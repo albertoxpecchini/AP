@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Alberto Pecchini">
+  <rect width="100" height="100" fill="#0066CC"/>
+  <circle cx="26" cy="39" r="8" fill="#FFFFFF"/>
+  <text x="53" y="57" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central"
+        font-family="'Titillium Web','Segoe UI',system-ui,Arial,sans-serif"
+        font-weight="700" font-size="66" letter-spacing="-3">ap</text>
+</svg>
