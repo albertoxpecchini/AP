@@ -255,8 +255,10 @@ export default function App() {
               <div className="col-lg-5">
                 <motion.img
                   {...fadeUp}
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=1100&fit=crop&auto=format"
+                  src="/alberto-pecchini.jpg"
                   alt="Ritratto di Alberto Pecchini"
+                  width={1050}
+                  height={1400}
                   className="img-fluid rounded shadow"
                   loading="lazy"
                 />
