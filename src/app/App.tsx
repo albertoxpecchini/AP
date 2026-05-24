@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
-  Github,
-  Linkedin,
   Mail,
   Phone,
   ChevronDown,
@@ -11,11 +9,51 @@ import {
   ArrowUpRight,
   Menu,
   X,
+  GraduationCap,
+  Download,
+  Bike,
+  Dumbbell,
+  Gamepad2,
+  Music,
+  Plane,
+  Cpu,
+  Palette,
+  Lightbulb,
+  Camera,
+  Car,
+  Film,
+  Mountain,
 } from "lucide-react";
+import {
+  SiInstagram,
+  SiTiktok,
+  SiFacebook,
+  SiX,
+  SiYoutube,
+  SiGithub,
+  SiWhatsapp,
+  SiTelegram,
+  SiDiscord,
+  SiSnapchat,
+  SiPinterest,
+  SiReddit,
+  SiTwitch,
+  SiSpotify,
+  SiThreads,
+  SiBehance,
+  SiDribbble,
+  SiFigma,
+  SiMedium,
+} from "react-icons/si";
+import { FaLinkedin } from "react-icons/fa6";
 
 const NAV_LINKS = [
   { href: "#chi-sono", label: "Chi sono" },
-  { href: "#progetti", label: "Progetti Web" },
+  { href: "#competenze", label: "Competenze" },
+  { href: "#curriculum", label: "Curriculum" },
+  { href: "#progetti", label: "Progetti" },
+  { href: "#hobby", label: "Hobby" },
+  { href: "#passioni", label: "Passioni" },
   { href: "#contatti", label: "Contatti" },
 ];
 
@@ -33,6 +71,71 @@ function WhatsAppIcon({ size = 20 }: { size?: number }) {
     </svg>
   );
 }
+
+// Social del footer. href "#" = profilo da fornire (verranno rimossi quelli non usati).
+const SOCIALS = [
+  { name: "Instagram", Icon: SiInstagram, href: "#" },
+  { name: "TikTok", Icon: SiTiktok, href: "#" },
+  { name: "Facebook", Icon: SiFacebook, href: "#" },
+  { name: "X (Twitter)", Icon: SiX, href: "#" },
+  { name: "YouTube", Icon: SiYoutube, href: "#" },
+  { name: "LinkedIn", Icon: FaLinkedin, href: "#" },
+  { name: "GitHub", Icon: SiGithub, href: "#" },
+  { name: "WhatsApp", Icon: SiWhatsapp, href: WHATSAPP_HREF },
+  { name: "Telegram", Icon: SiTelegram, href: "#" },
+  { name: "Discord", Icon: SiDiscord, href: "#" },
+  { name: "Snapchat", Icon: SiSnapchat, href: "#" },
+  { name: "Pinterest", Icon: SiPinterest, href: "#" },
+  { name: "Reddit", Icon: SiReddit, href: "#" },
+  { name: "Twitch", Icon: SiTwitch, href: "#" },
+  { name: "Spotify", Icon: SiSpotify, href: "#" },
+  { name: "Threads", Icon: SiThreads, href: "#" },
+  { name: "Behance", Icon: SiBehance, href: "#" },
+  { name: "Dribbble", Icon: SiDribbble, href: "#" },
+  { name: "Figma", Icon: SiFigma, href: "#" },
+  { name: "Medium", Icon: SiMedium, href: "#" },
+];
+
+const SKILLS = [
+  { title: "Sviluppo front-end", items: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"] },
+  { title: "Design & UX", items: ["UI/UX Design", "Figma", "Design System", "Bootstrap Italia", "Responsive Design"] },
+  { title: "Strumenti & Workflow", items: ["Git & GitHub", "Vite", "Vercel", "VS Code"] },
+  { title: "Area tecnica CAT", items: ["Disegno tecnico / CAD", "Topografia", "Progettazione edilizia", "Estimo"] },
+  { title: "Lingue", items: ["Italiano — madrelingua", "Inglese — intermedio"] },
+];
+
+const CV = [
+  {
+    period: "2021 — oggi",
+    title: "ITT «Carlo d'Arco» — Mantova",
+    role: "Diploma CAT · Costruzioni, Ambiente e Territorio (5º anno)",
+    desc: "Formazione tecnica su progettazione, disegno tecnico, topografia ed estimo.",
+  },
+  {
+    period: "2026",
+    title: "Rivalta sul Mincio — Sito web",
+    role: "Web design & sviluppo front-end",
+    desc: "Progettazione e sviluppo del sito responsive con Next.js, TypeScript, GSAP e Tailwind CSS.",
+  },
+];
+
+const HOBBY = [
+  { Icon: Bike, label: "Moto" },
+  { Icon: Dumbbell, label: "Sport" },
+  { Icon: Gamepad2, label: "Videogiochi" },
+  { Icon: Music, label: "Musica" },
+  { Icon: Plane, label: "Viaggi" },
+  { Icon: Cpu, label: "Tecnologia" },
+];
+
+const PASSIONI = [
+  { Icon: Palette, label: "Web design" },
+  { Icon: Lightbulb, label: "Innovazione digitale" },
+  { Icon: Camera, label: "Fotografia" },
+  { Icon: Car, label: "Motori" },
+  { Icon: Film, label: "Cinema" },
+  { Icon: Mountain, label: "Outdoor" },
+];
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
@@ -300,11 +403,72 @@ export default function App() {
           </div>
         </section>
 
+        <section id="competenze" className="py-5 my-lg-4 bg-light">
+          <div className="container">
+            <motion.div {...fadeUp} className="mb-5">
+              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
+                02 — Competenze e conoscenze
+              </p>
+              <h2 className="display-5 fw-bold mb-0">Cosa so fare</h2>
+            </motion.div>
+            <div className="row g-4">
+              {SKILLS.map((group) => (
+                <div className="col-md-6 col-lg-4" key={group.title}>
+                  <motion.div {...fadeUp} className="ap-skill-card h-100">
+                    <h3 className="h5 fw-bold mb-3">{group.title}</h3>
+                    <div className="d-flex flex-wrap gap-2">
+                      {group.items.map((item) => (
+                        <span key={item} className="chip chip-simple chip-primary">
+                          <span className="chip-label">{item}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="curriculum" className="py-5 my-lg-4 bg-white">
+          <div className="container">
+            <motion.div {...fadeUp} className="mb-5">
+              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
+                03 — Curriculum Vitae
+              </p>
+              <div className="d-flex flex-wrap justify-content-between align-items-end gap-3">
+                <h2 className="display-5 fw-bold mb-0">Formazione &amp; esperienze</h2>
+                <a
+                  href="/cv-alberto-pecchini.pdf"
+                  className="btn btn-outline-primary fw-semibold d-inline-flex align-items-center"
+                  download
+                >
+                  <Download size={18} className="me-2" aria-hidden="true" /> Scarica il CV (PDF)
+                </a>
+              </div>
+            </motion.div>
+            <div className="row">
+              <div className="col-lg-9">
+                <motion.div {...fadeUp} className="ap-timeline">
+                  {CV.map((item) => (
+                    <div className="ap-timeline-item" key={item.title}>
+                      <span className="ap-timeline-period">{item.period}</span>
+                      <h3 className="h5 fw-bold mb-1">{item.title}</h3>
+                      <p className="fw-semibold text-primary mb-2">{item.role}</p>
+                      <p className="text-muted mb-0">{item.desc}</p>
+                    </div>
+                  ))}
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="progetti" className="py-5 my-lg-4 bg-light">
           <div className="container">
             <motion.div {...fadeUp} className="mb-5">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                02 — Progetti Web
+                04 — Progetti Web
               </p>
               <h2 className="display-5 fw-bold mb-0">Il mio lavoro</h2>
             </motion.div>
@@ -352,11 +516,57 @@ export default function App() {
           </div>
         </section>
 
+        <section id="hobby" className="py-5 my-lg-4 bg-white">
+          <div className="container">
+            <motion.div {...fadeUp} className="mb-5">
+              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
+                05 — Hobby
+              </p>
+              <h2 className="display-5 fw-bold mb-0">Nel tempo libero</h2>
+            </motion.div>
+            <div className="row g-4">
+              {HOBBY.map(({ Icon, label }) => (
+                <div className="col-6 col-md-4 col-lg-2" key={label}>
+                  <motion.div {...fadeUp} className="ap-interest-card h-100">
+                    <span className="ap-interest-icon" aria-hidden="true">
+                      <Icon size={26} />
+                    </span>
+                    <span className="ap-interest-label">{label}</span>
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="passioni" className="py-5 my-lg-4 bg-light">
+          <div className="container">
+            <motion.div {...fadeUp} className="mb-5">
+              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
+                06 — Passioni
+              </p>
+              <h2 className="display-5 fw-bold mb-0">Cosa mi appassiona</h2>
+            </motion.div>
+            <div className="row g-4">
+              {PASSIONI.map(({ Icon, label }) => (
+                <div className="col-6 col-md-4 col-lg-2" key={label}>
+                  <motion.div {...fadeUp} className="ap-interest-card h-100">
+                    <span className="ap-interest-icon" aria-hidden="true">
+                      <Icon size={26} />
+                    </span>
+                    <span className="ap-interest-label">{label}</span>
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="contatti" className="py-5 bg-primary text-white">
           <div className="container text-center">
             <motion.div {...fadeUp}>
               <p className="ap-kicker text-uppercase fw-semibold mb-3" style={{ opacity: 0.85 }}>
-                03 — Contatti
+                07 — Contatti
               </p>
               <h2 className="display-5 fw-bold mb-4">Parliamone.</h2>
               <p className="lead mb-4 mx-auto" style={{ maxWidth: "40rem" }}>
@@ -386,26 +596,6 @@ export default function App() {
                   <Phone size={20} className="me-2" aria-hidden="true" /> Chiamami
                 </a>
               </div>
-              <div className="d-flex justify-content-center gap-3">
-                <a
-                  href="https://github.com/"
-                  className="ap-social"
-                  aria-label="Profilo GitHub"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <Github size={24} aria-hidden="true" />
-                </a>
-                <a
-                  href="https://www.linkedin.com/"
-                  className="ap-social"
-                  aria-label="Profilo LinkedIn"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <Linkedin size={24} aria-hidden="true" />
-                </a>
-              </div>
             </motion.div>
           </div>
         </section>
@@ -414,20 +604,39 @@ export default function App() {
       <footer className="it-footer">
         <div className="it-footer-main">
           <div className="container">
-            <div className="row align-items-center py-4">
-              <div className="col-12 col-md-6">
+            <div className="row py-4 gy-4">
+              <div className="col-12 col-lg-4">
                 <h2 className="h4 fw-bold mb-1">Alberto Pecchini</h2>
                 <p className="mb-0" style={{ opacity: 0.8 }}>
                   Designer &amp; Developer · ITT «Carlo d'Arco» — Mantova
                 </p>
               </div>
-              <div className="col-12 col-md-6 text-md-end mt-3 mt-md-0">
-                <p className="mb-1" style={{ opacity: 0.8 }}>
-                  Aggiornato il {currentDate}
+              <div className="col-12 col-lg-8">
+                <p className="text-uppercase fw-semibold mb-3" style={{ letterSpacing: "0.12em", opacity: 0.85 }}>
+                  Seguimi sui social
                 </p>
-                <p className="mb-0 small" style={{ opacity: 0.6 }}>
-                  © {currentYear} Alberto Pecchini — Tutti i diritti riservati
-                </p>
+                <div className="d-flex flex-wrap gap-2">
+                  {SOCIALS.map(({ name, Icon, href }) => (
+                    <a
+                      key={name}
+                      href={href}
+                      className="ap-social ap-social--sm"
+                      aria-label={name}
+                      title={name}
+                      {...(href !== "#" ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+                    >
+                      <Icon size={18} aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="row border-top pt-3 pb-4" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
+              <div className="col-12 col-md-6 small" style={{ opacity: 0.7 }}>
+                © {currentYear} Alberto Pecchini — Tutti i diritti riservati
+              </div>
+              <div className="col-12 col-md-6 text-md-end small" style={{ opacity: 0.7 }}>
+                Aggiornato il {currentDate}
               </div>
             </div>
           </div>
@@ -545,15 +754,104 @@ export default function App() {
           color: #ffffff;
           transform: translateY(-2px);
         }
+        .ap-social--sm {
+          width: 40px;
+          height: 40px;
+        }
+
+        /* Card competenze */
+        .ap-skill-card {
+          background: #ffffff;
+          border: 1px solid rgba(0, 102, 204, 0.12);
+          border-radius: 8px;
+          padding: 1.5rem;
+        }
+
+        /* Timeline curriculum */
+        .ap-timeline {
+          position: relative;
+          padding-left: 2rem;
+        }
+        .ap-timeline::before {
+          content: "";
+          position: absolute;
+          left: 7px;
+          top: 6px;
+          bottom: 6px;
+          width: 2px;
+          background: rgba(0, 102, 204, 0.25);
+        }
+        .ap-timeline-item {
+          position: relative;
+          padding-bottom: 2rem;
+        }
+        .ap-timeline-item:last-child {
+          padding-bottom: 0;
+        }
+        .ap-timeline-item::before {
+          content: "";
+          position: absolute;
+          left: -2rem;
+          top: 4px;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #06c;
+          border: 3px solid #ffffff;
+          box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
+        }
+        .ap-timeline-period {
+          display: inline-block;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #06c;
+          margin-bottom: 0.25rem;
+        }
+
+        /* Card hobby / passioni */
+        .ap-interest-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          padding: 1.75rem 1rem;
+          background: #ffffff;
+          border: 1px solid rgba(0, 102, 204, 0.12);
+          border-radius: 8px;
+          text-align: center;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .ap-interest-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        .ap-interest-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: rgba(0, 102, 204, 0.1);
+          color: #06c;
+        }
+        .ap-interest-label {
+          font-weight: 600;
+        }
 
         @media (prefers-reduced-motion: reduce) {
           .ap-project-card,
           .ap-social,
+          .ap-interest-card,
           .ap-navbar {
             transition: none;
           }
           .ap-project-card:hover,
           .ap-project-card:focus-within,
+          .ap-interest-card:hover,
           .ap-social:hover {
             transform: none;
           }
