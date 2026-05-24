@@ -1,0 +1,19 @@
+# Dipendenze
+node_modules
+
+# Output di build (Vercel lo rigenera)
+dist
+
+# Vercel
+.vercel
+
+# Strumenti locali / editor
+.claude
+*.local
+.DS_Store
+Thumbs.db
+
+# Log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

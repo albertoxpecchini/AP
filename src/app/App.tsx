@@ -1,915 +1,516 @@
-import { useRef, useState, useEffect } from "react";
-import { motion, useInView } from "motion/react";
-import { Github, Linkedin, Mail, ExternalLink, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import {
+  Github,
+  Linkedin,
+  Mail,
+  Phone,
+  ChevronDown,
+  Code2,
+  MapPin,
+  ArrowUpRight,
+  Menu,
+  X,
+} from "lucide-react";
 
-const PRIMARY = "#5B6FA8";
-const ACCENT = "#8FA7C8";
-const SOFT = "#A8B8C8";
-
-const skills = [
-  {
-    category: "Disegno Tecnico & CAD",
-    items: [
-      { name: "AutoCAD", level: 88 },
-      { name: "Revit BIM", level: 80 },
-      { name: "SketchUp", level: 76 },
-      { name: "Disegno a mano libera", level: 84 },
-    ],
-  },
-  {
-    category: "Materie Tecniche",
-    items: [
-      { name: "Topografia", level: 85 },
-      { name: "Estimo", level: 78 },
-      { name: "Progettazione", level: 82 },
-      { name: "Matematica", level: 80 },
-    ],
-  },
-  {
-    category: "Altro",
-    items: [
-      { name: "Fotografia", level: 75 },
-      { name: "Microsoft Office", level: 88 },
-      { name: "Italiano & Comunicazione", level: 90 },
-      { name: "Inglese Tecnico", level: 72 },
-    ],
-  },
+const NAV_LINKS = [
+  { href: "#chi-sono", label: "Chi sono" },
+  { href: "#progetti", label: "Progetti Web" },
+  { href: "#contatti", label: "Contatti" },
 ];
-
-const projects = [
-  {
-    num: "01",
-    title: "Progetto di Riqualificazione Urbana",
-    description:
-      "Piano di intervento per il recupero di un'area industriale dismessa nel centro di Mantova. Rilievo sul campo, planimetrie in AutoCAD e relazione tecnica completa.",
-    tags: ["AutoCAD", "Rilievo", "Urbanistica"],
-    year: "2025",
-    color: PRIMARY,
-  },
-  {
-    num: "02",
-    title: "Modello BIM Edificio Residenziale",
-    description:
-      "Realizzazione di un modello parametrico tridimensionale di un edificio a tre piani con Revit. Tavole architettoniche, computo metrico estimativo e simulazione energetica.",
-    tags: ["Revit", "BIM", "Estimo"],
-    year: "2024",
-    color: "#7A8FAF",
-  },
-  {
-    num: "03",
-    title: "Rilievo Topografico del Territorio",
-    description:
-      "Campagna di rilievo con stazione totale e GPS differenziale in zona periurbana. Elaborazione dati, restituzione cartografica e relazione finale con elaborati grafici.",
-    tags: ["Topografia", "GIS", "Stazione Totale"],
-    year: "2024",
-    color: "#8FA7C8",
-  },
-  {
-    num: "04",
-    title: "Valutazione Immobiliare — Estimo",
-    description:
-      "Perizia estimativa di un compendio agricolo con metodo di comparazione di mercato. Analisi del territorio, indagine catastale e redazione del rapporto di stima.",
-    tags: ["Estimo", "Catasto", "Relazione"],
-    year: "2024",
-    color: "#A0B4C4",
-  },
-];
-
-const stats = [
-  { label: "Media Voti", raw: 85, display: "8.5", suffix: "/10", decimal: true },
-  { label: "Progetti Tecnici", raw: 14, display: "14", suffix: "+", decimal: false },
-  { label: "Ore di Disegno", raw: 600, display: "600", suffix: "h", decimal: false },
-  { label: "Anni di Percorso", raw: 5, display: "5", suffix: "°", decimal: false },
-];
-
-const interests = [
-  "Architettura Sostenibile",
-  "Fotografia di Architettura",
-  "Modellazione 3D",
-  "Paesaggistica",
-  "Storia dell'Arte",
-  "Topografia Avanzata",
-  "Design Urbano",
-  "Edilizia Green",
-];
-
-function AnimatedName({ name, delay = 0 }: { name: string; delay?: number }) {
-  const chars = name.split("");
-  return (
-    <div className="overflow-hidden flex flex-wrap justify-center">
-      {chars.map((char, i) => (
-        <motion.span
-          key={i}
-          initial={{ y: "105%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{
-            duration: 0.8,
-            delay: delay + i * 0.035,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="inline-block"
-        >
-          {char === " " ? " " : char}
-        </motion.span>
-      ))}
-    </div>
-  );
-}
-
-function StatCounter({
-  raw,
-  suffix,
-  label,
-  active,
-  decimal,
-}: {
-  raw: number;
-  suffix: string;
-  label: string;
-  active: boolean;
-  decimal: boolean;
-}) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!active) return;
-    const duration = 1800;
-    const step = raw / (duration / 16);
-    let current = 0;
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= raw) {
-        setCount(raw);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [raw, active]);
-
-  const displayed = active
-    ? decimal
-      ? (count / 10).toFixed(1)
-      : count
-    : decimal
-    ? "0.0"
-    : "0";
-
-  return (
-    <div className="border-l-2 pl-5" style={{ borderColor: PRIMARY }}>
-      <div
-        className="font-display text-3xl lg:text-4xl font-semibold"
-        style={{ color: PRIMARY }}
-      >
-        {displayed}
-        {suffix}
-      </div>
-      <div
-        className="font-mono text-xs mt-1 uppercase tracking-wider"
-        style={{ color: "var(--muted-foreground)", fontFamily: "'DM Mono', monospace" }}
-      >
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function SkillBar({ name, level, delay }: { name: string; level: number; delay: number }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-
-  return (
-    <div ref={ref} className="mb-5">
-      <div className="flex justify-between mb-2">
-        <span
-          className="font-mono text-xs tracking-wider"
-          style={{ color: "var(--muted-foreground)", fontFamily: "'DM Mono', monospace" }}
-        >
-          {name}
-        </span>
-        <span
-          className="font-mono text-xs"
-          style={{ color: PRIMARY, fontFamily: "'DM Mono', monospace" }}
-        >
-          {level}%
-        </span>
-      </div>
-      <div
-        className="h-px overflow-hidden rounded-full"
-        style={{ background: "rgba(92, 111, 168, 0.12)" }}
-      >
-        <motion.div
-          initial={{ width: 0 }}
-          animate={inView ? { width: `${level}%` } : { width: 0 }}
-          transition={{ duration: 1.4, delay, ease: [0.22, 1, 0.36, 1] }}
-          className="h-full rounded-full"
-          style={{ background: `linear-gradient(90deg, ${PRIMARY}, ${ACCENT})` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function FadeSection({
-  children,
-  className = "",
-  id = "",
-  style,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  id?: string;
-  style?: React.CSSProperties;
-}) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
-  return (
-    <section id={id} style={style}>
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 44 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className={className}
-      >
-        {children}
-      </motion.div>
-    </section>
-  );
-}
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const statsRef = useRef(null);
-  const statsInView = useInView(statsRef, { once: true, margin: "-100px" });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  const now = new Date();
+  const currentDate = now.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" });
+  const currentYear = now.getFullYear();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 60);
-      const total = document.body.scrollHeight - window.innerHeight;
-      setScrollProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 60);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
-    { label: "Chi Sono", href: "#chi-sono" },
-    { label: "Competenze", href: "#competenze" },
-    { label: "Progetti", href: "#progetti" },
-    { label: "Contatti", href: "#contatti" },
-  ];
+  // Lock body scroll while the mobile menu overlay is open.
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
+
+  // Respect prefers-reduced-motion: no entrance transforms when the user opts out.
+  const fadeUp = reduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 32 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, amount: 0.25 },
+        transition: { duration: 0.7, ease: "easeOut" },
+      };
 
   return (
-    <div
-      className="min-h-screen bg-background text-foreground overflow-x-hidden"
-      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-    >
-      {/* Scroll progress */}
-      <div
-        className="fixed top-0 left-0 h-[2px] z-[100] pointer-events-none transition-none"
-        style={{
-          width: `${scrollProgress}%`,
-          background: `linear-gradient(90deg, ${PRIMARY}, ${ACCENT})`,
-        }}
-      />
+    <div className="it-page-wrapper">
+      {/* Skiplinks — requisito di accessibilità del Design System */}
+      <div className="skiplinks">
+        <a className="visually-hidden-focusable" href="#main-content">
+          Vai al contenuto principale
+        </a>
+        <a className="visually-hidden-focusable" href="#contatti">
+          Vai ai contatti
+        </a>
+      </div>
 
-      {/* Navbar */}
-      <nav
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-        style={
-          scrolled
-            ? {
-                backdropFilter: "blur(18px)",
-                background: "rgba(247, 245, 240, 0.88)",
-                borderBottom: "1px solid rgba(92, 111, 168, 0.12)",
-              }
-            : {}
-        }
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-5 flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="font-mono text-xs tracking-[0.3em] uppercase"
-            style={{ color: PRIMARY, fontFamily: "'DM Mono', monospace" }}
-          >
-            AP<span className="opacity-30 mx-2">—</span>CAT 5°
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="hidden md:flex items-center gap-10"
-          >
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="font-mono text-xs tracking-[0.2em] uppercase transition-colors duration-300"
-                style={{
-                  fontFamily: "'DM Mono', monospace",
-                  color: "var(--muted-foreground)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
-              >
-                {link.label}
-              </a>
-            ))}
-          </motion.div>
-        </div>
-      </nav>
-
-      {/* ── HERO ── */}
-      <section
-        id="home"
-        className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-        style={{ background: "#F7F5F0" }}
-      >
-        {/* Soft ambient layers */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="blob blob-1" />
-          <div className="blob blob-2" />
-          <div className="blob blob-3" />
-          <div className="grid-light" />
-        </div>
-
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 18, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="inline-flex items-center gap-3 mb-10 px-6 py-2.5 rounded-full"
-            style={{
-              border: `1px solid rgba(92, 111, 168, 0.25)`,
-              background: "rgba(92, 111, 168, 0.06)",
-            }}
-          >
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ background: PRIMARY }}
-            />
-            <span
-              className="font-mono text-[11px] tracking-[0.25em] uppercase"
-              style={{ color: PRIMARY, fontFamily: "'DM Mono', monospace" }}
-            >
-              ITT Carlo d'Arco · Sezione CAT · Classe 5ª
-            </span>
-          </motion.div>
-
-          {/* Name */}
-          <h1
-            className="font-display font-semibold leading-none tracking-tight mb-2"
-            style={{
-              fontFamily: "'Fraunces', serif",
-              fontSize: "clamp(3.2rem, 10vw, 8.5rem)",
-              color: "#1C1A17",
-            }}
-          >
-            <AnimatedName name="Alberto" delay={0.2} />
-          </h1>
-          <h1
-            className="font-display font-semibold leading-none tracking-tight mb-10"
-            style={{
-              fontFamily: "'Fraunces', serif",
-              fontSize: "clamp(3.2rem, 10vw, 8.5rem)",
-              color: PRIMARY,
-            }}
-          >
-            <AnimatedName name="Pecchini" delay={0.55} />
-          </h1>
-
-          {/* Divider line */}
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ duration: 0.7, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            className="w-16 h-px mx-auto mb-10 origin-center"
-            style={{ background: `linear-gradient(90deg, transparent, ${PRIMARY}, transparent)` }}
-          />
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
-            className="text-lg md:text-xl max-w-md mx-auto mb-14 leading-relaxed font-light"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            Studente di Costruzioni, Ambiente e Territorio.{" "}
-            <em
-              className="not-italic"
-              style={{ color: PRIMARY }}
-            >
-              Progetto spazi, misuro il territorio, costruisco il futuro.
-            </em>
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.55, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-5"
-          >
-            <a
-              href="#progetti"
-              className="relative px-10 py-3.5 text-sm font-medium overflow-hidden group rounded-sm transition-colors duration-300"
-              style={{ background: PRIMARY, color: "#fff" }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#4A5E97")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = PRIMARY)}
-            >
-              Vedi Progetti
-            </a>
-            <a
-              href="#contatti"
-              className="text-sm font-medium transition-colors duration-300"
-              style={{ color: "var(--muted-foreground)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
-            >
-              Contattami <span style={{ color: PRIMARY }}>→</span>
-            </a>
-          </motion.div>
-        </div>
-
-        {/* Scroll hint */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 2.1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span
-            className="font-mono text-[10px] tracking-[0.3em] uppercase"
-            style={{ color: "var(--muted-foreground)", fontFamily: "'DM Mono', monospace" }}
-          >
-            Scorri
-          </span>
-          <motion.div
-            animate={{ y: [0, 7, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <ChevronDown size={14} style={{ color: "var(--muted-foreground)" }} />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ── CHI SONO ── */}
-      <FadeSection
-        id="chi-sono"
-        className="py-32 px-6"
-        style={{ background: "#FFFFFF" }}
-      >
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 lg:gap-28 items-center">
-          {/* Photo */}
-          <div className="relative">
-            <div className="relative overflow-hidden rounded-sm" style={{ aspectRatio: "4/5" }}>
-              <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=750&fit=crop&auto=format"
-                alt="Alberto Pecchini, studente CAT"
-                className="w-full h-full object-cover"
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: "linear-gradient(to top, rgba(247,245,240,0.4) 0%, transparent 60%)",
-                }}
-              />
-            </div>
-            {/* Frame */}
-            <div
-              className="absolute -top-4 -left-4 w-full h-full pointer-events-none rounded-sm"
-              style={{ border: `1px solid rgba(92, 111, 168, 0.2)` }}
-            />
-            {/* Badge anno */}
-            <div
-              className="absolute bottom-6 left-6 px-4 py-2 font-mono text-xs tracking-widest rounded-sm"
-              style={{
-                background: PRIMARY,
-                color: "#fff",
-                fontFamily: "'DM Mono', monospace",
-              }}
-            >
-              2020 — 2025
-            </div>
-          </div>
-
-          {/* Text */}
-          <div>
-            <div
-              className="font-mono text-xs tracking-[0.3em] uppercase mb-6"
-              style={{ color: PRIMARY, fontFamily: "'DM Mono', monospace" }}
-            >
-              01 — Chi Sono
-            </div>
-            <h2
-              className="font-display font-semibold leading-tight mb-8"
-              style={{
-                fontFamily: "'Fraunces', serif",
-                fontSize: "clamp(2rem, 4vw, 3.2rem)",
-                color: "#1C1A17",
-              }}
-            >
-              Guardo il territorio{" "}
-              <span style={{ color: PRIMARY }}>con occhi</span>
-              <br />
-              da progettista.
-            </h2>
-            <p className="leading-relaxed mb-5" style={{ color: "var(--muted-foreground)" }}>
-              Mi chiamo Alberto Pecchini, ho 19 anni e frequento il quinto anno
-              della sezione CAT all'Istituto Tecnico Tecnologico{" "}
-              <span className="text-foreground font-medium">"Carlo d'Arco"</span> di Mantova.
-            </p>
-            <p className="leading-relaxed mb-12" style={{ color: "var(--muted-foreground)" }}>
-              Nel mio percorso ho imparato a leggere e disegnare il territorio, a
-              valutare immobili, a redigere progetti edilizi e a usare strumenti
-              professionali come AutoCAD e Revit. La mia passione è trasformare
-              dati tecnici in{" "}
-              <span className="text-foreground font-medium">spazi reali e vivibili</span>.
-            </p>
-
-            {/* Stats */}
-            <div ref={statsRef} className="grid grid-cols-2 gap-8">
-              {stats.map((s) => (
-                <StatCounter
-                  key={s.label}
-                  raw={s.raw}
-                  suffix={s.suffix}
-                  label={s.label}
-                  active={statsInView}
-                  decimal={s.decimal}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </FadeSection>
-
-      {/* ── COMPETENZE ── */}
-      <FadeSection
-        id="competenze"
-        className="py-32 px-6"
-        style={{ background: "#F7F5F0", borderTop: "1px solid rgba(92,111,168,0.1)" }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-20">
-            <div
-              className="font-mono text-xs tracking-[0.3em] uppercase mb-5"
-              style={{ color: PRIMARY, fontFamily: "'DM Mono', monospace" }}
-            >
-              02 — Competenze
-            </div>
-            <h2
-              className="font-display font-semibold leading-none"
-              style={{
-                fontFamily: "'Fraunces', serif",
-                fontSize: "clamp(2.5rem, 6vw, 5rem)",
-                color: "#1C1A17",
-              }}
-            >
-              Cosa so fare
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12 lg:gap-16 mb-20">
-            {skills.map((cat, ci) => (
-              <div key={cat.category}>
-                <div
-                  className="font-mono text-[10px] tracking-[0.3em] uppercase mb-6 pb-3"
-                  style={{
-                    color: "var(--muted-foreground)",
-                    fontFamily: "'DM Mono', monospace",
-                    borderBottom: `1px solid rgba(92, 111, 168, 0.15)`,
-                  }}
-                >
-                  {cat.category}
-                </div>
-                {cat.items.map((skill, si) => (
-                  <SkillBar
-                    key={skill.name}
-                    name={skill.name}
-                    level={skill.level}
-                    delay={si * 0.1 + ci * 0.06}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-
-          {/* Interest tags */}
-          <div className="flex flex-wrap gap-3">
-            {interests.map((tag, i) => (
-              <motion.span
-                key={tag}
-                initial={{ opacity: 0, scale: 0.92 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="px-5 py-2 font-mono text-xs tracking-wider rounded-full border cursor-default transition-all duration-300"
-                style={{
-                  fontFamily: "'DM Mono', monospace",
-                  borderColor: "rgba(92, 111, 168, 0.2)",
-                  color: "var(--muted-foreground)",
-                  background: "transparent",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = PRIMARY;
-                  (e.currentTarget as HTMLElement).style.color = PRIMARY;
-                  (e.currentTarget as HTMLElement).style.background = "rgba(92,111,168,0.06)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(92, 111, 168, 0.2)";
-                  (e.currentTarget as HTMLElement).style.color = "var(--muted-foreground)";
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-                }}
-              >
-                {tag}
-              </motion.span>
-            ))}
-          </div>
-        </div>
-      </FadeSection>
-
-      {/* ── PROGETTI ── */}
-      <section
-        id="progetti"
-        className="py-32 px-6"
-        style={{ background: "#FFFFFF", borderTop: "1px solid rgba(92,111,168,0.1)" }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-20"
-          >
-            <div
-              className="font-mono text-xs tracking-[0.3em] uppercase mb-5"
-              style={{ color: PRIMARY, fontFamily: "'DM Mono', monospace" }}
-            >
-              03 — Progetti
-            </div>
-            <h2
-              className="font-display font-semibold leading-none"
-              style={{
-                fontFamily: "'Fraunces', serif",
-                fontSize: "clamp(2.5rem, 6vw, 5rem)",
-                color: "#1C1A17",
-              }}
-            >
-              Il mio lavoro
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-5">
-            {projects.map((project, i) => (
-              <motion.div
-                key={project.title}
-                initial={{ opacity: 0, y: 36 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -4 }}
-                className="group relative p-8 border rounded-sm overflow-hidden cursor-pointer transition-all duration-500"
-                style={{
-                  borderColor: "rgba(92, 111, 168, 0.14)",
-                  background: "#FAFAF8",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = `rgba(92,111,168,0.35)`;
-                  (e.currentTarget as HTMLElement).style.boxShadow = `0 12px 40px rgba(92,111,168,0.1)`;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(92,111,168,0.14)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                }}
-              >
-                {/* Soft glow on hover */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(circle at 0% 0%, rgba(92,111,168,0.05) 0%, transparent 70%)`,
-                  }}
-                />
-
-                <div className="flex items-start justify-between mb-8">
-                  <span
-                    className="font-display font-semibold text-5xl leading-none opacity-15"
-                    style={{ color: project.color, fontFamily: "'Fraunces', serif" }}
-                  >
-                    {project.num}
+      <header className="it-header-wrapper">
+        {/* Header slim: ruolo + recapiti */}
+        <div className="it-header-slim-wrapper theme-dark">
+          <div className="container">
+            <div className="row">
+              <div className="col-12">
+                <div className="it-header-slim-wrapper-content">
+                  <span className="d-none d-lg-block navbar-brand">
+                    Disponibile per web design, sviluppo front-end e branding
                   </span>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="font-mono text-xs"
-                      style={{ color: "var(--muted-foreground)", fontFamily: "'DM Mono', monospace" }}
+                  <div className="it-header-slim-right-zone">
+                    <a
+                      href="mailto:alberto.pecchini@studente.it"
+                      className="text-white text-decoration-none d-flex align-items-center me-3"
                     >
-                      {project.year}
-                    </span>
-                    <ExternalLink
-                      size={13}
-                      className="opacity-30 group-hover:opacity-80 transition-opacity"
-                      style={{ color: project.color }}
-                    />
+                      <Mail size={16} className="me-1" aria-hidden="true" />
+                      <span className="d-none d-md-inline">alberto.pecchini@studente.it</span>
+                      <span className="d-md-none visually-hidden">Email</span>
+                    </a>
+                    <a
+                      href="tel:+390123456789"
+                      className="text-white text-decoration-none d-flex align-items-center"
+                    >
+                      <Phone size={16} className="me-1" aria-hidden="true" />
+                      <span className="d-none d-md-inline">+39 0123 456 789</span>
+                      <span className="d-md-none visually-hidden">Telefono</span>
+                    </a>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <h3
-                  className="font-display font-semibold mb-4 leading-snug"
-                  style={{
-                    fontFamily: "'Fraunces', serif",
-                    fontSize: "clamp(1.05rem, 2vw, 1.2rem)",
-                    color: "#1C1A17",
-                  }}
-                >
-                  {project.title}
-                </h3>
-                <p
-                  className="text-sm leading-relaxed mb-8"
-                  style={{ color: "var(--muted-foreground)" }}
-                >
-                  {project.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 font-mono text-[11px] tracking-wider rounded-full"
-                      style={{
-                        background: `rgba(92,111,168,0.08)`,
-                        color: project.color,
-                        fontFamily: "'DM Mono', monospace",
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
+        <div className="it-nav-wrapper">
+          {/* Header center: marchio */}
+          <div className="it-header-center-wrapper theme-dark">
+            <div className="container">
+              <div className="row">
+                <div className="col-12">
+                  <div className="it-header-center-content-wrapper">
+                    <div className="it-brand-wrapper">
+                      <a href="#home" aria-label="Alberto Pecchini, torna alla home">
+                        <span className="ap-brand-mark" aria-hidden="true">
+                          <Code2 size={26} />
+                        </span>
+                        <div className="it-brand-text">
+                          <div className="it-brand-title">Alberto Pecchini</div>
+                          <div className="it-brand-tagline d-none d-md-block">
+                            Designer &amp; Front-end Developer
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <div className="it-right-zone">
+                      <span className="d-none d-lg-flex align-items-center text-white">
+                        <MapPin size={18} className="me-1" aria-hidden="true" /> Mantova · Italia
+                      </span>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Bottom accent */}
-                <div
-                  className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 rounded-full"
-                  style={{ background: `linear-gradient(90deg, ${project.color}, transparent)` }}
-                />
-              </motion.div>
-            ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* ── CONTATTI ── */}
-      <FadeSection
-        id="contatti"
-        className="py-32 px-6 text-center"
-        style={{ background: "#F7F5F0", borderTop: "1px solid rgba(92,111,168,0.1)" }}
-      >
-        <div className="max-w-xl mx-auto">
+          {/* Navbar principale (sticky) */}
           <div
-            className="font-mono text-xs tracking-[0.3em] uppercase mb-6"
-            style={{ color: PRIMARY, fontFamily: "'DM Mono', monospace" }}
+            className={`it-header-navbar-wrapper theme-dark theme-dark-mobile ap-navbar ${scrolled ? "ap-navbar--scrolled" : ""}`}
           >
-            04 — Contatti
-          </div>
-          <h2
-            className="font-display font-semibold leading-none mb-8"
-            style={{
-              fontFamily: "'Fraunces', serif",
-              fontSize: "clamp(3rem, 8vw, 6rem)",
-              color: "#1C1A17",
-            }}
-          >
-            Parliamo
-            <span style={{ color: PRIMARY }}>.</span>
-          </h2>
-          <p
-            className="text-lg leading-relaxed mb-14"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            Per collaborazioni, domande sul mio percorso scolastico o semplicemente
-            per uno scambio di idee — sono disponibile.
-          </p>
+            <div className="container">
+              <div className="row">
+                <div className="col-12">
+                  <nav className="navbar navbar-expand-lg" aria-label="Navigazione principale">
+                    <button
+                      className="custom-navbar-toggler"
+                      type="button"
+                      aria-controls="nav-main"
+                      aria-expanded={menuOpen}
+                      aria-label="Apri il menu di navigazione"
+                      onClick={() => setMenuOpen(true)}
+                    >
+                      <Menu aria-hidden="true" />
+                    </button>
 
-          <a
-            href="mailto:alberto.pecchini@studente.it"
-            className="inline-flex items-center gap-3 px-12 py-4 text-sm font-medium rounded-sm transition-all duration-300"
-            style={{ background: PRIMARY, color: "#fff" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#4A5E97";
-              (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 30px rgba(92,111,168,0.25)`;
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = PRIMARY;
-              (e.currentTarget as HTMLElement).style.boxShadow = "none";
-            }}
-          >
-            <Mail size={15} />
-            Scrivimi
-          </a>
-
-          <div className="mt-12 flex items-center justify-center gap-10">
-            {[
-              { Icon: Github, label: "GitHub", href: "#" },
-              { Icon: Linkedin, label: "LinkedIn", href: "#" },
-            ].map(({ Icon, label, href }) => (
-              <a
-                key={label}
-                href={href}
-                className="flex items-center gap-2 font-mono text-xs tracking-[0.2em] uppercase transition-colors duration-300"
-                style={{
-                  fontFamily: "'DM Mono', monospace",
-                  color: "var(--muted-foreground)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
-              >
-                <Icon size={14} />
-                {label}
-              </a>
-            ))}
+                    <div className={`navbar-collapsable ${menuOpen ? "expanded" : ""}`} id="nav-main">
+                      <div className="overlay" onClick={closeMenu} />
+                      <div className="close-div">
+                        <button
+                          className="btn close-menu"
+                          type="button"
+                          aria-label="Chiudi il menu di navigazione"
+                          onClick={closeMenu}
+                        >
+                          <X aria-hidden="true" />
+                        </button>
+                      </div>
+                      <div className="menu-wrapper">
+                        <ul className="navbar-nav">
+                          {NAV_LINKS.map((link) => (
+                            <li className="nav-item" key={link.href}>
+                              <a className="nav-link" href={link.href} onClick={closeMenu}>
+                                <span>{link.label}</span>
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </nav>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </FadeSection>
+      </header>
 
-      {/* Footer */}
-      <footer
-        className="py-8 px-6"
-        style={{ background: "#FFFFFF", borderTop: "1px solid rgba(92,111,168,0.1)" }}
-      >
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-          <span
-            className="font-mono text-xs tracking-widest"
-            style={{ color: "var(--muted-foreground)", fontFamily: "'DM Mono', monospace" }}
-          >
-            © 2025 Alberto Pecchini
-          </span>
-          <span
-            className="font-mono text-xs tracking-widest"
-            style={{ color: "var(--muted-foreground)", fontFamily: "'DM Mono', monospace" }}
-          >
-            ITT "Carlo d'Arco" · Sezione CAT · Mantova
-          </span>
+      <main id="main-content">
+        <section
+          id="home"
+          className="ap-hero bg-primary text-white d-flex align-items-center"
+        >
+          <div className="container position-relative" style={{ zIndex: 1 }}>
+            <motion.div
+              initial={reduceMotion ? false : { opacity: 0, y: 40 }}
+              animate={reduceMotion ? {} : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <p className="ap-kicker text-uppercase fw-semibold mb-3">
+                Studente CAT · Front-end Developer
+              </p>
+              <h1 className="display-1 fw-bold mb-4" style={{ maxWidth: "12ch" }}>
+                Alberto Pecchini
+              </h1>
+              <p className="lead mb-4" style={{ maxWidth: "44rem" }}>
+                Creo esperienze digitali eleganti con un approccio moderno e funzionale.
+                Web design, sviluppo e animazioni curate per ogni schermo.
+              </p>
+              <div className="d-flex flex-column flex-sm-row gap-3">
+                <a href="#progetti" className="btn btn-light btn-lg fw-semibold text-primary">
+                  Vedi i progetti
+                </a>
+                <a href="#contatti" className="btn btn-outline-light btn-lg fw-semibold">
+                  Contattami
+                </a>
+              </div>
+            </motion.div>
+          </div>
+
+          {!reduceMotion && (
+            <div className="ap-scroll-hint" aria-hidden="true">
+              <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 1.6, repeat: Infinity }}>
+                <ChevronDown size={32} />
+              </motion.div>
+            </div>
+          )}
+        </section>
+
+        <section id="chi-sono" className="py-5 my-lg-4 bg-white">
+          <div className="container">
+            <div className="row align-items-center gy-5">
+              <div className="col-lg-5">
+                <motion.img
+                  {...fadeUp}
+                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=1100&fit=crop&auto=format"
+                  alt="Ritratto di Alberto Pecchini"
+                  className="img-fluid rounded shadow"
+                  loading="lazy"
+                />
+              </div>
+              <div className="col-lg-7">
+                <motion.div {...fadeUp}>
+                  <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
+                    01 — Chi sono
+                  </p>
+                  <h2 className="display-5 fw-bold mb-4">
+                    Creo esperienze digitali pulite ed eleganti.
+                  </h2>
+                  <p className="fs-5 text-muted">
+                    Mi chiamo Alberto Pecchini, ho 19 anni e frequento il quinto anno della
+                    sezione CAT all'Istituto Tecnico Tecnologico <strong>«Carlo d'Arco»</strong> di
+                    Mantova.
+                  </p>
+                  <p className="fs-5 text-muted">
+                    Sono uno sviluppatore web e designer appassionato di user experience e design
+                    minimalista. Utilizzo Next.js, TypeScript, GSAP e Tailwind CSS per creare siti
+                    web responsivi, veloci e raffinati.
+                  </p>
+                  <p className="fs-5 text-muted mb-0">
+                    La mia missione è trasformare le idee in{" "}
+                    <strong>esperienze digitali memorabili</strong>, mantenendo un design pulito,
+                    una tipografia curata e animazioni che valorizzano i contenuti.
+                  </p>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="progetti" className="py-5 my-lg-4 bg-light">
+          <div className="container">
+            <motion.div {...fadeUp} className="mb-5">
+              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
+                02 — Progetti Web
+              </p>
+              <h2 className="display-5 fw-bold mb-0">Il mio lavoro</h2>
+            </motion.div>
+
+            <div className="row">
+              <div className="col-12 col-lg-8">
+                <motion.div {...fadeUp} className="card-wrapper">
+                  <div className="it-card it-card-bg rounded shadow ap-project-card">
+                    <div className="it-card-body">
+                      <div className="category-top d-flex justify-content-between align-items-center">
+                        <span className="category">Sito web istituzionale</span>
+                        <span className="data">{currentYear}</span>
+                      </div>
+                      <h3 className="it-card-title h2 fw-bold">
+                        <a
+                          className="text-decoration-none stretched-link"
+                          href="https://rivaltasulmincio.it"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                        >
+                          Rivalta sul Mincio
+                          <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
+                        </a>
+                      </h3>
+                      <p className="it-card-text fs-5">
+                        Sito web responsive per la località turistica di Rivalta sul Mincio.
+                        Design minimalista con tipografia editoriale, palette calda monocromatica,
+                        griglie bento gapless, animazioni GSAP ScrollTrigger e composizione
+                        image-led.
+                      </p>
+                      <div className="d-flex flex-wrap gap-2 mt-4">
+                        {["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Design minimalista"].map(
+                          (tag) => (
+                            <span key={tag} className="chip chip-simple chip-primary">
+                              <span className="chip-label">{tag}</span>
+                            </span>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="contatti" className="py-5 bg-primary text-white">
+          <div className="container text-center">
+            <motion.div {...fadeUp}>
+              <p className="ap-kicker text-uppercase fw-semibold mb-3" style={{ opacity: 0.85 }}>
+                03 — Contatti
+              </p>
+              <h2 className="display-5 fw-bold mb-4">Parliamone.</h2>
+              <p className="lead mb-4 mx-auto" style={{ maxWidth: "40rem" }}>
+                Per collaborazioni, progetti web o semplicemente per uno scambio di idee — sono
+                disponibile.
+              </p>
+              <div className="d-flex justify-content-center flex-wrap gap-3 mb-5">
+                <a
+                  href="mailto:alberto.pecchini@studente.it"
+                  className="btn btn-light btn-lg fw-semibold text-primary d-inline-flex align-items-center"
+                >
+                  <Mail size={20} className="me-2" aria-hidden="true" /> Scrivimi
+                </a>
+                <a href="#home" className="btn btn-outline-light btn-lg fw-semibold">
+                  Torna all'inizio
+                </a>
+              </div>
+              <div className="d-flex justify-content-center gap-3">
+                <a
+                  href="https://github.com/"
+                  className="ap-social"
+                  aria-label="Profilo GitHub"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <Github size={24} aria-hidden="true" />
+                </a>
+                <a
+                  href="https://www.linkedin.com/"
+                  className="ap-social"
+                  aria-label="Profilo LinkedIn"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <Linkedin size={24} aria-hidden="true" />
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="it-footer">
+        <div className="it-footer-main">
+          <div className="container">
+            <div className="row align-items-center py-4">
+              <div className="col-12 col-md-6">
+                <h2 className="h4 fw-bold mb-1">Alberto Pecchini</h2>
+                <p className="mb-0" style={{ opacity: 0.8 }}>
+                  Designer &amp; Developer · ITT «Carlo d'Arco» — Mantova
+                </p>
+              </div>
+              <div className="col-12 col-md-6 text-md-end mt-3 mt-md-0">
+                <p className="mb-1" style={{ opacity: 0.8 }}>
+                  Aggiornato il {currentDate}
+                </p>
+                <p className="mb-0 small" style={{ opacity: 0.6 }}>
+                  © {currentYear} Alberto Pecchini — Tutti i diritti riservati
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
 
       <style>{`
-        .blob {
+        .it-page-wrapper {
+          min-height: 100vh;
+          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          background-color: #ffffff;
+        }
+
+        /* Marchio nel center header */
+        .ap-brand-mark {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          border-radius: 8px;
+          background-color: rgba(255, 255, 255, 0.14);
+          color: #ffffff;
+          margin-right: 12px;
+        }
+
+        /* Navbar sticky con feedback allo scroll */
+        .ap-navbar {
+          position: sticky;
+          top: 0;
+          z-index: 3;
+          transition: box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        .ap-navbar--scrolled {
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+        }
+
+        /*
+         * Menu mobile: nel Design System l'apertura del drawer è gestita dal JS
+         * di Bootstrap Italia. Qui la navigazione è controllata da React, quindi
+         * rendiamo lo stato .expanded autosufficiente in CSS (sotto i 992px).
+         */
+        @media (max-width: 991.98px) {
+          .ap-navbar .navbar-collapsable.expanded {
+            display: block;
+          }
+          .ap-navbar .navbar-collapsable .menu-wrapper {
+            height: 100%;
+            padding: 1.5rem;
+            overflow-y: auto;
+          }
+          .ap-navbar .navbar-collapsable .overlay {
+            display: none;
+          }
+          .ap-navbar .navbar-collapsable.expanded .overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+          }
+        }
+
+        /* Hero */
+        .ap-hero {
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+          background-color: #06c;
+        }
+        .ap-hero .lead {
+          color: rgba(255, 255, 255, 0.9);
+        }
+        .ap-kicker {
+          letter-spacing: 0.18em;
+          font-size: 0.875rem;
+        }
+        .ap-scroll-hint {
           position: absolute;
+          bottom: 1.5rem;
+          left: 50%;
+          transform: translateX(-50%);
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Card progetto */
+        .ap-project-card {
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .ap-project-card:hover,
+        .ap-project-card:focus-within {
+          transform: translateY(-4px);
+        }
+        .ap-project-card .it-card-title a {
+          display: inline-flex;
+          align-items: center;
+          color: inherit;
+        }
+
+        /* Icone social nei contatti */
+        .ap-social {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
-          filter: blur(90px);
-          will-change: transform;
+          border: 1px solid rgba(255, 255, 255, 0.45);
+          color: #ffffff;
+          transition: background-color 0.2s ease, transform 0.2s ease;
         }
-        .blob-1 {
-          width: 600px; height: 600px;
-          background: radial-gradient(circle, rgba(92,111,168,0.12), transparent);
-          top: -150px; left: -150px;
-          animation: blobdrift1 24s ease-in-out infinite;
+        .ap-social:hover,
+        .ap-social:focus-visible {
+          background-color: rgba(255, 255, 255, 0.16);
+          color: #ffffff;
+          transform: translateY(-2px);
         }
-        .blob-2 {
-          width: 450px; height: 450px;
-          background: radial-gradient(circle, rgba(143,167,200,0.1), transparent);
-          bottom: -80px; right: -80px;
-          animation: blobdrift2 18s ease-in-out infinite;
+
+        @media (prefers-reduced-motion: reduce) {
+          .ap-project-card,
+          .ap-social,
+          .ap-navbar {
+            transition: none;
+          }
+          .ap-project-card:hover,
+          .ap-project-card:focus-within,
+          .ap-social:hover {
+            transform: none;
+          }
         }
-        .blob-3 {
-          width: 300px; height: 300px;
-          background: radial-gradient(circle, rgba(168,184,200,0.1), transparent);
-          top: 50%; left: 55%;
-          animation: blobdrift3 30s ease-in-out infinite;
-        }
-        @keyframes blobdrift1 {
-          0%, 100% { transform: translate(0, 0); }
-          40% { transform: translate(50px, 40px); }
-          70% { transform: translate(20px, 70px); }
-        }
-        @keyframes blobdrift2 {
-          0%, 100% { transform: translate(0, 0); }
-          35% { transform: translate(-40px, -30px); }
-          65% { transform: translate(-20px, -55px); }
-        }
-        @keyframes blobdrift3 {
-          0%, 100% { transform: translate(-50%, -50%); }
-          30% { transform: translate(-60%, -42%); }
-          60% { transform: translate(-42%, -58%); }
-        }
-        .grid-light {
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(92, 111, 168, 0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(92, 111, 168, 0.04) 1px, transparent 1px);
-          background-size: 60px 60px;
-        }
-        ::-webkit-scrollbar { width: 0; }
-        * { scrollbar-width: none; }
       `}</style>
     </div>
   );
