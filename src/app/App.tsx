@@ -43,6 +43,14 @@ export default function App() {
   const currentDate = now.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" });
   const currentYear = now.getFullYear();
 
+  // Età calcolata dalla data di nascita (28 giugno 2006).
+  const birthDate = new Date(2006, 5, 28);
+  let age = currentYear - birthDate.getFullYear();
+  const monthDiff = now.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
     handleScroll();
@@ -272,7 +280,7 @@ export default function App() {
                     Creo esperienze digitali pulite ed eleganti.
                   </h2>
                   <p className="fs-5 text-muted">
-                    Mi chiamo Alberto Pecchini, ho 19 anni e frequento il quinto anno della
+                    Mi chiamo Alberto Pecchini, ho {age} anni e frequento il quinto anno della
                     sezione CAT all'Istituto Tecnico Tecnologico <strong>«Carlo d'Arco»</strong> di
                     Mantova.
                   </p>
