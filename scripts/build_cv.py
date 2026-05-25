@@ -247,76 +247,87 @@ SKILLS = [
 
 EDUCATION = [
     ("2021 — oggi", "Istituto Tecnico Tecnologico «Carlo d'Arco» — Mantova",
-     "Diploma CAT · Costruzioni, Ambiente e Territorio (5º anno)",
-     "Percorso tecnico-tecnologico incentrato su progettazione edilizia, disegno "
-     "tecnico e CAD, topografia ed estimo. Classe 5T (cod. meccanografico "
-     "MNTL009017). Competenze nella lettura del territorio, nella rappresentazione "
-     "grafica dei progetti e nella gestione tecnica delle costruzioni."),
-    ("ago 2024", "CES IELTS Test Centre — Dublino, Irlanda",
-     "General English Intensive (26 lezioni/sett.) · livello C1",
+     "Diploma CAT · Costruzioni, Ambiente e Territorio · Classe 5T",
+     "Percorso quinquennale di indirizzo tecnico-tecnologico. Materie principali: "
+     "progettazione architettonica e disegno tecnico (AutoCAD), topografia e rilievo "
+     "strumentale, estimo e valutazione immobiliare, gestione del cantiere, fisica "
+     "tecnica, matematica e inglese tecnico. Codice meccanografico MNTL009017."),
+    ("11 — 25 ago 2024", "CES IELTS Test Centre — Dublino, Irlanda",
+     "General English Intensive · 26 lezioni/settimana · Livello C1",
      "Corso intensivo di inglese generale al centro CES di Dame Court (Dublino 2): "
-     "quattro settimane di full immersion con focus su speaking, writing e "
-     "comprensione orale a livello avanzato (C1)."),
+     "quattro settimane di full immersion con focus su speaking, writing, reading e "
+     "comprensione orale a livello avanzato. Superamento dell'esame IELTS al "
+     "termine del corso."),
     ("2018 — 2021", "Scuola secondaria di primo grado — Mantova",
      "Istituto Redentore · Fondazione «Casa dello studente Beato Contardo Ferrini»",
-     "Formazione generale nella scuola secondaria di primo grado."),
+     "Percorso triennale con base solida in italiano, matematica, storia, scienze e "
+     "lingua inglese. Diploma conseguito con profitto."),
 ]
 
 EXPERIENCE = [
     ("2019 — oggi", "Vendite online — Vinted & Subito",
      "E-commerce · Fotografia commerciale · Customer care",
-     "Gestione autonoma di vendite su Vinted e Subito: fotografia prodotti con "
-     "iPhone 16 Pro, definizione prezzi, negoziazione, comunicazione con gli "
-     "acquirenti e gestione spedizioni. Prima vendita dicembre 2019 (trattore Same "
-     "Solaris 55, venduto in <24h); attività personale autonoma dall'autunno 2024. "
-     "Categorie: abbigliamento, collezionabili cinematografici, dispositivi tech.",
+     "Gestione autonoma dell'intero ciclo di vendita su Vinted e Subito: valutazione "
+     "del prodotto, definizione del prezzo di mercato, fotografia con Canon EOS 4000D "
+     "e iPhone 16 Pro, pubblicazione degli annunci, comunicazione con i potenziali "
+     "acquirenti, trattativa, spedizione e gestione dei feedback. Prima operazione "
+     "dicembre 2019; attività personale sistematica dall'autunno 2024. Categorie: "
+     "abbigliamento, collezionabili cinematografici, dispositivi tech.",
      "vinted.it/member/237170304"),
     ("continuativo", "Cascina di famiglia — Rivalta sul Mincio",
-     "Operaio agricolo · Logistica · Coordinamento",
-     "Supporto continuativo all'attività agricola familiare: cura delle piante "
-     "(annaffiamento, potatura), trasporto materiali su trattore con rimorchio, "
-     "raccolta del fieno, coordinamento di squadra durante le operazioni, assistenza "
-     "logistica negli spostamenti. Competenze acquisite: manualità specializzata, "
-     "problem-solving in campo, affidabilità operativa, gestione attrezzature agricole.",
+     "Collaboratore agricolo · Logistica · Coordinamento operativo",
+     "Collaborazione continuativa nell'attività agricola familiare. Attività: cura e "
+     "manutenzione delle piante (annaffiamento, potatura di diverse tipologie), "
+     "trasporto materiali su trattore con rimorchio, raccolta del fieno da prato "
+     "stabile, coordinamento delle operazioni con il team, supporto logistico negli "
+     "spostamenti. Gestione autonoma delle attrezzature agricole e risoluzione di "
+     "problemi operativi sul campo.",
      None),
     ("apr 2026", "Rivalta sul Mincio — Sito web",
      "Web design & sviluppo front-end",
-     "Progettazione e sviluppo del sito web responsive per la località turistica "
-     "di Rivalta sul Mincio. Design minimalista con tipografia editoriale, palette "
-     "calda monocromatica, griglie bento gapless, animazioni GSAP ScrollTrigger "
-     "(pinning, stacking, scrubbing) e composizione image-led. Stack: Next.js, "
-     "TypeScript, GSAP, Tailwind CSS.",
+     "Progettazione e sviluppo del sito web istituzionale e turistico per la "
+     "località di Rivalta sul Mincio. Design editoriale minimalista con tipografia "
+     "curata, palette cromatica calda e animazioni avanzate tramite GSAP "
+     "ScrollTrigger (pinning, stacking, scrubbing parallax). Griglie bento gapless "
+     "e composizione image-led per una narrazione visiva immersiva. "
+     "Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
      "rivaltasulmincio.it"),
     ("apr 2026", "Cascina Fontana — Sito web",
      "Web design & sviluppo front-end",
-     "Progettazione e sviluppo del sito web aziendale per Cascina Fontana. Layout "
-     "responsive con design curato, ottimizzato per presentare l'attività e i "
-     "servizi offerti. Stack: React, TypeScript, Tailwind CSS.",
+     "Progettazione e sviluppo del sito web ufficiale di Cascina Fontana. Analisi "
+     "delle esigenze del cliente, definizione dell'architettura dell'informazione e "
+     "realizzazione di un'interfaccia responsive curata nel design, ottimizzata per "
+     "la presentazione dei prodotti e servizi aziendali. Collaborazione diretta con "
+     "il cliente per la definizione dei contenuti. Stack: React, TypeScript, Tailwind CSS.",
      "cascinafontana.xyz"),
     ("2026", "Sito portfolio personale",
      "Design & sviluppo front-end",
      "Ideazione e realizzazione del portfolio personale basato sul Design System "
-     "Bootstrap Italia, con architettura a sezioni (chi sono, competenze, curriculum, "
-     "progetti), animazioni in entrata, accessibilità (skiplinks, focus, "
-     "prefers-reduced-motion) e deploy su Vercel.",
+     "Bootstrap Italia: architettura a sezioni (profilo, competenze, curriculum, "
+     "progetti), animazioni in entrata, piena accessibilità (skiplinks, gestione "
+     "focus, prefers-reduced-motion) e deploy continuo su Vercel.",
      "albertopecchini.it"),
 ]
 
 VOLUNTEER = [
     ("2024 — 2025", "Grest Parrocchiale · Parrocchia SS. Donato e Vigilio Martiri",
-     "Animatore volontario · 6 settimane/anno (2 edizioni)",
-     "Animazione e coordinamento di attività per bambini e ragazzi durante il Grest "
-     "estivo parrocchiale a Rivalta sul Mincio. Gestione gruppi eterogenei, "
-     "comunicazione adattiva per tutte le fasce d'età, organizzazione di attività "
-     "educative e ricreative. Referente: Parroco Andrea Grandi."),
-    ("2024", "CRED · Scuola Secondaria di Rodigo — Comune di Rodigo",
-     "Supporto educativo volontario · 2 settimane",
-     "Animazione e supporto educativo durante il centro ricreativo estivo comunale. "
-     "Affiancamento agli educatori, attività di gruppo, rapporto diretto con gli alunni."),
+     "Animatore volontario · Rivalta sul Mincio · 6 settimane/anno · 2 edizioni",
+     "Servizio di animazione volontaria durante il Grest estivo parrocchiale — due "
+     "edizioni consecutive (estate 2024 e 2025), per un totale di dodici settimane. "
+     "Responsabilità diretta su gruppi di bambini di diverse fasce d'età. "
+     "Pianificazione e conduzione di giochi, laboratori e attività educative. "
+     "Gestione delle dinamiche di gruppo, mediazione, comunicazione con i genitori. "
+     "Referente: don Andrea Grandi."),
+    ("estate 2024", "CRED · Scuola Secondaria di Rodigo",
+     "Supporto educativo volontario · Comune di Rodigo · 2 settimane",
+     "Supporto educativo e animazione durante il Centro Ricreativo Estivo Diurno "
+     "del Comune di Rodigo. Affiancamento agli educatori nella conduzione delle "
+     "attività, gestione dei gruppi e supporto individualizzato agli alunni."),
     ("2024 — 2025", "Festa del Pesce e del Luccio · Associazione Rivaltese",
      "Volontario logistico · 2 edizioni",
-     "Supporto logistico e organizzativo durante la manifestazione gastronomica locale. "
-     "Allestimento, gestione flussi, supporto allo staff durante l'evento."),
+     "Supporto logistico e organizzativo durante la manifestazione gastronomica "
+     "locale. Allestimento, gestione dei flussi di pubblico, supporto operativo "
+     "allo staff durante lo svolgimento dell'evento."),
 ]
 
 LANGS = [("Italiano", "Madrelingua", 1.0), ("Inglese", "C1 · IELTS", 0.85)]
