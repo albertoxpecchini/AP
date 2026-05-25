@@ -198,23 +198,9 @@ const CV = [
   // --- zona desideri ---
   {
     period: "✦ desidero",
-    title: "Reporter / Giornalismo",
-    role: "Comunicazione · Reportage · Scrittura",
-    desc: "Raccogliere storie vere, andare sul campo, costruire un pezzo dall'intervista alla pubblicazione. La curiosità per le persone e i luoghi è già parte di me.",
-    wish: true,
-  },
-  {
-    period: "✦ desidero",
-    title: "Benzinaio",
-    role: "Lavoro pratico · Contatto con le persone",
-    desc: "Un lavoro fisico e ritmato, sempre a contatto con chi passa. L'operatività concreta e il rapporto diretto con il pubblico mi piacciono quanto il lavoro digitale.",
-    wish: true,
-  },
-  {
-    period: "✦ desidero",
-    title: "Edicola",
-    role: "Informazione · Territorio · Retail",
-    desc: "Stare al centro del flusso quotidiano di una comunità, distribuire notizie e cultura cartacea. Un ruolo di presidio del territorio che rispetto profondamente.",
+    title: "Testata giornalistica — fondare la mia",
+    role: "Giornalismo indipendente · Reportage · Editoria",
+    desc: "Costruire un mezzo di informazione personale: andare sul campo, raccontare storie vere senza filtri, con la stessa aggressività e coraggio che ammiro in chi non si ferma davanti a nulla pur di portare la notizia.",
     wish: true,
   },
 ];

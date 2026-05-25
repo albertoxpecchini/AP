@@ -340,7 +340,7 @@ HOBBY = ["Moto", "Sport", "Videogiochi", "Musica", "Viaggi", "Tecnologia"]
 PASSIONI = ["Web design", "Innovazione digitale", "Fotografia", "Motori",
             "Cinema", "Outdoor"]
 AVAILABILITY = ["Stage e collaborazioni", "Progetti freelance", "Lavoro da remoto"]
-WISHLIST = ["Reporter / giornalismo", "Benzinaio", "Edicola"]
+WISHLIST = ["Fondare una testata giornalistica"]
 
 # ---------------------------------------------------------------- doc / frames
 def on_page_first(canvas, doc):
