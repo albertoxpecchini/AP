@@ -184,6 +184,12 @@ const CV = [
     desc: "Visita della capitale scozzese durante le festività natalizie: Old Town, Edinburgh Castle, Royal Mile e l'atmosfera unica dei vicoli storici nel periodo natalizio.",
   },
   {
+    period: "22 — 23 mar 2026",
+    title: "Scrutatore — Sezione 5, Rivalta sul Mincio",
+    role: "Operazioni elettorali · Comune di Rodigo · Referendum",
+    desc: "Incarico ufficiale di scrutatore presso la sezione elettorale n. 5 di Rivalta sul Mincio (Comune di Rodigo) in occasione del Referendum del 22 e 23 marzo 2026. Attività: verifica dell'identità degli elettori, gestione delle operazioni di voto, scrutinio delle schede, redazione dei verbali e trasmissione dei risultati. Incarico retribuito con onorari di 119,60 €.",
+  },
+  {
     period: "20 apr 2026",
     title: "Cascina Fontana — Sito web",
     role: "Web design & sviluppo front-end",

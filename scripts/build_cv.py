@@ -283,6 +283,14 @@ EXPERIENCE = [
      "spostamenti. Gestione autonoma delle attrezzature agricole e risoluzione di "
      "problemi operativi sul campo.",
      None),
+    ("22 — 23 mar 2026", "Scrutatore — Sezione 5, Rivalta sul Mincio",
+     "Operazioni elettorali · Comune di Rodigo · Referendum",
+     "Incarico ufficiale di scrutatore presso la sezione elettorale n. 5 di Rivalta "
+     "sul Mincio (Comune di Rodigo) per il Referendum del 22 e 23 marzo 2026. "
+     "Attività: verifica identità degli elettori, gestione delle operazioni di voto, "
+     "scrutinio delle schede, redazione dei verbali e trasmissione dei risultati. "
+     "Incarico retribuito — onorari: 119,60 €.",
+     None),
     ("apr 2026", "Rivalta sul Mincio — Sito web",
      "Web design & sviluppo front-end",
      "Progettazione e sviluppo del sito web istituzionale e turistico per la "
