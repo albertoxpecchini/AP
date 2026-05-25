@@ -340,6 +340,7 @@ HOBBY = ["Moto", "Sport", "Videogiochi", "Musica", "Viaggi", "Tecnologia"]
 PASSIONI = ["Web design", "Innovazione digitale", "Fotografia", "Motori",
             "Cinema", "Outdoor"]
 AVAILABILITY = ["Stage e collaborazioni", "Progetti freelance", "Lavoro da remoto"]
+WISHLIST = ["Reporter / giornalismo", "Benzinaio", "Edicola"]
 
 # ---------------------------------------------------------------- doc / frames
 def on_page_first(canvas, doc):
@@ -488,6 +489,16 @@ for d in AVAILABILITY:
     _sb.append(Paragraph(
         f"<font color='#0066cc'>•</font>&nbsp; {d}",
         ParagraphStyle("av", fontName=F, fontSize=8.4, leading=13, textColor=WHITE,
+                       spaceAfter=1)))
+_sb.append(Spacer(1, 10))
+_sb.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
+
+# Mi piacerebbe fare
+_sb.append(side_title("Mi piacerebbe fare"))
+for d in WISHLIST:
+    _sb.append(Paragraph(
+        f"<font color='#bcd4ee'>✦</font>&nbsp; {d}",
+        ParagraphStyle("wl", fontName=F, fontSize=8.4, leading=13, textColor=WHITE,
                        spaceAfter=1)))
 
 # KeepInFrame garantisce che il sidebar NON sfori mai il frame

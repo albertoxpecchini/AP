@@ -195,6 +195,28 @@ const CV = [
     role: "Web design & sviluppo front-end",
     desc: "Progettazione e sviluppo del sito web istituzionale e turistico per la località di Rivalta sul Mincio. Design editoriale minimalista con tipografia curata, palette cromatica calda e animazioni avanzate tramite GSAP ScrollTrigger (pinning, stacking, scrubbing parallax). Griglie bento gapless e composizione image-led per una narrazione visiva immersiva. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
   },
+  // --- zona desideri ---
+  {
+    period: "✦ desidero",
+    title: "Reporter / Giornalismo",
+    role: "Comunicazione · Reportage · Scrittura",
+    desc: "Raccogliere storie vere, andare sul campo, costruire un pezzo dall'intervista alla pubblicazione. La curiosità per le persone e i luoghi è già parte di me.",
+    wish: true,
+  },
+  {
+    period: "✦ desidero",
+    title: "Benzinaio",
+    role: "Lavoro pratico · Contatto con le persone",
+    desc: "Un lavoro fisico e ritmato, sempre a contatto con chi passa. L'operatività concreta e il rapporto diretto con il pubblico mi piacciono quanto il lavoro digitale.",
+    wish: true,
+  },
+  {
+    period: "✦ desidero",
+    title: "Edicola",
+    role: "Informazione · Territorio · Retail",
+    desc: "Stare al centro del flusso quotidiano di una comunità, distribuire notizie e cultura cartacea. Un ruolo di presidio del territorio che rispetto profondamente.",
+    wish: true,
+  },
 ];
 
 const HOBBY = [
@@ -689,10 +711,19 @@ export default function App() {
               <div className="col-lg-9">
                 <motion.div {...fadeUp} className="ap-timeline">
                   {CV.map((item) => (
-                    <div className="ap-timeline-item" key={item.title}>
-                      <span className="ap-timeline-period">{item.period}</span>
-                      <h3 className="h5 fw-bold mb-1">{item.title}</h3>
-                      <p className="fw-semibold text-primary mb-2">{item.role}</p>
+                    <div
+                      className={`ap-timeline-item${(item as any).wish ? " ap-timeline-item--wish" : ""}`}
+                      key={item.title}
+                    >
+                      <span className={`ap-timeline-period${ (item as any).wish ? " ap-timeline-period--wish" : ""}`}>
+                        {item.period}
+                      </span>
+                      <h3 className={`h5 mb-1${(item as any).wish ? " fst-italic fw-normal" : " fw-bold"}`}>
+                        {item.title}
+                      </h3>
+                      <p className={`fw-semibold mb-2${(item as any).wish ? " ap-wish-role" : " text-primary"}`}>
+                        {item.role}
+                      </p>
                       <p className="text-muted mb-0">{item.desc}</p>
                     </div>
                   ))}
@@ -1303,6 +1334,21 @@ export default function App() {
           text-transform: uppercase;
           color: #06c;
           margin-bottom: 0.25rem;
+        }
+        /* Variante "zona desideri" */
+        .ap-timeline-item--wish::before {
+          background: #f59e0b;
+          border-color: #fef3c7;
+          box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+        }
+        .ap-timeline-period--wish {
+          color: #b45309;
+        }
+        .ap-wish-role {
+          color: #92400e;
+        }
+        .ap-timeline-item--wish {
+          opacity: 0.85;
         }
 
         /* Card hobby / passioni */
