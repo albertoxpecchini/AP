@@ -1073,58 +1073,10 @@ export default function App() {
       </AnimatePresence>
 
       <style>{`
-        /* ── Palette ─────────────────────────────────────────────────────────
-           black   #111111   hero, contact, dark sections
-           white   #fafafa   body background
-           green   #16a34a   primary CTA / buttons
-           purple  #7c3aed   accents, links, timeline, chips
-        ─────────────────────────────────────────────────────────────────── */
-        :root {
-          --ap-black:  #111111;
-          --ap-white:  #ffffff;
-          --ap-green:  #16a34a;
-          --ap-purple: #7c3aed;
-          --ap-purple-light: #ede9fe;
-          --ap-purple-muted: rgba(124, 58, 237, 0.12);
-          --ap-purple-ring:  rgba(124, 58, 237, 0.25);
-          /* Bootstrap Italia primary override */
-          --bs-primary: #7c3aed;
-          --bs-primary-rgb: 124, 58, 237;
-          --bs-link-color: #7c3aed;
-          --bs-link-color-rgb: 124, 58, 237;
-        }
-        /* Bootstrap btn-primary → green */
-        .btn-primary,
-        .it-btn-primary {
-          background-color: #16a34a !important;
-          border-color: #16a34a !important;
-          color: #ffffff !important;
-        }
-        .btn-primary:hover,
-        .btn-primary:focus-visible,
-        .it-btn-primary:hover {
-          background-color: #15803d !important;
-          border-color: #15803d !important;
-        }
-        /* Bootstrap outline-primary → purple */
-        .btn-outline-primary {
-          color: #7c3aed !important;
-          border-color: #7c3aed !important;
-        }
-        .btn-outline-primary:hover,
-        .btn-outline-primary:focus-visible {
-          background-color: #7c3aed !important;
-          color: #ffffff !important;
-        }
-        /* text-primary utility → purple */
-        .text-primary { color: #7c3aed !important; }
-        /* bg-primary utility → black (hero / contact) */
-        .bg-primary { background-color: #111111 !important; }
-
         .it-page-wrapper {
           min-height: 100vh;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
-          background-color: #fafafa;
+          background-color: #ffffff;
         }
 
         /* Marchio nel center header */
@@ -1186,7 +1138,7 @@ export default function App() {
           min-height: 100vh;
           position: relative;
           overflow: hidden;
-          background-color: #111111;
+          background-color: #06c;
         }
         .ap-hero .lead {
           color: rgba(255, 255, 255, 0.9);
@@ -1231,8 +1183,8 @@ export default function App() {
         .ap-project-version {
           display: inline-block;
           padding: 0.18rem 0.55rem;
-          background: rgba(124, 58, 237, 0.1);
-          color: #7c3aed;
+          background: rgba(0, 102, 204, 0.1);
+          color: #06c;
           border-radius: 999px;
           font-size: 0.72rem;
           font-weight: 700;
@@ -1284,7 +1236,7 @@ export default function App() {
         .ap-project-placeholder {
           width: 100%;
           height: 100%;
-          background: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%);
+          background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1292,7 +1244,7 @@ export default function App() {
         .ap-project-placeholder-text {
           font-size: 0.9rem;
           font-weight: 600;
-          color: #7c3aed;
+          color: #4f46e5;
           text-align: center;
           padding: 1rem;
         }
@@ -1328,7 +1280,7 @@ export default function App() {
         /* Card competenze */
         .ap-skill-card {
           background: #ffffff;
-          border: 1px solid rgba(124, 58, 237, 0.12);
+          border: 1px solid rgba(0, 102, 204, 0.12);
           border-radius: 8px;
           padding: 1.5rem;
         }
@@ -1345,7 +1297,7 @@ export default function App() {
           top: 6px;
           bottom: 6px;
           width: 2px;
-          background: rgba(124, 58, 237, 0.25);
+          background: rgba(0, 102, 204, 0.25);
         }
         .ap-timeline-item {
           position: relative;
@@ -1362,9 +1314,9 @@ export default function App() {
           width: 16px;
           height: 16px;
           border-radius: 50%;
-          background: #7c3aed;
+          background: #06c;
           border: 3px solid #ffffff;
-          box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
+          box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
         }
         .ap-timeline-period {
           display: inline-block;
@@ -1372,7 +1324,7 @@ export default function App() {
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: #7c3aed;
+          color: #06c;
           margin-bottom: 0.25rem;
         }
         /* Variante "zona desideri" */
@@ -1400,7 +1352,7 @@ export default function App() {
           gap: 0.75rem;
           padding: 1.75rem 1rem;
           background: #ffffff;
-          border: 1px solid rgba(124, 58, 237, 0.12);
+          border: 1px solid rgba(0, 102, 204, 0.12);
           border-radius: 8px;
           text-align: center;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1416,8 +1368,8 @@ export default function App() {
           width: 56px;
           height: 56px;
           border-radius: 50%;
-          background: rgba(124, 58, 237, 0.1);
-          color: #7c3aed;
+          background: rgba(0, 102, 204, 0.1);
+          color: #06c;
         }
         .ap-interest-label {
           font-weight: 600;
@@ -1489,14 +1441,14 @@ export default function App() {
           width: 68px;
           height: 68px;
           border-radius: 50%;
-          background: rgba(124, 58, 237, 0.1);
-          color: #7c3aed;
+          background: rgba(0, 102, 204, 0.1);
+          color: #06c;
           margin-bottom: 1.25rem;
         }
         .ap-modal-title {
           font-size: 1.5rem;
           font-weight: 700;
-          color: #7c3aed;
+          color: #06c;
           margin-bottom: 1rem;
         }
         .ap-modal-body {
@@ -1550,7 +1502,7 @@ export default function App() {
           gap: 0.75rem;
           flex-wrap: wrap;
           padding: 0.6rem 0.85rem;
-          background: #111111;
+          background: #06c;
           color: #ffffff;
         }
         .ap-cv-title {
@@ -1584,7 +1536,7 @@ export default function App() {
           display: block;
           padding: 0.6rem 0.85rem;
           background: #f3f4f6;
-          color: #7c3aed;
+          color: #06c;
           font-weight: 600;
           text-align: center;
           text-decoration: none;
