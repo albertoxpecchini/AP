@@ -1073,409 +1073,534 @@ export default function App() {
       </AnimatePresence>
 
       <style>{`
-        /* ═══════════════════════════════════════════════════════════════════
-           PALETTE — tagli netti, zero sfumature
-           Verde   #16a34a  50 % → Competenze, Hobby, btn-primary
-           Viola   #7c3aed  50 % → Hero, Progetti, Passioni, accent
-           Nero    #111111  25 % → Header, Contatti, card interiors
-           Bianco  #ffffff  25 % → Chi sono, Curriculum, card faces
-        ═══════════════════════════════════════════════════════════════════ */
+        /* ── Palette ─────────────────────────────────────────────────────────
+           black   #111111   hero, contact, dark sections
+           white   #fafafa   body background
+           green   #16a34a   primary CTA / buttons
+           purple  #7c3aed   accents, links, timeline, chips
+        ─────────────────────────────────────────────────────────────────── */
         :root {
           --ap-black:  #111111;
           --ap-white:  #ffffff;
           --ap-green:  #16a34a;
           --ap-purple: #7c3aed;
-          --bs-primary:     #7c3aed;
+          --ap-purple-light: #ede9fe;
+          --ap-purple-muted: rgba(124, 58, 237, 0.12);
+          --ap-purple-ring:  rgba(124, 58, 237, 0.25);
+          /* Bootstrap Italia primary override */
+          --bs-primary: #7c3aed;
           --bs-primary-rgb: 124, 58, 237;
-          --bs-link-color:      #7c3aed;
-          --bs-link-color-rgb:  124, 58, 237;
+          --bs-link-color: #7c3aed;
+          --bs-link-color-rgb: 124, 58, 237;
         }
-
-        /* ── Bootstrap overrides ──────────────────────────────────────── */
-        .btn-primary, .it-btn-primary {
+        /* Bootstrap btn-primary → green */
+        .btn-primary,
+        .it-btn-primary {
           background-color: #16a34a !important;
-          border-color:     #16a34a !important;
+          border-color: #16a34a !important;
           color: #ffffff !important;
-          border-radius: 0 !important;
         }
-        .btn-primary:hover, .it-btn-primary:hover,
-        .btn-primary:focus-visible {
+        .btn-primary:hover,
+        .btn-primary:focus-visible,
+        .it-btn-primary:hover {
           background-color: #15803d !important;
-          border-color:     #15803d !important;
+          border-color: #15803d !important;
         }
+        /* Bootstrap outline-primary → purple */
         .btn-outline-primary {
-          color:        #7c3aed !important;
+          color: #7c3aed !important;
           border-color: #7c3aed !important;
-          border-radius: 0 !important;
         }
-        .btn-outline-primary:hover, .btn-outline-primary:focus-visible {
+        .btn-outline-primary:hover,
+        .btn-outline-primary:focus-visible {
           background-color: #7c3aed !important;
           color: #ffffff !important;
         }
-        .btn-light { border-radius: 0 !important; }
-        .btn-outline-light { border-radius: 0 !important; }
+        /* text-primary utility → purple */
         .text-primary { color: #7c3aed !important; }
-        .bg-primary   { background-color: #111111 !important; }
+        /* bg-primary utility → black (hero / contact) */
+        .bg-primary { background-color: #111111 !important; }
 
-        /* ── Pagina ───────────────────────────────────────────────────── */
         .it-page-wrapper {
           min-height: 100vh;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
-          background-color: #ffffff;
+          background-color: #fafafa;
         }
 
-        /* ── Brand mark ───────────────────────────────────────────────── */
+        /* Marchio nel center header */
         .ap-brand-mark {
           display: inline-flex;
           align-items: center;
           justify-content: center;
           width: 48px;
           height: 48px;
-          border-radius: 0;
+          border-radius: 8px;
           overflow: hidden;
           margin-right: 12px;
         }
-        .ap-brand-mark img { width: 100%; height: 100%; display: block; }
+        .ap-brand-mark img {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
 
-        /* ── Navbar ───────────────────────────────────────────────────── */
+        /* Navbar sticky con feedback allo scroll */
         .ap-navbar {
           position: sticky;
           top: 0;
           z-index: 3;
-          transition: box-shadow 0.3s ease;
+          transition: box-shadow 0.3s ease, background-color 0.3s ease;
         }
         .ap-navbar--scrolled {
-          box-shadow: 0 4px 0 0 #7c3aed;
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
         }
+
+        /*
+         * Menu mobile: nel Design System l'apertura del drawer è gestita dal JS
+         * di Bootstrap Italia. Qui la navigazione è controllata da React, quindi
+         * rendiamo lo stato .expanded autosufficiente in CSS (sotto i 992px).
+         */
         @media (max-width: 991.98px) {
-          .ap-navbar .navbar-collapsable.expanded { display: block; }
-          .ap-navbar .navbar-collapsable .menu-wrapper {
-            height: 100%; padding: 1.5rem; overflow-y: auto;
+          .ap-navbar .navbar-collapsable.expanded {
+            display: block;
           }
-          .ap-navbar .navbar-collapsable .overlay { display: none; }
+          .ap-navbar .navbar-collapsable .menu-wrapper {
+            height: 100%;
+            padding: 1.5rem;
+            overflow-y: auto;
+          }
+          .ap-navbar .navbar-collapsable .overlay {
+            display: none;
+          }
           .ap-navbar .navbar-collapsable.expanded .overlay {
-            display: block; position: fixed; inset: 0;
-            background: rgba(0, 0, 0, 0.6); z-index: -1;
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
           }
         }
 
-        /* ═══ SEZIONI — BLOCCHI NETTI ════════════════════════════════════ */
-
-        /* Hero → VIOLA */
+        /* Hero */
         .ap-hero {
           min-height: 100vh;
           position: relative;
           overflow: hidden;
-          background-color: #7c3aed;
+          background-color: #111111;
         }
-        .ap-hero .lead { color: rgba(255, 255, 255, 0.9); }
-
-        /* Kicker (base) */
-        .ap-kicker { letter-spacing: 0.18em; font-size: 0.875rem; }
-
-        /* Scroll hint */
+        .ap-hero .lead {
+          color: rgba(255, 255, 255, 0.9);
+        }
+        .ap-kicker {
+          letter-spacing: 0.18em;
+          font-size: 0.875rem;
+        }
         .ap-scroll-hint {
-          position: absolute; bottom: 1.5rem; left: 50%;
-          transform: translateX(-50%); color: rgba(255, 255, 255, 0.85);
+          position: absolute;
+          bottom: 1.5rem;
+          left: 50%;
+          transform: translateX(-50%);
+          color: rgba(255, 255, 255, 0.85);
         }
 
-        /* Competenze → VERDE pieno */
-        #competenze {
-          background-color: #16a34a !important;
-          color: #ffffff;
-        }
-        #competenze .ap-kicker,
-        #competenze h2 { color: #ffffff !important; }
-
-        /* Progetti → VIOLA pieno */
-        #progetti {
-          background-color: #7c3aed !important;
-          color: #ffffff;
-        }
-        #progetti .ap-kicker,
-        #progetti h2 { color: #ffffff !important; }
-
-        /* Hobby → VERDE pieno */
-        #hobby {
-          background-color: #16a34a !important;
-          color: #ffffff;
-        }
-        #hobby .ap-kicker,
-        #hobby h2 { color: #ffffff !important; }
-
-        /* Passioni → VIOLA pieno */
-        #passioni {
-          background-color: #7c3aed !important;
-          color: #ffffff;
-        }
-        #passioni .ap-kicker,
-        #passioni h2 { color: #ffffff !important; }
-
-        /* ── Card progetto ────────────────────────────────────────────── */
+        /* Card progetto */
         .ap-project-card {
-          transition: transform 0.25s ease;
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
           overflow: hidden;
-          border-radius: 0 !important;
-          box-shadow: none !important;
         }
         .ap-project-card:hover,
-        .ap-project-card:focus-within { transform: translateY(-5px); }
-
-        /* Card interna su sfondo viola → bianca netta */
-        #progetti .it-card {
-          background: #ffffff;
-          border-radius: 0 !important;
-          box-shadow: none !important;
-          border: none;
+        .ap-project-card:focus-within {
+          transform: translateY(-4px);
         }
-        #progetti .it-card-title a { color: #111111; }
-        #progetti .it-card-text     { color: #333; }
-        #progetti .category         { color: #7c3aed; font-weight: 700; }
-
         .ap-project-wip {
-          display: flex; align-items: center; gap: 0.45rem;
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
           padding: 0.55rem 1.25rem;
-          background: #111111; color: #fde047;
-          font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
-          border-bottom: 3px solid #fde047;
+          background: #fef9c3;
+          color: #854d0e;
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          border-bottom: 1px solid #fde047;
         }
-        .ap-project-gh-date { font-size: 0.78rem; color: #888; }
-
+        .ap-project-gh-date {
+          font-size: 0.78rem;
+          color: #888;
+        }
         .ap-project-version {
-          display: inline-block; padding: 0.18rem 0.55rem;
-          background: #7c3aed; color: #ffffff; border-radius: 0;
-          font-size: 0.72rem; font-weight: 700;
-          font-family: monospace; letter-spacing: 0.03em;
+          display: inline-block;
+          padding: 0.18rem 0.55rem;
+          background: rgba(124, 58, 237, 0.1);
+          color: #7c3aed;
+          border-radius: 999px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          font-family: monospace;
+          letter-spacing: 0.03em;
         }
-
-        /* Preview immagine */
+        /* Anteprima sito */
         .ap-project-preview {
-          width: 100%; height: 220px;
-          background: #111111;
-          border-bottom: 4px solid #16a34a;
+          width: 100%;
+          height: 220px;
+          background: #f5f5f5;
+          border-bottom: 1px solid #e0e0e0;
           overflow: hidden;
         }
         .ap-project-preview--wip {
-          width: 100%; height: 100%;
-          background: #111111;
-          display: flex; align-items: center; justify-content: center;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            135deg,
+            #fef9c3 0%,
+            #fef3c7 50%,
+            #fef9c3 100%
+          );
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .ap-project-cantiere {
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 0.75rem; color: #fde047; text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          color: #854d0e;
+          text-align: center;
+          opacity: 0.6;
         }
         .ap-project-cantiere span {
-          font-size: 0.875rem; font-weight: 700; letter-spacing: 0.05em;
+          font-size: 0.875rem;
+          font-weight: 700;
+          letter-spacing: 0.05em;
         }
         .ap-project-screenshot {
-          width: 100%; height: 100%; object-fit: cover; display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
         }
         .ap-project-placeholder {
-          width: 100%; height: 100%;
-          background: #111111;
-          display: flex; align-items: center; justify-content: center;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .ap-project-placeholder-text {
-          font-size: 0.9rem; font-weight: 700; color: #ffffff;
-          text-align: center; padding: 1rem; letter-spacing: 0.05em;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #7c3aed;
+          text-align: center;
+          padding: 1rem;
         }
         .ap-project-card .it-card-title a {
-          display: inline-flex; align-items: center; color: inherit;
+          display: inline-flex;
+          align-items: center;
+          color: inherit;
         }
 
-        /* ── Social icons ─────────────────────────────────────────────── */
+        /* Icone social nei contatti */
         .ap-social {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 48px; height: 48px;
-          border-radius: 0;
-          border: 2px solid #ffffff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.45);
           color: #ffffff;
           transition: background-color 0.2s ease, transform 0.2s ease;
         }
-        .ap-social:hover, .ap-social:focus-visible {
-          background-color: #16a34a;
-          border-color: #16a34a;
+        .ap-social:hover,
+        .ap-social:focus-visible {
+          background-color: rgba(255, 255, 255, 0.16);
           color: #ffffff;
           transform: translateY(-2px);
         }
-        .ap-social--sm { width: 40px; height: 40px; }
+        .ap-social--sm {
+          width: 40px;
+          height: 40px;
+        }
 
-        /* ── Skill cards → NERO su verde ─────────────────────────────── */
+        /* Card competenze */
         .ap-skill-card {
-          background: #111111;
-          border: none;
-          border-radius: 0;
+          background: #ffffff;
+          border: 1px solid rgba(124, 58, 237, 0.12);
+          border-radius: 8px;
           padding: 1.5rem;
-          color: #ffffff;
         }
-        .ap-skill-card h3 { color: #ffffff; }
 
-        /* Chips in sezione verde → bordo bianco */
-        #competenze .chip.chip-primary {
-          background-color: transparent;
-          border: 1px solid #ffffff;
-          color: #ffffff;
+        /* Timeline curriculum */
+        .ap-timeline {
+          position: relative;
+          padding-left: 2rem;
         }
-        #competenze .chip.chip-primary .chip-label { color: #ffffff; }
-
-        /* Chips in sezione viola (progetti) → verde solido */
-        #progetti .chip.chip-primary {
-          background-color: #16a34a;
-          border: none;
-          color: #ffffff;
-        }
-        #progetti .chip.chip-primary .chip-label { color: #ffffff; }
-
-        /* ── Timeline curriculum ──────────────────────────────────────── */
-        .ap-timeline { position: relative; padding-left: 2rem; }
         .ap-timeline::before {
-          content: ""; position: absolute;
-          left: 7px; top: 6px; bottom: 6px; width: 3px;
-          background: #7c3aed;
+          content: "";
+          position: absolute;
+          left: 7px;
+          top: 6px;
+          bottom: 6px;
+          width: 2px;
+          background: rgba(124, 58, 237, 0.25);
         }
-        .ap-timeline-item { position: relative; padding-bottom: 2rem; }
-        .ap-timeline-item:last-child { padding-bottom: 0; }
+        .ap-timeline-item {
+          position: relative;
+          padding-bottom: 2rem;
+        }
+        .ap-timeline-item:last-child {
+          padding-bottom: 0;
+        }
         .ap-timeline-item::before {
-          content: ""; position: absolute;
-          left: -2rem; top: 4px; width: 16px; height: 16px;
-          border-radius: 0;
-          background: #16a34a;
+          content: "";
+          position: absolute;
+          left: -2rem;
+          top: 4px;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #7c3aed;
           border: 3px solid #ffffff;
-          box-shadow: none;
+          box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
         }
         .ap-timeline-period {
-          display: inline-block; font-size: 0.8rem; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          color: #7c3aed; margin-bottom: 0.25rem;
+          display: inline-block;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #7c3aed;
+          margin-bottom: 0.25rem;
         }
-
-        /* Zona desideri */
+        /* Variante "zona desideri" */
         .ap-timeline-item--wish::before {
-          background: #f59e0b; border-color: #ffffff;
+          background: #f59e0b;
+          border-color: #fef3c7;
+          box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
         }
-        .ap-timeline-period--wish { color: #b45309; }
-        .ap-wish-role { color: #92400e; }
-        .ap-timeline-item--wish { opacity: 0.85; }
+        .ap-timeline-period--wish {
+          color: #b45309;
+        }
+        .ap-wish-role {
+          color: #92400e;
+        }
+        .ap-timeline-item--wish {
+          opacity: 0.85;
+        }
 
-        /* ── Card hobby / passioni → NERO su verde/viola ─────────────── */
+        /* Card hobby / passioni */
         .ap-interest-card {
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 0.75rem; padding: 1.75rem 1rem;
-          background: #111111;
-          border: none; border-radius: 0;
-          color: #ffffff; text-align: center;
-          transition: transform 0.2s ease;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          padding: 1.75rem 1rem;
+          background: #ffffff;
+          border: 1px solid rgba(124, 58, 237, 0.12);
+          border-radius: 8px;
+          text-align: center;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .ap-interest-card:hover { transform: translateY(-4px); }
+        .ap-interest-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
         .ap-interest-icon {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 56px; height: 56px; border-radius: 0;
-          background: #7c3aed; color: #ffffff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: rgba(124, 58, 237, 0.1);
+          color: #7c3aed;
         }
-        /* Icone in sezione verde → viola; in sezione viola → verde */
-        #hobby .ap-interest-icon    { background: #7c3aed; color: #ffffff; }
-        #passioni .ap-interest-icon { background: #16a34a; color: #ffffff; }
-        .ap-interest-label { font-weight: 600; color: #ffffff; }
+        .ap-interest-label {
+          font-weight: 600;
+        }
 
-        /* ── Modale hobby / passioni ──────────────────────────────────── */
+        /* Modale hobby / passioni */
         .ap-modal-backdrop {
-          position: fixed; inset: 0;
-          background: rgba(0, 0, 0, 0.75);
-          z-index: 1000; cursor: pointer;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.55);
+          z-index: 1000;
+          cursor: pointer;
         }
         .ap-modal {
-          position: fixed; top: 50%; left: 50%; z-index: 1001;
-          background: #ffffff; border-radius: 0;
-          max-width: 480px; width: calc(100% - 2rem);
-          max-height: 90vh; overflow-y: auto;
-          border: 3px solid #111111; box-shadow: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          z-index: 1001;
+          background: #ffffff;
+          border-radius: 14px;
+          max-width: 480px;
+          width: calc(100% - 2rem);
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
         }
-        .ap-modal-photo { height: 220px; overflow: hidden; flex-shrink: 0; }
+        .ap-modal-photo {
+          height: 220px;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
         .ap-modal-photo img {
-          width: 100%; height: 100%; object-fit: cover; display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
         }
-        .ap-modal-inner { padding: 1.5rem 2.5rem 2.5rem; }
+        .ap-modal-inner {
+          padding: 1.5rem 2.5rem 2.5rem;
+        }
         .ap-modal-close {
-          position: absolute; top: 1rem; right: 1rem;
-          display: flex; align-items: center; justify-content: center;
-          width: 36px; height: 36px;
-          border-radius: 0; border: 2px solid #111111;
-          background: #ffffff; cursor: pointer; color: #111111;
-          z-index: 1; padding: 0;
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(4px);
+          cursor: pointer;
+          color: #444;
+          z-index: 1;
+          padding: 0;
           transition: background-color 0.15s ease, color 0.15s ease;
         }
-        .ap-modal-close:hover, .ap-modal-close:focus-visible {
-          background-color: #111111; color: #ffffff;
+        .ap-modal-close:hover,
+        .ap-modal-close:focus-visible {
+          background-color: rgba(255, 255, 255, 1);
+          color: #111;
         }
         .ap-modal-icon-wrap {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 68px; height: 68px; border-radius: 0;
-          background: #7c3aed; color: #ffffff; margin-bottom: 1.25rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 68px;
+          height: 68px;
+          border-radius: 50%;
+          background: rgba(124, 58, 237, 0.1);
+          color: #7c3aed;
+          margin-bottom: 1.25rem;
         }
         .ap-modal-title {
-          font-size: 1.5rem; font-weight: 700;
-          color: #7c3aed; margin-bottom: 1rem;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #7c3aed;
+          margin-bottom: 1rem;
         }
         .ap-modal-body {
-          font-size: 1rem; line-height: 1.75; color: #333; margin: 0; padding: 0;
+          font-size: 1rem;
+          line-height: 1.75;
+          color: #444;
+          margin: 0;
+          padding: 0;
         }
+        /* Reset pulsante per le card interesse */
         button.ap-interest-card {
-          cursor: pointer; appearance: none;
-          font-family: inherit; font-size: inherit; width: 100%;
+          cursor: pointer;
+          appearance: none;
+          font-family: inherit;
+          font-size: inherit;
+          width: 100%;
         }
 
-        /* ── CV modal ─────────────────────────────────────────────────── */
+        /* Visualizzatore CV (modale con anteprima PDF) */
         .ap-cv-modal {
-          position: fixed; inset: 0; z-index: 1080;
-          display: flex; align-items: center; justify-content: center;
+          position: fixed;
+          inset: 0;
+          z-index: 1080;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           padding: clamp(0.5rem, 2vw, 2rem);
         }
         .ap-cv-backdrop {
-          position: absolute; inset: 0;
-          background: rgba(0, 0, 0, 0.7);
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.62);
+          backdrop-filter: blur(2px);
         }
         .ap-cv-dialog {
-          position: relative; z-index: 1;
-          display: flex; flex-direction: column;
-          width: min(940px, 100%); height: min(92vh, 100%);
-          background: #ffffff; border-radius: 0; overflow: hidden;
-          border: 3px solid #111111; box-shadow: none;
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          width: min(940px, 100%);
+          height: min(92vh, 100%);
+          background: #ffffff;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
         }
         .ap-cv-bar {
-          display: flex; align-items: center; justify-content: space-between;
-          gap: 0.75rem; flex-wrap: wrap;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.75rem;
+          flex-wrap: wrap;
           padding: 0.6rem 0.85rem;
-          background: #111111; color: #ffffff;
+          background: #111111;
+          color: #ffffff;
         }
-        .ap-cv-title { font-weight: 600; font-size: 0.95rem; }
+        .ap-cv-title {
+          font-weight: 600;
+          font-size: 0.95rem;
+        }
         .ap-cv-frame {
-          flex: 1 1 auto; width: 100%; min-height: 0;
-          border: 0; background: #525659;
+          flex: 1 1 auto;
+          width: 100%;
+          min-height: 0;
+          border: 0;
+          background: #525659;
         }
         .ap-cv-close {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 36px; height: 36px;
-          border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 0;
-          background: transparent; color: #ffffff;
-          transition: background-color 0.2s ease, border-color 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 50%;
+          background: transparent;
+          color: #ffffff;
+          transition: background-color 0.2s ease;
         }
-        .ap-cv-close:hover, .ap-cv-close:focus-visible {
-          background: #7c3aed; border-color: #7c3aed;
+        .ap-cv-close:hover,
+        .ap-cv-close:focus-visible {
+          background: rgba(255, 255, 255, 0.18);
         }
         .ap-cv-fallback {
-          display: block; padding: 0.6rem 0.85rem;
-          background: #f3f4f6; color: #7c3aed;
-          font-weight: 600; text-align: center; text-decoration: none;
+          display: block;
+          padding: 0.6rem 0.85rem;
+          background: #f3f4f6;
+          color: #7c3aed;
+          font-weight: 600;
+          text-align: center;
+          text-decoration: none;
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .ap-project-card, .ap-social, .ap-interest-card, .ap-navbar {
+          .ap-project-card,
+          .ap-social,
+          .ap-interest-card,
+          .ap-navbar {
             transition: none;
           }
-          .ap-project-card:hover, .ap-project-card:focus-within,
-          .ap-interest-card:hover, .ap-social:hover {
+          .ap-project-card:hover,
+          .ap-project-card:focus-within,
+          .ap-interest-card:hover,
+          .ap-social:hover {
             transform: none;
           }
         }
