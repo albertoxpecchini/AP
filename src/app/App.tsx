@@ -12,6 +12,8 @@ import {
   X,
   GraduationCap,
   Download,
+  Eye,
+  ExternalLink,
   AlertTriangle,
   Bike,
   Dumbbell,
@@ -251,7 +253,10 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [localMode, setLocalMode] = useState(false);
+  const [cvOpen, setCvOpen] = useState(false);
   const reduceMotion = useReducedMotion();
+
+  const CV_PDF = "/cv-alberto-pecchini.pdf";
 
   useEffect(() => {
     activateLocalMode(() => {
@@ -340,6 +345,18 @@ export default function App() {
       document.body.style.overflow = "";
     };
   }, [selectedItem]);
+
+  // Visualizzatore CV: blocco scroll + chiusura con Esc.
+  useEffect(() => {
+    if (!cvOpen) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setCvOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [cvOpen]);
 
   // Respect prefers-reduced-motion: no entrance transforms when the user opts out.
   const fadeUp = reduceMotion
@@ -623,13 +640,23 @@ export default function App() {
               </p>
               <div className="d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h2 className="display-5 fw-bold mb-0">Formazione &amp; esperienze</h2>
-                <a
-                  href="/cv-alberto-pecchini.pdf"
-                  className="btn btn-outline-primary fw-semibold d-inline-flex align-items-center"
-                  download
-                >
-                  <Download size={18} className="me-2" aria-hidden="true" /> Scarica il CV (PDF)
-                </a>
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCvOpen(true)}
+                    className="btn btn-primary fw-semibold d-inline-flex align-items-center"
+                    aria-haspopup="dialog"
+                  >
+                    <Eye size={18} className="me-2" aria-hidden="true" /> Visualizza il CV
+                  </button>
+                  <a
+                    href={CV_PDF}
+                    className="btn btn-outline-primary fw-semibold d-inline-flex align-items-center"
+                    download
+                  >
+                    <Download size={18} className="me-2" aria-hidden="true" /> Scarica (PDF)
+                  </a>
+                </div>
               </div>
             </motion.div>
             <div className="row">
@@ -925,6 +952,74 @@ export default function App() {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Visualizzatore CV inline: anteprima PDF in modale, niente download forzato */}
+      <AnimatePresence>
+        {cvOpen && (
+          <motion.div
+            key="cv-modal"
+            className="ap-cv-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Curriculum Vitae di Alberto Pecchini"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="ap-cv-backdrop" onClick={() => setCvOpen(false)} aria-hidden="true" />
+            <motion.div
+              className="ap-cv-dialog"
+              initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
+              animate={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }}
+              exit={reduceMotion ? {} : { opacity: 0, y: 12, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+            >
+              <div className="ap-cv-bar">
+                <span className="ap-cv-title">Curriculum Vitae — Alberto Pecchini</span>
+                <div className="d-flex align-items-center gap-2">
+                  <a
+                    href={CV_PDF}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="btn btn-sm btn-outline-light fw-semibold d-none d-sm-inline-flex align-items-center"
+                  >
+                    <ExternalLink size={15} className="me-1" aria-hidden="true" /> Nuova scheda
+                  </a>
+                  <a
+                    href={CV_PDF}
+                    download
+                    className="btn btn-sm btn-light fw-semibold text-primary d-inline-flex align-items-center"
+                  >
+                    <Download size={15} className="me-1" aria-hidden="true" /> Scarica
+                  </a>
+                  <button
+                    type="button"
+                    className="ap-cv-close"
+                    onClick={() => setCvOpen(false)}
+                    aria-label="Chiudi l'anteprima del CV"
+                  >
+                    <X size={20} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+              <iframe
+                className="ap-cv-frame"
+                src={`${CV_PDF}#view=FitH&toolbar=1&navpanes=0`}
+                title="Anteprima del Curriculum Vitae in PDF"
+              />
+              <a
+                href={CV_PDF}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="ap-cv-fallback d-sm-none"
+              >
+                Se l'anteprima non si carica, tocca qui per aprire il PDF
+              </a>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -1302,6 +1397,81 @@ export default function App() {
           font-family: inherit;
           font-size: inherit;
           width: 100%;
+        }
+
+        /* Visualizzatore CV (modale con anteprima PDF) */
+        .ap-cv-modal {
+          position: fixed;
+          inset: 0;
+          z-index: 1080;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: clamp(0.5rem, 2vw, 2rem);
+        }
+        .ap-cv-backdrop {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.62);
+          backdrop-filter: blur(2px);
+        }
+        .ap-cv-dialog {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          width: min(940px, 100%);
+          height: min(92vh, 100%);
+          background: #ffffff;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+        }
+        .ap-cv-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+          padding: 0.6rem 0.85rem;
+          background: #06c;
+          color: #ffffff;
+        }
+        .ap-cv-title {
+          font-weight: 600;
+          font-size: 0.95rem;
+        }
+        .ap-cv-frame {
+          flex: 1 1 auto;
+          width: 100%;
+          min-height: 0;
+          border: 0;
+          background: #525659;
+        }
+        .ap-cv-close {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 50%;
+          background: transparent;
+          color: #ffffff;
+          transition: background-color 0.2s ease;
+        }
+        .ap-cv-close:hover,
+        .ap-cv-close:focus-visible {
+          background: rgba(255, 255, 255, 0.18);
+        }
+        .ap-cv-fallback {
+          display: block;
+          padding: 0.6rem 0.85rem;
+          background: #f3f4f6;
+          color: #06c;
+          font-weight: 600;
+          text-align: center;
+          text-decoration: none;
         }
 
         @media (prefers-reduced-motion: reduce) {
