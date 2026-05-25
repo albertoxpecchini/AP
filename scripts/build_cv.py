@@ -232,10 +232,17 @@ SKILLS = [
                      "Responsive Design"]),
     ("AI & sviluppo assistito", ["Claude Code", "Codex", "GitHub Copilot", "Gemini"]),
     ("AI generativa · livello avanzato", ["Nano Banana Pro", "DeepSeek", "Grok"]),
-    ("Strumenti & Workflow", ["Git & GitHub", "Vite", "Vercel", "VS Code"]),
+    ("Strumenti & Workflow", ["Git & GitHub", "Vite", "Vercel", "VS Code",
+                              "PowerShell", "LaTeX / Overleaf"]),
     ("Sistemi operativi", ["iOS", "Windows", "Linux Ubuntu"]),
-    ("Area tecnica CAT", ["Disegno tecnico / CAD", "Topografia",
-                          "Progettazione edilizia", "Estimo"]),
+    ("Windows & IT Support", ["Troubleshooting PC", "Setup hardware & reti",
+                              "Ottimizzazione Windows", "File system 2.5 TB",
+                              "Malware removal", "Gestione periferiche"]),
+    ("Multimedia & Content", ["Fotografia commerciale", "DaVinci Resolve",
+                               "Adobe Premiere Pro", "Canva", "iPhone 16 Pro"]),
+    ("Area tecnica CAT", ["Disegno tecnico / CAD", "AutoCAD", "Topografia",
+                          "Progettazione edilizia", "Estimo",
+                          "Excel avanzato", "Word avanzato"]),
 ]
 
 EDUCATION = [
@@ -256,6 +263,22 @@ EDUCATION = [
 ]
 
 EXPERIENCE = [
+    ("2019 — oggi", "Vendite online — Vinted & Subito",
+     "E-commerce · Fotografia commerciale · Customer care",
+     "Gestione autonoma di vendite su Vinted e Subito: fotografia prodotti con "
+     "iPhone 16 Pro, definizione prezzi, negoziazione, comunicazione con gli "
+     "acquirenti e gestione spedizioni. Prima vendita dicembre 2019 (trattore Same "
+     "Solaris 55, venduto in <24h); attività personale autonoma dall'autunno 2024. "
+     "Categorie: abbigliamento, collezionabili cinematografici, dispositivi tech.",
+     "vinted.it/member/237170304"),
+    ("continuativo", "Cascina di famiglia — Rivalta sul Mincio",
+     "Operaio agricolo · Logistica · Coordinamento",
+     "Supporto continuativo all'attività agricola familiare: cura delle piante "
+     "(annaffiamento, potatura), trasporto materiali su trattore con rimorchio, "
+     "raccolta del fieno, coordinamento di squadra durante le operazioni, assistenza "
+     "logistica negli spostamenti. Competenze acquisite: manualità specializzata, "
+     "problem-solving in campo, affidabilità operativa, gestione attrezzature agricole.",
+     None),
     ("apr 2026", "Rivalta sul Mincio — Sito web",
      "Web design & sviluppo front-end",
      "Progettazione e sviluppo del sito web responsive per la località turistica "
@@ -279,11 +302,29 @@ EXPERIENCE = [
      "albertopecchini.it"),
 ]
 
+VOLUNTEER = [
+    ("2024 — 2025", "Grest Parrocchiale · Parrocchia SS. Donato e Vigilio Martiri",
+     "Animatore volontario · 6 settimane/anno (2 edizioni)",
+     "Animazione e coordinamento di attività per bambini e ragazzi durante il Grest "
+     "estivo parrocchiale a Rivalta sul Mincio. Gestione gruppi eterogenei, "
+     "comunicazione adattiva per tutte le fasce d'età, organizzazione di attività "
+     "educative e ricreative. Referente: Parroco Andrea Grandi."),
+    ("2024", "CRED · Scuola Secondaria di Rodigo — Comune di Rodigo",
+     "Supporto educativo volontario · 2 settimane",
+     "Animazione e supporto educativo durante il centro ricreativo estivo comunale. "
+     "Affiancamento agli educatori, attività di gruppo, rapporto diretto con gli alunni."),
+    ("2024 — 2025", "Festa del Pesce e del Luccio · Associazione Rivaltese",
+     "Volontario logistico · 2 edizioni",
+     "Supporto logistico e organizzativo durante la manifestazione gastronomica locale. "
+     "Allestimento, gestione flussi, supporto allo staff durante l'evento."),
+]
+
 LANGS = [("Italiano", "Madrelingua", 1.0), ("Inglese", "C1 · IELTS", 0.85)]
 LICENSE = ["A1", "B"]
 VEHICLES = ["Trattori", "Muletti", "Moto", "Furgoni", "Auto"]
 SOFT_SKILLS = ["Cura del dettaglio", "Precisione", "Problem solving", "Autonomia",
-               "Creatività", "Apprendimento rapido"]
+               "Creatività", "Apprendimento rapido", "Coordinamento", "Affidabilità",
+               "Customer care", "Animazione gruppi"]
 INTERNATIONAL = ["Dublino · IELTS C1", "Parigi & Normandia", "Edimburgo"]
 HOBBY = ["Moto", "Sport", "Videogiochi", "Musica", "Viaggi", "Tecnologia"]
 PASSIONI = ["Web design", "Innovazione digitale", "Fotografia", "Motori",
@@ -500,6 +541,26 @@ story.append(Spacer(1, 6))
 for period, title, role, desc in EDUCATION:
     head = Paragraph(title, st_item_t)
     per = Paragraph(period, ParagraphStyle("pp2", fontName=FB, fontSize=7.6, leading=10,
+                                           textColor=BLUE, alignment=2))
+    row = Table([[head, per]], colWidths=[MAIN_INNER - 28 * mm, 28 * mm])
+    row.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0), ("BOTTOMPADDING", (0, 0), (-1, -1), 1),
+    ]))
+    story.append(row)
+    story.append(Paragraph(role, st_item_r))
+    story.append(Spacer(1, 2))
+    story.append(Paragraph(desc, st_item_d))
+    story.append(Spacer(1, 6))
+
+# Volontariato
+story.append(Spacer(1, 4))
+story.append(section_title("Volontariato & attività extra", MAIN_INNER))
+story.append(Spacer(1, 6))
+for period, title, role, desc in VOLUNTEER:
+    head = Paragraph(title, st_item_t)
+    per = Paragraph(period, ParagraphStyle("pp3", fontName=FB, fontSize=7.6, leading=10,
                                            textColor=BLUE, alignment=2))
     row = Table([[head, per]], colWidths=[MAIN_INNER - 28 * mm, 28 * mm])
     row.setStyle(TableStyle([

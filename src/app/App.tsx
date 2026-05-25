@@ -120,9 +120,12 @@ const PROJECTS = [
 const SKILLS = [
   { title: "Sviluppo front-end", items: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"] },
   { title: "Design & UX", items: ["UI/UX Design", "Figma", "Design System", "Bootstrap Italia", "Responsive Design"] },
-  { title: "Strumenti & Workflow", items: ["Git & GitHub", "Vite", "Vercel", "VS Code"] },
-  { title: "Area tecnica CAT", items: ["Disegno tecnico / CAD", "Topografia", "Progettazione edilizia", "Estimo"] },
-  { title: "Lingue", items: ["Italiano — madrelingua", "Inglese — intermedio"] },
+  { title: "AI & sviluppo assistito", items: ["Claude Code", "Codex", "GitHub Copilot", "Gemini", "DeepSeek", "Grok"] },
+  { title: "Strumenti & Workflow", items: ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "LaTeX / Overleaf"] },
+  { title: "Windows & IT Support", items: ["Troubleshooting PC", "Setup hardware & reti", "Ottimizzazione Windows", "File system 2.5 TB", "Malware removal", "Gestione periferiche"] },
+  { title: "Multimedia & Content", items: ["Fotografia commerciale", "DaVinci Resolve", "Adobe Premiere Pro", "Canva", "iPhone 16 Pro"] },
+  { title: "Area tecnica CAT", items: ["Disegno tecnico / CAD", "AutoCAD", "Topografia", "Progettazione edilizia", "Estimo", "Excel avanzato"] },
+  { title: "Lingue", items: ["Italiano — madrelingua", "Inglese — C1 (IELTS)"] },
 ];
 
 const CV = [
@@ -139,10 +142,34 @@ const CV = [
     desc: "Formazione tecnica su progettazione, disegno tecnico, topografia ed estimo. Classe 5T, codice meccanografico MNTL009017.",
   },
   {
+    period: "2019 — oggi",
+    title: "Vendite online — Vinted & Subito",
+    role: "E-commerce · Fotografia commerciale · Customer care",
+    desc: "Gestione autonoma di vendite su Vinted e Subito: fotografia prodotti con iPhone 16 Pro, definizione prezzi, negoziazione e gestione spedizioni. Prima vendita dicembre 2019; attività personale autonoma dall'autunno 2024. Categorie: abbigliamento, collezionabili cinematografici, dispositivi tech.",
+  },
+  {
+    period: "continuativo",
+    title: "Cascina di famiglia — Rivalta sul Mincio",
+    role: "Operaio agricolo · Logistica · Coordinamento",
+    desc: "Supporto continuativo all'attività agricola familiare: cura delle piante (annaffiamento, potatura), trasporto materiali su trattore con rimorchio, raccolta del fieno, coordinamento di squadra durante le operazioni. Competenze: manualità specializzata, problem-solving operativo, affidabilità.",
+  },
+  {
     period: "11 — 25 ago 2024",
     title: "CES IELTS Test Centre — Dublino, Irlanda",
     role: "General English Intensive (26 lezioni/sett.) · livello C1",
     desc: "Corso intensivo di inglese generale presso il centro CES di Dame Court, Dublino 2. Quattro settimane di full immersion con focus su speaking, writing e comprensione orale a livello avanzato. Nel tempo libero ho esplorato i dintorni: Howth, Balbriggan, North Bull Island, Bray, Greystones, Glendalough, Powerscourt Estate e Galway.",
+  },
+  {
+    period: "2024 — 2025",
+    title: "Grest Parrocchiale · Parrocchia SS. Donato e Vigilio Martiri — Rivalta",
+    role: "Animatore volontario · 6 settimane/anno (2 edizioni)",
+    desc: "Animazione e coordinamento di attività per bambini e ragazzi durante il Grest estivo parrocchiale. Gestione gruppi eterogenei, comunicazione adattiva per tutte le fasce d'età, organizzazione di attività educative e ricreative.",
+  },
+  {
+    period: "estate 2024",
+    title: "CRED · Scuola Secondaria di Rodigo — Comune di Rodigo",
+    role: "Supporto educativo volontario · 2 settimane",
+    desc: "Animazione e supporto educativo durante il centro ricreativo estivo comunale. Affiancamento agli educatori, attività di gruppo, rapporto diretto con gli alunni.",
   },
   {
     period: "23 lug — 1 ago 2025",
