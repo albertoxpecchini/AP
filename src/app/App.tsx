@@ -112,6 +112,7 @@ const PROJECTS = [
     desc: "Sito web per Cascina Fontana. Design curato e layout responsive ottimizzato per presentare l'attività e i servizi offerti.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
     screenshotUrl: "https://cascinafontana.xyz",
+    previewImg: "/cascina-preview.png",
   },
 ];
 
@@ -722,9 +723,9 @@ export default function App() {
                               <span>In fase di sviluppo...</span>
                             </div>
                           </div>
-                        ) : projectImages[p.title] ? (
+                        ) : (p as any).previewImg || projectImages[p.title] ? (
                           <img
-                            src={projectImages[p.title]}
+                            src={(p as any).previewImg || projectImages[p.title]}
                             alt={`Anteprima ${p.title}`}
                             className="ap-project-screenshot"
                             loading="lazy"
