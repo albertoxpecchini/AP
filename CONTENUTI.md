@@ -1,52 +1,52 @@
-# Da completare — Alberto Pecchini
+# Portfolio — Alberto Pecchini
+
+✅ **Portfolio completato e funzionante!**
 
 ---
 
-## 12 foto per il modal hobby & passioni
+## Status: Completato
 
-Metti le foto nella cartella `public/images/`.
-Formato consigliato: JPG, almeno **900 × 500 px**, orientamento orizzontale (landscape).
+### ✅ Sezioni completate
 
-### Hobby
-
-| File da creare | Card |
-|---|---|
-| `public/images/hobby-moto.jpg` | Moto |
-| `public/images/hobby-sport.jpg` | Sport |
-| `public/images/hobby-videogiochi.jpg` | Videogiochi |
-| `public/images/hobby-musica.jpg` | Musica |
-| `public/images/hobby-viaggi.jpg` | Viaggi |
-| `public/images/hobby-tecnologia.jpg` | Tecnologia |
-
-### Passioni
-
-| File da creare | Card |
-|---|---|
-| `public/images/passione-webdesign.jpg` | Web design |
-| `public/images/passione-innovazione.jpg` | Innovazione digitale |
-| `public/images/passione-fotografia.jpg` | Fotografia |
-| `public/images/passione-motori.jpg` | Motori |
-| `public/images/passione-cinema.jpg` | Cinema |
-| `public/images/passione-outdoor.jpg` | Outdoor |
-
-> Finché un file non esiste la foto non appare, ma il modal funziona lo stesso (icona + titolo + testo).
+- **Chi sono** — Bio, foto reale, descrizione
+- **Competenze** — 5 categorie (front-end, design, strumenti, CAT, lingue)
+- **Curriculum** — Scuola secondaria, ITT, corsi inglese, viaggi, progetti web
+- **Progetti** — Rivalta sul Mincio + Cascina Fontana (WIP)
+  - Rivalta: Screenshot live da microlink.io, versione + data da GitHub
+  - Cascina: Banner giallo "In fase di sviluppo..."
+- **Hobby** — 6 card interattive con modal (icona + descrizione)
+- **Passioni** — 6 card interattive con modal (icona + descrizione)
+- **Social** — 17 profili linkati (Instagram, TikTok, X, YouTube, GitHub, WhatsApp, Telegram, Snapchat, Pinterest, Reddit, Twitch, Spotify, Threads, Steam, Vinted, Subito.it, OpenStreetMap)
 
 ---
 
-## CV PDF
+## Passaggi successivi (opzionali)
 
-| File da creare | Dove |
-|---|---|
-| `cv-alberto-pecchini.pdf` | `public/cv-alberto-pecchini.pdf` |
+### 1️⃣ Foto hobby & passioni (quando pronto)
 
----
+Aggiungi le foto nella cartella `public/images/`.  
+**Formato**: JPG, almeno **900 × 500 px**, orizzontale.
 
-## Social ancora da impostare
+**Hobby**:
+- `hobby-moto.jpg`, `hobby-sport.jpg`, `hobby-videogiochi.jpg`
+- `hobby-musica.jpg`, `hobby-viaggi.jpg`, `hobby-tecnologia.jpg`
 
-Modifica l'array `SOCIALS` in `src/app/App.tsx`.
+**Passioni**:
+- `passione-webdesign.jpg`, `passione-innovazione.jpg`, `passione-fotografia.jpg`
+- `passione-motori.jpg`, `passione-cinema.jpg`, `passione-outdoor.jpg`
 
-| Social | Azione |
-|---|---|
-| Facebook | Aggiungi la riga con l'URL del profilo |
-| LinkedIn | Aggiungi la riga con l'URL del profilo |
-| Discord | Aggiungi la riga solo se hai un server pubblico, altrimenti lascia stare |
+> 📌 Il modal funziona già senza foto (mostra icona + titolo + testo). Le immagini appariranno non appena le aggiungi.
+
+### 2️⃣ CV PDF
+
+Quando pronto, salva il CV in: `public/cv-alberto-pecchini.pdf`
+
+### 3️⃣ Social aggiuntivi (se vuoi)
+
+Se vuoi aggiungere **Facebook, LinkedIn o Discord**, modifica l'array `SOCIALS` in `src/app/App.tsx`:
+
+```javascript
+{ name: "Facebook", Icon: SiFacebook, href: "https://..." },
+{ name: "LinkedIn", Icon: SiLinkedin, href: "https://..." },
+{ name: "Discord", Icon: SiDiscord, href: "https://..." },
+```
