@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { activateLocalMode } from "./utils/local";
 import {
   Mail,
   Phone,
-  ChevronDown,
   MapPin,
   ArrowUpRight,
   Menu,
@@ -294,7 +292,6 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [localMode, setLocalMode] = useState(false);
   const [cvOpen, setCvOpen] = useState(false);
-  const reduceMotion = useReducedMotion();
 
   const CV_PDF = "/cv-alberto-pecchini.pdf";
 
@@ -398,15 +395,6 @@ export default function App() {
     };
   }, [cvOpen]);
 
-  // Respect prefers-reduced-motion: no entrance transforms when the user opts out.
-  const fadeUp = reduceMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 32 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, amount: 0.25 },
-        transition: { duration: 0.7, ease: "easeOut" },
-      };
 
   return (
     <div className="it-page-wrapper">
@@ -567,11 +555,7 @@ export default function App() {
           className="ap-hero bg-primary text-white d-flex align-items-center"
         >
           <div className="container position-relative" style={{ zIndex: 1 }}>
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 40 }}
-              animate={reduceMotion ? {} : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
+            <div>
               <p className="ap-kicker text-uppercase fw-semibold mb-3">
                 Studente CAT · Front-end Developer
               </p>
@@ -590,24 +574,15 @@ export default function App() {
                   Contattami
                 </a>
               </div>
-            </motion.div>
-          </div>
-
-          {!reduceMotion && (
-            <div className="ap-scroll-hint" aria-hidden="true">
-              <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 1.6, repeat: Infinity }}>
-                <ChevronDown size={32} />
-              </motion.div>
             </div>
-          )}
+          </div>
         </section>
 
         <section id="chi-sono" className="py-5 my-lg-4 bg-white">
           <div className="container">
             <div className="row align-items-center gy-5">
               <div className="col-lg-5">
-                <motion.img
-                  {...fadeUp}
+                <img
                   src="/alberto-pecchini.jpg"
                   alt="Ritratto di Alberto Pecchini"
                   width={1050}
@@ -617,7 +592,7 @@ export default function App() {
                 />
               </div>
               <div className="col-lg-7">
-                <motion.div {...fadeUp}>
+                <div>
                   <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
                     01 — Chi sono
                   </p>
@@ -639,7 +614,7 @@ export default function App() {
                     <strong>esperienze digitali memorabili</strong>, mantenendo un design pulito,
                     una tipografia curata e animazioni che valorizzano i contenuti.
                   </p>
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>
@@ -647,16 +622,16 @@ export default function App() {
 
         <section id="competenze" className="py-5 my-lg-4 bg-light">
           <div className="container">
-            <motion.div {...fadeUp} className="mb-5">
+            <div className="mb-5">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
                 02 — Competenze e conoscenze
               </p>
               <h2 className="display-5 fw-bold mb-0">Cosa so fare</h2>
-            </motion.div>
+            </div>
             <div className="row g-4">
               {SKILLS.map((group) => (
                 <div className="col-md-6 col-lg-4" key={group.title}>
-                  <motion.div {...fadeUp} className="ap-skill-card h-100">
+                  <div className="ap-skill-card h-100">
                     <h3 className="h5 fw-bold mb-3">{group.title}</h3>
                     <div className="d-flex flex-wrap gap-2">
                       {group.items.map((item) => (
@@ -665,7 +640,7 @@ export default function App() {
                         </span>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -674,7 +649,7 @@ export default function App() {
 
         <section id="curriculum" className="py-5 my-lg-4 bg-white">
           <div className="container">
-            <motion.div {...fadeUp} className="mb-5">
+            <div className="mb-5">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
                 03 — Curriculum Vitae
               </p>
@@ -698,10 +673,10 @@ export default function App() {
                   </a>
                 </div>
               </div>
-            </motion.div>
+            </div>
             <div className="row">
               <div className="col-lg-9">
-                <motion.div {...fadeUp} className="ap-timeline">
+                <div className="ap-timeline">
                   {CV.map((item) => (
                     <div
                       className={`ap-timeline-item${(item as any).wish ? " ap-timeline-item--wish" : ""}`}
@@ -719,7 +694,7 @@ export default function App() {
                       <p className="text-muted mb-0">{item.desc}</p>
                     </div>
                   ))}
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>
@@ -727,17 +702,17 @@ export default function App() {
 
         <section id="progetti" className="py-5 my-lg-4 bg-light">
           <div className="container">
-            <motion.div {...fadeUp} className="mb-5">
+            <div className="mb-5">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
                 04 — Progetti Web
               </p>
               <h2 className="display-5 fw-bold mb-0">Il mio lavoro</h2>
-            </motion.div>
+            </div>
 
             <div className="row g-4">
               {PROJECTS.map((p) => (
                 <div className="col-12 col-md-6" key={p.title}>
-                  <motion.div {...fadeUp} className="card-wrapper h-100">
+                  <div className="card-wrapper h-100">
                     <div className="it-card it-card-bg rounded shadow ap-project-card h-100 d-flex flex-column">
                       <div className="ap-project-preview">
                         {p.wip ? (
@@ -803,7 +778,7 @@ export default function App() {
                         )}
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -812,17 +787,16 @@ export default function App() {
 
         <section id="hobby" className="py-5 my-lg-4 bg-white">
           <div className="container">
-            <motion.div {...fadeUp} className="mb-5">
+            <div className="mb-5">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
                 05 — Hobby
               </p>
               <h2 className="display-5 fw-bold mb-0">Nel tempo libero</h2>
-            </motion.div>
+            </div>
             <div className="row g-4">
               {HOBBY.map((item) => (
                 <div className="col-6 col-md-4 col-lg-2" key={item.label}>
-                  <motion.button
-                    {...fadeUp}
+                  <button
                     type="button"
                     className="ap-interest-card h-100"
                     onClick={() => setSelectedItem(item)}
@@ -832,7 +806,7 @@ export default function App() {
                       <item.Icon size={26} />
                     </span>
                     <span className="ap-interest-label">{item.label}</span>
-                  </motion.button>
+                  </button>
                 </div>
               ))}
             </div>
@@ -841,17 +815,16 @@ export default function App() {
 
         <section id="passioni" className="py-5 my-lg-4 bg-light">
           <div className="container">
-            <motion.div {...fadeUp} className="mb-5">
+            <div className="mb-5">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
                 06 — Passioni
               </p>
               <h2 className="display-5 fw-bold mb-0">Cosa mi appassiona</h2>
-            </motion.div>
+            </div>
             <div className="row g-4">
               {PASSIONI.map((item) => (
                 <div className="col-6 col-md-4 col-lg-2" key={item.label}>
-                  <motion.button
-                    {...fadeUp}
+                  <button
                     type="button"
                     className="ap-interest-card h-100"
                     onClick={() => setSelectedItem(item)}
@@ -861,7 +834,7 @@ export default function App() {
                       <item.Icon size={26} />
                     </span>
                     <span className="ap-interest-label">{item.label}</span>
-                  </motion.button>
+                  </button>
                 </div>
               ))}
             </div>
@@ -870,7 +843,7 @@ export default function App() {
 
         <section id="contatti" className="py-5 bg-primary text-white">
           <div className="container text-center">
-            <motion.div {...fadeUp}>
+            <div>
               <p className="ap-kicker text-uppercase fw-semibold mb-3" style={{ opacity: 0.85 }}>
                 07 — Contatti
               </p>
@@ -902,7 +875,7 @@ export default function App() {
                   <Phone size={20} className="me-2" aria-hidden="true" /> Chiamami
                 </a>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
       </main>
@@ -949,128 +922,103 @@ export default function App() {
         </div>
       </footer>
 
-      <AnimatePresence>
-        {selectedItem && (
-          <>
-            <motion.div
-              key="modal-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="ap-modal-backdrop"
-              onClick={() => setSelectedItem(null)}
-              aria-hidden="true"
-            />
-            <motion.div
-              key="modal-panel"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="modal-title"
-              style={{ x: "-50%", y: "-50%" }}
-              initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
-              animate={reduceMotion ? {} : { opacity: 1, scale: 1 }}
-              exit={reduceMotion ? {} : { opacity: 0, scale: 0.92 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="ap-modal"
-            >
-              <button
-                type="button"
-                className="ap-modal-close"
-                onClick={() => setSelectedItem(null)}
-                aria-label="Chiudi"
-              >
-                <X size={20} />
-              </button>
-              {selectedItem.img && (
-                <div className="ap-modal-photo">
-                  <img
-                    src={selectedItem.img}
-                    alt={selectedItem.label}
-                    loading="lazy"
-                    onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
-                  />
-                </div>
-              )}
-              <div className="ap-modal-inner">
-                <div className="ap-modal-icon-wrap">
-                  <selectedItem.Icon size={32} />
-                </div>
-                <h2 id="modal-title" className="ap-modal-title">{selectedItem.label}</h2>
-                <p className="ap-modal-body">{selectedItem.desc}</p>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Visualizzatore CV inline: anteprima PDF in modale, niente download forzato */}
-      <AnimatePresence>
-        {cvOpen && (
-          <motion.div
-            key="cv-modal"
-            className="ap-cv-modal"
+      {selectedItem && (
+        <>
+          <div
+            className="ap-modal-backdrop"
+            onClick={() => setSelectedItem(null)}
+            aria-hidden="true"
+          />
+          <div
             role="dialog"
             aria-modal="true"
-            aria-label="Curriculum Vitae di Alberto Pecchini"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            aria-labelledby="modal-title"
+            style={{ transform: "translate(-50%, -50%)" }}
+            className="ap-modal"
           >
-            <div className="ap-cv-backdrop" onClick={() => setCvOpen(false)} aria-hidden="true" />
-            <motion.div
-              className="ap-cv-dialog"
-              initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
-              animate={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }}
-              exit={reduceMotion ? {} : { opacity: 0, y: 12, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
+            <button
+              type="button"
+              className="ap-modal-close"
+              onClick={() => setSelectedItem(null)}
+              aria-label="Chiudi"
             >
-              <div className="ap-cv-bar">
-                <span className="ap-cv-title">Curriculum Vitae — Alberto Pecchini</span>
-                <div className="d-flex align-items-center gap-2">
-                  <a
-                    href={CV_PDF}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="btn btn-sm btn-outline-light fw-semibold d-none d-sm-inline-flex align-items-center"
-                  >
-                    <ExternalLink size={15} className="me-1" aria-hidden="true" /> Nuova scheda
-                  </a>
-                  <a
-                    href={CV_PDF}
-                    download
-                    className="btn btn-sm btn-light fw-semibold text-primary d-inline-flex align-items-center"
-                  >
-                    <Download size={15} className="me-1" aria-hidden="true" /> Scarica
-                  </a>
-                  <button
-                    type="button"
-                    className="ap-cv-close"
-                    onClick={() => setCvOpen(false)}
-                    aria-label="Chiudi l'anteprima del CV"
-                  >
-                    <X size={20} aria-hidden="true" />
-                  </button>
-                </div>
+              <X size={20} />
+            </button>
+            {selectedItem.img && (
+              <div className="ap-modal-photo">
+                <img
+                  src={selectedItem.img}
+                  alt={selectedItem.label}
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                />
               </div>
-              <iframe
-                className="ap-cv-frame"
-                src={`${CV_PDF}#view=FitH&toolbar=1&navpanes=0`}
-                title="Anteprima del Curriculum Vitae in PDF"
-              />
-              <a
-                href={CV_PDF}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="ap-cv-fallback d-sm-none"
-              >
-                Se l'anteprima non si carica, tocca qui per aprire il PDF
-              </a>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            )}
+            <div className="ap-modal-inner">
+              <div className="ap-modal-icon-wrap">
+                <selectedItem.Icon size={32} />
+              </div>
+              <h2 id="modal-title" className="ap-modal-title">{selectedItem.label}</h2>
+              <p className="ap-modal-body">{selectedItem.desc}</p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Visualizzatore CV inline: anteprima PDF in modale, niente download forzato */}
+      {cvOpen && (
+        <div
+          className="ap-cv-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Curriculum Vitae di Alberto Pecchini"
+        >
+          <div className="ap-cv-backdrop" onClick={() => setCvOpen(false)} aria-hidden="true" />
+          <div className="ap-cv-dialog">
+            <div className="ap-cv-bar">
+              <span className="ap-cv-title">Curriculum Vitae — Alberto Pecchini</span>
+              <div className="d-flex align-items-center gap-2">
+                <a
+                  href={CV_PDF}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="btn btn-sm btn-outline-light fw-semibold d-none d-sm-inline-flex align-items-center"
+                >
+                  <ExternalLink size={15} className="me-1" aria-hidden="true" /> Nuova scheda
+                </a>
+                <a
+                  href={CV_PDF}
+                  download
+                  className="btn btn-sm btn-light fw-semibold text-primary d-inline-flex align-items-center"
+                >
+                  <Download size={15} className="me-1" aria-hidden="true" /> Scarica
+                </a>
+                <button
+                  type="button"
+                  className="ap-cv-close"
+                  onClick={() => setCvOpen(false)}
+                  aria-label="Chiudi l'anteprima del CV"
+                >
+                  <X size={20} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+            <iframe
+              className="ap-cv-frame"
+              src={`${CV_PDF}#view=FitH&toolbar=1&navpanes=0`}
+              title="Anteprima del Curriculum Vitae in PDF"
+            />
+            <a
+              href={CV_PDF}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="ap-cv-fallback d-sm-none"
+            >
+              Se l'anteprima non si carica, tocca qui per aprire il PDF
+            </a>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .it-page-wrapper {
@@ -1096,12 +1044,11 @@ export default function App() {
           display: block;
         }
 
-        /* Navbar sticky con feedback allo scroll */
+        /* Navbar sticky */
         .ap-navbar {
           position: sticky;
           top: 0;
           z-index: 3;
-          transition: box-shadow 0.3s ease, background-color 0.3s ease;
         }
         .ap-navbar--scrolled {
           box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
@@ -1157,12 +1104,7 @@ export default function App() {
 
         /* Card progetto */
         .ap-project-card {
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
           overflow: hidden;
-        }
-        .ap-project-card:hover,
-        .ap-project-card:focus-within {
-          transform: translateY(-4px);
         }
         .ap-project-wip {
           display: flex;
@@ -1264,13 +1206,11 @@ export default function App() {
           border-radius: 50%;
           border: 1px solid rgba(255, 255, 255, 0.45);
           color: #ffffff;
-          transition: background-color 0.2s ease, transform 0.2s ease;
         }
         .ap-social:hover,
         .ap-social:focus-visible {
           background-color: rgba(255, 255, 255, 0.16);
           color: #ffffff;
-          transform: translateY(-2px);
         }
         .ap-social--sm {
           width: 40px;
@@ -1355,11 +1295,6 @@ export default function App() {
           border: 1px solid rgba(0, 102, 204, 0.12);
           border-radius: 8px;
           text-align: center;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .ap-interest-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
         }
         .ap-interest-icon {
           display: inline-flex;
@@ -1542,20 +1477,6 @@ export default function App() {
           text-decoration: none;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          .ap-project-card,
-          .ap-social,
-          .ap-interest-card,
-          .ap-navbar {
-            transition: none;
-          }
-          .ap-project-card:hover,
-          .ap-project-card:focus-within,
-          .ap-interest-card:hover,
-          .ap-social:hover {
-            transform: none;
-          }
-        }
       `}</style>
     </div>
   );
