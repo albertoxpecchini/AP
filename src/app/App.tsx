@@ -5,7 +5,6 @@ import {
   Mail,
   Phone,
   ChevronDown,
-  Code2,
   MapPin,
   ArrowUpRight,
   Menu,
@@ -434,7 +433,7 @@ export default function App() {
                     <div className="it-brand-wrapper">
                       <a href="#home" aria-label="Alberto Pecchini, torna alla home">
                         <span className="ap-brand-mark" aria-hidden="true">
-                          <Code2 size={26} />
+                          <img src="/favicon.svg" alt="" width={48} height={48} />
                         </span>
                         <div className="it-brand-text">
                           <div className="it-brand-title">Alberto Pecchini</div>
@@ -1038,9 +1037,13 @@ export default function App() {
           width: 48px;
           height: 48px;
           border-radius: 8px;
-          background-color: rgba(255, 255, 255, 0.14);
-          color: #ffffff;
+          overflow: hidden;
           margin-right: 12px;
+        }
+        .ap-brand-mark img {
+          width: 100%;
+          height: 100%;
+          display: block;
         }
 
         /* Navbar sticky con feedback allo scroll */
