@@ -12,6 +12,7 @@ import {
   X,
   GraduationCap,
   Download,
+  AlertTriangle,
   Bike,
   Dumbbell,
   Gamepad2,
@@ -24,6 +25,8 @@ import {
   Car,
   Film,
   Mountain,
+  ShoppingBag,
+  Tag,
 } from "lucide-react";
 import {
   SiInstagram,
@@ -39,6 +42,10 @@ import {
   SiTwitch,
   SiSpotify,
   SiThreads,
+  SiSteam,
+  SiVinted,
+  SiOpenstreetmap,
+  SiEbay,
 } from "react-icons/si";
 
 const NAV_LINKS = [
@@ -81,6 +88,32 @@ const SOCIALS = [
   { name: "Twitch", Icon: SiTwitch, href: "https://www.twitch.tv/pzkko" },
   { name: "Spotify", Icon: SiSpotify, href: "https://open.spotify.com/user/qeefs44bv4bpoa7dk8epagrxf" },
   { name: "Threads", Icon: SiThreads, href: "https://www.threads.net/@albertoxpecchini" },
+  { name: "Steam", Icon: SiSteam, href: "https://steamcommunity.com/profiles/76561198971719489/" },
+  { name: "Vinted", Icon: SiVinted, href: "https://www.vinted.it/member/237170304" },
+  { name: "Subito.it", Icon: SiEbay, href: "https://www.subito.it/utente/127591135" },
+  { name: "OpenStreetMap", Icon: SiOpenstreetmap, href: "https://www.openstreetmap.org/user/albertoxpecchini" },
+];
+
+const PROJECTS = [
+  {
+    category: "Sito web istituzionale",
+    date: "27 apr 2026",
+    title: "Rivalta sul Mincio",
+    url: "https://rivaltasulmincio.it",
+    desc: "Sito web responsive per la località turistica di Rivalta sul Mincio. Design minimalista con tipografia editoriale, palette calda monocromatica, griglie bento gapless, animazioni GSAP ScrollTrigger e composizione image-led.",
+    tags: ["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Design minimalista"],
+    githubRepo: "albertoxpecchini/rivaltasulmincio",
+    screenshotUrl: "https://rivaltasulmincio.it",
+  },
+  {
+    category: "Sito web aziendale",
+    date: "20 apr 2026",
+    title: "Cascina Fontana",
+    url: "https://cascinafontana.xyz",
+    desc: "Sito web per Cascina Fontana. Design curato e layout responsive ottimizzato per presentare l'attività e i servizi offerti.",
+    tags: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
+    wip: true,
+  },
 ];
 
 const SKILLS = [
@@ -93,10 +126,16 @@ const SKILLS = [
 
 const CV = [
   {
+    period: "12 set 2018 — 8 giu 2021",
+    title: "Scuola secondaria di primo grado — Mantova",
+    role: "Istituto Redentore · Fondazione «Casa dello studente Beato Contardo Ferrini»",
+    desc: "Formazione generale nella scuola secondaria di primo grado.",
+  },
+  {
     period: "2021 — oggi",
-    title: "ITT «Carlo d'Arco» — Mantova",
+    title: "Istituto Tecnico Tecnologico «Carlo d'Arco» — Mantova",
     role: "Diploma CAT · Costruzioni, Ambiente e Territorio (5º anno)",
-    desc: "Formazione tecnica su progettazione, disegno tecnico, topografia ed estimo.",
+    desc: "Formazione tecnica su progettazione, disegno tecnico, topografia ed estimo. Classe 5T, codice meccanografico MNTL009017.",
   },
   {
     period: "11 — 25 ago 2024",
@@ -117,7 +156,13 @@ const CV = [
     desc: "Visita della capitale scozzese durante le festività: Old Town, Edinburgh Castle, Royal Mile e l'atmosfera unica dei vicoli storici nel periodo natalizio.",
   },
   {
-    period: "2026",
+    period: "20 apr 2026",
+    title: "Cascina Fontana — Sito web",
+    role: "Web design & sviluppo front-end",
+    desc: "Progettazione e sviluppo del sito web aziendale per Cascina Fontana. Layout responsive con design curato e ottimizzato per presentare l'attività e i servizi offerti.",
+  },
+  {
+    period: "27 apr 2026",
     title: "Rivalta sul Mincio — Sito web",
     role: "Web design & sviluppo front-end",
     desc: "Progettazione e sviluppo del sito responsive con Next.js, TypeScript, GSAP e Tailwind CSS.",
@@ -245,6 +290,46 @@ export default function App() {
   const closeMenu = () => setMenuOpen(false);
 
   const [selectedItem, setSelectedItem] = useState<{ Icon: any; label: string; desc: string; img?: string } | null>(null);
+
+  const [ghData, setGhData] = useState<Record<string, { pushedAt: string; version?: string }>>({});
+  const [projectImages, setProjectImages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    PROJECTS.forEach(async (p) => {
+      const repo = p.githubRepo;
+      if (!repo) return;
+      try {
+        const repoRes = await fetch(`https://api.github.com/repos/${repo}`);
+        if (!repoRes.ok) return;
+        const repoJson = await repoRes.json();
+
+        let version: string | undefined;
+        const releaseRes = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
+        if (releaseRes.ok) {
+          const rel = await releaseRes.json();
+          version = rel.tag_name;
+        } else {
+          const tagsRes = await fetch(`https://api.github.com/repos/${repo}/tags`);
+          if (tagsRes.ok) {
+            const tags = await tagsRes.json();
+            if (Array.isArray(tags) && tags.length > 0) version = tags[0].name;
+          }
+        }
+
+        setGhData((prev) => ({ ...prev, [repo]: { pushedAt: repoJson.pushed_at, version } }));
+      } catch {}
+    });
+
+    PROJECTS.forEach(async (p) => {
+      if (!p.screenshotUrl) return;
+      try {
+        const dataUrl = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(p.screenshotUrl)}&screenshot=true&viewport.width=600&viewport.height=300`)
+          .then(r => r.json())
+          .then(d => d.data?.screenshot?.url || null);
+        if (dataUrl) setProjectImages((prev) => ({ ...prev, [p.title]: dataUrl }));
+      } catch {}
+    });
+  }, []);
   useEffect(() => {
     if (!selectedItem) return;
     document.body.style.overflow = "hidden";
@@ -574,80 +659,77 @@ export default function App() {
             </motion.div>
 
             <div className="row g-4">
-              <div className="col-12 col-md-6">
-                <motion.div {...fadeUp} className="card-wrapper h-100">
-                  <div className="it-card it-card-bg rounded shadow ap-project-card h-100">
-                    <div className="it-card-body">
-                      <div className="category-top d-flex justify-content-between align-items-center">
-                        <span className="category">Sito web istituzionale</span>
-                        <span className="data">27 apr 2026</span>
+              {PROJECTS.map((p) => (
+                <div className="col-12 col-md-6" key={p.title}>
+                  <motion.div {...fadeUp} className="card-wrapper h-100">
+                    <div className="it-card it-card-bg rounded shadow ap-project-card h-100 d-flex flex-column">
+                      <div className="ap-project-preview">
+                        {p.wip ? (
+                          <div className="ap-project-preview--wip">
+                            <div className="ap-project-cantiere">
+                              <AlertTriangle size={48} />
+                              <span>In fase di sviluppo...</span>
+                            </div>
+                          </div>
+                        ) : projectImages[p.title] ? (
+                          <img
+                            src={projectImages[p.title]}
+                            alt={`Anteprima ${p.title}`}
+                            className="ap-project-screenshot"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="ap-project-placeholder">
+                            <div className="ap-project-placeholder-text">{p.title}</div>
+                          </div>
+                        )}
                       </div>
-                      <h3 className="it-card-title h2 fw-bold">
-                        <a
-                          className="text-decoration-none stretched-link"
-                          href="https://rivaltasulmincio.it"
-                          target="_blank"
-                          rel="noreferrer noopener"
-                        >
-                          Rivalta sul Mincio
-                          <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
-                        </a>
-                      </h3>
-                      <p className="it-card-text fs-5">
-                        Sito web responsive per la località turistica di Rivalta sul Mincio.
-                        Design minimalista con tipografia editoriale, palette calda monocromatica,
-                        griglie bento gapless, animazioni GSAP ScrollTrigger e composizione
-                        image-led.
-                      </p>
-                      <div className="d-flex flex-wrap gap-2 mt-4">
-                        {["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Design minimalista"].map(
-                          (tag) => (
+                      <div className="it-card-body flex-grow-1">
+                        <div className="category-top d-flex justify-content-between align-items-center">
+                          <span className="category">{p.category}</span>
+                          <span className="data">{p.date}</span>
+                        </div>
+                        <h3 className="it-card-title h2 fw-bold">
+                          <a
+                            className="text-decoration-none stretched-link"
+                            href={p.url}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            {p.title}
+                            <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
+                          </a>
+                        </h3>
+                        <p className="it-card-text fs-5">{p.desc}</p>
+                        <div className="d-flex flex-wrap gap-2 mt-4">
+                          {p.tags.map((tag) => (
                             <span key={tag} className="chip chip-simple chip-primary">
                               <span className="chip-label">{tag}</span>
                             </span>
-                          ),
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-              <div className="col-12 col-md-6">
-                <motion.div {...fadeUp} className="card-wrapper h-100">
-                  <div className="it-card it-card-bg rounded shadow ap-project-card h-100">
-                    <div className="it-card-body">
-                      <div className="category-top d-flex justify-content-between align-items-center">
-                        <span className="category">Sito web aziendale</span>
-                        <span className="data">20 apr 2026</span>
-                      </div>
-                      <h3 className="it-card-title h2 fw-bold">
-                        <a
-                          className="text-decoration-none stretched-link"
-                          href="https://cascinafontana.xyz"
-                          target="_blank"
-                          rel="noreferrer noopener"
-                        >
-                          Cascina Fontana
-                          <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
-                        </a>
-                      </h3>
-                      <p className="it-card-text fs-5">
-                        Sito web per Cascina Fontana. Design curato e layout responsive
-                        ottimizzato per presentare l'attività e i servizi offerti.
-                      </p>
-                      <div className="d-flex flex-wrap gap-2 mt-4">
-                        {["React", "TypeScript", "Tailwind CSS", "Responsive Design"].map(
-                          (tag) => (
-                            <span key={tag} className="chip chip-simple chip-primary">
-                              <span className="chip-label">{tag}</span>
+                          ))}
+                        </div>
+                        {p.githubRepo && ghData[p.githubRepo] && (
+                          <div className="d-flex align-items-center gap-2 mt-3">
+                            {ghData[p.githubRepo].version && (
+                              <span className="ap-project-version">
+                                {ghData[p.githubRepo].version}
+                              </span>
+                            )}
+                            <span className="ap-project-gh-date">
+                              Aggiornato il{" "}
+                              {new Date(ghData[p.githubRepo].pushedAt).toLocaleDateString("it-IT", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              })}
                             </span>
-                          ),
+                          </div>
                         )}
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              </div>
+                  </motion.div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -928,10 +1010,95 @@ export default function App() {
         /* Card progetto */
         .ap-project-card {
           transition: transform 0.25s ease, box-shadow 0.25s ease;
+          overflow: hidden;
         }
         .ap-project-card:hover,
         .ap-project-card:focus-within {
           transform: translateY(-4px);
+        }
+        .ap-project-wip {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          padding: 0.55rem 1.25rem;
+          background: #fef9c3;
+          color: #854d0e;
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          border-bottom: 1px solid #fde047;
+        }
+        .ap-project-gh-date {
+          font-size: 0.78rem;
+          color: #888;
+        }
+        .ap-project-version {
+          display: inline-block;
+          padding: 0.18rem 0.55rem;
+          background: rgba(0, 102, 204, 0.1);
+          color: #06c;
+          border-radius: 999px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          font-family: monospace;
+          letter-spacing: 0.03em;
+        }
+        /* Anteprima sito */
+        .ap-project-preview {
+          width: 100%;
+          height: 220px;
+          background: #f5f5f5;
+          border-bottom: 1px solid #e0e0e0;
+          overflow: hidden;
+        }
+        .ap-project-preview--wip {
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            135deg,
+            #fef9c3 0%,
+            #fef3c7 50%,
+            #fef9c3 100%
+          );
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .ap-project-cantiere {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          color: #854d0e;
+          text-align: center;
+          opacity: 0.6;
+        }
+        .ap-project-cantiere span {
+          font-size: 0.875rem;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+        }
+        .ap-project-screenshot {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .ap-project-placeholder {
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .ap-project-placeholder-text {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #4f46e5;
+          text-align: center;
+          padding: 1rem;
         }
         .ap-project-card .it-card-title a {
           display: inline-flex;
