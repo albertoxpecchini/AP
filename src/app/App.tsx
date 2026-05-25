@@ -111,7 +111,7 @@ const PROJECTS = [
     url: "https://cascinafontana.xyz",
     desc: "Sito web per Cascina Fontana. Design curato e layout responsive ottimizzato per presentare l'attività e i servizi offerti.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
-    wip: true,
+    screenshotUrl: "https://cascinafontana.xyz",
   },
 ];
 
