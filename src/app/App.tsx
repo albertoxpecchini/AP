@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { activateLocalMode } from "./utils/local";
 import {
   Mail,
   Phone,
@@ -27,25 +28,18 @@ import {
 import {
   SiInstagram,
   SiTiktok,
-  SiFacebook,
   SiX,
   SiYoutube,
   SiGithub,
   SiWhatsapp,
   SiTelegram,
-  SiDiscord,
   SiSnapchat,
   SiPinterest,
   SiReddit,
   SiTwitch,
   SiSpotify,
   SiThreads,
-  SiBehance,
-  SiDribbble,
-  SiFigma,
-  SiMedium,
 } from "react-icons/si";
-import { FaLinkedin } from "react-icons/fa6";
 
 const NAV_LINKS = [
   { href: "#chi-sono", label: "Chi sono" },
@@ -74,26 +68,19 @@ function WhatsAppIcon({ size = 20 }: { size?: number }) {
 
 // Social del footer. href "#" = profilo da fornire (verranno rimossi quelli non usati).
 const SOCIALS = [
-  { name: "Instagram", Icon: SiInstagram, href: "#" },
-  { name: "TikTok", Icon: SiTiktok, href: "#" },
-  { name: "Facebook", Icon: SiFacebook, href: "#" },
-  { name: "X (Twitter)", Icon: SiX, href: "#" },
-  { name: "YouTube", Icon: SiYoutube, href: "#" },
-  { name: "LinkedIn", Icon: FaLinkedin, href: "#" },
-  { name: "GitHub", Icon: SiGithub, href: "#" },
+  { name: "Instagram", Icon: SiInstagram, href: "https://www.instagram.com/albertoxpecchini" },
+  { name: "TikTok", Icon: SiTiktok, href: "https://www.tiktok.com/@albertoxpecchini" },
+  { name: "X (Twitter)", Icon: SiX, href: "https://x.com/ygpzk" },
+  { name: "YouTube", Icon: SiYoutube, href: "https://www.youtube.com/@alberto-h7y3h" },
+  { name: "GitHub", Icon: SiGithub, href: "https://github.com/albertoxpecchini" },
   { name: "WhatsApp", Icon: SiWhatsapp, href: WHATSAPP_HREF },
-  { name: "Telegram", Icon: SiTelegram, href: "#" },
-  { name: "Discord", Icon: SiDiscord, href: "#" },
-  { name: "Snapchat", Icon: SiSnapchat, href: "#" },
-  { name: "Pinterest", Icon: SiPinterest, href: "#" },
-  { name: "Reddit", Icon: SiReddit, href: "#" },
-  { name: "Twitch", Icon: SiTwitch, href: "#" },
-  { name: "Spotify", Icon: SiSpotify, href: "#" },
-  { name: "Threads", Icon: SiThreads, href: "#" },
-  { name: "Behance", Icon: SiBehance, href: "#" },
-  { name: "Dribbble", Icon: SiDribbble, href: "#" },
-  { name: "Figma", Icon: SiFigma, href: "#" },
-  { name: "Medium", Icon: SiMedium, href: "#" },
+  { name: "Telegram", Icon: SiTelegram, href: "https://t.me/albertopecchini" },
+  { name: "Snapchat", Icon: SiSnapchat, href: "https://www.snapchat.com/add/albertoxpecchini" },
+  { name: "Pinterest", Icon: SiPinterest, href: "https://www.pinterest.com/albertoxpecchini" },
+  { name: "Reddit", Icon: SiReddit, href: "https://www.reddit.com/user/yungpzkko" },
+  { name: "Twitch", Icon: SiTwitch, href: "https://www.twitch.tv/pzkko" },
+  { name: "Spotify", Icon: SiSpotify, href: "https://open.spotify.com/user/qeefs44bv4bpoa7dk8epagrxf" },
+  { name: "Threads", Icon: SiThreads, href: "https://www.threads.net/@albertoxpecchini" },
 ];
 
 const SKILLS = [
@@ -112,6 +99,24 @@ const CV = [
     desc: "Formazione tecnica su progettazione, disegno tecnico, topografia ed estimo.",
   },
   {
+    period: "11 — 25 ago 2024",
+    title: "CES IELTS Test Centre — Dublino, Irlanda",
+    role: "General English Intensive (26 lezioni/sett.) · livello C1",
+    desc: "Corso intensivo di inglese generale presso il centro CES di Dame Court, Dublino 2. Quattro settimane di full immersion con focus su speaking, writing e comprensione orale a livello avanzato. Nel tempo libero ho esplorato i dintorni: Howth, Balbriggan, North Bull Island, Bray, Greystones, Glendalough, Powerscourt Estate e Galway.",
+  },
+  {
+    period: "23 lug — 1 ago 2025",
+    title: "Parigi · Le Havre · Rouen · Étretat — Francia",
+    role: "Viaggio culturale",
+    desc: "Itinerario tra Normandia e Île-de-France: le scogliere di Étretat, la cattedrale gotica di Rouen, il porto di Le Havre e i principali musei e quartieri di Parigi.",
+  },
+  {
+    period: "26 — 29 dic 2025",
+    title: "Edimburgo — Scozia, Regno Unito",
+    role: "Viaggio culturale",
+    desc: "Visita della capitale scozzese durante le festività: Old Town, Edinburgh Castle, Royal Mile e l'atmosfera unica dei vicoli storici nel periodo natalizio.",
+  },
+  {
     period: "2026",
     title: "Rivalta sul Mincio — Sito web",
     role: "Web design & sviluppo front-end",
@@ -120,27 +125,95 @@ const CV = [
 ];
 
 const HOBBY = [
-  { Icon: Bike, label: "Moto" },
-  { Icon: Dumbbell, label: "Sport" },
-  { Icon: Gamepad2, label: "Videogiochi" },
-  { Icon: Music, label: "Musica" },
-  { Icon: Plane, label: "Viaggi" },
-  { Icon: Cpu, label: "Tecnologia" },
+  {
+    Icon: Bike,
+    label: "Moto",
+    img: "https://picsum.photos/seed/moto/900/500",
+    desc: "Le due ruote rappresentano per me libertà allo stato puro. Mi affascina la tecnica di guida, la meccanica dei motori e il senso di controllo totale che si prova su una moto. Seguire il mondo delle moto — dalle naked alle supersportive — è una delle cose che mi appassiona di più.",
+  },
+  {
+    Icon: Dumbbell,
+    label: "Sport",
+    img: "https://picsum.photos/seed/sport/900/500",
+    desc: "Mi alleno regolarmente in palestra: trovo che la disciplina sportiva migliori non solo il fisico ma anche la concentrazione e la costanza nel lavoro quotidiano. Mi interessano i workout di forza e mi documento continuamente su allenamento e nutrizione sportiva.",
+  },
+  {
+    Icon: Gamepad2,
+    label: "Videogiochi",
+    img: "https://picsum.photos/seed/gaming/900/500",
+    desc: "I videogiochi mi hanno avvicinato al mondo del design e della tecnologia fin da giovane. Apprezzo i titoli con una forte identità visiva, una narrativa curata e un gameplay profondo — sia esperienze single player immersive che titoli competitivi.",
+  },
+  {
+    Icon: Music,
+    label: "Musica",
+    img: "https://picsum.photos/seed/music/900/500",
+    desc: "La musica è una presenza costante mentre lavoro e mi rilasso. Ascolto generi molto diversi: dalla musica elettronica all'hip-hop, passando per colonne sonore cinematografiche. Il ritmo e l'atmosfera di un brano influenzano molto il mio approccio creativo.",
+  },
+  {
+    Icon: Plane,
+    label: "Viaggi",
+    img: "https://picsum.photos/seed/travel/900/500",
+    desc: "Viaggiare mi permette di osservare architetture, design urbano e culture diverse che poi rientrano inconsciamente nel mio lavoro creativo. Mi piace esplorare posti nuovi con curiosità, annotare dettagli visivi e portarli nei miei progetti.",
+  },
+  {
+    Icon: Cpu,
+    label: "Tecnologia",
+    img: "https://picsum.photos/seed/tech/900/500",
+    desc: "Sono attratto da tutto ciò che è nuovo nel mondo tech: hardware, software, intelligenza artificiale, smartphone. Seguire le novità tecnologiche non è solo un hobby ma un modo per restare aggiornato e trovare ispirazione per i miei progetti digitali.",
+  },
 ];
 
 const PASSIONI = [
-  { Icon: Palette, label: "Web design" },
-  { Icon: Lightbulb, label: "Innovazione digitale" },
-  { Icon: Camera, label: "Fotografia" },
-  { Icon: Car, label: "Motori" },
-  { Icon: Film, label: "Cinema" },
-  { Icon: Mountain, label: "Outdoor" },
+  {
+    Icon: Palette,
+    label: "Web design",
+    img: "https://picsum.photos/seed/design/900/500",
+    desc: "Il web design è la mia passione principale: creare interfacce belle e funzionali dove ogni dettaglio — dalla tipografia al ritmo degli spazi — contribuisce all'esperienza dell'utente. Studio continuamente trend di design e mi ispiro a designer internazionali per affinare il mio gusto visivo.",
+  },
+  {
+    Icon: Lightbulb,
+    label: "Innovazione digitale",
+    img: "https://picsum.photos/seed/innovation/900/500",
+    desc: "Mi affascina il modo in cui la tecnologia trasforma prodotti, servizi e abitudini quotidiane. Seguo con interesse l'evoluzione dell'intelligenza artificiale, dei tool creativi generativi e delle nuove piattaforme digitali che ridefiniscono il modo di costruire e vivere il web.",
+  },
+  {
+    Icon: Camera,
+    label: "Fotografia",
+    img: "https://picsum.photos/seed/photo/900/500",
+    desc: "Attraverso la fotografia imparo a vedere il mondo con occhio compositivo: luce, prospettiva, equilibrio visivo. Questi concetti si trasferiscono direttamente nel mio approccio al design delle interfacce, dove la gerarchia visiva e il contrasto sono tutto.",
+  },
+  {
+    Icon: Car,
+    label: "Motori",
+    img: "https://picsum.photos/seed/motors/900/500",
+    desc: "La passione per i motori va oltre le moto: seguo l'automotive design, la Formula 1 e l'ingegneria meccanica applicata alle auto. L'estetica di un'auto ben disegnata o la perfezione tecnica di un motore mi affascinano tanto quanto un'interfaccia web riuscita.",
+  },
+  {
+    Icon: Film,
+    label: "Cinema",
+    img: "https://picsum.photos/seed/cinema/900/500",
+    desc: "Il cinema mi interessa per il suo linguaggio visivo: composizione dell'inquadratura, uso del colore, ritmo del montaggio. I registi che usano l'immagine come strumento narrativo primario sono una grande fonte di ispirazione per il mio lavoro di design.",
+  },
+  {
+    Icon: Mountain,
+    label: "Outdoor",
+    img: "https://picsum.photos/seed/outdoor/900/500",
+    desc: "Staccare dallo schermo e stare all'aria aperta mi aiuta a ricaricare la creatività. Che sia una gita in moto, una camminata tra la natura mantovana o semplicemente del tempo fuori, il contrasto con il lavoro digitale è fondamentale per tornare ai progetti con occhi freschi.",
+  },
 ];
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [localMode, setLocalMode] = useState(false);
   const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    activateLocalMode(() => {
+      setLocalMode(true);
+      console.info("Local mode attivo");
+    });
+  }, []);
 
   const now = new Date();
   const currentDate = now.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" });
@@ -170,6 +243,18 @@ export default function App() {
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
+
+  const [selectedItem, setSelectedItem] = useState<{ Icon: any; label: string; desc: string; img?: string } | null>(null);
+  useEffect(() => {
+    if (!selectedItem) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSelectedItem(null); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [selectedItem]);
 
   // Respect prefers-reduced-motion: no entrance transforms when the user opts out.
   const fadeUp = reduceMotion
@@ -254,6 +339,21 @@ export default function App() {
                           <div className="it-brand-tagline d-none d-md-block">
                             Designer &amp; Front-end Developer
                           </div>
+                          {localMode ? (
+                            <span
+                              style={{
+                                display: "inline-block",
+                                marginTop: "0.25rem",
+                                fontSize: "0.75rem",
+                                color: "#ffffff",
+                                backgroundColor: "#198754",
+                                padding: "0.28rem 0.6rem",
+                                borderRadius: "9999px",
+                              }}
+                            >
+                              Local
+                            </span>
+                          ) : null}
                         </div>
                       </a>
                     </div>
@@ -473,14 +573,14 @@ export default function App() {
               <h2 className="display-5 fw-bold mb-0">Il mio lavoro</h2>
             </motion.div>
 
-            <div className="row">
-              <div className="col-12 col-lg-8">
-                <motion.div {...fadeUp} className="card-wrapper">
-                  <div className="it-card it-card-bg rounded shadow ap-project-card">
+            <div className="row g-4">
+              <div className="col-12 col-md-6">
+                <motion.div {...fadeUp} className="card-wrapper h-100">
+                  <div className="it-card it-card-bg rounded shadow ap-project-card h-100">
                     <div className="it-card-body">
                       <div className="category-top d-flex justify-content-between align-items-center">
                         <span className="category">Sito web istituzionale</span>
-                        <span className="data">{currentYear}</span>
+                        <span className="data">27 apr 2026</span>
                       </div>
                       <h3 className="it-card-title h2 fw-bold">
                         <a
@@ -512,6 +612,42 @@ export default function App() {
                   </div>
                 </motion.div>
               </div>
+              <div className="col-12 col-md-6">
+                <motion.div {...fadeUp} className="card-wrapper h-100">
+                  <div className="it-card it-card-bg rounded shadow ap-project-card h-100">
+                    <div className="it-card-body">
+                      <div className="category-top d-flex justify-content-between align-items-center">
+                        <span className="category">Sito web aziendale</span>
+                        <span className="data">20 apr 2026</span>
+                      </div>
+                      <h3 className="it-card-title h2 fw-bold">
+                        <a
+                          className="text-decoration-none stretched-link"
+                          href="https://cascinafontana.xyz"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                        >
+                          Cascina Fontana
+                          <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
+                        </a>
+                      </h3>
+                      <p className="it-card-text fs-5">
+                        Sito web per Cascina Fontana. Design curato e layout responsive
+                        ottimizzato per presentare l'attività e i servizi offerti.
+                      </p>
+                      <div className="d-flex flex-wrap gap-2 mt-4">
+                        {["React", "TypeScript", "Tailwind CSS", "Responsive Design"].map(
+                          (tag) => (
+                            <span key={tag} className="chip chip-simple chip-primary">
+                              <span className="chip-label">{tag}</span>
+                            </span>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </div>
         </section>
@@ -525,14 +661,20 @@ export default function App() {
               <h2 className="display-5 fw-bold mb-0">Nel tempo libero</h2>
             </motion.div>
             <div className="row g-4">
-              {HOBBY.map(({ Icon, label }) => (
-                <div className="col-6 col-md-4 col-lg-2" key={label}>
-                  <motion.div {...fadeUp} className="ap-interest-card h-100">
+              {HOBBY.map((item) => (
+                <div className="col-6 col-md-4 col-lg-2" key={item.label}>
+                  <motion.button
+                    {...fadeUp}
+                    type="button"
+                    className="ap-interest-card h-100"
+                    onClick={() => setSelectedItem(item)}
+                    aria-label={`Scopri di più: ${item.label}`}
+                  >
                     <span className="ap-interest-icon" aria-hidden="true">
-                      <Icon size={26} />
+                      <item.Icon size={26} />
                     </span>
-                    <span className="ap-interest-label">{label}</span>
-                  </motion.div>
+                    <span className="ap-interest-label">{item.label}</span>
+                  </motion.button>
                 </div>
               ))}
             </div>
@@ -548,14 +690,20 @@ export default function App() {
               <h2 className="display-5 fw-bold mb-0">Cosa mi appassiona</h2>
             </motion.div>
             <div className="row g-4">
-              {PASSIONI.map(({ Icon, label }) => (
-                <div className="col-6 col-md-4 col-lg-2" key={label}>
-                  <motion.div {...fadeUp} className="ap-interest-card h-100">
+              {PASSIONI.map((item) => (
+                <div className="col-6 col-md-4 col-lg-2" key={item.label}>
+                  <motion.button
+                    {...fadeUp}
+                    type="button"
+                    className="ap-interest-card h-100"
+                    onClick={() => setSelectedItem(item)}
+                    aria-label={`Scopri di più: ${item.label}`}
+                  >
                     <span className="ap-interest-icon" aria-hidden="true">
-                      <Icon size={26} />
+                      <item.Icon size={26} />
                     </span>
-                    <span className="ap-interest-label">{label}</span>
-                  </motion.div>
+                    <span className="ap-interest-label">{item.label}</span>
+                  </motion.button>
                 </div>
               ))}
             </div>
@@ -642,6 +790,61 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      <AnimatePresence>
+        {selectedItem && (
+          <>
+            <motion.div
+              key="modal-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="ap-modal-backdrop"
+              onClick={() => setSelectedItem(null)}
+              aria-hidden="true"
+            />
+            <motion.div
+              key="modal-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-title"
+              style={{ x: "-50%", y: "-50%" }}
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
+              animate={reduceMotion ? {} : { opacity: 1, scale: 1 }}
+              exit={reduceMotion ? {} : { opacity: 0, scale: 0.92 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="ap-modal"
+            >
+              <button
+                type="button"
+                className="ap-modal-close"
+                onClick={() => setSelectedItem(null)}
+                aria-label="Chiudi"
+              >
+                <X size={20} />
+              </button>
+              {selectedItem.img && (
+                <div className="ap-modal-photo">
+                  <img
+                    src={selectedItem.img}
+                    alt={selectedItem.label}
+                    loading="lazy"
+                    onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                  />
+                </div>
+              )}
+              <div className="ap-modal-inner">
+                <div className="ap-modal-icon-wrap">
+                  <selectedItem.Icon size={32} />
+                </div>
+                <h2 id="modal-title" className="ap-modal-title">{selectedItem.label}</h2>
+                <p className="ap-modal-body">{selectedItem.desc}</p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <style>{`
         .it-page-wrapper {
@@ -840,6 +1043,98 @@ export default function App() {
         }
         .ap-interest-label {
           font-weight: 600;
+        }
+
+        /* Modale hobby / passioni */
+        .ap-modal-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.55);
+          z-index: 1000;
+          cursor: pointer;
+        }
+        .ap-modal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          z-index: 1001;
+          background: #ffffff;
+          border-radius: 14px;
+          max-width: 480px;
+          width: calc(100% - 2rem);
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+        }
+        .ap-modal-photo {
+          height: 220px;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+        .ap-modal-photo img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .ap-modal-inner {
+          padding: 1.5rem 2.5rem 2.5rem;
+        }
+        .ap-modal-close {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(4px);
+          cursor: pointer;
+          color: #444;
+          z-index: 1;
+          padding: 0;
+          transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .ap-modal-close:hover,
+        .ap-modal-close:focus-visible {
+          background-color: rgba(255, 255, 255, 1);
+          color: #111;
+        }
+        .ap-modal-icon-wrap {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 68px;
+          height: 68px;
+          border-radius: 50%;
+          background: rgba(0, 102, 204, 0.1);
+          color: #06c;
+          margin-bottom: 1.25rem;
+        }
+        .ap-modal-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #06c;
+          margin-bottom: 1rem;
+        }
+        .ap-modal-body {
+          font-size: 1rem;
+          line-height: 1.75;
+          color: #444;
+          margin: 0;
+          padding: 0;
+        }
+        /* Reset pulsante per le card interesse */
+        button.ap-interest-card {
+          cursor: pointer;
+          appearance: none;
+          font-family: inherit;
+          font-size: inherit;
+          width: 100%;
         }
 
         @media (prefers-reduced-motion: reduce) {
