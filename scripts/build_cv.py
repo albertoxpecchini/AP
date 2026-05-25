@@ -333,9 +333,8 @@ VOLUNTEER = [
 LANGS = [("Italiano", "Madrelingua", 1.0), ("Inglese", "C1 · IELTS", 0.85)]
 LICENSE = ["A1", "B"]
 VEHICLES = ["Trattori", "Muletti", "Moto", "Furgoni", "Auto"]
-SOFT_SKILLS = ["Cura del dettaglio", "Precisione", "Problem solving", "Autonomia",
-               "Creatività", "Apprendimento rapido", "Coordinamento", "Affidabilità",
-               "Customer care", "Animazione gruppi"]
+SOFT_SKILLS = ["Problem solving", "Autonomia", "Coordinamento",
+               "Affidabilità", "Apprendimento rapido", "Cura del dettaglio"]
 INTERNATIONAL = ["Dublino · IELTS C1", "Parigi & Normandia", "Edimburgo"]
 HOBBY = ["Moto", "Sport", "Videogiochi", "Musica", "Viaggi", "Tecnologia"]
 PASSIONI = ["Web design", "Innovazione digitale", "Fotografia", "Motori",
@@ -394,15 +393,20 @@ MAIN_INNER = (PAGE_W - SIDE_W) - 10 * mm - 12 * mm
 story = []
 
 # ============================================================ SIDEBAR
+# Tutto il contenuto sidebar va in _sb; poi avvolto in KeepInFrame
+# così non può MAI sforare il frame indipendentemente da quanto contenuto aggiungiamo.
+SIDE_H = PAGE_H - (PAD + 2) - PAD   # altezza interna effettiva del side_frame
+_sb = []
+
 # foto circolare
 photo_buf = circular_photo(PHOTO, 600)
 ph = RLImage(photo_buf, width=42 * mm, height=42 * mm)
 ph.hAlign = "CENTER"
-story.append(ph)
-story.append(Spacer(1, 10))
+_sb.append(ph)
+_sb.append(Spacer(1, 10))
 
 # Contatti
-story.append(side_title("Contatti"))
+_sb.append(side_title("Contatti"))
 contacts = [
     ("Email", "pzkko@yahoo.com", "mailto:pzkko@yahoo.com"),
     ("Telefono", "+39 331 407 4198", "tel:+393314074198"),
@@ -411,18 +415,18 @@ contacts = [
     ("Web", "albertopecchini.it", "https://albertopecchini.it"),
 ]
 for label, val, href in contacts:
-    story.append(Paragraph(label.upper(), ParagraphStyle(
+    _sb.append(Paragraph(label.upper(), ParagraphStyle(
         "cl", fontName=FB, fontSize=6.6, leading=9, textColor=SIDE_MUTED, spaceBefore=3)))
     text = f'<a href="{href}"><font color="#ffffff">{val}</font></a>' if href else val
-    story.append(Paragraph(text, ParagraphStyle(
+    _sb.append(Paragraph(text, ParagraphStyle(
         "cv", fontName=F, fontSize=8.6, leading=11, textColor=WHITE, spaceAfter=1)))
-story.append(Spacer(1, 8))
-story.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
+_sb.append(Spacer(1, 8))
+_sb.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
 
 # Lingue con barra
-story.append(side_title("Lingue"))
+_sb.append(side_title("Lingue"))
 for name, lvl, frac in LANGS:
-    story.append(Paragraph(
+    _sb.append(Paragraph(
         f"{name} <font color='#bcd4ee' size='7.5'>· {lvl}</font>",
         ParagraphStyle("ln", fontName=FB, fontSize=8.8, leading=11, textColor=WHITE,
                        spaceBefore=4, spaceAfter=2)))
@@ -436,59 +440,61 @@ for name, lvl, frac in LANGS:
         ("TOPPADDING", (0, 0), (-1, -1), 0), ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
         ("ALIGN", (0, 0), (-1, -1), "LEFT"), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
-    story.append(track)
-story.append(Spacer(1, 10))
-story.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
+    _sb.append(track)
+_sb.append(Spacer(1, 10))
+_sb.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
 
 # Patente
-story.append(side_title("Patente"))
-story.append(ChipFlow(LICENSE, SIDE_INNER, font=F, size=7.8,
-                      fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=8, vpad=3, gap_x=4,
-                      gap_y=4, radius=5))
-story.append(Spacer(1, 9))
+_sb.append(side_title("Patente"))
+_sb.append(ChipFlow(LICENSE, SIDE_INNER, font=F, size=7.8,
+                    fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=8, vpad=3, gap_x=4,
+                    gap_y=4, radius=5))
+_sb.append(Spacer(1, 9))
 
 # Alla guida di
-story.append(side_title("Alla guida di"))
-story.append(ChipFlow(VEHICLES, SIDE_INNER, font=F, size=7.8,
-                      fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
-                      gap_y=4, radius=5))
-story.append(Spacer(1, 10))
-story.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
+_sb.append(side_title("Alla guida di"))
+_sb.append(ChipFlow(VEHICLES, SIDE_INNER, font=F, size=7.8,
+                    fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
+                    gap_y=4, radius=5))
+_sb.append(Spacer(1, 10))
+_sb.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
 
 # Punti di forza
-story.append(side_title("Punti di forza"))
-story.append(ChipFlow(SOFT_SKILLS, SIDE_INNER, font=F, size=7.8,
-                      fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
-                      gap_y=4, radius=5))
-story.append(Spacer(1, 10))
-story.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
+_sb.append(side_title("Punti di forza"))
+_sb.append(ChipFlow(SOFT_SKILLS, SIDE_INNER, font=F, size=7.8,
+                    fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
+                    gap_y=4, radius=5))
+_sb.append(Spacer(1, 10))
+_sb.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
 
 # Hobby
-story.append(side_title("Hobby"))
-story.append(ChipFlow(HOBBY, SIDE_INNER, font=F, size=7.8,
-                      fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
-                      gap_y=4, radius=5))
-story.append(Spacer(1, 10))
+_sb.append(side_title("Hobby"))
+_sb.append(ChipFlow(HOBBY, SIDE_INNER, font=F, size=7.8,
+                    fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
+                    gap_y=4, radius=5))
+_sb.append(Spacer(1, 10))
 
 # Passioni
-story.append(side_title("Passioni"))
-story.append(ChipFlow(PASSIONI, SIDE_INNER, font=F, size=7.8,
-                      fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
-                      gap_y=4, radius=5))
-story.append(Spacer(1, 10))
-story.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
+_sb.append(side_title("Passioni"))
+_sb.append(ChipFlow(PASSIONI, SIDE_INNER, font=F, size=7.8,
+                    fg=WHITE, bg=Color(1, 1, 1, 0.14), hpad=6, vpad=3, gap_x=4,
+                    gap_y=4, radius=5))
+_sb.append(Spacer(1, 10))
+_sb.append(HR(SIDE_INNER, SIDE_LINE, 0.7, 8))
 
 # Disponibilità
-story.append(side_title("Disponibilità"))
+_sb.append(side_title("Disponibilità"))
 for d in AVAILABILITY:
-    story.append(Paragraph(
+    _sb.append(Paragraph(
         f"<font color='#0066cc'>•</font>&nbsp; {d}",
         ParagraphStyle("av", fontName=F, fontSize=8.4, leading=13, textColor=WHITE,
                        spaceAfter=1)))
 
+# KeepInFrame garantisce che il sidebar NON sfori mai il frame
+story.append(KeepInFrame(SIDE_INNER, SIDE_H, _sb, mode='shrink'))
+
 # passa alla colonna principale
 story.append(FrameBreak())
-# se il contenuto sfora, la pagina 2 usa il template a piena colonna
 story.append(NextPageTemplate("later"))
 
 # ============================================================ MAIN
