@@ -1061,10 +1061,16 @@ export default function App() {
           border-color: #2F7D4A !important;
           color: #ffffff !important;
         }
-        .it-page-wrapper .chip-primary {
-          background-color: rgba(47, 125, 74, 0.12);
-          color: #1F6B3D;
-          border-color: rgba(47, 125, 74, 0.28);
+        .it-page-wrapper .chip-primary,
+        .it-page-wrapper .chip.chip-primary,
+        .it-page-wrapper .chip.chip-simple.chip-primary {
+          background-color: rgba(47, 125, 74, 0.12) !important;
+          color: #1F6B3D !important;
+          border-color: rgba(47, 125, 74, 0.28) !important;
+        }
+        .it-page-wrapper .chip-primary .chip-label,
+        .it-page-wrapper .chip.chip-primary .chip-label {
+          color: #1F6B3D !important;
         }
         .it-page-wrapper .theme-dark {
           background-color: #103820 !important;
