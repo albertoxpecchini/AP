@@ -32,19 +32,18 @@ from reportlab.graphics import renderPDF
 from reportlab.lib.colors import black
 import pypdfium2 as pdfium
 
-SRC = r"C:\Users\alberto\Downloads\ap_logo_font.svg"
+SRC = r"C:\Users\alberto\Downloads\ap_logo_sfondo_bianco_scritta_verde.svg"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
 
-# Parametri dall'SVG originale
+# Parametri dall'SVG originale (logo .ap, sfondo bianco, scritta verde Sassuolo)
 TEXT = ".ap"
 FONT_SIZE = 240
 TEXT_X = 45
 TEXT_Y = 315          # baseline (dall'alto)
-GRAD_FROM = "#0A6DD8"
-GRAD_TO = "#0057B8"
-THEME = "#0066CC"
-FILL = "#ffffff"
+BG_FILL = "#FFFFFF"   # sfondo bianco
+FILL = "#16A34A"      # scritta verde (matcha l'SVG sorgente)
+THEME = "#2F7D4A"     # palette neroverde Sassuolo
 VB = 512              # viewBox
 
 # ----------------------------------------------------------------- font
@@ -81,11 +80,7 @@ def build_svg():
     out = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{VB}" height="{VB}" '
         f'viewBox="0 0 {VB} {VB}">'
-        '<defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">'
-        f'<stop offset="0%" stop-color="{GRAD_FROM}"/>'
-        f'<stop offset="100%" stop-color="{GRAD_TO}"/>'
-        '</linearGradient></defs>'
-        f'<rect width="{VB}" height="{VB}" fill="url(#bg)"/>'
+        f'<rect width="{VB}" height="{VB}" fill="{BG_FILL}"/>'
         f'<path d="{d}" fill="{FILL}"/></svg>'
     )
     p = os.path.join(PUB, "favicon.svg")
@@ -122,23 +117,16 @@ def text_alpha(R=512):
     return ImageOps.invert(gray)
 
 
-def gradient(R):
-    c0, c1 = hx(GRAD_FROM), hx(GRAD_TO)
-    img = Image.new("RGB", (R, R))
-    px = img.load()
-    for y in range(R):
-        for x in range(R):
-            t = (x + y) / (2 * (R - 1))
-            px[x, y] = tuple(round(c0[k] + (c1[k] - c0[k]) * t) for k in range(3))
-    return img
+def solid_bg(R, hex_color):
+    return Image.new("RGB", (R, R), hx(hex_color))
 
 
 def icon_standard(R=512):
-    """Artwork fedele all'SVG: gradiente + testo bianco a sinistra."""
+    """Artwork fedele all'SVG: sfondo bianco + testo verde a sinistra."""
     alpha = text_alpha(R)
-    grad = gradient(R).convert("RGBA")
-    white = Image.new("RGBA", (R, R), (255, 255, 255, 255))
-    return Image.composite(white, grad, alpha).convert("RGB")
+    bg = solid_bg(R, BG_FILL).convert("RGBA")
+    fg = Image.new("RGBA", (R, R), hx(FILL) + (255,))
+    return Image.composite(fg, bg, alpha).convert("RGB")
 
 
 def icon_maskable(R=512, safe=0.66):
@@ -152,9 +140,9 @@ def icon_maskable(R=512, safe=0.66):
     crop = crop.resize((max(1, int(cw * k)), max(1, int(ch * k))), Image.LANCZOS)
     canvas = Image.new("L", (R, R), 0)
     canvas.paste(crop, ((R - crop.size[0]) // 2, (R - crop.size[1]) // 2))
-    grad = gradient(R).convert("RGBA")
-    white = Image.new("RGBA", (R, R), (255, 255, 255, 255))
-    return Image.composite(white, grad, canvas).convert("RGB")
+    bg = solid_bg(R, BG_FILL).convert("RGBA")
+    fg = Image.new("RGBA", (R, R), hx(FILL) + (255,))
+    return Image.composite(fg, bg, canvas).convert("RGB")
 
 
 # ----------------------------------------------------------------- build
@@ -196,7 +184,7 @@ def main():
              "type": "image/png", "purpose": "maskable"},
         ],
         "theme_color": THEME,
-        "background_color": GRAD_TO,
+        "background_color": BG_FILL,
         "display": "standalone",
         "start_url": "/",
     }

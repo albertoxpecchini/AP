@@ -20,8 +20,8 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#0066CC",
-  "background_color": "#0057B8",
+  "theme_color": "#2F7D4A",
+  "background_color": "#FFFFFF",
   "display": "standalone",
   "start_url": "/"
 }
