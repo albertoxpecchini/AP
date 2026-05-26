@@ -179,3 +179,29 @@
     line-height: 1.5;
   }
 }
+
+/* Override palette neroverde Sassuolo (sovrascrive Bootstrap Italia blue #0066cc) */
+:root {
+  --bs-primary: #2F7D4A !important;
+  --bs-primary-rgb: 47, 125, 74 !important;
+}
+
+.btn-outline-primary {
+  color: #1F6B3D !important;
+  border-color: #2F7D4A !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: #2F7D4A !important;
+  border-color: #2F7D4A !important;
+  color: #ffffff !important;
+}
+
+.text-primary {
+  color: #1F6B3D !important;
+}
+
+.bg-primary {
+  background-color: #2F7D4A !important;
+}
