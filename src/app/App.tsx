@@ -677,7 +677,7 @@ export default function App() {
                     >
                       <Download size={18} className="me-2" aria-hidden="true" /> Scarica (PDF)
                     </a>
-                    <span className="text-muted" style={{ fontSize: "0.8rem", lineHeight: 1 }}>2 pagine · 990 KB</span>
+                    <span className="text-muted" style={{ fontSize: "0.8rem", lineHeight: 1 }}>3 pagine · 990 KB</span>
                   </div>
                 </div>
               </div>
