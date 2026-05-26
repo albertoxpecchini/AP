@@ -27,14 +27,14 @@ PHOTO = os.path.join(ROOT, "public", "alberto-pecchini.jpg")
 OUT = os.path.join(ROOT, "public", "cv-alberto-pecchini.pdf")
 
 # ---------------------------------------------------------------- palette
-NAVY = HexColor("#0a3a66")     # sidebar profonda
-BLUE = HexColor("#0066cc")     # blu del sito (accento)
-BLUE_SOFT = HexColor("#e7f0fb")
+NAVY = HexColor("#103820")     # sidebar profonda - verde scuro Sassuolo
+BLUE = HexColor("#2F7D4A")     # verde primario Sassuolo (accento)
+BLUE_SOFT = HexColor("#e8f3ed")  # verde overlay chiaro
 INK = HexColor("#1f2933")      # testo principale
 MUTED = HexColor("#5b6b7b")    # testo secondario
-LINE = HexColor("#d9e2ec")
+LINE = HexColor("#c8dcd4")     # linea più verde
 WHITE = HexColor("#ffffff")
-SIDE_MUTED = HexColor("#bcd4ee")
+SIDE_MUTED = HexColor("#a8d4b8")  # testo secondario sidebar - verde chiaro
 SIDE_LINE = Color(1, 1, 1, 0.22)
 
 # ---------------------------------------------------------------- font
