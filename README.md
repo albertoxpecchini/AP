@@ -6,7 +6,7 @@
 
 Sito personale di **Alberto Pecchini** — studente CAT all'ITT «Carlo d'Arco» di Mantova, designer e front-end developer. Single-page application costruita su React + Vite con il design system **Bootstrap Italia**, palette ispirata al neroverde del Sassuolo, interazioni curate e integrazione live con l'API di GitHub per le metadata dei progetti.
 
-🔗 **Sito live:** [albertopecchini.it](https://albertopecchini.it) · **Repo:** [github.com/albertoxpecchini/Ap](https://github.com/albertoxpecchini/Ap)
+🔗 **Sito live:** [albertopecchini.it](https://albertopecchini.it) · **Repo:** [github.com/albertoxpecchini/AP](https://github.com/albertoxpecchini/AP)
 
 ---
 
