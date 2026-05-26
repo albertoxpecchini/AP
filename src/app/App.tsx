@@ -669,13 +669,16 @@ export default function App() {
                   >
                     <Eye size={18} className="me-2" aria-hidden="true" /> Visualizza il CV
                   </button>
-                  <a
-                    href={CV_PDF}
-                    className="btn btn-outline-primary fw-semibold d-inline-flex align-items-center"
-                    download
-                  >
-                    <Download size={18} className="me-2" aria-hidden="true" /> Scarica (PDF)
-                  </a>
+                  <div className="d-flex flex-column gap-1">
+                    <a
+                      href={CV_PDF}
+                      className="btn btn-outline-primary fw-semibold d-inline-flex align-items-center"
+                      download
+                    >
+                      <Download size={18} className="me-2" aria-hidden="true" /> Scarica (PDF)
+                    </a>
+                    <span className="text-muted" style={{ fontSize: "0.8rem", lineHeight: 1 }}>2 pagine · 990 KB</span>
+                  </div>
                 </div>
               </div>
             </div>
