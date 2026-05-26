@@ -1052,14 +1052,14 @@ export default function App() {
           border-color: #1F6B3D;
         }
         .it-page-wrapper .btn-outline-primary {
-          color: #1F6B3D;
-          border-color: #2F7D4A;
+          color: #1F6B3D !important;
+          border-color: #2F7D4A !important;
         }
         .it-page-wrapper .btn-outline-primary:hover,
         .it-page-wrapper .btn-outline-primary:focus {
-          background-color: #2F7D4A;
-          border-color: #2F7D4A;
-          color: #ffffff;
+          background-color: #2F7D4A !important;
+          border-color: #2F7D4A !important;
+          color: #ffffff !important;
         }
         .it-page-wrapper .chip-primary {
           background-color: rgba(47, 125, 74, 0.12);
