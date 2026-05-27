@@ -333,6 +333,11 @@ export default function App() {
   const closeMenu = () => setMenuOpen(false);
 
   const [selectedItem, setSelectedItem] = useState<{ Icon: any; label: string; desc: string; img?: string } | null>(null);
+  const [modalImgStatus, setModalImgStatus] = useState<"loading" | "loaded" | "error">("loading");
+
+  useEffect(() => {
+    setModalImgStatus("loading");
+  }, [selectedItem]);
 
   const [ghData, setGhData] = useState<Record<string, { pushedAt: string; version?: string }>>({});
   const [projectImages, setProjectImages] = useState<Record<string, string>>({});
@@ -952,13 +957,14 @@ export default function App() {
             >
               <X size={20} />
             </button>
-            {selectedItem.img && (
-              <div className="ap-modal-photo">
+            {selectedItem.img && modalImgStatus !== "error" && (
+              <div className={`ap-modal-photo${modalImgStatus === "loaded" ? " ap-modal-photo--ready" : ""}`}>
                 <img
                   src={selectedItem.img}
                   alt={selectedItem.label}
                   loading="lazy"
-                  onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                  onLoad={() => setModalImgStatus("loaded")}
+                  onError={() => setModalImgStatus("error")}
                 />
               </div>
             )}
@@ -1011,19 +1017,19 @@ export default function App() {
                 </button>
               </div>
             </div>
-            <iframe
-              className="ap-cv-frame"
-              src={`${CV_PDF}#view=FitH&toolbar=1&navpanes=0`}
-              title="Anteprima del Curriculum Vitae in PDF"
-            />
             <a
               href={CV_PDF}
               target="_blank"
               rel="noreferrer noopener"
               className="ap-cv-fallback d-sm-none"
             >
-              Se l'anteprima non si carica, tocca qui per aprire il PDF
+              Su mobile l'anteprima PDF potrebbe non caricare — tocca qui per aprire il file →
             </a>
+            <iframe
+              className="ap-cv-frame"
+              src={`${CV_PDF}#view=FitH&toolbar=1&navpanes=0`}
+              title="Anteprima del Curriculum Vitae in PDF"
+            />
           </div>
         </div>
       )}
@@ -1144,10 +1150,14 @@ export default function App() {
         /* Hero */
         .ap-hero {
           min-height: 100vh;
+          min-height: 100svh;
           position: relative;
           overflow: hidden;
           background-color: #1F6B3D;
           background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 60%, #3F8F5A 100%);
+        }
+        .ap-hero h1 {
+          overflow-wrap: anywhere;
         }
         .ap-hero .lead {
           color: rgba(255, 255, 255, 0.9);
@@ -1394,9 +1404,15 @@ export default function App() {
           box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
         }
         .ap-modal-photo {
-          height: 220px;
+          height: 0;
           overflow: hidden;
           flex-shrink: 0;
+          visibility: hidden;
+          transition: height 0.2s ease;
+        }
+        .ap-modal-photo--ready {
+          height: 220px;
+          visibility: visible;
         }
         .ap-modal-photo img {
           width: 100%;
@@ -1531,12 +1547,90 @@ export default function App() {
         }
         .ap-cv-fallback {
           display: block;
-          padding: 0.6rem 0.85rem;
-          background: #f3f4f6;
+          padding: 0.75rem 0.85rem;
+          background: #FFF7CC;
           color: #1F6B3D;
           font-weight: 600;
           text-align: center;
           text-decoration: none;
+          border-bottom: 1px solid #FDE68A;
+        }
+        .ap-cv-fallback:hover,
+        .ap-cv-fallback:focus-visible {
+          background: #FEF3A6;
+          color: #155030;
+        }
+
+        /* ===== Ottimizzazioni mobile ===== */
+        @media (max-width: 575.98px) {
+          .ap-hero {
+            min-height: 100vh;
+            min-height: min(85svh, 640px);
+          }
+          .ap-hero h1.display-1 {
+            font-size: clamp(2.25rem, 11vw, 3.25rem);
+            max-width: 100% !important;
+            line-height: 1.1;
+          }
+          .ap-hero .lead {
+            font-size: 1rem;
+          }
+          .ap-hero .ap-kicker {
+            font-size: 0.75rem;
+          }
+
+          /* Modali hobby/passioni */
+          .ap-modal {
+            border-radius: 12px;
+          }
+          .ap-modal-inner {
+            padding: 1.25rem 1.25rem 1.75rem;
+          }
+          .ap-modal-title {
+            font-size: 1.25rem;
+          }
+          .ap-modal-body {
+            font-size: 0.95rem;
+            line-height: 1.65;
+          }
+          .ap-modal-photo--ready {
+            height: 180px;
+          }
+          .ap-modal-icon-wrap {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 1rem;
+          }
+
+          /* Touch target ≥ 44px */
+          .ap-modal-close,
+          .ap-cv-close {
+            width: 44px;
+            height: 44px;
+          }
+
+          /* CV modal: più spazio in basso per safe-area iOS */
+          .ap-cv-dialog {
+            height: min(94svh, 100%);
+          }
+
+          /* Header slim: più respiro tra le icone, niente strizzature */
+          .it-header-slim-right-zone {
+            gap: 0.5rem;
+          }
+          .it-header-slim-right-zone .me-3 {
+            margin-right: 0 !important;
+          }
+
+          /* Titoli sezione: scala il display-5 per evitare strizzature */
+          section h2.display-5 {
+            font-size: clamp(1.75rem, 7vw, 2.5rem);
+          }
+
+          /* Card progetto: preview più compatta su mobile */
+          .ap-project-preview {
+            height: 180px;
+          }
         }
 
       `}</style>
