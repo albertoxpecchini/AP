@@ -606,6 +606,8 @@ export default function App() {
         >
           <div className="container position-relative" style={{ zIndex: 1 }}>
             <div>
+              {/* Spacer mobile: inline style, impossibile da sovrascrivere via CSS */}
+              <div className="d-lg-none" style={{ height: "88px" }} />
               {/* Logo: solo su mobile, sopra il kicker */}
               <div className="d-lg-none mb-4">
                 <img src="/favicon.svg" alt="Alberto Pecchini" width={52} height={52} style={{ borderRadius: "12px" }} />
@@ -1211,19 +1213,20 @@ export default function App() {
             display: none !important;
           }
 
-          /* ── Navbar: overlay trasparente fisso (sparisce come "barra") ── */
+          /* ── Navbar: overlay trasparente fisso, abbassato di 18px ── */
           .ap-navbar {
             position: fixed !important;
-            top: 0 !important;
+            top: 18px !important;
             left: 0 !important;
             right: 0 !important;
             background-color: transparent !important;
             box-shadow: none !important;
-            transition: background-color 0.25s ease !important;
+            transition: background-color 0.25s ease, top 0.2s ease !important;
             z-index: 100 !important;
           }
-          /* Sfondo visibile solo dopo lo scroll */
+          /* Quando scrollato: sale a top:0 e sfondo verde scuro */
           .ap-navbar.ap-navbar--scrolled {
+            top: 0 !important;
             background-color: #103820 !important;
             box-shadow: 0 2px 12px rgba(0,0,0,0.22) !important;
           }
@@ -1752,8 +1755,6 @@ export default function App() {
           .ap-hero {
             min-height: 100vh;
             min-height: min(85svh, 640px);
-            padding-top: calc(env(safe-area-inset-top) + 140px) !important;
-            align-items: flex-start !important;
             padding-bottom: 3rem;
           }
           .ap-hero h1.display-1 {
