@@ -1224,6 +1224,9 @@ export default function App() {
             box-shadow: none !important;
             transition: background-color 0.25s ease, top 0.2s ease !important;
             z-index: 100 !important;
+            /* Blocca BI da animare padding-top sul wrapper */
+            padding: 0 !important;
+            overflow: visible !important;
           }
           /* Quando scrollato: sale a top:0 e sfondo verde scuro */
           .ap-navbar.ap-navbar--scrolled {
@@ -1244,11 +1247,13 @@ export default function App() {
           /* Flex row con safe-area e padding laterale corretto */
           .ap-navbar .navbar {
             display: flex !important;
+            align-items: center !important;
             padding-top: calc(env(safe-area-inset-top) + 8px) !important;
             padding-bottom: 8px !important;
             padding-left: 6px !important;
             padding-right: 10px !important;
-            min-height: calc(env(safe-area-inset-top) + 52px) !important;
+            min-height: calc(env(safe-area-inset-top) + 62px) !important;
+            overflow: visible !important;
           }
 
           /* ── Hamburger: visibile su mobile, nascosto su desktop ── */
@@ -1287,19 +1292,22 @@ export default function App() {
             stroke: #ffffff !important;
           }
 
-          /* ── Bottoni contatto mobile (44×44 px, con margine a destra) ── */
+          /* ── Bottoni contatto mobile ── */
           .ap-mobile-contacts {
-            gap: 8px !important;
+            gap: 6px !important;
+            align-items: center !important;
+            padding-right: 4px !important;
+            flex-shrink: 0 !important;
           }
           .ap-mobile-contact-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 46px;
-            height: 46px;
+            width: 44px;
+            height: 44px;
             color: #ffffff;
             text-decoration: none;
-            border-radius: 12px;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.18);
             flex-shrink: 0;
             transition: background 0.15s ease;
