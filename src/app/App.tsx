@@ -556,8 +556,8 @@ export default function App() {
                       className="d-flex d-lg-none align-items-center text-white text-decoration-none ap-mobile-brand ms-2"
                       aria-label="Alberto Pecchini, torna alla home"
                     >
-                      <img src="/favicon.svg" alt="" width={28} height={28} style={{ borderRadius: "6px" }} />
-                      <span className="ms-2 fw-semibold">Alberto Pecchini</span>
+                      <img src="/favicon.svg" alt="" width={30} height={30} style={{ borderRadius: "7px", border: "1.5px solid rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.08)" }} />
+                      <span className="ms-2 fw-semibold" style={{ fontSize: "0.95rem", letterSpacing: "-0.01em" }}>Alberto Pecchini</span>
                     </a>
 
                     <div className="d-lg-none flex-grow-1" />
@@ -1221,16 +1221,20 @@ export default function App() {
           }
 
           /* ── Hamburger: tre linee bianche ── */
-          .ap-navbar .custom-navbar-toggler {
+          .ap-navbar .custom-navbar-toggler,
+          .it-header-navbar-wrapper .custom-navbar-toggler,
+          .navbar .custom-navbar-toggler {
             color: #ffffff !important;
-            background: none;
-            border: none;
-            padding: 8px;
+            background: none !important;
+            border: none !important;
+            padding: 10px 8px !important;
             line-height: 1;
           }
-          .ap-navbar .custom-navbar-toggler svg {
+          .ap-navbar .custom-navbar-toggler svg,
+          .it-header-navbar-wrapper .custom-navbar-toggler svg {
             color: #ffffff !important;
             stroke: #ffffff !important;
+            fill: none !important;
           }
 
           /* ── Menu drawer: sfondo verde scuro (Bootstrap Italia default = blu) ── */
@@ -1253,16 +1257,25 @@ export default function App() {
             stroke: #ffffff !important;
           }
 
+          /* ── Navbar mobile: altezza e padding ── */
+          .ap-navbar .navbar {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            min-height: 56px;
+          }
+
           /* ── Logo mobile ── */
           .ap-mobile-brand {
-            font-size: 0.95rem;
             line-height: 1;
           }
           .ap-mobile-brand:hover {
-            color: rgba(255, 255, 255, 0.85) !important;
+            color: rgba(255, 255, 255, 0.82) !important;
           }
 
           /* ── Bottoni contatto mobile (44×44 px, tappabili) ── */
+          .ap-mobile-contacts {
+            padding-right: 4px;
+          }
           .ap-mobile-contact-btn {
             display: flex;
             align-items: center;
@@ -1271,9 +1284,10 @@ export default function App() {
             height: 44px;
             color: #ffffff;
             text-decoration: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.10);
             flex-shrink: 0;
+            transition: background 0.15s ease;
           }
           .ap-mobile-contact-btn:hover,
           .ap-mobile-contact-btn:focus-visible {
