@@ -9,8 +9,7 @@
       "problemMatcher": {
         "owner": "vite",
         "pattern": {
-          "regexp": "^(.*)$",
-          "file": 1
+          "regexp": "^$"
         },
         "background": {
           "activeOnStart": true,
