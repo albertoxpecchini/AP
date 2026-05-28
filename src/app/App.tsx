@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { activateLocalMode } from "./utils/local";
+import { isIOS } from "./utils/device";
 import {
   Mail,
   Phone,
@@ -297,6 +298,25 @@ const PASSIONI = [
   },
 ];
 
+function lockBodyScroll() {
+  const scrollY = window.scrollY;
+  document.body.dataset.scrollLockY = String(scrollY);
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.width = "100%";
+  document.body.style.overflowY = "scroll";
+}
+
+function unlockBodyScroll() {
+  const scrollY = parseInt(document.body.dataset.scrollLockY || "0", 10);
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.width = "";
+  document.body.style.overflowY = "";
+  delete document.body.dataset.scrollLockY;
+  window.scrollTo(0, scrollY);
+}
+
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -310,6 +330,11 @@ export default function App() {
       setLocalMode(true);
       console.info("Local mode attivo");
     });
+  }, []);
+
+  useEffect(() => {
+    if (isIOS()) document.documentElement.classList.add("ios");
+    return () => document.documentElement.classList.remove("ios");
   }, []);
 
   const now = new Date();
@@ -333,10 +358,9 @@ export default function App() {
 
   // Lock body scroll while the mobile menu overlay is open.
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    if (menuOpen) lockBodyScroll();
+    else unlockBodyScroll();
+    return () => unlockBodyScroll();
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
@@ -389,25 +413,19 @@ export default function App() {
   }, []);
   useEffect(() => {
     if (!selectedItem) return;
-    document.body.style.overflow = "hidden";
+    lockBodyScroll();
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSelectedItem(null); };
     window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
+    return () => { window.removeEventListener("keydown", onKey); unlockBodyScroll(); };
   }, [selectedItem]);
 
   // Visualizzatore documenti PDF: blocco scroll + chiusura con Esc.
   useEffect(() => {
     if (!docOpen) return;
-    document.body.style.overflow = "hidden";
+    lockBodyScroll();
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setDocOpen(null); };
     window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
+    return () => { window.removeEventListener("keydown", onKey); unlockBodyScroll(); };
   }, [docOpen]);
 
 
