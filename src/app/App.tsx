@@ -550,6 +550,31 @@ export default function App() {
                       <Menu aria-hidden="true" />
                     </button>
 
+                    {/* Mobile: logo + nome (nascosto su desktop) */}
+                    <a
+                      href="#home"
+                      className="d-flex d-lg-none align-items-center text-white text-decoration-none ap-mobile-brand ms-2"
+                      aria-label="Alberto Pecchini, torna alla home"
+                    >
+                      <img src="/favicon.svg" alt="" width={28} height={28} style={{ borderRadius: "6px" }} />
+                      <span className="ms-2 fw-semibold">Alberto Pecchini</span>
+                    </a>
+
+                    <div className="d-lg-none flex-grow-1" />
+
+                    {/* Mobile: bottoni contatto a destra (nascosti su desktop) */}
+                    <div className="d-flex d-lg-none align-items-center gap-1 ap-mobile-contacts">
+                      <a href={`mailto:${EMAIL}`} className="ap-mobile-contact-btn" aria-label="Email">
+                        <Mail size={20} aria-hidden="true" />
+                      </a>
+                      <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener" className="ap-mobile-contact-btn" aria-label="WhatsApp">
+                        <WhatsAppIcon size={18} />
+                      </a>
+                      <a href={PHONE_HREF} className="ap-mobile-contact-btn" aria-label="Telefono">
+                        <Phone size={20} aria-hidden="true" />
+                      </a>
+                    </div>
+
                     <div className={`navbar-collapsable ${menuOpen ? "expanded" : ""}`} id="nav-main">
                       <div className="overlay" onClick={closeMenu} />
                       <div className="close-div">
@@ -1182,6 +1207,78 @@ export default function App() {
             inset: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: -1;
+          }
+
+          /* ── Mobile header: nascondi topbar e header centrale ── */
+          .it-header-slim-wrapper,
+          .it-header-center-wrapper {
+            display: none !important;
+          }
+
+          /* ── Navbar mobile: sfondo verde scuro esplicito ── */
+          .ap-navbar {
+            background-color: #103820 !important;
+          }
+
+          /* ── Hamburger: tre linee bianche ── */
+          .ap-navbar .custom-navbar-toggler {
+            color: #ffffff !important;
+            background: none;
+            border: none;
+            padding: 8px;
+            line-height: 1;
+          }
+          .ap-navbar .custom-navbar-toggler svg {
+            color: #ffffff !important;
+            stroke: #ffffff !important;
+          }
+
+          /* ── Menu drawer: sfondo verde scuro (Bootstrap Italia default = blu) ── */
+          .ap-navbar .navbar-collapsable,
+          .ap-navbar .navbar-collapsable .menu-wrapper,
+          .ap-navbar .navbar-collapsable .close-div {
+            background-color: #103820 !important;
+          }
+          .ap-navbar .navbar-collapsable .nav-link {
+            color: #ffffff !important;
+          }
+          .ap-navbar .navbar-collapsable .nav-link:hover,
+          .ap-navbar .navbar-collapsable .nav-link:focus {
+            color: rgba(255, 255, 255, 0.72) !important;
+          }
+          .ap-navbar .close-menu {
+            color: #ffffff !important;
+          }
+          .ap-navbar .close-menu svg {
+            stroke: #ffffff !important;
+          }
+
+          /* ── Logo mobile ── */
+          .ap-mobile-brand {
+            font-size: 0.95rem;
+            line-height: 1;
+          }
+          .ap-mobile-brand:hover {
+            color: rgba(255, 255, 255, 0.85) !important;
+          }
+
+          /* ── Bottoni contatto mobile (44×44 px, tappabili) ── */
+          .ap-mobile-contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+          }
+          .ap-mobile-contact-btn:hover,
+          .ap-mobile-contact-btn:focus-visible {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
           }
         }
 
