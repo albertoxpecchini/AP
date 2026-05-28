@@ -1752,7 +1752,7 @@ export default function App() {
           .ap-hero {
             min-height: 100vh;
             min-height: min(85svh, 640px);
-            padding-top: calc(env(safe-area-inset-top) + 70px) !important;
+            padding-top: calc(env(safe-area-inset-top) + 100px) !important;
             align-items: flex-start !important;
             padding-bottom: 3rem;
           }
