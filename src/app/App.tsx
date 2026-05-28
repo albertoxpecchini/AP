@@ -1205,23 +1205,63 @@ export default function App() {
             z-index: -1;
           }
 
-          /* ── Mobile header: nascondi topbar e header centrale ── */
+          /* ── Nascondi topbar e header centrale ── */
           .it-header-slim-wrapper,
           .it-header-center-wrapper {
             display: none !important;
           }
 
-          /* ── Navbar mobile: sfondo verde scuro esplicito ── */
+          /* ── Navbar: overlay trasparente fisso (sparisce come "barra") ── */
           .ap-navbar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+            transition: background-color 0.25s ease !important;
+            z-index: 100 !important;
+          }
+          /* Sfondo visibile solo dopo lo scroll */
+          .ap-navbar.ap-navbar--scrolled {
+            background-color: #103820 !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.22) !important;
+          }
+
+          /* Rimuovi i vincoli del container Bootstrap per usare tutta la larghezza */
+          .ap-navbar .container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+          .ap-navbar .row { margin: 0 !important; }
+          .ap-navbar .col-12 { padding: 0 !important; }
+
+          /* Flex row con safe-area e padding laterale corretto */
+          .ap-navbar .navbar {
+            display: flex !important;
+            padding-top: calc(env(safe-area-inset-top) + 8px) !important;
+            padding-bottom: 8px !important;
+            padding-left: 6px !important;
+            padding-right: 10px !important;
+            min-height: calc(env(safe-area-inset-top) + 52px) !important;
+          }
+
+          /* ── Hamburger: visibile su mobile, nascosto su desktop ── */
+          .ap-hamburger {
+            display: flex;
+          }
+
+          /* ── Menu drawer: full-screen, sfondo verde scuro ── */
+          .ap-navbar .navbar-collapsable.expanded {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            z-index: 200 !important;
             background-color: #103820 !important;
           }
-
-          /* ── Hamburger custom: su desktop nascosto (navbar-expand-lg gestisce il menu inline) ── */
-          .ap-hamburger {
-            display: none;
-          }
-
-          /* ── Menu drawer: sfondo verde scuro (Bootstrap Italia default = blu) ── */
           .ap-navbar .navbar-collapsable,
           .ap-navbar .navbar-collapsable .menu-wrapper,
           .ap-navbar .navbar-collapsable .close-div {
@@ -1229,6 +1269,8 @@ export default function App() {
           }
           .ap-navbar .navbar-collapsable .nav-link {
             color: #ffffff !important;
+            font-size: 1.15rem;
+            padding: 0.75rem 0 !important;
           }
           .ap-navbar .navbar-collapsable .nav-link:hover,
           .ap-navbar .navbar-collapsable .nav-link:focus {
@@ -1241,36 +1283,26 @@ export default function App() {
             stroke: #ffffff !important;
           }
 
-          /* ── Navbar mobile: hamburger visibile, altezza ── */
-          .ap-hamburger {
-            display: flex;
-          }
-          .ap-navbar .navbar {
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            min-height: 56px;
-          }
-
-          /* ── Bottoni contatto mobile (44×44 px, tappabili) ── */
+          /* ── Bottoni contatto mobile (44×44 px, con margine a destra) ── */
           .ap-mobile-contacts {
-            padding-right: 4px;
+            gap: 8px !important;
           }
           .ap-mobile-contact-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             color: #ffffff;
             text-decoration: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.10);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.18);
             flex-shrink: 0;
             transition: background 0.15s ease;
           }
           .ap-mobile-contact-btn:hover,
           .ap-mobile-contact-btn:focus-visible {
-            background: rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.30);
             color: #ffffff;
           }
         }
@@ -1720,6 +1752,9 @@ export default function App() {
           .ap-hero {
             min-height: 100vh;
             min-height: min(85svh, 640px);
+            padding-top: calc(env(safe-area-inset-top) + 70px) !important;
+            align-items: flex-start !important;
+            padding-bottom: 3rem;
           }
           .ap-hero h1.display-1 {
             font-size: clamp(2.25rem, 11vw, 3.25rem);
