@@ -314,7 +314,8 @@ function unlockBodyScroll() {
   document.body.style.width = "";
   document.body.style.overflowY = "";
   delete document.body.dataset.scrollLockY;
-  window.scrollTo(0, scrollY);
+  // 'instant' bypasses CSS scroll-behavior: smooth (incl. Bootstrap Italia !important)
+  window.scrollTo({ top: scrollY, behavior: "instant" as ScrollBehavior });
 }
 
 export default function App() {
@@ -358,8 +359,8 @@ export default function App() {
 
   // Lock body scroll while the mobile menu overlay is open.
   useEffect(() => {
-    if (menuOpen) lockBodyScroll();
-    else unlockBodyScroll();
+    if (!menuOpen) return;
+    lockBodyScroll();
     return () => unlockBodyScroll();
   }, [menuOpen]);
 
