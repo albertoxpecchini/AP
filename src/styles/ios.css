@@ -37,17 +37,7 @@ html.ios .it-header-slim-wrapper {
   padding-top: env(safe-area-inset-top);
 }
 
-/* ── 6. Safe area — navbar sticky ── */
-html.ios .ap-navbar {
-  padding-top: env(safe-area-inset-top);
-}
-
-/* ── 7. Safe area — hero (prima sezione, occupa tutto lo schermo) ── */
-html.ios .ap-hero {
-  padding-top: env(safe-area-inset-top);
-}
-
-/* ── 8. Safe area — footer e sezione contatti (home indicator) ── */
+/* ── 6. Safe area — footer e sezione contatti (home indicator) ── */
 html.ios .it-footer-main {
   padding-bottom: calc(1rem + env(safe-area-inset-bottom));
 }
@@ -75,13 +65,8 @@ html.ios select {
   font-size: max(16px, 1rem) !important;
 }
 
-/* ── 12. Accelerazione GPU per elementi animati frequentemente ── */
-html.ios .ap-navbar {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  will-change: transform;
-}
-
+/* ── 12. Accelerazione GPU — solo sulle modali, MAI sulla navbar/collapsable
+   (transform crea stacking context e rompe position:fixed dei figli) ── */
 html.ios .ap-modal,
 html.ios .ap-modal-backdrop,
 html.ios .ap-cv-dialog,
@@ -89,11 +74,6 @@ html.ios .ap-cv-backdrop {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   will-change: transform;
-}
-
-html.ios .navbar-collapsable {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 /* ── 13. Momentum scroll nelle aree scorrevoli ── */
