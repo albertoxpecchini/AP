@@ -26,6 +26,7 @@ import {
   Mountain,
   ShoppingBag,
   Tag,
+  FileText,
 } from "lucide-react";
 import {
   SiInstagram,
@@ -151,6 +152,14 @@ const CV = [
     title: "Cascina di famiglia — Rivalta sul Mincio",
     role: "Collaboratore agricolo · Logistica · Coordinamento operativo",
     desc: "Collaborazione continuativa nell'attività agricola familiare. Attività svolte: cura e manutenzione delle piante (annaffiamento, potatura di diverse tipologie e dimensioni), trasporto di materiali e attrezzature su trattore con rimorchio, raccolta del fieno da prato stabile, coordinamento delle operazioni con il team durante le fasi di lavoro intensivo, supporto logistico e assistenza negli spostamenti. Gestione autonoma di attrezzature agricole e risoluzione di problemi operativi sul campo.",
+  },
+  {
+    period: "19 dic 2023",
+    title: "Corso Sicurezza Lavoratori — Rischio Basso",
+    role: "Attestato di frequenza · LTO Mantova / FORMA · Regione Lombardia (ATS Val Padana) · 4 ore E-Learning",
+    desc: "Corso conforme all'Accordo Stato Regioni 21 dicembre 2011 (D.Lgs. 81/08, Art. 37), destinato ai lavoratori che svolgono attività d'ufficio. Contenuti: rischio elettrico, cadute dall'alto, microclima e illuminazione, videoterminali, organizzazione del lavoro e stress lavoro correlato, procedure di primo soccorso, segnaletica e antincendio (procedure di esodo). Attestato rilasciato in qualità di studente dal Laboratorio Territoriale Occupabilità di Mantova.",
+    pdf: "/attestato-sicurezza-lavoratori-rischio-basso.pdf",
+    pdfLabel: "Apri attestato (PDF)",
   },
   {
     period: "11 — 25 ago 2024",
@@ -292,7 +301,7 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [localMode, setLocalMode] = useState(false);
-  const [cvOpen, setCvOpen] = useState(false);
+  const [docOpen, setDocOpen] = useState<{ url: string; title: string } | null>(null);
 
   const CV_PDF = "/cv-alberto-pecchini.pdf";
 
@@ -389,17 +398,17 @@ export default function App() {
     };
   }, [selectedItem]);
 
-  // Visualizzatore CV: blocco scroll + chiusura con Esc.
+  // Visualizzatore documenti PDF: blocco scroll + chiusura con Esc.
   useEffect(() => {
-    if (!cvOpen) return;
+    if (!docOpen) return;
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setCvOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setDocOpen(null); };
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [cvOpen]);
+  }, [docOpen]);
 
 
   return (
@@ -668,7 +677,7 @@ export default function App() {
                 <div className="d-flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => setCvOpen(true)}
+                    onClick={() => setDocOpen({ url: CV_PDF, title: "Curriculum Vitae — Alberto Pecchini" })}
                     className="btn btn-primary fw-semibold d-inline-flex align-items-center"
                     aria-haspopup="dialog"
                   >
@@ -705,6 +714,17 @@ export default function App() {
                         {item.role}
                       </p>
                       <p className="text-muted mb-0">{item.desc}</p>
+                      {(item as any).pdf && (
+                        <button
+                          type="button"
+                          onClick={() => setDocOpen({ url: (item as any).pdf, title: item.title })}
+                          className="ap-cv-doc mt-3"
+                          aria-haspopup="dialog"
+                        >
+                          <FileText size={16} aria-hidden="true" />
+                          <span>{(item as any).pdfLabel || "Apri documento (PDF)"}</span>
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -979,21 +999,21 @@ export default function App() {
         </>
       )}
 
-      {/* Visualizzatore CV inline: anteprima PDF in modale, niente download forzato */}
-      {cvOpen && (
+      {/* Visualizzatore PDF generico: usato sia per il CV che per gli attestati */}
+      {docOpen && (
         <div
           className="ap-cv-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="Curriculum Vitae di Alberto Pecchini"
+          aria-label={docOpen.title}
         >
-          <div className="ap-cv-backdrop" onClick={() => setCvOpen(false)} aria-hidden="true" />
+          <div className="ap-cv-backdrop" onClick={() => setDocOpen(null)} aria-hidden="true" />
           <div className="ap-cv-dialog">
             <div className="ap-cv-bar">
-              <span className="ap-cv-title">Curriculum Vitae — Alberto Pecchini</span>
+              <span className="ap-cv-title">{docOpen.title}</span>
               <div className="d-flex align-items-center gap-2">
                 <a
-                  href={CV_PDF}
+                  href={docOpen.url}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="btn btn-sm btn-outline-light fw-semibold d-none d-sm-inline-flex align-items-center"
@@ -1001,7 +1021,7 @@ export default function App() {
                   <ExternalLink size={15} className="me-1" aria-hidden="true" /> Nuova scheda
                 </a>
                 <a
-                  href={CV_PDF}
+                  href={docOpen.url}
                   download
                   className="btn btn-sm btn-light fw-semibold text-primary d-inline-flex align-items-center"
                 >
@@ -1010,15 +1030,15 @@ export default function App() {
                 <button
                   type="button"
                   className="ap-cv-close"
-                  onClick={() => setCvOpen(false)}
-                  aria-label="Chiudi l'anteprima del CV"
+                  onClick={() => setDocOpen(null)}
+                  aria-label="Chiudi l'anteprima del documento"
                 >
                   <X size={20} aria-hidden="true" />
                 </button>
               </div>
             </div>
             <a
-              href={CV_PDF}
+              href={docOpen.url}
               target="_blank"
               rel="noreferrer noopener"
               className="ap-cv-fallback d-sm-none"
@@ -1027,8 +1047,8 @@ export default function App() {
             </a>
             <iframe
               className="ap-cv-frame"
-              src={`${CV_PDF}#view=FitH&toolbar=1&navpanes=0`}
-              title="Anteprima del Curriculum Vitae in PDF"
+              src={`${docOpen.url}#view=FitH&toolbar=1&navpanes=0`}
+              title={`Anteprima: ${docOpen.title}`}
             />
           </div>
         </div>
@@ -1353,6 +1373,32 @@ export default function App() {
         }
         .ap-timeline-item--wish {
           opacity: 0.85;
+        }
+
+        /* Bottone documento allegato (apre il visore PDF) nella timeline CV */
+        button.ap-cv-doc {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 0.9rem;
+          background: rgba(47, 125, 74, 0.08);
+          border: 1px solid rgba(47, 125, 74, 0.28);
+          border-radius: 999px;
+          color: #1F6B3D;
+          font-family: inherit;
+          font-size: 0.85rem;
+          font-weight: 600;
+          line-height: 1.2;
+          cursor: pointer;
+          appearance: none;
+          transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        button.ap-cv-doc:hover,
+        button.ap-cv-doc:focus-visible {
+          background: #2F7D4A;
+          border-color: #2F7D4A;
+          color: #ffffff;
+          outline: none;
         }
 
         /* Card hobby / passioni */
