@@ -539,26 +539,18 @@ export default function App() {
               <div className="row">
                 <div className="col-12">
                   <nav className="navbar navbar-expand-lg" aria-label="Navigazione principale">
+                    {/* Hamburger: classe custom → bypass Bootstrap Italia, inline style → impossibile da sovrascrivere */}
                     <button
-                      className="custom-navbar-toggler"
+                      className="ap-hamburger"
                       type="button"
                       aria-controls="nav-main"
                       aria-expanded={menuOpen}
                       aria-label="Apri il menu di navigazione"
                       onClick={() => setMenuOpen(true)}
+                      style={{ background: "none", border: "none", color: "#ffffff", padding: "12px 8px", lineHeight: 1, cursor: "pointer", flexShrink: 0 }}
                     >
-                      <Menu aria-hidden="true" />
+                      <Menu size={24} color="#ffffff" aria-hidden="true" />
                     </button>
-
-                    {/* Mobile: logo + nome (nascosto su desktop) */}
-                    <a
-                      href="#home"
-                      className="d-flex d-lg-none align-items-center text-white text-decoration-none ap-mobile-brand ms-2"
-                      aria-label="Alberto Pecchini, torna alla home"
-                    >
-                      <img src="/favicon.svg" alt="" width={30} height={30} style={{ borderRadius: "7px", border: "1.5px solid rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.08)" }} />
-                      <span className="ms-2 fw-semibold" style={{ fontSize: "0.95rem", letterSpacing: "-0.01em" }}>Alberto Pecchini</span>
-                    </a>
 
                     <div className="d-lg-none flex-grow-1" />
 
@@ -614,6 +606,10 @@ export default function App() {
         >
           <div className="container position-relative" style={{ zIndex: 1 }}>
             <div>
+              {/* Logo: solo su mobile, sopra il kicker */}
+              <div className="d-lg-none mb-4">
+                <img src="/favicon.svg" alt="Alberto Pecchini" width={52} height={52} style={{ borderRadius: "12px" }} />
+              </div>
               <p className="ap-kicker text-uppercase fw-semibold mb-3">
                 Studente CAT · Front-end Developer
               </p>
@@ -1220,21 +1216,9 @@ export default function App() {
             background-color: #103820 !important;
           }
 
-          /* ── Hamburger: tre linee bianche ── */
-          .ap-navbar .custom-navbar-toggler,
-          .it-header-navbar-wrapper .custom-navbar-toggler,
-          .navbar .custom-navbar-toggler {
-            color: #ffffff !important;
-            background: none !important;
-            border: none !important;
-            padding: 10px 8px !important;
-            line-height: 1;
-          }
-          .ap-navbar .custom-navbar-toggler svg,
-          .it-header-navbar-wrapper .custom-navbar-toggler svg {
-            color: #ffffff !important;
-            stroke: #ffffff !important;
-            fill: none !important;
+          /* ── Hamburger custom: su desktop nascosto (navbar-expand-lg gestisce il menu inline) ── */
+          .ap-hamburger {
+            display: none;
           }
 
           /* ── Menu drawer: sfondo verde scuro (Bootstrap Italia default = blu) ── */
@@ -1257,19 +1241,14 @@ export default function App() {
             stroke: #ffffff !important;
           }
 
-          /* ── Navbar mobile: altezza e padding ── */
+          /* ── Navbar mobile: hamburger visibile, altezza ── */
+          .ap-hamburger {
+            display: flex;
+          }
           .ap-navbar .navbar {
             padding-top: 0.5rem;
             padding-bottom: 0.5rem;
             min-height: 56px;
-          }
-
-          /* ── Logo mobile ── */
-          .ap-mobile-brand {
-            line-height: 1;
-          }
-          .ap-mobile-brand:hover {
-            color: rgba(255, 255, 255, 0.82) !important;
           }
 
           /* ── Bottoni contatto mobile (44×44 px, tappabili) ── */
