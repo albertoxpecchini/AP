@@ -434,6 +434,9 @@ export default function Parole() {
         }
 
         .parole-header {
+          position: sticky;
+          top: 0;
+          z-index: 20;
           width: 100%;
           display: flex;
           align-items: center;
