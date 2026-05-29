@@ -1,10 +1,12 @@
 {
   "version": "0.2.0",
   "configurations": [
+    
     {
-      "name": "Vite: Chrome",
+      "name": "Vite: Vivaldi",
       "type": "chrome",
       "request": "launch",
+      "runtimeExecutable": "C:\\Users\\alberto\\AppData\\Local\\Vivaldi\\Application\\vivaldi.exe",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}/src",
       "preLaunchTask": "vite: dev",

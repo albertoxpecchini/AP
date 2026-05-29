@@ -58,6 +58,19 @@ function fmt(s: number): string {
   return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
+function getRating(won: boolean, attempts: number) {
+  if (!won) return { emoji: "💪", label: "Ci riprovi!", grade: "—", accent: "#c0392b" };
+  const data = [
+    { emoji: "🏆", label: "Fenomenale!", grade: "S", accent: "#c8a415" },
+    { emoji: "⭐", label: "Straordinario!", grade: "A+", accent: "#2F7D4A" },
+    { emoji: "🎯", label: "Ottimo!", grade: "A", accent: "#2F7D4A" },
+    { emoji: "👏", label: "Bravo!", grade: "B", accent: "#D9A400" },
+    { emoji: "😅", label: "Ce la fai!", grade: "C", accent: "#D9A400" },
+    { emoji: "😮‍💨", label: "All'ultimo respiro!", grade: "D", accent: "#c0392b" },
+  ];
+  return data[Math.min(attempts - 1, 5)];
+}
+
 export default function Parole() {
   const [length, setLength] = useState<WordLength>(5);
   const [answer, setAnswer] = useState(() => randomWord(5));
@@ -74,6 +87,8 @@ export default function Parole() {
   const [record, setRecord] = useState<number | null>(null);
   const [trivia, setTrivia] = useState<string | null>(null);
   const [triviaLoading, setTriviaLoading] = useState(false);
+  const [newRecord, setNewRecord] = useState(false);
+  const [wordImage, setWordImage] = useState<string | null>(null);
 
   const cols = length;
   const msgTimer = useRef<number | undefined>(undefined);
@@ -113,22 +128,44 @@ export default function Parole() {
   const fetchTrivia = useCallback((word: string) => {
     const cacheKey = `trivia_${word.toLowerCase()}`;
     const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-      setTrivia(cached);
-      return;
-    }
+    if (cached) { setTrivia(cached); return; }
 
     setTriviaLoading(true);
-    fetch(`/api/trivia?word=${encodeURIComponent(word)}`)
+    fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(word)}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.trivia) {
-          localStorage.setItem(cacheKey, data.trivia);
-          setTrivia(data.trivia);
+        const text = data.extract?.split("\n")[0] ?? "";
+        if (text) {
+          localStorage.setItem(cacheKey, text);
+          setTrivia(text);
         }
       })
-      .catch((err) => console.error("Trivia fetch failed:", err))
+      .catch(() => {})
       .finally(() => setTriviaLoading(false));
+  }, []);
+
+  const fetchWordImage = useCallback((word: string) => {
+    const q = encodeURIComponent(word);
+    // Prima scelta: Wikipedia pageimages API (copre anche parole astratte con redirect)
+    fetch(`https://it.wikipedia.org/w/api.php?action=query&titles=${q}&prop=pageimages&format=json&pithumbsize=640&redirects=1&origin=*`)
+      .then((r) => r.json())
+      .then((data) => {
+        const pages = Object.values(data.query?.pages ?? {}) as any[];
+        const src = pages[0]?.thumbnail?.source;
+        if (src) { setWordImage(src); return; }
+        // Fallback: Wikimedia Commons cerca immagini libere per la parola
+        return fetch(`https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${q}&prop=imageinfo&iiprop=url&iiurlwidth=640&format=json&origin=*&gsrlimit=5`)
+          .then((r) => r.json())
+          .then((d) => {
+            const imgs = Object.values(d.query?.pages ?? {}) as any[];
+            const url = imgs.find((p) => {
+              const ext = p.imageinfo?.[0]?.url?.split(".").pop()?.toLowerCase();
+              return ["jpg","jpeg","png","webp"].includes(ext);
+            })?.imageinfo?.[0]?.thumburl;
+            if (url) setWordImage(url);
+          });
+      })
+      .catch(() => {});
   }, []);
 
   const startGame = useCallback((len: WordLength) => {
@@ -144,6 +181,8 @@ export default function Parole() {
     setHintsLeft(HINTS);
     setSeconds(0);
     setTrivia(null);
+    setNewRecord(false);
+    setWordImage(null);
   }, []);
 
   const newGame = useCallback(() => startGame(length), [startGame, length]);
@@ -193,18 +232,22 @@ export default function Parole() {
     if (guess === answer) {
       setState("won");
       fetchTrivia(answer);
+      fetchWordImage(answer);
       flash("Bravo! Indovinata 🎉");
       window.setTimeout(() => {
         confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
       }, 350);
       setRecord((prev) => {
-        const best = prev == null || seconds < prev ? seconds : prev;
+        const isNew = prev == null || seconds < prev;
+        if (isNew) setNewRecord(true);
+        const best = isNew ? seconds : prev;
         localStorage.setItem(recordKey(length), String(best));
         return best;
       });
     } else if (nextGuesses.length >= ROWS) {
       setState("lost");
       fetchTrivia(answer);
+      fetchWordImage(answer);
       flash(`Era ${answer.toUpperCase()}`);
     }
   }, [slots, cols, answer, guesses, evaluations, flash, seconds, length, fetchTrivia]);
@@ -226,7 +269,7 @@ export default function Parole() {
         return;
       }
       const up = key.toUpperCase();
-      if (/^[A-Z]$/.test(up) && !eliminated.has(up)) {
+      if (/^[A-Z]$/.test(up)) {
         setSlots((prev) => {
           const n = [...prev];
           n[cursor] = up.toLowerCase();
@@ -268,6 +311,15 @@ export default function Parole() {
           <RotateCcw size={20} />
         </button>
       </header>
+      {import.meta.env.DEV && state === "playing" && (
+        <button
+          className="parole-hint-btn"
+          style={{ position:"fixed", bottom:16, right:16, zIndex:999 }}
+          onClick={() => { setSlots(answer.split("")); setCursor(cols - 1); }}
+        >
+          ✎ Autofill
+        </button>
+      )}
 
       <div className="parole-modes" role="group" aria-label="Lunghezza parola">
         {LENGTHS.map((len) => (
@@ -358,26 +410,78 @@ export default function Parole() {
             })}
           </main>
 
-          {state !== "playing" && (
-            <div className="parole-result">
-              <p className="parole-result-text">
-                {state === "won"
-                  ? `Risolta in ${fmt(seconds)} e ${guesses.length} ${guesses.length === 1 ? "tentativo" : "tentativi"}`
-                  : `La parola era ${answer.toUpperCase()}`}
-              </p>
-              {(trivia || triviaLoading) && (
-                <div className="parole-trivia">
-                  <p className="parole-trivia-label">📚 Curiosità</p>
-                  <p className="parole-trivia-text">
-                    {triviaLoading ? "⏳ Generando..." : trivia}
-                  </p>
+          {state !== "playing" && (() => {
+            const rating = getRating(state === "won", guesses.length);
+            return (
+              <div className="parole-endgame-overlay">
+                <div className="parole-endgame-card">
+
+                  {/* Header */}
+                  <div className="parole-endgame-header" style={{ "--eg-accent": rating.accent } as React.CSSProperties}>
+                    <div className="parole-endgame-grade">{rating.grade}</div>
+                    <div className="parole-endgame-rating-text">
+                      <span className="parole-endgame-emoji">{rating.emoji}</span>
+                      <span className="parole-endgame-label">{rating.label}</span>
+                    </div>
+                    <div className="parole-endgame-word">{answer.toUpperCase()}</div>
+                    {newRecord && state === "won" && (
+                      <div className="parole-endgame-newrecord">🏅 Nuovo record!</div>
+                    )}
+                  </div>
+
+                  {/* Image */}
+                  {wordImage && (
+                    <div className="parole-endgame-imgwrap">
+                      <img
+                        className="parole-endgame-img"
+                        src={wordImage}
+                        alt={answer}
+                        onError={() => setWordImage(null)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Stats */}
+                  <div className="parole-endgame-stats">
+                    <div className="parole-endgame-stat">
+                      <span className="parole-endgame-stat-icon">⏱</span>
+                      <span className="parole-endgame-stat-val">{fmt(seconds)}</span>
+                      <span className="parole-endgame-stat-lbl">Tempo</span>
+                    </div>
+                    {state === "won" && (
+                      <div className="parole-endgame-stat parole-endgame-stat--mid">
+                        <span className="parole-endgame-stat-icon">🎯</span>
+                        <span className="parole-endgame-stat-val">{guesses.length}<small>/{ROWS}</small></span>
+                        <span className="parole-endgame-stat-lbl">Tentativi</span>
+                      </div>
+                    )}
+                    <div className="parole-endgame-stat">
+                      <span className="parole-endgame-stat-icon">🏅</span>
+                      <span className="parole-endgame-stat-val">{record != null ? fmt(record) : "—"}</span>
+                      <span className="parole-endgame-stat-lbl">Record</span>
+                    </div>
+                  </div>
+
+                  {/* Trivia */}
+                  <div className="parole-endgame-trivia">
+                    <div className="parole-endgame-trivia-title">📚 Curiosità</div>
+                    {triviaLoading
+                      ? <div className="parole-endgame-trivia-loading"><span className="parole-dot-pulse" />Generando curiosità…</div>
+                      : trivia
+                        ? <p className="parole-endgame-trivia-text">{trivia}</p>
+                        : <p className="parole-endgame-trivia-empty">Nessuna curiosità disponibile.</p>
+                    }
+                  </div>
+
+                  {/* CTA */}
+                  <button className="parole-endgame-cta" onClick={newGame}>
+                    <RotateCcw size={17} /> Gioca ancora
+                  </button>
+
                 </div>
-              )}
-              <button className="btn btn-primary fw-semibold" onClick={newGame}>
-                Gioca ancora
-              </button>
-            </div>
-          )}
+              </div>
+            );
+          })()}
         </div>
 
         <aside className="parole-controls" aria-label="Comandi">
@@ -437,7 +541,6 @@ export default function Parole() {
                   key={key}
                   className={`parole-key${wide ? " parole-key--wide" : ""}${st ? ` parole-key--${st}` : ""}${isElim ? " parole-key--elim" : ""}`}
                   onClick={() => onKey(key)}
-                  disabled={isElim}
                   type="button"
                 >
                   {key === "CANC" ? "⌫" : key}
@@ -658,36 +761,226 @@ export default function Parole() {
           70% { transform: translateY(-7px); }
         }
 
-        .parole-result { margin: 0.75rem 0; text-align: center; animation: parole-toast 0.3s ease; }
-        .parole-result-text { margin: 0 0 0.6rem; font-weight: 600; color: var(--green-dark); }
+        /* ── End-game modal ── */
+        .parole-endgame-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 100;
+          background: rgba(10, 30, 18, 0.72);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          animation: parole-fade-in 0.25s ease;
+        }
+        @keyframes parole-fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .parole-endgame-card {
+          background: #fff;
+          border-radius: 20px;
+          width: 100%;
+          max-width: 480px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+          animation: parole-slide-up 0.35s cubic-bezier(0.34,1.56,0.64,1);
+          display: flex;
+          flex-direction: column;
+        }
+        @keyframes parole-slide-up {
+          from { opacity: 0; transform: translateY(40px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-        .parole-trivia {
-          background: rgba(47, 125, 74, 0.08);
-          border-left: 3px solid var(--green);
-          padding: 0.85rem 1rem;
-          margin: 0.8rem 0;
-          border-radius: 6px;
-          text-align: left;
-          font-size: 0.95rem;
-          animation: parole-slide-in 0.4s ease 0.15s both;
+        /* Header */
+        .parole-endgame-header {
+          background: var(--eg-accent, var(--green));
+          color: #fff;
+          border-radius: 20px 20px 0 0;
+          padding: 1.4rem 1.5rem 1.2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.3rem;
+          position: relative;
         }
-        .parole-trivia-label {
-          margin: 0 0 0.35rem;
+        .parole-endgame-grade {
+          position: absolute;
+          top: 1rem;
+          right: 1.2rem;
+          font-size: 1.6rem;
+          font-weight: 900;
+          opacity: 0.28;
+          letter-spacing: -0.02em;
+          line-height: 1;
+        }
+        .parole-endgame-rating-text {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+        }
+        .parole-endgame-emoji { font-size: 1.5rem; line-height: 1; }
+        .parole-endgame-label {
+          font-size: 1.15rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+        }
+        .parole-endgame-word {
+          font-size: 2.4rem;
+          font-weight: 900;
+          letter-spacing: 0.18em;
+          margin-top: 0.15rem;
+        }
+        .parole-endgame-newrecord {
+          margin-top: 0.3rem;
+          font-size: 0.82rem;
+          font-weight: 700;
+          background: rgba(255,255,255,0.22);
+          border-radius: 999px;
+          padding: 0.2rem 0.75rem;
+          letter-spacing: 0.04em;
+        }
+
+        /* Image */
+        .parole-endgame-imgwrap {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          overflow: hidden;
+          background: #e8ede9;
+        }
+        .parole-endgame-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          animation: parole-fade-in 0.4s ease 0.2s both;
+        }
+
+        /* Stats */
+        .parole-endgame-stats {
+          display: flex;
+          justify-content: center;
+          gap: 0;
+          padding: 1rem 1.5rem 0.6rem;
+          border-bottom: 1px solid rgba(47,125,74,0.12);
+        }
+        .parole-endgame-stat {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.15rem;
+          padding: 0.5rem 0;
+        }
+        .parole-endgame-stat + .parole-endgame-stat {
+          border-left: 1px solid rgba(47,125,74,0.12);
+        }
+        .parole-endgame-stat--mid {
+          border-left: 1px solid rgba(47,125,74,0.12);
+          border-right: 1px solid rgba(47,125,74,0.12);
+        }
+        .parole-endgame-stat-icon { font-size: 1.1rem; line-height: 1; }
+        .parole-endgame-stat-val {
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: #103820;
+          font-variant-numeric: tabular-nums;
+          line-height: 1.1;
+        }
+        .parole-endgame-stat-val small {
+          font-size: 0.7em;
           font-weight: 600;
-          color: var(--green-dark);
-          font-size: 0.85rem;
+          opacity: 0.55;
+        }
+        .parole-endgame-stat-lbl {
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #6b8070;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
         }
-        .parole-trivia-text {
+
+        /* Trivia */
+        .parole-endgame-trivia {
+          padding: 1rem 1.5rem 0.75rem;
+          border-bottom: 1px solid rgba(47,125,74,0.1);
+        }
+        .parole-endgame-trivia-title {
+          font-size: 0.75rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: var(--green-dark);
+          margin-bottom: 0.5rem;
+        }
+        .parole-endgame-trivia-text {
           margin: 0;
+          font-size: 0.92rem;
           color: #1f3d2a;
-          line-height: 1.5;
+          line-height: 1.6;
+          animation: parole-slide-in 0.4s ease both;
         }
+        .parole-endgame-trivia-empty {
+          margin: 0;
+          font-size: 0.88rem;
+          color: #8ca090;
+          font-style: italic;
+        }
+        .parole-endgame-trivia-loading {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.88rem;
+          color: #6b8070;
+          font-style: italic;
+        }
+        .parole-dot-pulse {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--green);
+          display: inline-block;
+          animation: parole-pulse 1s ease-in-out infinite;
+        }
+        @keyframes parole-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.35; transform: scale(0.7); }
+        }
+
+        /* CTA */
+        .parole-endgame-cta {
+          margin: 1rem 1.5rem 1.25rem;
+          width: calc(100% - 3rem);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          background: var(--green);
+          color: #fff;
+          border: none;
+          border-radius: 12px;
+          padding: 0.85rem 1.5rem;
+          font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background 0.15s, transform 0.1s;
+        }
+        .parole-endgame-cta:hover { background: var(--green-dark); transform: translateY(-1px); }
+        .parole-endgame-cta:active { transform: scale(0.98); }
+
         @keyframes parole-slide-in {
           from { opacity: 0; transform: translateX(-8px); }
           to { opacity: 1; transform: translateX(0); }
         }
+
+        @media (max-width: 480px) {
+          .parole-endgame-card { max-height: 96vh; border-radius: 16px; }
+          .parole-endgame-header { border-radius: 16px 16px 0 0; }
+          .parole-endgame-word { font-size: 1.9rem; letter-spacing: 0.14em; }
+        }
+
 
         .parole-page .btn-primary { background-color: var(--green); border-color: var(--green); }
         .parole-page .btn-primary:hover,
@@ -781,9 +1074,6 @@ export default function Parole() {
         .parole-key--present { background: var(--amber); color: #fff; }
         .parole-key--absent { background: var(--absent); color: #fff; }
         .parole-key--elim {
-          opacity: 0.4;
-          cursor: not-allowed;
-          text-decoration: line-through;
           animation: parole-elim 0.3s ease;
         }
         @keyframes parole-elim {
