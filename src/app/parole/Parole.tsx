@@ -11,6 +11,7 @@ import {
   Delete,
 } from "lucide-react";
 import { LENGTHS, type WordLength, isValidWord, randomWord } from "./words";
+import { getTrivia } from "./words-trivia";
 
 const ROWS = 6;
 const HINTS = 3; // aiuti disponibili per partita
@@ -339,6 +340,12 @@ export default function Parole() {
                   ? `Risolta in ${fmt(seconds)} e ${guesses.length} ${guesses.length === 1 ? "tentativo" : "tentativi"}`
                   : `La parola era ${answer.toUpperCase()}`}
               </p>
+              {getTrivia(answer) && (
+                <div className="parole-trivia">
+                  <p className="parole-trivia-label">📚 Curiosità</p>
+                  <p className="parole-trivia-text">{getTrivia(answer)}</p>
+                </div>
+              )}
               <button className="btn btn-primary fw-semibold" onClick={newGame}>
                 Gioca ancora
               </button>
@@ -626,6 +633,34 @@ export default function Parole() {
 
         .parole-result { margin: 0.75rem 0; text-align: center; animation: parole-toast 0.3s ease; }
         .parole-result-text { margin: 0 0 0.6rem; font-weight: 600; color: var(--green-dark); }
+
+        .parole-trivia {
+          background: rgba(47, 125, 74, 0.08);
+          border-left: 3px solid var(--green);
+          padding: 0.85rem 1rem;
+          margin: 0.8rem 0;
+          border-radius: 6px;
+          text-align: left;
+          font-size: 0.95rem;
+          animation: parole-slide-in 0.4s ease 0.15s both;
+        }
+        .parole-trivia-label {
+          margin: 0 0 0.35rem;
+          font-weight: 600;
+          color: var(--green-dark);
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .parole-trivia-text {
+          margin: 0;
+          color: #1f3d2a;
+          line-height: 1.5;
+        }
+        @keyframes parole-slide-in {
+          from { opacity: 0; transform: translateX(-8px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
 
         .parole-page .btn-primary { background-color: var(--green); border-color: var(--green); }
         .parole-page .btn-primary:hover,
