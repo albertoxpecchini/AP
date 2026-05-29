@@ -97,6 +97,14 @@ const SOCIALS = [
 
 const PROJECTS = [
   {
+    category: "Web game",
+    date: "29 mag 2026",
+    title: "Parole",
+    url: "/parole",
+    desc: "Gioco di parole in stile Wordle, in italiano. Sei tentativi per indovinare una parola di cinque lettere: le caselle diventano verdi se la lettera è al posto giusto, gialle se è presente ma in posizione errata, grigie se assente. Tastiera fisica e a schermo, validazione sul dizionario e parola casuale a ogni partita.",
+    tags: ["React", "TypeScript", "react-router", "Game design"],
+  },
+  {
     category: "Sito web istituzionale",
     date: "27 apr 2026",
     title: "Rivalta sul Mincio",
@@ -237,7 +245,9 @@ const HOBBY = [
     Icon: Gamepad2,
     label: "Videogiochi",
     img: "/images/hobby-videogiochi.jpg",
-    desc: "I videogiochi mi hanno avvicinato al mondo del design e della tecnologia fin da giovane. Apprezzo i titoli con una forte identità visiva, una narrativa curata e un gameplay profondo — sia esperienze single player immersive che titoli competitivi.",
+    desc: "I videogiochi mi hanno avvicinato al mondo del design e della tecnologia fin da giovane. Apprezzo i titoli con una forte identità visiva, una narrativa curata e un gameplay profondo — sia esperienze single player immersive che titoli competitivi. Ne ho anche realizzato uno: Parole, un Wordle in italiano.",
+    link: "/parole",
+    linkLabel: "Gioca a Parole",
   },
   {
     Icon: Music,
@@ -1036,6 +1046,15 @@ export default function App() {
               </div>
               <h2 id="modal-title" className="ap-modal-title">{selectedItem.label}</h2>
               <p className="ap-modal-body">{selectedItem.desc}</p>
+              {(selectedItem as any).link && (
+                <a
+                  href={(selectedItem as any).link}
+                  className="btn btn-primary fw-semibold mt-2 d-inline-flex align-items-center"
+                >
+                  <Gamepad2 size={18} className="me-2" aria-hidden="true" />
+                  {(selectedItem as any).linkLabel ?? "Apri"}
+                </a>
+              )}
             </div>
           </div>
         </>
