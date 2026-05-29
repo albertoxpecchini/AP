@@ -421,8 +421,9 @@ export default function Parole() {
           --green-dark: #1F6B3D;
           --amber: #D9A400;
           --absent: #c0392b;
-          min-height: 100vh;
-          min-height: 100svh;
+          height: 100vh;
+          height: 100svh;
+          overflow-y: auto;
           background: #f4f6f5;
           color: #17271d;
           display: flex;
@@ -563,7 +564,7 @@ export default function Parole() {
 
         .parole-stage {
           width: 100%;
-          flex: 1;
+          flex: 1 0 auto;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -571,7 +572,7 @@ export default function Parole() {
         }
         .parole-game { display: flex; flex-direction: column; align-items: center; }
 
-        .parole-board { display: grid; grid-template-rows: repeat(${ROWS}, 1fr); gap: 7px; padding: 0.25rem; }
+        .parole-board { display: grid; gap: 7px; padding: 0.25rem; }
         .parole-row { display: grid; gap: 7px; }
         .parole-row--shake { animation: parole-shake 0.45s; }
         @keyframes parole-shake {
@@ -731,8 +732,9 @@ export default function Parole() {
 
         /* Mobile: tessere fluide. */
         @media (max-width: 480px) {
-          .parole-tile { width: 100%; aspect-ratio: 1; height: auto; font-size: 1.5rem; }
-          .parole-board { width: 100%; max-width: 360px; }
+          .parole-game { width: 100%; }
+          .parole-board { width: min(92vw, 22rem); max-width: none; margin: 0 auto; }
+          .parole-tile { width: auto; height: auto; aspect-ratio: 1; font-size: 1.5rem; }
           .parole-key { height: 50px; }
           .parole-toolbar { max-width: 100%; }
         }
