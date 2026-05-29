@@ -283,7 +283,7 @@ export default function Parole() {
       </div>
 
       <div className="parole-stage">
-        <div className="parole-board-col">
+        <div className="parole-game">
           <main className="parole-board">
             {Array.from({ length: ROWS }).map((_, r) => {
               const submitted = r < guesses.length;
@@ -388,11 +388,10 @@ export default function Parole() {
               Cancella una lettera
             </li>
           </ul>
-          <p className="parole-controls-hint">Da PC usa la tastiera fisica: i tasti qui sotto mostrano solo i colori.</p>
+          <p className="parole-controls-hint">Da PC usa la tastiera fisica: i tasti qui mostrano solo i colori.</p>
         </aside>
-      </div>
 
-      <div className="parole-keyboard">
+        <div className="parole-keyboard">
         {KEYBOARD.map((row, ri) => (
           <div key={ri} className="parole-krow">
             {row.map((key) => {
@@ -413,6 +412,7 @@ export default function Parole() {
             })}
           </div>
         ))}
+        </div>
       </div>
 
       <style>{`
@@ -559,12 +559,14 @@ export default function Parole() {
         }
 
         .parole-stage {
+          width: 100%;
+          flex: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 1rem;
         }
-        .parole-board-col { display: flex; flex-direction: column; align-items: center; }
+        .parole-game { display: flex; flex-direction: column; align-items: center; }
 
         .parole-board { display: grid; grid-template-rows: repeat(${ROWS}, 1fr); gap: 7px; padding: 0.25rem; }
         .parole-row { display: grid; gap: 7px; }
@@ -732,25 +734,44 @@ export default function Parole() {
           .parole-toolbar { max-width: 100%; }
         }
 
-        /* Desktop: pannello comandi a lato, tastiera più piccola e solo di riferimento. */
+        /* Desktop: griglia con comandi a tutta altezza e tastiera allineata sotto la board. */
         @media (min-width: 760px) {
-          .parole-stage { flex-direction: row; align-items: flex-start; justify-content: center; gap: 2.5rem; }
+          .parole-stage {
+            flex: initial;
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-template-areas:
+              "game controls"
+              "keyboard controls";
+            align-items: start;
+            justify-content: center;
+            gap: 1.1rem 2.25rem;
+          }
+          .parole-game { grid-area: game; }
           .parole-controls {
-            display: block;
-            width: 240px;
+            grid-area: controls;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+            width: 250px;
             background: #fff;
             border: 1px solid rgba(47,125,74,0.18);
             border-radius: 12px;
             padding: 1.25rem;
             box-shadow: 0 4px 18px rgba(0,0,0,0.06);
           }
+          .parole-controls .parole-controls-hint { margin-top: auto; padding-top: 0.75rem; }
           .parole-keyboard {
-            max-width: 380px;
+            grid-area: keyboard;
+            width: 100%;
+            max-width: none;
+            margin-top: 0;
+            padding: 0;
             pointer-events: none;
-            opacity: 0.9;
+            opacity: 0.85;
           }
-          .parole-key { height: 40px; font-size: 0.85rem; border-radius: 5px; }
-          .parole-key--wide { font-size: 0.62rem; }
+          .parole-key { height: 36px; font-size: 0.78rem; border-radius: 5px; }
+          .parole-key--wide { font-size: 0.55rem; }
         }
       `}</style>
     </div>
