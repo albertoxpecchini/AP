@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
+import { ArrowLeft, RotateCcw, Lightbulb, Clock, Trophy } from "lucide-react";
 import { WORD_SET, randomWord } from "./words";
 
 const ROWS = 6;
 const COLS = 5;
+const HINTS = 3; // aiuti disponibili per partita
+const HINT_BATCH = 3; // lettere eliminate per ogni aiuto
 
 type Status = "correct" | "present" | "absent";
 
@@ -18,7 +21,6 @@ const KEYBOARD: string[][] = [
 function evaluate(guess: string, answer: string): Status[] {
   const result: Status[] = Array(COLS).fill("absent");
   const taken = Array(COLS).fill(false);
-
   for (let i = 0; i < COLS; i++) {
     if (guess[i] === answer[i]) {
       result[i] = "correct";
@@ -38,8 +40,14 @@ function evaluate(guess: string, answer: string): Status[] {
   return result;
 }
 
-// Priorità per il colore dei tasti: verde > giallo > grigio.
 const RANK: Record<Status, number> = { absent: 0, present: 1, correct: 2 };
+const RECORD_KEY = "parole-record";
+
+function fmt(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+}
 
 export default function Parole() {
   const [answer, setAnswer] = useState(() => randomWord());
@@ -49,6 +57,22 @@ export default function Parole() {
   const [state, setState] = useState<"playing" | "won" | "lost">("playing");
   const [message, setMessage] = useState("");
   const [shake, setShake] = useState(false);
+  const [eliminated, setEliminated] = useState<Set<string>>(new Set());
+  const [hintsLeft, setHintsLeft] = useState(HINTS);
+  const [seconds, setSeconds] = useState(0);
+  const [record, setRecord] = useState<number | null>(() => {
+    const r = Number(localStorage.getItem(RECORD_KEY));
+    return r > 0 ? r : null;
+  });
+
+  const msgTimer = useRef<number | undefined>(undefined);
+
+  // Timer: avanza ogni secondo finché si gioca.
+  useEffect(() => {
+    if (state !== "playing") return;
+    const id = window.setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [state]);
 
   const keyStatuses = useMemo(() => {
     const map: Record<string, Status> = {};
@@ -59,12 +83,16 @@ export default function Parole() {
         if (!(up in map) || RANK[s] > RANK[map[up]]) map[up] = s;
       });
     });
+    eliminated.forEach((k) => {
+      if (!(k in map)) map[k] = "absent";
+    });
     return map;
-  }, [guesses, evaluations]);
+  }, [guesses, evaluations, eliminated]);
 
   const flash = useCallback((text: string) => {
     setMessage(text);
-    window.setTimeout(() => setMessage(""), 1600);
+    window.clearTimeout(msgTimer.current);
+    msgTimer.current = window.setTimeout(() => setMessage(""), 1700);
   }, []);
 
   const newGame = useCallback(() => {
@@ -74,7 +102,31 @@ export default function Parole() {
     setCurrent("");
     setState("playing");
     setMessage("");
+    setEliminated(new Set());
+    setHintsLeft(HINTS);
+    setSeconds(0);
   }, []);
+
+  const useHint = useCallback(() => {
+    if (state !== "playing" || hintsLeft <= 0) return;
+    // Lettere assenti dalla risposta, non già escluse e non già nella tastiera.
+    const known = new Set([...eliminated, ...Object.keys(keyStatuses)]);
+    const candidates = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      .split("")
+      .filter((c) => !answer.toUpperCase().includes(c) && !known.has(c));
+    if (candidates.length === 0) {
+      flash("Niente da eliminare");
+      return;
+    }
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    const picked = candidates.slice(0, HINT_BATCH);
+    setEliminated((prev) => new Set([...prev, ...picked]));
+    setHintsLeft((h) => h - 1);
+    flash(`Eliminate: ${picked.join(" ")}`);
+  }, [state, hintsLeft, eliminated, keyStatuses, answer, flash]);
 
   const submit = useCallback(() => {
     if (current.length < COLS) {
@@ -84,7 +136,7 @@ export default function Parole() {
       return;
     }
     if (!WORD_SET.has(current)) {
-      flash("Parola non nel dizionario");
+      flash("Parola non valida");
       setShake(true);
       window.setTimeout(() => setShake(false), 500);
       return;
@@ -98,24 +150,32 @@ export default function Parole() {
 
     if (current === answer) {
       setState("won");
-      flash("Indovinato!");
-      confetti({ particleCount: 140, spread: 70, origin: { y: 0.6 } });
+      flash("Bravo! Indovinata 🎉");
+      window.setTimeout(() => {
+        confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
+      }, 350);
+      setRecord((prev) => {
+        const best = prev == null || seconds < prev ? seconds : prev;
+        localStorage.setItem(RECORD_KEY, String(best));
+        return best;
+      });
     } else if (nextGuesses.length >= ROWS) {
       setState("lost");
-      setMessage(`Era ${answer.toUpperCase()}`);
+      flash(`Era ${answer.toUpperCase()}`);
     }
-  }, [current, answer, guesses, evaluations, flash]);
+  }, [current, answer, guesses, evaluations, flash, seconds]);
 
   const onKey = useCallback(
     (key: string) => {
       if (state !== "playing") return;
       if (key === "INVIO") return submit();
       if (key === "CANC") return setCurrent((c) => c.slice(0, -1));
-      if (/^[a-zA-Z]$/.test(key) && current.length < COLS) {
+      const up = key.toUpperCase();
+      if (/^[A-Z]$/.test(up) && !eliminated.has(up) && current.length < COLS) {
         setCurrent((c) => (c.length < COLS ? c + key.toLowerCase() : c));
       }
     },
-    [state, submit, current.length],
+    [state, submit, current.length, eliminated],
   );
 
   useEffect(() => {
@@ -129,17 +189,42 @@ export default function Parole() {
     return () => window.removeEventListener("keydown", handler);
   }, [onKey]);
 
+  const lastRow = guesses.length - 1;
+
   return (
     <div className="parole-page">
-      <header className="parole-header">
-        <a href="/" className="parole-back" aria-label="Torna al sito">←</a>
+      <header className="parole-header theme-dark">
+        <a href="/" className="parole-iconbtn" aria-label="Torna al sito">
+          <ArrowLeft size={22} />
+        </a>
         <h1 className="parole-title">
           PAR<span className="parole-title-accent">OL</span>E
         </h1>
-        <button className="parole-restart" onClick={newGame} aria-label="Nuova partita">
-          ⟳
+        <button className="parole-iconbtn" onClick={newGame} aria-label="Nuova partita">
+          <RotateCcw size={20} />
         </button>
       </header>
+
+      <div className="parole-toolbar">
+        <span className="parole-stat" aria-label="Tempo">
+          <Clock size={16} aria-hidden="true" />
+          <span className="parole-stat-val">{fmt(seconds)}</span>
+        </span>
+        <button
+          type="button"
+          className="parole-hint-btn"
+          onClick={useHint}
+          disabled={state !== "playing" || hintsLeft <= 0}
+        >
+          <Lightbulb size={17} aria-hidden="true" />
+          Aiuto
+          <span className="parole-hint-badge">{hintsLeft}</span>
+        </button>
+        <span className="parole-stat" aria-label="Record">
+          <Trophy size={16} aria-hidden="true" />
+          <span className="parole-stat-val">{record != null ? fmt(record) : "—"}</span>
+        </span>
+      </div>
 
       <div className="parole-message-slot">
         {message && <div className="parole-message">{message}</div>}
@@ -150,6 +235,7 @@ export default function Parole() {
           const submitted = r < guesses.length;
           const isCurrentRow = r === guesses.length && state === "playing";
           const rowWord = submitted ? guesses[r] : isCurrentRow ? current : "";
+          const isWinRow = state === "won" && r === lastRow;
           return (
             <div
               key={r}
@@ -163,11 +249,19 @@ export default function Parole() {
                   status ? `parole-tile--${status}` : "",
                   ch && !submitted ? "parole-tile--filled" : "",
                   submitted ? "parole-tile--revealed" : "",
+                  isWinRow ? "parole-tile--win" : "",
                 ]
                   .filter(Boolean)
                   .join(" ");
                 return (
-                  <div key={c} className={cls} style={{ transitionDelay: submitted ? `${c * 90}ms` : "0ms" }}>
+                  <div
+                    key={c}
+                    className={cls}
+                    style={{
+                      transitionDelay: submitted ? `${c * 90}ms` : "0ms",
+                      animationDelay: isWinRow ? `${c * 90}ms` : submitted ? `${c * 90}ms` : "0ms",
+                    }}
+                  >
                     {ch.toUpperCase()}
                   </div>
                 );
@@ -179,7 +273,12 @@ export default function Parole() {
 
       {state !== "playing" && (
         <div className="parole-result">
-          <button className="parole-play-again" onClick={newGame}>
+          <p className="parole-result-text">
+            {state === "won"
+              ? `Risolta in ${fmt(seconds)} e ${guesses.length} ${guesses.length === 1 ? "tentativo" : "tentativi"}`
+              : `La parola era ${answer.toUpperCase()}`}
+          </p>
+          <button className="btn btn-primary fw-semibold" onClick={newGame}>
             Gioca ancora
           </button>
         </div>
@@ -191,11 +290,13 @@ export default function Parole() {
             {row.map((key) => {
               const wide = key === "INVIO" || key === "CANC";
               const st = key.length === 1 ? keyStatuses[key] : undefined;
+              const isElim = eliminated.has(key);
               return (
                 <button
                   key={key}
-                  className={`parole-key${wide ? " parole-key--wide" : ""}${st ? ` parole-key--${st}` : ""}`}
+                  className={`parole-key${wide ? " parole-key--wide" : ""}${st ? ` parole-key--${st}` : ""}${isElim ? " parole-key--elim" : ""}`}
                   onClick={() => onKey(key)}
+                  disabled={isElim}
                   type="button"
                 >
                   {key === "CANC" ? "⌫" : key}
@@ -208,68 +309,128 @@ export default function Parole() {
 
       <style>{`
         .parole-page {
+          --green: #2F7D4A;
+          --green-dark: #1F6B3D;
+          --amber: #D9A400;
+          --gray: #6b7280;
           min-height: 100vh;
           min-height: 100svh;
-          background: #121213;
-          color: #fff;
+          background: #f4f6f5;
+          color: #17271d;
           display: flex;
           flex-direction: column;
           align-items: center;
-          font-family: "Titillium Web", "Helvetica Neue", Arial, sans-serif;
+          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
           user-select: none;
           padding-bottom: 1rem;
         }
+
         .parole-header {
           width: 100%;
-          max-width: 520px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.75rem 1rem;
-          border-bottom: 1px solid #3a3a3c;
+          padding: 0.8rem 1rem;
+          background: #103820;
+          color: #fff;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.18);
         }
         .parole-title {
-          font-size: 2rem;
+          font-size: 1.9rem;
           font-weight: 700;
-          letter-spacing: 0.18em;
+          letter-spacing: 0.2em;
           margin: 0;
-          padding-left: 0.18em;
+          padding-left: 0.2em;
+          animation: parole-drop 0.5s ease;
         }
-        .parole-title-accent { color: #6aaa64; }
-        .parole-back, .parole-restart {
-          background: none;
-          border: none;
+        .parole-title-accent { color: #6fd08a; }
+        @keyframes parole-drop {
+          from { opacity: 0; transform: translateY(-12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .parole-iconbtn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid rgba(255,255,255,0.35);
+          background: transparent;
           color: #fff;
-          font-size: 1.5rem;
-          line-height: 1;
           cursor: pointer;
-          text-decoration: none;
-          width: 2.5rem;
-          text-align: center;
+          transition: background 0.15s, transform 0.15s;
         }
-        .parole-back:hover, .parole-restart:hover { color: #6aaa64; }
+        .parole-iconbtn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
 
-        .parole-message-slot { height: 2.5rem; display: flex; align-items: center; }
-        .parole-message {
-          background: #fff;
-          color: #121213;
+        .parole-toolbar {
+          width: 100%;
+          max-width: 460px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          padding: 0.85rem 1rem 0.4rem;
+        }
+        .parole-stat {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-weight: 600;
+          color: var(--green-dark);
+          background: rgba(47,125,74,0.1);
+          border-radius: 999px;
+          padding: 0.32rem 0.7rem;
+          font-variant-numeric: tabular-nums;
+          min-width: 86px;
+          justify-content: center;
+        }
+        .parole-stat-val { font-size: 0.95rem; }
+        .parole-hint-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          background: var(--green);
+          color: #fff;
+          border: none;
+          border-radius: 999px;
+          padding: 0.4rem 0.9rem;
           font-weight: 700;
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          font-size: 0.9rem;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: background 0.15s, transform 0.1s, opacity 0.15s;
+        }
+        .parole-hint-btn:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
+        .parole-hint-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .parole-hint-badge {
+          background: rgba(255,255,255,0.28);
+          border-radius: 999px;
+          min-width: 1.4em;
+          height: 1.4em;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.8rem;
         }
 
-        .parole-board {
-          display: grid;
-          grid-template-rows: repeat(${ROWS}, 1fr);
-          gap: 6px;
-          padding: 0.5rem;
+        .parole-message-slot { height: 2.6rem; display: flex; align-items: center; }
+        .parole-message {
+          background: #17271d;
+          color: #fff;
+          font-weight: 700;
+          padding: 0.55rem 1.1rem;
+          border-radius: 8px;
+          font-size: 0.92rem;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+          animation: parole-toast 0.25s ease;
         }
-        .parole-row {
-          display: grid;
-          grid-template-columns: repeat(${COLS}, 1fr);
-          gap: 6px;
+        @keyframes parole-toast {
+          from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
+
+        .parole-board { display: grid; grid-template-rows: repeat(${ROWS}, 1fr); gap: 7px; padding: 0.25rem; }
+        .parole-row { display: grid; grid-template-columns: repeat(${COLS}, 1fr); gap: 7px; }
         .parole-row--shake { animation: parole-shake 0.45s; }
         @keyframes parole-shake {
           10%, 90% { transform: translateX(-2px); }
@@ -279,58 +440,67 @@ export default function Parole() {
         }
 
         .parole-tile {
-          width: 58px;
-          height: 58px;
+          width: 60px;
+          height: 60px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.9rem;
+          font-size: 1.95rem;
           font-weight: 700;
           text-transform: uppercase;
-          border: 2px solid #3a3a3c;
-          background: transparent;
-          color: #fff;
-          transition: transform 0.25s ease, background-color 0.2s, border-color 0.2s;
+          border: 2px solid #cdd8d1;
+          background: #fff;
+          color: #17271d;
+          border-radius: 6px;
+          transition: transform 0.25s ease, background-color 0.2s, border-color 0.2s, color 0.2s;
         }
         .parole-tile--filled {
-          border-color: #565758;
-          animation: parole-pop 0.1s ease;
+          border-color: var(--green);
+          animation: parole-pop 0.12s ease;
         }
-        @keyframes parole-pop {
-          0% { transform: scale(0.92); }
-          100% { transform: scale(1); }
-        }
-        .parole-tile--revealed { animation: parole-flip 0.5s ease forwards; }
+        @keyframes parole-pop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
+        .parole-tile--revealed { animation: parole-flip 0.55s ease forwards; color: #fff; }
         @keyframes parole-flip {
           0% { transform: rotateX(0); }
-          50% { transform: rotateX(90deg); }
+          45% { transform: rotateX(90deg); }
           100% { transform: rotateX(0); }
         }
-        .parole-tile--correct { background: #6aaa64; border-color: #6aaa64; }
-        .parole-tile--present { background: #c9b458; border-color: #c9b458; }
-        .parole-tile--absent { background: #3a3a3c; border-color: #3a3a3c; }
-
-        .parole-result { margin: 0.5rem 0; }
-        .parole-play-again {
-          background: #6aaa64;
-          color: #fff;
-          border: none;
-          border-radius: 6px;
-          padding: 0.7rem 1.4rem;
-          font-size: 1rem;
-          font-weight: 700;
-          cursor: pointer;
+        .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; }
+        .parole-tile--present { background: var(--amber); border-color: var(--amber); color: #fff; }
+        .parole-tile--absent { background: var(--gray); border-color: var(--gray); color: #fff; }
+        .parole-tile--win { animation: parole-bounce 0.6s ease; }
+        @keyframes parole-bounce {
+          0%, 100% { transform: translateY(0); }
+          30% { transform: translateY(-16px); }
+          50% { transform: translateY(0); }
+          70% { transform: translateY(-7px); }
         }
-        .parole-play-again:hover { background: #5d975a; }
+
+        .parole-result {
+          margin: 0.75rem 0;
+          text-align: center;
+          animation: parole-toast 0.3s ease;
+        }
+        .parole-result-text { margin: 0 0 0.6rem; font-weight: 600; color: var(--green-dark); }
+
+        .parole-page .btn-primary {
+          background-color: var(--green);
+          border-color: var(--green);
+        }
+        .parole-page .btn-primary:hover,
+        .parole-page .btn-primary:focus {
+          background-color: var(--green-dark);
+          border-color: var(--green-dark);
+        }
 
         .parole-keyboard {
           width: 100%;
           max-width: 500px;
           margin-top: auto;
-          padding: 0 0.5rem;
+          padding: 0.5rem;
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 7px;
         }
         .parole-krow { display: flex; gap: 6px; justify-content: center; }
         .parole-key {
@@ -338,24 +508,38 @@ export default function Parole() {
           min-width: 0;
           height: 56px;
           border: none;
-          border-radius: 4px;
-          background: #818384;
-          color: #fff;
+          border-radius: 6px;
+          background: #d3dad6;
+          color: #17271d;
           font-size: 1rem;
           font-weight: 700;
           text-transform: uppercase;
           cursor: pointer;
+          transition: transform 0.08s, background 0.15s, color 0.15s, opacity 0.2s;
         }
-        .parole-key:hover { filter: brightness(1.1); }
+        .parole-key:hover:not(:disabled) { filter: brightness(0.96); }
+        .parole-key:active:not(:disabled) { transform: scale(0.92); }
         .parole-key--wide { flex: 1.5; font-size: 0.75rem; }
-        .parole-key--correct { background: #6aaa64; }
-        .parole-key--present { background: #c9b458; }
-        .parole-key--absent { background: #3a3a3c; }
+        .parole-key--correct { background: var(--green); color: #fff; }
+        .parole-key--present { background: var(--amber); color: #fff; }
+        .parole-key--absent { background: var(--gray); color: #fff; }
+        .parole-key--elim {
+          opacity: 0.4;
+          cursor: not-allowed;
+          text-decoration: line-through;
+          animation: parole-elim 0.3s ease;
+        }
+        @keyframes parole-elim {
+          0% { transform: scale(1); }
+          50% { transform: scale(0.85) rotate(-3deg); }
+          100% { transform: scale(1); }
+        }
 
         @media (max-width: 480px) {
           .parole-tile { width: 100%; aspect-ratio: 1; height: auto; font-size: 1.6rem; }
-          .parole-board { width: 100%; max-width: 360px; }
+          .parole-board { width: 100%; max-width: 340px; }
           .parole-key { height: 50px; }
+          .parole-toolbar { max-width: 100%; }
         }
       `}</style>
     </div>
