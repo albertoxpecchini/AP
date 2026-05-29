@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { ArrowLeft, RotateCcw, Lightbulb, Clock, Trophy } from "lucide-react";
-import { WORD_SET, randomWord } from "./words";
+import { LENGTHS, type WordLength, isValidWord, randomWord } from "./words";
 
 const ROWS = 6;
-const COLS = 5;
 const HINTS = 3; // aiuti disponibili per partita
 const HINT_BATCH = 3; // lettere eliminate per ogni aiuto
 
@@ -19,17 +18,18 @@ const KEYBOARD: string[][] = [
 // Confronto stile Wordle con gestione corretta delle lettere doppie:
 // prima passata per i verdi, seconda per i gialli sui caratteri rimasti.
 function evaluate(guess: string, answer: string): Status[] {
-  const result: Status[] = Array(COLS).fill("absent");
-  const taken = Array(COLS).fill(false);
-  for (let i = 0; i < COLS; i++) {
+  const n = answer.length;
+  const result: Status[] = Array(n).fill("absent");
+  const taken = Array(n).fill(false);
+  for (let i = 0; i < n; i++) {
     if (guess[i] === answer[i]) {
       result[i] = "correct";
       taken[i] = true;
     }
   }
-  for (let i = 0; i < COLS; i++) {
+  for (let i = 0; i < n; i++) {
     if (result[i] === "correct") continue;
-    for (let j = 0; j < COLS; j++) {
+    for (let j = 0; j < n; j++) {
       if (!taken[j] && guess[i] === answer[j]) {
         result[i] = "present";
         taken[j] = true;
@@ -41,7 +41,7 @@ function evaluate(guess: string, answer: string): Status[] {
 }
 
 const RANK: Record<Status, number> = { absent: 0, present: 1, correct: 2 };
-const RECORD_KEY = "parole-record";
+const recordKey = (len: number) => `parole-record-${len}`;
 
 function fmt(s: number): string {
   const m = Math.floor(s / 60);
@@ -50,7 +50,8 @@ function fmt(s: number): string {
 }
 
 export default function Parole() {
-  const [answer, setAnswer] = useState(() => randomWord());
+  const [length, setLength] = useState<WordLength>(5);
+  const [answer, setAnswer] = useState(() => randomWord(5));
   const [guesses, setGuesses] = useState<string[]>([]);
   const [evaluations, setEvaluations] = useState<Status[][]>([]);
   const [current, setCurrent] = useState("");
@@ -60,12 +61,16 @@ export default function Parole() {
   const [eliminated, setEliminated] = useState<Set<string>>(new Set());
   const [hintsLeft, setHintsLeft] = useState(HINTS);
   const [seconds, setSeconds] = useState(0);
-  const [record, setRecord] = useState<number | null>(() => {
-    const r = Number(localStorage.getItem(RECORD_KEY));
-    return r > 0 ? r : null;
-  });
+  const [record, setRecord] = useState<number | null>(null);
 
+  const cols = length;
   const msgTimer = useRef<number | undefined>(undefined);
+
+  // Carica il record per la lunghezza corrente.
+  useEffect(() => {
+    const r = Number(localStorage.getItem(recordKey(length)));
+    setRecord(r > 0 ? r : null);
+  }, [length]);
 
   // Timer: avanza ogni secondo finché si gioca.
   useEffect(() => {
@@ -95,8 +100,9 @@ export default function Parole() {
     msgTimer.current = window.setTimeout(() => setMessage(""), 1700);
   }, []);
 
-  const newGame = useCallback(() => {
-    setAnswer(randomWord());
+  const startGame = useCallback((len: WordLength) => {
+    setLength(len);
+    setAnswer(randomWord(len));
     setGuesses([]);
     setEvaluations([]);
     setCurrent("");
@@ -107,9 +113,10 @@ export default function Parole() {
     setSeconds(0);
   }, []);
 
+  const newGame = useCallback(() => startGame(length), [startGame, length]);
+
   const useHint = useCallback(() => {
     if (state !== "playing" || hintsLeft <= 0) return;
-    // Lettere assenti dalla risposta, non già escluse e non già nella tastiera.
     const known = new Set([...eliminated, ...Object.keys(keyStatuses)]);
     const candidates = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       .split("")
@@ -129,13 +136,13 @@ export default function Parole() {
   }, [state, hintsLeft, eliminated, keyStatuses, answer, flash]);
 
   const submit = useCallback(() => {
-    if (current.length < COLS) {
+    if (current.length < cols) {
       flash("Parola troppo corta");
       setShake(true);
       window.setTimeout(() => setShake(false), 500);
       return;
     }
-    if (!WORD_SET.has(current)) {
+    if (!isValidWord(current)) {
       flash("Parola non valida");
       setShake(true);
       window.setTimeout(() => setShake(false), 500);
@@ -156,14 +163,14 @@ export default function Parole() {
       }, 350);
       setRecord((prev) => {
         const best = prev == null || seconds < prev ? seconds : prev;
-        localStorage.setItem(RECORD_KEY, String(best));
+        localStorage.setItem(recordKey(length), String(best));
         return best;
       });
     } else if (nextGuesses.length >= ROWS) {
       setState("lost");
       flash(`Era ${answer.toUpperCase()}`);
     }
-  }, [current, answer, guesses, evaluations, flash, seconds]);
+  }, [current, cols, answer, guesses, evaluations, flash, seconds, length]);
 
   const onKey = useCallback(
     (key: string) => {
@@ -171,11 +178,11 @@ export default function Parole() {
       if (key === "INVIO") return submit();
       if (key === "CANC") return setCurrent((c) => c.slice(0, -1));
       const up = key.toUpperCase();
-      if (/^[A-Z]$/.test(up) && !eliminated.has(up) && current.length < COLS) {
-        setCurrent((c) => (c.length < COLS ? c + key.toLowerCase() : c));
+      if (/^[A-Z]$/.test(up) && !eliminated.has(up) && current.length < cols) {
+        setCurrent((c) => (c.length < cols ? c + key.toLowerCase() : c));
       }
     },
-    [state, submit, current.length, eliminated],
+    [state, submit, current.length, cols, eliminated],
   );
 
   useEffect(() => {
@@ -204,6 +211,20 @@ export default function Parole() {
           <RotateCcw size={20} />
         </button>
       </header>
+
+      <div className="parole-modes" role="group" aria-label="Lunghezza parola">
+        {LENGTHS.map((len) => (
+          <button
+            key={len}
+            type="button"
+            className={`parole-mode${len === length ? " parole-mode--active" : ""}`}
+            onClick={() => startGame(len)}
+            aria-pressed={len === length}
+          >
+            {len} lettere
+          </button>
+        ))}
+      </div>
 
       <div className="parole-toolbar">
         <span className="parole-stat" aria-label="Tempo">
@@ -240,8 +261,9 @@ export default function Parole() {
             <div
               key={r}
               className={`parole-row${isCurrentRow && shake ? " parole-row--shake" : ""}`}
+              style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
             >
-              {Array.from({ length: COLS }).map((_, c) => {
+              {Array.from({ length: cols }).map((_, c) => {
                 const ch = rowWord[c] ?? "";
                 const status = submitted ? evaluations[r][c] : undefined;
                 const cls = [
@@ -363,6 +385,27 @@ export default function Parole() {
         }
         .parole-iconbtn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
 
+        .parole-modes {
+          display: inline-flex;
+          gap: 4px;
+          margin-top: 0.85rem;
+          padding: 4px;
+          background: rgba(47,125,74,0.1);
+          border-radius: 999px;
+        }
+        .parole-mode {
+          border: none;
+          background: transparent;
+          color: var(--green-dark);
+          font-weight: 700;
+          font-size: 0.9rem;
+          padding: 0.4rem 1.05rem;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: background 0.15s, color 0.15s;
+        }
+        .parole-mode--active { background: var(--green); color: #fff; box-shadow: 0 2px 8px rgba(47,125,74,0.35); }
+
         .parole-toolbar {
           width: 100%;
           max-width: 460px;
@@ -370,7 +413,7 @@ export default function Parole() {
           align-items: center;
           justify-content: space-between;
           gap: 0.5rem;
-          padding: 0.85rem 1rem 0.4rem;
+          padding: 0.7rem 1rem 0.4rem;
         }
         .parole-stat {
           display: inline-flex;
@@ -430,7 +473,7 @@ export default function Parole() {
         }
 
         .parole-board { display: grid; grid-template-rows: repeat(${ROWS}, 1fr); gap: 7px; padding: 0.25rem; }
-        .parole-row { display: grid; grid-template-columns: repeat(${COLS}, 1fr); gap: 7px; }
+        .parole-row { display: grid; gap: 7px; }
         .parole-row--shake { animation: parole-shake 0.45s; }
         @keyframes parole-shake {
           10%, 90% { transform: translateX(-2px); }
@@ -536,8 +579,8 @@ export default function Parole() {
         }
 
         @media (max-width: 480px) {
-          .parole-tile { width: 100%; aspect-ratio: 1; height: auto; font-size: 1.6rem; }
-          .parole-board { width: 100%; max-width: 340px; }
+          .parole-tile { width: 100%; aspect-ratio: 1; height: auto; font-size: 1.5rem; }
+          .parole-board { width: 100%; max-width: 360px; }
           .parole-key { height: 50px; }
           .parole-toolbar { max-width: 100%; }
         }
