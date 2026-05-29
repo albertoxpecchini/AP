@@ -11,7 +11,6 @@ import {
   Delete,
 } from "lucide-react";
 import { LENGTHS, type WordLength, isValidWord, randomWord } from "./words";
-import { getTrivia } from "./words-trivia";
 
 const ROWS = 6;
 const HINTS = 3; // aiuti disponibili per partita
@@ -73,6 +72,8 @@ export default function Parole() {
   const [hintsLeft, setHintsLeft] = useState(HINTS);
   const [seconds, setSeconds] = useState(0);
   const [record, setRecord] = useState<number | null>(null);
+  const [trivia, setTrivia] = useState<string | null>(null);
+  const [triviaLoading, setTriviaLoading] = useState(false);
 
   const cols = length;
   const msgTimer = useRef<number | undefined>(undefined);
@@ -109,6 +110,27 @@ export default function Parole() {
     msgTimer.current = window.setTimeout(() => setMessage(""), 1700);
   }, []);
 
+  const fetchTrivia = useCallback((word: string) => {
+    const cacheKey = `trivia_${word.toLowerCase()}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      setTrivia(cached);
+      return;
+    }
+
+    setTriviaLoading(true);
+    fetch(`/api/trivia?word=${encodeURIComponent(word)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.trivia) {
+          localStorage.setItem(cacheKey, data.trivia);
+          setTrivia(data.trivia);
+        }
+      })
+      .catch((err) => console.error("Trivia fetch failed:", err))
+      .finally(() => setTriviaLoading(false));
+  }, []);
+
   const startGame = useCallback((len: WordLength) => {
     setLength(len);
     setAnswer(randomWord(len));
@@ -121,6 +143,7 @@ export default function Parole() {
     setEliminated(new Set());
     setHintsLeft(HINTS);
     setSeconds(0);
+    setTrivia(null);
   }, []);
 
   const newGame = useCallback(() => startGame(length), [startGame, length]);
@@ -169,6 +192,7 @@ export default function Parole() {
 
     if (guess === answer) {
       setState("won");
+      fetchTrivia(answer);
       flash("Bravo! Indovinata 🎉");
       window.setTimeout(() => {
         confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
@@ -180,9 +204,10 @@ export default function Parole() {
       });
     } else if (nextGuesses.length >= ROWS) {
       setState("lost");
+      fetchTrivia(answer);
       flash(`Era ${answer.toUpperCase()}`);
     }
-  }, [slots, cols, answer, guesses, evaluations, flash, seconds, length]);
+  }, [slots, cols, answer, guesses, evaluations, flash, seconds, length, fetchTrivia]);
 
   const onKey = useCallback(
     (key: string) => {
@@ -340,10 +365,12 @@ export default function Parole() {
                   ? `Risolta in ${fmt(seconds)} e ${guesses.length} ${guesses.length === 1 ? "tentativo" : "tentativi"}`
                   : `La parola era ${answer.toUpperCase()}`}
               </p>
-              {getTrivia(answer) && (
+              {(trivia || triviaLoading) && (
                 <div className="parole-trivia">
                   <p className="parole-trivia-label">📚 Curiosità</p>
-                  <p className="parole-trivia-text">{getTrivia(answer)}</p>
+                  <p className="parole-trivia-text">
+                    {triviaLoading ? "⏳ Generando..." : trivia}
+                  </p>
                 </div>
               )}
               <button className="btn btn-primary fw-semibold" onClick={newGame}>
