@@ -420,7 +420,7 @@ export default function Parole() {
           --green: #2F7D4A;
           --green-dark: #1F6B3D;
           --amber: #D9A400;
-          --gray: #6b7280;
+          --absent: #c0392b;
           min-height: 100vh;
           min-height: 100svh;
           background: #f4f6f5;
@@ -611,7 +611,7 @@ export default function Parole() {
         }
         .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; }
         .parole-tile--present { background: var(--amber); border-color: var(--amber); color: #fff; }
-        .parole-tile--absent { background: var(--gray); border-color: var(--gray); color: #fff; }
+        .parole-tile--absent { background: var(--absent); border-color: var(--absent); color: #fff; }
         .parole-tile--win { animation: parole-bounce 0.6s ease; }
         @keyframes parole-bounce {
           0%, 100% { transform: translateY(0); }
@@ -713,7 +713,7 @@ export default function Parole() {
         .parole-key--wide { flex: 1.5; font-size: 0.75rem; }
         .parole-key--correct { background: var(--green); color: #fff; }
         .parole-key--present { background: var(--amber); color: #fff; }
-        .parole-key--absent { background: var(--gray); color: #fff; }
+        .parole-key--absent { background: var(--absent); color: #fff; }
         .parole-key--elim {
           opacity: 0.4;
           cursor: not-allowed;
