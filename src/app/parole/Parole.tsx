@@ -9,6 +9,8 @@ import {
   Trophy,
   CornerDownLeft,
   Delete,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { LENGTHS, type WordLength, isValidWord, randomWord } from "./words";
 
@@ -89,6 +91,13 @@ export default function Parole() {
   const [triviaLoading, setTriviaLoading] = useState(false);
   const [newRecord, setNewRecord] = useState(false);
   const [wordImage, setWordImage] = useState<string | null>(null);
+  const [dark, setDark] = useState(() => {
+    try {
+      const s = localStorage.getItem("games-dark");
+      if (s !== null) return s === "1";
+      return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+    } catch { return false; }
+  });
 
   const cols = length;
   const msgTimer = useRef<number | undefined>(undefined);
@@ -186,6 +195,10 @@ export default function Parole() {
   }, []);
 
   const newGame = useCallback(() => startGame(length), [startGame, length]);
+
+  const toggleDark = useCallback(() => {
+    setDark(d => { const n = !d; try { localStorage.setItem("games-dark", n ? "1" : "0"); } catch {} return n; });
+  }, []);
 
   const useHint = useCallback(() => {
     if (state !== "playing" || hintsLeft <= 0) return;
@@ -299,17 +312,24 @@ export default function Parole() {
   const lastRow = guesses.length - 1;
 
   return (
-    <div className="parole-page">
+    <div className={`parole-page${dark ? " dark" : ""}`}>
       <header className="parole-header theme-dark">
-        <a href="/" className="parole-iconbtn" aria-label="Torna al sito">
-          <ArrowLeft size={22} />
-        </a>
+        <div className="parole-hdr-side">
+          <a href="/" className="parole-iconbtn" aria-label="Torna al sito">
+            <ArrowLeft size={22} />
+          </a>
+        </div>
         <h1 className="parole-title">
           PAR<span className="parole-title-accent">OL</span>E
         </h1>
-        <button className="parole-iconbtn" onClick={newGame} aria-label="Nuova partita">
-          <RotateCcw size={20} />
-        </button>
+        <div className="parole-hdr-side parole-hdr-side--r">
+          <button className="parole-iconbtn" onClick={toggleDark} aria-label="Cambia tema">
+            {dark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button className="parole-iconbtn" onClick={newGame} aria-label="Nuova partita">
+            <RotateCcw size={20} />
+          </button>
+        </div>
       </header>
       {import.meta.env.DEV && state === "playing" && (
         <button
@@ -1130,6 +1150,87 @@ export default function Parole() {
           .parole-key { height: 36px; font-size: 0.78rem; border-radius: 5px; }
           .parole-key--wide { font-size: 0.55rem; }
         }
+
+        /* ── Header sides (centra il titolo con 2 btn a dx) ── */
+        .parole-hdr-side {
+          display: flex; align-items: center; gap: 6px; min-width: 82px;
+        }
+        .parole-hdr-side--r { justify-content: flex-end; }
+
+        /* ── Dark mode ── */
+        .parole-page.dark {
+          background: #111916;
+          color: #d4e8dc;
+        }
+        .parole-page.dark .parole-modes {
+          background: rgba(47,125,74,0.13);
+        }
+        .parole-page.dark .parole-mode { color: #7ab893; }
+        .parole-page.dark .parole-stat {
+          background: rgba(47,125,74,0.13);
+          color: #7ab893;
+        }
+        .parole-page.dark .parole-message-slot { color: #d4e8dc; }
+        .parole-page.dark .parole-tile {
+          background: #1a2720;
+          border-color: rgba(47,125,74,0.28);
+          color: #d4e8dc;
+        }
+        .parole-page.dark .parole-tile--cursor {
+          border-color: var(--green);
+          box-shadow: 0 0 0 3px rgba(47,125,74,0.45);
+        }
+        .parole-page.dark .parole-tile--filled { border-color: var(--green); }
+        .parole-page.dark .parole-key {
+          background: #253025;
+          color: #c8e0cc;
+        }
+        /* Colori tasti con lettera già usata: mantengono i colori originali */
+        .parole-page.dark .parole-key--correct { background: var(--green); color: #fff; }
+        .parole-page.dark .parole-key--present  { background: var(--amber); color: #fff; }
+        .parole-page.dark .parole-key--absent   { background: #5a1515; color: #c89090; }
+        .parole-page.dark .parole-tile--absent  { background: var(--absent); border-color: var(--absent); }
+        /* Endgame overlay */
+        .parole-page.dark .parole-endgame-overlay {
+          background: rgba(5,14,9,0.82);
+        }
+        .parole-page.dark .parole-endgame-card {
+          background: #1a2720;
+        }
+        .parole-page.dark .parole-endgame-imgwrap { background: #253025; }
+        .parole-page.dark .parole-endgame-stat-val { color: #d4e8dc; }
+        .parole-page.dark .parole-endgame-stat-lbl { color: #7ab893; }
+        .parole-page.dark .parole-endgame-stat + .parole-endgame-stat,
+        .parole-page.dark .parole-endgame-stat--mid {
+          border-color: rgba(47,125,74,0.18);
+        }
+        .parole-page.dark .parole-endgame-stats {
+          border-color: rgba(47,125,74,0.15);
+        }
+        .parole-page.dark .parole-endgame-trivia { border-color: rgba(47,125,74,0.12); }
+        .parole-page.dark .parole-endgame-trivia-title { color: #7ab893; }
+        .parole-page.dark .parole-endgame-trivia-text { color: #c4dcc8; }
+        .parole-page.dark .parole-endgame-trivia-empty,
+        .parole-page.dark .parole-endgame-trivia-loading { color: #7ab893; }
+        /* Desktop controls panel */
+        .parole-page.dark .parole-controls {
+          background: #1a2720 !important;
+          border-color: rgba(47,125,74,0.2) !important;
+        }
+        .parole-page.dark .parole-controls-title { color: #7ab893; }
+        .parole-page.dark .parole-legend li { color: #a4c4aa; }
+        .parole-page.dark .parole-legend kbd {
+          background: #253025;
+          border-color: #3a5040;
+          color: #c8e0cc;
+        }
+        .parole-page.dark .parole-controls-hint { color: #7ab893; }
+        .parole-page.dark .parole-cmd {
+          background: #253025;
+          border-color: rgba(47,125,74,0.3);
+          color: #7ab893;
+        }
+        .parole-page.dark .parole-cmd:hover { background: rgba(47,125,74,0.18); }
       `}</style>
     </div>
   );

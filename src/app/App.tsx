@@ -98,6 +98,14 @@ const SOCIALS = [
 const PROJECTS = [
   {
     category: "Web game",
+    date: "30 mag 2026",
+    title: "Angoli",
+    url: "/angoli",
+    desc: "Indovina l'angolo in gradianti tra due semirette ruotate casualmente. Feedback binario (Maggiore/Minore), cinque modalità di difficoltà (da 20g a 1g), sistema di strike consecutivi e trofei geometrici.",
+    tags: ["React", "TypeScript", "SVG", "Game design"],
+  },
+  {
+    category: "Web game",
     date: "29 mag 2026",
     title: "Parole",
     url: "/parole",
