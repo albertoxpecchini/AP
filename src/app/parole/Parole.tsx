@@ -228,6 +228,14 @@ export default function Parole() {
     setDark(d => { const n = !d; try { localStorage.setItem("games-dark", n ? "1" : "0"); } catch {} return n; });
   }, []);
 
+  // Blocca zoom iOS mentre il gioco è aperto
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null;
+    const prev = meta?.content ?? "";
+    meta?.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover");
+    return () => { if (meta && prev) meta.content = prev; };
+  }, []);
+
   const useHint = useCallback(() => {
     if (state !== "playing" || hintsLeft <= 0) return;
     const known = new Set([...eliminated, ...Object.keys(keyStatuses)]);
@@ -426,7 +434,7 @@ export default function Parole() {
 
       <div className="parole-stage">
         <div className="parole-game">
-          <main className="parole-board" onClick={focusInput}>
+          <main className="parole-board" onClick={focusInput} style={{ '--cols': cols } as React.CSSProperties}>
             {Array.from({ length: ROWS }).map((_, r) => {
               const submitted = r < guesses.length;
               const isCurrentRow = r === guesses.length && state === "playing";
@@ -1153,6 +1161,40 @@ export default function Parole() {
           .parole-tile { width: auto; height: auto; aspect-ratio: 1; font-size: 1.5rem; }
           .parole-key { height: 50px; }
           .parole-toolbar { max-width: 100%; }
+        }
+
+        /* ── Touch (telefono): tutto nella finestra, zero scroll ── */
+        @media (hover: none) and (pointer: coarse) {
+          .parole-page {
+            overflow: hidden;
+            touch-action: manipulation;
+            padding-bottom: 0;
+          }
+          /* Riduci spacing per guadagnare spazio verticale */
+          .parole-modes  { margin-top: 0.5rem; }
+          .parole-toolbar { padding: 0.4rem 1rem 0.2rem; }
+          .parole-message-slot { height: 1.8rem; }
+          .parole-stage  { flex: 1 1 0; min-height: 0; gap: 0.35rem; }
+          .parole-game   { flex: 1 1 0; min-height: 0; }
+
+          /*
+           * Tile size = min(larghezza disponibile / cols, altezza disponibile / 6 righe).
+           * --cols viene iniettato come custom property dal JSX.
+           * 195px ≈ spazio occupato da header + modes + toolbar + message + gap/padding.
+           */
+          .parole-board {
+            --ts: min(
+              calc((min(92vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
+              calc((100svh - 195px - 5 * 7px) / 6)
+            );
+            width: calc(var(--cols, 5) * var(--ts) + (var(--cols, 5) - 1) * 7px);
+            margin: 0 auto;
+          }
+          .parole-tile {
+            width:  var(--ts);
+            height: var(--ts);
+            font-size: min(1.4rem, calc(var(--ts) * 0.44));
+          }
         }
 
         /* Desktop: griglia con comandi a tutta altezza e tastiera allineata sotto la board. */
