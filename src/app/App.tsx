@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { activateLocalMode } from "./utils/local";
 import { isIOS } from "./utils/device";
 import {
@@ -28,6 +28,8 @@ import {
   ShoppingBag,
   Tag,
   FileText,
+  ArrowDown,
+  ArrowUp,
 } from "lucide-react";
 import {
   SiInstagram,
@@ -316,6 +318,42 @@ const PASSIONI = [
   },
 ];
 
+const ITA_MONTHS: Record<string, number> = {
+  gen: 0, feb: 1, mar: 2, apr: 3, mag: 4, giu: 5,
+  lug: 6, ago: 7, set: 8, ott: 9, nov: 10, dic: 11,
+};
+const ITA_MONTH_RE = "gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic";
+
+function parsePeriodStart(period: string): number {
+  if (!period) return 0;
+  const p = period.toLowerCase().trim();
+
+  // "continuativo" — collaborazione di lunga data, la trattiamo come molto antica.
+  if (p.includes("continuativo")) return new Date(1900, 0, 1).getTime();
+
+  // "estate YYYY" → 21 giugno YYYY.
+  const summer = p.match(/estate\s+(\d{4})/);
+  if (summer) return new Date(+summer[1], 5, 21).getTime();
+
+  // "DD MMM YYYY" all'inizio (data completa: "12 set 2018 — 8 giu 2021", "19 dic 2023").
+  const dmy = p.match(new RegExp(`^(\\d{1,2})\\s+(${ITA_MONTH_RE})\\s+(\\d{4})`));
+  if (dmy) return new Date(+dmy[3], ITA_MONTHS[dmy[2]], +dmy[1]).getTime();
+
+  // "DD MMM — ... YYYY" (es. "23 lug — 1 ago 2025"): anno dalla coda.
+  const dmRange = p.match(new RegExp(`^(\\d{1,2})\\s+(${ITA_MONTH_RE})\\s*—.*?(\\d{4})`));
+  if (dmRange) return new Date(+dmRange[3], ITA_MONTHS[dmRange[2]], +dmRange[1]).getTime();
+
+  // "DD — DD MMM YYYY" (es. "11 — 25 ago 2024"): mese/anno dalla coda.
+  const dRange = p.match(new RegExp(`^(\\d{1,2})\\s*—\\s*\\d{1,2}\\s+(${ITA_MONTH_RE})\\s+(\\d{4})`));
+  if (dRange) return new Date(+dRange[3], ITA_MONTHS[dRange[2]], +dRange[1]).getTime();
+
+  // "YYYY ..." (es. "2021 — oggi", "2024 — 2025").
+  const year = p.match(/^(\d{4})/);
+  if (year) return new Date(+year[1], 0, 1).getTime();
+
+  return 0;
+}
+
 function lockBodyScroll() {
   const scrollY = window.scrollY;
   document.body.dataset.scrollLockY = String(scrollY);
@@ -341,6 +379,18 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [localMode, setLocalMode] = useState(false);
   const [docOpen, setDocOpen] = useState<{ url: string; title: string } | null>(null);
+  const [cvSortOrder, setCvSortOrder] = useState<"asc" | "desc">("asc");
+
+  const sortedCV = useMemo(() => {
+    const wishes = CV.filter((c) => (c as any).wish);
+    const items = CV.filter((c) => !(c as any).wish);
+    const sorted = items.slice().sort((a, b) => {
+      const da = parsePeriodStart(a.period);
+      const db = parsePeriodStart(b.period);
+      return cvSortOrder === "asc" ? da - db : db - da;
+    });
+    return [...sorted, ...wishes];
+  }, [cvSortOrder]);
 
   const CV_PDF = "/cv-alberto-pecchini.pdf";
 
@@ -756,10 +806,33 @@ export default function App() {
                 </div>
               </div>
             </div>
+            <div className="ap-cv-sort mb-4 d-flex align-items-center gap-2 flex-wrap">
+              <span className="text-muted small">Ordina cronologicamente:</span>
+              <button
+                type="button"
+                onClick={() => setCvSortOrder("asc")}
+                className={`btn btn-sm fw-semibold d-inline-flex align-items-center ${cvSortOrder === "asc" ? "btn-primary" : "btn-outline-primary"}`}
+                aria-pressed={cvSortOrder === "asc"}
+                aria-label="Ordina dal più vecchio al più recente"
+              >
+                <ArrowUp size={16} className="me-2" aria-hidden="true" />
+                Crescente
+              </button>
+              <button
+                type="button"
+                onClick={() => setCvSortOrder("desc")}
+                className={`btn btn-sm fw-semibold d-inline-flex align-items-center ${cvSortOrder === "desc" ? "btn-primary" : "btn-outline-primary"}`}
+                aria-pressed={cvSortOrder === "desc"}
+                aria-label="Ordina dal più recente al più vecchio"
+              >
+                <ArrowDown size={16} className="me-2" aria-hidden="true" />
+                Decrescente
+              </button>
+            </div>
             <div className="row">
               <div className="col-lg-9">
                 <div className="ap-timeline">
-                  {CV.map((item) => (
+                  {sortedCV.map((item) => (
                     <div
                       className={`ap-timeline-item${(item as any).wish ? " ap-timeline-item--wish" : ""}`}
                       key={item.title}
