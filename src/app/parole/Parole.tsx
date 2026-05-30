@@ -357,12 +357,16 @@ export default function Parole() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // Frecce / Home / End: l'input nascosto non le gestisce, le processiamo qui.
+      if (e.key === "ArrowLeft") return onKey("LEFT");
+      if (e.key === "ArrowRight") return onKey("RIGHT");
+      if (e.key === "Home") return setCursor(0);
+      if (e.key === "End") return setCursor(cols - 1);
+      // Se l'input nascosto ha il focus, lettere/Backspace/Invio sono già
+      // gestite dai suoi handler (onChange/onKeyDown): evita il doppio input.
+      if (document.activeElement === hiddenInputRef.current) return;
       if (e.key === "Enter") onKey("INVIO");
       else if (e.key === "Backspace") onKey("CANC");
-      else if (e.key === "ArrowLeft") onKey("LEFT");
-      else if (e.key === "ArrowRight") onKey("RIGHT");
-      else if (e.key === "Home") setCursor(0);
-      else if (e.key === "End") setCursor(cols - 1);
       else if (/^[a-zA-Z]$/.test(e.key)) onKey(e.key);
     };
     window.addEventListener("keydown", handler);
