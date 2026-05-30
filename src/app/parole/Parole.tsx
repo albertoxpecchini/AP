@@ -101,6 +101,7 @@ export default function Parole() {
 
   const cols = length;
   const msgTimer = useRef<number | undefined>(undefined);
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const r = Number(localStorage.getItem(recordKey(length)));
@@ -195,6 +196,33 @@ export default function Parole() {
   }, []);
 
   const newGame = useCallback(() => startGame(length), [startGame, length]);
+
+  // ── Mobile: tastiera nativa ──────────────────────────────────────────────
+  const focusInput = useCallback(() => {
+    hiddenInputRef.current?.focus();
+  }, []);
+
+  // Auto-focus ogni volta che lo stato torna a "playing"
+  useEffect(() => {
+    if (state === "playing") {
+      const t = window.setTimeout(() => hiddenInputRef.current?.focus(), 80);
+      return () => window.clearTimeout(t);
+    }
+  }, [state]);
+
+  const handleMobileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val) {
+      const ch = val.slice(-1);
+      if (/^[a-zA-Z]$/.test(ch)) onKey(ch);
+      e.target.value = "";
+    }
+  }, [onKey]);
+
+  const handleMobileKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") { e.preventDefault(); onKey("CANC"); }
+    if (e.key === "Enter")     { e.preventDefault(); onKey("INVIO"); }
+  }, [onKey]);
 
   const toggleDark = useCallback(() => {
     setDark(d => { const n = !d; try { localStorage.setItem("games-dark", n ? "1" : "0"); } catch {} return n; });
@@ -331,6 +359,22 @@ export default function Parole() {
           </button>
         </div>
       </header>
+      {/* Input invisibile per tastiera nativa su mobile */}
+      <input
+        ref={hiddenInputRef}
+        className="parole-hidden-input"
+        type="text"
+        inputMode="text"
+        autoCapitalize="none"
+        autoCorrect="off"
+        autoComplete="off"
+        spellCheck={false}
+        aria-hidden="true"
+        tabIndex={-1}
+        onChange={handleMobileChange}
+        onKeyDown={handleMobileKeyDown}
+      />
+
       {import.meta.env.DEV && state === "playing" && (
         <button
           className="parole-hint-btn"
@@ -382,7 +426,7 @@ export default function Parole() {
 
       <div className="parole-stage">
         <div className="parole-game">
-          <main className="parole-board">
+          <main className="parole-board" onClick={focusInput}>
             {Array.from({ length: ROWS }).map((_, r) => {
               const submitted = r < guesses.length;
               const isCurrentRow = r === guesses.length && state === "playing";
@@ -1149,6 +1193,25 @@ export default function Parole() {
           }
           .parole-key { height: 36px; font-size: 0.78rem; border-radius: 5px; }
           .parole-key--wide { font-size: 0.55rem; }
+        }
+
+        /* ── Input nascosto per tastiera nativa mobile ── */
+        .parole-hidden-input {
+          position: fixed;
+          top: 0; left: 0;
+          width: 1px; height: 1px;
+          opacity: 0;
+          pointer-events: none;
+          border: none; outline: none;
+          padding: 0; margin: 0;
+          font-size: 16px; /* impedisce zoom iOS */
+          -webkit-user-select: text;
+          user-select: text;
+        }
+
+        /* ── Su touch screen: nascondi tastiera on-screen, usa quella nativa ── */
+        @media (hover: none) and (pointer: coarse) {
+          .parole-keyboard { display: none !important; }
         }
 
         /* ── Header sides (centra il titolo con 2 btn a dx) ── */
