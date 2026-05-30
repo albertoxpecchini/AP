@@ -93,8 +93,10 @@ export default function Angoli() {
   const subRef = useRef<()=>void>(()=>{});
   const stepR  = useRef(step);
 
-  stRef.current = gameState;
-  stepR.current = step;
+  // Specchio dei ref aggiornato in commit (non in render-phase) per evitare
+  // valori intermedi se React interrompe/riavvia il rendering.
+  useEffect(() => { stRef.current = gameState; }, [gameState]);
+  useEffect(() => { stepR.current = step; }, [step]);
 
   useEffect(() => {
     setBest(Number(localStorage.getItem("angoli-best-strike")) || 0);
@@ -150,7 +152,7 @@ export default function Angoli() {
     }
   }, [input, step, history, attempts, angle, strike, best, achieved, flash, doShake, goNext]);
 
-  subRef.current = handleSubmit;
+  useEffect(() => { subRef.current = handleSubmit; }, [handleSubmit]);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {

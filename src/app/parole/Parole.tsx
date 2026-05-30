@@ -102,10 +102,13 @@ export default function Parole() {
   const cols = length;
   const msgTimer = useRef<number | undefined>(undefined);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
+  // Token di generazione: invalida le risposte fetch di partite ormai concluse.
+  const fetchTokenRef = useRef(0);
 
   useEffect(() => {
-    const r = Number(localStorage.getItem(recordKey(length)));
-    setRecord(r > 0 ? r : null);
+    const raw = localStorage.getItem(recordKey(length));
+    const n = Number(raw);
+    setRecord(raw !== null && Number.isFinite(n) && n >= 0 ? n : null);
   }, [length]);
 
   useEffect(() => {
@@ -136,9 +139,10 @@ export default function Parole() {
   }, []);
 
   const fetchTrivia = useCallback((word: string) => {
+    const token = fetchTokenRef.current;
     const cacheKey = `trivia_${word.toLowerCase()}`;
     const cached = localStorage.getItem(cacheKey);
-    if (cached) { setTrivia(cached); return; }
+    if (cached) { if (token === fetchTokenRef.current) setTrivia(cached); return; }
 
     setTriviaLoading(true);
     fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(word)}`)
@@ -147,14 +151,20 @@ export default function Parole() {
         const text = data.extract?.split("\n")[0] ?? "";
         if (text) {
           localStorage.setItem(cacheKey, text);
-          setTrivia(text);
+          if (token === fetchTokenRef.current) setTrivia(text);
         }
       })
       .catch(() => {})
-      .finally(() => setTriviaLoading(false));
+      .finally(() => { if (token === fetchTokenRef.current) setTriviaLoading(false); });
   }, []);
 
   const fetchWordImage = useCallback((word: string) => {
+    const token = fetchTokenRef.current;
+    const isCurrent = () => token === fetchTokenRef.current;
+    const cacheKey = `wordimg_${word.toLowerCase()}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) { if (isCurrent()) setWordImage(cached); return; }
+
     const q = encodeURIComponent(word);
     // Prima scelta: Wikipedia pageimages API (copre anche parole astratte con redirect)
     fetch(`https://it.wikipedia.org/w/api.php?action=query&titles=${q}&prop=pageimages&format=json&pithumbsize=640&redirects=1&origin=*`)
@@ -162,7 +172,11 @@ export default function Parole() {
       .then((data) => {
         const pages = Object.values(data.query?.pages ?? {}) as any[];
         const src = pages[0]?.thumbnail?.source;
-        if (src) { setWordImage(src); return; }
+        if (src) {
+          localStorage.setItem(cacheKey, src);
+          if (isCurrent()) setWordImage(src);
+          return;
+        }
         // Fallback: Wikimedia Commons cerca immagini libere per la parola
         return fetch(`https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${q}&prop=imageinfo&iiprop=url&iiurlwidth=640&format=json&origin=*&gsrlimit=5`)
           .then((r) => r.json())
@@ -172,13 +186,18 @@ export default function Parole() {
               const ext = p.imageinfo?.[0]?.url?.split(".").pop()?.toLowerCase();
               return ["jpg","jpeg","png","webp"].includes(ext);
             })?.imageinfo?.[0]?.thumburl;
-            if (url) setWordImage(url);
+            if (url) {
+              localStorage.setItem(cacheKey, url);
+              if (isCurrent()) setWordImage(url);
+            }
           });
       })
       .catch(() => {});
   }, []);
 
   const startGame = useCallback((len: WordLength) => {
+    // Invalida eventuali fetch trivia/immagine ancora in volo della partita precedente.
+    fetchTokenRef.current++;
     setLength(len);
     setAnswer(randomWord(len));
     setGuesses([]);
@@ -193,6 +212,9 @@ export default function Parole() {
     setTrivia(null);
     setNewRecord(false);
     setWordImage(null);
+    // Focus sincrono entro il gesto utente: iOS Safari mostra la tastiera nativa
+    // solo se il focus avviene durante un gesto, non da un setTimeout differito.
+    hiddenInputRef.current?.focus();
   }, []);
 
   const newGame = useCallback(() => startGame(length), [startGame, length]);
@@ -202,27 +224,14 @@ export default function Parole() {
     hiddenInputRef.current?.focus();
   }, []);
 
-  // Auto-focus ogni volta che lo stato torna a "playing"
+  // Auto-focus ogni volta che lo stato torna a "playing" (fallback desktop;
+  // su iOS il focus affidabile avviene in-gesto dentro startGame/focusInput).
   useEffect(() => {
     if (state === "playing") {
       const t = window.setTimeout(() => hiddenInputRef.current?.focus(), 80);
       return () => window.clearTimeout(t);
     }
   }, [state]);
-
-  const handleMobileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (val) {
-      const ch = val.slice(-1);
-      if (/^[a-zA-Z]$/.test(ch)) onKey(ch);
-      e.target.value = "";
-    }
-  }, [onKey]);
-
-  const handleMobileKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace") { e.preventDefault(); onKey("CANC"); }
-    if (e.key === "Enter")     { e.preventDefault(); onKey("INVIO"); }
-  }, [onKey]);
 
   const toggleDark = useCallback(() => {
     setDark(d => { const n = !d; try { localStorage.setItem("games-dark", n ? "1" : "0"); } catch {} return n; });
@@ -299,7 +308,7 @@ export default function Parole() {
       fetchWordImage(answer);
       flash(`Era ${answer.toUpperCase()}`);
     }
-  }, [slots, cols, answer, guesses, evaluations, flash, seconds, length, fetchTrivia]);
+  }, [slots, cols, answer, guesses, evaluations, flash, seconds, length, fetchTrivia, fetchWordImage]);
 
   const onKey = useCallback(
     (key: string) => {
@@ -327,8 +336,23 @@ export default function Parole() {
         setCursor((c) => Math.min(cols - 1, c + 1));
       }
     },
-    [state, submit, cursor, cols, eliminated, slots],
+    [state, submit, cursor, cols, slots],
   );
+
+  // ── Mobile: tastiera nativa (definiti dopo onKey per evitare la TDZ) ──────
+  const handleMobileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val) {
+      const ch = val.slice(-1);
+      if (/^[a-zA-Z]$/.test(ch)) onKey(ch);
+      e.target.value = "";
+    }
+  }, [onKey]);
+
+  const handleMobileKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") { e.preventDefault(); onKey("CANC"); }
+    if (e.key === "Enter")     { e.preventDefault(); onKey("INVIO"); }
+  }, [onKey]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
