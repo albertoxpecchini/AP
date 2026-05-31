@@ -158,26 +158,28 @@ const CATT_TOP = "#2f7d4a";   // piano verde omogeneo
 const CATT_BODY = "#34373c";  // corpo/cassetti antracite (come la texture)
 
 function cattedraUnit(P: Proj, x: number, y: number, key: string): Draw {
-  const w = 1.8, d = 0.7, bh = 0.70;
+  // Proporzioni da desk.glb (≈2.11×1.07×1.05) scalate a un'altezza realistica.
+  const w = 1.55, d = 0.78, bh = 0.70;
   const body = isoBox(P, x, y, 0, w, d, bh, CATT_BODY, `${key}-body`);
-  const top = isoBox(P, x, y, bh, w + 0.06, d + 0.06, 0.07, CATT_TOP, `${key}-top`);
+  const top = isoBox(P, x, y, bh, w + 0.06, d + 0.06, 0.06, CATT_TOP, `${key}-top`);
 
-  // Cassetti sul lato NORD (verso il prof) — disegnati solo se quella faccia è
-  // rivolta allo spettatore. Il lato SUD resta un pannello chiuso (verso la classe).
+  // Cassettiera a 3 cassetti IMPILATI su un fianco (pedana est), fronti a NORD
+  // (verso il prof) — come desk.glb. Disegnata solo se la faccia nord è rivolta
+  // allo spettatore; il lato SUD resta un pannello chiuso (verso la classe).
   const yN = y - d / 2;
   const drawers: React.ReactNode[] = [];
   if (P(x, yN, bh / 2).sy > P(x, y, bh / 2).sy + 0.5) {
-    const hw = w / 2, inner = w - 0.16, z0 = 0.12, z1 = 0.60, hz = (z0 + z1) / 2;
-    for (let k = 0; k < 3; k++) {
-      const dx0 = -hw + 0.08 + (k * inner) / 3 + 0.02;
-      const dx1 = -hw + 0.08 + ((k + 1) * inner) / 3 - 0.02;
+    const dx0 = 0.20, dx1 = 0.68; // pedana cassetti sul lato est
+    const bands = [[0.10, 0.26], [0.28, 0.44], [0.46, 0.62]] as const;
+    bands.forEach(([z0, z1], k) => {
+      const hz = (z0 + z1) / 2;
       drawers.push(
         <polygon key={`d${k}`} points={join([P(x + dx0, yN, z0), P(x + dx1, yN, z0), P(x + dx1, yN, z1), P(x + dx0, yN, z1)])}
-          fill={shade(CATT_BODY, 1.3)} stroke={shade(CATT_BODY, 0.6)} strokeWidth={0.5} />,
-        <line key={`h${k}`} {...seg(P(x + dx0 + 0.06, yN, hz), P(x + dx1 - 0.06, yN, hz))}
-          stroke="#b8bcc0" strokeWidth={1.5} strokeLinecap="round" />,
+          fill={shade(CATT_BODY, 1.3)} stroke={shade(CATT_BODY, 0.55)} strokeWidth={0.5} />,
+        <line key={`h${k}`} {...seg(P(x + dx0 + 0.14, yN, hz), P(x + dx1 - 0.14, yN, hz))}
+          stroke="#b8bcc0" strokeWidth={1.7} strokeLinecap="round" />,
       );
-    }
+    });
   }
   return { depth: P(x, y, 0).depth, node: <g key={key}>{body.node}{drawers}{top.node}</g> };
 }
@@ -351,8 +353,9 @@ function buildFurniture(P: Proj): Draw[] {
   items.push(cattedraUnit(P, 4.2, 1.4, "cattedra"));
   items.push(person(P, 4.2, 0.85, "prof"));
 
-  // Termosifone rosso a colonne, sotto la finestra destra (parete sud)
-  items.push(isoBox(P, 5.0, 8.86, 0.1, 0.9, 0.12, 0.52, "#cc3b30", "radiator", 10));
+  // Termosifone a colonne verticali (proporzioni da radiator.glb, reso rosso),
+  // sotto la finestra destra (parete sud)
+  items.push(isoBox(P, 5.0, 8.88, 0.08, 0.62, 0.12, 0.8, "#cc3b30", "radiator", 9));
 
   return items;
 }
