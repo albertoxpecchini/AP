@@ -151,9 +151,11 @@ function chairUnit(P: Proj, x: number, y: number, key: string): Draw {
   return { depth: P(x, cy, 0).depth, node: <g key={key}>{legs}{seat.node}{posts}{back.node}</g> };
 }
 
-// ─── Cattedra (Desk.fbx): corpo legno, cassetti a NORD, piano verde solo sopra ─
+// ─── Cattedra (Desk.fbx): corpo antracite, cassetti a NORD, piano verde sopra ──
+// Materiali presi da Desk_Base_Color.PNG: corpo/cassetti scuri, piano (legno) →
+// reso verde omogeneo come richiesto ("verde solo sopra").
 const CATT_TOP = "#2f7d4a";   // piano verde omogeneo
-const CATT_BODY = "#caa978";  // corpo/cassetti in legno
+const CATT_BODY = "#34373c";  // corpo/cassetti antracite (come la texture)
 
 function cattedraUnit(P: Proj, x: number, y: number, key: string): Draw {
   const w = 1.8, d = 0.7, bh = 0.70;
@@ -171,9 +173,9 @@ function cattedraUnit(P: Proj, x: number, y: number, key: string): Draw {
       const dx1 = -hw + 0.08 + ((k + 1) * inner) / 3 - 0.02;
       drawers.push(
         <polygon key={`d${k}`} points={join([P(x + dx0, yN, z0), P(x + dx1, yN, z0), P(x + dx1, yN, z1), P(x + dx0, yN, z1)])}
-          fill={shade(CATT_BODY, 0.9)} stroke={shade(CATT_BODY, 0.6)} strokeWidth={0.5} />,
+          fill={shade(CATT_BODY, 1.3)} stroke={shade(CATT_BODY, 0.6)} strokeWidth={0.5} />,
         <line key={`h${k}`} {...seg(P(x + dx0 + 0.06, yN, hz), P(x + dx1 - 0.06, yN, hz))}
-          stroke="#6b5a36" strokeWidth={1.5} strokeLinecap="round" />,
+          stroke="#b8bcc0" strokeWidth={1.5} strokeLinecap="round" />,
       );
     }
   }
