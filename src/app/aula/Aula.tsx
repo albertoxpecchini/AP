@@ -3,7 +3,7 @@ import { ArrowLeft, RotateCcw, Moon, Sun, Hand } from "lucide-react";
 
 // ─── Modello stanza (metri) ─────────────────────────────────────────────────
 // x = Est-Ovest (corto) · y = Nord-Sud (lungo) · z = altezza
-const RW = 6.2;   // larghezza E-W
+const RW = 8.0;   // larghezza E-W (aula quasi quadrata, come la pianta)
 const RD = 9;     // profondità N-S
 const RH = 3.8;   // altezza pareti
 const CX = RW / 2;
@@ -106,6 +106,51 @@ function isoBox(
   };
 }
 
+// ─── Banchi e sedie (modello JsChair: legno chiaro + gambe metalliche) ────────
+const WOOD = "#e7d09a";   // betulla chiara
+const METAL = "#9aa0a6";  // tubolare metallico
+const TRAY = "#dadee0";   // vano portaoggetti
+
+// Gamba/montante come linea verticale (tubolare): poco costoso, legge bene.
+function legLine(P: Proj, x: number, y: number, z0: number, z1: number, key: string): React.ReactNode {
+  const a = P(x, y, z0), b = P(x, y, z1);
+  return <line key={key} x1={a.sx} y1={a.sy} x2={b.sx} y2={b.sy} stroke={METAL} strokeWidth={1.6} strokeLinecap="round" />;
+}
+
+// Banco: 4 gambe + vano portaoggetti + piano in legno.
+function deskUnit(P: Proj, x: number, y: number, key: string): Draw {
+  const hw = 0.33, hd = 0.25, ins = 0.05;
+  const legs = [
+    legLine(P, x - hw + ins, y - hd + ins, 0, 0.6, `${key}-l0`),
+    legLine(P, x + hw - ins, y - hd + ins, 0, 0.6, `${key}-l1`),
+    legLine(P, x + hw - ins, y + hd - ins, 0, 0.6, `${key}-l2`),
+    legLine(P, x - hw + ins, y + hd - ins, 0, 0.6, `${key}-l3`),
+  ];
+  const tray = isoBox(P, x, y, 0.40, 0.50, 0.40, 0.16, TRAY, `${key}-tray`);
+  const top = isoBox(P, x, y, 0.56, 0.66, 0.50, 0.08, WOOD, `${key}-top`);
+  return { depth: P(x, y, 0).depth, node: <g key={key}>{legs}{tray.node}{top.node}</g> };
+}
+
+// Sedia a SUD del banco (studente rivolto a nord): seduta + gambe + schienale.
+function chairUnit(P: Proj, x: number, y: number, key: string): Draw {
+  const cy = y + 0.46;                 // centro seduta, a sud del banco
+  const shw = 0.21, shd = 0.21, ins = 0.04;
+  const legs = [
+    legLine(P, x - shw + ins, cy - shd + ins, 0, 0.45, `${key}-l0`),
+    legLine(P, x + shw - ins, cy - shd + ins, 0, 0.45, `${key}-l1`),
+    legLine(P, x + shw - ins, cy + shd - ins, 0, 0.45, `${key}-l2`),
+    legLine(P, x - shw + ins, cy + shd - ins, 0, 0.45, `${key}-l3`),
+  ];
+  const seat = isoBox(P, x, cy, 0.42, 0.42, 0.42, 0.06, WOOD, `${key}-seat`);
+  const by = cy + shd;                 // bordo sud della seduta
+  const posts = [
+    legLine(P, x - 0.19, by, 0.45, 0.82, `${key}-p0`),
+    legLine(P, x + 0.19, by, 0.45, 0.82, `${key}-p1`),
+  ];
+  const back = isoBox(P, x, by, 0.55, 0.34, 0.05, 0.27, WOOD, `${key}-back`);
+  return { depth: P(x, cy, 0).depth, node: <g key={key}>{legs}{seat.node}{posts}{back.node}</g> };
+}
+
 // ─── Pareti ─────────────────────────────────────────────────────────────────
 type Wall = { id: "N" | "E" | "S" | "W"; p1: [number, number]; p2: [number, number]; len: number };
 const WALLS: Wall[] = [
@@ -140,27 +185,29 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
   ];
 
   if (w.id === "N") {
-    // Porta (sinistra/ovest)
+    // Porta doppia (centro-ovest)
     els.push(
       <g key="door">
-        <polygon points={join(mountQuad(P, w, 0.35, 1.25, 0, 2.05))} fill="#9aa3a8" stroke="#6f787d" strokeWidth={0.8} />
-        <polygon points={join(mountQuad(P, w, 0.48, 1.12, 0.18, 1.95))} fill="#aab1b6" />
-        <circle {...dot(wp(P, w, 1.05, 1.05))} r={2.4} fill="#5c6469" />
+        <polygon points={join(mountQuad(P, w, 0.85, 2.35, 0, 2.05))} fill="#8b9499" stroke="#6f787d" strokeWidth={0.8} />
+        <polygon points={join(mountQuad(P, w, 0.95, 1.58, 0.12, 1.95))} fill="#aab1b6" />
+        <polygon points={join(mountQuad(P, w, 1.62, 2.25, 0.12, 1.95))} fill="#aab1b6" />
+        <circle {...dot(wp(P, w, 1.52, 1.05))} r={2} fill="#5c6469" />
+        <circle {...dot(wp(P, w, 1.68, 1.05))} r={2} fill="#5c6469" />
       </g>,
     );
-    // LIM (destra/est)
+    // LIM al centro, dietro la cattedra
     els.push(
       <g key="lim">
-        <polygon points={join(mountQuad(P, w, 3.5, 5.1, 1.05, 2.25))} fill="#2b3a47" stroke="#1c2730" strokeWidth={0.8} />
-        <polygon points={join(mountQuad(P, w, 3.62, 4.98, 1.17, 2.13))} fill="#16212b" />
-        <circle {...dot(wp(P, w, 4.9, 1.21))} r={1.5} fill="#3a6f4a" />
+        <polygon points={join(mountQuad(P, w, 3.0, 5.4, 1.05, 2.3))} fill="#2b3a47" stroke="#1c2730" strokeWidth={0.8} />
+        <polygon points={join(mountQuad(P, w, 3.14, 5.26, 1.18, 2.17))} fill="#16212b" />
+        <circle {...dot(wp(P, w, 5.18, 1.22))} r={1.5} fill="#3a6f4a" />
       </g>,
     );
   } else if (w.id === "S") {
-    // Due finestre + crociera
-    for (const [c, key] of [[4.6, "wr"], [1.6, "wl"]] as [number, string][]) {
+    // Finestre lungo la parete sud + crociera
+    for (const [c, key] of [[1.4, "w0"], [3.0, "w1"], [5.0, "w2"], [6.6, "w3"]] as [number, string][]) {
       const u = RW - c; // u = distanza da est lungo S
-      const u0 = u - 0.6, u1 = u + 0.6, v0 = 1.1, v1 = 2.35;
+      const u0 = u - 0.6, u1 = u + 0.6, v0 = 1.15, v1 = 2.35;
       els.push(
         <g key={key}>
           <polygon points={join(mountQuad(P, w, u0, u1, v0, v1))} fill={pal.winFrame} stroke="#b9bfc2" strokeWidth={0.7} />
@@ -229,7 +276,7 @@ function person(P: Proj, x: number, y: number, key: string): Draw {
 
 // ─── Pavimento a piastrelle ──────────────────────────────────────────────────
 function buildFloor(P: Proj, floorA: string, floorB: string, dotC: string): React.ReactNode {
-  const cols = 6, rows = 12;
+  const cols = 6, rows = 9;
   const cw = RW / cols, ch = RD / rows;
   const tiles: React.ReactNode[] = [];
   for (let i = 0; i < cols; i++) {
@@ -248,47 +295,31 @@ function buildFloor(P: Proj, floorA: string, floorB: string, dotC: string): Reac
 }
 
 // ─── Arredo (banchi 2-2-2-3 su O/E, cattedra, prof, calorifero) ──────────────
-function deskYs(): number[] {
-  const groups = [2, 2, 2, 3];
-  const pitch = 0.85; // passo banchi nello stesso gruppo
-  const gap = 0.95;   // varco (centro-centro) tra gruppi
-  const start = 0.95;
-  const ys: number[] = [];
-  let y = start;
-  groups.forEach((g, gi) => {
-    for (let i = 0; i < g; i++) {
-      ys.push(y);
-      if (i < g - 1) y += pitch;
-    }
-    if (gi < groups.length - 1) y += gap;
-  });
-  return ys;
-}
+// Banchi in due blocchi (ovest/est) attorno a un corridoio centrale, come la
+// pianta: per lato, dal fronte (nord) al fondo, righe 2-2-2-3. Tutti rivolti a
+// NORD (sedia a sud del banco). L'ultima riga (3) si allarga verso il centro.
+const DESK_ROWS = [2.8, 4.5, 6.2, 7.9];   // y delle 4 righe
+const WEST_COLS = [0.85, 1.95];           // colonne ovest (righe 1-3)
+const WEST_COL3 = 3.05;                   // 3ª colonna ovest (solo riga 4)
 
 function buildFurniture(P: Proj): Draw[] {
   const items: Draw[] = [];
-  const ys = deskYs();
 
-  // Banchi vicino alle pareti lunghe; lo studente siede a SUD del banco ed è
-  // rivolto a NORD, verso il prof (sedia + schienale dietro le spalle, a sud).
-  const rows: { x: number; side: string }[] = [
-    { x: 0.95, side: "W" },        // ovest
-    { x: RW - 0.95, side: "E" },   // est
-  ];
-  for (const r of rows) {
-    ys.forEach((y, i) => {
-      items.push(isoBox(P, r.x, y, 0, 0.62, 0.46, 0.62, "#d9a441", `desk-${r.side}-${i}`));        // banco
-      items.push(isoBox(P, r.x, y + 0.42, 0, 0.40, 0.40, 0.45, "#2f7d4a", `seat-${r.side}-${i}`));  // sedia (a sud)
-      items.push(isoBox(P, r.x, y + 0.58, 0, 0.44, 0.08, 0.82, "#2a6b40", `back-${r.side}-${i}`));  // schienale
+  DESK_ROWS.forEach((y, ri) => {
+    const west = ri === DESK_ROWS.length - 1 ? [...WEST_COLS, WEST_COL3] : WEST_COLS;
+    const cols = [...west, ...west.map((x) => RW - x)]; // est = specchio su CX
+    cols.forEach((x, ci) => {
+      items.push(deskUnit(P, x, y, `desk-${ri}-${ci}`));
+      items.push(chairUnit(P, x, y, `chair-${ri}-${ci}`));
     });
-  }
+  });
 
-  // Cattedra verde (davanti alla LIM, lato est) + prof rivolta a sud
-  items.push(isoBox(P, 4.1, 0.95, 0, 1.3, 0.62, 0.76, "#2f7d4a", "cattedra"));
-  items.push(person(P, 4.1, 0.45, "prof"));
+  // Cattedra verde al centro-fronte (in asse con la LIM) + prof rivolto a sud
+  items.push(isoBox(P, 4.2, 1.4, 0, 1.8, 0.7, 0.76, "#2f7d4a", "cattedra"));
+  items.push(person(P, 4.2, 0.85, "prof"));
 
-  // Calorifero rosso sotto la finestra destra (parete sud)
-  items.push(isoBox(P, 4.6, 8.78, 0, 0.95, 0.2, 0.52, "#d64b3a", "radiator", 6));
+  // Calorifero rosso a costole (parete sud, centro-destra)
+  items.push(isoBox(P, 5.0, 8.78, 0, 0.95, 0.2, 0.52, "#d64b3a", "radiator", 6));
 
   return items;
 }
