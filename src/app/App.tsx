@@ -100,6 +100,14 @@ const SOCIALS = [
 const PROJECTS = [
   {
     category: "Web game",
+    date: "31 mag 2026",
+    title: "5BT",
+    url: "/5bt",
+    desc: "Aula isometrica pixel-art della 5BT in stile Tuber Simulator: cattedra, LIM, banchi 2-2-2-3, finestre e calorifero. Ruota la stanza con la manina su quattro viste.",
+    tags: ["React", "TypeScript", "SVG", "Isometrico", "Game design"],
+  },
+  {
+    category: "Web game",
     date: "30 mag 2026",
     title: "Angoli",
     url: "/angoli",

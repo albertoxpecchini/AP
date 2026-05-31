@@ -6,6 +6,7 @@ import "./styles/index.css";
 
 const Parole = lazy(() => import("./app/parole/Parole.tsx"));
 const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
+const Aula = lazy(() => import("./app/aula/Aula.tsx"));
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -24,6 +25,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Angoli />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/5bt"
+        element={
+          <Suspense fallback={null}>
+            <Aula />
           </Suspense>
         }
       />
