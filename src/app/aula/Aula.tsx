@@ -3,9 +3,9 @@ import { ArrowLeft, RotateCcw, Moon, Sun, Hand } from "lucide-react";
 
 // ─── Modello stanza (metri) ─────────────────────────────────────────────────
 // x = Est-Ovest (corto) · y = Nord-Sud (lungo) · z = altezza
-const RW = 4.4;   // larghezza E-W
+const RW = 6.2;   // larghezza E-W
 const RD = 9;     // profondità N-S
-const RH = 3.0;   // altezza pareti
+const RH = 3.8;   // altezza pareti
 const CX = RW / 2;
 const CY = RD / 2;
 const WAINSCOT = 1.5; // porzione bassa gialla
@@ -151,16 +151,16 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
     // LIM (destra/est)
     els.push(
       <g key="lim">
-        <polygon points={join(mountQuad(P, w, 2.6, 3.95, 1.0, 2.1))} fill="#2b3a47" stroke="#1c2730" strokeWidth={0.8} />
-        <polygon points={join(mountQuad(P, w, 2.72, 3.83, 1.12, 1.98))} fill="#16212b" />
-        <circle {...dot(wp(P, w, 3.74, 1.16))} r={1.5} fill="#3a6f4a" />
+        <polygon points={join(mountQuad(P, w, 3.5, 5.1, 1.05, 2.25))} fill="#2b3a47" stroke="#1c2730" strokeWidth={0.8} />
+        <polygon points={join(mountQuad(P, w, 3.62, 4.98, 1.17, 2.13))} fill="#16212b" />
+        <circle {...dot(wp(P, w, 4.9, 1.21))} r={1.5} fill="#3a6f4a" />
       </g>,
     );
   } else if (w.id === "S") {
     // Due finestre + crociera
-    for (const [c, key] of [[3.2, "wr"], [1.1, "wl"]] as [number, string][]) {
+    for (const [c, key] of [[4.6, "wr"], [1.6, "wl"]] as [number, string][]) {
       const u = RW - c; // u = distanza da est lungo S
-      const u0 = u - 0.52, u1 = u + 0.52, v0 = 1.05, v1 = 2.15;
+      const u0 = u - 0.6, u1 = u + 0.6, v0 = 1.1, v1 = 2.35;
       els.push(
         <g key={key}>
           <polygon points={join(mountQuad(P, w, u0, u1, v0, v1))} fill={pal.winFrame} stroke="#b9bfc2" strokeWidth={0.7} />
@@ -250,13 +250,18 @@ function buildFloor(P: Proj, floorA: string, floorB: string, dotC: string): Reac
 // ─── Arredo (banchi 2-2-2-3 su O/E, cattedra, prof, calorifero) ──────────────
 function deskYs(): number[] {
   const groups = [2, 2, 2, 3];
-  const pitch = 0.72, gap = 0.5, start = 0.85;
+  const pitch = 0.85; // passo banchi nello stesso gruppo
+  const gap = 0.95;   // varco (centro-centro) tra gruppi
+  const start = 0.95;
   const ys: number[] = [];
   let y = start;
-  for (const g of groups) {
-    for (let i = 0; i < g; i++) { ys.push(y); y += pitch; }
-    y += gap;
-  }
+  groups.forEach((g, gi) => {
+    for (let i = 0; i < g; i++) {
+      ys.push(y);
+      if (i < g - 1) y += pitch;
+    }
+    if (gi < groups.length - 1) y += gap;
+  });
   return ys;
 }
 
@@ -264,25 +269,26 @@ function buildFurniture(P: Proj): Draw[] {
   const items: Draw[] = [];
   const ys = deskYs();
 
-  // Banchi: ovest (x≈0.62) ed est (x≈3.78), sedia verso il centro
-  const rows: { dx: number; cx: number; bx: number; side: string }[] = [
-    { dx: 0.62, cx: 1.18, bx: 1.36, side: "W" }, // ovest
-    { dx: 3.78, cx: 3.22, bx: 3.04, side: "E" }, // est
+  // Banchi vicino alle pareti lunghe; lo studente siede a SUD del banco ed è
+  // rivolto a NORD, verso il prof (sedia + schienale dietro le spalle, a sud).
+  const rows: { x: number; side: string }[] = [
+    { x: 0.95, side: "W" },        // ovest
+    { x: RW - 0.95, side: "E" },   // est
   ];
   for (const r of rows) {
     ys.forEach((y, i) => {
-      items.push(isoBox(P, r.dx, y, 0, 0.56, 0.44, 0.62, "#d9a441", `desk-${r.side}-${i}`));
-      items.push(isoBox(P, r.cx, y, 0, 0.36, 0.38, 0.42, "#2f7d4a", `seat-${r.side}-${i}`)); // sedia
-      items.push(isoBox(P, r.bx, y, 0, 0.08, 0.38, 0.86, "#2a6b40", `back-${r.side}-${i}`)); // schienale
+      items.push(isoBox(P, r.x, y, 0, 0.62, 0.46, 0.62, "#d9a441", `desk-${r.side}-${i}`));        // banco
+      items.push(isoBox(P, r.x, y + 0.42, 0, 0.40, 0.40, 0.45, "#2f7d4a", `seat-${r.side}-${i}`));  // sedia (a sud)
+      items.push(isoBox(P, r.x, y + 0.58, 0, 0.44, 0.08, 0.82, "#2a6b40", `back-${r.side}-${i}`));  // schienale
     });
   }
 
   // Cattedra verde (davanti alla LIM, lato est) + prof rivolta a sud
-  items.push(isoBox(P, 2.9, 0.95, 0, 1.3, 0.62, 0.76, "#2f7d4a", "cattedra"));
-  items.push(person(P, 2.9, 0.45, "prof"));
+  items.push(isoBox(P, 4.1, 0.95, 0, 1.3, 0.62, 0.76, "#2f7d4a", "cattedra"));
+  items.push(person(P, 4.1, 0.45, "prof"));
 
   // Calorifero rosso sotto la finestra destra (parete sud)
-  items.push(isoBox(P, 3.2, 8.78, 0, 0.95, 0.2, 0.52, "#d64b3a", "radiator", 6));
+  items.push(isoBox(P, 4.6, 8.78, 0, 0.95, 0.2, 0.52, "#d64b3a", "radiator", 6));
 
   return items;
 }
