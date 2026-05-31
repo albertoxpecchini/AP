@@ -131,9 +131,10 @@ function deskUnit(P: Proj, x: number, y: number, key: string): Draw {
   return { depth: P(x, y, 0).depth, node: <g key={key}>{legs}{tray.node}{top.node}</g> };
 }
 
-// Sedia a SUD del banco (studente rivolto a nord): seduta + gambe + schienale.
-function chairUnit(P: Proj, x: number, y: number, key: string): Draw {
-  const cy = y + 0.46;                 // centro seduta, a sud del banco
+// Sedia: seduta + gambe + schienale. dir=1 schienale a sud (studente guarda a
+// nord); dir=-1 schienale a nord (prof guarda a sud). Stesso modello copiato.
+function chairUnit(P: Proj, x: number, y: number, key: string, dir = 1): Draw {
+  const cy = y + 0.46 * dir;           // centro seduta
   const shw = 0.21, shd = 0.21, ins = 0.04;
   const legs = [
     legLine(P, x - shw + ins, cy - shd + ins, 0, 0.45, `${key}-l0`),
@@ -142,7 +143,7 @@ function chairUnit(P: Proj, x: number, y: number, key: string): Draw {
     legLine(P, x - shw + ins, cy + shd - ins, 0, 0.45, `${key}-l3`),
   ];
   const seat = isoBox(P, x, cy, 0.42, 0.42, 0.42, 0.06, WOOD, `${key}-seat`);
-  const by = cy + shd;                 // bordo sud della seduta
+  const by = cy + shd * dir;           // bordo schienale (dietro le spalle)
   const posts = [
     legLine(P, x - 0.19, by, 0.45, 0.82, `${key}-p0`),
     legLine(P, x + 0.19, by, 0.45, 0.82, `${key}-p1`),
@@ -159,29 +160,34 @@ const CATT_BODY = "#34373c";  // corpo/cassetti antracite (come la texture)
 
 function cattedraUnit(P: Proj, x: number, y: number, key: string): Draw {
   // Proporzioni da desk.glb (≈2.11×1.07×1.05) scalate a un'altezza realistica.
-  const w = 1.55, d = 0.78, bh = 0.70;
-  const body = isoBox(P, x, y, 0, w, d, bh, CATT_BODY, `${key}-body`);
-  const top = isoBox(P, x, y, bh, w + 0.06, d + 0.06, 0.06, CATT_TOP, `${key}-top`);
+  // Struttura reale: cassettiera su un fianco + gamba sull'altro → VANO GAMBE
+  // (kneehole) vuoto in mezzo; pannello modestia chiude solo il lato sud.
+  const w = 1.55, d = 0.78, bh = 0.70, hw = w / 2, hd = d / 2;
+  const pedD = d - 0.04;
 
-  // Cassettiera a 3 cassetti IMPILATI su un fianco (pedana est), fronti a NORD
-  // (verso il prof) — come desk.glb. Disegnata solo se la faccia nord è rivolta
-  // allo spettatore; il lato SUD resta un pannello chiuso (verso la classe).
-  const yN = y - d / 2;
+  const top = isoBox(P, x, y, bh, w + 0.06, d + 0.06, 0.06, CATT_TOP, `${key}-top`);     // piano verde
+  const pedX = x + 0.50, pedW = 0.52;
+  const ped = isoBox(P, pedX, y, 0, pedW, pedD, bh, CATT_BODY, `${key}-ped`);             // cassettiera (est)
+  const legW = isoBox(P, x - hw + 0.05, y, 0, 0.08, pedD, bh, CATT_BODY, `${key}-legW`);  // gamba/pannello (ovest)
+  const k0 = x - hw + 0.09, k1 = pedX - pedW / 2;                                          // luce del vano gambe
+  const mod = isoBox(P, (k0 + k1) / 2, y + hd - 0.05, 0.26, k1 - k0, 0.05, 0.42, CATT_BODY, `${key}-mod`); // pannello modestia (sud, chiuso)
+
+  // Cassetti IN RILIEVO (cassetti sporgenti, non poligoni piatti) sulla faccia
+  // nord della cassettiera — disegnati solo quando il lato nord è verso lo spettatore.
   const drawers: React.ReactNode[] = [];
-  if (P(x, yN, bh / 2).sy > P(x, y, bh / 2).sy + 0.5) {
-    const dx0 = 0.20, dx1 = 0.68; // pedana cassetti sul lato est
-    const bands = [[0.10, 0.26], [0.28, 0.44], [0.46, 0.62]] as const;
+  if (P(x, y - hd, bh / 2).sy > P(x, y, bh / 2).sy + 0.5) {
+    const dy = y - pedD / 2 - 0.035; // sporge a nord oltre la faccia della pedana
+    const bands = [[0.12, 0.27], [0.29, 0.44], [0.46, 0.61]] as const;
     bands.forEach(([z0, z1], k) => {
+      drawers.push(isoBox(P, pedX, dy, z0, pedW - 0.10, 0.08, z1 - z0, shade(CATT_BODY, 1.28), `${key}-d${k}`).node);
       const hz = (z0 + z1) / 2;
       drawers.push(
-        <polygon key={`d${k}`} points={join([P(x + dx0, yN, z0), P(x + dx1, yN, z0), P(x + dx1, yN, z1), P(x + dx0, yN, z1)])}
-          fill={shade(CATT_BODY, 1.3)} stroke={shade(CATT_BODY, 0.55)} strokeWidth={0.5} />,
-        <line key={`h${k}`} {...seg(P(x + dx0 + 0.14, yN, hz), P(x + dx1 - 0.14, yN, hz))}
-          stroke="#b8bcc0" strokeWidth={1.7} strokeLinecap="round" />,
+        <line key={`${key}-h${k}`} {...seg(P(pedX - 0.13, dy - 0.045, hz), P(pedX + 0.13, dy - 0.045, hz))}
+          stroke="#c2c6ca" strokeWidth={1.8} strokeLinecap="round" />,
       );
     });
   }
-  return { depth: P(x, y, 0).depth, node: <g key={key}>{body.node}{drawers}{top.node}</g> };
+  return { depth: P(x, y, 0).depth, node: <g key={key}>{legW.node}{ped.node}{mod.node}{drawers}{top.node}</g> };
 }
 
 // ─── Pareti ─────────────────────────────────────────────────────────────────
@@ -349,9 +355,11 @@ function buildFurniture(P: Proj): Draw[] {
     });
   });
 
-  // Cattedra al centro-fronte (in asse con la LIM) + prof rivolto a sud
+  // Cattedra al centro-fronte (in asse con la LIM) + sedia della prof (copiata
+  // dai banchi, rivolta a sud: schienale a nord) allineata al vano gambe.
   items.push(cattedraUnit(P, 4.2, 1.4, "cattedra"));
-  items.push(person(P, 4.2, 0.85, "prof"));
+  items.push(chairUnit(P, 4.2, 1.18, "profchair", -1));
+  items.push(person(P, 4.2, 0.95, "prof"));
 
   // Termosifone a colonne verticali (proporzioni da radiator.glb, reso rosso),
   // sotto la finestra destra (parete sud)
