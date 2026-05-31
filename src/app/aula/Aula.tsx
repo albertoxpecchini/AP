@@ -242,6 +242,22 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
         <circle {...dot(wp(P, w, 5.18, 1.22))} r={1.5} fill="#3a6f4a" />
       </g>,
     );
+    // Box di sicurezza per il notebook del prof (collegato alla LIM), a destra
+    // della LIM in alto sulla parete nord. Armadietto sporgente aperto col laptop.
+    const fy = 0.22; // faccia frontale (verso la stanza) del box
+    const fq = (x0: number, x1: number, z0: number, z1: number) =>
+      join([P(x0, fy, z0), P(x1, fy, z0), P(x1, fy, z1), P(x0, fy, z1)]);
+    els.push(
+      <g key="secbox">
+        {isoBox(P, 6.3, 0.11, 1.55, 0.58, 0.22, 0.6, "#d7dbde", "sb-body").node}
+        <polygon points={fq(6.08, 6.52, 1.61, 2.09)} fill="#262b2e" />
+        <polygon points={fq(6.14, 6.46, 1.66, 2.02)} fill="#0e1418" />
+        <polygon points={fq(6.16, 6.44, 1.68, 2.00)} fill="#37525f" />
+        {isoBox(P, 6.3, 0.33, 1.585, 0.48, 0.22, 0.035, "#c6cbce", "sb-tray").node}
+        {isoBox(P, 6.3, 0.33, 1.62, 0.42, 0.18, 0.02, "#aeb4b8", "sb-kbd").node}
+        <circle {...dot(P(6.54, fy, 1.86))} r={1.6} fill="#5c6469" />
+      </g>,
+    );
   } else if (w.id === "S") {
     // 2 finestre alte e strette, cornice nera (3 specchiature)
     for (const [c, key] of [[3.0, "w0"], [5.0, "w1"]] as [number, string][]) {
@@ -273,22 +289,6 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
         <polygon points={join([wp(P, w, 3.88, 2.22), wp(P, w, 3.72, 2.16), wp(P, w, 3.90, 2.13)])} fill="#fbfbf7" />
         <line {...seg(wp(P, w, 4.18, 1.79), wp(P, w, 4.16, 1.46))} stroke="#fbfbf7" strokeWidth={1.7} strokeLinecap="round" />
         <line {...seg(wp(P, w, 4.40, 1.79), wp(P, w, 4.42, 1.46))} stroke="#fbfbf7" strokeWidth={1.7} strokeLinecap="round" />
-      </g>,
-    );
-    // Box di sicurezza per notebook (accessori LIM), a muro in alto, a nord del
-    // poster. Armadietto metallico sporgente (rilievo) aperto col laptop dentro.
-    const fx = 7.78; // piano frontale (ovest) del box, verso la stanza
-    const fq = (y0: number, y1: number, z0: number, z1: number) =>
-      join([P(fx, y0, z0), P(fx, y1, z0), P(fx, y1, z1), P(fx, y0, z1)]);
-    els.push(
-      <g key="secbox">
-        {isoBox(P, 7.89, 2.10, 1.55, 0.22, 0.58, 0.6, "#d7dbde", "sb-body").node}
-        <polygon points={fq(1.90, 2.30, 1.61, 2.09)} fill="#262b2e" />
-        {isoBox(P, 7.68, 2.10, 1.585, 0.22, 0.48, 0.035, "#c6cbce", "sb-tray").node}
-        {isoBox(P, 7.66, 2.10, 1.62, 0.18, 0.42, 0.02, "#aeb4b8", "sb-kbd").node}
-        <polygon points={fq(1.96, 2.24, 1.66, 2.02)} fill="#0e1418" />
-        <polygon points={fq(1.98, 2.22, 1.68, 2.00)} fill="#37525f" />
-        <circle {...dot(P(fx, 2.34, 1.86))} r={1.6} fill="#5c6469" />
       </g>,
     );
   }
