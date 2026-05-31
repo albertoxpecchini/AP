@@ -275,6 +275,22 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
         <line {...seg(wp(P, w, 4.40, 1.79), wp(P, w, 4.42, 1.46))} stroke="#fbfbf7" strokeWidth={1.7} strokeLinecap="round" />
       </g>,
     );
+    // Box di sicurezza per notebook (accessori LIM), a muro in alto, a nord del
+    // poster. Armadietto metallico sporgente (rilievo) aperto col laptop dentro.
+    const fx = 7.78; // piano frontale (ovest) del box, verso la stanza
+    const fq = (y0: number, y1: number, z0: number, z1: number) =>
+      join([P(fx, y0, z0), P(fx, y1, z0), P(fx, y1, z1), P(fx, y0, z1)]);
+    els.push(
+      <g key="secbox">
+        {isoBox(P, 7.89, 2.10, 1.55, 0.22, 0.58, 0.6, "#d7dbde", "sb-body").node}
+        <polygon points={fq(1.90, 2.30, 1.61, 2.09)} fill="#262b2e" />
+        {isoBox(P, 7.68, 2.10, 1.585, 0.22, 0.48, 0.035, "#c6cbce", "sb-tray").node}
+        {isoBox(P, 7.66, 2.10, 1.62, 0.18, 0.42, 0.02, "#aeb4b8", "sb-kbd").node}
+        <polygon points={fq(1.96, 2.24, 1.66, 2.02)} fill="#0e1418" />
+        <polygon points={fq(1.98, 2.22, 1.68, 2.00)} fill="#37525f" />
+        <circle {...dot(P(fx, 2.34, 1.86))} r={1.6} fill="#5c6469" />
+      </g>,
+    );
   }
 
   return <g key={`wall-${w.id}`}>{els}</g>;
