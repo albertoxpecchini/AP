@@ -151,6 +151,35 @@ function chairUnit(P: Proj, x: number, y: number, key: string): Draw {
   return { depth: P(x, cy, 0).depth, node: <g key={key}>{legs}{seat.node}{posts}{back.node}</g> };
 }
 
+// ─── Cattedra (Desk.fbx): corpo legno, cassetti a NORD, piano verde solo sopra ─
+const CATT_TOP = "#2f7d4a";   // piano verde omogeneo
+const CATT_BODY = "#caa978";  // corpo/cassetti in legno
+
+function cattedraUnit(P: Proj, x: number, y: number, key: string): Draw {
+  const w = 1.8, d = 0.7, bh = 0.70;
+  const body = isoBox(P, x, y, 0, w, d, bh, CATT_BODY, `${key}-body`);
+  const top = isoBox(P, x, y, bh, w + 0.06, d + 0.06, 0.07, CATT_TOP, `${key}-top`);
+
+  // Cassetti sul lato NORD (verso il prof) — disegnati solo se quella faccia è
+  // rivolta allo spettatore. Il lato SUD resta un pannello chiuso (verso la classe).
+  const yN = y - d / 2;
+  const drawers: React.ReactNode[] = [];
+  if (P(x, yN, bh / 2).sy > P(x, y, bh / 2).sy + 0.5) {
+    const hw = w / 2, inner = w - 0.16, z0 = 0.12, z1 = 0.60, hz = (z0 + z1) / 2;
+    for (let k = 0; k < 3; k++) {
+      const dx0 = -hw + 0.08 + (k * inner) / 3 + 0.02;
+      const dx1 = -hw + 0.08 + ((k + 1) * inner) / 3 - 0.02;
+      drawers.push(
+        <polygon key={`d${k}`} points={join([P(x + dx0, yN, z0), P(x + dx1, yN, z0), P(x + dx1, yN, z1), P(x + dx0, yN, z1)])}
+          fill={shade(CATT_BODY, 0.9)} stroke={shade(CATT_BODY, 0.6)} strokeWidth={0.5} />,
+        <line key={`h${k}`} {...seg(P(x + dx0 + 0.06, yN, hz), P(x + dx1 - 0.06, yN, hz))}
+          stroke="#6b5a36" strokeWidth={1.5} strokeLinecap="round" />,
+      );
+    }
+  }
+  return { depth: P(x, y, 0).depth, node: <g key={key}>{body.node}{drawers}{top.node}</g> };
+}
+
 // ─── Pareti ─────────────────────────────────────────────────────────────────
 type Wall = { id: "N" | "E" | "S" | "W"; p1: [number, number]; p2: [number, number]; len: number };
 const WALLS: Wall[] = [
@@ -204,16 +233,18 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
       </g>,
     );
   } else if (w.id === "S") {
-    // Finestre lungo la parete sud + crociera
-    for (const [c, key] of [[1.4, "w0"], [3.0, "w1"], [5.0, "w2"], [6.6, "w3"]] as [number, string][]) {
+    // 2 finestre alte e strette, cornice nera (3 specchiature)
+    for (const [c, key] of [[3.0, "w0"], [5.0, "w1"]] as [number, string][]) {
       const u = RW - c; // u = distanza da est lungo S
-      const u0 = u - 0.6, u1 = u + 0.6, v0 = 1.15, v1 = 2.35;
+      const u0 = u - 0.38, u1 = u + 0.38, v0 = 0.95, v1 = 2.78;
+      const t1 = v0 + (v1 - v0) / 3, t2 = v0 + (2 * (v1 - v0)) / 3;
       els.push(
         <g key={key}>
-          <polygon points={join(mountQuad(P, w, u0, u1, v0, v1))} fill={pal.winFrame} stroke="#b9bfc2" strokeWidth={0.7} />
-          <polygon points={join(mountQuad(P, w, u0 + 0.08, u1 - 0.08, v0 + 0.08, v1 - 0.08))} fill={pal.glass} />
-          <line {...seg(wp(P, w, u, v0 + 0.08), wp(P, w, u, v1 - 0.08))} stroke={pal.winFrame} strokeWidth={1.6} />
-          <line {...seg(wp(P, w, u0 + 0.08, (v0 + v1) / 2), wp(P, w, u1 - 0.08, (v0 + v1) / 2))} stroke={pal.winFrame} strokeWidth={1.6} />
+          <polygon points={join(mountQuad(P, w, u0, u1, v0, v1))} fill="#1a1a1a" stroke="#000" strokeWidth={0.8} />
+          <polygon points={join(mountQuad(P, w, u0 + 0.07, u1 - 0.07, v0 + 0.07, v1 - 0.07))} fill={pal.glass} />
+          <line {...seg(wp(P, w, u, v0 + 0.07), wp(P, w, u, v1 - 0.07))} stroke="#1a1a1a" strokeWidth={1.5} />
+          <line {...seg(wp(P, w, u0 + 0.07, t1), wp(P, w, u1 - 0.07, t1))} stroke="#1a1a1a" strokeWidth={1.4} />
+          <line {...seg(wp(P, w, u0 + 0.07, t2), wp(P, w, u1 - 0.07, t2))} stroke="#1a1a1a" strokeWidth={1.4} />
         </g>,
       );
     }
@@ -299,8 +330,8 @@ function buildFloor(P: Proj, floorA: string, floorB: string, dotC: string): Reac
 // pianta: per lato, dal fronte (nord) al fondo, righe 2-2-2-3. Tutti rivolti a
 // NORD (sedia a sud del banco). L'ultima riga (3) si allarga verso il centro.
 const DESK_ROWS = [2.8, 4.5, 6.2, 7.9];   // y delle 4 righe
-const WEST_COLS = [0.85, 1.95];           // colonne ovest (righe 1-3)
-const WEST_COL3 = 3.05;                   // 3ª colonna ovest (solo riga 4)
+const WEST_COLS = [0.40, 1.28];           // colonne ovest: esterna appoggiata al muro W
+const WEST_COL3 = 2.16;                   // 3ª colonna ovest (solo riga 4)
 
 function buildFurniture(P: Proj): Draw[] {
   const items: Draw[] = [];
@@ -314,12 +345,12 @@ function buildFurniture(P: Proj): Draw[] {
     });
   });
 
-  // Cattedra verde al centro-fronte (in asse con la LIM) + prof rivolto a sud
-  items.push(isoBox(P, 4.2, 1.4, 0, 1.8, 0.7, 0.76, "#2f7d4a", "cattedra"));
+  // Cattedra al centro-fronte (in asse con la LIM) + prof rivolto a sud
+  items.push(cattedraUnit(P, 4.2, 1.4, "cattedra"));
   items.push(person(P, 4.2, 0.85, "prof"));
 
-  // Calorifero rosso a costole (parete sud, centro-destra)
-  items.push(isoBox(P, 5.0, 8.78, 0, 0.95, 0.2, 0.52, "#d64b3a", "radiator", 6));
+  // Termosifone rosso a colonne, sotto la finestra destra (parete sud)
+  items.push(isoBox(P, 5.0, 8.86, 0.1, 0.9, 0.12, 0.52, "#cc3b30", "radiator", 10));
 
   return items;
 }
