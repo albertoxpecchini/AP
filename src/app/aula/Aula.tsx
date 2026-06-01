@@ -156,6 +156,93 @@ function chairUnit(P: Proj, x: number, y: number, key: string, dir = 1): Draw {
   return { depth: P(x, cy, 0).depth, node: <g key={key}>{legs}{seat.node}{posts}{back.node}</g> };
 }
 
+// ─── Notebook HP Pavilion Gaming 15 (aperto, rivolto al prof a nord) ──────────
+// Base/tastiera retroilluminata verde + schermo inclinato che mostra lo
+// screenshot. La faccia visibile (schermo o retro coperchio) è scelta in base
+// all'angolo, così ruotando non si vede mai "attraverso".
+function renderLaptop(P: Proj, cx: number, cyDesk: number): React.ReactNode {
+  const deskZ = 0.76;                         // piano verde della cattedra
+  const hw = 0.18, hd = 0.125;                // 0.36 × 0.25 m
+  const baseY = cyDesk - 0.12;                // tastiera spostata a nord (verso il prof)
+  const x0 = cx - hw, x1 = cx + hw;
+  const base = isoBox(P, cx, baseY, deskZ, 0.36, 0.25, 0.024, "#26292c", "lap-base");
+  const topZ = deskZ + 0.024;
+
+  // ── Tastiera QWERTY realistica (HP Spectre style: grigio ardesia, etichette bianche) ──
+  // Disegnata in uno spazio pixel 600×260, trasformata sulla superficie della scocca con matrice.
+  const kx0 = x0 + 0.012, kx1 = x1 - 0.012;
+  const ky0 = baseY - hd + 0.022;  // nord (prof/spacebar)
+  const ky1 = baseY + hd - 0.012;  // sud (schermo/fn row)
+  const KB_W = 600, KB_H = 248;
+  // Origine = angolo SW (lato schermo = fn row a y=0 dell'immagine), x→est, y→nord
+  const Osw = P(kx0, ky1, topZ), EXsw = P(kx1, ky1, topZ), EYsw = P(kx0, ky0, topZ);
+  const ka = (EXsw.sx - Osw.sx) / KB_W, kb = (EXsw.sy - Osw.sy) / KB_W;
+  const kc = (EYsw.sx - Osw.sx) / KB_H, kd2 = (EYsw.sy - Osw.sy) / KB_H;
+  const mkb = `matrix(${ka.toFixed(4)},${kb.toFixed(4)},${kc.toFixed(4)},${kd2.toFixed(4)},${Osw.sx.toFixed(2)},${Osw.sy.toFixed(2)})`;
+
+  // kh=28 g=2 → rh=30 · 6 righe = 180px · touchpad a 186 · totale 226 < KB_H=248 ✓
+  const u = 40, kh = 28, g = 2, rh = kh + g;
+  const KBG = "#2a2d30", KC = "#545760", KSH = "#3d4044", KT = "#dde0e3";
+  type KRow = [string, number];
+  const ROWS: KRow[][] = [
+    [['esc',1.5],['f1',1],['f2',1],['f3',1],['f4',1],['f5',1],['f6',1],['f7',1],['f8',1],['f9',1],['f10',1],['f11',1],['f12',1],['del',1.5]],
+    [['`',1],['1',1],['2',1],['3',1],['4',1],['5',1],['6',1],['7',1],['8',1],['9',1],['0',1],['-',1],['=',1],['⌫',2]],
+    [['tab',1.5],['Q',1],['W',1],['E',1],['R',1],['T',1],['Y',1],['U',1],['I',1],['O',1],['P',1],['[',1],[']',1],['\\',1.5]],
+    [['caps',1.75],['A',1],['S',1],['D',1],['F',1],['G',1],['H',1],['J',1],['K',1],['L',1],[';',1],["'",1],['↵',2.25]],
+    [['⇧',2.25],['Z',1],['X',1],['C',1],['V',1],['B',1],['N',1],['M',1],[',',1],['.',1],['/',1],['⇧',2.75]],
+    [['ctrl',1.5],['fn',1],['⊞',1],['alt',1.25],['',5.0],['alt',1.25],['ctrl',1.5],['←',0.83],['↕',0.84],['→',0.83]],
+  ];
+  const keys = ROWS.flatMap((row, ri) => {
+    let xp = 0;
+    return row.map(([lbl, wu], ki) => {
+      const kw = u * wu - g, ry2 = ri * rh;
+      const fs = lbl.length > 3 ? 8 : lbl.length === 3 ? 9 : lbl.length === 2 ? 10 : 13;
+      const el = (
+        <g key={`k${ri}-${ki}`}>
+          <rect x={xp + 1} y={ry2 + 2} width={kw - 1} height={kh - 1} rx={3} fill={KSH} />
+          <rect x={xp} y={ry2} width={kw} height={kh - 2} rx={3} fill={KC} />
+          {lbl && <text x={xp + kw / 2} y={ry2 + kh * 0.64} textAnchor="middle" fontSize={fs}
+            fill={KT} fontFamily="ui-monospace,monospace" fontWeight={500}>{lbl}</text>}
+        </g>
+      );
+      xp += u * wu; return el;
+    });
+  });
+
+  // ── Schermo ───────────────────────────────────────────────────────────────
+  const hy = baseY + hd, hz = topZ;
+  const ty = hy + 0.085, tz = hz + 0.205;
+  const sp = (xx: number, s: number) => P(xx, hy + s * (ty - hy), hz + s * (tz - hz));
+  const panel = [P(x0, hy, hz), P(x1, hy, hz), P(x1, ty, tz), P(x0, ty, tz)];
+  const scy = (hy + ty) / 2, scz = (hz + tz) / 2;
+  const frontVisible = P(cx, scy - 0.12, scz).depth > P(cx, scy + 0.12, scz).depth;
+  const Os = sp(x1 - 0.012, 0.94), EXs = sp(x0 + 0.012, 0.94), EYs = sp(x1 - 0.012, 0.06);
+  const ms = `matrix(${(EXs.sx - Os.sx).toFixed(3)},${(EXs.sy - Os.sy).toFixed(3)},${(EYs.sx - Os.sx).toFixed(3)},${(EYs.sy - Os.sy).toFixed(3)},${Os.sx.toFixed(2)},${Os.sy.toFixed(2)})`;
+
+  return (
+    <g key="laptop">
+      {base.node}
+      <g transform={mkb}>
+        <defs>
+          <clipPath id="lap-kb-clip">
+            <rect x={0} y={0} width={KB_W} height={KB_H} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#lap-kb-clip)">
+          <rect x={0} y={0} width={KB_W} height={KB_H} fill={KBG} />
+          {keys}
+          {/* touchpad: 6 righe = 6×30 = 180px, touchpad a 186 */}
+          <rect x={126} y={6 * rh + 6} width={348} height={42} rx={5} fill="#3e4145" />
+          <rect x={128} y={6 * rh + 7} width={344} height={39} rx={4} fill="#4a4d52" />
+        </g>
+      </g>
+      <polygon points={join(panel)} fill="#0f1112" stroke="#070809" strokeWidth={0.6} />
+      {frontVisible && <image href="/images/laptop-screen.png" x={0} y={0} width={1} height={1}
+        preserveAspectRatio="none" transform={ms} />}
+    </g>
+  );
+}
+
 // ─── Cattedra (Desk.fbx): corpo antracite, cassetti a NORD, piano verde sopra ──
 // Materiali presi da Desk_Base_Color.PNG: corpo/cassetti scuri, piano (legno) →
 // reso verde omogeneo come richiesto ("verde solo sopra").
@@ -191,7 +278,7 @@ function cattedraUnit(P: Proj, x: number, y: number, key: string): Draw {
       );
     });
   }
-  return { depth: P(x, y, 0).depth, node: <g key={key}>{legW.node}{ped.node}{mod.node}{drawers}{top.node}</g> };
+  return { depth: P(x, y, 0).depth, node: <g key={key}>{legW.node}{ped.node}{mod.node}{drawers}{top.node}{renderLaptop(P, x, y)}</g> };
 }
 
 // ─── Pareti ─────────────────────────────────────────────────────────────────
@@ -392,6 +479,8 @@ function renderWall(P: Proj, w: Wall, pal: Pal, dark: boolean): React.ReactNode 
         </g>,
       );
     }
+    // Termosifone: appartiene alla parete SUD → sfuma con essa (cutaway corretto).
+    els.push(isoBox(P, 5.0, RD - 0.12, 0.08, 0.62, 0.12, 0.8, "#cc3b30", "radiator", 9).node);
   } else if (w.id === "E") {
     // ── Poster cicogna: FOTO reale (public/images/cicogna.jpg) mappata sul muro,
     //    con sagoma vettoriale di riserva sotto (se il file manca). Spostato vicino
@@ -439,33 +528,56 @@ function renderWall(P: Proj, w: Wall, pal: Pal, dark: boolean): React.ReactNode 
 const dot = (p: Pt) => ({ cx: p.sx, cy: p.sy });
 const seg = (a: Pt, b: Pt) => ({ x1: a.sx, y1: a.sy, x2: b.sx, y2: b.sy });
 
-// ─── Sprite prof (billboard pixel) ──────────────────────────────────────────
+// ─── Prof 3D stile Minecraft: testa cubica grande, occhi rettangolari ────────
 function person(P: Proj, x: number, y: number, key: string): Draw {
-  const b = P(x, y, 0);
-  const S = 1.0; // scala px
-  const u = (vx: number, vy: number) => ({ x: b.sx + vx * S, y: b.sy + vy * S });
-  const px = (o: { x: number; y: number }, w: number, h: number, fill: string, k: string) => (
-    <rect key={k} x={o.x - w / 2} y={o.y} width={w} height={h} fill={fill} />
-  );
+  const SKIN  = "#c8835a";  // pelle mediterranea
+  const SCALP = "#b87348";  // testa calva (leggermente più scura, ombreggiata)
+  const BEARD = "#7a4828";  // zona barba/mento
+  const NAVY  = "#1b3a6e";  // polo blu navy
+  const PANT  = "#2e3840";  // pantaloni grigio scuro
+  const SHOE  = "#181e22";  // scarpe nere
+
+  const hy = y - 0.16;      // y della faccia sud della testa (quella verso gli studenti)
+
+  const parts: Draw[] = [
+    // ── Scarpe ──────────────────────────────────────────────────────────────
+    isoBox(P, x - 0.09, y + 0.04, 0.00, 0.11, 0.25, 0.07, SHOE,  `${key}-shL`),
+    isoBox(P, x + 0.09, y + 0.04, 0.00, 0.11, 0.25, 0.07, SHOE,  `${key}-shR`),
+    // ── Gambe (stinchi + cosce) ─────────────────────────────────────────────
+    isoBox(P, x - 0.09, y, 0.07,  0.10, 0.11, 0.39, PANT, `${key}-snL`),
+    isoBox(P, x + 0.09, y, 0.07,  0.10, 0.11, 0.39, PANT, `${key}-snR`),
+    isoBox(P, x - 0.09, y, 0.46,  0.13, 0.14, 0.38, PANT, `${key}-thL`),
+    isoBox(P, x + 0.09, y, 0.46,  0.13, 0.14, 0.38, PANT, `${key}-thR`),
+    // ── Torso taglia L ──────────────────────────────────────────────────────
+    isoBox(P, x, y,        0.84,  0.34, 0.20, 0.52, NAVY, `${key}-tor`),
+    // ── Braccia ─────────────────────────────────────────────────────────────
+    isoBox(P, x - 0.23, y, 0.86,  0.10, 0.12, 0.46, NAVY, `${key}-aL`),
+    isoBox(P, x + 0.23, y, 0.86,  0.10, 0.12, 0.46, NAVY, `${key}-aR`),
+    // ── Mani ────────────────────────────────────────────────────────────────
+    isoBox(P, x - 0.23, y, 0.44,  0.09, 0.10, 0.09, SKIN, `${key}-hnL`),
+    isoBox(P, x + 0.23, y, 0.44,  0.09, 0.10, 0.09, SKIN, `${key}-hnR`),
+    // ── TESTA grande stile Minecraft (0.32 m cubo, ~19% altezza totale) ────
+    isoBox(P, x, y,        1.36,  0.32, 0.32, 0.34, SCALP,`${key}-hd`),
+    // pelle su faccia sud + top (layers sovrapposti di isoBox)
+    isoBox(P, x, hy,       1.36,  0.32, 0.01, 0.34, SKIN, `${key}-face`),
+    // barba: terzo inferiore, faccia sud + lati
+    isoBox(P, x, y,        1.36,  0.32, 0.32, 0.11, BEARD,`${key}-brd`),
+    // ── Occhi Minecraft: rettangoli larghi sporgenti dal muso ───────────────
+    isoBox(P, x - 0.07, hy - 0.015, 1.565, 0.10, 0.02, 0.07, "#160804", `${key}-eL`),
+    isoBox(P, x + 0.07, hy - 0.015, 1.565, 0.10, 0.02, 0.07, "#160804", `${key}-eR`),
+    // sopracciglia (sottile barra scura sopra ogni occhio)
+    isoBox(P, x - 0.07, hy - 0.012, 1.635, 0.10, 0.015, 0.025, "#3a1e0a", `${key}-brL`),
+    isoBox(P, x + 0.07, hy - 0.012, 1.635, 0.10, 0.015, 0.025, "#3a1e0a", `${key}-brR`),
+  ];
+  parts.sort((a, b) => a.depth - b.depth);
+
+  const foot = P(x, y, 0);
   return {
-    depth: b.depth,
+    depth: foot.depth,
     node: (
-      <g key={key} shapeRendering="crispEdges">
-        {/* ombra */}
-        <ellipse cx={b.sx} cy={b.sy} rx={11} ry={4} fill="rgba(0,0,0,0.18)" />
-        {px(u(-6, -16), 5, 16, "#36434c", "legL")}
-        {px(u(1, -16), 5, 16, "#36434c", "legR")}
-        {px(u(-6, -15), 5, 4, "#26313a", "shoeL")}
-        {px(u(1, -15), 5, 4, "#26313a", "shoeR")}
-        {px(u(-8, -34), 16, 19, "#2f7d4a", "body")}
-        {px(u(-12, -33), 4, 15, "#2f7d4a", "armL")}
-        {px(u(8, -33), 4, 15, "#2f7d4a", "armR")}
-        {px(u(-12, -19), 4, 4, "#e8b48c", "handL")}
-        {px(u(8, -19), 4, 4, "#e8b48c", "handR")}
-        {px(u(-5, -45), 10, 11, "#e8b48c", "head")}
-        {px(u(-6, -47), 12, 5, "#3a2a1a", "hair")}
-        {px(u(-4, -40), 2.5, 2, "#2a2018", "eyeL")}
-        {px(u(1.5, -40), 2.5, 2, "#2a2018", "eyeR")}
+      <g key={key}>
+        <ellipse cx={foot.sx} cy={foot.sy} rx={14} ry={5} fill="rgba(0,0,0,0.22)" />
+        {parts.map((p) => p.node)}
       </g>
     ),
   };
@@ -499,6 +611,54 @@ const DESK_ROWS = [2.8, 4.5, 6.2, 7.9];   // y delle 4 righe
 const WEST_COLS = [0.40, 1.28];           // colonne ovest: esterna appoggiata al muro W
 const WEST_COL3 = 2.16;                   // 3ª colonna ovest (solo riga 4)
 
+// ─── Persona seduta che scrive al PC ─────────────────────────────────────────
+function seatedPerson(P: Proj, sx: number, sy: number, key: string, dir = -1): Draw {
+  const SKIN = "#c8835a", SCALP = "#b87348";
+  const NAVY = "#1b3a6e", PANT = "#2e3840", SHOE = "#181e22";
+
+  const cy = sy + 0.46 * dir;  // centro seduta (come in chairUnit)
+
+  const parts: Draw[] = [
+    // Cosce — appoggiate sulla seduta, poco profonde
+    isoBox(P, sx - 0.09, cy, 0.40, 0.13, 0.24, 0.12, PANT, `${key}-thL`),
+    isoBox(P, sx + 0.09, cy, 0.40, 0.13, 0.24, 0.12, PANT, `${key}-thR`),
+    // Stinchi — scendono dal ginocchio, posizionati in avanti della sedia
+    isoBox(P, sx - 0.09, cy + 0.20, 0.06, 0.10, 0.11, 0.36, PANT, `${key}-snL`),
+    isoBox(P, sx + 0.09, cy + 0.20, 0.06, 0.10, 0.11, 0.36, PANT, `${key}-snR`),
+    // Scarpe — sui piedi che toccano il pavimento
+    isoBox(P, sx - 0.09, cy + 0.28, 0.035, 0.11, 0.25, 0.07, SHOE, `${key}-shL`),
+    isoBox(P, sx + 0.09, cy + 0.28, 0.035, 0.11, 0.25, 0.07, SHOE, `${key}-shR`),
+    // Torso
+    isoBox(P, sx, cy, 0.48, 0.34, 0.20, 0.50, NAVY, `${key}-tor`),
+    // Braccia superiori protese verso PC
+    isoBox(P, sx - 0.23, cy + 0.06, 0.82, 0.10, 0.16, 0.10, NAVY, `${key}-uaL`),
+    isoBox(P, sx + 0.23, cy + 0.06, 0.82, 0.10, 0.16, 0.10, NAVY, `${key}-uaR`),
+    // Avambracci verso tastiera
+    isoBox(P, sx - 0.19, cy + 0.18, 0.76, 0.09, 0.15, 0.07, SKIN, `${key}-faL`),
+    isoBox(P, sx + 0.19, cy + 0.18, 0.76, 0.09, 0.15, 0.07, SKIN, `${key}-faR`),
+    // Mani posate sulla tastiera
+    isoBox(P, sx - 0.13, cy + 0.26, 0.74, 0.09, 0.10, 0.05, SKIN, `${key}-hnL`),
+    isoBox(P, sx + 0.13, cy + 0.26, 0.74, 0.09, 0.10, 0.05, SKIN, `${key}-hnR`),
+    // Testa inclinata verso PC
+    isoBox(P, sx, cy - 0.02, 0.98, 0.32, 0.32, 0.34, SCALP, `${key}-hd`),
+  ];
+  parts.sort((a, b) => a.depth - b.depth);
+
+  // Calcola depth considerando la posizione della testa (che è più dietro della sedia)
+  // per assicurare che la persona sia disegnata dietro alla sedia
+  const centerPoint = P(sx, cy, 0);
+  const headDepth = P(sx, cy - 0.16, 0.98).depth;  
+  return {
+    depth: headDepth,
+    node: (
+      <g key={key}>
+        <ellipse cx={centerPoint.sx} cy={centerPoint.sy} rx={14} ry={5} fill="rgba(0,0,0,0.22)" />
+        {parts.map((p) => p.node)}
+      </g>
+    ),
+  };
+}
+
 function buildFurniture(P: Proj): Draw[] {
   const items: Draw[] = [];
 
@@ -511,15 +671,10 @@ function buildFurniture(P: Proj): Draw[] {
     });
   });
 
-  // Cattedra al centro-fronte (in asse con la LIM) + sedia della prof (copiata
-  // dai banchi, rivolta a sud: schienale a nord) allineata al vano gambe.
+  // Cattedra al centro-fronte (in asse con la LIM)
   items.push(cattedraUnit(P, 4.2, 1.4, "cattedra"));
-  items.push(chairUnit(P, 4.2, 1.18, "profchair", -1));
-  items.push(person(P, 4.2, 0.95, "prof"));
-
-  // Termosifone a colonne verticali (proporzioni da radiator.glb, reso rosso),
-  // sotto la finestra destra (parete sud)
-  items.push(isoBox(P, 5.0, 8.88, 0.08, 0.62, 0.12, 0.8, "#cc3b30", "radiator", 9));
+  items.push(chairUnit(P, 4.2, 1.05, "cattedra-chair", -1));
+  items.push(seatedPerson(P, 4.2, 2.15, "docente", -1));
 
   return items;
 }
@@ -548,8 +703,6 @@ function buildShadows(P: Proj): React.ReactNode[] {
     });
   });
   sh.push(shadowQuad(P, 4.2, 1.4, 0.8, 0.4, 0.76, "sh-catt"));
-  sh.push(shadowQuad(P, 4.2, 0.95, 0.22, 0.18, 1.6, "sh-prof"));
-  sh.push(shadowQuad(P, 5.0, 8.88, 0.31, 0.06, 0.85, "sh-rad"));
   return sh;
 }
 
@@ -772,6 +925,7 @@ export default function Aula() {
   const nearWalls = wallView.filter((x) => x.near).sort((a, b) => a.depth - b.depth);
 
   const furniture = buildFurniture(P).sort((a, b) => a.depth - b.depth);
+  const allItems = furniture;
 
   // Bussola
   const dots: Record<string, number> = {
@@ -819,7 +973,7 @@ export default function Aula() {
             {farWalls.map(({ w, opacity }) => (
               <g key={`fw-${w.id}`} className="aula-wall" style={{ opacity }}>{renderWall(P, w, pal, dark)}</g>
             ))}
-            {furniture.map((f, i) => <g key={i}>{f.node}</g>)}
+            {allItems.map((f, i) => <g key={i}>{f.node}</g>)}
             {/* pareti davanti: cutaway, sfumano per far vedere dentro */}
             {nearWalls.map(({ w, opacity }) => (
               <g key={`nw-${w.id}`} className="aula-wall" style={{ opacity }}>{renderWall(P, w, pal, dark)}</g>
@@ -953,6 +1107,7 @@ export default function Aula() {
           flex-shrink: 0; margin: 0; padding: 0.55rem 1rem 0.8rem;
           font-size: 0.82rem; color: #5b6b61; text-align: center;
         }
+
 
         /* ── Dark / night mode ── */
         .aula-page.dark { background: #0e140f; color: #d4e8dc; }
