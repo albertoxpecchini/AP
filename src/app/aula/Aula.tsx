@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, RotateCcw, Moon, Sun, Hand } from "lucide-react";
+import { ArrowLeft, RotateCcw, Moon, Sun, Hand, ZoomIn, ZoomOut } from "lucide-react";
 
 // ─── Modello stanza (metri) ─────────────────────────────────────────────────
 // x = Est-Ovest (corto) · y = Nord-Sud (lungo) · z = altezza
@@ -14,6 +14,10 @@ const WAINSCOT = 1.5; // porzione bassa gialla
 const ISO_X = 25;
 const ISO_Y = 12.5;
 const ISO_Z = 30;
+
+// Zoom vettoriale (scale CSS sull'SVG → nitidezza cartoon sempre intatta).
+const ZOOM_MIN = 0.6;
+const ZOOM_MAX = 4;
 
 type Pt = { sx: number; sy: number; depth: number };
 type Proj = (x: number, y: number, z: number) => Pt;
@@ -216,7 +220,141 @@ interface Pal {
   glass: string; winFrame: string;
 }
 
-function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
+// ─── Sacca portatelefoni (parete N, a sinistra della porta, quasi nell'angolo) ─
+// Organizer da muro 6×5 (numeri 1-30): corpo 3D che sporge dal muro + tasche con
+// "bocca" scura (si vede che il telefono ci entra). Colori/proporzioni 1:1 con la foto.
+function renderPhoneBag(P: Proj): React.ReactNode {
+  const x0 = 0.07, x1 = 0.69, zBot = 1.05, zTop = 1.85;     // ingombro sul muro N
+  const xc = (x0 + x1) / 2, w = x1 - x0, h = zTop - zBot;
+  const depth = 0.06, yc = depth / 2, yF = depth;            // sporgenza nella stanza
+
+  const body = isoBox(P, xc, yc, zBot, w, depth, h, "#1b2746", "phonebag-body");
+
+  // Faccia frontale → sistema di coordinate locale: disegno tutto piatto (griglia,
+  // numeri) e la matrice lo "incolla" in prospettiva sul muro (resta vettoriale).
+  const W = 600, H = Math.round((600 * h) / w);
+  const O = P(x0, yF, zTop), EXp = P(x1, yF, zTop), EYp = P(x0, yF, zBot);
+  const a = (EXp.sx - O.sx) / W, b = (EXp.sy - O.sy) / W;
+  const c = (EYp.sx - O.sx) / H, d = (EYp.sy - O.sy) / H;
+  const mat = `matrix(${a.toFixed(4)},${b.toFixed(4)},${c.toFixed(4)},${d.toFixed(4)},${O.sx.toFixed(2)},${O.sy.toFixed(2)})`;
+
+  const COLS = 6, ROWS = 5, band = 60;
+  const gridH = H - band, cw = W / COLS, ch = gridH / ROWS;
+  const cells: React.ReactNode[] = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let col = 0; col < COLS; col++) {
+      const n = r * COLS + col + 1;
+      const pad = 7;
+      const rx = col * cw + pad, ry = band + r * ch + pad;
+      const rw = cw - pad * 2, rh = ch - pad * 2;
+      cells.push(
+        <g key={`pb-${n}`}>
+          <rect x={rx} y={ry} width={rw} height={rh} rx={5} fill="#0e1428" />
+          <rect x={rx} y={ry + 13} width={rw} height={rh - 13} rx={5} fill="#27365d" />
+          <rect x={rx + 2} y={ry + 13} width={rw - 4} height={8} fill="#aab3c0" opacity={0.85} />
+          <rect x={rx} y={ry + rh - 3} width={rw} height={4} rx={2} fill="#0a0f1e" opacity={0.55} />
+          <text x={rx + rw / 2} y={ry + rh / 2 + 13} textAnchor="middle" fontSize={34} fontWeight={800}
+            fill="#ffffff" fontFamily="'Titillium Web', sans-serif">{n}</text>
+        </g>,
+      );
+    }
+  }
+
+  return (
+    <g key="phonebag">
+      {body.node}
+      <g transform={mat}>
+        <rect x={0} y={0} width={W} height={H} fill="#1b2746" />
+        <rect x={0} y={0} width={W} height={band} fill="#f3c11d" />
+        {[0.16, 0.38, 0.62, 0.84].map((t, i) => (
+          <circle key={`g${i}`} cx={t * W} cy={band / 2} r={9} fill="#cdd2d7" stroke="#8a9096" strokeWidth={2} />
+        ))}
+        {cells}
+      </g>
+    </g>
+  );
+}
+
+// ─── Proiettore short-throw realistico (staffa bianca, ~50 cm dal muro) ───────
+// Tutte le parti sono volumi ordinati per profondità: restano attaccate alla
+// staffa a qualsiasi angolo (niente pezzi che fluttuano ruotando la visuale).
+const PJ_CX = 4.2;
+const PJ_LENS: [number, number, number] = [PJ_CX, 0.73, 2.40]; // muso/lente, punta alla LIM
+function renderProjector(P: Proj): React.ReactNode {
+  const cx = PJ_CX;
+  const parts: Draw[] = [
+    isoBox(P, cx, 0.05, 2.58, 0.26, 0.12, 0.24, "#e9eae8", "pj-plate"),    // piastra a muro
+    isoBox(P, cx, 0.31, 2.74, 0.10, 0.58, 0.05, "#eef0ee", "pj-arm"),      // braccio (~50 cm)
+    isoBox(P, cx, 0.52, 2.58, 0.12, 0.16, 0.18, "#eef0ee", "pj-yoke"),     // staffa che regge il corpo
+    isoBox(P, cx, 0.50, 2.44, 0.46, 0.30, 0.16, "#f5f5f3", "pj-body"),     // corpo
+    isoBox(P, cx, 0.50, 2.595, 0.40, 0.26, 0.02, "#e6e7e4", "pj-vent"),    // sfiato superiore
+    isoBox(P, cx, 0.66, 2.40, 0.24, 0.16, 0.11, "#d7dadc", "pj-lensblk"),  // blocco obiettivo (muso, in basso)
+  ];
+  parts.sort((a, b) => a.depth - b.depth);
+  const l = P(PJ_LENS[0], PJ_LENS[1], PJ_LENS[2]);
+  const le = P(PJ_LENS[0] + 0.06, PJ_LENS[1], PJ_LENS[2]);
+  const lr = Math.hypot(le.sx - l.sx, le.sy - l.sy) || 3;
+  return (
+    <g key="projector">
+      {parts.map((p) => p.node)}
+      {/* lente (faro) sul muso, rivolta verso la LIM */}
+      <ellipse cx={l.sx} cy={l.sy} rx={lr * 1.3} ry={lr * 1.05} fill="#16242f" stroke="#777b7f" strokeWidth={0.8} />
+      <ellipse cx={l.sx} cy={l.sy} rx={lr * 0.72} ry={lr * 0.58} fill="#2f4456" />
+      <circle cx={l.sx - lr * 0.35} cy={l.sy - lr * 0.3} r={lr * 0.2} fill="#cfe9fb" opacity={0.95} />
+      <circle {...dot(P(cx + 0.20, 0.56, 2.48))} r={1.4} fill="#3ad27c" />
+    </g>
+  );
+}
+
+// ─── LIM in rilievo: cornice acciaio 3 cm, schermo col desktop Windows, luminosa ─
+function renderLim(P: Proj, w: Wall, dark: boolean): React.ReactNode {
+  void w;
+  const x0 = 3.0, x1 = 5.4, zB = 1.05, zT = 2.55;     // top allungato → più alta
+  const fr = 0.03, dp = 0.05, cx = (x0 + x1) / 2;       // cornice 3 cm · rilievo · asse 4.2 (cattedra)
+  const sx0 = x0 + fr, sx1 = x1 - fr, szB = zB + fr, szT = zT - fr;
+
+  const body = isoBox(P, cx, dp / 2, zB, x1 - x0, dp, zT - zB, "#c4c8cb", "lim-body");
+  const frame = [P(x0, dp, zB), P(x1, dp, zB), P(x1, dp, zT), P(x0, dp, zT)];
+  const screen = [P(sx0, dp, szB), P(sx1, dp, szB), P(sx1, dp, szT), P(sx0, dp, szT)];
+
+  const O = P(sx0, dp, szT), EX = P(sx1, dp, szT), EY = P(sx0, dp, szB);
+  const m = `matrix(${(EX.sx - O.sx).toFixed(3)},${(EX.sy - O.sy).toFixed(3)},${(EY.sx - O.sx).toFixed(3)},${(EY.sy - O.sy).toFixed(3)},${O.sx.toFixed(2)},${O.sy.toFixed(2)})`;
+
+  // Faro: cono di luce dalla lente del proiettore fin sulla LIM (apice = lente).
+  const coneOuter = [P(cx - 0.06, 0.70, 2.40), P(cx + 0.06, 0.70, 2.40), P(sx1, dp, szB), P(sx0, dp, szB)];
+  const coneCore = [P(cx - 0.025, 0.70, 2.40), P(cx + 0.025, 0.70, 2.40), P(sx1 - 0.35, dp, szB + 0.15), P(sx0 + 0.35, dp, szB + 0.15)];
+
+  return (
+    <g key="lim">
+      <defs>
+        <filter id="limGlowF" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="7" />
+        </filter>
+        <radialGradient id="limScreenLight" cx="50%" cy="40%" r="75%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity={dark ? 0.55 : 0.34} />
+          <stop offset="55%" stopColor="#dce9ff" stopOpacity={0.12} />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
+        </radialGradient>
+      </defs>
+      {/* alone: la LIM proietta luce sul muro */}
+      <polygon points={join(frame)} fill={dark ? "#bfe0ff" : "#eaf4ff"} opacity={dark ? 0.9 : 0.5} filter="url(#limGlowF)" />
+      {/* corpo in rilievo + cornice acciaio sottile */}
+      {body.node}
+      <polygon points={join(frame)} fill="#cdd1d4" stroke="#969ca0" strokeWidth={0.8} />
+      <polygon points={join(frame)} fill="none" stroke="#f2f4f5" strokeWidth={0.4} />
+      {/* schermo: nero + desktop Windows + luce emessa */}
+      <polygon points={join(screen)} fill="#0b1626" />
+      <image href="/images/windows-desktop.jpg" x={0} y={0} width={1} height={1} preserveAspectRatio="none" transform={m} />
+      <polygon points={join(screen)} fill="url(#limScreenLight)" />
+      {/* faro: cono di luce verso la LIM + proiettore */}
+      <polygon points={join(coneOuter)} fill="#ffffff" opacity={dark ? 0.16 : 0.09} />
+      <polygon points={join(coneCore)} fill="#eaf3ff" opacity={dark ? 0.26 : 0.14} />
+      {renderProjector(P)}
+    </g>
+  );
+}
+
+function renderWall(P: Proj, w: Wall, pal: Pal, dark: boolean): React.ReactNode {
   const els: React.ReactNode[] = [
     <polygon key="y" points={join(wallBand(P, w, 0, WAINSCOT))} fill={pal.yellow} />,
     <polygon key="w" points={join(wallBand(P, w, WAINSCOT, RH))} fill={pal.white} />,
@@ -234,14 +372,10 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
         <circle {...dot(wp(P, w, 1.68, 1.05))} r={2} fill="#5c6469" />
       </g>,
     );
-    // LIM al centro, dietro la cattedra
-    els.push(
-      <g key="lim">
-        <polygon points={join(mountQuad(P, w, 3.0, 5.4, 1.05, 2.3))} fill="#2b3a47" stroke="#1c2730" strokeWidth={0.8} />
-        <polygon points={join(mountQuad(P, w, 3.14, 5.26, 1.18, 2.17))} fill="#16212b" />
-        <circle {...dot(wp(P, w, 5.18, 1.22))} r={1.5} fill="#3a6f4a" />
-      </g>,
-    );
+    // LIM in rilievo (cornice acciaio), schermo Windows luminoso, proiettore sopra
+    els.push(renderLim(P, w, dark));
+    // Sacca portatelefoni nell'angolo NO, a sinistra della porta
+    els.push(renderPhoneBag(P));
   } else if (w.id === "S") {
     // 2 finestre alte e strette, cornice nera (3 specchiature)
     for (const [c, key] of [[3.0, "w0"], [5.0, "w1"]] as [number, string][]) {
@@ -259,36 +393,42 @@ function renderWall(P: Proj, w: Wall, pal: Pal): React.ReactNode {
       );
     }
   } else if (w.id === "E") {
-    // Poster cicogna (sfondo senape, sagoma bianca)
+    // ── Poster cicogna: FOTO reale (public/images/cicogna.jpg) mappata sul muro,
+    //    con sagoma vettoriale di riserva sotto (se il file manca). Spostato vicino
+    //    e a destra del PC e abbassato di 50 cm. Rettangolo verticale come la foto. ──
+    const U0 = 1.62, U1 = 2.42, V0 = 0.90, V1 = 2.00; // y lungo il muro · z in altezza
+    // rimappa i punti della sagoma originale (rect 3.7..4.9 / 1.4..2.4) nel nuovo poster
+    const sp = (u: number, v: number) =>
+      wp(P, w, U0 + ((u - 3.7) / 1.2) * (U1 - U0), V0 + ((v - 1.4) / 1.0) * (V1 - V0));
+    // matrice: quadrato unitario dell'immagine → parallelogramma del muro
+    const o = wp(P, w, U0, V1), ex = wp(P, w, U1, V1), ey = wp(P, w, U0, V0);
+    const m = `matrix(${(ex.sx - o.sx).toFixed(3)},${(ex.sy - o.sy).toFixed(3)},${(ey.sx - o.sx).toFixed(3)},${(ey.sy - o.sy).toFixed(3)},${o.sx.toFixed(2)},${o.sy.toFixed(2)})`;
     els.push(
       <g key="poster">
-        <polygon points={join(mountQuad(P, w, 3.7, 4.9, 1.4, 2.4))} fill="#d9a441" stroke="#b6862f" strokeWidth={0.8} />
-        <polygon points={join([
-          wp(P, w, 4.05, 1.95), wp(P, w, 4.35, 2.02), wp(P, w, 4.62, 1.97),
-          wp(P, w, 4.66, 1.86), wp(P, w, 4.45, 1.78), wp(P, w, 4.10, 1.80),
-        ])} fill="#fbfbf7" />
-        <polygon points={join([
-          wp(P, w, 4.05, 1.95), wp(P, w, 3.88, 2.22), wp(P, w, 3.96, 2.24), wp(P, w, 4.14, 2.00),
-        ])} fill="#fbfbf7" />
-        <polygon points={join([wp(P, w, 3.88, 2.22), wp(P, w, 3.72, 2.16), wp(P, w, 3.90, 2.13)])} fill="#fbfbf7" />
-        <line {...seg(wp(P, w, 4.18, 1.79), wp(P, w, 4.16, 1.46))} stroke="#fbfbf7" strokeWidth={1.7} strokeLinecap="round" />
-        <line {...seg(wp(P, w, 4.40, 1.79), wp(P, w, 4.42, 1.46))} stroke="#fbfbf7" strokeWidth={1.7} strokeLinecap="round" />
+        <polygon points={join(mountQuad(P, w, U0, U1, V0, V1))} fill="#df9a2b" stroke="#b6862f" strokeWidth={0.8} />
+        {/* sagoma di riserva: visibile finché non aggiungi la foto */}
+        <polygon points={join([sp(4.05, 1.95), sp(4.35, 2.02), sp(4.62, 1.97), sp(4.66, 1.86), sp(4.45, 1.78), sp(4.10, 1.80)])} fill="#fbfbf7" />
+        <polygon points={join([sp(4.05, 1.95), sp(3.88, 2.22), sp(3.96, 2.24), sp(4.14, 2.00)])} fill="#fbfbf7" />
+        <polygon points={join([sp(3.88, 2.22), sp(3.72, 2.16), sp(3.90, 2.13)])} fill="#fbfbf7" />
+        <line {...seg(sp(4.18, 1.79), sp(4.16, 1.46))} stroke="#fbfbf7" strokeWidth={1.7} strokeLinecap="round" />
+        <line {...seg(sp(4.40, 1.79), sp(4.42, 1.46))} stroke="#fbfbf7" strokeWidth={1.7} strokeLinecap="round" />
+        {/* FOTO reale sovrapposta (in SVG un href mancante non mostra nulla → resta la sagoma) */}
+        <image href="/images/cicogna.jpg" x={0} y={0} width={1} height={1} preserveAspectRatio="none" transform={m} />
       </g>,
     );
-    // Box di sicurezza per il notebook del prof (collegato alla LIM), a muro in
-    // alto sulla parete est, verso l'angolo nord-est. Armadietto sporgente, aperto col laptop.
+    // ── PC del prof (notebook a muro) — abbassato di 50 cm ──
     const fx = 7.78; // faccia frontale (ovest, verso la stanza)
     const fq = (y0: number, y1: number, z0: number, z1: number) =>
       join([P(fx, y0, z0), P(fx, y1, z0), P(fx, y1, z1), P(fx, y0, z1)]);
     els.push(
       <g key="secbox">
-        {isoBox(P, 7.89, 1.2, 1.55, 0.22, 0.58, 0.6, "#d7dbde", "sb-body").node}
-        <polygon points={fq(1.00, 1.40, 1.61, 2.09)} fill="#262b2e" />
-        <polygon points={fq(1.06, 1.34, 1.66, 2.02)} fill="#0e1418" />
-        <polygon points={fq(1.08, 1.32, 1.68, 2.00)} fill="#37525f" />
-        {isoBox(P, 7.68, 1.2, 1.585, 0.22, 0.48, 0.035, "#c6cbce", "sb-tray").node}
-        {isoBox(P, 7.66, 1.2, 1.62, 0.18, 0.42, 0.02, "#aeb4b8", "sb-kbd").node}
-        <circle {...dot(P(fx, 1.44, 1.86))} r={1.6} fill="#5c6469" />
+        {isoBox(P, 7.89, 1.2, 1.05, 0.22, 0.58, 0.6, "#d7dbde", "sb-body").node}
+        <polygon points={fq(1.00, 1.40, 1.11, 1.59)} fill="#262b2e" />
+        <polygon points={fq(1.06, 1.34, 1.16, 1.52)} fill="#0e1418" />
+        <polygon points={fq(1.08, 1.32, 1.18, 1.50)} fill="#37525f" />
+        {isoBox(P, 7.68, 1.2, 1.085, 0.22, 0.48, 0.035, "#c6cbce", "sb-tray").node}
+        {isoBox(P, 7.66, 1.2, 1.12, 0.18, 0.42, 0.02, "#aeb4b8", "sb-kbd").node}
+        <circle {...dot(P(fx, 1.44, 1.36))} r={1.6} fill="#5c6469" />
       </g>,
     );
   }
@@ -384,9 +524,40 @@ function buildFurniture(P: Proj): Draw[] {
   return items;
 }
 
+// ─── Ombre a terra ────────────────────────────────────────────────────────────
+// Luce dalle finestre (parete sud) → le ombre cadono verso nord. L'ombra è la
+// pianta dell'oggetto sghembata verso nord, lunga in proporzione all'altezza.
+function shadowQuad(P: Proj, x: number, y: number, hw: number, hd: number, h: number, key: string): React.ReactNode {
+  const lx = 0.16, ly = -0.5;            // direzione luce (sud→nord, leggermente da est)
+  const ox = lx * h, oy = ly * h;
+  const pts = [
+    P(x - hw, y + hd, 0), P(x + hw, y + hd, 0),
+    P(x + hw + ox, y - hd + oy, 0), P(x - hw + ox, y - hd + oy, 0),
+  ];
+  return <polygon key={key} points={join(pts)} />;
+}
+
+function buildShadows(P: Proj): React.ReactNode[] {
+  const sh: React.ReactNode[] = [];
+  DESK_ROWS.forEach((y, ri) => {
+    const west = ri === DESK_ROWS.length - 1 ? [...WEST_COLS, WEST_COL3] : WEST_COLS;
+    const cols = [...west, ...west.map((x) => RW - x)];
+    cols.forEach((x, ci) => {
+      sh.push(shadowQuad(P, x, y, 0.33, 0.25, 0.6, `shd-${ri}-${ci}`));
+      sh.push(shadowQuad(P, x, y + 0.46, 0.21, 0.21, 0.82, `shc-${ri}-${ci}`));
+    });
+  });
+  sh.push(shadowQuad(P, 4.2, 1.4, 0.8, 0.4, 0.76, "sh-catt"));
+  sh.push(shadowQuad(P, 4.2, 0.95, 0.22, 0.18, 1.6, "sh-prof"));
+  sh.push(shadowQuad(P, 5.0, 8.88, 0.31, 0.06, 0.85, "sh-rad"));
+  return sh;
+}
+
 // ─── Componente ──────────────────────────────────────────────────────────────
 export default function Aula() {
-  const [angle, setAngle] = useState(0);
+  const [angle, setAngle] = useState(0);   // rotazione orizzontale (un solo cerchio)
+  // Vista: zoom + centro normalizzato (0..1) del viewBox sul box base → zoom-al-punto.
+  const [view, setView] = useState({ cx: 0.5, cy: 0.5, zoom: 1 });
   const [dark, setDark] = useState(() => {
     try {
       const s = localStorage.getItem("games-dark");
@@ -396,10 +567,48 @@ export default function Aula() {
   });
 
   const angleRef = useRef(0);
+  const viewRef = useRef(view);
+  const baseRef = useRef({ x: 0, y: 0, w: 1, h: 1 }); // viewBox base (auto-fit) corrente
   const rafRef = useRef<number>(0);
-  const dragRef = useRef({ x: 0, a: 0, moved: false, active: false, onHand: false });
+  const stageRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  // Puntatori attivi: 1 = ruota (cerchio orizzontale) · 2 = pinch-zoom.
+  const ptrs = useRef(new Map<number, { x: number; y: number }>());
+  const gest = useRef({ mode: "none" as "none" | "rot" | "pinch", x: 0, a: 0, moved: false, onHand: false, dist: 1, z: 1 });
 
   useEffect(() => { angleRef.current = angle; }, [angle]);
+  useEffect(() => { viewRef.current = view; }, [view]);
+
+  const applyView = useCallback((cx: number, cy: number, zoom: number) => {
+    let z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom));
+    if (z <= 1.0001) { cx = 0.5; cy = 0.5; z = Math.min(z, 1); } // a zoom 1 si ricentra
+    const nv = { cx, cy, zoom: z };
+    setView(nv); viewRef.current = nv;
+  }, []);
+
+  // Zoom tenendo FERMO il punto sotto la mano (clientX/clientY) — zoom-al-punto.
+  const zoomAt = useCallback((clientX: number, clientY: number, factor: number) => {
+    const svg = svgRef.current, base = baseRef.current, v = viewRef.current;
+    if (!svg) return;
+    const z2 = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, v.zoom * factor));
+    if (z2 === v.zoom) return;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const pt = svg.createSVGPoint(); pt.x = clientX; pt.y = clientY;
+    const U = pt.matrixTransform(ctm.inverse());            // punto sotto la mano (coord SVG)
+    const vw0 = base.w / v.zoom, vh0 = base.h / v.zoom;
+    const vx0 = base.x + v.cx * base.w - vw0 / 2, vy0 = base.y + v.cy * base.h - vh0 / 2;
+    const fracX = (U.x - vx0) / vw0, fracY = (U.y - vy0) / vh0;
+    const vw2 = base.w / z2, vh2 = base.h / z2;
+    const vx2 = U.x - fracX * vw2, vy2 = U.y - fracY * vh2;  // lo stesso punto resta sotto la mano
+    applyView((vx2 + vw2 / 2 - base.x) / base.w, (vy2 + vh2 / 2 - base.y) / base.h, z2);
+  }, [applyView]);
+
+  const zoomCentered = useCallback((factor: number) => {
+    const v = viewRef.current;
+    applyView(v.cx, v.cy, v.zoom * factor);
+  }, [applyView]);
 
   const tweenTo = useCallback((target: number) => {
     cancelAnimationFrame(rafRef.current);
@@ -421,31 +630,55 @@ export default function Aula() {
     tweenTo(Math.round(angleRef.current / 90) * 90 + dir * 90);
   }, [tweenTo]);
 
-  const onMove = useCallback((clientX: number) => {
-    const d = dragRef.current;
-    if (!d.active) return;
-    const dx = clientX - d.x;
-    if (Math.abs(dx) > 4) d.moved = true;
-    const na = d.a - dx / 2.0;
-    setAngle(na); angleRef.current = na;
-  }, []);
-
-  const onUp = useCallback(() => {
-    const d = dragRef.current;
-    if (!d.active) return;
-    d.active = false;
-    if (!d.moved) { if (d.onHand) rotateStep(1); }
-    else tweenTo(Math.round(angleRef.current / 90) * 90);
-  }, [rotateStep, tweenTo]);
-
-  const startDrag = useCallback((clientX: number, onHand: boolean) => {
+  // ── Gesti: trascina = ruota in cerchio · due dita = pinch-zoom ──
+  const pointerDown = useCallback((e: React.PointerEvent, onHand: boolean) => {
     cancelAnimationFrame(rafRef.current);
-    dragRef.current = { x: clientX, a: angleRef.current, moved: false, active: true, onHand };
+    ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const g = gest.current;
+    if (ptrs.current.size >= 2) {
+      const [a, b] = [...ptrs.current.values()];
+      g.mode = "pinch"; g.dist = Math.hypot(a.x - b.x, a.y - b.y) || 1; g.z = viewRef.current.zoom; g.moved = true;
+    } else {
+      g.mode = "rot"; g.x = e.clientX; g.a = angleRef.current; g.moved = false; g.onHand = onHand;
+    }
   }, []);
+
+  const pointerMove = useCallback((e: PointerEvent) => {
+    const p = ptrs.current.get(e.pointerId);
+    if (!p) return;
+    p.x = e.clientX; p.y = e.clientY;
+    const g = gest.current;
+    if (g.mode === "rot") {
+      const dx = e.clientX - g.x;
+      if (Math.abs(dx) > 4) g.moved = true;
+      const na = g.a - dx / 2.0;
+      setAngle(na); angleRef.current = na;
+    } else if (g.mode === "pinch") {
+      const [a, b] = [...ptrs.current.values()];
+      if (!a || !b) return;
+      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      const target = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, g.z * (dist / g.dist)));
+      zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, target / viewRef.current.zoom); // verso il centro delle dita
+    }
+  }, [zoomAt]);
+
+  const pointerUp = useCallback((e: PointerEvent) => {
+    if (!ptrs.current.delete(e.pointerId)) return;
+    const g = gest.current;
+    if (g.mode === "rot") {
+      if (!g.moved && g.onHand) rotateStep(1); // tap manina = +90° (come il tasto rotazione di The Sims)
+      g.mode = "none";                          // niente snap: il cerchio si ferma dove lo lasci
+    } else if (g.mode === "pinch") {
+      if (ptrs.current.size === 1) {
+        const [only] = [...ptrs.current.values()];
+        g.mode = "rot"; g.x = only.x; g.a = angleRef.current; g.moved = true; g.onHand = false;
+      } else g.mode = "none";
+    }
+  }, [rotateStep]);
 
   useEffect(() => {
-    const move = (e: PointerEvent) => onMove(e.clientX);
-    const up = () => onUp();
+    const move = (e: PointerEvent) => pointerMove(e);
+    const up = (e: PointerEvent) => pointerUp(e);
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", up);
@@ -454,21 +687,40 @@ export default function Aula() {
       window.removeEventListener("pointerup", up);
       window.removeEventListener("pointercancel", up);
     };
-  }, [onMove, onUp]);
+  }, [pointerMove, pointerUp]);
+
+  // Rotella = zoom (listener nativo non-passive per usare preventDefault).
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015)); // zoom dove c'è il puntatore
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [zoomAt]);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") rotateStep(-1);
       else if (e.key === "ArrowRight") rotateStep(1);
+      else if (e.key === "+" || e.key === "=") zoomCentered(1.15);
+      else if (e.key === "-" || e.key === "_") zoomCentered(1 / 1.15);
+      else return;
+      e.preventDefault();
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [rotateStep]);
+  }, [rotateStep, zoomCentered]);
 
   const toggleDark = useCallback(() => {
     setDark((d) => { const n = !d; try { localStorage.setItem("games-dark", n ? "1" : "0"); } catch {} return n; });
   }, []);
-  const resetView = useCallback(() => tweenTo(Math.round(angleRef.current / 360) * 360), [tweenTo]);
+  const resetView = useCallback(() => {
+    tweenTo(Math.round(angleRef.current / 360) * 360);
+    applyView(0.5, 0.5, 1);
+  }, [tweenTo, applyView]);
 
   // ── Costruzione scena ──
   const P = makeProject(angle);
@@ -480,8 +732,15 @@ export default function Aula() {
     minX = Math.min(minX, p.sx); maxX = Math.max(maxX, p.sx);
     minY = Math.min(minY, p.sy); maxY = Math.max(maxY, p.sy);
   }
+  // Zoom VETTORIALE: si stringe il viewBox (resta nitido) attorno al punto scelto
+  // (view.cx/cy normalizzati sul box base) → zoom dove tieni la mano.
   const pad = 26;
-  const vb = `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`;
+  const baseX = minX - pad, baseY = minY - pad;
+  const baseW = maxX - minX + pad * 2, baseH = maxY - minY + pad * 2;
+  baseRef.current = { x: baseX, y: baseY, w: baseW, h: baseH };
+  const vw = baseW / view.zoom, vh = baseH / view.zoom;
+  const vx = baseX + view.cx * baseW - vw / 2, vy = baseY + view.cy * baseH - vh / 2;
+  const vb = `${vx} ${vy} ${vw} ${vh}`;
 
   // Palette giorno/notte
   const pal: Pal = {
@@ -490,27 +749,34 @@ export default function Aula() {
   };
   const floorA = "#f3c9d0", floorB = "#efbcc6", dotC = "#e29bab";
 
-  // Pareti di fondo = le 2 di profondità minore (le 2 vicine sono "tagliate")
-  const wallsByDepth = WALLS
-    .map((w) => ({ w, d: (P(w.p1[0], w.p1[1], 0).depth + P(w.p2[0], w.p2[1], 0).depth) / 2 }))
-    .sort((a, b) => a.d - b.d);
-  const back = [wallsByDepth[0].w, wallsByDepth[1].w].sort(
-    (a, b) => (P(a.p1[0], a.p1[1], 0).depth + P(a.p2[0], a.p2[1], 0).depth) -
-              (P(b.p1[0], b.p1[1], 0).depth + P(b.p2[0], b.p2[1], 0).depth),
-  );
-
-  const furniture = buildFurniture(P).sort((a, b) => a.depth - b.depth);
-
-  // Bussola: direzione "verso lo spettatore" in coord stanza
+  // Direzione "verso lo spettatore" in coordinate stanza (cutaway + bussola).
   const ar = (angle * Math.PI) / 180;
   const dEast = Math.cos(ar) + Math.sin(ar);
   const dSouth = -Math.sin(ar) + Math.cos(ar);
   const dlen = Math.hypot(dEast, dSouth) || 1;
+
+  // Cutaway stile The Sims: ogni parete sfuma in base a quanto è rivolta verso
+  // lo spettatore. Normale uscente · direzione spettatore > 0 ⇒ parete davanti
+  // (si vede dentro) ⇒ diventa trasparente; ≤ 0 ⇒ parete di fondo ⇒ opaca.
+  // La transizione di opacità (CSS) dà la dissolvenza quando ruoti.
+  const WALL_NORMALS: Record<Wall["id"], [number, number]> = {
+    N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0],
+  };
+  const wallView = WALLS.map((w) => {
+    const facing = (WALL_NORMALS[w.id][0] * dEast + WALL_NORMALS[w.id][1] * dSouth) / dlen;
+    const depth = (P(w.p1[0], w.p1[1], 0).depth + P(w.p2[0], w.p2[1], 0).depth) / 2;
+    const opacity = facing > 0 ? Math.max(0, 1 - facing * 2.2) : 1;
+    return { w, depth, opacity, near: facing > 0 };
+  });
+  const farWalls = wallView.filter((x) => !x.near).sort((a, b) => a.depth - b.depth);
+  const nearWalls = wallView.filter((x) => x.near).sort((a, b) => a.depth - b.depth);
+
+  const furniture = buildFurniture(P).sort((a, b) => a.depth - b.depth);
+
+  // Bussola
   const dots: Record<string, number> = {
-    N: (0 * dEast + -1 * dSouth) / dlen,
-    S: (0 * dEast + 1 * dSouth) / dlen,
-    E: (1 * dEast + 0 * dSouth) / dlen,
-    W: (-1 * dEast + 0 * dSouth) / dlen,
+    N: (-1 * dSouth) / dlen, S: (1 * dSouth) / dlen,
+    E: (1 * dEast) / dlen, W: (-1 * dEast) / dlen,
   };
   const maxDot = Math.max(...Object.values(dots));
   const isFront = (c: string) => dots[c] >= maxDot - 0.35;
@@ -534,14 +800,30 @@ export default function Aula() {
       </header>
 
       <div
+        ref={stageRef}
         className="aula-stage"
-        onPointerDown={(e) => startDrag(e.clientX, false)}
+        onPointerDown={(e) => pointerDown(e, false)}
       >
-        <svg className="aula-svg" viewBox={vb} preserveAspectRatio="xMidYMid meet" aria-label="Aula isometrica 5BT">
+        <svg
+          ref={svgRef}
+          className="aula-svg"
+          viewBox={vb}
+          preserveAspectRatio="xMidYMid meet"
+          aria-label="Aula isometrica 5BT"
+        >
           <g className="aula-scene">
             {buildFloor(P, floorA, floorB, dotC)}
-            {back.map((w) => renderWall(P, w, pal))}
+            {/* ombre a terra: luce dalle finestre (sud) → ombre verso nord */}
+            <g className="aula-shadows" fill="#0d1018" opacity={0.16}>{buildShadows(P)}</g>
+            {/* pareti di fondo (opache) */}
+            {farWalls.map(({ w, opacity }) => (
+              <g key={`fw-${w.id}`} className="aula-wall" style={{ opacity }}>{renderWall(P, w, pal, dark)}</g>
+            ))}
             {furniture.map((f, i) => <g key={i}>{f.node}</g>)}
+            {/* pareti davanti: cutaway, sfumano per far vedere dentro */}
+            {nearWalls.map(({ w, opacity }) => (
+              <g key={`nw-${w.id}`} className="aula-wall" style={{ opacity }}>{renderWall(P, w, pal, dark)}</g>
+            ))}
           </g>
         </svg>
 
@@ -561,17 +843,27 @@ export default function Aula() {
           ))}
         </svg>
 
+        {/* Controlli zoom */}
+        <div className="aula-zoom">
+          <button className="aula-zoombtn" aria-label="Ingrandisci" onClick={() => zoomCentered(1.25)}>
+            <ZoomIn size={20} />
+          </button>
+          <button className="aula-zoombtn" aria-label="Riduci" onClick={() => zoomCentered(1 / 1.25)}>
+            <ZoomOut size={20} />
+          </button>
+        </div>
+
         {/* Manina */}
         <button
           className="aula-hand"
           aria-label="Ruota la classe (trascina o tocca)"
-          onPointerDown={(e) => { e.stopPropagation(); startDrag(e.clientX, true); }}
+          onPointerDown={(e) => { e.stopPropagation(); pointerDown(e, true); }}
         >
           <Hand size={26} />
         </button>
       </div>
 
-      <p className="aula-caption">Trascina la manina per ruotare la classe · ← → per girare</p>
+      <p className="aula-caption">Trascina per girare la classe · pizzica o rotella per lo zoom · ← → per ruotare</p>
 
       <style>{`
         .aula-page {
@@ -613,16 +905,33 @@ export default function Aula() {
           padding: 14px;
           cursor: grab;
           touch-action: none;
+          overflow: hidden;
           background: radial-gradient(ellipse at 50% 42%, #ffffff 0%, #e7ebe8 70%, #dde2de 100%);
         }
         .aula-stage:active { cursor: grabbing; }
         .aula-svg { display: block; width: 100%; height: 100%; }
         .aula-scene { transition: opacity .12s ease; }
+        /* dissolvenza del cutaway: le pareti davanti compaiono/spariscono morbide */
+        .aula-wall { transition: opacity .35s ease; }
 
         .aula-compass {
           position: absolute; top: 14px; left: 14px;
           width: 64px; height: 64px; pointer-events: none;
         }
+        .aula-zoom {
+          position: absolute; right: 18px; bottom: 88px; z-index: 10;
+          display: flex; flex-direction: column; gap: 8px;
+        }
+        .aula-zoombtn {
+          width: 42px; height: 42px; border-radius: 50%;
+          display: inline-flex; align-items: center; justify-content: center;
+          background: rgba(16,56,32,0.82); color: #fff; border: 1px solid rgba(255,255,255,0.18);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.22); cursor: pointer;
+          transition: background .15s, transform .12s;
+        }
+        .aula-zoombtn:hover { background: #1f6b3d; transform: translateY(-1px); }
+        .aula-zoombtn:active { transform: scale(0.92); }
+
         .aula-hand {
           position: absolute; right: 18px; bottom: 18px;
           width: 60px; height: 60px; border-radius: 50%;
@@ -656,6 +965,8 @@ export default function Aula() {
         @media (max-width: 639px) {
           .aula-title { font-size: 1.5rem; }
           .aula-hand { width: 54px; height: 54px; right: 14px; bottom: 14px; }
+          .aula-zoom { right: 14px; bottom: 78px; gap: 6px; }
+          .aula-zoombtn { width: 38px; height: 38px; }
           .aula-compass { width: 56px; height: 56px; top: 10px; left: 10px; }
           .aula-caption { font-size: 0.76rem; }
         }
