@@ -660,7 +660,7 @@ export default function Parole() {
           --absent: #c0392b;
           height: 100vh;
           height: 100svh;
-          overflow-y: auto;
+          overflow: hidden;
           background: #f4f6f5;
           color: #17271d;
           display: flex;
@@ -668,7 +668,7 @@ export default function Parole() {
           align-items: center;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
           user-select: none;
-          padding-bottom: 1rem;
+          padding-bottom: 0;
         }
 
         .parole-header {
@@ -801,15 +801,24 @@ export default function Parole() {
 
         .parole-stage {
           width: 100%;
-          flex: 1 0 auto;
+          flex: 1 1 0;
+          min-height: 0;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 1rem;
         }
-        .parole-game { display: flex; flex-direction: column; align-items: center; }
+        .parole-game { display: flex; flex-direction: column; align-items: center; flex: 1 1 0; min-height: 0; }
 
-        .parole-board { display: grid; gap: 7px; padding: 0.25rem; }
+        .parole-board {
+          display: grid; gap: 7px; padding: 0.25rem;
+          --ts: min(
+            calc((min(92vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
+            calc((100svh - 340px - 5 * 7px) / 6)
+          );
+          width: calc(var(--cols, 5) * var(--ts) + (var(--cols, 5) - 1) * 7px);
+          margin: 0 auto;
+        }
         .parole-row { display: grid; gap: 7px; }
         .parole-row--shake { animation: parole-shake 0.45s; }
         @keyframes parole-shake {
@@ -820,12 +829,12 @@ export default function Parole() {
         }
 
         .parole-tile {
-          width: 58px;
-          height: 58px;
+          width: var(--ts, 58px);
+          height: var(--ts, 58px);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.9rem;
+          font-size: min(1.9rem, calc(var(--ts, 58px) * 0.44));
           font-weight: 700;
           text-transform: uppercase;
           border: 2px solid #cdd8d1;
@@ -1194,9 +1203,7 @@ export default function Parole() {
         /* ── Touch (telefono): tutto nella finestra, zero scroll ── */
         @media (hover: none) and (pointer: coarse) {
           .parole-page {
-            overflow: hidden;
             touch-action: manipulation;
-            padding-bottom: 0;
           }
           /* Riduci spacing per guadagnare spazio verticale */
           .parole-modes  { margin-top: 0.5rem; }
@@ -1206,21 +1213,16 @@ export default function Parole() {
           .parole-game   { flex: 1 1 0; min-height: 0; }
 
           /*
-           * Tile size = min(larghezza disponibile / cols, altezza disponibile / 6 righe).
-           * --cols viene iniettato come custom property dal JSX.
-           * 195px ≈ spazio occupato da header + modes + toolbar + message + gap/padding.
+           * Su touch la tastiera virtuale è nascosta, quindi si guadagna ~145px in più.
+           * 195px ≈ header + modes + toolbar + message + padding (senza tastiera).
            */
           .parole-board {
             --ts: min(
               calc((min(92vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
               calc((100svh - 195px - 5 * 7px) / 6)
             );
-            width: calc(var(--cols, 5) * var(--ts) + (var(--cols, 5) - 1) * 7px);
-            margin: 0 auto;
           }
           .parole-tile {
-            width:  var(--ts);
-            height: var(--ts);
             font-size: min(1.4rem, calc(var(--ts) * 0.44));
           }
         }
@@ -1322,7 +1324,15 @@ export default function Parole() {
         .parole-page.dark .parole-key--correct { background: var(--green); color: #fff; }
         .parole-page.dark .parole-key--present  { background: var(--amber); color: #fff; }
         .parole-page.dark .parole-key--absent   { background: #5a1515; color: #c89090; }
-        .parole-page.dark .parole-tile--absent  { background: var(--absent); border-color: var(--absent); }
+        /* Colori tessere: specificità 0,2,0 serve per battere .parole-tile (0,2,0 pari → ordine vince) */
+        .parole-page.dark .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; }
+        .parole-page.dark .parole-tile--present  { background: var(--amber); border-color: var(--amber); color: #fff; }
+        .parole-page.dark .parole-tile--absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
+        /* Toast: su sfondo #111916 il precedente #17271d era quasi invisibile */
+        .parole-page.dark .parole-message {
+          background: #1e3d2b;
+          color: #d4e8dc;
+        }
         /* Endgame overlay */
         .parole-page.dark .parole-endgame-overlay {
           background: rgba(5,14,9,0.82);
