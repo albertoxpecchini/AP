@@ -160,26 +160,28 @@ function chairUnit(P: Proj, x: number, y: number, key: string, dir = 1): Draw {
 // Base/tastiera retroilluminata verde + schermo inclinato che mostra lo
 // screenshot. La faccia visibile (schermo o retro coperchio) è scelta in base
 // all'angolo, così ruotando non si vede mai "attraverso".
-function renderLaptop(P: Proj, cx: number, cyDesk: number, deskZ = 0.76, laptopKey = "laptop"): React.ReactNode {
+function renderLaptop(P: Proj, cx: number, cyDesk: number, deskZ = 0.76, laptopKey = "laptop", rot90ccw = false): React.ReactNode {
+  // Proiezione ruotata di 90° CCW in pianta attorno a (cx, cyDesk)
+  const PR: Proj = rot90ccw
+    ? (x, y, z) => P(cx - (y - cyDesk), cyDesk + (x - cx), z)
+    : P;
+
   const hw = 0.18, hd = 0.125;                // 0.36 × 0.25 m
   const baseY = cyDesk - 0.12;                // tastiera spostata a nord (verso il prof)
   const x0 = cx - hw, x1 = cx + hw;
-  const base = isoBox(P, cx, baseY, deskZ, 0.36, 0.25, 0.024, "#26292c", "lap-base");
+  const base = isoBox(PR, cx, baseY, deskZ, 0.36, 0.25, 0.024, "#26292c", "lap-base");
   const topZ = deskZ + 0.024;
 
-  // ── Tastiera QWERTY realistica (HP Spectre style: grigio ardesia, etichette bianche) ──
-  // Disegnata in uno spazio pixel 600×260, trasformata sulla superficie della scocca con matrice.
+  // ── Tastiera QWERTY realistica ──
   const kx0 = x0 + 0.012, kx1 = x1 - 0.012;
-  const ky0 = baseY - hd + 0.022;  // nord (prof/spacebar)
-  const ky1 = baseY + hd - 0.012;  // sud (schermo/fn row)
+  const ky0 = baseY - hd + 0.022;
+  const ky1 = baseY + hd - 0.012;
   const KB_W = 600, KB_H = 248;
-  // Origine = angolo SW (lato schermo = fn row a y=0 dell'immagine), x→est, y→nord
-  const Osw = P(kx0, ky1, topZ), EXsw = P(kx1, ky1, topZ), EYsw = P(kx0, ky0, topZ);
+  const Osw = PR(kx0, ky1, topZ), EXsw = PR(kx1, ky1, topZ), EYsw = PR(kx0, ky0, topZ);
   const ka = (EXsw.sx - Osw.sx) / KB_W, kb = (EXsw.sy - Osw.sy) / KB_W;
   const kc = (EYsw.sx - Osw.sx) / KB_H, kd2 = (EYsw.sy - Osw.sy) / KB_H;
   const mkb = `matrix(${ka.toFixed(4)},${kb.toFixed(4)},${kc.toFixed(4)},${kd2.toFixed(4)},${Osw.sx.toFixed(2)},${Osw.sy.toFixed(2)})`;
 
-  // kh=28 g=2 → rh=30 · 6 righe = 180px · touchpad a 186 · totale 226 < KB_H=248 ✓
   const u = 40, kh = 28, g = 2, rh = kh + g;
   const KBG = "#2a2d30", KC = "#545760", KSH = "#3d4044", KT = "#dde0e3";
   type KRow = [string, number];
@@ -211,10 +213,10 @@ function renderLaptop(P: Proj, cx: number, cyDesk: number, deskZ = 0.76, laptopK
   // ── Schermo ───────────────────────────────────────────────────────────────
   const hy = baseY + hd, hz = topZ;
   const ty = hy + 0.085, tz = hz + 0.205;
-  const sp = (xx: number, s: number) => P(xx, hy + s * (ty - hy), hz + s * (tz - hz));
-  const panel = [P(x0, hy, hz), P(x1, hy, hz), P(x1, ty, tz), P(x0, ty, tz)];
+  const sp = (xx: number, s: number) => PR(xx, hy + s * (ty - hy), hz + s * (tz - hz));
+  const panel = [PR(x0, hy, hz), PR(x1, hy, hz), PR(x1, ty, tz), PR(x0, ty, tz)];
   const scy = (hy + ty) / 2, scz = (hz + tz) / 2;
-  const frontVisible = P(cx, scy - 0.12, scz).depth > P(cx, scy + 0.12, scz).depth;
+  const frontVisible = PR(cx, scy - 0.12, scz).depth > PR(cx, scy + 0.12, scz).depth;
   const Os = sp(x1 - 0.012, 0.94), EXs = sp(x0 + 0.012, 0.94), EYs = sp(x1 - 0.012, 0.06);
   const ms = `matrix(${(EXs.sx - Os.sx).toFixed(3)},${(EXs.sy - Os.sy).toFixed(3)},${(EYs.sx - Os.sx).toFixed(3)},${(EYs.sy - Os.sy).toFixed(3)},${Os.sx.toFixed(2)},${Os.sy.toFixed(2)})`;
 
@@ -526,8 +528,8 @@ function renderWall(P: Proj, w: Wall, pal: Pal, dark: boolean): React.ReactNode 
       const mkHinge = (hy: number, hk: string) =>
         isoBox(P, sbFx - 0.005, hy, sbZ0 - th, 0.01, 0.03, 0.008, "#6e7274", hk);
 
-      // Laptop clone del prof posizionato SOPRA la porta aperta (piena visibilità)
-      const laptopOnDoor = renderLaptop(P, doorCx, sbY - 0.04, doorZ, "laptop-box");
+      // Laptop clone del prof sopra la porta aperta, ruotato 90° anti-orario
+      const laptopOnDoor = renderLaptop(P, doorCx, sbY - 0.04, doorZ, "laptop-box", true);
 
       els.push(
         <g key="secbox">
