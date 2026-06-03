@@ -500,6 +500,25 @@ export default function Parole() {
         {message && <div className="parole-message">{message}</div>}
       </div>
 
+      <div className="parole-mobile-kbd" aria-label="Stato lettere">
+        {KEYBOARD.map((row, ri) => (
+          <div key={ri} className="parole-mini-krow">
+            {row.filter(k => k.length === 1).map(k => {
+              const st = keyStatuses[k];
+              const isElim = eliminated.has(k);
+              return (
+                <span
+                  key={k}
+                  className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
+                >
+                  {k}
+                </span>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
       {eliminated.size > 0 && (
         <div className="parole-elim-row" aria-label="Lettere eliminate dall'aiuto">
           <span className="parole-elim-label">✗</span>
@@ -649,33 +668,43 @@ export default function Parole() {
           <button type="button" className="parole-cmd parole-cmd--wide" onClick={() => onKey("CANC")}>
             <Delete size={18} /> Cancella
           </button>
+          <div className="parole-mini-kbd" aria-label="Stato lettere">
+            {KEYBOARD.map((row, ri) => (
+              <div key={ri} className="parole-mini-krow">
+                {row.filter(k => k.length === 1).map(k => {
+                  const st = keyStatuses[k];
+                  const isElim = eliminated.has(k);
+                  return (
+                    <span
+                      key={k}
+                      className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
+                    >
+                      {k}
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
           <ul className="parole-legend">
             <li>
-              <span>
-                <kbd>←</kbd> <kbd>→</kbd>
-              </span>
+              <span><kbd>←</kbd> <kbd>→</kbd></span>
               Naviga tra le lettere
             </li>
             <li>
-              <span>
-                <kbd>A</kbd>–<kbd>Z</kbd>
-              </span>
+              <span><kbd>A</kbd>–<kbd>Z</kbd></span>
               Scrivi una lettera
             </li>
             <li>
-              <span>
-                <kbd>Invio</kbd>
-              </span>
+              <span><kbd>Invio</kbd></span>
               Conferma la parola
             </li>
             <li>
-              <span>
-                <kbd>⌫</kbd>
-              </span>
+              <span><kbd>⌫</kbd></span>
               Cancella una lettera
             </li>
           </ul>
-          <p className="parole-controls-hint">Da PC usa la tastiera fisica: i tasti qui mostrano solo i colori.</p>
+          <p className="parole-controls-hint">Da PC usa la tastiera fisica.</p>
         </aside>
 
         <div className="parole-keyboard">
@@ -886,6 +915,56 @@ export default function Parole() {
         .parole-page.dark .parole-elim-chip {
           background: rgba(192,57,43,0.2);
           border-color: rgba(192,57,43,0.45);
+        }
+
+        /* ── Mini tastiera stato lettere ── */
+        .parole-mini-krow {
+          display: flex; gap: 3px; justify-content: center; margin-bottom: 3px;
+        }
+        .parole-mini-key {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 22px; height: 22px;
+          font-size: 0.62rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          border-radius: 4px;
+          background: #d3dad6;
+          color: #17271d;
+          transition: background 0.2s, color 0.2s, transform 0.1s;
+          letter-spacing: 0;
+        }
+        .parole-mini-key--correct { background: var(--green); color: #fff; }
+        .parole-mini-key--present  { background: var(--amber); color: #fff; }
+        .parole-mini-key--absent   { background: #b0b8b2; color: #6b7870; }
+        .parole-mini-key--elim     { background: rgba(192,57,43,0.18); color: var(--absent); text-decoration: line-through; }
+        .parole-mini-key--pressed  { transform: scale(0.82); background: var(--green) !important; color: #fff !important; }
+        /* Dark mode */
+        .parole-page.dark .parole-mini-key { background: #2e3e35; color: #9ab8a2; }
+        .parole-page.dark .parole-mini-key--absent { background: #1e2820; color: #4a5e50; }
+        .parole-page.dark .parole-mini-key--elim { background: rgba(192,57,43,0.22); color: #c87070; }
+        .parole-page.dark .parole-mini-key--correct { background: var(--green); color: #fff; }
+        .parole-page.dark .parole-mini-key--present { background: var(--amber); color: #fff; }
+
+        /* Mobile: visibile; desktop: nascosta (la fa il pannello Comandi) */
+        .parole-mobile-kbd {
+          display: flex; flex-direction: column; align-items: center; gap: 0;
+          padding: 0.3rem 0 0.1rem;
+        }
+        @media (min-width: 760px) {
+          .parole-mobile-kbd { display: none; }
+        }
+        /* Desktop: mini kbd nel pannello comandi */
+        .parole-mini-kbd {
+          display: none;
+          flex-direction: column;
+          align-items: center;
+          gap: 0;
+          margin-bottom: 0.75rem;
+        }
+        @media (min-width: 760px) {
+          .parole-mini-kbd { display: flex; }
         }
 
         .parole-stage {
