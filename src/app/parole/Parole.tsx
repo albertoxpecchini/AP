@@ -417,21 +417,56 @@ export default function Parole() {
       errFlash ? "parole-errflash" : "",
     ].filter(Boolean).join(" ")}>
       <div className="parole-bg" aria-hidden="true" />
-      <header className="parole-header theme-dark">
-        <div className="parole-hdr-side">
+      <header className="parole-header">
+        <div className="parole-hdr-left">
           <a href="/" className="parole-iconbtn" aria-label="Torna al sito">
-            <ArrowLeft size={22} />
+            <ArrowLeft size={20} />
           </a>
         </div>
-        <h1 className="parole-title">
-          PAR<span className="parole-title-accent">OL</span>E
-        </h1>
-        <div className="parole-hdr-side parole-hdr-side--r">
+        <div className="parole-hdr-center">
+          <h1 className="parole-title">
+            PAR<span className="parole-title-accent">OL</span>E
+          </h1>
+          <div className="parole-modes-header" role="group" aria-label="Lunghezza parola">
+            {LENGTHS.map((len) => (
+              <button
+                key={len}
+                type="button"
+                className={`parole-mode-sm${len === length ? " parole-mode-sm--active" : ""}`}
+                onClick={() => startGame(len)}
+                aria-pressed={len === length}
+              >
+                {len}L
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="parole-hdr-right">
+          <span
+            className={`parole-hdr-stat${anxietyLevel > 0 ? ` parole-anx-stat-${anxietyLevel}` : ""}`}
+            aria-label="Tempo"
+          >
+            <Clock size={12} aria-hidden="true" />
+            {fmt(seconds)}
+          </span>
+          <button
+            type="button"
+            className="parole-hint-btn parole-hint-btn--sm"
+            onClick={useHint}
+            disabled={state !== "playing" || hintsLeft <= 0}
+          >
+            <Lightbulb size={13} aria-hidden="true" />
+            <span className="parole-hint-badge">{hintsLeft}</span>
+          </button>
+          <span className="parole-hdr-stat" aria-label="Record">
+            <Trophy size={12} aria-hidden="true" />
+            {record != null ? fmt(record) : "—"}
+          </span>
           <button className="parole-iconbtn" onClick={toggleDark} aria-label="Cambia tema">
-            {dark ? <Sun size={18} /> : <Moon size={18} />}
+            {dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           <button className="parole-iconbtn" onClick={newGame} aria-label="Nuova partita">
-            <RotateCcw size={20} />
+            <RotateCcw size={16} />
           </button>
         </div>
       </header>
@@ -520,7 +555,7 @@ export default function Parole() {
       </div>
 
       {eliminated.size > 0 && (
-        <div className="parole-elim-row" aria-label="Lettere eliminate dall'aiuto">
+        <div className="parole-elim-row parole-elim-row--flow" aria-label="Lettere eliminate dall'aiuto">
           <span className="parole-elim-label">✗</span>
           {[...eliminated].sort().map(k => (
             <span key={k} className="parole-elim-chip">{k}</span>
@@ -652,59 +687,73 @@ export default function Parole() {
           })()}
         </div>
 
-        <aside className="parole-controls" aria-label="Comandi">
-          <h2 className="parole-controls-title">Comandi</h2>
-          <div className="parole-cmd-row">
-            <button type="button" className="parole-cmd" onClick={() => onKey("LEFT")} aria-label="Lettera precedente">
-              <ArrowLeft size={20} />
-            </button>
-            <button type="button" className="parole-cmd" onClick={() => onKey("RIGHT")} aria-label="Lettera successiva">
-              <ArrowRight size={20} />
-            </button>
-          </div>
-          <button type="button" className="parole-cmd parole-cmd--wide" onClick={() => onKey("INVIO")}>
-            <CornerDownLeft size={18} /> Invio
-          </button>
-          <button type="button" className="parole-cmd parole-cmd--wide" onClick={() => onKey("CANC")}>
-            <Delete size={18} /> Cancella
-          </button>
-          <div className="parole-mini-kbd" aria-label="Stato lettere">
-            {KEYBOARD.map((row, ri) => (
-              <div key={ri} className="parole-mini-krow">
-                {row.filter(k => k.length === 1).map(k => {
-                  const st = keyStatuses[k];
-                  const isElim = eliminated.has(k);
-                  return (
-                    <span
-                      key={k}
-                      className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
-                    >
-                      {k}
-                    </span>
-                  );
-                })}
+        <aside className="parole-controls" aria-label="Pannello di gioco">
+
+          {/* — Stato lettere — */}
+          <div className="parole-panel-section">
+            <h3 className="parole-panel-label">Stato lettere</h3>
+            <div className="parole-mini-kbd" aria-label="Stato lettere">
+              {KEYBOARD.map((row, ri) => (
+                <div key={ri} className="parole-mini-krow">
+                  {row.filter(k => k.length === 1).map(k => {
+                    const st = keyStatuses[k];
+                    const isElim = eliminated.has(k);
+                    return (
+                      <span
+                        key={k}
+                        className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
+                      >
+                        {k}
+                      </span>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+            {eliminated.size > 0 && (
+              <div className="parole-elim-row" aria-label="Lettere eliminate">
+                <span className="parole-elim-label">✗</span>
+                {[...eliminated].sort().map(k => (
+                  <span key={k} className="parole-elim-chip">{k}</span>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-          <ul className="parole-legend">
-            <li>
-              <span><kbd>←</kbd> <kbd>→</kbd></span>
-              Naviga tra le lettere
-            </li>
-            <li>
-              <span><kbd>A</kbd>–<kbd>Z</kbd></span>
-              Scrivi una lettera
-            </li>
-            <li>
-              <span><kbd>Invio</kbd></span>
-              Conferma la parola
-            </li>
-            <li>
-              <span><kbd>⌫</kbd></span>
-              Cancella una lettera
-            </li>
-          </ul>
-          <p className="parole-controls-hint">Da PC usa la tastiera fisica.</p>
+
+          <div className="parole-panel-divider" />
+
+          {/* — Comandi — */}
+          <div className="parole-panel-section">
+            <h3 className="parole-panel-label">Comandi</h3>
+            <div className="parole-cmd-row">
+              <button type="button" className="parole-cmd" onClick={() => onKey("LEFT")} aria-label="Lettera precedente">
+                <ArrowLeft size={16} />
+              </button>
+              <button type="button" className="parole-cmd" onClick={() => onKey("RIGHT")} aria-label="Lettera successiva">
+                <ArrowRight size={16} />
+              </button>
+            </div>
+            <button type="button" className="parole-cmd parole-cmd--wide" onClick={() => onKey("INVIO")}>
+              <CornerDownLeft size={15} /> Invio
+            </button>
+            <button type="button" className="parole-cmd parole-cmd--wide" onClick={() => onKey("CANC")}>
+              <Delete size={15} /> Cancella
+            </button>
+          </div>
+
+          <div className="parole-panel-divider" />
+
+          {/* — Scorciatoie — */}
+          <div className="parole-panel-section parole-panel-section--grow">
+            <h3 className="parole-panel-label">Scorciatoie</h3>
+            <ul className="parole-legend">
+              <li><span><kbd>←</kbd> <kbd>→</kbd></span> Naviga</li>
+              <li><span><kbd>A</kbd>–<kbd>Z</kbd></span> Scrivi</li>
+              <li><span><kbd>Invio</kbd></span> Conferma</li>
+              <li><span><kbd>⌫</kbd></span> Cancella</li>
+            </ul>
+          </div>
+
         </aside>
 
         <div className="parole-keyboard">
@@ -758,17 +807,67 @@ export default function Parole() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.8rem 1rem;
+          padding: 0 0.75rem;
+          height: 52px;
           background: #103820;
           color: #fff;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+          box-shadow: 0 2px 16px rgba(0,0,0,0.22);
         }
+        .parole-hdr-left  { display: flex; align-items: center; }
+        .parole-hdr-center {
+          flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .parole-hdr-right { display: flex; align-items: center; gap: 4px; }
+        /* Mode buttons nel header (solo desktop, nascosti su mobile) */
+        .parole-modes-header { display: none; gap: 3px; }
+        .parole-mode-sm {
+          border: none;
+          background: rgba(255,255,255,0.12);
+          color: rgba(255,255,255,0.75);
+          font-weight: 700; font-size: 0.7rem;
+          padding: 0.16rem 0.5rem; border-radius: 999px;
+          cursor: pointer; transition: background 0.15s, color 0.15s;
+          letter-spacing: 0.02em;
+        }
+        .parole-mode-sm--active {
+          background: rgba(255,255,255,0.28); color: #fff;
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.3);
+        }
+        /* Stat nel header (solo desktop) */
+        .parole-hdr-stat {
+          display: none;
+          align-items: center; gap: 0.28rem;
+          font-size: 0.75rem; font-weight: 700;
+          color: rgba(255,255,255,0.88);
+          background: rgba(255,255,255,0.1);
+          padding: 0.2rem 0.5rem; border-radius: 999px;
+          font-variant-numeric: tabular-nums;
+          white-space: nowrap;
+        }
+        /* Hint button compatto nel header (solo desktop) */
+        .parole-hint-btn--sm {
+          display: none;
+          align-items: center; gap: 0.22rem;
+          background: rgba(255,255,255,0.14);
+          border: 1px solid rgba(255,255,255,0.22);
+          border-radius: 999px;
+          padding: 0.2rem 0.55rem;
+          color: #fff; cursor: pointer;
+          font-weight: 700; font-size: 0.75rem;
+          transition: background 0.15s;
+        }
+        .parole-hint-btn--sm:disabled { opacity: 0.4; cursor: not-allowed; }
+        .parole-hint-btn--sm:hover:not(:disabled) { background: rgba(255,255,255,0.24); }
+        /* Anxiety nel header stat */
+        .parole-anx-stat-1 { color: var(--amber) !important; }
+        .parole-anx-stat-2 { color: #e07b22 !important; animation: parole-timer-pulse 1.1s ease-in-out infinite; }
+        .parole-anx-stat-3 { color: var(--absent) !important; animation: parole-timer-pulse 0.55s ease-in-out infinite; box-shadow: 0 0 0 2px rgba(192,57,43,0.35) !important; }
+
         .parole-title {
-          font-size: 1.9rem;
+          font-size: 1.8rem;
           font-weight: 700;
           letter-spacing: 0.2em;
           margin: 0;
-          padding-left: 0.2em;
           animation: parole-drop 0.5s ease;
         }
         .parole-title-accent { color: #6fd08a; }
@@ -780,14 +879,15 @@ export default function Parole() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.35);
+          border: 1px solid rgba(255,255,255,0.3);
           background: transparent;
           color: #fff;
           cursor: pointer;
           transition: background 0.15s, transform 0.15s;
+          flex-shrink: 0;
         }
         .parole-iconbtn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
 
@@ -925,8 +1025,8 @@ export default function Parole() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 22px; height: 22px;
-          font-size: 0.62rem;
+          width: 26px; height: 26px;
+          font-size: 0.67rem;
           font-weight: 800;
           text-transform: uppercase;
           border-radius: 4px;
@@ -955,17 +1055,28 @@ export default function Parole() {
         @media (min-width: 760px) {
           .parole-mobile-kbd { display: none; }
         }
-        /* Desktop: mini kbd nel pannello comandi */
+        /* Mini kbd nel pannello (desktop) e mobile-kbd (touch) */
         .parole-mini-kbd {
           display: none;
           flex-direction: column;
           align-items: center;
           gap: 0;
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.5rem;
         }
-        @media (min-width: 760px) {
-          .parole-mini-kbd { display: flex; }
+
+        /* Panel sections (sidebar desktop) */
+        .parole-panel-section { padding: 0.5rem 0; }
+        .parole-panel-section--grow { flex: 1; min-height: 0; }
+        .parole-panel-label {
+          font-size: 0.58rem; font-weight: 800; letter-spacing: 0.1em;
+          text-transform: uppercase; color: var(--green-dark);
+          margin: 0 0 0.45rem; display: block;
         }
+        .parole-panel-divider {
+          height: 1px; background: rgba(47,125,74,0.1); flex-shrink: 0;
+        }
+        /* Elim-row--flow: visibile solo su mobile */
+        .parole-elim-row--flow { display: flex; }
 
         .parole-stage {
           width: 100%;
@@ -982,7 +1093,7 @@ export default function Parole() {
           display: grid; gap: 7px; padding: 0.25rem;
           --ts: min(
             calc((min(92vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
-            calc((100svh - 220px - 5 * 7px) / 6)
+            calc((100svh - 90px - 5 * 7px) / 6)
           );
           width: calc(var(--cols, 5) * var(--ts) + (var(--cols, 5) - 1) * 7px);
           margin: 0 auto;
@@ -1400,32 +1511,96 @@ export default function Parole() {
           }
         }
 
-        /* Desktop: griglia con comandi a tutta altezza e tastiera allineata sotto la board. */
+        /* ── Desktop: layout a due colonne ── */
         @media (min-width: 760px) {
-          .parole-stage {
-            flex: initial;
+          /* Header: 3 colonne, 64px */
+          .parole-header {
+            height: 64px;
             display: grid;
-            grid-template-columns: auto auto;
-            grid-template-areas: "game controls";
-            align-items: stretch;
-            justify-content: center;
-            gap: 1.1rem 2.25rem;
+            grid-template-columns: 1fr auto 1fr;
+            padding: 0 1rem;
           }
-          .parole-game { grid-area: game; }
+          .parole-hdr-left  { justify-self: start; }
+          .parole-hdr-center {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 3px;
+          }
+          .parole-hdr-right { justify-self: end; gap: 0.35rem; }
+          .parole-title { font-size: 1.3rem; letter-spacing: 0.18em; }
+          .parole-modes-header { display: flex; }
+          .parole-hdr-stat { display: inline-flex; }
+          .parole-hint-btn--sm { display: inline-flex; }
+
+          /* Nasconde elementi mobile sul desktop */
+          .parole-modes { display: none; }
+          .parole-toolbar { display: none; }
+          .parole-mobile-kbd { display: none; }
+          .parole-elim-row--flow { display: none; }
+          .parole-keyboard { display: none; }
+
+          /* Toast fixed sotto header */
+          .parole-message-slot {
+            position: fixed;
+            top: 72px; left: 50%; transform: translateX(-50%);
+            z-index: 50; height: auto; pointer-events: none;
+            width: max-content;
+          }
+
+          /* Stage: griglia 1fr + 270px sidebar */
+          .parole-stage {
+            flex: 1 1 0; min-height: 0;
+            display: grid;
+            grid-template-columns: 1fr 270px;
+            grid-template-areas: "game controls";
+            gap: 0 1.75rem;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            width: 100%; max-width: 960px;
+            margin: 0 auto;
+          }
+          .parole-game {
+            grid-area: game;
+            display: flex; align-items: center; justify-content: center;
+            height: 100%; flex: none; min-height: 0;
+          }
+
+          /* Board: tile size aggiornato (niente tastiera, niente toolbar) */
+          .parole-board {
+            --ts: min(
+              calc((min(55vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
+              calc((100svh - 110px - 5 * 7px) / 6)
+            );
+          }
+
+          /* Sidebar */
           .parole-controls {
             grid-area: controls;
-            align-self: stretch;
-            display: flex;
-            flex-direction: column;
-            width: 250px;
+            height: 100%;
+            overflow-y: auto;
+            display: flex; flex-direction: column;
             background: #fff;
-            border: 1px solid rgba(47,125,74,0.18);
-            border-radius: 12px;
-            padding: 1.25rem;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+            border: 1px solid rgba(47,125,74,0.14);
+            border-radius: 14px;
+            padding: 0.85rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
           }
-          .parole-controls .parole-controls-hint { margin-top: auto; padding-top: 0.75rem; }
-          .parole-keyboard { display: none; }
+          .parole-mini-kbd { display: flex; }
+
+          /* Cmd buttons più compatti */
+          .parole-cmd {
+            padding: 0.4rem 0.55rem;
+            font-size: 0.82rem;
+          }
+          .parole-cmd--wide { margin-bottom: 0.4rem; }
+          .parole-cmd-row { margin-bottom: 0.4rem; }
+
+          /* Legend compatta */
+          .parole-legend { margin-top: 0.5rem; }
+          .parole-legend li { font-size: 0.75rem; margin-bottom: 0.3rem; }
+          .parole-legend span { min-width: 60px; }
+
+          /* Panel label dark */
+          .parole-panel-label { color: var(--green-dark); }
         }
 
         /* ── Input nascosto per tastiera nativa mobile ── */
@@ -1446,12 +1621,6 @@ export default function Parole() {
         @media (hover: none) and (pointer: coarse) {
           .parole-keyboard { display: none !important; }
         }
-
-        /* ── Header sides (centra il titolo con 2 btn a dx) ── */
-        .parole-hdr-side {
-          display: flex; align-items: center; gap: 6px; min-width: 82px;
-        }
-        .parole-hdr-side--r { justify-content: flex-end; }
 
         /* ── Background animato (orbi galleggianti) ── */
         .parole-bg {
@@ -1642,6 +1811,20 @@ export default function Parole() {
           color: #7ab893;
         }
         .parole-page.dark .parole-cmd:hover { background: rgba(47,125,74,0.18); }
+        /* Nuovi elementi dark mode */
+        .parole-page.dark .parole-panel-divider { background: rgba(47,125,74,0.15); }
+        .parole-page.dark .parole-panel-label { color: #7ab893; }
+        .parole-page.dark .parole-mode-sm {
+          background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.65);
+        }
+        .parole-page.dark .parole-mode-sm--active {
+          background: rgba(255,255,255,0.2); color: #fff;
+        }
+        .parole-page.dark .parole-mini-key { background: #2e3e35; color: #9ab8a2; }
+        .parole-page.dark .parole-mini-key--absent { background: #1e2820; color: #4a5e50; }
+        .parole-page.dark .parole-mini-key--elim { background: rgba(192,57,43,0.22); color: #c87070; text-decoration: line-through; }
+        .parole-page.dark .parole-mini-key--correct { background: var(--green); color: #fff; }
+        .parole-page.dark .parole-mini-key--present { background: var(--amber); color: #fff; }
       `}</style>
     </div>
   );
