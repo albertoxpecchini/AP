@@ -422,11 +422,9 @@ export default function Parole() {
           <a href="/" className="parole-iconbtn" aria-label="Torna al sito">
             <ArrowLeft size={20} />
           </a>
+          <h1 className="parole-title">PAR<span className="parole-title-accent">OL</span>E</h1>
         </div>
         <div className="parole-hdr-center">
-          <h1 className="parole-title">
-            PAR<span className="parole-title-accent">OL</span>E
-          </h1>
           <div className="parole-modes-header" role="group" aria-label="Lunghezza parola">
             {LENGTHS.map((len) => (
               <button
@@ -436,37 +434,17 @@ export default function Parole() {
                 onClick={() => startGame(len)}
                 aria-pressed={len === length}
               >
-                {len}L
+                {len} lettere
               </button>
             ))}
           </div>
         </div>
         <div className="parole-hdr-right">
-          <span
-            className={`parole-hdr-stat${anxietyLevel > 0 ? ` parole-anx-stat-${anxietyLevel}` : ""}`}
-            aria-label="Tempo"
-          >
-            <Clock size={12} aria-hidden="true" />
-            {fmt(seconds)}
-          </span>
-          <button
-            type="button"
-            className="parole-hint-btn parole-hint-btn--sm"
-            onClick={useHint}
-            disabled={state !== "playing" || hintsLeft <= 0}
-          >
-            <Lightbulb size={13} aria-hidden="true" />
-            <span className="parole-hint-badge">{hintsLeft}</span>
-          </button>
-          <span className="parole-hdr-stat" aria-label="Record">
-            <Trophy size={12} aria-hidden="true" />
-            {record != null ? fmt(record) : "—"}
-          </span>
-          <button className="parole-iconbtn" onClick={toggleDark} aria-label="Cambia tema">
-            {dark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
           <button className="parole-iconbtn" onClick={newGame} aria-label="Nuova partita">
             <RotateCcw size={16} />
+          </button>
+          <button className="parole-iconbtn" onClick={toggleDark} aria-label="Cambia tema">
+            {dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
         </div>
       </header>
@@ -494,73 +472,6 @@ export default function Parole() {
         >
           ✎ Autofill
         </button>
-      )}
-
-      <div className="parole-modes" role="group" aria-label="Lunghezza parola">
-        {LENGTHS.map((len) => (
-          <button
-            key={len}
-            type="button"
-            className={`parole-mode${len === length ? " parole-mode--active" : ""}`}
-            onClick={() => startGame(len)}
-            aria-pressed={len === length}
-          >
-            {len} lettere
-          </button>
-        ))}
-      </div>
-
-      <div className="parole-toolbar">
-        <span className="parole-stat" aria-label="Tempo">
-          <Clock size={16} aria-hidden="true" />
-          <span className="parole-stat-val">{fmt(seconds)}</span>
-        </span>
-        <button
-          type="button"
-          className="parole-hint-btn"
-          onClick={useHint}
-          disabled={state !== "playing" || hintsLeft <= 0}
-        >
-          <Lightbulb size={17} aria-hidden="true" />
-          Aiuto
-          <span className="parole-hint-badge">{hintsLeft}</span>
-        </button>
-        <span className="parole-stat" aria-label="Record">
-          <Trophy size={16} aria-hidden="true" />
-          <span className="parole-stat-val">{record != null ? fmt(record) : "—"}</span>
-        </span>
-      </div>
-
-      <div className="parole-message-slot">
-        {message && <div className="parole-message">{message}</div>}
-      </div>
-
-      <div className="parole-mobile-kbd" aria-label="Stato lettere">
-        {KEYBOARD.map((row, ri) => (
-          <div key={ri} className="parole-mini-krow">
-            {row.filter(k => k.length === 1).map(k => {
-              const st = keyStatuses[k];
-              const isElim = eliminated.has(k);
-              return (
-                <span
-                  key={k}
-                  className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
-                >
-                  {k}
-                </span>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-
-      {eliminated.size > 0 && (
-        <div className="parole-elim-row parole-elim-row--flow" aria-label="Lettere eliminate dall'aiuto">
-          <span className="parole-elim-label">✗</span>
-          {[...eliminated].sort().map(k => (
-            <span key={k} className="parole-elim-chip">{k}</span>
-          ))}
-        </div>
       )}
 
       <div className="parole-stage">
@@ -685,6 +596,66 @@ export default function Parole() {
               </div>
             );
           })()}
+        </div>
+
+        {/* — Colonna centrale: stats + mini kbd — */}
+        <div className="parole-center">
+          <div className="parole-center-stats">
+            <div className={`parole-stat-card${anxietyLevel > 0 ? ` parole-anx-stat-${anxietyLevel}` : ""}`} aria-label="Tempo">
+              <Clock size={22} aria-hidden="true" />
+              <span className="parole-stat-card-val">{fmt(seconds)}</span>
+              <span className="parole-stat-card-lbl">Tempo</span>
+            </div>
+            <button
+              type="button"
+              className="parole-stat-card parole-stat-card--btn"
+              onClick={useHint}
+              disabled={state !== "playing" || hintsLeft <= 0}
+              aria-label="Usa aiuto"
+            >
+              <Lightbulb size={22} aria-hidden="true" />
+              <span className="parole-stat-card-val">{hintsLeft}</span>
+              <span className="parole-stat-card-lbl">Aiuto</span>
+            </button>
+            <div className="parole-stat-card" aria-label="Record">
+              <Trophy size={22} aria-hidden="true" />
+              <span className="parole-stat-card-val">{record != null ? fmt(record) : "—"}</span>
+              <span className="parole-stat-card-lbl">Record</span>
+            </div>
+          </div>
+
+          <div className="parole-message-slot">
+            {message && <div className="parole-message">{message}</div>}
+          </div>
+
+          <h3 className="parole-panel-label">Stato lettere</h3>
+          <div className="parole-mini-kbd parole-mini-kbd--center" aria-label="Stato lettere">
+            {KEYBOARD.map((row, ri) => (
+              <div key={ri} className="parole-mini-krow">
+                {row.filter(k => k.length === 1).map(k => {
+                  const st = keyStatuses[k];
+                  const isElim = eliminated.has(k);
+                  return (
+                    <span
+                      key={k}
+                      className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
+                    >
+                      {k}
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {eliminated.size > 0 && (
+            <div className="parole-elim-row" aria-label="Lettere eliminate">
+              <span className="parole-elim-label">✗</span>
+              {[...eliminated].sort().map(k => (
+                <span key={k} className="parole-elim-chip">{k}</span>
+              ))}
+            </div>
+          )}
         </div>
 
         <aside className="parole-controls" aria-label="Pannello di gioco">
@@ -1016,6 +987,37 @@ export default function Parole() {
           background: rgba(192,57,43,0.2);
           border-color: rgba(192,57,43,0.45);
         }
+
+        /* ── Colonna centro: stat cards ── */
+        .parole-center { display: none; } /* hidden on mobile */
+        .parole-center-stats { display: flex; gap: 0.5rem; }
+        .parole-stat-card {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 0.25rem; padding: 0.65rem 0.85rem;
+          background: rgba(47,125,74,0.08);
+          border: 1px solid rgba(47,125,74,0.15);
+          border-radius: 12px;
+          font-variant-numeric: tabular-nums;
+          color: var(--green-dark);
+          min-width: 0; flex: 1;
+        }
+        .parole-stat-card--btn {
+          border: none; cursor: pointer;
+          background: var(--green); color: #fff;
+          transition: background 0.15s, transform 0.1s;
+        }
+        .parole-stat-card--btn:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
+        .parole-stat-card--btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .parole-stat-card-val { font-size: 1.15rem; font-weight: 800; line-height: 1; }
+        .parole-stat-card-lbl { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; }
+        .parole-page.dark .parole-stat-card {
+          background: rgba(47,125,74,0.12); border-color: rgba(47,125,74,0.22); color: #7ab893;
+        }
+        .parole-page.dark .parole-stat-card--btn { background: var(--green); color: #fff; border: none; }
+        /* Anxiety on center stat card */
+        .parole-anx-stat-1.parole-stat-card { border-color: var(--amber); color: var(--amber); }
+        .parole-anx-stat-2.parole-stat-card { border-color: #e07b22; color: #e07b22; animation: parole-timer-pulse 1.1s ease-in-out infinite; }
+        .parole-anx-stat-3.parole-stat-card { border-color: var(--absent); color: var(--absent); animation: parole-timer-pulse 0.55s ease-in-out infinite; }
 
         /* ── Mini tastiera stato lettere ── */
         .parole-mini-krow {
@@ -1511,68 +1513,55 @@ export default function Parole() {
           }
         }
 
-        /* ── Desktop: layout a due colonne ── */
+        /* ── Desktop: layout a 3 colonne (Kit Italia) ── */
         @media (min-width: 760px) {
-          /* Header: 3 colonne, 64px */
+          /* Header: back+titolo sinistra | switch 5/6 centro | dark+reset destra */
           .parole-header {
-            height: 64px;
+            height: 60px;
             display: grid;
             grid-template-columns: 1fr auto 1fr;
-            padding: 0 1rem;
+            padding: 0 1.25rem;
           }
-          .parole-hdr-left  { justify-self: start; }
-          .parole-hdr-center {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 3px;
+          .parole-hdr-left  { justify-self: start; gap: 0.75rem; }
+          .parole-hdr-center { display: flex; align-items: center; justify-content: center; }
+          .parole-hdr-right { justify-self: end; gap: 0.5rem; }
+          .parole-title { font-size: 1.5rem; letter-spacing: 0.2em; animation: none; }
+          .parole-modes-header { display: flex; gap: 4px; }
+          .parole-mode-sm {
+            padding: 0.28rem 0.8rem; font-size: 0.78rem;
+            border: 1px solid rgba(255,255,255,0.25);
           }
-          .parole-hdr-right { justify-self: end; gap: 0.35rem; }
-          .parole-title { font-size: 1.3rem; letter-spacing: 0.18em; }
-          .parole-modes-header { display: flex; }
-          .parole-hdr-stat { display: inline-flex; }
-          .parole-hint-btn--sm { display: inline-flex; }
-
-          /* Nasconde elementi mobile sul desktop */
-          .parole-modes { display: none; }
-          .parole-toolbar { display: none; }
-          .parole-mobile-kbd { display: none; }
-          .parole-elim-row--flow { display: none; }
+          .parole-mode-sm--active {
+            background: rgba(255,255,255,0.3); color: #fff;
+            border-color: transparent;
+          }
           .parole-keyboard { display: none; }
 
-          /* Toast fixed sotto header */
-          .parole-message-slot {
-            position: fixed;
-            top: 72px; left: 50%; transform: translateX(-50%);
-            z-index: 50; height: auto; pointer-events: none;
-            width: max-content;
-          }
-
-          /* Stage: griglia 1fr + 270px sidebar */
+          /* Stage: 3 colonne — board | centro | comandi */
           .parole-stage {
             flex: 1 1 0; min-height: 0;
             display: grid;
-            grid-template-columns: 1fr 270px;
-            grid-template-areas: "game controls";
-            gap: 0 1.75rem;
+            grid-template-columns: auto auto auto;
+            grid-template-areas: "game center controls";
+            gap: 0 2rem;
             align-items: center;
-            padding: 0.75rem 1.5rem;
-            width: 100%; max-width: 960px;
-            margin: 0 auto;
+            justify-content: center;
+            padding: 1rem 2rem;
           }
           .parole-game {
             grid-area: game;
             display: flex; align-items: center; justify-content: center;
-            height: 100%; flex: none; min-height: 0;
+            height: 100%;
           }
-
-          /* Board: tile size aggiornato (niente tastiera, niente toolbar) */
-          .parole-board {
-            --ts: min(
-              calc((min(55vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
-              calc((100svh - 110px - 5 * 7px) / 6)
-            );
+          .parole-center {
+            grid-area: center;
+            display: flex; flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            height: 100%;
+            justify-content: center;
+            min-width: 190px;
           }
-
-          /* Sidebar */
           .parole-controls {
             grid-area: controls;
             height: 100%;
@@ -1581,25 +1570,48 @@ export default function Parole() {
             background: #fff;
             border: 1px solid rgba(47,125,74,0.14);
             border-radius: 14px;
-            padding: 0.85rem;
+            padding: 1.1rem;
             box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            min-width: 200px;
+            justify-content: center;
           }
-          .parole-mini-kbd { display: flex; }
 
-          /* Cmd buttons più compatti */
+          /* Board tile size (solo header 60px di chrome) */
+          .parole-board {
+            --ts: min(
+              calc((min(35vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
+              calc((100svh - 80px - 5 * 7px) / 6)
+            );
+          }
+
+          /* Mini kbd nella colonna centro: 32px keys leggibili */
+          .parole-mini-kbd--center { display: flex; }
+          .parole-mini-kbd--center .parole-mini-key {
+            width: 32px; height: 32px; font-size: 0.78rem; font-weight: 800;
+            border-radius: 5px;
+          }
+          .parole-mini-kbd--center .parole-mini-krow { gap: 3px; margin-bottom: 3px; }
+
+          /* Stats card verticali */
+          .parole-center-stats {
+            display: flex; flex-direction: column; gap: 0.5rem; width: 100%;
+          }
+
+          /* Toast nella colonna centro (non fixed) */
+          .parole-message-slot {
+            min-height: 2rem; width: 100%; text-align: center;
+          }
+
+          /* Cmd buttons grandi nel pannello comandi */
           .parole-cmd {
-            padding: 0.4rem 0.55rem;
-            font-size: 0.82rem;
+            padding: 0.7rem 0.85rem;
+            font-size: 0.95rem; font-weight: 700;
           }
-          .parole-cmd--wide { margin-bottom: 0.4rem; }
-          .parole-cmd-row { margin-bottom: 0.4rem; }
+          .parole-cmd--wide { margin-bottom: 0.5rem; }
+          .parole-cmd-row { margin-bottom: 0.5rem; gap: 0.5rem; }
 
-          /* Legend compatta */
-          .parole-legend { margin-top: 0.5rem; }
-          .parole-legend li { font-size: 0.75rem; margin-bottom: 0.3rem; }
-          .parole-legend span { min-width: 60px; }
-
-          /* Panel label dark */
+          .parole-legend { margin-top: 0.6rem; }
+          .parole-legend li { font-size: 0.78rem; margin-bottom: 0.35rem; }
           .parole-panel-label { color: var(--green-dark); }
         }
 
