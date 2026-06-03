@@ -102,8 +102,26 @@ export default function Parole() {
   const cols = length;
   const msgTimer = useRef<number | undefined>(undefined);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-  // Token di generazione: invalida le risposte fetch di partite ormai concluse.
   const fetchTokenRef = useRef(0);
+
+  const [lastKey, setLastKey] = useState<string | null>(null);
+  const lastKeyTimerRef = useRef<number | undefined>(undefined);
+
+  const [errFlash, setErrFlash] = useState(false);
+  const errFlashRef = useRef<number | undefined>(undefined);
+
+  const anxietyLevel = useMemo(() => {
+    if (state !== "playing") return 0;
+    if (seconds > 180) return 3;
+    if (seconds > 120) return 2;
+    if (seconds > 60)  return 1;
+    return 0;
+  }, [state, seconds]);
+
+  useEffect(() => () => {
+    window.clearTimeout(lastKeyTimerRef.current);
+    window.clearTimeout(errFlashRef.current);
+  }, []);
 
   useEffect(() => {
     const raw = localStorage.getItem(recordKey(length));
@@ -265,10 +283,17 @@ export default function Parole() {
     flash(`Eliminate: ${picked.join(" ")}`);
   }, [state, hintsLeft, eliminated, keyStatuses, answer, flash]);
 
+  const triggerErrFlash = useCallback(() => {
+    setErrFlash(true);
+    window.clearTimeout(errFlashRef.current);
+    errFlashRef.current = window.setTimeout(() => setErrFlash(false), 600);
+  }, []);
+
   const submit = useCallback(() => {
     if (!slots.every(Boolean)) {
       flash("Completa la parola");
       setShake(true);
+      triggerErrFlash();
       window.setTimeout(() => setShake(false), 500);
       return;
     }
@@ -276,6 +301,7 @@ export default function Parole() {
     if (!isValidWord(guess)) {
       flash("Parola non valida");
       setShake(true);
+      triggerErrFlash();
       window.setTimeout(() => setShake(false), 500);
       return;
     }
@@ -293,7 +319,10 @@ export default function Parole() {
       fetchWordImage(answer);
       flash("Bravo! Indovinata 🎉");
       window.setTimeout(() => {
-        confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
+        confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 }, colors: ['#2F7D4A','#D9A400','#fff','#6fd08a'] });
+        window.setTimeout(() => {
+          confetti({ particleCount: 80, spread: 50, origin: { y: 0.9 }, angle: 90, colors: ['#2F7D4A','#D9A400','#6fd08a'] });
+        }, 400);
       }, 350);
       setRecord((prev) => {
         const isNew = prev == null || seconds < prev;
@@ -308,7 +337,7 @@ export default function Parole() {
       fetchWordImage(answer);
       flash(`Era ${answer.toUpperCase()}`);
     }
-  }, [slots, cols, answer, guesses, evaluations, flash, seconds, length, fetchTrivia, fetchWordImage]);
+  }, [slots, cols, answer, guesses, evaluations, flash, seconds, length, fetchTrivia, fetchWordImage, triggerErrFlash]);
 
   const onKey = useCallback(
     (key: string) => {
@@ -328,6 +357,9 @@ export default function Parole() {
       }
       const up = key.toUpperCase();
       if (/^[A-Z]$/.test(up)) {
+        setLastKey(up);
+        window.clearTimeout(lastKeyTimerRef.current);
+        lastKeyTimerRef.current = window.setTimeout(() => setLastKey(null), 180);
         setSlots((prev) => {
           const n = [...prev];
           n[cursor] = up.toLowerCase();
@@ -376,7 +408,15 @@ export default function Parole() {
   const lastRow = guesses.length - 1;
 
   return (
-    <div className={`parole-page${dark ? " dark" : ""}`}>
+    <div className={[
+      "parole-page",
+      dark ? "dark" : "",
+      state === "won"  ? "parole-won"  : "",
+      state === "lost" ? "parole-lost" : "",
+      anxietyLevel > 0 ? `parole-anx-${anxietyLevel}` : "",
+      errFlash ? "parole-errflash" : "",
+    ].filter(Boolean).join(" ")}>
+      <div className="parole-bg" aria-hidden="true" />
       <header className="parole-header theme-dark">
         <div className="parole-hdr-side">
           <a href="/" className="parole-iconbtn" aria-label="Torna al sito">
@@ -639,7 +679,7 @@ export default function Parole() {
               return (
                 <button
                   key={key}
-                  className={`parole-key${wide ? " parole-key--wide" : ""}${st ? ` parole-key--${st}` : ""}${isElim ? " parole-key--elim" : ""}`}
+                  className={`parole-key${wide ? " parole-key--wide" : ""}${st ? ` parole-key--${st}` : ""}${isElim ? " parole-key--elim" : ""}${key === lastKey ? " parole-key--pressed" : ""}`}
                   onClick={() => onKey(key)}
                   type="button"
                 >
@@ -661,6 +701,7 @@ export default function Parole() {
           height: 100vh;
           height: 100svh;
           overflow: hidden;
+          isolation: isolate;
           background: #f4f6f5;
           color: #17271d;
           display: flex;
@@ -814,7 +855,7 @@ export default function Parole() {
           display: grid; gap: 7px; padding: 0.25rem;
           --ts: min(
             calc((min(92vw, 22rem) - (var(--cols, 5) - 1) * 7px) / var(--cols, 5)),
-            calc((100svh - 340px - 5 * 7px) / 6)
+            calc((100svh - 220px - 5 * 7px) / 6)
           );
           width: calc(var(--cols, 5) * var(--ts) + (var(--cols, 5) - 1) * 7px);
           margin: 0 auto;
@@ -851,6 +892,11 @@ export default function Parole() {
           border-color: var(--green);
           box-shadow: 0 0 0 3px rgba(47,125,74,0.3);
           cursor: pointer;
+          animation: parole-cursor-glow 1.5s ease-in-out infinite;
+        }
+        @keyframes parole-cursor-glow {
+          0%,100% { box-shadow: 0 0 0 3px rgba(47,125,74,0.3); }
+          50%     { box-shadow: 0 0 0 5px rgba(47,125,74,0.55), 0 0 12px rgba(47,125,74,0.2); }
         }
         @keyframes parole-pop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
         .parole-tile--revealed { animation: parole-flip 0.55s ease forwards; color: #fff; }
@@ -1233,10 +1279,8 @@ export default function Parole() {
             flex: initial;
             display: grid;
             grid-template-columns: auto auto;
-            grid-template-areas:
-              "game controls"
-              "keyboard controls";
-            align-items: start;
+            grid-template-areas: "game controls";
+            align-items: stretch;
             justify-content: center;
             gap: 1.1rem 2.25rem;
           }
@@ -1254,17 +1298,7 @@ export default function Parole() {
             box-shadow: 0 4px 18px rgba(0,0,0,0.06);
           }
           .parole-controls .parole-controls-hint { margin-top: auto; padding-top: 0.75rem; }
-          .parole-keyboard {
-            grid-area: keyboard;
-            width: 100%;
-            max-width: none;
-            margin-top: 0;
-            padding: 0;
-            pointer-events: none;
-            opacity: 0.85;
-          }
-          .parole-key { height: 36px; font-size: 0.78rem; border-radius: 5px; }
-          .parole-key--wide { font-size: 0.55rem; }
+          .parole-keyboard { display: none; }
         }
 
         /* ── Input nascosto per tastiera nativa mobile ── */
@@ -1291,6 +1325,113 @@ export default function Parole() {
           display: flex; align-items: center; gap: 6px; min-width: 82px;
         }
         .parole-hdr-side--r { justify-content: flex-end; }
+
+        /* ── Background animato (orbi galleggianti) ── */
+        .parole-bg {
+          position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+        }
+        .parole-bg::before, .parole-bg::after {
+          content: ''; position: absolute; border-radius: 50%;
+        }
+        .parole-bg::before {
+          width: 70vmax; height: 70vmax; top: -25%; left: -15%;
+          background: radial-gradient(circle, rgba(47,125,74,0.12) 0%, transparent 65%);
+          animation: parole-orb1 22s ease-in-out infinite;
+        }
+        .parole-bg::after {
+          width: 55vmax; height: 55vmax; bottom: -20%; right: -10%;
+          background: radial-gradient(circle, rgba(47,125,74,0.09) 0%, transparent 65%);
+          animation: parole-orb2 28s ease-in-out infinite;
+        }
+        @keyframes parole-orb1 {
+          0%,100% { transform: translate(0,0) scale(1); }
+          40%     { transform: translate(6%,10%) scale(1.1); }
+          70%     { transform: translate(-4%,4%) scale(0.93); }
+        }
+        @keyframes parole-orb2 {
+          0%,100% { transform: translate(0,0) scale(1); }
+          50%     { transform: translate(-9%,-7%) scale(1.18); }
+        }
+        .parole-page.dark .parole-bg::before {
+          background: radial-gradient(circle, rgba(47,125,74,0.22) 0%, transparent 65%);
+        }
+        .parole-page.dark .parole-bg::after {
+          background: radial-gradient(circle, rgba(47,125,74,0.17) 0%, transparent 65%);
+        }
+
+        /* ── Effetti di stato ── */
+
+        /* Tasto premuto (glow verde) */
+        .parole-key--pressed {
+          background: rgba(47,125,74,0.55) !important;
+          color: #fff !important;
+          transform: scale(0.88) !important;
+          box-shadow: 0 0 14px rgba(47,125,74,0.5) !important;
+          transition: none !important;
+        }
+
+        /* Timer ansioso — livello 1 (>60s) */
+        .parole-anx-1 .parole-stat:first-child { color: var(--amber); }
+
+        /* Livello 2 (>120s): timer arancione pulsante */
+        .parole-anx-2 .parole-stat:first-child {
+          color: #e07b22;
+          animation: parole-timer-pulse 1.1s ease-in-out infinite;
+        }
+        @keyframes parole-timer-pulse {
+          0%,100% { transform: scale(1); opacity: 1; }
+          50%     { transform: scale(1.07); opacity: 0.82; }
+        }
+
+        /* Livello 3 (>180s): rosso panico + vignette */
+        .parole-anx-3 .parole-stat:first-child {
+          color: var(--absent);
+          animation: parole-timer-pulse 0.55s ease-in-out infinite;
+          box-shadow: 0 0 0 3px rgba(192,57,43,0.28);
+        }
+        .parole-anx-3::after {
+          content: '';
+          position: fixed; inset: 0; z-index: 2; pointer-events: none;
+          box-shadow: inset 0 0 120px rgba(150,0,0,0.18);
+          animation: parole-vignette-pulse 1.1s ease-in-out infinite;
+        }
+        @keyframes parole-vignette-pulse {
+          0%,100% { opacity: 0.7; }
+          50%     { opacity: 1; }
+        }
+
+        /* Flash errore (parola sbagliata) */
+        .parole-errflash::before {
+          content: '';
+          position: fixed; inset: 0; z-index: 10; pointer-events: none;
+          background: rgba(192,57,43,0.11);
+          animation: parole-errflash-anim 0.55s ease forwards;
+        }
+        @keyframes parole-errflash-anim {
+          0%   { opacity: 1; }
+          100% { opacity: 0; }
+        }
+
+        /* Glow vittoria */
+        .parole-page.parole-won::before {
+          content: '';
+          position: fixed; inset: 0; z-index: 1; pointer-events: none;
+          background: radial-gradient(ellipse at 50% 40%, rgba(200,164,21,0.15) 0%, transparent 65%);
+          animation: parole-fade-in 0.7s ease forwards;
+        }
+
+        /* Effetto sconfitta: board trema */
+        .parole-page.parole-lost .parole-board {
+          animation: parole-lost-shake 0.65s cubic-bezier(0.36,0.07,0.19,0.97);
+        }
+        @keyframes parole-lost-shake {
+          0%,100% { transform: translateX(0) rotate(0deg); }
+          15%     { transform: translateX(-7px) rotate(-0.6deg); }
+          30%     { transform: translateX(7px) rotate(0.6deg); }
+          45%     { transform: translateX(-5px) rotate(-0.4deg); }
+          60%     { transform: translateX(5px) rotate(0.4deg); }
+          75%     { transform: translateX(-3px) rotate(-0.2deg); }
+        }
 
         /* ── Dark mode ── */
         .parole-page.dark {
