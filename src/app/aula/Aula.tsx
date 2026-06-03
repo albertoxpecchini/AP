@@ -160,8 +160,7 @@ function chairUnit(P: Proj, x: number, y: number, key: string, dir = 1): Draw {
 // Base/tastiera retroilluminata verde + schermo inclinato che mostra lo
 // screenshot. La faccia visibile (schermo o retro coperchio) è scelta in base
 // all'angolo, così ruotando non si vede mai "attraverso".
-function renderLaptop(P: Proj, cx: number, cyDesk: number): React.ReactNode {
-  const deskZ = 0.76;                         // piano verde della cattedra
+function renderLaptop(P: Proj, cx: number, cyDesk: number, deskZ = 0.76): React.ReactNode {
   const hw = 0.18, hd = 0.125;                // 0.36 × 0.25 m
   const baseY = cyDesk - 0.12;                // tastiera spostata a nord (verso il prof)
   const x0 = cx - hw, x1 = cx + hw;
@@ -505,21 +504,36 @@ function renderWall(P: Proj, w: Wall, pal: Pal, dark: boolean): React.ReactNode 
         <image href="/images/cicogna.jpg" x={0} y={0} width={1} height={1} preserveAspectRatio="none" transform={m} />
       </g>,
     );
-    // ── PC del prof (notebook a muro) — abbassato di 50 cm ──
-    const fx = 7.78; // faccia frontale (ovest, verso la stanza)
-    const fq = (y0: number, y1: number, z0: number, z1: number) =>
-      join([P(fx, y0, z0), P(fx, y1, z0), P(fx, y1, z1), P(fx, y0, z1)]);
-    els.push(
-      <g key="secbox">
-        {isoBox(P, 7.89, 1.2, 1.05, 0.22, 0.58, 0.6, "#d7dbde", "sb-body").node}
-        <polygon points={fq(1.00, 1.40, 1.11, 1.59)} fill="#262b2e" />
-        <polygon points={fq(1.06, 1.34, 1.16, 1.52)} fill="#0e1418" />
-        <polygon points={fq(1.08, 1.32, 1.18, 1.50)} fill="#37525f" />
-        {isoBox(P, 7.68, 1.2, 1.085, 0.22, 0.48, 0.035, "#c6cbce", "sb-tray").node}
-        {isoBox(P, 7.66, 1.2, 1.12, 0.18, 0.42, 0.02, "#aeb4b8", "sb-kbd").node}
-        <circle {...dot(P(fx, 1.44, 1.36))} r={1.6} fill="#5c6469" />
-      </g>,
-    );
+    // ── Security box: porta a baule aperta (cerniera in basso), laptop clone del prof ──
+    {
+      const sbX = 7.89, sbY = 1.2, sbZ0 = 1.05;
+      const sbW = 0.44, sbD = 0.58, sbH = 0.60; // allargato per contenere il laptop
+      const sbFx = sbX - sbW / 2;               // faccia frontale ovest: 7.67
+
+      // Laptop clone (prima, è il più lontano dalla parete — dietro le pareti del box)
+      const laptopInBox = renderLaptop(P, sbX - 0.04, sbY, sbZ0 + 0.015);
+
+      // Corpo del box (scocca: nord / sud / est / top — il fronte è aperto)
+      const sbBody = isoBox(P, sbX, sbY, sbZ0, sbW, sbD, sbH, "#d7dbde", "sb-body");
+
+      // Porta a baule aperta: ruotata 90° attorno alla cerniera in basso →
+      // pannello orizzontale a z ≈ sbZ0, si estende verso ovest di sbH
+      const sbDoor = isoBox(P, sbFx - sbH / 2, sbY, sbZ0 - 0.012, sbH, sbD, 0.024, "#c8ccce", "sb-door");
+
+      // Cerniere (2×) in basso ai lati della fronte aperta
+      const mkHinge = (hy: number, hk: string) =>
+        isoBox(P, sbFx - 0.008, hy, sbZ0 - 0.004, 0.016, 0.034, 0.009, "#6e7274", hk);
+
+      els.push(
+        <g key="secbox">
+          {laptopInBox}
+          {sbBody.node}
+          {sbDoor.node}
+          {mkHinge(sbY - sbD * 0.28, "sb-h1").node}
+          {mkHinge(sbY + sbD * 0.28, "sb-h2").node}
+        </g>,
+      );
+    }
   }
 
   return <g key={`wall-${w.id}`}>{els}</g>;
