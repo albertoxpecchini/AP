@@ -183,43 +183,62 @@ export default function Angoli() {
 
       {/* ── Header ── */}
       <header className="ang-header">
-        <div className="ang-hdr-side">
-          <a href="/" className="ang-iconbtn" aria-label="Torna al sito"><ArrowLeft size={22}/></a>
+        <div className="ang-hdr-left">
+          <a href="/" className="ang-iconbtn" aria-label="Torna al sito"><ArrowLeft size={20}/></a>
+          <h1 className="ang-title">ANG<span className="ang-accent">OL</span>I</h1>
         </div>
-        <h1 className="ang-title">ANG<span className="ang-accent">OL</span>I</h1>
-        <div className="ang-hdr-side ang-hdr-side--r">
+        <div className="ang-hdr-center">
+          <div className="ang-modes-header" role="group" aria-label="Difficoltà">
+            {STEP_OPTIONS.map(s=>(
+              <button key={s} type="button" className={`ang-mode-sm${step===s?" ang-mode-sm--active":""}`}
+                onClick={()=>changeStep(s)} aria-pressed={step===s}>{s}g</button>
+            ))}
+          </div>
+        </div>
+        <div className="ang-hdr-right">
+          <button className="ang-iconbtn" onClick={newGame} aria-label="Nuova partita"><RotateCcw size={16}/></button>
           <button className="ang-iconbtn" onClick={toggleDark} aria-label="Cambia tema">
-            {dark ? <Sun size={18}/> : <Moon size={18}/>}
+            {dark ? <Sun size={16}/> : <Moon size={16}/>}
           </button>
-          <button className="ang-iconbtn" onClick={newGame} aria-label="Nuova partita"><RotateCcw size={20}/></button>
         </div>
       </header>
 
-      {/* ── Top strip: modes + stats ── */}
-      <div className="ang-top">
-        <div className="ang-modes" role="group">
-          {STEP_OPTIONS.map(s=>(
-            <button key={s} type="button" className={`ang-mode${step===s?" ang-mode--on":""}`}
-              onClick={()=>changeStep(s)} aria-pressed={step===s}>{s}g</button>
-          ))}
-        </div>
-        <div className="ang-toolbar">
-          <span className="ang-stat"><Flame size={14}/><span>{strike}</span></span>
-          <span className="ang-modename">{STEP_LABELS[step]}</span>
-          <span className="ang-stat"><Trophy size={14}/><span>{best}</span></span>
-        </div>
-      </div>
-
       {/* ── Game area: figure ←→ ctrl block ── */}
-      <div className="ang-game-area">
+      <div className="ang-stage">
 
         {/* ── Left: angle figure ── */}
-        <div className="ang-fig-wrap">
-          <AngleDisplay angle={angle} rotation={rotation}/>
+        <div className="ang-game">
+          <div className="ang-fig-wrap">
+            <AngleDisplay angle={angle} rotation={rotation}/>
+          </div>
+        </div>
+
+        {/* ── Center: stats and message (desktop only) ── */}
+        <div className="ang-center">
+          <div className="ang-center-stats">
+            <div className="ang-stat-card" aria-label="Streak">
+              <Flame size={22} aria-hidden="true" />
+              <span className="ang-stat-card-val">{strike}</span>
+              <span className="ang-stat-card-lbl">Streak</span>
+            </div>
+            <div className="ang-stat-card" aria-label="Difficoltà">
+              <span className="ang-stat-card-val" style={{fontSize:"1.2rem"}}>{step}g</span>
+              <span className="ang-stat-card-lbl">Difficoltà</span>
+            </div>
+            <div className="ang-stat-card" aria-label="Miglior streak">
+              <Trophy size={22} aria-hidden="true" />
+              <span className="ang-stat-card-val">{best}</span>
+              <span className="ang-stat-card-lbl">Miglior Streak</span>
+            </div>
+          </div>
+
+          <div className="ang-message-slot">
+            {msg && <div className="ang-message">{msg}</div>}
+          </div>
         </div>
 
         {/* ── Right: white card (legend + input + keyboard) ── */}
-        <div className="ang-ctrl-block">
+        <aside className="ang-ctrl-block" aria-label="Pannello di gioco">
 
           {/* Legend box (stile /parole) */}
           <div className="ang-legend">
@@ -293,11 +312,8 @@ export default function Angoli() {
               Prossimo <RotateCcw size={15}/>
             </button>
           )}
-        </div>
+        </aside>
       </div>
-
-      {/* ── Toast ── */}
-      {msg && <div className="ang-toast" role="alert">{msg}</div>}
 
       {/* ── Trophy modal ── */}
       {trophy && (
@@ -344,55 +360,60 @@ export default function Angoli() {
         .ang-header {
           position: sticky; top:0; z-index:20; flex-shrink:0;
           width:100%; display:flex; align-items:center; justify-content:space-between;
-          padding:0.7rem 1rem; background:#103820; color:#fff;
-          box-shadow:0 2px 12px rgba(0,0,0,0.18);
+          padding:0 0.75rem; height:52px; background:#103820; color:#fff;
+          box-shadow:0 2px 16px rgba(0,0,0,0.22);
         }
-        .ang-title { font-size:1.75rem; font-weight:700; letter-spacing:0.22em; margin:0; padding-left:.2em; animation:ang-drop .5s ease; }
+        .ang-hdr-left { display:flex; align-items:center; }
+        .ang-hdr-center { flex:1; display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+        .ang-hdr-right { display:flex; align-items:center; gap:4px; }
+        .ang-modes-header { display:none; gap:3px; }
+        .ang-mode-sm {
+          border:none; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.75);
+          font-weight:700; font-size:0.7rem; padding:0.16rem 0.5rem; border-radius:999px;
+          cursor:pointer; transition:background 0.15s, color 0.15s; letter-spacing:0.02em;
+        }
+        .ang-mode-sm--active { background:rgba(255,255,255,0.28); color:#fff; box-shadow:0 0 0 1px rgba(255,255,255,0.3); }
+        .ang-title { font-size:1.5rem; font-weight:700; letter-spacing:0.2em; margin:0; animation:none; }
         .ang-accent { color:#6fd08a; }
         @keyframes ang-drop { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
         .ang-iconbtn {
           display:inline-flex; align-items:center; justify-content:center;
-          width:38px; height:38px; border-radius:50%;
-          border:1px solid rgba(255,255,255,0.35);
-          background:transparent; color:#fff; cursor:pointer; text-decoration:none;
+          width:36px; height:36px; border-radius:50%;
+          border:1px solid rgba(255,255,255,0.3);
+          background:transparent; color:#fff; cursor:pointer; text-decoration:none; flex-shrink:0;
           transition:background .15s,transform .15s;
         }
         .ang-iconbtn:hover { background:rgba(255,255,255,0.15); transform:translateY(-1px); }
 
-        /* ── Top strip ── */
-        .ang-top {
-          flex-shrink:0; width:100%; max-width:640px;
-          display:flex; flex-direction:column; align-items:center;
-          padding:0.55rem 1rem 0; gap:5px;
+        /* ── Stage: game area con layout ── */
+        .ang-stage {
+          width:100%; flex:1 1 0; min-height:0;
+          display:flex; flex-direction:column; align-items:center; gap:1rem;
         }
-        .ang-modes { display:inline-flex; gap:4px; padding:3px; background:rgba(47,125,74,0.1); border-radius:999px; }
-        .ang-mode {
-          border:none; background:transparent; color:var(--green-dark);
-          font-weight:700; font-size:0.88rem; padding:0.32rem 0.9rem;
-          border-radius:999px; cursor:pointer; font-family:inherit; transition:background .15s,color .15s;
-        }
-        .ang-mode--on { background:var(--green); color:#fff; box-shadow:0 2px 8px rgba(47,125,74,0.35); }
-        .ang-toolbar {
-          width:100%; max-width:460px;
-          display:flex; align-items:center; justify-content:space-between; gap:.5rem;
-        }
-        .ang-stat {
-          display:inline-flex; align-items:center; gap:.3rem;
-          font-weight:600; color:var(--green-dark); background:rgba(47,125,74,0.1);
-          border-radius:999px; padding:.28rem .65rem; min-width:72px; justify-content:center;
-          font-size:.88rem; font-variant-numeric:tabular-nums;
-        }
-        .ang-modename { font-size:.82rem; font-weight:700; color:var(--green-dark); }
 
-        /* ── Game area: 2 blocchi centrati ── */
-        .ang-game-area {
-          flex:1; min-height:0;
-          width:100%;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          gap:22px;
-          padding:10px 20px 14px;
+        /* ── Stat cards desktop (colonna centro) ── */
+        .ang-center { display:none; }
+        .ang-center-stats { display:flex; gap:0.5rem; flex-direction:column; }
+        .ang-stat-card {
+          display:flex; flex-direction:column; align-items:center; gap:0.25rem;
+          padding:0.65rem 0.85rem; background:rgba(47,125,74,0.08);
+          border:1px solid rgba(47,125,74,0.15); border-radius:12px;
+          font-variant-numeric:tabular-nums; color:var(--green-dark); min-width:0; flex:1;
+        }
+        .ang-stat-card-val { font-size:1.15rem; font-weight:800; line-height:1; }
+        .ang-stat-card-lbl { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; opacity:0.75; }
+
+        /* ── Message slot ── */
+        .ang-message-slot { display:flex; align-items:center; height:2.6rem; }
+        .ang-message {
+          background:#17271d; color:#fff; font-weight:700;
+          padding:0.55rem 1.1rem; border-radius:8px; font-size:0.92rem;
+          box-shadow:0 6px 18px rgba(0,0,0,0.2); animation:ang-toast .25s ease;
+        }
+
+        /* ── Game area: 2 blocchi centrati (mobile) ── */
+        .ang-game {
+          display:flex; flex-direction:column; align-items:center; flex:1 1 0; min-height:0;
         }
 
         /* ── Figura (sinistra) ── */
@@ -506,38 +527,78 @@ export default function Angoli() {
         }
         .ang-next:hover { background:var(--green-dark); transform:translateY(-1px); }
 
-        /* ── Toast ── */
-        .ang-toast {
-          position:fixed; top:68px; left:50%; transform:translateX(-50%);
-          background:#17271d; color:#fff; font-weight:700;
-          padding:.5rem 1.1rem; border-radius:8px; font-size:.9rem;
-          box-shadow:0 6px 18px rgba(0,0,0,0.2); pointer-events:none; z-index:600;
-          white-space:nowrap; animation:ang-toast .25s ease;
-        }
-        @keyframes ang-toast {
-          from{opacity:0;transform:translateX(-50%) translateY(-8px) scale(.96)}
-          to  {opacity:1;transform:translateX(-50%) translateY(0)    scale(1)}
-        }
-
         /* ── Mobile: blocchi impilati ── */
-        @media (max-width: 639px) {
-          .ang-game-area { flex-direction:column; gap:12px; overflow-y:auto; padding:8px 16px 16px; }
+        @media (max-width: 759px) {
+          .ang-stage { flex-direction:column; gap:12px; overflow-y:auto; padding:8px 16px 16px; }
+          .ang-game { width:100%; }
           .ang-fig-wrap  { width:min(85vw,240px); height:min(85vw,240px); }
           .ang-ctrl-block { --block-w: min(90vw, 320px); width:var(--block-w); }
           .ang-legend    { display:none; } /* nascosta su mobile */
           .ang-key       { height:40px; }
         }
 
-        /* ── Header sides (centra titolo con 2 btn a dx) ── */
-        .ang-hdr-side { display:flex; align-items:center; gap:6px; min-width:82px; }
-        .ang-hdr-side--r { justify-content:flex-end; }
+        /* ── Desktop: layout a 3 colonne ── */
+        @media (min-width: 760px) {
+          .ang-header {
+            height:60px;
+            display:grid;
+            grid-template-columns:1fr auto 1fr;
+            padding:0 1.25rem;
+          }
+          .ang-hdr-left { justify-self:start; gap:0.75rem; }
+          .ang-hdr-center { display:flex; align-items:center; justify-content:center; }
+          .ang-hdr-right { justify-self:end; gap:0.5rem; }
+          .ang-modes-header { display:flex; gap:4px; }
+          .ang-mode-sm { padding:0.28rem 0.8rem; font-size:0.78rem; border:1px solid rgba(255,255,255,0.25); }
+          .ang-mode-sm--active { background:rgba(255,255,255,0.3); color:#fff; border-color:transparent; }
+
+          /* Stage: 3 colonne — game | centro | comandi */
+          .ang-stage {
+            flex:1 1 0; min-height:0;
+            display:grid;
+            grid-template-columns:auto auto auto;
+            grid-template-areas:"game center controls";
+            gap:0 2rem;
+            align-items:center;
+            justify-content:center;
+            padding:1rem 2rem;
+          }
+          .ang-game {
+            grid-area:game;
+            display:flex; align-items:center; justify-content:center;
+            height:100%;
+          }
+          .ang-fig-wrap { width:290px; height:290px; }
+          .ang-center {
+            grid-area:center;
+            display:flex; flex-direction:column;
+            align-items:center;
+            gap:0.75rem;
+            height:100%;
+            justify-content:center;
+            min-width:190px;
+          }
+          .ang-ctrl-block {
+            grid-area:controls;
+            height:100%;
+            overflow-y:auto;
+            display:flex; flex-direction:column;
+            background:#fff;
+            border:1px solid rgba(47,125,74,0.14);
+            border-radius:14px;
+            padding:1.1rem;
+            box-shadow:0 4px 24px rgba(0,0,0,0.07);
+            min-width:200px;
+            justify-content:center;
+          }
+        }
 
         /* ── Dark mode ── */
         .ang-page.dark { background:#111916; color:#d4e8dc; }
-        .ang-page.dark .ang-modes { background:rgba(47,125,74,0.13); }
-        .ang-page.dark .ang-mode  { color:#7ab893; }
-        .ang-page.dark .ang-stat  { background:rgba(47,125,74,0.13); color:#7ab893; }
-        .ang-page.dark .ang-modename { color:#7ab893; }
+        .ang-page.dark .ang-stat-card {
+          background:rgba(47,125,74,0.12); border-color:rgba(47,125,74,0.22); color:#7ab893;
+        }
+        .ang-page.dark .ang-message { background:#1e3d2b; color:#d4e8dc; }
         /* Blocco carta destra */
         .ang-page.dark .ang-ctrl-block {
           background:#1a2720;
