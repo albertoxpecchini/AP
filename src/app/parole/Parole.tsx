@@ -500,6 +500,15 @@ export default function Parole() {
         {message && <div className="parole-message">{message}</div>}
       </div>
 
+      {eliminated.size > 0 && (
+        <div className="parole-elim-row" aria-label="Lettere eliminate dall'aiuto">
+          <span className="parole-elim-label">✗</span>
+          {[...eliminated].sort().map(k => (
+            <span key={k} className="parole-elim-chip">{k}</span>
+          ))}
+        </div>
+      )}
+
       <div className="parole-stage">
         <div className="parole-game">
           <main className="parole-board" onClick={focusInput} style={{ '--cols': cols } as React.CSSProperties}>
@@ -838,6 +847,45 @@ export default function Parole() {
         @keyframes parole-toast {
           from { opacity: 0; transform: translateY(-8px) scale(0.96); }
           to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .parole-elim-row {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          flex-wrap: wrap;
+          justify-content: center;
+          max-width: 460px;
+          padding: 0 1rem;
+          min-height: 1.6rem;
+          animation: parole-fade-in 0.3s ease;
+        }
+        .parole-elim-label {
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: var(--absent);
+          margin-right: 2px;
+        }
+        .parole-elim-chip {
+          font-size: 0.72rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          background: rgba(192,57,43,0.13);
+          color: var(--absent);
+          border: 1px solid rgba(192,57,43,0.35);
+          border-radius: 4px;
+          padding: 0.1rem 0.35rem;
+          letter-spacing: 0.04em;
+          line-height: 1.4;
+          animation: parole-elim-appear 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes parole-elim-appear {
+          from { opacity: 0; transform: scale(0.6); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        .parole-page.dark .parole-elim-chip {
+          background: rgba(192,57,43,0.2);
+          border-color: rgba(192,57,43,0.45);
         }
 
         .parole-stage {
