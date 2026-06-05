@@ -13,8 +13,8 @@
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "VITE",
-          "endsPattern": "Local:"
+          "beginsPattern": ".*VITE.*",
+          "endsPattern": ".*Local:.*"
         }
       },
       "presentation": {
