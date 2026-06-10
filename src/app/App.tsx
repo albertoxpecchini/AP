@@ -28,8 +28,6 @@ import {
   ShoppingBag,
   Tag,
   FileText,
-  ArrowDown,
-  ArrowUp,
 } from "lucide-react";
 import {
   SiInstagram,
@@ -98,15 +96,7 @@ const SOCIALS = [
 ];
 
 const PROJECTS = [
-  {
-    category: "Web game",
-    date: "31 mag 2026",
-    title: "5BT",
-    url: "/5bt",
-    desc: "Aula isometrica pixel-art della 5BT in stile Tuber Simulator: cattedra, LIM, banchi 2-2-2-3, finestre e calorifero. Ruota la stanza con la manina su quattro viste.",
-    tags: ["React", "TypeScript", "SVG", "Isometrico", "Game design"],
-  },
-  {
+{
     category: "Web game",
     date: "30 mag 2026",
     title: "Angoli",
@@ -387,7 +377,6 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [localMode, setLocalMode] = useState(false);
   const [docOpen, setDocOpen] = useState<{ url: string; title: string } | null>(null);
-  const [cvSortOrder, setCvSortOrder] = useState<"asc" | "desc">("asc");
 
   const sortedCV = useMemo(() => {
     const wishes = CV.filter((c) => (c as any).wish);
@@ -395,10 +384,10 @@ export default function App() {
     const sorted = items.slice().sort((a, b) => {
       const da = parsePeriodStart(a.period);
       const db = parsePeriodStart(b.period);
-      return cvSortOrder === "asc" ? da - db : db - da;
+      return db - da;
     });
     return [...sorted, ...wishes];
-  }, [cvSortOrder]);
+  }, []);
 
   const CV_PDF = "/cv-alberto-pecchini.pdf";
 
@@ -813,29 +802,6 @@ export default function App() {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="ap-cv-sort mb-4 d-flex align-items-center gap-2 flex-wrap">
-              <span className="text-muted small">Ordina cronologicamente:</span>
-              <button
-                type="button"
-                onClick={() => setCvSortOrder("asc")}
-                className={`btn btn-sm fw-semibold d-inline-flex align-items-center ${cvSortOrder === "asc" ? "btn-primary" : "btn-outline-primary"}`}
-                aria-pressed={cvSortOrder === "asc"}
-                aria-label="Ordina dal più vecchio al più recente"
-              >
-                <ArrowUp size={16} className="me-2" aria-hidden="true" />
-                Crescente
-              </button>
-              <button
-                type="button"
-                onClick={() => setCvSortOrder("desc")}
-                className={`btn btn-sm fw-semibold d-inline-flex align-items-center ${cvSortOrder === "desc" ? "btn-primary" : "btn-outline-primary"}`}
-                aria-pressed={cvSortOrder === "desc"}
-                aria-label="Ordina dal più recente al più vecchio"
-              >
-                <ArrowDown size={16} className="me-2" aria-hidden="true" />
-                Decrescente
-              </button>
             </div>
             <div className="row">
               <div className="col-lg-9">
