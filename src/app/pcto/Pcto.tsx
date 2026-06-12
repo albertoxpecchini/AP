@@ -728,6 +728,23 @@ export default function Pcto() {
             </div>
           </div>
         </section>
+
+        {/* Banner full-width: tutto il team davanti alla sede Caem */}
+        <section className="pcto-team-banner" aria-label="Il team del Caem Group davanti alla sede">
+          <img
+            src="/images/pcto-team-banner.jpg"
+            alt="Illustrazione del team dell'ufficio tecnico Caem Group davanti alla sede di Castellucchio"
+            loading="lazy"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+          />
+          <div className="pcto-team-scrim" aria-hidden="true" />
+          <div className="pcto-team-overlay">
+            <div className="container">
+              <p className="pcto-team-kicker">Caem Group S.p.A. · Castellucchio (MN)</p>
+              <h2 className="pcto-team-title">Tutto il team, davanti all'azienda</h2>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className="pcto-footer">
@@ -1071,6 +1088,58 @@ export default function Pcto() {
         .pcto-closing p { font-size: 1.15rem; line-height: 1.7; opacity: 0.96; max-width: 54rem; }
         .pcto-closing strong { color: #ffffff; }
         @media (max-width: 575.98px) { .pcto-closing { padding: 1.75rem; } }
+
+        /* Banner full-width del team davanti alla sede */
+        .pcto-team-banner {
+          position: relative;
+          width: 100%;
+          min-height: clamp(240px, 34vw, 440px);
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          /* fallback neroverde finché l'immagine non è presente */
+          background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 60%, #3F8F5A 100%);
+        }
+        .pcto-team-banner img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          z-index: 0;
+        }
+        .pcto-team-scrim {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          background-image: linear-gradient(
+            90deg,
+            rgba(16, 56, 32, 0.80) 0%,
+            rgba(16, 56, 32, 0.45) 42%,
+            rgba(16, 56, 32, 0.05) 72%,
+            rgba(16, 56, 32, 0) 100%
+          );
+        }
+        .pcto-team-overlay { position: relative; z-index: 2; width: 100%; }
+        .pcto-team-kicker {
+          color: rgba(255, 255, 255, 0.88);
+          text-transform: uppercase;
+          letter-spacing: 0.16em;
+          font-weight: 600;
+          font-size: 0.875rem;
+          margin-bottom: 0.5rem;
+        }
+        .pcto-team-title {
+          color: #ffffff;
+          font-weight: 800;
+          font-size: clamp(1.85rem, 4.4vw, 3.1rem);
+          line-height: 1.05;
+          letter-spacing: -0.01em;
+          margin-bottom: 0;
+          max-width: 22ch;
+          text-shadow: 0 2px 20px rgba(0, 0, 0, 0.28);
+        }
 
         /* Footer */
         .pcto-footer { background-color: #103820; color: #ffffff; }
