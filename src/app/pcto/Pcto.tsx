@@ -836,7 +836,7 @@ export default function Pcto() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center;
+          object-position: center 26%;
           z-index: 0;
         }
         .pcto-team-scrim {
