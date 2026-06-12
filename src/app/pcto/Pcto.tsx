@@ -16,6 +16,7 @@ import {
   FolderTree,
   ChevronRight,
   PencilRuler,
+  Images,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -412,6 +413,14 @@ const HOURS = [
   { year: "a.s. 2025/26", h: "80 h", note: "apprendimento misto" },
 ];
 
+// Foto di repertorio (Pexels, uso libero) — il legno strutturale dal vero.
+const GALLERY = [
+  { src: "/images/pcto-copertura-legno.jpg", cap: "Struttura di copertura in legno" },
+  { src: "/images/pcto-travi-travetti.jpg", cap: "Travi e travetti a vista" },
+  { src: "/images/pcto-tettoia.jpg", cap: "Tettoia in legno rifinita" },
+  { src: "/images/pcto-magazzino.jpg", cap: "Magazzino di legname" },
+];
+
 const TOOLS = [
   { name: "AutoCAD", who: "Il mio strumento", desc: "Modellazione 3D delle tettoie coi poligoni, dalle competenze di disegno tecnico della terza." },
   { name: "cadwork", who: "Software dell'azienda", desc: "CAD 3D di carpenteria in legno: qui i tecnici importavano e modificavano il progetto in diretta." },
@@ -546,6 +555,22 @@ export default function Pcto() {
                   <span className="pcto-fact-note">{note}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Il legno, dal vero — galleria di foto reali */}
+            <div className="pcto-gallery-wrap">
+              <p className="pcto-flow-title">
+                <Images size={18} className="me-2" aria-hidden="true" /> Il legno, dal vero
+              </p>
+              <div className="pcto-gallery">
+                {GALLERY.map((g) => (
+                  <figure className="pcto-shot" key={g.src}>
+                    <img src={g.src} alt={g.cap} loading="lazy" width={1600} height={1067} />
+                    <figcaption>{g.cap}</figcaption>
+                  </figure>
+                ))}
+              </div>
+              <p className="pcto-gallery-credit">Immagini di repertorio · Pexels (uso libero)</p>
             </div>
 
             {/* Il flusso di lavoro */}
@@ -870,6 +895,40 @@ export default function Pcto() {
         @media (max-width: 767.98px) {
           .pcto-facts { grid-template-columns: repeat(2, 1fr); }
           .pcto-fact:last-child { grid-column: 1 / -1; }
+        }
+
+        /* Galleria "Il legno, dal vero" */
+        .pcto-gallery-wrap { margin-bottom: 3.5rem; }
+        .pcto-gallery {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1rem;
+        }
+        .pcto-shot {
+          position: relative;
+          margin: 0;
+          border-radius: 14px;
+          overflow: hidden;
+          aspect-ratio: 3 / 2;
+          border: 1px solid rgba(47, 125, 74, 0.18);
+          box-shadow: 0 8px 22px rgba(16, 56, 32, 0.08);
+        }
+        .pcto-shot img {
+          width: 100%; height: 100%;
+          object-fit: cover; display: block;
+          transition: transform 0.45s ease;
+        }
+        .pcto-shot:hover img { transform: scale(1.05); }
+        .pcto-shot figcaption {
+          position: absolute;
+          left: 0; right: 0; bottom: 0;
+          padding: 1.6rem 0.85rem 0.6rem;
+          font-size: 0.82rem; font-weight: 700; color: #ffffff;
+          background: linear-gradient(to top, rgba(16, 56, 32, 0.88), rgba(16, 56, 32, 0));
+        }
+        .pcto-gallery-credit { margin-top: 0.6rem; font-size: 0.76rem; color: #6b8275; }
+        @media (max-width: 767.98px) {
+          .pcto-gallery { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
         }
 
         /* Flusso di lavoro */
