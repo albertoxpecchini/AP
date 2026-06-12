@@ -74,6 +74,65 @@ function WhatsAppIcon({ size = 20 }: { size?: number }) {
   );
 }
 
+// ── Miniature SVG dei progetti interni (line-art neroverde, discrete) ──
+function AngoliThumb() {
+  const vx = 96, vy = 158, r = 188, arcR = 48;
+  const a1 = 0, a2 = -(48 * Math.PI) / 180, steps = 18;
+  const pts: string[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = a1 + (a2 - a1) * (i / steps);
+    pts.push(`${(vx + arcR * Math.cos(t)).toFixed(1)} ${(vy + arcR * Math.sin(t)).toFixed(1)}`);
+  }
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      <path d={`M ${vx} ${vy} L ${pts.join(" L ")} Z`} fill="rgba(47,125,74,0.10)" />
+      <path d={`M ${pts.join(" L ")}`} fill="none" stroke="rgba(31,107,61,0.55)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1={vx} y1={vy} x2={vx + r} y2={vy} stroke="rgba(31,107,61,0.55)" strokeWidth="2.6" strokeLinecap="round" />
+      <line x1={vx} y1={vy} x2={vx + r * Math.cos(a2)} y2={vy + r * Math.sin(a2)} stroke="rgba(31,107,61,0.55)" strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx={vx} cy={vy} r="4" fill="#1F6B3D" />
+    </svg>
+  );
+}
+
+function ParoleThumb() {
+  const cols = 5, w = 44, gap = 11, rx = 7;
+  const rowW = cols * w + (cols - 1) * gap;
+  const startX = (360 - rowW) / 2;
+  const y1 = 50, y2 = 105;
+  const states = ["correct", "empty", "present", "empty", "empty"];
+  const fillFor: Record<string, string> = { correct: "rgba(47,125,74,0.20)", present: "rgba(214,158,46,0.22)", empty: "none" };
+  const strokeFor: Record<string, string> = { correct: "rgba(47,125,74,0.55)", present: "rgba(214,158,46,0.60)", empty: "rgba(31,107,61,0.35)" };
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      {Array.from({ length: cols }).map((_, i) => (
+        <rect key={`t${i}`} x={startX + i * (w + gap)} y={y1} width={w} height={w} rx={rx} fill="none" stroke="rgba(31,107,61,0.22)" strokeWidth="2" />
+      ))}
+      {states.map((s, i) => (
+        <rect key={`b${i}`} x={startX + i * (w + gap)} y={y2} width={w} height={w} rx={rx} fill={fillFor[s]} stroke={strokeFor[s]} strokeWidth="2.2" />
+      ))}
+    </svg>
+  );
+}
+
+function PctoThumb() {
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      <path d="M118 92 L118 118 Q118 143 180 147 Q242 143 242 118 L242 92 Z" fill="rgba(47,125,74,0.08)" stroke="rgba(31,107,61,0.5)" strokeWidth="2.2" strokeLinejoin="round" />
+      <path d="M180 52 L264 86 L180 120 L96 86 Z" fill="rgba(47,125,74,0.12)" stroke="rgba(31,107,61,0.6)" strokeWidth="2.4" strokeLinejoin="round" />
+      <circle cx="180" cy="86" r="4.5" fill="#1F6B3D" />
+      <path d="M180 86 L266 86 L288 138" fill="none" stroke="rgba(31,107,61,0.55)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="288" cy="143" r="5.5" fill="rgba(47,125,74,0.20)" stroke="rgba(31,107,61,0.55)" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function ProjectThumb({ name }: { name: string }) {
+  if (name === "angoli") return <AngoliThumb />;
+  if (name === "parole") return <ParoleThumb />;
+  if (name === "pcto") return <PctoThumb />;
+  return null;
+}
+
 // Social del footer. href "#" = profilo da fornire (verranno rimossi quelli non usati).
 const SOCIALS = [
   { name: "Instagram", Icon: SiInstagram, href: "https://www.instagram.com/albertoxpecchini" },
@@ -96,11 +155,21 @@ const SOCIALS = [
 ];
 
 const PROJECTS = [
-{
+  {
+    category: "Scuola-lavoro · PCTO",
+    date: "2023 — 2026",
+    title: "PCTO",
+    url: "/pcto",
+    thumb: "pcto",
+    desc: "Tre anni di alternanza scuola-lavoro al Caem Group S.p.A. di Castellucchio, nell'ufficio tecnico del reparto legno: modellazione 3D di tettoie in AutoCAD, osservazione del calcolo strutturale e archiviazione dei preventivi. Racconto del percorso con illustrazioni dei legni.",
+    tags: ["Reparto legno", "AutoCAD 3D", "Strutture in legno", "Ufficio tecnico"],
+  },
+  {
     category: "Web game",
     date: "30 mag 2026",
     title: "Angoli",
     url: "/angoli",
+    thumb: "angoli",
     desc: "Indovina l'angolo in gradianti tra due semirette ruotate casualmente. Feedback binario (Maggiore/Minore), cinque modalità di difficoltà (da 20g a 1g), sistema di strike consecutivi e trofei geometrici.",
     tags: ["React", "TypeScript", "SVG", "Game design"],
   },
@@ -109,6 +178,7 @@ const PROJECTS = [
     date: "29 mag 2026",
     title: "Parole",
     url: "/parole",
+    thumb: "parole",
     desc: "Gioco di parole in stile Wordle, in italiano. Sei tentativi per indovinare una parola di cinque lettere: le caselle diventano verdi se la lettera è al posto giusto, gialle se è presente ma in posizione errata, grigie se assente. Tastiera fisica e a schermo, validazione sul dizionario e parola casuale a ogni partita.",
     tags: ["React", "TypeScript", "react-router", "Game design"],
   },
@@ -869,6 +939,10 @@ export default function App() {
                             className="ap-project-screenshot"
                             loading="lazy"
                           />
+                        ) : (p as any).thumb ? (
+                          <div className="ap-project-thumb">
+                            <ProjectThumb name={(p as any).thumb} />
+                          </div>
                         ) : (
                           <div className="ap-project-placeholder">
                             <div className="ap-project-placeholder-text">{p.title}</div>
@@ -1507,6 +1581,21 @@ export default function App() {
           color: #1F6B3D;
           text-align: center;
           padding: 1rem;
+        }
+        /* Miniatura SVG (progetti interni) */
+        .ap-project-thumb {
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #DCEFE2 0%, #EAF6EE 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.25rem;
+        }
+        .ap-project-thumb svg {
+          width: 100%;
+          height: 100%;
+          display: block;
         }
         .ap-project-card .it-card-title a {
           display: inline-flex;

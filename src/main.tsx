@@ -6,7 +6,7 @@ import "./styles/index.css";
 
 const Parole = lazy(() => import("./app/parole/Parole.tsx"));
 const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
-const Aula = lazy(() => import("./app/aula/Aula.tsx"));
+const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -29,14 +29,14 @@ createRoot(document.getElementById("root")!).render(
         }
       />
       <Route
-        path="/5bt"
+        path="/pcto"
         element={
           <Suspense fallback={null}>
-            <Aula />
+            <Pcto />
           </Suspense>
         }
       />
-      <Route path="*" element={<App />} />
+<Route path="*" element={<App />} />
     </Routes>
   </BrowserRouter>,
 );
