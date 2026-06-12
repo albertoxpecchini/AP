@@ -823,20 +823,15 @@ export default function Pcto() {
         .pcto-team-banner {
           position: relative;
           width: 100%;
-          min-height: clamp(240px, 34vw, 440px);
-          display: flex;
-          align-items: center;
           overflow: hidden;
           /* fallback neroverde finché l'immagine non è presente */
           background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 60%, #3F8F5A 100%);
         }
         .pcto-team-banner img {
-          position: absolute;
-          inset: 0;
+          display: block;
           width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center 26%;
+          height: auto;          /* immagine intera, nessun taglio */
+          position: relative;
           z-index: 0;
         }
         .pcto-team-scrim {
@@ -844,14 +839,18 @@ export default function Pcto() {
           inset: 0;
           z-index: 1;
           background-image: linear-gradient(
-            90deg,
-            rgba(16, 56, 32, 0.80) 0%,
-            rgba(16, 56, 32, 0.45) 42%,
-            rgba(16, 56, 32, 0.05) 72%,
-            rgba(16, 56, 32, 0) 100%
+            165deg,
+            rgba(16, 56, 32, 0.66) 0%,
+            rgba(16, 56, 32, 0.22) 30%,
+            rgba(16, 56, 32, 0) 55%
           );
         }
-        .pcto-team-overlay { position: relative; z-index: 2; width: 100%; }
+        .pcto-team-overlay {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          z-index: 2;
+          padding-top: clamp(1.25rem, 3.5vw, 2.75rem);
+        }
         .pcto-team-kicker {
           color: rgba(255, 255, 255, 0.88);
           text-transform: uppercase;
