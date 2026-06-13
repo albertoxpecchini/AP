@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
-import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun, HelpCircle } from "lucide-react";
+import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun, HelpCircle, Layers } from "lucide-react";
 import GameTutorial, { hasSeenTutorial, resetTutorial, type IntroStep } from "../components/GameIntro";
 import AngoliMenu, { type StepMode as MenuStepMode } from "./AngoliMenu";
 
@@ -329,13 +329,11 @@ export default function Angoli() {
           <h1 className="ang-title">ANG<span className="ang-accent">OL</span>I</h1>
         </div>
         <div className="ang-hdr-center">
-          <div className="ang-modes-header" role="group" aria-label="Difficoltà">
-            {STEP_OPTIONS.map(s=>(
-              <button key={s} type="button" className={`ang-mode-sm${step===s?" ang-mode-sm--active":""}`}
-                onClick={()=>changeStep(s)} aria-pressed={step===s}
-                title={STEP_LABELS[s]}>{s}g</button>
-            ))}
-          </div>
+          <button className="ang-mode-pill" onClick={()=>setShowMenu(true)} aria-label="Cambia modalità">
+            <Layers size={13}/>
+            <span>{STEP_LABELS[step]}</span>
+            <span className="ang-mode-pill-step">{step}g</span>
+          </button>
         </div>
         <div className="ang-hdr-right">
           <button className="ang-iconbtn" onClick={newGame} aria-label="Nuova partita"><RotateCcw size={16}/></button>
@@ -518,6 +516,19 @@ export default function Angoli() {
           cursor:pointer; transition:background 0.15s, color 0.15s; letter-spacing:0.02em;
         }
         .ang-mode-sm--active { background:rgba(255,255,255,0.28); color:#fff; box-shadow:0 0 0 1px rgba(255,255,255,0.3); }
+        .ang-mode-pill {
+          display:inline-flex; align-items:center; gap:0.35rem;
+          background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.22);
+          color:#fff; border-radius:999px; padding:0.28rem 0.75rem 0.28rem 0.6rem;
+          font-size:0.78rem; font-weight:700; cursor:pointer; font-family:inherit;
+          transition:background 0.15s; letter-spacing:0.02em;
+        }
+        .ang-mode-pill:hover { background:rgba(255,255,255,0.22); }
+        .ang-mode-pill-step {
+          background:rgba(255,255,255,0.18); border-radius:999px;
+          padding:0.05rem 0.4rem; font-size:0.68rem; font-weight:800;
+          color:rgba(255,255,255,0.85);
+        }
         .ang-title { font-size:1.5rem; font-weight:700; letter-spacing:0.2em; margin:0; animation:none; }
         .ang-accent { color:#6fd08a; }
         @keyframes ang-drop { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
@@ -693,9 +704,7 @@ export default function Angoli() {
           .ang-hdr-left { justify-self:start; gap:0.75rem; }
           .ang-hdr-center { display:flex; align-items:center; justify-content:center; }
           .ang-hdr-right { justify-self:end; gap:0.5rem; }
-          .ang-modes-header { display:flex; gap:4px; }
-          .ang-mode-sm { padding:0.28rem 0.8rem; font-size:0.78rem; border:1px solid rgba(255,255,255,0.25); }
-          .ang-mode-sm--active { background:rgba(255,255,255,0.3); color:#fff; border-color:transparent; }
+          .ang-mode-pill { padding:0.32rem 0.9rem 0.32rem 0.7rem; font-size:0.82rem; }
 
           /* Stage: 3 colonne — game | centro | comandi */
           .ang-stage {
