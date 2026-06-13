@@ -693,7 +693,7 @@ export default function Angoli() {
           .ang-key       { height:40px; }
         }
 
-        /* ── Desktop: layout a 3 colonne ── */
+        /* ── Desktop ── */
         @media (min-width: 760px) {
           .ang-header {
             height:60px;
@@ -706,43 +706,48 @@ export default function Angoli() {
           .ang-hdr-right { justify-self:end; gap:0.5rem; }
           .ang-mode-pill { padding:0.32rem 0.9rem 0.32rem 0.7rem; font-size:0.82rem; }
 
-          /* Stage: 3 colonne — game | centro | comandi */
+          /* Stage: tutto centrato, larghezza massima fissa, niente spazio vuoto */
           .ang-stage {
             flex:1 1 0; min-height:0;
-            display:grid;
-            grid-template-columns:auto auto auto;
-            grid-template-areas:"game center controls";
-            gap:0 2rem;
+            display:flex;
+            flex-direction:row;
             align-items:center;
             justify-content:center;
-            padding:1rem 2rem;
+            gap:1.5rem;
+            padding:1rem 1.5rem;
+            overflow:hidden;
           }
           .ang-game {
-            grid-area:game;
             display:flex; align-items:center; justify-content:center;
-            height:100%;
+            flex-shrink:0;
           }
-          .ang-fig-wrap { width:290px; height:290px; }
+          /* SVG quadrato proporzionato all'altezza disponibile */
+          .ang-fig-wrap {
+            width:min(38vh, 340px);
+            height:min(38vh, 340px);
+          }
+          /* Colonna centrale: stats verticali */
           .ang-center {
-            grid-area:center;
             display:flex; flex-direction:column;
-            align-items:center;
-            gap:0.75rem;
-            height:100%;
-            justify-content:center;
-            min-width:190px;
+            align-items:center; justify-content:center;
+            gap:0.6rem;
+            flex-shrink:0;
+            width:130px;
           }
+          .ang-center-stats { flex-direction:column; gap:0.5rem; width:100%; }
+          .ang-stat-card { width:100%; }
+          /* Card comandi: altezza piena dell'area disponibile */
           .ang-ctrl-block {
-            grid-area:controls;
-            height:100%;
+            flex-shrink:0;
+            width:270px;
+            max-height:calc(100% - 0px);
             overflow-y:auto;
             display:flex; flex-direction:column;
             background:#fff;
             border:1px solid rgba(47,125,74,0.14);
             border-radius:14px;
-            padding:1.1rem;
+            padding:1rem;
             box-shadow:0 4px 24px rgba(0,0,0,0.07);
-            min-width:200px;
             justify-content:center;
           }
         }
