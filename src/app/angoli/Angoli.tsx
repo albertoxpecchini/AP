@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
-import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun } from "lucide-react";
+import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun, HelpCircle } from "lucide-react";
+import GameTutorial, { hasSeenTutorial, resetTutorial, type IntroStep } from "../components/GameIntro";
+import AngoliMenu from "./AngoliMenu";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -14,6 +16,111 @@ const TROPHIES = [
   { strike: 5,  emoji: "🥈", label: "Geometra Esperto",              desc: "5 angoli di fila. L'occhio non sbaglia.",   accent: "#7A8C99" },
   { strike: 3,  emoji: "🥉", label: "Geometra Dilettante",           desc: "3 angoli di fila. Il percorso è iniziato.", accent: "#A0674A" },
 ] as const;
+
+// ─── Intro steps ──────────────────────────────────────────────────────────────
+
+const ANGOLI_SVG_DEMO = (
+  <svg viewBox="0 0 220 150" width="220" height="150" aria-hidden="true">
+    {/* Vertex bottom-left, horizontal ray right, diagonal ray upper-right ~65° */}
+    <g transform="translate(30,110)">
+      {/* Arc */}
+      <path d="M 38 0 A 38 38 0 0 0 16.1 -34.4" fill="none" stroke="#D9A400" strokeWidth="3" strokeLinecap="round" />
+      {/* Horizontal ray */}
+      <line x1="0" y1="0" x2="155" y2="0" stroke="#2F7D4A" strokeWidth="4" strokeLinecap="round" />
+      <polygon points="162,0 150,-5 150,5" fill="#2F7D4A" />
+      {/* Diagonal ray ~65° upward */}
+      <line x1="0" y1="0" x2="54" y2="-115" stroke="#2F7D4A" strokeWidth="4" strokeLinecap="round" />
+      <polygon points="58,-122 46,-114 57,-105" fill="#2F7D4A" />
+      {/* Vertex dot */}
+      <circle cx="0" cy="0" r="6" fill="#2F7D4A" />
+      {/* Label */}
+      <text x="48" y="-18" fontSize="15" fill="#D9A400" fontWeight="800" fontFamily="monospace">?g</text>
+    </g>
+  </svg>
+);
+
+const HINT_SVG = (
+  <svg viewBox="0 0 220 120" width="220" height="120" aria-hidden="true">
+    {[
+      { y: 30, val: "30g", hint: "↑", label: "Maggiore", color: "#2F7D4A" },
+      { y: 70, val: "60g", hint: "↓", label: "Minore",   color: "#c0392b" },
+    ].map((r, i) => (
+      <g key={i}>
+        <rect x="10" y={r.y - 14} width="200" height="28" rx="6"
+          fill={r.color + "15"} stroke={r.color + "60"} strokeWidth="1.5" />
+        <text x="22" y={r.y + 5} fontSize="13" fill={r.color} fontWeight="700" fontFamily="monospace">
+          #{i + 1}
+        </text>
+        <text x="55" y={r.y + 5} fontSize="14" fill="#17271d" fontWeight="700" fontFamily="monospace">
+          {r.val}
+        </text>
+        <text x="105" y={r.y + 5} fontSize="17" fill={r.color} fontWeight="900">{r.hint}</text>
+        <text x="128" y={r.y + 5} fontSize="13" fill={r.color} fontWeight="700">{r.label}</text>
+      </g>
+    ))}
+  </svg>
+);
+
+const TROPHY_SVG = (
+  <div style={{ textAlign: "center" }}>
+    <div style={{ fontSize: "3rem", lineHeight: 1, marginBottom: "0.5rem" }}>🏆</div>
+    <div style={{ fontSize: "0.85rem", color: "#c8a415", fontWeight: 700 }}>
+      Trofeo della Geometria Piana
+    </div>
+    <div style={{ fontSize: "0.75rem", color: "#6b8070", marginTop: "0.2rem" }}>
+      10 angoli di fila
+    </div>
+  </div>
+);
+
+const ANGOLI_INTRO_STEPS: IntroStep[] = [
+  {
+    title: "Indovina l'angolo!",
+    body: "Osserva le due semirette nell'area sinistra. Il tuo obiettivo è indovinare la misura dell'angolo che formano, espressa in gradianti (g).",
+    visual: ANGOLI_SVG_DEMO,
+  },
+  {
+    title: "Il sistema di indizi",
+    body: "Dopo ogni tentativo ricevi un indizio: ↑ Maggiore (il vero angolo è più grande) oppure ↓ Minore (è più piccolo). Usa gli indizi per restringere il campo!",
+    visual: HINT_SVG,
+  },
+  {
+    title: "Difficoltà e gradianti",
+    body: "La difficoltà determina il 'passo': in modalità Facile (20g) i valori possibili sono 20, 40, 60… In modalità Maestro (1g) ogni valore da 1 a 399 è possibile.",
+    visual: undefined,
+  },
+  {
+    title: "Streak e trofei",
+    body: "Ogni risposta corretta consecutiva aumenta la tua Streak. Raggiungi 3, 5, 7 o 10 streak per sbloccare trofei geometrici esclusivi!",
+    visual: TROPHY_SVG,
+  },
+];
+
+// ─── Logo reale (PNG) ─────────────────────────────────────────────────────────
+
+function AngoliLogo({ size = 52 }: { size?: number }) {
+  return (
+    <img
+      src="/angoli-logo.png"
+      alt="Angoli"
+      width={size}
+      height={size}
+      style={{ objectFit: "contain", display: "block" }}
+    />
+  );
+}
+
+function AngoliLogoFull({ size = 80 }: { size?: number }) {
+  return (
+    <img
+      src="/angoli-logo.png"
+      alt="Angoli"
+      width={size}
+      height={size}
+      style={{ objectFit: "contain", display: "block" }}
+    />
+  );
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -65,6 +172,8 @@ function AngleDisplay({ angle, rotation }: { angle: number; rotation: number }) 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Angoli() {
+  const [showMenu, setShowMenu]       = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [step, setStep]     = useState<StepMode>(10);
   const [angle, setAngle]   = useState(() => randomAngle(10));
   const [rotation, setRot]  = useState(randomRotation);
@@ -181,6 +290,35 @@ export default function Angoli() {
   return (
     <div className={`ang-page${dark ? " dark" : ""}`}>
 
+      {/* ── Menu principale (sempre all'apertura) ── */}
+      {showMenu && (
+        <AngoliMenu
+          dark={dark}
+          bestStrike={best}
+          trophiesCount={achieved.length}
+          onPlay={() => {
+            if (!hasSeenTutorial("angoli")) {
+              setShowTutorial(true);
+            } else {
+              setShowMenu(false);
+            }
+          }}
+          onTutorial={() => setShowTutorial(true)}
+        />
+      )}
+
+      {/* ── Tutorial (prima volta obbligatorio, poi facoltativo) ── */}
+      {showTutorial && (
+        <GameTutorial
+          gameKey="angoli"
+          steps={ANGOLI_INTRO_STEPS}
+          accentColor="#2F7D4A"
+          darkBg="#103820"
+          dark={dark}
+          onDone={() => { setShowTutorial(false); setShowMenu(false); }}
+        />
+      )}
+
       {/* ── Header ── */}
       <header className="ang-header">
         <div className="ang-hdr-left">
@@ -199,6 +337,9 @@ export default function Angoli() {
           <button className="ang-iconbtn" onClick={newGame} aria-label="Nuova partita"><RotateCcw size={16}/></button>
           <button className="ang-iconbtn" onClick={toggleDark} aria-label="Cambia tema">
             {dark ? <Sun size={16}/> : <Moon size={16}/>}
+          </button>
+          <button className="ang-iconbtn" onClick={()=>setShowTutorial(true)} aria-label="Come si gioca">
+            <HelpCircle size={16}/>
           </button>
         </div>
       </header>
