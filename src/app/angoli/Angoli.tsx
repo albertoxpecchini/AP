@@ -538,35 +538,30 @@ export default function Angoli() {
         }
         .ang-iconbtn:hover { background:rgba(255,255,255,0.15); transform:translateY(-1px); }
 
-        /* ── Stage ── */
+        /* ── Stage: mobile prima, desktop override ── */
         .ang-stage {
-          width:100%; flex:1 1 0; min-height:0;
-          display:flex; flex-direction:column; align-items:center; gap:0.75rem;
-          padding:8px 16px 16px; overflow-y:auto;
+          flex:1 1 0; min-height:0;
+          display:flex; flex-direction:column;
+          align-items:center; justify-content:flex-start;
+          gap:12px; padding:12px 16px 20px;
+          overflow-y:auto; overflow-x:hidden;
+          width:100%;
         }
 
-        /* Stats nella card — nascosti su mobile (le stats non ci sono) */
+        /* Stats nella card — nascosti ovunque di default */
         .ang-card-stats { display:none; }
         .ang-message--card { display:none; }
 
-        /* ── Figura ── */
-        .ang-game {
-          display:flex; align-items:center; justify-content:center;
-          flex-shrink:0; width:100%;
-        }
-        .ang-fig-wrap {
-          width:min(85vw,280px); height:min(85vw,280px);
-          display:flex; align-items:center; justify-content:center;
-        }
+        /* ── Figura mobile ── */
+        .ang-game { display:flex; align-items:center; justify-content:center; width:100%; flex-shrink:0; }
+        .ang-fig-wrap { width:min(80vw,260px); height:min(80vw,260px); display:flex; align-items:center; justify-content:center; }
         .ang-svg { display:block; width:100%; height:100%; }
 
-        /* ── Card comandi ── */
+        /* ── Card mobile ── */
         .ang-ctrl-block {
-          flex-shrink:0; width:min(90vw,320px);
-          background:#fff;
-          border:1px solid rgba(47,125,74,0.18);
-          border-radius:14px;
-          padding:1rem 1rem 0.9rem;
+          flex-shrink:0; width:min(92vw,320px);
+          background:#fff; border:1px solid rgba(47,125,74,0.18);
+          border-radius:14px; padding:1rem;
           display:flex; flex-direction:column; gap:0;
           box-shadow:0 4px 18px rgba(0,0,0,0.06);
         }
@@ -667,62 +662,62 @@ export default function Angoli() {
 
         /* ── Desktop ── */
         @media (min-width: 760px) {
+          /* Header */
           .ang-header {
-            height:60px; flex-shrink:0;
+            height:56px; flex-shrink:0;
             display:grid; grid-template-columns:1fr auto 1fr;
             padding:0 1.25rem;
           }
           .ang-hdr-left  { justify-self:start; gap:0.75rem; }
           .ang-hdr-center{ display:flex; align-items:center; justify-content:center; }
           .ang-hdr-right { justify-self:end; gap:0.5rem; }
-          .ang-mode-pill { padding:0.32rem 0.9rem 0.32rem 0.7rem; font-size:0.82rem; }
+          .ang-mode-pill { padding:0.3rem 0.85rem 0.3rem 0.65rem; font-size:0.8rem; }
 
-          /* Stage: flexbox riga, centrato, dimensioni fisse coordinate */
+          /* Stage: riga centrata, niente overflow */
           .ang-stage {
-            flex:1 1 0; min-height:0; overflow:hidden;
+            flex:1 1 0; min-height:0;
             display:flex; flex-direction:row;
             align-items:center; justify-content:center;
-            gap:1.5rem; padding:1.5rem;
+            gap:2rem; padding:1.5rem 2rem;
+            overflow:hidden;
           }
 
-          /* SVG: stesso height della card */
-          .ang-game { flex-shrink:0; display:flex; align-items:center; }
-          .ang-fig-wrap { width:360px; height:420px; }
+          /* SVG: quadrato, dimensione calcolata sull'altezza disponibile */
+          .ang-game { flex-shrink:0; }
+          .ang-fig-wrap {
+            width:  clamp(240px, calc(100vh - 56px - 3rem), 380px);
+            height: clamp(240px, calc(100vh - 56px - 3rem), 380px);
+          }
 
-          /* Card: larghezza fissa, altezza uguale all'SVG */
+          /* Card: stessa altezza dell'SVG, larghezza fissa */
           .ang-ctrl-block {
-            flex-shrink:0; width:300px; height:420px;
+            flex-shrink:0;
+            width:300px;
+            height: clamp(240px, calc(100vh - 56px - 3rem), 380px);
             overflow-y:auto; overflow-x:hidden;
-            display:flex; flex-direction:column;
             padding:1rem 1.1rem;
             justify-content:flex-start;
           }
 
-          /* Stats riga in cima alla card — visibili su desktop */
+          /* Stats in cima alla card */
           .ang-card-stats {
-            display:flex; align-items:center;
-            gap:0; margin-bottom:0.8rem;
+            display:flex; align-items:stretch;
+            margin-bottom:0.8rem; flex-shrink:0;
             background:rgba(47,125,74,0.06);
             border:1px solid rgba(47,125,74,0.13);
-            border-radius:10px; padding:0.5rem 0.4rem;
-            flex-shrink:0;
+            border-radius:10px; padding:0.45rem 0.3rem;
           }
           .ang-card-stat {
             flex:1; display:flex; flex-direction:column;
-            align-items:center; gap:0.1rem; color:var(--green-dark);
+            align-items:center; gap:0.08rem; color:var(--green-dark);
           }
           .ang-card-stat--mid {
             border-left:1px solid rgba(47,125,74,0.15);
             border-right:1px solid rgba(47,125,74,0.15);
           }
           .ang-card-stat-val { font-size:1rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
-          .ang-card-stat-lbl { font-size:0.55rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; opacity:0.65; }
-
-          /* Messaggio nella card */
-          .ang-message--card {
-            display:flex; margin-bottom:0.5rem; flex-shrink:0;
-          }
-          .ang-message-slot { display:none; }
+          .ang-card-stat-lbl { font-size:0.52rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; opacity:0.6; }
+          .ang-message--card { display:flex; margin-bottom:0.4rem; flex-shrink:0; }
         }
 
         /* ── Dark mode ── */
