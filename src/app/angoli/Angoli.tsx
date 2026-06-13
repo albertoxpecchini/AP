@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun, HelpCircle } from "lucide-react";
 import GameTutorial, { hasSeenTutorial, resetTutorial, type IntroStep } from "../components/GameIntro";
-import AngoliMenu from "./AngoliMenu";
+import AngoliMenu, { type StepMode as MenuStepMode } from "./AngoliMenu";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -296,7 +296,10 @@ export default function Angoli() {
           dark={dark}
           bestStrike={best}
           trophiesCount={achieved.length}
-          onPlay={() => {
+          onPlay={(chosenStep: MenuStepMode) => {
+            setStep(chosenStep);
+            stepR.current = chosenStep;
+            goNext(chosenStep);
             if (!hasSeenTutorial("angoli")) {
               setShowTutorial(true);
             } else {
@@ -329,7 +332,8 @@ export default function Angoli() {
           <div className="ang-modes-header" role="group" aria-label="Difficoltà">
             {STEP_OPTIONS.map(s=>(
               <button key={s} type="button" className={`ang-mode-sm${step===s?" ang-mode-sm--active":""}`}
-                onClick={()=>changeStep(s)} aria-pressed={step===s}>{s}g</button>
+                onClick={()=>changeStep(s)} aria-pressed={step===s}
+                title={STEP_LABELS[s]}>{s}g</button>
             ))}
           </div>
         </div>
@@ -363,8 +367,8 @@ export default function Angoli() {
               <span className="ang-stat-card-lbl">Streak</span>
             </div>
             <div className="ang-stat-card" aria-label="Difficoltà">
-              <span className="ang-stat-card-val" style={{fontSize:"1.2rem"}}>{step}g</span>
-              <span className="ang-stat-card-lbl">Difficoltà</span>
+              <span className="ang-stat-card-val" style={{fontSize:"1rem", textAlign:"center", lineHeight:1.1}}>{STEP_LABELS[step]}</span>
+              <span className="ang-stat-card-lbl">{step}g · Difficoltà</span>
             </div>
             <div className="ang-stat-card" aria-label="Miglior streak">
               <Trophy size={22} aria-hidden="true" />
