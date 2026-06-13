@@ -346,42 +346,39 @@ export default function Angoli() {
         </div>
       </header>
 
-      {/* ── Game area: figure ←→ ctrl block ── */}
+      {/* ── Game area ── */}
       <div className="ang-stage">
 
-        {/* ── Left: angle figure ── */}
+        {/* ── SVG angolo ── */}
         <div className="ang-game">
           <div className="ang-fig-wrap">
             <AngleDisplay angle={angle} rotation={rotation}/>
           </div>
         </div>
 
-        {/* ── Center: stats and message (desktop only) ── */}
-        <div className="ang-center">
-          <div className="ang-center-stats">
-            <div className="ang-stat-card" aria-label="Streak">
-              <Flame size={22} aria-hidden="true" />
-              <span className="ang-stat-card-val">{strike}</span>
-              <span className="ang-stat-card-lbl">Streak</span>
-            </div>
-            <div className="ang-stat-card" aria-label="Difficoltà">
-              <span className="ang-stat-card-val" style={{fontSize:"1rem", textAlign:"center", lineHeight:1.1}}>{STEP_LABELS[step]}</span>
-              <span className="ang-stat-card-lbl">{step}g · Difficoltà</span>
-            </div>
-            <div className="ang-stat-card" aria-label="Miglior streak">
-              <Trophy size={22} aria-hidden="true" />
-              <span className="ang-stat-card-val">{best}</span>
-              <span className="ang-stat-card-lbl">Miglior Streak</span>
-            </div>
-          </div>
-
-          <div className="ang-message-slot">
-            {msg && <div className="ang-message">{msg}</div>}
-          </div>
-        </div>
-
-        {/* ── Right: white card (legend + input + keyboard) ── */}
+        {/* ── Right: white card ── */}
         <aside className="ang-ctrl-block" aria-label="Pannello di gioco">
+
+          {/* Stats row (visibile solo su desktop nella card) */}
+          <div className="ang-card-stats">
+            <div className="ang-card-stat">
+              <Flame size={16} aria-hidden="true" />
+              <span className="ang-card-stat-val">{strike}</span>
+              <span className="ang-card-stat-lbl">Streak</span>
+            </div>
+            <div className="ang-card-stat ang-card-stat--mid">
+              <span className="ang-card-stat-val" style={{fontSize:"0.85rem"}}>{STEP_LABELS[step]}</span>
+              <span className="ang-card-stat-lbl">{step}g</span>
+            </div>
+            <div className="ang-card-stat">
+              <Trophy size={16} aria-hidden="true" />
+              <span className="ang-card-stat-val">{best}</span>
+              <span className="ang-card-stat-lbl">Best</span>
+            </div>
+          </div>
+
+          {/* Messaggio feedback */}
+          {msg && <div className="ang-message ang-message--card">{msg}</div>}
 
           {/* Legend box (stile /parole) */}
           <div className="ang-legend">
@@ -541,56 +538,35 @@ export default function Angoli() {
         }
         .ang-iconbtn:hover { background:rgba(255,255,255,0.15); transform:translateY(-1px); }
 
-        /* ── Stage: game area con layout ── */
+        /* ── Stage ── */
         .ang-stage {
           width:100%; flex:1 1 0; min-height:0;
-          display:flex; flex-direction:column; align-items:center; gap:1rem;
+          display:flex; flex-direction:column; align-items:center; gap:0.75rem;
+          padding:8px 16px 16px; overflow-y:auto;
         }
 
-        /* ── Stat cards desktop (colonna centro) ── */
-        .ang-center { display:none; }
-        .ang-center-stats { display:flex; gap:0.5rem; flex-direction:column; }
-        .ang-stat-card {
-          display:flex; flex-direction:column; align-items:center; gap:0.25rem;
-          padding:0.65rem 0.85rem; background:rgba(47,125,74,0.08);
-          border:1px solid rgba(47,125,74,0.15); border-radius:12px;
-          font-variant-numeric:tabular-nums; color:var(--green-dark); min-width:0; flex:1;
-        }
-        .ang-stat-card-val { font-size:1.15rem; font-weight:800; line-height:1; }
-        .ang-stat-card-lbl { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; opacity:0.75; }
+        /* Stats nella card — nascosti su mobile (le stats non ci sono) */
+        .ang-card-stats { display:none; }
+        .ang-message--card { display:none; }
 
-        /* ── Message slot ── */
-        .ang-message-slot { display:flex; align-items:center; height:2.6rem; }
-        .ang-message {
-          background:#17271d; color:#fff; font-weight:700;
-          padding:0.55rem 1.1rem; border-radius:8px; font-size:0.92rem;
-          box-shadow:0 6px 18px rgba(0,0,0,0.2); animation:ang-toast .25s ease;
-        }
-
-        /* ── Game area: 2 blocchi centrati (mobile) ── */
+        /* ── Figura ── */
         .ang-game {
-          display:flex; flex-direction:column; align-items:center; flex:1 1 0; min-height:0;
+          display:flex; align-items:center; justify-content:center;
+          flex-shrink:0; width:100%;
         }
-
-        /* ── Figura (sinistra) ── */
         .ang-fig-wrap {
-          flex-shrink:0;
-          /* Quadrata, stessa larghezza del blocco destro */
-          width:var(--block-w, 290px);
-          height:var(--block-w, 290px);
+          width:min(85vw,280px); height:min(85vw,280px);
           display:flex; align-items:center; justify-content:center;
         }
         .ang-svg { display:block; width:100%; height:100%; }
 
-        /* ── Blocco destro: carta bianca ── */
+        /* ── Card comandi ── */
         .ang-ctrl-block {
-          --block-w: 290px;
-          flex-shrink:0;
-          width:var(--block-w);
+          flex-shrink:0; width:min(90vw,320px);
           background:#fff;
           border:1px solid rgba(47,125,74,0.18);
           border-radius:14px;
-          padding:1.1rem 1.1rem 0.9rem;
+          padding:1rem 1rem 0.9rem;
           display:flex; flex-direction:column; gap:0;
           box-shadow:0 4px 18px rgba(0,0,0,0.06);
         }
@@ -683,73 +659,70 @@ export default function Angoli() {
         }
         .ang-next:hover { background:var(--green-dark); transform:translateY(-1px); }
 
-        /* ── Mobile: blocchi impilati ── */
+        /* ── Mobile ── */
         @media (max-width: 759px) {
-          .ang-stage { flex-direction:column; gap:12px; overflow-y:auto; padding:8px 16px 16px; }
-          .ang-game { width:100%; }
-          .ang-fig-wrap  { width:min(85vw,240px); height:min(85vw,240px); }
-          .ang-ctrl-block { --block-w: min(90vw, 320px); width:var(--block-w); }
-          .ang-legend    { display:none; } /* nascosta su mobile */
-          .ang-key       { height:40px; }
+          .ang-legend { display:none; }
+          .ang-key    { height:40px; }
         }
 
         /* ── Desktop ── */
         @media (min-width: 760px) {
           .ang-header {
-            height:60px;
-            display:grid;
-            grid-template-columns:1fr auto 1fr;
+            height:60px; flex-shrink:0;
+            display:grid; grid-template-columns:1fr auto 1fr;
             padding:0 1.25rem;
           }
-          .ang-hdr-left { justify-self:start; gap:0.75rem; }
-          .ang-hdr-center { display:flex; align-items:center; justify-content:center; }
+          .ang-hdr-left  { justify-self:start; gap:0.75rem; }
+          .ang-hdr-center{ display:flex; align-items:center; justify-content:center; }
           .ang-hdr-right { justify-self:end; gap:0.5rem; }
           .ang-mode-pill { padding:0.32rem 0.9rem 0.32rem 0.7rem; font-size:0.82rem; }
 
-          /* Stage: tutto centrato, larghezza massima fissa, niente spazio vuoto */
+          /* Stage: flexbox riga, centrato, dimensioni fisse coordinate */
           .ang-stage {
-            flex:1 1 0; min-height:0;
-            display:flex;
-            flex-direction:row;
-            align-items:center;
-            justify-content:center;
-            gap:1.5rem;
-            padding:1rem 1.5rem;
-            overflow:hidden;
-          }
-          .ang-game {
-            display:flex; align-items:center; justify-content:center;
-            flex-shrink:0;
-          }
-          /* SVG quadrato proporzionato all'altezza disponibile */
-          .ang-fig-wrap {
-            width:min(38vh, 340px);
-            height:min(38vh, 340px);
-          }
-          /* Colonna centrale: stats verticali */
-          .ang-center {
-            display:flex; flex-direction:column;
+            flex:1 1 0; min-height:0; overflow:hidden;
+            display:flex; flex-direction:row;
             align-items:center; justify-content:center;
-            gap:0.6rem;
-            flex-shrink:0;
-            width:130px;
+            gap:1.5rem; padding:1.5rem;
           }
-          .ang-center-stats { flex-direction:column; gap:0.5rem; width:100%; }
-          .ang-stat-card { width:100%; }
-          /* Card comandi: altezza piena dell'area disponibile */
+
+          /* SVG: stesso height della card */
+          .ang-game { flex-shrink:0; display:flex; align-items:center; }
+          .ang-fig-wrap { width:360px; height:420px; }
+
+          /* Card: larghezza fissa, altezza uguale all'SVG */
           .ang-ctrl-block {
-            flex-shrink:0;
-            width:270px;
-            max-height:calc(100% - 0px);
-            overflow-y:auto;
+            flex-shrink:0; width:300px; height:420px;
+            overflow-y:auto; overflow-x:hidden;
             display:flex; flex-direction:column;
-            background:#fff;
-            border:1px solid rgba(47,125,74,0.14);
-            border-radius:14px;
-            padding:1rem;
-            box-shadow:0 4px 24px rgba(0,0,0,0.07);
-            justify-content:center;
+            padding:1rem 1.1rem;
+            justify-content:flex-start;
           }
+
+          /* Stats riga in cima alla card — visibili su desktop */
+          .ang-card-stats {
+            display:flex; align-items:center;
+            gap:0; margin-bottom:0.8rem;
+            background:rgba(47,125,74,0.06);
+            border:1px solid rgba(47,125,74,0.13);
+            border-radius:10px; padding:0.5rem 0.4rem;
+            flex-shrink:0;
+          }
+          .ang-card-stat {
+            flex:1; display:flex; flex-direction:column;
+            align-items:center; gap:0.1rem; color:var(--green-dark);
+          }
+          .ang-card-stat--mid {
+            border-left:1px solid rgba(47,125,74,0.15);
+            border-right:1px solid rgba(47,125,74,0.15);
+          }
+          .ang-card-stat-val { font-size:1rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+          .ang-card-stat-lbl { font-size:0.55rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; opacity:0.65; }
+
+          /* Messaggio nella card */
+          .ang-message--card {
+            display:flex; margin-bottom:0.5rem; flex-shrink:0;
+          }
+          .ang-message-slot { display:none; }
         }
 
         /* ── Dark mode ── */
