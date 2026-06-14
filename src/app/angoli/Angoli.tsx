@@ -345,7 +345,10 @@ function AngleDisplay({ angle, rotation, palette, spin }: { angle: number; rotat
 
 export default function Angoli() {
   const [nick, setNick]     = useState<string>(() => getStoredNick());
-  const [showGate, setShowGate] = useState<boolean>(() => !getStoredNick());
+  // Il gate NON appare all'apertura: viene chiesto solo premendo "Gioca"
+  // (se non c'è ancora un nick), come in Parole.
+  const [showGate, setShowGate] = useState<boolean>(false);
+  const pendingStep = useRef<StepMode | null>(null);
   const [showMenu, setShowMenu]       = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -555,6 +558,19 @@ export default function Angoli() {
   const dismissTrophy = useCallback(()=>{ setTrophy(null); autoT.current=window.setTimeout(()=>nextRound(),300); }, [nextRound]);
   // "Nuova partita" dall'header = nuova sessione da 1 minuto.
   const newGame = useCallback(()=>{ startSession(); }, [startSession]);
+
+  // Avvio effettivo dal menu (dopo l'eventuale gate nickname): imposta la
+  // modalità, avvia la sessione e — alla prima volta — mostra il tutorial.
+  const startPlay = useCallback((chosenStep: StepMode) => {
+    setStep(chosenStep);
+    stepR.current = chosenStep; stepRef.current = chosenStep;
+    startSession(chosenStep);
+    if (!hasSeenTutorial("angoli")) {
+      setShowTutorial(true);
+    } else {
+      setShowMenu(false);
+    }
+  }, [startSession]);
   const toggleDark = useCallback(()=>{
     setDark(d=>{ const n=!d; try{localStorage.setItem("games-dark",n?"1":"0");}catch{} return n; });
   }, []);
@@ -570,16 +586,16 @@ export default function Angoli() {
           trophiesCount={achieved.length}
           nick={nick}
           onLeaderboard={()=>setShowLeaderboard(true)}
-          onChangeNick={()=>setShowGate(true)}
+          onChangeNick={()=>{ pendingStep.current = null; setShowGate(true); }}
           onPlay={(chosenStep: MenuStepMode) => {
-            setStep(chosenStep);
-            stepR.current = chosenStep; stepRef.current = chosenStep;
-            startSession(chosenStep);
-            if (!hasSeenTutorial("angoli")) {
-              setShowTutorial(true);
-            } else {
-              setShowMenu(false);
+            // Gate nickname: se non c'è ancora un nick, chiedilo PRIMA di giocare
+            // (memorizza la modalità scelta e apri il gate).
+            if (!nick) {
+              pendingStep.current = chosenStep;
+              setShowGate(true);
+              return;
             }
+            startPlay(chosenStep);
           }}
           onTutorial={() => setShowTutorial(true)}
         />
@@ -808,12 +824,18 @@ export default function Angoli() {
         />
       )}
 
-      {/* ── Gate nickname (prima di tutto: si gioca solo con un nick valido) ── */}
+      {/* ── Gate nickname: chiesto premendo "Gioca" (o "cambia nickname") ── */}
       {showGate && (
         <NicknameGate
           dark={dark}
           initial={nick}
-          onConfirm={(n)=>{ setNick(n); setShowGate(false); }}
+          onConfirm={(n)=>{
+            setNick(n);
+            setShowGate(false);
+            const ps = pendingStep.current;
+            pendingStep.current = null;
+            if (ps != null) startPlay(ps);
+          }}
         />
       )}
 
