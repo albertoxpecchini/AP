@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BookOpen, Trophy, Flame, ChevronRight } from "lucide-react";
+import { Link } from "react-router";
+import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered } from "lucide-react";
 
 export type StepMode = 20 | 10 | 5 | 2 | 1;
 
@@ -25,11 +26,14 @@ interface AngoliMenuProps {
   dark: boolean;
   bestStrike: number;
   trophiesCount: number;
+  nick?: string;
   onPlay: (step: StepMode) => void;
   onTutorial: () => void;
+  onLeaderboard: () => void;
+  onChangeNick: () => void;
 }
 
-export default function AngoliMenu({ dark, bestStrike, trophiesCount, onPlay, onTutorial }: AngoliMenuProps) {
+export default function AngoliMenu({ dark, bestStrike, trophiesCount, nick, onPlay, onTutorial, onLeaderboard, onChangeNick }: AngoliMenuProps) {
   const [selected, setSelected] = useState<StepMode>(10);
 
   const bg       = dark ? "#111916" : "#f4f6f5";
@@ -125,6 +129,24 @@ export default function AngoliMenu({ dark, bestStrike, trophiesCount, onPlay, on
     </button>
   );
 
+  const LbBtn = (
+    <button type="button" onClick={onLeaderboard} className="anm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+      <ListOrdered size={15} /> Classifica live
+    </button>
+  );
+
+  const NickChip = nick ? (
+    <button type="button" onClick={onChangeNick} className="anm-nick-chip" style={{ color: lbl, border: `1px solid ${bord}` }}>
+      Giochi come <b style={{ color: textMain }}>{nick}</b> · cambia
+    </button>
+  ) : null;
+
+  const BackBtn = (
+    <Link to="/#progetti" className="anm-back-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+      <ArrowLeft size={15} /> Torna ai progetti
+    </Link>
+  );
+
   return (
     <div className="anm-root">
 
@@ -137,7 +159,7 @@ export default function AngoliMenu({ dark, bestStrike, trophiesCount, onPlay, on
           </div>
           <div style={{ textAlign: "center" }}>
             <h1 className="anm-title">ANG<span className="anm-accent">OL</span>I</h1>
-            <p className="anm-tagline">Indovina l'angolo in gradianti</p>
+            <p className="anm-tagline">1 minuto · più veloce, più punti</p>
           </div>
           <p className="anm-kicker">Web Game · Geometria</p>
         </div>
@@ -151,10 +173,13 @@ export default function AngoliMenu({ dark, bestStrike, trophiesCount, onPlay, on
           <p className="anm-section-label" style={{ color: lbl }}>Scegli la modalità</p>
           {ModeList}
           {PlayBtn}
+          {LbBtn}
           <button type="button" onClick={onTutorial} className="anm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
             <BookOpen size={15} /> Come si gioca
           </button>
-          <p style={{ fontSize: "0.7rem", color: note, textAlign: "center", margin: 0 }}>5 modalità · trofei geometrici · streak illimitata</p>
+          {NickChip}
+          {BackBtn}
+          <p style={{ fontSize: "0.7rem", color: note, textAlign: "center", margin: 0 }}>1 minuto a partita · più sei veloce, più punti · classifica live</p>
         </div>
       </div>
 
@@ -181,9 +206,14 @@ export default function AngoliMenu({ dark, bestStrike, trophiesCount, onPlay, on
           <p className="anm-section-label" style={{ color: lbl }}>Scegli la modalità</p>
           {ModeList}
           {PlayBtn}
-          <button type="button" onClick={onTutorial} className="anm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
-            <BookOpen size={15} /> Come si gioca
-          </button>
+          <div style={{ display: "flex", gap: "0.6rem" }}>
+            <div style={{ flex: 1 }}>{LbBtn}</div>
+            <button type="button" onClick={onTutorial} className="anm-tut-btn" style={{ flex: 1, color: icon, border: `1.5px solid ${bord}` }}>
+              <BookOpen size={15} /> Come si gioca
+            </button>
+          </div>
+          {NickChip}
+          {BackBtn}
         </div>
       </div>
 
@@ -244,13 +274,21 @@ export default function AngoliMenu({ dark, bestStrike, trophiesCount, onPlay, on
           font-size:0.65rem; font-weight:700; text-transform:uppercase;
           letter-spacing:0.12em; margin:0 0 0.1rem 0.2rem;
         }
-        .anm-tut-btn {
+        .anm-tut-btn, .anm-back-btn {
           display:inline-flex; align-items:center; justify-content:center; gap:0.45rem;
           padding:0.7rem 1rem; background:transparent;
           border-radius:10px; font-size:0.87rem; font-weight:700;
           cursor:pointer; font-family:inherit; transition:filter 0.15s;
+          text-decoration:none;
         }
-        .anm-tut-btn:hover { filter:brightness(0.85); }
+        .anm-tut-btn:hover, .anm-back-btn:hover { filter:brightness(0.85); }
+        .anm-nick-chip {
+          background:transparent; border-radius:999px;
+          padding:0.45rem 0.9rem; font-size:0.76rem; font-weight:600;
+          cursor:pointer; font-family:inherit; transition:filter 0.15s;
+          align-self:center;
+        }
+        .anm-nick-chip:hover { filter:brightness(0.85); }
 
         /* ════════ DESKTOP (≥760px) ════════ */
         @media (min-width: 760px) {
