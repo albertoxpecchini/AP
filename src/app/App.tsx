@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
+import { Link } from "react-router";
 import { activateLocalMode } from "./utils/local";
 import { isIOS } from "./utils/device";
 import {
@@ -492,6 +493,32 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Arrivo con un hash nell'URL (es. /#progetti da un'altra rotta): lo scroll
+  // nativo del browser scatta prima che il contenuto (lista CV, progetti,
+  // immagini lazy) sia montato e dimensionato, quindi finisce in cima. Qui
+  // riportiamo lo scroll sulla sezione giusta dopo il layout, con qualche
+  // tentativo per assorbire l'aumento di altezza dei contenuti tardivi.
+  useLayoutEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    // Primo allineamento SINCRONO, prima del paint: così tornando dal gioco la
+    // home appare già sulla sezione giusta, senza il salto "parte in cima poi
+    // scende" che si vedeva con lo scroll asincrono.
+    const jump = () => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "start" });
+    };
+    jump();
+    // Ritenta per assorbire l'aumento di altezza dei contenuti che montano dopo.
+    let tries = 0;
+    const align = () => {
+      jump();
+      if (++tries < 6) timer = window.setTimeout(align, 120);
+    };
+    let timer = window.setTimeout(align, 120);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Lock body scroll while the mobile menu overlay is open.
   useEffect(() => {
     if (!menuOpen) return;
@@ -919,9 +946,9 @@ export default function App() {
               <h2 className="display-5 fw-bold mb-0">Il mio lavoro</h2>
             </div>
 
-            <div className="row g-4">
+            <div className="ap-project-grid">
               {PROJECTS.map((p) => (
-                <div className="col-12 col-md-6" key={p.title}>
+                <div className="ap-project-cell" key={p.title}>
                   <div className="card-wrapper h-100">
                     <div className="it-card it-card-bg rounded shadow ap-project-card h-100 d-flex flex-column">
                       <div className="ap-project-preview">
@@ -955,15 +982,25 @@ export default function App() {
                           <span className="data">{p.date}</span>
                         </div>
                         <h3 className="it-card-title h2 fw-bold">
-                          <a
-                            className="text-decoration-none stretched-link"
-                            href={p.url}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                          >
-                            {p.title}
-                            <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
-                          </a>
+                          {p.url.startsWith("/") ? (
+                            <Link
+                              className="text-decoration-none stretched-link"
+                              to={p.url}
+                            >
+                              {p.title}
+                              <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
+                            </Link>
+                          ) : (
+                            <a
+                              className="text-decoration-none stretched-link"
+                              href={p.url}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              {p.title}
+                              <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
+                            </a>
+                          )}
                         </h3>
                         <p className="it-card-text fs-5">{p.desc}</p>
                         <div className="d-flex flex-wrap gap-2 mt-4">
@@ -1493,6 +1530,23 @@ export default function App() {
           transform: translateX(-50%);
           color: rgba(255, 255, 255, 0.85);
         }
+
+        /* Griglia progetti: 5 per riga su desktop, poi a capo. Responsive. */
+        .ap-project-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+        @media (min-width: 576px) {
+          .ap-project-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 768px) {
+          .ap-project-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1200px) {
+          .ap-project-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+        .ap-project-cell { min-width: 0; }
 
         /* Card progetto */
         .ap-project-card {

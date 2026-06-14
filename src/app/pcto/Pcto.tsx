@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router";
 import {
   ArrowLeft,
   MapPin,
@@ -170,7 +171,7 @@ export default function Pcto() {
       <header className="pcto-header">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between py-3">
-            <a href="/" className="pcto-brand text-decoration-none d-inline-flex align-items-center">
+            <Link to="/" className="pcto-brand text-decoration-none d-inline-flex align-items-center">
               <span className="pcto-brand-mark" aria-hidden="true">
                 <img src="/favicon.svg" alt="" width={40} height={40} />
               </span>
@@ -178,11 +179,11 @@ export default function Pcto() {
                 <span className="pcto-brand-title">Alberto Pecchini</span>
                 <span className="pcto-brand-tagline">Designer &amp; Front-end Developer</span>
               </span>
-            </a>
-            <a href="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
+            </Link>
+            <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
               <ArrowLeft size={16} className="me-1" aria-hidden="true" />
               <span>Torna alla home</span>
-            </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -480,9 +481,9 @@ export default function Pcto() {
             <span style={{ opacity: 0.8 }}>
               © {new Date().getFullYear()} Alberto Pecchini — ITT «Carlo d'Arco», Mantova
             </span>
-            <a href="/" className="text-white text-decoration-none d-inline-flex align-items-center">
+            <Link to="/" className="text-white text-decoration-none d-inline-flex align-items-center">
               <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
-            </a>
+            </Link>
           </div>
         </div>
       </footer>

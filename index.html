@@ -21,7 +21,9 @@
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
       <!-- Caratteri ufficiali del Design System (Bootstrap Italia): Titillium Web, Lora, Roboto Mono -->
       <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&family=Lora:wght@400;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
-      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+      <!-- Sfondo fisso fin dal primo paint: evita il flash nero/bianco quando si
+           cambia rotta (es. dal gioco → home) prima che React monti. -->
+      <style>html, body { height: 100%; margin: 0; background: #F7F5F0; } #root { height: 100%; }</style>
     </head>
 
     <body>

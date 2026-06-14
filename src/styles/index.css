@@ -2,3 +2,10 @@
 @import './tailwind.css';
 @import './theme.css';
 @import './ios.css';
+
+/* ── Regola globale anti-overflow ──
+   Nessun contenuto (testo, numeri, immagini) deve mai oltrepassare i margini,
+   né in pagina né dentro flex/grid. Vale ovunque. */
+html, body { overflow-x: hidden; }
+img, svg, video, canvas { max-width: 100%; }
+

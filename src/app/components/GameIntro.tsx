@@ -66,7 +66,8 @@ export default function GameTutorial({
       userSelect: "none",
     }}>
       <div style={{
-        width: "100%", maxWidth: 420,
+        width: "100%", maxWidth: 540,
+        maxHeight: "100%", minHeight: 0,
         display: "flex", flexDirection: "column", gap: "0.9rem",
         animation: "gt-up 0.32s cubic-bezier(.34,1.56,.64,1)",
       }}>
@@ -91,24 +92,34 @@ export default function GameTutorial({
           </button>
         </div>
 
-        {/* Card */}
+        {/* Card QUADRATA: stessa dimensione per ogni passo, lato = larghezza
+            massima ma mai oltre l'altezza della viewport. */}
         <div style={{
           background: cardBg, border: `1px solid ${cardBorder}`,
           borderRadius: 18, overflow: "hidden",
           boxShadow: "0 16px 48px rgba(0,0,0,0.35)",
+          display: "flex", flexDirection: "column",
+          aspectRatio: "1 / 1",    /* riquadro QUADRATO */
+          minHeight: 0,            /* permette al contenuto di restringersi dentro la viewport */
         }}>
-          {steps[stepIdx].visual && (
-            <div style={{
+          {/* Area visual SEMPRE presente. L'immagine ha SEMPRE margine interno
+              (padding) → non tocca mai i bordi del riquadro. */}
+          <div
+            key={`gt-vis-${stepIdx}`}
+            style={{
+              flex: "1 1 0", minHeight: 0,
               background: dark ? "#0f1612" : "#f4f6f5",
               borderBottom: `1px solid ${cardBorder}`,
-              minHeight: 148,
               display: "flex", alignItems: "center", justifyContent: "center",
-              padding: "1.25rem",
-            }}>
-              {steps[stepIdx].visual}
-            </div>
-          )}
-          <div style={{ padding: "1.3rem 1.5rem 1.1rem" }}>
+              padding: "1.75rem",   /* margine interno sempre presente attorno alla figura */
+              animation: "gt-vis-in 0.4s ease both",
+            }}
+          >
+            {steps[stepIdx].visual}
+          </div>
+          <div style={{
+            padding: "1.1rem 1.5rem 1.2rem", flexShrink: 0,
+          }}>
             <h2 style={{
               fontSize: "1.25rem", fontWeight: 800, margin: "0 0 0.5rem",
               color: textMain, lineHeight: 1.25,
@@ -153,6 +164,11 @@ export default function GameTutorial({
         @keyframes gt-up {
           from { opacity: 0; transform: translateY(20px) scale(0.97); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        /* La figura di ogni passo entra con un piccolo fade/zoom ad ogni cambio. */
+        @keyframes gt-vis-in {
+          from { opacity: 0; transform: scale(0.94); }
+          to   { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </div>

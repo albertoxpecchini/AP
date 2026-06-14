@@ -1,26 +1,14 @@
 {
   "version": "0.2.0",
   "configurations": [
-    
     {
-      "name": "Vite: Vivaldi",
+      "name": "Dev",
       "type": "chrome",
       "request": "launch",
-      "runtimeExecutable": "C:\\Users\\alberto\\AppData\\Local\\Vivaldi\\Application\\vivaldi.exe",
+      "runtimeExecutable": "C:\\Users\\Administrator\\AppData\\Local\\Vivaldi\\Application\\vivaldi.exe",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}/src",
-      "preLaunchTask": "vite: dev",
-      "sourceMapPathOverrides": {
-        "/@fs/*": "${workspaceFolder}/*"
-      }
-    },
-    {
-      "name": "Vite: Edge",
-      "type": "msedge",
-      "request": "launch",
-      "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}/src",
-      "preLaunchTask": "vite: dev",
+      "preLaunchTask": "dev",
       "sourceMapPathOverrides": {
         "/@fs/*": "${workspaceFolder}/*"
       }
