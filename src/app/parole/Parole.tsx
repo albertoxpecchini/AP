@@ -977,22 +977,18 @@ export default function Parole() {
           <div className="parole-panel-section">
             <h3 className="parole-panel-label">Stato lettere</h3>
             <div className="parole-mini-kbd" aria-label="Stato lettere">
-              {KEYBOARD.map((row, ri) => (
-                <div key={ri} className="parole-mini-krow">
-                  {row.filter(k => k.length === 1).map(k => {
-                    const st = keyStatuses[k];
-                    const isElim = eliminated.has(k);
-                    return (
-                      <span
-                        key={k}
-                        className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
-                      >
-                        {k}
-                      </span>
-                    );
-                  })}
-                </div>
-              ))}
+              {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(k => {
+                const st = keyStatuses[k];
+                const isElim = eliminated.has(k);
+                return (
+                  <span
+                    key={k}
+                    className={`parole-mini-key${st ? ` parole-mini-key--${st}` : ""}${isElim ? " parole-mini-key--elim" : ""}${k === lastKey ? " parole-mini-key--pressed" : ""}`}
+                  >
+                    {k}
+                  </span>
+                );
+              })}
             </div>
             {eliminated.size > 0 && (
               <div className="parole-elim-row" aria-label="Lettere eliminate">
@@ -1359,12 +1355,14 @@ export default function Parole() {
           display: flex; flex-direction: column; align-items: center;
           gap: 0.2rem; padding: 0.5rem 0.6rem;
           background: rgba(47,125,74,0.08);
-          border: 1px solid rgba(47,125,74,0.15);
+          border: 1px solid rgba(47,125,74,0.22);
           border-radius: 10px;
           font-variant-numeric: tabular-nums;
           color: var(--green-dark);
           min-width: 0;
+          box-shadow: 0 0 0 1px rgba(47,125,74,0.06), inset 0 0 12px rgba(47,125,74,0.05);
         }
+        .parole-stat-card-val { text-shadow: 0 0 8px rgba(47,125,74,0.25); }
         .parole-stat-card--btn {
           border: none; cursor: pointer;
           background: var(--green); color: #fff;
@@ -1375,34 +1373,34 @@ export default function Parole() {
         .parole-stat-card-val { font-size: 1.15rem; font-weight: 800; line-height: 1; }
         .parole-stat-card-lbl { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; }
         .parole-page.dark .parole-stat-card {
-          background: rgba(47,125,74,0.12); border-color: rgba(47,125,74,0.22); color: #7ab893;
+          background: rgba(47,125,74,0.12); border-color: rgba(95,208,154,0.3); color: #7ab893;
+          box-shadow: 0 0 0 1px rgba(95,208,154,0.12), inset 0 0 16px rgba(95,208,154,0.08);
         }
+        .parole-page.dark .parole-stat-card-val { text-shadow: 0 0 10px rgba(95,208,154,0.45); }
         .parole-page.dark .parole-stat-card--btn { background: var(--green); color: #fff; border: none; }
         /* Anxiety on center stat card */
         .parole-anx-stat-1.parole-stat-card { border-color: var(--amber); color: var(--amber); }
         .parole-anx-stat-2.parole-stat-card { border-color: #e07b22; color: #e07b22; animation: parole-timer-pulse 1.1s ease-in-out infinite; }
         .parole-anx-stat-3.parole-stat-card { border-color: var(--absent); color: var(--absent); animation: parole-timer-pulse 0.55s ease-in-out infinite; }
 
-        /* ── Mini tastiera stato lettere ── */
-        .parole-mini-krow {
-          display: flex; gap: 3px; justify-content: center; margin-bottom: 3px;
-        }
+        /* ── Mini tastiera stato lettere (griglia 6×5 alfabetica) ── */
         .parole-mini-key {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 26px; height: 26px;
-          font-size: 0.67rem;
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          font-size: 0.78rem;
           font-weight: 800;
           text-transform: uppercase;
-          border-radius: 4px;
+          border-radius: 5px;
           background: #d3dad6;
           color: #17271d;
-          transition: background 0.2s, color 0.2s, transform 0.1s;
+          transition: background 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
           letter-spacing: 0;
         }
-        .parole-mini-key--correct { background: var(--green); color: #fff; }
-        .parole-mini-key--present  { background: var(--amber); color: #fff; }
+        .parole-mini-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 8px rgba(47,125,74,0.55), inset 0 0 4px rgba(255,255,255,0.25); }
+        .parole-mini-key--present  { background: var(--amber); color: #fff; box-shadow: 0 0 8px rgba(217,164,0,0.6), inset 0 0 4px rgba(255,255,255,0.3); }
         .parole-mini-key--absent   { background: #b0b8b2; color: #6b7870; }
         .parole-mini-key--elim     { background: rgba(192,57,43,0.18); color: var(--absent); text-decoration: line-through; }
         .parole-mini-key--pressed  { transform: scale(0.82); background: var(--green) !important; color: #fff !important; }
@@ -1410,8 +1408,8 @@ export default function Parole() {
         .parole-page.dark .parole-mini-key { background: #2e3e35; color: #9ab8a2; }
         .parole-page.dark .parole-mini-key--absent { background: #1e2820; color: #4a5e50; }
         .parole-page.dark .parole-mini-key--elim { background: rgba(192,57,43,0.22); color: #c87070; }
-        .parole-page.dark .parole-mini-key--correct { background: var(--green); color: #fff; }
-        .parole-page.dark .parole-mini-key--present { background: var(--amber); color: #fff; }
+        .parole-page.dark .parole-mini-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 12px rgba(95,208,154,0.7), inset 0 0 5px rgba(255,255,255,0.3); }
+        .parole-page.dark .parole-mini-key--present { background: var(--amber); color: #fff; box-shadow: 0 0 12px rgba(224,160,32,0.75), inset 0 0 5px rgba(255,255,255,0.35); }
 
         /* Mobile: visibile; desktop: nascosta (la fa il pannello Comandi) */
         .parole-mobile-kbd {
@@ -1424,9 +1422,10 @@ export default function Parole() {
         /* Mini kbd nel pannello (desktop) e mobile-kbd (touch) */
         .parole-mini-kbd {
           display: none;
-          flex-direction: column;
-          align-items: center;
-          gap: 0;
+          grid-template-columns: repeat(6, 1fr);
+          gap: 5px;
+          width: 100%;
+          box-sizing: border-box;
           margin-bottom: 0.5rem;
         }
 
@@ -1509,8 +1508,8 @@ export default function Parole() {
           45% { transform: rotateX(90deg); }
           100% { transform: rotateX(0); }
         }
-        .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; }
-        .parole-tile--present { background: var(--amber); border-color: var(--amber); color: #fff; }
+        .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 0 14px rgba(47,125,74,0.5), inset 0 0 8px rgba(255,255,255,0.18); }
+        .parole-tile--present { background: var(--amber); border-color: var(--amber); color: #fff; box-shadow: 0 0 14px rgba(217,164,0,0.55), inset 0 0 8px rgba(255,255,255,0.22); }
         .parole-tile--absent { background: var(--absent); border-color: var(--absent); color: #fff; }
         .parole-tile--win { animation: parole-bounce 0.6s ease; }
         @keyframes parole-bounce {
@@ -1853,8 +1852,8 @@ export default function Parole() {
         .parole-key:hover:not(:disabled) { filter: brightness(0.96); }
         .parole-key:active:not(:disabled) { transform: scale(0.92); }
         .parole-key--wide { flex: 1.5; font-size: 0.75rem; }
-        .parole-key--correct { background: var(--green); color: #fff; }
-        .parole-key--present { background: var(--amber); color: #fff; }
+        .parole-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 10px rgba(47,125,74,0.5); }
+        .parole-key--present { background: var(--amber); color: #fff; box-shadow: 0 0 10px rgba(217,164,0,0.55); }
         .parole-key--absent { background: var(--absent); color: #fff; }
         .parole-key--elim {
           animation: parole-elim 0.3s ease;
@@ -1954,12 +1953,7 @@ export default function Parole() {
           }
 
           /* Stato lettere nel pannello: tasti leggibili 30px */
-          .parole-mini-kbd { display: flex; }
-          .parole-mini-kbd .parole-mini-key {
-            width: 30px; height: 30px; font-size: 0.76rem; font-weight: 800;
-            border-radius: 5px;
-          }
-          .parole-mini-kbd .parole-mini-krow { gap: 3px; margin-bottom: 3px; }
+          .parole-mini-kbd { display: grid; }
 
           /* Stats row 2×2 compatta in cima al pannello (come Angoli) */
           .parole-stats-grid {
@@ -2138,12 +2132,12 @@ export default function Parole() {
           color: #c8e0cc;
         }
         /* Colori tasti con lettera già usata: mantengono i colori originali */
-        .parole-page.dark .parole-key--correct { background: var(--green); color: #fff; }
-        .parole-page.dark .parole-key--present  { background: var(--amber); color: #fff; }
+        .parole-page.dark .parole-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 14px rgba(95,208,154,0.65); }
+        .parole-page.dark .parole-key--present  { background: var(--amber); color: #fff; box-shadow: 0 0 14px rgba(224,160,32,0.7); }
         .parole-page.dark .parole-key--absent   { background: #5a1515; color: #c89090; }
         /* Colori tessere: specificità 0,2,0 serve per battere .parole-tile (0,2,0 pari → ordine vince) */
-        .parole-page.dark .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; }
-        .parole-page.dark .parole-tile--present  { background: var(--amber); border-color: var(--amber); color: #fff; }
+        .parole-page.dark .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 0 18px rgba(95,208,154,0.6), inset 0 0 9px rgba(255,255,255,0.22); }
+        .parole-page.dark .parole-tile--present  { background: var(--amber); border-color: var(--amber); color: #fff; box-shadow: 0 0 18px rgba(224,160,32,0.65), inset 0 0 9px rgba(255,255,255,0.25); }
         .parole-page.dark .parole-tile--absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
         /* Toast: su sfondo #111916 il precedente #17271d era quasi invisibile */
         .parole-page.dark .parole-message {
@@ -2197,8 +2191,8 @@ export default function Parole() {
         .parole-page.dark .parole-mini-key { background: #2e3e35; color: #9ab8a2; }
         .parole-page.dark .parole-mini-key--absent { background: #1e2820; color: #4a5e50; }
         .parole-page.dark .parole-mini-key--elim { background: rgba(192,57,43,0.22); color: #c87070; text-decoration: line-through; }
-        .parole-page.dark .parole-mini-key--correct { background: var(--green); color: #fff; }
-        .parole-page.dark .parole-mini-key--present { background: var(--amber); color: #fff; }
+        .parole-page.dark .parole-mini-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 12px rgba(95,208,154,0.7), inset 0 0 5px rgba(255,255,255,0.3); }
+        .parole-page.dark .parole-mini-key--present { background: var(--amber); color: #fff; box-shadow: 0 0 12px rgba(224,160,32,0.75), inset 0 0 5px rgba(255,255,255,0.35); }
       `}</style>
     </div>
   );

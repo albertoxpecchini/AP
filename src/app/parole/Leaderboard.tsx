@@ -119,6 +119,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
                   </span>
                   <span className="par-lb-nick">{r.nick}{mine ? " (tu)" : ""}</span>
                   <span className="par-lb-mode">{MODE_LABEL[r.mode] ?? r.mode}</span>
+                  <span className="par-lb-strike" title="Miglior streak">🔥 {r.best_streak ?? 0}</span>
                   <span className="par-lb-score">{fmtTime(secondsFromScore(r.score))}</span>
                 </div>
               );
@@ -187,10 +188,15 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .par-lb.dark .par-lb-empty { color:#8fc7a6; }
 
         .par-lb-row {
-          display:grid; grid-template-columns:34px 1fr auto auto; align-items:center; gap:.6rem;
+          display:grid; grid-template-columns:34px 1fr auto auto auto; align-items:center; gap:.55rem;
           padding:.55rem .7rem; border-radius:10px; margin-bottom:3px;
           animation:par-lb-rowin .25s ease;
         }
+        .par-lb-strike {
+          font-size:.78rem; font-weight:800; color:#c07800;
+          font-variant-numeric:tabular-nums; white-space:nowrap;
+        }
+        .par-lb.dark .par-lb-strike { color:#e0a020; }
         @keyframes par-lb-rowin { from { opacity:0; transform:translateX(-6px) } to { opacity:1; transform:none } }
         .par-lb-row:nth-child(even) { background:rgba(0,0,0,0.025); }
         .par-lb.dark .par-lb-row:nth-child(even) { background:rgba(255,255,255,0.025); }
