@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap } from "lucide-react";
+import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";
 import { chapterCoveragePct } from "./coverage";
 import type { QType } from "./parseTrivia";
@@ -9,6 +9,15 @@ import type { QType } from "./parseTrivia";
 export type ChapterSelection = string[];
 // Selezione tipi di domanda. Vuota = tutti i tipi.
 export type TypeSelection = QType[];
+
+// Criteri di ordinamento della lista capitoli (tasto "Ordina").
+type SortKey = "cronologico" | "az" | "za" | "esplorato";
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "cronologico", label: "Ordine cronologico" },
+  { key: "az",          label: "A → Z" },
+  { key: "za",          label: "Z → A" },
+  { key: "esplorato",   label: "Da esplorare" },
+];
 
 // Tipi di domanda selezionabili, con etichetta e icona "da gioco".
 const TYPE_DEFS: { id: QType; label: string; desc: string; color: string }[] = [
@@ -59,6 +68,29 @@ export default function TriviaMenu({
       return next;
     });
 
+  // ── Ordinamento della lista capitoli (tasto "Ordina") ──
+  // cronologico = ordine di caricamento dei raw (default); az/za = per titolo;
+  // esplorato = meno esplorati in cima (così è una "to-do" di studio).
+  const [sortBy, setSortBy] = useState<SortKey>("cronologico");
+  // Colore stabile per capitolo (basato sull'ordine cronologico): non cambia
+  // quando riordini la lista.
+  const colorById = useMemo(() => {
+    const m = new Map<string, string>();
+    [...CHAPTERS].sort((a, b) => a.order - b.order).forEach((c, i) => m.set(c.id, colorForIdx(i)));
+    return m;
+  }, []);
+  const orderedChapters = useMemo(() => {
+    const arr = [...CHAPTERS];
+    switch (sortBy) {
+      case "az": return arr.sort((a, b) => a.title.localeCompare(b.title, "it"));
+      case "za": return arr.sort((a, b) => b.title.localeCompare(a.title, "it"));
+      case "esplorato": // meno esplorati in cima; a parità, ordine cronologico
+        return arr.sort((a, b) => chapterCoveragePct(a.id) - chapterCoveragePct(b.id) || a.order - b.order);
+      case "cronologico":
+      default: return arr.sort((a, b) => a.order - b.order);
+    }
+  }, [sortBy]);
+
   const bg       = dark ? "#111916" : "#f4f6f5";
   const card     = dark ? "#1a2720" : "#ffffff";
   const bord     = dark ? "rgba(47,125,74,0.22)" : "rgba(47,125,74,0.15)";
@@ -72,9 +104,10 @@ export default function TriviaMenu({
   const totalQuestions = CHAPTERS.reduce((s, c) => s + c.questions.length, 0);
   // Domande disponibili nella selezione corrente (capitoli + tipi).
   const availableCount = questionsForMany([...selected], [...types]).length;
-  // Colore "principale" = verde se "tutti", altrimenti colore del primo capitolo scelto.
-  const firstSelIdx = allMode ? -1 : CHAPTERS.findIndex(c => selected.has(c.id));
-  const selectedColor = allMode ? "#2F7D4A" : colorForIdx(firstSelIdx);
+  // Colore "principale" = verde se "tutti", altrimenti colore del primo capitolo
+  // scelto (nell'ordine di visualizzazione corrente).
+  const firstSel = allMode ? undefined : orderedChapters.find(c => selected.has(c.id));
+  const selectedColor = firstSel ? (colorById.get(firstSel.id) || "#2F7D4A") : "#2F7D4A";
   const selectedName = allMode
     ? "Tutti i capitoli"
     : selected.size === 1
@@ -123,9 +156,37 @@ export default function TriviaMenu({
     }}>{cov}%</span>
   ) : undefined;
 
+  // Tendina "Ordina": select nativa (accessibile, niente librerie).
+  const SortControl = (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginBottom: "0.1rem" }}>
+      <label style={{
+        display: "inline-flex", alignItems: "center", gap: "0.35rem",
+        fontSize: "0.72rem", fontWeight: 700, color: lbl,
+        border: `1px solid ${bord}`, borderRadius: 999, padding: "0.2rem 0.5rem 0.2rem 0.7rem",
+        background: card,
+      }}>
+        <ArrowDownUp size={13} style={{ color: icon }} />
+        Ordina
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value as SortKey)}
+          aria-label="Ordina i capitoli"
+          style={{
+            border: "none", background: "transparent", color: textMain,
+            fontFamily: "inherit", fontSize: "0.72rem", fontWeight: 800,
+            cursor: "pointer", outline: "none", padding: "0.1rem 0.1rem",
+          }}
+        >
+          {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+        </select>
+      </label>
+    </div>
+  );
+
   // ── Lista to-do: "Tutti i capitoli" + una riga per capitolo ──
   const ChapterList = (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+      {SortControl}
       {/* Tutti (deseleziona tutto) */}
       <TodoRow
         active={allMode}
@@ -136,9 +197,9 @@ export default function TriviaMenu({
         dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
         onClick={selectAll}
       />
-      {CHAPTERS.map((c, i) => {
+      {orderedChapters.map((c) => {
         const cov = chapterCoveragePct(c.id);
-        const color = colorForIdx(i);
+        const color = colorById.get(c.id) || "#2F7D4A";
         return (
           <TodoRow
             key={c.id}
