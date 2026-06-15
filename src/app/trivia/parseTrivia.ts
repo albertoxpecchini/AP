@@ -302,6 +302,9 @@ export function isAnswerCorrect(guess: string, question: Question): boolean {
 
   for (const c of candidates) {
     if (g === c) return true;
+    // I numeri (anni, date, conteggi) non hanno "refusi": cambiare una cifra
+    // produce un valore diverso. Niente tolleranza Levenshtein, solo match esatto.
+    if (/\d/.test(c) || /\d/.test(g)) continue;
     const dist = levenshtein(g, c);
     if (dist <= tolerance(c.length)) return true;
   }
