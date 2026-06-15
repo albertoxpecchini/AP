@@ -9,11 +9,12 @@ import Leaderboard from "./Leaderboard";
 import GameTutorial, { hasSeenTutorial } from "../components/GameIntro";
 import { TRIVIA_INTRO } from "./tutorialSteps";
 
-import { questionsForMany, pickQuestions } from "./questions";
+import { questionsForMany, prepareGame } from "./questions";
 import { isAnswerCorrect, type Question } from "./parseTrivia";
 import { fetchPhoto, prefetchPhoto } from "./photos";
 import { markSeen, coveragePct } from "./coverage";
 import { gradeFromPct, isGoodGrade } from "./grade";
+import { computePackageGrades, typeLabelLong } from "./packageGrades";
 import { submitScore, type ScoreRow } from "./leaderboardApi";
 
 const GAME_KEY = "trivia";
@@ -25,8 +26,8 @@ const DARK_KEY = "games-dark";
 const TIME_PER_Q = 20000;
 const BASE_POINTS = 100;
 const SPEED_BONUS_MAX = 100; // si esaurisce linearmente entro TIME_PER_Q
-// Tetto di domande per partita (le domande filtrate vengono mescolate e tagliate).
-const MAX_QUESTIONS = 15;
+// Nessun tetto di domande: la partita copre TUTTE le domande del filtro scelto,
+// così è possibile "completare" un pacchetto (argomento × tipo) e ricevere il voto.
 
 type Phase = "menu" | "gate" | "playing" | "results";
 
@@ -56,6 +57,9 @@ export default function Trivia() {
   // ── stato partita ──
   const [chapters, setChapters] = useState<ChapterSelection>([]);
   const [qTypes, setQTypes] = useState<TypeSelection>([]);
+  // `queue` = tutte le domande del filtro (ordine+opzioni mescolati). È anche il
+  // "pool" di riferimento per i voti per pacchetto: un pacchetto è completato se
+  // le domande giocate di quel argomento×tipo eguagliano quelle in coda.
   const [queue, setQueue] = useState<Question[]>([]);
   const [idx, setIdx] = useState(0);
   const [played, setPlayed] = useState<Played[]>([]);
@@ -85,11 +89,11 @@ export default function Trivia() {
   const current = queue[idx];
 
   // ─── Avvio partita ───
-  // Usa tutte le domande che corrispondono a capitoli+tipi scelti, mescolate
-  // e limitate a MAX_QUESTIONS.
+  // Usa TUTTE le domande dei capitoli+tipi scelti (niente tetto), con ordine e
+  // opzioni mescolati: così puoi completare un pacchetto e niente "memoria di zona".
   const startGame = useCallback((chaps: ChapterSelection, t: TypeSelection) => {
     const pool = questionsForMany(chaps, t);
-    const picked = pickQuestions(pool, MAX_QUESTIONS);
+    const picked = prepareGame(pool); // tutte le domande del filtro, ordine + opzioni mescolati
     if (picked.length === 0) return;
     setChapters(chaps);
     setQTypes(t);
@@ -261,8 +265,10 @@ export default function Trivia() {
     const correctCount = played.filter(p => p.correct).length;
     const total = played.length || 1;
     const accuracy = Math.round((correctCount / total) * 100);
-    return { correctCount, total: played.length, accuracy, grade: gradeFromPct(accuracy) };
-  }, [played]);
+    // Voti per pacchetto (argomento × tipo) completato al 100%.
+    const packages = computePackageGrades(played, queue);
+    return { correctCount, total: played.length, accuracy, grade: gradeFromPct(accuracy), packages };
+  }, [played, queue]);
 
   return (
     <div className={`trv-page${dark ? " dark" : ""}`}>
@@ -386,6 +392,27 @@ export default function Trivia() {
             <div className="trv-res-stat"><span className="trv-res-num">{score.toLocaleString("it-IT")}</span><span className="trv-res-lbl">Punti</span></div>
             <div className="trv-res-stat"><span className="trv-res-num">{bestStreakRun}</span><span className="trv-res-lbl">Streak</span></div>
           </div>
+
+          {/* Voti per pacchetto (argomento × tipo) completato al 100% */}
+          {results.packages.length > 0 ? (
+            <div className="trv-res-pkgs">
+              <p className="trv-res-pkgs-title">Voti per argomento e tipo</p>
+              {results.packages.map((p, i) => (
+                <div className="trv-res-pkg" key={i}>
+                  <div className="trv-res-pkg-info">
+                    <span className="trv-res-pkg-arg">{p.argomento}</span>
+                    <span className="trv-res-pkg-type">{typeLabelLong(p.type)} · {p.correct}/{p.total}</span>
+                  </div>
+                  <span className="trv-res-pkg-grade" style={{ color: dark ? p.grade.colorDark : p.grade.color }}>{p.grade.letter}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="trv-res-pkgs-empty">
+              Completa <b>tutte</b> le domande di un tipo per un argomento (es. tutti i Vero/Falso) per sbloccarne il voto.
+            </p>
+          )}
+
           <p className="trv-res-cov">Hai esplorato il <b>{coverage}%</b> di tutte le domande</p>
           <div className="trv-res-actions">
             <button className="trv-res-primary" onClick={() => startGame(chapters, qTypes)}><RotateCcw size={17} /> Rigioca</button>
@@ -639,6 +666,29 @@ const styles = `
 .trv-res-num { font-size: 1.5rem; font-weight: 900; font-variant-numeric: tabular-nums; }
 .trv-res-lbl { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--sub); }
 .trv-res-cov { font-size: .9rem; color: var(--sub); margin: 0; }
+
+/* Voti per pacchetto (argomento × tipo) */
+.trv-res-pkgs { width: 100%; display: flex; flex-direction: column; gap: .45rem; }
+.trv-res-pkgs-title {
+  font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--sub); margin: .2rem 0 .1rem; text-align: left;
+}
+.trv-res-pkg {
+  display: flex; align-items: center; gap: .7rem;
+  background: var(--card); border: 1px solid var(--bord); border-radius: 12px;
+  padding: .7rem .9rem; text-align: left;
+}
+.trv-res-pkg-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .12rem; }
+.trv-res-pkg-arg { font-size: .92rem; font-weight: 800; line-height: 1.25; }
+.trv-res-pkg-type { font-size: .72rem; font-weight: 600; color: var(--sub); }
+.trv-res-pkg-grade {
+  font-size: 1.9rem; font-weight: 900; line-height: 1; flex-shrink: 0;
+  font-variant-numeric: tabular-nums; min-width: 2ch; text-align: center;
+}
+.trv-res-pkgs-empty {
+  width: 100%; font-size: .82rem; line-height: 1.5; color: var(--sub); margin: 0;
+  background: var(--card); border: 1px dashed var(--bord); border-radius: 12px; padding: .8rem .9rem;
+}
 .trv-res-actions { display: flex; gap: .6rem; width: 100%; }
 .trv-res-primary, .trv-res-second {
   flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: .4rem;

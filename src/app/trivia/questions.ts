@@ -42,12 +42,26 @@ export function questionsForMany(chapterIds: string[], types?: QType[]): Questio
   return pool;
 }
 
-// Mescola e prende le prime `n` (Fisher–Yates su copia).
-export function pickQuestions(pool: Question[], n: number): Question[] {
-  const arr = pool.slice();
+// Fisher–Yates su copia (riusato per domande e opzioni).
+function shuffled<T>(input: readonly T[]): T[] {
+  const arr = input.slice();
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return arr.slice(0, Math.min(n, arr.length));
+  return arr;
+}
+
+/**
+ * Prepara le domande per una partita: mescola l'ordine E rimescola le opzioni
+ * di ogni multipla (così la lettera della risposta corretta cambia posizione
+ * a ogni partita → niente "memoria di zona"). Le opzioni sono clonate, i dati
+ * globali (`ALL_QUESTIONS`) restano intatti.
+ */
+export function prepareGame(pool: Question[]): Question[] {
+  return shuffled(pool).map(q =>
+    q.type === "multipla" && q.options
+      ? { ...q, options: shuffled(q.options) }
+      : q,
+  );
 }

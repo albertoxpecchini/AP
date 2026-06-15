@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, Layers, GraduationCap, ListChecks, ToggleLeft, PencilLine } from "lucide-react";
+import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";
 import { chapterCoveragePct } from "./coverage";
 import type { QType } from "./parseTrivia";
@@ -11,10 +11,10 @@ export type ChapterSelection = string[];
 export type TypeSelection = QType[];
 
 // Tipi di domanda selezionabili, con etichetta e icona "da gioco".
-const TYPE_DEFS: { id: QType; label: string; desc: string; icon: React.ReactNode; color: string }[] = [
-  { id: "multipla",   label: "Scelta multipla", desc: "Scegli l'opzione giusta",    icon: <ListChecks size={18} />, color: "#2F7D4A" },
-  { id: "vero-falso", label: "Vero o Falso",    desc: "Vero oppure falso",          icon: <ToggleLeft size={18} />, color: "#3a7bbf" },
-  { id: "aperta",     label: "Completamento",   desc: "Scrivi tu la risposta",      icon: <PencilLine size={18} />, color: "#b5651d" },
+const TYPE_DEFS: { id: QType; label: string; desc: string; color: string }[] = [
+  { id: "multipla",   label: "Scelta multipla", desc: "Scegli l'opzione giusta", color: "#2F7D4A" },
+  { id: "vero-falso", label: "Vero o Falso",    desc: "Vero oppure falso",       color: "#3a7bbf" },
+  { id: "aperta",     label: "Completamento",   desc: "Scrivi tu la risposta",   color: "#b5651d" },
 ];
 
 interface TriviaMenuProps {
@@ -113,86 +113,71 @@ export default function TriviaMenu({
     );
   }
 
-  // ── Card "Tutti i capitoli" + una multi-selezionabile per capitolo ──
+  // Badge "% visto" riusato a destra della riga capitolo.
+  const covBadge = (cov: number, color: string, active: boolean) => cov > 0 && cov < 100 ? (
+    <span style={{
+      fontSize: "0.56rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em",
+      padding: "0.08rem 0.38rem", borderRadius: 999, flexShrink: 0,
+      background: active ? `${color}22` : (dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"),
+      color: active ? color : lbl,
+    }}>{cov}%</span>
+  ) : undefined;
+
+  // ── Lista to-do: "Tutti i capitoli" + una riga per capitolo ──
   const ChapterList = (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
       {/* Tutti (deseleziona tutto) */}
-      <ChapCard
+      <TodoRow
         active={allMode}
         multi={false}
         color="#2F7D4A"
-        icon={<Layers size={20} />}
         title="Tutti i capitoli"
         subtitle={`Mix da tutti i ${CHAPTERS.length} capitoli · ${totalQuestions} domande`}
-        cov={coverage}
-        dark={dark} card={card} bord={bord} lbl={lbl} note={note} textMain={textMain} textSub={textSub}
+        dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
         onClick={selectAll}
       />
-      {CHAPTERS.map((c, i) => (
-        <ChapCard
-          key={c.id}
-          active={selected.has(c.id)}
-          multi
-          color={colorForIdx(i)}
-          icon={<span style={{ fontWeight: 900, fontSize: "1rem" }}>{c.title.charAt(0).toUpperCase()}</span>}
-          title={c.title}
-          // Sottotitolo = argomento/autore (utile), non più "N domande"
-          // (tutti i capitoli ne hanno lo stesso numero → era ridondante).
-          subtitle={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
-          cov={chapterCoveragePct(c.id)}
-          dark={dark} card={card} bord={bord} lbl={lbl} note={note} textMain={textMain} textSub={textSub}
-          onClick={() => toggleChapter(c.id)}
-        />
-      ))}
+      {CHAPTERS.map((c, i) => {
+        const cov = chapterCoveragePct(c.id);
+        const color = colorForIdx(i);
+        return (
+          <TodoRow
+            key={c.id}
+            active={selected.has(c.id)}
+            multi
+            color={color}
+            title={c.title}
+            // Sottotitolo = argomento/autore (utile), non più "N domande".
+            subtitle={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
+            badge={covBadge(cov, color, selected.has(c.id))}
+            done={cov >= 100}
+            dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
+            onClick={() => toggleChapter(c.id)}
+          />
+        );
+      })}
     </div>
   );
 
-  // ── Selezione tipi di domanda (multi, come i capitoli) ──
+  // ── Lista to-do dei tipi di domanda (stesso look dei capitoli) ──
   const TypeList = (
     <div>
       <p className="trm-section-label" style={{ color: lbl }}>Tipi di domanda</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-        {TYPE_DEFS.map(t => {
-          const active = allTypes || types.has(t.id);
-          const explicit = types.has(t.id);
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => toggleType(t.id)}
-              style={{
-                display: "flex", alignItems: "center", gap: "0.7rem",
-                padding: "0.6rem 0.9rem", width: "100%", textAlign: "left",
-                background: explicit ? `${t.color}${dark ? "26" : "14"}` : card,
-                border: `2px solid ${explicit ? t.color : bord}`,
-                borderRadius: 12, cursor: "pointer", fontFamily: "inherit",
-                transition: "border-color .15s, background .15s",
-              }}
-            >
-              <div style={{
-                width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-                background: explicit ? t.color : (dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"),
-                color: explicit ? "#fff" : lbl,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>{t.icon}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "0.9rem", fontWeight: 800, color: explicit ? t.color : textMain }}>{t.label}</div>
-                <p style={{ fontSize: "0.72rem", color: textSub, margin: 0, lineHeight: 1.3 }}>{t.desc}</p>
-              </div>
-              <div style={{
-                width: 22, height: 22, flexShrink: 0, borderRadius: 6,
-                background: explicit ? t.color : "transparent",
-                border: explicit ? `2px solid ${t.color}` : `2px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)"}`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                {explicit && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
-              </div>
-            </button>
-          );
-        })}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+        {TYPE_DEFS.map(t => (
+          <TodoRow
+            key={t.id}
+            active={types.has(t.id)}
+            multi
+            color={t.color}
+            title={t.label}
+            subtitle={t.desc}
+            dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
+            onClick={() => toggleType(t.id)}
+          />
+        ))}
       </div>
       <p style={{ fontSize: "0.72rem", color: availableCount === 0 ? "#c0392b" : lbl, margin: "0.4rem 0 0 0.2rem", fontWeight: availableCount === 0 ? 700 : 400 }}>
-        {allTypes ? "Tutti i tipi" : `${types.size} tipi`}
+        {allTypes ? "Tutti i tipi (nessun filtro)" : `${types.size} tipi selezionati`}
         {" · "}
         {availableCount === 0 ? "nessuna domanda con questi filtri" : `${availableCount} domande nel quiz`}
       </p>
@@ -405,62 +390,58 @@ export default function TriviaMenu({
   );
 }
 
-// ── Card capitolo riusabile (mobile + desktop) ──
-function ChapCard(props: {
-  active: boolean; multi: boolean; color: string; icon: React.ReactNode; title: string; subtitle: string; cov: number;
-  dark: boolean; card: string; bord: string; lbl: string; note: string; textMain: string; textSub: string;
+// ── Riga "to-do" riusabile (capitoli e tipi condividono lo stesso look) ──
+// Checkbox A SINISTRA, poi contenuto, poi badge opzionale a destra.
+// `multi` = checkbox quadrata (capitolo/tipo), altrimenti pallino ("Tutti").
+// `done` = pacchetto/capitolo completato al 100% → spunta piena di colore.
+function TodoRow(props: {
+  active: boolean; multi: boolean; color: string; title: string; subtitle: string;
+  badge?: React.ReactNode; done?: boolean;
+  dark: boolean; card: string; bord: string; lbl: string; textMain: string; textSub: string;
   onClick: () => void;
 }) {
-  const { active, multi, color, icon, title, subtitle, cov, dark, card, bord, lbl, textMain, textSub, onClick } = props;
+  const { active, multi, color, title, subtitle, badge, done, dark, card, bord, lbl, textMain, textSub, onClick } = props;
+  // La checkbox è "piena" se selezionata oppure se il capitolo è completato.
+  const filled = active || done;
   return (
     <button
       type="button"
       onClick={onClick}
       style={{
-        display: "flex", alignItems: "center", gap: "0.75rem",
-        padding: "0.7rem 0.9rem",
-        background: active ? `${color}${dark ? "26" : "14"}` : card,
-        border: `2px solid ${active ? color : bord}`,
-        borderRadius: "12px", cursor: "pointer", fontFamily: "inherit",
+        display: "flex", alignItems: "center", gap: "0.7rem",
+        padding: "0.6rem 0.8rem",
+        background: active ? `${color}${dark ? "22" : "12"}` : card,
+        border: `1.5px solid ${active ? color : bord}`,
+        borderRadius: "11px", cursor: "pointer", fontFamily: "inherit",
         textAlign: "left", width: "100%",
         transition: "border-color 0.15s, background 0.15s",
-        boxShadow: active ? `0 2px 12px ${color}22` : "none",
       }}
     >
-      <div style={{
-        width: 42, height: 42, borderRadius: "10px", flexShrink: 0,
-        background: active ? color : (dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"),
-        color: active ? "#fff" : lbl,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background 0.15s",
-      }}>
-        {icon}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.1rem" }}>
-          <span style={{ fontSize: "0.9rem", fontWeight: 800, color: active ? color : textMain }}>{title}</span>
-          {cov > 0 && (
-            <span style={{
-              fontSize: "0.56rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em",
-              padding: "0.08rem 0.38rem", borderRadius: 999, flexShrink: 0,
-              background: active ? `${color}22` : (dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"),
-              color: active ? color : lbl,
-            }}>{cov}% visto</span>
-          )}
-        </div>
-        <p style={{ fontSize: "0.73rem", color: textSub, margin: 0, lineHeight: 1.3 }}>{subtitle}</p>
-      </div>
-      {/* Indicatore: checkbox quadrata per i capitoli (multi), pallino per "Tutti". */}
+      {/* Checkbox a SINISTRA (stile to-do) */}
       <div style={{
         width: 22, height: 22, flexShrink: 0,
         borderRadius: multi ? 6 : "50%",
-        background: active ? color : "transparent",
-        border: active ? `2px solid ${color}` : `2px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)"}`,
+        background: filled ? color : "transparent",
+        border: filled ? `2px solid ${color}` : `2px solid ${dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.2)"}`,
         display: "flex", alignItems: "center", justifyContent: "center",
         transition: "background .15s, border-color .15s",
       }}>
-        {active && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
+        {filled && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
       </div>
+      {/* Pallino colore-capitolo (dà varietà ma resta sobrio) */}
+      <span style={{ width: 9, height: 9, borderRadius: "50%", flexShrink: 0, background: color }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: "0.88rem", fontWeight: 800, color: active ? color : textMain, lineHeight: 1.25 }}>{title}</div>
+        {subtitle && <p style={{ fontSize: "0.72rem", color: textSub, margin: "0.05rem 0 0", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtitle}</p>}
+      </div>
+      {badge}
+      {done && (
+        <span style={{
+          fontSize: "0.54rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.05em",
+          padding: "0.1rem 0.4rem", borderRadius: 999, flexShrink: 0,
+          background: `${color}22`, color,
+        }}>100%</span>
+      )}
     </button>
   );
 }
