@@ -68,14 +68,19 @@ export function chapterIdFromPath(path: string): string {
   return base.replace(/\.md$/i, "").trim();
 }
 
-// Deriva una query-foto sensata dal testo della domanda: toglie la
-// punteggiatura finale e taglia a una lunghezza ragionevole per la ricerca.
-function derivePhotoQuery(text: string): string {
-  return text
-    .replace(/[?!.…]+\s*$/u, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 90);
+// Deriva una query-foto sensata dal testo della domanda, eventualmente
+// arricchita con la risposta corretta (utile quando l'entità da fotografare
+// è nella risposta, non nella domanda). "vero"/"falso" non sono indizi utili.
+function derivePhotoQuery(text: string, answerHint?: string): string {
+  const base = text.replace(/[?!.…]+\s*$/u, "").replace(/\s+/g, " ").trim();
+  const ans = (answerHint || "").trim();
+  const usefulAns = ans && !/^(vero|falso)$/i.test(ans) && /[A-ZÀ-Þ]/.test(ans);
+  // Se la risposta è un nome proprio e non è già citata nella domanda,
+  // la mettiamo DAVANTI: pesa di più nella ricerca → foto più inerente.
+  if (usefulAns && !base.toLowerCase().includes(ans.toLowerCase())) {
+    return `${ans} ${base}`.slice(0, 110);
+  }
+  return base.slice(0, 100);
 }
 
 function fail(chapterId: string, qIdx: number, msg: string): never {
@@ -178,12 +183,18 @@ function parseBlock(chapterId: string, idx: number, block: string[]): Question |
   if (!text) fail(chapterId, idx, "manca il testo della domanda");
   if (!type) fail(chapterId, idx, 'manca la riga "type:" (multipla | vero-falso | aperta)');
 
+  // Indizio foto: override esplicito, altrimenti deriva dal testo arricchito
+  // con la risposta corretta (spesso è lì l'"entità" da fotografare, es.
+  // "Brunelleschi" per "Chi progettò la cupola?").
+  const correctOpt = options.find(o => o.correct)?.text;
+  const photoHint = photoOverride || derivePhotoQuery(text, answer || correctOpt);
+
   const base = {
     chapter: "", // riempito dal chiamante via spread, non necessario qui
     chapterId,
     text,
     explanation,
-    photoQuery: photoOverride || derivePhotoQuery(text),
+    photoQuery: photoHint,
   };
 
   if (type === "multipla") {
@@ -203,7 +214,7 @@ function parseBlock(chapterId: string, idx: number, block: string[]): Question |
     return { id: "", type, answer: a, ...base } as Question;
   }
 
-  // aperta
+  // aperta (completamento)
   if (!answer) fail(chapterId, idx, 'una domanda aperta richiede "risposta: <testo>"');
   return { id: "", type, answer, accept, ...base } as Question;
 }

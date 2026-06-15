@@ -7,7 +7,7 @@
 // Per aggiungere domande: basta modificare/aggiungere un file .md in
 // content/trivia/. Niente da toccare qui.
 
-import { parseChapter, chapterIdFromPath, type Chapter, type Question } from "./parseTrivia";
+import { parseChapter, chapterIdFromPath, type Chapter, type Question, type QType } from "./parseTrivia";
 
 const modules = import.meta.glob("/content/trivia/*.md", {
   query: "?raw",
@@ -15,7 +15,11 @@ const modules = import.meta.glob("/content/trivia/*.md", {
   eager: true,
 }) as Record<string, string>;
 
+// README.md (e simili file di documentazione) non sono capitoli.
+const IGNORED = /\/readme\.md$/i;
+
 export const CHAPTERS: Chapter[] = Object.entries(modules)
+  .filter(([path]) => !IGNORED.test(path))
   .map(([path, raw]) => parseChapter(chapterIdFromPath(path), raw))
   // capitoli in ordine alfabetico di titolo, stabile e prevedibile
   .sort((a, b) => a.title.localeCompare(b.title, "it"));
@@ -24,10 +28,17 @@ export const ALL_QUESTIONS: Question[] = CHAPTERS.flatMap(c => c.questions);
 
 export const TOTAL_QUESTIONS = ALL_QUESTIONS.length;
 
-/** Domande di un capitolo (o tutte se `chapterId` assente / "all"). */
-export function questionsFor(chapterId?: string | "all"): Question[] {
-  if (!chapterId || chapterId === "all") return ALL_QUESTIONS;
-  return CHAPTERS.find(c => c.id === chapterId)?.questions ?? [];
+/**
+ * Domande dai capitoli e tipi selezionati.
+ *  • `chapterIds` vuoto → tutti i capitoli.
+ *  • `types` vuoto/omesso → tutti i tipi.
+ */
+export function questionsForMany(chapterIds: string[], types?: QType[]): Question[] {
+  const chapSet = chapterIds.length ? new Set(chapterIds) : null;
+  const typeSet = types && types.length ? new Set(types) : null;
+  let pool = chapSet ? CHAPTERS.filter(c => chapSet.has(c.id)).flatMap(c => c.questions) : ALL_QUESTIONS;
+  if (typeSet) pool = pool.filter(q => typeSet.has(q.type));
+  return pool;
 }
 
 // Mescola e prende le prime `n` (Fisher–Yates su copia).

@@ -14,7 +14,8 @@ interface LeaderboardProps {
 const CHAP_LABEL: Record<string, string> = Object.fromEntries(
   CHAPTERS.map(c => [c.id, c.title]),
 );
-const chapLabel = (id: string) => (id === "all" ? "Tutti" : CHAP_LABEL[id] ?? id);
+const chapLabel = (id: string) =>
+  id === "all" ? "Tutti" : id === "misto" ? "Misto" : (CHAP_LABEL[id] ?? id);
 
 /**
  * Classifica live: top punteggi + aggiornamenti realtime (WebSocket Supabase).

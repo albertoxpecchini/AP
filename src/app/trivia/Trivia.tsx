@@ -3,13 +3,13 @@ import { Link } from "react-router";
 import confetti from "canvas-confetti";
 import { ArrowLeft, Moon, Sun, Flame, Check, X as XIcon, ImageOff, ListOrdered, RotateCcw, Send } from "lucide-react";
 
-import TriviaMenu, { type ChapterChoice, type GameLength } from "./TriviaMenu";
+import TriviaMenu, { type ChapterSelection, type TypeSelection } from "./TriviaMenu";
 import NicknameGate, { getStoredNick } from "./NicknameGate";
 import Leaderboard from "./Leaderboard";
 import GameTutorial, { hasSeenTutorial } from "../components/GameIntro";
 import { TRIVIA_INTRO } from "./tutorialSteps";
 
-import { questionsFor, pickQuestions } from "./questions";
+import { questionsForMany, pickQuestions } from "./questions";
 import { isAnswerCorrect, type Question } from "./parseTrivia";
 import { fetchPhoto, prefetchPhoto } from "./photos";
 import { markSeen, coveragePct } from "./coverage";
@@ -25,6 +25,8 @@ const DARK_KEY = "games-dark";
 const TIME_PER_Q = 20000;
 const BASE_POINTS = 100;
 const SPEED_BONUS_MAX = 100; // si esaurisce linearmente entro TIME_PER_Q
+// Tetto di domande per partita (le domande filtrate vengono mescolate e tagliate).
+const MAX_QUESTIONS = 15;
 
 type Phase = "menu" | "gate" | "playing" | "results";
 
@@ -49,10 +51,11 @@ export default function Trivia() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const [nick, setNick] = useState<string>(() => getStoredNick());
-  const pendingPlay = useRef<{ chapter: ChapterChoice; length: GameLength } | null>(null);
+  const pendingPlay = useRef<{ chapters: ChapterSelection; types: TypeSelection } | null>(null);
 
   // ── stato partita ──
-  const [chapter, setChapter] = useState<ChapterChoice>("all");
+  const [chapters, setChapters] = useState<ChapterSelection>([]);
+  const [qTypes, setQTypes] = useState<TypeSelection>([]);
   const [queue, setQueue] = useState<Question[]>([]);
   const [idx, setIdx] = useState(0);
   const [played, setPlayed] = useState<Played[]>([]);
@@ -82,11 +85,14 @@ export default function Trivia() {
   const current = queue[idx];
 
   // ─── Avvio partita ───
-  const startGame = useCallback((chap: ChapterChoice, length: GameLength) => {
-    const pool = questionsFor(chap);
-    const picked = pickQuestions(pool, length);
+  // Usa tutte le domande che corrispondono a capitoli+tipi scelti, mescolate
+  // e limitate a MAX_QUESTIONS.
+  const startGame = useCallback((chaps: ChapterSelection, t: TypeSelection) => {
+    const pool = questionsForMany(chaps, t);
+    const picked = pickQuestions(pool, MAX_QUESTIONS);
     if (picked.length === 0) return;
-    setChapter(chap);
+    setChapters(chaps);
+    setQTypes(t);
     setQueue(picked);
     setIdx(0);
     setPlayed([]);
@@ -97,14 +103,14 @@ export default function Trivia() {
   }, []);
 
   // "Gioca": prima il gate nickname (se mai scelto), poi parte.
-  const onPlay = useCallback((chap: ChapterChoice, length: GameLength) => {
+  const onPlay = useCallback((chaps: ChapterSelection, t: TypeSelection) => {
     if (!nick) {
-      pendingPlay.current = { chapter: chap, length };
+      pendingPlay.current = { chapters: chaps, types: t };
       setPhase("gate");
       return;
     }
-    if (!hasSeenTutorial(GAME_KEY)) { pendingPlay.current = { chapter: chap, length }; setShowTutorial(true); return; }
-    startGame(chap, length);
+    if (!hasSeenTutorial(GAME_KEY)) { pendingPlay.current = { chapters: chaps, types: t }; setShowTutorial(true); return; }
+    startGame(chaps, t);
   }, [nick, startGame]);
 
   const onGateConfirm = useCallback((n: string) => {
@@ -113,7 +119,7 @@ export default function Trivia() {
     setPhase("menu");
     if (p) {
       if (!hasSeenTutorial(GAME_KEY)) { setShowTutorial(true); return; }
-      startGame(p.chapter, p.length);
+      startGame(p.chapters, p.types);
     }
   }, [startGame]);
 
@@ -121,8 +127,12 @@ export default function Trivia() {
     setShowTutorial(false);
     const p = pendingPlay.current;
     pendingPlay.current = null;
-    if (p && nick) startGame(p.chapter, p.length);
+    if (p && nick) startGame(p.chapters, p.types);
   }, [nick, startGame]);
+
+  // Chiave capitolo per la classifica: "all" se nessuno, l'id se uno solo,
+  // altrimenti "misto" (più capitoli selezionati).
+  const chapterKey = chapters.length === 0 ? "all" : chapters.length === 1 ? chapters[0] : "misto";
 
   // ─── Setup di ogni domanda: foto + timer + prefetch della successiva ───
   useEffect(() => {
@@ -229,7 +239,7 @@ export default function Trivia() {
     if (accuracy > prevBestPct) { setBestGrade(grade.letter); try { localStorage.setItem(BEST_GRADE_KEY, grade.letter); } catch {} }
 
     // invio classifica (non blocca la UI)
-    submitScore({ nick: nick || "Anon", score, chapter: chapter === "all" ? "all" : chapter, accuracy, best_streak: bestStreakRun })
+    submitScore({ nick: nick || "Anon", score, chapter: chapterKey, accuracy, best_streak: bestStreakRun })
       .then(row => setJustSubmitted(row))
       .catch(() => {});
 
@@ -238,7 +248,7 @@ export default function Trivia() {
     }
     setPhase("results");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queue, played, bestStreakRun, bestStreak, bestGrade, nick, score, chapter]);
+  }, [queue, played, bestStreakRun, bestStreak, bestGrade, nick, score, chapterKey]);
 
   const backToMenu = useCallback(() => {
     clearInterval(tickRef.current);
@@ -370,7 +380,7 @@ export default function Trivia() {
           </div>
           <p className="trv-res-cov">Hai esplorato il <b>{coverage}%</b> di tutte le domande</p>
           <div className="trv-res-actions">
-            <button className="trv-res-primary" onClick={() => startGame(chapter, queue.length as GameLength)}><RotateCcw size={17} /> Rigioca</button>
+            <button className="trv-res-primary" onClick={() => startGame(chapters, qTypes)}><RotateCcw size={17} /> Rigioca</button>
             <button className="trv-res-second" onClick={() => setShowLeaderboard(true)}><ListOrdered size={17} /> Classifica</button>
           </div>
           <button className="trv-res-menu" onClick={backToMenu}>Torna al menu</button>

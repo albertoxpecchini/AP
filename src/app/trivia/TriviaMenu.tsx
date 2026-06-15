@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, Layers, GraduationCap } from "lucide-react";
-import { CHAPTERS } from "./questions";
+import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, Layers, GraduationCap, ListChecks, ToggleLeft, PencilLine } from "lucide-react";
+import { CHAPTERS, questionsForMany } from "./questions";
 import { chapterCoveragePct } from "./coverage";
+import type { QType } from "./parseTrivia";
 
-export type ChapterChoice = string | "all"; // id capitolo o "tutti"
+// Selezione capitoli: lista di id. Vuota = tutti i capitoli.
+export type ChapterSelection = string[];
+// Selezione tipi di domanda. Vuota = tutti i tipi.
+export type TypeSelection = QType[];
 
-// Lunghezza partita selezionabile.
-export const LENGTHS = [5, 10, 15] as const;
-export type GameLength = (typeof LENGTHS)[number];
+// Tipi di domanda selezionabili, con etichetta e icona "da gioco".
+const TYPE_DEFS: { id: QType; label: string; desc: string; icon: React.ReactNode; color: string }[] = [
+  { id: "multipla",   label: "Scelta multipla", desc: "Scegli l'opzione giusta",    icon: <ListChecks size={18} />, color: "#2F7D4A" },
+  { id: "vero-falso", label: "Vero o Falso",    desc: "Vero oppure falso",          icon: <ToggleLeft size={18} />, color: "#3a7bbf" },
+  { id: "aperta",     label: "Completamento",   desc: "Scrivi tu la risposta",      icon: <PencilLine size={18} />, color: "#b5651d" },
+];
 
 interface TriviaMenuProps {
   dark: boolean;
@@ -16,7 +23,7 @@ interface TriviaMenuProps {
   bestGrade: string;        // es. "A−" o "—"
   coverage: number;         // % totale db visto
   nick?: string;
-  onPlay: (chapter: ChapterChoice, length: GameLength) => void;
+  onPlay: (chapters: ChapterSelection, types: TypeSelection) => void;
   onTutorial: () => void;
   onLeaderboard: () => void;
   onChangeNick: () => void;
@@ -30,8 +37,27 @@ export default function TriviaMenu({
   dark, bestStreak, bestGrade, coverage, nick,
   onPlay, onTutorial, onLeaderboard, onChangeNick,
 }: TriviaMenuProps) {
-  const [chapter, setChapter] = useState<ChapterChoice>("all");
-  const [length, setLength] = useState<GameLength>(10);
+  // Set di id capitoli selezionati. Vuoto = "Tutti i capitoli".
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  // Set di tipi domanda selezionati. Vuoto = "Tutti i tipi".
+  const [types, setTypes] = useState<Set<QType>>(new Set());
+
+  const allMode = selected.size === 0;
+  const toggleChapter = (id: string) =>
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  const selectAll = () => setSelected(new Set());
+
+  const allTypes = types.size === 0;
+  const toggleType = (id: QType) =>
+    setTypes(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
 
   const bg       = dark ? "#111916" : "#f4f6f5";
   const card     = dark ? "#1a2720" : "#ffffff";
@@ -44,89 +70,155 @@ export default function TriviaMenu({
   const textSub  = dark ? "#a4c4aa" : "#4a5c50";
 
   const totalQuestions = CHAPTERS.reduce((s, c) => s + c.questions.length, 0);
-  const selectedColor = chapter === "all" ? "#2F7D4A" : colorForIdx(CHAPTERS.findIndex(c => c.id === chapter));
-  const selectedName =
-    chapter === "all" ? "Tutti i capitoli" : (CHAPTERS.find(c => c.id === chapter)?.title ?? "Capitolo");
+  // Domande disponibili nella selezione corrente (capitoli + tipi).
+  const availableCount = questionsForMany([...selected], [...types]).length;
+  // Colore "principale" = verde se "tutti", altrimenti colore del primo capitolo scelto.
+  const firstSelIdx = allMode ? -1 : CHAPTERS.findIndex(c => selected.has(c.id));
+  const selectedColor = allMode ? "#2F7D4A" : colorForIdx(firstSelIdx);
+  const selectedName = allMode
+    ? "Tutti i capitoli"
+    : selected.size === 1
+      ? (CHAPTERS.find(c => selected.has(c.id))?.title ?? "1 capitolo")
+      : `${selected.size} capitoli`;
 
-  // ── Card "Tutti i capitoli" + una per capitolo ──
+  // Nessun capitolo caricato (cartella content/trivia vuota): stato "in arrivo".
+  if (CHAPTERS.length === 0) {
+    return (
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 200, background: bg,
+        fontFamily: '"Titillium Web", Geneva, Tahoma, sans-serif',
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        gap: "1.3rem", padding: "1.5rem", textAlign: "center",
+      }}>
+        <div style={{ background: "#1a5030", color: "#fff", borderRadius: 18, padding: 16, display: "inline-flex", boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}>
+          <GraduationCap size={46} />
+        </div>
+        <div>
+          <h1 style={{ fontSize: "clamp(2rem,8vw,2.6rem)", fontWeight: 900, letterSpacing: "0.26em", margin: 0, color: dark ? "#6fe0a6" : "#1a5030" }}>
+            TRI<span style={{ color: dark ? "#9ff0c2" : "#3a9e5f" }}>VI</span>A
+          </h1>
+          <p style={{ margin: ".4rem 0 0", fontWeight: 700, color: textSub }}>Storia dell'Architettura</p>
+        </div>
+        <div style={{ background: card, border: `1px dashed ${bord}`, borderRadius: 14, padding: "1.5rem 1.3rem", maxWidth: 360, color: textSub }}>
+          <BookOpen size={28} style={{ color: icon, marginBottom: ".5rem" }} />
+          <p style={{ margin: 0, fontWeight: 800, color: textMain }}>Domande in arrivo</p>
+          <p style={{ margin: ".4rem 0 0", fontSize: ".85rem", lineHeight: 1.5 }}>
+            I capitoli del quiz verranno caricati a breve. Torna presto!
+          </p>
+        </div>
+        <Link to="/#progetti" style={{ display: "inline-flex", alignItems: "center", gap: ".4rem", color: icon, textDecoration: "none", fontWeight: 700, fontSize: ".9rem" }}>
+          <ArrowLeft size={15} /> Torna ai progetti
+        </Link>
+      </div>
+    );
+  }
+
+  // ── Card "Tutti i capitoli" + una multi-selezionabile per capitolo ──
   const ChapterList = (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-      {/* Tutti */}
+      {/* Tutti (deseleziona tutto) */}
       <ChapCard
-        active={chapter === "all"}
+        active={allMode}
+        multi={false}
         color="#2F7D4A"
         icon={<Layers size={20} />}
         title="Tutti i capitoli"
         subtitle={`Mix da tutti i ${CHAPTERS.length} capitoli · ${totalQuestions} domande`}
         cov={coverage}
         dark={dark} card={card} bord={bord} lbl={lbl} note={note} textMain={textMain} textSub={textSub}
-        onClick={() => setChapter("all")}
+        onClick={selectAll}
       />
       {CHAPTERS.map((c, i) => (
         <ChapCard
           key={c.id}
-          active={chapter === c.id}
+          active={selected.has(c.id)}
+          multi
           color={colorForIdx(i)}
           icon={<span style={{ fontWeight: 900, fontSize: "1rem" }}>{c.title.charAt(0).toUpperCase()}</span>}
           title={c.title}
           subtitle={`${c.questions.length} domande`}
           cov={chapterCoveragePct(c.id)}
           dark={dark} card={card} bord={bord} lbl={lbl} note={note} textMain={textMain} textSub={textSub}
-          onClick={() => setChapter(c.id)}
+          onClick={() => toggleChapter(c.id)}
         />
       ))}
     </div>
   );
 
-  const LengthPicker = (
+  // ── Selezione tipi di domanda (multi, come i capitoli) ──
+  const TypeList = (
     <div>
-      <p className="trm-section-label" style={{ color: lbl }}>Quante domande</p>
-      <div style={{ display: "flex", gap: "0.5rem" }}>
-        {LENGTHS.map(n => {
-          const on = length === n;
+      <p className="trm-section-label" style={{ color: lbl }}>Tipi di domanda</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+        {TYPE_DEFS.map(t => {
+          const active = allTypes || types.has(t.id);
+          const explicit = types.has(t.id);
           return (
             <button
-              key={n}
+              key={t.id}
               type="button"
-              onClick={() => setLength(n)}
+              onClick={() => toggleType(t.id)}
               style={{
-                flex: 1, padding: "0.6rem 0", borderRadius: 12,
-                border: `2px solid ${on ? selectedColor : bord}`,
-                background: on ? `${selectedColor}1a` : card,
-                color: on ? selectedColor : textMain,
-                fontFamily: "inherit", fontWeight: 800, fontSize: "1rem", cursor: "pointer",
-                transition: "all .15s",
+                display: "flex", alignItems: "center", gap: "0.7rem",
+                padding: "0.6rem 0.9rem", width: "100%", textAlign: "left",
+                background: explicit ? `${t.color}${dark ? "26" : "14"}` : card,
+                border: `2px solid ${explicit ? t.color : bord}`,
+                borderRadius: 12, cursor: "pointer", fontFamily: "inherit",
+                transition: "border-color .15s, background .15s",
               }}
             >
-              {n}
+              <div style={{
+                width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+                background: explicit ? t.color : (dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"),
+                color: explicit ? "#fff" : lbl,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>{t.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: "0.9rem", fontWeight: 800, color: explicit ? t.color : textMain }}>{t.label}</div>
+                <p style={{ fontSize: "0.72rem", color: textSub, margin: 0, lineHeight: 1.3 }}>{t.desc}</p>
+              </div>
+              <div style={{
+                width: 22, height: 22, flexShrink: 0, borderRadius: 6,
+                background: explicit ? t.color : "transparent",
+                border: explicit ? `2px solid ${t.color}` : `2px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)"}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {explicit && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
+              </div>
             </button>
           );
         })}
       </div>
+      <p style={{ fontSize: "0.72rem", color: availableCount === 0 ? "#c0392b" : lbl, margin: "0.4rem 0 0 0.2rem", fontWeight: availableCount === 0 ? 700 : 400 }}>
+        {allTypes ? "Tutti i tipi" : `${types.size} tipi`}
+        {" · "}
+        {availableCount === 0 ? "nessuna domanda con questi filtri" : `${availableCount} domande nel quiz`}
+      </p>
     </div>
   );
 
   const PlayBtn = (
     <button
       type="button"
-      onClick={() => onPlay(chapter, length)}
+      onClick={() => { if (availableCount > 0) onPlay([...selected], [...types]); }}
+      disabled={availableCount === 0}
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0.95rem 1.3rem",
         background: selectedColor, color: "#fff",
         border: "none", borderRadius: "14px",
         fontSize: "0.98rem", fontWeight: 800,
-        cursor: "pointer", fontFamily: "inherit",
+        cursor: availableCount === 0 ? "not-allowed" : "pointer", fontFamily: "inherit",
         boxShadow: `0 6px 24px ${selectedColor}55`,
         transition: "filter 0.12s, transform 0.12s",
-        width: "100%",
+        width: "100%", opacity: availableCount === 0 ? 0.5 : 1,
       }}
-      onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+      onMouseEnter={e => { if (availableCount > 0) { e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-1px)"; } }}
       onMouseLeave={e => { e.currentTarget.style.filter = ""; e.currentTarget.style.transform = ""; }}
     >
       <div>
         <div style={{ fontSize: "0.98rem", fontWeight: 800 }}>Gioca</div>
-        <div style={{ fontSize: "0.72rem", opacity: 0.85, marginTop: "0.1rem" }}>{selectedName} · {length} domande</div>
+        <div style={{ fontSize: "0.72rem", opacity: 0.85, marginTop: "0.1rem" }}>{selectedName} · {availableCount} domande</div>
       </div>
       <ChevronRight size={20} />
     </button>
@@ -179,9 +271,9 @@ export default function TriviaMenu({
         </div>
         <div className="trm-body">
           {StatsCard(false)}
-          <p className="trm-section-label" style={{ color: lbl }}>Scegli il capitolo</p>
+          <p className="trm-section-label" style={{ color: lbl }}>Scegli i capitoli</p>
           {ChapterList}
-          {LengthPicker}
+          {TypeList}
           {PlayBtn}
           {LbBtn}
           <button type="button" onClick={onTutorial} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
@@ -203,9 +295,9 @@ export default function TriviaMenu({
           <p className="trm-kicker" style={{ position: "static", marginTop: "auto", opacity: 1 }}>Web Game · Quiz</p>
         </div>
         <div className="trm-desktop-right" style={{ background: bg }}>
-          <p className="trm-section-label" style={{ color: lbl }}>Scegli il capitolo</p>
+          <p className="trm-section-label" style={{ color: lbl }}>Scegli i capitoli</p>
           {ChapterList}
-          {LengthPicker}
+          {TypeList}
           {PlayBtn}
           <div style={{ display: "flex", gap: "0.6rem" }}>
             <div style={{ flex: 1 }}>{LbBtn}</div>
@@ -313,11 +405,11 @@ export default function TriviaMenu({
 
 // ── Card capitolo riusabile (mobile + desktop) ──
 function ChapCard(props: {
-  active: boolean; color: string; icon: React.ReactNode; title: string; subtitle: string; cov: number;
+  active: boolean; multi: boolean; color: string; icon: React.ReactNode; title: string; subtitle: string; cov: number;
   dark: boolean; card: string; bord: string; lbl: string; note: string; textMain: string; textSub: string;
   onClick: () => void;
 }) {
-  const { active, color, icon, title, subtitle, cov, dark, card, bord, lbl, note, textMain, textSub, onClick } = props;
+  const { active, multi, color, icon, title, subtitle, cov, dark, card, bord, lbl, textMain, textSub, onClick } = props;
   return (
     <button
       type="button"
@@ -356,11 +448,17 @@ function ChapCard(props: {
         </div>
         <p style={{ fontSize: "0.73rem", color: textSub, margin: 0, lineHeight: 1.3 }}>{subtitle}</p>
       </div>
-      {active && (
-        <div style={{ width: 20, height: 20, borderRadius: "50%", background: color, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-        </div>
-      )}
+      {/* Indicatore: checkbox quadrata per i capitoli (multi), pallino per "Tutti". */}
+      <div style={{
+        width: 22, height: 22, flexShrink: 0,
+        borderRadius: multi ? 6 : "50%",
+        background: active ? color : "transparent",
+        border: active ? `2px solid ${color}` : `2px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)"}`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        transition: "background .15s, border-color .15s",
+      }}>
+        {active && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
+      </div>
     </button>
   );
 }
