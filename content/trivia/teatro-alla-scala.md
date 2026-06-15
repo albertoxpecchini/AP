@@ -1,5 +1,10 @@
 # Teatro alla Scala di Milano
 
+ordine: 2
+argomento: Neoclassicismo
+autore: Giuseppe Piermarini
+edificio: Teatro alla Scala, Milano
+
 ## Domanda
 type: multipla
 Chi è l'architetto del Teatro alla Scala di Milano?
@@ -91,31 +96,92 @@ A chi era riservato il quinto ordine?
 foto: Teatro alla Scala Milano
 
 ## Domanda
-type: aperta
-Il Teatro alla Scala di Milano è il primo edificio teatrale neoclassico costruito in __________.
-risposta: Giuseppe Piermarini
+type: vero-falso
+Il Teatro alla Scala è il primo edificio teatrale neoclassico costruito in Europa.
+risposta: vero
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+Giuseppe Piermarini fu attivo soprattutto in Lombardia.
+risposta: vero
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+Il teatro fu costruito tra il 1776 e il 1778.
+risposta: vero
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+Il nome del teatro deriva dal Duomo di Milano.
+risposta: falso
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+L'ampliamento tra il 2002 e il 2004 fu progettato da Mario Botta.
+risposta: vero
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+La facciata era stata concepita per essere vista di fronte.
+risposta: falso
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+Il portico al piano terreno permetteva alle carrozze di accedere al teatro senza esporsi alle intemperie.
+risposta: vero
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+L'attico è caratterizzato da finestre timpanate.
+risposta: falso
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+La sala del teatro ha una pianta a ferro di cavallo.
+risposta: vero
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: vero-falso
+La platea era destinata alla servitù.
+risposta: vero
 foto: Teatro alla Scala Milano
 
 ## Domanda
 type: aperta
-Il teatro fu costruito tra il __________ e il 1778.
-risposta: 1776-1778
+Il Teatro alla Scala di Milano (Piermarini) è il primo edificio teatrale neoclassico costruito in __________.
+risposta: Europa
 foto: Teatro alla Scala Milano
 
 ## Domanda
 type: aperta
-Il nome del teatro deriva dalla Chiesa di Santa Maria alla __________.
+Il Teatro alla Scala fu costruito tra il __________ e il 1778.
+risposta: 1776
+foto: Teatro alla Scala Milano
+
+## Domanda
+type: aperta
+Il nome del Teatro alla Scala deriva dalla Chiesa di Santa Maria alla __________.
 risposta: Scala
 foto: Teatro alla Scala Milano
 
 ## Domanda
 type: aperta
-La sala del teatro ha una pianta a __________ di cavallo.
+La sala del Teatro alla Scala ha una pianta a __________ di cavallo.
 risposta: ferro
 foto: Teatro alla Scala Milano
 
 ## Domanda
 type: aperta
-La platea era destinata alla __________.
-risposta: servitù
+Alla Scala il quinto ordine di palchi era riservato ai __________ (ceto cittadino).
+risposta: borghesi
+accetta: borghesia
 foto: Teatro alla Scala Milano

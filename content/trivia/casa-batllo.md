@@ -1,5 +1,10 @@
 # Casa Batlló
 
+ordine: 13
+argomento: Modernismo catalano
+autore: Antoni Gaudí
+edificio: Casa Batlló, Barcellona
+
 ## Domanda
 type: multipla
 Tra quali anni fu realizzata Casa Batlló?
@@ -91,31 +96,91 @@ Quanti insiemi di camini inserì Gaudí sulla terrazza?
 foto: Casa Batlló Barcelona
 
 ## Domanda
-type: aperta
-Casa Batlló venne realizzata tra il __________ e il 1906.
-risposta: 1904-1906
+type: vero-falso
+Casa Batlló è il risultato del rifacimento di un edificio preesistente.
+risposta: vero
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+Josep Batlló era un ricco industriale del settore tessile.
+risposta: vero
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+La facciata suggerisce un'idea di continuo movimento.
+risposta: vero
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+I cosiddetti "motivi ossei" si trovano nella parte bassa della facciata.
+risposta: vero
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+Il tetto è separato dalla facciata da una netta interruzione.
+risposta: falso
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+I parapetti dei balconi hanno forma di maschere o mezzi teschi.
+risposta: vero
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+Negli interni sono presenti spigoli e linee rette molto marcate.
+risposta: falso
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+L'appartamento della famiglia Batlló è suddiviso in tre zone.
+risposta: vero
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+Il cortile interno consente l'illuminazione di tutte le stanze.
+risposta: vero
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: vero-falso
+Due scale a chiocciola collegano questo piano alla terrazza.
+risposta: vero
 foto: Casa Batlló Barcelona
 
 ## Domanda
 type: aperta
-L'edificio fu commissionato da Josep Batlló, un ricco industriale del settore __________.
-risposta: Josep Batlló
+Casa Batlló, a Barcellona (Gaudí), venne realizzata tra il __________ e il 1906.
+risposta: 1904
 foto: Casa Batlló Barcelona
 
 ## Domanda
 type: aperta
-La parte centrale della facciata utilizza dischi di maiolica frammentata e vetri __________.
+Casa Batlló fu commissionata da Josep Batlló, un ricco industriale del settore __________.
+risposta: tessile
+foto: Casa Batlló Barcelona
+
+## Domanda
+type: aperta
+Nella facciata di Casa Batlló, Gaudí usò dischi di maiolica frammentata e vetri __________.
 risposta: istoriati
 foto: Casa Batlló Barcelona
 
 ## Domanda
 type: aperta
-L'appartamento della famiglia Batlló si trova al piano __________.
+In Casa Batlló l'appartamento della famiglia si trova al piano __________.
 risposta: nobile
 foto: Casa Batlló Barcelona
 
 ## Domanda
 type: aperta
-Due scale a __________ collegano questo piano alla terrazza.
+In Casa Batlló due scale a __________ collegano il piano nobile alla terrazza.
 risposta: chiocciola
 foto: Casa Batlló Barcelona

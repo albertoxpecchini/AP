@@ -1,5 +1,10 @@
 # Art Nouveau in Francia
 
+ordine: 11
+argomento: Art Nouveau
+autore: Hector Guimard
+edificio: Métro di Parigi / Castel Béranger
+
 ## Domanda
 type: multipla
 Da quale Paese si diffuse l'Art Nouveau in Francia?
@@ -91,31 +96,93 @@ In quale città fu costruito Castel Béranger?
 foto: Métro Paris Guimard entrance
 
 ## Domanda
-type: aperta
-Il nome Art Nouveau deriva dal negozio parigino __________ – La Maison Bing.
-risposta: L'Art
+type: vero-falso
+In Francia l'Art Nouveau incontrò resistenze in architettura.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+Il nome Art Nouveau deriva da un negozio londinese.
+risposta: falso
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+Samuel Bing era un mercante d'arte.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+In Francia si affermò l'idea che anche la produzione in serie possa essere di qualità.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+Le bouches du métro sono gli accessi delle stazioni della metropolitana parigina.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+La rete metropolitana sotterranea era a trazione elettrica.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+Le strutture progettate da Guimard si classificano in quattro tipologie.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+Le edicole erano strutture dotate di pensilina a forma di padiglione.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+I padiglioni ospitavano anche la biglietteria.
+risposta: vero
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: vero-falso
+Castel Béranger fu costruito tra il 1898 e il 1905.
+risposta: falso
 foto: Métro Paris Guimard entrance
 
 ## Domanda
 type: aperta
-Hector Guimard visse dal 1867 al __________.
+Il nome "Art Nouveau" deriva dal negozio parigino __________ – La Maison Bing.
+risposta: L'Art Nouveau
+accetta: Art Nouveau
+foto: Métro Paris Guimard entrance
+
+## Domanda
+type: aperta
+L'architetto Hector Guimard, autore degli ingressi del Métro di Parigi, visse dal 1867 al __________.
 risposta: 1942
 foto: Métro Paris Guimard entrance
 
 ## Domanda
 type: aperta
-Tra il 1900 e il 1914 vennero aperte ben __________ stazioni.
-risposta: 1900 e 1914
+A Parigi, tra il 1900 e il 1914 vennero aperte ben __________ stazioni della metropolitana.
+risposta: 150
 foto: Métro Paris Guimard entrance
 
 ## Domanda
 type: aperta
-Le strutture progettate da Guimard sono realizzate in __________.
+Le strutture del Métro progettate da Guimard sono realizzate in __________ (verniciata a imitazione del bronzo).
 risposta: ghisa
 foto: Métro Paris Guimard entrance
 
 ## Domanda
 type: aperta
-Castel Béranger è un edificio residenziale di __________ appartamenti.
-risposta: Parigi
+Castel Béranger, a Parigi (Guimard), è un edificio residenziale di __________ appartamenti.
+risposta: 36
+accetta: trentasei
 foto: Métro Paris Guimard entrance

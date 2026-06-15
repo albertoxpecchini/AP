@@ -1,5 +1,10 @@
 # Quartiere CityLife
 
+ordine: 40
+argomento: Architettura contemporanea
+autore: Hadid · Isozaki · Libeskind
+edificio: Quartiere CityLife, Milano
+
 ## Domanda
 type: multipla
 Da quale intervento urbano è nato il quartiere CityLife di Milano?
@@ -91,6 +96,66 @@ Qual è l'altezza della Torre Libeskind?
 foto: CityLife Milano Tre Torri
 
 ## Domanda
+type: vero-falso
+Il quartiere CityLife nasce dalla riqualificazione dell'area della Fiera campionaria milanese.
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+Il cuore del progetto è rappresentato da Piazza Tre Torri.
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+La Torre Hadid è stata la seconda torre a essere edificata.
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+La Torre Hadid è caratterizzata da una forma rettilinea.
+risposta: falso
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+La Torre Hadid è alta 192 metri.
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+La Torre Isozaki è soprannominata "Il Dritto".
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+La Torre Isozaki è stata costruita tra il 2012 e il 2015.
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+Cinque dei piani della Torre Isozaki sono interrati.
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+La Torre Libeskind è soprannominata "Il Curvo".
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
+type: vero-falso
+La Torre Libeskind è stata completata nel 2020.
+risposta: vero
+foto: CityLife Milano Tre Torri
+
+## Domanda
 type: aperta
 Il quartiere CityLife si trova a __________.
 risposta: Milano
@@ -98,25 +163,25 @@ foto: CityLife Milano Tre Torri
 
 ## Domanda
 type: aperta
-Il cuore del progetto è Piazza __________.
+Il cuore del progetto CityLife è Piazza __________.
 risposta: Tre Torri
+accetta: Tre
 foto: CityLife Milano Tre Torri
 
 ## Domanda
 type: aperta
-La Torre Hadid è soprannominata "Lo __________".
+A CityLife la Torre Hadid è soprannominata "Lo __________".
 risposta: Storto
 foto: CityLife Milano Tre Torri
 
 ## Domanda
 type: aperta
-La Torre Isozaki è alta __________ metri.
-risposta: Arata
+A CityLife la Torre Isozaki è alta __________ metri.
+risposta: 209
 foto: CityLife Milano Tre Torri
 
 ## Domanda
 type: aperta
-La Torre Libeskind è soprannominata "Il __________".
-risposta: 175
-accetta: 175 m
+A CityLife la Torre Libeskind è soprannominata "Il __________".
+risposta: Curvo
 foto: CityLife Milano Tre Torri

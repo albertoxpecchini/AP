@@ -136,7 +136,9 @@ export default function TriviaMenu({
           color={colorForIdx(i)}
           icon={<span style={{ fontWeight: 900, fontSize: "1rem" }}>{c.title.charAt(0).toUpperCase()}</span>}
           title={c.title}
-          subtitle={`${c.questions.length} domande`}
+          // Sottotitolo = argomento/autore (utile), non più "N domande"
+          // (tutti i capitoli ne hanno lo stesso numero → era ridondante).
+          subtitle={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
           cov={chapterCoveragePct(c.id)}
           dark={dark} card={card} bord={bord} lbl={lbl} note={note} textMain={textMain} textSub={textSub}
           onClick={() => toggleChapter(c.id)}

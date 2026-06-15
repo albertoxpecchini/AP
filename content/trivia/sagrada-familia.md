@@ -1,5 +1,10 @@
 # Sagrada Família
 
+ordine: 15
+argomento: Modernismo catalano
+autore: Antoni Gaudí
+edificio: Sagrada Família, Barcellona
+
 ## Domanda
 type: multipla
 In quale anno Antoni Gaudí cominciò a lavorare alla Sagrada Familia?
@@ -91,31 +96,91 @@ In quante navate è suddiviso il corpo longitudinale della chiesa?
 foto: Sagrada Família Barcelona
 
 ## Domanda
+type: vero-falso
+Gaudí dedicò tutte le sue energie alla Sagrada Familia.
+risposta: vero
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+I lavori della Sagrada Familia iniziarono dopo l'arrivo di Gaudí.
+risposta: falso
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+Gaudí abbandonò il riferimento alle cattedrali gotiche.
+risposta: falso
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+La facciata orientale era stata completata alla morte di Gaudí.
+risposta: vero
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+La facciata della Natività è rivolta a ovest.
+risposta: falso
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+La torre centrale dedicata a Gesù Cristo raggiungerà 170 metri di altezza.
+risposta: vero
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+La facciata della Passione è dedicata alla nascita di Cristo.
+risposta: falso
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+La facciata della Gloria è ancora in costruzione.
+risposta: vero
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+La pianta della chiesa è a croce latina.
+risposta: vero
+foto: Sagrada Família Barcelona
+
+## Domanda
+type: vero-falso
+L'interno della Sagrada Familia è descritto come una foresta in pietra.
+risposta: vero
+foto: Sagrada Família Barcelona
+
+## Domanda
 type: aperta
-La Sagrada Familia è l'opera di un'intera vita: Antoni Gaudí cominciò a lavorarvi nel __________.
+La Sagrada Família è l'opera di una vita: Antoni Gaudí cominciò a lavorarvi nel __________.
 risposta: 1883
 foto: Sagrada Família Barcelona
 
 ## Domanda
 type: aperta
-La Sagrada Familia è stata dichiarata Patrimonio dell'umanità dall'Unesco nel __________.
+La Sagrada Família è stata dichiarata Patrimonio dell'umanità dall'Unesco nel __________.
 risposta: 1984
 foto: Sagrada Família Barcelona
 
 ## Domanda
 type: aperta
-La torre centrale, quella di Gesù Cristo, raggiungerà i suoi __________ m di altezza.
+La torre centrale della Sagrada Família, quella di Gesù Cristo, raggiungerà i __________ m di altezza.
 risposta: 170
 foto: Sagrada Família Barcelona
 
 ## Domanda
 type: aperta
-La facciata della Gloria dovrà ospitare l'ingresso principale con la scalinata __________.
-risposta: cammino dell'uomo all'interno Creazione
+La facciata della Gloria della Sagrada Família ospiterà l'ingresso principale con la scalinata __________.
+risposta: monumentale
 foto: Sagrada Família Barcelona
 
 ## Domanda
 type: aperta
-L'interno della Sagrada Familia è una sorta di foresta in __________.
-risposta: 1883
+L'interno della Sagrada Família è descritto come una sorta di foresta in __________.
+risposta: pietra
 foto: Sagrada Família Barcelona

@@ -1,5 +1,10 @@
 # Torre Eiffel
 
+ordine: 9
+argomento: Architettura del ferro
+autore: Gustave Eiffel
+edificio: Torre Eiffel, Parigi
+
 ## Domanda
 type: multipla
 In quale anno Parigi ospitò l'Esposizione universale che celebrava il centenario della Rivoluzione francese?
@@ -91,26 +96,92 @@ Per quale motivo la Torre Eiffel non fu demolita nel 1905?
 foto: Torre Eiffel Parigi
 
 ## Domanda
-type: aperta
-Nel 1889 Parigi ospitò l'Esposizione universale che celebrava il centenario della __________ francese.
-risposta: 1889
+type: vero-falso
+L'Esposizione universale del 1889 celebrava il centenario della Rivoluzione francese.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+Il monumento doveva essere costruito nel quartiere di Montmartre.
+risposta: falso
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+Gustave Eiffel fu il progettista tecnico della torre insieme a Maurice Koechlin ed Émile Nouguier.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+Stephen Sauvestre era un architetto.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+Per la realizzazione della torre furono prodotti 1333 m² di disegni.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+La Torre Eiffel era costituita sostanzialmente da quattro piloni curvi.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+Le arcate di raccordo tra i piloni avevano una funzione puramente decorativa.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+La prima piattaforma si trovava a 56 metri di altezza.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+Il progetto originario prevedeva già la presenza degli ascensori.
+risposta: vero
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: vero-falso
+La Torre Eiffel venne demolita nel 1905.
+risposta: falso
 foto: Torre Eiffel Parigi
 
 ## Domanda
 type: aperta
-La torre venne commissionata nel 1887 alla Maison Eiffel et __________.
+Nel 1889 Parigi ospitò l'Esposizione universale che celebrava il centenario della __________ francese.
+risposta: Rivoluzione
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: aperta
+La Torre Eiffel venne commissionata nel 1887 alla Maison Eiffel et __________.
 risposta: Compagnie
 foto: Torre Eiffel Parigi
 
 ## Domanda
 type: aperta
-La struttura era costituita sostanzialmente da quattro __________ curvi.
-risposta: Quattro
+Per realizzare la Torre Eiffel furono prodotti in tutto circa __________ m² di disegni.
+risposta: 1333
 foto: Torre Eiffel Parigi
 
 ## Domanda
 type: aperta
-La terza piattaforma si trovava a __________ m di altezza.
-risposta: 115
-accetta: 115 m
+La struttura della Torre Eiffel era costituita sostanzialmente da quattro __________ curvi.
+risposta: piloni
+accetta: pilastri
+foto: Torre Eiffel Parigi
+
+## Domanda
+type: aperta
+La terza piattaforma della Torre Eiffel si trovava a __________ m di altezza.
+risposta: 276
 foto: Torre Eiffel Parigi

@@ -1,5 +1,10 @@
 # Parigi di Haussmann
 
+ordine: 6
+argomento: Urbanistica dell'Ottocento
+autore: Georges-Eugène Haussmann
+edificio: Parigi (piano di Haussmann)
+
 ## Domanda
 type: multipla
 Chi volle la radicale trasformazione di Parigi?
@@ -91,31 +96,91 @@ Dove abitava la servitù negli edifici privati?
 foto: Boulevard Haussmann Parigi
 
 ## Domanda
-type: aperta
-La trasformazione di Parigi fu realizzata a partire dal __________.
-risposta: Napoleone III
+type: vero-falso
+Il piano urbanistico di Parigi fu voluto da Napoleone III.
+risposta: vero
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Haussmann era prefetto della Senna.
+risposta: vero
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Uno degli obiettivi era migliorare la viabilità.
+risposta: vero
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Le condizioni igieniche dei quartieri poveri erano soddisfacenti.
+risposta: falso
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Il centro storico era caratterizzato da vicoli stretti e tortuosi.
+risposta: vero
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Il piano aveva una visione a lungo termine.
+risposta: vero
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Per creare i boulevard si sventrarono interi quartieri del centro storico.
+risposta: vero
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Il piano prevedeva il completo rinnovamento della rete fognaria.
+risposta: vero
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+L'edilizia privata non era regolamentata.
+risposta: falso
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: vero-falso
+Gli edifici privati dovevano avere altezza omogenea.
+risposta: vero
 foto: Boulevard Haussmann Parigi
 
 ## Domanda
 type: aperta
-Il prefetto della Senna incaricato del piano era Georges-Eugène __________.
+La trasformazione di Parigi voluta da Napoleone III fu realizzata a partire dal __________.
+risposta: 1853
+foto: Boulevard Haussmann Parigi
+
+## Domanda
+type: aperta
+Il prefetto della Senna incaricato del piano di Parigi era Georges-Eugène __________.
 risposta: Haussmann
 foto: Boulevard Haussmann Parigi
 
 ## Domanda
 type: aperta
-Il piano elaborato da Haussmann era noto come Grands __________.
+Il piano di rinnovamento di Parigi elaborato da Haussmann era noto come Grands __________.
 risposta: travaux
 foto: Boulevard Haussmann Parigi
 
 ## Domanda
 type: aperta
-Tra i nuovi spazi verdi furono sistemati il Bois de Boulogne e il Bois de __________.
+Tra i nuovi spazi verdi di Parigi furono sistemati il Bois de Boulogne e il Bois de __________.
 risposta: Vincennes
 foto: Boulevard Haussmann Parigi
 
 ## Domanda
 type: aperta
-Nei palazzi privati la servitù abitava nelle __________.
+Nei palazzi privati della Parigi di Haussmann la servitù abitava nelle __________ (l'ultimo piano sottotetto).
 risposta: mansarde
 foto: Boulevard Haussmann Parigi

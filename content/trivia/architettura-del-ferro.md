@@ -1,5 +1,8 @@
 # Architettura del ferro e ponti
 
+ordine: 7
+argomento: Architettura del ferro
+
 ## Domanda
 type: multipla
 Grazie a quali progressi si affermò l'utilizzo delle strutture in ferro?
@@ -91,26 +94,86 @@ Qual era la lunghezza totale del Forth Bridge?
 foto: Forth Bridge Scotland
 
 ## Domanda
+type: vero-falso
+L'utilizzo delle strutture in ferro si affermò tra la fine del Settecento e l'inizio dell'Ottocento.
+risposta: vero
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+Il ferro era impiegato esclusivamente per elementi decorativi.
+risposta: falso
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+L'abbinamento tra ferro e vetro consentì di realizzare coperture trasparenti.
+risposta: vero
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+La Gran Bretagna fu una delle nazioni pionieristiche nell'impiego del ferro.
+risposta: vero
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+Il Crystal Palace di Londra è citato come padiglione espositivo.
+risposta: vero
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+Il ponte sul Severn fu costruito sul fiume Tamigi.
+risposta: falso
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+Il ponte sul Severn era composto da cinque nervature parallele ad arco.
+risposta: vero
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+Il Forth Railway Bridge si trova sulla costa occidentale della Scozia.
+risposta: falso
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+Il Forth Bridge si basa sul principio del ponte a sbalzo.
+risposta: vero
+foto: Forth Bridge Scotland
+
+## Domanda
+type: vero-falso
+All'epoca della sua costruzione il Forth Bridge era il ponte più lungo del mondo.
+risposta: vero
+foto: Forth Bridge Scotland
+
+## Domanda
 type: aperta
 Tra la fine del Settecento e l'inizio dell'Ottocento si affermò l'utilizzo delle strutture in __________.
-risposta: Della siderurgia
+risposta: ferro
 foto: Forth Bridge Scotland
 
 ## Domanda
 type: aperta
-Il ferro venne spesso abbinato al __________.
-risposta: Vetro
+Nell'architettura dell'Ottocento il ferro venne spesso abbinato al __________, per realizzare coperture trasparenti.
+risposta: vetro
 foto: Forth Bridge Scotland
 
 ## Domanda
 type: aperta
-Il ponte sul fiume Severn fu costruito tra il 1775 e il __________.
+Il ponte sul fiume Severn (Pritchard), in Inghilterra, fu costruito tra il 1775 e il __________.
 risposta: 1779
 foto: Forth Bridge Scotland
 
 ## Domanda
 type: aperta
-Il primo ponte interamente in acciaio fu il __________ Railway Bridge.
+Il primo ponte interamente in acciaio fu il __________ Railway Bridge, in Scozia.
 risposta: Forth
 foto: Forth Bridge Scotland
 
@@ -118,5 +181,4 @@ foto: Forth Bridge Scotland
 type: aperta
 Il Forth Bridge aveva una lunghezza totale di __________ metri.
 risposta: 2467
-accetta: 2467 m
 foto: Forth Bridge Scotland

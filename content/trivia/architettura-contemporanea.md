@@ -1,5 +1,8 @@
 # Architettura contemporanea
 
+ordine: 30
+argomento: Architettura contemporanea
+
 ## Domanda
 type: multipla
 Da quale periodo si fa partire l'architettura contemporanea?
@@ -91,31 +94,92 @@ In quali aree si sviluppò il De Costruttivismo?
 foto: Centre Pompidou Paris
 
 ## Domanda
-type: aperta
-L'architettura contemporanea viene fatta iniziare dalla metà degli anni __________ del Novecento.
-risposta: Sessanta
+type: vero-falso
+L'architettura contemporanea viene fatta iniziare dalla metà degli anni Sessanta del Novecento.
+risposta: vero
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+La globalizzazione ha portato a un superamento della tradizione e del localismo.
+risposta: vero
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+Le opere contemporanee fanno riferimento al luogo e alla tipologia.
+risposta: falso
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+Ogni architetto può avere trasformazioni nello stile durante la propria carriera.
+risposta: vero
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+Il Postmodernismo ha superato i modelli formali del Movimento moderno.
+risposta: vero
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+Piazza d'Italia fu progettata nel 1978.
+risposta: vero
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+Il 550 Madison Avenue era in passato noto come AT&T Building.
+risposta: vero
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+L'Architettura high-tech nasconde impianti e collegamenti verticali.
+risposta: falso
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+Il Centro Pompidou fu progettato da Renzo Piano e Richard Rogers.
+risposta: vero
+foto: Centre Pompidou Paris
+
+## Domanda
+type: vero-falso
+Zaha Hadid è citata tra i massimi rappresentanti del De Costruttivismo.
+risposta: vero
 foto: Centre Pompidou Paris
 
 ## Domanda
 type: aperta
-Uno dei software citati per la progettazione architettonica è __________.
+L'architettura contemporanea viene fatta iniziare dalla metà degli anni __________ del Novecento.
+risposta: Sessanta
+accetta: 60; '60
+foto: Centre Pompidou Paris
+
+## Domanda
+type: aperta
+Tra i software citati per la progettazione architettonica c'è __________.
 risposta: AutoCAD
 foto: Centre Pompidou Paris
 
 ## Domanda
 type: aperta
-Il libro di riferimento del Postmodernismo è "Imparare da __________".
+Il libro di riferimento del Postmodernismo è "Imparare da __________" (Venturi).
 risposta: Las Vegas
 foto: Centre Pompidou Paris
 
 ## Domanda
 type: aperta
-Il Centro Pompidou fu completato nel __________.
+Il Centre Pompidou, esempio di high-tech, fu completato nel __________.
 risposta: 1977
 foto: Centre Pompidou Paris
 
 ## Domanda
 type: aperta
-Il De Costruttivismo si sviluppò negli anni '80 negli Stati Uniti e in __________.
+Il Decostruttivismo si sviluppò negli anni '80 negli Stati Uniti e in __________.
 risposta: Europa
 foto: Centre Pompidou Paris

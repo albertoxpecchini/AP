@@ -21,8 +21,9 @@ const IGNORED = /\/readme\.md$/i;
 export const CHAPTERS: Chapter[] = Object.entries(modules)
   .filter(([path]) => !IGNORED.test(path))
   .map(([path, raw]) => parseChapter(chapterIdFromPath(path), raw))
-  // capitoli in ordine alfabetico di titolo, stabile e prevedibile
-  .sort((a, b) => a.title.localeCompare(b.title, "it"));
+  // Ordine CRONOLOGICO di caricamento dei sorgenti (campo `ordine:` nel .md):
+  // Neoclassicismo → … → CityLife. A parità di `order`, fallback sul titolo.
+  .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, "it"));
 
 export const ALL_QUESTIONS: Question[] = CHAPTERS.flatMap(c => c.questions);
 

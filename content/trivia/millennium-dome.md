@@ -1,5 +1,10 @@
 # Millennium Dome
 
+ordine: 36
+argomento: Architettura high-tech
+autore: Richard Rogers
+edificio: Millennium Dome (The O2), Londra
+
 ## Domanda
 type: multipla
 In quale periodo fu costruito il Millennium Dome?
@@ -91,32 +96,92 @@ Con quale nome è stata ribattezzata l'arena dopo la ristrutturazione?
 foto: Millennium Dome O2 London
 
 ## Domanda
+type: vero-falso
+Il Millennium Dome fu costruito per celebrare l'avvento del terzo millennio.
+risposta: vero
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+Il sito scelto ha un notevole valore simbolico perché corrisponde al punto di passaggio del meridiano di Greenwich.
+risposta: vero
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+Richard Rogers optò per dodici padiglioni separati.
+risposta: falso
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+La soluzione scelta garantì tempi di installazione molto rapidi.
+risposta: vero
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+La struttura misura 365 m di diametro.
+risposta: vero
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+La calotta raggiunge i 50 m nel suo punto più alto.
+risposta: vero
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+Tecnicamente si tratta di una cupola che scarica il peso sulla propria circonferenza.
+risposta: falso
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+Il perimetro esterno è scandito da torri cilindriche.
+risposta: falso
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+Il tessuto traslucido del tetto lascia filtrare la luce solare.
+risposta: vero
+foto: Millennium Dome O2 London
+
+## Domanda
+type: vero-falso
+Nel 2005 il Millennium Dome fu demolito.
+risposta: falso
+foto: Millennium Dome O2 London
+
+## Domanda
 type: aperta
-Il Millennium Dome fu costruito tra il 1997 e il __________.
+Il Millennium Dome di Londra (Richard Rogers) fu costruito tra il 1997 e il __________.
 risposta: 1999
 foto: Millennium Dome O2 London
 
 ## Domanda
 type: aperta
-Sorge sulla riva del __________.
+Il Millennium Dome sorge sulla riva del __________, a Londra.
 risposta: Tamigi
 foto: Millennium Dome O2 London
 
 ## Domanda
 type: aperta
-Il sito corrisponde al punto di passaggio del meridiano di __________.
+Il sito del Millennium Dome corrisponde al punto di passaggio del meridiano di __________.
 risposta: Greenwich
 foto: Millennium Dome O2 London
 
 ## Domanda
 type: aperta
-La struttura ha un diametro di __________ metri.
+La struttura del Millennium Dome ha un diametro di __________ metri.
 risposta: 365
-accetta: 365 m
 foto: Millennium Dome O2 London
 
 ## Domanda
 type: aperta
-Dopo la ristrutturazione l'arena è stata ribattezzata __________.
+Dopo la ristrutturazione, l'arena del Millennium Dome è stata ribattezzata __________.
 risposta: The O2
+accetta: O2
 foto: Millennium Dome O2 London

@@ -1,5 +1,10 @@
 # Cimitero di San Cataldo
 
+ordine: 32
+argomento: Architettura contemporanea
+autore: Aldo Rossi e Gianni Braghieri
+edificio: Cimitero di San Cataldo, Modena
+
 ## Domanda
 type: multipla
 In quale anno Aldo Rossi e Gianni Braghieri vinsero il concorso per l'ampliamento del cimitero?
@@ -91,31 +96,92 @@ Che cosa simboleggia la forma del cubo?
 foto: Cimitero San Cataldo Modena Aldo Rossi
 
 ## Domanda
+type: vero-falso
+Aldo Rossi e Gianni Braghieri vinsero il concorso nel 1971.
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+Il nuovo complesso è stato completato integralmente.
+risposta: falso
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+Rossi e Braghieri progettarono una sorta di "città dei morti".
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+Gli spazi urbani sono descritti come metafisici e atemporali.
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+Il complesso riprende le dimensioni e le proporzioni della parte ottocentesca.
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+Il recinto è costituito da edifici perimetrali contenenti ciascuno tre file di colombari.
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+La copertura a falde è in lamiera metallica azzurra.
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+Il cubo era stato concepito in origine come sacrario dei caduti nelle guerre mondiali e nella lotta partigiana.
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+All'interno del cubo è addossata una struttura di ferro zincato.
+risposta: vero
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
+type: vero-falso
+La forma del cubo richiama una casa completamente abitabile.
+risposta: falso
+foto: Cimitero San Cataldo Modena Aldo Rossi
+
+## Domanda
 type: aperta
-Aldo Rossi e Gianni Braghieri vinsero il concorso nel __________.
+Aldo Rossi e Gianni Braghieri vinsero il concorso per il Cimitero di San Cataldo nel __________.
 risposta: 1971
 foto: Cimitero San Cataldo Modena Aldo Rossi
 
 ## Domanda
 type: aperta
-Il nuovo cimitero di San Cataldo si trova a __________.
+Il nuovo Cimitero di San Cataldo (Aldo Rossi) si trova a __________.
 risposta: Modena
 foto: Cimitero San Cataldo Modena Aldo Rossi
 
 ## Domanda
 type: aperta
-Il complesso venne aperto nel __________.
+Il complesso del Cimitero di San Cataldo venne aperto nel __________.
 risposta: 1986
 foto: Cimitero San Cataldo Modena Aldo Rossi
 
 ## Domanda
 type: aperta
-Finora è stato realizzato soltanto il __________.
+Del Cimitero di San Cataldo (Aldo Rossi) finora è stato realizzato soltanto il __________.
 risposta: cubo
 foto: Cimitero San Cataldo Modena Aldo Rossi
 
 ## Domanda
 type: aperta
-La costruzione a cielo aperto è dipinta di colore __________.
-risposta: Color mattone
+Nel Cimitero di San Cataldo la costruzione a cielo aperto (il cubo) è dipinta di colore __________.
+risposta: mattone
+accetta: rosso mattone
 foto: Cimitero San Cataldo Modena Aldo Rossi

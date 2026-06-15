@@ -301,6 +301,14 @@ export default function Trivia() {
             <span className="trv-photo-chip">{typeLabel(current.type)}</span>
           </div>
 
+          {/* Contesto SEMPRE visibile: di cosa/chi/quale opera si parla.
+              Così nessuna domanda resta ambigua ("quale chiesa?"). */}
+          <div className="trv-ctx">
+            <span className="trv-ctx-item trv-ctx-arg" title="Argomento">{current.argomento}</span>
+            {current.edificio && <span className="trv-ctx-item trv-ctx-edi" title="Edificio / opera">{current.edificio}</span>}
+            {current.autore && <span className="trv-ctx-item trv-ctx-aut" title="Autore">{current.autore}</span>}
+          </div>
+
           {/* Domanda */}
           <h2 className="trv-q">{current.text}</h2>
 
@@ -512,6 +520,25 @@ const styles = `
   font-size: .62rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
   background: rgba(16,56,32,0.82); color: #fff; padding: .25rem .6rem; border-radius: 999px;
 }
+
+/* Contesto domanda (argomento · edificio · autore) */
+.trv-ctx { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.trv-ctx-item {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .72rem; font-weight: 700; line-height: 1;
+  padding: .32rem .6rem; border-radius: 999px;
+  border: 1px solid var(--bord); background: var(--card); color: var(--sub);
+  max-width: 100%; white-space: normal;
+}
+/* Pallini-prefisso colorati per distinguere a colpo d'occhio i tre campi. */
+.trv-ctx-item::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.trv-ctx-arg { color: var(--green-d); border-color: rgba(47,125,74,0.4); }
+.trv-ctx-arg::before { background: var(--green); }
+.trv-ctx-edi::before { background: var(--gold); }
+.trv-ctx-aut::before { background: #3a7bbf; }
+.trv-page.dark .trv-ctx-aut::before { background: #6fa8dc; }
 
 .trv-q { font-size: clamp(1.15rem, 4.5vw, 1.5rem); font-weight: 800; margin: 0; line-height: 1.3; }
 

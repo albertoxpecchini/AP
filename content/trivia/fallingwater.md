@@ -1,5 +1,10 @@
 # Casa sulla cascata (Fallingwater)
 
+ordine: 26
+argomento: Architettura organica
+autore: Frank Lloyd Wright
+edificio: Fallingwater (Casa Kaufmann), Mill Run
+
 ## Domanda
 type: multipla
 Con quale altro nome è nota Fallingwater?
@@ -91,31 +96,92 @@ Che cosa ospita l'ultimo piano?
 foto: Fallingwater Frank Lloyd Wright
 
 ## Domanda
+type: vero-falso
+Fallingwater è considerata uno dei capolavori del XX secolo.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+L'edificio si trova in un'area boschiva nei pressi di Mill Run.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+Nel 1938 Wright progettò ulteriori alloggi per gli ospiti.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+La forza estetica di Fallingwater consiste nella perfetta integrazione con il paesaggio.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+L'architettura non incontra la natura ma si fonde con essa.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+Le terrazze sono tutte orientate nella stessa direzione.
+risposta: falso
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+Gli elementi orizzontali sono in calcestruzzo armato gettato in opera.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+Le lunghe vetrate liberano la visuale verso la natura circostante.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+Il primo piano è occupato per intero dal grande soggiorno.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
+type: vero-falso
+Un grande masso è stato inglobato alla base del caminetto.
+risposta: vero
+foto: Fallingwater Frank Lloyd Wright
+
+## Domanda
 type: aperta
-Fallingwater è detta anche Casa __________.
+Fallingwater (Frank Lloyd Wright) è detta anche Casa __________.
 risposta: Kaufmann
 foto: Fallingwater Frank Lloyd Wright
 
 ## Domanda
 type: aperta
-L'edificio si trova nei pressi di Mill Run, in __________.
+Fallingwater si trova nei pressi di Mill Run, in __________.
 risposta: Pennsylvania
 foto: Fallingwater Frank Lloyd Wright
 
 ## Domanda
 type: aperta
-Fallingwater fu progettata nel __________.
+Fallingwater fu progettata da Wright nel __________.
 risposta: 1936
 foto: Fallingwater Frank Lloyd Wright
 
 ## Domanda
 type: aperta
-La casa si articola su __________ piani.
-risposta: Tre
+La Casa sulla cascata (Fallingwater) si articola su __________ piani.
+risposta: tre
+accetta: 3
 foto: Fallingwater Frank Lloyd Wright
 
 ## Domanda
 type: aperta
-Il primo piano è occupato dal grande __________.
+A Fallingwater il primo piano è occupato per intero dal grande __________.
 risposta: soggiorno
 foto: Fallingwater Frank Lloyd Wright

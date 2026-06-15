@@ -54,12 +54,21 @@ export interface Question {
   accept?: string[];   // aperta: varianti accettate (oltre ad `answer`)
   explanation?: string;
   photoQuery: string;  // keyword per la foto Wikimedia
+  // Contesto SEMPRE mostrato sopra la domanda, così non c'è mai dubbio su "di
+  // cosa/chi/quale edificio si parla". Ereditato dall'header del capitolo.
+  argomento: string;   // tema/corrente (es. "Movimento moderno")
+  autore?: string;     // architetto/i (es. "Le Corbusier"); assente se non pertinente
+  edificio?: string;   // opera/edificio (es. "Villa Savoye"); assente se non pertinente
 }
 
 export interface Chapter {
   id: string;
   title: string;
   questions: Question[];
+  argomento: string;
+  autore?: string;
+  edificio?: string;
+  order: number;       // posizione cronologica (ordine di caricamento dei raw)
 }
 
 // ── Slug del capitolo dal path del file (es. "/content/trivia/gotico.md" → "gotico") ──
@@ -96,6 +105,12 @@ export function parseChapter(chapterId: string, raw: string): Chapter {
   const lines = raw.replace(/\r\n/g, "\n").split("\n");
 
   let title = chapterId;
+  // Contesto di capitolo (header): righe "argomento:/autore:/edificio:" che
+  // stanno PRIMA del primo "## Domanda". Ereditato da tutte le domande.
+  let argomento = "";
+  let autore: string | undefined;
+  let edificio: string | undefined;
+  let order = 999; // default in coda se l'header non lo dichiara
   // Blocchi domanda: ogni "## Domanda" (o "## " generico) apre un nuovo blocco.
   const blocks: string[][] = [];
   let current: string[] | null = null;
@@ -111,20 +126,32 @@ export function parseChapter(chapterId: string, raw: string): Chapter {
       blocks.push(current);
       continue;
     }
-    if (current) current.push(line);
+    if (current) { current.push(line); continue; }
+    // Siamo ancora nell'header del capitolo (prima della prima domanda).
+    const mOrd = line.match(/^ordine:\s*(\d+)/i);
+    if (mOrd) { order = parseInt(mOrd[1], 10); continue; }
+    const mArg = line.match(/^argomento:\s*(.+)$/i);
+    if (mArg) { argomento = mArg[1].trim(); continue; }
+    const mAut = line.match(/^autore:\s*(.+)$/i);
+    if (mAut) { autore = mAut[1].trim() || undefined; continue; }
+    const mEdi = line.match(/^edificio:\s*(.+)$/i);
+    if (mEdi) { edificio = mEdi[1].trim() || undefined; continue; }
   }
+
+  // Default sensato: se l'header non dichiara l'argomento, usa il titolo.
+  if (!argomento) argomento = title;
 
   const questions: Question[] = blocks
     .map((blk, idx) => parseBlock(chapterId, idx, blk))
     .filter((q): q is Question => q !== null)
-    // id stabile sull'indice finale + titolo capitolo iniettato in ogni domanda
-    .map((q, i) => ({ ...q, id: `${chapterId}-${i}`, chapter: title }));
+    // id stabile sull'indice finale + contesto di capitolo iniettato in ogni domanda
+    .map((q, i) => ({ ...q, id: `${chapterId}-${i}`, chapter: title, argomento, autore, edificio }));
 
   if (questions.length === 0) {
     throw new Error(`[trivia] ${chapterId}.md: nessuna domanda trovata (manca "## Domanda"?)`);
   }
 
-  return { id: chapterId, title, questions };
+  return { id: chapterId, title, questions, argomento, autore, edificio, order };
 }
 
 function parseBlock(chapterId: string, idx: number, block: string[]): Question | null {

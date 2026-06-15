@@ -1,5 +1,10 @@
 # Casa Milà – La Pedrera
 
+ordine: 14
+argomento: Modernismo catalano
+autore: Antoni Gaudí
+edificio: Casa Milà – La Pedrera, Barcellona
+
 ## Domanda
 type: multipla
 Tra quali anni fu costruita Casa Milà?
@@ -91,31 +96,94 @@ Quante scale consentono la distribuzione ai diversi piani?
 foto: Casa Milà La Pedrera
 
 ## Domanda
-type: aperta
-Casa Milà, conosciuta come __________, fu costruita tra il 1906 e il 1912.
-risposta: 1906-1912
+type: vero-falso
+Casa Milà è rivestita in pietra calcarea.
+risposta: vero
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+Casa Milà è stata l'ultima opera civile di Antoni Gaudí.
+risposta: vero
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+Il progetto presentato da Gaudí prevedeva appartamenti distribuiti intorno a due cortili.
+risposta: vero
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+La facciata presenta un andamento perfettamente simmetrico.
+risposta: falso
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+La superficie porosa della pietra evoca una formazione rocciosa plasmata dagli agenti atmosferici.
+risposta: vero
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+I muri hanno funzione portante nell'edificio.
+risposta: falso
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+Nel seminterrato Gaudí realizzò un garage per pullman e auto.
+risposta: vero
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+Ogni piano dell'edificio è suddiviso in quattro appartamenti.
+risposta: vero
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+Il cortile di Passeig de Gràcia è a pianta circolare.
+risposta: vero
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: vero-falso
+Il tetto della Pedrera è un grande spazio piano praticabile.
+risposta: vero
 foto: Casa Milà La Pedrera
 
 ## Domanda
 type: aperta
-L'edificio fu costruito per i coniugi Segimon __________.
+Casa Milà, a Barcellona (Gaudí), conosciuta come __________, fu costruita tra il 1906 e il 1912.
+risposta: La Pedrera
+accetta: Pedrera
+foto: Casa Milà La Pedrera
+
+## Domanda
+type: aperta
+Casa Milà fu costruita per i coniugi Segimon __________.
 risposta: Milà
+accetta: Mila
 foto: Casa Milà La Pedrera
 
 ## Domanda
 type: aperta
-Nel 1905 Milà acquistò un terreno di più di __________ m².
-risposta: 1905
+Nel 1905 Milà acquistò, per Casa Milà, un terreno di più di __________ m².
+risposta: 1000
+accetta: 1.000
 foto: Casa Milà La Pedrera
 
 ## Domanda
 type: aperta
-La struttura dell'edificio è in pietra, laterizio e __________.
+La struttura di Casa Milà è in pietra, laterizio e __________.
 risposta: ferro
 foto: Casa Milà La Pedrera
 
 ## Domanda
 type: aperta
-La pianta si articola intorno a due ampi __________ centrali.
-risposta: Due
+La pianta di Casa Milà si articola intorno a due ampi __________ centrali.
+risposta: cortili
 foto: Casa Milà La Pedrera

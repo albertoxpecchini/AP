@@ -1,5 +1,10 @@
 # Piramide del Louvre
 
+ordine: 33
+argomento: Architettura contemporanea
+autore: Ieoh Ming Pei
+edificio: Piramide del Louvre, Parigi
+
 ## Domanda
 type: multipla
 Chi è l'architetto della Piramide del Louvre?
@@ -91,33 +96,91 @@ Qual è l'altezza della piramide rovesciata realizzata nell'atrio?
 foto: Louvre Pyramid Paris
 
 ## Domanda
+type: vero-falso
+Ieoh Ming Pei era un architetto statunitense di origine cinese.
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+La Piramide del Louvre rappresenta l'ingresso principale del museo.
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+Sotto la piramide si trovano una biblioteca e un teatro.
+risposta: falso
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+La piramide principale sorge su una superficie di 1254 m².
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+La struttura è in acciaio e cemento armato.
+risposta: falso
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+La piramide racchiude 603 quadrati e 70 triangoli di vetro.
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+Pei richiese che la Piramide fosse perfettamente trasparente.
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+Durante la sua realizzazione la Piramide fu una delle opere più controverse d'Europa.
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+Oggi la Piramide è considerata un capolavoro al pari delle opere custodite dal Louvre.
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
+type: vero-falso
+Nell'atrio è presente una piramide rovesciata realizzata nel 1993.
+risposta: vero
+foto: Louvre Pyramid Paris
+
+## Domanda
 type: aperta
-La Piramide del Louvre è opera di Ieoh Ming __________.
+La Piramide del Louvre, a Parigi, è opera di Ieoh Ming __________.
 risposta: Pei
 foto: Louvre Pyramid Paris
 
 ## Domanda
 type: aperta
-La Piramide fu commissionata nel __________.
+La Piramide del Louvre fu commissionata (da Mitterrand) nel __________.
 risposta: 1983
 foto: Louvre Pyramid Paris
 
 ## Domanda
 type: aperta
-La struttura principale raggiunge i __________ metri di altezza.
+La struttura principale della Piramide del Louvre raggiunge i __________ metri di altezza.
 risposta: 22
-accetta: 22 m
 foto: Louvre Pyramid Paris
 
 ## Domanda
 type: aperta
-La struttura racchiude __________ triangoli di vetro.
+La Piramide del Louvre racchiude __________ triangoli di vetro.
 risposta: 603
 foto: Louvre Pyramid Paris
 
 ## Domanda
 type: aperta
-La piramide rovesciata dell'atrio è alta __________ metri.
+Nell'atrio del Louvre la piramide rovesciata di Pei è alta __________ metri.
 risposta: 7
-accetta: 7 m
 foto: Louvre Pyramid Paris

@@ -1,5 +1,10 @@
 # Opéra di Parigi (Palais Garnier)
 
+ordine: 5
+argomento: Eclettismo
+autore: Charles Garnier
+edificio: Opéra di Parigi (Palais Garnier)
+
 ## Domanda
 type: multipla
 Come è detto anche il Teatro dell'Opéra di Parigi?
@@ -91,25 +96,92 @@ Circa quanti spettatori può ospitare la sala?
 foto: Palais Garnier Opéra Paris
 
 ## Domanda
-type: aperta
-Il Teatro dell'Opéra di Parigi è detto anche Opéra Garnier e Palais __________.
-risposta: Palais Garnier
+type: vero-falso
+L'Opéra di Parigi è un monumento rappresentativo dell'Eclettismo del XIX secolo.
+risposta: vero
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+Charles Garnier definì l'edificio "stile Napoleone III".
+risposta: vero
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+L'edificio fu costruito prima del 1800.
+risposta: falso
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+La facciata principale si articola su tre registri.
+risposta: vero
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+Il primo piano è percorso da una loggia ritmata da finestroni rettangolari.
+risposta: vero
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+L'attico è privo di decorazioni.
+risposta: falso
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+Il lato occidentale era riservato a Napoleone III e ai membri della sua corte.
+risposta: vero
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+Il grand foyer era destinato ad accogliere gli spettatori durante gli intervalli.
+risposta: vero
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+La sala del teatro possiede cinque ordini di palchi.
+risposta: vero
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: vero-falso
+Il palcoscenico può ospitare fino a 450 artisti.
+risposta: vero
 foto: Palais Garnier Opéra Paris
 
 ## Domanda
 type: aperta
-L'autore del progetto fu l'architetto francese Charles __________.
+Il Teatro dell'Opéra di Parigi (Charles Garnier) è detto anche Opéra Garnier e Palais __________.
 risposta: Garnier
 foto: Palais Garnier Opéra Paris
 
 ## Domanda
 type: aperta
-L'edificio fu realizzato tra il 1862 e il __________.
+L'autore del progetto dell'Opéra di Parigi fu l'architetto francese Charles __________.
+risposta: Garnier
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: aperta
+L'Opéra di Parigi fu realizzata tra il 1862 e il __________.
 risposta: 1875
 foto: Palais Garnier Opéra Paris
 
 ## Domanda
 type: aperta
-Il palcoscenico può ospitare fino a __________ artisti.
-risposta: 2000
+All'Opéra di Parigi il grand foyer era il luogo di incontro della società __________ (l'alta società del tempo).
+risposta: borghese
+accetta: aristocratica; altolocata; elegante
+foto: Palais Garnier Opéra Paris
+
+## Domanda
+type: aperta
+Il palcoscenico dell'Opéra di Parigi può ospitare fino a __________ artisti.
+risposta: 450
 foto: Palais Garnier Opéra Paris

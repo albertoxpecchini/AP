@@ -1,5 +1,10 @@
 # Crystal Palace
 
+ordine: 8
+argomento: Architettura del ferro
+autore: Joseph Paxton
+edificio: Crystal Palace, Londra
+
 ## Domanda
 type: multipla
 A quale nuova tipologia architettonica si applicò l'ingegneria strutturale verso la metà dell'Ottocento?
@@ -91,32 +96,93 @@ Da cosa fu distrutto il Crystal Palace?
 foto: Crystal Palace London
 
 ## Domanda
-type: aperta
-La prima manifestazione di questo tipo fu la __________ of the Works of Industry of All Nations.
-risposta: Londra
+type: vero-falso
+Le Esposizioni universali erano grandi mostre temporanee.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+La Great Exhibition of the Works of Industry of All Nations si tenne a Parigi nel 1851.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+Per ospitare la Great Exhibition era necessario costruire un edificio originale e innovativo.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+Joseph Paxton era un paesaggista e progettista di serre.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+Charles Fox collaborò con Joseph Paxton al progetto del Crystal Palace.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+La pianta del Crystal Palace richiamava quella delle basiliche civili romane.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+Il Crystal Palace era lungo 564 metri.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+Ogni elemento della struttura superava la tonnellata di peso.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+Dopo la Grande esposizione il Crystal Palace fu ricostruito a Sydenham Hill.
+risposta: vero
+foto: Crystal Palace London
+
+## Domanda
+type: vero-falso
+Ai lati della struttura furono aggiunte torricelle per immagazzinare acqua.
+risposta: vero
 foto: Crystal Palace London
 
 ## Domanda
 type: aperta
-Il progetto scelto per il Crystal Palace fu elaborato da __________ Paxton.
+La prima Esposizione universale fu la Great Exhibition __________ of the Works of Industry of All Nations.
+risposta: Great Exhibition
+accetta: of the Works of Industry of All Nations; Great
+foto: Crystal Palace London
+
+## Domanda
+type: aperta
+Il progetto scelto per il Crystal Palace di Londra fu elaborato da __________ Paxton.
 risposta: Joseph
 foto: Crystal Palace London
 
 ## Domanda
 type: aperta
-Il Crystal Palace occupava una superficie di __________ m².
+Il Crystal Palace occupava una superficie di circa __________ m².
 risposta: 92000
-accetta: 92000 m²
+accetta: 92.000; 92 000
 foto: Crystal Palace London
 
 ## Domanda
 type: aperta
-L'edificio fu costruito nel grande parco londinese di __________ Park.
+Il Crystal Palace fu costruito nel grande parco londinese di __________ Park.
 risposta: Hyde
 foto: Crystal Palace London
 
 ## Domanda
 type: aperta
-Dopo aver ospitato mostre e manifestazioni per anni, il Crystal Palace fu distrutto da un __________.
+Dopo aver ospitato mostre per anni, il Crystal Palace fu distrutto da un __________.
 risposta: incendio
 foto: Crystal Palace London

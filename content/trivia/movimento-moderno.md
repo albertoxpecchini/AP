@@ -1,5 +1,10 @@
 # Movimento moderno
 
+ordine: 18
+argomento: Movimento moderno
+autore: Frank Lloyd Wright
+edificio: Robie House, Chicago
+
 ## Domanda
 type: multipla
 In quale periodo nasce il Movimento moderno?
@@ -91,9 +96,70 @@ Quale soluzione adottò la Robie House per gli spazi interni?
 foto: Robie House Chicago
 
 ## Domanda
+type: vero-falso
+Il Movimento moderno nasce per affrontare i problemi legati alla ricostruzione.
+risposta: vero
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+Il funzionalismo coincide con lo sfruttamento più possibile razionale dello spazio a disposizione.
+risposta: vero
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+Nel Movimento moderno la forma di un edificio è indipendente dalla funzione.
+risposta: falso
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+La standardizzazione riguarda forme lineari, modulari e replicabili in serie.
+risposta: vero
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+Walter Gropius è indicato tra gli architetti di riferimento del Movimento moderno.
+risposta: vero
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+L'Architettura organica accetta il concetto di standardizzazione.
+risposta: falso
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+Frank Lloyd Wright concepisce l'edificio come un organismo che si sviluppa dall'interno verso l'esterno.
+risposta: vero
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+Le Prairie House prendono il nome dal paesaggio del Midwest.
+risposta: vero
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+Nella Robie House prevale lo sviluppo verticale.
+risposta: falso
+foto: Robie House Chicago
+
+## Domanda
+type: vero-falso
+La Robie House adotta una notevole riduzione delle pareti divisorie.
+risposta: vero
+foto: Robie House Chicago
+
+## Domanda
 type: aperta
 Il Movimento moderno nasce alla fine della __________ guerra mondiale.
 risposta: Prima
+accetta: prima; 1ª
 foto: Robie House Chicago
 
 ## Domanda
@@ -111,11 +177,11 @@ foto: Robie House Chicago
 ## Domanda
 type: aperta
 Frank Lloyd Wright è considerato il fondatore dell'Architettura __________.
-risposta: Frank Lloyd Wright
+risposta: organica
 foto: Robie House Chicago
 
 ## Domanda
 type: aperta
-La Robie House fu completata nel __________.
+La Robie House, a Chicago (Wright), fu completata nel __________.
 risposta: 1910
 foto: Robie House Chicago

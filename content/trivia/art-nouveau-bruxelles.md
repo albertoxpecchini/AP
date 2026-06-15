@@ -1,5 +1,10 @@
 # Art Nouveau a Bruxelles
 
+ordine: 10
+argomento: Art Nouveau
+autore: Victor Horta
+edificio: Casa Tassel / Casa Solvay, Bruxelles
+
 ## Domanda
 type: multipla
 Tra quali secoli si diffuse il movimento artistico dell'Art Nouveau?
@@ -91,32 +96,91 @@ Quale larghezza ha la facciata esterna di Casa Solvay?
 foto: Hôtel Tassel Bruxelles
 
 ## Domanda
-type: aperta
-In Germania l'Art Nouveau era chiamato __________.
-risposta: Modern Style
+type: vero-falso
+L'Art Nouveau interessò, oltre all'architettura, le arti figurative e le arti applicate.
+risposta: vero
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+In Italia l'Art Nouveau era chiamato Jugendstil.
+risposta: falso
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+La "nuova arte" si ispira alla natura perseguendo un'armonia di forme, materiali e colori.
+risposta: vero
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+Victor Horta nacque nel 1861.
+risposta: vero
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+Henry van de Velde visse dal 1863 al 1957.
+risposta: vero
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+Casa Tassel è considerata il manifesto architettonico dell'Art Nouveau.
+risposta: vero
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+Casa Tassel occupa un lotto largo 39 m e profondo 7,20 m.
+risposta: falso
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+La facciata di Casa Tassel è arretrata rispetto al fronte della strada.
+risposta: falso
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+Casa Solvay è dotata di impianto di riscaldamento.
+risposta: vero
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: vero-falso
+L'interno di Casa Solvay è dominato da una bella scalinata.
+risposta: vero
 foto: Hôtel Tassel Bruxelles
 
 ## Domanda
 type: aperta
-L'Art Nouveau si presenta per la prima volta in forma ben definita tra il 1893 e il 1902 a __________.
+In Germania l'Art Nouveau era chiamato __________.
+risposta: Jugendstil
+foto: Hôtel Tassel Bruxelles
+
+## Domanda
+type: aperta
+L'Art Nouveau si presenta per la prima volta in forma ben definita tra il 1893 e il 1902 a __________ (con Horta e van de Velde).
 risposta: Bruxelles
 foto: Hôtel Tassel Bruxelles
 
 ## Domanda
 type: aperta
-Casa Tassel fu costruita nel 1893 per il professore Émile __________.
-risposta: Émile Tassel
+Casa Tassel, a Bruxelles, fu costruita da Victor Horta nel 1893 per il professore Émile __________.
+risposta: Tassel
 foto: Hôtel Tassel Bruxelles
 
 ## Domanda
 type: aperta
-Casa Solvay fu costruita per l'industriale Armand __________.
-risposta: Armand Solvay
+Casa Solvay, a Bruxelles, fu costruita da Victor Horta per l'industriale Armand __________.
+risposta: Solvay
 foto: Hôtel Tassel Bruxelles
 
 ## Domanda
 type: aperta
 La facciata esterna di Casa Solvay è larga __________ metri.
 risposta: 15
-accetta: 15 m
 foto: Hôtel Tassel Bruxelles

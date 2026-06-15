@@ -1,5 +1,10 @@
 # Padiglione Reale di Brighton
 
+ordine: 4
+argomento: Eclettismo / Orientalismo
+autore: John Nash
+edificio: Padiglione Reale, Brighton
+
 ## Domanda
 type: multipla
 In quale città si trova il Padiglione reale di Brighton?
@@ -91,31 +96,92 @@ Quante finestre possiede la grande cucina?
 foto: Royal Pavilion Brighton
 
 ## Domanda
+type: vero-falso
+Il Padiglione reale di Brighton è uno dei più pregevoli esempi di architettura eclettica in Europa.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+La costruzione originaria era conosciuta come Marine Pavilion.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+L'esterno della prima costruzione era in stile neoclassico.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+Giorgio IV visitò realmente l'Oriente.
+risposta: falso
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+John Nash interpretò molto liberamente le indicazioni del sovrano.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+Nell'edificio convivono elementi dell'architettura indiana e cinese.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+Le cupole a cipolla richiamano le moschee dell'architettura islamica.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+Nash si occupò anche dell'illuminazione, del riscaldamento e dei servizi igienico-sanitari.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+La Galleria Lunga culmina in una scalinata realizzata in fusione di ghisa.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
+type: vero-falso
+La grande cucina dispone di un sistema di ventilazione ottimale.
+risposta: vero
+foto: Royal Pavilion Brighton
+
+## Domanda
 type: aperta
-La costruzione preesistente era nota come __________ Pavilion.
+Il Padiglione Reale di Brighton sorse trasformando la costruzione preesistente nota come __________ Pavilion.
 risposta: Marine
 foto: Royal Pavilion Brighton
 
 ## Domanda
 type: aperta
-La trasformazione fu eseguita tra il __________ e il 1823.
-risposta: 1815-1823
+La trasformazione del Padiglione di Brighton, ad opera di John Nash, fu eseguita tra il __________ e il 1823.
+risposta: 1815
 foto: Royal Pavilion Brighton
 
 ## Domanda
 type: aperta
-Molti elementi strutturali furono realizzati con la tecnologia della fusione di __________.
+A Brighton molti elementi strutturali furono realizzati con la tecnologia della fusione di __________.
 risposta: ghisa
 foto: Royal Pavilion Brighton
 
 ## Domanda
 type: aperta
-Dall'atrio si accede alla Galleria __________.
+Nel Padiglione di Brighton, dall'atrio si accede alla Galleria __________.
 risposta: Lunga
 foto: Royal Pavilion Brighton
 
 ## Domanda
 type: aperta
-La grande cucina è illuminata da ben __________ finestre.
+La grande cucina del Padiglione di Brighton è illuminata da ben __________ finestre.
 risposta: 12
+accetta: dodici
 foto: Royal Pavilion Brighton

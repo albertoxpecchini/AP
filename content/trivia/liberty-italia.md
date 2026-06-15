@@ -1,5 +1,10 @@
 # Liberty in Italia
 
+ordine: 16
+argomento: Liberty
+autore: Giuseppe Sommaruga / Pietro Fenoglio
+edificio: Palazzo Castiglioni / Villa Fenoglio
+
 ## Domanda
 type: multipla
 Da quale nome deriva il termine Liberty in Italia?
@@ -91,31 +96,92 @@ Che cosa svetta sulla torretta di Villa Fenoglio?
 foto: Palazzo Castiglioni Milano
 
 ## Domanda
-type: aperta
-In Italia lo stile Art Nouveau prende il nome di __________.
-risposta: Arthur Laseby Liberty
+type: vero-falso
+In Italia lo stile Art Nouveau prende il nome di Liberty.
+risposta: vero
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+Il Liberty italiano dura più a lungo rispetto al resto d'Europa.
+risposta: falso
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+Il Liberty costituisce una ribellione contro la tradizione classica.
+risposta: vero
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+Ernesto Basile è indicato come architetto milanese.
+risposta: falso
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+Palazzo Castiglioni è considerato il massimo esempio di Liberty milanese.
+risposta: vero
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+La facciata di Palazzo Castiglioni è simmetrica.
+risposta: falso
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+Lo scalone interno di Palazzo Castiglioni conserva un'elegante ringhiera floreale.
+risposta: vero
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+Villa Fenoglio fu progettata da Pietro Fenoglio come casa-studio.
+risposta: vero
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+Le due ali della fabbrica di Villa Fenoglio confluiscono in una torretta angolare.
+risposta: vero
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: vero-falso
+I balconi di Villa Fenoglio hanno ringhiere in ferro battuto.
+risposta: vero
 foto: Palazzo Castiglioni Milano
 
 ## Domanda
 type: aperta
-Palazzo Castiglioni fu costruito tra il 1901 e il __________.
+In Italia lo stile Art Nouveau prende il nome di __________.
+risposta: Liberty
+foto: Palazzo Castiglioni Milano
+
+## Domanda
+type: aperta
+Palazzo Castiglioni, a Milano (Sommaruga), fu costruito tra il 1901 e il __________.
 risposta: 1904
 foto: Palazzo Castiglioni Milano
 
 ## Domanda
 type: aperta
-Villa Fenoglio fu progettata nel __________.
+Villa Fenoglio-La Fleur, a Torino (Pietro Fenoglio), fu progettata nel __________.
 risposta: 1902
 foto: Palazzo Castiglioni Milano
 
 ## Domanda
 type: aperta
-L'edificio di Villa Fenoglio è di __________ piani.
-risposta: Quattro
+L'edificio di Villa Fenoglio, a Torino, è di __________ piani.
+risposta: tre
+accetta: 3
 foto: Palazzo Castiglioni Milano
 
 ## Domanda
 type: aperta
-I balconi hanno ringhiere in __________ battuto.
+I balconi di Villa Fenoglio hanno ringhiere in __________ battuto.
 risposta: ferro
 foto: Palazzo Castiglioni Milano

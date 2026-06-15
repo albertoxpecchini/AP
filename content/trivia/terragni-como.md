@@ -1,5 +1,10 @@
 # Novocomum e Casa del Fascio
 
+ordine: 29
+argomento: Razionalismo italiano
+autore: Giuseppe Terragni
+edificio: Novocomum e Casa del Fascio, Como
+
 ## Domanda
 type: multipla
 In quale periodo fu costruito il Novocomum di Como?
@@ -91,26 +96,87 @@ Quante porte si aprono lungo tutto il perimetro del piano terra della Casa del F
 foto: Casa del Fascio Como Terragni
 
 ## Domanda
-type: aperta
-Giuseppe Terragni è considerato uno tra i più importanti rappresentanti del __________ italiano.
-risposta: Giuseppe Terragni
+type: vero-falso
+Giuseppe Terragni contribuì anche alla nascita del MIAR.
+risposta: vero
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+Il Gruppo 7 ebbe un ruolo di primo piano nella diffusione di un'architettura funzionale.
+risposta: vero
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+Tra le opere più note di Terragni vi sono il Novocomum e la Casa del Fascio.
+risposta: vero
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+Il Novocomum è un edificio residenziale a cinque piani fuori terra.
+risposta: vero
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+Il Novocomum ha una copertura a falde inclinate.
+risposta: falso
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+La struttura portante del Novocomum ha permesso di adottare soluzioni innovative per gli angoli.
+risposta: vero
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+La Casa del Fascio è considerata un capolavoro dell'architettura razionalista.
+risposta: vero
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+Le facciate della Casa del Fascio sono tutte identiche.
+risposta: falso
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+La grande area vuota laterale era destinata a ospitare manifesti di propaganda del regime.
+risposta: vero
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: vero-falso
+Il tetto della Casa del Fascio è un susseguirsi di terrazze percorribili.
+risposta: falso
 foto: Casa del Fascio Como Terragni
 
 ## Domanda
 type: aperta
-Il Novocomum fu costruito tra il 1928 e il __________.
+Giuseppe Terragni è considerato uno dei più importanti rappresentanti del __________ italiano.
+risposta: Razionalismo
+foto: Casa del Fascio Como Terragni
+
+## Domanda
+type: aperta
+Il Novocomum, a Como (Terragni), fu costruito tra il 1928 e il __________.
 risposta: 1929
 foto: Casa del Fascio Como Terragni
 
 ## Domanda
 type: aperta
-Il corpo maggiore del Novocomum è affiancato da __________ corpi minori.
-risposta: Quattro
+Il corpo maggiore del Novocomum (Terragni) è affiancato da __________ corpi minori.
+risposta: tre
+accetta: 3
 foto: Casa del Fascio Como Terragni
 
 ## Domanda
 type: aperta
-La Casa del Fascio fu costruita tra il 1933 e il __________.
+La Casa del Fascio di Como (Terragni) fu costruita tra il 1933 e il __________.
 risposta: 1936
 foto: Casa del Fascio Como Terragni
 
@@ -118,4 +184,5 @@ foto: Casa del Fascio Como Terragni
 type: aperta
 Lungo il perimetro del piano terra della Casa del Fascio si aprono __________ porte.
 risposta: 16
+accetta: sedici
 foto: Casa del Fascio Como Terragni

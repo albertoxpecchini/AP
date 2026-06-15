@@ -1,5 +1,10 @@
 # Stazione Mediopadana e ponti di Calatrava
 
+ordine: 38
+argomento: Architettura contemporanea
+autore: Santiago Calatrava
+edificio: Stazione Mediopadana, Reggio Emilia
+
 ## Domanda
 type: multipla
 In quale città si trova la Stazione Mediopadana?
@@ -91,32 +96,91 @@ Qual è la lunghezza dei ponti laterali?
 foto: Stazione Mediopadana Reggio Emilia Calatrava
 
 ## Domanda
+type: vero-falso
+L'area a nord di Reggio Emilia è stata oggetto di un'intensa riqualificazione.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+Santiago Calatrava è indicato come artefice del rilancio di Bilbao e Valencia.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+La Stazione Mediopadana è stata inaugurata nel 2013.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+I portali in acciaio generano una forma sinusoidale.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+La stazione si articola su due livelli.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+Il piano superiore ospita i servizi per i viaggiatori.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+I tre ponti fungono da porta d'ingresso alla città di Reggio Emilia.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+I ponti sono realizzati in acciaio dipinto di bianco.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+Il ponte centrale raggiunge un'altezza massima di 46 m.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
+type: vero-falso
+I ponti laterali hanno una lunghezza di 179 m.
+risposta: vero
+foto: Stazione Mediopadana Reggio Emilia Calatrava
+
+## Domanda
 type: aperta
-La Stazione Mediopadana si trova a __________ Emilia.
+La Stazione Mediopadana (Calatrava) si trova a __________ Emilia.
 risposta: Reggio
 foto: Stazione Mediopadana Reggio Emilia Calatrava
 
 ## Domanda
 type: aperta
-La stazione fu inaugurata nel __________.
+La Stazione Mediopadana di Reggio Emilia fu inaugurata nel __________.
 risposta: 2013
 foto: Stazione Mediopadana Reggio Emilia Calatrava
 
 ## Domanda
 type: aperta
-L'edificio principale è lungo __________ metri.
+L'edificio principale della Stazione Mediopadana è lungo __________ metri.
 risposta: 500
-accetta: 500 m
 foto: Stazione Mediopadana Reggio Emilia Calatrava
 
 ## Domanda
 type: aperta
-I tre ponti progettati da Calatrava sono detti __________.
+I tre ponti progettati da Calatrava a Reggio Emilia sono detti le __________.
 risposta: Vele
 foto: Stazione Mediopadana Reggio Emilia Calatrava
 
 ## Domanda
 type: aperta
-Il ponte centrale scavalca l'autostrada __________.
+Il ponte centrale di Calatrava a Reggio Emilia scavalca l'autostrada __________.
 risposta: A1
 foto: Stazione Mediopadana Reggio Emilia Calatrava

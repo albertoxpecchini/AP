@@ -1,5 +1,8 @@
 # Architettura eclettica
 
+ordine: 3
+argomento: Eclettismo
+
 ## Domanda
 type: multipla
 Quando il Neoclassicismo viene almeno in parte superato?
@@ -91,31 +94,92 @@ Chi progettò la Galleria Vittorio Emanuele II?
 foto: Galleria Vittorio Emanuele II Milano
 
 ## Domanda
-type: aperta
-Le elaborazioni di forme e tipologie costruttive esistenti sono caratterizzate dal prefisso __________.
-risposta: Neo
+type: vero-falso
+Gli architetti iniziano a rivolgere l'attenzione al ricco repertorio delle strutture del passato.
+risposta: vero
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+La scala classica resta l'unica possibilità espressiva.
+risposta: falso
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+Il Medioevo è considerato dall'età romantica l'origine dell'identità nazionale.
+risposta: vero
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+Il Caffè Pedrocchi si trova a Roma.
+risposta: falso
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+Il Monumento a Vittorio Emanuele II fu costruito a Roma nel 1884.
+risposta: vero
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+Nell'architettura eclettica si tende a riproporre più o meno fedelmente le forme esistenti di un unico stile.
+risposta: falso
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+Il termine eclettico significa "scegliere tra cose diverse".
+risposta: vero
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+L'Eclettismo cominciò a declinare dagli anni '30 del XXI secolo.
+risposta: falso
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+L'Opéra di Parigi presenta prevalentemente stili neorinascimentale e neobarocco.
+risposta: vero
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: vero-falso
+La Galleria Vittorio Emanuele II fu costruita tra il 1865 e il 1878.
+risposta: vero
 foto: Galleria Vittorio Emanuele II Milano
 
 ## Domanda
 type: aperta
-Il Caffè Pedrocchi si trova a __________.
+Nell'architettura eclettica le rielaborazioni di forme e tipologie del passato sono indicate dal prefisso __________.
+risposta: neo
+foto: Galleria Vittorio Emanuele II Milano
+
+## Domanda
+type: aperta
+Il Caffè Pedrocchi, opera di Giuseppe Jappelli, si trova a __________.
 risposta: Padova
 foto: Galleria Vittorio Emanuele II Milano
 
 ## Domanda
 type: aperta
-Il Monumento a Vittorio Emanuele II è detto anche Vittoriano o Altare della __________.
+Il Monumento a Vittorio Emanuele II (Sacconi) è detto anche Vittoriano o Altare della __________.
 risposta: Patria
 foto: Galleria Vittorio Emanuele II Milano
 
 ## Domanda
 type: aperta
-Il termine eclettico deriva dal verbo greco __________.
+Il termine "eclettico" deriva dal verbo greco __________ ("scegliere").
 risposta: eklegein
+accetta: eklégein
 foto: Galleria Vittorio Emanuele II Milano
 
 ## Domanda
 type: aperta
-La Galleria Vittorio Emanuele II fu progettata da Giuseppe __________.
+La Galleria Vittorio Emanuele II di Milano fu progettata da Giuseppe __________.
 risposta: Mengoni
 foto: Galleria Vittorio Emanuele II Milano

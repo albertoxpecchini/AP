@@ -1,5 +1,10 @@
 # Cappella di Notre-Dame du Haut (Ronchamp)
 
+ordine: 23
+argomento: Movimento moderno
+autore: Le Corbusier
+edificio: Cappella di Notre-Dame du Haut, Ronchamp
+
 ## Domanda
 type: multipla
 In quale periodo fu costruita la Cappella di Notre-Dame du Haut?
@@ -91,31 +96,91 @@ Dove sono stati collocati i nuovi edifici del progetto di espansione?
 foto: Notre-Dame du Haut Ronchamp
 
 ## Domanda
+type: vero-falso
+La Cappella di Notre-Dame du Haut è una delle opere più famose di Le Corbusier.
+risposta: vero
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+La cappella si trova nella Francia meridionale.
+risposta: falso
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+Le macerie del santuario medievale furono inserite nello spessore dei muri.
+risposta: vero
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+Il tetto è sostenuto da pilastri che lo separano dallo spessore dei muri.
+risposta: vero
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+La copertura è in legno verniciato.
+risposta: falso
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+I prospetti sono rivestiti di intonaco bianco granuloso.
+risposta: vero
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+L'interno è costituito da un'unica aula irregolare.
+risposta: vero
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+Il pavimento è perfettamente orizzontale.
+risposta: falso
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+Vicino alla cappella Le Corbusier costruì anche la casa del custode e la casa dei pellegrini.
+risposta: vero
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
+type: vero-falso
+Il nuovo padiglione d'ingresso e il convento sono stati tagliati dentro il pendio della collina.
+risposta: vero
+foto: Notre-Dame du Haut Ronchamp
+
+## Domanda
 type: aperta
-La Cappella di Notre-Dame du Haut fu costruita tra il 1950 e il __________.
+La Cappella di Notre-Dame du Haut, a Ronchamp (Le Corbusier), fu costruita tra il 1950 e il __________.
 risposta: 1955
 foto: Notre-Dame du Haut Ronchamp
 
 ## Domanda
 type: aperta
-La cappella si trova nei pressi di __________.
+La cappella di Le Corbusier si trova nei pressi di __________, in Francia.
 risposta: Ronchamp
 foto: Notre-Dame du Haut Ronchamp
 
 ## Domanda
 type: aperta
-Il tetto ricorda una __________ gonfiata dal vento.
+Il tetto della cappella di Ronchamp ricorda una __________ gonfiata dal vento.
 risposta: vela
 foto: Notre-Dame du Haut Ronchamp
 
 ## Domanda
 type: aperta
-L'aula interna può contenere circa __________ persone.
+L'aula interna della cappella di Ronchamp può contenere circa __________ persone.
 risposta: 200
 foto: Notre-Dame du Haut Ronchamp
 
 ## Domanda
 type: aperta
-L'espansione e il rinnovamento furono progettati dal Renzo Piano Building __________.
+L'espansione di Notre-Dame du Haut fu progettata dal Renzo Piano Building __________.
 risposta: Workshop
 foto: Notre-Dame du Haut Ronchamp

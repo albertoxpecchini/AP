@@ -1,5 +1,10 @@
 # Auditorium Parco della Musica
 
+ordine: 35
+argomento: Architettura contemporanea
+autore: Renzo Piano
+edificio: Auditorium Parco della Musica, Roma
+
 ## Domanda
 type: multipla
 In quale città si trova l'Auditorium Parco della Musica?
@@ -91,31 +96,92 @@ Quanti posti ha la Sala Petrassi?
 foto: Auditorium Parco della Musica Roma
 
 ## Domanda
+type: vero-falso
+L'Auditorium Parco della Musica è un complesso dedicato alla musica e allo spettacolo.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+Le tre sale concerto sono disposte ortogonalmente attorno alla cavea all'aperto.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+La cavea ha una configurazione a emiciclo.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+L'anfiteatro a gradoni sfrutta un dislivello naturale di 10 m.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+I tre edifici sono coperti con lastre di piombo.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+La Sala Santa Cecilia è dedicata alla musica sinfonica.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+Il controsoffitto della Sala Santa Cecilia è formato da 26 gusci in legno di ciliegio.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+Le due sale minori sono caratterizzate da una spiccata flessibilità.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+La Sala Sinopoli ha 2744 posti.
+risposta: falso
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
+type: vero-falso
+Le pareti della Sala Petrassi possono ruotare modificando le dimensioni del palco.
+risposta: vero
+foto: Auditorium Parco della Musica Roma
+
+## Domanda
 type: aperta
-L'Auditorium Parco della Musica si trova a __________.
+L'Auditorium Parco della Musica (Renzo Piano) si trova a __________.
 risposta: Roma
 foto: Auditorium Parco della Musica Roma
 
 ## Domanda
 type: aperta
-La costruzione avvenne tra il 1994 e il __________.
+La costruzione dell'Auditorium Parco della Musica avvenne tra il 1994 e il __________.
 risposta: 2003
 foto: Auditorium Parco della Musica Roma
 
 ## Domanda
 type: aperta
-Il complesso si articola in __________ sale concerto autonome.
-risposta: Tre
+L'Auditorium Parco della Musica si articola in __________ sale concerto autonome.
+risposta: tre
+accetta: 3
 foto: Auditorium Parco della Musica Roma
 
 ## Domanda
 type: aperta
-La Sala Santa Cecilia conta __________ posti.
+La Sala Santa Cecilia dell'Auditorium di Roma conta __________ posti.
 risposta: 2744
 foto: Auditorium Parco della Musica Roma
 
 ## Domanda
 type: aperta
-La Sala Petrassi è intitolata al compositore __________ Petrassi.
-risposta: 673
+La Sala Petrassi dell'Auditorium di Roma è intitolata al compositore __________ Petrassi.
+risposta: Goffredo
 foto: Auditorium Parco della Musica Roma

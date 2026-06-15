@@ -1,5 +1,10 @@
 # Solomon R. Guggenheim Museum
 
+ordine: 27
+argomento: Architettura organica
+autore: Frank Lloyd Wright
+edificio: Solomon R. Guggenheim Museum, New York
+
 ## Domanda
 type: multipla
 Quale architetto progettò il Solomon R. Guggenheim Museum di New York?
@@ -91,32 +96,93 @@ Che cosa si trova a livello del suolo nella rotonda?
 foto: Solomon R. Guggenheim Museum New York
 
 ## Domanda
-type: aperta
-Il Solomon R. Guggenheim Museum si trova a __________.
-risposta: Frank Lloyd Wright
+type: vero-falso
+Il Solomon R. Guggenheim Museum è considerato una delle opere più conosciute di Frank Lloyd Wright.
+risposta: vero
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+Il museo ha dimostrato che la sede delle collezioni d'arte è meno importante delle opere che racchiude.
+risposta: falso
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+Solomon R. Guggenheim era un industriale e mecenate.
+risposta: vero
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+Wright amava New York perché la percepiva come sovradimensionata.
+risposta: falso
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+Né Wright né Guggenheim riuscirono a vedere completato il museo.
+risposta: vero
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+La piccola rotonda doveva ospitare gli appartamenti di Hilla Rebay e Solomon Guggenheim.
+risposta: vero
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+L'edificio rettangolare aperto nel 1992 ha 16 piani.
+risposta: vero
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+Wright concepisce il museo come uno spazio aperto e arioso.
+risposta: vero
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+La rampa continua si svolge attorno a un grande vuoto centrale.
+risposta: vero
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: vero-falso
+La luce filtra dalle finestre a nastro poste nella parte alta della rampa.
+risposta: vero
 foto: Solomon R. Guggenheim Museum New York
 
 ## Domanda
 type: aperta
-Wright fu incaricato del progetto nel __________.
-risposta: Solomon R. Guggenheim
+Il Solomon R. Guggenheim Museum (Frank Lloyd Wright) si trova a __________.
+risposta: New York
 foto: Solomon R. Guggenheim Museum New York
 
 ## Domanda
 type: aperta
-La grande rotonda ha la forma di un tronco di cono __________.
+Wright fu incaricato del progetto del Guggenheim di New York nel __________.
+risposta: 1943
+foto: Solomon R. Guggenheim Museum New York
+
+## Domanda
+type: aperta
+La grande rotonda del Guggenheim di New York ha la forma di un tronco di cono __________.
 risposta: capovolto
+accetta: rovesciato
 foto: Solomon R. Guggenheim Museum New York
 
 ## Domanda
 type: aperta
-La rampa continua interna è lunga __________ metri.
+All'interno del Guggenheim di New York la rampa continua è lunga __________ metri.
 risposta: 430
-accetta: 430 m
 foto: Solomon R. Guggenheim Museum New York
 
 ## Domanda
 type: aperta
-Il lucernario è sovrastato da una cupola con __________ vele.
+Il lucernario del Guggenheim di New York è sovrastato da una cupola con __________ vele.
 risposta: 12
+accetta: dodici
 foto: Solomon R. Guggenheim Museum New York

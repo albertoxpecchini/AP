@@ -1,5 +1,10 @@
 # Architetture di Alvar Aalto
 
+ordine: 25
+argomento: Architettura organica
+autore: Alvar Aalto
+edificio: Sanatorio di Paimio / Chiesa di Riola
+
 ## Domanda
 type: multipla
 Chi è considerato il più importante architetto finlandese del XX secolo?
@@ -91,31 +96,91 @@ Quale materiale riveste la copertura della chiesa?
 foto: Paimio Sanatorium Aalto
 
 ## Domanda
-type: aperta
-Alvar Aalto è considerato il più importante architetto __________ del XX secolo.
-risposta: Alvar Aalto
+type: vero-falso
+Alvar Aalto è considerato il più importante architetto finlandese del XX secolo.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+Aalto rifiuta il Funzionalismo ma cerca di superarne i tratti più rigidi.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+La linea curva è definita il simbolo della civiltà.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+Aalto curò in ogni minimo dettaglio i suoi progetti.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+Il Sanatorio di Paimio sorge nel cuore della foresta finlandese.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+Nel Sanatorio di Paimio il corpo si organizza in modo funzionale.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+La Chiesa di Santa Maria Assunta è un edificio civile.
+risposta: falso
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+La torre campanaria è composta da sei alti e sottili pilastri a lama.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+L'interno della chiesa è costituito da un'unica navata asimmetrica.
+risposta: vero
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: vero-falso
+I pavimenti in cotto toscano contrastano con il bianco delle pareti.
+risposta: vero
 foto: Paimio Sanatorium Aalto
 
 ## Domanda
 type: aperta
-Il principio ispiratore di tutta la sua opera è la __________.
+Alvar Aalto è considerato il più importante architetto __________ del XX secolo.
+risposta: finlandese
+foto: Paimio Sanatorium Aalto
+
+## Domanda
+type: aperta
+Il principio ispiratore di tutta l'opera di Alvar Aalto è la __________.
 risposta: natura
 foto: Paimio Sanatorium Aalto
 
 ## Domanda
 type: aperta
-Il Sanatorio di Paimio fu progettato nel __________.
+Il Sanatorio di Paimio, in Finlandia, fu progettato da Aalto nel __________.
 risposta: 1929
 foto: Paimio Sanatorium Aalto
 
 ## Domanda
 type: aperta
-La Chiesa di Santa Maria Assunta sorse a Riola di Vergato, in provincia di __________.
-risposta: 1964-1980
+La Chiesa di Santa Maria Assunta di Aalto sorse a Riola di Vergato, in provincia di __________.
+risposta: Bologna
 foto: Paimio Sanatorium Aalto
 
 ## Domanda
 type: aperta
-La copertura della chiesa è rivestita con lastre di __________.
-risposta: Rame
+La copertura della chiesa di Riola (Aalto) è rivestita con lastre di __________.
+risposta: rame
 foto: Paimio Sanatorium Aalto
