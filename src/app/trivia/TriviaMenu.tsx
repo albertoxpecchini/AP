@@ -2,8 +2,19 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";
-import { chapterCoveragePct } from "./coverage";
+import { chapterCoveragePct, chapterCoverageCount } from "./coverage";
+import { iconForChapter } from "./chapterIcons";
 import type { QType } from "./parseTrivia";
+
+// Colore "semaforo" in base alla % esplorata del capitolo.
+// rosso = appena iniziato, giallo = a metà, verde = completato.
+function trafficColor(pct: number): string {
+  if (pct >= 100) return "#2F7D4A";   // verde pieno
+  if (pct >= 66)  return "#5aa02c";   // verde-lime
+  if (pct >= 33)  return "#d9a300";   // giallo
+  if (pct > 0)    return "#e07a1f";   // arancio
+  return "#c0392b";                   // rosso = da esplorare
+}
 
 // Selezione capitoli: lista di id. Vuota = tutti i capitoli.
 export type ChapterSelection = string[];
@@ -146,15 +157,32 @@ export default function TriviaMenu({
     );
   }
 
-  // Badge "% visto" riusato a destra della riga capitolo.
-  const covBadge = (cov: number, color: string, active: boolean) => cov > 0 && cov < 100 ? (
-    <span style={{
-      fontSize: "0.56rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em",
-      padding: "0.08rem 0.38rem", borderRadius: 999, flexShrink: 0,
-      background: active ? `${color}22` : (dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"),
-      color: active ? color : lbl,
-    }}>{cov}%</span>
-  ) : undefined;
+  // Cerchio progressi "N/T" a destra della riga capitolo, colorato a semaforo
+  // (rosso → giallo → verde in base alla % esplorata). Anello SVG + numeri.
+  const progressRing = (seen: number, total: number, pct: number) => {
+    const col = trafficColor(pct);
+    const R = 15, C = 2 * Math.PI * R;
+    const track = dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.10)";
+    return (
+      <div style={{ position: "relative", width: 38, height: 38, flexShrink: 0 }} title={`${seen} / ${total} domande viste · ${pct}%`}>
+        <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: "rotate(-90deg)" }}>
+          <circle cx="19" cy="19" r={R} fill="none" stroke={track} strokeWidth="3.5" />
+          <circle
+            cx="19" cy="19" r={R} fill="none" stroke={col} strokeWidth="3.5" strokeLinecap="round"
+            strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)}
+            style={{ transition: "stroke-dashoffset .3s, stroke .3s" }}
+          />
+        </svg>
+        <div style={{
+          position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", lineHeight: 1,
+        }}>
+          <span style={{ fontSize: "0.6rem", fontWeight: 900, color: col, fontVariantNumeric: "tabular-nums" }}>{seen}</span>
+          <span style={{ fontSize: "0.46rem", fontWeight: 700, color: lbl }}>/{total}</span>
+        </div>
+      </div>
+    );
+  };
 
   // Tendina "Ordina": select nativa (accessibile, niente librerie).
   const SortControl = (
@@ -199,6 +227,7 @@ export default function TriviaMenu({
       />
       {orderedChapters.map((c) => {
         const cov = chapterCoveragePct(c.id);
+        const { seen, total } = chapterCoverageCount(c.id);
         const color = colorById.get(c.id) || "#2F7D4A";
         return (
           <TodoRow
@@ -209,7 +238,8 @@ export default function TriviaMenu({
             title={c.title}
             // Sottotitolo = argomento/autore (utile), non più "N domande".
             subtitle={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
-            badge={covBadge(cov, color, selected.has(c.id))}
+            logo={iconForChapter(c.id)}
+            badge={progressRing(seen, total, cov)}
             done={cov >= 100}
             dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
             onClick={() => toggleChapter(c.id)}
@@ -443,7 +473,7 @@ export default function TriviaMenu({
           .trm-desktop-right {
             flex:1; min-width:0;
             display:flex; flex-direction:column; gap:0.85rem;
-            padding:2rem 1.8rem; overflow-y:auto; justify-content:center;
+            padding:2rem 1.8rem; overflow-y:auto;
           }
         }
       `}</style>
@@ -457,11 +487,11 @@ export default function TriviaMenu({
 // `done` = pacchetto/capitolo completato al 100% → spunta piena di colore.
 function TodoRow(props: {
   active: boolean; multi: boolean; color: string; title: string; subtitle: string;
-  badge?: React.ReactNode; done?: boolean;
+  badge?: React.ReactNode; done?: boolean; logo?: React.ReactNode;
   dark: boolean; card: string; bord: string; lbl: string; textMain: string; textSub: string;
   onClick: () => void;
 }) {
-  const { active, multi, color, title, subtitle, badge, done, dark, card, bord, lbl, textMain, textSub, onClick } = props;
+  const { active, multi, color, title, subtitle, badge, done, logo, dark, card, bord, lbl, textMain, textSub, onClick } = props;
   // La checkbox è "piena" se selezionata oppure se il capitolo è completato.
   const filled = active || done;
   return (
@@ -489,20 +519,21 @@ function TodoRow(props: {
       }}>
         {filled && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
       </div>
-      {/* Pallino colore-capitolo (dà varietà ma resta sobrio) */}
-      <span style={{ width: 9, height: 9, borderRadius: "50%", flexShrink: 0, background: color }} />
+      {/* Slot logo SVG del capitolo: discreto e indicativo. Quando un capitolo
+          avrà il suo logo (campo `logo`) verrà mostrato qui; altrimenti niente. */}
+      {logo && (
+        <span style={{
+          width: 26, height: 26, flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: dark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.45)",
+          opacity: 0.85,
+        }}>{logo}</span>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: "0.88rem", fontWeight: 800, color: active ? color : textMain, lineHeight: 1.25 }}>{title}</div>
         {subtitle && <p style={{ fontSize: "0.72rem", color: textSub, margin: "0.05rem 0 0", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtitle}</p>}
       </div>
       {badge}
-      {done && (
-        <span style={{
-          fontSize: "0.54rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.05em",
-          padding: "0.1rem 0.4rem", borderRadius: 999, flexShrink: 0,
-          background: `${color}22`, color,
-        }}>100%</span>
-      )}
     </button>
   );
 }
