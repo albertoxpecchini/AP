@@ -127,9 +127,30 @@ function PctoThumb() {
   );
 }
 
+function TriviaThumb() {
+  // Tre "card domanda" stilizzate + check, in palette neroverde.
+  const card = (x: number, fill: string, stroke: string) => (
+    <g key={x}>
+      <rect x={x} y={64} width={64} height={72} rx={10} fill={fill} stroke={stroke} strokeWidth="2.2" />
+      <rect x={x + 12} y={80} width={40} height={6} rx={3} fill={stroke} opacity="0.6" />
+      <rect x={x + 12} y={96} width={28} height={6} rx={3} fill={stroke} opacity="0.35" />
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      {card(70, "rgba(47,125,74,0.08)", "rgba(31,107,61,0.5)")}
+      {card(148, "rgba(217,164,0,0.10)", "rgba(192,120,0,0.55)")}
+      {card(226, "rgba(47,125,74,0.12)", "rgba(31,107,61,0.6)")}
+      <circle cx="258" cy="78" r="13" fill="#2F7D4A" />
+      <path d="M252 78 l4 4 7 -8" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function ProjectThumb({ name }: { name: string }) {
   if (name === "angoli") return <AngoliThumb />;
   if (name === "parole") return <ParoleThumb />;
+  if (name === "trivia") return <TriviaThumb />;
   if (name === "pcto") return <PctoThumb />;
   return null;
 }
@@ -164,6 +185,15 @@ const PROJECTS = [
     thumb: "pcto",
     desc: "Tre anni di alternanza scuola-lavoro al Caem Group S.p.A. di Castellucchio, nell'ufficio tecnico del reparto legno: modellazione 3D di tettoie in AutoCAD, osservazione del calcolo strutturale e archiviazione dei preventivi. Racconto del percorso con illustrazioni dei legni.",
     tags: ["Reparto legno", "AutoCAD 3D", "Strutture in legno", "Ufficio tecnico"],
+  },
+  {
+    category: "Web game",
+    date: "15 giu 2026",
+    title: "Trivia",
+    url: "/trivia",
+    thumb: "trivia",
+    desc: "Trivia quiz sulla storia dell'architettura: domande a scelta multipla, vero o falso e a risposta aperta, suddivise in capitoli. Foto pertinenti per ogni domanda, punteggio con bonus velocità, streak con trofei, voto finale in stile americano (A–F) e classifica live. Pensato come un vero gioco, leggero e animato, per PC e mobile.",
+    tags: ["React", "TypeScript", "Game design", "UI/UX"],
   },
   {
     category: "Web game",
