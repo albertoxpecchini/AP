@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { X, Trophy, Wifi, WifiOff, Crown } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { X, Trophy, Wifi, WifiOff, Medal, Target } from "lucide-react";
 import { fetchTop, subscribeToScores, leaderboardConfigured, type ScoreRow } from "./leaderboardApi";
 import { CHAPTERS } from "./questions";
+import { iconForChapter } from "./chapterIcons";
 
 interface LeaderboardProps {
   dark: boolean;
@@ -18,16 +19,21 @@ const chapLabel = (id: string) =>
   id === "all" ? "Tutti" : id === "misto" ? "Misto" : (CHAP_LABEL[id] ?? id);
 
 /**
- * Classifica live: top punteggi + aggiornamenti realtime (WebSocket Supabase).
- * Filtrabile per capitolo. Ordine SEMPRE decrescente per punteggio.
- * Gemella di angoli/Leaderboard.
+ * Classifica live in stile Kit Italia (Bootstrap Italia, palette neroverde).
+ *
+ * Layout professionale: podio top-3, filtri a chip con icone tematiche
+ * (scroll orizzontale con sfumatura ai bordi), righe con barra di precisione
+ * e medaglie, stato di caricamento "skeleton" ed empty-state curato.
+ * Ordine SEMPRE decrescente per punteggio. Gemella di angoli/Leaderboard.
  */
 export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: LeaderboardProps) {
   const [filter, setFilter] = useState<string | "all">("all");
   const [rows, setRows] = useState<ScoreRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [live, setLive] = useState(false);
+  const [pulseId, setPulseId] = useState<number | null>(null);
   const seenIds = useRef<Set<number>>(new Set());
+  const filtersRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let alive = true;
@@ -49,6 +55,10 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         return [...prev, row].sort((a, b) => b.score - a.score).slice(0, 50);
       });
       setLive(true);
+      if (row.id != null) {
+        setPulseId(row.id);
+        setTimeout(() => setPulseId(p => (p === row.id ? null : p)), 1600);
+      }
     });
     return unsub;
   }, [filter]);
@@ -62,154 +72,385 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
     });
   }, [justSubmitted, filter]);
 
+  // Esc per chiudere (accessibilità).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   const fmtScore = (n: number) => n.toLocaleString("it-IT");
 
+  // Podio (top-3) e resto della classifica.
+  const podium = useMemo(() => rows.slice(0, 3), [rows]);
+  const rest = useMemo(() => rows.slice(3), [rows]);
+
+  const myRank = useMemo(() => {
+    if (!myNick) return -1;
+    return rows.findIndex(r => r.nick === myNick);
+  }, [rows, myNick]);
+
+  const renderRow = (r: ScoreRow, i: number) => {
+    const rank = i + 1;
+    const mine = myNick && r.nick === myNick;
+    return (
+      <li
+        key={r.id ?? `${r.nick}-${i}`}
+        className={`trv-lb-row${mine ? " me" : ""}${r.id != null && r.id === pulseId ? " pulse" : ""}`}
+        style={{ animationDelay: `${Math.min(i, 12) * 28}ms` }}
+      >
+        <span className="trv-lb-rank">{rank}</span>
+        <span className="trv-lb-nick">
+          {r.nick}
+          {mine && <span className="trv-lb-you">tu</span>}
+        </span>
+        <span className="trv-lb-acc" title={`Precisione ${r.accuracy}%`}>
+          <span className="trv-lb-accbar"><i style={{ width: `${r.accuracy}%` }} /></span>
+          <span className="trv-lb-accnum">{r.accuracy}%</span>
+        </span>
+        <span className="trv-lb-chap" title={chapLabel(r.chapter)}>{chapLabel(r.chapter)}</span>
+        <span className="trv-lb-score">{fmtScore(r.score)}<small>pt</small></span>
+      </li>
+    );
+  };
+
+  const medalClass = ["gold", "silver", "bronze"];
+
   return (
-    <div className={`trv-lb${dark ? " dark" : ""}`} onClick={onClose}>
+    <div className={`trv-lb${dark ? " dark" : ""}`} onClick={onClose} role="dialog" aria-modal="true" aria-label="Classifica">
       <div className="trv-lb-card" onClick={e => e.stopPropagation()}>
         <header className="trv-lb-head">
-          <div className="trv-lb-title">
-            <Trophy size={20} /> <span>Classifica</span>
+          <div className="trv-lb-headrow">
+            <div className="trv-lb-title">
+              <span className="trv-lb-tico"><Trophy size={18} strokeWidth={2.2} /></span>
+              <span className="trv-lb-ttext">
+                Classifica
+                <small>Storia dell'Architettura · Trivia</small>
+              </span>
+            </div>
+            <button className="trv-lb-x" onClick={onClose} aria-label="Chiudi"><X size={20} /></button>
+          </div>
+          <div className="trv-lb-statusrow">
             {leaderboardConfigured ? (
               <span className={`trv-lb-live${live ? " on" : ""}`} title="Aggiornamenti in tempo reale">
-                <Wifi size={12} /> live
+                <Wifi size={11} /> {live ? "Aggiornamenti in tempo reale" : "Connesso"}
               </span>
             ) : (
               <span className="trv-lb-live off" title="Backend non configurato: solo locale">
-                <WifiOff size={12} /> locale
+                <WifiOff size={11} /> Solo locale
               </span>
             )}
           </div>
-          <button className="trv-lb-x" onClick={onClose} aria-label="Chiudi"><X size={20} /></button>
         </header>
 
-        <div className="trv-lb-filters">
-          <button className={`trv-lb-fbtn${filter === "all" ? " act" : ""}`} onClick={() => setFilter("all")}>Tutti</button>
-          {CHAPTERS.map(c => (
-            <button key={c.id} className={`trv-lb-fbtn${filter === c.id ? " act" : ""}`} onClick={() => setFilter(c.id)}>
-              {c.title}
+        <div className="trv-lb-filterswrap">
+          <div className="trv-lb-filters" ref={filtersRef} role="tablist" aria-label="Filtra per capitolo">
+            <button
+              className={`trv-lb-fbtn${filter === "all" ? " act" : ""}`}
+              onClick={() => setFilter("all")}
+              role="tab"
+              aria-selected={filter === "all"}
+            >
+              <Trophy size={13} strokeWidth={2.2} /> Tutti
             </button>
-          ))}
+            {CHAPTERS.map(c => (
+              <button
+                key={c.id}
+                className={`trv-lb-fbtn${filter === c.id ? " act" : ""}`}
+                onClick={() => setFilter(c.id)}
+                role="tab"
+                aria-selected={filter === c.id}
+                title={c.title}
+              >
+                <span className="trv-lb-fico">{iconForChapter(c.id, 13)}</span>
+                {c.title}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="trv-lb-list">
+        <div className="trv-lb-body">
           {loading ? (
-            <div className="trv-lb-empty">Caricamento…</div>
-          ) : rows.length === 0 ? (
-            <div className="trv-lb-empty">Nessun punteggio ancora. Sii il primo! 🎓</div>
-          ) : (
-            rows.map((r, i) => {
-              const mine = myNick && r.nick === myNick;
-              return (
-                <div key={r.id ?? `${r.nick}-${i}`} className={`trv-lb-row${mine ? " me" : ""}${i < 3 ? " top" + (i + 1) : ""}`}>
-                  <span className="trv-lb-rank">{i === 0 ? <Crown size={16} /> : i + 1}</span>
-                  <span className="trv-lb-nick">{r.nick}{mine ? " (tu)" : ""}</span>
-                  <span className="trv-lb-acc">{r.accuracy}%</span>
-                  <span className="trv-lb-chap">{chapLabel(r.chapter)}</span>
-                  <span className="trv-lb-score">{fmtScore(r.score)}</span>
+            <div className="trv-lb-skel">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div className="trv-lb-skelrow" key={i} style={{ animationDelay: `${i * 80}ms` }}>
+                  <span className="trv-lb-skeldot" />
+                  <span className="trv-lb-skelbar" />
+                  <span className="trv-lb-skelbar sm" />
                 </div>
-              );
-            })
+              ))}
+            </div>
+          ) : rows.length === 0 ? (
+            <div className="trv-lb-empty">
+              <span className="trv-lb-emptyico"><Trophy size={30} strokeWidth={1.6} /></span>
+              <strong>Nessun punteggio… ancora</strong>
+              <span>Gioca una partita e conquista il primo posto del podio! 🎓</span>
+            </div>
+          ) : (
+            <>
+              {podium.length > 0 && (
+                <ol className="trv-lb-podium" aria-label="Podio">
+                  {/* Ordine visivo: 2° · 1° · 3° */}
+                  {[1, 0, 2].map(idx => {
+                    const r = podium[idx];
+                    if (!r) return <li key={idx} className="trv-lb-podium-slot empty" aria-hidden="true" />;
+                    const mine = myNick && r.nick === myNick;
+                    return (
+                      <li
+                        key={r.id ?? `${r.nick}-${idx}`}
+                        className={`trv-lb-podium-slot p${idx + 1}${mine ? " me" : ""}`}
+                      >
+                        <span className={`trv-lb-medal ${medalClass[idx]}`}>
+                          <Medal size={idx === 0 ? 22 : 18} strokeWidth={2.1} />
+                          <b>{idx + 1}</b>
+                        </span>
+                        <span className="trv-lb-pnick">{r.nick}{mine && <span className="trv-lb-you">tu</span>}</span>
+                        <span className="trv-lb-pscore">{fmtScore(r.score)}<small>pt</small></span>
+                        <span className="trv-lb-pacc"><Target size={11} /> {r.accuracy}%</span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+
+              {rest.length > 0 && (
+                <ol className="trv-lb-list" start={4}>
+                  {rest.map((r, i) => renderRow(r, i + 3))}
+                </ol>
+              )}
+            </>
           )}
         </div>
+
+        {!loading && myNick && myRank >= 0 && (
+          <footer className="trv-lb-foot">
+            <span className="trv-lb-footlbl">La tua posizione</span>
+            <span className="trv-lb-footrank">#{myRank + 1}</span>
+            <span className="trv-lb-footnick">{myNick}</span>
+            <span className="trv-lb-footscore">{fmtScore(rows[myRank].score)} pt</span>
+          </footer>
+        )}
       </div>
 
       <style>{`
         .trv-lb {
           position: fixed; inset: 0; z-index: 260;
-          background: rgba(10,30,18,0.66);
+          background: rgba(10,28,17,0.62); backdrop-filter: blur(3px);
           display: flex; align-items: center; justify-content: center;
-          padding: 1rem; animation: trv-lb-fade .2s ease;
+          padding: 1rem; animation: trv-lb-fade .22s ease;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
         }
         @keyframes trv-lb-fade { from { opacity:0 } to { opacity:1 } }
-        .trv-lb-card {
-          width: min(96vw, 460px); max-height: min(86vh, 640px);
-          display: flex; flex-direction: column;
-          background: #fff; border-radius: 18px; overflow: hidden;
-          box-shadow: 0 24px 64px rgba(0,0,0,0.4);
-          animation: trv-lb-up .3s cubic-bezier(.34,1.56,.64,1);
-        }
-        .trv-lb.dark .trv-lb-card { background: #15231c; }
-        @keyframes trv-lb-up { from { opacity:0; transform:translateY(12px) scale(.97) } to { opacity:1; transform:none } }
 
+        .trv-lb-card {
+          width: min(96vw, 480px); max-height: min(90vh, 720px);
+          display: flex; flex-direction: column;
+          background: #fff; border-radius: 20px; overflow: hidden;
+          box-shadow: 0 30px 80px rgba(6,22,14,0.45), 0 2px 8px rgba(6,22,14,0.2);
+          animation: trv-lb-up .34s cubic-bezier(.2,.9,.3,1.1);
+        }
+        .trv-lb.dark .trv-lb-card { background: #14211a; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
+        @keyframes trv-lb-up { from { opacity:0; transform:translateY(16px) scale(.97) } to { opacity:1; transform:none } }
+
+        /* ── Header (Kit Italia: barra istituzionale verde) ── */
         .trv-lb-head {
-          display:flex; align-items:center; justify-content:space-between;
-          padding:1rem 1.2rem; background:#103820; color:#fff; flex-shrink:0;
+          background: linear-gradient(135deg, #14512c 0%, #2F7D4A 100%);
+          color: #fff; flex-shrink: 0; padding: 1rem 1.1rem .85rem;
+          position: relative; overflow: hidden;
         }
-        .trv-lb.dark .trv-lb-head { background:#0a1410; }
-        .trv-lb-title { display:flex; align-items:center; gap:.5rem; font-size:1.1rem; font-weight:800; }
-        .trv-lb-live {
-          display:inline-flex; align-items:center; gap:.25rem;
-          font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
-          background:rgba(255,255,255,0.14); border-radius:999px; padding:.12rem .45rem;
-          color:rgba(255,255,255,0.6);
+        .trv-lb-head::after {
+          content:""; position:absolute; right:-30px; top:-50px;
+          width:180px; height:180px; border-radius:50%;
+          background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+          pointer-events:none;
         }
-        .trv-lb-live.on { background:rgba(111,224,166,0.25); color:#9ff0c2; }
-        .trv-lb-live.off { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.5); }
+        .trv-lb.dark .trv-lb-head { background: linear-gradient(135deg, #0c2e19 0%, #1c5733 100%); }
+        .trv-lb-headrow { display:flex; align-items:flex-start; justify-content:space-between; position:relative; z-index:1; }
+        .trv-lb-title { display:flex; align-items:center; gap:.6rem; }
+        .trv-lb-tico {
+          display:inline-flex; align-items:center; justify-content:center;
+          width:38px; height:38px; border-radius:11px; flex-shrink:0;
+          background:rgba(255,255,255,0.16); box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18);
+        }
+        .trv-lb-ttext { display:flex; flex-direction:column; line-height:1.12; font-size:1.18rem; font-weight:800; letter-spacing:-.01em; }
+        .trv-lb-ttext small { font-size:.66rem; font-weight:600; opacity:.78; letter-spacing:.01em; margin-top:.12rem; }
         .trv-lb-x {
           display:inline-flex; align-items:center; justify-content:center;
-          width:34px; height:34px; border-radius:50%; border:none;
-          background:rgba(255,255,255,0.12); color:#fff; cursor:pointer; transition:background .15s;
+          width:34px; height:34px; border-radius:50%; border:none; flex-shrink:0;
+          background:rgba(255,255,255,0.14); color:#fff; cursor:pointer; transition:background .15s, transform .15s;
         }
-        .trv-lb-x:hover { background:rgba(255,255,255,0.24); }
+        .trv-lb-x:hover { background:rgba(255,255,255,0.26); transform:rotate(90deg); }
+        .trv-lb-x:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+        .trv-lb-statusrow { margin-top:.7rem; position:relative; z-index:1; }
+        .trv-lb-live {
+          display:inline-flex; align-items:center; gap:.32rem;
+          font-size:.66rem; font-weight:700; letter-spacing:.02em;
+          background:rgba(255,255,255,0.13); border-radius:999px; padding:.2rem .6rem;
+          color:rgba(255,255,255,0.78);
+        }
+        .trv-lb-live.on { background:rgba(127,224,159,0.22); color:#bdf5d4; }
+        .trv-lb-live.on::before {
+          content:""; width:6px; height:6px; border-radius:50%; background:#5fe39c;
+          box-shadow:0 0 0 0 rgba(95,227,156,0.7); animation:trv-lb-blink 1.6s infinite;
+        }
+        @keyframes trv-lb-blink { 0%{box-shadow:0 0 0 0 rgba(95,227,156,0.6)} 70%{box-shadow:0 0 0 6px rgba(95,227,156,0)} 100%{box-shadow:0 0 0 0 rgba(95,227,156,0)} }
+        .trv-lb-live.off { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); }
 
+        /* ── Filtri a chip con icone tematiche (scroll + fade ai bordi) ── */
+        .trv-lb-filterswrap { position:relative; flex-shrink:0; border-bottom:1px solid rgba(0,0,0,0.06); }
+        .trv-lb.dark .trv-lb-filterswrap { border-color:rgba(95,208,154,0.14); }
+        .trv-lb-filterswrap::before, .trv-lb-filterswrap::after {
+          content:""; position:absolute; top:0; bottom:1px; width:22px; pointer-events:none; z-index:2;
+        }
+        .trv-lb-filterswrap::before { left:0; background:linear-gradient(90deg,#fff,transparent); }
+        .trv-lb-filterswrap::after  { right:0; background:linear-gradient(270deg,#fff,transparent); }
+        .trv-lb.dark .trv-lb-filterswrap::before { background:linear-gradient(90deg,#14211a,transparent); }
+        .trv-lb.dark .trv-lb-filterswrap::after  { background:linear-gradient(270deg,#14211a,transparent); }
         .trv-lb-filters {
-          display:flex; gap:.3rem; padding:.7rem .9rem; flex-wrap:wrap;
-          border-bottom:1px solid rgba(0,0,0,0.07); flex-shrink:0;
+          display:flex; gap:.4rem; padding:.7rem .9rem; overflow-x:auto; scrollbar-width:thin;
+          scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch;
         }
-        .trv-lb.dark .trv-lb-filters { border-color:rgba(95,208,154,0.14); }
+        .trv-lb-filters::-webkit-scrollbar { height:5px; }
+        .trv-lb-filters::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.3); border-radius:99px; }
         .trv-lb-fbtn {
-          border:1px solid rgba(47,125,74,0.25); background:transparent;
-          color:#2F7D4A; border-radius:999px; padding:.25rem .7rem;
-          font-family:inherit; font-size:.76rem; font-weight:700; cursor:pointer; transition:all .12s;
+          display:inline-flex; align-items:center; gap:.3rem; white-space:nowrap; scroll-snap-align:start;
+          border:1.5px solid rgba(47,125,74,0.22); background:#fff;
+          color:#1F6B3D; border-radius:999px; padding:.32rem .72rem;
+          font-family:inherit; font-size:.76rem; font-weight:700; cursor:pointer;
+          transition:background .14s, color .14s, border-color .14s, transform .1s;
         }
-        .trv-lb.dark .trv-lb-fbtn { color:#6fe0a6; border-color:rgba(95,208,154,0.28); }
-        .trv-lb-fbtn:hover { background:rgba(47,125,74,0.08); }
-        .trv-lb-fbtn.act { background:#2F7D4A; color:#fff; border-color:#2F7D4A; }
+        .trv-lb-fbtn .trv-lb-fico { display:inline-flex; opacity:.75; }
+        .trv-lb.dark .trv-lb-fbtn { color:#6fe0a6; background:transparent; border-color:rgba(95,208,154,0.26); }
+        .trv-lb-fbtn:hover { background:rgba(47,125,74,0.08); transform:translateY(-1px); }
+        .trv-lb-fbtn:focus-visible { outline:2px solid #2F7D4A; outline-offset:1px; }
+        .trv-lb-fbtn.act { background:#2F7D4A; color:#fff; border-color:#2F7D4A; box-shadow:0 2px 8px rgba(47,125,74,0.3); }
+        .trv-lb-fbtn.act .trv-lb-fico { opacity:1; }
         .trv-lb.dark .trv-lb-fbtn.act { background:#2f9e63; border-color:#2f9e63; color:#06160e; }
 
-        .trv-lb-list { flex:1; min-height:0; overflow-y:auto; padding:.5rem .7rem .9rem; }
-        .trv-lb-empty { text-align:center; padding:2.5rem 1rem; color:#6b8070; font-weight:600; }
-        .trv-lb.dark .trv-lb-empty { color:#8fc7a6; }
+        /* ── Body scrollabile ── */
+        .trv-lb-body { flex:1; min-height:0; overflow-y:auto; padding:.9rem .85rem 1rem; scrollbar-width:thin; }
+        .trv-lb-body::-webkit-scrollbar { width:7px; }
+        .trv-lb-body::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.25); border-radius:99px; }
 
-        .trv-lb-row {
-          display:grid; grid-template-columns:32px 1fr auto auto auto; align-items:center; gap:.55rem;
-          padding:.55rem .7rem; border-radius:10px; margin-bottom:3px;
-          animation:trv-lb-rowin .25s ease;
+        /* ── Podio ── */
+        .trv-lb-podium {
+          list-style:none; margin:.2rem 0 1rem; padding:0;
+          display:grid; grid-template-columns:1fr 1.18fr 1fr; gap:.55rem; align-items:end;
         }
-        @keyframes trv-lb-rowin { from { opacity:0; transform:translateX(-6px) } to { opacity:1; transform:none } }
-        .trv-lb-row:nth-child(even) { background:rgba(0,0,0,0.025); }
+        .trv-lb-podium-slot {
+          display:flex; flex-direction:column; align-items:center; gap:.25rem;
+          background:linear-gradient(180deg, rgba(47,125,74,0.06), rgba(47,125,74,0.02));
+          border:1px solid rgba(47,125,74,0.12); border-radius:14px;
+          padding:.7rem .4rem .6rem; text-align:center; position:relative;
+          animation:trv-lb-pop .4s cubic-bezier(.2,.9,.3,1.2) both;
+        }
+        .trv-lb-podium-slot.empty { background:transparent; border:none; animation:none; }
+        .trv-lb-podium-slot.p1 { padding-top:1rem; background:linear-gradient(180deg, rgba(200,164,21,0.16), rgba(200,164,21,0.04)); border-color:rgba(200,164,21,0.4); animation-delay:.08s; }
+        .trv-lb-podium-slot.p2 { animation-delay:0s; border-color:rgba(140,150,160,0.35); }
+        .trv-lb-podium-slot.p3 { animation-delay:.16s; border-color:rgba(176,114,76,0.35); }
+        .trv-lb.dark .trv-lb-podium-slot { background:rgba(255,255,255,0.03); border-color:rgba(95,208,154,0.16); }
+        .trv-lb.dark .trv-lb-podium-slot.p1 { background:linear-gradient(180deg, rgba(214,178,40,0.18), rgba(214,178,40,0.04)); border-color:rgba(214,178,40,0.45); }
+        .trv-lb-podium-slot.me { box-shadow:0 0 0 2px rgba(47,125,74,0.5); }
+        @keyframes trv-lb-pop { from{opacity:0; transform:translateY(14px) scale(.9)} to{opacity:1; transform:none} }
+
+        .trv-lb-medal {
+          display:inline-flex; align-items:center; justify-content:center; position:relative;
+          width:44px; height:44px; border-radius:50%; color:#fff; margin-bottom:.15rem;
+        }
+        .trv-lb-medal b { position:absolute; font-size:.6rem; font-weight:900; bottom:-2px; right:-2px; background:#fff; color:#333; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.25); }
+        .trv-lb-medal.gold   { background:linear-gradient(135deg,#f4d03f,#c8a415); box-shadow:0 4px 12px rgba(200,164,21,0.45); }
+        .trv-lb-medal.silver { background:linear-gradient(135deg,#cfd8dc,#9aa6ad); box-shadow:0 4px 12px rgba(150,160,170,0.4); }
+        .trv-lb-medal.bronze { background:linear-gradient(135deg,#d99c6a,#b0724c); box-shadow:0 4px 12px rgba(176,114,76,0.4); }
+        .trv-lb-pnick { font-weight:800; font-size:.84rem; color:#17271d; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:.25rem; }
+        .trv-lb.dark .trv-lb-pnick { color:#e4f3ea; }
+        .trv-lb-pscore { font-weight:900; font-size:1.05rem; color:#2F7D4A; font-variant-numeric:tabular-nums; line-height:1; }
+        .trv-lb-podium-slot.p1 .trv-lb-pscore { font-size:1.25rem; }
+        .trv-lb.dark .trv-lb-pscore { color:#6fe0a6; }
+        .trv-lb-pscore small { font-size:.55em; font-weight:700; opacity:.6; margin-left:.12em; }
+        .trv-lb-pacc { display:inline-flex; align-items:center; gap:.2rem; font-size:.66rem; font-weight:700; color:#6b8070; }
+        .trv-lb.dark .trv-lb-pacc { color:#8fc7a6; }
+
+        /* ── Lista (dal 4° posto) ── */
+        .trv-lb-list { list-style:none; margin:0; padding:0; }
+        .trv-lb-row {
+          display:grid; grid-template-columns:30px 1fr 86px 78px auto; align-items:center; gap:.5rem;
+          padding:.5rem .6rem; border-radius:11px; margin-bottom:3px;
+          animation:trv-lb-rowin .3s ease both;
+        }
+        @keyframes trv-lb-rowin { from{opacity:0; transform:translateX(-8px)} to{opacity:1; transform:none} }
+        .trv-lb-row:nth-child(even) { background:rgba(0,0,0,0.022); }
         .trv-lb.dark .trv-lb-row:nth-child(even) { background:rgba(255,255,255,0.025); }
         .trv-lb-row.me { background:rgba(47,125,74,0.12); box-shadow:inset 0 0 0 1.5px rgba(47,125,74,0.4); }
         .trv-lb.dark .trv-lb-row.me { background:rgba(95,208,154,0.14); box-shadow:inset 0 0 0 1.5px rgba(95,208,154,0.4); }
-        .trv-lb-row.top1 { background:linear-gradient(90deg,rgba(200,164,21,0.18),transparent); }
-        .trv-lb-row.top2 { background:linear-gradient(90deg,rgba(122,140,153,0.15),transparent); }
-        .trv-lb-row.top3 { background:linear-gradient(90deg,rgba(160,103,74,0.15),transparent); }
+        .trv-lb-row.pulse { animation:trv-lb-pulse 1.6s ease; }
+        @keyframes trv-lb-pulse { 0%{background:rgba(95,227,156,0.4)} 100%{background:transparent} }
 
-        .trv-lb-rank {
-          display:inline-flex; align-items:center; justify-content:center;
-          font-weight:800; font-size:.9rem; color:#6b8070; font-variant-numeric:tabular-nums;
-        }
-        .trv-lb.dark .trv-lb-rank { color:#a4c4aa; }
-        .trv-lb-row.top1 .trv-lb-rank { color:#c8a415; }
-        .trv-lb-nick { font-weight:800; color:#17271d; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .trv-lb-rank { display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; color:#9aa89e; font-variant-numeric:tabular-nums; }
+        .trv-lb.dark .trv-lb-rank { color:#7fa389; }
+        .trv-lb-nick { font-weight:700; color:#17271d; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:.35rem; }
         .trv-lb.dark .trv-lb-nick { color:#d4e8dc; }
-        .trv-lb-acc {
-          font-size:.72rem; font-weight:800; color:#2F7D4A; font-variant-numeric:tabular-nums;
+        .trv-lb-you {
+          font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+          background:#2F7D4A; color:#fff; padding:.06rem .3rem; border-radius:5px; flex-shrink:0;
         }
-        .trv-lb.dark .trv-lb-acc { color:#6fe0a6; }
+        .trv-lb.dark .trv-lb-you { background:#2f9e63; color:#06160e; }
+        .trv-lb-acc { display:flex; align-items:center; gap:.35rem; }
+        .trv-lb-accbar { flex:1; height:5px; border-radius:99px; background:rgba(47,125,74,0.14); overflow:hidden; }
+        .trv-lb.dark .trv-lb-accbar { background:rgba(95,208,154,0.15); }
+        .trv-lb-accbar i { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#2F7D4A,#5fc08a); transition:width .5s ease; }
+        .trv-lb-accnum { font-size:.64rem; font-weight:800; color:#2F7D4A; font-variant-numeric:tabular-nums; width:28px; text-align:right; flex-shrink:0; }
+        .trv-lb.dark .trv-lb-accnum { color:#6fe0a6; }
         .trv-lb-chap {
-          font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
-          color:#6b8070; background:rgba(0,0,0,0.05); padding:.12rem .4rem; border-radius:999px;
-          max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+          font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
+          color:#6b8070; background:rgba(0,0,0,0.045); padding:.16rem .45rem; border-radius:999px;
+          overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center;
         }
         .trv-lb.dark .trv-lb-chap { color:#8fc7a6; background:rgba(255,255,255,0.06); }
-        .trv-lb-score {
-          font-weight:900; font-size:1rem; color:#17271d; font-variant-numeric:tabular-nums;
-          min-width:52px; text-align:right;
+        .trv-lb-score { font-weight:900; font-size:.98rem; color:#17271d; font-variant-numeric:tabular-nums; text-align:right; }
+        .trv-lb.dark .trv-lb-score { color:#e4f3ea; }
+        .trv-lb-score small { font-size:.54em; font-weight:700; opacity:.5; margin-left:.12em; }
+
+        /* ── Footer "la tua posizione" ── */
+        .trv-lb-foot {
+          flex-shrink:0; display:flex; align-items:center; gap:.6rem;
+          padding:.65rem 1rem; background:#2F7D4A; color:#fff;
+          font-weight:700; animation:trv-lb-footin .3s ease;
         }
-        .trv-lb.dark .trv-lb-score { color:#d4e8dc; }
+        @keyframes trv-lb-footin { from{transform:translateY(100%)} to{transform:none} }
+        .trv-lb.dark .trv-lb-foot { background:#1c5733; }
+        .trv-lb-footlbl { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; opacity:.8; }
+        .trv-lb-footrank { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
+        .trv-lb-footnick { font-size:.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+        .trv-lb-footscore { font-size:.85rem; font-weight:900; font-variant-numeric:tabular-nums; }
+
+        /* ── Skeleton di caricamento ── */
+        .trv-lb-skel { padding:.4rem .2rem; }
+        .trv-lb-skelrow { display:flex; align-items:center; gap:.6rem; padding:.55rem .4rem; animation:trv-lb-fade .3s both; }
+        .trv-lb-skeldot, .trv-lb-skelbar { background:linear-gradient(90deg,rgba(0,0,0,0.05),rgba(0,0,0,0.1),rgba(0,0,0,0.05)); background-size:200% 100%; animation:trv-lb-shimmer 1.3s infinite; border-radius:8px; }
+        .trv-lb.dark .trv-lb-skeldot, .trv-lb.dark .trv-lb-skelbar { background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.09),rgba(255,255,255,0.04)); background-size:200% 100%; }
+        .trv-lb-skeldot { width:26px; height:26px; border-radius:50%; flex-shrink:0; }
+        .trv-lb-skelbar { height:11px; flex:1; }
+        .trv-lb-skelbar.sm { flex:none; width:52px; }
+        @keyframes trv-lb-shimmer { from{background-position:200% 0} to{background-position:-200% 0} }
+
+        /* ── Empty state ── */
+        .trv-lb-empty { display:flex; flex-direction:column; align-items:center; gap:.5rem; text-align:center; padding:2.6rem 1.5rem; }
+        .trv-lb-emptyico { display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; border-radius:50%; background:rgba(47,125,74,0.1); color:#2F7D4A; margin-bottom:.3rem; }
+        .trv-lb.dark .trv-lb-emptyico { background:rgba(95,208,154,0.12); color:#6fe0a6; }
+        .trv-lb-empty strong { font-size:1.02rem; color:#17271d; font-weight:800; }
+        .trv-lb.dark .trv-lb-empty strong { color:#e4f3ea; }
+        .trv-lb-empty span { font-size:.82rem; color:#6b8070; max-width:240px; }
+        .trv-lb.dark .trv-lb-empty span { color:#8fc7a6; }
+
+        @media (max-width:380px) {
+          .trv-lb-row { grid-template-columns:26px 1fr 60px auto; }
+          .trv-lb-chap { display:none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .trv-lb, .trv-lb-card, .trv-lb-row, .trv-lb-podium-slot, .trv-lb-foot, .trv-lb-skelrow, .trv-lb-skeldot, .trv-lb-skelbar { animation:none !important; }
+          .trv-lb-x:hover { transform:none; }
+          .trv-lb-accbar i { transition:none; }
+        }
       `}</style>
     </div>
   );
