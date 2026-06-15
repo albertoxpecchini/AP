@@ -57,3 +57,12 @@ export function chapterCoveragePct(chapterId: string): number {
   const n = chap.questions.filter(q => seen.has(q.id)).length;
   return Math.round((n / chap.questions.length) * 100);
 }
+
+/** Domande viste sul totale per un capitolo (per il cerchio "12 / 30"). */
+export function chapterCoverageCount(chapterId: string): { seen: number; total: number } {
+  const chap = CHAPTERS.find(c => c.id === chapterId);
+  if (!chap) return { seen: 0, total: 0 };
+  const seen = seenValid();
+  const n = chap.questions.filter(q => seen.has(q.id)).length;
+  return { seen: n, total: chap.questions.length };
+}
