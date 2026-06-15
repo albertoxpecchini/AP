@@ -1,21 +1,30 @@
-// ─── Foto pertinenti dalle parole della domanda (Wikipedia/Wikimedia) ────────
+// ─── Foto pertinenti dalle parole della domanda (multi-fonte, licenze libere) ─
 //
-// Per ogni domanda cerchiamo un'immagine pertinente usando le API pubbliche di
-// Wikipedia (REST + Action API, niente API key, licenze libere). L'obiettivo è
-// che la foto sia INERENTE alla domanda e che si carichi quasi sempre.
+// Per ogni domanda cerchiamo un'immagine pertinente e di qualità da PIÙ fonti
+// pubbliche, tutte senza API key e con licenze aperte/CC. Nessuno scraping di
+// immagini protette (illegale e instabile): usiamo provider che espongono
+// immagini legalmente riutilizzabili e affidabili nel tempo.
 //
-// Strategia a cascata (ci si ferma alla prima che dà un'immagine valida):
-//   1. REST summary della pagina più probabile per la query → originalimage/thumbnail
-//   2. generator=search + pageimages (immagine principale della miglior pagina)
-//   3. come (1)/(2) ma sulla query "di ripiego" (+ "architettura")
+// Cascata (ci si ferma alla prima immagine valida):
+//   1. Wikipedia IT → EN: REST summary + generator=search (foto rappresentativa)
+//   2. Wikimedia Commons: ricerca DIRETTA dei file (namespace 6) → enorme
+//      copertura anche senza un articolo con lead image (es. ponti di R. Emilia)
+//   3. Openverse: aggregatore Creative Commons (Flickr, musei, collezioni…)
+// I candidati di query vanno dal più specifico (entità della domanda) ai campi
+// di capitolo (edificio/autore/argomento), così la foto resta inerente.
 //
 // Tutto è progettato per NON bloccare mai il gioco:
 //  • cache in-memory + sessionStorage (anche i "miss");
 //  • prefetch della domanda successiva mentre giochi quella corrente;
-//  • timeout breve e fallback silenzioso (il gioco mostra una card grafica).
+//  • timeout breve per fonte e fallback silenzioso (card grafica col capitolo).
 
-const REST = "https://it.wikipedia.org/api/rest_v1/page/summary/";
-const ACTION = "https://it.wikipedia.org/w/api.php";
+// Più fonti = più copertura. Tutte ad accesso libero, senza API key, con
+// immagini di licenza aperta (Wikimedia/Commons) o CC (Openverse).
+const WIKIS = ["it", "en"] as const;           // Wikipedia IT poi EN (fallback)
+const COMMONS = "https://commons.wikimedia.org/w/api.php"; // repository foto diretto
+const OPENVERSE = "https://api.openverse.org/v1/images/";  // aggregatore CC (Flickr, musei…)
+const wikiRest = (lang: string) => `https://${lang}.wikipedia.org/api/rest_v1/page/summary/`;
+const wikiAction = (lang: string) => `https://${lang}.wikipedia.org/w/api.php`;
 const THUMB_PX = 800;
 const MIN_PX = 200;          // scarta immagini troppo piccole (icone/loghi)
 const TIMEOUT_MS = 7000;
@@ -58,10 +67,10 @@ function looksBad(url: string): boolean {
 }
 
 // ── (1) REST summary: di solito l'immagine più rappresentativa della pagina ──
-async function viaSummary(query: string): Promise<string | null> {
+async function viaSummary(lang: string, query: string): Promise<string | null> {
   const { signal, done } = withTimeout();
   try {
-    const res = await fetch(REST + encodeURIComponent(query), {
+    const res = await fetch(wikiRest(lang) + encodeURIComponent(query), {
       signal, headers: { Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -78,7 +87,7 @@ async function viaSummary(query: string): Promise<string | null> {
 }
 
 // ── (2) Action API: miglior pagina della ricerca + sua pageimage ──
-async function viaSearch(query: string): Promise<string | null> {
+async function viaSearch(lang: string, query: string): Promise<string | null> {
   const params = new URLSearchParams({
     action: "query", format: "json", origin: "*",
     generator: "search", gsrsearch: query, gsrlimit: "3", gsrnamespace: "0",
@@ -86,7 +95,7 @@ async function viaSearch(query: string): Promise<string | null> {
   });
   const { signal, done } = withTimeout();
   try {
-    const res = await fetch(`${ACTION}?${params}`, { signal });
+    const res = await fetch(`${wikiAction(lang)}?${params}`, { signal });
     if (!res.ok) return null;
     const data = await res.json();
     const pages = data?.query?.pages as Record<string, any> | undefined;
@@ -98,6 +107,58 @@ async function viaSearch(query: string): Promise<string | null> {
       const w = p?.thumbnail?.width ?? p?.original?.width ?? 0;
       const url = orig || thumb;
       if (url && !looksBad(url) && w >= MIN_PX) return bumpThumb(url);
+    }
+    return null;
+  } catch { return null; }
+  finally { done(); }
+}
+
+// ── (3) Commons: cerca DIRETTAMENTE i file foto (namespace 6). È il repository
+// di Wikimedia: trova immagini anche quando nessun articolo ha una lead image
+// (qui sta la vera ampiezza di copertura, es. i ponti di Reggio Emilia). ──
+async function viaCommons(query: string): Promise<string | null> {
+  const params = new URLSearchParams({
+    action: "query", format: "json", origin: "*",
+    generator: "search", gsrsearch: `${query} filetype:bitmap`, gsrlimit: "8", gsrnamespace: "6",
+    prop: "imageinfo", iiprop: "url|size", iiurlwidth: String(THUMB_PX),
+  });
+  const { signal, done } = withTimeout();
+  try {
+    const res = await fetch(`${COMMONS}?${params}`, { signal });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const pages = data?.query?.pages as Record<string, any> | undefined;
+    if (!pages) return null;
+    const list = Object.values(pages).sort((a: any, b: any) => (a.index ?? 99) - (b.index ?? 99));
+    for (const p of list) {
+      const ii = p?.imageinfo?.[0];
+      const url = (ii?.thumburl || ii?.url) as string | undefined;
+      const w = ii?.thumbwidth ?? ii?.width ?? 0;
+      if (url && !looksBad(url) && w >= MIN_PX) return url;
+    }
+    return null;
+  } catch { return null; }
+  finally { done(); }
+}
+
+// ── (4) Openverse: aggregatore di immagini Creative Commons (Flickr, musei,
+// collezioni…). Allarga la copertura oltre Wikimedia, sempre con licenza CC. ──
+async function viaOpenverse(query: string): Promise<string | null> {
+  const params = new URLSearchParams({
+    q: query, page_size: "5", mature: "false",
+    // formati comuni e dimensione "large" per qualità
+    size: "large",
+  });
+  const { signal, done } = withTimeout();
+  try {
+    const res = await fetch(`${OPENVERSE}?${params}`, { signal, headers: { Accept: "application/json" } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const results = (data?.results ?? []) as any[];
+    for (const r of results) {
+      const url = (r?.url || r?.thumbnail) as string | undefined;
+      const w = r?.width ?? 0;
+      if (url && !looksBad(url) && (w === 0 || w >= MIN_PX)) return url;
     }
     return null;
   } catch { return null; }
@@ -171,13 +232,33 @@ async function resolve(query: string, hints?: PhotoHints): Promise<string | null
   ].filter(Boolean) as string[];
 
   const tried = new Set<string>();
-  for (const c of candidates) {
-    const key = c.trim().toLowerCase();
-    if (!key || tried.has(key)) continue;
-    tried.add(key);
-    const hit = (await viaSummary(c)) || (await viaSearch(c));
+  const uniq = candidates
+    .map(c => c.trim())
+    .filter(c => { const k = c.toLowerCase(); if (!k || tried.has(k)) return false; tried.add(k); return true; });
+
+  // Passata 1: Wikipedia (IT poi EN) per OGNI candidato. Voci enciclopediche →
+  // foto più "rappresentative" e pertinenti. È la fonte preferita.
+  for (const c of uniq) {
+    for (const lang of WIKIS) {
+      const hit = (await viaSummary(lang, c)) || (await viaSearch(lang, c));
+      if (hit) return hit;
+    }
+  }
+
+  // Passata 2: Commons (file diretti) sui candidati migliori. Copre i casi in
+  // cui esiste la FOTO ma nessun articolo la usa come immagine principale
+  // (es. ponti di Reggio Emilia). Limitata ai primi 3 per restare veloce.
+  for (const c of uniq.slice(0, 3)) {
+    const hit = await viaCommons(c);
     if (hit) return hit;
   }
+
+  // Passata 3: Openverse (Creative Commons oltre Wikimedia) come ultima rete.
+  for (const c of uniq.slice(0, 2)) {
+    const hit = await viaOpenverse(c);
+    if (hit) return hit;
+  }
+
   return null;
 }
 
