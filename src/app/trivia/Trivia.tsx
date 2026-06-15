@@ -280,7 +280,13 @@ export default function Trivia() {
           <button className="trv-hud-back" onClick={backToMenu} aria-label="Esci"><ArrowLeft size={18} /></button>
           <div className="trv-hud-prog">
             <span className="trv-hud-prog-txt">{idx + 1} / {queue.length}</span>
-            <div className="trv-hud-bar"><div className="trv-hud-bar-fill" style={{ width: `${((idx) / queue.length) * 100}%` }} /></div>
+            <div className="trv-hud-bar">
+              <div className="trv-hud-bar-fill" style={{ width: `${((idx) / queue.length) * 100}%` }}>
+                <span className="trv-liquid-wave" />
+                <span className="trv-liquid-wave two" />
+                <span className="trv-liquid-shine" />
+              </div>
+            </div>
           </div>
           <div className="trv-hud-right">
             <span className={`trv-hud-streak${streak > 0 ? " on" : ""}`}><Flame size={15} /> {streak}</span>
@@ -313,12 +319,13 @@ export default function Trivia() {
             <div className="trv-photo-subject">
               <span className="trv-subj-ico">{iconForChapter(current.chapterId, 18)}</span>
               <div className="trv-subj-txt">
-                <span className="trv-subj-main">{(current.edificio || current.argomento)?.split(/[,/]/)[0].trim()}</span>
-                {(current.edificio && current.argomento) && (
-                  <span className="trv-subj-sub">{current.argomento}{current.autore ? ` · ${current.autore}` : ""}</span>
-                )}
-                {(!current.edificio && current.autore) && (
-                  <span className="trv-subj-sub">{current.autore}</span>
+                {/* Titolo = capitolo (sempre pulito e descrittivo). Sottotitolo =
+                    corrente · autore. Evita liste-con-parentesi del campo edificio. */}
+                <span className="trv-subj-main">{current.chapter}</span>
+                {(current.argomento || current.autore) && (
+                  <span className="trv-subj-sub">
+                    {[cleanCtx(current.argomento), current.autore].filter(Boolean).join(" · ")}
+                  </span>
                 )}
               </div>
             </div>
@@ -490,6 +497,11 @@ function typeLabel(t: Question["type"]): string {
   return t === "multipla" ? "Scelta multipla" : t === "vero-falso" ? "Vero o Falso" : "Risposta aperta";
 }
 
+// Sottotitolo argomento: toglie solo eventuali parentesi, tiene il resto leggibile.
+function cleanCtx(s?: string): string {
+  return (s || "").replace(/\s*\([^)]*\)?/g, "").replace(/\s+/g, " ").trim();
+}
+
 const styles = `
 .trv-page {
   position: fixed; inset: 0; z-index: 200; overflow-y: auto;
@@ -520,8 +532,35 @@ const styles = `
 .trv-hud-back:hover { background: rgba(255,255,255,0.24); }
 .trv-hud-prog { flex: 1; min-width: 0; }
 .trv-hud-prog-txt { font-size: .7rem; font-weight: 800; opacity: .8; letter-spacing: .04em; }
-.trv-hud-bar { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.15); margin-top: 3px; overflow: hidden; }
-.trv-hud-bar-fill { height: 100%; background: #6fd08a; border-radius: 999px; transition: width .3s ease; }
+/* Barra progressi "liquida": il riempimento sale fluido e ha onde animate. */
+.trv-hud-bar {
+  position: relative; height: 12px; border-radius: 999px; margin-top: 4px; overflow: hidden;
+  background: rgba(255,255,255,0.13); box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
+}
+.trv-hud-bar-fill {
+  position: relative; height: 100%; min-width: 12px; border-radius: 999px; overflow: hidden;
+  background: linear-gradient(180deg, #7fe3a6, #2f9e63 70%);
+  box-shadow: 0 0 10px rgba(111,224,138,0.5);
+  transition: width .6s cubic-bezier(.65,0,.35,1);
+}
+/* Due onde sfasate sul bordo superiore del liquido → cresta in movimento. */
+.trv-liquid-wave {
+  position: absolute; top: -7px; left: 0; width: 240%; height: 14px;
+  background: radial-gradient(circle at 12px -4px, transparent 6px, #7fe3a6 6.5px) repeat-x;
+  background-size: 24px 14px; opacity: .9;
+  animation: trv-wave 2.1s linear infinite;
+}
+.trv-liquid-wave.two {
+  top: -6px; background: radial-gradient(circle at 12px -4px, transparent 7px, #5fd08a 7.5px) repeat-x;
+  background-size: 30px 14px; opacity: .55; animation-duration: 3.1s; animation-direction: reverse;
+}
+@keyframes trv-wave { from { transform: translateX(0); } to { transform: translateX(-30px); } }
+/* Riflesso "liquido" che scorre, e bollicine. */
+.trv-liquid-shine {
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+  background-size: 200% 100%; animation: trv-shimmer 2.4s linear infinite;
+}
 .trv-hud-right { display: flex; align-items: center; gap: .6rem; flex-shrink: 0; }
 .trv-hud-streak { display: inline-flex; align-items: center; gap: .2rem; font-weight: 800; font-size: .85rem; opacity: .55; transition: opacity .2s; }
 .trv-hud-streak.on { opacity: 1; color: #ffd27a; }

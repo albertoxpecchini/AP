@@ -53,13 +53,54 @@ function shuffled<T>(input: readonly T[]): T[] {
 }
 
 /**
- * Prepara le domande per una partita: mescola l'ordine E rimescola le opzioni
- * di ogni multipla (così la lettera della risposta corretta cambia posizione
- * a ogni partita → niente "memoria di zona"). Le opzioni sono clonate, i dati
- * globali (`ALL_QUESTIONS`) restano intatti.
+ * Distribuisce le domande in modo che capitoli/argomenti vicini NON si ripetano
+ * di fila: niente "blocchi" dello stesso edificio. Algoritmo: raggruppa per
+ * capitolo, mescola ogni gruppo, poi intercala scegliendo a ogni passo il
+ * gruppo più "pieno" diverso dall'ultimo usato (round-robin pesato). Risultato:
+ * argomenti ben mischiati, mai due domande consecutive dello stesso capitolo
+ * (quando possibile).
+ */
+function spreadByChapter(items: Question[]): Question[] {
+  const groups = new Map<string, Question[]>();
+  for (const q of items) {
+    const arr = groups.get(q.chapterId);
+    if (arr) arr.push(q); else groups.set(q.chapterId, [q]);
+  }
+  // ogni gruppo già mescolato internamente
+  const buckets = [...groups.values()].map(g => shuffled(g));
+
+  const out: Question[] = [];
+  let lastChapter: string | null = null;
+  while (out.length < items.length) {
+    // candidato: bucket più capiente, diverso dall'ultimo capitolo usato
+    let pick = -1, pickLen = -1;
+    for (let i = 0; i < buckets.length; i++) {
+      const b = buckets[i];
+      if (b.length === 0) continue;
+      if (b[0].chapterId === lastChapter) continue;
+      if (b.length > pickLen) { pickLen = b.length; pick = i; }
+    }
+    // se l'unico rimasto è lo stesso capitolo (inevitabile), accettalo
+    if (pick === -1) {
+      for (let i = 0; i < buckets.length; i++) if (buckets[i].length) { pick = i; break; }
+    }
+    if (pick === -1) break;
+    const q = buckets[pick].shift()!;
+    out.push(q);
+    lastChapter = q.chapterId;
+  }
+  return out;
+}
+
+/**
+ * Prepara le domande per una partita: mescola e DISTRIBUISCE per argomento
+ * (niente blocchi dello stesso capitolo) e rimescola le opzioni di ogni multipla
+ * (così la lettera della risposta corretta cambia posizione a ogni partita →
+ * niente "memoria di zona"). Le opzioni sono clonate, i dati globali
+ * (`ALL_QUESTIONS`) restano intatti.
  */
 export function prepareGame(pool: Question[]): Question[] {
-  return shuffled(pool).map(q =>
+  return spreadByChapter(pool).map(q =>
     q.type === "multipla" && q.options
       ? { ...q, options: shuffled(q.options) }
       : q,

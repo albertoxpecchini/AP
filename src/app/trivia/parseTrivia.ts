@@ -210,11 +210,15 @@ function parseBlock(chapterId: string, idx: number, block: string[]): Question |
   if (!text) fail(chapterId, idx, "manca il testo della domanda");
   if (!type) fail(chapterId, idx, 'manca la riga "type:" (multipla | vero-falso | aperta)');
 
-  // Indizio foto: override esplicito, altrimenti deriva dal testo arricchito
-  // con la risposta corretta (spesso è lì l'"entità" da fotografare, es.
-  // "Brunelleschi" per "Chi progettò la cupola?").
+  // Indizio foto PER SINGOLA DOMANDA: si deriva dall'entità della domanda + la
+  // sua risposta (es. "Cerdà" per "…fu affidato all'ingegnere Ildefonso ___",
+  // "Brunelleschi" per "Chi progettò la cupola?"). Gli override `foto:` nei .md
+  // erano FISSI per capitolo (stessa foto per tutte le domande del capitolo) e
+  // davano foto non pertinenti: vengono ignorati. La rete di sicurezza tematica
+  // (edificio/autore/argomento del capitolo) è gestita a runtime in photos.ts.
   const correctOpt = options.find(o => o.correct)?.text;
-  const photoHint = photoOverride || derivePhotoQuery(text, answer || correctOpt);
+  void photoOverride; // override per-capitolo deprecati: vince la derivazione per-domanda
+  const photoHint = derivePhotoQuery(text, answer || correctOpt);
 
   const base = {
     chapter: "", // riempito dal chiamante via spread, non necessario qui

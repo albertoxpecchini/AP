@@ -134,25 +134,38 @@ function focusQuery(text: string): string {
   return (best && best.trim().split(" ").length >= 1 && /[A-ZÀ-Þ]/.test(best)) ? best.trim() : "";
 }
 
+/**
+ * Pulisce un campo "edificio/argomento" che può essere una LISTA con parentesi,
+ * es. "Barcellona (Palau Güell, Park Güell)" → "Barcellona", oppure
+ * "Villa Savoye, Poissy" → "Villa Savoye". Toglie contenuto tra parentesi,
+ * poi prende la prima voce prima di "," "/" ";".
+ */
+export function cleanEntity(s?: string): string {
+  if (!s) return "";
+  return s
+    .replace(/\([^)]*\)?/g, " ")   // via "(... )" anche se non chiusa
+    .replace(/[,/;].*$/, " ")       // via tutto dopo la prima virgola/slash
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function resolve(query: string, hints?: PhotoHints): Promise<string | null> {
-  // I CANDIDATI MIGLIORI sono le entità strutturate del capitolo (edificio,
-  // autore, argomento): sono titoli/voci Wikipedia "puliti" che risolvono quasi
-  // sempre, a differenza della frase-domanda intera. Si provano PRIMA.
+  // Priorità ai candidati PIÙ SPECIFICI della singola domanda: l'entità estratta
+  // dalla frase/risposta (focus) batte i campi di CAPITOLO, che sono spesso liste
+  // generiche (es. "Barcellona (Palau Güell, Park Güell)") e darebbero foto
+  // sbagliate per domande su altri soggetti dello stesso capitolo.
   //
-  // Ordine: edificio → "edificio + autore" → autore → argomento → query mirata
-  // sui nomi propri della domanda → query intera → query + "architettura".
+  // Ordine: focus (domanda) → edificio pulito → "edificio + autore" → autore →
+  //         argomento → query intera → query + "architettura".
   const focus = focusQuery(query);
-  // Edificio "pulito": prima del primo "/" o "," (es. "Villa Savoye, Poissy"
-  // → "Villa Savoye") per dare a viaSummary una chance di match esatto.
-  const ediShort = hints?.edificio?.split(/[,/]/)[0].trim();
-  const argShort = hints?.argomento?.split(/[,/]/)[0].trim();
+  const ediShort = cleanEntity(hints?.edificio);
+  const argShort = cleanEntity(hints?.argomento);
   const candidates = [
+    focus,
     ediShort,
-    hints?.edificio,
     ediShort && hints?.autore ? `${ediShort} ${hints.autore}` : "",
     hints?.autore,
     argShort,
-    focus,
     query,
     `${query} architettura`,
   ].filter(Boolean) as string[];
