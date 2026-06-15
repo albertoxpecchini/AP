@@ -6,6 +6,7 @@ import "./styles/index.css";
 
 const Parole = lazy(() => import("./app/parole/Parole.tsx"));
 const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
+const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
 const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
 
 createRoot(document.getElementById("root")!).render(
@@ -25,6 +26,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Angoli />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/trivia"
+        element={
+          <Suspense fallback={null}>
+            <Trivia />
           </Suspense>
         }
       />
