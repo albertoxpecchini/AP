@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
-import { ArrowLeft, Moon, Sun, Flame, Check, X as XIcon, ImageOff, ListOrdered, RotateCcw, Send } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Flame, Check, X as XIcon, ListOrdered, RotateCcw, Send } from "lucide-react";
 
 import TriviaMenu, { type ChapterSelection, type TypeSelection } from "./TriviaMenu";
 import NicknameGate, { getStoredNick } from "./NicknameGate";
@@ -13,6 +13,7 @@ import { questionsForMany, prepareGame } from "./questions";
 import { isAnswerCorrect, type Question } from "./parseTrivia";
 import { fetchPhoto, prefetchPhoto } from "./photos";
 import { markSeen, coveragePct } from "./coverage";
+import { iconForChapter } from "./chapterIcons";
 import { gradeFromPct, isGoodGrade } from "./grade";
 import { computePackageGrades, typeLabelLong } from "./packageGrades";
 import { submitScore, type ScoreRow } from "./leaderboardApi";
@@ -149,9 +150,10 @@ export default function Trivia() {
     setPhotoUrl(undefined);
 
     let alive = true;
-    fetchPhoto(current.photoQuery).then(url => { if (alive) setPhotoUrl(url); });
+    const hintsFor = (q: Question) => ({ edificio: q.edificio, autore: q.autore, argomento: q.argomento });
+    fetchPhoto(current.photoQuery, hintsFor(current)).then(url => { if (alive) setPhotoUrl(url); });
     const nextQ = queue[idx + 1];
-    if (nextQ) prefetchPhoto(nextQ.photoQuery);
+    if (nextQ) prefetchPhoto(nextQ.photoQuery, hintsFor(nextQ));
 
     if (current.type === "aperta") setTimeout(() => openRef.current?.focus(), 60);
 
@@ -295,24 +297,31 @@ export default function Trivia() {
             <div className="trv-timer-fill" style={{ width: `${(remaining / TIME_PER_Q) * 100}%`, background: remaining < 5000 ? "#c0392b" : undefined }} />
           </div>
 
-          {/* Foto / fallback */}
+          {/* Foto + soggetto in evidenza: il TITOLO grande sopra la foto dice
+              subito di cosa/chi parla la domanda (edificio o argomento), così
+              nessuna domanda resta ambigua ("quale chiesa?"). */}
           <div className="trv-photo">
             {photoUrl === undefined ? (
               <div className="trv-photo-skel" />
             ) : photoUrl ? (
               <img src={photoUrl} alt="" loading="eager" className="trv-photo-img" />
             ) : (
-              <div className="trv-photo-fallback"><ImageOff size={28} /><span>{current.chapter}</span></div>
+              <div className="trv-photo-fallback"><span className="trv-photo-fallico">{iconForChapter(current.chapterId, 40)}</span></div>
             )}
-            <span className="trv-photo-chip">{typeLabel(current.type)}</span>
-          </div>
-
-          {/* Contesto SEMPRE visibile: di cosa/chi/quale opera si parla.
-              Così nessuna domanda resta ambigua ("quale chiesa?"). */}
-          <div className="trv-ctx">
-            <span className="trv-ctx-item trv-ctx-arg" title="Argomento">{current.argomento}</span>
-            {current.edificio && <span className="trv-ctx-item trv-ctx-edi" title="Edificio / opera">{current.edificio}</span>}
-            {current.autore && <span className="trv-ctx-item trv-ctx-aut" title="Autore">{current.autore}</span>}
+            <div className="trv-photo-grad" />
+            <span className="trv-photo-type">{typeLabel(current.type)}</span>
+            <div className="trv-photo-subject">
+              <span className="trv-subj-ico">{iconForChapter(current.chapterId, 18)}</span>
+              <div className="trv-subj-txt">
+                <span className="trv-subj-main">{(current.edificio || current.argomento)?.split(/[,/]/)[0].trim()}</span>
+                {(current.edificio && current.argomento) && (
+                  <span className="trv-subj-sub">{current.argomento}{current.autore ? ` · ${current.autore}` : ""}</span>
+                )}
+                {(!current.edificio && current.autore) && (
+                  <span className="trv-subj-sub">{current.autore}</span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Domanda */}
@@ -530,44 +539,59 @@ const styles = `
 .trv-timer-fill { height: 100%; background: var(--green); border-radius: 999px; transition: width .1s linear; }
 
 .trv-photo {
-  position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden;
-  background: var(--card); border: 1px solid var(--bord); box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+  position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 18px; overflow: hidden;
+  background: var(--card); border: 1px solid var(--bord); box-shadow: 0 6px 24px rgba(0,0,0,0.10);
 }
-.trv-photo-img { width: 100%; height: 100%; object-fit: cover; display: block; animation: trv-fade .35s ease; }
-@keyframes trv-fade { from { opacity: 0; } to { opacity: 1; } }
+.trv-photo-img { width: 100%; height: 100%; object-fit: cover; display: block; animation: trv-fade .45s ease; }
+@keyframes trv-fade { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
 .trv-photo-skel { position: absolute; inset: 0; background: linear-gradient(100deg, var(--card) 30%, rgba(47,125,74,0.08) 50%, var(--card) 70%); background-size: 200% 100%; animation: trv-shimmer 1.2s infinite; }
 @keyframes trv-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .trv-photo-fallback {
-  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem;
-  color: var(--sub); background: linear-gradient(160deg, rgba(47,125,74,0.10), rgba(217,164,0,0.06));
-  font-weight: 800; font-size: 1rem; text-align: center; padding: 1rem;
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--green); background: linear-gradient(160deg, rgba(47,125,74,0.14), rgba(217,164,0,0.08));
 }
-.trv-photo-chip {
-  position: absolute; top: .6rem; left: .6rem;
-  font-size: .62rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
-  background: rgba(16,56,32,0.82); color: #fff; padding: .25rem .6rem; border-radius: 999px;
+.trv-photo-fallico { opacity: .5; }
+
+/* Gradiente in basso per leggibilità del titolo-soggetto sopra ogni foto. */
+.trv-photo-grad {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(8,24,15,0.86) 0%, rgba(8,24,15,0.45) 32%, transparent 62%);
+}
+.trv-photo-type {
+  position: absolute; top: .7rem; right: .7rem;
+  font-size: .6rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em;
+  background: rgba(255,255,255,0.92); color: var(--green-d); padding: .28rem .65rem; border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+}
+.trv-page.dark .trv-photo-type { background: rgba(20,33,26,0.92); color: var(--green-d); }
+
+/* SOGGETTO in evidenza: dice subito di cosa parla la domanda. */
+.trv-photo-subject {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+  display: flex; align-items: center; gap: .7rem; padding: .85rem 1rem 1rem; color: #fff;
+}
+.trv-subj-ico {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 40px; height: 40px; border-radius: 11px;
+  background: rgba(255,255,255,0.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
+  backdrop-filter: blur(3px);
+}
+.trv-subj-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.trv-subj-main {
+  font-size: clamp(1.15rem, 5vw, 1.5rem); font-weight: 900; letter-spacing: -.01em;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.trv-subj-sub {
+  font-size: .76rem; font-weight: 700; opacity: .9; margin-top: .12rem;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
-/* Contesto domanda (argomento · edificio · autore) */
-.trv-ctx { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
-.trv-ctx-item {
-  display: inline-flex; align-items: center; gap: .3rem;
-  font-size: .72rem; font-weight: 700; line-height: 1;
-  padding: .32rem .6rem; border-radius: 999px;
-  border: 1px solid var(--bord); background: var(--card); color: var(--sub);
-  max-width: 100%; white-space: normal;
+.trv-q {
+  font-size: clamp(1.15rem, 4.5vw, 1.5rem); font-weight: 800; margin: 0; line-height: 1.3;
+  padding-left: .9rem; border-left: 4px solid var(--green); border-radius: 2px;
 }
-/* Pallini-prefisso colorati per distinguere a colpo d'occhio i tre campi. */
-.trv-ctx-item::before {
-  content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-}
-.trv-ctx-arg { color: var(--green-d); border-color: rgba(47,125,74,0.4); }
-.trv-ctx-arg::before { background: var(--green); }
-.trv-ctx-edi::before { background: var(--gold); }
-.trv-ctx-aut::before { background: #3a7bbf; }
-.trv-page.dark .trv-ctx-aut::before { background: #6fa8dc; }
-
-.trv-q { font-size: clamp(1.15rem, 4.5vw, 1.5rem); font-weight: 800; margin: 0; line-height: 1.3; }
 
 /* Multipla */
 .trv-opts { display: flex; flex-direction: column; gap: .55rem; }

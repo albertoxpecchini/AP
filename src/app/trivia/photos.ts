@@ -23,6 +23,13 @@ const SS_PREFIX = "trivia-photo:";
 
 const memCache = new Map<string, Promise<string | null>>();
 
+/** Entità strutturate del capitolo: i migliori indizi per una foto pertinente. */
+export interface PhotoHints {
+  edificio?: string;
+  autore?: string;
+  argomento?: string;
+}
+
 function ssGet(key: string): string | null | undefined {
   try {
     const raw = sessionStorage.getItem(SS_PREFIX + key);
@@ -41,10 +48,13 @@ function withTimeout(): { signal: AbortSignal; done: () => void } {
 }
 
 // Scarta immagini palesemente non-foto (loghi, icone, mappe, stemmi, bandiere).
+// IMPORTANTE: si analizza SOLO il nome file, non l'host: ogni foto Wikimedia sta
+// su "upload.wikimedia.org", quindi cercare "wikimedia" nell'intero URL scartava
+// QUALSIASI immagine (era la causa per cui non caricava mai nessuna foto).
 function looksBad(url: string): boolean {
-  const u = url.toLowerCase();
-  if (u.endsWith(".svg")) return true;
-  return /logo|icon|flag|coat[_-]?of[_-]?arms|stemma|bandiera|map|mappa|disambig|wiki(media|pedia)|commons-logo|edit-icon|ambox|question_book/.test(u);
+  const file = (url.split("/").pop() || url).toLowerCase();
+  if (file.endsWith(".svg")) return true;
+  return /logo|icon|flag|coat[_-]?of[_-]?arms|stemma|bandiera|[_-]map[_.-]|mappa|disambig|commons-logo|edit-icon|ambox|question_book/.test(file);
 }
 
 // ── (1) REST summary: di solito l'immagine più rappresentativa della pagina ──
@@ -124,11 +134,29 @@ function focusQuery(text: string): string {
   return (best && best.trim().split(" ").length >= 1 && /[A-ZÀ-Þ]/.test(best)) ? best.trim() : "";
 }
 
-async function resolve(query: string): Promise<string | null> {
-  // candidati in ordine: query mirata sui nomi propri, poi la query intera,
-  // infine la query intera + "architettura" come rete di sicurezza tematica.
+async function resolve(query: string, hints?: PhotoHints): Promise<string | null> {
+  // I CANDIDATI MIGLIORI sono le entità strutturate del capitolo (edificio,
+  // autore, argomento): sono titoli/voci Wikipedia "puliti" che risolvono quasi
+  // sempre, a differenza della frase-domanda intera. Si provano PRIMA.
+  //
+  // Ordine: edificio → "edificio + autore" → autore → argomento → query mirata
+  // sui nomi propri della domanda → query intera → query + "architettura".
   const focus = focusQuery(query);
-  const candidates = [focus, query, `${query} architettura`].filter(Boolean) as string[];
+  // Edificio "pulito": prima del primo "/" o "," (es. "Villa Savoye, Poissy"
+  // → "Villa Savoye") per dare a viaSummary una chance di match esatto.
+  const ediShort = hints?.edificio?.split(/[,/]/)[0].trim();
+  const argShort = hints?.argomento?.split(/[,/]/)[0].trim();
+  const candidates = [
+    ediShort,
+    hints?.edificio,
+    ediShort && hints?.autore ? `${ediShort} ${hints.autore}` : "",
+    hints?.autore,
+    argShort,
+    focus,
+    query,
+    `${query} architettura`,
+  ].filter(Boolean) as string[];
+
   const tried = new Set<string>();
   for (const c of candidates) {
     const key = c.trim().toLowerCase();
@@ -144,8 +172,11 @@ async function resolve(query: string): Promise<string | null> {
  * Ritorna l'URL di una foto pertinente alla query, oppure null se non trovata.
  * Memoizza risultati e "miss" per evitare richieste ripetute.
  */
-export function fetchPhoto(query: string): Promise<string | null> {
-  const key = query.trim().toLowerCase();
+export function fetchPhoto(query: string, hints?: PhotoHints): Promise<string | null> {
+  // La chiave include gli indizi: capitoli diversi con la stessa domanda generica
+  // ("Chi lo progettò?") devono poter avere foto diverse.
+  const key = [query, hints?.edificio, hints?.autore, hints?.argomento]
+    .filter(Boolean).join("|").trim().toLowerCase();
   if (!key) return Promise.resolve(null);
 
   const cached = memCache.get(key);
@@ -158,12 +189,12 @@ export function fetchPhoto(query: string): Promise<string | null> {
     return p;
   }
 
-  const p = resolve(query).then(url => { ssSet(key, url); return url; });
+  const p = resolve(query, hints).then(url => { ssSet(key, url); return url; });
   memCache.set(key, p);
   return p;
 }
 
 /** Avvia il fetch senza attenderlo: scalda la cache per la domanda successiva. */
-export function prefetchPhoto(query: string): void {
-  void fetchPhoto(query);
+export function prefetchPhoto(query: string, hints?: PhotoHints): void {
+  void fetchPhoto(query, hints);
 }
