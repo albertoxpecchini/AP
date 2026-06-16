@@ -49,6 +49,15 @@ export default function TriviaMenu({
   // Set di tipi domanda selezionati. Vuoto = "Tutti i tipi".
   const [types, setTypes] = useState<Set<QType>>(new Set());
 
+  // Desktop: "torcia" del mouse. Scrive la posizione del cursore (in %) nelle
+  // CSS var --mx/--my della tile sotto al puntatore, così un alone verde sfumato
+  // segue il mouse (vedi .trm-tile-spot). Solo per puntatori reali.
+  const handleTileMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+    e.currentTarget.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+  };
+
   const allMode = selected.size === 0;
   const toggleChapter = (id: string) =>
     setSelected(prev => {
@@ -219,9 +228,11 @@ export default function TriviaMenu({
               key={c.id}
               type="button"
               onClick={() => toggleChapter(c.id)}
+              onMouseMove={handleTileMove}
               className={`trm-tile${on ? " is-on" : ""}${cov >= 100 ? " is-done" : ""}`}
               title={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
             >
+              <span className="trm-tile-spot" aria-hidden />
               <span className="trm-tile-glow" aria-hidden />
               <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
               <span className="trm-tile-ring">{progressRing(seen, total, cov)}</span>
@@ -246,9 +257,11 @@ export default function TriviaMenu({
               key={t.id}
               type="button"
               onClick={() => toggleType(t.id)}
+              onMouseMove={handleTileMove}
               className={`trm-tile${on ? " is-on" : ""}`}
               title={t.desc}
             >
+              <span className="trm-tile-spot" aria-hidden />
               <span className="trm-tile-glow" aria-hidden />
               <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
               <span className="trm-tile-title trm-tile-title-type">{t.label}</span>
@@ -509,6 +522,18 @@ export default function TriviaMenu({
           background:linear-gradient(155deg, var(--gv3) 0%, var(--gv) 45%, var(--gv2) 100%);
           opacity:0; transition:opacity .28s ease;
         }
+        /* "torcia" del cursore: alone verde sfumato centrato su --mx/--my (vedi
+           handleTileMove). Resta sotto al contenuto (z-index:-1) e sopra al fondo. */
+        .trm-tile-spot {
+          position:absolute; inset:0; z-index:-1; pointer-events:none;
+          border-radius:inherit; opacity:0; transition:opacity .25s ease;
+          background:radial-gradient(circle 70px at var(--mx,50%) var(--my,50%),
+            ${dark ? "rgba(111,224,166,0.30)" : "rgba(47,158,95,0.28)"} 0%, transparent 70%);
+        }
+        @media (hover: hover) {
+          .trm-tile:hover .trm-tile-spot { opacity:1; }
+        }
+
         /* alone luminoso animato (shimmer) che scorre allo hover */
         .trm-tile-glow {
           position:absolute; inset:-40%; z-index:-1; pointer-events:none;
@@ -517,24 +542,32 @@ export default function TriviaMenu({
           transition:opacity .3s, transform .5s ease;
         }
 
-        .trm-tile:hover {
-          transform:translateY(-4px);
-          border-color:var(--gv);
-          box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(31,107,60,0.30)"};
+        /* Hover effetti solo su dispositivi con puntatore reale (mouse):
+           su mobile lo scroll-touch lasciava "appiccicato" l'hover, accendendo
+           le tile mentre si scorre. Ora da telefono conta solo il click (is-on). */
+        @media (hover: hover) {
+          .trm-tile:hover {
+            transform:translateY(-4px);
+            border-color:var(--gv);
+            box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(31,107,60,0.30)"};
+          }
+          .trm-tile:hover::before { opacity:1; }
+          .trm-tile:hover .trm-tile-glow { opacity:1; transform:translate(0,0) scale(1); }
+          .trm-tile:hover .trm-tile-title { color:#fff; }
+          .trm-tile:hover .trm-tile-mark { color:rgba(255,255,255,0.9); opacity:0.95; transform:scale(1.15) rotate(-4deg); }
+          .trm-tile:hover .trm-tile-title { text-shadow:0 1px 8px rgba(0,0,0,0.25); }
+          .trm-tile:hover .trm-tile-ring { filter:brightness(0) invert(1) opacity(0.92); }
         }
-        .trm-tile:active { transform:translateY(-1px) scale(0.97); }
+        /* Touch: tap fugace mentre scorri = solo bordo verde, nessun "accendi". */
+        .trm-tile:active { transform:translateY(-1px) scale(0.97); border-color:var(--gv); }
 
-        /* HOVER e SELEZIONATO: la card diventa verde pieno, testo bianco */
-        .trm-tile:hover::before { opacity:1; }
-        .trm-tile:hover .trm-tile-glow { opacity:1; transform:translate(0,0) scale(1); }
+        /* SELEZIONATO (click reale): la card diventa verde pieno, testo bianco */
         .trm-tile.is-on::before { opacity:1; }
         .trm-tile.is-on {
           border-color:var(--gv3);
           box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(31,107,60,0.35)"};
         }
-        .trm-tile:hover .trm-tile-title,
         .trm-tile.is-on .trm-tile-title { color:#fff; }
-        .trm-tile:hover .trm-tile-mark,
         .trm-tile.is-on .trm-tile-mark { color:rgba(255,255,255,0.9); opacity:0.95; transform:scale(1.15) rotate(-4deg); }
 
         /* logo a filigrana grande nell'angolo alto-sinistra */
@@ -557,13 +590,11 @@ export default function TriviaMenu({
           transition:color .25s;
           text-shadow:0 1px 0 rgba(255,255,255,0.04);
         }
-        .trm-tile:hover .trm-tile-title,
         .trm-tile.is-on .trm-tile-title { text-shadow:0 1px 8px rgba(0,0,0,0.25); }
         .trm-tile-title-type { font-size:0.92rem; -webkit-line-clamp:2; }
 
         /* anello progressi: angolo in alto a destra; su verde diventa chiaro */
         .trm-tile-ring { position:absolute; top:7px; right:7px; z-index:1; transition:filter .25s; }
-        .trm-tile:hover .trm-tile-ring,
         .trm-tile.is-on .trm-tile-ring { filter:brightness(0) invert(1) opacity(0.92); }
 
         /* spunta "accesa": angolo basso-destra, pop elastico */

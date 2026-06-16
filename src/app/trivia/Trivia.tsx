@@ -210,6 +210,8 @@ export default function Trivia() {
     setScore(s => s + awarded);
     setWasCorrect(correct);
     setRevealed(true);
+    // Feedback aptico: vibrazione corta se giusto, doppia "buzz" se sbagliato.
+    navigator.vibrate?.(correct ? 18 : [0, 30, 40, 30]);
     setPlayed(prev => [...prev, { question: current, correct, awarded, ms: elapsed }]);
 
     if (correct) {
@@ -710,7 +712,7 @@ const styles = `
 }
 .trv-opt:nth-child(1){animation-delay:.02s}.trv-opt:nth-child(2){animation-delay:.07s}.trv-opt:nth-child(3){animation-delay:.12s}.trv-opt:nth-child(4){animation-delay:.17s}
 @keyframes trv-opt-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.trv-opt:not(:disabled):hover { border-color: var(--green); transform: translateY(-1px); }
+@media (hover: hover) { .trv-opt:not(:disabled):hover { border-color: var(--green); transform: translateY(-1px); } }
 .trv-opt-letter {
   width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px;
   background: var(--bord); color: var(--green-d); font-weight: 900;
