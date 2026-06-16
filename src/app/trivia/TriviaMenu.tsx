@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useLayoutEffect } from "react";
 import { Link } from "react-router";
 import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";
@@ -48,6 +48,41 @@ export default function TriviaMenu({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // Set di tipi domanda selezionati. Vuoto = "Tutti i tipi".
   const [types, setTypes] = useState<Set<QType>>(new Set());
+
+  // ── Fit-to-box: ogni titolo dentro la tile viene ingrandito al massimo finché
+  //    riempie il riquadro (stile "Bolt"). Un singolo font-size CSS non basta:
+  //    titoli corti ("Torre Eiffel") e lunghi devono riempire entrambi. Qui per
+  //    ogni .trm-tile-title cerco (binary search) il font-size più grande che ci
+  //    sta in larghezza E altezza. Rigirato a ogni resize e cambio ordine. ──
+  const gridWrapRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const fitAll = () => {
+      const root = gridWrapRef.current;
+      if (!root) return;
+      const titles = root.querySelectorAll<HTMLElement>(".trm-tile-titlebox .trm-tile-title");
+      titles.forEach(el => {
+        const box = el.parentElement;
+        if (!box) return;
+        // altezza disponibile = spazio dato al titolo (flex:1) nella tile
+        const maxW = el.clientWidth;
+        const maxH = box.clientHeight;
+        if (!maxW || !maxH) return;
+        let lo = 11, hi = 64, best = 11;
+        for (let i = 0; i < 8; i++) {
+          const mid = (lo + hi) / 2;
+          el.style.fontSize = mid + "px";
+          if (el.scrollHeight <= maxH && el.scrollWidth <= maxW) { best = mid; lo = mid; }
+          else hi = mid;
+        }
+        el.style.fontSize = best + "px";
+      });
+    };
+    fitAll();
+    window.addEventListener("resize", fitAll);
+    // i font possono caricare dopo il primo layout
+    (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready.then(fitAll);
+    return () => window.removeEventListener("resize", fitAll);
+  });
 
   // Desktop: "torcia" del mouse. Scrive la posizione del cursore (in %) nelle
   // CSS var --mx/--my della tile sotto al puntatore, così un alone verde sfumato
@@ -237,7 +272,7 @@ export default function TriviaMenu({
               <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
               <span className="trm-tile-ring">{progressRing(seen, total, cov)}</span>
               <span className="trm-tile-mark" aria-hidden>{iconForChapter(c.id)}</span>
-              <span className="trm-tile-title">{c.title}</span>
+              <span className="trm-tile-titlebox"><span className="trm-tile-title">{c.title}</span></span>
             </button>
           );
         })}
@@ -362,7 +397,7 @@ export default function TriviaMenu({
   };
 
   return (
-    <div className="trm-root">
+    <div className="trm-root" ref={gridWrapRef}>
       {/* ════════ MOBILE ════════ */}
       <div className="trm-mobile">
         <div className="trm-hero">
@@ -580,23 +615,25 @@ export default function TriviaMenu({
         }
         .trm-tile-mark svg { width:28px; height:28px; }
 
-        /* TITOLO protagonista: dimensionato in cqw (unità sulla larghezza della
-           tile, container-type:size) così il testo SCALA col riquadro e lo riempie.
-           Niente font fisso: tile piccole = testo proporzionalmente più piccolo. */
+        /* TITOLO protagonista stile "Bolt": riempie tutta l'area disponibile.
+           .trm-tile-titlebox è l'area (flex:1) che il JS misura; .trm-tile-title è
+           il testo, ingrandito via JS (fit-to-box) fino a riempire larghezza+altezza. */
+        .trm-tile-titlebox {
+          position:relative; z-index:1; flex:1 1 auto; width:100%;
+          display:flex; align-items:flex-end; min-height:0; overflow:hidden;
+        }
         .trm-tile-title {
-          position:relative; z-index:1;
-          font-size:clamp(0.92rem, 13cqw, 1.7rem);
-          font-weight:800; line-height:1.06;
-          letter-spacing:-0.02em;
+          font-size:1.6rem; /* fallback prima del fit JS */
+          font-weight:900; line-height:0.96;
+          letter-spacing:-0.03em;
           color:${textMain};
-          flex:1 1 auto; display:flex; align-items:flex-end;
-          overflow:hidden; width:100%;
-          word-break:break-word; hyphens:auto;
+          width:100%;
+          word-break:break-word; hyphens:auto; text-wrap:balance;
           transition:color .25s;
           text-shadow:0 1px 0 rgba(255,255,255,0.04);
         }
         .trm-tile.is-on .trm-tile-title { text-shadow:0 1px 8px rgba(0,0,0,0.25); }
-        .trm-tile-title-type { font-size:clamp(0.95rem, 8cqw, 1.45rem); -webkit-line-clamp:2; }
+        .trm-tile-title-type { font-size:clamp(0.95rem, 8cqw, 1.45rem); font-weight:800; -webkit-line-clamp:2; }
 
         /* anello progressi: angolo in alto a destra; su verde diventa chiaro */
         .trm-tile-ring { position:absolute; top:7px; right:7px; z-index:1; transition:filter .25s; }
