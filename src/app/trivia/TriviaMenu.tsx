@@ -1,6 +1,7 @@
 import { useMemo, useState, useRef, useLayoutEffect } from "react";
 import { Link } from "react-router";
-import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp } from "lucide-react";
+import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp, ListChecks, ToggleLeft, PencilLine, MoreHorizontal, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";
 import { chapterCoveragePct, chapterCoverageCount } from "./coverage";
 import { iconForChapter } from "./chapterIcons";
@@ -39,10 +40,10 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 ];
 
 // Tipi di domanda selezionabili, con etichetta e icona "da gioco".
-const TYPE_DEFS: { id: QType; label: string; desc: string; color: string }[] = [
-  { id: "multipla",   label: "Scelta multipla", desc: "Scegli l'opzione giusta", color: "#2F7D4A" },
-  { id: "vero-falso", label: "Vero o Falso",    desc: "Vero oppure falso",       color: "#3a7bbf" },
-  { id: "aperta",     label: "Completamento",   desc: "Scrivi tu la risposta",   color: "#b5651d" },
+const TYPE_DEFS: { id: QType; label: string; desc: string; icon: LucideIcon }[] = [
+  { id: "multipla",   label: "Scelta multipla", desc: "Scegli l'opzione giusta", icon: ListChecks },
+  { id: "vero-falso", label: "Vero o Falso",    desc: "Vero oppure falso",       icon: ToggleLeft },
+  { id: "aperta",     label: "Completamento",   desc: "Scrivi tu la risposta",   icon: PencilLine },
 ];
 
 interface TriviaMenuProps {
@@ -66,6 +67,9 @@ export default function TriviaMenu({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // Set di tipi domanda selezionati. Vuoto = "Tutti i tipi".
   const [types, setTypes] = useState<Set<QType>>(new Set());
+  // Drawer "Altro" su mobile: raccoglie le azioni dopo Gioca (classifica, pagella…)
+  // così la sequenza 1-2-3 resta pulita.
+  const [moreOpen, setMoreOpen] = useState(false);
 
   // ── Fit-to-box "a parole" (stile Bolt): ogni PAROLA del titolo va su una riga
   //    propria, MAI tagliata, e ha dimensione INDIPENDENTE — ognuna ingrandita
@@ -167,6 +171,16 @@ export default function TriviaMenu({
   const totalQuestions = CHAPTERS.reduce((s, c) => s + c.questions.length, 0);
   // Domande disponibili nella selezione corrente (capitoli + tipi).
   const availableCount = questionsForMany([...selected], [...types]).length;
+  // Quante domande di OGNI tipo nei capitoli scelti (ignora il filtro tipi):
+  // mostrato in leggero sul tasto del tipo, si aggiorna selezionando i capitoli.
+  const countByType = useMemo(() => {
+    const ids = [...selected];
+    const m = {} as Record<QType, number>;
+    (["multipla", "vero-falso", "aperta"] as QType[]).forEach(t => {
+      m[t] = questionsForMany(ids, [t]).length;
+    });
+    return m;
+  }, [selected]);
   const selectedName = allMode
     ? "Tutti i capitoli"
     : selected.size === 1
@@ -293,6 +307,8 @@ export default function TriviaMenu({
               className={`trm-tile${on ? " is-on" : ""}${cov >= 100 ? " is-done" : ""}`}
               title={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
             >
+              {/* immagine/segnaposto grafico al ~30% dietro al titolo (icona gigante) */}
+              <span className="trm-tile-bg" aria-hidden>{iconForChapter(c.id, 130)}</span>
               <span className="trm-tile-spot" aria-hidden />
               <span className="trm-tile-glow" aria-hidden />
               <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
@@ -310,32 +326,40 @@ export default function TriviaMenu({
     </div>
   );
 
-  // ── Tipi di domanda: tre tile verdi in riga (stesso linguaggio dei capitoli) ──
+  // ── Tipi di domanda: tre tasti grossi con ICONA + conteggio domande per tipo ──
   const TypeList = (
     <div>
-      <p className="trm-section-label" style={{ color: vio }}>Tipi di domanda</p>
-      <div className="trm-grid trm-grid-types">
+      <p className="trm-section-label" style={{ color: vio }}>
+        <span className="trm-step" style={{ background: vio }}>2</span>Tipi di domanda
+      </p>
+      <div className="trm-types-row">
         {TYPE_DEFS.map(t => {
           const on = types.has(t.id);
+          const n = countByType[t.id];
+          const Icon = t.icon;
           return (
             <button
               key={t.id}
               type="button"
               onClick={() => toggleType(t.id)}
               onMouseMove={handleTileMove}
-              className={`trm-tile trm-vio${on ? " is-on" : ""}`}
+              className={`trm-typebtn trm-vio${on ? " is-on" : ""}`}
               title={t.desc}
+              disabled={n === 0}
             >
               <span className="trm-tile-spot" aria-hidden />
-              <span className="trm-tile-glow" aria-hidden />
-              <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
-              <span className="trm-tile-title trm-tile-title-type">{t.label}</span>
+              <span className="trm-typebtn-ic"><Icon size={26} strokeWidth={2.2} /></span>
+              <span className="trm-typebtn-label">{t.label}</span>
+              <span className="trm-typebtn-count">{n} <span className="trm-typebtn-count-u">dom.</span></span>
+              <span className="trm-typebtn-check" aria-hidden>
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
+              </span>
             </button>
           );
         })}
       </div>
-      <p style={{ fontSize: "0.72rem", color: availableCount === 0 ? "#c0392b" : lbl, margin: "0.4rem 0 0 0.2rem", fontWeight: availableCount === 0 ? 700 : 400 }}>
-        {allTypes ? "Tutti i tipi (nessun filtro)" : `${types.size} tipi selezionati`}
+      <p style={{ fontSize: "0.78rem", color: availableCount === 0 ? "#c0392b" : lbl, margin: "0.5rem 0 0 0.2rem", fontWeight: availableCount === 0 ? 800 : 600 }}>
+        {allTypes ? "Tutti i tipi" : `${types.size} tipi`}
         {" · "}
         {availableCount === 0 ? "nessuna domanda con questi filtri" : `${availableCount} domande nel quiz`}
       </p>
@@ -361,12 +385,29 @@ export default function TriviaMenu({
       onMouseEnter={e => { if (availableCount > 0) { e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-1px)"; } }}
       onMouseLeave={e => { e.currentTarget.style.filter = ""; e.currentTarget.style.transform = ""; }}
     >
-      <div>
-        <div style={{ fontSize: "0.98rem", fontWeight: 800 }}>Gioca</div>
-        <div style={{ fontSize: "0.72rem", opacity: 0.85, marginTop: "0.1rem" }}>{selectedName} · {availableCount} domande</div>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+        <span className="trm-step" style={{ background: "rgba(255,255,255,0.22)", color: "#fff", width: 26, height: 26, fontSize: "0.9rem" }}>3</span>
+        <div>
+          <div style={{ fontSize: "1.1rem", fontWeight: 900 }}>Gioca</div>
+          <div style={{ fontSize: "0.74rem", opacity: 0.9, marginTop: "0.1rem" }}>{selectedName} · {availableCount} domande</div>
+        </div>
       </div>
-      <ChevronRight size={20} />
+      <ChevronRight size={22} />
     </button>
+  );
+
+  // Azioni secondarie (dopo Gioca): su desktop vanno nel pannello viola a sinistra,
+  // su mobile dentro il drawer "Altro". Stesso markup, riusato.
+  const SecondaryActions = (onLight: boolean) => (
+    <>
+      {LbBtn}
+      {PagellaBtn}
+      <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={onLight ? { color: vio, border: `1.5px solid ${vBord}` } : undefined}>
+        <BookOpen size={18} /> Come si gioca
+      </button>
+      {NickChip}
+      {BackBtn}
+    </>
   );
 
   const LbBtn = (
@@ -441,19 +482,31 @@ export default function TriviaMenu({
         </div>
         <div className="trm-body">
           {StatsCard(false)}
-          <p className="trm-section-label" style={{ color: lbl }}>Scegli i capitoli</p>
+          <p className="trm-section-label" style={{ color: icon }}>
+            <span className="trm-step" style={{ background: icon }}>1</span>Scegli i capitoli
+          </p>
           {ChapterList}
           {TypeList}
           {PlayBtn}
-          {LbBtn}
-          {PagellaBtn}
-          <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
-            <BookOpen size={18} /> Come si gioca
+          {/* Tutto ciò che viene dopo Gioca è nel drawer "Altro" */}
+          <button type="button" className="trm-more-toggle trm-vio-btn" onClick={() => setMoreOpen(true)} style={{ color: vio, border: `1.5px solid ${vBord}` }}>
+            <MoreHorizontal size={18} /> Altro
           </button>
-          {NickChip}
-          {BackBtn}
           <p style={{ fontSize: "0.7rem", color: note, textAlign: "center", margin: 0 }}>Più rispondi giusto e veloce, più punti · classifica live</p>
         </div>
+
+        {/* Drawer "Altro": azioni secondarie, fuori dalla sequenza di gioco */}
+        {moreOpen && (
+          <div className="trm-drawer-back" onClick={() => setMoreOpen(false)}>
+            <div className="trm-drawer" onClick={e => e.stopPropagation()}>
+              <div className="trm-drawer-head">
+                <span>Altro</span>
+                <button type="button" onClick={() => setMoreOpen(false)} aria-label="Chiudi" className="trm-drawer-x"><X size={20} /></button>
+              </div>
+              <div className="trm-actions">{SecondaryActions(true)}</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ════════ DESKTOP ════════ */}
@@ -464,22 +517,17 @@ export default function TriviaMenu({
           <p className="trm-tagline">Storia dell'Architettura</p>
           {BookCover}
           {StatsCard(true)}
+          {/* Azioni secondarie nel pannello a sinistra: non confondono la sequenza di gioco */}
+          <div className="trm-actions trm-actions-dark">{SecondaryActions(false)}</div>
           <p className="trm-kicker" style={{ position: "static", marginTop: "auto", opacity: 1 }}>Web Game · Quiz</p>
         </div>
         <div className="trm-desktop-right" style={{ background: bg }}>
-          <p className="trm-section-label" style={{ color: lbl }}>Scegli i capitoli</p>
+          <p className="trm-section-label" style={{ color: icon }}>
+            <span className="trm-step" style={{ background: icon }}>1</span>Scegli i capitoli
+          </p>
           {ChapterList}
           {TypeList}
           {PlayBtn}
-          <div style={{ display: "flex", gap: "0.6rem" }}>
-            <div style={{ flex: 1 }}>{LbBtn}</div>
-            <div style={{ flex: 1 }}>{PagellaBtn}</div>
-          </div>
-          <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
-            <BookOpen size={18} /> Come si gioca
-          </button>
-          {NickChip}
-          {BackBtn}
         </div>
       </div>
 
@@ -551,9 +599,82 @@ export default function TriviaMenu({
         .trm-stat-sep { width:1px; margin:0 0.4rem; flex-shrink:0; }
 
         .trm-section-label {
-          font-size:0.65rem; font-weight:700; text-transform:uppercase;
-          letter-spacing:0.12em; margin:0 0 0.35rem 0.2rem;
+          font-size:0.72rem; font-weight:800; text-transform:uppercase;
+          letter-spacing:0.1em; margin:0 0 0.4rem 0.1rem;
+          display:flex; align-items:center; gap:0.5rem;
         }
+        /* pallino numerato della sequenza (1 capitoli, 2 tipi, 3 gioca) */
+        .trm-step {
+          display:inline-flex; align-items:center; justify-content:center;
+          width:20px; height:20px; border-radius:999px; flex-shrink:0;
+          color:#fff; font-size:0.72rem; font-weight:900; line-height:1;
+          box-shadow:0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* ─── Tipi di domanda: tasti grossi con icona + conteggio (importanti!) ─── */
+        .trm-types-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0.55rem; margin-top:0.4rem; }
+        .trm-typebtn {
+          --gv:#7c3aed; --gv2:#6024c4; --gv3:#9b5cf6;
+          --spot:${dark ? "rgba(196,165,255,0.32)" : "rgba(124,58,237,0.26)"};
+          position:relative; isolation:isolate; overflow:hidden;
+          display:flex; flex-direction:column; align-items:center; justify-content:center;
+          gap:0.3rem; padding:0.85rem 0.5rem 0.7rem;
+          min-height:108px; border:1.5px solid ${vBord}; border-radius:16px;
+          background:${dark ? "rgba(155,92,246,0.08)" : "rgba(124,58,237,0.05)"};
+          color:${textMain}; cursor:pointer; font-family:inherit;
+          transition:transform .18s, border-color .18s, box-shadow .18s, background .2s;
+        }
+        .trm-typebtn:disabled { opacity:0.4; cursor:not-allowed; }
+        @media (hover:hover) {
+          .trm-typebtn:not(:disabled):hover { transform:translateY(-3px); border-color:var(--gv3); box-shadow:0 10px 24px ${dark ? "rgba(0,0,0,0.5)" : "rgba(124,58,237,0.22)"}; }
+        }
+        .trm-typebtn:active { transform:translateY(-1px) scale(0.98); }
+        .trm-typebtn.is-on {
+          background:linear-gradient(155deg, var(--gv3) 0%, var(--gv) 55%, var(--gv2) 100%);
+          border-color:var(--gv3); color:#fff;
+          box-shadow:0 0 0 2px var(--gv3), 0 10px 26px ${dark ? "rgba(0,0,0,0.55)" : "rgba(91,33,182,0.38)"};
+        }
+        .trm-typebtn-ic { color:var(--gv); display:flex; transition:color .2s, transform .2s; }
+        .trm-typebtn.is-on .trm-typebtn-ic { color:#fff; transform:scale(1.08); }
+        .trm-typebtn-label { font-size:0.92rem; font-weight:800; line-height:1.1; text-align:center; }
+        .trm-typebtn-count { font-size:0.78rem; font-weight:800; opacity:0.62; font-variant-numeric:tabular-nums; }
+        .trm-typebtn.is-on .trm-typebtn-count { opacity:0.92; }
+        .trm-typebtn-count-u { font-weight:600; opacity:0.8; }
+        .trm-typebtn-check {
+          position:absolute; top:7px; right:7px; width:18px; height:18px; border-radius:6px;
+          background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center;
+          transform:scale(0); opacity:0; transition:transform .22s cubic-bezier(.2,.9,.3,1.6), opacity .18s;
+        }
+        .trm-typebtn.is-on .trm-typebtn-check { transform:scale(1); opacity:1; }
+
+        /* azioni secondarie raggruppate (drawer mobile / pannello desktop) */
+        .trm-actions { display:flex; flex-direction:column; gap:0.55rem; width:100%; }
+        .trm-actions-dark .trm-tut-btn, .trm-actions-dark .trm-back-btn {
+          background:rgba(255,255,255,0.10); color:#fff !important; border:1px solid rgba(255,255,255,0.16) !important;
+        }
+        .trm-actions-dark .trm-tut-btn:hover, .trm-actions-dark .trm-back-btn:hover { background:rgba(255,255,255,0.18); }
+        .trm-actions-dark .trm-tut-btn svg, .trm-actions-dark .trm-back-btn svg { color:#c4a5ff; }
+        .trm-actions-dark .trm-nick-chip { color:rgba(255,255,255,0.85) !important; border-color:rgba(255,255,255,0.22) !important; }
+        .trm-actions-dark .trm-nick-chip b { color:#fff !important; }
+
+        /* toggle "Altro" (mobile) */
+        .trm-more-toggle {
+          display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; width:100%;
+          padding:0.85rem 1rem; border-radius:13px; font-size:0.95rem; font-weight:800;
+          background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          cursor:pointer; font-family:inherit; transition:background .15s;
+        }
+        /* drawer mobile */
+        .trm-drawer-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; animation:trm-fade .2s ease; }
+        @keyframes trm-fade { from{opacity:0;} to{opacity:1;} }
+        .trm-drawer {
+          width:100%; background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 60%,#103820 130%);
+          border-radius:20px 20px 0 0; padding:1.1rem 1.1rem 1.6rem;
+          box-shadow:0 -10px 40px rgba(0,0,0,0.4); animation:trm-up .25s cubic-bezier(.2,.8,.3,1);
+        }
+        @keyframes trm-up { from{transform:translateY(100%);} to{transform:none;} }
+        .trm-drawer-head { display:flex; align-items:center; justify-content:space-between; color:#fff; font-weight:800; font-size:1.05rem; margin-bottom:0.9rem; padding:0 0.2rem; }
+        .trm-drawer-x { background:rgba(255,255,255,0.12); border:none; color:#fff; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
         .trm-tut-btn, .trm-back-btn {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
           width:100%;
@@ -667,6 +788,17 @@ export default function TriviaMenu({
           transition:transform .3s cubic-bezier(.2,.7,.3,1.5), color .25s, opacity .25s;
         }
         .trm-tile-mark svg { width:28px; height:28px; }
+
+        /* "immagine" di sfondo (segnaposto grafico): icona gigante del capitolo al
+           ~30%, in basso a destra, dietro il titolo. Su tile accesa diventa bianca. */
+        .trm-tile-bg {
+          position:absolute; right:-14px; bottom:-18px; z-index:-1; pointer-events:none;
+          color:var(--gv); opacity:0.16;
+          transition:opacity .25s, color .25s, transform .3s;
+        }
+        .trm-tile-bg svg { width:130px; height:130px; }
+        .trm-tile:hover .trm-tile-bg,
+        .trm-tile.is-on .trm-tile-bg { color:#fff; opacity:0.30; transform:scale(1.06) rotate(-4deg); }
 
         /* TITOLO protagonista stile "Bolt": riempie tutta l'area disponibile.
            .trm-tile-titlebox è l'area (flex:1) che il JS misura; .trm-tile-title è
