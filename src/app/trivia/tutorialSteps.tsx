@@ -14,6 +14,8 @@ const GREEN_LITE = "#2F9E5A";
 const BLUE = "#3a7bbf";
 const ORANGE = "#b5651d";
 const GOLD = "#D9A400";
+const VIOLA = "#7c3aed";
+const VIOLA_LITE = "#9b5cf6";
 
 // ── Passo 1 ─────────────────────────────────────────────────────────────────
 // "Tre tipi di domanda" — tre card che entrano a cascata, fluttuano in loop
@@ -229,21 +231,172 @@ function StreakVisual() {
   );
 }
 
+// ── Passo: CONTESTO sempre visibile ───────────────────────────────────────────
+// Banner argomento · autore · edificio che "monta" riga per riga sopra una
+// domanda finta → spiega che non sei mai senza riferimenti ("quale chiesa?").
+function ContextVisual() {
+  const rows = [
+    { k: "Argomento", v: "Sagrada Família", d: 0 },
+    { k: "Autore", v: "Antoni Gaudí", d: 0.18 },
+    { k: "Edificio", v: "Basilica, Barcellona", d: 0.36 },
+  ];
+  return (
+    <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", gap: "0.7rem" }}>
+      <div style={{
+        borderRadius: 14, overflow: "hidden",
+        border: `1px solid ${GREEN}33`,
+        boxShadow: `0 10px 24px ${GREEN}22`,
+        animation: "tut-card-in 0.5s cubic-bezier(.34,1.56,.64,1) both",
+      }}>
+        {/* banner contesto */}
+        <div style={{ background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LITE})`, padding: "0.7rem 0.85rem", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+          {rows.map(r => (
+            <div key={r.k} style={{
+              display: "flex", alignItems: "baseline", gap: "0.45rem",
+              animation: `tut-row-in 0.5s ease ${0.25 + r.d}s both`,
+            }}>
+              <span style={{ fontSize: "0.56rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.7)", width: 60, flexShrink: 0 }}>{r.k}</span>
+              <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#fff" }}>{r.v}</span>
+            </div>
+          ))}
+        </div>
+        {/* domanda finta sotto */}
+        <div style={{ background: "#fff", padding: "0.85rem", display: "flex", flexDirection: "column", gap: "0.5rem", animation: "tut-row-in 0.5s ease 0.6s both" }}>
+          <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3c4a41", lineHeight: 1.4 }}>In che anno iniziò la costruzione?</span>
+          <div style={{ display: "flex", gap: "0.4rem" }}>
+            {["1882", "1905", "1926"].map((o, i) => (
+              <span key={o} style={{
+                flex: 1, textAlign: "center", padding: "0.35rem", borderRadius: 8,
+                fontSize: "0.72rem", fontWeight: 800,
+                background: i === 0 ? `${GREEN}1a` : "rgba(0,0,0,0.05)",
+                color: i === 0 ? GREEN : "#7a8a80",
+                border: i === 0 ? `1.5px solid ${GREEN}` : "1.5px solid transparent",
+                animation: i === 0 ? "tut-pop-soft 2.6s ease 1s infinite" : "none",
+              }}>{o}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Passo: COPERTURA / progressi ──────────────────────────────────────────────
+// Una barra "DB esplorato" che si riempie + una pila di capitoli che fanno
+// "25/25" e diventano viola (completati). Conta su il numero.
+function CoverageVisual() {
+  const chapters = [
+    { name: "Neoclassicismo", n: "25/25", done: true, d: 0.2 },
+    { name: "Torre Eiffel", n: "25/25", done: true, d: 0.4 },
+    { name: "Bauhaus", n: "18/25", done: false, d: 0.6 },
+  ];
+  return (
+    <div style={{ width: "100%", maxWidth: 300, display: "flex", flexDirection: "column", gap: "1rem" }}>
+      {/* barra DB esplorato */}
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.07em", color: "#7a8a80", marginBottom: 5 }}>
+          <span>Database esplorato</span>
+          <span style={{ color: VIOLA, animation: "tut-blink 3s ease 0.3s infinite" }}>68%</span>
+        </div>
+        <div style={{ height: 9, borderRadius: 999, background: "rgba(0,0,0,0.08)", overflow: "hidden" }}>
+          <div style={{ height: "100%", borderRadius: 999, background: `linear-gradient(90deg, ${VIOLA}, ${VIOLA_LITE})`, animation: "tut-fill-68 2.6s cubic-bezier(.4,0,.2,1) 0.3s infinite", boxShadow: `0 0 10px ${VIOLA}88` }} />
+        </div>
+      </div>
+      {/* capitoli con N/T */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {chapters.map(c => (
+          <div key={c.name} style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "0.5rem 0.7rem", borderRadius: 10,
+            background: c.done ? `${VIOLA}14` : "rgba(0,0,0,0.04)",
+            border: c.done ? `1px solid ${VIOLA}3a` : "1px solid transparent",
+            animation: `tut-row-in 0.5s ease ${c.d}s both`,
+          }}>
+            <span style={{ fontSize: "0.78rem", fontWeight: 800, color: c.done ? VIOLA : "#5a6a60" }}>{c.name}</span>
+            <span style={{
+              fontSize: "0.74rem", fontWeight: 900, fontVariantNumeric: "tabular-nums",
+              padding: "0.1rem 0.5rem", borderRadius: 999,
+              color: c.done ? "#fff" : GREEN,
+              background: c.done ? VIOLA : `${GREEN}1a`,
+              animation: c.done ? `tut-badge-pop 2.6s ease ${0.8 + c.d}s infinite` : "none",
+            }}>{c.n}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Passo: VOTO per pacchetto + PAGELLA ───────────────────────────────────────
+// Tre "lettere" voto che escono come timbri (A+, A−, B) per argomento×tipo, poi
+// un mini-libretto "pagella" che si apre.
+function GradeVisual() {
+  const grades = [
+    { g: "A+", lab: "Neoclassicismo · Multipla", col: GREEN_LITE, d: 0.2 },
+    { g: "A−", lab: "Torre Eiffel · Vero/Falso", col: GREEN, d: 0.5 },
+    { g: "B", lab: "Bauhaus · Completamento", col: GOLD, d: 0.8 },
+  ];
+  return (
+    <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", marginBottom: "0.1rem" }}>
+        <span style={{ fontSize: "1.2rem", animation: "tut-trophy 2.4s ease infinite", display: "inline-block" }}>📒</span>
+        <span style={{ fontSize: "0.74rem", fontWeight: 900, color: VIOLA, textTransform: "uppercase", letterSpacing: "0.06em" }}>La tua pagella</span>
+      </div>
+      {grades.map(r => (
+        <div key={r.lab} style={{
+          display: "flex", alignItems: "center", gap: "0.6rem",
+          padding: "0.4rem 0.6rem", borderRadius: 11,
+          background: "rgba(0,0,0,0.04)",
+          animation: `tut-row-in 0.5s ease ${r.d}s both`,
+        }}>
+          <span style={{
+            width: 34, height: 34, flexShrink: 0, borderRadius: 9,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 900, fontSize: "1rem", color: "#fff",
+            background: `linear-gradient(140deg, ${r.col}, ${r.col}cc)`,
+            boxShadow: `0 4px 12px ${r.col}55`,
+            animation: `tut-stamp 2.8s cubic-bezier(.34,1.56,.64,1) ${r.d + 0.3}s infinite`,
+          }}>{r.g}</span>
+          <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#3c4a41" }}>{r.lab}</span>
+        </div>
+      ))}
+      <p style={{ margin: "0.15rem 0 0", fontSize: "0.66rem", color: "#8a9e91", textAlign: "center", lineHeight: 1.35 }}>
+        La lettera arriva solo se rispondi a <b style={{ color: VIOLA }}>tutte</b> le domande del pacchetto.
+      </p>
+    </div>
+  );
+}
+
 export const TRIVIA_INTRO: IntroStep[] = [
   {
     title: "Tre tipi di domanda",
-    body: "Scelta multipla, vero o falso e risposta aperta. Le aperte accettano piccoli errori di battitura, quindi scrivi con tranquillità.",
+    body: "Scelta multipla, vero o falso e completamento. Nel completamento scrivi tu la risposta: accetta piccoli errori di battitura, quindi vai tranquillo.",
     visual: <TypesVisual />,
   },
   {
+    title: "Non sei mai senza riferimenti",
+    body: "Sopra ogni domanda trovi sempre argomento, autore ed edificio. Niente più «ma quale chiesa?»: il contesto è sempre lì, a colpo d'occhio.",
+    visual: <ContextVisual />,
+  },
+  {
     title: "Più giusto e veloce, più punti",
-    body: "Ogni risposta corretta vale punti, con un bonus se rispondi in fretta. A fine partita ricevi un voto in stile americano, da F ad A+.",
+    body: "Hai 20 secondi a domanda. Ogni risposta corretta vale punti, con un bonus che cresce quanto più rispondi in fretta.",
     visual: <ScoreVisual />,
   },
   {
     title: "Streak e classifica live",
-    body: "Le risposte corrette di fila accendono la streak e sbloccano trofei. Il tuo punteggio finisce nella classifica live di tutti i giocatori.",
+    body: "Le risposte corrette di fila accendono la streak e sbloccano trofei. Il tuo punteggio entra subito nella classifica live di tutti i giocatori.",
     visual: <StreakVisual />,
+  },
+  {
+    title: "Esplora tutto il database",
+    body: "Ogni capitolo tiene il conto delle domande viste (le «25/25»). Quando lo completi diventa viola e la percentuale di database esplorato sale.",
+    visual: <CoverageVisual />,
+  },
+  {
+    title: "Voti e pagella",
+    body: "Ogni argomento riceve un voto da F ad A+ per ciascun tipo di domanda — ma solo se lo completi al 100%. Tutti i voti restano salvati nella tua pagella.",
+    visual: <GradeVisual />,
   },
 ];
 
@@ -341,6 +494,26 @@ export const TUTORIAL_KEYFRAMES = (
     @keyframes tut-bar-grow {
       0%   { width: 30%; }
       40%,100% { width: 92%; }
+    }
+
+    /* Passo contesto / copertura / pagella */
+    @keyframes tut-pop-soft {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.06); }
+    }
+    @keyframes tut-fill-68 {
+      0%   { width: 6%; }
+      45%,100% { width: 68%; }
+    }
+    @keyframes tut-badge-pop {
+      0%,70%,100% { transform: scale(1); }
+      80%         { transform: scale(1.18); }
+    }
+    @keyframes tut-stamp {
+      0%   { transform: scale(1.6) rotate(-12deg); opacity: 0; }
+      18%  { transform: scale(0.92) rotate(3deg); opacity: 1; }
+      30%  { transform: scale(1) rotate(0deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
     }
 
     @media (prefers-reduced-motion: reduce) {

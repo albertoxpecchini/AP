@@ -10,6 +10,7 @@ import Pagella from "./Pagella";
 import SubjectBadge from "./SubjectBadge";
 import GameTutorial, { hasSeenTutorial } from "../components/GameIntro";
 import { TRIVIA_INTRO, TUTORIAL_KEYFRAMES } from "./tutorialSteps";
+import HomeTour, { type TourStep } from "./HomeTour";
 
 import { questionsForMany, prepareGame } from "./questions";
 import { isAnswerCorrect, type Question } from "./parseTrivia";
@@ -24,6 +25,44 @@ import { saveGrades, fetchGradeRows } from "./gradesApi";
 
 const GAME_KEY = "trivia";
 const DARK_KEY = "games-dark";
+const TOUR_KEY = "trivia-home-tour-seen";
+
+// Passi del tour guidato sulla home: ogni passo evidenzia un pulsante reale
+// (via [data-tour=...]) e obbliga a premerlo per scoprire la funzione.
+const HOME_TOUR: TourStep[] = [
+  {
+    selector: '[data-tour="leaderboard"]',
+    title: "La classifica live",
+    body: "Qui vedi il podio di tutti i giocatori, aggiornato in tempo reale. Aprila per dare un'occhiata: poi chiudila per continuare.",
+    hint: "Apri la classifica",
+  },
+  {
+    selector: '[data-tour="pagella"]',
+    title: "La tua pagella",
+    body: "Tutti i voti che conquisti, capitolo per capitolo e tipo per tipo. È la tua scheda dei progressi. Aprila per vederla.",
+    hint: "Apri la pagella",
+  },
+  {
+    selector: '[data-tour="tutorial"]',
+    title: "Come si gioca",
+    body: "Questo è il tasto che hai appena premuto: da qui puoi rivedere quando vuoi la spiegazione del gioco, con tutte le meccaniche animate.",
+    hint: "Rivedi il tutorial",
+    noClick: true,
+  },
+  {
+    selector: '[data-tour="player"]',
+    title: "Il tuo profilo",
+    body: "Questa pastiglia mostra il tuo punteggio totale e il tuo nome. Toccala quando vuoi cambiare nickname.",
+    hint: "È il tuo profilo",
+    noClick: true,
+  },
+  {
+    selector: '[data-tour="chapters"]',
+    title: "E ora… si gioca!",
+    body: "Scegli uno o più capitoli, i tipi di domanda, e premi Gioca. Buon divertimento e scala la classifica!",
+    noClick: true,
+  },
+];
 
 // Tempo per rispondere (ms) e punteggio: base per corretta + bonus velocità.
 const TIME_PER_Q = 20000;
@@ -53,8 +92,16 @@ export default function Trivia() {
 
   const [phase, setPhase] = useState<Phase>("menu");
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showPagella, setShowPagella] = useState(false);
+  // Quando la slideshow del tutorial finisce, vogliamo lanciare il tour guidato?
+  // (true solo per il flusso "scopri il gioco", non quando il tutorial precede
+  //  l'avvio di una partita).
+  const chainTour = useRef(false);
+
+  const hasSeenTour = () => { try { return localStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
+  const markTourSeen = () => { try { localStorage.setItem(TOUR_KEY, "1"); } catch {} };
 
   const [nick, setNick] = useState<string>(() => getStoredNick());
   const pendingPlay = useRef<{ chapters: ChapterSelection; types: TypeSelection } | null>(null);
@@ -178,12 +225,41 @@ export default function Trivia() {
     }
   }, [startGame]);
 
+  // Il tour "a riflettore" ha senso solo su DESKTOP (≥760px), dove il rail
+  // funzioni è sempre visibile; su mobile quelle azioni stanno nel drawer "Altro".
+  const isDesktop = () => typeof window !== "undefined" && window.matchMedia("(min-width: 760px)").matches;
+
   const onTutorialDone = useCallback(() => {
     setShowTutorial(false);
     const p = pendingPlay.current;
     pendingPlay.current = null;
-    if (p && nick) startGame(p.chapters, p.types);
+    if (p && nick) { startGame(p.chapters, p.types); return; }
+    // Niente partita in coda → se richiesto (e su desktop), prosegue col tour.
+    if (chainTour.current && isDesktop()) { chainTour.current = false; setShowTour(true); }
+    else chainTour.current = false;
   }, [nick, startGame]);
+
+  // "Come si gioca": prima la slideshow (meccaniche), poi il tour guidato.
+  // Se il tour è GIÀ in corso (l'utente sta cliccando il passo "tutorial"), NON
+  // ri-incatenare un altro tour: mostra solo la slideshow e lascia il tour dov'è.
+  const onTutorial = useCallback(() => {
+    if (!showTour) chainTour.current = true;
+    setShowTutorial(true);
+  }, [showTour]);
+
+  const onTourDone = useCallback(() => { setShowTour(false); markTourSeen(); }, []);
+
+  // Primo accesso col nickname già scelto: avvia da solo slideshow + tour una volta.
+  useEffect(() => {
+    if (phase !== "menu" || !nick) return;
+    if (!isDesktop()) return;
+    if (!hasSeenTour() && !showTour && !showTutorial) {
+      chainTour.current = true;
+      if (!hasSeenTutorial(GAME_KEY)) setShowTutorial(true);
+      else setShowTour(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, nick]);
 
   // Chiave capitolo per la classifica: "all" se nessuno, l'id se uno solo,
   // altrimenti "misto" (più capitoli selezionati).
@@ -539,7 +615,7 @@ export default function Trivia() {
           progress={progress}
           nick={nick}
           onPlay={onPlay}
-          onTutorial={() => setShowTutorial(true)}
+          onTutorial={onTutorial}
           onLeaderboard={() => setShowLeaderboard(true)}
           onPagella={() => setShowPagella(true)}
           onChangeNick={() => { pendingPlay.current = null; setPhase("gate"); }}
@@ -559,6 +635,13 @@ export default function Trivia() {
           dark={dark}
           extra={TUTORIAL_KEYFRAMES}
           onDone={onTutorialDone}
+        />
+      )}
+      {showTour && phase === "menu" && (
+        <HomeTour
+          steps={HOME_TOUR}
+          onDone={onTourDone}
+          onCloseModals={() => { setShowLeaderboard(false); setShowPagella(false); }}
         />
       )}
       {showLeaderboard && (

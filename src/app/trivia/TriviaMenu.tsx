@@ -7,6 +7,7 @@ import { fetchTotals } from "./leaderboardApi";
 import { chapterCoverageFrom } from "./questionStats";
 import type { ProgressMap } from "./progressApi";
 import { iconForChapter } from "./chapterIcons";
+import { TRIVIA_VERSION } from "./version";
 import type { QType } from "./parseTrivia";
 
 // Spezza un titolo in "righe" per le tile: le parole brevi/connettori (di, e,
@@ -277,7 +278,7 @@ export default function TriviaMenu({
   // ── Griglia di tile quadrate: "Tutti i capitoli" (largo) + una tile per capitolo ──
   // Stile "Italia kit": logo verde, testo nero, hover che colora, click che accende.
   const ChapterList = (
-    <div>
+    <div data-tour="chapters">
       {SortControl}
       {/* Tile larga "Tutti i capitoli" (occupa tutta la riga) */}
       <button
@@ -395,25 +396,27 @@ export default function TriviaMenu({
 
   // Azioni secondarie (dopo Gioca): su desktop vanno nel pannello viola a sinistra,
   // su mobile dentro il drawer "Altro". Stesso markup, riusato.
-  const SecondaryActions = (onLight: boolean) => (
+  const SecondaryActions = () => (
     <>
       {LbBtn}
       {PagellaBtn}
-      <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={onLight ? { color: vio, border: `1.5px solid ${vBord}` } : undefined}>
-        <BookOpen size={18} /> Come si gioca
+      {/* "Come si gioca": tasto PIENO viola, grosso e spesso come gli altri CTA
+          (prima era un ghost smorto). È l'invito a scoprire il tour. */}
+      <button type="button" onClick={onTutorial} data-tour="tutorial" className="trm-tut-btn trm-tut-cta">
+        <BookOpen size={19} strokeWidth={2.4} /> Come si gioca
       </button>
       {BackBtn}
     </>
   );
 
   const LbBtn = (
-    <button type="button" onClick={onLeaderboard} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
+    <button type="button" onClick={onLeaderboard} data-tour="leaderboard" className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
       <ListOrdered size={18} /> Classifica live
     </button>
   );
 
   const PagellaBtn = (
-    <button type="button" onClick={onPagella} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
+    <button type="button" onClick={onPagella} data-tour="pagella" className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
       <GraduationCap size={18} /> La mia pagella
     </button>
   );
@@ -421,7 +424,7 @@ export default function TriviaMenu({
   // Icona-tasto giocatore: pastiglia con avatar (punteggio dentro) + nome.
   // Sta FUORI dai bottoni d'azione. Tap = cambia nome.
   const PlayerIcon = (onDark: boolean) => nick ? (
-    <button type="button" onClick={onChangeNick} className={`trm-player${onDark ? " on-dark" : ""}`} title={`${nick} · tocca per cambiare`}>
+    <button type="button" onClick={onChangeNick} data-tour="player" className={`trm-player${onDark ? " on-dark" : ""}`} title={`${nick} · tocca per cambiare`}>
       <span className="trm-player-badge">{playerScore === null ? "…" : fmtScore(playerScore)}</span>
       <span className="trm-player-name">{nick}</span>
     </button>
@@ -477,7 +480,7 @@ export default function TriviaMenu({
             <p className="trm-tagline">Storia dell'Architettura · rispondi e scala la classifica</p>
           </div>
           {BookCover}
-          <p className="trm-kicker">Web Game · Quiz</p>
+          <p className="trm-kicker">Versione {TRIVIA_VERSION}</p>
         </div>
         <div className="trm-body">
           {StatsCard(false)}
@@ -502,32 +505,45 @@ export default function TriviaMenu({
                 {PlayerIcon(true) ?? <span>Altro</span>}
                 <button type="button" onClick={() => setMoreOpen(false)} aria-label="Chiudi" className="trm-drawer-x"><X size={20} /></button>
               </div>
-              <div className="trm-actions trm-actions-dark">{SecondaryActions(false)}</div>
+              <div className="trm-actions trm-actions-dark">{SecondaryActions()}</div>
             </div>
           </div>
         )}
       </div>
 
-      {/* ════════ DESKTOP ════════ */}
+      {/* ════════ DESKTOP — tre colonne ════════
+          SINISTRA (vetrina scura): logo, titolo, sottotitolo, LIBRO grande, DATI grandi.
+          CENTRO (chiaro): la sequenza di gioco 1-2-3 (capitoli, tipi, Gioca).
+          DESTRA (rail scuro speculare): funzioni (classifica, pagella, tutorial) +
+          giocatore con punteggio. Così il login non sposta più nulla del resto. */}
       <div className="trm-desktop">
+        {/* ── Vetrina sinistra ── */}
         <div className="trm-desktop-left">
           <div className="trm-logo-wrap"><BrainCircuit size={54} /></div>
           <h1 className="trm-title">TRI<span className="trm-accent">VI</span>A</h1>
           <p className="trm-tagline">Storia dell'Architettura</p>
           {BookCover}
           {StatsCard(true)}
-          {/* Azioni secondarie nel pannello a sinistra: non confondono la sequenza di gioco */}
-          <div className="trm-actions trm-actions-dark">{SecondaryActions(false)}</div>
-          <div className="trm-player-slot">{PlayerIcon(true)}</div>
-          <p className="trm-kicker" style={{ position: "static", opacity: 1 }}>Web Game · Quiz</p>
+          <p className="trm-kicker" style={{ position: "static", opacity: 1 }}>Versione {TRIVIA_VERSION} · gioco gratuito</p>
         </div>
-        <div className="trm-desktop-right" style={{ background: bg }}>
+
+        {/* ── Centro: il gioco ── */}
+        <div className="trm-desktop-center" style={{ background: bg }}>
           <p className="trm-section-label" style={{ color: icon }}>
             <span className="trm-step" style={{ background: icon }}>1</span>Scegli i capitoli
           </p>
           {ChapterList}
           {TypeList}
           {PlayBtn}
+        </div>
+
+        {/* ── Rail destro: funzioni + giocatore (speculare alla vetrina) ── */}
+        <div className="trm-desktop-right">
+          <p className="trm-rail-label">Funzioni</p>
+          <div className="trm-actions trm-actions-dark">{SecondaryActions()}</div>
+          <div className="trm-rail-spacer" />
+          <p className="trm-rail-label">Il tuo profilo</p>
+          <div className="trm-player-slot">{PlayerIcon(true)}</div>
         </div>
       </div>
 
@@ -699,6 +715,28 @@ export default function TriviaMenu({
         .trm-tut-btn:hover, .trm-back-btn:hover {
           background:${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.11)"};
           transform:translateY(-1px);
+        }
+        /* "Come si gioca": CTA PIENO viola — grosso, spesso, con accento e un
+           leggero respiro luminoso per invitare a scoprire il tour. */
+        .trm-tut-cta {
+          background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important;
+          color:#fff !important; border:none !important;
+          font-size:1.05rem !important; font-weight:900 !important; letter-spacing:0.01em;
+          box-shadow:0 6px 22px rgba(91,33,182,0.45);
+          position:relative; overflow:hidden;
+          animation:trm-cta-breathe 2.8s ease-in-out infinite;
+        }
+        .trm-tut-cta svg { color:#fff; width:19px; height:19px; }
+        .trm-tut-cta::after {
+          content:""; position:absolute; top:0; left:-60%; width:45%; height:100%;
+          background:linear-gradient(100deg,transparent,rgba(255,255,255,0.35),transparent);
+          transform:skewX(-18deg); animation:trm-cta-shine 3.4s ease-in-out infinite;
+        }
+        .trm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(91,33,182,0.55); background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important; }
+        @keyframes trm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(91,33,182,0.4);} 50%{box-shadow:0 8px 30px rgba(124,58,237,0.65);} }
+        @keyframes trm-cta-shine { 0%,55%{left:-60%;} 100%{left:130%;} }
+        @media (prefers-reduced-motion: reduce) {
+          .trm-tut-cta, .trm-tut-cta::after { animation:none; }
         }
         /* icona-tasto giocatore: pastiglia con badge punteggio + nome (fuori dai bottoni) */
         .trm-player-slot { display:flex; justify-content:center; }
@@ -950,55 +988,97 @@ export default function TriviaMenu({
         }
         @keyframes trm-pop { 0%{transform:scale(0.6);opacity:0;} 60%{transform:scale(1.08);} 100%{transform:scale(1);opacity:1;} }
 
+        /* ════════ DESKTOP: tre colonne (vetrina | gioco | funzioni) ════════ */
         @media (min-width: 760px) {
           .trm-mobile  { display:none; }
           .trm-root { display:flex; align-items:stretch; justify-content:center; }
           .trm-desktop {
             display:flex; flex-direction:row; height:100%; overflow:hidden;
-            max-width:920px; margin:0 auto; width:100%;
+            max-width:1120px; margin:0 auto; width:100%;
           }
-          .trm-desktop-left {
-            width:340px; flex-shrink:0;
+
+          /* Fasce scure SINISTRA e DESTRA: stessa "pelle" speculare. */
+          .trm-desktop-left, .trm-desktop-right {
+            flex-shrink:0;
             background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
-            gap:1.1rem; padding:2.5rem 2rem; overflow:hidden;
+            display:flex; flex-direction:column; overflow:hidden; position:relative;
+          }
+          /* alone viola/verde diffuso in entrambe le fasce (vibrante) */
+          .trm-desktop-left::before, .trm-desktop-right::before {
+            content:""; position:absolute; width:75%; height:45%; border-radius:50%;
+            filter:blur(60px); opacity:0.4; pointer-events:none;
+            background:#7c3aed; top:-10%; left:-20%;
+          }
+          .trm-desktop-left::after, .trm-desktop-right::after {
+            content:""; position:absolute; width:75%; height:45%; border-radius:50%;
+            filter:blur(60px); opacity:0.3; pointer-events:none;
+            background:#2F9E5A; bottom:-12%; right:-20%;
+          }
+          .trm-desktop-left > *, .trm-desktop-right > * { position:relative; z-index:1; }
+
+          /* SINISTRA = vetrina. Ora che azioni/giocatore sono a destra, c'è spazio:
+             libro e statistiche più GRANDI e protagonisti. */
+          .trm-desktop-left {
+            width:330px;
+            align-items:center; justify-content:center; gap:1.5rem; padding:2rem;
           }
           .trm-desktop-left .trm-logo-wrap { padding:16px; border-radius:22px; }
-          .trm-desktop-left .trm-title { font-size:3rem; }
-          .trm-desktop-left .trm-stats-card { width:100%; }
-          .trm-desktop-right {
+          .trm-desktop-left .trm-title { font-size:3.1rem; }
+          .trm-desktop-left .trm-tagline { font-size:0.95rem; }
+          .trm-desktop-left .trm-book { width:178px; }
+          .trm-desktop-left .trm-stats-card { width:100%; padding:1.1rem 1.2rem; background:rgba(255,255,255,0.06); }
+          .trm-desktop-left .trm-stat-val { font-size:1.9rem; }
+          .trm-desktop-left .trm-stat-lbl { font-size:0.62rem; }
+          .trm-desktop-left .trm-stat svg { width:24px; height:24px; }
+
+          /* CENTRO = il gioco (la sequenza 1-2-3). */
+          .trm-desktop-center {
             flex:1; min-width:0;
             display:flex; flex-direction:column; gap:0.85rem;
             padding:2rem 1.8rem; overflow-y:auto;
           }
-          .trm-desktop-right .trm-grid { grid-template-columns:repeat(3,1fr); }
-          .trm-desktop-right .trm-grid-types { grid-template-columns:repeat(3,1fr); }
+          .trm-desktop-center .trm-grid { grid-template-columns:repeat(3,1fr); }
+          .trm-desktop-center .trm-grid-types { grid-template-columns:repeat(3,1fr); }
+
+          /* DESTRA = funzioni + profilo. Larghezza fissa: il login non sposta nulla. */
+          .trm-desktop-right {
+            width:280px;
+            justify-content:flex-start; gap:0.7rem; padding:2rem 1.5rem;
+          }
+          .trm-desktop-right .trm-actions { gap:0.6rem; }
+          .trm-rail-label {
+            font-size:0.66rem; font-weight:800; text-transform:uppercase;
+            letter-spacing:0.14em; color:rgba(255,255,255,0.45); margin:0 0 0.1rem 0.2rem;
+          }
+          .trm-rail-spacer { flex:1; min-height:1rem; }
+          .trm-desktop-right .trm-player-slot { justify-content:stretch; }
+          .trm-desktop-right .trm-player { width:100%; justify-content:flex-start; }
         }
 
-        /* ─── Pannello sinistro: compatta tutto quando lo schermo è basso, così
-           il contenuto (logo → titolo → libro → stats → azioni → giocatore) ci
-           sta sempre nella viewport senza essere tagliato in alto/basso. ─── */
-        @media (min-width:760px) and (max-height:820px) {
-          .trm-desktop-left { gap:0.7rem; padding:1.4rem 1.6rem; }
-          .trm-desktop-left .trm-logo-wrap { padding:11px; border-radius:18px; }
-          .trm-desktop-left .trm-logo-wrap svg { width:42px; height:42px; }
-          .trm-desktop-left .trm-title { font-size:2.4rem; letter-spacing:0.22em; }
-          .trm-desktop-left .trm-tagline { font-size:0.78rem; }
-          .trm-desktop-left .trm-book { width:104px; }
-          .trm-desktop-left .trm-stats-card { padding:0.6rem 0.9rem; }
-          .trm-desktop-left .trm-stat-val { font-size:1.15rem; }
-          .trm-desktop-left .trm-actions { gap:0.4rem; }
-          .trm-desktop-left .trm-tut-btn, .trm-desktop-left .trm-back-btn { padding:0.65rem 1rem; font-size:0.92rem; border-radius:11px; }
-          .trm-desktop-left .trm-player-badge { min-width:32px; height:32px; font-size:0.82rem; }
+        /* ─── Fasce scure: compatta quando lo schermo è basso, così logo→titolo→
+           libro→stats (sx) e funzioni→profilo (dx) ci stanno senza tagli. ─── */
+        @media (min-width:760px) and (max-height:860px) {
+          .trm-desktop-left { gap:0.95rem; padding:1.5rem; }
+          .trm-desktop-left .trm-logo-wrap { padding:12px; border-radius:18px; }
+          .trm-desktop-left .trm-logo-wrap svg { width:44px; height:44px; }
+          .trm-desktop-left .trm-title { font-size:2.5rem; letter-spacing:0.22em; }
+          .trm-desktop-left .trm-tagline { font-size:0.82rem; }
+          .trm-desktop-left .trm-book { width:140px; }
+          .trm-desktop-left .trm-stats-card { padding:0.8rem 1rem; }
+          .trm-desktop-left .trm-stat-val { font-size:1.5rem; }
           .trm-desktop-left .trm-kicker { display:none; }
+          .trm-desktop-right { padding:1.5rem 1.4rem; gap:0.5rem; }
+          .trm-desktop-right .trm-actions { gap:0.45rem; }
+          .trm-desktop-right .trm-tut-btn, .trm-desktop-right .trm-back-btn { padding:0.7rem 1rem; font-size:0.92rem; }
         }
         /* Schermi molto bassi: stringi ancora un filo. */
         @media (min-width:760px) and (max-height:680px) {
-          .trm-desktop-left { gap:0.5rem; padding:1rem 1.4rem; }
-          .trm-desktop-left .trm-logo-wrap svg { width:34px; height:34px; }
-          .trm-desktop-left .trm-title { font-size:2rem; }
-          .trm-desktop-left .trm-book { width:84px; }
-          .trm-desktop-left .trm-tut-btn, .trm-desktop-left .trm-back-btn { padding:0.55rem 1rem; }
+          .trm-desktop-left { gap:0.65rem; padding:1.1rem 1.4rem; }
+          .trm-desktop-left .trm-logo-wrap svg { width:36px; height:36px; }
+          .trm-desktop-left .trm-title { font-size:2.1rem; }
+          .trm-desktop-left .trm-book { width:108px; }
+          .trm-desktop-left .trm-stat-val { font-size:1.3rem; }
+          .trm-desktop-right .trm-tut-btn, .trm-desktop-right .trm-back-btn { padding:0.58rem 1rem; }
         }
       `}</style>
     </div>

@@ -1,7 +1,22 @@
 import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
+import { execSync } from 'child_process'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+
+// Versione del gioco Trivia = 1.<numero di commit che toccano src/app/trivia/>.
+// Calcolata a build-time (anche in dev) così si aggiorna da sola ad ogni deploy.
+// Se git non è disponibile (es. ambiente di build esotico) ripiega su 1.0.
+function triviaVersion(): string {
+  try {
+    const n = execSync('git rev-list --count HEAD -- src/app/trivia/', {
+      encoding: 'utf8',
+    }).trim()
+    return `1.${n || '0'}`
+  } catch {
+    return '1.0'
+  }
+}
 
 
 function figmaAssetResolver() {
@@ -69,10 +84,15 @@ export default defineConfig({
     },
   },
 
+  define: {
+    // Esposta al client come stringa, es. "1.37".
+    __TRIVIA_VERSION__: JSON.stringify(triviaVersion()),
+  },
+
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
   server: {
-    port: 5173,
+    port: 2858,
     strictPort: true,
   },
 })
