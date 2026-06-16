@@ -503,9 +503,10 @@ export default function TriviaMenu({
         .trm-tile {
           --gv:#2F7D4A; --gv2:#1f6b3c; --gv3:#3a9e5f;
           position:relative; isolation:isolate;
+          container-type:size;
           display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
           aspect-ratio:1/1; min-height:0;
-          padding:0.7rem 0.75rem;
+          padding:2.3rem 0.7rem 0.7rem;
           border:1px solid ${bord};
           border-radius:18px; cursor:pointer; font-family:inherit; text-align:left;
           overflow:hidden;
@@ -579,19 +580,23 @@ export default function TriviaMenu({
         }
         .trm-tile-mark svg { width:28px; height:28px; }
 
-        /* TITOLO protagonista: grande, in basso, riempie la card */
+        /* TITOLO protagonista: dimensionato in cqw (unità sulla larghezza della
+           tile, container-type:size) così il testo SCALA col riquadro e lo riempie.
+           Niente font fisso: tile piccole = testo proporzionalmente più piccolo. */
         .trm-tile-title {
           position:relative; z-index:1;
-          font-size:1.22rem; font-weight:800; line-height:1.12;
-          letter-spacing:-0.01em;
+          font-size:clamp(0.92rem, 13cqw, 1.7rem);
+          font-weight:800; line-height:1.06;
+          letter-spacing:-0.02em;
           color:${textMain};
-          display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
-          overflow:hidden; max-width:100%;
+          flex:1 1 auto; display:flex; align-items:flex-end;
+          overflow:hidden; width:100%;
+          word-break:break-word; hyphens:auto;
           transition:color .25s;
           text-shadow:0 1px 0 rgba(255,255,255,0.04);
         }
         .trm-tile.is-on .trm-tile-title { text-shadow:0 1px 8px rgba(0,0,0,0.25); }
-        .trm-tile-title-type { font-size:1.05rem; -webkit-line-clamp:2; }
+        .trm-tile-title-type { font-size:clamp(0.95rem, 8cqw, 1.45rem); -webkit-line-clamp:2; }
 
         /* anello progressi: angolo in alto a destra; su verde diventa chiaro */
         .trm-tile-ring { position:absolute; top:7px; right:7px; z-index:1; transition:filter .25s; }
