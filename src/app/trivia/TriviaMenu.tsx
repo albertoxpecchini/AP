@@ -168,7 +168,6 @@ export default function TriviaMenu({
   const vio  = dark ? "#c4a5ff" : "#6d28d9";
   const vBord = dark ? "rgba(155,92,246,0.34)" : "rgba(124,58,237,0.28)";
 
-  const totalQuestions = CHAPTERS.reduce((s, c) => s + c.questions.length, 0);
   // Domande disponibili nella selezione corrente (capitoli + tipi).
   const availableCount = questionsForMany([...selected], [...types]).length;
   // Quante domande di OGNI tipo nei capitoli scelti (ignora il filtro tipi):
@@ -284,12 +283,9 @@ export default function TriviaMenu({
         onClick={selectAll}
         className={`trm-tile trm-tile-all trm-vio${allMode ? " is-on" : ""}`}
       >
-        <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
-        <span className="trm-tile-all-ic"><BookOpen size={22} /></span>
-        <span className="trm-tile-all-txt">
-          <span className="trm-tile-all-title">Tutti i capitoli</span>
-          <span className="trm-tile-all-sub">Mix da tutti i {CHAPTERS.length} capitoli · {totalQuestions} domande</span>
-        </span>
+        <span className="trm-tile-all-ic"><BookOpen size={30} /></span>
+        <span className="trm-tile-all-title">Tutti i capitoli</span>
+        <span className="trm-tile-check"><svg width="14" height="14" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
       </button>
 
       {/* Griglia capitoli */}
@@ -855,8 +851,9 @@ export default function TriviaMenu({
         .trm-tile-all {
           flex-direction:row; aspect-ratio:auto; align-items:center;
           justify-content:flex-start; text-align:left;
-          gap:0.7rem; padding:0.85rem 1rem;
+          gap:0.85rem; padding:1.25rem 1.2rem;
           width:100%; border:none;
+          margin-bottom:1.1rem;   /* stacca dalla griglia capitoli sotto */
           background:linear-gradient(135deg, var(--gv3) 0%, var(--gv) 50%, var(--gv2) 100%);
           box-shadow:0 8px 22px ${dark ? "rgba(0,0,0,0.5)" : "rgba(91,33,182,0.34)"};
         }
@@ -870,10 +867,7 @@ export default function TriviaMenu({
         .trm-tile-all.is-on .trm-tile-check { transform:scale(1); opacity:1; }
         .trm-tile-all-ic { color:#fff; display:flex; flex-shrink:0; transition:transform .25s; }
         .trm-tile-all:hover .trm-tile-all-ic { transform:scale(1.15) rotate(-6deg); }
-        .trm-tile-all-txt { display:flex; flex-direction:column; min-width:0; }
-        .trm-tile-all-title { font-size:1rem; font-weight:800; color:#fff; line-height:1.2; }
-        .trm-tile-all-sub { font-size:0.72rem; color:rgba(255,255,255,0.82); line-height:1.3; margin-top:0.12rem;
-          overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .trm-tile-all-title { font-size:1.35rem; font-weight:900; color:#fff; line-height:1.1; flex:1; letter-spacing:-0.01em; }
 
         /* tipo domanda: tile più basse, titolo centrato e BEN leggibile */
         .trm-grid-types .trm-tile {
