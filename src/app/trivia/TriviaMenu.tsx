@@ -6,16 +6,6 @@ import { chapterCoveragePct, chapterCoverageCount } from "./coverage";
 import { iconForChapter } from "./chapterIcons";
 import type { QType } from "./parseTrivia";
 
-// Colore "semaforo" in base alla % esplorata del capitolo.
-// rosso = appena iniziato, giallo = a metà, verde = completato.
-function trafficColor(pct: number): string {
-  if (pct >= 100) return "#2F7D4A";   // verde pieno
-  if (pct >= 66)  return "#5aa02c";   // verde-lime
-  if (pct >= 33)  return "#d9a300";   // giallo
-  if (pct > 0)    return "#e07a1f";   // arancio
-  return "#c0392b";                   // rosso = da esplorare
-}
-
 // Selezione capitoli: lista di id. Vuota = tutti i capitoli.
 export type ChapterSelection = string[];
 // Selezione tipi di domanda. Vuota = tutti i tipi.
@@ -50,10 +40,6 @@ interface TriviaMenuProps {
   onChangeNick: () => void;
 }
 
-// Palette per i capitoli (ciclica): dà varietà colore alle card capitolo.
-const CHAP_COLORS = ["#2F7D4A", "#3a7bbf", "#b5651d", "#8e44ad", "#c0392b", "#0e8a8a", "#c79a00"];
-const colorForIdx = (i: number) => CHAP_COLORS[i % CHAP_COLORS.length];
-
 export default function TriviaMenu({
   dark, bestStreak, bestGrade, coverage, nick,
   onPlay, onTutorial, onLeaderboard, onPagella, onChangeNick,
@@ -84,13 +70,6 @@ export default function TriviaMenu({
   // cronologico = ordine di caricamento dei raw (default); az/za = per titolo;
   // esplorato = meno esplorati in cima (così è una "to-do" di studio).
   const [sortBy, setSortBy] = useState<SortKey>("cronologico");
-  // Colore stabile per capitolo (basato sull'ordine cronologico): non cambia
-  // quando riordini la lista.
-  const colorById = useMemo(() => {
-    const m = new Map<string, string>();
-    [...CHAPTERS].sort((a, b) => a.order - b.order).forEach((c, i) => m.set(c.id, colorForIdx(i)));
-    return m;
-  }, []);
   const orderedChapters = useMemo(() => {
     const arr = [...CHAPTERS];
     switch (sortBy) {
@@ -116,10 +95,8 @@ export default function TriviaMenu({
   const totalQuestions = CHAPTERS.reduce((s, c) => s + c.questions.length, 0);
   // Domande disponibili nella selezione corrente (capitoli + tipi).
   const availableCount = questionsForMany([...selected], [...types]).length;
-  // Colore "principale" = verde se "tutti", altrimenti colore del primo capitolo
-  // scelto (nell'ordine di visualizzazione corrente).
-  const firstSel = allMode ? undefined : orderedChapters.find(c => selected.has(c.id));
-  const selectedColor = firstSel ? (colorById.get(firstSel.id) || "#2F7D4A") : "#2F7D4A";
+  // Colore principale: sempre verde (Italia kit).
+  const selectedColor = "#2F7D4A";
   const selectedName = allMode
     ? "Tutti i capitoli"
     : selected.size === 1
@@ -161,25 +138,25 @@ export default function TriviaMenu({
   // Cerchio progressi "N/T" a destra della riga capitolo, colorato a semaforo
   // (rosso → giallo → verde in base alla % esplorata). Anello SVG + numeri.
   const progressRing = (seen: number, total: number, pct: number) => {
-    const col = trafficColor(pct);
-    const R = 14, C = 2 * Math.PI * R;
-    const track = dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.09)";
+    const col = "#2F7D4A";   // verde unico (Italia kit): niente più semaforo
+    const R = 13, C = 2 * Math.PI * R;
+    const track = dark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)";
     return (
-      <div style={{ position: "relative", width: 34, height: 34, flexShrink: 0 }} title={`${seen} / ${total} domande viste · ${pct}%`}>
-        <svg width="34" height="34" viewBox="0 0 34 34" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx="17" cy="17" r={R} fill="none" stroke={track} strokeWidth="3" />
+      <div style={{ position: "relative", width: 30, height: 30, flexShrink: 0 }} title={`${seen} / ${total} domande viste · ${pct}%`}>
+        <svg width="30" height="30" viewBox="0 0 30 30" style={{ transform: "rotate(-90deg)" }}>
+          <circle cx="15" cy="15" r={R} fill="none" stroke={track} strokeWidth="3" />
           <circle
-            cx="17" cy="17" r={R} fill="none" stroke={col} strokeWidth="3" strokeLinecap="round"
+            cx="15" cy="15" r={R} fill="none" stroke={col} strokeWidth="3" strokeLinecap="round"
             strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)}
-            style={{ transition: "stroke-dashoffset .3s, stroke .3s" }}
+            style={{ transition: "stroke-dashoffset .35s ease" }}
           />
         </svg>
         <div style={{
           position: "absolute", inset: 0, display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", lineHeight: 1,
         }}>
-          <span style={{ fontSize: "0.58rem", fontWeight: 900, color: col, fontVariantNumeric: "tabular-nums" }}>{seen}</span>
-          <span style={{ fontSize: "0.44rem", fontWeight: 700, color: lbl }}>/{total}</span>
+          <span style={{ fontSize: "0.52rem", fontWeight: 900, color: col, fontVariantNumeric: "tabular-nums" }}>{seen}</span>
+          <span style={{ fontSize: "0.4rem", fontWeight: 700, color: lbl }}>/{total}</span>
         </div>
       </div>
     );
@@ -212,61 +189,70 @@ export default function TriviaMenu({
     </div>
   );
 
-  // ── Lista to-do: "Tutti i capitoli" + una riga per capitolo ──
+  // ── Griglia di tile quadrate: "Tutti i capitoli" (largo) + una tile per capitolo ──
+  // Stile "Italia kit": logo verde, testo nero, hover che colora, click che accende.
   const ChapterList = (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+    <div>
       {SortControl}
-      {/* Tutti (deseleziona tutto) */}
-      <TodoRow
-        active={allMode}
-        multi={false}
-        color="#2F7D4A"
-        title="Tutti i capitoli"
-        subtitle={`Mix da tutti i ${CHAPTERS.length} capitoli · ${totalQuestions} domande`}
-        dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
+      {/* Tile larga "Tutti i capitoli" (occupa tutta la riga) */}
+      <button
+        type="button"
         onClick={selectAll}
-      />
-      {orderedChapters.map((c) => {
-        const cov = chapterCoveragePct(c.id);
-        const { seen, total } = chapterCoverageCount(c.id);
-        const color = colorById.get(c.id) || "#2F7D4A";
-        return (
-          <TodoRow
-            key={c.id}
-            active={selected.has(c.id)}
-            multi
-            color={color}
-            title={c.title}
-            // Sottotitolo = argomento/autore (utile), non più "N domande".
-            subtitle={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
-            logo={iconForChapter(c.id)}
-            badge={progressRing(seen, total, cov)}
-            done={cov >= 100}
-            dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
-            onClick={() => toggleChapter(c.id)}
-          />
-        );
-      })}
+        className={`trm-tile trm-tile-all${allMode ? " is-on" : ""}`}
+      >
+        <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
+        <span className="trm-tile-all-ic"><BookOpen size={22} /></span>
+        <span className="trm-tile-all-txt">
+          <span className="trm-tile-all-title">Tutti i capitoli</span>
+          <span className="trm-tile-all-sub">Mix da tutti i {CHAPTERS.length} capitoli · {totalQuestions} domande</span>
+        </span>
+      </button>
+
+      {/* Griglia capitoli */}
+      <div className="trm-grid">
+        {orderedChapters.map((c) => {
+          const cov = chapterCoveragePct(c.id);
+          const { seen, total } = chapterCoverageCount(c.id);
+          const on = selected.has(c.id);
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => toggleChapter(c.id)}
+              className={`trm-tile${on ? " is-on" : ""}${cov >= 100 ? " is-done" : ""}`}
+              title={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
+            >
+              <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
+              <span className="trm-tile-ring">{progressRing(seen, total, cov)}</span>
+              <span className="trm-tile-logo">{iconForChapter(c.id)}</span>
+              <span className="trm-tile-title">{c.title}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 
-  // ── Lista to-do dei tipi di domanda (stesso look dei capitoli) ──
+  // ── Tipi di domanda: tre tile verdi in riga (stesso linguaggio dei capitoli) ──
   const TypeList = (
     <div>
       <p className="trm-section-label" style={{ color: lbl }}>Tipi di domanda</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        {TYPE_DEFS.map(t => (
-          <TodoRow
-            key={t.id}
-            active={types.has(t.id)}
-            multi
-            color={t.color}
-            title={t.label}
-            subtitle={t.desc}
-            dark={dark} card={card} bord={bord} lbl={lbl} textMain={textMain} textSub={textSub}
-            onClick={() => toggleType(t.id)}
-          />
-        ))}
+      <div className="trm-grid trm-grid-types">
+        {TYPE_DEFS.map(t => {
+          const on = types.has(t.id);
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => toggleType(t.id)}
+              className={`trm-tile${on ? " is-on" : ""}`}
+              title={t.desc}
+            >
+              <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
+              <span className="trm-tile-title trm-tile-title-type">{t.label}</span>
+            </button>
+          );
+        })}
       </div>
       <p style={{ fontSize: "0.72rem", color: availableCount === 0 ? "#c0392b" : lbl, margin: "0.4rem 0 0 0.2rem", fontWeight: availableCount === 0 ? 700 : 400 }}>
         {allTypes ? "Tutti i tipi (nessun filtro)" : `${types.size} tipi selezionati`}
@@ -491,9 +477,98 @@ export default function TriviaMenu({
         }
         .trm-nick-chip:hover { filter:brightness(0.85); }
 
-        /* Casella "Pento": piccolo pop allo hover della riga */
-        button:hover > .trm-pento-box { transform:scale(1.08); }
-        button:active > .trm-pento-box { transform:scale(0.94); }
+        /* ═══════ Tile capitoli "Italia kit": logo verde, testo nero, hover che colora, click che accende ═══════ */
+        .trm-grid {
+          display:grid; grid-template-columns:repeat(2,1fr); gap:0.5rem;
+          margin-top:0.5rem;
+        }
+        .trm-grid-types { grid-template-columns:repeat(3,1fr); }
+
+        .trm-tile {
+          --gv:#2F7D4A;
+          position:relative; isolation:isolate;
+          display:flex; flex-direction:column; align-items:center; justify-content:center;
+          gap:0.4rem; text-align:center;
+          aspect-ratio:1/1; min-height:0;
+          padding:0.7rem 0.5rem;
+          background:${card};
+          border:1.5px solid ${bord};
+          border-radius:14px; cursor:pointer; font-family:inherit;
+          overflow:hidden;
+          transition:transform .18s cubic-bezier(.2,.7,.3,1.2), border-color .18s, box-shadow .18s, background .18s;
+          box-shadow:0 1px 2px rgba(0,0,0,0.04);
+        }
+        /* velo verde che sale dal basso allo hover (riempimento "kit Italia") */
+        .trm-tile::before {
+          content:""; position:absolute; inset:0; z-index:-1;
+          background:linear-gradient(180deg, ${dark ? "rgba(47,125,74,0.18)" : "rgba(47,125,74,0.07)"} 0%, transparent 70%);
+          opacity:0; transition:opacity .2s;
+        }
+        .trm-tile:hover {
+          border-color:var(--gv);
+          transform:translateY(-3px);
+          box-shadow:0 10px 22px ${dark ? "rgba(0,0,0,0.4)" : "rgba(47,125,74,0.18)"};
+        }
+        .trm-tile:hover::before { opacity:1; }
+        .trm-tile:active { transform:translateY(-1px) scale(0.97); }
+
+        /* stato "acceso" = selezionato */
+        .trm-tile.is-on {
+          border-color:var(--gv);
+          background:${dark ? "rgba(47,125,74,0.16)" : "rgba(47,125,74,0.10)"};
+          box-shadow:0 0 0 1px var(--gv), 0 8px 20px ${dark ? "rgba(0,0,0,0.45)" : "rgba(47,125,74,0.22)"};
+        }
+        .trm-tile.is-on::before { opacity:1; }
+
+        .trm-tile-logo {
+          width:34px; height:34px; flex-shrink:0;
+          display:flex; align-items:center; justify-content:center;
+          color:var(--gv);
+          transition:transform .2s cubic-bezier(.2,.7,.3,1.4);
+        }
+        .trm-tile-logo svg { width:30px; height:30px; }
+        .trm-tile:hover .trm-tile-logo,
+        .trm-tile.is-on .trm-tile-logo { transform:scale(1.12) translateY(-1px); }
+
+        .trm-tile-title {
+          font-size:0.74rem; font-weight:700; line-height:1.2;
+          color:${textMain};
+          display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+          overflow:hidden; max-width:100%;
+        }
+        .trm-tile-title-type { -webkit-line-clamp:2; }
+
+        /* anello progressi: angolo in alto a destra */
+        .trm-tile-ring { position:absolute; top:6px; right:6px; }
+
+        /* spunta "accesa": angolo in alto a sinistra, compare con pop */
+        .trm-tile-check {
+          position:absolute; top:6px; left:6px;
+          width:20px; height:20px; border-radius:7px;
+          background:var(--gv); color:#fff;
+          display:flex; align-items:center; justify-content:center;
+          transform:scale(0); opacity:0;
+          transition:transform .22s cubic-bezier(.2,.9,.3,1.5), opacity .18s;
+          box-shadow:0 2px 8px ${dark ? "rgba(0,0,0,0.5)" : "rgba(47,125,74,0.45)"};
+        }
+        .trm-tile.is-on .trm-tile-check,
+        .trm-tile.is-done .trm-tile-check { transform:scale(1); opacity:1; }
+
+        /* tile larga "Tutti i capitoli" */
+        .trm-tile-all {
+          flex-direction:row; aspect-ratio:auto;
+          justify-content:flex-start; text-align:left;
+          gap:0.7rem; padding:0.7rem 0.9rem 0.7rem 1rem;
+          width:100%;
+        }
+        .trm-tile-all .trm-tile-check { position:static; transform:scale(0); width:22px; height:22px; }
+        .trm-tile-all.is-on .trm-tile-check { transform:scale(1); opacity:1; }
+        .trm-tile-all-ic { color:var(--gv); display:flex; flex-shrink:0; transition:transform .2s; }
+        .trm-tile-all:hover .trm-tile-all-ic { transform:scale(1.1); }
+        .trm-tile-all-txt { display:flex; flex-direction:column; min-width:0; }
+        .trm-tile-all-title { font-size:0.92rem; font-weight:800; color:${textMain}; line-height:1.2; }
+        .trm-tile-all-sub { font-size:0.7rem; color:${textSub}; line-height:1.3; margin-top:0.1rem;
+          overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
         @media (min-width: 760px) {
           .trm-mobile  { display:none; }
@@ -516,68 +591,11 @@ export default function TriviaMenu({
             display:flex; flex-direction:column; gap:0.85rem;
             padding:2rem 1.8rem; overflow-y:auto;
           }
+          .trm-desktop-right .trm-grid { grid-template-columns:repeat(3,1fr); }
+          .trm-desktop-right .trm-grid-types { grid-template-columns:repeat(3,1fr); }
         }
       `}</style>
     </div>
   );
 }
 
-// ── Riga "to-do" riusabile (capitoli e tipi condividono lo stesso look) ──
-// Checkbox A SINISTRA, poi contenuto, poi badge opzionale a destra.
-// `multi` = checkbox quadrata (capitolo/tipo), altrimenti pallino ("Tutti").
-// `done` = pacchetto/capitolo completato al 100% → spunta piena di colore.
-function TodoRow(props: {
-  active: boolean; multi: boolean; color: string; title: string; subtitle: string;
-  badge?: React.ReactNode; done?: boolean; logo?: React.ReactNode;
-  dark: boolean; card: string; bord: string; lbl: string; textMain: string; textSub: string;
-  onClick: () => void;
-}) {
-  const { active, multi, color, title, subtitle, badge, done, logo, dark, card, bord, lbl, textMain, textSub, onClick } = props;
-  // La checkbox è "piena" se selezionata oppure se il capitolo è completato.
-  const filled = active || done;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        display: "flex", alignItems: "center", gap: "0.6rem",
-        padding: "0.5rem 0.7rem",
-        background: active ? `${color}${dark ? "1e" : "0e"}` : card,
-        border: `1px solid ${active ? color : bord}`,
-        boxShadow: active ? `inset 0 0 0 1px ${color}` : "0 1px 2px rgba(0,0,0,0.04)",
-        borderRadius: "12px", cursor: "pointer", fontFamily: "inherit",
-        textAlign: "left", width: "100%",
-        transition: "border-color 0.15s, background 0.15s, box-shadow 0.15s",
-      }}
-    >
-      {/* Checkbox "Pento" a SINISTRA: casella netta, angoli morbidi, spunta marcata.
-          Vuota = bordo spesso + interno tenue del colore; piena = pieno colore + alone. */}
-      <div className="trm-pento-box" style={{
-        width: 24, height: 24, flexShrink: 0,
-        borderRadius: multi ? 8 : "50%",
-        background: filled ? color : (dark ? "rgba(255,255,255,0.04)" : `${color}10`),
-        border: filled ? `2px solid ${color}` : `2px solid ${color}66`,
-        boxShadow: filled ? `0 3px 10px ${color}80` : "none",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background .18s, border-color .18s, box-shadow .18s, transform .18s",
-      }}>
-        {filled && <svg width="14" height="14" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
-      </div>
-      {/* Slot logo SVG del capitolo: discreto e indicativo. Quando un capitolo
-          avrà il suo logo (campo `logo`) verrà mostrato qui; altrimenti niente. */}
-      {logo && (
-        <span style={{
-          width: 24, height: 24, flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: active ? color : (dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.42)"),
-          opacity: active ? 1 : 0.85, transition: "color .15s",
-        }}>{logo}</span>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "0.86rem", fontWeight: 700, color: active ? color : textMain, lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</div>
-        {subtitle && <p style={{ fontSize: "0.7rem", color: textSub, margin: "0.05rem 0 0", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtitle}</p>}
-      </div>
-      {badge && <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>{badge}</div>}
-    </button>
-  );
-}
