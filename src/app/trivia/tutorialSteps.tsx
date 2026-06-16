@@ -1,46 +1,230 @@
 import type { IntroStep } from "../components/GameIntro";
 
-// Visual semplice e leggero (SVG/HTML inline) per ogni passo del tutorial.
-// Niente immagini esterne: tutto vettoriale → leggerissimo.
+// ════════════════════════════════════════════════════════════════════════════
+// Tutorial Trivia — VISUAL ANIMATI (vettoriale puro, zero dipendenze esterne)
+// ════════════════════════════════════════════════════════════════════════════
+// Ogni passo è una "scena" autonoma: tutto è CSS/SVG inline → leggerissimo, ma
+// con animazioni stratificate (entrata in sequenza, loop continui, parallax,
+// glow, conta-su numerico) per un effetto ultra-fluido. Palette Kit Italia:
+// verde #2F7D4A / #2F9E5A, oro #D9A400. Le keyframes vivono in <style> in fondo,
+// con prefisso `tut-` per non collidere con quelle di GameIntro (`gt-`).
 
+const GREEN = "#2F7D4A";
+const GREEN_LITE = "#2F9E5A";
+const BLUE = "#3a7bbf";
+const ORANGE = "#b5651d";
+const GOLD = "#D9A400";
+
+// ── Passo 1 ─────────────────────────────────────────────────────────────────
+// "Tre tipi di domanda" — tre card che entrano a cascata, fluttuano in loop
+// sfalsato, e mostrano una micro-anteprima animata del proprio tipo.
 function TypesVisual() {
-  const chip = (bg: string, label: string) => (
-    <div style={{
-      background: bg, color: "#fff", borderRadius: 12, padding: "0.7rem 0.5rem",
-      fontWeight: 800, fontSize: "0.8rem", textAlign: "center",
-    }}>{label}</div>
-  );
+  const cards: { bg: string; label: string; icon: React.ReactNode; delay: number }[] = [
+    {
+      bg: GREEN, label: "Scelta\nmultipla", delay: 0,
+      icon: (
+        <svg viewBox="0 0 44 44" width="40" height="40" fill="none">
+          {[8, 20, 32].map((y, i) => (
+            <g key={y}>
+              <circle cx="9" cy={y} r="4.5" stroke="#fff" strokeWidth="2"
+                style={{ opacity: 0.85 }} />
+              {i === 1 && (
+                <circle cx="9" cy={y} r="2" fill="#fff"
+                  style={{ animation: "tut-pop 2.4s ease-in-out infinite", transformOrigin: "9px 20px" }} />
+              )}
+              <rect x="18" y={y - 2.5} width={i === 1 ? 22 : 16} height="5" rx="2.5" fill="#fff"
+                style={{ opacity: i === 1 ? 0.95 : 0.5 }} />
+            </g>
+          ))}
+        </svg>
+      ),
+    },
+    {
+      bg: BLUE, label: "Vero /\nFalso", delay: 0.12,
+      icon: (
+        <svg viewBox="0 0 44 44" width="40" height="40" fill="none">
+          <g style={{ animation: "tut-flip 3s ease-in-out infinite", transformOrigin: "22px 22px" }}>
+            <circle cx="22" cy="22" r="15" stroke="#fff" strokeWidth="2.2" style={{ opacity: 0.55 }} />
+            <path d="M15 22.5 l4.5 4.5 L30 16" stroke="#fff" strokeWidth="3"
+              strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="26" strokeDashoffset="26"
+              style={{ animation: "tut-draw 3s ease-in-out infinite" }} />
+          </g>
+        </svg>
+      ),
+    },
+    {
+      bg: ORANGE, label: "Risposta\naperta", delay: 0.24,
+      icon: (
+        <svg viewBox="0 0 44 44" width="40" height="40" fill="none">
+          <rect x="6" y="13" width="32" height="18" rx="4" stroke="#fff" strokeWidth="2" style={{ opacity: 0.6 }} />
+          <rect x="11" y="20.5" width="0" height="3" rx="1.5" fill="#fff"
+            style={{ animation: "tut-type 3.2s steps(1) infinite" }} />
+          <rect x="11" y="19" width="2" height="6" rx="1" fill="#fff"
+            style={{ animation: "tut-caret 3.2s ease infinite" }} />
+        </svg>
+      ),
+    },
+  ];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", width: "100%", maxWidth: 320 }}>
-      {chip("#2F7D4A", "Scelta multipla")}
-      {chip("#3a7bbf", "Vero / Falso")}
-      {chip("#b5651d", "Risposta aperta")}
+    <div style={{ display: "flex", gap: "0.7rem", width: "100%", maxWidth: 360, perspective: 800 }}>
+      {cards.map((c) => (
+        <div
+          key={c.label}
+          style={{
+            flex: 1,
+            background: `linear-gradient(160deg, ${c.bg}, ${c.bg} 60%, rgba(0,0,0,0.18))`,
+            borderRadius: 16,
+            padding: "0.9rem 0.4rem 0.7rem",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem",
+            boxShadow: `0 10px 22px ${c.bg}44`,
+            animation: `tut-card-in 0.6s cubic-bezier(.34,1.56,.64,1) ${c.delay}s both, tut-float 4s ease-in-out ${c.delay + 0.6}s infinite`,
+          }}
+        >
+          <div style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}>{c.icon}</div>
+          <span style={{
+            color: "#fff", fontWeight: 800, fontSize: "0.72rem", textAlign: "center",
+            lineHeight: 1.15, whiteSpace: "pre-line", letterSpacing: "0.01em",
+          }}>{c.label}</span>
+        </div>
+      ))}
     </div>
   );
 }
 
+// ── Passo 2 ─────────────────────────────────────────────────────────────────
+// "Più giusto e veloce, più punti" — anello di voto che si disegna + numero che
+// conta su, una barra "bonus velocità" che si svuota in loop e scintille d'oro.
 function ScoreVisual() {
+  const R = 52;
+  const C = 2 * Math.PI * R;
+  const pct = 0.82; // riempimento finale dell'anello
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem" }}>
-      <div style={{
-        width: 92, height: 92, borderRadius: "50%",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        background: "conic-gradient(#2F9E5A 0 78%, rgba(0,0,0,0.08) 78% 100%)",
-        fontWeight: 900, fontSize: "2rem", color: "#2F9E5A",
-      }}>
-        <div style={{ width: 70, height: 70, borderRadius: "50%", background: "#f4f6f5", display: "flex", alignItems: "center", justifyContent: "center" }}>A−</div>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.1rem", width: "100%", maxWidth: 320 }}>
+      <div style={{ position: "relative", width: 132, height: 132 }}>
+        {/* scintille orbitanti */}
+        {[0, 1, 2, 3].map((i) => (
+          <span key={i} style={{
+            position: "absolute", top: "50%", left: "50%", width: 6, height: 6, marginLeft: -3, marginTop: -3,
+            borderRadius: "50%", background: GOLD,
+            boxShadow: `0 0 8px ${GOLD}`,
+            animation: `tut-orbit 3.4s linear ${i * 0.85}s infinite`,
+            opacity: 0,
+          }} />
+        ))}
+        <svg viewBox="0 0 132 132" width="132" height="132" style={{ transform: "rotate(-90deg)" }}>
+          <circle cx="66" cy="66" r={R} stroke="rgba(47,125,74,0.14)" strokeWidth="11" fill="none" />
+          <circle
+            cx="66" cy="66" r={R} stroke={GREEN_LITE} strokeWidth="11" fill="none"
+            strokeLinecap="round"
+            strokeDasharray={C}
+            strokeDashoffset={C}
+            style={{
+              animation: "tut-ring 2.6s cubic-bezier(.4,0,.2,1) 0.3s infinite",
+              // valore custom usato nelle keyframes
+              ["--ring-target" as string]: `${C * (1 - pct)}`,
+              filter: `drop-shadow(0 0 6px ${GREEN_LITE}88)`,
+            }}
+          />
+        </svg>
+        <div style={{
+          position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+          flexDirection: "column",
+        }}>
+          <span style={{
+            fontWeight: 900, fontSize: "2.4rem", color: GREEN_LITE, lineHeight: 1,
+            animation: "tut-grade-pop 2.6s ease 0.3s infinite",
+          }}>A−</span>
+        </div>
       </div>
-      <p style={{ margin: 0, fontWeight: 700, fontSize: "0.85rem", color: "#3c4a41" }}>Voto + bonus velocità</p>
+
+      {/* barra bonus velocità che si "consuma" come un timer */}
+      <div style={{ width: "100%", maxWidth: 240 }}>
+        <div style={{
+          display: "flex", justifyContent: "space-between", fontSize: "0.66rem",
+          fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em",
+          color: "#7a8a80", marginBottom: 5,
+        }}>
+          <span>Bonus velocità</span>
+          <span style={{ color: GOLD, animation: "tut-blink 2.6s ease 0.3s infinite" }}>+100</span>
+        </div>
+        <div style={{ height: 8, borderRadius: 999, background: "rgba(0,0,0,0.08)", overflow: "hidden" }}>
+          <div style={{
+            height: "100%", borderRadius: 999,
+            background: `linear-gradient(90deg, ${GOLD}, #f2c94c)`,
+            animation: "tut-drain 2.6s linear 0.3s infinite",
+            boxShadow: `0 0 10px ${GOLD}aa`,
+          }} />
+        </div>
+      </div>
     </div>
   );
 }
 
+// ── Passo 3 ─────────────────────────────────────────────────────────────────
+// "Streak e classifica live" — fiamme che pulsano in cascata, moltiplicatore che
+// "scatta", trofeo che rimbalza, e tre righe di classifica che salgono di posto.
 function StreakVisual() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "1.8rem" }}>
-      <span>🔥</span><span>🔥</span><span>🔥</span>
-      <span style={{ fontWeight: 900, fontSize: "1.4rem", color: "#D9A400" }}>×3</span>
-      <span style={{ fontSize: "1.6rem" }}>🏆</span>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.1rem", width: "100%", maxWidth: 300 }}>
+      {/* fiamme + moltiplicatore */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+        {[0, 1, 2].map((i) => (
+          <span key={i} style={{
+            fontSize: "2rem", display: "inline-block",
+            animation: `tut-flame 1.1s ease-in-out ${i * 0.18}s infinite`,
+            filter: "drop-shadow(0 3px 6px rgba(217,164,0,0.5))",
+          }}>🔥</span>
+        ))}
+        <span style={{
+          fontWeight: 900, fontSize: "1.6rem", color: GOLD, marginLeft: 4,
+          animation: "tut-mult 2.2s cubic-bezier(.34,1.56,.64,1) infinite",
+          textShadow: `0 2px 8px ${GOLD}66`,
+        }}>×3</span>
+        <span style={{
+          fontSize: "1.9rem", marginLeft: 6, display: "inline-block",
+          animation: "tut-trophy 2.2s ease 0.4s infinite",
+          filter: "drop-shadow(0 3px 6px rgba(217,164,0,0.5))",
+        }}>🏆</span>
+      </div>
+
+      {/* mini-classifica live: la riga "tu" sale in cima */}
+      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}>
+        {[
+          { name: "Giulia", me: false, w: "72%", base: 0 },
+          { name: "TU", me: true, w: "92%", base: 1 },
+          { name: "Marco", me: false, w: "58%", base: 2 },
+        ].map((r, i) => (
+          <div key={r.name} style={{
+            display: "flex", alignItems: "center", gap: "0.55rem",
+            padding: "0.4rem 0.6rem", borderRadius: 10,
+            background: r.me ? `linear-gradient(90deg, ${GREEN}1f, ${GREEN}08)` : "rgba(0,0,0,0.04)",
+            border: r.me ? `1px solid ${GREEN}40` : "1px solid transparent",
+            animation: r.me
+              ? "tut-rank-rise 3s cubic-bezier(.5,0,.2,1) infinite"
+              : `tut-row-in 0.5s ease ${0.3 + i * 0.1}s both`,
+          }}>
+            <span style={{
+              width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+              background: r.me ? GREEN_LITE : "rgba(0,0,0,0.12)",
+              color: r.me ? "#fff" : "#7a8a80",
+              fontSize: "0.6rem", fontWeight: 900,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>{i + 1}</span>
+            <span style={{
+              fontWeight: r.me ? 900 : 700, fontSize: "0.74rem",
+              color: r.me ? GREEN : "#5a6a60", width: 52, flexShrink: 0,
+            }}>{r.name}</span>
+            <div style={{ flex: 1, height: 6, borderRadius: 999, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+              <div style={{
+                height: "100%", width: r.w, borderRadius: 999,
+                background: r.me ? `linear-gradient(90deg, ${GREEN}, ${GREEN_LITE})` : "rgba(0,0,0,0.18)",
+                animation: r.me ? "tut-bar-grow 3s ease infinite" : "none",
+              }} />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -62,3 +246,105 @@ export const TRIVIA_INTRO: IntroStep[] = [
     visual: <StreakVisual />,
   },
 ];
+
+// ════════════════════════════════════════════════════════════════════════════
+// Keyframes condivise dai visual. Iniettate una sola volta (id univoco) così da
+// non duplicarle ad ogni cambio di passo.
+// ════════════════════════════════════════════════════════════════════════════
+export const TUTORIAL_KEYFRAMES = (
+  <style id="trivia-tutorial-keyframes">{`
+    /* Passo 1 — card */
+    @keyframes tut-card-in {
+      from { opacity: 0; transform: translateY(26px) rotateX(28deg) scale(0.9); }
+      to   { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+    }
+    @keyframes tut-float {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-7px); }
+    }
+    @keyframes tut-pop {
+      0%,100% { transform: scale(0); opacity: 0; }
+      40%,70% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes tut-flip {
+      0%,100% { transform: rotateY(0deg); }
+      50%     { transform: rotateY(180deg); }
+    }
+    @keyframes tut-draw {
+      0%,30%  { stroke-dashoffset: 26; }
+      55%,100%{ stroke-dashoffset: 0; }
+    }
+    @keyframes tut-type {
+      0%   { width: 0; }
+      80%  { width: 20px; }
+      100% { width: 0; }
+    }
+    @keyframes tut-caret {
+      0%,80% { transform: translateX(0); opacity: 1; }
+      40%    { transform: translateX(20px); }
+      90%,100% { transform: translateX(0); opacity: 0.4; }
+    }
+
+    /* Passo 2 — anello voto + bonus */
+    @keyframes tut-ring {
+      0%   { stroke-dashoffset: 327; }   /* C ≈ 327 (vuoto) */
+      45%,100% { stroke-dashoffset: var(--ring-target); }
+    }
+    @keyframes tut-grade-pop {
+      0%   { transform: scale(0.6); opacity: 0; }
+      45%  { transform: scale(1.18); opacity: 1; }
+      60%  { transform: scale(1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes tut-drain {
+      0%   { width: 100%; }
+      100% { width: 8%; }
+    }
+    @keyframes tut-blink {
+      0%,45% { opacity: 0; transform: translateY(-3px); }
+      55%    { opacity: 1; transform: translateY(0); }
+      100%   { opacity: 1; }
+    }
+    @keyframes tut-orbit {
+      0%   { transform: rotate(0deg) translateX(58px) rotate(0deg); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: rotate(360deg) translateX(58px) rotate(-360deg); opacity: 0; }
+    }
+
+    /* Passo 3 — streak + classifica */
+    @keyframes tut-flame {
+      0%,100% { transform: translateY(0) scale(1); }
+      30%     { transform: translateY(-5px) scale(1.14) rotate(-4deg); }
+      60%     { transform: translateY(-2px) scale(1.05) rotate(3deg); }
+    }
+    @keyframes tut-mult {
+      0%,70%,100% { transform: scale(1); }
+      78%         { transform: scale(1.45) rotate(-6deg); }
+      86%         { transform: scale(0.92); }
+    }
+    @keyframes tut-trophy {
+      0%,60%,100% { transform: translateY(0) rotate(0); }
+      72%         { transform: translateY(-10px) rotate(8deg); }
+      84%         { transform: translateY(0) rotate(-5deg); }
+    }
+    @keyframes tut-row-in {
+      from { opacity: 0; transform: translateX(-14px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes tut-rank-rise {
+      0%   { transform: translateY(28px) scale(0.96); }
+      35%  { transform: translateY(0) scale(1.03); }
+      45%  { transform: scale(1); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes tut-bar-grow {
+      0%   { width: 30%; }
+      40%,100% { width: 92%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .gt-scene * { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
+    }
+  `}</style>
+);

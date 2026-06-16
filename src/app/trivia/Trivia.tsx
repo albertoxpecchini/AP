@@ -9,7 +9,7 @@ import Leaderboard from "./Leaderboard";
 import Pagella from "./Pagella";
 import SubjectBadge from "./SubjectBadge";
 import GameTutorial, { hasSeenTutorial } from "../components/GameIntro";
-import { TRIVIA_INTRO } from "./tutorialSteps";
+import { TRIVIA_INTRO, TUTORIAL_KEYFRAMES } from "./tutorialSteps";
 
 import { questionsForMany, prepareGame } from "./questions";
 import { isAnswerCorrect, type Question } from "./parseTrivia";
@@ -557,6 +557,7 @@ export default function Trivia() {
           accentColor="#2F7D4A"
           darkBg="#103820"
           dark={dark}
+          extra={TUTORIAL_KEYFRAMES}
           onDone={onTutorialDone}
         />
       )}
