@@ -222,9 +222,10 @@ export default function TriviaMenu({
               className={`trm-tile${on ? " is-on" : ""}${cov >= 100 ? " is-done" : ""}`}
               title={c.autore ? `${c.argomento} · ${c.autore}` : c.argomento}
             >
+              <span className="trm-tile-glow" aria-hidden />
               <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
               <span className="trm-tile-ring">{progressRing(seen, total, cov)}</span>
-              <span className="trm-tile-logo">{iconForChapter(c.id)}</span>
+              <span className="trm-tile-mark" aria-hidden>{iconForChapter(c.id)}</span>
               <span className="trm-tile-title">{c.title}</span>
             </button>
           );
@@ -248,6 +249,7 @@ export default function TriviaMenu({
               className={`trm-tile${on ? " is-on" : ""}`}
               title={t.desc}
             >
+              <span className="trm-tile-glow" aria-hidden />
               <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
               <span className="trm-tile-title trm-tile-title-type">{t.label}</span>
             </button>
@@ -477,98 +479,135 @@ export default function TriviaMenu({
         }
         .trm-nick-chip:hover { filter:brightness(0.85); }
 
-        /* ═══════ Tile capitoli "Italia kit": logo verde, testo nero, hover che colora, click che accende ═══════ */
+        /* ═══════ Tile capitoli stile "booking card": titolo grande che riempie la card,
+                   fondo a gradiente verde, logo a filigrana, sfumature + animazioni ═══════ */
         .trm-grid {
-          display:grid; grid-template-columns:repeat(2,1fr); gap:0.5rem;
+          display:grid; grid-template-columns:repeat(2,1fr); gap:0.55rem;
           margin-top:0.5rem;
         }
         .trm-grid-types { grid-template-columns:repeat(3,1fr); }
 
         .trm-tile {
-          --gv:#2F7D4A;
+          --gv:#2F7D4A; --gv2:#1f6b3c; --gv3:#3a9e5f;
           position:relative; isolation:isolate;
-          display:flex; flex-direction:column; align-items:center; justify-content:center;
-          gap:0.4rem; text-align:center;
+          display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
           aspect-ratio:1/1; min-height:0;
-          padding:0.7rem 0.5rem;
-          background:${card};
-          border:1.5px solid ${bord};
-          border-radius:14px; cursor:pointer; font-family:inherit;
+          padding:0.7rem 0.75rem;
+          border:1px solid ${bord};
+          border-radius:18px; cursor:pointer; font-family:inherit; text-align:left;
           overflow:hidden;
-          transition:transform .18s cubic-bezier(.2,.7,.3,1.2), border-color .18s, box-shadow .18s, background .18s;
-          box-shadow:0 1px 2px rgba(0,0,0,0.04);
+          background:
+            radial-gradient(120% 90% at 100% 0%, ${dark ? "rgba(58,158,95,0.18)" : "rgba(58,158,95,0.10)"} 0%, transparent 55%),
+            linear-gradient(160deg, ${card} 0%, ${dark ? "#16241c" : "#f3faf5"} 100%);
+          box-shadow:0 2px 6px rgba(0,0,0,0.05);
+          transition:transform .22s cubic-bezier(.2,.7,.3,1.25), border-color .22s, box-shadow .22s, background .25s;
         }
-        /* velo verde che sale dal basso allo hover (riempimento "kit Italia") */
+
+        /* gradiente verde pieno che "sale" allo hover / quando acceso */
         .trm-tile::before {
-          content:""; position:absolute; inset:0; z-index:-1;
-          background:linear-gradient(180deg, ${dark ? "rgba(47,125,74,0.18)" : "rgba(47,125,74,0.07)"} 0%, transparent 70%);
-          opacity:0; transition:opacity .2s;
+          content:""; position:absolute; inset:0; z-index:-2;
+          background:linear-gradient(155deg, var(--gv3) 0%, var(--gv) 45%, var(--gv2) 100%);
+          opacity:0; transition:opacity .28s ease;
         }
+        /* alone luminoso animato (shimmer) che scorre allo hover */
+        .trm-tile-glow {
+          position:absolute; inset:-40%; z-index:-1; pointer-events:none;
+          background:radial-gradient(closest-side, rgba(255,255,255,0.35), transparent 70%);
+          opacity:0; transform:translate(-30%,30%) scale(0.6);
+          transition:opacity .3s, transform .5s ease;
+        }
+
         .trm-tile:hover {
+          transform:translateY(-4px);
           border-color:var(--gv);
-          transform:translateY(-3px);
-          box-shadow:0 10px 22px ${dark ? "rgba(0,0,0,0.4)" : "rgba(47,125,74,0.18)"};
+          box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(31,107,60,0.30)"};
         }
-        .trm-tile:hover::before { opacity:1; }
         .trm-tile:active { transform:translateY(-1px) scale(0.97); }
 
-        /* stato "acceso" = selezionato */
-        .trm-tile.is-on {
-          border-color:var(--gv);
-          background:${dark ? "rgba(47,125,74,0.16)" : "rgba(47,125,74,0.10)"};
-          box-shadow:0 0 0 1px var(--gv), 0 8px 20px ${dark ? "rgba(0,0,0,0.45)" : "rgba(47,125,74,0.22)"};
-        }
+        /* HOVER e SELEZIONATO: la card diventa verde pieno, testo bianco */
+        .trm-tile:hover::before { opacity:1; }
+        .trm-tile:hover .trm-tile-glow { opacity:1; transform:translate(0,0) scale(1); }
         .trm-tile.is-on::before { opacity:1; }
-
-        .trm-tile-logo {
-          width:34px; height:34px; flex-shrink:0;
-          display:flex; align-items:center; justify-content:center;
-          color:var(--gv);
-          transition:transform .2s cubic-bezier(.2,.7,.3,1.4);
+        .trm-tile.is-on {
+          border-color:var(--gv3);
+          box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(31,107,60,0.35)"};
         }
-        .trm-tile-logo svg { width:30px; height:30px; }
-        .trm-tile:hover .trm-tile-logo,
-        .trm-tile.is-on .trm-tile-logo { transform:scale(1.12) translateY(-1px); }
+        .trm-tile:hover .trm-tile-title,
+        .trm-tile.is-on .trm-tile-title { color:#fff; }
+        .trm-tile:hover .trm-tile-mark,
+        .trm-tile.is-on .trm-tile-mark { color:rgba(255,255,255,0.9); opacity:0.95; transform:scale(1.15) rotate(-4deg); }
 
+        /* logo a filigrana grande nell'angolo alto-sinistra */
+        .trm-tile-mark {
+          position:absolute; top:8px; left:9px;
+          width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+          color:var(--gv); opacity:0.55;
+          transition:transform .3s cubic-bezier(.2,.7,.3,1.5), color .25s, opacity .25s;
+        }
+        .trm-tile-mark svg { width:28px; height:28px; }
+
+        /* TITOLO protagonista: grande, in basso, riempie la card */
         .trm-tile-title {
-          font-size:0.74rem; font-weight:700; line-height:1.2;
+          position:relative; z-index:1;
+          font-size:1.02rem; font-weight:800; line-height:1.12;
+          letter-spacing:-0.01em;
           color:${textMain};
-          display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+          display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
           overflow:hidden; max-width:100%;
+          transition:color .25s;
+          text-shadow:0 1px 0 rgba(255,255,255,0.04);
         }
-        .trm-tile-title-type { -webkit-line-clamp:2; }
+        .trm-tile:hover .trm-tile-title,
+        .trm-tile.is-on .trm-tile-title { text-shadow:0 1px 8px rgba(0,0,0,0.25); }
+        .trm-tile-title-type { font-size:0.92rem; -webkit-line-clamp:2; }
 
-        /* anello progressi: angolo in alto a destra */
-        .trm-tile-ring { position:absolute; top:6px; right:6px; }
+        /* anello progressi: angolo in alto a destra; su verde diventa chiaro */
+        .trm-tile-ring { position:absolute; top:7px; right:7px; z-index:1; transition:filter .25s; }
+        .trm-tile:hover .trm-tile-ring,
+        .trm-tile.is-on .trm-tile-ring { filter:brightness(0) invert(1) opacity(0.92); }
 
-        /* spunta "accesa": angolo in alto a sinistra, compare con pop */
+        /* spunta "accesa": angolo basso-destra, pop elastico */
         .trm-tile-check {
-          position:absolute; top:6px; left:6px;
-          width:20px; height:20px; border-radius:7px;
-          background:var(--gv); color:#fff;
+          position:absolute; bottom:8px; right:8px; z-index:2;
+          width:22px; height:22px; border-radius:8px;
+          background:#fff; color:var(--gv);
           display:flex; align-items:center; justify-content:center;
-          transform:scale(0); opacity:0;
-          transition:transform .22s cubic-bezier(.2,.9,.3,1.5), opacity .18s;
-          box-shadow:0 2px 8px ${dark ? "rgba(0,0,0,0.5)" : "rgba(47,125,74,0.45)"};
+          transform:scale(0) rotate(-30deg); opacity:0;
+          transition:transform .26s cubic-bezier(.2,.9,.3,1.6), opacity .2s;
+          box-shadow:0 3px 10px rgba(0,0,0,0.3);
         }
+        .trm-tile-check svg path { stroke:var(--gv); }
         .trm-tile.is-on .trm-tile-check,
-        .trm-tile.is-done .trm-tile-check { transform:scale(1); opacity:1; }
+        .trm-tile.is-done .trm-tile-check { transform:scale(1) rotate(0); opacity:1; }
 
-        /* tile larga "Tutti i capitoli" */
+        /* tile larga "Tutti i capitoli": gradiente verde pieno fisso (come hero card della foto) */
         .trm-tile-all {
-          flex-direction:row; aspect-ratio:auto;
+          flex-direction:row; aspect-ratio:auto; align-items:center;
           justify-content:flex-start; text-align:left;
-          gap:0.7rem; padding:0.7rem 0.9rem 0.7rem 1rem;
-          width:100%;
+          gap:0.7rem; padding:0.85rem 1rem;
+          width:100%; border:none;
+          background:linear-gradient(135deg, var(--gv3) 0%, var(--gv) 50%, var(--gv2) 100%);
+          box-shadow:0 8px 22px ${dark ? "rgba(0,0,0,0.5)" : "rgba(31,107,60,0.32)"};
         }
-        .trm-tile-all .trm-tile-check { position:static; transform:scale(0); width:22px; height:22px; }
+        .trm-tile-all::before, .trm-tile-all .trm-tile-glow { display:none; }
+        .trm-tile-all:hover { transform:translateY(-3px); box-shadow:0 16px 34px ${dark ? "rgba(0,0,0,0.6)" : "rgba(31,107,60,0.42)"}; }
+        .trm-tile-all .trm-tile-check {
+          position:static; transform:scale(0); width:24px; height:24px; border-radius:8px;
+          background:rgba(255,255,255,0.22); color:#fff; box-shadow:none;
+        }
+        .trm-tile-all .trm-tile-check svg path { stroke:#fff; }
         .trm-tile-all.is-on .trm-tile-check { transform:scale(1); opacity:1; }
-        .trm-tile-all-ic { color:var(--gv); display:flex; flex-shrink:0; transition:transform .2s; }
-        .trm-tile-all:hover .trm-tile-all-ic { transform:scale(1.1); }
+        .trm-tile-all-ic { color:#fff; display:flex; flex-shrink:0; transition:transform .25s; }
+        .trm-tile-all:hover .trm-tile-all-ic { transform:scale(1.15) rotate(-6deg); }
         .trm-tile-all-txt { display:flex; flex-direction:column; min-width:0; }
-        .trm-tile-all-title { font-size:0.92rem; font-weight:800; color:${textMain}; line-height:1.2; }
-        .trm-tile-all-sub { font-size:0.7rem; color:${textSub}; line-height:1.3; margin-top:0.1rem;
+        .trm-tile-all-title { font-size:1rem; font-weight:800; color:#fff; line-height:1.2; }
+        .trm-tile-all-sub { font-size:0.72rem; color:rgba(255,255,255,0.82); line-height:1.3; margin-top:0.12rem;
           overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+        /* tipo domanda: tile più basse, titolo centrato */
+        .trm-grid-types .trm-tile { aspect-ratio:auto; min-height:64px; align-items:center; justify-content:center; }
+        .trm-grid-types .trm-tile .trm-tile-title { text-align:center; }
+        @keyframes trm-pop { 0%{transform:scale(0.6);opacity:0;} 60%{transform:scale(1.08);} 100%{transform:scale(1);opacity:1;} }
 
         @media (min-width: 760px) {
           .trm-mobile  { display:none; }
