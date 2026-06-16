@@ -46,6 +46,7 @@ interface TriviaMenuProps {
   onPlay: (chapters: ChapterSelection, types: TypeSelection) => void;
   onTutorial: () => void;
   onLeaderboard: () => void;
+  onPagella: () => void;
   onChangeNick: () => void;
 }
 
@@ -55,7 +56,7 @@ const colorForIdx = (i: number) => CHAP_COLORS[i % CHAP_COLORS.length];
 
 export default function TriviaMenu({
   dark, bestStreak, bestGrade, coverage, nick,
-  onPlay, onTutorial, onLeaderboard, onChangeNick,
+  onPlay, onTutorial, onLeaderboard, onPagella, onChangeNick,
 }: TriviaMenuProps) {
   // Set di id capitoli selezionati. Vuoto = "Tutti i capitoli".
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -308,6 +309,12 @@ export default function TriviaMenu({
     </button>
   );
 
+  const PagellaBtn = (
+    <button type="button" onClick={onPagella} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+      <GraduationCap size={15} /> La mia pagella
+    </button>
+  );
+
   const NickChip = nick ? (
     <button type="button" onClick={onChangeNick} className="trm-nick-chip" style={{ color: lbl, border: `1px solid ${bord}` }}>
       Giochi come <b style={{ color: textMain }}>{nick}</b> · cambia
@@ -354,6 +361,7 @@ export default function TriviaMenu({
           {TypeList}
           {PlayBtn}
           {LbBtn}
+          {PagellaBtn}
           <button type="button" onClick={onTutorial} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
             <BookOpen size={15} /> Come si gioca
           </button>
@@ -379,10 +387,11 @@ export default function TriviaMenu({
           {PlayBtn}
           <div style={{ display: "flex", gap: "0.6rem" }}>
             <div style={{ flex: 1 }}>{LbBtn}</div>
-            <button type="button" onClick={onTutorial} className="trm-tut-btn" style={{ flex: 1, color: icon, border: `1.5px solid ${bord}` }}>
-              <BookOpen size={15} /> Come si gioca
-            </button>
+            <div style={{ flex: 1 }}>{PagellaBtn}</div>
           </div>
+          <button type="button" onClick={onTutorial} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+            <BookOpen size={15} /> Come si gioca
+          </button>
           {NickChip}
           {BackBtn}
         </div>

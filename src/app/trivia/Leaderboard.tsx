@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, Trophy, Wifi, WifiOff, Medal, Target } from "lucide-react";
+import { X, Trophy, Wifi, WifiOff, Medal, Target, GraduationCap } from "lucide-react";
 import { fetchTop, subscribeToScores, leaderboardConfigured, type ScoreRow } from "./leaderboardApi";
 import { CHAPTERS } from "./questions";
 import { iconForChapter } from "./chapterIcons";
+import Pagella from "./Pagella";
 
 interface LeaderboardProps {
   dark: boolean;
@@ -27,6 +28,7 @@ const chapLabel = (id: string) =>
  * Ordine SEMPRE decrescente per punteggio. Gemella di angoli/Leaderboard.
  */
 export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: LeaderboardProps) {
+  const [view, setView] = useState<"classifica" | "pagella">("classifica");
   const [filter, setFilter] = useState<string | "all">("all");
   const [rows, setRows] = useState<ScoreRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,8 +143,25 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
               </span>
             )}
           </div>
+
+          <div className="trv-lb-tabs" role="tablist" aria-label="Vista">
+            <button className={`trv-lb-tab${view === "classifica" ? " act" : ""}`} role="tab" aria-selected={view === "classifica"} onClick={() => setView("classifica")}>
+              <Trophy size={13} /> Classifica
+            </button>
+            <button className={`trv-lb-tab${view === "pagella" ? " act" : ""}`} role="tab" aria-selected={view === "pagella"} onClick={() => setView("pagella")}>
+              <GraduationCap size={13} /> La mia pagella
+            </button>
+          </div>
         </header>
 
+        {view === "pagella" ? (
+          <div className="trv-lb-body">
+            {myNick
+              ? <Pagella dark={dark} nick={myNick} compact />
+              : <div className="trv-lb-empty"><span className="trv-lb-emptyico"><GraduationCap size={30} strokeWidth={1.6} /></span><strong>Nessun nome</strong><span>Scegli un nome per vedere la tua pagella.</span></div>}
+          </div>
+        ) : (
+        <>
         <div className="trv-lb-filterswrap">
           <div className="trv-lb-filters" ref={filtersRef} role="tablist" aria-label="Filtra per capitolo">
             <button
@@ -152,6 +171,15 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
               aria-selected={filter === "all"}
             >
               <Trophy size={13} strokeWidth={2.2} /> Tutti
+            </button>
+            <button
+              className={`trv-lb-fbtn${filter === "misto" ? " act" : ""}`}
+              onClick={() => setFilter("misto")}
+              role="tab"
+              aria-selected={filter === "misto"}
+              title="Partite su più capitoli insieme"
+            >
+              <Target size={13} strokeWidth={2.2} /> Misto
             </button>
             {CHAPTERS.map(c => (
               <button
@@ -230,6 +258,8 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
             <span className="trv-lb-footscore">{fmtScore(rows[myRank].score)} pt</span>
           </footer>
         )}
+        </>
+        )}
       </div>
 
       <style>{`
@@ -295,6 +325,19 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         }
         @keyframes trv-lb-blink { 0%{box-shadow:0 0 0 0 rgba(95,227,156,0.6)} 70%{box-shadow:0 0 0 6px rgba(95,227,156,0)} 100%{box-shadow:0 0 0 0 rgba(95,227,156,0)} }
         .trv-lb-live.off { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); }
+
+        /* ── Tab Classifica / Pagella ── */
+        .trv-lb-tabs { display:flex; gap:.4rem; margin-top:.7rem; position:relative; z-index:1; }
+        .trv-lb-tab {
+          flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.35rem;
+          border:none; border-radius:999px; padding:.4rem .6rem; cursor:pointer;
+          font-family:inherit; font-size:.78rem; font-weight:800;
+          background:rgba(255,255,255,0.13); color:rgba(255,255,255,0.82);
+          transition:background .15s, color .15s, transform .1s;
+        }
+        .trv-lb-tab:hover { background:rgba(255,255,255,0.2); }
+        .trv-lb-tab.act { background:#fff; color:#1F6B3D; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+        .trv-lb.dark .trv-lb-tab.act { background:#0e1512; color:#6fe0a6; }
 
         /* ── Filtri a chip con icone tematiche (scroll + fade ai bordi) ── */
         .trv-lb-filterswrap { position:relative; flex-shrink:0; border-bottom:1px solid rgba(0,0,0,0.06); }

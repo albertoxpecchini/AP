@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
-import { ArrowLeft, Moon, Sun, Flame, Check, X as XIcon, ListOrdered, RotateCcw, Send } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Flame, Check, X as XIcon, ListOrdered, RotateCcw, Send, GraduationCap } from "lucide-react";
 
 import TriviaMenu, { type ChapterSelection, type TypeSelection } from "./TriviaMenu";
 import NicknameGate, { getStoredNick } from "./NicknameGate";
 import Leaderboard from "./Leaderboard";
+import Pagella from "./Pagella";
+import SubjectBadge from "./SubjectBadge";
 import GameTutorial, { hasSeenTutorial } from "../components/GameIntro";
 import { TRIVIA_INTRO } from "./tutorialSteps";
 
@@ -17,6 +19,7 @@ import { iconForChapter } from "./chapterIcons";
 import { gradeFromPct, isGoodGrade } from "./grade";
 import { computePackageGrades, typeLabelLong } from "./packageGrades";
 import { submitScore, type ScoreRow } from "./leaderboardApi";
+import { saveGrades } from "./gradesApi";
 
 const GAME_KEY = "trivia";
 const BEST_STREAK_KEY = "trivia-best-streak";
@@ -36,6 +39,7 @@ interface Played {
   question: Question;
   correct: boolean;
   awarded: number;
+  ms: number;        // tempo impiegato su questa domanda (cronometro dal via)
 }
 
 export default function Trivia() {
@@ -51,6 +55,7 @@ export default function Trivia() {
   const [phase, setPhase] = useState<Phase>("menu");
   const [showTutorial, setShowTutorial] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showPagella, setShowPagella] = useState(false);
 
   const [nick, setNick] = useState<string>(() => getStoredNick());
   const pendingPlay = useRef<{ chapters: ChapterSelection; types: TypeSelection } | null>(null);
@@ -205,7 +210,7 @@ export default function Trivia() {
     setScore(s => s + awarded);
     setWasCorrect(correct);
     setRevealed(true);
-    setPlayed(prev => [...prev, { question: current, correct, awarded }]);
+    setPlayed(prev => [...prev, { question: current, correct, awarded, ms: elapsed }]);
 
     if (correct) {
       confetti({ particleCount: 28, spread: 55, startVelocity: 32, origin: { y: 0.7 }, colors: ["#2F7D4A", "#D9A400", "#fff", "#6fd08a"] });
@@ -249,6 +254,10 @@ export default function Trivia() {
       .then(row => setJustSubmitted(row))
       .catch(() => {});
 
+    // pagella: salva i voti dei pacchetti completati (record+ultimo, con tempi)
+    const packages = computePackageGrades(played, queue);
+    if (nick && packages.length) void saveGrades(nick, packages);
+
     if (isGoodGrade(accuracy)) {
       setTimeout(() => confetti({ particleCount: 220, spread: 120, origin: { y: 0.4 }, colors: ["#2F9E5A", "#D9A400", "#fff", "#6fd08a", "#c8a415"] }), 200);
     }
@@ -278,6 +287,9 @@ export default function Trivia() {
       {phase === "playing" && current && (
         <header className="trv-hud">
           <button className="trv-hud-back" onClick={backToMenu} aria-label="Esci"><ArrowLeft size={18} /></button>
+          {nick && current.argomento && (
+            <SubjectBadge dark={dark} nick={nick} argomento={current.argomento} />
+          )}
           <div className="trv-hud-prog">
             <span className="trv-hud-prog-txt">{idx + 1} / {queue.length}</span>
             <div className="trv-hud-bar">
@@ -433,6 +445,7 @@ export default function Trivia() {
           <div className="trv-res-actions">
             <button className="trv-res-primary" onClick={() => startGame(chapters, qTypes)}><RotateCcw size={17} /> Rigioca</button>
             <button className="trv-res-second" onClick={() => setShowLeaderboard(true)}><ListOrdered size={17} /> Classifica</button>
+            <button className="trv-res-second" onClick={() => setShowPagella(true)}><GraduationCap size={17} /> Pagella</button>
           </div>
           <button className="trv-res-menu" onClick={backToMenu}>Torna al menu</button>
           <Link to="/#progetti" className="trv-res-back"><ArrowLeft size={14} /> Torna ai progetti</Link>
@@ -450,6 +463,7 @@ export default function Trivia() {
           onPlay={onPlay}
           onTutorial={() => setShowTutorial(true)}
           onLeaderboard={() => setShowLeaderboard(true)}
+          onPagella={() => setShowPagella(true)}
           onChangeNick={() => { pendingPlay.current = null; setPhase("gate"); }}
         />
       )}
@@ -470,6 +484,58 @@ export default function Trivia() {
       )}
       {showLeaderboard && (
         <Leaderboard dark={dark} myNick={nick} justSubmitted={justSubmitted} onClose={() => setShowLeaderboard(false)} />
+      )}
+      {showPagella && (
+        <div className={`trv-pagmodal${dark ? " dark" : ""}`} onClick={() => setShowPagella(false)} role="dialog" aria-modal="true" aria-label="La mia pagella">
+          <div className="trv-pagmodal-card" onClick={e => e.stopPropagation()}>
+            <header className="trv-pagmodal-head">
+              <div className="trv-pagmodal-title">
+                <GraduationCap size={20} />
+                <span>La mia pagella{nick ? <small>{nick}</small> : null}</span>
+              </div>
+              <button className="trv-pagmodal-x" onClick={() => setShowPagella(false)} aria-label="Chiudi"><XIcon size={20} /></button>
+            </header>
+            <div className="trv-pagmodal-body">
+              {nick
+                ? <Pagella dark={dark} nick={nick} />
+                : <p style={{ textAlign: "center", padding: "2rem", color: dark ? "#8fc7a6" : "#6b8070" }}>Scegli un nome per avere la tua pagella.</p>}
+            </div>
+          </div>
+          <style>{`
+            .trv-pagmodal {
+              position:fixed; inset:0; z-index:260;
+              background:rgba(10,28,17,0.62); backdrop-filter:blur(3px);
+              display:flex; align-items:center; justify-content:center; padding:1rem;
+              font-family:"Titillium Web", Geneva, Tahoma, sans-serif;
+              animation:trv-pagmodal-fade .22s ease;
+            }
+            @keyframes trv-pagmodal-fade { from{opacity:0} to{opacity:1} }
+            .trv-pagmodal-card {
+              width:min(96vw,520px); max-height:min(90vh,760px);
+              display:flex; flex-direction:column; background:#fff; border-radius:20px; overflow:hidden;
+              box-shadow:0 30px 80px rgba(6,22,14,0.45);
+              animation:trv-pagmodal-up .34s cubic-bezier(.2,.9,.3,1.1);
+            }
+            .trv-pagmodal.dark .trv-pagmodal-card { background:#14211a; }
+            @keyframes trv-pagmodal-up { from{opacity:0; transform:translateY(16px) scale(.97)} to{opacity:1; transform:none} }
+            .trv-pagmodal-head {
+              background:linear-gradient(135deg,#14512c 0%,#2F7D4A 100%); color:#fff; flex-shrink:0;
+              padding:1rem 1.1rem; display:flex; align-items:center; justify-content:space-between;
+            }
+            .trv-pagmodal.dark .trv-pagmodal-head { background:linear-gradient(135deg,#0c2e19 0%,#1c5733 100%); }
+            .trv-pagmodal-title { display:flex; align-items:center; gap:.55rem; font-size:1.18rem; font-weight:800; }
+            .trv-pagmodal-title small { display:block; font-size:.66rem; font-weight:600; opacity:.8; margin-top:.1rem; }
+            .trv-pagmodal-x {
+              display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+              border-radius:50%; border:none; background:rgba(255,255,255,0.14); color:#fff; cursor:pointer;
+              transition:background .15s, transform .15s;
+            }
+            .trv-pagmodal-x:hover { background:rgba(255,255,255,0.26); transform:rotate(90deg); }
+            .trv-pagmodal-body { flex:1; min-height:0; overflow-y:auto; padding:1rem .9rem 1.2rem; scrollbar-width:thin; }
+            .trv-pagmodal-body::-webkit-scrollbar { width:7px; }
+            .trv-pagmodal-body::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.25); border-radius:99px; }
+          `}</style>
+        </div>
       )}
 
       {/* Toggle tema (visibile in playing/results) */}
