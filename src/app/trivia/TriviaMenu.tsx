@@ -408,7 +408,6 @@ export default function TriviaMenu({
       <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={onLight ? { color: vio, border: `1.5px solid ${vBord}` } : undefined}>
         <BookOpen size={18} /> Come si gioca
       </button>
-      {NickChip}
       {BackBtn}
     </>
   );
@@ -425,10 +424,11 @@ export default function TriviaMenu({
     </button>
   );
 
-  // Icona giocatore: punteggio grande (12.4k) + nome sotto. Tap = cambia nome.
-  const NickChip = nick ? (
-    <button type="button" onClick={onChangeNick} className="trm-player" title={`${nick} · tocca per cambiare`}>
-      <span className="trm-player-score">{playerScore === null ? "…" : fmtScore(playerScore)}</span>
+  // Icona-tasto giocatore: pastiglia con avatar (punteggio dentro) + nome.
+  // Sta FUORI dai bottoni d'azione. Tap = cambia nome.
+  const PlayerIcon = (onDark: boolean) => nick ? (
+    <button type="button" onClick={onChangeNick} className={`trm-player${onDark ? " on-dark" : ""}`} title={`${nick} · tocca per cambiare`}>
+      <span className="trm-player-badge">{playerScore === null ? "…" : fmtScore(playerScore)}</span>
       <span className="trm-player-name">{nick}</span>
     </button>
   ) : null;
@@ -505,7 +505,7 @@ export default function TriviaMenu({
           <div className="trm-drawer-back" onClick={() => setMoreOpen(false)}>
             <div className="trm-drawer" onClick={e => e.stopPropagation()}>
               <div className="trm-drawer-head">
-                <span>Altro</span>
+                {PlayerIcon(true) ?? <span>Altro</span>}
                 <button type="button" onClick={() => setMoreOpen(false)} aria-label="Chiudi" className="trm-drawer-x"><X size={20} /></button>
               </div>
               <div className="trm-actions trm-actions-dark">{SecondaryActions(false)}</div>
@@ -524,7 +524,8 @@ export default function TriviaMenu({
           {StatsCard(true)}
           {/* Azioni secondarie nel pannello a sinistra: non confondono la sequenza di gioco */}
           <div className="trm-actions trm-actions-dark">{SecondaryActions(false)}</div>
-          <p className="trm-kicker" style={{ position: "static", marginTop: "auto", opacity: 1 }}>Web Game · Quiz</p>
+          <div className="trm-player-slot">{PlayerIcon(true)}</div>
+          <p className="trm-kicker" style={{ position: "static", opacity: 1 }}>Web Game · Quiz</p>
         </div>
         <div className="trm-desktop-right" style={{ background: bg }}>
           <p className="trm-section-label" style={{ color: icon }}>
@@ -705,24 +706,31 @@ export default function TriviaMenu({
           background:${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.11)"};
           transform:translateY(-1px);
         }
-        /* icona giocatore: punteggione + nome sotto (clickbait da gioco) */
+        /* icona-tasto giocatore: pastiglia con badge punteggio + nome (fuori dai bottoni) */
+        .trm-player-slot { display:flex; justify-content:center; }
         .trm-player {
-          display:flex; flex-direction:column; align-items:center; gap:0.1rem;
-          align-self:center; padding:0.45rem 1.1rem; border:none; cursor:pointer;
-          background:transparent; font-family:inherit; transition:transform .12s;
+          display:inline-flex; align-items:center; gap:0.6rem;
+          padding:0.4rem 0.95rem 0.4rem 0.4rem; border-radius:999px; cursor:pointer;
+          border:1.5px solid ${vBord}; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          font-family:inherit; transition:transform .12s, background .15s, box-shadow .15s;
         }
-        .trm-player:hover { transform:translateY(-1px); }
-        .trm-player:active { transform:scale(0.96); }
-        .trm-player-score {
-          font-size:1.55rem; font-weight:900; line-height:1; letter-spacing:-0.02em;
-          color:${vio}; font-variant-numeric:tabular-nums;
+        .trm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(124,58,237,0.25); }
+        .trm-player:active { transform:scale(0.97); }
+        /* badge tondo "avatar" col punteggio dentro */
+        .trm-player-badge {
+          display:inline-flex; align-items:center; justify-content:center;
+          min-width:38px; height:38px; padding:0 0.4rem; border-radius:999px;
+          background:linear-gradient(140deg,#7c3aed,#5b21b6); color:#fff;
+          font-size:0.92rem; font-weight:900; line-height:1; letter-spacing:-0.02em;
+          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(91,33,182,0.4);
         }
         .trm-player-name {
-          font-size:0.78rem; font-weight:800; color:${textSub};
-          text-transform:uppercase; letter-spacing:0.04em;
+          font-size:0.92rem; font-weight:800; color:${vio};
+          letter-spacing:0.01em; padding-right:0.2rem;
         }
-        .trm-actions-dark .trm-player-score { color:#c4a5ff; }
-        .trm-actions-dark .trm-player-name { color:rgba(255,255,255,0.8); }
+        /* su pannello/drawer scuro */
+        .trm-player.on-dark { border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); }
+        .trm-player.on-dark .trm-player-name { color:#fff; }
 
         /* ═══════ Tile capitoli stile "booking card": titolo grande che riempie la card,
                    fondo a gradiente verde, logo a filigrana, sfumature + animazioni ═══════ */
