@@ -491,6 +491,10 @@ export default function TriviaMenu({
         }
         .trm-nick-chip:hover { filter:brightness(0.85); }
 
+        /* Casella "Pento": piccolo pop allo hover della riga */
+        button:hover > .trm-pento-box { transform:scale(1.08); }
+        button:active > .trm-pento-box { transform:scale(0.94); }
+
         @media (min-width: 760px) {
           .trm-mobile  { display:none; }
           .trm-root { display:flex; align-items:stretch; justify-content:center; }
@@ -546,17 +550,18 @@ function TodoRow(props: {
         transition: "border-color 0.15s, background 0.15s, box-shadow 0.15s",
       }}
     >
-      {/* Checkbox "Pento" a SINISTRA: quadrato morbido / pallino, spunta animata */}
-      <div style={{
-        width: 20, height: 20, flexShrink: 0,
-        borderRadius: multi ? 7 : "50%",
-        background: filled ? color : "transparent",
-        border: filled ? `1.5px solid ${color}` : `1.5px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.16)"}`,
-        boxShadow: filled ? `0 2px 6px ${color}66` : "none",
+      {/* Checkbox "Pento" a SINISTRA: casella netta, angoli morbidi, spunta marcata.
+          Vuota = bordo spesso + interno tenue del colore; piena = pieno colore + alone. */}
+      <div className="trm-pento-box" style={{
+        width: 24, height: 24, flexShrink: 0,
+        borderRadius: multi ? 8 : "50%",
+        background: filled ? color : (dark ? "rgba(255,255,255,0.04)" : `${color}10`),
+        border: filled ? `2px solid ${color}` : `2px solid ${color}66`,
+        boxShadow: filled ? `0 3px 10px ${color}80` : "none",
         display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background .15s, border-color .15s, box-shadow .15s",
+        transition: "background .18s, border-color .18s, box-shadow .18s, transform .18s",
       }}>
-        {filled && <svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6.2l2.6 2.6L10 3.4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
+        {filled && <svg width="14" height="14" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
       </div>
       {/* Slot logo SVG del capitolo: discreto e indicativo. Quando un capitolo
           avrà il suo logo (campo `logo`) verrà mostrato qui; altrimenti niente. */}
