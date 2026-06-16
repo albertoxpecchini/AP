@@ -503,7 +503,7 @@ export default function TriviaMenu({
                 <span>Altro</span>
                 <button type="button" onClick={() => setMoreOpen(false)} aria-label="Chiudi" className="trm-drawer-x"><X size={20} /></button>
               </div>
-              <div className="trm-actions">{SecondaryActions(true)}</div>
+              <div className="trm-actions trm-actions-dark">{SecondaryActions(false)}</div>
             </div>
           </div>
         )}

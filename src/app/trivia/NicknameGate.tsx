@@ -137,17 +137,18 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
 
         .trv-gate-hero { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
         .trv-gate-logo {
-          background:#1a5030; color:#fff; border-radius:18px; padding:16px; display:inline-flex;
-          box-shadow:0 8px 32px rgba(0,0,0,0.18);
+          background:linear-gradient(140deg,#7c3aed 0%,#5b21b6 55%,#1a5030 130%);
+          color:#fff; border-radius:20px; padding:16px; display:inline-flex;
+          box-shadow:0 10px 32px rgba(91,33,182,0.4);
         }
-        .trv-gate.dark .trv-gate-logo { background:#2f9e63; color:#06160e; }
+        .trv-gate.dark .trv-gate-logo { box-shadow:0 10px 32px rgba(91,33,182,0.5); }
         .trv-gate-title {
           font-size:clamp(2.2rem,9vw,3rem); font-weight:900; letter-spacing:0.26em;
           margin:.4rem 0 0; line-height:1; color:#1a5030;
         }
         .trv-gate.dark .trv-gate-title { color:#6fe0a6; }
-        .trv-gate-title span { color:#3a9e5f; }
-        .trv-gate.dark .trv-gate-title span { color:#9ff0c2; }
+        .trv-gate-title span { color:#7c3aed; }
+        .trv-gate.dark .trv-gate-title span { color:#b794ff; }
         .trv-gate-tag { font-size:.9rem; color:#6b8070; margin:0; font-weight:600; }
         .trv-gate.dark .trv-gate-tag { color:#a4c4aa; }
 
@@ -167,8 +168,8 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
           padding:.1rem .9rem; transition:border-color .15s, box-shadow .15s;
           background:rgba(0,0,0,0.015);
         }
-        .trv-gate.dark .trv-gate-inputwrap { background:rgba(255,255,255,0.03); border-color:rgba(95,208,154,0.25); }
-        .trv-gate-inputwrap:focus-within { border-color:#2F7D4A; box-shadow:0 0 0 .2rem rgba(47,125,74,.18); }
+        .trv-gate.dark .trv-gate-inputwrap { background:rgba(255,255,255,0.03); border-color:rgba(155,92,246,0.3); }
+        .trv-gate-inputwrap:focus-within { border-color:#7c3aed; box-shadow:0 0 0 .2rem rgba(124,58,237,.2); }
         .trv-gate-inputwrap.err { border-color:#c0392b; box-shadow:0 0 0 .2rem rgba(192,57,43,.15); }
         .trv-gate-input {
           flex:1; min-width:0; border:none; outline:none; background:transparent;
@@ -181,11 +182,11 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
           padding-left:.2rem;
         }
         .trv-gate-go {
-          margin-top:.2rem; height:50px; width:100%;
+          margin-top:.2rem; height:52px; width:100%;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          background:#2F7D4A; color:#fff; border:none; border-radius:12px;
-          font-family:inherit; font-size:1.05rem; font-weight:800; cursor:pointer;
-          box-shadow:0 6px 20px rgba(47,125,74,0.35); transition:filter .12s, transform .12s;
+          background:linear-gradient(100deg,#7c3aed 0%,#5b21b6 45%,#2F7D4A 100%); color:#fff; border:none; border-radius:13px;
+          font-family:inherit; font-size:1.1rem; font-weight:900; cursor:pointer;
+          box-shadow:0 6px 22px rgba(91,33,182,0.4); transition:filter .12s, transform .12s;
         }
         .trv-gate-go:hover { filter:brightness(.92); transform:translateY(-1px); }
         .trv-gate-go:active { transform:scale(.98); }
@@ -208,16 +209,16 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         }
         .trv-gate-chip {
           display:inline-flex; align-items:center; gap:.3rem;
-          border:1.5px solid rgba(47,125,74,0.3); border-radius:999px;
-          background:rgba(47,125,74,0.06); color:#1a5030;
+          border:1.5px solid rgba(124,58,237,0.32); border-radius:999px;
+          background:rgba(124,58,237,0.07); color:#6d28d9;
           font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
           padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;
         }
         .trv-gate.dark .trv-gate-chip {
-          border-color:rgba(95,208,154,0.3); background:rgba(95,208,154,0.08); color:#9ff0c2;
+          border-color:rgba(155,92,246,0.34); background:rgba(155,92,246,0.1); color:#c4a5ff;
         }
-        .trv-gate-chip:hover { background:rgba(47,125,74,0.14); transform:translateY(-1px); }
-        .trv-gate.dark .trv-gate-chip:hover { background:rgba(95,208,154,0.16); }
+        .trv-gate-chip:hover { background:rgba(124,58,237,0.15); transform:translateY(-1px); }
+        .trv-gate.dark .trv-gate-chip:hover { background:rgba(155,92,246,0.18); }
         .trv-gate-chip:active { transform:scale(.97); }
       `}</style>
     </div>

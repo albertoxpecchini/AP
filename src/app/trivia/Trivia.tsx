@@ -513,7 +513,8 @@ export default function Trivia() {
             }
             @keyframes trv-pagmodal-fade { from{opacity:0} to{opacity:1} }
             .trv-pagmodal-card {
-              width:min(96vw,520px); max-height:min(90vh,760px);
+              width:min(96vw,520px);
+              max-height:90vh; max-height:90dvh;  /* dvh = viewport reale iOS (toolbar inclusa) */
               display:flex; flex-direction:column; background:#fff; border-radius:20px; overflow:hidden;
               box-shadow:0 30px 80px rgba(6,22,14,0.45);
               animation:trv-pagmodal-up .34s cubic-bezier(.2,.9,.3,1.1);
@@ -533,7 +534,7 @@ export default function Trivia() {
               transition:background .15s, transform .15s;
             }
             .trv-pagmodal-x:hover { background:rgba(255,255,255,0.26); transform:rotate(90deg); }
-            .trv-pagmodal-body { flex:1; min-height:0; overflow-y:auto; padding:1rem .9rem 1.2rem; scrollbar-width:thin; }
+            .trv-pagmodal-body { flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:1rem .9rem 1.2rem; scrollbar-width:thin; }
             .trv-pagmodal-body::-webkit-scrollbar { width:7px; }
             .trv-pagmodal-body::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.25); border-radius:99px; }
           `}</style>
