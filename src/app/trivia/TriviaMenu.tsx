@@ -974,6 +974,32 @@ export default function TriviaMenu({
           .trm-desktop-right .trm-grid { grid-template-columns:repeat(3,1fr); }
           .trm-desktop-right .trm-grid-types { grid-template-columns:repeat(3,1fr); }
         }
+
+        /* ─── Pannello sinistro: compatta tutto quando lo schermo è basso, così
+           il contenuto (logo → titolo → libro → stats → azioni → giocatore) ci
+           sta sempre nella viewport senza essere tagliato in alto/basso. ─── */
+        @media (min-width:760px) and (max-height:820px) {
+          .trm-desktop-left { gap:0.7rem; padding:1.4rem 1.6rem; }
+          .trm-desktop-left .trm-logo-wrap { padding:11px; border-radius:18px; }
+          .trm-desktop-left .trm-logo-wrap svg { width:42px; height:42px; }
+          .trm-desktop-left .trm-title { font-size:2.4rem; letter-spacing:0.22em; }
+          .trm-desktop-left .trm-tagline { font-size:0.78rem; }
+          .trm-desktop-left .trm-book { width:104px; }
+          .trm-desktop-left .trm-stats-card { padding:0.6rem 0.9rem; }
+          .trm-desktop-left .trm-stat-val { font-size:1.15rem; }
+          .trm-desktop-left .trm-actions { gap:0.4rem; }
+          .trm-desktop-left .trm-tut-btn, .trm-desktop-left .trm-back-btn { padding:0.65rem 1rem; font-size:0.92rem; border-radius:11px; }
+          .trm-desktop-left .trm-player-badge { min-width:32px; height:32px; font-size:0.82rem; }
+          .trm-desktop-left .trm-kicker { display:none; }
+        }
+        /* Schermi molto bassi: stringi ancora un filo. */
+        @media (min-width:760px) and (max-height:680px) {
+          .trm-desktop-left { gap:0.5rem; padding:1rem 1.4rem; }
+          .trm-desktop-left .trm-logo-wrap svg { width:34px; height:34px; }
+          .trm-desktop-left .trm-title { font-size:2rem; }
+          .trm-desktop-left .trm-book { width:84px; }
+          .trm-desktop-left .trm-tut-btn, .trm-desktop-left .trm-back-btn { padding:0.55rem 1rem; }
+        }
       `}</style>
     </div>
   );
