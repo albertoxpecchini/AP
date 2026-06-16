@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { ArrowLeft, ArrowRight, User } from "lucide-react";
 import { checkNickname } from "./nickname";
+import { fetchPlayers, upsertPlayer, getAccountNick, type Player } from "../../lib/players";
 
 const NICK_KEY = "parole-nick";
 
@@ -22,20 +23,31 @@ interface NicknameGateProps {
  * Schermata "gate": prima di entrare in Parole si sceglie un nickname
  * (max 10 lettere, niente parolacce). Overlay fixed sopra a tutto (z-250),
  * stesso look del menu (hero verde).
+ *
+ * "Login col nome": il nome scelto crea/aggiorna un account su Supabase
+ * (tabella `players` condivisa fra i giochi); da qualsiasi dispositivo puoi
+ * loggarti riselezionandolo dalla lista qui sotto.
  */
 export default function NicknameGate({ dark, initial = "", onConfirm }: NicknameGateProps) {
-  const [value, setValue] = useState(initial);
+  const [value, setValue] = useState(initial || getAccountNick());
   const [error, setError] = useState<string>("");
   const [touched, setTouched] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => { fetchPlayers().then(setPlayers).catch(() => {}); }, []);
+
+  const enter = (nick: string) => {
+    storeNick(nick);
+    void upsertPlayer(nick);
+    onConfirm(nick);
+  };
 
   const submit = () => {
     const res = checkNickname(value);
     if (!res.ok) { setError(res.message || "Nickname non valido"); setTouched(true); return; }
-    storeNick(res.value);
-    onConfirm(res.value);
+    enter(res.value);
   };
 
   const onChange = (raw: string) => {
@@ -87,6 +99,27 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         <button type="button" className="par-gate-go" onClick={submit}>
           Entra <ArrowRight size={18} />
         </button>
+
+        {players.length > 0 && (
+          <div className="par-gate-accounts">
+            <div className="par-gate-accounts-label" style={{ color: sub }}>
+              Oppure entra con un nome già usato
+            </div>
+            <div className="par-gate-accounts-list">
+              {players.map(p => (
+                <button
+                  key={p.nick}
+                  type="button"
+                  className="par-gate-chip"
+                  onClick={() => enter(p.nick.slice(0, 10))}
+                  title={`Entra come ${p.nick}`}
+                >
+                  <User size={12} /> {p.nick}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <Link to="/#progetti" className="par-gate-back" style={{ color: sub }}>
           <ArrowLeft size={14} /> Torna ai progetti
@@ -171,6 +204,29 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         }
         .par-gate-back:hover { filter:brightness(.85); }
         .par-gate-note { font-size:.72rem; text-align:center; margin:.3rem 0 0; line-height:1.4; }
+
+        .par-gate-accounts { margin-top:.7rem; display:flex; flex-direction:column; gap:.5rem; }
+        .par-gate-accounts-label {
+          font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;
+          text-align:center;
+        }
+        .par-gate-accounts-list {
+          display:flex; flex-wrap:wrap; gap:.4rem; justify-content:center;
+          max-height:128px; overflow-y:auto; padding:.1rem;
+        }
+        .par-gate-chip {
+          display:inline-flex; align-items:center; gap:.3rem;
+          border:1.5px solid rgba(47,125,74,0.3); border-radius:999px;
+          background:rgba(47,125,74,0.06); color:#1a5030;
+          font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
+          padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;
+        }
+        .par-gate.dark .par-gate-chip {
+          border-color:rgba(95,208,154,0.3); background:rgba(95,208,154,0.08); color:#9ff0c2;
+        }
+        .par-gate-chip:hover { background:rgba(47,125,74,0.14); transform:translateY(-1px); }
+        .par-gate.dark .par-gate-chip:hover { background:rgba(95,208,154,0.16); }
+        .par-gate-chip:active { transform:scale(.97); }
       `}</style>
     </div>
   );

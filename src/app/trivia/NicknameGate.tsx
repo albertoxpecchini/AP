@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { ArrowLeft, ArrowRight, User, BrainCircuit } from "lucide-react";
 import { checkNickname, storeNick } from "./nickname";
+import { fetchPlayers, upsertPlayer, getAccountNick, type Player } from "../../lib/players";
 
 export { getStoredNick, storeNick } from "./nickname";
 
@@ -15,20 +16,31 @@ interface NicknameGateProps {
  * Schermata "gate": premendo "Gioca" si sceglie un nickname (max 10 lettere,
  * niente parolacce) prima di entrare. Overlay fixed sopra a tutto (z-250),
  * stesso look del menu (hero verde Kit Italia). Gemello di angoli/NicknameGate.
+ *
+ * "Login col nome": il nome scelto crea/aggiorna un account su Supabase
+ * (tabella `players`), così da qualsiasi dispositivo puoi loggarti
+ * riselezionandolo dalla lista qui sotto.
  */
 export default function NicknameGate({ dark, initial = "", onConfirm }: NicknameGateProps) {
-  const [value, setValue] = useState(initial);
+  const [value, setValue] = useState(initial || getAccountNick());
   const [error, setError] = useState<string>("");
   const [touched, setTouched] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => { fetchPlayers().then(setPlayers).catch(() => {}); }, []);
+
+  const enter = (nick: string) => {
+    storeNick(nick);
+    void upsertPlayer(nick);   // crea/aggiorna l'account condiviso su Supabase
+    onConfirm(nick);
+  };
 
   const submit = () => {
     const res = checkNickname(value);
     if (!res.ok) { setError(res.message || "Nickname non valido"); setTouched(true); return; }
-    storeNick(res.value);
-    onConfirm(res.value);
+    enter(res.value);
   };
 
   const onChange = (raw: string) => {
@@ -80,6 +92,27 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         <button type="button" className="trv-gate-go" onClick={submit}>
           Entra <ArrowRight size={18} />
         </button>
+
+        {players.length > 0 && (
+          <div className="trv-gate-accounts">
+            <div className="trv-gate-accounts-label" style={{ color: sub }}>
+              Oppure entra con un nome già usato
+            </div>
+            <div className="trv-gate-accounts-list">
+              {players.map(p => (
+                <button
+                  key={p.nick}
+                  type="button"
+                  className="trv-gate-chip"
+                  onClick={() => enter(p.nick.slice(0, 10))}
+                  title={`Entra come ${p.nick}`}
+                >
+                  <User size={12} /> {p.nick}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <Link to="/#progetti" className="trv-gate-back" style={{ color: sub }}>
           <ArrowLeft size={14} /> Torna ai progetti
@@ -163,6 +196,29 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         }
         .trv-gate-back:hover { filter:brightness(.85); }
         .trv-gate-note { font-size:.72rem; text-align:center; margin:.3rem 0 0; line-height:1.4; }
+
+        .trv-gate-accounts { margin-top:.7rem; display:flex; flex-direction:column; gap:.5rem; }
+        .trv-gate-accounts-label {
+          font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;
+          text-align:center;
+        }
+        .trv-gate-accounts-list {
+          display:flex; flex-wrap:wrap; gap:.4rem; justify-content:center;
+          max-height:128px; overflow-y:auto; padding:.1rem;
+        }
+        .trv-gate-chip {
+          display:inline-flex; align-items:center; gap:.3rem;
+          border:1.5px solid rgba(47,125,74,0.3); border-radius:999px;
+          background:rgba(47,125,74,0.06); color:#1a5030;
+          font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
+          padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;
+        }
+        .trv-gate.dark .trv-gate-chip {
+          border-color:rgba(95,208,154,0.3); background:rgba(95,208,154,0.08); color:#9ff0c2;
+        }
+        .trv-gate-chip:hover { background:rgba(47,125,74,0.14); transform:translateY(-1px); }
+        .trv-gate.dark .trv-gate-chip:hover { background:rgba(95,208,154,0.16); }
+        .trv-gate-chip:active { transform:scale(.97); }
       `}</style>
     </div>
   );
