@@ -6,6 +6,24 @@ import { chapterCoveragePct, chapterCoverageCount } from "./coverage";
 import { iconForChapter } from "./chapterIcons";
 import type { QType } from "./parseTrivia";
 
+// Spezza un titolo in "righe" per le tile: le parole brevi/connettori (di, e,
+// in, a, del...) e i pezzi tra parentesi NON vanno mai da soli su una riga,
+// restano agganciati alla parola vicina. Così l'impaginazione resta leggibile.
+const CONNETTORI = new Set(["di","e","in","a","il","la","lo","le","i","gli","del","della","dei","delle","dello","al","alla","con","su","da","per","e'","o","ed"]);
+function titoloInRighe(titolo: string): string[] {
+  const parole = titolo.split(/\s+/).filter(Boolean);
+  const righe: string[] = [];
+  for (let i = 0; i < parole.length; i++) {
+    const p = parole[i];
+    const breve = p.length <= 3 || CONNETTORI.has(p.toLowerCase()) || p.startsWith("(");
+    // un connettore si attacca alla riga precedente (se c'è), altrimenti alla prossima
+    if (breve && righe.length) righe[righe.length - 1] += " " + p;
+    else if (breve && i + 1 < parole.length) { righe.push(p + " " + parole[i + 1]); i++; }
+    else righe.push(p);
+  }
+  return righe;
+}
+
 // Selezione capitoli: lista di id. Vuota = tutti i capitoli.
 export type ChapterSelection = string[];
 // Selezione tipi di domanda. Vuota = tutti i tipi.
@@ -181,7 +199,7 @@ export default function TriviaMenu({
           </p>
         </div>
         <Link to="/#progetti" style={{ display: "inline-flex", alignItems: "center", gap: ".4rem", color: icon, textDecoration: "none", fontWeight: 700, fontSize: ".9rem" }}>
-          <ArrowLeft size={15} /> Torna ai progetti
+          <ArrowLeft size={18} /> Torna ai progetti
         </Link>
       </div>
     );
@@ -281,8 +299,8 @@ export default function TriviaMenu({
               <span className="trm-tile-ring">{progressRing(seen, total, cov)}</span>
               <span className="trm-tile-mark" aria-hidden>{iconForChapter(c.id)}</span>
               <span className="trm-tile-titlebox">
-                {c.title.split(/\s+/).map((w, i) => (
-                  <span className="trm-word" key={i}>{w}</span>
+                {titoloInRighe(c.title).map((riga, i) => (
+                  <span className="trm-word" key={i}>{riga}</span>
                 ))}
               </span>
             </button>
@@ -353,13 +371,13 @@ export default function TriviaMenu({
 
   const LbBtn = (
     <button type="button" onClick={onLeaderboard} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
-      <ListOrdered size={15} /> Classifica live
+      <ListOrdered size={18} /> Classifica live
     </button>
   );
 
   const PagellaBtn = (
     <button type="button" onClick={onPagella} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
-      <GraduationCap size={15} /> La mia pagella
+      <GraduationCap size={18} /> La mia pagella
     </button>
   );
 
@@ -371,7 +389,7 @@ export default function TriviaMenu({
 
   const BackBtn = (
     <Link to="/#progetti" className="trm-back-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
-      <ArrowLeft size={15} /> Torna ai progetti
+      <ArrowLeft size={18} /> Torna ai progetti
     </Link>
   );
 
@@ -430,7 +448,7 @@ export default function TriviaMenu({
           {LbBtn}
           {PagellaBtn}
           <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
-            <BookOpen size={15} /> Come si gioca
+            <BookOpen size={18} /> Come si gioca
           </button>
           {NickChip}
           {BackBtn}
@@ -458,7 +476,7 @@ export default function TriviaMenu({
             <div style={{ flex: 1 }}>{PagellaBtn}</div>
           </div>
           <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
-            <BookOpen size={15} /> Come si gioca
+            <BookOpen size={18} /> Come si gioca
           </button>
           {NickChip}
           {BackBtn}
@@ -537,16 +555,21 @@ export default function TriviaMenu({
           letter-spacing:0.12em; margin:0 0 0.35rem 0.2rem;
         }
         .trm-tut-btn, .trm-back-btn {
-          display:inline-flex; align-items:center; justify-content:center; gap:0.45rem;
-          padding:0.7rem 1rem; background:transparent;
-          border-radius:10px; font-size:0.87rem; font-weight:700;
-          cursor:pointer; font-family:inherit; transition:filter 0.15s;
+          display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
+          width:100%;
+          padding:0.95rem 1rem; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          border-radius:13px; font-size:1rem; font-weight:800;
+          cursor:pointer; font-family:inherit; transition:filter .15s, transform .12s, background .15s;
           text-decoration:none;
         }
-        .trm-tut-btn:hover, .trm-back-btn:hover { filter:brightness(0.85); }
+        .trm-vio-btn svg { width:18px; height:18px; }
+        .trm-tut-btn:hover, .trm-back-btn:hover {
+          background:${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.11)"};
+          transform:translateY(-1px);
+        }
         .trm-nick-chip {
           background:transparent; border-radius:999px;
-          padding:0.45rem 0.9rem; font-size:0.76rem; font-weight:600;
+          padding:0.55rem 1rem; font-size:0.85rem; font-weight:700;
           cursor:pointer; font-family:inherit; transition:filter 0.15s; align-self:center;
         }
         .trm-nick-chip:hover { filter:brightness(0.85); }
@@ -562,7 +585,6 @@ export default function TriviaMenu({
         .trm-tile {
           --gv:#2F7D4A; --gv2:#1f6b3c; --gv3:#3a9e5f;
           position:relative; isolation:isolate;
-          container-type:size;
           display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
           aspect-ratio:1/1; min-height:0;
           padding:2.3rem 0.7rem 0.7rem;
@@ -669,7 +691,7 @@ export default function TriviaMenu({
         .trm-tile.is-on .trm-word { color:#fff; text-shadow:0 1px 8px rgba(0,0,0,0.25); }
         .trm-tile-title-type {
           position:relative; z-index:1;
-          font-size:clamp(0.95rem, 8cqw, 1.4rem); font-weight:800; line-height:1.1;
+          font-size:1.18rem; font-weight:800; line-height:1.15;
           letter-spacing:-0.01em; color:${textMain};
           display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
           overflow:hidden; transition:color .25s;
@@ -717,9 +739,16 @@ export default function TriviaMenu({
         .trm-tile-all-sub { font-size:0.72rem; color:rgba(255,255,255,0.82); line-height:1.3; margin-top:0.12rem;
           overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-        /* tipo domanda: tile più basse, titolo centrato */
-        .trm-grid-types .trm-tile { aspect-ratio:auto; min-height:64px; align-items:center; justify-content:center; }
-        .trm-grid-types .trm-tile .trm-tile-title { text-align:center; }
+        /* tipo domanda: tile più basse, titolo centrato e BEN leggibile */
+        .trm-grid-types .trm-tile {
+          aspect-ratio:auto; min-height:90px;
+          align-items:center; justify-content:center;
+          padding:0.7rem 0.5rem;
+        }
+        .trm-grid-types .trm-tile .trm-tile-title-type {
+          text-align:center; font-size:1rem; line-height:1.12; font-weight:800;
+          -webkit-line-clamp:3; word-break:normal; hyphens:none;
+        }
         @keyframes trm-pop { 0%{transform:scale(0.6);opacity:0;} 60%{transform:scale(1.08);} 100%{transform:scale(1);opacity:1;} }
 
         @media (min-width: 760px) {
