@@ -103,6 +103,66 @@ export async function fetchTop(limit = 50, chapter?: string): Promise<ScoreRow[]
   return (await res.json()) as ScoreRow[];
 }
 
+// ─── Classifica "Totale" (somma del miglior punteggio per capitolo) ─────────
+//
+// Confronto equo fra giocatori: NON la somma di tutte le partite (chi gioca di
+// più vincerebbe sempre), ma per ogni giocatore la somma del SUO miglior
+// punteggio in ciascun CAPITOLO singolo. Le partite "misto"/"all" non contano.
+
+export interface TotalRow {
+  nick: string;
+  score: number;        // somma dei best per capitolo
+  chapters: number;     // quanti capitoli distinti ha giocato
+  accuracy: number;     // media (pesata sui best) — indicativa
+}
+
+/**
+ * Aggrega i punteggi per capitolo singolo in un totale per giocatore.
+ * @param chapterIds capitoli "veri" da considerare (esclude misto/all)
+ */
+export async function fetchTotals(chapterIds: string[], limit = 50): Promise<TotalRow[]> {
+  const chapSet = new Set(chapterIds);
+
+  let all: ScoreRow[];
+  if (!leaderboardConfigured) {
+    all = readLocal().filter(r => chapSet.has(r.chapter));
+  } else {
+    // Scarica tutti i punteggi dei capitoli veri (no misto/all) in un colpo.
+    const params = new URLSearchParams({
+      select: "nick,score,chapter,accuracy",
+      chapter: `in.(${chapterIds.join(",")})`,
+      order: "score.desc",
+      limit: "2000",
+    });
+    try {
+      const res = await fetch(`${URL}/rest/v1/${TABLE}?${params}`, { headers: restHeaders() });
+      all = res.ok ? ((await res.json()) as ScoreRow[]) : [];
+    } catch {
+      all = [];
+    }
+  }
+
+  // best per (nick, chapter)
+  type Best = { score: number; accuracy: number };
+  const byNick = new Map<string, Map<string, Best>>();
+  for (const r of all) {
+    if (!chapSet.has(r.chapter)) continue;
+    let m = byNick.get(r.nick);
+    if (!m) { m = new Map(); byNick.set(r.nick, m); }
+    const prev = m.get(r.chapter);
+    if (!prev || r.score > prev.score) m.set(r.chapter, { score: r.score, accuracy: r.accuracy });
+  }
+
+  const out: TotalRow[] = [];
+  for (const [nick, m] of byNick) {
+    let score = 0, accSum = 0;
+    for (const b of m.values()) { score += b.score; accSum += b.accuracy; }
+    out.push({ nick, score, chapters: m.size, accuracy: Math.round(accSum / m.size) });
+  }
+  out.sort((a, b) => b.score - a.score);
+  return out.slice(0, limit);
+}
+
 // ─── Realtime: nuovi punteggi in tempo reale via WebSocket ──────────────────
 
 export type Unsubscribe = () => void;

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { X, Trophy, Wifi, WifiOff, Medal, Target, GraduationCap } from "lucide-react";
-import { fetchTop, subscribeToScores, leaderboardConfigured, type ScoreRow } from "./leaderboardApi";
+import { fetchTop, fetchTotals, subscribeToScores, leaderboardConfigured, type ScoreRow, type TotalRow } from "./leaderboardApi";
 import { CHAPTERS } from "./questions";
 import { iconForChapter } from "./chapterIcons";
 import Pagella from "./Pagella";
@@ -19,6 +19,23 @@ const CHAP_LABEL: Record<string, string> = Object.fromEntries(
 const chapLabel = (id: string) =>
   id === "all" ? "Tutti" : id === "misto" ? "Misto" : (CHAP_LABEL[id] ?? id);
 
+// Riga unificata della classifica: vale sia per il capitolo singolo sia per il
+// totale aggregato. `chapters` valorizzato solo nella vista "Totale".
+interface LbRow {
+  id?: number;
+  nick: string;
+  score: number;
+  accuracy: number;
+  chapter?: string;     // capitolo singolo
+  chapters?: number;    // n. capitoli (solo Totale)
+}
+
+const scoreToLbRow = (r: ScoreRow): LbRow => ({
+  id: r.id, nick: r.nick, score: r.score, accuracy: r.accuracy, chapter: r.chapter,
+});
+const toLbRows = (rows: TotalRow[]): LbRow[] =>
+  rows.map(r => ({ nick: r.nick, score: r.score, accuracy: r.accuracy, chapters: r.chapters }));
+
 /**
  * Classifica live in stile Kit Italia (Bootstrap Italia, palette neroverde).
  *
@@ -29,49 +46,76 @@ const chapLabel = (id: string) =>
  */
 export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: LeaderboardProps) {
   const [view, setView] = useState<"classifica" | "pagella">("classifica");
-  const [filter, setFilter] = useState<string | "all">("all");
-  const [rows, setRows] = useState<ScoreRow[]>([]);
+  // Filtro: "totale" (somma del best per capitolo, equo) oppure id di un capitolo
+  // singolo. Niente più "Tutti"/"Misto": confrontare partite di lunghezza diversa
+  // non avrebbe senso (più argomenti = più punti).
+  const [filter, setFilter] = useState<string>("totale");
+  const [rows, setRows] = useState<LbRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [live, setLive] = useState(false);
   const [pulseId, setPulseId] = useState<number | null>(null);
   const seenIds = useRef<Set<number>>(new Set());
   const filtersRef = useRef<HTMLDivElement>(null);
 
+  const realChapterIds = useMemo(() => CHAPTERS.map(c => c.id), []);
+  const isTotal = filter === "totale";
+
+  // Ricarica silenziosa (per i refresh realtime del Totale): non tocca `loading`,
+  // così non rifà lampeggiare lo skeleton.
+  const reload = () =>
+    isTotal
+      ? fetchTotals(realChapterIds, 50).then(toLbRows)
+      : fetchTop(50, filter).then(rows => rows.map(scoreToLbRow));
+
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    fetchTop(50, filter === "all" ? undefined : filter)
-      .then(data => { if (alive) { setRows(data); seenIds.current = new Set(data.map(r => r.id ?? -1)); } })
+    const job = isTotal
+      ? fetchTotals(realChapterIds, 50).then(toLbRows)
+      : fetchTop(50, filter).then(data => {
+          seenIds.current = new Set(data.map(r => r.id ?? -1));
+          return data.map(scoreToLbRow);
+        });
+    job
+      .then(data => { if (alive) setRows(data); })
       .catch(() => { if (alive) setRows([]); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
+  // Realtime: a un nuovo punteggio ricarico (il totale va ricalcolato comunque).
   useEffect(() => {
     if (!leaderboardConfigured) return;
     const unsub = subscribeToScores(row => {
+      setLive(true);
+      // Capitolo singolo: aggiorna in-place se pertinente; totale: ricarica.
+      if (isTotal) {
+        if (realChapterIds.includes(row.chapter)) reload().then(d => setRows(d)).catch(() => {});
+        return;
+      }
+      if (row.chapter !== filter) return;
       if (row.id != null && seenIds.current.has(row.id)) return;
       if (row.id != null) seenIds.current.add(row.id);
-      setRows(prev => {
-        if (filter !== "all" && row.chapter !== filter) return prev;
-        return [...prev, row].sort((a, b) => b.score - a.score).slice(0, 50);
-      });
-      setLive(true);
+      setRows(prev => [...prev, scoreToLbRow(row)].sort((a, b) => b.score - a.score).slice(0, 50));
       if (row.id != null) {
         setPulseId(row.id);
         setTimeout(() => setPulseId(p => (p === row.id ? null : p)), 1600);
       }
     });
     return unsub;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   useEffect(() => {
     if (!justSubmitted) return;
+    if (isTotal) { reload().then(d => setRows(d)).catch(() => {}); return; }
+    if (justSubmitted.chapter !== filter) return;
     setRows(prev => {
       if (justSubmitted.id != null && prev.some(r => r.id === justSubmitted.id)) return prev;
-      if (filter !== "all" && justSubmitted.chapter !== filter) return prev;
-      return [...prev, justSubmitted].sort((a, b) => b.score - a.score).slice(0, 50);
+      return [...prev, scoreToLbRow(justSubmitted)].sort((a, b) => b.score - a.score).slice(0, 50);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [justSubmitted, filter]);
 
   // Esc per chiudere (accessibilità).
@@ -92,9 +136,12 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
     return rows.findIndex(r => r.nick === myNick);
   }, [rows, myNick]);
 
-  const renderRow = (r: ScoreRow, i: number) => {
+  const renderRow = (r: LbRow, i: number) => {
     const rank = i + 1;
     const mine = myNick && r.nick === myNick;
+    const tag = isTotal
+      ? `${r.chapters ?? 0} cap.`
+      : (r.chapter ? chapLabel(r.chapter) : "");
     return (
       <li
         key={r.id ?? `${r.nick}-${i}`}
@@ -110,7 +157,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           <span className="trv-lb-accbar"><i style={{ width: `${r.accuracy}%` }} /></span>
           <span className="trv-lb-accnum">{r.accuracy}%</span>
         </span>
-        <span className="trv-lb-chap" title={chapLabel(r.chapter)}>{chapLabel(r.chapter)}</span>
+        <span className="trv-lb-chap" title={isTotal ? `${r.chapters} capitoli giocati` : tag}>{tag}</span>
         <span className="trv-lb-score">{fmtScore(r.score)}<small>pt</small></span>
       </li>
     );
@@ -165,21 +212,13 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         <div className="trv-lb-filterswrap">
           <div className="trv-lb-filters" ref={filtersRef} role="tablist" aria-label="Filtra per capitolo">
             <button
-              className={`trv-lb-fbtn${filter === "all" ? " act" : ""}`}
-              onClick={() => setFilter("all")}
+              className={`trv-lb-fbtn${filter === "totale" ? " act" : ""}`}
+              onClick={() => setFilter("totale")}
               role="tab"
-              aria-selected={filter === "all"}
+              aria-selected={filter === "totale"}
+              title="Somma del tuo miglior punteggio in ogni capitolo"
             >
-              <Trophy size={13} strokeWidth={2.2} /> Tutti
-            </button>
-            <button
-              className={`trv-lb-fbtn${filter === "misto" ? " act" : ""}`}
-              onClick={() => setFilter("misto")}
-              role="tab"
-              aria-selected={filter === "misto"}
-              title="Partite su più capitoli insieme"
-            >
-              <Target size={13} strokeWidth={2.2} /> Misto
+              <Trophy size={13} strokeWidth={2.2} /> Totale
             </button>
             {CHAPTERS.map(c => (
               <button
@@ -216,6 +255,11 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
             </div>
           ) : (
             <>
+              {isTotal && (
+                <p className="trv-lb-totalnote">
+                  Punteggio = somma del tuo <b>miglior</b> risultato in ogni capitolo. Più capitoli padroneggi, più sali — senza vantaggi per chi gioca all'infinito.
+                </p>
+              )}
               {podium.length > 0 && (
                 <ol className="trv-lb-podium" aria-label="Podio">
                   {/* Ordine visivo: 2° · 1° · 3° */}
@@ -374,6 +418,15 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-body { flex:1; min-height:0; overflow-y:auto; padding:.9rem .85rem 1rem; scrollbar-width:thin; }
         .trv-lb-body::-webkit-scrollbar { width:7px; }
         .trv-lb-body::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.25); border-radius:99px; }
+
+        .trv-lb-totalnote {
+          margin:.1rem .1rem .8rem; padding:.5rem .7rem; border-radius:10px;
+          font-size:.72rem; line-height:1.35; color:#4a5c50; font-weight:600;
+          background:rgba(47,125,74,0.07); border:1px solid rgba(47,125,74,0.13);
+        }
+        .trv-lb.dark .trv-lb-totalnote { color:#a4c4aa; background:rgba(95,208,154,0.08); border-color:rgba(95,208,154,0.16); }
+        .trv-lb-totalnote b { color:#2F7D4A; }
+        .trv-lb.dark .trv-lb-totalnote b { color:#6fe0a6; }
 
         /* ── Podio ── */
         .trv-lb-podium {

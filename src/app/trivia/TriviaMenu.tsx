@@ -327,6 +327,24 @@ export default function TriviaMenu({
     </Link>
   );
 
+  // Copertina del libro di riferimento, sotto il titolo. Se l'immagine manca,
+  // onError la nasconde (niente icona rotta).
+  const BookCover = (
+    <a
+      className="trm-book"
+      href="https://www.hoepli.it/libro/progettazione-costruzioni-e-impianti-volume-3/9788836011247.html"
+      target="_blank" rel="noopener noreferrer"
+      title="Progettazione, Costruzioni e Impianti 3 — Baraldi, Zanghì (Hoepli)"
+    >
+      <img
+        src="/trivia-libro.jpg"
+        alt="Progettazione, Costruzioni e Impianti 3 — Hoepli"
+        loading="lazy"
+        onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+      />
+    </a>
+  );
+
   const StatsCard = (forceDark: boolean) => {
     const c = forceDark ? "#fff" : val;
     const l = forceDark ? "rgba(255,255,255,0.55)" : lbl;
@@ -352,6 +370,7 @@ export default function TriviaMenu({
             <h1 className="trm-title">TRI<span className="trm-accent">VI</span>A</h1>
             <p className="trm-tagline">Storia dell'Architettura · rispondi e scala la classifica</p>
           </div>
+          {BookCover}
           <p className="trm-kicker">Web Game · Quiz</p>
         </div>
         <div className="trm-body">
@@ -377,6 +396,7 @@ export default function TriviaMenu({
           <div className="trm-logo-wrap"><GraduationCap size={54} /></div>
           <h1 className="trm-title">TRI<span className="trm-accent">VI</span>A</h1>
           <p className="trm-tagline">Storia dell'Architettura</p>
+          {BookCover}
           {StatsCard(true)}
           <p className="trm-kicker" style={{ position: "static", marginTop: "auto", opacity: 1 }}>Web Game · Quiz</p>
         </div>
@@ -425,6 +445,14 @@ export default function TriviaMenu({
         }
         .trm-accent { color:#6fd08a; }
         .trm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.6); margin:0; font-weight:500; text-align:center; }
+        .trm-book {
+          display:block; width:104px; flex-shrink:0; border-radius:8px; overflow:hidden;
+          box-shadow:0 8px 26px rgba(0,0,0,0.35); line-height:0;
+          transition:transform .18s, box-shadow .18s;
+        }
+        .trm-book:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 12px 34px rgba(0,0,0,0.45); }
+        .trm-book img { width:100%; height:auto; display:block; }
+        .trm-desktop-left .trm-book { width:140px; }
         .trm-kicker {
           position:absolute; bottom:0.7rem; left:1.4rem;
           font-size:0.63rem; font-weight:700; text-transform:uppercase;
