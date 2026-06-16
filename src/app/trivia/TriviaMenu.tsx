@@ -49,37 +49,43 @@ export default function TriviaMenu({
   // Set di tipi domanda selezionati. Vuoto = "Tutti i tipi".
   const [types, setTypes] = useState<Set<QType>>(new Set());
 
-  // ── Fit-to-box: ogni titolo dentro la tile viene ingrandito al massimo finché
-  //    riempie il riquadro (stile "Bolt"). Un singolo font-size CSS non basta:
-  //    titoli corti ("Torre Eiffel") e lunghi devono riempire entrambi. Qui per
-  //    ogni .trm-tile-title cerco (binary search) il font-size più grande che ci
-  //    sta in larghezza E altezza. Rigirato a ogni resize e cambio ordine. ──
+  // ── Fit-to-box "a parole" (stile Bolt): ogni PAROLA del titolo va su una riga
+  //    propria, MAI tagliata, e ha dimensione INDIPENDENTE — ognuna ingrandita
+  //    fino a riempire la larghezza della tile. Poi tutte le parole si scalano in
+  //    blocco se eccedono l'altezza disponibile. Rigirato a resize e font ready. ──
   const gridWrapRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const fitAll = () => {
       const root = gridWrapRef.current;
       if (!root) return;
-      const titles = root.querySelectorAll<HTMLElement>(".trm-tile-titlebox .trm-tile-title");
-      titles.forEach(el => {
-        const box = el.parentElement;
-        if (!box) return;
-        // altezza disponibile = spazio dato al titolo (flex:1) nella tile
-        const maxW = el.clientWidth;
+      root.querySelectorAll<HTMLElement>(".trm-tile-titlebox").forEach(box => {
+        const words = Array.from(box.querySelectorAll<HTMLElement>(".trm-word"));
+        if (!words.length) return;
+        const maxW = box.clientWidth - 2;   // margine di sicurezza anti-clipping
         const maxH = box.clientHeight;
-        if (!maxW || !maxH) return;
-        let lo = 11, hi = 64, best = 11;
-        for (let i = 0; i < 8; i++) {
-          const mid = (lo + hi) / 2;
-          el.style.fontSize = mid + "px";
-          if (el.scrollHeight <= maxH && el.scrollWidth <= maxW) { best = mid; lo = mid; }
-          else hi = mid;
+        if (maxW <= 0 || !maxH) return;
+        // 1) ogni parola: font-size massimo che entra in larghezza (mai troncata)
+        words.forEach(w => {
+          let lo = 9, hi = 56, best = 9;
+          for (let i = 0; i < 10; i++) {
+            const mid = (lo + hi) / 2;
+            w.style.fontSize = mid + "px";
+            if (w.scrollWidth <= maxW) { best = mid; lo = mid; } else hi = mid;
+          }
+          w.style.fontSize = Math.floor(best) + "px";
+        });
+        // 2) se la pila di parole sfora l'altezza, riduci tutte in proporzione
+        const totalH = box.scrollHeight;
+        if (totalH > maxH) {
+          const k = (maxH / totalH) * 0.99;
+          words.forEach(w => {
+            w.style.fontSize = Math.floor(parseFloat(w.style.fontSize) * k) + "px";
+          });
         }
-        el.style.fontSize = best + "px";
       });
     };
     fitAll();
     window.addEventListener("resize", fitAll);
-    // i font possono caricare dopo il primo layout
     (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready.then(fitAll);
     return () => window.removeEventListener("resize", fitAll);
   });
@@ -136,11 +142,13 @@ export default function TriviaMenu({
   const textMain = dark ? "#d4e8dc" : "#17271d";
   const textSub  = dark ? "#a4c4aa" : "#4a5c50";
 
+  // Viola del menù (tutto ciò che NON è capitolo). Verde resta solo per i capitoli.
+  const vio  = dark ? "#c4a5ff" : "#6d28d9";
+  const vBord = dark ? "rgba(155,92,246,0.34)" : "rgba(124,58,237,0.28)";
+
   const totalQuestions = CHAPTERS.reduce((s, c) => s + c.questions.length, 0);
   // Domande disponibili nella selezione corrente (capitoli + tipi).
   const availableCount = questionsForMany([...selected], [...types]).length;
-  // Colore principale: sempre verde (Italia kit).
-  const selectedColor = "#2F7D4A";
   const selectedName = allMode
     ? "Tutti i capitoli"
     : selected.size === 1
@@ -242,7 +250,7 @@ export default function TriviaMenu({
       <button
         type="button"
         onClick={selectAll}
-        className={`trm-tile trm-tile-all${allMode ? " is-on" : ""}`}
+        className={`trm-tile trm-tile-all trm-vio${allMode ? " is-on" : ""}`}
       >
         <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
         <span className="trm-tile-all-ic"><BookOpen size={22} /></span>
@@ -272,7 +280,11 @@ export default function TriviaMenu({
               <span className="trm-tile-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.3l2.6 2.7L10 3.2" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
               <span className="trm-tile-ring">{progressRing(seen, total, cov)}</span>
               <span className="trm-tile-mark" aria-hidden>{iconForChapter(c.id)}</span>
-              <span className="trm-tile-titlebox"><span className="trm-tile-title">{c.title}</span></span>
+              <span className="trm-tile-titlebox">
+                {c.title.split(/\s+/).map((w, i) => (
+                  <span className="trm-word" key={i}>{w}</span>
+                ))}
+              </span>
             </button>
           );
         })}
@@ -283,7 +295,7 @@ export default function TriviaMenu({
   // ── Tipi di domanda: tre tile verdi in riga (stesso linguaggio dei capitoli) ──
   const TypeList = (
     <div>
-      <p className="trm-section-label" style={{ color: lbl }}>Tipi di domanda</p>
+      <p className="trm-section-label" style={{ color: vio }}>Tipi di domanda</p>
       <div className="trm-grid trm-grid-types">
         {TYPE_DEFS.map(t => {
           const on = types.has(t.id);
@@ -293,7 +305,7 @@ export default function TriviaMenu({
               type="button"
               onClick={() => toggleType(t.id)}
               onMouseMove={handleTileMove}
-              className={`trm-tile${on ? " is-on" : ""}`}
+              className={`trm-tile trm-vio${on ? " is-on" : ""}`}
               title={t.desc}
             >
               <span className="trm-tile-spot" aria-hidden />
@@ -320,11 +332,11 @@ export default function TriviaMenu({
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0.95rem 1.3rem",
-        background: selectedColor, color: "#fff",
+        background: "linear-gradient(100deg, #7c3aed 0%, #5b21b6 42%, #2F7D4A 100%)", color: "#fff",
         border: "none", borderRadius: "14px",
         fontSize: "0.98rem", fontWeight: 800,
         cursor: availableCount === 0 ? "not-allowed" : "pointer", fontFamily: "inherit",
-        boxShadow: `0 6px 24px ${selectedColor}55`,
+        boxShadow: "0 6px 24px rgba(91,33,182,0.4)",
         transition: "filter 0.12s, transform 0.12s",
         width: "100%", opacity: availableCount === 0 ? 0.5 : 1,
       }}
@@ -340,25 +352,25 @@ export default function TriviaMenu({
   );
 
   const LbBtn = (
-    <button type="button" onClick={onLeaderboard} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+    <button type="button" onClick={onLeaderboard} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
       <ListOrdered size={15} /> Classifica live
     </button>
   );
 
   const PagellaBtn = (
-    <button type="button" onClick={onPagella} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+    <button type="button" onClick={onPagella} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
       <GraduationCap size={15} /> La mia pagella
     </button>
   );
 
   const NickChip = nick ? (
-    <button type="button" onClick={onChangeNick} className="trm-nick-chip" style={{ color: lbl, border: `1px solid ${bord}` }}>
+    <button type="button" onClick={onChangeNick} className="trm-nick-chip" style={{ color: vio, border: `1px solid ${vBord}` }}>
       Giochi come <b style={{ color: textMain }}>{nick}</b> · cambia
     </button>
   ) : null;
 
   const BackBtn = (
-    <Link to="/#progetti" className="trm-back-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+    <Link to="/#progetti" className="trm-back-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
       <ArrowLeft size={15} /> Torna ai progetti
     </Link>
   );
@@ -383,10 +395,10 @@ export default function TriviaMenu({
 
   const StatsCard = (forceDark: boolean) => {
     const c = forceDark ? "#fff" : val;
-    const l = forceDark ? "rgba(255,255,255,0.55)" : lbl;
-    const ic = forceDark ? "#6fd08a" : icon;
+    const l = forceDark ? "rgba(255,255,255,0.6)" : lbl;
+    const ic = forceDark ? "#c4a5ff" : vio;   // stats: accento viola
     return (
-      <div className={`trm-stats-card${forceDark ? " trm-stats-dark" : ""}`} style={forceDark ? undefined : { background: card, border: `1px solid ${bord}` }}>
+      <div className={`trm-stats-card${forceDark ? " trm-stats-dark" : ""}`} style={forceDark ? undefined : { background: card, border: `1px solid ${vBord}` }}>
         <div className="trm-stat"><GraduationCap size={20} style={{ color: ic }} /><span className="trm-stat-val" style={{ color: c }}>{bestGrade}</span><span className="trm-stat-lbl" style={{ color: l }}>Miglior voto</span></div>
         <div className="trm-stat-sep" style={{ background: forceDark ? "rgba(255,255,255,0.15)" : bord }} />
         <div className="trm-stat"><Flame size={20} style={{ color: ic }} /><span className="trm-stat-val" style={{ color: c }}>{bestStreak}</span><span className="trm-stat-lbl" style={{ color: l }}>Streak record</span></div>
@@ -417,7 +429,7 @@ export default function TriviaMenu({
           {PlayBtn}
           {LbBtn}
           {PagellaBtn}
-          <button type="button" onClick={onTutorial} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+          <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
             <BookOpen size={15} /> Come si gioca
           </button>
           {NickChip}
@@ -445,7 +457,7 @@ export default function TriviaMenu({
             <div style={{ flex: 1 }}>{LbBtn}</div>
             <div style={{ flex: 1 }}>{PagellaBtn}</div>
           </div>
-          <button type="button" onClick={onTutorial} className="trm-tut-btn" style={{ color: icon, border: `1.5px solid ${bord}` }}>
+          <button type="button" onClick={onTutorial} className="trm-tut-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
             <BookOpen size={15} /> Come si gioca
           </button>
           {NickChip}
@@ -455,6 +467,10 @@ export default function TriviaMenu({
 
       <style>{`
         .trm-root {
+          /* Palette: VERDE = capitoli (il contenuto), VIOLA = tutto il resto del menù */
+          --pv:#7c3aed; --pv2:#6024c4; --pv3:#9b5cf6; --pv-soft:${dark ? "rgba(155,92,246,0.16)" : "rgba(124,58,237,0.10)"};
+          --pv-ink:${dark ? "#c4a5ff" : "#6d28d9"};
+          --gv:#2F7D4A; --gv3:#3a9e5f;
           position: fixed; inset: 0; z-index: 200;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
           animation: trm-in 0.22s ease;
@@ -466,20 +482,28 @@ export default function TriviaMenu({
         .trm-desktop { display:none; }
 
         .trm-hero {
-          background: linear-gradient(160deg,#0b2a18 0%,#103820 45%,#1a5030 100%);
+          background: linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
         }
+        /* alone viola + alone verde negli angoli dell'hero (vibrante, "note di viola") */
+        .trm-hero::before, .trm-hero::after {
+          content:""; position:absolute; width:60%; height:70%; border-radius:50%;
+          filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
+        }
+        .trm-hero::before { background:#7c3aed; top:-25%; left:-15%; }
+        .trm-hero::after  { background:#2F9E5A; bottom:-30%; right:-15%; opacity:0.45; }
+        .trm-hero > * { position:relative; z-index:1; }
         .trm-logo-wrap {
-          background:#fff; color:#1a5030; border-radius:18px; padding:14px;
-          box-shadow:0 8px 32px rgba(0,0,0,0.28); display:inline-flex;
+          background:#fff; color:#6024c4; border-radius:18px; padding:14px;
+          box-shadow:0 8px 32px rgba(91,33,182,0.4); display:inline-flex;
         }
         .trm-title {
           font-size:clamp(2.4rem,10vw,3.8rem); font-weight:900;
           letter-spacing:0.28em; margin:0; line-height:1; color:#fff;
         }
-        .trm-accent { color:#6fd08a; }
+        .trm-accent { color:#b794ff; }
         .trm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.6); margin:0; font-weight:500; text-align:center; }
         .trm-book {
           display:block; width:104px; flex-shrink:0; border-radius:8px; overflow:hidden;
@@ -552,6 +576,12 @@ export default function TriviaMenu({
           transition:transform .22s cubic-bezier(.2,.7,.3,1.25), border-color .22s, box-shadow .22s, background .25s;
         }
 
+        /* Variante VIOLA (.trm-vio): "Tutti i capitoli" + tipi di domanda.
+           Ridefinisce solo le variabili colore → riusa tutta l'estetica delle tile. */
+        .trm-vio {
+          --gv:#7c3aed; --gv2:#6024c4; --gv3:#9b5cf6;
+        }
+
         /* gradiente verde pieno che "sale" allo hover / quando acceso */
         .trm-tile::before {
           content:""; position:absolute; inset:0; z-index:-2;
@@ -564,8 +594,9 @@ export default function TriviaMenu({
           position:absolute; inset:0; z-index:-1; pointer-events:none;
           border-radius:inherit; opacity:0; transition:opacity .25s ease;
           background:radial-gradient(circle 70px at var(--mx,50%) var(--my,50%),
-            ${dark ? "rgba(111,224,166,0.30)" : "rgba(47,158,95,0.28)"} 0%, transparent 70%);
+            var(--spot, ${dark ? "rgba(111,224,166,0.30)" : "rgba(47,158,95,0.28)"}) 0%, transparent 70%);
         }
+        .trm-vio { --spot:${dark ? "rgba(196,165,255,0.32)" : "rgba(124,58,237,0.26)"}; }
         @media (hover: hover) {
           .trm-tile:hover .trm-tile-spot { opacity:1; }
         }
@@ -620,20 +651,29 @@ export default function TriviaMenu({
            il testo, ingrandito via JS (fit-to-box) fino a riempire larghezza+altezza. */
         .trm-tile-titlebox {
           position:relative; z-index:1; flex:1 1 auto; width:100%;
-          display:flex; align-items:flex-end; min-height:0; overflow:hidden;
+          display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
+          min-height:0; overflow:hidden; gap:0.02em;
         }
-        .trm-tile-title {
-          font-size:1.6rem; /* fallback prima del fit JS */
-          font-weight:900; line-height:0.96;
+        /* ogni PAROLA: blocco a riga propria, mai mandata a capo (no troncamento),
+           font-size impostato dal JS per riempire la larghezza in modo indipendente */
+        .trm-word {
+          display:block; white-space:nowrap;
+          font-size:1.4rem; /* fallback prima del fit JS */
+          font-weight:900; line-height:0.92;
           letter-spacing:-0.03em;
           color:${textMain};
-          width:100%;
-          word-break:break-word; hyphens:auto; text-wrap:balance;
           transition:color .25s;
           text-shadow:0 1px 0 rgba(255,255,255,0.04);
         }
-        .trm-tile.is-on .trm-tile-title { text-shadow:0 1px 8px rgba(0,0,0,0.25); }
-        .trm-tile-title-type { font-size:clamp(0.95rem, 8cqw, 1.45rem); font-weight:800; -webkit-line-clamp:2; }
+        .trm-tile:hover .trm-word,
+        .trm-tile.is-on .trm-word { color:#fff; text-shadow:0 1px 8px rgba(0,0,0,0.25); }
+        .trm-tile-title-type {
+          position:relative; z-index:1;
+          font-size:clamp(0.95rem, 8cqw, 1.4rem); font-weight:800; line-height:1.1;
+          letter-spacing:-0.01em; color:${textMain};
+          display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+          overflow:hidden; transition:color .25s;
+        }
 
         /* anello progressi: angolo in alto a destra; su verde diventa chiaro */
         .trm-tile-ring { position:absolute; top:7px; right:7px; z-index:1; transition:filter .25s; }
@@ -660,10 +700,10 @@ export default function TriviaMenu({
           gap:0.7rem; padding:0.85rem 1rem;
           width:100%; border:none;
           background:linear-gradient(135deg, var(--gv3) 0%, var(--gv) 50%, var(--gv2) 100%);
-          box-shadow:0 8px 22px ${dark ? "rgba(0,0,0,0.5)" : "rgba(31,107,60,0.32)"};
+          box-shadow:0 8px 22px ${dark ? "rgba(0,0,0,0.5)" : "rgba(91,33,182,0.34)"};
         }
         .trm-tile-all::before, .trm-tile-all .trm-tile-glow { display:none; }
-        .trm-tile-all:hover { transform:translateY(-3px); box-shadow:0 16px 34px ${dark ? "rgba(0,0,0,0.6)" : "rgba(31,107,60,0.42)"}; }
+        .trm-tile-all:hover { transform:translateY(-3px); box-shadow:0 16px 34px ${dark ? "rgba(0,0,0,0.6)" : "rgba(91,33,182,0.44)"}; }
         .trm-tile-all .trm-tile-check {
           position:static; transform:scale(0); width:24px; height:24px; border-radius:8px;
           background:rgba(255,255,255,0.22); color:#fff; box-shadow:none;
@@ -691,7 +731,7 @@ export default function TriviaMenu({
           }
           .trm-desktop-left {
             width:340px; flex-shrink:0;
-            background:linear-gradient(160deg,#0b2a18 0%,#103820 45%,#1a5030 100%);
+            background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
             display:flex; flex-direction:column; align-items:center; justify-content:center;
             gap:1.1rem; padding:2.5rem 2rem; overflow:hidden;
           }
