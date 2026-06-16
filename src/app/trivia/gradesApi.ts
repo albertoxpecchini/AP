@@ -29,7 +29,9 @@ const restHeaders = () => ({
   "Content-Type": "application/json",
 });
 
-export const argKey = (argomento: string) => argomento.trim().toLowerCase();
+// Chiave DB di un pacchetto = lo slug del capitolo (es. "unite-marsiglia"),
+// già minuscolo/stabile. NON più derivata dall'argomento (condiviso fra unità).
+export const argKey = (chapterId: string) => chapterId.trim().toLowerCase();
 
 // Riga "grezza" come arriva da Supabase.
 export interface GradeRow {
@@ -85,7 +87,7 @@ function writeLocal(rows: GradeRow[]) {
 
 function recordLocal(nick: string, p: PackageGrade) {
   const key = nick.trim().toLowerCase();
-  const ak = argKey(p.argomento);
+  const ak = argKey(p.chapterId);   // chiave = capitolo; p.argomento è l'etichetta
   const acc = p.accuracy;
   const rows = readLocal();
   const i = rows.findIndex(r => r.arg_key === ak && r.type === p.type && r.nick.toLowerCase() === key);
@@ -128,8 +130,8 @@ export async function saveGrades(nick: string, packages: PackageGrade[]): Promis
       headers: restHeaders(),
       body: JSON.stringify({
         p_nick: clean,
-        p_arg_key: argKey(p.argomento),
-        p_arg: p.argomento,
+        p_arg_key: argKey(p.chapterId),   // chiave = capitolo (slug)
+        p_arg: p.argomento,               // etichetta = titolo del capitolo
         p_type: p.type,
         p_correct: p.correct,
         p_total: p.total,
@@ -181,6 +183,32 @@ function groupBySubject(rows: GradeRow[]): SubjectReport[] {
   return out;
 }
 
+/**
+ * Righe "grezze" della pagella di un giocatore (per il RECUPERO progressi:
+ * vedi backfillProgressFromGrades). Solo i campi utili al backfill.
+ */
+export async function fetchGradeRows(nick: string): Promise<GradeRow[]> {
+  const key = nick.trim().toLowerCase();
+  if (!key) return [];
+
+  if (!gradesConfigured) {
+    return readLocal().filter(r => r.nick.toLowerCase() === key);
+  }
+
+  const params = new URLSearchParams({
+    select: "arg_key,type,best_correct,best_total",
+    nick_key: `eq.${key}`,
+    limit: "500",
+  });
+  try {
+    const res = await fetch(`${URL}/rest/v1/${TABLE}?${params}`, { headers: restHeaders() });
+    if (!res.ok) return [];
+    return (await res.json()) as GradeRow[];
+  } catch {
+    return [];
+  }
+}
+
 /** Pagella completa di un giocatore. Vuota se il nick non ha voti. */
 export async function fetchReport(nick: string): Promise<SubjectReport[]> {
   const key = nick.trim().toLowerCase();
@@ -205,10 +233,10 @@ export async function fetchReport(nick: string): Promise<SubjectReport[]> {
   }
 }
 
-/** Solo i voti di un singolo argomento (per il badge in-quiz). */
-export async function fetchSubject(nick: string, argomento: string): Promise<SubjectReport | null> {
+/** Solo i voti di un singolo capitolo (per il badge in-quiz). `chapterId` = slug. */
+export async function fetchSubject(nick: string, chapterId: string): Promise<SubjectReport | null> {
   const key = nick.trim().toLowerCase();
-  const ak = argKey(argomento);
+  const ak = argKey(chapterId);
   if (!key || !ak) return null;
 
   if (!gradesConfigured) {

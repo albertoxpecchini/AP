@@ -15,16 +15,14 @@ import { questionsForMany, prepareGame } from "./questions";
 import { isAnswerCorrect, type Question } from "./parseTrivia";
 import { fetchPhoto, prefetchPhoto } from "./photos";
 import { fetchProgress, recordProgress, type ProgressMap } from "./progressApi";
-import { cumulativePackageGrades, applyResults, totalCoverageFrom } from "./questionStats";
+import { cumulativePackageGrades, applyResults, totalCoverageFrom, backfillProgressFromGrades } from "./questionStats";
 import { iconForChapter } from "./chapterIcons";
 import { gradeFromPct, isGoodGrade } from "./grade";
 import { computePackageGrades, typeLabelLong } from "./packageGrades";
-import { submitScore, type ScoreRow } from "./leaderboardApi";
-import { saveGrades } from "./gradesApi";
+import { submitScore, fetchPlayerBests, type ScoreRow } from "./leaderboardApi";
+import { saveGrades, fetchGradeRows } from "./gradesApi";
 
 const GAME_KEY = "trivia";
-const BEST_STREAK_KEY = "trivia-best-streak";
-const BEST_GRADE_KEY = "trivia-best-grade";
 const DARK_KEY = "games-dark";
 
 // Tempo per rispondere (ms) e punteggio: base per corretta + bonus velocità.
@@ -86,17 +84,48 @@ export default function Trivia() {
   const qStart = useRef<number>(0);
   const openRef = useRef<HTMLInputElement>(null);
 
-  // record persistiti (menu)
-  const [bestStreak, setBestStreak] = useState(() => { try { return Number(localStorage.getItem(BEST_STREAK_KEY)) || 0; } catch { return 0; } });
-  const [bestGrade, setBestGrade] = useState<string>(() => { try { return localStorage.getItem(BEST_GRADE_KEY) || "—"; } catch { return "—"; } });
+  // Record del menu (Miglior voto, Streak record): PER ACCOUNT, letti da Supabase.
+  // Niente più localStorage globale (era uguale per tutti gli account del device).
+  const [bestStreak, setBestStreak] = useState(0);
+  const [bestGrade, setBestGrade] = useState<string>("—");
 
   // Progresso PER ACCOUNT (copertura + best per domanda): caricato dal nome
   // loggato, così ogni account ha i SUOI progressi e si vedono ovunque.
   const [progress, setProgress] = useState<ProgressMap>(new Map());
   useEffect(() => {
-    if (!nick) { setProgress(new Map()); return; }
+    if (!nick) { setProgress(new Map()); setBestStreak(0); setBestGrade("—"); return; }
     let alive = true;
-    fetchProgress(nick).then(m => { if (alive) setProgress(m); }).catch(() => {});
+    // Reset SUBITO i record del vecchio account: se la fetch del nuovo è lenta o
+    // fallisce, non restano "appiccicati" i valori di chi era loggato prima.
+    setProgress(new Map());
+    setBestStreak(0);
+    setBestGrade("—");
+    // 1) progresso dal DB, POI 2) RECUPERO dai voti già in pagella i progressi non
+    //    segnati (vedi backfillProgressFromGrades): se mancano su trivia_progress
+    //    ma esiste il voto, ricostruiamo le domande viste/giuste — e li ri-salviamo
+    //    su Supabase così non si perdono più. I dati restano coerenti con la pagella.
+    void (async () => {
+      const m = await fetchProgress(nick).catch(() => new Map() as ProgressMap);
+      if (!alive) return;
+      setProgress(m);
+      const rows = await fetchGradeRows(nick).catch(() => []);
+      if (!alive) return;
+      const recovered = backfillProgressFromGrades(m, rows);
+      if (recovered !== m) {
+        setProgress(recovered);
+        // persisti SOLO le domande nuove o passate a "giusta" rispetto al DB
+        // (il record lato server è idempotente: tiene comunque il best).
+        const newRows = [...recovered]
+          .filter(([id, v]) => !m.has(id) || m.get(id)!.ok !== v.ok)
+          .map(([id, v]) => ({ id, ok: v.ok, ms: v.ms }));
+        if (newRows.length) void recordProgress(nick, newRows);
+      }
+    })();
+    fetchPlayerBests(nick).then(b => {
+      if (!alive) return;
+      setBestStreak(b.bestStreak);
+      setBestGrade(b.bestAccuracy > 0 ? gradeFromPct(b.bestAccuracy).letter : "—");
+    }).catch(() => {});
     return () => { alive = false; };
   }, [nick]);
   const coverage = useMemo(() => totalCoverageFrom(progress), [progress]);
@@ -252,11 +281,17 @@ export default function Trivia() {
     const total = queue.length || 1;
     const accuracy = Math.round((correctCount / total) * 100);
     const grade = gradeFromPct(accuracy);
+    // Streak record della partita ricavato dai risultati (fonte di verità),
+    // non dallo stato async: evita l'off-by-one sull'ultima risposta.
+    let run = 0, maxRun = 0;
+    for (const pl of played) { run = pl.correct ? run + 1 : 0; if (run > maxRun) maxRun = run; }
+    const finalStreak = Math.max(maxRun, bestStreakRun);
 
-    // record locali (streak/voto migliore: solo "trofei" del device, non punti)
-    if (bestStreakRun > bestStreak) { setBestStreak(bestStreakRun); try { localStorage.setItem(BEST_STREAK_KEY, String(bestStreakRun)); } catch {} }
+    // record del menu: aggiorno solo lo stato a schermo (la verità è su Supabase
+    // via submitScore qui sotto, riletta per-account al prossimo apri-menu).
+    if (finalStreak > bestStreak) setBestStreak(finalStreak);
     const prevBestPct = gradeToPct(bestGrade);
-    if (accuracy > prevBestPct) { setBestGrade(grade.letter); try { localStorage.setItem(BEST_GRADE_KEY, grade.letter); } catch {} }
+    if (accuracy > prevBestPct) setBestGrade(grade.letter);
 
     // invio classifica (non blocca la UI)
     submitScore({ nick: nick || "Anon", score, chapter: chapterKey, accuracy, best_streak: bestStreakRun })
@@ -270,6 +305,11 @@ export default function Trivia() {
 
     if (nick) {
       const rows = played.map(p => ({ id: p.question.id, ok: p.correct, ms: p.ms ?? 0 }));
+      // VOTO SUBITO: i pacchetti completati IN QUESTA partita vanno in pagella
+      // immediatamente, senza aspettare il giro su Supabase (così "appena finito
+      // un quiz, il voto è già lì"). Poi sotto si riconcilia col cumulativo.
+      const justNow = cumulativePackageGrades(optimistic);
+      if (justNow.length) void saveGrades(nick, justNow);
       // 1) salva gli esiti per-domanda su Supabase, POI
       // 2) rileggi il progresso AUTORITATIVO (così conta anche ciò visto in altre
       //    partite/dispositivi), 3) ricalcola e salva i voti della pagella.
@@ -313,8 +353,8 @@ export default function Trivia() {
       {phase === "playing" && current && (
         <header className="trv-hud">
           <button className="trv-hud-back" onClick={backToMenu} aria-label="Esci"><ArrowLeft size={18} /></button>
-          {nick && current.argomento && (
-            <SubjectBadge dark={dark} nick={nick} argomento={current.argomento} />
+          {nick && current.chapterId && (
+            <SubjectBadge dark={dark} nick={nick} chapterId={current.chapterId} label={current.chapter} />
           )}
           <div className="trv-hud-prog">
             <span className="trv-hud-prog-txt">{idx + 1} / {queue.length}</span>

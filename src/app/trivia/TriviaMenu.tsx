@@ -236,31 +236,24 @@ export default function TriviaMenu({
     );
   }
 
-  // Cerchio progressi "N/T" a destra della riga capitolo, colorato a semaforo
-  // (rosso → giallo → verde in base alla % esplorata). Anello SVG + numeri.
+  // Progressi capitolo "N/T" come ICONCINA grande e leggibile (es. 0/25 … 25/25):
+  // pastiglia col numero in grande, verde mentre esplori, VIOLA quando completato
+  // (coerente con la tile). Niente più anellino minuscolo: il numero è protagonista.
   const progressRing = (seen: number, total: number, pct: number) => {
-    // verde mentre esplori; VIOLA quando completato (100%) per coerenza con la tile
-    const col = pct >= 100 ? "#7c3aed" : "#2F7D4A";
-    const R = 13, C = 2 * Math.PI * R;
-    const track = dark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)";
+    const done = pct >= 100;
+    const col = done ? "#7c3aed" : "#2F7D4A";
+    const bg = done
+      ? (dark ? "rgba(124,58,237,0.22)" : "rgba(124,58,237,0.12)")
+      : (dark ? "rgba(47,125,74,0.22)"  : "rgba(47,125,74,0.12)");
     return (
-      <div style={{ position: "relative", width: 30, height: 30, flexShrink: 0 }} title={`${seen} / ${total} domande viste · ${pct}%`}>
-        <svg width="30" height="30" viewBox="0 0 30 30" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx="15" cy="15" r={R} fill="none" stroke={track} strokeWidth="3" />
-          <circle
-            cx="15" cy="15" r={R} fill="none" stroke={col} strokeWidth="3" strokeLinecap="round"
-            strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)}
-            style={{ transition: "stroke-dashoffset .35s ease" }}
-          />
-        </svg>
-        <div style={{
-          position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", lineHeight: 1,
-        }}>
-          <span style={{ fontSize: "0.52rem", fontWeight: 900, color: col, fontVariantNumeric: "tabular-nums" }}>{seen}</span>
-          <span style={{ fontSize: "0.4rem", fontWeight: 700, color: lbl }}>/{total}</span>
-        </div>
-      </div>
+      <span
+        className="trm-progbadge"
+        style={{ color: col, background: bg, borderColor: col }}
+        title={`${seen} / ${total} domande viste · ${pct}%`}
+      >
+        <span className="trm-progbadge-seen">{seen}</span>
+        <span className="trm-progbadge-tot">/{total}</span>
+      </span>
     );
   };
 
@@ -884,9 +877,30 @@ export default function TriviaMenu({
           overflow:hidden; transition:color .12s;
         }
 
-        /* anello progressi: angolo in alto a destra; su verde diventa chiaro */
-        .trm-tile-ring { position:absolute; top:7px; right:7px; z-index:1; transition:filter .12s; }
-        .trm-tile.is-on .trm-tile-ring { filter:brightness(0) invert(1) opacity(0.92); }
+        /* badge progressi "N/T": angolo in alto a destra. Numero grande = iconcina. */
+        .trm-tile-ring { position:absolute; top:6px; right:6px; z-index:2; }
+        .trm-progbadge {
+          display:inline-flex; align-items:baseline; gap:0.02em;
+          padding:0.12rem 0.42rem; border-radius:999px;
+          border:1.5px solid currentColor;
+          background:rgba(255,255,255,0.92);
+          line-height:1; font-variant-numeric:tabular-nums;
+          box-shadow:0 2px 7px rgba(0,0,0,0.16);
+          backdrop-filter:blur(2px);
+        }
+        .trm-progbadge-seen { font-size:0.92rem; font-weight:900; letter-spacing:-0.03em; }
+        .trm-progbadge-tot  { font-size:0.6rem;  font-weight:800; opacity:0.72; }
+        /* su tile accesa/hover (fondo verde/viola pieno): badge bianco traslucido */
+        .trm-tile.is-on .trm-progbadge {
+          color:#fff !important; border-color:rgba(255,255,255,0.55) !important;
+          background:rgba(255,255,255,0.18) !important; box-shadow:none;
+        }
+        @media (hover: hover) {
+          .trm-tile:hover .trm-progbadge {
+            color:#fff !important; border-color:rgba(255,255,255,0.55) !important;
+            background:rgba(255,255,255,0.18) !important; box-shadow:none;
+          }
+        }
 
         /* spunta "accesa": angolo basso-destra, pop elastico */
         .trm-tile-check {

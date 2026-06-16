@@ -103,6 +103,34 @@ export async function fetchTop(limit = 50, chapter?: string): Promise<ScoreRow[]
   return (await res.json()) as ScoreRow[];
 }
 
+// ─── Record personali PER ACCOUNT (miglior voto + streak record) ────────────
+//
+// Letti da Supabase (tabella scores), legati al NOME (case-insensitive). Così
+// "Miglior voto" e "Streak record" nel menu NON sono più per-dispositivo.
+export interface PlayerBests { bestAccuracy: number; bestStreak: number }
+
+export async function fetchPlayerBests(nick: string): Promise<PlayerBests> {
+  const key = nick.trim().toLowerCase();
+  if (!key) return { bestAccuracy: 0, bestStreak: 0 };
+
+  let rows: ScoreRow[];
+  if (!leaderboardConfigured) {
+    rows = readLocal().filter(r => r.nick.trim().toLowerCase() === key);
+  } else {
+    const params = new URLSearchParams({ select: "nick,accuracy,best_streak", order: "score.desc", limit: "2000" });
+    try {
+      const res = await fetch(`${URL}/rest/v1/${TABLE}?${params}`, { headers: restHeaders() });
+      rows = res.ok ? ((await res.json()) as ScoreRow[]).filter(r => r.nick.trim().toLowerCase() === key) : [];
+    } catch { rows = []; }
+  }
+  let bestAccuracy = 0, bestStreak = 0;
+  for (const r of rows) {
+    bestAccuracy = Math.max(bestAccuracy, r.accuracy || 0);
+    bestStreak = Math.max(bestStreak, r.best_streak || 0);
+  }
+  return { bestAccuracy, bestStreak };
+}
+
 // ─── Classifica "Totale" (somma del miglior punteggio per capitolo) ─────────
 //
 // Confronto equo fra giocatori: NON la somma di tutte le partite (chi gioca di
