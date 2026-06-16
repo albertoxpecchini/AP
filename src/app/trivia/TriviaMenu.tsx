@@ -797,8 +797,10 @@ export default function TriviaMenu({
           transition:opacity .25s, color .25s, transform .3s;
         }
         .trm-tile-bg svg { width:130px; height:130px; }
-        .trm-tile:hover .trm-tile-bg,
         .trm-tile.is-on .trm-tile-bg { color:#fff; opacity:0.30; transform:scale(1.06) rotate(-4deg); }
+        @media (hover: hover) {
+          .trm-tile:hover .trm-tile-bg { color:#fff; opacity:0.30; transform:scale(1.06) rotate(-4deg); }
+        }
 
         /* TITOLO protagonista stile "Bolt": riempie tutta l'area disponibile.
            .trm-tile-titlebox è l'area (flex:1) che il JS misura; .trm-tile-title è
@@ -819,8 +821,10 @@ export default function TriviaMenu({
           transition:color .25s;
           text-shadow:0 1px 0 rgba(255,255,255,0.04);
         }
-        .trm-tile:hover .trm-word,
         .trm-tile.is-on .trm-word { color:#fff; text-shadow:0 1px 8px rgba(0,0,0,0.25); }
+        @media (hover: hover) {
+          .trm-tile:hover .trm-word { color:#fff; text-shadow:0 1px 8px rgba(0,0,0,0.25); }
+        }
         .trm-tile-title-type {
           position:relative; z-index:1;
           font-size:1.18rem; font-weight:800; line-height:1.15;
