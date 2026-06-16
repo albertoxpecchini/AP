@@ -264,15 +264,26 @@ export default function Trivia() {
       .catch(() => {});
 
     // ── progresso PER ACCOUNT ──
-    // 1) salva su Supabase l'esito di ogni domanda (seen + giusta + best ms)
-    if (nick) void recordProgress(nick, played.map(p => ({ id: p.question.id, ok: p.correct, ms: p.ms })));
-    // 2) aggiorna la mappa locale per la UI immediata (copertura, pagella)
-    const nextProgress = applyResults(progress, played);
-    setProgress(nextProgress);
-    // 3) pagella: pacchetti completati CUMULATIVAMENTE (giuste a TUTTE le domande
-    //    del tipo, anche in partite diverse) → se hai 25/25 hai il voto su ogni tipo.
-    const packages = cumulativePackageGrades(nextProgress);
-    if (nick && packages.length) void saveGrades(nick, packages);
+    // aggiorna subito la mappa locale per la UI immediata (copertura, pagella)
+    const optimistic = applyResults(progress, played);
+    setProgress(optimistic);
+
+    if (nick) {
+      const rows = played.map(p => ({ id: p.question.id, ok: p.correct, ms: p.ms ?? 0 }));
+      // 1) salva gli esiti per-domanda su Supabase, POI
+      // 2) rileggi il progresso AUTORITATIVO (così conta anche ciò visto in altre
+      //    partite/dispositivi), 3) ricalcola e salva i voti della pagella.
+      void (async () => {
+        try {
+          await recordProgress(nick, rows);
+          const fresh = await fetchProgress(nick);
+          const merged = fresh.size ? fresh : optimistic; // fallback se la lettura fallisce
+          setProgress(merged);
+          const packages = cumulativePackageGrades(merged);
+          if (packages.length) await saveGrades(nick, packages);
+        } catch { /* offline: riproverà alla prossima partita */ }
+      })();
+    }
 
     if (isGoodGrade(accuracy)) {
       setTimeout(() => confetti({ particleCount: 220, spread: 120, origin: { y: 0.4 }, colors: ["#2F9E5A", "#D9A400", "#fff", "#6fd08a", "#c8a415"] }), 200);

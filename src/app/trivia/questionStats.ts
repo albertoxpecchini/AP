@@ -36,25 +36,32 @@ const keyOf = (argomento: string, type: QType) => `${argomento} ${type}`;
 /**
  * Voti per pacchetto CUMULATIVI: un pacchetto (argomento × tipo) è "completato"
  * quando hai risposto GIUSTO almeno una volta a TUTTE le sue domande nel db.
- * Allora prende voto pieno (100%). Finché non è completo, non produce un voto.
+ * Un pacchetto è VOTABILE quando hai VISTO tutte le sue domande (25/25). Il voto
+ * riflette quante ne hai indovinate (best per domanda) — non per forza 100%.
  */
 export function cumulativePackageGrades(progress: ProgressMap): PackageGrade[] {
-  type Agg = { argomento: string; type: QType; total: number; okCount: number; ms: number };
+  type Agg = { argomento: string; type: QType; total: number; seenCount: number; okCount: number; ms: number };
   const byKey = new Map<string, Agg>();
   for (const c of CHAPTERS) {
     for (const q of c.questions) {
       const k = keyOf(q.argomento, q.type);
       let a = byKey.get(k);
-      if (!a) { a = { argomento: q.argomento, type: q.type, total: 0, okCount: 0, ms: 0 }; byKey.set(k, a); }
+      if (!a) { a = { argomento: q.argomento, type: q.type, total: 0, seenCount: 0, okCount: 0, ms: 0 }; byKey.set(k, a); }
       a.total++;
       const st = progress.get(q.id);
-      if (st?.ok) { a.okCount++; a.ms += st.ms; }
+      if (st) {            // domanda VISTA (tentata almeno una volta)
+        a.seenCount++;
+        if (st.ok) { a.okCount++; a.ms += st.ms; }
+      }
     }
   }
   const out: PackageGrade[] = [];
   for (const a of byKey.values()) {
-    if (a.okCount < a.total) continue;
-    out.push({ argomento: a.argomento, type: a.type, correct: a.okCount, total: a.total, accuracy: 100, grade: gradeFromPct(100), ms: a.ms });
+    // Pacchetto VOTABILE quando hai VISTO tutte le sue domande (finito il "25/25").
+    // Il voto riflette quante ne hai indovinate (best per domanda), non per forza 100%.
+    if (a.seenCount < a.total) continue;
+    const accuracy = Math.round((a.okCount / a.total) * 100);
+    out.push({ argomento: a.argomento, type: a.type, correct: a.okCount, total: a.total, accuracy, grade: gradeFromPct(accuracy), ms: a.ms });
   }
   const typeRank: Record<QType, number> = { multipla: 0, "vero-falso": 1, aperta: 2 };
   out.sort((x, y) => x.argomento.localeCompare(y.argomento, "it") || typeRank[x.type] - typeRank[y.type]);
