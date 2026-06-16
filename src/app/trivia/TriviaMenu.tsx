@@ -245,29 +245,23 @@ export default function TriviaMenu({
     );
   };
 
-  // Tendina "Ordina": select nativa (accessibile, niente librerie).
+  // Tasto "Ordina": tasto pulito, leggibile, staccato (select nativa accessibile).
   const SortControl = (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginBottom: "0.1rem" }}>
-      <label style={{
-        display: "inline-flex", alignItems: "center", gap: "0.35rem",
-        fontSize: "0.72rem", fontWeight: 700, color: lbl,
-        border: `1px solid ${bord}`, borderRadius: 999, padding: "0.2rem 0.5rem 0.2rem 0.7rem",
-        background: card,
-      }}>
-        <ArrowDownUp size={13} style={{ color: icon }} />
-        Ordina
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.9rem" }}>
+      <label className="trm-sort" style={{ background: card, border: `1.5px solid ${bord}` }}>
+        <ArrowDownUp size={16} style={{ color: vio, flexShrink: 0 }} />
+        <span className="trm-sort-txt" style={{ color: textMain }}>
+          {SORT_OPTIONS.find(o => o.key === sortBy)?.label}
+        </span>
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as SortKey)}
           aria-label="Ordina i capitoli"
-          style={{
-            border: "none", background: "transparent", color: textMain,
-            fontFamily: "inherit", fontSize: "0.72rem", fontWeight: 800,
-            cursor: "pointer", outline: "none", padding: "0.1rem 0.1rem",
-          }}
+          className="trm-sort-select"
         >
           {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
         </select>
+        <svg className="trm-sort-caret" width="12" height="12" viewBox="0 0 12 12" style={{ color: lbl }}><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </label>
     </div>
   );
@@ -599,6 +593,21 @@ export default function TriviaMenu({
           letter-spacing:0.1em; margin:0 0 0.4rem 0.1rem;
           display:flex; align-items:center; gap:0.5rem;
         }
+        /* tasto "Ordina": pill pulita; la select nativa sta sopra invisibile */
+        .trm-sort {
+          position:relative; display:inline-flex; align-items:center; gap:0.5rem;
+          padding:0.55rem 0.85rem; border-radius:12px; cursor:pointer;
+          font-family:inherit; box-shadow:0 2px 8px rgba(0,0,0,0.05);
+          transition:transform .12s, box-shadow .15s;
+        }
+        .trm-sort:hover { transform:translateY(-1px); box-shadow:0 5px 14px rgba(0,0,0,0.08); }
+        .trm-sort-txt { font-size:0.9rem; font-weight:800; white-space:nowrap; }
+        .trm-sort-caret { flex-shrink:0; }
+        .trm-sort-select {
+          position:absolute; inset:0; width:100%; height:100%;
+          opacity:0; cursor:pointer; font-family:inherit; border:none;
+        }
+
         /* pallino numerato della sequenza (1 capitoli, 2 tipi, 3 gioca) */
         .trm-step {
           display:inline-flex; align-items:center; justify-content:center;
