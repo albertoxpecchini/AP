@@ -56,18 +56,36 @@ select public._repair_progress('vero', 'parigi-haussmann-' || g, g < 6)
 from generate_series(0, 9) g;
 --    NB: le aperte (20–24) NON risultano in pagella per "vero" → non le tocco.
 
+-- ── 3) PULIZIA pagelle VECCHIE per-argomento (card doppie in pagella) ──
+--    Le pagelle storiche erano salvate con arg_key = ARGOMENTO (es. "architettura
+--    contemporanea") invece del CAPITOLO (slug). Ora convivono con le nuove
+--    (arg_key = "architettura-contemporanea") → DUE card con lo stesso titolo, e
+--    i voti dello stesso capitolo spezzati. Le righe vecchie sono ANCHE ambigue
+--    (un argomento copre più capitoli) → non fondibili. Le eliminiamo: quei voti
+--    si rifaranno rigiocando il capitolo, salvandosi puliti per-capitolo.
+--
+--    REGOLA SICURA: gli slug dei capitoli non contengono MAI spazi (usano "-").
+--    Quindi "arg_key con uno spazio" identifica ESATTAMENTE le righe vecchie.
+--    (Nello SQL Editor giri come owner → niente RLS, il DELETE passa.)
+delete from public.trivia_grades where arg_key like '% %';
+
 -- ── Pulizia: rimuovi l'helper temporaneo ──
 drop function if exists public._repair_progress(text, text, boolean);
 
 -- ----------------------------------------------------------------------------
 -- VERIFICA (lancia separatamente dopo il Run):
+--
+-- 1) progressi riparati:
 --   select nick_key,
 --          split_part(question_id,'-', case when question_id like 'parigi-%' then 2 else 1 end) as chap,
 --          count(*) filter (where seen) seen, count(*) filter (where ok) ok
 --     from public.trivia_progress
 --    where question_id like 'neoclassicismo-%' or question_id like 'parigi-haussmann-%'
 --    group by 1,2 order by 1,2;
--- Atteso:
---   alberto · neoclassicismo : seen 25, ok 25
---   vero    · parigi-haussmann: seen 20, ok 16   (10 V/F + 6 multiple giuste)
+--   Atteso:
+--     alberto · neoclassicismo : seen 25, ok 25
+--     vero    · parigi-haussmann: seen 20, ok 16   (10 V/F + 6 multiple giuste)
+--
+-- 2) nessuna pagella vecchia residua (deve dare 0 righe → niente card doppie):
+--   select nick, arg_key, type from public.trivia_grades where arg_key like '% %';
 -- ============================================================================
