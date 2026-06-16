@@ -68,6 +68,10 @@ export default function Trivia() {
   const [queue, setQueue] = useState<Question[]>([]);
   const [idx, setIdx] = useState(0);
   const [played, setPlayed] = useState<Played[]>([]);
+  // Specchio SINCRONO di `played`: finishGame può essere chiamato (via goNext) con
+  // una closure di `played` STALE → l'ultima risposta non c'era e la sua domanda
+  // non finiva su Supabase (es. 24/25 invece di 25/25). Il ref è sempre aggiornato.
+  const playedRef = useRef<Played[]>([]);
   const [streak, setStreak] = useState(0);
   const [bestStreakRun, setBestStreakRun] = useState(0);
   const [score, setScore] = useState(0);
@@ -146,6 +150,7 @@ export default function Trivia() {
     setQueue(picked);
     setIdx(0);
     setPlayed([]);
+    playedRef.current = [];
     setStreak(0);
     setBestStreakRun(0);
     setScore(0);
@@ -252,7 +257,9 @@ export default function Trivia() {
     setRevealed(true);
     // Feedback aptico: vibrazione corta se giusto, doppia "buzz" se sbagliato.
     navigator.vibrate?.(correct ? 18 : [0, 30, 40, 30]);
-    setPlayed(prev => [...prev, { question: current, correct, awarded, ms: elapsed }]);
+    const entry: Played = { question: current, correct, awarded, ms: elapsed };
+    playedRef.current = [...playedRef.current, entry]; // sync, prima di goNext/finishGame
+    setPlayed(prev => [...prev, entry]);
 
     if (correct) {
       confetti({ particleCount: 28, spread: 55, startVelocity: 32, origin: { y: 0.7 }, colors: ["#2F7D4A", "#D9A400", "#fff", "#6fd08a"] });
@@ -277,14 +284,18 @@ export default function Trivia() {
   const finishGame = useCallback(() => {
     clearInterval(tickRef.current);
 
-    const correctCount = played.filter(p => p.correct).length;
+    // USA IL REF, non lo stato: finishGame arriva via goNext con `played` potenzialmente
+    // STALE (mancava l'ultima risposta → 24/25). Il ref ha SEMPRE tutte le risposte.
+    const allPlayed = playedRef.current;
+
+    const correctCount = allPlayed.filter(p => p.correct).length;
     const total = queue.length || 1;
     const accuracy = Math.round((correctCount / total) * 100);
     const grade = gradeFromPct(accuracy);
     // Streak record della partita ricavato dai risultati (fonte di verità),
     // non dallo stato async: evita l'off-by-one sull'ultima risposta.
     let run = 0, maxRun = 0;
-    for (const pl of played) { run = pl.correct ? run + 1 : 0; if (run > maxRun) maxRun = run; }
+    for (const pl of allPlayed) { run = pl.correct ? run + 1 : 0; if (run > maxRun) maxRun = run; }
     const finalStreak = Math.max(maxRun, bestStreakRun);
 
     // record del menu: aggiorno solo lo stato a schermo (la verità è su Supabase
@@ -300,11 +311,11 @@ export default function Trivia() {
 
     // ── progresso PER ACCOUNT ──
     // aggiorna subito la mappa locale per la UI immediata (copertura, pagella)
-    const optimistic = applyResults(progress, played);
+    const optimistic = applyResults(progress, allPlayed);
     setProgress(optimistic);
 
     if (nick) {
-      const rows = played.map(p => ({ id: p.question.id, ok: p.correct, ms: p.ms ?? 0 }));
+      const rows = allPlayed.map(p => ({ id: p.question.id, ok: p.correct, ms: p.ms ?? 0 }));
       // VOTO SUBITO: i pacchetti completati IN QUESTA partita vanno in pagella
       // immediatamente, senza aspettare il giro su Supabase (così "appena finito
       // un quiz, il voto è già lì"). Poi sotto si riconcilia col cumulativo.
