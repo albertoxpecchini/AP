@@ -582,7 +582,7 @@ export default function TriviaMenu({
         /* TITOLO protagonista: grande, in basso, riempie la card */
         .trm-tile-title {
           position:relative; z-index:1;
-          font-size:1.02rem; font-weight:800; line-height:1.12;
+          font-size:1.22rem; font-weight:800; line-height:1.12;
           letter-spacing:-0.01em;
           color:${textMain};
           display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
@@ -591,7 +591,7 @@ export default function TriviaMenu({
           text-shadow:0 1px 0 rgba(255,255,255,0.04);
         }
         .trm-tile.is-on .trm-tile-title { text-shadow:0 1px 8px rgba(0,0,0,0.25); }
-        .trm-tile-title-type { font-size:0.92rem; -webkit-line-clamp:2; }
+        .trm-tile-title-type { font-size:1.05rem; -webkit-line-clamp:2; }
 
         /* anello progressi: angolo in alto a destra; su verde diventa chiaro */
         .trm-tile-ring { position:absolute; top:7px; right:7px; z-index:1; transition:filter .25s; }
