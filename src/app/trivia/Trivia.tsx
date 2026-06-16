@@ -14,7 +14,8 @@ import { TRIVIA_INTRO } from "./tutorialSteps";
 import { questionsForMany, prepareGame } from "./questions";
 import { isAnswerCorrect, type Question } from "./parseTrivia";
 import { fetchPhoto, prefetchPhoto } from "./photos";
-import { markSeen, coveragePct } from "./coverage";
+import { fetchProgress, recordProgress, type ProgressMap } from "./progressApi";
+import { cumulativePackageGrades, applyResults, totalCoverageFrom } from "./questionStats";
 import { iconForChapter } from "./chapterIcons";
 import { gradeFromPct, isGoodGrade } from "./grade";
 import { computePackageGrades, typeLabelLong } from "./packageGrades";
@@ -88,7 +89,17 @@ export default function Trivia() {
   // record persistiti (menu)
   const [bestStreak, setBestStreak] = useState(() => { try { return Number(localStorage.getItem(BEST_STREAK_KEY)) || 0; } catch { return 0; } });
   const [bestGrade, setBestGrade] = useState<string>(() => { try { return localStorage.getItem(BEST_GRADE_KEY) || "—"; } catch { return "—"; } });
-  const [coverage, setCoverage] = useState(() => coveragePct());
+
+  // Progresso PER ACCOUNT (copertura + best per domanda): caricato dal nome
+  // loggato, così ogni account ha i SUOI progressi e si vedono ovunque.
+  const [progress, setProgress] = useState<ProgressMap>(new Map());
+  useEffect(() => {
+    if (!nick) { setProgress(new Map()); return; }
+    let alive = true;
+    fetchProgress(nick).then(m => { if (alive) setProgress(m); }).catch(() => {});
+    return () => { alive = false; };
+  }, [nick]);
+  const coverage = useMemo(() => totalCoverageFrom(progress), [progress]);
 
   const [justSubmitted, setJustSubmitted] = useState<ScoreRow | null>(null);
 
@@ -236,18 +247,14 @@ export default function Trivia() {
 
   const finishGame = useCallback(() => {
     clearInterval(tickRef.current);
-    // copertura: marca tutte le domande viste in questa partita
-    markSeen(queue.map(q => q.id));
-    setCoverage(coveragePct());
 
     const correctCount = played.filter(p => p.correct).length;
     const total = queue.length || 1;
     const accuracy = Math.round((correctCount / total) * 100);
     const grade = gradeFromPct(accuracy);
 
-    // record locali
+    // record locali (streak/voto migliore: solo "trofei" del device, non punti)
     if (bestStreakRun > bestStreak) { setBestStreak(bestStreakRun); try { localStorage.setItem(BEST_STREAK_KEY, String(bestStreakRun)); } catch {} }
-    // miglior voto = quello con percentuale più alta vista finora
     const prevBestPct = gradeToPct(bestGrade);
     if (accuracy > prevBestPct) { setBestGrade(grade.letter); try { localStorage.setItem(BEST_GRADE_KEY, grade.letter); } catch {} }
 
@@ -256,8 +263,15 @@ export default function Trivia() {
       .then(row => setJustSubmitted(row))
       .catch(() => {});
 
-    // pagella: salva i voti dei pacchetti completati (record+ultimo, con tempi)
-    const packages = computePackageGrades(played, queue);
+    // ── progresso PER ACCOUNT ──
+    // 1) salva su Supabase l'esito di ogni domanda (seen + giusta + best ms)
+    if (nick) void recordProgress(nick, played.map(p => ({ id: p.question.id, ok: p.correct, ms: p.ms })));
+    // 2) aggiorna la mappa locale per la UI immediata (copertura, pagella)
+    const nextProgress = applyResults(progress, played);
+    setProgress(nextProgress);
+    // 3) pagella: pacchetti completati CUMULATIVAMENTE (giuste a TUTTE le domande
+    //    del tipo, anche in partite diverse) → se hai 25/25 hai il voto su ogni tipo.
+    const packages = cumulativePackageGrades(nextProgress);
     if (nick && packages.length) void saveGrades(nick, packages);
 
     if (isGoodGrade(accuracy)) {
@@ -265,12 +279,11 @@ export default function Trivia() {
     }
     setPhase("results");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queue, played, bestStreakRun, bestStreak, bestGrade, nick, score, chapterKey]);
+  }, [queue, played, bestStreakRun, bestStreak, bestGrade, nick, score, chapterKey, progress]);
 
   const backToMenu = useCallback(() => {
     clearInterval(tickRef.current);
     setPhase("menu");
-    setCoverage(coveragePct());
   }, []);
 
   // ─── Render ───
@@ -461,6 +474,7 @@ export default function Trivia() {
           bestStreak={bestStreak}
           bestGrade={bestGrade}
           coverage={coverage}
+          progress={progress}
           nick={nick}
           onPlay={onPlay}
           onTutorial={() => setShowTutorial(true)}
@@ -522,11 +536,11 @@ export default function Trivia() {
             .trv-pagmodal.dark .trv-pagmodal-card { background:#14211a; }
             @keyframes trv-pagmodal-up { from{opacity:0; transform:translateY(16px) scale(.97)} to{opacity:1; transform:none} }
             .trv-pagmodal-head {
-              background:linear-gradient(135deg,#14512c 0%,#2F7D4A 100%); color:#fff; flex-shrink:0;
-              padding:1rem 1.1rem; display:flex; align-items:center; justify-content:space-between;
+              background:linear-gradient(120deg,#7c3aed 0%,#5b21b6 55%,#2F7D4A 130%); color:#fff; flex-shrink:0;
+              padding:1.1rem 1.1rem; display:flex; align-items:center; justify-content:space-between;
             }
-            .trv-pagmodal.dark .trv-pagmodal-head { background:linear-gradient(135deg,#0c2e19 0%,#1c5733 100%); }
-            .trv-pagmodal-title { display:flex; align-items:center; gap:.55rem; font-size:1.18rem; font-weight:800; }
+            .trv-pagmodal.dark .trv-pagmodal-head { background:linear-gradient(120deg,#4c1d95 0%,#2a1150 60%,#103820 130%); }
+            .trv-pagmodal-title { display:flex; align-items:center; gap:.55rem; font-size:1.3rem; font-weight:900; letter-spacing:-.01em; }
             .trv-pagmodal-title small { display:block; font-size:.66rem; font-weight:600; opacity:.8; margin-top:.1rem; }
             .trv-pagmodal-x {
               display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
@@ -536,7 +550,7 @@ export default function Trivia() {
             .trv-pagmodal-x:hover { background:rgba(255,255,255,0.26); transform:rotate(90deg); }
             .trv-pagmodal-body { flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:1rem .9rem 1.2rem; scrollbar-width:thin; }
             .trv-pagmodal-body::-webkit-scrollbar { width:7px; }
-            .trv-pagmodal-body::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.25); border-radius:99px; }
+            .trv-pagmodal-body::-webkit-scrollbar-thumb { background:rgba(124,58,237,0.3); border-radius:99px; }
           `}</style>
         </div>
       )}

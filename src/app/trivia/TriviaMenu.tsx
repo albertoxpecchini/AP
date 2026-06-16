@@ -4,7 +4,8 @@ import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, Graduati
 import type { LucideIcon } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";
 import { fetchTotals } from "./leaderboardApi";
-import { chapterCoveragePct, chapterCoverageCount } from "./coverage";
+import { chapterCoverageFrom } from "./questionStats";
+import type { ProgressMap } from "./progressApi";
 import { iconForChapter } from "./chapterIcons";
 import type { QType } from "./parseTrivia";
 
@@ -52,6 +53,7 @@ interface TriviaMenuProps {
   bestStreak: number;
   bestGrade: string;        // es. "A−" o "—"
   coverage: number;         // % totale db visto
+  progress: ProgressMap;    // progresso per-account (copertura per capitolo)
   nick?: string;
   onPlay: (chapters: ChapterSelection, types: TypeSelection) => void;
   onTutorial: () => void;
@@ -61,7 +63,7 @@ interface TriviaMenuProps {
 }
 
 export default function TriviaMenu({
-  dark, bestStreak, bestGrade, coverage, nick,
+  dark, bestStreak, bestGrade, coverage, progress, nick,
   onPlay, onTutorial, onLeaderboard, onPagella, onChangeNick,
 }: TriviaMenuProps) {
   // Set di id capitoli selezionati. Vuoto = "Tutti i capitoli".
@@ -80,7 +82,7 @@ export default function TriviaMenu({
     let alive = true;
     const realIds = CHAPTERS.map(c => c.id);
     fetchTotals(realIds, 500)
-      .then(rows => { if (alive) setPlayerScore(rows.find(r => r.nick === nick)?.score ?? 0); })
+      .then(rows => { if (alive) { const k = nick.trim().toLowerCase(); setPlayerScore(rows.find(r => r.nick.trim().toLowerCase() === k)?.score ?? 0); } })
       .catch(() => { if (alive) setPlayerScore(0); });
     return () => { alive = false; };
   }, [nick]);
@@ -164,11 +166,11 @@ export default function TriviaMenu({
       case "az": return arr.sort((a, b) => a.title.localeCompare(b.title, "it"));
       case "za": return arr.sort((a, b) => b.title.localeCompare(a.title, "it"));
       case "esplorato": // meno esplorati in cima; a parità, ordine cronologico
-        return arr.sort((a, b) => chapterCoveragePct(a.id) - chapterCoveragePct(b.id) || a.order - b.order);
+        return arr.sort((a, b) => chapterCoverageFrom(progress, a.id).pct - chapterCoverageFrom(progress, b.id).pct || a.order - b.order);
       case "cronologico":
       default: return arr.sort((a, b) => a.order - b.order);
     }
-  }, [sortBy]);
+  }, [sortBy, progress]);
 
   const bg       = dark ? "#111916" : "#f4f6f5";
   const card     = dark ? "#1a2720" : "#ffffff";
@@ -298,8 +300,7 @@ export default function TriviaMenu({
       {/* Griglia capitoli */}
       <div className="trm-grid">
         {orderedChapters.map((c) => {
-          const cov = chapterCoveragePct(c.id);
-          const { seen, total } = chapterCoverageCount(c.id);
+          const { seen, total, pct: cov } = chapterCoverageFrom(progress, c.id);
           const on = selected.has(c.id);
           return (
             <button

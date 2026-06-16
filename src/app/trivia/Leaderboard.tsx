@@ -328,17 +328,17 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
 
         /* ── Header (Kit Italia: barra istituzionale verde) ── */
         .trv-lb-head {
-          background: linear-gradient(135deg, #14512c 0%, #2F7D4A 100%);
-          color: #fff; flex-shrink: 0; padding: 1rem 1.1rem .85rem;
+          background: linear-gradient(120deg, #7c3aed 0%, #5b21b6 55%, #2F7D4A 130%);
+          color: #fff; flex-shrink: 0; padding: 1.1rem 1.1rem .85rem;
           position: relative; overflow: hidden;
         }
         .trv-lb-head::after {
           content:""; position:absolute; right:-30px; top:-50px;
           width:180px; height:180px; border-radius:50%;
-          background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+          background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
           pointer-events:none;
         }
-        .trv-lb.dark .trv-lb-head { background: linear-gradient(135deg, #0c2e19 0%, #1c5733 100%); }
+        .trv-lb.dark .trv-lb-head { background: linear-gradient(120deg, #4c1d95 0%, #2a1150 60%, #103820 130%); }
         .trv-lb-headrow { display:flex; align-items:flex-start; justify-content:space-between; position:relative; z-index:1; }
         .trv-lb-title { display:flex; align-items:center; gap:.6rem; }
         .trv-lb-tico {
@@ -380,8 +380,8 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           transition:background .15s, color .15s, transform .1s;
         }
         .trv-lb-tab:hover { background:rgba(255,255,255,0.2); }
-        .trv-lb-tab.act { background:#fff; color:#1F6B3D; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
-        .trv-lb.dark .trv-lb-tab.act { background:#0e1512; color:#6fe0a6; }
+        .trv-lb-tab.act { background:#fff; color:#6d28d9; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+        .trv-lb.dark .trv-lb-tab.act { background:#0e1512; color:#c4a5ff; }
 
         /* ── Filtri a chip con icone tematiche (scroll + fade ai bordi) ── */
         .trv-lb-filterswrap { position:relative; flex-shrink:0; border-bottom:1px solid rgba(0,0,0,0.06); }
@@ -410,9 +410,9 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb.dark .trv-lb-fbtn { color:#6fe0a6; background:transparent; border-color:rgba(95,208,154,0.26); }
         .trv-lb-fbtn:hover { background:rgba(47,125,74,0.08); transform:translateY(-1px); }
         .trv-lb-fbtn:focus-visible { outline:2px solid #2F7D4A; outline-offset:1px; }
-        .trv-lb-fbtn.act { background:#2F7D4A; color:#fff; border-color:#2F7D4A; box-shadow:0 2px 8px rgba(47,125,74,0.3); }
+        .trv-lb-fbtn.act { background:#7c3aed; color:#fff; border-color:#7c3aed; box-shadow:0 2px 8px rgba(124,58,237,0.34); }
         .trv-lb-fbtn.act .trv-lb-fico { opacity:1; }
-        .trv-lb.dark .trv-lb-fbtn.act { background:#2f9e63; border-color:#2f9e63; color:#06160e; }
+        .trv-lb.dark .trv-lb-fbtn.act { background:#9b5cf6; border-color:#9b5cf6; color:#190a2e; }
 
         /* ── Body scrollabile ── */
         .trv-lb-body { flex:1; min-height:0; overflow-y:auto; padding:.9rem .85rem 1rem; scrollbar-width:thin; }

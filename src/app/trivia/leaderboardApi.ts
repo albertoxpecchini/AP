@@ -142,22 +142,23 @@ export async function fetchTotals(chapterIds: string[], limit = 50): Promise<Tot
     }
   }
 
-  // best per (nick, chapter)
+  // best per (nick, chapter) — nick aggregato CASE-INSENSITIVE (alberto == Alberto)
   type Best = { score: number; accuracy: number };
-  const byNick = new Map<string, Map<string, Best>>();
+  const byNick = new Map<string, { label: string; chaps: Map<string, Best> }>();
   for (const r of all) {
     if (!chapSet.has(r.chapter)) continue;
-    let m = byNick.get(r.nick);
-    if (!m) { m = new Map(); byNick.set(r.nick, m); }
-    const prev = m.get(r.chapter);
-    if (!prev || r.score > prev.score) m.set(r.chapter, { score: r.score, accuracy: r.accuracy });
+    const key = r.nick.trim().toLowerCase();
+    let e = byNick.get(key);
+    if (!e) { e = { label: r.nick, chaps: new Map() }; byNick.set(key, e); }
+    const prev = e.chaps.get(r.chapter);
+    if (!prev || r.score > prev.score) e.chaps.set(r.chapter, { score: r.score, accuracy: r.accuracy });
   }
 
   const out: TotalRow[] = [];
-  for (const [nick, m] of byNick) {
+  for (const { label, chaps } of byNick.values()) {
     let score = 0, accSum = 0;
-    for (const b of m.values()) { score += b.score; accSum += b.accuracy; }
-    out.push({ nick, score, chapters: m.size, accuracy: Math.round(accSum / m.size) });
+    for (const b of chaps.values()) { score += b.score; accSum += b.accuracy; }
+    out.push({ nick: label, score, chapters: chaps.size, accuracy: Math.round(accSum / chaps.size) });
   }
   out.sort((a, b) => b.score - a.score);
   return out.slice(0, limit);

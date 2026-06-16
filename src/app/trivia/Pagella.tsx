@@ -109,7 +109,7 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
                     const cell = s.cells.find(c => c.type === t);
                     return cell
                       ? renderCell(cell)
-                      : <div key={t} className="pag-cell empty"><div className="pag-cell-type">{TYPE_SHORT[t]}</div><div className="pag-cell-na">—</div></div>;
+                      : <div key={t} className="pag-cell todo"><div className="pag-cell-type">{TYPE_SHORT[t]}</div><div className="pag-cell-na">Da fare</div></div>;
                   })}
                 </div>
               </div>
@@ -126,12 +126,12 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
         }
         .pag-sum-item {
           display:flex; flex-direction:column; align-items:center; gap:.1rem;
-          background:rgba(47,125,74,0.07); border:1px solid rgba(47,125,74,0.14);
-          border-radius:12px; padding:.55rem .3rem;
+          background:rgba(124,58,237,0.06); border:1px solid rgba(124,58,237,0.16);
+          border-radius:13px; padding:.6rem .3rem;
         }
-        .pag.dark .pag-sum-item { background:rgba(95,208,154,0.08); border-color:rgba(95,208,154,0.18); }
-        .pag-sum-item b { font-size:1.05rem; font-weight:900; color:#2F7D4A; font-variant-numeric:tabular-nums; }
-        .pag.dark .pag-sum-item b { color:#6fe0a6; }
+        .pag.dark .pag-sum-item { background:rgba(155,92,246,0.1); border-color:rgba(155,92,246,0.2); }
+        .pag-sum-item b { font-size:1.15rem; font-weight:900; color:#6d28d9; font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+        .pag.dark .pag-sum-item b { color:#c4a5ff; }
         .pag-sum-item small { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:#6b8070; }
         .pag.dark .pag-sum-item small { color:#8fc7a6; }
 
@@ -156,10 +156,12 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
           background:#fff; text-align:center;
         }
         .pag.dark .pag-cell { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.07); }
-        .pag-cell.empty { opacity:.5; }
+        .pag-cell.todo { border-style:dashed; border-color:rgba(124,58,237,0.4); background:rgba(124,58,237,0.04); }
+        .pag.dark .pag-cell.todo { border-color:rgba(155,92,246,0.4); background:rgba(155,92,246,0.07); }
         .pag-cell-type { font-size:.58rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#9aa89e; }
         .pag-cell-grade { font-size:1.5rem; font-weight:900; line-height:1; letter-spacing:-.02em; }
-        .pag-cell-na { font-size:1.3rem; font-weight:800; color:#bcc7c0; line-height:1.4; }
+        .pag-cell-na { font-size:.82rem; font-weight:800; color:#7c3aed; line-height:1; padding:.5rem 0; text-transform:uppercase; letter-spacing:.03em; }
+        .pag.dark .pag-cell-na { color:#b794ff; }
         .pag-cell-pct { font-size:.72rem; font-weight:800; color:#17271d; font-variant-numeric:tabular-nums; }
         .pag.dark .pag-cell-pct { color:#d4e8dc; }
         .pag-cell-meta { display:flex; flex-direction:column; align-items:center; gap:.05rem; font-size:.56rem; font-weight:700; color:#6b8070; margin-top:.1rem; }
