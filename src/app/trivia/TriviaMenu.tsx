@@ -162,14 +162,14 @@ export default function TriviaMenu({
   // (rosso → giallo → verde in base alla % esplorata). Anello SVG + numeri.
   const progressRing = (seen: number, total: number, pct: number) => {
     const col = trafficColor(pct);
-    const R = 15, C = 2 * Math.PI * R;
-    const track = dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.10)";
+    const R = 14, C = 2 * Math.PI * R;
+    const track = dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.09)";
     return (
-      <div style={{ position: "relative", width: 38, height: 38, flexShrink: 0 }} title={`${seen} / ${total} domande viste · ${pct}%`}>
-        <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx="19" cy="19" r={R} fill="none" stroke={track} strokeWidth="3.5" />
+      <div style={{ position: "relative", width: 34, height: 34, flexShrink: 0 }} title={`${seen} / ${total} domande viste · ${pct}%`}>
+        <svg width="34" height="34" viewBox="0 0 34 34" style={{ transform: "rotate(-90deg)" }}>
+          <circle cx="17" cy="17" r={R} fill="none" stroke={track} strokeWidth="3" />
           <circle
-            cx="19" cy="19" r={R} fill="none" stroke={col} strokeWidth="3.5" strokeLinecap="round"
+            cx="17" cy="17" r={R} fill="none" stroke={col} strokeWidth="3" strokeLinecap="round"
             strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)}
             style={{ transition: "stroke-dashoffset .3s, stroke .3s" }}
           />
@@ -178,8 +178,8 @@ export default function TriviaMenu({
           position: "absolute", inset: 0, display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", lineHeight: 1,
         }}>
-          <span style={{ fontSize: "0.6rem", fontWeight: 900, color: col, fontVariantNumeric: "tabular-nums" }}>{seen}</span>
-          <span style={{ fontSize: "0.46rem", fontWeight: 700, color: lbl }}>/{total}</span>
+          <span style={{ fontSize: "0.58rem", fontWeight: 900, color: col, fontVariantNumeric: "tabular-nums" }}>{seen}</span>
+          <span style={{ fontSize: "0.44rem", fontWeight: 700, color: lbl }}>/{total}</span>
         </div>
       </div>
     );
@@ -214,7 +214,7 @@ export default function TriviaMenu({
 
   // ── Lista to-do: "Tutti i capitoli" + una riga per capitolo ──
   const ChapterList = (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
       {SortControl}
       {/* Tutti (deseleziona tutto) */}
       <TodoRow
@@ -254,7 +254,7 @@ export default function TriviaMenu({
   const TypeList = (
     <div>
       <p className="trm-section-label" style={{ color: lbl }}>Tipi di domanda</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
         {TYPE_DEFS.map(t => (
           <TodoRow
             key={t.id}
@@ -332,7 +332,7 @@ export default function TriviaMenu({
   const BookCover = (
     <a
       className="trm-book"
-      href="https://www.hoepli.it/libro/progettazione-costruzioni-e-impianti-volume-3/9788836011247.html"
+      href="https://www.amazon.it/Progettazione-Costruzioni-Impianti-Vall%C3%AC-Baraldi/dp/8836007562"
       target="_blank" rel="noopener noreferrer"
       title="Progettazione, Costruzioni e Impianti 3 — Baraldi, Zanghì (Hoepli)"
     >
@@ -536,41 +536,43 @@ function TodoRow(props: {
       type="button"
       onClick={onClick}
       style={{
-        display: "flex", alignItems: "center", gap: "0.7rem",
-        padding: "0.6rem 0.8rem",
-        background: active ? `${color}${dark ? "22" : "12"}` : card,
-        border: `1.5px solid ${active ? color : bord}`,
-        borderRadius: "11px", cursor: "pointer", fontFamily: "inherit",
+        display: "flex", alignItems: "center", gap: "0.6rem",
+        padding: "0.5rem 0.7rem",
+        background: active ? `${color}${dark ? "1e" : "0e"}` : card,
+        border: `1px solid ${active ? color : bord}`,
+        boxShadow: active ? `inset 0 0 0 1px ${color}` : "0 1px 2px rgba(0,0,0,0.04)",
+        borderRadius: "12px", cursor: "pointer", fontFamily: "inherit",
         textAlign: "left", width: "100%",
-        transition: "border-color 0.15s, background 0.15s",
+        transition: "border-color 0.15s, background 0.15s, box-shadow 0.15s",
       }}
     >
-      {/* Checkbox a SINISTRA (stile to-do) */}
+      {/* Checkbox "Pento" a SINISTRA: quadrato morbido / pallino, spunta animata */}
       <div style={{
-        width: 22, height: 22, flexShrink: 0,
-        borderRadius: multi ? 6 : "50%",
+        width: 20, height: 20, flexShrink: 0,
+        borderRadius: multi ? 7 : "50%",
         background: filled ? color : "transparent",
-        border: filled ? `2px solid ${color}` : `2px solid ${dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.2)"}`,
+        border: filled ? `1.5px solid ${color}` : `1.5px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.16)"}`,
+        boxShadow: filled ? `0 2px 6px ${color}66` : "none",
         display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background .15s, border-color .15s",
+        transition: "background .15s, border-color .15s, box-shadow .15s",
       }}>
-        {filled && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
+        {filled && <svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6.2l2.6 2.6L10 3.4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
       </div>
       {/* Slot logo SVG del capitolo: discreto e indicativo. Quando un capitolo
           avrà il suo logo (campo `logo`) verrà mostrato qui; altrimenti niente. */}
       {logo && (
         <span style={{
-          width: 26, height: 26, flexShrink: 0,
+          width: 24, height: 24, flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
-          color: dark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.45)",
-          opacity: 0.85,
+          color: active ? color : (dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.42)"),
+          opacity: active ? 1 : 0.85, transition: "color .15s",
         }}>{logo}</span>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "0.88rem", fontWeight: 800, color: active ? color : textMain, lineHeight: 1.25 }}>{title}</div>
-        {subtitle && <p style={{ fontSize: "0.72rem", color: textSub, margin: "0.05rem 0 0", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtitle}</p>}
+        <div style={{ fontSize: "0.86rem", fontWeight: 700, color: active ? color : textMain, lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</div>
+        {subtitle && <p style={{ fontSize: "0.7rem", color: textSub, margin: "0.05rem 0 0", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtitle}</p>}
       </div>
-      {badge}
+      {badge && <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>{badge}</div>}
     </button>
   );
 }
