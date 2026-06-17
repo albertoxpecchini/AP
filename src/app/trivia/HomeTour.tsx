@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, MousePointerClick, ArrowRight } from "lucide-react";
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -26,6 +26,9 @@ export interface TourStep {
   // selettore della modale che si apre cliccando (solo "modal"): quando appare
   // e poi sparisce, il tour avanza. Default: qualsiasi [role=dialog].
   modalSelector?: string;
+  // selettore del tasto di chiusura DENTRO la modale: a scheda aperta il tour
+  // illumina SOLO quella ✕ (solo "modal"). Default: '[aria-label="Chiudi"]'.
+  closeSelector?: string;
 }
 
 interface HomeTourProps {
@@ -60,15 +63,22 @@ export default function HomeTour({ steps, onDone, onCloseModals }: HomeTourProps
     if (idx >= steps.length - 1) finish();
   }, [idx, steps.length, finish, onCloseModals]);
 
-  // ── Misura il target del passo, con retry finché compare (max ~1.2s). Se non
-  //    compare proprio, salta il passo invece di lasciare lo schermo nero. ──
+  // Quale elemento illuminare: di norma il pulsante del menù (`step.selector`);
+  // ma in un passo "modal" a scheda APERTA, illuminiamo SOLO la ✕ di chiusura.
+  const spotlightSelector =
+    step.kind === "modal" && modalShown
+      ? (step.closeSelector ?? '[aria-label="Chiudi"]')
+      : step.selector;
+
+  // ── Misura il target, con retry finché compare (max ~1.2s). Se non compare
+  //    proprio, salta il passo invece di lasciare lo schermo nero. ──
   useEffect(() => {
     let raf = 0, tries = 0, alive = true;
     const tick = () => {
       if (!alive) return;
       // Possono esistere DUE match (markup mobile + desktop): scegli il primo
       // VISIBILE (rettangolo non nullo), così non misuriamo quello nascosto.
-      const els = Array.from(document.querySelectorAll<HTMLElement>(step.selector));
+      const els = Array.from(document.querySelectorAll<HTMLElement>(spotlightSelector));
       const el = els.find(e => { const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0; }) ?? null;
       if (el) {
         const r = el.getBoundingClientRect();
@@ -96,7 +106,7 @@ export default function HomeTour({ steps, onDone, onCloseModals }: HomeTourProps
     tick();
     return () => { alive = false; cancelAnimationFrame(raf); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, step.selector]);
+  }, [idx, spotlightSelector]);
 
   // ── Passi "modal": clicca il target → si apre la modale → quando la chiudi
   //    (✕ / Esc / click fuori) il tour avanza. Rilevazione via osservazione DOM. ──
@@ -145,18 +155,21 @@ export default function HomeTour({ steps, onDone, onCloseModals }: HomeTourProps
     }
   }
 
-  // ── Passo "modal" con scheda aperta: nascondi la maschera, mostra solo la
-  //    barra-istruzione (la modale è già pulita sotto). ──
+  // ── Passo "modal" con scheda aperta: NIENTE maschera (la scheda resta pulita
+  //    e leggibile). Illuminiamo SOLO la sua ✕ con un alone + una piccola
+  //    etichetta: chiudendo lì il tour avanza da solo. Unico tasto extra: "Salta". ──
   if (step.kind === "modal" && modalShown) {
     return (
       <div className="tour-root" style={{ position: "fixed", inset: 0, zIndex: 1400, pointerEvents: "none", opacity: exiting ? 0 : 1 }}>
-        <div className="tour-bar" style={{ pointerEvents: "auto" }}>
-          <span className="tour-bar-txt"><MousePointerClick size={15} /> Chiudila con la ✕ per continuare il tour</span>
-          <div className="tour-bar-btns">
-            <button type="button" className="tour-skip" onClick={finish}><X size={13} /> Salta</button>
-            <button type="button" className="tour-next tour-next-on" onClick={next}>{isLast ? "Finisci" : "Avanti →"}</button>
-          </div>
-        </div>
+        {rect && (
+          <>
+            <div className="tour-halo" style={{ top: rect.top - 6, left: rect.left - 6, width: rect.width + 12, height: rect.height + 12, borderRadius: 999 }} />
+            <div className="tour-hint" style={{ top: rect.top - 12, left: rect.left + rect.width / 2 }}>
+              Chiudi qui per continuare
+            </div>
+          </>
+        )}
+        <button type="button" className="tour-skip tour-skip-float" style={{ pointerEvents: "auto" }} onClick={finish}><X size={13} /> Salta il tour</button>
         <style>{TOUR_CSS}</style>
       </div>
     );
@@ -281,20 +294,17 @@ const TOUR_CSS = `
   .tour-waiting-dot { width:9px; height:9px; border-radius:50%; background:#7c3aed; animation:tour-dot 0.9s ease-in-out infinite; }
   @keyframes tour-dot { 0%,100% { opacity:0.3; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.2); } }
 
-  .tour-bar {
+  /* "Salta il tour" fluttuante in basso, durante una scheda aperta */
+  .tour-skip-float {
     position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
-    display: flex; align-items: center; gap: 0.9rem;
-    background: linear-gradient(100deg,#1a0b2e,#103820);
-    border: 1px solid rgba(124,58,237,0.4);
-    border-radius: 14px; padding: 0.6rem 0.7rem 0.6rem 1.1rem;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
-    font-family: "Titillium Web", sans-serif; max-width: calc(100vw - 24px);
+    font-size: 0.78rem !important; padding: 0.5rem 0.9rem !important;
+    background: linear-gradient(100deg,#1a0b2e,#103820) !important;
+    color: #d4e8dc !important; border: 1px solid rgba(124,58,237,0.4) !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.45);
     animation: tour-bar-in 0.32s cubic-bezier(.34,1.56,.64,1) both;
   }
+  .tour-skip-float:hover { background: linear-gradient(100deg,#2a1150,#155030) !important; }
   @keyframes tour-bar-in { from { opacity:0; transform:translate(-50%,16px); } to { opacity:1; transform:translate(-50%,0); } }
-  .tour-bar-txt { display:inline-flex; align-items:center; gap:7px; color:#d4e8dc; font-weight:700; font-size:0.82rem; }
-  .tour-bar-txt svg { color:#6fd08a; flex-shrink:0; }
-  .tour-bar-btns { display:flex; align-items:center; gap:0.5rem; flex-shrink:0; }
 
   @media (prefers-reduced-motion: reduce) {
     .tour-halo, .tour-hint, .tour-next-on, .tour-waiting-dot { animation: none; }
