@@ -278,12 +278,13 @@ export default function TriviaMenu({
   // ── Griglia di tile quadrate: "Tutti i capitoli" (largo) + una tile per capitolo ──
   // Stile "Italia kit": logo verde, testo nero, hover che colora, click che accende.
   const ChapterList = (
-    <div data-tour="chapters">
+    <div>
       {SortControl}
       {/* Tile larga "Tutti i capitoli" (occupa tutta la riga) */}
       <button
         type="button"
         onClick={selectAll}
+        data-tour="chapters"
         className={`trm-tile trm-tile-all trm-vio${allMode ? " is-on" : ""}`}
       >
         <span className="trm-tile-all-ic"><BookOpen size={30} /></span>

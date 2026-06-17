@@ -27,40 +27,44 @@ const GAME_KEY = "trivia";
 const DARK_KEY = "games-dark";
 const TOUR_KEY = "trivia-home-tour-seen";
 
-// Passi del tour guidato sulla home: ogni passo evidenzia un pulsante reale
-// (via [data-tour=...]) e obbliga a premerlo per scoprire la funzione.
+// Passi del tour guidato sulla home. I passi "modal" obbligano ad APRIRE la
+// funzione (classifica/pagella): il tour rileva l'apertura, mostra la scheda
+// pulita e avanza appena la chiudi (la ✕ fa da "Avanti"). I passi "info" sono
+// solo spiegati (spotlight + "Avanti"); il click sul pulsante reale è bloccato.
 const HOME_TOUR: TourStep[] = [
   {
     selector: '[data-tour="leaderboard"]',
+    kind: "modal",
+    modalSelector: ".trv-lb",
     title: "La classifica live",
-    body: "Qui vedi il podio di tutti i giocatori, aggiornato in tempo reale. Aprila per dare un'occhiata: poi chiudila per continuare.",
+    body: "Il podio di tutti i giocatori, in tempo reale. Aprila, dài un'occhiata e chiudila per continuare.",
     hint: "Apri la classifica",
   },
   {
     selector: '[data-tour="pagella"]',
+    kind: "modal",
+    modalSelector: ".trv-pagmodal",
     title: "La tua pagella",
-    body: "Tutti i voti che conquisti, capitolo per capitolo e tipo per tipo. È la tua scheda dei progressi. Aprila per vederla.",
+    body: "Tutti i voti che conquisti, capitolo per capitolo e tipo per tipo. Aprila per vederla, poi chiudila.",
     hint: "Apri la pagella",
   },
   {
     selector: '[data-tour="tutorial"]',
+    kind: "info",
     title: "Come si gioca",
-    body: "Questo è il tasto che hai appena premuto: da qui puoi rivedere quando vuoi la spiegazione del gioco, con tutte le meccaniche animate.",
-    hint: "Rivedi il tutorial",
-    noClick: true,
+    body: "È il tasto che hai appena premuto: da qui rivedi quando vuoi la spiegazione del gioco, con tutte le meccaniche animate.",
   },
   {
     selector: '[data-tour="player"]',
+    kind: "info",
     title: "Il tuo profilo",
     body: "Questa pastiglia mostra il tuo punteggio totale e il tuo nome. Toccala quando vuoi cambiare nickname.",
-    hint: "È il tuo profilo",
-    noClick: true,
   },
   {
     selector: '[data-tour="chapters"]',
+    kind: "info",
     title: "E ora… si gioca!",
-    body: "Scegli uno o più capitoli, i tipi di domanda, e premi Gioca. Buon divertimento e scala la classifica!",
-    noClick: true,
+    body: "Scegli uno o più capitoli, i tipi di domanda e premi Gioca. Buon divertimento, e scala la classifica!",
   },
 ];
 
