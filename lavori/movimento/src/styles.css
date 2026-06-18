@@ -1,0 +1,219 @@
+/* ============================================================
+   Movimento — stili specifici del gioco
+   Bootstrap Italia fornisce la base; qui aggiungiamo solo
+   ciò che serve per la "tela" di gioco e l'estetica scura.
+   ============================================================ */
+
+:root {
+  --mv-bg: #0c0c0d;
+  --mv-panel: #161618;
+  --mv-grid: rgba(255, 255, 255, 0.06);
+  --mv-accent: #5b5bf0; /* viola/blu come negli screenshot */
+  --mv-dot: #f4f1ea;
+  --mv-path: rgba(255, 255, 255, 0.85);
+}
+
+html,
+body,
+#root,
+.app-shell {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--mv-bg);
+  color: var(--mv-dot);
+}
+
+/* ---------- HOME ---------- */
+.mv-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+
+.mv-hero__title {
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-size: clamp(3rem, 12vw, 7rem);
+  margin: 0;
+  color: var(--mv-dot);
+}
+
+.mv-hero__lead {
+  color: rgba(244, 241, 234, 0.6);
+  max-width: 30rem;
+  font-size: 1.125rem;
+}
+
+.mv-tagstrip {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 234, 0.45);
+}
+
+.mv-tagstrip .active {
+  color: var(--mv-dot);
+}
+
+.mv-dot-mini {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mv-accent);
+  display: inline-block;
+}
+
+/* pulsanti grandi pillola della home */
+.mv-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 1.15rem 1.75rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.mv-pill:hover {
+  transform: translateY(-2px);
+}
+
+.mv-pill--primary {
+  background: #f4f1ea;
+  color: #111;
+}
+
+.mv-pill--ghost {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--mv-dot);
+}
+
+.mv-pill--ghost .mv-pill__meta {
+  color: rgba(244, 241, 234, 0.45);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+/* curva decorativa della home */
+.mv-hero__curve {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+
+/* ---------- GIOCO ---------- */
+.mv-game {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.25rem 2rem;
+}
+
+.mv-game__phase {
+  text-align: center;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--mv-accent);
+}
+
+.mv-game__hint {
+  text-align: center;
+  color: rgba(244, 241, 234, 0.55);
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.mv-stage {
+  position: relative;
+  margin: 1.25rem auto 0;
+  width: 100%;
+  max-width: 820px;
+  aspect-ratio: 1 / 1;
+  background: var(--mv-panel);
+  border-radius: 20px;
+  overflow: hidden;
+  touch-action: none; /* evita scroll durante il disegno */
+}
+
+.mv-stage__label {
+  position: absolute;
+  top: 0.9rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: rgba(244, 241, 234, 0.35);
+}
+
+.mv-stage__label--left {
+  left: 1.1rem;
+  font-weight: 700;
+  color: rgba(244, 241, 234, 0.7);
+}
+
+.mv-stage__label--right {
+  right: 1.1rem;
+  text-transform: uppercase;
+}
+
+.mv-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.mv-result {
+  text-align: center;
+  margin-top: auto;
+  padding-top: 1.5rem;
+}
+
+.mv-accuracy {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mv-accuracy small {
+  font-size: 1rem;
+  color: rgba(244, 241, 234, 0.5);
+}
+
+/* punteggio / livello in alto a destra del gioco */
+.mv-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mv-score-chip {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: rgba(244, 241, 234, 0.6);
+}
+
+.mv-link {
+  background: none;
+  border: none;
+  color: rgba(244, 241, 234, 0.55);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.mv-link:hover {
+  color: var(--mv-dot);
+}
