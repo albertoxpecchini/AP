@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft } from "lucide-react";
 
-// I cinque livelli ricalcano la tabella di scaling della Master Specification:
-// griglia e numero di nodi del percorso crescono con la difficoltà.
+// I cinque livelli regolano quanto tempo hai per MEMORIZZARE la curva prima
+// che sparisca: più sali, meno tempo. Griglia sempre 10×10, curva morbida.
 export type LevelMode = 1 | 2 | 3 | 4 | 5;
 
 interface Mode {
@@ -14,16 +14,15 @@ interface Mode {
   color: string;
   bg: string;
   bgDark: string;
-  grid: number;
-  nodes: number;
+  watch: string; // tempo di memorizzazione mostrato sul badge
 }
 
 export const MODES: Mode[] = [
-  { level: 1, name: "Esploratore",  desc: "Griglia 3×3, percorso di 3 nodi. Per iniziare.",        tag: "Consigliato", color: "#3a9e5f", bg: "rgba(47,125,74,0.08)", bgDark: "rgba(47,125,74,0.15)", grid: 3, nodes: 3 },
-  { level: 2, name: "Viaggiatore",  desc: "Griglia 3×3, percorso di 4 nodi. Un passo in più.",      tag: "Classico",    color: "#2F7D4A", bg: "rgba(47,125,74,0.08)", bgDark: "rgba(47,125,74,0.15)", grid: 3, nodes: 4 },
-  { level: 3, name: "Navigatore",   desc: "Griglia 4×4, percorso di 5 nodi. La sfida cresce.",      tag: "Sfida",       color: "#D9A400", bg: "rgba(217,164,0,0.08)", bgDark: "rgba(217,164,0,0.13)", grid: 4, nodes: 5 },
-  { level: 4, name: "Pilota",       desc: "Griglia 5×5, percorso di 6 nodi. Memoria sotto sforzo.", tag: "Difficile",   color: "#c07800", bg: "rgba(192,120,0,0.08)", bgDark: "rgba(192,120,0,0.13)", grid: 5, nodes: 6 },
-  { level: 5, name: "Maestro del Movimento", desc: "Griglia 6×6, percorso di 8 nodi. Il limite.",   tag: "Estremo",     color: "#c0392b", bg: "rgba(192,57,43,0.07)", bgDark: "rgba(192,57,43,0.13)", grid: 6, nodes: 8 },
+  { level: 1, name: "Esploratore",  desc: "3 secondi per memorizzare la curva. Per iniziare.",   tag: "Consigliato", color: "#3a9e5f", bg: "rgba(47,125,74,0.08)", bgDark: "rgba(47,125,74,0.15)", watch: "3,0 s" },
+  { level: 2, name: "Viaggiatore",  desc: "2,5 secondi di osservazione. Il ritmo classico.",      tag: "Classico",    color: "#2F7D4A", bg: "rgba(47,125,74,0.08)", bgDark: "rgba(47,125,74,0.15)", watch: "2,5 s" },
+  { level: 3, name: "Navigatore",   desc: "2 secondi soltanto. La sfida cresce.",                 tag: "Sfida",       color: "#D9A400", bg: "rgba(217,164,0,0.08)", bgDark: "rgba(217,164,0,0.13)", watch: "2,0 s" },
+  { level: 4, name: "Pilota",       desc: "1,5 secondi. Memoria sotto sforzo.",                   tag: "Difficile",   color: "#c07800", bg: "rgba(192,120,0,0.08)", bgDark: "rgba(192,120,0,0.13)", watch: "1,5 s" },
+  { level: 5, name: "Maestro del Movimento", desc: "Appena 1,1 secondi. Il limite.",              tag: "Estremo",     color: "#c0392b", bg: "rgba(192,57,43,0.07)", bgDark: "rgba(192,57,43,0.13)", watch: "1,1 s" },
 ];
 
 interface MovimentoMenuProps {
@@ -76,8 +75,8 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               transition: "background 0.15s",
             }}>
-              <span style={{ fontSize: "1rem", fontWeight: 900, lineHeight: 1, color: isSelected ? "#fff" : lbl }}>{mode.grid}×{mode.grid}</span>
-              <span style={{ fontSize: "0.55rem", fontWeight: 700, color: isSelected ? "rgba(255,255,255,0.7)" : note }}>{mode.nodes} nodi</span>
+              <span style={{ fontSize: "1.15rem", fontWeight: 900, lineHeight: 1, color: isSelected ? "#fff" : lbl }}>{mode.level}</span>
+              <span style={{ fontSize: "0.5rem", fontWeight: 700, color: isSelected ? "rgba(255,255,255,0.7)" : note }}>liv.</span>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.1rem" }}>
@@ -124,7 +123,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
     >
       <div>
         <div style={{ fontSize: "0.98rem", fontWeight: 800 }}>Gioca · {selectedMode.name}</div>
-        <div style={{ fontSize: "0.72rem", opacity: 0.8, marginTop: "0.1rem" }}>Griglia {selectedMode.grid}×{selectedMode.grid} · {selectedMode.nodes} nodi · {selectedMode.tag}</div>
+        <div style={{ fontSize: "0.72rem", opacity: 0.8, marginTop: "0.1rem" }}>Memorizza in {selectedMode.watch} · {selectedMode.tag}</div>
       </div>
       <ChevronRight size={20} />
     </button>

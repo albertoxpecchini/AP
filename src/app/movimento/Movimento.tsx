@@ -5,11 +5,16 @@ import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun, HelpCircle, Layers, Eye
 import GameTutorial, { hasSeenTutorial, type IntroStep } from "../components/GameIntro";
 import MovimentoMenu, { MODES, type LevelMode } from "./MovimentoMenu";
 
+// Mappa livello → durata della fase "guarda" (ms): più alto il livello, meno
+// tempo hai per memorizzare la curva prima che sparisca.
+const WATCH_MS_BY_LEVEL: Record<LevelMode, number> = { 1: 3000, 2: 2500, 3: 2000, 4: 1500, 5: 1100 };
+
 // ─── Costanti ───────────────────────────────────────────────────────────────
 
 const TOTAL_ROUNDS = 5;
-// Soglia di accuracy per considerare il round "superato" (alimenta la streak).
-const PASS = 0.6;
+// Soglia (su 100) per considerare il round "superato" (alimenta la streak).
+// Severo: serve un disegno davvero somigliante per tenere viva la streak.
+const PASS_100 = 70;
 
 const TROPHIES = [
   { streak: 10, emoji: "🏆", label: "Maestro del Movimento", desc: "10 percorsi di fila. La tua memoria non sbaglia un colpo.", accent: "#c8a415" },
@@ -23,84 +28,137 @@ const TROPHIES = [
 type Pt = { x: number; y: number };               // coordinate normalizzate 0..1
 type Phase = "watch" | "draw" | "result" | "over"; // fasi del round / fine partita
 
-// ─── Generazione del percorso (sempre completabile) ──────────────────────────
+// ─── Generazione del percorso: curva morbida libera ──────────────────────────
+// Una catena di control point casuali ma armonici (dentro un margine sicuro),
+// interpolata con una spline Catmull-Rom → curva fluida tipo lo screenshot.
+// La griglia 10×10 è solo sfondo: il percorso NON passa per i nodi.
 
-// Passi su una griglia tra celle adiacenti (king-move) senza ripetere una cella.
-// Restituisce i centri delle celle in coordinate normalizzate.
-function makePath(grid: number, nodes: number): Pt[] {
-  const key = (r: number, c: number) => `${r},${c}`;
-  const seen = new Set<string>();
-  let r = Math.floor(Math.random() * grid);
-  let c = Math.floor(Math.random() * grid);
-  const steps: [number, number][] = [[r, c]];
-  seen.add(key(r, c));
-  const moves = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+const GRID = 10;        // griglia di sfondo (10×10)
+const MARGIN = 0.1;     // i punti restano dentro [MARGIN, 1-MARGIN]
 
-  let guard = 0;
-  while (steps.length < nodes && guard < 600) {
-    guard++;
-    const order = [...moves].sort(() => Math.random() - 0.5);
-    let moved = false;
-    for (const [dr, dc] of order) {
-      const nr = r + dr, nc = c + dc;
-      if (nr < 0 || nc < 0 || nr >= grid || nc >= grid) continue;
-      if (seen.has(key(nr, nc))) continue;
-      r = nr; c = nc; seen.add(key(nr, nc)); steps.push([r, c]); moved = true; break;
-    }
-    if (!moved) break; // vicolo cieco: ci si accontenta del percorso fin qui
-  }
-  return steps.map(([rr, cc]) => ({ x: (cc + 0.5) / grid, y: (rr + 0.5) / grid }));
-}
+function rand(a: number, b: number) { return a + Math.random() * (b - a); }
 
-// Densifica una polilinea in punti ravvicinati, per il confronto geometrico.
-function densify(pts: Pt[], stepLen = 0.012): Pt[] {
+// Interpola una catena di anchor con Catmull-Rom, restituendo punti fitti.
+function catmullRom(anchors: Pt[], perSeg = 22): Pt[] {
+  if (anchors.length < 2) return anchors.slice();
+  const pts = [anchors[0], ...anchors, anchors[anchors.length - 1]];
   const out: Pt[] = [];
-  for (let i = 0; i < pts.length - 1; i++) {
-    const a = pts[i], b = pts[i + 1];
-    const d = Math.hypot(b.x - a.x, b.y - a.y);
-    const n = Math.max(1, Math.round(d / stepLen));
-    for (let s = 0; s < n; s++) {
-      const t = s / n;
-      out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+  for (let i = 1; i < pts.length - 2; i++) {
+    const p0 = pts[i - 1], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2];
+    for (let s = 0; s < perSeg; s++) {
+      const t = s / perSeg, t2 = t * t, t3 = t2 * t;
+      out.push({
+        x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+        y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3),
+      });
     }
   }
-  if (pts.length) out.push(pts[pts.length - 1]);
+  out.push(anchors[anchors.length - 1]);
   return out;
 }
 
-function minDist(p: Pt, set: Pt[]): number {
-  let m = Infinity;
-  for (const q of set) {
-    const d = (p.x - q.x) ** 2 + (p.y - q.y) ** 2;
-    if (d < m) m = d;
+// Crea il percorso del round: 4–6 anchor, partenza da un lato, deriva graduale
+// così la curva attraversa la tela senza tornare brutalmente su sé stessa.
+function makePath(): Pt[] {
+  const n = 4 + Math.floor(Math.random() * 3); // 4..6 anchor
+  const lo = MARGIN, hi = 1 - MARGIN;
+  const anchors: Pt[] = [];
+  // partenza vicino a un bordo, in basso o di lato (come lo screenshot a S)
+  let x = rand(lo, lo + 0.18);
+  let y = rand(hi - 0.18, hi);
+  anchors.push({ x, y });
+  for (let i = 1; i < n; i++) {
+    // passo casuale ma sempre verso destra/alto in media → curva ampia
+    x = Math.min(hi, Math.max(lo, x + rand(0.12, 0.30)));
+    y = Math.min(hi, Math.max(lo, y + rand(-0.34, 0.18)));
+    anchors.push({ x, y });
   }
-  return Math.sqrt(m);
+  return catmullRom(anchors);
 }
 
-// Accuracy 0..1 = media tra PRECISIONE (quanto il gesto resta sul tracciato) e
-// COPERTURA (quanta parte del tracciato è stata raggiunta). Così non basta
-// scarabocchiare su metà percorso, né uscire spesso fuori traccia.
-function scorePath(drawing: Pt[], target: Pt[]): number {
-  if (drawing.length < 2) return 0;
-  const dT = densify(target), dD = densify(drawing);
-  const tol = 0.085;
-  let inside = 0;
-  for (const p of dD) if (minDist(p, dT) <= tol) inside++;
-  const precision = inside / dD.length;
-  let covered = 0;
-  for (const q of dT) if (minDist(q, dD) <= tol) covered++;
-  const coverage = covered / dT.length;
-  return Math.max(0, Math.min(1, precision * 0.5 + coverage * 0.5));
+// Ricampiona una polilinea a N punti equispaziati per arclength.
+function resample(pts: Pt[], count = 96): Pt[] {
+  if (pts.length < 2) return pts.length ? new Array(count).fill(pts[0]) : [];
+  const cum: number[] = [0];
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+  const total = cum[cum.length - 1] || 1;
+  const out: Pt[] = [];
+  let j = 0;
+  for (let k = 0; k < count; k++) {
+    const target = (k / (count - 1)) * total;
+    while (j < cum.length - 2 && cum[j + 1] < target) j++;
+    const seg = cum[j + 1] - cum[j] || 1;
+    const t = (target - cum[j]) / seg;
+    out.push({ x: pts[j].x + (pts[j + 1].x - pts[j].x) * t, y: pts[j].y + (pts[j + 1].y - pts[j].y) * t });
+  }
+  return out;
 }
 
-// Punti del round: 0..1000 in base all'accuracy (curva leggermente premiante).
-function roundPoints(acc: number): number {
-  return Math.round(1000 * Math.pow(acc, 1.15));
+function pathLength(pts: Pt[]): number {
+  let L = 0;
+  for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+  return L;
 }
 
-function getScoreEmoji(acc: number): string {
-  if (acc >= 0.97) return "🏆"; if (acc >= 0.9) return "⭐"; if (acc >= 0.8) return "🎯";
-  if (acc >= PASS) return "👏"; if (acc >= 0.4) return "😅"; return "😮‍💨";
+type SubScores = { shape: number; position: number; length: number; total: number };
+
+// Confronto severo. Tre componenti, ognuna 0..100:
+//  · POSITION — quanto i punti del disegno cadono SOPRA il percorso vero
+//    (errore medio punto-a-punto dopo il ricampionamento per arclength).
+//  · SHAPE    — stessa misura ma su entrambe le curve centrate e normalizzate
+//    in scala (toglie posizione e dimensione → conta solo la forma).
+//  · LENGTH   — quanto la lunghezza del tratto somiglia a quella del percorso.
+// La curva di errore è ripida (esponenziale) → un disegno mediocre crolla.
+function scorePath(drawing: Pt[], target: Pt[]): SubScores {
+  if (drawing.length < 2) return { shape: 0, position: 0, length: 0, total: 0 };
+  const A = resample(target);
+  const B = resample(drawing);
+
+  // POSITION: errore medio assoluto (in unità di tela 0..1), curva severa.
+  let posErr = 0;
+  for (let i = 0; i < A.length; i++) posErr += Math.hypot(A[i].x - B[i].x, A[i].y - B[i].y);
+  posErr /= A.length;
+  // 0 err → 100 ; ~0.18 err → ~0 . exp(-err/0.06) è molto severo.
+  const position = 100 * Math.exp(-posErr / 0.06);
+
+  // SHAPE: normalizza entrambe (centro + scala RMS) e confronta.
+  const norm = (p: Pt[]) => {
+    const cx = p.reduce((s, q) => s + q.x, 0) / p.length;
+    const cy = p.reduce((s, q) => s + q.y, 0) / p.length;
+    let rms = 0;
+    for (const q of p) rms += (q.x - cx) ** 2 + (q.y - cy) ** 2;
+    rms = Math.sqrt(rms / p.length) || 1;
+    return p.map(q => ({ x: (q.x - cx) / rms, y: (q.y - cy) / rms }));
+  };
+  const nA = norm(A), nB = norm(B);
+  let shapeErr = 0;
+  for (let i = 0; i < nA.length; i++) shapeErr += Math.hypot(nA[i].x - nB[i].x, nA[i].y - nB[i].y);
+  shapeErr /= nA.length;
+  const shape = 100 * Math.exp(-shapeErr / 0.5);
+
+  // LENGTH: rapporto tra lunghezze (penalizza tratti troppo corti/lunghi).
+  const lA = pathLength(A), lB = pathLength(B);
+  const ratio = lA > 0 ? Math.min(lA, lB) / Math.max(lA, lB) : 0;
+  const length = 100 * Math.pow(ratio, 2.2);
+
+  // Totale pesato: la forma e la posizione contano più della lunghezza.
+  const total = shape * 0.45 + position * 0.4 + length * 0.15;
+  const clamp = (v: number) => Math.max(0, Math.min(100, v));
+  return { shape: clamp(shape), position: clamp(position), length: clamp(length), total: clamp(total) };
+}
+
+// Punti del round (0..1000) dal totale 0..100.
+function roundPoints(total100: number): number {
+  return Math.round(total100 * 10);
+}
+// Formatta un punteggio 0..100 con due decimali e virgola (it-IT).
+function fmt2(v: number): string {
+  return v.toFixed(2).replace(".", ",");
+}
+
+function getScoreEmoji(total100: number): string {
+  if (total100 >= 97) return "🏆"; if (total100 >= 90) return "⭐"; if (total100 >= 80) return "🎯";
+  if (total100 >= PASS_100) return "👏"; if (total100 >= 40) return "😅"; return "😮‍💨";
 }
 function getTrophyForStreak(n: number): (typeof TROPHIES)[number] | null {
   return TROPHIES.find(t => t.streak === n) ?? null;
@@ -153,9 +211,9 @@ function TrophyVisual() {
 
 const MOVIMENTO_INTRO_STEPS: IntroStep[] = [
   { title: "Guarda il percorso", body: "Un pallino attraversa la griglia disegnando un tracciato. Osservalo con attenzione: tra un attimo sparirà e dovrai ricordarlo.", visual: <WatchVisual /> },
-  { title: "Ridisegnalo a memoria", body: "Con un solo gesto continuo (mouse o dito) ripercorri il tracciato che hai memorizzato. Niente fretta: conta la forma, non la velocità.", visual: <DrawVisual /> },
-  { title: "Difficoltà crescente", body: "Ogni partita sono 5 percorsi. Più sali di livello, più la griglia è grande e i nodi aumentano: da 3×3 con 3 nodi fino a 6×6 con 8 nodi.", visual: <GridVisual /> },
-  { title: "Precisione e streak", body: "Più il tuo gesto resta sul tracciato, più punti ottieni. Superando il percorso al primo colpo la streak sale: ogni soglia (3, 5, 7, 10) sblocca un trofeo.", visual: <TrophyVisual /> },
+  { title: "Ridisegnalo a memoria", body: "Con un solo gesto continuo (mouse o dito), come su Paint, ripercorri la curva che hai memorizzato. Conta la forma, la posizione e la lunghezza del tratto.", visual: <DrawVisual /> },
+  { title: "Tre voti, molto severi", body: "Il tuo tratto viene valutato da 0,00 a 100,00 su tre criteri: FORMA (la silhouette), POSIZIONE (dov'è sulla griglia) e LUNGHEZZA. Anche piccole imprecisioni abbassano il voto.", visual: <GridVisual /> },
+  { title: "Difficoltà e streak", body: "Più sali di livello, meno tempo hai per memorizzare la curva. Con un voto ≥ 70 la streak sale: ogni soglia (3, 5, 7, 10) sblocca un trofeo.", visual: <TrophyVisual /> },
 ];
 
 const MOVIMENTO_TUTORIAL_CSS = `
@@ -189,7 +247,7 @@ export default function Movimento() {
   const [round, setRound] = useState(1);
   const [phase, setPhase] = useState<Phase>("watch");
   const [path, setPath] = useState<Pt[]>([]);
-  const [accuracy, setAccuracy] = useState(0);
+  const [scores, setScores] = useState<SubScores>({ shape: 0, position: 0, length: 0, total: 0 });
   const [roundScore, setRoundScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -212,7 +270,6 @@ export default function Movimento() {
   const autoT = useRef<number>();
   const phaseRef = useRef<Phase>(phase);
   const totalRef = useRef(0);
-  const config = MODES.find(m => m.level === level)!;
 
   useEffect(() => { phaseRef.current = phase; }, [phase]);
   useEffect(() => { totalRef.current = total; }, [total]);
@@ -226,78 +283,113 @@ export default function Movimento() {
   // ── Disegno di base (griglia + polilinee) ──
   const dims = () => { const cv = canvasRef.current!; return { w: cv.width, h: cv.height }; };
 
+  // Griglia 10×10 di sfondo: linee leggerissime + punti agli incroci (come
+  // l'app di riferimento). È puramente decorativa, il percorso non la usa.
   const drawGrid = useCallback((ctx: CanvasRenderingContext2D, w: number, h: number) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.strokeStyle = dark ? "rgba(111,224,166,0.10)" : "rgba(47,125,74,0.12)";
+    ctx.strokeStyle = dark ? "rgba(111,224,166,0.055)" : "rgba(120,140,130,0.10)";
     ctx.lineWidth = 1;
-    const g = config.grid;
-    for (let i = 1; i < g; i++) {
-      const x = (w * i) / g, y = (h * i) / g;
+    for (let i = 1; i < GRID; i++) {
+      const x = (w * i) / GRID, y = (h * i) / GRID;
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
     }
-  }, [config.grid, dark]);
+    ctx.fillStyle = dark ? "rgba(111,224,166,0.10)" : "rgba(120,140,130,0.16)";
+    for (let r = 1; r < GRID; r++) for (let c = 1; c < GRID; c++) {
+      ctx.beginPath(); ctx.arc((w * c) / GRID, (h * r) / GRID, 1.1, 0, Math.PI * 2); ctx.fill();
+    }
+  }, [dark]);
 
-  const drawPoly = useCallback((ctx: CanvasRenderingContext2D, pts: Pt[], w: number, h: number, color: string, width: number) => {
+  // Tratto morbido (quadratic smoothing tra i midpoint) → linea fluida da
+  // "Paint", senza spigoli, sia per il percorso vero che per il gesto utente.
+  const drawSmooth = useCallback((ctx: CanvasRenderingContext2D, pts: Pt[], w: number, h: number, color: string, width: number) => {
     if (pts.length < 1) return;
     ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin = "round"; ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(pts[0].x * w, pts[0].y * h);
-    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x * w, pts[i].y * h);
+    if (pts.length < 3) {
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x * w, pts[i].y * h);
+    } else {
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i].x + pts[i + 1].x) / 2 * w;
+        const my = (pts[i].y + pts[i + 1].y) / 2 * h;
+        ctx.quadraticCurveTo(pts[i].x * w, pts[i].y * h, mx, my);
+      }
+      ctx.lineTo(pts[pts.length - 1].x * w, pts[pts.length - 1].y * h);
+    }
     ctx.stroke();
   }, []);
 
   // ── Nuovo round: genera il percorso e parte la fase WATCH ──
   useEffect(() => {
     if (showMenu) return;
-    setPath(makePath(config.grid, config.nodes));
+    const p = makePath();
+    setPath(p);
     drawingRef.current = [];
     setPhase("watch");
+    // Solo in sviluppo locale: espone il percorso per i test E2E (innocuo in prod).
+    try { if (location.hostname === "localhost") (window as any).__movPath = p; } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [round, level, showMenu]);
+  }, [round, showMenu]);
 
-  // ── FASE WATCH: anima il pallino lungo il percorso, poi nascondi ──
+  // ── FASE WATCH: il pallino percorre la curva LASCIANDO LA SCIA ──
+  // La traccia viene disegnata fino al punto corrente (linea continua tipo
+  // Paint), poi tutto sparisce e si passa al disegno. Dopo la traccia completa
+  // resta visibile un istante (memorizzazione), poi si pulisce.
   useEffect(() => {
     if (phase !== "watch" || path.length === 0 || showMenu) return;
     const cv = canvasRef.current; if (!cv) return;
     const ctx = cv.getContext("2d")!; const { w, h } = dims();
-    const accent = dark ? "#6fe0a6" : "#2F7D4A";
-    const duration = 800 + path.length * 480;
+    const accent = dark ? "#7c83ff" : "#5b5bf0"; // blu/viola come il riferimento
+    const dotCol = dark ? "#ffffff" : "#1b1b1f";
+    const drawMs = WATCH_MS_BY_LEVEL[level];   // tempo di tracciamento per livello
+    const holdMs = Math.max(350, drawMs * 0.28); // pausa con la curva intera visibile
     let start: number | null = null;
 
     const tick = (ts: number) => {
       if (start === null) start = ts;
-      const t = Math.min(1, (ts - start) / duration);
+      const elapsed = ts - start;
+      const t = Math.min(1, elapsed / drawMs);
       drawGrid(ctx, w, h);
-      const upto = Math.max(1, Math.floor(t * (path.length - 1)) + 1);
-      drawPoly(ctx, path.slice(0, upto), w, h, accent, 4);
-      const seg = t * (path.length - 1);
-      const i = Math.min(path.length - 2, Math.floor(seg));
-      const f = seg - i;
-      const a = path[i], b = path[i + 1] || a;
-      const px = (a.x + (b.x - a.x) * f) * w, py = (a.y + (b.y - a.y) * f) * h;
-      ctx.fillStyle = dark ? "#d4e8dc" : "#1F6B3D";
-      ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill();
-      if (t < 1) { animRef.current = requestAnimationFrame(tick); }
-      else { autoT.current = window.setTimeout(() => { drawGrid(ctx, w, h); setPhase("draw"); }, 480); }
+      const upto = Math.max(2, Math.floor(t * (path.length - 1)) + 1);
+      const trail = path.slice(0, upto);
+      drawSmooth(ctx, trail, w, h, accent, 5);
+      // pallino in testa alla scia
+      const head = trail[trail.length - 1];
+      ctx.fillStyle = dotCol;
+      ctx.beginPath(); ctx.arc(head.x * w, head.y * h, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = accent; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(head.x * w, head.y * h, 9, 0, Math.PI * 2); ctx.stroke();
+
+      if (t < 1) { animRef.current = requestAnimationFrame(tick); return; }
+      // curva intera tracciata → tienila visibile, poi pulisci e passa a draw
+      autoT.current = window.setTimeout(() => { drawGrid(ctx, w, h); setPhase("draw"); }, holdMs);
     };
     animRef.current = requestAnimationFrame(tick);
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); clearTimeout(autoT.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, path, showMenu, dark, drawGrid, drawPoly]);
+  }, [phase, path, showMenu, dark, level, drawGrid, drawSmooth]);
 
   // ── Ridisegno in DRAW/RESULT ──
+  // RESULT: percorso vero in bianco + tratto utente in blu/viola (come il
+  // riferimento: "Your trace"). DRAW: solo la griglia (tela pulita su cui disegnare).
   useEffect(() => {
     if (phase === "watch" || showMenu) return;
     const cv = canvasRef.current; if (!cv) return;
     const ctx = cv.getContext("2d")!; const { w, h } = dims();
     drawGrid(ctx, w, h);
     if (phase === "result") {
-      drawPoly(ctx, path, w, h, dark ? "rgba(212,232,220,0.35)" : "rgba(47,125,74,0.3)", 4);
-      drawPoly(ctx, drawingRef.current, w, h, dark ? "#6fe0a6" : "#D9A400", 4);
+      drawSmooth(ctx, path, w, h, dark ? "rgba(255,255,255,0.92)" : "#1b1b1f", 5);
+      drawSmooth(ctx, drawingRef.current, w, h, dark ? "#7c83ff" : "#5b5bf0", 5);
+      // pallino di partenza (cerchio cavo) come nel riferimento
+      if (path.length) {
+        ctx.fillStyle = dark ? "#0e1512" : "#ffffff";
+        ctx.strokeStyle = dark ? "rgba(255,255,255,0.9)" : "#1b1b1f"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(path[0].x * w, path[0].y * h, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, path, showMenu, dark, drawGrid, drawPoly]);
+  }, [phase, path, showMenu, dark, drawGrid, drawSmooth]);
 
   // ── Input (mouse + touch) per il gesto continuo ──
   const ptFromEvent = (e: React.MouseEvent | React.TouchEvent): Pt => {
@@ -308,38 +400,53 @@ export default function Movimento() {
     return { x: (cx - rect.left) / rect.width, y: (cy - rect.top) / rect.height };
   };
 
+  const renderUserStroke = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
+    drawGrid(ctx, w, h);
+    drawSmooth(ctx, drawingRef.current, w, h, dark ? "#7c83ff" : "#5b5bf0", 5);
+    // pallino di partenza dove ha cominciato a disegnare
+    if (drawingRef.current.length) {
+      const p0 = drawingRef.current[0];
+      ctx.fillStyle = dark ? "#0e1512" : "#ffffff";
+      ctx.strokeStyle = dark ? "#7c83ff" : "#5b5bf0"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(p0.x * w, p0.y * h, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    }
+  };
+
   const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
     if (phaseRef.current !== "draw") return;
     e.preventDefault(); drawingActive.current = true; drawingRef.current = [ptFromEvent(e)];
   };
   const moveDraw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!drawingActive.current || phaseRef.current !== "draw") return;
-    e.preventDefault(); drawingRef.current.push(ptFromEvent(e));
+    e.preventDefault();
+    const p = ptFromEvent(e);
+    // ignora micro-movimenti per una linea più pulita
+    const last = drawingRef.current[drawingRef.current.length - 1];
+    if (!last || Math.hypot(p.x - last.x, p.y - last.y) > 0.004) drawingRef.current.push(p);
     const cv = canvasRef.current!; const ctx = cv.getContext("2d")!; const { w, h } = dims();
-    drawGrid(ctx, w, h);
-    drawPoly(ctx, drawingRef.current, w, h, dark ? "#6fe0a6" : "#D9A400", 4);
+    renderUserStroke(ctx, w, h);
   };
   const endDraw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!drawingActive.current || phaseRef.current !== "draw") return;
     e.preventDefault(); drawingActive.current = false;
-    const acc = scorePath(drawingRef.current, path);
-    const pts = roundPoints(acc);
-    setAccuracy(acc); setRoundScore(pts);
+    const sc = scorePath(drawingRef.current, path);
+    const pts = roundPoints(sc.total);
+    setScores(sc); setRoundScore(pts);
     const newTotal = totalRef.current + pts; totalRef.current = newTotal; setTotal(newTotal);
 
-    // Streak: sale se il round è superato (accuracy ≥ PASS), altrimenti azzera.
-    const passed = acc >= PASS;
+    // Streak: sale se il round è superato (totale ≥ PASS_100), altrimenti azzera.
+    const passed = sc.total >= PASS_100;
     const ns = passed ? streak + 1 : 0;
     setStreak(ns);
     if (passed && ns > best) { setBest(ns); localStorage.setItem("movimento-best-streak", String(ns)); }
 
-    confetti({ particleCount: acc >= 0.9 ? 110 : acc >= PASS ? 55 : 12, spread: 72, origin: { y: 0.6 }, colors: ["#2F7D4A", "#D9A400", "#fff", "#1F6B3D"] });
+    confetti({ particleCount: sc.total >= 90 ? 110 : sc.total >= PASS_100 ? 55 : 10, spread: 72, origin: { y: 0.6 }, colors: ["#5b5bf0", "#7c83ff", "#fff", "#2F7D4A"] });
 
     const tr = passed ? getTrophyForStreak(ns) : null;
     if (tr && !achieved.includes(ns)) {
       const upd = [...achieved, ns]; setAch(upd);
       localStorage.setItem("movimento-trophies", JSON.stringify(upd));
-      setTimeout(() => { setTrophy(tr); confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#2F7D4A", "#D9A400", "#fff"] }); }, 650);
+      setTimeout(() => { setTrophy(tr); confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#5b5bf0", "#7c83ff", "#fff"] }); }, 650);
     }
     setPhase("result");
   };
@@ -358,17 +465,21 @@ export default function Movimento() {
     }
   }, [round]);
 
+  const zeroScores = { shape: 0, position: 0, length: 0, total: 0 };
+
   const startGame = useCallback((chosen: LevelMode) => {
     setLevel(chosen);
-    setRound(1); setTotal(0); totalRef.current = 0; setStreak(0); setRoundScore(0); setAccuracy(0);
+    setRound(1); setTotal(0); totalRef.current = 0; setStreak(0); setRoundScore(0); setScores(zeroScores);
     if (!hasSeenTutorial("movimento")) setShowTutorial(true);
     else setShowMenu(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const restart = useCallback(() => {
-    setRound(1); setTotal(0); totalRef.current = 0; setStreak(0); setRoundScore(0); setAccuracy(0);
-    setPath(makePath(config.grid, config.nodes)); drawingRef.current = []; setPhase("watch");
-  }, [config.grid, config.nodes]);
+    setRound(1); setTotal(0); totalRef.current = 0; setStreak(0); setRoundScore(0); setScores(zeroScores);
+    setPath(makePath()); drawingRef.current = []; setPhase("watch");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const replayWatch = useCallback(() => {
     if (phaseRef.current !== "draw") return;
@@ -501,20 +612,24 @@ export default function Movimento() {
           ) : phase === "result" ? (
             <div className="mov-panel mov-panel--won" key="won">
               <div className="mov-win-reveal">
-                <span className="mov-wr-e">{getScoreEmoji(accuracy)}</span>
-                <span className="mov-wr-label">Precisione</span>
-                <span className="mov-wr-a">{Math.round(accuracy * 100)}%</span>
-                <div className="mov-wr-grid">
-                  <div className="mov-wr-cell"><span className="mov-wr-num">+{roundScore.toLocaleString("it-IT")}</span><span className="mov-wr-sub">punti</span></div>
-                  <div className="mov-wr-cell"><span className="mov-wr-num">{streak}</span><span className="mov-wr-sub">streak</span></div>
-                  <div className="mov-wr-cell"><span className="mov-wr-num">{total.toLocaleString("it-IT")}</span><span className="mov-wr-sub">totale</span></div>
+                <span className="mov-wr-e">{getScoreEmoji(scores.total)}</span>
+                {/* Punteggio grande 0,00–100,00 (due decimali, virgola) come il riferimento */}
+                <div className="mov-bigscore">
+                  <span className="mov-bigscore-int">{Math.floor(scores.total)}</span>
+                  <span className="mov-bigscore-dec">,{scores.total.toFixed(2).split(".")[1]}</span>
+                  <span className="mov-bigscore-max">/ 100</span>
+                </div>
+                <div className="mov-subs">
+                  <div className="mov-sub"><span className="mov-sub-lbl">Forma</span><span className="mov-sub-val">{fmt2(scores.shape)}</span></div>
+                  <div className="mov-sub"><span className="mov-sub-lbl">Posizione</span><span className="mov-sub-val">{fmt2(scores.position)}</span></div>
+                  <div className="mov-sub"><span className="mov-sub-lbl">Lunghezza</span><span className="mov-sub-val">{fmt2(scores.length)}</span></div>
                 </div>
                 <p className="mov-wr-tip">
-                  {accuracy >= 0.9 ? "Tracciato perfetto!" : accuracy >= PASS ? "Bel gesto, continua così." : "Verde = vero percorso, oro = il tuo. Riprova!"}
+                  {scores.total >= 90 ? "Tracciato eccellente!" : scores.total >= PASS_100 ? "Bel gesto, continua così." : "Bianco = vero percorso, blu = il tuo. Riprova!"}
                 </p>
               </div>
               <button type="button" className="mov-next" onClick={nextRound}>
-                {round >= TOTAL_ROUNDS ? "Vedi il risultato" : "Prossimo percorso"} <RotateCcw size={16} />
+                {round >= TOTAL_ROUNDS ? "Vedi il risultato" : "Continua"} <RotateCcw size={16} />
               </button>
             </div>
           ) : (
@@ -565,6 +680,7 @@ export default function Movimento() {
           --green-dark: hsl(160, 100%, 19%);
           --amber:      hsl(36, 100%, 30%);
           --absent:     hsl(350, 60%, 50%);
+          --accent2:    #5b5bf0;   /* blu/viola del tratto utente */
           --bs-100:     hsl(0, 0%, 96%);
           --bs-200:     hsl(0, 0%, 90%);
           --bs-300:     hsl(0, 0%, 83%);
@@ -656,7 +772,7 @@ export default function Movimento() {
           box-shadow:var(--shadow-key);
         }
         .mov-phase-badge--watch  { background:var(--green); }
-        .mov-phase-badge--draw   { background:var(--amber); }
+        .mov-phase-badge--draw   { background:var(--accent2); }
         .mov-phase-badge--result { background:var(--green-dark); }
 
         /* ── Card di gioco ── */
@@ -699,14 +815,22 @@ export default function Movimento() {
           border:2px solid rgba(47,125,74,0.2); border-radius:12px; padding:0.9rem;
           animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
-        .mov-wr-e { font-size:2.2rem; line-height:1; animation:mov-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
-        .mov-wr-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#6b8070; }
-        .mov-wr-a { font-size:2rem; color:var(--green); font-weight:900; line-height:1; }
+        .mov-wr-e { font-size:2rem; line-height:1; animation:mov-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
+        /* Punteggio grande in stile riferimento: intero enorme + decimali piccoli */
+        .mov-bigscore { display:flex; align-items:baseline; gap:0.15rem; margin-top:0.15rem; color:var(--text); font-variant-numeric:tabular-nums; }
+        .mov-bigscore-int { font-size:3.4rem; font-weight:800; line-height:0.9; letter-spacing:-0.02em; }
+        .mov-bigscore-dec { font-size:1.4rem; font-weight:700; }
+        .mov-bigscore-max { font-size:0.78rem; font-weight:600; color:var(--text-soft); margin-left:0.25rem; align-self:flex-end; }
+        .mov-subs { display:flex; gap:0.45rem; width:100%; margin-top:0.6rem; }
+        .mov-sub { flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:0.12rem; background:rgba(91,91,240,0.06); border:1px solid rgba(91,91,240,0.16); border-radius:8px; padding:0.45rem 0.55rem; }
+        .mov-sub-lbl { font-size:0.54rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-soft); }
+        .mov-sub-val { font-size:1rem; font-weight:800; color:var(--accent2); font-variant-numeric:tabular-nums; }
+        .mov-wr-tip { font-size:0.74rem; color:var(--text-soft); margin:0.6rem 0 0; text-align:center; line-height:1.3; }
+        /* manteniamo le classi grid/cell per il game-over */
         .mov-wr-grid { display:flex; gap:0.4rem; width:100%; margin-top:0.5rem; }
         .mov-wr-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.1rem; background:rgba(255,255,255,0.6); border:1px solid rgba(47,125,74,0.13); border-radius:8px; padding:0.4rem 0.2rem; }
         .mov-wr-num { font-size:0.92rem; font-weight:800; color:var(--green-dark); font-variant-numeric:tabular-nums; }
         .mov-wr-sub { font-size:0.55rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#6b8070; }
-        .mov-wr-tip { font-size:0.74rem; color:var(--text-soft); margin:0.5rem 0 0; text-align:center; line-height:1.3; }
         @keyframes mov-slide-up { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
         @keyframes mov-pop { from{transform:scale(0)} to{transform:scale(1)} }
 
@@ -761,6 +885,7 @@ export default function Movimento() {
         .mov-page.dark {
           --green:      hsl(160, 70%, 42%);
           --green-dark: hsl(160, 70%, 34%);
+          --accent2:    #7c83ff;
           --surface:    #0e1512;
           --panel:      #15231c;
           --panel-bd:   rgba(95,208,154,0.18);
