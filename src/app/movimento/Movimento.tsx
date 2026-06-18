@@ -340,7 +340,7 @@ export default function Movimento() {
     if (phase !== "watch" || path.length === 0 || showMenu) return;
     const cv = canvasRef.current; if (!cv) return;
     const ctx = cv.getContext("2d")!; const { w, h } = dims();
-    const accent = dark ? "#7c83ff" : "#5b5bf0"; // blu/viola come il riferimento
+    const accent = dark ? "#b794ff" : "#7c3aed"; // blu/viola come il riferimento
     const dotCol = dark ? "#ffffff" : "#1b1b1f";
     const drawMs = WATCH_MS_BY_LEVEL[level];   // tempo di tracciamento per livello
     const holdMs = Math.max(350, drawMs * 0.28); // pausa con la curva intera visibile
@@ -380,7 +380,7 @@ export default function Movimento() {
     drawGrid(ctx, w, h);
     if (phase === "result") {
       drawSmooth(ctx, path, w, h, dark ? "rgba(255,255,255,0.92)" : "#1b1b1f", 5);
-      drawSmooth(ctx, drawingRef.current, w, h, dark ? "#7c83ff" : "#5b5bf0", 5);
+      drawSmooth(ctx, drawingRef.current, w, h, dark ? "#b794ff" : "#7c3aed", 5);
       // pallino di partenza (cerchio cavo) come nel riferimento
       if (path.length) {
         ctx.fillStyle = dark ? "#0e1512" : "#ffffff";
@@ -402,12 +402,12 @@ export default function Movimento() {
 
   const renderUserStroke = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     drawGrid(ctx, w, h);
-    drawSmooth(ctx, drawingRef.current, w, h, dark ? "#7c83ff" : "#5b5bf0", 5);
+    drawSmooth(ctx, drawingRef.current, w, h, dark ? "#b794ff" : "#7c3aed", 5);
     // pallino di partenza dove ha cominciato a disegnare
     if (drawingRef.current.length) {
       const p0 = drawingRef.current[0];
       ctx.fillStyle = dark ? "#0e1512" : "#ffffff";
-      ctx.strokeStyle = dark ? "#7c83ff" : "#5b5bf0"; ctx.lineWidth = 3;
+      ctx.strokeStyle = dark ? "#b794ff" : "#7c3aed"; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(p0.x * w, p0.y * h, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     }
   };
@@ -440,13 +440,13 @@ export default function Movimento() {
     setStreak(ns);
     if (passed && ns > best) { setBest(ns); localStorage.setItem("movimento-best-streak", String(ns)); }
 
-    confetti({ particleCount: sc.total >= 90 ? 110 : sc.total >= PASS_100 ? 55 : 10, spread: 72, origin: { y: 0.6 }, colors: ["#5b5bf0", "#7c83ff", "#fff", "#2F7D4A"] });
+    confetti({ particleCount: sc.total >= 90 ? 110 : sc.total >= PASS_100 ? 55 : 10, spread: 72, origin: { y: 0.6 }, colors: ["#7c3aed", "#b794ff", "#fff", "#2F7D4A"] });
 
     const tr = passed ? getTrophyForStreak(ns) : null;
     if (tr && !achieved.includes(ns)) {
       const upd = [...achieved, ns]; setAch(upd);
       localStorage.setItem("movimento-trophies", JSON.stringify(upd));
-      setTimeout(() => { setTrophy(tr); confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#5b5bf0", "#7c83ff", "#fff"] }); }, 650);
+      setTimeout(() => { setTrophy(tr); confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#7c3aed", "#b794ff", "#fff"] }); }, 650);
     }
     setPhase("result");
   };
@@ -520,8 +520,8 @@ export default function Movimento() {
           <GameTutorial
             gameKey="movimento"
             steps={MOVIMENTO_INTRO_STEPS}
-            accentColor="#2F7D4A"
-            darkBg="#103820"
+            accentColor="#7c3aed"
+            darkBg="#2a1150"
             dark={dark}
             onDone={() => { setShowTutorial(false); setShowMenu(false); }}
           />
@@ -675,30 +675,35 @@ export default function Movimento() {
 
       <style>{`
         .mov-page {
-          /* ── Token Kit Italia (Bootstrap Italia 2.18.1) ── */
-          --green:      hsl(160, 100%, 25%);
-          --green-dark: hsl(160, 100%, 19%);
+          /* ── Palette stile TRIVIA: VIOLA (accento) + VERDE (secondario) ── */
+          --pv:         #7c3aed;   /* viola primario */
+          --pv2:        #6024c4;   /* viola scuro */
+          --pv3:        #9b5cf6;   /* viola chiaro */
+          --pv-ink:     #6d28d9;   /* testo viola */
+          --green:      #2F7D4A;   /* verde secondario */
+          --green-dark: #1F6B3D;
+          --gold:       #D9A400;
           --amber:      hsl(36, 100%, 30%);
           --absent:     hsl(350, 60%, 50%);
-          --accent2:    #5b5bf0;   /* blu/viola del tratto utente */
+          --accent2:    #7c3aed;   /* tratto utente = viola Trivia */
           --bs-100:     hsl(0, 0%, 96%);
           --bs-200:     hsl(0, 0%, 90%);
           --bs-300:     hsl(0, 0%, 83%);
           --radius:     8px;
           --radius-sm:  4px;
-          --focus-ring: 0 0 0 .25rem rgba(0,127.5,85,.25);
+          --focus-ring: 0 0 0 .25rem rgba(124,58,237,.25);
           --shadow-key: 0 .125rem .25rem rgba(0,0,0,.075);
           --shadow-card: 0 .5rem 1rem rgba(0,0,0,.12);
           --hdr-h: 52px;
 
           --surface:    #f4f6f5;
           --panel:      #ffffff;
-          --panel-bd:   var(--bs-300);
-          --stage-bg:   #eef2f0;
+          --panel-bd:   rgba(124,58,237,0.16);
+          --stage-bg:   #f1edf9;
           --text:       #17271d;
-          --text-soft:  #3c4a41;
-          --stat-bg:    rgba(0,127,85,0.06);
-          --stat-bd:    rgba(0,127,85,0.16);
+          --text-soft:  #4a4458;
+          --stat-bg:    rgba(124,58,237,0.06);
+          --stat-bd:    rgba(124,58,237,0.16);
           --legend-sep: var(--bs-200);
 
           height: 100dvh; overflow: hidden;
@@ -708,11 +713,12 @@ export default function Movimento() {
           user-select: none;
         }
 
-        /* ── Header ── */
+        /* ── Header (gradiente viola→verde come Trivia) ── */
         .mov-header {
           position: sticky; top:0; z-index:20; flex-shrink:0;
           width:100%; display:flex; align-items:center; justify-content:space-between;
-          padding:0 0.75rem; height:var(--hdr-h); background:#103820; color:#fff;
+          padding:0 0.75rem; height:var(--hdr-h);
+          background:linear-gradient(100deg,#7c3aed 0%,#5b21b6 45%,#103820 120%); color:#fff;
           box-shadow:0 2px 16px rgba(0,0,0,0.22);
         }
         .mov-hdr-left { display:flex; align-items:center; gap:0.5rem; }
@@ -727,7 +733,7 @@ export default function Movimento() {
         }
         .mov-mode-pill:hover { background:rgba(255,255,255,0.22); }
         .mov-title { font-size:1.4rem; font-weight:800; letter-spacing:0.14em; margin:0; }
-        .mov-accent { color:#6fd08a; }
+        .mov-accent { color:#b794ff; }
         .mov-iconbtn {
           display:inline-flex; align-items:center; justify-content:center;
           width:36px; height:36px; border-radius:50%;
@@ -791,9 +797,9 @@ export default function Movimento() {
         .mov-card-stat {
           flex:1; min-width:0; display:grid;
           grid-template-columns:auto minmax(0,1fr); grid-template-rows:auto auto;
-          align-items:center; column-gap:0.5rem; padding:0.1rem 0.5rem; color:var(--green-dark);
+          align-items:center; column-gap:0.5rem; padding:0.1rem 0.5rem; color:var(--pv-ink);
         }
-        .mov-card-stat-ico { grid-row:1 / span 2; color:var(--green); }
+        .mov-card-stat-ico { grid-row:1 / span 2; color:var(--pv); }
         .mov-card-stat-val { font-size:1.4rem; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; align-self:end; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .mov-card-stat-lbl { font-size:0.56rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; opacity:0.7; align-self:start; }
         .mov-card-stat--mid { border-left:1px solid var(--stat-bd); padding-left:0.7rem; }
@@ -804,15 +810,15 @@ export default function Movimento() {
         /* ── Legenda fasi (playing) ── */
         .mov-legend-list { list-style:none; margin:0; padding:0 0 0.55rem; display:flex; flex-direction:column; gap:0.55rem; border-bottom:1px solid var(--legend-sep); }
         .mov-legend-list li { display:flex; align-items:center; gap:0.6rem; font-size:0.8rem; color:var(--text-soft); line-height:1.25; }
-        .mov-legend-ico { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; flex-shrink:0; border-radius:8px; background:var(--stat-bg); color:var(--green); border:1px solid var(--stat-bd); }
+        .mov-legend-ico { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; flex-shrink:0; border-radius:8px; background:var(--stat-bg); color:var(--pv); border:1px solid var(--stat-bd); }
         .mov-legend-txt b { color:var(--text); }
-        .mov-phase-hint { text-align:center; font-size:0.84rem; font-weight:700; color:var(--green-dark); padding:0.3rem 0; }
+        .mov-phase-hint { text-align:center; font-size:0.84rem; font-weight:700; color:var(--pv-ink); padding:0.3rem 0; }
 
         /* ── Result reveal ── */
         .mov-win-reveal {
           display:flex; flex-direction:column; align-items:center; gap:0.2rem;
-          background:linear-gradient(160deg,rgba(47,125,74,0.08),rgba(217,164,0,0.06));
-          border:2px solid rgba(47,125,74,0.2); border-radius:12px; padding:0.9rem;
+          background:linear-gradient(160deg,rgba(124,58,237,0.09),rgba(47,125,74,0.06));
+          border:2px solid rgba(124,58,237,0.2); border-radius:12px; padding:0.9rem;
           animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
         .mov-wr-e { font-size:2rem; line-height:1; animation:mov-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
@@ -822,7 +828,7 @@ export default function Movimento() {
         .mov-bigscore-dec { font-size:1.4rem; font-weight:700; }
         .mov-bigscore-max { font-size:0.78rem; font-weight:600; color:var(--text-soft); margin-left:0.25rem; align-self:flex-end; }
         .mov-subs { display:flex; gap:0.45rem; width:100%; margin-top:0.6rem; }
-        .mov-sub { flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:0.12rem; background:rgba(91,91,240,0.06); border:1px solid rgba(91,91,240,0.16); border-radius:8px; padding:0.45rem 0.55rem; }
+        .mov-sub { flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:0.12rem; background:rgba(124,58,237,0.07); border:1px solid rgba(124,58,237,0.18); border-radius:8px; padding:0.45rem 0.55rem; }
         .mov-sub-lbl { font-size:0.54rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-soft); }
         .mov-sub-val { font-size:1rem; font-weight:800; color:var(--accent2); font-variant-numeric:tabular-nums; }
         .mov-wr-tip { font-size:0.74rem; color:var(--text-soft); margin:0.6rem 0 0; text-align:center; line-height:1.3; }
@@ -834,32 +840,32 @@ export default function Movimento() {
         @keyframes mov-slide-up { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
         @keyframes mov-pop { from{transform:scale(0)} to{transform:scale(1)} }
 
-        /* ── Bottone primario ── */
+        /* ── Bottone primario (CTA viola Trivia) ── */
         .mov-next {
           width:100%; height:48px;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          background:var(--green); color:#fff; border:1px solid var(--green);
-          border-radius:var(--radius-sm); font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer;
-          box-shadow:var(--shadow-key); animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
-          transition:background .15s,transform .1s,box-shadow .15s;
+          background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%); color:#fff; border:none;
+          border-radius:var(--radius-sm); font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer;
+          box-shadow:0 6px 20px rgba(91,33,182,0.4); animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
+          transition:filter .15s,transform .1s,box-shadow .15s;
         }
-        .mov-next:hover { background:var(--green-dark); border-color:var(--green-dark); transform:translateY(-1px); }
+        .mov-next:hover { filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 10px 28px rgba(91,33,182,0.5); }
         .mov-next:focus-visible { outline:none; box-shadow:var(--focus-ring); }
         .mov-next:active { transform:scale(.98); }
-        .mov-next--ghost { background:transparent; color:var(--green); border:1.5px solid var(--panel-bd); box-shadow:none; height:42px; margin-top:.1rem; font-weight:700; animation:none; }
-        .mov-next--ghost:hover { background:var(--stat-bg); border-color:var(--green); transform:none; }
+        .mov-next--ghost { background:transparent; color:var(--pv-ink); border:1.5px solid var(--panel-bd); box-shadow:none; height:42px; margin-top:.1rem; font-weight:700; animation:none; }
+        .mov-next--ghost:hover { background:var(--stat-bg); border-color:var(--pv); transform:none; filter:none; }
 
         /* ── Game over ── */
         .mov-panel--over { gap:0.7rem; }
         .mov-over {
           display:flex; flex-direction:column; align-items:center; gap:0.1rem;
-          background:linear-gradient(160deg,rgba(47,125,74,0.08),rgba(217,164,0,0.06));
-          border:2px solid rgba(47,125,74,0.18); border-radius:12px; padding:1rem 0.9rem 0.85rem;
+          background:linear-gradient(160deg,rgba(124,58,237,0.08),rgba(47,125,74,0.06));
+          border:2px solid rgba(124,58,237,0.18); border-radius:12px; padding:1rem 0.9rem 0.85rem;
           animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
         .mov-over-emoji { font-size:2.4rem; line-height:1; animation:mov-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
-        .mov-over-label { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--green-dark); margin-top:.2rem; }
-        .mov-over-total { font-size:2.6rem; font-weight:900; line-height:1; color:var(--green); font-variant-numeric:tabular-nums; margin-top:.1rem; }
+        .mov-over-label { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--pv-ink); margin-top:.2rem; }
+        .mov-over-total { font-size:2.6rem; font-weight:900; line-height:1; color:var(--pv); font-variant-numeric:tabular-nums; margin-top:.1rem; }
         .mov-over-pts { font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#6b8070; }
 
         /* ── Mobile ── */
@@ -881,40 +887,46 @@ export default function Movimento() {
           .mov-ctrl-block { flex:0 0 320px; width:320px; padding:1rem 1.1rem; }
         }
 
-        /* ════════════════ DARK MODE ════════════════ */
+        /* ════════════════ DARK MODE (viola+verde, base Trivia) ════════════════ */
         .mov-page.dark {
-          --green:      hsl(160, 70%, 42%);
-          --green-dark: hsl(160, 70%, 34%);
-          --accent2:    #7c83ff;
+          --pv:         #9b5cf6;
+          --pv2:        #7c3aed;
+          --pv3:        #b794ff;
+          --pv-ink:     #c4a5ff;
+          --green:      #2f9e63;
+          --green-dark: #6fe0a6;
+          --gold:       #e8c34a;
+          --accent2:    #b794ff;
           --surface:    #0e1512;
           --panel:      #15231c;
-          --panel-bd:   rgba(95,208,154,0.18);
-          --stage-bg:   #0c1611;
-          --text:       #d4e8dc;
-          --text-soft:  #a4c4aa;
-          --stat-bg:    rgba(95,208,154,0.07);
-          --stat-bd:    rgba(95,208,154,0.18);
-          --legend-sep: rgba(95,208,154,0.16);
+          --panel-bd:   rgba(155,92,246,0.22);
+          --stage-bg:   #140e22;
+          --text:       #e7def7;
+          --text-soft:  #b6a9cf;
+          --stat-bg:    rgba(155,92,246,0.10);
+          --stat-bd:    rgba(155,92,246,0.22);
+          --legend-sep: rgba(155,92,246,0.18);
           --shadow-card: 0 .5rem 1.25rem rgba(0,0,0,0.45);
           --shadow-key:  0 .125rem .25rem rgba(0,0,0,0.25);
         }
-        .mov-page.dark .mov-header { background:#0a1410; }
-        .mov-page.dark .mov-stage  { background:radial-gradient(ellipse at 38% 42%, #13201a 0%, var(--surface) 70%); }
-        .mov-page.dark .mov-card-stat { color:#6fe0a6; }
-        .mov-page.dark .mov-card-stat-ico { color:#6fe0a6; }
+        .mov-page.dark .mov-header { background:linear-gradient(100deg,#4c1d95 0%,#2a1150 55%,#0a1410 130%); }
+        .mov-page.dark .mov-stage  { background:radial-gradient(ellipse at 38% 42%, #1c1233 0%, var(--surface) 72%); }
+        .mov-page.dark .mov-card-stat { color:#c4a5ff; }
+        .mov-page.dark .mov-card-stat-ico { color:#c4a5ff; }
         .mov-page.dark .mov-round-badge { background:rgba(0,0,0,0.4); color:var(--text-soft); }
-        .mov-page.dark .mov-win-reveal { background:linear-gradient(160deg,rgba(95,208,154,0.12),rgba(217,164,0,0.08)); border-color:rgba(95,208,154,0.25); }
-        .mov-page.dark .mov-wr-label,.mov-page.dark .mov-wr-sub { color:#8fc7a6; }
-        .mov-page.dark .mov-wr-num { color:#6fe0a6; }
-        .mov-page.dark .mov-wr-cell { background:rgba(255,255,255,0.04); border-color:rgba(95,208,154,0.2); }
-        .mov-page.dark .mov-over { background:linear-gradient(160deg,rgba(95,208,154,0.12),rgba(217,164,0,0.08)); border-color:rgba(95,208,154,0.25); }
-        .mov-page.dark .mov-over-pts { color:#8fc7a6; }
-        .mov-page.dark .mov-tcard { background:#15231c; }
-        .mov-page.dark .mov-tdesc { color:#8fc7a6; }
+        .mov-page.dark .mov-win-reveal { background:linear-gradient(160deg,rgba(155,92,246,0.16),rgba(47,158,99,0.08)); border-color:rgba(155,92,246,0.28); }
+        .mov-page.dark .mov-wr-label,.mov-page.dark .mov-wr-sub { color:#b6a9cf; }
+        .mov-page.dark .mov-wr-num { color:#c4a5ff; }
+        .mov-page.dark .mov-wr-cell { background:rgba(255,255,255,0.04); border-color:rgba(155,92,246,0.22); }
+        .mov-page.dark .mov-sub { background:rgba(155,92,246,0.12); border-color:rgba(155,92,246,0.26); }
+        .mov-page.dark .mov-over { background:linear-gradient(160deg,rgba(155,92,246,0.16),rgba(47,158,99,0.08)); border-color:rgba(155,92,246,0.28); }
+        .mov-page.dark .mov-over-pts { color:#b6a9cf; }
+        .mov-page.dark .mov-tcard { background:#1a1230; }
+        .mov-page.dark .mov-tdesc { color:#b6a9cf; }
         .mov-page.dark .mov-tsub  { color:var(--text); }
 
         /* ── Trophy overlay ── */
-        .mov-overlay { position:fixed; inset:0; z-index:100; background:rgba(10,30,18,0.72); display:flex; align-items:center; justify-content:center; padding:1rem; animation:mov-fadein .25s ease; }
+        .mov-overlay { position:fixed; inset:0; z-index:100; background:rgba(20,10,40,0.74); display:flex; align-items:center; justify-content:center; padding:1rem; animation:mov-fadein .25s ease; }
         @keyframes mov-fadein { from{opacity:0} to{opacity:1} }
         .mov-tcard { background:#fff; border-radius:20px; overflow:hidden; width:100%; max-width:380px; box-shadow:0 24px 64px rgba(0,0,0,0.35); animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1); }
         .mov-thead { color:#fff; padding:1.3rem 1.5rem 1.1rem; display:flex; flex-direction:column; align-items:center; gap:.25rem; position:relative; }
@@ -924,8 +936,8 @@ export default function Movimento() {
         .mov-tbody { padding:1.1rem 1.4rem; }
         .mov-tdesc { color:#6b8070; font-size:.9rem; margin-bottom:.35rem; }
         .mov-tsub  { font-weight:700; color:#17271d; margin-bottom:.9rem; font-size:.88rem; }
-        .mov-tcta  { width:100%; padding:.8rem 1.4rem; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:var(--green); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.95rem; font-weight:700; cursor:pointer; }
-        .mov-tcta:hover { background:var(--green-dark); }
+        .mov-tcta  { width:100%; padding:.8rem 1.4rem; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:filter .15s; }
+        .mov-tcta:hover { filter:brightness(1.08); }
       `}</style>
     </div>
   );

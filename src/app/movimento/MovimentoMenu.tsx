@@ -18,11 +18,11 @@ interface Mode {
 }
 
 export const MODES: Mode[] = [
-  { level: 1, name: "Esploratore",  desc: "3 secondi per memorizzare la curva. Per iniziare.",   tag: "Consigliato", color: "#3a9e5f", bg: "rgba(47,125,74,0.08)", bgDark: "rgba(47,125,74,0.15)", watch: "3,0 s" },
-  { level: 2, name: "Viaggiatore",  desc: "2,5 secondi di osservazione. Il ritmo classico.",      tag: "Classico",    color: "#2F7D4A", bg: "rgba(47,125,74,0.08)", bgDark: "rgba(47,125,74,0.15)", watch: "2,5 s" },
-  { level: 3, name: "Navigatore",   desc: "2 secondi soltanto. La sfida cresce.",                 tag: "Sfida",       color: "#D9A400", bg: "rgba(217,164,0,0.08)", bgDark: "rgba(217,164,0,0.13)", watch: "2,0 s" },
-  { level: 4, name: "Pilota",       desc: "1,5 secondi. Memoria sotto sforzo.",                   tag: "Difficile",   color: "#c07800", bg: "rgba(192,120,0,0.08)", bgDark: "rgba(192,120,0,0.13)", watch: "1,5 s" },
-  { level: 5, name: "Maestro del Movimento", desc: "Appena 1,1 secondi. Il limite.",              tag: "Estremo",     color: "#c0392b", bg: "rgba(192,57,43,0.07)", bgDark: "rgba(192,57,43,0.13)", watch: "1,1 s" },
+  { level: 1, name: "Esploratore",  desc: "3 secondi per memorizzare la curva. Per iniziare.",   tag: "Consigliato", color: "#9b5cf6", bg: "rgba(155,92,246,0.08)", bgDark: "rgba(155,92,246,0.16)", watch: "3,0 s" },
+  { level: 2, name: "Viaggiatore",  desc: "2,5 secondi di osservazione. Il ritmo classico.",      tag: "Classico",    color: "#7c3aed", bg: "rgba(124,58,237,0.08)", bgDark: "rgba(124,58,237,0.16)", watch: "2,5 s" },
+  { level: 3, name: "Navigatore",   desc: "2 secondi soltanto. La sfida cresce.",                 tag: "Sfida",       color: "#6024c4", bg: "rgba(96,36,196,0.08)",  bgDark: "rgba(96,36,196,0.18)",  watch: "2,0 s" },
+  { level: 4, name: "Pilota",       desc: "1,5 secondi. Memoria sotto sforzo.",                   tag: "Difficile",   color: "#5b21b6", bg: "rgba(91,33,182,0.08)",  bgDark: "rgba(91,33,182,0.18)",  watch: "1,5 s" },
+  { level: 5, name: "Maestro del Movimento", desc: "Appena 1,1 secondi. Il limite.",              tag: "Estremo",     color: "#4c1d95", bg: "rgba(76,29,149,0.08)",  bgDark: "rgba(76,29,149,0.20)",  watch: "1,1 s" },
 ];
 
 interface MovimentoMenuProps {
@@ -36,15 +36,16 @@ interface MovimentoMenuProps {
 export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay, onTutorial }: MovimentoMenuProps) {
   const [selected, setSelected] = useState<LevelMode>(1);
 
-  const bg       = dark ? "#111916" : "#f4f6f5";
-  const card     = dark ? "#1a2720" : "#ffffff";
-  const bord     = dark ? "rgba(47,125,74,0.22)" : "rgba(47,125,74,0.15)";
-  const val      = dark ? "#d4e8dc" : "#17271d";
-  const lbl      = dark ? "#7ab893" : "#6b8070";
-  const icon     = dark ? "#6fd08a" : "#2F7D4A";
-  const note     = dark ? "#5a7a62" : "#8a9e91";
-  const textMain = dark ? "#d4e8dc" : "#17271d";
-  const textSub  = dark ? "#a4c4aa" : "#4a5c50";
+  // Palette stile TRIVIA: viola accento + verde, su sfondo neutro.
+  const bg       = dark ? "#0e0a16" : "#f4f6f5";
+  const card     = dark ? "#1a1230" : "#ffffff";
+  const bord     = dark ? "rgba(155,92,246,0.24)" : "rgba(124,58,237,0.16)";
+  const val      = dark ? "#e7def7" : "#17271d";
+  const lbl      = dark ? "#b6a9cf" : "#6b6080";
+  const icon     = dark ? "#c4a5ff" : "#7c3aed";
+  const note     = dark ? "#6a5d86" : "#9a90ab";
+  const textMain = dark ? "#e7def7" : "#17271d";
+  const textSub  = dark ? "#b6a9cf" : "#4a4458";
 
   const selectedMode = MODES.find(m => m.level === selected)!;
 
@@ -207,21 +208,29 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
         .mvm-desktop { display:none; }
 
         .mvm-hero {
-          background: linear-gradient(160deg,#0b2a18 0%,#103820 45%,#1a5030 100%);
+          background: linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
         }
+        /* aloni viola + verde negli angoli (come l'hero di Trivia) */
+        .mvm-hero::before, .mvm-hero::after {
+          content:""; position:absolute; width:60%; height:70%; border-radius:50%;
+          filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
+        }
+        .mvm-hero::before { background:#7c3aed; top:-25%; left:-15%; }
+        .mvm-hero::after  { background:#2F9E5A; bottom:-30%; right:-15%; opacity:0.45; }
+        .mvm-hero > * { position:relative; z-index:1; }
         .mvm-logo-wrap {
-          background:#fff; border-radius:18px; padding:12px;
-          box-shadow:0 8px 32px rgba(0,0,0,0.28); display:inline-flex;
+          background:#fff; color:#6024c4; border-radius:18px; padding:12px;
+          box-shadow:0 8px 32px rgba(91,33,182,0.4); display:inline-flex;
         }
         .mvm-title {
           font-size:clamp(2rem,8.5vw,3.4rem); font-weight:900;
           letter-spacing:0.14em; margin:0; line-height:1; color:#fff;
         }
-        .mvm-accent { color:#6fd08a; }
-        .mvm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.55); margin:0; font-weight:500; }
+        .mvm-accent { color:#b794ff; }
+        .mvm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.6); margin:0; font-weight:500; }
         .mvm-kicker {
           position:absolute; bottom:0.7rem; left:1.4rem;
           font-size:0.63rem; font-weight:700; text-transform:uppercase;
@@ -264,7 +273,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           .mvm-root { display:flex; align-items:stretch; justify-content:center; }
           .mvm-desktop-left {
             width:340px; flex-shrink:0;
-            background:linear-gradient(160deg,#0b2a18 0%,#103820 45%,#1a5030 100%);
+            background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
             display:flex; flex-direction:column; align-items:center; justify-content:center;
             gap:1.1rem; padding:2.5rem 2rem; overflow:hidden;
           }
@@ -285,14 +294,14 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
 }
 
 // Marchio del gioco: un percorso a "S" con un pallino di partenza, in palette
-// neroverde — coerente con le miniature degli altri giochi del portfolio.
+// viola (stile Trivia) con un tocco di verde sul nodo finale.
 export function MovimentoMark({ size = 64 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
       <path d="M16 70 C 34 70, 38 30, 54 42 S 78 70, 86 28"
-        fill="none" stroke="#2F7D4A" strokeWidth="6" strokeLinecap="round" />
-      <circle cx="16" cy="70" r="8" fill="#1F6B3D" />
-      <circle cx="86" cy="28" r="5" fill="#D9A400" />
+        fill="none" stroke="#7c3aed" strokeWidth="6" strokeLinecap="round" />
+      <circle cx="16" cy="70" r="8" fill="#6024c4" />
+      <circle cx="86" cy="28" r="5" fill="#2F7D4A" />
     </svg>
   );
 }
