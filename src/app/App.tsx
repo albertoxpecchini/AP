@@ -147,11 +147,29 @@ function TriviaThumb() {
   );
 }
 
+function MovimentoThumb() {
+  // Percorso a "S" su griglia con nodi: l'identità di Movimento (memoria spaziale).
+  const nodes = [[88,150],[176,108],[130,64],[252,82],[290,40]];
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      {[1, 2, 3].map(i => (
+        <g key={i}>
+          <line x1={90 + i * 60} y1="30" x2={90 + i * 60} y2="170" stroke="rgba(31,107,61,0.16)" strokeWidth="1.5" />
+          <line x1="80" y1={50 + i * 40} x2="300" y2={50 + i * 40} stroke="rgba(31,107,61,0.16)" strokeWidth="1.5" />
+        </g>
+      ))}
+      <polyline points={nodes.map(n => n.join(",")).join(" ")} fill="none" stroke="rgba(31,107,61,0.6)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      {nodes.map((n, i) => <circle key={i} cx={n[0]} cy={n[1]} r={i === 0 ? 5.5 : 4} fill={i === 0 ? "#1F6B3D" : "rgba(47,125,74,0.55)"} />)}
+    </svg>
+  );
+}
+
 function ProjectThumb({ name }: { name: string }) {
   if (name === "angoli") return <AngoliThumb />;
   if (name === "parole") return <ParoleThumb />;
   if (name === "trivia") return <TriviaThumb />;
   if (name === "pcto") return <PctoThumb />;
+  if (name === "movimento") return <MovimentoThumb />;
   return null;
 }
 
@@ -185,6 +203,15 @@ const PROJECTS = [
     thumb: "pcto",
     desc: "Tre anni di alternanza scuola-lavoro al Caem Group S.p.A. di Castellucchio, nell'ufficio tecnico del reparto legno: modellazione 3D di tettoie in AutoCAD, osservazione del calcolo strutturale e archiviazione dei preventivi. Racconto del percorso con illustrazioni dei legni.",
     tags: ["Reparto legno", "AutoCAD 3D", "Strutture in legno", "Ufficio tecnico"],
+  },
+  {
+    category: "Web game",
+    date: "18 giu 2026",
+    title: "Movimento",
+    url: "/movimento",
+    thumb: "movimento",
+    desc: "Allena la memoria spaziale: un pallino traccia un percorso su una griglia e poi sparisce; tu lo ridisegni a memoria con un solo gesto continuo. Cinque livelli di difficoltà (da 3×3 a 6×6), valutazione della precisione del tracciato, streak con trofei e tema chiaro/scuro. Mouse e touch.",
+    tags: ["React", "TypeScript", "Canvas", "Game design"],
   },
   {
     category: "Web game",

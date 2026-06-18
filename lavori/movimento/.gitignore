@@ -1,7 +1,0 @@
-node_modules
-dist
-.vercel
-*.local
-.DS_Store
-Thumbs.db
-npm-debug.log*
