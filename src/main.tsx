@@ -2,7 +2,12 @@ import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import App from "./app/App.tsx";
+import { disableBackspaceNavigation } from "./app/utils/keyboard.ts";
 import "./styles/index.css";
+
+// Il Backspace non deve più far "uscire" dalla pagina (navigazione Indietro del
+// browser): resta attivo solo dentro i campi di testo per cancellare i caratteri.
+disableBackspaceNavigation();
 
 const Parole = lazy(() => import("./app/parole/Parole.tsx"));
 const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
