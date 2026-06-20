@@ -29,6 +29,12 @@ import {
   ShoppingBag,
   Tag,
   FileText,
+  Globe2,
+  Compass,
+  Footprints,
+  Type,
+  BrainCircuit,
+  Ruler,
 } from "lucide-react";
 import {
   SiInstagram,
@@ -187,6 +193,20 @@ function ProjectThumb({ name }: { name: string }) {
   if (name === "movimento") return <MovimentoThumb />;
   if (name === "mappa") return <MappaThumb />;
   return null;
+}
+
+// Glyph singolo per la card "diapositiva" (bolla tonda): icona pulita e
+// riconoscibile a 36px, scelta in base al progetto. I siti esterni usano il globo.
+function ProjectIcon({ thumb }: { thumb?: string }) {
+  switch (thumb) {
+    case "angoli":    return <Compass size={32} strokeWidth={2.1} />;
+    case "parole":    return <Type size={32} strokeWidth={2.1} />;
+    case "trivia":    return <BrainCircuit size={32} strokeWidth={2.1} />;
+    case "pcto":      return <Ruler size={32} strokeWidth={2.1} />;
+    case "movimento": return <Footprints size={32} strokeWidth={2.1} />;
+    case "mappa":     return <Globe2 size={32} strokeWidth={2.1} />;
+    default:          return <Globe2 size={30} strokeWidth={2.1} />;
+  }
 }
 
 // Social del footer. href "#" = profilo da fornire (verranno rimossi quelli non usati).
@@ -1019,101 +1039,45 @@ export default function App() {
           </div>
         </section>
 
-        <section id="progetti" className="py-5 my-lg-4 bg-light">
+        <section id="progetti" className="ap-slides-section">
           <div className="container">
-            <div className="mb-5">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
+            <div className="ap-slides-head">
+              <p className="ap-kicker ap-slides-kicker text-uppercase fw-semibold mb-3">
                 04 — Progetti Web
               </p>
-              <h2 className="display-5 fw-bold mb-0">Il mio lavoro</h2>
+              <h2 className="display-5 fw-bold mb-0 text-white">Il mio lavoro</h2>
             </div>
 
-            <div className="ap-project-grid">
-              {PROJECTS.map((p) => (
-                <div className="ap-project-cell" key={p.title}>
-                  <div className="card-wrapper h-100">
-                    <div className="it-card it-card-bg rounded shadow ap-project-card h-100 d-flex flex-column">
-                      <div className="ap-project-preview">
-                        {p.wip ? (
-                          <div className="ap-project-preview--wip">
-                            <div className="ap-project-cantiere">
-                              <AlertTriangle size={48} />
-                              <span>In fase di sviluppo...</span>
-                            </div>
-                          </div>
-                        ) : (p as any).previewImg || projectImages[p.title] ? (
-                          <img
-                            src={(p as any).previewImg || projectImages[p.title]}
-                            alt={`Anteprima ${p.title}`}
-                            className="ap-project-screenshot"
-                            loading="lazy"
-                          />
-                        ) : (p as any).thumb ? (
-                          <div className="ap-project-thumb">
-                            <ProjectThumb name={(p as any).thumb} />
-                          </div>
-                        ) : (
-                          <div className="ap-project-placeholder">
-                            <div className="ap-project-placeholder-text">{p.title}</div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="it-card-body flex-grow-1">
-                        <div className="category-top d-flex justify-content-between align-items-center">
-                          <span className="category">{p.category}</span>
-                          <span className="data">{p.date}</span>
-                        </div>
-                        <h3 className="it-card-title h2 fw-bold">
-                          {p.url.startsWith("/") ? (
-                            <Link
-                              className="text-decoration-none stretched-link"
-                              to={p.url}
-                            >
-                              {p.title}
-                              <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
-                            </Link>
-                          ) : (
-                            <a
-                              className="text-decoration-none stretched-link"
-                              href={p.url}
-                              target="_blank"
-                              rel="noreferrer noopener"
-                            >
-                              {p.title}
-                              <ArrowUpRight size={22} className="ms-2" aria-hidden="true" />
-                            </a>
-                          )}
-                        </h3>
-                        <p className="it-card-text fs-5">{p.desc}</p>
-                        <div className="d-flex flex-wrap gap-2 mt-4">
-                          {p.tags.map((tag) => (
-                            <span key={tag} className="chip chip-simple chip-primary">
-                              <span className="chip-label">{tag}</span>
-                            </span>
-                          ))}
-                        </div>
-                        {p.githubRepo && ghData[p.githubRepo] && (
-                          <div className="d-flex align-items-center gap-2 mt-3">
-                            {ghData[p.githubRepo].version && (
-                              <span className="ap-project-version">
-                                {ghData[p.githubRepo].version}
-                              </span>
-                            )}
-                            <span className="ap-project-gh-date">
-                              Aggiornato il{" "}
-                              {new Date(ghData[p.githubRepo].pushedAt).toLocaleDateString("it-IT", {
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric",
-                              })}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="ap-slides-grid">
+              {PROJECTS.map((p) => {
+                const internal = p.url.startsWith("/");
+                const Inner = (
+                  <>
+                    <span className="ap-slide-icon" aria-hidden="true">
+                      <ProjectIcon thumb={(p as any).thumb} />
+                    </span>
+                    <span className="ap-slide-cat">{p.category}</span>
+                    <span className="ap-slide-title">{p.title}</span>
+                    <span className="ap-slide-desc">{p.desc}</span>
+                  </>
+                );
+                return internal ? (
+                  <Link key={p.title} to={p.url} className="ap-slide" aria-label={p.title}>
+                    {Inner}
+                  </Link>
+                ) : (
+                  <a
+                    key={p.title}
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="ap-slide"
+                    aria-label={p.title}
+                  >
+                    {Inner}
+                  </a>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -1611,6 +1575,77 @@ export default function App() {
           left: 50%;
           transform: translateX(-50%);
           color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* ═══════ Vetrina progetti "a diapositive" (card uniformi, icona tonda
+           che sporge dal bordo superiore) — stile games, palette viola+verde ═══════ */
+        .ap-slides-section {
+          background: linear-gradient(160deg,#1a0b2e 0%,#2a1150 42%,#103820 130%);
+          padding: 4.5rem 0 4rem;
+          position: relative; overflow: hidden;
+        }
+        .ap-slides-section::before, .ap-slides-section::after {
+          content:""; position:absolute; width:55%; height:55%; border-radius:50%;
+          filter:blur(80px); opacity:0.28; pointer-events:none;
+        }
+        .ap-slides-section::before { background:#7c3aed; top:-12%; left:-10%; }
+        .ap-slides-section::after  { background:#2F9E5A; bottom:-15%; right:-8%; opacity:0.22; }
+        .ap-slides-head { position:relative; z-index:1; margin-bottom: 3rem; }
+        .ap-slides-kicker { color:#b794ff !important; }
+
+        .ap-slides-grid {
+          position: relative; z-index: 1;
+          display: grid; grid-template-columns: 1fr;
+          gap: 2.2rem 1.5rem;
+        }
+        @media (min-width: 576px) { .ap-slides-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 992px) { .ap-slides-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .ap-slide {
+          position: relative;
+          display: flex; flex-direction: column; align-items: center; text-align: center;
+          padding: 2.9rem 1.3rem 1.6rem;            /* spazio in alto per l'icona che sporge */
+          margin-top: 1.7rem;                        /* lascia spazio all'icona sopra il bordo */
+          border: 1px solid rgba(155,92,246,0.26);
+          border-radius: 18px;
+          background: rgba(124,58,237,0.10);
+          text-decoration: none; color: inherit;
+          transition: transform .16s ease, border-color .16s, box-shadow .16s, background .16s;
+        }
+        .ap-slide:hover {
+          transform: translateY(-4px);
+          border-color: rgba(155,92,246,0.55);
+          background: rgba(124,58,237,0.16);
+          box-shadow: 0 16px 38px rgba(0,0,0,0.45);
+        }
+        /* icona tonda che ESCE dal bordo superiore (come lo screenshot) */
+        .ap-slide-icon {
+          position: absolute; top: 0; left: 50%;
+          transform: translate(-50%, -50%);
+          width: 60px; height: 60px; border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          background: #fff; color: #6024c4;
+          box-shadow: 0 8px 24px rgba(91,33,182,0.45);
+          border: 1px solid rgba(124,58,237,0.25);
+          transition: transform .16s ease, box-shadow .16s;
+          overflow: hidden;
+        }
+        .ap-slide:hover .ap-slide-icon { transform: translate(-50%, -50%) scale(1.07); box-shadow: 0 12px 30px rgba(91,33,182,0.6); }
+        .ap-slide-icon svg { width: 36px; height: 36px; display:block; }
+        .ap-slide-cat {
+          font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+          letter-spacing: 0.12em; color: #9c86d6; margin-bottom: 0.45rem;
+        }
+        .ap-slide-title {
+          font-size: 1.18rem; font-weight: 900; color: #fff;
+          line-height: 1.15; margin-bottom: 0.55rem; letter-spacing: 0.01em;
+        }
+        .ap-slide-desc {
+          font-size: 0.85rem; line-height: 1.5; color: rgba(231,222,247,0.78);
+          display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ap-slide, .ap-slide-icon { transition: none; }
         }
 
         /* Griglia progetti: 5 per riga su desktop, poi a capo. Responsive. */
