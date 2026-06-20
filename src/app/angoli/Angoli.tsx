@@ -6,7 +6,40 @@ import GameTutorial, { hasSeenTutorial, resetTutorial, type IntroStep } from "..
 import AngoliMenu, { type StepMode as MenuStepMode } from "./AngoliMenu";
 import NicknameGate, { getStoredNick } from "./NicknameGate";
 import Leaderboard from "./Leaderboard";
+import HomeTour, { type TourStep } from "../trivia/HomeTour";
 import { submitScore, type ScoreRow } from "./leaderboardApi";
+
+const TOUR_KEY = "angoli-home-tour-seen";
+
+// Passi del tour guidato sulla home (gemello di quello di Trivia).
+const HOME_TOUR: TourStep[] = [
+  {
+    selector: '[data-tour="leaderboard"]',
+    kind: "modal",
+    modalSelector: ".ang-lb",
+    title: "La classifica live",
+    body: "Il podio di tutti i giocatori, in tempo reale. Aprila, dài un'occhiata e chiudila per continuare.",
+    hint: "Apri la classifica",
+  },
+  {
+    selector: '[data-tour="tutorial"]',
+    kind: "info",
+    title: "Come si gioca",
+    body: "Da qui rivedi quando vuoi la spiegazione del gioco, con tutte le meccaniche animate.",
+  },
+  {
+    selector: '[data-tour="player"]',
+    kind: "info",
+    title: "Il tuo profilo",
+    body: "Questa pastiglia mostra il tuo punteggio totale e il tuo nome. Toccala quando vuoi cambiare nickname.",
+  },
+  {
+    selector: '[data-tour="chapters"]',
+    kind: "info",
+    title: "E ora… si gioca!",
+    body: "Scegli la difficoltà e premi Gioca. Hai un minuto: più sei veloce, più punti. Buon divertimento!",
+  },
+];
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -352,6 +385,8 @@ export default function Angoli() {
   const [showMenu, setShowMenu]       = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const chainTour = useRef(false);
   const [step, setStep]     = useState<StepMode>(10);
   const [angle, setAngle]   = useState(() => randomAngle(10));
   const [rotation, setRot]  = useState(randomRotation);
@@ -575,6 +610,31 @@ export default function Angoli() {
     setDark(d=>{ const n=!d; try{localStorage.setItem("games-dark",n?"1":"0");}catch{} return n; });
   }, []);
 
+  // ── Tour guidato "a riflettore" (solo desktop, dove il rail funzioni è visibile) ──
+  const isDesktop = () => typeof window !== "undefined" && window.matchMedia("(min-width: 760px)").matches;
+  const hasSeenTour = () => { try { return localStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
+  const markTourSeen = () => { try { localStorage.setItem(TOUR_KEY, "1"); } catch {} };
+
+  // "Come si gioca": slideshow meccaniche, poi (su desktop) il tour guidato.
+  const onTutorial = useCallback(() => {
+    if (!showTour) chainTour.current = true;
+    setShowTutorial(true);
+  }, [showTour]);
+
+  const onTourDone = useCallback(() => { setShowTour(false); markTourSeen(); }, []);
+
+  // Primo accesso col nickname già scelto: avvia da solo slideshow + tour una volta.
+  useEffect(() => {
+    if (!showMenu || !nick) return;
+    if (!isDesktop()) return;
+    if (!hasSeenTour() && !showTour && !showTutorial) {
+      chainTour.current = true;
+      if (!hasSeenTutorial("angoli")) setShowTutorial(true);
+      else setShowTour(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showMenu, nick]);
+
   return (
     <div className={`ang-page${dark ? " dark" : ""}`}>
 
@@ -597,7 +657,7 @@ export default function Angoli() {
             }
             startPlay(chosenStep);
           }}
-          onTutorial={() => setShowTutorial(true)}
+          onTutorial={onTutorial}
         />
       )}
 
@@ -608,12 +668,32 @@ export default function Angoli() {
           <GameTutorial
             gameKey="angoli"
             steps={ANGOLI_INTRO_STEPS}
-            accentColor="#2F7D4A"
-            darkBg="#103820"
+            accentColor="#7c3aed"
+            darkBg="#2a1150"
             dark={dark}
-            onDone={() => { setShowTutorial(false); setShowMenu(false); }}
+            onDone={() => {
+              setShowTutorial(false);
+              // Se aperto da "Come si gioca" (chainTour) e siamo su desktop, prosegui
+              // col tour guidato restando nel menu. Altrimenti chiudi il menu e gioca.
+              if (chainTour.current && showMenu && isDesktop()) {
+                chainTour.current = false;
+                setShowTour(true);
+              } else {
+                chainTour.current = false;
+                setShowMenu(false);
+              }
+            }}
           />
         </>
+      )}
+
+      {/* ── Tour guidato a riflettore (solo desktop) ── */}
+      {showTour && showMenu && (
+        <HomeTour
+          steps={HOME_TOUR}
+          onDone={onTourDone}
+          onCloseModals={() => { setShowLeaderboard(false); }}
+        />
       )}
 
       {/* ── Header ── */}

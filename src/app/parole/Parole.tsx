@@ -22,7 +22,40 @@ import GameTutorial, { hasSeenTutorial, type IntroStep } from "../components/Gam
 import ParoleMenu, { getMode, type ModeId } from "./ParoleMenu";
 import NicknameGate, { getStoredNick } from "./NicknameGate";
 import Leaderboard from "./Leaderboard";
+import HomeTour, { type TourStep } from "../trivia/HomeTour";
 import { submitScore, scoreFromSeconds, type ScoreRow } from "./leaderboardApi";
+
+const TOUR_KEY = "parole-home-tour-seen";
+
+// Passi del tour guidato sulla home (gemello di quello di Trivia/Angoli).
+const HOME_TOUR: TourStep[] = [
+  {
+    selector: '[data-tour="leaderboard"]',
+    kind: "modal",
+    modalSelector: ".par-lb",
+    title: "La classifica live",
+    body: "Il podio di tutti i giocatori, in tempo reale. Aprila, dài un'occhiata e chiudila per continuare.",
+    hint: "Apri la classifica",
+  },
+  {
+    selector: '[data-tour="tutorial"]',
+    kind: "info",
+    title: "Come si gioca",
+    body: "Da qui rivedi quando vuoi la spiegazione del gioco, con tutte le meccaniche animate.",
+  },
+  {
+    selector: '[data-tour="player"]',
+    kind: "info",
+    title: "Il tuo profilo",
+    body: "Questa pastiglia mostra il tuo punteggio totale e il tuo nome. Toccala quando vuoi cambiare nickname.",
+  },
+  {
+    selector: '[data-tour="chapters"]',
+    kind: "info",
+    title: "E ora… si gioca!",
+    body: "Scegli la modalità e premi Gioca. Più sei veloce a indovinare, più punti. Buon divertimento!",
+  },
+];
 
 const ROWS = 6;
 const HINT_BATCH = 3; // lettere eliminate per ogni aiuto
@@ -263,6 +296,8 @@ export default function Parole() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showGate, setShowGate] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const chainTour = useRef(false);
   const [nick, setNick] = useState<string>(() => getStoredNick());
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<ScoreRow | null>(null);
@@ -488,6 +523,29 @@ export default function Parole() {
     }
   }, [startGame]);
 
+  // ── Tour guidato "a riflettore" (solo desktop) ──
+  const isDesktop = () => typeof window !== "undefined" && window.matchMedia("(min-width: 760px)").matches;
+  const hasSeenTour = () => { try { return localStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
+  const markTourSeen = () => { try { localStorage.setItem(TOUR_KEY, "1"); } catch {} };
+
+  const onTutorial = useCallback(() => {
+    if (!showTour) chainTour.current = true;
+    setShowTutorial(true);
+  }, [showTour]);
+
+  const onTourDone = useCallback(() => { setShowTour(false); markTourSeen(); }, []);
+
+  useEffect(() => {
+    if (!showMenu || !nick) return;
+    if (!isDesktop()) return;
+    if (!hasSeenTour() && !showTour && !showTutorial) {
+      chainTour.current = true;
+      if (!hasSeenTutorial("parole")) setShowTutorial(true);
+      else setShowTour(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showMenu, nick]);
+
   const handlePlayFromMenu = useCallback((modeId: ModeId) => {
     // Gate nickname obbligatorio prima di giocare (come Angoli).
     if (!nick) {
@@ -707,7 +765,16 @@ export default function Parole() {
           onLeaderboard={() => setShowLeaderboard(true)}
           onChangeNick={() => { pendingMode.current = null; setShowGate(true); }}
           onPlay={handlePlayFromMenu}
-          onTutorial={() => setShowTutorial(true)}
+          onTutorial={onTutorial}
+        />
+      )}
+
+      {/* ── Tour guidato a riflettore (solo desktop) ── */}
+      {showTour && showMenu && (
+        <HomeTour
+          steps={HOME_TOUR}
+          onDone={onTourDone}
+          onCloseModals={() => { setShowLeaderboard(false); }}
         />
       )}
 
@@ -737,10 +804,19 @@ export default function Parole() {
           <GameTutorial
             gameKey="parole"
             steps={introSteps}
-            accentColor="#2F7D4A"
-            darkBg="#103820"
+            accentColor="#7c3aed"
+            darkBg="#2a1150"
             dark={dark}
-            onDone={() => { setShowTutorial(false); setShowMenu(false); }}
+            onDone={() => {
+              setShowTutorial(false);
+              if (chainTour.current && showMenu && isDesktop()) {
+                chainTour.current = false;
+                setShowTour(true);
+              } else {
+                chainTour.current = false;
+                setShowMenu(false);
+              }
+            }}
           />
         </>
       )}

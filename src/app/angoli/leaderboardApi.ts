@@ -102,6 +102,36 @@ export async function fetchTop(limit = 50, mode?: number): Promise<ScoreRow[]> {
   return (await res.json()) as ScoreRow[];
 }
 
+// ─── Punteggio TOTALE del giocatore (somma del best per modalità) ───────────
+//
+// Confronto equo: per ogni modalità prendiamo solo il MIGLIOR punteggio del
+// giocatore, poi li sommiamo. Mostrato come badge nel menu (icona-tasto profilo),
+// gemello di fetchTotals di Trivia. Nick aggregato CASE-INSENSITIVE.
+export async function fetchPlayerScore(nick: string): Promise<number> {
+  const key = nick.trim().toLowerCase();
+  if (!key) return 0;
+
+  let rows: ScoreRow[];
+  if (!leaderboardConfigured) {
+    rows = readLocal().filter(r => r.nick.trim().toLowerCase() === key);
+  } else {
+    const params = new URLSearchParams({ select: "nick,score,mode", order: "score.desc", limit: "2000" });
+    try {
+      const res = await fetch(`${URL}/rest/v1/${TABLE}?${params}`, { headers: restHeaders() });
+      rows = res.ok ? ((await res.json()) as ScoreRow[]).filter(r => r.nick.trim().toLowerCase() === key) : [];
+    } catch { rows = []; }
+  }
+  // best per modalità
+  const bestByMode = new Map<number, number>();
+  for (const r of rows) {
+    const prev = bestByMode.get(r.mode) ?? 0;
+    if ((r.score || 0) > prev) bestByMode.set(r.mode, r.score || 0);
+  }
+  let total = 0;
+  for (const v of bestByMode.values()) total += v;
+  return total;
+}
+
 // ─── Realtime: nuovi punteggi in tempo reale via WebSocket ──────────────────
 //
 // Usa il protocollo Realtime di Supabase (Phoenix channels) direttamente sul

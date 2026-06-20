@@ -191,6 +191,17 @@ export async function fetchTotals(modeIds: string[], limit = 50): Promise<TotalR
   return out.slice(0, limit);
 }
 
+/**
+ * Punteggio TOTALE del giocatore: somma del best per livello, per il badge del
+ * menu (tasto profilo). Riusa fetchTotals e cerca il nick CASE-INSENSITIVE.
+ */
+export async function fetchPlayerScore(nick: string, modeIds: string[]): Promise<number> {
+  const key = nick.trim().toLowerCase();
+  if (!key) return 0;
+  const totals = await fetchTotals(modeIds, 500);
+  return totals.find(t => t.nick.trim().toLowerCase() === key)?.score ?? 0;
+}
+
 // ─── Realtime: nuovi punteggi in tempo reale via WebSocket ──────────────────
 
 export type Unsubscribe = () => void;

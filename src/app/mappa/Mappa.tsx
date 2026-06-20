@@ -6,6 +6,39 @@ import GameTutorial, { hasSeenTutorial, type IntroStep } from "../components/Gam
 import MappaMenu, { MODES, MappaMark, type LevelMode } from "./MappaMenu";
 import NicknameGate from "./NicknameGate";
 import Leaderboard from "./Leaderboard";
+import HomeTour, { type TourStep } from "../trivia/HomeTour";
+
+const TOUR_KEY = "mappa-home-tour-seen";
+
+// Passi del tour guidato sulla home (gemello di quello di Trivia).
+const HOME_TOUR: TourStep[] = [
+  {
+    selector: '[data-tour="leaderboard"]',
+    kind: "modal",
+    modalSelector: ".mpl",
+    title: "La classifica live",
+    body: "Il podio di tutti i giocatori, in tempo reale. Aprila, dài un'occhiata e chiudila per continuare.",
+    hint: "Apri la classifica",
+  },
+  {
+    selector: '[data-tour="tutorial"]',
+    kind: "info",
+    title: "Come si gioca",
+    body: "Da qui rivedi quando vuoi la spiegazione del gioco, con tutte le meccaniche animate.",
+  },
+  {
+    selector: '[data-tour="player"]',
+    kind: "info",
+    title: "Il tuo profilo",
+    body: "Questa pastiglia mostra il tuo punteggio totale e il tuo nome. Toccala quando vuoi cambiare nickname.",
+  },
+  {
+    selector: '[data-tour="chapters"]',
+    kind: "info",
+    title: "E ora… si gioca!",
+    body: "Scegli la difficoltà e premi Gioca. Riconosci la città dal satellite e scala la classifica!",
+  },
+];
 import { CITIES, CITY_NAMES, isCorrectGuess, type City } from "./cities";
 import { submitScore, fetchPlayerBests, type ScoreRow } from "./leaderboardApi";
 import { getStoredNick } from "./nickname";
@@ -157,6 +190,9 @@ export default function Mappa() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showGate, setShowGate] = useState(false);
   const [showBoard, setShowBoard] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const chainTour = useRef(false);
+  const pendingPlay = useRef(false);
   const [nick, setNick] = useState<string>(() => getStoredNick() || getAccountNick());
 
   const [level, setLevel] = useState<LevelMode>(1);
@@ -292,7 +328,7 @@ export default function Mappa() {
   // Dal menu: scegli difficoltà → (gate se serve) → (tutorial se mai visto) → gioco
   const onPlay = useCallback((chosen: LevelMode) => {
     setLevel(chosen);
-    if (!nick) { setShowGate(true); return; }
+    if (!nick) { pendingPlay.current = true; setShowGate(true); return; }
     if (!hasSeenTutorial("mappa")) { setShowTutorial(true); return; }
     beginSession(chosen);
     setShowMenu(false);
@@ -301,19 +337,53 @@ export default function Mappa() {
   const onGateConfirm = useCallback((confirmed: string) => {
     setNick(confirmed);
     setShowGate(false);
+    // Gate aperto da "cambia nome" nel menu (nessuna partita in coda): resta nel menu.
+    if (!pendingPlay.current) return;
+    pendingPlay.current = false;
     if (!hasSeenTutorial("mappa")) { setShowTutorial(true); return; }
     beginSession(level);
     setShowMenu(false);
   }, [level, beginSession]);
 
+  // ── Tour guidato "a riflettore" (solo desktop) ──
+  const isDesktop = () => typeof window !== "undefined" && window.matchMedia("(min-width: 760px)").matches;
+  const hasSeenTour = () => { try { return localStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
+  const markTourSeen = () => { try { localStorage.setItem(TOUR_KEY, "1"); } catch {} };
+
+  const onTutorial = useCallback(() => {
+    if (!showTour) chainTour.current = true;
+    setShowTutorial(true);
+  }, [showTour]);
+
+  const onTourDone = useCallback(() => { setShowTour(false); markTourSeen(); }, []);
+
   const onTutorialDone = useCallback(() => {
     setShowTutorial(false);
-    // se il tutorial è stato aperto dal menu (gioco non in corso), avvia la sessione
+    // Se aperto da "Come si gioca" (chainTour) su desktop, prosegui col tour
+    // restando nel menu. Altrimenti, se il menu è aperto, avvia la sessione.
+    if (chainTour.current && showMenu && isDesktop()) {
+      chainTour.current = false;
+      setShowTour(true);
+      return;
+    }
+    chainTour.current = false;
     setShowMenu(prev => {
       if (prev) { beginSession(level); return false; }
       return prev;
     });
-  }, [level, beginSession]);
+  }, [level, beginSession, showMenu]);
+
+  // Primo accesso col nickname già scelto: avvia da solo slideshow + tour una volta.
+  useEffect(() => {
+    if (!showMenu || !nick) return;
+    if (!isDesktop()) return;
+    if (!hasSeenTour() && !showTour && !showTutorial) {
+      chainTour.current = true;
+      if (!hasSeenTutorial("mappa")) setShowTutorial(true);
+      else setShowTour(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showMenu, nick]);
 
   // ── Indizi progressivi (rivelati al posto dei tentativi) ──
   const hints = useMemo(() => {
@@ -457,8 +527,20 @@ export default function Mappa() {
           dark={dark}
           bestStreak={best}
           trophiesCount={achieved.length}
+          nick={nick}
           onPlay={onPlay}
-          onTutorial={() => setShowTutorial(true)}
+          onTutorial={onTutorial}
+          onLeaderboard={() => setShowBoard(true)}
+          onChangeNick={() => setShowGate(true)}
+        />
+      )}
+
+      {/* ── Tour guidato a riflettore (solo desktop) ── */}
+      {showTour && showMenu && (
+        <HomeTour
+          steps={HOME_TOUR}
+          onDone={onTourDone}
+          onCloseModals={() => { setShowBoard(false); }}
         />
       )}
 

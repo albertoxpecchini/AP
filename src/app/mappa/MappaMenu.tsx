@@ -1,6 +1,7 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { Link } from "react-router";
-import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, MapPin, Target } from "lucide-react";
+import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, MapPin, Target, ListOrdered, MoreHorizontal, X } from "lucide-react";
+import { fetchPlayerScore } from "./leaderboardApi";
 
 // I cinque livelli regolano quante città devi indovinare e quanti tentativi hai
 // per ciascuna. Più sali, più città e meno tentativi: la sfida cresce.
@@ -47,14 +48,31 @@ interface MappaMenuProps {
   dark: boolean;
   bestStreak: number;
   trophiesCount: number;
+  nick?: string;
   onPlay: (level: LevelMode) => void;
   onTutorial: () => void;
+  onLeaderboard: () => void;
+  onChangeNick: () => void;
 }
 
-export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onTutorial }: MappaMenuProps) {
+export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPlay, onTutorial, onLeaderboard, onChangeNick }: MappaMenuProps) {
   // Livello selezionato (single-select, parte dal primo).
   const [selected, setSelected] = useState<LevelMode>(1);
   const selectedMode = MODES.find(m => m.level === selected)!;
+  // Drawer "Altro" su mobile (azioni secondarie dopo Gioca).
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  // Punteggio totale del giocatore → badge nel tasto profilo.
+  const [playerScore, setPlayerScore] = useState<number | null>(null);
+  useEffect(() => {
+    if (!nick) { setPlayerScore(null); return; }
+    let alive = true;
+    fetchPlayerScore(nick, MODES.map(m => m.key))
+      .then(s => { if (alive) setPlayerScore(s); })
+      .catch(() => { if (alive) setPlayerScore(0); });
+    return () => { alive = false; };
+  }, [nick]);
+  const fmtScore = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, "")}k` : `${n}`;
 
   // ── Fit-to-box "a parole" (stile Bolt, copiato da Trivia): ogni PAROLA del
   //    nome del livello su una riga propria, MAI tagliata, dimensione indipendente
@@ -118,7 +136,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onT
       <p className="mpm-section-label" style={{ color: vio }}>
         <span className="mpm-step" style={{ background: vio }}>1</span>Scegli la difficoltà
       </p>
-      <div className="mpm-grid">
+      <div className="mpm-grid" data-tour="chapters">
         {MODES.map((m) => {
           const on = selected === m.level;
           return (
@@ -183,10 +201,21 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onT
     </button>
   );
 
-  // Azioni secondarie (dopo Gioca): "Come si gioca" CTA + torna ai progetti.
+  // Icona-tasto giocatore: pastiglia con badge punteggio + nome. Tap = cambia nome.
+  const PlayerIcon = (onDark: boolean) => nick ? (
+    <button type="button" onClick={onChangeNick} data-tour="player" className={`mpm-player${onDark ? " on-dark" : ""}`} title={`${nick} · tocca per cambiare`}>
+      <span className="mpm-player-badge">{playerScore === null ? "…" : fmtScore(playerScore)}</span>
+      <span className="mpm-player-name">{nick}</span>
+    </button>
+  ) : null;
+
+  // Azioni secondarie (dopo Gioca): classifica + "Come si gioca" + torna ai progetti.
   const SecondaryActions = () => (
     <>
-      <button type="button" onClick={onTutorial} className="mpm-tut-btn mpm-tut-cta">
+      <button type="button" onClick={onLeaderboard} data-tour="leaderboard" className="mpm-tut-btn mpm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
+        <ListOrdered size={18} /> Classifica live
+      </button>
+      <button type="button" onClick={onTutorial} data-tour="tutorial" className="mpm-tut-btn mpm-tut-cta">
         <BookOpen size={19} strokeWidth={2.4} /> Come si gioca
       </button>
       <Link to="/#progetti" className="mpm-back-btn mpm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
@@ -226,9 +255,23 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onT
           {StatsCard(false)}
           {ModeList}
           {PlayBtn}
-          <div className="mpm-actions">{SecondaryActions()}</div>
+          <button type="button" className="mpm-more-toggle mpm-vio-btn" onClick={() => setMoreOpen(true)} style={{ color: vio, border: `1.5px solid ${vBord}` }}>
+            <MoreHorizontal size={18} /> Altro
+          </button>
           <p style={{ fontSize: "0.7rem", color: note, textAlign: "center", margin: 0 }}>Vista satellitare reale · meno tentativi, più punti</p>
         </div>
+
+        {moreOpen && (
+          <div className="mpm-drawer-back" onClick={() => setMoreOpen(false)}>
+            <div className="mpm-drawer" onClick={e => e.stopPropagation()}>
+              <div className="mpm-drawer-head">
+                {PlayerIcon(true) ?? <span>Altro</span>}
+                <button type="button" onClick={() => setMoreOpen(false)} aria-label="Chiudi" className="mpm-drawer-x"><X size={20} /></button>
+              </div>
+              <div className="mpm-actions mpm-actions-dark">{SecondaryActions()}</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ════════ DESKTOP — tre colonne (vetrina | gioco | funzioni) ════════ */}
@@ -253,8 +296,8 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onT
           <p className="mpm-rail-label">Funzioni</p>
           <div className="mpm-actions mpm-actions-dark">{SecondaryActions()}</div>
           <div className="mpm-rail-spacer" />
-          <p className="mpm-rail-label">Geografia dal cielo</p>
-          <div className="mpm-rail-note">Trova le città · streak ≥ 3 sblocca trofei</div>
+          <p className="mpm-rail-label">Il tuo profilo</p>
+          <div className="mpm-player-slot">{PlayerIcon(true)}</div>
         </div>
       </div>
 
@@ -333,7 +376,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onT
           background:rgba(255,255,255,0.10); color:#fff !important; border:1px solid rgba(255,255,255,0.16) !important;
         }
         .mpm-actions-dark .mpm-tut-btn:hover, .mpm-actions-dark .mpm-back-btn:hover { background:rgba(255,255,255,0.18); }
-        .mpm-actions-dark .mpm-back-btn svg { color:#c4a5ff; }
+        .mpm-actions-dark .mpm-tut-btn svg, .mpm-actions-dark .mpm-back-btn svg { color:#c4a5ff; }
 
         .mpm-tut-btn, .mpm-back-btn {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
@@ -368,6 +411,47 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onT
         @media (prefers-reduced-motion: reduce) {
           .mpm-tut-cta, .mpm-tut-cta::after { animation:none; }
         }
+
+        /* toggle "Altro" (mobile) */
+        .mpm-more-toggle {
+          display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; width:100%;
+          padding:0.85rem 1rem; border-radius:13px; font-size:0.95rem; font-weight:800;
+          background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          cursor:pointer; font-family:inherit; transition:background .15s;
+        }
+        /* drawer mobile */
+        .mpm-drawer-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; animation:mpm-fade .2s ease; }
+        @keyframes mpm-fade { from{opacity:0;} to{opacity:1;} }
+        .mpm-drawer {
+          width:100%; background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 60%,#103820 130%);
+          border-radius:20px 20px 0 0; padding:1.1rem 1.1rem calc(1.6rem + env(safe-area-inset-bottom));
+          box-shadow:0 -10px 40px rgba(0,0,0,0.4); animation:mpm-up .25s cubic-bezier(.2,.8,.3,1);
+          max-height:88dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+        }
+        @keyframes mpm-up { from{transform:translateY(100%);} to{transform:none;} }
+        .mpm-drawer-head { display:flex; align-items:center; justify-content:space-between; color:#fff; font-weight:800; font-size:1.05rem; margin-bottom:0.9rem; padding:0 0.2rem; }
+        .mpm-drawer-x { background:rgba(255,255,255,0.12); border:none; color:#fff; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+        /* icona-tasto giocatore: badge punteggio + nome */
+        .mpm-player-slot { display:flex; justify-content:center; }
+        .mpm-player {
+          display:inline-flex; align-items:center; gap:0.6rem;
+          padding:0.4rem 0.95rem 0.4rem 0.4rem; border-radius:999px; cursor:pointer;
+          border:1.5px solid ${vBord}; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          font-family:inherit; transition:transform .12s, background .15s, box-shadow .15s;
+        }
+        .mpm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(124,58,237,0.25); }
+        .mpm-player:active { transform:scale(0.97); }
+        .mpm-player-badge {
+          display:inline-flex; align-items:center; justify-content:center;
+          min-width:38px; height:38px; padding:0 0.4rem; border-radius:999px;
+          background:linear-gradient(140deg,#7c3aed,#5b21b6); color:#fff;
+          font-size:0.92rem; font-weight:900; line-height:1; letter-spacing:-0.02em;
+          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(91,33,182,0.4);
+        }
+        .mpm-player-name { font-size:0.92rem; font-weight:800; color:${vio}; letter-spacing:0.01em; padding-right:0.2rem; }
+        .mpm-player.on-dark { border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); }
+        .mpm-player.on-dark .mpm-player-name { color:#fff; }
 
         /* ═══════ Tile livelli stile "booking card" (copiata da Trivia) ═══════ */
         .mpm-grid {
@@ -566,6 +650,8 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, onPlay, onT
           }
           .mpm-rail-spacer { flex:1; min-height:1rem; }
           .mpm-rail-note { font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.62); line-height:1.4; padding:0 0.2rem; }
+          .mpm-desktop-right .mpm-player-slot { justify-content:stretch; }
+          .mpm-desktop-right .mpm-player { width:100%; justify-content:flex-start; }
         }
 
         @media (min-width:760px) and (max-height:820px) {
