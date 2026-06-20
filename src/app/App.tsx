@@ -164,12 +164,28 @@ function MovimentoThumb() {
   );
 }
 
+function MappaThumb() {
+  // Globo con meridiani + pin di localizzazione: l'identità di Mappa (città dal satellite).
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      <circle cx="180" cy="100" r="62" fill="none" stroke="rgba(124,58,237,0.55)" strokeWidth="3.2" />
+      <ellipse cx="180" cy="100" rx="26" ry="62" fill="none" stroke="rgba(124,58,237,0.4)" strokeWidth="2.6" />
+      <line x1="118" y1="100" x2="242" y2="100" stroke="rgba(124,58,237,0.4)" strokeWidth="2.6" />
+      <path d="M126 70 Q180 88 234 70" fill="none" stroke="rgba(124,58,237,0.35)" strokeWidth="2.4" />
+      <path d="M126 130 Q180 112 234 130" fill="none" stroke="rgba(124,58,237,0.35)" strokeWidth="2.4" />
+      <path d="M180 74c-11 0-18 7-18 18 0 13 18 32 18 32s18-19 18-32c0-11-7-18-18-18z" fill="rgba(47,125,74,0.65)" stroke="#1F6B3D" strokeWidth="2" />
+      <circle cx="180" cy="92" r="6" fill="#fff" />
+    </svg>
+  );
+}
+
 function ProjectThumb({ name }: { name: string }) {
   if (name === "angoli") return <AngoliThumb />;
   if (name === "parole") return <ParoleThumb />;
   if (name === "trivia") return <TriviaThumb />;
   if (name === "pcto") return <PctoThumb />;
   if (name === "movimento") return <MovimentoThumb />;
+  if (name === "mappa") return <MappaThumb />;
   return null;
 }
 
@@ -203,6 +219,15 @@ const PROJECTS = [
     thumb: "pcto",
     desc: "Tre anni di alternanza scuola-lavoro al Caem Group S.p.A. di Castellucchio, nell'ufficio tecnico del reparto legno: modellazione 3D di tettoie in AutoCAD, osservazione del calcolo strutturale e archiviazione dei preventivi. Racconto del percorso con illustrazioni dei legni.",
     tags: ["Reparto legno", "AutoCAD 3D", "Strutture in legno", "Ufficio tecnico"],
+  },
+  {
+    category: "Web game",
+    date: "20 giu 2026",
+    title: "Mappa",
+    url: "/mappa",
+    thumb: "mappa",
+    desc: "Riconosci la città del mondo dalla sua vista satellitare reale: trascina e zooma la mappa a caccia di indizi (monumenti, fiumi, la forma delle strade), poi scrivi il nome. Cinque livelli di difficoltà, indizi progressivi (continente, iniziale, Paese), punteggio con bonus combo, account col nome, classifica live e tema chiaro/scuro. Mappe Esri, mouse e touch.",
+    tags: ["React", "TypeScript", "Leaflet", "Game design"],
   },
   {
     category: "Web game",

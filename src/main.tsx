@@ -9,6 +9,7 @@ const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
 const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
 const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
 const Movimento = lazy(() => import("./app/movimento/Movimento.tsx"));
+const Mappa = lazy(() => import("./app/mappa/Mappa.tsx"));
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -51,6 +52,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Movimento />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/mappa"
+        element={
+          <Suspense fallback={null}>
+            <Mappa />
           </Suspense>
         }
       />
