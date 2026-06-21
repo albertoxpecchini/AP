@@ -831,9 +831,9 @@ const styles = `
 /* Stage — 2 colonne su desktop (foto | domanda), riempie la viewport */
 .trv-stage {
   flex: 1; min-height: 0; width: 100%;
-  max-width: min(1700px, 96vw); margin: 0 auto; align-content: center;
-  display: grid; grid-template-columns: 1fr; gap: clamp(.9rem,2vmin,2rem);
-  padding: clamp(.9rem,2.2vmin,2.4rem) clamp(1rem,3vw,3.2rem) clamp(1.2rem,2.4vmin,2.4rem);
+  max-width: 100%; margin: 0 auto; align-content: center;
+  display: grid; grid-template-columns: 1fr; gap: clamp(.9rem,2vmin,2.6rem);
+  padding: clamp(.8rem,1.8vmin,1.8rem) clamp(1rem,2.4vw,2.6rem) clamp(1rem,2vmin,2rem);
   animation: trv-q-in .3s ease;
 }
 @keyframes trv-q-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -980,7 +980,7 @@ const styles = `
 /* Results */
 .trv-results {
   flex: 1; min-height: 0; overflow: auto;
-  width: 100%; max-width: min(680px, 94vw); margin: 0 auto;
+  width: 100%; max-width: min(900px, 94vw); margin: 0 auto;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: clamp(1rem,2vmin,1.8rem); padding: clamp(2rem,5vmin,4rem) clamp(1.2rem,3vw,3rem); text-align: center;
   animation: trv-res-in .35s ease;

@@ -996,7 +996,7 @@ export default function TriviaMenu({
           .trm-root { display:flex; align-items:stretch; justify-content:center; }
           .trm-desktop {
             display:flex; flex-direction:row; height:100%; overflow:hidden;
-            max-width:min(1760px, 100vw); margin:0 auto; width:100%;
+            max-width:100%; margin:0 auto; width:100%;
           }
 
           /* Fasce scure SINISTRA e DESTRA: stessa "pelle" speculare. */
@@ -1039,7 +1039,7 @@ export default function TriviaMenu({
             display:flex; flex-direction:column; gap:0.85rem;
             padding:2rem 1.8rem; overflow-y:auto;
           }
-          .trm-desktop-center .trm-grid { grid-template-columns:repeat(3,1fr); }
+          .trm-desktop-center .trm-grid { grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); }
           .trm-desktop-center .trm-grid-types { grid-template-columns:repeat(3,1fr); }
 
           /* DESTRA = funzioni + profilo. Larghezza fissa: il login non sposta nulla. */
