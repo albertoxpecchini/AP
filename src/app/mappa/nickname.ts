@@ -1,12 +1,6 @@
-// Validazione nickname condivisa con gli altri giochi (stesso filtro
-// parolacce multilingua). Qui cambia solo la chiave di storage.
-export { checkNickname, type NickCheck, type NickError } from "../angoli/nickname";
+// Validazione nickname condivisa con gli altri giochi (fonte unica nel motore
+// src/app/_game). Qui resta solo la chiave di storage propria del gioco.
+import { makeNickStorage } from "../_game/nickname";
+export { checkNickname, type NickCheck, type NickError } from "../_game/nickname";
 
-const NICK_KEY = "mappa-nick";
-
-export function getStoredNick(): string {
-  try { return (localStorage.getItem(NICK_KEY) || "").slice(0, 10); } catch { return ""; }
-}
-export function storeNick(nick: string) {
-  try { localStorage.setItem(NICK_KEY, nick.slice(0, 10)); } catch {}
-}
+export const { getStoredNick, storeNick } = makeNickStorage("mappa-nick");
