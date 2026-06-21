@@ -1,254 +1,189 @@
-# Alberto Pecchini — Portfolio
+<div align="center">
 
-[![Stack](https://img.shields.io/badge/stack-React%2018%20%C2%B7%20TypeScript%20%C2%B7%20Vite%206-2F7D4A?style=flat-square)](#stack-tecnologico)
-[![Design System](https://img.shields.io/badge/design%20system-Bootstrap%20Italia-103820?style=flat-square)](https://italia.github.io/bootstrap-italia/)
-[![License](https://img.shields.io/badge/license-MIT-1F6B3D?style=flat-square)](#licenza)
+# Alberto Pecchini — Portfolio & Game Hub
 
-Sito personale di **Alberto Pecchini** — studente CAT all'ITT «Carlo d'Arco» di Mantova, designer e front-end developer. Single-page application costruita su React + Vite con il design system **Bootstrap Italia**, palette ispirata al neroverde del Sassuolo, interazioni curate e integrazione live con l'API di GitHub per le metadata dei progetti.
+**SPA React/TypeScript** che fonde un portfolio personale con un _hub_ di sei applicazioni ludico-didattiche a tema architettura, geografia e lingua, su design system **Bootstrap Italia** e palette neroverde Sassuolo.
 
-🔗 **Sito live:** [albertopecchini.it](https://albertopecchini.it) · **Repo:** [github.com/albertoxpecchini/AP](https://github.com/albertoxpecchini/AP)
+<!-- ─────────────  METRICHE LIVE (shields.io → GitHub API, auto-aggiornanti)  ───────────── -->
 
----
+[![Last commit](https://img.shields.io/github/last-commit/albertoxpecchini/AP/main?style=flat-square&logo=git&logoColor=white&color=2F7D4A)](https://github.com/albertoxpecchini/AP/commits/main)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/albertoxpecchini/AP?style=flat-square&color=1F6B3D)](https://github.com/albertoxpecchini/AP/pulse)
+[![Created at](https://img.shields.io/github/created-at/albertoxpecchini/AP?style=flat-square&label=nato%20il&color=103820)](https://github.com/albertoxpecchini/AP)
+[![Repo size](https://img.shields.io/github/repo-size/albertoxpecchini/AP?style=flat-square&color=2F7D4A)](https://github.com/albertoxpecchini/AP)
+[![Code size](https://img.shields.io/github/languages/code-size/albertoxpecchini/AP?style=flat-square&label=code&color=1F6B3D)](https://github.com/albertoxpecchini/AP)
+[![Top language](https://img.shields.io/github/languages/top/albertoxpecchini/AP?style=flat-square&color=3178C6)](https://github.com/albertoxpecchini/AP)
+[![Languages](https://img.shields.io/github/languages/count/albertoxpecchini/AP?style=flat-square&label=lingue&color=7FC09A)](https://github.com/albertoxpecchini/AP)
+[![Files in src](https://img.shields.io/github/directory-file-count/albertoxpecchini/AP/src?type=file&style=flat-square&label=file%20src&color=103820)](https://github.com/albertoxpecchini/AP/tree/main/src)
+[![License](https://img.shields.io/github/license/albertoxpecchini/AP?style=flat-square&color=1F6B3D)](#-licenza)
 
-## Indice
+<!-- ─────────────  STACK (badge logo statici)  ───────────── -->
 
-- [Caratteristiche](#caratteristiche)
-- [Stack tecnologico](#stack-tecnologico)
-- [Struttura del progetto](#struttura-del-progetto)
-- [Sezioni del sito](#sezioni-del-sito)
-- [Getting started](#getting-started)
-- [Script disponibili](#script-disponibili)
-- [Palette & tema](#palette--tema)
-- [Integrazioni esterne](#integrazioni-esterne)
-- [Accessibilità](#accessibilità)
-- [Deploy](#deploy)
-- [Roadmap](#roadmap)
-- [Licenza](#licenza)
-- [Contatti](#contatti)
+[![React](https://img.shields.io/badge/React-18.3-20232A?style=flat-square&logo=react&logoColor=61DAFB)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-6.3-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev)
+[![Tailwind](https://img.shields.io/badge/Tailwind-4.1-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Radix UI](https://img.shields.io/badge/Radix_UI-primitives-161618?style=flat-square&logo=radixui&logoColor=white)](https://www.radix-ui.com)
+[![Motion](https://img.shields.io/badge/Motion-12-FF4D8D?style=flat-square&logo=framer&logoColor=white)](https://motion.dev)
+[![React Router](https://img.shields.io/badge/React_Router-7-CA4245?style=flat-square&logo=reactrouter&logoColor=white)](https://reactrouter.com)
+[![Supabase](https://img.shields.io/badge/Supabase-backend-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
+[![Anthropic](https://img.shields.io/badge/Claude-Haiku_4.5-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com)
+[![Bootstrap Italia](https://img.shields.io/badge/Bootstrap_Italia-AgID-0066CC?style=flat-square&logo=bootstrap&logoColor=white)](https://italia.github.io/bootstrap-italia/)
 
----
+🔗 **Live:** [albertopecchini.it](https://albertopecchini.it) · **Repo:** [albertoxpecchini/AP](https://github.com/albertoxpecchini/AP) · **Autore:** [@albertoxpecchini](https://github.com/albertoxpecchini)
 
-## Caratteristiche
-
-- **SPA in React 18** con bundler Vite 6 e TypeScript.
-- **Bootstrap Italia** come design system di base (componenti, griglia, tipografia ufficiali AgID).
-- **Palette neroverde Sassuolo** con override completo del primario `--bs-primary` e tonalità chiare/scure coerenti.
-- **Animazioni** declarate con `motion/react` (Framer Motion v12) e rispetto di `prefers-reduced-motion`.
-- **Card progetti dinamiche**: anteprime screenshot via API Microlink + versione e data ultimo push lette dall'API GitHub.
-- **Modali hobby/passioni** con immagine, icona e descrizione, chiusura via overlay, `Esc` o pulsante.
-- **Visualizzatore CV** integrato (iframe PDF + fallback download).
-- **Local mode** opzionale per anteprime offline (badge visibile in header).
-- **PWA-ready**: manifest, set completo di favicon, icone maskable 192/512.
-- **Tipografia ufficiale**: Titillium Web, Lora, Roboto Mono.
-- **17 social** linkati nel footer (Instagram, TikTok, X, YouTube, GitHub, WhatsApp, Telegram, Snapchat, Pinterest, Reddit, Twitch, Spotify, Threads, Steam, Vinted, Subito, OpenStreetMap).
+</div>
 
 ---
 
-## Stack tecnologico
+## 📊 Il progetto in numeri
 
-| Categoria              | Tecnologie                                                                 |
-| ---------------------- | -------------------------------------------------------------------------- |
-| **Framework**          | React 18, TypeScript                                                       |
-| **Build tool**         | Vite 6                                                                     |
-| **Design System**      | Bootstrap Italia (CSS + JS bundle, hosted in `/public/bootstrap-italia/`) |
-| **Styling**            | Tailwind CSS 4, CSS-in-JS via `<style>` inline, CSS custom properties      |
-| **Animazioni**         | motion (Framer Motion v12)                                                 |
-| **Icone**              | lucide-react, react-icons (Simple Icons brand pack)                        |
-| **Componenti UI**      | Radix UI primitives + shadcn/ui style                                      |
-| **Package manager**    | pnpm (workspace), compatibile con npm                                      |
-| **CV / asset script**  | Python (`scripts/build_cv.py`, `scripts/build_favicon.py`)                 |
+> I badge di metrica derivano in tempo reale dall'API GitHub: si ricalcolano a ogni `git push`, senza manutenzione.
+
+| Dominio | Valore | Dettaglio |
+| :--- | :--- | :--- |
+| **Codebase** | **~28.7k LOC** in `src/` | 74 `.tsx` · 27 `.ts` · 6 `.css` |
+| **Componenti UI** | **48** primitivi | wrapper shadcn/ui su Radix in `src/app/components/ui/` |
+| **Dipendenze** | **58 runtime** + 7 dev | `pnpm` workspace, lockfile riproducibile |
+| **Applicazioni** | **6 giochi** + 1 portfolio | code-split via `React.lazy` per rotta |
+| **Trivia — quiz** | **1005 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
+| **Parole — lessico** | **~27,7k lemmi** (5–6 lettere) | dizionario di validazione + pool soluzioni curate |
+| **Mappa — atlante** | **30 città** da satellite | riconoscimento da imagery zenitale |
+| **Cronologia** | **176 commit** dal 2026-05-24 | 63 `feat` · 50 `fix` · 21 `style` · 6 `chore` · 4 altri |
+
+[![GitHub stars](https://img.shields.io/github/stars/albertoxpecchini/AP?style=social)](https://github.com/albertoxpecchini/AP/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/albertoxpecchini/AP?style=social)](https://github.com/albertoxpecchini/AP/network/members)
 
 ---
 
-## Struttura del progetto
+## 🎮 Architettura a hub — le sei applicazioni
+
+Ogni gioco è un sotto-applicativo autonomo (route dedicata, _lazy chunk_ indipendente, gating del nickname, leaderboard Supabase isolata). La home (`App.tsx`) funge da vetrina e da dispatcher di navigazione.
+
+| Rotta | Gioco | Dominio | LOC | Badge versione |
+| :--- | :--- | :--- | ---: | :--- |
+| `/trivia` | **Trivia** | Storia dell'architettura — quiz a capitoli | 5.764 | ![v](https://img.shields.io/badge/auto--versioned-1.x-2F7D4A?style=flat-square) |
+| `/parole` | **Parole** | Word game stile Wordle, IT 5–6 lettere | 6.750 | ![lessico](https://img.shields.io/badge/lessico-~27.7k-1F6B3D?style=flat-square) |
+| `/angoli` | **Angoli** | Stima/misura di angoli e frazioni | 2.796 | ![math](https://img.shields.io/badge/math-geometria-7FC09A?style=flat-square) |
+| `/mappa` | **Mappa** | Riconosci la città dal satellite | 2.779 | ![città](https://img.shields.io/badge/città-30-103820?style=flat-square) |
+| `/movimento` | **Movimento** | Mobilità e trasporti | 1.577 | ![booking](https://img.shields.io/badge/UX-vetrina-1F6B3D?style=flat-square) |
+| `/pcto` | **PCTO** | Modulo percorso scuola-lavoro | 879 | ![edu](https://img.shields.io/badge/edu-PCTO-2F7D4A?style=flat-square) |
+
+**Pattern condiviso** per ogni gioco: `NicknameGate` (onboarding identità) → loop di gioco → `Leaderboard` + `leaderboardApi` (persistenza Supabase) → schermata di esito. Trivia aggiunge `Pagella`, `progressApi`, `gradesApi` e copertura statistica per capitolo.
+
+---
+
+## 🧠 Trivia — il modulo di punta
+
+Pipeline **content-driven, zero-config**: i capitoli sono file Markdown in [`content/trivia/`](content/trivia/), importati a build-time via `import.meta.glob(..., { query: '?raw', eager: true })` e parsati una sola volta in `parseTrivia.ts`. Aggiungere un capitolo = aggiungere un `.md`; nessun codice da toccare.
+
+- **40 capitoli** (`Neoclassicismo → … → CityLife`), ordinati dal campo `ordine:` con fallback alfabetico.
+- **1005 domande** tipizzate: `multipla` (401), `vero`/falso (401), `aperta`/completamento (201).
+- **Versionamento automatico** — `__TRIVIA_VERSION__` è iniettata da `vite.config.ts` come `1.<git rev-list --count -- src/app/trivia/>`: ogni deploy che tocca il modulo incrementa la _minor_ da solo.
+- **Arricchimento AI** — middleware dev `/api/trivia` (`vite.config.ts`) interroga **Claude Haiku 4.5** (`@anthropic-ai/sdk`) per curiosità contestuali; chiave via `ANTHROPIC_API_KEY` nel `.env`.
+
+---
+
+## 🗂️ Struttura del repository
 
 ```
-Ap/
+AP/
+├── content/trivia/          # 40 capitoli .md → fonte unica delle domande Trivia
 ├── public/
-│   ├── bootstrap-italia/       # Design System AgID (CSS, JS, fonts, assets)
-│   ├── images/                 # Foto hobby & passioni
-│   ├── cv-alberto-pecchini.pdf # CV pronto al download
-│   ├── favicon*, icon-*        # Set completo PWA
-│   └── site.webmanifest        # Manifest PWA
+│   ├── bootstrap-italia/     # Design System AgID (CSS/JS/font/svg)
+│   ├── images/               # Asset hobby, passioni, copertine
+│   └── site.webmanifest      # PWA: manifest + favicon/icone maskable 192/512
 ├── src/
 │   ├── app/
-│   │   ├── App.tsx             # Componente principale (hero, sezioni, footer, modali)
-│   │   ├── components/         # UI primitives shadcn/Radix
-│   │   └── utils/local.ts      # Attivazione local mode
-│   ├── styles/
-│   │   ├── theme.css           # Design tokens (palette verde, dark mode)
-│   │   ├── tailwind.css        # Entry Tailwind
-│   │   ├── fonts.css           # Caricamento font
-│   │   └── index.css           # Aggregatore
-│   └── main.tsx                # Entry React
-├── scripts/
-│   ├── build_cv.py             # Genera il PDF del CV
-│   └── build_favicon.py        # Genera set completo favicon/PWA
-├── guidelines/                  # Guidelines di sviluppo
-├── CV-IDEE.md                  # Brainstorm CV
-├── CONTENUTI.md                # Inventario contenuti
-├── index.html
-├── package.json
-├── vite.config.ts
-└── README.md
+│   │   ├── App.tsx           # Home/portfolio + dispatcher di navigazione
+│   │   ├── trivia/  parole/  angoli/  mappa/  movimento/  pcto/   # 6 giochi
+│   │   ├── components/ui/     # 48 primitivi shadcn/Radix
+│   │   └── utils/            # keyboard guard, local mode, helper
+│   ├── lib/                  # utilità trasversali (players, ecc.)
+│   ├── styles/               # theme.css (token palette) · tailwind · fonts · index
+│   └── main.tsx              # BrowserRouter + 7 Route lazy-loaded
+├── scripts/                  # build_cv.py · build_favicon.py
+└── vite.config.ts            # plugin React/Tailwind, asset resolver, versioning, dev-API
 ```
 
 ---
 
-## Sezioni del sito
+## 🧰 Stack tecnologico
 
-1. **Hero** — kicker, titolo, sottotitolo, due CTA, scroll hint animato.
-2. **01 — Chi sono** — ritratto + bio (include nota da tifoso del Sassuolo).
-3. **02 — Competenze** — 8 card raggruppate (Front-end, Design/UX, AI, Strumenti, Windows/IT, Multimedia, Area tecnica CAT, Lingue).
-4. **03 — Curriculum** — timeline verticale + download CV + visualizzatore PDF integrato.
-5. **04 — Progetti** — card con screenshot live, tag, versione e data ultimo push da GitHub.
-6. **05 — Hobby** — 6 card cliccabili → modale con foto e descrizione.
-7. **06 — Passioni** — 6 card cliccabili → modale con foto e descrizione.
-8. **07 — Contatti** — CTA mail, WhatsApp, telefono.
-9. **Footer** — branding + 17 social + crediti.
+| Layer | Tecnologie |
+| :--- | :--- |
+| **Core** | React 18.3 · TypeScript · Vite 6.3 |
+| **Routing** | `react-router` 7 (BrowserRouter, route `lazy` + `Suspense`) |
+| **Styling** | Tailwind CSS 4 · CSS custom properties · Bootstrap Italia (AgID) |
+| **UI kit** | 48 primitivi Radix UI in chiave shadcn/ui · `class-variance-authority` · `tailwind-merge` |
+| **Motion** | `motion` (Framer Motion 12), rispettoso di `prefers-reduced-motion` |
+| **Dataviz / FX** | `recharts` · `canvas-confetti` · `embla-carousel` · `skinview3d` |
+| **Form / input** | `react-hook-form` · `input-otp` · `cmdk` · `sonner` (toast) |
+| **Backend** | Supabase (leaderboard, pagelle, progressi per gioco) |
+| **AI** | `@anthropic-ai/sdk` → Claude Haiku 4.5 (curiosità Trivia) |
+| **Tooling** | `pnpm` · `playwright` (E2E) · script Python per CV/favicon |
 
 ---
 
-## Getting started
+## 🚀 Getting started
 
-### Requisiti
-
-- **Node.js** ≥ 18
-- **pnpm** ≥ 8 (consigliato) oppure npm/yarn
-
-### Installazione
+**Requisiti:** Node ≥ 18 · `pnpm` ≥ 8 (compatibile npm/yarn).
 
 ```bash
-git clone https://github.com/albertoxpecchini/Ap.git
-cd Ap
-pnpm install      # oppure: npm install
+git clone https://github.com/albertoxpecchini/AP.git && cd AP
+pnpm install
+pnpm dev          # http://localhost:5173 — HMR attivo, strictPort
+pnpm build        # bundle di produzione in dist/
 ```
 
-### Avvio in sviluppo
+Per l'arricchimento AI di Trivia in locale, creare un `.env` con `ANTHROPIC_API_KEY=...`.
 
-```bash
-pnpm dev          # oppure: npm run dev
-```
-
-Apri http://localhost:5173. Hot Module Replacement attivo.
-
-### Build di produzione
-
-```bash
-pnpm build        # oppure: npm run build
-```
-
-Output in `dist/`. Servi con qualsiasi static host (Vercel, Netlify, GitHub Pages, Nginx, ecc.).
+| Comando | Azione |
+| :--- | :--- |
+| `pnpm dev` | Dev server Vite + middleware `/api/trivia` (porta 5173) |
+| `pnpm build` | Build statica in `dist/` |
+| `python scripts/build_cv.py` | Rigenera il PDF del CV |
+| `python scripts/build_favicon.py` | Rigenera set favicon + icone PWA |
 
 ---
 
-## Script disponibili
+## 🔌 Integrazioni esterne
 
-| Comando          | Descrizione                                |
-| ---------------- | ------------------------------------------ |
-| `npm run dev`    | Dev server Vite con HMR (porta 5173)       |
-| `npm run build`  | Build di produzione in `dist/`             |
-
-### Script Python ausiliari
-
-```bash
-python scripts/build_cv.py        # Rigenera public/cv-alberto-pecchini.pdf
-python scripts/build_favicon.py   # Rigenera set completo favicon + icone PWA
-```
+- **Supabase** — persistenza realtime di leaderboard, pagelle e progressi, con API isolata per ciascun gioco (`*/leaderboardApi.ts`, `trivia/gradesApi.ts`, `trivia/progressApi.ts`).
+- **Anthropic / Claude Haiku 4.5** — generazione di curiosità testuali on-demand.
+- **GitHub REST API** — `App.tsx` legge `pushed_at` e ultima release dei repo dei progetti (no-auth, rate limit pubblico).
+- **Microlink** — screenshot live 1200×630 come anteprima delle card progetto.
+- **Google Fonts** — Titillium Web · Lora · Roboto Mono (`preconnect` + `display=swap`).
 
 ---
 
-## Palette & tema
+## ♿ Accessibilità & 🚀 Deploy
 
-Palette **neroverde Sassuolo** (sostituisce il blu di default di Bootstrap Italia):
+**A11y:** skiplink al contenuto/contatti · landmark semantici (`main`/`nav[aria-label]`/`header`/`footer`) · `aria-labelledby` sui modali · focus visibile · contrasto AA sull'intera palette · `prefers-reduced-motion` onorato · `Backspace` neutralizzato fuori dai campi testo (`disableBackspaceNavigation`).
 
-| Token         | Hex       | Uso                                                |
-| ------------- | --------- | -------------------------------------------------- |
-| Verde scuro   | `#103820` | Header (slim/center/navbar) e footer-main          |
-| Verde profondo| `#1F6B3D` | Testo `text-primary`, kicker, timeline, icone hover|
-| Verde primario| `#2F7D4A` | `--primary`, `bg-primary`, bordi, pallini timeline |
-| Verde chiaro  | `#7FC09A` | `--accent`                                         |
-| Verde overlay | `rgba(47, 125, 74, 0.12)` | Sfondi card/chip/icone soft        |
-
-Override implementato in `src/app/App.tsx` con `--bs-primary` per propagare ai componenti Bootstrap Italia, e in `src/styles/theme.css` per i token globali del tema (light/dark).
+**Deploy:** SPA statica → deploy su **Vercel** (autodetect Vite, `dist/`, branch `main` = produzione). Equivalente su Netlify, GitHub Pages o qualunque static host.
 
 ---
 
-## Integrazioni esterne
+## 🎨 Palette — neroverde Sassuolo
 
-- **GitHub REST API** — letta da `App.tsx` per recuperare `pushed_at` e ultima release/tag dei repo dei progetti (no auth, rate limit pubblico).
-- **Microlink API** — genera screenshot live (1200×630) dei siti dei progetti come anteprima nelle card.
-- **Google Fonts** — Titillium Web, Lora, Roboto Mono (preconnect + display=swap).
+Override completo del primario Bootstrap Italia (`--bs-primary`) propagato in `App.tsx`; token globali light/dark in `src/styles/theme.css`.
 
----
-
-## Accessibilità
-
-- **Skiplinks** all'inizio della pagina (al contenuto e ai contatti).
-- **Marker semantici** `<main>`, `<nav aria-label>`, `<header>`, `<footer>`, `aria-labelledby` sui modali.
-- **Focus visibile** su CTA, social e card interattive.
-- **`prefers-reduced-motion`** rispettato: niente animazioni di ingresso, scroll hint e hover transform.
-- **Contrasto** AA su tutta la palette verde.
-- **Modali**: chiusura via overlay, `Esc`, pulsante; trap su `body { overflow: hidden }`.
+![#103820](https://img.shields.io/badge/Header-%23103820-103820?style=flat-square)
+![#1F6B3D](https://img.shields.io/badge/Profondo-%231F6B3D-1F6B3D?style=flat-square)
+![#2F7D4A](https://img.shields.io/badge/Primario-%232F7D4A-2F7D4A?style=flat-square)
+![#7FC09A](https://img.shields.io/badge/Accent-%237FC09A-7FC09A?style=flat-square&labelColor=555)
 
 ---
 
-## Deploy
+## 📄 Licenza
 
-Il sito è una SPA statica → qualsiasi host che serva file statici è sufficiente.
+Codice sotto licenza **MIT** — liberamente riutilizzabile. Testi, foto personali, CV e brand «Alberto Pecchini» sono **© Alberto Pecchini**, non riproducibili senza autorizzazione. Bootstrap Italia è BSD-3-Clause (Presidenza del Consiglio dei Ministri).
 
-### Vercel (consigliato)
+## 📬 Contatti
 
-```bash
-vercel        # detect automatico: Vite, output dir = dist
-```
+[![Email](https://img.shields.io/badge/Email-pzkko@yahoo.com-D14836?style=flat-square&logo=maildotru&logoColor=white)](mailto:pzkko@yahoo.com)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-+44_7340_995142-25D366?style=flat-square&logo=whatsapp&logoColor=white)](https://wa.me/447340995142)
+[![GitHub](https://img.shields.io/badge/GitHub-@albertoxpecchini-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/albertoxpecchini)
+[![Instagram](https://img.shields.io/badge/Instagram-@albertoxpecchini-E4405F?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/albertoxpecchini)
 
-### GitHub Pages
-
-```bash
-pnpm build
-# pubblica il contenuto di dist/ su gh-pages branch
-```
-
-### Manualmente
-
-```bash
-pnpm build
-rsync -av dist/ user@server:/var/www/albertopecchini.it/
-```
-
----
-
-## Roadmap
-
-- [ ] Cascina Fontana — pubblicazione sito (in produzione)
-- [ ] Rivalta sul Mincio — pubblicazione sito
-- [ ] Blog tecnico con MDX
-- [ ] Dark mode toggle persistente
-- [ ] i18n (it/en) per la versione internazionale
-- [ ] Lighthouse score 100 su tutte le metriche
-
----
-
-## Licenza
-
-Distribuito sotto licenza **MIT**. Il codice è liberamente riutilizzabile; testi, foto personali, CV e contenuti del brand "Alberto Pecchini" sono **© Alberto Pecchini** e non riproducibili senza autorizzazione.
-
-Bootstrap Italia è rilasciato sotto licenza BSD-3-Clause da Presidenza del Consiglio dei Ministri.
-
----
-
-## Contatti
-
-- **Email** — [pzkko@yahoo.com](mailto:pzkko@yahoo.com)
-- **WhatsApp** — [+44 7340 995142](https://wa.me/447340995142)
-- **Telefono** — +39 331 407 4198
-- **GitHub** — [@albertoxpecchini](https://github.com/albertoxpecchini)
-- **Instagram** — [@albertoxpecchini](https://www.instagram.com/albertoxpecchini)
-- **Sede** — Mantova, Italia
-
----
-
-<p align="center">
-  <sub>Costruito con ❤️ a Mantova · Forza Sassuolo ⚫🟢</sub>
-</p>
+<div align="center"><sub>Costruito con ❤️ a Mantova · Forza Sassuolo ⚫🟢</sub></div>
