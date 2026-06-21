@@ -57,10 +57,9 @@ import {
 } from "react-icons/si";
 
 const NAV_LINKS = [
-  { href: "#chi-sono", label: "Chi sono" },
-  { href: "#competenze", label: "Competenze" },
-  { href: "#curriculum", label: "Curriculum" },
   { href: "#progetti", label: "Progetti" },
+  { href: "#chi-sono", label: "Chi sono" },
+  { href: "#curriculum", label: "Curriculum" },
   { href: "#hobby", label: "Hobby" },
   { href: "#passioni", label: "Passioni" },
   { href: "#contatti", label: "Contatti" },
@@ -706,259 +705,229 @@ export default function App() {
         </a>
       </div>
 
-      <header className="it-header-wrapper">
-        {/* Header slim: ruolo + recapiti */}
-        <div className="it-header-slim-wrapper theme-dark">
-          <div className="container">
-            <div className="row">
-              <div className="col-12">
-                <div className="it-header-slim-wrapper-content">
-                  <span className="d-none d-lg-block navbar-brand">
-                    Disponibile per web design, sviluppo front-end e branding
-                  </span>
-                  <div className="it-header-slim-right-zone">
-                    <a
-                      href={`mailto:${EMAIL}`}
-                      className="text-white text-decoration-none d-flex align-items-center me-3"
-                    >
-                      <Mail size={16} className="me-1" aria-hidden="true" />
-                      <span className="d-none d-md-inline">{EMAIL}</span>
-                      <span className="d-md-none visually-hidden">Email</span>
-                    </a>
-                    <a
-                      href={WHATSAPP_HREF}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-white text-decoration-none d-flex align-items-center me-3"
-                    >
-                      <WhatsAppIcon size={15} />
-                      <span className="d-none d-md-inline ms-1">WhatsApp</span>
-                      <span className="d-md-none visually-hidden">WhatsApp</span>
-                    </a>
-                    <a
-                      href={PHONE_HREF}
-                      className="text-white text-decoration-none d-flex align-items-center"
-                    >
-                      <Phone size={16} className="me-1" aria-hidden="true" />
-                      <span className="d-none d-md-inline">{PHONE_DISPLAY}</span>
-                      <span className="d-md-none visually-hidden">Telefono</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
+      <header className={`ap-hdr ${scrolled ? "ap-hdr--scrolled" : ""}`}>
+        <div className="ap-wrap ap-hdr-inner">
+          <a href="#home" className="ap-hdr-brand" aria-label="Alberto Pecchini, torna su">
+            <img src="/alberto-pecchini.jpg" alt="" className="ap-hdr-avatar" width={36} height={36} loading="eager" />
+            <span className="ap-hdr-name">Alberto Pecchini</span>
+            {localMode ? <span className="ap-hdr-local">Local</span> : null}
+          </a>
+
+          <nav className="ap-hdr-nav" aria-label="Navigazione principale">
+            {NAV_LINKS.filter((l) => l.href !== "#contatti").map((link) => (
+              <a key={link.href} className="ap-hdr-link" href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="ap-hdr-right">
+            <div className="ap-hdr-social">
+              <a href="https://github.com/albertoxpecchini" target="_blank" rel="noreferrer noopener" aria-label="GitHub" title="GitHub">
+                <SiGithub size={18} aria-hidden="true" />
+              </a>
+              <a href="https://www.instagram.com/albertoxpecchini" target="_blank" rel="noreferrer noopener" aria-label="Instagram" title="Instagram">
+                <SiInstagram size={18} aria-hidden="true" />
+              </a>
+              <a href="https://x.com/ygpzk" target="_blank" rel="noreferrer noopener" aria-label="X" title="X">
+                <SiX size={18} aria-hidden="true" />
+              </a>
             </div>
+            <a href="#contatti" className="ap-hdr-cta">Contatti</a>
+            <button
+              className="ap-hdr-burger"
+              type="button"
+              aria-controls="ap-drawer"
+              aria-expanded={menuOpen}
+              aria-label="Apri il menu di navigazione"
+              onClick={() => setMenuOpen(true)}
+            >
+              <Menu size={22} aria-hidden="true" />
+            </button>
           </div>
         </div>
 
-        <div className="it-nav-wrapper">
-          {/* Header center: marchio */}
-          <div className="it-header-center-wrapper theme-dark">
-            <div className="container">
-              <div className="row">
-                <div className="col-12">
-                  <div className="it-header-center-content-wrapper">
-                    <div className="it-brand-wrapper">
-                      <a href="#home" aria-label="Alberto Pecchini, torna alla home">
-                        <span className="ap-brand-mark" aria-hidden="true">
-                          <img src="/favicon.svg" alt="" width={48} height={48} />
-                        </span>
-                        <div className="it-brand-text">
-                          <div className="it-brand-title">Alberto Pecchini</div>
-                          <div className="it-brand-tagline d-none d-md-block">
-                            Designer &amp; Front-end Developer
-                          </div>
-                          {localMode ? (
-                            <span
-                              style={{
-                                display: "inline-block",
-                                marginTop: "0.25rem",
-                                fontSize: "0.75rem",
-                                color: "#ffffff",
-                                backgroundColor: "#198754",
-                                padding: "0.28rem 0.6rem",
-                                borderRadius: "9999px",
-                              }}
-                            >
-                              Local
-                            </span>
-                          ) : null}
-                        </div>
-                      </a>
-                    </div>
-                    <div className="it-right-zone">
-                      <span className="d-none d-lg-flex align-items-center text-white">
-                        <MapPin size={18} className="me-1" aria-hidden="true" /> Mantova · Italia
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Navbar principale (sticky) */}
-          <div
-            className={`it-header-navbar-wrapper theme-dark theme-dark-mobile ap-navbar ${scrolled ? "ap-navbar--scrolled" : ""}`}
-          >
-            <div className="container">
-              <div className="row">
-                <div className="col-12">
-                  <nav className="navbar navbar-expand-lg" aria-label="Navigazione principale">
-                    {/* Hamburger: classe custom → bypass Bootstrap Italia, inline style → impossibile da sovrascrivere */}
-                    <button
-                      className="ap-hamburger"
-                      type="button"
-                      aria-controls="nav-main"
-                      aria-expanded={menuOpen}
-                      aria-label="Apri il menu di navigazione"
-                      onClick={() => setMenuOpen(true)}
-                      style={{ background: "none", border: "none", color: "#ffffff", padding: "12px 8px", lineHeight: 1, cursor: "pointer", flexShrink: 0 }}
-                    >
-                      <Menu size={24} color="#ffffff" aria-hidden="true" />
-                    </button>
-
-                    <div className="d-lg-none flex-grow-1" />
-
-                    {/* Mobile: bottoni contatto a destra (nascosti su desktop) */}
-                    <div className="d-flex d-lg-none align-items-center gap-1 ap-mobile-contacts">
-                      <a href={`mailto:${EMAIL}`} className="ap-mobile-contact-btn" aria-label="Email">
-                        <Mail size={20} aria-hidden="true" />
-                      </a>
-                      <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener" className="ap-mobile-contact-btn" aria-label="WhatsApp">
-                        <WhatsAppIcon size={18} />
-                      </a>
-                      <a href={PHONE_HREF} className="ap-mobile-contact-btn" aria-label="Telefono">
-                        <Phone size={20} aria-hidden="true" />
-                      </a>
-                    </div>
-
-                    <div className={`navbar-collapsable ${menuOpen ? "expanded" : ""}`} id="nav-main">
-                      <div className="overlay" onClick={closeMenu} />
-                      <div className="close-div">
-                        <button
-                          className="btn close-menu"
-                          type="button"
-                          aria-label="Chiudi il menu di navigazione"
-                          onClick={closeMenu}
-                        >
-                          <X aria-hidden="true" />
-                        </button>
-                      </div>
-                      <div className="menu-wrapper">
-                        <ul className="navbar-nav">
-                          {NAV_LINKS.map((link) => (
-                            <li className="nav-item" key={link.href}>
-                              <a className="nav-link" href={link.href} onClick={closeMenu}>
-                                <span>{link.label}</span>
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </nav>
-                </div>
-              </div>
+        {/* Drawer mobile */}
+        <div className={`ap-drawer ${menuOpen ? "open" : ""}`} id="ap-drawer">
+          <div className="ap-drawer-backdrop" onClick={closeMenu} aria-hidden="true" />
+          <div className="ap-drawer-panel" role="dialog" aria-modal="true" aria-label="Menu di navigazione">
+            <button className="ap-drawer-close" type="button" aria-label="Chiudi il menu" onClick={closeMenu}>
+              <X size={22} aria-hidden="true" />
+            </button>
+            <nav className="ap-drawer-nav" aria-label="Navigazione">
+              {NAV_LINKS.map((link) => (
+                <a key={link.href} href={link.href} onClick={closeMenu}>
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+            <div className="ap-drawer-contacts">
+              <a href={`mailto:${EMAIL}`}>
+                <Mail size={18} aria-hidden="true" /> {EMAIL}
+              </a>
+              <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener">
+                <WhatsAppIcon size={16} /> WhatsApp
+              </a>
+              <a href={PHONE_HREF}>
+                <Phone size={18} aria-hidden="true" /> {PHONE_DISPLAY}
+              </a>
             </div>
           </div>
         </div>
       </header>
 
       <main id="main-content">
-        <section
-          id="home"
-          className="ap-hero bg-primary text-white d-flex align-items-center"
-        >
-          <div className="container position-relative" style={{ zIndex: 1 }}>
-            <div>
-              {/* Spacer mobile: inline style, impossibile da sovrascrivere via CSS */}
-              <div className="d-lg-none" style={{ height: "88px" }} />
-              {/* Logo: solo su mobile, sopra il kicker */}
-              <div className="d-lg-none mb-4">
-                <img src="/favicon.svg" alt="Alberto Pecchini" width={52} height={52} style={{ borderRadius: "12px" }} />
-              </div>
-              <p className="ap-kicker text-uppercase fw-semibold mb-3">
-                Studente CAT · Front-end Developer
-              </p>
-              <h1 className="display-1 fw-bold mb-4" style={{ maxWidth: "12ch" }}>
-                Alberto Pecchini
+        <section id="home" className="ap-hero2">
+          <div className="ap-wrap ap-hero2-grid">
+            <div className="ap-hero2-main">
+              <p className="ap-eyebrow">Studente CAT · Front-end Developer</p>
+              <h1 className="ap-hero2-title">
+                Studente CAT che progetta <span className="ap-hero2-accent">siti web</span> e{" "}
+                <span className="ap-hero2-accent">web game</span>.
               </h1>
-              <p className="lead mb-4" style={{ maxWidth: "44rem" }}>
+              <p className="ap-hero2-lead">
                 Creo esperienze digitali eleganti con un approccio moderno e funzionale.
                 Web design, sviluppo e animazioni curate per ogni schermo.
               </p>
-              <div className="d-flex flex-column flex-sm-row gap-3">
-                <a href="#progetti" className="btn btn-light btn-lg fw-semibold text-primary">
-                  Vedi i progetti
-                </a>
-                <a href="#contatti" className="btn btn-outline-light btn-lg fw-semibold">
-                  Contattami
-                </a>
+              <div className="ap-hero2-actions">
+                <a href="#progetti" className="ap-pill ap-pill--solid">Progetti</a>
+                <a href="#chi-sono" className="ap-pill ap-pill--ghost">Chi sono</a>
+              </div>
+              <div className="ap-hero2-quick">
+                {["Trivia", "Mappa", "Angoli"].map((t) => {
+                  const p = PROJECTS.find((x) => x.title === t);
+                  if (!p) return null;
+                  return (
+                    <Link key={t} to={p.url} className="ap-quick" aria-label={`Vai a ${p.title}`}>
+                      <span className="ap-quick-ic" aria-hidden="true">
+                        <ProjectIcon thumb={(p as any).thumb} />
+                      </span>
+                      <span>{p.title}</span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
-          </div>
-        </section>
-
-        <section id="chi-sono" className="py-5 my-lg-4 bg-white">
-          <div className="container">
-            <div className="row align-items-center gy-5">
-              <div className="col-lg-5">
+            <div className="ap-hero2-aside">
+              <div className="ap-hero2-portrait">
                 <img
                   src="/alberto-pecchini.jpg"
                   alt="Ritratto di Alberto Pecchini"
                   width={1050}
                   height={1400}
-                  className="img-fluid rounded shadow"
-                  loading="lazy"
+                  loading="eager"
                 />
-              </div>
-              <div className="col-lg-7">
-                <div>
-                  <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                    01 — Chi sono
-                  </p>
-                  <h2 className="display-5 fw-bold mb-4">
-                    Creo esperienze digitali pulite ed eleganti.
-                  </h2>
-                  <p className="fs-5 text-muted">
-                    Mi chiamo Alberto Pecchini, ho {age} anni e frequento il quinto anno della
-                    sezione CAT all'Istituto Tecnico Tecnologico <strong>«Carlo d'Arco»</strong> di
-                    Mantova.
-                  </p>
-                  <p className="fs-5 text-muted">
-                    Sono uno sviluppatore web e designer appassionato di user experience e design
-                    minimalista. Utilizzo Next.js, TypeScript, GSAP e Tailwind CSS per creare siti
-                    web responsivi, veloci e raffinati.
-                  </p>
-                  <p className="fs-5 text-muted mb-3">
-                    La mia missione è trasformare le idee in{" "}
-                    <strong>esperienze digitali memorabili</strong>, mantenendo un design pulito,
-                    una tipografia curata e animazioni che valorizzano i contenuti.
-                  </p>
-                  <p className="fs-5 text-muted mb-0">
-                    Fuori dallo schermo sono un <strong>tifoso del Sassuolo</strong>: il neroverde
-                    è anche il filo conduttore cromatico di questo sito.
-                  </p>
-                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="competenze" className="py-5 my-lg-4 bg-light">
-          <div className="container">
-            <div className="mb-5">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                02 — Competenze e conoscenze
-              </p>
-              <h2 className="display-5 fw-bold mb-0">Cosa so fare</h2>
+        <section id="progetti" className="ap-sec">
+          <div className="ap-wrap">
+            <div className="ap-sec-head">
+              <div>
+                <p className="ap-eyebrow">Progetti</p>
+                <h2 className="ap-sec-title">Il mio lavoro</h2>
+              </div>
+              <Link to="/trivia" className="ap-sec-action">
+                Apri il progetto in evidenza <ArrowUpRight size={16} aria-hidden="true" />
+              </Link>
             </div>
-            <div className="row g-4">
-              {SKILLS.map((group) => (
-                <div className="col-md-6 col-lg-4" key={group.title}>
-                  <div className="ap-skill-card h-100">
-                    <h3 className="h5 fw-bold mb-3">{group.title}</h3>
-                    <div className="d-flex flex-wrap gap-2">
+
+            <div className="ap-cards">
+              {PROJECTS.map((p) => {
+                const internal = p.url.startsWith("/");
+                const shot = projectImages[p.title] || (p as any).previewImg;
+                const media = shot ? (
+                  <img className="ap-project-screenshot" src={shot} alt={`Anteprima di ${p.title}`} loading="lazy" />
+                ) : (p as any).thumb ? (
+                  <div className="ap-project-thumb">
+                    <ProjectThumb name={(p as any).thumb} />
+                  </div>
+                ) : (
+                  <div className="ap-project-placeholder">
+                    <span className="ap-project-placeholder-text">{p.title}</span>
+                  </div>
+                );
+                const body = (
+                  <>
+                    <div className="ap-card-media">{media}</div>
+                    <div className="ap-card-body">
+                      <div className="ap-card-titlerow">
+                        <span className="ap-card-title">{p.title}</span>
+                        <span className="ap-badge ap-badge--active">
+                          <span className="ap-badge-dot" aria-hidden="true" />Attivo
+                        </span>
+                      </div>
+                      <span className="ap-card-date">{p.date}</span>
+                      <p className="ap-card-desc">{p.desc}</p>
+                      <span className="ap-card-link">
+                        Apri progetto <ArrowUpRight size={15} aria-hidden="true" />
+                      </span>
+                    </div>
+                  </>
+                );
+                return internal ? (
+                  <Link key={p.title} to={p.url} className="ap-card" aria-label={p.title}>
+                    {body}
+                  </Link>
+                ) : (
+                  <a
+                    key={p.title}
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="ap-card"
+                    aria-label={p.title}
+                  >
+                    {body}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section id="chi-sono" className="ap-sec ap-sec--alt">
+          <div className="ap-wrap ap-bio">
+            <div className="ap-bio-main">
+              <p className="ap-eyebrow">Chi sono</p>
+              <h2 className="ap-sec-title">Creo esperienze digitali pulite ed eleganti.</h2>
+              <p className="ap-bio-p">
+                Mi chiamo Alberto Pecchini, ho {age} anni e frequento il quinto anno della
+                sezione CAT all'Istituto Tecnico Tecnologico <strong>«Carlo d'Arco»</strong> di
+                Mantova.
+              </p>
+              <p className="ap-bio-p">
+                Sono uno sviluppatore web e designer appassionato di user experience e design
+                minimalista. Utilizzo Next.js, TypeScript, GSAP e Tailwind CSS per creare siti
+                web responsivi, veloci e raffinati.
+              </p>
+              <p className="ap-bio-p">
+                La mia missione è trasformare le idee in{" "}
+                <strong>esperienze digitali memorabili</strong>, mantenendo un design pulito,
+                una tipografia curata e animazioni che valorizzano i contenuti.
+              </p>
+              <p className="ap-bio-p mb-0">
+                Fuori dallo schermo sono un <strong>tifoso del Sassuolo</strong>: il neroverde
+                è anche il filo conduttore cromatico di questo sito.
+              </p>
+            </div>
+
+            <aside className="ap-bio-side">
+              <div className="ap-side-box">
+                <p className="ap-side-label">Dove</p>
+                <p className="ap-side-based">
+                  <MapPin size={16} aria-hidden="true" /> Mantova · Italia
+                </p>
+              </div>
+
+              <div className="ap-side-box">
+                <p className="ap-side-label">Competenze</p>
+                {SKILLS.map((group) => (
+                  <div className="ap-side-skill" key={group.title}>
+                    <span className="ap-side-skill-title">{group.title}</span>
+                    <div className="ap-side-chips">
                       {group.items.map((item) => (
                         <span key={item} className="chip chip-simple chip-primary">
                           <span className="chip-label">{item}</span>
@@ -966,20 +935,34 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              <div className="ap-side-box">
+                <p className="ap-side-label">Formazione</p>
+                <p className="ap-side-edu-lead">
+                  Diploma CAT in corso all'ITT «Carlo d'Arco» di Mantova; inglese C1 (IELTS)
+                  conseguito a Dublino.
+                </p>
+                <ul className="ap-side-edu">
+                  <li>
+                    <GraduationCap size={16} aria-hidden="true" /> ITT «Carlo d'Arco» — Diploma CAT
+                  </li>
+                  <li>
+                    <GraduationCap size={16} aria-hidden="true" /> CES Dublino — IELTS, livello C1
+                  </li>
+                </ul>
+              </div>
+            </aside>
           </div>
         </section>
 
-        <section id="curriculum" className="py-5 my-lg-4 bg-white">
-          <div className="container">
+        <section id="curriculum" className="ap-sec">
+          <div className="ap-wrap">
             <div className="mb-5">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                03 — Curriculum Vitae
-              </p>
+              <p className="ap-eyebrow">Curriculum</p>
               <div className="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <h2 className="display-5 fw-bold mb-0">Formazione &amp; esperienze</h2>
+                <h2 className="ap-sec-title mb-0">Formazione &amp; esperienze</h2>
                 <div className="d-flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -1039,182 +1022,143 @@ export default function App() {
           </div>
         </section>
 
-        <section id="progetti" className="ap-slides-section">
-          <div className="container">
-            <div className="ap-slides-head">
-              <p className="ap-kicker ap-slides-kicker text-uppercase fw-semibold mb-3">
-                04 — Progetti Web
-              </p>
-              <h2 className="display-5 fw-bold mb-0 text-white">Il mio lavoro</h2>
-            </div>
-
-            <div className="ap-slides-grid">
-              {PROJECTS.map((p) => {
-                const internal = p.url.startsWith("/");
-                const Inner = (
-                  <>
-                    <span className="ap-slide-icon" aria-hidden="true">
-                      <ProjectIcon thumb={(p as any).thumb} />
-                    </span>
-                    <span className="ap-slide-cat">{p.category}</span>
-                    <span className="ap-slide-title">{p.title}</span>
-                    <span className="ap-slide-desc">{p.desc}</span>
-                  </>
-                );
-                return internal ? (
-                  <Link key={p.title} to={p.url} className="ap-slide" aria-label={p.title}>
-                    {Inner}
-                  </Link>
-                ) : (
-                  <a
-                    key={p.title}
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="ap-slide"
-                    aria-label={p.title}
-                  >
-                    {Inner}
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section id="hobby" className="py-5 my-lg-4 bg-white">
-          <div className="container">
-            <div className="mb-5">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                05 — Hobby
-              </p>
-              <h2 className="display-5 fw-bold mb-0">Nel tempo libero</h2>
-            </div>
-            <div className="row g-4">
-              {HOBBY.map((item) => (
-                <div className="col-6 col-md-4 col-lg-2" key={item.label}>
-                  <button
-                    type="button"
-                    className="ap-interest-card h-100"
-                    onClick={() => setSelectedItem(item)}
-                    aria-label={`Scopri di più: ${item.label}`}
-                  >
-                    <span className="ap-interest-icon" aria-hidden="true">
-                      <item.Icon size={26} />
-                    </span>
-                    <span className="ap-interest-label">{item.label}</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="passioni" className="py-5 my-lg-4 bg-light">
-          <div className="container">
-            <div className="mb-5">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                06 — Passioni
-              </p>
-              <h2 className="display-5 fw-bold mb-0">Cosa mi appassiona</h2>
-            </div>
-            <div className="row g-4">
-              {PASSIONI.map((item) => (
-                <div className="col-6 col-md-4 col-lg-2" key={item.label}>
-                  <button
-                    type="button"
-                    className="ap-interest-card h-100"
-                    onClick={() => setSelectedItem(item)}
-                    aria-label={`Scopri di più: ${item.label}`}
-                  >
-                    <span className="ap-interest-icon" aria-hidden="true">
-                      <item.Icon size={26} />
-                    </span>
-                    <span className="ap-interest-label">{item.label}</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="contatti" className="py-5 bg-primary text-white">
-          <div className="container text-center">
-            <div>
-              <p className="ap-kicker text-uppercase fw-semibold mb-3" style={{ opacity: 0.85 }}>
-                07 — Contatti
-              </p>
-              <h2 className="display-5 fw-bold mb-4">Parliamone.</h2>
-              <p className="lead mb-4 mx-auto" style={{ maxWidth: "40rem" }}>
-                Per collaborazioni, progetti web o semplicemente per uno scambio di idee — sono
-                disponibile.
-              </p>
-              <div className="d-flex justify-content-center flex-wrap gap-3 mb-5">
-                <a
-                  href={`mailto:${EMAIL}`}
-                  className="btn btn-light btn-lg fw-semibold text-primary d-inline-flex align-items-center"
-                >
-                  <Mail size={20} className="me-2" aria-hidden="true" /> Scrivimi
-                </a>
-                <a
-                  href={WHATSAPP_HREF}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="btn btn-outline-light btn-lg fw-semibold d-inline-flex align-items-center"
-                >
-                  <WhatsAppIcon size={20} />
-                  <span className="ms-2">WhatsApp</span>
-                </a>
-                <a
-                  href={PHONE_HREF}
-                  className="btn btn-outline-light btn-lg fw-semibold d-inline-flex align-items-center"
-                >
-                  <Phone size={20} className="me-2" aria-hidden="true" /> Chiamami
-                </a>
+        <section id="hobby" className="ap-sec ap-sec--alt">
+          <div className="ap-wrap">
+            <div className="ap-sec-head">
+              <div>
+                <p className="ap-eyebrow">Hobby</p>
+                <h2 className="ap-sec-title">Nel tempo libero</h2>
+                <p className="ap-sec-sub">Le cose che faccio quando non sono davanti allo schermo</p>
               </div>
+            </div>
+            <div className="ap-cards">
+              {HOBBY.map((item) => (
+                <button
+                  type="button"
+                  className="ap-card ap-card--btn"
+                  key={item.label}
+                  onClick={() => setSelectedItem(item)}
+                  aria-label={`Scopri di più: ${item.label}`}
+                >
+                  <div className="ap-card-media">
+                    {item.img ? (
+                      <img className="ap-project-screenshot" src={item.img} alt={item.label} loading="lazy" />
+                    ) : (
+                      <div className="ap-project-placeholder">
+                        <span className="ap-interest-icon" aria-hidden="true">
+                          <item.Icon size={26} />
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="ap-card-body">
+                    <span className="ap-card-meta">
+                      <item.Icon size={14} aria-hidden="true" /> Hobby
+                    </span>
+                    <span className="ap-card-title">{item.label}</span>
+                    <p className="ap-card-desc ap-card-desc--clamp">{item.desc}</p>
+                    <span className="ap-card-link">
+                      Scopri di più <ArrowUpRight size={15} aria-hidden="true" />
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="passioni" className="ap-sec">
+          <div className="ap-wrap">
+            <div className="ap-sec-head">
+              <div>
+                <p className="ap-eyebrow">Passioni</p>
+                <h2 className="ap-sec-title">Cosa mi appassiona</h2>
+                <p className="ap-sec-sub">I temi che alimentano il mio modo di progettare</p>
+              </div>
+            </div>
+            <div className="ap-cards">
+              {PASSIONI.map((item) => (
+                <button
+                  type="button"
+                  className="ap-card ap-card--btn"
+                  key={item.label}
+                  onClick={() => setSelectedItem(item)}
+                  aria-label={`Scopri di più: ${item.label}`}
+                >
+                  <div className="ap-card-media">
+                    {item.img ? (
+                      <img className="ap-project-screenshot" src={item.img} alt={item.label} loading="lazy" />
+                    ) : (
+                      <div className="ap-project-placeholder">
+                        <span className="ap-interest-icon" aria-hidden="true">
+                          <item.Icon size={26} />
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="ap-card-body">
+                    <span className="ap-card-meta">
+                      <item.Icon size={14} aria-hidden="true" /> Passione
+                    </span>
+                    <span className="ap-card-title">{item.label}</span>
+                    <p className="ap-card-desc ap-card-desc--clamp">{item.desc}</p>
+                    <span className="ap-card-link">
+                      Scopri di più <ArrowUpRight size={15} aria-hidden="true" />
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="contatti" className="ap-contact">
+          <div className="ap-wrap ap-contact-inner">
+            <p className="ap-eyebrow ap-eyebrow--light">Contatti</p>
+            <h2 className="ap-contact-title">Parliamone.</h2>
+            <p className="ap-contact-lead">
+              Per collaborazioni, progetti web o semplicemente per uno scambio di idee — sono
+              disponibile.
+            </p>
+            <div className="ap-contact-actions">
+              <a href={`mailto:${EMAIL}`} className="ap-pill ap-pill--light">
+                <Mail size={18} aria-hidden="true" /> Scrivimi
+              </a>
+              <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener" className="ap-pill ap-pill--lightghost">
+                <WhatsAppIcon size={18} /> WhatsApp
+              </a>
+              <a href={PHONE_HREF} className="ap-pill ap-pill--lightghost">
+                <Phone size={18} aria-hidden="true" /> Chiamami
+              </a>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="it-footer">
-        <div className="it-footer-main">
-          <div className="container">
-            <div className="row py-4 gy-4">
-              <div className="col-12 col-lg-4">
-                <h2 className="h4 fw-bold mb-1">Alberto Pecchini</h2>
-                <p className="mb-0" style={{ opacity: 0.8 }}>
-                  Designer &amp; Developer · ITT «Carlo d'Arco» — Mantova
-                </p>
-              </div>
-              <div className="col-12 col-lg-8">
-                <p className="text-uppercase fw-semibold mb-3" style={{ letterSpacing: "0.12em", opacity: 0.85 }}>
-                  Seguimi sui social
-                </p>
-                <div className="d-flex flex-wrap gap-2">
-                  {SOCIALS.map(({ name, Icon, href }) => (
-                    <a
-                      key={name}
-                      href={href}
-                      className="ap-social ap-social--sm"
-                      aria-label={name}
-                      title={name}
-                      {...(href !== "#" ? { target: "_blank", rel: "noreferrer noopener" } : {})}
-                    >
-                      <Icon size={18} aria-hidden="true" />
-                    </a>
-                  ))}
-                </div>
-              </div>
+      <footer className="ap-foot">
+        <div className="ap-wrap">
+          <div className="ap-foot-top">
+            <div>
+              <p className="ap-foot-name">Alberto Pecchini</p>
+              <p className="ap-foot-role">Designer &amp; Developer · ITT «Carlo d'Arco» — Mantova</p>
             </div>
-            <div className="row border-top pt-3 pb-4" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
-              <div className="col-12 col-md-6 small" style={{ opacity: 0.7 }}>
-                © {currentYear} Alberto Pecchini — Tutti i diritti riservati
-              </div>
-              <div className="col-12 col-md-6 text-md-end small" style={{ opacity: 0.7 }}>
-                Aggiornato il {currentDate}
-              </div>
+            <div className="ap-foot-social">
+              {SOCIALS.map(({ name, Icon, href }) => (
+                <a
+                  key={name}
+                  href={href}
+                  aria-label={name}
+                  title={name}
+                  {...(href !== "#" ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                </a>
+              ))}
             </div>
+          </div>
+          <div className="ap-foot-bottom">
+            <span>© {currentYear} Alberto Pecchini — Tutti i diritti riservati</span>
+            <span>Aggiornato il {currentDate}</span>
           </div>
         </div>
       </footer>
@@ -2164,6 +2108,551 @@ export default function App() {
           .ap-project-preview {
             height: 180px;
           }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LAYOUT "vetrina" — composizione a sezioni con label, hero col
+           ritratto, griglie di card e bio a due colonne. Palette neroverde.
+           ═══════════════════════════════════════════════════════════════ */
+
+        /* Contenitore comune */
+        .ap-wrap {
+          width: 100%;
+          max-width: 1200px;
+          margin-left: auto;
+          margin-right: auto;
+          padding-left: 1.25rem;
+          padding-right: 1.25rem;
+        }
+        section[id] { scroll-margin-top: 84px; }
+
+        /* Etichette di sezione */
+        .ap-eyebrow {
+          font-size: 0.72rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.18em;
+          color: #2F7D4A;
+          margin: 0 0 0.5rem;
+        }
+        .ap-eyebrow--light { color: rgba(255, 255, 255, 0.85); }
+
+        .ap-sec { padding: 4.5rem 0; background: #ffffff; }
+        .ap-sec--alt { background: #F4FAF6; }
+        .ap-sec-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          margin-bottom: 2.5rem;
+        }
+        .ap-sec-title {
+          font-size: clamp(1.9rem, 4vw, 2.6rem);
+          font-weight: 800;
+          line-height: 1.1;
+          color: #14241b;
+          margin: 0;
+        }
+        .ap-sec-sub { color: #5b6b62; margin: 0.6rem 0 0; font-size: 1rem; }
+        .ap-sec-action {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          color: #1F6B3D;
+          font-weight: 700;
+          font-size: 0.9rem;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+        .ap-sec-action:hover { color: #155030; }
+
+        /* ── Header chiaro minimale ── */
+        .ap-hdr {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background: rgba(255, 255, 255, 0.88);
+          backdrop-filter: saturate(180%) blur(12px);
+          -webkit-backdrop-filter: saturate(180%) blur(12px);
+          border-bottom: 1px solid rgba(47, 125, 74, 0.12);
+        }
+        .ap-hdr--scrolled { box-shadow: 0 6px 20px rgba(16, 56, 32, 0.08); }
+        .ap-hdr-inner {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          height: 64px;
+        }
+        .ap-hdr-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          text-decoration: none;
+          color: #14241b;
+          font-weight: 800;
+          flex-shrink: 0;
+        }
+        .ap-hdr-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          object-fit: cover;
+          object-position: center 18%;
+          border: 1px solid rgba(47, 125, 74, 0.25);
+        }
+        .ap-hdr-name { font-size: 1rem; white-space: nowrap; }
+        .ap-hdr-local {
+          font-size: 0.7rem;
+          background: #198754;
+          color: #fff;
+          padding: 0.15rem 0.5rem;
+          border-radius: 999px;
+        }
+        .ap-hdr-nav {
+          display: flex;
+          align-items: center;
+          gap: 1.35rem;
+          margin-left: auto;
+        }
+        .ap-hdr-link {
+          color: #3a4a41;
+          text-decoration: none;
+          font-size: 0.92rem;
+          font-weight: 600;
+        }
+        .ap-hdr-link:hover { color: #1F6B3D; }
+        .ap-hdr-right { display: flex; align-items: center; gap: 0.8rem; }
+        .ap-hdr-social { display: flex; gap: 0.55rem; }
+        .ap-hdr-social a { color: #3a4a41; display: inline-flex; }
+        .ap-hdr-social a:hover { color: #1F6B3D; }
+        .ap-hdr-cta {
+          background: #103820;
+          color: #ffffff !important;
+          padding: 0.5rem 1.1rem;
+          border-radius: 999px;
+          font-weight: 700;
+          font-size: 0.9rem;
+          text-decoration: none;
+          white-space: nowrap;
+          transition: background 0.15s ease;
+        }
+        .ap-hdr-cta:hover { background: #1F6B3D; }
+        .ap-hdr-burger {
+          display: none;
+          background: none;
+          border: none;
+          color: #14241b;
+          cursor: pointer;
+          padding: 6px;
+          line-height: 1;
+        }
+
+        /* ── Drawer mobile ── */
+        .ap-drawer { position: fixed; inset: 0; z-index: 100; visibility: hidden; }
+        .ap-drawer.open { visibility: visible; }
+        .ap-drawer-backdrop {
+          position: absolute;
+          inset: 0;
+          background: rgba(16, 56, 32, 0.5);
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        .ap-drawer.open .ap-drawer-backdrop { opacity: 1; }
+        .ap-drawer-panel {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 100%;
+          width: min(82vw, 340px);
+          background: #103820;
+          color: #fff;
+          padding: calc(env(safe-area-inset-top) + 1.5rem) 1.5rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.2rem;
+          transform: translateX(100%);
+          transition: transform 0.25s ease;
+        }
+        .ap-drawer.open .ap-drawer-panel { transform: translateX(0); }
+        .ap-drawer-close {
+          align-self: flex-end;
+          background: none;
+          border: none;
+          color: #fff;
+          cursor: pointer;
+          padding: 6px;
+          line-height: 1;
+        }
+        .ap-drawer-nav { display: flex; flex-direction: column; }
+        .ap-drawer-nav a {
+          color: #fff;
+          text-decoration: none;
+          font-size: 1.15rem;
+          font-weight: 600;
+          padding: 0.7rem 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .ap-drawer-nav a:hover { color: rgba(255, 255, 255, 0.72); }
+        .ap-drawer-contacts {
+          margin-top: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 0.7rem;
+        }
+        .ap-drawer-contacts a {
+          color: rgba(255, 255, 255, 0.85);
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+          font-size: 0.95rem;
+        }
+        .ap-drawer-contacts a:hover { color: #fff; }
+
+        /* ── Hero a due colonne ── */
+        .ap-hero2 {
+          background: linear-gradient(180deg, #EAF6EE 0%, #F4FAF6 45%, #ffffff 100%);
+          padding: clamp(2.5rem, 6vw, 5rem) 0 clamp(3rem, 7vw, 6rem);
+          overflow: hidden;
+        }
+        .ap-hero2-grid {
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: clamp(2rem, 5vw, 4rem);
+          align-items: center;
+        }
+        .ap-hero2-main { min-width: 0; }
+        .ap-hero2-title {
+          font-size: clamp(2.2rem, 5.2vw, 3.6rem);
+          font-weight: 800;
+          line-height: 1.08;
+          letter-spacing: -0.01em;
+          color: #14241b;
+          margin: 0.4rem 0 1.1rem;
+          overflow-wrap: anywhere;
+        }
+        .ap-hero2-accent { color: #2F7D4A; }
+        .ap-hero2-lead {
+          font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+          line-height: 1.6;
+          color: #46564c;
+          max-width: 44rem;
+          margin: 0 0 1.6rem;
+        }
+        .ap-hero2-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.8rem; }
+        .ap-hero2-quick { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; }
+
+        /* Pillole */
+        .ap-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.7rem 1.5rem;
+          border-radius: 999px;
+          font-weight: 700;
+          font-size: 0.95rem;
+          text-decoration: none;
+          cursor: pointer;
+          border: 1.5px solid transparent;
+          transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+        }
+        .ap-pill--solid { background: #103820; color: #fff; }
+        .ap-pill--solid:hover { background: #1F6B3D; }
+        .ap-pill--ghost { background: transparent; color: #14241b; border-color: rgba(47, 125, 74, 0.4); }
+        .ap-pill--ghost:hover { background: #fff; border-color: #2F7D4A; color: #1F6B3D; }
+        .ap-pill--light { background: #fff; color: #1F6B3D; }
+        .ap-pill--light:hover { background: #eafaf0; }
+        .ap-pill--lightghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.5); }
+        .ap-pill--lightghost:hover { background: rgba(255, 255, 255, 0.12); }
+
+        /* Quick-link progetti nell'hero */
+        .ap-quick {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.4rem 0.95rem 0.4rem 0.4rem;
+          background: #fff;
+          border: 1px solid rgba(47, 125, 74, 0.18);
+          border-radius: 999px;
+          text-decoration: none;
+          color: #14241b;
+          font-weight: 600;
+          font-size: 0.9rem;
+          box-shadow: 0 2px 10px rgba(16, 56, 32, 0.05);
+          transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .ap-quick:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(16, 56, 32, 0.12);
+          border-color: #2F7D4A;
+          color: #1F6B3D;
+        }
+        .ap-quick-ic {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: rgba(47, 125, 74, 0.12);
+          color: #1F6B3D;
+          flex-shrink: 0;
+        }
+        .ap-quick-ic svg { width: 20px; height: 20px; }
+
+        /* Ritratto hero */
+        .ap-hero2-aside { display: flex; justify-content: center; }
+        .ap-hero2-portrait {
+          position: relative;
+          width: 100%;
+          max-width: 360px;
+          border-radius: 22px;
+          overflow: hidden;
+          background: #fff;
+          border: 1px solid rgba(255, 255, 255, 0.6);
+          box-shadow: 0 30px 60px rgba(16, 56, 32, 0.22);
+        }
+        .ap-hero2-portrait img {
+          width: 100%;
+          height: auto;
+          display: block;
+          aspect-ratio: 3 / 4;
+          object-fit: cover;
+        }
+
+        /* ── Griglia di card ── */
+        .ap-cards {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.6rem;
+        }
+        .ap-card {
+          display: flex;
+          flex-direction: column;
+          background: #fff;
+          border: 1px solid rgba(47, 125, 74, 0.14);
+          border-radius: 16px;
+          overflow: hidden;
+          text-decoration: none;
+          color: inherit;
+          text-align: left;
+          transition: transform 0.16s, box-shadow 0.16s, border-color 0.16s;
+        }
+        .ap-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 18px 40px rgba(16, 56, 32, 0.12);
+          border-color: rgba(47, 125, 74, 0.3);
+        }
+        .ap-card--btn {
+          cursor: pointer;
+          appearance: none;
+          font-family: inherit;
+          width: 100%;
+          padding: 0;
+        }
+        .ap-card-media {
+          height: 200px;
+          background: #f4faf6;
+          border-bottom: 1px solid rgba(47, 125, 74, 0.12);
+          overflow: hidden;
+        }
+        .ap-card-body {
+          display: flex;
+          flex-direction: column;
+          flex: 1 1 auto;
+          padding: 1.25rem 1.25rem 1.4rem;
+        }
+        .ap-card-titlerow {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.6rem;
+          margin-bottom: 0.3rem;
+        }
+        .ap-card-title { font-size: 1.15rem; font-weight: 800; color: #14241b; line-height: 1.2; }
+        .ap-card-meta {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-size: 0.7rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #2F7D4A;
+          margin-bottom: 0.4rem;
+        }
+        .ap-card-date {
+          font-size: 0.72rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #7c8a82;
+          margin-bottom: 0.6rem;
+        }
+        .ap-card-desc { font-size: 0.92rem; line-height: 1.55; color: #56655c; margin: 0 0 1rem; }
+        .ap-card-desc--clamp {
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .ap-card-link {
+          margin-top: auto;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          color: #1F6B3D;
+          font-weight: 700;
+          font-size: 0.9rem;
+        }
+        .ap-card:hover .ap-card-link { color: #155030; }
+
+        /* Badge stato */
+        .ap-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          flex-shrink: 0;
+          font-size: 0.72rem;
+          font-weight: 700;
+          padding: 0.25rem 0.6rem;
+          border-radius: 999px;
+        }
+        .ap-badge--active { background: rgba(47, 125, 74, 0.12); color: #1F6B3D; }
+        .ap-badge-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #2F9E5A;
+          box-shadow: 0 0 0 3px rgba(47, 158, 90, 0.18);
+        }
+
+        /* ── Bio a due colonne ── */
+        .ap-bio {
+          display: grid;
+          grid-template-columns: 1.4fr 1fr;
+          gap: clamp(2rem, 5vw, 4rem);
+          align-items: start;
+        }
+        .ap-bio-main { min-width: 0; }
+        .ap-bio-p { font-size: 1.05rem; line-height: 1.7; color: #46564c; margin: 0 0 1rem; }
+        .ap-bio-side { display: flex; flex-direction: column; gap: 1.2rem; }
+        .ap-side-box {
+          background: #fff;
+          border: 1px solid rgba(47, 125, 74, 0.14);
+          border-radius: 14px;
+          padding: 1.25rem 1.35rem;
+        }
+        .ap-side-label {
+          font-size: 0.7rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
+          color: #2F7D4A;
+          margin: 0 0 0.8rem;
+        }
+        .ap-side-based {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 700;
+          color: #14241b;
+          margin: 0;
+        }
+        .ap-side-skill { margin-bottom: 1rem; }
+        .ap-side-skill:last-child { margin-bottom: 0; }
+        .ap-side-skill-title {
+          display: block;
+          font-weight: 700;
+          font-size: 0.9rem;
+          color: #14241b;
+          margin-bottom: 0.5rem;
+        }
+        .ap-side-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .ap-side-edu-lead { color: #56655c; font-size: 0.92rem; line-height: 1.5; margin: 0 0 0.8rem; }
+        .ap-side-edu { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+        .ap-side-edu li {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 600;
+          font-size: 0.92rem;
+          color: #14241b;
+        }
+        .ap-side-edu li svg { color: #2F7D4A; flex-shrink: 0; }
+
+        /* ── Band contatti ── */
+        .ap-contact {
+          background: linear-gradient(135deg, #103820 0%, #1F6B3D 70%, #2F7D4A 120%);
+          color: #fff;
+          padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+        }
+        .ap-contact-inner { text-align: center; max-width: 46rem; margin: 0 auto; }
+        .ap-contact-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; margin: 0.3rem 0 1rem; }
+        .ap-contact-lead {
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0 auto 2rem;
+          max-width: 38rem;
+        }
+        .ap-contact-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; }
+
+        /* ── Footer minimale ── */
+        .ap-foot { background: #0c2a18; color: #fff; padding: 2.5rem 0 2rem; }
+        .ap-foot-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          padding-bottom: 1.5rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        }
+        .ap-foot-name { font-size: 1.2rem; font-weight: 800; margin: 0 0 0.2rem; }
+        .ap-foot-role { margin: 0; opacity: 0.75; font-size: 0.92rem; }
+        .ap-foot-social { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+        .ap-foot-social a {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          color: #fff;
+          transition: background 0.15s ease;
+        }
+        .ap-foot-social a:hover { background: rgba(255, 255, 255, 0.14); }
+        .ap-foot-bottom {
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
+          flex-wrap: wrap;
+          padding-top: 1.25rem;
+          font-size: 0.82rem;
+          opacity: 0.7;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 991.98px) {
+          .ap-hdr-nav, .ap-hdr-social, .ap-hdr-cta { display: none; }
+          .ap-hdr-burger { display: inline-flex; }
+          .ap-hdr-right { margin-left: auto; }
+          .ap-hero2-grid { grid-template-columns: 1fr; }
+          .ap-cards { grid-template-columns: repeat(2, 1fr); }
+          .ap-bio { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 575.98px) {
+          .ap-sec { padding: 3rem 0; }
+          .ap-cards { grid-template-columns: 1fr; }
+          .ap-card-media { height: 180px; }
+          .ap-hero2-portrait { max-width: 280px; }
+          .ap-foot-social { justify-content: flex-start; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ap-card, .ap-quick, .ap-pill, .ap-drawer-panel, .ap-drawer-backdrop { transition: none; }
         }
 
       `}</style>
