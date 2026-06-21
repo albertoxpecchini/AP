@@ -9,6 +9,7 @@ import "./styles/index.css";
 // browser): resta attivo solo dentro i campi di testo per cancellare i caratteri.
 disableBackspaceNavigation();
 
+const Bio = lazy(() => import("./app/site/Bio.tsx"));
 const Parole = lazy(() => import("./app/parole/Parole.tsx"));
 const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
 const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
@@ -20,6 +21,14 @@ createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
+      <Route
+        path="/bio"
+        element={
+          <Suspense fallback={null}>
+            <Bio />
+          </Suspense>
+        }
+      />
       <Route
         path="/parole"
         element={
