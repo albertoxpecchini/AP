@@ -14,6 +14,7 @@ import {
   Ruler,
   DraftingCompass,
   Building2,
+  BrickWall,
   Code2,
   Plane,
   Target,
@@ -357,11 +358,44 @@ export default function MeStesso() {
           </div>
         </section>
 
-        {/* ⑤ Le mie passioni */}
+        {/* ⑤ Il restauro — dove tutto è iniziato */}
+        <section className="py-5 my-lg-4 bg-light">
+          <div className="container">
+            <div className="mb-4">
+              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">04 — Il restauro</p>
+              <h2 className="display-5 fw-bold mb-0">Dove è iniziato tutto</h2>
+            </div>
+            <div className="ms-story-row">
+              <div className="ms-story-art">
+                <Shot src="/images/me-stesso/restauro-1.jpg" alt="Al corso di restauro nel 2018, al lavoro su un vecchio muro" caption="2018 — le mani sui mattoni" icon={<BrickWall size={56} strokeWidth={1.5} />} />
+              </div>
+              <div className="ms-story-text">
+                <p className="ms-prose ms-prose--lead">Tutto, in fondo, è cominciato da qui.</p>
+                <p className="ms-prose">
+                  Nel 2018 — avevo dodici anni — ho seguito un <strong>corso di restauro</strong> al
+                  Seminario di Mantova (oggi <strong>Unicollege Mantova</strong>), tra le iniziative per i
+                  giovani di <strong>Santagnese10 Officina Creativa</strong>, l'hub del centro storico che
+                  ospita il primo coworking della città.
+                </p>
+                <p className="ms-prose mb-0">
+                  Con i guanti da lavoro ho ripulito e rimesso in sesto vecchi muri di mattoni e ciottoli:
+                  è stata la prima volta che mettevo le mani su un <strong>edificio storico</strong> — e mi
+                  è rimasta dentro. Di lì a poco avrei scelto il CAT.
+                </p>
+              </div>
+            </div>
+            <div className="ms-friends-grid mt-4">
+              <Shot src="/images/me-stesso/restauro-2.jpg" alt="Il gruppo di ragazzi al corso di restauro" icon={<Users size={48} strokeWidth={1.5} />} />
+              <Shot src="/images/me-stesso/restauro-3.jpg" alt="L'edificio storico in mattoni e ciottoli su cui abbiamo lavorato" icon={<BrickWall size={48} strokeWidth={1.5} />} />
+            </div>
+          </div>
+        </section>
+
+        {/* ⑥ Le mie passioni */}
         <section className="py-5 my-lg-4 bg-white">
           <div className="container">
             <div className="mb-5">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">04 — Le mie passioni</p>
+              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">05 — Le mie passioni</p>
               <h2 className="display-5 fw-bold mb-0">Ciò che mi muove</h2>
             </div>
 
@@ -561,7 +595,7 @@ export default function MeStesso() {
           <div className="container">
             <div className="ms-future-grid">
               <div>
-                <p className="ap-kicker text-uppercase fw-semibold mb-3 ms-future-kicker">05 — Il mio domani</p>
+                <p className="ap-kicker text-uppercase fw-semibold mb-3 ms-future-kicker">06 — Il mio domani</p>
                 <h2 className="display-5 fw-bold mb-3 text-white">Il mio futuro</h2>
                 <p className="ms-future-hl">
                   Dopo la maturità voglio continuare a crescere come <strong>designer e sviluppatore front-end.</strong>

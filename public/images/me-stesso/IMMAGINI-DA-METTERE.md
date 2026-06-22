@@ -19,13 +19,16 @@ nulla, ma con le foto vere diventa molto più bella.
 | 7 | `dublino.jpg` | Passioni · Viaggi | **Dublino** (vacanza studio): un tuo scatto in città, la scuola, un monumento irlandese. |
 | 8 | `parigi.jpg` | Passioni · Viaggi | **Parigi / Le Havre / Normandia** con gli amici: Tour Eiffel, Étretat, un panorama del viaggio. |
 | 9 | `viaggio-gruppo.jpg` | Passioni · Viaggi | Il **gruppo di amici in viaggio** insieme (foto di gruppo, stazione, aeroporto…). |
-| 10 | `tiro.jpg` | Passioni · Sport | **Tiro a volo** al poligono «Al Perrosso» di Castel Goffredo: tu in pedana, il fucile, i piattelli. |
+
 | 11 | `moto.jpg` | Passioni · Moto | La tua **Ducati Scrambler 125** (2023): la moto ferma o tu in sella. |
 | 12 | `festa-cascina.jpg` | Passioni · Stare con gli altri | Una **piccola festa in cascina** organizzata da te: tavolata, amici, atmosfera tranquilla. |
 | 13 | `grest.jpg` | Passioni · Stare con gli altri | Tu **animatore al Grest** (o al CRED) con i bambini, durante un'attività. |
-| 14 | `cucina.jpg` | Passioni · Buona tavola | Uno dei tuoi **piatti preferiti** (cacio e pepe, spaghetti alle vongole, pizza 4 formaggi) o un tagliere di formaggi. |
+
 | 15 | `futuro.jpg` | Il mio domani | Immagine "**idee da costruire**": laptop con codice/design, una scrivania di lavoro, mockup di un sito. |
 | 16 | `grazie.jpg` | Banner finale | Foto d'**atmosfera in orizzontale larga** (paesaggio, tu di spalle, una bella vista): farà da sfondo scuro con la scritta "Grazie". |
+| 17 | `restauro-1.jpg` | Il restauro (2018) | Tu **al lavoro sui vecchi muri** durante il corso di restauro (guanti, secchio, mattoni). Foto principale: scegli quella in cui si vede meglio l'azione. |
+| 18 | `restauro-2.jpg` | Il restauro (2018) | Il **gruppo di ragazzi** al corso, nel cortile/campetto. _(quella che mi hai mandato è ruotata: la raddrizzo io)_ |
+| 19 | `restauro-3.jpg` | Il restauro (2018) | L'**edificio storico** in mattoni e ciottoli su cui avete lavorato. _(ruotata: la raddrizzo io)_ |
 
 > Suggerimento: se non hai una foto per qualche voce, lascia pure il placeholder — il design
 > regge benissimo anche con metà delle immagini.
