@@ -34,11 +34,12 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 // «Me stesso» — Presentazione personale di Alberto Pecchini (Esame di Stato 2026).
 //
-// Impaginazione in stile /pcto col design system neroverde: hero copertina,
-// chi sono, radici (l'azienda di famiglia), percorso CAT, le passioni (web,
-// viaggi + Paesi visitati con bandiere SVG, tiro, moto, stare con gli altri,
-// buona tavola) e il futuro. Le foto vivono in /images/me-stesso/: se mancano,
-// ogni cornice mostra un placeholder coerente con la palette.
+// Impaginazione col look "dark premium" del gioco Trivia — accento VIOLA al
+// 100% su fondo scuro e superfici "vetro": hero copertina, chi sono, radici
+// (l'azienda di famiglia), percorso CAT, le passioni (web, viaggi + Paesi
+// visitati con bandiere SVG, tiro, moto, stare con gli altri, buona tavola) e
+// il futuro. Le foto vivono in /images/me-stesso/: se mancano, ogni cornice
+// mostra un placeholder coerente con la palette.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Età calcolata dal giorno di nascita: niente numero che invecchia da solo.
@@ -52,19 +53,25 @@ function ageFromISO(iso: string): number {
 }
 
 // Cornice foto con fallback elegante: se l'immagine manca, mostra un
-// placeholder neroverde con icona, senza spezzare il layout.
+// placeholder dark-premium con icona, senza spezzare il layout.
+//
+// Inquadramento: la prop `focus` imposta l'object-position dell'immagine
+// (es. "50% 30%") per scegliere quale parte resta in cornice quando la foto
+// viene ritagliata in cover — così i volti non vengono mai tagliati a metà.
 function Shot({
   src,
   alt,
   caption,
   icon,
   portrait = false,
+  focus,
 }: {
   src: string;
   alt: string;
   caption?: string;
   icon: React.ReactNode;
   portrait?: boolean;
+  focus?: string;
 }) {
   const [failed, setFailed] = useState(false);
   return (
@@ -74,7 +81,13 @@ function Shot({
           <span className="ms-shot-ph-ic" aria-hidden="true">{icon}</span>
         </div>
       ) : (
-        <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} />
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          style={focus ? { objectPosition: focus } : undefined}
+        />
       )}
       {caption && <figcaption>{caption}</figcaption>}
     </figure>
@@ -155,7 +168,7 @@ const FACTS = [
 ];
 
 const RUOLI = [
-  { Icon: Tractor, label: "Trattori & cascina", note: "guida e lavori nei campi" },
+  { Icon: Tractor, label: "Macchine operatrici", note: "guida e lavori in cascina" },
   { Icon: Trees, label: "Parchi & giardini", note: "cura del verde delle proprietà" },
   { Icon: Waves, label: "Piscine & arredi esterni", note: "manutenzione con mio padre" },
   { Icon: MonitorSmartphone, label: "Tutto il digitale", note: "ordini, preventivi, usato online" },
@@ -237,6 +250,7 @@ export default function MeStesso() {
                   alt="Ritratto di Alberto Pecchini"
                   icon={<GraduationCap size={64} strokeWidth={1.5} />}
                   portrait
+                  focus="50% 30%"
                 />
               </div>
             </div>
@@ -291,8 +305,9 @@ export default function MeStesso() {
                 </p>
                 <p className="ms-prose">
                   Con mio padre mi occupo della manutenzione di <strong>parchi e arredi esterni</strong> —
-                  le piscine, il verde, gli spazi delle proprietà — e guido i <strong>trattori</strong>
-                  della cascina. Un lavoro concreto, fatto di mani, stagioni e attenzione ai dettagli.
+                  le piscine, il verde, gli spazi delle proprietà — e guido le <strong>macchine
+                  operatrici</strong> della cascina. Un lavoro concreto, fatto di mani, stagioni e
+                  attenzione ai dettagli.
                 </p>
                 <p className="ms-prose">
                   In azienda ho preso in carico tutto il <strong>lato digitale</strong>: gli ordini online,
@@ -330,7 +345,7 @@ export default function MeStesso() {
 
             {/* Galleria del lavoro */}
             <div className="ms-gallery3">
-              <Shot src="/images/me-stesso/trattore.jpg" alt="Alla guida del trattore della cascina" caption="Sul trattore" icon={<Tractor size={48} strokeWidth={1.5} />} />
+              <Shot src="/images/me-stesso/trattore.jpg" alt="Il Landini L25 Testacalda del 1957, la macchina operatrice storica di famiglia" caption="Landini L25 Testacalda · 1957" icon={<Tractor size={48} strokeWidth={1.5} />} />
               <Shot src="/images/me-stesso/manutenzione.jpg" alt="Manutenzione del verde e degli arredi esterni" caption="Manutenzione esterni" icon={<Trees size={48} strokeWidth={1.5} />} />
               <Shot src="/images/me-stesso/azienda-digitale.jpg" alt="Il lato digitale: preventivi e foto satellitari" caption="Il digitale dell'azienda" icon={<MonitorSmartphone size={48} strokeWidth={1.5} />} />
             </div>
@@ -472,7 +487,7 @@ export default function MeStesso() {
             {/* Lo sport: il tiro */}
             <div className="ms-story-row mb-4">
               <div className="ms-story-art">
-                <Shot src="/images/me-stesso/tiro.jpg" alt="Al poligono di tiro insieme a mio padre" caption="Con mio papà, al poligono" icon={<Crosshair size={56} strokeWidth={1.5} />} portrait />
+                <Shot src="/images/me-stesso/tiro.jpg" alt="Al poligono di tiro insieme a mio padre" caption="Con mio papà, al poligono" icon={<Crosshair size={56} strokeWidth={1.5} />} portrait focus="50% 30%" />
               </div>
               <div className="ms-story-text">
                 <h3 className="h3 fw-bold mb-3">Lo sport che mi rappresenta: il tiro</h3>
@@ -655,37 +670,79 @@ export default function MeStesso() {
       </footer>
 
       <style>{`
-        /* Palette neroverde — coerente con la home e con /pcto. */
+        /* ─────────────────────────────────────────────────────────────────────
+           Look "dark premium" · accento VIOLA al 100% (lo stesso del gioco
+           Trivia, vedi src/app/_game/ui/tokens.ts). Sfondo scuro profondo,
+           superfici "vetro" e neon viola: niente più neroverde.
+           ───────────────────────────────────────────────────────────────────── */
         .ms-page {
-          --bs-primary: #2F7D4A;
-          --bs-primary-rgb: 47, 125, 74;
+          --accent: #8b7bff;          /* viola neon (accento Trivia) */
+          --accent-2: #7c6cff;
+          --accent-3: #9d8fff;
+          --accent-deep: #5b4bd6;
+          --ink: #c4a5ff;             /* viola chiaro: kicker, icone, dettagli */
+          --glow: rgba(139, 123, 255, 0.45);
+          --text: #e8eef4;
+          --sub: #a7b2bd;
+          --surface: rgba(255, 255, 255, 0.05);
+          --surface-bd: rgba(255, 255, 255, 0.10);
+          --vio-soft: rgba(139, 123, 255, 0.10);
+          --vio-bd: rgba(139, 123, 255, 0.28);
+          --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
           min-height: 100vh;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
-          background-color: #ffffff;
+          color: var(--text);
+          background:
+            radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
         }
-        .ms-page .text-primary { color: #1F6B3D !important; }
+        /* Override delle utility Bootstrap dentro il tema scuro */
+        .ms-page .ap-kicker.text-primary { color: var(--ink) !important; }
+        .ms-page .bg-white { background: transparent !important; }
+        .ms-page .bg-light { background: rgba(255, 255, 255, 0.022) !important; }
+        .ms-page .display-5, .ms-page .h3 { color: var(--text); }
+        .ms-page .btn-outline-light { border-color: rgba(255, 255, 255, 0.4); color: #ffffff; }
         .ms-page .btn-outline-light:hover,
-        .ms-page .btn-outline-light:focus { color: #1F6B3D !important; }
+        .ms-page .btn-outline-light:focus {
+          background-color: var(--accent); border-color: var(--accent); color: #0a0d11 !important;
+        }
         .ap-kicker { letter-spacing: 0.18em; font-size: 0.875rem; }
 
-        /* Header */
-        .ms-header { background-color: #103820; position: sticky; top: 0; z-index: 10; }
+        /* Header — vetro scuro con filo viola */
+        .ms-header {
+          background: rgba(10, 13, 17, 0.82); position: sticky; top: 0; z-index: 10;
+          backdrop-filter: blur(14px) saturate(120%);
+          -webkit-backdrop-filter: blur(14px) saturate(120%);
+          border-bottom: 1px solid var(--surface-bd);
+        }
         .ms-brand-mark {
           display: inline-flex; align-items: center; justify-content: center;
           width: 40px; height: 40px; border-radius: 8px; overflow: hidden; margin-right: 12px;
+          background: var(--vio-soft); border: 1px solid var(--vio-bd);
         }
         .ms-brand-mark img { width: 100%; height: 100%; display: block; }
         .ms-brand-text { display: inline-flex; flex-direction: column; line-height: 1.2; }
         .ms-brand-title { color: #ffffff; font-weight: 700; font-size: 1.05rem; }
-        .ms-brand-tagline { color: rgba(255, 255, 255, 0.7); font-size: 0.78rem; }
+        .ms-brand-tagline { color: var(--sub); font-size: 0.78rem; }
         @media (max-width: 575.98px) { .ms-brand-tagline { display: none; } }
 
-        /* Hero copertina */
+        /* Hero copertina — pannello scuro con aloni viola */
         .ms-hero {
+          position: relative; overflow: hidden;
           padding: clamp(3rem, 7vw, 5.5rem) 0;
           color: #ffffff;
-          background-image: linear-gradient(135deg, #103820 0%, #1F6B3D 58%, #2F7D4A 100%);
+          background:
+            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
+            var(--panel);
+          border-bottom: 1px solid var(--surface-bd);
         }
+        .ms-hero::before, .ms-hero::after {
+          content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
+          filter: blur(60px); opacity: 0.45; pointer-events: none; z-index: 0;
+        }
+        .ms-hero::before { background: #8b7bff; top: -30%; right: -10%; }
+        .ms-hero::after  { background: #5b4bd6; bottom: -35%; left: -12%; opacity: 0.35; }
+        .ms-hero .container { position: relative; z-index: 1; }
         .ms-hero-grid {
           display: grid;
           grid-template-columns: 1.15fr 0.85fr;
@@ -695,56 +752,57 @@ export default function MeStesso() {
         .ms-hero-badge {
           display: inline-flex; align-items: center; justify-content: center;
           width: 84px; height: 84px; border-radius: 20px;
-          background: rgba(255, 255, 255, 0.14);
-          border: 1px solid rgba(255, 255, 255, 0.32);
+          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
+          border: 1px solid rgba(255, 255, 255, 0.28);
           color: #ffffff; margin-bottom: 1.5rem;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 14px 40px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
         .ms-hero-title {
           font-size: clamp(2.75rem, 7vw, 5rem);
-          line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1.1rem;
+          line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1.1rem; color: #ffffff;
         }
         .ms-hero-rule {
           display: block; width: 64px; height: 4px; border-radius: 2px;
-          background: rgba(255, 255, 255, 0.6); margin-bottom: 1.1rem;
+          background: var(--accent); box-shadow: 0 0 18px var(--glow); margin-bottom: 1.1rem;
         }
         .ms-hero-lead {
           font-size: clamp(1.25rem, 2.6vw, 1.7rem);
           font-style: italic; font-weight: 600; color: #ffffff; margin-bottom: 0.85rem;
         }
-        .ms-hero-school { color: rgba(255, 255, 255, 0.82); font-size: 1.02rem; }
+        .ms-hero-school { color: rgba(255, 255, 255, 0.78); font-size: 1.02rem; }
         @media (max-width: 767.98px) {
           .ms-hero-grid { grid-template-columns: 1fr; }
           .ms-hero-badge { width: 68px; height: 68px; border-radius: 16px; margin-bottom: 1.1rem; }
           .ms-hero-badge svg { width: 36px; height: 36px; }
         }
 
-        /* Cornici foto + placeholder */
+        /* Cornici foto + placeholder (dark premium) */
         .ms-shot {
           position: relative; margin: 0;
           border-radius: 18px; overflow: hidden;
           aspect-ratio: 3 / 2;
-          border: 1px solid rgba(47, 125, 74, 0.22);
-          box-shadow: 0 12px 32px rgba(16, 56, 32, 0.12);
-          background: #f0f4f1;
+          border: 1px solid var(--surface-bd);
+          box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+          background: rgba(255, 255, 255, 0.04);
         }
         .ms-shot--portrait { aspect-ratio: 4 / 5; }
-        .ms-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* object-position default 50% 50%, sovrascrivibile via prop focus (inquadramento) */
+        .ms-shot img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; }
         .ms-shot-ph {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
           background-image:
-            radial-gradient(120% 120% at 30% 20%, rgba(47,125,74,0.18), rgba(16,56,32,0.06)),
-            linear-gradient(135deg, #eef3ef 0%, #e2ece5 100%);
+            radial-gradient(120% 120% at 30% 20%, rgba(139, 123, 255, 0.22), rgba(10, 12, 16, 0.2)),
+            linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
         }
-        .ms-shot-ph-ic { color: rgba(31, 107, 61, 0.55); }
+        .ms-shot-ph-ic { color: rgba(196, 165, 255, 0.6); }
         .ms-shot figcaption {
           position: absolute; left: 0; right: 0; bottom: 0;
           padding: 1.8rem 0.95rem 0.7rem;
           font-size: 0.85rem; font-weight: 700; font-style: italic; color: #ffffff;
-          background: linear-gradient(to top, rgba(16, 56, 32, 0.9), rgba(16, 56, 32, 0));
+          background: linear-gradient(to top, rgba(7, 9, 16, 0.92), rgba(7, 9, 16, 0));
         }
-        .ms-hero-aside .ms-shot { box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28); }
+        .ms-hero-aside .ms-shot { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); border-color: var(--vio-bd); }
 
         /* Chi sono */
         .ms-about {
@@ -760,19 +818,19 @@ export default function MeStesso() {
           align-items: center;
           column-gap: 1rem;
           padding: 1rem 1.25rem;
-          background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18);
+          background: var(--surface);
+          border: 1px solid var(--surface-bd);
           border-radius: 14px;
-          box-shadow: 0 6px 18px rgba(16, 56, 32, 0.05);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         }
         .ms-fact-icon {
           grid-row: 1 / 3;
           display: inline-flex; align-items: center; justify-content: center;
           width: 56px; height: 56px; border-radius: 14px;
-          background: rgba(47, 125, 74, 0.10); color: #1F6B3D;
+          background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd);
         }
-        .ms-fact-value { font-size: 1.3rem; font-weight: 800; color: #103820; line-height: 1.1; }
-        .ms-fact-label { font-size: 0.9rem; color: #5a6f63; }
+        .ms-fact-value { font-size: 1.3rem; font-weight: 800; color: #ffffff; line-height: 1.1; }
+        .ms-fact-label { font-size: 0.9rem; color: var(--sub); }
         @media (max-width: 767.98px) { .ms-about { grid-template-columns: 1fr; } }
 
         /* Righe narrate */
@@ -782,9 +840,9 @@ export default function MeStesso() {
           gap: clamp(1.5rem, 4vw, 3rem);
           align-items: center;
         }
-        .ms-prose { font-size: 1.08rem; line-height: 1.75; color: #4a5d51; }
-        .ms-prose strong { color: #103820; }
-        .ms-prose--lead { font-size: 1.2rem; font-weight: 700; color: #103820; }
+        .ms-prose { font-size: 1.08rem; line-height: 1.75; color: var(--sub); }
+        .ms-prose strong { color: #ffffff; }
+        .ms-prose--lead { font-size: 1.2rem; font-weight: 700; color: #ffffff; }
         @media (max-width: 767.98px) {
           .ms-story-row { grid-template-columns: 1fr; }
           .ms-story-row .ms-story-art { order: -1; }
@@ -794,48 +852,53 @@ export default function MeStesso() {
         .ms-company {
           display: inline-flex; align-items: center; gap: 0.9rem;
           margin-top: 1.5rem; padding: 0.85rem 1.25rem;
-          background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.20);
-          border-left: 4px solid #2F7D4A;
+          background: var(--surface);
+          border: 1px solid var(--surface-bd);
+          border-left: 4px solid var(--accent);
           border-radius: 12px;
         }
         .ms-company-ic {
           display: inline-flex; align-items: center; justify-content: center;
           width: 46px; height: 46px; border-radius: 50%;
-          background: rgba(47, 125, 74, 0.12); color: #1F6B3D;
+          background: var(--vio-soft); color: var(--ink);
         }
         .ms-company-text { display: inline-flex; flex-direction: column; line-height: 1.25; }
-        .ms-company-name { font-weight: 800; color: #103820; font-size: 1.1rem; }
-        .ms-company-sub { font-size: 0.85rem; color: #6b8275; }
+        .ms-company-name { font-weight: 800; color: #ffffff; font-size: 1.1rem; }
+        .ms-company-sub { font-size: 0.85rem; color: var(--sub); }
 
         /* Ruoli in azienda */
         .ms-roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2.25rem; }
         .ms-role {
           display: flex; flex-direction: column; gap: 0.2rem;
-          padding: 1.1rem 1.2rem; background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18); border-radius: 14px;
+          padding: 1.1rem 1.2rem; background: var(--surface);
+          border: 1px solid var(--surface-bd); border-radius: 14px;
+          transition: transform .15s, border-color .15s, box-shadow .15s;
         }
+        .ms-role:hover { transform: translateY(-3px); border-color: var(--vio-bd); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45); }
         .ms-role-ic {
           display: inline-flex; align-items: center; justify-content: center;
           width: 44px; height: 44px; border-radius: 12px;
-          background: rgba(47, 125, 74, 0.10); color: #1F6B3D; margin-bottom: 0.4rem;
+          background: var(--vio-soft); color: var(--ink); margin-bottom: 0.4rem;
         }
-        .ms-role-label { font-weight: 800; color: #103820; }
-        .ms-role-note { font-size: 0.82rem; color: #6b8275; }
+        .ms-role-label { font-weight: 800; color: #ffffff; }
+        .ms-role-note { font-size: 0.82rem; color: var(--sub); }
         @media (max-width: 767.98px) { .ms-roles { grid-template-columns: repeat(2, 1fr); } }
 
         /* Galleria 3 foto */
         .ms-gallery3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
         @media (max-width: 767.98px) { .ms-gallery3 { grid-template-columns: 1fr; } }
 
-        /* Banda scura — Il mio percorso */
+        /* Banda — Il mio percorso */
         .ms-band {
           padding: clamp(3rem, 7vw, 5rem) 0;
-          background-image: linear-gradient(160deg, #0c2c19 0%, #103820 60%, #16482a 100%);
+          background:
+            radial-gradient(100% 130% at 100% 0%, rgba(139, 123, 255, 0.18) 0%, transparent 55%),
+            linear-gradient(160deg, #120c20 0%, #0b0f14 60%, #15101f 100%);
+          border-top: 1px solid var(--surface-bd); border-bottom: 1px solid var(--surface-bd);
         }
-        .ms-band-kicker { color: #7FC09A; letter-spacing: 0.18em; }
+        .ms-band-kicker { color: var(--ink); letter-spacing: 0.18em; }
         .ms-band-lead {
-          color: rgba(255, 255, 255, 0.86);
+          color: rgba(255, 255, 255, 0.82);
           font-size: 1.15rem; line-height: 1.7; max-width: 52rem; margin-bottom: 2.5rem;
         }
         .ms-band-lead strong { color: #ffffff; }
@@ -843,41 +906,41 @@ export default function MeStesso() {
         .ms-percorso-card {
           padding: 1.75rem 1.5rem;
           background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.14);
+          border: 1px solid var(--surface-bd);
           border-radius: 16px;
         }
         .ms-percorso-ic {
           display: inline-flex; align-items: center; justify-content: center;
           width: 54px; height: 54px; border-radius: 14px;
-          background: rgba(127, 192, 154, 0.16); color: #9BD3B2; margin-bottom: 1rem;
+          background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd); margin-bottom: 1rem;
         }
         .ms-percorso-title { color: #ffffff; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
-        .ms-percorso-desc { color: rgba(255, 255, 255, 0.78); font-size: 0.98rem; line-height: 1.6; }
+        .ms-percorso-desc { color: rgba(255, 255, 255, 0.72); font-size: 0.98rem; line-height: 1.6; }
         @media (max-width: 767.98px) { .ms-percorso { grid-template-columns: 1fr; } }
 
         /* Titolo di blocco (passioni) */
         .ms-block-title {
           display: flex; align-items: center; flex-wrap: wrap;
-          font-weight: 800; color: #103820; font-size: 1.1rem; margin-bottom: 1.1rem;
+          font-weight: 800; color: #ffffff; font-size: 1.1rem; margin-bottom: 1.1rem;
         }
-        .ms-block-note { font-weight: 600; color: #6b8275; font-size: 0.95rem; }
+        .ms-block-note { font-weight: 600; color: var(--sub); font-size: 0.95rem; }
 
         /* Callout (Dublino) */
         .ms-callout {
           display: flex; gap: 1rem; align-items: flex-start;
           margin-top: 1.5rem; padding: 1.1rem 1.35rem;
-          background: rgba(47, 125, 74, 0.07);
-          border: 1px solid rgba(47, 125, 74, 0.20);
-          border-left: 4px solid #2F7D4A; border-radius: 14px;
+          background: var(--vio-soft);
+          border: 1px solid var(--vio-bd);
+          border-left: 4px solid var(--accent); border-radius: 14px;
         }
         .ms-callout-ic {
           flex-shrink: 0;
           display: inline-flex; align-items: center; justify-content: center;
           width: 44px; height: 44px; border-radius: 50%;
-          background: rgba(47, 125, 74, 0.12); color: #1F6B3D;
+          background: var(--vio-soft); color: var(--ink);
         }
-        .ms-callout p { font-size: 1rem; line-height: 1.65; color: #4a5d51; }
-        .ms-callout strong { color: #103820; }
+        .ms-callout p { font-size: 1rem; line-height: 1.65; color: var(--sub); }
+        .ms-callout strong { color: #ffffff; }
 
         /* Bandiere paesi visitati */
         .ms-flags { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.85rem; }
@@ -885,11 +948,11 @@ export default function MeStesso() {
         .ms-flag-svg-wrap {
           width: 100%; aspect-ratio: 3 / 2;
           border-radius: 8px; overflow: hidden;
-          border: 1px solid rgba(16, 56, 32, 0.14);
-          box-shadow: 0 4px 12px rgba(16, 56, 32, 0.10);
+          border: 1px solid var(--surface-bd);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
         .ms-flag-svg { width: 100%; height: 100%; display: block; }
-        .ms-flag-name { font-size: 0.8rem; font-weight: 700; color: #103820; text-align: center; }
+        .ms-flag-name { font-size: 0.8rem; font-weight: 700; color: var(--text); text-align: center; }
         @media (max-width: 767.98px) { .ms-flags { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 430px) { .ms-flags { grid-template-columns: repeat(3, 1fr); } }
 
@@ -898,20 +961,20 @@ export default function MeStesso() {
         .ms-chip {
           display: inline-flex; align-items: center; gap: 0.4rem;
           padding: 0.45rem 0.9rem; border-radius: 999px;
-          background: rgba(47, 125, 74, 0.10);
-          border: 1px solid rgba(47, 125, 74, 0.24);
-          font-weight: 700; font-size: 0.9rem; color: #1F6B3D;
+          background: var(--vio-soft);
+          border: 1px solid var(--vio-bd);
+          font-weight: 700; font-size: 0.9rem; color: var(--ink);
         }
 
         /* Mini-storico sportivo */
         .ms-track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
         .ms-track-item {
-          padding: 1rem 1.1rem; background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18); border-radius: 12px;
+          padding: 1rem 1.1rem; background: var(--surface);
+          border: 1px solid var(--surface-bd); border-radius: 12px;
         }
-        .ms-track-year { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #1F6B3D; }
-        .ms-track-label { display: block; margin-top: 0.15rem; font-weight: 800; color: #103820; }
-        .ms-track-note { font-size: 0.82rem; color: #6b8275; }
+        .ms-track-year { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+        .ms-track-label { display: block; margin-top: 0.15rem; font-weight: 800; color: #ffffff; }
+        .ms-track-note { font-size: 0.82rem; color: var(--sub); }
         @media (max-width: 575.98px) { .ms-track { grid-template-columns: repeat(2, 1fr); } }
 
         /* Stare con gli altri */
@@ -920,7 +983,7 @@ export default function MeStesso() {
           flex-shrink: 0;
           display: inline-flex; align-items: center; justify-content: center;
           width: 52px; height: 52px; border-radius: 14px;
-          background: rgba(47, 125, 74, 0.10); color: #1F6B3D;
+          background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd);
         }
         .ms-friends-copy { max-width: 62rem; margin-bottom: 1.5rem; }
         .ms-friends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
@@ -929,43 +992,47 @@ export default function MeStesso() {
         /* Buona tavola */
         .ms-taste { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
         .ms-taste-card {
-          padding: 1.25rem 1.35rem; background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18); border-radius: 14px;
+          padding: 1.25rem 1.35rem; background: var(--surface);
+          border: 1px solid var(--surface-bd); border-radius: 14px;
         }
-        .ms-taste-title { font-size: 0.95rem; font-weight: 800; color: #1F6B3D; margin-bottom: 0.5rem; }
+        .ms-taste-title { font-size: 0.95rem; font-weight: 800; color: var(--ink); margin-bottom: 0.5rem; }
         .ms-taste-list { list-style: none; padding: 0; margin: 0; }
         .ms-taste-list li {
           display: flex; align-items: center; gap: 0.55rem;
-          padding: 0.45rem 0; color: #4a5d51; font-weight: 600; font-size: 0.98rem;
-          border-bottom: 1px dashed rgba(47, 125, 74, 0.16);
+          padding: 0.45rem 0; color: var(--sub); font-weight: 600; font-size: 0.98rem;
+          border-bottom: 1px dashed var(--surface-bd);
         }
         .ms-taste-list li:last-child { border-bottom: none; }
         .ms-taste-list li::before {
           content: ""; flex-shrink: 0;
-          width: 7px; height: 7px; border-radius: 50%; background: #2F7D4A;
+          width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--glow);
         }
 
-        /* Il mio domani */
+        /* Il mio domani — banda viola profondo */
         .ms-future {
+          position: relative; overflow: hidden;
           padding: clamp(3rem, 7vw, 5rem) 0;
           color: #ffffff;
-          background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 60%, #3F8F5A 100%);
+          background:
+            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.25) 0%, transparent 55%),
+            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
+          border-top: 1px solid var(--surface-bd);
         }
         .ms-future-grid {
           display: grid; grid-template-columns: 1.05fr 0.95fr;
           gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center;
         }
-        .ms-future-kicker { color: rgba(255, 255, 255, 0.92); letter-spacing: 0.18em; }
-        .ms-future-hl { font-size: 1.4rem; line-height: 1.5; margin-bottom: 1.1rem; }
+        .ms-future-kicker { color: var(--ink); letter-spacing: 0.18em; }
+        .ms-future-hl { font-size: 1.4rem; line-height: 1.5; margin-bottom: 1.1rem; color: rgba(255, 255, 255, 0.92); }
         .ms-future-hl strong { color: #ffffff; }
-        .ms-future-copy { color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; }
+        .ms-future-copy { color: rgba(255, 255, 255, 0.85); font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; }
         .ms-future-copy strong { color: #ffffff; }
         .ms-future-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
         .ms-future-chip {
           display: inline-flex; align-items: center; gap: 0.4rem;
           padding: 0.45rem 0.9rem; border-radius: 999px;
-          background: rgba(255, 255, 255, 0.16);
-          border: 1px solid rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.28);
           font-weight: 700; font-size: 0.9rem; color: #ffffff;
         }
         @media (max-width: 767.98px) { .ms-future-grid { grid-template-columns: 1fr; } }
@@ -973,20 +1040,22 @@ export default function MeStesso() {
         /* Grazie — banner */
         .ms-thanks {
           position: relative; width: 100%; overflow: hidden;
-          background-image: linear-gradient(135deg, #103820 0%, #1F6B3D 100%);
+          background-image: linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
           min-height: clamp(20rem, 42vw, 34rem);
           display: flex; align-items: center;
         }
+        /* Inquadramento: l'immagine è ancorata in alto (50% 22%) così i volti
+           del soggetto restano in cornice e non viene tagliata a mezzo busto. */
         .ms-thanks img {
           position: absolute; inset: 0; z-index: 0;
-          width: 100%; height: 100%; object-fit: cover;
+          width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%;
         }
         .ms-thanks-scrim {
           position: absolute; inset: 0; z-index: 1;
-          background-image: linear-gradient(120deg, rgba(8, 28, 16, 0.86) 0%, rgba(8, 28, 16, 0.5) 50%, rgba(8, 28, 16, 0.2) 100%);
+          background-image: linear-gradient(120deg, rgba(7, 9, 16, 0.92) 0%, rgba(7, 9, 16, 0.6) 50%, rgba(20, 16, 40, 0.35) 100%);
         }
         .ms-thanks-overlay { position: relative; z-index: 2; width: 100%; }
-        .ms-thanks-quote { color: rgba(255, 255, 255, 0.55); margin-bottom: 0.75rem; }
+        .ms-thanks-quote { color: var(--ink); opacity: 0.8; margin-bottom: 0.75rem; }
         .ms-thanks-title {
           color: #ffffff; font-weight: 800; line-height: 1.02;
           font-size: clamp(3rem, 9vw, 6rem); letter-spacing: -0.02em; margin-bottom: 0.75rem;
@@ -998,7 +1067,7 @@ export default function MeStesso() {
         }
 
         /* Footer */
-        .ms-footer { background-color: #103820; color: #ffffff; }
+        .ms-footer { background-color: #090c10; color: #ffffff; border-top: 1px solid var(--surface-bd); }
       `}</style>
     </div>
   );
