@@ -523,12 +523,19 @@ export default function MeStesso() {
             {/* Buona tavola */}
             <div className="ms-story-row">
               <div className="ms-story-art">
-                <Shot src="/images/me-stesso/cucina.jpg" alt="Uno dei miei piatti preferiti" caption="A tavola" icon={<UtensilsCrossed size={56} strokeWidth={1.5} />} />
+                <Shot src="/images/me-stesso/cucina.jpg" alt="Panino sardo con crudo di Villagrande, pecorino sardo, pomodorini e rucola" caption="Sardegna: crudo di Villagrande e pecorino" icon={<UtensilsCrossed size={56} strokeWidth={1.5} />} portrait />
               </div>
               <div className="ms-story-text">
                 <h3 className="h3 fw-bold mb-3">Buona tavola</h3>
                 <p className="ms-prose ms-prose--lead">
-                  Sono un tipo a cui piace mangiar bene.
+                  Sono un tipo a cui piace mangiar bene — e un buon panino, fatto con prodotti veri, per
+                  me vale quanto un piatto.
+                </p>
+                <p className="ms-prose">
+                  Come questo, gustato in Sardegna: <strong>pane di semola morbido</strong> (un
+                  moddizzosu, il cugino soffice del carasau), <strong>prosciutto crudo di Villagrande</strong>,
+                  <strong> pecorino sardo stagionato</strong>, pomodorini, rucola e un filo d'<strong>olio
+                  extravergine DOP di Sardegna</strong>.
                 </p>
                 <div className="ms-taste">
                   <div className="ms-taste-card">
