@@ -489,31 +489,72 @@ export default function Pcto() {
       </footer>
 
       <style>{`
-        /* Palette neroverde — coerente con la home (override Bootstrap Italia). */
+        /* ── Look "dark premium" viola — identico al gioco Trivia ─────────────
+           Sfondo scuro, superfici "vetro" e accento viola/indaco neon (#8b7bff).
+           Stesse token del motore giochi (src/app/_game/ui/tokens.ts). */
         .pcto-page {
-          --bs-primary: #2F7D4A;
-          --bs-primary-rgb: 47, 125, 74;
+          --accent: #8b7bff;        /* viola/indaco neon */
+          --accent-2: #6d4dff;      /* viola pieno */
+          --accent-3: #9d8fff;      /* viola chiaro */
+          --accent-deep: #5b4bd6;   /* viola profondo */
+          --accent-ink: #c4a5ff;    /* viola tenue su scuro */
+          --glow: rgba(139, 123, 255, 0.45);
+          --vbord: rgba(139, 123, 255, 0.34);
+          --bg0: #0a0d11;
+          --bg1: #0b0f14;
+          --bg2: #090c10;
+          --text: #e8eef4;
+          --sub: #a7b2bd;
+          --note: #6b7785;
+          --glass: rgba(255, 255, 255, 0.05);
+          --glass-2: rgba(255, 255, 255, 0.08);
+          --glass-bd: rgba(255, 255, 255, 0.11);
+          --bs-primary: #8b7bff;
+          --bs-primary-rgb: 139, 123, 255;
           min-height: 100vh;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
-          background-color: #ffffff;
+          color: var(--text);
         }
-        .pcto-page .bg-primary { background-color: #2F7D4A !important; }
-        .pcto-page .text-primary { color: #1F6B3D !important; }
-        .pcto-page .btn-outline-light:hover,
-        .pcto-page .btn-outline-light:focus {
-          color: #1F6B3D !important;
+        /* Canvas scuro continuo con alone viola in alto (come la hero del Trivia).
+           Compound .it-page-wrapper.pcto-page per battere il bianco globale. */
+        .it-page-wrapper.pcto-page {
+          background:
+            radial-gradient(120% 55% at 50% -8%, rgba(139, 123, 255, 0.20) 0%, transparent 55%),
+            linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+          background-color: var(--bg0);
         }
-        .pcto-page .chip-primary,
-        .pcto-page .chip.chip-simple.chip-primary {
-          background-color: rgba(47, 125, 74, 0.12) !important;
-          color: #1F6B3D !important;
-          border-color: rgba(47, 125, 74, 0.28) !important;
+        /* Override Bootstrap Italia → dark premium (specificità (0,3,0) per vincere) */
+        .it-page-wrapper.pcto-page .bg-primary,
+        .it-page-wrapper.pcto-page .bg-white,
+        .it-page-wrapper.pcto-page .bg-light { background-color: transparent !important; }
+        .it-page-wrapper.pcto-page .text-primary { color: var(--accent) !important; }
+        .it-page-wrapper.pcto-page .text-muted { color: var(--sub) !important; }
+        .it-page-wrapper.pcto-page .text-white { color: var(--text) !important; }
+        .pcto-page strong { color: #f4f1ff; }
+        .pcto-page .btn-outline-light {
+          color: var(--text);
+          border-color: var(--glass-bd);
         }
-        .pcto-page .chip-primary .chip-label { color: #1F6B3D !important; }
+        .it-page-wrapper.pcto-page .btn-outline-light:hover,
+        .it-page-wrapper.pcto-page .btn-outline-light:focus {
+          background-color: var(--accent) !important;
+          border-color: var(--accent) !important;
+          color: #0a0d11 !important;
+        }
+        .it-page-wrapper.pcto-page .chip-primary,
+        .it-page-wrapper.pcto-page .chip.chip-simple.chip-primary {
+          background-color: rgba(139, 123, 255, 0.12) !important;
+          color: var(--accent) !important;
+          border-color: var(--vbord) !important;
+        }
+        .it-page-wrapper.pcto-page .chip-primary .chip-label { color: var(--accent) !important; }
 
-        /* Header */
+        /* Header — barra "vetro" scura, sticky */
         .pcto-header {
-          background-color: #103820;
+          background: rgba(10, 13, 17, 0.72);
+          backdrop-filter: blur(14px) saturate(120%);
+          -webkit-backdrop-filter: blur(14px) saturate(120%);
+          border-bottom: 1px solid var(--glass-bd);
           position: sticky;
           top: 0;
           z-index: 10;
@@ -534,11 +575,18 @@ export default function Pcto() {
         .pcto-brand-tagline { color: rgba(255, 255, 255, 0.7); font-size: 0.78rem; }
         @media (max-width: 575.98px) { .pcto-brand-tagline { display: none; } }
 
-        /* Hero */
+        /* Hero — canvas scuro con aloni viola (come la hero del Trivia) */
         .pcto-hero {
+          position: relative;
+          overflow: hidden;
           padding: clamp(3.5rem, 8vw, 6.5rem) 0;
-          background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 60%, #3F8F5A 100%);
+          background-image:
+            radial-gradient(80% 120% at 12% -10%, rgba(139, 123, 255, 0.30) 0%, transparent 55%),
+            radial-gradient(70% 120% at 100% 110%, rgba(109, 77, 255, 0.26) 0%, transparent 55%),
+            linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+          border-bottom: 1px solid var(--glass-bd);
         }
+        .pcto-hero > .container { position: relative; z-index: 1; }
         .pcto-hero-inner { max-width: 50rem; }
         .pcto-hero-badge {
           display: inline-flex;
@@ -547,11 +595,11 @@ export default function Pcto() {
           width: 92px;
           height: 92px;
           border-radius: 22px;
-          background: rgba(255, 255, 255, 0.14);
-          border: 1px solid rgba(255, 255, 255, 0.32);
+          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
+          border: 1px solid rgba(255, 255, 255, 0.22);
           color: #ffffff;
           margin-bottom: 1.75rem;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 12px 40px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
         .pcto-hero-title {
           font-size: clamp(3.5rem, 9vw, 5.75rem);
@@ -581,7 +629,7 @@ export default function Pcto() {
           position: absolute;
           left: 7px; top: 6px; bottom: 6px;
           width: 2px;
-          background: rgba(47, 125, 74, 0.28);
+          background: linear-gradient(180deg, var(--vbord), rgba(139, 123, 255, 0.10));
         }
         .ap-timeline-item { position: relative; padding-bottom: 2rem; }
         .ap-timeline-item:last-child { padding-bottom: 0; }
@@ -591,9 +639,9 @@ export default function Pcto() {
           left: -2rem; top: 4px;
           width: 16px; height: 16px;
           border-radius: 50%;
-          background: #2F7D4A;
-          border: 3px solid #ffffff;
-          box-shadow: 0 0 0 2px rgba(47, 125, 74, 0.28);
+          background: var(--accent);
+          border: 3px solid var(--bg0);
+          box-shadow: 0 0 0 2px var(--vbord), 0 0 14px var(--glow);
         }
         .ap-timeline-period {
           display: inline-block;
@@ -601,7 +649,7 @@ export default function Pcto() {
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: #1F6B3D;
+          color: var(--accent);
           margin-bottom: 0.25rem;
         }
 
@@ -619,10 +667,10 @@ export default function Pcto() {
           text-align: center;
           gap: 0.15rem;
           padding: 1.25rem 0.75rem;
-          background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18);
+          background: var(--glass);
+          border: 1px solid var(--glass-bd);
           border-radius: 14px;
-          box-shadow: 0 6px 18px rgba(16, 56, 32, 0.05);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.30);
         }
         .pcto-fact-icon {
           display: inline-flex;
@@ -630,13 +678,14 @@ export default function Pcto() {
           justify-content: center;
           width: 46px; height: 46px;
           border-radius: 12px;
-          background: rgba(47, 125, 74, 0.10);
-          color: #1F6B3D;
+          background: rgba(139, 123, 255, 0.14);
+          border: 1px solid var(--vbord);
+          color: var(--accent);
           margin-bottom: 0.4rem;
         }
-        .pcto-fact-value { font-size: 1.6rem; font-weight: 800; color: #103820; line-height: 1.1; }
-        .pcto-fact-label { font-size: 0.9rem; font-weight: 700; color: #1F6B3D; }
-        .pcto-fact-note { font-size: 0.78rem; color: #6b8275; }
+        .pcto-fact-value { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1.1; }
+        .pcto-fact-label { font-size: 0.9rem; font-weight: 700; color: var(--accent); }
+        .pcto-fact-note { font-size: 0.78rem; color: var(--note); }
         @media (max-width: 767.98px) {
           .pcto-facts { grid-template-columns: repeat(2, 1fr); }
           .pcto-fact:last-child { grid-column: 1 / -1; }
@@ -655,8 +704,8 @@ export default function Pcto() {
           border-radius: 14px;
           overflow: hidden;
           aspect-ratio: 3 / 2;
-          border: 1px solid rgba(47, 125, 74, 0.18);
-          box-shadow: 0 8px 22px rgba(16, 56, 32, 0.08);
+          border: 1px solid var(--glass-bd);
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.40);
         }
         .pcto-shot img {
           width: 100%; height: 100%;
@@ -669,9 +718,9 @@ export default function Pcto() {
           left: 0; right: 0; bottom: 0;
           padding: 1.6rem 0.85rem 0.6rem;
           font-size: 0.82rem; font-weight: 700; color: #ffffff;
-          background: linear-gradient(to top, rgba(16, 56, 32, 0.88), rgba(16, 56, 32, 0));
+          background: linear-gradient(to top, rgba(10, 13, 17, 0.92), rgba(10, 13, 17, 0));
         }
-        .pcto-gallery-credit { margin-top: 0.6rem; font-size: 0.76rem; color: #6b8275; }
+        .pcto-gallery-credit { margin-top: 0.6rem; font-size: 0.76rem; color: var(--note); }
         @media (max-width: 767.98px) {
           .pcto-gallery { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
         }
@@ -680,9 +729,10 @@ export default function Pcto() {
         .pcto-flow-wrap { margin-bottom: 3.5rem; }
         .pcto-flow-title {
           display: flex; align-items: center;
-          font-weight: 800; color: #103820;
+          font-weight: 800; color: var(--text);
           font-size: 1.05rem; margin-bottom: 1rem;
         }
+        .pcto-flow-title svg { color: var(--accent); }
         .pcto-flow {
           display: flex;
           align-items: stretch;
@@ -698,8 +748,8 @@ export default function Pcto() {
           text-align: center;
           gap: 0.2rem;
           padding: 1rem 0.5rem;
-          background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18);
+          background: var(--glass);
+          border: 1px solid var(--glass-bd);
           border-radius: 14px;
           height: 100%;
         }
@@ -707,13 +757,14 @@ export default function Pcto() {
           display: inline-flex; align-items: center; justify-content: center;
           width: 48px; height: 48px;
           border-radius: 50%;
-          background: rgba(47, 125, 74, 0.10);
-          color: #1F6B3D;
+          background: rgba(139, 123, 255, 0.14);
+          border: 1px solid var(--vbord);
+          color: var(--accent);
           margin-bottom: 0.35rem;
         }
-        .pcto-flow-label { font-weight: 700; color: #103820; font-size: 0.95rem; }
-        .pcto-flow-sub { font-size: 0.76rem; color: #6b8275; }
-        .pcto-flow-arrow { color: rgba(47, 125, 74, 0.55); flex-shrink: 0; margin: 0 0.1rem; }
+        .pcto-flow-label { font-weight: 700; color: var(--text); font-size: 0.95rem; }
+        .pcto-flow-sub { font-size: 0.76rem; color: var(--note); }
+        .pcto-flow-arrow { color: rgba(139, 123, 255, 0.60); flex-shrink: 0; margin: 0 0.1rem; }
         @media (max-width: 767.98px) {
           .pcto-flow { flex-direction: column; }
           .pcto-flow-step { width: 100%; flex-direction: column; }
@@ -730,10 +781,10 @@ export default function Pcto() {
         }
         .pcto-story-row--rev .pcto-story-art { order: 2; }
         .pcto-art-frame {
-          border: 1px solid rgba(47, 125, 74, 0.20);
+          border: 1px solid var(--glass-bd);
           border-radius: 18px;
           overflow: hidden;
-          box-shadow: 0 10px 30px rgba(16, 56, 32, 0.07);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.40);
         }
         .pcto-art-img {
           width: 100%;
@@ -746,8 +797,9 @@ export default function Pcto() {
           align-items: center; justify-content: center;
           width: 38px; height: 38px;
           border-radius: 50%;
-          background: rgba(47, 125, 74, 0.12);
-          color: #1F6B3D;
+          background: rgba(139, 123, 255, 0.14);
+          border: 1px solid var(--vbord);
+          color: var(--accent);
           font-size: 1.2rem; font-weight: 800;
           margin-bottom: 0.75rem;
         }
@@ -762,23 +814,23 @@ export default function Pcto() {
         .pcto-tool-card {
           display: flex; flex-direction: column;
           padding: 1.25rem;
-          background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18);
-          border-left: 4px solid #2F7D4A;
+          background: var(--glass);
+          border: 1px solid var(--glass-bd);
+          border-left: 4px solid var(--accent);
           border-radius: 12px;
         }
-        .pcto-tool-name { font-weight: 800; font-size: 1.15rem; color: #103820; }
+        .pcto-tool-name { font-weight: 800; font-size: 1.15rem; color: var(--text); }
         .pcto-tool-who {
           font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
-          font-weight: 700; color: #1F6B3D; margin-bottom: 0.5rem;
+          font-weight: 700; color: var(--accent); margin-bottom: 0.5rem;
         }
-        .pcto-tool-desc { font-size: 0.92rem; color: #5a6f63; line-height: 1.55; }
+        .pcto-tool-desc { font-size: 0.92rem; color: var(--sub); line-height: 1.55; }
 
         /* Ore in struttura */
         .pcto-hours-wrap { margin-top: 3.5rem; }
         .pcto-hours {
-          background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.18);
+          background: var(--glass);
+          border: 1px solid var(--glass-bd);
           border-radius: 14px;
           padding: 1.25rem 1.5rem;
         }
@@ -788,20 +840,24 @@ export default function Pcto() {
           align-items: center;
           gap: 1rem;
           padding: 0.6rem 0;
-          border-bottom: 1px solid rgba(47, 125, 74, 0.12);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .pcto-hours-row:last-child { border-bottom: none; }
         .pcto-hours-row--total { font-weight: 800; }
-        .pcto-hours-row--total .pcto-hours-h { color: #103820; font-size: 1.15rem; }
-        .pcto-hours-year { font-weight: 700; color: #1F6B3D; font-size: 0.9rem; }
+        .pcto-hours-row--total .pcto-hours-h { color: var(--text); font-size: 1.15rem; }
+        .pcto-hours-year { font-weight: 700; color: var(--accent); font-size: 0.9rem; }
         .pcto-hours-bar {
           height: 12px; border-radius: 6px;
-          background: rgba(47, 125, 74, 0.12);
+          background: rgba(255, 255, 255, 0.08);
           overflow: hidden;
         }
-        .pcto-hours-fill { display: block; height: 100%; background: #2F7D4A; border-radius: 6px; }
-        .pcto-hours-h { font-weight: 800; color: #1F6B3D; }
-        .pcto-hours-note { font-size: 0.82rem; color: #6b8275; text-align: right; }
+        .pcto-hours-fill {
+          display: block; height: 100%; border-radius: 6px;
+          background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
+          box-shadow: 0 0 14px var(--glow);
+        }
+        .pcto-hours-h { font-weight: 800; color: var(--accent); }
+        .pcto-hours-note { font-size: 0.82rem; color: var(--note); text-align: right; }
         @media (max-width: 575.98px) {
           .pcto-hours-row { grid-template-columns: 1fr auto; }
           .pcto-hours-bar, .pcto-hours-note { display: none; }
@@ -813,8 +869,9 @@ export default function Pcto() {
           padding: 2.5rem;
           border-radius: 18px;
           color: #ffffff;
-          background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 100%);
-          box-shadow: 0 14px 36px rgba(16, 56, 32, 0.18);
+          background-image: linear-gradient(120deg, #9d8fff 0%, #7c6cff 45%, #5b4bd6 100%);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          box-shadow: 0 16px 44px rgba(124, 108, 255, 0.40);
         }
         .pcto-closing p { font-size: 1.15rem; line-height: 1.7; opacity: 0.96; max-width: 54rem; }
         .pcto-closing strong { color: #ffffff; }
@@ -825,8 +882,8 @@ export default function Pcto() {
           position: relative;
           width: 100%;
           overflow: hidden;
-          /* fallback neroverde finché l'immagine non è presente */
-          background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 60%, #3F8F5A 100%);
+          /* fallback dark premium finché l'immagine non è presente */
+          background-image: linear-gradient(135deg, #15101f 0%, #1a1430 55%, #0b0f14 100%);
         }
         .pcto-team-banner img {
           display: block;
@@ -841,9 +898,9 @@ export default function Pcto() {
           z-index: 1;
           background-image: linear-gradient(
             165deg,
-            rgba(16, 56, 32, 0.66) 0%,
-            rgba(16, 56, 32, 0.22) 30%,
-            rgba(16, 56, 32, 0) 55%
+            rgba(10, 13, 17, 0.78) 0%,
+            rgba(10, 13, 17, 0.30) 32%,
+            rgba(10, 13, 17, 0) 58%
           );
         }
         .pcto-team-overlay {
@@ -872,7 +929,11 @@ export default function Pcto() {
         }
 
         /* Footer */
-        .pcto-footer { background-color: #103820; color: #ffffff; }
+        .pcto-footer {
+          background-color: var(--bg2);
+          color: var(--sub);
+          border-top: 1px solid var(--glass-bd);
+        }
       `}</style>
     </div>
   );
