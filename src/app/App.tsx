@@ -18,6 +18,7 @@ import {
   Type,
   BrainCircuit,
   Ruler,
+  UserRound,
 } from "lucide-react";
 import SiteHeader from "./site/SiteHeader";
 import SiteFooter from "./site/SiteFooter";
@@ -71,6 +72,19 @@ function PctoThumb() {
       <circle cx="180" cy="86" r="4.5" fill="#1F6B3D" />
       <path d="M180 86 L266 86 L288 138" fill="none" stroke="rgba(31,107,61,0.55)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="288" cy="143" r="5.5" fill="rgba(47,125,74,0.20)" stroke="rgba(31,107,61,0.55)" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function MeStessoThumb() {
+  // Persona stilizzata dentro una cornice "slide": l'identità di «Me stesso»
+  // (presentazione personale), in palette neroverde line-art.
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      <rect x="96" y="34" width="168" height="132" rx="14" fill="rgba(47,125,74,0.06)" stroke="rgba(31,107,61,0.32)" strokeWidth="2" />
+      <circle cx="180" cy="92" r="28" fill="rgba(47,125,74,0.12)" stroke="rgba(31,107,61,0.6)" strokeWidth="2.4" />
+      <path d="M138 158 Q138 116 180 116 Q222 116 222 158" fill="rgba(47,125,74,0.08)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="180" cy="92" r="5" fill="#1F6B3D" />
     </svg>
   );
 }
@@ -132,6 +146,7 @@ function ProjectThumb({ name }: { name: string }) {
   if (name === "parole") return <ParoleThumb />;
   if (name === "trivia") return <TriviaThumb />;
   if (name === "pcto") return <PctoThumb />;
+  if (name === "mestesso") return <MeStessoThumb />;
   if (name === "movimento") return <MovimentoThumb />;
   if (name === "mappa") return <MappaThumb />;
   return null;
@@ -145,6 +160,7 @@ function ProjectIcon({ thumb }: { thumb?: string }) {
     case "parole":    return <Type size={32} strokeWidth={2.1} />;
     case "trivia":    return <BrainCircuit size={32} strokeWidth={2.1} />;
     case "pcto":      return <Ruler size={32} strokeWidth={2.1} />;
+    case "mestesso":  return <UserRound size={32} strokeWidth={2.1} />;
     case "movimento": return <Footprints size={32} strokeWidth={2.1} />;
     case "mappa":     return <Globe2 size={32} strokeWidth={2.1} />;
     default:          return <Globe2 size={30} strokeWidth={2.1} />;
@@ -160,6 +176,15 @@ const PROJECTS = [
     thumb: "pcto",
     desc: "Tre anni di alternanza scuola-lavoro al Caem Group S.p.A. di Castellucchio, nell'ufficio tecnico del reparto legno: modellazione 3D di tettoie in AutoCAD, osservazione del calcolo strutturale e archiviazione dei preventivi. Racconto del percorso con illustrazioni dei legni.",
     tags: ["Reparto legno", "AutoCAD 3D", "Strutture in legno", "Ufficio tecnico"],
+  },
+  {
+    category: "Presentazione personale",
+    date: "22 giu 2026",
+    title: "Me stesso",
+    url: "/me-stesso",
+    thumb: "mestesso",
+    desc: "La presentazione personale di Federico Sgarbi per l'Esame di Stato 2026, ricostruita come pagina web col mio design system neroverde: copertina, radici familiari, percorso di studi, passioni e futuro in un'unica scroll narrata, in stile /pcto.",
+    tags: ["Presentazione", "Design system", "Storytelling", "React"],
   },
   {
     category: "Web game",
@@ -231,6 +256,7 @@ const PROJECTS = [
 // Emoji per ogni progetto (mostrata nella riga "categoria" della card).
 const PROJECT_EMOJI: Record<string, string> = {
   "PCTO": "🪵",
+  "Me stesso": "🎓",
   "Mappa": "🗺️",
   "Movimento": "👣",
   "Trivia": "🧠",

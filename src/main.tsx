@@ -14,6 +14,7 @@ const Parole = lazy(() => import("./app/parole/Parole.tsx"));
 const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
 const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
 const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
+const MeStesso = lazy(() => import("./app/me-stesso/MeStesso.tsx"));
 const Movimento = lazy(() => import("./app/movimento/Movimento.tsx"));
 const Mappa = lazy(() => import("./app/mappa/Mappa.tsx"));
 
@@ -58,6 +59,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Pcto />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/me-stesso"
+        element={
+          <Suspense fallback={null}>
+            <MeStesso />
           </Suspense>
         }
       />
