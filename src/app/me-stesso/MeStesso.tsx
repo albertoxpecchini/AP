@@ -25,8 +25,9 @@ import {
   HeartHandshake,
   Users,
   UtensilsCrossed,
-  Palette,
-  Newspaper,
+  Store,
+  ShoppingCart,
+  TrendingUp,
   Quote,
 } from "lucide-react";
 
@@ -598,22 +599,23 @@ export default function MeStesso() {
                 <p className="ap-kicker text-uppercase fw-semibold mb-3 ms-future-kicker">06 — Il mio domani</p>
                 <h2 className="display-5 fw-bold mb-3 text-white">Il mio futuro</h2>
                 <p className="ms-future-hl">
-                  Dopo la maturità voglio continuare a crescere come <strong>designer e sviluppatore front-end.</strong>
+                  Voglio unire le mie due strade: il <strong>lavoro concreto</strong> e il <strong>digitale.</strong>
                 </p>
                 <p className="ms-future-copy">
-                  Trasformare idee in esperienze digitali curate è ciò che mi riesce meglio e mi
-                  appassiona di più — lo faccio già ogni giorno, anche per l'azienda di famiglia. E coltivo
-                  un sogno più grande: un giorno fondare la mia <strong>testata giornalistica</strong>,
-                  andare sul campo e raccontare storie vere.
+                  Il mio obiettivo è rilevare <strong>Punto Energy Service</strong>, il punto vendita
+                  «Home Engineer» di Medole — batterie, caricabatterie, lubrificanti e ricambi per auto e
+                  automezzi — e farlo crescere costruendogli un <strong>e-commerce</strong> tutto mio, per
+                  vendere online e raggiungere molti più clienti. È qui che le competenze che già uso ogni
+                  giorno — web, gestione digitale, vendite online — diventano un progetto di vita.
                 </p>
                 <div className="ms-future-chips">
-                  <span className="ms-future-chip"><Palette size={15} aria-hidden="true" /> Design</span>
-                  <span className="ms-future-chip"><Code2 size={15} aria-hidden="true" /> Sviluppo</span>
-                  <span className="ms-future-chip"><Newspaper size={15} aria-hidden="true" /> Storie</span>
+                  <span className="ms-future-chip"><Store size={15} aria-hidden="true" /> Il punto vendita</span>
+                  <span className="ms-future-chip"><ShoppingCart size={15} aria-hidden="true" /> E-commerce</span>
+                  <span className="ms-future-chip"><TrendingUp size={15} aria-hidden="true" /> Crescita online</span>
                 </div>
               </div>
               <div className="ms-future-art">
-                <Shot src="/images/me-stesso/futuro.jpg" alt="Le idee che voglio costruire" caption="Le idee che voglio costruire" icon={<Code2 size={56} strokeWidth={1.5} />} />
+                <Shot src="/images/me-stesso/futuro.jpg" alt="Il punto vendita Punto Energy Service a Medole" caption="Punto Energy Service — Medole" icon={<Store size={56} strokeWidth={1.5} />} />
               </div>
             </div>
           </div>
