@@ -4,28 +4,28 @@ import {
   ArrowLeft,
   GraduationCap,
   MapPin,
-  Cake,
   CalendarDays,
-  Waves,
+  Sprout,
   Ruler,
   DraftingCompass,
   Building2,
-  Trophy,
+  Code2,
+  HeartHandshake,
   Users,
-  Sparkles,
-  Briefcase,
-  HardHat,
+  Plane,
+  Palette,
+  Newspaper,
   Quote,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// «Me stesso» — Presentazione personale di Federico Sgarbi (Esame di Stato 2026).
+// «Me stesso» — Presentazione personale di Alberto Pecchini (Esame di Stato 2026).
 //
-// Ricostruzione web fedele della presentazione (9 slide) col design system
-// neroverde del portfolio, in stile /pcto: header sticky, hero a gradiente,
-// sezioni con kicker numerato, righe narrate alternate, banda di chiusura e
-// banner full-width. Le foto vivono in /images/me-stesso/ — se mancano, ogni
-// cornice mostra un placeholder coerente con la palette (nessuna immagine rotta).
+// Stessa impaginazione della presentazione (9 sezioni) col design system
+// neroverde del portfolio, in stile /pcto: hero copertina, chi sono, radici
+// familiari (la cascina di Rivalta), percorso CAT, passioni (web, volontariato,
+// viaggi), futuro e banner di chiusura. Le foto vivono in /images/me-stesso/ —
+// se mancano, ogni cornice mostra un placeholder coerente con la palette.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Cornice foto con fallback elegante: se l'immagine manca, mostra un
@@ -59,8 +59,8 @@ function Shot({
 }
 
 const FACTS = [
-  { Icon: Cake, value: "19 anni", label: "Nato il 3 gennaio 2007" },
-  { Icon: MapPin, value: "Mantova", label: "Un piccolo paese: Stradella" },
+  { Icon: MapPin, value: "Rivalta sul Mincio", label: "Comune di Rodigo, provincia di Mantova" },
+  { Icon: GraduationCap, value: "Classe 5T", label: "Diploma CAT — Costruzioni, Ambiente e Territorio" },
   { Icon: CalendarDays, value: "5 anni", label: "di percorso, che oggi si concludono qui" },
 ];
 
@@ -68,24 +68,24 @@ const PERCORSO = [
   {
     Icon: Ruler,
     title: "Disegno e progetto",
-    desc: "Ho imparato a progettare con metodo e precisione.",
+    desc: "Progettare con metodo e precisione, dall'AutoCAD fino al dettaglio.",
   },
   {
     Icon: DraftingCompass,
     title: "Metodo e rigore",
-    desc: "A ragionare per problemi e a risolverli un passo alla volta.",
+    desc: "Ragionare per problemi e risolverli un passo alla volta — anche scrivendo codice.",
   },
   {
     Icon: Building2,
     title: "Territorio",
-    desc: "A leggere e interpretare il territorio e le costruzioni.",
+    desc: "Leggere e interpretare il territorio, il rilievo e le costruzioni.",
   },
 ];
 
 export default function MeStesso() {
   useEffect(() => {
     const prev = document.title;
-    document.title = "Me stesso · Federico Sgarbi — Esame di Stato 2026";
+    document.title = "Me stesso · Alberto Pecchini — Esame di Stato 2026";
     return () => { document.title = prev; };
   }, []);
 
@@ -122,17 +122,17 @@ export default function MeStesso() {
                   <GraduationCap size={44} strokeWidth={1.75} />
                 </span>
                 <p className="ap-kicker text-uppercase fw-semibold mb-3">Esame di Stato 2026</p>
-                <h1 className="ms-hero-title fw-bold">Federico Sgarbi</h1>
+                <h1 className="ms-hero-title fw-bold">Alberto Pecchini</h1>
                 <span className="ms-hero-rule" aria-hidden="true" />
                 <p className="ms-hero-lead">Presentazione personale</p>
                 <p className="ms-hero-school d-inline-flex align-items-center mb-0">
-                  Istituto Tecnico «Carlo d'Arco» — Indirizzo Geometri
+                  Istituto Tecnico Tecnologico «Carlo d'Arco» — Mantova · Indirizzo CAT
                 </p>
               </div>
               <div className="ms-hero-aside">
                 <Shot
-                  src="/images/me-stesso/cover.jpg"
-                  alt="Federico Sgarbi"
+                  src="/alberto-pecchini.jpg"
+                  alt="Ritratto di Alberto Pecchini"
                   icon={<GraduationCap size={64} strokeWidth={1.5} />}
                   portrait
                 />
@@ -146,7 +146,11 @@ export default function MeStesso() {
           <div className="container">
             <div className="mb-4">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">01 — Chi sono</p>
-              <h2 className="display-5 fw-bold mb-0">Un po' di me</h2>
+              <h2 className="display-5 fw-bold mb-2">Un po' di me</h2>
+              <p className="ms-prose mb-0" style={{ maxWidth: "46rem" }}>
+                Sono uno studente CAT all'ultimo anno e, fuori dai banchi,
+                <strong> designer e sviluppatore front-end</strong>.
+              </p>
             </div>
             <div className="ms-about">
               <div className="ms-facts">
@@ -159,10 +163,10 @@ export default function MeStesso() {
                 ))}
               </div>
               <Shot
-                src="/images/me-stesso/infanzia.jpg"
-                alt="Federico da bambino"
-                caption="Io, qualche anno fa"
-                icon={<Cake size={56} strokeWidth={1.5} />}
+                src="/images/me-stesso/rivalta.jpg"
+                alt="Rivalta sul Mincio, dove sono cresciuto"
+                caption="Tra Rivalta e Mantova"
+                icon={<MapPin size={56} strokeWidth={1.5} />}
               />
             </div>
           </div>
@@ -173,33 +177,35 @@ export default function MeStesso() {
           <div className="container">
             <div className="mb-4">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">02 — Le mie radici</p>
-              <h2 className="display-5 fw-bold mb-0">La mia famiglia e l'azienda</h2>
+              <h2 className="display-5 fw-bold mb-0">La mia famiglia e la cascina</h2>
             </div>
             <div className="ms-story-row">
               <div className="ms-story-text">
                 <p className="ms-prose">
-                  La mia storia parte da <strong>Stradella</strong> e dalla mia famiglia, che qui ha
-                  costruito qualcosa di cui sono molto orgoglioso: l'<strong>azienda di famiglia</strong>,
-                  che si occupa di impianti idraulici.
+                  La mia storia parte da <strong>Rivalta sul Mincio</strong> e dalla mia famiglia, che
+                  qui porta avanti la <strong>cascina di famiglia</strong>: un'attività agricola fatta
+                  di terra, stagioni e lavoro vero.
                 </p>
                 <p className="ms-prose">
-                  Crescere in una famiglia di imprenditori mi ha insegnato fin da piccolo il valore del
-                  <strong> lavoro</strong>, del <strong>sacrificio</strong> e della <strong>costanza</strong>:
-                  i risultati non arrivano per caso, ma si costruiscono giorno dopo giorno.
+                  Collaboro da sempre — curo e poto le piante, trasporto materiali sul trattore,
+                  raccolgo il fieno e coordino le operazioni nei periodi più intensi. È qui che ho
+                  imparato il valore del <strong>lavoro</strong>, della <strong>costanza</strong> e
+                  della <strong>responsabilità</strong>: i risultati non arrivano per caso, ma si
+                  costruiscono giorno dopo giorno.
                 </p>
                 <div className="ms-company">
-                  <span className="ms-company-ic" aria-hidden="true"><Waves size={24} /></span>
+                  <span className="ms-company-ic" aria-hidden="true"><Sprout size={24} /></span>
                   <span className="ms-company-text">
-                    <span className="ms-company-name">Sgarbi Aldino S.r.l.</span>
-                    <span className="ms-company-sub">Impianti idraulici</span>
+                    <span className="ms-company-name">Cascina di famiglia</span>
+                    <span className="ms-company-sub">Rivalta sul Mincio</span>
                   </span>
                 </div>
               </div>
               <div className="ms-story-art">
                 <Shot
-                  src="/images/me-stesso/azienda.jpg"
-                  alt="La sede dell'azienda di famiglia a Stradella"
-                  icon={<Waves size={56} strokeWidth={1.5} />}
+                  src="/images/me-stesso/cascina.jpg"
+                  alt="La cascina di famiglia a Rivalta sul Mincio"
+                  icon={<Sprout size={56} strokeWidth={1.5} />}
                 />
               </div>
             </div>
@@ -210,11 +216,11 @@ export default function MeStesso() {
         <section className="ms-band">
           <div className="container">
             <p className="ap-kicker text-uppercase fw-semibold mb-3 ms-band-kicker">03 — Il mio percorso</p>
-            <h2 className="display-5 fw-bold mb-3 text-white">Perché ho scelto i Geometri</h2>
+            <h2 className="display-5 fw-bold mb-3 text-white">Perché ho scelto il CAT</h2>
             <p className="ms-band-lead">
-              L'azienda di famiglia è stata una delle motivazioni principali della mia scelta: un
-              percorso concreto e tecnico, legato alle costruzioni, alla progettazione e al territorio —
-              vicino al mondo che vedevo a casa.
+              Mi ha spinto la voglia di un percorso concreto e creativo insieme: disegnare, progettare,
+              capire il territorio e le costruzioni. Ed è lo stesso disegno tecnico che, fuori dalla
+              scuola, mi ha portato verso il <strong>web design</strong> e lo <strong>sviluppo</strong>.
             </p>
             <div className="ms-percorso">
               {PERCORSO.map(({ Icon, title, desc }) => (
@@ -236,82 +242,87 @@ export default function MeStesso() {
               <h2 className="display-5 fw-bold mb-0">Ciò che mi muove</h2>
             </div>
 
-            {/* Calcio */}
+            {/* Web design & sviluppo */}
             <div className="ms-story-row mb-5">
               <div className="ms-story-art">
                 <Shot
-                  src="/images/me-stesso/calcio.jpg"
-                  alt="Federico in campo durante una partita di calcio"
-                  caption="7 anni in campo"
-                  icon={<Trophy size={56} strokeWidth={1.5} />}
+                  src="/images/me-stesso/web.jpg"
+                  alt="Alberto al lavoro su un progetto web"
+                  caption="Designer & front-end developer"
+                  icon={<Code2 size={56} strokeWidth={1.5} />}
                 />
               </div>
               <div className="ms-story-text">
-                <h3 className="h3 fw-bold mb-3">La passione più grande: il calcio</h3>
+                <h3 className="h3 fw-bold mb-3">La passione più grande: creare per il web</h3>
                 <p className="ms-prose ms-prose--lead">
-                  Ho praticato calcio per sette anni e mi ha dato molto più di uno sport.
+                  Progetto e sviluppo siti web e web game: è ciò che mi definisce.
                 </p>
                 <p className="ms-prose">
-                  Mi ha insegnato il valore del gruppo, il rispetto delle regole, la disciplina e
-                  l'importanza di lottare fino alla fine, anche quando le cose non vanno come vorresti.
+                  Mi occupo di tutto, dall'idea al codice: ho realizzato siti veri — <strong>Cascina
+                  Fontana</strong> e <strong>Rivalta sul Mincio</strong> — e una serie di web game
+                  (Trivia, Mappa, Movimento, Angoli, Parole) curati nel design e nelle animazioni.
                 </p>
                 <p className="ms-prose mb-0">
-                  Sono lezioni che non servono solo in campo, ma nella vita di tutti i giorni — e che
-                  mi hanno aiutato anche nello studio.
+                  Amo trasformare un'idea in qualcosa che si può toccare a schermo, iterarla e rifinirla
+                  fino all'ultimo dettaglio.
                 </p>
               </div>
             </div>
 
-            {/* Stare in compagnia */}
+            {/* Volontariato / stare con gli altri */}
             <div className="ms-friends mb-5">
               <div className="ms-friends-head">
-                <span className="ms-pass-ic" aria-hidden="true"><Users size={24} /></span>
+                <span className="ms-pass-ic" aria-hidden="true"><HeartHandshake size={24} /></span>
                 <div>
-                  <h3 className="h3 fw-bold mb-2">Stare in compagnia</h3>
+                  <h3 className="h3 fw-bold mb-2">Stare con gli altri</h3>
                   <p className="ms-prose ms-prose--lead mb-0">
-                    Una delle cose che mi rende più felice è stare con le persone a cui voglio bene.
+                    Una parte importante di me è il tempo passato con le persone.
                   </p>
                 </div>
               </div>
               <p className="ms-prose ms-friends-copy">
-                Gli amici sono una parte fondamentale della mia vita: con loro condivido i momenti belli,
-                ma sono anche quelli su cui posso contare nei momenti difficili. È ciò che mi dà l'energia
-                per affrontare tutto il resto.
+                Ho fatto l'animatore al <strong>Grest parrocchiale</strong> di Rivalta per due estati e
+                ho dato supporto al <strong>CRED</strong> di Rodigo: gestire gruppi di bambini, inventare
+                giochi e attività, mediare ed esserci davvero. Mi dà energia e mi ha insegnato a lavorare
+                in squadra.
               </p>
               <div className="ms-friends-grid">
                 <Shot
-                  src="/images/me-stesso/amici-1.jpg"
-                  alt="Federico con gli amici a tavola"
+                  src="/images/me-stesso/grest-1.jpg"
+                  alt="Animazione al Grest con i bambini"
                   icon={<Users size={48} strokeWidth={1.5} />}
                 />
                 <Shot
-                  src="/images/me-stesso/amici-2.jpg"
-                  alt="Federico con un amico allo stadio"
-                  icon={<Users size={48} strokeWidth={1.5} />}
+                  src="/images/me-stesso/grest-2.jpg"
+                  alt="Attività di gruppo durante il Grest"
+                  icon={<HeartHandshake size={48} strokeWidth={1.5} />}
                 />
               </div>
             </div>
 
-            {/* Padel */}
+            {/* Viaggi */}
             <div className="ms-story-row">
               <div className="ms-story-text">
-                <h3 className="h3 fw-bold mb-3">Una nuova sfida: il padel</h3>
+                <h3 className="h3 fw-bold mb-3">Conoscere il mondo: i viaggi</h3>
                 <p className="ms-prose ms-prose--lead">
-                  È la mia passione più recente: ho iniziato da poco, ma mi ha conquistato subito.
+                  Mi piace mettermi in gioco e scoprire posti nuovi.
                 </p>
                 <p className="ms-prose">
-                  Mi piace perché unisce la competizione al divertimento e allo stare insieme.
+                  Un mese a <strong>Dublino</strong> per l'inglese (livello C1, esame IELTS), la
+                  Normandia e <strong>Parigi</strong>, <strong>Edimburgo</strong> a Natale: viaggiare mi
+                  apre la testa.
                 </p>
                 <p className="ms-prose mb-0">
-                  E in fondo dice qualcosa di me: ho ancora tanta voglia di mettermi in gioco, di provare
-                  cose nuove e di migliorarmi, senza accontentarmi.
+                  E in fondo dice qualcosa di me: ho tanta voglia di provare cose nuove, di migliorarmi
+                  e di non accontentarmi.
                 </p>
               </div>
               <div className="ms-story-art">
                 <Shot
-                  src="/images/me-stesso/padel.jpg"
-                  alt="Federico gioca a padel in campo"
-                  icon={<Sparkles size={56} strokeWidth={1.5} />}
+                  src="/images/me-stesso/viaggi.jpg"
+                  alt="Uno dei miei viaggi"
+                  caption="Dublino · Parigi · Edimburgo"
+                  icon={<Plane size={56} strokeWidth={1.5} />}
                 />
               </div>
             </div>
@@ -326,25 +337,25 @@ export default function MeStesso() {
                 <p className="ap-kicker text-uppercase fw-semibold mb-3 ms-future-kicker">05 — Il mio domani</p>
                 <h2 className="display-5 fw-bold mb-3 text-white">Il mio futuro</h2>
                 <p className="ms-future-hl">
-                  Dopo la maturità ho le idee chiare: <strong>andrò a lavorare nell'azienda di famiglia.</strong>
+                  Dopo la maturità voglio continuare a crescere come <strong>designer e sviluppatore front-end.</strong>
                 </p>
                 <p className="ms-future-copy">
-                  Voglio mettere in pratica ciò che ho studiato e dare il mio contributo a quello che la
-                  mia famiglia ha costruito, portando avanti con impegno e responsabilità il lavoro di chi
-                  mi ha preceduto.
+                  Trasformare idee in esperienze digitali curate è ciò che mi riesce meglio e mi
+                  appassiona di più. E coltivo un sogno più grande: un giorno fondare la mia
+                  <strong> testata giornalistica</strong>, andare sul campo e raccontare storie vere.
                 </p>
                 <div className="ms-future-chips">
-                  <span className="ms-future-chip"><Briefcase size={15} aria-hidden="true" /> Lavoro</span>
-                  <span className="ms-future-chip"><HardHat size={15} aria-hidden="true" /> Responsabilità</span>
-                  <span className="ms-future-chip"><Waves size={15} aria-hidden="true" /> Continuità</span>
+                  <span className="ms-future-chip"><Palette size={15} aria-hidden="true" /> Design</span>
+                  <span className="ms-future-chip"><Code2 size={15} aria-hidden="true" /> Sviluppo</span>
+                  <span className="ms-future-chip"><Newspaper size={15} aria-hidden="true" /> Storie</span>
                 </div>
               </div>
               <div className="ms-future-art">
                 <Shot
-                  src="/images/me-stesso/azienda.jpg"
-                  alt="L'azienda di famiglia, dove Federico costruirà il suo futuro"
-                  caption="L'azienda di famiglia, dove costruirò il mio futuro"
-                  icon={<Building2 size={56} strokeWidth={1.5} />}
+                  src="/images/me-stesso/futuro.jpg"
+                  alt="Le idee che voglio costruire"
+                  caption="Le idee che voglio costruire"
+                  icon={<Code2 size={56} strokeWidth={1.5} />}
                 />
               </div>
             </div>
@@ -365,7 +376,7 @@ export default function MeStesso() {
             <div className="container">
               <Quote size={40} className="ms-thanks-quote" aria-hidden="true" />
               <h2 className="ms-thanks-title">Grazie<span> per l'attenzione</span></h2>
-              <p className="ms-thanks-sign">Federico Sgarbi — Esame di Stato 2026</p>
+              <p className="ms-thanks-sign">Alberto Pecchini — Esame di Stato 2026</p>
             </div>
           </div>
         </section>
@@ -375,7 +386,7 @@ export default function MeStesso() {
         <div className="container">
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-4">
             <span style={{ opacity: 0.8 }}>
-              Presentazione di Federico Sgarbi · ricostruzione web di Alberto Pecchini
+              Presentazione personale di Alberto Pecchini · Esame di Stato 2026
             </span>
             <Link to="/" className="text-white text-decoration-none d-inline-flex align-items-center">
               <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
@@ -521,7 +532,7 @@ export default function MeStesso() {
           .ms-story-row .ms-story-art { order: -1; }
         }
 
-        /* Badge azienda */
+        /* Badge (cascina) */
         .ms-company {
           display: inline-flex; align-items: center; gap: 0.9rem;
           margin-top: 1.5rem; padding: 0.85rem 1.25rem;
@@ -549,6 +560,7 @@ export default function MeStesso() {
           color: rgba(255, 255, 255, 0.86);
           font-size: 1.15rem; line-height: 1.7; max-width: 52rem; margin-bottom: 2.5rem;
         }
+        .ms-band-lead strong { color: #ffffff; }
         .ms-percorso {
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
         }
@@ -567,7 +579,7 @@ export default function MeStesso() {
         .ms-percorso-desc { color: rgba(255, 255, 255, 0.78); font-size: 0.98rem; line-height: 1.6; }
         @media (max-width: 767.98px) { .ms-percorso { grid-template-columns: 1fr; } }
 
-        /* Amici */
+        /* Stare con gli altri */
         .ms-friends-head { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
         .ms-pass-ic {
           flex-shrink: 0;
@@ -593,6 +605,7 @@ export default function MeStesso() {
         .ms-future-hl { font-size: 1.4rem; line-height: 1.5; margin-bottom: 1.1rem; }
         .ms-future-hl strong { color: #ffffff; }
         .ms-future-copy { color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; }
+        .ms-future-copy strong { color: #ffffff; }
         .ms-future-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
         .ms-future-chip {
           display: inline-flex; align-items: center; gap: 0.4rem;

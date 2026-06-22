@@ -183,7 +183,7 @@ const PROJECTS = [
     title: "Me stesso",
     url: "/me-stesso",
     thumb: "mestesso",
-    desc: "La presentazione personale di Federico Sgarbi per l'Esame di Stato 2026, ricostruita come pagina web col mio design system neroverde: copertina, radici familiari, percorso di studi, passioni e futuro in un'unica scroll narrata, in stile /pcto.",
+    desc: "La mia presentazione personale per l'Esame di Stato 2026: chi sono, le radici alla cascina di Rivalta, il percorso CAT, le passioni (web, volontariato, viaggi) e il futuro — in un'unica scroll narrata col mio design system neroverde, in stile /pcto.",
     tags: ["Presentazione", "Design system", "Storytelling", "React"],
   },
   {
