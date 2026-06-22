@@ -1044,11 +1044,15 @@ export default function MeStesso() {
           min-height: clamp(20rem, 42vw, 34rem);
           display: flex; align-items: center;
         }
-        /* Inquadramento: l'immagine è ancorata in alto (50% 22%) così i volti
-           del soggetto restano in cornice e non viene tagliata a mezzo busto. */
+        /* Inquadramento: foto verticale (ala dell'aereo al tramonto, scatto da
+           iPhone) dentro un banner largo e basso → in cover si vede solo una
+           fascia orizzontale. La ancoriamo a ~45% per tenere in cornice
+           l'orizzonte arancione, il bagliore del sole e l'ala — non il cielo
+           vuoto in alto. image-orientation:from-image garantisce la rotazione EXIF. */
         .ms-thanks img {
           position: absolute; inset: 0; z-index: 0;
-          width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%;
+          width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%;
+          image-orientation: from-image;
         }
         .ms-thanks-scrim {
           position: absolute; inset: 0; z-index: 1;
