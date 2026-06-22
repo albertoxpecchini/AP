@@ -437,7 +437,7 @@ export default function MeStesso() {
             {/* Lo sport: il tiro */}
             <div className="ms-story-row mb-4">
               <div className="ms-story-art">
-                <Shot src="/images/me-stesso/tiro.jpg" alt="Al poligono durante il tiro a volo" caption="Tiro a volo — poligono «Al Perrosso»" icon={<Crosshair size={56} strokeWidth={1.5} />} />
+                <Shot src="/images/me-stesso/tiro.jpg" alt="Al poligono di tiro insieme a mio padre" caption="Con mio papà, al poligono" icon={<Crosshair size={56} strokeWidth={1.5} />} portrait />
               </div>
               <div className="ms-story-text">
                 <h3 className="h3 fw-bold mb-3">Lo sport che mi rappresenta: il tiro</h3>
@@ -445,8 +445,9 @@ export default function MeStesso() {
                   Mira, respiro, concentrazione: il tiro è il mio sport.
                 </p>
                 <p className="ms-prose">
-                  Da qualche anno pratico il <strong>tiro a volo</strong> al poligono «Al Perrosso» di
-                  Castel Goffredo (MN), seguito dal maestro <strong>Fausto Chitò</strong>. Lo prendo con
+                  A farmi appassionare al mondo delle armi è stato <strong>mio padre</strong>: è grazie a
+                  lui se ho iniziato. Oggi pratico il <strong>tiro a volo</strong> al poligono «Al Perrosso»
+                  di Castel Goffredo (MN), seguito dal maestro <strong>Fausto Chitò</strong>. Lo prendo con
                   calma, ma è la disciplina in cui mi ritrovo di più: silenzio, precisione e nervi saldi.
                 </p>
                 <p className="ms-prose mb-0">
