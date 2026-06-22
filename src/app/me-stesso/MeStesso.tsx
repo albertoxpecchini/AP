@@ -4,15 +4,26 @@ import {
   ArrowLeft,
   GraduationCap,
   MapPin,
+  Cake,
   CalendarDays,
   Sprout,
+  Tractor,
+  Trees,
+  Waves,
+  MonitorSmartphone,
   Ruler,
   DraftingCompass,
   Building2,
   Code2,
+  Plane,
+  Target,
+  Crosshair,
+  Volleyball,
+  Bike,
+  Car,
   HeartHandshake,
   Users,
-  Plane,
+  UtensilsCrossed,
   Palette,
   Newspaper,
   Quote,
@@ -21,12 +32,22 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 // «Me stesso» — Presentazione personale di Alberto Pecchini (Esame di Stato 2026).
 //
-// Stessa impaginazione della presentazione (9 sezioni) col design system
-// neroverde del portfolio, in stile /pcto: hero copertina, chi sono, radici
-// familiari (la cascina di Rivalta), percorso CAT, passioni (web, volontariato,
-// viaggi), futuro e banner di chiusura. Le foto vivono in /images/me-stesso/ —
-// se mancano, ogni cornice mostra un placeholder coerente con la palette.
+// Impaginazione in stile /pcto col design system neroverde: hero copertina,
+// chi sono, radici (l'azienda di famiglia), percorso CAT, le passioni (web,
+// viaggi + Paesi visitati con bandiere SVG, tiro, moto, stare con gli altri,
+// buona tavola) e il futuro. Le foto vivono in /images/me-stesso/: se mancano,
+// ogni cornice mostra un placeholder coerente con la palette.
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Età calcolata dal giorno di nascita: niente numero che invecchia da solo.
+function ageFromISO(iso: string): number {
+  const b = new Date(iso);
+  const now = new Date();
+  let a = now.getFullYear() - b.getFullYear();
+  const m = now.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) a -= 1;
+  return a;
+}
 
 // Cornice foto con fallback elegante: se l'immagine manca, mostra un
 // placeholder neroverde con icona, senza spezzare il layout.
@@ -58,29 +79,108 @@ function Shot({
   );
 }
 
+// ── Bandiere SVG (colori reali) ──────────────────────────────────────────────
+const FlagItalia = () => (
+  <svg viewBox="0 0 60 40" className="ms-flag-svg" aria-hidden="true">
+    <rect width="60" height="40" fill="#ffffff" />
+    <rect width="20" height="40" fill="#009246" />
+    <rect x="40" width="20" height="40" fill="#CE2B37" />
+  </svg>
+);
+const FlagSanMarino = () => (
+  <svg viewBox="0 0 60 40" className="ms-flag-svg" aria-hidden="true">
+    <rect width="60" height="40" fill="#5EB6E4" />
+    <rect width="60" height="20" fill="#ffffff" />
+    <g transform="translate(30 20)">
+      <circle r="7" fill="#ffffff" stroke="#C8A14B" strokeWidth="1.2" />
+      <rect x="-4.6" y="-1.8" width="2.5" height="4.4" fill="#5EB6E4" />
+      <rect x="-1.25" y="-3" width="2.5" height="5.6" fill="#5EB6E4" />
+      <rect x="2.1" y="-1.8" width="2.5" height="4.4" fill="#5EB6E4" />
+    </g>
+  </svg>
+);
+const FlagSvizzera = () => (
+  <svg viewBox="0 0 60 40" className="ms-flag-svg" aria-hidden="true">
+    <rect width="60" height="40" fill="#D52B1E" />
+    <rect x="26" y="10" width="8" height="20" fill="#ffffff" />
+    <rect x="20" y="16" width="20" height="8" fill="#ffffff" />
+  </svg>
+);
+const FlagAustria = () => (
+  <svg viewBox="0 0 60 40" className="ms-flag-svg" aria-hidden="true">
+    <rect width="60" height="40" fill="#ffffff" />
+    <rect width="60" height="13.34" fill="#ED2939" />
+    <rect y="26.66" width="60" height="13.34" fill="#ED2939" />
+  </svg>
+);
+const FlagFrancia = () => (
+  <svg viewBox="0 0 60 40" className="ms-flag-svg" aria-hidden="true">
+    <rect width="60" height="40" fill="#ffffff" />
+    <rect width="20" height="40" fill="#0055A4" />
+    <rect x="40" width="20" height="40" fill="#EF4135" />
+  </svg>
+);
+const FlagIrlanda = () => (
+  <svg viewBox="0 0 60 40" className="ms-flag-svg" aria-hidden="true">
+    <rect width="60" height="40" fill="#ffffff" />
+    <rect width="20" height="40" fill="#169B62" />
+    <rect x="40" width="20" height="40" fill="#FF883E" />
+  </svg>
+);
+const FlagScozia = () => (
+  <svg viewBox="0 0 60 40" className="ms-flag-svg" aria-hidden="true">
+    <rect width="60" height="40" fill="#005EB8" />
+    <path d="M0 0 L60 40 M60 0 L0 40" stroke="#ffffff" strokeWidth="8" />
+  </svg>
+);
+
+// Paesi visitati, in ordine di distanza da casa (Rivalta sul Mincio).
+const COUNTRIES = [
+  { name: "Italia", Flag: FlagItalia },
+  { name: "San Marino", Flag: FlagSanMarino },
+  { name: "Svizzera", Flag: FlagSvizzera },
+  { name: "Austria", Flag: FlagAustria },
+  { name: "Francia", Flag: FlagFrancia },
+  { name: "Irlanda", Flag: FlagIrlanda },
+  { name: "Scozia", Flag: FlagScozia },
+];
+
 const FACTS = [
+  { Icon: Cake, value: `${ageFromISO("2006-06-28")} anni`, label: "Nato il 28 giugno 2006" },
   { Icon: MapPin, value: "Rivalta sul Mincio", label: "Comune di Rodigo, provincia di Mantova" },
-  { Icon: GraduationCap, value: "Classe 5T", label: "Diploma CAT — Costruzioni, Ambiente e Territorio" },
+  { Icon: GraduationCap, value: "Classe 5BT", label: "Diploma CAT — Costruzioni, Ambiente e Territorio" },
   { Icon: CalendarDays, value: "5 anni", label: "di percorso, che oggi si concludono qui" },
 ];
 
-const PERCORSO = [
-  {
-    Icon: Ruler,
-    title: "Disegno e progetto",
-    desc: "Progettare con metodo e precisione, dall'AutoCAD fino al dettaglio.",
-  },
-  {
-    Icon: DraftingCompass,
-    title: "Metodo e rigore",
-    desc: "Ragionare per problemi e risolverli un passo alla volta — anche scrivendo codice.",
-  },
-  {
-    Icon: Building2,
-    title: "Territorio",
-    desc: "Leggere e interpretare il territorio, il rilievo e le costruzioni.",
-  },
+const RUOLI = [
+  { Icon: Tractor, label: "Trattori & cascina", note: "guida e lavori nei campi" },
+  { Icon: Trees, label: "Parchi & giardini", note: "cura del verde delle proprietà" },
+  { Icon: Waves, label: "Piscine & arredi esterni", note: "manutenzione con mio padre" },
+  { Icon: MonitorSmartphone, label: "Tutto il digitale", note: "ordini, preventivi, usato online" },
 ];
+
+const PERCORSO = [
+  { Icon: Ruler, title: "Disegno e progetto", desc: "Progettare con metodo e precisione, dall'AutoCAD fino al dettaglio." },
+  { Icon: DraftingCompass, title: "Metodo e rigore", desc: "Ragionare per problemi e risolverli un passo alla volta — anche scrivendo codice." },
+  { Icon: Building2, title: "Territorio", desc: "Leggere e interpretare il territorio, il rilievo e le costruzioni." },
+];
+
+const SPORT_PREF = [
+  { Icon: Target, label: "Tiro a segno" },
+  { Icon: Crosshair, label: "Tiro a volo" },
+  { Icon: Waves, label: "Nuoto" },
+  { Icon: Volleyball, label: "Pallavolo" },
+];
+
+const SPORT_STORIA = [
+  { year: "2014", label: "Nuoto", note: "un anno" },
+  { year: "2015", label: "Pallavolo", note: "un anno" },
+  { year: "2017", label: "Basket", note: "due anni" },
+  { year: "2024 — oggi", label: "Tiro a volo", note: "al poligono, con calma" },
+];
+
+const FORMAGGI = ["Pecorino sardo stagionato", "Gorgonzola", "Grana Padano DOP"];
+const PIATTI = ["Spaghetti cacio e pepe", "Spaghetti alle vongole", "Pizza ai quattro formaggi", "Filetto di manzo"];
 
 export default function MeStesso() {
   useEffect(() => {
@@ -126,7 +226,7 @@ export default function MeStesso() {
                 <span className="ms-hero-rule" aria-hidden="true" />
                 <p className="ms-hero-lead">Presentazione personale</p>
                 <p className="ms-hero-school d-inline-flex align-items-center mb-0">
-                  Istituto Tecnico Tecnologico «Carlo d'Arco» — Mantova · Indirizzo CAT
+                  Istituto Tecnico «Carlo d'Arco» — Mantova · Indirizzo CAT · Classe 5BT
                 </p>
               </div>
               <div className="ms-hero-aside">
@@ -149,7 +249,8 @@ export default function MeStesso() {
               <h2 className="display-5 fw-bold mb-2">Un po' di me</h2>
               <p className="ms-prose mb-0" style={{ maxWidth: "46rem" }}>
                 Sono uno studente CAT all'ultimo anno e, fuori dai banchi,
-                <strong> designer e sviluppatore front-end</strong>.
+                <strong> designer e sviluppatore front-end</strong>. Sono cresciuto a Rivalta sul Mincio,
+                dove la mia famiglia ha le sue radici e una sua attività.
               </p>
             </div>
             <div className="ms-about">
@@ -177,27 +278,31 @@ export default function MeStesso() {
           <div className="container">
             <div className="mb-4">
               <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">02 — Le mie radici</p>
-              <h2 className="display-5 fw-bold mb-0">La mia famiglia e la cascina</h2>
+              <h2 className="display-5 fw-bold mb-0">La mia famiglia e l'azienda</h2>
             </div>
             <div className="ms-story-row">
               <div className="ms-story-text">
                 <p className="ms-prose">
-                  La mia storia parte da <strong>Rivalta sul Mincio</strong> e dalla mia famiglia, che
-                  qui porta avanti la <strong>cascina di famiglia</strong>: un'attività agricola fatta
-                  di terra, stagioni e lavoro vero.
+                  La mia storia parte da <strong>Rivalta sul Mincio</strong> e dalla mia famiglia. Fin da
+                  piccolo sono cresciuto dando una mano nell'attività di casa: non un passatempo, ma il
+                  modo in cui ho imparato cosa significhi <strong>lavorare davvero</strong>.
                 </p>
                 <p className="ms-prose">
-                  Collaboro da sempre — curo e poto le piante, trasporto materiali sul trattore,
-                  raccolgo il fieno e coordino le operazioni nei periodi più intensi. È qui che ho
-                  imparato il valore del <strong>lavoro</strong>, della <strong>costanza</strong> e
-                  della <strong>responsabilità</strong>: i risultati non arrivano per caso, ma si
-                  costruiscono giorno dopo giorno.
+                  Con mio padre mi occupo della manutenzione di <strong>parchi e arredi esterni</strong> —
+                  le piscine, il verde, gli spazi delle proprietà — e guido i <strong>trattori</strong>
+                  della cascina. Un lavoro concreto, fatto di mani, stagioni e attenzione ai dettagli.
+                </p>
+                <p className="ms-prose">
+                  In azienda ho preso in carico tutto il <strong>lato digitale</strong>: gli ordini online,
+                  le foto satellitari che servono a preparare i preventivi e gli annunci per la vendita
+                  dell'usato. È qui che le mie due anime — quella pratica e quella informatica — si
+                  incontrano.
                 </p>
                 <div className="ms-company">
                   <span className="ms-company-ic" aria-hidden="true"><Sprout size={24} /></span>
                   <span className="ms-company-text">
-                    <span className="ms-company-name">Cascina di famiglia</span>
-                    <span className="ms-company-sub">Rivalta sul Mincio</span>
+                    <span className="ms-company-name">Cascina &amp; azienda di famiglia</span>
+                    <span className="ms-company-sub">Rivalta sul Mincio (MN)</span>
                   </span>
                 </div>
               </div>
@@ -208,6 +313,24 @@ export default function MeStesso() {
                   icon={<Sprout size={56} strokeWidth={1.5} />}
                 />
               </div>
+            </div>
+
+            {/* Cosa faccio in azienda */}
+            <div className="ms-roles">
+              {RUOLI.map(({ Icon, label, note }) => (
+                <div className="ms-role" key={label}>
+                  <span className="ms-role-ic" aria-hidden="true"><Icon size={22} /></span>
+                  <span className="ms-role-label">{label}</span>
+                  <span className="ms-role-note">{note}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Galleria del lavoro */}
+            <div className="ms-gallery3">
+              <Shot src="/images/me-stesso/trattore.jpg" alt="Alla guida del trattore della cascina" caption="Sul trattore" icon={<Tractor size={48} strokeWidth={1.5} />} />
+              <Shot src="/images/me-stesso/manutenzione.jpg" alt="Manutenzione del verde e degli arredi esterni" caption="Manutenzione esterni" icon={<Trees size={48} strokeWidth={1.5} />} />
+              <Shot src="/images/me-stesso/azienda-digitale.jpg" alt="Il lato digitale: preventivi e foto satellitari" caption="Il digitale dell'azienda" icon={<MonitorSmartphone size={48} strokeWidth={1.5} />} />
             </div>
           </div>
         </section>
@@ -245,12 +368,7 @@ export default function MeStesso() {
             {/* Web design & sviluppo */}
             <div className="ms-story-row mb-5">
               <div className="ms-story-art">
-                <Shot
-                  src="/images/me-stesso/web.jpg"
-                  alt="Alberto al lavoro su un progetto web"
-                  caption="Designer & front-end developer"
-                  icon={<Code2 size={56} strokeWidth={1.5} />}
-                />
+                <Shot src="/images/me-stesso/web.jpg" alt="Alberto al lavoro su un progetto web" caption="Designer & front-end developer" icon={<Code2 size={56} strokeWidth={1.5} />} />
               </div>
               <div className="ms-story-text">
                 <h3 className="h3 fw-bold mb-3">La passione più grande: creare per il web</h3>
@@ -269,61 +387,162 @@ export default function MeStesso() {
               </div>
             </div>
 
-            {/* Volontariato / stare con gli altri */}
+            {/* Viaggi & organizzazione */}
+            <div className="ms-story-row mb-4">
+              <div className="ms-story-text">
+                <h3 className="h3 fw-bold mb-3">Viaggiare e organizzare ogni dettaglio</h3>
+                <p className="ms-prose ms-prose--lead">
+                  Adoro scoprire posti nuovi — e adoro che tutto fili liscio.
+                </p>
+                <p className="ms-prose">
+                  Quando partiamo in gruppo, anche solo tra amici (Parigi, Le Havre…), sono io a gestire
+                  biglietti, prenotazioni e itinerari: con le mie competenze informatiche tengo insieme
+                  tutta l'organizzazione. In viaggio, sono <strong>il cervello delle operazioni</strong>.
+                </p>
+                <div className="ms-callout">
+                  <span className="ms-callout-ic" aria-hidden="true"><Plane size={22} /></span>
+                  <p className="mb-0">
+                    Il viaggio a cui tengo di più me lo sono <strong>regalato io</strong>: dopo i 18 anni
+                    sono partito per una vacanza studio a <strong>Dublino</strong>. Per la prima volta ho
+                    preso l'aereo, ho scoperto un Paese nuovo e ho provato a vivere la scuola interamente
+                    in inglese (livello C1, esame IELTS).
+                  </p>
+                </div>
+              </div>
+              <div className="ms-story-art">
+                <Shot src="/images/me-stesso/dublino.jpg" alt="Vacanza studio a Dublino" caption="Dublino — il regalo per i miei 18 anni" icon={<Plane size={56} strokeWidth={1.5} />} />
+              </div>
+            </div>
+
+            {/* Paesi visitati — bandiere */}
+            <div className="ms-flags-wrap mb-5">
+              <p className="ms-block-title">
+                <MapPin size={18} className="me-2" aria-hidden="true" /> Paesi visitati
+                <span className="ms-block-note"> — in ordine di distanza da casa</span>
+              </p>
+              <div className="ms-flags">
+                {COUNTRIES.map(({ name, Flag }) => (
+                  <div className="ms-flag" key={name}>
+                    <span className="ms-flag-svg-wrap"><Flag /></span>
+                    <span className="ms-flag-name">{name}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="ms-friends-grid mt-4">
+                <Shot src="/images/me-stesso/parigi.jpg" alt="Viaggio a Parigi e Le Havre con gli amici" icon={<Plane size={48} strokeWidth={1.5} />} />
+                <Shot src="/images/me-stesso/viaggio-gruppo.jpg" alt="Il gruppo di amici in viaggio" icon={<Users size={48} strokeWidth={1.5} />} />
+              </div>
+            </div>
+
+            {/* Lo sport: il tiro */}
+            <div className="ms-story-row mb-4">
+              <div className="ms-story-art">
+                <Shot src="/images/me-stesso/tiro.jpg" alt="Al poligono durante il tiro a volo" caption="Tiro a volo — poligono «Al Perrosso»" icon={<Crosshair size={56} strokeWidth={1.5} />} />
+              </div>
+              <div className="ms-story-text">
+                <h3 className="h3 fw-bold mb-3">Lo sport che mi rappresenta: il tiro</h3>
+                <p className="ms-prose ms-prose--lead">
+                  Mira, respiro, concentrazione: il tiro è il mio sport.
+                </p>
+                <p className="ms-prose">
+                  Da qualche anno pratico il <strong>tiro a volo</strong> al poligono «Al Perrosso» di
+                  Castel Goffredo (MN), seguito dal maestro <strong>Fausto Chitò</strong>. Lo prendo con
+                  calma, ma è la disciplina in cui mi ritrovo di più: silenzio, precisione e nervi saldi.
+                </p>
+                <p className="ms-prose mb-0">
+                  Prima di arrivarci ho provato un po' di tutto — nuoto, pallavolo, basket — ma è qui che
+                  mi sono fermato.
+                </p>
+              </div>
+            </div>
+            <div className="ms-chiprow">
+              {SPORT_PREF.map(({ Icon, label }) => (
+                <span className="ms-chip" key={label}><Icon size={15} aria-hidden="true" /> {label}</span>
+              ))}
+            </div>
+            <div className="ms-track mb-5">
+              {SPORT_STORIA.map((s) => (
+                <div className="ms-track-item" key={s.label}>
+                  <span className="ms-track-year">{s.year}</span>
+                  <span className="ms-track-label">{s.label}</span>
+                  <span className="ms-track-note">{s.note}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Su strada: moto & auto */}
+            <div className="ms-story-row mb-5">
+              <div className="ms-story-text">
+                <h3 className="h3 fw-bold mb-3">Su due ruote (e quattro): la mia libertà</h3>
+                <p className="ms-prose ms-prose--lead">
+                  Quando le giornate diventano monotone, salgo in sella.
+                </p>
+                <p className="ms-prose">
+                  Dal 2023 ho una <strong>Ducati Scrambler 125</strong>: la uso per staccare la spina e
+                  schiarirmi le idee. Sono ancora un rider alle prime armi, ma mi diverto.
+                </p>
+                <p className="ms-prose mb-0">
+                  Da un anno ho anche la patente dell'auto, e non mi sono fatto mancare qualche viaggio su
+                  strada: <strong>Milano, Brescia, Verona, Bologna, Piacenza</strong>.
+                </p>
+                <div className="ms-chiprow mt-3">
+                  <span className="ms-chip"><Bike size={15} aria-hidden="true" /> Ducati Scrambler 125</span>
+                  <span className="ms-chip"><Car size={15} aria-hidden="true" /> Patente da 1 anno</span>
+                </div>
+              </div>
+              <div className="ms-story-art">
+                <Shot src="/images/me-stesso/moto.jpg" alt="La mia Ducati Scrambler 125" caption="La Scrambler, per staccare" icon={<Bike size={56} strokeWidth={1.5} />} />
+              </div>
+            </div>
+
+            {/* Stare con gli altri */}
             <div className="ms-friends mb-5">
               <div className="ms-friends-head">
                 <span className="ms-pass-ic" aria-hidden="true"><HeartHandshake size={24} /></span>
                 <div>
-                  <h3 className="h3 fw-bold mb-2">Stare con gli altri</h3>
+                  <h3 className="h3 fw-bold mb-2">Stare con gli altri, a modo mio</h3>
                   <p className="ms-prose ms-prose--lead mb-0">
-                    Una parte importante di me è il tempo passato con le persone.
+                    Preferisco la compagnia vera ai posti affollati.
                   </p>
                 </div>
               </div>
               <p className="ms-prose ms-friends-copy">
-                Ho fatto l'animatore al <strong>Grest parrocchiale</strong> di Rivalta per due estati e
-                ho dato supporto al <strong>CRED</strong> di Rodigo: gestire gruppi di bambini, inventare
-                giochi e attività, mediare ed esserci davvero. Mi dà energia e mi ha insegnato a lavorare
-                in squadra.
+                Le discoteche non fanno per me: meglio organizzare <strong>piccole feste in cascina</strong>,
+                dove c'è più tranquillità e ci si gode davvero le persone. E poi c'è il volontariato — per
+                due estati ho fatto l'<strong>animatore al Grest</strong> di Rivalta e ho dato una mano al
+                <strong> CRED</strong> di Rodigo, con i bambini. Stare in mezzo agli altri, guidare un
+                gruppo, inventare attività: mi dà energia.
               </p>
               <div className="ms-friends-grid">
-                <Shot
-                  src="/images/me-stesso/grest-1.jpg"
-                  alt="Animazione al Grest con i bambini"
-                  icon={<Users size={48} strokeWidth={1.5} />}
-                />
-                <Shot
-                  src="/images/me-stesso/grest-2.jpg"
-                  alt="Attività di gruppo durante il Grest"
-                  icon={<HeartHandshake size={48} strokeWidth={1.5} />}
-                />
+                <Shot src="/images/me-stesso/festa-cascina.jpg" alt="Una piccola festa organizzata in cascina" icon={<Users size={48} strokeWidth={1.5} />} />
+                <Shot src="/images/me-stesso/grest.jpg" alt="Animatore al Grest con i bambini" icon={<HeartHandshake size={48} strokeWidth={1.5} />} />
               </div>
             </div>
 
-            {/* Viaggi */}
+            {/* Buona tavola */}
             <div className="ms-story-row">
-              <div className="ms-story-text">
-                <h3 className="h3 fw-bold mb-3">Conoscere il mondo: i viaggi</h3>
-                <p className="ms-prose ms-prose--lead">
-                  Mi piace mettermi in gioco e scoprire posti nuovi.
-                </p>
-                <p className="ms-prose">
-                  Un mese a <strong>Dublino</strong> per l'inglese (livello C1, esame IELTS), la
-                  Normandia e <strong>Parigi</strong>, <strong>Edimburgo</strong> a Natale: viaggiare mi
-                  apre la testa.
-                </p>
-                <p className="ms-prose mb-0">
-                  E in fondo dice qualcosa di me: ho tanta voglia di provare cose nuove, di migliorarmi
-                  e di non accontentarmi.
-                </p>
-              </div>
               <div className="ms-story-art">
-                <Shot
-                  src="/images/me-stesso/viaggi.jpg"
-                  alt="Uno dei miei viaggi"
-                  caption="Dublino · Parigi · Edimburgo"
-                  icon={<Plane size={56} strokeWidth={1.5} />}
-                />
+                <Shot src="/images/me-stesso/cucina.jpg" alt="Uno dei miei piatti preferiti" caption="A tavola" icon={<UtensilsCrossed size={56} strokeWidth={1.5} />} />
+              </div>
+              <div className="ms-story-text">
+                <h3 className="h3 fw-bold mb-3">Buona tavola</h3>
+                <p className="ms-prose ms-prose--lead">
+                  Sono un tipo a cui piace mangiar bene.
+                </p>
+                <div className="ms-taste">
+                  <div className="ms-taste-card">
+                    <h4 className="ms-taste-title">Formaggi del cuore</h4>
+                    <ul className="ms-taste-list">
+                      {FORMAGGI.map((f) => <li key={f}>{f}</li>)}
+                    </ul>
+                  </div>
+                  <div className="ms-taste-card">
+                    <h4 className="ms-taste-title">Piatti che non rifiuto mai</h4>
+                    <ul className="ms-taste-list">
+                      {PIATTI.map((p) => <li key={p}>{p}</li>)}
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -341,8 +560,9 @@ export default function MeStesso() {
                 </p>
                 <p className="ms-future-copy">
                   Trasformare idee in esperienze digitali curate è ciò che mi riesce meglio e mi
-                  appassiona di più. E coltivo un sogno più grande: un giorno fondare la mia
-                  <strong> testata giornalistica</strong>, andare sul campo e raccontare storie vere.
+                  appassiona di più — lo faccio già ogni giorno, anche per l'azienda di famiglia. E coltivo
+                  un sogno più grande: un giorno fondare la mia <strong>testata giornalistica</strong>,
+                  andare sul campo e raccontare storie vere.
                 </p>
                 <div className="ms-future-chips">
                   <span className="ms-future-chip"><Palette size={15} aria-hidden="true" /> Design</span>
@@ -351,12 +571,7 @@ export default function MeStesso() {
                 </div>
               </div>
               <div className="ms-future-art">
-                <Shot
-                  src="/images/me-stesso/futuro.jpg"
-                  alt="Le idee che voglio costruire"
-                  caption="Le idee che voglio costruire"
-                  icon={<Code2 size={56} strokeWidth={1.5} />}
-                />
+                <Shot src="/images/me-stesso/futuro.jpg" alt="Le idee che voglio costruire" caption="Le idee che voglio costruire" icon={<Code2 size={56} strokeWidth={1.5} />} />
               </div>
             </div>
           </div>
@@ -485,7 +700,6 @@ export default function MeStesso() {
           font-size: 0.85rem; font-weight: 700; font-style: italic; color: #ffffff;
           background: linear-gradient(to top, rgba(16, 56, 32, 0.9), rgba(16, 56, 32, 0));
         }
-        .ms-shot--portrait + .ms-shot,
         .ms-hero-aside .ms-shot { box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28); }
 
         /* Chi sono */
@@ -517,7 +731,7 @@ export default function MeStesso() {
         .ms-fact-label { font-size: 0.9rem; color: #5a6f63; }
         @media (max-width: 767.98px) { .ms-about { grid-template-columns: 1fr; } }
 
-        /* Righe narrate (radici / passioni) */
+        /* Righe narrate */
         .ms-story-row {
           display: grid;
           grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -532,7 +746,7 @@ export default function MeStesso() {
           .ms-story-row .ms-story-art { order: -1; }
         }
 
-        /* Badge (cascina) */
+        /* Badge azienda */
         .ms-company {
           display: inline-flex; align-items: center; gap: 0.9rem;
           margin-top: 1.5rem; padding: 0.85rem 1.25rem;
@@ -550,6 +764,26 @@ export default function MeStesso() {
         .ms-company-name { font-weight: 800; color: #103820; font-size: 1.1rem; }
         .ms-company-sub { font-size: 0.85rem; color: #6b8275; }
 
+        /* Ruoli in azienda */
+        .ms-roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2.25rem; }
+        .ms-role {
+          display: flex; flex-direction: column; gap: 0.2rem;
+          padding: 1.1rem 1.2rem; background: #ffffff;
+          border: 1px solid rgba(47, 125, 74, 0.18); border-radius: 14px;
+        }
+        .ms-role-ic {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 44px; height: 44px; border-radius: 12px;
+          background: rgba(47, 125, 74, 0.10); color: #1F6B3D; margin-bottom: 0.4rem;
+        }
+        .ms-role-label { font-weight: 800; color: #103820; }
+        .ms-role-note { font-size: 0.82rem; color: #6b8275; }
+        @media (max-width: 767.98px) { .ms-roles { grid-template-columns: repeat(2, 1fr); } }
+
+        /* Galleria 3 foto */
+        .ms-gallery3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+        @media (max-width: 767.98px) { .ms-gallery3 { grid-template-columns: 1fr; } }
+
         /* Banda scura — Il mio percorso */
         .ms-band {
           padding: clamp(3rem, 7vw, 5rem) 0;
@@ -561,9 +795,7 @@ export default function MeStesso() {
           font-size: 1.15rem; line-height: 1.7; max-width: 52rem; margin-bottom: 2.5rem;
         }
         .ms-band-lead strong { color: #ffffff; }
-        .ms-percorso {
-          display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
-        }
+        .ms-percorso { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
         .ms-percorso-card {
           padding: 1.75rem 1.5rem;
           background: rgba(255, 255, 255, 0.05);
@@ -579,6 +811,65 @@ export default function MeStesso() {
         .ms-percorso-desc { color: rgba(255, 255, 255, 0.78); font-size: 0.98rem; line-height: 1.6; }
         @media (max-width: 767.98px) { .ms-percorso { grid-template-columns: 1fr; } }
 
+        /* Titolo di blocco (passioni) */
+        .ms-block-title {
+          display: flex; align-items: center; flex-wrap: wrap;
+          font-weight: 800; color: #103820; font-size: 1.1rem; margin-bottom: 1.1rem;
+        }
+        .ms-block-note { font-weight: 600; color: #6b8275; font-size: 0.95rem; }
+
+        /* Callout (Dublino) */
+        .ms-callout {
+          display: flex; gap: 1rem; align-items: flex-start;
+          margin-top: 1.5rem; padding: 1.1rem 1.35rem;
+          background: rgba(47, 125, 74, 0.07);
+          border: 1px solid rgba(47, 125, 74, 0.20);
+          border-left: 4px solid #2F7D4A; border-radius: 14px;
+        }
+        .ms-callout-ic {
+          flex-shrink: 0;
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 44px; height: 44px; border-radius: 50%;
+          background: rgba(47, 125, 74, 0.12); color: #1F6B3D;
+        }
+        .ms-callout p { font-size: 1rem; line-height: 1.65; color: #4a5d51; }
+        .ms-callout strong { color: #103820; }
+
+        /* Bandiere paesi visitati */
+        .ms-flags { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.85rem; }
+        .ms-flag { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+        .ms-flag-svg-wrap {
+          width: 100%; aspect-ratio: 3 / 2;
+          border-radius: 8px; overflow: hidden;
+          border: 1px solid rgba(16, 56, 32, 0.14);
+          box-shadow: 0 4px 12px rgba(16, 56, 32, 0.10);
+        }
+        .ms-flag-svg { width: 100%; height: 100%; display: block; }
+        .ms-flag-name { font-size: 0.8rem; font-weight: 700; color: #103820; text-align: center; }
+        @media (max-width: 767.98px) { .ms-flags { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 430px) { .ms-flags { grid-template-columns: repeat(3, 1fr); } }
+
+        /* Chips (sport / mezzi) */
+        .ms-chiprow { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .ms-chip {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          padding: 0.45rem 0.9rem; border-radius: 999px;
+          background: rgba(47, 125, 74, 0.10);
+          border: 1px solid rgba(47, 125, 74, 0.24);
+          font-weight: 700; font-size: 0.9rem; color: #1F6B3D;
+        }
+
+        /* Mini-storico sportivo */
+        .ms-track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
+        .ms-track-item {
+          padding: 1rem 1.1rem; background: #ffffff;
+          border: 1px solid rgba(47, 125, 74, 0.18); border-radius: 12px;
+        }
+        .ms-track-year { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #1F6B3D; }
+        .ms-track-label { display: block; margin-top: 0.15rem; font-weight: 800; color: #103820; }
+        .ms-track-note { font-size: 0.82rem; color: #6b8275; }
+        @media (max-width: 575.98px) { .ms-track { grid-template-columns: repeat(2, 1fr); } }
+
         /* Stare con gli altri */
         .ms-friends-head { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
         .ms-pass-ic {
@@ -587,9 +878,28 @@ export default function MeStesso() {
           width: 52px; height: 52px; border-radius: 14px;
           background: rgba(47, 125, 74, 0.10); color: #1F6B3D;
         }
-        .ms-friends-copy { max-width: 60rem; margin-bottom: 1.5rem; }
+        .ms-friends-copy { max-width: 62rem; margin-bottom: 1.5rem; }
         .ms-friends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
         @media (max-width: 575.98px) { .ms-friends-grid { grid-template-columns: 1fr; } }
+
+        /* Buona tavola */
+        .ms-taste { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
+        .ms-taste-card {
+          padding: 1.25rem 1.35rem; background: #ffffff;
+          border: 1px solid rgba(47, 125, 74, 0.18); border-radius: 14px;
+        }
+        .ms-taste-title { font-size: 0.95rem; font-weight: 800; color: #1F6B3D; margin-bottom: 0.5rem; }
+        .ms-taste-list { list-style: none; padding: 0; margin: 0; }
+        .ms-taste-list li {
+          display: flex; align-items: center; gap: 0.55rem;
+          padding: 0.45rem 0; color: #4a5d51; font-weight: 600; font-size: 0.98rem;
+          border-bottom: 1px dashed rgba(47, 125, 74, 0.16);
+        }
+        .ms-taste-list li:last-child { border-bottom: none; }
+        .ms-taste-list li::before {
+          content: ""; flex-shrink: 0;
+          width: 7px; height: 7px; border-radius: 50%; background: #2F7D4A;
+        }
 
         /* Il mio domani */
         .ms-future {
