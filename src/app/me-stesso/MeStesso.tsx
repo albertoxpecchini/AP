@@ -345,7 +345,7 @@ export default function MeStesso() {
 
             {/* Galleria del lavoro */}
             <div className="ms-gallery3">
-              <Shot src="/images/me-stesso/trattore.jpg" alt="Il Landini L25 Testacalda del 1957, la macchina operatrice storica di famiglia" caption="Landini L25 Testacalda · 1957" icon={<Tractor size={48} strokeWidth={1.5} />} />
+              <Shot src="/images/me-stesso/trattore.jpg" alt="Il Landini L25 Testacalda del 1957, la macchina operatrice storica di famiglia" caption="Landini L25 Testacalda · 1957" icon={<Tractor size={48} strokeWidth={1.5} />} focus="50% 72%" />
               <Shot src="/images/me-stesso/manutenzione.jpg" alt="Manutenzione del verde e degli arredi esterni" caption="Manutenzione esterni" icon={<Trees size={48} strokeWidth={1.5} />} />
               <Shot src="/images/me-stesso/azienda-digitale.jpg" alt="Il lato digitale: preventivi e foto satellitari" caption="Il digitale dell'azienda" icon={<MonitorSmartphone size={48} strokeWidth={1.5} />} />
             </div>
