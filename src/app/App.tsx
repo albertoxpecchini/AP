@@ -23,6 +23,7 @@ import {
   UserRound,
   BookOpen,
   Cat,
+  GraduationCap,
 } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
 import {
@@ -53,6 +54,7 @@ function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: number }) {
     case "mestesso":   return <UserRound size={size} strokeWidth={sw} />;
     case "dubliners":  return <BookOpen size={size} strokeWidth={sw} />;
     case "gattopardo": return <Cat size={size} strokeWidth={sw} />;
+    case "letteratura": return <GraduationCap size={size} strokeWidth={sw} />;
     case "movimento":  return <Footprints size={size} strokeWidth={sw} />;
     case "mappa":      return <Globe2 size={size} strokeWidth={sw} />;
     default:           return <Globe2 size={size} strokeWidth={sw} />;
@@ -95,6 +97,15 @@ const PROJECTS = [
     thumb: "gattopardo",
     desc: "Tomasi di Lampedusa's «The Leopard» in 3 minutes: who the author is (a single novel, famous only after his death), Sicily in 1860 with the Unification of Italy, the characters (Prince Fabrizio, Tancredi, the Salinas), the collapse of the old order and the theme — «if we want things to stay as they are, things will have to change». A narrated scroll built with my «dark premium» violet design system, in the style of /me-stesso.",
     tags: ["Literature", "Risorgimento", "Storytelling", "React"],
+  },
+  {
+    category: "Study hub · Maturità",
+    date: "Jun 23, 2026",
+    title: "Letteratura",
+    url: "/letteratura",
+    thumb: "letteratura",
+    desc: "Study schemas for the 2026 final-exam Italian literature programme: one sheet per author and topic (from Naturalism and Verga to Montale's «Satura»), each with a synthesis, key facts, must-know concepts, the texts in the syllabus, cross-links for the oral, and — the core feature — the likely oral-exam questions with hideable model answers to self-test. Built with my «dark premium» violet design system.",
+    tags: ["Study", "Literature", "Design system", "React"],
   },
   {
     category: "Web game",
@@ -169,6 +180,7 @@ const PROJECT_EMOJI: Record<string, string> = {
   "About Me": "🎓",
   "Dubliners": "📖",
   "The Leopard": "🐆",
+  "Letteratura": "🎓",
   "Mappa": "🗺️",
   "Movimento": "👣",
   "Trivia": "🧠",
