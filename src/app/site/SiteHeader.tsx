@@ -35,13 +35,13 @@ export default function SiteHeader({
   return (
     <header className={`ap-hdr ${scrolled ? "ap-hdr--scrolled" : ""}`}>
       <div className="ap-wrap ap-hdr-inner">
-        <a href={avatarHref} className="ap-hdr-brand" aria-label="Alberto Pecchini, torna su">
+        <a href={avatarHref} className="ap-hdr-brand" aria-label="Alberto Pecchini, back to top">
           <img src="/alberto-pecchini.jpg" alt="" className="ap-hdr-avatar" width={36} height={36} loading="eager" />
           <span className="ap-hdr-name">Alberto Pecchini</span>
           {localMode ? <span className="ap-hdr-local">Local</span> : null}
         </a>
 
-        <nav className="ap-hdr-nav" aria-label="Navigazione principale">
+        <nav className="ap-hdr-nav" aria-label="Primary navigation">
           {NAV_LINKS.map((link) =>
             link.route ? (
               <Link key={link.href} className="ap-hdr-link" to={link.href}>
@@ -67,13 +67,13 @@ export default function SiteHeader({
               <SiX size={18} aria-hidden="true" />
             </a>
           </div>
-          <a href="/#contatti" className="ap-hdr-cta">Contatti</a>
+          <a href="/#contatti" className="ap-hdr-cta">Contact</a>
           <button
             className="ap-hdr-burger"
             type="button"
             aria-controls="ap-drawer"
             aria-expanded={menuOpen}
-            aria-label="Apri il menu di navigazione"
+            aria-label="Open navigation menu"
             onClick={() => setMenuOpen(true)}
           >
             <Menu size={22} aria-hidden="true" />
@@ -84,11 +84,11 @@ export default function SiteHeader({
       {/* Drawer mobile */}
       <div className={`ap-drawer ${menuOpen ? "open" : ""}`} id="ap-drawer">
         <div className="ap-drawer-backdrop" onClick={closeMenu} aria-hidden="true" />
-        <div className="ap-drawer-panel" role="dialog" aria-modal="true" aria-label="Menu di navigazione">
-          <button className="ap-drawer-close" type="button" aria-label="Chiudi il menu" onClick={closeMenu}>
+        <div className="ap-drawer-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+          <button className="ap-drawer-close" type="button" aria-label="Close menu" onClick={closeMenu}>
             <X size={22} aria-hidden="true" />
           </button>
-          <nav className="ap-drawer-nav" aria-label="Navigazione">
+          <nav className="ap-drawer-nav" aria-label="Navigation">
             {NAV_LINKS.map((link) =>
               link.route ? (
                 <Link key={link.href} to={link.href} onClick={closeMenu}>

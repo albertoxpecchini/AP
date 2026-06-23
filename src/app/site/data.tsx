@@ -41,12 +41,12 @@ export const PHONE_HREF = "tel:+393314074198";
 export const WHATSAPP_HREF = "https://wa.me/447340995142";
 
 // Voci di navigazione. Gli href sono assoluti (con /#ancora) così funzionano
-// anche dalla pagina Bio; "Chi sono" è una rotta a sé (route: true).
+// anche dalla pagina Bio; "About" è una rotta a sé (route: true).
 export const NAV_LINKS: { href: string; label: string; route?: boolean }[] = [
-  { href: "/#progetti", label: "Progetti" },
-  { href: "/bio", label: "Chi sono", route: true },
-  { href: "/#curriculum", label: "Curriculum" },
-  { href: "/#contatti", label: "Contatti" },
+  { href: "/#progetti", label: "Work" },
+  { href: "/bio", label: "About", route: true },
+  { href: "/#curriculum", label: "Résumé" },
+  { href: "/#contatti", label: "Contact" },
 ];
 
 // lucide-react non include un'icona brand di WhatsApp: la definiamo inline.
@@ -93,46 +93,46 @@ export const HOBBY: Interest[] = [
   {
     Icon: Bike,
     emoji: "🏍️",
-    label: "Moto",
+    label: "Motorbikes",
     img: "/images/hobby-moto.jpg",
-    desc: "Le due ruote rappresentano per me libertà allo stato puro. Mi affascina la tecnica di guida, la meccanica dei motori e il senso di controllo totale che si prova su una moto. Seguire il mondo delle moto — dalle naked alle supersportive — è una delle cose che mi appassiona di più.",
+    desc: "Two wheels mean pure freedom to me. I'm fascinated by riding technique, engine mechanics and the sense of total control you feel on a bike. Following the world of motorbikes — from nakeds to supersports — is one of the things I'm most passionate about.",
   },
   {
     Icon: Dumbbell,
     emoji: "🏋️",
     label: "Sport",
     img: "/images/hobby-sport.jpg",
-    desc: "Mi alleno regolarmente in palestra: trovo che la disciplina sportiva migliori non solo il fisico ma anche la concentrazione e la costanza nel lavoro quotidiano. Mi interessano i workout di forza e mi documento continuamente su allenamento e nutrizione sportiva.",
+    desc: "I train regularly at the gym: I find that sporting discipline improves not only the body but also focus and consistency in everyday work. I'm into strength workouts and keep reading up on training and sports nutrition.",
   },
   {
     Icon: Gamepad2,
     emoji: "🎮",
-    label: "Videogiochi",
+    label: "Video games",
     img: "/images/hobby-videogiochi.jpg",
-    desc: "I videogiochi mi hanno avvicinato al mondo del design e della tecnologia fin da giovane. Apprezzo i titoli con una forte identità visiva, una narrativa curata e un gameplay profondo — sia esperienze single player immersive che titoli competitivi. Ne ho anche realizzato uno: Parole, un Wordle in italiano.",
+    desc: "Video games drew me into the world of design and technology from a young age. I love titles with a strong visual identity, careful storytelling and deep gameplay — both immersive single-player experiences and competitive titles. I've even built one: Parole, an Italian Wordle.",
     link: "/parole",
-    linkLabel: "Gioca a Parole",
+    linkLabel: "Play Parole",
   },
   {
     Icon: Music,
     emoji: "🎧",
-    label: "Musica",
+    label: "Music",
     img: "/images/hobby-musica.jpg",
-    desc: "La musica è una presenza costante mentre lavoro e mi rilasso. Ascolto generi molto diversi: dalla musica elettronica all'hip-hop, passando per colonne sonore cinematografiche. Il ritmo e l'atmosfera di un brano influenzano molto il mio approccio creativo.",
+    desc: "Music is a constant presence while I work and unwind. I listen to very different genres: from electronic to hip-hop, by way of film scores. The rhythm and mood of a track strongly shape my creative approach.",
   },
   {
     Icon: Plane,
     emoji: "✈️",
-    label: "Viaggi",
+    label: "Travel",
     img: "/images/hobby-viaggi.jpg",
-    desc: "Viaggiare mi permette di osservare architetture, design urbano e culture diverse che poi rientrano inconsciamente nel mio lavoro creativo. Mi piace esplorare posti nuovi con curiosità, annotare dettagli visivi e portarli nei miei progetti.",
+    desc: "Travelling lets me observe architecture, urban design and different cultures that then unconsciously feed back into my creative work. I like exploring new places with curiosity, noting visual details and carrying them into my projects.",
   },
   {
     Icon: Cpu,
     emoji: "💻",
-    label: "Tecnologia",
+    label: "Technology",
     img: "/images/hobby-tecnologia.jpg",
-    desc: "Sono attratto da tutto ciò che è nuovo nel mondo tech: hardware, software, intelligenza artificiale, smartphone. Seguire le novità tecnologiche non è solo un hobby ma un modo per restare aggiornato e trovare ispirazione per i miei progetti digitali.",
+    desc: "I'm drawn to everything new in tech: hardware, software, artificial intelligence, smartphones. Following tech news isn't just a hobby but a way to stay up to date and find inspiration for my digital projects.",
   },
 ];
 
@@ -142,52 +142,52 @@ export const PASSIONI: Interest[] = [
     emoji: "🎨",
     label: "Web design",
     img: "/images/passione-webdesign.jpg",
-    desc: "Il web design è la mia passione principale: creare interfacce belle e funzionali dove ogni dettaglio — dalla tipografia al ritmo degli spazi — contribuisce all'esperienza dell'utente. Studio continuamente trend di design e mi ispiro a designer internazionali per affinare il mio gusto visivo.",
+    desc: "Web design is my main passion: creating beautiful, functional interfaces where every detail — from typography to the rhythm of spacing — contributes to the user experience. I constantly study design trends and take inspiration from international designers to refine my visual taste.",
   },
   {
     Icon: Lightbulb,
     emoji: "💡",
-    label: "Innovazione digitale",
+    label: "Digital innovation",
     img: "/images/passione-innovazione.jpg",
-    desc: "Mi affascina il modo in cui la tecnologia trasforma prodotti, servizi e abitudini quotidiane. Seguo con interesse l'evoluzione dell'intelligenza artificiale, dei tool creativi generativi e delle nuove piattaforme digitali che ridefiniscono il modo di costruire e vivere il web.",
+    desc: "I'm fascinated by the way technology transforms products, services and everyday habits. I follow with interest the evolution of artificial intelligence, generative creative tools and the new digital platforms redefining how we build and experience the web.",
   },
   {
     Icon: Camera,
     emoji: "📷",
-    label: "Fotografia",
+    label: "Photography",
     img: "/images/passione-fotografia.jpg",
-    desc: "Attraverso la fotografia imparo a vedere il mondo con occhio compositivo: luce, prospettiva, equilibrio visivo. Questi concetti si trasferiscono direttamente nel mio approccio al design delle interfacce, dove la gerarchia visiva e il contrasto sono tutto.",
+    desc: "Through photography I learn to see the world with a compositional eye: light, perspective, visual balance. These concepts transfer directly into my approach to interface design, where visual hierarchy and contrast are everything.",
   },
   {
     Icon: Car,
     emoji: "🏎️",
-    label: "Motori",
+    label: "Motors",
     img: "/images/passione-motori.jpg",
-    desc: "La passione per i motori va oltre le moto: seguo l'automotive design, la Formula 1 e l'ingegneria meccanica applicata alle auto. L'estetica di un'auto ben disegnata o la perfezione tecnica di un motore mi affascinano tanto quanto un'interfaccia web riuscita.",
+    desc: "My passion for engines goes beyond motorbikes: I follow automotive design, Formula 1 and the mechanical engineering behind cars. The aesthetics of a well-designed car or the technical perfection of an engine fascinate me as much as a great web interface.",
   },
   {
     Icon: Film,
     emoji: "🎬",
     label: "Cinema",
     img: "/images/passione-cinema.jpg",
-    desc: "Il cinema mi interessa per il suo linguaggio visivo: composizione dell'inquadratura, uso del colore, ritmo del montaggio. I registi che usano l'immagine come strumento narrativo primario sono una grande fonte di ispirazione per il mio lavoro di design.",
+    desc: "Cinema interests me for its visual language: framing, use of colour, editing rhythm. Directors who use the image as their primary narrative tool are a great source of inspiration for my design work.",
   },
   {
     Icon: Mountain,
     emoji: "🏔️",
-    label: "Outdoor",
+    label: "Outdoors",
     img: "/images/passione-outdoor.jpg",
-    desc: "Staccare dallo schermo e stare all'aria aperta mi aiuta a ricaricare la creatività. Che sia una gita in moto, una camminata tra la natura mantovana o semplicemente del tempo fuori, il contrasto con il lavoro digitale è fondamentale per tornare ai progetti con occhi freschi.",
+    desc: "Stepping away from the screen and being outdoors helps me recharge my creativity. Whether it's a ride on the bike, a walk through the Mantua countryside or simply time outside, the contrast with digital work is essential to come back to projects with fresh eyes.",
   },
 ];
 
 export const SKILLS: { emoji: string; title: string; items: string[] }[] = [
-  { emoji: "🖥️", title: "Sviluppo front-end", items: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"] },
+  { emoji: "🖥️", title: "Front-end development", items: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"] },
   { emoji: "🎨", title: "Design & UX", items: ["UI/UX Design", "Figma", "Design System", "Bootstrap Italia", "Responsive Design"] },
-  { emoji: "🤖", title: "AI & sviluppo assistito", items: ["Claude Code", "Codex", "GitHub Copilot", "Gemini", "DeepSeek", "Grok"] },
-  { emoji: "🛠️", title: "Strumenti & Workflow", items: ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "LaTeX / Overleaf"] },
-  { emoji: "🪟", title: "Windows & IT Support", items: ["Troubleshooting PC", "Setup hardware & reti", "Ottimizzazione Windows", "File system 2.5 TB", "Malware removal", "Gestione periferiche"] },
-  { emoji: "🎥", title: "Multimedia & Content", items: ["Fotografia commerciale", "DaVinci Resolve", "Adobe Premiere Pro", "Canva", "iPhone 16 Pro"] },
-  { emoji: "📐", title: "Area tecnica CAT", items: ["Disegno tecnico / CAD", "AutoCAD", "Topografia", "Progettazione edilizia", "Estimo", "Excel avanzato"] },
-  { emoji: "🌍", title: "Lingue", items: ["Italiano — madrelingua", "Inglese — C1 (IELTS)"] },
+  { emoji: "🤖", title: "AI-assisted development", items: ["Claude Code", "Codex", "GitHub Copilot", "Gemini", "DeepSeek", "Grok"] },
+  { emoji: "🛠️", title: "Tools & Workflow", items: ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "LaTeX / Overleaf"] },
+  { emoji: "🪟", title: "Windows & IT Support", items: ["PC troubleshooting", "Hardware & network setup", "Windows optimisation", "2.5 TB file system", "Malware removal", "Peripheral management"] },
+  { emoji: "🎥", title: "Multimedia & Content", items: ["Commercial photography", "DaVinci Resolve", "Adobe Premiere Pro", "Canva", "iPhone 16 Pro"] },
+  { emoji: "📐", title: "CAT technical area", items: ["Technical drawing / CAD", "AutoCAD", "Topography", "Building design", "Valuation", "Advanced Excel"] },
+  { emoji: "🌍", title: "Languages", items: ["Italian — native", "English — C1 (IELTS)"] },
 ];

@@ -7,11 +7,13 @@ import {
   Mail,
   Phone,
   ArrowUpRight,
+  ArrowRight,
   X,
   Download,
   Eye,
   ExternalLink,
   FileText,
+  Menu,
   Globe2,
   Compass,
   Footprints,
@@ -22,309 +24,151 @@ import {
   BookOpen,
   Cat,
 } from "lucide-react";
-import SiteHeader from "./site/SiteHeader";
-import SiteFooter from "./site/SiteFooter";
-import { EMAIL, PHONE_HREF, WHATSAPP_HREF, WhatsAppIcon } from "./site/data";
+import { SiGithub, SiInstagram, SiX } from "react-icons/si";
+import {
+  EMAIL,
+  PHONE_DISPLAY,
+  PHONE_HREF,
+  WHATSAPP_HREF,
+  WhatsAppIcon,
+  SOCIALS,
+} from "./site/data";
 
-// ── Miniature SVG dei progetti interni (line-art neroverde, discrete) ──
-function AngoliThumb() {
-  const vx = 96, vy = 158, r = 188, arcR = 48;
-  const a1 = 0, a2 = -(48 * Math.PI) / 180, steps = 18;
-  const pts: string[] = [];
-  for (let i = 0; i <= steps; i++) {
-    const t = a1 + (a2 - a1) * (i / steps);
-    pts.push(`${(vx + arcR * Math.cos(t)).toFixed(1)} ${(vy + arcR * Math.sin(t)).toFixed(1)}`);
-  }
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      <path d={`M ${vx} ${vy} L ${pts.join(" L ")} Z`} fill="rgba(47,125,74,0.10)" />
-      <path d={`M ${pts.join(" L ")}`} fill="none" stroke="rgba(31,107,61,0.55)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-      <line x1={vx} y1={vy} x2={vx + r} y2={vy} stroke="rgba(31,107,61,0.55)" strokeWidth="2.6" strokeLinecap="round" />
-      <line x1={vx} y1={vy} x2={vx + r * Math.cos(a2)} y2={vy + r * Math.sin(a2)} stroke="rgba(31,107,61,0.55)" strokeWidth="2.6" strokeLinecap="round" />
-      <circle cx={vx} cy={vy} r="4" fill="#1F6B3D" />
-    </svg>
-  );
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Home / portfolio — look "dark premium" (lo stesso di /me-stesso, /dubliners,
+// /gattopardo e del gioco Trivia): fondo scuro, superfici "vetro", accento VIOLA
+// neon. Testi in inglese. La home è autosufficiente: header, footer e stile sono
+// inline qui dentro (come le pagine di approfondimento), così il restyle non
+// tocca la pagina /bio, che resta in stile chiaro.
+// ─────────────────────────────────────────────────────────────────────────────
 
-function ParoleThumb() {
-  const cols = 5, w = 44, gap = 11, rx = 7;
-  const rowW = cols * w + (cols - 1) * gap;
-  const startX = (360 - rowW) / 2;
-  const y1 = 50, y2 = 105;
-  const states = ["correct", "empty", "present", "empty", "empty"];
-  const fillFor: Record<string, string> = { correct: "rgba(47,125,74,0.20)", present: "rgba(214,158,46,0.22)", empty: "none" };
-  const strokeFor: Record<string, string> = { correct: "rgba(47,125,74,0.55)", present: "rgba(214,158,46,0.60)", empty: "rgba(31,107,61,0.35)" };
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      {Array.from({ length: cols }).map((_, i) => (
-        <rect key={`t${i}`} x={startX + i * (w + gap)} y={y1} width={w} height={w} rx={rx} fill="none" stroke="rgba(31,107,61,0.22)" strokeWidth="2" />
-      ))}
-      {states.map((s, i) => (
-        <rect key={`b${i}`} x={startX + i * (w + gap)} y={y2} width={w} height={w} rx={rx} fill={fillFor[s]} stroke={strokeFor[s]} strokeWidth="2.2" />
-      ))}
-    </svg>
-  );
-}
-
-function PctoThumb() {
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      <path d="M118 92 L118 118 Q118 143 180 147 Q242 143 242 118 L242 92 Z" fill="rgba(47,125,74,0.08)" stroke="rgba(31,107,61,0.5)" strokeWidth="2.2" strokeLinejoin="round" />
-      <path d="M180 52 L264 86 L180 120 L96 86 Z" fill="rgba(47,125,74,0.12)" stroke="rgba(31,107,61,0.6)" strokeWidth="2.4" strokeLinejoin="round" />
-      <circle cx="180" cy="86" r="4.5" fill="#1F6B3D" />
-      <path d="M180 86 L266 86 L288 138" fill="none" stroke="rgba(31,107,61,0.55)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="288" cy="143" r="5.5" fill="rgba(47,125,74,0.20)" stroke="rgba(31,107,61,0.55)" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function MeStessoThumb() {
-  // Persona stilizzata dentro una cornice "slide": l'identità di «Me stesso»
-  // (presentazione personale), in palette neroverde line-art.
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      <rect x="96" y="34" width="168" height="132" rx="14" fill="rgba(47,125,74,0.06)" stroke="rgba(31,107,61,0.32)" strokeWidth="2" />
-      <circle cx="180" cy="92" r="28" fill="rgba(47,125,74,0.12)" stroke="rgba(31,107,61,0.6)" strokeWidth="2.4" />
-      <path d="M138 158 Q138 116 180 116 Q222 116 222 158" fill="rgba(47,125,74,0.08)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="180" cy="92" r="5" fill="#1F6B3D" />
-    </svg>
-  );
-}
-
-function DublinersThumb() {
-  // Libro aperto con poche righe di testo: l'identità di «Gente di Dublino»
-  // (approfondimento letterario), in palette neroverde line-art.
-  const lines = (cx: number) =>
-    [92, 104, 116].map((y, i) => (
-      <line
-        key={`${cx}-${y}`}
-        x1={cx - 26 + i * 2}
-        y1={y}
-        x2={cx + 26 - i * 3}
-        y2={y - 1}
-        stroke="rgba(31,107,61,0.45)"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-    ));
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      <path d="M180 70 C150 58 116 60 98 66 L98 142 C116 136 150 134 180 142 Z" fill="rgba(47,125,74,0.08)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinejoin="round" />
-      <path d="M180 70 C210 58 244 60 262 66 L262 142 C244 136 210 134 180 142 Z" fill="rgba(47,125,74,0.12)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinejoin="round" />
-      <line x1="180" y1="70" x2="180" y2="142" stroke="rgba(31,107,61,0.6)" strokeWidth="2.6" />
-      {lines(132)}
-      {lines(228)}
-    </svg>
-  );
-}
-
-function GattopardoThumb() {
-  // Corona nobiliare line-art: l'identità de «Il Gattopardo» (l'aristocrazia
-  // al tramonto), in palette neroverde — coerente con la home.
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      <path d="M116 132 L116 84 L150 112 L180 70 L210 112 L244 84 L244 132 Z" fill="rgba(47,125,74,0.10)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinejoin="round" />
-      <path d="M112 132 L248 132 L242 152 L118 152 Z" fill="rgba(47,125,74,0.14)" stroke="rgba(31,107,61,0.6)" strokeWidth="2.4" strokeLinejoin="round" />
-      <circle cx="116" cy="84" r="5.5" fill="rgba(47,125,74,0.55)" stroke="#1F6B3D" strokeWidth="2" />
-      <circle cx="180" cy="70" r="6.5" fill="rgba(47,125,74,0.55)" stroke="#1F6B3D" strokeWidth="2" />
-      <circle cx="244" cy="84" r="5.5" fill="rgba(47,125,74,0.55)" stroke="#1F6B3D" strokeWidth="2" />
-      <circle cx="180" cy="142" r="5" fill="#1F6B3D" />
-    </svg>
-  );
-}
-
-function TriviaThumb() {
-  // Tre "card domanda" stilizzate + check, in palette neroverde.
-  const card = (x: number, fill: string, stroke: string) => (
-    <g key={x}>
-      <rect x={x} y={64} width={64} height={72} rx={10} fill={fill} stroke={stroke} strokeWidth="2.2" />
-      <rect x={x + 12} y={80} width={40} height={6} rx={3} fill={stroke} opacity="0.6" />
-      <rect x={x + 12} y={96} width={28} height={6} rx={3} fill={stroke} opacity="0.35" />
-    </g>
-  );
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      {card(70, "rgba(47,125,74,0.08)", "rgba(31,107,61,0.5)")}
-      {card(148, "rgba(217,164,0,0.10)", "rgba(192,120,0,0.55)")}
-      {card(226, "rgba(47,125,74,0.12)", "rgba(31,107,61,0.6)")}
-      <circle cx="258" cy="78" r="13" fill="#2F7D4A" />
-      <path d="M252 78 l4 4 7 -8" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function MovimentoThumb() {
-  // Percorso a "S" su griglia con nodi: l'identità di Movimento (memoria spaziale).
-  const nodes = [[88,150],[176,108],[130,64],[252,82],[290,40]];
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      {[1, 2, 3].map(i => (
-        <g key={i}>
-          <line x1={90 + i * 60} y1="30" x2={90 + i * 60} y2="170" stroke="rgba(31,107,61,0.16)" strokeWidth="1.5" />
-          <line x1="80" y1={50 + i * 40} x2="300" y2={50 + i * 40} stroke="rgba(31,107,61,0.16)" strokeWidth="1.5" />
-        </g>
-      ))}
-      <polyline points={nodes.map(n => n.join(",")).join(" ")} fill="none" stroke="rgba(31,107,61,0.6)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
-      {nodes.map((n, i) => <circle key={i} cx={n[0]} cy={n[1]} r={i === 0 ? 5.5 : 4} fill={i === 0 ? "#1F6B3D" : "rgba(47,125,74,0.55)"} />)}
-    </svg>
-  );
-}
-
-function MappaThumb() {
-  // Globo con meridiani + pin di localizzazione: l'identità di Mappa (città dal satellite).
-  return (
-    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      <circle cx="180" cy="100" r="62" fill="none" stroke="rgba(124,58,237,0.55)" strokeWidth="3.2" />
-      <ellipse cx="180" cy="100" rx="26" ry="62" fill="none" stroke="rgba(124,58,237,0.4)" strokeWidth="2.6" />
-      <line x1="118" y1="100" x2="242" y2="100" stroke="rgba(124,58,237,0.4)" strokeWidth="2.6" />
-      <path d="M126 70 Q180 88 234 70" fill="none" stroke="rgba(124,58,237,0.35)" strokeWidth="2.4" />
-      <path d="M126 130 Q180 112 234 130" fill="none" stroke="rgba(124,58,237,0.35)" strokeWidth="2.4" />
-      <path d="M180 74c-11 0-18 7-18 18 0 13 18 32 18 32s18-19 18-32c0-11-7-18-18-18z" fill="rgba(47,125,74,0.65)" stroke="#1F6B3D" strokeWidth="2" />
-      <circle cx="180" cy="92" r="6" fill="#fff" />
-    </svg>
-  );
-}
-
-function ProjectThumb({ name }: { name: string }) {
-  if (name === "angoli") return <AngoliThumb />;
-  if (name === "parole") return <ParoleThumb />;
-  if (name === "trivia") return <TriviaThumb />;
-  if (name === "pcto") return <PctoThumb />;
-  if (name === "mestesso") return <MeStessoThumb />;
-  if (name === "dubliners") return <DublinersThumb />;
-  if (name === "gattopardo") return <GattopardoThumb />;
-  if (name === "movimento") return <MovimentoThumb />;
-  if (name === "mappa") return <MappaThumb />;
-  return null;
-}
-
-// Glyph singolo per la card "diapositiva" (bolla tonda): icona pulita e
-// riconoscibile a 36px, scelta in base al progetto. I siti esterni usano il globo.
-function ProjectIcon({ thumb }: { thumb?: string }) {
+// Glyph del progetto (lucide). I siti esterni usano il globo.
+function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: number }) {
+  const sw = 2.1;
   switch (thumb) {
-    case "angoli":    return <Compass size={32} strokeWidth={2.1} />;
-    case "parole":    return <Type size={32} strokeWidth={2.1} />;
-    case "trivia":    return <BrainCircuit size={32} strokeWidth={2.1} />;
-    case "pcto":      return <Ruler size={32} strokeWidth={2.1} />;
-    case "mestesso":  return <UserRound size={32} strokeWidth={2.1} />;
-    case "dubliners": return <BookOpen size={32} strokeWidth={2.1} />;
-    case "gattopardo": return <Cat size={32} strokeWidth={2.1} />;
-    case "movimento": return <Footprints size={32} strokeWidth={2.1} />;
-    case "mappa":     return <Globe2 size={32} strokeWidth={2.1} />;
-    default:          return <Globe2 size={30} strokeWidth={2.1} />;
+    case "angoli":     return <Compass size={size} strokeWidth={sw} />;
+    case "parole":     return <Type size={size} strokeWidth={sw} />;
+    case "trivia":     return <BrainCircuit size={size} strokeWidth={sw} />;
+    case "pcto":       return <Ruler size={size} strokeWidth={sw} />;
+    case "mestesso":   return <UserRound size={size} strokeWidth={sw} />;
+    case "dubliners":  return <BookOpen size={size} strokeWidth={sw} />;
+    case "gattopardo": return <Cat size={size} strokeWidth={sw} />;
+    case "movimento":  return <Footprints size={size} strokeWidth={sw} />;
+    case "mappa":      return <Globe2 size={size} strokeWidth={sw} />;
+    default:           return <Globe2 size={size} strokeWidth={sw} />;
   }
 }
 
 const PROJECTS = [
   {
-    category: "Scuola-lavoro · PCTO",
+    category: "Work placement · PCTO",
     date: "2023 — 2026",
     title: "PCTO",
     url: "/pcto",
     thumb: "pcto",
-    desc: "Tre anni di alternanza scuola-lavoro al Caem Group S.p.A. di Castellucchio, nell'ufficio tecnico del reparto legno: modellazione 3D di tettoie in AutoCAD, osservazione del calcolo strutturale e archiviazione dei preventivi. Racconto del percorso con illustrazioni dei legni.",
-    tags: ["Reparto legno", "AutoCAD 3D", "Strutture in legno", "Ufficio tecnico"],
+    desc: "Three years of work-based learning (PCTO) at Caem Group S.p.A. in Castellucchio, in the technical office of the timber department: 3D modelling of canopies in AutoCAD, observing structural design and archiving quotes. The journey told through illustrations of the woods.",
+    tags: ["Timber dept.", "AutoCAD 3D", "Timber structures", "Technical office"],
   },
   {
-    category: "Presentazione personale",
-    date: "22 giu 2026",
-    title: "Me stesso",
+    category: "Personal presentation",
+    date: "Jun 22, 2026",
+    title: "About Me",
     url: "/me-stesso",
     thumb: "mestesso",
-    desc: "La mia presentazione personale per l'Esame di Stato 2026: chi sono, le radici nell'azienda di famiglia a Rivalta, il percorso CAT, le passioni (web, viaggi, tiro, moto) e il futuro — in un'unica scroll narrata col mio design system neroverde, in stile /pcto.",
-    tags: ["Presentazione", "Design system", "Storytelling", "React"],
+    desc: "My personal presentation for the 2026 final state exam: who I am, my roots in the family business in Rivalta, the CAT path, my passions (web, travel, shooting, motorbikes) and the future — a single narrated scroll built with my neroverde design system, in the style of /pcto.",
+    tags: ["Presentation", "Design system", "Storytelling", "React"],
   },
   {
-    category: "Approfondimento letterario",
-    date: "23 giu 2026",
-    title: "Gente di Dublino",
+    category: "Literature deep-dive",
+    date: "Jun 23, 2026",
+    title: "Dubliners",
     url: "/dubliners",
     thumb: "dubliners",
-    desc: "«Dubliners» di James Joyce raccontato in 3 minuti: chi è l'autore, che cos'è la raccolta dei 15 racconti, i personaggi (gente comune, nessun eroe), la trama in cui non succede quasi niente e il vero tema — l'essere intrappolati. Una scroll narrata col mio design system «dark premium» viola, in stile /me-stesso, chiusa dalla celebre frase finale de «I morti».",
-    tags: ["Letteratura", "Storytelling", "Design system", "React"],
+    desc: "James Joyce's «Dubliners» in 3 minutes: who the author is, what the collection of 15 stories is, the characters (ordinary people, no heroes), the plot in which almost nothing happens and the real theme — being trapped. A narrated scroll built with my «dark premium» violet design system, in the style of /me-stesso, closing on the famous last lines of «The Dead».",
+    tags: ["Literature", "Storytelling", "Design system", "React"],
   },
   {
-    category: "Approfondimento letterario",
-    date: "23 giu 2026",
-    title: "Il Gattopardo",
+    category: "Literature deep-dive",
+    date: "Jun 23, 2026",
+    title: "The Leopard",
     url: "/gattopardo",
     thumb: "gattopardo",
-    desc: "«Il Gattopardo» di Tomasi di Lampedusa raccontato in 3 minuti: chi è l'autore (un solo romanzo, famoso solo dopo la morte), la Sicilia del 1860 con l'Unità d'Italia, i personaggi (il Principe Fabrizio, Tancredi, i Salina), il crollo del vecchio ordine e il tema — «se vogliamo che tutto rimanga come è, bisogna che tutto cambi». Una scroll narrata col mio design system «dark premium» viola, in stile /me-stesso.",
-    tags: ["Letteratura", "Risorgimento", "Storytelling", "React"],
+    desc: "Tomasi di Lampedusa's «The Leopard» in 3 minutes: who the author is (a single novel, famous only after his death), Sicily in 1860 with the Unification of Italy, the characters (Prince Fabrizio, Tancredi, the Salinas), the collapse of the old order and the theme — «if we want things to stay as they are, things will have to change». A narrated scroll built with my «dark premium» violet design system, in the style of /me-stesso.",
+    tags: ["Literature", "Risorgimento", "Storytelling", "React"],
   },
   {
     category: "Web game",
-    date: "20 giu 2026",
+    date: "Jun 20, 2026",
     title: "Mappa",
     url: "/mappa",
     thumb: "mappa",
-    desc: "Riconosci la città del mondo dalla sua vista satellitare reale: trascina e zooma la mappa a caccia di indizi (monumenti, fiumi, la forma delle strade), poi scrivi il nome. Cinque livelli di difficoltà, indizi progressivi (continente, iniziale, Paese), punteggio con bonus combo, account col nome, classifica live e tema chiaro/scuro. Mappe Esri, mouse e touch.",
+    desc: "Recognise the world city from its real satellite view: pan and zoom the map hunting for clues (monuments, rivers, the shape of the streets), then type the name. Five difficulty levels, progressive hints (continent, initial, country), scoring with combo bonus, name-based account, live leaderboard and light/dark theme. Esri maps, mouse and touch.",
     tags: ["React", "TypeScript", "Leaflet", "Game design"],
   },
   {
     category: "Web game",
-    date: "18 giu 2026",
+    date: "Jun 18, 2026",
     title: "Movimento",
     url: "/movimento",
     thumb: "movimento",
-    desc: "Allena la memoria spaziale: un pallino traccia un percorso su una griglia e poi sparisce; tu lo ridisegni a memoria con un solo gesto continuo. Cinque livelli di difficoltà (da 3×3 a 6×6), valutazione della precisione del tracciato, streak con trofei e tema chiaro/scuro. Mouse e touch.",
+    desc: "Train your spatial memory: a dot traces a path on a grid and then disappears; you redraw it from memory in a single continuous gesture. Five difficulty levels (from 3×3 to 6×6), accuracy scoring of the trace, streaks with trophies and light/dark theme. Mouse and touch.",
     tags: ["React", "TypeScript", "Canvas", "Game design"],
   },
   {
     category: "Web game",
-    date: "15 giu 2026",
+    date: "Jun 15, 2026",
     title: "Trivia",
     url: "/trivia",
     thumb: "trivia",
-    desc: "Trivia quiz sulla storia dell'architettura: domande a scelta multipla, vero o falso e a risposta aperta, suddivise in capitoli. Foto pertinenti per ogni domanda, punteggio con bonus velocità, streak con trofei, voto finale in stile americano (A–F) e classifica live. Pensato come un vero gioco, leggero e animato, per PC e mobile.",
+    desc: "Trivia quiz on the history of architecture: multiple-choice, true-or-false and open-answer questions, organised in chapters. A relevant photo for every question, scoring with speed bonus, streaks with trophies, an American-style final grade (A–F) and a live leaderboard. Designed as a real game — light and animated — for desktop and mobile.",
     tags: ["React", "TypeScript", "Game design", "UI/UX"],
   },
   {
     category: "Web game",
-    date: "30 mag 2026",
+    date: "May 30, 2026",
     title: "Angoli",
     url: "/angoli",
     thumb: "angoli",
-    desc: "Indovina l'angolo in gradianti tra due semirette ruotate casualmente. Feedback binario (Maggiore/Minore), cinque modalità di difficoltà (da 20g a 1g), sistema di strike consecutivi e trofei geometrici.",
+    desc: "Guess the angle in gradians between two randomly rotated rays. Binary feedback (Higher/Lower), five difficulty modes (from 20g to 1g), a consecutive-strike system and geometric trophies.",
     tags: ["React", "TypeScript", "SVG", "Game design"],
   },
   {
     category: "Web game",
-    date: "29 mag 2026",
+    date: "May 29, 2026",
     title: "Parole",
     url: "/parole",
     thumb: "parole",
-    desc: "Gioco di parole in stile Wordle, in italiano. Sei tentativi per indovinare una parola di cinque lettere: le caselle diventano verdi se la lettera è al posto giusto, gialle se è presente ma in posizione errata, grigie se assente. Tastiera fisica e a schermo, validazione sul dizionario e parola casuale a ogni partita.",
+    desc: "A Wordle-style word game, in Italian. Six attempts to guess a five-letter word: tiles turn green if the letter is in the right place, yellow if present but misplaced, grey if absent. Physical and on-screen keyboard, dictionary validation and a random word each game.",
     tags: ["React", "TypeScript", "react-router", "Game design"],
   },
   {
-    category: "Sito web istituzionale",
-    date: "27 apr 2026",
+    category: "Institutional website",
+    date: "Apr 27, 2026",
     title: "Rivalta sul Mincio",
     url: "https://rivaltasulmincio.it",
-    desc: "Sito web responsive per la località turistica di Rivalta sul Mincio. Design minimalista con tipografia editoriale, palette calda monocromatica, griglie bento gapless, animazioni GSAP ScrollTrigger e composizione image-led.",
-    tags: ["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Design minimalista"],
+    desc: "Responsive website for the tourist destination of Rivalta sul Mincio. Minimalist design with editorial typography, a warm monochrome palette, gapless bento grids, GSAP ScrollTrigger animations and an image-led composition.",
+    tags: ["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Minimal design"],
     githubRepo: "albertoxpecchini/rivaltasulmincio",
     screenshotUrl: "https://rivaltasulmincio.it",
   },
   {
-    category: "Sito web aziendale",
-    date: "20 apr 2026",
+    category: "Business website",
+    date: "Apr 20, 2026",
     title: "Cascina Fontana",
     url: "https://cascinafontana.xyz",
-    desc: "Sito web per Cascina Fontana. Design curato e layout responsive ottimizzato per presentare l'attività e i servizi offerti.",
+    desc: "Website for Cascina Fontana. Polished design and a responsive layout optimised to present the business and the services it offers.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
     screenshotUrl: "https://cascinafontana.xyz",
     previewImg: "/cascina-preview.png",
   },
 ];
 
-// Emoji per ogni progetto (mostrata nella riga "categoria" della card).
+// Emoji per ogni progetto (riga "categoria" della card).
 const PROJECT_EMOJI: Record<string, string> = {
   "PCTO": "🪵",
-  "Me stesso": "🎓",
-  "Gente di Dublino": "📖",
-  "Il Gattopardo": "🐆",
+  "About Me": "🎓",
+  "Dubliners": "📖",
+  "The Leopard": "🐆",
   "Mappa": "🗺️",
   "Movimento": "👣",
   "Trivia": "🧠",
@@ -336,143 +180,142 @@ const PROJECT_EMOJI: Record<string, string> = {
 
 const CV = [
   {
-    period: "12 set 2018 — 8 giu 2021",
-    title: "Scuola secondaria di primo grado — Mantova",
-    role: "Istituto Redentore · Fondazione «Casa dello studente Beato Contardo Ferrini»",
-    desc: "Percorso triennale con solida base in italiano, matematica, storia, scienze e lingua inglese. Sviluppo del metodo di studio e delle competenze trasversali. Diploma conseguito con profitto.",
+    period: "Sep 2018 — Jun 2021",
+    title: "Lower secondary school — Mantua",
+    role: "Istituto Redentore · «Beato Contardo Ferrini» Student House Foundation",
+    desc: "A three-year programme with a solid grounding in Italian, mathematics, history, science and English. Development of study method and cross-disciplinary skills. Diploma achieved with merit.",
   },
   {
-    period: "2021 — oggi",
-    title: "Istituto Tecnico Tecnologico «Carlo d'Arco» — Mantova",
-    role: "Diploma CAT · Costruzioni, Ambiente e Territorio (5º anno) · Classe 5T",
-    desc: "Percorso quinquennale di indirizzo tecnico-tecnologico. Materie principali: progettazione architettonica e disegno tecnico (AutoCAD), topografia e rilievo strumentale, estimo e valutazione immobiliare, gestione del cantiere, fisica tecnica, matematica e inglese tecnico. Codice meccanografico MNTL009017.",
+    period: "2021 — present",
+    title: "«Carlo d'Arco» Technical Institute — Mantua",
+    role: "CAT diploma · Construction, Environment and Territory (5th year) · Class 5T",
+    desc: "A five-year technical programme. Core subjects: architectural design and technical drawing (AutoCAD), topography and instrumental surveying, valuation and real-estate appraisal, site management, applied physics, mathematics and technical English. School code MNTL009017.",
   },
   {
-    period: "2019 — oggi",
-    title: "Vendite online — Vinted & Subito",
-    role: "E-commerce · Fotografia commerciale · Customer care",
-    desc: "Gestione autonoma dell'intero ciclo di vendita su Vinted e Subito: valutazione del prodotto, definizione del prezzo di mercato, fotografia con Canon EOS 4000D e iPhone 16 Pro, pubblicazione degli annunci, comunicazione con i potenziali acquirenti, trattativa, spedizione e gestione dei feedback. Prima operazione nel dicembre 2019. Attività personale sistematica dall'autunno 2024. Categorie: abbigliamento, collezionabili cinematografici, dispositivi tech (Apple Watch, Nintendo Switch, Flipper Zero).",
+    period: "2019 — present",
+    title: "Online sales — Vinted & Subito",
+    role: "E-commerce · Commercial photography · Customer care",
+    desc: "End-to-end management of the entire sales cycle on Vinted and Subito: product appraisal, market pricing, photography with a Canon EOS 4000D and iPhone 16 Pro, listing, communication with prospective buyers, negotiation, shipping and feedback handling. First sale in December 2019. A systematic personal activity since autumn 2024. Categories: clothing, film collectibles, tech devices (Apple Watch, Nintendo Switch, Flipper Zero).",
   },
   {
-    period: "continuativo",
-    title: "Cascina di famiglia — Rivalta sul Mincio",
-    role: "Collaboratore agricolo · Logistica · Coordinamento operativo",
-    desc: "Collaborazione continuativa nell'attività agricola familiare. Attività svolte: cura e manutenzione delle piante (annaffiamento, potatura di diverse tipologie e dimensioni), trasporto di materiali e attrezzature su trattore con rimorchio, raccolta del fieno da prato stabile, coordinamento delle operazioni con il team durante le fasi di lavoro intensivo, supporto logistico e assistenza negli spostamenti. Gestione autonoma di attrezzature agricole e risoluzione di problemi operativi sul campo.",
+    period: "ongoing",
+    title: "Family farm — Rivalta sul Mincio",
+    role: "Farm hand · Logistics · Operational coordination",
+    desc: "Ongoing collaboration in the family farming business. Tasks: plant care and maintenance (watering, pruning of various types and sizes), transport of materials and equipment on a tractor with trailer, hay harvesting from permanent meadow, coordinating operations with the team during intensive work, logistical support and assistance with transfers. Autonomous handling of farm equipment and on-field problem-solving.",
   },
   {
-    period: "19 dic 2023",
-    title: "Corso Sicurezza Lavoratori — Rischio Basso",
-    role: "Attestato di frequenza · LTO Mantova / FORMA · Regione Lombardia (ATS Val Padana) · 4 ore E-Learning",
-    desc: "Corso conforme all'Accordo Stato Regioni 21 dicembre 2011 (D.Lgs. 81/08, Art. 37), destinato ai lavoratori che svolgono attività d'ufficio. Contenuti: rischio elettrico, cadute dall'alto, microclima e illuminazione, videoterminali, organizzazione del lavoro e stress lavoro correlato, procedure di primo soccorso, segnaletica e antincendio (procedure di esodo). Attestato rilasciato in qualità di studente dal Laboratorio Territoriale Occupabilità di Mantova.",
+    period: "Dec 19, 2023",
+    title: "Workers' Safety Course — Low Risk",
+    role: "Certificate of attendance · LTO Mantua / FORMA · Lombardy Region (ATS Val Padana) · 4 hours e-learning",
+    desc: "Course compliant with the State–Regions Agreement of 21 December 2011 (Legislative Decree 81/08, Art. 37), aimed at office workers. Contents: electrical risk, falls from height, microclimate and lighting, display screens, work organisation and work-related stress, first-aid procedures, signage and fire safety (evacuation procedures). Certificate issued as a student by the Mantua Territorial Employability Laboratory.",
     pdf: "/attestato-sicurezza-lavoratori-rischio-basso.pdf",
-    pdfLabel: "Apri attestato (PDF)",
+    pdfLabel: "Open certificate (PDF)",
   },
   {
-    period: "11 — 25 ago 2024",
-    title: "CES IELTS Test Centre — Dublino, Irlanda",
-    role: "General English Intensive · 26 lezioni/settimana · Livello C1",
-    desc: "Corso intensivo di inglese generale presso il centro CES di Dame Court, Dublino 2. Quattro settimane di full immersion con focus su speaking, writing, reading e comprensione orale a livello avanzato (C1). Superamento dell'esame IELTS al termine del corso. Esplorazione autonoma del territorio: Howth, Balbriggan, North Bull Island, Bray, Greystones, Glendalough, Powerscourt Estate e Galway.",
+    period: "Aug 11 — 25, 2024",
+    title: "CES IELTS Test Centre — Dublin, Ireland",
+    role: "General English Intensive · 26 lessons/week · Level C1",
+    desc: "Intensive general English course at the CES centre on Dame Court, Dublin 2. Four weeks of full immersion focused on speaking, writing, reading and listening at advanced level (C1). Passed the IELTS exam at the end of the course. Independent exploration of the area: Howth, Balbriggan, North Bull Island, Bray, Greystones, Glendalough, Powerscourt Estate and Galway.",
   },
   {
     period: "2024 — 2025",
-    title: "Grest Parrocchiale · Parrocchia SS. Donato e Vigilio Martiri",
-    role: "Animatore volontario · Rivalta sul Mincio · 6 settimane/anno · 2 edizioni",
-    desc: "Servizio di animazione volontaria durante il Grest estivo parrocchiale — due edizioni consecutive (estate 2024 e 2025), per un totale di dodici settimane di attività. Responsabilità diretta su gruppi di bambini di diverse fasce d'età. Pianificazione e conduzione di giochi, laboratori e attività educative. Gestione delle dinamiche di gruppo, mediazione, comunicazione con i genitori. Referente: don Andrea Grandi.",
+    title: "Parish summer camp · SS. Donato e Vigilio Martiri Parish",
+    role: "Volunteer youth leader · Rivalta sul Mincio · 6 weeks/year · 2 editions",
+    desc: "Volunteer youth-leader service during the parish summer camp (Grest) — two consecutive editions (summer 2024 and 2025), for a total of twelve weeks. Direct responsibility for groups of children of different ages. Planning and running games, workshops and educational activities. Managing group dynamics, mediation, communication with parents. Reference: Fr. Andrea Grandi.",
   },
   {
-    period: "estate 2024",
-    title: "CRED · Scuola Secondaria di Rodigo",
-    role: "Supporto educativo volontario · Comune di Rodigo · 2 settimane",
-    desc: "Supporto educativo e animazione durante il Centro Ricreativo Estivo Diurno del Comune di Rodigo. Affiancamento agli educatori nella conduzione delle attività, gestione dei gruppi, supporto individualizzato agli alunni e organizzazione di momenti di gioco strutturato e libero.",
+    period: "Summer 2024",
+    title: "CRED · Rodigo Secondary School",
+    role: "Volunteer educational support · Municipality of Rodigo · 2 weeks",
+    desc: "Educational support and youth activities during the Municipality of Rodigo's summer day camp. Assisting educators in running activities, managing groups, individual support for pupils and organising structured and free play.",
   },
   {
-    period: "23 lug — 1 ago 2025",
-    title: "Parigi · Le Havre · Rouen · Étretat — Francia",
-    role: "Viaggio culturale",
-    desc: "Itinerario tra Normandia e Île-de-France: le scogliere di Étretat, la cattedrale gotica di Rouen, il porto storico di Le Havre e i principali musei e quartieri di Parigi.",
+    period: "Jul 23 — Aug 1, 2025",
+    title: "Paris · Le Havre · Rouen · Étretat — France",
+    role: "Cultural trip",
+    desc: "An itinerary across Normandy and Île-de-France: the cliffs of Étretat, the Gothic cathedral of Rouen, the historic port of Le Havre and the main museums and quarters of Paris.",
   },
   {
-    period: "26 — 29 dic 2025",
-    title: "Edimburgo — Scozia, Regno Unito",
-    role: "Viaggio culturale",
-    desc: "Visita della capitale scozzese durante le festività natalizie: Old Town, Edinburgh Castle, Royal Mile e l'atmosfera unica dei vicoli storici nel periodo natalizio.",
+    period: "Dec 26 — 29, 2025",
+    title: "Edinburgh — Scotland, United Kingdom",
+    role: "Cultural trip",
+    desc: "A visit to the Scottish capital over the Christmas holidays: the Old Town, Edinburgh Castle, the Royal Mile and the unique atmosphere of the historic closes at Christmas.",
   },
   {
-    period: "22 — 23 mar 2026",
-    title: "Scrutatore — Sezione 5, Rivalta sul Mincio",
-    role: "Operazioni elettorali · Comune di Rodigo · Referendum",
-    desc: "Incarico ufficiale di scrutatore presso la sezione elettorale n. 5 di Rivalta sul Mincio (Comune di Rodigo) in occasione del Referendum del 22 e 23 marzo 2026. Attività: verifica dell'identità degli elettori, gestione delle operazioni di voto, scrutinio delle schede, redazione dei verbali e trasmissione dei risultati. Incarico retribuito con onorari di 119,60 €.",
+    period: "Mar 22 — 23, 2026",
+    title: "Polling clerk — Section 5, Rivalta sul Mincio",
+    role: "Electoral operations · Municipality of Rodigo · Referendum",
+    desc: "Official appointment as a polling clerk at electoral section no. 5 of Rivalta sul Mincio (Municipality of Rodigo) for the Referendum of 22–23 March 2026. Tasks: verifying voters' identity, managing voting operations, counting ballots, drafting reports and transmitting results. Paid appointment with a fee of €119.60.",
   },
   {
-    period: "20 apr 2026",
-    title: "Cascina Fontana — Sito web",
-    role: "Web design & sviluppo front-end",
-    desc: "Progettazione e sviluppo del sito web ufficiale di Cascina Fontana. Analisi delle esigenze del cliente, definizione dell'architettura dell'informazione e realizzazione di un'interfaccia responsive, curata nel design e ottimizzata per la presentazione dei prodotti e servizi aziendali. Collaborazione diretta con il cliente per la definizione dei contenuti. Stack: React, TypeScript, Tailwind CSS.",
+    period: "Apr 20, 2026",
+    title: "Cascina Fontana — Website",
+    role: "Web design & front-end development",
+    desc: "Design and development of the official Cascina Fontana website. Analysis of the client's needs, definition of the information architecture and creation of a responsive, carefully designed interface optimised to present the company's products and services. Direct collaboration with the client to define the content. Stack: React, TypeScript, Tailwind CSS.",
   },
   {
-    period: "27 apr 2026",
-    title: "Rivalta sul Mincio — Sito web",
-    role: "Web design & sviluppo front-end",
-    desc: "Progettazione e sviluppo del sito web istituzionale e turistico per la località di Rivalta sul Mincio. Design editoriale minimalista con tipografia curata, palette cromatica calda e animazioni avanzate tramite GSAP ScrollTrigger (pinning, stacking, scrubbing parallax). Griglie bento gapless e composizione image-led per una narrazione visiva immersiva. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
+    period: "Apr 27, 2026",
+    title: "Rivalta sul Mincio — Website",
+    role: "Web design & front-end development",
+    desc: "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography, a warm colour palette and advanced animations via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Gapless bento grids and image-led composition for immersive visual storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
   },
-  // --- zona desideri ---
+  // --- wishlist ---
   {
-    period: "✦ desidero",
-    title: "Testata giornalistica — fondare la mia",
-    role: "Giornalismo indipendente · Reportage · Editoria",
-    desc: "Costruire un mezzo di informazione personale: andare sul campo, raccontare storie vere senza filtri, con la stessa aggressività e coraggio che ammiro in chi non si ferma davanti a nulla pur di portare la notizia.",
+    period: "✦ wish",
+    title: "Found my own news outlet",
+    role: "Independent journalism · Reportage · Publishing",
+    desc: "To build a personal news medium: go out into the field and tell true stories without filters, with the same drive and courage I admire in those who stop at nothing to get the story.",
     wish: true,
   },
 ];
 
-const ITA_MONTHS: Record<string, number> = {
-  gen: 0, feb: 1, mar: 2, apr: 3, mag: 4, giu: 5,
-  lug: 6, ago: 7, set: 8, ott: 9, nov: 10, dic: 11,
+// Parsing della data d'inizio (formato inglese) per l'ordinamento del CV.
+const EN_MONTHS: Record<string, number> = {
+  jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+  jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
 };
-const ITA_MONTH_RE = "gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic";
+const EN_MONTH_RE = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec";
 
 function parsePeriodStart(period: string): number {
   if (!period) return 0;
   const p = period.toLowerCase().trim();
 
-  // "continuativo" — collaborazione di lunga data, la trattiamo come molto antica.
-  if (p.includes("continuativo")) return new Date(1900, 0, 1).getTime();
+  // "ongoing" — collaborazione di lunga data: la trattiamo come molto antica.
+  if (p.includes("ongoing")) return new Date(1900, 0, 1).getTime();
 
-  // "estate YYYY" → 21 giugno YYYY.
-  const summer = p.match(/estate\s+(\d{4})/);
+  // "Summer YYYY" → 21 June YYYY.
+  const summer = p.match(/summer\s+(\d{4})/);
   if (summer) return new Date(+summer[1], 5, 21).getTime();
 
-  // "DD MMM YYYY" all'inizio (data completa: "12 set 2018 — 8 giu 2021", "19 dic 2023").
-  const dmy = p.match(new RegExp(`^(\\d{1,2})\\s+(${ITA_MONTH_RE})\\s+(\\d{4})`));
-  if (dmy) return new Date(+dmy[3], ITA_MONTHS[dmy[2]], +dmy[1]).getTime();
+  // Primo mese + giorno (il lookahead evita di scambiare le cifre dell'anno
+  // per un giorno, es. "Sep 2018"); l'anno è il primo gruppo di 4 cifre.
+  const md = p.match(new RegExp(`(${EN_MONTH_RE})\\s+(\\d{1,2})(?!\\d)`));
+  const year = p.match(/(\d{4})/);
+  if (md && year) return new Date(+year[1], EN_MONTHS[md[1]], +md[2]).getTime();
 
-  // "DD MMM — ... YYYY" (es. "23 lug — 1 ago 2025"): anno dalla coda.
-  const dmRange = p.match(new RegExp(`^(\\d{1,2})\\s+(${ITA_MONTH_RE})\\s*—.*?(\\d{4})`));
-  if (dmRange) return new Date(+dmRange[3], ITA_MONTHS[dmRange[2]], +dmRange[1]).getTime();
-
-  // "DD — DD MMM YYYY" (es. "11 — 25 ago 2024"): mese/anno dalla coda.
-  const dRange = p.match(new RegExp(`^(\\d{1,2})\\s*—\\s*\\d{1,2}\\s+(${ITA_MONTH_RE})\\s+(\\d{4})`));
-  if (dRange) return new Date(+dRange[3], ITA_MONTHS[dRange[2]], +dRange[1]).getTime();
-
-  // "YYYY ..." (es. "2021 — oggi", "2024 — 2025").
-  const year = p.match(/^(\d{4})/);
+  // Solo anno (es. "2021 — present", "2024 — 2025").
   if (year) return new Date(+year[1], 0, 1).getTime();
 
   return 0;
 }
 
+const NAV = [
+  { href: "#progetti", label: "Work" },
+  { href: "/bio", label: "About", route: true },
+  { href: "#curriculum", label: "Résumé" },
+  { href: "#contatti", label: "Contact" },
+];
+
 export default function App() {
   const [localMode, setLocalMode] = useState(false);
   const [docOpen, setDocOpen] = useState<{ url: string; title: string } | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const sortedCV = useMemo(() => {
     const wishes = CV.filter((c) => (c as any).wish);
     const items = CV.filter((c) => !(c as any).wish);
-    const sorted = items.slice().sort((a, b) => {
-      const da = parsePeriodStart(a.period);
-      const db = parsePeriodStart(b.period);
-      return db - da;
-    });
+    const sorted = items.slice().sort((a, b) => parsePeriodStart(b.period) - parsePeriodStart(a.period));
     return [...sorted, ...wishes];
   }, []);
 
@@ -490,23 +333,29 @@ export default function App() {
     return () => document.documentElement.classList.remove("ios");
   }, []);
 
-  // Arrivo con un hash nell'URL (es. /#progetti da un'altra rotta): lo scroll
-  // nativo del browser scatta prima che il contenuto (lista CV, progetti,
-  // immagini lazy) sia montato e dimensionato, quindi finisce in cima. Qui
-  // riportiamo lo scroll sulla sezione giusta dopo il layout, con qualche
-  // tentativo per assorbire l'aumento di altezza dei contenuti tardivi.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [menuOpen]);
+
+  // Arrivo con un hash nell'URL: riallinea lo scroll dopo il layout (i contenuti
+  // lazy montano dopo e cambiano l'altezza), evitando il salto "parte in cima".
   useLayoutEffect(() => {
     const id = window.location.hash.slice(1);
     if (!id) return;
-    // Primo allineamento SINCRONO, prima del paint: così tornando dal gioco la
-    // home appare già sulla sezione giusta, senza il salto "parte in cima poi
-    // scende" che si vedeva con lo scroll asincrono.
     const jump = () => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "start" });
     };
     jump();
-    // Ritenta per assorbire l'aumento di altezza dei contenuti che montano dopo.
     let tries = 0;
     const align = () => {
       jump();
@@ -539,46 +388,116 @@ export default function App() {
     return () => { window.removeEventListener("keydown", onKey); unlockBodyScroll(); };
   }, [docOpen]);
 
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div className="it-page-wrapper">
-      {/* Skiplinks — requisito di accessibilità del Design System */}
+    <div className="it-page-wrapper hm-page">
+      {/* Skiplinks — requisito di accessibilità */}
       <div className="skiplinks">
-        <a className="visually-hidden-focusable" href="#main-content">
-          Vai al contenuto principale
-        </a>
-        <a className="visually-hidden-focusable" href="#contatti">
-          Vai ai contatti
-        </a>
+        <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>
+        <a className="visually-hidden-focusable" href="#contatti">Skip to contacts</a>
       </div>
 
-      <SiteHeader localMode={localMode} />
+      {/* ── Header dark premium ── */}
+      <header className={`hm-hdr ${scrolled ? "hm-hdr--scrolled" : ""}`}>
+        <div className="hm-wrap hm-hdr-inner">
+          <a href="#home" className="hm-brand" aria-label="Alberto Pecchini — back to top">
+            <span className="hm-brand-mark" aria-hidden="true">
+              <img src="/favicon.svg" alt="" width={40} height={40} />
+            </span>
+            <span className="hm-brand-text">
+              <span className="hm-brand-name">Alberto Pecchini</span>
+              <span className="hm-brand-tag">Designer &amp; Front-end Developer</span>
+            </span>
+            {localMode ? <span className="hm-local">Local</span> : null}
+          </a>
+
+          <nav className="hm-nav" aria-label="Primary navigation">
+            {NAV.map((l) =>
+              l.route ? (
+                <Link key={l.href} to={l.href} className="hm-link">{l.label}</Link>
+              ) : (
+                <a key={l.href} href={l.href} className="hm-link">{l.label}</a>
+              ),
+            )}
+          </nav>
+
+          <div className="hm-right">
+            <div className="hm-social">
+              <a href="https://github.com/albertoxpecchini" target="_blank" rel="noreferrer noopener" aria-label="GitHub" title="GitHub"><SiGithub size={18} aria-hidden="true" /></a>
+              <a href="https://www.instagram.com/albertoxpecchini" target="_blank" rel="noreferrer noopener" aria-label="Instagram" title="Instagram"><SiInstagram size={18} aria-hidden="true" /></a>
+              <a href="https://x.com/ygpzk" target="_blank" rel="noreferrer noopener" aria-label="X" title="X"><SiX size={18} aria-hidden="true" /></a>
+            </div>
+            <a href="#contatti" className="hm-cta">Contact</a>
+            <button
+              className="hm-burger"
+              type="button"
+              aria-controls="hm-drawer"
+              aria-expanded={menuOpen}
+              aria-label="Open navigation menu"
+              onClick={() => setMenuOpen(true)}
+            >
+              <Menu size={22} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        {/* Drawer mobile */}
+        <div className={`hm-drawer ${menuOpen ? "open" : ""}`} id="hm-drawer">
+          <div className="hm-drawer-backdrop" onClick={closeMenu} aria-hidden="true" />
+          <div className="hm-drawer-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+            <button className="hm-drawer-close" type="button" aria-label="Close menu" onClick={closeMenu}>
+              <X size={22} aria-hidden="true" />
+            </button>
+            <nav className="hm-drawer-nav" aria-label="Navigation">
+              {NAV.map((l) =>
+                l.route ? (
+                  <Link key={l.href} to={l.href} onClick={closeMenu}>{l.label}</Link>
+                ) : (
+                  <a key={l.href} href={l.href} onClick={closeMenu}>{l.label}</a>
+                ),
+              )}
+            </nav>
+            <div className="hm-drawer-contacts">
+              <a href={`mailto:${EMAIL}`}><Mail size={18} aria-hidden="true" /> {EMAIL}</a>
+              <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener"><WhatsAppIcon size={16} /> WhatsApp</a>
+              <a href={PHONE_HREF}><Phone size={18} aria-hidden="true" /> {PHONE_DISPLAY}</a>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <main id="main-content">
-        <section id="home" className="ap-hero2">
-          <div className="ap-wrap ap-hero2-grid">
-            <div className="ap-hero2-main">
-              <p className="ap-eyebrow">💻 Studente CAT · Front-end Developer</p>
-              <h1 className="ap-hero2-title">
-                Studente CAT che progetta <span className="ap-hero2-accent">siti web</span> 🌐 e{" "}
-                <span className="ap-hero2-accent">web game</span> 🎮.
-              </h1>
-              <p className="ap-hero2-lead">
-                Creo esperienze digitali eleganti con un approccio moderno e funzionale.
-                Web design, sviluppo e animazioni curate per ogni schermo.
+        {/* ① Hero — nome + posizionamento (stile FiveSight/Prilo) */}
+        <section id="home" className="hm-hero">
+          <div className="hm-wrap hm-hero-grid">
+            <div className="hm-hero-main">
+              <p className="hm-hero-eyebrow">💻 Front-end Developer · CAT Student</p>
+              <h1 className="hm-hero-name">Alberto Pecchini</h1>
+              <span className="hm-hero-rule" aria-hidden="true" />
+              <p className="hm-hero-lead">
+                High-school senior &amp; front-end developer behind a hub of web games —{" "}
+                <span className="hm-ink">Trivia</span>, <span className="hm-ink">Mappa</span> and{" "}
+                <span className="hm-ink">Parole</span> — and client websites like{" "}
+                <span className="hm-ink">Rivalta sul Mincio</span> and{" "}
+                <span className="hm-ink">Cascina Fontana</span>.
               </p>
-              <div className="ap-hero2-actions">
-                <a href="#progetti" className="ap-pill ap-pill--solid">🚀 Progetti</a>
-                <Link to="/bio" className="ap-pill ap-pill--ghost">👋 Chi sono</Link>
+              <p className="hm-hero-sub">
+                Building elegant, fast web experiences with React, TypeScript and careful
+                motion design — from playful games to real-world business sites.
+              </p>
+              <div className="hm-hero-actions">
+                <a href="#progetti" className="hm-pill hm-pill--solid">🚀 Projects</a>
+                <Link to="/bio" className="hm-pill hm-pill--ghost">👋 Bio</Link>
               </div>
-              <div className="ap-hero2-quick">
+              <div className="hm-hero-quick">
                 {["Trivia", "Mappa", "Angoli"].map((t) => {
                   const p = PROJECTS.find((x) => x.title === t);
                   if (!p) return null;
                   return (
-                    <Link key={t} to={p.url} className="ap-quick" aria-label={`Vai a ${p.title}`}>
-                      <span className="ap-quick-ic" aria-hidden="true">
-                        <ProjectIcon thumb={(p as any).thumb} />
+                    <Link key={t} to={p.url} className="hm-quick" aria-label={`Open ${p.title}`}>
+                      <span className="hm-quick-ic" aria-hidden="true">
+                        <ProjectIcon thumb={(p as any).thumb} size={20} />
                       </span>
                       <span>{p.title}</span>
                     </Link>
@@ -586,11 +505,11 @@ export default function App() {
                 })}
               </div>
             </div>
-            <div className="ap-hero2-aside">
-              <div className="ap-hero2-portrait">
+            <div className="hm-hero-aside">
+              <div className="hm-portrait">
                 <img
                   src="/alberto-pecchini.jpg"
-                  alt="Ritratto di Alberto Pecchini"
+                  alt="Portrait of Alberto Pecchini"
                   width={1050}
                   height={1400}
                   loading="eager"
@@ -600,220 +519,492 @@ export default function App() {
           </div>
         </section>
 
-        <section id="progetti" className="ap-sec">
-          <div className="ap-wrap">
-            <div className="ap-sec-head">
+        {/* ② Work */}
+        <section id="progetti" className="hm-sec">
+          <div className="hm-wrap">
+            <div className="hm-sec-head">
               <div>
-                <p className="ap-eyebrow">🚀 Progetti</p>
-                <h2 className="ap-sec-title">Il mio lavoro</h2>
+                <p className="hm-eyebrow">🚀 Projects</p>
+                <h2 className="hm-title">My work</h2>
               </div>
-              <Link to="/trivia" className="ap-sec-action">
-                Apri il progetto in evidenza <ArrowUpRight size={16} aria-hidden="true" />
+              <Link to="/trivia" className="hm-action">
+                Open featured project <ArrowUpRight size={16} aria-hidden="true" />
               </Link>
             </div>
 
-            <div className="ap-cards">
+            <div className="hm-cards">
               {PROJECTS.map((p) => {
                 const internal = p.url.startsWith("/");
                 const shot = projectImages[p.title] || (p as any).previewImg;
                 const media = shot ? (
-                  <img className="ap-project-screenshot" src={shot} alt={`Anteprima di ${p.title}`} loading="lazy" />
-                ) : (p as any).thumb ? (
-                  <div className="ap-project-thumb">
-                    <ProjectThumb name={(p as any).thumb} />
-                  </div>
+                  <img className="hm-card-shot" src={shot} alt={`Preview of ${p.title}`} loading="lazy" />
                 ) : (
-                  <div className="ap-project-placeholder">
-                    <span className="ap-project-placeholder-text">{p.title}</span>
+                  <div className="hm-card-icon" aria-hidden="true">
+                    <span className="hm-card-icon-badge">
+                      <ProjectIcon thumb={(p as any).thumb} size={48} />
+                    </span>
                   </div>
                 );
                 const body = (
                   <>
-                    <div className="ap-card-media">{media}</div>
-                    <div className="ap-card-body">
-                      <span className="ap-card-meta">
+                    <div className="hm-card-media">{media}</div>
+                    <div className="hm-card-body">
+                      <span className="hm-card-meta">
                         <span aria-hidden="true">{PROJECT_EMOJI[p.title] ?? "📦"}</span> {p.category}
                       </span>
-                      <div className="ap-card-titlerow">
-                        <span className="ap-card-title">{p.title}</span>
-                        <span className="ap-badge ap-badge--active">
-                          <span className="ap-badge-dot" aria-hidden="true" />Attivo
+                      <div className="hm-card-titlerow">
+                        <span className="hm-card-title">{p.title}</span>
+                        <span className="hm-badge hm-badge--live">
+                          <span className="hm-badge-dot" aria-hidden="true" />Live
                         </span>
                       </div>
-                      <span className="ap-card-date">{p.date}</span>
-                      <p className="ap-card-desc">{p.desc}</p>
-                      <span className="ap-card-link">
-                        Apri progetto <ArrowUpRight size={15} aria-hidden="true" />
+                      <span className="hm-card-date">{p.date}</span>
+                      <p className="hm-card-desc">{p.desc}</p>
+                      <span className="hm-card-link">
+                        Open project <ArrowUpRight size={15} aria-hidden="true" />
                       </span>
                     </div>
                   </>
                 );
                 return internal ? (
-                  <Link key={p.title} to={p.url} className="ap-card" aria-label={p.title}>
-                    {body}
-                  </Link>
+                  <Link key={p.title} to={p.url} className="hm-card" aria-label={p.title}>{body}</Link>
                 ) : (
-                  <a
-                    key={p.title}
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="ap-card"
-                    aria-label={p.title}
-                  >
-                    {body}
-                  </a>
+                  <a key={p.title} href={p.url} target="_blank" rel="noreferrer noopener" className="hm-card" aria-label={p.title}>{body}</a>
                 );
               })}
             </div>
           </div>
         </section>
 
-        <section id="curriculum" className="ap-sec">
-          <div className="ap-wrap">
-            <div className="mb-5">
-              <p className="ap-eyebrow">🎓 Curriculum</p>
-              <div className="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <h2 className="ap-sec-title mb-0">Formazione &amp; esperienze</h2>
-                <div className="d-flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setDocOpen({ url: CV_PDF, title: "Curriculum Vitae — Alberto Pecchini" })}
-                    className="btn btn-primary fw-semibold d-inline-flex align-items-center"
-                    aria-haspopup="dialog"
-                  >
-                    <Eye size={18} className="me-2" aria-hidden="true" /> Visualizza il CV
-                  </button>
-                  <div className="d-flex flex-column gap-1">
-                    <a
-                      href={CV_PDF}
-                      className="btn btn-outline-primary fw-semibold d-inline-flex align-items-center"
-                      download
-                    >
-                      <Download size={18} className="me-2" aria-hidden="true" /> Scarica (PDF)
-                    </a>
-                    <span className="text-muted" style={{ fontSize: "0.8rem", lineHeight: 1 }}>3 pagine · 990 KB</span>
-                  </div>
-                </div>
+        {/* ③ Résumé */}
+        <section id="curriculum" className="hm-sec hm-sec--alt">
+          <div className="hm-wrap">
+            <div className="hm-sec-head">
+              <div>
+                <p className="hm-eyebrow">🎓 Résumé</p>
+                <h2 className="hm-title">Education &amp; experience</h2>
+              </div>
+              <div className="hm-cvbtns">
+                <button
+                  type="button"
+                  onClick={() => setDocOpen({ url: CV_PDF, title: "Curriculum Vitae — Alberto Pecchini" })}
+                  className="hm-btn hm-btn--solid"
+                  aria-haspopup="dialog"
+                >
+                  <Eye size={18} aria-hidden="true" /> View CV
+                </button>
+                <a href={CV_PDF} className="hm-btn hm-btn--ghost" download>
+                  <Download size={18} aria-hidden="true" /> Download (PDF)
+                </a>
               </div>
             </div>
-            <div className="row">
-              <div className="col-lg-9">
-                <div className="ap-timeline">
-                  {sortedCV.map((item) => (
-                    <div
-                      className={`ap-timeline-item${(item as any).wish ? " ap-timeline-item--wish" : ""}`}
-                      key={item.title}
+
+            <div className="hm-timeline">
+              {sortedCV.map((item) => (
+                <div className={`hm-tl-item${(item as any).wish ? " hm-tl-item--wish" : ""}`} key={item.title}>
+                  <span className={`hm-tl-period${(item as any).wish ? " hm-tl-period--wish" : ""}`}>{item.period}</span>
+                  <h3 className={`hm-tl-title${(item as any).wish ? " hm-tl-title--wish" : ""}`}>{item.title}</h3>
+                  <p className={`hm-tl-role${(item as any).wish ? " hm-tl-role--wish" : ""}`}>{item.role}</p>
+                  <p className="hm-tl-desc">{item.desc}</p>
+                  {(item as any).pdf && (
+                    <button
+                      type="button"
+                      onClick={() => setDocOpen({ url: (item as any).pdf, title: item.title })}
+                      className="hm-cv-doc"
+                      aria-haspopup="dialog"
                     >
-                      <span className={`ap-timeline-period${ (item as any).wish ? " ap-timeline-period--wish" : ""}`}>
-                        {item.period}
-                      </span>
-                      <h3 className={`h5 mb-1${(item as any).wish ? " fst-italic fw-normal" : " fw-bold"}`}>
-                        {item.title}
-                      </h3>
-                      <p className={`fw-semibold mb-2${(item as any).wish ? " ap-wish-role" : " text-primary"}`}>
-                        {item.role}
-                      </p>
-                      <p className="text-muted mb-0">{item.desc}</p>
-                      {(item as any).pdf && (
-                        <button
-                          type="button"
-                          onClick={() => setDocOpen({ url: (item as any).pdf, title: item.title })}
-                          className="ap-cv-doc mt-3"
-                          aria-haspopup="dialog"
-                        >
-                          <FileText size={16} aria-hidden="true" />
-                          <span>{(item as any).pdfLabel || "Apri documento (PDF)"}</span>
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                      <FileText size={16} aria-hidden="true" />
+                      <span>{(item as any).pdfLabel || "Open document (PDF)"}</span>
+                    </button>
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <section id="contatti" className="ap-contact">
-          <div className="ap-wrap ap-contact-inner">
-            <p className="ap-eyebrow ap-eyebrow--light">✉️ Contatti</p>
-            <h2 className="ap-contact-title">Parliamone. 💬</h2>
-            <p className="ap-contact-lead">
-              Per collaborazioni, progetti web o semplicemente per uno scambio di idee — sono
-              disponibile.
+        {/* ④ Contact */}
+        <section id="contatti" className="hm-contact">
+          <div className="hm-wrap hm-contact-inner">
+            <p className="hm-eyebrow hm-eyebrow--light">✉️ Contact</p>
+            <h2 className="hm-contact-title">Let's talk. 💬</h2>
+            <p className="hm-contact-lead">
+              For collaborations, web projects or simply to exchange ideas — I'm available.
             </p>
-            <div className="ap-contact-actions">
-              <a href={`mailto:${EMAIL}`} className="ap-pill ap-pill--light">
-                <Mail size={18} aria-hidden="true" /> Scrivimi
-              </a>
-              <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener" className="ap-pill ap-pill--lightghost">
-                <WhatsAppIcon size={18} /> WhatsApp
-              </a>
-              <a href={PHONE_HREF} className="ap-pill ap-pill--lightghost">
-                <Phone size={18} aria-hidden="true" /> Chiamami
-              </a>
+            <div className="hm-contact-actions">
+              <a href={`mailto:${EMAIL}`} className="hm-pill hm-pill--light"><Mail size={18} aria-hidden="true" /> Email me</a>
+              <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener" className="hm-pill hm-pill--lightghost"><WhatsAppIcon size={18} /> WhatsApp</a>
+              <a href={PHONE_HREF} className="hm-pill hm-pill--lightghost"><Phone size={18} aria-hidden="true" /> Call me</a>
             </div>
           </div>
         </section>
       </main>
 
-      <SiteFooter />
+      {/* ── Footer dark premium ── */}
+      <footer className="hm-foot">
+        <div className="hm-wrap">
+          <div className="hm-foot-top">
+            <div>
+              <p className="hm-foot-name">Alberto Pecchini</p>
+              <p className="hm-foot-role">Designer &amp; Developer · ITT «Carlo d'Arco» — Mantua</p>
+            </div>
+            <div className="hm-foot-social">
+              {SOCIALS.map(({ name, Icon, href }) => (
+                <a
+                  key={name}
+                  href={href}
+                  aria-label={name}
+                  title={name}
+                  {...(href !== "#" ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="hm-foot-bottom">
+            <span>© {new Date().getFullYear()} Alberto Pecchini — All rights reserved</span>
+            <span>Updated {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</span>
+          </div>
+        </div>
+      </footer>
 
-      {/* Visualizzatore PDF generico: usato sia per il CV che per gli attestati */}
+      {/* Visualizzatore PDF generico (CV + attestati) */}
       {docOpen && (
-        <div
-          className="ap-cv-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label={docOpen.title}
-        >
+        <div className="ap-cv-modal" role="dialog" aria-modal="true" aria-label={docOpen.title}>
           <div className="ap-cv-backdrop" onClick={() => setDocOpen(null)} aria-hidden="true" />
           <div className="ap-cv-dialog">
             <div className="ap-cv-bar">
               <span className="ap-cv-title">{docOpen.title}</span>
               <div className="d-flex align-items-center gap-2">
-                <a
-                  href={docOpen.url}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="btn btn-sm btn-outline-light fw-semibold d-none d-sm-inline-flex align-items-center"
-                >
-                  <ExternalLink size={15} className="me-1" aria-hidden="true" /> Nuova scheda
+                <a href={docOpen.url} target="_blank" rel="noreferrer noopener" className="btn btn-sm btn-outline-light fw-semibold d-none d-sm-inline-flex align-items-center">
+                  <ExternalLink size={15} className="me-1" aria-hidden="true" /> New tab
                 </a>
-                <a
-                  href={docOpen.url}
-                  download
-                  className="btn btn-sm btn-light fw-semibold text-primary d-inline-flex align-items-center"
-                >
-                  <Download size={15} className="me-1" aria-hidden="true" /> Scarica
+                <a href={docOpen.url} download className="btn btn-sm btn-light fw-semibold d-inline-flex align-items-center">
+                  <Download size={15} className="me-1" aria-hidden="true" /> Download
                 </a>
-                <button
-                  type="button"
-                  className="ap-cv-close"
-                  onClick={() => setDocOpen(null)}
-                  aria-label="Chiudi l'anteprima del documento"
-                >
+                <button type="button" className="ap-cv-close" onClick={() => setDocOpen(null)} aria-label="Close the document preview">
                   <X size={20} aria-hidden="true" />
                 </button>
               </div>
             </div>
-            <a
-              href={docOpen.url}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="ap-cv-fallback d-sm-none"
-            >
-              Su mobile l'anteprima PDF potrebbe non caricare — tocca qui per aprire il file →
+            <a href={docOpen.url} target="_blank" rel="noreferrer noopener" className="ap-cv-fallback d-sm-none">
+              On mobile the PDF preview may not load — tap here to open the file →
             </a>
-            <iframe
-              className="ap-cv-frame"
-              src={`${docOpen.url}#view=FitH&toolbar=1&navpanes=0`}
-              title={`Anteprima: ${docOpen.title}`}
-            />
+            <iframe className="ap-cv-frame" src={`${docOpen.url}#view=FitH&toolbar=1&navpanes=0`} title={`Preview: ${docOpen.title}`} />
           </div>
         </div>
       )}
 
+      <style>{`
+        /* ─────────────────────────────────────────────────────────────────────
+           Home "dark premium" · accento VIOLA al 100% (lo stesso di /me-stesso,
+           /dubliners, /gattopardo). Sfondo scuro profondo, superfici "vetro",
+           neon viola. Autosufficiente: non tocca la pagina /bio (stile chiaro).
+           ───────────────────────────────────────────────────────────────────── */
+        .hm-page {
+          --accent: #8b7bff;
+          --accent-2: #7c6cff;
+          --accent-deep: #5b4bd6;
+          --ink: #c4a5ff;
+          --glow: rgba(139, 123, 255, 0.45);
+          --text: #e8eef4;
+          --sub: #a7b2bd;
+          --surface: rgba(255, 255, 255, 0.05);
+          --surface-bd: rgba(255, 255, 255, 0.10);
+          --vio-soft: rgba(139, 123, 255, 0.10);
+          --vio-bd: rgba(139, 123, 255, 0.28);
+          min-height: 100vh;
+          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          color: var(--text);
+          background:
+            radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+        }
+        .hm-wrap {
+          width: 100%; max-width: 1200px; margin: 0 auto;
+          padding-left: 1.25rem; padding-right: 1.25rem;
+        }
+        .hm-ink { color: var(--ink); font-weight: 700; }
+
+        /* ── Header ── */
+        .hm-hdr {
+          position: sticky; top: 0; z-index: 50;
+          background: rgba(10, 13, 17, 0.72);
+          backdrop-filter: blur(14px) saturate(140%);
+          -webkit-backdrop-filter: blur(14px) saturate(140%);
+          border-bottom: 1px solid var(--surface-bd);
+          transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .hm-hdr--scrolled {
+          background: rgba(8, 11, 15, 0.92);
+          border-bottom-color: var(--vio-bd);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+        .hm-hdr-inner { display: flex; align-items: center; gap: 1rem; height: 66px; }
+        .hm-brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; color: var(--text); flex-shrink: 0; }
+        .hm-brand-mark {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 40px; height: 40px; border-radius: 10px; overflow: hidden;
+          background: var(--vio-soft); border: 1px solid var(--vio-bd);
+        }
+        .hm-brand-mark img { width: 100%; height: 100%; display: block; }
+        .hm-brand-text { display: inline-flex; flex-direction: column; line-height: 1.18; }
+        .hm-brand-name { font-weight: 800; font-size: 1.02rem; color: #ffffff; white-space: nowrap; }
+        .hm-brand-tag { font-size: 0.74rem; color: var(--sub); white-space: nowrap; }
+        .hm-local { font-size: 0.68rem; background: var(--accent); color: #0a0d11; font-weight: 800; padding: 0.12rem 0.5rem; border-radius: 999px; margin-left: 0.5rem; }
+        @media (max-width: 480px) { .hm-brand-tag { display: none; } }
+
+        .hm-nav { display: flex; align-items: center; gap: 1.35rem; margin-left: auto; }
+        .hm-link { color: var(--sub); text-decoration: none; font-size: 0.92rem; font-weight: 600; transition: color 0.15s; }
+        .hm-link:hover { color: #ffffff; }
+        .hm-right { display: flex; align-items: center; gap: 0.85rem; }
+        .hm-social { display: flex; gap: 0.6rem; }
+        .hm-social a { color: var(--sub); display: inline-flex; transition: color 0.15s; }
+        .hm-social a:hover { color: var(--ink); }
+        .hm-cta {
+          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
+          color: #ffffff !important; padding: 0.5rem 1.15rem; border-radius: 999px;
+          font-weight: 700; font-size: 0.9rem; text-decoration: none; white-space: nowrap;
+          border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 6px 20px var(--glow);
+          transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .hm-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 26px var(--glow); }
+        .hm-burger { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 6px; line-height: 1; }
+
+        /* Drawer mobile */
+        .hm-drawer { position: fixed; inset: 0; z-index: 100; visibility: hidden; }
+        .hm-drawer.open { visibility: visible; }
+        .hm-drawer-backdrop { position: absolute; inset: 0; background: rgba(5, 7, 10, 0.65); opacity: 0; transition: opacity 0.2s ease; }
+        .hm-drawer.open .hm-drawer-backdrop { opacity: 1; }
+        .hm-drawer-panel {
+          position: absolute; top: 0; right: 0; height: 100%; width: min(82vw, 340px);
+          background: linear-gradient(160deg, #15101f 0%, #0b0f14 100%);
+          border-left: 1px solid var(--vio-bd);
+          color: #fff; padding: calc(env(safe-area-inset-top) + 1.5rem) 1.5rem 1.5rem;
+          display: flex; flex-direction: column; gap: 1.2rem;
+          transform: translateX(100%); transition: transform 0.25s ease;
+        }
+        .hm-drawer.open .hm-drawer-panel { transform: translateX(0); }
+        .hm-drawer-close { align-self: flex-end; background: none; border: none; color: #fff; cursor: pointer; padding: 6px; line-height: 1; }
+        .hm-drawer-nav { display: flex; flex-direction: column; }
+        .hm-drawer-nav a { color: #fff; text-decoration: none; font-size: 1.15rem; font-weight: 600; padding: 0.7rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .hm-drawer-nav a:hover { color: var(--ink); }
+        .hm-drawer-contacts { margin-top: auto; display: flex; flex-direction: column; gap: 0.7rem; }
+        .hm-drawer-contacts a { color: rgba(255, 255, 255, 0.85); text-decoration: none; display: flex; align-items: center; gap: 0.55rem; font-size: 0.95rem; }
+        .hm-drawer-contacts a:hover { color: #fff; }
+
+        /* ── Hero ── */
+        .hm-hero {
+          position: relative; overflow: hidden;
+          padding: clamp(3rem, 7vw, 6rem) 0 clamp(3.5rem, 8vw, 6.5rem);
+          border-bottom: 1px solid var(--surface-bd);
+          background:
+            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.20) 0%, transparent 55%),
+            linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 110%);
+        }
+        .hm-hero::before, .hm-hero::after {
+          content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
+          filter: blur(70px); opacity: 0.4; pointer-events: none; z-index: 0;
+        }
+        .hm-hero::before { background: #8b7bff; top: -32%; right: -8%; }
+        .hm-hero::after  { background: #5b4bd6; bottom: -38%; left: -12%; opacity: 0.3; }
+        .hm-hero-grid {
+          position: relative; z-index: 1;
+          display: grid; grid-template-columns: 1.15fr 0.85fr;
+          gap: clamp(2rem, 5vw, 4rem); align-items: center;
+        }
+        .hm-hero-main { min-width: 0; }
+        .hm-hero-eyebrow {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          padding: 0.4rem 0.9rem; border-radius: 999px;
+          background: var(--vio-soft); border: 1px solid var(--vio-bd);
+          color: var(--ink); font-weight: 700; font-size: 0.8rem;
+          letter-spacing: 0.04em; margin: 0 0 1.2rem;
+        }
+        .hm-hero-name {
+          font-size: clamp(2.6rem, 7vw, 4.6rem); font-weight: 800; line-height: 1.02;
+          letter-spacing: -0.02em; color: #ffffff; margin: 0 0 1.1rem;
+        }
+        .hm-hero-rule { display: block; width: 64px; height: 4px; border-radius: 2px; background: var(--accent); box-shadow: 0 0 18px var(--glow); margin-bottom: 1.3rem; }
+        .hm-hero-lead { font-size: clamp(1.15rem, 1.9vw, 1.45rem); line-height: 1.55; font-weight: 600; color: #ffffff; margin: 0 0 1rem; max-width: 42rem; }
+        .hm-hero-sub { font-size: clamp(1rem, 1.5vw, 1.12rem); line-height: 1.65; color: var(--sub); margin: 0 0 1.8rem; max-width: 40rem; }
+        .hm-hero-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.8rem; }
+        .hm-hero-quick { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; }
+
+        /* Pillole */
+        .hm-pill {
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          padding: 0.7rem 1.5rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem;
+          text-decoration: none; cursor: pointer; border: 1.5px solid transparent;
+          transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+        }
+        .hm-pill--solid { background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%); color: #fff; box-shadow: 0 8px 24px var(--glow); }
+        .hm-pill--solid:hover { transform: translateY(-2px); box-shadow: 0 12px 30px var(--glow); }
+        .hm-pill--ghost { background: var(--vio-soft); color: var(--text); border-color: var(--vio-bd); }
+        .hm-pill--ghost:hover { border-color: var(--accent); color: #fff; background: rgba(139, 123, 255, 0.16); }
+        .hm-pill--light { background: #fff; color: #1a1430; }
+        .hm-pill--light:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3); }
+        .hm-pill--lightghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.5); }
+        .hm-pill--lightghost:hover { background: rgba(255, 255, 255, 0.14); }
+
+        /* Quick-link progetti */
+        .hm-quick {
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          padding: 0.4rem 0.95rem 0.4rem 0.4rem;
+          background: var(--surface); border: 1px solid var(--surface-bd); border-radius: 999px;
+          text-decoration: none; color: var(--text); font-weight: 600; font-size: 0.9rem;
+          transition: transform 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+        }
+        .hm-quick:hover { transform: translateY(-2px); border-color: var(--vio-bd); color: #fff; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4); }
+        .hm-quick-ic { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--vio-soft); color: var(--ink); flex-shrink: 0; }
+
+        /* Ritratto */
+        .hm-hero-aside { display: flex; justify-content: center; }
+        .hm-portrait {
+          position: relative; width: 100%; max-width: 360px; border-radius: 22px; overflow: hidden;
+          border: 1px solid var(--vio-bd);
+          box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 50px var(--glow);
+        }
+        .hm-portrait img { width: 100%; height: auto; display: block; aspect-ratio: 3 / 4; object-fit: cover; }
+
+        /* ── Sezioni ── */
+        .hm-sec { padding: clamp(3.5rem, 7vw, 5.5rem) 0; position: relative; }
+        .hm-sec--alt { background: rgba(255, 255, 255, 0.018); border-top: 1px solid var(--surface-bd); border-bottom: 1px solid var(--surface-bd); }
+        .hm-sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+        .hm-eyebrow { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink); margin: 0 0 0.5rem; }
+        .hm-eyebrow--light { color: rgba(255, 255, 255, 0.85); }
+        .hm-title { font-size: clamp(1.9rem, 4vw, 2.6rem); font-weight: 800; line-height: 1.1; color: #ffffff; margin: 0; }
+        .hm-action { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--ink); font-weight: 700; font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
+        .hm-action:hover { color: #fff; }
+
+        /* Card */
+        .hm-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+        .hm-card {
+          display: flex; flex-direction: column; background: var(--surface);
+          border: 1px solid var(--surface-bd); border-radius: 18px; overflow: hidden;
+          text-decoration: none; color: inherit; text-align: left;
+          transition: transform 0.16s, box-shadow 0.16s, border-color 0.16s;
+        }
+        .hm-card:hover { transform: translateY(-4px); border-color: var(--vio-bd); box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5); }
+        .hm-card-media { height: 200px; overflow: hidden; border-bottom: 1px solid var(--surface-bd); }
+        .hm-card-shot { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .hm-card-icon {
+          width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+          background:
+            radial-gradient(120% 120% at 30% 20%, rgba(139, 123, 255, 0.22), rgba(10, 12, 16, 0.2)),
+            linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+        }
+        .hm-card-icon-badge {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 84px; height: 84px; border-radius: 22px;
+          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
+          color: #fff; border: 1px solid rgba(255, 255, 255, 0.25);
+          box-shadow: 0 14px 40px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+        .hm-card:hover .hm-card-icon-badge { transform: scale(1.05); transition: transform 0.16s; }
+        .hm-card-body { display: flex; flex-direction: column; flex: 1 1 auto; padding: 1.25rem 1.25rem 1.4rem; }
+        .hm-card-meta { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink); margin-bottom: 0.4rem; }
+        .hm-card-titlerow { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.3rem; }
+        .hm-card-title { font-size: 1.15rem; font-weight: 800; color: #ffffff; line-height: 1.2; }
+        .hm-card-date { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--sub); margin-bottom: 0.6rem; }
+        .hm-card-desc { font-size: 0.92rem; line-height: 1.55; color: var(--sub); margin: 0 0 1rem; }
+        .hm-card-link { margin-top: auto; display: inline-flex; align-items: center; gap: 0.35rem; color: var(--ink); font-weight: 700; font-size: 0.9rem; }
+        .hm-card:hover .hm-card-link { color: #fff; }
+
+        /* Badge "Live" */
+        .hm-badge { display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 999px; }
+        .hm-badge--live { background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd); }
+        .hm-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(139, 123, 255, 0.2); }
+
+        /* CV buttons */
+        .hm-cvbtns { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; }
+        .hm-btn {
+          display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.62rem 1.2rem;
+          border-radius: 999px; font-weight: 700; font-size: 0.92rem; cursor: pointer;
+          text-decoration: none; border: 1.5px solid transparent; font-family: inherit;
+          transition: transform 0.15s, box-shadow 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .hm-btn--solid { background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%); color: #fff; box-shadow: 0 8px 22px var(--glow); }
+        .hm-btn--solid:hover { transform: translateY(-2px); box-shadow: 0 12px 28px var(--glow); }
+        .hm-btn--ghost { background: var(--vio-soft); color: var(--text); border-color: var(--vio-bd); }
+        .hm-btn--ghost:hover { border-color: var(--accent); color: #fff; }
+
+        /* Timeline */
+        .hm-timeline { position: relative; padding-left: 2rem; }
+        .hm-timeline::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--vio-bd); }
+        .hm-tl-item { position: relative; padding-bottom: 2rem; }
+        .hm-tl-item:last-child { padding-bottom: 0; }
+        .hm-tl-item::before {
+          content: ""; position: absolute; left: -2rem; top: 4px; width: 16px; height: 16px; border-radius: 50%;
+          background: var(--accent); border: 3px solid #0b0f14; box-shadow: 0 0 0 2px var(--vio-bd), 0 0 14px var(--glow);
+        }
+        .hm-tl-period { display: inline-block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); margin-bottom: 0.25rem; }
+        .hm-tl-title { font-size: 1.18rem; font-weight: 800; color: #ffffff; margin: 0 0 0.2rem; }
+        .hm-tl-role { font-weight: 700; color: var(--ink); margin: 0 0 0.5rem; }
+        .hm-tl-desc { color: var(--sub); margin: 0; line-height: 1.65; }
+        /* Variante "wish" (ambra) */
+        .hm-tl-item--wish::before { background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3), 0 0 14px rgba(245, 158, 11, 0.4); }
+        .hm-tl-item--wish { opacity: 0.9; }
+        .hm-tl-period--wish { color: #fbbf24; }
+        .hm-tl-title--wish { font-weight: 600; font-style: italic; }
+        .hm-tl-role--wish { color: #fcd34d; }
+        .hm-cv-doc {
+          display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.9rem;
+          padding: 0.5rem 0.9rem; background: var(--vio-soft); border: 1px solid var(--vio-bd);
+          border-radius: 999px; color: var(--ink); font-family: inherit; font-size: 0.85rem; font-weight: 700;
+          cursor: pointer; appearance: none; transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .hm-cv-doc:hover { background: var(--accent); border-color: var(--accent); color: #0a0d11; }
+
+        /* ── Contact ── */
+        .hm-contact {
+          position: relative; overflow: hidden; color: #fff;
+          padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+          background:
+            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.28) 0%, transparent 55%),
+            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
+          border-top: 1px solid var(--surface-bd);
+        }
+        .hm-contact-inner { position: relative; z-index: 1; text-align: center; max-width: 46rem; margin: 0 auto; }
+        .hm-contact-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; margin: 0.3rem 0 1rem; color: #fff; }
+        .hm-contact-lead { font-size: 1.1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.88); margin: 0 auto 2rem; max-width: 38rem; }
+        .hm-contact-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; }
+
+        /* ── Footer ── */
+        .hm-foot { background: #090c10; color: #fff; border-top: 1px solid var(--surface-bd); padding: 2.5rem 0 2rem; }
+        .hm-foot-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.5rem; border-bottom: 1px solid var(--surface-bd); }
+        .hm-foot-name { font-size: 1.2rem; font-weight: 800; margin: 0 0 0.2rem; }
+        .hm-foot-role { margin: 0; color: var(--sub); font-size: 0.92rem; }
+        .hm-foot-social { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+        .hm-foot-social a { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--surface-bd); color: #fff; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+        .hm-foot-social a:hover { background: var(--vio-soft); border-color: var(--vio-bd); color: var(--ink); }
+        .hm-foot-bottom { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-top: 1.25rem; font-size: 0.82rem; color: var(--sub); }
+
+        /* Modale PDF — accento viola coerente con la home */
+        .hm-page .ap-cv-bar { background: var(--accent-deep); }
+        .hm-page .ap-cv-fallback { background: var(--vio-soft); color: var(--ink); border-bottom-color: var(--vio-bd); }
+
+        /* ── Responsive ── */
+        @media (max-width: 991.98px) {
+          .hm-nav, .hm-social, .hm-cta { display: none; }
+          .hm-burger { display: inline-flex; }
+          .hm-right { margin-left: auto; }
+          .hm-hero-grid { grid-template-columns: 1fr; }
+          .hm-hero-aside { order: -1; }
+          .hm-portrait { max-width: 300px; }
+          .hm-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 575.98px) {
+          .hm-cards { grid-template-columns: 1fr; }
+          .hm-card-media { height: 180px; }
+          .hm-foot-social { justify-content: flex-start; }
+          .hm-sec-head { align-items: flex-start; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hm-card, .hm-quick, .hm-pill, .hm-btn, .hm-cta, .hm-drawer-panel, .hm-drawer-backdrop, .hm-card-icon-badge { transition: none; }
+        }
+      `}</style>
     </div>
   );
 }

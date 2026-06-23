@@ -28,7 +28,7 @@ export default function Bio() {
           className="ap-biolist-item"
           key={it.label}
           onClick={() => setSelectedItem(it)}
-          aria-label={`Scopri di più: ${it.label}`}
+          aria-label={`Learn more: ${it.label}`}
         >
           <span className="ap-biolist-emoji" aria-hidden="true">{it.emoji}</span>
           <span>{it.label}</span>
@@ -49,33 +49,32 @@ export default function Bio() {
         <section className="ap-hero2">
           <div className="ap-wrap ap-hero2-grid">
             <div className="ap-hero2-main">
-              <p className="ap-eyebrow">👋 Chi sono</p>
-              <h1 className="ap-hero2-title">Ciao, sono Alberto.</h1>
+              <p className="ap-eyebrow">👋 About me</p>
+              <h1 className="ap-hero2-title">Hi, I'm Alberto.</h1>
               <p className="ap-bio-p">
-                Mi chiamo Alberto Pecchini, ho {age} anni e frequento il quinto anno della
-                sezione CAT all'Istituto Tecnico Tecnologico <strong>«Carlo d'Arco»</strong> di
-                Mantova.
+                My name is Alberto Pecchini, I'm {age} and I'm in my fifth year of the CAT
+                programme at the <strong>«Carlo d'Arco»</strong> Technical Institute in Mantua.
               </p>
               <p className="ap-bio-p">
-                Sono uno sviluppatore web e designer appassionato di user experience e design
-                minimalista. Utilizzo Next.js, TypeScript, GSAP e Tailwind CSS per creare siti
-                web responsivi, veloci e raffinati.
+                I'm a web developer and designer passionate about user experience and minimalist
+                design. I use Next.js, TypeScript, GSAP and Tailwind CSS to build responsive,
+                fast and polished websites.
               </p>
               <p className="ap-bio-p">
-                La mia missione è trasformare le idee in{" "}
-                <strong>esperienze digitali memorabili</strong>, mantenendo un design pulito,
-                una tipografia curata e animazioni che valorizzano i contenuti.
+                My mission is to turn ideas into{" "}
+                <strong>memorable digital experiences</strong>, keeping a clean design, careful
+                typography and animations that enhance the content.
               </p>
               <p className="ap-bio-p mb-0">
-                Fuori dallo schermo sono un <strong>tifoso del Sassuolo</strong> ⚫🟢: il neroverde
-                è anche il filo conduttore cromatico di questo sito.
+                Away from the screen I'm a <strong>Sassuolo fan</strong> ⚫🟢: the black-and-green
+                is also the colour thread running through this site.
               </p>
             </div>
             <div className="ap-hero2-aside">
               <div className="ap-hero2-portrait">
                 <img
                   src="/alberto-pecchini.jpg"
-                  alt="Ritratto di Alberto Pecchini"
+                  alt="Portrait of Alberto Pecchini"
                   width={1050}
                   height={1400}
                   loading="eager"
@@ -90,15 +89,15 @@ export default function Bio() {
           <div className="ap-wrap ap-twocol">
             <div>
               <div className="ap-biolist-head">
-                <p className="ap-eyebrow">🎮 I miei hobby</p>
-                <h2 className="ap-sec-title">Nel tempo libero</h2>
+                <p className="ap-eyebrow">🎮 My hobbies</p>
+                <h2 className="ap-sec-title">In my free time</h2>
               </div>
               {renderList(HOBBY)}
             </div>
             <div>
               <div className="ap-biolist-head">
-                <p className="ap-eyebrow">🔥 Le mie passioni</p>
-                <h2 className="ap-sec-title">Cosa mi appassiona</h2>
+                <p className="ap-eyebrow">🔥 My passions</p>
+                <h2 className="ap-sec-title">What drives me</h2>
               </div>
               {renderList(PASSIONI)}
             </div>
@@ -109,7 +108,7 @@ export default function Bio() {
         <section className="ap-sec">
           <div className="ap-wrap ap-twocol">
             <div className="ap-side-box">
-              <p className="ap-side-label">🧰 Competenze</p>
+              <p className="ap-side-label">🧰 Skills</p>
               {SKILLS.map((group) => (
                 <div className="ap-side-skill" key={group.title}>
                   <span className="ap-side-skill-title">
@@ -128,23 +127,23 @@ export default function Bio() {
 
             <div className="ap-bio-side">
               <div className="ap-side-box">
-                <p className="ap-side-label">📍 Dove</p>
+                <p className="ap-side-label">📍 Location</p>
                 <p className="ap-side-based">
-                  <MapPin size={16} aria-hidden="true" /> Mantova · Italia
+                  <MapPin size={16} aria-hidden="true" /> Mantua · Italy
                 </p>
               </div>
               <div className="ap-side-box">
-                <p className="ap-side-label">🎓 Formazione</p>
+                <p className="ap-side-label">🎓 Education</p>
                 <p className="ap-side-edu-lead">
-                  Diploma CAT in corso all'ITT «Carlo d'Arco» di Mantova; inglese C1 (IELTS)
-                  conseguito a Dublino.
+                  CAT diploma in progress at ITT «Carlo d'Arco» in Mantua; English C1 (IELTS)
+                  achieved in Dublin.
                 </p>
                 <ul className="ap-side-edu">
                   <li>
-                    <GraduationCap size={16} aria-hidden="true" /> ITT «Carlo d'Arco» — Diploma CAT
+                    <GraduationCap size={16} aria-hidden="true" /> ITT «Carlo d'Arco» — CAT diploma
                   </li>
                   <li>
-                    <GraduationCap size={16} aria-hidden="true" /> CES Dublino — IELTS, livello C1
+                    <GraduationCap size={16} aria-hidden="true" /> CES Dublin — IELTS, level C1
                   </li>
                 </ul>
               </div>

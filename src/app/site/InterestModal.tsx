@@ -36,7 +36,7 @@ export default function InterestModal({ item, onClose }: { item: Interest | null
         style={{ transform: "translate(-50%, -50%)" }}
         className="ap-modal"
       >
-        <button type="button" className="ap-modal-close" onClick={onClose} aria-label="Chiudi">
+        <button type="button" className="ap-modal-close" onClick={onClose} aria-label="Close">
           <X size={20} />
         </button>
         {item.img && imgStatus !== "error" && (
@@ -61,7 +61,7 @@ export default function InterestModal({ item, onClose }: { item: Interest | null
           {item.link && (
             <a href={item.link} className="btn btn-primary fw-semibold mt-2 d-inline-flex align-items-center">
               <Gamepad2 size={18} className="me-2" aria-hidden="true" />
-              {item.linkLabel ?? "Apri"}
+              {item.linkLabel ?? "Open"}
             </a>
           )}
         </div>
