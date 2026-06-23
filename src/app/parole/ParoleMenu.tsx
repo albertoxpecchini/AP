@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Link } from "react-router";
 import { BookOpen, Trophy, Flame, Clock, ChevronRight, ArrowLeft, ListOrdered, MoreHorizontal, X, Type } from "lucide-react";
 import { type WordLength } from "./words";
@@ -62,6 +62,39 @@ export default function ParoleMenu({
     return () => { alive = false; };
   }, [nick]);
   const fmtScore = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, "")}k` : `${n}`;
+
+  const gridWrapRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const fitAll = () => {
+      const root = gridWrapRef.current;
+      if (!root) return;
+      root.querySelectorAll<HTMLElement>(".trm-tile-titlebox").forEach(box => {
+        const words = Array.from(box.querySelectorAll<HTMLElement>(".trm-word"));
+        if (!words.length) return;
+        const maxW = box.clientWidth - 2;
+        const maxH = box.clientHeight;
+        if (maxW <= 0 || !maxH) return;
+        words.forEach(w => {
+          let lo = 9, hi = 56, best = 9;
+          for (let i = 0; i < 10; i++) {
+            const mid = (lo + hi) / 2;
+            w.style.fontSize = mid + "px";
+            if (w.scrollWidth <= maxW) { best = mid; lo = mid; } else hi = mid;
+          }
+          w.style.fontSize = Math.floor(best) + "px";
+        });
+        const totalH = box.scrollHeight;
+        if (totalH > maxH) {
+          const k = (maxH / totalH) * 0.99;
+          words.forEach(w => { w.style.fontSize = Math.floor(parseFloat(w.style.fontSize) * k) + "px"; });
+        }
+      });
+    };
+    fitAll();
+    window.addEventListener("resize", fitAll);
+    (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready.then(fitAll);
+    return () => window.removeEventListener("resize", fitAll);
+  });
 
   const handleTileMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -192,7 +225,7 @@ export default function ParoleMenu({
   };
 
   return (
-    <div className="trm-root">
+    <div className="trm-root" ref={gridWrapRef}>
       {/* ════════ MOBILE ════════ */}
       <div className="trm-mobile">
         <div className="trm-hero">
@@ -271,7 +304,7 @@ export default function ParoleMenu({
         .trm-desktop { display:none; }
 
         .trm-hero {
-          background: linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
+          background: linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
@@ -280,8 +313,8 @@ export default function ParoleMenu({
           content:""; position:absolute; width:60%; height:70%; border-radius:50%;
           filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
         }
-        .trm-hero::before { background:#7c3aed; top:-25%; left:-15%; }
-        .trm-hero::after  { background:#2F9E5A; bottom:-30%; right:-15%; opacity:0.45; }
+        .trm-hero::before { background:#8b7bff; top:-25%; left:-15%; }
+        .trm-hero::after  { background:#6d4dff; bottom:-30%; right:-15%; opacity:0.4; }
         .trm-hero > * { position:relative; z-index:1; }
         .trm-logo-wrap {
           background:#fff; color:#6024c4; border-radius:18px; padding:12px;
@@ -343,7 +376,7 @@ export default function ParoleMenu({
         .trm-drawer-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; animation:trm-fade .2s ease; }
         @keyframes trm-fade { from{opacity:0;} to{opacity:1;} }
         .trm-drawer {
-          width:100%; background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 60%,#103820 130%);
+          width:100%; background:linear-gradient(160deg,#15101f 0%,#1a1430 60%,#0b0f14 130%);
           border-radius:20px 20px 0 0; padding:1.1rem 1.1rem calc(1.6rem + env(safe-area-inset-bottom));
           box-shadow:0 -10px 40px rgba(0,0,0,0.4); animation:trm-up .25s cubic-bezier(.2,.8,.3,1);
           max-height:88dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
@@ -495,10 +528,10 @@ export default function ParoleMenu({
           min-height:0; overflow:hidden; gap:0.02em;
         }
         .trm-word {
-          display:block; white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
-          font-size:1.05rem;
-          font-weight:900; line-height:1.02;
-          letter-spacing:-0.02em;
+          display:block; white-space:nowrap;
+          font-size:1.4rem;
+          font-weight:900; line-height:0.92;
+          letter-spacing:-0.03em;
           color:${textMain};
           transition:color .12s;
           text-shadow:0 1px 0 rgba(255,255,255,0.04);
@@ -554,18 +587,18 @@ export default function ParoleMenu({
 
           .trm-desktop-left, .trm-desktop-right {
             flex-shrink:0;
-            background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
+            background:linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
             display:flex; flex-direction:column; overflow:hidden; position:relative;
           }
           .trm-desktop-left::before, .trm-desktop-right::before {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.4; pointer-events:none;
-            background:#7c3aed; top:-10%; left:-20%;
+            background:#8b7bff; top:-10%; left:-20%;
           }
           .trm-desktop-left::after, .trm-desktop-right::after {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.3; pointer-events:none;
-            background:#2F9E5A; bottom:-12%; right:-20%;
+            background:#6d4dff; bottom:-12%; right:-20%;
           }
           .trm-desktop-left > *, .trm-desktop-right > * { position:relative; z-index:1; }
 
@@ -587,7 +620,7 @@ export default function ParoleMenu({
             display:flex; flex-direction:column; gap:0.85rem;
             padding:2rem 1.8rem; overflow-y:auto;
           }
-          .trm-desktop-center .trm-grid { grid-template-columns:repeat(2,1fr); }
+          .trm-desktop-center .trm-grid { grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); }
 
           .trm-desktop-right {
             width:280px;

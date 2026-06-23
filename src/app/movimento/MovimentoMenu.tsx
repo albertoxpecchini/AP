@@ -71,7 +71,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
         const maxH = box.clientHeight;
         if (maxW <= 0 || !maxH) return;
         words.forEach(w => {
-          let lo = 9, hi = 48, best = 9;
+          let lo = 9, hi = 56, best = 9;
           for (let i = 0; i < 10; i++) {
             const mid = (lo + hi) / 2;
             w.style.fontSize = mid + "px";
@@ -276,7 +276,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
         .mvm-desktop { display:none; }
 
         .mvm-hero {
-          background: linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
+          background: linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
@@ -285,8 +285,8 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           content:""; position:absolute; width:60%; height:70%; border-radius:50%;
           filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
         }
-        .mvm-hero::before { background:#7c3aed; top:-25%; left:-15%; }
-        .mvm-hero::after  { background:#2F9E5A; bottom:-30%; right:-15%; opacity:0.45; }
+        .mvm-hero::before { background:#8b7bff; top:-25%; left:-15%; }
+        .mvm-hero::after  { background:#6d4dff; bottom:-30%; right:-15%; opacity:0.4; }
         .mvm-hero > * { position:relative; z-index:1; }
         .mvm-logo-wrap {
           background:#fff; color:#6024c4; border-radius:18px; padding:14px;
@@ -470,7 +470,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
         }
         .mvm-word {
           display:block; white-space:nowrap;
-          font-size:1.4rem;
+          font-size:1.4rem; /* fallback; il JS sovrascrive inline */
           font-weight:900; line-height:0.92;
           letter-spacing:-0.03em;
           color:${textMain};
@@ -535,18 +535,18 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           /* Fasce scure SINISTRA e DESTRA: stessa "pelle" speculare. */
           .mvm-desktop-left, .mvm-desktop-right {
             flex-shrink:0;
-            background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 38%,#103820 100%);
+            background:linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
             display:flex; flex-direction:column; overflow:hidden; position:relative;
           }
           .mvm-desktop-left::before, .mvm-desktop-right::before {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.4; pointer-events:none;
-            background:#7c3aed; top:-10%; left:-20%;
+            background:#8b7bff; top:-10%; left:-20%;
           }
           .mvm-desktop-left::after, .mvm-desktop-right::after {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.3; pointer-events:none;
-            background:#2F9E5A; bottom:-12%; right:-20%;
+            background:#6d4dff; bottom:-12%; right:-20%;
           }
           .mvm-desktop-left > *, .mvm-desktop-right > * { position:relative; z-index:1; }
 
@@ -570,7 +570,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
             display:flex; flex-direction:column; gap:0.85rem; justify-content:center;
             padding:2rem 1.8rem; overflow-y:auto;
           }
-          .mvm-desktop-center .mvm-grid { grid-template-columns:repeat(3,1fr); }
+          .mvm-desktop-center .mvm-grid { grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); }
 
           /* DESTRA = funzioni. */
           .mvm-desktop-right {
