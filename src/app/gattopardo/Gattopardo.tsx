@@ -396,6 +396,13 @@ export default function Gattopardo() {
               <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
             </Link>
           </div>
+          <p className="mb-0 pb-3" style={{ fontSize: "0.78rem", color: "var(--sub)" }}>
+            Immagini:{" "}
+            <a href="https://commons.wikimedia.org" target="_blank" rel="noreferrer" style={{ color: "var(--ink)" }}>
+              Wikimedia Commons
+            </a>{" "}
+            — pubblico dominio (ritratto di Hayez; veduta di Palermo di F. Lojacono, 1875; valle di Segesta di Th. Cole, 1844) e CC0 (tramonto sulla costa siciliana).
+          </p>
         </div>
       </footer>
 
