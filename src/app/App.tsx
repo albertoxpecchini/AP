@@ -623,7 +623,48 @@ export default function App() {
           </div>
         </section>
 
-        {/* ④ Contact */}
+        {/* ④ Stack */}
+        <section className="hm-sec">
+          <div className="hm-wrap">
+            <div className="hm-sec-head">
+              <div>
+                <p className="hm-eyebrow">⚙️ Stack</p>
+                <h2 className="hm-title">Built with</h2>
+              </div>
+            </div>
+            <div className="hm-stack">
+              <a href="https://react.dev" target="_blank" rel="noreferrer noopener" title="React 18.3">
+                <img src="https://img.shields.io/badge/React-18.3-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React 18.3" />
+              </a>
+              <a href="https://www.typescriptlang.org" target="_blank" rel="noreferrer noopener" title="TypeScript strict">
+                <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript strict" />
+              </a>
+              <a href="https://vite.dev" target="_blank" rel="noreferrer noopener" title="Vite 6.3">
+                <img src="https://img.shields.io/badge/Vite-6.3-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite 6.3" />
+              </a>
+              <a href="https://tailwindcss.com" target="_blank" rel="noreferrer noopener" title="Tailwind 4.1">
+                <img src="https://img.shields.io/badge/Tailwind-4.1-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind 4.1" />
+              </a>
+              <a href="https://www.radix-ui.com" target="_blank" rel="noreferrer noopener" title="Radix UI">
+                <img src="https://img.shields.io/badge/Radix_UI-primitives-161618?style=flat-square&logo=radixui&logoColor=white" alt="Radix UI primitives" />
+              </a>
+              <a href="https://motion.dev" target="_blank" rel="noreferrer noopener" title="Motion 12">
+                <img src="https://img.shields.io/badge/Motion-12-FF4D8D?style=flat-square&logo=framer&logoColor=white" alt="Motion 12" />
+              </a>
+              <a href="https://reactrouter.com" target="_blank" rel="noreferrer noopener" title="React Router 7">
+                <img src="https://img.shields.io/badge/React_Router-7-CA4245?style=flat-square&logo=reactrouter&logoColor=white" alt="React Router 7" />
+              </a>
+              <a href="https://supabase.com" target="_blank" rel="noreferrer noopener" title="Supabase">
+                <img src="https://img.shields.io/badge/Supabase-backend-3FCF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase backend" />
+              </a>
+              <a href="https://www.anthropic.com" target="_blank" rel="noreferrer noopener" title="Claude Opus 4.8">
+                <img src="https://img.shields.io/badge/Claude-Opus_4.8-D97757?style=flat-square&logo=anthropic&logoColor=white" alt="Claude Opus 4.8" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ⑤ Contact */}
         <section id="contatti" className="hm-contact">
           <div className="hm-wrap hm-contact-inner">
             <p className="hm-eyebrow hm-eyebrow--light">✉️ Contact</p>
@@ -956,6 +997,12 @@ export default function App() {
           cursor: pointer; appearance: none; transition: background 0.15s, border-color 0.15s, color 0.15s;
         }
         .hm-cv-doc:hover { background: var(--accent); border-color: var(--accent); color: #0a0d11; }
+
+        /* Stack badges */
+        .hm-stack { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; }
+        .hm-stack a { display: inline-flex; transition: transform 0.15s, opacity 0.15s; }
+        .hm-stack a:hover { transform: translateY(-2px); opacity: 0.9; }
+        .hm-stack img { height: auto; display: block; max-height: 32px; }
 
         /* ── Contact ── */
         .hm-contact {
