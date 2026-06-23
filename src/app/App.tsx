@@ -1005,7 +1005,7 @@ export default function App() {
         }
         /* linguetta della cartella */
         .hm-mat-tab {
-          position: absolute; top: -16px; left: clamp(1.25rem, 3vw, 2.5rem);
+          position: absolute; top: -16px; left: clamp(1.25rem, 3vw, 2.5rem); z-index: 10;
           display: inline-flex; align-items: center; gap: 0.5rem;
           padding: 0.5rem 1.1rem; border-radius: 12px;
           background: linear-gradient(140deg, var(--gold) 0%, var(--gold-deep) 130%);
@@ -1015,7 +1015,7 @@ export default function App() {
         }
         /* badge "in evidenza" in alto a destra */
         .hm-mat-pin {
-          position: absolute; top: -13px; right: clamp(1.25rem, 3vw, 2.5rem);
+          position: absolute; top: -13px; right: clamp(1.25rem, 3vw, 2.5rem); z-index: 10;
           display: inline-flex; align-items: center; gap: 0.35rem;
           padding: 0.35rem 0.8rem; border-radius: 999px;
           background: var(--gold-soft); color: var(--gold-2); border: 1px solid var(--gold-bd);
