@@ -26,7 +26,7 @@
 [![Motion](https://img.shields.io/badge/Motion-12-FF4D8D?style=flat-square&logo=framer&logoColor=white)](https://motion.dev)
 [![React Router](https://img.shields.io/badge/React_Router-7-CA4245?style=flat-square&logo=reactrouter&logoColor=white)](https://reactrouter.com)
 [![Supabase](https://img.shields.io/badge/Supabase-backend-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
-[![Anthropic](https://img.shields.io/badge/Claude-Haiku_4.5-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com)
+[![Anthropic](https://img.shields.io/badge/Claude-Opus_4.8-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com)
 [![Bootstrap Italia](https://img.shields.io/badge/Bootstrap_Italia-AgID-0066CC?style=flat-square&logo=bootstrap&logoColor=white)](https://italia.github.io/bootstrap-italia/)
 
 🔗 **Live:** [albertopecchini.it](https://albertopecchini.it) · **Repo:** [albertoxpecchini/AP](https://github.com/albertoxpecchini/AP) · **Autore:** [@albertoxpecchini](https://github.com/albertoxpecchini)
