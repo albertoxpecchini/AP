@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import {
   ArrowLeft,
   ArrowUp,
+  Download,
   Printer,
   GraduationCap,
   ChevronDown,
@@ -277,14 +278,14 @@ export default function Letteratura() {
               </span>
             </Link>
             <div className="d-inline-flex align-items-center gap-2">
-              <button
-                type="button"
-                onClick={() => window.print()}
+              <a
+                href="/schemi-orale-letteratura.pdf"
+                download
                 className="lt-print-btn"
               >
-                <Printer size={16} aria-hidden="true" />
-                <span>Stampa / PDF</span>
-              </button>
+                <Download size={16} aria-hidden="true" />
+                <span>Scarica PDF</span>
+              </a>
               <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
                 <ArrowLeft size={16} className="me-1" aria-hidden="true" />
                 <span className="d-none d-sm-inline">Torna alla home</span>
@@ -316,9 +317,9 @@ export default function Letteratura() {
             </div>
             <div className="lt-hero-actions">
               <div className="lt-hero-btns">
-                <button type="button" className="lt-print-cta" onClick={() => window.print()}>
-                  <Printer size={18} aria-hidden="true" /> Stampa o salva in PDF
-                </button>
+                <a href="/schemi-orale-letteratura.pdf" download className="lt-print-cta">
+                  <Download size={18} aria-hidden="true" /> Scarica il PDF (tutti gli schemi)
+                </a>
                 <button
                   type="button"
                   className={`lt-expand-cta${expandAll ? " is-on" : ""}`}
@@ -331,10 +332,14 @@ export default function Letteratura() {
                     <><ChevronsUpDown size={18} aria-hidden="true" /> Apri tutti gli schemi</>
                   )}
                 </button>
+                <button type="button" className="lt-expand-cta lt-print-ghost" onClick={() => window.print()}>
+                  <Printer size={18} aria-hidden="true" /> Stampa la pagina
+                </button>
               </div>
               <span className="lt-hero-hint">
-                «Apri tutti gli schemi» mostra a video ogni domanda con la risposta. In stampa si aprono comunque
-                tutte da sole: scegli «Salva come PDF» (o premi Ctrl/Cmd&nbsp;+&nbsp;P).
+                Il <strong>PDF</strong> raccoglie tutti gli schemi in versione descrittiva, già impaginati e pronti
+                da stampare — il modo più sicuro per studiare offline. In alternativa, «Apri tutti gli schemi»
+                mostra a video ogni domanda con la risposta.
               </span>
             </div>
           </div>

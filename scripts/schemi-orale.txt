@@ -1,0 +1,193 @@
+#TITLE Letteratura italiana — Schemi per l'orale
+#SUB Esame di Stato 2026 · Classe 5T · Sintesi descrittive e domande tipiche
+
+Questi schemi raccontano ogni autore e argomento del programma in forma discorsiva: pensati per essere letti e ripetuti ad alta voce, come se stessi rispondendo alla commissione. Alla fine di ogni sezione trovi alcune domande tipiche da cui la prof può partire all'orale. Per i testi e i numeri di pagina fai sempre riferimento al manuale in adozione.
+
+#MOD 01 — Il Naturalismo
+#META Émile Zola · Francia, anni 1870-1880 · dal Positivismo al romanzo
+
+Il Naturalismo è la grande corrente del romanzo francese della seconda metà dell'Ottocento e nasce dentro il clima del Positivismo, cioè dalla fiducia assoluta nella scienza, nel progresso e nel metodo sperimentale. L'idea di fondo è che anche la società e l'uomo possano essere studiati come fenomeni naturali, applicando il rigore con cui si studiano la fisica o la medicina. Su questa base si innesta il determinismo del filosofo Taine, secondo cui ogni individuo è il prodotto di tre fattori: la razza (l'eredità biologica), l'ambiente in cui vive e il momento storico. L'uomo, insomma, non è del tutto libero: è in gran parte determinato dalle condizioni che lo circondano.
+
+Il teorico e maestro del movimento è Émile Zola. Nel saggio «Il romanzo sperimentale» Zola sostiene che il romanziere deve comportarsi come uno scienziato: osserva la realtà, colloca i suoi personaggi in un certo ambiente e poi ne studia le reazioni, esattamente come in un esperimento di laboratorio. Da qui nasce il suo grande progetto, il ciclo dei Rougon-Macquart, venti romanzi che seguono una stessa famiglia attraverso le generazioni per mostrare come ereditarietà e ambiente ne segnino i destini.
+
+A differenza di quanto accadrà con il Verismo italiano, il Naturalismo ha una chiara finalità sociale e progressista: denunciando le condizioni disumane delle classi popolari, Zola crede che la letteratura possa contribuire a riformare la società. Il romanzo «L'Assommoir» ne è l'esempio più noto: nel brano antologizzato, «Gervasia all'Assommoir», seguiamo la lavandaia Gervaise e il degrado del mondo operaio parigino, segnato dalla miseria e dall'alcolismo (l'assommoir è proprio l'osteria-distilleria dove ci si ubriaca). Zola descrive tutto questo senza filtri moralistici, lasciando che siano i fatti a parlare.
+
+#Q Che cos'è il Naturalismo e da quale clima culturale nasce?
+#Q In che cosa consiste il metodo sperimentale applicato da Zola al romanzo?
+#Q Qual è la finalità sociale del Naturalismo? Racconta il brano «Gervasia all'Assommoir».
+
+#MOD 02 — Il Verismo e Giovanni Verga
+#META Catania, 1840 - 1922 · la versione italiana del Naturalismo
+
+Il Verismo è la risposta italiana al Naturalismo francese: ne condivide il metodo, ma lo cala nella realtà del Sud rurale e, soprattutto, lo carica di un pessimismo che in Zola non c'era. Naturalismo e Verismo hanno infatti molto in comune — l'attenzione al vero, l'ambientazione popolare, la volontà di rappresentare la realtà in modo oggettivo — ma li separa un punto decisivo: Zola crede nel progresso e nella possibilità di migliorare la società, mentre Verga è convinto che per i più deboli non ci sia riscatto possibile.
+
+Giovanni Verga, dopo una prima fase di romanzi mondani, approda al Verismo intorno alla fine degli anni Settanta. La sua poetica si fonda sull'impersonalità: l'opera deve sembrare «essersi fatta da sé», senza che l'autore intervenga a commentare o giudicare. Per ottenere questo effetto Verga usa alcune tecniche precise. La regressione del narratore: la voce narrante si abbassa al livello dei personaggi e ne assume il punto di vista, la mentalità e perfino la lingua popolare. Lo straniamento: i valori vengono capovolti, così che ciò che per noi è normale appare strano agli occhi del mondo contadino e viceversa (Rosso Malpelo è considerato «cattivo» semplicemente perché ha i capelli rossi). Il discorso indiretto libero: i pensieri dei personaggi entrano nel racconto senza virgolette, fondendosi con la narrazione.
+
+Alla base di tutto c'è il pessimismo verghiano, riassunto nell'ideale dell'ostrica: come l'ostrica muore se si stacca dallo scoglio, così l'uomo che abbandona il «nido» — la famiglia, il paese, le tradizioni — viene travolto. Il progresso è una «fiumana» che porta avanti l'umanità ma lascia sul fondo i vinti. Proprio i Vinti danno il titolo al grande progetto di Verga: un ciclo di cinque romanzi sulla lotta per la vita a tutti i livelli sociali, di cui completò però solo i primi due, «I Malavoglia» e «Mastro-don Gesualdo».
+
+I testi in programma mostrano bene tutto questo. In «Rosso Malpelo» (da Vita dei campi) il lavoro disumano nella cava di rena diventa il banco di prova dello straniamento. Ne «I Malavoglia», nel brano del ritorno e dell'addio di 'Ntoni, il giovane che aveva lasciato il paese torna ormai estraneo e riparte per sempre: qui il paesaggio non fa da semplice sfondo, ma partecipa allo stato d'animo del personaggio, accompagnandone la malinconia. Ne «La roba» (da Novelle rusticane) Mazzarò accumula terre e beni per tutta la vita, fino a identificarsi con essi: nel finale, capendo di non poterli portare con sé nella morte, esce gridando «roba mia, vientene con me!». È la roba ad aver posseduto lui, non il contrario.
+
+#Q Quali sono le somiglianze e le differenze tra Naturalismo e Verismo?
+#Q Che cos'è l'impersonalità e con quali tecniche Verga la realizza?
+#Q Spiega l'ideale dell'ostrica e il pessimismo di Verga. Che cos'è il ciclo dei Vinti?
+#Q Analizza «Rosso Malpelo» e il ruolo del paesaggio nel ritorno di 'Ntoni.
+
+#MOD 03 — La Scapigliatura
+#META Milano e Torino, 1860-1880 · Tarchetti, Praga, Boito
+
+La Scapigliatura è un gruppo di artisti ribelli e anticonformisti attivo soprattutto a Milano: il nome traduce l'idea della «bohème», la vita disordinata e fuori dalle regole dei bohémien parigini. Sono giovani inquieti, in polemica con la società borghese e con la tradizione letteraria italiana, da Manzoni in poi. Il loro tratto più caratteristico è il dualismo: una lacerazione interiore che li divide tra l'aspirazione all'ideale e l'attrazione per il reale, per il brutto, per la malattia e la morte. Per questo si guarda con interesse a modelli stranieri come Baudelaire, Poe, Hoffmann e Heine, e si parla della Scapigliatura come di un movimento di transizione, un ponte tra il Romanticismo che tramonta e il Decadentismo che sta per arrivare.
+
+Igino Ugo Tarchetti, nel romanzo «Fosca», ne offre l'esempio più estremo: il protagonista è attratto in modo morboso da Fosca, una donna brutta e gravemente malata. È il rovesciamento del modello romantico della bellezza: qui affascinano la malattia e la deformità, secondo quella «estetica del brutto» tipicamente scapigliata. Emilio Praga, invece, nella poesia «Preludio» (dalla raccolta Penombre) firma una sorta di manifesto del movimento, in aperta polemica contro la poesia rassicurante e morale del Romanticismo manzoniano.
+
+Un confronto utile all'orale è quello tra il «vero» di Praga e il «vero» di Verga. Per Verga il vero è oggettivo, scientifico e sociale, rappresentato con la massima impersonalità. Per Praga, invece, il vero è soggettivo e provocatorio: una ribellione che si compiace dello scandalo e del brutto. Detto in breve: Verga descrive, Praga provoca.
+
+#Q Che cosa significa «Scapigliatura» e quali sono i suoi caratteri principali?
+#Q Perché la Scapigliatura è definita un movimento di transizione?
+#Q Confronta il «vero» di Verga con il «vero» di Praga.
+
+#MOD 04 — Il Futurismo
+#META Filippo Tommaso Marinetti · Manifesto del 1909
+
+Il Futurismo è la prima grande avanguardia italiana e ha una data di nascita precisa: il 20 febbraio 1909, quando Filippo Tommaso Marinetti pubblica il «Manifesto del Futurismo» sul quotidiano francese «Le Figaro». È un movimento che vuole rompere clamorosamente con il passato e celebrare il mondo nuovo. I suoi miti sono la velocità, la macchina, l'automobile, l'industria, la città, il dinamismo e l'energia; il suo atteggiamento è l'antipassatismo, fino alla provocazione di voler «distruggere i musei e le biblioteche». A questo si aggiunge l'esaltazione, oggi inquietante, della guerra come «sola igiene del mondo»: una posizione che la tragedia della Prima guerra mondiale avrebbe poi drammaticamente smentito.
+
+Alla rivoluzione dei contenuti corrisponde una rivoluzione del linguaggio: le «parole in libertà». Marinetti aboliscono la sintassi, la punteggiatura e il verso tradizionale; il verbo va all'infinito, si usano analogie ardite e onomatopee, e perfino l'impaginazione diventa visiva (le tavole parolibere). Il testo in programma, «Il bombardamento di Adrianopoli» (da Zang Tumb Tumb), ne è l'esempio perfetto: con onomatopee e parole in libertà Marinetti prova a riprodurre il rumore e il caos di un assedio reale, durante la guerra balcanica. Il linguaggio non descrive la battaglia: la imita.
+
+#Q Quando e dove esce il Manifesto del Futurismo? Quali sono i miti del movimento?
+#Q Che cosa sono le «parole in libertà»? Analizza «Il bombardamento di Adrianopoli».
+
+#MOD 05 — Gabriele D'Annunzio
+#META Pescara, 1863 - Vittoriale, 1938 · il Decadentismo ed estetismo
+
+D'Annunzio è il grande protagonista del Decadentismo italiano e fa della propria vita un'opera d'arte. La sua parabola attraversa tre grandi fasi, che corrispondono ad altrettanti concetti-chiave. L'estetismo: il culto assoluto della bellezza, vissuta al di sopra di ogni morale o utilità. Il superomismo: ripreso (e in parte frainteso) da Nietzsche, è l'idea dell'individuo eccezionale, posto al di sopra della massa e della morale comune. E il panismo: la fusione totale dell'io con la Natura, il farsi pioggia, albero, vento, dissolvendosi nel «tutto». A queste idee D'Annunzio aggiunge il mito del poeta-vate, il poeta come guida e profeta della nazione, ruolo che incarna anche nella vita pubblica con le sue celebri imprese di combattente: il volo su Vienna, la beffa di Buccari, l'impresa di Fiume del 1919-20.
+
+Il romanzo «Il piacere» mette in scena l'estetismo attraverso il suo eroe decadente, Andrea Sperelli. Nel brano «Il ritratto di un esteta» lo conosciamo come un nobile raffinatissimo, che vive di sensazioni e di bellezza ma è incapace di agire davvero: è, in fondo, un inetto, e proprio in questo si rivela la crisi e il vuoto dell'estetismo.
+
+La grande stagione lirica è quella delle «Laudi», e in particolare di «Alcyone». In «La sera fiesolana» l'io poetico si rivolge alla sera (e a una donna), lodandola in un paesaggio toscano carico di mistero. Le figure retoriche dominanti sono la sinestesia, la metafora e la personificazione, mentre le antifone «Laudata sii» richiamano apertamente il Cantico delle creature di San Francesco, soprattutto nella seconda strofa: la Natura diventa qualcosa di sacro, e da essa si sprigiona un senso del mistero che è il cuore del panismo.
+
+Un volto diverso di D'Annunzio emerge dal «Notturno», scritto durante un periodo di cecità temporanea dovuto a una ferita all'occhio. Nel brano «Deserto di cenere» la prosa si fa frammentaria, fatta di sensazioni e di incertezza, perché la vista è precaria: nasce un modo nuovo di percepire il mondo, e con esso affiora la fragilità dell'uomo. È l'esatto contrario del superuomo sicuro di sé della giovinezza.
+
+#Q Spiega estetismo, superomismo e panismo. Che cosa significa «poeta-vate»?
+#Q Chi è Andrea Sperelli e perché è l'eroe decadente per eccellenza?
+#Q «La sera fiesolana»: a chi si rivolge l'io poetico, con quali figure e quali richiami francescani?
+#Q «Deserto di cenere»: come cambia la percezione e perché è l'opposto del superuomo?
+
+#MOD 06 — Sibilla Aleramo
+#META Alessandria, 1876 - Roma, 1960 · «Una donna» (1906)
+
+Sibilla Aleramo è lo pseudonimo di Rina Faccio, e con il romanzo «Una donna» del 1906 firma quello che è considerato il primo grande romanzo femminista italiano. È un'opera autobiografica: racconta in prima persona la presa di coscienza di una donna che, dentro un matrimonio infelice e segnato dalla violenza, capisce a poco a poco di essere una persona, e non soltanto «moglie» o «madre». Il punto più alto e doloroso del libro è la scelta finale: per salvare se stessa e la propria dignità, la protagonista decide di lasciare il marito e perfino il figlio. È il prezzo terribile della libertà.
+
+Il brano antologizzato si presta a un confronto diretto con l'attualità, in particolare con il tema della violenza di genere: già nel 1906 Aleramo mostra una violenza «normalizzata» all'interno della famiglia, lo stesso meccanismo che oggi continuiamo a denunciare. È quindi un ottimo testo da collegare, all'orale, ai temi di cittadinanza.
+
+#Q Chi è Sibilla Aleramo e perché «Una donna» è un libro importante?
+#Q Perché la protagonista lascia marito e figlio? Come colleghi il romanzo all'attualità?
+
+#MOD 07 — Giuseppe Ungaretti
+#META Alessandria d'Egitto, 1888 - Milano, 1970 · «L'Allegria»
+
+La poesia di Ungaretti nasce nelle trincee della Prima guerra mondiale, dove combatté come fante sul Carso. È proprio l'esperienza della guerra a rivelargli, insieme, l'orrore della morte e il valore assoluto della vita. La raccolta fondamentale è «L'Allegria», che prima di arrivare a questo titolo si era chiamata «Il porto sepolto» (1916) e «Allegria di naufragi» (1919). I suoi temi sono la guerra, la fragilità dell'uomo, la fratellanza e l'attaccamento alla vita.
+
+A questi contenuti corrisponde uno stile rivoluzionario, ridotto all'essenziale. Ungaretti usa versi liberi, spesso una sola parola per verso, circondata da grandi spazi bianchi; abolisce la punteggiatura e affida tutto all'analogia, l'accostamento immediato di immagini lontane. Ogni poesia, inoltre, porta la data e il luogo (le date topiche e croniche), come le pagine di un diario di guerra: la parola è radicata in un momento e in un punto precisi del fronte.
+
+I testi in programma illustrano questa poetica. In «Veglia» il poeta passa una notte accanto al cadavere di un compagno e, proprio davanti alla morte, scrive «lettere piene d'amore»: dall'orrore nasce un attaccamento violento alla vita. In «Fratelli» la parola «fratelli», rivolta nella notte a un altro reparto, rivela la fragilità e la solidarietà tra gli uomini in guerra; vi troviamo l'ossimoro e l'analogia. In «Sono una creatura» il dolore è talmente grande da essersi pietrificato, duro e arido come la pietra del Carso. In «I fiumi», infine, Ungaretti ripercorre la propria identità attraverso quattro fiumi della sua vita — il Serchio delle radici familiari, il Nilo dell'infanzia in Egitto, la Senna della formazione a Parigi e l'Isonzo della guerra — riconoscendosi «una docile fibra dell'universo».
+
+#Q Come l'esperienza della guerra dà origine alla poesia de «L'Allegria»? Quali furono i titoli precedenti?
+#Q Spiega le tecniche compositive di Ungaretti (parola-verso, spazi bianchi, analogia, date).
+#Q Analizza «Veglia» e «Fratelli». Perché in «I fiumi» il poeta sceglie proprio i fiumi?
+
+#MOD 08 — Giovanni Pascoli
+#META San Mauro di Romagna, 1855 - Bologna, 1912 · il Decadentismo
+
+La vita di Pascoli è segnata da una tragedia familiare: l'assassinio del padre, nel 1867, e una serie di lutti che distruggono la sua famiglia. Da questo trauma nasce l'ossessione che attraversa tutta la sua opera, quella del «nido»: la famiglia vissuta come rifugio chiuso e protettivo, e insieme la paura del mondo esterno, del «lontano», che fa male e ricorda la morte.
+
+Al centro della sua poetica c'è il «fanciullino»: secondo Pascoli dentro ogni uomo vive un fanciullo che guarda il mondo con stupore e dà nomi nuovi alle cose, e il poeta è proprio colui che sa ancora ascoltarne la voce. La poesia, allora, non ha fini pratici: è intuizione, scoperta, meraviglia. A questo si lega il simbolismo di Pascoli, per cui le cose nascondono un significato segreto oltre l'apparenza, e il fonosimbolismo, l'uso dei suoni e delle onomatopee — come il «chiù» dell'assiuolo — per evocare sensazioni e misteri.
+
+I testi mostrano queste idee all'opera. «Il gelsomino notturno» (che, va ricordato, appartiene ai Canti di Castelvecchio e non a Myricae) descrive una notte in cui, mentre il fiore si apre, si allude alla prima notte di nozze di amici: il poeta resta escluso, fuori dal nido, e tutto è giocato su simboli e sinestesie. «L'assiuolo» (da Myricae) costruisce un'atmosfera angosciosa attorno al verso dell'uccello, il «chiù», che risuona come una voce di morte: vi si riconoscono l'enjambement, la sinestesia e il fonosimbolismo. «Nebbia» (Canti di Castelvecchio) esprime invece il desiderio di chiudersi nel piccolo mondo del nido, lasciando che la nebbia nasconda tutto ciò che è lontano e minaccioso.
+
+È utile, all'orale, confrontare Pascoli e D'Annunzio: entrambi decadenti e simbolisti, cercano il mistero oltre le cose, ma Pascoli è umile e intimista, poeta delle piccole cose e del nido, mentre D'Annunzio è sontuoso, sensuale, poeta del superuomo e del panismo.
+
+#Q Spiega la poetica del «fanciullino» e il tema del «nido».
+#Q Che cosa si intende per simbolismo e fonosimbolismo in Pascoli?
+#Q Analizza «L'assiuolo» e «Nebbia». Confronta i motivi decadenti di Pascoli e D'Annunzio.
+
+#MOD 09 — Luigi Pirandello
+#META Agrigento, 1867 - Roma, 1936 · Premio Nobel 1934
+
+Pirandello è il grande indagatore della crisi dell'io e dell'uomo moderno. Quanto al suo rapporto con il fascismo, si iscrisse al partito nel 1924, ma fu un legame complesso e ambiguo: la sua opera, tutta fondata sul relativismo e sulla messa in crisi di ogni certezza, è in fondo l'opposto di un'ideologia totalitaria.
+
+Alla base del suo pensiero c'è la poetica dell'umorismo, spiegata nel saggio «L'umorismo». Pirandello distingue la comicità dall'umorismo attraverso il celebre esempio della vecchia signora imbellettata: se mi limito a notarne il contrasto (una vecchia agghindata come una ragazza) provo l'«avvertimento del contrario» e rido; ma se rifletto sul perché lo fa (forse per trattenere il marito), provo il «sentimento del contrario» e non rido più, anzi la compatisco. L'umorismo, dunque, scompone e fa riflettere.
+
+Da qui derivano gli altri concetti-chiave. Il relativismo gnoseologico: non esiste una verità unica e oggettiva, ognuno ha la propria e nessuno può conoscere davvero l'altro. La maschera: la società ci impone dei ruoli, così che non siamo mai un solo «io», ma «uno, nessuno e centomila». E il contrasto tra vita e forma: la vita è un flusso continuo, ma la «forma» — i ruoli, le convenzioni — la imprigiona; vivere significa restare ingabbiati. In questo quadro la follia diventa una via di fuga: impazzire, o fingersi pazzi, è l'unico modo per sfuggire alle maschere sociali, come accade in «Enrico IV» e in «Così è (se vi pare)».
+
+Nel romanzo «Il fu Mattia Pascal» il protagonista, creduto morto, tenta una seconda vita con il nome di Adriano Meis, ma scopre che senza un'identità sociale — documenti, ruolo, legami — non può amare né esistere davvero; torna, ma ormai è «il fu», né vivo né morto. Il brano «Io e l'ombra mia» fotografa proprio questa condizione di uomo ridotto a pura ombra. Tra le «Novelle per un anno», «Il treno ha fischiato» racconta l'impiegato Belluca che, oppresso da una vita grigia, una notte «impazzisce» scoprendo con la fantasia il mondo intero che esiste oltre la sua gabbia: la follia è in realtà una liberazione. La novella «La signora Frola e il signor Ponza, suo genero» è invece all'origine di «Così è (se vi pare)»: la verità resta inconoscibile, perché ciascun personaggio ne offre una versione opposta e ugualmente credibile.
+
+Infine il teatro, dove Pirandello rivoluziona tutto con il «teatro nel teatro». In «Sei personaggi in cerca d'autore» sei personaggi irrompono sul palco chiedendo a una compagnia di rappresentare il loro dramma; ma gli attori non riescono a restituire il loro vissuto reale. È la dimostrazione che il teatro non può rendere conto della realtà: chi ha vissuto davvero qualcosa non si riconosce nella sua riproduzione scenica, e così la funzione del teatro resta lontana dal restituire il reale.
+
+#Q Spiega l'umorismo: avvertimento e sentimento del contrario (con l'esempio della vecchia signora).
+#Q Che cosa sono il relativismo gnoseologico, la maschera e il contrasto vita/forma?
+#Q «Il fu Mattia Pascal»: perché Mattia non riesce a rinascere come Adriano Meis?
+#Q «Sei personaggi in cerca d'autore»: perché il teatro non può rappresentare la realtà?
+
+#MOD 10 — Italo Svevo
+#META Trieste, 1861 - 1928 · «La coscienza di Zeno» (1923)
+
+Italo Svevo, pseudonimo di Ettore Schmitz, è lo scrittore della Trieste mitteleuropea, città di confine tra cultura italiana, tedesca ed ebraica. La sua formazione europea e l'amicizia con James Joyce lo aprono al grande romanzo del Novecento, e per primo porta nella narrativa italiana la psicoanalisi di Freud. La figura che attraversa tutta la sua opera è quella dell'inetto, l'uomo incapace di agire, decidere e «vivere»; ma il suo personaggio più celebre, Zeno, è un inetto ambiguo, che alla fine sembra quasi avere la meglio.
+
+«La coscienza di Zeno» è costruito come un memoriale che Zeno scrive su invito del proprio psicanalista, il dottor S., il quale poi lo pubblica per vendetta. Non procede in ordine cronologico, ma per grandi temi, e ha un narratore inattendibile: Zeno mente, anche a se stesso. L'episodio dell'«ultima sigaretta» è esemplare: Zeno fuma da sempre «l'ultima» sigaretta, ma non smette mai, e questa serie infinita di propositi falliti rivela la sua incapacità di volere. Centrale è anche la morte del padre: il padre morente alza la mano e lo colpisce con uno schiaffo, gesto forse involontario, che però lascia in Zeno un enorme e irrisolto senso di colpa.
+
+La conclusione del romanzo capovolge il significato di tutto. Zeno si dichiara guarito non grazie alla psicoanalisi, ma perché capisce che è l'intera società a essere malata, non solo lui. Il libro si chiude con una visione apocalittica: un'esplosione che distruggerà la Terra. È la dichiarazione che la «salute» piena è un'illusione e che la malattia è ormai la condizione stessa dell'uomo moderno.
+
+#Q Chi è l'inetto e che importanza ha la psicoanalisi nell'opera di Svevo?
+#Q Spiega la struttura del romanzo e il significato dell'«ultima sigaretta».
+#Q Qual è la conclusione del romanzo e quale visione dell'uomo propone?
+
+#MOD 11 — Umberto Saba
+#META Trieste, 1883 - Roma, 1957 · «Il Canzoniere»
+
+Umberto Saba è legatissimo a Trieste, la sua città, dove tenne anche una libreria antiquaria; la sua infanzia, la psicoanalisi e gli affetti familiari sono al centro della sua poesia. La sua opera è sostanzialmente una sola, «Il Canzoniere»: come quello di Petrarca, è il libro di tutta una vita, ordinato e accresciuto di continuo. La sua poetica è quella della «poesia onesta»: chiara, sincera, diretta, lontana dalle oscurità e dagli sperimentalismi delle avanguardie. Per questo Saba è spesso definito «antinovecentista»: usa forme tradizionali — rime, metri classici — mentre gli altri le rompono; la novità sta nei contenuti psicologici, non nelle forme.
+
+In «A mia moglie» il poeta paragona la moglie a diversi animali femmina — la giovane gallina, la giovenca, la cagna, la coniglia — lodandone l'istinto e la naturalezza: è una preghiera d'amore che ricorda da vicino il Cantico dei Cantici della Bibbia, e all'orale si possono mettere in luce i suoi aspetti fonici, linguistici e metrici. In «Trieste» e in «Città vecchia» emerge invece il legame profondo con la città: tra i vicoli poveri e l'umanità umile — operai, prostitute, marinai — Saba arriva a sentire «l'infinito nell'umiltà», cioè l'amore per tutte le creature, anche le più misere.
+
+#Q Che cos'è «Il Canzoniere» e la poetica della «poesia onesta»? Perché Saba è detto antinovecentista?
+#Q Analizza «A mia moglie» e il suo legame con il Cantico dei Cantici.
+
+#MOD 12 — Eugenio Montale
+#META Genova, 1896 - Milano, 1981 · Premio Nobel 1975
+
+Montale è il poeta del «male di vivere»: la sua opera nasce dalla sfiducia, dalla convinzione che l'esistenza non offra né certezze né formule consolatorie. Genovese, legato al paesaggio aspro e arido della Liguria, antifascista, attraversa il Novecento con raccolte fondamentali: «Ossi di seppia» (1925), «Le occasioni», «La bufera e altro» e infine «Satura» (1971). Si tiene a distanza dalla retorica e cerca, attraverso la poesia, di dire con onestà la condizione dell'uomo moderno.
+
+Lo strumento tecnico più importante è il «correlativo oggettivo», ripreso da T. S. Eliot: invece di nominare un sentimento, Montale lo fa emergere da un oggetto o da un'immagine concreta. Così, in «Meriggiare pallido e assorto», il male di vivere prende la forma di un muro «con cocci aguzzi di bottiglia», impossibile da superare, in un meriggio assolato e arido. In «I limoni» Montale dichiara il suo programma poetico: rifiuta i «poeti laureati» e la poesia aulica, e sceglie le cose umili, come i limoni di un orto, sperando di cogliere tra esse un «varco», un piccolo «errore di Natura» che riveli un senso nascosto. In «Non chiederci la parola» afferma che la poesia non può offrire verità: può dire soltanto, in negativo, «ciò che non siamo, ciò che non vogliamo». Infine, nella raccolta «Satura», la lirica «Ho sceso le scale dandoti il braccio» appartiene agli Xenia, dedicati alla moglie morta, «Mosca», così chiamata per la forte miopia: con tono colloquiale, Montale scopre che proprio lei, che «vedeva» pochissimo, aveva in realtà la vera vista, e che l'amore è stato l'unica vera forma di conoscenza.
+
+#Q Che cos'è il «male di vivere» e come si esprime nella poesia di Montale?
+#Q Definisci il «correlativo oggettivo» con un esempio (il muro di «Meriggiare»).
+#Q «I limoni» e «Non chiederci la parola»: qual è il programma poetico di Montale?
+#Q «Ho sceso le scale dandoti il braccio»: chi è «Mosca» e che cosa scopre il poeta?
+
+#MOD 13 — Le letture a scelta
+#META Due libri dalla bibliografia indicata · da novembre 2025
+
+All'orale la commissione può chiederti dei due libri che hai scelto e letto durante l'anno. Non serve riassumere tutta la trama: serve una scaletta solida con cui parlarne con sicurezza. Conviene costruire la risposta in pochi passaggi: prima l'autore e il contesto in cui il libro è stato scritto; poi la trama riassunta in poche frasi, senza perdersi nei dettagli; quindi i personaggi principali e, soprattutto, i temi e il messaggio dell'opera; infine il motivo personale per cui l'hai scelto e una scena o una frase che ti è rimasta impressa.
+
+Il vero punto di forza, però, è il collegamento con il programma: conviene preparare in anticipo un ponte tra il libro letto e un autore o un tema studiati. Un romanzo sulla guerra si collega a Ungaretti; un personaggio inetto o in crisi a Svevo e Pirandello; una protagonista femminile che cerca la propria libertà a Sibilla Aleramo; un tema sociale a Verga. Saper passare dal proprio libro al programma dimostra maturità e capacità di ragionamento, che è ciò che la commissione cerca.
+
+#Q Parlami di uno dei libri che hai letto quest'anno: di cosa parla e perché lo hai scelto?
+#Q Qual è il tema principale del libro e come lo colleghi a un autore del programma?
+
+#MOD 14 — I temi di attualità
+#META Spunti per il colloquio interdisciplinare
+
+Durante l'anno sono stati affrontati alcuni temi di attualità su cui è utile arrivare preparati, perché si prestano bene al colloquio e permettono di mostrare spirito critico. Il primo è la violenza, in particolare quella amplificata dai social: l'anonimato e la velocità della rete fanno crescere l'odio online e abbassano l'empatia, fino a normalizzare l'aggressività, anche quella di genere; è un tema che si collega direttamente a Sibilla Aleramo e ai testi argomentativi svolti in classe. C'è poi il caso della «famiglia nel bosco», che pone il conflitto tra la libertà individuale di vivere fuori dalle istituzioni e i diritti dei figli, come l'istruzione e la salute: conviene argomentare una posizione equilibrata.
+
+Un altro tema è la situazione in Iran, di cui è bene conoscere le fasi del conflitto, le cause e la questione dei diritti e della libertà, in particolare delle donne, distinguendo sempre tra il popolo e il regime. È stato visto anche un documentario sugli eco-villaggi e su comunità che vivono fuori dalle istituzioni, cercando un'unità tra le aspirazioni individuali, il lavoro e una «famiglia allargata»: un tema di utopia e di ritorno alla natura, di cui valutare con onestà potenzialità e limiti. Infine il tema della mafia, affrontato attraverso il film «I cento passi», dedicato a Peppino Impastato: una storia di legalità e di coraggio civile, che si collega all'impegno dell'intellettuale e al dovere di raccontare la verità.
+
+#Q Come i social amplificano la violenza? A quale autrice del programma colleghi il tema?
+#Q Che cosa racconta «I cento passi» e perché è importante parlarne?
+
+#MOD 15 — Gli scritti svolti (Prima prova)
+#META Le tre tipologie dell'Esame di Stato
+
+La Prima prova prevede tre tipologie, tutte esercitate durante l'anno. La Tipologia A è l'analisi di un testo letterario e si svolge in tre fasi: la comprensione (di che cosa parla il testo), l'analisi (lingua, stile, struttura, figure retoriche) e infine l'interpretazione e la contestualizzazione, che lega il testo all'autore e al movimento. In classe è stata svolta sull'analisi di «La pentolaccia» di Verga, da Vita dei campi: un testo in cui si riconoscono i caratteri veristi — l'impersonalità, il mondo popolare siciliano, il fatalismo — da ricondurre alla poetica dell'autore.
+
+La Tipologia B richiede prima di comprendere un testo dato e di individuarne la tesi, e poi di produrre un testo argomentativo coerente in cui si sostiene una propria posizione. Sono stati svolti due esercizi di questo tipo: uno sul tema della violenza tra realtà e social (a partire da un articolo di Annalisa Appignanesi su Centropagina, del 23 novembre 2025, con le parole dello psichiatra Volpe) e uno sull'ipotesi che internet smetta di funzionare per un giorno (da un articolo di Giuliana Rotondi su Focus, del 12 febbraio 2018). La Tipologia C, infine, è la riflessione critica su un tema di attualità a partire da una traccia, e richiede una tesi chiara, esempi concreti e una struttura ordinata. Durante l'anno è stata svolta anche una simulazione completa della Prima prova della durata di cinque ore.
+
+#Q Quali sono le tre tipologie della Prima prova e come si imposta ciascuna?
+#Q Parlami del testo «La pentolaccia» di Verga analizzato come Tipologia A.

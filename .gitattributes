@@ -1,0 +1,14 @@
+# I file binari non devono mai subire conversioni di fine riga (LF<->CRLF),
+# altrimenti si corrompono (es. i PDF serviti da /public).
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.eot  binary
