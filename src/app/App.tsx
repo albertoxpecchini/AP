@@ -19,6 +19,7 @@ import {
   BrainCircuit,
   Ruler,
   UserRound,
+  BookOpen,
 } from "lucide-react";
 import SiteHeader from "./site/SiteHeader";
 import SiteFooter from "./site/SiteFooter";
@@ -89,6 +90,33 @@ function MeStessoThumb() {
   );
 }
 
+function DublinersThumb() {
+  // Libro aperto con poche righe di testo: l'identità di «Gente di Dublino»
+  // (approfondimento letterario), in palette neroverde line-art.
+  const lines = (cx: number) =>
+    [92, 104, 116].map((y, i) => (
+      <line
+        key={`${cx}-${y}`}
+        x1={cx - 26 + i * 2}
+        y1={y}
+        x2={cx + 26 - i * 3}
+        y2={y - 1}
+        stroke="rgba(31,107,61,0.45)"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    ));
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      <path d="M180 70 C150 58 116 60 98 66 L98 142 C116 136 150 134 180 142 Z" fill="rgba(47,125,74,0.08)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinejoin="round" />
+      <path d="M180 70 C210 58 244 60 262 66 L262 142 C244 136 210 134 180 142 Z" fill="rgba(47,125,74,0.12)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinejoin="round" />
+      <line x1="180" y1="70" x2="180" y2="142" stroke="rgba(31,107,61,0.6)" strokeWidth="2.6" />
+      {lines(132)}
+      {lines(228)}
+    </svg>
+  );
+}
+
 function TriviaThumb() {
   // Tre "card domanda" stilizzate + check, in palette neroverde.
   const card = (x: number, fill: string, stroke: string) => (
@@ -147,6 +175,7 @@ function ProjectThumb({ name }: { name: string }) {
   if (name === "trivia") return <TriviaThumb />;
   if (name === "pcto") return <PctoThumb />;
   if (name === "mestesso") return <MeStessoThumb />;
+  if (name === "dubliners") return <DublinersThumb />;
   if (name === "movimento") return <MovimentoThumb />;
   if (name === "mappa") return <MappaThumb />;
   return null;
@@ -161,6 +190,7 @@ function ProjectIcon({ thumb }: { thumb?: string }) {
     case "trivia":    return <BrainCircuit size={32} strokeWidth={2.1} />;
     case "pcto":      return <Ruler size={32} strokeWidth={2.1} />;
     case "mestesso":  return <UserRound size={32} strokeWidth={2.1} />;
+    case "dubliners": return <BookOpen size={32} strokeWidth={2.1} />;
     case "movimento": return <Footprints size={32} strokeWidth={2.1} />;
     case "mappa":     return <Globe2 size={32} strokeWidth={2.1} />;
     default:          return <Globe2 size={30} strokeWidth={2.1} />;
@@ -185,6 +215,15 @@ const PROJECTS = [
     thumb: "mestesso",
     desc: "La mia presentazione personale per l'Esame di Stato 2026: chi sono, le radici nell'azienda di famiglia a Rivalta, il percorso CAT, le passioni (web, viaggi, tiro, moto) e il futuro — in un'unica scroll narrata col mio design system neroverde, in stile /pcto.",
     tags: ["Presentazione", "Design system", "Storytelling", "React"],
+  },
+  {
+    category: "Approfondimento letterario",
+    date: "23 giu 2026",
+    title: "Gente di Dublino",
+    url: "/dubliners",
+    thumb: "dubliners",
+    desc: "«Dubliners» di James Joyce raccontato in 3 minuti: chi è l'autore, che cos'è la raccolta dei 15 racconti, i personaggi (gente comune, nessun eroe), la trama in cui non succede quasi niente e il vero tema — l'essere intrappolati. Una scroll narrata col mio design system «dark premium» viola, in stile /me-stesso, chiusa dalla celebre frase finale de «I morti».",
+    tags: ["Letteratura", "Storytelling", "Design system", "React"],
   },
   {
     category: "Web game",
@@ -257,6 +296,7 @@ const PROJECTS = [
 const PROJECT_EMOJI: Record<string, string> = {
   "PCTO": "🪵",
   "Me stesso": "🎓",
+  "Gente di Dublino": "📖",
   "Mappa": "🗺️",
   "Movimento": "👣",
   "Trivia": "🧠",

@@ -15,6 +15,7 @@ const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
 const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
 const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
 const MeStesso = lazy(() => import("./app/me-stesso/MeStesso.tsx"));
+const Dubliners = lazy(() => import("./app/dubliners/Dubliners.tsx"));
 const Movimento = lazy(() => import("./app/movimento/Movimento.tsx"));
 const Mappa = lazy(() => import("./app/mappa/Mappa.tsx"));
 
@@ -67,6 +68,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <MeStesso />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/dubliners"
+        element={
+          <Suspense fallback={null}>
+            <Dubliners />
           </Suspense>
         }
       />
