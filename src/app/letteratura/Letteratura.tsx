@@ -100,11 +100,12 @@ function Domanda({ qa, open, onToggle }: { qa: QA; open: boolean; onToggle: () =
   );
 }
 
-// Una scheda-modulo completa.
-function Scheda({ m }: { m: Modulo }) {
+// Una scheda-modulo completa. Con `forceOpen` (controllo globale "Apri tutto")
+// tutte le domande risultano aperte, ignorando lo stato locale.
+function Scheda({ m, forceOpen = false }: { m: Modulo; forceOpen?: boolean }) {
   // Apertura indipendente per ogni domanda; "espandi/comprimi tutte" per modulo.
   const [openSet, setOpenSet] = useState<Set<number>>(new Set());
-  const allOpen = openSet.size === m.domande.length && m.domande.length > 0;
+  const allLocalOpen = openSet.size === m.domande.length && m.domande.length > 0;
 
   const toggle = (i: number) =>
     setOpenSet((prev) => {
@@ -114,7 +115,7 @@ function Scheda({ m }: { m: Modulo }) {
     });
 
   const toggleAll = () =>
-    setOpenSet(allOpen ? new Set() : new Set(m.domande.map((_, i) => i)));
+    setOpenSet(allLocalOpen ? new Set() : new Set(m.domande.map((_, i) => i)));
 
   return (
     <section className="lt-card" id={m.id} aria-labelledby={`${m.id}-title`}>
@@ -193,17 +194,19 @@ function Scheda({ m }: { m: Modulo }) {
             <Quote size={16} aria-hidden="true" /> Possibili domande all'orale
             <span className="lt-qa-count">{m.domande.length}</span>
           </p>
-          <button type="button" className="lt-toggle-all" onClick={toggleAll}>
-            {allOpen ? (
-              <><ChevronsDownUp size={15} aria-hidden="true" /> Comprimi tutte</>
-            ) : (
-              <><ChevronsUpDown size={15} aria-hidden="true" /> Espandi tutte</>
-            )}
-          </button>
+          {!forceOpen && (
+            <button type="button" className="lt-toggle-all" onClick={toggleAll}>
+              {allLocalOpen ? (
+                <><ChevronsDownUp size={15} aria-hidden="true" /> Comprimi tutte</>
+              ) : (
+                <><ChevronsUpDown size={15} aria-hidden="true" /> Espandi tutte</>
+              )}
+            </button>
+          )}
         </div>
         <div className="lt-qa-list">
           {m.domande.map((qa, i) => (
-            <Domanda key={i} qa={qa} open={openSet.has(i)} onToggle={() => toggle(i)} />
+            <Domanda key={i} qa={qa} open={forceOpen || openSet.has(i)} onToggle={() => toggle(i)} />
           ))}
         </div>
       </div>
@@ -214,6 +217,7 @@ function Scheda({ m }: { m: Modulo }) {
 export default function Letteratura() {
   const [showTop, setShowTop] = useState(false);
   const [activeId, setActiveId] = useState<string>(MODULI[0]?.id ?? "");
+  const [expandAll, setExpandAll] = useState(false);
 
   useEffect(() => {
     const prev = document.title;
@@ -311,11 +315,26 @@ export default function Letteratura() {
               <span className="lt-stat"><strong>1870 → 1971</strong> dal Naturalismo a Satura</span>
             </div>
             <div className="lt-hero-actions">
-              <button type="button" className="lt-print-cta" onClick={() => window.print()}>
-                <Printer size={18} aria-hidden="true" /> Stampa o salva in PDF
-              </button>
+              <div className="lt-hero-btns">
+                <button type="button" className="lt-print-cta" onClick={() => window.print()}>
+                  <Printer size={18} aria-hidden="true" /> Stampa o salva in PDF
+                </button>
+                <button
+                  type="button"
+                  className={`lt-expand-cta${expandAll ? " is-on" : ""}`}
+                  aria-pressed={expandAll}
+                  onClick={() => setExpandAll((v) => !v)}
+                >
+                  {expandAll ? (
+                    <><ChevronsDownUp size={18} aria-hidden="true" /> Chiudi tutti gli schemi</>
+                  ) : (
+                    <><ChevronsUpDown size={18} aria-hidden="true" /> Apri tutti gli schemi</>
+                  )}
+                </button>
+              </div>
               <span className="lt-hero-hint">
-                In stampa tutte le risposte si aprono in automatico — scegli «Salva come PDF» (o premi Ctrl/Cmd&nbsp;+&nbsp;P).
+                «Apri tutti gli schemi» mostra a video ogni domanda con la risposta. In stampa si aprono comunque
+                tutte da sole: scegli «Salva come PDF» (o premi Ctrl/Cmd&nbsp;+&nbsp;P).
               </span>
             </div>
           </div>
@@ -346,7 +365,7 @@ export default function Letteratura() {
           <div className="container">
             <div className="lt-grid">
               {MODULI.map((m) => (
-                <Scheda key={m.id} m={m} />
+                <Scheda key={m.id} m={m} forceOpen={expandAll} />
               ))}
             </div>
           </div>
@@ -518,6 +537,16 @@ export default function Letteratura() {
         .lt-hero-actions {
           display: flex; flex-direction: column; align-items: center; gap: 0.7rem; margin-top: 1.8rem;
         }
+        .lt-hero-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
+        .lt-expand-cta {
+          display: inline-flex; align-items: center; gap: 0.55rem; cursor: pointer;
+          padding: 0.75rem 1.4rem; border-radius: 999px; font-family: inherit;
+          font-size: 1rem; font-weight: 700;
+          background: var(--vio-soft); color: var(--text); border: 1.5px solid var(--vio-bd);
+          transition: background .15s, color .15s, border-color .15s, transform .15s;
+        }
+        .lt-expand-cta:hover { transform: translateY(-2px); color: #fff; border-color: var(--accent); background: rgba(139,123,255,0.16); }
+        .lt-expand-cta.is-on { background: rgba(139,123,255,0.18); color: #fff; border-color: var(--accent); }
         .lt-print-cta {
           display: inline-flex; align-items: center; gap: 0.55rem; cursor: pointer;
           padding: 0.75rem 1.6rem; border-radius: 999px; font-family: inherit;
