@@ -20,6 +20,7 @@ import {
   Ruler,
   UserRound,
   BookOpen,
+  Cat,
 } from "lucide-react";
 import SiteHeader from "./site/SiteHeader";
 import SiteFooter from "./site/SiteFooter";
@@ -117,6 +118,21 @@ function DublinersThumb() {
   );
 }
 
+function GattopardoThumb() {
+  // Corona nobiliare line-art: l'identità de «Il Gattopardo» (l'aristocrazia
+  // al tramonto), in palette neroverde — coerente con la home.
+  return (
+    <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      <path d="M116 132 L116 84 L150 112 L180 70 L210 112 L244 84 L244 132 Z" fill="rgba(47,125,74,0.10)" stroke="rgba(31,107,61,0.55)" strokeWidth="2.4" strokeLinejoin="round" />
+      <path d="M112 132 L248 132 L242 152 L118 152 Z" fill="rgba(47,125,74,0.14)" stroke="rgba(31,107,61,0.6)" strokeWidth="2.4" strokeLinejoin="round" />
+      <circle cx="116" cy="84" r="5.5" fill="rgba(47,125,74,0.55)" stroke="#1F6B3D" strokeWidth="2" />
+      <circle cx="180" cy="70" r="6.5" fill="rgba(47,125,74,0.55)" stroke="#1F6B3D" strokeWidth="2" />
+      <circle cx="244" cy="84" r="5.5" fill="rgba(47,125,74,0.55)" stroke="#1F6B3D" strokeWidth="2" />
+      <circle cx="180" cy="142" r="5" fill="#1F6B3D" />
+    </svg>
+  );
+}
+
 function TriviaThumb() {
   // Tre "card domanda" stilizzate + check, in palette neroverde.
   const card = (x: number, fill: string, stroke: string) => (
@@ -176,6 +192,7 @@ function ProjectThumb({ name }: { name: string }) {
   if (name === "pcto") return <PctoThumb />;
   if (name === "mestesso") return <MeStessoThumb />;
   if (name === "dubliners") return <DublinersThumb />;
+  if (name === "gattopardo") return <GattopardoThumb />;
   if (name === "movimento") return <MovimentoThumb />;
   if (name === "mappa") return <MappaThumb />;
   return null;
@@ -191,6 +208,7 @@ function ProjectIcon({ thumb }: { thumb?: string }) {
     case "pcto":      return <Ruler size={32} strokeWidth={2.1} />;
     case "mestesso":  return <UserRound size={32} strokeWidth={2.1} />;
     case "dubliners": return <BookOpen size={32} strokeWidth={2.1} />;
+    case "gattopardo": return <Cat size={32} strokeWidth={2.1} />;
     case "movimento": return <Footprints size={32} strokeWidth={2.1} />;
     case "mappa":     return <Globe2 size={32} strokeWidth={2.1} />;
     default:          return <Globe2 size={30} strokeWidth={2.1} />;
@@ -224,6 +242,15 @@ const PROJECTS = [
     thumb: "dubliners",
     desc: "«Dubliners» di James Joyce raccontato in 3 minuti: chi è l'autore, che cos'è la raccolta dei 15 racconti, i personaggi (gente comune, nessun eroe), la trama in cui non succede quasi niente e il vero tema — l'essere intrappolati. Una scroll narrata col mio design system «dark premium» viola, in stile /me-stesso, chiusa dalla celebre frase finale de «I morti».",
     tags: ["Letteratura", "Storytelling", "Design system", "React"],
+  },
+  {
+    category: "Approfondimento letterario",
+    date: "23 giu 2026",
+    title: "Il Gattopardo",
+    url: "/gattopardo",
+    thumb: "gattopardo",
+    desc: "«Il Gattopardo» di Tomasi di Lampedusa raccontato in 3 minuti: chi è l'autore (un solo romanzo, famoso solo dopo la morte), la Sicilia del 1860 con l'Unità d'Italia, i personaggi (il Principe Fabrizio, Tancredi, i Salina), il crollo del vecchio ordine e il tema — «se vogliamo che tutto rimanga come è, bisogna che tutto cambi». Una scroll narrata col mio design system «dark premium» viola, in stile /me-stesso.",
+    tags: ["Letteratura", "Risorgimento", "Storytelling", "React"],
   },
   {
     category: "Web game",
@@ -297,6 +324,7 @@ const PROJECT_EMOJI: Record<string, string> = {
   "PCTO": "🪵",
   "Me stesso": "🎓",
   "Gente di Dublino": "📖",
+  "Il Gattopardo": "🐆",
   "Mappa": "🗺️",
   "Movimento": "👣",
   "Trivia": "🧠",
