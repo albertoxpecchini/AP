@@ -79,7 +79,7 @@ Pipeline **content-driven, zero-config**: i capitoli sono file Markdown in [`con
 - **40 capitoli** (`Neoclassicismo → … → CityLife`), ordinati dal campo `ordine:` con fallback alfabetico.
 - **1005 domande** tipizzate: `multipla` (401), `vero`/falso (401), `aperta`/completamento (201).
 - **Versionamento automatico** — `__TRIVIA_VERSION__` è iniettata da `vite.config.ts` come `1.<git rev-list --count -- src/app/trivia/>`: ogni deploy che tocca il modulo incrementa la _minor_ da solo.
-- **Arricchimento AI** — middleware dev `/api/trivia` (`vite.config.ts`) interroga **Claude Haiku 4.5** (`@anthropic-ai/sdk`) per curiosità contestuali; chiave via `ANTHROPIC_API_KEY` nel `.env`.
+- **Arricchimento AI** — middleware dev `/api/trivia` (`vite.config.ts`) interroga **Claude Opus 4.8** (`@anthropic-ai/sdk`) per curiosità contestuali; chiave via `ANTHROPIC_API_KEY` nel `.env`.
 
 ---
 
@@ -119,7 +119,7 @@ AP/
 | **Dataviz / FX** | `recharts` · `canvas-confetti` · `embla-carousel` · `skinview3d` |
 | **Form / input** | `react-hook-form` · `input-otp` · `cmdk` · `sonner` (toast) |
 | **Backend** | Supabase (leaderboard, pagelle, progressi per gioco) |
-| **AI** | `@anthropic-ai/sdk` → Claude Haiku 4.5 (curiosità Trivia) |
+| **AI** | `@anthropic-ai/sdk` → Claude Opus 4.8 (curiosità Trivia) |
 | **Tooling** | `pnpm` · `playwright` (E2E) · script Python per CV/favicon |
 
 ---
@@ -149,7 +149,7 @@ Per l'arricchimento AI di Trivia in locale, creare un `.env` con `ANTHROPIC_API_
 ## 🔌 Integrazioni esterne
 
 - **Supabase** — persistenza realtime di leaderboard, pagelle e progressi, con API isolata per ciascun gioco (`*/leaderboardApi.ts`, `trivia/gradesApi.ts`, `trivia/progressApi.ts`).
-- **Anthropic / Claude Haiku 4.5** — generazione di curiosità testuali on-demand.
+- **Anthropic / Claude Opus 4.8** — generazione di curiosità testuali on-demand.
 - **GitHub REST API** — `App.tsx` legge `pushed_at` e ultima release dei repo dei progetti (no-auth, rate limit pubblico).
 - **Microlink** — screenshot live 1200×630 come anteprima delle card progetto.
 - **Google Fonts** — Titillium Web · Lora · Roboto Mono (`preconnect` + `display=swap`).

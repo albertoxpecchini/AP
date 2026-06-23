@@ -4,6 +4,8 @@ import { execSync } from 'child_process'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+
 // Versione del gioco Trivia = 1.<numero di commit che toccano src/app/trivia/>.
 // Calcolata a build-time (anche in dev) così si aggiorna da sola ad ogni deploy.
 // Se git non è disponibile (es. ambiente di build esotico) ripiega su 1.0.
@@ -92,7 +94,7 @@ export default defineConfig({
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
   server: {
-    port: 2858,
+    port: 5173,
     strictPort: true,
   },
 })
