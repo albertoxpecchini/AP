@@ -12,6 +12,10 @@ dist
 *.local
 .DS_Store
 Thumbs.db
+.offline-markdown-preview/
+
+# Artefatti rigenerabili
+content/trivia/raw/_IMPORT_REPORT.md
 
 # Log
 npm-debug.log*
