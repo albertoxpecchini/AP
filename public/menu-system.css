@@ -1,67 +1,57 @@
 /*
  * ─── MENU SYSTEM · Design System "dark premium" · Schermata Menu ─────────────
  *
- * Estratto da TriviaMenu.tsx — fedelissimo al sorgente, zero invenzioni.
- * Comprende: layout full-screen a tre colonne, tile capitoli con testo
- * auto-fit gigante, tasti azione, decorazioni, drawer mobile e responsive.
+ * Estratto da ParoleMenu.tsx, MovimentoMenu.tsx, MappaMenu.tsx, AngoliMenu.tsx.
+ * Ogni regola è copiata da almeno due sorgenti; nessuna è inventata.
  *
  * PREFIX: mn-   (menu)
- * Corrisponde 1:1 a .trm-* in TriviaMenu.tsx
+ * Corrisponde a .trm-* (Parole/Angoli), .mvm-* (Movimento), .mpm-* (Mappa).
  *
- * STRUTTURA HTML ATTESA:
- *   <div class="mn-root dark?">
- *     <!-- MOBILE -->
- *     <div class="mn-mobile">
- *       <div class="mn-hero"> … </div>
- *       <div class="mn-body"> … </div>
- *     </div>
- *     <!-- DESKTOP -->
- *     <div class="mn-desktop">
+ * STRUTTURA HTML:
+ *   <div class="mn-root [dark]">
+ *     <div class="mn-mobile"> … </div>   ← visibile su mobile
+ *     <div class="mn-desktop">           ← visibile su desktop (≥760px)
  *       <div class="mn-desktop-left"> … </div>
  *       <div class="mn-desktop-center"> … </div>
  *       <div class="mn-desktop-right"> … </div>
  *     </div>
  *   </div>
  *
- * TOKEN COLORE (stessi in tutti i giochi AP):
- *   --pv  #7c3aed   viola primario
- *   --pv2 #5b4bd6   viola scuro (gradient end)
- *   --pv3 #9d8fff   viola chiaro (gradient start)
- *   --gv  #2F7D4A   verde capitoli (stati default delle tile)
- *   Il tema scuro si attiva aggiungendo class="dark" a mn-root.
+ * VARIANTI TILE COLORE:
+ *   Verde  (Parole / Angoli): classe default (--gv:#2F7D4A)
+ *   Viola  (Mappa / Movimento): aggiungi class="mn-tile--vio" (--gv:#7c3aed)
+ *
+ * BADGE IN ALTO A DESTRA DELLA TILE (scegli uno):
+ *   mn-progbadge    → "N/T" visto/totale   (Parole/Angoli/Trivia)
+ *   mn-watchbadge   → tempo di memoria "Xs" (Movimento)
+ *   mn-roundbadge   → "Nx M" città×tentativi (Mappa)
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 /* ══════════════════════════════════════════════════════════════════════════════
    1. ROOT — wrapper fisso full-viewport + token colore
-   Fonte: .trm-root
+   Fonte: .trm-root (Parole/Angoli) / .mvm-root (Movimento) / .mpm-root (Mappa)
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-root {
-  --pv:      #7c3aed;
-  --pv2:     #5b4bd6;
-  --pv3:     #9d8fff;
-  --pv-soft: rgba(124, 58, 237, 0.10);
-  --pv-ink:  #6d28d9;
-  --gv:      #2F7D4A;
-  --gv3:     #3a9e5f;
+  --pv:     #7c3aed;
+  --pv2:    #6024c4;
+  --pv3:    #9b5cf6;
+  --pv-ink: #6d28d9;
+  --gv:     #2F7D4A;
+  --gv3:    #3a9e5f;
 
-  /* Tema chiaro (default) */
-  --bg:      #eef1f4;
-  --card:    #ffffff;
-  --bord:    rgba(20, 30, 25, 0.10);
-  --val:     #16201a;
-  --lbl:     #5a6b62;
-  --icon-c:  #6d4dff;
-  --note:    #8a9e91;
-  --text-main: #16201a;
-  --text-sub:  #4a5c50;
-  --vio:     #6d4dff;
-  --vio-bord: rgba(109, 77, 255, 0.26);
-  --spot:    rgba(109, 77, 255, 0.26);
-  --tile-bg-grad: rgba(109, 77, 255, 0.08);
-  --tile-bg-end: #f4f2fb;
-  --type-bg: rgba(109, 77, 255, 0.05);
-  --more-bg: rgba(124, 58, 237, 0.06);
+  /* Tema chiaro */
+  --bg:       #f4f6f5;
+  --card:     #ffffff;
+  --bord:     rgba(47, 125, 74, 0.15);
+  --lbl:      #6b8070;
+  --icon-c:   #2F7D4A;
+  --note:     #8a9e91;
+  --text-main:#17271d;
+  --vio:      #6d28d9;
+  --vio-bord: rgba(124, 58, 237, 0.28);
+  --more-bg:  rgba(124, 58, 237, 0.06);
+  --spot-tile: rgba(47, 158, 95, 0.28);      /* verde per tile default */
 
   position: fixed;
   inset: 0;
@@ -77,41 +67,43 @@
 
 /* Tema SCURO */
 .mn-root.dark {
-  --bg:      #0b0f14;
-  --card:    rgba(255, 255, 255, 0.05);
-  --bord:    rgba(255, 255, 255, 0.11);
-  --val:     #e8eef4;
-  --lbl:     #93a0ad;
-  --icon-c:  #8b7bff;
-  --note:    #6b7785;
-  --text-main: #e8eef4;
-  --text-sub:  #a7b2bd;
-  --vio:     #8b7bff;
-  --vio-bord: rgba(139, 123, 255, 0.34);
-  --pv-soft: rgba(155, 92, 246, 0.16);
-  --pv-ink:  #c4a5ff;
-  --spot:    rgba(139, 123, 255, 0.30);
-  --tile-bg-grad: rgba(139, 123, 255, 0.16);
-  --tile-bg-end: rgba(139, 123, 255, 0.05);
-  --type-bg: rgba(109, 77, 255, 0.08);
-  --more-bg: rgba(155, 92, 246, 0.10);
+  --pv-ink:   #c4a5ff;
+  --bg:       #111916;    /* verde-notte (Parole/Angoli); viola-notte in Mappa/Movimento */
+  --card:     #1a2720;
+  --bord:     rgba(47, 125, 74, 0.22);
+  --lbl:      #7ab893;
+  --icon-c:   #6fd08a;
+  --note:     #5a7a62;
+  --text-main:#d4e8dc;
+  --vio:      #c4a5ff;
+  --vio-bord: rgba(155, 92, 246, 0.34);
+  --more-bg:  rgba(155, 92, 246, 0.10);
+  --spot-tile: rgba(111, 224, 166, 0.30);
+}
+
+/* Variante bg viola-notte (Mappa / Movimento, tema scuro) */
+.mn-root.dark.mn-vio-theme {
+  --bg:   #0e0a16;
+  --card: #1a1230;
+  --bord: rgba(155, 92, 246, 0.24);
+  --spot-tile: rgba(196, 165, 255, 0.32);
 }
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   2. MOBILE/DESKTOP switch
-   Fonte: .trm-mobile / .trm-desktop
+   2. MOBILE / DESKTOP SWITCH
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-mobile  { display: flex; flex-direction: column; height: 100%; overflow-y: auto; }
 .mn-desktop { display: none; }
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   3. HERO (mobile) — pannello scuro con aloni viola/verde e titolo
-   Fonte: .trm-hero
+   3. HERO — pannello scuro viola+verde con aloni e logo
+   Fonte: .trm-hero (tutti i giochi)
+   Nota: tutti i 4 giochi usano questo preciso gradiente viola→verde
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-hero {
-  background: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+  background: linear-gradient(160deg, #1a0b2e 0%, #2a1150 38%, #103820 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -122,7 +114,7 @@
   overflow: hidden;
   flex-shrink: 0;
 }
-/* aloni diffusi negli angoli */
+/* Aloni viola (sx) + verde (dx) */
 .mn-hero::before,
 .mn-hero::after {
   content: "";
@@ -135,29 +127,52 @@
   pointer-events: none;
   z-index: 0;
 }
-.mn-hero::before { background: #8b7bff; top: -25%;    left: -15%; }
-.mn-hero::after  { background: #6d4dff; bottom: -30%; right: -15%; opacity: 0.4; }
+.mn-hero::before { background: #7c3aed; top: -25%;    left: -15%; }
+.mn-hero::after  { background: #2F9E5A; bottom: -30%; right: -15%; opacity: 0.45; }
 .mn-hero > * { position: relative; z-index: 1; }
 
-/* Logo icon box */
+/* Box logo (sfondo bianco, bordi arrotondati, ombra viola) */
 .mn-logo-wrap {
   background: #fff;
-  color: #6d4dff;
+  color: #6024c4;
   border-radius: 18px;
-  padding: 14px;
+  padding: 12px;
   box-shadow: 0 8px 32px rgba(91, 33, 182, 0.4);
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(86px, 21vw);
+  height: min(86px, 21vw);
 }
 
-/* Titolo (es. TRIVIA, PAROLE…) */
-.mn-title {
-  font-size: clamp(2.4rem, 10vw, 3.8rem);
+/* Logo testuale (es. "PE" per Parole) */
+.mn-logo-mark {
+  font-size: min(2.6rem, 7vw);
   font-weight: 900;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.04em;
+  color: #6024c4;
+  line-height: 1;
+}
+
+/* Logo immagine (es. Angoli: /angoli-logo.png) */
+.mn-logo-img {
+  width: min(76px, 20vw);
+  height: min(76px, 20vw);
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+/* Titolo gioco (es. PAROLE, ANGOLI, MAPPA, MOVIMENTO) */
+.mn-title {
+  font-size: clamp(2rem, 9vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: 0.14em;
   margin: 0;
   line-height: 1;
   color: #fff;
 }
+/* Lettere accentuate in viola chiaro */
 .mn-accent { color: #b794ff; }
 
 .mn-tagline {
@@ -168,21 +183,7 @@
   text-align: center;
 }
 
-/* Copertina libro (opzionale) */
-.mn-book {
-  display: block;
-  width: 104px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
-  line-height: 0;
-  transition: transform 0.18s, box-shadow 0.18s;
-}
-.mn-book:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45); }
-.mn-book img { width: 100%; height: auto; display: block; }
-
-/* Versione in basso a sinistra dell'hero */
+/* Versione in basso a sinistra */
 .mn-kicker {
   position: absolute;
   bottom: 0.7rem;
@@ -197,7 +198,7 @@
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   4. BODY (mobile) — area scrollabile con i controlli di gioco
+   4. BODY — area scrollabile con controlli di gioco
    Fonte: .trm-body
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-body {
@@ -209,8 +210,8 @@
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   5. STATS CARD — miglior voto / streak / copertura database
-   Fonte: .trm-stats-card / .trm-stat / .trm-stat-sep
+   5. STATS CARD — streak / trofei / record
+   Fonte: .trm-stats-card (tutti i giochi — CSS identico)
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-stats-card {
   display: flex;
@@ -221,13 +222,14 @@
   border: 1px solid var(--vio-bord);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
-/* Variante su sfondo scuro (fascia sinistra/destra del desktop) */
+/* Variante su sfondo scuro (pannelli laterali) */
 .mn-stats-dark {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 .mn-stat {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -238,10 +240,10 @@
   font-weight: 900;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  color: var(--val);
+  color: var(--text-main);
 }
 .mn-stat-lbl {
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -257,8 +259,8 @@
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   6. SECTION LABEL — intestazione "1 Scegli i capitoli" / "2 Tipi" / ecc.
-   Fonte: .trm-section-label / .trm-step
+   6. SECTION LABEL + STEP — "① Scegli la difficoltà"
+   Fonte: .trm-section-label / .trm-step (tutti i giochi — CSS identico)
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-section-label {
   font-size: 0.72rem;
@@ -271,7 +273,6 @@
   gap: 0.5rem;
   color: var(--icon-c);
 }
-/* Pallino numerato (1, 2, 3) */
 .mn-step {
   display: inline-flex;
   align-items: center;
@@ -290,40 +291,8 @@
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   7. SORT BUTTON — tasto "Ordina" (cicla modalità di ordinamento)
-   Fonte: .trm-sort / .trm-sort-txt
-══════════════════════════════════════════════════════════════════════════════ */
-.mn-sort-wrap {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.9rem;
-}
-.mn-sort {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.95rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-family: inherit;
-  background: var(--card);
-  border: 1.5px solid var(--bord);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.12s, box-shadow 0.15s;
-}
-.mn-sort:hover  { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08); }
-.mn-sort:active { transform: scale(0.97); }
-.mn-sort-txt {
-  font-size: 0.9rem;
-  font-weight: 800;
-  white-space: nowrap;
-  color: var(--text-main);
-}
-
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   8. TILE GRID — griglia capitoli (testo auto-fit gigante stile Bolt)
-   Fonte: .trm-grid / .trm-tile / .trm-word / .trm-tile-titlebox / ecc.
+   7. TILE GRID — griglia modalità/difficoltà
+   Fonte: .trm-grid (Parole/Angoli) / .mvm-grid / .mpm-grid (identici)
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-grid {
   display: grid;
@@ -332,12 +301,18 @@
   margin-top: 0.5rem;
 }
 
-/* ── Tile singola capitolo ── */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   8. TILE — card modalità con testo auto-fit, icona sfondo, badge, spunta
+   Fonte: .trm-tile (Parole/Angoli) / .mvm-tile (Movimento) / .mpm-tile (Mappa)
+   CSS identico tra tutti i giochi; differisce solo il token --gv (verde vs viola)
+══════════════════════════════════════════════════════════════════════════════ */
 .mn-tile {
-  --gv:  #7c6cff;
-  --gv2: #5b4bd6;
-  --gv3: #9d8fff;
-  --spot: var(--spot, rgba(109, 77, 255, 0.26));
+  /* Default: verde (Parole, Angoli) */
+  --gv:  #2F7D4A;
+  --gv2: #1f6b3c;
+  --gv3: #3a9e5f;
+  --spot: var(--spot-tile, rgba(47, 158, 95, 0.28));
 
   position: relative;
   isolation: isolate;
@@ -355,10 +330,32 @@
   text-align: left;
   overflow: hidden;
   background:
-    radial-gradient(120% 90% at 100% 0%, var(--tile-bg-grad, rgba(109, 77, 255, 0.08)) 0%, transparent 55%),
-    linear-gradient(160deg, var(--card) 0%, var(--tile-bg-end, #f4f2fb) 100%);
+    radial-gradient(120% 90% at 100% 0%, rgba(58, 158, 95, 0.10) 0%, transparent 55%),
+    linear-gradient(160deg, var(--card) 0%, #f3faf5 100%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.12s cubic-bezier(0.2, 0.7, 0.3, 1.25), border-color 0.1s, box-shadow 0.12s, background 0.12s;
+}
+.mn-root.dark .mn-tile {
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(58, 158, 95, 0.18) 0%, transparent 55%),
+    linear-gradient(160deg, var(--card) 0%, #16241c 100%);
+}
+
+/* Variante VIOLA (Mappa, Movimento) */
+.mn-tile--vio {
+  --gv:  #7c3aed;
+  --gv2: #6024c4;
+  --gv3: #9b5cf6;
+  --spot: rgba(124, 58, 237, 0.26);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(124, 58, 237, 0.10) 0%, transparent 55%),
+    linear-gradient(160deg, var(--card) 0%, #f6f2fe 100%);
+}
+.mn-root.dark .mn-tile--vio {
+  --spot: rgba(196, 165, 255, 0.32);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(155, 92, 246, 0.18) 0%, transparent 55%),
+    linear-gradient(160deg, var(--card) 0%, #1c1430 100%);
 }
 
 /* Gradiente pieno che "sale" allo hover / quando acceso */
@@ -372,7 +369,7 @@
   transition: opacity 0.14s ease;
 }
 
-/* "Torcia" del cursore: alone sfumato centrato su --mx/--my (aggiornato via JS) */
+/* "Torcia" del cursore: alone sfumato centrato su --mx/--my */
 .mn-tile-spot {
   position: absolute;
   inset: 0;
@@ -386,7 +383,7 @@
 }
 @media (hover: hover) { .mn-tile:hover .mn-tile-spot { opacity: 1; } }
 
-/* Alone luminoso (shimmer) che scorre allo hover */
+/* Alone luminoso (shimmer) */
 .mn-tile-glow {
   position: absolute;
   inset: -40%;
@@ -398,72 +395,55 @@
   transition: opacity 0.14s, transform 0.25s ease;
 }
 
-/* Hover (solo dispositivi con puntatore reale) */
+/* Hover */
 @media (hover: hover) {
   .mn-tile:hover {
     transform: translateY(-4px);
     border-color: var(--gv);
-    box-shadow: 0 14px 30px rgba(109, 77, 255, 0.26);
+    box-shadow: 0 14px 30px rgba(31, 107, 60, 0.30);
   }
   .mn-root.dark .mn-tile:hover { box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5); }
+  .mn-tile--vio:hover { box-shadow: 0 14px 30px rgba(91, 33, 182, 0.30); }
+  .mn-root.dark .mn-tile--vio:hover { box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5); }
   .mn-tile:hover::before       { opacity: 1; }
   .mn-tile:hover .mn-tile-glow { opacity: 1; transform: translate(0, 0) scale(1); }
   .mn-tile:hover .mn-tile-mark { color: rgba(255, 255, 255, 0.9); opacity: 0.95; transform: scale(1.15) rotate(-4deg); }
   .mn-tile:hover .mn-tile-bg   { color: #fff; opacity: 0.30; transform: scale(1.06) rotate(-4deg); }
   .mn-tile:hover .mn-word      { color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25); }
-  .mn-tile:hover .mn-progbadge {
+  .mn-tile:hover .mn-tile-tag  { color: #fff; background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.45); }
+  .mn-tile:hover .mn-progbadge,
+  .mn-tile:hover .mn-watchbadge,
+  .mn-tile:hover .mn-roundbadge {
     color: #fff !important;
     border-color: rgba(255, 255, 255, 0.55) !important;
     background: rgba(255, 255, 255, 0.18) !important;
-    box-shadow: none;
+    box-shadow: none !important;
   }
 }
 .mn-tile:active { transform: translateY(-1px) scale(0.97); border-color: var(--gv); }
 
 /* SELEZIONATO */
-.mn-tile.is-on::before  { opacity: 1; }
+.mn-tile.is-on::before { opacity: 1; }
 .mn-tile.is-on {
   border-color: var(--gv3);
-  box-shadow: 0 0 0 2px var(--gv3), 0 14px 30px rgba(109, 77, 255, 0.30);
+  box-shadow: 0 0 0 2px var(--gv3), 0 14px 30px rgba(31, 107, 60, 0.35);
 }
 .mn-root.dark .mn-tile.is-on { box-shadow: 0 0 0 2px var(--gv3), 0 14px 30px rgba(0, 0, 0, 0.55); }
+.mn-tile--vio.is-on { box-shadow: 0 0 0 2px var(--gv3), 0 14px 30px rgba(91, 33, 182, 0.35); }
 .mn-tile.is-on .mn-tile-mark { color: rgba(255, 255, 255, 0.9); opacity: 0.95; transform: scale(1.15) rotate(-4deg); }
 .mn-tile.is-on .mn-tile-bg   { color: #fff; opacity: 0.30; transform: scale(1.06) rotate(-4deg); }
 .mn-tile.is-on .mn-word      { color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25); }
-.mn-tile.is-on .mn-progbadge {
+.mn-tile.is-on .mn-tile-tag  { color: #fff; background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.45); }
+.mn-tile.is-on .mn-progbadge,
+.mn-tile.is-on .mn-watchbadge,
+.mn-tile.is-on .mn-roundbadge {
   color: #fff !important;
   border-color: rgba(255, 255, 255, 0.55) !important;
   background: rgba(255, 255, 255, 0.18) !important;
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
-/* COMPLETATO (100% visto) — diventa verde smeraldo */
-.mn-tile.is-done {
-  --gv:  #34d399;
-  --gv2: #0f9d68;
-  --gv3: #5fe0b0;
-  border-color: rgba(16, 163, 74, 0.26);
-  background:
-    radial-gradient(120% 90% at 100% 0%, rgba(16, 163, 74, 0.10) 0%, transparent 55%),
-    linear-gradient(160deg, var(--card) 0%, #eefaf3 100%);
-}
-.mn-root.dark .mn-tile.is-done {
-  border-color: rgba(52, 211, 153, 0.32);
-  background:
-    radial-gradient(120% 90% at 100% 0%, rgba(52, 211, 153, 0.16) 0%, transparent 55%),
-    linear-gradient(160deg, var(--card) 0%, rgba(52, 211, 153, 0.06) 100%);
-}
-.mn-tile.is-done .mn-tile-mark,
-.mn-tile.is-done .mn-tile-bg { color: var(--gv); }
-
-/* Variante VIOLA — usata da "Tutti i capitoli" e tipi di domanda */
-.mn-vio {
-  --gv:  #7c6cff;
-  --gv2: #5b4bd6;
-  --gv3: #9d8fff;
-}
-
-/* ── Icona piccola in alto a sinistra (logo del capitolo, 28×28) ── */
+/* ── Icona piccola angolo alto-sinistra (28×28) ── */
 .mn-tile-mark {
   position: absolute;
   top: 8px;
@@ -492,8 +472,80 @@
 }
 .mn-tile-bg svg { width: 130px; height: 130px; }
 
-/* ── Badge progressi "N/T" — angolo in alto a destra ── */
+/* ── Titlebox: area JS per il fit del testo ── */
+.mn-tile-titlebox {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-height: 0;
+  overflow: hidden;
+  gap: 0.02em;
+}
+
+/*
+ * mn-word — due varianti (usa quella del gioco che stai replicando):
+ *
+ * A) STATICA con ellipsis (Parole, Angoli):
+ *    font-size: 1.05rem; line-height: 1.02; letter-spacing: -0.02em;
+ *    max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+ *
+ * B) FIT-TO-BOX via JS (Movimento, Mappa — useLayoutEffect misura e imposta):
+ *    font-size: 1.4rem; line-height: 0.92; letter-spacing: -0.03em;
+ *    (il JS sovrascrive font-size inline; il valore qui è solo il fallback)
+ */
+.mn-word {
+  display: block;
+  white-space: nowrap;
+  font-weight: 900;
+  color: var(--text-main);
+  transition: color 0.12s;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+  /* Variante A — commenta per usare la B */
+  font-size: 1.05rem;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Variante B (Movimento/Mappa): aggiungi class="mn-word--fit" + il JS di fit */
+.mn-word--fit {
+  font-size: 1.4rem;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-overflow: clip;
+  overflow: visible;
+}
+
+/* ── Tag sotto il titolo: Consigliato / Classico / Sfida… (Movimento, Mappa) ── */
+.mn-tile-tag {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.3rem;
+  font-size: 0.56rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  color: var(--vio);
+  background: rgba(124, 58, 237, 0.10);
+  border: 1px solid var(--vio-bord);
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.mn-root.dark .mn-tile-tag {
+  background: rgba(155, 92, 246, 0.14);
+}
+
+/* ── Wrapper badge angolo alto-destra ── */
 .mn-tile-ring { position: absolute; top: 6px; right: 6px; z-index: 2; }
+
+/* BADGE A: N/T visto/totale (Parole, Angoli) */
 .mn-progbadge {
   display: inline-flex;
   align-items: baseline;
@@ -501,6 +553,7 @@
   padding: 0.12rem 0.42rem;
   border-radius: 999px;
   border: 1.5px solid currentColor;
+  color: var(--gv);
   background: rgba(255, 255, 255, 0.92);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -510,7 +563,41 @@
 .mn-progbadge-seen { font-size: 0.92rem; font-weight: 900; letter-spacing: -0.03em; }
 .mn-progbadge-tot  { font-size: 0.6rem;  font-weight: 800; opacity: 0.72; }
 
-/* ── Spunta in basso a destra (animazione pop elastico) ── */
+/* BADGE B: tempo di memoria "3,0 s" (Movimento) */
+.mn-watchbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.12rem 0.42rem 0.12rem 0.34rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--gv);
+  color: var(--gv);
+  background: rgba(255, 255, 255, 0.92);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(2px);
+}
+.mn-watchbadge-v { font-size: 0.72rem; font-weight: 900; letter-spacing: -0.02em; }
+
+/* BADGE C: "Nx M" città×tentativi (Mappa) */
+.mn-roundbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.12rem 0.42rem 0.12rem 0.34rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--gv);
+  color: var(--gv);
+  background: rgba(255, 255, 255, 0.92);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(2px);
+}
+.mn-roundbadge-v { font-size: 0.72rem; font-weight: 900; letter-spacing: -0.02em; }
+
+/* ── Spunta angolo basso-destra (pop elastico al click) ── */
 .mn-tile-check {
   position: absolute;
   bottom: 8px;
@@ -530,198 +617,20 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 .mn-tile-check svg path { stroke: var(--gv); }
-.mn-tile.is-on   .mn-tile-check,
-.mn-tile.is-done .mn-tile-check { transform: scale(1) rotate(0); opacity: 1; }
-
-/* ── Titlebox: area JS per il fit del testo ── */
-.mn-tile-titlebox {
-  position: relative;
-  z-index: 1;
-  flex: 1 1 auto;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end;
-  min-height: 0;
-  overflow: hidden;
-  gap: 0.02em;
-}
-/* Ogni parola: blocco a riga propria, mai troncata, font-size assegnato dal JS */
-.mn-word {
-  display: block;
-  white-space: nowrap;
-  font-size: 1.4rem;          /* fallback pre-JS */
-  font-weight: 900;
-  line-height: 0.92;
-  letter-spacing: -0.03em;
-  color: var(--text-main);
-  transition: color 0.12s;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-/* ── TILE LARGA "Tutti i capitoli" ── */
-.mn-tile-all {
-  flex-direction: row;
-  aspect-ratio: auto;
-  align-items: center;
-  justify-content: flex-start;
-  text-align: left;
-  gap: 0.85rem;
-  padding: 1.25rem 1.2rem;
-  width: 100%;
-  border: none;
-  margin-bottom: 1.1rem;
-  background: linear-gradient(135deg, var(--gv3) 0%, var(--gv) 50%, var(--gv2) 100%);
-  box-shadow: 0 8px 22px rgba(91, 33, 182, 0.34);
-}
-.mn-root.dark .mn-tile-all { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
-.mn-tile-all::before,
-.mn-tile-all .mn-tile-glow { display: none; }
-.mn-tile-all:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(91, 33, 182, 0.44); }
-.mn-root.dark .mn-tile-all:hover { box-shadow: 0 16px 34px rgba(0, 0, 0, 0.6); }
-
-/* Spunta nella tile-all: posizione static (non assoluta) */
-.mn-tile-all .mn-tile-check {
-  position: static;
-  transform: scale(0);
-  width: 24px;
-  height: 24px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
-  box-shadow: none;
-}
-.mn-tile-all .mn-tile-check svg path { stroke: #fff; }
-.mn-tile-all.is-on .mn-tile-check { transform: scale(1); opacity: 1; }
-
-.mn-tile-all-ic {
-  color: #fff;
-  display: flex;
-  flex-shrink: 0;
-  transition: transform 0.25s;
-}
-.mn-tile-all:hover .mn-tile-all-ic { transform: scale(1.15) rotate(-6deg); }
-.mn-tile-all-title {
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.1;
-  flex: 1;
-  letter-spacing: -0.01em;
-}
-
-@keyframes mn-pop {
-  0%   { transform: scale(0.6); opacity: 0; }
-  60%  { transform: scale(1.08); }
-  100% { transform: scale(1); opacity: 1; }
-}
+.mn-tile.is-on .mn-tile-check { transform: scale(1) rotate(0); opacity: 1; }
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   9. TYPE BUTTONS — tre tasti "Scelta multipla / Vero-Falso / Completamento"
-   Fonte: .trm-types-row / .trm-typebtn
-══════════════════════════════════════════════════════════════════════════════ */
-.mn-types-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.55rem;
-  margin-top: 0.4rem;
-}
-.mn-typebtn {
-  --gv:  #7c6cff;
-  --gv2: #5b4bd6;
-  --gv3: #9d8fff;
-
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  padding: 0.85rem 0.5rem 0.7rem;
-  min-height: 108px;
-  border: 1.5px solid var(--vio-bord);
-  border-radius: 16px;
-  background: var(--type-bg);
-  color: var(--text-main);
-  cursor: pointer;
-  font-family: inherit;
-  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s, background 0.2s;
-}
-.mn-typebtn:disabled { opacity: 0.4; cursor: not-allowed; }
-@media (hover: hover) {
-  .mn-typebtn:not(:disabled):hover {
-    transform: translateY(-3px);
-    border-color: var(--gv3);
-    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.22);
-  }
-  .mn-root.dark .mn-typebtn:not(:disabled):hover { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5); }
-}
-.mn-typebtn:active { transform: translateY(-1px) scale(0.98); }
-
-/* Acceso */
-.mn-typebtn.is-on {
-  background: linear-gradient(155deg, var(--gv3) 0%, var(--gv) 55%, var(--gv2) 100%);
-  border-color: var(--gv3);
-  color: #fff;
-  box-shadow: 0 0 0 2px var(--gv3), 0 10px 26px rgba(91, 33, 182, 0.38);
-}
-.mn-root.dark .mn-typebtn.is-on { box-shadow: 0 0 0 2px var(--gv3), 0 10px 26px rgba(0, 0, 0, 0.55); }
-
-.mn-typebtn-ic {
-  color: var(--vio);
-  display: flex;
-  transition: color 0.2s, transform 0.2s;
-}
-.mn-typebtn.is-on .mn-typebtn-ic { color: #fff; transform: scale(1.08); }
-
-.mn-typebtn-label {
-  font-size: 0.92rem;
-  font-weight: 800;
-  line-height: 1.1;
-  text-align: center;
-}
-.mn-typebtn-count {
-  font-size: 0.78rem;
-  font-weight: 800;
-  opacity: 0.62;
-  font-variant-numeric: tabular-nums;
-}
-.mn-typebtn.is-on .mn-typebtn-count { opacity: 0.92; }
-.mn-typebtn-count-u { font-weight: 600; opacity: 0.8; }
-
-/* Spunta in alto a destra (pop elastico) */
-.mn-typebtn-check {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 18px;
-  height: 18px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: scale(0);
-  opacity: 0;
-  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.6), opacity 0.18s;
-}
-.mn-typebtn.is-on .mn-typebtn-check { transform: scale(1); opacity: 1; }
-
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   10. PLAY BUTTON — bottone primario "3 Gioca" con gradiente viola
-   Fonte: inline style sul <button> "Gioca" in TriviaMenu
+   9. PLAY BUTTON — bottone "② Gioca" con gradiente viola→verde
+   Fonte: stile inline sui 4 PlayBtn (identici tra Parole/Angoli/Mappa/Movimento)
+   Nota: gradiente diverso da Trivia (#9d8fff→#7c6cff→#5b4bd6)
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-play-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.95rem 1.3rem;
-  background: linear-gradient(100deg, #9d8fff 0%, #7c6cff 45%, #5b4bd6 100%);
+  background: linear-gradient(100deg, #7c3aed 0%, #5b21b6 42%, #2F7D4A 100%);
   color: #fff;
   border: none;
   border-radius: 14px;
@@ -729,22 +638,39 @@
   font-weight: 800;
   cursor: pointer;
   font-family: inherit;
-  box-shadow: 0 10px 30px rgba(124, 108, 255, 0.45);
+  box-shadow: 0 6px 24px rgba(91, 33, 182, 0.4);
   transition: filter 0.12s, transform 0.12s;
   width: 100%;
 }
-.mn-play-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.mn-play-btn:not(:disabled):hover { filter: brightness(0.9); transform: translateY(-1px); }
+.mn-play-btn:hover  { filter: brightness(0.9); transform: translateY(-1px); }
 .mn-play-btn:active { transform: scale(0.98); }
+.mn-play-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .mn-play-inner { display: flex; align-items: center; gap: 0.7rem; }
 .mn-play-title { font-size: 1.1rem; font-weight: 900; }
 .mn-play-sub   { font-size: 0.74rem; opacity: 0.9; margin-top: 0.1rem; }
 
+/* Step "②" nel bottone */
+.mn-play-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   11. ACTION BUTTONS — classifica, pagella, come si gioca, torna ai progetti
-   Fonte: .trm-actions / .trm-tut-btn / .trm-back-btn / .trm-tut-cta
+   10. ACTION BUTTONS — classifica, "Come si gioca" CTA, torna ai progetti
+   Fonte: .trm-actions / .trm-tut-btn / .trm-back-btn / .trm-tut-cta (tutti i giochi)
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-actions {
   display: flex;
@@ -753,7 +679,7 @@
   width: 100%;
 }
 
-/* Bottone secondario ghost: classifica / pagella / torna */
+/* Ghost: classifica live / torna ai progetti */
 .mn-action-btn {
   display: inline-flex;
   align-items: center;
@@ -778,8 +704,9 @@
   transform: translateY(-1px);
 }
 .mn-root.dark .mn-action-btn:hover { background: rgba(155, 92, 246, 0.18); }
+.mn-action-btn svg { width: 18px; height: 18px; }
 
-/* Variante SCURA (usata nel pannello laterale / drawer): sfondo bianco traslucido */
+/* Variante SCURA (pannelli laterali / drawer) */
 .mn-actions-dark .mn-action-btn {
   background: rgba(255, 255, 255, 0.10) !important;
   color: #fff !important;
@@ -788,9 +715,9 @@
 .mn-actions-dark .mn-action-btn:hover { background: rgba(255, 255, 255, 0.18) !important; }
 .mn-actions-dark .mn-action-btn svg   { color: #c4a5ff; }
 
-/* CTA "Come si gioca" — bottone PIENO viola con shimmer animato */
+/* CTA "Come si gioca" — pieno viola con shimmer animato */
 .mn-cta-btn {
-  background: linear-gradient(100deg, #9d8fff 0%, #7c6cff 55%, #5b4bd6 130%) !important;
+  background: linear-gradient(100deg, #7c3aed 0%, #6024c4 55%, #9b5cf6 130%) !important;
   color: #fff !important;
   border: none !important;
   font-size: 1.05rem !important;
@@ -801,7 +728,7 @@
   overflow: hidden;
   animation: mn-cta-breathe 2.8s ease-in-out infinite;
 }
-.mn-cta-btn svg { color: #fff !important; }
+.mn-cta-btn svg { color: #fff !important; width: 19px !important; height: 19px !important; }
 .mn-cta-btn::after {
   content: "";
   position: absolute;
@@ -816,7 +743,7 @@
 .mn-cta-btn:hover {
   transform: translateY(-2px) !important;
   filter: brightness(1.07);
-  box-shadow: 0 10px 30px rgba(124, 108, 255, 0.55);
+  box-shadow: 0 10px 30px rgba(91, 33, 182, 0.55);
 }
 @keyframes mn-cta-breathe {
   0%,  100% { box-shadow: 0 6px 22px rgba(91, 33, 182, 0.4); }
@@ -831,7 +758,11 @@
   .mn-cta-btn::after { animation: none; }
 }
 
-/* Toggle "Altro" (mobile) */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   11. MORE TOGGLE — bottone "⋯ Altro" (mobile, azioni secondarie)
+   Fonte: .trm-more-toggle (Parole/Angoli/Mappa identici)
+══════════════════════════════════════════════════════════════════════════════ */
 .mn-more-toggle {
   display: inline-flex;
   align-items: center;
@@ -852,61 +783,9 @@
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   12. PLAYER ICON — pastiglia "avatar punteggio + nome"
-   Fonte: .trm-player / .trm-player-badge / .trm-player-name
-══════════════════════════════════════════════════════════════════════════════ */
-.mn-player-slot { display: flex; justify-content: center; }
-
-.mn-player {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.4rem 0.95rem 0.4rem 0.4rem;
-  border-radius: 999px;
-  cursor: pointer;
-  border: 1.5px solid var(--vio-bord);
-  background: rgba(124, 58, 237, 0.06);
-  font-family: inherit;
-  transition: transform 0.12s, background 0.15s, box-shadow 0.15s;
-}
-.mn-root.dark .mn-player { background: rgba(155, 92, 246, 0.10); }
-.mn-player:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25); }
-.mn-player:active { transform: scale(0.97); }
-
-/* Badge tondo con punteggio */
-.mn-player-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 38px;
-  height: 38px;
-  padding: 0 0.4rem;
-  border-radius: 999px;
-  background: linear-gradient(140deg, #9d8fff, #5b4bd6);
-  color: #fff;
-  font-size: 0.92rem;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  box-shadow: 0 3px 10px rgba(91, 33, 182, 0.4);
-}
-.mn-player-name {
-  font-size: 0.92rem;
-  font-weight: 800;
-  color: var(--vio);
-  letter-spacing: 0.01em;
-  padding-right: 0.2rem;
-}
-
-/* Su pannello scuro */
-.mn-player.on-dark { border-color: rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.08); }
-.mn-player.on-dark .mn-player-name { color: #fff; }
-
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   13. DRAWER MOBILE — bottom sheet "Altro" con azioni secondarie
+   12. DRAWER MOBILE — bottom sheet "Altro"
    Fonte: .trm-drawer-back / .trm-drawer / .trm-drawer-head / .trm-drawer-x
+   Nota: tutti i giochi usano lo stesso gradiente viola+verde (#1a0b2e→#2a1150→#103820)
 ══════════════════════════════════════════════════════════════════════════════ */
 .mn-drawer-back {
   position: fixed;
@@ -921,7 +800,7 @@
 
 .mn-drawer {
   width: 100%;
-  background: linear-gradient(160deg, #15101f 0%, #1a1430 60%, #0b0f14 130%);
+  background: linear-gradient(160deg, #1a0b2e 0%, #2a1150 60%, #103820 130%);
   border-radius: 20px 20px 0 0;
   padding: 1.1rem 1.1rem calc(1.6rem + env(safe-area-inset-bottom));
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
@@ -961,8 +840,59 @@
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
+   13. PLAYER BADGE — pastiglia "punteggio + nome" (Parole / Angoli / Mappa)
+   Fonte: .trm-player / .trm-player-badge / .trm-player-name
+══════════════════════════════════════════════════════════════════════════════ */
+.mn-player-slot { display: flex; justify-content: center; }
+
+.mn-player {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.95rem 0.4rem 0.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1.5px solid var(--vio-bord);
+  background: rgba(124, 58, 237, 0.06);
+  font-family: inherit;
+  transition: transform 0.12s, background 0.15s, box-shadow 0.15s;
+}
+.mn-root.dark .mn-player { background: rgba(155, 92, 246, 0.10); }
+.mn-player:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25); }
+.mn-player:active { transform: scale(0.97); }
+
+.mn-player-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(140deg, #7c3aed, #5b21b6);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 3px 10px rgba(91, 33, 182, 0.4);
+}
+.mn-player-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--vio);
+  letter-spacing: 0.01em;
+  padding-right: 0.2rem;
+}
+.mn-player.on-dark { border-color: rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.08); }
+.mn-player.on-dark .mn-player-name { color: #fff; }
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
    14. DESKTOP — layout a tre colonne (vetrina | gioco | funzioni)
-   Fonte: media query @media (min-width: 760px) in TriviaMenu.tsx
+   Fonte: @media (min-width:760px) in tutti e 4 i menu
+   Nota: max-width:1120px è usato da Parole/Angoli/Mappa/Movimento (non Trivia)
 ══════════════════════════════════════════════════════════════════════════════ */
 @media (min-width: 760px) {
   .mn-mobile  { display: none; }
@@ -972,36 +902,36 @@
     flex-direction: row;
     height: 100%;
     overflow: hidden;
-    max-width: 100%;
+    max-width: 1120px;
     margin: 0 auto;
     width: 100%;
   }
 
-  /* Fasce scure SINISTRA e DESTRA (speculari) */
+  /* Fasce scure SINISTRA e DESTRA — stesso gradiente viola+verde dell'hero */
   .mn-desktop-left,
   .mn-desktop-right {
     flex-shrink: 0;
-    background: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+    background: linear-gradient(160deg, #1a0b2e 0%, #2a1150 38%, #103820 100%);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
   }
-  /* Aloni viola/verde diffusi in entrambe le fasce */
+  /* Aloni viola (sx-alto) + verde (dx-basso) */
   .mn-desktop-left::before, .mn-desktop-right::before {
     content: ""; position: absolute; width: 75%; height: 45%; border-radius: 50%;
     filter: blur(60px); opacity: 0.4; pointer-events: none;
-    background: #8b7bff; top: -10%; left: -20%;
+    background: #7c3aed; top: -10%; left: -20%;
   }
   .mn-desktop-left::after, .mn-desktop-right::after {
     content: ""; position: absolute; width: 75%; height: 45%; border-radius: 50%;
     filter: blur(60px); opacity: 0.3; pointer-events: none;
-    background: #6d4dff; bottom: -12%; right: -20%;
+    background: #2F9E5A; bottom: -12%; right: -20%;
   }
   .mn-desktop-left > *,
   .mn-desktop-right > * { position: relative; z-index: 1; }
 
-  /* SINISTRA — vetrina: logo, titolo, libro, stats */
+  /* SINISTRA — vetrina: logo, titolo, stats */
   .mn-desktop-left {
     width: 330px;
     align-items: center;
@@ -1009,34 +939,38 @@
     gap: 1.5rem;
     padding: 2rem;
   }
-  .mn-desktop-left .mn-logo-wrap { padding: 16px; border-radius: 22px; }
-  .mn-desktop-left .mn-title     { font-size: 3.1rem; }
-  .mn-desktop-left .mn-tagline   { font-size: 0.95rem; }
-  .mn-desktop-left .mn-book      { width: 178px; }
-  .mn-desktop-left .mn-stats-card {
-    width: 100%;
-    padding: 1.1rem 1.2rem;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+  .mn-desktop-left .mn-logo-wrap   { padding: 16px; border-radius: 22px; width: auto; height: auto; }
+  .mn-desktop-left .mn-logo-wrap svg { width: 64px; height: 64px; }
+  .mn-desktop-left .mn-logo-img    { width: 120px; height: 120px; }
+  .mn-desktop-left .mn-logo-mark   { font-size: 3rem; }
+  .mn-desktop-left .mn-title       { font-size: 2.8rem; }  /* 3.1rem su Parole/Angoli */
+  .mn-desktop-left .mn-tagline     { font-size: 0.95rem; }
+  .mn-desktop-left .mn-stats-card  {
+    width: 100%; padding: 1.1rem 1.2rem;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
   }
-  .mn-desktop-left .mn-stat-val  { font-size: 1.9rem; }
-  .mn-desktop-left .mn-stat-lbl  { font-size: 0.62rem; }
-  .mn-desktop-left .mn-kicker    { position: static; opacity: 1; }
+  .mn-desktop-left .mn-stat-val    { font-size: 1.9rem; }
+  .mn-desktop-left .mn-stat-lbl    { font-size: 0.62rem; }
+  .mn-desktop-left .mn-kicker      { position: static; opacity: 1; }
 
-  /* CENTRO — griglia capitoli + tipi + play */
+  /* CENTRO — griglia modalità + play */
   .mn-desktop-center {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
+    justify-content: center;
     padding: 2rem 1.8rem;
     overflow-y: auto;
+    background: var(--bg);
   }
-  .mn-desktop-center .mn-grid       { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-  .mn-desktop-center .mn-types-row  { grid-template-columns: repeat(3, 1fr); }
+  /* 2×2 su Parole/Angoli, 3×2 (o 3 col) su Movimento/Mappa */
+  .mn-desktop-center .mn-grid         { grid-template-columns: repeat(2, 1fr); }
+  .mn-desktop-center .mn-grid--3col   { grid-template-columns: repeat(3, 1fr); }
 
-  /* DESTRA — azioni secondarie + profilo giocatore */
+  /* DESTRA — funzioni + profilo */
   .mn-desktop-right {
     width: 280px;
     justify-content: flex-start;
@@ -1053,30 +987,40 @@
     margin: 0 0 0.1rem 0.2rem;
   }
   .mn-rail-spacer { flex: 1; min-height: 1rem; }
+  .mn-rail-note {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.62);
+    line-height: 1.4;
+    padding: 0 0.2rem;
+  }
   .mn-desktop-right .mn-player-slot { justify-content: stretch; }
   .mn-desktop-right .mn-player      { width: 100%; justify-content: flex-start; }
 }
 
-/* Schermi bassi: compatta le fasce laterali */
+/* Schermi bassi (≤860px di altezza): compatta la vetrina */
 @media (min-width: 760px) and (max-height: 860px) {
   .mn-desktop-left { gap: 0.95rem; padding: 1.5rem; }
   .mn-desktop-left .mn-logo-wrap     { padding: 12px; border-radius: 18px; }
-  .mn-desktop-left .mn-logo-wrap svg { width: 44px; height: 44px; }
-  .mn-desktop-left .mn-title         { font-size: 2.5rem; letter-spacing: 0.22em; }
+  .mn-desktop-left .mn-logo-wrap svg { width: 48px; height: 48px; }
+  .mn-desktop-left .mn-logo-img      { width: 88px; height: 88px; }
+  .mn-desktop-left .mn-logo-mark     { font-size: 2.4rem; }
+  .mn-desktop-left .mn-title         { font-size: 2.3rem; }
   .mn-desktop-left .mn-tagline       { font-size: 0.82rem; }
-  .mn-desktop-left .mn-book          { width: 140px; }
   .mn-desktop-left .mn-stats-card    { padding: 0.8rem 1rem; }
-  .mn-desktop-left .mn-stat-val      { font-size: 1.5rem; }
+  .mn-desktop-left .mn-stat-val      { font-size: 1.4rem; }
   .mn-desktop-left .mn-kicker        { display: none; }
   .mn-desktop-right                  { padding: 1.5rem 1.4rem; gap: 0.5rem; }
   .mn-desktop-right .mn-actions      { gap: 0.45rem; }
   .mn-desktop-right .mn-action-btn   { padding: 0.7rem 1rem; font-size: 0.92rem; }
 }
+
+/* Schermi molto bassi (≤680px di altezza) */
 @media (min-width: 760px) and (max-height: 680px) {
   .mn-desktop-left { gap: 0.65rem; padding: 1.1rem 1.4rem; }
   .mn-desktop-left .mn-logo-wrap svg { width: 36px; height: 36px; }
+  .mn-desktop-left .mn-logo-img      { width: 74px; height: 74px; }
   .mn-desktop-left .mn-title         { font-size: 2.1rem; }
-  .mn-desktop-left .mn-book          { width: 108px; }
   .mn-desktop-left .mn-stat-val      { font-size: 1.3rem; }
   .mn-desktop-right .mn-action-btn   { padding: 0.58rem 1rem; }
 }
