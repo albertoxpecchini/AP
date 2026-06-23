@@ -594,12 +594,14 @@ export default function App() {
         <section id="maturita" className="hm-sec hm-mat-sec">
           <div className="hm-wrap">
             <div className="hm-mat-folder">
-              <span className="hm-mat-tab">
-                <FolderOpen size={17} aria-hidden="true" /> Esame di Maturità
-              </span>
-              <span className="hm-mat-pin">
-                <Sparkles size={13} aria-hidden="true" /> In evidenza
-              </span>
+              <div className="hm-mat-toprow">
+                <span className="hm-mat-tab">
+                  <FolderOpen size={17} aria-hidden="true" /> Esame di Maturità
+                </span>
+                <span className="hm-mat-pin">
+                  <Sparkles size={13} aria-hidden="true" /> In evidenza
+                </span>
+              </div>
 
               <div className="hm-mat-head">
                 <p className="hm-eyebrow hm-eyebrow--gold">🎓 Final state exam · 2026</p>
@@ -1003,9 +1005,13 @@ export default function App() {
           background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold-2) 80%, transparent);
           border-radius: 0 0 3px 3px; opacity: 0.85; pointer-events: none;
         }
+        /* riga superiore cartella: tab + pin affiancati */
+        .hm-mat-toprow {
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+        }
         /* linguetta della cartella */
         .hm-mat-tab {
-          position: absolute; top: -16px; left: clamp(1.25rem, 3vw, 2.5rem); z-index: 10;
           display: inline-flex; align-items: center; gap: 0.5rem;
           padding: 0.5rem 1.1rem; border-radius: 12px;
           background: linear-gradient(140deg, var(--gold) 0%, var(--gold-deep) 130%);
@@ -1013,9 +1019,8 @@ export default function App() {
           border: 1px solid rgba(255, 255, 255, 0.28);
           box-shadow: 0 10px 24px rgba(245, 179, 1, 0.28);
         }
-        /* badge "in evidenza" in alto a destra */
+        /* badge "in evidenza" */
         .hm-mat-pin {
-          position: absolute; top: -13px; right: clamp(1.25rem, 3vw, 2.5rem); z-index: 10;
           display: inline-flex; align-items: center; gap: 0.35rem;
           padding: 0.35rem 0.8rem; border-radius: 999px;
           background: var(--gold-soft); color: var(--gold-2); border: 1px solid var(--gold-bd);
@@ -1039,7 +1044,6 @@ export default function App() {
           box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--gold-soft);
         }
         @media (max-width: 575.98px) {
-          .hm-mat-pin { display: none; }
           .hm-mat-tab { font-size: 0.8rem; }
         }
 
