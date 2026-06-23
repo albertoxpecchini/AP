@@ -26,6 +26,7 @@ import {
   GraduationCap,
   FolderOpen,
   Sparkles,
+  Gamepad2,
 } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
 import {
@@ -196,6 +197,10 @@ const PROJECT_EMOJI: Record<string, string> = {
 // L'ordine segue quello qui sotto; questi progetti vengono mostrati SOLO dentro
 // la cartella e tolti dalla griglia "Work" per non duplicarli.
 const MATURITA_URLS = ["/me-stesso", "/pcto", "/letteratura", "/dubliners", "/gattopardo"];
+
+// Cartella "Giochi Web · In evidenza": i 5 web game del progetto.
+// Anche questi vengono tolti dalla griglia "Work" per non duplicarli.
+const GAMES_URLS = ["/trivia", "/mappa", "/movimento", "/angoli", "/parole"];
 
 const CV = [
   {
@@ -387,13 +392,17 @@ export default function App() {
 
   const [projectImages, setProjectImages] = useState<Record<string, string>>({});
 
-  // Cartella "in evidenza" Maturità + griglia con il resto (giochi e siti).
+  // Cartelle "in evidenza" + griglia con il resto (solo siti esterni).
   const maturitaProjects = useMemo(
     () => MATURITA_URLS.map((u) => PROJECTS.find((p) => p.url === u)).filter(Boolean) as typeof PROJECTS,
     [],
   );
+  const gamesProjects = useMemo(
+    () => GAMES_URLS.map((u) => PROJECTS.find((p) => p.url === u)).filter(Boolean) as typeof PROJECTS,
+    [],
+  );
   const otherProjects = useMemo(
-    () => PROJECTS.filter((p) => !MATURITA_URLS.includes(p.url)),
+    () => PROJECTS.filter((p) => !MATURITA_URLS.includes(p.url) && !GAMES_URLS.includes(p.url)),
     [],
   );
 
@@ -619,6 +628,40 @@ export default function App() {
 
               <div className="hm-cards hm-cards--mat">
                 {maturitaProjects.map(renderCard)}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ② b — Giochi Web · In evidenza */}
+        <section id="giochi" className="hm-sec hm-gam-sec">
+          <div className="hm-wrap">
+            <div className="hm-gam-folder">
+              <div className="hm-mat-toprow">
+                <span className="hm-gam-tab">
+                  <Gamepad2 size={17} aria-hidden="true" /> Giochi Web
+                </span>
+                <span className="hm-gam-pin">
+                  <Sparkles size={13} aria-hidden="true" /> In evidenza
+                </span>
+              </div>
+
+              <div className="hm-mat-head">
+                <p className="hm-eyebrow hm-eyebrow--cyan">🎮 Web games · 2026</p>
+                <h2 className="hm-title">I miei giochi</h2>
+                <p className="hm-gam-lead">
+                  Cinque giochi web costruiti da zero con React e TypeScript:{" "}
+                  <span className="hm-cyan-ink">Trivia</span> quiz sull'architettura,{" "}
+                  <span className="hm-cyan-ink">Mappa</span> dalla vista satellitare,{" "}
+                  <span className="hm-cyan-ink">Movimento</span> di memoria spaziale,{" "}
+                  <span className="hm-cyan-ink">Angoli</span> in gradianti e{" "}
+                  <span className="hm-cyan-ink">Parole</span> stile Wordle in italiano.
+                </p>
+                <span className="hm-mat-count" style={{ color: "var(--cyan-2)" }}>🕹️ {gamesProjects.length} giochi</span>
+              </div>
+
+              <div className="hm-cards hm-cards--gam">
+                {gamesProjects.map(renderCard)}
               </div>
             </div>
           </div>
@@ -1038,13 +1081,60 @@ export default function App() {
           font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
           color: var(--gold-2);
         }
-        /* le card dentro la cartella prendono il riflesso oro all'hover */
+        /* le card dentro la cartella Maturità prendono il riflesso oro all'hover */
         .hm-cards--mat .hm-card:hover {
           border-color: var(--gold-bd);
           box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--gold-soft);
         }
         @media (max-width: 575.98px) {
           .hm-mat-tab { font-size: 0.8rem; }
+        }
+
+        /* ── Giochi Web — cartella "in evidenza" (accento ciano) ── */
+        .hm-gam-sec { padding-top: clamp(2.75rem, 6vw, 4.25rem); padding-bottom: clamp(2.75rem, 6vw, 4.25rem); }
+        .hm-gam-folder {
+          --cyan: #22d3ee; --cyan-2: #67e8f9; --cyan-deep: #0e7490;
+          --cyan-bd: rgba(34, 211, 238, 0.34); --cyan-soft: rgba(34, 211, 238, 0.10);
+          position: relative; margin-top: 1.5rem;
+          padding: clamp(2.6rem, 4vw, 3.4rem) clamp(1.25rem, 3vw, 2.5rem) clamp(1.75rem, 3vw, 2.5rem);
+          border: 1px solid var(--cyan-bd); border-radius: 24px;
+          background:
+            radial-gradient(120% 90% at 0% 0%, rgba(34, 211, 238, 0.10) 0%, transparent 55%),
+            linear-gradient(180deg, rgba(34, 211, 238, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+          box-shadow: 0 26px 64px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        /* linea ciano lungo il bordo superiore */
+        .hm-gam-folder::after {
+          content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 3px;
+          background: linear-gradient(90deg, transparent, var(--cyan) 20%, var(--cyan-2) 80%, transparent);
+          border-radius: 0 0 3px 3px; opacity: 0.85; pointer-events: none;
+        }
+        /* linguetta ciano */
+        .hm-gam-tab {
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          padding: 0.5rem 1.1rem; border-radius: 12px;
+          background: linear-gradient(140deg, var(--cyan) 0%, var(--cyan-deep) 130%);
+          color: #07222b; font-weight: 800; font-size: 0.86rem;
+          border: 1px solid rgba(255, 255, 255, 0.28);
+          box-shadow: 0 10px 24px rgba(34, 211, 238, 0.28);
+        }
+        /* badge "in evidenza" ciano */
+        .hm-gam-pin {
+          display: inline-flex; align-items: center; gap: 0.35rem;
+          padding: 0.35rem 0.8rem; border-radius: 999px;
+          background: var(--cyan-soft); color: var(--cyan-2); border: 1px solid var(--cyan-bd);
+          font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .hm-eyebrow--cyan { color: var(--cyan-2); }
+        .hm-cyan-ink { color: var(--cyan-2); font-weight: 700; }
+        .hm-gam-lead {
+          font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.65; color: var(--sub);
+          margin: 0.9rem 0 0; max-width: 52rem;
+        }
+        /* card con riflesso ciano all'hover */
+        .hm-cards--gam .hm-card:hover {
+          border-color: var(--cyan-bd);
+          box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--cyan-soft);
         }
 
         /* Card */
