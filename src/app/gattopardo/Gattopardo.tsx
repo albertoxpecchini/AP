@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import {
   ArrowLeft,
+  ArrowRight,
   BookOpen,
   BookText,
   Library,
@@ -384,6 +385,27 @@ export default function Gattopardo() {
             </div>
           </div>
         </section>
+
+        {/* ⑪ Vai all'altro libro */}
+        <section className="gp-next">
+          <div className="container">
+            <Link to="/dubliners" className="gp-next-card">
+              <span className="gp-next-eyebrow">
+                <BookOpen size={15} aria-hidden="true" /> Continua · l'altro approfondimento
+              </span>
+              <span className="gp-next-row">
+                <span className="gp-next-ic" aria-hidden="true"><BookOpen size={28} /></span>
+                <span className="gp-next-text">
+                  <span className="gp-next-title">Gente di Dublino</span>
+                  <span className="gp-next-sub">
+                    James Joyce, 1914 — quindici racconti da una città che non lascia andare nessuno.
+                  </span>
+                </span>
+                <ArrowRight size={24} className="gp-next-arrow" aria-hidden="true" />
+              </span>
+            </Link>
+          </div>
+        </section>
       </main>
 
       <footer className="gp-footer">
@@ -726,6 +748,44 @@ export default function Gattopardo() {
           color: rgba(255, 255, 255, 0.82);
           text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; font-size: 0.9rem; margin-bottom: 0;
         }
+
+        /* Vai all'altro libro — CTA cross-link */
+        .gp-next { padding: clamp(2.5rem, 6vw, 4rem) 0; background: linear-gradient(180deg, #0b0f14 0%, #090c10 100%); }
+        .gp-next-card {
+          display: block; text-decoration: none;
+          padding: clamp(1.5rem, 4vw, 2.25rem);
+          background: var(--surface);
+          border: 1px solid var(--vio-bd);
+          border-radius: 20px;
+          box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
+          transition: transform .18s, border-color .18s, box-shadow .18s, background .18s;
+        }
+        .gp-next-card:hover, .gp-next-card:focus-visible {
+          transform: translateY(-4px);
+          border-color: var(--accent);
+          box-shadow: 0 24px 60px var(--glow);
+          background: var(--vio-soft);
+        }
+        .gp-next-eyebrow {
+          display: inline-flex; align-items: center; gap: 0.45rem;
+          text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.78rem; font-weight: 700;
+          color: var(--ink); margin-bottom: 1.1rem;
+        }
+        .gp-next-row { display: flex; align-items: center; gap: 1.1rem; }
+        .gp-next-ic {
+          flex-shrink: 0;
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 58px; height: 58px; border-radius: 16px;
+          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
+          border: 1px solid rgba(255, 255, 255, 0.28);
+          color: #ffffff; box-shadow: 0 10px 30px var(--glow);
+        }
+        .gp-next-text { display: flex; flex-direction: column; min-width: 0; }
+        .gp-next-title { color: #ffffff; font-weight: 800; font-size: clamp(1.25rem, 3vw, 1.6rem); line-height: 1.15; }
+        .gp-next-sub { color: var(--sub); font-size: 0.95rem; line-height: 1.45; margin-top: 0.3rem; }
+        .gp-next-arrow { flex-shrink: 0; margin-left: auto; color: var(--ink); transition: transform .18s, color .18s; }
+        .gp-next-card:hover .gp-next-arrow, .gp-next-card:focus-visible .gp-next-arrow { transform: translateX(5px); color: #ffffff; }
+        @media (max-width: 575.98px) { .gp-next-arrow { display: none; } }
 
         /* Footer */
         .gp-footer { background-color: #090c10; color: #ffffff; border-top: 1px solid var(--surface-bd); }
