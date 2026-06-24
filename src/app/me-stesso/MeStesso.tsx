@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { currentTheme, requestToggle, subscribeTheme } from "../theme/themeCore";
+import { currentTheme, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import {
   ArrowLeft,
@@ -34,8 +34,6 @@ import {
   Heart,
   Zap,
   Mountain,
-  Sun,
-  Moon,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -239,11 +237,10 @@ export default function MeStesso() {
   // Il tema segue il sistema globale (tasto luna/sole + sensore orario).
   useEffect(() => subscribeTheme(setTheme), []);
 
-  const toggleTheme = () => requestToggle();
-
   return (
     <div className={`it-page-wrapper ms-page ms-${theme}`}>
-      {/* Header compatto: marchio del portfolio + tasto tema + ritorno alla home */}
+      {/* Header compatto: marchio del portfolio + ritorno alla home (il tasto
+          tema ora è quello globale, in basso a sinistra). */}
       <header className="ms-header">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between py-3">
@@ -256,23 +253,10 @@ export default function MeStesso() {
                 <span className="ms-brand-tagline">Designer &amp; Front-end Developer</span>
               </span>
             </Link>
-            <div className="d-inline-flex align-items-center gap-2">
-              <button
-                type="button"
-                className="ms-theme-toggle"
-                onClick={toggleTheme}
-                aria-label={theme === "light" ? "Passa al tema scuro" : "Passa al tema chiaro"}
-                title={theme === "light" ? "Tema scuro" : "Tema chiaro"}
-              >
-                {theme === "light"
-                  ? <Moon size={18} aria-hidden="true" />
-                  : <Sun size={18} aria-hidden="true" />}
-              </button>
-              <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
-                <ArrowLeft size={16} className="me-1" aria-hidden="true" />
-                <span>Torna alla home</span>
-              </Link>
-            </div>
+            <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
+              <ArrowLeft size={16} className="me-1" aria-hidden="true" />
+              <span>Torna alla home</span>
+            </Link>
           </div>
         </div>
       </header>
@@ -879,16 +863,6 @@ export default function MeStesso() {
         .ms-brand-title { color: var(--text-strong); font-weight: 700; font-size: 1.05rem; }
         .ms-brand-tagline { color: var(--sub); font-size: 0.78rem; }
         @media (max-width: 575.98px) { .ms-brand-tagline { display: none; } }
-
-        /* Tasto tema (luna/sole) */
-        .ms-theme-toggle {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 38px; height: 38px; border-radius: 10px;
-          background: var(--vio-soft); border: 1px solid var(--vio-bd);
-          color: var(--ink); cursor: pointer;
-          transition: background .15s, color .15s, transform .15s, border-color .15s;
-        }
-        .ms-theme-toggle:hover { transform: translateY(-1px); border-color: var(--accent); color: var(--accent); }
 
         /* Hero copertina — pannello con aloni viola */
         .ms-hero {
