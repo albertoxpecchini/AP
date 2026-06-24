@@ -1,0 +1,25 @@
+{
+  // ──────────────────────────────────────────────────────────────────────────
+  // Git / GitHub — fix dello spinner infinito di "Commit & Push".
+  //
+  // Sintomo: dal terminale `git push` funziona subito, ma in VS Code il tasto
+  // "Commit & Push" (o "Sync Changes") resta a caricare all'infinito senza
+  // pushare nulla.
+  //
+  // Causa: di default VS Code inietta il proprio askpass e tenta di gestire
+  // l'autenticazione GitHub dall'editor. Se quel prompt non compare (finestra
+  // nascosta / sessione GitHub interna in stato anomalo), il push resta
+  // appeso in attesa di credenziali che non arrivano mai.
+  //
+  // Soluzione: far gestire l'autenticazione a Git Credential Manager — che su
+  // questa macchina autentica già senza problemi (credenziale salvata in
+  // Windows Credential Manager) — togliendo VS Code dal flusso.
+  // ──────────────────────────────────────────────────────────────────────────
+  "git.useIntegratedAskPass": false,
+  "github.gitAuthentication": false,
+
+  // Niente fetch automatico in background né dialog di conferma sul sync:
+  // altre due fonti di spinner/attese inutili al push.
+  "git.autofetch": false,
+  "git.confirmSync": false
+}
