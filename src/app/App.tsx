@@ -24,6 +24,8 @@ import {
   BookOpen,
   Cat,
   GraduationCap,
+  FolderOpen,
+  Sparkles,
 } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
 import {
@@ -190,6 +192,11 @@ const PROJECT_EMOJI: Record<string, string> = {
   "Cascina Fontana": "🏡",
 };
 
+// Cartella "in evidenza": tutti i materiali per l'Esame di Maturità 2026.
+// L'ordine segue quello qui sotto; questi progetti vengono mostrati SOLO dentro
+// la cartella e tolti dalla griglia "Work" per non duplicarli.
+const MATURITA_URLS = ["/me-stesso", "/pcto", "/letteratura", "/dubliners", "/gattopardo"];
+
 const CV = [
   {
     period: "Sep 2018 — Jun 2021",
@@ -312,6 +319,7 @@ function parsePeriodStart(period: string): number {
 }
 
 const NAV = [
+  { href: "#maturita", label: "Maturità" },
   { href: "#progetti", label: "Work" },
   { href: "/bio", label: "About", route: true },
   { href: "#curriculum", label: "Résumé" },
@@ -378,6 +386,57 @@ export default function App() {
   }, []);
 
   const [projectImages, setProjectImages] = useState<Record<string, string>>({});
+
+  // Cartella "in evidenza" Maturità + griglia con il resto (giochi e siti).
+  const maturitaProjects = useMemo(
+    () => MATURITA_URLS.map((u) => PROJECTS.find((p) => p.url === u)).filter(Boolean) as typeof PROJECTS,
+    [],
+  );
+  const otherProjects = useMemo(
+    () => PROJECTS.filter((p) => !MATURITA_URLS.includes(p.url)),
+    [],
+  );
+
+  // Rendering di una singola card progetto (condiviso tra cartella e griglia).
+  const renderCard = (p: (typeof PROJECTS)[number]) => {
+    const internal = p.url.startsWith("/");
+    const shot = projectImages[p.title] || (p as any).previewImg;
+    const media = shot ? (
+      <img className="hm-card-shot" src={shot} alt={`Preview of ${p.title}`} loading="lazy" />
+    ) : (
+      <div className="hm-card-icon" aria-hidden="true">
+        <span className="hm-card-icon-badge">
+          <ProjectIcon thumb={(p as any).thumb} size={48} />
+        </span>
+      </div>
+    );
+    const body = (
+      <>
+        <div className="hm-card-media">{media}</div>
+        <div className="hm-card-body">
+          <span className="hm-card-meta">
+            <span aria-hidden="true">{PROJECT_EMOJI[p.title] ?? "📦"}</span> {p.category}
+          </span>
+          <div className="hm-card-titlerow">
+            <span className="hm-card-title">{p.title}</span>
+            <span className="hm-badge hm-badge--live">
+              <span className="hm-badge-dot" aria-hidden="true" />Live
+            </span>
+          </div>
+          <span className="hm-card-date">{p.date}</span>
+          <p className="hm-card-desc">{p.desc}</p>
+          <span className="hm-card-link">
+            Open project <ArrowUpRight size={15} aria-hidden="true" />
+          </span>
+        </div>
+      </>
+    );
+    return internal ? (
+      <Link key={p.title} to={p.url} className="hm-card" aria-label={p.title}>{body}</Link>
+    ) : (
+      <a key={p.title} href={p.url} target="_blank" rel="noreferrer noopener" className="hm-card" aria-label={p.title}>{body}</a>
+    );
+  };
 
   useEffect(() => {
     PROJECTS.forEach(async (p) => {
@@ -531,7 +590,39 @@ export default function App() {
           </div>
         </section>
 
-        {/* ② Work */}
+        {/* ② Esame di Maturità — cartella "in evidenza" */}
+        <section id="maturita" className="hm-sec hm-mat-sec">
+          <div className="hm-wrap">
+            <div className="hm-mat-folder">
+              <span className="hm-mat-tab">
+                <FolderOpen size={17} aria-hidden="true" /> Esame di Maturità
+              </span>
+              <span className="hm-mat-pin">
+                <Sparkles size={13} aria-hidden="true" /> In evidenza
+              </span>
+
+              <div className="hm-mat-head">
+                <p className="hm-eyebrow hm-eyebrow--gold">🎓 Final state exam · 2026</p>
+                <h2 className="hm-title">Esame di Maturità</h2>
+                <p className="hm-mat-lead">
+                  Everything for the 2026 final state exam, gathered in one folder: my{" "}
+                  <span className="hm-gold-ink">PCTO</span> work placement, my personal{" "}
+                  <span className="hm-gold-ink">presentation</span>, the literature deep-dives on{" "}
+                  <span className="hm-gold-ink">«Dubliners»</span> and{" "}
+                  <span className="hm-gold-ink">«The Leopard»</span>, and the Italian-literature{" "}
+                  <span className="hm-gold-ink">study hub</span>.
+                </p>
+                <span className="hm-mat-count">📂 {maturitaProjects.length} items</span>
+              </div>
+
+              <div className="hm-cards hm-cards--mat">
+                {maturitaProjects.map(renderCard)}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ③ Work */}
         <section id="progetti" className="hm-sec">
           <div className="hm-wrap">
             <div className="hm-sec-head">
@@ -545,50 +636,12 @@ export default function App() {
             </div>
 
             <div className="hm-cards">
-              {PROJECTS.map((p) => {
-                const internal = p.url.startsWith("/");
-                const shot = projectImages[p.title] || (p as any).previewImg;
-                const media = shot ? (
-                  <img className="hm-card-shot" src={shot} alt={`Preview of ${p.title}`} loading="lazy" />
-                ) : (
-                  <div className="hm-card-icon" aria-hidden="true">
-                    <span className="hm-card-icon-badge">
-                      <ProjectIcon thumb={(p as any).thumb} size={48} />
-                    </span>
-                  </div>
-                );
-                const body = (
-                  <>
-                    <div className="hm-card-media">{media}</div>
-                    <div className="hm-card-body">
-                      <span className="hm-card-meta">
-                        <span aria-hidden="true">{PROJECT_EMOJI[p.title] ?? "📦"}</span> {p.category}
-                      </span>
-                      <div className="hm-card-titlerow">
-                        <span className="hm-card-title">{p.title}</span>
-                        <span className="hm-badge hm-badge--live">
-                          <span className="hm-badge-dot" aria-hidden="true" />Live
-                        </span>
-                      </div>
-                      <span className="hm-card-date">{p.date}</span>
-                      <p className="hm-card-desc">{p.desc}</p>
-                      <span className="hm-card-link">
-                        Open project <ArrowUpRight size={15} aria-hidden="true" />
-                      </span>
-                    </div>
-                  </>
-                );
-                return internal ? (
-                  <Link key={p.title} to={p.url} className="hm-card" aria-label={p.title}>{body}</Link>
-                ) : (
-                  <a key={p.title} href={p.url} target="_blank" rel="noreferrer noopener" className="hm-card" aria-label={p.title}>{body}</a>
-                );
-              })}
+              {otherProjects.map(renderCard)}
             </div>
           </div>
         </section>
 
-        {/* ③ Résumé */}
+        {/* ④ Résumé */}
         <section id="curriculum" className="hm-sec hm-sec--alt">
           <div className="hm-wrap">
             <div className="hm-sec-head">
@@ -635,7 +688,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ④ Stack */}
+        {/* ⑤ Stack */}
         <section className="hm-sec">
           <div className="hm-wrap">
             <div className="hm-sec-head">
@@ -676,7 +729,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ⑤ Contact */}
+        {/* ⑥ Contact */}
         <section id="contatti" className="hm-contact">
           <div className="hm-wrap hm-contact-inner">
             <p className="hm-eyebrow hm-eyebrow--light">✉️ Contact</p>
@@ -930,6 +983,65 @@ export default function App() {
         .hm-title { font-size: clamp(1.9rem, 4vw, 2.6rem); font-weight: 800; line-height: 1.1; color: #ffffff; margin: 0; }
         .hm-action { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--ink); font-weight: 700; font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
         .hm-action:hover { color: #fff; }
+
+        /* ── Esame di Maturità — cartella "in evidenza" (accento oro) ── */
+        .hm-mat-sec { padding-top: clamp(2.75rem, 6vw, 4.25rem); padding-bottom: clamp(2.75rem, 6vw, 4.25rem); }
+        .hm-mat-folder {
+          --gold: #f5b301; --gold-2: #fbbf24; --gold-deep: #b97e05;
+          --gold-bd: rgba(245, 179, 1, 0.34); --gold-soft: rgba(245, 179, 1, 0.10);
+          position: relative; margin-top: 1.5rem;
+          padding: clamp(2.6rem, 4vw, 3.4rem) clamp(1.25rem, 3vw, 2.5rem) clamp(1.75rem, 3vw, 2.5rem);
+          border: 1px solid var(--gold-bd); border-radius: 24px;
+          background:
+            radial-gradient(120% 90% at 0% 0%, rgba(245, 179, 1, 0.12) 0%, transparent 55%),
+            linear-gradient(180deg, rgba(245, 179, 1, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+          box-shadow: 0 26px 64px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        /* riga "evidenziatore" oro lungo il bordo superiore */
+        .hm-mat-folder::after {
+          content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 3px;
+          background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold-2) 80%, transparent);
+          border-radius: 0 0 3px 3px; opacity: 0.85; pointer-events: none;
+        }
+        /* linguetta della cartella */
+        .hm-mat-tab {
+          position: absolute; top: -16px; left: clamp(1.25rem, 3vw, 2.5rem);
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          padding: 0.5rem 1.1rem; border-radius: 12px;
+          background: linear-gradient(140deg, var(--gold) 0%, var(--gold-deep) 130%);
+          color: #1a1206; font-weight: 800; font-size: 0.86rem;
+          border: 1px solid rgba(255, 255, 255, 0.28);
+          box-shadow: 0 10px 24px rgba(245, 179, 1, 0.28);
+        }
+        /* badge "in evidenza" in alto a destra */
+        .hm-mat-pin {
+          position: absolute; top: -13px; right: clamp(1.25rem, 3vw, 2.5rem);
+          display: inline-flex; align-items: center; gap: 0.35rem;
+          padding: 0.35rem 0.8rem; border-radius: 999px;
+          background: var(--gold-soft); color: var(--gold-2); border: 1px solid var(--gold-bd);
+          font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .hm-mat-head { margin-bottom: 2rem; }
+        .hm-eyebrow--gold { color: var(--gold-2); }
+        .hm-gold-ink { color: var(--gold-2); font-weight: 700; }
+        .hm-mat-lead {
+          font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.65; color: var(--sub);
+          margin: 0.9rem 0 0; max-width: 52rem;
+        }
+        .hm-mat-count {
+          display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1rem;
+          font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+          color: var(--gold-2);
+        }
+        /* le card dentro la cartella prendono il riflesso oro all'hover */
+        .hm-cards--mat .hm-card:hover {
+          border-color: var(--gold-bd);
+          box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--gold-soft);
+        }
+        @media (max-width: 575.98px) {
+          .hm-mat-pin { display: none; }
+          .hm-mat-tab { font-size: 0.8rem; }
+        }
 
         /* Card */
         .hm-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
