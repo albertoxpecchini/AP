@@ -1,0 +1,226 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   TEMA GLOBALE chiaro/scuro — controllo + applicazione su ogni pagina.
+
+   1) Widget fisso (tasto luna/sole + chip "Auto") e overlay di transizione.
+   2) Tema CHIARO per le pagine nate "dark premium" (home + approfondimenti):
+      si attiva solo quando il tema globale è light (html[data-ap-theme=light]).
+      I giochi e /me-stesso hanno già un loro tema nativo e vengono pilotati
+      dal bus, quindi qui non li tocchiamo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Overlay di transizione (cerchio che si espande) ── */
+.ap-theme-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483600;
+  pointer-events: none;
+  opacity: 0;
+  clip-path: circle(0px at 50% 50%);
+  will-change: clip-path, opacity;
+  background: #090c10;
+}
+
+/* ── Dock del widget (in basso a sinistra, libero dai FAB dei giochi) ── */
+.ap-theme-dock {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 2147483500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+}
+
+.ap-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: 1px solid var(--apt-bd);
+  background: var(--apt-bg);
+  color: var(--apt-fg);
+  box-shadow: 0 8px 24px var(--apt-shadow);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+    background 0.2s ease;
+}
+.ap-theme-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  color: var(--apt-accent);
+  border-color: var(--apt-accent);
+}
+.ap-theme-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+.ap-theme-ico {
+  display: inline-flex;
+  animation: ap-theme-pop 0.35s ease;
+}
+@keyframes ap-theme-pop {
+  0% {
+    transform: rotate(-90deg) scale(0.4);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.ap-theme-auto {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--apt-bd);
+  background: var(--apt-bg);
+  color: var(--apt-muted);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.ap-theme-auto.is-on {
+  color: #fff;
+  background: var(--apt-accent);
+  border-color: var(--apt-accent);
+}
+
+/* Palette del widget per i due temi */
+.ap-theme-dock[data-ap-theme="dark"] {
+  --apt-bg: rgba(18, 22, 30, 0.72);
+  --apt-bd: rgba(139, 123, 255, 0.32);
+  --apt-fg: #e8eef4;
+  --apt-muted: #a7b2bd;
+  --apt-accent: #8b7bff;
+  --apt-shadow: rgba(0, 0, 0, 0.5);
+}
+.ap-theme-dock[data-ap-theme="light"] {
+  --apt-bg: rgba(255, 255, 255, 0.82);
+  --apt-bd: rgba(109, 75, 214, 0.28);
+  --apt-fg: #4a2fb0;
+  --apt-muted: #6f6391;
+  --apt-accent: #6d4bd6;
+  --apt-shadow: rgba(80, 60, 160, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-theme-ico {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TEMA CHIARO per home (.hm-page) + approfondimenti (.it-page-wrapper).
+   Le pagine sono in gran parte guidate da variabili: ribaltando le variabili
+   (palette di .ms-light) si ottiene un chiaro coerente. Heroes e footer, che
+   sono pannelli scuri a sé, restano scuri di proposito (dark hero su pagina
+   chiara) per non rischiare testo bianco su fondo chiaro.
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-ap-theme="light"] .hm-page,
+html[data-ap-theme="light"] .db-page,
+html[data-ap-theme="light"] .gp-page,
+html[data-ap-theme="light"] .lt-page,
+html[data-ap-theme="light"] .pcto-page,
+html[data-ap-theme="light"] .bio-page {
+  --accent: #6d4bd6;
+  --accent-2: #7c5cff;
+  --accent-3: #8b6dff;
+  --accent-deep: #4a2fb0;
+  --ink: #5b34c9;
+  --glow: rgba(109, 75, 214, 0.28);
+  --text: #2a1f44;
+  --sub: #6f6391;
+  --surface: rgba(109, 75, 214, 0.05);
+  --surface-bd: rgba(109, 75, 214, 0.16);
+  --vio-soft: rgba(109, 75, 214, 0.08);
+  --vio-bd: rgba(109, 75, 214, 0.24);
+  --panel: linear-gradient(160deg, #f4f1fc 0%, #efeafb 45%, #ffffff 100%);
+  background:
+    radial-gradient(120% 70% at 50% -10%, rgba(109, 75, 214, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, #f7f5fd 100%) !important;
+  color: var(--text);
+  transition: color 0.4s ease;
+}
+
+/* Header a vetro chiaro + titolo brand leggibile */
+html[data-ap-theme="light"] .hm-hdr,
+html[data-ap-theme="light"] .db-header,
+html[data-ap-theme="light"] .gp-header,
+html[data-ap-theme="light"] .lt-header,
+html[data-ap-theme="light"] .pcto-header,
+html[data-ap-theme="light"] .bio-header {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-bottom-color: var(--surface-bd) !important;
+}
+html[data-ap-theme="light"] .hm-hdr--scrolled {
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 8px 30px rgba(80, 60, 160, 0.1) !important;
+}
+
+/* Testi che erano #fff su fondo CHIARO (header + sezioni del corpo): vanno scuri.
+   NB: hero, fascia "contact" e footer restano pannelli scuri (vedi sotto) e i
+   loro testi NON sono qui dentro. */
+html[data-ap-theme="light"] .hm-brand-name,
+html[data-ap-theme="light"] .hm-title,
+html[data-ap-theme="light"] .hm-card-title,
+html[data-ap-theme="light"] .hm-tl-title,
+html[data-ap-theme="light"] .db-brand-title,
+html[data-ap-theme="light"] .gp-brand-title,
+html[data-ap-theme="light"] .lt-brand-title,
+html[data-ap-theme="light"] .pcto-brand-title,
+html[data-ap-theme="light"] .bio-brand-title {
+  color: #1d1147 !important;
+}
+html[data-ap-theme="light"] .hm-link:hover {
+  color: #1d1147;
+}
+
+/* Bande che restano SCURE di proposito (hero, fasce "banda", CTA "next" e
+   footer): qui ri-applico la palette scura alle variabili, così i testi che le
+   usano (var(--sub), var(--ink), var(--text)…) restano chiari e leggibili sul
+   fondo scuro. I testi .text-white di Bootstrap, già bianchi, restano corretti. */
+html[data-ap-theme="light"] .hm-hero,
+html[data-ap-theme="light"] .hm-contact,
+html[data-ap-theme="light"] .hm-foot,
+html[data-ap-theme="light"] .hm-drawer-panel,
+html[data-ap-theme="light"] .db-hero,
+html[data-ap-theme="light"] .db-band,
+html[data-ap-theme="light"] .db-next,
+html[data-ap-theme="light"] .db-footer,
+html[data-ap-theme="light"] .gp-hero,
+html[data-ap-theme="light"] .gp-band,
+html[data-ap-theme="light"] .gp-next,
+html[data-ap-theme="light"] .gp-footer,
+html[data-ap-theme="light"] .lt-hero,
+html[data-ap-theme="light"] .lt-band,
+html[data-ap-theme="light"] .lt-footer,
+html[data-ap-theme="light"] .pcto-hero,
+html[data-ap-theme="light"] .pcto-footer,
+html[data-ap-theme="light"] .bio-hero,
+html[data-ap-theme="light"] .bio-footer {
+  --text: #e8eef4;
+  --sub: #a7b2bd;
+  --ink: #c4a5ff;
+  --accent: #8b7bff;
+  --accent-2: #7c6cff;
+  --accent-deep: #5b4bd6;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-bd: rgba(255, 255, 255, 0.1);
+  --vio-soft: rgba(139, 123, 255, 0.1);
+  --vio-bd: rgba(139, 123, 255, 0.28);
+}
+
+/* Card della home: superficie chiara leggibile */
+html[data-ap-theme="light"] .hm-card {
+  box-shadow: 0 10px 30px rgba(80, 60, 160, 0.08);
+}
+html[data-ap-theme="light"] .hm-card:hover {
+  box-shadow: 0 20px 44px rgba(80, 60, 160, 0.16);
+}

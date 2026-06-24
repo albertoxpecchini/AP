@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { currentTheme, requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import {
   ArrowLeft,
@@ -227,7 +228,7 @@ const FORMAGGI = ["Pecorino sardo stagionato", "Gorgonzola", "Grana Padano DOP"]
 const PIATTI = ["Spaghetti cacio e pepe", "Spaghetti alle vongole", "Pizza ai quattro formaggi", "Filetto di manzo"];
 
 export default function MeStesso() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(() => currentTheme());
 
   useEffect(() => {
     const prev = document.title;
@@ -235,21 +236,10 @@ export default function MeStesso() {
     return () => { document.title = prev; };
   }, []);
 
-  // Tema scelto: il default è chiaro (sfondo bianco, scritte viola scuro);
-  // la scelta viene ricordata tra una visita e l'altra.
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("ms-theme");
-      if (saved === "light" || saved === "dark") setTheme(saved);
-    } catch { /* localStorage non disponibile */ }
-  }, []);
+  // Il tema segue il sistema globale (tasto luna/sole + sensore orario).
+  useEffect(() => subscribeTheme(setTheme), []);
 
-  const toggleTheme = () =>
-    setTheme((t) => {
-      const next = t === "light" ? "dark" : "light";
-      try { localStorage.setItem("ms-theme", next); } catch { /* ignora */ }
-      return next;
-    });
+  const toggleTheme = () => requestToggle();
 
   return (
     <div className={`it-page-wrapper ms-page ms-${theme}`}>

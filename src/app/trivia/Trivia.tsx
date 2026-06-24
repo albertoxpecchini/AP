@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
 import { ArrowLeft, Moon, Sun, Flame, Check, X as XIcon, ListOrdered, RotateCcw, Send, GraduationCap, Maximize2, Minimize2 } from "lucide-react";
@@ -92,7 +93,9 @@ export default function Trivia() {
       return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
     } catch { return false; }
   });
-  const toggleDark = () => setDark(d => { const n = !d; try { localStorage.setItem(DARK_KEY, n ? "1" : "0"); } catch {} return n; });
+  // Il tasto tema del gioco passa dal sistema globale (animazione + sensore).
+  const toggleDark = () => requestToggle();
+  useEffect(() => subscribeTheme((t) => setDark(t === "dark")), []);
 
   // Schermo intero "vero" (Fullscreen API): non si può forzare senza un gesto
   // utente, ma offriamo il pulsante. Il layout è comunque sempre full-viewport.

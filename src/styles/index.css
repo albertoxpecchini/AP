@@ -3,6 +3,7 @@
 @import './theme.css';
 @import './ios.css';
 @import './site.css';
+@import './theme-auto.css';
 
 /* ── Regola globale anti-overflow ──
    Nessun contenuto (testo, numeri, immagini) deve mai oltrepassare i margini,

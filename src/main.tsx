@@ -3,11 +3,16 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import App from "./app/App.tsx";
 import { disableBackspaceNavigation } from "./app/utils/keyboard.ts";
+import ThemeWidget from "./app/theme/ThemeWidget.tsx";
+import { syncTheme } from "./app/theme/themeCore.ts";
 import "./styles/index.css";
 
 // Il Backspace non deve più far "uscire" dalla pagina (navigazione Indietro del
 // browser): resta attivo solo dentro i campi di testo per cancellare i caratteri.
 disableBackspaceNavigation();
+
+// Tema globale applicato subito (mode manuale o sensore orario).
+syncTheme();
 
 const Bio = lazy(() => import("./app/site/Bio.tsx"));
 const Parole = lazy(() => import("./app/parole/Parole.tsx"));
@@ -22,7 +27,8 @@ const Movimento = lazy(() => import("./app/movimento/Movimento.tsx"));
 const Mappa = lazy(() => import("./app/mappa/Mappa.tsx"));
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
+  <>
+    <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
       <Route
@@ -115,5 +121,8 @@ createRoot(document.getElementById("root")!).render(
       />
 <Route path="*" element={<App />} />
     </Routes>
-  </BrowserRouter>,
+    </BrowserRouter>
+    {/* Widget tema globale: tasto luna/sole + sensore orario, su ogni pagina. */}
+    <ThemeWidget />
+  </>,
 );

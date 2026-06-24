@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
 import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun, HelpCircle, Layers, Eye, Pencil, Target, Award } from "lucide-react";
@@ -488,9 +489,9 @@ export default function Movimento() {
 
   const dismissTrophy = useCallback(() => { setTrophy(null); }, []);
 
-  const toggleDark = useCallback(() => {
-    setDark(d => { const n = !d; try { localStorage.setItem("games-dark", n ? "1" : "0"); } catch {} return n; });
-  }, []);
+  // Il tasto tema del gioco passa dal sistema globale (animazione + sensore).
+  const toggleDark = useCallback(() => { requestToggle(); }, []);
+  useEffect(() => subscribeTheme((t) => setDark(t === "dark")), []);
 
   const phaseLabel = phase === "watch" ? "Guarda" : phase === "draw" ? "Disegna" : phase === "result" ? "Risultato" : "Fine partita";
   const phaseHint =

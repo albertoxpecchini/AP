@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
 import {
@@ -505,9 +506,9 @@ export default function Parole() {
     }
   }, [state]);
 
-  const toggleDark = useCallback(() => {
-    setDark(d => { const n = !d; try { localStorage.setItem("games-dark", n ? "1" : "0"); } catch {} return n; });
-  }, []);
+  // Il tasto tema del gioco passa dal sistema globale (animazione + sensore).
+  const toggleDark = useCallback(() => { requestToggle(); }, []);
+  useEffect(() => subscribeTheme((t) => setDark(t === "dark")), []);
 
   // Chiude la modale trofeo e prosegue.
   const dismissTrophy = useCallback(() => { setTrophy(null); }, []);

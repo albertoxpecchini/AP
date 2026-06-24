@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
 import { ArrowLeft, RotateCcw, Trophy, Flame, Moon, Sun, HelpCircle, Layers, Timer, Delete, CornerDownLeft, ListOrdered, Award } from "lucide-react";
@@ -606,9 +607,9 @@ export default function Angoli() {
       setShowMenu(false);
     }
   }, [startSession]);
-  const toggleDark = useCallback(()=>{
-    setDark(d=>{ const n=!d; try{localStorage.setItem("games-dark",n?"1":"0");}catch{} return n; });
-  }, []);
+  // Il tasto tema del gioco passa dal sistema globale (animazione + sensore).
+  const toggleDark = useCallback(()=>{ requestToggle(); }, []);
+  useEffect(() => subscribeTheme((t) => setDark(t === "dark")), []);
 
   // ── Tour guidato "a riflettore" (solo desktop, dove il rail funzioni è visibile) ──
   const isDesktop = () => typeof window !== "undefined" && window.matchMedia("(min-width: 760px)").matches;
