@@ -199,7 +199,7 @@ const SCUOLA_RAMI = [
     key: "easy",
     Icon: Zap,
     title: "Facile",
-    items: ["Disegno e CAD", "Inglese tecnico (C1)", "Tecnologia delle costruzioni"],
+    items: ["Disegno e CAD", "Informatica e digitale", "Tecnologia delle costruzioni"],
   },
   {
     key: "hard",
