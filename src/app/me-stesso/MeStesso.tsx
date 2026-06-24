@@ -542,10 +542,10 @@ export default function MeStesso() {
                 <div className="ms-callout">
                   <span className="ms-callout-ic" aria-hidden="true"><Plane size={22} /></span>
                   <p className="mb-0">
-                    Il viaggio a cui tengo di più me lo sono <strong>regalato io</strong>: dopo i 18 anni
-                    sono partito per una vacanza studio a <strong>Dublino</strong>. Per la prima volta ho
-                    preso l'aereo, ho scoperto un Paese nuovo e ho provato a vivere la scuola interamente
-                    in inglese (livello C1, esame IELTS).
+                    Il viaggio a cui tengo di più me lo sono <strong>regalato io</strong>: nell'<strong>estate
+                    2024</strong>, appena compiuti i 18 anni, sono partito per una vacanza studio a
+                    <strong> Dublino</strong>. Per la prima volta ho preso l'aereo, ho scoperto un Paese
+                    nuovo e per un mese ho provato a vivere e studiare interamente in inglese.
                   </p>
                 </div>
               </div>
