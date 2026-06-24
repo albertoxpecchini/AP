@@ -29,17 +29,23 @@ import {
   ShoppingCart,
   TrendingUp,
   Quote,
+  School,
+  Heart,
+  Zap,
+  Mountain,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // «Me stesso» — Presentazione personale di Alberto Pecchini (Esame di Stato 2026).
 //
-// Impaginazione col look "dark premium" del gioco Trivia — accento VIOLA al
-// 100% su fondo scuro e superfici "vetro": hero copertina, chi sono, radici
-// (l'azienda di famiglia), percorso CAT, le passioni (web, viaggi + Paesi
-// visitati con bandiere SVG, tiro, moto, stare con gli altri, buona tavola) e
-// il futuro. Le foto vivono in /images/me-stesso/: se mancano, ogni cornice
-// mostra un placeholder coerente con la palette.
+// Due temi commutabili col tasto luna/sole in alto:
+//  · CHIARO (default): sfondo bianco, scritte viola scuro;
+//  · SCURO "dark premium": fondo scuro e neon viola (lo stesso del gioco Trivia).
+// Tutti i colori passano da variabili CSS definite per tema, così una sola
+// classe (.ms-light / .ms-dark) ribalta l'intera pagina. Le foto vivono in
+// /images/me-stesso/: se mancano, ogni cornice mostra un placeholder coerente.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Età calcolata dal giorno di nascita: niente numero che invecchia da solo.
@@ -53,7 +59,7 @@ function ageFromISO(iso: string): number {
 }
 
 // Cornice foto con fallback elegante: se l'immagine manca, mostra un
-// placeholder dark-premium con icona, senza spezzare il layout.
+// placeholder coerente con la palette, senza spezzare il layout.
 //
 // Inquadramento: la prop `focus` imposta l'object-position dell'immagine
 // (es. "50% 30%") per scegliere quale parte resta in cornice quando la foto
@@ -180,6 +186,29 @@ const PERCORSO = [
   { Icon: Building2, title: "Territorio", desc: "Leggere e interpretare il territorio, il rilievo e le costruzioni." },
 ];
 
+// La scuola in rami schematici: cosa mi è piaciuto, cosa è stato facile e cosa
+// difficile nel percorso CAT. Contenuti da personalizzare con l'esperienza reale.
+const SCUOLA_RAMI = [
+  {
+    key: "like",
+    Icon: Heart,
+    title: "Mi è piaciuto",
+    items: ["Disegno tecnico & AutoCAD", "Progettazione", "Topografia e rilievo"],
+  },
+  {
+    key: "easy",
+    Icon: Zap,
+    title: "Facile",
+    items: ["Disegno e CAD", "Inglese tecnico (C1)", "Tecnologia delle costruzioni"],
+  },
+  {
+    key: "hard",
+    Icon: Mountain,
+    title: "Difficile",
+    items: ["Estimo", "Matematica", "Calcoli di topografia"],
+  },
+];
+
 const SPORT_PREF = [
   { Icon: Target, label: "Tiro a segno" },
   { Icon: Crosshair, label: "Tiro a volo" },
@@ -198,15 +227,33 @@ const FORMAGGI = ["Pecorino sardo stagionato", "Gorgonzola", "Grana Padano DOP"]
 const PIATTI = ["Spaghetti cacio e pepe", "Spaghetti alle vongole", "Pizza ai quattro formaggi", "Filetto di manzo"];
 
 export default function MeStesso() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
   useEffect(() => {
     const prev = document.title;
     document.title = "Me stesso · Alberto Pecchini — Esame di Stato 2026";
     return () => { document.title = prev; };
   }, []);
 
+  // Tema scelto: il default è chiaro (sfondo bianco, scritte viola scuro);
+  // la scelta viene ricordata tra una visita e l'altra.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("ms-theme");
+      if (saved === "light" || saved === "dark") setTheme(saved);
+    } catch { /* localStorage non disponibile */ }
+  }, []);
+
+  const toggleTheme = () =>
+    setTheme((t) => {
+      const next = t === "light" ? "dark" : "light";
+      try { localStorage.setItem("ms-theme", next); } catch { /* ignora */ }
+      return next;
+    });
+
   return (
-    <div className="it-page-wrapper ms-page">
-      {/* Header compatto: marchio del portfolio + ritorno alla home */}
+    <div className={`it-page-wrapper ms-page ms-${theme}`}>
+      {/* Header compatto: marchio del portfolio + tasto tema + ritorno alla home */}
       <header className="ms-header">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between py-3">
@@ -219,10 +266,23 @@ export default function MeStesso() {
                 <span className="ms-brand-tagline">Designer &amp; Front-end Developer</span>
               </span>
             </Link>
-            <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" />
-              <span>Torna alla home</span>
-            </Link>
+            <div className="d-inline-flex align-items-center gap-2">
+              <button
+                type="button"
+                className="ms-theme-toggle"
+                onClick={toggleTheme}
+                aria-label={theme === "light" ? "Passa al tema scuro" : "Passa al tema chiaro"}
+                title={theme === "light" ? "Tema scuro" : "Tema chiaro"}
+              >
+                {theme === "light"
+                  ? <Moon size={18} aria-hidden="true" />
+                  : <Sun size={18} aria-hidden="true" />}
+              </button>
+              <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
+                <ArrowLeft size={16} className="me-1" aria-hidden="true" />
+                <span>Torna alla home</span>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -352,7 +412,7 @@ export default function MeStesso() {
           </div>
         </section>
 
-        {/* ④ Il mio percorso — banda scura */}
+        {/* ④ Il mio percorso — banda d'accento */}
         <section className="ms-band">
           <div className="container">
             <p className="ap-kicker text-uppercase fw-semibold mb-3 ms-band-kicker">03 — Il mio percorso</p>
@@ -370,6 +430,36 @@ export default function MeStesso() {
                   <p className="ms-percorso-desc mb-0">{desc}</p>
                 </div>
               ))}
+            </div>
+
+            {/* La scuola in rami schematici */}
+            <div className="ms-tree-wrap">
+              <h3 className="ms-tree-heading">La scuola, in breve</h3>
+              <p className="ms-tree-sub">
+                Cosa mi è piaciuto, cosa è stato facile e cosa più difficile.
+              </p>
+              <div className="ms-tree">
+                <div className="ms-tree-top">
+                  <div className="ms-tree-root">
+                    <span className="ms-tree-root-ic" aria-hidden="true"><School size={22} /></span>
+                    La scuola · il CAT
+                  </div>
+                </div>
+                <div className="ms-trunk" aria-hidden="true" />
+                <div className="ms-tree-branches">
+                  {SCUOLA_RAMI.map(({ key, Icon, title, items }) => (
+                    <div className={`ms-branch ms-branch--${key}`} key={key}>
+                      <div className="ms-branch-head">
+                        <span className="ms-branch-ic" aria-hidden="true"><Icon size={18} /></span>
+                        {title}
+                      </div>
+                      <ul className="ms-branch-list">
+                        {items.map((it) => <li key={it}>{it}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -662,7 +752,7 @@ export default function MeStesso() {
             <span style={{ opacity: 0.8 }}>
               Presentazione personale di Alberto Pecchini · Esame di Stato 2026
             </span>
-            <Link to="/" className="text-white text-decoration-none d-inline-flex align-items-center">
+            <Link to="/" className="ms-footer-link text-decoration-none d-inline-flex align-items-center">
               <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
             </Link>
           </div>
@@ -671,49 +761,123 @@ export default function MeStesso() {
 
       <style>{`
         /* ─────────────────────────────────────────────────────────────────────
-           Look "dark premium" · accento VIOLA al 100% (lo stesso del gioco
-           Trivia, vedi src/app/_game/ui/tokens.ts). Sfondo scuro profondo,
-           superfici "vetro" e neon viola: niente più neroverde.
+           Due temi commutabili (tasto luna/sole):
+            · .ms-light — CHIARO di default: sfondo bianco, scritte viola scuro;
+            · .ms-dark  — SCURO "dark premium": fondo scuro e neon viola (Trivia).
+           Tutti i colori passano da variabili: una sola classe ribalta la pagina.
            ───────────────────────────────────────────────────────────────────── */
         .ms-page {
-          --accent: #8b7bff;          /* viola neon (accento Trivia) */
+          min-height: 100vh;
+          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          color: var(--text);
+          background: var(--page-bg);
+          transition: background .35s ease, color .35s ease;
+        }
+
+        /* ── Tema CHIARO (default) ── */
+        .ms-page.ms-light {
+          --accent: #6d4bd6;
+          --accent-2: #7c5cff;
+          --accent-3: #8b6dff;
+          --accent-deep: #4a2fb0;
+          --ink: #5b34c9;
+          --glow: rgba(109, 75, 214, 0.28);
+          --text: #2a1f44;
+          --text-strong: #1d1147;
+          --sub: #6f6391;
+          --surface: rgba(109, 75, 214, 0.05);
+          --surface-bd: rgba(109, 75, 214, 0.16);
+          --vio-soft: rgba(109, 75, 214, 0.08);
+          --vio-bd: rgba(109, 75, 214, 0.24);
+          --bg-light-tint: rgba(109, 75, 214, 0.045);
+          --tree-line: rgba(109, 75, 214, 0.35);
+          --bc-like: #15803d; --bc-easy: #5b34c9; --bc-hard: #b45309;
+          --page-bg:
+            radial-gradient(120% 70% at 50% -10%, rgba(109, 75, 214, 0.08) 0%, transparent 55%),
+            linear-gradient(180deg, #ffffff 0%, #f7f5fd 100%);
+          --hdr-bg: rgba(255, 255, 255, 0.82);
+          --panel: linear-gradient(160deg, #f4f1fc 0%, #efeafb 45%, #ffffff 100%);
+          --hero-bg:
+            radial-gradient(90% 120% at 0% 0%, rgba(109, 75, 214, 0.12) 0%, transparent 55%),
+            var(--panel);
+          --band-bg:
+            radial-gradient(100% 130% at 100% 0%, rgba(109, 75, 214, 0.10) 0%, transparent 55%),
+            linear-gradient(160deg, #f6f3fe 0%, #ffffff 60%, #f3effd 100%);
+          --future-bg:
+            radial-gradient(90% 120% at 0% 0%, rgba(109, 75, 214, 0.18) 0%, transparent 55%),
+            linear-gradient(135deg, #efeafd 0%, #e8defb 55%, #f6f3fe 100%);
+          --thanks-bg: linear-gradient(135deg, #f4f1fc 0%, #ece6fa 100%);
+          --thanks-scrim: linear-gradient(120deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.6) 50%, rgba(236,230,250,0.4) 100%);
+          --footer-bg: #f3f0fb;
+          --shot-bg: rgba(109, 75, 214, 0.04);
+          --ph-bg:
+            radial-gradient(120% 120% at 30% 20%, rgba(109, 75, 214, 0.16), rgba(255, 255, 255, 0.2)),
+            linear-gradient(135deg, #efeafb 0%, #ffffff 100%);
+          --blob-1: 0.16; --blob-2: 0.12;
+        }
+
+        /* ── Tema SCURO "dark premium" ── */
+        .ms-page.ms-dark {
+          --accent: #8b7bff;
           --accent-2: #7c6cff;
           --accent-3: #9d8fff;
           --accent-deep: #5b4bd6;
-          --ink: #c4a5ff;             /* viola chiaro: kicker, icone, dettagli */
+          --ink: #c4a5ff;
           --glow: rgba(139, 123, 255, 0.45);
           --text: #e8eef4;
+          --text-strong: #ffffff;
           --sub: #a7b2bd;
           --surface: rgba(255, 255, 255, 0.05);
           --surface-bd: rgba(255, 255, 255, 0.10);
           --vio-soft: rgba(139, 123, 255, 0.10);
           --vio-bd: rgba(139, 123, 255, 0.28);
-          --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
-          min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
-          color: var(--text);
-          background:
+          --bg-light-tint: rgba(255, 255, 255, 0.022);
+          --tree-line: rgba(139, 123, 255, 0.4);
+          --bc-like: #34d399; --bc-easy: #c4a5ff; --bc-hard: #fbbf24;
+          --page-bg:
             radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
             linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+          --hdr-bg: rgba(10, 13, 17, 0.82);
+          --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+          --hero-bg:
+            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
+            var(--panel);
+          --band-bg:
+            radial-gradient(100% 130% at 100% 0%, rgba(139, 123, 255, 0.18) 0%, transparent 55%),
+            linear-gradient(160deg, #120c20 0%, #0b0f14 60%, #15101f 100%);
+          --future-bg:
+            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.25) 0%, transparent 55%),
+            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
+          --thanks-bg: linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+          --thanks-scrim: linear-gradient(120deg, rgba(7,9,16,0.92) 0%, rgba(7,9,16,0.6) 50%, rgba(20,16,40,0.35) 100%);
+          --footer-bg: #090c10;
+          --shot-bg: rgba(255, 255, 255, 0.04);
+          --ph-bg:
+            radial-gradient(120% 120% at 30% 20%, rgba(139, 123, 255, 0.22), rgba(10, 12, 16, 0.2)),
+            linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+          --blob-1: 0.45; --blob-2: 0.35;
         }
-        /* Override delle utility Bootstrap dentro il tema scuro */
+
+        /* Override delle utility Bootstrap dentro i temi */
         .ms-page .ap-kicker.text-primary { color: var(--ink) !important; }
         .ms-page .bg-white { background: transparent !important; }
-        .ms-page .bg-light { background: rgba(255, 255, 255, 0.022) !important; }
-        .ms-page .display-5, .ms-page .h3 { color: var(--text); }
-        .ms-page .btn-outline-light { border-color: rgba(255, 255, 255, 0.4); color: #ffffff; }
+        .ms-page .bg-light { background: var(--bg-light-tint) !important; }
+        .ms-page .display-5, .ms-page .h3 { color: var(--text-strong); }
+        .ms-page .text-white { color: var(--text-strong) !important; }
+        .ms-page .btn-outline-light { border-color: var(--vio-bd); color: var(--text-strong); }
         .ms-page .btn-outline-light:hover,
         .ms-page .btn-outline-light:focus {
-          background-color: var(--accent); border-color: var(--accent); color: #0a0d11 !important;
+          background-color: var(--accent); border-color: var(--accent); color: #ffffff !important;
         }
         .ap-kicker { letter-spacing: 0.18em; font-size: 0.875rem; }
 
-        /* Header — vetro scuro con filo viola */
+        /* Header — vetro con filo viola */
         .ms-header {
-          background: rgba(10, 13, 17, 0.82); position: sticky; top: 0; z-index: 10;
+          background: var(--hdr-bg); position: sticky; top: 0; z-index: 10;
           backdrop-filter: blur(14px) saturate(120%);
           -webkit-backdrop-filter: blur(14px) saturate(120%);
           border-bottom: 1px solid var(--surface-bd);
+          transition: background .35s ease, border-color .35s ease;
         }
         .ms-brand-mark {
           display: inline-flex; align-items: center; justify-content: center;
@@ -722,26 +886,34 @@ export default function MeStesso() {
         }
         .ms-brand-mark img { width: 100%; height: 100%; display: block; }
         .ms-brand-text { display: inline-flex; flex-direction: column; line-height: 1.2; }
-        .ms-brand-title { color: #ffffff; font-weight: 700; font-size: 1.05rem; }
+        .ms-brand-title { color: var(--text-strong); font-weight: 700; font-size: 1.05rem; }
         .ms-brand-tagline { color: var(--sub); font-size: 0.78rem; }
         @media (max-width: 575.98px) { .ms-brand-tagline { display: none; } }
 
-        /* Hero copertina — pannello scuro con aloni viola */
+        /* Tasto tema (luna/sole) */
+        .ms-theme-toggle {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 38px; height: 38px; border-radius: 10px;
+          background: var(--vio-soft); border: 1px solid var(--vio-bd);
+          color: var(--ink); cursor: pointer;
+          transition: background .15s, color .15s, transform .15s, border-color .15s;
+        }
+        .ms-theme-toggle:hover { transform: translateY(-1px); border-color: var(--accent); color: var(--accent); }
+
+        /* Hero copertina — pannello con aloni viola */
         .ms-hero {
           position: relative; overflow: hidden;
           padding: clamp(3rem, 7vw, 5.5rem) 0;
-          color: #ffffff;
-          background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
-            var(--panel);
+          color: var(--text);
+          background: var(--hero-bg);
           border-bottom: 1px solid var(--surface-bd);
         }
         .ms-hero::before, .ms-hero::after {
           content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
-          filter: blur(60px); opacity: 0.45; pointer-events: none; z-index: 0;
+          filter: blur(60px); pointer-events: none; z-index: 0;
         }
-        .ms-hero::before { background: #8b7bff; top: -30%; right: -10%; }
-        .ms-hero::after  { background: #5b4bd6; bottom: -35%; left: -12%; opacity: 0.35; }
+        .ms-hero::before { background: var(--accent); top: -30%; right: -10%; opacity: var(--blob-1); }
+        .ms-hero::after  { background: var(--accent-deep); bottom: -35%; left: -12%; opacity: var(--blob-2); }
         .ms-hero .container { position: relative; z-index: 1; }
         .ms-hero-grid {
           display: grid;
@@ -759,7 +931,7 @@ export default function MeStesso() {
         }
         .ms-hero-title {
           font-size: clamp(2.75rem, 7vw, 5rem);
-          line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1.1rem; color: #ffffff;
+          line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1.1rem; color: var(--text-strong);
         }
         .ms-hero-rule {
           display: block; width: 64px; height: 4px; border-radius: 2px;
@@ -767,23 +939,23 @@ export default function MeStesso() {
         }
         .ms-hero-lead {
           font-size: clamp(1.25rem, 2.6vw, 1.7rem);
-          font-style: italic; font-weight: 600; color: #ffffff; margin-bottom: 0.85rem;
+          font-style: italic; font-weight: 600; color: var(--text-strong); margin-bottom: 0.85rem;
         }
-        .ms-hero-school { color: rgba(255, 255, 255, 0.78); font-size: 1.02rem; }
+        .ms-hero-school { color: var(--sub); font-size: 1.02rem; }
         @media (max-width: 767.98px) {
           .ms-hero-grid { grid-template-columns: 1fr; }
           .ms-hero-badge { width: 68px; height: 68px; border-radius: 16px; margin-bottom: 1.1rem; }
           .ms-hero-badge svg { width: 36px; height: 36px; }
         }
 
-        /* Cornici foto + placeholder (dark premium) */
+        /* Cornici foto + placeholder */
         .ms-shot {
           position: relative; margin: 0;
           border-radius: 18px; overflow: hidden;
           aspect-ratio: 3 / 2;
           border: 1px solid var(--surface-bd);
-          box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
-          background: rgba(255, 255, 255, 0.04);
+          box-shadow: 0 18px 44px rgba(15, 8, 40, 0.18);
+          background: var(--shot-bg);
         }
         .ms-shot--portrait { aspect-ratio: 4 / 5; }
         /* object-position default 50% 50%, sovrascrivibile via prop focus (inquadramento) */
@@ -791,18 +963,16 @@ export default function MeStesso() {
         .ms-shot-ph {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
-          background-image:
-            radial-gradient(120% 120% at 30% 20%, rgba(139, 123, 255, 0.22), rgba(10, 12, 16, 0.2)),
-            linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+          background-image: var(--ph-bg);
         }
-        .ms-shot-ph-ic { color: rgba(196, 165, 255, 0.6); }
+        .ms-shot-ph-ic { color: var(--ink); opacity: 0.6; }
         .ms-shot figcaption {
           position: absolute; left: 0; right: 0; bottom: 0;
           padding: 1.8rem 0.95rem 0.7rem;
           font-size: 0.85rem; font-weight: 700; font-style: italic; color: #ffffff;
           background: linear-gradient(to top, rgba(7, 9, 16, 0.92), rgba(7, 9, 16, 0));
         }
-        .ms-hero-aside .ms-shot { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); border-color: var(--vio-bd); }
+        .ms-hero-aside .ms-shot { box-shadow: 0 24px 60px rgba(15, 8, 40, 0.22); border-color: var(--vio-bd); }
 
         /* Chi sono */
         .ms-about {
@@ -821,7 +991,7 @@ export default function MeStesso() {
           background: var(--surface);
           border: 1px solid var(--surface-bd);
           border-radius: 14px;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 6px 18px rgba(15, 8, 40, 0.08);
         }
         .ms-fact-icon {
           grid-row: 1 / 3;
@@ -829,7 +999,7 @@ export default function MeStesso() {
           width: 56px; height: 56px; border-radius: 14px;
           background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd);
         }
-        .ms-fact-value { font-size: 1.3rem; font-weight: 800; color: #ffffff; line-height: 1.1; }
+        .ms-fact-value { font-size: 1.3rem; font-weight: 800; color: var(--text-strong); line-height: 1.1; }
         .ms-fact-label { font-size: 0.9rem; color: var(--sub); }
         @media (max-width: 767.98px) { .ms-about { grid-template-columns: 1fr; } }
 
@@ -841,8 +1011,8 @@ export default function MeStesso() {
           align-items: center;
         }
         .ms-prose { font-size: 1.08rem; line-height: 1.75; color: var(--sub); }
-        .ms-prose strong { color: #ffffff; }
-        .ms-prose--lead { font-size: 1.2rem; font-weight: 700; color: #ffffff; }
+        .ms-prose strong { color: var(--text-strong); }
+        .ms-prose--lead { font-size: 1.2rem; font-weight: 700; color: var(--text-strong); }
         @media (max-width: 767.98px) {
           .ms-story-row { grid-template-columns: 1fr; }
           .ms-story-row .ms-story-art { order: -1; }
@@ -863,7 +1033,7 @@ export default function MeStesso() {
           background: var(--vio-soft); color: var(--ink);
         }
         .ms-company-text { display: inline-flex; flex-direction: column; line-height: 1.25; }
-        .ms-company-name { font-weight: 800; color: #ffffff; font-size: 1.1rem; }
+        .ms-company-name { font-weight: 800; color: var(--text-strong); font-size: 1.1rem; }
         .ms-company-sub { font-size: 0.85rem; color: var(--sub); }
 
         /* Ruoli in azienda */
@@ -874,13 +1044,13 @@ export default function MeStesso() {
           border: 1px solid var(--surface-bd); border-radius: 14px;
           transition: transform .15s, border-color .15s, box-shadow .15s;
         }
-        .ms-role:hover { transform: translateY(-3px); border-color: var(--vio-bd); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45); }
+        .ms-role:hover { transform: translateY(-3px); border-color: var(--vio-bd); box-shadow: 0 12px 28px rgba(15, 8, 40, 0.14); }
         .ms-role-ic {
           display: inline-flex; align-items: center; justify-content: center;
           width: 44px; height: 44px; border-radius: 12px;
           background: var(--vio-soft); color: var(--ink); margin-bottom: 0.4rem;
         }
-        .ms-role-label { font-weight: 800; color: #ffffff; }
+        .ms-role-label { font-weight: 800; color: var(--text-strong); }
         .ms-role-note { font-size: 0.82rem; color: var(--sub); }
         @media (max-width: 767.98px) { .ms-roles { grid-template-columns: repeat(2, 1fr); } }
 
@@ -891,21 +1061,19 @@ export default function MeStesso() {
         /* Banda — Il mio percorso */
         .ms-band {
           padding: clamp(3rem, 7vw, 5rem) 0;
-          background:
-            radial-gradient(100% 130% at 100% 0%, rgba(139, 123, 255, 0.18) 0%, transparent 55%),
-            linear-gradient(160deg, #120c20 0%, #0b0f14 60%, #15101f 100%);
+          background: var(--band-bg);
           border-top: 1px solid var(--surface-bd); border-bottom: 1px solid var(--surface-bd);
         }
         .ms-band-kicker { color: var(--ink); letter-spacing: 0.18em; }
         .ms-band-lead {
-          color: rgba(255, 255, 255, 0.82);
+          color: var(--text);
           font-size: 1.15rem; line-height: 1.7; max-width: 52rem; margin-bottom: 2.5rem;
         }
-        .ms-band-lead strong { color: #ffffff; }
+        .ms-band-lead strong { color: var(--text-strong); }
         .ms-percorso { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
         .ms-percorso-card {
           padding: 1.75rem 1.5rem;
-          background: rgba(255, 255, 255, 0.05);
+          background: var(--surface);
           border: 1px solid var(--surface-bd);
           border-radius: 16px;
         }
@@ -914,14 +1082,83 @@ export default function MeStesso() {
           width: 54px; height: 54px; border-radius: 14px;
           background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd); margin-bottom: 1rem;
         }
-        .ms-percorso-title { color: #ffffff; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
-        .ms-percorso-desc { color: rgba(255, 255, 255, 0.72); font-size: 0.98rem; line-height: 1.6; }
+        .ms-percorso-title { color: var(--text-strong); font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .ms-percorso-desc { color: var(--sub); font-size: 0.98rem; line-height: 1.6; }
         @media (max-width: 767.98px) { .ms-percorso { grid-template-columns: 1fr; } }
+
+        /* ── Rami schematici della scuola ── */
+        .ms-tree-wrap { margin-top: clamp(2.5rem, 6vw, 3.75rem); }
+        .ms-tree-heading { color: var(--text-strong); font-weight: 800; font-size: 1.5rem; margin-bottom: 0.35rem; }
+        .ms-tree-sub { color: var(--sub); font-size: 1rem; margin-bottom: 1.75rem; }
+        .ms-tree { position: relative; }
+        .ms-tree-top { display: flex; justify-content: center; }
+        .ms-tree-root {
+          display: inline-flex; align-items: center; gap: 0.6rem;
+          padding: 0.8rem 1.5rem; border-radius: 999px;
+          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
+          color: #ffffff; font-weight: 800; font-size: 1.1rem;
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          box-shadow: 0 12px 32px var(--glow);
+        }
+        .ms-tree-root-ic { display: inline-flex; }
+        .ms-trunk { width: 2px; height: 28px; background: var(--tree-line); margin: 0 auto; }
+        .ms-tree-branches {
+          display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
+          position: relative;
+        }
+        /* Binario orizzontale che collega i tre rami (centri delle colonne) */
+        .ms-tree-branches::before {
+          content: ""; position: absolute; top: -14px; left: 16.66%; right: 16.66%;
+          height: 2px; background: var(--tree-line);
+        }
+        .ms-branch {
+          --bc: var(--accent);
+          position: relative;
+          padding: 1.25rem 1.35rem;
+          background: var(--surface);
+          border: 1px solid var(--surface-bd);
+          border-top: 3px solid var(--bc);
+          border-radius: 14px;
+        }
+        /* Stelo verticale dal binario alla card */
+        .ms-branch::before {
+          content: ""; position: absolute; top: -14px; left: 50%;
+          width: 2px; height: 14px; background: var(--tree-line); transform: translateX(-50%);
+        }
+        .ms-branch--like { --bc: var(--bc-like); }
+        .ms-branch--easy { --bc: var(--bc-easy); }
+        .ms-branch--hard { --bc: var(--bc-hard); }
+        .ms-branch-head {
+          display: flex; align-items: center; gap: 0.55rem;
+          font-weight: 800; font-size: 1.05rem; color: var(--bc); margin-bottom: 0.85rem;
+        }
+        .ms-branch-ic {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 34px; height: 34px; border-radius: 9px;
+          background: var(--vio-soft); border: 1px solid var(--surface-bd); color: var(--bc);
+        }
+        .ms-branch-list { list-style: none; padding: 0; margin: 0; }
+        .ms-branch-list li {
+          display: flex; align-items: center; gap: 0.55rem;
+          padding: 0.4rem 0; color: var(--text); font-weight: 600; font-size: 0.98rem;
+          border-bottom: 1px dashed var(--surface-bd);
+        }
+        .ms-branch-list li:last-child { border-bottom: none; }
+        .ms-branch-list li::before {
+          content: ""; flex-shrink: 0;
+          width: 7px; height: 7px; border-radius: 50%; background: var(--bc);
+        }
+        @media (max-width: 767.98px) {
+          .ms-tree-branches { grid-template-columns: 1fr; }
+          .ms-tree-branches::before { display: none; }
+          .ms-branch::before { display: none; }
+          .ms-trunk { height: 18px; }
+        }
 
         /* Titolo di blocco (passioni) */
         .ms-block-title {
           display: flex; align-items: center; flex-wrap: wrap;
-          font-weight: 800; color: #ffffff; font-size: 1.1rem; margin-bottom: 1.1rem;
+          font-weight: 800; color: var(--text-strong); font-size: 1.1rem; margin-bottom: 1.1rem;
         }
         .ms-block-note { font-weight: 600; color: var(--sub); font-size: 0.95rem; }
 
@@ -940,7 +1177,7 @@ export default function MeStesso() {
           background: var(--vio-soft); color: var(--ink);
         }
         .ms-callout p { font-size: 1rem; line-height: 1.65; color: var(--sub); }
-        .ms-callout strong { color: #ffffff; }
+        .ms-callout strong { color: var(--text-strong); }
 
         /* Bandiere paesi visitati */
         .ms-flags { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.85rem; }
@@ -949,7 +1186,7 @@ export default function MeStesso() {
           width: 100%; aspect-ratio: 3 / 2;
           border-radius: 8px; overflow: hidden;
           border: 1px solid var(--surface-bd);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 4px 12px rgba(15, 8, 40, 0.12);
         }
         .ms-flag-svg { width: 100%; height: 100%; display: block; }
         .ms-flag-name { font-size: 0.8rem; font-weight: 700; color: var(--text); text-align: center; }
@@ -973,7 +1210,7 @@ export default function MeStesso() {
           border: 1px solid var(--surface-bd); border-radius: 12px;
         }
         .ms-track-year { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
-        .ms-track-label { display: block; margin-top: 0.15rem; font-weight: 800; color: #ffffff; }
+        .ms-track-label { display: block; margin-top: 0.15rem; font-weight: 800; color: var(--text-strong); }
         .ms-track-note { font-size: 0.82rem; color: var(--sub); }
         @media (max-width: 575.98px) { .ms-track { grid-template-columns: repeat(2, 1fr); } }
 
@@ -1012,10 +1249,8 @@ export default function MeStesso() {
         .ms-future {
           position: relative; overflow: hidden;
           padding: clamp(3rem, 7vw, 5rem) 0;
-          color: #ffffff;
-          background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.25) 0%, transparent 55%),
-            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
+          color: var(--text);
+          background: var(--future-bg);
           border-top: 1px solid var(--surface-bd);
         }
         .ms-future-grid {
@@ -1023,32 +1258,30 @@ export default function MeStesso() {
           gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center;
         }
         .ms-future-kicker { color: var(--ink); letter-spacing: 0.18em; }
-        .ms-future-hl { font-size: 1.4rem; line-height: 1.5; margin-bottom: 1.1rem; color: rgba(255, 255, 255, 0.92); }
-        .ms-future-hl strong { color: #ffffff; }
-        .ms-future-copy { color: rgba(255, 255, 255, 0.85); font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; }
-        .ms-future-copy strong { color: #ffffff; }
+        .ms-future-hl { font-size: 1.4rem; line-height: 1.5; margin-bottom: 1.1rem; color: var(--text); }
+        .ms-future-hl strong { color: var(--text-strong); }
+        .ms-future-copy { color: var(--text); font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; }
+        .ms-future-copy strong { color: var(--text-strong); }
         .ms-future-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
         .ms-future-chip {
           display: inline-flex; align-items: center; gap: 0.4rem;
           padding: 0.45rem 0.9rem; border-radius: 999px;
-          background: rgba(255, 255, 255, 0.12);
-          border: 1px solid rgba(255, 255, 255, 0.28);
-          font-weight: 700; font-size: 0.9rem; color: #ffffff;
+          background: var(--vio-soft);
+          border: 1px solid var(--vio-bd);
+          font-weight: 700; font-size: 0.9rem; color: var(--ink);
         }
         @media (max-width: 767.98px) { .ms-future-grid { grid-template-columns: 1fr; } }
 
         /* Grazie — banner */
         .ms-thanks {
           position: relative; width: 100%; overflow: hidden;
-          background-image: linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+          background-image: var(--thanks-bg);
           min-height: clamp(20rem, 42vw, 34rem);
           display: flex; align-items: center;
         }
-        /* Inquadramento: foto verticale (ala dell'aereo al tramonto, scatto da
-           iPhone) dentro un banner largo e basso → in cover si vede solo una
-           fascia orizzontale. La ancoriamo a ~45% per tenere in cornice
-           l'orizzonte arancione, il bagliore del sole e l'ala — non il cielo
-           vuoto in alto. image-orientation:from-image garantisce la rotazione EXIF. */
+        /* Inquadramento: foto verticale (ala dell'aereo al tramonto) dentro un
+           banner largo e basso → in cover si vede solo una fascia orizzontale.
+           La ancoriamo a ~45% per tenere in cornice l'orizzonte, il sole e l'ala. */
         .ms-thanks img {
           position: absolute; inset: 0; z-index: 0;
           width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%;
@@ -1056,22 +1289,27 @@ export default function MeStesso() {
         }
         .ms-thanks-scrim {
           position: absolute; inset: 0; z-index: 1;
-          background-image: linear-gradient(120deg, rgba(7, 9, 16, 0.92) 0%, rgba(7, 9, 16, 0.6) 50%, rgba(20, 16, 40, 0.35) 100%);
+          background-image: var(--thanks-scrim);
         }
         .ms-thanks-overlay { position: relative; z-index: 2; width: 100%; }
-        .ms-thanks-quote { color: var(--ink); opacity: 0.8; margin-bottom: 0.75rem; }
+        .ms-thanks-quote { color: var(--ink); opacity: 0.85; margin-bottom: 0.75rem; }
         .ms-thanks-title {
-          color: #ffffff; font-weight: 800; line-height: 1.02;
+          color: var(--text-strong); font-weight: 800; line-height: 1.02;
           font-size: clamp(3rem, 9vw, 6rem); letter-spacing: -0.02em; margin-bottom: 0.75rem;
         }
-        .ms-thanks-title span { display: block; font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 600; font-style: italic; color: rgba(255, 255, 255, 0.88); }
+        .ms-thanks-title span { display: block; font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 600; font-style: italic; color: var(--text); }
         .ms-thanks-sign {
-          color: rgba(255, 255, 255, 0.82);
+          color: var(--sub);
           text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; font-size: 0.9rem; margin-bottom: 0;
         }
 
         /* Footer */
-        .ms-footer { background-color: #090c10; color: #ffffff; border-top: 1px solid var(--surface-bd); }
+        .ms-footer {
+          background-color: var(--footer-bg); color: var(--text); border-top: 1px solid var(--surface-bd);
+          transition: background .35s ease, color .35s ease;
+        }
+        .ms-footer-link { color: var(--text-strong); }
+        .ms-footer-link:hover { color: var(--accent); }
       `}</style>
     </div>
   );
