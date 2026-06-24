@@ -603,14 +603,12 @@ export default function App() {
         <section id="maturita" className="hm-sec hm-mat-sec">
           <div className="hm-wrap">
             <div className="hm-mat-folder">
-              <div className="hm-mat-toprow">
-                <span className="hm-mat-tab">
-                  <FolderOpen size={17} aria-hidden="true" /> Esame di Maturità
-                </span>
-                <span className="hm-mat-pin">
-                  <Sparkles size={13} aria-hidden="true" /> In evidenza
-                </span>
-              </div>
+              <span className="hm-mat-tab">
+                <FolderOpen size={17} aria-hidden="true" /> Esame di Maturità
+              </span>
+              <span className="hm-mat-pin">
+                <Sparkles size={13} aria-hidden="true" /> In evidenza
+              </span>
 
               <div className="hm-mat-head">
                 <p className="hm-eyebrow hm-eyebrow--gold">🎓 Final state exam · 2026</p>
@@ -637,14 +635,12 @@ export default function App() {
         <section id="giochi" className="hm-sec hm-gam-sec">
           <div className="hm-wrap">
             <div className="hm-gam-folder">
-              <div className="hm-mat-toprow">
-                <span className="hm-gam-tab">
-                  <Gamepad2 size={17} aria-hidden="true" /> Giochi Web
-                </span>
-                <span className="hm-gam-pin">
-                  <Sparkles size={13} aria-hidden="true" /> In evidenza
-                </span>
-              </div>
+              <span className="hm-gam-tab">
+                <Gamepad2 size={17} aria-hidden="true" /> Giochi Web
+              </span>
+              <span className="hm-gam-pin">
+                <Sparkles size={13} aria-hidden="true" /> In evidenza
+              </span>
 
               <div className="hm-mat-head">
                 <p className="hm-eyebrow hm-eyebrow--cyan">🎮 Web games · 2026</p>
@@ -1042,19 +1038,18 @@ export default function App() {
             linear-gradient(180deg, rgba(245, 179, 1, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
           box-shadow: 0 26px 64px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
-        /* riga "evidenziatore" oro lungo il bordo superiore */
+        /* riga "evidenziatore" oro: bordo superiore della cartella, agganciato
+           ai bordi della linguetta e del badge (che la coprono alle estremità) */
         .hm-mat-folder::after {
-          content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 3px;
-          background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold-2) 80%, transparent);
-          border-radius: 0 0 3px 3px; opacity: 0.85; pointer-events: none;
+          content: ""; position: absolute; z-index: 1;
+          left: clamp(1.25rem, 3vw, 2.5rem); right: clamp(1.25rem, 3vw, 2.5rem);
+          top: 0; height: 2px;
+          background: linear-gradient(90deg, var(--gold) 0%, var(--gold-2) 100%);
+          border-radius: 2px; opacity: 0.92; pointer-events: none;
         }
-        /* riga superiore cartella: tab + pin affiancati */
-        .hm-mat-toprow {
-          display: flex; align-items: center; justify-content: space-between;
-          gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
-        }
-        /* linguetta della cartella */
+        /* linguetta della cartella — sopra la riga oro, la copre a sinistra */
         .hm-mat-tab {
+          position: absolute; z-index: 2; top: -16px; left: clamp(1.25rem, 3vw, 2.5rem);
           display: inline-flex; align-items: center; gap: 0.5rem;
           padding: 0.5rem 1.1rem; border-radius: 12px;
           background: linear-gradient(140deg, var(--gold) 0%, var(--gold-deep) 130%);
@@ -1062,12 +1057,17 @@ export default function App() {
           border: 1px solid rgba(255, 255, 255, 0.28);
           box-shadow: 0 10px 24px rgba(245, 179, 1, 0.28);
         }
-        /* badge "in evidenza" */
+        /* badge "in evidenza" — sopra la riga oro, opaco, la copre a destra */
         .hm-mat-pin {
+          position: absolute; z-index: 2; top: -13px; right: clamp(1.25rem, 3vw, 2.5rem);
           display: inline-flex; align-items: center; gap: 0.35rem;
-          padding: 0.35rem 0.8rem; border-radius: 999px;
-          background: var(--gold-soft); color: var(--gold-2); border: 1px solid var(--gold-bd);
+          padding: 0.4rem 0.85rem; border-radius: 999px;
+          background:
+            linear-gradient(180deg, rgba(245, 179, 1, 0.16) 0%, rgba(245, 179, 1, 0.05) 100%),
+            #0c0f13;
+          color: var(--gold-2); border: 1px solid var(--gold-bd);
           font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         .hm-mat-head { margin-bottom: 2rem; }
         .hm-eyebrow--gold { color: var(--gold-2); }
@@ -1087,7 +1087,7 @@ export default function App() {
           box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--gold-soft);
         }
         @media (max-width: 575.98px) {
-          .hm-mat-tab { font-size: 0.8rem; }
+          .hm-mat-tab, .hm-gam-tab { font-size: 0.8rem; }
         }
 
         /* ── Giochi Web — cartella "in evidenza" (accento ciano) ── */
@@ -1103,14 +1103,18 @@ export default function App() {
             linear-gradient(180deg, rgba(34, 211, 238, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
           box-shadow: 0 26px 64px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
-        /* linea ciano lungo il bordo superiore */
+        /* riga "evidenziatore" ciano: bordo superiore, coperta alle estremità
+           dalla linguetta e dal badge */
         .hm-gam-folder::after {
-          content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 3px;
-          background: linear-gradient(90deg, transparent, var(--cyan) 20%, var(--cyan-2) 80%, transparent);
-          border-radius: 0 0 3px 3px; opacity: 0.85; pointer-events: none;
+          content: ""; position: absolute; z-index: 1;
+          left: clamp(1.25rem, 3vw, 2.5rem); right: clamp(1.25rem, 3vw, 2.5rem);
+          top: 0; height: 2px;
+          background: linear-gradient(90deg, var(--cyan) 0%, var(--cyan-2) 100%);
+          border-radius: 2px; opacity: 0.92; pointer-events: none;
         }
-        /* linguetta ciano */
+        /* linguetta ciano — sopra la riga, la copre a sinistra */
         .hm-gam-tab {
+          position: absolute; z-index: 2; top: -16px; left: clamp(1.25rem, 3vw, 2.5rem);
           display: inline-flex; align-items: center; gap: 0.5rem;
           padding: 0.5rem 1.1rem; border-radius: 12px;
           background: linear-gradient(140deg, var(--cyan) 0%, var(--cyan-deep) 130%);
@@ -1118,12 +1122,17 @@ export default function App() {
           border: 1px solid rgba(255, 255, 255, 0.28);
           box-shadow: 0 10px 24px rgba(34, 211, 238, 0.28);
         }
-        /* badge "in evidenza" ciano */
+        /* badge "in evidenza" ciano — sopra la riga, opaco, la copre a destra */
         .hm-gam-pin {
+          position: absolute; z-index: 2; top: -13px; right: clamp(1.25rem, 3vw, 2.5rem);
           display: inline-flex; align-items: center; gap: 0.35rem;
-          padding: 0.35rem 0.8rem; border-radius: 999px;
-          background: var(--cyan-soft); color: var(--cyan-2); border: 1px solid var(--cyan-bd);
+          padding: 0.4rem 0.85rem; border-radius: 999px;
+          background:
+            linear-gradient(180deg, rgba(34, 211, 238, 0.16) 0%, rgba(34, 211, 238, 0.05) 100%),
+            #0c0f13;
+          color: var(--cyan-2); border: 1px solid var(--cyan-bd);
           font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         .hm-eyebrow--cyan { color: var(--cyan-2); }
         .hm-cyan-ink { color: var(--cyan-2); font-weight: 700; }
