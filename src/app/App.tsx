@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Link } from "react-router";
 import { activateLocalMode } from "./utils/local";
 import { isIOS } from "./utils/device";
@@ -62,6 +62,107 @@ function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: number }) {
     case "mappa":      return <Globe2 size={size} strokeWidth={sw} />;
     default:           return <Globe2 size={size} strokeWidth={sw} />;
   }
+}
+
+// ── Maturità: eyebrow che, passandoci sopra col mouse o scorrendo (entrando in
+// viewport), srotola un piccolo "striscione" di festa. Oggi 25/06/2026 ho fatto
+// la maturità ed è andata bene. ──────────────────────────────────────────────
+function MaturitaReveal() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setRevealed(true);
+            io.disconnect();
+          }
+        }
+      },
+      { threshold: 0.6 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`hm-mat-reveal${revealed ? " is-revealed" : ""}`}
+      tabIndex={0}
+    >
+      <p className="hm-eyebrow hm-eyebrow--gold hm-mat-trigger">
+        🎓 Final state exam · 2026
+      </p>
+      <div className="hm-striscione" role="status" aria-label="Striscione di festa">
+        <div className="hm-bunting" aria-hidden="true">
+          {Array.from({ length: 15 }).map((_, i) => (
+            <span key={i} />
+          ))}
+        </div>
+        <div className="hm-striscione-body">
+          🎉 Ce l'ho fatta — <b>maturità superata</b> ed è andata alla grande! 🎓✨
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Conto alla rovescia fino alla pubblicazione dei voti: ven 26 giu 2026, ore
+// 10:00 (ora italiana, CEST = +02:00). ──────────────────────────────────────
+function VotiCountdown() {
+  const target = useMemo(
+    () => new Date("2026-06-26T10:00:00+02:00").getTime(),
+    [],
+  );
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const diff = target - now;
+  const done = diff <= 0;
+  const total = Math.max(0, diff);
+  const days = Math.floor(total / 86400000);
+  const hours = Math.floor((total % 86400000) / 3600000);
+  const mins = Math.floor((total % 3600000) / 60000);
+  const secs = Math.floor((total % 60000) / 1000);
+
+  const tiles: [number, string][] = [
+    [days, "giorni"],
+    [hours, "ore"],
+    [mins, "min"],
+    [secs, "sec"],
+  ];
+
+  return (
+    <div className={`hm-voti${done ? " is-done" : ""}`}>
+      {done ? (
+        <p className="hm-voti-done">📣 I voti sono usciti — in bocca al lupo! 🍀</p>
+      ) : (
+        <>
+          <span className="hm-voti-label">
+            ⏳ Pubblicazione voti · ven 26 giu, ore 10:00
+          </span>
+          <div className="hm-voti-clock" aria-live="off">
+            {tiles.map(([v, l], i) => (
+              <div className="hm-voti-tile" key={l}>
+                <span className="hm-voti-num">{String(v).padStart(2, "0")}</span>
+                <span className="hm-voti-unit">{l}</span>
+                {i < tiles.length - 1 && <span className="hm-voti-sep">:</span>}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 const PROJECTS = [
@@ -611,7 +712,7 @@ export default function App() {
               </span>
 
               <div className="hm-mat-head">
-                <p className="hm-eyebrow hm-eyebrow--gold">🎓 Final state exam · 2026</p>
+                <MaturitaReveal />
                 <h2 className="hm-title">Esame di Maturità</h2>
                 <p className="hm-mat-lead">
                   Everything for the 2026 final state exam, gathered in one folder: my{" "}
@@ -621,7 +722,10 @@ export default function App() {
                   <span className="hm-gold-ink">«The Leopard»</span>, and the Italian-literature{" "}
                   <span className="hm-gold-ink">study hub</span>.
                 </p>
-                <span className="hm-mat-count">📂 {maturitaProjects.length} items</span>
+                <div className="hm-mat-meta">
+                  <span className="hm-mat-count">📂 {maturitaProjects.length} items</span>
+                  <VotiCountdown />
+                </div>
               </div>
 
               <div className="hm-cards hm-cards--mat">
@@ -1077,10 +1181,123 @@ export default function App() {
           margin: 0.9rem 0 0; max-width: 52rem;
         }
         .hm-mat-count {
-          display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1rem;
+          display: inline-flex; align-items: center; gap: 0.4rem;
           font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
           color: var(--gold-2);
         }
+        .hm-mat-meta {
+          display: flex; align-items: center; flex-wrap: wrap; gap: 0.9rem 1.4rem; margin-top: 1.1rem;
+        }
+
+        /* ── Striscione "ce l'ho fatta" — si srotola all'hover o entrando in viewport ── */
+        .hm-mat-reveal {
+          display: inline-block; max-width: 100%; outline: none;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .hm-mat-trigger {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          cursor: help; user-select: none; width: max-content;
+          transition: filter 0.25s ease, transform 0.25s ease;
+        }
+        .hm-mat-reveal:hover .hm-mat-trigger,
+        .hm-mat-reveal:focus-visible .hm-mat-trigger,
+        .hm-mat-reveal.is-revealed .hm-mat-trigger {
+          filter: drop-shadow(0 0 10px rgba(245, 179, 1, 0.5));
+        }
+        .hm-striscione {
+          max-height: 0; opacity: 0; overflow: hidden; margin-top: 0;
+          transform: translateY(-8px) scaleY(0.9); transform-origin: top center;
+          transition: max-height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                      opacity 0.4s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                      margin-top 0.45s ease;
+          pointer-events: none;
+        }
+        .hm-mat-reveal:hover .hm-striscione,
+        .hm-mat-reveal:focus-visible .hm-striscione,
+        .hm-mat-reveal.is-revealed .hm-striscione {
+          max-height: 160px; opacity: 1; margin-top: 0.85rem;
+          transform: translateY(0) scaleY(1);
+        }
+        /* cordoncino + bandierine triangolari */
+        .hm-bunting {
+          position: relative; display: flex; gap: 4px; justify-content: center;
+          padding-top: 2px; margin-bottom: 0.5rem;
+        }
+        .hm-bunting::before {
+          content: ""; position: absolute; left: 4%; right: 4%; top: 1px; height: 2px;
+          background: linear-gradient(90deg, transparent, var(--gold-bd) 12%, var(--gold-bd) 88%, transparent);
+          border-radius: 2px;
+        }
+        .hm-bunting span {
+          width: 0; height: 0;
+          border-left: 8px solid transparent; border-right: 8px solid transparent;
+          border-top: 13px solid var(--gold);
+          filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+        }
+        .hm-bunting span:nth-child(even) { border-top-color: var(--gold-2); }
+        .hm-bunting span:nth-child(3n) { border-top-color: var(--gold-deep); }
+        .hm-striscione-body {
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          padding: 0.7rem 1.4rem; border-radius: 12px;
+          background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 135%);
+          color: #1a1206; font-weight: 800; font-size: clamp(0.92rem, 1.5vw, 1.05rem);
+          line-height: 1.35; text-align: center;
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          box-shadow: 0 14px 32px rgba(245, 179, 1, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        }
+        .hm-striscione-body b { color: #2a1c00; }
+        .hm-mat-reveal:hover .hm-striscione-body,
+        .hm-mat-reveal:focus-visible .hm-striscione-body,
+        .hm-mat-reveal.is-revealed .hm-striscione-body {
+          animation: hm-striscione-pop 0.6s ease both;
+        }
+        @keyframes hm-striscione-pop {
+          0% { transform: rotate(-1.5deg) scale(0.94); }
+          55% { transform: rotate(1deg) scale(1.03); }
+          100% { transform: rotate(0deg) scale(1); }
+        }
+
+        /* ── Countdown pubblicazione voti ── */
+        .hm-voti {
+          display: inline-flex; flex-direction: column; gap: 0.5rem;
+          padding: 0.7rem 1rem; border-radius: 14px;
+          background: var(--gold-soft); border: 1px solid var(--gold-bd);
+        }
+        .hm-voti-label {
+          font-size: 0.74rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+          color: var(--gold-2);
+        }
+        .hm-voti-clock { display: flex; align-items: flex-start; gap: 0.45rem; }
+        .hm-voti-tile {
+          position: relative; display: flex; flex-direction: column; align-items: center;
+          min-width: 2.6rem; padding: 0.4rem 0.55rem; border-radius: 10px;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.18));
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .hm-voti-num {
+          font-size: clamp(1.2rem, 2.4vw, 1.5rem); font-weight: 900; line-height: 1;
+          color: var(--gold-2); font-variant-numeric: tabular-nums;
+        }
+        .hm-voti-unit {
+          margin-top: 0.25rem; font-size: 0.6rem; font-weight: 800;
+          text-transform: uppercase; letter-spacing: 0.08em; color: var(--sub);
+        }
+        .hm-voti-sep {
+          position: absolute; right: -0.42rem; top: 50%; transform: translateY(-65%);
+          font-size: 1.1rem; font-weight: 900; color: var(--gold-2); opacity: 0.6;
+        }
+        .hm-voti.is-done {
+          background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 135%);
+          border-color: rgba(255, 255, 255, 0.4);
+        }
+        .hm-voti-done {
+          margin: 0; font-weight: 800; color: #1a1206;
+          font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hm-striscione, .hm-striscione-body { transition: none; animation: none; }
+        }
+
         /* le card dentro la cartella Maturità prendono il riflesso oro all'hover */
         .hm-cards--mat .hm-card:hover {
           border-color: var(--gold-bd);
