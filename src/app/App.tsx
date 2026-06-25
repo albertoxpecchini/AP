@@ -68,44 +68,35 @@ function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: number }) {
 // viewport), srotola un piccolo "striscione" di festa. Oggi 25/06/2026 ho fatto
 // la maturità ed è andata bene. ──────────────────────────────────────────────
 function MaturitaReveal() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [revealed, setRevealed] = useState(false);
+  const triggerRef = useRef<HTMLParagraphElement | null>(null);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    const el = ref.current;
+    const el = triggerRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setRevealed(true);
-            io.disconnect();
-          }
-        }
-      },
-      { threshold: 0.6 },
+      ([e]) => setInView(e.isIntersecting),
+      { threshold: 0.85, rootMargin: "0px 0px -8% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
   return (
-    <div
-      ref={ref}
-      className={`hm-mat-reveal${revealed ? " is-revealed" : ""}`}
-      tabIndex={0}
-    >
-      <p className="hm-eyebrow hm-eyebrow--gold hm-mat-trigger">
+    <div className={`hm-mat-reveal${inView ? " is-revealed" : ""}`}>
+      <p
+        ref={triggerRef}
+        className="hm-eyebrow hm-eyebrow--gold hm-mat-trigger"
+        tabIndex={0}
+      >
         🎓 Final state exam · 2026
       </p>
       <div className="hm-striscione" role="status" aria-label="Striscione di festa">
-        <div className="hm-bunting" aria-hidden="true">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <span key={i} />
-          ))}
-        </div>
+        <div className="hm-bunting" aria-hidden="true" />
         <div className="hm-striscione-body">
-          🎉 Ce l'ho fatta — <b>maturità superata</b> ed è andata alla grande! 🎓✨
+          <span className="hm-striscione-text">
+            🎉 Ce l'ho fatta — <b>maturità superata</b> ed è andata alla grande! 🎓✨
+          </span>
         </div>
       </div>
     </div>
@@ -1189,72 +1180,80 @@ export default function App() {
           display: flex; align-items: center; flex-wrap: wrap; gap: 0.9rem 1.4rem; margin-top: 1.1rem;
         }
 
-        /* ── Striscione "ce l'ho fatta" — si srotola all'hover o entrando in viewport ── */
-        .hm-mat-reveal {
-          display: inline-block; max-width: 100%; outline: none;
-          -webkit-tap-highlight-color: transparent;
-        }
+        /* ── Striscione "ce l'ho fatta" — stendardo orizzontale coast-to-coast che
+           si srotola dal centro verso i bordi all'hover o entrando in viewport ── */
+        .hm-mat-reveal { display: block; }
         .hm-mat-trigger {
           display: inline-flex; align-items: center; gap: 0.4rem;
-          cursor: help; user-select: none; width: max-content;
-          transition: filter 0.25s ease, transform 0.25s ease;
+          cursor: help; user-select: none; width: max-content; outline: none;
+          -webkit-tap-highlight-color: transparent;
+          transition: filter 0.25s ease;
         }
-        .hm-mat-reveal:hover .hm-mat-trigger,
-        .hm-mat-reveal:focus-visible .hm-mat-trigger,
+        .hm-mat-trigger:hover,
+        .hm-mat-trigger:focus-visible,
         .hm-mat-reveal.is-revealed .hm-mat-trigger {
-          filter: drop-shadow(0 0 10px rgba(245, 179, 1, 0.5));
+          filter: drop-shadow(0 0 10px rgba(245, 179, 1, 0.55));
         }
+        /* full-bleed: esce dalla cartella e arriva ai bordi dello schermo */
         .hm-striscione {
-          max-height: 0; opacity: 0; overflow: hidden; margin-top: 0;
-          transform: translateY(-8px) scaleY(0.9); transform-origin: top center;
-          transition: max-height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-                      opacity 0.4s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
+          margin-top: 0; max-height: 0; opacity: 0; overflow: hidden;
+          clip-path: inset(0 50% 0 50%);
+          transition: max-height 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                      opacity 0.35s ease,
+                      clip-path 0.85s cubic-bezier(0.22, 1, 0.36, 1),
                       margin-top 0.45s ease;
           pointer-events: none;
         }
-        .hm-mat-reveal:hover .hm-striscione,
-        .hm-mat-reveal:focus-visible .hm-striscione,
+        .hm-mat-trigger:hover ~ .hm-striscione,
+        .hm-mat-trigger:focus-visible ~ .hm-striscione,
         .hm-mat-reveal.is-revealed .hm-striscione {
-          max-height: 160px; opacity: 1; margin-top: 0.85rem;
-          transform: translateY(0) scaleY(1);
+          max-height: 240px; opacity: 1; margin-top: 1rem;
+          clip-path: inset(0 0 0 0);
         }
-        /* cordoncino + bandierine triangolari */
+        /* cordoncino + bandierine triangolari (▽) ripetute su tutta la larghezza */
         .hm-bunting {
-          position: relative; display: flex; gap: 4px; justify-content: center;
-          padding-top: 2px; margin-bottom: 0.5rem;
-        }
-        .hm-bunting::before {
-          content: ""; position: absolute; left: 4%; right: 4%; top: 1px; height: 2px;
-          background: linear-gradient(90deg, transparent, var(--gold-bd) 12%, var(--gold-bd) 88%, transparent);
-          border-radius: 2px;
-        }
-        .hm-bunting span {
-          width: 0; height: 0;
-          border-left: 8px solid transparent; border-right: 8px solid transparent;
-          border-top: 13px solid var(--gold);
+          position: relative; height: 16px; width: 100%;
+          background:
+            conic-gradient(from -45deg at 50% 100%, var(--gold) 0 90deg, transparent 90deg),
+            conic-gradient(from -45deg at 50% 100%, var(--gold-2) 0 90deg, transparent 90deg);
+          background-repeat: repeat-x, repeat-x;
+          background-size: 48px 16px, 48px 16px;
+          background-position: 0 0, 24px 0;
           filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
         }
-        .hm-bunting span:nth-child(even) { border-top-color: var(--gold-2); }
-        .hm-bunting span:nth-child(3n) { border-top-color: var(--gold-deep); }
+        .hm-bunting::before {
+          content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+          background: var(--gold-bd);
+        }
         .hm-striscione-body {
-          display: inline-flex; align-items: center; gap: 0.5rem;
-          padding: 0.7rem 1.4rem; border-radius: 12px;
-          background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 135%);
-          color: #1a1206; font-weight: 800; font-size: clamp(0.92rem, 1.5vw, 1.05rem);
-          line-height: 1.35; text-align: center;
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          box-shadow: 0 14px 32px rgba(245, 179, 1, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+          position: relative; overflow: hidden;
+          display: flex; align-items: center; justify-content: center;
+          width: 100%; padding: clamp(0.75rem, 2vw, 1.25rem) 1rem;
+          background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 140%);
+          color: #1a1206; font-weight: 900;
+          font-size: clamp(1rem, 3.2vw, 1.7rem); line-height: 1.3;
+          text-align: center; letter-spacing: 0.005em;
+          border-top: 1px solid rgba(255, 255, 255, 0.45);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
         .hm-striscione-body b { color: #2a1c00; }
-        .hm-mat-reveal:hover .hm-striscione-body,
-        .hm-mat-reveal:focus-visible .hm-striscione-body,
-        .hm-mat-reveal.is-revealed .hm-striscione-body {
-          animation: hm-striscione-pop 0.6s ease both;
+        .hm-striscione-text { position: relative; z-index: 1; }
+        /* lampo di luce che spazza il drappo da sinistra a destra */
+        .hm-striscione-body::after {
+          content: ""; position: absolute; inset: 0; z-index: 0;
+          background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.5) 50%, transparent 65%);
+          transform: translateX(-130%);
         }
-        @keyframes hm-striscione-pop {
-          0% { transform: rotate(-1.5deg) scale(0.94); }
-          55% { transform: rotate(1deg) scale(1.03); }
-          100% { transform: rotate(0deg) scale(1); }
+        .hm-mat-trigger:hover ~ .hm-striscione .hm-striscione-body::after,
+        .hm-mat-trigger:focus-visible ~ .hm-striscione .hm-striscione-body::after,
+        .hm-mat-reveal.is-revealed .hm-striscione-body::after {
+          animation: hm-striscione-shine 2.6s ease 0.5s infinite;
+        }
+        @keyframes hm-striscione-shine {
+          0% { transform: translateX(-130%); }
+          45%, 100% { transform: translateX(130%); }
         }
 
         /* ── Countdown pubblicazione voti ── */
@@ -1295,7 +1294,8 @@ export default function App() {
           font-size: clamp(0.95rem, 1.6vw, 1.1rem);
         }
         @media (prefers-reduced-motion: reduce) {
-          .hm-striscione, .hm-striscione-body { transition: none; animation: none; }
+          .hm-striscione { transition: opacity 0.3s ease; clip-path: none; }
+          .hm-striscione-body::after { animation: none; display: none; }
         }
 
         /* le card dentro la cartella Maturità prendono il riflesso oro all'hover */
