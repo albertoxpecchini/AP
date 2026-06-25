@@ -1194,22 +1194,21 @@ export default function App() {
         .hm-mat-reveal.is-revealed .hm-mat-trigger {
           filter: drop-shadow(0 0 10px rgba(245, 179, 1, 0.55));
         }
-        /* full-bleed: esce dalla cartella e arriva ai bordi dello schermo */
+        /* full-bleed: esce dalla cartella e arriva ai bordi dello schermo.
+           Comparsa/uscita in DISSOLVENZA: opaco quando arrivo scrollando, svanisce
+           andando via. */
         .hm-striscione {
           width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
-          margin-top: 0; max-height: 0; opacity: 0; overflow: hidden;
-          clip-path: inset(0 50% 0 50%);
-          transition: max-height 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-                      opacity 0.35s ease,
-                      clip-path 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-                      margin-top 0.45s ease;
+          margin-top: 0; max-height: 0; opacity: 0; overflow: visible;
+          transform: translateY(-14px);
+          transition: max-height 0.5s ease, opacity 0.65s ease,
+                      transform 0.65s ease, margin-top 0.4s ease;
           pointer-events: none;
         }
         .hm-mat-trigger:hover ~ .hm-striscione,
         .hm-mat-trigger:focus-visible ~ .hm-striscione,
         .hm-mat-reveal.is-revealed .hm-striscione {
-          max-height: 240px; opacity: 1; margin-top: 1rem;
-          clip-path: inset(0 0 0 0);
+          max-height: 260px; opacity: 1; margin-top: 1rem; transform: translateY(0);
         }
         /* cordoncino + bandierine triangolari (▽) ripetute su tutta la larghezza */
         .hm-bunting {
@@ -1226,20 +1225,36 @@ export default function App() {
           content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px;
           background: var(--gold-bd);
         }
+        /* stendardo: drappo a tutta larghezza, bordo inferiore ondulato (mask SVG)
+           che ondeggia come una bandiera al vento */
         .hm-striscione-body {
           position: relative; overflow: hidden;
           display: flex; align-items: center; justify-content: center;
-          width: 100%; padding: clamp(0.75rem, 2vw, 1.25rem) 1rem;
+          width: 100%; padding: clamp(0.7rem, 1.8vw, 1.1rem) 1rem clamp(1.2rem, 3vw, 2rem);
           background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 140%);
           color: #1a1206; font-weight: 900;
           font-size: clamp(1rem, 3.2vw, 1.7rem); line-height: 1.3;
           text-align: center; letter-spacing: 0.005em;
           border-top: 1px solid rgba(255, 255, 255, 0.45);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.42));
+          -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,0%20H1200%20V84%20C1100,98%201000,98%20900,84%20S700,70%20600,84%20S400,98%20300,84%20S100,70%200,84%20Z'%20fill='%23fff'/%3E%3C/svg%3E");
+                  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,0%20H1200%20V84%20C1100,98%201000,98%20900,84%20S700,70%20600,84%20S400,98%20300,84%20S100,70%200,84%20Z'%20fill='%23fff'/%3E%3C/svg%3E");
+          -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+          -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
         }
         .hm-striscione-body b { color: #2a1c00; }
         .hm-striscione-text { position: relative; z-index: 1; }
+        /* ondeggio "al vento" quando il drappo è visibile */
+        .hm-mat-trigger:hover ~ .hm-striscione .hm-striscione-body,
+        .hm-mat-trigger:focus-visible ~ .hm-striscione .hm-striscione-body,
+        .hm-mat-reveal.is-revealed .hm-striscione-body {
+          animation: hm-striscione-wave 5.5s ease-in-out infinite;
+        }
+        @keyframes hm-striscione-wave {
+          0%, 100% { transform: translateY(0) skewY(-0.35deg); }
+          50% { transform: translateY(-5px) skewY(0.35deg); }
+        }
         /* lampo di luce che spazza il drappo da sinistra a destra */
         .hm-striscione-body::after {
           content: ""; position: absolute; inset: 0; z-index: 0;
@@ -1294,7 +1309,8 @@ export default function App() {
           font-size: clamp(0.95rem, 1.6vw, 1.1rem);
         }
         @media (prefers-reduced-motion: reduce) {
-          .hm-striscione { transition: opacity 0.3s ease; clip-path: none; }
+          .hm-striscione { transition: opacity 0.3s ease; transform: none; }
+          .hm-striscione-body { animation: none !important; }
           .hm-striscione-body::after { animation: none; display: none; }
         }
 
