@@ -94,7 +94,8 @@ function festaNotifyDevApi() {
           if (!nome || !valid.includes(body.presenza)) {
             res.statusCode = 400; res.end(JSON.stringify({ error: 'Payload non valido' })); return
           }
-          const payload = { nome: nome.slice(0, 40), presenza: body.presenza, cibo: body.cibo ?? null }
+          const giorno = (body.giorno === '27' || body.giorno === '28') ? body.giorno : '27'
+          const payload = { nome: nome.slice(0, 40), presenza: body.presenza, giorno, cibo: body.cibo ?? null }
           if (!process.env.RESEND_API_KEY) {
             console.log('[festa] voto (no RESEND_API_KEY, email saltata):', payload)
             res.statusCode = 200; res.end(JSON.stringify({ ok: true, skipped: true })); return

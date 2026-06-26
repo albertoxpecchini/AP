@@ -15,10 +15,14 @@
 
 export type Presenza = "pomeriggio" | "sera" | "no";
 
+// Giorno della festa: "27" = sabato 27, "28" = domenica 28. Separa i due inviti.
+export type Giorno = "27" | "28";
+
 export interface PresenzaRow {
   id?: number;
   nome: string;
   presenza: Presenza;
+  giorno: Giorno;
   cibo?: string | null;
   created_at?: string;
 }
@@ -53,6 +57,7 @@ const writeLocal = (rows: PresenzaRow[]) => {
 const sanitize = (row: PresenzaRow): PresenzaRow => ({
   nome: row.nome.trim().slice(0, 40),
   presenza: row.presenza,
+  giorno: row.giorno,
   cibo: (row.cibo ?? "").trim().slice(0, 200) || null,
 });
 
@@ -76,12 +81,15 @@ export async function submitPresenza(row: PresenzaRow): Promise<PresenzaRow> {
   return data[0];
 }
 
-/** Elenco presenze, dal più recente (newest-first). */
-export async function fetchPresenze(limit = 200): Promise<PresenzaRow[]> {
-  if (!festaConfigured) return readLocal().slice(0, limit);
+/** Elenco presenze di un dato giorno, dal più recente (newest-first). */
+export async function fetchPresenze(giorno: Giorno, limit = 200): Promise<PresenzaRow[]> {
+  if (!festaConfigured) {
+    return readLocal().filter((r) => r.giorno === giorno).slice(0, limit);
+  }
 
   const params = new URLSearchParams({
-    select: "id,nome,presenza,cibo,created_at",
+    select: "id,nome,presenza,giorno,cibo,created_at",
+    giorno: `eq.${giorno}`,
     order: "created_at.desc",
     limit: String(limit),
   });

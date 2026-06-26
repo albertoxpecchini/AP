@@ -1,29 +1,48 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  MapPin, CalendarDays, Gift, Utensils, PartyPopper, Send, Check, Loader2,
+  MapPin, CalendarDays, Gift, Utensils, PartyPopper, Send, Loader2,
+  ArrowLeftRight,
 } from "lucide-react";
 import {
   submitPresenza, fetchPresenze, subscribePresenze,
-  type PresenzaRow, type Presenza,
+  type PresenzaRow, type Presenza, type Giorno,
 } from "./festaApi";
 import "./festa.css";
 
-// ─── Accesso: link segreto + scadenza ───────────────────────────────────────
-// Il token vive nel bundle (SPA statica): è "sicurezza per oscurità", adatto a
-// un invito privato. La pagina si auto-disabilita dopo la scadenza.
-const FESTA_TOKEN = "alb20-mtv74";
-// Lunedì 29 giugno 2026, 00:00 (Europe/Rome, CEST = +02:00).
+// ─── Giorni della festa: due inviti separati, un link (token) ciascuno ──────
+// Stesso evento, due date: chi vuole può esserci anche entrambi i giorni.
+// Il giorno viaggia col record (colonna "giorno") così le adesioni restano
+// separate e so a quale giorno si riferisce ogni risposta.
+interface DayCfg {
+  id: Giorno;
+  token: string;
+  weekday: string;     // "Sabato" / "Domenica"
+  weekdayShort: string;// "sab" / "dom"
+  dayNum: string;      // "27" / "28"
+  dateLabel: string;   // "27 giugno"
+  other: { token: string; label: string }; // link all'altro giorno
+}
+
+const DAYS: Record<string, DayCfg> = {
+  "alb20-mtv74": {
+    id: "27", token: "alb20-mtv74",
+    weekday: "Sabato", weekdayShort: "sab", dayNum: "27", dateLabel: "27 giugno",
+    other: { token: "alb20-mtv74-28", label: "domenica 28" },
+  },
+  "alb20-mtv74-28": {
+    id: "28", token: "alb20-mtv74-28",
+    weekday: "Domenica", weekdayShort: "dom", dayNum: "28", dateLabel: "28 giugno",
+    other: { token: "alb20-mtv74", label: "sabato 27" },
+  },
+};
+
+// Lunedì 29 giugno 2026, 00:00 (Europe/Rome, CEST = +02:00): entrambi gli
+// inviti restano attivi fino a fine domenica 28.
 const DEADLINE = new Date("2026-06-29T00:00:00+02:00");
 
 const ADDRESS = "Strada Vedusino, 4";
 const GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Strada Vedusino 4")}`;
 const AMAPS = `https://maps.apple.com/?q=${encodeURIComponent("Strada Vedusino 4")}`;
-
-const PRESENZA_OPTS: { value: Presenza; emoji: string; label: string }[] = [
-  { value: "pomeriggio", emoji: "🏊", label: "Ci sono al bagno (pom. sab 27)" },
-  { value: "sera",       emoji: "🌙", label: "Resto anche alla sera" },
-  { value: "no",         emoji: "🙁", label: "Non riesco a venire" },
-];
 
 const PRESENZA_BADGE: Record<Presenza, { emoji: string; short: string }> = {
   pomeriggio: { emoji: "🏊", short: "Pomeriggio" },
@@ -52,18 +71,18 @@ export default function Festa() {
   // Gate calcolato una volta sola al mount.
   const access = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    const tokenOk = params.get("k") === FESTA_TOKEN;
+    const day = DAYS[params.get("k") ?? ""] ?? null;
     const expired = Date.now() >= DEADLINE.getTime();
-    return { tokenOk, expired };
+    return { day, expired };
   }, []);
 
-  if (!access.tokenOk) return <FestaClosed expired={false} />;
+  if (!access.day) return <FestaClosed expired={false} />;
   if (access.expired) return <FestaClosed expired={true} />;
 
-  return <FestaContent />;
+  return <FestaContent day={access.day} />;
 }
 
-function FestaContent() {
+function FestaContent({ day }: { day: DayCfg }) {
   const [nome, setNome] = useState("");
   const [presenza, setPresenza] = useState<Presenza | null>(null);
   const [cibo, setCibo] = useState("");
@@ -74,23 +93,30 @@ function FestaContent() {
 
   const seen = useRef<Set<string>>(new Set());
 
-  // Carica le presenze esistenti + sottoscrizione realtime.
+  const presenzaOpts: { value: Presenza; emoji: string; label: string }[] = [
+    { value: "pomeriggio", emoji: "🏊", label: `Ci sono al bagno (pom. ${day.weekdayShort} ${day.dayNum})` },
+    { value: "sera",       emoji: "🌙", label: "Resto anche alla sera" },
+    { value: "no",         emoji: "🙁", label: "Non riesco a venire" },
+  ];
+
+  // Carica le presenze del giorno + sottoscrizione realtime (filtrata).
   useEffect(() => {
     let alive = true;
-    fetchPresenze().then((data) => {
+    fetchPresenze(day.id).then((data) => {
       if (!alive) return;
       data.forEach((r) => seen.current.add(rowKey(r)));
       setRows(data);
     }).catch(() => {});
 
     const unsub = subscribePresenze((r) => {
+      if (r.giorno !== day.id) return; // ignora l'altro giorno
       const k = rowKey(r);
       if (seen.current.has(k)) return;
       seen.current.add(k);
       setRows((prev) => [r, ...prev]);
     });
     return () => { alive = false; unsub(); };
-  }, []);
+  }, [day.id]);
 
   const canSend = nome.trim().length > 0 && presenza != null && !sending;
 
@@ -100,7 +126,7 @@ function FestaContent() {
     setSending(true);
     setError(null);
     try {
-      const saved = await submitPresenza({ nome, presenza, cibo });
+      const saved = await submitPresenza({ nome, presenza, cibo, giorno: day.id });
       // Mostra subito la propria riga (in caso il realtime tardasse).
       const k = rowKey(saved);
       if (!seen.current.has(k)) {
@@ -111,7 +137,7 @@ function FestaContent() {
       fetch("/api/notify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: nome.trim(), presenza, cibo: cibo.trim() }),
+        body: JSON.stringify({ nome: nome.trim(), presenza, cibo: cibo.trim(), giorno: day.id }),
       }).catch(() => {});
       setSent(true);
     } catch (err: any) {
@@ -127,13 +153,27 @@ function FestaContent() {
 
         {/* ── Hero ── */}
         <header className="festa-hero">
-          <div className="festa-hero-badge">Sei invitato/a 🎉</div>
+          <div className="festa-hero-badge">Sei invitato/a · {day.weekday} {day.dayNum} 🎉</div>
           <h1 className="festa-hero-title">Festa di Alberto</h1>
           <p className="festa-hero-sub">
             <strong>20 anni</strong> &nbsp;·&nbsp; Diploma di maturità <strong>74/100</strong>
           </p>
           <p className="festa-hero-geom">Geom. Alberto Pecchini</p>
         </header>
+
+        {/* ── Due giorni: invito separato per ciascun giorno ── */}
+        <section className="festa-card festa-cross">
+          <div className="festa-card-head">
+            <ArrowLeftRight size={20} /><h2>Due giorni di festa</h2>
+          </div>
+          <p className="festa-cross-text">
+            Questo invito è per <strong>{day.weekday} {day.dateLabel}</strong>.
+            Non riesci? <a className="festa-cross-link" href={`/festa?k=${day.other.token}`}>Vieni {day.other.label} →</a>
+          </p>
+          <p className="festa-cross-note">
+            E ovviamente puoi esserci <strong>entrambi i giorni</strong>: in tal caso rispondi a tutti e due gli inviti. 💚
+          </p>
+        </section>
 
         {/* ── Dove ── */}
         <section className="festa-card">
@@ -157,7 +197,7 @@ function FestaContent() {
             <CalendarDays size={20} /><h2>Quando</h2>
           </div>
           <ul className="festa-list">
-            <li><span className="festa-dot">🏊</span> <span><strong>Sabato 27 giugno, pomeriggio</strong> — si fa il bagno.</span></li>
+            <li><span className="festa-dot">🏊</span> <span><strong>{day.weekday} {day.dateLabel}, pomeriggio</strong> — si fa il bagno.</span></li>
             <li><span className="festa-dot">🌙</span> <span>Poi <strong>chi vuole resta alla sera</strong>.</span></li>
           </ul>
         </section>
@@ -193,14 +233,14 @@ function FestaContent() {
         {/* ── Sondaggio presenze ── */}
         <section className="festa-card festa-poll">
           <div className="festa-card-head">
-            <PartyPopper size={20} /><h2>Ci sei? Fammelo sapere</h2>
+            <PartyPopper size={20} /><h2>Ci sei {day.weekday.toLowerCase()} {day.dayNum}? Fammelo sapere</h2>
           </div>
 
           {sent ? (
             <div className="festa-thanks">
               <div className="festa-thanks-emoji">🥳</div>
               <h3>Grazie, segnato!</h3>
-              <p>Ci vediamo presto. Sei nella lista qui sotto.</p>
+              <p>Ci vediamo {day.weekday.toLowerCase()} {day.dayNum}. Sei nella lista qui sotto.</p>
             </div>
           ) : (
             <form className="festa-form" onSubmit={handleSubmit}>
@@ -218,9 +258,9 @@ function FestaContent() {
               </label>
 
               <div className="festa-field">
-                <span className="festa-label">Ci sarai?</span>
+                <span className="festa-label">Ci sarai {day.weekday.toLowerCase()} {day.dayNum}?</span>
                 <div className="festa-seg">
-                  {PRESENZA_OPTS.map((o) => (
+                  {presenzaOpts.map((o) => (
                     <button
                       key={o.value}
                       type="button"
@@ -259,7 +299,7 @@ function FestaContent() {
           <div className="festa-live">
             <div className="festa-live-head">
               <span className="festa-live-dot" />
-              <span>Chi ha già risposto ({rows.length})</span>
+              <span>Chi c'è {day.weekday.toLowerCase()} {day.dayNum} ({rows.length})</span>
             </div>
             {rows.length === 0 ? (
               <p className="festa-live-empty">Ancora nessuno… sii il primo!</p>
