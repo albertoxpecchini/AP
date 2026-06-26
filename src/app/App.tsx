@@ -103,6 +103,34 @@ function MaturitaReveal() {
   );
 }
 
+// ── Stato di attesa: il countdown è scaduto ma i voti NON sono ancora online.
+// Mostriamo uno spinner con messaggi che ruotano, "stiamo aspettando i voti". ─
+const VOTI_WAIT_MESSAGES = [
+  "⏳ Stiamo aspettando i voti…",
+  "📡 Il tabellone non è ancora online…",
+  "✍️ I prof stanno ancora caricando i voti…",
+  "🔄 Continuiamo a controllare per te…",
+  "🤞 Ancora un attimo, incrociamo le dita…",
+  "☕ Manca poco… respira.",
+];
+
+function VotiWaiting() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(
+      () => setI((n) => (n + 1) % VOTI_WAIT_MESSAGES.length),
+      2800,
+    );
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="hm-voti-wait" role="status" aria-live="polite">
+      <span className="hm-voti-spinner" aria-hidden="true" />
+      <span className="hm-voti-wait-msg" key={i}>{VOTI_WAIT_MESSAGES[i]}</span>
+    </div>
+  );
+}
+
 // ── Conto alla rovescia fino alla pubblicazione dei voti: ven 26 giu 2026, ore
 // 10:00 (ora italiana, CEST = +02:00). ──────────────────────────────────────
 function VotiCountdown() {
@@ -133,9 +161,12 @@ function VotiCountdown() {
   ];
 
   return (
-    <div className={`hm-voti${done ? " is-done" : ""}`}>
+    <div className={`hm-voti${done ? " is-waiting" : ""}`}>
       {done ? (
-        <p className="hm-voti-done">📣 I voti sono usciti — in bocca al lupo! 🍀</p>
+        <>
+          <span className="hm-voti-label">⏳ In attesa dei voti · ven 26 giu</span>
+          <VotiWaiting />
+        </>
       ) : (
         <>
           <span className="hm-voti-label">
@@ -1300,18 +1331,32 @@ export default function App() {
           position: absolute; right: -0.42rem; top: 50%; transform: translateY(-65%);
           font-size: 1.1rem; font-weight: 900; color: var(--gold-2); opacity: 0.6;
         }
-        .hm-voti.is-done {
-          background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 135%);
-          border-color: rgba(255, 255, 255, 0.4);
+        .hm-voti.is-waiting {
+          background: var(--gold-soft); border-color: var(--gold-bd);
         }
-        .hm-voti-done {
-          margin: 0; font-weight: 800; color: #1a1206;
-          font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+        .hm-voti-wait {
+          display: flex; align-items: center; gap: 0.6rem; min-height: 1.5rem;
+        }
+        .hm-voti-spinner {
+          width: 1.05rem; height: 1.05rem; flex: none; border-radius: 50%;
+          border: 2px solid var(--gold-bd); border-top-color: var(--gold-2);
+          animation: hm-voti-spin 0.8s linear infinite;
+        }
+        .hm-voti-wait-msg {
+          font-size: clamp(0.85rem, 1.5vw, 1rem); font-weight: 800; color: var(--gold-2);
+          animation: hm-voti-fade 0.5s ease;
+        }
+        @keyframes hm-voti-spin { to { transform: rotate(360deg); } }
+        @keyframes hm-voti-fade {
+          from { opacity: 0; transform: translateY(5px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         @media (prefers-reduced-motion: reduce) {
           .hm-striscione { transition: opacity 0.3s ease; transform: none; }
           .hm-striscione-body { animation: none !important; }
           .hm-striscione-body::after { animation: none; display: none; }
+          .hm-voti-spinner { animation-duration: 1.8s; }
+          .hm-voti-wait-msg { animation: none; }
         }
 
         /* le card dentro la cartella Maturità prendono il riflesso oro all'hover */
