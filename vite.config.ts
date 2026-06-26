@@ -70,10 +70,54 @@ function triviaDevApi() {
   }
 }
 
+// Festa · /api/notify in sviluppo: invia l'email del voto via Resend (stesso
+// helper della funzione serverless), così l'invito si testa end-to-end in locale.
+// Senza RESEND_API_KEY non invia, ma logga il voto in console.
+function festaNotifyDevApi() {
+  return {
+    name: 'festa-notify-dev-api',
+    configureServer(server: any) {
+      const env = loadEnv(server.config.mode, process.cwd(), '')
+      if (env.RESEND_API_KEY && !process.env.RESEND_API_KEY) {
+        process.env.RESEND_API_KEY = env.RESEND_API_KEY
+      }
+
+      server.middlewares.use('/api/notify', async (req: any, res: any) => {
+        if (req.method !== 'POST') { res.statusCode = 405; res.end('{}'); return }
+        let raw = ''
+        req.on('data', (c: any) => { raw += c })
+        req.on('end', async () => {
+          let body: any = {}
+          try { body = JSON.parse(raw || '{}') } catch {}
+          const valid = ['pomeriggio', 'sera', 'no']
+          const nome = typeof body.nome === 'string' ? body.nome.trim() : ''
+          if (!nome || !valid.includes(body.presenza)) {
+            res.statusCode = 400; res.end(JSON.stringify({ error: 'Payload non valido' })); return
+          }
+          const payload = { nome: nome.slice(0, 40), presenza: body.presenza, cibo: body.cibo ?? null }
+          if (!process.env.RESEND_API_KEY) {
+            console.log('[festa] voto (no RESEND_API_KEY, email saltata):', payload)
+            res.statusCode = 200; res.end(JSON.stringify({ ok: true, skipped: true })); return
+          }
+          const { sendVoteEmail } = await import('./api/_festaEmail')
+          const result = await sendVoteEmail(payload)
+          if (!result.ok) {
+            console.error('[festa] invio email fallito:', result.status, result.detail)
+            res.statusCode = result.status; res.end(JSON.stringify({ error: result.detail })); return
+          }
+          console.log('[festa] email inviata per:', payload.nome)
+          res.statusCode = 200; res.end(JSON.stringify({ ok: true }))
+        })
+      })
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
     figmaAssetResolver(),
     triviaDevApi(),
+    festaNotifyDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),

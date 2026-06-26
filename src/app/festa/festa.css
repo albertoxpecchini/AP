@@ -1,0 +1,349 @@
+/* ─── Festa · stile Kit Italia (AgID) ──────────────────────────────────────
+   Titillium Web e Bootstrap Italia sono già caricati globalmente (index.html).
+   Verde "neroverde" del progetto = #2F7D4A. Dark mode sotto .dark. */
+
+.festa-page {
+  --fst-green:   #2F7D4A;
+  --fst-green-d: #1F6B3D;
+  --fst-bg:      #f4f7f4;
+  --fst-card:    #ffffff;
+  --fst-ink:     #1c1a17;
+  --fst-sub:     #5b6660;
+  --fst-bd:      rgba(47, 125, 74, 0.16);
+  --fst-shadow:  0 6px 24px rgba(31, 107, 61, 0.10);
+
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(47,125,74,0.12), transparent 60%),
+    var(--fst-bg);
+  color: var(--fst-ink);
+  font-family: "Titillium Web", system-ui, -apple-system, sans-serif;
+  padding: clamp(16px, 4vw, 40px) 16px 48px;
+  box-sizing: border-box;
+}
+
+.dark .festa-page {
+  --fst-green:   #46c47b;
+  --fst-green-d: #6fe0a6;
+  --fst-bg:      #0b1310;
+  --fst-card:    #11201a;
+  --fst-ink:     #e6f1ea;
+  --fst-sub:     #9bb3a7;
+  --fst-bd:      rgba(111, 224, 166, 0.18);
+  --fst-shadow:  0 6px 28px rgba(0, 0, 0, 0.45);
+}
+
+.festa-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Hero ── */
+.festa-hero {
+  text-align: center;
+  padding: clamp(20px, 5vw, 36px) 20px;
+  border-radius: 20px;
+  background: linear-gradient(150deg, var(--fst-green), var(--fst-green-d));
+  color: #fff;
+  box-shadow: var(--fst-shadow);
+}
+.festa-hero-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+.festa-hero-title {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 2.9rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.festa-hero-sub {
+  margin: 10px 0 0;
+  font-size: clamp(1rem, 3.4vw, 1.25rem);
+  opacity: 0.96;
+}
+.festa-hero-geom {
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* ── Card ── */
+.festa-card {
+  background: var(--fst-card);
+  border: 1px solid var(--fst-bd);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: var(--fst-shadow);
+}
+.festa-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fst-green);
+  margin-bottom: 14px;
+}
+.festa-card-head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--fst-ink);
+}
+
+.festa-address {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+.festa-maps {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.festa-btn {
+  flex: 1 1 200px;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  padding: 10px 16px !important;
+}
+.btn-primary.festa-btn {
+  background: var(--fst-green) !important;
+  border-color: var(--fst-green) !important;
+}
+.btn-outline-primary.festa-btn {
+  color: var(--fst-green) !important;
+  border-color: var(--fst-green) !important;
+}
+
+.festa-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.festa-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+.festa-dot {
+  flex: 0 0 auto;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.festa-bring {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.festa-chip {
+  background: rgba(47, 125, 74, 0.10);
+  border: 1px solid var(--fst-bd);
+  color: var(--fst-ink);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+.dark .festa-chip { background: rgba(111, 224, 166, 0.10); }
+
+/* ── Sondaggio ── */
+.festa-poll { padding-bottom: 8px; }
+.festa-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.festa-field { display: flex; flex-direction: column; gap: 8px; }
+.festa-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.festa-label em { font-weight: 400; color: var(--fst-sub); font-style: normal; }
+
+.festa-input {
+  width: 100%;
+  border: 1.5px solid var(--fst-bd) !important;
+  border-radius: 12px !important;
+  padding: 11px 14px !important;
+  font-size: 1rem !important;
+  background: var(--fst-card) !important;
+  color: var(--fst-ink) !important;
+  box-sizing: border-box;
+}
+.festa-input:focus {
+  outline: none !important;
+  border-color: var(--fst-green) !important;
+  box-shadow: 0 0 0 0.2rem rgba(47, 125, 74, 0.20) !important;
+}
+
+.festa-seg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.festa-seg-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  width: 100%;
+  border: 1.5px solid var(--fst-bd);
+  background: transparent;
+  color: var(--fst-ink);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .05s;
+}
+.festa-seg-btn:hover { border-color: var(--fst-green); }
+.festa-seg-btn:active { transform: scale(0.99); }
+.festa-seg-btn.is-active {
+  border-color: var(--fst-green);
+  background: rgba(47, 125, 74, 0.12);
+  box-shadow: inset 0 0 0 1px var(--fst-green);
+}
+.dark .festa-seg-btn.is-active { background: rgba(111, 224, 166, 0.14); }
+.festa-seg-emoji { font-size: 1.3rem; }
+
+.festa-error {
+  background: rgba(201, 64, 64, 0.10);
+  border: 1px solid rgba(201, 64, 64, 0.35);
+  color: #b03030;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+}
+
+.festa-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--fst-green) !important;
+  border-color: var(--fst-green) !important;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  padding: 12px 18px !important;
+}
+.festa-submit:disabled { opacity: 0.55; }
+.festa-spin { animation: festa-spin 0.8s linear infinite; }
+@keyframes festa-spin { to { transform: rotate(360deg); } }
+
+.festa-thanks {
+  text-align: center;
+  padding: 18px 8px 8px;
+}
+.festa-thanks-emoji { font-size: 2.6rem; }
+.festa-thanks h3 { margin: 8px 0 4px; font-weight: 800; }
+.festa-thanks p { margin: 0; color: var(--fst-sub); }
+
+/* ── Lista live ── */
+.festa-live {
+  margin-top: 20px;
+  border-top: 1px dashed var(--fst-bd);
+  padding-top: 16px;
+}
+.festa-live-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+.festa-live-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--fst-green);
+  box-shadow: 0 0 0 0 rgba(47, 125, 74, 0.55);
+  animation: festa-pulse 1.8s infinite;
+}
+@keyframes festa-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(47, 125, 74, 0.45); }
+  70%  { box-shadow: 0 0 0 8px rgba(47, 125, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(47, 125, 74, 0); }
+}
+.festa-live-empty { color: var(--fst-sub); margin: 0; }
+.festa-live-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.festa-live-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: rgba(47, 125, 74, 0.06);
+  border: 1px solid var(--fst-bd);
+  border-radius: 10px;
+  padding: 9px 12px;
+}
+.dark .festa-live-row { background: rgba(111, 224, 166, 0.07); }
+.festa-live-name { font-weight: 700; }
+.festa-live-badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.festa-live-badge.p-pomeriggio { background: rgba(47, 125, 74, 0.16); color: var(--fst-green-d); }
+.festa-live-badge.p-sera       { background: rgba(98, 70, 234, 0.14); color: #6246ea; }
+.festa-live-badge.p-no         { background: rgba(201, 64, 64, 0.14); color: #b03030; }
+.dark .festa-live-badge.p-sera { color: #b3a4ff; }
+.dark .festa-live-badge.p-no   { color: #ff9d9d; }
+.festa-live-food {
+  font-size: 0.86rem;
+  color: var(--fst-sub);
+  flex-basis: 100%;
+}
+
+.festa-foot {
+  text-align: center;
+  color: var(--fst-sub);
+  font-size: 0.95rem;
+  padding: 8px 0 0;
+}
+
+/* ── Schermata neutra ── */
+.festa-closed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.festa-closed-card {
+  text-align: center;
+  background: var(--fst-card);
+  border: 1px solid var(--fst-bd);
+  border-radius: 18px;
+  padding: 40px 32px;
+  box-shadow: var(--fst-shadow);
+  max-width: 420px;
+}
+.festa-closed-emoji { font-size: 3rem; }
+.festa-closed-card h1 { margin: 12px 0 8px; font-size: 1.6rem; font-weight: 800; }
+.festa-closed-card p { margin: 0; color: var(--fst-sub); }

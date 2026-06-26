@@ -25,6 +25,7 @@ const Gattopardo = lazy(() => import("./app/gattopardo/Gattopardo.tsx"));
 const Letteratura = lazy(() => import("./app/letteratura/Letteratura.tsx"));
 const Movimento = lazy(() => import("./app/movimento/Movimento.tsx"));
 const Mappa = lazy(() => import("./app/mappa/Mappa.tsx"));
+const Festa = lazy(() => import("./app/festa/Festa.tsx"));
 
 createRoot(document.getElementById("root")!).render(
   <>
@@ -116,6 +117,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Mappa />
+          </Suspense>
+        }
+      />
+<Route
+        path="/festa"
+        element={
+          <Suspense fallback={null}>
+            <Festa />
           </Suspense>
         }
       />
