@@ -95,7 +95,7 @@ function MaturitaReveal() {
         <div className="hm-bunting" aria-hidden="true" />
         <div className="hm-striscione-body">
           <span className="hm-striscione-text">
-            🎉 Ce l'ho fatta — <b>maturità superata</b> ed è andata alla grande! 🎓✨
+            🎉 Ce l'ho fatta — <b>maturità superata con 74/100</b>! 🎓✨
           </span>
         </div>
       </div>
@@ -103,30 +103,12 @@ function MaturitaReveal() {
   );
 }
 
-// ── Stato di attesa: il countdown è scaduto ma i voti NON sono ancora online.
-// Mostriamo uno spinner con messaggi che ruotano, "stiamo aspettando i voti". ─
-const VOTI_WAIT_MESSAGES = [
-  "⏳ Stiamo aspettando i voti…",
-  "📡 Il tabellone non è ancora online…",
-  "✍️ I prof stanno ancora caricando i voti…",
-  "🔄 Continuiamo a controllare per te…",
-  "🤞 Ancora un attimo, incrociamo le dita…",
-  "☕ Manca poco… respira.",
-];
-
-function VotiWaiting() {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    const id = setInterval(
-      () => setI((n) => (n + 1) % VOTI_WAIT_MESSAGES.length),
-      2800,
-    );
-    return () => clearInterval(id);
-  }, []);
+// ── Voto arrivato: i voti sono online. Mostriamo il risultato della maturità. ─
+function VotiResult() {
   return (
-    <div className="hm-voti-wait" role="status" aria-live="polite">
-      <span className="hm-voti-spinner" aria-hidden="true" />
-      <span className="hm-voti-wait-msg" key={i}>{VOTI_WAIT_MESSAGES[i]}</span>
+    <div className="hm-voti-result" role="status" aria-label="Voto di maturità: 74 su 100">
+      <span className="hm-voti-grade-num">74</span>
+      <span className="hm-voti-grade-den">/100</span>
     </div>
   );
 }
@@ -161,11 +143,11 @@ function VotiCountdown() {
   ];
 
   return (
-    <div className={`hm-voti${done ? " is-waiting" : ""}`}>
+    <div className={`hm-voti${done ? " is-result" : ""}`}>
       {done ? (
         <>
-          <span className="hm-voti-label">⏳ In attesa dei voti · ven 26 giu</span>
-          <VotiWaiting />
+          <span className="hm-voti-label">🎓 Voto di maturità · ven 26 giu</span>
+          <VotiResult />
         </>
       ) : (
         <>
@@ -1331,32 +1313,32 @@ export default function App() {
           position: absolute; right: -0.42rem; top: 50%; transform: translateY(-65%);
           font-size: 1.1rem; font-weight: 900; color: var(--gold-2); opacity: 0.6;
         }
-        .hm-voti.is-waiting {
+        .hm-voti.is-result {
           background: var(--gold-soft); border-color: var(--gold-bd);
         }
-        .hm-voti-wait {
-          display: flex; align-items: center; gap: 0.6rem; min-height: 1.5rem;
+        .hm-voti-result {
+          display: flex; align-items: baseline; gap: 0.1rem;
+          animation: hm-voti-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .hm-voti-spinner {
-          width: 1.05rem; height: 1.05rem; flex: none; border-radius: 50%;
-          border: 2px solid var(--gold-bd); border-top-color: var(--gold-2);
-          animation: hm-voti-spin 0.8s linear infinite;
+        .hm-voti-grade-num {
+          font-size: clamp(1.9rem, 4vw, 2.5rem); font-weight: 900; line-height: 1;
+          color: var(--gold-2); font-variant-numeric: tabular-nums;
+          text-shadow: 0 1px 12px rgba(212, 165, 60, 0.35);
         }
-        .hm-voti-wait-msg {
-          font-size: clamp(0.85rem, 1.5vw, 1rem); font-weight: 800; color: var(--gold-2);
-          animation: hm-voti-fade 0.5s ease;
+        .hm-voti-grade-den {
+          font-size: clamp(0.95rem, 1.8vw, 1.15rem); font-weight: 800;
+          color: var(--sub); font-variant-numeric: tabular-nums;
         }
-        @keyframes hm-voti-spin { to { transform: rotate(360deg); } }
-        @keyframes hm-voti-fade {
-          from { opacity: 0; transform: translateY(5px); }
-          to { opacity: 1; transform: translateY(0); }
+        @keyframes hm-voti-pop {
+          0% { opacity: 0; transform: scale(0.6); }
+          60% { transform: scale(1.08); }
+          100% { opacity: 1; transform: scale(1); }
         }
         @media (prefers-reduced-motion: reduce) {
           .hm-striscione { transition: opacity 0.3s ease; transform: none; }
           .hm-striscione-body { animation: none !important; }
           .hm-striscione-body::after { animation: none; display: none; }
-          .hm-voti-spinner { animation-duration: 1.8s; }
-          .hm-voti-wait-msg { animation: none; }
+          .hm-voti-result { animation: none; }
         }
 
         /* le card dentro la cartella Maturità prendono il riflesso oro all'hover */
