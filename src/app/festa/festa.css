@@ -64,6 +64,19 @@ html.dark .festa-page {
     0 0 90px -10px rgba(226, 193, 120, 0.30);
 }
 
+/* ════════ Emoji Apple (immagini) ════════ */
+/* Servite come PNG Apple (vedi AppleEmoji.tsx) per essere identiche ovunque.
+   Si dimensionano al font corrente: width/height 1em → basta `font-size` sul
+   genitore. Le classi di animazione (festa-anim-*) vanno sull'<img> stessa. */
+.festa-emoji {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.16em;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 /* ════════ Scrivania: icone che fluttuano ════════ */
 .festa-decor {
   position: fixed;
@@ -636,33 +649,38 @@ html.dark .festa-prop { opacity: 0.42; }
 .festa-reply-sub { margin: 6px 0 0; font-size: 0.98rem; color: var(--ink-soft); }
 .festa-reply-sub strong { color: var(--accent-deep); }
 
-/* Micro-istruzioni a passi */
+/* Micro-istruzioni a passi — 3 mini-card che restano intere (numerini ok) */
 .festa-steps {
   list-style: none;
-  margin: 0 0 18px;
+  margin: 0 0 20px;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  justify-content: center;
 }
 .festa-steps li {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--ink);
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--paper-bd);
+  border-radius: 10px;
+  background: rgba(255, 251, 240, 0.6);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink-title);
 }
-.festa-steps li em { font-style: normal; color: var(--ink-soft); }
-.festa-steps li span {
+.festa-steps li em { font-weight: 400; font-style: normal; color: var(--ink-soft); }
+.festa-step-n {
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
-  width: 20px; height: 20px;
+  width: 22px; height: 22px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
@@ -862,9 +880,10 @@ html.dark .festa-prop { opacity: 0.42; }
   padding: 3px 11px;
   border: 1px solid transparent;
 }
-.festa-guest-badge.p-pomeriggio { background: rgba(124, 108, 255, 0.16); color: #5a48d6; border-color: color-mix(in srgb, var(--accent) 32%, transparent); }
-.festa-guest-badge.p-sera       { background: rgba(56, 132, 200, 0.16); color: #2f6fb0; border-color: rgba(56, 132, 200, 0.30); }
-.festa-guest-badge.p-no         { background: rgba(200, 70, 70, 0.14); color: #b23b3b; border-color: rgba(200, 70, 70, 0.28); }
+/* Pomeriggio = azzurro piscina, Cena = verde, No = rosso (rietichettatura in Festa.tsx) */
+.festa-guest-badge.p-pomeriggio { background: rgba(56, 132, 200, 0.16);  color: #2f6fb0; border-color: rgba(56, 132, 200, 0.32); }
+.festa-guest-badge.p-sera       { background: rgba(76, 175, 114, 0.16);  color: #2f8b54; border-color: rgba(76, 175, 114, 0.34); }
+.festa-guest-badge.p-no         { background: rgba(200, 70, 70, 0.14);   color: #b23b3b; border-color: rgba(200, 70, 70, 0.28); }
 .festa-guest-food { font-size: 0.85rem; color: var(--ink-soft); flex-basis: 100%; }
 
 /* ── Firma ── */
@@ -901,6 +920,7 @@ html:not(.dark) .festa-foot-sign { color: var(--ink-title) !important; }
 /* ── Responsive ── */
 @media (max-width: 430px) {
   .festa-glance { grid-template-columns: 1fr; }
+  .festa-steps { grid-template-columns: 1fr; }  /* passi in colonna: massima chiarezza */
   .festa-glance-item { flex-direction: row; justify-content: flex-start; text-align: left; gap: 12px; padding: 13px 16px; }
   .festa-glance-item + .festa-glance-item { border-left: 0; border-top: 1px solid var(--paper-bd); }
   .festa-glance-emoji { font-size: 1.5rem; }

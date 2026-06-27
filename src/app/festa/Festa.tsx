@@ -7,6 +7,7 @@ import {
   submitPresenza, fetchPresenze, subscribePresenze,
   type PresenzaRow, type Presenza, type Giorno,
 } from "./festaApi";
+import { E } from "./AppleEmoji";
 import "./festa.css";
 
 // ─── Giorni della festa: due inviti separati, un link (token) ciascuno ──────
@@ -31,8 +32,8 @@ const DAYS: Record<string, DayCfg> = {
   },
 };
 
-// Lunedì 29 giugno 2026, 00:00 (Europe/Rome, CEST = +02:00): entrambi gli
-// inviti restano attivi fino a fine domenica 28.
+// Lunedì 29 giugno 2026, 00:00 (Europe/Rome, CEST = +02:00): l'invito resta
+// attivo fino a fine domenica 28 (la festa va dalle 18 a tarda notte).
 const DEADLINE = new Date("2026-06-29T00:00:00+02:00");
 
 // Prenotazione pizze: le ordino al Pizzangolo (Rivalta sul Mincio) entro le
@@ -45,9 +46,17 @@ const ADDRESS = "Strada Vedusino, 4";
 const GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Strada Vedusino 4")}`;
 const AMAPS = `https://maps.apple.com/?q=${encodeURIComponent("Strada Vedusino 4")}`;
 
+// ─── Risposte presenza ──────────────────────────────────────────────────────
+// Stesse tre scelte di sempre. Per NON migrare lo schema Supabase riuso i valori
+// storici della colonna `presenza`, rietichettando solo "sera" → "cena":
+//   'pomeriggio' → in piscina nel pomeriggio
+//   'sera'       → resta a cena (dalle 18)
+//   'no'         → non viene
+// Sul DB restano i codici vecchi; ovunque (UI + email) si mostrano le etichette
+// nuove, così per chi legge resta tutto chiaro.
 const PRESENZA_BADGE: Record<Presenza, { emoji: string; short: string }> = {
   pomeriggio: { emoji: "🏊", short: "Pomeriggio" },
-  sera:       { emoji: "🌙", short: "Anche sera" },
+  sera:       { emoji: "🍕", short: "A cena" },
   no:         { emoji: "🙁", short: "Non viene" },
 };
 
@@ -78,7 +87,7 @@ function DeskDecor() {
             animationDuration: `${p.d}s`, animationDelay: `${p.dl}s`,
           }}
         >
-          {p.e}
+          <E e={p.e} />
         </span>
       ))}
     </div>
@@ -122,7 +131,7 @@ function Confetti() {
 function Medallion({ emoji, anim }: { emoji: string; anim: string }) {
   return (
     <span className="festa-medal" aria-hidden="true">
-      <span className={`festa-medal-ico festa-anim-${anim}`}>{emoji}</span>
+      <E e={emoji} className={`festa-medal-ico festa-anim-${anim}`} />
     </span>
   );
 }
@@ -133,7 +142,7 @@ function FestaClosed({ expired }: { expired: boolean }) {
     <div className="festa-page festa-closed">
       <DeskDecor />
       <div className="festa-closed-card">
-        <div className="festa-closed-emoji">{expired ? "🎈" : "🔒"}</div>
+        <E e={expired ? "🎈" : "🔒"} className="festa-closed-emoji" />
         <h1>{expired ? "Evento concluso" : "Pagina non disponibile"}</h1>
         <p>
           {expired
@@ -173,15 +182,19 @@ function FestaContent({ day }: { day: DayCfg }) {
 
   // Mese e anno per il blocco data (derivati dal config: "28 giugno" → "giugno").
   const monthLabel = day.dateLabel.replace(day.dayNum, "").trim();
-  const year = String(DEADLINE.getFullYear() - (DEADLINE.getMonth() === 0 ? 1 : 0));
+  const year = "2026";
 
+  // Opzioni del form: emoji + etichetta chiara + sotto-testo. I `value` sono i
+  // codici storici del DB (vedi PRESENZA_BADGE): 'sera' = «a cena».
   const presenzaOpts: { value: Presenza; emoji: string; label: string; hint: string }[] = [
-    { value: "pomeriggio", emoji: "🏊", label: "Ci sono al pomeriggio", hint: `bagno in piscina · ${day.weekdayShort} ${day.dayNum}` },
-    { value: "sera",       emoji: "🌙", label: "Resto anche alla sera",  hint: "pomeriggio + serata" },
-    { value: "no",         emoji: "🙁", label: "Non riesco a venire",     hint: "sarai con noi col pensiero" },
+    { value: "pomeriggio", emoji: "🏊", label: "Ci sono al pomeriggio", hint: "bagno in piscina" },
+    { value: "sera",       emoji: "🍕", label: "Resto a cena",          hint: "dalle 18 in poi" },
+    { value: "no",         emoji: "🙁", label: "Non riesco a venire",   hint: "sarò con voi col pensiero" },
   ];
 
   // Carica le presenze del giorno + sottoscrizione realtime (filtrata).
+  // La subscribe è "live" anche in modalità statica/locale (vedi festaApi):
+  // su un'altra scheda/sessione le nuove adesioni arrivano via evento storage.
   useEffect(() => {
     let alive = true;
     fetchPresenze(day.id).then((data) => {
@@ -246,11 +259,11 @@ function FestaContent({ day }: { day: DayCfg }) {
           {/* Francobollo decorativo nell'angolo */}
           <span className="festa-stamp" aria-hidden="true">
             <span className="festa-stamp-top">DOM · 28</span>
-            <span className="festa-stamp-emoji">🎉</span>
+            <E e="🎉" className="festa-stamp-emoji" />
             <span className="festa-stamp-bot">GIU 2026</span>
           </span>
 
-          {/* Intestazione */}
+          {/* Intestazione dell'invito */}
           <header className="festa-head">
             <p className="festa-eyebrow">
               <span className="festa-flourish">❧</span>
@@ -267,14 +280,14 @@ function FestaContent({ day }: { day: DayCfg }) {
               <span /><span className="festa-rule-dot">✦</span><span />
             </div>
 
-            {/* Ceralacca */}
+            {/* Ceralacca con monogramma */}
             <span className="festa-seal" aria-hidden="true">
               <span className="festa-seal-shine" />
               <span className="festa-seal-mono">AP</span>
             </span>
           </header>
 
-          {/* Blocco DATA — il save-the-date */}
+          {/* Blocco DATA — il save-the-date, con cornice ad angoli dorati */}
           <div className="festa-date">
             <span className="festa-date-corner tl" aria-hidden="true" />
             <span className="festa-date-corner tr" aria-hidden="true" />
@@ -283,43 +296,43 @@ function FestaContent({ day }: { day: DayCfg }) {
             <span className="festa-date-wd">{day.weekday}</span>
             <span className="festa-date-num">{day.dayNum}</span>
             <span className="festa-date-my">{monthLabel} {year}</span>
-            <span className="festa-date-note">dal pomeriggio… fino a sera 🌙</span>
+            <span className="festa-date-note">dalle 18 fino a tarda notte <E e="🌙" /></span>
           </div>
 
-          {/* Due giorni: solo se esiste un secondo invito attivo */}
+          {/* Due giorni: blocco mostrato solo se esiste un secondo invito attivo */}
           {day.other && (
             <div className="festa-cross">
               <ArrowLeftRight size={18} />
               <p>
                 Non riesci? <a href={`/festa?k=${day.other.token}`}>Vieni {day.other.label} →</a>
-                &nbsp;Puoi esserci anche <strong>entrambi i giorni</strong>: rispondi a tutti e due gli inviti. 💚
+                &nbsp;Puoi esserci anche <strong>entrambi i giorni</strong>: rispondi a tutti e due gli inviti. <E e="💚" />
               </p>
             </div>
           )}
 
-          {/* A colpo d'occhio — chiarezza immediata */}
+          {/* A colpo d'occhio — le 3 cose da sapere subito, per non impazzire */}
           <div className="festa-glance">
             <div className="festa-glance-item">
-              <span className="festa-glance-emoji">📅</span>
+              <E e="📅" className="festa-glance-emoji" />
               <span className="festa-glance-k">Quando</span>
-              <span className="festa-glance-v">{day.weekdayShort} {day.dayNum} {monthLabel}<br />dal pomeriggio</span>
+              <span className="festa-glance-v">{day.weekdayShort} {day.dayNum} {monthLabel}<br />dalle 18</span>
             </div>
             <div className="festa-glance-item">
-              <span className="festa-glance-emoji">📍</span>
+              <E e="📍" className="festa-glance-emoji" />
               <span className="festa-glance-k">Dove</span>
               <span className="festa-glance-v">{ADDRESS}</span>
             </div>
             <div className="festa-glance-item">
-              <span className="festa-glance-emoji">🍕</span>
+              <E e="🍕" className="festa-glance-emoji" />
               <span className="festa-glance-k">Cibo</span>
-              <span className="festa-glance-v">Pizza offerta<br />niente regali</span>
+              <span className="festa-glance-v">Pizza offerta<br />regalo facoltativo</span>
             </div>
           </div>
 
-          {/* Il programma — timeline chiara */}
+          {/* Il programma — timeline chiara dalla sera a tarda notte */}
           <section className="festa-block">
             <div className="festa-block-head">
-              <Medallion emoji="🗓️" anim="bob" />
+              <Medallion emoji="⏰" anim="bob" />
               <h2>Il programma</h2>
             </div>
             <div className="festa-timeline">
@@ -327,28 +340,39 @@ function FestaContent({ day }: { day: DayCfg }) {
                 <span className="festa-tl-time">Pomeriggio</span>
                 <span className="festa-tl-line" aria-hidden="true"><i /></span>
                 <div className="festa-tl-body">
-                  <span className="festa-tl-emoji festa-anim-swim">🏊</span>
+                  <E e="🏊" className="festa-tl-emoji festa-anim-swim" />
                   <div>
-                    <p className="festa-tl-title">Si fa il bagno in piscina</p>
-                    <p className="festa-tl-desc">Si parte nel pomeriggio: tuffi, sole e relax.</p>
+                    <p className="festa-tl-title">Piscina aperta</p>
+                    <p className="festa-tl-desc">Chi vuole arriva prima: bagno, sole e aperitivo di benvenuto <E e="🥂" />.</p>
                   </div>
                 </div>
               </div>
               <div className="festa-tl-row">
-                <span className="festa-tl-time">Sera</span>
+                <span className="festa-tl-time">Dalle 18</span>
                 <span className="festa-tl-line" aria-hidden="true"><i /></span>
                 <div className="festa-tl-body">
-                  <span className="festa-tl-emoji festa-anim-bob">🌙</span>
+                  <E e="🍕" className="festa-tl-emoji festa-anim-bob" />
                   <div>
-                    <p className="festa-tl-title">Chi vuole resta alla sera</p>
-                    <p className="festa-tl-desc">Niente fretta: si continua insieme anche dopo il tramonto.</p>
+                    <p className="festa-tl-title">Cena insieme</p>
+                    <p className="festa-tl-desc">Pizza alla teglia dal Pizzangolo: offre la casa, niente pensieri.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="festa-tl-row">
+                <span className="festa-tl-time">Fino a tardi</span>
+                <span className="festa-tl-line" aria-hidden="true"><i /></span>
+                <div className="festa-tl-body">
+                  <E e="🌙" className="festa-tl-emoji festa-anim-bob" />
+                  <div>
+                    <p className="festa-tl-title">Musica & chill</p>
+                    <p className="festa-tl-desc">Si continua tra chiacchiere e musica <E e="🎶" />, nessuna fretta.</p>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Dove */}
+          {/* Dove — indirizzo + scorciatoie mappe */}
           <section className="festa-block">
             <div className="festa-block-head">
               <Medallion emoji="📍" anim="drop" />
@@ -365,7 +389,7 @@ function FestaContent({ day }: { day: DayCfg }) {
             </div>
           </section>
 
-          {/* Cosa portare */}
+          {/* Cosa portare — chip (piscina di sera → c'è anche la felpa) */}
           <section className="festa-block">
             <div className="festa-block-head">
               <Medallion emoji="🎒" anim="wiggle" />
@@ -377,13 +401,14 @@ function FestaContent({ day }: { day: DayCfg }) {
                 { e: "🩴", t: "Ciabatte" },
                 { e: "👕", t: "Cambio vestiti" },
                 { e: "🏖️", t: "Asciugamano" },
+                { e: "🧥", t: "Felpa per la notte" },
               ].map((x) => (
-                <span key={x.t} className="festa-chip"><span className="festa-chip-e">{x.e}</span> {x.t}</span>
+                <span key={x.t} className="festa-chip"><E e={x.e} className="festa-chip-e" /> {x.t}</span>
               ))}
             </div>
           </section>
 
-          {/* Buono a sapersi */}
+          {/* Buono a sapersi — pizza + regalo facoltativo (chill) */}
           <section className="festa-block">
             <div className="festa-block-head">
               <Medallion emoji="🍕" anim="spin" />
@@ -393,19 +418,19 @@ function FestaContent({ day }: { day: DayCfg }) {
               <li>
                 <Pizza size={18} className="festa-note-ic" />
                 <span>
-                  <strong>Pizza alla teglia dal Pizzangolo</strong> (Rivalta sul Mincio) — offre la casa! 🎉
+                  <strong>Pizza alla teglia dal Pizzangolo</strong> (Rivalta sul Mincio) — offre la casa! <E e="🎉" />{" "}
                   Scrivi il tuo gusto nella cartolina qui sotto <strong>entro le 21 di sabato 27 giugno</strong>.
                 </span>
               </li>
               <li>
                 <Gift size={18} className="festa-note-ic" />
-                <span><strong>Nessun regalo è richiesto</strong>: vieni e basta, è già il regalo più bello. 💚</span>
+                <span><strong>Regalo facoltativo</strong>, nessun impegno: vieni e basta, è già festa così. Tutto molto chill. <E e="💚" /></span>
               </li>
             </ul>
           </section>
         </article>
 
-        {/* ════════ CARTOLINA R.S.V.P. (risposta) ════════ */}
+        {/* ════════ CARTOLINA R.S.V.P. (la "risposta", staccabile) ════════ */}
         <article className="festa-reply">
           <div className="festa-tear" aria-hidden="true">
             <Scissors size={15} />
@@ -416,13 +441,13 @@ function FestaContent({ day }: { day: DayCfg }) {
             <p className="festa-rsvp-tag"><CalendarHeart size={15} /> R.S.V.P.</p>
             <h2 className="festa-reply-title">Ci sei {day.weekday.toLowerCase()} {day.dayNum}?</h2>
             <p className="festa-reply-sub">
-              Fammelo sapere <strong>entro {day.weekday.toLowerCase()} {day.dateLabel}</strong>.
+              Fammelo sapere <strong>entro {day.weekday.toLowerCase()} {day.dateLabel}</strong> — nessun impegno, è tutto chill.
             </p>
           </div>
 
           {sent ? (
             <div className="festa-thanks">
-              <div className="festa-thanks-emoji">🥳</div>
+              <E e="🥳" className="festa-thanks-emoji" />
               <h3>Grazie, segnato!</h3>
               <p>Ci vediamo {day.weekday.toLowerCase()} {day.dayNum}. Trovi il tuo nome nella lista qui sotto.</p>
             </div>
@@ -430,9 +455,9 @@ function FestaContent({ day }: { day: DayCfg }) {
             <>
               {/* Micro-istruzioni: 3 passi chiarissimi */}
               <ol className="festa-steps">
-                <li><span>1</span> Scrivi il tuo nome</li>
-                <li><span>2</span> Dimmi se vieni</li>
-                <li><span>3</span> <em>(se vuoi)</em> il gusto della pizza</li>
+                <li><span className="festa-step-n">1</span> Scrivi il tuo nome</li>
+                <li><span className="festa-step-n">2</span> Dimmi se vieni</li>
+                <li><span className="festa-step-n">3</span> Gusto pizza <em>(se vuoi)</em></li>
               </ol>
 
               <form className="festa-form" onSubmit={handleSubmit}>
@@ -459,7 +484,7 @@ function FestaContent({ day }: { day: DayCfg }) {
                         className={`festa-seg-btn${presenza === o.value ? " is-active" : ""}`}
                         onClick={() => setPresenza(o.value)}
                       >
-                        <span className="festa-seg-emoji">{o.emoji}</span>
+                        <E e={o.emoji} className="festa-seg-emoji" />
                         <span className="festa-seg-txt">
                           <span className="festa-seg-main">{o.label}</span>
                           <span className="festa-seg-hint">{o.hint}</span>
@@ -483,12 +508,12 @@ function FestaContent({ day }: { day: DayCfg }) {
                         onChange={(e) => setCibo(e.target.value)}
                       />
                       <span className="festa-hint">
-                        🍕 Prenoto i gusti al Pizzangolo (Rivalta) entro <strong>{PIZZA_DEADLINE_LABEL}</strong>.
+                        <E e="🍕" /> Prenoto i gusti al Pizzangolo (Rivalta) entro <strong>{PIZZA_DEADLINE_LABEL}</strong>.
                       </span>
                     </>
                   ) : (
                     <div className="festa-locked">
-                      🔒 Prenotazione pizze chiusa (scadenza: {PIZZA_DEADLINE_LABEL}). Puoi comunque confermare la presenza.
+                      <E e="🔒" /> Prenotazione pizze chiusa (scadenza: {PIZZA_DEADLINE_LABEL}). Puoi comunque confermare la presenza.
                     </div>
                   )}
                 </div>
@@ -503,7 +528,7 @@ function FestaContent({ day }: { day: DayCfg }) {
             </>
           )}
 
-          {/* Libro degli ospiti — lista live */}
+          {/* Libro degli ospiti — lista live (aggiornata in tempo reale) */}
           <div className="festa-guests">
             <div className="festa-guests-head">
               <PartyPopper size={16} />
@@ -512,16 +537,16 @@ function FestaContent({ day }: { day: DayCfg }) {
               <span className="festa-live-dot" aria-hidden="true" />
             </div>
             {rows.length === 0 ? (
-              <p className="festa-guests-empty">Ancora nessuno… sii il primo! 🎈</p>
+              <p className="festa-guests-empty">Ancora nessuno… sii il primo! <E e="🎈" /></p>
             ) : (
               <ul className="festa-guests-list">
                 {rows.map((r, i) => {
-                  const b = PRESENZA_BADGE[r.presenza] ?? { emoji: "•", short: r.presenza };
+                  const b = PRESENZA_BADGE[r.presenza] ?? { emoji: "🎉", short: r.presenza };
                   return (
                     <li key={r.id ?? `${r.nome}-${i}`} className="festa-guest-row">
                       <span className="festa-guest-name">{r.nome}</span>
-                      <span className={`festa-guest-badge p-${r.presenza}`}>{b.emoji} {b.short}</span>
-                      {r.cibo ? <span className="festa-guest-food">🍽️ {r.cibo}</span> : null}
+                      <span className={`festa-guest-badge p-${r.presenza}`}><E e={b.emoji} /> {b.short}</span>
+                      {r.cibo ? <span className="festa-guest-food"><E e="🍽️" /> {r.cibo}</span> : null}
                     </li>
                   );
                 })}
@@ -530,10 +555,11 @@ function FestaContent({ day }: { day: DayCfg }) {
           </div>
         </article>
 
+        {/* Firma */}
         <footer className="festa-foot">
           <span className="festa-foot-flourish" aria-hidden="true">✦ ✦ ✦</span>
           <p>Con affetto, ti aspetto.</p>
-          <p className="festa-foot-sign">Alberto 💚</p>
+          <p className="festa-foot-sign">Alberto <E e="💚" /></p>
         </footer>
       </div>
     </div>

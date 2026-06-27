@@ -29,9 +29,11 @@ const GIORNO_LABEL: Record<VotePayload["giorno"], string> = {
   "28": "Domenica 28 giugno",
 };
 
+// Etichette "umane" della presenza. NB: il codice DB "sera" è riusato come
+// «a cena» (niente migrazione dello schema) → qui lo rendo leggibile.
 const PRESENZA_LABEL: Record<VotePayload["presenza"], string> = {
-  pomeriggio: "🏊 Ci sono al bagno (pomeriggio)",
-  sera: "🌙 Resto anche alla sera",
+  pomeriggio: "🏊 Ci sono al pomeriggio",
+  sera: "🍕 Resto a cena",
   no: "🙁 Non riesce a venire",
 };
 

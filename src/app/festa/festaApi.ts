@@ -98,9 +98,27 @@ export async function fetchPresenze(giorno: Giorno, limit = 200): Promise<Presen
   return (await res.json()) as PresenzaRow[];
 }
 
-// ─── Realtime: nuove presenze in tempo reale via WebSocket ──────────────────
+// ─── Realtime: nuove presenze in tempo reale ───────────────────────────────
 export function subscribePresenze(onInsert: (row: PresenzaRow) => void): Unsubscribe {
-  if (!festaConfigured) return () => {};
+  // ── Modalità statica/locale: niente backend, ma comunque "live" tra schede ──
+  // Quando un'altra scheda/sessione scrive su localStorage il browser emette un
+  // evento `storage` (solo nelle ALTRE schede): da lì ricaviamo le righe nuove e
+  // le inoltriamo, così la lista si aggiorna in tempo reale anche senza Supabase.
+  if (!festaConfigured) {
+    const onStorage = (ev: StorageEvent) => {
+      if (ev.key !== LOCAL_KEY) return;
+      let oldRows: PresenzaRow[] = [];
+      let newRows: PresenzaRow[] = [];
+      try { oldRows = ev.oldValue ? JSON.parse(ev.oldValue) : []; } catch {}
+      try { newRows = ev.newValue ? JSON.parse(ev.newValue) : []; } catch {}
+      const oldIds = new Set(oldRows.map((r) => r.id));
+      // writeLocal mette le nuove in testa: le emetto dalla più vecchia alla più
+      // nuova così l'ordine finale lato UI resta newest-first.
+      newRows.filter((r) => !oldIds.has(r.id)).reverse().forEach(onInsert);
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }
 
   let ws: WebSocket | null = null;
   let hb: ReturnType<typeof setInterval> | null = null;
