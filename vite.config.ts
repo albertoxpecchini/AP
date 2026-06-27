@@ -100,7 +100,7 @@ function festaNotifyDevApi() {
             console.log('[festa] voto (no RESEND_API_KEY, email saltata):', payload)
             res.statusCode = 200; res.end(JSON.stringify({ ok: true, skipped: true })); return
           }
-          const { sendVoteEmail } = await import('./api/_festaEmail')
+          const { sendVoteEmail } = await import('./api/notify')
           const result = await sendVoteEmail(payload)
           if (!result.ok) {
             console.error('[festa] invio email fallito:', result.status, result.detail)
