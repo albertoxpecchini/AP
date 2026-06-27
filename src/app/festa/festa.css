@@ -1,29 +1,66 @@
-/* ─── Festa · stile "dark premium" (identico alla home) ─────────────────────
-   Sfondo scuro profondo, superfici "vetro", accento VIOLA neon. Sempre dark,
-   a prescindere dal tema. Font Titillium Web (già caricato globalmente).
-   Le classi sono le stesse di Festa.tsx: nessuna modifica al markup. */
+/* ─── Festa · stile "dark/light premium" ────────────────────────────────────
+   Accento VIOLA neon. Reattivo al tema globale (.dark su <html>): di default
+   è CHIARO, sotto `html.dark` diventa scuro. L'hero resta un "banner" viola in
+   entrambi i temi. Niente backdrop-filter (perf): solo transform/opacity nelle
+   animazioni → fluido, zero lag. Emoji native di sistema (Apple su iOS/macOS). */
 
 .festa-page {
-  --accent:     #8b7bff;
-  --accent-2:   #7c6cff;
-  --accent-deep:#5b4bd6;
-  --ink:        #c4a5ff;
-  --glow:       rgba(139, 123, 255, 0.45);
-  --text:       #e8eef4;
-  --sub:        #a7b2bd;
-  --surface:    rgba(255, 255, 255, 0.05);
-  --surface-bd: rgba(255, 255, 255, 0.10);
-  --vio-soft:   rgba(139, 123, 255, 0.10);
-  --vio-bd:     rgba(139, 123, 255, 0.28);
+  /* Accento (uguale nei due temi) */
+  --accent:      #7c6cff;
+  --accent-2:    #6a5af0;
+  --accent-deep: #5b4bd6;
+
+  /* ── Tema CHIARO (default) ── */
+  --ink:         #5a48d6;
+  --glow:        rgba(124, 108, 255, 0.28);
+  --title:       #1b1630;
+  --text:        #36314a;
+  --sub:         #6d6786;
+  --surface:     rgba(255, 255, 255, 0.72);
+  --surface-bd:  rgba(27, 22, 48, 0.12);
+  --vio-soft:    rgba(124, 108, 255, 0.10);
+  --vio-bd:      rgba(124, 108, 255, 0.32);
+  --input-bg:    rgba(255, 255, 255, 0.85);
+  --input-bg-2:  #ffffff;
+  --seg-bg:      rgba(255, 255, 255, 0.60);
+  --seg-hover:   rgba(124, 108, 255, 0.08);
+  --seg-active:  rgba(124, 108, 255, 0.16);
+  --row-bg:      rgba(255, 255, 255, 0.62);
+  --card-shadow: 0 16px 40px rgba(40, 30, 90, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --page-bg:
+    radial-gradient(120% 70% at 50% -10%, rgba(124, 108, 255, 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #f6f4fd 0%, #eceafa 100%);
 
   min-height: 100dvh;
   color: var(--text);
-  font-family: "Titillium Web", Geneva, Tahoma, system-ui, sans-serif;
-  background:
-    radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
-    linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+  font-family: "Titillium Web", system-ui, -apple-system, "Segoe UI", Tahoma,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  background: var(--page-bg);
   padding: clamp(16px, 4vw, 44px) 16px 56px;
   box-sizing: border-box;
+}
+
+/* ── Tema SCURO ── */
+html.dark .festa-page {
+  --ink:         #c4a5ff;
+  --glow:        rgba(139, 123, 255, 0.45);
+  --title:       #ffffff;
+  --text:        #e8eef4;
+  --sub:         #a7b2bd;
+  --surface:     rgba(255, 255, 255, 0.05);
+  --surface-bd:  rgba(255, 255, 255, 0.10);
+  --vio-soft:    rgba(139, 123, 255, 0.10);
+  --vio-bd:      rgba(139, 123, 255, 0.28);
+  --input-bg:    rgba(255, 255, 255, 0.04);
+  --input-bg-2:  rgba(255, 255, 255, 0.06);
+  --seg-bg:      rgba(255, 255, 255, 0.03);
+  --seg-hover:   rgba(139, 123, 255, 0.08);
+  --seg-active:  rgba(139, 123, 255, 0.16);
+  --row-bg:      rgba(255, 255, 255, 0.04);
+  --card-shadow: 0 18px 44px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --page-bg:
+    radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
 }
 
 .festa-wrap {
@@ -34,32 +71,57 @@
   gap: 18px;
 }
 
-/* ── Hero ── */
+/* ── Animazione d'ingresso (stagger, GPU: solo transform/opacity) ── */
+@keyframes festa-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+.festa-wrap > * {
+  animation: festa-rise 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.festa-wrap > *:nth-child(1) { animation-delay: 0.03s; }
+.festa-wrap > *:nth-child(2) { animation-delay: 0.10s; }
+.festa-wrap > *:nth-child(3) { animation-delay: 0.17s; }
+.festa-wrap > *:nth-child(4) { animation-delay: 0.24s; }
+.festa-wrap > *:nth-child(5) { animation-delay: 0.31s; }
+.festa-wrap > *:nth-child(6) { animation-delay: 0.38s; }
+.festa-wrap > *:nth-child(7) { animation-delay: 0.45s; }
+.festa-wrap > *:nth-child(8) { animation-delay: 0.52s; }
+
+/* ── Hero (banner viola in entrambi i temi) ── */
 .festa-hero {
   position: relative;
   overflow: hidden;
   text-align: center;
   padding: clamp(28px, 6vw, 48px) 22px;
   border-radius: 24px;
-  border: 1px solid var(--vio-bd);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background:
-    radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
-    linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 110%);
-  box-shadow: 0 26px 64px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.30) 0%, transparent 55%),
+    linear-gradient(160deg, #1a1330 0%, #221a40 45%, #120d22 110%);
+  box-shadow: 0 26px 64px rgba(30, 20, 70, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .festa-hero::before, .festa-hero::after {
   content: ""; position: absolute; width: 60%; height: 80%; border-radius: 50%;
-  filter: blur(64px); opacity: 0.4; pointer-events: none; z-index: 0;
+  filter: blur(64px); opacity: 0.42; pointer-events: none; z-index: 0;
 }
-.festa-hero::before { background: #8b7bff; top: -34%; right: -10%; }
-.festa-hero::after  { background: #5b4bd6; bottom: -40%; left: -14%; opacity: 0.32; }
+.festa-hero::before {
+  background: #8b7bff; top: -34%; right: -10%;
+  animation: festa-drift-a 15s ease-in-out infinite alternate;
+}
+.festa-hero::after {
+  background: #5b4bd6; bottom: -40%; left: -14%; opacity: 0.34;
+  animation: festa-drift-b 19s ease-in-out infinite alternate;
+}
+@keyframes festa-drift-a { to { transform: translate(-8%, 8%) scale(1.12); } }
+@keyframes festa-drift-b { to { transform: translate(10%, -6%) scale(1.1); } }
 .festa-hero > * { position: relative; z-index: 1; }
 
 .festa-hero-badge {
   display: inline-flex; align-items: center; gap: 0.4rem;
-  background: var(--vio-soft);
-  border: 1px solid var(--vio-bd);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #d9d2ff;
   border-radius: 999px;
   padding: 6px 15px;
   font-weight: 800;
@@ -78,7 +140,7 @@
 .festa-hero-sub {
   margin: 12px 0 0;
   font-size: clamp(1rem, 3.4vw, 1.22rem);
-  color: var(--sub);
+  color: rgba(255, 255, 255, 0.80);
 }
 .festa-hero-sub strong { color: #ffffff; font-weight: 700; }
 .festa-hero-geom {
@@ -87,7 +149,7 @@
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: #c4b6ff;
 }
 
 /* ── Card ── */
@@ -97,9 +159,7 @@
   border: 1px solid var(--surface-bd);
   border-radius: 18px;
   padding: 22px 24px;
-  backdrop-filter: blur(10px) saturate(130%);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: var(--card-shadow);
 }
 .festa-card-head {
   display: flex;
@@ -113,13 +173,13 @@
   font-size: 1.22rem;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: var(--title);
 }
 
 .festa-address {
   font-size: 1.18rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--title);
   margin: 0 0 16px;
 }
 .festa-maps {
@@ -148,13 +208,12 @@
 .btn-primary.festa-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px var(--glow) !important; }
 .btn-outline-primary.festa-btn {
   background: var(--vio-soft) !important;
-  color: var(--text) !important;
+  color: var(--ink) !important;
   border: 1.5px solid var(--vio-bd) !important;
 }
 .btn-outline-primary.festa-btn:hover {
   border-color: var(--accent) !important;
-  color: #ffffff !important;
-  background: rgba(139, 123, 255, 0.16) !important;
+  background: var(--seg-hover) !important;
 }
 
 .festa-list {
@@ -173,7 +232,7 @@
   line-height: 1.45;
   color: var(--text);
 }
-.festa-list strong { color: #ffffff; }
+.festa-list strong { color: var(--title); }
 .festa-dot {
   flex: 0 0 auto;
   font-size: 1.2rem;
@@ -193,12 +252,14 @@
   padding: 8px 15px;
   font-weight: 600;
   font-size: 0.96rem;
+  transition: transform 0.12s, border-color 0.15s;
 }
+.festa-chip:hover { transform: translateY(-1px); border-color: var(--accent); }
 
 /* ── Due giorni (cross-invito) ── */
 .festa-cross {
   background:
-    radial-gradient(120% 90% at 0% 0%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
+    radial-gradient(120% 90% at 0% 0%, rgba(124, 108, 255, 0.14) 0%, transparent 55%),
     var(--surface);
   border-color: var(--vio-bd);
 }
@@ -208,7 +269,7 @@
   line-height: 1.5;
   color: var(--text);
 }
-.festa-cross-text strong { color: #ffffff; }
+.festa-cross-text strong { color: var(--title); }
 .festa-cross-link {
   display: inline-block;
   margin-top: 2px;
@@ -218,7 +279,7 @@
   border-bottom: 2px solid var(--vio-bd);
   transition: color 0.15s, border-color 0.15s;
 }
-.festa-cross-link:hover { color: #ffffff; border-bottom-color: var(--accent); }
+.festa-cross-link:hover { color: var(--accent-deep); border-bottom-color: var(--accent); }
 .festa-cross-note {
   margin: 12px 0 0;
   font-size: 0.92rem;
@@ -238,7 +299,7 @@
 .festa-label {
   font-weight: 700;
   font-size: 0.95rem;
-  color: #ffffff;
+  color: var(--title);
 }
 .festa-label em { font-weight: 400; color: var(--sub); font-style: normal; }
 
@@ -248,17 +309,17 @@
   border-radius: 12px !important;
   padding: 12px 14px !important;
   font-size: 1rem !important;
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: var(--input-bg) !important;
   color: var(--text) !important;
   box-sizing: border-box;
-  transition: border-color 0.15s, box-shadow 0.15s !important;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s !important;
 }
-.festa-input::placeholder { color: rgba(167, 178, 189, 0.6); }
+.festa-input::placeholder { color: var(--sub); opacity: 0.7; }
 .festa-input:focus {
   outline: none !important;
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 0.22rem rgba(139, 123, 255, 0.25) !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 0 0 0.22rem rgba(124, 108, 255, 0.22) !important;
+  background: var(--input-bg-2) !important;
 }
 
 .festa-seg {
@@ -273,32 +334,37 @@
   text-align: left;
   width: 100%;
   border: 1.5px solid var(--surface-bd);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--seg-bg);
   color: var(--text);
   border-radius: 12px;
   padding: 13px 15px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color .15s, background .15s, box-shadow .15s, transform .05s;
+  transition: border-color .15s, background .15s, box-shadow .15s, transform .08s;
 }
-.festa-seg-btn:hover { border-color: var(--vio-bd); background: rgba(139, 123, 255, 0.08); }
+.festa-seg-btn:hover { border-color: var(--vio-bd); background: var(--seg-hover); transform: translateY(-1px); }
 .festa-seg-btn:active { transform: scale(0.99); }
 .festa-seg-btn.is-active {
   border-color: var(--accent);
-  background: rgba(139, 123, 255, 0.16);
-  box-shadow: inset 0 0 0 1px var(--accent), 0 8px 22px rgba(139, 123, 255, 0.20);
-  color: #ffffff;
+  background: var(--seg-active);
+  box-shadow: inset 0 0 0 1px var(--accent), 0 8px 22px var(--glow);
+  color: var(--title);
 }
 .festa-seg-emoji { font-size: 1.35rem; }
 
 .festa-error {
-  background: rgba(255, 107, 107, 0.12);
-  border: 1px solid rgba(255, 107, 107, 0.4);
-  color: #ff9d9d;
+  background: rgba(220, 70, 70, 0.10);
+  border: 1px solid rgba(220, 70, 70, 0.30);
+  color: #c0392b;
   border-radius: 12px;
   padding: 11px 14px;
   font-size: 0.95rem;
+}
+html.dark .festa-error {
+  background: rgba(255, 107, 107, 0.12);
+  border-color: rgba(255, 107, 107, 0.4);
+  color: #ff9d9d;
 }
 
 .festa-hint {
@@ -340,9 +406,11 @@
 .festa-thanks {
   text-align: center;
   padding: 20px 8px 10px;
+  animation: festa-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.festa-thanks-emoji { font-size: 2.8rem; }
-.festa-thanks h3 { margin: 10px 0 4px; font-weight: 800; color: #ffffff; }
+.festa-thanks-emoji { font-size: 2.8rem; animation: festa-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes festa-pop { from { transform: scale(0); } to { transform: scale(1); } }
+.festa-thanks h3 { margin: 10px 0 4px; font-weight: 800; color: var(--title); }
 .festa-thanks p { margin: 0; color: var(--sub); }
 
 /* ── Lista live ── */
@@ -357,18 +425,17 @@
   gap: 8px;
   font-weight: 700;
   font-size: 0.95rem;
-  color: #ffffff;
+  color: var(--title);
   margin-bottom: 13px;
 }
 .festa-live-dot {
   width: 9px; height: 9px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 0 var(--glow);
   animation: festa-pulse 1.8s infinite;
 }
 @keyframes festa-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(139, 123, 255, 0.5); }
+  0%   { box-shadow: 0 0 0 0 var(--glow); }
   70%  { box-shadow: 0 0 0 9px rgba(139, 123, 255, 0); }
   100% { box-shadow: 0 0 0 0 rgba(139, 123, 255, 0); }
 }
@@ -386,12 +453,13 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 9px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--row-bg);
   border: 1px solid var(--surface-bd);
   border-radius: 12px;
   padding: 10px 13px;
+  animation: festa-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.festa-live-name { font-weight: 700; color: #ffffff; }
+.festa-live-name { font-weight: 700; color: var(--title); }
 .festa-live-badge {
   font-size: 0.8rem;
   font-weight: 700;
@@ -399,9 +467,12 @@
   padding: 3px 11px;
   border: 1px solid transparent;
 }
-.festa-live-badge.p-pomeriggio { background: rgba(139, 123, 255, 0.18); color: #c4a5ff; border-color: var(--vio-bd); }
-.festa-live-badge.p-sera       { background: rgba(99, 179, 237, 0.16); color: #8ecbf5; border-color: rgba(99, 179, 237, 0.34); }
-.festa-live-badge.p-no         { background: rgba(255, 107, 107, 0.14); color: #ff9d9d; border-color: rgba(255, 107, 107, 0.32); }
+.festa-live-badge.p-pomeriggio { background: rgba(124, 108, 255, 0.14); color: #5a48d6; border-color: var(--vio-bd); }
+.festa-live-badge.p-sera       { background: rgba(56, 132, 200, 0.14); color: #2f6fb0; border-color: rgba(56, 132, 200, 0.30); }
+.festa-live-badge.p-no         { background: rgba(220, 70, 70, 0.12); color: #c0392b; border-color: rgba(220, 70, 70, 0.28); }
+html.dark .festa-live-badge.p-pomeriggio { background: rgba(139, 123, 255, 0.18); color: #c4a5ff; }
+html.dark .festa-live-badge.p-sera       { background: rgba(99, 179, 237, 0.16); color: #8ecbf5; border-color: rgba(99, 179, 237, 0.34); }
+html.dark .festa-live-badge.p-no          { background: rgba(255, 107, 107, 0.14); color: #ff9d9d; border-color: rgba(255, 107, 107, 0.32); }
 .festa-live-food {
   font-size: 0.86rem;
   color: var(--sub);
@@ -427,11 +498,19 @@
   border: 1px solid var(--vio-bd);
   border-radius: 22px;
   padding: 44px 34px;
-  backdrop-filter: blur(10px) saturate(130%);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
-  box-shadow: 0 26px 64px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--card-shadow);
   max-width: 420px;
 }
 .festa-closed-emoji { font-size: 3rem; }
-.festa-closed-card h1 { margin: 14px 0 8px; font-size: 1.6rem; font-weight: 800; color: #ffffff; }
+.festa-closed-card h1 { margin: 14px 0 8px; font-size: 1.6rem; font-weight: 800; color: var(--title); }
 .festa-closed-card p { margin: 0; color: var(--sub); }
+
+/* ── Rispetta chi preferisce meno movimento ── */
+@media (prefers-reduced-motion: reduce) {
+  .festa-wrap > *,
+  .festa-hero::before, .festa-hero::after,
+  .festa-live-row, .festa-live-dot,
+  .festa-thanks, .festa-thanks-emoji {
+    animation: none !important;
+  }
+}
