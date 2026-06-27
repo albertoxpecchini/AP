@@ -35,6 +35,12 @@ const DAYS: Record<string, DayCfg> = {
 // inviti restano attivi fino a fine domenica 28.
 const DEADLINE = new Date("2026-06-29T00:00:00+02:00");
 
+// Prenotazione pizze: le ordino al Pizzangolo (Rivalta sul Mincio) entro le
+// 21:00 di sabato 27/06 (il giorno prima). Dopo, il campo "gusto" si blocca:
+// la presenza resta comunque confermabile.
+const PIZZA_DEADLINE = new Date("2026-06-27T21:00:00+02:00");
+const PIZZA_DEADLINE_LABEL = "sabato 27 giugno, ore 21:00";
+
 const ADDRESS = "Strada Vedusino, 4";
 const GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Strada Vedusino 4")}`;
 const AMAPS = `https://maps.apple.com/?q=${encodeURIComponent("Strada Vedusino 4")}`;
@@ -112,6 +118,9 @@ function FestaContent({ day }: { day: DayCfg }) {
     });
     return () => { alive = false; unsub(); };
   }, [day.id]);
+
+  // Le pizze si ordinano in pizzeria entro le 21 di sabato 27: dopo, niente gusti.
+  const pizzaOpen = Date.now() < PIZZA_DEADLINE.getTime();
 
   const canSend = nome.trim().length > 0 && presenza != null && !sending;
 
@@ -205,7 +214,7 @@ function FestaContent({ day }: { day: DayCfg }) {
             <Utensils size={20} /><h2>Cibo & regali</h2>
           </div>
           <ul className="festa-list">
-            <li><span className="festa-dot">🍕</span> <span><strong>Pizza alla teglia dal Cuore di Pizza</strong> (Castellucchio) — scrivi il gusto nel sondaggio qui sotto.</span></li>
+            <li><span className="festa-dot">🍕</span> <span><strong>Pizza alla teglia dal Pizzangolo</strong> (Rivalta sul Mincio) — scrivi il gusto nel sondaggio qui sotto, <strong>entro le 21 di sabato 27 giugno</strong>.</span></li>
             <li><span className="festa-dot">🎁</span> <span><strong>Nessun regalo è richiesto</strong>, non preoccupatevi.</span></li>
           </ul>
         </section>
@@ -271,17 +280,28 @@ function FestaContent({ day }: { day: DayCfg }) {
                 </div>
               </div>
 
-              <label className="festa-field">
+              <div className="festa-field">
                 <span className="festa-label">Pizza alla teglia: che gusto? <em>(facoltativo)</em></span>
-                <textarea
-                  className="form-control festa-input"
-                  value={cibo}
-                  maxLength={200}
-                  rows={2}
-                  placeholder="Es. margherita, patate, würstel, prosciutto…"
-                  onChange={(e) => setCibo(e.target.value)}
-                />
-              </label>
+                {pizzaOpen ? (
+                  <>
+                    <textarea
+                      className="form-control festa-input"
+                      value={cibo}
+                      maxLength={200}
+                      rows={2}
+                      placeholder="Es. margherita, patate, würstel, prosciutto…"
+                      onChange={(e) => setCibo(e.target.value)}
+                    />
+                    <span className="festa-hint">
+                      🍕 Prenoto i gusti al Pizzangolo (Rivalta) entro <strong>{PIZZA_DEADLINE_LABEL}</strong>.
+                    </span>
+                  </>
+                ) : (
+                  <div className="festa-locked">
+                    🔒 Prenotazione pizze chiusa (scadenza: {PIZZA_DEADLINE_LABEL}). Puoi comunque confermare la presenza.
+                  </div>
+                )}
+              </div>
 
               {error && <div className="festa-error">{error}</div>}
 
