@@ -20,19 +20,14 @@ interface DayCfg {
   weekdayShort: string;// "sab" / "dom"
   dayNum: string;      // "27" / "28"
   dateLabel: string;   // "27 giugno"
-  other: { token: string; label: string }; // link all'altro giorno
+  other?: { token: string; label: string }; // link all'altro giorno (se attivo)
 }
 
+// Invito del 27 revocato: resta attivo solo il link di domenica 28.
 const DAYS: Record<string, DayCfg> = {
-  "alb20-mtv74": {
-    id: "27", token: "alb20-mtv74",
-    weekday: "Sabato", weekdayShort: "sab", dayNum: "27", dateLabel: "27 giugno",
-    other: { token: "alb20-mtv74-28", label: "domenica 28" },
-  },
   "alb20-mtv74-28": {
     id: "28", token: "alb20-mtv74-28",
     weekday: "Domenica", weekdayShort: "dom", dayNum: "28", dateLabel: "28 giugno",
-    other: { token: "alb20-mtv74", label: "sabato 27" },
   },
 };
 
@@ -161,19 +156,21 @@ function FestaContent({ day }: { day: DayCfg }) {
           <p className="festa-hero-geom">Geom. Alberto Pecchini</p>
         </header>
 
-        {/* ── Due giorni: invito separato per ciascun giorno ── */}
-        <section className="festa-card festa-cross">
-          <div className="festa-card-head">
-            <ArrowLeftRight size={20} /><h2>Due giorni di festa</h2>
-          </div>
-          <p className="festa-cross-text">
-            Questo invito è per <strong>{day.weekday} {day.dateLabel}</strong>.
-            Non riesci? <a className="festa-cross-link" href={`/festa?k=${day.other.token}`}>Vieni {day.other.label} →</a>
-          </p>
-          <p className="festa-cross-note">
-            E ovviamente puoi esserci <strong>entrambi i giorni</strong>: in tal caso rispondi a tutti e due gli inviti. 💚
-          </p>
-        </section>
+        {/* ── Due giorni: mostrato solo se esiste un secondo invito attivo ── */}
+        {day.other && (
+          <section className="festa-card festa-cross">
+            <div className="festa-card-head">
+              <ArrowLeftRight size={20} /><h2>Due giorni di festa</h2>
+            </div>
+            <p className="festa-cross-text">
+              Questo invito è per <strong>{day.weekday} {day.dateLabel}</strong>.
+              Non riesci? <a className="festa-cross-link" href={`/festa?k=${day.other.token}`}>Vieni {day.other.label} →</a>
+            </p>
+            <p className="festa-cross-note">
+              E ovviamente puoi esserci <strong>entrambi i giorni</strong>: in tal caso rispondi a tutti e due gli inviti. 💚
+            </p>
+          </section>
+        )}
 
         {/* ── Dove ── */}
         <section className="festa-card">
@@ -208,7 +205,7 @@ function FestaContent({ day }: { day: DayCfg }) {
             <Utensils size={20} /><h2>Cibo & regali</h2>
           </div>
           <ul className="festa-list">
-            <li><span className="festa-dot">🍕</span> <span><strong>Prendo d'asporto quello che volete</strong> — scrivilo nel sondaggio qui sotto.</span></li>
+            <li><span className="festa-dot">🍕</span> <span><strong>Pizza alla teglia dal Cuore di Pizza</strong> (Castellucchio) — scrivi il gusto nel sondaggio qui sotto.</span></li>
             <li><span className="festa-dot">🎁</span> <span><strong>Nessun regalo è richiesto</strong>, non preoccupatevi.</span></li>
           </ul>
         </section>
@@ -275,13 +272,13 @@ function FestaContent({ day }: { day: DayCfg }) {
               </div>
 
               <label className="festa-field">
-                <span className="festa-label">Cosa vuoi d'asporto? <em>(facoltativo)</em></span>
+                <span className="festa-label">Pizza alla teglia: che gusto? <em>(facoltativo)</em></span>
                 <textarea
                   className="form-control festa-input"
                   value={cibo}
                   maxLength={200}
                   rows={2}
-                  placeholder="Es. pizza margherita, sushi, kebab…"
+                  placeholder="Es. margherita, patate, würstel, prosciutto…"
                   onChange={(e) => setCibo(e.target.value)}
                 />
               </label>
