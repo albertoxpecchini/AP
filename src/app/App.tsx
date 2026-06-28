@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import { Link } from "react-router";
 import { activateLocalMode } from "./utils/local";
 import { isIOS } from "./utils/device";
@@ -7,16 +7,12 @@ import {
   Mail,
   Phone,
   ArrowUpRight,
-  ArrowRight,
   X,
   Download,
   Eye,
   ExternalLink,
   FileText,
   Menu,
-  FolderOpen,
-  Sparkles,
-  Gamepad2,
 } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
 import {
@@ -27,13 +23,8 @@ import {
   WhatsAppIcon,
   SOCIALS,
 } from "./site/data";
-import {
-  PROJECTS,
-  PROJECT_EMOJI,
-  MATURITA_URLS,
-  GAMES_URLS,
-  ProjectIcon,
-} from "./site/projects";
+import { PROJECTS, ProjectIcon } from "./site/projects";
+import { ArchivioExplorer } from "./archivio/Archivio";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Home / portfolio — look "dark premium" (lo stesso di /me-stesso, /dubliners,
@@ -42,111 +33,6 @@ import {
 // inline qui dentro (come le pagine di approfondimento), così il restyle non
 // tocca la pagina /bio, che resta in stile chiaro.
 // ─────────────────────────────────────────────────────────────────────────────
-
-// ── Maturità: eyebrow che, passandoci sopra col mouse o scorrendo (entrando in
-// viewport), srotola un piccolo "striscione" di festa. Oggi 25/06/2026 ho fatto
-// la maturità ed è andata bene. ──────────────────────────────────────────────
-function MaturitaReveal() {
-  const triggerRef = useRef<HTMLParagraphElement | null>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const el = triggerRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => setInView(e.isIntersecting),
-      { threshold: 0.85, rootMargin: "0px 0px -8% 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <div className={`hm-mat-reveal${inView ? " is-revealed" : ""}`}>
-      <p
-        ref={triggerRef}
-        className="hm-eyebrow hm-eyebrow--gold hm-mat-trigger"
-        tabIndex={0}
-      >
-        🎓 Final state exam · 2026
-      </p>
-      <div className="hm-striscione" role="status" aria-label="Striscione di festa">
-        <div className="hm-bunting" aria-hidden="true" />
-        <div className="hm-striscione-body">
-          <span className="hm-striscione-text">
-            🎉 Ce l'ho fatta — <b>maturità superata con 74/100</b>! 🎓✨
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Voto arrivato: i voti sono online. Mostriamo il risultato della maturità. ─
-function VotiResult() {
-  return (
-    <div className="hm-voti-result" role="status" aria-label="Voto di maturità: 74 su 100">
-      <span className="hm-voti-grade-num">74</span>
-      <span className="hm-voti-grade-den">/100</span>
-    </div>
-  );
-}
-
-// ── Conto alla rovescia fino alla pubblicazione dei voti: ven 26 giu 2026, ore
-// 10:00 (ora italiana, CEST = +02:00). ──────────────────────────────────────
-function VotiCountdown() {
-  const target = useMemo(
-    () => new Date("2026-06-26T10:00:00+02:00").getTime(),
-    [],
-  );
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const diff = target - now;
-  const done = diff <= 0;
-  const total = Math.max(0, diff);
-  const days = Math.floor(total / 86400000);
-  const hours = Math.floor((total % 86400000) / 3600000);
-  const mins = Math.floor((total % 3600000) / 60000);
-  const secs = Math.floor((total % 60000) / 1000);
-
-  const tiles: [number, string][] = [
-    [days, "giorni"],
-    [hours, "ore"],
-    [mins, "min"],
-    [secs, "sec"],
-  ];
-
-  return (
-    <div className={`hm-voti${done ? " is-result" : ""}`}>
-      {done ? (
-        <>
-          <span className="hm-voti-label">🎓 Voto di maturità · ven 26 giu</span>
-          <VotiResult />
-        </>
-      ) : (
-        <>
-          <span className="hm-voti-label">
-            ⏳ Pubblicazione voti · ven 26 giu, ore 10:00
-          </span>
-          <div className="hm-voti-clock" aria-live="off">
-            {tiles.map(([v, l], i) => (
-              <div className="hm-voti-tile" key={l}>
-                <span className="hm-voti-num">{String(v).padStart(2, "0")}</span>
-                <span className="hm-voti-unit">{l}</span>
-                {i < tiles.length - 1 && <span className="hm-voti-sep">:</span>}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
 const CV = [
   {
@@ -270,9 +156,7 @@ function parsePeriodStart(period: string): number {
 }
 
 const NAV = [
-  { href: "#maturita", label: "Maturità" },
-  { href: "#progetti", label: "Work" },
-  { href: "/archivio", label: "Archive", route: true },
+  { href: "#archivio", label: "Archive" },
   { href: "/bio", label: "About", route: true },
   { href: "#curriculum", label: "Résumé" },
   { href: "#contatti", label: "Contact" },
@@ -335,75 +219,6 @@ export default function App() {
     };
     let timer = window.setTimeout(align, 120);
     return () => clearTimeout(timer);
-  }, []);
-
-  const [projectImages, setProjectImages] = useState<Record<string, string>>({});
-
-  // Cartelle "in evidenza" + griglia con il resto (solo siti esterni).
-  const maturitaProjects = useMemo(
-    () => MATURITA_URLS.map((u) => PROJECTS.find((p) => p.url === u)).filter(Boolean) as typeof PROJECTS,
-    [],
-  );
-  const gamesProjects = useMemo(
-    () => GAMES_URLS.map((u) => PROJECTS.find((p) => p.url === u)).filter(Boolean) as typeof PROJECTS,
-    [],
-  );
-  const otherProjects = useMemo(
-    () => PROJECTS.filter((p) => !MATURITA_URLS.includes(p.url) && !GAMES_URLS.includes(p.url)),
-    [],
-  );
-
-  // Rendering di una singola card progetto (condiviso tra cartella e griglia).
-  const renderCard = (p: (typeof PROJECTS)[number]) => {
-    const internal = p.url.startsWith("/");
-    const shot = projectImages[p.title] || (p as any).previewImg;
-    const media = shot ? (
-      <img className="hm-card-shot" src={shot} alt={`Preview of ${p.title}`} loading="lazy" />
-    ) : (
-      <div className="hm-card-icon" aria-hidden="true">
-        <span className="hm-card-icon-badge">
-          <ProjectIcon thumb={(p as any).thumb} size={48} />
-        </span>
-      </div>
-    );
-    const body = (
-      <>
-        <div className="hm-card-media">{media}</div>
-        <div className="hm-card-body">
-          <span className="hm-card-meta">
-            <span aria-hidden="true">{PROJECT_EMOJI[p.title] ?? "📦"}</span> {p.category}
-          </span>
-          <div className="hm-card-titlerow">
-            <span className="hm-card-title">{p.title}</span>
-            <span className="hm-badge hm-badge--live">
-              <span className="hm-badge-dot" aria-hidden="true" />Live
-            </span>
-          </div>
-          <span className="hm-card-date">{p.date}</span>
-          <p className="hm-card-desc">{p.desc}</p>
-          <span className="hm-card-link">
-            Open project <ArrowUpRight size={15} aria-hidden="true" />
-          </span>
-        </div>
-      </>
-    );
-    return internal ? (
-      <Link key={p.title} to={p.url} className="hm-card" aria-label={p.title}>{body}</Link>
-    ) : (
-      <a key={p.title} href={p.url} target="_blank" rel="noreferrer noopener" className="hm-card" aria-label={p.title}>{body}</a>
-    );
-  };
-
-  useEffect(() => {
-    PROJECTS.forEach(async (p) => {
-      if (!p.screenshotUrl) return;
-      try {
-        const dataUrl = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(p.screenshotUrl)}&screenshot=true&viewport.width=600&viewport.height=300`)
-          .then(r => r.json())
-          .then(d => d.data?.screenshot?.url || null);
-        if (dataUrl) setProjectImages((prev) => ({ ...prev, [p.title]: dataUrl }));
-      } catch {}
-    });
   }, []);
 
   // Visualizzatore documenti PDF: blocco scroll + chiusura con Esc.
@@ -514,7 +329,7 @@ export default function App() {
                 motion design — from playful games to real-world business sites.
               </p>
               <div className="hm-hero-actions">
-                <a href="#progetti" className="hm-pill hm-pill--solid">🚀 Projects</a>
+                <a href="#archivio" className="hm-pill hm-pill--solid">🚀 Projects</a>
                 <Link to="/bio" className="hm-pill hm-pill--ghost">👋 Bio</Link>
               </div>
               <div className="hm-hero-quick">
@@ -546,88 +361,20 @@ export default function App() {
           </div>
         </section>
 
-        {/* ② Esame di Maturità — cartella "in evidenza" */}
-        <section id="maturita" className="hm-sec hm-mat-sec">
-          <div className="hm-wrap">
-            <div className="hm-mat-folder">
-              <span className="hm-mat-tab">
-                <FolderOpen size={17} aria-hidden="true" /> Esame di Maturità
-              </span>
-              <span className="hm-mat-pin">
-                <Sparkles size={13} aria-hidden="true" /> In evidenza
-              </span>
-
-              <div className="hm-mat-head">
-                <MaturitaReveal />
-                <h2 className="hm-title">Esame di Maturità</h2>
-                <p className="hm-mat-lead">
-                  Everything for the 2026 final state exam, gathered in one folder: my{" "}
-                  <span className="hm-gold-ink">PCTO</span> work placement, my personal{" "}
-                  <span className="hm-gold-ink">presentation</span>, the literature deep-dives on{" "}
-                  <span className="hm-gold-ink">«Dubliners»</span> and{" "}
-                  <span className="hm-gold-ink">«The Leopard»</span>, and the Italian-literature{" "}
-                  <span className="hm-gold-ink">study hub</span>.
-                </p>
-                <div className="hm-mat-meta">
-                  <span className="hm-mat-count">📂 {maturitaProjects.length} items</span>
-                  <VotiCountdown />
-                </div>
-              </div>
-
-              <div className="hm-cards hm-cards--mat">
-                {maturitaProjects.map(renderCard)}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ② b — Giochi Web · In evidenza */}
-        <section id="giochi" className="hm-sec hm-gam-sec">
-          <div className="hm-wrap">
-            <div className="hm-gam-folder">
-              <span className="hm-gam-tab">
-                <Gamepad2 size={17} aria-hidden="true" /> Giochi Web
-              </span>
-              <span className="hm-gam-pin">
-                <Sparkles size={13} aria-hidden="true" /> In evidenza
-              </span>
-
-              <div className="hm-mat-head">
-                <p className="hm-eyebrow hm-eyebrow--cyan">🎮 Web games · 2026</p>
-                <h2 className="hm-title">I miei giochi</h2>
-                <p className="hm-gam-lead">
-                  Cinque giochi web costruiti da zero con React e TypeScript:{" "}
-                  <span className="hm-cyan-ink">Trivia</span> quiz sull'architettura,{" "}
-                  <span className="hm-cyan-ink">Mappa</span> dalla vista satellitare,{" "}
-                  <span className="hm-cyan-ink">Movimento</span> di memoria spaziale,{" "}
-                  <span className="hm-cyan-ink">Angoli</span> in gradianti e{" "}
-                  <span className="hm-cyan-ink">Parole</span> stile Wordle in italiano.
-                </p>
-                <span className="hm-mat-count" style={{ color: "var(--cyan-2)" }}>🕹️ {gamesProjects.length} giochi</span>
-              </div>
-
-              <div className="hm-cards hm-cards--gam">
-                {gamesProjects.map(renderCard)}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ③ Work */}
-        <section id="progetti" className="hm-sec">
+        {/* ② Archivio progetti — clone di /archivio, incorporato sotto l'hero */}
+        <section id="archivio" className="hm-sec">
           <div className="hm-wrap">
             <div className="hm-sec-head">
               <div>
-                <p className="hm-eyebrow">🚀 Projects</p>
-                <h2 className="hm-title">My work</h2>
+                <p className="hm-eyebrow">🗂️ Archive</p>
+                <h2 className="hm-title">Everything, in one place</h2>
               </div>
-              <Link to="/trivia" className="hm-action">
-                Open featured project <ArrowUpRight size={16} aria-hidden="true" />
+              <Link to="/archivio" className="hm-action">
+                Open full archive <ArrowUpRight size={16} aria-hidden="true" />
               </Link>
             </div>
-
-            <div className="hm-cards">
-              {otherProjects.map(renderCard)}
+            <div className="ax-embed">
+              <ArchivioExplorer embedded />
             </div>
           </div>
         </section>

@@ -7,8 +7,11 @@
    di selezione è il VIOLA brand per legarsi al resto del sito.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.ax-root {
-  /* Palette CHIARA (Windows 11 light) */
+/* Palette CHIARA (Windows 11 light) — definita SIA sul desktop (.ax-root) SIA
+   sulla finestra (.ax-window), così funziona a tutto schermo (/archivio) e anche
+   incorporata nella home (.ax-embed, che avvolge solo .ax-window). */
+.ax-root,
+.ax-window {
   --ax-desk: radial-gradient(120% 90% at 50% -10%, #efeafd 0%, #e7e9f3 45%, #dfe3ec 100%);
   --ax-win: #f3f3f3;
   --ax-titlebar: #e9e9ef;
@@ -23,8 +26,11 @@
   --ax-hover: rgba(0, 0, 0, 0.045);
   --ax-active: rgba(0, 0, 0, 0.08);
   --ax-field: #ffffff;
-  --ax-sel: rgba(109, 75, 214, 0.14);
-  --ax-sel-bd: rgba(109, 75, 214, 0.42);
+  /* Selezione BLU come Windows */
+  --ax-sel: rgba(0, 103, 192, 0.16);
+  --ax-sel-bd: rgba(0, 103, 192, 0.55);
+  --ax-blue: #0067c0;
+  --ax-marquee: rgba(0, 103, 192, 0.16);
   --ax-accent: #6d4bd6;
   --ax-accent-soft: rgba(109, 75, 214, 0.12);
   --ax-shadow: 0 24px 70px -18px rgba(40, 28, 80, 0.45), 0 6px 18px -10px rgba(40, 28, 80, 0.3);
@@ -35,7 +41,10 @@
   --ax-site: #1fb6a8;
   --ax-doc: #e0564c;
   --ax-folder: #f0b429;
+}
 
+/* Il "desktop" a tutto schermo della pagina /archivio */
+.ax-root {
   min-height: 100dvh;
   width: 100%;
   display: grid;
@@ -43,12 +52,20 @@
   padding: clamp(0px, 2.4vw, 34px);
   box-sizing: border-box;
   background: var(--ax-desk);
-  font-family: "Segoe UI", "Titillium Web", system-ui, -apple-system, Tahoma, sans-serif;
+  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
   color: var(--ax-text);
   -webkit-text-size-adjust: 100%;
 }
 
-html.dark .ax-root {
+/* Esploratore incorporato nella home (sotto l'hero): finestra in pagina. */
+.ax-embed { width: 100%; }
+.ax-embed .ax-window {
+  width: 100%;
+  height: min(800px, 82vh);
+}
+
+html.dark .ax-root,
+html.dark .ax-window {
   /* Palette SCURA (Windows 11 dark — come gli screenshot) */
   --ax-desk: radial-gradient(120% 90% at 50% -10%, #161226 0%, #0e1016 50%, #08090d 100%);
   --ax-win: #202020;
@@ -64,8 +81,11 @@ html.dark .ax-root {
   --ax-hover: rgba(255, 255, 255, 0.055);
   --ax-active: rgba(255, 255, 255, 0.1);
   --ax-field: #1d1d1d;
-  --ax-sel: rgba(124, 108, 255, 0.26);
-  --ax-sel-bd: rgba(124, 108, 255, 0.6);
+  /* Selezione BLU come Windows (variante scura) */
+  --ax-sel: rgba(76, 194, 255, 0.22);
+  --ax-sel-bd: rgba(76, 194, 255, 0.55);
+  --ax-blue: #4cc2ff;
+  --ax-marquee: rgba(76, 194, 255, 0.20);
   --ax-accent: #8b7bff;
   --ax-accent-soft: rgba(124, 108, 255, 0.18);
   --ax-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.75), 0 8px 22px -12px rgba(0, 0, 0, 0.6);
@@ -96,7 +116,7 @@ html.dark .ax-root {
   align-items: flex-end;
   gap: 8px;
   height: 44px;
-  padding: 0 12px;
+  padding: 0 0 0 12px;
   background: var(--ax-titlebar);
   border-bottom: 1px solid var(--ax-bd);
   flex: 0 0 auto;
@@ -128,13 +148,21 @@ html.dark .ax-root {
   color: var(--ax-muted);
 }
 .ax-tab-new:hover { background: var(--ax-hover); color: var(--ax-text); }
-.ax-winbtns { margin-left: auto; display: flex; gap: 16px; padding-bottom: 12px; }
-.ax-winbtns i {
-  width: 12px; height: 12px; border-radius: 50%; display: inline-block;
+/* Controlli finestra Windows: − (indietro) · □ (apri /archivio) · × (indietro) */
+.ax-winctl { margin-left: auto; align-self: stretch; display: flex; }
+.ax-winbtn {
+  width: 46px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  color: var(--ax-text2);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
 }
-.ax-winbtns i:nth-child(1) { background: #febc2e; }
-.ax-winbtns i:nth-child(2) { background: #28c840; }
-.ax-winbtns i:nth-child(3) { background: #ff5f57; }
+.ax-winbtn:hover { background: var(--ax-hover); color: var(--ax-text); }
+.ax-winbtn:active { background: var(--ax-active); }
+.ax-winbtn--close:hover { background: #e81123; color: #fff; }
 
 /* ── Toolbar (azioni) ── */
 .ax-toolbar {
@@ -327,7 +355,17 @@ html.dark .ax-root {
   display: flex;
   flex-direction: column;
 }
-.ax-scroll { flex: 1 1 auto; overflow: auto; }
+.ax-scroll { flex: 1 1 auto; overflow: auto; user-select: none; -webkit-user-select: none; }
+
+/* Rettangolo di selezione (marquee) blu, come Windows */
+.ax-marquee {
+  position: fixed;
+  z-index: 2147483200;
+  pointer-events: none;
+  background: var(--ax-marquee);
+  border: 1px solid var(--ax-blue);
+  border-radius: 1px;
+}
 
 /* ── Sezioni "cartelle" (vista radice) ── */
 .ax-section-h {
@@ -443,7 +481,8 @@ html.dark .ax-root {
 }
 .ax-row:hover td { background: var(--ax-hover); }
 .ax-row.is-sel td { background: var(--ax-sel); }
-.ax-row.is-sel td:first-child { box-shadow: inset 2px 0 0 var(--ax-accent); }
+.ax-row.is-sel:hover td { background: var(--ax-sel); }
+.ax-row.is-sel td:first-child { box-shadow: inset 2px 0 0 var(--ax-blue); }
 
 .ax-name {
   display: flex;
@@ -558,7 +597,7 @@ html.dark .ax-root {
   padding: 5px;
   box-shadow: 0 16px 44px -10px rgba(0, 0, 0, 0.4);
   z-index: 2147483000;
-  font-family: "Segoe UI", "Titillium Web", system-ui, sans-serif;
+  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
 }
 .ax-mi {
   display: flex;
