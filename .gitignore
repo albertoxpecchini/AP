@@ -16,6 +16,7 @@ Thumbs.db
 
 # Artefatti rigenerabili
 content/trivia/raw/_IMPORT_REPORT.md
+public/zips
 
 # Log
 npm-debug.log*

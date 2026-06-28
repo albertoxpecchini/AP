@@ -14,16 +14,6 @@ import {
   ExternalLink,
   FileText,
   Menu,
-  Globe2,
-  Compass,
-  Footprints,
-  Type,
-  BrainCircuit,
-  Ruler,
-  UserRound,
-  BookOpen,
-  Cat,
-  GraduationCap,
   FolderOpen,
   Sparkles,
   Gamepad2,
@@ -37,6 +27,13 @@ import {
   WhatsAppIcon,
   SOCIALS,
 } from "./site/data";
+import {
+  PROJECTS,
+  PROJECT_EMOJI,
+  MATURITA_URLS,
+  GAMES_URLS,
+  ProjectIcon,
+} from "./site/projects";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Home / portfolio — look "dark premium" (lo stesso di /me-stesso, /dubliners,
@@ -45,24 +42,6 @@ import {
 // inline qui dentro (come le pagine di approfondimento), così il restyle non
 // tocca la pagina /bio, che resta in stile chiaro.
 // ─────────────────────────────────────────────────────────────────────────────
-
-// Glyph del progetto (lucide). I siti esterni usano il globo.
-function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: number }) {
-  const sw = 2.1;
-  switch (thumb) {
-    case "angoli":     return <Compass size={size} strokeWidth={sw} />;
-    case "parole":     return <Type size={size} strokeWidth={sw} />;
-    case "trivia":     return <BrainCircuit size={size} strokeWidth={sw} />;
-    case "pcto":       return <Ruler size={size} strokeWidth={sw} />;
-    case "mestesso":   return <UserRound size={size} strokeWidth={sw} />;
-    case "dubliners":  return <BookOpen size={size} strokeWidth={sw} />;
-    case "gattopardo": return <Cat size={size} strokeWidth={sw} />;
-    case "letteratura": return <GraduationCap size={size} strokeWidth={sw} />;
-    case "movimento":  return <Footprints size={size} strokeWidth={sw} />;
-    case "mappa":      return <Globe2 size={size} strokeWidth={sw} />;
-    default:           return <Globe2 size={size} strokeWidth={sw} />;
-  }
-}
 
 // ── Maturità: eyebrow che, passandoci sopra col mouse o scorrendo (entrando in
 // viewport), srotola un piccolo "striscione" di festa. Oggi 25/06/2026 ho fatto
@@ -168,144 +147,6 @@ function VotiCountdown() {
     </div>
   );
 }
-
-const PROJECTS = [
-  {
-    category: "Work placement · PCTO",
-    date: "2023 — 2026",
-    title: "PCTO",
-    url: "/pcto",
-    thumb: "pcto",
-    desc: "Three years of work-based learning (PCTO) at Caem Group S.p.A. in Castellucchio, in the technical office of the timber department: 3D modelling of canopies in AutoCAD, observing structural design and archiving quotes. The journey told through illustrations of the woods.",
-    tags: ["Timber dept.", "AutoCAD 3D", "Timber structures", "Technical office"],
-  },
-  {
-    category: "Personal presentation",
-    date: "Jun 22, 2026",
-    title: "About Me",
-    url: "/me-stesso",
-    thumb: "mestesso",
-    desc: "My personal presentation for the 2026 final state exam: who I am, my roots in the family business in Rivalta, the CAT path, my passions (web, travel, shooting, motorbikes) and the future — a single narrated scroll built with my neroverde design system, in the style of /pcto.",
-    tags: ["Presentation", "Design system", "Storytelling", "React"],
-  },
-  {
-    category: "Literature deep-dive",
-    date: "Jun 23, 2026",
-    title: "Dubliners",
-    url: "/dubliners",
-    thumb: "dubliners",
-    desc: "James Joyce's «Dubliners» in 3 minutes: who the author is, what the collection of 15 stories is, the characters (ordinary people, no heroes), the plot in which almost nothing happens and the real theme — being trapped. A narrated scroll built with my «dark premium» violet design system, in the style of /me-stesso, closing on the famous last lines of «The Dead».",
-    tags: ["Literature", "Storytelling", "Design system", "React"],
-  },
-  {
-    category: "Literature deep-dive",
-    date: "Jun 23, 2026",
-    title: "The Leopard",
-    url: "/gattopardo",
-    thumb: "gattopardo",
-    desc: "Tomasi di Lampedusa's «The Leopard» in 3 minutes: who the author is (a single novel, famous only after his death), Sicily in 1860 with the Unification of Italy, the characters (Prince Fabrizio, Tancredi, the Salinas), the collapse of the old order and the theme — «if we want things to stay as they are, things will have to change». A narrated scroll built with my «dark premium» violet design system, in the style of /me-stesso.",
-    tags: ["Literature", "Risorgimento", "Storytelling", "React"],
-  },
-  {
-    category: "Study hub · Maturità",
-    date: "Jun 23, 2026",
-    title: "Letteratura",
-    url: "/letteratura",
-    thumb: "letteratura",
-    desc: "Study schemas for the 2026 final-exam Italian literature programme: one sheet per author and topic (from Naturalism and Verga to Montale's «Satura»), each with a synthesis, key facts, must-know concepts, the texts in the syllabus, cross-links for the oral, and — the core feature — the likely oral-exam questions with hideable model answers to self-test. Built with my «dark premium» violet design system.",
-    tags: ["Study", "Literature", "Design system", "React"],
-  },
-  {
-    category: "Web game",
-    date: "Jun 20, 2026",
-    title: "Mappa",
-    url: "/mappa",
-    thumb: "mappa",
-    desc: "Recognise the world city from its real satellite view: pan and zoom the map hunting for clues (monuments, rivers, the shape of the streets), then type the name. Five difficulty levels, progressive hints (continent, initial, country), scoring with combo bonus, name-based account, live leaderboard and light/dark theme. Esri maps, mouse and touch.",
-    tags: ["React", "TypeScript", "Leaflet", "Game design"],
-  },
-  {
-    category: "Web game",
-    date: "Jun 18, 2026",
-    title: "Movimento",
-    url: "/movimento",
-    thumb: "movimento",
-    desc: "Train your spatial memory: a dot traces a path on a grid and then disappears; you redraw it from memory in a single continuous gesture. Five difficulty levels (from 3×3 to 6×6), accuracy scoring of the trace, streaks with trophies and light/dark theme. Mouse and touch.",
-    tags: ["React", "TypeScript", "Canvas", "Game design"],
-  },
-  {
-    category: "Web game",
-    date: "Jun 15, 2026",
-    title: "Trivia",
-    url: "/trivia",
-    thumb: "trivia",
-    desc: "Trivia quiz on the history of architecture: multiple-choice, true-or-false and open-answer questions, organised in chapters. A relevant photo for every question, scoring with speed bonus, streaks with trophies, an American-style final grade (A–F) and a live leaderboard. Designed as a real game — light and animated — for desktop and mobile.",
-    tags: ["React", "TypeScript", "Game design", "UI/UX"],
-  },
-  {
-    category: "Web game",
-    date: "May 30, 2026",
-    title: "Angoli",
-    url: "/angoli",
-    thumb: "angoli",
-    desc: "Guess the angle in gradians between two randomly rotated rays. Binary feedback (Higher/Lower), five difficulty modes (from 20g to 1g), a consecutive-strike system and geometric trophies.",
-    tags: ["React", "TypeScript", "SVG", "Game design"],
-  },
-  {
-    category: "Web game",
-    date: "May 29, 2026",
-    title: "Parole",
-    url: "/parole",
-    thumb: "parole",
-    desc: "A Wordle-style word game, in Italian. Six attempts to guess a five-letter word: tiles turn green if the letter is in the right place, yellow if present but misplaced, grey if absent. Physical and on-screen keyboard, dictionary validation and a random word each game.",
-    tags: ["React", "TypeScript", "react-router", "Game design"],
-  },
-  {
-    category: "Institutional website",
-    date: "Apr 27, 2026",
-    title: "Rivalta sul Mincio",
-    url: "https://rivaltasulmincio.it",
-    desc: "Responsive website for the tourist destination of Rivalta sul Mincio. Minimalist design with editorial typography, a warm monochrome palette, gapless bento grids, GSAP ScrollTrigger animations and an image-led composition.",
-    tags: ["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Minimal design"],
-    githubRepo: "albertoxpecchini/rivaltasulmincio",
-    screenshotUrl: "https://rivaltasulmincio.it",
-  },
-  {
-    category: "Business website",
-    date: "Apr 20, 2026",
-    title: "Cascina Fontana",
-    url: "https://cascinafontana.xyz",
-    desc: "Website for Cascina Fontana. Polished design and a responsive layout optimised to present the business and the services it offers.",
-    tags: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
-    screenshotUrl: "https://cascinafontana.xyz",
-    previewImg: "/cascina-preview.png",
-  },
-];
-
-// Emoji per ogni progetto (riga "categoria" della card).
-const PROJECT_EMOJI: Record<string, string> = {
-  "PCTO": "🪵",
-  "About Me": "🎓",
-  "Dubliners": "📖",
-  "The Leopard": "🐆",
-  "Letteratura": "🎓",
-  "Mappa": "🗺️",
-  "Movimento": "👣",
-  "Trivia": "🧠",
-  "Angoli": "📐",
-  "Parole": "🔤",
-  "Rivalta sul Mincio": "🏞️",
-  "Cascina Fontana": "🏡",
-};
-
-// Cartella "in evidenza": tutti i materiali per l'Esame di Maturità 2026.
-// L'ordine segue quello qui sotto; questi progetti vengono mostrati SOLO dentro
-// la cartella e tolti dalla griglia "Work" per non duplicarli.
-const MATURITA_URLS = ["/me-stesso", "/pcto", "/letteratura", "/dubliners", "/gattopardo"];
-
-// Cartella "Giochi Web · In evidenza": i 5 web game del progetto.
-// Anche questi vengono tolti dalla griglia "Work" per non duplicarli.
-const GAMES_URLS = ["/trivia", "/mappa", "/movimento", "/angoli", "/parole"];
 
 const CV = [
   {
@@ -431,6 +272,7 @@ function parsePeriodStart(period: string): number {
 const NAV = [
   { href: "#maturita", label: "Maturità" },
   { href: "#progetti", label: "Work" },
+  { href: "/archivio", label: "Archive", route: true },
   { href: "/bio", label: "About", route: true },
   { href: "#curriculum", label: "Résumé" },
   { href: "#contatti", label: "Contact" },

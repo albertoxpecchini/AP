@@ -4,8 +4,10 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "prebuild": "node scripts/build-zips.mjs",
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "zips": "node scripts/build-zips.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.100.1",
@@ -68,6 +70,7 @@
     "vaul": "1.1.2"
   },
   "devDependencies": {
+    "archiver": "^7.0.1",
     "@tailwindcss/vite": "4.1.12",
     "@types/node": "^26.0.0",
     "@types/react": "^18.3.29",
