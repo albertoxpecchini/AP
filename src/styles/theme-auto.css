@@ -135,13 +135,13 @@ html[data-ap-theme="light"] .bio-page {
   --accent-deep: #4a2fb0;
   --ink: #5b34c9;
   --glow: rgba(109, 75, 214, 0.28);
-  --text: #2a1f44;
-  --text-strong: #1d1147;
-  --sub: #6f6391;
-  --surface: rgba(109, 75, 214, 0.05);
-  --surface-bd: rgba(109, 75, 214, 0.16);
-  --vio-soft: rgba(109, 75, 214, 0.08);
-  --vio-bd: rgba(109, 75, 214, 0.24);
+  --text: #221838;
+  --text-strong: #170d3a;
+  --sub: #574a78;
+  --surface: rgba(109, 75, 214, 0.09);
+  --surface-bd: rgba(109, 75, 214, 0.30);
+  --vio-soft: rgba(109, 75, 214, 0.12);
+  --vio-bd: rgba(109, 75, 214, 0.38);
   --panel: linear-gradient(160deg, #f4f1fc 0%, #efeafb 45%, #ffffff 100%);
   background:
     radial-gradient(120% 70% at 50% -10%, rgba(109, 75, 214, 0.08) 0%, transparent 55%),
@@ -274,8 +274,8 @@ html[data-ap-theme="light"] .bio-page .ap-modal {
 
 /* Card della home: superficie chiara leggibile */
 html[data-ap-theme="light"] .hm-card {
-  box-shadow: 0 10px 30px rgba(80, 60, 160, 0.08);
+  box-shadow: 0 10px 30px rgba(80, 60, 160, 0.13);
 }
 html[data-ap-theme="light"] .hm-card:hover {
-  box-shadow: 0 20px 44px rgba(80, 60, 160, 0.16);
+  box-shadow: 0 20px 44px rgba(80, 60, 160, 0.22);
 }

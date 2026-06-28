@@ -756,15 +756,15 @@ export default function MeStesso() {
           --accent-deep: #4a2fb0;
           --ink: #5b34c9;
           --glow: rgba(109, 75, 214, 0.28);
-          --text: #2a1f44;
-          --text-strong: #1d1147;
-          --sub: #6f6391;
-          --surface: rgba(109, 75, 214, 0.05);
-          --surface-bd: rgba(109, 75, 214, 0.16);
-          --vio-soft: rgba(109, 75, 214, 0.08);
-          --vio-bd: rgba(109, 75, 214, 0.24);
-          --bg-light-tint: rgba(109, 75, 214, 0.045);
-          --tree-line: rgba(109, 75, 214, 0.35);
+          --text: #221838;
+          --text-strong: #170d3a;
+          --sub: #574a78;
+          --surface: rgba(109, 75, 214, 0.09);
+          --surface-bd: rgba(109, 75, 214, 0.30);
+          --vio-soft: rgba(109, 75, 214, 0.12);
+          --vio-bd: rgba(109, 75, 214, 0.38);
+          --bg-light-tint: rgba(109, 75, 214, 0.08);
+          --tree-line: rgba(109, 75, 214, 0.50);
           --bc-like: #15803d; --bc-easy: #5b34c9; --bc-hard: #b45309;
           --page-bg:
             radial-gradient(120% 70% at 50% -10%, rgba(109, 75, 214, 0.08) 0%, transparent 55%),
@@ -783,7 +783,7 @@ export default function MeStesso() {
           --thanks-bg: linear-gradient(135deg, #f4f1fc 0%, #ece6fa 100%);
           --thanks-scrim: linear-gradient(120deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.6) 50%, rgba(236,230,250,0.4) 100%);
           --footer-bg: #f3f0fb;
-          --shot-bg: rgba(109, 75, 214, 0.04);
+          --shot-bg: rgba(109, 75, 214, 0.07);
           --ph-bg:
             radial-gradient(120% 120% at 30% 20%, rgba(109, 75, 214, 0.16), rgba(255, 255, 255, 0.2)),
             linear-gradient(135deg, #efeafb 0%, #ffffff 100%);
