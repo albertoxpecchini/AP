@@ -385,6 +385,83 @@ html.dark .festa-prop { opacity: 0.42; }
   font-style: italic;
 }
 
+/* ── Countdown + azioni della data (calendario, meteo) ── */
+.festa-after-date { text-align: center; margin: 6px 0 2px; }
+.festa-count {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.festa-count-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+  padding: 9px 6px;
+  border: 1px solid var(--paper-bd);
+  border-radius: 10px;
+  background: rgba(255, 251, 240, 0.6);
+}
+.festa-count-num {
+  font-family: "Lora", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--ink-title);
+  font-variant-numeric: tabular-nums;
+}
+.festa-count-unit {
+  margin-top: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--foil-3);
+}
+.festa-count--live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 1.02rem;
+  color: var(--accent-deep);
+}
+.festa-date-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.festa-cal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1.5px solid var(--foil);
+  background: rgba(184, 146, 63, 0.10);
+  color: var(--foil-3);
+  font-weight: 800;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.festa-cal-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(184, 146, 63, 0.18);
+  box-shadow: 0 8px 18px -8px rgba(120, 90, 30, 0.6);
+}
+.festa-weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
 /* ── Cross-invito (secondo giorno) ── */
 .festa-cross {
   display: flex;

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MapPin, Navigation, Gift, Pizza, PartyPopper, Send, Loader2,
-  ArrowLeftRight, ListChecks, PenLine, CalendarHeart, Scissors,
+  ArrowLeftRight, ListChecks, PenLine, CalendarHeart, Scissors, CalendarPlus,
 } from "lucide-react";
 import {
   submitPresenza, fetchPresenze, subscribePresenze,
@@ -41,6 +41,13 @@ const DEADLINE = new Date("2026-06-29T00:00:00+02:00");
 // la presenza resta comunque confermabile.
 const PIZZA_DEADLINE = new Date("2026-06-27T21:00:00+02:00");
 const PIZZA_DEADLINE_LABEL = "sabato 27 giugno, ore 21:00";
+
+// Inizio festa: domenica 28 giugno 2026, ore 18:00 (Europe/Rome, CEST = +02:00).
+// Usato dal countdown e dal file .ics ("Aggiungi al calendario").
+const FESTA_START = new Date("2026-06-28T18:00:00+02:00");
+const FESTA_END = new Date("2026-06-29T01:00:00+02:00"); // "tarda notte"
+// Coordinate di Rivalta sul Mincio: meteo della serata (Open-Meteo, no key).
+const COORDS = { lat: 45.181, lon: 10.662 };
 
 const ADDRESS = "Strada Vedusino, 4";
 const GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Strada Vedusino 4")}`;
@@ -134,6 +141,118 @@ function Medallion({ emoji, anim }: { emoji: string; anim: string }) {
       <E e={emoji} className={`festa-medal-ico festa-anim-${anim}`} />
     </span>
   );
+}
+
+// ─── Countdown alla festa (live, una tile per unità) ────────────────────────
+function Countdown() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const diff = FESTA_START.getTime() - now;
+  // Festa iniziata (o in corso): niente conto alla rovescia, messaggio festoso.
+  if (diff <= 0) {
+    return (
+      <div className="festa-count festa-count--live">
+        <E e="🎉" /> La festa è iniziata — ci vediamo!
+      </div>
+    );
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  const tiles: [number, string][] = [
+    [days, "giorni"], [hours, "ore"], [mins, "min"], [secs, "sec"],
+  ];
+  return (
+    <div className="festa-count" aria-label="Conto alla rovescia alla festa">
+      {tiles.map(([v, l]) => (
+        <div className="festa-count-tile" key={l}>
+          <span className="festa-count-num">{String(v).padStart(2, "0")}</span>
+          <span className="festa-count-unit">{l}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Meteo della serata (Open-Meteo, gratis e senza API key) ────────────────
+// Previsione oraria di Rivalta per il 28/06: prendo l'ora ~20:00. Best-effort:
+// se la chiamata fallisce o la data è fuori finestra previsionale, non mostra
+// nulla (la riga sparisce, niente errori).
+function weatherInfo(code: number): { emoji: string; label: string } {
+  if (code === 0) return { emoji: "☀️", label: "sereno" };
+  if (code === 1 || code === 2) return { emoji: "🌤️", label: "poco nuvoloso" };
+  if (code === 3) return { emoji: "☁️", label: "coperto" };
+  if (code === 45 || code === 48) return { emoji: "🌫️", label: "nebbia" };
+  if (code >= 51 && code <= 57) return { emoji: "🌦️", label: "pioviggine" };
+  if (code >= 61 && code <= 67) return { emoji: "🌧️", label: "pioggia" };
+  if (code >= 71 && code <= 77) return { emoji: "🌨️", label: "neve" };
+  if (code >= 80 && code <= 82) return { emoji: "🌦️", label: "rovesci" };
+  if (code >= 95) return { emoji: "⛈️", label: "temporale" };
+  return { emoji: "🌡️", label: "—" };
+}
+
+function Weather() {
+  const [w, setW] = useState<{ emoji: string; text: string } | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const d = "2026-06-28";
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${COORDS.lat}&longitude=${COORDS.lon}&hourly=temperature_2m,weather_code&timezone=Europe%2FRome&start_date=${d}&end_date=${d}`;
+    fetch(url)
+      .then((r) => r.json())
+      .then((j) => {
+        if (!alive) return;
+        const times: string[] = j?.hourly?.time ?? [];
+        const temps: number[] = j?.hourly?.temperature_2m ?? [];
+        const codes: number[] = j?.hourly?.weather_code ?? [];
+        let i = times.findIndex((t) => t.endsWith("T20:00"));
+        if (i < 0) i = times.findIndex((t) => t.endsWith("T19:00"));
+        if (i < 0 || temps[i] == null) return;
+        const { emoji, label } = weatherInfo(codes[i]);
+        setW({ emoji, text: `Serata: ${Math.round(temps[i])}° · ${label}` });
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  if (!w) return null;
+  return <span className="festa-weather"><E e={w.emoji} /> {w.text}</span>;
+}
+
+// ─── "Aggiungi al calendario": genera e scarica un .ics al volo ─────────────
+function downloadIcs() {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const fmt = (d: Date) =>
+    `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T` +
+    `${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//albertopecchini.it//festa//IT",
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
+    "UID:festa-alberto-28@albertopecchini.it",
+    `DTSTAMP:${fmt(new Date())}`,
+    `DTSTART:${fmt(FESTA_START)}`,
+    `DTEND:${fmt(FESTA_END)}`,
+    "SUMMARY:🎉 Festa di Alberto (20 anni + Maturità)",
+    "LOCATION:Strada Vedusino 4\\, Rivalta sul Mincio",
+    "DESCRIPTION:Festa dalle 18 a tarda notte. Piscina dal pomeriggio\\, cena dalle 18. RSVP: https://www.albertopecchini.it/festa?k=alb20-mtv74-28",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "festa-alberto.ics";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // ─── Schermata neutra (token errato o evento concluso) ──────────────────────
@@ -297,6 +416,17 @@ function FestaContent({ day }: { day: DayCfg }) {
             <span className="festa-date-num">{day.dayNum}</span>
             <span className="festa-date-my">{monthLabel} {year}</span>
             <span className="festa-date-note">dalle 18 fino a tarda notte <E e="🌙" /></span>
+          </div>
+
+          {/* Countdown live + meteo serata + aggiungi al calendario */}
+          <div className="festa-after-date">
+            <Countdown />
+            <div className="festa-date-actions">
+              <button type="button" className="festa-cal-btn" onClick={downloadIcs}>
+                <CalendarPlus size={16} /> Aggiungi al calendario
+              </button>
+              <Weather />
+            </div>
           </div>
 
           {/* Due giorni: blocco mostrato solo se esiste un secondo invito attivo */}
