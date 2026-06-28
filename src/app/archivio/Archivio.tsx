@@ -35,6 +35,8 @@ import {
   ExternalLink,
   Link2,
   Check,
+  PanelRight,
+  Info,
 } from "lucide-react";
 import {
   PROJECTS,
@@ -49,7 +51,48 @@ import {
   zipHref,
   type Project,
 } from "../site/projects";
+import { readmeOf } from "../site/readmes";
 import "./archivio.css";
+
+// ── Renderer markdown minimale per i README del riquadro dettagli ──
+function mdInline(text: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  const re = /\*\*([^*]+)\*\*|`([^`]+)`/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(text))) {
+    if (m.index > last) nodes.push(text.slice(last, m.index));
+    if (m[1] != null) nodes.push(<strong key={k++}>{m[1]}</strong>);
+    else nodes.push(<code key={k++}>{m[2]}</code>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
+}
+
+function ReadmeView({ text }: { text: string }) {
+  const lines = text.replace(/\r/g, "").split("\n");
+  const blocks: React.ReactNode[] = [];
+  let i = 0;
+  let key = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i++; continue; }
+    if (line.startsWith("## ")) { blocks.push(<h4 key={key++} className="ax-md-h">{mdInline(line.slice(3))}</h4>); i++; continue; }
+    if (line.startsWith("> ")) { blocks.push(<p key={key++} className="ax-md-note">{mdInline(line.slice(2))}</p>); i++; continue; }
+    if (line.startsWith("- ")) {
+      const items: React.ReactNode[] = [];
+      while (i < lines.length && lines[i].startsWith("- ")) { items.push(<li key={items.length}>{mdInline(lines[i].slice(2))}</li>); i++; }
+      blocks.push(<ul key={key++} className="ax-md-ul">{items}</ul>);
+      continue;
+    }
+    const para: string[] = [];
+    while (i < lines.length && lines[i].trim() && !/^(## |- |> )/.test(lines[i])) { para.push(lines[i]); i++; }
+    blocks.push(<p key={key++} className="ax-md-p">{mdInline(para.join(" "))}</p>);
+  }
+  return <>{blocks}</>;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // "Esplora File di Windows 11" per i progetti. Contiene tutto il lavoro
@@ -130,7 +173,9 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
   const [visible, setVisible] = useState<Set<ColKey>>(() => new Set(load<ColKey[]>("ap-archivio-cols", DEFAULT_VISIBLE)));
   const [widths, setWidths] = useState<Record<ColKey, number>>(() => ({ ...DEF_WIDTHS, ...load("ap-archivio-widths", {}) }));
   const [view, setView] = useState<"details" | "icons">(() => load("ap-archivio-view", "details"));
+  const [detailsOpen, setDetailsOpen] = useState<boolean>(() => load("ap-archivio-details", true));
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [sizes, setSizes] = useState<Record<string, number>>({});
   const [flash, setFlash] = useState("");
 
@@ -142,6 +187,7 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
   useEffect(() => save("ap-archivio-cols", Array.from(visible)), [visible]);
   useEffect(() => save("ap-archivio-widths", widths), [widths]);
   useEffect(() => save("ap-archivio-view", view), [view]);
+  useEffect(() => save("ap-archivio-details", detailsOpen), [detailsOpen]);
 
   useEffect(() => {
     if (!embedded) document.title = "Archivio progetti — Alberto Pecchini";
@@ -302,7 +348,14 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
     } else {
       setSelected(new Set([id]));
     }
+    setDetailId(id);
   };
+
+  const detailItem = detailId ? ALL.find((p) => p.id === detailId) ?? null : null;
+
+  // "Posizione" stile Windows: dominio + percorso (interni/PDF) o URL (esterni).
+  const locationOf = (p: Project) =>
+    p.url.startsWith("/") ? `albertopecchini.it${p.url}` : p.url.replace(/^https?:\/\//, "");
 
   // ── Selezione a rettangolo (marquee) blu, come su Windows ──
   const startMarquee = (e: React.PointerEvent) => {
@@ -328,11 +381,16 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
       const h = Math.abs(dy);
       setMarquee({ x, y, w, h });
       const ids = new Set(base);
+      let first: string | null = null;
       scrollRef.current?.querySelectorAll<HTMLElement>("[data-id]").forEach((el) => {
         const r = el.getBoundingClientRect();
-        if (r.left < x + w && r.right > x && r.top < y + h && r.bottom > y) ids.add(el.dataset.id!);
+        if (r.left < x + w && r.right > x && r.top < y + h && r.bottom > y) {
+          ids.add(el.dataset.id!);
+          if (!first) first = el.dataset.id!;
+        }
       });
       setSelected(ids);
+      if (first) setDetailId(first);
     };
     const up = () => {
       setMarquee(null);
@@ -389,13 +447,22 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
         <button className="ax-tbtn ax-tbtn--ico" disabled title="Altro"><MoreHorizontal size={16} /></button>
         <span className="ax-tspring" />
         <div className="ax-seg" role="group" aria-label="Vista">
-          <button className={view === "details" ? "is-on" : ""} onClick={() => setView("details")} title="Dettagli">
-            <List size={15} /> Dettagli
+          <button className={view === "details" ? "is-on" : ""} onClick={() => setView("details")} title="Vista dettagli" aria-label="Vista dettagli">
+            <List size={15} />
           </button>
-          <button className={view === "icons" ? "is-on" : ""} onClick={() => setView("icons")} title="Icone">
-            <LayoutGrid size={15} /> Icone
+          <button className={view === "icons" ? "is-on" : ""} onClick={() => setView("icons")} title="Vista icone" aria-label="Vista icone">
+            <LayoutGrid size={15} />
           </button>
         </div>
+        <span className="ax-tsep" />
+        <button
+          className={`ax-tbtn ax-tbtn--pane${detailsOpen ? " is-on" : ""}`}
+          onClick={() => setDetailsOpen((v) => !v)}
+          title="Riquadro dettagli"
+          aria-pressed={detailsOpen}
+        >
+          <PanelRight size={16} /> <span className="ax-tbtn-lbl">Dettagli</span>
+        </button>
       </div>
 
       {/* ── Barra indirizzi + ricerca ── */}
@@ -449,7 +516,7 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
               <button
                 key={f.id}
                 className={`ax-side-item${folder === f.id ? " is-on" : ""}`}
-                onClick={() => { setFolder(f.id); setSelected(new Set()); }}
+                onClick={() => { setFolder(f.id); setSelected(new Set()); setDetailId(null); }}
               >
                 <span className="ax-side-ico"><f.Icon size={17} /></span>
                 {f.label}
@@ -459,7 +526,7 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
           </div>
           <div className="ax-side-group">
             <div className="ax-side-title">Posizioni</div>
-            <button className={`ax-side-item${folder === "root" ? " is-on" : ""}`} onClick={() => { setFolder("root"); setSelected(new Set()); }}>
+            <button className={`ax-side-item${folder === "root" ? " is-on" : ""}`} onClick={() => { setFolder("root"); setSelected(new Set()); setDetailId(null); }}>
               <span className="ax-side-ico"><Monitor size={17} /></span>
               Questo PC
               <span className="ax-side-count">{ALL.length}</span>
@@ -637,6 +704,61 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
             {flash && <span>{flash}</span>}
           </div>
         </main>
+
+        {/* ── Riquadro dettagli (destra) — info + README della voce ── */}
+        {detailsOpen && (
+          <aside className="ax-details" aria-label="Riquadro dettagli">
+            {detailItem ? (
+              <div className="ax-dt-body">
+                <div className="ax-dt-preview">
+                  {detailItem.previewImg ? (
+                    <img src={detailItem.previewImg} alt={`Anteprima di ${detailItem.title}`} />
+                  ) : (
+                    <span className="ax-dt-bigico" data-kind={detailItem.kind}><TypeGlyph p={detailItem} size={46} /></span>
+                  )}
+                </div>
+                <div className="ax-dt-name">
+                  <span className="ax-name-ico" data-kind={detailItem.kind}><TypeGlyph p={detailItem} /></span>
+                  <span className="ax-dt-filename">{detailItem.title}</span>
+                </div>
+                <div className="ax-dt-actions">
+                  <button className="ax-dt-btn ax-dt-btn--primary" onClick={() => openOnline(detailItem)}>
+                    <ExternalLink size={15} /> Apri online
+                  </button>
+                  {zipHref(detailItem) && (
+                    <button className="ax-dt-btn" onClick={() => download(detailItem)}>
+                      <Download size={15} /> {detailItem.kind === "doc" ? "Scarica PDF" : "Scarica ZIP"}
+                    </button>
+                  )}
+                  <button className="ax-dt-btn" onClick={() => copyLink(detailItem)}>
+                    <Share2 size={15} /> Condividi
+                  </button>
+                </div>
+
+                <div className="ax-dt-sec-title">Dettagli</div>
+                <dl className="ax-dt-list">
+                  <div className="ax-dt-row"><dt>Tipo</dt><dd>{typeLabel(detailItem.kind)}</dd></div>
+                  <div className="ax-dt-row"><dt>Dimensione</dt><dd>{formatBytes(sizes[detailItem.id])}</dd></div>
+                  <div className="ax-dt-row"><dt>Posizione</dt><dd title={locationOf(detailItem)}>{locationOf(detailItem)}</dd></div>
+                  <div className="ax-dt-row"><dt>Ultima modifica</dt><dd>{formatDate(detailItem.modified)}</dd></div>
+                  <div className="ax-dt-row"><dt>Categoria</dt><dd title={detailItem.category}>{detailItem.category}</dd></div>
+                  <div className="ax-dt-row"><dt>Autori</dt><dd>{AUTHOR}</dd></div>
+                  {detailItem.tags?.length ? (
+                    <div className="ax-dt-row"><dt>Tag</dt><dd title={detailItem.tags.join(", ")}>{detailItem.tags.join(", ")}</dd></div>
+                  ) : null}
+                </dl>
+
+                <div className="ax-dt-sec-title">README</div>
+                <div className="ax-dt-readme"><ReadmeView text={readmeOf(detailItem)} /></div>
+              </div>
+            ) : (
+              <div className="ax-dt-empty">
+                <Info size={30} aria-hidden="true" />
+                <p>Seleziona un elemento per vederne i dettagli e il README.</p>
+              </div>
+            )}
+          </aside>
+        )}
       </div>
 
       {/* Rettangolo di selezione (marquee) — posizione fissa, coord. viewport */}
