@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import SiteFooter from "../site/SiteFooter";
 import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
@@ -1015,6 +1016,7 @@ export default function Mappa() {
         .map-tcta  { width:100%; padding:.8rem 1.4rem; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:filter .15s; }
         .map-tcta:hover { filter:brightness(1.08); }
       `}</style>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router";
+import SiteFooter from "../site/SiteFooter";
 import {
   ArrowLeft,
   MapPin,
@@ -475,18 +476,7 @@ export default function Pcto() {
         </section>
       </main>
 
-      <footer className="pcto-footer">
-        <div className="container">
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-4">
-            <span style={{ opacity: 0.8 }}>
-              © {new Date().getFullYear()} Alberto Pecchini — ITT «Carlo d'Arco», Mantova
-            </span>
-            <Link to="/" className="text-white text-decoration-none d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <style>{`
         /* ── Look "dark premium" viola — identico al gioco Trivia ─────────────

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
+import SiteFooter from "../site/SiteFooter";
 import confetti from "canvas-confetti";
 import { ArrowLeft, Moon, Sun, Flame, Check, X as XIcon, ListOrdered, RotateCcw, Send, GraduationCap, Maximize2, Minimize2 } from "lucide-react";
 
@@ -735,6 +736,7 @@ export default function Trivia() {
       )}
 
       <style>{styles}</style>
+      <SiteFooter />
     </div>
   );
 }

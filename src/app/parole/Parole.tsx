@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import SiteFooter from "../site/SiteFooter";
 import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
@@ -2271,6 +2272,7 @@ export default function Parole() {
         .parole-page.dark .parole-mini-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 12px rgba(95,208,154,0.7), inset 0 0 5px rgba(255,255,255,0.3); }
         .parole-page.dark .parole-mini-key--present { background: var(--amber); color: #fff; box-shadow: 0 0 12px rgba(224,160,32,0.75), inset 0 0 5px rgba(255,255,255,0.35); }
       `}</style>
+      <SiteFooter />
     </div>
   );
 }

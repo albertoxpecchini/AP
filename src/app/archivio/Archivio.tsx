@@ -52,6 +52,7 @@ import {
   type Project,
 } from "../site/projects";
 import { readmeOf } from "../site/readmes";
+import SiteFooter from "../site/SiteFooter";
 import "./archivio.css";
 
 // ── Renderer markdown minimale per i README del riquadro dettagli ──
@@ -908,8 +909,11 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
 // Pagina /archivio "pura": la finestra a tutto schermo sulla "scrivania".
 export default function Archivio() {
   return (
-    <div className="ax-root">
-      <ArchivioExplorer />
-    </div>
+    <>
+      <div className="ax-root">
+        <ArchivioExplorer />
+      </div>
+      <SiteFooter />
+    </>
   );
 }

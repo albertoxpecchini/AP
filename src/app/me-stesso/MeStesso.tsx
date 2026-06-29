@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { currentTheme, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
+import SiteFooter from "../site/SiteFooter";
 import {
   ArrowLeft,
   GraduationCap,
@@ -720,18 +721,7 @@ export default function MeStesso() {
         </section>
       </main>
 
-      <footer className="ms-footer">
-        <div className="container">
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-4">
-            <span style={{ opacity: 0.8 }}>
-              Presentazione personale di Alberto Pecchini · Esame di Stato 2026
-            </span>
-            <Link to="/" className="ms-footer-link text-decoration-none d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <style>{`
         /* ─────────────────────────────────────────────────────────────────────

@@ -10,6 +10,7 @@ import {
   type DonatoreRow,
 } from "./donazioniApi";
 import { currentTheme, subscribeTheme, type Theme } from "../theme/themeCore";
+import SiteFooter from "../site/SiteFooter";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sostieni / Donazioni — veste "finestre che galleggiano" su sfondo vivo.
@@ -409,12 +410,7 @@ export default function Sostieni() {
         </div>
       </main>
 
-      <footer className="sos-foot">
-        <div className="sos-wrap sos-foot-inner">
-          <MessageCircle size={14} aria-hidden="true" />
-          <span>© {new Date().getFullYear()} Alberto Pecchini — grazie.</span>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <style>{`
         .sos-page {

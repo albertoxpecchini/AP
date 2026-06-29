@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { ArrowLeft, ArrowUpRight, MapPin, GraduationCap, UserRound } from "lucide-react";
 import InterestModal from "./InterestModal";
+import SiteFooter from "./SiteFooter";
 import { HOBBY, PASSIONI, SKILLS, type Interest } from "./data";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -220,18 +221,7 @@ export default function Bio() {
         </section>
       </main>
 
-      <footer className="bio-footer">
-        <div className="container">
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-4">
-            <span style={{ opacity: 0.8 }}>
-              About · Alberto Pecchini — Designer &amp; Front-end Developer
-            </span>
-            <Link to="/" className="text-white text-decoration-none d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Back to home
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <InterestModal item={selectedItem} onClose={() => setSelectedItem(null)} />
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import SiteFooter from "../site/SiteFooter";
 import { requestToggle, subscribeTheme } from "../theme/themeCore";
 import { Link } from "react-router";
 import confetti from "canvas-confetti";
@@ -1390,6 +1391,7 @@ export default function Angoli() {
         }
         .ang-tcta:hover { background:var(--green-dark); }
       `}</style>
+      <SiteFooter />
     </div>
   );
 }

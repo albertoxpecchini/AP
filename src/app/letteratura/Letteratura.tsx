@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router";
+import SiteFooter from "../site/SiteFooter";
 import {
   ArrowLeft,
   ArrowUp,
@@ -403,22 +404,7 @@ export default function Letteratura() {
         </section>
       </main>
 
-      <footer className="lt-footer">
-        <div className="container">
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-4">
-            <span style={{ opacity: 0.8 }}>
-              Schemi di studio · Letteratura italiana — Maturità 2026 · Alberto Pecchini
-            </span>
-            <Link to="/" className="text-white text-decoration-none d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
-            </Link>
-          </div>
-          <p className="mb-0 pb-3" style={{ fontSize: "0.78rem", color: "var(--sub)" }}>
-            Sussidio personale per il ripasso: sintesi e domande d'orale basate sul programma di classe.
-            Verifica sempre testi e pagine sul manuale in adozione.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
 
       {/* Torna su */}
       <button

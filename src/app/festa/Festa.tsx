@@ -8,6 +8,7 @@ import {
   type PresenzaRow, type Presenza, type Giorno,
 } from "./festaApi";
 import { E } from "./AppleEmoji";
+import SiteFooter from "../site/SiteFooter";
 import "./festa.css";
 
 // ─── Giorni della festa: due inviti separati, un link (token) ciascuno ──────
@@ -282,8 +283,8 @@ export default function Festa() {
     return { day, expired };
   }, []);
 
-  if (!access.day) return <FestaClosed expired={false} />;
-  if (access.expired) return <FestaClosed expired={true} />;
+  if (!access.day) return <><FestaClosed expired={false} /><SiteFooter /></>;
+  if (access.expired) return <><FestaClosed expired={true} /><SiteFooter /></>;
 
   return <FestaContent day={access.day} />;
 }
@@ -692,6 +693,7 @@ function FestaContent({ day }: { day: DayCfg }) {
           <p className="festa-foot-sign">Alberto <E e="💚" /></p>
         </footer>
       </div>
+      <SiteFooter />
     </div>
   );
 }

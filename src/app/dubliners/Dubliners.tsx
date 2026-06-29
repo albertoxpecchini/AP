@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import SiteFooter from "../site/SiteFooter";
 import {
   ArrowLeft,
   ArrowRight,
@@ -420,25 +421,7 @@ export default function Dubliners() {
         </section>
       </main>
 
-      <footer className="db-footer">
-        <div className="container">
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-4">
-            <span style={{ opacity: 0.8 }}>
-              «Gente di Dublino» · James Joyce, 1914 — approfondimento di Alberto Pecchini
-            </span>
-            <Link to="/" className="text-white text-decoration-none d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" /> Torna alla home
-            </Link>
-          </div>
-          <p className="mb-0 pb-3" style={{ fontSize: "0.78rem", color: "var(--sub)" }}>
-            Immagini:{" "}
-            <a href="https://commons.wikimedia.org" target="_blank" rel="noreferrer" style={{ color: "var(--ink)" }}>
-              Wikimedia Commons
-            </a>{" "}
-            — pubblico dominio e CC0 (ritratto di Joyce, 1915; Dublino, O'Connell Bridge ~1890; nevicata nel Wicklow).
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <style>{`
         /* ─────────────────────────────────────────────────────────────────────
