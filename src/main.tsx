@@ -5,6 +5,9 @@ import App from "./app/App.tsx";
 import { disableBackspaceNavigation } from "./app/utils/keyboard.ts";
 import ThemeWidget from "./app/theme/ThemeWidget.tsx";
 import { syncTheme } from "./app/theme/themeCore.ts";
+import LanguageSwitcher from "./app/i18n/LanguageSwitcher.tsx";
+import { startI18nEngine } from "./app/i18n/translateDom.ts";
+import { initLangAttr } from "./app/i18n/langCore.ts";
 import "./styles/index.css";
 
 // Il Backspace non deve più far "uscire" dalla pagina (navigazione Indietro del
@@ -13,6 +16,9 @@ disableBackspaceNavigation();
 
 // Tema globale applicato subito (mode manuale o sensore orario).
 syncTheme();
+
+// Lingua globale: imposta <html lang> col valore memorizzato/rilevato.
+initLangAttr();
 
 const Bio = lazy(() => import("./app/site/Bio.tsx"));
 const Parole = lazy(() => import("./app/parole/Parole.tsx"));
@@ -151,5 +157,12 @@ createRoot(document.getElementById("root")!).render(
     </BrowserRouter>
     {/* Widget tema globale: tasto luna/sole + sensore orario, su ogni pagina. */}
     <ThemeWidget />
+    {/* Switcher di lingua globale: IT/EN/FR/DE, su ogni pagina, senza ricaricare. */}
+    <LanguageSwitcher />
   </>,
 );
+
+// Avvia il motore di traduzione DOPO il primo render: traduce subito ciò che è
+// già a schermo (la home non è lazy → DOM presente) e poi segue ogni cambio
+// pagina/contenuto e ogni cambio lingua.
+startI18nEngine();
