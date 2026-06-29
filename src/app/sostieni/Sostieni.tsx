@@ -116,7 +116,7 @@ export default function Sostieni() {
     // Onde viola "dark premium" in scuro, lavanda chiara in tema chiaro.
     const optsFor = (t: Theme) =>
       t === "light"
-        ? { color: 0xb7a6ff, shininess: 42, waveHeight: 13, waveSpeed: 0.55, zoom: 0.92 }
+        ? { color: 0x8e74e6, shininess: 55, waveHeight: 16, waveSpeed: 0.55, zoom: 0.92 }
         : { color: 0x342a7a, shininess: 30, waveHeight: 18, waveSpeed: 0.62, zoom: 0.86 };
 
     (async () => {
@@ -570,8 +570,8 @@ export default function Sostieni() {
           background: linear-gradient(180deg, #ffffff 0%, #f5f2fd 100%);
         }
         html[data-ap-theme="light"] .sos-hdr { background: rgba(255, 255, 255, 0.82); }
-        html[data-ap-theme="light"] .sos-vanta { opacity: 0.55; }
-        html[data-ap-theme="light"] .sos-scrim { background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.18) 32%, rgba(255,255,255,0.66) 100%); }
+        html[data-ap-theme="light"] .sos-vanta { opacity: 0.78; }
+        html[data-ap-theme="light"] .sos-scrim { background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 34%, rgba(255,255,255,0.5) 100%); }
       `}</style>
     </div>
   );
