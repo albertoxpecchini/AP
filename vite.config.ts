@@ -3,6 +3,7 @@ import path from 'path'
 import { execSync } from 'child_process'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
@@ -123,6 +124,49 @@ export default defineConfig({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    // Service worker: precache dell'app-shell (JS/CSS/HTML/font) + cache delle
+    // immagini man mano che si visitano. Al secondo accesso il sito parte dalla
+    // cache locale → istantaneo, e funziona anche offline.
+    // `autoUpdate`: ad ogni nuovo deploy il SW si aggiorna in background e
+    // prende il controllo subito, così non si resta su versioni vecchie.
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      manifest: false, // usiamo già /public/site.webmanifest
+      includeAssets: [],
+      workbox: {
+        // Precache: solo app-shell e font (stabili). Le immagini NO, per non
+        // appesantire il primo accesso: entrano in cache quando vengono viste.
+        globPatterns: ['**/*.{js,css,html,woff2}'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        navigateFallback: '/index.html',
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+        runtimeCaching: [
+          {
+            // Immagini: cache-first, restano in locale 30 giorni.
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ap-images',
+              expiration: { maxEntries: 150, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // PDF, ZIP e altri documenti: stessa logica.
+            urlPattern: ({ url }) => /\.(pdf|zip)$/i.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ap-docs',
+              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
   ],
   resolve: {
     alias: {
