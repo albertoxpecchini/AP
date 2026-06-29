@@ -13,6 +13,7 @@ import {
   ExternalLink,
   FileText,
   Menu,
+  Heart,
 } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
 import {
@@ -159,6 +160,7 @@ const NAV = [
   { href: "#archivio", label: "Archive" },
   { href: "/bio", label: "About", route: true },
   { href: "#curriculum", label: "Résumé" },
+  { href: "/sostieni", label: "Support", route: true },
   { href: "#contatti", label: "Contact" },
 ];
 
@@ -479,6 +481,7 @@ export default function App() {
               <a href={`mailto:${EMAIL}`} className="hm-pill hm-pill--light"><Mail size={18} aria-hidden="true" /> Email me</a>
               <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener" className="hm-pill hm-pill--lightghost"><WhatsAppIcon size={18} /> WhatsApp</a>
               <a href={PHONE_HREF} className="hm-pill hm-pill--lightghost"><Phone size={18} aria-hidden="true" /> Call me</a>
+              <Link to="/sostieni" className="hm-pill hm-pill--lightghost"><Heart size={18} aria-hidden="true" /> Support me</Link>
             </div>
           </div>
         </section>

@@ -27,6 +27,7 @@ const Movimento = lazy(() => import("./app/movimento/Movimento.tsx"));
 const Mappa = lazy(() => import("./app/mappa/Mappa.tsx"));
 const Festa = lazy(() => import("./app/festa/Festa.tsx"));
 const Archivio = lazy(() => import("./app/archivio/Archivio.tsx"));
+const Sostieni = lazy(() => import("./app/sostieni/Sostieni.tsx"));
 
 createRoot(document.getElementById("root")!).render(
   <>
@@ -134,6 +135,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Archivio />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/sostieni"
+        element={
+          <Suspense fallback={null}>
+            <Sostieni />
           </Suspense>
         }
       />
