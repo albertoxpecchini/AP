@@ -457,7 +457,6 @@ const RAW: Record<string, Entry> = {
   "Codice fiscale": { en: "Tax code", fr: "Code fiscal", de: "Steuernummer" },
   "Banca": { en: "Bank", fr: "Banque", de: "Bank" },
   "Causale (facoltativa)": { en: "Description (optional)", fr: "Description (facultatif)", de: "Beschreibung (optional)" },
-  "Copia": { en: "Copy", fr: "Copier", de: "Kopieren" },
   "Copiato": { en: "Copied", fr: "Copié", de: "Kopiert" },
   "Libro dei donatori": { en: "Donor book", fr: "Livre des donateurs", de: "Spenderbuch" },
   "Se vuoi lasciare un segno del tuo passaggio, firma qui. È facoltativo.": {
@@ -467,7 +466,6 @@ const RAW: Record<string, Entry> = {
   },
   "Grazie.": { en: "Thank you.", fr: "Merci.", de: "Danke." },
   "La tua firma è nel libro.": { en: "Your signature is in the book.", fr: "Votre signature est dans le livre.", de: "Deine Unterschrift ist im Buch." },
-  "Il tuo nome": { en: "Your name", fr: "Votre nom", de: "Dein Name" },
   "Es. Mario R.": { en: "e.g., Mario R.", fr: "ex. Mario R.", de: "z.B. Mario R." },
   "Due parole (facoltative)": { en: "A few words (optional)", fr: "Un message (facultatif)", de: "Ein paar Worte (optional)" },
   "Un saluto…": { en: "A greeting…", fr: "Un salut…", de: "Ein Gruß…" },
@@ -546,8 +544,6 @@ const RAW: Record<string, Entry> = {
   "Riquadro dettagli": { en: "Details pane", fr: "Volet détails", de: "Detailbereich" },
 
   // — Navigazione —
-  "Indietro": { en: "Back", fr: "Précédent", de: "Zurück" },
-  "Avanti": { en: "Forward", fr: "Suivant", de: "Weiter" },
   "Su": { en: "Up", fr: "Parent", de: "Nach oben" },
   "Aggiorna": { en: "Refresh", fr: "Actualiser", de: "Aktualisieren" },
   "Questo PC": { en: "This PC", fr: "Cet ordinateur", de: "Dieser PC" },
@@ -567,7 +563,6 @@ const RAW: Record<string, Entry> = {
   // — Controlli finestra —
   "Riduci a icona": { en: "Minimize", fr: "Réduire", de: "Minimieren" },
   "Ingrandisci": { en: "Maximize", fr: "Agrandir", de: "Maximieren" },
-  "Chiudi": { en: "Close", fr: "Fermer", de: "Schließen" },
 
   // — Flash messages —
   "Link copiato negli appunti": { en: "Link copied to clipboard", fr: "Lien copié dans le presse-papiers", de: "Link in Zwischenablage kopiert" },
