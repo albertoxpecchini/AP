@@ -107,17 +107,22 @@ export default function Sostieni() {
   const vantaEffect = useRef<{ destroy?: () => void } | null>(null);
 
   useEffect(() => {
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return; // niente movimento: resta il gradiente di fallback
+    // Chi preferisce meno movimento NON resta col fondo piatto: mostriamo
+    // comunque le onde 3D, ma ferme (waveSpeed 0). Così lo sfondo "cosmico"
+    // c'è sempre, senza animazione per chi l'ha disattivata.
+    const reduce = !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
     let cancelled = false;
     let unsubTheme = () => {};
 
     // Onde viola "dark premium" in scuro, lavanda chiara in tema chiaro.
-    const optsFor = (t: Theme) =>
-      t === "light"
-        ? { color: 0x8e74e6, shininess: 55, waveHeight: 16, waveSpeed: 0.55, zoom: 0.92 }
-        : { color: 0x342a7a, shininess: 30, waveHeight: 18, waveSpeed: 0.62, zoom: 0.86 };
+    const optsFor = (t: Theme) => {
+      const base =
+        t === "light"
+          ? { color: 0x8e74e6, shininess: 55, waveHeight: 16, waveSpeed: 0.55, zoom: 0.92 }
+          : { color: 0x342a7a, shininess: 30, waveHeight: 18, waveSpeed: 0.62, zoom: 0.86 };
+      return reduce ? { ...base, waveSpeed: 0 } : base;
+    };
 
     (async () => {
       try {
