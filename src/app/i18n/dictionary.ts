@@ -426,6 +426,152 @@ const RAW: Record<string, Entry> = {
     de: "Mit Zuneigung warte ich auf dich.",
   },
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SOSTIENI / DONAZIONI  (sorgente: ITALIANO → en / fr / de)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  "Home": { en: "Home", fr: "Accueil", de: "Startseite" },
+  "Sostieni": { en: "Support", fr: "Soutenir", de: "Unterstützen" },
+  "Una piccola pagina": { en: "A small page", fr: "Une petite page", de: "Eine kleine Seite" },
+  "Se ti va, puoi sostenermi.": {
+    en: "If you'd like, you can support me.",
+    fr: "Si tu veux, tu peux me soutenir.",
+    de: "Wenn du möchtest, kannst du mich unterstützen.",
+  },
+  "Se qualcosa che ho fatto ti è stato utile e hai piacere di darmi una mano, puoi farlo con un bonifico — l'importo e la frequenza li decidi tu, dalla tua banca. Nessun obbligo, nessuna pressione. Grazie comunque per essere passato di qui.": {
+    en: "If something I've done was useful to you and you'd like to give me a hand, you can do it with a transfer — the amount and frequency are up to you, from your bank. No obligation, no pressure. Thanks anyway for stopping by.",
+    fr: "Si quelque chose que j'ai fait vous a été utile et que vous aimeriez me donner un coup de main, vous pouvez le faire par virement — le montant et la fréquence vous appartiennent, de votre banque. Aucune obligation, aucune pression. Merci quand même de votre passage.",
+    de: "Wenn etwas, das ich getan habe, dir geholfen hat und du mir einen Gefallen tun möchtest, kannst du das per Überweisung tun — Betrag und Häufigkeit entscheidest du selbst, von deiner Bank. Keine Verpflichtung, kein Druck. Danke trotzdem, dass du vorbeigekommen bist.",
+  },
+  "Bonifico bancario": { en: "Bank transfer", fr: "Virement bancaire", de: "Banküberweisung" },
+  "Solo per bonifico": { en: "For transfer only", fr: "Uniquement pour virement", de: "Nur per Überweisung" },
+  "Questi dati servono esclusivamente per il bonifico. Copia ciò che ti serve e procedi dalla tua banca, con l'importo che preferisci.": {
+    en: "This data is exclusively for the transfer. Copy what you need and proceed from your bank, with the amount you prefer.",
+    fr: "Ces données sont exclusivement pour le virement. Copiez ce dont vous avez besoin et procédez de votre banque, avec le montant que vous préférez.",
+    de: "Diese Daten sind ausschließlich für die Überweisung. Kopiere, was du brauchst, und gehe von deiner Bank weiter, mit dem Betrag, den du bevorzugst.",
+  },
+  "Beneficiario": { en: "Beneficiary", fr: "Bénéficiaire", de: "Begünstigter" },
+  "IBAN": { en: "IBAN", fr: "IBAN", de: "IBAN" },
+  "BIC / SWIFT": { en: "BIC / SWIFT", fr: "BIC / SWIFT", de: "BIC / SWIFT" },
+  "Banca corrispondente (BIC)": { en: "Correspondent bank (BIC)", fr: "Banque correspondante (BIC)", de: "Korrespondenzbank (BIC)" },
+  "Codice fiscale": { en: "Tax code", fr: "Code fiscal", de: "Steuernummer" },
+  "Banca": { en: "Bank", fr: "Banque", de: "Bank" },
+  "Causale (facoltativa)": { en: "Description (optional)", fr: "Description (facultatif)", de: "Beschreibung (optional)" },
+  "Copia": { en: "Copy", fr: "Copier", de: "Kopieren" },
+  "Copiato": { en: "Copied", fr: "Copié", de: "Kopiert" },
+  "Libro dei donatori": { en: "Donor book", fr: "Livre des donateurs", de: "Spenderbuch" },
+  "Se vuoi lasciare un segno del tuo passaggio, firma qui. È facoltativo.": {
+    en: "If you'd like to leave a mark of your visit, sign here. It's optional.",
+    fr: "Si vous souhaitez laisser une trace de votre passage, signez ici. C'est facultatif.",
+    de: "Wenn du eine Spur deines Besuchs hinterlassen möchtest, unterschreib hier. Es ist optional.",
+  },
+  "Grazie.": { en: "Thank you.", fr: "Merci.", de: "Danke." },
+  "La tua firma è nel libro.": { en: "Your signature is in the book.", fr: "Votre signature est dans le livre.", de: "Deine Unterschrift ist im Buch." },
+  "Il tuo nome": { en: "Your name", fr: "Votre nom", de: "Dein Name" },
+  "Es. Mario R.": { en: "e.g., Mario R.", fr: "ex. Mario R.", de: "z.B. Mario R." },
+  "Due parole (facoltative)": { en: "A few words (optional)", fr: "Un message (facultatif)", de: "Ein paar Worte (optional)" },
+  "Un saluto…": { en: "A greeting…", fr: "Un salut…", de: "Ein Gruß…" },
+  "Firma il libro": { en: "Sign the book", fr: "Signer le livre", de: "Das Buch unterzeichnen" },
+  "Firmo…": { en: "Signing…", fr: "Signature…", de: "Unterschreibe…" },
+  "Sponsor": { en: "Sponsor", fr: "Sponsor", de: "Sponsor" },
+  "4,99€": { en: "4.99€", fr: "4,99€", de: "4,99€" },
+  "Se hai un progetto o un'attività, puoi comparire tra gli sponsor con un piccolo contributo. Lasciami i dati e ne parliamo con calma: ti scrivo io.": {
+    en: "If you have a project or business, you can appear as a sponsor with a small contribution. Send me your details and we'll discuss it calmly: I'll write to you.",
+    fr: "Si vous avez un projet ou une entreprise, vous pouvez apparaître comme sponsor avec une petite contribution. Envoyez-moi vos coordonnées et nous en discuterons calmement : je vous écrirai.",
+    de: "Wenn du ein Projekt oder ein Geschäft hast, kannst du mit einem kleinen Beitrag als Sponsor erscheinen. Schreib mir deine Daten und wir besprechen es in aller Ruhe: ich schreibe dir.",
+  },
+  "Nome / Brand": { en: "Name / Brand", fr: "Nom / Marque", de: "Name / Marke" },
+  "La tua attività": { en: "Your business", fr: "Votre activité", de: "Dein Geschäft" },
+  "Link (sito o social)": { en: "Link (website or social)", fr: "Lien (site ou réseaux sociaux)", de: "Link (Website oder Sozial)" },
+  "https://…": { en: "https://…", fr: "https://…", de: "https://…" },
+  "Messaggio (facoltativo)": { en: "Message (optional)", fr: "Message (facultatif)", de: "Nachricht (optional)" },
+  "Cosa vorresti promuovere?": {
+    en: "What would you like to promote?",
+    fr: "Qu'aimeriez-vous promouvoir ?",
+    de: "Was möchtest du bewerben?",
+  },
+  "Scrivimi su WhatsApp": { en: "Message me on WhatsApp", fr: "Écrivez-moi sur WhatsApp", de: "Schreib mir auf WhatsApp" },
+  "Scrivimi via email": { en: "Email me", fr: "Écrivez-moi par e-mail", de: "Schreib mir eine E-Mail" },
+  "Chi è passato di qui": { en: "Who's been here", fr: "Qui est passé par ici", de: "Wer ist hier vorbeigekommen" },
+  "Anteprima locale: le firme restano su questo dispositivo finché il backend non è collegato.": {
+    en: "Local preview: signatures remain on this device until the backend is connected.",
+    fr: "Aperçu local : les signatures restent sur cet appareil jusqu'à ce que le backend soit connecté.",
+    de: "Lokale Vorschau: Signaturen bleiben auf diesem Gerät, bis das Backend verbunden ist.",
+  },
+  "Donatori": { en: "Donors", fr: "Donateurs", de: "Spender" },
+  "Carico…": { en: "Loading…", fr: "Chargement…", de: "Wird geladen…" },
+  "Ancora nessuna firma.": { en: "No signatures yet.", fr: "Pas encore de signatures.", de: "Noch keine Unterschriften." },
+  "Per qualsiasi cosa, sono qui.": { en: "For anything, I'm here.", fr: "Pour tout, je suis là.", de: "Für alles bin ich hier." },
+  "ora": { en: "now", fr: "à l'instant", de: "gerade" },
+  "min fa": { en: "min ago", fr: "min", de: "vor min" },
+  "h fa": { en: "h ago", fr: "h", de: "vor h" },
+  "g fa": { en: "d ago", fr: "j", de: "vor d" },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ARCHIVIO  (sorgente: ITALIANO → en / fr / de)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // — Colonne della tabella —
+  "Nome": { en: "Name", fr: "Nom", de: "Name" },
+  "Ultima modifica": { en: "Modified", fr: "Dernière modification", de: "Geändert" },
+  "Tipo": { en: "Type", fr: "Type", de: "Typ" },
+  "Dimensione": { en: "Size", fr: "Taille", de: "Größe" },
+  "Data creazione": { en: "Created", fr: "Date de création", de: "Erstellt" },
+  "Autori": { en: "Authors", fr: "Auteurs", de: "Autoren" },
+  "Categorie": { en: "Categories", fr: "Catégories", de: "Kategorien" },
+  "Tag": { en: "Tags", fr: "Étiquettes", de: "Tags" },
+  "Titolo": { en: "Title", fr: "Titre", de: "Titel" },
+
+  // — Cartelle principali —
+  "Esame di Maturità": { en: "High School Diploma", fr: "Examen de Bac", de: "Abitur" },
+  "Giochi Web": { en: "Web Games", fr: "Jeux Web", de: "Web-Spiele" },
+  "Siti web": { en: "Websites", fr: "Sites web", de: "Websites" },
+  "Documenti": { en: "Documents", fr: "Documents", de: "Dokumente" },
+
+  // — Toolbar —
+  "Nuovo": { en: "New", fr: "Nouveau", de: "Neu" },
+  "Taglia": { en: "Cut", fr: "Couper", de: "Ausschneiden" },
+  "Copia": { en: "Copy", fr: "Copier", de: "Kopieren" },
+  "Incolla": { en: "Paste", fr: "Coller", de: "Einfügen" },
+  "Rinomina": { en: "Rename", fr: "Renommer", de: "Umbenennen" },
+  "Condividi": { en: "Share", fr: "Partager", de: "Teilen" },
+  "Elimina": { en: "Delete", fr: "Supprimer", de: "Löschen" },
+  "Ordina": { en: "Sort", fr: "Trier", de: "Sortieren" },
+  "Inverti ordinamento": { en: "Reverse sort", fr: "Inverser le tri", de: "Sortierung umkehren" },
+  "Altro": { en: "More", fr: "Plus", de: "Mehr" },
+
+  // — Vista e layout —
+  "Vista dettagli": { en: "Details view", fr: "Vue détails", de: "Detailansicht" },
+  "Vista icone": { en: "Icons view", fr: "Vue icônes", de: "Symbolansicht" },
+  "Riquadro dettagli": { en: "Details pane", fr: "Volet détails", de: "Detailbereich" },
+
+  // — Navigazione —
+  "Indietro": { en: "Back", fr: "Précédent", de: "Zurück" },
+  "Avanti": { en: "Forward", fr: "Suivant", de: "Weiter" },
+  "Su": { en: "Up", fr: "Parent", de: "Nach oben" },
+  "Aggiorna": { en: "Refresh", fr: "Actualiser", de: "Aktualisieren" },
+  "Questo PC": { en: "This PC", fr: "Cet ordinateur", de: "Dieser PC" },
+  "Archivio": { en: "Archive", fr: "Archives", de: "Archiv" },
+
+  // — Sidebar —
+  "In evidenza": { en: "Favorites", fr: "En évidence", de: "Favoriten" },
+  "Posizioni": { en: "Locations", fr: "Emplacements", de: "Speicherorte" },
+
+  // — Sezioni —
+  "Cartelle in evidenza": { en: "Featured folders", fr: "Dossiers en évidence", de: "Ausgewählte Ordner" },
+  "Tutti gli elementi": { en: "All items", fr: "Tous les éléments", de: "Alle Elemente" },
+
+  // — Ricerca —
+  "Cerca nell'archivio": { en: "Search archive", fr: "Rechercher dans l'archive", de: "Im Archiv suchen" },
+
+  // — Controlli finestra —
+  "Riduci a icona": { en: "Minimize", fr: "Réduire", de: "Minimieren" },
+  "Ingrandisci": { en: "Maximize", fr: "Agrandir", de: "Maximieren" },
+  "Chiudi": { en: "Close", fr: "Fermer", de: "Schließen" },
+
+  // — Flash messages —
+  "Link copiato negli appunti": { en: "Link copied to clipboard", fr: "Lien copié dans le presse-papiers", de: "Link in Zwischenablage kopiert" },
+
   // — Pagina non disponibile —
   "Evento concluso": { en: "Event concluded", fr: "Événement terminé", de: "Veranstaltung beendet" },
   "Pagina non disponibile": { en: "Page not available", fr: "Page non disponible", de: "Seite nicht verfügbar" },
