@@ -18,6 +18,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { Lang } from "./langCore";
+// Store delle traduzioni del sito: chiave = testo SORGENTE, valore = le altre
+// lingue. È il file mantenuto a mano/aggiornato; `scripts/i18n-extract.mjs` fa
+// il crawl di tutte le pagine ed elenca le stringhe ancora da tradurre. Le voci
+// curate qui sotto (RAW) restano come extra (stringhe dinamiche non sempre
+// presenti nel DOM durante il crawl, es. esiti dei giochi).
+import generated from "./translations.json";
 
 export type Entry = Partial<Record<Lang, string>>;
 
@@ -223,6 +229,8 @@ const RAW: Record<string, Entry> = {
   "Hai perso": { en: "You lost", fr: "Vous avez perdu", de: "Du hast verloren" },
 };
 
-// Indicizza per chiave normalizzata (robusto a spazi/righe nel sorgente sopra).
+// Indicizza per chiave normalizzata. Prima le voci curate (RAW), poi quelle
+// generate dal crawl (che vincono in caso di sovrapposizione: sono autorevoli).
 export const DICT: Record<string, Entry> = Object.create(null);
 for (const k in RAW) DICT[normalizeKey(k)] = RAW[k];
+for (const k in generated) DICT[normalizeKey(k)] = (generated as Record<string, Entry>)[k];

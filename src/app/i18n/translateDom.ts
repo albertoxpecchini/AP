@@ -206,6 +206,8 @@ function onMutations(muts: MutationRecord[]): void {
  */
 export function startI18nEngine(): void {
   if (started || typeof window === "undefined") return;
+  // Interruttore (estrazione/debug): mostra il testo SORGENTE grezzo.
+  if ((window as unknown as { __AP_NO_I18N__?: boolean }).__AP_NO_I18N__) return;
   started = true;
 
   const boot = () => {
