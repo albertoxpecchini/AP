@@ -286,30 +286,54 @@ export default function App() {
           </div>
         </div>
 
-        {/* Drawer mobile */}
-        <div className={`hm-drawer ${menuOpen ? "open" : ""}`} id="hm-drawer">
-          <div className="hm-drawer-backdrop" onClick={closeMenu} aria-hidden="true" />
-          <div className="hm-drawer-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
-            <button className="hm-drawer-close" type="button" aria-label="Close menu" onClick={closeMenu}>
+      </header>
+
+      {/* ── Menu mobile a schermo intero (fuori da <header>: l'header ha
+           backdrop-filter e farebbe da containing-block al position:fixed,
+           confinando il menu nella sola barra in alto) ── */}
+      <div className={`hm-menu ${menuOpen ? "open" : ""}`} id="hm-drawer" aria-hidden={!menuOpen}>
+        <button className="hm-menu-scrim" type="button" aria-label="Chiudi il menu" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu} />
+        <div className="hm-menu-sheet" role="dialog" aria-modal="true" aria-label="Menu di navigazione">
+          <div className="hm-menu-head">
+            <span className="hm-menu-brand">
+              <span className="hm-brand-mark" aria-hidden="true"><img src="/favicon.svg" alt="" width={32} height={32} /></span>
+              Alberto Pecchini
+            </span>
+            <button className="hm-menu-close" type="button" aria-label="Chiudi il menu" onClick={closeMenu}>
               <X size={22} aria-hidden="true" />
             </button>
-            <nav className="hm-drawer-nav" aria-label="Navigation">
-              {NAV.map((l) =>
-                l.route ? (
-                  <Link key={l.href} to={l.href} onClick={closeMenu}>{l.label}</Link>
-                ) : (
-                  <a key={l.href} href={l.href} onClick={closeMenu}>{l.label}</a>
-                ),
-              )}
-            </nav>
-            <div className="hm-drawer-contacts">
+          </div>
+
+          <nav className="hm-menu-nav" aria-label="Navigazione">
+            {NAV.map((l, i) =>
+              l.route ? (
+                <Link key={l.href} to={l.href} onClick={closeMenu} style={{ "--i": i } as React.CSSProperties}>
+                  <span>{l.label}</span><ArrowUpRight size={20} aria-hidden="true" />
+                </Link>
+              ) : (
+                <a key={l.href} href={l.href} onClick={closeMenu} style={{ "--i": i } as React.CSSProperties}>
+                  <span>{l.label}</span><ArrowUpRight size={20} aria-hidden="true" />
+                </a>
+              ),
+            )}
+          </nav>
+
+          <div className="hm-menu-foot">
+            <div className="hm-menu-contacts">
               <a href={`mailto:${EMAIL}`}><Mail size={18} aria-hidden="true" /> {EMAIL}</a>
               <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener"><WhatsAppIcon size={16} /> WhatsApp</a>
               <a href={PHONE_HREF}><Phone size={18} aria-hidden="true" /> {PHONE_DISPLAY}</a>
             </div>
+            <div className="hm-menu-social">
+              {SOCIALS.slice(0, 8).map(({ name, Icon, href }) => (
+                <a key={name} href={href} aria-label={name} title={name} {...(href !== "#" ? { target: "_blank", rel: "noreferrer noopener" } : {})}>
+                  <Icon size={18} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <main id="main-content">
         {/* ① Hero — nome + posizionamento (stile FiveSight/Prilo) */}
@@ -619,27 +643,76 @@ export default function App() {
         .hm-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 26px var(--glow); }
         .hm-burger { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 6px; line-height: 1; }
 
-        /* Drawer mobile */
-        .hm-drawer { position: fixed; inset: 0; z-index: 100; visibility: hidden; }
-        .hm-drawer.open { visibility: visible; }
-        .hm-drawer-backdrop { position: absolute; inset: 0; background: rgba(5, 7, 10, 0.65); opacity: 0; transition: opacity 0.2s ease; }
-        .hm-drawer.open .hm-drawer-backdrop { opacity: 1; }
-        .hm-drawer-panel {
-          position: absolute; top: 0; right: 0; height: 100%; width: min(82vw, 340px);
-          background: linear-gradient(160deg, #15101f 0%, #0b0f14 100%);
-          border-left: 1px solid var(--vio-bd);
-          color: #fff; padding: calc(env(safe-area-inset-top) + 1.5rem) 1.5rem 1.5rem;
-          display: flex; flex-direction: column; gap: 1.2rem;
-          transform: translateX(100%); transition: transform 0.25s ease;
+        /* ── Menu mobile a schermo intero ── */
+        .hm-menu { position: fixed; inset: 0; z-index: 1000; visibility: hidden; pointer-events: none; }
+        .hm-menu.open { visibility: visible; pointer-events: auto; }
+        .hm-menu-scrim {
+          position: absolute; inset: 0; border: none; cursor: pointer;
+          background: rgba(5, 7, 10, 0.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+          opacity: 0; transition: opacity 0.28s ease;
         }
-        .hm-drawer.open .hm-drawer-panel { transform: translateX(0); }
-        .hm-drawer-close { align-self: flex-end; background: none; border: none; color: #fff; cursor: pointer; padding: 6px; line-height: 1; }
-        .hm-drawer-nav { display: flex; flex-direction: column; }
-        .hm-drawer-nav a { color: #fff; text-decoration: none; font-size: 1.15rem; font-weight: 600; padding: 0.7rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        .hm-drawer-nav a:hover { color: var(--ink); }
-        .hm-drawer-contacts { margin-top: auto; display: flex; flex-direction: column; gap: 0.7rem; }
-        .hm-drawer-contacts a { color: rgba(255, 255, 255, 0.85); text-decoration: none; display: flex; align-items: center; gap: 0.55rem; font-size: 0.95rem; }
-        .hm-drawer-contacts a:hover { color: #fff; }
+        .hm-menu.open .hm-menu-scrim { opacity: 1; }
+        .hm-menu-sheet {
+          position: absolute; top: 0; right: 0; height: 100%;
+          width: min(90vw, 400px);
+          background:
+            radial-gradient(120% 60% at 100% 0%, rgba(139, 123, 255, 0.20) 0%, transparent 60%),
+            linear-gradient(165deg, #181226 0%, #0d1016 60%, #0a0d11 100%);
+          border-left: 1px solid var(--vio-bd);
+          box-shadow: -24px 0 60px rgba(0, 0, 0, 0.55);
+          color: #fff;
+          padding: calc(env(safe-area-inset-top) + 1.1rem) 1.5rem calc(env(safe-area-inset-bottom) + 1.5rem);
+          display: flex; flex-direction: column;
+          transform: translateX(102%); transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+          overflow-y: auto;
+        }
+        .hm-menu.open .hm-menu-sheet { transform: translateX(0); }
+
+        .hm-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
+        .hm-menu-brand { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 800; font-size: 1.02rem; color: #fff; }
+        .hm-menu-brand .hm-brand-mark { width: 32px; height: 32px; border-radius: 9px; }
+        .hm-menu-close {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+          background: var(--vio-soft); border: 1px solid var(--vio-bd); color: #fff; cursor: pointer;
+          transition: background 0.15s, transform 0.15s;
+        }
+        .hm-menu-close:hover { background: rgba(139, 123, 255, 0.2); transform: rotate(90deg); }
+
+        .hm-menu-nav { display: flex; flex-direction: column; gap: 0.2rem; }
+        .hm-menu-nav a {
+          display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+          color: #fff; text-decoration: none; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em;
+          padding: 0.85rem 0.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .hm-menu-nav a svg { color: var(--ink); opacity: 0; transform: translateX(-6px); transition: opacity 0.18s, transform 0.18s; }
+        .hm-menu-nav a:hover { color: var(--ink); }
+        .hm-menu-nav a:hover svg, .hm-menu-nav a:active svg { opacity: 1; transform: translateX(0); }
+        /* entrata "a cascata" delle voci quando il menu si apre */
+        .hm-menu.open .hm-menu-nav a {
+          animation: hm-menu-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+          animation-delay: calc(0.12s + var(--i) * 0.05s);
+        }
+        @keyframes hm-menu-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+
+        .hm-menu-foot { margin-top: auto; padding-top: 1.6rem; display: flex; flex-direction: column; gap: 1.2rem; }
+        .hm-menu-contacts { display: flex; flex-direction: column; gap: 0.75rem; }
+        .hm-menu-contacts a { color: rgba(255, 255, 255, 0.82); text-decoration: none; display: flex; align-items: center; gap: 0.6rem; font-size: 0.98rem; }
+        .hm-menu-contacts a svg { color: var(--ink); flex-shrink: 0; }
+        .hm-menu-contacts a:hover { color: #fff; }
+        .hm-menu-social { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .hm-menu-social a {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 40px; height: 40px; border-radius: 11px;
+          background: var(--surface); border: 1px solid var(--surface-bd); color: var(--sub);
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+        .hm-menu-social a:hover { color: #fff; border-color: var(--vio-bd); background: var(--vio-soft); }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hm-menu-sheet { transition: none; }
+          .hm-menu.open .hm-menu-nav a { animation: none; }
+        }
 
         /* ── Hero ── */
         .hm-hero {
