@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
   Heart, Copy, Check, Send, Loader2, Crown, Mail, ArrowLeft,
@@ -9,6 +9,7 @@ import {
   submitDonatore, fetchDonatori, subscribeDonatori, donazioniConfigured,
   type DonatoreRow,
 } from "./donazioniApi";
+import { currentTheme, subscribeTheme, type Theme } from "../theme/themeCore";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sostieni / Donazioni — veste "finestre che galleggiano" su sfondo vivo.
@@ -101,6 +102,63 @@ export default function Sostieni() {
   const [book, setBook] = useState<DonatoreRow[]>([]);
   const [loadingBook, setLoadingBook] = useState(true);
 
+  // ── Sfondo vivo: Vanta WAVES (oceano 3D), colori legati al tema ──
+  const vantaRef = useRef<HTMLDivElement | null>(null);
+  const vantaEffect = useRef<{ destroy?: () => void } | null>(null);
+
+  useEffect(() => {
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return; // niente movimento: resta il gradiente di fallback
+
+    let cancelled = false;
+    let unsubTheme = () => {};
+
+    // Onde viola "dark premium" in scuro, lavanda chiara in tema chiaro.
+    const optsFor = (t: Theme) =>
+      t === "light"
+        ? { color: 0xb7a6ff, shininess: 42, waveHeight: 13, waveSpeed: 0.55, zoom: 0.92 }
+        : { color: 0x342a7a, shininess: 30, waveHeight: 18, waveSpeed: 0.62, zoom: 0.86 };
+
+    (async () => {
+      try {
+        const [THREE, vantaMod] = await Promise.all([
+          import("three"),
+          import("vanta/dist/vanta.waves.min"),
+        ]);
+        if (cancelled || !vantaRef.current) return;
+        const WAVES = (vantaMod as any).default ?? (vantaMod as any);
+
+        const build = (t: Theme) => {
+          vantaEffect.current?.destroy?.();
+          vantaEffect.current = WAVES({
+            el: vantaRef.current,
+            THREE,
+            mouseControls: false,
+            touchControls: false,
+            gyroControls: false,
+            minHeight: 200,
+            minWidth: 200,
+            scale: 1,
+            scaleMobile: 1,
+            ...optsFor(t),
+          });
+        };
+
+        build(currentTheme());
+        unsubTheme = subscribeTheme((t) => build(t));
+      } catch (e) {
+        console.error("[sostieni] Vanta non caricato:", e);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      unsubTheme();
+      vantaEffect.current?.destroy?.();
+      vantaEffect.current = null;
+    };
+  }, []);
+
   useEffect(() => {
     let alive = true;
     fetchDonatori()
@@ -177,16 +235,10 @@ export default function Sostieni() {
 
   return (
     <div className="it-page-wrapper sos-page">
-      {/* ── Sfondo vivo: aurore + finestre fantasma che galleggiano ── */}
+      {/* ── Sfondo vivo: Vanta WAVES (oceano 3D) + velo per leggibilità ── */}
       <div className="sos-bg" aria-hidden="true">
-        <span className="sos-aurora sos-aurora--1" />
-        <span className="sos-aurora sos-aurora--2" />
-        <span className="sos-aurora sos-aurora--3" />
-        {[0, 1, 2, 3, 4].map((n) => (
-          <span key={n} className={`sos-ghost sos-ghost--${n}`}>
-            <span className="sos-ghost-bar"><i /><i /><i /></span>
-          </span>
-        ))}
+        <div ref={vantaRef} className="sos-vanta" />
+        <div className="sos-scrim" />
       </div>
 
       {/* ── Header ── */}
@@ -386,27 +438,11 @@ export default function Sostieni() {
         }
         .sos-wrap { width: 100%; max-width: 920px; margin: 0 auto; padding-left: 1.4rem; padding-right: 1.4rem; }
 
-        /* ── Sfondo vivo ── */
+        /* ── Sfondo vivo: Vanta WAVES ── */
         .sos-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-        .sos-aurora { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; will-change: transform; }
-        .sos-aurora--1 { width: 46vw; height: 46vw; background: #6f5cff; top: -12vw; left: -8vw; animation: sos-drift1 26s ease-in-out infinite; }
-        .sos-aurora--2 { width: 40vw; height: 40vw; background: #5b4bd6; bottom: -14vw; right: -10vw; opacity: 0.4; animation: sos-drift2 32s ease-in-out infinite; }
-        .sos-aurora--3 { width: 30vw; height: 30vw; background: #9d7bff; top: 38%; left: 46%; opacity: 0.28; animation: sos-drift3 38s ease-in-out infinite; }
-        @keyframes sos-drift1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(6vw, 5vw) scale(1.12); } }
-        @keyframes sos-drift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-5vw, -6vw) scale(1.1); } }
-        @keyframes sos-drift3 { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-42%,-58%) scale(1.18); } }
-
-        /* Finestre fantasma che galleggiano dietro al contenuto */
-        .sos-ghost { position: absolute; border-radius: 14px; border: 1px solid var(--surface-bd); background: rgba(255,255,255,0.025); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); opacity: 0.5; will-change: transform; }
-        .sos-ghost-bar { position: absolute; top: 8px; left: 10px; display: flex; gap: 5px; }
-        .sos-ghost-bar i { width: 6px; height: 6px; border-radius: 50%; background: var(--surface-bd); display: block; }
-        .sos-ghost--0 { width: 190px; height: 130px; top: 14%; left: 6%; animation: sos-float-a 17s ease-in-out infinite; }
-        .sos-ghost--1 { width: 150px; height: 110px; top: 30%; right: 7%; animation: sos-float-b 21s ease-in-out infinite; }
-        .sos-ghost--2 { width: 220px; height: 150px; top: 60%; left: 4%; animation: sos-float-b 24s ease-in-out infinite; }
-        .sos-ghost--3 { width: 130px; height: 96px; top: 74%; right: 9%; animation: sos-float-a 19s ease-in-out infinite; }
-        .sos-ghost--4 { width: 170px; height: 120px; top: 46%; left: 50%; animation: sos-float-a 27s ease-in-out infinite; opacity: 0.32; }
-        @keyframes sos-float-a { 0%,100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-26px) rotate(1.5deg); } }
-        @keyframes sos-float-b { 0%,100% { transform: translateY(0) rotate(1.5deg); } 50% { transform: translateY(-22px) rotate(-2deg); } }
+        .sos-vanta { position: absolute; inset: 0; opacity: 0.72; }
+        /* Velo: scurisce sopra/sotto così il testo resta leggibile sulle onde */
+        .sos-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(9,12,16,0.42) 0%, rgba(9,12,16,0.12) 32%, rgba(9,12,16,0.6) 100%); }
 
         /* ── Header ── */
         .sos-hdr { position: sticky; top: 0; z-index: 30; background: rgba(10, 13, 17, 0.7); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid var(--surface-bd); }
@@ -515,9 +551,9 @@ export default function Sostieni() {
           .sos-actions .sos-btn { flex: 1 1 100%; }
         }
 
-        /* Rispetta chi preferisce meno movimento */
+        /* Rispetta chi preferisce meno movimento (Vanta non parte affatto) */
         @media (prefers-reduced-motion: reduce) {
-          .sos-aurora, .sos-ghost, .sos-win, .sos-spin { animation: none !important; }
+          .sos-win, .sos-spin { animation: none !important; }
         }
 
         /* ═══ TEMA CHIARO ═══ */
@@ -534,11 +570,8 @@ export default function Sostieni() {
           background: linear-gradient(180deg, #ffffff 0%, #f5f2fd 100%);
         }
         html[data-ap-theme="light"] .sos-hdr { background: rgba(255, 255, 255, 0.82); }
-        html[data-ap-theme="light"] .sos-aurora { opacity: 0.3; }
-        html[data-ap-theme="light"] .sos-aurora--1 { background: #b3a4ff; }
-        html[data-ap-theme="light"] .sos-aurora--2 { background: #c9bcff; }
-        html[data-ap-theme="light"] .sos-aurora--3 { background: #d9ccff; }
-        html[data-ap-theme="light"] .sos-ghost { background: rgba(109, 75, 214, 0.04); opacity: 0.6; }
+        html[data-ap-theme="light"] .sos-vanta { opacity: 0.55; }
+        html[data-ap-theme="light"] .sos-scrim { background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.18) 32%, rgba(255,255,255,0.66) 100%); }
       `}</style>
     </div>
   );

@@ -138,12 +138,27 @@ export default defineConfig({
         // Precache: solo app-shell e font (stabili). Le immagini NO, per non
         // appesantire il primo accesso: entrano in cache quando vengono viste.
         globPatterns: ['**/*.{js,css,html,woff2}'],
+        // three.js + Vanta servono SOLO a /sostieni: fuori dal precache, così non
+        // appesantiscono il primo accesso di chi non visita quella pagina. Vengono
+        // messi in cache "al volo" la prima volta che si apre /sostieni (sotto).
+        globIgnores: ['**/three.module-*.js', '**/vanta.waves.min-*.js'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
         runtimeCaching: [
+          {
+            // three.js + Vanta (sfondo vivo di /sostieni): cache-first al primo
+            // utilizzo, poi locali per 30 giorni come gli altri asset pesanti.
+            urlPattern: ({ url }) => /\/assets\/(three\.module|vanta\.waves\.min)-.*\.js$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ap-vendor-3d',
+              expiration: { maxEntries: 6, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             // Immagini: cache-first, restano in locale 30 giorni.
             urlPattern: ({ request }) => request.destination === 'image',
