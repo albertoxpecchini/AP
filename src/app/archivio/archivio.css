@@ -779,6 +779,43 @@ html.dark .ax-window {
   .ax-tbtn span.ax-tbtn-lbl { display: none; }
   .ax-scroll { overflow: auto; }
 }
+
+/* ── Touch / mobile: icone e bersagli più grandi (prima minuscoli) ────────────
+   Su schermi piccoli le iconcine da 14–22px erano illeggibili e difficili da
+   toccare. Le ingrandiamo e diamo ai pulsanti un'area di tap ≥ 40px. */
+@media (max-width: 760px), (pointer: coarse) {
+  /* niente selezione testo accidentale toccando le righe */
+  .ax-row, .ax-card, .ax-tile { -webkit-user-select: none; user-select: none; }
+
+  /* icone-tipo nella colonna Nome e in vista icone */
+  .ax-name-ico { width: 30px; height: 30px; border-radius: 7px; }
+  .ax-name-ico svg { width: 18px; height: 18px; }
+  .ax-name-txt { font-size: 0.98rem; }
+  .ax-row td { height: 48px; }
+
+  /* pulsanti azione riga (apri / scarica) */
+  .ax-act { width: 40px; height: 40px; border-radius: 9px; }
+  .ax-act svg { width: 19px; height: 19px; }
+
+  /* toolbar + barra indirizzi: bersagli più grandi */
+  .ax-tbtn { min-height: 40px; }
+  .ax-tbtn svg { width: 19px; height: 19px; }
+  .ax-navbtn { width: 40px; height: 40px; }
+  .ax-navbtn svg { width: 19px; height: 19px; }
+  .ax-seg button { min-width: 40px; min-height: 36px; }
+  .ax-seg svg { width: 18px; height: 18px; }
+  .ax-winbtn { min-width: 44px; height: 38px; }
+
+  /* vista icone: tessere e glifi più generosi */
+  .ax-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .ax-card-ico { width: 64px; height: 64px; border-radius: 14px; }
+  .ax-card-ico svg { width: 32px; height: 32px; }
+  .ax-card-name { font-size: 0.86rem; }
+
+  /* cartelle in evidenza */
+  .ax-tile-ico svg { width: 28px; height: 28px; }
+}
+
 @media (max-width: 560px) {
   .ax-side { display: none; }
   .ax-search { width: 40px; }

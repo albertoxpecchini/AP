@@ -360,6 +360,9 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
   // ── Selezione a rettangolo (marquee) blu, come su Windows ──
   const startMarquee = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
+    // Su touch (mobile) niente rettangolo di selezione: intralcia lo scroll e
+    // non ha senso col dito. Resta solo su mouse/trackpad.
+    if (e.pointerType === "touch") return;
     const t = e.target as HTMLElement;
     // lascia gestire a righe, schede, header, pulsanti, link, input, tile
     if (t.closest(".ax-row, .ax-card, .ax-th, button, a, input, .ax-tile")) return;
