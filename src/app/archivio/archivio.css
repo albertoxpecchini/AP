@@ -589,7 +589,19 @@ html.dark .ax-window {
 }
 
 /* ── Menu contestuale (Radix) — colonne e righe ── */
+/* I menu sono renderizzati in un Portal su <body>, FUORI da .ax-window: lì le
+   variabili --ax-* non esistono. Le ridichiariamo sul menu stesso (chiaro di
+   default, override scuro) così sfondo/testi non risultano trasparenti. */
 .ax-menu {
+  --ax-win: #f3f3f3;
+  --ax-bd-strong: rgba(0, 0, 0, 0.16);
+  --ax-bd: rgba(0, 0, 0, 0.09);
+  --ax-text: #1b1b1f;
+  --ax-text2: #3c3c43;
+  --ax-muted: #6b6b72;
+  --ax-accent: #6d4bd6;
+  --ax-accent-soft: rgba(109, 75, 214, 0.12);
+
   min-width: 220px;
   background: var(--ax-win);
   border: 1px solid var(--ax-bd-strong);
@@ -597,7 +609,19 @@ html.dark .ax-window {
   padding: 5px;
   box-shadow: 0 16px 44px -10px rgba(0, 0, 0, 0.4);
   z-index: 2147483000;
+  color: var(--ax-text);
   font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+}
+html.dark .ax-menu {
+  --ax-win: #2b2b2b;
+  --ax-bd-strong: rgba(255, 255, 255, 0.14);
+  --ax-bd: rgba(255, 255, 255, 0.08);
+  --ax-text: #ffffff;
+  --ax-text2: #d6d6da;
+  --ax-muted: #9b9ba2;
+  --ax-accent: #8b7bff;
+  --ax-accent-soft: rgba(124, 108, 255, 0.18);
+  box-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.7);
 }
 .ax-mi {
   display: flex;
@@ -631,6 +655,40 @@ html.dark .ax-window {
   color: var(--ax-muted);
   padding: 6px 10px 3px;
 }
+
+/* ── Menu tasto-destro "Esplora File di Windows" (sfondo) ──────────────────── */
+.ax-winmenu { min-width: 244px; }
+/* glifo icona dal font di sistema di Windows (100% Windows); altrove invisibile
+   ma mantiene la colonna allineata */
+.ax-winico {
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  text-align: center;
+  font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ax-text2);
+  pointer-events: none;
+}
+.ax-winico--off { font-size: 0; }
+/* freccia del sottomenu a destra */
+.ax-mi-arrow {
+  margin-left: auto;
+  padding-left: 16px;
+  display: inline-flex;
+  color: var(--ax-muted);
+}
+/* scorciatoia tastiera (es. CTRL+Z) a destra */
+.ax-mi-shortcut {
+  margin-left: auto;
+  padding-left: 18px;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--ax-muted);
+}
+/* sottomenu aperto: evidenzia la voce */
+.ax-mi[data-state="open"] { background: var(--ax-accent-soft); }
 
 /* ── Riquadro dettagli (destra) ── */
 .ax-tbtn--pane.is-on { color: var(--ax-accent); background: var(--ax-accent-soft); }

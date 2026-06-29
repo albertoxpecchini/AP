@@ -182,6 +182,14 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [marquee, setMarquee] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
+  // Su Windows usiamo i glifi del font di sistema "Segoe Fluent Icons" (icone
+  // 100% Windows nel menu tasto-destro). Altrove le icone restano nascoste per
+  // non mostrare quadratini "tofu".
+  const isWindows = useMemo(
+    () => typeof navigator !== "undefined" && /Windows/i.test(navigator.userAgent),
+    [],
+  );
+
   // Persistenza impostazioni (come Windows che "ricorda")
   useEffect(() => save("ap-archivio-sort", sort), [sort]);
   useEffect(() => save("ap-archivio-cols", Array.from(visible)), [visible]);
@@ -410,6 +418,20 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
     else navigate("/");
   };
 
+  // "Proprietà" del menu tasto-destro: apre il riquadro dettagli.
+  const openProperties = () => {
+    setDetailsOpen(true);
+    showFlash(folderLabel ? `Proprietà — ${folderLabel}` : "Proprietà — Questo PC");
+  };
+
+  // Glifo icona Segoe (solo su Windows); altrove mantiene la spaziatura.
+  const WinIco = ({ g }: { g: string }) =>
+    isWindows ? (
+      <span className="ax-winico" aria-hidden="true">{g}</span>
+    ) : (
+      <span className="ax-winico ax-winico--off" aria-hidden="true" />
+    );
+
   // ── Icona-tipo (glifo bianco su riquadro colorato) ──
   const TypeGlyph = ({ p, size = 14 }: { p: Project; size?: number }) =>
     p.kind === "doc" ? <FileText size={size} strokeWidth={2.1} /> : <ProjectIcon thumb={p.thumb} size={size} />;
@@ -539,6 +561,8 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
 
         {/* Main */}
         <main className="ax-main">
+          <ContextMenu.Root>
+          <ContextMenu.Trigger asChild>
           <div className="ax-scroll" ref={scrollRef} onPointerDown={startMarquee}>
             {/* Cartelle (solo radice) */}
             {folder === "root" && !query && (
@@ -572,7 +596,7 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
                 <thead>
                   <ContextMenu.Root>
                     <ContextMenu.Trigger asChild>
-                      <tr>
+                      <tr onContextMenu={(e) => e.stopPropagation()}>
                         {visibleCols.map((c) => (
                           <th key={c.key} className="ax-th">
                             <div className="ax-th-inner" onClick={() => toggleSort(c.key)} title={`Ordina per ${c.label}`}>
@@ -627,6 +651,7 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
                             className={`ax-row${selected.has(p.id) ? " is-sel" : ""}`}
                             onClick={(e) => selectItem(e, p.id)}
                             onDoubleClick={() => openOnline(p)}
+                            onContextMenu={(e) => e.stopPropagation()}
                           >
                             {visibleCols.map((c) =>
                               c.key === "name" ? (
@@ -698,6 +723,110 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
 
             {rows.length === 0 && <div className="ax-empty">Nessun elemento corrisponde alla ricerca.</div>}
           </div>
+          </ContextMenu.Trigger>
+
+          {/* ── Menu tasto-destro sullo sfondo: stile "Esplora File" di Windows ── */}
+          <ContextMenu.Portal>
+            <ContextMenu.Content className="ax-menu ax-winmenu" collisionPadding={8}>
+              {/* Visualizza ▸ */}
+              <ContextMenu.Sub>
+                <ContextMenu.SubTrigger className="ax-mi">
+                  <WinIco g={""} /> Visualizza
+                  <span className="ax-mi-arrow"><ChevronRight size={14} /></span>
+                </ContextMenu.SubTrigger>
+                <ContextMenu.Portal>
+                  <ContextMenu.SubContent className="ax-menu ax-winmenu" sideOffset={2} alignOffset={-5}>
+                    <ContextMenu.RadioGroup value={view} onValueChange={(v) => setView(v as "details" | "icons")}>
+                      <ContextMenu.RadioItem value="icons" className="ax-mi">
+                        <ContextMenu.ItemIndicator className="ax-mi-check"><Check size={14} /></ContextMenu.ItemIndicator>
+                        Icone grandi
+                      </ContextMenu.RadioItem>
+                      <ContextMenu.RadioItem value="details" className="ax-mi">
+                        <ContextMenu.ItemIndicator className="ax-mi-check"><Check size={14} /></ContextMenu.ItemIndicator>
+                        Dettagli
+                      </ContextMenu.RadioItem>
+                    </ContextMenu.RadioGroup>
+                  </ContextMenu.SubContent>
+                </ContextMenu.Portal>
+              </ContextMenu.Sub>
+
+              {/* Ordina per ▸ */}
+              <ContextMenu.Sub>
+                <ContextMenu.SubTrigger className="ax-mi">
+                  <WinIco g={""} /> Ordina per
+                  <span className="ax-mi-arrow"><ChevronRight size={14} /></span>
+                </ContextMenu.SubTrigger>
+                <ContextMenu.Portal>
+                  <ContextMenu.SubContent className="ax-menu ax-winmenu" sideOffset={2} alignOffset={-5}>
+                    <ContextMenu.RadioGroup value={sort.col} onValueChange={(c) => setSort((s) => ({ col: c as ColKey, dir: s.dir }))}>
+                      {(["name", "modified", "type", "size"] as ColKey[]).map((k) => (
+                        <ContextMenu.RadioItem key={k} value={k} className="ax-mi">
+                          <ContextMenu.ItemIndicator className="ax-mi-check"><Check size={14} /></ContextMenu.ItemIndicator>
+                          {COLUMNS.find((c) => c.key === k)!.label}
+                        </ContextMenu.RadioItem>
+                      ))}
+                    </ContextMenu.RadioGroup>
+                    <div className="ax-menu-sep" />
+                    <ContextMenu.RadioGroup value={sort.dir} onValueChange={(d) => setSort((s) => ({ ...s, dir: d as "asc" | "desc" }))}>
+                      <ContextMenu.RadioItem value="asc" className="ax-mi">
+                        <ContextMenu.ItemIndicator className="ax-mi-check"><Check size={14} /></ContextMenu.ItemIndicator>
+                        Crescente
+                      </ContextMenu.RadioItem>
+                      <ContextMenu.RadioItem value="desc" className="ax-mi">
+                        <ContextMenu.ItemIndicator className="ax-mi-check"><Check size={14} /></ContextMenu.ItemIndicator>
+                        Decrescente
+                      </ContextMenu.RadioItem>
+                    </ContextMenu.RadioGroup>
+                  </ContextMenu.SubContent>
+                </ContextMenu.Portal>
+              </ContextMenu.Sub>
+
+              {/* Raggruppa per ▸ (come Windows: nessun raggruppamento) */}
+              <ContextMenu.Sub>
+                <ContextMenu.SubTrigger className="ax-mi">
+                  <WinIco g={""} /> Raggruppa per
+                  <span className="ax-mi-arrow"><ChevronRight size={14} /></span>
+                </ContextMenu.SubTrigger>
+                <ContextMenu.Portal>
+                  <ContextMenu.SubContent className="ax-menu ax-winmenu" sideOffset={2} alignOffset={-5}>
+                    <ContextMenu.RadioGroup value="none">
+                      <ContextMenu.RadioItem value="none" className="ax-mi">
+                        <ContextMenu.ItemIndicator className="ax-mi-check"><Check size={14} /></ContextMenu.ItemIndicator>
+                        (Nessuno)
+                      </ContextMenu.RadioItem>
+                    </ContextMenu.RadioGroup>
+                  </ContextMenu.SubContent>
+                </ContextMenu.Portal>
+              </ContextMenu.Sub>
+
+              <ContextMenu.Item className="ax-mi" onSelect={loadManifest}>
+                <WinIco g={""} /> Aggiorna
+              </ContextMenu.Item>
+
+              <div className="ax-menu-sep" />
+
+              <ContextMenu.Item className="ax-mi" disabled>
+                <WinIco g={""} /> Incolla
+              </ContextMenu.Item>
+              <ContextMenu.Item className="ax-mi" disabled>
+                <WinIco g={""} /> Annulla Elimina
+                <span className="ax-mi-shortcut">CTRL+Z</span>
+              </ContextMenu.Item>
+
+              <div className="ax-menu-sep" />
+
+              <ContextMenu.Item className="ax-mi" disabled>
+                <WinIco g={""} /> Aggiungi percorso di rete
+              </ContextMenu.Item>
+
+              <div className="ax-menu-sep" />
+
+              <ContextMenu.Item className="ax-mi" onSelect={openProperties}>
+                <WinIco g={""} /> Proprietà
+              </ContextMenu.Item>
+            </ContextMenu.Content>
+          </ContextMenu.Portal>
+          </ContextMenu.Root>
 
           {/* Barra di stato */}
           <div className="ax-status">
