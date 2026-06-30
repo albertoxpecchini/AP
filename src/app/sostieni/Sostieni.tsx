@@ -11,7 +11,6 @@ import {
 } from "./donazioniApi";
 import { currentTheme, subscribeTheme, type Theme } from "../theme/themeCore";
 import SiteFooter from "../site/SiteFooter";
-import { useT } from "../i18n/langCore";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sostieni / Donazioni — veste "finestre che galleggiano" su sfondo vivo.
@@ -92,7 +91,6 @@ function Win({
 }
 
 export default function Sostieni() {
-  const t = useT();
   const [nome, setNome] = useState("");
   const [messaggio, setMessaggio] = useState("");
   const [sending, setSending] = useState(false);
@@ -259,7 +257,7 @@ export default function Sostieni() {
         <section className="sos-hero">
           <div className="sos-wrap">
             <p className="sos-hero-eyebrow">Una piccola pagina</p>
-            <h1 className="sos-h1">{t("Se ti va, puoi sostenermi.")}</h1>
+            <h1 className="sos-h1"><span style={{ display: "block", maxWidth: "350px" }}>Se ti va, puoi sostenermi.</span></h1>
             <p className="sos-lead">
               Se qualcosa che ho fatto ti è stato utile e hai piacere di darmi una mano, puoi
               farlo con un bonifico — l'importo e la frequenza li decidi tu, dalla tua banca.
