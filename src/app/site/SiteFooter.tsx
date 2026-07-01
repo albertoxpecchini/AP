@@ -1,5 +1,17 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { SOCIALS } from "./data";
+import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
+
+// Locale della data "Updated": segue la lingua attiva, così anche il MESE è
+// nella lingua giusta. Il resto del footer lo traduce il motore i18n dal
+// dizionario; la data è dinamica, quindi va formattata qui a mano.
+const DATE_LOCALE: Record<Lang, string> = {
+  it: "it-IT",
+  en: "en-GB",
+  fr: "fr-FR",
+  de: "de-DE",
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Footer condiviso da TUTTE le pagine (/...): nome + ruolo, icone social,
@@ -8,8 +20,17 @@ import { SOCIALS } from "./data";
 // pagina, chiara o scura, così il look è identico ovunque.
 // ─────────────────────────────────────────────────────────────────────────────
 export default function SiteFooter() {
+  // La lingua attiva pilota SOLO il formato della data (il testo del footer è
+  // tradotto dal motore i18n che gira su tutto il DOM).
+  const [lang, setLang] = useState<Lang>(() => getLang());
+  useEffect(() => subscribeLang(setLang), []);
+
   const now = new Date();
-  const updated = now.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+  const updated = now.toLocaleDateString(DATE_LOCALE[lang], {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
   const year = now.getFullYear();
 
   return (

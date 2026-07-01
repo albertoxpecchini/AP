@@ -26,6 +26,7 @@ import {
 } from "./site/data";
 import { PROJECTS, ProjectIcon } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
+import SiteFooter from "./site/SiteFooter";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Home / portfolio — look "dark premium" (lo stesso di /me-stesso, /dubliners,
@@ -511,34 +512,8 @@ export default function App() {
         </section>
       </main>
 
-      {/* ── Footer dark premium ── */}
-      <footer className="hm-foot">
-        <div className="hm-wrap">
-          <div className="hm-foot-top">
-            <div>
-              <p className="hm-foot-name">Alberto Pecchini</p>
-              <p className="hm-foot-role">Designer &amp; Developer · ITT «Carlo d'Arco» — Mantua</p>
-            </div>
-            <div className="hm-foot-social">
-              {SOCIALS.map(({ name, Icon, href }) => (
-                <a
-                  key={name}
-                  href={href}
-                  aria-label={name}
-                  title={name}
-                  {...(href !== "#" ? { target: "_blank", rel: "noreferrer noopener" } : {})}
-                >
-                  <Icon size={18} aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-          </div>
-          <div className="hm-foot-bottom">
-            <span>© {new Date().getFullYear()} Alberto Pecchini — All rights reserved</span>
-            <span>Updated {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</span>
-          </div>
-        </div>
-      </footer>
+      {/* ── Footer condiviso: lo stesso, tradotto, su ogni pagina ── */}
+      <SiteFooter />
 
       {/* Visualizzatore PDF generico (CV + attestati) */}
       {docOpen && (
@@ -1170,16 +1145,6 @@ export default function App() {
         .hm-contact-lead { font-size: 1.1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.88); margin: 0 auto 2rem; max-width: 38rem; }
         .hm-contact-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; }
 
-        /* ── Footer ── */
-        .hm-foot { background: #090c10; color: #fff; border-top: 1px solid var(--surface-bd); padding: 2.5rem 0 2rem; }
-        .hm-foot-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.5rem; border-bottom: 1px solid var(--surface-bd); }
-        .hm-foot-name { font-size: 1.2rem; font-weight: 800; margin: 0 0 0.2rem; }
-        .hm-foot-role { margin: 0; color: var(--sub); font-size: 0.92rem; }
-        .hm-foot-social { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
-        .hm-foot-social a { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--surface-bd); color: #fff; transition: background 0.15s, border-color 0.15s, color 0.15s; }
-        .hm-foot-social a:hover { background: var(--vio-soft); border-color: var(--vio-bd); color: var(--ink); }
-        .hm-foot-bottom { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-top: 1.25rem; font-size: 0.82rem; color: var(--sub); }
-
         /* Modale PDF — accento viola coerente con la home */
         .hm-page .ap-cv-bar { background: var(--accent-deep); }
         .hm-page .ap-cv-fallback { background: var(--vio-soft); color: var(--ink); border-bottom-color: var(--vio-bd); }
@@ -1197,7 +1162,6 @@ export default function App() {
         @media (max-width: 575.98px) {
           .hm-cards { grid-template-columns: 1fr; }
           .hm-card-media { height: 180px; }
-          .hm-foot-social { justify-content: flex-start; }
           .hm-sec-head { align-items: flex-start; }
         }
         @media (prefers-reduced-motion: reduce) {
