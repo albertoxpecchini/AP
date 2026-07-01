@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Languages, Check } from "lucide-react";
 import { getLang, setLang, subscribeLang, langMeta, LANGS, type Lang } from "./langCore";
@@ -113,13 +114,18 @@ export default function LanguageSwitcher() {
 
   return (
     <>
-      {/* Onda a tutto schermo (sopra tutto, sotto l'onda del tema) */}
-      <div ref={overlayRef} className="ap-lang-wipe" aria-hidden="true">
-        <div className="ap-lang-wipe-badge">
-          <span className="ap-lang-wipe-code">{target.label}</span>
-          <span className="ap-lang-wipe-name">{target.name}</span>
-        </div>
-      </div>
+      {/* Onda a tutto schermo (sopra tutto, sotto l'onda del tema).
+          Portata su <body>: il backdrop-filter della barra di controllo che la
+          contiene la ritaglierebbe altrimenti alla propria dimensione. */}
+      {createPortal(
+        <div ref={overlayRef} className="ap-lang-wipe" aria-hidden="true">
+          <div className="ap-lang-wipe-badge">
+            <span className="ap-lang-wipe-code">{target.label}</span>
+            <span className="ap-lang-wipe-name">{target.name}</span>
+          </div>
+        </div>,
+        document.body,
+      )}
 
       <div className="ap-lang-dock" ref={dockRef} data-no-i18n="">
         <AnimatePresence>

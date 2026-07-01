@@ -117,6 +117,156 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   BARRA DI CONTROLLO UNICA — lingua · tema · sensore orario.
+   I due widget globali (LanguageSwitcher + ThemeWidget) vivono dentro un unico
+   contenitore .ap-controlbar (vedi main.tsx): una sola pillola in vetro, in
+   basso a sinistra, orizzontale. Dentro la barra i singoli tasti diventano
+   segmenti trasparenti separati da un filo divisore. Gli stili qui (contesto
+   .ap-controlbar …) sovrascrivono per specificità il posizionamento fisso e la
+   veste "a sé" che i due widget avrebbero da soli.
+   NB: le onde a tutto schermo dei widget sono portate su <body> (createPortal),
+   perché il backdrop-filter della barra le ritaglierebbe alla sua dimensione.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ap-controlbar {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 2147483500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 16px;
+  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+  background: var(--apc-bg);
+  border: 1px solid var(--apc-bd);
+  box-shadow: 0 12px 34px var(--apc-shadow), 0 0 0 1px rgba(139, 123, 255, 0.05);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  /* palette di default = scuro (l'<html> ha sempre data-ap-theme, ma restiamo safe) */
+  --apc-bg: rgba(18, 22, 30, 0.72);
+  --apc-bd: rgba(139, 123, 255, 0.32);
+  --apc-fg: #e8eef4;
+  --apc-muted: #a7b2bd;
+  --apc-accent: #8b7bff;
+  --apc-shadow: rgba(0, 0, 0, 0.5);
+  --apc-divider: rgba(139, 123, 255, 0.22);
+  --apc-hover: rgba(139, 123, 255, 0.12);
+}
+:root[data-ap-theme="light"] .ap-controlbar {
+  --apc-bg: rgba(255, 255, 255, 0.82);
+  --apc-bd: rgba(109, 75, 214, 0.28);
+  --apc-fg: #4a2fb0;
+  --apc-muted: #6f6391;
+  --apc-accent: #6d4bd6;
+  --apc-shadow: rgba(80, 60, 160, 0.18);
+  --apc-divider: rgba(109, 75, 214, 0.22);
+  --apc-hover: rgba(109, 75, 214, 0.1);
+}
+
+/* — Segmento LINGUA (annulla dock fisso + veste propria della pillola) — */
+.ap-controlbar .ap-lang-dock {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  z-index: auto;
+}
+.ap-controlbar .ap-lang-trigger {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 11px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--apc-fg);
+}
+.ap-controlbar .ap-lang-trigger:hover,
+.ap-controlbar .ap-lang-trigger.is-open {
+  transform: none;
+  background: var(--apc-hover);
+  border-color: transparent;
+  color: var(--apc-accent);
+}
+.ap-controlbar .ap-lang-trigger:active {
+  transform: scale(0.96);
+}
+
+/* — Filo divisore + gruppo TEMA in riga — */
+.ap-controlbar .ap-theme-dock {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  z-index: auto;
+  flex-direction: row;
+  gap: 4px;
+  padding-left: 6px;
+  margin-left: 2px;
+  border-left: 1px solid var(--apc-divider);
+}
+
+/* — Segmento TEMA (luna/sole) — */
+.ap-controlbar .ap-theme-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--apc-fg);
+}
+.ap-controlbar .ap-theme-btn:hover {
+  transform: none;
+  background: var(--apc-hover);
+  border-color: transparent;
+  color: var(--apc-accent);
+}
+.ap-controlbar .ap-theme-btn:active {
+  transform: scale(0.94);
+}
+
+/* — Segmento AUTO (sensore orario): trasparente da spento, accento da acceso — */
+.ap-controlbar .ap-theme-auto {
+  height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 11px;
+  font-size: 0.64rem;
+  background: transparent;
+  border-color: transparent;
+  color: var(--apc-muted);
+}
+.ap-controlbar .ap-theme-auto:hover {
+  background: var(--apc-hover);
+  color: var(--apc-accent);
+}
+.ap-controlbar .ap-theme-auto.is-on {
+  background: var(--apc-accent);
+  border-color: var(--apc-accent);
+  color: #fff;
+}
+
+/* Schermi molto stretti: barra un filo più compatta */
+@media (max-width: 380px) {
+  .ap-controlbar {
+    gap: 2px;
+    padding: 5px;
+  }
+  .ap-controlbar .ap-lang-trigger,
+  .ap-controlbar .ap-theme-auto {
+    height: 38px;
+  }
+  .ap-controlbar .ap-theme-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    TEMA CHIARO per home (.hm-page) + approfondimenti (.it-page-wrapper).
    Le pagine sono in gran parte guidate da variabili: ribaltando le variabili
    (palette di .ms-light) si ottiene un chiaro coerente. Heroes e footer, che

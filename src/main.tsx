@@ -155,10 +155,13 @@ createRoot(document.getElementById("root")!).render(
 <Route path="*" element={<App />} />
     </Routes>
     </BrowserRouter>
-    {/* Widget tema globale: tasto luna/sole + sensore orario, su ogni pagina. */}
-    <ThemeWidget />
-    {/* Switcher di lingua globale: IT/EN/FR/DE, su ogni pagina, senza ricaricare. */}
-    <LanguageSwitcher />
+    {/* Barra di controllo globale — un'unica pillola in vetro, in basso a
+        sinistra: lingua · tema · sensore orario. Presente su ogni pagina.
+        L'ordine qui è l'ordine dei segmenti da sinistra a destra. */}
+    <div className="ap-controlbar">
+      <LanguageSwitcher />
+      <ThemeWidget />
+    </div>
   </>,
 );
 

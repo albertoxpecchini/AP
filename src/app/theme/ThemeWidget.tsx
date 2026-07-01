@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Sun, Moon } from "lucide-react";
 import {
   applyTheme,
@@ -190,7 +191,12 @@ export default function ThemeWidget() {
 
   return (
     <>
-      <div ref={overlayRef} className="ap-theme-wipe" aria-hidden="true" />
+      {/* Onda a tutto schermo portata su <body>: il backdrop-filter della barra
+          di controllo che la contiene la ritaglierebbe altrimenti. */}
+      {createPortal(
+        <div ref={overlayRef} className="ap-theme-wipe" aria-hidden="true" />,
+        document.body,
+      )}
 
       <div className="ap-theme-dock" data-ap-theme={theme}>
         <button
