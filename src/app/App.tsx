@@ -184,6 +184,17 @@ export default function App() {
 
   const CV_PDF = `/cv-alberto-pecchini-${lang}.pdf`;
 
+  // Apre un documento: su telefono (<576px) direttamente in una nuova scheda —
+  // il viewer PDF nativo è molto meno invasivo dell'iframe incorniciato; su
+  // desktop resta l'anteprima "vetro" in modale.
+  const openDoc = (url: string, title: string) => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 575.98px)").matches) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      setDocOpen({ url, title });
+    }
+  };
+
   useEffect(() => subscribeLang(setLangState), []);
 
   useEffect(() => {
@@ -423,7 +434,7 @@ export default function App() {
               <div className="hm-cvbtns">
                 <button
                   type="button"
-                  onClick={() => setDocOpen({ url: CV_PDF, title: "Curriculum Vitae — Alberto Pecchini" })}
+                  onClick={() => openDoc(CV_PDF, "Curriculum Vitae — Alberto Pecchini")}
                   className="hm-btn hm-btn--solid"
                   aria-haspopup="dialog"
                 >
@@ -445,7 +456,7 @@ export default function App() {
                   {(item as any).pdf && (
                     <button
                       type="button"
-                      onClick={() => setDocOpen({ url: (item as any).pdf, title: item.title })}
+                      onClick={() => openDoc((item as any).pdf, item.title)}
                       className="hm-cv-doc"
                       aria-haspopup="dialog"
                     >

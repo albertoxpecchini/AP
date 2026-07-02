@@ -691,7 +691,10 @@
         .ap-cv-modal {
           position: fixed;
           inset: 0;
-          z-index: 1080;
+          /* Sopra lo switcher lingua/tema (position:fixed, z-index ~2.1e9): senza
+             questo la barra "vetro" in basso a sinistra galleggerebbe sopra il
+             modale del CV su desktop. */
+          z-index: 2147483601;
           display: flex;
           align-items: center;
           justify-content: center;

@@ -144,6 +144,12 @@ export default defineConfig({
         globIgnores: ['**/three.module-*.js', '**/vanta.waves.min-*.js'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html',
+        // Le rotte SPA non hanno estensione → prendono il fallback a index.html.
+        // I file statici (PDF, ZIP, immagini…) NO: senza questa denylist il SW
+        // servirebbe index.html anche per una navigazione verso un .pdf (iframe o
+        // nuova scheda = mode "navigate"), facendo comparire la home al posto del
+        // documento. Escludendoli, la richiesta va in rete / runtimeCaching.
+        navigateFallbackDenylist: [/\.(?:pdf|zip|png|jpe?g|gif|webp|svg|ico|txt|xml|json|woff2?|mp4|webm|mp3)$/i],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
