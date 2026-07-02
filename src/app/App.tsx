@@ -27,6 +27,7 @@ import {
 import { PROJECTS, ProjectIcon } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
 import SiteFooter from "./site/SiteFooter";
+import { getLang, subscribeLang, type Lang } from "./i18n/langCore";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Home / portfolio — look "dark premium" (lo stesso di /me-stesso, /dubliners,
@@ -170,6 +171,9 @@ export default function App() {
   const [docOpen, setDocOpen] = useState<{ url: string; title: string } | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Lingua attiva del sito: serve a servire il PDF del CV nella lingua giusta
+  // (il testo a schermo lo traduce già il motore DOM; il PDF no, è statico).
+  const [lang, setLangState] = useState<Lang>(() => getLang());
 
   const sortedCV = useMemo(() => {
     const wishes = CV.filter((c) => (c as any).wish);
@@ -178,7 +182,9 @@ export default function App() {
     return [...sorted, ...wishes];
   }, []);
 
-  const CV_PDF = "/cv-alberto-pecchini.pdf";
+  const CV_PDF = `/cv-alberto-pecchini-${lang}.pdf`;
+
+  useEffect(() => subscribeLang(setLangState), []);
 
   useEffect(() => {
     activateLocalMode(() => {

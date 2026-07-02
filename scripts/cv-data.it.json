@@ -1,4 +1,19 @@
 {
+  "ui": {
+    "runningTitle": "Curriculum Vitae",
+    "langs": "Lingue",
+    "license": "Patente",
+    "canDrive": "Alla guida di",
+    "strengths": "Punti di forza",
+    "availability": "Disponibilità",
+    "wish": "Nel cassetto",
+    "profile": "Profilo",
+    "skills": "Competenze tecniche",
+    "experience": "Esperienze & progetti",
+    "education": "Formazione",
+    "travel": "Esperienze internazionali",
+    "volunteer": "Volontariato & attività extra"
+  },
   "name": "Alberto Pecchini",
   "role": "Designer & Front-end Developer",
   "tagline": "Studente CAT · Front-end Developer · Disponibile per web design, sviluppo front-end e branding",

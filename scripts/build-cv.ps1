@@ -4,7 +4,8 @@
 #  palette dark-premium viola, struttura kit: fascia d'intestazione, "card",
 #  "tag"/chip, section header, lista esperienze con marcatore d'accento.
 #  Nessun Python / Node: solo PowerShell + System.Drawing (foto + preview).
-#  Legge scripts/cv-data.json (UTF-8) -> public/cv-alberto-pecchini.pdf.
+#  Legge scripts/cv-data.<it|en|fr|de>.json (UTF-8) e genera un PDF per lingua:
+#  public/cv-alberto-pecchini-<loc>.pdf (+ copia IT -> cv-alberto-pecchini.pdf).
 #  Sorgente ASCII-only: il testo accentato arriva dal JSON (letto come UTF-8).
 # =============================================================================
 param([switch]$Preview)
@@ -13,13 +14,13 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
 $root     = 'c:\Users\Administrator\Documents\AP'
-$dataPath = Join-Path $root 'scripts\cv-data.json'
 $photoPath= Join-Path $root 'public\alberto-pecchini.jpg'
-$outPath  = Join-Path $root 'public\cv-alberto-pecchini.pdf'
 $fontDir  = Join-Path $root 'public\bootstrap-italia\fonts\Titillium_Web'
 
-$raw  = [System.IO.File]::ReadAllText($dataPath, [System.Text.Encoding]::UTF8)
-$data = $raw | ConvertFrom-Json
+# Multilingua: un PDF per lingua. I dati stanno in scripts\cv-data.<loc>.json
+# (stessa struttura, testo tradotto + blocco "ui" con le etichette di sezione).
+# $data e $outPath vengono impostati per-lingua nel loop di BUILD, in fondo.
+$LOCALES = @('it','en','fr','de')
 
 # ---- page geometry (points; 72 = 1 inch) -----------------------------------
 $PW = 595.28; $PH = 841.89
@@ -183,7 +184,7 @@ function DrawBg($pg,[bool]$first){
     RectOp $pg 0 0 9.0 $PH $cSideBg
     RectOp $pg 9.0 0 2.0 $PH $cAccent
     TextOp $pg $MX1 30.0 8.0 'F4' $cSub 'ALBERTO PECCHINI'
-    $rt = 'Curriculum Vitae'
+    $rt = $data.ui.runningTitle
     $rw = MeasureW $rt 8 'R'
     TextOp $pg ($PW-$MR-$rw) 30.0 8.0 'F1' $cSub $rt
     RectOp $pg $MX1 41.0 ($PW-$MX1-$MR) 0.8 $cHair
@@ -332,8 +333,19 @@ function BandChips($pg,$items,[double]$x0,[double]$yTop,[double]$maxRight){
 }
 
 # =============================================================================
-#  BUILD
+#  BUILD  (una passata per lingua -> un PDF per lingua)
 # =============================================================================
+foreach($loc in $LOCALES){
+$dataPath = Join-Path $root ("scripts\cv-data.$loc.json")
+$raw  = [System.IO.File]::ReadAllText($dataPath, [System.Text.Encoding]::UTF8)
+$data = $raw | ConvertFrom-Json
+$outPath = Join-Path $root ("public\cv-alberto-pecchini-$loc.pdf")
+
+# stato di layout azzerato a ogni lingua (colonna principale + rail sinistra)
+$Pages = New-Object System.Collections.ArrayList
+$script:miIdx = 0; $script:my = $MT0; $script:curPage = $null
+$script:sy = $railTop
+
 $pg0 = New-Object System.Collections.ArrayList
 DrawBg $pg0 $true
 [void]$Pages.Add($pg0)
@@ -353,22 +365,22 @@ $contactVals = @(); foreach($c in $data.contacts){ $contactVals += $c[1] }
 BandChips $pg0 $contactVals $idX 116.0 $idR
 
 # ----- rail sinistra -----
-SideTitle 'Lingue'
+SideTitle $data.ui.langs
 foreach($l in $data.languages){ SideLang $l[0] $l[1] ([double]$l[2]) }
 SideRule
-SideTitle 'Patente'
+SideTitle $data.ui.license
 SideChips $data.patente 7.8
 $script:sy += 5
-SideTitle 'Alla guida di'
+SideTitle $data.ui.canDrive
 SideChips $data.guida 7.8
 SideRule
-SideTitle 'Punti di forza'
+SideTitle $data.ui.strengths
 SideChips $data.strengths 7.8
 SideRule
-SideTitle ('Disponibilit' + [char]0xE0)
+SideTitle $data.ui.availability
 foreach($a in $data.availability){ SideBullet $a }
 SideRule
-SideTitle 'Nel cassetto'
+SideTitle $data.ui.wish
 SideText $data.wishlist 8.2 'I' $cSideLbl 0
 
 # ----- colonna principale -----
@@ -376,26 +388,26 @@ $script:miIdx = 0
 $script:my = $MT0
 $script:curPage = $Pages[0]
 
-MainSection 'Profilo'
+MainSection $data.ui.profile
 MainText $data.profile 9.4 'R' $cText 0 0 1 1.4
 
-MainSection 'Competenze tecniche'
+MainSection $data.ui.skills
 foreach($s in $data.skills){
   MainText $s[0] 9.2 'SB' $cText 0 3 3 1.2
   MainChips $s[1] 8.3 $cInk $cChipBg $cChipBd 8 3.6 5 5 6 0
   $script:my += 3
 }
 
-MainSection 'Esperienze & progetti'
+MainSection $data.ui.experience
 foreach($e in $data.experience){ MainEntry $e.period $e.title $e.role $e.desc $e.link }
 
-MainSection 'Formazione'
+MainSection $data.ui.education
 foreach($e in $data.education){ MainEntry $e.period $e.title $e.role $e.desc $null }
 
-MainSection 'Esperienze internazionali'
+MainSection $data.ui.travel
 foreach($e in $data.travel){ MainEntry $e.period $e.title $e.role $e.desc $null }
 
-MainSection ('Volontariato & attivit' + [char]0xE0 + ' extra')
+MainSection $data.ui.volunteer
 foreach($e in $data.volunteer){ MainEntry $e.period $e.title $e.role $e.desc $null }
 
 $script:my += 6
@@ -556,8 +568,15 @@ $ms.Dispose()
 $kb = [math]::Round((Get-Item $outPath).Length / 1KB, 1)
 Write-Output ("OK: $outPath  |  pagine: $n  |  oggetti: $maxObj  |  font: Titillium Web (4 pesi, embedded)  |  totale: $kb KB")
 
-# ---- optional PNG preview (System.Drawing) for visual QA --------------------
-if($Preview){
+# L'italiano e' anche il PDF "base" (link storici, /archivio, build-zips).
+if($loc -eq 'it'){
+  $basePath = Join-Path $root 'public\cv-alberto-pecchini.pdf'
+  Copy-Item $outPath $basePath -Force
+  Write-Output "OK: $basePath  (copia IT del CV base)"
+}
+
+# ---- optional PNG preview (System.Drawing) for visual QA (solo IT) ----------
+if($Preview -and $loc -eq 'it'){
   $previewDir = $env:CV_PREVIEW_DIR; if(-not $previewDir){ $previewDir = (Join-Path $root 'scripts') }
   $scale = 1.7
   $photoImg = [System.Drawing.Image]::FromStream((New-Object System.IO.MemoryStream(,$jpegBytes)))
@@ -614,3 +633,4 @@ if($Preview){
   }
   $photoImg.Dispose()
 }
+} # foreach $loc

@@ -1,0 +1,158 @@
+{
+  "ui": {
+    "runningTitle": "Lebenslauf",
+    "langs": "Sprachen",
+    "license": "Führerschein",
+    "canDrive": "Kann fahren",
+    "strengths": "Stärken",
+    "availability": "Verfügbarkeit",
+    "wish": "Auf der Wunschliste",
+    "profile": "Profil",
+    "skills": "Technische Fähigkeiten",
+    "experience": "Erfahrung & Projekte",
+    "education": "Ausbildung",
+    "travel": "Internationale Erfahrungen",
+    "volunteer": "Ehrenamt & Extra"
+  },
+  "name": "Alberto Pecchini",
+  "role": "Designer & Frontend-Entwickler",
+  "tagline": "CAT-Schüler · Frontend-Entwickler · Verfügbar für Webdesign, Frontend-Entwicklung und Branding",
+  "contacts": [
+    ["E-Mail", "pzkko@yahoo.com"],
+    ["Telefon", "+39 331 407 4198"],
+    ["WhatsApp", "+44 7340 995142"],
+    ["Ort", "Mantova, Italien"],
+    ["Web", "albertopecchini.it"]
+  ],
+  "languages": [
+    ["Italienisch", "Muttersprache", 1.0],
+    ["Englisch", "C1 · IELTS", 0.85]
+  ],
+  "patente": ["A1", "B"],
+  "guida": ["Traktoren", "Gabelstapler", "Motorräder", "Transporter", "Autos"],
+  "strengths": ["Problemlösung", "Eigenständigkeit", "Koordination", "Zuverlässigkeit", "Liebe zum Detail", "Schnelle Auffassungsgabe"],
+  "availability": ["Praktika und Kooperationen", "Freelance-Projekte", "Remote-Arbeit"],
+  "profile": "Schüler im fünften Jahr der Fachrichtung CAT (Bauwesen, Umwelt und Raumordnung) und autodidaktischer Frontend-Entwickler & Designer. Ich verbinde eine technische Ausbildung in Planung und Zeichnung — auch in drei Jahren praxisorientierten Lernens (PCTO) im technischen Büro der Holzabteilung der Caem Group erworben — mit der Leidenschaft fürs Web und baue moderne, schnelle und bis ins Detail sorgfältig gestaltete Oberflächen. Ich arbeite mit React, Next.js, TypeScript, Tailwind CSS und GSAP-Animationen, mit Fokus auf User Experience, Typografie und minimalistisches Design. Ich integriere künstliche Intelligenz in meinen Entwicklungs-Workflow (Claude Code, Codex, GitHub Copilot, Gemini) und nutze generative KI-Tools wie Nano Banana Pro, DeepSeek und Grok auf fortgeschrittenem Niveau.",
+  "skills": [
+    ["Frontend-Entwicklung", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
+    ["Design & UX", ["UI/UX Design", "Figma", "Design System", "Responsive Design", "Motion"]],
+    ["KI & assistierte Entwicklung", ["Claude Code", "Codex", "GitHub Copilot", "Gemini"]],
+    ["Generative KI · fortgeschrittenes Niveau", ["Nano Banana Pro", "DeepSeek", "Grok"]],
+    ["Tools & Workflow", ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "Supabase"]],
+    ["Technischer Bereich CAT", ["AutoCAD", "cadwork", "Topografie", "Wertermittlung", "Technische Zeichnung / CAD", "Excel (fortgeschritten)"]],
+    ["IT & Multimedia", ["PC-Fehlerbehebung", "Windows", "Linux Ubuntu", "Kommerzielle Fotografie", "DaVinci Resolve", "Canva"]]
+  ],
+  "experience": [
+    {
+      "period": "2023 — 2026",
+      "title": "Praxisorientiertes Lernen (PCTO) — Caem Group S.p.A., Castellucchio (MN)",
+      "role": "Technisches Büro · Holzabteilung · AutoCAD 3D, cadwork",
+      "desc": "Drei Jahre praxisorientiertes Lernen (PCTO) im technischen Büro der Holzabteilung der Caem Group: 3D-Modellierung von Vordächern in AutoCAD, Beobachtung der Angebotserstellung live mit dem Kunden und geordnete Archivierung der technischen Unterlagen. Insgesamt 232 Stunden in drei Sessions (80 + 72 + 80), 8 Stunden pro Tag in einem siebenköpfigen Team, im Umgang mit Brettschichtholz- und X-LAM-Strukturen.",
+      "link": null
+    },
+    {
+      "period": "2019 — heute",
+      "title": "Online-Verkäufe — Vinted & Subito",
+      "role": "E-Commerce · Kommerzielle Fotografie · Kundenbetreuung",
+      "desc": "Eigenständige Abwicklung des gesamten Verkaufszyklus auf Vinted und Subito: Produktbewertung, Marktpreis, Fotografie mit einer Canon EOS 4000D und einem iPhone 16 Pro, Erstellung der Anzeigen, Verhandlung, Versand und Bewertungsmanagement. Erster Verkauf im Dezember 2019; systematische Tätigkeit seit Herbst 2024. Kategorien: Kleidung, Film-Sammlerstücke, Tech-Geräte (Apple Watch, Nintendo Switch, Flipper Zero).",
+      "link": "vinted.it/member/237170304"
+    },
+    {
+      "period": "fortlaufend",
+      "title": "Familienbauernhof — Rivalta sul Mincio",
+      "role": "Landwirtschaftlicher Helfer · Logistik · Operative Koordination",
+      "desc": "Fortlaufende Mitarbeit im familiären Landwirtschaftsbetrieb: Pflege und Instandhaltung der Pflanzen (Bewässerung, Schnitt verschiedener Arten), Transport von Materialien mit Traktor und Anhänger, Heuernte von Dauergrünland, Koordination der Arbeiten mit dem Team und logistische Unterstützung bei Transporten. Eigenständiger Umgang mit den Geräten und Problemlösung vor Ort.",
+      "link": null
+    },
+    {
+      "period": "22. — 23. März 2026",
+      "title": "Wahlhelfer — Sektion 5, Rivalta sul Mincio",
+      "role": "Wahlvorgänge · Gemeinde Rodigo · Referendum",
+      "desc": "Offizielle Bestellung als Wahlhelfer im Wahllokal Nr. 5 von Rivalta sul Mincio (Gemeinde Rodigo) für das Referendum am 22. und 23. März 2026: Überprüfung der Wähleridentität, Betreuung der Wahlvorgänge, Auszählung der Stimmzettel, Erstellung der Protokolle und Übermittlung der Ergebnisse. Vergütete Tätigkeit — Aufwandsentschädigung von 119,60 €.",
+      "link": null
+    },
+    {
+      "period": "Apr. 2026",
+      "title": "Rivalta sul Mincio — Website",
+      "role": "Webdesign & Frontend-Entwicklung",
+      "desc": "Konzeption und Entwicklung der institutionellen Tourismus-Website des Ortes Rivalta sul Mincio. Minimalistisches redaktionelles Design mit sorgfältiger Typografie, warmer Farbpalette und fortgeschrittenen Animationen via GSAP ScrollTrigger (Pinning, Stacking, Parallax-Scrubbing). Gapless-Bento-Grids und bildgeführte Komposition für immersives visuelles Storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
+      "link": "rivaltasulmincio.it"
+    },
+    {
+      "period": "Apr. 2026",
+      "title": "Cascina Fontana — Website",
+      "role": "Webdesign & Frontend-Entwicklung",
+      "desc": "Konzeption und Entwicklung der offiziellen Website von Cascina Fontana. Analyse der Kundenbedürfnisse, Definition der Informationsarchitektur und Erstellung einer responsiven, sorgfältig gestalteten Oberfläche zur Präsentation von Produkten und Dienstleistungen. Direkte Zusammenarbeit mit dem Kunden an den Inhalten. Stack: React, TypeScript, Tailwind CSS.",
+      "link": "cascinafontana.xyz"
+    },
+    {
+      "period": "2026",
+      "title": "Persönliche Portfolio-Website",
+      "role": "Design & Frontend-Entwicklung · «dark premium»",
+      "desc": "Konzeption und Entwicklung des persönlichen Portfolios und eines Hubs von Web-Games (Trivia, Mappa, Parole, Angoli, Movimento) sowie von Lernmaterial für das Abitur (Maturità). Ein violettes «dark premium»-Designsystem, sektionsbasierte Architektur, Einblend-Animationen, volle Barrierefreiheit (Skip-Links, Fokus-Management, prefers-reduced-motion) und kontinuierliches Deployment auf Vercel. Stack: React, TypeScript, Vite, Tailwind CSS, Supabase.",
+      "link": "albertopecchini.it"
+    }
+  ],
+  "education": [
+    {
+      "period": "2021 — heute",
+      "title": "Technisches Institut «Carlo d'Arco» — Mantua",
+      "role": "CAT-Diplom · Bauwesen, Umwelt und Raumordnung · Klasse 5T",
+      "desc": "Fünfjähriger technisch-technologischer Bildungsgang. Hauptfächer: Architekturplanung und technisches Zeichnen (AutoCAD), Topografie und instrumentelle Vermessung, Wertermittlung und Immobilienbewertung, Baustellenmanagement, technische Physik, Mathematik und technisches Englisch. Schulcode MNTL009017."
+    },
+    {
+      "period": "11. — 25. Aug. 2024",
+      "title": "CES IELTS Test Centre — Dublin, Irland",
+      "role": "General English Intensive · 26 Lektionen/Woche · Niveau C1",
+      "desc": "Intensivkurs in allgemeinem Englisch am CES-Zentrum in Dame Court (Dublin 2): vier Wochen Full-Immersion in Speaking, Writing, Reading und Hörverstehen auf fortgeschrittenem Niveau. Bestehen der IELTS-Prüfung am Ende des Kurses."
+    },
+    {
+      "period": "19. Dez. 2023",
+      "title": "Arbeitssicherheitskurs — Niedriges Risiko",
+      "role": "Teilnahmebescheinigung · LTO Mantua / FORMA · Region Lombardei · 4 Std. E-Learning",
+      "desc": "Kurs gemäß der Staat-Regionen-Vereinbarung vom 21.12.2011 (Gesetzesdekret 81/08, Art. 37) für Büroangestellte: elektrisches Risiko, Absturz aus der Höhe, Mikroklima und Beleuchtung, Bildschirmarbeit, arbeitsbedingter Stress, Erste Hilfe, Beschilderung und Brandschutz-Notfälle."
+    },
+    {
+      "period": "2018 — 2021",
+      "title": "Sekundarschule der ersten Stufe — Mantua",
+      "role": "Istituto Redentore · Stiftung «Studentenhaus B. Contardo Ferrini»",
+      "desc": "Dreijähriger Bildungsgang mit solider Grundlage in Italienisch, Mathematik, Geschichte, Naturwissenschaften und Englisch. Diplom mit gutem Erfolg erworben."
+    }
+  ],
+  "travel": [
+    {
+      "period": "23. Juli — 1. Aug. 2025",
+      "title": "Paris · Le Havre · Rouen · Étretat — Frankreich",
+      "role": "Kulturreise",
+      "desc": "Eine Route durch die Normandie und die Île-de-France: die Steilküste von Étretat, die gotische Kathedrale von Rouen, der historische Hafen von Le Havre und die wichtigsten Museen und Viertel von Paris."
+    },
+    {
+      "period": "26. — 29. Dez. 2025",
+      "title": "Edinburgh — Schottland, Vereinigtes Königreich",
+      "role": "Kulturreise",
+      "desc": "Besuch der schottischen Hauptstadt über die Weihnachtsfeiertage: die Old Town, das Edinburgh Castle, die Royal Mile und die einzigartige Atmosphäre der historischen Closes zu Weihnachten."
+    }
+  ],
+  "volunteer": [
+    {
+      "period": "2024 — 2025",
+      "title": "Pfarr-Sommercamp · Pfarrei SS. Donato e Vigilio Martiri",
+      "role": "Ehrenamtlicher Betreuer · Rivalta sul Mincio · 2 Ausgaben",
+      "desc": "Betreuungsdienst während des Sommercamps (Grest) — zwei aufeinanderfolgende Ausgaben (2024 und 2025), insgesamt zwölf Wochen. Direkte Verantwortung für Kindergruppen unterschiedlichen Alters, Planung von Spielen und Workshops, Steuerung der Gruppendynamik und Kommunikation mit den Eltern. Ansprechpartner: Don Andrea Grandi."
+    },
+    {
+      "period": "Sommer 2024",
+      "title": "CRED · Sekundarschule Rodigo",
+      "role": "Ehrenamtliche pädagogische Unterstützung · Gemeinde Rodigo · 2 Wochen",
+      "desc": "Pädagogische Unterstützung und Animation während des sommerlichen Tagesbetreuungszentrums der Gemeinde Rodigo: Unterstützung der Erzieher, Betreuung der Gruppen und individuelle Förderung der Schüler."
+    },
+    {
+      "period": "2024 — 2025",
+      "title": "Fisch- und Hechtfest · Associazione Rivaltese",
+      "role": "Logistik-Freiwilliger · 2 Ausgaben",
+      "desc": "Logistische und organisatorische Unterstützung beim lokalen Gastronomie-Event: Aufbau, Steuerung der Besucherströme und operative Unterstützung des Teams."
+    }
+  ],
+  "wishlist": "Ein eigenes Nachrichtenmedium gründen: rausgehen ins Feld und wahre Geschichten erzählen, ohne Filter.",
+  "privacy": "Ich erkläre mich mit der Verarbeitung der in diesem Lebenslauf enthaltenen personenbezogenen Daten gemäß EU-Verordnung 2016/679 (DSGVO) und Gesetzesdekret 196/2003 einverstanden."
+}
