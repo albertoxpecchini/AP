@@ -91,6 +91,13 @@
       "role": "Design & sviluppo front-end · «dark premium»",
       "desc": "Ideazione e sviluppo del portfolio personale e di un hub di giochi web (Trivia, Mappa, Parole, Angoli, Movimento) e approfondimenti per la Maturità. Design system «dark premium» viola, architettura a sezioni, animazioni in entrata, piena accessibilità (skiplinks, gestione focus, prefers-reduced-motion) e deploy continuo su Vercel. Stack: React, TypeScript, Vite, Tailwind CSS, Supabase.",
       "link": "albertopecchini.it"
+    },
+    {
+      "period": "30 giu — 1 lug 2026",
+      "title": "Figurazione — Serie TV «House of Gonzaga»",
+      "role": "Comparsa · Scena tra il pubblico · Piazza Broletto, Mantova",
+      "desc": "Figurazione per la serie TV «House of Gonzaga», girata nel centro storico di Mantova. Ho preso parte come comparsa tra il pubblico di una scena notturna ambientata durante un DJ set, in Piazza Broletto, su due giornate (30 giugno – 1 luglio 2026) per circa 10 ore sul set.",
+      "link": null
     }
   ],
   "education": [

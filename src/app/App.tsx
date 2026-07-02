@@ -118,6 +118,12 @@ const CV = [
     role: "Web design & front-end development",
     desc: "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography, a warm colour palette and advanced animations via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Gapless bento grids and image-led composition for immersive visual storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
   },
+  {
+    period: "Jun 30 — Jul 1, 2026",
+    title: "Film extra — «House of Gonzaga» TV series",
+    role: "Background actor · Crowd scene · Piazza Broletto, Mantua",
+    desc: "Background acting (figurazione) for the television series «House of Gonzaga», shot in the historic centre of Mantua. Part of the crowd in a night-time DJ-set scene filmed in Piazza Broletto, over two days (30 June – 1 July 2026) for around 10 hours on set.",
+  },
   // --- wishlist ---
   {
     period: "✦ wish",
