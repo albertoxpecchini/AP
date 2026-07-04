@@ -19,6 +19,7 @@ content/trivia/raw/_IMPORT_REPORT.md
 public/zips
 
 # Log
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
