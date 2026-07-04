@@ -126,33 +126,6 @@ function buildSeq(c: Copy): string {
     deactivate VC`;
 }
 
-const MERMAID_THEME = {
-  fontFamily: '"Titillium Web", Geneva, Tahoma, sans-serif',
-  fontSize: "14px",
-  background: "#0b0e14",
-  primaryColor: "#191d2e",
-  primaryBorderColor: "#8b7bff",
-  primaryTextColor: "#e8eef4",
-  secondaryColor: "#20243a",
-  actorBkg: "#191d2e",
-  actorBorder: "#8b7bff",
-  actorTextColor: "#eef2f7",
-  actorLineColor: "#5a5580",
-  signalColor: "#b9a6ff",
-  signalTextColor: "#cdd6e0",
-  labelBoxBkgColor: "#241b3b",
-  labelBoxBorderColor: "#8b7bff",
-  labelTextColor: "#eae6ff",
-  loopTextColor: "#cdd6e0",
-  noteBkgColor: "#241b3b",
-  noteTextColor: "#eae6ff",
-  noteBorderColor: "#8b7bff",
-  activationBkgColor: "#33306a",
-  activationBorderColor: "#b9a6ff",
-  sequenceNumberColor: "#ffffff",
-  lineColor: "#8b7bff",
-};
-
 export default function WorkflowModal() {
   const [lang, setLang] = useState<Lang>(() => getLang());
   const [open, setOpen] = useState(false);
@@ -182,11 +155,12 @@ export default function WorkflowModal() {
     (async () => {
       try {
         const mermaid = (await import("mermaid")).default;
+        // Tema Mermaid PREDEFINITO (nessuna personalizzazione): resa identica a
+        // GitHub/allo screenshot — box lavanda, note gialle, numeri neri.
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: "loose",
-          theme: "base",
-          themeVariables: MERMAID_THEME,
+          theme: "default",
           sequence: { useMaxWidth: true, wrap: true, mirrorActors: true, actorMargin: 42 },
         });
         const id = "apw-seq-" + Math.random().toString(36).slice(2);
@@ -249,37 +223,37 @@ export default function WorkflowModal() {
 
         .apw-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Titillium Web", Geneva, Tahoma, sans-serif; }
         .apw-backdrop { position: absolute; inset: 0; background: rgba(4, 6, 10, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: apw-fade 0.2s ease; }
+        /* Dialogo CHIARO: il diagramma Mermaid di default vive su fondo bianco,
+           come nello screenshot (README). Nessuno stile "del sito" addosso. */
         .apw-dialog {
           position: relative; z-index: 1;
           width: min(1000px, 100%); max-height: min(90vh, 940px);
           display: flex; flex-direction: column;
-          background: linear-gradient(180deg, #0e1218 0%, #0a0d12 100%);
-          border: 1px solid rgba(139, 123, 255, 0.28); border-radius: 18px;
-          box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.14); border-radius: 14px;
+          box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
           overflow: hidden; animation: apw-pop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .apw-bar {
           display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-          padding: 0.85rem 1.1rem; border-bottom: 1px solid rgba(139, 123, 255, 0.18);
-          background: rgba(139, 123, 255, 0.06);
+          padding: 0.8rem 1.1rem; border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          background: #f6f8fa;
         }
         .apw-bar-txt { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
-        .apw-bar-title { color: #fff; font-weight: 800; font-size: 1.02rem; line-height: 1.2; }
-        .apw-bar-sub { color: #8893a0; font-size: 0.78rem; font-weight: 600; }
+        .apw-bar-title { color: #1f2328; font-weight: 800; font-size: 1.05rem; line-height: 1.2; }
+        .apw-bar-sub { color: #656d76; font-size: 0.78rem; font-weight: 600; }
         .apw-close {
           flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
-          width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
-          border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); color: #cdd6e0;
+          width: 34px; height: 34px; border-radius: 8px; cursor: pointer;
+          border: 1px solid rgba(0, 0, 0, 0.14); background: #ffffff; color: #57606a;
           transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .apw-close:hover { color: #fff; border-color: rgba(139, 123, 255, 0.5); background: rgba(139, 123, 255, 0.16); }
+        .apw-close:hover { color: #1f2328; border-color: rgba(0, 0, 0, 0.28); background: #eef0f2; }
 
-        .apw-body { padding: clamp(0.8rem, 3vw, 1.5rem); overflow: auto; }
-        .apw-msg { color: #97a1ad; font-size: 0.9rem; text-align: center; padding: 2rem 0; }
+        .apw-body { padding: clamp(0.8rem, 3vw, 1.5rem); overflow: auto; background: #ffffff; }
+        .apw-msg { color: #656d76; font-size: 0.9rem; text-align: center; padding: 2rem 0; }
         .apw-diagram { display: flex; justify-content: center; min-width: min-content; }
         .apw-diagram svg { max-width: 100%; height: auto; }
-        /* La numerazione (autonumber) resta leggibile sul cerchio accento */
-        .apw-diagram :where(text.sequenceNumber) { fill: #ffffff; }
 
         @keyframes apw-fade { from { opacity: 0; } to { opacity: 1; } }
         @keyframes apw-pop { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
