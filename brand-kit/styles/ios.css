@@ -1,0 +1,95 @@
+/* ============================================================
+   iOS / iPadOS native-like optimizations
+   Attivato da: html.ios (classe aggiunta via JS al mount)
+   Desktop: NESSUN effetto — ogni regola è sotto html.ios
+   ============================================================ */
+
+/* ── 1. Font rendering ── */
+html.ios {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 2. Tap highlight: rimuove il flash grigio su ogni tap ── */
+html.ios * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── 3. Tap delay: elimina il 300ms su elementi interattivi ── */
+html.ios button,
+html.ios a,
+html.ios [role="button"],
+html.ios input,
+html.ios textarea,
+html.ios select,
+html.ios label {
+  touch-action: manipulation;
+}
+
+/* ── 4. Overscroll: niente bounce indesiderato su SPA ── */
+html.ios,
+html.ios body {
+  overscroll-behavior: none;
+}
+
+/* ── 5. Safe area — header slim (fascia verde scuro in cima) ── */
+html.ios .it-header-slim-wrapper {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* ── 6. Safe area — footer e sezione contatti (home indicator) ── */
+html.ios .it-footer-main {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+html.ios #contatti {
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+}
+
+/* ── 9. Safe area — modali hobby/passioni ── */
+html.ios .ap-modal {
+  max-height: calc(90vh - env(safe-area-inset-bottom));
+  top: calc(50% - env(safe-area-inset-bottom) / 2);
+}
+
+/* ── 10. Safe area — CV / PDF dialog ── */
+html.ios .ap-cv-dialog {
+  height: calc(min(92vh, 100%) - env(safe-area-inset-bottom));
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── 11. Input zoom prevention: font-size < 16px triggera lo zoom iOS ── */
+html.ios input,
+html.ios textarea,
+html.ios select {
+  font-size: max(16px, 1rem) !important;
+}
+
+/* ── 12. Accelerazione GPU — solo sulle modali, MAI sulla navbar/collapsable
+   (transform crea stacking context e rompe position:fixed dei figli) ── */
+html.ios .ap-modal,
+html.ios .ap-modal-backdrop,
+html.ios .ap-cv-dialog,
+html.ios .ap-cv-backdrop {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ── 13. Momentum scroll nelle aree scorrevoli ── */
+html.ios .ap-modal,
+html.ios .navbar-collapsable .menu-wrapper {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ── 14. Prefers-reduced-motion: rispetta la preferenza di sistema iOS ── */
+@media (prefers-reduced-motion: reduce) {
+  html.ios *,
+  html.ios *::before,
+  html.ios *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

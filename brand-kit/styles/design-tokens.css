@@ -1,0 +1,84 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — fonte unica dei colori del brand.
+   Copia questo file in un nuovo progetto e importalo per primo.
+   Contiene DUE identità visive che convivono nel sito originale:
+
+     A) ISTITUZIONALE "neroverde"  → pagine sobrie, Bootstrap Italia / kit Italia
+     B) DARK PREMIUM "viola/indaco" → home, giochi, sezioni editoriali
+
+   Ogni colore è una CSS custom property: cambi il valore qui e cambia ovunque.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Tipografia (caratteri caricati in index.html) ────────────────────────
+     Titillium Web = font ufficiale del Design System Italia (usa SOLO questo
+     per l'interfaccia; niente Segoe UI o altri). Lora per i titoli editoriali,
+     Roboto Mono per numeri/codice. */
+  --font-ui:     "Titillium Web", Geneva, Tahoma, sans-serif;
+  --font-serif:  "Lora", Georgia, serif;
+  --font-mono:   "Roboto Mono", ui-monospace, monospace;
+  --font-size:   16px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 600;
+  --radius: 0.625rem;          /* raggio base dei bordi (10px) */
+
+  /* ══════════════════════════════════════════════════════════════════════
+     A) PALETTE ISTITUZIONALE "NEROVERDE"
+     Il verde primario che sostituisce il blu di Bootstrap Italia.
+     ══════════════════════════════════════════════════════════════════════ */
+  --brand-green:        #2F7D4A;   /* primario */
+  --brand-green-rgb:    47, 125, 74;
+  --brand-green-deep:   #1F6B3D;   /* link / hover primario */
+  --brand-green-darker: #155030;   /* hover profondo */
+  --brand-green-night:  #103820;   /* fasce scure / footer */
+  --brand-green-soft:   #7FC09A;   /* accento chiaro / accent-foreground bg */
+
+  /* Superfici chiare istituzionali */
+  --paper:      #F7F5F0;   /* sfondo pagina caldo */
+  --card:       #FFFFFF;
+  --ink:        #1C1A17;   /* testo principale */
+  --ink-muted:  #8A8478;   /* testo attenuato */
+  --line:       #EAE7E0;   /* bordi / secondary */
+
+  /* ══════════════════════════════════════════════════════════════════════
+     B) PALETTE DARK PREMIUM "VIOLA / INDACO"
+     Usata da home, sezioni editoriali e giochi. Ha una variante scura (default)
+     e una chiara (attivata da html[data-ap-theme="light"], vedi theme-auto.css).
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* Sfondi scuri */
+  --dp-bg0:     #090c10;   /* fondo assoluto (boot, overlay) */
+  --dp-bg1:     #0b0f14;
+  --dp-text:    #e8eef4;   /* testo su scuro */
+  --dp-sub:     #a7b2bd;   /* testo attenuato su scuro */
+  --dp-glass:       rgba(255, 255, 255, 0.045);  /* superficie "vetro" */
+  --dp-glass-border: rgba(255, 255, 255, 0.09);
+
+  /* Accento viola (identità principale dark-premium) */
+  --dp-accent:      #8b7bff;   /* viola/indaco neon (tema scuro) */
+  --dp-accent-2:    #7c6cff;
+  --dp-accent-deep: #5b4bd6;
+  --dp-glow:        rgba(139, 123, 255, 0.45);   /* alone/ombra dell'accento */
+
+  /* Variante chiara dell'accento (tema light delle stesse pagine) */
+  --dp-accent-light:      #6d4bd6;
+  --dp-accent-light-deep: #4a2fb0;
+  --dp-glow-light:        rgba(109, 75, 214, 0.28);
+  --dp-paper-light:       #f7f5fd;   /* fondo pagina chiaro viola */
+
+  /* ── Accenti "neon" per-gioco (motore giochi, vedi core/game/tokens.ts) ── */
+  --game-trivia:    #8b7bff;   /* viola/indaco */
+  --game-mappa:     #a855f7;   /* viola */
+  --game-angoli:    #34d399;   /* verde */
+  --game-parole:    #fbbf24;   /* ambra */
+  --game-movimento: #38bdf8;   /* ciano */
+
+  /* ── Stato / feedback ── */
+  --ok:      #34d399;
+  --warn:    #fbbf24;
+  --danger:  #C94040;
+}
+
+/* Colore di boot: evita il flash bianco/nero al primo paint e al cambio rotta.
+   Lo script inline in index.html imposta --ap-boot-bg prima di React. */
+html, body { background: var(--ap-boot-bg, var(--paper)); }
