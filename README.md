@@ -116,57 +116,52 @@ su Vercel e ai **dati live** che il browser richiede a runtime (GitHub, Supabase
 > Lo stesso schema è consultabile dal sito: **footer → «Come funziona»** (finestra interna).
 
 ```mermaid
-flowchart TB
-  subgraph S1["🗂️ Sorgenti & contenuti"]
-    A1["📝 i18n · dictionary.ts"]
-    A2["📄 cv-data ×4 · JSON"]
-    A3["❓ trivia · raw / .md"]
-    A4["🖼️ images · assets"]
-    A5["🧩 code · React · TS"]
-  end
+sequenceDiagram
+    autonumber
+    actor Dev as Alberto · dev
+    participant CC as Claude Code
+    participant GH as GitHub · main
+    participant VC as Vercel · CI/hosting
+    participant BR as Browser · PWA
+    participant EXT as API e servizi esterni
 
-  subgraph S2["⚙️ Build & codifiche · script locali"]
-    B1["import-trivia → chapters JSON"]
-    B2["build-cv.ps1 → 4× PDF"]
-    B3["compress-images · sharp → WebP"]
-    B4["build-zips · archiver → ZIP"]
-    B5["i18n-extract → translations.json"]
-    B6["vite build · Rollup → bundle JS/CSS"]
-    B7["vite-plugin-pwa · Workbox → service worker"]
-  end
+    Note over Dev,CC: 1 · Sviluppo locale (codifiche)
+    Dev->>CC: "fai la modifica X"
+    activate CC
+    Note over CC: build-cv.ps1 → 4× PDF · sharp → WebP · import-trivia → JSON
+    CC->>GH: git commit + push → main
+    deactivate CC
 
-  subgraph S3["🚀 Versioning & deploy"]
-    C1["🤖 Claude Code · dev locale"]
-    C2["🌿 git commit + push → main"]
-    C3["🐙 GitHub · repo AP"]
-    C4["▲ Vercel · CI build"]
-  end
+    Note over GH,VC: 2 · Build e deploy (CI)
+    GH->>VC: webhook · nuovo commit su main
+    activate VC
+    Note over VC: prebuild · build-zips → ZIP
+    Note over VC: vite build · Rollup → bundle JS/CSS
+    Note over VC: vite-plugin-pwa · Workbox → service worker
+    VC-->>GH: deploy ok
+    deactivate VC
 
-  subgraph S4["☁️ Online · Vercel"]
-    D1["🗄️ CDN statica · HTML · JS · CSS · PDF · ZIP · WebP · font"]
-    D2["🔌 /api/trivia → 🤖 Anthropic Claude"]
-    D3["🔌 /api/notify → ✉️ Resend · email"]
-  end
+    Note over BR,EXT: 3 · Un utente apre il sito
+    BR->>VC: GET / (HTML · JS · CSS · WebP · font)
+    VC-->>BR: SPA React + service worker (precache offline)
 
-  subgraph S5["🧑‍💻 Client · browser (PWA)"]
-    E1["⚛️ SPA React + Router"]
-    E2["⚡ Service worker · cache offline"]
-    E3["📊 Footer → sparkline dei commit"]
-    E4["🏆 Classifiche dei giochi"]
-  end
-
-  GH["🐙 GitHub API · pubblica"]
-  SB["🟢 Supabase · Postgres"]
-
-  S1 -- "file sorgente" --> S2
-  S2 -- "artefatti: bundle · PDF · ZIP · WebP · SW" --> S3
-  S3 -- "git push → build → deploy" --> S4
-  S4 -- "HTTPS · JSON · lazy chunks" --> S5
-
-  E3 -. "REST / JSON" .-> GH
-  E4 -. "REST + Realtime WebSocket" .-> SB
-  E1 -. "fetch" .-> D2
-  E1 -. "fetch" .-> D3
+    Note over BR,EXT: 4 · Dati live a runtime
+    BR->>EXT: GitHub API · profilo / eventi
+    EXT-->>BR: JSON → sparkline dei commit
+    BR->>EXT: Supabase · REST + Realtime WS
+    EXT-->>BR: classifiche + aggiornamenti live
+    BR->>VC: GET /api/trivia · parola
+    activate VC
+    VC->>EXT: Anthropic Claude (Haiku)
+    EXT-->>VC: curiosità (testo)
+    VC-->>BR: JSON (cache 24 h)
+    deactivate VC
+    BR->>VC: POST /api/notify · voto Festa
+    activate VC
+    VC->>EXT: Resend · invio email
+    EXT-->>VC: 202 accepted
+    VC-->>BR: ok
+    deactivate VC
 ```
 
 | Servizio esterno | Uso | Dove |

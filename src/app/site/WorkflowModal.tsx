@@ -1,149 +1,163 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Workflow, X } from "lucide-react";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import { lockBodyScroll, unlockBodyScroll } from "../utils/scrollLock";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// "Come funziona" — il GIRO DEI DATI del sito, dal codice all'online: sorgenti →
-// build/codifiche → deploy → online (Vercel: CDN + serverless) → client (PWA).
+// "Come funziona" — il GIRO DEI DATI del sito come SEQUENCE DIAGRAM (stile Vajra
+// MCP): dallo sviluppo locale al deploy Vercel, fino ai dati live a runtime
+// (GitHub API, Supabase, funzioni serverless → Anthropic / Resend).
 //
-// Diagramma disegnato a mano in HTML/CSS (nessuna dipendenza), dark premium,
-// aperto in una finestra interna sul modello del visualizzatore PDF (.ap-cv-*).
-// La STESSA pipeline è nel README come diagramma Mermaid.
-//
-// Multilingua senza il motore i18n (marcato data-no-i18n): la NARRAZIONE (titoli,
-// sottotitoli, connettori) si traduce da sé leggendo la lingua attiva; i nodi
-// restano etichette tecniche universali (nomi di tool, formati, protocolli).
+// Lo STESSO diagramma è nel README (blocco ```mermaid); qui è renderizzato in una
+// finestra interna (sul modello del viewer PDF) con Mermaid caricato in lazy —
+// così pesa solo quando si apre il modale. Multilingua: la definizione è generata
+// dalla lingua attiva; i token tecnici (tool, protocolli, formati) restano fissi.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Node = { i: string; l: string; d: string };
-type Stage = { icon: string; nodes: Node[] };
-
-// Nodi = termini tecnici (universali in dev), uguali in ogni lingua.
-const STAGES: Stage[] = [
-  {
-    icon: "🗂️",
-    nodes: [
-      { i: "📝", l: "i18n", d: "dictionary.ts" },
-      { i: "📄", l: "cv-data ×4", d: "JSON" },
-      { i: "❓", l: "trivia", d: "raw .txt" },
-      { i: "🖼️", l: "images", d: "assets" },
-      { i: "🧩", l: "code", d: "React · TS" },
-    ],
-  },
-  {
-    icon: "⚙️",
-    nodes: [
-      { i: "❓", l: "import-trivia", d: "→ chapters JSON" },
-      { i: "📄", l: "build-cv.ps1", d: "→ 4× PDF" },
-      { i: "🖼️", l: "compress-images", d: "sharp → WebP" },
-      { i: "🗜️", l: "build-zips", d: "archiver → ZIP" },
-      { i: "🌐", l: "i18n-extract", d: "→ translations.json" },
-      { i: "📦", l: "vite build", d: "Rollup → bundle" },
-      { i: "⚡", l: "vite-plugin-pwa", d: "Workbox → SW" },
-    ],
-  },
-  {
-    icon: "🚀",
-    nodes: [
-      { i: "🤖", l: "Claude Code", d: "local dev" },
-      { i: "🌿", l: "git push", d: "→ main" },
-      { i: "🐙", l: "GitHub", d: "repo AP" },
-      { i: "▲", l: "Vercel", d: "CI build" },
-    ],
-  },
-  {
-    icon: "☁️",
-    nodes: [
-      { i: "🗄️", l: "static CDN", d: "HTML · JS · CSS · PDF · ZIP · WebP" },
-      { i: "🤖", l: "/api/trivia", d: "→ Anthropic Claude" },
-      { i: "✉️", l: "/api/notify", d: "→ Resend · email" },
-    ],
-  },
-  {
-    icon: "🧑‍💻",
-    nodes: [
-      { i: "⚛️", l: "SPA React", d: "Router + PWA" },
-      { i: "📊", l: "footer", d: "GitHub API → sparkline" },
-      { i: "🏆", l: "leaderboards", d: "Supabase · REST + WS" },
-      { i: "⚡", l: "service worker", d: "offline cache" },
-    ],
-  },
-];
-
-// Narrazione localizzata: chrome + titoli/sottotitoli dei 5 stadi + connettori.
 type Copy = {
-  open: string;
-  title: string;
-  subtitle: string;
-  close: string;
-  stages: { t: string; s: string }[];
-  conn: string[]; // 4 connettori tra i 5 stadi
+  open: string; title: string; subtitle: string; close: string;
+  loading: string; error: string;
+  dev: string; ext: string;
+  p1: string; p2: string; p3: string; p4: string;
+  ask: string; newCommit: string; deployOk: string; spa: string;
+  profileEvents: string; sparkline: string; leaderboards: string;
+  word: string; curiosity: string; festaVote: string; sendEmail: string;
 };
 
 const T: Record<Lang, Copy> = {
   it: {
-    open: "Come funziona",
-    title: "Il giro dei dati — dal codice all'online",
-    subtitle: "sorgenti → build → deploy → online → browser",
-    close: "Chiudi",
-    stages: [
-      { t: "Sorgenti & contenuti", s: "testi, dati, immagini, codice" },
-      { t: "Build & codifiche", s: "script locali → artefatti (PDF · ZIP · WebP · JSON · bundle)" },
-      { t: "Versioning & deploy", s: "dal locale a Vercel" },
-      { t: "Online · Vercel", s: "CDN statica + funzioni serverless" },
-      { t: "Nel browser · client PWA", s: "runtime: dati live da GitHub, Supabase, /api" },
-    ],
-    conn: ["file sorgente", "artefatti · bundle · PDF · ZIP · WebP · SW", "git push → build → deploy", "HTTPS · JSON · lazy chunks"],
+    open: "Come funziona", title: "Il giro dei dati — dal codice all'online",
+    subtitle: "sviluppo → build → deploy → online → browser", close: "Chiudi",
+    loading: "carico il diagramma…", error: "diagramma non disponibile",
+    dev: "Alberto · dev", ext: "API e servizi esterni",
+    p1: "Sviluppo locale (codifiche)", p2: "Build e deploy (CI)",
+    p3: "Un utente apre il sito", p4: "Dati live a runtime",
+    ask: "«fai la modifica X»", newCommit: "nuovo commit su main", deployOk: "deploy ok",
+    spa: "SPA React + service worker (precache offline)",
+    profileEvents: "profilo / eventi", sparkline: "sparkline dei commit",
+    leaderboards: "classifiche + aggiornamenti live", word: "parola",
+    curiosity: "curiosità (testo)", festaVote: "voto Festa", sendEmail: "invio email",
   },
   en: {
-    open: "How it works",
-    title: "The data journey — from code to online",
-    subtitle: "sources → build → deploy → online → browser",
-    close: "Close",
-    stages: [
-      { t: "Sources & content", s: "text, data, images, code" },
-      { t: "Build & encodings", s: "local scripts → artifacts (PDF · ZIP · WebP · JSON · bundle)" },
-      { t: "Versioning & deploy", s: "from local to Vercel" },
-      { t: "Online · Vercel", s: "static CDN + serverless functions" },
-      { t: "In the browser · PWA client", s: "runtime: live data from GitHub, Supabase, /api" },
-    ],
-    conn: ["source files", "artifacts · bundle · PDF · ZIP · WebP · SW", "git push → build → deploy", "HTTPS · JSON · lazy chunks"],
+    open: "How it works", title: "The data journey — from code to online",
+    subtitle: "development → build → deploy → online → browser", close: "Close",
+    loading: "loading the diagram…", error: "diagram unavailable",
+    dev: "Alberto · dev", ext: "External APIs and services",
+    p1: "Local development (encodings)", p2: "Build and deploy (CI)",
+    p3: "A user opens the site", p4: "Live data at runtime",
+    ask: "«make change X»", newCommit: "new commit on main", deployOk: "deploy ok",
+    spa: "React SPA + service worker (offline precache)",
+    profileEvents: "profile / events", sparkline: "commit sparkline",
+    leaderboards: "leaderboards + live updates", word: "word",
+    curiosity: "fun fact (text)", festaVote: "party RSVP", sendEmail: "send email",
   },
   fr: {
-    open: "Fonctionnement",
-    title: "Le parcours des données — du code au live",
-    subtitle: "sources → build → déploiement → en ligne → navigateur",
-    close: "Fermer",
-    stages: [
-      { t: "Sources & contenus", s: "textes, données, images, code" },
-      { t: "Build & encodages", s: "scripts locaux → artefacts (PDF · ZIP · WebP · JSON · bundle)" },
-      { t: "Versioning & déploiement", s: "du local à Vercel" },
-      { t: "En ligne · Vercel", s: "CDN statique + fonctions serverless" },
-      { t: "Dans le navigateur · client PWA", s: "runtime : données live de GitHub, Supabase, /api" },
-    ],
-    conn: ["fichiers source", "artefacts · bundle · PDF · ZIP · WebP · SW", "git push → build → déploiement", "HTTPS · JSON · lazy chunks"],
+    open: "Fonctionnement", title: "Le parcours des données — du code au live",
+    subtitle: "développement → build → déploiement → en ligne → navigateur", close: "Fermer",
+    loading: "chargement du diagramme…", error: "diagramme indisponible",
+    dev: "Alberto · dev", ext: "API et services externes",
+    p1: "Développement local (encodages)", p2: "Build et déploiement (CI)",
+    p3: "Un utilisateur ouvre le site", p4: "Données live à l'exécution",
+    ask: "« fais la modif X »", newCommit: "nouveau commit sur main", deployOk: "déploiement ok",
+    spa: "SPA React + service worker (precache hors-ligne)",
+    profileEvents: "profil / événements", sparkline: "sparkline des commits",
+    leaderboards: "classements + màj live", word: "mot",
+    curiosity: "anecdote (texte)", festaVote: "vote fête", sendEmail: "envoi email",
   },
   de: {
-    open: "Wie es funktioniert",
-    title: "Der Datenfluss — vom Code bis online",
-    subtitle: "Quellen → Build → Deploy → online → Browser",
-    close: "Schließen",
-    stages: [
-      { t: "Quellen & Inhalte", s: "Texte, Daten, Bilder, Code" },
-      { t: "Build & Kodierungen", s: "lokale Skripte → Artefakte (PDF · ZIP · WebP · JSON · Bundle)" },
-      { t: "Versionierung & Deploy", s: "vom Lokalen zu Vercel" },
-      { t: "Online · Vercel", s: "statisches CDN + Serverless-Funktionen" },
-      { t: "Im Browser · PWA-Client", s: "Runtime: Live-Daten von GitHub, Supabase, /api" },
-    ],
-    conn: ["Quelldateien", "Artefakte · Bundle · PDF · ZIP · WebP · SW", "git push → build → deploy", "HTTPS · JSON · lazy chunks"],
+    open: "Wie es funktioniert", title: "Der Datenfluss — vom Code bis online",
+    subtitle: "Entwicklung → Build → Deploy → online → Browser", close: "Schließen",
+    loading: "Diagramm wird geladen…", error: "Diagramm nicht verfügbar",
+    dev: "Alberto · dev", ext: "Externe APIs und Dienste",
+    p1: "Lokale Entwicklung (Kodierungen)", p2: "Build und Deploy (CI)",
+    p3: "Ein Nutzer öffnet die Seite", p4: "Live-Daten zur Laufzeit",
+    ask: "„mach Änderung X\"", newCommit: "neuer Commit auf main", deployOk: "Deploy ok",
+    spa: "React SPA + Service Worker (Offline-Precache)",
+    profileEvents: "Profil / Events", sparkline: "Commit-Sparkline",
+    leaderboards: "Ranglisten + Live-Updates", word: "Wort",
+    curiosity: "Fun Fact (Text)", festaVote: "Fest-Zusage", sendEmail: "E-Mail senden",
   },
+};
+
+// Genera la definizione Mermaid nella lingua data. Token tecnici = fissi.
+function buildSeq(c: Copy): string {
+  return `sequenceDiagram
+    autonumber
+    actor Dev as ${c.dev}
+    participant CC as Claude Code
+    participant GH as GitHub · main
+    participant VC as Vercel · CI/hosting
+    participant BR as Browser · PWA
+    participant EXT as ${c.ext}
+    Note over Dev,CC: 1 · ${c.p1}
+    Dev->>CC: ${c.ask}
+    activate CC
+    Note over CC: build-cv.ps1 → 4× PDF · sharp → WebP · import-trivia → JSON
+    CC->>GH: git commit + push → main
+    deactivate CC
+    Note over GH,VC: 2 · ${c.p2}
+    GH->>VC: webhook · ${c.newCommit}
+    activate VC
+    Note over VC: prebuild · build-zips → ZIP
+    Note over VC: vite build · Rollup → bundle JS/CSS
+    Note over VC: vite-plugin-pwa · Workbox → service worker
+    VC-->>GH: ${c.deployOk}
+    deactivate VC
+    Note over BR,EXT: 3 · ${c.p3}
+    BR->>VC: GET / (HTML · JS · CSS · WebP)
+    VC-->>BR: ${c.spa}
+    Note over BR,EXT: 4 · ${c.p4}
+    BR->>EXT: GitHub API · ${c.profileEvents}
+    EXT-->>BR: JSON → ${c.sparkline}
+    BR->>EXT: Supabase · REST + Realtime WS
+    EXT-->>BR: ${c.leaderboards}
+    BR->>VC: GET /api/trivia · ${c.word}
+    activate VC
+    VC->>EXT: Anthropic Claude (Haiku)
+    EXT-->>VC: ${c.curiosity}
+    VC-->>BR: JSON (cache 24 h)
+    deactivate VC
+    BR->>VC: POST /api/notify · ${c.festaVote}
+    activate VC
+    VC->>EXT: Resend · ${c.sendEmail}
+    EXT-->>VC: 202 accepted
+    VC-->>BR: ok
+    deactivate VC`;
+}
+
+const MERMAID_THEME = {
+  fontFamily: '"Titillium Web", Geneva, Tahoma, sans-serif',
+  fontSize: "14px",
+  background: "#0b0e14",
+  primaryColor: "#191d2e",
+  primaryBorderColor: "#8b7bff",
+  primaryTextColor: "#e8eef4",
+  secondaryColor: "#20243a",
+  actorBkg: "#191d2e",
+  actorBorder: "#8b7bff",
+  actorTextColor: "#eef2f7",
+  actorLineColor: "#5a5580",
+  signalColor: "#b9a6ff",
+  signalTextColor: "#cdd6e0",
+  labelBoxBkgColor: "#241b3b",
+  labelBoxBorderColor: "#8b7bff",
+  labelTextColor: "#eae6ff",
+  loopTextColor: "#cdd6e0",
+  noteBkgColor: "#241b3b",
+  noteTextColor: "#eae6ff",
+  noteBorderColor: "#8b7bff",
+  activationBkgColor: "#33306a",
+  activationBorderColor: "#b9a6ff",
+  sequenceNumberColor: "#ffffff",
+  lineColor: "#8b7bff",
 };
 
 export default function WorkflowModal() {
   const [lang, setLang] = useState<Lang>(() => getLang());
   const [open, setOpen] = useState(false);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const holderRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => subscribeLang(setLang), []);
 
   // Esc chiude + blocca lo scroll del body mentre è aperto.
@@ -160,6 +174,35 @@ export default function WorkflowModal() {
     };
   }, [open]);
 
+  // Render del diagramma con Mermaid (lazy) all'apertura e a ogni cambio lingua.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setStatus("loading");
+    (async () => {
+      try {
+        const mermaid = (await import("mermaid")).default;
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: "loose",
+          theme: "base",
+          themeVariables: MERMAID_THEME,
+          sequence: { useMaxWidth: true, wrap: true, mirrorActors: true, actorMargin: 42 },
+        });
+        const id = "apw-seq-" + Math.random().toString(36).slice(2);
+        const { svg } = await mermaid.render(id, buildSeq(T[lang]));
+        if (cancelled) return;
+        if (holderRef.current) holderRef.current.innerHTML = svg;
+        setStatus("ready");
+      } catch {
+        if (!cancelled) setStatus("error");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, lang]);
+
   const t = T[lang];
 
   return (
@@ -171,13 +214,7 @@ export default function WorkflowModal() {
 
       {open &&
         createPortal(
-          <div
-            className="apw-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label={t.title}
-            data-no-i18n
-          >
+          <div className="apw-modal" role="dialog" aria-modal="true" aria-label={t.title} data-no-i18n>
             <div className="apw-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
             <div className="apw-dialog">
               <div className="apw-bar">
@@ -191,38 +228,10 @@ export default function WorkflowModal() {
               </div>
 
               <div className="apw-body">
-                {STAGES.map((stage, si) => (
-                  <div key={si}>
-                    <section className="apw-stage">
-                      <div className="apw-stage-head">
-                        <span className="apw-stage-ico" aria-hidden="true">{stage.icon}</span>
-                        <span className="apw-stage-n">{si + 1}</span>
-                        <div>
-                          <h3 className="apw-stage-title">{t.stages[si].t}</h3>
-                          <p className="apw-stage-sub">{t.stages[si].s}</p>
-                        </div>
-                      </div>
-                      <div className="apw-nodes">
-                        {stage.nodes.map((n, ni) => (
-                          <span className="apw-node" key={ni}>
-                            <span className="apw-node-ico" aria-hidden="true">{n.i}</span>
-                            <span className="apw-node-txt">
-                              <b>{n.l}</b>
-                              <small>{n.d}</small>
-                            </span>
-                          </span>
-                        ))}
-                      </div>
-                    </section>
-
-                    {si < STAGES.length - 1 && (
-                      <div className="apw-conn" aria-hidden="true">
-                        <span className="apw-conn-label">{t.conn[si]}</span>
-                        <span className="apw-conn-arrow">▼</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {status !== "ready" && (
+                  <p className="apw-msg">{status === "error" ? t.error : t.loading}</p>
+                )}
+                <div ref={holderRef} className="apw-diagram" aria-label={t.title} />
               </div>
             </div>
           </div>,
@@ -230,7 +239,6 @@ export default function WorkflowModal() {
         )}
 
       <style>{`
-        /* Trigger nel footer */
         .apw-open {
           display: inline-flex; align-items: center; gap: 0.4rem;
           padding: 0; border: none; background: none; cursor: pointer;
@@ -239,12 +247,11 @@ export default function WorkflowModal() {
         }
         .apw-open:hover { color: #c4a5ff; }
 
-        /* Modale (sul modello del viewer PDF) */
-        .apw-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.75rem, 3vw, 2rem); font-family: "Titillium Web", Geneva, Tahoma, sans-serif; }
+        .apw-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Titillium Web", Geneva, Tahoma, sans-serif; }
         .apw-backdrop { position: absolute; inset: 0; background: rgba(4, 6, 10, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: apw-fade 0.2s ease; }
         .apw-dialog {
           position: relative; z-index: 1;
-          width: min(920px, 100%); max-height: min(88vh, 900px);
+          width: min(1000px, 100%); max-height: min(90vh, 940px);
           display: flex; flex-direction: column;
           background: linear-gradient(180deg, #0e1218 0%, #0a0d12 100%);
           border: 1px solid rgba(139, 123, 255, 0.28); border-radius: 18px;
@@ -267,40 +274,12 @@ export default function WorkflowModal() {
         }
         .apw-close:hover { color: #fff; border-color: rgba(139, 123, 255, 0.5); background: rgba(139, 123, 255, 0.16); }
 
-        .apw-body { padding: clamp(1rem, 3vw, 1.6rem); overflow-y: auto; }
-
-        .apw-stage {
-          border: 1px solid rgba(139, 123, 255, 0.16); border-radius: 14px;
-          background: rgba(255, 255, 255, 0.02); padding: 0.9rem 1rem 1rem;
-        }
-        .apw-stage-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
-        .apw-stage-ico { font-size: 1.3rem; line-height: 1; }
-        .apw-stage-n {
-          flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
-          width: 22px; height: 22px; border-radius: 50%;
-          background: #8b7bff; color: #fff; font-weight: 800; font-size: 0.74rem;
-        }
-        .apw-stage-title { margin: 0; color: #eef2f7; font-size: 0.98rem; font-weight: 800; }
-        .apw-stage-sub { margin: 0.05rem 0 0; color: #8893a0; font-size: 0.8rem; }
-
-        .apw-nodes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .apw-node {
-          display: inline-flex; align-items: center; gap: 0.5rem;
-          padding: 0.45rem 0.7rem; border-radius: 10px;
-          background: rgba(139, 123, 255, 0.08); border: 1px solid rgba(139, 123, 255, 0.2);
-        }
-        .apw-node-ico { font-size: 1rem; line-height: 1; }
-        .apw-node-txt { display: flex; flex-direction: column; line-height: 1.25; }
-        .apw-node-txt b { color: #e8eef4; font-size: 0.84rem; font-weight: 700; }
-        .apw-node-txt small { color: #97a1ad; font-size: 0.72rem; }
-
-        .apw-conn { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.35rem 0; }
-        .apw-conn-label {
-          font-size: 0.72rem; font-weight: 700; color: #b9a6ff;
-          background: rgba(139, 123, 255, 0.12); border: 1px solid rgba(139, 123, 255, 0.22);
-          padding: 0.15rem 0.6rem; border-radius: 999px; text-align: center;
-        }
-        .apw-conn-arrow { color: #6d5bd0; font-size: 0.8rem; line-height: 1; }
+        .apw-body { padding: clamp(0.8rem, 3vw, 1.5rem); overflow: auto; }
+        .apw-msg { color: #97a1ad; font-size: 0.9rem; text-align: center; padding: 2rem 0; }
+        .apw-diagram { display: flex; justify-content: center; min-width: min-content; }
+        .apw-diagram svg { max-width: 100%; height: auto; }
+        /* La numerazione (autonumber) resta leggibile sul cerchio accento */
+        .apw-diagram :where(text.sequenceNumber) { fill: #ffffff; }
 
         @keyframes apw-fade { from { opacity: 0; } to { opacity: 1; } }
         @keyframes apw-pop { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
