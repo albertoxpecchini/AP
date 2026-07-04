@@ -249,7 +249,7 @@ export default function GitHubFooterWidget() {
                 aria-label={`${sparkTotal} ${s.commits} · ${s.days14}`}
               >
                 {series.map((d, i) => {
-                  const h = d.count === 0 ? 3 : Math.round(4 + (d.count / sparkMax) * 18);
+                  const h = d.count === 0 ? 3 : Math.round(5 + (d.count / sparkMax) * 21);
                   const label = new Date(d.day).toLocaleDateString(DATE_LOCALE[lang], {
                     day: "2-digit",
                     month: "short",
@@ -299,13 +299,15 @@ export default function GitHubFooterWidget() {
         .apf-gh__repo:hover { color: #c4a5ff; }
 
         /* ── Mini grafico dei commit giornalieri ── */
-        .apf-gh__spark { display: inline-flex; flex-direction: column; gap: 0.35rem; }
+        /* Il grafico occupa TUTTO lo spazio residuo della riga, fino al margine
+           destro del contenuto del footer (.apf-wrap → margini del sito). */
+        .apf-gh__spark { display: flex; flex-direction: column; gap: 0.4rem; flex: 1 1 260px; min-width: 220px; }
         .apf-gh__spark-cap { font-size: 0.8rem; color: #8893a0; white-space: nowrap; }
         .apf-gh__spark-cap b { color: #cdd6e0; font-weight: 700; }
-        .apf-gh__bars { display: flex; align-items: flex-end; gap: 2px; height: 24px; }
+        .apf-gh__bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; height: 28px; width: 100%; }
         .apf-gh__bar {
-          width: 5px; height: 3px; flex-shrink: 0;
-          border-radius: 2px 2px 0 0;
+          flex: 1 1 0; min-width: 5px; max-width: 46px; height: 3px;
+          border-radius: 3px 3px 0 0;
           background: rgba(139, 123, 255, 0.5);
           transition: background 0.15s, transform 0.15s;
         }
