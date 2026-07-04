@@ -107,6 +107,77 @@ AP/
 
 ---
 
+## 🔀 Come funziona — il giro dei dati (dal codice all'online)
+
+Dalla **sorgente** (testi, dati, immagini, codice) agli **artefatti** prodotti dagli
+script di build (PDF · ZIP · WebP · JSON · bundle · service worker), fino al **deploy**
+su Vercel e ai **dati live** che il browser richiede a runtime (GitHub, Supabase, `/api`).
+
+> Lo stesso schema è consultabile dal sito: **footer → «Come funziona»** (finestra interna).
+
+```mermaid
+flowchart TB
+  subgraph S1["🗂️ Sorgenti & contenuti"]
+    A1["📝 i18n · dictionary.ts"]
+    A2["📄 cv-data ×4 · JSON"]
+    A3["❓ trivia · raw / .md"]
+    A4["🖼️ images · assets"]
+    A5["🧩 code · React · TS"]
+  end
+
+  subgraph S2["⚙️ Build & codifiche · script locali"]
+    B1["import-trivia → chapters JSON"]
+    B2["build-cv.ps1 → 4× PDF"]
+    B3["compress-images · sharp → WebP"]
+    B4["build-zips · archiver → ZIP"]
+    B5["i18n-extract → translations.json"]
+    B6["vite build · Rollup → bundle JS/CSS"]
+    B7["vite-plugin-pwa · Workbox → service worker"]
+  end
+
+  subgraph S3["🚀 Versioning & deploy"]
+    C1["🤖 Claude Code · dev locale"]
+    C2["🌿 git commit + push → main"]
+    C3["🐙 GitHub · repo AP"]
+    C4["▲ Vercel · CI build"]
+  end
+
+  subgraph S4["☁️ Online · Vercel"]
+    D1["🗄️ CDN statica · HTML · JS · CSS · PDF · ZIP · WebP · font"]
+    D2["🔌 /api/trivia → 🤖 Anthropic Claude"]
+    D3["🔌 /api/notify → ✉️ Resend · email"]
+  end
+
+  subgraph S5["🧑‍💻 Client · browser (PWA)"]
+    E1["⚛️ SPA React + Router"]
+    E2["⚡ Service worker · cache offline"]
+    E3["📊 Footer → sparkline dei commit"]
+    E4["🏆 Classifiche dei giochi"]
+  end
+
+  GH["🐙 GitHub API · pubblica"]
+  SB["🟢 Supabase · Postgres"]
+
+  S1 -- "file sorgente" --> S2
+  S2 -- "artefatti: bundle · PDF · ZIP · WebP · SW" --> S3
+  S3 -- "git push → build → deploy" --> S4
+  S4 -- "HTTPS · JSON · lazy chunks" --> S5
+
+  E3 -. "REST / JSON" .-> GH
+  E4 -. "REST + Realtime WebSocket" .-> SB
+  E1 -. "fetch" .-> D2
+  E1 -. "fetch" .-> D3
+```
+
+| Servizio esterno | Uso | Dove |
+| :--- | :--- | :--- |
+| **GitHub API** (pubblica) | attività + sparkline dei commit nel footer | client |
+| **Supabase** (REST + Realtime WS) | classifiche live dei giochi (fallback `localStorage`) | client |
+| **Anthropic Claude** | curiosità sulle parole (gioco Parole) | serverless `/api/trivia` |
+| **Resend** | email dei voti della Festa | serverless `/api/notify` |
+
+---
+
 ## 🧰 Stack tecnologico
 
 | Layer | Tecnologie |
