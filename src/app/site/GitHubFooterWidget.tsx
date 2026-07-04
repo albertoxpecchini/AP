@@ -250,8 +250,11 @@ export default function GitHubFooterWidget() {
               >
                 {series.map((d, i) => {
                   const h = d.count === 0 ? 3 : Math.round(5 + (d.count / sparkMax) * 21);
-                  const label = new Date(d.day).toLocaleDateString(DATE_LOCALE[lang], {
-                    day: "2-digit",
+                  // Data locale (mezzanotte locale → nessuno slittamento di giorno)
+                  // con giorno della settimana, alla GitHub.
+                  const label = new Date(`${d.day}T00:00:00`).toLocaleDateString(DATE_LOCALE[lang], {
+                    weekday: "short",
+                    day: "numeric",
                     month: "short",
                   });
                   return (
@@ -259,7 +262,7 @@ export default function GitHubFooterWidget() {
                       key={d.day}
                       className="apf-gh__bar"
                       style={{ height: `${h}px` }}
-                      title={`${d.count} ${s.commits} · ${label}`}
+                      data-tip={`${d.count} ${s.commits} · ${label}`}
                       data-zero={d.count === 0 ? "" : undefined}
                       data-today={i === series.length - 1 ? "" : undefined}
                     />
@@ -306,14 +309,51 @@ export default function GitHubFooterWidget() {
         .apf-gh__spark-cap b { color: #cdd6e0; font-weight: 700; }
         .apf-gh__bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; height: 28px; width: 100%; }
         .apf-gh__bar {
+          position: relative;
           flex: 1 1 0; min-width: 5px; max-width: 46px; height: 3px;
           border-radius: 3px 3px 0 0;
           background: rgba(139, 123, 255, 0.5);
-          transition: background 0.15s, transform 0.15s;
+          transition: background 0.15s;
         }
-        .apf-gh__bar:hover { background: #a08cff; transform: scaleY(1.06); transform-origin: bottom; }
+        .apf-gh__bar:hover { background: #a08cff; }
         .apf-gh__bar[data-today] { background: #8b7bff; }
+        .apf-gh__bar[data-today]:hover { background: #a594ff; }
         .apf-gh__bar[data-zero] { background: rgba(255, 255, 255, 0.08); }
+        .apf-gh__bar[data-zero]:hover { background: rgba(255, 255, 255, 0.16); }
+
+        /* Tooltip alla GitHub: data della candela + numero di commit del giorno */
+        .apf-gh__bar::after,
+        .apf-gh__bar::before {
+          position: absolute; left: 50%;
+          opacity: 0; pointer-events: none;
+          transition: opacity 0.14s ease, transform 0.14s ease;
+          z-index: 6;
+        }
+        .apf-gh__bar::after {
+          content: attr(data-tip);
+          bottom: calc(100% + 9px);
+          transform: translateX(-50%) translateY(4px);
+          padding: 5px 9px; border-radius: 7px;
+          background: #1b2028; color: #eaeef3;
+          font-size: 0.72rem; font-weight: 600; line-height: 1; white-space: nowrap;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+        }
+        .apf-gh__bar::before {
+          content: ""; bottom: calc(100% + 5px);
+          width: 8px; height: 8px;
+          transform: translateX(-50%) translateY(4px) rotate(45deg);
+          background: #1b2028;
+          border-right: 1px solid rgba(255, 255, 255, 0.14);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        }
+        .apf-gh__bar:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .apf-gh__bar:hover::before { opacity: 1; transform: translateX(-50%) translateY(0) rotate(45deg); }
+        /* Barre ai bordi: la bolla non esce dai margini del footer */
+        .apf-gh__bar:first-child::after { left: 0; transform: translateX(0) translateY(4px); }
+        .apf-gh__bar:first-child:hover::after { transform: translateX(0) translateY(0); }
+        .apf-gh__bar:last-child::after { left: auto; right: 0; transform: translateX(0) translateY(4px); }
+        .apf-gh__bar:last-child:hover::after { transform: translateX(0) translateY(0); }
         @keyframes apf-gh-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.75; } }
         @keyframes apf-gh-live {
           0% { box-shadow: 0 0 0 0 rgba(87, 201, 138, 0.55); }
