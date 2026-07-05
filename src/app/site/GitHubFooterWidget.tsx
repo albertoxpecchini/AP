@@ -473,7 +473,8 @@ export default function GitHubFooterWidget() {
         .apf-gh__langdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
         /* ── Grafico dei contributi giornalieri (dati reali) ── */
-        .apf-gh__spark { display: flex; flex-direction: column; gap: 0.45rem; width: 100%; max-width: 640px; }
+        /* Larghezza piena: si allinea ai margini del footer (come .apf-top / .apf-bottom). */
+        .apf-gh__spark { display: flex; flex-direction: column; gap: 0.45rem; width: 100%; }
         .apf-gh__spark-cap { font-size: 0.8rem; color: #8893a0; }
         .apf-gh__spark-cap b { color: #cdd6e0; font-weight: 700; }
         .apf-gh__bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; height: 32px; width: 100%; }
@@ -521,7 +522,7 @@ export default function GitHubFooterWidget() {
         .apf-gh__bar:last-child:hover::after { transform: translateX(0) translateY(0); }
 
         /* ── Barra dei linguaggi ── */
-        .apf-gh__langs { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 640px; }
+        .apf-gh__langs { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
         .apf-gh__langbar {
           display: flex; height: 8px; width: 100%; border-radius: 999px; overflow: hidden;
           gap: 2px; background: rgba(255, 255, 255, 0.05);
