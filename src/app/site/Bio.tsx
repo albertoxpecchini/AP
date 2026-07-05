@@ -227,17 +227,54 @@ export default function Bio() {
 
       <style>{`
         /* ─────────────────────────────────────────────────────────────────────
-           Look "dark premium" · accento VIOLA al 100% (lo stesso di /me-stesso,
-           /dubliners, /gattopardo e della home). Sfondo scuro profondo,
-           superfici "vetro" e neon viola. Autosufficiente.
+           Look premium · accento VIOLA (lo stesso di /me-stesso, /dubliners,
+           /gattopardo e della home). Segue il TEMA GLOBALE chiaro/scuro:
+           valori chiari di default in .bio-page, override scuro su
+           html.dark .bio-page (come /archivio). Autosufficiente.
            ───────────────────────────────────────────────────────────────────── */
         .bio-page {
+          /* — Tema CHIARO (default) — */
+          --accent: #7c6cff;
+          --accent-2: #6d4bd6;
+          --accent-3: #9d8fff;
+          --accent-deep: #5b4bd6;
+          --ink: #6d4bd6;
+          --glow: rgba(124, 108, 255, 0.35);
+          --heading: #14121c;
+          --text: #2a2833;
+          --sub: #55535f;
+          --surface: #ffffff;
+          --surface-bd: rgba(24, 12, 60, 0.10);
+          --vio-soft: rgba(109, 75, 214, 0.07);
+          --vio-bd: rgba(109, 75, 214, 0.22);
+          --panel: linear-gradient(160deg, #efeafd 0%, #e9e6fb 45%, #f4f2fb 100%);
+          --halo-1: rgba(124, 108, 255, 0.35);
+          --halo-2: rgba(109, 75, 214, 0.22);
+          --page-bg:
+            radial-gradient(120% 70% at 50% -10%, rgba(124, 108, 255, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #f7f5fd 0%, #f2f0fb 100%);
+          --header-bg: rgba(247, 245, 253, 0.82);
+          --section-alt: rgba(109, 75, 214, 0.045);
+          --btn-bd: rgba(24, 12, 60, 0.28);
+          --btn-fg: #2a2833;
+          --portrait-shadow: 0 24px 60px rgba(40, 28, 80, 0.28);
+          --card-shadow: 0 14px 36px rgba(40, 28, 80, 0.12);
+
+          min-height: 100vh;
+          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          color: var(--text);
+          background: var(--page-bg);
+        }
+
+        /* — Tema SCURO — */
+        html.dark .bio-page {
           --accent: #8b7bff;
           --accent-2: #7c6cff;
           --accent-3: #9d8fff;
           --accent-deep: #5b4bd6;
           --ink: #c4a5ff;
           --glow: rgba(139, 123, 255, 0.45);
+          --heading: #ffffff;
           --text: #e8eef4;
           --sub: #a7b2bd;
           --surface: rgba(255, 255, 255, 0.05);
@@ -245,27 +282,33 @@ export default function Bio() {
           --vio-soft: rgba(139, 123, 255, 0.10);
           --vio-bd: rgba(139, 123, 255, 0.28);
           --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
-          min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
-          color: var(--text);
-          background:
+          --halo-1: #8b7bff;
+          --halo-2: #5b4bd6;
+          --page-bg:
             radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
             linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+          --header-bg: rgba(10, 13, 17, 0.82);
+          --section-alt: rgba(255, 255, 255, 0.022);
+          --btn-bd: rgba(255, 255, 255, 0.4);
+          --btn-fg: #ffffff;
+          --portrait-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+          --card-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
         }
+
         .bio-page .ap-kicker.text-primary { color: var(--ink) !important; }
         .bio-page .bg-white { background: transparent !important; }
-        .bio-page .bg-light { background: rgba(255, 255, 255, 0.022) !important; }
-        .bio-page .display-5, .bio-page .h3 { color: var(--text); }
-        .bio-page .btn-outline-light { border-color: rgba(255, 255, 255, 0.4); color: #ffffff; }
+        .bio-page .bg-light { background: var(--section-alt) !important; }
+        .bio-page .display-5, .bio-page .h3 { color: var(--heading); }
+        .bio-page .btn-outline-light { border-color: var(--btn-bd); color: var(--btn-fg); }
         .bio-page .btn-outline-light:hover,
         .bio-page .btn-outline-light:focus {
-          background-color: var(--accent); border-color: var(--accent); color: #0a0d11 !important;
+          background-color: var(--accent); border-color: var(--accent); color: #ffffff !important;
         }
         .bio-page .ap-kicker { letter-spacing: 0.18em; font-size: 0.875rem; }
 
-        /* Header — vetro scuro con filo viola */
+        /* Header — vetro con filo viola */
         .bio-header {
-          background: rgba(10, 13, 17, 0.82); position: sticky; top: 0; z-index: 10;
+          background: var(--header-bg); position: sticky; top: 0; z-index: 10;
           backdrop-filter: blur(14px) saturate(120%);
           -webkit-backdrop-filter: blur(14px) saturate(120%);
           border-bottom: 1px solid var(--surface-bd);
@@ -277,17 +320,17 @@ export default function Bio() {
         }
         .bio-brand-mark img { width: 100%; height: 100%; display: block; }
         .bio-brand-text { display: inline-flex; flex-direction: column; line-height: 1.2; }
-        .bio-brand-title { color: #ffffff; font-weight: 700; font-size: 1.05rem; }
+        .bio-brand-title { color: var(--heading); font-weight: 700; font-size: 1.05rem; }
         .bio-brand-tagline { color: var(--sub); font-size: 0.78rem; }
         @media (max-width: 575.98px) { .bio-brand-tagline { display: none; } }
 
-        /* Hero copertina — pannello scuro con aloni viola */
+        /* Hero copertina — pannello con aloni viola */
         .bio-hero {
           position: relative; overflow: hidden;
           padding: clamp(3rem, 7vw, 5.5rem) 0;
-          color: #ffffff;
+          color: var(--heading);
           background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
+            radial-gradient(90% 120% at 0% 0%, var(--vio-soft) 0%, transparent 55%),
             var(--panel);
           border-bottom: 1px solid var(--surface-bd);
         }
@@ -295,8 +338,8 @@ export default function Bio() {
           content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
           filter: blur(60px); opacity: 0.45; pointer-events: none; z-index: 0;
         }
-        .bio-hero::before { background: #8b7bff; top: -30%; right: -10%; }
-        .bio-hero::after  { background: #5b4bd6; bottom: -35%; left: -12%; opacity: 0.35; }
+        .bio-hero::before { background: var(--halo-1); top: -30%; right: -10%; }
+        .bio-hero::after  { background: var(--halo-2); bottom: -35%; left: -12%; opacity: 0.35; }
         .bio-hero .container { position: relative; z-index: 1; }
         .bio-hero-grid {
           display: grid;
@@ -314,7 +357,7 @@ export default function Bio() {
         }
         .bio-hero-title {
           font-size: clamp(2.75rem, 7vw, 5rem);
-          line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1.1rem; color: #ffffff;
+          line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1.1rem; color: var(--heading);
         }
         .bio-hero-rule {
           display: block; width: 64px; height: 4px; border-radius: 2px;
@@ -322,9 +365,9 @@ export default function Bio() {
         }
         .bio-hero-lead {
           font-size: clamp(1.25rem, 2.6vw, 1.7rem);
-          font-style: italic; font-weight: 600; color: #ffffff; margin-bottom: 0.85rem;
+          font-style: italic; font-weight: 600; color: var(--heading); margin-bottom: 0.85rem;
         }
-        .bio-hero-school { color: rgba(255, 255, 255, 0.78); font-size: 1.02rem; }
+        .bio-hero-school { color: var(--sub); font-size: 1.02rem; }
         @media (max-width: 767.98px) {
           .bio-hero-grid { grid-template-columns: 1fr; }
           .bio-hero-badge { width: 68px; height: 68px; border-radius: 16px; margin-bottom: 1.1rem; }
@@ -335,7 +378,7 @@ export default function Bio() {
         .bio-portrait {
           position: relative; border-radius: 20px; overflow: hidden;
           border: 1px solid var(--vio-bd);
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+          box-shadow: var(--portrait-shadow);
           max-width: 380px; margin-left: auto;
         }
         .bio-portrait img { width: 100%; height: auto; display: block; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 30%; }
@@ -344,7 +387,7 @@ export default function Bio() {
         /* Prosa */
         .bio-prose-wrap { max-width: 48rem; }
         .bio-prose { font-size: 1.1rem; line-height: 1.8; color: var(--sub); margin-bottom: 1.1rem; }
-        .bio-prose strong { color: #ffffff; }
+        .bio-prose strong { color: var(--heading); }
 
         /* Layout a due colonne */
         .bio-twocol {
@@ -366,7 +409,7 @@ export default function Bio() {
         }
         .bio-list-item:hover, .bio-list-item:focus-visible {
           transform: translateY(-2px); border-color: var(--vio-bd); background: var(--vio-soft);
-          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4); outline: none;
+          box-shadow: var(--card-shadow); outline: none;
         }
         .bio-list-emoji {
           flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
@@ -375,7 +418,7 @@ export default function Bio() {
         }
         .bio-list-label { min-width: 0; }
         .bio-list-arrow { margin-left: auto; color: var(--ink); display: inline-flex; transition: transform .15s, color .15s; }
-        .bio-list-item:hover .bio-list-arrow, .bio-list-item:focus-visible .bio-list-arrow { transform: translate(2px, -2px); color: #ffffff; }
+        .bio-list-item:hover .bio-list-arrow, .bio-list-item:focus-visible .bio-list-arrow { transform: translate(2px, -2px); color: var(--heading); }
 
         /* Skills */
         .bio-skillgrid {
@@ -386,10 +429,10 @@ export default function Bio() {
         .bio-box {
           background: var(--surface); border: 1px solid var(--surface-bd);
           border-radius: 18px; padding: clamp(1.25rem, 3vw, 1.6rem);
-          box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
+          box-shadow: var(--card-shadow);
         }
         .bio-box-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink); margin: 0 0 1rem; }
-        .bio-skill-title { display: block; font-weight: 700; color: #ffffff; margin-bottom: 0.75rem; font-size: 1.02rem; }
+        .bio-skill-title { display: block; font-weight: 700; color: var(--heading); margin-bottom: 0.75rem; font-size: 1.02rem; }
         .bio-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
         .bio-chip {
           display: inline-flex; align-items: center;
@@ -407,27 +450,29 @@ export default function Bio() {
         .bio-edu li svg { color: var(--ink); flex-shrink: 0; }
 
         /* Footer */
-        .bio-footer { background-color: #090c10; color: #ffffff; border-top: 1px solid var(--surface-bd); }
+        .bio-footer { background-color: var(--header-bg); color: var(--heading); border-top: 1px solid var(--surface-bd); }
 
-        /* ── Modale interessi (ri-stilizzata in dark premium, scoped) ── */
-        .bio-page .ap-modal-backdrop { background: rgba(5, 7, 10, 0.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        /* ── Modale interessi (scoped, segue il tema) ── */
+        .bio-page .ap-modal-backdrop { background: rgba(5, 7, 10, 0.35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        html.dark .bio-page .ap-modal-backdrop { background: rgba(5, 7, 10, 0.7); }
         .bio-page .ap-modal {
-          background: linear-gradient(160deg, #15101f 0%, #0b0f14 100%);
+          background: var(--panel);
           border: 1px solid var(--vio-bd);
-          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+          box-shadow: 0 30px 80px rgba(40, 28, 80, 0.28);
           color: var(--text);
         }
+        html.dark .bio-page .ap-modal { box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7); }
         .bio-page .ap-modal-close {
-          background: rgba(255, 255, 255, 0.08); color: #ffffff; border: 1px solid var(--surface-bd);
+          background: var(--vio-soft); color: var(--heading); border: 1px solid var(--surface-bd);
           backdrop-filter: blur(4px);
         }
         .bio-page .ap-modal-close:hover, .bio-page .ap-modal-close:focus-visible {
-          background: var(--accent); color: #0a0d11;
+          background: var(--accent); color: #ffffff;
         }
         .bio-page .ap-modal-icon-wrap {
           background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd);
         }
-        .bio-page .ap-modal-title { color: #ffffff; }
+        .bio-page .ap-modal-title { color: var(--heading); }
         .bio-page .ap-modal-body { color: var(--sub); }
         .bio-page .ap-modal .btn-primary {
           background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
