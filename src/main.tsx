@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import App from "./app/App.tsx";
 import { disableBackspaceNavigation } from "./app/utils/keyboard.ts";
 import ThemeWidget from "./app/theme/ThemeWidget.tsx";
@@ -162,6 +163,9 @@ createRoot(document.getElementById("root")!).render(
       <LanguageSwitcher />
       <ThemeWidget />
     </div>
+    {/* Vercel Speed Insights: raccoglie le metriche di performance reali (Core
+        Web Vitals) su ogni pagina. Attivo solo in produzione su Vercel. */}
+    <SpeedInsights />
   </>,
 );
 
