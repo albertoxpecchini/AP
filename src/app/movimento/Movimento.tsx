@@ -172,8 +172,8 @@ function WatchVisual() {
   // Un pallino percorre una curva: la traccia si "scopre" e il pallino avanza.
   return (
     <svg viewBox="0 0 220 150" aria-hidden="true" className="mtv-watch" style={{ width: "100%", height: "100%" }} preserveAspectRatio="xMidYMid meet">
-      <path className="mtv-track" d="M24 110 C 60 110, 70 36, 110 60 S 170 110, 196 34" fill="none" stroke="#2F7D4A" strokeWidth="4" strokeLinecap="round" />
-      <circle className="mtv-mover" r="8" fill="#1F6B3D" />
+      <path className="mtv-track" d="M24 110 C 60 110, 70 36, 110 60 S 170 110, 196 34" fill="none" stroke="#e95420" strokeWidth="4" strokeLinecap="round" />
+      <circle className="mtv-mover" r="8" fill="#c2410c" />
       <circle cx="24" cy="110" r="5" fill="#D9A400" />
     </svg>
   );
@@ -182,7 +182,7 @@ function DrawVisual() {
   // Una mano-gesto ridisegna il tracciato tratteggiato.
   return (
     <svg viewBox="0 0 220 150" aria-hidden="true" className="mtv-draw" style={{ width: "100%", height: "100%" }} preserveAspectRatio="xMidYMid meet">
-      <path d="M24 110 C 60 110, 70 36, 110 60 S 170 110, 196 34" fill="none" stroke="rgba(47,125,74,0.3)" strokeWidth="4" strokeLinecap="round" strokeDasharray="3 9" />
+      <path d="M24 110 C 60 110, 70 36, 110 60 S 170 110, 196 34" fill="none" stroke="rgba(233, 84, 32,0.3)" strokeWidth="4" strokeLinecap="round" strokeDasharray="3 9" />
       <path className="mtv-trace" d="M24 110 C 60 110, 70 36, 110 60 S 170 110, 196 34" fill="none" stroke="#D9A400" strokeWidth="4" strokeLinecap="round" />
       <circle className="mtv-pen" r="7" fill="#c07800" />
     </svg>
@@ -191,13 +191,13 @@ function DrawVisual() {
 function GridVisual() {
   // La griglia si riempie e compaiono i nodi del percorso.
   const cells = [];
-  for (let i = 1; i < 4; i++) { cells.push(<line key={`v${i}`} x1={i*55} y1="0" x2={i*55} y2="150" stroke="rgba(47,125,74,0.25)" strokeWidth="1.5" />); cells.push(<line key={`h${i}`} x1="0" y1={i*37.5} x2="220" y2={i*37.5} stroke="rgba(47,125,74,0.25)" strokeWidth="1.5" />); }
+  for (let i = 1; i < 4; i++) { cells.push(<line key={`v${i}`} x1={i*55} y1="0" x2={i*55} y2="150" stroke="rgba(233, 84, 32,0.25)" strokeWidth="1.5" />); cells.push(<line key={`h${i}`} x1="0" y1={i*37.5} x2="220" y2={i*37.5} stroke="rgba(233, 84, 32,0.25)" strokeWidth="1.5" />); }
   const nodes = [[27,131],[137,94],[82,56],[192,19]];
   return (
     <svg viewBox="0 0 220 150" aria-hidden="true" className="mtv-grid" style={{ width: "100%", height: "100%" }} preserveAspectRatio="none">
       {cells}
-      <polyline className="mtv-grid-path" points={nodes.map(n => n.join(",")).join(" ")} fill="none" stroke="#2F7D4A" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-      {nodes.map((n, i) => <circle key={i} className="mtv-grid-dot" style={{ animationDelay: `${0.3 + i*0.15}s` }} cx={n[0]} cy={n[1]} r="6" fill="#1F6B3D" />)}
+      <polyline className="mtv-grid-path" points={nodes.map(n => n.join(",")).join(" ")} fill="none" stroke="#e95420" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      {nodes.map((n, i) => <circle key={i} className="mtv-grid-dot" style={{ animationDelay: `${0.3 + i*0.15}s` }} cx={n[0]} cy={n[1]} r="6" fill="#c2410c" />)}
     </svg>
   );
 }
@@ -342,7 +342,7 @@ export default function Movimento() {
     if (phase !== "watch" || path.length === 0 || showMenu) return;
     const cv = canvasRef.current; if (!cv) return;
     const ctx = cv.getContext("2d")!; const { w, h } = dims();
-    const accent = dark ? "#b794ff" : "#7c3aed"; // blu/viola come il riferimento
+    const accent = dark ? "#f6a583" : "#e95420"; // blu/viola come il riferimento
     const dotCol = dark ? "#ffffff" : "#1b1b1f";
     const drawMs = WATCH_MS_BY_LEVEL[level];   // tempo di tracciamento per livello
     const holdMs = Math.max(350, drawMs * 0.28); // pausa con la curva intera visibile
@@ -382,7 +382,7 @@ export default function Movimento() {
     drawGrid(ctx, w, h);
     if (phase === "result") {
       drawSmooth(ctx, path, w, h, dark ? "rgba(255,255,255,0.92)" : "#1b1b1f", 5);
-      drawSmooth(ctx, drawingRef.current, w, h, dark ? "#b794ff" : "#7c3aed", 5);
+      drawSmooth(ctx, drawingRef.current, w, h, dark ? "#f6a583" : "#e95420", 5);
       // pallino di partenza (cerchio cavo) come nel riferimento
       if (path.length) {
         ctx.fillStyle = dark ? "#0e1512" : "#ffffff";
@@ -404,12 +404,12 @@ export default function Movimento() {
 
   const renderUserStroke = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     drawGrid(ctx, w, h);
-    drawSmooth(ctx, drawingRef.current, w, h, dark ? "#b794ff" : "#7c3aed", 5);
+    drawSmooth(ctx, drawingRef.current, w, h, dark ? "#f6a583" : "#e95420", 5);
     // pallino di partenza dove ha cominciato a disegnare
     if (drawingRef.current.length) {
       const p0 = drawingRef.current[0];
       ctx.fillStyle = dark ? "#0e1512" : "#ffffff";
-      ctx.strokeStyle = dark ? "#b794ff" : "#7c3aed"; ctx.lineWidth = 3;
+      ctx.strokeStyle = dark ? "#f6a583" : "#e95420"; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(p0.x * w, p0.y * h, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     }
   };
@@ -442,13 +442,13 @@ export default function Movimento() {
     setStreak(ns);
     if (passed && ns > best) { setBest(ns); localStorage.setItem("movimento-best-streak", String(ns)); }
 
-    confetti({ particleCount: sc.total >= 90 ? 110 : sc.total >= PASS_100 ? 55 : 10, spread: 72, origin: { y: 0.6 }, colors: ["#7c3aed", "#b794ff", "#fff", "#2F7D4A"] });
+    confetti({ particleCount: sc.total >= 90 ? 110 : sc.total >= PASS_100 ? 55 : 10, spread: 72, origin: { y: 0.6 }, colors: ["#e95420", "#f6a583", "#fff", "#e95420"] });
 
     const tr = passed ? getTrophyForStreak(ns) : null;
     if (tr && !achieved.includes(ns)) {
       const upd = [...achieved, ns]; setAch(upd);
       localStorage.setItem("movimento-trophies", JSON.stringify(upd));
-      setTimeout(() => { setTrophy(tr); confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#7c3aed", "#b794ff", "#fff"] }); }, 650);
+      setTimeout(() => { setTrophy(tr); confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#e95420", "#f6a583", "#fff"] }); }, 650);
     }
     setPhase("result");
   };
@@ -522,8 +522,8 @@ export default function Movimento() {
           <GameTutorial
             gameKey="movimento"
             steps={MOVIMENTO_INTRO_STEPS}
-            accentColor="#7c3aed"
-            darkBg="#2a1150"
+            accentColor="#e95420"
+            darkBg="#3c202f"
             dark={dark}
             onDone={() => { setShowTutorial(false); setShowMenu(false); }}
           />
@@ -678,40 +678,40 @@ export default function Movimento() {
       <style>{`
         .mov-page {
           /* ── Palette stile TRIVIA: VIOLA (accento) + VERDE (secondario) ── */
-          --pv:         #7c3aed;   /* viola primario */
-          --pv2:        #6024c4;   /* viola scuro */
-          --pv3:        #9b5cf6;   /* viola chiaro */
-          --pv-ink:     #6d28d9;   /* testo viola */
-          --green:      #2F7D4A;   /* verde secondario */
-          --green-dark: #1F6B3D;
+          --pv:         #e95420;   /* viola primario */
+          --pv2:        #bc3d10;   /* viola scuro */
+          --pv3:        #ed7143;   /* viola chiaro */
+          --pv-ink:     #cf4312;   /* testo viola */
+          --green:      #e95420;   /* verde secondario */
+          --green-dark: #c2410c;
           --gold:       #D9A400;
           --amber:      hsl(36, 100%, 30%);
           --absent:     hsl(350, 60%, 50%);
-          --accent2:    #7c3aed;   /* tratto utente = viola Trivia */
+          --accent2:    #e95420;   /* tratto utente = viola Trivia */
           --bs-100:     hsl(0, 0%, 96%);
           --bs-200:     hsl(0, 0%, 90%);
           --bs-300:     hsl(0, 0%, 83%);
           --radius:     8px;
           --radius-sm:  4px;
-          --focus-ring: 0 0 0 .25rem rgba(124,58,237,.25);
+          --focus-ring: 0 0 0 .25rem rgba(233, 84, 32,.25);
           --shadow-key: 0 .125rem .25rem rgba(0,0,0,.075);
           --shadow-card: 0 .5rem 1rem rgba(0,0,0,.12);
           --hdr-h: 52px;
 
           --surface:    #f4f6f5;
           --panel:      #ffffff;
-          --panel-bd:   rgba(124,58,237,0.16);
+          --panel-bd:   rgba(233, 84, 32,0.16);
           --stage-bg:   #f1edf9;
           --text:       #17271d;
           --text-soft:  #4a4458;
-          --stat-bg:    rgba(124,58,237,0.06);
-          --stat-bd:    rgba(124,58,237,0.16);
+          --stat-bg:    rgba(233, 84, 32,0.06);
+          --stat-bd:    rgba(233, 84, 32,0.16);
           --legend-sep: var(--bs-200);
 
           height: 100dvh; overflow: hidden;
           background: var(--surface); color: var(--text);
           display: flex; flex-direction: column; align-items: center;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           user-select: none;
         }
 
@@ -720,7 +720,7 @@ export default function Movimento() {
           position: sticky; top:0; z-index:20; flex-shrink:0;
           width:100%; display:flex; align-items:center; justify-content:space-between;
           padding:0 0.75rem; height:var(--hdr-h);
-          background:linear-gradient(100deg,#7c3aed 0%,#5b21b6 45%,#103820 120%); color:#fff;
+          background:linear-gradient(100deg,#e95420 0%,#a2330e 45%,#2c001e 120%); color:#fff;
           box-shadow:0 2px 16px rgba(0,0,0,0.22);
         }
         .mov-hdr-left { display:flex; align-items:center; gap:0.5rem; }
@@ -735,7 +735,7 @@ export default function Movimento() {
         }
         .mov-mode-pill:hover { background:rgba(255,255,255,0.22); }
         .mov-title { font-size:1.4rem; font-weight:800; letter-spacing:0.14em; margin:0; }
-        .mov-accent { color:#b794ff; }
+        .mov-accent { color:#f6a583; }
         .mov-iconbtn {
           display:inline-flex; align-items:center; justify-content:center;
           width:36px; height:36px; border-radius:50%;
@@ -819,8 +819,8 @@ export default function Movimento() {
         /* ── Result reveal ── */
         .mov-win-reveal {
           display:flex; flex-direction:column; align-items:center; gap:0.2rem;
-          background:linear-gradient(160deg,rgba(124,58,237,0.09),rgba(47,125,74,0.06));
-          border:2px solid rgba(124,58,237,0.2); border-radius:12px; padding:0.9rem;
+          background:linear-gradient(160deg,rgba(233, 84, 32,0.09),rgba(233, 84, 32,0.06));
+          border:2px solid rgba(233, 84, 32,0.2); border-radius:12px; padding:0.9rem;
           animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
         .mov-wr-e { font-size:2rem; line-height:1; animation:mov-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
@@ -830,13 +830,13 @@ export default function Movimento() {
         .mov-bigscore-dec { font-size:1.4rem; font-weight:700; }
         .mov-bigscore-max { font-size:0.78rem; font-weight:600; color:var(--text-soft); margin-left:0.25rem; align-self:flex-end; }
         .mov-subs { display:flex; gap:0.45rem; width:100%; margin-top:0.6rem; }
-        .mov-sub { flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:0.12rem; background:rgba(124,58,237,0.07); border:1px solid rgba(124,58,237,0.18); border-radius:8px; padding:0.45rem 0.55rem; }
+        .mov-sub { flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:0.12rem; background:rgba(233, 84, 32,0.07); border:1px solid rgba(233, 84, 32,0.18); border-radius:8px; padding:0.45rem 0.55rem; }
         .mov-sub-lbl { font-size:0.54rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-soft); }
         .mov-sub-val { font-size:1rem; font-weight:800; color:var(--accent2); font-variant-numeric:tabular-nums; }
         .mov-wr-tip { font-size:0.74rem; color:var(--text-soft); margin:0.6rem 0 0; text-align:center; line-height:1.3; }
         /* manteniamo le classi grid/cell per il game-over */
         .mov-wr-grid { display:flex; gap:0.4rem; width:100%; margin-top:0.5rem; }
-        .mov-wr-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.1rem; background:rgba(255,255,255,0.6); border:1px solid rgba(47,125,74,0.13); border-radius:8px; padding:0.4rem 0.2rem; }
+        .mov-wr-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.1rem; background:rgba(255,255,255,0.6); border:1px solid rgba(233, 84, 32,0.13); border-radius:8px; padding:0.4rem 0.2rem; }
         .mov-wr-num { font-size:0.92rem; font-weight:800; color:var(--green-dark); font-variant-numeric:tabular-nums; }
         .mov-wr-sub { font-size:0.55rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#6b8070; }
         @keyframes mov-slide-up { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
@@ -846,12 +846,12 @@ export default function Movimento() {
         .mov-next {
           width:100%; height:48px;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%); color:#fff; border:none;
+          background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%); color:#fff; border:none;
           border-radius:var(--radius-sm); font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer;
-          box-shadow:0 6px 20px rgba(91,33,182,0.4); animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
+          box-shadow:0 6px 20px rgba(162, 51, 14,0.4); animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
           transition:filter .15s,transform .1s,box-shadow .15s;
         }
-        .mov-next:hover { filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 10px 28px rgba(91,33,182,0.5); }
+        .mov-next:hover { filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 10px 28px rgba(162, 51, 14,0.5); }
         .mov-next:focus-visible { outline:none; box-shadow:var(--focus-ring); }
         .mov-next:active { transform:scale(.98); }
         .mov-next--ghost { background:transparent; color:var(--pv-ink); border:1.5px solid var(--panel-bd); box-shadow:none; height:42px; margin-top:.1rem; font-weight:700; animation:none; }
@@ -861,8 +861,8 @@ export default function Movimento() {
         .mov-panel--over { gap:0.7rem; }
         .mov-over {
           display:flex; flex-direction:column; align-items:center; gap:0.1rem;
-          background:linear-gradient(160deg,rgba(124,58,237,0.08),rgba(47,125,74,0.06));
-          border:2px solid rgba(124,58,237,0.18); border-radius:12px; padding:1rem 0.9rem 0.85rem;
+          background:linear-gradient(160deg,rgba(233, 84, 32,0.08),rgba(233, 84, 32,0.06));
+          border:2px solid rgba(233, 84, 32,0.18); border-radius:12px; padding:1rem 0.9rem 0.85rem;
           animation:mov-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
         .mov-over-emoji { font-size:2.4rem; line-height:1; animation:mov-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
@@ -891,40 +891,40 @@ export default function Movimento() {
 
         /* ════════════════ DARK MODE (viola+verde, base Trivia) ════════════════ */
         .mov-page.dark {
-          --pv:         #9b5cf6;
-          --pv2:        #7c3aed;
-          --pv3:        #b794ff;
-          --pv-ink:     #c4a5ff;
+          --pv:         #ed7143;
+          --pv2:        #e95420;
+          --pv3:        #f6a583;
+          --pv-ink:     #f6a583;
           --green:      #2f9e63;
           --green-dark: #6fe0a6;
           --gold:       #e8c34a;
-          --accent2:    #b794ff;
+          --accent2:    #f6a583;
           --surface:    #0e1512;
           --panel:      #15231c;
-          --panel-bd:   rgba(155,92,246,0.22);
+          --panel-bd:   rgba(237, 113, 67,0.22);
           --stage-bg:   #140e22;
-          --text:       #e7def7;
-          --text-soft:  #b6a9cf;
-          --stat-bg:    rgba(155,92,246,0.10);
-          --stat-bd:    rgba(155,92,246,0.22);
-          --legend-sep: rgba(155,92,246,0.18);
+          --text:       #f5ede8;
+          --text-soft:  #c9bcb4;
+          --stat-bg:    rgba(237, 113, 67,0.10);
+          --stat-bd:    rgba(237, 113, 67,0.22);
+          --legend-sep: rgba(237, 113, 67,0.18);
           --shadow-card: 0 .5rem 1.25rem rgba(0,0,0,0.45);
           --shadow-key:  0 .125rem .25rem rgba(0,0,0,0.25);
         }
-        .mov-page.dark .mov-header { background:linear-gradient(100deg,#4c1d95 0%,#2a1150 55%,#0a1410 130%); }
+        .mov-page.dark .mov-header { background:linear-gradient(100deg,#7e2708 0%,#3c202f 55%,#0a1410 130%); }
         .mov-page.dark .mov-stage  { background:radial-gradient(ellipse at 38% 42%, #1c1233 0%, var(--surface) 72%); }
-        .mov-page.dark .mov-card-stat { color:#c4a5ff; }
-        .mov-page.dark .mov-card-stat-ico { color:#c4a5ff; }
+        .mov-page.dark .mov-card-stat { color:#f6a583; }
+        .mov-page.dark .mov-card-stat-ico { color:#f6a583; }
         .mov-page.dark .mov-round-badge { background:rgba(0,0,0,0.4); color:var(--text-soft); }
-        .mov-page.dark .mov-win-reveal { background:linear-gradient(160deg,rgba(155,92,246,0.16),rgba(47,158,99,0.08)); border-color:rgba(155,92,246,0.28); }
-        .mov-page.dark .mov-wr-label,.mov-page.dark .mov-wr-sub { color:#b6a9cf; }
-        .mov-page.dark .mov-wr-num { color:#c4a5ff; }
-        .mov-page.dark .mov-wr-cell { background:rgba(255,255,255,0.04); border-color:rgba(155,92,246,0.22); }
-        .mov-page.dark .mov-sub { background:rgba(155,92,246,0.12); border-color:rgba(155,92,246,0.26); }
-        .mov-page.dark .mov-over { background:linear-gradient(160deg,rgba(155,92,246,0.16),rgba(47,158,99,0.08)); border-color:rgba(155,92,246,0.28); }
-        .mov-page.dark .mov-over-pts { color:#b6a9cf; }
-        .mov-page.dark .mov-tcard { background:#1a1230; }
-        .mov-page.dark .mov-tdesc { color:#b6a9cf; }
+        .mov-page.dark .mov-win-reveal { background:linear-gradient(160deg,rgba(237, 113, 67,0.16),rgba(47,158,99,0.08)); border-color:rgba(237, 113, 67,0.28); }
+        .mov-page.dark .mov-wr-label,.mov-page.dark .mov-wr-sub { color:#c9bcb4; }
+        .mov-page.dark .mov-wr-num { color:#f6a583; }
+        .mov-page.dark .mov-wr-cell { background:rgba(255,255,255,0.04); border-color:rgba(237, 113, 67,0.22); }
+        .mov-page.dark .mov-sub { background:rgba(237, 113, 67,0.12); border-color:rgba(237, 113, 67,0.26); }
+        .mov-page.dark .mov-over { background:linear-gradient(160deg,rgba(237, 113, 67,0.16),rgba(47,158,99,0.08)); border-color:rgba(237, 113, 67,0.28); }
+        .mov-page.dark .mov-over-pts { color:#c9bcb4; }
+        .mov-page.dark .mov-tcard { background:#291d26; }
+        .mov-page.dark .mov-tdesc { color:#c9bcb4; }
         .mov-page.dark .mov-tsub  { color:var(--text); }
 
         /* ── Trophy overlay ── */
@@ -938,7 +938,7 @@ export default function Movimento() {
         .mov-tbody { padding:1.1rem 1.4rem; }
         .mov-tdesc { color:#6b8070; font-size:.9rem; margin-bottom:.35rem; }
         .mov-tsub  { font-weight:700; color:#17271d; margin-bottom:.9rem; font-size:.88rem; }
-        .mov-tcta  { width:100%; padding:.8rem 1.4rem; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:filter .15s; }
+        .mov-tcta  { width:100%; padding:.8rem 1.4rem; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:filter .15s; }
         .mov-tcta:hover { filter:brightness(1.08); }
       `}</style>
       <SiteFooter />

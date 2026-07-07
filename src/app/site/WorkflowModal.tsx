@@ -219,9 +219,9 @@ export default function WorkflowModal() {
           color: #8893a0; font-family: inherit; font-size: 0.86rem;
           transition: color 0.15s;
         }
-        .apw-open:hover { color: #c4a5ff; }
+        .apw-open:hover { color: #f6a583; }
 
-        .apw-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Titillium Web", Geneva, Tahoma, sans-serif; }
+        .apw-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Ubuntu", Geneva, Tahoma, sans-serif; }
         .apw-backdrop { position: absolute; inset: 0; background: rgba(4, 6, 10, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: apw-fade 0.2s ease; }
         /* Dialogo CHIARO: il diagramma Mermaid di default vive su fondo bianco,
            come nello screenshot (README). Nessuno stile "del sito" addosso. */

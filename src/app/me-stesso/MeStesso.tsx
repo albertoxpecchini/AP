@@ -732,7 +732,7 @@ export default function MeStesso() {
            ───────────────────────────────────────────────────────────────────── */
         .ms-page {
           min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           color: var(--text);
           background: var(--page-bg);
           transition: background .35s ease, color .35s ease;
@@ -740,85 +740,85 @@ export default function MeStesso() {
 
         /* ── Tema CHIARO (default) ── */
         .ms-page.ms-light {
-          --accent: #6d4bd6;
-          --accent-2: #7c5cff;
-          --accent-3: #8b6dff;
-          --accent-deep: #4a2fb0;
-          --ink: #5b34c9;
-          --glow: rgba(109, 75, 214, 0.28);
-          --text: #221838;
-          --text-strong: #170d3a;
-          --sub: #574a78;
-          --surface: rgba(109, 75, 214, 0.09);
-          --surface-bd: rgba(109, 75, 214, 0.30);
-          --vio-soft: rgba(109, 75, 214, 0.12);
-          --vio-bd: rgba(109, 75, 214, 0.38);
-          --bg-light-tint: rgba(109, 75, 214, 0.08);
-          --tree-line: rgba(109, 75, 214, 0.50);
-          --bc-like: #15803d; --bc-easy: #5b34c9; --bc-hard: #b45309;
+          --accent: #c2410c;
+          --accent-2: #d9480f;
+          --accent-3: #e8590c;
+          --accent-deep: #9a3412;
+          --ink: #a63a0d;
+          --glow: rgba(194, 65, 12, 0.28);
+          --text: #3d3846;
+          --text-strong: #241f31;
+          --sub: #6e6259;
+          --surface: rgba(194, 65, 12, 0.09);
+          --surface-bd: rgba(194, 65, 12, 0.30);
+          --vio-soft: rgba(194, 65, 12, 0.12);
+          --vio-bd: rgba(194, 65, 12, 0.38);
+          --bg-light-tint: rgba(194, 65, 12, 0.08);
+          --tree-line: rgba(194, 65, 12, 0.50);
+          --bc-like: #15803d; --bc-easy: #a63a0d; --bc-hard: #b45309;
           --page-bg:
-            radial-gradient(120% 70% at 50% -10%, rgba(109, 75, 214, 0.08) 0%, transparent 55%),
-            linear-gradient(180deg, #ffffff 0%, #f7f5fd 100%);
+            radial-gradient(120% 70% at 50% -10%, rgba(194, 65, 12, 0.08) 0%, transparent 55%),
+            linear-gradient(180deg, #ffffff 0%, #faf8f6 100%);
           --hdr-bg: rgba(255, 255, 255, 0.82);
-          --panel: linear-gradient(160deg, #f4f1fc 0%, #efeafb 45%, #ffffff 100%);
+          --panel: linear-gradient(160deg, #f7f4f1 0%, #f2ede8 45%, #ffffff 100%);
           --hero-bg:
-            radial-gradient(90% 120% at 0% 0%, rgba(109, 75, 214, 0.12) 0%, transparent 55%),
+            radial-gradient(90% 120% at 0% 0%, rgba(194, 65, 12, 0.12) 0%, transparent 55%),
             var(--panel);
           --band-bg:
-            radial-gradient(100% 130% at 100% 0%, rgba(109, 75, 214, 0.10) 0%, transparent 55%),
+            radial-gradient(100% 130% at 100% 0%, rgba(194, 65, 12, 0.10) 0%, transparent 55%),
             linear-gradient(160deg, #f6f3fe 0%, #ffffff 60%, #f3effd 100%);
           --future-bg:
-            radial-gradient(90% 120% at 0% 0%, rgba(109, 75, 214, 0.18) 0%, transparent 55%),
+            radial-gradient(90% 120% at 0% 0%, rgba(194, 65, 12, 0.18) 0%, transparent 55%),
             linear-gradient(135deg, #efeafd 0%, #e8defb 55%, #f6f3fe 100%);
-          --thanks-bg: linear-gradient(135deg, #f4f1fc 0%, #ece6fa 100%);
+          --thanks-bg: linear-gradient(135deg, #f7f4f1 0%, #ece6fa 100%);
           --thanks-scrim: linear-gradient(120deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.6) 50%, rgba(236,230,250,0.4) 100%);
           --footer-bg: #f3f0fb;
-          --shot-bg: rgba(109, 75, 214, 0.07);
+          --shot-bg: rgba(194, 65, 12, 0.07);
           --ph-bg:
-            radial-gradient(120% 120% at 30% 20%, rgba(109, 75, 214, 0.16), rgba(255, 255, 255, 0.2)),
-            linear-gradient(135deg, #efeafb 0%, #ffffff 100%);
+            radial-gradient(120% 120% at 30% 20%, rgba(194, 65, 12, 0.16), rgba(255, 255, 255, 0.2)),
+            linear-gradient(135deg, #f2ede8 0%, #ffffff 100%);
           --blob-1: 0.16; --blob-2: 0.12;
         }
 
         /* ── Tema SCURO "dark premium" ── */
         .ms-page.ms-dark {
-          --accent: #8b7bff;
-          --accent-2: #7c6cff;
-          --accent-3: #9d8fff;
-          --accent-deep: #5b4bd6;
-          --ink: #c4a5ff;
-          --glow: rgba(139, 123, 255, 0.45);
-          --text: #e8eef4;
+          --accent: #e95420;
+          --accent-2: #dd4814;
+          --accent-3: #f39a76;
+          --accent-deep: #bc3d10;
+          --ink: #f6a583;
+          --glow: rgba(233, 84, 32, 0.45);
+          --text: #f5f3f1;
           --text-strong: #ffffff;
-          --sub: #a7b2bd;
+          --sub: #b3aca6;
           --surface: rgba(255, 255, 255, 0.05);
           --surface-bd: rgba(255, 255, 255, 0.10);
-          --vio-soft: rgba(139, 123, 255, 0.10);
-          --vio-bd: rgba(139, 123, 255, 0.28);
+          --vio-soft: rgba(233, 84, 32, 0.10);
+          --vio-bd: rgba(233, 84, 32, 0.28);
           --bg-light-tint: rgba(255, 255, 255, 0.022);
-          --tree-line: rgba(139, 123, 255, 0.4);
-          --bc-like: #34d399; --bc-easy: #c4a5ff; --bc-hard: #fbbf24;
+          --tree-line: rgba(233, 84, 32, 0.4);
+          --bc-like: #34d399; --bc-easy: #f6a583; --bc-hard: #fbbf24;
           --page-bg:
-            radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
-          --hdr-bg: rgba(10, 13, 17, 0.82);
-          --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+            radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
+          --hdr-bg: rgba(28, 22, 27, 0.82);
+          --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
           --hero-bg:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
+            radial-gradient(90% 120% at 0% 0%, rgba(233, 84, 32, 0.22) 0%, transparent 55%),
             var(--panel);
           --band-bg:
-            radial-gradient(100% 130% at 100% 0%, rgba(139, 123, 255, 0.18) 0%, transparent 55%),
-            linear-gradient(160deg, #120c20 0%, #0b0f14 60%, #15101f 100%);
+            radial-gradient(100% 130% at 100% 0%, rgba(233, 84, 32, 0.18) 0%, transparent 55%),
+            linear-gradient(160deg, #120c20 0%, #241c22 60%, #221a20 100%);
           --future-bg:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.25) 0%, transparent 55%),
-            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
-          --thanks-bg: linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+            radial-gradient(90% 120% at 0% 0%, rgba(233, 84, 32, 0.25) 0%, transparent 55%),
+            linear-gradient(135deg, #2a1e26 0%, #322330 55%, #221a20 100%);
+          --thanks-bg: linear-gradient(135deg, #221a20 0%, #241c22 100%);
           --thanks-scrim: linear-gradient(120deg, rgba(7,9,16,0.92) 0%, rgba(7,9,16,0.6) 50%, rgba(20,16,40,0.35) 100%);
-          --footer-bg: #090c10;
+          --footer-bg: #1b151a;
           --shot-bg: rgba(255, 255, 255, 0.04);
           --ph-bg:
-            radial-gradient(120% 120% at 30% 20%, rgba(139, 123, 255, 0.22), rgba(10, 12, 16, 0.2)),
-            linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+            radial-gradient(120% 120% at 30% 20%, rgba(233, 84, 32, 0.22), rgba(10, 12, 16, 0.2)),
+            linear-gradient(135deg, #221a20 0%, #241c22 100%);
           --blob-1: 0.45; --blob-2: 0.35;
         }
 

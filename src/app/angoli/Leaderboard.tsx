@@ -122,7 +122,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           background: rgba(10,30,18,0.66);
           display: flex; align-items: center; justify-content: center;
           padding: 1rem; animation: ang-lb-fade .2s ease;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
         }
         @keyframes ang-lb-fade { from { opacity:0 } to { opacity:1 } }
         .ang-lb-card {
@@ -137,7 +137,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
 
         .ang-lb-head {
           display:flex; align-items:center; justify-content:space-between;
-          padding:1rem 1.2rem; background:#103820; color:#fff; flex-shrink:0;
+          padding:1rem 1.2rem; background:#2c001e; color:#fff; flex-shrink:0;
         }
         .ang-lb.dark .ang-lb-head { background:#0a1410; }
         .ang-lb-title { display:flex; align-items:center; gap:.5rem; font-size:1.1rem; font-weight:800; }
@@ -162,13 +162,13 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         }
         .ang-lb.dark .ang-lb-filters { border-color:rgba(95,208,154,0.14); }
         .ang-lb-fbtn {
-          border:1px solid rgba(47,125,74,0.25); background:transparent;
-          color:#2F7D4A; border-radius:999px; padding:.25rem .7rem;
+          border:1px solid rgba(233, 84, 32,0.25); background:transparent;
+          color:#e95420; border-radius:999px; padding:.25rem .7rem;
           font-family:inherit; font-size:.76rem; font-weight:700; cursor:pointer; transition:all .12s;
         }
         .ang-lb.dark .ang-lb-fbtn { color:#6fe0a6; border-color:rgba(95,208,154,0.28); }
-        .ang-lb-fbtn:hover { background:rgba(47,125,74,0.08); }
-        .ang-lb-fbtn.act { background:#2F7D4A; color:#fff; border-color:#2F7D4A; }
+        .ang-lb-fbtn:hover { background:rgba(233, 84, 32,0.08); }
+        .ang-lb-fbtn.act { background:#e95420; color:#fff; border-color:#e95420; }
         .ang-lb.dark .ang-lb-fbtn.act { background:#2f9e63; border-color:#2f9e63; color:#06160e; }
 
         .ang-lb-list { flex:1; min-height:0; overflow-y:auto; padding:.5rem .7rem .9rem; }
@@ -183,7 +183,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         @keyframes ang-lb-rowin { from { opacity:0; transform:translateX(-6px) } to { opacity:1; transform:none } }
         .ang-lb-row:nth-child(even) { background:rgba(0,0,0,0.025); }
         .ang-lb.dark .ang-lb-row:nth-child(even) { background:rgba(255,255,255,0.025); }
-        .ang-lb-row.me { background:rgba(47,125,74,0.12); box-shadow:inset 0 0 0 1.5px rgba(47,125,74,0.4); }
+        .ang-lb-row.me { background:rgba(233, 84, 32,0.12); box-shadow:inset 0 0 0 1.5px rgba(233, 84, 32,0.4); }
         .ang-lb.dark .ang-lb-row.me { background:rgba(95,208,154,0.14); box-shadow:inset 0 0 0 1.5px rgba(95,208,154,0.4); }
         .ang-lb-row.top1 { background:linear-gradient(90deg,rgba(200,164,21,0.18),transparent); }
         .ang-lb-row.top2 { background:linear-gradient(90deg,rgba(122,140,153,0.15),transparent); }
@@ -205,7 +205,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         }
         .ang-lb.dark .ang-lb-mode { color:#8fc7a6; background:rgba(255,255,255,0.06); }
         .ang-lb-score {
-          font-weight:900; font-size:1rem; color:#2F7D4A; font-variant-numeric:tabular-nums;
+          font-weight:900; font-size:1rem; color:#e95420; font-variant-numeric:tabular-nums;
           min-width:54px; text-align:right;
         }
         .ang-lb.dark .ang-lb-score { color:#6fe0a6; }

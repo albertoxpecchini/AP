@@ -6,51 +6,51 @@
         /* Palette neroverde: override del primario di Bootstrap Italia
            (era blu #06c) per uniformare bg-primary, text-primary, btn-*-primary. */
         :root {
-          --bs-primary: #2F7D4A;
+          --bs-primary: #e95420;
           --bs-primary-rgb: 47, 125, 74;
-          --bs-link-color: #1F6B3D;
+          --bs-link-color: #c2410c;
           --bs-link-color-rgb: 31, 107, 61;
-          --bs-link-hover-color: #155030;
+          --bs-link-hover-color: #9a3412;
           --bs-link-hover-color-rgb: 21, 80, 48;
         }
-        .it-page-wrapper .bg-primary { background-color: #2F7D4A !important; }
-        .it-page-wrapper .text-primary { color: #1F6B3D !important; }
-        .it-page-wrapper .border-primary { border-color: #2F7D4A !important; }
+        .it-page-wrapper .bg-primary { background-color: #e95420 !important; }
+        .it-page-wrapper .text-primary { color: #c2410c !important; }
+        .it-page-wrapper .border-primary { border-color: #e95420 !important; }
         .it-page-wrapper .btn-primary {
-          background-color: #2F7D4A;
-          border-color: #2F7D4A;
+          background-color: #e95420;
+          border-color: #e95420;
         }
         .it-page-wrapper .btn-primary:hover,
         .it-page-wrapper .btn-primary:focus {
-          background-color: #1F6B3D;
-          border-color: #1F6B3D;
+          background-color: #c2410c;
+          border-color: #c2410c;
         }
         .it-page-wrapper .btn-outline-primary {
-          color: #1F6B3D !important;
-          border-color: #2F7D4A !important;
+          color: #c2410c !important;
+          border-color: #e95420 !important;
         }
         .it-page-wrapper .btn-outline-primary:hover,
         .it-page-wrapper .btn-outline-primary:focus {
-          background-color: #2F7D4A !important;
-          border-color: #2F7D4A !important;
+          background-color: #e95420 !important;
+          border-color: #e95420 !important;
           color: #ffffff !important;
         }
         .it-page-wrapper .chip-primary,
         .it-page-wrapper .chip.chip-primary,
         .it-page-wrapper .chip.chip-simple.chip-primary {
-          background-color: rgba(47, 125, 74, 0.12) !important;
-          color: #1F6B3D !important;
-          border-color: rgba(47, 125, 74, 0.28) !important;
+          background-color: rgba(233, 84, 32, 0.12) !important;
+          color: #c2410c !important;
+          border-color: rgba(233, 84, 32, 0.28) !important;
         }
         .it-page-wrapper .chip-primary .chip-label,
         .it-page-wrapper .chip.chip-primary .chip-label {
-          color: #1F6B3D !important;
+          color: #c2410c !important;
         }
         .it-page-wrapper .theme-dark {
-          background-color: #103820 !important;
+          background-color: #2c001e !important;
         }
         .it-page-wrapper .it-footer-main {
-          background-color: #103820 !important;
+          background-color: #2c001e !important;
         }
         .it-page-wrapper .it-footer-main .border-top {
           border-color: rgba(255, 255, 255, 0.18) !important;
@@ -58,7 +58,7 @@
 
         .it-page-wrapper {
           min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           background-color: #ffffff;
         }
 
@@ -137,7 +137,7 @@
           /* Quando scrollato: sale a top:0 e sfondo verde scuro */
           .ap-navbar.ap-navbar--scrolled {
             top: 0 !important;
-            background-color: #103820 !important;
+            background-color: #2c001e !important;
             box-shadow: 0 2px 12px rgba(0,0,0,0.22) !important;
           }
 
@@ -175,12 +175,12 @@
             right: 0 !important;
             bottom: 0 !important;
             z-index: 200 !important;
-            background-color: #103820 !important;
+            background-color: #2c001e !important;
           }
           .ap-navbar .navbar-collapsable,
           .ap-navbar .navbar-collapsable .menu-wrapper,
           .ap-navbar .navbar-collapsable .close-div {
-            background-color: #103820 !important;
+            background-color: #2c001e !important;
           }
           .ap-navbar .navbar-collapsable .nav-link {
             color: #ffffff !important;
@@ -231,8 +231,8 @@
           min-height: 100svh;
           position: relative;
           overflow: hidden;
-          background-color: #1F6B3D;
-          background-image: linear-gradient(135deg, #1F6B3D 0%, #2F7D4A 60%, #3F8F5A 100%);
+          background-color: #c2410c;
+          background-image: linear-gradient(135deg, #c2410c 0%, #e95420 60%, #3F8F5A 100%);
         }
         .ap-hero h1 {
           overflow-wrap: anywhere;
@@ -255,7 +255,7 @@
         /* ═══════ Vetrina progetti "a diapositive" (card uniformi, icona tonda
            che sporge dal bordo superiore) — stile games, palette viola+verde ═══════ */
         .ap-slides-section {
-          background: linear-gradient(160deg,#1a0b2e 0%,#2a1150 42%,#103820 130%);
+          background: linear-gradient(160deg,#271724 0%,#3c202f 42%,#2c001e 130%);
           padding: 4.5rem 0 4rem;
           position: relative; overflow: hidden;
         }
@@ -263,10 +263,10 @@
           content:""; position:absolute; width:55%; height:55%; border-radius:50%;
           filter:blur(80px); opacity:0.28; pointer-events:none;
         }
-        .ap-slides-section::before { background:#7c3aed; top:-12%; left:-10%; }
+        .ap-slides-section::before { background:#e95420; top:-12%; left:-10%; }
         .ap-slides-section::after  { background:#2F9E5A; bottom:-15%; right:-8%; opacity:0.22; }
         .ap-slides-head { position:relative; z-index:1; margin-bottom: 3rem; }
-        .ap-slides-kicker { color:#b794ff !important; }
+        .ap-slides-kicker { color:#f6a583 !important; }
 
         .ap-slides-grid {
           position: relative; z-index: 1;
@@ -281,16 +281,16 @@
           display: flex; flex-direction: column; align-items: center; text-align: center;
           padding: 2.9rem 1.3rem 1.6rem;            /* spazio in alto per l'icona che sporge */
           margin-top: 1.7rem;                        /* lascia spazio all'icona sopra il bordo */
-          border: 1px solid rgba(155,92,246,0.26);
+          border: 1px solid rgba(237, 113, 67,0.26);
           border-radius: 18px;
-          background: rgba(124,58,237,0.10);
+          background: rgba(233, 84, 32,0.10);
           text-decoration: none; color: inherit;
           transition: transform .16s ease, border-color .16s, box-shadow .16s, background .16s;
         }
         .ap-slide:hover {
           transform: translateY(-4px);
-          border-color: rgba(155,92,246,0.55);
-          background: rgba(124,58,237,0.16);
+          border-color: rgba(237, 113, 67,0.55);
+          background: rgba(233, 84, 32,0.16);
           box-shadow: 0 16px 38px rgba(0,0,0,0.45);
         }
         /* icona tonda che ESCE dal bordo superiore (come lo screenshot) */
@@ -299,13 +299,13 @@
           transform: translate(-50%, -50%);
           width: 60px; height: 60px; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          background: #fff; color: #6024c4;
-          box-shadow: 0 8px 24px rgba(91,33,182,0.45);
-          border: 1px solid rgba(124,58,237,0.25);
+          background: #fff; color: #bc3d10;
+          box-shadow: 0 8px 24px rgba(162, 51, 14,0.45);
+          border: 1px solid rgba(233, 84, 32,0.25);
           transition: transform .16s ease, box-shadow .16s;
           overflow: hidden;
         }
-        .ap-slide:hover .ap-slide-icon { transform: translate(-50%, -50%) scale(1.07); box-shadow: 0 12px 30px rgba(91,33,182,0.6); }
+        .ap-slide:hover .ap-slide-icon { transform: translate(-50%, -50%) scale(1.07); box-shadow: 0 12px 30px rgba(162, 51, 14,0.6); }
         .ap-slide-icon svg { width: 36px; height: 36px; display:block; }
         .ap-slide-cat {
           font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
@@ -363,8 +363,8 @@
         .ap-project-version {
           display: inline-block;
           padding: 0.18rem 0.55rem;
-          background: rgba(47, 125, 74, 0.12);
-          color: #1F6B3D;
+          background: rgba(233, 84, 32, 0.12);
+          color: #c2410c;
           border-radius: 999px;
           font-size: 0.72rem;
           font-weight: 700;
@@ -424,7 +424,7 @@
         .ap-project-placeholder-text {
           font-size: 0.9rem;
           font-weight: 600;
-          color: #1F6B3D;
+          color: #c2410c;
           text-align: center;
           padding: 1rem;
         }
@@ -473,7 +473,7 @@
         /* Card competenze */
         .ap-skill-card {
           background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.14);
+          border: 1px solid rgba(233, 84, 32, 0.14);
           border-radius: 8px;
           padding: 1.5rem;
         }
@@ -490,7 +490,7 @@
           top: 6px;
           bottom: 6px;
           width: 2px;
-          background: rgba(47, 125, 74, 0.28);
+          background: rgba(233, 84, 32, 0.28);
         }
         .ap-timeline-item {
           position: relative;
@@ -507,9 +507,9 @@
           width: 16px;
           height: 16px;
           border-radius: 50%;
-          background: #2F7D4A;
+          background: #e95420;
           border: 3px solid #ffffff;
-          box-shadow: 0 0 0 2px rgba(47, 125, 74, 0.28);
+          box-shadow: 0 0 0 2px rgba(233, 84, 32, 0.28);
         }
         .ap-timeline-period {
           display: inline-block;
@@ -517,7 +517,7 @@
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: #1F6B3D;
+          color: #c2410c;
           margin-bottom: 0.25rem;
         }
         /* Variante "zona desideri" */
@@ -542,10 +542,10 @@
           align-items: center;
           gap: 0.5rem;
           padding: 0.5rem 0.9rem;
-          background: rgba(47, 125, 74, 0.08);
-          border: 1px solid rgba(47, 125, 74, 0.28);
+          background: rgba(233, 84, 32, 0.08);
+          border: 1px solid rgba(233, 84, 32, 0.28);
           border-radius: 999px;
-          color: #1F6B3D;
+          color: #c2410c;
           font-family: inherit;
           font-size: 0.85rem;
           font-weight: 600;
@@ -556,8 +556,8 @@
         }
         button.ap-cv-doc:hover,
         button.ap-cv-doc:focus-visible {
-          background: #2F7D4A;
-          border-color: #2F7D4A;
+          background: #e95420;
+          border-color: #e95420;
           color: #ffffff;
           outline: none;
         }
@@ -571,7 +571,7 @@
           gap: 0.75rem;
           padding: 1.75rem 1rem;
           background: #ffffff;
-          border: 1px solid rgba(47, 125, 74, 0.14);
+          border: 1px solid rgba(233, 84, 32, 0.14);
           border-radius: 8px;
           text-align: center;
         }
@@ -582,8 +582,8 @@
           width: 56px;
           height: 56px;
           border-radius: 50%;
-          background: rgba(47, 125, 74, 0.12);
-          color: #1F6B3D;
+          background: rgba(233, 84, 32, 0.12);
+          color: #c2410c;
         }
         .ap-interest-label {
           font-weight: 600;
@@ -661,14 +661,14 @@
           width: 68px;
           height: 68px;
           border-radius: 50%;
-          background: rgba(47, 125, 74, 0.12);
-          color: #1F6B3D;
+          background: rgba(233, 84, 32, 0.12);
+          color: #c2410c;
           margin-bottom: 1.25rem;
         }
         .ap-modal-title {
           font-size: 1.5rem;
           font-weight: 700;
-          color: #1F6B3D;
+          color: #c2410c;
           margin-bottom: 1rem;
         }
         .ap-modal-body {
@@ -725,7 +725,7 @@
           gap: 0.75rem;
           flex-wrap: wrap;
           padding: 0.6rem 0.85rem;
-          background: #2F7D4A;
+          background: #e95420;
           color: #ffffff;
         }
         .ap-cv-title {
@@ -759,7 +759,7 @@
           display: block;
           padding: 0.75rem 0.85rem;
           background: #FFF7CC;
-          color: #1F6B3D;
+          color: #c2410c;
           font-weight: 600;
           text-align: center;
           text-decoration: none;
@@ -768,7 +768,7 @@
         .ap-cv-fallback:hover,
         .ap-cv-fallback:focus-visible {
           background: #FEF3A6;
-          color: #155030;
+          color: #9a3412;
         }
 
         /* ===== Ottimizzazioni mobile ===== */
@@ -866,7 +866,7 @@
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.18em;
-          color: #2F7D4A;
+          color: #e95420;
           margin: 0 0 0.5rem;
         }
         .ap-eyebrow--light { color: rgba(255, 255, 255, 0.85); }
@@ -893,13 +893,13 @@
           display: inline-flex;
           align-items: center;
           gap: 0.35rem;
-          color: #1F6B3D;
+          color: #c2410c;
           font-weight: 700;
           font-size: 0.9rem;
           text-decoration: none;
           white-space: nowrap;
         }
-        .ap-sec-action:hover { color: #155030; }
+        .ap-sec-action:hover { color: #9a3412; }
 
         /* ── Header chiaro minimale ── */
         .ap-hdr {
@@ -909,7 +909,7 @@
           background: rgba(255, 255, 255, 0.88);
           backdrop-filter: saturate(180%) blur(12px);
           -webkit-backdrop-filter: saturate(180%) blur(12px);
-          border-bottom: 1px solid rgba(47, 125, 74, 0.12);
+          border-bottom: 1px solid rgba(233, 84, 32, 0.12);
         }
         .ap-hdr--scrolled { box-shadow: 0 6px 20px rgba(16, 56, 32, 0.08); }
         .ap-hdr-inner {
@@ -933,7 +933,7 @@
           border-radius: 50%;
           object-fit: cover;
           object-position: center 18%;
-          border: 1px solid rgba(47, 125, 74, 0.25);
+          border: 1px solid rgba(233, 84, 32, 0.25);
         }
         .ap-hdr-name { font-size: 1rem; white-space: nowrap; }
         .ap-hdr-local {
@@ -955,13 +955,13 @@
           font-size: 0.92rem;
           font-weight: 600;
         }
-        .ap-hdr-link:hover { color: #1F6B3D; }
+        .ap-hdr-link:hover { color: #c2410c; }
         .ap-hdr-right { display: flex; align-items: center; gap: 0.8rem; }
         .ap-hdr-social { display: flex; gap: 0.55rem; }
         .ap-hdr-social a { color: #3a4a41; display: inline-flex; }
-        .ap-hdr-social a:hover { color: #1F6B3D; }
+        .ap-hdr-social a:hover { color: #c2410c; }
         .ap-hdr-cta {
-          background: #103820;
+          background: #2c001e;
           color: #ffffff !important;
           padding: 0.5rem 1.1rem;
           border-radius: 999px;
@@ -971,7 +971,7 @@
           white-space: nowrap;
           transition: background 0.15s ease;
         }
-        .ap-hdr-cta:hover { background: #1F6B3D; }
+        .ap-hdr-cta:hover { background: #c2410c; }
         .ap-hdr-burger {
           display: none;
           background: none;
@@ -999,7 +999,7 @@
           right: 0;
           height: 100%;
           width: min(82vw, 340px);
-          background: #103820;
+          background: #2c001e;
           color: #fff;
           padding: calc(env(safe-area-inset-top) + 1.5rem) 1.5rem 1.5rem;
           display: flex;
@@ -1066,7 +1066,7 @@
           margin: 0.4rem 0 1.1rem;
           overflow-wrap: anywhere;
         }
-        .ap-hero2-accent { color: #2F7D4A; }
+        .ap-hero2-accent { color: #e95420; }
         .ap-hero2-lead {
           font-size: clamp(1.05rem, 1.6vw, 1.2rem);
           line-height: 1.6;
@@ -1091,11 +1091,11 @@
           border: 1.5px solid transparent;
           transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
         }
-        .ap-pill--solid { background: #103820; color: #fff; }
-        .ap-pill--solid:hover { background: #1F6B3D; }
-        .ap-pill--ghost { background: transparent; color: #14241b; border-color: rgba(47, 125, 74, 0.4); }
-        .ap-pill--ghost:hover { background: #fff; border-color: #2F7D4A; color: #1F6B3D; }
-        .ap-pill--light { background: #fff; color: #1F6B3D; }
+        .ap-pill--solid { background: #2c001e; color: #fff; }
+        .ap-pill--solid:hover { background: #c2410c; }
+        .ap-pill--ghost { background: transparent; color: #14241b; border-color: rgba(233, 84, 32, 0.4); }
+        .ap-pill--ghost:hover { background: #fff; border-color: #e95420; color: #c2410c; }
+        .ap-pill--light { background: #fff; color: #c2410c; }
         .ap-pill--light:hover { background: #eafaf0; }
         .ap-pill--lightghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.5); }
         .ap-pill--lightghost:hover { background: rgba(255, 255, 255, 0.12); }
@@ -1107,7 +1107,7 @@
           gap: 0.5rem;
           padding: 0.4rem 0.95rem 0.4rem 0.4rem;
           background: #fff;
-          border: 1px solid rgba(47, 125, 74, 0.18);
+          border: 1px solid rgba(233, 84, 32, 0.18);
           border-radius: 999px;
           text-decoration: none;
           color: #14241b;
@@ -1119,8 +1119,8 @@
         .ap-quick:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 20px rgba(16, 56, 32, 0.12);
-          border-color: #2F7D4A;
-          color: #1F6B3D;
+          border-color: #e95420;
+          color: #c2410c;
         }
         .ap-quick-ic {
           display: inline-flex;
@@ -1129,8 +1129,8 @@
           width: 34px;
           height: 34px;
           border-radius: 50%;
-          background: rgba(47, 125, 74, 0.12);
-          color: #1F6B3D;
+          background: rgba(233, 84, 32, 0.12);
+          color: #c2410c;
           flex-shrink: 0;
         }
         .ap-quick-ic svg { width: 20px; height: 20px; }
@@ -1165,7 +1165,7 @@
           display: flex;
           flex-direction: column;
           background: #fff;
-          border: 1px solid rgba(47, 125, 74, 0.14);
+          border: 1px solid rgba(233, 84, 32, 0.14);
           border-radius: 16px;
           overflow: hidden;
           text-decoration: none;
@@ -1176,7 +1176,7 @@
         .ap-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 18px 40px rgba(16, 56, 32, 0.12);
-          border-color: rgba(47, 125, 74, 0.3);
+          border-color: rgba(233, 84, 32, 0.3);
         }
         .ap-card--btn {
           cursor: pointer;
@@ -1188,7 +1188,7 @@
         .ap-card-media {
           height: 200px;
           background: #f4faf6;
-          border-bottom: 1px solid rgba(47, 125, 74, 0.12);
+          border-bottom: 1px solid rgba(233, 84, 32, 0.12);
           overflow: hidden;
         }
         .ap-card-body {
@@ -1213,7 +1213,7 @@
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          color: #2F7D4A;
+          color: #e95420;
           margin-bottom: 0.4rem;
         }
         .ap-card-date {
@@ -1236,11 +1236,11 @@
           display: inline-flex;
           align-items: center;
           gap: 0.35rem;
-          color: #1F6B3D;
+          color: #c2410c;
           font-weight: 700;
           font-size: 0.9rem;
         }
-        .ap-card:hover .ap-card-link { color: #155030; }
+        .ap-card:hover .ap-card-link { color: #9a3412; }
 
         /* Badge stato */
         .ap-badge {
@@ -1253,7 +1253,7 @@
           padding: 0.25rem 0.6rem;
           border-radius: 999px;
         }
-        .ap-badge--active { background: rgba(47, 125, 74, 0.12); color: #1F6B3D; }
+        .ap-badge--active { background: rgba(233, 84, 32, 0.12); color: #c2410c; }
         .ap-badge-dot {
           width: 7px;
           height: 7px;
@@ -1274,7 +1274,7 @@
         .ap-bio-side { display: flex; flex-direction: column; gap: 1.2rem; }
         .ap-side-box {
           background: #fff;
-          border: 1px solid rgba(47, 125, 74, 0.14);
+          border: 1px solid rgba(233, 84, 32, 0.14);
           border-radius: 14px;
           padding: 1.25rem 1.35rem;
         }
@@ -1283,7 +1283,7 @@
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.14em;
-          color: #2F7D4A;
+          color: #e95420;
           margin: 0 0 0.8rem;
         }
         .ap-side-based {
@@ -1314,11 +1314,11 @@
           font-size: 0.92rem;
           color: #14241b;
         }
-        .ap-side-edu li svg { color: #2F7D4A; flex-shrink: 0; }
+        .ap-side-edu li svg { color: #e95420; flex-shrink: 0; }
 
         /* ── Band contatti ── */
         .ap-contact {
-          background: linear-gradient(135deg, #103820 0%, #1F6B3D 70%, #2F7D4A 120%);
+          background: linear-gradient(135deg, #2c001e 0%, #c2410c 70%, #e95420 120%);
           color: #fff;
           padding: clamp(3.5rem, 7vw, 5.5rem) 0;
         }
@@ -1406,7 +1406,7 @@
           text-align: left;
           padding: 0.85rem 1.1rem;
           background: #fff;
-          border: 1px solid rgba(47, 125, 74, 0.14);
+          border: 1px solid rgba(233, 84, 32, 0.14);
           border-radius: 14px;
           cursor: pointer;
           appearance: none;
@@ -1420,7 +1420,7 @@
         .ap-biolist-item:hover {
           transform: translateY(-2px);
           box-shadow: 0 10px 24px rgba(16, 56, 32, 0.1);
-          border-color: #2F7D4A;
+          border-color: #e95420;
         }
         .ap-biolist-emoji {
           display: inline-flex;
@@ -1429,13 +1429,13 @@
           width: 42px;
           height: 42px;
           border-radius: 50%;
-          background: rgba(47, 125, 74, 0.1);
+          background: rgba(233, 84, 32, 0.1);
           font-size: 1.25rem;
           line-height: 1;
           flex-shrink: 0;
         }
         .ap-biolist-arrow { margin-left: auto; color: #9bb0a4; display: inline-flex; }
-        .ap-biolist-item:hover .ap-biolist-arrow { color: #1F6B3D; }
+        .ap-biolist-item:hover .ap-biolist-arrow { color: #c2410c; }
         @media (max-width: 767.98px) {
           .ap-twocol { grid-template-columns: 1fr; }
         }

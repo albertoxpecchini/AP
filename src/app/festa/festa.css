@@ -8,10 +8,10 @@
 
 .festa-page {
   /* Brand / interattivo */
-  --accent:      #7c6cff;
+  --accent:      #dd4814;
   --accent-2:    #6a5af0;
-  --accent-deep: #5b4bd6;
-  --glow:        rgba(124, 108, 255, 0.30);
+  --accent-deep: #bc3d10;
+  --glow:        rgba(221, 72, 20, 0.30);
 
   /* Oro foil (ornamenti, bordi, francobollo, sigillo) */
   --foil:        #b8923f;
@@ -29,7 +29,7 @@
 
   /* Scrivania CHIARA (default) */
   --desk:
-    radial-gradient(80% 55% at 50% 0%, rgba(124, 108, 255, 0.18) 0%, transparent 60%),
+    radial-gradient(80% 55% at 50% 0%, rgba(221, 72, 20, 0.18) 0%, transparent 60%),
     radial-gradient(60% 50% at 50% 42%, rgba(226, 193, 120, 0.18) 0%, transparent 70%),
     linear-gradient(180deg, #efe9f7 0%, #e7dff1 100%);
   --paper-shadow:
@@ -39,7 +39,7 @@
 
   min-height: 100dvh;
   color: var(--ink);
-  font-family: "Titillium Web", system-ui, -apple-system, "Segoe UI", Tahoma,
+  font-family: "Ubuntu", system-ui, -apple-system, "Segoe UI", Tahoma,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
   background: var(--desk);
   padding: clamp(18px, 4vw, 48px) 15px 64px;
@@ -56,7 +56,7 @@ html.dark .festa-page {
   --paper-bd:  rgba(120, 90, 30, 0.40);
   --desk:
     radial-gradient(58% 42% at 50% 30%, rgba(226, 193, 120, 0.16) 0%, transparent 70%),
-    radial-gradient(80% 50% at 50% 0%, rgba(124, 108, 255, 0.20) 0%, transparent 60%),
+    radial-gradient(80% 50% at 50% 0%, rgba(221, 72, 20, 0.20) 0%, transparent 60%),
     linear-gradient(180deg, #0c0e14 0%, #08090d 100%);
   --paper-shadow:
     0 2px 0 rgba(255,255,255,0.30),
@@ -470,7 +470,7 @@ html.dark .festa-prop { opacity: 0.42; }
   margin-top: 22px;
   padding: 14px 16px;
   border-radius: 10px;
-  background: rgba(124, 108, 255, 0.08);
+  background: rgba(221, 72, 20, 0.08);
   border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   color: var(--ink);
 }
@@ -630,11 +630,11 @@ html.dark .festa-prop { opacity: 0.42; }
   font-size: 0.95rem;
   text-decoration: none;
   border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  background: rgba(124, 108, 255, 0.08);
+  background: rgba(221, 72, 20, 0.08);
   color: var(--accent-deep);
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s, border-color 0.15s;
 }
-.festa-map-btn:hover { transform: translateY(-2px); border-color: var(--accent); background: rgba(124,108,255,0.14); }
+.festa-map-btn:hover { transform: translateY(-2px); border-color: var(--accent); background: rgba(221, 72, 20,0.14); }
 .festa-map-btn--primary {
   background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
   border-color: transparent;
@@ -709,7 +709,7 @@ html.dark .festa-prop { opacity: 0.42; }
   margin: 0 0 8px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(124, 108, 255, 0.12);
+  background: rgba(221, 72, 20, 0.12);
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   color: var(--accent-deep);
   font-size: 0.72rem;
@@ -792,7 +792,7 @@ html.dark .festa-prop { opacity: 0.42; }
   outline: none;
   border-color: var(--accent);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(124, 108, 255, 0.18);
+  box-shadow: 0 0 0 4px rgba(221, 72, 20, 0.18);
 }
 
 /* Scelta presenza */
@@ -816,7 +816,7 @@ html.dark .festa-prop { opacity: 0.42; }
 .festa-seg-btn:active { transform: scale(0.99); }
 .festa-seg-btn.is-active {
   border-color: var(--accent);
-  background: rgba(124, 108, 255, 0.12);
+  background: rgba(221, 72, 20, 0.12);
   box-shadow: inset 0 0 0 1px var(--accent), 0 8px 20px -8px var(--glow);
 }
 .festa-seg-emoji { font-size: 1.45rem; flex: 0 0 auto; }
@@ -849,7 +849,7 @@ html.dark .festa-prop { opacity: 0.42; }
 .festa-hint { margin-top: 4px; font-size: 0.85rem; color: var(--ink-soft); }
 .festa-hint strong { color: var(--accent-deep); }
 .festa-locked {
-  background: rgba(124, 108, 255, 0.08);
+  background: rgba(221, 72, 20, 0.08);
   border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   color: var(--ink);
   border-radius: 11px;

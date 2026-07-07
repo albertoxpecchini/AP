@@ -2,29 +2,29 @@
 
 :root {
   --font-size: 16px;
-  --background: #F7F5F0;
+  --background: #faf8f6;
   --foreground: #1C1A17;
   --card: #FFFFFF;
   --card-foreground: #1C1A17;
   --popover: #FFFFFF;
   --popover-foreground: #1C1A17;
-  --primary: #2F7D4A;
+  --primary: #e95420;
   --primary-foreground: #ffffff;
   --secondary: #EAE7E0;
   --secondary-foreground: #1C1A17;
   --muted: #EAE7E0;
   --muted-foreground: #8A8478;
-  --accent: #7FC09A;
+  --accent: #f0a183;
   --accent-foreground: #1C1A17;
   --destructive: #C94040;
   --destructive-foreground: #ffffff;
-  --border: rgba(47, 125, 74, 0.15);
+  --border: rgba(233, 84, 32, 0.15);
   --input: transparent;
   --input-background: #EAE7E0;
   --switch-background: #C8C4BB;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: rgba(47, 125, 74, 0.35);
+  --ring: rgba(233, 84, 32, 0.35);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -182,26 +182,26 @@
 
 /* Override palette neroverde Sassuolo (sovrascrive Bootstrap Italia blue #0066cc) */
 :root {
-  --bs-primary: #2F7D4A !important;
+  --bs-primary: #e95420 !important;
   --bs-primary-rgb: 47, 125, 74 !important;
 }
 
 .btn-outline-primary {
-  color: #1F6B3D !important;
-  border-color: #2F7D4A !important;
+  color: #c2410c !important;
+  border-color: #e95420 !important;
 }
 
 .btn-outline-primary:hover,
 .btn-outline-primary:focus {
-  background-color: #2F7D4A !important;
-  border-color: #2F7D4A !important;
+  background-color: #e95420 !important;
+  border-color: #e95420 !important;
   color: #ffffff !important;
 }
 
 .text-primary {
-  color: #1F6B3D !important;
+  color: #c2410c !important;
 }
 
 .bg-primary {
-  background-color: #2F7D4A !important;
+  background-color: #e95420 !important;
 }

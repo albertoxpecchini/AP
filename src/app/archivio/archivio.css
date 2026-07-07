@@ -31,12 +31,12 @@
   --ax-sel-bd: rgba(0, 103, 192, 0.55);
   --ax-blue: #0067c0;
   --ax-marquee: rgba(0, 103, 192, 0.16);
-  --ax-accent: #6d4bd6;
-  --ax-accent-soft: rgba(109, 75, 214, 0.12);
+  --ax-accent: #c2410c;
+  --ax-accent-soft: rgba(194, 65, 12, 0.12);
   --ax-shadow: 0 24px 70px -18px rgba(40, 28, 80, 0.45), 0 6px 18px -10px rgba(40, 28, 80, 0.3);
 
   /* Pastelli per le icone-tipo */
-  --ax-game: #7c5cff;
+  --ax-game: #d9480f;
   --ax-page: #4f7df0;
   --ax-site: #1fb6a8;
   --ax-doc: #e0564c;
@@ -52,7 +52,7 @@
   padding: clamp(0px, 2.4vw, 34px);
   box-sizing: border-box;
   background: var(--ax-desk);
-  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
   color: var(--ax-text);
   -webkit-text-size-adjust: 100%;
 }
@@ -86,10 +86,10 @@ html.dark .ax-window {
   --ax-sel-bd: rgba(76, 194, 255, 0.55);
   --ax-blue: #4cc2ff;
   --ax-marquee: rgba(76, 194, 255, 0.20);
-  --ax-accent: #8b7bff;
-  --ax-accent-soft: rgba(124, 108, 255, 0.18);
+  --ax-accent: #e95420;
+  --ax-accent-soft: rgba(221, 72, 20, 0.18);
   --ax-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.75), 0 8px 22px -12px rgba(0, 0, 0, 0.6);
-  --ax-game: #9d8fff;
+  --ax-game: #f39a76;
   --ax-page: #6f97ff;
   --ax-site: #3ad0c1;
   --ax-doc: #ff7a70;
@@ -599,8 +599,8 @@ html.dark .ax-window {
   --ax-text: #1b1b1f;
   --ax-text2: #3c3c43;
   --ax-muted: #6b6b72;
-  --ax-accent: #6d4bd6;
-  --ax-accent-soft: rgba(109, 75, 214, 0.12);
+  --ax-accent: #c2410c;
+  --ax-accent-soft: rgba(194, 65, 12, 0.12);
 
   min-width: 220px;
   background: var(--ax-win);
@@ -610,7 +610,7 @@ html.dark .ax-window {
   box-shadow: 0 16px 44px -10px rgba(0, 0, 0, 0.4);
   z-index: 2147483000;
   color: var(--ax-text);
-  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
 }
 html.dark .ax-menu {
   --ax-win: #2b2b2b;
@@ -619,8 +619,8 @@ html.dark .ax-menu {
   --ax-text: #ffffff;
   --ax-text2: #d6d6da;
   --ax-muted: #9b9ba2;
-  --ax-accent: #8b7bff;
-  --ax-accent-soft: rgba(124, 108, 255, 0.18);
+  --ax-accent: #e95420;
+  --ax-accent-soft: rgba(221, 72, 20, 0.18);
   box-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.7);
 }
 .ax-mi {
@@ -821,7 +821,7 @@ html.dark .ax-menu {
   background: var(--ax-hover);
   padding: 1px 6px;
   border-radius: 4px;
-  font-family: "Roboto Mono", monospace;
+  font-family: "Ubuntu Mono", monospace;
   font-size: 0.88em;
 }
 

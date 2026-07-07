@@ -572,23 +572,23 @@ export default function App() {
            neon viola. Autosufficiente: non tocca la pagina /bio (stile chiaro).
            ───────────────────────────────────────────────────────────────────── */
         .hm-page {
-          --accent: #8b7bff;
-          --accent-2: #7c6cff;
-          --accent-deep: #5b4bd6;
-          --ink: #c4a5ff;
-          --glow: rgba(139, 123, 255, 0.45);
-          --text: #e8eef4;
-          --sub: #a7b2bd;
+          --accent: #e95420;
+          --accent-2: #dd4814;
+          --accent-deep: #bc3d10;
+          --ink: #f6a583;
+          --glow: rgba(233, 84, 32, 0.45);
+          --text: #f5f3f1;
+          --sub: #b3aca6;
           --surface: rgba(255, 255, 255, 0.05);
           --surface-bd: rgba(255, 255, 255, 0.10);
-          --vio-soft: rgba(139, 123, 255, 0.10);
-          --vio-bd: rgba(139, 123, 255, 0.28);
+          --vio-soft: rgba(233, 84, 32, 0.10);
+          --vio-bd: rgba(233, 84, 32, 0.28);
           min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           color: var(--text);
           background:
-            radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+            radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
         }
         .hm-wrap {
           width: 100%; max-width: 1200px; margin: 0 auto;
@@ -599,14 +599,14 @@ export default function App() {
         /* ── Header ── */
         .hm-hdr {
           position: sticky; top: 0; z-index: 50;
-          background: rgba(10, 13, 17, 0.72);
+          background: rgba(28, 22, 27, 0.72);
           backdrop-filter: blur(14px) saturate(140%);
           -webkit-backdrop-filter: blur(14px) saturate(140%);
           border-bottom: 1px solid var(--surface-bd);
           transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .hm-hdr--scrolled {
-          background: rgba(8, 11, 15, 0.92);
+          background: rgba(23, 18, 22, 0.92);
           border-bottom-color: var(--vio-bd);
           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
         }
@@ -621,7 +621,7 @@ export default function App() {
         .hm-brand-text { display: inline-flex; flex-direction: column; line-height: 1.18; }
         .hm-brand-name { font-weight: 800; font-size: 1.02rem; color: #ffffff; white-space: nowrap; }
         .hm-brand-tag { font-size: 0.74rem; color: var(--sub); white-space: nowrap; }
-        .hm-local { font-size: 0.68rem; background: var(--accent); color: #0a0d11; font-weight: 800; padding: 0.12rem 0.5rem; border-radius: 999px; margin-left: 0.5rem; }
+        .hm-local { font-size: 0.68rem; background: var(--accent); color: #ffffff; font-weight: 800; padding: 0.12rem 0.5rem; border-radius: 999px; margin-left: 0.5rem; }
         @media (max-width: 480px) { .hm-brand-tag { display: none; } }
 
         .hm-nav { display: flex; align-items: center; gap: 1.35rem; margin-left: auto; }
@@ -654,8 +654,8 @@ export default function App() {
           position: absolute; top: 0; right: 0; height: 100%;
           width: min(90vw, 400px);
           background:
-            radial-gradient(120% 60% at 100% 0%, rgba(139, 123, 255, 0.20) 0%, transparent 60%),
-            linear-gradient(165deg, #181226 0%, #0d1016 60%, #0a0d11 100%);
+            radial-gradient(120% 60% at 100% 0%, rgba(233, 84, 32, 0.20) 0%, transparent 60%),
+            linear-gradient(165deg, #2a1f26 0%, #201a1e 60%, #1d171b 100%);
           border-left: 1px solid var(--vio-bd);
           box-shadow: -24px 0 60px rgba(0, 0, 0, 0.55);
           color: #fff;
@@ -675,7 +675,7 @@ export default function App() {
           background: var(--vio-soft); border: 1px solid var(--vio-bd); color: #fff; cursor: pointer;
           transition: background 0.15s, transform 0.15s;
         }
-        .hm-menu-close:hover { background: rgba(139, 123, 255, 0.2); transform: rotate(90deg); }
+        .hm-menu-close:hover { background: rgba(233, 84, 32, 0.2); transform: rotate(90deg); }
 
         .hm-menu-nav { display: flex; flex-direction: column; gap: 0.2rem; }
         .hm-menu-nav a {
@@ -718,15 +718,15 @@ export default function App() {
           padding: clamp(3rem, 7vw, 6rem) 0 clamp(3.5rem, 8vw, 6.5rem);
           border-bottom: 1px solid var(--surface-bd);
           background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.20) 0%, transparent 55%),
-            linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 110%);
+            radial-gradient(90% 120% at 0% 0%, rgba(233, 84, 32, 0.20) 0%, transparent 55%),
+            linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 110%);
         }
         .hm-hero::before, .hm-hero::after {
           content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
           filter: blur(70px); opacity: 0.4; pointer-events: none; z-index: 0;
         }
-        .hm-hero::before { background: #8b7bff; top: -32%; right: -8%; }
-        .hm-hero::after  { background: #5b4bd6; bottom: -38%; left: -12%; opacity: 0.3; }
+        .hm-hero::before { background: #e95420; top: -32%; right: -8%; }
+        .hm-hero::after  { background: #bc3d10; bottom: -38%; left: -12%; opacity: 0.3; }
         .hm-hero-grid {
           position: relative; z-index: 1;
           display: grid; grid-template-columns: 1.15fr 0.85fr;
@@ -760,8 +760,8 @@ export default function App() {
         .hm-pill--solid { background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%); color: #fff; box-shadow: 0 8px 24px var(--glow); }
         .hm-pill--solid:hover { transform: translateY(-2px); box-shadow: 0 12px 30px var(--glow); }
         .hm-pill--ghost { background: var(--vio-soft); color: var(--text); border-color: var(--vio-bd); }
-        .hm-pill--ghost:hover { border-color: var(--accent); color: #fff; background: rgba(139, 123, 255, 0.16); }
-        .hm-pill--light { background: #fff; color: #1a1430; }
+        .hm-pill--ghost:hover { border-color: var(--accent); color: #fff; background: rgba(233, 84, 32, 0.16); }
+        .hm-pill--light { background: #fff; color: #2a1e26; }
         .hm-pill--light:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3); }
         .hm-pill--lightghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.5); }
         .hm-pill--lightghost:hover { background: rgba(255, 255, 255, 0.14); }
@@ -1083,8 +1083,8 @@ export default function App() {
         .hm-card-icon {
           width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
           background:
-            radial-gradient(120% 120% at 30% 20%, rgba(139, 123, 255, 0.22), rgba(10, 12, 16, 0.2)),
-            linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+            radial-gradient(120% 120% at 30% 20%, rgba(233, 84, 32, 0.22), rgba(10, 12, 16, 0.2)),
+            linear-gradient(135deg, #221a20 0%, #241c22 100%);
         }
         .hm-card-icon-badge {
           display: inline-flex; align-items: center; justify-content: center;
@@ -1106,7 +1106,7 @@ export default function App() {
         /* Badge "Live" */
         .hm-badge { display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 999px; }
         .hm-badge--live { background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd); }
-        .hm-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(139, 123, 255, 0.2); }
+        .hm-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(233, 84, 32, 0.2); }
 
         /* CV buttons */
         .hm-cvbtns { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; }
@@ -1128,7 +1128,7 @@ export default function App() {
         .hm-tl-item:last-child { padding-bottom: 0; }
         .hm-tl-item::before {
           content: ""; position: absolute; left: -2rem; top: 4px; width: 16px; height: 16px; border-radius: 50%;
-          background: var(--accent); border: 3px solid #0b0f14; box-shadow: 0 0 0 2px var(--vio-bd), 0 0 14px var(--glow);
+          background: var(--accent); border: 3px solid #241c22; box-shadow: 0 0 0 2px var(--vio-bd), 0 0 14px var(--glow);
         }
         .hm-tl-period { display: inline-block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); margin-bottom: 0.25rem; }
         .hm-tl-title { font-size: 1.18rem; font-weight: 800; color: #ffffff; margin: 0 0 0.2rem; }
@@ -1146,7 +1146,7 @@ export default function App() {
           border-radius: 999px; color: var(--ink); font-family: inherit; font-size: 0.85rem; font-weight: 700;
           cursor: pointer; appearance: none; transition: background 0.15s, border-color 0.15s, color 0.15s;
         }
-        .hm-cv-doc:hover { background: var(--accent); border-color: var(--accent); color: #0a0d11; }
+        .hm-cv-doc:hover { background: var(--accent); border-color: var(--accent); color: #ffffff; }
 
         /* Stack badges */
         .hm-stack { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; }
@@ -1159,8 +1159,8 @@ export default function App() {
           position: relative; overflow: hidden; color: #fff;
           padding: clamp(3.5rem, 7vw, 5.5rem) 0;
           background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.28) 0%, transparent 55%),
-            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
+            radial-gradient(90% 120% at 0% 0%, rgba(233, 84, 32, 0.28) 0%, transparent 55%),
+            linear-gradient(135deg, #2a1e26 0%, #322330 55%, #221a20 100%);
           border-top: 1px solid var(--surface-bd);
         }
         .hm-contact-inner { position: relative; z-index: 1; text-align: center; max-width: 46rem; margin: 0 auto; }

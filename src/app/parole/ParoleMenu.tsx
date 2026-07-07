@@ -104,14 +104,14 @@ export default function ParoleMenu({
 
   const bg       = dark ? "#111916" : "#f4f6f5";
   const card     = dark ? "#1a2720" : "#ffffff";
-  const bord     = dark ? "rgba(47,125,74,0.22)" : "rgba(47,125,74,0.15)";
+  const bord     = dark ? "rgba(233, 84, 32,0.22)" : "rgba(233, 84, 32,0.15)";
   const lbl      = dark ? "#7ab893" : "#6b8070";
-  const icon     = dark ? "#6fd08a" : "#2F7D4A";
+  const icon     = dark ? "#6fd08a" : "#e95420";
   const note     = dark ? "#5a7a62" : "#8a9e91";
   const textMain = dark ? "#d4e8dc" : "#17271d";
 
-  const vio  = dark ? "#c4a5ff" : "#6d28d9";
-  const vBord = dark ? "rgba(155,92,246,0.34)" : "rgba(124,58,237,0.28)";
+  const vio  = dark ? "#f6a583" : "#cf4312";
+  const vBord = dark ? "rgba(237, 113, 67,0.34)" : "rgba(233, 84, 32,0.28)";
 
   const selectedMode = getMode(selected);
 
@@ -158,11 +158,11 @@ export default function ParoleMenu({
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0.95rem 1.3rem",
-        background: "linear-gradient(100deg, #7c3aed 0%, #5b21b6 42%, #2F7D4A 100%)", color: "#fff",
+        background: "linear-gradient(100deg, #e95420 0%, #a2330e 42%, #e95420 100%)", color: "#fff",
         border: "none", borderRadius: "14px",
         fontSize: "0.98rem", fontWeight: 800,
         cursor: "pointer", fontFamily: "inherit",
-        boxShadow: "0 6px 24px rgba(91,33,182,0.4)",
+        boxShadow: "0 6px 24px rgba(162, 51, 14,0.4)",
         transition: "filter 0.12s, transform 0.12s",
         width: "100%",
       }}
@@ -212,7 +212,7 @@ export default function ParoleMenu({
   const StatsCard = (forceDark: boolean) => {
     const c = forceDark ? "#fff" : textMain;
     const l = forceDark ? "rgba(255,255,255,0.6)" : lbl;
-    const ic = forceDark ? "#c4a5ff" : vio;
+    const ic = forceDark ? "#f6a583" : vio;
     return (
       <div className={`trm-stats-card${forceDark ? " trm-stats-dark" : ""}`} style={forceDark ? undefined : { background: card, border: `1px solid ${vBord}` }}>
         <div className="trm-stat"><Flame size={20} style={{ color: ic }} /><span className="trm-stat-val" style={{ color: c }}>{bestStrike}</span><span className="trm-stat-lbl" style={{ color: l }}>Streak</span></div>
@@ -291,10 +291,10 @@ export default function ParoleMenu({
 
       <style>{`
         .trm-root {
-          --pv:#7c3aed; --pv2:#6024c4; --pv3:#9b5cf6;
-          --gv:#2F7D4A; --gv3:#3a9e5f;
+          --pv:#e95420; --pv2:#bc3d10; --pv3:#ed7143;
+          --gv:#e95420; --gv3:#3a9e5f;
           position: fixed; inset: 0; z-index: 200;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           animation: trm-in 0.22s ease;
           background: ${bg};
         }
@@ -304,7 +304,7 @@ export default function ParoleMenu({
         .trm-desktop { display:none; }
 
         .trm-hero {
-          background: linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+          background: linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
@@ -313,20 +313,20 @@ export default function ParoleMenu({
           content:""; position:absolute; width:60%; height:70%; border-radius:50%;
           filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
         }
-        .trm-hero::before { background:#8b7bff; top:-25%; left:-15%; }
-        .trm-hero::after  { background:#6d4dff; bottom:-30%; right:-15%; opacity:0.4; }
+        .trm-hero::before { background:#e95420; top:-25%; left:-15%; }
+        .trm-hero::after  { background:#c2410c; bottom:-30%; right:-15%; opacity:0.4; }
         .trm-hero > * { position:relative; z-index:1; }
         .trm-logo-wrap {
-          background:#fff; color:#6024c4; border-radius:18px; padding:12px;
-          box-shadow:0 8px 32px rgba(91,33,182,0.4); display:inline-flex;
+          background:#fff; color:#bc3d10; border-radius:18px; padding:12px;
+          box-shadow:0 8px 32px rgba(162, 51, 14,0.4); display:inline-flex;
           align-items:center; justify-content:center; width:min(86px,21vw); height:min(86px,21vw);
         }
-        .trm-logo-mark { font-size:min(2.6rem,7vw); font-weight:900; letter-spacing:0.04em; color:#6024c4; line-height:1; }
+        .trm-logo-mark { font-size:min(2.6rem,7vw); font-weight:900; letter-spacing:0.04em; color:#bc3d10; line-height:1; }
         .trm-title {
           font-size:clamp(2.4rem,10vw,3.8rem); font-weight:900;
           letter-spacing:0.28em; margin:0; line-height:1; color:#fff;
         }
-        .trm-accent { color:#b794ff; }
+        .trm-accent { color:#f6a583; }
         .trm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.6); margin:0; font-weight:500; text-align:center; }
         .trm-kicker {
           position:absolute; bottom:0.7rem; left:1.4rem;
@@ -365,18 +365,18 @@ export default function ParoleMenu({
           background:rgba(255,255,255,0.10); color:#fff !important; border:1px solid rgba(255,255,255,0.16) !important;
         }
         .trm-actions-dark .trm-tut-btn:hover, .trm-actions-dark .trm-back-btn:hover { background:rgba(255,255,255,0.18); }
-        .trm-actions-dark .trm-tut-btn svg, .trm-actions-dark .trm-back-btn svg { color:#c4a5ff; }
+        .trm-actions-dark .trm-tut-btn svg, .trm-actions-dark .trm-back-btn svg { color:#f6a583; }
 
         .trm-more-toggle {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; width:100%;
           padding:0.85rem 1rem; border-radius:13px; font-size:0.95rem; font-weight:800;
-          background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           cursor:pointer; font-family:inherit; transition:background .15s;
         }
         .trm-drawer-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; animation:trm-fade .2s ease; }
         @keyframes trm-fade { from{opacity:0;} to{opacity:1;} }
         .trm-drawer {
-          width:100%; background:linear-gradient(160deg,#15101f 0%,#1a1430 60%,#0b0f14 130%);
+          width:100%; background:linear-gradient(160deg,#221a20 0%,#2a1e26 60%,#241c22 130%);
           border-radius:20px 20px 0 0; padding:1.1rem 1.1rem calc(1.6rem + env(safe-area-inset-bottom));
           box-shadow:0 -10px 40px rgba(0,0,0,0.4); animation:trm-up .25s cubic-bezier(.2,.8,.3,1);
           max-height:88dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
@@ -387,21 +387,21 @@ export default function ParoleMenu({
         .trm-tut-btn, .trm-back-btn {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
           width:100%;
-          padding:0.95rem 1rem; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          padding:0.95rem 1rem; background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           border-radius:13px; font-size:1rem; font-weight:800;
           cursor:pointer; font-family:inherit; transition:filter .15s, transform .12s, background .15s;
           text-decoration:none;
         }
         .trm-vio-btn svg { width:18px; height:18px; }
         .trm-tut-btn:hover, .trm-back-btn:hover {
-          background:${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.11)"};
+          background:${dark ? "rgba(237, 113, 67,0.18)" : "rgba(233, 84, 32,0.11)"};
           transform:translateY(-1px);
         }
         .trm-tut-cta {
-          background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important;
+          background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%) !important;
           color:#fff !important; border:none !important;
           font-size:1.05rem !important; font-weight:900 !important; letter-spacing:0.01em;
-          box-shadow:0 6px 22px rgba(91,33,182,0.45);
+          box-shadow:0 6px 22px rgba(162, 51, 14,0.45);
           position:relative; overflow:hidden;
           animation:trm-cta-breathe 2.8s ease-in-out infinite;
         }
@@ -411,8 +411,8 @@ export default function ParoleMenu({
           background:linear-gradient(100deg,transparent,rgba(255,255,255,0.35),transparent);
           transform:skewX(-18deg); animation:trm-cta-shine 3.4s ease-in-out infinite;
         }
-        .trm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(91,33,182,0.55); background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important; }
-        @keyframes trm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(91,33,182,0.4);} 50%{box-shadow:0 8px 30px rgba(124,58,237,0.65);} }
+        .trm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(162, 51, 14,0.55); background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%) !important; }
+        @keyframes trm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(162, 51, 14,0.4);} 50%{box-shadow:0 8px 30px rgba(233, 84, 32,0.65);} }
         @keyframes trm-cta-shine { 0%,55%{left:-60%;} 100%{left:130%;} }
         @media (prefers-reduced-motion: reduce) {
           .trm-tut-cta, .trm-tut-cta::after { animation:none; }
@@ -421,17 +421,17 @@ export default function ParoleMenu({
         .trm-player {
           display:inline-flex; align-items:center; gap:0.6rem;
           padding:0.4rem 0.95rem 0.4rem 0.4rem; border-radius:999px; cursor:pointer;
-          border:1.5px solid ${vBord}; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          border:1.5px solid ${vBord}; background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           font-family:inherit; transition:transform .12s, background .15s, box-shadow .15s;
         }
-        .trm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(124,58,237,0.25); }
+        .trm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(233, 84, 32,0.25); }
         .trm-player:active { transform:scale(0.97); }
         .trm-player-badge {
           display:inline-flex; align-items:center; justify-content:center;
           min-width:38px; height:38px; padding:0 0.4rem; border-radius:999px;
-          background:linear-gradient(140deg,#7c3aed,#5b21b6); color:#fff;
+          background:linear-gradient(140deg,#e95420,#a2330e); color:#fff;
           font-size:0.92rem; font-weight:900; line-height:1; letter-spacing:-0.02em;
-          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(91,33,182,0.4);
+          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(162, 51, 14,0.4);
         }
         .trm-player-name {
           font-size:0.92rem; font-weight:800; color:${vio};
@@ -447,7 +447,7 @@ export default function ParoleMenu({
         }
 
         .trm-tile {
-          --gv:#2F7D4A; --gv2:#1f6b3c; --gv3:#3a9e5f;
+          --gv:#e95420; --gv2:#1f6b3c; --gv3:#3a9e5f;
           position:relative; isolation:isolate;
           display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
           aspect-ratio:1/1; min-height:0;
@@ -587,18 +587,18 @@ export default function ParoleMenu({
 
           .trm-desktop-left, .trm-desktop-right {
             flex-shrink:0;
-            background:linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+            background:linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
             display:flex; flex-direction:column; overflow:hidden; position:relative;
           }
           .trm-desktop-left::before, .trm-desktop-right::before {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.4; pointer-events:none;
-            background:#8b7bff; top:-10%; left:-20%;
+            background:#e95420; top:-10%; left:-20%;
           }
           .trm-desktop-left::after, .trm-desktop-right::after {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.3; pointer-events:none;
-            background:#6d4dff; bottom:-12%; right:-20%;
+            background:#c2410c; bottom:-12%; right:-20%;
           }
           .trm-desktop-left > *, .trm-desktop-right > * { position:relative; z-index:1; }
 

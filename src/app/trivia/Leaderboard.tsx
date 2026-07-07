@@ -312,7 +312,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           background: rgba(10,28,17,0.62); backdrop-filter: blur(3px);
           display: flex; align-items: center; justify-content: center;
           padding: 1rem; animation: trv-lb-fade .22s ease;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
         }
         @keyframes trv-lb-fade { from { opacity:0 } to { opacity:1 } }
 
@@ -328,7 +328,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
 
         /* ── Header (Kit Italia: barra istituzionale verde) ── */
         .trv-lb-head {
-          background: linear-gradient(120deg, #7c3aed 0%, #5b21b6 55%, #2F7D4A 130%);
+          background: linear-gradient(120deg, #e95420 0%, #a2330e 55%, #e95420 130%);
           color: #fff; flex-shrink: 0; padding: 1.1rem 1.1rem .85rem;
           position: relative; overflow: hidden;
         }
@@ -338,7 +338,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
           pointer-events:none;
         }
-        .trv-lb.dark .trv-lb-head { background: linear-gradient(120deg, #4c1d95 0%, #2a1150 60%, #103820 130%); }
+        .trv-lb.dark .trv-lb-head { background: linear-gradient(120deg, #7e2708 0%, #3c202f 60%, #2c001e 130%); }
         .trv-lb-headrow { display:flex; align-items:flex-start; justify-content:space-between; position:relative; z-index:1; }
         .trv-lb-title { display:flex; align-items:center; gap:.6rem; }
         .trv-lb-tico {
@@ -380,8 +380,8 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           transition:background .15s, color .15s, transform .1s;
         }
         .trv-lb-tab:hover { background:rgba(255,255,255,0.2); }
-        .trv-lb-tab.act { background:#fff; color:#6d28d9; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
-        .trv-lb.dark .trv-lb-tab.act { background:#0e1512; color:#c4a5ff; }
+        .trv-lb-tab.act { background:#fff; color:#cf4312; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+        .trv-lb.dark .trv-lb-tab.act { background:#0e1512; color:#f6a583; }
 
         /* ── Filtri a chip con icone tematiche (scroll + fade ai bordi) ── */
         .trv-lb-filterswrap { position:relative; flex-shrink:0; border-bottom:1px solid rgba(0,0,0,0.06); }
@@ -398,34 +398,34 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch;
         }
         .trv-lb-filters::-webkit-scrollbar { height:5px; }
-        .trv-lb-filters::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.3); border-radius:99px; }
+        .trv-lb-filters::-webkit-scrollbar-thumb { background:rgba(233, 84, 32,0.3); border-radius:99px; }
         .trv-lb-fbtn {
           display:inline-flex; align-items:center; gap:.3rem; white-space:nowrap; scroll-snap-align:start;
-          border:1.5px solid rgba(47,125,74,0.22); background:#fff;
-          color:#1F6B3D; border-radius:999px; padding:.32rem .72rem;
+          border:1.5px solid rgba(233, 84, 32,0.22); background:#fff;
+          color:#c2410c; border-radius:999px; padding:.32rem .72rem;
           font-family:inherit; font-size:.76rem; font-weight:700; cursor:pointer;
           transition:background .14s, color .14s, border-color .14s, transform .1s;
         }
         .trv-lb-fbtn .trv-lb-fico { display:inline-flex; opacity:.75; }
         .trv-lb.dark .trv-lb-fbtn { color:#6fe0a6; background:transparent; border-color:rgba(95,208,154,0.26); }
-        .trv-lb-fbtn:hover { background:rgba(47,125,74,0.08); transform:translateY(-1px); }
-        .trv-lb-fbtn:focus-visible { outline:2px solid #2F7D4A; outline-offset:1px; }
-        .trv-lb-fbtn.act { background:#7c3aed; color:#fff; border-color:#7c3aed; box-shadow:0 2px 8px rgba(124,58,237,0.34); }
+        .trv-lb-fbtn:hover { background:rgba(233, 84, 32,0.08); transform:translateY(-1px); }
+        .trv-lb-fbtn:focus-visible { outline:2px solid #e95420; outline-offset:1px; }
+        .trv-lb-fbtn.act { background:#e95420; color:#fff; border-color:#e95420; box-shadow:0 2px 8px rgba(233, 84, 32,0.34); }
         .trv-lb-fbtn.act .trv-lb-fico { opacity:1; }
-        .trv-lb.dark .trv-lb-fbtn.act { background:#9b5cf6; border-color:#9b5cf6; color:#190a2e; }
+        .trv-lb.dark .trv-lb-fbtn.act { background:#ed7143; border-color:#ed7143; color:#190a2e; }
 
         /* ── Body scrollabile ── */
         .trv-lb-body { flex:1; min-height:0; overflow-y:auto; padding:.9rem .85rem 1rem; scrollbar-width:thin; }
         .trv-lb-body::-webkit-scrollbar { width:7px; }
-        .trv-lb-body::-webkit-scrollbar-thumb { background:rgba(47,125,74,0.25); border-radius:99px; }
+        .trv-lb-body::-webkit-scrollbar-thumb { background:rgba(233, 84, 32,0.25); border-radius:99px; }
 
         .trv-lb-totalnote {
           margin:.1rem .1rem .8rem; padding:.5rem .7rem; border-radius:10px;
           font-size:.72rem; line-height:1.35; color:#4a5c50; font-weight:600;
-          background:rgba(47,125,74,0.07); border:1px solid rgba(47,125,74,0.13);
+          background:rgba(233, 84, 32,0.07); border:1px solid rgba(233, 84, 32,0.13);
         }
         .trv-lb.dark .trv-lb-totalnote { color:#a4c4aa; background:rgba(95,208,154,0.08); border-color:rgba(95,208,154,0.16); }
-        .trv-lb-totalnote b { color:#2F7D4A; }
+        .trv-lb-totalnote b { color:#e95420; }
         .trv-lb.dark .trv-lb-totalnote b { color:#6fe0a6; }
 
         /* ── Podio ── */
@@ -435,8 +435,8 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         }
         .trv-lb-podium-slot {
           display:flex; flex-direction:column; align-items:center; gap:.25rem;
-          background:linear-gradient(180deg, rgba(47,125,74,0.06), rgba(47,125,74,0.02));
-          border:1px solid rgba(47,125,74,0.12); border-radius:14px;
+          background:linear-gradient(180deg, rgba(233, 84, 32,0.06), rgba(233, 84, 32,0.02));
+          border:1px solid rgba(233, 84, 32,0.12); border-radius:14px;
           padding:.7rem .4rem .6rem; text-align:center; position:relative;
           animation:trv-lb-pop .4s cubic-bezier(.2,.9,.3,1.2) both;
         }
@@ -446,7 +446,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-podium-slot.p3 { animation-delay:.16s; border-color:rgba(176,114,76,0.35); }
         .trv-lb.dark .trv-lb-podium-slot { background:rgba(255,255,255,0.03); border-color:rgba(95,208,154,0.16); }
         .trv-lb.dark .trv-lb-podium-slot.p1 { background:linear-gradient(180deg, rgba(214,178,40,0.18), rgba(214,178,40,0.04)); border-color:rgba(214,178,40,0.45); }
-        .trv-lb-podium-slot.me { box-shadow:0 0 0 2px rgba(47,125,74,0.5); }
+        .trv-lb-podium-slot.me { box-shadow:0 0 0 2px rgba(233, 84, 32,0.5); }
         @keyframes trv-lb-pop { from{opacity:0; transform:translateY(14px) scale(.9)} to{opacity:1; transform:none} }
 
         .trv-lb-medal {
@@ -459,7 +459,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-medal.bronze { background:linear-gradient(135deg,#d99c6a,#b0724c); box-shadow:0 4px 12px rgba(176,114,76,0.4); }
         .trv-lb-pnick { font-weight:800; font-size:.84rem; color:#17271d; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:.25rem; }
         .trv-lb.dark .trv-lb-pnick { color:#e4f3ea; }
-        .trv-lb-pscore { font-weight:900; font-size:1.05rem; color:#2F7D4A; font-variant-numeric:tabular-nums; line-height:1; }
+        .trv-lb-pscore { font-weight:900; font-size:1.05rem; color:#e95420; font-variant-numeric:tabular-nums; line-height:1; }
         .trv-lb-podium-slot.p1 .trv-lb-pscore { font-size:1.25rem; }
         .trv-lb.dark .trv-lb-pscore { color:#6fe0a6; }
         .trv-lb-pscore small { font-size:.55em; font-weight:700; opacity:.6; margin-left:.12em; }
@@ -476,7 +476,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         @keyframes trv-lb-rowin { from{opacity:0; transform:translateX(-8px)} to{opacity:1; transform:none} }
         .trv-lb-row:nth-child(even) { background:rgba(0,0,0,0.022); }
         .trv-lb.dark .trv-lb-row:nth-child(even) { background:rgba(255,255,255,0.025); }
-        .trv-lb-row.me { background:rgba(47,125,74,0.12); box-shadow:inset 0 0 0 1.5px rgba(47,125,74,0.4); }
+        .trv-lb-row.me { background:rgba(233, 84, 32,0.12); box-shadow:inset 0 0 0 1.5px rgba(233, 84, 32,0.4); }
         .trv-lb.dark .trv-lb-row.me { background:rgba(95,208,154,0.14); box-shadow:inset 0 0 0 1.5px rgba(95,208,154,0.4); }
         .trv-lb-row.pulse { animation:trv-lb-pulse 1.6s ease; }
         @keyframes trv-lb-pulse { 0%{background:rgba(95,227,156,0.4)} 100%{background:transparent} }
@@ -487,14 +487,14 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb.dark .trv-lb-nick { color:#d4e8dc; }
         .trv-lb-you {
           font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
-          background:#2F7D4A; color:#fff; padding:.06rem .3rem; border-radius:5px; flex-shrink:0;
+          background:#e95420; color:#fff; padding:.06rem .3rem; border-radius:5px; flex-shrink:0;
         }
         .trv-lb.dark .trv-lb-you { background:#2f9e63; color:#06160e; }
         .trv-lb-acc { display:flex; align-items:center; gap:.35rem; }
-        .trv-lb-accbar { flex:1; height:5px; border-radius:99px; background:rgba(47,125,74,0.14); overflow:hidden; }
+        .trv-lb-accbar { flex:1; height:5px; border-radius:99px; background:rgba(233, 84, 32,0.14); overflow:hidden; }
         .trv-lb.dark .trv-lb-accbar { background:rgba(95,208,154,0.15); }
-        .trv-lb-accbar i { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#2F7D4A,#5fc08a); transition:width .5s ease; }
-        .trv-lb-accnum { font-size:.64rem; font-weight:800; color:#2F7D4A; font-variant-numeric:tabular-nums; width:28px; text-align:right; flex-shrink:0; }
+        .trv-lb-accbar i { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#e95420,#5fc08a); transition:width .5s ease; }
+        .trv-lb-accnum { font-size:.64rem; font-weight:800; color:#e95420; font-variant-numeric:tabular-nums; width:28px; text-align:right; flex-shrink:0; }
         .trv-lb.dark .trv-lb-accnum { color:#6fe0a6; }
         .trv-lb-chap {
           font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
@@ -509,7 +509,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         /* ── Footer "la tua posizione" ── */
         .trv-lb-foot {
           flex-shrink:0; display:flex; align-items:center; gap:.6rem;
-          padding:.65rem 1rem; background:#2F7D4A; color:#fff;
+          padding:.65rem 1rem; background:#e95420; color:#fff;
           font-weight:700; animation:trv-lb-footin .3s ease;
         }
         @keyframes trv-lb-footin { from{transform:translateY(100%)} to{transform:none} }
@@ -531,7 +531,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
 
         /* ── Empty state ── */
         .trv-lb-empty { display:flex; flex-direction:column; align-items:center; gap:.5rem; text-align:center; padding:2.6rem 1.5rem; }
-        .trv-lb-emptyico { display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; border-radius:50%; background:rgba(47,125,74,0.1); color:#2F7D4A; margin-bottom:.3rem; }
+        .trv-lb-emptyico { display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; border-radius:50%; background:rgba(233, 84, 32,0.1); color:#e95420; margin-bottom:.3rem; }
         .trv-lb.dark .trv-lb-emptyico { background:rgba(95,208,154,0.12); color:#6fe0a6; }
         .trv-lb-empty strong { font-size:1.02rem; color:#17271d; font-weight:800; }
         .trv-lb.dark .trv-lb-empty strong { color:#e4f3ea; }

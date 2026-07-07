@@ -18,11 +18,11 @@ interface Mode {
 }
 
 export const MODES: Mode[] = [
-  { level: 1, name: "Esploratore",  desc: "3 secondi per memorizzare la curva. Per iniziare.",   tag: "Consigliato", color: "#9b5cf6", bg: "rgba(155,92,246,0.08)", bgDark: "rgba(155,92,246,0.16)", watch: "3,0 s" },
-  { level: 2, name: "Viaggiatore",  desc: "2,5 secondi di osservazione. Il ritmo classico.",      tag: "Classico",    color: "#7c3aed", bg: "rgba(124,58,237,0.08)", bgDark: "rgba(124,58,237,0.16)", watch: "2,5 s" },
-  { level: 3, name: "Navigatore",   desc: "2 secondi soltanto. La sfida cresce.",                 tag: "Sfida",       color: "#6024c4", bg: "rgba(96,36,196,0.08)",  bgDark: "rgba(96,36,196,0.18)",  watch: "2,0 s" },
-  { level: 4, name: "Pilota",       desc: "1,5 secondi. Memoria sotto sforzo.",                   tag: "Difficile",   color: "#5b21b6", bg: "rgba(91,33,182,0.08)",  bgDark: "rgba(91,33,182,0.18)",  watch: "1,5 s" },
-  { level: 5, name: "Maestro del Movimento", desc: "Appena 1,1 secondi. Il limite.",              tag: "Estremo",     color: "#4c1d95", bg: "rgba(76,29,149,0.08)",  bgDark: "rgba(76,29,149,0.20)",  watch: "1,1 s" },
+  { level: 1, name: "Esploratore",  desc: "3 secondi per memorizzare la curva. Per iniziare.",   tag: "Consigliato", color: "#ed7143", bg: "rgba(237, 113, 67,0.08)", bgDark: "rgba(237, 113, 67,0.16)", watch: "3,0 s" },
+  { level: 2, name: "Viaggiatore",  desc: "2,5 secondi di osservazione. Il ritmo classico.",      tag: "Classico",    color: "#e95420", bg: "rgba(233, 84, 32,0.08)", bgDark: "rgba(233, 84, 32,0.16)", watch: "2,5 s" },
+  { level: 3, name: "Navigatore",   desc: "2 secondi soltanto. La sfida cresce.",                 tag: "Sfida",       color: "#bc3d10", bg: "rgba(188, 61, 16,0.08)",  bgDark: "rgba(188, 61, 16,0.18)",  watch: "2,0 s" },
+  { level: 4, name: "Pilota",       desc: "1,5 secondi. Memoria sotto sforzo.",                   tag: "Difficile",   color: "#a2330e", bg: "rgba(162, 51, 14,0.08)",  bgDark: "rgba(162, 51, 14,0.18)",  watch: "1,5 s" },
+  { level: 5, name: "Maestro del Movimento", desc: "Appena 1,1 secondi. Il limite.",              tag: "Estremo",     color: "#7e2708", bg: "rgba(76,29,149,0.08)",  bgDark: "rgba(76,29,149,0.20)",  watch: "1,1 s" },
 ];
 
 const MOVIMENTO_VERSION = "1.0";
@@ -100,18 +100,18 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
     e.currentTarget.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
   };
 
-  const bg       = dark ? "#0e0a16" : "#f4f6f5";
-  const card     = dark ? "#1a1230" : "#ffffff";
-  const bord     = dark ? "rgba(155,92,246,0.24)" : "rgba(124,58,237,0.16)";
-  const val      = dark ? "#e7def7" : "#17271d";
-  const lbl      = dark ? "#b6a9cf" : "#6b6080";
-  const icon     = dark ? "#c4a5ff" : "#7c3aed";
+  const bg       = dark ? "#171114" : "#f4f6f5";
+  const card     = dark ? "#291d26" : "#ffffff";
+  const bord     = dark ? "rgba(237, 113, 67,0.24)" : "rgba(233, 84, 32,0.16)";
+  const val      = dark ? "#f5ede8" : "#17271d";
+  const lbl      = dark ? "#c9bcb4" : "#7d7066";
+  const icon     = dark ? "#f6a583" : "#e95420";
   const note     = dark ? "#6a5d86" : "#9a90ab";
-  const textMain = dark ? "#e7def7" : "#17271d";
+  const textMain = dark ? "#f5ede8" : "#17271d";
 
   // Viola del menù — accento di tutto ciò che non è una tile-livello.
-  const vio   = dark ? "#c4a5ff" : "#6d28d9";
-  const vBord = dark ? "rgba(155,92,246,0.34)" : "rgba(124,58,237,0.28)";
+  const vio   = dark ? "#f6a583" : "#cf4312";
+  const vBord = dark ? "rgba(237, 113, 67,0.34)" : "rgba(233, 84, 32,0.28)";
 
   // ── Griglia di tile quadrate "booking card": una tile per livello ──
   const ModeList = (
@@ -162,11 +162,11 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0.95rem 1.3rem",
-        background: "linear-gradient(100deg, #7c3aed 0%, #5b21b6 42%, #2F7D4A 100%)", color: "#fff",
+        background: "linear-gradient(100deg, #e95420 0%, #a2330e 42%, #e95420 100%)", color: "#fff",
         border: "none", borderRadius: "14px",
         fontSize: "0.98rem", fontWeight: 800,
         cursor: "pointer", fontFamily: "inherit",
-        boxShadow: "0 6px 24px rgba(91,33,182,0.4)",
+        boxShadow: "0 6px 24px rgba(162, 51, 14,0.4)",
         transition: "filter 0.12s, transform 0.12s",
         width: "100%",
       }}
@@ -199,7 +199,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
   const StatsCard = (forceDark: boolean) => {
     const c = forceDark ? "#fff" : val;
     const l = forceDark ? "rgba(255,255,255,0.6)" : lbl;
-    const ic = forceDark ? "#c4a5ff" : vio;
+    const ic = forceDark ? "#f6a583" : vio;
     return (
       <div className={`mvm-stats-card${forceDark ? " mvm-stats-dark" : ""}`} style={forceDark ? undefined : { background: card, border: `1px solid ${vBord}` }}>
         <div className="mvm-stat"><Flame size={20} style={{ color: ic }} /><span className="mvm-stat-val" style={{ color: c }}>{bestStreak}</span><span className="mvm-stat-lbl" style={{ color: l }}>Miglior streak</span></div>
@@ -262,11 +262,11 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
       <style>{`
         .mvm-root {
           /* VIOLA = accento del menù · VERDE = secondario (come Trivia) */
-          --pv:#7c3aed; --pv2:#6024c4; --pv3:#9b5cf6;
-          --pv-ink:${dark ? "#c4a5ff" : "#6d28d9"};
-          --gv:#2F7D4A; --gv3:#3a9e5f;
+          --pv:#e95420; --pv2:#bc3d10; --pv3:#ed7143;
+          --pv-ink:${dark ? "#f6a583" : "#cf4312"};
+          --gv:#e95420; --gv3:#3a9e5f;
           position: fixed; inset: 0; z-index: 200;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           animation: mvm-in 0.22s ease;
           background: ${bg};
         }
@@ -276,7 +276,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
         .mvm-desktop { display:none; }
 
         .mvm-hero {
-          background: linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+          background: linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
@@ -285,18 +285,18 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           content:""; position:absolute; width:60%; height:70%; border-radius:50%;
           filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
         }
-        .mvm-hero::before { background:#8b7bff; top:-25%; left:-15%; }
-        .mvm-hero::after  { background:#6d4dff; bottom:-30%; right:-15%; opacity:0.4; }
+        .mvm-hero::before { background:#e95420; top:-25%; left:-15%; }
+        .mvm-hero::after  { background:#c2410c; bottom:-30%; right:-15%; opacity:0.4; }
         .mvm-hero > * { position:relative; z-index:1; }
         .mvm-logo-wrap {
-          background:#fff; color:#6024c4; border-radius:18px; padding:14px;
-          box-shadow:0 8px 32px rgba(91,33,182,0.4); display:inline-flex;
+          background:#fff; color:#bc3d10; border-radius:18px; padding:14px;
+          box-shadow:0 8px 32px rgba(162, 51, 14,0.4); display:inline-flex;
         }
         .mvm-title {
           font-size:clamp(2rem,9vw,3.4rem); font-weight:900;
           letter-spacing:0.14em; margin:0; line-height:1; color:#fff;
         }
-        .mvm-accent { color:#b794ff; }
+        .mvm-accent { color:#f6a583; }
         .mvm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.6); margin:0; font-weight:500; text-align:center; }
         .mvm-kicker {
           position:absolute; bottom:0.7rem; left:1.4rem;
@@ -336,27 +336,27 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           background:rgba(255,255,255,0.10); color:#fff !important; border:1px solid rgba(255,255,255,0.16) !important;
         }
         .mvm-actions-dark .mvm-tut-btn:hover, .mvm-actions-dark .mvm-back-btn:hover { background:rgba(255,255,255,0.18); }
-        .mvm-actions-dark .mvm-back-btn svg { color:#c4a5ff; }
+        .mvm-actions-dark .mvm-back-btn svg { color:#f6a583; }
 
         .mvm-tut-btn, .mvm-back-btn {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
           width:100%;
-          padding:0.95rem 1rem; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          padding:0.95rem 1rem; background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           border-radius:13px; font-size:1rem; font-weight:800;
           cursor:pointer; font-family:inherit; transition:filter .15s, transform .12s, background .15s;
           text-decoration:none;
         }
         .mvm-vio-btn svg { width:18px; height:18px; }
         .mvm-tut-btn:hover, .mvm-back-btn:hover {
-          background:${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.11)"};
+          background:${dark ? "rgba(237, 113, 67,0.18)" : "rgba(233, 84, 32,0.11)"};
           transform:translateY(-1px);
         }
         /* "Come si gioca": CTA PIENO viola — grosso, spesso, con un respiro luminoso */
         .mvm-tut-cta {
-          background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important;
+          background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%) !important;
           color:#fff !important; border:none !important;
           font-size:1.05rem !important; font-weight:900 !important; letter-spacing:0.01em;
-          box-shadow:0 6px 22px rgba(91,33,182,0.45);
+          box-shadow:0 6px 22px rgba(162, 51, 14,0.45);
           position:relative; overflow:hidden;
           animation:mvm-cta-breathe 2.8s ease-in-out infinite;
         }
@@ -366,8 +366,8 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           background:linear-gradient(100deg,transparent,rgba(255,255,255,0.35),transparent);
           transform:skewX(-18deg); animation:mvm-cta-shine 3.4s ease-in-out infinite;
         }
-        .mvm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(91,33,182,0.55); background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important; }
-        @keyframes mvm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(91,33,182,0.4);} 50%{box-shadow:0 8px 30px rgba(124,58,237,0.65);} }
+        .mvm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(162, 51, 14,0.55); background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%) !important; }
+        @keyframes mvm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(162, 51, 14,0.4);} 50%{box-shadow:0 8px 30px rgba(233, 84, 32,0.65);} }
         @keyframes mvm-cta-shine { 0%,55%{left:-60%;} 100%{left:130%;} }
         @media (prefers-reduced-motion: reduce) {
           .mvm-tut-cta, .mvm-tut-cta::after { animation:none; }
@@ -380,8 +380,8 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
         }
 
         .mvm-tile {
-          --gv:#7c3aed; --gv2:#6024c4; --gv3:#9b5cf6;
-          --spot:${dark ? "rgba(196,165,255,0.32)" : "rgba(124,58,237,0.26)"};
+          --gv:#e95420; --gv2:#bc3d10; --gv3:#ed7143;
+          --spot:${dark ? "rgba(196,165,255,0.32)" : "rgba(233, 84, 32,0.26)"};
           position:relative; isolation:isolate;
           display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
           aspect-ratio:1/1; min-height:0;
@@ -390,7 +390,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           border-radius:18px; cursor:pointer; font-family:inherit; text-align:left;
           overflow:hidden;
           background:
-            radial-gradient(120% 90% at 100% 0%, ${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.10)"} 0%, transparent 55%),
+            radial-gradient(120% 90% at 100% 0%, ${dark ? "rgba(237, 113, 67,0.18)" : "rgba(233, 84, 32,0.10)"} 0%, transparent 55%),
             linear-gradient(160deg, ${card} 0%, ${dark ? "#1c1430" : "#f6f2fe"} 100%);
           box-shadow:0 2px 6px rgba(0,0,0,0.05);
           transition:transform .12s cubic-bezier(.2,.7,.3,1.25), border-color .1s, box-shadow .12s, background .12s;
@@ -423,7 +423,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           .mvm-tile:hover {
             transform:translateY(-4px);
             border-color:var(--gv);
-            box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(91,33,182,0.30)"};
+            box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(162, 51, 14,0.30)"};
           }
           .mvm-tile:hover::before { opacity:1; }
           .mvm-tile:hover .mvm-tile-glow { opacity:1; transform:translate(0,0) scale(1); }
@@ -438,7 +438,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
         .mvm-tile.is-on::before { opacity:1; }
         .mvm-tile.is-on {
           border-color:var(--gv3);
-          box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(91,33,182,0.35)"};
+          box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(162, 51, 14,0.35)"};
         }
         .mvm-tile.is-on .mvm-word { color:#fff; text-shadow:0 1px 8px rgba(0,0,0,0.25); }
         .mvm-tile.is-on .mvm-tile-mark { color:rgba(255,255,255,0.9); opacity:0.95; transform:scale(1.15) rotate(-4deg); }
@@ -482,7 +482,7 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           position:relative; z-index:1; margin-top:0.3rem;
           font-size:0.56rem; font-weight:800; text-transform:uppercase; letter-spacing:0.07em;
           padding:0.12rem 0.45rem; border-radius:999px;
-          color:${vio}; background:${dark ? "rgba(155,92,246,0.14)" : "rgba(124,58,237,0.10)"};
+          color:${vio}; background:${dark ? "rgba(237, 113, 67,0.14)" : "rgba(233, 84, 32,0.10)"};
           border:1px solid ${vBord};
           transition:color .12s, background .12s, border-color .12s;
         }
@@ -535,18 +535,18 @@ export default function MovimentoMenu({ dark, bestStreak, trophiesCount, onPlay,
           /* Fasce scure SINISTRA e DESTRA: stessa "pelle" speculare. */
           .mvm-desktop-left, .mvm-desktop-right {
             flex-shrink:0;
-            background:linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+            background:linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
             display:flex; flex-direction:column; overflow:hidden; position:relative;
           }
           .mvm-desktop-left::before, .mvm-desktop-right::before {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.4; pointer-events:none;
-            background:#8b7bff; top:-10%; left:-20%;
+            background:#e95420; top:-10%; left:-20%;
           }
           .mvm-desktop-left::after, .mvm-desktop-right::after {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.3; pointer-events:none;
-            background:#6d4dff; bottom:-12%; right:-20%;
+            background:#c2410c; bottom:-12%; right:-20%;
           }
           .mvm-desktop-left > *, .mvm-desktop-right > * { position:relative; z-index:1; }
 
@@ -607,9 +607,9 @@ export function MovimentoMark({ size = 64 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
       <path d="M16 70 C 34 70, 38 30, 54 42 S 78 70, 86 28"
-        fill="none" stroke="#7c3aed" strokeWidth="6" strokeLinecap="round" />
-      <circle cx="16" cy="70" r="8" fill="#6024c4" />
-      <circle cx="86" cy="28" r="5" fill="#2F7D4A" />
+        fill="none" stroke="#e95420" strokeWidth="6" strokeLinecap="round" />
+      <circle cx="16" cy="70" r="8" fill="#bc3d10" />
+      <circle cx="86" cy="28" r="5" fill="#e95420" />
     </svg>
   );
 }

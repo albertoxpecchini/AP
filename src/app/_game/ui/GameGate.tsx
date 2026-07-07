@@ -138,11 +138,11 @@ export default function GameGate({
       <style>{`
         .gg {
           position: fixed; inset: 0; z-index: 250;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           display: flex; flex-direction: column; align-items: center; justify-content: center;
           gap: 1.6rem; padding: 1.5rem; overflow-y: auto;
           animation: gg-in .28s cubic-bezier(.2,.7,.2,1);
-          --text: #e8eef4; --sub: #8b98a6;
+          --text: #f5f3f1; --sub: #8b98a6;
           --surface: rgba(255,255,255,0.05); --surface-bd: rgba(255,255,255,0.10);
           --field: rgba(255,255,255,0.04); --field-bd: rgba(255,255,255,0.14);
         }
@@ -150,7 +150,7 @@ export default function GameGate({
           color: var(--text);
           background:
             radial-gradient(115% 80% at 50% -8%, var(--glow) 0%, transparent 52%),
-            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
         }
         .gg-light {
           --text: #16201a; --sub: #5a6b62;
@@ -213,7 +213,7 @@ export default function GameGate({
         .gg-go {
           margin-top:.2rem; height:52px; width:100%;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          border:none; border-radius:14px; cursor:pointer; color:#0a0d11;
+          border:none; border-radius:14px; cursor:pointer; color: #ffffff;
           font-family:inherit; font-size:1.1rem; font-weight:900;
           background:linear-gradient(100deg, #fff 0%, var(--accent) 28%, var(--accent) 100%);
           box-shadow:0 10px 30px var(--glow); transition:filter .12s, transform .12s;
@@ -237,7 +237,7 @@ export default function GameGate({
           font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
           padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;
         }
-        .gg-chip:hover { background: var(--glow); color:#0a0d11; transform:translateY(-1px); }
+        .gg-chip:hover { background: var(--glow); color: #ffffff; transform:translateY(-1px); }
         .gg-light .gg-chip:hover { color:#fff; }
         .gg-chip:active { transform:scale(.97); }
 

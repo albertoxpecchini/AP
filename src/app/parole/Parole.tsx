@@ -120,8 +120,8 @@ function getRating(won: boolean, attempts: number) {
   if (!won) return { emoji: "💪", label: "Ci riprovi!", grade: "—", accent: "#c0392b" };
   const data = [
     { emoji: "🏆", label: "Fenomenale!", grade: "S", accent: "#c8a415" },
-    { emoji: "⭐", label: "Straordinario!", grade: "A+", accent: "#2F7D4A" },
-    { emoji: "🎯", label: "Ottimo!", grade: "A", accent: "#2F7D4A" },
+    { emoji: "⭐", label: "Straordinario!", grade: "A+", accent: "#e95420" },
+    { emoji: "🎯", label: "Ottimo!", grade: "A", accent: "#e95420" },
     { emoji: "👏", label: "Bravo!", grade: "B", accent: "#D9A400" },
     { emoji: "😅", label: "Ce la fai!", grade: "C", accent: "#D9A400" },
     { emoji: "😮‍💨", label: "All'ultimo respiro!", grade: "D", accent: "#c0392b" },
@@ -137,9 +137,9 @@ function getRating(won: boolean, attempts: number) {
 function tutVars(dark: boolean): React.CSSProperties {
   return {
     ["--gtv-text" as any]:  dark ? "#d4e8dc" : "#17271d",
-    ["--gtv-accent" as any]: dark ? "#6fd08a" : "#2F7D4A",
-    ["--gtv-bar-bg" as any]: dark ? "rgba(95,208,154,0.10)" : "rgba(47,125,74,0.10)",
-    ["--gtv-bar-bd" as any]: dark ? "rgba(95,208,154,0.22)" : "rgba(47,125,74,0.18)",
+    ["--gtv-accent" as any]: dark ? "#6fd08a" : "#e95420",
+    ["--gtv-bar-bg" as any]: dark ? "rgba(95,208,154,0.10)" : "rgba(233, 84, 32,0.10)",
+    ["--gtv-bar-bd" as any]: dark ? "rgba(95,208,154,0.22)" : "rgba(233, 84, 32,0.18)",
   };
 }
 
@@ -151,7 +151,7 @@ function DemoTilesVisual({ dark }: { dark: boolean }) {
     { ch: "L", st: "present" },
     { ch: "A", st: "absent" },
   ];
-  const color: Record<string, string> = { correct: "#2F7D4A", present: "#D9A400", absent: dark ? "#566159" : "#9aa6a0" };
+  const color: Record<string, string> = { correct: "#e95420", present: "#D9A400", absent: dark ? "#566159" : "#9aa6a0" };
   return (
     <div className="gtv-tiles" style={tutVars(dark)}>
       {tiles.map((t, i) => (
@@ -166,7 +166,7 @@ function DemoTilesVisual({ dark }: { dark: boolean }) {
 // Visual 2: legenda dei colori che compare riga per riga.
 function ColorLegendVisual({ dark }: { dark: boolean }) {
   const rows = [
-    { c: "#2F7D4A", label: "Lettera giusta, posto giusto" },
+    { c: "#e95420", label: "Lettera giusta, posto giusto" },
     { c: "#D9A400", label: "Lettera presente, posto sbagliato" },
     { c: dark ? "#566159" : "#9aa6a0", label: "Lettera assente dalla parola" },
   ];
@@ -267,18 +267,18 @@ const PAROLE_TUTORIAL_CSS = `
   .gtv-scale-bar {
     position:relative; display:flex; align-items:center; gap:8px;
     height:34px; padding:0 14px; border-radius:7px; overflow:hidden;
-    background:var(--gtv-bar-bg,rgba(47,125,74,0.10)); border:1px solid var(--gtv-bar-bd,rgba(47,125,74,0.18));
+    background:var(--gtv-bar-bg,rgba(233, 84, 32,0.10)); border:1px solid var(--gtv-bar-bd,rgba(233, 84, 32,0.18));
     opacity:0; animation:gtv-bar-in .4s ease forwards;
   }
   .gtv-scale-fill {
     position:absolute; left:0; top:0; bottom:0;
-    background:linear-gradient(90deg, rgba(47,125,74,0.30), rgba(217,164,0,0.30));
+    background:linear-gradient(90deg, rgba(233, 84, 32,0.30), rgba(217,164,0,0.30));
     transform-origin:left; animation:gtv-grow .5s ease forwards;
   }
   .gtv-scale-lbl { position:relative; z-index:1; font-size:0.92rem; font-weight:800; color:var(--gtv-text,#17271d); }
   .gtv-scale-g {
     position:relative; z-index:1; margin-left:auto;
-    font-size:0.82rem; font-weight:800; font-family:monospace; color:var(--gtv-accent,#2F7D4A);
+    font-size:0.82rem; font-weight:800; font-family:monospace; color:var(--gtv-accent,#e95420);
   }
   @keyframes gtv-bar-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
   @keyframes gtv-grow { from { transform:scaleX(0); } to { transform:scaleX(1); } }
@@ -632,9 +632,9 @@ export default function Parole() {
       fetchWordImage(answer);
       flash("Bravo! Indovinata 🎉");
       window.setTimeout(() => {
-        confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 }, colors: ['#2F7D4A','#D9A400','#fff','#6fd08a'] });
+        confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 }, colors: ['#e95420','#D9A400','#fff','#6fd08a'] });
         window.setTimeout(() => {
-          confetti({ particleCount: 80, spread: 50, origin: { y: 0.9 }, angle: 90, colors: ['#2F7D4A','#D9A400','#6fd08a'] });
+          confetti({ particleCount: 80, spread: 50, origin: { y: 0.9 }, angle: 90, colors: ['#e95420','#D9A400','#6fd08a'] });
         }, 400);
       }, 350);
       setRecord((prev) => {
@@ -665,7 +665,7 @@ export default function Parole() {
         localStorage.setItem("parole-trophies", JSON.stringify(upd));
         window.setTimeout(() => {
           setTrophy(tr);
-          confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415","#2F7D4A","#D9A400","#fff"] });
+          confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415","#e95420","#D9A400","#fff"] });
         }, 900);
       }
     } else if (nextGuesses.length >= ROWS) {
@@ -806,8 +806,8 @@ export default function Parole() {
           <GameTutorial
             gameKey="parole"
             steps={introSteps}
-            accentColor="#7c3aed"
-            darkBg="#2a1150"
+            accentColor="#e95420"
+            darkBg="#3c202f"
             dark={dark}
             onDone={() => {
               setShowTutorial(false);
@@ -1151,8 +1151,8 @@ export default function Parole() {
 
       <style>{`
         .parole-page {
-          --green: #2F7D4A;
-          --green-dark: #1F6B3D;
+          --green: #e95420;
+          --green-dark: #c2410c;
           --amber: #D9A400;
           --absent: #c0392b;
           height: 100vh;
@@ -1164,7 +1164,7 @@ export default function Parole() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           user-select: none;
           padding-bottom: 0;
         }
@@ -1179,7 +1179,7 @@ export default function Parole() {
           justify-content: space-between;
           padding: 0 0.75rem;
           height: 52px;
-          background: #103820;
+          background: #2c001e;
           color: #fff;
           box-shadow: 0 2px 16px rgba(0,0,0,0.22);
         }
@@ -1307,7 +1307,7 @@ export default function Parole() {
           gap: 4px;
           margin-top: 0.85rem;
           padding: 4px;
-          background: rgba(47,125,74,0.1);
+          background: rgba(233, 84, 32,0.1);
           border-radius: 999px;
         }
         .parole-mode {
@@ -1321,7 +1321,7 @@ export default function Parole() {
           cursor: pointer;
           transition: background 0.15s, color 0.15s;
         }
-        .parole-mode--active { background: var(--green); color: #fff; box-shadow: 0 2px 8px rgba(47,125,74,0.35); }
+        .parole-mode--active { background: var(--green); color: #fff; box-shadow: 0 2px 8px rgba(233, 84, 32,0.35); }
 
         .parole-toolbar {
           width: 100%;
@@ -1338,7 +1338,7 @@ export default function Parole() {
           gap: 0.35rem;
           font-weight: 600;
           color: var(--green-dark);
-          background: rgba(47,125,74,0.1);
+          background: rgba(233, 84, 32,0.1);
           border-radius: 999px;
           padding: 0.32rem 0.7rem;
           font-variant-numeric: tabular-nums;
@@ -1432,15 +1432,15 @@ export default function Parole() {
         .parole-stat-card {
           display: flex; flex-direction: column; align-items: center;
           gap: 0.2rem; padding: 0.5rem 0.6rem;
-          background: rgba(47,125,74,0.08);
-          border: 1px solid rgba(47,125,74,0.22);
+          background: rgba(233, 84, 32,0.08);
+          border: 1px solid rgba(233, 84, 32,0.22);
           border-radius: 10px;
           font-variant-numeric: tabular-nums;
           color: var(--green-dark);
           min-width: 0;
-          box-shadow: 0 0 0 1px rgba(47,125,74,0.06), inset 0 0 12px rgba(47,125,74,0.05);
+          box-shadow: 0 0 0 1px rgba(233, 84, 32,0.06), inset 0 0 12px rgba(233, 84, 32,0.05);
         }
-        .parole-stat-card-val { text-shadow: 0 0 8px rgba(47,125,74,0.25); }
+        .parole-stat-card-val { text-shadow: 0 0 8px rgba(233, 84, 32,0.25); }
         .parole-stat-card--btn {
           border: none; cursor: pointer;
           background: var(--green); color: #fff;
@@ -1451,7 +1451,7 @@ export default function Parole() {
         .parole-stat-card-val { font-size: 1.15rem; font-weight: 800; line-height: 1; }
         .parole-stat-card-lbl { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; }
         .parole-page.dark .parole-stat-card {
-          background: rgba(47,125,74,0.12); border-color: rgba(95,208,154,0.3); color: #7ab893;
+          background: rgba(233, 84, 32,0.12); border-color: rgba(95,208,154,0.3); color: #7ab893;
           box-shadow: 0 0 0 1px rgba(95,208,154,0.12), inset 0 0 16px rgba(95,208,154,0.08);
         }
         .parole-page.dark .parole-stat-card-val { text-shadow: 0 0 10px rgba(95,208,154,0.45); }
@@ -1477,7 +1477,7 @@ export default function Parole() {
           transition: background 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
           letter-spacing: 0;
         }
-        .parole-mini-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 8px rgba(47,125,74,0.55), inset 0 0 4px rgba(255,255,255,0.25); }
+        .parole-mini-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 8px rgba(233, 84, 32,0.55), inset 0 0 4px rgba(255,255,255,0.25); }
         .parole-mini-key--present  { background: var(--amber); color: #fff; box-shadow: 0 0 8px rgba(217,164,0,0.6), inset 0 0 4px rgba(255,255,255,0.3); }
         .parole-mini-key--absent   { background: #b0b8b2; color: #6b7870; }
         .parole-mini-key--elim     { background: rgba(192,57,43,0.18); color: var(--absent); text-decoration: line-through; }
@@ -1515,7 +1515,7 @@ export default function Parole() {
           margin: 0 0 0.4rem; display: block;
         }
         .parole-panel-divider {
-          height: 1px; background: rgba(47,125,74,0.1); flex-shrink: 0;
+          height: 1px; background: rgba(233, 84, 32,0.1); flex-shrink: 0;
           margin: 0.2rem 0;
         }
         /* Elim-row--flow: visibile solo su mobile */
@@ -1571,13 +1571,13 @@ export default function Parole() {
         }
         .parole-tile--cursor {
           border-color: var(--green);
-          box-shadow: 0 0 0 3px rgba(47,125,74,0.3);
+          box-shadow: 0 0 0 3px rgba(233, 84, 32,0.3);
           cursor: pointer;
           animation: parole-cursor-glow 1.5s ease-in-out infinite;
         }
         @keyframes parole-cursor-glow {
-          0%,100% { box-shadow: 0 0 0 3px rgba(47,125,74,0.3); }
-          50%     { box-shadow: 0 0 0 5px rgba(47,125,74,0.55), 0 0 12px rgba(47,125,74,0.2); }
+          0%,100% { box-shadow: 0 0 0 3px rgba(233, 84, 32,0.3); }
+          50%     { box-shadow: 0 0 0 5px rgba(233, 84, 32,0.55), 0 0 12px rgba(233, 84, 32,0.2); }
         }
         @keyframes parole-pop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
         .parole-tile--revealed { animation: parole-flip 0.55s ease forwards; color: #fff; }
@@ -1586,7 +1586,7 @@ export default function Parole() {
           45% { transform: rotateX(90deg); }
           100% { transform: rotateX(0); }
         }
-        .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 0 14px rgba(47,125,74,0.5), inset 0 0 8px rgba(255,255,255,0.18); }
+        .parole-tile--correct { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 0 14px rgba(233, 84, 32,0.5), inset 0 0 8px rgba(255,255,255,0.18); }
         .parole-tile--present { background: var(--amber); border-color: var(--amber); color: #fff; box-shadow: 0 0 14px rgba(217,164,0,0.55), inset 0 0 8px rgba(255,255,255,0.22); }
         .parole-tile--absent { background: var(--absent); border-color: var(--absent); color: #fff; }
         .parole-tile--win { animation: parole-bounce 0.6s ease; }
@@ -1700,7 +1700,7 @@ export default function Parole() {
           justify-content: center;
           gap: 0;
           padding: 1rem 1.5rem 0.6rem;
-          border-bottom: 1px solid rgba(47,125,74,0.12);
+          border-bottom: 1px solid rgba(233, 84, 32,0.12);
         }
         .parole-endgame-stat {
           flex: 1;
@@ -1711,17 +1711,17 @@ export default function Parole() {
           padding: 0.5rem 0;
         }
         .parole-endgame-stat + .parole-endgame-stat {
-          border-left: 1px solid rgba(47,125,74,0.12);
+          border-left: 1px solid rgba(233, 84, 32,0.12);
         }
         .parole-endgame-stat--mid {
-          border-left: 1px solid rgba(47,125,74,0.12);
-          border-right: 1px solid rgba(47,125,74,0.12);
+          border-left: 1px solid rgba(233, 84, 32,0.12);
+          border-right: 1px solid rgba(233, 84, 32,0.12);
         }
         .parole-endgame-stat-icon { font-size: 1.1rem; line-height: 1; }
         .parole-endgame-stat-val {
           font-size: 1.35rem;
           font-weight: 800;
-          color: #103820;
+          color: #2c001e;
           font-variant-numeric: tabular-nums;
           line-height: 1.1;
         }
@@ -1741,7 +1741,7 @@ export default function Parole() {
         /* Trivia */
         .parole-endgame-trivia {
           padding: 1rem 1.5rem 0.75rem;
-          border-bottom: 1px solid rgba(47,125,74,0.1);
+          border-bottom: 1px solid rgba(233, 84, 32,0.1);
         }
         .parole-endgame-trivia-title {
           font-size: 0.75rem;
@@ -1818,9 +1818,9 @@ export default function Parole() {
         .parole-endgame-cta--ghost {
           flex: 0 0 auto;
           background: transparent; color: var(--green);
-          border: 1.5px solid rgba(47,125,74,0.3);
+          border: 1.5px solid rgba(233, 84, 32,0.3);
         }
-        .parole-endgame-cta--ghost:hover { background: rgba(47,125,74,0.08); }
+        .parole-endgame-cta--ghost:hover { background: rgba(233, 84, 32,0.08); }
         .parole-page.dark .parole-endgame-cta--ghost { color: #6fd08a; border-color: rgba(95,208,154,0.3); }
         .parole-page.dark .parole-endgame-cta--ghost:hover { background: rgba(95,208,154,0.1); }
 
@@ -1858,7 +1858,7 @@ export default function Parole() {
           justify-content: center;
           gap: 0.4rem;
           background: #fff;
-          border: 1px solid rgba(47,125,74,0.3);
+          border: 1px solid rgba(233, 84, 32,0.3);
           color: var(--green-dark);
           border-radius: 8px;
           padding: 0.55rem 0.7rem;
@@ -1867,7 +1867,7 @@ export default function Parole() {
           cursor: pointer;
           transition: background 0.15s, transform 0.08s, box-shadow 0.15s;
         }
-        .parole-cmd:hover { background: rgba(47,125,74,0.08); box-shadow: 0 2px 8px rgba(47,125,74,0.18); }
+        .parole-cmd:hover { background: rgba(233, 84, 32,0.08); box-shadow: 0 2px 8px rgba(233, 84, 32,0.18); }
         .parole-cmd:active { transform: scale(0.96); }
         .parole-cmd--ok { background: var(--green); border-color: var(--green); color: #fff; }
         .parole-cmd--ok:hover { background: var(--green-dark); }
@@ -1887,7 +1887,7 @@ export default function Parole() {
           border-bottom-width: 2px;
           border-radius: 4px;
           padding: 0.05rem 0.3rem;
-          font-family: "Roboto Mono", monospace;
+          font-family: "Ubuntu Mono", monospace;
           font-size: 0.7rem;
           color: #17271d;
           margin: 0 1px;
@@ -1930,7 +1930,7 @@ export default function Parole() {
         .parole-key:hover:not(:disabled) { filter: brightness(0.96); }
         .parole-key:active:not(:disabled) { transform: scale(0.92); }
         .parole-key--wide { flex: 1.5; font-size: 0.75rem; }
-        .parole-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 10px rgba(47,125,74,0.5); }
+        .parole-key--correct { background: var(--green); color: #fff; box-shadow: 0 0 10px rgba(233, 84, 32,0.5); }
         .parole-key--present { background: var(--amber); color: #fff; box-shadow: 0 0 10px rgba(217,164,0,0.55); }
         .parole-key--absent { background: var(--absent); color: #fff; }
         .parole-key--elim {
@@ -2013,7 +2013,7 @@ export default function Parole() {
             flex: 0 0 320px; width: 320px;
             display: flex; flex-direction: column;
             background: #fff;
-            border: 1px solid rgba(47,125,74,0.14);
+            border: 1px solid rgba(233, 84, 32,0.14);
             border-radius: 14px;
             padding: 0.9rem 1rem;
             box-shadow: 0 4px 24px rgba(0,0,0,0.07);
@@ -2083,12 +2083,12 @@ export default function Parole() {
         }
         .parole-bg::before {
           width: 70vmax; height: 70vmax; top: -25%; left: -15%;
-          background: radial-gradient(circle, rgba(47,125,74,0.12) 0%, transparent 65%);
+          background: radial-gradient(circle, rgba(233, 84, 32,0.12) 0%, transparent 65%);
           animation: parole-orb1 22s ease-in-out infinite;
         }
         .parole-bg::after {
           width: 55vmax; height: 55vmax; bottom: -20%; right: -10%;
-          background: radial-gradient(circle, rgba(47,125,74,0.09) 0%, transparent 65%);
+          background: radial-gradient(circle, rgba(233, 84, 32,0.09) 0%, transparent 65%);
           animation: parole-orb2 28s ease-in-out infinite;
         }
         @keyframes parole-orb1 {
@@ -2101,20 +2101,20 @@ export default function Parole() {
           50%     { transform: translate(-9%,-7%) scale(1.18); }
         }
         .parole-page.dark .parole-bg::before {
-          background: radial-gradient(circle, rgba(47,125,74,0.22) 0%, transparent 65%);
+          background: radial-gradient(circle, rgba(233, 84, 32,0.22) 0%, transparent 65%);
         }
         .parole-page.dark .parole-bg::after {
-          background: radial-gradient(circle, rgba(47,125,74,0.17) 0%, transparent 65%);
+          background: radial-gradient(circle, rgba(233, 84, 32,0.17) 0%, transparent 65%);
         }
 
         /* ── Effetti di stato ── */
 
         /* Tasto premuto (glow verde) */
         .parole-key--pressed {
-          background: rgba(47,125,74,0.55) !important;
+          background: rgba(233, 84, 32,0.55) !important;
           color: #fff !important;
           transform: scale(0.88) !important;
-          box-shadow: 0 0 14px rgba(47,125,74,0.5) !important;
+          box-shadow: 0 0 14px rgba(233, 84, 32,0.5) !important;
           transition: none !important;
         }
 
@@ -2187,22 +2187,22 @@ export default function Parole() {
           color: #d4e8dc;
         }
         .parole-page.dark .parole-modes {
-          background: rgba(47,125,74,0.13);
+          background: rgba(233, 84, 32,0.13);
         }
         .parole-page.dark .parole-mode { color: #7ab893; }
         .parole-page.dark .parole-stat {
-          background: rgba(47,125,74,0.13);
+          background: rgba(233, 84, 32,0.13);
           color: #7ab893;
         }
         .parole-page.dark .parole-message-slot { color: #d4e8dc; }
         .parole-page.dark .parole-tile {
           background: #1a2720;
-          border-color: rgba(47,125,74,0.28);
+          border-color: rgba(233, 84, 32,0.28);
           color: #d4e8dc;
         }
         .parole-page.dark .parole-tile--cursor {
           border-color: var(--green);
-          box-shadow: 0 0 0 3px rgba(47,125,74,0.45);
+          box-shadow: 0 0 0 3px rgba(233, 84, 32,0.45);
         }
         .parole-page.dark .parole-tile--filled { border-color: var(--green); }
         .parole-page.dark .parole-key {
@@ -2234,12 +2234,12 @@ export default function Parole() {
         .parole-page.dark .parole-endgame-stat-lbl { color: #7ab893; }
         .parole-page.dark .parole-endgame-stat + .parole-endgame-stat,
         .parole-page.dark .parole-endgame-stat--mid {
-          border-color: rgba(47,125,74,0.18);
+          border-color: rgba(233, 84, 32,0.18);
         }
         .parole-page.dark .parole-endgame-stats {
-          border-color: rgba(47,125,74,0.15);
+          border-color: rgba(233, 84, 32,0.15);
         }
-        .parole-page.dark .parole-endgame-trivia { border-color: rgba(47,125,74,0.12); }
+        .parole-page.dark .parole-endgame-trivia { border-color: rgba(233, 84, 32,0.12); }
         .parole-page.dark .parole-endgame-trivia-title { color: #7ab893; }
         .parole-page.dark .parole-endgame-trivia-text { color: #c4dcc8; }
         .parole-page.dark .parole-endgame-trivia-empty,
@@ -2247,18 +2247,18 @@ export default function Parole() {
         /* Desktop controls panel */
         .parole-page.dark .parole-controls {
           background: #1a2720 !important;
-          border-color: rgba(47,125,74,0.2) !important;
+          border-color: rgba(233, 84, 32,0.2) !important;
         }
         .parole-page.dark .parole-controls-title { color: #7ab893; }
         .parole-page.dark .parole-controls-hint { color: #7ab893; }
         .parole-page.dark .parole-cmd {
           background: #253025;
-          border-color: rgba(47,125,74,0.3);
+          border-color: rgba(233, 84, 32,0.3);
           color: #7ab893;
         }
-        .parole-page.dark .parole-cmd:hover { background: rgba(47,125,74,0.18); }
+        .parole-page.dark .parole-cmd:hover { background: rgba(233, 84, 32,0.18); }
         /* Nuovi elementi dark mode */
-        .parole-page.dark .parole-panel-divider { background: rgba(47,125,74,0.15); }
+        .parole-page.dark .parole-panel-divider { background: rgba(233, 84, 32,0.15); }
         .parole-page.dark .parole-panel-label { color: #7ab893; }
         .parole-page.dark .parole-mode-sm {
           background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.65);

@@ -53,10 +53,10 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
     }
   };
 
-  const card = dark ? "#1a1230" : "#ffffff";
-  const bord = dark ? "rgba(155,92,246,0.22)" : "rgba(124,58,237,0.15)";
-  const text = dark ? "#e7def7" : "#17271d";
-  const sub  = dark ? "#b6a9cf" : "#4a5c50";
+  const card = dark ? "#291d26" : "#ffffff";
+  const bord = dark ? "rgba(237, 113, 67,0.22)" : "rgba(233, 84, 32,0.15)";
+  const text = dark ? "#f5ede8" : "#17271d";
+  const sub  = dark ? "#c9bcb4" : "#4a5c50";
 
   return (
     <div className={`mpg-gate${dark ? " dark" : ""}`}>
@@ -127,30 +127,30 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
       <style>{`
         .mpg-gate {
           position: fixed; inset: 0; z-index: 250;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           background: #f4f6f5;
           display: flex; flex-direction: column; align-items: center; justify-content: center;
           gap: 1.5rem; padding: 1.5rem; overflow-y: auto;
           animation: mpg-gate-in .25s ease;
         }
-        .mpg-gate.dark { background: #0e0a16; }
+        .mpg-gate.dark { background: #171114; }
         @keyframes mpg-gate-in { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none; } }
 
         .mpg-gate-hero { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
         .mpg-gate-logo {
-          background:#fff; color:#6024c4; border-radius:20px; padding:16px; display:inline-flex;
-          box-shadow:0 10px 32px rgba(91,33,182,0.4);
+          background:#fff; color:#bc3d10; border-radius:20px; padding:16px; display:inline-flex;
+          box-shadow:0 10px 32px rgba(162, 51, 14,0.4);
         }
-        .mpg-gate.dark .mpg-gate-logo { box-shadow:0 10px 32px rgba(91,33,182,0.5); }
+        .mpg-gate.dark .mpg-gate-logo { box-shadow:0 10px 32px rgba(162, 51, 14,0.5); }
         .mpg-gate-title {
           font-size:clamp(2.2rem,9vw,3rem); font-weight:900; letter-spacing:0.16em;
-          margin:.4rem 0 0; line-height:1; color:#5b21b6;
+          margin:.4rem 0 0; line-height:1; color:#a2330e;
         }
-        .mpg-gate.dark .mpg-gate-title { color:#b794ff; }
-        .mpg-gate-title span { color:#2F7D4A; }
+        .mpg-gate.dark .mpg-gate-title { color:#f6a583; }
+        .mpg-gate-title span { color:#e95420; }
         .mpg-gate.dark .mpg-gate-title span { color:#6fe0a6; }
-        .mpg-gate-tag { font-size:.9rem; color:#6b6080; margin:0; font-weight:600; }
-        .mpg-gate.dark .mpg-gate-tag { color:#b6a9cf; }
+        .mpg-gate-tag { font-size:.9rem; color:#7d7066; margin:0; font-weight:600; }
+        .mpg-gate.dark .mpg-gate-tag { color:#c9bcb4; }
 
         .mpg-gate-body {
           width:min(94vw,360px);
@@ -164,12 +164,12 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         }
         .mpg-gate-inputwrap {
           display:flex; align-items:center; gap:.5rem;
-          border:2px solid rgba(124,58,237,0.25); border-radius:12px;
+          border:2px solid rgba(233, 84, 32,0.25); border-radius:12px;
           padding:.1rem .9rem; transition:border-color .15s, box-shadow .15s;
           background:rgba(0,0,0,0.015);
         }
-        .mpg-gate.dark .mpg-gate-inputwrap { background:rgba(255,255,255,0.03); border-color:rgba(155,92,246,0.3); }
-        .mpg-gate-inputwrap:focus-within { border-color:#7c3aed; box-shadow:0 0 0 .2rem rgba(124,58,237,.2); }
+        .mpg-gate.dark .mpg-gate-inputwrap { background:rgba(255,255,255,0.03); border-color:rgba(237, 113, 67,0.3); }
+        .mpg-gate-inputwrap:focus-within { border-color:#e95420; box-shadow:0 0 0 .2rem rgba(233, 84, 32,.2); }
         .mpg-gate-inputwrap.err { border-color:#c0392b; box-shadow:0 0 0 .2rem rgba(192,57,43,.15); }
         .mpg-gate-input {
           flex:1; min-width:0; border:none; outline:none; background:transparent;
@@ -184,9 +184,9 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         .mpg-gate-go {
           margin-top:.2rem; height:52px; width:100%;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          background:linear-gradient(100deg,#7c3aed 0%,#5b21b6 45%,#2F7D4A 100%); color:#fff; border:none; border-radius:13px;
+          background:linear-gradient(100deg,#e95420 0%,#a2330e 45%,#e95420 100%); color:#fff; border:none; border-radius:13px;
           font-family:inherit; font-size:1.1rem; font-weight:900; cursor:pointer;
-          box-shadow:0 6px 22px rgba(91,33,182,0.4); transition:filter .12s, transform .12s;
+          box-shadow:0 6px 22px rgba(162, 51, 14,0.4); transition:filter .12s, transform .12s;
         }
         .mpg-gate-go:hover { filter:brightness(.92); transform:translateY(-1px); }
         .mpg-gate-go:active { transform:scale(.98); }
@@ -209,16 +209,16 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         }
         .mpg-gate-chip {
           display:inline-flex; align-items:center; gap:.3rem;
-          border:1.5px solid rgba(124,58,237,0.32); border-radius:999px;
-          background:rgba(124,58,237,0.07); color:#6d28d9;
+          border:1.5px solid rgba(233, 84, 32,0.32); border-radius:999px;
+          background:rgba(233, 84, 32,0.07); color:#cf4312;
           font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
           padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;
         }
         .mpg-gate.dark .mpg-gate-chip {
-          border-color:rgba(155,92,246,0.34); background:rgba(155,92,246,0.1); color:#c4a5ff;
+          border-color:rgba(237, 113, 67,0.34); background:rgba(237, 113, 67,0.1); color:#f6a583;
         }
-        .mpg-gate-chip:hover { background:rgba(124,58,237,0.15); transform:translateY(-1px); }
-        .mpg-gate.dark .mpg-gate-chip:hover { background:rgba(155,92,246,0.18); }
+        .mpg-gate-chip:hover { background:rgba(233, 84, 32,0.15); transform:translateY(-1px); }
+        .mpg-gate.dark .mpg-gate-chip:hover { background:rgba(237, 113, 67,0.18); }
         .mpg-gate-chip:active { transform:scale(.97); }
       `}</style>
     </div>

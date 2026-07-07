@@ -19,11 +19,11 @@ interface Mode {
 }
 
 export const MODES: Mode[] = [
-  { level: 1, key: "esploratore", name: "Esploratore", desc: "3 città, 6 tentativi ciascuna. Per iniziare.",          tag: "Consigliato", color: "#9b5cf6", rounds: 3, attempts: 6 },
-  { level: 2, key: "viaggiatore", name: "Viaggiatore", desc: "4 città, 5 tentativi. Il ritmo classico.",              tag: "Classico",    color: "#7c3aed", rounds: 4, attempts: 5 },
-  { level: 3, key: "navigatore",  name: "Navigatore",  desc: "5 città, 4 tentativi. La sfida cresce.",                tag: "Sfida",       color: "#6024c4", rounds: 5, attempts: 4 },
-  { level: 4, key: "pilota",      name: "Pilota",      desc: "6 città, 3 tentativi. Occhio allenato.",                tag: "Difficile",   color: "#5b21b6", rounds: 6, attempts: 3 },
-  { level: 5, key: "esploratore-globale", name: "Cartografo", desc: "7 città, appena 2 tentativi. Il limite.",       tag: "Estremo",     color: "#4c1d95", rounds: 7, attempts: 2 },
+  { level: 1, key: "esploratore", name: "Esploratore", desc: "3 città, 6 tentativi ciascuna. Per iniziare.",          tag: "Consigliato", color: "#ed7143", rounds: 3, attempts: 6 },
+  { level: 2, key: "viaggiatore", name: "Viaggiatore", desc: "4 città, 5 tentativi. Il ritmo classico.",              tag: "Classico",    color: "#e95420", rounds: 4, attempts: 5 },
+  { level: 3, key: "navigatore",  name: "Navigatore",  desc: "5 città, 4 tentativi. La sfida cresce.",                tag: "Sfida",       color: "#bc3d10", rounds: 5, attempts: 4 },
+  { level: 4, key: "pilota",      name: "Pilota",      desc: "6 città, 3 tentativi. Occhio allenato.",                tag: "Difficile",   color: "#a2330e", rounds: 6, attempts: 3 },
+  { level: 5, key: "esploratore-globale", name: "Cartografo", desc: "7 città, appena 2 tentativi. Il limite.",       tag: "Estremo",     color: "#7e2708", rounds: 7, attempts: 2 },
 ];
 
 const MAPPA_VERSION = "1.0";
@@ -118,17 +118,17 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
     e.currentTarget.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
   };
 
-  const bg       = dark ? "#0e0a16" : "#f4f6f5";
-  const card     = dark ? "#1a1230" : "#ffffff";
-  const bord     = dark ? "rgba(155,92,246,0.24)" : "rgba(124,58,237,0.16)";
-  const val      = dark ? "#e7def7" : "#17271d";
-  const lbl      = dark ? "#b6a9cf" : "#6b6080";
+  const bg       = dark ? "#171114" : "#f4f6f5";
+  const card     = dark ? "#291d26" : "#ffffff";
+  const bord     = dark ? "rgba(237, 113, 67,0.24)" : "rgba(233, 84, 32,0.16)";
+  const val      = dark ? "#f5ede8" : "#17271d";
+  const lbl      = dark ? "#c9bcb4" : "#7d7066";
   const note     = dark ? "#6a5d86" : "#9a90ab";
-  const textMain = dark ? "#e7def7" : "#17271d";
+  const textMain = dark ? "#f5ede8" : "#17271d";
 
   // Viola del menù — accento di tutto ciò che non è una tile-livello.
-  const vio   = dark ? "#c4a5ff" : "#6d28d9";
-  const vBord = dark ? "rgba(155,92,246,0.34)" : "rgba(124,58,237,0.28)";
+  const vio   = dark ? "#f6a583" : "#cf4312";
+  const vBord = dark ? "rgba(237, 113, 67,0.34)" : "rgba(233, 84, 32,0.28)";
 
   // ── Griglia di tile quadrate "booking card": una tile per livello ──
   const ModeList = (
@@ -179,11 +179,11 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0.95rem 1.3rem",
-        background: "linear-gradient(100deg, #7c3aed 0%, #5b21b6 42%, #2F7D4A 100%)", color: "#fff",
+        background: "linear-gradient(100deg, #e95420 0%, #a2330e 42%, #e95420 100%)", color: "#fff",
         border: "none", borderRadius: "14px",
         fontSize: "0.98rem", fontWeight: 800,
         cursor: "pointer", fontFamily: "inherit",
-        boxShadow: "0 6px 24px rgba(91,33,182,0.4)",
+        boxShadow: "0 6px 24px rgba(162, 51, 14,0.4)",
         transition: "filter 0.12s, transform 0.12s",
         width: "100%",
       }}
@@ -227,7 +227,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
   const StatsCard = (forceDark: boolean) => {
     const c = forceDark ? "#fff" : val;
     const l = forceDark ? "rgba(255,255,255,0.6)" : lbl;
-    const ic = forceDark ? "#c4a5ff" : vio;
+    const ic = forceDark ? "#f6a583" : vio;
     return (
       <div className={`mpm-stats-card${forceDark ? " mpm-stats-dark" : ""}`} style={forceDark ? undefined : { background: card, border: `1px solid ${vBord}` }}>
         <div className="mpm-stat"><Flame size={20} style={{ color: ic }} /><span className="mpm-stat-val" style={{ color: c }}>{bestStreak}</span><span className="mpm-stat-lbl" style={{ color: l }}>Miglior streak</span></div>
@@ -304,11 +304,11 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
       <style>{`
         .mpm-root {
           /* VIOLA = accento del menù · VERDE = secondario (come Trivia) */
-          --pv:#7c3aed; --pv2:#6024c4; --pv3:#9b5cf6;
-          --pv-ink:${dark ? "#c4a5ff" : "#6d28d9"};
-          --gv:#2F7D4A; --gv3:#3a9e5f;
+          --pv:#e95420; --pv2:#bc3d10; --pv3:#ed7143;
+          --pv-ink:${dark ? "#f6a583" : "#cf4312"};
+          --gv:#e95420; --gv3:#3a9e5f;
           position: fixed; inset: 0; z-index: 200;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           animation: mpm-in 0.22s ease;
           background: ${bg};
         }
@@ -318,7 +318,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
         .mpm-desktop { display:none; }
 
         .mpm-hero {
-          background: linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+          background: linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
@@ -327,18 +327,18 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
           content:""; position:absolute; width:60%; height:70%; border-radius:50%;
           filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
         }
-        .mpm-hero::before { background:#8b7bff; top:-25%; left:-15%; }
-        .mpm-hero::after  { background:#6d4dff; bottom:-30%; right:-15%; opacity:0.4; }
+        .mpm-hero::before { background:#e95420; top:-25%; left:-15%; }
+        .mpm-hero::after  { background:#c2410c; bottom:-30%; right:-15%; opacity:0.4; }
         .mpm-hero > * { position:relative; z-index:1; }
         .mpm-logo-wrap {
-          background:#fff; color:#6024c4; border-radius:18px; padding:14px;
-          box-shadow:0 8px 32px rgba(91,33,182,0.4); display:inline-flex;
+          background:#fff; color:#bc3d10; border-radius:18px; padding:14px;
+          box-shadow:0 8px 32px rgba(162, 51, 14,0.4); display:inline-flex;
         }
         .mpm-title {
           font-size:clamp(2rem,9vw,3.4rem); font-weight:900;
           letter-spacing:0.14em; margin:0; line-height:1; color:#fff;
         }
-        .mpm-accent { color:#b794ff; }
+        .mpm-accent { color:#f6a583; }
         .mpm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.6); margin:0; font-weight:500; text-align:center; }
         .mpm-kicker {
           position:absolute; bottom:0.7rem; left:1.4rem;
@@ -376,26 +376,26 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
           background:rgba(255,255,255,0.10); color:#fff !important; border:1px solid rgba(255,255,255,0.16) !important;
         }
         .mpm-actions-dark .mpm-tut-btn:hover, .mpm-actions-dark .mpm-back-btn:hover { background:rgba(255,255,255,0.18); }
-        .mpm-actions-dark .mpm-tut-btn svg, .mpm-actions-dark .mpm-back-btn svg { color:#c4a5ff; }
+        .mpm-actions-dark .mpm-tut-btn svg, .mpm-actions-dark .mpm-back-btn svg { color:#f6a583; }
 
         .mpm-tut-btn, .mpm-back-btn {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
           width:100%;
-          padding:0.95rem 1rem; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          padding:0.95rem 1rem; background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           border-radius:13px; font-size:1rem; font-weight:800;
           cursor:pointer; font-family:inherit; transition:filter .15s, transform .12s, background .15s;
           text-decoration:none;
         }
         .mpm-vio-btn svg { width:18px; height:18px; }
         .mpm-tut-btn:hover, .mpm-back-btn:hover {
-          background:${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.11)"};
+          background:${dark ? "rgba(237, 113, 67,0.18)" : "rgba(233, 84, 32,0.11)"};
           transform:translateY(-1px);
         }
         .mpm-tut-cta {
-          background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important;
+          background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%) !important;
           color:#fff !important; border:none !important;
           font-size:1.05rem !important; font-weight:900 !important; letter-spacing:0.01em;
-          box-shadow:0 6px 22px rgba(91,33,182,0.45);
+          box-shadow:0 6px 22px rgba(162, 51, 14,0.45);
           position:relative; overflow:hidden;
           animation:mpm-cta-breathe 2.8s ease-in-out infinite;
         }
@@ -405,8 +405,8 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
           background:linear-gradient(100deg,transparent,rgba(255,255,255,0.35),transparent);
           transform:skewX(-18deg); animation:mpm-cta-shine 3.4s ease-in-out infinite;
         }
-        .mpm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(91,33,182,0.55); background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%) !important; }
-        @keyframes mpm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(91,33,182,0.4);} 50%{box-shadow:0 8px 30px rgba(124,58,237,0.65);} }
+        .mpm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(162, 51, 14,0.55); background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%) !important; }
+        @keyframes mpm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(162, 51, 14,0.4);} 50%{box-shadow:0 8px 30px rgba(233, 84, 32,0.65);} }
         @keyframes mpm-cta-shine { 0%,55%{left:-60%;} 100%{left:130%;} }
         @media (prefers-reduced-motion: reduce) {
           .mpm-tut-cta, .mpm-tut-cta::after { animation:none; }
@@ -416,14 +416,14 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
         .mpm-more-toggle {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; width:100%;
           padding:0.85rem 1rem; border-radius:13px; font-size:0.95rem; font-weight:800;
-          background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           cursor:pointer; font-family:inherit; transition:background .15s;
         }
         /* drawer mobile */
         .mpm-drawer-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; animation:mpm-fade .2s ease; }
         @keyframes mpm-fade { from{opacity:0;} to{opacity:1;} }
         .mpm-drawer {
-          width:100%; background:linear-gradient(160deg,#1a0b2e 0%,#2a1150 60%,#103820 130%);
+          width:100%; background:linear-gradient(160deg,#271724 0%,#3c202f 60%,#2c001e 130%);
           border-radius:20px 20px 0 0; padding:1.1rem 1.1rem calc(1.6rem + env(safe-area-inset-bottom));
           box-shadow:0 -10px 40px rgba(0,0,0,0.4); animation:mpm-up .25s cubic-bezier(.2,.8,.3,1);
           max-height:88dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
@@ -437,17 +437,17 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
         .mpm-player {
           display:inline-flex; align-items:center; gap:0.6rem;
           padding:0.4rem 0.95rem 0.4rem 0.4rem; border-radius:999px; cursor:pointer;
-          border:1.5px solid ${vBord}; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          border:1.5px solid ${vBord}; background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           font-family:inherit; transition:transform .12s, background .15s, box-shadow .15s;
         }
-        .mpm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(124,58,237,0.25); }
+        .mpm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(233, 84, 32,0.25); }
         .mpm-player:active { transform:scale(0.97); }
         .mpm-player-badge {
           display:inline-flex; align-items:center; justify-content:center;
           min-width:38px; height:38px; padding:0 0.4rem; border-radius:999px;
-          background:linear-gradient(140deg,#7c3aed,#5b21b6); color:#fff;
+          background:linear-gradient(140deg,#e95420,#a2330e); color:#fff;
           font-size:0.92rem; font-weight:900; line-height:1; letter-spacing:-0.02em;
-          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(91,33,182,0.4);
+          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(162, 51, 14,0.4);
         }
         .mpm-player-name { font-size:0.92rem; font-weight:800; color:${vio}; letter-spacing:0.01em; padding-right:0.2rem; }
         .mpm-player.on-dark { border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); }
@@ -460,8 +460,8 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
         }
 
         .mpm-tile {
-          --gv:#7c3aed; --gv2:#6024c4; --gv3:#9b5cf6;
-          --spot:${dark ? "rgba(196,165,255,0.32)" : "rgba(124,58,237,0.26)"};
+          --gv:#e95420; --gv2:#bc3d10; --gv3:#ed7143;
+          --spot:${dark ? "rgba(196,165,255,0.32)" : "rgba(233, 84, 32,0.26)"};
           position:relative; isolation:isolate;
           display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
           aspect-ratio:1/1; min-height:0;
@@ -470,7 +470,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
           border-radius:18px; cursor:pointer; font-family:inherit; text-align:left;
           overflow:hidden;
           background:
-            radial-gradient(120% 90% at 100% 0%, ${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.10)"} 0%, transparent 55%),
+            radial-gradient(120% 90% at 100% 0%, ${dark ? "rgba(237, 113, 67,0.18)" : "rgba(233, 84, 32,0.10)"} 0%, transparent 55%),
             linear-gradient(160deg, ${card} 0%, ${dark ? "#1c1430" : "#f6f2fe"} 100%);
           box-shadow:0 2px 6px rgba(0,0,0,0.05);
           transition:transform .12s cubic-bezier(.2,.7,.3,1.25), border-color .1s, box-shadow .12s, background .12s;
@@ -500,7 +500,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
           .mpm-tile:hover {
             transform:translateY(-4px);
             border-color:var(--gv);
-            box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(91,33,182,0.30)"};
+            box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(162, 51, 14,0.30)"};
           }
           .mpm-tile:hover::before { opacity:1; }
           .mpm-tile:hover .mpm-tile-glow { opacity:1; transform:translate(0,0) scale(1); }
@@ -514,7 +514,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
         .mpm-tile.is-on::before { opacity:1; }
         .mpm-tile.is-on {
           border-color:var(--gv3);
-          box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(91,33,182,0.35)"};
+          box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(162, 51, 14,0.35)"};
         }
         .mpm-tile.is-on .mpm-word { color:#fff; text-shadow:0 1px 8px rgba(0,0,0,0.25); }
         .mpm-tile.is-on .mpm-tile-mark { color:rgba(255,255,255,0.9); opacity:0.95; transform:scale(1.15) rotate(-4deg); }
@@ -554,7 +554,7 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
           position:relative; z-index:1; margin-top:0.3rem;
           font-size:0.56rem; font-weight:800; text-transform:uppercase; letter-spacing:0.07em;
           padding:0.12rem 0.45rem; border-radius:999px;
-          color:${vio}; background:${dark ? "rgba(155,92,246,0.14)" : "rgba(124,58,237,0.10)"};
+          color:${vio}; background:${dark ? "rgba(237, 113, 67,0.14)" : "rgba(233, 84, 32,0.10)"};
           border:1px solid ${vBord};
           transition:color .12s, background .12s, border-color .12s;
         }
@@ -604,18 +604,18 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
 
           .mpm-desktop-left, .mpm-desktop-right {
             flex-shrink:0;
-            background:linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+            background:linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
             display:flex; flex-direction:column; overflow:hidden; position:relative;
           }
           .mpm-desktop-left::before, .mpm-desktop-right::before {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.4; pointer-events:none;
-            background:#8b7bff; top:-10%; left:-20%;
+            background:#e95420; top:-10%; left:-20%;
           }
           .mpm-desktop-left::after, .mpm-desktop-right::after {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.3; pointer-events:none;
-            background:#6d4dff; bottom:-12%; right:-20%;
+            background:#c2410c; bottom:-12%; right:-20%;
           }
           .mpm-desktop-left > *, .mpm-desktop-right > * { position:relative; z-index:1; }
 
@@ -673,10 +673,10 @@ export default function MappaMenu({ dark, bestStreak, trophiesCount, nick, onPla
 export function MappaMark({ size = 64 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-      <circle cx="50" cy="50" r="34" fill="none" stroke="#7c3aed" strokeWidth="6" />
-      <ellipse cx="50" cy="50" rx="14" ry="34" fill="none" stroke="#9b5cf6" strokeWidth="4" />
-      <line x1="16" y1="50" x2="84" y2="50" stroke="#9b5cf6" strokeWidth="4" />
-      <path d="M50 30c-7 0-12 5-12 12 0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#2F7D4A" stroke="#1F6B3D" strokeWidth="2" />
+      <circle cx="50" cy="50" r="34" fill="none" stroke="#e95420" strokeWidth="6" />
+      <ellipse cx="50" cy="50" rx="14" ry="34" fill="none" stroke="#ed7143" strokeWidth="4" />
+      <line x1="16" y1="50" x2="84" y2="50" stroke="#ed7143" strokeWidth="4" />
+      <path d="M50 30c-7 0-12 5-12 12 0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#e95420" stroke="#c2410c" strokeWidth="2" />
       <circle cx="50" cy="42" r="4" fill="#fff" />
     </svg>
   );

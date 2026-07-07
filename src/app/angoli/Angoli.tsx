@@ -86,14 +86,14 @@ function DemoAngleVisual() {
         fill="none" stroke="#D9A400" strokeWidth="3" strokeLinecap="round" />
       {/* Raggio orizzontale */}
       <line className="gtv-ray gtv-ray1" x1={vx} y1={vy} x2={rH.x} y2={rH.y}
-        stroke="#2F7D4A" strokeWidth="4" strokeLinecap="round" />
-      <polygon className="gtv-head gtv-head1" points={`${rH.x + 7},${rH.y} ${rH.x - 5},${rH.y - 5} ${rH.x - 5},${rH.y + 5}`} fill="#2F7D4A" />
+        stroke="#e95420" strokeWidth="4" strokeLinecap="round" />
+      <polygon className="gtv-head gtv-head1" points={`${rH.x + 7},${rH.y} ${rH.x - 5},${rH.y - 5} ${rH.x - 5},${rH.y + 5}`} fill="#e95420" />
       {/* Raggio diagonale */}
       <line className="gtv-ray gtv-ray2" x1={vx} y1={vy} x2={rD.x} y2={rD.y}
-        stroke="#2F7D4A" strokeWidth="4" strokeLinecap="round" />
-      <polygon className="gtv-head gtv-head2" points={`${rD.x + 4},${rD.y - 7} ${rD.x - 8},${rD.y + 1} ${rD.x + 3},${rD.y + 9}`} fill="#2F7D4A" />
+        stroke="#e95420" strokeWidth="4" strokeLinecap="round" />
+      <polygon className="gtv-head gtv-head2" points={`${rD.x + 4},${rD.y - 7} ${rD.x - 8},${rD.y + 1} ${rD.x + 3},${rD.y + 9}`} fill="#e95420" />
       {/* Vertice */}
-      <circle className="gtv-vertex" cx={vx} cy={vy} r="6" fill="#2F7D4A" />
+      <circle className="gtv-vertex" cx={vx} cy={vy} r="6" fill="#e95420" />
       {/* Etichetta ?g */}
       <text className="gtv-label" x={vx + 48} y={vy - 60} fontSize="18" fill="#D9A400" fontWeight="800" fontFamily="monospace">?g</text>
     </svg>
@@ -103,7 +103,7 @@ function DemoAngleVisual() {
 // ── Visual 2: le righe-indizio compaiono una alla volta ──
 function HintVisual() {
   const rows = [
-    { val: "30g", hint: "↑", label: "Maggiore", color: "#2F7D4A" },
+    { val: "30g", hint: "↑", label: "Maggiore", color: "#e95420" },
     { val: "60g", hint: "↓", label: "Minore",   color: "#c0392b" },
   ];
   return (
@@ -213,18 +213,18 @@ const ANGOLI_TUTORIAL_CSS = `
   .gtv-scale-bar {
     position: relative; display: flex; align-items: center; gap: 8px;
     height: 34px; padding: 0 14px; border-radius: 7px; overflow: hidden;
-    background: rgba(47,125,74,0.10); border: 1px solid rgba(47,125,74,0.18);
+    background: rgba(233, 84, 32,0.10); border: 1px solid rgba(233, 84, 32,0.18);
     opacity: 0; animation: gtv-bar-in .4s ease forwards;
   }
   .gtv-scale-fill {
     position: absolute; left: 0; top: 0; bottom: 0;
-    background: linear-gradient(90deg, rgba(47,125,74,0.30), rgba(217,164,0,0.30));
+    background: linear-gradient(90deg, rgba(233, 84, 32,0.30), rgba(217,164,0,0.30));
     transform-origin: left; animation: gtv-grow .5s ease forwards;
   }
   .gtv-scale-lbl { position: relative; z-index: 1; font-size: 0.92rem; font-weight: 800; color: #17271d; }
   .gtv-scale-g {
     position: relative; z-index: 1; margin-left: auto;
-    font-size: 0.82rem; font-weight: 800; font-family: monospace; color: #2F7D4A;
+    font-size: 0.82rem; font-weight: 800; font-family: monospace; color: #e95420;
   }
   @keyframes gtv-bar-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   @keyframes gtv-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -554,13 +554,13 @@ export default function Angoli() {
       setStrike(ns);
       if (firstTry && ns > best) { setBest(ns); localStorage.setItem("angoli-best-strike", String(ns)); }
 
-      confetti({ particleCount: pts>=1300?110:55, spread:72, origin:{y:0.6}, colors:["#2F7D4A","#D9A400","#fff","#1F6B3D"] });
+      confetti({ particleCount: pts>=1300?110:55, spread:72, origin:{y:0.6}, colors:["#e95420","#D9A400","#fff","#c2410c"] });
 
       const tr = firstTry ? getTrophyForStrike(ns) : null;
       if (tr && !achieved.includes(ns)) {
         const upd = [...achieved, ns]; setAch(upd);
         localStorage.setItem("angoli-trophies", JSON.stringify(upd));
-        setTimeout(()=>{ setTrophy(tr); confetti({ particleCount:220, spread:110, origin:{y:0.45}, colors:["#c8a415","#2F7D4A","#D9A400","#fff"] }); }, 700);
+        setTimeout(()=>{ setTrophy(tr); confetti({ particleCount:220, spread:110, origin:{y:0.45}, colors:["#c8a415","#e95420","#D9A400","#fff"] }); }, 700);
       } else {
         // Avanza in fretta: il minuto scorre, non si sta fermi sulla vittoria.
         autoT.current = window.setTimeout(()=>nextRound(), 1100);
@@ -670,8 +670,8 @@ export default function Angoli() {
           <GameTutorial
             gameKey="angoli"
             steps={ANGOLI_INTRO_STEPS}
-            accentColor="#7c3aed"
-            darkBg="#2a1150"
+            accentColor="#e95420"
+            darkBg="#3c202f"
             dark={dark}
             onDone={() => {
               setShowTutorial(false);
@@ -969,7 +969,7 @@ export default function Angoli() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           user-select: none;
         }
 
@@ -977,7 +977,7 @@ export default function Angoli() {
         .ang-header {
           position: sticky; top:0; z-index:20; flex-shrink:0;
           width:100%; display:flex; align-items:center; justify-content:space-between;
-          padding:0 0.75rem; height:var(--hdr-h); background:#103820; color:#fff;
+          padding:0 0.75rem; height:var(--hdr-h); background:#2c001e; color:#fff;
           box-shadow:0 2px 16px rgba(0,0,0,0.22);
         }
         .ang-hdr-left { display:flex; align-items:center; }
@@ -1057,7 +1057,7 @@ export default function Angoli() {
           display:inline-flex; align-items:center; gap:.4rem;
           background:var(--green-dark); color:#fff;
           padding:.4em .7em; border-radius:var(--radius-sm);
-          font-family:var(--bs-font-monospace,"Roboto Mono",monospace);
+          font-family:var(--bs-font-monospace,"Ubuntu Mono",monospace);
           font-weight:500; font-size:1rem; line-height:1; letter-spacing:.02em;
           box-shadow:var(--shadow-key);
         }
@@ -1127,7 +1127,7 @@ export default function Angoli() {
           display:inline-flex; align-items:center; justify-content:center;
           background:var(--kbd-bg); border:1px solid var(--kbd-bd); border-bottom-width:2px;
           border-radius:var(--radius-sm); min-width:1.5rem; height:1.5rem; padding:0 0.35rem;
-          font-family:var(--bs-font-monospace,"Roboto Mono",monospace);
+          font-family:var(--bs-font-monospace,"Ubuntu Mono",monospace);
           font-size:0.82rem; font-weight:700; color:var(--kbd-fg);
         }
         .ang-kbd-up { color:var(--green); }
@@ -1153,8 +1153,8 @@ export default function Angoli() {
         /* ── Win reveal ── */
         .ang-win-reveal {
           display:flex; flex-direction:column; align-items:center; gap:0.25rem;
-          background:linear-gradient(160deg,rgba(47,125,74,0.08),rgba(217,164,0,0.06));
-          border:2px solid rgba(47,125,74,0.2); border-radius:12px;
+          background:linear-gradient(160deg,rgba(233, 84, 32,0.08),rgba(217,164,0,0.06));
+          border:2px solid rgba(233, 84, 32,0.2); border-radius:12px;
           padding:0.9rem 0.9rem;
           animation:ang-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
@@ -1164,7 +1164,7 @@ export default function Angoli() {
         .ang-wr-grid { display:flex; gap:0.4rem; width:100%; margin-top:0.5rem; }
         .ang-wr-cell {
           flex:1; display:flex; flex-direction:column; align-items:center; gap:0.1rem;
-          background:rgba(255,255,255,0.6); border:1px solid rgba(47,125,74,0.13);
+          background:rgba(255,255,255,0.6); border:1px solid rgba(233, 84, 32,0.13);
           border-radius:8px; padding:0.4rem 0.2rem;
         }
         .ang-wr-num { font-size:0.95rem; font-weight:800; color:var(--green-dark); font-variant-numeric:tabular-nums; }
@@ -1178,7 +1178,7 @@ export default function Angoli() {
           padding:5px 9px; border-radius:6px; font-size:.8rem;
           animation:ang-slide-in .22s ease;
         }
-        .ang-hrow--maggiore { background:rgba(47,125,74,0.09); border-left:3px solid var(--green); }
+        .ang-hrow--maggiore { background:rgba(233, 84, 32,0.09); border-left:3px solid var(--green); }
         .ang-hrow--minore   { background:rgba(192,57,43,0.09);  border-left:3px solid var(--absent); }
         .ang-hn { color:#6b8070; font-size:.7rem; width:22px; flex-shrink:0; }
         .ang-hv { font-weight:800; width:48px; flex-shrink:0; }

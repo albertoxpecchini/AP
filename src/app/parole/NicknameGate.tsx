@@ -60,7 +60,7 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
   };
 
   const card = dark ? "#15231c" : "#ffffff";
-  const bord = dark ? "rgba(95,208,154,0.22)" : "rgba(47,125,74,0.15)";
+  const bord = dark ? "rgba(95,208,154,0.22)" : "rgba(233, 84, 32,0.15)";
   const text = dark ? "#d4e8dc" : "#17271d";
   const sub  = dark ? "#a4c4aa" : "#4a5c50";
 
@@ -133,7 +133,7 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
       <style>{`
         .par-gate {
           position: fixed; inset: 0; z-index: 250;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           background: #f4f6f5;
           display: flex; flex-direction: column; align-items: center; justify-content: center;
           gap: 1.5rem; padding: 1.5rem; overflow-y: auto;
@@ -144,19 +144,19 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
 
         .par-gate-hero { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
         .par-gate-logo {
-          background:linear-gradient(140deg,#7c3aed 0%,#5b21b6 55%,#1a5030 130%); border-radius:20px; padding:14px; display:inline-flex;
+          background:linear-gradient(140deg,#e95420 0%,#a2330e 55%,#1a5030 130%); border-radius:20px; padding:14px; display:inline-flex;
           align-items:center; justify-content:center; width:74px; height:74px;
-          box-shadow:0 10px 32px rgba(91,33,182,0.4);
+          box-shadow:0 10px 32px rgba(162, 51, 14,0.4);
         }
-        .par-gate.dark .par-gate-logo { box-shadow:0 10px 32px rgba(91,33,182,0.5); }
+        .par-gate.dark .par-gate-logo { box-shadow:0 10px 32px rgba(162, 51, 14,0.5); }
         .par-gate-mark { font-size:2.2rem; font-weight:900; letter-spacing:.04em; color:#fff; line-height:1; }
         .par-gate-title {
           font-size:clamp(2.2rem,9vw,3rem); font-weight:900; letter-spacing:0.26em;
           margin:.4rem 0 0; line-height:1; color:#1a5030;
         }
         .par-gate.dark .par-gate-title { color:#6fe0a6; }
-        .par-gate-title span { color:#7c3aed; }
-        .par-gate.dark .par-gate-title span { color:#b794ff; }
+        .par-gate-title span { color:#e95420; }
+        .par-gate.dark .par-gate-title span { color:#f6a583; }
         .par-gate-tag { font-size:.9rem; color:#6b8070; margin:0; font-weight:600; }
         .par-gate.dark .par-gate-tag { color:#a4c4aa; }
 
@@ -172,12 +172,12 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         }
         .par-gate-inputwrap {
           display:flex; align-items:center; gap:.5rem;
-          border:2px solid rgba(47,125,74,0.25); border-radius:12px;
+          border:2px solid rgba(233, 84, 32,0.25); border-radius:12px;
           padding:.1rem .9rem; transition:border-color .15s, box-shadow .15s;
           background:rgba(0,0,0,0.015);
         }
-        .par-gate.dark .par-gate-inputwrap { background:rgba(255,255,255,0.03); border-color:rgba(155,92,246,0.3); }
-        .par-gate-inputwrap:focus-within { border-color:#7c3aed; box-shadow:0 0 0 .2rem rgba(124,58,237,.2); }
+        .par-gate.dark .par-gate-inputwrap { background:rgba(255,255,255,0.03); border-color:rgba(237, 113, 67,0.3); }
+        .par-gate-inputwrap:focus-within { border-color:#e95420; box-shadow:0 0 0 .2rem rgba(233, 84, 32,.2); }
         .par-gate-inputwrap.err { border-color:#c0392b; box-shadow:0 0 0 .2rem rgba(192,57,43,.15); }
         .par-gate-input {
           flex:1; min-width:0; border:none; outline:none; background:transparent;
@@ -192,9 +192,9 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         .par-gate-go {
           margin-top:.2rem; height:52px; width:100%;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          background:linear-gradient(100deg,#7c3aed 0%,#5b21b6 45%,#2F7D4A 100%); color:#fff; border:none; border-radius:13px;
+          background:linear-gradient(100deg,#e95420 0%,#a2330e 45%,#e95420 100%); color:#fff; border:none; border-radius:13px;
           font-family:inherit; font-size:1.1rem; font-weight:900; cursor:pointer;
-          box-shadow:0 6px 22px rgba(91,33,182,0.4); transition:filter .12s, transform .12s;
+          box-shadow:0 6px 22px rgba(162, 51, 14,0.4); transition:filter .12s, transform .12s;
         }
         .par-gate-go:hover { filter:brightness(.92); transform:translateY(-1px); }
         .par-gate-go:active { transform:scale(.98); }
@@ -217,16 +217,16 @@ export default function NicknameGate({ dark, initial = "", onConfirm }: Nickname
         }
         .par-gate-chip {
           display:inline-flex; align-items:center; gap:.3rem;
-          border:1.5px solid rgba(124,58,237,0.32); border-radius:999px;
-          background:rgba(124,58,237,0.07); color:#6d28d9;
+          border:1.5px solid rgba(233, 84, 32,0.32); border-radius:999px;
+          background:rgba(233, 84, 32,0.07); color:#cf4312;
           font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
           padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;
         }
         .par-gate.dark .par-gate-chip {
-          border-color:rgba(155,92,246,0.34); background:rgba(155,92,246,0.1); color:#c4a5ff;
+          border-color:rgba(237, 113, 67,0.34); background:rgba(237, 113, 67,0.1); color:#f6a583;
         }
-        .par-gate-chip:hover { background:rgba(124,58,237,0.15); transform:translateY(-1px); }
-        .par-gate.dark .par-gate-chip:hover { background:rgba(155,92,246,0.18); }
+        .par-gate-chip:hover { background:rgba(233, 84, 32,0.15); transform:translateY(-1px); }
+        .par-gate.dark .par-gate-chip:hover { background:rgba(237, 113, 67,0.18); }
         .par-gate-chip:active { transform:scale(.97); }
       `}</style>
     </div>

@@ -69,10 +69,10 @@ export default function SiteFooter() {
 
       <style>{`
         .apf-foot {
-          background: linear-gradient(180deg, #0b0f14 0%, #08090d 100%);
-          border-top: 1px solid rgba(139, 123, 255, 0.22);
-          color: #e8eef4;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          background: linear-gradient(180deg, #241c22 0%, #08090d 100%);
+          border-top: 1px solid rgba(233, 84, 32, 0.22);
+          color: #f5f3f1;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           padding: clamp(2rem, 4vw, 2.75rem) 0 clamp(1.6rem, 3vw, 2rem);
           position: relative; z-index: 2;
         }
@@ -88,18 +88,18 @@ export default function SiteFooter() {
           display: inline-block; font-size: 1.2rem; font-weight: 800; color: #ffffff;
           text-decoration: none; margin: 0 0 0.25rem;
         }
-        .apf-name:hover { color: #c4a5ff; }
-        .apf-role { margin: 0; color: #a7b2bd; font-size: 0.92rem; }
+        .apf-name:hover { color: #f6a583; }
+        .apf-role { margin: 0; color: #b3aca6; font-size: 0.92rem; }
         .apf-social { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
         .apf-social a {
           display: inline-flex; align-items: center; justify-content: center;
           width: 38px; height: 38px; border-radius: 50%;
           background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.10);
-          color: #a7b2bd; transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.15s;
+          color: #b3aca6; transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.15s;
         }
         .apf-social a:hover {
-          color: #ffffff; border-color: rgba(139, 123, 255, 0.45);
-          background: rgba(139, 123, 255, 0.14); transform: translateY(-2px);
+          color: #ffffff; border-color: rgba(233, 84, 32, 0.45);
+          background: rgba(233, 84, 32, 0.14); transform: translateY(-2px);
         }
         .apf-bottom {
           display: flex; align-items: center; justify-content: space-between;

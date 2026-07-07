@@ -191,23 +191,23 @@ export default function LanguageSwitcher() {
           left: max(16px, env(safe-area-inset-left));
           bottom: calc(max(16px, env(safe-area-inset-bottom)) + 84px);
           z-index: 2147483400;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
-          --apl-bg: rgba(18, 22, 30, 0.72);
-          --apl-bd: rgba(139, 123, 255, 0.32);
-          --apl-fg: #e8eef4;
-          --apl-muted: #a7b2bd;
-          --apl-accent: #8b7bff;
-          --apl-accent-deep: #5b4bd6;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
+          --apl-bg: rgba(30, 24, 29, 0.72);
+          --apl-bd: rgba(233, 84, 32, 0.32);
+          --apl-fg: #f5f3f1;
+          --apl-muted: #b3aca6;
+          --apl-accent: #e95420;
+          --apl-accent-deep: #bc3d10;
           --apl-shadow: rgba(0, 0, 0, 0.5);
         }
         :root[data-ap-theme="light"] .ap-lang-dock {
           --apl-bg: rgba(255, 255, 255, 0.82);
-          --apl-bd: rgba(109, 75, 214, 0.28);
-          --apl-fg: #4a2fb0;
-          --apl-muted: #6f6391;
-          --apl-accent: #6d4bd6;
-          --apl-accent-deep: #4a2fb0;
-          --apl-shadow: rgba(80, 60, 160, 0.18);
+          --apl-bd: rgba(194, 65, 12, 0.28);
+          --apl-fg: #9a3412;
+          --apl-muted: #756a61;
+          --apl-accent: #c2410c;
+          --apl-accent-deep: #9a3412;
+          --apl-shadow: rgba(90, 45, 18, 0.18);
         }
 
         /* ── Pillola compatta ── */
@@ -233,7 +233,7 @@ export default function LanguageSwitcher() {
           list-style: none; margin: 0; padding: 7px;
           min-width: 184px; border-radius: 16px;
           background: var(--apl-bg); border: 1px solid var(--apl-bd);
-          box-shadow: 0 18px 44px var(--apl-shadow), 0 0 0 1px rgba(139, 123, 255, 0.06);
+          box-shadow: 0 18px 44px var(--apl-shadow), 0 0 0 1px rgba(233, 84, 32, 0.06);
           -webkit-backdrop-filter: blur(16px) saturate(150%);
           backdrop-filter: blur(16px) saturate(150%);
           transform-origin: bottom left;
@@ -250,13 +250,13 @@ export default function LanguageSwitcher() {
         .ap-lang-opt:hover { color: var(--apl-accent); }
         .ap-lang-opt:hover::before {
           content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 11px;
-          background: rgba(139, 123, 255, 0.10);
+          background: rgba(233, 84, 32, 0.10);
         }
         .ap-lang-opt-code {
           display: inline-flex; align-items: center; justify-content: center;
           width: 30px; height: 24px; flex-shrink: 0; border-radius: 7px;
           font-weight: 800; font-size: 0.72rem; letter-spacing: 0.04em;
-          background: rgba(139, 123, 255, 0.14); border: 1px solid var(--apl-bd);
+          background: rgba(233, 84, 32, 0.14); border: 1px solid var(--apl-bd);
           color: var(--apl-fg);
         }
         .ap-lang-opt-name { font-weight: 600; flex: 1 1 auto; }
@@ -268,7 +268,7 @@ export default function LanguageSwitcher() {
         /* indicatore "attivo" che scorre tra le voci */
         .ap-lang-ink {
           position: absolute; inset: 0; z-index: -1; border-radius: 11px;
-          background: rgba(139, 123, 255, 0.16);
+          background: rgba(233, 84, 32, 0.16);
           border: 1px solid var(--apl-bd);
         }
 
@@ -280,11 +280,11 @@ export default function LanguageSwitcher() {
           will-change: clip-path, opacity;
           display: flex; align-items: center; justify-content: center;
           background:
-            radial-gradient(120% 120% at 18% 88%, #8b7bff 0%, #6d4bd6 45%, #3f2da8 100%);
+            radial-gradient(120% 120% at 18% 88%, #e95420 0%, #c2410c 45%, #3f2da8 100%);
         }
         .ap-lang-wipe-badge {
           display: flex; flex-direction: column; align-items: center; gap: 10px;
-          color: #fff; font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          color: #fff; font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           transform: scale(0.7); opacity: 0;
           transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
         }

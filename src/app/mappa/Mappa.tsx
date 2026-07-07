@@ -93,11 +93,11 @@ function AccountVisual() {
 function ServerVisual() {
   return (
     <svg viewBox="0 0 220 150" aria-hidden="true" className="mptv-srv" style={{ width: "100%", height: "100%" }} preserveAspectRatio="xMidYMid meet">
-      <circle cx="110" cy="75" r="44" fill="none" stroke="#2F7D4A" strokeWidth="4" />
-      <ellipse cx="110" cy="75" rx="18" ry="44" fill="none" stroke="#7c3aed" strokeWidth="3.5" />
-      <line x1="66" y1="75" x2="154" y2="75" stroke="#7c3aed" strokeWidth="3.5" />
+      <circle cx="110" cy="75" r="44" fill="none" stroke="#e95420" strokeWidth="4" />
+      <ellipse cx="110" cy="75" rx="18" ry="44" fill="none" stroke="#e95420" strokeWidth="3.5" />
+      <line x1="66" y1="75" x2="154" y2="75" stroke="#e95420" strokeWidth="3.5" />
       {[0, 1, 2].map(i => (
-        <circle key={i} className="mptv-srv-dot" style={{ animationDelay: `${i * 0.25}s` }} cx={40 + i * 70} cy={i === 1 ? 28 : 122} r="6" fill="#9b5cf6" />
+        <circle key={i} className="mptv-srv-dot" style={{ animationDelay: `${i * 0.25}s` }} cx={40 + i * 70} cy={i === 1 ? 28 : 122} r="6" fill="#ed7143" />
       ))}
     </svg>
   );
@@ -110,7 +110,7 @@ function MapVisual() {
       <path d="M40 14 L52 136" stroke="#2a4636" strokeWidth="6" />
       <path d="M150 14 L138 136" stroke="#2a4636" strokeWidth="6" />
       <g className="mptv-map-pin">
-        <path d="M110 52c-9 0-15 6-15 15 0 11 15 26 15 26s15-15 15-26c0-9-6-15-15-15z" fill="#7c3aed" stroke="#fff" strokeWidth="2.5" />
+        <path d="M110 52c-9 0-15 6-15 15 0 11 15 26 15 26s15-15 15-26c0-9-6-15-15-15z" fill="#e95420" stroke="#fff" strokeWidth="2.5" />
         <circle cx="110" cy="67" r="5" fill="#fff" />
       </g>
     </svg>
@@ -134,12 +134,12 @@ const MAPPA_INTRO_STEPS: IntroStep[] = [
 
 const MAPPA_TUTORIAL_CSS = `
   .mptv-acc { display:flex; flex-direction:column; align-items:center; gap:.8rem; }
-  .mptv-acc-card { display:flex; align-items:center; gap:.7rem; background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); border-radius:14px; padding:.8rem 1rem; animation:mptv-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
-  .mptv-acc-ava { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#5b21b6); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.4rem; }
+  .mptv-acc-card { display:flex; align-items:center; gap:.7rem; background:rgba(233, 84, 32,0.1); border:1px solid rgba(233, 84, 32,0.25); border-radius:14px; padding:.8rem 1rem; animation:mptv-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
+  .mptv-acc-ava { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,#e95420,#a2330e); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.4rem; }
   .mptv-acc-bars { display:flex; flex-direction:column; gap:.35rem; }
-  .mptv-acc-bars span { display:block; height:8px; border-radius:99px; background:rgba(124,58,237,0.4); }
+  .mptv-acc-bars span { display:block; height:8px; border-radius:99px; background:rgba(233, 84, 32,0.4); }
   .mptv-acc-bars span:nth-child(1){ width:72px; } .mptv-acc-bars span:nth-child(2){ width:48px; opacity:.6; }
-  .mptv-acc-chip { font-size:.85rem; font-weight:800; color:#6d28d9; background:#fff; border:1.5px solid rgba(124,58,237,0.3); border-radius:999px; padding:.25rem .8rem; opacity:0; animation:mptv-fade .4s ease .4s forwards; }
+  .mptv-acc-chip { font-size:.85rem; font-weight:800; color:#cf4312; background:#fff; border:1.5px solid rgba(233, 84, 32,0.3); border-radius:999px; padding:.25rem .8rem; opacity:0; animation:mptv-fade .4s ease .4s forwards; }
 
   .mptv-srv .mptv-srv-dot { opacity:0; transform-box:fill-box; transform-origin:center; animation:mptv-pop .5s cubic-bezier(.34,1.7,.5,1) infinite alternate; }
 
@@ -147,11 +147,11 @@ const MAPPA_TUTORIAL_CSS = `
   @keyframes mptv-drop { 0%{ transform:translateY(-30px) scale(.6); opacity:0; } 60%{ opacity:1; } 100%{ transform:translateY(0) scale(1); opacity:1; } }
 
   .mptv-guess { display:flex; flex-direction:column; align-items:center; gap:.7rem; }
-  .mptv-guess-field { display:flex; align-items:center; gap:.5rem; background:#fff; border:2px solid #7c3aed; border-radius:12px; padding:.6rem 1rem; color:#17271d; box-shadow:0 4px 14px rgba(124,58,237,0.2); }
+  .mptv-guess-field { display:flex; align-items:center; gap:.5rem; background:#fff; border:2px solid #e95420; border-radius:12px; padding:.6rem 1rem; color:#17271d; box-shadow:0 4px 14px rgba(233, 84, 32,0.2); }
   .mptv-guess-text { font-size:1.1rem; font-weight:800; }
-  .mptv-guess-caret { width:2px; height:20px; background:#7c3aed; animation:mptv-blink 1s steps(2) infinite; }
+  .mptv-guess-caret { width:2px; height:20px; background:#e95420; animation:mptv-blink 1s steps(2) infinite; }
   @keyframes mptv-blink { 50%{ opacity:0; } }
-  .mptv-guess-ok { font-size:1rem; font-weight:900; color:#2F7D4A; opacity:0; animation:mptv-fade .4s ease .6s forwards; }
+  .mptv-guess-ok { font-size:1rem; font-weight:900; color:#e95420; opacity:0; animation:mptv-fade .4s ease .6s forwards; }
 
   @keyframes mptv-pop { from{ opacity:0; transform:scale(0); } to{ opacity:1; transform:scale(1); } }
   @keyframes mptv-fade { to{ opacity:1; } }
@@ -416,7 +416,7 @@ export default function Mappa() {
       setFound(f => f + 1);
       setLastOk(true);
       setPhase("reveal");
-      confetti({ particleCount: attemptUsed === 1 ? 110 : 60, spread: 72, origin: { y: 0.5 }, colors: ["#7c3aed", "#b794ff", "#fff", "#2F7D4A"] });
+      confetti({ particleCount: attemptUsed === 1 ? 110 : 60, spread: 72, origin: { y: 0.5 }, colors: ["#e95420", "#f6a583", "#fff", "#e95420"] });
     } else {
       const left = attemptsLeft - 1;
       setAttemptsLeft(left);
@@ -478,7 +478,7 @@ export default function Mappa() {
       localStorage.setItem("mappa-trophies", JSON.stringify(upd));
       autoT.current = window.setTimeout(() => {
         setTrophy(tr);
-        confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#7c3aed", "#b794ff", "#fff"] });
+        confetti({ particleCount: 220, spread: 110, origin: { y: 0.45 }, colors: ["#c8a415", "#e95420", "#f6a583", "#fff"] });
       }, 650);
     }
 
@@ -558,8 +558,8 @@ export default function Mappa() {
           <GameTutorial
             gameKey="mappa"
             steps={MAPPA_INTRO_STEPS}
-            accentColor="#7c3aed"
-            darkBg="#2a1150"
+            accentColor="#e95420"
+            darkBg="#3c202f"
             dark={dark}
             onDone={onTutorialDone}
           />
@@ -741,22 +741,22 @@ export default function Mappa() {
       <style>{`
         .map-page {
           /* ── Palette stile TRIVIA: VIOLA (accento) + VERDE (secondario) ── */
-          --pv:#7c3aed; --pv2:#6024c4; --pv3:#9b5cf6; --pv-ink:#6d28d9;
-          --green:#2F7D4A; --green-dark:#1F6B3D; --gold:#D9A400;
+          --pv:#e95420; --pv2:#bc3d10; --pv3:#ed7143; --pv-ink:#cf4312;
+          --green:#e95420; --green-dark:#c2410c; --gold:#D9A400;
           --absent:hsl(350,60%,50%);
           --radius:8px; --radius-sm:4px;
-          --focus-ring:0 0 0 .25rem rgba(124,58,237,.25);
+          --focus-ring:0 0 0 .25rem rgba(233, 84, 32,.25);
           --shadow-key:0 .125rem .25rem rgba(0,0,0,.075);
           --shadow-card:0 .5rem 1rem rgba(0,0,0,.12);
           --hdr-h:52px;
-          --surface:#f4f6f5; --panel:#ffffff; --panel-bd:rgba(124,58,237,0.16);
+          --surface:#f4f6f5; --panel:#ffffff; --panel-bd:rgba(233, 84, 32,0.16);
           --stage-bg:#f1edf9; --text:#17271d; --text-soft:#4a4458;
-          --stat-bg:rgba(124,58,237,0.06); --stat-bd:rgba(124,58,237,0.16);
+          --stat-bg:rgba(233, 84, 32,0.06); --stat-bd:rgba(233, 84, 32,0.16);
 
           height:100dvh; overflow:hidden;
           background:var(--surface); color:var(--text);
           display:flex; flex-direction:column; align-items:center;
-          font-family:"Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family:"Ubuntu", Geneva, Tahoma, sans-serif;
           user-select:none;
         }
 
@@ -765,7 +765,7 @@ export default function Mappa() {
           position:sticky; top:0; z-index:20; flex-shrink:0;
           width:100%; display:flex; align-items:center; justify-content:space-between;
           padding:0 0.75rem; height:var(--hdr-h);
-          background:linear-gradient(100deg,#7c3aed 0%,#5b21b6 45%,#103820 120%); color:#fff;
+          background:linear-gradient(100deg,#e95420 0%,#a2330e 45%,#2c001e 120%); color:#fff;
           box-shadow:0 2px 16px rgba(0,0,0,0.22);
         }
         .map-hdr-left { display:flex; align-items:center; gap:0.5rem; }
@@ -780,7 +780,7 @@ export default function Mappa() {
         }
         .map-mode-pill:hover { background:rgba(255,255,255,0.22); }
         .map-title { font-size:1.4rem; font-weight:800; letter-spacing:0.14em; margin:0; }
-        .map-accent { color:#b794ff; }
+        .map-accent { color:#f6a583; }
         .map-iconbtn {
           display:inline-flex; align-items:center; justify-content:center;
           width:36px; height:36px; border-radius:50%;
@@ -821,13 +821,13 @@ export default function Mappa() {
         .map-maperr { color:var(--absent); }
         .map-spinner {
           width:28px; height:28px; border-radius:50%;
-          border:3px solid rgba(124,58,237,0.25); border-top-color:#7c3aed;
+          border:3px solid rgba(233, 84, 32,0.25); border-top-color:#e95420;
           animation:map-spin .8s linear infinite;
         }
         @keyframes map-spin { to { transform:rotate(360deg); } }
         .map-mapover {
           position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-          background:radial-gradient(ellipse at center, rgba(124,58,237,0.08), var(--stage-bg) 70%);
+          background:radial-gradient(ellipse at center, rgba(233, 84, 32,0.08), var(--stage-bg) 70%);
         }
 
         .map-round-badge {
@@ -840,7 +840,7 @@ export default function Mappa() {
         .map-attempt-badge {
           position:absolute; top:8px; right:10px; z-index:2;
           font-size:0.78rem; font-weight:800; color:#fff;
-          background:rgba(124,58,237,0.85); border-radius:999px; padding:0.16rem 0.55rem;
+          background:rgba(233, 84, 32,0.85); border-radius:999px; padding:0.16rem 0.55rem;
           box-shadow:var(--shadow-key);
         }
 
@@ -903,16 +903,16 @@ export default function Mappa() {
           font-size:0.74rem; font-weight:800; border-radius:999px; padding:0.2rem 0.6rem;
           background:rgba(192,57,43,0.1); color:#c0392b; border:1px solid rgba(192,57,43,0.25);
         }
-        .map-guesschip.ok { background:rgba(47,125,74,0.12); color:var(--green); border-color:rgba(47,125,74,0.3); }
+        .map-guesschip.ok { background:rgba(233, 84, 32,0.12); color:var(--green); border-color:rgba(233, 84, 32,0.3); }
 
         /* ── Reveal ── */
         .map-reveal {
           display:flex; flex-direction:column; align-items:center; gap:0.15rem;
-          background:linear-gradient(160deg,rgba(124,58,237,0.1),rgba(47,125,74,0.06));
-          border:2px solid rgba(124,58,237,0.22); border-radius:12px; padding:0.9rem;
+          background:linear-gradient(160deg,rgba(233, 84, 32,0.1),rgba(233, 84, 32,0.06));
+          border:2px solid rgba(233, 84, 32,0.22); border-radius:12px; padding:0.9rem;
           animation:map-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
-        .map-reveal.miss { background:linear-gradient(160deg,rgba(192,57,43,0.1),rgba(124,58,237,0.05)); border-color:rgba(192,57,43,0.25); }
+        .map-reveal.miss { background:linear-gradient(160deg,rgba(192,57,43,0.1),rgba(233, 84, 32,0.05)); border-color:rgba(192,57,43,0.25); }
         .map-reveal-flag { font-size:1.8rem; line-height:1; font-weight:900; color:var(--green); animation:map-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
         .map-reveal.miss .map-reveal-flag { color:#c0392b; }
         .map-reveal-lbl { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-soft); }
@@ -926,12 +926,12 @@ export default function Mappa() {
         .map-next {
           width:100%; height:48px;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%); color:#fff; border:none;
+          background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%); color:#fff; border:none;
           border-radius:var(--radius-sm); font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer;
-          box-shadow:0 6px 20px rgba(91,33,182,0.4);
+          box-shadow:0 6px 20px rgba(162, 51, 14,0.4);
           transition:filter .15s,transform .1s,box-shadow .15s;
         }
-        .map-next:hover { filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 10px 28px rgba(91,33,182,0.5); }
+        .map-next:hover { filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 10px 28px rgba(162, 51, 14,0.5); }
         .map-next:focus-visible { outline:none; box-shadow:var(--focus-ring); }
         .map-next:active { transform:scale(.98); }
         .map-next:disabled { opacity:0.5; cursor:not-allowed; filter:none; transform:none; box-shadow:none; }
@@ -942,8 +942,8 @@ export default function Mappa() {
         .map-panel--over { gap:0.6rem; }
         .map-over {
           display:flex; flex-direction:column; align-items:center; gap:0.1rem;
-          background:linear-gradient(160deg,rgba(124,58,237,0.08),rgba(47,125,74,0.06));
-          border:2px solid rgba(124,58,237,0.18); border-radius:12px; padding:1rem 0.9rem 0.85rem;
+          background:linear-gradient(160deg,rgba(233, 84, 32,0.08),rgba(233, 84, 32,0.06));
+          border:2px solid rgba(233, 84, 32,0.18); border-radius:12px; padding:1rem 0.9rem 0.85rem;
           animation:map-slide-up .35s cubic-bezier(.34,1.56,.64,1);
         }
         .map-over-emoji { font-size:2.4rem; line-height:1; animation:map-pop .5s cubic-bezier(.34,1.7,.5,1) both; }
@@ -951,7 +951,7 @@ export default function Mappa() {
         .map-over-total { font-size:2.6rem; font-weight:900; line-height:1; color:var(--pv); font-variant-numeric:tabular-nums; margin-top:.1rem; }
         .map-over-pts { font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#6b8070; }
         .map-wr-grid { display:flex; gap:0.4rem; width:100%; margin-top:0.6rem; }
-        .map-wr-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.1rem; background:rgba(255,255,255,0.6); border:1px solid rgba(47,125,74,0.13); border-radius:8px; padding:0.4rem 0.2rem; }
+        .map-wr-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.1rem; background:rgba(255,255,255,0.6); border:1px solid rgba(233, 84, 32,0.13); border-radius:8px; padding:0.4rem 0.2rem; }
         .map-wr-num { font-size:0.92rem; font-weight:800; color:var(--green-dark); font-variant-numeric:tabular-nums; }
         .map-wr-sub { font-size:0.55rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#6b8070; }
 
@@ -977,29 +977,29 @@ export default function Mappa() {
 
         /* ════════════════ DARK MODE (viola+verde, base Trivia) ════════════════ */
         .map-page.dark {
-          --pv:#9b5cf6; --pv2:#7c3aed; --pv3:#b794ff; --pv-ink:#c4a5ff;
+          --pv:#ed7143; --pv2:#e95420; --pv3:#f6a583; --pv-ink:#f6a583;
           --green:#2f9e63; --green-dark:#6fe0a6; --gold:#e8c34a;
-          --surface:#0e0a16; --panel:#15231c; --panel-bd:rgba(155,92,246,0.22);
-          --stage-bg:#140e22; --text:#e7def7; --text-soft:#b6a9cf;
-          --stat-bg:rgba(155,92,246,0.10); --stat-bd:rgba(155,92,246,0.22);
+          --surface:#171114; --panel:#15231c; --panel-bd:rgba(237, 113, 67,0.22);
+          --stage-bg:#140e22; --text:#f5ede8; --text-soft:#c9bcb4;
+          --stat-bg:rgba(237, 113, 67,0.10); --stat-bd:rgba(237, 113, 67,0.22);
           --shadow-card:0 .5rem 1.25rem rgba(0,0,0,0.45);
           --shadow-key:0 .125rem .25rem rgba(0,0,0,0.25);
         }
-        .map-page.dark .map-header { background:linear-gradient(100deg,#4c1d95 0%,#2a1150 55%,#0a1410 130%); }
+        .map-page.dark .map-header { background:linear-gradient(100deg,#7e2708 0%,#3c202f 55%,#0a1410 130%); }
         .map-page.dark .map-stage  { background:radial-gradient(ellipse at 38% 42%, #1c1233 0%, var(--surface) 72%); }
-        .map-page.dark .map-card-stat { color:#c4a5ff; }
-        .map-page.dark .map-card-stat-ico { color:#c4a5ff; }
-        .map-page.dark .map-reveal { background:linear-gradient(160deg,rgba(155,92,246,0.16),rgba(47,158,99,0.08)); border-color:rgba(155,92,246,0.28); }
-        .map-page.dark .map-reveal.miss { background:linear-gradient(160deg,rgba(192,57,43,0.16),rgba(155,92,246,0.06)); border-color:rgba(192,57,43,0.32); }
-        .map-page.dark .map-wr-num { color:#c4a5ff; }
-        .map-page.dark .map-wr-cell { background:rgba(255,255,255,0.04); border-color:rgba(155,92,246,0.22); }
-        .map-page.dark .map-wr-sub { color:#b6a9cf; }
-        .map-page.dark .map-over { background:linear-gradient(160deg,rgba(155,92,246,0.16),rgba(47,158,99,0.08)); border-color:rgba(155,92,246,0.28); }
-        .map-page.dark .map-over-pts { color:#b6a9cf; }
+        .map-page.dark .map-card-stat { color:#f6a583; }
+        .map-page.dark .map-card-stat-ico { color:#f6a583; }
+        .map-page.dark .map-reveal { background:linear-gradient(160deg,rgba(237, 113, 67,0.16),rgba(47,158,99,0.08)); border-color:rgba(237, 113, 67,0.28); }
+        .map-page.dark .map-reveal.miss { background:linear-gradient(160deg,rgba(192,57,43,0.16),rgba(237, 113, 67,0.06)); border-color:rgba(192,57,43,0.32); }
+        .map-page.dark .map-wr-num { color:#f6a583; }
+        .map-page.dark .map-wr-cell { background:rgba(255,255,255,0.04); border-color:rgba(237, 113, 67,0.22); }
+        .map-page.dark .map-wr-sub { color:#c9bcb4; }
+        .map-page.dark .map-over { background:linear-gradient(160deg,rgba(237, 113, 67,0.16),rgba(47,158,99,0.08)); border-color:rgba(237, 113, 67,0.28); }
+        .map-page.dark .map-over-pts { color:#c9bcb4; }
         .map-page.dark .map-guesschip { background:rgba(192,57,43,0.18); border-color:rgba(192,57,43,0.35); color:#ef9a93; }
         .map-page.dark .map-guesschip.ok { background:rgba(47,158,99,0.18); border-color:rgba(47,158,99,0.35); color:#7fd3a5; }
-        .map-page.dark .map-tcard { background:#1a1230; }
-        .map-page.dark .map-tdesc { color:#b6a9cf; }
+        .map-page.dark .map-tcard { background:#291d26; }
+        .map-page.dark .map-tdesc { color:#c9bcb4; }
         .map-page.dark .map-tsub  { color:var(--text); }
 
         /* ── Trophy overlay ── */
@@ -1013,7 +1013,7 @@ export default function Mappa() {
         .map-tbody { padding:1.1rem 1.4rem; }
         .map-tdesc { color:#6b8070; font-size:.9rem; margin-bottom:.35rem; }
         .map-tsub  { font-weight:700; color:#17271d; margin-bottom:.9rem; font-size:.88rem; }
-        .map-tcta  { width:100%; padding:.8rem 1.4rem; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:linear-gradient(100deg,#7c3aed 0%,#6024c4 55%,#9b5cf6 130%); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:filter .15s; }
+        .map-tcta  { width:100%; padding:.8rem 1.4rem; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:linear-gradient(100deg,#e95420 0%,#bc3d10 55%,#ed7143 130%); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:filter .15s; }
         .map-tcta:hover { filter:brightness(1.08); }
       `}</style>
       <SiteFooter />

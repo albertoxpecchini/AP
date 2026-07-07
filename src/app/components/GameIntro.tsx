@@ -74,7 +74,7 @@ export default function GameTutorial({
   }, [next, prev, finish]);
 
   const cardBg     = dark ? "#1a2720" : "#ffffff";
-  const cardBorder = dark ? "rgba(47,125,74,0.22)" : "rgba(47,125,74,0.18)";
+  const cardBorder = dark ? "rgba(233, 84, 32,0.22)" : "rgba(233, 84, 32,0.18)";
   const textMain   = dark ? "#d4e8dc" : "#17271d";
   const textSub    = dark ? "#a4c4aa" : "#3c4a41";
   const visualBg   = dark ? "#0f1612" : "#f4f6f5";
@@ -87,7 +87,7 @@ export default function GameTutorial({
       style={{
         position: "fixed", inset: 0, zIndex: 300,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: '"Titillium Web", Geneva, Tahoma, sans-serif',
+        fontFamily: '"Ubuntu", Geneva, Tahoma, sans-serif',
         padding: "1rem",
         opacity: exiting ? 0 : 1,
         transition: "opacity 0.36s ease",

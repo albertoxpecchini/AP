@@ -6,7 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
       <title>Alberto Pecchini — Designer & Developer</title>
       <meta name="description" content="Alberto Pecchini, studente CAT e front-end developer di Mantova. Web design, sviluppo front-end e branding digitale." />
-      <meta name="theme-color" content="#2F7D4A" />
+      <meta name="theme-color" content="#e95420" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="apple-mobile-web-app-title" content="Alberto Pecchini" />
@@ -19,8 +19,8 @@
       <link rel="stylesheet" href="/bootstrap-italia/css/bootstrap-italia.min.css" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      <!-- Caratteri ufficiali del Design System (Bootstrap Italia): Titillium Web, Lora, Roboto Mono -->
-      <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&family=Lora:wght@400;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+      <!-- Caratteri del sito in stile Ubuntu: Ubuntu + Ubuntu Mono (Lora resta solo per /festa) -->
+      <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&family=Lora:wght@400;600&display=swap" rel="stylesheet" />
       <!-- Tema globale: calcolato PRIMA del primo paint per evitare il flash.
            mode "manuale" → ultima scelta; altrimenti il sensore orario
            (08:00–19:59 chiaro, il resto scuro). -->
@@ -38,7 +38,7 @@
             var de = document.documentElement;
             de.classList.toggle("dark", theme === "dark");
             de.setAttribute("data-ap-theme", theme);
-            de.style.setProperty("--ap-boot-bg", theme === "dark" ? "#090c10" : "#f7f5fd");
+            de.style.setProperty("--ap-boot-bg", theme === "dark" ? "#1b151a" : "#faf8f6");
             localStorage.setItem("games-dark", theme === "dark" ? "1" : "0");
             localStorage.setItem("ms-theme", theme);
           } catch (e) {}
@@ -46,7 +46,7 @@
       </script>
       <!-- Sfondo fisso fin dal primo paint: evita il flash nero/bianco quando si
            cambia rotta (es. dal gioco → home) prima che React monti. -->
-      <style>html, body { height: 100%; margin: 0; background: var(--ap-boot-bg, #F7F5F0); } #root { height: 100%; }</style>
+      <style>html, body { height: 100%; margin: 0; background: var(--ap-boot-bg, #faf8f6); } #root { height: 100%; }</style>
     </head>
 
     <body>

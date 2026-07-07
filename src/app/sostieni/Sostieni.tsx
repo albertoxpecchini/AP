@@ -116,8 +116,8 @@ export default function Sostieni() {
     // Onde viola "dark premium" in scuro, lavanda chiara in tema chiaro.
     const optsFor = (t: Theme) =>
       t === "light"
-        ? { color: 0x8e74e6, shininess: 55, waveHeight: 16, waveSpeed: 0.55, zoom: 0.92 }
-        : { color: 0x342a7a, shininess: 30, waveHeight: 18, waveSpeed: 0.62, zoom: 0.86 };
+        ? { color: 0xe95420, shininess: 55, waveHeight: 16, waveSpeed: 0.55, zoom: 0.92 }
+        : { color: 0x5e2750, shininess: 30, waveHeight: 18, waveSpeed: 0.62, zoom: 0.86 };
 
     (async () => {
       try {
@@ -414,21 +414,21 @@ export default function Sostieni() {
 
       <style>{`
         .sos-page {
-          --accent: #8b7bff; --accent-deep: #5b4bd6;
-          --ink: #c4a5ff; --glow: rgba(139, 123, 255, 0.45);
-          --text: #e8eef4; --text-strong: #ffffff; --sub: #a7b2bd;
+          --accent: #e95420; --accent-deep: #bc3d10;
+          --ink: #f6a583; --glow: rgba(233, 84, 32, 0.45);
+          --text: #f5f3f1; --text-strong: #ffffff; --sub: #b3aca6;
           --surface: rgba(255, 255, 255, 0.05);
           --surface-bd: rgba(255, 255, 255, 0.10);
-          --vio-soft: rgba(139, 123, 255, 0.10);
-          --vio-bd: rgba(139, 123, 255, 0.28);
+          --vio-soft: rgba(233, 84, 32, 0.10);
+          --vio-bd: rgba(233, 84, 32, 0.28);
           --field-bg: rgba(0, 0, 0, 0.25); --field-bd: rgba(255, 255, 255, 0.12);
           --win-bg: rgba(20, 24, 34, 0.62); --win-bar: rgba(255, 255, 255, 0.04);
           --card-shadow: rgba(0, 0, 0, 0.45);
           --gold: #f5b301; --gold-bd: rgba(245, 179, 1, 0.34); --gold-soft: rgba(245, 179, 1, 0.10);
           position: relative; min-height: 100vh; overflow-x: clip;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           color: var(--text);
-          background: linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+          background: linear-gradient(180deg, #241c22 0%, #1b151a 100%);
           transition: background 0.4s ease, color 0.4s ease;
         }
         .sos-wrap { width: 100%; max-width: 920px; margin: 0 auto; padding-left: 1.4rem; padding-right: 1.4rem; }
@@ -440,7 +440,7 @@ export default function Sostieni() {
         .sos-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(9,12,16,0.42) 0%, rgba(9,12,16,0.12) 32%, rgba(9,12,16,0.6) 100%); }
 
         /* ── Header ── */
-        .sos-hdr { position: sticky; top: 0; z-index: 30; background: rgba(10, 13, 17, 0.7); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid var(--surface-bd); }
+        .sos-hdr { position: sticky; top: 0; z-index: 30; background: rgba(28, 22, 27, 0.7); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid var(--surface-bd); }
         .sos-hdr-inner { display: flex; align-items: center; justify-content: space-between; height: 62px; }
         .sos-back { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--sub); text-decoration: none; font-weight: 700; font-size: 1rem; transition: color 0.15s; }
         .sos-back:hover { color: var(--text-strong); }
@@ -553,14 +553,14 @@ export default function Sostieni() {
 
         /* ═══ TEMA CHIARO ═══ */
         html[data-ap-theme="light"] .sos-page {
-          --accent: #6d4bd6; --accent-deep: #4a2fb0;
-          --ink: #5b34c9; --glow: rgba(109, 75, 214, 0.26);
-          --text: #221838; --text-strong: #170d3a; --sub: #574a78;
-          --surface: #ffffff; --surface-bd: rgba(109, 75, 214, 0.16);
-          --vio-soft: rgba(109, 75, 214, 0.10); --vio-bd: rgba(109, 75, 214, 0.28);
-          --field-bg: #f6f3fd; --field-bd: rgba(109, 75, 214, 0.20);
-          --win-bg: rgba(255, 255, 255, 0.7); --win-bar: rgba(109, 75, 214, 0.05);
-          --card-shadow: rgba(80, 60, 160, 0.14);
+          --accent: #c2410c; --accent-deep: #9a3412;
+          --ink: #a63a0d; --glow: rgba(194, 65, 12, 0.26);
+          --text: #3d3846; --text-strong: #241f31; --sub: #6e6259;
+          --surface: #ffffff; --surface-bd: rgba(194, 65, 12, 0.16);
+          --vio-soft: rgba(194, 65, 12, 0.10); --vio-bd: rgba(194, 65, 12, 0.28);
+          --field-bg: #f6f3fd; --field-bd: rgba(194, 65, 12, 0.20);
+          --win-bg: rgba(255, 255, 255, 0.7); --win-bar: rgba(194, 65, 12, 0.05);
+          --card-shadow: rgba(90, 45, 18, 0.14);
           --gold: #b9810a; --gold-bd: rgba(185, 129, 10, 0.32); --gold-soft: rgba(245, 179, 1, 0.14);
           background: linear-gradient(180deg, #ffffff 0%, #f5f2fd 100%);
         }

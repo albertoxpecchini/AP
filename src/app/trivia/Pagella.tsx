@@ -119,25 +119,25 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
       )}
 
       <style>{`
-        .pag { font-family:"Titillium Web", Geneva, Tahoma, sans-serif; }
+        .pag { font-family:"Ubuntu", Geneva, Tahoma, sans-serif; }
 
         .pag-summary {
           display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-bottom:.9rem;
         }
         .pag-sum-item {
           display:flex; flex-direction:column; align-items:center; gap:.1rem;
-          background:rgba(124,58,237,0.06); border:1px solid rgba(124,58,237,0.16);
+          background:rgba(233, 84, 32,0.06); border:1px solid rgba(233, 84, 32,0.16);
           border-radius:13px; padding:.6rem .3rem;
         }
-        .pag.dark .pag-sum-item { background:rgba(155,92,246,0.1); border-color:rgba(155,92,246,0.2); }
-        .pag-sum-item b { font-size:1.15rem; font-weight:900; color:#6d28d9; font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
-        .pag.dark .pag-sum-item b { color:#c4a5ff; }
+        .pag.dark .pag-sum-item { background:rgba(237, 113, 67,0.1); border-color:rgba(237, 113, 67,0.2); }
+        .pag-sum-item b { font-size:1.15rem; font-weight:900; color:#cf4312; font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+        .pag.dark .pag-sum-item b { color:#f6a583; }
         .pag-sum-item small { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:#6b8070; }
         .pag.dark .pag-sum-item small { color:#8fc7a6; }
 
         .pag-list { display:flex; flex-direction:column; gap:.7rem; }
         .pag-subj {
-          border:1px solid rgba(47,125,74,0.14); border-radius:14px; padding:.7rem .75rem .8rem;
+          border:1px solid rgba(233, 84, 32,0.14); border-radius:14px; padding:.7rem .75rem .8rem;
           background:rgba(0,0,0,0.012);
         }
         .pag.dark .pag-subj { border-color:rgba(95,208,154,0.16); background:rgba(255,255,255,0.02); }
@@ -156,12 +156,12 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
           background:#fff; text-align:center;
         }
         .pag.dark .pag-cell { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.07); }
-        .pag-cell.todo { border-style:dashed; border-color:rgba(124,58,237,0.4); background:rgba(124,58,237,0.04); }
-        .pag.dark .pag-cell.todo { border-color:rgba(155,92,246,0.4); background:rgba(155,92,246,0.07); }
+        .pag-cell.todo { border-style:dashed; border-color:rgba(233, 84, 32,0.4); background:rgba(233, 84, 32,0.04); }
+        .pag.dark .pag-cell.todo { border-color:rgba(237, 113, 67,0.4); background:rgba(237, 113, 67,0.07); }
         .pag-cell-type { font-size:.58rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#9aa89e; }
         .pag-cell-grade { font-size:1.5rem; font-weight:900; line-height:1; letter-spacing:-.02em; }
-        .pag-cell-na { font-size:.82rem; font-weight:800; color:#7c3aed; line-height:1; padding:.5rem 0; text-transform:uppercase; letter-spacing:.03em; }
-        .pag.dark .pag-cell-na { color:#b794ff; }
+        .pag-cell-na { font-size:.82rem; font-weight:800; color:#e95420; line-height:1; padding:.5rem 0; text-transform:uppercase; letter-spacing:.03em; }
+        .pag.dark .pag-cell-na { color:#f6a583; }
         .pag-cell-pct { font-size:.72rem; font-weight:800; color:#17271d; font-variant-numeric:tabular-nums; }
         .pag.dark .pag-cell-pct { color:#d4e8dc; }
         .pag-cell-meta { display:flex; flex-direction:column; align-items:center; gap:.05rem; font-size:.56rem; font-weight:700; color:#6b8070; margin-top:.1rem; }
@@ -182,7 +182,7 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
         @keyframes pag-shim { from{background-position:200% 0} to{background-position:-200% 0} }
 
         .pag-empty { display:flex; flex-direction:column; align-items:center; gap:.5rem; text-align:center; padding:2.2rem 1.4rem; }
-        .pag-empty-ico { display:inline-flex; align-items:center; justify-content:center; width:62px; height:62px; border-radius:50%; background:rgba(47,125,74,0.1); color:#2F7D4A; }
+        .pag-empty-ico { display:inline-flex; align-items:center; justify-content:center; width:62px; height:62px; border-radius:50%; background:rgba(233, 84, 32,0.1); color:#e95420; }
         .pag.dark .pag-empty-ico { background:rgba(95,208,154,0.12); color:#6fe0a6; }
         .pag-empty strong { font-size:1rem; color:#17271d; font-weight:800; }
         .pag.dark .pag-empty strong { color:#e4f3ea; }

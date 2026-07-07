@@ -234,60 +234,60 @@ export default function Bio() {
            ───────────────────────────────────────────────────────────────────── */
         .bio-page {
           /* — Tema CHIARO (default) — */
-          --accent: #7c6cff;
-          --accent-2: #6d4bd6;
-          --accent-3: #9d8fff;
-          --accent-deep: #5b4bd6;
-          --ink: #6d4bd6;
-          --glow: rgba(124, 108, 255, 0.35);
+          --accent: #dd4814;
+          --accent-2: #c2410c;
+          --accent-3: #f39a76;
+          --accent-deep: #bc3d10;
+          --ink: #c2410c;
+          --glow: rgba(221, 72, 20, 0.35);
           --heading: #14121c;
           --text: #2a2833;
           --sub: #55535f;
           --surface: #ffffff;
           --surface-bd: rgba(24, 12, 60, 0.10);
-          --vio-soft: rgba(109, 75, 214, 0.07);
-          --vio-bd: rgba(109, 75, 214, 0.22);
+          --vio-soft: rgba(194, 65, 12, 0.07);
+          --vio-bd: rgba(194, 65, 12, 0.22);
           --panel: linear-gradient(160deg, #efeafd 0%, #e9e6fb 45%, #f4f2fb 100%);
-          --halo-1: rgba(124, 108, 255, 0.35);
-          --halo-2: rgba(109, 75, 214, 0.22);
+          --halo-1: rgba(221, 72, 20, 0.35);
+          --halo-2: rgba(194, 65, 12, 0.22);
           --page-bg:
-            radial-gradient(120% 70% at 50% -10%, rgba(124, 108, 255, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #f7f5fd 0%, #f2f0fb 100%);
+            radial-gradient(120% 70% at 50% -10%, rgba(221, 72, 20, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #faf8f6 0%, #f2f0fb 100%);
           --header-bg: rgba(247, 245, 253, 0.82);
-          --section-alt: rgba(109, 75, 214, 0.045);
+          --section-alt: rgba(194, 65, 12, 0.045);
           --btn-bd: rgba(24, 12, 60, 0.28);
           --btn-fg: #2a2833;
           --portrait-shadow: 0 24px 60px rgba(40, 28, 80, 0.28);
           --card-shadow: 0 14px 36px rgba(40, 28, 80, 0.12);
 
           min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           color: var(--text);
           background: var(--page-bg);
         }
 
         /* — Tema SCURO — */
         html.dark .bio-page {
-          --accent: #8b7bff;
-          --accent-2: #7c6cff;
-          --accent-3: #9d8fff;
-          --accent-deep: #5b4bd6;
-          --ink: #c4a5ff;
-          --glow: rgba(139, 123, 255, 0.45);
+          --accent: #e95420;
+          --accent-2: #dd4814;
+          --accent-3: #f39a76;
+          --accent-deep: #bc3d10;
+          --ink: #f6a583;
+          --glow: rgba(233, 84, 32, 0.45);
           --heading: #ffffff;
-          --text: #e8eef4;
-          --sub: #a7b2bd;
+          --text: #f5f3f1;
+          --sub: #b3aca6;
           --surface: rgba(255, 255, 255, 0.05);
           --surface-bd: rgba(255, 255, 255, 0.10);
-          --vio-soft: rgba(139, 123, 255, 0.10);
-          --vio-bd: rgba(139, 123, 255, 0.28);
-          --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
-          --halo-1: #8b7bff;
-          --halo-2: #5b4bd6;
+          --vio-soft: rgba(233, 84, 32, 0.10);
+          --vio-bd: rgba(233, 84, 32, 0.28);
+          --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
+          --halo-1: #e95420;
+          --halo-2: #bc3d10;
           --page-bg:
-            radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
-          --header-bg: rgba(10, 13, 17, 0.82);
+            radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
+          --header-bg: rgba(28, 22, 27, 0.82);
           --section-alt: rgba(255, 255, 255, 0.022);
           --btn-bd: rgba(255, 255, 255, 0.4);
           --btn-fg: #ffffff;

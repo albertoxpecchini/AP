@@ -41,15 +41,15 @@ const LANG_COLORS: Record<string, string> = {
   Jupyter: "#DA5B0B", "Jupyter Notebook": "#DA5B0B", MDX: "#fcb32c", Lua: "#000080",
   MATLAB: "#e16737", Makefile: "#427819", Batchfile: "#C1F12E", PowerShell: "#012456",
 };
-const LANG_FALLBACK = "#8b7bff";
+const LANG_FALLBACK = "#e95420";
 const langColor = (name: string | null) => (name && LANG_COLORS[name]) || LANG_FALLBACK;
 
 // Sfondo delle candele del grafico per livello di intensità (0-4), tono viola.
 const LEVEL_BG = [
   "rgba(255, 255, 255, 0.07)",
-  "rgba(139, 123, 255, 0.34)",
-  "rgba(139, 123, 255, 0.55)",
-  "rgba(139, 123, 255, 0.78)",
+  "rgba(233, 84, 32, 0.34)",
+  "rgba(233, 84, 32, 0.55)",
+  "rgba(233, 84, 32, 0.78)",
   "#a594ff",
 ];
 const levelBg = (lvl: number) => LEVEL_BG[Math.max(0, Math.min(4, lvl))];
@@ -443,10 +443,10 @@ export default function GitHubFooterWidget() {
         .apf-gh__row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 0.85rem; width: 100%; }
 
         .apf-gh__profile { display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none; color: #cdd6e0; }
-        .apf-gh__profile:hover .apf-gh__user { color: #c4a5ff; }
+        .apf-gh__profile:hover .apf-gh__user { color: #f6a583; }
         .apf-gh__avatar {
           width: 22px; height: 22px; border-radius: 50%;
-          border: 1px solid rgba(139, 123, 255, 0.35); flex-shrink: 0;
+          border: 1px solid rgba(233, 84, 32, 0.35); flex-shrink: 0;
         }
         .apf-gh__user { font-weight: 700; }
         .apf-gh__since { color: #8893a0; }
@@ -469,7 +469,7 @@ export default function GitHubFooterWidget() {
         }
         .apf-gh__star { color: #e3b341; }
         a.apf-gh__repo { text-decoration: none; }
-        a.apf-gh__repo:hover { color: #e6ebf1; border-color: rgba(139, 123, 255, 0.5); background: rgba(139, 123, 255, 0.12); }
+        a.apf-gh__repo:hover { color: #e6ebf1; border-color: rgba(233, 84, 32, 0.5); background: rgba(233, 84, 32, 0.12); }
         .apf-gh__langdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
         /* ── Grafico dei contributi giornalieri (dati reali) ── */

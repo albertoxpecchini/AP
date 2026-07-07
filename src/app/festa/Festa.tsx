@@ -103,7 +103,7 @@ function DeskDecor() {
 }
 
 // ─── Coriandoli: scoppio al momento della conferma ──────────────────────────
-const CONF_COLORS = ["#7c6cff", "#d8b86a", "#ff8fb3", "#5ad1c4", "#ffd24a", "#fff7e6"];
+const CONF_COLORS = ["#dd4814", "#d8b86a", "#ff8fb3", "#5ad1c4", "#ffd24a", "#fff7e6"];
 function Confetti() {
   const pieces = useMemo(
     () => Array.from({ length: 40 }, (_, i) => ({

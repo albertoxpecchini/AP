@@ -360,10 +360,10 @@ export default function Trivia() {
     setPlayed(prev => [...prev, entry]);
 
     if (correct) {
-      confetti({ particleCount: 28, spread: 55, startVelocity: 32, origin: { y: 0.7 }, colors: ["#8b7bff", "#34d399", "#fff", "#b7a8ff"] });
+      confetti({ particleCount: 28, spread: 55, startVelocity: 32, origin: { y: 0.7 }, colors: ["#e95420", "#34d399", "#fff", "#b7a8ff"] });
       // Trofeo + confetti grossi sui traguardi di streak.
       if ([3, 5, 7, 10].includes(newStreak)) {
-        setTimeout(() => confetti({ particleCount: 160, spread: 100, origin: { y: 0.45 }, colors: ["#8b7bff", "#34d399", "#fbbf24", "#fff"] }), 250);
+        setTimeout(() => confetti({ particleCount: 160, spread: 100, origin: { y: 0.45 }, colors: ["#e95420", "#34d399", "#fbbf24", "#fff"] }), 250);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -435,7 +435,7 @@ export default function Trivia() {
     }
 
     if (isGoodGrade(accuracy)) {
-      setTimeout(() => confetti({ particleCount: 220, spread: 120, origin: { y: 0.4 }, colors: ["#8b7bff", "#34d399", "#fbbf24", "#fff", "#b7a8ff"] }), 200);
+      setTimeout(() => confetti({ particleCount: 220, spread: 120, origin: { y: 0.4 }, colors: ["#e95420", "#34d399", "#fbbf24", "#fff", "#b7a8ff"] }), 200);
     }
     setPhase("results");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -652,8 +652,8 @@ export default function Trivia() {
         <GameTutorial
           gameKey={GAME_KEY}
           steps={TRIVIA_INTRO}
-          accentColor="#2F7D4A"
-          darkBg="#103820"
+          accentColor="#e95420"
+          darkBg="#2c001e"
           dark={dark}
           extra={TUTORIAL_KEYFRAMES}
           onDone={onTutorialDone}
@@ -690,7 +690,7 @@ export default function Trivia() {
               position:fixed; inset:0; z-index:260;
               background:rgba(10,28,17,0.62); backdrop-filter:blur(3px);
               display:flex; align-items:center; justify-content:center; padding:1rem;
-              font-family:"Titillium Web", Geneva, Tahoma, sans-serif;
+              font-family:"Ubuntu", Geneva, Tahoma, sans-serif;
               animation:trv-pagmodal-fade .22s ease;
             }
             @keyframes trv-pagmodal-fade { from{opacity:0} to{opacity:1} }
@@ -704,10 +704,10 @@ export default function Trivia() {
             .trv-pagmodal.dark .trv-pagmodal-card { background:#14211a; }
             @keyframes trv-pagmodal-up { from{opacity:0; transform:translateY(16px) scale(.97)} to{opacity:1; transform:none} }
             .trv-pagmodal-head {
-              background:linear-gradient(120deg,#7c3aed 0%,#5b21b6 55%,#2F7D4A 130%); color:#fff; flex-shrink:0;
+              background:linear-gradient(120deg,#e95420 0%,#a2330e 55%,#e95420 130%); color:#fff; flex-shrink:0;
               padding:1.1rem 1.1rem; display:flex; align-items:center; justify-content:space-between;
             }
-            .trv-pagmodal.dark .trv-pagmodal-head { background:linear-gradient(120deg,#4c1d95 0%,#2a1150 60%,#103820 130%); }
+            .trv-pagmodal.dark .trv-pagmodal-head { background:linear-gradient(120deg,#7e2708 0%,#3c202f 60%,#2c001e 130%); }
             .trv-pagmodal-title { display:flex; align-items:center; gap:.55rem; font-size:1.3rem; font-weight:900; letter-spacing:-.01em; }
             .trv-pagmodal-title small { display:block; font-size:.66rem; font-weight:600; opacity:.8; margin-top:.1rem; }
             .trv-pagmodal-x {
@@ -718,7 +718,7 @@ export default function Trivia() {
             .trv-pagmodal-x:hover { background:rgba(255,255,255,0.26); transform:rotate(90deg); }
             .trv-pagmodal-body { flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:1rem .9rem 1.2rem; scrollbar-width:thin; }
             .trv-pagmodal-body::-webkit-scrollbar { width:7px; }
-            .trv-pagmodal-body::-webkit-scrollbar-thumb { background:rgba(124,58,237,0.3); border-radius:99px; }
+            .trv-pagmodal-body::-webkit-scrollbar-thumb { background:rgba(233, 84, 32,0.3); border-radius:99px; }
           `}</style>
         </div>
       )}
@@ -762,19 +762,19 @@ function cleanCtx(s?: string): string {
 const styles = `
 .trv-page {
   position: fixed; inset: 0; z-index: 200; overflow-y: auto;
-  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
   background: #f4f6f5; color: #17271d;
   /* token tema chiaro (dark premium → variante chiara pulita) */
-  --accent: #6d4dff; --glow: rgba(109,77,255,0.26);
+  --accent: #c2410c; --glow: rgba(194, 65, 12,0.26);
   --ok: #16a34a; --no: #e11d48;
   --text: #17271d; --sub: #5a6b62;
   --surface: #ffffff; --surface-2: #eef1f5; --bord: rgba(20,30,25,0.10);
 }
 .trv-page.dark {
-  background: #0b0f14; color: #e8eef4;
-  --accent: #8b7bff; --glow: rgba(139,123,255,0.45);
+  background: #241c22; color: #f5f3f1;
+  --accent: #e95420; --glow: rgba(233, 84, 32,0.45);
   --ok: #34d399; --no: #fb7185;
-  --text: #e8eef4; --sub: #93a0ad;
+  --text: #f5f3f1; --sub: #93a0ad;
   --surface: rgba(255,255,255,0.05); --surface-2: rgba(255,255,255,0.085); --bord: rgba(255,255,255,0.11);
 }
 
@@ -810,7 +810,7 @@ const styles = `
   background: var(--surface-2); color: var(--text); cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s, transform .12s;
 }
-.trv-hud-back:hover { background: var(--accent); color: #0a0d11; transform: translateY(-1px); }
+.trv-hud-back:hover { background: var(--accent); color: #ffffff; transform: translateY(-1px); }
 .trv-hud-prog { flex: 1; min-width: 0; }
 .trv-hud-prog-txt { font-size: clamp(.7rem,.5vw+.5rem,1rem); font-weight: 800; color: var(--sub); letter-spacing: .04em; }
 .trv-hud-bar {
@@ -957,7 +957,7 @@ const styles = `
 .trv-open-input.no { border-color: var(--no); background: color-mix(in srgb, var(--no) 10%, transparent); }
 .trv-open-send {
   flex-shrink: 0; width: clamp(52px,5vmin,68px); border-radius: clamp(12px,1.2vmin,18px); border: none; cursor: pointer;
-  background: var(--accent); color: #0a0d11; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--accent); color: #ffffff; display: inline-flex; align-items: center; justify-content: center;
   box-shadow: 0 8px 24px var(--glow); transition: filter .12s, transform .12s;
 }
 .trv-open-send:disabled { opacity: .4; cursor: default; box-shadow: none; }
@@ -977,7 +977,7 @@ const styles = `
 .trv-feedback-exp { margin: .6rem 0 0; font-size: clamp(.9rem,.4vw+.65rem,1.15rem); line-height: 1.55; color: var(--sub); }
 .trv-next {
   margin-top: 1rem; width: 100%; padding: clamp(.85rem,1.5vmin,1.3rem) 1rem; border-radius: clamp(12px,1.2vmin,16px); border: none;
-  background: var(--accent); color: #0a0d11; font-family: inherit; font-weight: 900; font-size: clamp(1rem,.5vw+.7rem,1.3rem); cursor: pointer;
+  background: var(--accent); color: #ffffff; font-family: inherit; font-weight: 900; font-size: clamp(1rem,.5vw+.7rem,1.3rem); cursor: pointer;
   box-shadow: 0 10px 30px var(--glow); transition: filter .12s, transform .12s;
 }
 .trv-next:hover { filter: brightness(1.08); transform: translateY(-1px); }
@@ -1033,7 +1033,7 @@ const styles = `
   padding: clamp(.85rem,1.5vmin,1.2rem) 1rem; border-radius: clamp(12px,1.2vmin,16px); font-family: inherit; font-weight: 800; font-size: clamp(.95rem,.4vw+.65rem,1.15rem); cursor: pointer;
   transition: filter .12s, transform .12s, border-color .15s;
 }
-.trv-res-primary { border: none; background: var(--accent); color: #0a0d11; box-shadow: 0 10px 30px var(--glow); }
+.trv-res-primary { border: none; background: var(--accent); color: #ffffff; box-shadow: 0 10px 30px var(--glow); }
 .trv-res-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
 .trv-res-second { border: 1px solid var(--bord); background: var(--surface); color: var(--text); }
 .trv-res-second:hover { border-color: var(--accent); transform: translateY(-1px); }

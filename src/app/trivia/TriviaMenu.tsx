@@ -173,20 +173,20 @@ export default function TriviaMenu({
     }
   }, [sortBy, progress]);
 
-  const bg       = dark ? "#0b0f14" : "#eef1f4";
+  const bg       = dark ? "#241c22" : "#eef1f4";
   const card     = dark ? "rgba(255,255,255,0.05)" : "#ffffff";
   const bord     = dark ? "rgba(255,255,255,0.11)" : "rgba(20,30,25,0.10)";
-  const val      = dark ? "#e8eef4" : "#16201a";
+  const val      = dark ? "#f5f3f1" : "#16201a";
   const lbl      = dark ? "#93a0ad" : "#5a6b62";
-  const icon     = dark ? "#8b7bff" : "#6d4dff";
+  const icon     = dark ? "#e95420" : "#c2410c";
   const note     = dark ? "#6b7785" : "#8a9e91";
-  const textMain = dark ? "#e8eef4" : "#16201a";
-  const textSub  = dark ? "#a7b2bd" : "#4a5c50";
+  const textMain = dark ? "#f5f3f1" : "#16201a";
+  const textSub  = dark ? "#b3aca6" : "#4a5c50";
 
   // Accento del menù: viola neon ovunque (coerente col gioco). Lo smeraldo è
   // riservato ai capitoli COMPLETATI per distinguerli a colpo d'occhio.
-  const vio  = dark ? "#8b7bff" : "#6d4dff";
-  const vBord = dark ? "rgba(139,123,255,0.34)" : "rgba(109,77,255,0.26)";
+  const vio  = dark ? "#e95420" : "#c2410c";
+  const vBord = dark ? "rgba(233, 84, 32,0.34)" : "rgba(194, 65, 12,0.26)";
 
   // Domande disponibili nella selezione corrente (capitoli + tipi).
   const availableCount = questionsForMany([...selected], [...types]).length;
@@ -211,7 +211,7 @@ export default function TriviaMenu({
     return (
       <div style={{
         position: "fixed", inset: 0, zIndex: 200, background: bg,
-        fontFamily: '"Titillium Web", Geneva, Tahoma, sans-serif',
+        fontFamily: '"Ubuntu", Geneva, Tahoma, sans-serif',
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         gap: "1.3rem", padding: "1.5rem", textAlign: "center",
       }}>
@@ -243,10 +243,10 @@ export default function TriviaMenu({
   // (coerente con la tile). Niente più anellino minuscolo: il numero è protagonista.
   const progressRing = (seen: number, total: number, pct: number) => {
     const done = pct >= 100;
-    const col = done ? "#34d399" : (dark ? "#8b7bff" : "#6d4dff");
+    const col = done ? "#34d399" : (dark ? "#e95420" : "#c2410c");
     const bg = done
       ? (dark ? "rgba(52,211,153,0.20)" : "rgba(16,163,74,0.12)")
-      : (dark ? "rgba(139,123,255,0.20)" : "rgba(109,77,255,0.12)");
+      : (dark ? "rgba(233, 84, 32,0.20)" : "rgba(194, 65, 12,0.12)");
     return (
       <span
         className="trm-progbadge"
@@ -374,11 +374,11 @@ export default function TriviaMenu({
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0.95rem 1.3rem",
-        background: "linear-gradient(100deg, #9d8fff 0%, #7c6cff 45%, #5b4bd6 100%)", color: "#fff",
+        background: "linear-gradient(100deg, #f39a76 0%, #dd4814 45%, #bc3d10 100%)", color: "#fff",
         border: "none", borderRadius: "14px",
         fontSize: "0.98rem", fontWeight: 800,
         cursor: availableCount === 0 ? "not-allowed" : "pointer", fontFamily: "inherit",
-        boxShadow: "0 10px 30px rgba(124,108,255,0.45)",
+        boxShadow: "0 10px 30px rgba(221, 72, 20,0.45)",
         transition: "filter 0.12s, transform 0.12s",
         width: "100%", opacity: availableCount === 0 ? 0.5 : 1,
       }}
@@ -459,7 +459,7 @@ export default function TriviaMenu({
   const StatsCard = (forceDark: boolean) => {
     const c = forceDark ? "#fff" : val;
     const l = forceDark ? "rgba(255,255,255,0.6)" : lbl;
-    const ic = forceDark ? "#c4a5ff" : vio;   // stats: accento viola
+    const ic = forceDark ? "#f6a583" : vio;   // stats: accento viola
     return (
       <div className={`trm-stats-card${forceDark ? " trm-stats-dark" : ""}`} style={forceDark ? undefined : { background: card, border: `1px solid ${vBord}` }}>
         <div className="trm-stat"><GraduationCap size={20} style={{ color: ic }} /><span className="trm-stat-val" style={{ color: c }}>{bestGrade}</span><span className="trm-stat-lbl" style={{ color: l }}>Miglior voto</span></div>
@@ -552,11 +552,11 @@ export default function TriviaMenu({
       <style>{`
         .trm-root {
           /* Palette: VERDE = capitoli (il contenuto), VIOLA = tutto il resto del menù */
-          --pv:#7c3aed; --pv2:#6024c4; --pv3:#9b5cf6; --pv-soft:${dark ? "rgba(155,92,246,0.16)" : "rgba(124,58,237,0.10)"};
-          --pv-ink:${dark ? "#c4a5ff" : "#6d28d9"};
-          --gv:#2F7D4A; --gv3:#3a9e5f;
+          --pv:#e95420; --pv2:#bc3d10; --pv3:#ed7143; --pv-soft:${dark ? "rgba(237, 113, 67,0.16)" : "rgba(233, 84, 32,0.10)"};
+          --pv-ink:${dark ? "#f6a583" : "#cf4312"};
+          --gv:#e95420; --gv3:#3a9e5f;
           position: fixed; inset: 0; z-index: 200;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           animation: trm-in 0.22s ease;
           background: ${bg};
         }
@@ -566,7 +566,7 @@ export default function TriviaMenu({
         .trm-desktop { display:none; }
 
         .trm-hero {
-          background: linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+          background: linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:1rem; padding:2rem 1.5rem 1.8rem;
           position:relative; overflow:hidden; flex-shrink:0;
@@ -576,18 +576,18 @@ export default function TriviaMenu({
           content:""; position:absolute; width:60%; height:70%; border-radius:50%;
           filter:blur(50px); opacity:0.55; pointer-events:none; z-index:0;
         }
-        .trm-hero::before { background:#8b7bff; top:-25%; left:-15%; }
-        .trm-hero::after  { background:#6d4dff; bottom:-30%; right:-15%; opacity:0.4; }
+        .trm-hero::before { background:#e95420; top:-25%; left:-15%; }
+        .trm-hero::after  { background:#c2410c; bottom:-30%; right:-15%; opacity:0.4; }
         .trm-hero > * { position:relative; z-index:1; }
         .trm-logo-wrap {
-          background:#fff; color:#6d4dff; border-radius:18px; padding:14px;
-          box-shadow:0 8px 32px rgba(91,33,182,0.4); display:inline-flex;
+          background:#fff; color:#c2410c; border-radius:18px; padding:14px;
+          box-shadow:0 8px 32px rgba(162, 51, 14,0.4); display:inline-flex;
         }
         .trm-title {
           font-size:clamp(2.4rem,10vw,3.8rem); font-weight:900;
           letter-spacing:0.28em; margin:0; line-height:1; color:#fff;
         }
-        .trm-accent { color:#b794ff; }
+        .trm-accent { color:#f6a583; }
         .trm-tagline { font-size:0.85rem; color:rgba(255,255,255,0.6); margin:0; font-weight:500; text-align:center; }
         .trm-book {
           display:block; width:104px; flex-shrink:0; border-radius:8px; overflow:hidden;
@@ -643,25 +643,25 @@ export default function TriviaMenu({
         /* ─── Tipi di domanda: tasti grossi con icona + conteggio (importanti!) ─── */
         .trm-types-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0.55rem; margin-top:0.4rem; }
         .trm-typebtn {
-          --gv:#7c6cff; --gv2:#5b4bd6; --gv3:#9d8fff;
-          --spot:${dark ? "rgba(139,123,255,0.30)" : "rgba(109,77,255,0.24)"};
+          --gv:#dd4814; --gv2:#bc3d10; --gv3:#f39a76;
+          --spot:${dark ? "rgba(233, 84, 32,0.30)" : "rgba(194, 65, 12,0.24)"};
           position:relative; isolation:isolate; overflow:hidden;
           display:flex; flex-direction:column; align-items:center; justify-content:center;
           gap:0.3rem; padding:0.85rem 0.5rem 0.7rem;
           min-height:108px; border:1.5px solid ${vBord}; border-radius:16px;
-          background:${dark ? "rgba(139,123,255,0.08)" : "rgba(109,77,255,0.05)"};
+          background:${dark ? "rgba(233, 84, 32,0.08)" : "rgba(194, 65, 12,0.05)"};
           color:${textMain}; cursor:pointer; font-family:inherit;
           transition:transform .18s, border-color .18s, box-shadow .18s, background .2s;
         }
         .trm-typebtn:disabled { opacity:0.4; cursor:not-allowed; }
         @media (hover:hover) {
-          .trm-typebtn:not(:disabled):hover { transform:translateY(-3px); border-color:var(--gv3); box-shadow:0 10px 24px ${dark ? "rgba(0,0,0,0.5)" : "rgba(124,58,237,0.22)"}; }
+          .trm-typebtn:not(:disabled):hover { transform:translateY(-3px); border-color:var(--gv3); box-shadow:0 10px 24px ${dark ? "rgba(0,0,0,0.5)" : "rgba(233, 84, 32,0.22)"}; }
         }
         .trm-typebtn:active { transform:translateY(-1px) scale(0.98); }
         .trm-typebtn.is-on {
           background:linear-gradient(155deg, var(--gv3) 0%, var(--gv) 55%, var(--gv2) 100%);
           border-color:var(--gv3); color:#fff;
-          box-shadow:0 0 0 2px var(--gv3), 0 10px 26px ${dark ? "rgba(0,0,0,0.55)" : "rgba(91,33,182,0.38)"};
+          box-shadow:0 0 0 2px var(--gv3), 0 10px 26px ${dark ? "rgba(0,0,0,0.55)" : "rgba(162, 51, 14,0.38)"};
         }
         .trm-typebtn-ic { color:var(--gv); display:flex; transition:color .2s, transform .2s; }
         .trm-typebtn.is-on .trm-typebtn-ic { color:#fff; transform:scale(1.08); }
@@ -682,7 +682,7 @@ export default function TriviaMenu({
           background:rgba(255,255,255,0.10); color:#fff !important; border:1px solid rgba(255,255,255,0.16) !important;
         }
         .trm-actions-dark .trm-tut-btn:hover, .trm-actions-dark .trm-back-btn:hover { background:rgba(255,255,255,0.18); }
-        .trm-actions-dark .trm-tut-btn svg, .trm-actions-dark .trm-back-btn svg { color:#c4a5ff; }
+        .trm-actions-dark .trm-tut-btn svg, .trm-actions-dark .trm-back-btn svg { color:#f6a583; }
         .trm-actions-dark .trm-nick-chip { color:rgba(255,255,255,0.85) !important; border-color:rgba(255,255,255,0.22) !important; }
         .trm-actions-dark .trm-nick-chip b { color:#fff !important; }
 
@@ -690,14 +690,14 @@ export default function TriviaMenu({
         .trm-more-toggle {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; width:100%;
           padding:0.85rem 1rem; border-radius:13px; font-size:0.95rem; font-weight:800;
-          background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           cursor:pointer; font-family:inherit; transition:background .15s;
         }
         /* drawer mobile */
         .trm-drawer-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; animation:trm-fade .2s ease; }
         @keyframes trm-fade { from{opacity:0;} to{opacity:1;} }
         .trm-drawer {
-          width:100%; background:linear-gradient(160deg,#15101f 0%,#1a1430 60%,#0b0f14 130%);
+          width:100%; background:linear-gradient(160deg,#221a20 0%,#2a1e26 60%,#241c22 130%);
           border-radius:20px 20px 0 0; padding:1.1rem 1.1rem calc(1.6rem + env(safe-area-inset-bottom));
           box-shadow:0 -10px 40px rgba(0,0,0,0.4); animation:trm-up .25s cubic-bezier(.2,.8,.3,1);
           max-height:88dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
@@ -708,23 +708,23 @@ export default function TriviaMenu({
         .trm-tut-btn, .trm-back-btn {
           display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
           width:100%;
-          padding:0.95rem 1rem; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          padding:0.95rem 1rem; background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           border-radius:13px; font-size:1rem; font-weight:800;
           cursor:pointer; font-family:inherit; transition:filter .15s, transform .12s, background .15s;
           text-decoration:none;
         }
         .trm-vio-btn svg { width:18px; height:18px; }
         .trm-tut-btn:hover, .trm-back-btn:hover {
-          background:${dark ? "rgba(155,92,246,0.18)" : "rgba(124,58,237,0.11)"};
+          background:${dark ? "rgba(237, 113, 67,0.18)" : "rgba(233, 84, 32,0.11)"};
           transform:translateY(-1px);
         }
         /* "Come si gioca": CTA PIENO viola — grosso, spesso, con accento e un
            leggero respiro luminoso per invitare a scoprire il tour. */
         .trm-tut-cta {
-          background:linear-gradient(100deg,#9d8fff 0%,#7c6cff 55%,#5b4bd6 130%) !important;
+          background:linear-gradient(100deg,#f39a76 0%,#dd4814 55%,#bc3d10 130%) !important;
           color:#fff !important; border:none !important;
           font-size:1.05rem !important; font-weight:900 !important; letter-spacing:0.01em;
-          box-shadow:0 6px 22px rgba(91,33,182,0.45);
+          box-shadow:0 6px 22px rgba(162, 51, 14,0.45);
           position:relative; overflow:hidden;
           animation:trm-cta-breathe 2.8s ease-in-out infinite;
         }
@@ -734,8 +734,8 @@ export default function TriviaMenu({
           background:linear-gradient(100deg,transparent,rgba(255,255,255,0.35),transparent);
           transform:skewX(-18deg); animation:trm-cta-shine 3.4s ease-in-out infinite;
         }
-        .trm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(124,108,255,0.55); background:linear-gradient(100deg,#9d8fff 0%,#7c6cff 55%,#5b4bd6 130%) !important; }
-        @keyframes trm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(91,33,182,0.4);} 50%{box-shadow:0 8px 30px rgba(124,58,237,0.65);} }
+        .trm-tut-cta:hover { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 10px 30px rgba(221, 72, 20,0.55); background:linear-gradient(100deg,#f39a76 0%,#dd4814 55%,#bc3d10 130%) !important; }
+        @keyframes trm-cta-breathe { 0%,100%{box-shadow:0 6px 22px rgba(162, 51, 14,0.4);} 50%{box-shadow:0 8px 30px rgba(233, 84, 32,0.65);} }
         @keyframes trm-cta-shine { 0%,55%{left:-60%;} 100%{left:130%;} }
         @media (prefers-reduced-motion: reduce) {
           .trm-tut-cta, .trm-tut-cta::after { animation:none; }
@@ -745,18 +745,18 @@ export default function TriviaMenu({
         .trm-player {
           display:inline-flex; align-items:center; gap:0.6rem;
           padding:0.4rem 0.95rem 0.4rem 0.4rem; border-radius:999px; cursor:pointer;
-          border:1.5px solid ${vBord}; background:${dark ? "rgba(155,92,246,0.10)" : "rgba(124,58,237,0.06)"};
+          border:1.5px solid ${vBord}; background:${dark ? "rgba(237, 113, 67,0.10)" : "rgba(233, 84, 32,0.06)"};
           font-family:inherit; transition:transform .12s, background .15s, box-shadow .15s;
         }
-        .trm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(124,58,237,0.25); }
+        .trm-player:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(233, 84, 32,0.25); }
         .trm-player:active { transform:scale(0.97); }
         /* badge tondo "avatar" col punteggio dentro */
         .trm-player-badge {
           display:inline-flex; align-items:center; justify-content:center;
           min-width:38px; height:38px; padding:0 0.4rem; border-radius:999px;
-          background:linear-gradient(140deg,#9d8fff,#5b4bd6); color:#fff;
+          background:linear-gradient(140deg,#f39a76,#bc3d10); color:#fff;
           font-size:0.92rem; font-weight:900; line-height:1; letter-spacing:-0.02em;
-          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(91,33,182,0.4);
+          font-variant-numeric:tabular-nums; box-shadow:0 3px 10px rgba(162, 51, 14,0.4);
         }
         .trm-player-name {
           font-size:0.92rem; font-weight:800; color:${vio};
@@ -775,7 +775,7 @@ export default function TriviaMenu({
         .trm-grid-types { grid-template-columns:repeat(3,1fr); }
 
         .trm-tile {
-          --gv:#7c6cff; --gv2:#5b4bd6; --gv3:#9d8fff;
+          --gv:#dd4814; --gv2:#bc3d10; --gv3:#f39a76;
           position:relative; isolation:isolate;
           display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
           aspect-ratio:1/1; min-height:0;
@@ -784,8 +784,8 @@ export default function TriviaMenu({
           border-radius:18px; cursor:pointer; font-family:inherit; text-align:left;
           overflow:hidden;
           background:
-            radial-gradient(120% 90% at 100% 0%, ${dark ? "rgba(139,123,255,0.16)" : "rgba(109,77,255,0.08)"} 0%, transparent 55%),
-            linear-gradient(160deg, ${card} 0%, ${dark ? "rgba(139,123,255,0.05)" : "#f4f2fb"} 100%);
+            radial-gradient(120% 90% at 100% 0%, ${dark ? "rgba(233, 84, 32,0.16)" : "rgba(194, 65, 12,0.08)"} 0%, transparent 55%),
+            linear-gradient(160deg, ${card} 0%, ${dark ? "rgba(233, 84, 32,0.05)" : "#f4f2fb"} 100%);
           box-shadow:0 2px 6px rgba(0,0,0,0.05);
           transition:transform .12s cubic-bezier(.2,.7,.3,1.25), border-color .1s, box-shadow .12s, background .12s;
         }
@@ -806,7 +806,7 @@ export default function TriviaMenu({
         /* Variante VIOLA (.trm-vio): "Tutti i capitoli" + tipi di domanda.
            Ridefinisce solo le variabili colore → riusa tutta l'estetica delle tile. */
         .trm-vio {
-          --gv:#7c6cff; --gv2:#5b4bd6; --gv3:#9d8fff;
+          --gv:#dd4814; --gv2:#bc3d10; --gv3:#f39a76;
         }
 
         /* gradiente verde pieno che "sale" allo hover / quando acceso */
@@ -821,9 +821,9 @@ export default function TriviaMenu({
           position:absolute; inset:0; z-index:-1; pointer-events:none;
           border-radius:inherit; opacity:0; transition:opacity .25s ease;
           background:radial-gradient(circle 70px at var(--mx,50%) var(--my,50%),
-            var(--spot, ${dark ? "rgba(139,123,255,0.30)" : "rgba(109,77,255,0.26)"}) 0%, transparent 70%);
+            var(--spot, ${dark ? "rgba(233, 84, 32,0.30)" : "rgba(194, 65, 12,0.26)"}) 0%, transparent 70%);
         }
-        .trm-vio { --spot:${dark ? "rgba(139,123,255,0.30)" : "rgba(109,77,255,0.26)"}; }
+        .trm-vio { --spot:${dark ? "rgba(233, 84, 32,0.30)" : "rgba(194, 65, 12,0.26)"}; }
         @media (hover: hover) {
           .trm-tile:hover .trm-tile-spot { opacity:1; }
         }
@@ -843,7 +843,7 @@ export default function TriviaMenu({
           .trm-tile:hover {
             transform:translateY(-4px);
             border-color:var(--gv);
-            box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(109,77,255,0.26)"};
+            box-shadow:0 14px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(194, 65, 12,0.26)"};
           }
           .trm-tile:hover::before { opacity:1; }
           .trm-tile:hover .trm-tile-glow { opacity:1; transform:translate(0,0) scale(1); }
@@ -859,7 +859,7 @@ export default function TriviaMenu({
         .trm-tile.is-on::before { opacity:1; }
         .trm-tile.is-on {
           border-color:var(--gv3);
-          box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(109,77,255,0.30)"};
+          box-shadow:0 0 0 2px var(--gv3), 0 14px 30px ${dark ? "rgba(0,0,0,0.55)" : "rgba(194, 65, 12,0.30)"};
         }
         .trm-tile.is-on .trm-tile-title { color:#fff; }
         .trm-tile.is-on .trm-tile-mark { color:rgba(255,255,255,0.9); opacity:0.95; transform:scale(1.15) rotate(-4deg); }
@@ -964,10 +964,10 @@ export default function TriviaMenu({
           width:100%; border:none;
           margin-bottom:1.1rem;   /* stacca dalla griglia capitoli sotto */
           background:linear-gradient(135deg, var(--gv3) 0%, var(--gv) 50%, var(--gv2) 100%);
-          box-shadow:0 8px 22px ${dark ? "rgba(0,0,0,0.5)" : "rgba(91,33,182,0.34)"};
+          box-shadow:0 8px 22px ${dark ? "rgba(0,0,0,0.5)" : "rgba(162, 51, 14,0.34)"};
         }
         .trm-tile-all::before, .trm-tile-all .trm-tile-glow { display:none; }
-        .trm-tile-all:hover { transform:translateY(-3px); box-shadow:0 16px 34px ${dark ? "rgba(0,0,0,0.6)" : "rgba(91,33,182,0.44)"}; }
+        .trm-tile-all:hover { transform:translateY(-3px); box-shadow:0 16px 34px ${dark ? "rgba(0,0,0,0.6)" : "rgba(162, 51, 14,0.44)"}; }
         .trm-tile-all .trm-tile-check {
           position:static; transform:scale(0); width:24px; height:24px; border-radius:8px;
           background:rgba(255,255,255,0.22); color:#fff; box-shadow:none;
@@ -1002,19 +1002,19 @@ export default function TriviaMenu({
           /* Fasce scure SINISTRA e DESTRA: stessa "pelle" speculare. */
           .trm-desktop-left, .trm-desktop-right {
             flex-shrink:0;
-            background:linear-gradient(160deg,#15101f 0%,#1a1430 45%,#0b0f14 100%);
+            background:linear-gradient(160deg,#221a20 0%,#2a1e26 45%,#241c22 100%);
             display:flex; flex-direction:column; overflow:hidden; position:relative;
           }
           /* alone viola/verde diffuso in entrambe le fasce (vibrante) */
           .trm-desktop-left::before, .trm-desktop-right::before {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.4; pointer-events:none;
-            background:#8b7bff; top:-10%; left:-20%;
+            background:#e95420; top:-10%; left:-20%;
           }
           .trm-desktop-left::after, .trm-desktop-right::after {
             content:""; position:absolute; width:75%; height:45%; border-radius:50%;
             filter:blur(60px); opacity:0.3; pointer-events:none;
-            background:#6d4dff; bottom:-12%; right:-20%;
+            background:#c2410c; bottom:-12%; right:-20%;
           }
           .trm-desktop-left > *, .trm-desktop-right > * { position:relative; z-index:1; }
 

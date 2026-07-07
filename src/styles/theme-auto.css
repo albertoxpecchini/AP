@@ -17,7 +17,7 @@
   opacity: 0;
   clip-path: circle(0px at 50% 50%);
   will-change: clip-path, opacity;
-  background: #090c10;
+  background: #1b151a;
 }
 
 /* ── Dock del widget (in basso a sinistra, libero dai FAB dei giochi) ── */
@@ -30,7 +30,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
 }
 
 .ap-theme-btn {
@@ -94,20 +94,20 @@
 
 /* Palette del widget per i due temi */
 .ap-theme-dock[data-ap-theme="dark"] {
-  --apt-bg: rgba(18, 22, 30, 0.72);
-  --apt-bd: rgba(139, 123, 255, 0.32);
-  --apt-fg: #e8eef4;
-  --apt-muted: #a7b2bd;
-  --apt-accent: #8b7bff;
+  --apt-bg: rgba(30, 24, 29, 0.72);
+  --apt-bd: rgba(233, 84, 32, 0.32);
+  --apt-fg: #f5f3f1;
+  --apt-muted: #b3aca6;
+  --apt-accent: #e95420;
   --apt-shadow: rgba(0, 0, 0, 0.5);
 }
 .ap-theme-dock[data-ap-theme="light"] {
   --apt-bg: rgba(255, 255, 255, 0.82);
-  --apt-bd: rgba(109, 75, 214, 0.28);
-  --apt-fg: #4a2fb0;
-  --apt-muted: #6f6391;
-  --apt-accent: #6d4bd6;
-  --apt-shadow: rgba(80, 60, 160, 0.18);
+  --apt-bd: rgba(194, 65, 12, 0.28);
+  --apt-fg: #9a3412;
+  --apt-muted: #756a61;
+  --apt-accent: #c2410c;
+  --apt-shadow: rgba(90, 45, 18, 0.18);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -137,31 +137,31 @@
   gap: 4px;
   padding: 6px;
   border-radius: 16px;
-  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
   background: var(--apc-bg);
   border: 1px solid var(--apc-bd);
-  box-shadow: 0 12px 34px var(--apc-shadow), 0 0 0 1px rgba(139, 123, 255, 0.05);
+  box-shadow: 0 12px 34px var(--apc-shadow), 0 0 0 1px rgba(233, 84, 32, 0.05);
   -webkit-backdrop-filter: blur(14px) saturate(150%);
   backdrop-filter: blur(14px) saturate(150%);
   /* palette di default = scuro (l'<html> ha sempre data-ap-theme, ma restiamo safe) */
-  --apc-bg: rgba(18, 22, 30, 0.72);
-  --apc-bd: rgba(139, 123, 255, 0.32);
-  --apc-fg: #e8eef4;
-  --apc-muted: #a7b2bd;
-  --apc-accent: #8b7bff;
+  --apc-bg: rgba(30, 24, 29, 0.72);
+  --apc-bd: rgba(233, 84, 32, 0.32);
+  --apc-fg: #f5f3f1;
+  --apc-muted: #b3aca6;
+  --apc-accent: #e95420;
   --apc-shadow: rgba(0, 0, 0, 0.5);
-  --apc-divider: rgba(139, 123, 255, 0.22);
-  --apc-hover: rgba(139, 123, 255, 0.12);
+  --apc-divider: rgba(233, 84, 32, 0.22);
+  --apc-hover: rgba(233, 84, 32, 0.12);
 }
 :root[data-ap-theme="light"] .ap-controlbar {
   --apc-bg: rgba(255, 255, 255, 0.82);
-  --apc-bd: rgba(109, 75, 214, 0.28);
-  --apc-fg: #4a2fb0;
-  --apc-muted: #6f6391;
-  --apc-accent: #6d4bd6;
-  --apc-shadow: rgba(80, 60, 160, 0.18);
-  --apc-divider: rgba(109, 75, 214, 0.22);
-  --apc-hover: rgba(109, 75, 214, 0.1);
+  --apc-bd: rgba(194, 65, 12, 0.28);
+  --apc-fg: #9a3412;
+  --apc-muted: #756a61;
+  --apc-accent: #c2410c;
+  --apc-shadow: rgba(90, 45, 18, 0.18);
+  --apc-divider: rgba(194, 65, 12, 0.22);
+  --apc-hover: rgba(194, 65, 12, 0.1);
 }
 
 /* — Segmento LINGUA (annulla dock fisso + veste propria della pillola) — */
@@ -279,23 +279,23 @@ html[data-ap-theme="light"] .gp-page,
 html[data-ap-theme="light"] .lt-page,
 html[data-ap-theme="light"] .pcto-page,
 html[data-ap-theme="light"] .bio-page {
-  --accent: #6d4bd6;
-  --accent-2: #7c5cff;
-  --accent-3: #8b6dff;
-  --accent-deep: #4a2fb0;
-  --ink: #5b34c9;
-  --glow: rgba(109, 75, 214, 0.28);
-  --text: #221838;
-  --text-strong: #170d3a;
-  --sub: #574a78;
-  --surface: rgba(109, 75, 214, 0.09);
-  --surface-bd: rgba(109, 75, 214, 0.30);
-  --vio-soft: rgba(109, 75, 214, 0.12);
-  --vio-bd: rgba(109, 75, 214, 0.38);
-  --panel: linear-gradient(160deg, #f4f1fc 0%, #efeafb 45%, #ffffff 100%);
+  --accent: #c2410c;
+  --accent-2: #d9480f;
+  --accent-3: #e8590c;
+  --accent-deep: #9a3412;
+  --ink: #a63a0d;
+  --glow: rgba(194, 65, 12, 0.28);
+  --text: #3d3846;
+  --text-strong: #241f31;
+  --sub: #6e6259;
+  --surface: rgba(194, 65, 12, 0.09);
+  --surface-bd: rgba(194, 65, 12, 0.30);
+  --vio-soft: rgba(194, 65, 12, 0.12);
+  --vio-bd: rgba(194, 65, 12, 0.38);
+  --panel: linear-gradient(160deg, #f7f4f1 0%, #f2ede8 45%, #ffffff 100%);
   background:
-    radial-gradient(120% 70% at 50% -10%, rgba(109, 75, 214, 0.08) 0%, transparent 55%),
-    linear-gradient(180deg, #ffffff 0%, #f7f5fd 100%) !important;
+    radial-gradient(120% 70% at 50% -10%, rgba(194, 65, 12, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, #faf8f6 100%) !important;
   color: var(--text);
   transition: color 0.4s ease;
 }
@@ -312,11 +312,11 @@ html[data-ap-theme="light"] .bio-header {
 }
 html[data-ap-theme="light"] .hm-hdr--scrolled {
   background: rgba(255, 255, 255, 0.92) !important;
-  box-shadow: 0 8px 30px rgba(80, 60, 160, 0.1) !important;
+  box-shadow: 0 8px 30px rgba(90, 45, 18, 0.1) !important;
 }
 
 /* ── Testi che erano #fff su fondo CHIARO → scuri ──
-   Tutti passano da var(--text-strong): nelle sezioni chiare vale #1d1147,
+   Tutti passano da var(--text-strong): nelle sezioni chiare vale #241f31,
    mentre dentro le bande scure (vedi blocco sotto) viene ri-portato a #ffffff,
    così ogni scritta resta leggibile sul proprio fondo, qualunque sia la banda.
    I testi su pulsanti/badge ad accento pieno (viola) restano bianchi: il viola
@@ -409,23 +409,23 @@ html[data-ap-theme="light"] .pcto-footer,
 html[data-ap-theme="light"] .bio-hero,
 html[data-ap-theme="light"] .bio-footer,
 html[data-ap-theme="light"] .bio-page .ap-modal {
-  --text: #e8eef4;
+  --text: #f5f3f1;
   --text-strong: #ffffff;
-  --sub: #a7b2bd;
-  --ink: #c4a5ff;
-  --accent: #8b7bff;
-  --accent-2: #7c6cff;
-  --accent-deep: #5b4bd6;
+  --sub: #b3aca6;
+  --ink: #f6a583;
+  --accent: #e95420;
+  --accent-2: #dd4814;
+  --accent-deep: #bc3d10;
   --surface: rgba(255, 255, 255, 0.05);
   --surface-bd: rgba(255, 255, 255, 0.1);
-  --vio-soft: rgba(139, 123, 255, 0.1);
-  --vio-bd: rgba(139, 123, 255, 0.28);
+  --vio-soft: rgba(233, 84, 32, 0.1);
+  --vio-bd: rgba(233, 84, 32, 0.28);
 }
 
 /* Card della home: superficie chiara leggibile */
 html[data-ap-theme="light"] .hm-card {
-  box-shadow: 0 10px 30px rgba(80, 60, 160, 0.13);
+  box-shadow: 0 10px 30px rgba(90, 45, 18, 0.13);
 }
 html[data-ap-theme="light"] .hm-card:hover {
-  box-shadow: 0 20px 44px rgba(80, 60, 160, 0.22);
+  box-shadow: 0 20px 44px rgba(90, 45, 18, 0.22);
 }

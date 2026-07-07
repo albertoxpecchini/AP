@@ -418,25 +418,25 @@ export default function Gattopardo() {
            "vetro" e neon viola.
            ───────────────────────────────────────────────────────────────────── */
         .gp-page {
-          --accent: #8b7bff;
-          --accent-2: #7c6cff;
-          --accent-3: #9d8fff;
-          --accent-deep: #5b4bd6;
-          --ink: #c4a5ff;
-          --glow: rgba(139, 123, 255, 0.45);
-          --text: #e8eef4;
-          --sub: #a7b2bd;
+          --accent: #e95420;
+          --accent-2: #dd4814;
+          --accent-3: #f39a76;
+          --accent-deep: #bc3d10;
+          --ink: #f6a583;
+          --glow: rgba(233, 84, 32, 0.45);
+          --text: #f5f3f1;
+          --sub: #b3aca6;
           --surface: rgba(255, 255, 255, 0.05);
           --surface-bd: rgba(255, 255, 255, 0.10);
-          --vio-soft: rgba(139, 123, 255, 0.10);
-          --vio-bd: rgba(139, 123, 255, 0.28);
-          --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+          --vio-soft: rgba(233, 84, 32, 0.10);
+          --vio-bd: rgba(233, 84, 32, 0.28);
+          --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
           min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           color: var(--text);
           background:
-            radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+            radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
         }
         .gp-page .ap-kicker.text-primary { color: var(--ink) !important; }
         .gp-page .bg-white { background: transparent !important; }
@@ -445,13 +445,13 @@ export default function Gattopardo() {
         .gp-page .btn-outline-light { border-color: rgba(255, 255, 255, 0.4); color: #ffffff; }
         .gp-page .btn-outline-light:hover,
         .gp-page .btn-outline-light:focus {
-          background-color: var(--accent); border-color: var(--accent); color: #0a0d11 !important;
+          background-color: var(--accent); border-color: var(--accent); color: #ffffff !important;
         }
         .gp-page .ap-kicker { letter-spacing: 0.18em; font-size: 0.875rem; }
 
         /* Header — vetro scuro con filo viola */
         .gp-header {
-          background: rgba(10, 13, 17, 0.82); position: sticky; top: 0; z-index: 10;
+          background: rgba(28, 22, 27, 0.82); position: sticky; top: 0; z-index: 10;
           backdrop-filter: blur(14px) saturate(120%);
           -webkit-backdrop-filter: blur(14px) saturate(120%);
           border-bottom: 1px solid var(--surface-bd);
@@ -473,7 +473,7 @@ export default function Gattopardo() {
           padding: clamp(3rem, 7vw, 5.5rem) 0;
           color: #ffffff;
           background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
+            radial-gradient(90% 120% at 0% 0%, rgba(233, 84, 32, 0.22) 0%, transparent 55%),
             var(--panel);
           border-bottom: 1px solid var(--surface-bd);
         }
@@ -481,8 +481,8 @@ export default function Gattopardo() {
           content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
           filter: blur(60px); opacity: 0.45; pointer-events: none; z-index: 0;
         }
-        .gp-hero::before { background: #8b7bff; top: -30%; right: -10%; }
-        .gp-hero::after  { background: #5b4bd6; bottom: -35%; left: -12%; opacity: 0.35; }
+        .gp-hero::before { background: #e95420; top: -30%; right: -10%; }
+        .gp-hero::after  { background: #bc3d10; bottom: -35%; left: -12%; opacity: 0.35; }
         .gp-hero .container { position: relative; z-index: 1; }
         .gp-hero-grid {
           display: grid;
@@ -532,8 +532,8 @@ export default function Gattopardo() {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
           background-image:
-            radial-gradient(120% 120% at 30% 20%, rgba(139, 123, 255, 0.22), rgba(10, 12, 16, 0.2)),
-            linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+            radial-gradient(120% 120% at 30% 20%, rgba(233, 84, 32, 0.22), rgba(10, 12, 16, 0.2)),
+            linear-gradient(135deg, #221a20 0%, #241c22 100%);
         }
         .gp-shot-ph-ic { color: rgba(196, 165, 255, 0.6); }
         .gp-shot figcaption {
@@ -630,8 +630,8 @@ export default function Gattopardo() {
         .gp-band {
           padding: clamp(3rem, 7vw, 5rem) 0;
           background:
-            radial-gradient(100% 130% at 100% 0%, rgba(139, 123, 255, 0.18) 0%, transparent 55%),
-            linear-gradient(160deg, #120c20 0%, #0b0f14 60%, #15101f 100%);
+            radial-gradient(100% 130% at 100% 0%, rgba(233, 84, 32, 0.18) 0%, transparent 55%),
+            linear-gradient(160deg, #120c20 0%, #241c22 60%, #221a20 100%);
           border-top: 1px solid var(--surface-bd); border-bottom: 1px solid var(--surface-bd);
         }
         .gp-band-kicker { color: var(--ink); letter-spacing: 0.18em; }
@@ -687,8 +687,8 @@ export default function Gattopardo() {
           padding: clamp(3rem, 7vw, 5rem) 0;
           color: #ffffff;
           background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.25) 0%, transparent 55%),
-            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
+            radial-gradient(90% 120% at 0% 0%, rgba(233, 84, 32, 0.25) 0%, transparent 55%),
+            linear-gradient(135deg, #2a1e26 0%, #322330 55%, #221a20 100%);
           border-top: 1px solid var(--surface-bd);
         }
         .gp-future-kicker { color: var(--ink); letter-spacing: 0.18em; }
@@ -706,7 +706,7 @@ export default function Gattopardo() {
         /* Chiusura — banner con citazione */
         .gp-thanks {
           position: relative; width: 100%; overflow: hidden;
-          background-image: linear-gradient(135deg, #15101f 0%, #0b0f14 100%);
+          background-image: linear-gradient(135deg, #221a20 0%, #241c22 100%);
           min-height: clamp(20rem, 42vw, 34rem);
           display: flex; align-items: center;
         }
@@ -733,7 +733,7 @@ export default function Gattopardo() {
         }
 
         /* Vai all'altro libro — CTA cross-link */
-        .gp-next { padding: clamp(2.5rem, 6vw, 4rem) 0; background: linear-gradient(180deg, #0b0f14 0%, #090c10 100%); }
+        .gp-next { padding: clamp(2.5rem, 6vw, 4rem) 0; background: linear-gradient(180deg, #241c22 0%, #1b151a 100%); }
         .gp-next-card {
           display: block; text-decoration: none;
           padding: clamp(1.5rem, 4vw, 2.25rem);
@@ -771,7 +771,7 @@ export default function Gattopardo() {
         @media (max-width: 575.98px) { .gp-next-arrow { display: none; } }
 
         /* Footer */
-        .gp-footer { background-color: #090c10; color: #ffffff; border-top: 1px solid var(--surface-bd); }
+        .gp-footer { background-color: #1b151a; color: #ffffff; border-top: 1px solid var(--surface-bd); }
       `}</style>
     </div>
   );

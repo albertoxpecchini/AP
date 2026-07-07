@@ -1,0 +1,118 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SKIN UBUNTU / YARU — layer globale, caricato PER ULTIMO (vince sui token di
+   theme.css a parità di selettore). Qui vive tutto ciò che rende il sito
+   "Ubuntu": font Ubuntu, arancio #E95420, melanzana, grigi caldi, selezione
+   arancio e scrollbar stile GNOME. Le pagine mantengono la loro struttura.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Palette ufficiale Canonical */
+  --yaru-orange: #e95420;
+  --yaru-orange-old: #dd4814;
+  --yaru-aubergine-light: #77216f;
+  --yaru-aubergine-mid: #5e2750;
+  --yaru-aubergine-dark: #2c001e;
+  --yaru-warm-grey: #aea79f;
+
+  --font-ubuntu: "Ubuntu", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  --font-ubuntu-mono: "Ubuntu Mono", ui-monospace, monospace;
+}
+
+/* ── Tipografia: Ubuntu ovunque, Ubuntu Mono per il codice ──
+   (Batte anche la Titillium dichiarata da bootstrap-italia.min.css, che non
+   viene più caricata.) */
+html, body, button, input, select, textarea, .it-page-wrapper {
+  font-family: var(--font-ubuntu);
+}
+code, pre, kbd, samp {
+  font-family: var(--font-ubuntu-mono);
+}
+
+/* ── Token shadcn/Tailwind rimappati su Yaru (chiaro) ── */
+:root {
+  --background: #fafaf8;
+  --foreground: #3d3846;
+  --card: #ffffff;
+  --card-foreground: #3d3846;
+  --popover: #ffffff;
+  --popover-foreground: #3d3846;
+  --primary: #e95420;
+  --primary-foreground: #ffffff;
+  --secondary: #f0eeec;
+  --secondary-foreground: #3d3846;
+  --muted: #f0eeec;
+  --muted-foreground: #77716b;
+  --accent: #f7e0d6;
+  --accent-foreground: #3d3846;
+  --destructive: #da3450;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.12);
+  --input-background: #f0eeec;
+  --switch-background: #c9c4bf;
+  --ring: rgba(233, 84, 32, 0.4);
+  /* GNOME: angoli generosi (finestre/card 12px) */
+  --radius: 0.75rem;
+}
+
+/* ── Token shadcn/Tailwind rimappati su Yaru (scuro) ── */
+.dark {
+  --background: #242424;
+  --foreground: #ffffff;
+  --card: #303030;
+  --card-foreground: #ffffff;
+  --popover: #303030;
+  --popover-foreground: #ffffff;
+  --primary: #e95420;
+  --primary-foreground: #ffffff;
+  --secondary: #3a3a3a;
+  --secondary-foreground: #ffffff;
+  --muted: #3a3a3a;
+  --muted-foreground: #9a9996;
+  --accent: #45383a;
+  --accent-foreground: #ffffff;
+  --destructive: #da3450;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: #3a3a3a;
+  --ring: rgba(233, 84, 32, 0.5);
+}
+
+/* ── Selezione del testo: arancio Ubuntu, come nel terminale/GNOME ── */
+::selection {
+  background: var(--yaru-orange);
+  color: #ffffff;
+}
+
+/* ── Scrollbar stile GNOME: sottile, tonda, discreta ── */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 113, 108, 0.55) transparent;
+}
+html.dark {
+  scrollbar-color: rgba(154, 153, 150, 0.5) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 113, 108, 0.55);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 113, 108, 0.8);
+  background-clip: content-box;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(154, 153, 150, 0.5);
+  background-clip: content-box;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(154, 153, 150, 0.75);
+  background-clip: content-box;
+}

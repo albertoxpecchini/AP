@@ -423,29 +423,29 @@ export default function Letteratura() {
            neon viola. Pagina autosufficiente.
            ───────────────────────────────────────────────────────────────────── */
         .lt-page {
-          --accent: #8b7bff;
-          --accent-2: #7c6cff;
-          --accent-deep: #5b4bd6;
-          --ink: #c4a5ff;
-          --glow: rgba(139, 123, 255, 0.45);
-          --text: #e8eef4;
-          --sub: #a7b2bd;
+          --accent: #e95420;
+          --accent-2: #dd4814;
+          --accent-deep: #bc3d10;
+          --ink: #f6a583;
+          --glow: rgba(233, 84, 32, 0.45);
+          --text: #f5f3f1;
+          --sub: #b3aca6;
           --surface: rgba(255, 255, 255, 0.05);
           --surface-bd: rgba(255, 255, 255, 0.10);
-          --vio-soft: rgba(139, 123, 255, 0.10);
-          --vio-bd: rgba(139, 123, 255, 0.28);
-          --panel: linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+          --vio-soft: rgba(233, 84, 32, 0.10);
+          --vio-bd: rgba(233, 84, 32, 0.28);
+          --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
           min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           color: var(--text);
           background:
-            radial-gradient(120% 70% at 50% -10%, rgba(139, 123, 255, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #0b0f14 0%, #090c10 100%);
+            radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),
+            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
         }
         .lt-page .btn-outline-light { border-color: rgba(255, 255, 255, 0.4); color: #ffffff; }
         .lt-page .btn-outline-light:hover,
         .lt-page .btn-outline-light:focus {
-          background-color: var(--accent); border-color: var(--accent); color: #0a0d11 !important;
+          background-color: var(--accent); border-color: var(--accent); color: #ffffff !important;
         }
         .lt-kicker {
           text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.8rem;
@@ -454,7 +454,7 @@ export default function Letteratura() {
 
         /* Header — vetro scuro con filo viola */
         .lt-header {
-          background: rgba(10, 13, 17, 0.82); position: sticky; top: 0; z-index: 30;
+          background: rgba(28, 22, 27, 0.82); position: sticky; top: 0; z-index: 30;
           backdrop-filter: blur(14px) saturate(120%);
           -webkit-backdrop-filter: blur(14px) saturate(120%);
           border-bottom: 1px solid var(--surface-bd);
@@ -486,7 +486,7 @@ export default function Letteratura() {
           position: relative; overflow: hidden; text-align: center;
           padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(2.5rem, 5vw, 3.5rem);
           background:
-            radial-gradient(90% 120% at 50% 0%, rgba(139, 123, 255, 0.22) 0%, transparent 55%),
+            radial-gradient(90% 120% at 50% 0%, rgba(233, 84, 32, 0.22) 0%, transparent 55%),
             var(--panel);
           border-bottom: 1px solid var(--surface-bd);
         }
@@ -494,8 +494,8 @@ export default function Letteratura() {
           content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
           filter: blur(70px); opacity: 0.4; pointer-events: none; z-index: 0;
         }
-        .lt-hero::before { background: #8b7bff; top: -34%; right: -8%; }
-        .lt-hero::after  { background: #5b4bd6; bottom: -38%; left: -10%; opacity: 0.3; }
+        .lt-hero::before { background: #e95420; top: -34%; right: -8%; }
+        .lt-hero::after  { background: #bc3d10; bottom: -38%; left: -10%; opacity: 0.3; }
         .lt-hero .container { position: relative; z-index: 1; }
         .lt-hero-badge {
           display: inline-flex; align-items: center; justify-content: center;
@@ -536,8 +536,8 @@ export default function Letteratura() {
           background: var(--vio-soft); color: var(--text); border: 1.5px solid var(--vio-bd);
           transition: background .15s, color .15s, border-color .15s, transform .15s;
         }
-        .lt-expand-cta:hover { transform: translateY(-2px); color: #fff; border-color: var(--accent); background: rgba(139,123,255,0.16); }
-        .lt-expand-cta.is-on { background: rgba(139,123,255,0.18); color: #fff; border-color: var(--accent); }
+        .lt-expand-cta:hover { transform: translateY(-2px); color: #fff; border-color: var(--accent); background: rgba(233, 84, 32,0.16); }
+        .lt-expand-cta.is-on { background: rgba(233, 84, 32,0.18); color: #fff; border-color: var(--accent); }
         .lt-print-cta {
           display: inline-flex; align-items: center; gap: 0.55rem; cursor: pointer;
           padding: 0.75rem 1.6rem; border-radius: 999px; font-family: inherit;
@@ -679,7 +679,7 @@ export default function Letteratura() {
         .lt-qa-count {
           display: inline-flex; align-items: center; justify-content: center;
           min-width: 22px; height: 22px; padding: 0 0.4rem; border-radius: 999px;
-          background: var(--accent); color: #0a0d11; font-size: 0.74rem; font-weight: 800; margin-left: 0.2rem;
+          background: var(--accent); color: #ffffff; font-size: 0.74rem; font-weight: 800; margin-left: 0.2rem;
         }
         .lt-toggle-all {
           display: inline-flex; align-items: center; gap: 0.4rem;
@@ -724,8 +724,8 @@ export default function Letteratura() {
           position: relative; overflow: hidden;
           padding: clamp(3rem, 6vw, 4.5rem) 0;
           background:
-            radial-gradient(90% 120% at 0% 0%, rgba(139, 123, 255, 0.25) 0%, transparent 55%),
-            linear-gradient(135deg, #1a1430 0%, #211a3d 55%, #15101f 100%);
+            radial-gradient(90% 120% at 0% 0%, rgba(233, 84, 32, 0.25) 0%, transparent 55%),
+            linear-gradient(135deg, #2a1e26 0%, #322330 55%, #221a20 100%);
           border-top: 1px solid var(--surface-bd);
         }
         .lt-band-kicker { color: var(--ink); }
@@ -738,7 +738,7 @@ export default function Letteratura() {
         .lt-method-n {
           display: inline-flex; align-items: center; justify-content: center;
           width: 38px; height: 38px; border-radius: 50%; margin-bottom: 0.7rem;
-          background: var(--accent); color: #0a0d11; font-weight: 800; font-size: 1.1rem;
+          background: var(--accent); color: #ffffff; font-weight: 800; font-size: 1.1rem;
         }
         .lt-method-step p { margin: 0; color: rgba(255,255,255,0.82); line-height: 1.55; font-size: 0.95rem; }
         .lt-method-step strong { color: #fff; }
@@ -746,7 +746,7 @@ export default function Letteratura() {
         @media (max-width: 520px) { .lt-method { grid-template-columns: 1fr; } }
 
         /* Footer */
-        .lt-footer { background-color: #090c10; color: #ffffff; border-top: 1px solid var(--surface-bd); }
+        .lt-footer { background-color: #1b151a; color: #ffffff; border-top: 1px solid var(--surface-bd); }
 
         /* Torna su */
         .lt-top {
@@ -793,17 +793,17 @@ export default function Letteratura() {
 
           /* Hero compatto */
           .lt-hero {
-            background: none !important; border-bottom: 2px solid #5b4bd6 !important;
+            background: none !important; border-bottom: 2px solid #bc3d10 !important;
             padding: 0 0 0.6cm !important; text-align: left;
           }
           .lt-hero-badge { display: none !important; }
           .lt-hero-title { color: #15171c !important; font-size: 24pt !important; margin-bottom: 0.2cm; }
           .lt-hero-rule { display: none !important; }
           .lt-hero-lead { color: #333 !important; font-size: 11pt !important; margin-bottom: 0.3cm; }
-          .lt-hero-lead strong, .lt-kicker { color: #5b4bd6 !important; }
+          .lt-hero-lead strong, .lt-kicker { color: #bc3d10 !important; }
           .lt-hero-stats { gap: 0.4rem; }
           .lt-stat { border: 1px solid #ccc !important; background: none !important; color: #333 !important; }
-          .lt-stat strong { color: #5b4bd6 !important; }
+          .lt-stat strong { color: #bc3d10 !important; }
 
           /* Schede: niente sfondo vetro, solo bordo leggero; non spezzare l'header */
           .lt-body { padding: 0.4cm 0 !important; }
@@ -815,13 +815,13 @@ export default function Letteratura() {
           }
           .lt-card-head { break-after: avoid; }
           .lt-card-ic {
-            background: #ece8ff !important; color: #5b4bd6 !important;
+            background: #ece8ff !important; color: #bc3d10 !important;
             border: 1px solid #cdbcff !important; width: 44px; height: 44px;
           }
-          .lt-card-kicker, .lt-card-meta { color: #5b4bd6 !important; }
+          .lt-card-kicker, .lt-card-meta { color: #bc3d10 !important; }
           .lt-card-title { color: #15171c !important; }
 
-          .lt-lead { color: #222 !important; border-left-color: #5b4bd6 !important; }
+          .lt-lead { color: #222 !important; border-left-color: #bc3d10 !important; }
           .lt-lead strong { color: #000 !important; }
 
           /* Fatti / concetti / testi: bianco con bordo, testo scuro */
@@ -829,26 +829,26 @@ export default function Letteratura() {
             background: #fafafa !important; border: 1px solid #d4d4d8 !important;
             break-inside: avoid;
           }
-          .lt-testi li { border-left: 3px solid #5b4bd6 !important; }
+          .lt-testi li { border-left: 3px solid #bc3d10 !important; }
           .lt-fact-value, .lt-concetto dt, .lt-testo-title { color: #15171c !important; }
           .lt-fact-label, .lt-concetto dd, .lt-testo-note, .lt-link-chip { color: #333 !important; }
-          .lt-concetto dd strong, .lt-testo-opera { color: #5b4bd6 !important; }
+          .lt-concetto dd strong, .lt-testo-opera { color: #bc3d10 !important; }
           .lt-block-h, .lt-block-h svg, .lt-block-h--accent { color: #15171c !important; }
-          .lt-block-h svg { color: #5b4bd6 !important; }
+          .lt-block-h svg { color: #bc3d10 !important; }
 
           /* Domande: tutte aperte, ben distinte */
           .lt-block--qa { border-top: 1px solid #d4d4d8 !important; }
-          .lt-qa-count { background: #5b4bd6 !important; color: #fff !important; }
+          .lt-qa-count { background: #bc3d10 !important; color: #fff !important; }
           .lt-qa-q { color: #15171c !important; font-size: 11pt !important; padding-bottom: 0.15cm; }
           .lt-qa-mark {
-            background: #ece8ff !important; color: #5b4bd6 !important; border: 1px solid #cdbcff !important;
+            background: #ece8ff !important; color: #bc3d10 !important; border: 1px solid #cdbcff !important;
           }
           /* Mostra SEMPRE la risposta in stampa, anche se l'accordion è chiuso */
           .lt-page .lt-qa-a { display: block !important; }
           .lt-qa-a p { color: #222 !important; }
           .lt-qa-a strong { color: #000 !important; }
 
-          a { color: #5b4bd6 !important; text-decoration: none; }
+          a { color: #bc3d10 !important; text-decoration: none; }
         }
       `}</style>
     </div>

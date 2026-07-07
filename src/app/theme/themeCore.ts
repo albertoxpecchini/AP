@@ -24,8 +24,8 @@ const MANUAL_KEY = "ap-theme-manual";
 
 // Colore di fondo per ogni tema (overlay di transizione + <meta theme-color>).
 export const THEME_BG: Record<Theme, string> = {
-  light: "#f7f5fd",
-  dark: "#090c10",
+  light: "#faf8f6",
+  dark: "#1b151a",
 };
 
 // Ore "chiare": dalle 08:00:00 alle 19:59:59. Tutto il resto è scuro.
@@ -84,7 +84,7 @@ export function applyTheme(theme: Theme): void {
   }
 
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "dark" ? THEME_BG.dark : "#2F7D4A");
+  if (meta) meta.setAttribute("content", theme === "dark" ? THEME_BG.dark : "#e95420");
 
   try {
     window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: { theme } }));

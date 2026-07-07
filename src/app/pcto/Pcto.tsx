@@ -480,36 +480,36 @@ export default function Pcto() {
 
       <style>{`
         /* ── Look "dark premium" viola — identico al gioco Trivia ─────────────
-           Sfondo scuro, superfici "vetro" e accento viola/indaco neon (#8b7bff).
+           Sfondo scuro, superfici "vetro" e accento viola/indaco neon (#e95420).
            Stesse token del motore giochi (src/app/_game/ui/tokens.ts). */
         .pcto-page {
-          --accent: #8b7bff;        /* viola/indaco neon */
-          --accent-2: #6d4dff;      /* viola pieno */
-          --accent-3: #9d8fff;      /* viola chiaro */
-          --accent-deep: #5b4bd6;   /* viola profondo */
-          --accent-ink: #c4a5ff;    /* viola tenue su scuro */
-          --glow: rgba(139, 123, 255, 0.45);
-          --vbord: rgba(139, 123, 255, 0.34);
-          --bg0: #0a0d11;
-          --bg1: #0b0f14;
-          --bg2: #090c10;
-          --text: #e8eef4;
-          --sub: #a7b2bd;
+          --accent: #e95420;        /* viola/indaco neon */
+          --accent-2: #c2410c;      /* viola pieno */
+          --accent-3: #f39a76;      /* viola chiaro */
+          --accent-deep: #bc3d10;   /* viola profondo */
+          --accent-ink: #f6a583;    /* viola tenue su scuro */
+          --glow: rgba(233, 84, 32, 0.45);
+          --vbord: rgba(233, 84, 32, 0.34);
+          --bg0: #1d171b;
+          --bg1: #241c22;
+          --bg2: #1b151a;
+          --text: #f5f3f1;
+          --sub: #b3aca6;
           --note: #6b7785;
           --glass: rgba(255, 255, 255, 0.05);
           --glass-2: rgba(255, 255, 255, 0.08);
           --glass-bd: rgba(255, 255, 255, 0.11);
-          --bs-primary: #8b7bff;
+          --bs-primary: #e95420;
           --bs-primary-rgb: 139, 123, 255;
           min-height: 100vh;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
           color: var(--text);
         }
         /* Canvas scuro continuo con alone viola in alto (come la hero del Trivia).
            Compound .it-page-wrapper.pcto-page per battere il bianco globale. */
         .it-page-wrapper.pcto-page {
           background:
-            radial-gradient(120% 55% at 50% -8%, rgba(139, 123, 255, 0.20) 0%, transparent 55%),
+            radial-gradient(120% 55% at 50% -8%, rgba(233, 84, 32, 0.20) 0%, transparent 55%),
             linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
           background-color: var(--bg0);
         }
@@ -529,11 +529,11 @@ export default function Pcto() {
         .it-page-wrapper.pcto-page .btn-outline-light:focus {
           background-color: var(--accent) !important;
           border-color: var(--accent) !important;
-          color: #0a0d11 !important;
+          color: #ffffff !important;
         }
         .it-page-wrapper.pcto-page .chip-primary,
         .it-page-wrapper.pcto-page .chip.chip-simple.chip-primary {
-          background-color: rgba(139, 123, 255, 0.12) !important;
+          background-color: rgba(233, 84, 32, 0.12) !important;
           color: var(--accent) !important;
           border-color: var(--vbord) !important;
         }
@@ -541,7 +541,7 @@ export default function Pcto() {
 
         /* Header — barra "vetro" scura, sticky */
         .pcto-header {
-          background: rgba(10, 13, 17, 0.72);
+          background: rgba(28, 22, 27, 0.72);
           backdrop-filter: blur(14px) saturate(120%);
           -webkit-backdrop-filter: blur(14px) saturate(120%);
           border-bottom: 1px solid var(--glass-bd);
@@ -571,9 +571,9 @@ export default function Pcto() {
           overflow: hidden;
           padding: clamp(3.5rem, 8vw, 6.5rem) 0;
           background-image:
-            radial-gradient(80% 120% at 12% -10%, rgba(139, 123, 255, 0.30) 0%, transparent 55%),
-            radial-gradient(70% 120% at 100% 110%, rgba(109, 77, 255, 0.26) 0%, transparent 55%),
-            linear-gradient(160deg, #15101f 0%, #1a1430 45%, #0b0f14 100%);
+            radial-gradient(80% 120% at 12% -10%, rgba(233, 84, 32, 0.30) 0%, transparent 55%),
+            radial-gradient(70% 120% at 100% 110%, rgba(194, 65, 12, 0.26) 0%, transparent 55%),
+            linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
           border-bottom: 1px solid var(--glass-bd);
         }
         .pcto-hero > .container { position: relative; z-index: 1; }
@@ -619,7 +619,7 @@ export default function Pcto() {
           position: absolute;
           left: 7px; top: 6px; bottom: 6px;
           width: 2px;
-          background: linear-gradient(180deg, var(--vbord), rgba(139, 123, 255, 0.10));
+          background: linear-gradient(180deg, var(--vbord), rgba(233, 84, 32, 0.10));
         }
         .ap-timeline-item { position: relative; padding-bottom: 2rem; }
         .ap-timeline-item:last-child { padding-bottom: 0; }
@@ -668,7 +668,7 @@ export default function Pcto() {
           justify-content: center;
           width: 46px; height: 46px;
           border-radius: 12px;
-          background: rgba(139, 123, 255, 0.14);
+          background: rgba(233, 84, 32, 0.14);
           border: 1px solid var(--vbord);
           color: var(--accent);
           margin-bottom: 0.4rem;
@@ -708,7 +708,7 @@ export default function Pcto() {
           left: 0; right: 0; bottom: 0;
           padding: 1.6rem 0.85rem 0.6rem;
           font-size: 0.82rem; font-weight: 700; color: #ffffff;
-          background: linear-gradient(to top, rgba(10, 13, 17, 0.92), rgba(10, 13, 17, 0));
+          background: linear-gradient(to top, rgba(28, 22, 27, 0.92), rgba(28, 22, 27, 0));
         }
         .pcto-gallery-credit { margin-top: 0.6rem; font-size: 0.76rem; color: var(--note); }
         @media (max-width: 767.98px) {
@@ -747,14 +747,14 @@ export default function Pcto() {
           display: inline-flex; align-items: center; justify-content: center;
           width: 48px; height: 48px;
           border-radius: 50%;
-          background: rgba(139, 123, 255, 0.14);
+          background: rgba(233, 84, 32, 0.14);
           border: 1px solid var(--vbord);
           color: var(--accent);
           margin-bottom: 0.35rem;
         }
         .pcto-flow-label { font-weight: 700; color: var(--text); font-size: 0.95rem; }
         .pcto-flow-sub { font-size: 0.76rem; color: var(--note); }
-        .pcto-flow-arrow { color: rgba(139, 123, 255, 0.60); flex-shrink: 0; margin: 0 0.1rem; }
+        .pcto-flow-arrow { color: rgba(233, 84, 32, 0.60); flex-shrink: 0; margin: 0 0.1rem; }
         @media (max-width: 767.98px) {
           .pcto-flow { flex-direction: column; }
           .pcto-flow-step { width: 100%; flex-direction: column; }
@@ -787,7 +787,7 @@ export default function Pcto() {
           align-items: center; justify-content: center;
           width: 38px; height: 38px;
           border-radius: 50%;
-          background: rgba(139, 123, 255, 0.14);
+          background: rgba(233, 84, 32, 0.14);
           border: 1px solid var(--vbord);
           color: var(--accent);
           font-size: 1.2rem; font-weight: 800;
@@ -859,9 +859,9 @@ export default function Pcto() {
           padding: 2.5rem;
           border-radius: 18px;
           color: #ffffff;
-          background-image: linear-gradient(120deg, #9d8fff 0%, #7c6cff 45%, #5b4bd6 100%);
+          background-image: linear-gradient(120deg, #f39a76 0%, #dd4814 45%, #bc3d10 100%);
           border: 1px solid rgba(255, 255, 255, 0.14);
-          box-shadow: 0 16px 44px rgba(124, 108, 255, 0.40);
+          box-shadow: 0 16px 44px rgba(221, 72, 20, 0.40);
         }
         .pcto-closing p { font-size: 1.15rem; line-height: 1.7; opacity: 0.96; max-width: 54rem; }
         .pcto-closing strong { color: #ffffff; }
@@ -873,7 +873,7 @@ export default function Pcto() {
           width: 100%;
           overflow: hidden;
           /* fallback dark premium finché l'immagine non è presente */
-          background-image: linear-gradient(135deg, #15101f 0%, #1a1430 55%, #0b0f14 100%);
+          background-image: linear-gradient(135deg, #221a20 0%, #2a1e26 55%, #241c22 100%);
         }
         .pcto-team-banner img {
           display: block;
@@ -888,9 +888,9 @@ export default function Pcto() {
           z-index: 1;
           background-image: linear-gradient(
             165deg,
-            rgba(10, 13, 17, 0.78) 0%,
-            rgba(10, 13, 17, 0.30) 32%,
-            rgba(10, 13, 17, 0) 58%
+            rgba(28, 22, 27, 0.78) 0%,
+            rgba(28, 22, 27, 0.30) 32%,
+            rgba(28, 22, 27, 0) 58%
           );
         }
         .pcto-team-overlay {
