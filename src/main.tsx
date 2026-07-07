@@ -22,16 +22,12 @@ syncTheme();
 initLangAttr();
 
 const Bio = lazy(() => import("./app/site/Bio.tsx"));
-const Parole = lazy(() => import("./app/parole/Parole.tsx"));
-const Angoli = lazy(() => import("./app/angoli/Angoli.tsx"));
 const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
 const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
 const MeStesso = lazy(() => import("./app/me-stesso/MeStesso.tsx"));
 const Dubliners = lazy(() => import("./app/dubliners/Dubliners.tsx"));
 const Gattopardo = lazy(() => import("./app/gattopardo/Gattopardo.tsx"));
 const Letteratura = lazy(() => import("./app/letteratura/Letteratura.tsx"));
-const Movimento = lazy(() => import("./app/movimento/Movimento.tsx"));
-const Mappa = lazy(() => import("./app/mappa/Mappa.tsx"));
 const Festa = lazy(() => import("./app/festa/Festa.tsx"));
 const Archivio = lazy(() => import("./app/archivio/Archivio.tsx"));
 const Sostieni = lazy(() => import("./app/sostieni/Sostieni.tsx"));
@@ -46,22 +42,6 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Bio />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/parole"
-        element={
-          <Suspense fallback={null}>
-            <Parole />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/angoli"
-        element={
-          <Suspense fallback={null}>
-            <Angoli />
           </Suspense>
         }
       />
@@ -114,22 +94,6 @@ createRoot(document.getElementById("root")!).render(
         }
       />
       <Route
-        path="/movimento"
-        element={
-          <Suspense fallback={null}>
-            <Movimento />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/mappa"
-        element={
-          <Suspense fallback={null}>
-            <Mappa />
-          </Suspense>
-        }
-      />
-<Route
         path="/festa"
         element={
           <Suspense fallback={null}>

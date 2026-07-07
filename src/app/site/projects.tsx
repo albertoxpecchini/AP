@@ -131,32 +131,6 @@ export const PROJECTS: Project[] = [
     tags: ["Study", "Literature", "Design system", "React"],
   },
   {
-    id: "mappa",
-    category: "Web game",
-    date: "Jun 20, 2026",
-    modified: "2026-06-20",
-    title: "Mappa",
-    url: "/mappa",
-    kind: "game",
-    thumb: "mappa",
-    srcDir: "src/app/mappa",
-    desc: "Recognise the world city from its real satellite view: pan and zoom the map hunting for clues (monuments, rivers, the shape of the streets), then type the name. Five difficulty levels, progressive hints (continent, initial, country), scoring with combo bonus, name-based account, live leaderboard and light/dark theme. Esri maps, mouse and touch.",
-    tags: ["React", "TypeScript", "Leaflet", "Game design"],
-  },
-  {
-    id: "movimento",
-    category: "Web game",
-    date: "Jun 18, 2026",
-    modified: "2026-06-18",
-    title: "Movimento",
-    url: "/movimento",
-    kind: "game",
-    thumb: "movimento",
-    srcDir: "src/app/movimento",
-    desc: "Train your spatial memory: a dot traces a path on a grid and then disappears; you redraw it from memory in a single continuous gesture. Five difficulty levels (from 3×3 to 6×6), accuracy scoring of the trace, streaks with trophies and light/dark theme. Mouse and touch.",
-    tags: ["React", "TypeScript", "Canvas", "Game design"],
-  },
-  {
     id: "trivia",
     category: "Web game",
     date: "Jun 15, 2026",
@@ -168,32 +142,6 @@ export const PROJECTS: Project[] = [
     srcDir: "src/app/trivia",
     desc: "Trivia quiz on the history of architecture: multiple-choice, true-or-false and open-answer questions, organised in chapters. A relevant photo for every question, scoring with speed bonus, streaks with trophies, an American-style final grade (A–F) and a live leaderboard. Designed as a real game — light and animated — for desktop and mobile.",
     tags: ["React", "TypeScript", "Game design", "UI/UX"],
-  },
-  {
-    id: "angoli",
-    category: "Web game",
-    date: "May 30, 2026",
-    modified: "2026-05-30",
-    title: "Angoli",
-    url: "/angoli",
-    kind: "game",
-    thumb: "angoli",
-    srcDir: "src/app/angoli",
-    desc: "Guess the angle in gradians between two randomly rotated rays. Binary feedback (Higher/Lower), five difficulty modes (from 20g to 1g), a consecutive-strike system and geometric trophies.",
-    tags: ["React", "TypeScript", "SVG", "Game design"],
-  },
-  {
-    id: "parole",
-    category: "Web game",
-    date: "May 29, 2026",
-    modified: "2026-05-29",
-    title: "Parole",
-    url: "/parole",
-    kind: "game",
-    thumb: "parole",
-    srcDir: "src/app/parole",
-    desc: "A Wordle-style word game, in Italian. Six attempts to guess a five-letter word: tiles turn green if the letter is in the right place, yellow if present but misplaced, grey if absent. Physical and on-screen keyboard, dictionary validation and a random word each game.",
-    tags: ["React", "TypeScript", "react-router", "Game design"],
   },
   {
     id: "rivalta",
@@ -286,7 +234,7 @@ export const MATURITA_URLS = ["/me-stesso", "/pcto", "/letteratura", "/dubliners
 
 // Cartella "Giochi Web · In evidenza": i 5 web game del progetto.
 // Anche questi vengono tolti dalla griglia "Work" per non duplicarli.
-export const GAMES_URLS = ["/trivia", "/mappa", "/movimento", "/angoli", "/parole"];
+export const GAMES_URLS = ["/trivia"];
 
 // Siti esterni (clienti).
 export const EXTERNAL_URLS = ["https://rivaltasulmincio.it", "https://cascinafontana.xyz"];

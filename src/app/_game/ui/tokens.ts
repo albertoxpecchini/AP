@@ -12,13 +12,9 @@ export interface GameAccent {
   glow: string;
 }
 
-// Accenti = palette "accent color" di Ubuntu/Yaru: ogni gioco un accento.
+// Accento = arancio Ubuntu (Trivia è l'unico gioco rimasto).
 export const ACCENTS: Record<string, GameAccent> = {
-  trivia:    { accent: "#e95420", glow: "rgba(233, 84, 32,0.45)" }, // arancio Ubuntu
-  mappa:     { accent: "#7764d8", glow: "rgba(119,100,216,0.45)" }, // viola Yaru
-  angoli:    { accent: "#34d399", glow: "rgba(52,211,153,0.42)" },  // verde
-  parole:    { accent: "#fbbf24", glow: "rgba(251,191,36,0.42)" },  // ambra
-  movimento: { accent: "#38bdf8", glow: "rgba(56,189,248,0.42)" },  // ciano
+  trivia: { accent: "#e95420", glow: "rgba(233, 84, 32,0.45)" }, // arancio Ubuntu
 };
 
 // Superfici/testi del tema (riferimento per i componenti del motore).

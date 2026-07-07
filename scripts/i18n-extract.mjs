@@ -23,8 +23,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BASE = process.env.I18N_BASE || "http://localhost:4173";
 const ROUTES = [
-  "/", "/bio", "/parole", "/angoli", "/trivia", "/pcto", "/me-stesso",
-  "/dubliners", "/gattopardo", "/letteratura", "/movimento", "/mappa",
+  "/", "/bio", "/trivia", "/pcto", "/me-stesso",
+  "/dubliners", "/gattopardo", "/letteratura", 
   "/festa", "/archivio", "/sostieni",
 ];
 

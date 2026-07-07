@@ -109,9 +109,9 @@ export const HOBBY: Interest[] = [
     emoji: "🎮",
     label: "Video games",
     img: "/images/hobby-videogiochi.jpg",
-    desc: "Video games drew me into the world of design and technology from a young age. I love titles with a strong visual identity, careful storytelling and deep gameplay — both immersive single-player experiences and competitive titles. I've even built one: Parole, an Italian Wordle.",
-    link: "/parole",
-    linkLabel: "Play Parole",
+    desc: "Video games drew me into the world of design and technology from a young age. I love titles with a strong visual identity, careful storytelling and deep gameplay — both immersive single-player experiences and competitive titles. I've even built one: Trivia, a quiz game on the history of architecture.",
+    link: "/trivia",
+    linkLabel: "Play Trivia",
   },
   {
     Icon: Music,

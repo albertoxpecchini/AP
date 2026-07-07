@@ -501,11 +501,13 @@ export default function Trivia() {
                 {/* Titolo = capitolo (sempre pulito e descrittivo). Sottotitolo =
                     corrente · autore. Evita liste-con-parentesi del campo edificio. */}
                 <span className="trv-subj-main">{current.chapter}</span>
-                {(current.argomento || current.autore) && (
-                  <span className="trv-subj-sub">
-                    {[cleanCtx(current.argomento), current.autore].filter(Boolean).join(" · ")}
-                  </span>
-                )}
+                {(() => {
+                  // Niente doppioni: se argomento/autore ripetono il titolo, via.
+                  const title = current.chapter.trim().toLowerCase();
+                  const parts = [cleanCtx(current.argomento), current.autore]
+                    .filter((p): p is string => !!p && p.trim().toLowerCase() !== title);
+                  return parts.length > 0 ? <span className="trv-subj-sub">{parts.join(" · ")}</span> : null;
+                })()}
               </div>
             </div>
           </div>
@@ -736,7 +738,6 @@ export default function Trivia() {
       )}
 
       <style>{styles}</style>
-      <SiteFooter />
     </div>
   );
 }
@@ -833,10 +834,10 @@ const styles = `
   font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; color: var(--text);
 }
 
-/* Stage — 2 colonne su desktop (foto | domanda), riempie la viewport */
+/* Stage — 2 colonne su desktop (foto | domanda), CENTRATO nella viewport */
 .trv-stage {
   flex: 1; min-height: 0; width: 100%;
-  max-width: 100%; margin: 0 auto; align-content: center;
+  max-width: min(1220px, 100%); margin: 0 auto; align-content: center;
   display: grid; grid-template-columns: 1fr; gap: clamp(.9rem,2vmin,2.6rem);
   padding: clamp(.8rem,1.8vmin,1.8rem) clamp(1rem,2.4vw,2.6rem) clamp(1rem,2vmin,2rem);
   animation: trv-q-in .3s ease;
@@ -848,6 +849,13 @@ const styles = `
 .trv-stage-media { min-width: 0; min-height: 0; display: flex; }
 .trv-stage-qa { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: clamp(.7rem,1.6vmin,1.3rem); }
 @media (min-width: 900px) { .trv-stage-qa { max-height: 86vh; overflow: auto; padding-right: .3rem; } }
+
+/* In partita la barra globale lingua/tema si fa da parte: coprirebbe i comandi
+   (il tema resta cambiabile dal FAB del gioco). Torna visibile nel menu. */
+body:has(.trv-page[data-phase="playing"]) .ap-controlbar {
+  opacity: 0; pointer-events: none; transform: translateY(10px);
+  transition: opacity .2s ease, transform .2s ease;
+}
 
 .trv-timer { height: clamp(5px,.7vmin,9px); border-radius: 999px; background: var(--surface-2); overflow: hidden; flex-shrink: 0; }
 .trv-timer-fill { height: 100%; background: var(--accent); border-radius: 999px; box-shadow: 0 0 12px var(--glow); transition: width .1s linear; }
