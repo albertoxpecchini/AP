@@ -848,8 +848,22 @@ const RAW: Record<string, Entry> = {
   },
 };
 
+// Una chiave ha senso solo se contiene almeno una lettera: numeri, date e
+// simboli sono identici in tutte le lingue. Scarta anche gli indici numerici
+// spuri finiti per errore nel JSON generato (traducevano i numeri dei giochi
+// in stringhe a caso del sito).
+function isTranslatableKey(k: string): boolean {
+  return /\p{L}/u.test(k);
+}
+
 // Indicizza per chiave normalizzata. Prima le voci curate (RAW), poi quelle
 // generate dal crawl (che vincono in caso di sovrapposizione: sono autorevoli).
 export const DICT: Record<string, Entry> = Object.create(null);
-for (const k in RAW) DICT[normalizeKey(k)] = RAW[k];
-for (const k in generated) DICT[normalizeKey(k)] = (generated as Record<string, Entry>)[k];
+for (const k in RAW) {
+  const key = normalizeKey(k);
+  if (isTranslatableKey(key)) DICT[key] = RAW[k];
+}
+for (const k in generated) {
+  const key = normalizeKey(k);
+  if (isTranslatableKey(key)) DICT[key] = (generated as Record<string, Entry>)[k];
+}
