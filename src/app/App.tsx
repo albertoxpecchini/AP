@@ -368,22 +368,22 @@ export default function App() {
               <h1 className="hm-hero-name">Alberto Pecchini</h1>
               <span className="hm-hero-rule" aria-hidden="true" />
               <p className="hm-hero-lead">
-                High-school senior &amp; front-end developer behind a hub of web games —{" "}
-                <span className="hm-ink">Trivia</span>, <span className="hm-ink">Mappa</span> and{" "}
-                <span className="hm-ink">Parole</span> — and client websites like{" "}
+                High-school senior &amp; front-end developer behind{" "}
+                <span className="hm-ink">Trivia</span> — a web game on the history of
+                architecture — and client websites like{" "}
                 <span className="hm-ink">Rivalta sul Mincio</span> and{" "}
                 <span className="hm-ink">Cascina Fontana</span>.
               </p>
               <p className="hm-hero-sub">
                 Building elegant, fast web experiences with React, TypeScript and careful
-                motion design — from playful games to real-world business sites.
+                motion design — from a playful quiz game to real-world business sites.
               </p>
               <div className="hm-hero-actions">
                 <a href="#archivio" className="hm-pill hm-pill--solid">🚀 Projects</a>
                 <Link to="/bio" className="hm-pill hm-pill--ghost">👋 Bio</Link>
               </div>
               <div className="hm-hero-quick">
-                {["Trivia", "Mappa", "Angoli"].map((t) => {
+                {["Trivia", "Letteratura", "About Me"].map((t) => {
                   const p = PROJECTS.find((x) => x.title === t);
                   if (!p) return null;
                   return (

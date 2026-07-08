@@ -492,8 +492,8 @@ export default function MeStesso() {
                 </p>
                 <p className="ms-prose">
                   Mi occupo di tutto, dall'idea al codice: ho realizzato siti veri — <strong>Cascina
-                  Fontana</strong> e <strong>Rivalta sul Mincio</strong> — e una serie di web game
-                  (Trivia, Mappa, Movimento, Angoli, Parole) curati nel design e nelle animazioni.
+                  Fontana</strong> e <strong>Rivalta sul Mincio</strong> — e <strong>Trivia</strong>,
+                  un web game sulla storia dell'architettura curato nel design e nelle animazioni.
                 </p>
                 <p className="ms-prose mb-0">
                   Amo trasformare un'idea in qualcosa che si può toccare a schermo, iterarla e rifinirla

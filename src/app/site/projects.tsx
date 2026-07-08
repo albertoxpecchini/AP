@@ -12,9 +12,6 @@
 
 import {
   Globe2,
-  Compass,
-  Footprints,
-  Type,
   BrainCircuit,
   Ruler,
   UserRound,
@@ -50,16 +47,12 @@ export interface Project {
 export function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: number }) {
   const sw = 2.1;
   switch (thumb) {
-    case "angoli":      return <Compass size={size} strokeWidth={sw} />;
-    case "parole":      return <Type size={size} strokeWidth={sw} />;
     case "trivia":      return <BrainCircuit size={size} strokeWidth={sw} />;
     case "pcto":        return <Ruler size={size} strokeWidth={sw} />;
     case "mestesso":    return <UserRound size={size} strokeWidth={sw} />;
     case "dubliners":   return <BookOpen size={size} strokeWidth={sw} />;
     case "gattopardo":  return <Cat size={size} strokeWidth={sw} />;
     case "letteratura": return <GraduationCap size={size} strokeWidth={sw} />;
-    case "movimento":   return <Footprints size={size} strokeWidth={sw} />;
-    case "mappa":       return <Globe2 size={size} strokeWidth={sw} />;
     default:            return <Globe2 size={size} strokeWidth={sw} />;
   }
 }
@@ -215,11 +208,7 @@ export const PROJECT_EMOJI: Record<string, string> = {
   "Dubliners": "📖",
   "The Leopard": "🐆",
   "Letteratura": "🎓",
-  "Mappa": "🗺️",
-  "Movimento": "👣",
   "Trivia": "🧠",
-  "Angoli": "📐",
-  "Parole": "🔤",
   "Rivalta sul Mincio": "🏞️",
   "Cascina Fontana": "🏡",
   "Schemi orale — Letteratura": "📝",
@@ -232,7 +221,7 @@ export const PROJECT_EMOJI: Record<string, string> = {
 // la cartella e tolti dalla griglia "Work" per non duplicarli.
 export const MATURITA_URLS = ["/me-stesso", "/pcto", "/letteratura", "/dubliners", "/gattopardo"];
 
-// Cartella "Giochi Web · In evidenza": i 5 web game del progetto.
+// Cartella "Giochi Web · In evidenza": i web game del progetto (oggi solo Trivia).
 // Anche questi vengono tolti dalla griglia "Work" per non duplicarli.
 export const GAMES_URLS = ["/trivia"];
 

@@ -58,16 +58,21 @@ const RAW: Record<string, Entry> = {
     fr: "💻 Développeur front-end · Étudiant CAT",
     de: "💻 Frontend-Entwickler · CAT-Schüler",
   },
-  "High-school senior & front-end developer behind a hub of web games —": {
-    it: "Studente dell'ultimo anno e sviluppatore front-end dietro a un hub di web game —",
-    fr: "Lycéen en terminale et développeur front-end derrière un hub de jeux web —",
-    de: "Schüler der Abschlussklasse und Frontend-Entwickler hinter einem Hub von Web-Games —",
+  "High-school senior & front-end developer behind": {
+    it: "Studente dell'ultimo anno e sviluppatore front-end dietro a",
+    fr: "Lycéen en terminale et développeur front-end derrière",
+    de: "Schüler der Abschlussklasse und Frontend-Entwickler hinter",
   },
-  "Building elegant, fast web experiences with React, TypeScript and careful motion design — from playful games to real-world business sites.":
+  "— a web game on the history of architecture — and client websites like": {
+    it: "— un web game sulla storia dell'architettura — e siti web per clienti come",
+    fr: "— un jeu web sur l'histoire de l'architecture — et des sites web pour clients comme",
+    de: "— einem Web-Game über die Geschichte der Architektur — und Kunden-Websites wie",
+  },
+  "Building elegant, fast web experiences with React, TypeScript and careful motion design — from a playful quiz game to real-world business sites.":
     {
-      it: "Creo esperienze web eleganti e veloci con React, TypeScript e cura del movimento — dai giochi spensierati ai veri siti aziendali.",
-      fr: "Je crée des expériences web élégantes et rapides avec React, TypeScript et un soin particulier des animations — des jeux ludiques aux vrais sites d'entreprise.",
-      de: "Ich baue elegante, schnelle Web-Erlebnisse mit React, TypeScript und sorgfältigem Motion Design — von verspielten Games bis zu echten Unternehmensseiten.",
+      it: "Creo esperienze web eleganti e veloci con React, TypeScript e cura del movimento — da un quiz spensierato ai veri siti aziendali.",
+      fr: "Je crée des expériences web élégantes et rapides avec React, TypeScript et un soin particulier des animations — d'un quiz ludique aux vrais sites d'entreprise.",
+      de: "Ich baue elegante, schnelle Web-Erlebnisse mit React, TypeScript und sorgfältigem Motion Design — vom verspielten Quiz bis zu echten Unternehmensseiten.",
     },
   "🚀 Projects": { it: "🚀 Progetti", fr: "🚀 Projets", de: "🚀 Projekte" },
 
@@ -582,9 +587,7 @@ const RAW: Record<string, Entry> = {
   "Telegram": { en: "Telegram", fr: "Telegram", de: "Telegram" },
   "Snapchat": { en: "Snapchat", fr: "Snapchat", de: "Snapchat" },
   "Trivia": { en: "Trivia", fr: "Trivia", de: "Trivia" },
-  "Mappa": { en: "Map", fr: "Carte", de: "Karte" },
-  "Parole": { en: "Words", fr: "Mots", de: "Wörter" },
-  "Angoli": { en: "Angles", fr: "Angles", de: "Winkel" },
+  // "Movimento" resta: è il kicker degli schemi di letteratura, non più un gioco.
   "Movimento": { en: "Movement", fr: "Mouvement", de: "Bewegung" },
   "Cascina Fontana": { en: "Cascina Fontana", fr: "Cascina Fontana", de: "Cascina Fontana" },
   "Rivalta sul Mincio": { en: "Rivalta sul Mincio", fr: "Rivalta sul Mincio", de: "Rivalta sul Mincio" },

@@ -57,26 +57,6 @@ Schemi di studio per il programma di letteratura italiana della Maturità 2026: 
 
 **Tecnologie:** React, TypeScript, design system.`,
 
-  mappa: `## Mappa — riconosci la città
-Riconosci la città del mondo dalla vista satellitare reale: esplora la mappa cercando indizi (monumenti, fiumi, la forma delle strade), poi scrivi il nome.
-
-**Caratteristiche**
-- 5 livelli di difficoltà, indizi progressivi (continente, iniziale, nazione)
-- Punteggio con bonus combo, account a nickname, classifica live
-- Tema chiaro/scuro, mappe Esri, mouse e touch
-
-**Tecnologie:** React, TypeScript, Leaflet.`,
-
-  movimento: `## Movimento — memoria spaziale
-Allena la memoria spaziale: un punto traccia un percorso su una griglia e poi sparisce; tu lo ridisegni a memoria in un unico gesto continuo.
-
-**Caratteristiche**
-- 5 livelli (da 3×3 a 6×6)
-- Punteggio sull'accuratezza del tratto, serie con trofei
-- Tema chiaro/scuro, mouse e touch
-
-**Tecnologie:** React, TypeScript, Canvas.`,
-
   trivia: `## Trivia — quiz di storia dell'architettura
 Quiz sulla storia dell'architettura: domande a scelta multipla, vero/falso e a risposta aperta, organizzate in capitoli.
 
@@ -86,26 +66,6 @@ Quiz sulla storia dell'architettura: domande a scelta multipla, vero/falso e a r
 - Pensato come un vero gioco, leggero e animato, per desktop e mobile
 
 **Tecnologie:** React, TypeScript.`,
-
-  angoli: `## Angoli — indovina l'angolo
-Indovina l'angolo in gradianti tra due semirette ruotate a caso.
-
-**Caratteristiche**
-- Feedback binario (più alto / più basso)
-- 5 modalità di difficoltà (da 20g a 1g)
-- Sistema di serie consecutive e trofei geometrici
-
-**Tecnologie:** React, TypeScript, SVG.`,
-
-  parole: `## Parole — alla Wordle, in italiano
-Un gioco di parole in stile Wordle. Sei tentativi per indovinare una parola di cinque lettere.
-
-**Caratteristiche**
-- Tessere verdi/gialle/grigie secondo la posizione delle lettere
-- Tastiera fisica e a schermo, validazione col dizionario
-- Una parola casuale a ogni partita
-
-**Tecnologie:** React, TypeScript, react-router.`,
 
   rivalta: `## Rivalta sul Mincio — sito turistico
 Sito responsive per la destinazione turistica di Rivalta sul Mincio.

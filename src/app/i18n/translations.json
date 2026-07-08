@@ -79,25 +79,25 @@
     "fr": "💻 Développeur front-end · Étudiant CAT",
     "de": "💻 Frontend-Entwickler · CAT-Schüler"
   },
-  "High-school senior & front-end developer behind a hub of web games —": {
-    "it": "Studente dell'ultimo anno e sviluppatore front-end dietro a un hub di web game —",
-    "fr": "Lycéen en terminale et développeur front-end derrière un hub de jeux web —",
-    "de": "Schüler der Abschlussklasse und Frontend-Entwickler hinter einem Hub von Web-Games —"
+  "High-school senior & front-end developer behind": {
+    "it": "Studente dell'ultimo anno e sviluppatore front-end dietro a",
+    "fr": "Lycéen en terminale et développeur front-end derrière",
+    "de": "Schüler der Abschlussklasse und Frontend-Entwickler hinter"
   },
   "and": {
     "it": "e",
     "fr": "et",
     "de": "und"
   },
-  "— and client websites like": {
-    "it": "— e siti web per clienti come",
-    "fr": "— et des sites web pour clients comme",
-    "de": "— und Kunden-Websites wie"
+  "— a web game on the history of architecture — and client websites like": {
+    "it": "— un web game sulla storia dell'architettura — e siti web per clienti come",
+    "fr": "— un jeu web sur l'histoire de l'architecture — et des sites web pour clients comme",
+    "de": "— einem Web-Game über die Geschichte der Architektur — und Kunden-Websites wie"
   },
-  "Building elegant, fast web experiences with React, TypeScript and careful motion design — from playful games to real-world business sites.": {
-    "it": "Creo esperienze web eleganti e veloci con React, TypeScript e cura del movimento — dai giochi spensierati ai veri siti aziendali.",
-    "fr": "Je crée des expériences web élégantes et rapides avec React, TypeScript et un soin particulier des animations — des jeux ludiques aux vrais sites d'entreprise.",
-    "de": "Ich baue elegante, schnelle Web-Erlebnisse mit React, TypeScript und sorgfältigem Motion Design — von verspielten Games bis zu echten Unternehmensseiten."
+  "Building elegant, fast web experiences with React, TypeScript and careful motion design — from a playful quiz game to real-world business sites.": {
+    "it": "Creo esperienze web eleganti e veloci con React, TypeScript e cura del movimento — da un quiz spensierato ai veri siti aziendali.",
+    "fr": "Je crée des expériences web élégantes et rapides avec React, TypeScript et un soin particulier des animations — d'un quiz ludique aux vrais sites d'entreprise.",
+    "de": "Ich baue elegante, schnelle Web-Erlebnisse mit React, TypeScript und sorgfältigem Motion Design — vom verspielten Quiz bis zu echten Unternehmensseiten."
   },
   "🚀 Projects": {
     "it": "🚀 Progetti",
@@ -109,15 +109,15 @@
     "fr": "Ouvrir Trivia",
     "de": "Trivia öffnen"
   },
-  "Open Mappa": {
-    "it": "Apri Mappa",
-    "fr": "Ouvrir Mappa",
-    "de": "Mappa öffnen"
+  "Open Letteratura": {
+    "it": "Apri Letteratura",
+    "fr": "Ouvrir Letteratura",
+    "de": "Letteratura öffnen"
   },
-  "Open Angoli": {
-    "it": "Apri Angoli",
-    "fr": "Ouvrir Angoli",
-    "de": "Angoli öffnen"
+  "Open About Me": {
+    "it": "Apri About Me",
+    "fr": "Ouvrir About Me",
+    "de": "About Me öffnen"
   },
   "Portrait of Alberto Pecchini": {
     "it": "Ritratto di Alberto Pecchini",
@@ -1194,16 +1194,6 @@
     "fr": "Retour à l'accueil",
     "de": "Zurück zur Startseite"
   },
-  "Lessico · indovina la parola e scala la classifica": {
-    "en": "Lexicon · guess the word and climb the leaderboard",
-    "fr": "Lexique · devine le mot et grimpe au classement",
-    "de": "Wortschatz · errate das Wort und klettere in der Bestenliste"
-  },
-  "Web Game · Lessico": {
-    "en": "Web Game · Lexicon",
-    "fr": "Web Game · Lexique",
-    "de": "Web-Game · Wortschatz"
-  },
   "Trofei": {
     "en": "Trophies",
     "fr": "Trophées",
@@ -1308,16 +1298,6 @@
     "en": "4 modes · live leaderboard · trophies · streak",
     "fr": "4 modes · classement en direct · trophées · série",
     "de": "4 Modi · Live-Bestenliste · Trophäen · Streak"
-  },
-  "Indovina la parola nascosta": {
-    "en": "Guess the hidden word",
-    "fr": "Devine le mot caché",
-    "de": "Errate das versteckte Wort"
-  },
-  "Web Game · gioco gratuito": {
-    "en": "Web Game · free game",
-    "fr": "Web Game · jeu gratuit",
-    "de": "Web-Game · kostenloses Spiel"
   },
   "Funzioni": {
     "en": "Features",
@@ -1438,16 +1418,6 @@
     "en": "ENTER",
     "fr": "ENTRÉE",
     "de": "ENTER"
-  },
-  "Geometria · indovina l'angolo e scala la classifica": {
-    "en": "Geometry · guess the angle and climb the leaderboard",
-    "fr": "Géométrie · devine l'angle et grimpe au classement",
-    "de": "Geometrie · errate den Winkel und klettere in der Bestenliste"
-  },
-  "Web Game · Geometria": {
-    "en": "Web Game · Geometry",
-    "fr": "Web Game · Géométrie",
-    "de": "Web-Game · Geometrie"
   },
   "Miglior streak": {
     "en": "Best streak",
@@ -3059,10 +3029,15 @@
     "fr": "Je m'occupe de tout, de l'idée au code : j'ai réalisé de vrais sites —",
     "de": "Ich kümmere mich um alles, von der Idee bis zum Code: Ich habe echte Seiten gebaut —"
   },
-  "— e una serie di web game (Trivia, Mappa, Movimento, Angoli, Parole) curati nel design e nelle animazioni.": {
-    "en": "— and a series of web games (Trivia, Mappa, Movimento, Angoli, Parole) crafted in design and animation.",
-    "fr": "— et une série de web games (Trivia, Mappa, Movimento, Angoli, Parole) soignés dans le design et les animations.",
-    "de": "— und eine Reihe von Web-Games (Trivia, Mappa, Movimento, Angoli, Parole), sorgfältig in Design und Animation."
+  "— e": {
+    "en": "— and",
+    "fr": "— et",
+    "de": "— und"
+  },
+  ", un web game sulla storia dell'architettura curato nel design e nelle animazioni.": {
+    "en": ", a web game on the history of architecture, crafted in design and animation.",
+    "fr": ", un jeu web sur l'histoire de l'architecture, soigné dans le design et les animations.",
+    "de": ", ein Web-Game über die Geschichte der Architektur, sorgfältig in Design und Animation."
   },
   "Amo trasformare un'idea in qualcosa che si può toccare a schermo, iterarla e rifinirla fino all'ultimo dettaglio.": {
     "en": "I love turning an idea into something you can touch on screen, iterating and refining it down to the last detail.",

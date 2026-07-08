@@ -1,9 +1,8 @@
 // ─── MOTORE GIOCHI · Validazione nickname (fonte unica) ─────────────────────
 //
-// Questo file è il MODELLO condiviso da tutti i giochi (Trivia, Angoli, Mappa,
-// Parole, Movimento, …). Prima la stessa logica era copiata identica in
-// angoli/nickname.ts e parole/nickname.ts (127 righe × 2) e re-esportata da
-// trivia/ e mappa/. Ora vive qui una volta sola: ogni gioco re-esporta da qui.
+// Questo file è il MODELLO condiviso del motore giochi. Nato quando i giochi
+// erano cinque (la stessa logica era copiata identica in più cartelle), oggi
+// serve il solo Trivia, che re-esporta da qui.
 //
 // Regole:
 //  • massimo 10 lettere

@@ -1,4 +1,4 @@
-// ─── Account giocatori "col nome" (condiviso fra Trivia / Angoli / Parole) ───
+// ─── Account giocatori "col nome" (oggi usato dal solo Trivia) ───────────────
 //
 // Login leggero senza password: scegliendo un nome viene creato/aggiornato un
 // record su Supabase (tabella `players`, SQL in supabase/players.sql). Da
