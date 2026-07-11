@@ -14,6 +14,8 @@
 // ci si iscrive ai cambi. Il widget (LanguageSwitcher) e il motore leggono da qui.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { getPref, setPref } from "../utils/prefs";
+
 export type Lang = "it" | "en" | "fr" | "de";
 
 export interface LangMeta {
@@ -48,12 +50,8 @@ export function langMeta(code: Lang): LangMeta {
 
 // Lingua iniziale: scelta memorizzata → lingua del browser → italiano.
 function detect(): Lang {
-  try {
-    const stored = localStorage.getItem(KEY);
-    if (isLang(stored)) return stored;
-  } catch {
-    /* storage non disponibile */
-  }
+  const stored = getPref(KEY);
+  if (isLang(stored)) return stored;
   try {
     const nav = (navigator.language || "").slice(0, 2).toLowerCase();
     if (isLang(nav)) return nav;
@@ -87,11 +85,7 @@ export function initLangAttr(): void {
 export function setLang(lang: Lang): void {
   if (!isLang(lang) || lang === current) return;
   current = lang;
-  try {
-    localStorage.setItem(KEY, lang);
-  } catch {
-    /* ignora */
-  }
+  setPref(KEY, lang);
   try {
     document.documentElement.lang = lang;
   } catch {

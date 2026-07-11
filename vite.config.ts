@@ -149,7 +149,13 @@ export default defineConfig({
         // servirebbe index.html anche per una navigazione verso un .pdf (iframe o
         // nuova scheda = mode "navigate"), facendo comparire la home al posto del
         // documento. Escludendoli, la richiesta va in rete / runtimeCaching.
-        navigateFallbackDenylist: [/\.(?:pdf|zip|png|jpe?g|gif|webp|svg|ico|txt|xml|json|woff2?|mp4|webm|mp3)$/i],
+        navigateFallbackDenylist: [
+          /\.(?:pdf|zip|png|jpe?g|gif|webp|svg|ico|txt|xml|json|woff2?|mp4|webm|mp3)$/i,
+          // Sottodomini canonici: i vecchi /path su www vengono 301-redirezionati
+          // da Vercel ai sottodomini. Escludendoli dal fallback, il service worker
+          // non serve index.html e lascia scattare il redirect di rete.
+          /^\/(bio|trivia|pcto|me-stesso|dubliners|gattopardo|letteratura|archivio|sostieni|festa)(?:\/|$)/,
+        ],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,

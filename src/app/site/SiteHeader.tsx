@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link, urlForPath } from "./nav";
 import { Mail, Phone, Menu, X } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
 import { EMAIL, PHONE_DISPLAY, PHONE_HREF, WHATSAPP_HREF, NAV_LINKS, WhatsAppIcon } from "./data";
@@ -48,7 +48,7 @@ export default function SiteHeader({
                 {link.label}
               </Link>
             ) : (
-              <a key={link.href} className="ap-hdr-link" href={link.href}>
+              <a key={link.href} className="ap-hdr-link" href={urlForPath(link.href)}>
                 {link.label}
               </a>
             ),
@@ -67,7 +67,7 @@ export default function SiteHeader({
               <SiX size={18} aria-hidden="true" />
             </a>
           </div>
-          <a href="/#contatti" className="ap-hdr-cta">Contact</a>
+          <a href={urlForPath("/#contatti")} className="ap-hdr-cta">Contact</a>
           <button
             className="ap-hdr-burger"
             type="button"
@@ -95,7 +95,7 @@ export default function SiteHeader({
                   {link.label}
                 </Link>
               ) : (
-                <a key={link.href} href={link.href} onClick={closeMenu}>
+                <a key={link.href} href={urlForPath(link.href)} onClick={closeMenu}>
                   {link.label}
                 </a>
               ),

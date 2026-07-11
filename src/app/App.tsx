@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useMemo } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link } from "./site/nav";
 import { activateLocalMode } from "./utils/local";
 import { isIOS } from "./utils/device";
 import { lockBodyScroll, unlockBodyScroll } from "./utils/scrollLock";

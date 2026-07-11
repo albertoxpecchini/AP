@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link } from "../site/nav";
 import SiteFooter from "../site/SiteFooter";
 import {
   ArrowLeft,

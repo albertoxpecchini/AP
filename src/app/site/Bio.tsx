@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link } from "./nav";
 import { ArrowLeft, ArrowUpRight, MapPin, GraduationCap, UserRound } from "lucide-react";
 import InterestModal from "./InterestModal";
 import SiteFooter from "./SiteFooter";

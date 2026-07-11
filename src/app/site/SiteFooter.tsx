@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link } from "./nav";
 import { SOCIALS } from "./data";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import GitHubFooterWidget from "./GitHubFooterWidget";

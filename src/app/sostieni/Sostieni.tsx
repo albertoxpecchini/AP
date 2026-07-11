@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link } from "../site/nav";
 import {
   Heart, Copy, Check, Send, Loader2, Crown, Mail, ArrowLeft, Gift,
 } from "lucide-react";

@@ -13,6 +13,8 @@
 // (`ms-theme`), così il tema è davvero unico ovunque.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { getPref, setPref } from "../utils/prefs";
+
 export type Theme = "light" | "dark";
 export type Mode = "auto" | "manual";
 
@@ -39,19 +41,11 @@ export function timeTheme(d: Date = new Date()): Theme {
 }
 
 export function getMode(): Mode {
-  try {
-    return localStorage.getItem(MODE_KEY) === "manual" ? "manual" : "auto";
-  } catch {
-    return "auto";
-  }
+  return getPref(MODE_KEY) === "manual" ? "manual" : "auto";
 }
 
 export function getManual(): Theme {
-  try {
-    return localStorage.getItem(MANUAL_KEY) === "dark" ? "dark" : "light";
-  } catch {
-    return "light";
-  }
+  return getPref(MANUAL_KEY) === "dark" ? "dark" : "light";
 }
 
 /** Tema che dovrebbe essere attivo ADESSO, dati mode + orologio. */
@@ -100,23 +94,15 @@ export function syncTheme(): Theme {
   return t;
 }
 
-/** Passa a "manuale" memorizzando la scelta dell'utente. */
+/** Passa a "manuale" memorizzando la scelta dell'utente (condivisa tra sottodomini). */
 export function setManualTheme(theme: Theme): void {
-  try {
-    localStorage.setItem(MODE_KEY, "manual");
-    localStorage.setItem(MANUAL_KEY, theme);
-  } catch {
-    /* ignora */
-  }
+  setPref(MODE_KEY, "manual");
+  setPref(MANUAL_KEY, theme);
 }
 
 /** Restituisce il comando al sensore orario. */
 export function setAutoMode(): void {
-  try {
-    localStorage.setItem(MODE_KEY, "auto");
-  } catch {
-    /* ignora */
-  }
+  setPref(MODE_KEY, "auto");
 }
 
 /** Si iscrive ai cambi di tema. Ritorna la funzione di disiscrizione. */

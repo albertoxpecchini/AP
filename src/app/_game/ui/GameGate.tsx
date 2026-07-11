@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link } from "../../site/nav";
 import { ArrowLeft, ArrowRight, User } from "lucide-react";
 import { checkNickname } from "../nickname";
 import { fetchPlayers, upsertPlayer, getAccountNick, type Player } from "../../../lib/players";

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -9,6 +9,7 @@ import { syncTheme } from "./app/theme/themeCore.ts";
 import LanguageSwitcher from "./app/i18n/LanguageSwitcher.tsx";
 import { startI18nEngine } from "./app/i18n/translateDom.ts";
 import { initLangAttr } from "./app/i18n/langCore.ts";
+import { pathForHost } from "./app/site/nav";
 import "./styles/index.css";
 
 // Il Backspace non deve più far "uscire" dalla pagina (navigazione Indietro del
@@ -32,9 +33,33 @@ const Festa = lazy(() => import("./app/festa/Festa.tsx"));
 const Archivio = lazy(() => import("./app/archivio/Archivio.tsx"));
 const Sostieni = lazy(() => import("./app/sostieni/Sostieni.tsx"));
 
+// ── Sottodomini canonici ──────────────────────────────────────────────────────
+// Se siamo su <pagina>.albertopecchini.it, serviamo DIRETTAMENTE quella pagina
+// alla root del sottodominio: l'URL resta pulito (nessun /path aggiunto) e non
+// c'è alcun redirect. Su www/apex (e in dev/preview) resta il routing a path.
+const SUBDOMAIN_PAGE: Record<string, ComponentType> = {
+  "/bio": Bio,
+  "/trivia": Trivia,
+  "/pcto": Pcto,
+  "/me-stesso": MeStesso,
+  "/dubliners": Dubliners,
+  "/gattopardo": Gattopardo,
+  "/letteratura": Letteratura,
+  "/archivio": Archivio,
+  "/sostieni": Sostieni,
+  "/festa": Festa,
+};
+const subPath = pathForHost();
+const SubPage = subPath ? SUBDOMAIN_PAGE[subPath] : null;
+
 createRoot(document.getElementById("root")!).render(
   <>
     <BrowserRouter>
+    {SubPage ? (
+      <Routes>
+        <Route path="*" element={<Suspense fallback={null}><SubPage /></Suspense>} />
+      </Routes>
+    ) : (
     <Routes>
       <Route path="/" element={<App />} />
       <Route
@@ -119,6 +144,7 @@ createRoot(document.getElementById("root")!).render(
       />
 <Route path="*" element={<App />} />
     </Routes>
+    )}
     </BrowserRouter>
     {/* Barra di controllo globale — un'unica pillola in vetro, in basso a
         sinistra: lingua · tema · sensore orario. Presente su ogni pagina.

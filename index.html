@@ -27,10 +27,18 @@
       <script>
         (function () {
           try {
-            var mode = localStorage.getItem("ap-theme-mode");
+            // Preferenza condivisa tra i sottodomini: cookie su .albertopecchini.it,
+            // poi fallback a localStorage (dev/preview). Evita il flash di tema
+            // arrivando su un sottodominio senza il valore in localStorage locale.
+            function readPref(k) {
+              var m = document.cookie.match(new RegExp("(?:^|; )" + k + "=([^;]*)"));
+              if (m) return decodeURIComponent(m[1]);
+              try { return localStorage.getItem(k); } catch (e) { return null; }
+            }
+            var mode = readPref("ap-theme-mode");
             var theme;
             if (mode === "manual") {
-              theme = localStorage.getItem("ap-theme-manual") === "dark" ? "dark" : "light";
+              theme = readPref("ap-theme-manual") === "dark" ? "dark" : "light";
             } else {
               var h = new Date().getHours();
               theme = h >= 8 && h < 20 ? "light" : "dark";

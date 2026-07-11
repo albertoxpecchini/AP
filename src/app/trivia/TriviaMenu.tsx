@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useLayoutEffect, useEffect } from "react";
-import { Link } from "react-router";
+import { SiteLink as Link } from "../site/nav";
 import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp, ListChecks, ToggleLeft, PencilLine, MoreHorizontal, X, BrainCircuit } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";

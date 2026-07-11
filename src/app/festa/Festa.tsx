@@ -241,7 +241,7 @@ function downloadIcs() {
     `DTEND:${fmt(FESTA_END)}`,
     "SUMMARY:🎉 Festa di Alberto (20 anni + Maturità)",
     "LOCATION:Strada Vedusino 4\\, Rivalta sul Mincio",
-    "DESCRIPTION:Festa dalle 18 a tarda notte. Piscina dal pomeriggio\\, cena dalle 18. RSVP: https://www.albertopecchini.it/festa?k=alb20-mtv74-28",
+    "DESCRIPTION:Festa dalle 18 a tarda notte. Piscina dal pomeriggio\\, cena dalle 18. RSVP: https://festa.albertopecchini.it?k=alb20-mtv74-28",
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");

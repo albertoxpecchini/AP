@@ -4,6 +4,7 @@ import { Sun, Moon } from "lucide-react";
 import {
   applyTheme,
   currentTheme,
+  getMode,
   nextBoundary,
   resolveTheme,
   setAutoMode,
@@ -230,9 +231,5 @@ export default function ThemeWidget() {
 }
 
 function isAuto(): boolean {
-  try {
-    return localStorage.getItem("ap-theme-mode") !== "manual";
-  } catch {
-    return true;
-  }
+  return getMode() !== "manual";
 }

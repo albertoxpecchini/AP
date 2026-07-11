@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { currentTheme, subscribeTheme } from "../theme/themeCore";
-import { Link } from "react-router";
+import { SiteLink as Link } from "../site/nav";
 import SiteFooter from "../site/SiteFooter";
 import {
   ArrowLeft,

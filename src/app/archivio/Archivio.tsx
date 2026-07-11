@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router";
+import { isProdHost, urlForPath, subForPath } from "../site/nav";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import {
   Folder,
@@ -314,8 +315,12 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
   };
 
   const openOnline = (p: Project) => {
-    if (p.url.startsWith("/") && p.kind !== "doc") navigate(p.url);
-    else window.open(p.url, "_blank", "noopener,noreferrer");
+    if (p.url.startsWith("/") && p.kind !== "doc") {
+      // Pagina interna: in produzione vive sul suo sottodominio (cross-origin),
+      // in dev/preview resta navigazione SPA.
+      if (isProdHost()) window.location.href = urlForPath(p.url);
+      else navigate(p.url);
+    } else window.open(p.url, "_blank", "noopener,noreferrer");
   };
 
   const download = (p: Project) => {
@@ -334,7 +339,9 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
   };
 
   const copyLink = (p: Project) => {
-    const url = p.url.startsWith("/") ? window.location.origin + p.url : p.url;
+    const url = p.url.startsWith("/")
+      ? (isProdHost() ? urlForPath(p.url) : window.location.origin + p.url)
+      : p.url;
     navigator.clipboard?.writeText(url).then(
       () => showFlash("Link copiato negli appunti"),
       () => showFlash(url),
@@ -362,9 +369,13 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
 
   const detailItem = detailId ? ALL.find((p) => p.id === detailId) ?? null : null;
 
-  // "Posizione" stile Windows: dominio + percorso (interni/PDF) o URL (esterni).
-  const locationOf = (p: Project) =>
-    p.url.startsWith("/") ? `albertopecchini.it${p.url}` : p.url.replace(/^https?:\/\//, "");
+  // "Posizione" stile Windows: host canonico. Le pagine interne vivono sul loro
+  // sottodominio (trivia.albertopecchini.it); gli asset (PDF/zip) sul dominio hub.
+  const locationOf = (p: Project) => {
+    if (!p.url.startsWith("/")) return p.url.replace(/^https?:\/\//, "");
+    const sub = subForPath(p.url);
+    return sub ? `${sub}.albertopecchini.it` : `albertopecchini.it${p.url}`;
+  };
 
   // ── Selezione a rettangolo (marquee) blu, come su Windows ──
   const startMarquee = (e: React.PointerEvent) => {
