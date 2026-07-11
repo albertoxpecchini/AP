@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
-  Heart, Copy, Check, Send, Loader2, Crown, Mail, ArrowLeft,
-  Landmark, Gift, MessageCircle,
+  Heart, Copy, Check, Send, Loader2, Crown, Mail, ArrowLeft, Gift,
 } from "lucide-react";
 import { EMAIL, WHATSAPP_HREF, WhatsAppIcon } from "../site/data";
 import {
@@ -533,8 +532,6 @@ export default function Sostieni() {
         /* Contatti + footer */
         .sos-contact { text-align: center; padding: 1rem 0 0; }
         .sos-contact p { font-size: 1.1rem; color: var(--sub); margin: 0 0 1.1rem; }
-        .sos-foot { position: relative; z-index: 1; border-top: 1px solid var(--surface-bd); padding: 1.6rem 0; margin-top: 2rem; }
-        .sos-foot-inner { display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--sub); font-size: 0.92rem; }
 
         .sos-spin { animation: sos-spin 0.9s linear infinite; }
         @keyframes sos-spin { to { transform: rotate(360deg); } }

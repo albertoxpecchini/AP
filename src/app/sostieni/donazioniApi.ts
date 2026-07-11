@@ -8,19 +8,17 @@
 //   VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
 //
 // Schema tabella in supabase/donatori.sql:
-//   id, nome, tipo ('donatore'|'sponsor'), frequenza, importo, messaggio, link, created_at
+//   id, nome, tipo ('donatore'|'sponsor'), importo, messaggio, link, created_at
 //
 // Se non configurate, lavora in modalità "solo locale" (localStorage), così il
 // libro resta funzionante anche senza backend.
 
 export type Tipo = "donatore" | "sponsor";
-export type Frequenza = "tantum" | "settimanale" | "mensile";
 
 export interface DonatoreRow {
   id?: number;
   nome: string;
   tipo: Tipo;
-  frequenza?: Frequenza | null;
   importo?: string | null;
   messaggio?: string | null;
   link?: string | null;
@@ -62,7 +60,6 @@ const trimOrNull = (s: string | null | undefined, max: number): string | null =>
 const sanitize = (row: DonatoreRow): DonatoreRow => ({
   nome: row.nome.trim().slice(0, 40),
   tipo: row.tipo === "sponsor" ? "sponsor" : "donatore",
-  frequenza: row.frequenza ?? null,
   importo: trimOrNull(row.importo, 20),
   messaggio: trimOrNull(row.messaggio, 280),
   link: trimOrNull(row.link, 200),
@@ -95,7 +92,7 @@ export async function fetchDonatori(limit = 200): Promise<DonatoreRow[]> {
   }
 
   const params = new URLSearchParams({
-    select: "id,nome,tipo,frequenza,importo,messaggio,link,created_at",
+    select: "id,nome,tipo,importo,messaggio,link,created_at",
     order: "created_at.desc",
     limit: String(limit),
   });
