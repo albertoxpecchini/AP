@@ -154,7 +154,7 @@ export default defineConfig({
           // Sottodomini canonici: i vecchi /path su www vengono 301-redirezionati
           // da Vercel ai sottodomini. Escludendoli dal fallback, il service worker
           // non serve index.html e lascia scattare il redirect di rete.
-          /^\/(bio|trivia|pcto|me-stesso|dubliners|gattopardo|letteratura|archivio|sostieni|festa)(?:\/|$)/,
+          /^\/(bio|trivia|pcto|me-stesso|dubliners|gattopardo|archivio|sostieni|festa)(?:\/|$)/,
         ],
         cleanupOutdatedCaches: true,
         clientsClaim: true,

@@ -24,7 +24,7 @@ const ROOT = path.resolve(__dirname, "..");
 const BASE = process.env.I18N_BASE || "http://localhost:4173";
 const ROUTES = [
   "/", "/bio", "/trivia", "/pcto", "/me-stesso",
-  "/dubliners", "/gattopardo", "/letteratura", 
+  "/dubliners", "/gattopardo",
   "/festa", "/archivio", "/sostieni",
 ];
 

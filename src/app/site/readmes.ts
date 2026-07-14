@@ -47,16 +47,6 @@ La mia presentazione per l'Esame di Maturità 2026: chi sono, le radici nell'azi
 
 **Tecnologie:** React, TypeScript, design system "dark premium".`,
 
-  letteratura: `## Letteratura — hub di studio
-Schemi di studio per il programma di letteratura italiana della Maturità 2026: una scheda per autore/argomento (dal Naturalismo e Verga a «Satura» di Montale).
-
-**Caratteristiche**
-- Sintesi, fatti chiave, concetti da sapere
-- I testi in programma e i collegamenti per l'orale
-- **Le probabili domande d'orale** con risposte nascondibili per auto-interrogarsi
-
-**Tecnologie:** React, TypeScript, design system.`,
-
   trivia: `## Trivia — quiz di storia dell'architettura
 Quiz sulla storia dell'architettura: domande a scelta multipla, vero/falso e a risposta aperta, organizzate in capitoli.
 
@@ -85,11 +75,6 @@ Sito per Cascina Fontana: design curato e layout responsive ottimizzato per pres
 **Tecnologie:** React, TypeScript, Tailwind CSS.
 
 > Sito esterno: usa "Apri online".`,
-
-  "schemi-orale": `## Schemi orale — Letteratura
-Schemi di studio per l'orale di letteratura italiana della Maturità 2026: sintesi, concetti chiave e collegamenti.
-
-**Tipo:** documento PDF stampabile.`,
 
   cv: `## Curriculum Vitae
 Il mio curriculum: istruzione, esperienze, competenze e progetti.

@@ -21,7 +21,6 @@ export const SUB_TO_PATH: Record<string, string> = {
   "me-stesso": "/me-stesso",
   dubliners: "/dubliners",
   gattopardo: "/gattopardo",
-  letteratura: "/letteratura",
   archivio: "/archivio",
   sostieni: "/sostieni",
   festa: "/festa",

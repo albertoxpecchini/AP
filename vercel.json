@@ -8,7 +8,6 @@
     { "source": "/me-stesso",   "has": [{ "type": "host", "value": "www.albertopecchini.it" }], "destination": "https://me-stesso.albertopecchini.it",   "permanent": true },
     { "source": "/dubliners",   "has": [{ "type": "host", "value": "www.albertopecchini.it" }], "destination": "https://dubliners.albertopecchini.it",   "permanent": true },
     { "source": "/gattopardo",  "has": [{ "type": "host", "value": "www.albertopecchini.it" }], "destination": "https://gattopardo.albertopecchini.it",  "permanent": true },
-    { "source": "/letteratura", "has": [{ "type": "host", "value": "www.albertopecchini.it" }], "destination": "https://letteratura.albertopecchini.it", "permanent": true },
     { "source": "/archivio",    "has": [{ "type": "host", "value": "www.albertopecchini.it" }], "destination": "https://archivio.albertopecchini.it",    "permanent": true },
     { "source": "/sostieni",    "has": [{ "type": "host", "value": "www.albertopecchini.it" }], "destination": "https://sostieni.albertopecchini.it",    "permanent": true },
     { "source": "/festa",       "has": [{ "type": "host", "value": "www.albertopecchini.it" }], "destination": "https://festa.albertopecchini.it",       "permanent": true }

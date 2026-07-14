@@ -17,7 +17,6 @@ import {
   UserRound,
   BookOpen,
   Cat,
-  GraduationCap,
 } from "lucide-react";
 
 export type ProjectKind = "game" | "page" | "site" | "doc";
@@ -52,7 +51,6 @@ export function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: numbe
     case "mestesso":    return <UserRound size={size} strokeWidth={sw} />;
     case "dubliners":   return <BookOpen size={size} strokeWidth={sw} />;
     case "gattopardo":  return <Cat size={size} strokeWidth={sw} />;
-    case "letteratura": return <GraduationCap size={size} strokeWidth={sw} />;
     default:            return <Globe2 size={size} strokeWidth={sw} />;
   }
 }
@@ -111,19 +109,6 @@ export const PROJECTS: Project[] = [
     tags: ["Literature", "Risorgimento", "Storytelling", "React"],
   },
   {
-    id: "letteratura",
-    category: "Study hub · Maturità",
-    date: "Jun 23, 2026",
-    modified: "2026-06-23",
-    title: "Letteratura",
-    url: "/letteratura",
-    kind: "page",
-    thumb: "letteratura",
-    srcDir: "src/app/letteratura",
-    desc: "Study schemas for the 2026 final-exam Italian literature programme: one sheet per author and topic (from Naturalism and Verga to Montale's «Satura»), each with a synthesis, key facts, must-know concepts, the texts in the syllabus, cross-links for the oral, and — the core feature — the likely oral-exam questions with hideable model answers to self-test. Built with my «dark premium» violet design system.",
-    tags: ["Study", "Literature", "Design system", "React"],
-  },
-  {
     id: "trivia",
     category: "Web game",
     date: "Jun 15, 2026",
@@ -167,17 +152,6 @@ export const PROJECTS: Project[] = [
 // Materiali (PDF già in public/): rientrano nell'archivio come "documenti".
 export const MATERIALS: Project[] = [
   {
-    id: "schemi-orale",
-    category: "Materiale di studio · Maturità",
-    date: "Jun 23, 2026",
-    modified: "2026-06-23",
-    title: "Schemi orale — Letteratura",
-    url: "/schemi-orale-letteratura.pdf",
-    kind: "doc",
-    desc: "Schemi di studio per l'orale di letteratura italiana dell'Esame di Maturità 2026: sintesi, concetti chiave e collegamenti, in formato PDF.",
-    tags: ["PDF", "Studio", "Letteratura"],
-  },
-  {
     id: "cv",
     category: "Documento personale",
     date: "Jun 2026",
@@ -207,11 +181,9 @@ export const PROJECT_EMOJI: Record<string, string> = {
   "About Me": "🎓",
   "Dubliners": "📖",
   "The Leopard": "🐆",
-  "Letteratura": "🎓",
   "Trivia": "🧠",
   "Rivalta sul Mincio": "🏞️",
   "Cascina Fontana": "🏡",
-  "Schemi orale — Letteratura": "📝",
   "Curriculum Vitae": "📄",
   "Attestato sicurezza lavoratori": "📜",
 };
@@ -219,7 +191,7 @@ export const PROJECT_EMOJI: Record<string, string> = {
 // Cartella "in evidenza": tutti i materiali per l'Esame di Maturità 2026.
 // L'ordine segue quello qui sotto; questi progetti vengono mostrati SOLO dentro
 // la cartella e tolti dalla griglia "Work" per non duplicarli.
-export const MATURITA_URLS = ["/me-stesso", "/pcto", "/letteratura", "/dubliners", "/gattopardo"];
+export const MATURITA_URLS = ["/me-stesso", "/pcto", "/dubliners", "/gattopardo"];
 
 // Cartella "Giochi Web · In evidenza": i web game del progetto (oggi solo Trivia).
 // Anche questi vengono tolti dalla griglia "Work" per non duplicarli.

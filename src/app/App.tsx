@@ -383,7 +383,7 @@ export default function App() {
                 <Link to="/bio" className="hm-pill hm-pill--ghost">👋 Bio</Link>
               </div>
               <div className="hm-hero-quick">
-                {["Trivia", "Letteratura", "About Me"].map((t) => {
+                {["Trivia", "Cascina Fontana"].map((t) => {
                   const p = PROJECTS.find((x) => x.title === t);
                   if (!p) return null;
                   return (
@@ -417,14 +417,14 @@ export default function App() {
             <div className="hm-sec-head">
               <div>
                 <p className="hm-eyebrow">🗂️ Archive</p>
-                <h2 className="hm-title">Everything, in one place</h2>
+                <h2 className="hm-title">Featured projects</h2>
               </div>
               <Link to="/archivio" className="hm-action">
                 Open full archive <ArrowUpRight size={16} aria-hidden="true" />
               </Link>
             </div>
-            <div className="ax-embed">
-              <ArchivioExplorer embedded />
+            <div className="ax-embed ax-embed--compact">
+              <ArchivioExplorer embedded onlyUrls={["/trivia", "https://cascinafontana.xyz"]} />
             </div>
           </div>
         </section>

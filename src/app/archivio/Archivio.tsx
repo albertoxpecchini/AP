@@ -165,7 +165,14 @@ function defaultDir(col: ColKey): "asc" | "desc" {
   return col === "modified" || col === "created" || col === "size" ? "desc" : "asc";
 }
 
-export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
+export function ArchivioExplorer({
+  embedded = false,
+  onlyUrls,
+}: {
+  embedded?: boolean;
+  /** Se presente, mostra solo questi progetti (usato dalla home per la vetrina ridotta). */
+  onlyUrls?: string[];
+}) {
   const navigate = useNavigate();
 
   const [folder, setFolder] = useState<FolderId>("root");
@@ -216,8 +223,17 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
   };
   useEffect(loadManifest, []);
 
+  // Vista ridotta della home: solo i progetti indicati (le cartelle "in
+  // evidenza" non hanno senso su una manciata di elementi, quindi spariscono).
+  const items = useMemo(() => {
+    if (!onlyUrls) return ALL;
+    const allow = new Set(onlyUrls);
+    return ALL.filter((p) => allow.has(p.url));
+  }, [onlyUrls]);
+
   // Cartelle "in evidenza"
   const folders = useMemo(() => {
+    if (onlyUrls) return [];
     const find = (u: string) => PROJECTS.find((p) => p.url === u);
     const maturita = MATURITA_URLS.map(find).filter(Boolean) as Project[];
     const giochi = GAMES_URLS.map(find).filter(Boolean) as Project[];
@@ -229,12 +245,12 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
       { id: "siti" as FolderId,     label: "Siti web",          Icon: Globe,         items: siti },
       { id: "documenti" as FolderId, label: "Documenti",        Icon: FileText,      items: documenti },
     ];
-  }, []);
+  }, [onlyUrls]);
 
   const currentItems = useMemo(() => {
-    if (folder === "root") return ALL;
-    return folders.find((f) => f.id === folder)?.items ?? ALL;
-  }, [folder, folders]);
+    if (folder === "root") return items;
+    return folders.find((f) => f.id === folder)?.items ?? items;
+  }, [folder, folders, items]);
 
   const folderLabel = folder === "root" ? null : folders.find((f) => f.id === folder)?.label ?? null;
 
@@ -547,26 +563,28 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
       <div className="ax-body">
         {/* Sidebar */}
         <aside className="ax-side">
-          <div className="ax-side-group">
-            <div className="ax-side-title"><Star size={11} style={{ marginRight: 6 }} />In evidenza</div>
-            {folders.map((f) => (
-              <button
-                key={f.id}
-                className={`ax-side-item${folder === f.id ? " is-on" : ""}`}
-                onClick={() => { setFolder(f.id); setSelected(new Set()); setDetailId(null); }}
-              >
-                <span className="ax-side-ico"><f.Icon size={17} /></span>
-                {f.label}
-                <span className="ax-side-count">{f.items.length}</span>
-              </button>
-            ))}
-          </div>
+          {folders.length > 0 && (
+            <div className="ax-side-group">
+              <div className="ax-side-title"><Star size={11} style={{ marginRight: 6 }} />In evidenza</div>
+              {folders.map((f) => (
+                <button
+                  key={f.id}
+                  className={`ax-side-item${folder === f.id ? " is-on" : ""}`}
+                  onClick={() => { setFolder(f.id); setSelected(new Set()); setDetailId(null); }}
+                >
+                  <span className="ax-side-ico"><f.Icon size={17} /></span>
+                  {f.label}
+                  <span className="ax-side-count">{f.items.length}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="ax-side-group">
             <div className="ax-side-title">Posizioni</div>
             <button className={`ax-side-item${folder === "root" ? " is-on" : ""}`} onClick={() => { setFolder("root"); setSelected(new Set()); setDetailId(null); }}>
               <span className="ax-side-ico"><Monitor size={17} /></span>
               Questo PC
-              <span className="ax-side-count">{ALL.length}</span>
+              <span className="ax-side-count">{items.length}</span>
             </button>
           </div>
         </aside>
@@ -576,8 +594,8 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
           <ContextMenu.Root>
           <ContextMenu.Trigger asChild>
           <div className="ax-scroll" ref={scrollRef} onPointerDown={startMarquee}>
-            {/* Cartelle (solo radice) */}
-            {folder === "root" && !query && (
+            {/* Cartelle (solo radice, e solo se non è la vetrina ridotta) */}
+            {folder === "root" && !query && folders.length > 0 && (
               <>
                 <div className="ax-section-h">Cartelle in evidenza</div>
                 <div className="ax-tiles">
@@ -587,7 +605,7 @@ export function ArchivioExplorer({ embedded = false }: { embedded?: boolean }) {
                       <span style={{ flex: 1, minWidth: 0 }}>
                         <span className="ax-tile-name">{f.label}</span>
                         <span className="ax-tile-sub">{f.items.length} elementi</span>
-                        <span className="ax-tile-bar"><i style={{ width: `${Math.min(100, (f.items.length / ALL.length) * 100 + 20)}%` }} /></span>
+                        <span className="ax-tile-bar"><i style={{ width: `${Math.min(100, (f.items.length / items.length) * 100 + 20)}%` }} /></span>
                       </span>
                     </button>
                   ))}

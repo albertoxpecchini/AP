@@ -109,11 +109,6 @@
     "fr": "Ouvrir Trivia",
     "de": "Trivia öffnen"
   },
-  "Open Letteratura": {
-    "it": "Apri Letteratura",
-    "fr": "Ouvrir Letteratura",
-    "de": "Letteratura öffnen"
-  },
   "Open About Me": {
     "it": "Apri About Me",
     "fr": "Ouvrir About Me",
@@ -383,16 +378,6 @@
     "en": "Download ZIP",
     "fr": "Télécharger le ZIP",
     "de": "ZIP herunterladen"
-  },
-  "Letteratura": {
-    "en": "Literature",
-    "fr": "Littérature",
-    "de": "Literatur"
-  },
-  "Schemi orale — Letteratura": {
-    "en": "Oral exam outlines — Literature",
-    "fr": "Fiches de l'oral — Littérature",
-    "de": "Mündliche-Prüfung-Übersichten — Literatur"
   },
   "Documento PDF": {
     "en": "PDF document",

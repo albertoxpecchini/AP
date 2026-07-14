@@ -34,13 +34,11 @@ const INTERNAL = [
   { id: "me-stesso",   dir: "src/app/me-stesso",   game: false },
   { id: "dubliners",   dir: "src/app/dubliners",   game: false },
   { id: "gattopardo",  dir: "src/app/gattopardo",  game: false },
-  { id: "letteratura", dir: "src/app/letteratura", game: false },
   { id: "trivia",      dir: "src/app/trivia",      game: true  },
 ];
 
 // Documenti (PDF già in public/): solo dimensione per la colonna "Dimensione".
 const DOCS = [
-  { id: "schemi-orale",        file: "public/schemi-orale-letteratura.pdf" },
   { id: "cv",                  file: "public/cv-alberto-pecchini.pdf" },
   { id: "attestato-sicurezza", file: "public/attestato-sicurezza-lavoratori-rischio-basso.pdf" },
 ];

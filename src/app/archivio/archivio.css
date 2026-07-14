@@ -63,6 +63,11 @@
   width: 100%;
   height: min(800px, 82vh);
 }
+/* Vetrina ridotta (solo pochi progetti "in evidenza"): finestra più bassa,
+   niente spazio vuoto sotto le 1-2 righe della tabella. */
+.ax-embed--compact .ax-window {
+  height: min(420px, 60vh);
+}
 
 html.dark .ax-root,
 html.dark .ax-window {

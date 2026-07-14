@@ -276,7 +276,6 @@
 html[data-ap-theme="light"] .hm-page,
 html[data-ap-theme="light"] .db-page,
 html[data-ap-theme="light"] .gp-page,
-html[data-ap-theme="light"] .lt-page,
 html[data-ap-theme="light"] .pcto-page,
 html[data-ap-theme="light"] .bio-page {
   --accent: #c2410c;
@@ -304,7 +303,6 @@ html[data-ap-theme="light"] .bio-page {
 html[data-ap-theme="light"] .hm-hdr,
 html[data-ap-theme="light"] .db-header,
 html[data-ap-theme="light"] .gp-header,
-html[data-ap-theme="light"] .lt-header,
 html[data-ap-theme="light"] .pcto-header,
 html[data-ap-theme="light"] .bio-header {
   background: rgba(255, 255, 255, 0.82) !important;
@@ -332,7 +330,6 @@ html[data-ap-theme="light"] .hm-btn--ghost:hover,
 /* approfondimenti — titoli brand (header chiaro) */
 html[data-ap-theme="light"] .db-brand-title,
 html[data-ap-theme="light"] .gp-brand-title,
-html[data-ap-theme="light"] .lt-brand-title,
 html[data-ap-theme="light"] .pcto-brand-title,
 html[data-ap-theme="light"] .bio-brand-title,
 /* Dubliners — testo del corpo su vetro/pagina */
@@ -351,19 +348,6 @@ html[data-ap-theme="light"] .gp-company-name,
 html[data-ap-theme="light"] .gp-role-label,
 html[data-ap-theme="light"] .gp-callout strong,
 html[data-ap-theme="light"] .gp-page .btn-outline-light,
-/* Letteratura — schede, fatti, concetti, domande d'orale */
-html[data-ap-theme="light"] .lt-card-title,
-html[data-ap-theme="light"] .lt-lead strong,
-html[data-ap-theme="light"] .lt-fact-value,
-html[data-ap-theme="light"] .lt-concetto dt,
-html[data-ap-theme="light"] .lt-testo-title,
-html[data-ap-theme="light"] .lt-qa-q,
-html[data-ap-theme="light"] .lt-qa-a strong,
-html[data-ap-theme="light"] .lt-toggle-all:hover,
-html[data-ap-theme="light"] .lt-expand-cta:hover,
-html[data-ap-theme="light"] .lt-expand-cta.is-on,
-html[data-ap-theme="light"] .lt-toc-chip:hover,
-html[data-ap-theme="light"] .lt-page .btn-outline-light,
 /* Bio — prose, skill, freccia liste */
 html[data-ap-theme="light"] .bio-prose strong,
 html[data-ap-theme="light"] .bio-skill-title,
@@ -400,9 +384,6 @@ html[data-ap-theme="light"] .gp-future,
 html[data-ap-theme="light"] .gp-thanks,
 html[data-ap-theme="light"] .gp-next,
 html[data-ap-theme="light"] .gp-footer,
-html[data-ap-theme="light"] .lt-hero,
-html[data-ap-theme="light"] .lt-band,
-html[data-ap-theme="light"] .lt-footer,
 html[data-ap-theme="light"] .pcto-hero,
 html[data-ap-theme="light"] .pcto-team-banner,
 html[data-ap-theme="light"] .pcto-footer,

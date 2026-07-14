@@ -28,7 +28,6 @@ const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
 const MeStesso = lazy(() => import("./app/me-stesso/MeStesso.tsx"));
 const Dubliners = lazy(() => import("./app/dubliners/Dubliners.tsx"));
 const Gattopardo = lazy(() => import("./app/gattopardo/Gattopardo.tsx"));
-const Letteratura = lazy(() => import("./app/letteratura/Letteratura.tsx"));
 const Festa = lazy(() => import("./app/festa/Festa.tsx"));
 const Archivio = lazy(() => import("./app/archivio/Archivio.tsx"));
 const Sostieni = lazy(() => import("./app/sostieni/Sostieni.tsx"));
@@ -44,7 +43,6 @@ const SUBDOMAIN_PAGE: Record<string, ComponentType> = {
   "/me-stesso": MeStesso,
   "/dubliners": Dubliners,
   "/gattopardo": Gattopardo,
-  "/letteratura": Letteratura,
   "/archivio": Archivio,
   "/sostieni": Sostieni,
   "/festa": Festa,
@@ -107,14 +105,6 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Gattopardo />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/letteratura"
-        element={
-          <Suspense fallback={null}>
-            <Letteratura />
           </Suspense>
         }
       />
