@@ -128,7 +128,7 @@ sequenceDiagram
     Note over Dev,CC: 1 · Sviluppo locale (codifiche)
     Dev->>CC: "fai la modifica X"
     activate CC
-    Note over CC: build-cv.ps1 → 4× PDF · sharp → WebP · import-trivia → JSON
+    Note over CC: build-cv.py → 4× PDF · sharp → WebP · import-trivia → JSON
     CC->>GH: git commit + push → main
     deactivate CC
 
