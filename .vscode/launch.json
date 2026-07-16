@@ -2,7 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Dev",
+      // ────────────────────────────────────────────────────────────────────
+      // F5 su questa macchina (Linux). Avvia il dev server Vite e apre da solo
+      // l'app nel browser di sistema (qui: Firefox) grazie a `--open`.
+      // Il debugger Node si aggancia al processo Vite: la console e i log del
+      // server compaiono nel terminale integrato di VS Code.
+      // Non serve installare nulla: usa il browser predefinito del sistema.
+      // ────────────────────────────────────────────────────────────────────
+      "name": "Dev · Firefox (Linux)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev -- --open",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      // ────────────────────────────────────────────────────────────────────
+      // Debug nel browser su Windows (Vivaldi). Da usare sull'altra macchina:
+      // seleziona questa voce nel menù a tendina "Run and Debug" prima di F5.
+      // Richiede un browser Chromium (Vivaldi/Chrome): mette i breakpoint del
+      // frontend direttamente in VS Code.
+      // ────────────────────────────────────────────────────────────────────
+      "name": "Dev · Vivaldi (Windows)",
       "type": "chrome",
       "request": "launch",
       "runtimeExecutable": "C:\\Users\\Administrator\\AppData\\Local\\Vivaldi\\Application\\vivaldi.exe",
