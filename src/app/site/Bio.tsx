@@ -204,10 +204,14 @@ export default function Bio() {
               <div className="bio-box">
                 <p className="bio-box-label">🎓 Education</p>
                 <p className="bio-edu-lead">
-                  CAT diploma in progress at ITT «Carlo d'Arco» in Mantua; English C1 (IELTS)
-                  achieved in Dublin.
+                  CAT diploma at ITT «Carlo d'Arco» in Mantua, now studying Construction and
+                  Land Management at the University of Modena and Reggio Emilia; English C1
+                  (IELTS) achieved in Dublin.
                 </p>
                 <ul className="bio-edu">
+                  <li>
+                    <GraduationCap size={16} aria-hidden="true" /> UniMoRe «Enzo Ferrari» — Construction &amp; Land Management
+                  </li>
                   <li>
                     <GraduationCap size={16} aria-hidden="true" /> ITT «Carlo d'Arco» — CAT diploma
                   </li>

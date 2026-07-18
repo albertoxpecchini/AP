@@ -37,10 +37,16 @@ const CV = [
     desc: "A three-year programme with a solid grounding in Italian, mathematics, history, science and English. Development of study method and cross-disciplinary skills. Diploma achieved with merit.",
   },
   {
-    period: "2021 — present",
+    period: "2021 — 2026",
     title: "«Carlo d'Arco» Technical Institute — Mantua",
-    role: "CAT diploma · Construction, Environment and Territory (5th year) · Class 5T",
-    desc: "A five-year technical programme. Core subjects: architectural design and technical drawing (AutoCAD), topography and instrumental surveying, valuation and real-estate appraisal, site management, applied physics, mathematics and technical English. School code MNTL009017.",
+    role: "CAT diploma · Construction, Environment and Territory · Class 5T",
+    desc: "A five-year technical programme. Core subjects: architectural design and technical drawing (AutoCAD), topography and instrumental surveying, valuation and real-estate appraisal, site management, applied physics, mathematics and technical English. School code MNTL009017. Diploma achieved in 2026.",
+  },
+  {
+    period: "2026 — present",
+    title: "University of Modena and Reggio Emilia — «Enzo Ferrari» Eng. Dept.",
+    role: "BSc in Construction and Land Management · Full-time",
+    desc: "Enrolled in the professional bachelor's degree in Construction and Land Management, continuing on from the CAT technical track. Admission through the TOLC-LP entrance test, passed in July 2026.",
   },
   {
     period: "2019 — present",

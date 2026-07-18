@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compare Two Lists</title>
+  <meta name="description" content="Compare two text lists in your browser. Special mode for Instagram followers.html / following.html that returns clickable profile links. 100% client-side." />
+
+  <!-- Tailwind CSS (self-hosted Play build — served as 'self' to satisfy the site CSP) -->
+  <script src="/vendor/tailwind.js"></script>
+  <script>
+    // Tailwind runtime config: dark mode + custom neon palette
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            neon:   '#a855f7', // violet
+            cyan:   '#22d3ee', // cyan
+            ink:    '#0a0a12', // deep background
+            panel:  '#12121c', // card background
+          },
+          boxShadow: {
+            glow: '0 0 18px rgba(168,85,247,.45)',
+            glowc:'0 0 18px rgba(34,211,238,.45)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Particle background (tsParticles, self-hosted) -->
+  <script src="/vendor/tsparticles.slim.bundle.min.js"></script>
+  <!-- GSAP for entrance / results animations (self-hosted) -->
+  <script src="/vendor/gsap.min.js"></script>
+
+  <style>
+    /* Base look ---------------------------------------------------------- */
+    html, body { height: 100%; }
+    body {
+      background: radial-gradient(1200px 800px at 50% -10%, #1b1030 0%, #0a0a12 60%);
+      color: #e5e7eb;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    /* tsParticles canvas sits behind everything */
+    #tsparticles {
+      position: fixed; inset: 0; z-index: 0;
+    }
+    /* Gradient text helper */
+    .grad-text {
+      background: linear-gradient(90deg, #a855f7, #22d3ee);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    /* Custom scrollbars for the textareas */
+    textarea::-webkit-scrollbar { width: 10px; }
+    textarea::-webkit-scrollbar-thumb { background: #2a2a3d; border-radius: 8px; }
+    /* Neon focus ring + hover glow, reused via classes below */
+    .glow-input:focus { box-shadow: 0 0 0 2px rgba(34,211,238,.5), 0 0 16px rgba(34,211,238,.25); }
+    .btn { transition: transform .12s ease, box-shadow .2s ease, background .2s ease; }
+    .btn:hover { transform: translateY(-1px) scale(1.02); }
+    .btn:active { transform: translateY(0) scale(.99); }
+    /* Accordion open/close animation */
+    .acc-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+    /* Small spinner used in the Compare button */
+    .spinner {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.35); border-top-color: #fff;
+      animation: spin .7s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Result output link styling (IG mode) */
+    .result-out a { color: #22d3ee; text-decoration: none; }
+    .result-out a:hover { color: #a855f7; text-decoration: underline; }
+    .result-out { white-space: pre-wrap; word-break: break-all; }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+
+  <!-- Animated particle background -->
+  <div id="tsparticles"></div>
+
+  <!-- ============================ MAIN CONTAINER ============================ -->
+  <main id="app" class="relative z-10 w-full max-w-[900px] opacity-0">
+
+    <!-- ---------------------------- HEADER ---------------------------- -->
+    <header class="text-center mb-8">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight grad-text">Compare Two Lists</h1>
+      <p class="mt-4 text-sm sm:text-base text-amber-300/90">
+        <strong>Important:</strong> Start by selecting <em>"Instagram followers"</em> to remove unwanted data
+        like dates and profile picture texts from the lists.
+      </p>
+      <p class="mt-2 text-xs sm:text-sm text-gray-400 max-w-2xl mx-auto">
+        You can then paste your copied lists or upload the exported <code class="text-cyan">following.html</code>
+        and <code class="text-cyan">followers.html</code> files directly as they are.
+        <a href="https://www.youtube.com/results?search_query=how+to+download+instagram+followers+html"
+           target="_blank" rel="noopener" class="text-neon hover:underline">Watch this video on YouTube</a>
+        to see how it can be done. After watching the first 2 minutes, just use
+        <code class="text-cyan">following.html</code> and <code class="text-cyan">followers.html</code> as they are.
+      </p>
+    </header>
+
+    <!-- ------------------------- CONTROL PANEL ------------------------- -->
+    <section class="bg-panel/70 backdrop-blur rounded-2xl border border-white/10 p-5 mb-6 shadow-xl">
+      <h2 class="text-xs uppercase tracking-widest text-gray-400 mb-3">Modes</h2>
+      <div class="grid sm:grid-cols-3 gap-3">
+        <label class="btn flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-3 py-2 cursor-pointer border border-white/5">
+          <input id="mode-case" type="checkbox" class="accent-cyan w-4 h-4" />
+          <span class="text-sm">Case insensitive</span>
+        </label>
+        <label class="btn flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-3 py-2 cursor-pointer border border-white/5">
+          <input id="mode-reduce" type="checkbox" class="accent-cyan w-4 h-4" />
+          <span class="text-sm">Reduce output for large lists</span>
+        </label>
+        <label class="btn flex items-center gap-3 bg-neon/10 hover:bg-neon/20 rounded-xl px-3 py-2 cursor-pointer border border-neon/30">
+          <input id="mode-ig" type="checkbox" class="accent-neon w-4 h-4" />
+          <span class="text-sm font-semibold">Instagram followers</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- --------------------------- INPUT LISTS --------------------------- -->
+    <section class="grid md:grid-cols-2 gap-5 mb-6">
+      <!-- List A -->
+      <div class="bg-panel/70 backdrop-blur rounded-2xl border border-white/10 p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-cyan">List A</h3>
+          <span id="fileA-name" class="text-xs text-gray-500 truncate max-w-[45%]"></span>
+        </div>
+        <textarea id="listA" rows="10" placeholder="Paste list A here… (one item per line)"
+          class="glow-input w-full resize-y rounded-xl bg-black/40 border border-white/10 p-3 text-sm outline-none font-mono"></textarea>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button data-browse="A" class="btn text-xs px-3 py-2 rounded-lg bg-cyan/15 hover:bg-cyan/25 border border-cyan/30 hover:shadow-glowc">📂 Browse</button>
+          <button data-copy="listA" class="btn text-xs px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10">📋 Copy list to clipboard</button>
+          <input data-file="A" type="file" accept=".txt,.html,.htm,text/plain,text/html" class="hidden" />
+        </div>
+      </div>
+
+      <!-- List B -->
+      <div class="bg-panel/70 backdrop-blur rounded-2xl border border-white/10 p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-neon">List B</h3>
+          <span id="fileB-name" class="text-xs text-gray-500 truncate max-w-[45%]"></span>
+        </div>
+        <textarea id="listB" rows="10" placeholder="Paste list B here… (one item per line)"
+          class="glow-input w-full resize-y rounded-xl bg-black/40 border border-white/10 p-3 text-sm outline-none font-mono"></textarea>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button data-browse="B" class="btn text-xs px-3 py-2 rounded-lg bg-neon/15 hover:bg-neon/25 border border-neon/30 hover:shadow-glow">📂 Browse</button>
+          <button data-copy="listB" class="btn text-xs px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10">📋 Copy list to clipboard</button>
+          <input data-file="B" type="file" accept=".txt,.html,.htm,text/plain,text/html" class="hidden" />
+        </div>
+      </div>
+    </section>
+
+    <!-- --------------------------- COMPARE BUTTON --------------------------- -->
+    <div class="flex justify-center mb-8">
+      <button id="compareBtn"
+        class="btn inline-flex items-center gap-3 px-8 py-3 rounded-xl font-bold text-white
+               bg-gradient-to-r from-neon to-cyan hover:shadow-glow text-lg">
+        <span id="compareLabel">Compare</span>
+        <span id="compareSpin" class="hidden spinner"></span>
+      </button>
+    </div>
+
+    <!-- ------------------------------ RESULTS ------------------------------ -->
+    <section id="results" class="hidden">
+      <!-- Stats table -->
+      <div class="bg-panel/70 backdrop-blur rounded-2xl border border-white/10 p-5 mb-6 shadow-xl overflow-x-auto">
+        <table class="w-full text-sm">
+          <tbody id="statsBody" class="[&_td]:py-2 [&_td]:px-2 [&_tr]:border-b [&_tr]:border-white/5"></tbody>
+        </table>
+      </div>
+
+      <!-- Output textareas -->
+      <div id="outputs" class="grid gap-5">
+        <!-- filled by JS -->
+      </div>
+    </section>
+
+    <!-- ---------------------------- ACCORDIONS ---------------------------- -->
+    <section class="mt-10 space-y-3">
+
+      <!-- How the tool works -->
+      <div class="bg-panel/60 rounded-xl border border-white/10 overflow-hidden">
+        <button class="acc-toggle w-full flex items-center justify-between px-5 py-4 text-left font-semibold hover:bg-white/5">
+          <span>How the tool works</span><span class="acc-icon transition-transform">▼</span>
+        </button>
+        <div class="acc-body">
+          <ul class="px-6 pb-5 text-sm text-gray-300 space-y-2 list-disc list-inside">
+            <li>One item per line and only one row per list.</li>
+            <li>You can either paste your lists or click the browse buttons to use files on your local machine. Only text files can be used and maximum 15MB combined size for the two files.</li>
+            <li>The two lists will be sorted and duplicates and empty lines will be removed.</li>
+            <li>Lists are treated as case sensitive (abc is not the same as ABC) unless you select "Case insensitive". Lists will then be converted to lower case.</li>
+            <li>If the lists are large (several MB) you can select "Reduce output for large lists". The lists will then not be kept in the input fields and the result will not be shown but must be downloaded.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Text replacement tool -->
+      <div class="bg-panel/60 rounded-xl border border-white/10 overflow-hidden">
+        <button class="acc-toggle w-full flex items-center justify-between px-5 py-4 text-left font-semibold hover:bg-white/5">
+          <span>Text replacement tool</span><span class="acc-icon transition-transform">▼</span>
+        </button>
+        <div class="acc-body">
+          <div class="px-6 pb-6 text-sm text-gray-300 space-y-3">
+            <p>Need to remove unwanted characters like quotes or replace commas with linebreaks? Use this tool.</p>
+            <textarea id="tr-input" rows="5" placeholder="Text to modify…"
+              class="glow-input w-full rounded-xl bg-black/40 border border-white/10 p-3 outline-none font-mono"></textarea>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Search for</label>
+                <input id="tr-search" list="tr-suggest" placeholder="e.g. ,   or   &quot;"
+                  class="glow-input w-full rounded-lg bg-black/40 border border-white/10 p-2 outline-none font-mono" />
+                <datalist id="tr-suggest">
+                  <option value=",">comma</option>
+                  <option value='"'>double quote</option>
+                  <option value="'">single quote</option>
+                  <option value=" ">space</option>
+                  <option value="\t">tab</option>
+                  <option value=";">semicolon</option>
+                  <option value="\s+">one or more whitespace (regex)</option>
+                </datalist>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Replace with</label>
+                <input id="tr-replace" list="tr-suggest2" placeholder="e.g. \n for a line break"
+                  class="glow-input w-full rounded-lg bg-black/40 border border-white/10 p-2 outline-none font-mono" />
+                <datalist id="tr-suggest2">
+                  <option value="\n">line break</option>
+                  <option value="">nothing (delete)</option>
+                  <option value=" ">space</option>
+                  <option value=",">comma</option>
+                  <option value="$1">capture group 1</option>
+                </datalist>
+              </div>
+            </div>
+            <label class="inline-flex items-center gap-2 text-xs">
+              <input id="tr-regex" type="checkbox" class="accent-neon w-4 h-4" />
+              Treat "Search for" as a regular expression
+            </label>
+            <p class="text-xs text-gray-500">
+              If you (double) click the replace input field, you get a list of suggestions, but you can always enter your own values.
+              <br><strong>Advanced use:</strong> You can use regular expressions and ( ) capture groups and replace with $1 etc.
+            </p>
+            <div class="flex gap-2">
+              <button id="tr-run" class="btn text-sm px-4 py-2 rounded-lg bg-gradient-to-r from-neon to-cyan text-white font-semibold">Replace</button>
+              <button id="tr-copy" class="btn text-sm px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10">📋 Copy result</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-gray-600 mt-10 mb-4">
+      100% client-side — your lists never leave your browser.
+    </footer>
+  </main>
+
+  <!-- Hidden live-region for "copied!" toasts -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg bg-neon text-white text-sm shadow-glow opacity-0 pointer-events-none transition-opacity"></div>
+
+  <script>
+  /* =========================================================================
+     COMPARE TWO LISTS — client-side logic
+     No backend. Uses FileReader for uploads, DOMParser for Instagram HTML.
+     ========================================================================= */
+
+  const $ = (sel) => document.querySelector(sel);
+  const MAX_COMBINED_BYTES = 15 * 1024 * 1024; // 15 MB combined limit
+
+  // Keep track of uploaded file sizes so we can enforce the combined limit
+  const uploadedBytes = { A: 0, B: 0 };
+
+  /* ---------- tiny toast helper ---------- */
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.style.opacity = '0'), 1600);
+  }
+
+  /* =========================================================================
+     INSTAGRAM PARSING
+     Instagram's exported followers.html / following.html store every connection
+     as an anchor whose href points at the profile, e.g.
+       <a href="https://www.instagram.com/some_user" target="_blank">some_user</a>
+     Around it there is junk: timestamps, "profile picture" alt-texts, headings…
+     Strategy:
+       1. If the input looks like HTML, parse it and read every instagram.com
+          anchor, extracting the clean username from the href (most reliable).
+       2. Otherwise treat it as pasted text and keep only lines that look like a
+          valid IG username, dropping dates / "profile picture" / empty junk.
+     ========================================================================= */
+
+  // A valid Instagram username: letters, numbers, dots, underscores (1–30 chars)
+  const IG_USERNAME_RE = /^[A-Za-z0-9._]{1,30}$/;
+
+  // Pull the first path segment out of an instagram URL -> the username
+  function usernameFromHref(href) {
+    try {
+      const url = new URL(href, 'https://www.instagram.com');
+      // path like "/some_user/" -> ["", "some_user", ""]
+      const seg = url.pathname.split('/').filter(Boolean)[0] || '';
+      return seg;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  // Non-usernames that sometimes appear as instagram.com/<segment>
+  const IG_RESERVED = new Set([
+    'p','reel','reels','stories','explore','accounts','about','directory',
+    'developer','legal','privacy','terms','directory','tv','ig'
+  ]);
+
+  function looksLikeHtml(text) {
+    return /<\s*(a|html|body|div)\b/i.test(text) && /instagram\.com/i.test(text);
+  }
+
+  function parseInstagram(rawText) {
+    const out = [];
+    const seen = new Set();
+
+    if (looksLikeHtml(rawText)) {
+      // --- HTML path: read every instagram.com anchor -------------------
+      const doc = new DOMParser().parseFromString(rawText, 'text/html');
+      const anchors = doc.querySelectorAll('a[href*="instagram.com"]');
+      anchors.forEach((a) => {
+        let name = usernameFromHref(a.getAttribute('href') || '');
+        // Fall back to visible text if href gave nothing usable
+        if (!name) name = (a.textContent || '').trim();
+        name = name.trim();
+        if (!name || IG_RESERVED.has(name.toLowerCase())) return;
+        if (!IG_USERNAME_RE.test(name)) return;
+        const key = name.toLowerCase();
+        if (!seen.has(key)) { seen.add(key); out.push(name); }
+      });
+      // Some exports have no anchors, only visible username text — fall back
+      if (out.length) return out;
+    }
+
+    // --- Text path: keep only username-shaped lines -----------------------
+    rawText.split(/\r?\n/).forEach((line) => {
+      let s = line.trim();
+      if (!s) return;
+      // Drop obvious junk lines from copied lists
+      if (/profile picture/i.test(s)) return;
+      if (/^\d{1,2}\s*(second|minute|hour|day|week|month|year)/i.test(s)) return; // "3 days ago"
+      // If the line is a full IG url, extract username
+      if (/instagram\.com/i.test(s)) {
+        const u = usernameFromHref(s);
+        if (u) s = u;
+      }
+      // Strip a leading @ if the user pasted @handles
+      if (s[0] === '@') s = s.slice(1);
+      if (!IG_USERNAME_RE.test(s)) return;
+      if (IG_RESERVED.has(s.toLowerCase())) return;
+      const key = s.toLowerCase();
+      if (!seen.has(key)) { seen.add(key); out.push(s); }
+    });
+    return out;
+  }
+
+  /* =========================================================================
+     LIST NORMALISATION
+     Turn raw textarea content into a clean array of items:
+       - if IG mode: run the Instagram parser
+       - split into lines, trim, drop empties
+       - lower-case if "case insensitive"
+       - de-duplicate, then sort alphabetically
+     ========================================================================= */
+  function normaliseList(rawText, { ig, caseInsensitive }) {
+    let items = ig
+      ? parseInstagram(rawText)
+      : rawText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+
+    if (caseInsensitive) items = items.map((s) => s.toLowerCase());
+
+    // De-duplicate via a Set, then sort alphabetically (locale-aware)
+    const unique = Array.from(new Set(items));
+    unique.sort((a, b) => a.localeCompare(b));
+    return unique;
+  }
+
+  /* =========================================================================
+     COMPARISON
+     Given two clean, sorted, de-duplicated arrays, compute:
+       onlyA, onlyB, both.
+     A Set on the "other" list gives O(n) lookups.
+     ========================================================================= */
+  function compareLists(a, b) {
+    const setB = new Set(b);
+    const setA = new Set(a);
+    const onlyA = a.filter((x) => !setB.has(x));
+    const onlyB = b.filter((x) => !setA.has(x));
+    const both  = a.filter((x) => setB.has(x));
+    return { onlyA, onlyB, both };
+  }
+
+  /* =========================================================================
+     OUTPUT FORMATTING
+     Plain text for download/clipboard; clickable links for on-screen IG mode.
+     ========================================================================= */
+  function toPlainText(items) { return items.join('\n'); }
+
+  // Build clickable profile links (used in IG mode, both on screen & in files)
+  function toIgLinks(items) {
+    return items
+      .map((u) => `<a href="https://instagram.com/${encodeURIComponent(u)}" target="_blank" rel="noopener">${u}</a>`)
+      .join('\n');
+  }
+
+  // Trigger a client-side download of a text/html blob
+  function download(filename, content, mime) {
+    const blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // Wrap IG links into a minimal standalone HTML page for download
+  function igDownloadHtml(title, items) {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title></head>` +
+           `<body style="font-family:sans-serif;line-height:1.8">` +
+           items.map((u) => `<a href="https://instagram.com/${encodeURIComponent(u)}" target="_blank" rel="noopener">${u}</a>`).join('<br>\n') +
+           `</body></html>`;
+  }
+
+  /* =========================================================================
+     CLIPBOARD
+     ========================================================================= */
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Copied to clipboard');
+    } catch (_) {
+      // Fallback for non-secure contexts
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      toast('Copied to clipboard');
+    }
+  }
+
+  /* =========================================================================
+     FILE UPLOAD (FileReader API)
+     Reads .txt/.html into the matching textarea, enforcing the 15MB combined cap
+     and showing the filename next to the Browse button.
+     ========================================================================= */
+  function handleFile(which, file) {
+    if (!file) return;
+    const otherKey = which === 'A' ? 'B' : 'A';
+    if (file.size + uploadedBytes[otherKey] > MAX_COMBINED_BYTES) {
+      toast('Combined file size exceeds 15MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      $('#list' + which).value = e.target.result;
+      uploadedBytes[which] = file.size;
+      $('#file' + which + '-name').textContent = file.name;
+    };
+    reader.onerror = () => toast('Could not read file');
+    reader.readAsText(file);
+  }
+
+  /* =========================================================================
+     STATS TABLE + OUTPUT RENDERING
+     ========================================================================= */
+  function statRow(label, count, downloadFn) {
+    const tr = document.createElement('tr');
+    const btn = downloadFn
+      ? `<button class="btn text-xs px-2 py-1 rounded bg-cyan/15 hover:bg-cyan/25 border border-cyan/30" data-dl="${label}">Download list</button>`
+      : '';
+    tr.innerHTML = `<td class="text-gray-300">${label}</td>
+                    <td class="font-mono font-bold text-cyan text-right">${count}</td>
+                    <td class="text-right">${btn}</td>`;
+    return tr;
+  }
+
+  function outputBlock(title, items, ig) {
+    const wrap = document.createElement('div');
+    wrap.className = 'bg-panel/70 backdrop-blur rounded-2xl border border-white/10 p-4 shadow-xl';
+    const bodyHtml = ig ? toIgLinks(items) : toPlainText(items).replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    wrap.innerHTML = `
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-semibold">${title} <span class="text-gray-500 text-sm">(${items.length})</span></h3>
+        <button class="btn text-xs px-3 py-1 rounded bg-white/5 hover:bg-white/10 border border-white/10" data-copyout>📋 Copy list to clipboard</button>
+      </div>
+      <div class="result-out h-48 overflow-auto rounded-xl bg-black/40 border border-white/10 p-3 text-sm font-mono">${bodyHtml || '<span class="text-gray-600">— empty —</span>'}</div>`;
+    // Copy button: copies plain usernames (not the HTML markup)
+    wrap.querySelector('[data-copyout]').addEventListener('click', () => copyToClipboard(toPlainText(items)));
+    return wrap;
+  }
+
+  /* =========================================================================
+     MAIN COMPARE HANDLER
+     ========================================================================= */
+  function runCompare() {
+    const opts = {
+      ig: $('#mode-ig').checked,
+      caseInsensitive: $('#mode-case').checked,
+      reduce: $('#mode-reduce').checked,
+    };
+
+    const listA = normaliseList($('#listA').value, opts);
+    const listB = normaliseList($('#listB').value, opts);
+    const { onlyA, onlyB, both } = compareLists(listA, listB);
+
+    // In "reduce output" mode we clear the heavy input fields to free memory
+    if (opts.reduce) { $('#listA').value = ''; $('#listB').value = ''; }
+
+    // ---- Build stats table -------------------------------------------------
+    const body = $('#statsBody');
+    body.innerHTML = '';
+    body.appendChild(statRow('In list A', listA.length, true));
+    body.appendChild(statRow('In list B', listB.length, true));
+    body.appendChild(statRow('Difference', Math.abs(listA.length - listB.length), false));
+    body.appendChild(statRow('Only in list A', onlyA.length, true));
+    body.appendChild(statRow('Only in list B', onlyB.length, true));
+    body.appendChild(statRow('In both lists', both.length, true));
+
+    // Map each downloadable label to its data
+    const dataByLabel = {
+      'In list A': listA,
+      'In list B': listB,
+      'Only in list A': onlyA,
+      'Only in list B': onlyB,
+      'In both lists': both,
+    };
+
+    // Wire the download buttons in the stats table
+    body.querySelectorAll('[data-dl]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const label = btn.getAttribute('data-dl');
+        const items = dataByLabel[label];
+        const safe = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        if (opts.ig) {
+          // IG mode: file contains clickable profile links (even with reduce on)
+          download(safe + '.html', igDownloadHtml(label, items), 'text/html;charset=utf-8');
+        } else {
+          download(safe + '.txt', toPlainText(items));
+        }
+      });
+    });
+
+    // ---- Build on-screen outputs (skipped in reduce mode) ------------------
+    const outputs = $('#outputs');
+    outputs.innerHTML = '';
+    if (opts.reduce) {
+      const note = document.createElement('div');
+      note.className = 'text-center text-sm text-amber-300/90 bg-panel/70 rounded-2xl border border-white/10 p-5';
+      note.textContent = 'Reduce output is on — results are not shown on screen. Use the "Download list" buttons above.';
+      outputs.appendChild(note);
+    } else {
+      outputs.appendChild(outputBlock('Only in list A', onlyA, opts.ig));
+      outputs.appendChild(outputBlock('Only in list B', onlyB, opts.ig));
+      outputs.appendChild(outputBlock('In both lists', both, opts.ig));
+    }
+
+    // ---- Reveal results with a smooth animation ----------------------------
+    const results = $('#results');
+    results.classList.remove('hidden');
+    gsap.fromTo(results, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .5, ease: 'power2.out' });
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* =========================================================================
+     TEXT REPLACEMENT TOOL
+     Supports literal replace and, when the regex box is ticked, RegExp with
+     ( ) capture groups and $1 backreferences. \n and \t escapes are honoured.
+     ========================================================================= */
+  function unescape(str) {
+    return str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r');
+  }
+  function runReplace() {
+    const src = $('#tr-input').value;
+    const search = $('#tr-search').value;
+    const replaceRaw = unescape($('#tr-replace').value);
+    if (!search) { toast('Enter something to search for'); return; }
+    let result;
+    try {
+      if ($('#tr-regex').checked) {
+        // Regex mode: use the raw pattern with a global flag
+        result = src.replace(new RegExp(search, 'g'), replaceRaw);
+      } else {
+        // Literal mode: split/join replaces every occurrence safely
+        result = src.split(unescape(search)).join(replaceRaw);
+      }
+    } catch (err) {
+      toast('Invalid regular expression');
+      return;
+    }
+    $('#tr-input').value = result;
+    toast('Replaced');
+  }
+
+  /* =========================================================================
+     WIRING / EVENT LISTENERS
+     ========================================================================= */
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // Entrance animation for the whole container
+    gsap.to('#app', { opacity: 1, y: 0, duration: .8, ease: 'power2.out', delay: .1 });
+    gsap.from('#app', { y: 20, duration: .8, ease: 'power2.out', delay: .1 });
+
+    // Compare button (with a short loading state)
+    $('#compareBtn').addEventListener('click', () => {
+      $('#compareSpin').classList.remove('hidden');
+      $('#compareLabel').textContent = 'Comparing…';
+      // Defer to next frame so the spinner paints before the (sync) work
+      setTimeout(() => {
+        try { runCompare(); }
+        finally {
+          $('#compareSpin').classList.add('hidden');
+          $('#compareLabel').textContent = 'Compare';
+        }
+      }, 120);
+    });
+
+    // Browse buttons -> trigger the hidden file inputs
+    document.querySelectorAll('[data-browse]').forEach((btn) => {
+      const which = btn.getAttribute('data-browse');
+      btn.addEventListener('click', () => document.querySelector(`[data-file="${which}"]`).click());
+    });
+    document.querySelectorAll('[data-file]').forEach((inp) => {
+      const which = inp.getAttribute('data-file');
+      inp.addEventListener('change', (e) => handleFile(which, e.target.files[0]));
+    });
+
+    // "Copy list to clipboard" buttons for the input textareas
+    document.querySelectorAll('[data-copy]').forEach((btn) => {
+      btn.addEventListener('click', () => copyToClipboard($('#' + btn.getAttribute('data-copy')).value));
+    });
+
+    // When the user types into a textarea, reset its "uploaded size" tracker
+    ['A', 'B'].forEach((k) => {
+      $('#list' + k).addEventListener('input', () => { uploadedBytes[k] = 0; $('#file' + k + '-name').textContent = ''; });
+    });
+
+    // Accordions
+    document.querySelectorAll('.acc-toggle').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const body = btn.nextElementSibling;
+        const icon = btn.querySelector('.acc-icon');
+        const open = body.style.maxHeight && body.style.maxHeight !== '0px';
+        if (open) { body.style.maxHeight = '0px'; icon.style.transform = 'rotate(0deg)'; }
+        else { body.style.maxHeight = body.scrollHeight + 'px'; icon.style.transform = 'rotate(180deg)'; }
+      });
+    });
+
+    // Text replacement tool
+    $('#tr-run').addEventListener('click', runReplace);
+    $('#tr-copy').addEventListener('click', () => copyToClipboard($('#tr-input').value));
+
+    // ---- Particle background ----------------------------------------------
+    tsParticles.load({
+      id: 'tsparticles',
+      options: {
+        fpsLimit: 60,
+        background: { color: 'transparent' },
+        particles: {
+          number: { value: 55, density: { enable: true, area: 900 } },
+          color: { value: ['#a855f7', '#22d3ee'] },
+          links: { enable: true, color: '#6d28d9', distance: 140, opacity: .35, width: 1 },
+          move: { enable: true, speed: .8, outModes: { default: 'bounce' } },
+          opacity: { value: .45 },
+          size: { value: { min: 1, max: 3 } },
+        },
+        interactivity: {
+          events: { onHover: { enable: true, mode: 'grab' } },
+          modes: { grab: { distance: 160, links: { opacity: .6 } } },
+        },
+        detectRetina: true,
+      },
+    });
+  });
+  </script>
+</body>
+</html>
