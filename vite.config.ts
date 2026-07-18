@@ -117,11 +117,37 @@ function festaNotifyDevApi() {
   }
 }
 
+// Contatore confronti in sviluppo: stesso endpoint della funzione serverless
+// (/api/ig-stats). Legge le env Supabase da .env così funziona anche in locale.
+function igStatsDevApi() {
+  return {
+    name: "ig-stats-dev-api",
+    configureServer(server: any) {
+      const env = loadEnv(server.config.mode, process.cwd(), "");
+      for (const k of ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) {
+        if (env[k] && !process.env[k]) process.env[k] = env[k];
+      }
+      server.middlewares.use("/api/ig-stats", async (req: any, res: any) => {
+        try {
+          const { readCount, incrementCount } = await import("./api/ig-stats");
+          res.setHeader("Content-Type", "application/json");
+          if (req.method === "GET") { res.end(JSON.stringify({ count: await readCount() })); return; }
+          if (req.method === "POST") { res.end(JSON.stringify({ count: await incrementCount() })); return; }
+          res.statusCode = 405; res.end("{}");
+        } catch {
+          res.statusCode = 500; res.end("{}");
+        }
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     figmaAssetResolver(),
     triviaDevApi(),
     festaNotifyDevApi(),
+    igStatsDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),

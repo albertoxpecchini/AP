@@ -936,8 +936,85 @@ const RAW: Record<string, Entry> = {
   "Trova i 2 file .html": {
     en: "Find the 2 .html files", fr: "Trouve les 2 fichiers .html", de: "Finde die 2 .html-Dateien",
   },
-  "Torna qui e confronta": {
-    en: "Come back here and compare", fr: "Reviens ici et compare", de: "Komm zurück und vergleiche",
+  "Torna su questo sito e confronta": {
+    en: "Come back to this site and compare", fr: "Reviens sur ce site et compare", de: "Zurück zu dieser Seite und vergleichen",
+  },
+
+  // — Tutorial: corpi delle slide (100% multilingua) —
+  "Per il confronto servono i file «following.html» (chi segui) e «followers.html» (chi ti segue): te li fornisce Instagram stesso, è il modo più preciso e sicuro.": {
+    en: "For the comparison you need the files “following.html” (who you follow) and “followers.html” (who follows you): Instagram itself gives them to you — it's the most precise and safe way.",
+    fr: "Pour la comparaison, il te faut les fichiers « following.html » (qui tu suis) et « followers.html » (qui te suit) : Instagram te les fournit lui-même, c'est la manière la plus précise et sûre.",
+    de: "Für den Vergleich brauchst du die Dateien „following.html“ (wem du folgst) und „followers.html“ (wer dir folgt): Instagram selbst gibt sie dir — das ist der genaueste und sicherste Weg.",
+  },
+  "Ti guido dall'app sul telefono. Da computer i passaggi sono identici, cambia solo la posizione sullo schermo. Puoi saltare quando vuoi.": {
+    en: "I'll guide you from the phone app. On a computer the steps are identical, only the position on screen changes. You can skip anytime.",
+    fr: "Je te guide depuis l'appli sur le téléphone. Sur ordinateur les étapes sont identiques, seule la position à l'écran change. Tu peux passer quand tu veux.",
+    de: "Ich führe dich über die Handy-App. Am Computer sind die Schritte identisch, nur die Position auf dem Bildschirm ändert sich. Du kannst jederzeit überspringen.",
+  },
+  "Apri il tuo profilo (icona in basso a destra), poi premi le tre lineette in alto a destra.": {
+    en: "Open your profile (icon at the bottom right), then tap the three lines at the top right.",
+    fr: "Ouvre ton profil (icône en bas à droite), puis appuie sur les trois lignes en haut à droite.",
+    de: "Öffne dein Profil (Symbol unten rechts), tippe dann auf die drei Striche oben rechts.",
+  },
+  "Dal menu che si apre, in fondo, premi «Impostazioni e privacy».": {
+    en: "In the menu that opens, at the bottom, tap “Settings and privacy”.",
+    fr: "Dans le menu qui s'ouvre, tout en bas, appuie sur « Paramètres et confidentialité ».",
+    de: "Tippe im geöffneten Menü ganz unten auf „Einstellungen und Privatsphäre“.",
+  },
+  "Scorri fino al gruppo «Le tue informazioni e autorizzazioni» e premi «Scarica le tue informazioni».": {
+    en: "Scroll to the “Your information and permissions” group and tap “Download your information”.",
+    fr: "Fais défiler jusqu'au groupe « Tes informations et autorisations » et appuie sur « Télécharger tes informations ».",
+    de: "Scrolle zur Gruppe „Deine Informationen und Berechtigungen“ und tippe auf „Deine Informationen herunterladen“.",
+  },
+  "Premi «Scarica o trasferisci informazioni», scegli il tuo profilo e premi «Avanti».": {
+    en: "Tap “Download or transfer information”, choose your profile and tap “Next”.",
+    fr: "Appuie sur « Télécharger ou transférer des informations », choisis ton profil et appuie sur « Suivant ».",
+    de: "Tippe auf „Informationen herunterladen oder übertragen“, wähle dein Profil und tippe auf „Weiter“.",
+  },
+  "Se «Seleziona tutto» è attivo, premilo per togliere tutte le spunte.": {
+    en: "If “Select all” is on, tap it to remove all the checks.",
+    fr: "Si « Tout sélectionner » est activé, appuie dessus pour retirer toutes les coches.",
+    de: "Wenn „Alles auswählen“ aktiv ist, tippe darauf, um alle Häkchen zu entfernen.",
+  },
+  "Poi apri «Connessioni» e spunta solo «Followers e following». Premi «Avanti».": {
+    en: "Then open “Connections” and check only “Followers and following”. Tap “Next”.",
+    fr: "Ouvre ensuite « Connexions » et coche uniquement « Followers et following ». Appuie sur « Suivant ».",
+    de: "Öffne dann „Verbindungen“ und hake nur „Follower und Abonnierte“ an. Tippe auf „Weiter“.",
+  },
+  "Alla voce «Formato» scegli «HTML» (non JSON), poi premi «Inoltra richiesta».": {
+    en: "Under “Format” choose “HTML” (not JSON), then tap “Submit request”.",
+    fr: "À la rubrique « Format », choisis « HTML » (pas JSON), puis appuie sur « Envoyer la demande ».",
+    de: "Wähle unter „Format“ die Option „HTML“ (nicht JSON) und tippe dann auf „Anfrage senden“.",
+  },
+  "Instagram prepara il file: di solito passa circa mezz'ora (a volte fino a qualche ora). Ti arriva una notifica e anche una email quando è pronto.": {
+    en: "Instagram prepares the file: it usually takes about half an hour (sometimes up to a few hours). You'll get a notification and also an email when it's ready.",
+    fr: "Instagram prépare le fichier : cela prend en général environ une demi-heure (parfois jusqu'à quelques heures). Tu recevras une notification et aussi un e-mail quand c'est prêt.",
+    de: "Instagram bereitet die Datei vor: das dauert meist etwa eine halbe Stunde (manchmal bis zu ein paar Stunden). Du bekommst eine Benachrichtigung und auch eine E-Mail, wenn sie fertig ist.",
+  },
+  "Torna nella stessa pagina, premi «Scarica», inserisci la password: parte un file «.zip».": {
+    en: "Go back to the same page, tap “Download”, enter your password: a “.zip” file starts.",
+    fr: "Retourne sur la même page, appuie sur « Télécharger », saisis ton mot de passe : un fichier « .zip » démarre.",
+    de: "Gehe zurück auf dieselbe Seite, tippe auf „Herunterladen“, gib dein Passwort ein: eine „.zip“-Datei startet.",
+  },
+  "Apri (estrai) lo zip. Entra nella cartella «connections», poi «followers_and_following».": {
+    en: "Open (extract) the zip. Go into the “connections” folder, then “followers_and_following”.",
+    fr: "Ouvre (extrais) le zip. Entre dans le dossier « connections », puis « followers_and_following ».",
+    de: "Öffne (entpacke) die ZIP. Gehe in den Ordner „connections“, dann „followers_and_following“.",
+  },
+  "Lì trovi i due file: «following.html» e «followers.html».": {
+    en: "There you'll find the two files: “following.html” and “followers.html”.",
+    fr: "Tu y trouves les deux fichiers : « following.html » et « followers.html ».",
+    de: "Dort findest du die zwei Dateien: „following.html“ und „followers.html“.",
+  },
+  "Ci siamo! Torna su questo sito (albertopecchini.it/instagram): non è Instagram, è lo strumento che stai usando ora.": {
+    en: "Almost done! Come back to this site (albertopecchini.it/instagram): it's not Instagram, it's the tool you're using right now.",
+    fr: "On y est ! Reviens sur ce site (albertopecchini.it/instagram) : ce n'est pas Instagram, c'est l'outil que tu utilises en ce moment.",
+    de: "Fast fertig! Komm zurück auf diese Seite (albertopecchini.it/instagram): das ist nicht Instagram, sondern das Tool, das du gerade benutzt.",
+  },
+  "Metti «following.html» nel riquadro «I miei seguiti» (a sinistra) e «followers.html» in «I miei follower» (a destra), poi premi «Confronta».": {
+    en: "Put “following.html” in the “People I follow” box (left) and “followers.html” in “My followers” (right), then tap “Compare”.",
+    fr: "Mets « following.html » dans le cadre « Mes abonnements » (à gauche) et « followers.html » dans « Mes abonnés » (à droite), puis appuie sur « Comparer ».",
+    de: "Lege „following.html“ in das Feld „Wem ich folge“ (links) und „followers.html“ in „Meine Follower“ (rechts), dann tippe auf „Vergleichen“.",
   },
 
   // — Banner novità home (sorgente EN) —
@@ -976,6 +1053,16 @@ const RAW: Record<string, Entry> = {
     en: "The only thing stored on your device is whether you've already seen the tutorial (a local preference), so it isn't shown again. Nothing else.",
     fr: "La seule chose enregistrée sur ton appareil est si tu as déjà vu le tutoriel (une préférence locale), pour ne pas te le remontrer. Rien d'autre.",
     de: "Das Einzige, was auf deinem Gerät gespeichert wird, ist, ob du das Tutorial schon gesehen hast (eine lokale Einstellung), damit es nicht erneut erscheint. Sonst nichts.",
+  },
+
+  // — Contatore live + tasti incolla —
+  "confronti effettuati finora": {
+    en: "comparisons done so far", fr: "comparaisons effectuées jusqu'ici", de: "bisher durchgeführte Vergleiche",
+  },
+  "Il browser ha bloccato l'incolla automatico. Clicca nell'area di testo e usa Ctrl+V (o ⌘V).": {
+    en: "The browser blocked automatic paste. Click in the text area and use Ctrl+V (or ⌘V).",
+    fr: "Le navigateur a bloqué le collage automatique. Clique dans la zone de texte et utilise Ctrl+V (ou ⌘V).",
+    de: "Der Browser hat das automatische Einfügen blockiert. Klicke ins Textfeld und nutze Strg+V (oder ⌘V).",
   },
 };
 

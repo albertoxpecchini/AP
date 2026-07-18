@@ -8,7 +8,8 @@ import {
 import SiteFooter from "../site/SiteFooter";
 import Tutorial from "./Tutorial";
 import Particles from "./Particles";
-import { ShieldCheck, Lock, WifiOff } from "lucide-react";
+import { ShieldCheck, Lock, WifiOff, ClipboardPaste, Activity } from "lucide-react";
+import { fetchCount, bumpCount, subscribeCount } from "./statsApi";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import { getPref, setPref } from "../utils/prefs";
 
@@ -412,6 +413,8 @@ export default function Instagram() {
   const [copied, setCopied] = useState<ResultKey | null>(null);
   const [lang, setLang] = useState<Lang>(() => getLang());
   const [showTutorial, setShowTutorial] = useState(false);
+  const [analyses, setAnalyses] = useState<number | null>(null); // contatore globale live
+  const [pasteErr, setPasteErr] = useState(false);
 
   const fileFollowing = useRef<HTMLInputElement>(null);
   const fileFollowers = useRef<HTMLInputElement>(null);
@@ -431,6 +434,25 @@ export default function Instagram() {
   const closeTutorial = useCallback(() => {
     setShowTutorial(false);
     setPref(TUTORIAL_PREF, "seen");
+  }, []);
+
+  // Contatore globale dei confronti: totale iniziale + aggiornamenti live.
+  useEffect(() => {
+    let alive = true;
+    fetchCount().then((n) => { if (alive && n != null) setAnalyses(n); });
+    const unsub = subscribeCount((n) => setAnalyses(n));
+    return () => { alive = false; unsub(); };
+  }, []);
+
+  // Incolla dagli appunti nella textarea indicata.
+  const pasteInto = useCallback(async (setText: (v: string) => void, setName: (v: string) => void) => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) { setText(text); setName(""); setPasteErr(false); }
+    } catch {
+      setPasteErr(true);
+      window.setTimeout(() => setPasteErr(false), 2500);
+    }
   }, []);
 
   const readFile = useCallback(
@@ -471,6 +493,9 @@ export default function Instagram() {
   const compare = () => {
     if (!canCompare) return;
     setRan(true);
+    // Conta il confronto (ottimistico + valore autoritativo dal server).
+    setAnalyses((a) => (a == null ? a : a + 1));
+    bumpCount().then((n) => { if (n != null) setAnalyses(n); });
     requestAnimationFrame(() =>
       requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })),
     );
@@ -562,6 +587,14 @@ export default function Instagram() {
           <button type="button" className="ig-guide" onClick={() => setShowTutorial(true)}>
             <HelpCircle size={16} /><span>Come scarico i file da Instagram?</span>
           </button>
+          {analyses != null && (
+            <div className="ig-counter" role="status" aria-live="polite">
+              <span className="ig-counter-dot" aria-hidden="true" />
+              <Activity size={15} aria-hidden="true" />
+              <b translate="no">{analyses.toLocaleString(locale)}</b>
+              <span>confronti effettuati finora</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -575,9 +608,14 @@ export default function Instagram() {
                 <span className="ig-card-file" translate="no">{nameFollowing}</span>
               </div>
               <p className="ig-card-hint">Il file following.html — chi segui tu</p>
-              <button type="button" className="ig-upload" onClick={() => fileFollowing.current?.click()}>
-                <Upload size={16} /><span>Scegli file</span>
-              </button>
+              <div className="ig-btnrow">
+                <button type="button" className="ig-upload" onClick={() => fileFollowing.current?.click()}>
+                  <Upload size={16} /><span>Scegli file</span>
+                </button>
+                <button type="button" className="ig-paste" onClick={() => pasteInto(setFollowing, setNameFollowing)}>
+                  <ClipboardPaste size={16} /><span>Incolla</span>
+                </button>
+              </div>
               <input ref={fileFollowing} type="file" accept=".html,.htm,.txt,.json" hidden
                 onChange={(e) => readFile(e.target.files?.[0], setFollowing, setNameFollowing)} />
               <textarea className="ig-textarea" value={following} spellCheck={false}
@@ -591,9 +629,14 @@ export default function Instagram() {
                 <span className="ig-card-file" translate="no">{nameFollowers}</span>
               </div>
               <p className="ig-card-hint">Il file followers.html — chi ti segue</p>
-              <button type="button" className="ig-upload" onClick={() => fileFollowers.current?.click()}>
-                <Upload size={16} /><span>Scegli file</span>
-              </button>
+              <div className="ig-btnrow">
+                <button type="button" className="ig-upload" onClick={() => fileFollowers.current?.click()}>
+                  <Upload size={16} /><span>Scegli file</span>
+                </button>
+                <button type="button" className="ig-paste" onClick={() => pasteInto(setFollowers, setNameFollowers)}>
+                  <ClipboardPaste size={16} /><span>Incolla</span>
+                </button>
+              </div>
               <input ref={fileFollowers} type="file" accept=".html,.htm,.txt,.json" hidden
                 onChange={(e) => readFile(e.target.files?.[0], setFollowers, setNameFollowers)} />
               <textarea className="ig-textarea" value={followers} spellCheck={false}
@@ -618,9 +661,14 @@ export default function Instagram() {
                   <h2 className="ig-card-title">I miei follower di prima</h2>
                   <span className="ig-card-file" translate="no">{nameOld}</span>
                 </div>
-                <button type="button" className="ig-upload" onClick={() => fileOld.current?.click()}>
-                  <Upload size={16} /><span>Scegli file</span>
-                </button>
+                <div className="ig-btnrow">
+                  <button type="button" className="ig-upload" onClick={() => fileOld.current?.click()}>
+                    <Upload size={16} /><span>Scegli file</span>
+                  </button>
+                  <button type="button" className="ig-paste" onClick={() => pasteInto(setOldFollowers, setNameOld)}>
+                    <ClipboardPaste size={16} /><span>Incolla</span>
+                  </button>
+                </div>
                 <input ref={fileOld} type="file" accept=".html,.htm,.txt,.json" hidden
                   onChange={(e) => readFile(e.target.files?.[0], setOldFollowers, setNameOld)} />
                 <textarea className="ig-textarea" value={oldFollowers} spellCheck={false}
@@ -629,6 +677,12 @@ export default function Instagram() {
               </div>
             )}
           </div>
+
+          {pasteErr && (
+            <p className="ig-paste-err" role="alert">
+              Il browser ha bloccato l'incolla automatico. Clicca nell'area di testo e usa Ctrl+V (o ⌘V).
+            </p>
+          )}
 
           <div className="ig-controls">
             <button type="button" className="ig-go" onClick={compare} disabled={!canCompare}>Confronta</button>
@@ -821,6 +875,42 @@ export default function Instagram() {
         html.dark .ig-guide { color: var(--ink); }
         .ig-guide:hover { background: var(--soft); border-color: var(--accent); transform: translateY(-1px); }
         .ig-guide:active { transform: translateY(0); }
+
+        /* Contatore live dei confronti */
+        .ig-counter {
+          display: inline-flex; align-items: center; gap: .5rem; margin: 1rem auto 0;
+          padding: .45rem .9rem; border-radius: 999px; font-size: .9rem; color: var(--sub);
+          background: var(--surface); border: 1px solid var(--surface-bd);
+        }
+        .ig-counter b { color: var(--accent-2); font-variant-numeric: tabular-nums; font-size: 1rem; }
+        html.dark .ig-counter b { color: var(--ink); }
+        .ig-counter svg { color: var(--accent-2); }
+        html.dark .ig-counter svg { color: var(--ink); }
+        .ig-counter-dot {
+          width: 8px; height: 8px; border-radius: 50%; background: #2ecc71; flex: 0 0 auto;
+          box-shadow: 0 0 0 0 rgba(46,204,113,.6); animation: ig-pulse 2s infinite;
+        }
+        @keyframes ig-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(46,204,113,.55); }
+          70% { box-shadow: 0 0 0 7px rgba(46,204,113,0); }
+          100% { box-shadow: 0 0 0 0 rgba(46,204,113,0); }
+        }
+
+        /* Riga bottoni file/incolla + tasto Incolla */
+        .ig-btnrow { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .ig-paste {
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          background: transparent; color: var(--text); border: 1px solid var(--surface-bd);
+          border-radius: 10px; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.9rem;
+          cursor: pointer; font-family: inherit; transition: border-color 0.15s, color 0.15s, background 0.15s;
+        }
+        .ig-paste:hover { border-color: var(--accent); color: var(--accent-2); background: var(--soft); }
+        html.dark .ig-paste:hover { color: var(--ink); }
+        .ig-paste-err {
+          margin: 1rem 0 0; font-size: 0.86rem; color: var(--accent-2);
+          background: var(--soft); border: 1px solid var(--soft-bd); border-radius: 8px; padding: .55rem .75rem;
+        }
+        html.dark .ig-paste-err { color: var(--ink); }
 
         .ig-tool { padding: clamp(2rem, 4vw, 3rem) 0; }
         .ig-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 1.75rem); }
@@ -1026,8 +1116,43 @@ export default function Instagram() {
         .ig-inputs .ig-card { animation: ig-rise .5s cubic-bezier(.22,1,.36,1) both; }
         .ig-inputs .ig-card:nth-child(2) { animation-delay: .08s; }
 
+        /* Aurora viva dietro la hero (loop lento e discreto). */
+        .ig-hero::after {
+          content: ""; position: absolute; inset: -30%; z-index: 0; pointer-events: none;
+          background:
+            radial-gradient(40% 40% at 20% 30%, rgba(233,84,32,.16), transparent 60%),
+            radial-gradient(45% 45% at 80% 20%, rgba(221,72,20,.14), transparent 60%),
+            radial-gradient(40% 40% at 60% 80%, rgba(246,165,131,.14), transparent 60%);
+          filter: blur(20px); animation: ig-aurora 16s ease-in-out infinite alternate;
+        }
+        .ig-hero > .container { position: relative; z-index: 1; }
+        @keyframes ig-aurora {
+          0% { transform: translate3d(-3%, -2%, 0) scale(1); }
+          50% { transform: translate3d(3%, 2%, 0) scale(1.08); }
+          100% { transform: translate3d(-2%, 3%, 0) scale(1.03); }
+        }
+        /* Filetto della hero: gradiente che scorre in loop. */
+        .ig-hero-rule {
+          background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+          background-size: 200% 100%; animation: ig-flow 3.5s linear infinite;
+        }
+        @keyframes ig-flow { to { background-position: 200% 0; } }
+        /* Card principale dei risultati: bordo che "respira". */
+        .ig-result--primary { animation: ig-glow 3.6s ease-in-out infinite; }
+        @keyframes ig-glow {
+          0%, 100% { box-shadow: 0 14px 36px var(--glow); }
+          50% { box-shadow: 0 14px 50px var(--glow), 0 0 0 3px rgba(233,84,32,.10); }
+        }
+        /* Badge privacy pulsante. */
+        .ig-privacy-badge { animation: ig-breath 4.5s ease-in-out infinite; }
+        /* Icona attività del contatore che pulsa piano. */
+        .ig-counter svg { animation: ig-throb 2.4s ease-in-out infinite; }
+        @keyframes ig-throb { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.15); opacity: 1; } }
+
         @media (prefers-reduced-motion: reduce) {
-          .ig-go::after, .ig-hero-badge, .ig-inputs .ig-card { animation: none !important; }
+          .ig-go::after, .ig-hero-badge, .ig-inputs .ig-card, .ig-hero::after,
+          .ig-hero-rule, .ig-result--primary, .ig-privacy-badge, .ig-counter svg,
+          .ig-counter-dot { animation: none !important; }
           .ig-card:hover, .ig-result:hover { transform: none; }
         }
 
