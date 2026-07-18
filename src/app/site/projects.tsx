@@ -17,9 +17,10 @@ import {
   UserRound,
   BookOpen,
   Cat,
+  Instagram,
 } from "lucide-react";
 
-export type ProjectKind = "game" | "page" | "site" | "doc";
+export type ProjectKind = "game" | "page" | "site" | "doc" | "tool";
 
 export interface Project {
   /** Chiave breve: per gli interni coincide col nome cartella (es. "trivia"). */
@@ -47,6 +48,7 @@ export function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: numbe
   const sw = 2.1;
   switch (thumb) {
     case "trivia":      return <BrainCircuit size={size} strokeWidth={sw} />;
+    case "instagram":   return <Instagram size={size} strokeWidth={sw} />;
     case "pcto":        return <Ruler size={size} strokeWidth={sw} />;
     case "mestesso":    return <UserRound size={size} strokeWidth={sw} />;
     case "dubliners":   return <BookOpen size={size} strokeWidth={sw} />;
@@ -122,6 +124,19 @@ export const PROJECTS: Project[] = [
     tags: ["React", "TypeScript", "Game design", "UI/UX"],
   },
   {
+    id: "instagram",
+    category: "Web tool",
+    date: "Jul 18, 2026",
+    modified: "2026-07-18",
+    title: "Compare Two Lists",
+    url: "/instagram",
+    kind: "tool",
+    thumb: "instagram",
+    srcDir: "src/app/instagram",
+    desc: "A privacy-first tool that compares two lists right in your browser. Built for Instagram: load your following.html and followers.html and instantly see who doesn't follow you back, who you don't follow back and your mutuals — with monogram avatars, follow dates, name/chronological sorting, a compare-over-time mode, an illustrated step-by-step tutorial and downloadable HTML reports. Nothing is uploaded, nothing is stored: the comparison runs entirely client-side.",
+    tags: ["React", "TypeScript", "Client-side", "Privacy", "UI/UX"],
+  },
+  {
     id: "rivalta",
     category: "Institutional website",
     date: "Apr 27, 2026",
@@ -182,6 +197,7 @@ export const PROJECT_EMOJI: Record<string, string> = {
   "Dubliners": "📖",
   "The Leopard": "🐆",
   "Trivia": "🧠",
+  "Compare Two Lists": "👀",
   "Rivalta sul Mincio": "🏞️",
   "Cascina Fontana": "🏡",
   "Curriculum Vitae": "📄",
@@ -208,6 +224,7 @@ export function typeLabel(kind: ProjectKind): string {
     case "game": return "Gioco web";
     case "page": return "Pagina · approfondimento";
     case "site": return "Sito web";
+    case "tool": return "Strumento web";
     case "doc":  return "Documento PDF";
   }
 }

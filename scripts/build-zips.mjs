@@ -35,6 +35,7 @@ const INTERNAL = [
   { id: "dubliners",   dir: "src/app/dubliners",   game: false },
   { id: "gattopardo",  dir: "src/app/gattopardo",  game: false },
   { id: "trivia",      dir: "src/app/trivia",      game: true  },
+  { id: "instagram",   dir: "src/app/instagram",   game: false },
 ];
 
 // Documenti (PDF già in public/): solo dimensione per la colonna "Dimensione".

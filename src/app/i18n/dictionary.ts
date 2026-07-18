@@ -821,6 +821,162 @@ const RAW: Record<string, Entry> = {
     fr: "Le lien n'est pas valide ou a expiré.",
     de: "Der Link ist ungültig oder ist abgelaufen.",
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // INSTAGRAM — «Chi ti ha tolto il follow»  (sorgente: ITALIANO → en / fr / de)
+  // ("Torna alla home", "Copia", "Copiato" sono già tradotti sopra — non ripetuti.)
+  // ═══════════════════════════════════════════════════════════════════════════
+  "Chi ti ha tolto il follow? 👀": {
+    en: "Who unfollowed you? 👀", fr: "Qui t'a unfollow ? 👀", de: "Wer ist dir entfolgt? 👀",
+  },
+  "Scopri in 10 secondi chi segui che non ti ricambia.": {
+    en: "Find out in 10 seconds who you follow that doesn't follow you back.",
+    fr: "Découvre en 10 secondes qui tu suis qui ne te suit pas en retour.",
+    de: "Finde in 10 Sekunden heraus, wem du folgst, der dir nicht zurückfolgt.",
+  },
+  "Carica i due file following.html e followers.html che scarichi da Instagram (vanno bene anche i .json), oppure incolla le liste. Resta tutto nel tuo browser: nessun login, nessun dato inviato.": {
+    en: "Upload the two files following.html and followers.html you download from Instagram (.json works too), or paste the lists. Everything stays in your browser: no login, no data sent.",
+    fr: "Charge les deux fichiers following.html et followers.html téléchargés depuis Instagram (les .json marchent aussi), ou colle les listes. Tout reste dans ton navigateur : aucune connexion, aucune donnée envoyée.",
+    de: "Lade die beiden Dateien following.html und followers.html von Instagram hoch (.json geht auch) oder füge die Listen ein. Alles bleibt in deinem Browser: kein Login, keine Daten gesendet.",
+  },
+  "I miei seguiti": { en: "People I follow", fr: "Mes abonnements", de: "Wem ich folge" },
+  "I miei follower": { en: "My followers", fr: "Mes abonnés", de: "Meine Follower" },
+  "Il file following.html — chi segui tu": {
+    en: "The following.html file — who you follow",
+    fr: "Le fichier following.html — qui tu suis",
+    de: "Die Datei following.html — wem du folgst",
+  },
+  "Il file followers.html — chi ti segue": {
+    en: "The followers.html file — who follows you",
+    fr: "Le fichier followers.html — qui te suit",
+    de: "Die Datei followers.html — wer dir folgt",
+  },
+  "Scegli file": { en: "Choose file", fr: "Choisir un fichier", de: "Datei wählen" },
+  "…oppure incolla qui la lista": { en: "…or paste the list here", fr: "…ou colle la liste ici", de: "…oder füge die Liste hier ein" },
+  Confronta: { en: "Compare", fr: "Comparer", de: "Vergleichen" },
+  "Cancella e ricomincia": { en: "Clear and start over", fr: "Effacer et recommencer", de: "Löschen und neu starten" },
+  "profili che segui non ti ricambiano.": {
+    en: "accounts you follow don't follow you back.",
+    fr: "comptes que tu suis ne te suivent pas en retour.",
+    de: "Konten, denen du folgst, folgen dir nicht zurück.",
+  },
+  "Li trovi nella lista in evidenza qui sotto.": {
+    en: "You'll find them in the highlighted list below.",
+    fr: "Tu les trouves dans la liste en évidence ci-dessous.",
+    de: "Du findest sie in der hervorgehobenen Liste unten.",
+  },
+  "Ordina:": { en: "Sort:", fr: "Trier :", de: "Sortieren:" },
+  "Nome (A-Z)": { en: "Name (A-Z)", fr: "Nom (A-Z)", de: "Name (A-Z)" },
+  "Follow più recenti": { en: "Most recent follows", fr: "Abonnements récents", de: "Neueste Follows" },
+  "Le date non sono presenti in questo export": {
+    en: "Dates are not present in this export",
+    fr: "Les dates ne sont pas présentes dans cet export",
+    de: "Daten sind in diesem Export nicht vorhanden",
+  },
+  "Chi mi segue ma io non seguo": {
+    en: "They follow me, I don't follow back", fr: "Ils me suivent, je ne les suis pas", de: "Folgen mir, ich nicht zurück",
+  },
+  "Io seguo ma non mi segue": {
+    en: "I follow, they don't follow back", fr: "Je suis, ils ne me suivent pas", de: "Ich folge, sie nicht zurück",
+  },
+  "Chi seguo e mi risegue": {
+    en: "We follow each other", fr: "On se suit mutuellement", de: "Wir folgen uns gegenseitig",
+  },
+  Scarica: { en: "Download", fr: "Télécharger", de: "Herunterladen" },
+  "Nessuno qui 🎉": { en: "No one here 🎉", fr: "Personne ici 🎉", de: "Niemand hier 🎉" },
+  "Chi mi ha tolto il follow di recente? Confronta con un export vecchio": {
+    en: "Who unfollowed me recently? Compare with an older export",
+    fr: "Qui m'a unfollow récemment ? Compare avec un ancien export",
+    de: "Wer ist mir kürzlich entfolgt? Mit einem älteren Export vergleichen",
+  },
+  "Metti qui i follower di un export più vecchio (il followers.html di settimane fa): chi c'era allora e ora non c'è più ti ha tolto il follow.": {
+    en: "Put here the followers from an older export (the followers.html from weeks ago): whoever was there and isn't anymore has unfollowed you.",
+    fr: "Mets ici les abonnés d'un export plus ancien (le followers.html d'il y a quelques semaines) : celui qui y était et n'y est plus t'a unfollow.",
+    de: "Füge hier die Follower aus einem älteren Export ein (das followers.html von vor Wochen): Wer damals dabei war und jetzt fehlt, ist dir entfolgt.",
+  },
+  "I miei follower di prima": { en: "My previous followers", fr: "Mes anciens abonnés", de: "Meine früheren Follower" },
+  "…oppure incolla qui la lista dei follower di prima": {
+    en: "…or paste your previous followers list here",
+    fr: "…ou colle ici la liste de tes anciens abonnés",
+    de: "…oder füge hier deine frühere Followerliste ein",
+  },
+  "Rispetto al tuo export vecchio": { en: "Compared to your older export", fr: "Par rapport à ton ancien export", de: "Im Vergleich zu deinem älteren Export" },
+  "Ti hanno tolto il follow": { en: "They unfollowed you", fr: "Ils t'ont unfollow", de: "Sie sind dir entfolgt" },
+  "Nuovi follower": { en: "New followers", fr: "Nouveaux abonnés", de: "Neue Follower" },
+
+  // — Tutorial "come scaricare i file" (titoli, guida, navigazione) —
+  "Come scarico i file da Instagram?": {
+    en: "How do I download the files from Instagram?",
+    fr: "Comment télécharger les fichiers depuis Instagram ?",
+    de: "Wie lade ich die Dateien von Instagram herunter?",
+  },
+  Salta: { en: "Skip", fr: "Passer", de: "Überspringen" },
+  "Ho capito, inizia": { en: "Got it, start", fr: "Compris, commencer", de: "Verstanden, los" },
+  "Scarica i tuoi 2 file da Instagram": {
+    en: "Download your 2 files from Instagram", fr: "Télécharge tes 2 fichiers depuis Instagram", de: "Lade deine 2 Dateien von Instagram herunter",
+  },
+  "Profilo → menu → Impostazioni": {
+    en: "Profile → menu → Settings", fr: "Profil → menu → Paramètres", de: "Profil → Menü → Einstellungen",
+  },
+  "Scarica le tue informazioni": {
+    en: "Download your information", fr: "Télécharger tes informations", de: "Deine Informationen herunterladen",
+  },
+  "Scarica o trasferisci informazioni": {
+    en: "Download or transfer information", fr: "Télécharger ou transférer des informations", de: "Informationen herunterladen oder übertragen",
+  },
+  "Solo «Followers e following»": {
+    en: "Only “Followers and following”", fr: "Seulement « Followers et following »", de: "Nur „Follower und Abonnierte“",
+  },
+  "Formato HTML → Inoltra": {
+    en: "HTML format → Submit", fr: "Format HTML → Envoyer", de: "HTML-Format → Absenden",
+  },
+  "Attendi, poi scarica lo ZIP": {
+    en: "Wait, then download the ZIP", fr: "Attends, puis télécharge le ZIP", de: "Warte, dann lade die ZIP herunter",
+  },
+  "Trova i 2 file .html": {
+    en: "Find the 2 .html files", fr: "Trouve les 2 fichiers .html", de: "Finde die 2 .html-Dateien",
+  },
+  "Torna qui e confronta": {
+    en: "Come back here and compare", fr: "Reviens ici et compare", de: "Komm zurück und vergleiche",
+  },
+
+  // — Banner novità home (sorgente EN) —
+  "— new tool: find out who doesn't follow you back on Instagram, all in your browser.": {
+    it: "— nuovo strumento: scopri chi non ti segue su Instagram, tutto nel tuo browser.",
+    fr: "— nouvel outil : découvre qui ne te suit pas sur Instagram, directement dans ton navigateur.",
+    de: "— neues Tool: finde heraus, wer dir auf Instagram nicht zurückfolgt, alles in deinem Browser.",
+  },
+  "Try it": { it: "Provalo", fr: "Essaie-le", de: "Ausprobieren" },
+
+  // — Sezione privacy —
+  "La tua privacy, davvero": {
+    en: "Your privacy, for real", fr: "Ta vie privée, pour de vrai", de: "Deine Privatsphäre, wirklich",
+  },
+  "Questo strumento gira interamente nel tuo browser: i file e le liste che carichi non vengono inviati da nessuna parte, non passano da alcun server e non vengono salvati. Il confronto lo vedi solo tu, su questo dispositivo.": {
+    en: "This tool runs entirely in your browser: the files and lists you load are never sent anywhere, never pass through any server and are never stored. Only you see the comparison, on this device.",
+    fr: "Cet outil fonctionne entièrement dans ton navigateur : les fichiers et les listes que tu charges ne sont envoyés nulle part, ne passent par aucun serveur et ne sont jamais enregistrés. Toi seul vois la comparaison, sur cet appareil.",
+    de: "Dieses Tool läuft vollständig in deinem Browser: Die Dateien und Listen, die du lädst, werden nirgendwo gesendet, laufen über keinen Server und werden nie gespeichert. Nur du siehst den Vergleich, auf diesem Gerät.",
+  },
+  "Nessun caricamento su internet: tutto resta in locale.": {
+    en: "No upload to the internet: everything stays local.",
+    fr: "Aucun envoi sur internet : tout reste en local.",
+    de: "Kein Upload ins Internet: alles bleibt lokal.",
+  },
+  "Nessun login, nessun account, nessun cookie di tracciamento.": {
+    en: "No login, no account, no tracking cookies.",
+    fr: "Aucune connexion, aucun compte, aucun cookie de suivi.",
+    de: "Kein Login, kein Konto, keine Tracking-Cookies.",
+  },
+  "Niente database: appena chiudi o ricarichi la pagina, i dati spariscono.": {
+    en: "No database: as soon as you close or reload the page, the data is gone.",
+    fr: "Aucune base de données : dès que tu fermes ou recharges la page, les données disparaissent.",
+    de: "Keine Datenbank: sobald du die Seite schließt oder neu lädst, sind die Daten weg.",
+  },
+  "L'unica cosa memorizzata sul tuo dispositivo è se hai già visto il tutorial (una preferenza locale), così non ti viene riproposto. Nient'altro.": {
+    en: "The only thing stored on your device is whether you've already seen the tutorial (a local preference), so it isn't shown again. Nothing else.",
+    fr: "La seule chose enregistrée sur ton appareil est si tu as déjà vu le tutoriel (une préférence locale), pour ne pas te le remontrer. Rien d'autre.",
+    de: "Das Einzige, was auf deinem Gerät gespeichert wird, ist, ob du das Tutorial schon gesehen hast (eine lokale Einstellung), damit es nicht erneut erscheint. Sonst nichts.",
+  },
 };
 
 // Una chiave ha senso solo se contiene almeno una lettera: numeri, date e

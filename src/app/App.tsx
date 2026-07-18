@@ -20,6 +20,11 @@ import { PROJECTS, ProjectIcon } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
 import SiteFooter from "./site/SiteFooter";
 import { getLang, subscribeLang, type Lang } from "./i18n/langCore";
+import { getPref, setPref } from "./utils/prefs";
+
+// Banner "novità: nuovo strumento" mostrato per 7 giorni dal lancio (18/07/2026),
+// poi sparisce da solo. Richiudibile a mano (ricordato con una preferenza locale).
+const NEW_TOOL_UNTIL = Date.parse("2026-07-26T00:00:00");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Home / portfolio — look "dark premium" (lo stesso di /me-stesso, /dubliners,
@@ -178,6 +183,12 @@ export default function App() {
   // Lingua attiva del sito: serve a servire il PDF del CV nella lingua giusta
   // (il testo a schermo lo traduce già il motore DOM; il PDF no, è statico).
   const [lang, setLangState] = useState<Lang>(() => getLang());
+  const [showToolBanner, setShowToolBanner] = useState(false);
+
+  useEffect(() => {
+    if (Date.now() < NEW_TOOL_UNTIL && getPref("ap-tools-banner") !== "off") setShowToolBanner(true);
+  }, []);
+  const dismissToolBanner = () => { setShowToolBanner(false); setPref("ap-tools-banner", "off"); };
 
   const sortedCV = useMemo(() => {
     const wishes = CV.filter((c) => (c as any).wish);
@@ -258,6 +269,22 @@ export default function App() {
 
   return (
     <div className="it-page-wrapper hm-page">
+      {/* Banner novità (7 giorni): nuovo strumento web */}
+      {showToolBanner && (
+        <div className="hm-newbanner" role="region" aria-label="News">
+          <Link to="/instagram" className="hm-newbanner-link">
+            <span className="hm-newbanner-tag">NEW</span>
+            <span className="hm-newbanner-text">
+              <b translate="no">Compare Two Lists</b> <span>— new tool: find out who doesn't follow you back on Instagram, all in your browser.</span>
+            </span>
+            <span className="hm-newbanner-cta">Try it <ArrowUpRight size={15} aria-hidden="true" /></span>
+          </Link>
+          <button className="hm-newbanner-x" onClick={dismissToolBanner} aria-label="Close" type="button">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {/* Skiplinks — requisito di accessibilità */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>
@@ -379,7 +406,7 @@ export default function App() {
                 <Link to="/bio" className="hm-pill hm-pill--ghost">👋 Bio</Link>
               </div>
               <div className="hm-hero-quick">
-                {["Trivia", "Cascina Fontana"].map((t) => {
+                {["Trivia", "Compare Two Lists", "Cascina Fontana"].map((t) => {
                   const p = PROJECTS.find((x) => x.title === t);
                   if (!p) return null;
                   return (
@@ -420,7 +447,7 @@ export default function App() {
               </Link>
             </div>
             <div className="ax-embed ax-embed--compact">
-              <ArchivioExplorer embedded onlyUrls={["/trivia", "https://cascinafontana.xyz"]} />
+              <ArchivioExplorer embedded onlyUrls={["/trivia", "/instagram", "https://cascinafontana.xyz"]} />
             </div>
           </div>
         </section>
@@ -705,6 +732,36 @@ export default function App() {
           .hm-menu-sheet { transition: none; }
           .hm-menu.open .hm-menu-nav a { animation: none; }
         }
+
+        /* ── Banner novità ── */
+        .hm-newbanner {
+          position: relative; display: flex; align-items: center; gap: .5rem;
+          background: linear-gradient(90deg, #e95420, #bc3d10); color: #fff;
+          padding: .55rem 2.6rem .55rem 1rem; font-size: .92rem;
+          animation: hm-banner-in .4s cubic-bezier(.22,1,.36,1) both;
+        }
+        @keyframes hm-banner-in { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: none; } }
+        .hm-newbanner-link {
+          display: flex; align-items: center; gap: .6rem; flex: 1 1 auto; justify-content: center;
+          flex-wrap: wrap; color: #fff; text-decoration: none;
+        }
+        .hm-newbanner-tag {
+          background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.45);
+          border-radius: 999px; padding: 1px 9px; font-weight: 800; font-size: .7rem; letter-spacing: .1em;
+        }
+        .hm-newbanner-text b { font-weight: 700; }
+        .hm-newbanner-cta {
+          display: inline-flex; align-items: center; gap: .25rem; font-weight: 700;
+          text-decoration: underline; white-space: nowrap;
+        }
+        .hm-newbanner-link:hover .hm-newbanner-cta { text-decoration: none; }
+        .hm-newbanner-x {
+          position: absolute; right: .6rem; top: 50%; transform: translateY(-50%);
+          background: transparent; border: none; color: #fff; opacity: .85; cursor: pointer;
+          padding: 4px; display: inline-flex; border-radius: 6px;
+        }
+        .hm-newbanner-x:hover { opacity: 1; background: rgba(255,255,255,.15); }
+        @media (max-width: 640px) { .hm-newbanner-cta { display: none; } .hm-newbanner { font-size: .82rem; } }
 
         /* ── Hero ── */
         .hm-hero {
