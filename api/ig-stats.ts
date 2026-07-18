@@ -1,28 +1,66 @@
 // ─── Contatore confronti "Compare Two Lists" — endpoint hardenizzato ─────────
 //
-// L'incremento NON parte più direttamente dal client verso Supabase: passa da
-// qui, dove applichiamo controllo d'origine (sameOriginOk) e rate-limit, come
-// /api/trivia e /api/notify. Così il contatore si alza solo da una pagina del
-// sito. La lettura è pubblica (il totale è per definizione visibile a tutti).
+// L'incremento NON parte direttamente dal client verso Supabase: passa da qui,
+// con controllo d'origine + rate-limit (come /api/trivia). La lettura è pubblica.
 //
-// Usa la SERVICE_ROLE se presente (così si può revocare l'accesso anon alla RPC
-// e blindare del tutto — vedi supabase/tool_stats_lock.sql); altrimenti ripiega
-// sull'anon key (già pubblica). Env lette a runtime: VITE_SUPABASE_URL,
-// SUPABASE_SERVICE_ROLE_KEY | VITE_SUPABASE_ANON_KEY.
-
-import { getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity";
+// NB: gli helper di sicurezza sono INLINE (non importati da ../lib) di proposito:
+// su Vercel le funzioni girano come ESM e un import relativo senza estensione
+// (../lib/serverSecurity) non si risolve a runtime (ERR_MODULE_NOT_FOUND). Così
+// l'endpoint è autosufficiente e non dipende da quella risoluzione.
+//
+// Usa la SERVICE_ROLE se presente (vedi supabase/tool_stats_lock.sql), altrimenti
+// l'anon key (già pubblica). Env: VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY |
+// VITE_SUPABASE_ANON_KEY.
 
 export const config = { runtime: "nodejs" };
 
 const ALLOWED_HOSTS = ["albertopecchini.it", "vercel.app"];
 const STAT_ID = "instagram_compare";
 
+// ── Helper di sicurezza (inline) ─────────────────────────────────────────────
+function getHeader(req: any, name: string): string {
+  const h = req?.headers?.[name.toLowerCase()];
+  if (Array.isArray(h)) return h[0] ?? "";
+  return h ?? "";
+}
+function getClientIp(req: any): string {
+  const xff = getHeader(req, "x-forwarded-for");
+  if (xff) return xff.split(",")[0]!.trim();
+  return getHeader(req, "x-real-ip") || getHeader(req, "x-vercel-forwarded-for") || "";
+}
+function sameOriginOk(req: any, hosts: string[]): boolean {
+  const src = getHeader(req, "origin") || getHeader(req, "referer");
+  if (!src) return false;
+  try {
+    const host = new URL(src).hostname;
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    return hosts.some((h) => host === h || host.endsWith("." + h));
+  } catch {
+    return false;
+  }
+}
+const HITS = new Map<string, number[]>();
+function rateLimit(key: string, max: number, windowMs: number): { ok: boolean; retryAfterSec: number } {
+  const now = Date.now();
+  const cutoff = now - windowMs;
+  const hits = (HITS.get(key) ?? []).filter((t) => t > cutoff);
+  hits.push(now);
+  HITS.set(key, hits);
+  if (HITS.size > 5000) {
+    for (const [k, v] of HITS) if (v.every((t) => t <= cutoff)) HITS.delete(k);
+  }
+  if (hits.length > max) {
+    return { ok: false, retryAfterSec: Math.max(1, Math.ceil((hits[0]! + windowMs - now) / 1000)) };
+  }
+  return { ok: true, retryAfterSec: 0 };
+}
+
+// ── Supabase ─────────────────────────────────────────────────────────────────
 function supa(): { url: string; key: string } | null {
   const url = process.env.VITE_SUPABASE_URL?.replace(/\/+$/, "");
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
   return url && key ? { url, key } : null;
 }
-
 const headers = (key: string) => ({
   apikey: key,
   Authorization: `Bearer ${key}`,
@@ -69,7 +107,6 @@ export default async function handler(req: any, res: any) {
   }
 
   if (req.method === "POST") {
-    // Blindatura: solo dal sito + freno anti-abuso per IP.
     if (!sameOriginOk(req, ALLOWED_HOSTS)) {
       return res.status(403).json({ error: "Origine non consentita" });
     }
