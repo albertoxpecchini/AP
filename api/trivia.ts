@@ -1,4 +1,5 @@
 import { Anthropic } from "@anthropic-ai/sdk";
+import { getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity";
 
 const client = new Anthropic();
 
@@ -6,14 +7,33 @@ export const config = {
   runtime: "nodejs",
 };
 
+// Host consentiti: l'endpoint chiama Claude a pagamento, quindi accettiamo solo
+// richieste che partono dal sito (blocca l'uso come proxy AI gratuito altrui).
+const ALLOWED_HOSTS = ["albertopecchini.it", "vercel.app"];
+
+// Solo lettere (con accenti) e spazi: una "parola" del gioco, non un prompt.
+const WORD_RE = /^[\p{L} ]{3,40}$/u;
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  if (!sameOriginOk(req, ALLOWED_HOSTS)) {
+    return res.status(403).json({ error: "Origine non consentita" });
+  }
+
+  // Anti-abuso di costo: max 20 richieste/minuto per IP (best-effort).
+  const gate = rateLimit(`trivia:${getClientIp(req) || "ignoto"}`, 20, 60_000);
+  if (!gate.ok) {
+    res.setHeader("Retry-After", String(gate.retryAfterSec));
+    return res.status(429).json({ error: "Troppe richieste, riprova tra poco" });
+  }
+
   const { word } = req.query;
 
-  if (!word || typeof word !== "string" || word.length < 3) {
+  // Vincolo forte sull'input: niente prompt injection da 100 KB, tetto a 40 char.
+  if (!word || typeof word !== "string" || !WORD_RE.test(word)) {
     return res.status(400).json({ error: "Invalid word parameter" });
   }
 

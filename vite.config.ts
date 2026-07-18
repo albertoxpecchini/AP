@@ -102,7 +102,9 @@ function festaNotifyDevApi() {
             res.statusCode = 200; res.end(JSON.stringify({ ok: true, skipped: true })); return
           }
           const { sendVoteEmail } = await import('./api/notify')
-          const result = await sendVoteEmail(payload)
+          const { collectDiagnostics } = await import('./lib/serverSecurity')
+          const { html: diagHtml } = collectDiagnostics(req)
+          const result = await sendVoteEmail(payload, diagHtml)
           if (!result.ok) {
             console.error('[festa] invio email fallito:', result.status, result.detail)
             res.statusCode = result.status; res.end(JSON.stringify({ error: result.detail })); return

@@ -101,7 +101,7 @@ AP/
 │   ├── lib/                  # utilità trasversali (players, ecc.)
 │   ├── styles/               # theme.css (token palette) · tailwind · fonts · index
 │   └── main.tsx              # BrowserRouter + 7 Route lazy-loaded
-├── scripts/                  # build_cv.py · build_favicon.py
+├── scripts/                  # build-zips.mjs (gira in prebuild → public/zips/)
 └── vite.config.ts            # plugin React/Tailwind, asset resolver, versioning, dev-API
 ```
 
@@ -196,19 +196,18 @@ sequenceDiagram
 
 ```bash
 git clone https://github.com/albertoxpecchini/AP.git && cd AP
-pnpm install
-pnpm dev          # http://localhost:5173 — HMR attivo, strictPort
-pnpm build        # bundle di produzione in dist/
+npm install
+npm run dev       # http://localhost:5173 — HMR attivo, strictPort
+npm run build     # bundle di produzione in dist/
 ```
 
 Per l'arricchimento AI di Trivia in locale, creare un `.env` con `ANTHROPIC_API_KEY=...`.
 
 | Comando | Azione |
 | :--- | :--- |
-| `pnpm dev` | Dev server Vite + middleware `/api/trivia` (porta 5173) |
-| `pnpm build` | Build statica in `dist/` |
-| `python scripts/build_cv.py` | Rigenera il PDF del CV |
-| `python scripts/build_favicon.py` | Rigenera set favicon + icone PWA |
+| `npm run dev` | Dev server Vite + middleware `/api/trivia` (porta 5173) |
+| `npm run build` | Build statica in `dist/` (esegue prima `prebuild` → ZIP archivio) |
+| `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 
 ---
 

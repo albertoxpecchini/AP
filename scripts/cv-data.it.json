@@ -16,114 +16,213 @@
   },
   "name": "Alberto Pecchini",
   "role": "Designer & Front-end Developer",
-  "tagline": "Studente CAT · Front-end Developer · Disponibile per web design, sviluppo front-end e branding",
+  "tagline": "Studente di Costruzioni e gestione del territorio · Front-end Developer · Disponibile per web design, sviluppo front-end e branding",
   "contacts": [
-    ["Email", "pzkko@yahoo.com"],
-    ["Telefono", "+39 331 407 4198"],
-    ["WhatsApp", "+44 7340 995142"],
-    ["Luogo", "Mantova, Italia"],
-    ["Web", "albertopecchini.it"]
+    [
+      "Email",
+      "pzkko@yahoo.com"
+    ],
+    [
+      "Luogo",
+      "Mantova, Italia"
+    ],
+    [
+      "Web",
+      "albertopecchini.it"
+    ]
   ],
   "languages": [
-    ["Italiano", "Madrelingua", 1.0],
-    ["Inglese", "C1 · IELTS", 0.85]
+    [
+      "Italiano",
+      "Madrelingua",
+      1.0
+    ],
+    [
+      "Inglese",
+      "C1 · IELTS",
+      0.85
+    ]
   ],
-  "patente": ["A1", "B"],
-  "guida": ["Trattori", "Muletti", "Moto", "Furgoni", "Auto"],
-  "strengths": ["Problem solving", "Autonomia", "Coordinamento", "Affidabilità", "Cura del dettaglio", "Apprendimento rapido"],
-  "availability": ["Stage e collaborazioni", "Progetti freelance", "Lavoro da remoto"],
-  "profile": "Studente del quinto anno dell'indirizzo CAT (Costruzioni, Ambiente e Territorio) e front-end developer & designer autodidatta. Unisco la formazione tecnica su progettazione e disegno — maturata anche in tre anni di PCTO all'ufficio tecnico del reparto legno del Caem Group — con la passione per il web, costruendo interfacce moderne, veloci e curate nei dettagli. Lavoro con React, Next.js, TypeScript, Tailwind CSS e animazioni GSAP, con attenzione a user experience, tipografia e design minimalista. Integro l'intelligenza artificiale nel mio workflow di sviluppo (Claude Code, Codex, GitHub Copilot, Gemini) e uso a livello avanzato strumenti di AI generativa come Nano Banana Pro, DeepSeek e Grok.",
+  "patente": [
+    "A1",
+    "B"
+  ],
+  "guida": [
+    "Trattori",
+    "Muletti",
+    "Moto",
+    "Furgoni",
+    "Auto"
+  ],
+  "strengths": [
+    "Problem solving",
+    "Autonomia",
+    "Coordinamento",
+    "Affidabilità",
+    "Cura del dettaglio",
+    "Apprendimento rapido"
+  ],
+  "availability": [
+    "Stage e collaborazioni",
+    "Progetti freelance",
+    "Lavoro da remoto"
+  ],
+  "profile": "Diplomato CAT (Costruzioni, Ambiente e Territorio) e studente di Costruzioni e gestione del territorio all'Università di Modena e Reggio Emilia, front-end developer & designer autodidatta. Unisco la formazione tecnica su progettazione e disegno con la passione per il web, costruendo interfacce moderne, veloci e curate nei dettagli. Lavoro con React, Next.js, TypeScript, Tailwind CSS e animazioni GSAP, con attenzione a user experience, tipografia e design minimalista, e integro l'intelligenza artificiale nel mio workflow di sviluppo.",
   "skills": [
-    ["Sviluppo front-end", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
-    ["Design & UX", ["UI/UX Design", "Figma", "Design System", "Responsive Design", "Motion"]],
-    ["AI & sviluppo assistito", ["Claude Code", "Codex", "GitHub Copilot", "Gemini"]],
-    ["AI generativa · livello avanzato", ["Nano Banana Pro", "DeepSeek", "Grok"]],
-    ["Strumenti & Workflow", ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "Supabase"]],
-    ["Area tecnica CAT", ["AutoCAD", "cadwork", "Topografia", "Estimo", "Disegno tecnico / CAD", "Excel avanzato"]],
-    ["IT & multimedia", ["Troubleshooting PC", "Windows", "Linux Ubuntu", "Fotografia commerciale", "DaVinci Resolve", "Canva"]]
+    [
+      "Sviluppo front-end",
+      [
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Next.js",
+        "Tailwind CSS",
+        "GSAP"
+      ]
+    ],
+    [
+      "Design & UX",
+      [
+        "UI/UX Design",
+        "Figma",
+        "Design System",
+        "Responsive Design",
+        "Motion"
+      ]
+    ],
+    [
+      "AI & sviluppo assistito",
+      [
+        "Claude Code",
+        "Codex",
+        "GitHub Copilot",
+        "Gemini"
+      ]
+    ],
+    [
+      "Strumenti & Workflow",
+      [
+        "Git & GitHub",
+        "Vite",
+        "Vercel",
+        "VS Code",
+        "PowerShell",
+        "Supabase"
+      ]
+    ],
+    [
+      "Area tecnica CAT",
+      [
+        "AutoCAD",
+        "cadwork",
+        "Topografia",
+        "Estimo",
+        "Disegno tecnico / CAD",
+        "Excel avanzato"
+      ]
+    ],
+    [
+      "IT & multimedia",
+      [
+        "Troubleshooting PC",
+        "Windows",
+        "Linux Ubuntu",
+        "Fotografia commerciale",
+        "DaVinci Resolve",
+        "Canva"
+      ]
+    ]
   ],
   "experience": [
     {
       "period": "2023 — 2026",
       "title": "PCTO — Caem Group S.p.A., Castellucchio (MN)",
       "role": "Ufficio tecnico · Reparto legno · AutoCAD 3D, cadwork",
-      "desc": "Tre anni di alternanza scuola-lavoro (PCTO) nell'ufficio tecnico del reparto legno del Caem Group: modellazione 3D di tettoie in AutoCAD, osservazione della stesura dei preventivi in diretta con il cliente e archiviazione ordinata della documentazione tecnica. 232 ore totali in tre sessioni (80 + 72 + 80), 8 ore al giorno in un team di sette persone, a contatto con strutture in legno lamellare e X-LAM.",
+      "desc": "Tre anni di alternanza scuola-lavoro nell'ufficio tecnico del reparto legno: modellazione 3D di tettoie in AutoCAD, supporto alla stesura dei preventivi e archiviazione della documentazione tecnica, su strutture in legno lamellare e X-LAM.",
       "link": null
     },
     {
       "period": "2019 — oggi",
       "title": "Vendite online — Vinted & Subito",
       "role": "E-commerce · Fotografia commerciale · Customer care",
-      "desc": "Gestione autonoma dell'intero ciclo di vendita su Vinted e Subito: valutazione del prodotto, prezzo di mercato, fotografia con Canon EOS 4000D e iPhone 16 Pro, pubblicazione degli annunci, trattativa, spedizione e gestione dei feedback. Prima operazione dicembre 2019; attività sistematica dall'autunno 2024. Categorie: abbigliamento, collezionabili cinematografici, dispositivi tech (Apple Watch, Nintendo Switch, Flipper Zero).",
-      "link": "vinted.it/member/237170304"
+      "desc": "Gestione autonoma dell'intero ciclo di vendita online: valutazione del prodotto, prezzo, fotografia, pubblicazione degli annunci, trattativa e spedizione. Categorie: abbigliamento, collezionabili e dispositivi tech.",
+      "link": null
     },
     {
       "period": "continuativo",
       "title": "Cascina di famiglia — Rivalta sul Mincio",
       "role": "Collaboratore agricolo · Logistica · Coordinamento operativo",
-      "desc": "Collaborazione continuativa nell'attività agricola familiare: cura e manutenzione delle piante (annaffiamento, potatura di diverse tipologie), trasporto materiali su trattore con rimorchio, raccolta del fieno da prato stabile, coordinamento delle operazioni con il team e supporto logistico negli spostamenti. Gestione autonoma delle attrezzature e problem-solving sul campo.",
+      "desc": "Collaborazione continuativa nell'attività agricola familiare: cura e manutenzione delle piante, trasporto materiali su trattore, raccolta del fieno e coordinamento delle operazioni sul campo.",
       "link": null
     },
     {
       "period": "22 — 23 mar 2026",
       "title": "Scrutatore — Sezione 5, Rivalta sul Mincio",
       "role": "Operazioni elettorali · Comune di Rodigo · Referendum",
-      "desc": "Incarico ufficiale di scrutatore presso la sezione elettorale n. 5 di Rivalta sul Mincio (Comune di Rodigo) per il Referendum del 22 e 23 marzo 2026: verifica dell'identità degli elettori, gestione delle operazioni di voto, scrutinio delle schede, redazione dei verbali e trasmissione dei risultati. Incarico retribuito — onorario di 119,60 €.",
+      "desc": "Incarico ufficiale di scrutatore alla sezione n. 5 di Rivalta sul Mincio (Comune di Rodigo) per il Referendum di marzo 2026: gestione delle operazioni di voto, scrutinio delle schede e redazione dei verbali.",
       "link": null
     },
     {
       "period": "apr 2026",
       "title": "Rivalta sul Mincio — Sito web",
       "role": "Web design & sviluppo front-end",
-      "desc": "Progettazione e sviluppo del sito istituzionale e turistico della località di Rivalta sul Mincio. Design editoriale minimalista con tipografia curata, palette calda e animazioni avanzate via GSAP ScrollTrigger (pinning, stacking, scrubbing parallax). Griglie bento gapless e composizione image-led per una narrazione visiva immersiva. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
+      "desc": "Progettazione e sviluppo del sito istituzionale e turistico di Rivalta sul Mincio: design editoriale minimalista e animazioni avanzate con GSAP ScrollTrigger. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
       "link": "rivaltasulmincio.it"
     },
     {
       "period": "apr 2026",
       "title": "Cascina Fontana — Sito web",
       "role": "Web design & sviluppo front-end",
-      "desc": "Progettazione e sviluppo del sito ufficiale di Cascina Fontana. Analisi delle esigenze del cliente, definizione dell'architettura dell'informazione e realizzazione di un'interfaccia responsive curata nel design, ottimizzata per presentare prodotti e servizi. Collaborazione diretta con il cliente sui contenuti. Stack: React, TypeScript, Tailwind CSS.",
+      "desc": "Progettazione e sviluppo del sito ufficiale di Cascina Fontana: analisi delle esigenze del cliente e interfaccia responsive ottimizzata per presentare prodotti e servizi. Stack: React, TypeScript, Tailwind CSS.",
       "link": "cascinafontana.xyz"
     },
     {
       "period": "2026",
       "title": "Sito portfolio personale",
       "role": "Design & sviluppo front-end · «dark premium»",
-      "desc": "Ideazione e sviluppo del portfolio personale e di un hub di giochi web (Trivia, Mappa, Parole, Angoli, Movimento) e approfondimenti per la Maturità. Design system «dark premium» viola, architettura a sezioni, animazioni in entrata, piena accessibilità (skiplinks, gestione focus, prefers-reduced-motion) e deploy continuo su Vercel. Stack: React, TypeScript, Vite, Tailwind CSS, Supabase.",
+      "desc": "Ideazione e sviluppo del portfolio personale e di un hub di giochi web, con design system «dark premium», animazioni in entrata e piena accessibilità. Deploy continuo su Vercel. Stack: React, TypeScript, Vite, Tailwind CSS, Supabase.",
       "link": "albertopecchini.it"
     },
     {
       "period": "30 giu — 1 lug 2026",
       "title": "Figurazione — Serie TV «House of Gonzaga»",
       "role": "Comparsa · Scena tra il pubblico · Piazza Broletto, Mantova",
-      "desc": "Figurazione per la serie TV «House of Gonzaga», girata nel centro storico di Mantova. Ho preso parte come comparsa tra il pubblico di una scena notturna ambientata durante un DJ set, in Piazza Broletto, su due giornate (30 giugno – 1 luglio 2026) per circa 10 ore sul set.",
+      "desc": "Figurazione per la serie TV «House of Gonzaga», girata nel centro storico di Mantova: comparsa tra il pubblico di una scena notturna in Piazza Broletto.",
       "link": null
     }
   ],
   "education": [
     {
-      "period": "2021 — oggi",
+      "period": "2026 — oggi",
+      "title": "Università di Modena e Reggio Emilia — Dip. Ingegneria «Enzo Ferrari»",
+      "role": "Corso di Laurea in Costruzioni e gestione del territorio · Tempo pieno",
+      "desc": "Immatricolazione al corso di laurea in Costruzioni e gestione del territorio, in continuità con la formazione tecnica CAT. Ammissione tramite test d'ingresso TOLC-LP superato nel luglio 2026."
+    },
+    {
+      "period": "2021 — 2026",
       "title": "I.T.T. «Carlo d'Arco» — Mantova",
       "role": "Diploma CAT · Costruzioni, Ambiente e Territorio · Classe 5T",
-      "desc": "Percorso quinquennale tecnico-tecnologico. Materie principali: progettazione architettonica e disegno tecnico (AutoCAD), topografia e rilievo strumentale, estimo e valutazione immobiliare, gestione del cantiere, fisica tecnica, matematica e inglese tecnico. Codice meccanografico MNTL009017."
+      "desc": "Percorso quinquennale tecnico-tecnologico. Materie principali: progettazione e disegno tecnico (AutoCAD), topografia e rilievo, estimo, gestione del cantiere e inglese tecnico."
     },
     {
       "period": "11 — 25 ago 2024",
       "title": "CES IELTS Test Centre — Dublino, Irlanda",
       "role": "General English Intensive · 26 lezioni/settimana · Livello C1",
-      "desc": "Corso intensivo di inglese generale al centro CES di Dame Court (Dublino 2): quattro settimane di full immersion su speaking, writing, reading e comprensione orale a livello avanzato. Superamento dell'esame IELTS al termine del corso."
+      "desc": "Corso intensivo di inglese generale a Dublino: quattro settimane di full immersion a livello avanzato, con superamento dell'esame IELTS al termine del corso."
     },
     {
       "period": "19 dic 2023",
       "title": "Corso Sicurezza Lavoratori — Rischio Basso",
       "role": "Attestato di frequenza · LTO Mantova / FORMA · Regione Lombardia · 4 h e-learning",
-      "desc": "Corso conforme all'Accordo Stato-Regioni del 21/12/2011 (D.lgs. 81/08, art. 37) per lavoratori d'ufficio: rischio elettrico, cadute dall'alto, microclima e illuminazione, videoterminali, stress lavoro-correlato, primo soccorso, segnaletica ed emergenze antincendio."
+      "desc": "Corso per lavoratori a rischio basso conforme all'Accordo Stato-Regioni (D.lgs. 81/08): rischi in ufficio, videoterminali, primo soccorso, segnaletica ed emergenze antincendio."
     },
     {
       "period": "2018 — 2021",
       "title": "Scuola secondaria di primo grado — Mantova",
       "role": "Istituto Redentore · Fondazione «Casa dello studente B. Contardo Ferrini»",
-      "desc": "Percorso triennale con base solida in italiano, matematica, storia, scienze e lingua inglese. Diploma conseguito con profitto."
+      "desc": "Percorso triennale con base solida in italiano, matematica, storia, scienze e inglese. Diploma conseguito con profitto."
     }
   ],
   "travel": [
@@ -131,13 +230,13 @@
       "period": "23 lug — 1 ago 2025",
       "title": "Parigi · Le Havre · Rouen · Étretat — Francia",
       "role": "Viaggio culturale",
-      "desc": "Itinerario tra Normandia e Île-de-France: le falesie di Étretat, la cattedrale gotica di Rouen, il porto storico di Le Havre e i principali musei e quartieri di Parigi."
+      "desc": "Itinerario tra Normandia e Île-de-France: le falesie di Étretat, la cattedrale gotica di Rouen, il porto di Le Havre e Parigi."
     },
     {
       "period": "26 — 29 dic 2025",
       "title": "Edimburgo — Scozia, Regno Unito",
       "role": "Viaggio culturale",
-      "desc": "Visita alla capitale scozzese durante le festività natalizie: la Old Town, il Castello di Edimburgo, il Royal Mile e l'atmosfera unica dei closes storici a Natale."
+      "desc": "Visita alla capitale scozzese durante le festività: la Old Town, il Castello di Edimburgo e il Royal Mile."
     }
   ],
   "volunteer": [
@@ -145,19 +244,19 @@
       "period": "2024 — 2025",
       "title": "Grest parrocchiale · Parrocchia SS. Donato e Vigilio Martiri",
       "role": "Animatore volontario · Rivalta sul Mincio · 2 edizioni",
-      "desc": "Servizio di animazione durante il Grest estivo — due edizioni consecutive (2024 e 2025), dodici settimane in totale. Responsabilità diretta su gruppi di bambini di diverse fasce d'età, pianificazione di giochi e laboratori, gestione delle dinamiche di gruppo e comunicazione con i genitori. Referente: don Andrea Grandi."
+      "desc": "Animatore volontario al Grest estivo per due edizioni (2024 e 2025): gestione di gruppi di bambini, giochi e laboratori e comunicazione con i genitori."
     },
     {
       "period": "estate 2024",
       "title": "CRED · Scuola Secondaria di Rodigo",
       "role": "Supporto educativo volontario · Comune di Rodigo · 2 settimane",
-      "desc": "Supporto educativo e animazione durante il Centro Ricreativo Estivo Diurno del Comune di Rodigo: affiancamento agli educatori, gestione dei gruppi e supporto individualizzato agli alunni."
+      "desc": "Supporto educativo e animazione al centro estivo del Comune di Rodigo: affiancamento agli educatori e supporto individualizzato agli alunni."
     },
     {
       "period": "2024 — 2025",
       "title": "Festa del Pesce e del Luccio · Associazione Rivaltese",
       "role": "Volontario logistico · 2 edizioni",
-      "desc": "Supporto logistico e organizzativo durante la manifestazione gastronomica locale: allestimento, gestione dei flussi di pubblico e supporto operativo allo staff."
+      "desc": "Supporto logistico e organizzativo alla manifestazione gastronomica locale: allestimento e gestione dei flussi di pubblico."
     }
   ],
   "wishlist": "Fondare una mia testata giornalistica: andare sul campo e raccontare storie vere, senza filtri.",

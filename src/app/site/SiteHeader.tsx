@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { SiteLink as Link, urlForPath } from "./nav";
-import { Mail, Phone, Menu, X } from "lucide-react";
+import { Mail, Menu, X } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
-import { EMAIL, PHONE_DISPLAY, PHONE_HREF, WHATSAPP_HREF, NAV_LINKS, WhatsAppIcon } from "./data";
+import { EMAIL, NAV_LINKS } from "./data";
 import { lockBodyScroll, unlockBodyScroll } from "../utils/scrollLock";
 
 // Header chiaro minimale, condiviso tra home e pagina Bio.
@@ -104,12 +104,6 @@ export default function SiteHeader({
           <div className="ap-drawer-contacts">
             <a href={`mailto:${EMAIL}`}>
               <Mail size={18} aria-hidden="true" /> {EMAIL}
-            </a>
-            <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener">
-              <WhatsAppIcon size={16} /> WhatsApp
-            </a>
-            <a href={PHONE_HREF}>
-              <Phone size={18} aria-hidden="true" /> {PHONE_DISPLAY}
             </a>
           </div>
         </div>

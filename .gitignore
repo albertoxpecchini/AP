@@ -9,6 +9,9 @@ dist
 
 # Strumenti locali / editor
 .claude
+CLAUDE.md
+CLAUDE.local.md
+.vscode
 *.local
 .DS_Store
 Thumbs.db

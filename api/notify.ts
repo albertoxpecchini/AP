@@ -7,9 +7,16 @@
 //
 // Richiede la env RESEND_API_KEY (lato server, NON esposta al client).
 
+import { collectDiagnostics, getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity";
+
 export const config = {
   runtime: "nodejs",
 };
+
+// Host da cui accettiamo l'invio (blocca script esterni e curl "nudo"). I
+// sottodomini (festa., www., …) sono coperti da sameOriginOk; vercel.app tiene
+// funzionanti i deploy di anteprima.
+const ALLOWED_HOSTS = ["albertopecchini.it", "vercel.app"];
 
 export interface VotePayload {
   nome: string;
@@ -42,8 +49,9 @@ function esc(s: string): string {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 }
 
-/** Invia l'email del voto. Non lancia: ritorna esito così il chiamante decide. */
-export async function sendVoteEmail(p: VotePayload): Promise<SendResult> {
+/** Invia l'email del voto. Non lancia: ritorna esito così il chiamante decide.
+ *  `diagHtml` (facoltativo) è il blocco diagnostico su chi ha compilato. */
+export async function sendVoteEmail(p: VotePayload, diagHtml = ""): Promise<SendResult> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, status: 500, detail: "RESEND_API_KEY mancante" };
 
@@ -64,6 +72,7 @@ export async function sendVoteEmail(p: VotePayload): Promise<SendResult> {
         <p style="margin:0 0 12px"><strong>Presenza:</strong> ${presenza}</p>
         <p style="margin:0"><strong>Cibo d'asporto:</strong> ${cibo}</p>
       </div>
+      ${diagHtml}
     </div>`;
 
   try {
@@ -97,6 +106,18 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // Solo richieste che arrivano da una pagina del sito.
+  if (!sameOriginOk(req, ALLOWED_HOSTS)) {
+    return res.status(403).json({ error: "Origine non consentita" });
+  }
+
+  // Anti-spam: max 5 invii/minuto per IP (best-effort, senza database).
+  const gate = rateLimit(`notify:${getClientIp(req) || "ignoto"}`, 5, 60_000);
+  if (!gate.ok) {
+    res.setHeader("Retry-After", String(gate.retryAfterSec));
+    return res.status(429).json({ error: "Troppi invii, riprova tra poco" });
+  }
+
   // Su Vercel il body JSON è già parsato; in dev arriva una stringa.
   let body: any = req.body;
   if (typeof body === "string") {
@@ -107,14 +128,16 @@ export default async function handler(req: any, res: any) {
   const presenza = body?.presenza;
   // Compat: vecchi payload senza "giorno" → 27 (sabato).
   const giorno = VALID_GIORNO.has(body?.giorno) ? body.giorno : "27";
-  const cibo = typeof body?.cibo === "string" ? body.cibo : null;
+  // Cap di lunghezza sugli input liberi (difesa da payload gonfiati).
+  const cibo = typeof body?.cibo === "string" ? body.cibo.slice(0, 200) : null;
 
   if (!nome || !VALID.has(presenza)) {
     return res.status(400).json({ error: "Payload non valido" });
   }
 
   const payload: VotePayload = { nome: nome.slice(0, 40), presenza, giorno, cibo };
-  const result = await sendVoteEmail(payload);
+  const { html: diagHtml } = collectDiagnostics(req);
+  const result = await sendVoteEmail(payload, diagHtml);
 
   if (!result.ok) {
     console.error("[notify] invio fallito:", result.status, result.detail);

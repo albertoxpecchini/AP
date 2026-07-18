@@ -5,7 +5,6 @@ import { isIOS } from "./utils/device";
 import { lockBodyScroll, unlockBodyScroll } from "./utils/scrollLock";
 import {
   Mail,
-  Phone,
   ArrowUpRight,
   X,
   Download,
@@ -16,14 +15,7 @@ import {
   Heart,
 } from "lucide-react";
 import { SiGithub, SiInstagram, SiX } from "react-icons/si";
-import {
-  EMAIL,
-  PHONE_DISPLAY,
-  PHONE_HREF,
-  WHATSAPP_HREF,
-  WhatsAppIcon,
-  SOCIALS,
-} from "./site/data";
+import { EMAIL, SOCIALS } from "./site/data";
 import { PROJECTS, ProjectIcon } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
 import SiteFooter from "./site/SiteFooter";
@@ -345,8 +337,6 @@ export default function App() {
           <div className="hm-menu-foot">
             <div className="hm-menu-contacts">
               <a href={`mailto:${EMAIL}`}><Mail size={18} aria-hidden="true" /> {EMAIL}</a>
-              <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener"><WhatsAppIcon size={16} /> WhatsApp</a>
-              <a href={PHONE_HREF}><Phone size={18} aria-hidden="true" /> {PHONE_DISPLAY}</a>
             </div>
             <div className="hm-menu-social">
               {SOCIALS.slice(0, 8).map(({ name, Icon, href }) => (
@@ -527,8 +517,6 @@ export default function App() {
             </p>
             <div className="hm-contact-actions">
               <a href={`mailto:${EMAIL}`} className="hm-pill hm-pill--light"><Mail size={18} aria-hidden="true" /> Email me</a>
-              <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener" className="hm-pill hm-pill--lightghost"><WhatsAppIcon size={18} /> WhatsApp</a>
-              <a href={PHONE_HREF} className="hm-pill hm-pill--lightghost"><Phone size={18} aria-hidden="true" /> Call me</a>
               <Link to="/sostieni" className="hm-pill hm-pill--lightghost"><Heart size={18} aria-hidden="true" /> Support me</Link>
             </div>
           </div>

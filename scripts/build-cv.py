@@ -43,7 +43,7 @@ CSS_VARS = """
   --accent:      #f0a183;
   --border:      rgba(233, 84, 32, 0.18);
   --hair:        rgba(28, 26, 23, 0.10);
-  --chip-bg:     rgba(233, 84, 32, 0.10);
+  --chip-bg:     #f9e7de;   /* pesca tenue, opaco (una sola pillola) */
   --chip-bd:     rgba(233, 84, 32, 0.26);
   --aubergine:      #2c001e;  /* melanzana Ubuntu (fascia / footer del sito) */
   --aubergine-mid:  #5e2750;
@@ -160,12 +160,12 @@ def build_html(data: dict, photo_uri: str) -> str:
     body += section(ui["profile"], f'<p class="profile">{esc(data["profile"])}</p>')
     body += section(ui["skills"], skills)
     body += section(
-        ui["experience"],
-        "".join(render_entry(e) for e in data["experience"]),
-    )
-    body += section(
         ui["education"],
         "".join(render_entry(e, show_link=False) for e in data["education"]),
+    )
+    body += section(
+        ui["experience"],
+        "".join(render_entry(e) for e in data["experience"]),
     )
     body += section(
         ui["travel"],
@@ -201,87 +201,89 @@ body {{ background: var(--bg); }}
 
 /* ---- fascia intestazione (melanzana Ubuntu) ---- */
 .masthead {{
-  display: flex; align-items: center; gap: 16px;
+  display: flex; align-items: center; gap: 18px;
   background: var(--aubergine);
-  background-image: linear-gradient(135deg, #3a0327 0%, var(--aubergine) 60%);
-  border-radius: 14px; padding: 15px 20px; color: #faf8f6;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-image: radial-gradient(120% 160% at 0% 0%, #4a0733 0%, var(--aubergine) 55%);
+  border-radius: 16px; padding: 17px 22px; color: #faf8f6;
 }}
 .masthead .photo {{
-  width: 92px; height: 92px; border-radius: 50%; object-fit: cover;
-  border: 3px solid var(--orange); flex: 0 0 auto;
+  width: 94px; height: 94px; border-radius: 50%; object-fit: cover;
+  border: 2.5px solid var(--orange); flex: 0 0 auto;
 }}
-.masthead h1 {{ font-size: 25px; font-weight: 700; letter-spacing: -0.01em;
-                line-height: 1.05; }}
+.masthead h1 {{ font-size: 26px; font-weight: 700; letter-spacing: -0.015em;
+                line-height: 1.02; }}
 .masthead .role {{ font-size: 12.5px; font-weight: 500; color: var(--accent);
-                   margin-top: 3px; }}
-.masthead .tagline {{ font-size: 9px; color: rgba(255, 255, 255, 0.74);
-                      margin-top: 6px; max-width: 92%; }}
-.masthead .contacts {{ display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }}
-.c-chip {{ font-size: 8px; padding: 2.5px 8px; border-radius: 10px;
-           background: rgba(255, 255, 255, 0.10);
-           border: 1px solid rgba(255, 255, 255, 0.18); color: #f3ede9; }}
-.c-chip .c-k {{ color: var(--accent); font-weight: 600; margin-right: 5px; }}
+                   margin-top: 4px; letter-spacing: 0.005em; }}
+.masthead .tagline {{ font-size: 9px; color: rgba(255, 255, 255, 0.72);
+                      margin-top: 7px; max-width: 94%; line-height: 1.5; }}
+.masthead .contacts {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }}
+.c-chip {{ font-size: 8px; padding: 3px 10px; border-radius: 999px;
+           background: #4a1f3d; color: #f3ede9; }}
+.c-chip .c-k {{ color: var(--accent); font-weight: 700; margin-right: 5px;
+                text-transform: uppercase; letter-spacing: 0.05em; font-size: 7px; }}
 
 /* ---- "in breve" ---- */
 .facts {{
-  display: flex; gap: 16px; margin-top: 11px;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px 16px;
+  display: flex; gap: 18px; margin-top: 12px;
+  background: var(--card); border-radius: 14px; padding: 15px 18px;
 }}
 .facts .fcol {{ flex: 1; }}
-.f-label {{ font-size: 8px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.09em; color: var(--orange-ink); margin-bottom: 6px; }}
-.f-label.sp {{ margin-top: 11px; }}
-.lang {{ margin-bottom: 7px; }}
+.facts .fcol + .fcol {{ border-left: 1px solid var(--hair); padding-left: 18px; }}
+.f-label {{ font-size: 7.5px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.12em; color: var(--orange-ink); margin-bottom: 7px; }}
+.f-label.sp {{ margin-top: 12px; }}
+.lang {{ margin-bottom: 8px; }}
 .lang-row {{ display: flex; justify-content: space-between; align-items: baseline; }}
 .lang-name {{ font-size: 9.5px; font-weight: 700; color: var(--ink); }}
 .lang-lvl {{ font-size: 8px; color: var(--muted); }}
-.bar-track {{ height: 4px; border-radius: 2px; background: var(--secondary);
-              margin-top: 3px; overflow: hidden; }}
-.bar-fill {{ display: block; height: 4px; border-radius: 2px; background: var(--orange); }}
+.bar-track {{ height: 3px; border-radius: 999px; background: var(--secondary);
+              margin-top: 4px; overflow: hidden; }}
+.bar-fill {{ display: block; height: 3px; border-radius: 999px;
+             background-image: linear-gradient(90deg, var(--orange), var(--accent)); }}
 .avail {{ list-style: none; }}
-.avail li {{ font-size: 9px; color: var(--ink-soft); padding-left: 12px;
-             position: relative; margin-bottom: 3px; }}
-.avail li::before {{ content: "+"; position: absolute; left: 0; top: -1px;
-                     color: var(--orange); font-weight: 700; }}
-.wish {{ font-size: 9px; font-style: italic; color: var(--ink-soft);
-         border-left: 2px solid var(--chip-bd); padding-left: 9px; }}
+.avail li {{ font-size: 9px; color: var(--ink-soft); padding-left: 13px;
+             position: relative; margin-bottom: 4px; }}
+.avail li::before {{ content: ""; position: absolute; left: 0; top: 4px;
+                     width: 4px; height: 4px; border-radius: 50%; background: var(--orange); }}
+.wish {{ font-size: 9px; font-style: italic; color: var(--ink-soft); line-height: 1.55; }}
 
 /* ---- chip generici ---- */
-.chips {{ display: flex; flex-wrap: wrap; gap: 4px; }}
-.chip {{ font-size: 8.4px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
-         background: var(--chip-bg); border: 1px solid var(--chip-bd);
-         color: var(--orange-ink); }}
+.chips {{ display: flex; flex-wrap: wrap; gap: 5px; }}
+.chip {{ font-size: 8.4px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+         background: var(--chip-bg); color: var(--orange-ink); }}
 
 /* ---- sezioni ---- */
-.section {{ margin-top: 15px; }}
-.section.tight {{ margin-top: 11px; }}
-.sec-head {{ display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }}
-.sec-head .bar {{ width: 4px; height: 15px; border-radius: 2px; background: var(--orange); }}
-.sec-head h2 {{ font-size: 11.5px; font-weight: 700; text-transform: uppercase;
-                letter-spacing: 0.07em; color: var(--orange-ink); }}
-.profile {{ font-size: 9.6px; color: var(--ink-soft); line-height: 1.55; text-align: justify; }}
+.section {{ margin-top: 16px; }}
+.section.tight {{ margin-top: 12px; }}
+.sec-head {{ display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }}
+.sec-head .bar {{ width: 14px; height: 3px; border-radius: 999px; background: var(--orange);
+                  flex: 0 0 auto; }}
+.sec-head h2 {{ font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: 0.14em; color: var(--ink); flex: 0 0 auto; }}
+.sec-head::after {{ content: ""; flex: 1; height: 1px; background: var(--hair); }}
+.profile {{ font-size: 9.6px; color: var(--ink-soft); line-height: 1.6; text-align: justify; }}
 
-.skill-group {{ margin-bottom: 7px; }}
-.sk-label {{ font-size: 9.2px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }}
+.skill-group {{ margin-bottom: 9px; }}
+.sk-label {{ font-size: 8px; font-weight: 700; text-transform: uppercase;
+             letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 5px; }}
 
-/* ---- esperienze / voci ---- */
-.entry {{ position: relative; padding: 1px 0 8px 15px; margin-bottom: 4px;
-          border-left: 2px solid var(--border); break-inside: avoid; }}
-.entry::before {{ content: ""; position: absolute; left: -2px; top: 2px;
-                  width: 2px; height: 15px; background: var(--orange); }}
-.e-period {{ display: inline-block; font-size: 8px; font-weight: 600;
-             padding: 2px 8px; border-radius: 10px; background: var(--chip-bg);
-             border: 1px solid var(--chip-bd); color: var(--orange-ink);
-             margin-bottom: 5px; }}
+/* ---- esperienze / voci (timeline a nodo singolo) ---- */
+.entry {{ position: relative; padding: 0 0 11px 17px; margin-bottom: 2px;
+          border-left: 1.5px solid var(--hair); break-inside: avoid; }}
+.entry:last-child {{ padding-bottom: 2px; }}
+.entry::before {{ content: ""; position: absolute; left: -4px; top: 3.5px;
+                  width: 6.5px; height: 6.5px; border-radius: 50%;
+                  background: var(--orange); box-shadow: 0 0 0 2.5px var(--bg); }}
+.e-period {{ display: inline-block; font-size: 7.5px; font-weight: 700;
+             letter-spacing: 0.04em; text-transform: uppercase;
+             color: var(--orange-ink); margin-bottom: 5px; }}
 .e-title {{ font-size: 10.6px; font-weight: 700; color: var(--ink); line-height: 1.25; }}
-.e-role {{ font-size: 9px; font-weight: 600; color: var(--orange-ink); margin-top: 1px; }}
-.e-desc {{ font-size: 8.9px; color: var(--muted); line-height: 1.5; margin-top: 3px; text-align: justify; }}
-.e-link {{ font-size: 8.4px; font-weight: 600; color: var(--orange-ink); margin-top: 3px; }}
+.e-role {{ font-size: 9px; font-weight: 600; color: var(--orange-ink); margin-top: 2px; }}
+.e-desc {{ font-size: 8.9px; color: var(--muted); line-height: 1.55; margin-top: 4px; text-align: justify; }}
+.e-link {{ font-size: 8.4px; font-weight: 600; color: var(--orange-ink); margin-top: 4px; }}
 
 .privacy {{ font-size: 7.4px; font-style: italic; color: var(--muted);
-            margin-top: 16px; padding-top: 8px; border-top: 1px solid var(--hair); }}
+            margin-top: 18px; padding-top: 9px; border-top: 1px solid var(--hair); }}
 </style></head>
 <body>{body}
 </body></html>"""

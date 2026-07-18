@@ -1,35 +1,11 @@
 # Capitoli del quiz Trivia
 
-Questa cartella contiene i **capitoli generati** del quiz: i file `.md` qui (uno per
+Questa cartella contiene i **capitoli** del quiz: i file `.md` qui (uno per
 capitolo, es. `villa-savoye.md`) vengono caricati automaticamente al build e diventano
 i capitoli selezionabili nel gioco. Il titolo del capitolo è l'intestazione `#` in cima.
 
-## Da dove vengono (pipeline di import)
-
-I capitoli **non si scrivono a mano**: si generano dai sorgenti "formato libro" in
-[`raw/`](./raw/) tramite lo script di import.
-
-```
-content/trivia/raw/*.md   →  node scripts/import-trivia.mjs  →  content/trivia/*.md
-   (formato del libro)            (convertitore)                  (capitoli del gioco)
-```
-
-- Metti/aggiorna i sorgenti del libro in `content/trivia/raw/` (un file = un argomento).
-- Lancia `node scripts/import-trivia.mjs` dalla root del progetto.
-- Lo script: sistema l'encoding, importa le **multiple**, **salta i Vero/Falso**
-  (in attesa delle risposte), **deduce i completamenti** dalle multiple dello stesso
-  argomento, assegna titoli puliti e una keyword `foto:` per capitolo.
-- Produce anche `content/trivia/raw/_IMPORT_REPORT.md` con conteggi e i (pochi)
-  completamenti la cui risposta non è deducibile con certezza, da rivedere a mano
-  (override possibili nella tabella `COMPLETION_OVERRIDE` dentro lo script).
-
-> Non modificare a mano i file generati: verrebbero sovrascritti al prossimo import.
-> Per correggere una risposta dedotta, agisci sul sorgente in `raw/` o sull'override.
-
-## Formato di una domanda (capitolo generato)
-
-Ogni domanda inizia con `## Domanda` e ha una riga `type:` tra:
-`multipla`, `vero-falso`, `aperta`.
+Per aggiungere un capitolo basta creare qui un nuovo `.md` che rispetti il formato
+descritto sotto: il build lo prende da solo, non serve registrarlo da nessuna parte.
 
 ## Formato di una domanda
 

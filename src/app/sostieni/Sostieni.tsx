@@ -3,7 +3,7 @@ import { SiteLink as Link } from "../site/nav";
 import {
   Heart, Copy, Check, Send, Loader2, Crown, Mail, ArrowLeft, Gift,
 } from "lucide-react";
-import { EMAIL, WHATSAPP_HREF, WhatsAppIcon } from "../site/data";
+import { EMAIL } from "../site/data";
 import {
   submitDonatore, fetchDonatori, subscribeDonatori, donazioniConfigured,
   type DonatoreRow,
@@ -206,7 +206,7 @@ export default function Sostieni() {
     return lines.join("\n");
   };
 
-  const proceedSponsor = async (channel: "whatsapp" | "email") => {
+  const proceedSponsor = async () => {
     if (!spName.trim()) {
       alert("Inserisci almeno il nome o il brand.");
       return;
@@ -225,11 +225,7 @@ export default function Sostieni() {
     }
 
     const text = sponsorMessage();
-    if (channel === "whatsapp") {
-      window.open(`${WHATSAPP_HREF}?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-    } else {
-      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent("Sponsor del sito (4,99€)")}&body=${encodeURIComponent(text)}`;
-    }
+    window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent("Sponsor del sito (4,99€)")}&body=${encodeURIComponent(text)}`;
   };
 
   return (
@@ -339,10 +335,7 @@ export default function Sostieni() {
                   value={spMsg} onChange={(e) => setSpMsg(e.target.value)} />
               </div>
               <div className="sos-actions">
-                <button type="button" className="sos-btn sos-btn--wa" onClick={() => proceedSponsor("whatsapp")}>
-                  <WhatsAppIcon size={17} /> Scrivimi su WhatsApp
-                </button>
-                <button type="button" className="sos-btn sos-btn--ghost" onClick={() => proceedSponsor("email")}>
+                <button type="button" className="sos-btn sos-btn--ghost" onClick={() => proceedSponsor()}>
                   <Mail size={17} aria-hidden="true" /> Scrivimi via email
                 </button>
               </div>
@@ -398,9 +391,6 @@ export default function Sostieni() {
           <section className="sos-contact">
             <p>Per qualsiasi cosa, sono qui.</p>
             <div className="sos-actions sos-actions--center">
-              <a className="sos-btn sos-btn--wa" href={WHATSAPP_HREF} target="_blank" rel="noreferrer noopener">
-                <WhatsAppIcon size={17} /> WhatsApp
-              </a>
               <a className="sos-btn sos-btn--ghost" href={`mailto:${EMAIL}`}>
                 <Mail size={17} aria-hidden="true" /> Email
               </a>
