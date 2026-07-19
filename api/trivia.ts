@@ -1,5 +1,5 @@
 import { Anthropic } from "@anthropic-ai/sdk";
-import { getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity";
+import { getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity.js";
 
 const client = new Anthropic();
 

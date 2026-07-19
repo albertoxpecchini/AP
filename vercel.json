@@ -19,7 +19,7 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://api.github.com https://github-contributions-api.jogruber.de https://api.open-meteo.com https://api.openverse.org https://commons.wikimedia.org https://*.wikipedia.org; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://api.github.com https://github-contributions-api.jogruber.de https://api.open-meteo.com https://api.openverse.org https://commons.wikimedia.org https://*.wikipedia.org; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },

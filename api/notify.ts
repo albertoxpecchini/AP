@@ -7,7 +7,7 @@
 //
 // Richiede la env RESEND_API_KEY (lato server, NON esposta al client).
 
-import { collectDiagnostics, getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity";
+import { collectDiagnostics, getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity.js";
 
 export const config = {
   runtime: "nodejs",

@@ -62,7 +62,14 @@ export function subscribeCount(onChange: (n: number) => void): () => void {
 
   const connect = () => {
     if (closed) return;
-    ws = new WebSocket(wsUrl);
+    // Il costruttore WebSocket può LANCIARE in modo sincrono (es. WebSocket
+    // bloccato dalla CSP su Safari): va assolutamente contenuto, altrimenti
+    // l'errore risale nell'effect e fa crashare la pagina (schermata bianca).
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch {
+      return; // niente realtime: il contatore resta comunque leggibile
+    }
     ws.onopen = () => {
       ws!.send(JSON.stringify({
         topic: `realtime:public:${TABLE}`,
