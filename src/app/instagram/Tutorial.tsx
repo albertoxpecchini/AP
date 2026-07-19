@@ -349,9 +349,9 @@ export default function Tutorial({ onClose }: { onClose: () => void }) {
           position: relative; width: 100%; max-width: 780px; max-height: 92vh; overflow: auto;
           background: var(--card, #fff); color: var(--foreground, #1c1a17);
           border: 1px solid var(--border, rgba(0,0,0,.12)); border-radius: 18px;
-          box-shadow: 0 30px 90px rgba(0,0,0,.5); padding: clamp(18px, 3vw, 30px);
-          display: grid; grid-template-columns: 260px 1fr; grid-template-areas: "art body" "nav nav";
-          gap: 10px 28px; align-items: center;
+          box-shadow: 0 20px 60px rgba(0,0,0,.35); padding: clamp(18px, 3vw, 30px);
+          display: grid; grid-template-columns: 250px 1fr; grid-template-areas: "art body" "nav nav";
+          gap: 12px 30px; align-items: center;
           animation: tut-pop .28s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes tut-pop { from { opacity: 0; transform: translateY(16px) scale(.97) } to { opacity: 1; transform: none } }
@@ -367,10 +367,9 @@ export default function Tutorial({ onClose }: { onClose: () => void }) {
         }
         .tut-skip:hover { color: var(--primary, #e95420); border-color: var(--primary, #e95420); }
         .tut-art { grid-area: art; display: flex; justify-content: center; align-items: center; }
-        .tut-svg { width: 100%; max-width: 250px; height: auto; filter: drop-shadow(0 14px 30px rgba(0,0,0,.24)); }
+        .tut-svg { width: 100%; max-width: 250px; height: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
         .tut-hero-logo { display: flex; justify-content: center; padding: 8px; }
-        .tut-logo { width: 150px; height: 150px; filter: drop-shadow(0 16px 34px rgba(214,41,118,.4)); animation: tut-float 4s ease-in-out infinite; }
-        @keyframes tut-float { 0%,100% { transform: translateY(0) rotate(-2deg) } 50% { transform: translateY(-8px) rotate(2deg) } }
+        .tut-logo { width: 140px; height: 140px; filter: drop-shadow(0 10px 24px rgba(214,41,118,.28)); }
         .tut-body { grid-area: body; min-width: 0; }
         .tut-step { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--primary, #e95420); margin-bottom: .4rem; }
         .tut-title { margin: 0 0 .6rem; font-size: clamp(1.25rem, 3vw, 1.6rem); font-weight: 700; line-height: 1.15; }

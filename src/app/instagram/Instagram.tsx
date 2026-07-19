@@ -7,8 +7,7 @@ import {
 } from "lucide-react";
 import SiteFooter from "../site/SiteFooter";
 import Tutorial from "./Tutorial";
-import Particles from "./Particles";
-import { ShieldCheck, Lock, WifiOff, ClipboardPaste, Activity } from "lucide-react";
+import { ShieldCheck, Lock, WifiOff, ClipboardPaste } from "lucide-react";
 import { fetchCount, bumpCount, subscribeCount } from "./statsApi";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import { getPref, setPref } from "../utils/prefs";
@@ -548,7 +547,6 @@ export default function Instagram() {
 
   return (
     <div className="it-page-wrapper ig-page">
-      <Particles />
       {showTutorial && <Tutorial onClose={closeTutorial} />}
 
       {/* Header — marchio del portfolio + ritorno alla home */}
@@ -587,14 +585,6 @@ export default function Instagram() {
           <button type="button" className="ig-guide" onClick={() => setShowTutorial(true)}>
             <HelpCircle size={16} /><span>Come scarico i file da Instagram?</span>
           </button>
-          {analyses != null && (
-            <div className="ig-counter" role="status" aria-live="polite">
-              <span className="ig-counter-dot" aria-hidden="true" />
-              <Activity size={15} aria-hidden="true" />
-              <b translate="no">{analyses.toLocaleString(locale)}</b>
-              <span>confronti effettuati finora</span>
-            </div>
-          )}
         </div>
       </section>
 
@@ -690,6 +680,16 @@ export default function Instagram() {
               <RotateCcw size={16} /><span>Cancella e ricomincia</span>
             </button>
           </div>
+
+          {analyses != null && (
+            <p className="ig-stat" role="status" aria-live="polite">
+              <span className="ig-stat-live">
+                <span className="ig-stat-dot" aria-hidden="true" />
+                <span className="ig-stat-num" translate="no">{analyses.toLocaleString(locale)}</span>
+              </span>
+              <span className="ig-stat-label">confronti effettuati con questo strumento</span>
+            </p>
+          )}
         </div>
       </section>
 
@@ -803,7 +803,7 @@ export default function Instagram() {
           --accent: #e95420; --accent-2: #dd4814; --accent-deep: #bc3d10; --ink: #f6a583;
           --glow: rgba(233, 84, 32, 0.45);
           --heading: #ffffff; --text: #f5f3f1; --sub: #b3aca6;
-          --surface: rgba(255, 255, 255, 0.05); --surface-2: rgba(255, 255, 255, 0.03);
+          --surface: #241c22; --surface-2: #1f181d;
           --surface-bd: rgba(255, 255, 255, 0.10);
           --soft: rgba(233, 84, 32, 0.10); --soft-bd: rgba(233, 84, 32, 0.28);
           --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
@@ -814,10 +814,6 @@ export default function Instagram() {
           --card-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
           --warn-bg: rgba(233, 84, 32, 0.10); --warn-bd: rgba(233, 84, 32, 0.4);
         }
-
-        /* Campo particelle dietro tutto; il contenuto resta sopra e leggibile. */
-        .ig-particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .ig-page > *:not(.ig-particles) { position: relative; z-index: 1; }
 
         .ig-header {
           background: var(--header-bg); position: sticky; top: 0; z-index: 10;
@@ -876,17 +872,24 @@ export default function Instagram() {
         .ig-guide:hover { background: var(--soft); border-color: var(--accent); transform: translateY(-1px); }
         .ig-guide:active { transform: translateY(0); }
 
-        /* Contatore live dei confronti */
-        .ig-counter {
-          display: inline-flex; align-items: center; gap: .5rem; margin: 1rem auto 0;
-          padding: .45rem .9rem; border-radius: 999px; font-size: .9rem; color: var(--sub);
-          background: var(--surface); border: 1px solid var(--surface-bd);
+        /* Contatore live dei confronti — riga sobria, sotto gli strumenti */
+        .ig-stat {
+          display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+          gap: .25rem .6rem; margin: 1.4rem 0 0; font-size: .92rem; color: var(--sub);
+          text-align: center;
         }
-        .ig-counter b { color: var(--accent-2); font-variant-numeric: tabular-nums; font-size: 1rem; }
-        html.dark .ig-counter b { color: var(--ink); }
-        .ig-counter svg { color: var(--accent-2); }
-        html.dark .ig-counter svg { color: var(--ink); }
-        .ig-counter-dot {
+        .ig-stat-live {
+          display: inline-flex; align-items: center; gap: .5rem;
+          padding: .3rem .7rem; border-radius: 999px;
+          background: var(--surface-2); border: 1px solid var(--surface-bd);
+        }
+        .ig-stat-num {
+          color: var(--accent-2); font-weight: 700; font-size: 1.05rem;
+          font-variant-numeric: tabular-nums; line-height: 1;
+        }
+        html.dark .ig-stat-num { color: var(--ink); }
+        .ig-stat-label { color: var(--sub); }
+        .ig-stat-dot {
           width: 8px; height: 8px; border-radius: 50%; background: #2ecc71; flex: 0 0 auto;
           box-shadow: 0 0 0 0 rgba(46,204,113,.6); animation: ig-pulse 2s infinite;
         }
@@ -1075,85 +1078,13 @@ export default function Instagram() {
         .ig-date { flex: 0 0 auto; font-size: 0.76rem; color: var(--sub); font-variant-numeric: tabular-nums; }
         .ig-empty { margin: 0.6rem 0.2rem; color: var(--sub); font-size: 0.95rem; }
 
-        /* ── Vita: riflessi, sheen e micro-animazioni ─────────────────────── */
-        /* Vetro + riflesso sottile in cima alle card. */
-        .ig-card, .ig-result, .ig-old-body, .ig-privacy-card {
-          position: relative; overflow: hidden;
-          backdrop-filter: blur(6px) saturate(115%);
-          -webkit-backdrop-filter: blur(6px) saturate(115%);
-        }
-        .ig-card::before, .ig-result::before, .ig-privacy-card::before {
-          content: ""; position: absolute; inset: 0 0 auto 0; height: 40%;
-          background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
-          opacity: 0.6; pointer-events: none;
-        }
-        html.dark .ig-card::before, html.dark .ig-result::before, html.dark .ig-privacy-card::before {
-          background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
-        }
-        /* Le card salgono un filo al passaggio del mouse (comfort, non salto). */
-        .ig-card, .ig-result { transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease; }
-        .ig-card:hover, .ig-result:hover { transform: translateY(-3px); box-shadow: 0 20px 46px rgba(60,30,12,.16); }
-        html.dark .ig-card:hover, html.dark .ig-result:hover { box-shadow: 0 20px 46px rgba(0,0,0,.4); }
-
-        /* Sheen luminoso che attraversa il bottone Confronta. */
-        .ig-go { position: relative; overflow: hidden; }
-        .ig-go::after {
-          content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
-          background: linear-gradient(100deg, transparent, rgba(255,255,255,0.45), transparent);
-          transform: skewX(-18deg); transition: none;
-        }
-        .ig-go:not(:disabled)::after { animation: ig-sheen 3.4s ease-in-out infinite; }
-        .ig-go:hover:not(:disabled)::after { animation-duration: 1.1s; }
-        @keyframes ig-sheen { 0%, 15% { left: -60%; } 55%, 100% { left: 130%; } }
-
-        /* Badge hero con alone che respira. */
-        .ig-hero-badge { animation: ig-breath 4.5s ease-in-out infinite; }
-        @keyframes ig-breath {
-          0%, 100% { box-shadow: 0 14px 40px var(--glow), inset 0 1px 0 rgba(255,255,255,.25); }
-          50% { box-shadow: 0 14px 54px var(--glow), 0 0 0 6px rgba(233,84,32,.10), inset 0 1px 0 rgba(255,255,255,.25); }
-        }
-        /* Entrata morbida dei due riquadri input. */
-        .ig-inputs .ig-card { animation: ig-rise .5s cubic-bezier(.22,1,.36,1) both; }
-        .ig-inputs .ig-card:nth-child(2) { animation-delay: .08s; }
-
-        /* Aurora viva dietro la hero (loop lento e discreto). */
-        .ig-hero::after {
-          content: ""; position: absolute; inset: -30%; z-index: 0; pointer-events: none;
-          background:
-            radial-gradient(40% 40% at 20% 30%, rgba(233,84,32,.16), transparent 60%),
-            radial-gradient(45% 45% at 80% 20%, rgba(221,72,20,.14), transparent 60%),
-            radial-gradient(40% 40% at 60% 80%, rgba(246,165,131,.14), transparent 60%);
-          filter: blur(20px); animation: ig-aurora 16s ease-in-out infinite alternate;
-        }
-        .ig-hero > .container { position: relative; z-index: 1; }
-        @keyframes ig-aurora {
-          0% { transform: translate3d(-3%, -2%, 0) scale(1); }
-          50% { transform: translate3d(3%, 2%, 0) scale(1.08); }
-          100% { transform: translate3d(-2%, 3%, 0) scale(1.03); }
-        }
-        /* Filetto della hero: gradiente che scorre in loop. */
-        .ig-hero-rule {
-          background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
-          background-size: 200% 100%; animation: ig-flow 3.5s linear infinite;
-        }
-        @keyframes ig-flow { to { background-position: 200% 0; } }
-        /* Card principale dei risultati: bordo che "respira". */
-        .ig-result--primary { animation: ig-glow 3.6s ease-in-out infinite; }
-        @keyframes ig-glow {
-          0%, 100% { box-shadow: 0 14px 36px var(--glow); }
-          50% { box-shadow: 0 14px 50px var(--glow), 0 0 0 3px rgba(233,84,32,.10); }
-        }
-        /* Badge privacy pulsante. */
-        .ig-privacy-badge { animation: ig-breath 4.5s ease-in-out infinite; }
-        /* Icona attività del contatore che pulsa piano. */
-        .ig-counter svg { animation: ig-throb 2.4s ease-in-out infinite; }
-        @keyframes ig-throb { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.15); opacity: 1; } }
+        /* Micro-transizioni sobrie: solo bordo/ombra al passaggio del mouse. */
+        .ig-card, .ig-result { transition: border-color .15s ease, box-shadow .15s ease; }
+        .ig-card:hover { box-shadow: 0 10px 28px rgba(60, 30, 12, 0.10); }
+        html.dark .ig-card:hover { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32); }
 
         @media (prefers-reduced-motion: reduce) {
-          .ig-go::after, .ig-hero-badge, .ig-inputs .ig-card, .ig-hero::after,
-          .ig-hero-rule, .ig-result--primary, .ig-privacy-badge, .ig-counter svg,
-          .ig-counter-dot { animation: none !important; }
-          .ig-card:hover, .ig-result:hover { transform: none; }
+          .ig-result, .ig-banner, .ig-old-body, .ig-stat-dot { animation: none !important; }
         }
 
         /* ── Sezione privacy ──────────────────────────────────────────────── */
