@@ -75,14 +75,14 @@ export async function submitDonatore(row: DonatoreRow): Promise<DonatoreRow> {
     return stored;
   }
 
-  const res = await fetch(`${URL}/rest/v1/${TABLE}`, {
+  // Scrittura via endpoint blindato (origine + rate-limit, insert con service-role).
+  const res = await fetch("/api/sponsor", {
     method: "POST",
-    headers: { ...restHeaders(), Prefer: "return=representation" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(clean),
   });
   if (!res.ok) throw new Error(`submitDonatore ${res.status}: ${await res.text()}`);
-  const data = (await res.json()) as DonatoreRow[];
-  return data[0];
+  return (await res.json()) as DonatoreRow;
 }
 
 /** Elenco firme dal più recente (newest-first). */
@@ -127,7 +127,13 @@ export function subscribeDonatori(onInsert: (row: DonatoreRow) => void): Unsubsc
 
   const connect = () => {
     if (closed) return;
-    ws = new WebSocket(wsUrl);
+    // Il costruttore può lanciare in modo sincrono (es. WS bloccato dalla CSP su
+    // Safari): va contenuto o l'errore risale nell'effect e imbianca la pagina.
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch {
+      return;
+    }
 
     ws.onopen = () => {
       ws!.send(JSON.stringify({

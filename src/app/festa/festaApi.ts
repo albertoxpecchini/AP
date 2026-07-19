@@ -71,14 +71,14 @@ export async function submitPresenza(row: PresenzaRow): Promise<PresenzaRow> {
     return stored;
   }
 
-  const res = await fetch(`${URL}/rest/v1/${TABLE}`, {
+  // Scrittura via endpoint blindato (origine + rate-limit, insert con service-role).
+  const res = await fetch("/api/festa-rsvp", {
     method: "POST",
-    headers: { ...restHeaders(), Prefer: "return=representation" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(clean),
   });
   if (!res.ok) throw new Error(`submitPresenza ${res.status}: ${await res.text()}`);
-  const data = (await res.json()) as PresenzaRow[];
-  return data[0];
+  return (await res.json()) as PresenzaRow;
 }
 
 /** Elenco presenze di un dato giorno, dal più recente (newest-first). */
@@ -129,7 +129,13 @@ export function subscribePresenze(onInsert: (row: PresenzaRow) => void): Unsubsc
 
   const connect = () => {
     if (closed) return;
-    ws = new WebSocket(wsUrl);
+    // Il costruttore può lanciare in modo sincrono (es. WS bloccato dalla CSP su
+    // Safari): va contenuto o l'errore risale nell'effect e imbianca la pagina.
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch {
+      return;
+    }
 
     ws.onopen = () => {
       ws!.send(JSON.stringify({

@@ -142,12 +142,45 @@ function igStatsDevApi() {
   };
 }
 
+// Scritture blindate in sviluppo (sponsor, RSVP festa): stessi endpoint delle
+// funzioni serverless, così si testano anche con `vite dev`. Leggono le env
+// Supabase da .env. Body JSON letto a mano (in dev non c'è il parser di Vercel).
+function writeDevApi(route: string, importer: () => Promise<{ insert: (b: any) => Promise<any> }>) {
+  return {
+    name: `write-dev-api:${route}`,
+    configureServer(server: any) {
+      const env = loadEnv(server.config.mode, process.cwd(), "");
+      for (const k of ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) {
+        if (env[k] && !process.env[k]) process.env[k] = env[k];
+      }
+      server.middlewares.use(route, async (req: any, res: any) => {
+        res.setHeader("Content-Type", "application/json");
+        if (req.method !== "POST") { res.statusCode = 405; res.end('{"error":"Method not allowed"}'); return; }
+        let raw = "";
+        req.on("data", (c: any) => { raw += c; });
+        req.on("end", async () => {
+          try {
+            const body = raw ? JSON.parse(raw) : {};
+            const out = await (await importer()).insert(body);
+            if (!out.ok) { res.statusCode = out.status; res.end(JSON.stringify({ error: out.error })); return; }
+            res.end(JSON.stringify(out.row));
+          } catch {
+            res.statusCode = 500; res.end('{"error":"dev"}');
+          }
+        });
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     figmaAssetResolver(),
     triviaDevApi(),
     festaNotifyDevApi(),
     igStatsDevApi(),
+    writeDevApi("/api/sponsor", async () => ({ insert: (await import("./api/sponsor")).insertDonatore })),
+    writeDevApi("/api/festa-rsvp", async () => ({ insert: (await import("./api/festa-rsvp")).insertPresenza })),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),
