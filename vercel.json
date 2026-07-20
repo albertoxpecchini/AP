@@ -36,9 +36,15 @@
       ]
     },
     {
-      "source": "/((?!assets/).*)\\.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|pdf|zip)",
+      "source": "/((?!assets/).*)\\.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|zip)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=2592000" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.pdf",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     },
     {
