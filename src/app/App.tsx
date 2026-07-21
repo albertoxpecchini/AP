@@ -78,6 +78,8 @@ const CV = [
     title: "CES IELTS Test Centre — Dublin, Ireland",
     role: "General English Intensive · 26 lessons/week · Level C1",
     desc: "Intensive general English course at the CES centre on Dame Court, Dublin 2. Four weeks of full immersion focused on speaking, writing, reading and listening at advanced level (C1). Passed the IELTS exam at the end of the course. Independent exploration of the area: Howth, Balbriggan, North Bull Island, Bray, Greystones, Glendalough, Powerscourt Estate and Galway.",
+    pdf: "/attestato-ces-ielts-c1.pdf",
+    pdfLabel: "Open certificate (PDF)",
   },
   {
     period: "2024 — 2025",
