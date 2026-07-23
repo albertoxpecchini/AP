@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useLayoutEffect, useEffect } from "react";
 import { SiteLink as Link } from "../site/nav";
-import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp, ListChecks, ToggleLeft, PencilLine, MoreHorizontal, X, BrainCircuit } from "lucide-react";
+import { BookOpen, Trophy, Flame, ChevronRight, ArrowLeft, ListOrdered, GraduationCap, ArrowDownUp, ListChecks, ToggleLeft, PencilLine, MoreHorizontal, X, BrainCircuit, UserRound } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { CHAPTERS, questionsForMany } from "./questions";
 import { fetchTotals } from "./leaderboardApi";
@@ -424,13 +424,20 @@ export default function TriviaMenu({
   );
 
   // Icona-tasto giocatore: pastiglia con avatar (punteggio dentro) + nome.
-  // Sta FUORI dai bottoni d'azione. Tap = cambia nome.
+  // Sta FUORI dai bottoni d'azione. Tap = scegli/cambia profilo (apre il gate,
+  // che elenca anche i profili già registrati). Senza nick NON sparisce: diventa
+  // l'invito "Scegli profilo", altrimenti il gate resta irraggiungibile dal menù.
   const PlayerIcon = (onDark: boolean) => nick ? (
-    <button type="button" onClick={onChangeNick} data-tour="player" className={`trm-player${onDark ? " on-dark" : ""}`} title={`${nick} · tocca per cambiare`}>
+    <button type="button" onClick={onChangeNick} data-tour="player" className={`trm-player${onDark ? " on-dark" : ""}`} title={`${nick} · tocca per cambiare profilo`}>
       <span className="trm-player-badge">{playerScore === null ? "…" : fmtScore(playerScore)}</span>
       <span className="trm-player-name">{nick}</span>
     </button>
-  ) : null;
+  ) : (
+    <button type="button" onClick={onChangeNick} data-tour="player" className={`trm-player${onDark ? " on-dark" : ""}`} title="Scegli o crea il tuo profilo">
+      <span className="trm-player-badge"><UserRound size={17} strokeWidth={2.4} /></span>
+      <span className="trm-player-name">Scegli profilo</span>
+    </button>
+  );
 
   const BackBtn = (
     <Link to="/#progetti" className="trm-back-btn trm-vio-btn" style={{ color: vio, border: `1.5px solid ${vBord}` }}>
