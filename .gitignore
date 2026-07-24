@@ -29,3 +29,6 @@ yarn-error.log*
 
 .env
 .env.local
+
+# Bozze email generate (dati dei destinatari): mai committarle
+email/bozze/
