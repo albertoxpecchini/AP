@@ -216,6 +216,10 @@ export default defineConfig({
           // da Vercel ai sottodomini. Escludendoli dal fallback, il service worker
           // non serve index.html e lascia scattare il redirect di rete.
           /^\/(bio|trivia|pcto|me-stesso|dubliners|gattopardo|archivio|sostieni|festa)(?:\/|$)/,
+          // Link tracciabili /d/<id>: non hanno estensione, quindi senza questa
+          // esclusione il SW servirebbe index.html (la home) al posto di lasciar
+          // scattare il rewrite Vercel → /api/d → 302 verso il documento.
+          /^\/d\//,
         ],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
