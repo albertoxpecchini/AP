@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { SiteLink as Link } from "./nav";
-import { ArrowLeft, ArrowUpRight, MapPin, GraduationCap, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  MapPin,
+  GraduationCap,
+  UserRound,
+  Cake,
+  Compass,
+  Building2,
+} from "lucide-react";
 import InterestModal from "./InterestModal";
 import SiteFooter from "./SiteFooter";
 import { HOBBY, PASSIONI, SKILLS, type Interest } from "./data";
@@ -15,6 +24,40 @@ import { HOBBY, PASSIONI, SKILLS, type Interest } from "./data";
 // vecchio SiteHeader/SiteFooter in stile chiaro. La modale degli interessi
 // viene ri-stilizzata in dark premium con selettori scoped sotto `.bio-page`.
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Cornice foto con didascalia. Se il file manca, la figure sparisce invece di
+// lasciare un riquadro rotto: il layout a griglia si richiude da solo.
+//
+// `focus` imposta l'object-position (es. "50% 30%") per scegliere quale parte
+// dell'immagine resta in cornice quando viene ritagliata in cover.
+function Photo({
+  src,
+  alt,
+  caption,
+  portrait = false,
+  focus,
+}: {
+  src: string;
+  alt: string;
+  caption?: string;
+  portrait?: boolean;
+  focus?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <figure className={`bio-shot${portrait ? " bio-shot--portrait" : ""}`}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onError={() => setFailed(true)}
+        style={focus ? { objectPosition: focus } : undefined}
+      />
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  );
+}
 
 export default function Bio() {
   const [selectedItem, setSelectedItem] = useState<Interest | null>(null);
@@ -35,6 +78,16 @@ export default function Bio() {
   let age = now.getFullYear() - birthDate.getFullYear();
   const monthDiff = now.getMonth() - birthDate.getMonth();
   if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) age--;
+
+  // Dati essenziali della sezione «Chi sono». L'età si ricalcola da sola.
+  const FACTS = [
+    // Il valore resta il numero puro: una stringa con l'età dentro non sarebbe
+    // traducibile (la chiave del dizionario cambierebbe a ogni compleanno).
+    { Icon: Cake, value: `${age}`, label: "Years old · born 28 June 2006" },
+    { Icon: MapPin, value: "Rivalta sul Mincio", label: "Province of Mantua, Italy" },
+    { Icon: GraduationCap, value: "CAT diploma, 2026", label: "ITT «Carlo d'Arco», Mantua" },
+    { Icon: Building2, value: "UniMoRe", label: "Construction & Land Management" },
+  ];
 
   const renderList = (items: Interest[]) => (
     <div className="bio-list">
@@ -91,7 +144,7 @@ export default function Bio() {
                 <p className="ap-kicker text-uppercase fw-semibold mb-3">👋 About me</p>
                 <h1 className="bio-hero-title fw-bold">Hi, I'm Alberto.</h1>
                 <span className="bio-hero-rule" aria-hidden="true" />
-                <p className="bio-hero-lead">Web developer &amp; designer — CAT student in Mantua.</p>
+                <p className="bio-hero-lead">Designer &amp; front-end developer, raised between Rivalta sul Mincio and Mantua.</p>
                 <p className="bio-hero-school mb-0">
                   Turning ideas into elegant, fast digital experiences.
                 </p>
@@ -120,23 +173,97 @@ export default function Bio() {
             </div>
             <div className="bio-prose-wrap">
               <p className="bio-prose">
-                My name is Alberto Pecchini, I'm {age} and I'm in my fifth year of the CAT
-                programme at the <strong>«Carlo d'Arco»</strong> Technical Institute in Mantua.
+                My name is Alberto Pecchini, I'm {age} and I grew up in{" "}
+                <strong>Rivalta sul Mincio</strong>, a village in the province of Mantua where my
+                family has both its roots and its business.
               </p>
               <p className="bio-prose">
-                I'm a web developer and designer passionate about user experience and minimalist
-                design. I use <strong>Next.js</strong>, <strong>TypeScript</strong>, GSAP and
-                Tailwind CSS to build responsive, fast and polished websites.
+                I hold a <strong>CAT diploma</strong> — Construction, Environment and Territory —
+                from the «Carlo d'Arco» Technical Institute in Mantua, and I'm now studying{" "}
+                <strong>Construction and Land Management</strong> at the University of Modena and
+                Reggio Emilia. Outside the classroom I'm a self-taught designer and front-end
+                developer: I build responsive, fast and polished interfaces with React, Next.js,
+                TypeScript, Tailwind CSS and GSAP.
               </p>
               <p className="bio-prose">
-                My mission is to turn ideas into{" "}
-                <strong>memorable digital experiences</strong>, keeping a clean design, careful
-                typography and animations that enhance the content.
+                I've been giving a hand in the family business since I was a kid — not as a
+                pastime, but as the way I learned what <strong>real work</strong> means. With my
+                father I look after parks, pools and outdoor spaces, and I drive the farm
+                machinery. It's concrete work, made of hands, seasons and attention to detail.
               </p>
               <p className="bio-prose mb-0">
-                Away from the screen I'm a <strong>Sassuolo fan</strong> ⚫🟢 — football, motorbikes
-                and a good camera are never far away.
+                In the business I've also taken over everything <strong>digital</strong>: online
+                orders, the satellite imagery we use to prepare quotes, the listings for
+                second-hand sales. That's where my two sides — the hands-on one and the digital
+                one — meet.
               </p>
+            </div>
+
+            {/* Dati essenziali, in chiaro */}
+            <div className="bio-facts">
+              {FACTS.map(({ Icon, value, label }) => (
+                <div className="bio-fact" key={value}>
+                  <span className="bio-fact-icon" aria-hidden="true"><Icon size={20} /></span>
+                  <span className="bio-fact-value">{value}</span>
+                  <span className="bio-fact-label">{label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Dove sono cresciuto e cosa faccio, in tre scatti */}
+            <div className="bio-gallery">
+              <Photo
+                src="/images/me-stesso/rivalta.jpg"
+                alt="Rivalta sul Mincio, where I grew up"
+                caption="Between Rivalta and Mantua"
+              />
+              <Photo
+                src="/images/me-stesso/cascina.jpg"
+                alt="The family farm in Rivalta sul Mincio"
+                caption="The family farm"
+              />
+              <Photo
+                src="/images/me-stesso/trattore.jpg"
+                alt="The Landini L25 Testacalda from 1957, the family's historic machine"
+                caption="Landini L25 Testacalda · 1957"
+                focus="50% 72%"
+              />
+            </div>
+
+            {/* Il restauro: da dove è partito tutto */}
+            <div className="bio-story mt-5">
+              <div className="bio-story-art">
+                <Photo
+                  src="/images/me-stesso/restauro-1.jpg"
+                  alt="At the restoration course in 2018, working on an old wall"
+                  caption="2018 — hands on the bricks"
+                />
+              </div>
+              <div className="bio-story-text">
+                <h3 className="h3 fw-bold mb-3">Where it all started</h3>
+                <p className="bio-prose">
+                  In 2018 — I was twelve — I took a <strong>restoration course</strong> at the
+                  Mantua Seminary, today Unicollege Mantova, one of the youth projects run by
+                  Santagnese10 Officina Creativa, the hub that hosts the city's first coworking
+                  space.
+                </p>
+                <p className="bio-prose mb-0">
+                  With work gloves on I cleaned up and repaired old brick and cobblestone walls:
+                  it was the first time I put my hands on a <strong>historic building</strong>,
+                  and it stayed with me. Not long after, I chose the CAT programme — and the same
+                  technical drawing I learned there is what later pulled me towards web design.
+                </p>
+              </div>
+            </div>
+            <div className="bio-gallery bio-gallery--two mt-4">
+              <Photo
+                src="/images/me-stesso/restauro-2.jpg"
+                alt="The group of kids at the restoration course"
+              />
+              <Photo
+                src="/images/me-stesso/restauro-3.jpg"
+                alt="The historic brick and cobblestone building we worked on"
+              />
             </div>
           </div>
         </section>
@@ -198,27 +325,68 @@ export default function Bio() {
               <div className="bio-box">
                 <p className="bio-box-label">📍 Location</p>
                 <p className="bio-based">
-                  <MapPin size={18} aria-hidden="true" /> Mantua · Italy
+                  <MapPin size={18} aria-hidden="true" /> Rivalta sul Mincio · Mantua, Italy
                 </p>
+                <p className="bio-edu-lead mt-3 mb-0">
+                  I live and work where I grew up, a few kilometres from Mantua, and I'm available
+                  for remote work, freelance projects and collaborations.
+                </p>
+                <ul className="bio-edu mt-3">
+                  <li>
+                    <Compass size={16} aria-hidden="true" /> Italy · San Marino · Switzerland · Austria
+                  </li>
+                  <li>
+                    <Compass size={16} aria-hidden="true" /> France · Ireland · Scotland
+                  </li>
+                </ul>
               </div>
               <div className="bio-box">
                 <p className="bio-box-label">🎓 Education</p>
                 <p className="bio-edu-lead">
-                  CAT diploma at ITT «Carlo d'Arco» in Mantua, now studying Construction and
-                  Land Management at the University of Modena and Reggio Emilia; English C1
-                  (IELTS) achieved in Dublin.
+                  CAT diploma at ITT «Carlo d'Arco» in Mantua, now studying Construction and Land
+                  Management at the University of Modena and Reggio Emilia; English C1 (IELTS)
+                  achieved in Dublin.
                 </p>
                 <ul className="bio-edu">
                   <li>
-                    <GraduationCap size={16} aria-hidden="true" /> UniMoRe «Enzo Ferrari» — Construction &amp; Land Management
+                    <GraduationCap size={16} aria-hidden="true" /> UniMoRe «Enzo Ferrari» — Construction &amp; Land Management, since 2026
                   </li>
                   <li>
-                    <GraduationCap size={16} aria-hidden="true" /> ITT «Carlo d'Arco» — CAT diploma
+                    <GraduationCap size={16} aria-hidden="true" /> ITT «Carlo d'Arco» — CAT diploma, 2021—2026
                   </li>
                   <li>
-                    <GraduationCap size={16} aria-hidden="true" /> CES Dublin — IELTS, level C1
+                    <GraduationCap size={16} aria-hidden="true" /> CES Dublin — IELTS, level C1, August 2024
+                  </li>
+                  <li>
+                    <GraduationCap size={16} aria-hidden="true" /> Workplace safety, low risk — Mantua, 2023
                   </li>
                 </ul>
+              </div>
+            </div>
+
+            {/* Dublino: il mese che ha portato al C1 */}
+            <div className="bio-story mt-5">
+              <div className="bio-story-text">
+                <h3 className="h3 fw-bold mb-3">A month living in English</h3>
+                <p className="bio-prose">
+                  The trip I care about most I gave to myself: in the summer of{" "}
+                  <strong>2024</strong>, just turned eighteen, I left for a language stay in{" "}
+                  <strong>Dublin</strong>. I took a plane for the first time, discovered a new
+                  country, and for a month I tried living and studying entirely in English.
+                </p>
+                <p className="bio-prose mb-0">
+                  Four weeks of full immersion at the CES centre on Dame Court — twenty-six
+                  lessons a week on speaking, writing, reading and listening — and the{" "}
+                  <strong>IELTS exam passed at level C1</strong> at the end of the course. In
+                  between, I explored on my own: Howth, Bray, Glendalough, Galway.
+                </p>
+              </div>
+              <div className="bio-story-art">
+                <Photo
+                  src="/images/me-stesso/dublino.jpg"
+                  alt="Language stay in Dublin"
+                  caption="Dublin — my present to myself at eighteen"
+                />
               </div>
             </div>
           </div>
@@ -392,6 +560,60 @@ export default function Bio() {
         .bio-prose-wrap { max-width: 48rem; }
         .bio-prose { font-size: 1.1rem; line-height: 1.8; color: var(--sub); margin-bottom: 1.1rem; }
         .bio-prose strong { color: var(--heading); }
+
+        /* Dati essenziali — striscia di quattro riquadri */
+        .bio-facts {
+          display: grid; grid-template-columns: repeat(4, 1fr);
+          gap: 1rem; margin-top: 2.5rem;
+        }
+        @media (max-width: 767.98px) { .bio-facts { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 419.98px) { .bio-facts { grid-template-columns: 1fr; } }
+        .bio-fact {
+          display: flex; flex-direction: column; gap: 0.3rem;
+          padding: 1.1rem 1.15rem; border-radius: 16px;
+          background: var(--surface); border: 1px solid var(--surface-bd);
+          box-shadow: var(--card-shadow);
+        }
+        .bio-fact-icon {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 38px; height: 38px; border-radius: 11px; margin-bottom: 0.35rem;
+          background: var(--vio-soft); border: 1px solid var(--vio-bd); color: var(--ink);
+        }
+        .bio-fact-value { color: var(--heading); font-weight: 700; font-size: 1.05rem; line-height: 1.25; }
+        .bio-fact-label { color: var(--sub); font-size: 0.85rem; line-height: 1.4; }
+
+        /* Gallerie fotografiche */
+        .bio-gallery {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          gap: 1rem; margin-top: 2rem;
+        }
+        .bio-gallery--two { grid-template-columns: repeat(2, 1fr); }
+        @media (max-width: 767.98px) {
+          .bio-gallery, .bio-gallery--two { grid-template-columns: 1fr; }
+        }
+        .bio-shot {
+          margin: 0; border-radius: 16px; overflow: hidden;
+          background: var(--vio-soft); border: 1px solid var(--surface-bd);
+          box-shadow: var(--card-shadow);
+        }
+        .bio-shot img {
+          display: block; width: 100%; height: 100%;
+          aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 50%;
+        }
+        .bio-shot--portrait img { aspect-ratio: 3 / 4; }
+        .bio-shot figcaption {
+          padding: 0.6rem 0.9rem; font-size: 0.82rem; font-weight: 600;
+          color: var(--sub); border-top: 1px solid var(--surface-bd);
+        }
+
+        /* Blocco racconto: testo + foto affiancati */
+        .bio-story {
+          display: grid; grid-template-columns: 1fr 1fr;
+          gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
+        }
+        @media (max-width: 767.98px) { .bio-story { grid-template-columns: 1fr; } }
+        .bio-story .bio-shot img { aspect-ratio: 4 / 3; }
+        .bio-story .h3 { color: var(--heading); }
 
         /* Layout a due colonne */
         .bio-twocol {

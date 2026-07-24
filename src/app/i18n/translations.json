@@ -814,11 +814,6 @@
     "fr": "Salut, je suis Alberto.",
     "de": "Hi, ich bin Alberto."
   },
-  "Web developer & designer — CAT student in Mantua.": {
-    "it": "Web developer e designer — studente CAT a Mantova.",
-    "fr": "Développeur web & designer — étudiant CAT à Mantoue.",
-    "de": "Webentwickler & Designer — CAT-Schüler in Mantua."
-  },
   "Turning ideas into elegant, fast digital experiences.": {
     "it": "Trasformo le idee in esperienze digitali eleganti e veloci.",
     "fr": "Je transforme les idées en expériences numériques élégantes et rapides.",
@@ -838,56 +833,6 @@
     "it": "Mi chiamo Alberto Pecchini, ho",
     "fr": "Je m'appelle Alberto Pecchini, j'ai",
     "de": "Ich heiße Alberto Pecchini, ich bin"
-  },
-  "and I'm in my fifth year of the CAT programme at the": {
-    "it": "anni e frequento il quinto anno del corso CAT presso l'",
-    "fr": "ans et je suis en cinquième année du cursus CAT à l'",
-    "de": "Jahre alt und im fünften Jahr des CAT-Programms am"
-  },
-  "Technical Institute in Mantua.": {
-    "it": "Istituto Tecnico di Mantova.",
-    "fr": "Institut technique de Mantoue.",
-    "de": "Technisches Institut in Mantua."
-  },
-  "I'm a web developer and designer passionate about user experience and minimalist design. I use": {
-    "it": "Sono un web developer e designer appassionato di user experience e design minimalista. Uso",
-    "fr": "Je suis un développeur web et designer passionné par l'expérience utilisateur et le design minimaliste. J'utilise",
-    "de": "Ich bin Webentwickler und Designer mit Leidenschaft für User Experience und minimalistisches Design. Ich nutze"
-  },
-  ", GSAP and Tailwind CSS to build responsive, fast and polished websites.": {
-    "it": ", GSAP e Tailwind CSS per costruire siti web responsive, veloci e curati.",
-    "fr": ", GSAP et Tailwind CSS pour créer des sites web responsives, rapides et soignés.",
-    "de": ", GSAP und Tailwind CSS, um responsive, schnelle und ausgefeilte Websites zu bauen."
-  },
-  "My mission is to turn ideas into": {
-    "it": "La mia missione è trasformare le idee in",
-    "fr": "Ma mission est de transformer les idées en",
-    "de": "Meine Mission ist es, Ideen zu verwandeln in"
-  },
-  "memorable digital experiences": {
-    "it": "esperienze digitali memorabili",
-    "fr": "expériences numériques mémorables",
-    "de": "unvergessliche digitale Erlebnisse"
-  },
-  ", keeping a clean design, careful typography and animations that enhance the content.": {
-    "it": ", mantenendo un design pulito, una tipografia curata e animazioni che valorizzano il contenuto.",
-    "fr": ", en gardant un design épuré, une typographie soignée et des animations qui mettent en valeur le contenu.",
-    "de": ", mit klarem Design, sorgfältiger Typografie und Animationen, die den Inhalt unterstreichen."
-  },
-  "Away from the screen I'm a": {
-    "it": "Lontano dallo schermo sono un",
-    "fr": "Loin de l'écran, je suis un",
-    "de": "Abseits des Bildschirms bin ich ein"
-  },
-  "Sassuolo fan": {
-    "it": "tifoso del Sassuolo",
-    "fr": "supporter de Sassuolo",
-    "de": "Sassuolo-Fan"
-  },
-  "⚫🟢 — football, motorbikes and a good camera are never far away.": {
-    "it": "⚫🟢 — calcio, moto e una buona macchina fotografica non mancano mai.",
-    "fr": "⚫🟢 — le football, les motos et un bon appareil photo ne sont jamais loin.",
-    "de": "⚫🟢 — Fußball, Motorräder und eine gute Kamera sind nie weit."
   },
   "🎮 My hobbies": {
     "it": "🎮 I miei hobby",
@@ -1039,75 +984,25 @@
     "fr": "Développement front-end",
     "de": "Frontend-Entwicklung"
   },
-  "Claude Code": {
-    "it": "Sviluppo assistito dall'IA",
-    "fr": "Développement assisté par l'IA",
-    "de": "KI-gestützte Entwicklung"
-  },
-  "Git & GitHub": {
-    "it": "Strumenti e workflow",
-    "fr": "Outils & workflow",
-    "de": "Tools & Workflow"
-  },
   "PC troubleshooting": {
-    "it": "Windows e supporto IT",
-    "fr": "Windows & support IT",
-    "de": "Windows & IT-Support"
-  },
-  "Hardware & network setup": {
     "it": "Risoluzione problemi PC",
     "fr": "Dépannage PC",
     "de": "PC-Fehlerbehebung"
   },
-  "Windows optimisation": {
-    "it": "Configurazione hardware e rete",
-    "fr": "Configuration matériel & réseau",
-    "de": "Hardware- & Netzwerk-Einrichtung"
-  },
-  "2.5 TB file system": {
-    "it": "Ottimizzazione di Windows",
-    "fr": "Optimisation de Windows",
-    "de": "Windows-Optimierung"
-  },
-  "Malware removal": {
-    "it": "File system da 2,5 TB",
-    "fr": "Système de fichiers de 2,5 To",
-    "de": "2,5-TB-Dateisystem"
-  },
-  "Peripheral management": {
-    "it": "Rimozione malware",
-    "fr": "Suppression de malwares",
-    "de": "Malware-Entfernung"
-  },
-  "Multimedia & Content": {
-    "it": "Gestione periferiche",
-    "fr": "Gestion des périphériques",
-    "de": "Peripherie-Verwaltung"
-  },
   "Commercial photography": {
-    "it": "Multimedia e contenuti",
-    "fr": "Multimédia & contenu",
-    "de": "Multimedia & Content"
-  },
-  "DaVinci Resolve": {
     "it": "Fotografia commerciale",
     "fr": "Photographie commerciale",
     "de": "Produktfotografie"
   },
   "Technical drawing / CAD": {
-    "it": "Area tecnica CAT",
-    "fr": "Domaine technique CAT",
-    "de": "CAT-Fachbereich"
+    "it": "Disegno tecnico / CAD",
+    "fr": "Dessin technique / CAO",
+    "de": "Technisches Zeichnen / CAD"
   },
   "Topography": {
     "it": "Topografia",
     "fr": "Topographie",
     "de": "Topografie"
-  },
-  "Building design": {
-    "it": "Progettazione edile",
-    "fr": "Conception de bâtiments",
-    "de": "Bauplanung"
   },
   "Valuation": {
     "it": "Estimo",
@@ -1158,21 +1053,6 @@
     "it": "🎓 Istruzione",
     "fr": "🎓 Formation",
     "de": "🎓 Ausbildung"
-  },
-  "CAT diploma in progress at ITT «Carlo d'Arco» in Mantua; English C1 (IELTS) achieved in Dublin.": {
-    "it": "Diploma CAT in corso all'ITT «Carlo d'Arco» di Mantova; inglese C1 (IELTS) conseguito a Dublino.",
-    "fr": "Diplôme CAT en cours à l'ITT «Carlo d'Arco» de Mantoue ; anglais C1 (IELTS) obtenu à Dublin.",
-    "de": "CAT-Diplom in Arbeit am ITT «Carlo d'Arco» in Mantua; Englisch C1 (IELTS) in Dublin erreicht."
-  },
-  "ITT «Carlo d'Arco» — CAT diploma": {
-    "it": "ITT «Carlo d'Arco» — Diploma CAT",
-    "fr": "ITT «Carlo d'Arco» — Diplôme CAT",
-    "de": "ITT «Carlo d'Arco» — CAT-Diplom"
-  },
-  "CES Dublin — IELTS, level C1": {
-    "it": "CES Dublino — IELTS, livello C1",
-    "fr": "CES Dublin — IELTS, niveau C1",
-    "de": "CES Dublin — IELTS, Niveau C1"
   },
   "Torna alla home": {
     "en": "Back to home",
@@ -3493,5 +3373,480 @@
     "en": "Alberto Pecchini — State Exam 2026",
     "fr": "Alberto Pecchini — Examen d'État 2026",
     "de": "Alberto Pecchini — Staatsexamen 2026"
+  },
+  "Designer & front-end developer, raised between Rivalta sul Mincio and Mantua.": {
+    "it": "Designer e sviluppatore front-end, cresciuto tra Rivalta sul Mincio e Mantova.",
+    "fr": "Designer et développeur front-end, ayant grandi entre Rivalta sul Mincio et Mantoue.",
+    "de": "Designer und Frontend-Entwickler, aufgewachsen zwischen Rivalta sul Mincio und Mantua."
+  },
+  "and I grew up in": {
+    "it": "anni e sono cresciuto a",
+    "fr": "ans et j'ai grandi à",
+    "de": "Jahre alt und aufgewachsen in"
+  },
+  ", a village in the province of Mantua where my family has both its roots and its business.": {
+    "it": ", un paese in provincia di Mantova dove la mia famiglia ha le sue radici e la sua attività.",
+    "fr": ", un village de la province de Mantoue où ma famille a ses racines et son entreprise.",
+    "de": ", einem Dorf in der Provinz Mantua, wo meine Familie ihre Wurzeln und ihren Betrieb hat."
+  },
+  "I hold a": {
+    "it": "Ho un",
+    "fr": "Je suis titulaire d'un",
+    "de": "Ich habe ein"
+  },
+  "CAT diploma": {
+    "it": "diploma CAT",
+    "fr": "diplôme CAT",
+    "de": "CAT-Diplom"
+  },
+  "— Construction, Environment and Territory — from the «Carlo d'Arco» Technical Institute in Mantua, and I'm now studying": {
+    "it": "— Costruzioni, Ambiente e Territorio — conseguito all'Istituto Tecnico «Carlo d'Arco» di Mantova, e ora studio",
+    "fr": "— Constructions, Environnement et Territoire — obtenu à l'Institut technique «Carlo d'Arco» de Mantoue, et j'étudie aujourd'hui",
+    "de": "— Bauwesen, Umwelt und Raum — vom Technischen Institut «Carlo d'Arco» in Mantua, und studiere jetzt"
+  },
+  "Construction and Land Management": {
+    "it": "Costruzioni e gestione del territorio",
+    "fr": "Constructions et gestion du territoire",
+    "de": "Bauwesen und Raummanagement"
+  },
+  "at the University of Modena and Reggio Emilia. Outside the classroom I'm a self-taught designer and front-end developer: I build responsive, fast and polished interfaces with React, Next.js, TypeScript, Tailwind CSS and GSAP.": {
+    "it": "all'Università di Modena e Reggio Emilia. Fuori dai banchi sono un designer e sviluppatore front-end autodidatta: costruisco interfacce responsive, veloci e curate con React, Next.js, TypeScript, Tailwind CSS e GSAP.",
+    "fr": "à l'Université de Modène et Reggio d'Émilie. En dehors des cours, je suis designer et développeur front-end autodidacte : je construis des interfaces responsives, rapides et soignées avec React, Next.js, TypeScript, Tailwind CSS et GSAP.",
+    "de": "an der Universität Modena und Reggio Emilia. Außerhalb des Hörsaals bin ich autodidaktischer Designer und Frontend-Entwickler: Ich baue responsive, schnelle und sorgfältig gestaltete Interfaces mit React, Next.js, TypeScript, Tailwind CSS und GSAP."
+  },
+  "I've been giving a hand in the family business since I was a kid — not as a pastime, but as the way I learned what": {
+    "it": "Fin da piccolo do una mano nell'attività di famiglia: non un passatempo, ma il modo in cui ho imparato cosa significhi",
+    "fr": "Depuis tout petit je donne un coup de main dans l'entreprise familiale : pas un passe-temps, mais la façon dont j'ai appris ce que signifie",
+    "de": "Seit ich klein bin, helfe ich im Familienbetrieb mit — kein Zeitvertreib, sondern die Art, wie ich gelernt habe, was"
+  },
+  "real work": {
+    "it": "lavorare davvero",
+    "fr": "travailler vraiment",
+    "de": "echte Arbeit"
+  },
+  "means. With my father I look after parks, pools and outdoor spaces, and I drive the farm machinery. It's concrete work, made of hands, seasons and attention to detail.": {
+    "it": ". Con mio padre mi occupo di parchi, piscine e arredi esterni, e guido le macchine operatrici della cascina. Un lavoro concreto, fatto di mani, stagioni e attenzione ai dettagli.",
+    "fr": ". Avec mon père je m'occupe des parcs, des piscines et des espaces extérieurs, et je conduis les engins de la ferme. Un travail concret, fait de mains, de saisons et d'attention au détail.",
+    "de": "bedeutet. Mit meinem Vater kümmere ich mich um Parks, Pools und Außenanlagen und fahre die Landmaschinen. Konkrete Arbeit aus Händen, Jahreszeiten und Liebe zum Detail."
+  },
+  "In the business I've also taken over everything": {
+    "it": "In azienda ho preso in carico anche tutto il lato",
+    "fr": "Dans l'entreprise, j'ai aussi pris en charge tout le côté",
+    "de": "Im Betrieb habe ich außerdem alles"
+  },
+  "digital": {
+    "it": "digitale",
+    "fr": "numérique",
+    "de": "Digitale übernommen"
+  },
+  ": online orders, the satellite imagery we use to prepare quotes, the listings for second-hand sales. That's where my two sides — the hands-on one and the digital one — meet.": {
+    "it": ": gli ordini online, le foto satellitari che servono a preparare i preventivi, gli annunci per la vendita dell'usato. È qui che le mie due anime — quella pratica e quella digitale — si incontrano.",
+    "fr": " : les commandes en ligne, les images satellite qui servent à préparer les devis, les annonces pour la vente d'occasion. C'est là que mes deux facettes — la pratique et la numérique — se rencontrent.",
+    "de": ": Online-Bestellungen, die Satellitenbilder für die Angebotserstellung, die Anzeigen für den Gebrauchtverkauf. Hier treffen sich meine beiden Seiten — die praktische und die digitale."
+  },
+  "Years old · born 28 June 2006": {
+    "it": "Anni · nato il 28 giugno 2006",
+    "fr": "Ans · né le 28 juin 2006",
+    "de": "Jahre · geboren am 28. Juni 2006"
+  },
+  "Province of Mantua, Italy": {
+    "it": "Provincia di Mantova, Italia",
+    "fr": "Province de Mantoue, Italie",
+    "de": "Provinz Mantua, Italien"
+  },
+  "CAT diploma, 2026": {
+    "it": "Diploma CAT, 2026",
+    "fr": "Diplôme CAT, 2026",
+    "de": "CAT-Diplom, 2026"
+  },
+  "ITT «Carlo d'Arco», Mantua": {
+    "it": "ITT «Carlo d'Arco», Mantova",
+    "fr": "ITT «Carlo d'Arco», Mantoue",
+    "de": "ITT «Carlo d'Arco», Mantua"
+  },
+  "Construction & Land Management": {
+    "it": "Costruzioni e gestione del territorio",
+    "fr": "Constructions et gestion du territoire",
+    "de": "Bauwesen und Raummanagement"
+  },
+  "Rivalta sul Mincio, where I grew up": {
+    "it": "Rivalta sul Mincio, dove sono cresciuto",
+    "fr": "Rivalta sul Mincio, où j'ai grandi",
+    "de": "Rivalta sul Mincio, wo ich aufgewachsen bin"
+  },
+  "Between Rivalta and Mantua": {
+    "it": "Tra Rivalta e Mantova",
+    "fr": "Entre Rivalta et Mantoue",
+    "de": "Zwischen Rivalta und Mantua"
+  },
+  "The family farm in Rivalta sul Mincio": {
+    "it": "La cascina di famiglia a Rivalta sul Mincio",
+    "fr": "La ferme familiale à Rivalta sul Mincio",
+    "de": "Der Familienhof in Rivalta sul Mincio"
+  },
+  "The family farm": {
+    "it": "La cascina di famiglia",
+    "fr": "La ferme familiale",
+    "de": "Der Familienhof"
+  },
+  "The Landini L25 Testacalda from 1957, the family's historic machine": {
+    "it": "Il Landini L25 Testacalda del 1957, la macchina operatrice storica di famiglia",
+    "fr": "Le Landini L25 Testacalda de 1957, l'engin historique de la famille",
+    "de": "Der Landini L25 Testacalda von 1957, die historische Maschine der Familie"
+  },
+  "At the restoration course in 2018, working on an old wall": {
+    "it": "Al corso di restauro nel 2018, al lavoro su un vecchio muro",
+    "fr": "Au cours de restauration en 2018, au travail sur un vieux mur",
+    "de": "Beim Restaurierungskurs 2018, an einer alten Mauer"
+  },
+  "2018 — hands on the bricks": {
+    "it": "2018 — le mani sui mattoni",
+    "fr": "2018 — les mains sur les briques",
+    "de": "2018 — die Hände an den Ziegeln"
+  },
+  "The group of kids at the restoration course": {
+    "it": "Il gruppo di ragazzi al corso di restauro",
+    "fr": "Le groupe de jeunes au cours de restauration",
+    "de": "Die Gruppe Jugendlicher beim Restaurierungskurs"
+  },
+  "The historic brick and cobblestone building we worked on": {
+    "it": "L'edificio storico in mattoni e ciottoli su cui abbiamo lavorato",
+    "fr": "Le bâtiment historique en briques et galets sur lequel nous avons travaillé",
+    "de": "Das historische Gebäude aus Ziegeln und Kieseln, an dem wir gearbeitet haben"
+  },
+  "Where it all started": {
+    "it": "Dove è iniziato tutto",
+    "fr": "Où tout a commencé",
+    "de": "Wo alles begann"
+  },
+  "In 2018 — I was twelve — I took a": {
+    "it": "Nel 2018 — avevo dodici anni — ho seguito un",
+    "fr": "En 2018 — j'avais douze ans — j'ai suivi un",
+    "de": "2018 — ich war zwölf — besuchte ich einen"
+  },
+  "restoration course": {
+    "it": "corso di restauro",
+    "fr": "cours de restauration",
+    "de": "Restaurierungskurs"
+  },
+  "at the Mantua Seminary, today Unicollege Mantova, one of the youth projects run by Santagnese10 Officina Creativa, the hub that hosts the city's first coworking space.": {
+    "it": "al Seminario di Mantova, oggi Unicollege Mantova, tra le iniziative per i giovani di Santagnese10 Officina Creativa, l'hub che ospita il primo coworking della città.",
+    "fr": "au Séminaire de Mantoue, aujourd'hui Unicollege Mantova, parmi les initiatives pour les jeunes de Santagnese10 Officina Creativa, le hub qui abrite le premier coworking de la ville.",
+    "de": "am Seminar von Mantua, heute Unicollege Mantova, eine der Jugendinitiativen von Santagnese10 Officina Creativa, dem Hub mit dem ersten Coworking der Stadt."
+  },
+  "With work gloves on I cleaned up and repaired old brick and cobblestone walls: it was the first time I put my hands on a": {
+    "it": "Con i guanti da lavoro ho ripulito e rimesso in sesto vecchi muri di mattoni e ciottoli: è stata la prima volta che mettevo le mani su un",
+    "fr": "Avec des gants de travail j'ai nettoyé et remis en état de vieux murs de briques et de galets : c'était la première fois que je mettais les mains sur un",
+    "de": "Mit Arbeitshandschuhen habe ich alte Ziegel- und Kieselmauern gereinigt und instand gesetzt: das erste Mal, dass ich Hand an ein"
+  },
+  "historic building": {
+    "it": "edificio storico",
+    "fr": "bâtiment historique",
+    "de": "historisches Gebäude legte"
+  },
+  ", and it stayed with me. Not long after, I chose the CAT programme — and the same technical drawing I learned there is what later pulled me towards web design.": {
+    "it": "— e mi è rimasta dentro. Di lì a poco avrei scelto il CAT, ed è lo stesso disegno tecnico imparato lì che più tardi mi ha portato verso il web design.",
+    "fr": ", et cela m'est resté. Peu après, j'ai choisi le cursus CAT — et c'est le même dessin technique appris là-bas qui m'a ensuite mené vers le web design.",
+    "de": ". Kurz darauf wählte ich den CAT-Zweig — und dasselbe technische Zeichnen führte mich später zum Webdesign."
+  },
+  "Rivalta sul Mincio · Mantua, Italy": {
+    "it": "Rivalta sul Mincio · Mantova, Italia",
+    "fr": "Rivalta sul Mincio · Mantoue, Italie",
+    "de": "Rivalta sul Mincio · Mantua, Italien"
+  },
+  "I live and work where I grew up, a few kilometres from Mantua, and I'm available for remote work, freelance projects and collaborations.": {
+    "it": "Vivo e lavoro dove sono cresciuto, a pochi chilometri da Mantova, e sono disponibile per lavoro da remoto, progetti freelance e collaborazioni.",
+    "fr": "Je vis et travaille là où j'ai grandi, à quelques kilomètres de Mantoue, et je suis disponible pour du télétravail, des projets freelance et des collaborations.",
+    "de": "Ich lebe und arbeite dort, wo ich aufgewachsen bin, wenige Kilometer von Mantua entfernt, und bin verfügbar für Remote-Arbeit, Freelance-Projekte und Kooperationen."
+  },
+  "Italy · San Marino · Switzerland · Austria": {
+    "it": "Italia · San Marino · Svizzera · Austria",
+    "fr": "Italie · Saint-Marin · Suisse · Autriche",
+    "de": "Italien · San Marino · Schweiz · Österreich"
+  },
+  "France · Ireland · Scotland": {
+    "it": "Francia · Irlanda · Scozia",
+    "fr": "France · Irlande · Écosse",
+    "de": "Frankreich · Irland · Schottland"
+  },
+  "CAT diploma at ITT «Carlo d'Arco» in Mantua, now studying Construction and Land Management at the University of Modena and Reggio Emilia; English C1 (IELTS) achieved in Dublin.": {
+    "it": "Diploma CAT all'ITT «Carlo d'Arco» di Mantova, ora studio Costruzioni e gestione del territorio all'Università di Modena e Reggio Emilia; inglese C1 (IELTS) conseguito a Dublino.",
+    "fr": "Diplôme CAT à l'ITT «Carlo d'Arco» de Mantoue, j'étudie maintenant Constructions et gestion du territoire à l'Université de Modène et Reggio d'Émilie ; anglais C1 (IELTS) obtenu à Dublin.",
+    "de": "CAT-Diplom am ITT «Carlo d'Arco» in Mantua, jetzt Studium Bauwesen und Raummanagement an der Universität Modena und Reggio Emilia; Englisch C1 (IELTS) in Dublin erreicht."
+  },
+  "UniMoRe «Enzo Ferrari» — Construction & Land Management, since 2026": {
+    "it": "UniMoRe «Enzo Ferrari» — Costruzioni e gestione del territorio, dal 2026",
+    "fr": "UniMoRe «Enzo Ferrari» — Constructions et gestion du territoire, depuis 2026",
+    "de": "UniMoRe «Enzo Ferrari» — Bauwesen und Raummanagement, seit 2026"
+  },
+  "ITT «Carlo d'Arco» — CAT diploma, 2021—2026": {
+    "it": "ITT «Carlo d'Arco» — Diploma CAT, 2021—2026",
+    "fr": "ITT «Carlo d'Arco» — Diplôme CAT, 2021—2026",
+    "de": "ITT «Carlo d'Arco» — CAT-Diplom, 2021—2026"
+  },
+  "CES Dublin — IELTS, level C1, August 2024": {
+    "it": "CES Dublino — IELTS, livello C1, agosto 2024",
+    "fr": "CES Dublin — IELTS, niveau C1, août 2024",
+    "de": "CES Dublin — IELTS, Niveau C1, August 2024"
+  },
+  "Workplace safety, low risk — Mantua, 2023": {
+    "it": "Sicurezza sul lavoro, rischio basso — Mantova, 2023",
+    "fr": "Sécurité au travail, risque faible — Mantoue, 2023",
+    "de": "Arbeitssicherheit, geringes Risiko — Mantua, 2023"
+  },
+  "A month living in English": {
+    "it": "Un mese vivendo in inglese",
+    "fr": "Un mois à vivre en anglais",
+    "de": "Ein Monat auf Englisch"
+  },
+  "The trip I care about most I gave to myself: in the summer of": {
+    "it": "Il viaggio a cui tengo di più me lo sono regalato io: nell'estate del",
+    "fr": "Le voyage auquel je tiens le plus, je me le suis offert : à l'été",
+    "de": "Die Reise, die mir am meisten bedeutet, habe ich mir selbst geschenkt: im Sommer"
+  },
+  ", just turned eighteen, I left for a language stay in": {
+    "it": ", appena compiuti i diciotto anni, sono partito per una vacanza studio a",
+    "fr": ", tout juste dix-huit ans, je suis parti pour un séjour linguistique à",
+    "de": ", gerade achtzehn geworden, reiste ich zu einem Sprachaufenthalt nach"
+  },
+  "Dublin": {
+    "it": "Dublino",
+    "fr": "Dublin",
+    "de": "Dublin"
+  },
+  ". I took a plane for the first time, discovered a new country, and for a month I tried living and studying entirely in English.": {
+    "it": ". Per la prima volta ho preso l'aereo, ho scoperto un Paese nuovo e per un mese ho provato a vivere e studiare interamente in inglese.",
+    "fr": ". J'ai pris l'avion pour la première fois, découvert un nouveau pays, et pendant un mois j'ai essayé de vivre et d'étudier entièrement en anglais.",
+    "de": ". Zum ersten Mal saß ich in einem Flugzeug, entdeckte ein neues Land und versuchte einen Monat lang, vollständig auf Englisch zu leben und zu lernen."
+  },
+  "Four weeks of full immersion at the CES centre on Dame Court — twenty-six lessons a week on speaking, writing, reading and listening — and the": {
+    "it": "Quattro settimane di full immersion al centro CES di Dame Court — ventisei lezioni a settimana tra speaking, writing, reading e listening — e l'",
+    "fr": "Quatre semaines d'immersion totale au centre CES de Dame Court — vingt-six leçons par semaine en speaking, writing, reading et listening — et l'",
+    "de": "Vier Wochen Full Immersion im CES-Zentrum am Dame Court — sechsundzwanzig Stunden pro Woche in Speaking, Writing, Reading und Listening — und die"
+  },
+  "IELTS exam passed at level C1": {
+    "it": "esame IELTS superato a livello C1",
+    "fr": "examen IELTS réussi au niveau C1",
+    "de": "IELTS-Prüfung auf Niveau C1 bestanden"
+  },
+  "at the end of the course. In between, I explored on my own: Howth, Bray, Glendalough, Galway.": {
+    "it": "a fine corso. Nel mezzo, ho esplorato da solo: Howth, Bray, Glendalough, Galway.",
+    "fr": "à la fin du cours. Entre-temps, j'ai exploré tout seul : Howth, Bray, Glendalough, Galway.",
+    "de": "am Ende des Kurses. Dazwischen erkundete ich das Land auf eigene Faust: Howth, Bray, Glendalough, Galway."
+  },
+  "Language stay in Dublin": {
+    "it": "Vacanza studio a Dublino",
+    "fr": "Séjour linguistique à Dublin",
+    "de": "Sprachaufenthalt in Dublin"
+  },
+  "Dublin — my present to myself at eighteen": {
+    "it": "Dublino — il regalo per i miei diciotto anni",
+    "fr": "Dublin — mon cadeau pour mes dix-huit ans",
+    "de": "Dublin — mein Geschenk zum achtzehnten Geburtstag"
+  },
+  "Clay shooting": {
+    "it": "Tiro a volo",
+    "fr": "Tir aux clays",
+    "de": "Wurfscheibenschießen"
+  },
+  "Learn more: Clay shooting": {
+    "it": "Scopri di più: Tiro a volo",
+    "fr": "En savoir plus : Tir aux clays",
+    "de": "Mehr erfahren: Wurfscheibenschießen"
+  },
+  "Good food": {
+    "it": "Buona tavola",
+    "fr": "Bonne chère",
+    "de": "Gutes Essen"
+  },
+  "Learn more: Good food": {
+    "it": "Scopri di più: Buona tavola",
+    "fr": "En savoir plus : Bonne chère",
+    "de": "Mehr erfahren: Gutes Essen"
+  },
+  "Time with friends": {
+    "it": "Tempo con gli amici",
+    "fr": "Du temps avec les amis",
+    "de": "Zeit mit Freunden"
+  },
+  "Learn more: Time with friends": {
+    "it": "Scopri di più: Tempo con gli amici",
+    "fr": "En savoir plus : Du temps avec les amis",
+    "de": "Mehr erfahren: Zeit mit Freunden"
+  },
+  "Play Trivia": {
+    "it": "Gioca a Trivia",
+    "fr": "Jouer à Trivia",
+    "de": "Trivia spielen"
+  },
+  "Restoration": {
+    "it": "Restauro",
+    "fr": "Restauration",
+    "de": "Restaurierung"
+  },
+  "Learn more: Restoration": {
+    "it": "Scopri di più: Restauro",
+    "fr": "En savoir plus : Restauration",
+    "de": "Mehr erfahren: Restaurierung"
+  },
+  "Working the land": {
+    "it": "Lavorare la terra",
+    "fr": "Travailler la terre",
+    "de": "Arbeit auf dem Land"
+  },
+  "Learn more: Working the land": {
+    "it": "Scopri di più: Lavorare la terra",
+    "fr": "En savoir plus : Travailler la terre",
+    "de": "Mehr erfahren: Arbeit auf dem Land"
+  },
+  "Digitising the business": {
+    "it": "Digitalizzare l'azienda",
+    "fr": "Numériser l'entreprise",
+    "de": "Den Betrieb digitalisieren"
+  },
+  "Learn more: Digitising the business": {
+    "it": "Scopri di più: Digitalizzare l'azienda",
+    "fr": "En savoir plus : Numériser l'entreprise",
+    "de": "Mehr erfahren: Den Betrieb digitalisieren"
+  },
+  "Volunteering": {
+    "it": "Volontariato",
+    "fr": "Bénévolat",
+    "de": "Ehrenamt"
+  },
+  "Learn more: Volunteering": {
+    "it": "Scopri di più: Volontariato",
+    "fr": "En savoir plus : Bénévolat",
+    "de": "Mehr erfahren: Ehrenamt"
+  },
+  "Building a business": {
+    "it": "Costruire un'impresa",
+    "fr": "Bâtir une entreprise",
+    "de": "Ein Unternehmen aufbauen"
+  },
+  "Learn more: Building a business": {
+    "it": "Scopri di più: Costruire un'impresa",
+    "fr": "En savoir plus : Bâtir une entreprise",
+    "de": "Mehr erfahren: Ein Unternehmen aufbauen"
+  },
+  "Since 2023 I've owned a Ducati Scrambler 125, and I ride it whenever the days start feeling monotonous: it's how I clear my head. I'm still a beginner on two wheels, but the sense of freedom is worth every kilometre. I've had my car licence for a year too, and I haven't passed up a few road trips — Milan, Brescia, Verona, Bologna, Piacenza.": {
+    "it": "Dal 2023 ho una Ducati Scrambler 125 e la uso quando le giornate diventano monotone: è il mio modo di schiarirmi le idee. Sono ancora alle prime armi su due ruote, ma il senso di libertà vale ogni chilometro. Da un anno ho anche la patente dell'auto, e non mi sono fatto mancare qualche viaggio su strada: Milano, Brescia, Verona, Bologna, Piacenza.",
+    "fr": "Depuis 2023 j'ai une Ducati Scrambler 125, et je la sors dès que les journées deviennent monotones : c'est ma façon de me vider la tête. Je suis encore débutant sur deux roues, mais le sentiment de liberté vaut chaque kilomètre. J'ai aussi le permis auto depuis un an, et je ne me suis pas privé de quelques road trips — Milan, Brescia, Vérone, Bologne, Plaisance.",
+    "de": "Seit 2023 fahre ich eine Ducati Scrambler 125, immer dann, wenn die Tage eintönig werden: So bekomme ich den Kopf frei. Auf zwei Rädern bin ich noch Anfänger, aber das Gefühl von Freiheit ist jeden Kilometer wert. Seit einem Jahr habe ich auch den Autoführerschein und ein paar Roadtrips gemacht — Mailand, Brescia, Verona, Bologna, Piacenza."
+  },
+  "Aim, breathe, focus: shooting is my sport. My father got me into it, and today I practise clay shooting at the «Al Perrosso» range in Castel Goffredo under coach Fausto Chitò. I take it slowly, but it's the discipline I recognise myself in the most: silence, precision and steady nerves. Before landing here I tried a bit of everything — swimming, volleyball, basketball.": {
+    "it": "Mira, respiro, concentrazione: il tiro è il mio sport. A farmi appassionare è stato mio padre, e oggi pratico il tiro a volo al poligono «Al Perrosso» di Castel Goffredo, seguito dal maestro Fausto Chitò. Lo prendo con calma, ma è la disciplina in cui mi ritrovo di più: silenzio, precisione e nervi saldi. Prima di arrivarci ho provato un po' di tutto — nuoto, pallavolo, basket.",
+    "fr": "Viser, respirer, se concentrer : le tir est mon sport. C'est mon père qui m'y a initié, et aujourd'hui je pratique le tir aux clays au stand «Al Perrosso» de Castel Goffredo, encadré par le maître Fausto Chitò. Je prends mon temps, mais c'est la discipline dans laquelle je me reconnais le plus : silence, précision et nerfs solides. Avant d'y arriver, j'ai un peu tout essayé — natation, volley, basket.",
+    "de": "Zielen, atmen, konzentrieren: Schießen ist mein Sport. Mein Vater hat mich dafür begeistert, heute trainiere ich Wurfscheibenschießen auf dem Stand «Al Perrosso» in Castel Goffredo bei Trainer Fausto Chitò. Ich gehe es ruhig an, aber es ist die Disziplin, in der ich mich am meisten wiederfinde: Stille, Präzision und ruhige Nerven. Davor habe ich alles Mögliche ausprobiert — Schwimmen, Volleyball, Basketball."
+  },
+  "I love discovering new places — and I love it when everything runs smoothly. When we travel as a group, even just with friends, I'm the one handling tickets, bookings and itineraries: on the road I'm the brain of the operation. So far: Italy, San Marino, Switzerland, Austria, France, Ireland and Scotland.": {
+    "it": "Adoro scoprire posti nuovi — e adoro che tutto fili liscio. Quando partiamo in gruppo, anche solo tra amici, sono io a gestire biglietti, prenotazioni e itinerari: in viaggio sono il cervello delle operazioni. Finora: Italia, San Marino, Svizzera, Austria, Francia, Irlanda e Scozia.",
+    "fr": "J'adore découvrir de nouveaux endroits — et j'adore que tout se passe sans accroc. Quand nous partons en groupe, même juste entre amis, c'est moi qui gère les billets, les réservations et les itinéraires : en voyage, je suis le cerveau des opérations. Jusqu'ici : Italie, Saint-Marin, Suisse, Autriche, France, Irlande et Écosse.",
+    "de": "Ich entdecke gern neue Orte — und ich liebe es, wenn alles reibungslos läuft. Wenn wir in der Gruppe unterwegs sind, auch nur unter Freunden, kümmere ich mich um Tickets, Buchungen und Routen: Auf Reisen bin ich der Kopf der Operation. Bisher: Italien, San Marino, Schweiz, Österreich, Frankreich, Irland und Schottland."
+  },
+  "Video games pulled me into design and technology from a young age. I love titles with a strong visual identity, careful storytelling and deep gameplay. I've even built one: Trivia, a quiz game on the history of architecture, with its own design system and animations.": {
+    "it": "I videogiochi mi hanno tirato dentro il mondo del design e della tecnologia fin da piccolo. Amo i titoli con una forte identità visiva, una narrazione curata e un gameplay profondo. Ne ho anche costruito uno: Trivia, un quiz sulla storia dell'architettura, con un suo design system e le sue animazioni.",
+    "fr": "Les jeux vidéo m'ont attiré vers le design et la technologie dès mon plus jeune âge. J'aime les titres à forte identité visuelle, à la narration soignée et au gameplay profond. J'en ai même créé un : Trivia, un quiz sur l'histoire de l'architecture, avec son propre design system et ses animations.",
+    "de": "Videospiele haben mich schon früh zu Design und Technik gebracht. Ich mag Titel mit starker visueller Identität, sorgfältigem Storytelling und tiefem Gameplay. Eines habe ich sogar selbst gebaut: Trivia, ein Quiz zur Architekturgeschichte, mit eigenem Designsystem und eigenen Animationen."
+  },
+  "I'm the kind of person who likes eating well, and a good sandwich made with real ingredients is worth as much to me as a plated dish. Aged Sardinian pecorino, gorgonzola and Grana Padano DOP are the cheeses I always come back to; cacio e pepe, spaghetti alle vongole and a proper fillet of beef are the dishes I never turn down.": {
+    "it": "Sono un tipo a cui piace mangiar bene, e un buon panino fatto con prodotti veri per me vale quanto un piatto. Pecorino sardo stagionato, gorgonzola e Grana Padano DOP sono i formaggi a cui torno sempre; cacio e pepe, spaghetti alle vongole e un filetto di manzo fatto bene sono i piatti che non rifiuto mai.",
+    "fr": "Je suis du genre à aimer bien manger, et un bon sandwich fait avec de vrais produits vaut autant qu'un plat à mes yeux. Le pecorino sarde affiné, le gorgonzola et le Grana Padano AOP sont les fromages vers lesquels je reviens toujours ; cacio e pepe, spaghetti alle vongole et un beau filet de bœuf sont les plats que je ne refuse jamais.",
+    "de": "Ich esse gern gut, und ein gutes Sandwich aus echten Zutaten ist mir so viel wert wie ein Teller im Restaurant. Gereifter sardischer Pecorino, Gorgonzola und Grana Padano DOP sind die Käsesorten, zu denen ich immer zurückkehre; Cacio e Pepe, Spaghetti alle Vongole und ein gutes Rinderfilet sind die Gerichte, die ich nie ablehne."
+  },
+  "Clubs aren't my thing: I'd rather organise small parties at the farm, where it's quieter and you actually get to enjoy the people around you. Real company over crowded places, every time.": {
+    "it": "Le discoteche non fanno per me: preferisco organizzare piccole feste in cascina, dove c'è più tranquillità e ci si gode davvero le persone. Meglio la compagnia vera dei posti affollati, sempre.",
+    "fr": "Les boîtes de nuit, ce n'est pas pour moi : je préfère organiser de petites fêtes à la ferme, où c'est plus tranquille et où l'on profite vraiment des gens. La vraie compagnie plutôt que les endroits bondés, à chaque fois.",
+    "de": "Clubs sind nichts für mich: Lieber organisiere ich kleine Feste auf dem Hof, wo es ruhiger ist und man die Leute wirklich genießt. Echte Gesellschaft statt überfüllter Orte, jedes Mal."
+  },
+  "Designing and building websites and web games is what defines me. I handle everything from the idea to the code: I've delivered real sites — Cascina Fontana and Rivalta sul Mincio — and Trivia, a web game with careful design and animation. What I love is turning an idea into something you can touch on screen, then iterating and refining it down to the last detail.": {
+    "it": "Progettare e sviluppare siti web e web game è ciò che mi definisce. Mi occupo di tutto, dall'idea al codice: ho realizzato siti veri — Cascina Fontana e Rivalta sul Mincio — e Trivia, un web game curato nel design e nelle animazioni. Amo trasformare un'idea in qualcosa che si può toccare a schermo, poi iterarla e rifinirla fino all'ultimo dettaglio.",
+    "fr": "Concevoir et développer des sites web et des web games est ce qui me définit. Je m'occupe de tout, de l'idée au code : j'ai livré de vrais sites — Cascina Fontana et Rivalta sul Mincio — et Trivia, un web game soigné dans son design et ses animations. J'aime transformer une idée en quelque chose qu'on peut toucher à l'écran, puis l'itérer et l'affiner jusqu'au moindre détail.",
+    "de": "Websites und Web-Games zu gestalten und zu bauen, ist das, was mich ausmacht. Ich mache alles, von der Idee bis zum Code: Ich habe echte Websites umgesetzt — Cascina Fontana und Rivalta sul Mincio — und Trivia, ein Web-Game mit sorgfältigem Design und Animationen. Ich liebe es, eine Idee in etwas zu verwandeln, das man auf dem Bildschirm anfassen kann, und sie dann bis ins letzte Detail zu verfeinern."
+  },
+  "Everything really started here. In 2018, aged twelve, I took a restoration course at the Mantua Seminary — today Unicollege Mantova — one of the youth projects run by Santagnese10 Officina Creativa. With work gloves on I cleaned up and repaired old brick and cobblestone walls: the first time I put my hands on a historic building, and it stayed with me. Not long after, I chose the CAT programme.": {
+    "it": "Tutto, in fondo, è cominciato da qui. Nel 2018, a dodici anni, ho seguito un corso di restauro al Seminario di Mantova — oggi Unicollege Mantova — tra le iniziative per i giovani di Santagnese10 Officina Creativa. Con i guanti da lavoro ho ripulito e rimesso in sesto vecchi muri di mattoni e ciottoli: la prima volta che mettevo le mani su un edificio storico, e mi è rimasta dentro. Di lì a poco avrei scelto il CAT.",
+    "fr": "Tout a vraiment commencé ici. En 2018, à douze ans, j'ai suivi un cours de restauration au Séminaire de Mantoue — aujourd'hui Unicollege Mantova — parmi les initiatives pour les jeunes de Santagnese10 Officina Creativa. Avec des gants de travail, j'ai nettoyé et remis en état de vieux murs de briques et de galets : la première fois que je mettais les mains sur un bâtiment historique, et cela m'est resté. Peu après, j'ai choisi le cursus CAT.",
+    "de": "Angefangen hat eigentlich alles hier. 2018, mit zwölf, besuchte ich einen Restaurierungskurs am Seminar von Mantua — heute Unicollege Mantova — eine der Jugendinitiativen von Santagnese10 Officina Creativa. Mit Arbeitshandschuhen habe ich alte Ziegel- und Kieselmauern gereinigt und instand gesetzt: das erste Mal, dass ich Hand an ein historisches Gebäude legte, und es blieb bei mir. Kurz darauf wählte ich den CAT-Zweig."
+  },
+  "I grew up lending a hand in the family business — not as a pastime, but as the way I learned what real work means. I drive the farm machinery, including the Landini L25 Testacalda from 1957, and with my father I look after parks, pools and outdoor spaces. Concrete work, made of hands, seasons and attention to detail.": {
+    "it": "Sono cresciuto dando una mano nell'attività di famiglia: non un passatempo, ma il modo in cui ho imparato cosa significhi lavorare davvero. Guido le macchine operatrici della cascina, compreso il Landini L25 Testacalda del 1957, e con mio padre mi occupo di parchi, piscine e arredi esterni. Un lavoro concreto, fatto di mani, stagioni e attenzione ai dettagli.",
+    "fr": "J'ai grandi en donnant un coup de main dans l'entreprise familiale : pas un passe-temps, mais la façon dont j'ai appris ce que signifie travailler vraiment. Je conduis les engins de la ferme, dont le Landini L25 Testacalda de 1957, et avec mon père je m'occupe des parcs, des piscines et des espaces extérieurs. Un travail concret, fait de mains, de saisons et d'attention au détail.",
+    "de": "Ich bin damit aufgewachsen, im Familienbetrieb mitzuhelfen — kein Zeitvertreib, sondern die Art, wie ich gelernt habe, was echte Arbeit bedeutet. Ich fahre die Landmaschinen, darunter den Landini L25 Testacalda von 1957, und kümmere mich mit meinem Vater um Parks, Pools und Außenanlagen. Konkrete Arbeit aus Händen, Jahreszeiten und Liebe zum Detail."
+  },
+  "In the family business I've taken over everything digital: online orders, the satellite imagery we use to prepare quotes, and the listings for second-hand sales. It's where my two sides — the hands-on one and the digital one — meet, and where I first saw that software can make real work lighter.": {
+    "it": "Nell'azienda di famiglia ho preso in carico tutto il lato digitale: gli ordini online, le foto satellitari che servono a preparare i preventivi e gli annunci per la vendita dell'usato. È qui che le mie due anime — quella pratica e quella digitale — si incontrano, ed è qui che ho visto per la prima volta come il software possa alleggerire il lavoro vero.",
+    "fr": "Dans l'entreprise familiale, j'ai pris en charge tout le côté numérique : les commandes en ligne, les images satellite qui servent à préparer les devis et les annonces pour la vente d'occasion. C'est là que mes deux facettes — la pratique et la numérique — se rencontrent, et là que j'ai vu pour la première fois que le logiciel peut alléger le travail réel.",
+    "de": "Im Familienbetrieb habe ich alles Digitale übernommen: Online-Bestellungen, die Satellitenbilder für die Angebotserstellung und die Anzeigen für den Gebrauchtverkauf. Hier treffen sich meine beiden Seiten — die praktische und die digitale — und hier habe ich zum ersten Mal gesehen, dass Software echte Arbeit leichter machen kann."
+  },
+  "For two summers I was a group leader at the Grest in Rivalta sul Mincio, and I gave a hand at the CRED summer school in Rodigo, working with children. Being among people, leading a group, inventing activities: it gives me energy — and it taught me to keep calm when a plan falls apart.": {
+    "it": "Per due estati ho fatto l'animatore al Grest di Rivalta sul Mincio e ho dato una mano al CRED di Rodigo, con i bambini. Stare in mezzo agli altri, guidare un gruppo, inventare attività: mi dà energia — e mi ha insegnato a mantenere la calma quando un programma salta.",
+    "fr": "Pendant deux étés j'ai été animateur au Grest de Rivalta sul Mincio, et j'ai donné un coup de main au CRED de Rodigo, auprès des enfants. Être parmi les gens, guider un groupe, inventer des activités : ça me donne de l'énergie — et ça m'a appris à garder mon calme quand un programme s'effondre.",
+    "de": "Zwei Sommer lang war ich Betreuer beim Grest in Rivalta sul Mincio und habe beim CRED in Rodigo mit Kindern ausgeholfen. Unter Menschen zu sein, eine Gruppe zu führen, Aktivitäten zu erfinden: Das gibt mir Energie — und es hat mich gelehrt, ruhig zu bleiben, wenn ein Plan platzt."
+  },
+  "My goal is to take over Punto Energy Service, the «Home Engineer» store in Medole — batteries, chargers, lubricants and spare parts for cars and vehicles — and grow it by building it an e-commerce of my own, to sell online and reach far more customers. It's where the skills I already use every day become a life project.": {
+    "it": "Il mio obiettivo è rilevare Punto Energy Service, il punto vendita «Home Engineer» di Medole — batterie, caricabatterie, lubrificanti e ricambi per auto e automezzi — e farlo crescere costruendogli un e-commerce tutto mio, per vendere online e raggiungere molti più clienti. È qui che le competenze che già uso ogni giorno diventano un progetto di vita.",
+    "fr": "Mon objectif est de reprendre Punto Energy Service, le point de vente «Home Engineer» de Medole — batteries, chargeurs, lubrifiants et pièces détachées pour voitures et véhicules — et de le faire grandir en lui construisant un e-commerce bien à moi, pour vendre en ligne et toucher beaucoup plus de clients. C'est là que les compétences que j'utilise déjà chaque jour deviennent un projet de vie.",
+    "de": "Mein Ziel ist es, Punto Energy Service zu übernehmen, den «Home Engineer»-Laden in Medole — Batterien, Ladegeräte, Schmierstoffe und Ersatzteile für Autos und Fahrzeuge — und ihn wachsen zu lassen, indem ich ihm einen eigenen Online-Shop baue, um online zu verkaufen und viel mehr Kunden zu erreichen. Hier werden die Fähigkeiten, die ich täglich nutze, zu einem Lebensprojekt."
+  },
+  "Design & UX": {
+    "it": "Design e UX",
+    "fr": "Design & UX",
+    "de": "Design & UX"
+  },
+  "AI-assisted development": {
+    "it": "Sviluppo assistito dall'IA",
+    "fr": "Développement assisté par l'IA",
+    "de": "KI-gestützte Entwicklung"
+  },
+  "Tools & Workflow": {
+    "it": "Strumenti e workflow",
+    "fr": "Outils & workflow",
+    "de": "Tools & Workflow"
+  },
+  "CAT technical area": {
+    "it": "Area tecnica CAT",
+    "fr": "Domaine technique CAT",
+    "de": "CAT-Fachbereich"
+  },
+  "IT & multimedia": {
+    "it": "IT e multimedia",
+    "fr": "IT & multimédia",
+    "de": "IT & Multimedia"
+  },
+  "On the ground": {
+    "it": "Sul campo",
+    "fr": "Sur le terrain",
+    "de": "Im Einsatz"
+  },
+  "Responsive Design": {
+    "it": "Design responsive",
+    "fr": "Design responsive",
+    "de": "Responsive Design"
+  },
+  "Motion": {
+    "it": "Animazioni",
+    "fr": "Animation",
+    "de": "Motion Design"
+  },
+  "Tractors & forklifts": {
+    "it": "Trattori e muletti",
+    "fr": "Tracteurs & chariots élévateurs",
+    "de": "Traktoren & Gabelstapler"
+  },
+  "Grounds & pool upkeep": {
+    "it": "Manutenzione verde e piscine",
+    "fr": "Entretien des espaces verts & piscines",
+    "de": "Pflege von Grünflächen & Pools"
+  },
+  "Site logistics": {
+    "it": "Logistica di cantiere",
+    "fr": "Logistique de chantier",
+    "de": "Baustellenlogistik"
+  },
+  "Team coordination": {
+    "it": "Coordinamento della squadra",
+    "fr": "Coordination d'équipe",
+    "de": "Teamkoordination"
   }
 }
