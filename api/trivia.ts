@@ -39,8 +39,12 @@ export default async function handler(req: any, res: any) {
 
   try {
     const message = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 150,
+      model: "claude-fable-5",
+      // Fable 5 pensa SEMPRE (adaptive), e max_tokens è il tetto su pensiero +
+      // risposta: 150 non basterebbe. Diamo margine e teniamo l'effort "low",
+      // perché una curiosità di 1-2 frasi non richiede ragionamento profondo.
+      max_tokens: 2048,
+      output_config: { effort: "low" },
       messages: [
         {
           role: "user",
@@ -49,8 +53,10 @@ export default async function handler(req: any, res: any) {
       ],
     });
 
-    const text =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    // Su Fable 5 il primo blocco è di pensiero (testo vuoto): prendo il primo
+    // blocco di testo vero, non content[0].
+    const textBlock = message.content.find((b) => b.type === "text");
+    const text = textBlock && textBlock.type === "text" ? textBlock.text : "";
 
     res.setHeader("Cache-Control", "public, max-age=86400"); // Cache per 24h
     return res.status(200).json({ word, trivia: text.trim() });

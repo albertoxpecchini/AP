@@ -114,7 +114,7 @@ function buildSeq(c: Copy): string {
     EXT-->>BR: ${c.leaderboards}
     BR->>VC: GET /api/trivia · ${c.word}
     activate VC
-    VC->>EXT: Anthropic Claude (Haiku)
+    VC->>EXT: Anthropic Claude (Fable 5)
     EXT-->>VC: ${c.curiosity}
     VC-->>BR: JSON (cache 24 h)
     deactivate VC

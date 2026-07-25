@@ -4,6 +4,7 @@ import { SOCIALS } from "./data";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import GitHubFooterWidget from "./GitHubFooterWidget";
 import WorkflowModal from "./WorkflowModal";
+import ReadmeModal from "./ReadmeModal";
 
 // Locale della data "Updated": segue la lingua attiva, così anche il MESE è
 // nella lingua giusta. Il resto del footer lo traduce il motore i18n dal
@@ -62,7 +63,11 @@ export default function SiteFooter() {
 
         <div className="apf-bottom">
           <span>© {year} Alberto Pecchini — All rights reserved</span>
-          <WorkflowModal />
+          <div className="apf-links">
+            <ReadmeModal />
+            <span className="apf-sep" aria-hidden="true">·</span>
+            <WorkflowModal />
+          </div>
           <span>Updated {updated}</span>
         </div>
       </div>
@@ -108,6 +113,8 @@ export default function SiteFooter() {
           border-top: 1px solid rgba(255, 255, 255, 0.08);
           color: #8893a0; font-size: 0.86rem;
         }
+        .apf-links { display: inline-flex; align-items: center; gap: 0.6rem; }
+        .apf-sep { color: #4a515c; }
         @media (max-width: 640px) {
           .apf-social { justify-content: flex-start; }
         }

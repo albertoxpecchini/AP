@@ -54,11 +54,15 @@ function triviaDevApi() {
         if (word.length < 3) { res.statusCode = 400; res.end('{}'); return }
         try {
           const msg = await client.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 150,
+            model: 'claude-fable-5',
+            // Fable 5 pensa sempre: max_tokens copre pensiero + risposta, effort
+            // "low" perché è solo una curiosità di 1-2 frasi (come api/trivia.ts).
+            max_tokens: 2048,
+            output_config: { effort: 'low' },
             messages: [{ role: 'user', content: `Genera una breve curiosità o fatto interessante sulla parola italiana "${word.toUpperCase()}" in 1-2 frasi. Scrivi direttamente il fatto senza premesse.` }],
           })
-          const text = msg.content[0].type === 'text' ? msg.content[0].text : ''
+          const textBlock = msg.content.find((b: any) => b.type === 'text')
+          const text = textBlock ? textBlock.text : ''
           res.setHeader('Content-Type', 'application/json')
           res.end(JSON.stringify({ word, trivia: text.trim() }))
         } catch (err: any) {
