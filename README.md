@@ -50,14 +50,14 @@ e tema chiaro/scuro nativo.
 
 | Dominio | Valore | Dettaglio |
 | :--- | :--- | :--- |
-| **Codebase** | **~31,1k LOC** in `src/` | 92 file: 40 `.tsx` (17,3k) · 32 `.ts` (5,1k) · 20 `.css` (8,8k) |
+| **Codebase** | **~31,6k LOC** in `src/` | 93 file: 40 `.tsx` (17,6k) · 32 `.ts` (4,9k) · 21 `.css` (9,2k) |
 | **Backend + tooling** | **~1,8k LOC** fuori da `src/` | 7 funzioni `api/` + `lib/` (889) · `scripts/` (893) |
 | **Dipendenze** | **13 runtime** + 9 dev | niente framework pesanti, tutto essenziale |
 | **Pagine** | **11 rotte** | 1 hub + 10 pagine `React.lazy`, code-split per rotta |
-| **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1010 voci generate |
+| **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1011 voci generate |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
 | **Serverless** | **7 funzioni** in `api/` | trivia · notify · festa-rsvp · sponsor · ig-stats · d · cron |
-| **Cronologia** | **334 commit** dal 2026-05-24 | 164 `feat` · 78 `fix` · 25 `style` · 15 `chore` · 6 `refactor` |
+| **Cronologia** | **336 commit** dal 2026-05-24 | 165 `feat` · 78 `fix` · 25 `style` · 15 `chore` · 6 `refactor` |
 
 ---
 
@@ -69,19 +69,25 @@ colonne, griglia prodotti a 12 colonne con card a bordo-gradiente, pannello «da
 dello stack con codice vero, story-card, muro community, sezione open source, CTA finale) portata
 su ogni pagina.
 
-- **Prefisso `.sb-`** — tutti i token e le classi vivono in [`src/app/home.css`](src/app/home.css) (1706 righe),
+- **Prefisso `.sb-`** — tutti i token e le classi vivono in [`src/app/home.css`](src/app/home.css) (1528 righe),
   ereditati da footer, ControlBar, archivio e pagine interne.
 - **Tema chiaro/scuro NATIVO** — non due fogli di stile, ma un set di custom properties ridichiarate
   sotto `html.dark`. Il chiaro è il default.
 - **Palette neutra + un solo colore** — grigi puri per fondali, bordi e testo; l'unica tinta è il
   **verde brand `hsl(153 60% 53%)`**. L'arancio Ubuntu resta come **identità storica** (documentato,
   non più dominante).
+- **Un fondale solo, per tutta la pagina** — `.sb-bg` è `position: fixed`: due velature radiali
+  (verde e ciano) e una griglia tecnica che si dissolve verso il basso, incollate alla finestra.
+  Nessun bordo di sezione può tagliarlo mentre si scorre, quindi **fra una sezione e l'altra non
+  c'è nessun confine**; il contenuto scorre sopra, trasparente. Anche il footer non comincia con un
+  bordo: il suo colore entra in **dissolvenza** dall'alto.
 - **Tipografia Ubuntu** — il carattere del sito resta Ubuntu (+ Ubuntu Mono; Lora solo per `/festa`),
   al posto del Circular di Supabase.
 - **CSS per pagina** — ogni pagina ha il suo file accanto al componente
   (`bio.css`, `pcto.css`, `mestesso.css`, `instagram.css`, `sostieni.css`, `trivia.css`,
-  `archivio.css`, `controlbar.css`, `palette.css`, `scrollprogress.css`), importato dal componente
-  stesso: nessun foglio monolitico, e il code-splitting per rotta porta con sé anche lo stile.
+  `archivio.css`, `controlbar.css`, `palette.css`, `scrollprogress.css`, `workflow.css`), importato
+  dal componente stesso: nessun foglio monolitico, e il code-splitting per rotta porta con sé anche
+  lo stile.
 
 **La palette per intero è consultabile dal sito**: footer → **«Palette»**
 ([`PaletteModal.tsx`](src/app/site/PaletteModal.tsx)) apre una finestra con tutte le tinte in uso —
@@ -109,23 +115,42 @@ successivo**, poi il sensore riprende il comando. Il tema si riflette su `<html>
 
 ---
 
-## 🌀 Movimento — GSAP + `prefers-reduced-motion`
+## 🌀 Movimento — GSAP, e soprattutto quello che è stato tolto
 
-Il movimento è diviso per responsabilità, non sparso nei componenti:
+Il sito ha attraversato una fase in cui **ogni blocco si annunciava**: reveal a cascata allo scroll,
+riflessi che seguivano il puntatore dentro i pannelli, lampi in diagonale all'ingresso nelle card,
+alone della hero con inerzia, e una manciata di loop CSS infiniti (sheen dei bottoni, aurora, deriva
+della griglia, shimmer degli scheletri, lancetta). **È stato quasi tutto rimosso**, con la
+motivazione scritta nel codice dove stava l'effetto:
 
-- [`site/homeMotion.ts`](src/app/site/homeMotion.ts) — la regia della home: reveal a cascata sullo
-  scroll, effetti da puntatore, sequenze. Tutto in `gsap.context()` con `revert()` al dismount.
+> Ogni blocco entrava in scena da opacità 0 salendo di una ventina di pixel: scendendo piano si
+> vedeva la pagina «ricaricarsi» un blocco alla volta, con quella dissolvenza chiara che faceva
+> sembrare lo scroll a scatti. Il contenuto adesso c'è e basta — **scorrere una pagina non è un
+> evento da annunciare.**
+
+Quel che resta è diviso per responsabilità, non sparso nei componenti:
+
+- [`site/homeMotion.ts`](src/app/site/homeMotion.ts) — regia della home. Restano l'**intro della
+  hero** (una timeline sola, che parte al caricamento) e i **contatori** che si accendono arrivando
+  a vista. Nessun reveal allo scroll.
 - [`site/footMotion.ts`](src/app/site/footMotion.ts) — regia **separata** del footer, perché il footer
-  vive su ogni pagina e deve accendersi anche in fondo a Trivia o all'archivio (sulla home i suoi
-  elementi sono esclusi a mano da `homeMotion`, così a comandare è sempre un file solo).
-  Include i «magneti»: card, icone social e chip che si sporgono di 7 px verso il cursore.
+  vive su ogni pagina e deve funzionare anche in fondo a Trivia o all'archivio (sulla home i suoi
+  elementi sono esclusi a mano da `homeMotion`, così a comandare è sempre un file solo). Restano i
+  contatori — armati da un `MutationObserver`, perché i numeri del widget GitHub arrivano dalla rete
+  **dopo** il montaggio — e i **magneti**: card, icone social e chip che si sporgono al massimo di
+  7 px verso il cursore, con un solo ascoltatore in delega su tutto il footer.
 - [`site/homeLive.tsx`](src/app/site/homeLive.tsx) — i visual delle card non sono fermi immagine:
   orologio di Mantova in diretta, ticker dei progetti in corso, terminale che scrive, HUD di gioco,
-  radar, grafico contribuzioni. Ogni pezzo monta il suo loop e lo smonta da solo.
-- **Loop puramente decorativi in CSS** (`home.css`), così girano anche se il JS arriva tardi.
+  cubo, grafico contribuzioni. Ogni pezzo monta il suo loop e lo smonta da solo — sono **contenuto**
+  della card, non decorazione della pagina.
+- [`site/ScrollProgress.tsx`](src/app/site/ScrollProgress.tsx) — l'avanzamento della lettura. Prima
+  cresceva sul filo del footer, cioè si vedeva **solo una volta arrivati in fondo**, quando non
+  serviva più; ora sta in cima alla finestra, su ogni pagina. È l'unica cosa che **resta accesa
+  anche con `prefers-reduced-motion`** (senza inerzia): è informazione sulla pagina, e a muoverla
+  è lo scroll dell'utente.
 - `gsap.matchMedia()` ovunque: **`prefers-reduced-motion` spegne ogni movimento autonomo**, e gli
-  effetti da puntatore si montano solo con `(hover: hover)`. Resta acceso solo il filo di
-  avanzamento — è informazione sulla pagina, non decorazione.
+  effetti da puntatore si montano solo con `(hover: hover) and (pointer: fine)`. Tutto si smonta con
+  `mm.revert()` — niente doppioni al cambio pagina.
 - Regola ferrea: **niente split del testo traducibile** — il motore i18n cammina sui nodi di testo
   e trovarsi uno `<span>` per lettera lo manderebbe fuori strada.
 
@@ -253,9 +278,10 @@ AP/
 │   ├── app/
 │   │   ├── App.tsx           # Home «piattaforma» + header/menu inline
 │   │   ├── home.css          # il design system .sb- (token, layout, loop CSS)
-│   │   ├── site/             # footer, nav, dati, progetti, README, modali,
+│   │   ├── site/             # footer, nav, dati, progetti, README dei progetti,
 │   │   │                     #   homeIcons/homeLive/homeMotion/footMotion,
-│   │   │                     #   repoTree, PaletteModal, ScrollProgress
+│   │   │                     #   repoTree, PaletteModal, ScrollProgress,
+│   │   │                     #   WorkflowModal + workflow.css (diagramma in CSS)
 │   │   ├── theme/            # ControlBar (lingua·tema·sensore) + themeCore
 │   │   ├── trivia/           # gioco quiz + parser + API leaderboard/pagelle/progressi
 │   │   ├── bio  pcto  me-stesso  dubliners  gattopardo  festa  archivio  sostieni  instagram
@@ -276,7 +302,14 @@ Dalla **sorgente** (testi, dati, immagini, codice) agli **artefatti** prodotti d
 (PDF · ZIP · `repo-tree.json` · bundle · service worker), fino al **deploy** su Vercel e ai **dati live**
 che il browser richiede a runtime (GitHub, Supabase, `/api`).
 
-> Lo stesso schema è consultabile dal sito: **footer → «Come funziona»** (finestra interna).
+> **Lo stesso schema è consultabile dal sito**: footer → **«Come funziona»**
+> ([`WorkflowModal.tsx`](src/app/site/WorkflowModal.tsx)). Qui sotto è un blocco `mermaid`, che
+> GitHub renderizza da sé; **il sito però non usa Mermaid**. Il diagramma di sequenza è disegnato
+> a mano con una griglia CSS (`.apw-`, [`workflow.css`](src/app/site/workflow.css)): una colonna per
+> partecipante, linea di vita tratteggiata, barra di attività verde, messaggi che scavalcano le
+> colonne. Così segue il tema chiaro/scuro del sito, parla tutte e 4 le lingue, e **sotto i 780 px
+> diventa un elenco di passi** — con lo stesso markup, è React a deciderlo via `matchMedia`.
+> Il vantaggio vero: non si porta dietro una libreria intera per un solo diagramma.
 
 ```mermaid
 sequenceDiagram
@@ -346,8 +379,8 @@ sequenceDiagram
 | **Core** | React 18.3 · TypeScript · Vite 6.3 |
 | **Routing** | `react-router` 7 (BrowserRouter, `lazy` + `Suspense`) + mappa host → pagina per i sottodomini |
 | **Styling** | design system `.sb-` in CSS puro (custom properties, tema nativo) · Tailwind CSS 4.1 · `tw-animate-css` |
-| **Motion** | `gsap` 3.15 + ScrollTrigger (home, footer, filo di lettura, card vive) · `motion` (Framer Motion 12) su home e switcher lingua · `canvas-confetti` in Trivia |
-| **UI** | icone `homeIcons.tsx` disegnate a mano (outline 24×24, tratto 1.5) · `lucide-react` + `react-icons` dove serve · `@radix-ui/react-context-menu` (archivio) · `mermaid` (finestra «Come funziona») |
+| **Motion** | `gsap` 3.15 + ScrollTrigger (intro della hero, contatori, magneti, filo di lettura, card vive) · `motion` (Framer Motion 12) su home e switcher lingua · `canvas-confetti` in Trivia |
+| **UI** | icone `homeIcons.tsx` disegnate a mano (outline 24×24, tratto 1.5) · `lucide-react` + `react-icons` dove serve · `@radix-ui/react-context-menu` (archivio) · diagrammi disegnati in CSS, senza librerie |
 | **i18n** | motore proprietario che traduce il DOM in IT · EN · FR · DE |
 | **PWA** | `vite-plugin-pwa` + Workbox (precache offline, auto-update) |
 | **Backend** | Supabase via REST/Realtime · 7 funzioni serverless Vercel + `lib/serverSecurity` |
@@ -355,9 +388,10 @@ sequenceDiagram
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
 | **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero |
 
-> `three` e `vanta` restano elencati fra le dipendenze e nelle esclusioni del service worker, ma
-> **non sono più importati da nessun modulo di `src/`**: gli sfondi animati sono stati sostituiti
-> dalla regia GSAP.
+> **Dipendenze rimaste indietro.** `three` e `vanta` (sfondi animati, sostituiti dalla regia GSAP)
+> e `mermaid` (il diagramma «Come funziona», ora disegnato in CSS) sono ancora elencati in
+> `package.json` — e `three`/`vanta` anche nelle esclusioni del service worker — ma **non sono più
+> importati da nessun modulo di `src/`**: non finiscono nel bundle, solo in `node_modules`.
 
 ---
 
