@@ -8,10 +8,10 @@
 // terminale) portano data-no-i18n + translate="no" — il traduttore DOM non deve
 // inseguire testo che cambia da solo.
 // ─────────────────────────────────────────────────────────────────────────────
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { SiteLink } from "./nav";
-import { IcCompass, IcArrowUpRight } from "./homeIcons";
+import { IcArrowUpRight } from "./homeIcons";
 
 /** Il movimento decorativo si accende solo se l'utente non l'ha disattivato. */
 function motionOK() {
@@ -19,7 +19,7 @@ function motionOK() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Hero — riga di stato "in diretta" + ticker dei progetti in corso
+   Hero — riga di stato "in diretta" + bottoni dei progetti in corso
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const clock = () =>
@@ -50,88 +50,120 @@ export function LiveStatus() {
   );
 }
 
-/* Le voci del ticker sono i siti veri, ognuna col suo link: Trivia e l'archivio
-   restano dentro il sito (SiteLink gestisce i sottodomini), i due siti dei
-   clienti aprono in una scheda nuova. */
+/* I lavori in corso. Se ne vede uno alla volta: per aggiungerne un altro basta
+   una riga qui sotto — la giostra si adatta da sola, e con una voce sola sta
+   ferma. `route: true` per le pagine di casa (SiteLink gestisce i
+   sottodomini), altrimenti il sito del cliente si apre in una scheda nuova. */
 const BUILDING: { name: string; href: string; route?: boolean }[] = [
-  { name: "Trivia", href: "/trivia", route: true },
   { name: "Cascina Fontana", href: "https://cascinafontana.xyz" },
   { name: "Rivalta sul Mincio", href: "https://rivaltasulmincio.it" },
-  { name: "albertopecchini.it", href: "/archivio", route: true },
 ];
 
-/** La voce più lunga detta la larghezza: così la riga non si allarga a scatti. */
-const LONGEST = BUILDING.reduce((a, b) => (b.name.length > a.name.length ? b : a)).name;
+/** Quanto resta fermo un nome prima di dare il cambio. */
+const BUILD_HOLD = 3400;
 
+/* Un bottone vero alla volta: entra da sotto la finestrella, resta fermo il
+   tempo di leggerlo e di premerlo, esce da sopra. Nel DOM ce n'è sempre uno
+   solo — niente pile in position:absolute, niente turni da sincronizzare: il
+   bersaglio è pieno e premibile per intero. E finché il puntatore (o il focus)
+   sta dentro, il turno salta: un bersaglio che scappa mentre lo miri non è un
+   bersaglio. */
 export function NowBuilding() {
-  const ref = useRef<HTMLSpanElement>(null);
+  const [i, setI] = useState(0);
+  const itemRef = useRef<HTMLSpanElement>(null);
+  const held = useRef(false);
+  const first = useRef(true);
+  const cur = BUILDING[i];
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !motionOK()) return;
+  // useLayoutEffect e non useEffect: il nome nuovo deve trovarsi già fuori
+  // dalla finestrella al primo frame, altrimenti lampeggia al suo posto prima
+  // di saltare giù.
+  useLayoutEffect(() => {
+    const item = itemRef.current;
+    if (!item) return;
 
-    const ctx = gsap.context(() => {
-      const items = gsap.utils.toArray<HTMLElement>(".sb-rot-item", el);
-      gsap.set(items, { yPercent: 110, autoAlpha: 0 });
-      gsap.set(items[0], { yPercent: 0, autoAlpha: 1 });
-      items[0].classList.add("is-on");
+    const anim = motionOK();
+    let alive = true;
+    let timer = 0;
 
-      // Solo la voce a schermo è premibile: le altre sono fuori dalla finestra
-      // e non devono intercettare il clic durante l'incrocio.
-      const tl = gsap.timeline({ repeat: -1 });
-      items.forEach((item, i) => {
-        const next = items[(i + 1) % items.length];
-        tl.to({}, { duration: 2.6 })
-          .call(() => item.classList.remove("is-on"))
-          .to(item, { yPercent: -110, autoAlpha: 0, duration: 0.5, ease: "power2.in" })
-          .fromTo(
-            next,
-            { yPercent: 110, autoAlpha: 0 },
-            {
-              yPercent: 0,
-              autoAlpha: 1,
-              duration: 0.5,
-              ease: "power2.out",
-              onComplete: () => next.classList.add("is-on"),
-            },
-            "-=0.25",
-          );
-      });
-    }, el);
+    // Il primo nome è già al suo posto: si anima solo chi arriva dopo.
+    if (first.current) first.current = false;
+    else if (anim) {
+      gsap.fromTo(
+        item,
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out" },
+      );
+    }
 
-    return () => ctx.revert();
-  }, []);
+    if (BUILDING.length > 1) {
+      const advance = () => {
+        if (alive) setI((v) => (v + 1) % BUILDING.length);
+      };
+      const turn = () => {
+        if (!alive) return;
+        if (held.current) {
+          timer = window.setTimeout(turn, BUILD_HOLD);
+          return;
+        }
+        if (anim) {
+          gsap.to(item, {
+            yPercent: -115,
+            autoAlpha: 0,
+            duration: 0.32,
+            ease: "power2.in",
+            onComplete: advance,
+          });
+        } else advance();
+      };
+      timer = window.setTimeout(turn, BUILD_HOLD);
+    }
+
+    return () => {
+      alive = false;
+      window.clearTimeout(timer);
+      gsap.killTweensOf(item);
+    };
+  }, [i]);
+
+  const hold = (on: boolean) => () => {
+    held.current = on;
+  };
 
   return (
-    <p className="sb-nowbuild">
+    <div className="sb-nowbuild">
       <span className="sb-nowbuild-label">Currently building</span>
-      <span className="sb-rot" ref={ref} data-no-i18n translate="no">
-        {/* Fantasma che tiene la larghezza della voce più lunga */}
-        <span className="sb-rot-sizer" aria-hidden="true">
-          {LONGEST}
-          <IcArrowUpRight size={13} />
-        </span>
-        {BUILDING.map((b) =>
-          b.route ? (
-            <SiteLink key={b.name} to={b.href} className="sb-rot-item">
-              {b.name}
-              <IcArrowUpRight size={13} />
+      <span
+        className="sb-nowbuild-slot"
+        data-no-i18n
+        translate="no"
+        onPointerEnter={hold(true)}
+        onPointerLeave={hold(false)}
+        onFocus={hold(true)}
+        onBlur={hold(false)}
+      >
+        {/* key sul nome: il turno smonta il vecchio e monta il nuovo, così la
+            fromTo di entrata parte sempre da un nodo pulito. */}
+        <span className="sb-nowbuild-item" key={cur.name} ref={itemRef}>
+          {cur.route ? (
+            <SiteLink to={cur.href} className="sb-nowbuild-btn">
+              {cur.name}
+              <IcArrowUpRight size={13} aria-hidden="true" />
             </SiteLink>
           ) : (
             <a
-              key={b.name}
-              href={b.href}
+              href={cur.href}
               target="_blank"
               rel="noreferrer noopener"
-              className="sb-rot-item"
+              className="sb-nowbuild-btn"
             >
-              {b.name}
-              <IcArrowUpRight size={13} />
+              {cur.name}
+              <IcArrowUpRight size={13} aria-hidden="true" />
             </a>
-          ),
-        )}
+          )}
+        </span>
       </span>
-    </p>
+    </div>
   );
 }
 
@@ -212,7 +244,6 @@ export function BrowserMock() {
         <div className="sb-skel sb-skel--foot" />
         <span className="sb-browser-cursor" />
       </div>
-      <span className="sb-sheen" />
     </div>
   );
 }
@@ -462,61 +493,130 @@ export function ClientFlow() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "CAT" — carta millimetrata con radar che spazza e bussola che ruota
+   Card "CAT" — piano cartesiano in tre dimensioni con un cubo che ci galleggia
+   sopra. È 3D vero (perspective + preserve-3d, sei facce): il cubo respira
+   piano da fermo e, quando ci si passa sopra, si gira verso il puntatore —
+   trascinandolo in orizzontale lo si fa ruotare su sé stesso, alzando e
+   abbassando lo si guarda da sopra o da sotto.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function BlueprintRadar() {
+const CUBE_FACES = ["front", "back", "right", "left", "top", "bottom"] as const;
+
+/** Posa di riposo del cubo: assonometria leggibile, un vertice verso di noi. */
+const CUBE_REST = { rotationX: -22, rotationY: 32 };
+
+export function CatCube() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const cube = el.querySelector<HTMLElement>(".sb-cat-cube");
+    const lift = el.querySelector<HTMLElement>(".sb-cat-lift");
+    const shadow = el.querySelector<HTMLElement>(".sb-cat-shadow");
+    if (!cube || !lift || !shadow) return;
+
+    // Movimento ridotto: il cubo resta nella posa di riposo, appoggiato in aria.
+    if (!motionOK()) {
+      gsap.set(cube, CUBE_REST);
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.set(cube, CUBE_REST);
+
+      // ── Galleggiamento: sale e scende piano, e l'ombra sul piano si stringe
+      //    mentre sale. Sta sul portacubo, non sul cubo.
+      const float = gsap
+        .timeline({ repeat: -1, yoyo: true, defaults: { duration: 2.6, ease: "sine.inOut" } })
+        .to(lift, { y: -13 }, 0)
+        .to(shadow, { scale: 0.78, opacity: 0.55 }, 0);
+
+      // ── Giro lento da fermo. Anche questo sul PORTACUBO: il cubo è centrato
+      //    sul suo asse verticale, quindi gira su sé stesso — e le rotazioni
+      //    del puntatore, che stanno sul cubo, non si sovrascrivono con questa.
+      const idle = gsap.to(lift, { rotationY: "+=360", duration: 26, ease: "none", repeat: -1 });
+
+      // ── Sotto il puntatore comanda la mano: trascinando in orizzontale il
+      //    cubo ruota, alzando e abbassando lo si guarda da sopra o da sotto.
+      const rotX = gsap.quickTo(cube, "rotationX", { duration: 0.7, ease: "power3" });
+      const rotY = gsap.quickTo(cube, "rotationY", { duration: 0.7, ease: "power3" });
+
+      // Il puntatore comanda dall'intera card, non dal solo riquadro: il cubo
+      // reagisce già mentre si legge il testo qui accanto.
+      const zone = el.closest<HTMLElement>(".sb-card") ?? el;
+
+      const move = (e: PointerEvent) => {
+        const r = el.getBoundingClientRect();
+        const nx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        const ny = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        rotX(gsap.utils.clamp(-62, 62, CUBE_REST.rotationX - ny * 38));
+        rotY(gsap.utils.clamp(-90, 90, CUBE_REST.rotationY + nx * 72));
+      };
+      const enter = () => {
+        idle.pause();
+        gsap.to(float, { timeScale: 1.8, duration: 0.4 });
+      };
+      const leave = () => {
+        gsap.to(float, { timeScale: 1, duration: 0.6 });
+        // Rientro alla posa di riposo con gli STESSI quickTo dell'inseguimento:
+        // un tween in più sulle stesse proprietà si metterebbe a litigare con
+        // quello ancora in volo se si esce dalla card di corsa.
+        rotX(CUBE_REST.rotationX);
+        rotY(CUBE_REST.rotationY);
+        idle.play();
+      };
+
+      zone.addEventListener("pointermove", move);
+      zone.addEventListener("pointerenter", enter);
+      zone.addEventListener("pointerleave", leave);
+      return () => {
+        zone.removeEventListener("pointermove", move);
+        zone.removeEventListener("pointerenter", enter);
+        zone.removeEventListener("pointerleave", leave);
+      };
+    }, el);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="sb-blueprint" aria-hidden="true">
-      <span className="sb-blueprint-sweep" />
-      <span className="sb-blueprint-needle">
-        <IcCompass size={44} />
-      </span>
-      <svg className="sb-blueprint-dim" viewBox="0 0 300 116" fill="none" preserveAspectRatio="none">
-        <path d="M24,96 H276" strokeWidth="1" />
-        <path d="M24,90 V102M276,90 V102" strokeWidth="1" />
-      </svg>
+    <div className="sb-cat" ref={ref} aria-hidden="true">
+      <div className="sb-cat-stage">
+        <span className="sb-cat-plane" />
+        <span className="sb-cat-origin">
+          <span className="sb-cat-shadow" />
+          <span className="sb-cat-z" />
+          <span className="sb-cat-lift">
+            <span className="sb-cat-cube">
+              {CUBE_FACES.map((f) => (
+                <span key={f} className={`sb-cat-face sb-cat-face--${f}`} />
+              ))}
+            </span>
+          </span>
+        </span>
+      </div>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Sezione open source — muro dei commit: le celle si accendono a ondate
+   Sezione open source — muro dei commit, fermo.
+   Prima un'onda di calore lo attraversava in continuazione: 119 celle in
+   animazione perenne, un ridisegno a ogni frame anche mentre si scorreva
+   dall'altra parte della pagina. Il muro dice già tutto da fermo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const WEEKS = 17;
 const DAYS = 7;
 
 export function ContribGraph() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !motionOK()) return;
-
-    const ctx = gsap.context(() => {
-      // Le celle sono in ordine di colonna (grid-auto-flow: column): uno
-      // stagger semplice basta perché l'onda attraversi il muro da sinistra.
-      const cells = gsap.utils.toArray<HTMLElement>(".sb-cell", el);
-      gsap.to(cells, {
-        "--sb-heat": 1,
-        duration: 0.5,
-        stagger: 0.012,
-        repeat: -1,
-        yoyo: true,
-        repeatDelay: 1.6,
-        ease: "power1.inOut",
-      });
-    }, el);
-
-    return () => ctx.revert();
-  }, []);
-
   // Intensità pseudo-casuale ma stabile: stesso disegno a ogni render.
   const level = (i: number) => [0, 1, 1, 2, 0, 3, 2, 1, 4, 0, 2, 3, 1, 0][i % 14];
 
   return (
-    <div className="sb-contrib" ref={ref} aria-hidden="true">
+    <div className="sb-contrib" aria-hidden="true">
       <div className="sb-contrib-grid">
         {Array.from({ length: WEEKS * DAYS }, (_, i) => (
           <span key={i} className="sb-cell" data-lv={level(i)} />

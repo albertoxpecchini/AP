@@ -4138,10 +4138,15 @@
     "fr": "Tout le site tourne sur ce stack — pas de CMS, pas de page builder. De vrais extraits du dépôt, un par technologie.",
     "de": "Die ganze Website läuft auf diesem Stack — kein CMS, keine Page-Builder. Echte Snippets aus dem Repository, eines pro Technologie."
   },
-  "Six more pages, each with its own design system": {
-    "it": "Altre sei pagine, ognuna col suo design system",
-    "fr": "Six autres pages, chacune avec son propre design system",
-    "de": "Sechs weitere Seiten, jede mit eigenem Designsystem"
+  "Six more pages I designed and built": {
+    "it": "Altre sei pagine disegnate e costruite da me",
+    "fr": "Six autres pages que j'ai conçues et développées",
+    "de": "Sechs weitere Seiten, von mir entworfen und gebaut"
+  },
+  "Other projects of mine — some born for school, some to support myself. Different subjects, the same hand and the same design system as this page.": {
+    "it": "Altri miei progetti — alcuni nati per la scuola, altri per mantenermi. Argomenti diversi, la stessa mano e lo stesso design system di questa pagina.",
+    "fr": "D'autres de mes projets — certains nés pour l'école, d'autres pour subvenir à mes besoins. Des sujets différents, la même main et le même design system que cette page.",
+    "de": "Weitere Projekte von mir — manche für die Schule entstanden, manche um mich zu finanzieren. Andere Themen, dieselbe Hand und dasselbe Designsystem wie diese Seite."
   },
   "My personal presentation for the 2026 final state exam — who I am, my roots and the future, in a single narrated scroll.": {
     "it": "La mia presentazione personale per l'Esame di Maturità 2026 — chi sono, le mie radici e il futuro, in un unico scroll narrato.",
@@ -4273,10 +4278,10 @@
     "fr": "Lis-le, télécharge chaque projet en ZIP, réutilise ce qui t'aide.",
     "de": "Lies mit, lade jedes Projekt als ZIP herunter und verwende weiter, was dir hilft."
   },
-  "Every page ships with its own design system — and the archive lets you take the sources home.": {
-    "it": "Ogni pagina esce col suo design system — e l'archivio ti lascia portare a casa i sorgenti.",
-    "fr": "Chaque page sort avec son propre design system — et les archives te laissent emporter les sources.",
-    "de": "Jede Seite kommt mit eigenem Designsystem — und im Archiv kannst du die Quellen mitnehmen."
+  "One design system across the whole site, one repository, nothing hidden — and the archive lets you take the sources home.": {
+    "it": "Un solo design system su tutto il sito, un solo repository, niente di nascosto — e l'archivio ti lascia portare a casa i sorgenti.",
+    "fr": "Un seul design system sur tout le site, un seul dépôt, rien de caché — et les archives te laissent emporter les sources.",
+    "de": "Ein Designsystem für die ganze Website, ein Repository, nichts Verstecktes — und im Archiv kannst du die Quellen mitnehmen."
   },
   "Designer & front-end developer — Mantua, Italy. CAT diploma, now studying Construction and Land Management.": {
     "it": "Designer e sviluppatore front-end — Mantova. Diploma CAT, ora studio Costruzioni e Gestione del Territorio.",

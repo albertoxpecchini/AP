@@ -592,6 +592,24 @@ export const IcScreen = (p: IcProps) => (
   </Ic>
 );
 
+/* Finestra del browser: cornice, barra dell'indirizzo, due pallini. */
+export const IcBrowser = (p: IcProps) => (
+  <Ic {...p}>
+    <rect x="2.5" y="4" width="19" height="16" rx="2" />
+    <path d="M2.5 9h19" />
+    <circle cx="5.6" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
+    <circle cx="8" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
+    <path d="M11 6.5h7.5" />
+  </Ic>
+);
+
+/* Servizi remoti: la nuvola delle API esterne. */
+export const IcCloud = (p: IcProps) => (
+  <Ic {...p}>
+    <path d="M7.4 18.5a4.4 4.4 0 0 1-.5-8.77 5.3 5.3 0 0 1 10.1 1.05 3.86 3.86 0 0 1-.6 7.72H7.4z" />
+  </Ic>
+);
+
 export const IcStore = (p: IcProps) => (
   <Ic {...p}>
     <path d="M4.1 9.5l1.1-5h13.6l1.1 5" />

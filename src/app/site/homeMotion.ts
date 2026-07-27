@@ -19,28 +19,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Elementi che entrano in scena scorrendo: selettore → parametri del reveal. */
-const REVEALS: { sel: string; y?: number; stagger?: number; scale?: number }[] = [
-  { sel: ".sb-hero-copy p", y: 18, stagger: 0.08 },
-  { sel: ".sb-hero-actions", y: 14 },
-  { sel: ".sb-card", y: 26, stagger: 0.06, scale: 0.985 },
-  { sel: ".sb-prodfoot-tag", y: 16 },
-  { sel: ".sb-trusted-label", y: 10 },
-  { sel: ".sb-trusted a", y: 12, stagger: 0.1 },
-  { sel: ".sb-sechead", y: 22 },
-  { sel: ".sb-tabs", y: 14 },
-  { sel: ".sb-arch-frame", y: 30, scale: 0.99 },
-  { sel: ".sb-stack-grid > *", y: 26, stagger: 0.1 },
-  { sel: ".sb-splithead", y: 20 },
-  { sel: ".sb-page-card", y: 22, stagger: 0.05 },
-  { sel: ".sb-story", y: 22, stagger: 0.06 },
-  { sel: ".sb-cv-actions", y: 14 },
-  { sel: ".sb-wall-card", y: 24, stagger: 0.04 },
-  { sel: ".sb-open > *", y: 26, stagger: 0.12 },
-  { sel: ".sb-cta h2", y: 20 },
-  { sel: ".sb-cta p", y: 16 },
-  { sel: ".sb-cta-actions", y: 14 },
-];
+// Qui NON c'è nessun reveal allo scroll. Ogni blocco entrava in scena da
+// opacità 0 salendo di una ventina di pixel: scendendo piano si vedeva la
+// pagina "ricaricarsi" un blocco alla volta, con quella dissolvenza chiara che
+// faceva sembrare lo scroll a scatti. Il contenuto adesso c'è e basta —
+// scorrere una pagina non è un evento da annunciare.
 
 export function useHomeMotion(root: RefObject<HTMLElement | null>) {
   useEffect(() => {
@@ -64,28 +47,7 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
           .from(".sb-hero-copy p", { autoAlpha: 0, y: 16, stagger: 0.08 }, "-=0.55")
           .from(".sb-hero-actions > *", { autoAlpha: 0, y: 12, stagger: 0.08 }, "-=0.5");
 
-        // ── ② Reveal allo scroll ──────────────────────────────────────────
-        // La hero è già animata dall'intro: la si esclude dai trigger.
-        REVEALS.forEach(({ sel, y = 20, stagger = 0, scale }) => {
-          const items = gsap.utils.toArray<HTMLElement>(sel, scope).filter((el) => !el.closest(".sb-hero"));
-          if (!items.length) return;
-          ScrollTrigger.batch(items, {
-            start: "top 88%",
-            once: true,
-            onEnter: (batch) =>
-              gsap.from(batch, {
-                autoAlpha: 0,
-                y,
-                scale,
-                duration: 0.75,
-                ease: "power3.out",
-                stagger,
-                overwrite: true,
-              }),
-          });
-        });
-
-        // ── ③ Contatori: i numeri si "accendono" arrivando a vista ────────
+        // ── ② Contatori: i numeri si "accendono" arrivando a vista ────────
         // Il footer ha una regia sua (site/footMotion.ts): i suoi contatori
         // restano fuori da qui, o partirebbero due volte sulla home.
         const counters = gsap.utils
@@ -116,43 +78,17 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
         };
       });
 
-      // ── ④ Riflesso che segue il mouse sui pannelli ──────────────────────
-      //     Due variabili CSS (--sb-mx/--sb-my) guidano un alone radiale e il
-      //     "vetro" del bordo: il pannello sembra illuminato da una lampada.
+      // ── ③ Bottoni "magnetici": si sporgono verso il cursore ─────────────
+      //     Spostamento limitato a pochi pixel: deve sembrare attrazione,
+      //     non un bersaglio che scappa quando provi a cliccarlo.
+      //
+      //     Qui NON c'è più il riflesso che seguiva il puntatore sui pannelli:
+      //     scorrendo la pagina il cursore attraversa una card dopo l'altra e
+      //     ognuna si accendeva sotto di lui — un lampeggio continuo, e un
+      //     ridisegno di gradienti grandi a ogni movimento del mouse.
       mm.add("(hover: hover) and (pointer: fine)", () => {
-        // L'archivio incorporato resta fuori: è un'interfaccia densa, con menù
-        // e anteprime — un alone che ci passa sopra darebbe solo fastidio.
-        // Fuori anche il footer: lì comanda footMotion, su ogni pagina.
-        const panels = gsap.utils
-          .toArray<HTMLElement>(".sb-panel", scope)
-          .filter((p) => !p.closest(".sb-arch-frame") && !p.closest(".sb-foot"));
         const cleanups: (() => void)[] = [];
 
-        panels.forEach((panel) => {
-          const setX = gsap.quickSetter(panel, "--sb-mx", "px");
-          const setY = gsap.quickSetter(panel, "--sb-my", "px");
-
-          const move = (e: PointerEvent) => {
-            const r = panel.getBoundingClientRect();
-            setX(e.clientX - r.left);
-            setY(e.clientY - r.top);
-          };
-          const enter = () => gsap.to(panel, { "--sb-spot": 1, duration: 0.35, ease: "power2.out" });
-          const leave = () => gsap.to(panel, { "--sb-spot": 0, duration: 0.5, ease: "power2.out" });
-
-          panel.addEventListener("pointermove", move);
-          panel.addEventListener("pointerenter", enter);
-          panel.addEventListener("pointerleave", leave);
-          cleanups.push(() => {
-            panel.removeEventListener("pointermove", move);
-            panel.removeEventListener("pointerenter", enter);
-            panel.removeEventListener("pointerleave", leave);
-          });
-        });
-
-        // ── ⑤ Bottoni "magnetici": si sporgono verso il cursore ───────────
-        //     Spostamento limitato a pochi pixel: deve sembrare attrazione,
-        //     non un bersaglio che scappa quando provi a cliccarlo.
         const magnets = gsap.utils
           .toArray<HTMLElement>(".sb-btn--primary, .sb-tech", scope)
           .filter((btn) => !btn.closest(".sb-foot"));
@@ -177,23 +113,6 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
             btn.removeEventListener("pointerleave", leave);
           });
         });
-
-        // ── ⑥ Alone della hero che insegue il puntatore, con inerzia ──────
-        const hero = scope.querySelector<HTMLElement>(".sb-hero");
-        if (hero) {
-          const pos = { x: 50, y: 40 };
-          const setHx = gsap.quickSetter(hero, "--sb-hx", "%");
-          const setHy = gsap.quickSetter(hero, "--sb-hy", "%");
-          const xTo = gsap.quickTo(pos, "x", { duration: 0.9, ease: "power3", onUpdate: () => setHx(pos.x) });
-          const yTo = gsap.quickTo(pos, "y", { duration: 0.9, ease: "power3", onUpdate: () => setHy(pos.y) });
-          const move = (e: PointerEvent) => {
-            const r = hero.getBoundingClientRect();
-            xTo(((e.clientX - r.left) / r.width) * 100);
-            yTo(((e.clientY - r.top) / r.height) * 100);
-          };
-          hero.addEventListener("pointermove", move);
-          cleanups.push(() => hero.removeEventListener("pointermove", move));
-        }
 
         return () => cleanups.forEach((fn) => fn());
       });

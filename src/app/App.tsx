@@ -54,7 +54,7 @@ import {
   GameHud,
   DiffScan,
   ClientFlow,
-  BlueprintRadar,
+  CatCube,
   ContribGraph,
   TrustedDot,
 } from "./site/homeLive";
@@ -645,6 +645,13 @@ export default function App() {
 
   return (
     <div className="sb-home" ref={homeRef}>
+      {/* Fondale continuo di TUTTA la pagina: è fisso alla finestra, quindi
+          nessun bordo di sezione può tagliarlo a metà mentre si scorre. Fra
+          una sezione e l'altra non c'è nessun confine. */}
+      <div className="sb-bg" aria-hidden="true">
+        <span className="sb-bg-grid" />
+      </div>
+
       {/* Skiplinks — requisito di accessibilità */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>
@@ -743,17 +750,10 @@ export default function App() {
         </div>
       </div>
 
-      <main id="main-content">
-        {/* ① Hero — titolo a sinistra, testo a destra (come Supabase) */}
+      <main id="main-content" className="sb-main">
+        {/* ① Hero — titolo a sinistra, testo a destra (come Supabase).
+             Nessun fondale suo: usa quello continuo della pagina. */}
         <section id="home" className="sb-hero">
-          {/* Fondale animato: griglia in deriva + aurora + alone che segue il
-              puntatore (la variabile la muove GSAP, vedi site/homeMotion). */}
-          <div className="sb-hero-bg" aria-hidden="true">
-            <span className="sb-hero-grid-bg" />
-            <span className="sb-hero-aurora" />
-            <span className="sb-hero-spot" />
-          </div>
-
           <div className="sb-container">
             <LiveStatus />
             <div className="sb-hero-grid">
@@ -914,7 +914,7 @@ export default function App() {
                   </p>
                 </div>
                 <div className="sb-card-visual">
-                  <BlueprintRadar />
+                  <CatCube />
                 </div>
               </div>
             </div>
@@ -1037,7 +1037,13 @@ export default function App() {
         <section className="sb-section" aria-label="Pages">
           <div className="sb-container">
             <div className="sb-splithead">
-              <h3>Six more pages, each with its own design system</h3>
+              <div>
+                <h3>Six more pages I designed and built</h3>
+                <p>
+                  Other projects of mine — some born for school, some to support myself.
+                  Different subjects, the same hand and the same design system as this page.
+                </p>
+              </div>
               <Link to="/archivio" className="sb-btn sb-btn--sm sb-btn--secondary">View them all</Link>
             </div>
             <div className="sb-pages">
@@ -1166,8 +1172,8 @@ export default function App() {
                   reuse what helps you.</strong>
                 </p>
                 <p>
-                  Every page ships with its own design system — and the archive lets you take
-                  the sources home.
+                  One design system across the whole site, one repository, nothing hidden —
+                  and the archive lets you take the sources home.
                 </p>
                 <a
                   href="https://github.com/albertoxpecchini/AP"

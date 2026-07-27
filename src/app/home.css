@@ -89,6 +89,49 @@ html.dark .sb-home {
 }
 .sb-section { padding-top: clamp(4rem, 8vw, 6rem); padding-bottom: clamp(4rem, 8vw, 6rem); }
 
+/* ── Fondale continuo ──────────────────────────────────────────────────────
+   UN SOLO fondale per tutta la pagina, non uno per sezione: è position:fixed,
+   quindi resta incollato alla finestra e nessun bordo di sezione può tagliarlo
+   a metà scorrendo. Fra una sezione e l'altra non c'è nessun confine — sopra
+   scorre solo il contenuto, che è trasparente. Il grigio di base sta su
+   .sb-home; qui ci sono solo le due velature di colore e la griglia. */
+.sb-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Strato a sé: il browser lo dipinge una volta e poi si limita a comporlo. */
+  transform: translateZ(0);
+  background:
+    radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.14), transparent 62%),
+    radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.1), transparent 60%);
+}
+html.dark .sb-bg {
+  background:
+    radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.16), transparent 62%),
+    radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.12), transparent 60%);
+}
+/* Griglia tecnica: si dissolve verso il basso, così non finisce mai con una
+   riga netta. Ferma, non alla deriva: il movimento lo dà lo scroll. */
+.sb-bg-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  background:
+    linear-gradient(var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px;
+  -webkit-mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
+  mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
+}
+/* Il contenuto scorre SOPRA il fondale (che è a z-index 0). Solo la home:
+   le altre pagine usano .sb-home senza fondale e non devono ritrovarsi un
+   contesto di impilamento in più attorno al loro contenuto. */
+.sb-main { position: relative; z-index: 1; }
+
+@media print {
+  .sb-bg { display: none; }
+}
+
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
 .sb-nav {
   position: sticky;
@@ -97,10 +140,12 @@ html.dark .sb-home {
   background: color-mix(in srgb, var(--sb-bg) 92%, transparent);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
   backdrop-filter: blur(10px) saturate(140%);
-  border-bottom: 1px solid var(--sb-border);
-  transition: box-shadow 0.2s ease;
+  border-bottom: 1px solid transparent;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); }
+/* In cima alla pagina la nav non ha bordo: nessuna riga a tagliare la hero.
+   Compare solo quando c'è del contenuto che le scorre sotto. */
+.sb-nav--scrolled { border-bottom-color: var(--sb-border); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); }
 html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-nav-inner { display: flex; align-items: center; gap: 1rem; height: 64px; }
 .sb-nav-brand {
@@ -181,28 +226,11 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-btn--sm { height: 32px; padding: 0 0.8rem; font-size: 0.8rem; }
 .sb-btn--primary {
   position: relative;
-  overflow: hidden;
   background: var(--sb-btn-bg);
   border-color: var(--sb-btn-bd);
   color: var(--sb-btn-fg);
 }
 .sb-btn--primary:hover { background: var(--sb-btn-bg-hover); border-color: var(--sb-brand); }
-/* Riflesso che ogni tanto attraversa il bottone principale */
-.sb-btn--primary::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -80%;
-  width: 55%;
-  pointer-events: none;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.42), transparent);
-  animation: sb-btn-sheen 5s ease-in-out infinite;
-}
-@keyframes sb-btn-sheen {
-  0%, 74% { left: -80%; }
-  100% { left: 135%; }
-}
 .sb-btn--secondary {
   background: var(--sb-bg-alt);
   border-color: var(--sb-border-strong);
@@ -231,53 +259,13 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-link:hover svg { transform: translateX(2px); }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
+/* Niente fondale proprio e niente overflow:hidden: il fondo della hero è il
+   fondale continuo della pagina (.sb-bg). Così scendendo non si vede nessuna
+   riga dove "finisce la hero e comincia il resto". */
 .sb-hero {
-  /* Centro dell'alone che segue il puntatore: lo muove GSAP con inerzia. */
-  --sb-hx: 50%;
-  --sb-hy: 38%;
-
   position: relative;
-  overflow: hidden;
   padding-top: clamp(3rem, 9vw, 8.5rem);
   padding-bottom: clamp(2.5rem, 5vw, 4rem);
-}
-.sb-hero > .sb-container { position: relative; z-index: 1; }
-.sb-hero-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-/* Griglia tecnica che scorre piano in diagonale, sfumata verso il basso */
-.sb-hero-grid-bg {
-  position: absolute;
-  inset: -80px;
-  opacity: 0.8;
-  background:
-    linear-gradient(var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px,
-    linear-gradient(90deg, var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px;
-  -webkit-mask-image: radial-gradient(120% 82% at 50% 0%, #000 26%, transparent 76%);
-  mask-image: radial-gradient(120% 82% at 50% 0%, #000 26%, transparent 76%);
-  animation: sb-grid-drift 26s linear infinite;
-}
-@keyframes sb-grid-drift { to { background-position: 64px 64px, 64px 64px; } }
-/* Aurora: due macchie di colore che respirano */
-.sb-hero-aurora {
-  position: absolute;
-  left: 50%;
-  top: -34%;
-  width: min(1100px, 130%);
-  aspect-ratio: 2 / 1;
-  filter: blur(26px);
-  background:
-    radial-gradient(closest-side, hsla(153, 60%, 53%, 0.22), transparent 72%) 18% 42% / 62% 74% no-repeat,
-    radial-gradient(closest-side, hsla(192, 72%, 55%, 0.16), transparent 72%) 78% 30% / 56% 66% no-repeat;
-  animation: sb-aurora 20s ease-in-out infinite;
-}
-@keyframes sb-aurora {
-  0%, 100% { transform: translateX(-52%) scale(1); opacity: 0.75; }
-  50% { transform: translateX(-47%) scale(1.1); opacity: 1; }
-}
-/* Alone sotto il puntatore */
-.sb-hero-spot {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(440px circle at var(--sb-hx) var(--sb-hy), hsla(153, 60%, 53%, 0.14), transparent 62%);
 }
 
 /* Riga di stato "in diretta": disponibilità + orologio di Mantova */
@@ -303,40 +291,57 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   color: var(--sb-fg-muted);
 }
 
-/* Ticker "in lavorazione": i nomi scorrono uno alla volta (GSAP) */
-.sb-nowbuild { display: flex; align-items: center; gap: 0.6rem; margin: 1.5rem 0 0; font-size: 0.84rem; }
+/* Progetti in corso — una giostra a un posto solo: un bottone vero alla volta,
+   che entra da sotto ed esce da sopra. La finestrella è alta quanto il bottone
+   e larga quanto serve (il nome nuovo la allarga mentre quello vecchio è già
+   invisibile, quindi non si vede nessuno scatto). */
+.sb-nowbuild {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+  margin: 1.5rem 0 0;
+}
 .sb-nowbuild-label {
   font-size: 0.68rem;
   letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--sb-fg-muted);
 }
-/* La finestrella è alta una riga e larga quanto la voce più lunga (il
-   "fantasma" in flusso): le voci scorrono dentro, il testo attorno non balla. */
-.sb-rot { position: relative; display: inline-flex; overflow: hidden; line-height: 1.45; }
-.sb-rot-sizer { visibility: hidden; }
-.sb-rot-sizer, .sb-rot-item {
+.sb-nowbuild-slot {
+  display: inline-flex;
+  height: 30px;
+  /* clip invece di hidden: non crea un contenitore di scorrimento e, col
+     margine, lascia respirare l'anello di focus del bottone. hidden resta
+     come ripiego dove clip non c'è. */
+  overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: 5px;
+}
+.sb-nowbuild-item { display: inline-flex; will-change: transform, opacity; }
+.sb-nowbuild-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  white-space: nowrap;
+  gap: 0.35rem;
+  height: 30px;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--sb-border-strong);
+  background: color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
+  font-size: 0.8rem;
   font-weight: 500;
-}
-.sb-rot-item {
-  position: absolute;
-  left: 0;
-  top: 0;
+  line-height: 1;
+  white-space: nowrap;
   color: var(--sb-brand-text);
   text-decoration: none;
-  opacity: 0;
-  /* Premibile solo quando è quella a schermo (la classe la mette GSAP). */
-  pointer-events: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
-.sb-rot-item:first-child { opacity: 1; }
-.sb-rot-item.is-on { pointer-events: auto; }
-.sb-rot-item:hover { text-decoration: underline; text-underline-offset: 3px; }
-.sb-rot-item svg { opacity: 0.65; transition: transform 0.2s ease, opacity 0.2s ease; }
-.sb-rot-item:hover svg { opacity: 1; transform: translate(2px, -2px); }
+.sb-nowbuild-btn:hover {
+  background: var(--sb-surface-200);
+  border-color: color-mix(in srgb, var(--sb-brand) 55%, var(--sb-border-strong));
+}
+.sb-nowbuild-btn svg { opacity: 0.6; transition: transform 0.2s ease, opacity 0.2s ease; }
+.sb-nowbuild-btn:hover svg { opacity: 1; transform: translate(2px, -2px); }
 .sb-hero-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -373,15 +378,13 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 @media (min-width: 640px) { .sb-card { height: 400px; } .sb-card--lg { grid-column: span 2; } }
 @media (min-width: 1280px) { .sb-card { grid-column: span 3; } .sb-card--lg { grid-column: span 6; } }
 
-/* Pannello con bordo-gradiente da 1px (marchio di fabbrica delle card) */
+/* Pannello con bordo-gradiente da 1px (marchio di fabbrica delle card).
+   NIENTE aloni né riflessi che seguono il puntatore: scorrendo la pagina il
+   cursore attraversa una card dopo l'altra e ognuna si accendeva sotto di lui —
+   un lampeggio continuo che abbagliava e costava un ridisegno a ogni frame.
+   All'hover resta solo quello che serve a dire "questa è premibile": il bordo
+   si fa più netto e la card si solleva di 3 px. */
 .sb-panel {
-  /* Posizione del puntatore dentro il pannello: la scrive GSAP (homeMotion),
-     la leggono il riflesso sul bordo e l'alone interno. --sb-spot è l'intensità
-     (0 fuori, 1 sopra), sfumata da un tween: niente stacchi netti. */
-  --sb-mx: 50%;
-  --sb-my: 50%;
-  --sb-spot: 0;
-
   position: relative;
   height: 100%;
   padding: 1px;
@@ -393,25 +396,14 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   );
   transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* Riflesso sul filo del bordo: si vede solo nel millimetro non coperto
-   da .sb-panel-inner, ed è esattamente lì che deve brillare. */
-.sb-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: var(--sb-spot);
-  background: radial-gradient(170px circle at var(--sb-mx) var(--sb-my), var(--sb-brand), transparent 62%);
-}
 a.sb-card:hover .sb-panel,
 button.sb-card:hover .sb-panel,
 .sb-panel--hover:hover {
   background: var(--sb-border-stronger);
   box-shadow: var(--sb-shadow-card);
 }
-/* Sollevamento all'hover: sta sul pannello e non sulla card, perché la card
-   porta il transform inline lasciato dal reveal GSAP. */
+/* Il sollevamento all'hover sta sul pannello, non sulla card: la card è la
+   maglia della griglia, spostarla sposterebbe anche il suo ingombro. */
 a.sb-card:hover .sb-panel,
 .sb-page-card:hover .sb-panel,
 .sb-story:hover .sb-panel {
@@ -426,50 +418,6 @@ a.sb-card:hover .sb-panel,
   display: flex;
   flex-direction: column;
 }
-/* Alone morbido sotto il puntatore, dentro la card. */
-.sb-panel-inner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  opacity: var(--sb-spot);
-  background: radial-gradient(
-    260px circle at calc(var(--sb-mx) - 1px) calc(var(--sb-my) - 1px),
-    hsla(153, 60%, 53%, 0.16),
-    transparent 62%
-  );
-}
-/* Lampo di luce che attraversa la card quando ci passi sopra. */
-.sb-panel-inner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-130%);
-  background: linear-gradient(
-    104deg,
-    transparent 34%,
-    rgba(255, 255, 255, 0.1) 46%,
-    rgba(255, 255, 255, 0.26) 50%,
-    rgba(255, 255, 255, 0.1) 54%,
-    transparent 66%
-  );
-}
-a.sb-card:hover .sb-panel-inner::before,
-.sb-page-card:hover .sb-panel-inner::before,
-.sb-story:hover .sb-panel-inner::before,
-.sb-wall-card:hover .sb-panel-inner::before {
-  animation: sb-sheen 0.9s ease-out;
-}
-@keyframes sb-sheen {
-  0% { opacity: 0; transform: translateX(-130%); }
-  18% { opacity: 1; }
-  100% { opacity: 0; transform: translateX(130%); }
-}
-
 /* Contenuto delle card prodotto */
 .sb-card-head { padding: 1.4rem 1.4rem 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .sb-card-title {
@@ -522,7 +470,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 
 /* Mock "browser" della card grande — si ricostruisce da solo: un cursore fa il
    giro dei blocchi, i blocchi si accendono, la pillola passa da "building" a
-   "live", e ogni tanto un riflesso attraversa il vetro. */
+   "live". */
 .sb-browser {
   position: relative;
   width: 100%;
@@ -557,6 +505,9 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   white-space: nowrap;
 }
 .sb-browser-body { position: relative; padding: 0.9rem; display: grid; grid-template-columns: 1fr 2fr; gap: 0.6rem; }
+/* Niente luccichio di caricamento sui blocchi: era una sfumatura chiara che
+   li attraversava in continuazione, e a costruire il sito qui dentro basta
+   già il cursore che li visita accendendoli uno a uno. */
 .sb-skel {
   --sb-lit: 0;
   position: relative;
@@ -564,27 +515,6 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   background: var(--sb-surface-200);
   border: 1px solid var(--sb-border);
   overflow: hidden;
-}
-/* Luccichio di caricamento, sfalsato blocco per blocco */
-.sb-skel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(
-    100deg,
-    transparent 24%,
-    color-mix(in srgb, var(--sb-fg) 9%, transparent) 50%,
-    transparent 76%
-  );
-  animation: sb-shimmer 2.6s ease-in-out infinite;
-}
-.sb-skel:nth-child(2)::before { animation-delay: 0.25s; }
-.sb-skel:nth-child(3)::before { animation-delay: 0.5s; }
-.sb-skel:nth-child(4)::before { animation-delay: 0.75s; }
-@keyframes sb-shimmer {
-  0% { transform: translateX(-100%); }
-  55%, 100% { transform: translateX(100%); }
 }
 /* Contorno che si accende al passaggio del cursore finto (GSAP → --sb-lit) */
 .sb-skel::after {
@@ -635,28 +565,6 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   background: hsla(153, 60%, 53%, 0.22);
   pointer-events: none;
   z-index: 2;
-}
-
-/* Riflesso periodico sul "vetro" */
-.sb-sheen {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 3;
-  transform: translateX(-130%);
-  background: linear-gradient(
-    102deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.12) 47%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0.12) 53%,
-    transparent 62%
-  );
-  animation: sb-sheen-run 6.5s ease-in-out infinite;
-}
-@keyframes sb-sheen-run {
-  0%, 68% { transform: translateX(-130%); }
-  100% { transform: translateX(130%); }
 }
 
 /* Terminale (card AI) — resta scuro in entrambi i temi, come un vero terminale.
@@ -869,64 +777,105 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   60%, 100% { transform: translateY(62px); opacity: 0; }
 }
 
-/* Carta millimetrata (card CAT) — la griglia scorre, il radar spazza, l'ago
-   della bussola oscilla e la quota si ridisegna. */
-.sb-blueprint {
+/* Card CAT — piano cartesiano in tre dimensioni con un cubo che ci galleggia
+   sopra. Vera profondità CSS (perspective + transform-style: preserve-3d), non
+   un disegno che finge il 3D: il cubo ha sei facce e passandoci sopra si gira
+   davvero verso il puntatore. Il moto lo comanda GSAP (vedi CatCube in
+   site/homeLive); qui c'è solo la scena.
+   La catena preserve-3d NON va interrotta: stage → origin → lift → cube. */
+.sb-cat {
+  position: relative;
   width: 100%;
   max-width: 300px;
-  height: 116px;
-  border-radius: 10px;
-  border: 1px solid var(--sb-border-strong);
-  background:
-    linear-gradient(var(--sb-border) 1px, transparent 1px) 0 0 / 20px 20px,
-    linear-gradient(90deg, var(--sb-border) 1px, transparent 1px) 0 0 / 20px 20px,
-    var(--sb-bg);
-  position: relative;
-  overflow: hidden;
-  animation: sb-graph-drift 12s linear infinite;
+  height: 150px;
+  perspective: 620px;
+  perspective-origin: 50% 44%;
 }
-@keyframes sb-graph-drift { to { background-position: 20px 20px, 20px 20px, 0 0; } }
-.sb-blueprint-sweep {
+.sb-cat-stage { position: absolute; inset: 0; transform-style: preserve-3d; }
+
+/* Il piano: griglia coricata all'indietro, sfumata sui bordi perché non
+   finisca con un taglio netto. */
+.sb-cat-plane {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 260px;
-  height: 260px;
-  margin: -130px 0 0 -130px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: conic-gradient(
-    from 0deg,
-    hsla(153, 60%, 53%, 0) 0deg,
-    hsla(153, 60%, 53%, 0.26) 46deg,
-    hsla(153, 60%, 53%, 0) 82deg
-  );
-  animation: sb-spin 4.5s linear infinite;
+  top: 78%;
+  width: 320px;
+  height: 320px;
+  margin: -160px 0 0 -160px;
+  transform: rotateX(74deg);
+  background:
+    linear-gradient(var(--sb-border-strong) 1px, transparent 1px) 0 0 / 26px 26px,
+    linear-gradient(90deg, var(--sb-border-strong) 1px, transparent 1px) 0 0 / 26px 26px;
+  -webkit-mask-image: radial-gradient(closest-side, #000 26%, transparent 74%);
+  mask-image: radial-gradient(closest-side, #000 26%, transparent 74%);
 }
-@keyframes sb-spin { to { transform: rotate(360deg); } }
-.sb-blueprint-needle {
+/* Assi X e Y, sul piano */
+.sb-cat-plane::before,
+.sb-cat-plane::after {
+  content: "";
+  position: absolute;
+  background: var(--sb-brand);
+  opacity: 0.5;
+}
+.sb-cat-plane::before { left: 12%; right: 12%; top: 50%; height: 1px; }
+.sb-cat-plane::after { top: 12%; bottom: 12%; left: 50%; width: 1px; }
+
+/* Origine degli assi: punto a dimensione zero da cui pende tutto il resto. */
+.sb-cat-origin { position: absolute; left: 50%; top: 78%; transform-style: preserve-3d; }
+/* Asse Z: sale dall'origine fino al cubo */
+.sb-cat-z {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 58px;
+  background: linear-gradient(to top, var(--sb-brand), transparent);
+  opacity: 0.5;
+}
+/* Ombra portata sul piano, coricata come il piano */
+.sb-cat-shadow {
+  position: absolute;
+  left: -24px;
+  top: -7px;
+  width: 48px;
+  height: 14px;
+  border-radius: 50%;
+  /* Il translateZ dopo la rotazione stacca l'ombra di un pelo dal piano:
+     complanari, i due si contenderebbero lo stesso pixel (z-fighting). */
+  transform: rotateX(74deg) translateZ(1px);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-fg) 26%, transparent), transparent 72%);
+}
+/* Il galleggiamento sta qui (GSAP muove la y), la rotazione sul cubo: due
+   trasformazioni separate, così non si sovrascrivono a vicenda. */
+.sb-cat-lift { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+.sb-cat-cube {
+  position: absolute;
+  left: -24px;
+  top: -82px;
+  width: 48px;
+  height: 48px;
+  transform-style: preserve-3d;
+  /* Posa di riposo, la stessa di CUBE_REST: vale finché GSAP non prende mano. */
+  transform: rotateX(-22deg) rotateY(32deg);
+}
+.sb-cat-face {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  color: var(--sb-brand-text);
-  animation: sb-needle 9s ease-in-out infinite;
+  border: 1px solid color-mix(in srgb, var(--sb-brand) 65%, transparent);
+  background: color-mix(in srgb, var(--sb-brand) 13%, transparent);
 }
-@keyframes sb-needle {
-  0%, 100% { transform: rotate(-9deg); }
-  50% { transform: rotate(9deg); }
+.sb-cat-face--front { transform: translateZ(24px); }
+.sb-cat-face--back { transform: rotateY(180deg) translateZ(24px); }
+.sb-cat-face--right { transform: rotateY(90deg) translateZ(24px); }
+.sb-cat-face--left { transform: rotateY(-90deg) translateZ(24px); }
+/* Le due facce orizzontali prendono più luce: dà volume senza ombre finte. */
+.sb-cat-face--top {
+  transform: rotateX(90deg) translateZ(24px);
+  background: color-mix(in srgb, var(--sb-brand) 26%, transparent);
 }
-.sb-blueprint-dim { position: absolute; inset: 0; width: 100%; height: 100%; }
-.sb-blueprint-dim path {
-  stroke: var(--sb-brand-text);
-  opacity: 0.55;
-  stroke-dasharray: 260;
-  animation: sb-draw 6s ease-in-out infinite;
-}
-@keyframes sb-draw {
-  0% { stroke-dashoffset: 260; }
-  35%, 70% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -260; }
+.sb-cat-face--bottom {
+  transform: rotateX(-90deg) translateZ(24px);
+  background: color-mix(in srgb, var(--sb-brand) 7%, transparent);
 }
 
 /* Tipografia "Aa" (card design) — la stessa interfaccia disegnata due volte:
@@ -1049,10 +998,6 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   border-color: var(--sb-border-strong);
 }
 .sb-arch-frame .sb-panel-inner { background: var(--sb-bg-alt); }
-/* Nessun riflesso sopra l'archivio: sotto ci sono menù e anteprime. */
-.sb-arch-frame .sb-panel-inner::after,
-.sb-arch-frame .sb-panel-inner::before,
-.sb-arch-frame .sb-panel::before { display: none; }
 .sb-arch-cta { display: flex; justify-content: center; margin-top: 1.4rem; }
 
 /* ── Sezione stack ("Use Supabase with React") ───────────────────────────── */
@@ -1162,6 +1107,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   color: var(--sb-fg);
   max-width: 30rem;
 }
+.sb-splithead p { margin: 0.6rem 0 0; max-width: 34rem; font-size: 0.95rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 
 /* ── Griglia "pagine" (≈ template) ───────────────────────────────────────── */
 .sb-pages { display: grid; grid-template-columns: 1fr; gap: 1rem; }
@@ -1277,13 +1223,12 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   padding: 0.12rem 0.5rem;
 }
 
-/* Muro dei commit — un'onda di calore lo attraversa da sinistra a destra
-   (lo stagger lo guida GSAP, vedi ContribGraph in site/homeLive). */
+/* Muro dei commit — fermo. Prima un'onda di calore lo attraversava tenendo
+   119 celle in animazione all'infinito: da sola bastava a far arrancare lo
+   scroll di tutta la pagina, per un effetto che nessuno guardava. */
 .sb-contrib { margin-top: 0.2rem; }
 .sb-contrib-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; }
 .sb-cell {
-  --sb-heat: 0;
-  position: relative;
   aspect-ratio: 1;
   border-radius: 2px;
   background: var(--sb-surface-200);
@@ -1292,14 +1237,6 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-cell[data-lv="2"] { background: hsla(153, 60%, 53%, 0.52); }
 .sb-cell[data-lv="3"] { background: hsla(153, 60%, 53%, 0.74); }
 .sb-cell[data-lv="4"] { background: hsla(153, 60%, 53%, 0.95); }
-.sb-cell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--sb-brand);
-  opacity: calc(var(--sb-heat) * 0.55);
-}
 .sb-contrib-foot {
   display: flex;
   align-items: center;
@@ -1439,63 +1376,17 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 /* ── Footer condiviso (.sb-foot) — replica del footer Supabase ────────────
    Vive su OGNI pagina: porta con sé la classe .sb-home per ereditare i token
    (e quindi il tema nativo chiaro/scuro), ma annulla il min-height da pagina.
-   Il movimento (alone, riflessi, lampo, magneti, cascata, contatori) è diretto
-   da site/footMotion.ts — qui ci sono solo i posti dove la luce va a cadere. */
-.sb-home.sb-foot {
-  /* Posizione dell'alone ambientale: la scrive footMotion inseguendo il
-     puntatore con inerzia; --sb-aura è quanto è acceso. */
-  --sb-fx: 50%;
-  --sb-fy: 0%;
-  --sb-aura: 0.5;
+   Il movimento (cascata d'ingresso, magneti, contatori) è diretto da
+   site/footMotion.ts.
 
+   Non è un blocco a sé: niente bordo in cima, niente alone che il suo stesso
+   overflow tagliava a metà. Il colore entra in dissolvenza dall'alto, così
+   scendendo non si vede il punto in cui la pagina "finisce". */
+.sb-home.sb-foot {
   min-height: 0;
-  background: var(--sb-bg-alt);
-  border-top: 1px solid var(--sb-border);
+  background: linear-gradient(to bottom, transparent, var(--sb-bg-alt) 14rem);
   position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  z-index: 2;
-}
-/* Alone ambientale: una lampada verde dietro tutto il footer che insegue il
-   puntatore e, quando il puntatore è altrove, respira piano (loop GSAP). */
-.sb-foot-aura {
-  position: absolute;
-  inset: -30% -10% auto -10%;
-  height: 150%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: var(--sb-aura);
-  background: radial-gradient(
-    44rem 24rem at var(--sb-fx) var(--sb-fy),
-    hsla(153, 60%, 53%, 0.14),
-    transparent 68%
-  );
-}
-html.dark .sb-foot-aura {
-  background: radial-gradient(
-    44rem 24rem at var(--sb-fx) var(--sb-fy),
-    hsla(153, 60%, 53%, 0.2),
-    transparent 68%
-  );
-}
-/* Filo di luce che ogni tanto percorre il bordo alto del footer (loop GSAP). */
-.sb-foot-beam {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 26%;
-  height: 2px;
-  z-index: 2;
-  pointer-events: none;
-  transform: translateX(-120%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    hsl(153, 60%, 53%),
-    hsl(192, 72%, 55%),
-    transparent
-  );
-  box-shadow: 0 0 14px -2px hsl(153, 60%, 53%);
+  z-index: 1;
 }
 .sb-foot-wrap {
   position: relative;
@@ -1513,7 +1404,7 @@ html.dark .sb-foot-aura {
 /* Le card del footer stanno più basse delle card della home: il footer è una
    coda, non una vetrina — bordo appena accennato finché non ci passi sopra. */
 .sb-foot-card { min-width: 0; }
-.sb-foot-card .sb-panel-inner { background: var(--sb-bg); }
+.sb-foot-card .sb-panel-inner { background: color-mix(in srgb, var(--sb-bg) 82%, transparent); }
 .sb-foot-card:hover .sb-panel {
   background: var(--sb-border-stronger);
   box-shadow: var(--sb-shadow-card);
@@ -1526,46 +1417,8 @@ html.dark .sb-foot-aura {
   gap: 0;
 }
 /* Il widget GitHub ha bollette che escono dai suoi bordi (i tooltip delle
-   candele del grafico): l'interno della card qui NON taglia. A tagliare il
-   lampo ci pensa la sua vaschetta, e l'alone si arrotonda da sé. */
+   candele del grafico): l'interno della card qui NON taglia. */
 .sb-foot-card .sb-panel-inner { overflow: visible; }
-.sb-foot-card .sb-panel-inner::after { border-radius: inherit; }
-.sb-foot-flashwrap {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  border-radius: inherit;
-  overflow: hidden;
-  pointer-events: none;
-}
-/* Lampo che attraversa la card in diagonale quando ci entri col puntatore.
-   È un elemento vero (non una ::before animata dal CSS) perché lo comanda
-   GSAP: così rientrando di corsa riparte sempre dall'inizio. */
-.sb-foot-flash {
-  position: absolute;
-  inset: -10% -30%;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-140%);
-  background: linear-gradient(
-    104deg,
-    transparent 36%,
-    hsla(153, 60%, 53%, 0.1) 46%,
-    rgba(255, 255, 255, 0.28) 50%,
-    hsla(192, 72%, 55%, 0.1) 54%,
-    transparent 64%
-  );
-}
-html.dark .sb-foot-flash {
-  background: linear-gradient(
-    104deg,
-    transparent 36%,
-    hsla(153, 60%, 53%, 0.12) 46%,
-    rgba(255, 255, 255, 0.16) 50%,
-    hsla(192, 72%, 55%, 0.12) 54%,
-    transparent 64%
-  );
-}
 .sb-foot-name {
   display: inline-block;
   font-size: 1.05rem;
@@ -1600,38 +1453,14 @@ html.dark .sb-foot-flash {
 .sb-foot-social a svg { transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
 .sb-foot-social a:hover svg { transform: scale(1.22) rotate(-8deg); }
 /* Filo sfumato (trasparente → bordo → trasparente), firma di Supabase.
-   Ogni tanto un impulso verde lo percorre da sinistra a destra; sopra ci
-   scorre la barra di avanzamento verde/ciano che misura l'ingresso del footer. */
+   Solo un filo: l'avanzamento della lettura si misura in cima alla finestra
+   (site/ScrollProgress), dove lo si vede mentre si scorre — non quaggiù, dove
+   diceva "sei in fondo" quando ormai ci eri arrivato. */
 .sb-foot-hairline {
-  position: relative;
   height: 2px;
   margin-top: clamp(2rem, 4vw, 3rem);
-  overflow: hidden;
   border-radius: 999px;
   background: linear-gradient(to right, transparent, var(--sb-border-stronger), transparent);
-}
-.sb-foot-prog {
-  position: absolute;
-  inset: 0;
-  transform: scaleX(0);
-  transform-origin: left center;
-  border-radius: inherit;
-  background: linear-gradient(90deg, hsl(153, 60%, 53%), hsl(192, 72%, 55%));
-  box-shadow: 0 0 12px -1px hsl(153, 60%, 53%);
-}
-.sb-foot-hairline::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -34%;
-  width: 34%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, var(--sb-brand), transparent);
-  animation: sb-hairline 7s ease-in-out infinite;
-}
-@keyframes sb-hairline {
-  0%, 55% { left: -34%; }
-  100% { left: 110%; }
 }
 .sb-foot-bottom {
   display: flex;
@@ -1685,11 +1514,8 @@ html.dark .sb-foot-flash {
   }
 
   /* Stati di riposo scelti a mano, dove il fotogramma iniziale non basta. */
-  .sb-hero-grid-bg { opacity: 0.5; }
-  .sb-skel::before, .sb-sheen, .sb-diff-scan, .sb-blueprint-sweep, .sb-browser-cursor,
-  .sb-foot-hairline::after, .sb-foot-beam, .sb-btn--primary::after, .sb-flow-wires .pulse { display: none; }
-  /* L'alone del footer resta, fermo al centro: è atmosfera, non movimento. */
-  .sb-home.sb-foot { --sb-fx: 50%; --sb-fy: 0%; --sb-aura: 0.45; }
+  .sb-bg-grid { opacity: 0.5; }
+  .sb-diff-scan, .sb-browser-cursor, .sb-flow-wires .pulse { display: none; }
   .sb-foot-social a svg { transition: none; }
   .sb-aa .dark { clip-path: inset(0 0 0 50%); }
   .sb-aa-handle { left: 50%; }
@@ -1698,9 +1524,5 @@ html.dark .sb-foot-flash {
     -webkit-text-fill-color: currentColor;
     color: var(--sb-brand-text);
   }
-  .sb-blueprint-dim path { stroke-dasharray: none; }
-  .sb-rot-sizer { display: none; }
-  .sb-rot-item { position: static; pointer-events: auto; }
-  .sb-rot-item:not(:first-child) { display: none; }
   .sb-cursor, .sb-caret { opacity: 1; }
 }
