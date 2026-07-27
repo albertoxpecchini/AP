@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Sun, Moon } from "lucide-react";
+import { IcClock, IcMoon, IcSun } from "../site/homeIcons";
 import {
   applyTheme,
   currentTheme,
@@ -18,12 +18,13 @@ import {
 } from "./themeCore";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Widget tema globale: montato UNA volta (in main.tsx), vive su ogni pagina.
+// Widget tema globale: due segmenti della barra di controllo (ControlBar.tsx).
 //  · tasto luna/sole → cambia tema a mano (mode "manuale");
 //  · chip "Auto"     → ridà il comando al sensore orario;
 //  · sensore orario  → alle 08:00 e 20:00 cambia da solo, con l'animazione che
 //                      parte 1s prima (alle :59:59) "senza premere nulla";
 //  · ogni cambio tema (manuale o automatico) ha la stessa transizione a cerchio.
+// Veste e misure: grammatica Supabase (.sb-ctl-*, vedi controlbar.css).
 // ─────────────────────────────────────────────────────────────────────────────
 
 const WIPE_MS = 620;
@@ -195,37 +196,36 @@ export default function ThemeWidget() {
       {/* Onda a tutto schermo portata su <body>: il backdrop-filter della barra
           di controllo che la contiene la ritaglierebbe altrimenti. */}
       {createPortal(
-        <div ref={overlayRef} className="ap-theme-wipe" aria-hidden="true" />,
+        <div ref={overlayRef} className="sb-theme-wipe" aria-hidden="true" />,
         document.body,
       )}
 
-      <div className="ap-theme-dock" data-ap-theme={theme}>
-        <button
-          ref={btnRef}
-          type="button"
-          className="ap-theme-btn"
-          onClick={onToggle}
-          aria-label={isDark ? "Passa al tema chiaro" : "Passa al tema scuro"}
-          title={isDark ? "Tema chiaro" : "Tema scuro"}
-        >
-          <span key={theme} className="ap-theme-ico" aria-hidden="true">
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
-          </span>
-        </button>
-        <button
-          type="button"
-          className={`ap-theme-auto${auto ? " is-on" : ""}`}
-          onClick={onAuto}
-          aria-pressed={auto}
-          title={
-            auto
-              ? "Sensore orario attivo (08–20 chiaro, resto scuro)"
-              : "Riattiva il sensore orario"
-          }
-        >
-          Auto
-        </button>
-      </div>
+      <button
+        ref={btnRef}
+        type="button"
+        className="sb-ctl-btn"
+        onClick={onToggle}
+        aria-label={isDark ? "Passa al tema chiaro" : "Passa al tema scuro"}
+        title={isDark ? "Tema chiaro" : "Tema scuro"}
+      >
+        <span key={theme} className="sb-ctl-ico" aria-hidden="true">
+          {isDark ? <IcSun size={16} /> : <IcMoon size={16} />}
+        </span>
+      </button>
+      <button
+        type="button"
+        className={`sb-ctl-btn sb-ctl-auto${auto ? " is-on" : ""}`}
+        onClick={onAuto}
+        aria-pressed={auto}
+        title={
+          auto
+            ? "Sensore orario attivo (08–20 chiaro, resto scuro)"
+            : "Riattiva il sensore orario"
+        }
+      >
+        <IcClock size={14} />
+        <span>Auto</span>
+      </button>
     </>
   );
 }

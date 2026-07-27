@@ -1,0 +1,1706 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOME "piattaforma" — rifatta da zero sul layout della homepage di Supabase
+   (supabase.com, "The Postgres Development Platform"), adattata ai contenuti
+   del sito. Fedele nella struttura: nav sottile, hero a due colonne, griglia
+   prodotti 12 colonne con card a bordo-gradiente, pannello "dashboard" (qui:
+   l'archivio dei progetti), sezione stack con switcher di framework e codice,
+   griglia "template" (le pagine del sito), story-card, muro community (qui: il
+   curriculum), sezione open source e CTA finale.
+
+   Tema NATIVO chiaro/scuro: palette neutra (grigi puri) + verde brand Supabase
+   hsl(153 60% 53%), tipografia Ubuntu (identità del sito, al posto di Circular).
+   Il chiaro è il default; lo scuro si attiva con html.dark (tema globale).
+   Prefisso: .sb- (l'archivio incorporato usa .sb-ar-, vedi archivio.css).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-home {
+  /* ── Palette CHIARA (default) ── */
+  --sb-bg: #fcfcfc;
+  --sb-bg-alt: #f8f8f8;
+  --sb-surface-75: #fbfbfb;
+  --sb-surface-100: #f6f6f6;
+  --sb-surface-200: #f0f0f0;
+  --sb-overlay: rgba(0, 0, 0, 0.05);
+  --sb-border: #e8e8e8;
+  --sb-border-strong: #dbdbdb;
+  --sb-border-stronger: #c7c7c7;
+  --sb-fg: #171717;
+  --sb-fg-light: #525252;
+  --sb-fg-lighter: #6f6f6f;
+  --sb-fg-muted: #8f8f8f;
+  --sb-brand: hsl(153, 60%, 53%);
+  --sb-brand-text: hsl(153, 86%, 28%);
+  --sb-btn-bg: hsl(151, 67%, 67%);
+  --sb-btn-bd: hsla(155, 78%, 40%, 0.75);
+  --sb-btn-bg-hover: hsl(151, 63%, 60%);
+  --sb-btn-fg: #101010;
+  --sb-code-kw: #0550ae;
+  --sb-code-num: #953800;
+  --sb-code-fn: #8250df;
+  --sb-shadow-card: 0 4px 20px -6px rgba(0, 0, 0, 0.1);
+
+  min-height: 100vh;
+  background: var(--sb-bg);
+  color: var(--sb-fg);
+  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+html.dark .sb-home {
+  /* ── Palette SCURA ── */
+  --sb-bg: #141414;
+  --sb-bg-alt: #181818;
+  --sb-surface-75: #1c1c1c;
+  --sb-surface-100: #222222;
+  --sb-surface-200: #282828;
+  --sb-overlay: rgba(255, 255, 255, 0.07);
+  --sb-border: #2a2a2a;
+  --sb-border-strong: #343434;
+  --sb-border-stronger: #414141;
+  --sb-fg: #ededed;
+  --sb-fg-light: #b4b4b4;
+  --sb-fg-lighter: #969696;
+  --sb-fg-muted: #707070;
+  --sb-brand: hsl(153, 60%, 53%);
+  --sb-brand-text: hsl(155, 100%, 42%);
+  --sb-btn-bg: hsl(155, 100%, 19%);
+  --sb-btn-bd: hsla(153, 60%, 53%, 0.3);
+  --sb-btn-bg-hover: hsl(155, 74%, 25%);
+  --sb-btn-fg: #ffffff;
+  --sb-code-kw: #79c0ff;
+  --sb-code-num: #ffcda1;
+  --sb-code-fn: #bda4ff;
+  --sb-shadow-card: 0 4px 24px -6px rgba(0, 0, 0, 0.55);
+}
+
+.sb-home ::selection { background: hsla(153, 60%, 53%, 0.35); }
+.sb-home :focus-visible { outline: 2px solid var(--sb-brand); outline-offset: 2px; border-radius: 4px; }
+.sb-home a { color: inherit; }
+
+/* Contenitore di sezione (≈ .section-container di Supabase) */
+.sb-container {
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding-left: clamp(1.25rem, 4vw, 5rem);
+  padding-right: clamp(1.25rem, 4vw, 5rem);
+}
+.sb-section { padding-top: clamp(4rem, 8vw, 6rem); padding-bottom: clamp(4rem, 8vw, 6rem); }
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+.sb-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--sb-bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid var(--sb-border);
+  transition: box-shadow 0.2s ease;
+}
+.sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); }
+html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
+.sb-nav-inner { display: flex; align-items: center; gap: 1rem; height: 64px; }
+.sb-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--sb-fg);
+  flex-shrink: 0;
+}
+.sb-nav-brand img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+.sb-nav-brand-name { font-size: 0.98rem; font-weight: 500; white-space: nowrap; letter-spacing: -0.01em; }
+.sb-local {
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--sb-btn-bg);
+  border: 1px solid var(--sb-btn-bd);
+  color: var(--sb-btn-fg);
+}
+.sb-nav-links { display: flex; align-items: center; gap: 0.15rem; }
+.sb-nav-link {
+  position: relative;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--sb-fg-light);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.sb-nav-link:hover { color: var(--sb-fg); background: var(--sb-overlay); }
+/* Filo verde che si apre da sinistra sotto la voce puntata */
+.sb-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.12rem;
+  height: 1px;
+  background: var(--sb-brand);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sb-nav-link:hover::after { transform: scaleX(1); }
+.sb-nav-right { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.sb-burger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--sb-fg-light);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+}
+.sb-burger:hover { color: var(--sb-fg); background: var(--sb-overlay); }
+
+/* ── Bottoni (misure e vesti Supabase: h 38px, radius 6, bordo) ──────────── */
+.sb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 38px;
+  padding: 0 1rem;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.sb-btn--sm { height: 32px; padding: 0 0.8rem; font-size: 0.8rem; }
+.sb-btn--primary {
+  position: relative;
+  overflow: hidden;
+  background: var(--sb-btn-bg);
+  border-color: var(--sb-btn-bd);
+  color: var(--sb-btn-fg);
+}
+.sb-btn--primary:hover { background: var(--sb-btn-bg-hover); border-color: var(--sb-brand); }
+/* Riflesso che ogni tanto attraversa il bottone principale */
+.sb-btn--primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -80%;
+  width: 55%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+  animation: sb-btn-sheen 5s ease-in-out infinite;
+}
+@keyframes sb-btn-sheen {
+  0%, 74% { left: -80%; }
+  100% { left: 135%; }
+}
+.sb-btn--secondary {
+  background: var(--sb-bg-alt);
+  border-color: var(--sb-border-strong);
+  color: var(--sb-fg);
+}
+.sb-btn--secondary:hover { background: var(--sb-surface-200); border-color: var(--sb-border-stronger); }
+.sb-btn--ghost { background: transparent; border-color: transparent; color: var(--sb-fg-light); }
+.sb-btn--ghost:hover { color: var(--sb-fg); background: var(--sb-overlay); }
+
+/* Link verdi "testo + freccia" */
+.sb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--sb-brand-text);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+.sb-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sb-link svg { transition: transform 0.15s ease; }
+.sb-link:hover svg { transform: translateX(2px); }
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.sb-hero {
+  /* Centro dell'alone che segue il puntatore: lo muove GSAP con inerzia. */
+  --sb-hx: 50%;
+  --sb-hy: 38%;
+
+  position: relative;
+  overflow: hidden;
+  padding-top: clamp(3rem, 9vw, 8.5rem);
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.sb-hero > .sb-container { position: relative; z-index: 1; }
+.sb-hero-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+/* Griglia tecnica che scorre piano in diagonale, sfumata verso il basso */
+.sb-hero-grid-bg {
+  position: absolute;
+  inset: -80px;
+  opacity: 0.8;
+  background:
+    linear-gradient(var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px;
+  -webkit-mask-image: radial-gradient(120% 82% at 50% 0%, #000 26%, transparent 76%);
+  mask-image: radial-gradient(120% 82% at 50% 0%, #000 26%, transparent 76%);
+  animation: sb-grid-drift 26s linear infinite;
+}
+@keyframes sb-grid-drift { to { background-position: 64px 64px, 64px 64px; } }
+/* Aurora: due macchie di colore che respirano */
+.sb-hero-aurora {
+  position: absolute;
+  left: 50%;
+  top: -34%;
+  width: min(1100px, 130%);
+  aspect-ratio: 2 / 1;
+  filter: blur(26px);
+  background:
+    radial-gradient(closest-side, hsla(153, 60%, 53%, 0.22), transparent 72%) 18% 42% / 62% 74% no-repeat,
+    radial-gradient(closest-side, hsla(192, 72%, 55%, 0.16), transparent 72%) 78% 30% / 56% 66% no-repeat;
+  animation: sb-aurora 20s ease-in-out infinite;
+}
+@keyframes sb-aurora {
+  0%, 100% { transform: translateX(-52%) scale(1); opacity: 0.75; }
+  50% { transform: translateX(-47%) scale(1.1); opacity: 1; }
+}
+/* Alone sotto il puntatore */
+.sb-hero-spot {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(440px circle at var(--sb-hx) var(--sb-hy), hsla(153, 60%, 53%, 0.14), transparent 62%);
+}
+
+/* Riga di stato "in diretta": disponibilità + orologio di Mantova */
+.sb-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.5rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.6rem;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: 0.78rem;
+  color: var(--sb-fg-lighter);
+}
+.sb-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sb-brand); animation: sb-ping 2.2s ease-out infinite; }
+.sb-live-sep { width: 1px; height: 12px; background: var(--sb-border-strong); }
+.sb-live-clock {
+  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-fg-muted);
+}
+
+/* Ticker "in lavorazione": i nomi scorrono uno alla volta (GSAP) */
+.sb-nowbuild { display: flex; align-items: center; gap: 0.6rem; margin: 1.5rem 0 0; font-size: 0.84rem; }
+.sb-nowbuild-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+/* La finestrella è alta una riga e larga quanto la voce più lunga (il
+   "fantasma" in flusso): le voci scorrono dentro, il testo attorno non balla. */
+.sb-rot { position: relative; display: inline-flex; overflow: hidden; line-height: 1.45; }
+.sb-rot-sizer { visibility: hidden; }
+.sb-rot-sizer, .sb-rot-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.sb-rot-item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--sb-brand-text);
+  text-decoration: none;
+  opacity: 0;
+  /* Premibile solo quando è quella a schermo (la classe la mette GSAP). */
+  pointer-events: none;
+}
+.sb-rot-item:first-child { opacity: 1; }
+.sb-rot-item.is-on { pointer-events: auto; }
+.sb-rot-item:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sb-rot-item svg { opacity: 0.65; transition: transform 0.2s ease, opacity 0.2s ease; }
+.sb-rot-item:hover svg { opacity: 1; transform: translate(2px, -2px); }
+.sb-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: end;
+}
+@media (min-width: 1024px) { .sb-hero-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+.sb-hero-title {
+  margin: 0;
+  font-size: clamp(2.3rem, 5.4vw, 3.4rem);
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  color: var(--sb-fg);
+}
+.sb-hero-title span { display: block; }
+.sb-hero-title .sb-brandline { color: var(--sb-brand); }
+.sb-hero-copy { max-width: 36rem; }
+.sb-hero-copy p { margin: 0 0 0.7rem; font-size: 1rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+.sb-hero-copy p:last-child { margin-bottom: 0; }
+.sb-hero-copy strong { font-weight: 400; color: var(--sb-fg); }
+.sb-hero-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.6rem; }
+
+/* ── Griglia prodotti ────────────────────────────────────────────────────── */
+.sb-products {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding-top: clamp(2rem, 4vw, 3rem);
+}
+@media (min-width: 640px) { .sb-products { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1280px) { .sb-products { grid-template-columns: repeat(12, 1fr); } }
+.sb-card { display: block; text-decoration: none; color: inherit; }
+@media (min-width: 640px) { .sb-card { height: 400px; } .sb-card--lg { grid-column: span 2; } }
+@media (min-width: 1280px) { .sb-card { grid-column: span 3; } .sb-card--lg { grid-column: span 6; } }
+
+/* Pannello con bordo-gradiente da 1px (marchio di fabbrica delle card) */
+.sb-panel {
+  /* Posizione del puntatore dentro il pannello: la scrive GSAP (homeMotion),
+     la leggono il riflesso sul bordo e l'alone interno. --sb-spot è l'intensità
+     (0 fuori, 1 sopra), sfumata da un tween: niente stacchi netti. */
+  --sb-mx: 50%;
+  --sb-my: 50%;
+  --sb-spot: 0;
+
+  position: relative;
+  height: 100%;
+  padding: 1px;
+  border-radius: 12px;
+  background: linear-gradient(
+    to bottom,
+    var(--sb-border-strong),
+    color-mix(in srgb, var(--sb-border) 45%, transparent)
+  );
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Riflesso sul filo del bordo: si vede solo nel millimetro non coperto
+   da .sb-panel-inner, ed è esattamente lì che deve brillare. */
+.sb-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--sb-spot);
+  background: radial-gradient(170px circle at var(--sb-mx) var(--sb-my), var(--sb-brand), transparent 62%);
+}
+a.sb-card:hover .sb-panel,
+button.sb-card:hover .sb-panel,
+.sb-panel--hover:hover {
+  background: var(--sb-border-stronger);
+  box-shadow: var(--sb-shadow-card);
+}
+/* Sollevamento all'hover: sta sul pannello e non sulla card, perché la card
+   porta il transform inline lasciato dal reveal GSAP. */
+a.sb-card:hover .sb-panel,
+.sb-page-card:hover .sb-panel,
+.sb-story:hover .sb-panel {
+  transform: translateY(-3px);
+}
+.sb-panel-inner {
+  position: relative;
+  height: 100%;
+  border-radius: 11px;
+  background: var(--sb-surface-75);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+/* Alone morbido sotto il puntatore, dentro la card. */
+.sb-panel-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: var(--sb-spot);
+  background: radial-gradient(
+    260px circle at calc(var(--sb-mx) - 1px) calc(var(--sb-my) - 1px),
+    hsla(153, 60%, 53%, 0.16),
+    transparent 62%
+  );
+}
+/* Lampo di luce che attraversa la card quando ci passi sopra. */
+.sb-panel-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-130%);
+  background: linear-gradient(
+    104deg,
+    transparent 34%,
+    rgba(255, 255, 255, 0.1) 46%,
+    rgba(255, 255, 255, 0.26) 50%,
+    rgba(255, 255, 255, 0.1) 54%,
+    transparent 66%
+  );
+}
+a.sb-card:hover .sb-panel-inner::before,
+.sb-page-card:hover .sb-panel-inner::before,
+.sb-story:hover .sb-panel-inner::before,
+.sb-wall-card:hover .sb-panel-inner::before {
+  animation: sb-sheen 0.9s ease-out;
+}
+@keyframes sb-sheen {
+  0% { opacity: 0; transform: translateX(-130%); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(130%); }
+}
+
+/* Contenuto delle card prodotto */
+.sb-card-head { padding: 1.4rem 1.4rem 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.sb-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--sb-fg);
+}
+.sb-card-title h3 { margin: 0; font-size: 0.98rem; font-weight: 500; letter-spacing: -0.01em; }
+/* L'icona della card reagisce al passaggio: si ingrandisce, si inclina, si tinge */
+.sb-card-title svg {
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease;
+}
+a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color: var(--sb-brand-text); }
+.sb-page-card .sb-page-top > svg { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease; }
+.sb-page-card:hover .sb-page-top > svg { transform: scale(1.15) rotate(-8deg); color: var(--sb-brand-text); }
+/* Le spunte si accendono una dopo l'altra, in ciclo */
+.sb-checks svg { animation: sb-tick 4.5s ease-in-out infinite; }
+.sb-checks li:nth-child(2) svg { animation-delay: 0.35s; }
+.sb-checks li:nth-child(3) svg { animation-delay: 0.7s; }
+@keyframes sb-tick {
+  0%, 70%, 100% { transform: scale(1); opacity: 0.85; }
+  8% { transform: scale(1.35); opacity: 1; }
+  16% { transform: scale(1); opacity: 1; }
+}
+.sb-card-desc { margin: 0; font-size: 0.875rem; line-height: 1.55; color: var(--sb-fg-lighter); }
+.sb-card-desc strong { font-weight: 400; color: var(--sb-fg); }
+.sb-card-visual {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1.25rem 1.4rem 1.4rem;
+  min-height: 108px;
+}
+
+/* Card grande: testo a sinistra, visual a destra (da lg in su) */
+.sb-card--lg .sb-panel-inner { flex-direction: column; }
+@media (min-width: 1024px) {
+  .sb-card--lg .sb-panel-inner { flex-direction: row; align-items: stretch; }
+  .sb-card--lg .sb-card-head { max-width: 300px; padding: 1.6rem 0 1.6rem 1.6rem; }
+  .sb-card--lg .sb-card-visual { align-items: center; padding: 1.6rem; }
+}
+
+/* Elenco spunte (card grande) */
+.sb-checks { list-style: none; margin: 0.4rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+.sb-checks li { display: flex; align-items: center; gap: 0.55rem; font-size: 0.875rem; color: var(--sb-fg-light); }
+.sb-checks svg { color: var(--sb-brand); flex-shrink: 0; }
+
+/* Mock "browser" della card grande — si ricostruisce da solo: un cursore fa il
+   giro dei blocchi, i blocchi si accendono, la pillola passa da "building" a
+   "live", e ogni tanto un riflesso attraversa il vetro. */
+.sb-browser {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 10px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-bg);
+  overflow: hidden;
+  box-shadow: var(--sb-shadow-card);
+}
+.sb-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--sb-border);
+  background: var(--sb-surface-100);
+}
+.sb-browser-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--sb-border-stronger); }
+.sb-browser-url {
+  margin-left: 0.3rem;
+  flex: 1;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--sb-surface-200);
+  border: 1px solid var(--sb-border);
+  font-size: 0.62rem;
+  line-height: 18px;
+  color: var(--sb-fg-muted);
+  padding: 0 0.7rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.sb-browser-body { position: relative; padding: 0.9rem; display: grid; grid-template-columns: 1fr 2fr; gap: 0.6rem; }
+.sb-skel {
+  --sb-lit: 0;
+  position: relative;
+  border-radius: 6px;
+  background: var(--sb-surface-200);
+  border: 1px solid var(--sb-border);
+  overflow: hidden;
+}
+/* Luccichio di caricamento, sfalsato blocco per blocco */
+.sb-skel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    100deg,
+    transparent 24%,
+    color-mix(in srgb, var(--sb-fg) 9%, transparent) 50%,
+    transparent 76%
+  );
+  animation: sb-shimmer 2.6s ease-in-out infinite;
+}
+.sb-skel:nth-child(2)::before { animation-delay: 0.25s; }
+.sb-skel:nth-child(3)::before { animation-delay: 0.5s; }
+.sb-skel:nth-child(4)::before { animation-delay: 0.75s; }
+@keyframes sb-shimmer {
+  0% { transform: translateX(-100%); }
+  55%, 100% { transform: translateX(100%); }
+}
+/* Contorno che si accende al passaggio del cursore finto (GSAP → --sb-lit) */
+.sb-skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--sb-lit);
+  box-shadow: inset 0 0 0 1.5px hsla(153, 60%, 53%, 0.75), inset 0 0 16px hsla(153, 60%, 53%, 0.3);
+}
+.sb-skel--hero { grid-column: 1 / -1; height: 56px; background:
+  linear-gradient(120deg, color-mix(in srgb, var(--sb-brand) 18%, var(--sb-surface-200)), var(--sb-surface-200)); }
+.sb-skel--side { height: 84px; }
+.sb-skel--main { height: 84px; }
+.sb-skel--foot { grid-column: 1 / -1; height: 26px; }
+
+/* Pillola di stato del deploy */
+.sb-browser-badge {
+  flex-shrink: 0;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-200);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.sb-browser.is-live .sb-browser-badge {
+  background: var(--sb-btn-bg);
+  border-color: var(--sb-btn-bd);
+  color: var(--sb-btn-fg);
+  box-shadow: 0 0 14px -2px var(--sb-brand);
+}
+
+/* Cursore che visita i blocchi (posizione mossa da GSAP) */
+.sb-browser-cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--sb-brand);
+  background: hsla(153, 60%, 53%, 0.22);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Riflesso periodico sul "vetro" */
+.sb-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  transform: translateX(-130%);
+  background: linear-gradient(
+    102deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.12) 47%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.12) 53%,
+    transparent 62%
+  );
+  animation: sb-sheen-run 6.5s ease-in-out infinite;
+}
+@keyframes sb-sheen-run {
+  0%, 68% { transform: translateX(-130%); }
+  100% { transform: translateX(130%); }
+}
+
+/* Terminale (card AI) — resta scuro in entrambi i temi, come un vero terminale.
+   Digita davvero: il testo lo scrive un timeline GSAP (vedi site/homeLive). */
+.sb-term {
+  position: relative;
+  width: 100%;
+  min-height: 104px;
+  border-radius: 10px;
+  background: #171717;
+  border: 1px solid #2e2e2e;
+  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-size: 0.82rem;
+  color: #ededed;
+  padding: 0.9rem 1rem 1.5rem;
+  text-align: left;
+  overflow: hidden;
+}
+.sb-term-line { display: flex; gap: 0.5rem; white-space: nowrap; line-height: 1.7; }
+.sb-term-line .p { color: var(--sb-brand); }
+.sb-term-line .c { color: #8f8f8f; }
+.sb-term-typed { display: inline-flex; align-items: baseline; }
+.sb-term-cmd { min-height: 1em; }
+/* Filo che scorre a fondo terminale: la sessione è viva, sta ascoltando. */
+.sb-term-ants { position: absolute; left: 1rem; right: 1rem; bottom: 0.6rem; display: block; line-height: 0; }
+.sb-term-ants line { stroke: var(--sb-brand); opacity: 0.55; animation: sb-ants 0.9s linear infinite; }
+@keyframes sb-ants { to { stroke-dashoffset: -8; } }
+.sb-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--sb-brand);
+  animation: sb-blink 1.1s steps(1) infinite;
+}
+@keyframes sb-blink { 50% { opacity: 0; } }
+
+/* Chip-loghi (card siti clienti / lingue) */
+.sb-chiprow { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.sb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-bg);
+  font-size: 0.8rem;
+  color: var(--sb-fg-light);
+  white-space: nowrap;
+}
+.sb-chip svg { color: var(--sb-fg-muted); }
+.sb-chip-dot {
+  display: inline-block;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sb-brand);
+  animation: sb-ping 2.6s ease-out infinite;
+}
+.sb-chip-dot--sm { width: 5px; height: 5px; margin-right: 0.35rem; vertical-align: 0.1em; }
+@keyframes sb-ping {
+  0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55); }
+  70% { box-shadow: 0 0 0 7px hsla(153, 60%, 53%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
+}
+
+/* Grafo di diffusione (card siti clienti) — dal nodo centrale partono pacchetti
+   verso i due siti: è la stessa tecnica dei broadcast di Supabase Realtime,
+   una traccia "fantasma" più un tratteggio che la percorre. */
+.sb-flow { position: relative; width: 100%; max-width: 300px; height: 116px; }
+.sb-flow-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.sb-flow-wires .ghost { stroke: var(--sb-border-stronger); opacity: 0.6; }
+.sb-flow-wires .pulse { stroke: var(--sb-brand); animation: sb-packet 3s linear infinite; }
+@keyframes sb-packet {
+  from { stroke-dashoffset: 322; }
+  to { stroke-dashoffset: 0; }
+}
+.sb-flow-hub {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -17px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-bg);
+  animation: sb-hub 3s ease-out infinite;
+}
+.sb-flow-hub img { width: 20px; height: 20px; border-radius: 5px; display: block; }
+@keyframes sb-hub {
+  0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.5); }
+  60% { box-shadow: 0 0 0 12px hsla(153, 60%, 53%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
+}
+.sb-flow-ends {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+.sb-flow-ends .sb-chip { padding: 0.34rem 0.6rem; font-size: 0.7rem; gap: 0.35rem; }
+
+/* HUD di gioco (card giochi web) — gioca da sola: i punti salgono a scatti,
+   la serie s'infiamma, il voto si ribalta. */
+.sb-hud { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; perspective: 500px; }
+.sb-hud-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-bg);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--sb-fg-light);
+  font-variant-numeric: tabular-nums;
+}
+.sb-hud-pill .up { color: var(--sb-brand-text); }
+.sb-hud-score { min-width: 3.4ch; text-align: right; }
+/* "+120" che sale e svanisce a ogni risposta giusta */
+.sb-hud-pop {
+  position: absolute;
+  right: 0.5rem;
+  top: -0.1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--sb-brand-text);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.sb-hud-streak { animation: sb-flicker 2.8s ease-in-out infinite; }
+@keyframes sb-flicker {
+  0%, 100% { box-shadow: 0 0 0 0 hsla(24, 92%, 55%, 0); border-color: var(--sb-border-strong); }
+  45% { box-shadow: 0 0 16px -2px hsla(24, 92%, 55%, 0.55); border-color: hsla(24, 92%, 55%, 0.5); }
+}
+.sb-hud-grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--sb-btn-bg);
+  border: 1px solid var(--sb-btn-bd);
+  color: var(--sb-btn-fg);
+  font-weight: 700;
+  font-size: 0.95rem;
+  transform-style: preserve-3d;
+  animation: sb-grade-glow 2.8s ease-in-out infinite;
+}
+@keyframes sb-grade-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
+  50% { box-shadow: 0 0 20px -4px var(--sb-brand); }
+}
+
+/* Diff a due liste (card strumenti) — una riga di scansione scende e le voci
+   si accendono al suo passaggio: il confronto avviene sotto gli occhi. */
+.sb-diff { position: relative; width: 100%; max-width: 300px; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.sb-diff-col {
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 8px;
+  background: var(--sb-bg);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.sb-diff-row { height: 9px; border-radius: 4px; background: var(--sb-surface-200); }
+.sb-diff-row--hit { background: color-mix(in srgb, var(--sb-brand) 38%, var(--sb-surface-200)); }
+.sb-diff-row--miss { background: color-mix(in srgb, #e93d5d 30%, var(--sb-surface-200)); }
+.sb-diff-row--hit, .sb-diff-row--miss { animation: sb-hit 3.6s ease-in-out infinite; }
+.sb-diff-row:nth-child(1) { animation-delay: 0.35s; }
+.sb-diff-row:nth-child(2) { animation-delay: 0.68s; }
+.sb-diff-row:nth-child(3) { animation-delay: 1.01s; }
+.sb-diff-row:nth-child(4) { animation-delay: 1.34s; }
+@keyframes sb-hit {
+  0%, 100% { transform: scaleX(1); filter: none; }
+  8% { transform: scaleX(1.03); filter: brightness(1.45) saturate(1.3); }
+  22% { transform: scaleX(1); filter: none; }
+}
+.sb-diff-scan {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 0;
+  height: 16px;
+  border-radius: 8px;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, hsla(153, 60%, 53%, 0.3), transparent);
+  box-shadow: 0 0 18px hsla(153, 60%, 53%, 0.45);
+  animation: sb-scan 3.6s ease-in-out infinite;
+}
+@keyframes sb-scan {
+  0% { transform: translateY(2px); opacity: 0; }
+  10% { opacity: 1; }
+  45% { transform: translateY(62px); opacity: 1; }
+  60%, 100% { transform: translateY(62px); opacity: 0; }
+}
+
+/* Carta millimetrata (card CAT) — la griglia scorre, il radar spazza, l'ago
+   della bussola oscilla e la quota si ridisegna. */
+.sb-blueprint {
+  width: 100%;
+  max-width: 300px;
+  height: 116px;
+  border-radius: 10px;
+  border: 1px solid var(--sb-border-strong);
+  background:
+    linear-gradient(var(--sb-border) 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(90deg, var(--sb-border) 1px, transparent 1px) 0 0 / 20px 20px,
+    var(--sb-bg);
+  position: relative;
+  overflow: hidden;
+  animation: sb-graph-drift 12s linear infinite;
+}
+@keyframes sb-graph-drift { to { background-position: 20px 20px, 20px 20px, 0 0; } }
+.sb-blueprint-sweep {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 260px;
+  margin: -130px 0 0 -130px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    hsla(153, 60%, 53%, 0) 0deg,
+    hsla(153, 60%, 53%, 0.26) 46deg,
+    hsla(153, 60%, 53%, 0) 82deg
+  );
+  animation: sb-spin 4.5s linear infinite;
+}
+@keyframes sb-spin { to { transform: rotate(360deg); } }
+.sb-blueprint-needle {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--sb-brand-text);
+  animation: sb-needle 9s ease-in-out infinite;
+}
+@keyframes sb-needle {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+.sb-blueprint-dim { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sb-blueprint-dim path {
+  stroke: var(--sb-brand-text);
+  opacity: 0.55;
+  stroke-dasharray: 260;
+  animation: sb-draw 6s ease-in-out infinite;
+}
+@keyframes sb-draw {
+  0% { stroke-dashoffset: 260; }
+  35%, 70% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -260; }
+}
+
+/* Tipografia "Aa" (card design) — la stessa interfaccia disegnata due volte:
+   una tendina scorre avanti e indietro e scopre lo scuro sotto il chiaro. */
+.sb-aa {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--sb-border-strong);
+}
+.sb-aa > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 1.1rem 0;
+  font-size: 1.7rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.sb-aa .lite { background: #fcfcfc; color: #171717; }
+.sb-aa .dark {
+  position: absolute;
+  inset: 0;
+  background: #171717;
+  color: #ededed;
+  clip-path: inset(0 0 0 50%);
+  animation: sb-wipe 7s ease-in-out infinite;
+}
+@keyframes sb-wipe {
+  0%, 100% { clip-path: inset(0 0 0 64%); }
+  50% { clip-path: inset(0 0 0 22%); }
+}
+.sb-aa-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: var(--sb-brand);
+  animation: sb-wipe-handle 7s ease-in-out infinite;
+}
+@keyframes sb-wipe-handle {
+  0%, 100% { left: 64%; }
+  50% { left: 22%; }
+}
+.sb-aa-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--sb-brand);
+  box-shadow: 0 0 0 4px hsla(153, 60%, 53%, 0.22);
+}
+.sb-aa small { font-size: 0.95rem; color: var(--sb-brand); font-weight: 400; }
+
+/* Coda della griglia: tagline + "trusted by" */
+.sb-prodfoot { text-align: center; padding-top: clamp(2.5rem, 5vw, 4rem); }
+.sb-prodfoot-tag { margin: 0 0 2rem; font-size: 0.95rem; color: var(--sb-fg-lighter); }
+.sb-prodfoot-tag strong { font-weight: 500; color: var(--sb-fg); }
+.sb-trusted-label {
+  display: block;
+  margin: 0 0 0.9rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+.sb-trusted { display: flex; flex-wrap: wrap; gap: 0.8rem 2.2rem; align-items: center; justify-content: center; }
+.sb-trusted a, .sb-trusted span {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--sb-fg-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.sb-trusted a:hover { color: var(--sb-fg); }
+
+/* ── Sezione archivio ("dashboard") ──────────────────────────────────────── */
+.sb-sechead { max-width: 40rem; margin: 0 auto; text-align: center; }
+.sb-sechead h2, .sb-sechead h3 {
+  margin: 0 0 0.8rem;
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--sb-fg);
+}
+.sb-sechead p { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+.sb-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; margin: 1.6rem 0 1.2rem; }
+.sb-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 34px;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: none;
+  font-family: inherit;
+  font-size: 0.84rem;
+  color: var(--sb-fg-lighter);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.sb-tab:hover { color: var(--sb-fg); }
+.sb-tab[aria-selected="true"] {
+  color: var(--sb-fg);
+  background: var(--sb-surface-100);
+  border-color: var(--sb-border-strong);
+}
+.sb-arch-frame .sb-panel-inner { background: var(--sb-bg-alt); }
+/* Nessun riflesso sopra l'archivio: sotto ci sono menù e anteprime. */
+.sb-arch-frame .sb-panel-inner::after,
+.sb-arch-frame .sb-panel-inner::before,
+.sb-arch-frame .sb-panel::before { display: none; }
+.sb-arch-cta { display: flex; justify-content: center; margin-top: 1.4rem; }
+
+/* ── Sezione stack ("Use Supabase with React") ───────────────────────────── */
+.sb-stack-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: start; }
+@media (min-width: 1024px) { .sb-stack-grid { grid-template-columns: 5fr 7fr; gap: 3rem; } }
+.sb-stack-title {
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--sb-fg);
+}
+/* Il nome della tecnologia cambia con un piccolo lampo di luce che lo attraversa */
+.sb-stack-title .tech {
+  color: var(--sb-brand-text);
+  background: linear-gradient(
+    100deg,
+    var(--sb-brand-text) 38%,
+    color-mix(in srgb, var(--sb-brand-text) 45%, #fff) 50%,
+    var(--sb-brand-text) 62%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: sb-textshine 5.5s ease-in-out infinite;
+}
+@keyframes sb-textshine {
+  0%, 62% { background-position: 160% 0; }
+  100% { background-position: -60% 0; }
+}
+.sb-techrow { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.6rem; }
+.sb-tech {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--sb-fg-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.sb-tech:hover { color: var(--sb-fg-light); background: var(--sb-overlay); }
+.sb-tech svg { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.sb-tech:hover svg { transform: scale(1.2) rotate(-8deg); }
+.sb-tech[aria-selected="true"] {
+  color: var(--sb-fg);
+  background: var(--sb-surface-100);
+  border-color: var(--sb-border-strong);
+  box-shadow: 0 0 22px -8px var(--sb-brand);
+}
+.sb-tech[aria-selected="true"] svg { animation: sb-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes sb-pop {
+  0% { transform: scale(0.7) rotate(-14deg); }
+  60% { transform: scale(1.15) rotate(4deg); }
+  100% { transform: scale(1); }
+}
+.sb-stack-note { margin: 0 0 1.2rem; font-size: 0.9rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+.sb-codehead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--sb-border);
+  background: var(--sb-surface-100);
+  border-radius: 11px 11px 0 0;
+  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-size: 0.76rem;
+  color: var(--sb-fg-muted);
+}
+.sb-codehead i { width: 8px; height: 8px; border-radius: 50%; background: var(--sb-border-stronger); }
+.sb-code {
+  margin: 0;
+  padding: 1rem 1.1rem 1.2rem;
+  min-height: 320px;
+  overflow-x: auto;
+  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-size: 0.83rem;
+  line-height: 1.65;
+  color: var(--sb-fg-light);
+  tab-size: 2;
+}
+.sb-code .tk-k { color: var(--sb-code-kw); }
+.sb-code .tk-s { color: var(--sb-brand-text); }
+.sb-code .tk-c { color: var(--sb-fg-muted); font-style: italic; }
+.sb-code .tk-n { color: var(--sb-code-num); }
+.sb-code .tk-f { color: var(--sb-code-fn); }
+
+/* ── Testate di sezione a due lati ───────────────────────────────────────── */
+.sb-splithead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.sb-splithead h3 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--sb-fg);
+  max-width: 30rem;
+}
+
+/* ── Griglia "pagine" (≈ template) ───────────────────────────────────────── */
+.sb-pages { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 640px) { .sb-pages { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .sb-pages { grid-template-columns: repeat(3, 1fr); } }
+.sb-page-card { display: block; text-decoration: none; color: inherit; }
+.sb-page-inner { padding: 1.3rem; gap: 0.7rem; }
+.sb-page-top { display: flex; align-items: center; justify-content: space-between; color: var(--sb-fg-light); }
+.sb-page-top .go { color: var(--sb-fg-muted); opacity: 0; transform: translate(-3px, 3px); transition: opacity 0.15s, transform 0.15s, color 0.15s; }
+.sb-page-card:hover .go { opacity: 1; transform: none; color: var(--sb-fg); }
+.sb-page-inner h4 { margin: 0; font-size: 0.95rem; font-weight: 500; color: var(--sb-fg); }
+.sb-page-inner p { margin: 0; font-size: 0.84rem; line-height: 1.55; color: var(--sb-fg-lighter); }
+
+/* ── Story-card dei progetti di punta ────────────────────────────────────── */
+.sb-stories { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 640px) { .sb-stories { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1280px) { .sb-stories { grid-template-columns: repeat(4, 1fr); } }
+.sb-story { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+.sb-story-inner { padding: 1.4rem; gap: 1rem; }
+.sb-story-top { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.sb-story-name { font-size: 0.95rem; font-weight: 500; color: var(--sb-fg); letter-spacing: -0.01em; }
+.sb-story-kind {
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  white-space: nowrap;
+}
+.sb-story-quote { margin: 0; flex: 1; font-size: 0.98rem; line-height: 1.55; color: var(--sb-fg-light); }
+.sb-story-quote strong { font-weight: 400; color: var(--sb-fg); }
+.sb-story-foot { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.84rem; color: var(--sb-brand-text); }
+
+/* ── Muro curriculum (≈ muro dei tweet) ──────────────────────────────────── */
+.sb-cv-actions { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0 2rem; }
+.sb-wall { columns: 1; column-gap: 1rem; }
+@media (min-width: 640px) { .sb-wall { columns: 2; } }
+@media (min-width: 1024px) { .sb-wall { columns: 3; } }
+@media (min-width: 1440px) { .sb-wall { columns: 4; } }
+.sb-wall-card { break-inside: avoid; margin: 0 0 1rem; }
+.sb-wall-inner { padding: 1.1rem 1.2rem; gap: 0.45rem; }
+.sb-cv-period { font-size: 0.8rem; font-weight: 500; color: var(--sb-brand-text); }
+.sb-cv-title { margin: 0; font-size: 0.92rem; font-weight: 500; line-height: 1.35; color: var(--sb-fg); }
+.sb-cv-role { margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--sb-fg-muted); }
+.sb-cv-desc { margin: 0.15rem 0 0; font-size: 0.84rem; line-height: 1.55; color: var(--sb-fg-lighter); }
+.sb-cv-doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--sb-brand-text);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.sb-cv-doc:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sb-wall-card--wish .sb-panel {
+  background: linear-gradient(to bottom, hsla(153, 60%, 53%, 0.55), hsla(153, 60%, 53%, 0.12));
+}
+.sb-wall-card--wish .sb-cv-title { font-style: italic; }
+
+/* ── Open source ─────────────────────────────────────────────────────────── */
+.sb-open { display: grid; grid-template-columns: 1fr; gap: 2.5rem; align-items: center; }
+@media (min-width: 1024px) { .sb-open { grid-template-columns: 1fr 1fr; gap: 4rem; } }
+.sb-open h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--sb-fg);
+}
+.sb-open p { margin: 0 0 1rem; font-size: 0.95rem; line-height: 1.65; color: var(--sb-fg-lighter); }
+.sb-open p strong { font-weight: 400; color: var(--sb-fg); }
+.sb-ghcard-inner { padding: 1.5rem; gap: 1rem; }
+.sb-ghcard-id { display: flex; align-items: center; gap: 0.9rem; }
+.sb-ghcard-id img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid var(--sb-border-strong);
+  object-fit: cover;
+}
+.sb-ghcard-name { font-size: 1rem; font-weight: 500; color: var(--sb-fg); line-height: 1.3; }
+.sb-ghcard-handle { font-size: 0.84rem; color: var(--sb-fg-muted); }
+.sb-ghcard-bio { margin: 0; font-size: 0.86rem; line-height: 1.55; color: var(--sb-fg-lighter); }
+.sb-ghcard-repo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 8px;
+  background: var(--sb-bg);
+  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-size: 0.8rem;
+  color: var(--sb-fg-light);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.sb-ghcard-repo:hover { border-color: var(--sb-border-stronger); }
+.sb-ghcard-repo .badge {
+  margin-left: auto;
+  font-size: 0.66rem;
+  font-family: "Ubuntu", sans-serif;
+  color: var(--sb-fg-muted);
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+}
+
+/* Muro dei commit — un'onda di calore lo attraversa da sinistra a destra
+   (lo stagger lo guida GSAP, vedi ContribGraph in site/homeLive). */
+.sb-contrib { margin-top: 0.2rem; }
+.sb-contrib-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; }
+.sb-cell {
+  --sb-heat: 0;
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--sb-surface-200);
+}
+.sb-cell[data-lv="1"] { background: hsla(153, 60%, 53%, 0.3); }
+.sb-cell[data-lv="2"] { background: hsla(153, 60%, 53%, 0.52); }
+.sb-cell[data-lv="3"] { background: hsla(153, 60%, 53%, 0.74); }
+.sb-cell[data-lv="4"] { background: hsla(153, 60%, 53%, 0.95); }
+.sb-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sb-brand);
+  opacity: calc(var(--sb-heat) * 0.55);
+}
+.sb-contrib-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.55rem;
+  font-size: 0.72rem;
+  color: var(--sb-fg-muted);
+}
+.sb-contrib-foot b { color: var(--sb-brand-text); font-weight: 500; font-variant-numeric: tabular-nums; }
+.sb-contrib-legend { display: inline-flex; align-items: center; gap: 2px; }
+.sb-contrib-legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--sb-surface-200); }
+.sb-contrib-legend i[data-lv="1"] { background: hsla(153, 60%, 53%, 0.3); }
+.sb-contrib-legend i[data-lv="2"] { background: hsla(153, 60%, 53%, 0.52); }
+.sb-contrib-legend i[data-lv="3"] { background: hsla(153, 60%, 53%, 0.74); }
+.sb-contrib-legend i[data-lv="4"] { background: hsla(153, 60%, 53%, 0.95); }
+
+/* ── CTA finale ──────────────────────────────────────────────────────────── */
+.sb-cta { text-align: center; }
+.sb-cta h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--sb-fg);
+}
+.sb-cta h2 .sb-brandline { display: block; color: var(--sb-brand); }
+/* Cursore che lampeggia in fondo all'invito: la riga sembra appena scritta */
+.sb-caret {
+  display: inline-block;
+  width: 0.42ch;
+  height: 0.86em;
+  margin-left: 0.14em;
+  vertical-align: -0.06em;
+  background: var(--sb-brand);
+  animation: sb-blink 1.1s steps(1) infinite;
+}
+.sb-cta p { margin: 0 auto 1.8rem; max-width: 34rem; font-size: 1rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+.sb-cta-actions { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+
+/* ── Menu mobile ─────────────────────────────────────────────────────────── */
+.sb-menu { position: fixed; inset: 0; z-index: 1000; visibility: hidden; pointer-events: none; }
+.sb-menu.open { visibility: visible; pointer-events: auto; }
+.sb-menu-scrim {
+  position: absolute;
+  inset: 0;
+  border: none;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.sb-menu.open .sb-menu-scrim { opacity: 1; }
+.sb-menu-sheet {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(88vw, 360px);
+  background: var(--sb-bg);
+  border-left: 1px solid var(--sb-border);
+  display: flex;
+  flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + 0.8rem) 1.25rem calc(env(safe-area-inset-bottom) + 1.25rem);
+  transform: translateX(102%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow-y: auto;
+}
+.sb-menu.open .sb-menu-sheet { transform: translateX(0); }
+.sb-menu-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.sb-menu-nav { display: flex; flex-direction: column; }
+.sb-menu-nav a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.2rem;
+  border-bottom: 1px solid var(--sb-border);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--sb-fg);
+  text-decoration: none;
+}
+.sb-menu-nav a svg { color: var(--sb-fg-muted); }
+.sb-menu-nav a:hover svg { color: var(--sb-brand-text); }
+.sb-menu-foot { margin-top: auto; padding-top: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.sb-menu-foot .sb-btn { width: 100%; }
+.sb-menu-mail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--sb-fg-light);
+  text-decoration: none;
+}
+.sb-menu-mail:hover { color: var(--sb-fg); }
+.sb-menu-mail svg { color: var(--sb-brand-text); }
+
+/* ── Modale PDF: barra coerente con la home verde ────────────────────────── */
+.sb-home .ap-cv-bar { background: #1c1c1c; }
+.sb-home .ap-cv-fallback { background: var(--sb-surface-100); color: var(--sb-brand-text); border-bottom-color: var(--sb-border); }
+
+/* ── Skiplink (riusa la convenzione del sito) ────────────────────────────── */
+.sb-home .visually-hidden-focusable:not(:focus):not(:focus-within) {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.sb-home .visually-hidden-focusable:focus {
+  position: fixed;
+  top: 8px; left: 8px;
+  z-index: 2000;
+  background: var(--sb-btn-bg);
+  color: var(--sb-btn-fg);
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+/* ── Responsive nav ──────────────────────────────────────────────────────── */
+@media (max-width: 1023.98px) {
+  .sb-nav-links { display: none; }
+  .sb-nav-right .sb-btn--gh-label { display: none; }
+}
+@media (max-width: 767.98px) {
+  .sb-nav-right .sb-btn:not(.sb-btn--keep) { display: none; }
+  .sb-burger { display: inline-flex; }
+}
+
+/* ── Footer condiviso (.sb-foot) — replica del footer Supabase ────────────
+   Vive su OGNI pagina: porta con sé la classe .sb-home per ereditare i token
+   (e quindi il tema nativo chiaro/scuro), ma annulla il min-height da pagina.
+   Il movimento (alone, riflessi, lampo, magneti, cascata, contatori) è diretto
+   da site/footMotion.ts — qui ci sono solo i posti dove la luce va a cadere. */
+.sb-home.sb-foot {
+  /* Posizione dell'alone ambientale: la scrive footMotion inseguendo il
+     puntatore con inerzia; --sb-aura è quanto è acceso. */
+  --sb-fx: 50%;
+  --sb-fy: 0%;
+  --sb-aura: 0.5;
+
+  min-height: 0;
+  background: var(--sb-bg-alt);
+  border-top: 1px solid var(--sb-border);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 2;
+}
+/* Alone ambientale: una lampada verde dietro tutto il footer che insegue il
+   puntatore e, quando il puntatore è altrove, respira piano (loop GSAP). */
+.sb-foot-aura {
+  position: absolute;
+  inset: -30% -10% auto -10%;
+  height: 150%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--sb-aura);
+  background: radial-gradient(
+    44rem 24rem at var(--sb-fx) var(--sb-fy),
+    hsla(153, 60%, 53%, 0.14),
+    transparent 68%
+  );
+}
+html.dark .sb-foot-aura {
+  background: radial-gradient(
+    44rem 24rem at var(--sb-fx) var(--sb-fy),
+    hsla(153, 60%, 53%, 0.2),
+    transparent 68%
+  );
+}
+/* Filo di luce che ogni tanto percorre il bordo alto del footer (loop GSAP). */
+.sb-foot-beam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26%;
+  height: 2px;
+  z-index: 2;
+  pointer-events: none;
+  transform: translateX(-120%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(153, 60%, 53%),
+    hsl(192, 72%, 55%),
+    transparent
+  );
+  box-shadow: 0 0 14px -2px hsl(153, 60%, 53%);
+}
+.sb-foot-wrap {
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  /* Il fondo lascia spazio alla barra fissa lingua/tema (in basso a sinistra):
+     senza questa aria coprirebbe il © e le righe finali a fine scroll. */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 5.5rem);
+}
+/* Griglia alla Supabase: identità+social a sinistra (≈ colonna del logo),
+   mini-dashboard GitHub a destra (≈ colonne di link). Le due colonne sono card
+   .sb-panel come quelle della home: stesso bordo-gradiente, stesso riflesso. */
+.sb-foot-grid { display: grid; grid-template-columns: 1fr; gap: 1.1rem; align-items: stretch; }
+@media (min-width: 1024px) { .sb-foot-grid { grid-template-columns: 2fr 5fr; gap: 1.25rem; } }
+/* Le card del footer stanno più basse delle card della home: il footer è una
+   coda, non una vetrina — bordo appena accennato finché non ci passi sopra. */
+.sb-foot-card { min-width: 0; }
+.sb-foot-card .sb-panel-inner { background: var(--sb-bg); }
+.sb-foot-card:hover .sb-panel {
+  background: var(--sb-border-stronger);
+  box-shadow: var(--sb-shadow-card);
+}
+.sb-foot-pad {
+  padding: clamp(1.1rem, 2.4vw, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+}
+/* Il widget GitHub ha bollette che escono dai suoi bordi (i tooltip delle
+   candele del grafico): l'interno della card qui NON taglia. A tagliare il
+   lampo ci pensa la sua vaschetta, e l'alone si arrotonda da sé. */
+.sb-foot-card .sb-panel-inner { overflow: visible; }
+.sb-foot-card .sb-panel-inner::after { border-radius: inherit; }
+.sb-foot-flashwrap {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Lampo che attraversa la card in diagonale quando ci entri col puntatore.
+   È un elemento vero (non una ::before animata dal CSS) perché lo comanda
+   GSAP: così rientrando di corsa riparte sempre dall'inizio. */
+.sb-foot-flash {
+  position: absolute;
+  inset: -10% -30%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-140%);
+  background: linear-gradient(
+    104deg,
+    transparent 36%,
+    hsla(153, 60%, 53%, 0.1) 46%,
+    rgba(255, 255, 255, 0.28) 50%,
+    hsla(192, 72%, 55%, 0.1) 54%,
+    transparent 64%
+  );
+}
+html.dark .sb-foot-flash {
+  background: linear-gradient(
+    104deg,
+    transparent 36%,
+    hsla(153, 60%, 53%, 0.12) 46%,
+    rgba(255, 255, 255, 0.16) 50%,
+    hsla(192, 72%, 55%, 0.12) 54%,
+    transparent 64%
+  );
+}
+.sb-foot-name {
+  display: inline-block;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--sb-fg);
+  text-decoration: none;
+}
+.sb-foot-name:hover { color: var(--sb-brand-text); }
+.sb-foot-role { margin: 0.3rem 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--sb-fg-lighter); }
+.sb-foot-social { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1.3rem; max-width: 21rem; }
+/* Le icone social sono magnetiche (footMotion muove la <a> con x/y): il
+   transform dell'hover sta quindi sull'icona DENTRO, non sul contenitore —
+   altrimenti i due si sovrascriverebbero a vicenda. */
+.sb-foot-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: var(--sb-fg-muted);
+  border: 1px solid transparent;
+  transition: color 0.18s, background 0.18s, border-color 0.18s;
+  will-change: transform;
+}
+.sb-foot-social a:hover {
+  color: var(--sb-brand-text);
+  background: var(--sb-overlay);
+  border-color: color-mix(in srgb, var(--sb-brand) 35%, transparent);
+}
+.sb-foot-social a svg { transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+.sb-foot-social a:hover svg { transform: scale(1.22) rotate(-8deg); }
+/* Filo sfumato (trasparente → bordo → trasparente), firma di Supabase.
+   Ogni tanto un impulso verde lo percorre da sinistra a destra; sopra ci
+   scorre la barra di avanzamento verde/ciano che misura l'ingresso del footer. */
+.sb-foot-hairline {
+  position: relative;
+  height: 2px;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(to right, transparent, var(--sb-border-stronger), transparent);
+}
+.sb-foot-prog {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  border-radius: inherit;
+  background: linear-gradient(90deg, hsl(153, 60%, 53%), hsl(192, 72%, 55%));
+  box-shadow: 0 0 12px -1px hsl(153, 60%, 53%);
+}
+.sb-foot-hairline::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -34%;
+  width: 34%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--sb-brand), transparent);
+  animation: sb-hairline 7s ease-in-out infinite;
+}
+@keyframes sb-hairline {
+  0%, 55% { left: -34%; }
+  100% { left: 110%; }
+}
+.sb-foot-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  flex-wrap: wrap;
+  padding-top: 1.2rem;
+  font-size: 0.8rem;
+  color: var(--sb-fg-muted);
+}
+.sb-foot-links { display: inline-flex; align-items: center; gap: 0.6rem; }
+.sb-foot-sep { color: var(--sb-border-stronger); }
+/* I due pulsanti in fondo (Palette · Come funziona) prendono la sottolineatura
+   che si apre da sinistra della nav, e sono magnetici come le icone social. */
+.sb-foot-links .apl-open,
+.sb-foot-links .apw-open {
+  position: relative;
+  padding-bottom: 2px;
+  will-change: transform;
+}
+.sb-foot-links .apl-open::after,
+.sb-foot-links .apw-open::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--sb-brand);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sb-foot-links .apl-open:hover::after,
+.sb-foot-links .apw-open:hover::after { transform: scaleX(1); }
+
+/* ── Riduzione del movimento ─────────────────────────────────────────────────
+   Chi ha chiesto meno movimento non deve vedere NIENTE che si muova da solo:
+   i loop si spengono tutti e ogni cosa resta sul fotogramma più leggibile.
+   Restano solo le transizioni brevissime legate a un gesto dell'utente e la
+   barra di avanzamento, che è informazione. La regia GSAP dei loop non parte
+   nemmeno (i componenti controllano la media query prima di montare). */
+@media (prefers-reduced-motion: reduce) {
+  .sb-menu-sheet, .sb-menu-scrim, .sb-panel, .sb-link svg, .sb-page-top .go { transition: none; }
+
+  .sb-home *,
+  .sb-home *::before,
+  .sb-home *::after {
+    animation: none !important;
+  }
+
+  /* Stati di riposo scelti a mano, dove il fotogramma iniziale non basta. */
+  .sb-hero-grid-bg { opacity: 0.5; }
+  .sb-skel::before, .sb-sheen, .sb-diff-scan, .sb-blueprint-sweep, .sb-browser-cursor,
+  .sb-foot-hairline::after, .sb-foot-beam, .sb-btn--primary::after, .sb-flow-wires .pulse { display: none; }
+  /* L'alone del footer resta, fermo al centro: è atmosfera, non movimento. */
+  .sb-home.sb-foot { --sb-fx: 50%; --sb-fy: 0%; --sb-aura: 0.45; }
+  .sb-foot-social a svg { transition: none; }
+  .sb-aa .dark { clip-path: inset(0 0 0 50%); }
+  .sb-aa-handle { left: 50%; }
+  .sb-stack-title .tech {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--sb-brand-text);
+  }
+  .sb-blueprint-dim path { stroke-dasharray: none; }
+  .sb-rot-sizer { display: none; }
+  .sb-rot-item { position: static; pointer-events: auto; }
+  .sb-rot-item:not(:first-child) { display: none; }
+  .sb-cursor, .sb-caret { opacity: 1; }
+}

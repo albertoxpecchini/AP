@@ -839,6 +839,11 @@
     "fr": "🎮 Mes loisirs",
     "de": "🎮 Meine Hobbys"
   },
+  "My hobbies": {
+    "it": "I miei hobby",
+    "fr": "Mes loisirs",
+    "de": "Meine Hobbys"
+  },
   "In my free time": {
     "it": "Nel tempo libero",
     "fr": "Pendant mon temps libre",
@@ -903,6 +908,11 @@
     "it": "🔥 Le mie passioni",
     "fr": "🔥 Mes passions",
     "de": "🔥 Meine Leidenschaften"
+  },
+  "My passions": {
+    "it": "Le mie passioni",
+    "fr": "Mes passions",
+    "de": "Meine Leidenschaften"
   },
   "What drives me": {
     "it": "Cosa mi spinge",
@@ -1044,6 +1054,11 @@
     "fr": "📍 Emplacement",
     "de": "📍 Standort"
   },
+  "Where I'm based": {
+    "it": "Dove vivo",
+    "fr": "Où je vis",
+    "de": "Wo ich lebe"
+  },
   "Mantua · Italy": {
     "it": "Mantova · Italia",
     "fr": "Mantoue · Italie",
@@ -1054,10 +1069,25 @@
     "fr": "🎓 Formation",
     "de": "🎓 Ausbildung"
   },
+  "Education & training": {
+    "it": "Studi e formazione",
+    "fr": "Études et formation",
+    "de": "Ausbildung und Studium"
+  },
+  "Close the details": {
+    "it": "Chiudi la scheda",
+    "fr": "Fermer la fiche",
+    "de": "Details schließen"
+  },
   "Torna alla home": {
     "en": "Back to home",
     "fr": "Retour à l'accueil",
     "de": "Zurück zur Startseite"
+  },
+  "Vai al contenuto principale": {
+    "en": "Skip to main content",
+    "fr": "Aller au contenu principal",
+    "de": "Zum Hauptinhalt springen"
   },
   "Trofei": {
     "en": "Trophies",
@@ -1720,9 +1750,9 @@
     "de": "Drei Jahre duale Ausbildung (Schule–Arbeit) bei"
   },
   "di Castellucchio, nell'": {
-    "en": "in Castellucchio, in the",
-    "fr": "de Castellucchio, dans le",
-    "de": "in Castellucchio, im"
+    "en": "in Castellucchio, in the ",
+    "fr": "de Castellucchio, dans le ",
+    "de": "in Castellucchio, im "
   },
   "ufficio tecnico del reparto legno": {
     "en": "technical office of the timber department",
@@ -1855,9 +1885,9 @@
     "de": "Ich absolvierte mein Praktikum (PCTO) bei"
   },
   ", gruppo nato dalla fusione dei principali rivenditori edili mantovani. Mi hanno assegnato all'": {
-    "en": ", a group born from the merger of Mantua's main building-materials dealers. They assigned me to the",
-    "fr": ", un groupe né de la fusion des principaux revendeurs de matériaux de construction de Mantoue. Ils m'ont affecté au",
-    "de": ", einer Gruppe aus der Fusion der wichtigsten Mantuaner Baustoffhändler. Man teilte mich dem"
+    "en": ", a group born from the merger of Mantua's main building-materials dealers. They assigned me to the ",
+    "fr": ", un groupe né de la fusion des principaux revendeurs de matériaux de construction de Mantoue. Ils m'ont affecté au ",
+    "de": ", einer Gruppe aus der Fusion der wichtigsten Mantuaner Baustoffhändler. Man teilte mich dem "
   },
   ", dove si progettano coperture e strutture eco-compatibili — dal lamellare all'X-LAM, fino alle piccole tettoie. Eravamo in sette in ufficio, ma il via vai era continuo: chi rientrava dal magazzino dei legni, chi partiva per cantieri anche lontani.": {
     "en": ", where eco-friendly roofs and structures are designed — from glulam to X-LAM, down to small canopies. There were seven of us in the office, but the coming and going was constant: some returning from the timber warehouse, some leaving for sites, even distant ones.",
@@ -1955,134 +1985,129 @@
     "de": "AutoCAD — ich"
   },
   "i tecnici": {
-    "en": "Validation",
-    "fr": "Validation",
-    "de": "Validierung"
-  },
-  "Calcolo": {
     "en": "the technicians",
     "fr": "les techniciens",
     "de": "die Techniker"
   },
-  "cadwork · RFEM": {
+  "Calcolo": {
     "en": "Calculation",
     "fr": "Calcul",
     "de": "Berechnung"
   },
   "stampa A4": {
-    "en": "Quote",
-    "fr": "Devis",
-    "de": "Angebot"
-  },
-  "A–Z, io": {
     "en": "A4 print",
     "fr": "impression A4",
     "de": "A4-Druck"
   },
-  "Illustrazione in stile Unica: Alberto osserva una tettoia in legno": {
+  "A–Z, io": {
     "en": "A–Z, me",
     "fr": "A–Z, moi",
     "de": "A–Z, ich"
   },
-  "Il reparto legno": {
+  "Illustrazione in stile Unica: Alberto osserva una tettoia in legno": {
     "en": "Unica-style illustration: Alberto looks at a timber canopy",
     "fr": "Illustration style Unica : Alberto observe un auvent en bois",
     "de": "Illustration im Unica-Stil: Alberto betrachtet ein Holzvordach"
   },
-  "Il mondo in cui sono entrato": {
+  "Il reparto legno": {
     "en": "The timber department",
     "fr": "Le département bois",
     "de": "Die Holzabteilung"
   },
-  "Il reparto legno del Caem progetta e fornisce strutture eco-compatibili: travi e travetti in legno lamellare, coperture, solai in X-LAM. Il prodotto che ho imparato a conoscere meglio è la": {
+  "Il mondo in cui sono entrato": {
     "en": "The world I entered",
     "fr": "Le monde dans lequel je suis entré",
     "de": "Die Welt, in die ich eintrat"
   },
-  "tettoia": {
+  "Il reparto legno del Caem progetta e fornisce strutture eco-compatibili: travi e travetti in legno lamellare, coperture, solai in X-LAM. Il prodotto che ho imparato a conoscere meglio è la": {
     "en": "Caem's timber department designs and supplies eco-friendly structures: glulam beams and joists, roofs, X-LAM floors. The product I got to know best is the",
     "fr": "Le département bois de Caem conçoit et fournit des structures écologiques : poutres et solives en lamellé-collé, toitures, planchers en X-LAM. Le produit que j'ai le mieux appris à connaître est l'",
     "de": "Caems Holzabteilung entwirft und liefert umweltfreundliche Konstruktionen: Balken und Sparren aus Brettschichtholz, Dächer, X-LAM-Decken. Das Produkt, das ich am besten kennenlernte, ist das"
   },
-  "— un sistema apparentemente semplice di montanti, travi e travetti che però va disegnato, calcolato e verificato con cura. Sono entrato in questo mondo partendo da ciò che già sapevo fare: disegnare.": {
+  "tettoia": {
     "en": "canopy",
     "fr": "auvent",
     "de": "Vordach"
   },
-  "Illustrazione in stile Unica: Alberto modella una tettoia 3D in AutoCAD": {
+  "— un sistema apparentemente semplice di montanti, travi e travetti che però va disegnato, calcolato e verificato con cura. Sono entrato in questo mondo partendo da ciò che già sapevo fare: disegnare.": {
     "en": "— an apparently simple system of posts, beams and joists that nevertheless has to be drawn, calculated and checked with care. I entered this world starting from what I already knew how to do: draw.",
     "fr": "— un système en apparence simple de montants, poutres et solives, qui doit pourtant être dessiné, calculé et vérifié avec soin. Je suis entré dans ce monde en partant de ce que je savais déjà faire : dessiner.",
     "de": "— ein scheinbar einfaches System aus Stützen, Balken und Sparren, das dennoch sorgfältig gezeichnet, berechnet und geprüft werden muss. Ich betrat diese Welt ausgehend von dem, was ich schon konnte: zeichnen."
   },
-  "Il mio strumento": {
+  "Illustrazione in stile Unica: Alberto modella una tettoia 3D in AutoCAD": {
     "en": "Unica-style illustration: Alberto models a 3D canopy in AutoCAD",
     "fr": "Illustration style Unica : Alberto modélise un auvent 3D dans AutoCAD",
     "de": "Illustration im Unica-Stil: Alberto modelliert ein 3D-Vordach in AutoCAD"
   },
-  "Modellare in 3D con AutoCAD": {
+  "Il mio strumento": {
     "en": "My tool",
     "fr": "Mon outil",
     "de": "Mein Werkzeug"
   },
-  "I programmi professionali dell'azienda erano molto complessi, così usavo quello che padroneggiavo:": {
+  "Modellare in 3D con AutoCAD": {
     "en": "Modelling in 3D with AutoCAD",
     "fr": "Modéliser en 3D avec AutoCAD",
     "de": "In 3D modellieren mit AutoCAD"
   },
-  ". Modellavo in": {
+  "I programmi professionali dell'azienda erano molto complessi, così usavo quello che padroneggiavo:": {
     "en": "The company's professional software was very complex, so I used what I had mastered:",
     "fr": "Les logiciels professionnels de l'entreprise étaient très complexes, alors j'utilisais ce que je maîtrisais :",
     "de": "Die professionelle Software des Unternehmens war sehr komplex, also nutzte ich, was ich beherrschte:"
   },
-  "3D": {
+  ". Modellavo in": {
     "en": ". I modelled in",
     "fr": ". Je modélisais en",
     "de": ". Ich modellierte in"
   },
-  "poligoni": {
+  "piccole tettoie in legno lavorando con i": {
     "en": "small timber canopies, working with",
     "fr": "de petits auvents en bois en travaillant avec les",
     "de": "kleine Holzvordächer und arbeitete mit"
   },
-  ", con le competenze di disegno tecnico imparate in terza superiore. Partivo da un wireframe — i vertici, gli assi X-Y-Z — e arrivavo al volume della struttura.": {
+  "poligoni": {
     "en": "polygons",
     "fr": "polygones",
     "de": "Polygonen"
   },
-  "Illustrazione in stile Unica: Alberto misura una trave accanto a un travetto": {
+  ", con le competenze di disegno tecnico imparate in terza superiore. Partivo da un wireframe — i vertici, gli assi X-Y-Z — e arrivavo al volume della struttura.": {
     "en": ", using the technical-drawing skills I learned in my third year. I started from a wireframe — the vertices, the X-Y-Z axes — and arrived at the volume of the structure.",
     "fr": ", avec les compétences de dessin technique apprises en troisième année. Je partais d'un wireframe — les sommets, les axes X-Y-Z — et j'arrivais au volume de la structure.",
     "de": ", mit den im dritten Jahr erlernten technischen Zeichenkenntnissen. Ich begann mit einem Wireframe — den Eckpunkten, den X-Y-Z-Achsen — und gelangte zum Volumen der Struktur."
   },
-  "Il vocabolario del legno": {
+  "Illustrazione in stile Unica: Alberto misura una trave accanto a un travetto": {
     "en": "Unica-style illustration: Alberto measures a beam next to a joist",
     "fr": "Illustration style Unica : Alberto mesure une poutre à côté d'une solive",
     "de": "Illustration im Unica-Stil: Alberto misst einen Balken neben einem Sparren"
   },
-  "Ho imparato il linguaggio del legno strutturale: la": {
+  "Il vocabolario del legno": {
     "en": "The vocabulary of timber",
     "fr": "Le vocabulaire du bois",
     "de": "Das Vokabular des Holzes"
   },
-  "trave": {
+  "Ho imparato il linguaggio del legno strutturale: la": {
     "en": "I learned the language of structural timber: the",
     "fr": "J'ai appris le langage du bois structurel : la",
     "de": "Ich lernte die Sprache des Holzbaus: der"
   },
-  ", l'elemento portante principale, e il": {
+  "trave": {
     "en": "beam",
     "fr": "poutre",
     "de": "Balken"
   },
-  "travetto": {
+  ", l'elemento portante principale, e il": {
     "en": ", the main load-bearing element, and the",
     "fr": ", l'élément porteur principal, et la",
     "de": ", das tragende Hauptelement, und der"
   },
-  ", l'orditura secondaria che la affianca e regge il manto. Cambiano sezione, luce e funzione — e ogni scelta pesa sul calcolo che viene dopo.": {
+  "travetto": {
     "en": "joist",
     "fr": "solive",
     "de": "Sparren"
+  },
+  ", l'orditura secondaria che la affianca e regge il manto. Cambiano sezione, luce e funzione — e ogni scelta pesa sul calcolo che viene dopo.": {
+    "en": ", the secondary framing that flanks it and carries the roof covering. Section, span and function change — and every choice weighs on the calculation that follows.",
+    "fr": ", l'ossature secondaire qui l'accompagne et porte la couverture. La section, la portée et la fonction changent — et chaque choix pèse sur le calcul qui suit.",
+    "de": ", die sekundäre Lage, die ihn begleitet und die Dachhaut trägt. Querschnitt, Spannweite und Funktion ändern sich — und jede Entscheidung wirkt sich auf die folgende Berechnung aus."
   },
   "Illustrazione in stile Unica: i nodi strutturali — connessione rigida, cerniera, appoggio su fondazione": {
     "en": "Unica-style illustration: the structural joints — rigid connection, hinge, support on foundation",
@@ -2130,9 +2155,9 @@
     "de": "spezifische Gewicht des Holzes"
   },
   ", le sezioni e i vincoli, e controllavano i calcoli secondo l'": {
-    "en": ", the sections and the constraints, and checked the calculations according to",
+    "en": ", the sections and the constraints, and checked the calculations according to ",
     "fr": ", les sections et les contraintes, et vérifiaient les calculs selon l'",
-    "de": ", die Querschnitte und die Auflager ein und prüften die Berechnungen nach"
+    "de": ", die Querschnitte und die Auflager ein und prüften die Berechnungen nach "
   },
   "Eurocodice 5": {
     "en": "Eurocode 5",
@@ -2240,9 +2265,9 @@
     "de": "Ordnung schaffen: Druck und Ablage"
   },
   "Il mio compito operativo era l'": {
-    "en": "My operational task was",
+    "en": "My operational task was ",
     "fr": "Ma tâche opérationnelle était l'",
-    "de": "Meine operative Aufgabe war die"
+    "de": "Meine operative Aufgabe war die "
   },
   "ordine": {
     "en": "order",
@@ -2940,9 +2965,9 @@
     "de": "selbst geschenkt"
   },
   ": nell'": {
-    "en": ": in",
+    "en": ": in ",
     "fr": " : au cours de l'",
-    "de": ": im"
+    "de": ": im "
   },
   "estate 2024": {
     "en": "summer 2024",
@@ -3180,9 +3205,9 @@
     "de": "kleine Feste auf dem Hof"
   },
   ", dove c'è più tranquillità e ci si gode davvero le persone. E poi c'è il volontariato — per due estati ho fatto l'": {
-    "en": ", where it's calmer and you really enjoy people. And then there's volunteering — for two summers I was a",
-    "fr": ", où c'est plus tranquille et où l'on profite vraiment des gens. Et puis il y a le bénévolat — pendant deux étés, j'ai été",
-    "de": ", wo es ruhiger ist und man die Menschen wirklich genießt. Und dann ist da das Ehrenamt — zwei Sommer lang war ich"
+    "en": ", where it's calmer and you really enjoy people. And then there's volunteering — for two summers I was a ",
+    "fr": ", où c'est plus tranquille et où l'on profite vraiment des gens. Et puis il y a le bénévolat — pendant deux étés, j'ai été ",
+    "de": ", wo es ruhiger ist und man die Menschen wirklich genießt. Und dann ist da das Ehrenamt — zwei Sommer lang war ich "
   },
   "animatore al Grest": {
     "en": "youth leader at the summer camp (Grest)",
@@ -3255,9 +3280,9 @@
     "de": "gereifter sardischer Pecorino"
   },
   ", pomodorini, rucola e un filo d'": {
-    "en": ", cherry tomatoes, rocket and a drizzle of",
+    "en": ", cherry tomatoes, rocket and a drizzle of ",
     "fr": ", tomates cerises, roquette et un filet d'",
-    "de": ", Kirschtomaten, Rucola und einem Schuss"
+    "de": ", Kirschtomaten, Rucola und einem Schuss "
   },
   "olio extravergine DOP di Sardegna": {
     "en": "PDO Sardinian extra-virgin olive oil",
@@ -3545,7 +3570,7 @@
     "de": "historisches Gebäude legte"
   },
   ", and it stayed with me. Not long after, I chose the CAT programme — and the same technical drawing I learned there is what later pulled me towards web design.": {
-    "it": "— e mi è rimasta dentro. Di lì a poco avrei scelto il CAT, ed è lo stesso disegno tecnico imparato lì che più tardi mi ha portato verso il web design.",
+    "it": " — e mi è rimasta dentro. Di lì a poco avrei scelto il CAT, ed è lo stesso disegno tecnico imparato lì che più tardi mi ha portato verso il web design.",
     "fr": ", et cela m'est resté. Peu après, j'ai choisi le cursus CAT — et c'est le même dessin technique appris là-bas qui m'a ensuite mené vers le web design.",
     "de": ". Kurz darauf wählte ich den CAT-Zweig — und dasselbe technische Zeichnen führte mich später zum Webdesign."
   },
@@ -3848,5 +3873,1179 @@
     "it": "Coordinamento della squadra",
     "fr": "Coordination d'équipe",
     "de": "Teamkoordination"
+  },
+  "Projects": {
+    "it": "Progetti",
+    "fr": "Projets",
+    "de": "Projekte"
+  },
+  "Explore my projects": {
+    "it": "Esplora i miei progetti",
+    "fr": "Découvrir mes projets",
+    "de": "Meine Projekte entdecken"
+  },
+  "View my résumé": {
+    "it": "Guarda il curriculum",
+    "fr": "Voir mon CV",
+    "de": "Lebenslauf ansehen"
+  },
+  "View on GitHub": {
+    "it": "Vedi su GitHub",
+    "fr": "Voir sur GitHub",
+    "de": "Auf GitHub ansehen"
+  },
+  "View them all": {
+    "it": "Vedile tutte",
+    "fr": "Tout voir",
+    "de": "Alle ansehen"
+  },
+  "More in the archive": {
+    "it": "Altro in archivio",
+    "fr": "Plus dans les archives",
+    "de": "Mehr im Archiv"
+  },
+  "Open the full archive": {
+    "it": "Apri l'archivio completo",
+    "fr": "Ouvrir les archives complètes",
+    "de": "Das ganze Archiv öffnen"
+  },
+  "Open the project": {
+    "it": "Apri il progetto",
+    "fr": "Ouvrir le projet",
+    "de": "Projekt öffnen"
+  },
+  "Close the menu": {
+    "it": "Chiudi il menu",
+    "fr": "Fermer le menu",
+    "de": "Menü schließen"
+  },
+  "Navigation menu": {
+    "it": "Menu di navigazione",
+    "fr": "Menu de navigation",
+    "de": "Navigationsmenü"
+  },
+  "Navigation": {
+    "it": "Navigazione",
+    "fr": "Navigation",
+    "de": "Navigation"
+  },
+  "Read the docs": {
+    "it": "Leggi la documentazione",
+    "fr": "Lire la documentation",
+    "de": "Zur Dokumentation"
+  },
+  "Technologies": {
+    "it": "Tecnologie",
+    "fr": "Technologies",
+    "de": "Technologien"
+  },
+  "Archive filters": {
+    "it": "Filtri dell'archivio",
+    "fr": "Filtres des archives",
+    "de": "Archivfilter"
+  },
+  "What I do": {
+    "it": "Cosa faccio",
+    "fr": "Ce que je fais",
+    "de": "Was ich mache"
+  },
+  "Pages": {
+    "it": "Pagine",
+    "fr": "Pages",
+    "de": "Seiten"
+  },
+  "Featured work": {
+    "it": "Lavori in evidenza",
+    "fr": "Travaux à la une",
+    "de": "Ausgewählte Arbeiten"
+  },
+  "Web development": {
+    "it": "Sviluppo web",
+    "fr": "Développement web",
+    "de": "Webentwicklung"
+  },
+  "Web games": {
+    "it": "Giochi web",
+    "fr": "Jeux web",
+    "de": "Web-Spiele"
+  },
+  "Web tools": {
+    "it": "Strumenti web",
+    "fr": "Outils web",
+    "de": "Web-Tools"
+  },
+  "Client websites": {
+    "it": "Siti per clienti",
+    "fr": "Sites pour clients",
+    "de": "Kunden-Websites"
+  },
+  "CAT · Technical area": {
+    "it": "CAT · Area tecnica",
+    "fr": "CAT · Domaine technique",
+    "de": "CAT · Technischer Bereich"
+  },
+  "Every project is": {
+    "it": "Ogni progetto è",
+    "fr": "Chaque projet est",
+    "de": "Jedes Projekt ist"
+  },
+  "a complete hand-built website": {
+    "it": "un sito completo costruito a mano",
+    "fr": "un site complet construit à la main",
+    "de": "eine komplette, von Hand gebaute Website"
+  },
+  "— designed, coded and shipped end to end with React and TypeScript.": {
+    "it": "— progettato, scritto e pubblicato da cima a fondo con React e TypeScript.",
+    "fr": "— conçu, codé et livré de bout en bout avec React et TypeScript.",
+    "de": "— entworfen, programmiert und veröffentlicht, von A bis Z mit React und TypeScript."
+  },
+  "100% responsive": {
+    "fr": "100 % responsive",
+    "de": "100 % responsiv"
+  },
+  "Careful motion design": {
+    "it": "Motion design curato",
+    "fr": "Motion design soigné",
+    "de": "Sorgfältiges Motion Design"
+  },
+  "Easy to extend": {
+    "it": "Facile da estendere",
+    "fr": "Facile à étendre",
+    "de": "Leicht erweiterbar"
+  },
+  "Interfaces with": {
+    "it": "Interfacce con",
+    "fr": "Des interfaces avec",
+    "de": "Interfaces mit"
+  },
+  "careful typography, spacing and motion": {
+    "it": "tipografia, spazi e movimento curati",
+    "fr": "typographie, espaces et animations soignés",
+    "de": "sorgfältiger Typografie, Raum und Bewegung"
+  },
+  "— designed twice, in light and in dark.": {
+    "it": "— progettate due volte, in chiaro e in scuro.",
+    "fr": "— conçues deux fois, en clair et en sombre.",
+    "de": "— zweimal gestaltet, hell und dunkel."
+  },
+  "Ship faster with AI in the loop": {
+    "it": "Pubblicare più in fretta con l'AI nel flusso",
+    "fr": "Livrer plus vite avec l'IA dans la boucle",
+    "de": "Schneller liefern mit KI im Loop"
+  },
+  "— Claude Code, Codex and Copilot, every line reviewed.": {
+    "it": "— Claude Code, Codex e Copilot, ogni riga revisionata.",
+    "fr": "— Claude Code, Codex et Copilot, chaque ligne relue.",
+    "de": "— Claude Code, Codex und Copilot, jede Zeile geprüft."
+  },
+  "Build": {
+    "it": "Costruisco",
+    "fr": "Je crée",
+    "de": "Ich baue"
+  },
+  "playful experiences": {
+    "it": "esperienze giocose",
+    "fr": "des expériences ludiques",
+    "de": "verspielte Erlebnisse"
+  },
+  "— scores, streaks, speed bonuses and a live leaderboard.": {
+    "it": "— punteggi, serie, bonus velocità e una classifica live.",
+    "fr": "— scores, séries, bonus de vitesse et un classement en direct.",
+    "de": "— Punkte, Serien, Tempo-Boni und eine Live-Bestenliste."
+  },
+  "Privacy-first utilities that": {
+    "it": "Utility privacy-first che",
+    "fr": "Des utilitaires privacy-first qui",
+    "de": "Privacy-first-Werkzeuge, die"
+  },
+  "run entirely in your browser": {
+    "it": "girano interamente nel tuo browser",
+    "fr": "tournent entièrement dans ton navigateur",
+    "de": "komplett in deinem Browser laufen"
+  },
+  "— nothing uploaded, nothing stored.": {
+    "it": "— niente upload, niente salvataggi.",
+    "fr": "— rien d'envoyé, rien de stocké.",
+    "de": "— nichts hochgeladen, nichts gespeichert."
+  },
+  "Real sites for real businesses,": {
+    "it": "Siti veri per attività vere,",
+    "fr": "De vrais sites pour de vraies activités,",
+    "de": "Echte Websites für echte Betriebe,"
+  },
+  "from brief to launch": {
+    "it": "dal brief al lancio",
+    "fr": "du brief au lancement",
+    "de": "vom Briefing bis zum Launch"
+  },
+  "— content included.": {
+    "it": "— contenuti compresi.",
+    "fr": "— contenus compris.",
+    "de": "— Inhalte inklusive."
+  },
+  "From": {
+    "it": "Dal",
+    "fr": "Du",
+    "de": "Vom"
+  },
+  "technical drawing to topography": {
+    "it": "disegno tecnico alla topografia",
+    "fr": "dessin technique à la topographie",
+    "de": "technischen Zeichnen bis zur Topographie"
+  },
+  "— AutoCAD, cadwork, valuation and surveying.": {
+    "it": "— AutoCAD, cadwork, estimo e rilievo.",
+    "fr": "— AutoCAD, cadwork, estimation et relevés.",
+    "de": "— AutoCAD, cadwork, Bewertung und Vermessung."
+  },
+  "One person, end to end.": {
+    "it": "Una persona sola, dall'inizio alla fine.",
+    "fr": "Une seule personne, de bout en bout.",
+    "de": "Eine Person, von Anfang bis Ende."
+  },
+  "Design, code, content and deploy — integrated like a platform.": {
+    "it": "Design, codice, contenuti e deploy — integrati come una piattaforma.",
+    "fr": "Design, code, contenus et déploiement — intégrés comme une plateforme.",
+    "de": "Design, Code, Inhalte und Deployment — integriert wie eine Plattform."
+  },
+  "Trusted by real clients": {
+    "it": "Scelto da clienti veri",
+    "fr": "Choisi par de vrais clients",
+    "de": "Von echten Kunden gewählt"
+  },
+  "Browse the featured projects without leaving the home": {
+    "it": "Sfoglia i progetti in evidenza senza uscire dalla home",
+    "fr": "Parcours les projets à la une sans quitter l'accueil",
+    "de": "Stöbere in den vorgestellten Projekten, ohne die Startseite zu verlassen"
+  },
+  "Featured": {
+    "it": "In evidenza",
+    "fr": "À la une",
+    "de": "Ausgewählt"
+  },
+  "Exam 2026": {
+    "it": "Maturità 2026",
+    "fr": "Bac 2026",
+    "de": "Abitur 2026"
+  },
+  "Client sites": {
+    "it": "Siti clienti",
+    "fr": "Sites clients",
+    "de": "Kundenseiten"
+  },
+  "The whole site runs on this stack — no CMS, no page builders. Real snippets from the repository, one per technology.": {
+    "it": "Tutto il sito gira su questo stack — niente CMS, niente page builder. Snippet veri dal repository, uno per tecnologia.",
+    "fr": "Tout le site tourne sur ce stack — pas de CMS, pas de page builder. De vrais extraits du dépôt, un par technologie.",
+    "de": "Die ganze Website läuft auf diesem Stack — kein CMS, keine Page-Builder. Echte Snippets aus dem Repository, eines pro Technologie."
+  },
+  "Six more pages, each with its own design system": {
+    "it": "Altre sei pagine, ognuna col suo design system",
+    "fr": "Six autres pages, chacune avec son propre design system",
+    "de": "Sechs weitere Seiten, jede mit eigenem Designsystem"
+  },
+  "My personal presentation for the 2026 final state exam — who I am, my roots and the future, in a single narrated scroll.": {
+    "it": "La mia presentazione personale per l'Esame di Maturità 2026 — chi sono, le mie radici e il futuro, in un unico scroll narrato.",
+    "fr": "Ma présentation personnelle pour l'examen de fin d'études 2026 — qui je suis, mes racines et l'avenir, en un seul scroll narratif.",
+    "de": "Meine persönliche Präsentation für die Abschlussprüfung 2026 — wer ich bin, meine Wurzeln und die Zukunft, in einem einzigen erzählten Scroll."
+  },
+  "Three years of work placement at Caem Group's timber department, told through illustrations of the woods.": {
+    "it": "Tre anni di PCTO nel reparto legno di Caem Group, raccontati con le illustrazioni dei legni.",
+    "fr": "Trois ans de stage au département bois de Caem Group, racontés par des illustrations des bois.",
+    "de": "Drei Jahre Praktikum in der Holzabteilung der Caem Group, erzählt mit Illustrationen der Hölzer."
+  },
+  "James Joyce's «Dubliners» in 3 minutes — fifteen stories where almost nothing happens, and that's the point.": {
+    "it": "I «Dubliners» di James Joyce in 3 minuti — quindici racconti in cui non succede quasi nulla, ed è proprio il punto.",
+    "fr": "Les « Gens de Dublin » de James Joyce en 3 minutes — quinze nouvelles où il ne se passe presque rien, et c'est le but.",
+    "de": "James Joyces «Dubliner» in 3 Minuten — fünfzehn Erzählungen, in denen fast nichts passiert, und genau darum geht es."
+  },
+  "Tomasi di Lampedusa's novel in 3 minutes — Sicily in 1860 and the art of changing everything to change nothing.": {
+    "it": "Il romanzo di Tomasi di Lampedusa in 3 minuti — la Sicilia del 1860 e l'arte di cambiare tutto per non cambiare niente.",
+    "fr": "Le roman de Tomasi di Lampedusa en 3 minutes — la Sicile de 1860 et l'art de tout changer pour ne rien changer.",
+    "de": "Tomasi di Lampedusas Roman in 3 Minuten — Sizilien 1860 und die Kunst, alles zu ändern, um nichts zu ändern."
+  },
+  "The long version of the story: interests, skills, socials and everything that doesn't fit in a hero section.": {
+    "it": "La versione lunga della storia: interessi, competenze, social e tutto quello che non sta in una hero.",
+    "fr": "La version longue de l'histoire : centres d'intérêt, compétences, réseaux et tout ce qui ne tient pas dans un hero.",
+    "de": "Die lange Version der Geschichte: Interessen, Fähigkeiten, Socials und alles, was nicht in eine Hero-Section passt."
+  },
+  "Ways to support my work — every contribution goes straight into new projects and better tools.": {
+    "it": "I modi per sostenere il mio lavoro — ogni contributo va dritto in nuovi progetti e strumenti migliori.",
+    "fr": "Les façons de soutenir mon travail — chaque contribution va droit dans de nouveaux projets et de meilleurs outils.",
+    "de": "Möglichkeiten, meine Arbeit zu unterstützen — jeder Beitrag fließt direkt in neue Projekte und bessere Werkzeuge."
+  },
+  "How the featured projects are built": {
+    "it": "Come nascono i progetti in evidenza",
+    "fr": "Comment naissent les projets à la une",
+    "de": "Wie die vorgestellten Projekte entstehen"
+  },
+  "Institutional site": {
+    "it": "Sito istituzionale",
+    "fr": "Site institutionnel",
+    "de": "Institutionelle Website"
+  },
+  "Business site": {
+    "it": "Sito aziendale",
+    "fr": "Site d'entreprise",
+    "de": "Firmen-Website"
+  },
+  "Web game": {
+    "it": "Gioco web",
+    "fr": "Jeu web",
+    "de": "Web-Spiel"
+  },
+  "Web tool": {
+    "it": "Strumento web",
+    "fr": "Outil web",
+    "de": "Web-Tool"
+  },
+  "Minimalist editorial design, GSAP scroll animations and": {
+    "it": "Design editoriale minimale, animazioni GSAP allo scroll e",
+    "fr": "Design éditorial minimaliste, animations GSAP au scroll et",
+    "de": "Minimalistisches Editorial-Design, GSAP-Scroll-Animationen und"
+  },
+  "image-led visual storytelling": {
+    "it": "una narrazione visiva guidata dalle immagini",
+    "fr": "un storytelling visuel porté par l'image",
+    "de": "bildgeführtes visuelles Storytelling"
+  },
+  "for the village on the Mincio.": {
+    "it": "per il borgo sul Mincio.",
+    "fr": "pour le village sur le Mincio.",
+    "de": "für das Dorf am Mincio."
+  },
+  "A responsive, carefully designed interface built": {
+    "it": "Un'interfaccia responsive e curata, costruita",
+    "fr": "Une interface responsive et soignée, construite",
+    "de": "Ein responsives, sorgfältig gestaltetes Interface, gebaut"
+  },
+  "with the client, for the client": {
+    "it": "col cliente, per il cliente",
+    "fr": "avec le client, pour le client",
+    "de": "mit dem Kunden, für den Kunden"
+  },
+  "— from brief to launch.": {
+    "it": "— dal brief al lancio.",
+    "fr": "— du brief au lancement.",
+    "de": "— vom Briefing bis zum Launch."
+  },
+  "A quiz on the history of architecture designed": {
+    "it": "Un quiz sulla storia dell'architettura pensato",
+    "fr": "Un quiz sur l'histoire de l'architecture pensé",
+    "de": "Ein Quiz zur Architekturgeschichte, gestaltet"
+  },
+  "as a real game": {
+    "it": "come un vero gioco",
+    "fr": "comme un vrai jeu",
+    "de": "wie ein echtes Spiel"
+  },
+  "— scoring, streaks, trophies and a live leaderboard.": {
+    "it": "— punteggio, serie, trofei e una classifica live.",
+    "fr": "— score, séries, trophées et un classement en direct.",
+    "de": "— Punkte, Serien, Trophäen und eine Live-Bestenliste."
+  },
+  "Who doesn't follow you back, computed": {
+    "it": "Chi non ti ricambia il follow, calcolato",
+    "fr": "Qui ne te suit pas en retour, calculé",
+    "de": "Wer dir nicht zurückfolgt, berechnet"
+  },
+  "entirely in your browser": {
+    "it": "interamente nel tuo browser",
+    "fr": "entièrement dans ton navigateur",
+    "de": "komplett in deinem Browser"
+  },
+  "The full story behind the CV — school, work, volunteering, travel and one wish.": {
+    "it": "Tutta la storia dietro il CV — scuola, lavoro, volontariato, viaggi e un desiderio.",
+    "fr": "Toute l'histoire derrière le CV — école, travail, bénévolat, voyages et un vœu.",
+    "de": "Die ganze Geschichte hinter dem Lebenslauf — Schule, Arbeit, Ehrenamt, Reisen und ein Wunsch."
+  },
+  "Open source from day one": {
+    "it": "Open source dal primo giorno",
+    "fr": "Open source depuis le premier jour",
+    "de": "Open Source vom ersten Tag an"
+  },
+  "This site is built in the open: code, content and even the AI workflow live in one public repository.": {
+    "it": "Questo sito è costruito alla luce del sole: codice, contenuti e perfino il flusso di lavoro con l'AI vivono in un unico repository pubblico.",
+    "fr": "Ce site est construit au grand jour : le code, les contenus et même le workflow IA vivent dans un seul dépôt public.",
+    "de": "Diese Website entsteht offen: Code, Inhalte und sogar der KI-Workflow leben in einem öffentlichen Repository."
+  },
+  "Read it, download any project as a ZIP, reuse what helps you.": {
+    "it": "Leggilo, scarica ogni progetto in ZIP, riusa quello che ti serve.",
+    "fr": "Lis-le, télécharge chaque projet en ZIP, réutilise ce qui t'aide.",
+    "de": "Lies mit, lade jedes Projekt als ZIP herunter und verwende weiter, was dir hilft."
+  },
+  "Every page ships with its own design system — and the archive lets you take the sources home.": {
+    "it": "Ogni pagina esce col suo design system — e l'archivio ti lascia portare a casa i sorgenti.",
+    "fr": "Chaque page sort avec son propre design system — et les archives te laissent emporter les sources.",
+    "de": "Jede Seite kommt mit eigenem Designsystem — und im Archiv kannst du die Quellen mitnehmen."
+  },
+  "Designer & front-end developer — Mantua, Italy. CAT diploma, now studying Construction and Land Management.": {
+    "it": "Designer e sviluppatore front-end — Mantova. Diploma CAT, ora studio Costruzioni e Gestione del Territorio.",
+    "fr": "Designer & développeur front-end — Mantoue, Italie. Diplôme CAT, aujourd'hui en Construction et Gestion du Territoire.",
+    "de": "Designer & Frontend-Entwickler — Mantua, Italien. CAT-Diplom, jetzt Studium Bau- und Gebietsmanagement."
+  },
+  "this site": {
+    "it": "questo sito",
+    "fr": "ce site",
+    "de": "diese Website"
+  },
+  "Have a project in mind?": {
+    "it": "Hai un progetto in mente?",
+    "fr": "Un projet en tête ?",
+    "de": "Ein Projekt im Kopf?"
+  },
+  "Let's talk.": {
+    "it": "Parliamone.",
+    "fr": "Parlons-en.",
+    "de": "Reden wir."
+  },
+  "Mostra lingua e tema": {
+    "en": "Show language and theme",
+    "fr": "Afficher langue et thème",
+    "de": "Sprache und Thema einblenden"
+  },
+  "Nascondi lingua e tema": {
+    "en": "Hide language and theme",
+    "fr": "Masquer langue et thème",
+    "de": "Sprache und Thema ausblenden"
+  },
+  "Chi ti ha tolto il follow?": {
+    "en": "Who unfollowed you?",
+    "fr": "Qui t'a unfollow ?",
+    "de": "Wer ist dir entfolgt?"
+  },
+  "Nessuno qui": {
+    "en": "No one here",
+    "fr": "Personne ici",
+    "de": "Niemand hier"
+  },
+  "confronti effettuati con questo strumento": {
+    "en": "comparisons run with this tool",
+    "fr": "comparaisons effectuées avec cet outil",
+    "de": "mit diesem Tool durchgeführte Vergleiche"
+  },
+  "Risultati del confronto": {
+    "en": "Comparison results",
+    "fr": "Résultats de la comparaison",
+    "de": "Ergebnisse des Vergleichs"
+  },
+  "Come scaricare i dati da Instagram": {
+    "en": "How to download your data from Instagram",
+    "fr": "Comment télécharger tes données depuis Instagram",
+    "de": "So lädst du deine Daten von Instagram herunter"
+  },
+  "Copiato": {
+    "en": "Copied",
+    "fr": "Copié",
+    "de": "Kopiert"
+  },
+  "Scarica": {
+    "en": "Download",
+    "fr": "Télécharger",
+    "de": "Herunterladen"
+  },
+  "Confronta": {
+    "en": "Compare",
+    "fr": "Comparer",
+    "de": "Vergleichen"
+  },
+  "Salta": {
+    "en": "Skip",
+    "fr": "Passer",
+    "de": "Überspringen"
+  },
+  "The archive is a small file browser: open the folders, star your favourites, check the properties and download the sources as ZIPs.": {
+    "it": "L'archivio è un piccolo esploratore di file: apri le cartelle, metti la stella ai preferiti, guarda le proprietà e scarica i sorgenti in ZIP.",
+    "fr": "Les archives sont un petit explorateur de fichiers : ouvre les dossiers, mets des étoiles à tes favoris, consulte les propriétés et télécharge les sources en ZIP.",
+    "de": "Das Archiv ist ein kleiner Dateibrowser: Ordner öffnen, Favoriten markieren, Eigenschaften ansehen und die Quellen als ZIP herunterladen."
+  },
+  "Archivio progetti": {
+    "en": "Project archive",
+    "fr": "Archives des projets",
+    "de": "Projektarchiv"
+  },
+  "Percorso": {
+    "en": "Path",
+    "fr": "Chemin",
+    "de": "Pfad"
+  },
+  "Risultati": {
+    "en": "Results",
+    "fr": "Résultats",
+    "de": "Ergebnisse"
+  },
+  "Cerca nell'archivio…": {
+    "en": "Search archive…",
+    "fr": "Rechercher dans l'archive…",
+    "de": "Im Archiv suchen…"
+  },
+  "Chiudi la ricerca": {
+    "en": "Close the search",
+    "fr": "Fermer la recherche",
+    "de": "Suche schließen"
+  },
+  "Vista a elenco": {
+    "en": "List view",
+    "fr": "Vue en liste",
+    "de": "Listenansicht"
+  },
+  "Vista a griglia": {
+    "en": "Grid view",
+    "fr": "Vue en grille",
+    "de": "Rasteransicht"
+  },
+  "Opzioni di visualizzazione": {
+    "en": "View options",
+    "fr": "Options d'affichage",
+    "de": "Anzeigeoptionen"
+  },
+  "Crescente": {
+    "en": "Ascending",
+    "fr": "Croissant",
+    "de": "Aufsteigend"
+  },
+  "Decrescente": {
+    "en": "Descending",
+    "fr": "Décroissant",
+    "de": "Absteigend"
+  },
+  "Seleziona tutto": {
+    "en": "Select all",
+    "fr": "Tout sélectionner",
+    "de": "Alles auswählen"
+  },
+  "Risorse": {
+    "en": "Places",
+    "fr": "Ressources",
+    "de": "Orte"
+  },
+  "Recenti": {
+    "en": "Recent",
+    "fr": "Récents",
+    "de": "Zuletzt verwendet"
+  },
+  "Preferiti": {
+    "en": "Starred",
+    "fr": "Favoris",
+    "de": "Favoriten"
+  },
+  "Cestino": {
+    "en": "Trash",
+    "fr": "Corbeille",
+    "de": "Papierkorb"
+  },
+  "Cartelle": {
+    "en": "Folders",
+    "fr": "Dossiers",
+    "de": "Ordner"
+  },
+  "Elenco elementi": {
+    "en": "Item list",
+    "fr": "Liste des éléments",
+    "de": "Elementliste"
+  },
+  "Modificato": {
+    "en": "Modified",
+    "fr": "Modifié",
+    "de": "Geändert"
+  },
+  "Apri": {
+    "en": "Open",
+    "fr": "Ouvrir",
+    "de": "Öffnen"
+  },
+  "Copia link": {
+    "en": "Copy link",
+    "fr": "Copier le lien",
+    "de": "Link kopieren"
+  },
+  "Aggiungi ai preferiti": {
+    "en": "Add to favourites",
+    "fr": "Ajouter aux favoris",
+    "de": "Zu Favoriten hinzufügen"
+  },
+  "Rimuovi dai preferiti": {
+    "en": "Remove from favourites",
+    "fr": "Retirer des favoris",
+    "de": "Aus Favoriten entfernen"
+  },
+  "Proprietà": {
+    "en": "Properties",
+    "fr": "Propriétés",
+    "de": "Eigenschaften"
+  },
+  "Il cestino è vuoto": {
+    "en": "The trash is empty",
+    "fr": "La corbeille est vide",
+    "de": "Der Papierkorb ist leer"
+  },
+  "Qui non si butta via niente.": {
+    "en": "Nothing gets thrown away here.",
+    "fr": "Ici, on ne jette rien.",
+    "de": "Hier wird nichts weggeworfen."
+  },
+  "Nessun preferito": {
+    "en": "No favourites",
+    "fr": "Aucun favori",
+    "de": "Keine Favoriten"
+  },
+  "Premi la stellina su un elemento per ritrovarlo qui.": {
+    "en": "Tap the star on an item to find it here.",
+    "fr": "Appuie sur l'étoile d'un élément pour le retrouver ici.",
+    "de": "Tippe auf den Stern eines Elements, um es hier wiederzufinden."
+  },
+  "Nessun risultato": {
+    "en": "No results",
+    "fr": "Aucun résultat",
+    "de": "Keine Ergebnisse"
+  },
+  "Prova con un termine diverso.": {
+    "en": "Try a different term.",
+    "fr": "Essaie un autre terme.",
+    "de": "Versuche einen anderen Begriff."
+  },
+  "Archivio aggiornato": {
+    "en": "Archive updated",
+    "fr": "Archive mise à jour",
+    "de": "Archiv aktualisiert"
+  },
+  "Cartella": {
+    "en": "Folder",
+    "fr": "Dossier",
+    "de": "Ordner"
+  },
+  "Cartella in evidenza": {
+    "en": "Featured folder",
+    "fr": "Dossier en vedette",
+    "de": "Hervorgehobener Ordner"
+  },
+  "Apri cartella": {
+    "en": "Open folder",
+    "fr": "Ouvrir le dossier",
+    "de": "Ordner öffnen"
+  },
+  "Contenuto": {
+    "en": "Contents",
+    "fr": "Contenu",
+    "de": "Inhalt"
+  },
+  "Posizione": {
+    "en": "Location",
+    "fr": "Emplacement",
+    "de": "Ort"
+  },
+  "Autore": {
+    "en": "Author",
+    "fr": "Auteur",
+    "de": "Autor"
+  },
+  "Strumento web": {
+    "en": "Web tool",
+    "fr": "Outil web",
+    "de": "Web-Tool"
+  },
+  "1 oggetto": {
+    "en": "1 item",
+    "fr": "1 élément",
+    "de": "1 Objekt"
+  },
+  "Tutto il sito, cartella per cartella": {
+    "en": "The whole site, folder by folder",
+    "fr": "Tout le site, dossier par dossier",
+    "de": "Die ganze Website, Ordner für Ordner"
+  },
+  "Qui dentro c'è ogni cosa che ho costruito: pagine, giochi web, siti per clienti e documenti PDF, con data, dimensione e sorgenti.": {
+    "en": "Everything I've built is in here: pages, web games, client websites and PDF documents, with dates, sizes and sources.",
+    "fr": "Tout ce que j'ai construit est ici : pages, jeux web, sites pour clients et documents PDF, avec date, taille et sources.",
+    "de": "Hier drin ist alles, was ich gebaut habe: Seiten, Web-Spiele, Kunden-Websites und PDF-Dokumente, mit Datum, Größe und Quellcode."
+  },
+  "Apri le cartelle, ordina le colonne, metti la stellina sui preferiti: le proprietà di ogni voce mostrano il README, e da lì apri il progetto online o scarichi i sorgenti in ZIP.": {
+    "en": "Open the folders, sort the columns, star your favourites: the properties of each item show the README, and from there you open the project online or download the sources as a ZIP.",
+    "fr": "Ouvre les dossiers, trie les colonnes, mets une étoile à tes favoris : les propriétés de chaque élément affichent le README, et de là tu ouvres le projet en ligne ou tu télécharges les sources en ZIP.",
+    "de": "Öffne die Ordner, sortiere die Spalten, markiere Favoriten mit dem Stern: die Eigenschaften jedes Eintrags zeigen die README, und von dort öffnest du das Projekt online oder lädst die Quellen als ZIP herunter."
+  },
+  "Sfoglia l'archivio": {
+    "en": "Browse the archive",
+    "fr": "Parcourir l'archive",
+    "de": "Archiv durchstöbern"
+  },
+  "Vedi il codice su GitHub": {
+    "en": "See the code on GitHub",
+    "fr": "Voir le code sur GitHub",
+    "de": "Code auf GitHub ansehen"
+  },
+  "Progetti pubblicati": {
+    "en": "Published projects",
+    "fr": "Projets publiés",
+    "de": "Veröffentlichte Projekte"
+  },
+  "Documenti PDF": {
+    "en": "PDF documents",
+    "fr": "Documents PDF",
+    "de": "PDF-Dokumente"
+  },
+  "Ultimo aggiornamento": {
+    "en": "Last update",
+    "fr": "Dernière mise à jour",
+    "de": "Letzte Aktualisierung"
+  },
+  "Sfoglia l'archivio senza lasciare la pagina": {
+    "en": "Browse the archive without leaving the page",
+    "fr": "Parcours l'archive sans quitter la page",
+    "de": "Durchstöbere das Archiv, ohne die Seite zu verlassen"
+  },
+  "Elenco o griglia, ricerca globale, preferiti e proprietà con il README: doppio clic apre, il tasto destro fa il resto.": {
+    "en": "List or grid, global search, favourites and properties with the README: double-click opens, right-click does the rest.",
+    "fr": "Liste ou grille, recherche globale, favoris et propriétés avec le README : le double-clic ouvre, le clic droit fait le reste.",
+    "de": "Liste oder Raster, globale Suche, Favoriten und Eigenschaften mit README: Doppelklick öffnet, die rechte Maustaste macht den Rest."
+  },
+  "Cosa trovi nell'archivio": {
+    "en": "What's in the archive",
+    "fr": "Ce que tu trouves dans l'archive",
+    "de": "Was im Archiv steckt"
+  },
+  "Ogni voce ha un tipo: le colonne della tabella usano queste etichette.": {
+    "en": "Every item has a type: the table columns use these labels.",
+    "fr": "Chaque élément a un type : les colonnes du tableau utilisent ces étiquettes.",
+    "de": "Jeder Eintrag hat einen Typ: die Tabellenspalten verwenden diese Bezeichnungen."
+  },
+  "Ti serve il codice?": {
+    "en": "Need the code?",
+    "fr": "Besoin du code ?",
+    "de": "Brauchst du den Code?"
+  },
+  "È tutto aperto.": {
+    "en": "It's all open.",
+    "fr": "Tout est ouvert.",
+    "de": "Alles ist offen."
+  },
+  "I sorgenti di ogni progetto sono su GitHub, oppure li scarichi in ZIP dalle proprietà di ciascuna voce dell'archivio.": {
+    "en": "The sources of every project are on GitHub, or you can download them as a ZIP from the properties of each archive item.",
+    "fr": "Les sources de chaque projet sont sur GitHub, ou tu les télécharges en ZIP depuis les propriétés de chaque élément de l'archive.",
+    "de": "Die Quellen jedes Projekts liegen auf GitHub — oder du lädst sie als ZIP über die Eigenschaften jedes Archiveintrags herunter."
+  },
+  "Codice sorgente": {
+    "en": "Source code",
+    "fr": "Code source",
+    "de": "Quellcode"
+  },
+  "Repository": {
+    "en": "Repository",
+    "fr": "Dépôt",
+    "de": "Repository"
+  },
+  "Cerca fra i file…": {
+    "en": "Search files…",
+    "fr": "Rechercher dans les fichiers…",
+    "de": "Dateien durchsuchen…"
+  },
+  "Cerca fra i file del repository": {
+    "en": "Search the repository files",
+    "fr": "Rechercher dans les fichiers du dépôt",
+    "de": "Dateien des Repositorys durchsuchen"
+  },
+  "Apri su GitHub": {
+    "en": "Open on GitHub",
+    "fr": "Ouvrir sur GitHub",
+    "de": "Auf GitHub öffnen"
+  },
+  "Copia percorso": {
+    "en": "Copy path",
+    "fr": "Copier le chemin",
+    "de": "Pfad kopieren"
+  },
+  "Percorso copiato negli appunti": {
+    "en": "Path copied to clipboard",
+    "fr": "Chemin copié dans le presse-papiers",
+    "de": "Pfad in die Zwischenablage kopiert"
+  },
+  "Elenco dei file non disponibile": {
+    "en": "File list unavailable",
+    "fr": "Liste des fichiers indisponible",
+    "de": "Dateiliste nicht verfügbar"
+  },
+  "La fotografia del repository si genera in fase di build.": {
+    "en": "The repository snapshot is generated at build time.",
+    "fr": "L'instantané du dépôt est généré au moment du build.",
+    "de": "Die Momentaufnahme des Repositorys entsteht beim Build."
+  },
+  "Ultimo commit": {
+    "en": "Latest commit",
+    "fr": "Dernier commit",
+    "de": "Letzter Commit"
+  },
+  "Cronologia": {
+    "en": "History",
+    "fr": "Historique",
+    "de": "Verlauf"
+  },
+  "Vedi la cronologia su GitHub": {
+    "en": "See the history on GitHub",
+    "fr": "Voir l'historique sur GitHub",
+    "de": "Verlauf auf GitHub ansehen"
+  },
+  "File nel repository": {
+    "en": "Files in the repository",
+    "fr": "Fichiers dans le dépôt",
+    "de": "Dateien im Repository"
+  },
+  "Dati JSON": {
+    "en": "JSON data",
+    "fr": "Données JSON",
+    "de": "JSON-Daten"
+  },
+  "Foglio di stile": {
+    "en": "Stylesheet",
+    "fr": "Feuille de style",
+    "de": "Stylesheet"
+  },
+  "Pagina HTML": {
+    "en": "HTML page",
+    "fr": "Page HTML",
+    "de": "HTML-Seite"
+  },
+  "Documento Markdown": {
+    "en": "Markdown document",
+    "fr": "Document Markdown",
+    "de": "Markdown-Dokument"
+  },
+  "Script Python": {
+    "en": "Python script",
+    "fr": "Script Python",
+    "de": "Python-Skript"
+  },
+  "Immagine SVG": {
+    "en": "SVG image",
+    "fr": "Image SVG",
+    "de": "SVG-Bild"
+  },
+  "Immagine bitmap": {
+    "en": "Bitmap image",
+    "fr": "Image bitmap",
+    "de": "Bitmap-Bild"
+  },
+  "Icona del sito": {
+    "en": "Site icon",
+    "fr": "Icône du site",
+    "de": "Website-Symbol"
+  },
+  "Carattere tipografico": {
+    "en": "Typeface",
+    "fr": "Police de caractères",
+    "de": "Schriftart"
+  },
+  "Tabella CSV": {
+    "en": "CSV table",
+    "fr": "Tableau CSV",
+    "de": "CSV-Tabelle"
+  },
+  "File di testo": {
+    "en": "Text file",
+    "fr": "Fichier texte",
+    "de": "Textdatei"
+  },
+  "Configurazione YAML": {
+    "en": "YAML configuration",
+    "fr": "Configuration YAML",
+    "de": "YAML-Konfiguration"
+  },
+  "Query SQL": {
+    "en": "SQL query",
+    "fr": "Requête SQL",
+    "de": "SQL-Abfrage"
+  },
+  "Script shell": {
+    "en": "Shell script",
+    "fr": "Script shell",
+    "de": "Shell-Skript"
+  },
+  "File multimediale": {
+    "en": "Media file",
+    "fr": "Fichier multimédia",
+    "de": "Mediendatei"
+  },
+  "File senza estensione": {
+    "en": "File without extension",
+    "fr": "Fichier sans extension",
+    "de": "Datei ohne Erweiterung"
+  },
+  "Nella posizione «Codice sorgente» ci sono i file veri del repository, con dimensione e data dell'ultimo commit: l'elenco si rigenera ad ogni build.": {
+    "en": "The “Source code” location holds the real repository files, with size and date of the latest commit: the list is regenerated at every build.",
+    "fr": "L'emplacement « Code source » contient les vrais fichiers du dépôt, avec la taille et la date du dernier commit : la liste est régénérée à chaque build.",
+    "de": "Der Ort „Quellcode“ enthält die echten Dateien des Repositorys, mit Größe und Datum des letzten Commits: Die Liste wird bei jedem Build neu erzeugt."
+  },
+  "L'elenco è la fotografia dei file versionati a questo commit: si rigenera ad ogni build del sito, quindi segue il repository commit dopo commit.": {
+    "en": "The list is a snapshot of the files versioned at this commit: it is regenerated at every build of the site, so it follows the repository commit after commit.",
+    "fr": "La liste est un instantané des fichiers versionnés à ce commit : elle est régénérée à chaque build du site, elle suit donc le dépôt commit après commit.",
+    "de": "Die Liste ist eine Momentaufnahme der zu diesem Commit versionierten Dateien: Sie wird bei jedem Build der Website neu erzeugt und folgt dem Repository also Commit für Commit."
+  },
+  "File di configurazione": {
+    "en": "Configuration file",
+    "fr": "Fichier de configuration",
+    "de": "Konfigurationsdatei"
+  },
+  "Anni · nato il 28 giugno 2006": {
+    "en": "Years old · born 28 June 2006",
+    "fr": "Ans · né le 28 juin 2006",
+    "de": "Jahre alt · geboren am 28. Juni 2006"
+  },
+  "Le tre sessioni": {
+    "en": "The three sessions",
+    "fr": "Les trois sessions",
+    "de": "Die drei Einsätze"
+  },
+  "Il racconto": {
+    "en": "The story",
+    "fr": "Le récit",
+    "de": "Die Erzählung"
+  },
+  "Il racconto del percorso": {
+    "en": "The story of the placement",
+    "fr": "Le récit du parcours",
+    "de": "Die Erzählung des Praktikums"
+  },
+  "Rispondi e scala la classifica.": {
+    "en": "Answer and climb the leaderboard.",
+    "fr": "Réponds et grimpe au classement.",
+    "de": "Antworte und klettere in der Bestenliste."
+  },
+  "gioco gratuito": {
+    "en": "free game",
+    "fr": "jeu gratuit",
+    "de": "kostenloses Spiel"
+  },
+  "Scegli i capitoli e i tipi di domanda, poi premi Gioca: la partita copre tutte le domande del filtro scelto, così puoi completare un argomento e prenderne il voto.": {
+    "en": "Pick the chapters and the question types, then hit Play: a round covers every question matching your filter, so you can complete a topic and earn its grade.",
+    "fr": "Choisis les chapitres et les types de questions, puis appuie sur Jouer : la partie couvre toutes les questions du filtre choisi, de quoi terminer un sujet et décrocher sa note.",
+    "de": "Wähle Kapitel und Fragetypen und drücke dann auf Spielen: Eine Runde umfasst alle Fragen deines Filters, sodass du ein Thema abschließen und dafür eine Note bekommen kannst."
+  },
+  "Il voto più alto che hai preso su un pacchetto.": {
+    "en": "The highest grade you have earned on a package.",
+    "fr": "La meilleure note que tu as obtenue sur un paquet.",
+    "de": "Die beste Note, die du für ein Paket bekommen hast."
+  },
+  "Risposte giuste di fila, il tuo primato.": {
+    "en": "Correct answers in a row — your record.",
+    "fr": "Bonnes réponses d'affilée — ton record.",
+    "de": "Richtige Antworten in Folge — dein Rekord."
+  },
+  "Quante domande del database hai già visto.": {
+    "en": "How many questions in the database you have already seen.",
+    "fr": "Combien de questions de la base tu as déjà vues.",
+    "de": "Wie viele Fragen der Datenbank du schon gesehen hast."
+  },
+  "Libro di riferimento": {
+    "en": "Reference book",
+    "fr": "Livre de référence",
+    "de": "Referenzbuch"
+  },
+  "Vedi il libro": {
+    "en": "See the book",
+    "fr": "Voir le livre",
+    "de": "Zum Buch"
+  },
+  "Vuoto vuol dire tutti: seleziona uno o più capitoli per restringere il quiz.": {
+    "en": "Empty means all: select one or more chapters to narrow the quiz down.",
+    "fr": "Vide veut dire tous : sélectionne un ou plusieurs chapitres pour restreindre le quiz.",
+    "de": "Leer heißt alle: Wähle ein oder mehrere Kapitel, um das Quiz einzugrenzen."
+  },
+  "domande nel quiz": {
+    "en": "questions in the quiz",
+    "fr": "questions dans le quiz",
+    "de": "Fragen im Quiz"
+  },
+  "A → Z": {
+    "en": "A → Z",
+    "fr": "A → Z",
+    "de": "A → Z"
+  },
+  "Z → A": {
+    "en": "Z → A",
+    "fr": "Z → A",
+    "de": "Z → A"
+  },
+  "Da esplorare": {
+    "en": "Least explored",
+    "fr": "À explorer",
+    "de": "Noch zu erkunden"
+  },
+  "Nessun filtro: il quiz pesca da tutti i capitoli.": {
+    "en": "No filter: the quiz draws from every chapter.",
+    "fr": "Aucun filtre : le quiz pioche dans tous les chapitres.",
+    "de": "Kein Filter: Das Quiz zieht aus allen Kapiteln."
+  },
+  "Tutti i tipi: tocca per accendere o spegnere un tipo di domanda.": {
+    "en": "All types: tap to switch a question type on or off.",
+    "fr": "Tous les types : touche pour activer ou désactiver un type de question.",
+    "de": "Alle Typen: Tippe, um einen Fragetyp ein- oder auszuschalten."
+  },
+  "Solo i tipi accesi finiscono nel quiz: tocca di nuovo per spegnerli.": {
+    "en": "Only the types switched on make it into the quiz: tap again to switch them off.",
+    "fr": "Seuls les types activés entrent dans le quiz : touche à nouveau pour les désactiver.",
+    "de": "Nur eingeschaltete Typen kommen ins Quiz: Tippe erneut, um sie auszuschalten."
+  },
+  "Pronto a giocare?": {
+    "en": "Ready to play?",
+    "fr": "Prêt à jouer ?",
+    "de": "Bereit zum Spielen?"
+  },
+  "capitoli selezionati": {
+    "en": "chapters selected",
+    "fr": "chapitres sélectionnés",
+    "de": "Kapitel ausgewählt"
+  },
+  "nessuna domanda con questi filtri": {
+    "en": "no questions match these filters",
+    "fr": "aucune question avec ces filtres",
+    "de": "keine Fragen mit diesen Filtern"
+  },
+  "Tutto quello che il gioco tiene da conto": {
+    "en": "Everything the game keeps track of",
+    "fr": "Tout ce que le jeu garde en mémoire",
+    "de": "Alles, was das Spiel mitzählt"
+  },
+  "Il podio di tutti i giocatori, aggiornato in tempo reale.": {
+    "en": "The podium of every player, updated in real time.",
+    "fr": "Le podium de tous les joueurs, mis à jour en temps réel.",
+    "de": "Das Podium aller Spielenden, in Echtzeit aktualisiert."
+  },
+  "I voti che conquisti, capitolo per capitolo e tipo per tipo.": {
+    "en": "The grades you earn, chapter by chapter and type by type.",
+    "fr": "Les notes que tu décroches, chapitre par chapitre et type par type.",
+    "de": "Die Noten, die du holst — Kapitel für Kapitel und Typ für Typ."
+  },
+  "Punteggi, bonus velocità e streak, spiegati passo per passo.": {
+    "en": "Scores, speed bonuses and streaks, explained step by step.",
+    "fr": "Scores, bonus de vitesse et séries, expliqués pas à pas.",
+    "de": "Punkte, Tempo-Boni und Serien, Schritt für Schritt erklärt."
+  },
+  "Metti alla prova quello che sai": {
+    "en": "Put what you know to the test",
+    "fr": "Mets tes connaissances à l'épreuve",
+    "de": "Stell dein Wissen auf die Probe"
+  },
+  "Buona partita.": {
+    "en": "Have a good game.",
+    "fr": "Bonne partie.",
+    "de": "Viel Spaß beim Spielen."
+  },
+  "Scegli profilo": {
+    "en": "Choose a profile",
+    "fr": "Choisir un profil",
+    "de": "Profil wählen"
+  },
+  "Domande in arrivo": {
+    "en": "Questions on the way",
+    "fr": "Questions à venir",
+    "de": "Fragen sind unterwegs"
+  },
+  "I capitoli del quiz verranno caricati a breve. Torna presto!": {
+    "en": "The quiz chapters will be loaded shortly. Come back soon!",
+    "fr": "Les chapitres du quiz seront chargés sous peu. Reviens vite !",
+    "de": "Die Quiz-Kapitel werden bald geladen. Schau bald wieder vorbei!"
+  },
+  "Esci dalla partita": {
+    "en": "Leave the game",
+    "fr": "Quitter la partie",
+    "de": "Spiel verlassen"
+  },
+  "Invia la risposta": {
+    "en": "Send the answer",
+    "fr": "Envoyer la réponse",
+    "de": "Antwort senden"
+  },
+  "Scrivi la tua risposta…": {
+    "en": "Type your answer…",
+    "fr": "Écris ta réponse…",
+    "de": "Schreib deine Antwort…"
+  },
+  "VERO": {
+    "en": "TRUE",
+    "fr": "VRAI",
+    "de": "WAHR"
+  },
+  "FALSO": {
+    "en": "FALSE",
+    "fr": "FAUX",
+    "de": "FALSCH"
+  },
+  "Corretto!": {
+    "en": "Correct!",
+    "fr": "Correct !",
+    "de": "Richtig!"
+  },
+  "Sbagliato": {
+    "en": "Wrong",
+    "fr": "Faux",
+    "de": "Falsch"
+  },
+  "La risposta era:": {
+    "en": "The answer was:",
+    "fr": "La réponse était :",
+    "de": "Die Antwort war:"
+  },
+  "Vedi il voto": {
+    "en": "See the grade",
+    "fr": "Voir la note",
+    "de": "Note ansehen"
+  },
+  "Risposta aperta": {
+    "en": "Open answer",
+    "fr": "Réponse ouverte",
+    "de": "Freie Antwort"
+  },
+  "Corrette": {
+    "en": "Correct",
+    "fr": "Correctes",
+    "de": "Richtig"
+  },
+  "Risposte": {
+    "en": "Answers",
+    "fr": "Réponses",
+    "de": "Antworten"
+  },
+  "Voti per argomento e tipo": {
+    "en": "Grades by topic and type",
+    "fr": "Notes par sujet et par type",
+    "de": "Noten nach Thema und Typ"
+  },
+  "Per sbloccare un voto completa tutte le domande di un tipo per un argomento, per esempio tutti i Vero/Falso.": {
+    "en": "To unlock a grade, complete every question of one type for a topic — for example all the True/False ones.",
+    "fr": "Pour débloquer une note, termine toutes les questions d'un type pour un sujet — par exemple tous les Vrai/Faux.",
+    "de": "Um eine Note freizuschalten, beantworte alle Fragen eines Typs zu einem Thema — zum Beispiel alle Wahr/Falsch-Fragen."
+  },
+  "del database di domande esplorato": {
+    "en": "of the question database explored",
+    "fr": "de la base de questions explorée",
+    "de": "der Fragendatenbank erkundet"
+  },
+  "Rigioca": {
+    "en": "Play again",
+    "fr": "Rejouer",
+    "de": "Nochmal spielen"
+  },
+  "Torna al menu": {
+    "en": "Back to the menu",
+    "fr": "Retour au menu",
+    "de": "Zurück zum Menü"
+  },
+  "Schermo intero": {
+    "en": "Full screen",
+    "fr": "Plein écran",
+    "de": "Vollbild"
+  },
+  "Esci da schermo intero": {
+    "en": "Exit full screen",
+    "fr": "Quitter le plein écran",
+    "de": "Vollbild beenden"
+  },
+  "Tema chiaro/scuro": {
+    "en": "Light / dark theme",
+    "fr": "Thème clair / sombre",
+    "de": "Helles / dunkles Design"
+  },
+  "Scegli un nome per avere la tua pagella.": {
+    "en": "Choose a name to get your report card.",
+    "fr": "Choisis un nom pour avoir ton bulletin.",
+    "de": "Wähle einen Namen, um dein Zeugnis zu bekommen."
   }
 }

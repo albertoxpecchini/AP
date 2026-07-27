@@ -273,9 +273,12 @@ Lo script assume **tutte** le chiavi presenti — nessuna è opzionale:
 
 Il testo passa sempre da `esc()`: si può scrivere liberamente `&`, `<`, virgolette.
 
-**Stile:** skin Ubuntu/Yaru identica al sito — crema `#faf8f6`, melanzana `#2c001e`
-(fascia intestazione), arancio Yaru `#e95420`. CSS inline in `build_html()`, nessun
-foglio separato. A4, paged media, numerazione "pagina / totale" in basso a destra.
+**Stile:** skin "piattaforma Supabase" identica alla home `.sb-` (tema chiaro) —
+pagina `#fcfcfc`, inchiostro `#171717`, verde brand `hsl(153 60% 53%)` /
+`hsl(153 86% 28%)` per il testo, pannelli con bordo-gradiente da 1px, chip neutre
+bordate, timeline a nodi verdi, titoli Ubuntu peso 500 con tracking negativo.
+CSS inline in `build_html()`, nessun foglio separato. A4, paged media,
+numerazione "pagina / totale" in basso al centro.
 
 ## B3. Timeline sul sito
 

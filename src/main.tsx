@@ -4,9 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import App from "./app/App.tsx";
 import { disableBackspaceNavigation } from "./app/utils/keyboard.ts";
-import ThemeWidget from "./app/theme/ThemeWidget.tsx";
+import ControlBar from "./app/theme/ControlBar.tsx";
+import ScrollProgress from "./app/site/ScrollProgress.tsx";
 import { syncTheme } from "./app/theme/themeCore.ts";
-import LanguageSwitcher from "./app/i18n/LanguageSwitcher.tsx";
 import { startI18nEngine } from "./app/i18n/translateDom.ts";
 import { initLangAttr } from "./app/i18n/langCore.ts";
 import { pathForHost } from "./app/site/nav";
@@ -145,13 +145,13 @@ createRoot(document.getElementById("root")!).render(
     </Routes>
     )}
     </BrowserRouter>
-    {/* Barra di controllo globale — un'unica pillola in vetro, in basso a
-        sinistra: lingua · tema · sensore orario. Presente su ogni pagina.
-        L'ordine qui è l'ordine dei segmenti da sinistra a destra. */}
-    <div className="ap-controlbar">
-      <LanguageSwitcher />
-      <ThemeWidget />
-    </div>
+    {/* Barra di controllo globale — un'unica pillola in basso a sinistra:
+        lingua · tema · sensore orario. Presente su ogni pagina. Sta
+        rincantucciata oltre il bordo ed esce dal lato quando ci si avvicina. */}
+    <ControlBar />
+    {/* Filo di avanzamento della lettura, sul bordo alto: cresce da sinistra a
+        destra avvicinandosi alla fine della pagina. Anche questo su ogni pagina. */}
+    <ScrollProgress />
     {/* Vercel Speed Insights: raccoglie le metriche di performance reali (Core
         Web Vitals) su ogni pagina. Attivo solo in produzione su Vercel. */}
     <SpeedInsights />

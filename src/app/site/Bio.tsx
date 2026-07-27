@@ -1,29 +1,77 @@
 import { useState, useEffect } from "react";
 import { SiteLink as Link } from "./nav";
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  MapPin,
-  GraduationCap,
-  UserRound,
-  Cake,
-  Compass,
-  Building2,
-} from "lucide-react";
-import InterestModal from "./InterestModal";
 import SiteFooter from "./SiteFooter";
 import { HOBBY, PASSIONI, SKILLS, type Interest } from "./data";
+import { lockBodyScroll, unlockBodyScroll } from "../utils/scrollLock";
+import {
+  IcArrowLeft,
+  IcArrowUpRight,
+  IcClose,
+  IcGame,
+  IcGrad,
+  IcGlobe,
+  IcCode,
+  IcPen,
+  IcSparkle,
+  IcCompass,
+  IcHeart,
+  IcCake,
+  IcPin,
+  IcBuilding,
+  IcMoto,
+  IcTarget,
+  IcPlane,
+  IcFork,
+  IcUsers,
+  IcPalette,
+  IcBrick,
+  IcTractor,
+  IcScreen,
+  IcStore,
+  IcWrench,
+  IcImage,
+  IcExplore,
+  type IcProps,
+} from "./homeIcons";
+import "../home.css";
+import "./bio.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// «Bio» — pagina About di Alberto Pecchini.
-//
-// Look "dark premium" · accento VIOLA al 100% (lo stesso di /me-stesso,
-// /dubliners, /gattopardo e della home): fondo scuro profondo, superfici
-// "vetro" e neon viola. Pagina autosufficiente: header, footer e stile sono
-// inline qui dentro (come le altre pagine premium), così non dipende più dal
-// vecchio SiteHeader/SiteFooter in stile chiaro. La modale degli interessi
-// viene ri-stilizzata in dark premium con selettori scoped sotto `.bio-page`.
+// «Bio» — pagina About di Alberto Pecchini, rifatta sulla grammatica Supabase
+// della home (.sb-): nav sottile 64px, hero a due colonne con ritratto in
+// pannello, prose, fact-card, gallerie, blocchi racconto, liste hobby/passioni
+// con modale di dettaglio, griglia competenze e box dove/formazione. Tema
+// chiaro/scuro nativo via token --sb-* (home.css); stili propri in bio.css.
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Icone della casa (homeIcons) al posto di lucide/emoji: una per interesse,
+// scelta per etichetta (i dati condivisi in data.tsx restano intatti).
+const INTEREST_ICON: Record<string, (p: IcProps) => JSX.Element> = {
+  "Motorbikes": IcMoto,
+  "Clay shooting": IcTarget,
+  "Travel": IcPlane,
+  "Video games": IcGame,
+  "Good food": IcFork,
+  "Time with friends": IcUsers,
+  "Web design": IcPalette,
+  "Restoration": IcBrick,
+  "Working the land": IcTractor,
+  "Digitising the business": IcScreen,
+  "Volunteering": IcHeart,
+  "Building a business": IcStore,
+};
+const iconFor = (label: string) => INTEREST_ICON[label] ?? IcSparkle;
+
+const SKILL_ICON: Record<string, (p: IcProps) => JSX.Element> = {
+  "Front-end development": IcCode,
+  "Design & UX": IcPen,
+  "AI-assisted development": IcSparkle,
+  "Tools & Workflow": IcWrench,
+  "CAT technical area": IcCompass,
+  "IT & multimedia": IcImage,
+  "On the ground": IcTractor,
+  "Languages": IcGlobe,
+};
 
 // Cornice foto con didascalia. Se il file manca, la figure sparisce invece di
 // lasciare un riquadro rotto: il layout a griglia si richiude da solo.
@@ -34,19 +82,17 @@ function Photo({
   src,
   alt,
   caption,
-  portrait = false,
   focus,
 }: {
   src: string;
   alt: string;
   caption?: string;
-  portrait?: boolean;
   focus?: string;
 }) {
   const [failed, setFailed] = useState(false);
   if (failed) return null;
   return (
-    <figure className={`bio-shot${portrait ? " bio-shot--portrait" : ""}`}>
+    <figure className="sb-bio-shot">
       <img
         src={src}
         alt={alt}
@@ -59,8 +105,20 @@ function Photo({
   );
 }
 
+// Foto della modale: se manca il file, sparisce e resta il solo testo.
+function ModalPhoto({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <div className="sb-bio-modal-photo">
+      <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} />
+    </div>
+  );
+}
+
 export default function Bio() {
-  const [selectedItem, setSelectedItem] = useState<Interest | null>(null);
+  const [selected, setSelected] = useState<Interest | null>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
@@ -71,6 +129,22 @@ export default function Bio() {
     document.title = "About · Alberto Pecchini";
     return () => { document.title = prev; };
   }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Modale interessi: blocco scroll + chiusura con Esc.
+  useEffect(() => {
+    if (!selected) return;
+    lockBodyScroll();
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSelected(null); };
+    window.addEventListener("keydown", onKey);
+    return () => { window.removeEventListener("keydown", onKey); unlockBodyScroll(); };
+  }, [selected]);
 
   // Età calcolata dalla data di nascita (28 giugno 2006).
   const now = new Date();
@@ -83,81 +157,81 @@ export default function Bio() {
   const FACTS = [
     // Il valore resta il numero puro: una stringa con l'età dentro non sarebbe
     // traducibile (la chiave del dizionario cambierebbe a ogni compleanno).
-    { Icon: Cake, value: `${age}`, label: "Years old · born 28 June 2006" },
-    { Icon: MapPin, value: "Rivalta sul Mincio", label: "Province of Mantua, Italy" },
-    { Icon: GraduationCap, value: "CAT diploma, 2026", label: "ITT «Carlo d'Arco», Mantua" },
-    { Icon: Building2, value: "UniMoRe", label: "Construction & Land Management" },
+    { Icon: IcCake, value: `${age}`, label: "Years old · born 28 June 2006", noTranslate: false },
+    { Icon: IcPin, value: "Rivalta sul Mincio", label: "Province of Mantua, Italy", noTranslate: true },
+    { Icon: IcGrad, value: "CAT diploma, 2026", label: "ITT «Carlo d'Arco», Mantua", noTranslate: false },
+    { Icon: IcBuilding, value: "UniMoRe", label: "Construction & Land Management", noTranslate: true },
   ];
 
   const renderList = (items: Interest[]) => (
-    <div className="bio-list">
-      {items.map((it) => (
-        <button
-          type="button"
-          className="bio-list-item"
-          key={it.label}
-          onClick={() => setSelectedItem(it)}
-          aria-label={`Learn more: ${it.label}`}
-        >
-          <span className="bio-list-emoji" aria-hidden="true">{it.emoji}</span>
-          <span className="bio-list-label">{it.label}</span>
-          <span className="bio-list-arrow" aria-hidden="true">
-            <ArrowUpRight size={18} />
-          </span>
-        </button>
-      ))}
+    <div className="sb-bio-list">
+      {items.map((it) => {
+        const Icon = iconFor(it.label);
+        return (
+          <button
+            type="button"
+            className="sb-bio-item"
+            key={it.label}
+            onClick={() => setSelected(it)}
+            aria-label={`Learn more: ${it.label}`}
+          >
+            <span className="sb-bio-item-icon" aria-hidden="true"><Icon size={19} /></span>
+            <span className="sb-bio-item-label">{it.label}</span>
+            <IcArrowUpRight size={16} className="go" />
+          </button>
+        );
+      })}
     </div>
   );
 
+  const SelectedIcon = selected ? iconFor(selected.label) : null;
+
   return (
-    <div className="it-page-wrapper bio-page">
-      {/* Header compatto: marchio del portfolio + ritorno alla home */}
-      <header className="bio-header">
-        <div className="container">
-          <div className="d-flex align-items-center justify-content-between py-3">
-            <Link to="/" className="bio-brand text-decoration-none d-inline-flex align-items-center">
-              <span className="bio-brand-mark" aria-hidden="true">
-                <img src="/favicon.svg" alt="" width={40} height={40} />
-              </span>
-              <span className="bio-brand-text">
-                <span className="bio-brand-title">Alberto Pecchini</span>
-                <span className="bio-brand-tagline">Designer &amp; Front-end Developer</span>
-              </span>
-            </Link>
-            <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" />
-              <span>Back to home</span>
-            </Link>
-          </div>
+    <div className="sb-home bio-page">
+      {/* Skiplink — requisito di accessibilità */}
+      <div className="skiplinks">
+        <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>
+      </div>
+
+      {/* ── Nav sottile: brand + ritorno alla home ── */}
+      <header className={`sb-nav ${scrolled ? "sb-nav--scrolled" : ""}`}>
+        <div className="sb-container sb-nav-inner">
+          <Link to="/" className="sb-nav-brand">
+            <img src="/favicon.svg" alt="" width={28} height={28} />
+            <span className="sb-nav-brand-name" translate="no">Alberto Pecchini</span>
+            <span className="sb-bio-tagline">Designer &amp; Front-end Developer</span>
+          </Link>
+          <Link to="/" className="sb-btn sb-btn--sm sb-btn--secondary sb-bio-back">
+            <IcArrowLeft size={15} /> Back to home
+          </Link>
         </div>
       </header>
 
       <main id="main-content">
-        {/* ① Copertina */}
-        <section className="bio-hero">
-          <div className="container">
-            <div className="bio-hero-grid">
-              <div className="bio-hero-text">
-                <span className="bio-hero-badge" aria-hidden="true">
-                  <UserRound size={44} strokeWidth={1.75} />
-                </span>
-                <p className="ap-kicker text-uppercase fw-semibold mb-3">👋 About me</p>
-                <h1 className="bio-hero-title fw-bold">Hi, I'm Alberto.</h1>
-                <span className="bio-hero-rule" aria-hidden="true" />
-                <p className="bio-hero-lead">Designer &amp; front-end developer, raised between Rivalta sul Mincio and Mantua.</p>
-                <p className="bio-hero-school mb-0">
-                  Turning ideas into elegant, fast digital experiences.
-                </p>
+        {/* ① Hero — titolo e presentazione a sinistra, ritratto a destra */}
+        <section className="sb-hero" aria-labelledby="bio-hero-title">
+          <div className="sb-container">
+            <div className="sb-bio-hero-grid">
+              <div>
+                <h1 className="sb-hero-title" id="bio-hero-title">
+                  <span>Hi, I'm Alberto.</span>
+                </h1>
+                <div className="sb-hero-copy" style={{ marginTop: "1.2rem" }}>
+                  <p><strong>Designer &amp; front-end developer, raised between Rivalta sul Mincio and Mantua.</strong></p>
+                  <p>Turning ideas into elegant, fast digital experiences.</p>
+                </div>
               </div>
-              <div className="bio-hero-aside">
-                <div className="bio-portrait">
-                  <img
-                    src="/alberto-pecchini.jpg"
-                    alt="Portrait of Alberto Pecchini"
-                    width={1050}
-                    height={1400}
-                    loading="eager"
-                  />
+              <div className="sb-bio-portrait">
+                <div className="sb-panel">
+                  <div className="sb-panel-inner">
+                    <img
+                      src="/alberto-pecchini.jpg"
+                      alt="Portrait of Alberto Pecchini"
+                      width={1050}
+                      height={1400}
+                      loading="eager"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -165,19 +239,19 @@ export default function Bio() {
         </section>
 
         {/* ② Chi sono */}
-        <section className="py-5 my-lg-4 bg-white">
-          <div className="container">
-            <div className="mb-4">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">01 — Who I am</p>
-              <h2 className="display-5 fw-bold mb-3">A little about me</h2>
+        <section className="sb-section" aria-labelledby="bio-chi-sono">
+          <div className="sb-container">
+            <div className="sb-bio-sechead">
+              <span className="sb-bio-kicker">01 — Who I am</span>
+              <h2 id="bio-chi-sono">A little about me</h2>
             </div>
-            <div className="bio-prose-wrap">
-              <p className="bio-prose">
+            <div className="sb-bio-prose">
+              <p>
                 My name is Alberto Pecchini, I'm {age} and I grew up in{" "}
                 <strong>Rivalta sul Mincio</strong>, a village in the province of Mantua where my
                 family has both its roots and its business.
               </p>
-              <p className="bio-prose">
+              <p>
                 I hold a <strong>CAT diploma</strong> — Construction, Environment and Territory —
                 from the «Carlo d'Arco» Technical Institute in Mantua, and I'm now studying{" "}
                 <strong>Construction and Land Management</strong> at the University of Modena and
@@ -185,13 +259,13 @@ export default function Bio() {
                 developer: I build responsive, fast and polished interfaces with React, Next.js,
                 TypeScript, Tailwind CSS and GSAP.
               </p>
-              <p className="bio-prose">
+              <p>
                 I've been giving a hand in the family business since I was a kid — not as a
                 pastime, but as the way I learned what <strong>real work</strong> means. With my
                 father I look after parks, pools and outdoor spaces, and I drive the farm
                 machinery. It's concrete work, made of hands, seasons and attention to detail.
               </p>
-              <p className="bio-prose mb-0">
+              <p>
                 In the business I've also taken over everything <strong>digital</strong>: online
                 orders, the satellite imagery we use to prepare quotes, the listings for
                 second-hand sales. That's where my two sides — the hands-on one and the digital
@@ -199,19 +273,21 @@ export default function Bio() {
               </p>
             </div>
 
-            {/* Dati essenziali, in chiaro */}
-            <div className="bio-facts">
-              {FACTS.map(({ Icon, value, label }) => (
-                <div className="bio-fact" key={value}>
-                  <span className="bio-fact-icon" aria-hidden="true"><Icon size={20} /></span>
-                  <span className="bio-fact-value">{value}</span>
-                  <span className="bio-fact-label">{label}</span>
+            {/* Dati essenziali */}
+            <div className="sb-bio-facts">
+              {FACTS.map(({ Icon, value, label, noTranslate }) => (
+                <div className="sb-panel" key={value}>
+                  <div className="sb-panel-inner sb-bio-fact">
+                    <span className="sb-bio-fact-icon" aria-hidden="true"><Icon size={18} /></span>
+                    <span className="sb-bio-fact-value" {...(noTranslate ? { translate: "no" as const } : {})}>{value}</span>
+                    <span className="sb-bio-fact-label">{label}</span>
+                  </div>
                 </div>
               ))}
             </div>
 
             {/* Dove sono cresciuto e cosa faccio, in tre scatti */}
-            <div className="bio-gallery">
+            <div className="sb-bio-gallery">
               <Photo
                 src="/images/me-stesso/rivalta.jpg"
                 alt="Rivalta sul Mincio, where I grew up"
@@ -231,31 +307,33 @@ export default function Bio() {
             </div>
 
             {/* Il restauro: da dove è partito tutto */}
-            <div className="bio-story mt-5">
-              <div className="bio-story-art">
+            <div className="sb-bio-story">
+              <div>
                 <Photo
                   src="/images/me-stesso/restauro-1.jpg"
                   alt="At the restoration course in 2018, working on an old wall"
                   caption="2018 — hands on the bricks"
                 />
               </div>
-              <div className="bio-story-text">
-                <h3 className="h3 fw-bold mb-3">Where it all started</h3>
-                <p className="bio-prose">
-                  In 2018 — I was twelve — I took a <strong>restoration course</strong> at the
-                  Mantua Seminary, today Unicollege Mantova, one of the youth projects run by
-                  Santagnese10 Officina Creativa, the hub that hosts the city's first coworking
-                  space.
-                </p>
-                <p className="bio-prose mb-0">
-                  With work gloves on I cleaned up and repaired old brick and cobblestone walls:
-                  it was the first time I put my hands on a <strong>historic building</strong>,
-                  and it stayed with me. Not long after, I chose the CAT programme — and the same
-                  technical drawing I learned there is what later pulled me towards web design.
-                </p>
+              <div>
+                <h3>Where it all started</h3>
+                <div className="sb-bio-prose">
+                  <p>
+                    In 2018 — I was twelve — I took a <strong>restoration course</strong> at the
+                    Mantua Seminary, today Unicollege Mantova, one of the youth projects run by
+                    Santagnese10 Officina Creativa, the hub that hosts the city's first coworking
+                    space.
+                  </p>
+                  <p>
+                    With work gloves on I cleaned up and repaired old brick and cobblestone walls:
+                    it was the first time I put my hands on a <strong>historic building</strong>,
+                    and it stayed with me. Not long after, I chose the CAT programme — and the same
+                    technical drawing I learned there is what later pulled me towards web design.
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="bio-gallery bio-gallery--two mt-4">
+            <div className="sb-bio-gallery sb-bio-gallery--two">
               <Photo
                 src="/images/me-stesso/restauro-2.jpg"
                 alt="The group of kids at the restoration course"
@@ -268,21 +346,21 @@ export default function Bio() {
           </div>
         </section>
 
-        {/* ③ Hobby + Passioni come liste con emoji */}
-        <section className="py-5 my-lg-4 bg-light">
-          <div className="container">
-            <div className="bio-twocol">
+        {/* ③ Hobby + Passioni come liste cliccabili */}
+        <section className="sb-section" aria-labelledby="bio-hobby">
+          <div className="sb-container">
+            <div className="sb-bio-twocol">
               <div>
-                <div className="bio-list-head">
-                  <p className="ap-kicker text-primary text-uppercase fw-semibold mb-2">🎮 My hobbies</p>
-                  <h2 className="h3 fw-bold mb-3">In my free time</h2>
+                <div className="sb-bio-listhead">
+                  <span className="sb-bio-kicker">My hobbies</span>
+                  <h2 id="bio-hobby">In my free time</h2>
                 </div>
                 {renderList(HOBBY)}
               </div>
               <div>
-                <div className="bio-list-head">
-                  <p className="ap-kicker text-primary text-uppercase fw-semibold mb-2">🔥 My passions</p>
-                  <h2 className="h3 fw-bold mb-3">What drives me</h2>
+                <div className="sb-bio-listhead">
+                  <span className="sb-bio-kicker">My passions</span>
+                  <h2>What drives me</h2>
                 </div>
                 {renderList(PASSIONI)}
               </div>
@@ -291,97 +369,109 @@ export default function Bio() {
         </section>
 
         {/* ④ Competenze */}
-        <section className="py-5 my-lg-4 bg-white">
-          <div className="container">
-            <div className="mb-4">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">02 — Skills</p>
-              <h2 className="display-5 fw-bold mb-0">What I work with</h2>
+        <section className="sb-section" aria-labelledby="bio-skills">
+          <div className="sb-container">
+            <div className="sb-bio-sechead">
+              <span className="sb-bio-kicker">02 — Skills</span>
+              <h2 id="bio-skills">What I work with</h2>
             </div>
-            <div className="bio-skillgrid">
-              {SKILLS.map((group) => (
-                <div className="bio-box" key={group.title}>
-                  <span className="bio-skill-title">
-                    <span aria-hidden="true">{group.emoji}</span> {group.title}
-                  </span>
-                  <div className="bio-chips">
-                    {group.items.map((item) => (
-                      <span key={item} className="bio-chip">{item}</span>
-                    ))}
+            <div className="sb-bio-skillgrid">
+              {SKILLS.map((group) => {
+                const Icon = SKILL_ICON[group.title] ?? IcSparkle;
+                return (
+                  <div className="sb-panel" key={group.title}>
+                    <div className="sb-panel-inner sb-bio-skill">
+                      <div className="sb-bio-skill-title">
+                        <Icon size={18} />
+                        <span>{group.title}</span>
+                      </div>
+                      <div className="sb-bio-chips">
+                        {group.items.map((item) => (
+                          <span key={item} className="sb-chip">{item}</span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
 
         {/* ⑤ Dove + Formazione */}
-        <section className="py-5 my-lg-4 bg-light">
-          <div className="container">
-            <div className="mb-4">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">03 — Where &amp; education</p>
-              <h2 className="display-5 fw-bold mb-0">Based &amp; trained</h2>
+        <section className="sb-section" aria-labelledby="bio-dove">
+          <div className="sb-container">
+            <div className="sb-bio-sechead">
+              <span className="sb-bio-kicker">03 — Where &amp; education</span>
+              <h2 id="bio-dove">Based &amp; trained</h2>
             </div>
-            <div className="bio-twocol">
-              <div className="bio-box">
-                <p className="bio-box-label">📍 Location</p>
-                <p className="bio-based">
-                  <MapPin size={18} aria-hidden="true" /> Rivalta sul Mincio · Mantua, Italy
-                </p>
-                <p className="bio-edu-lead mt-3 mb-0">
-                  I live and work where I grew up, a few kilometres from Mantua, and I'm available
-                  for remote work, freelance projects and collaborations.
-                </p>
-                <ul className="bio-edu mt-3">
-                  <li>
-                    <Compass size={16} aria-hidden="true" /> Italy · San Marino · Switzerland · Austria
-                  </li>
-                  <li>
-                    <Compass size={16} aria-hidden="true" /> France · Ireland · Scotland
-                  </li>
-                </ul>
+            <div className="sb-bio-twocol">
+              <div className="sb-panel">
+                <div className="sb-panel-inner sb-bio-box">
+                  <span className="sb-bio-boxlabel">Where I'm based</span>
+                  <p className="sb-bio-based">
+                    <IcPin size={16} aria-hidden="true" /> Rivalta sul Mincio · Mantua, Italy
+                  </p>
+                  <p className="sb-bio-boxlead">
+                    I live and work where I grew up, a few kilometres from Mantua, and I'm available
+                    for remote work, freelance projects and collaborations.
+                  </p>
+                  <ul className="sb-bio-lines">
+                    <li>
+                      <IcExplore size={15} aria-hidden="true" /> Italy · San Marino · Switzerland · Austria
+                    </li>
+                    <li>
+                      <IcExplore size={15} aria-hidden="true" /> France · Ireland · Scotland
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <div className="bio-box">
-                <p className="bio-box-label">🎓 Education</p>
-                <p className="bio-edu-lead">
-                  CAT diploma at ITT «Carlo d'Arco» in Mantua, now studying Construction and Land
-                  Management at the University of Modena and Reggio Emilia; English C1 (IELTS)
-                  achieved in Dublin.
-                </p>
-                <ul className="bio-edu">
-                  <li>
-                    <GraduationCap size={16} aria-hidden="true" /> UniMoRe «Enzo Ferrari» — Construction &amp; Land Management, since 2026
-                  </li>
-                  <li>
-                    <GraduationCap size={16} aria-hidden="true" /> ITT «Carlo d'Arco» — CAT diploma, 2021—2026
-                  </li>
-                  <li>
-                    <GraduationCap size={16} aria-hidden="true" /> CES Dublin — IELTS, level C1, August 2024
-                  </li>
-                  <li>
-                    <GraduationCap size={16} aria-hidden="true" /> Workplace safety, low risk — Mantua, 2023
-                  </li>
-                </ul>
+              <div className="sb-panel">
+                <div className="sb-panel-inner sb-bio-box">
+                  <span className="sb-bio-boxlabel">Education &amp; training</span>
+                  <p className="sb-bio-boxlead">
+                    CAT diploma at ITT «Carlo d'Arco» in Mantua, now studying Construction and Land
+                    Management at the University of Modena and Reggio Emilia; English C1 (IELTS)
+                    achieved in Dublin.
+                  </p>
+                  <ul className="sb-bio-lines">
+                    <li>
+                      <IcGrad size={15} aria-hidden="true" /> UniMoRe «Enzo Ferrari» — Construction &amp; Land Management, since 2026
+                    </li>
+                    <li>
+                      <IcGrad size={15} aria-hidden="true" /> ITT «Carlo d'Arco» — CAT diploma, 2021—2026
+                    </li>
+                    <li>
+                      <IcGrad size={15} aria-hidden="true" /> CES Dublin — IELTS, level C1, August 2024
+                    </li>
+                    <li>
+                      <IcGrad size={15} aria-hidden="true" /> Workplace safety, low risk — Mantua, 2023
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
             {/* Dublino: il mese che ha portato al C1 */}
-            <div className="bio-story mt-5">
-              <div className="bio-story-text">
-                <h3 className="h3 fw-bold mb-3">A month living in English</h3>
-                <p className="bio-prose">
-                  The trip I care about most I gave to myself: in the summer of{" "}
-                  <strong>2024</strong>, just turned eighteen, I left for a language stay in{" "}
-                  <strong>Dublin</strong>. I took a plane for the first time, discovered a new
-                  country, and for a month I tried living and studying entirely in English.
-                </p>
-                <p className="bio-prose mb-0">
-                  Four weeks of full immersion at the CES centre on Dame Court — twenty-six
-                  lessons a week on speaking, writing, reading and listening — and the{" "}
-                  <strong>IELTS exam passed at level C1</strong> at the end of the course. In
-                  between, I explored on my own: Howth, Bray, Glendalough, Galway.
-                </p>
+            <div className="sb-bio-story">
+              <div>
+                <h3>A month living in English</h3>
+                <div className="sb-bio-prose">
+                  <p>
+                    The trip I care about most I gave to myself: in the summer of{" "}
+                    <strong>2024</strong>, just turned eighteen, I left for a language stay in{" "}
+                    <strong>Dublin</strong>. I took a plane for the first time, discovered a new
+                    country, and for a month I tried living and studying entirely in English.
+                  </p>
+                  <p>
+                    Four weeks of full immersion at the CES centre on Dame Court — twenty-six
+                    lessons a week on speaking, writing, reading and listening — and the{" "}
+                    <strong>IELTS exam passed at level C1</strong> at the end of the course. In
+                    between, I explored on my own: Howth, Bray, Glendalough, Galway.
+                  </p>
+                </div>
               </div>
-              <div className="bio-story-art">
+              <div>
                 <Photo
                   src="/images/me-stesso/dublino.jpg"
                   alt="Language stay in Dublin"
@@ -395,318 +485,44 @@ export default function Bio() {
 
       <SiteFooter />
 
-      <InterestModal item={selectedItem} onClose={() => setSelectedItem(null)} />
-
-      <style>{`
-        /* ─────────────────────────────────────────────────────────────────────
-           Look premium · accento VIOLA (lo stesso di /me-stesso, /dubliners,
-           /gattopardo e della home). Segue il TEMA GLOBALE chiaro/scuro:
-           valori chiari di default in .bio-page, override scuro su
-           html.dark .bio-page (come /archivio). Autosufficiente.
-           ───────────────────────────────────────────────────────────────────── */
-        .bio-page {
-          /* — Tema CHIARO (default) — */
-          --accent: #dd4814;
-          --accent-2: #c2410c;
-          --accent-3: #f39a76;
-          --accent-deep: #bc3d10;
-          --ink: #c2410c;
-          --glow: rgba(221, 72, 20, 0.35);
-          --heading: #14121c;
-          --text: #2a2833;
-          --sub: #55535f;
-          --surface: #ffffff;
-          --surface-bd: rgba(24, 12, 60, 0.10);
-          --vio-soft: rgba(194, 65, 12, 0.07);
-          --vio-bd: rgba(194, 65, 12, 0.22);
-          --panel: linear-gradient(160deg, #efeafd 0%, #e9e6fb 45%, #f4f2fb 100%);
-          --halo-1: rgba(221, 72, 20, 0.35);
-          --halo-2: rgba(194, 65, 12, 0.22);
-          --page-bg:
-            radial-gradient(120% 70% at 50% -10%, rgba(221, 72, 20, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #faf8f6 0%, #f2f0fb 100%);
-          --header-bg: rgba(247, 245, 253, 0.82);
-          --section-alt: rgba(194, 65, 12, 0.045);
-          --btn-bd: rgba(24, 12, 60, 0.28);
-          --btn-fg: #2a2833;
-          --portrait-shadow: 0 24px 60px rgba(40, 28, 80, 0.28);
-          --card-shadow: 0 14px 36px rgba(40, 28, 80, 0.12);
-
-          min-height: 100vh;
-          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
-          color: var(--text);
-          background: var(--page-bg);
-        }
-
-        /* — Tema SCURO — */
-        html.dark .bio-page {
-          --accent: #e95420;
-          --accent-2: #dd4814;
-          --accent-3: #f39a76;
-          --accent-deep: #bc3d10;
-          --ink: #f6a583;
-          --glow: rgba(233, 84, 32, 0.45);
-          --heading: #ffffff;
-          --text: #f5f3f1;
-          --sub: #b3aca6;
-          --surface: rgba(255, 255, 255, 0.05);
-          --surface-bd: rgba(255, 255, 255, 0.10);
-          --vio-soft: rgba(233, 84, 32, 0.10);
-          --vio-bd: rgba(233, 84, 32, 0.28);
-          --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
-          --halo-1: #e95420;
-          --halo-2: #bc3d10;
-          --page-bg:
-            radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
-          --header-bg: rgba(28, 22, 27, 0.82);
-          --section-alt: rgba(255, 255, 255, 0.022);
-          --btn-bd: rgba(255, 255, 255, 0.4);
-          --btn-fg: #ffffff;
-          --portrait-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-          --card-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
-        }
-
-        .bio-page .ap-kicker.text-primary { color: var(--ink) !important; }
-        .bio-page .bg-white { background: transparent !important; }
-        .bio-page .bg-light { background: var(--section-alt) !important; }
-        .bio-page .display-5, .bio-page .h3 { color: var(--heading); }
-        .bio-page .btn-outline-light { border-color: var(--btn-bd); color: var(--btn-fg); }
-        .bio-page .btn-outline-light:hover,
-        .bio-page .btn-outline-light:focus {
-          background-color: var(--accent); border-color: var(--accent); color: #ffffff !important;
-        }
-        .bio-page .ap-kicker { letter-spacing: 0.18em; font-size: 0.875rem; }
-
-        /* Header — vetro con filo viola */
-        .bio-header {
-          background: var(--header-bg); position: sticky; top: 0; z-index: 10;
-          backdrop-filter: blur(14px) saturate(120%);
-          -webkit-backdrop-filter: blur(14px) saturate(120%);
-          border-bottom: 1px solid var(--surface-bd);
-        }
-        .bio-brand-mark {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 40px; height: 40px; border-radius: 8px; overflow: hidden; margin-right: 12px;
-          background: var(--vio-soft); border: 1px solid var(--vio-bd);
-        }
-        .bio-brand-mark img { width: 100%; height: 100%; display: block; }
-        .bio-brand-text { display: inline-flex; flex-direction: column; line-height: 1.2; }
-        .bio-brand-title { color: var(--heading); font-weight: 700; font-size: 1.05rem; }
-        .bio-brand-tagline { color: var(--sub); font-size: 0.78rem; }
-        @media (max-width: 575.98px) { .bio-brand-tagline { display: none; } }
-
-        /* Hero copertina — pannello con aloni viola */
-        .bio-hero {
-          position: relative; overflow: hidden;
-          padding: clamp(3rem, 7vw, 5.5rem) 0;
-          color: var(--heading);
-          background:
-            radial-gradient(90% 120% at 0% 0%, var(--vio-soft) 0%, transparent 55%),
-            var(--panel);
-          border-bottom: 1px solid var(--surface-bd);
-        }
-        .bio-hero::before, .bio-hero::after {
-          content: ""; position: absolute; width: 55%; height: 75%; border-radius: 50%;
-          filter: blur(60px); opacity: 0.45; pointer-events: none; z-index: 0;
-        }
-        .bio-hero::before { background: var(--halo-1); top: -30%; right: -10%; }
-        .bio-hero::after  { background: var(--halo-2); bottom: -35%; left: -12%; opacity: 0.35; }
-        .bio-hero .container { position: relative; z-index: 1; }
-        .bio-hero-grid {
-          display: grid;
-          grid-template-columns: 1.15fr 0.85fr;
-          gap: clamp(1.5rem, 4vw, 3.5rem);
-          align-items: center;
-        }
-        .bio-hero-badge {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 84px; height: 84px; border-radius: 20px;
-          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
-          border: 1px solid rgba(255, 255, 255, 0.28);
-          color: #ffffff; margin-bottom: 1.5rem;
-          box-shadow: 0 14px 40px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-        .bio-hero-title {
-          font-size: clamp(2.75rem, 7vw, 5rem);
-          line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1.1rem; color: var(--heading);
-        }
-        .bio-hero-rule {
-          display: block; width: 64px; height: 4px; border-radius: 2px;
-          background: var(--accent); box-shadow: 0 0 18px var(--glow); margin-bottom: 1.1rem;
-        }
-        .bio-hero-lead {
-          font-size: clamp(1.25rem, 2.6vw, 1.7rem);
-          font-style: italic; font-weight: 600; color: var(--heading); margin-bottom: 0.85rem;
-        }
-        .bio-hero-school { color: var(--sub); font-size: 1.02rem; }
-        @media (max-width: 767.98px) {
-          .bio-hero-grid { grid-template-columns: 1fr; }
-          .bio-hero-badge { width: 68px; height: 68px; border-radius: 16px; margin-bottom: 1.1rem; }
-          .bio-hero-badge svg { width: 36px; height: 36px; }
-        }
-
-        /* Ritratto */
-        .bio-portrait {
-          position: relative; border-radius: 20px; overflow: hidden;
-          border: 1px solid var(--vio-bd);
-          box-shadow: var(--portrait-shadow);
-          max-width: 380px; margin-left: auto;
-        }
-        .bio-portrait img { width: 100%; height: auto; display: block; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 30%; }
-        @media (max-width: 767.98px) { .bio-portrait { margin: 0 auto; } }
-
-        /* Prosa */
-        .bio-prose-wrap { max-width: 48rem; }
-        .bio-prose { font-size: 1.1rem; line-height: 1.8; color: var(--sub); margin-bottom: 1.1rem; }
-        .bio-prose strong { color: var(--heading); }
-
-        /* Dati essenziali — striscia di quattro riquadri */
-        .bio-facts {
-          display: grid; grid-template-columns: repeat(4, 1fr);
-          gap: 1rem; margin-top: 2.5rem;
-        }
-        @media (max-width: 767.98px) { .bio-facts { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 419.98px) { .bio-facts { grid-template-columns: 1fr; } }
-        .bio-fact {
-          display: flex; flex-direction: column; gap: 0.3rem;
-          padding: 1.1rem 1.15rem; border-radius: 16px;
-          background: var(--surface); border: 1px solid var(--surface-bd);
-          box-shadow: var(--card-shadow);
-        }
-        .bio-fact-icon {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 38px; height: 38px; border-radius: 11px; margin-bottom: 0.35rem;
-          background: var(--vio-soft); border: 1px solid var(--vio-bd); color: var(--ink);
-        }
-        .bio-fact-value { color: var(--heading); font-weight: 700; font-size: 1.05rem; line-height: 1.25; }
-        .bio-fact-label { color: var(--sub); font-size: 0.85rem; line-height: 1.4; }
-
-        /* Gallerie fotografiche */
-        .bio-gallery {
-          display: grid; grid-template-columns: repeat(3, 1fr);
-          gap: 1rem; margin-top: 2rem;
-        }
-        .bio-gallery--two { grid-template-columns: repeat(2, 1fr); }
-        @media (max-width: 767.98px) {
-          .bio-gallery, .bio-gallery--two { grid-template-columns: 1fr; }
-        }
-        .bio-shot {
-          margin: 0; border-radius: 16px; overflow: hidden;
-          background: var(--vio-soft); border: 1px solid var(--surface-bd);
-          box-shadow: var(--card-shadow);
-        }
-        .bio-shot img {
-          display: block; width: 100%; height: 100%;
-          aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 50%;
-        }
-        .bio-shot--portrait img { aspect-ratio: 3 / 4; }
-        .bio-shot figcaption {
-          padding: 0.6rem 0.9rem; font-size: 0.82rem; font-weight: 600;
-          color: var(--sub); border-top: 1px solid var(--surface-bd);
-        }
-
-        /* Blocco racconto: testo + foto affiancati */
-        .bio-story {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
-        }
-        @media (max-width: 767.98px) { .bio-story { grid-template-columns: 1fr; } }
-        .bio-story .bio-shot img { aspect-ratio: 4 / 3; }
-        .bio-story .h3 { color: var(--heading); }
-
-        /* Layout a due colonne */
-        .bio-twocol {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: clamp(1.5rem, 4vw, 3rem); align-items: start;
-        }
-        @media (max-width: 767.98px) { .bio-twocol { grid-template-columns: 1fr; } }
-        .bio-list-head .ap-kicker { color: var(--ink) !important; }
-
-        /* Liste hobby / passioni (voci cliccabili → modale) */
-        .bio-list { display: flex; flex-direction: column; gap: 0.6rem; }
-        .bio-list-item {
-          display: flex; align-items: center; gap: 0.85rem; width: 100%; text-align: left;
-          padding: 0.85rem 1.05rem; border-radius: 14px;
-          background: var(--surface); border: 1px solid var(--surface-bd);
-          color: var(--text); cursor: pointer;
-          font-family: inherit; font-size: 1rem; font-weight: 600;
-          transition: transform .15s, border-color .15s, box-shadow .15s, background .15s;
-        }
-        .bio-list-item:hover, .bio-list-item:focus-visible {
-          transform: translateY(-2px); border-color: var(--vio-bd); background: var(--vio-soft);
-          box-shadow: var(--card-shadow); outline: none;
-        }
-        .bio-list-emoji {
-          flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
-          width: 42px; height: 42px; border-radius: 11px; font-size: 1.2rem;
-          background: var(--vio-soft); border: 1px solid var(--vio-bd);
-        }
-        .bio-list-label { min-width: 0; }
-        .bio-list-arrow { margin-left: auto; color: var(--ink); display: inline-flex; transition: transform .15s, color .15s; }
-        .bio-list-item:hover .bio-list-arrow, .bio-list-item:focus-visible .bio-list-arrow { transform: translate(2px, -2px); color: var(--heading); }
-
-        /* Skills */
-        .bio-skillgrid {
-          display: grid; grid-template-columns: repeat(2, 1fr);
-          gap: 1.1rem; align-items: start;
-        }
-        @media (max-width: 767.98px) { .bio-skillgrid { grid-template-columns: 1fr; } }
-        .bio-box {
-          background: var(--surface); border: 1px solid var(--surface-bd);
-          border-radius: 18px; padding: clamp(1.25rem, 3vw, 1.6rem);
-          box-shadow: var(--card-shadow);
-        }
-        .bio-box-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink); margin: 0 0 1rem; }
-        .bio-skill-title { display: block; font-weight: 700; color: var(--heading); margin-bottom: 0.75rem; font-size: 1.02rem; }
-        .bio-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-        .bio-chip {
-          display: inline-flex; align-items: center;
-          padding: 0.35rem 0.8rem; border-radius: 999px;
-          background: var(--vio-soft); border: 1px solid var(--vio-bd);
-          color: var(--ink); font-size: 0.85rem; font-weight: 600;
-        }
-
-        /* Dove + Formazione */
-        .bio-based { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text); font-weight: 600; font-size: 1.05rem; margin: 0; }
-        .bio-based svg { color: var(--ink); }
-        .bio-edu-lead { color: var(--sub); line-height: 1.65; margin: 0 0 1rem; }
-        .bio-edu { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
-        .bio-edu li { display: flex; align-items: center; gap: 0.55rem; color: var(--text); font-weight: 600; }
-        .bio-edu li svg { color: var(--ink); flex-shrink: 0; }
-
-        /* Footer */
-        .bio-footer { background-color: var(--header-bg); color: var(--heading); border-top: 1px solid var(--surface-bd); }
-
-        /* ── Modale interessi (scoped, segue il tema) ── */
-        .bio-page .ap-modal-backdrop { background: rgba(5, 7, 10, 0.35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-        html.dark .bio-page .ap-modal-backdrop { background: rgba(5, 7, 10, 0.7); }
-        .bio-page .ap-modal {
-          background: var(--panel);
-          border: 1px solid var(--vio-bd);
-          box-shadow: 0 30px 80px rgba(40, 28, 80, 0.28);
-          color: var(--text);
-        }
-        html.dark .bio-page .ap-modal { box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7); }
-        .bio-page .ap-modal-close {
-          background: var(--vio-soft); color: var(--heading); border: 1px solid var(--surface-bd);
-          backdrop-filter: blur(4px);
-        }
-        .bio-page .ap-modal-close:hover, .bio-page .ap-modal-close:focus-visible {
-          background: var(--accent); color: #ffffff;
-        }
-        .bio-page .ap-modal-icon-wrap {
-          background: var(--vio-soft); color: var(--ink); border: 1px solid var(--vio-bd);
-        }
-        .bio-page .ap-modal-title { color: var(--heading); }
-        .bio-page .ap-modal-body { color: var(--sub); }
-        .bio-page .ap-modal .btn-primary {
-          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
-          border: 1px solid rgba(255, 255, 255, 0.18); color: #ffffff;
-          box-shadow: 0 8px 22px var(--glow);
-        }
-        .bio-page .ap-modal .btn-primary:hover, .bio-page .ap-modal .btn-primary:focus { filter: brightness(1.08); color: #ffffff; }
-      `}</style>
+      {/* ── Modale di dettaglio hobby/passioni ── */}
+      {selected && SelectedIcon && (
+        <>
+          <div className="sb-bio-modal-backdrop" onClick={() => setSelected(null)} aria-hidden="true" />
+          <div
+            className="sb-bio-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sb-bio-modal-title"
+          >
+            <div className="sb-panel">
+              <div className="sb-panel-inner">
+                <button
+                  type="button"
+                  className="sb-bio-modal-close"
+                  onClick={() => setSelected(null)}
+                  aria-label="Close the details"
+                >
+                  <IcClose size={18} />
+                </button>
+                {selected.img && (
+                  <ModalPhoto key={selected.img} src={selected.img} alt={selected.label} />
+                )}
+                <div className="sb-bio-modal-body">
+                  <span className="sb-bio-modal-icon" aria-hidden="true"><SelectedIcon size={22} /></span>
+                  <h2 id="sb-bio-modal-title">{selected.label}</h2>
+                  <p>{selected.desc}</p>
+                  {selected.link && (
+                    <Link to={selected.link} className="sb-btn sb-btn--primary sb-bio-modal-link">
+                      <IcGame size={16} /> {selected.linkLabel ?? "Open"}
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

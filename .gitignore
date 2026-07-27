@@ -20,6 +20,7 @@ Thumbs.db
 # Artefatti rigenerabili
 content/trivia/raw/_IMPORT_REPORT.md
 public/zips
+public/repo-tree.json
 
 # Log
 *.log

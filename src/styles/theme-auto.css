@@ -1,283 +1,22 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   TEMA GLOBALE chiaro/scuro — controllo + applicazione su ogni pagina.
-
-   1) Widget fisso (tasto luna/sole + chip "Auto") e overlay di transizione.
-   2) Tema CHIARO per le pagine nate "dark premium" (home + approfondimenti):
-      si attiva solo quando il tema globale è light (html[data-ap-theme=light]).
-      I giochi e /me-stesso hanno già un loro tema nativo e vengono pilotati
-      dal bus, quindi qui non li tocchiamo.
+   TEMA CHIARO per gli approfondimenti (.it-page-wrapper).
+   Si attiva solo quando il tema globale è chiaro (html[data-ap-theme=light]).
+   Le pagine sono in gran parte guidate da variabili: ribaltandole si ottiene un
+   chiaro coerente. Heroes e footer, che sono pannelli scuri a sé, restano scuri
+   di proposito (dark hero su pagina chiara) per non rischiare testo bianco su
+   fondo chiaro.
+   I giochi hanno già un loro tema nativo e vengono pilotati dal bus, quindi qui
+   non li tocchiamo.
+   NB: le pagine in veste "piattaforma" (.sb-home) — home, /bio, /sostieni,
+   /instagram, /archivio, /pcto, /me-stesso e /trivia — hanno un tema
+   chiaro/scuro NATIVO (src/app/home.css più il css della pagina), e la barra
+   di controllo globale
+   (lingua · tema · sensore orario) sta in src/app/theme/controlbar.css: niente
+   di tutto ciò passa più di qui (per /instagram, /archivio, /pcto, /me-stesso e
+   /trivia non resta alcuna regola .ig-/.gx-/.pcto-/.ms-/.trv-).
    ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Overlay di transizione (cerchio che si espande) ── */
-.ap-theme-wipe {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483600;
-  pointer-events: none;
-  opacity: 0;
-  clip-path: circle(0px at 50% 50%);
-  will-change: clip-path, opacity;
-  background: #1b151a;
-}
-
-/* ── Dock del widget (in basso a sinistra, libero dai FAB dei giochi) ── */
-.ap-theme-dock {
-  position: fixed;
-  left: max(16px, env(safe-area-inset-left));
-  bottom: max(16px, env(safe-area-inset-bottom));
-  z-index: 2147483500;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
-}
-
-.ap-theme-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  cursor: pointer;
-  border: 1px solid var(--apt-bd);
-  background: var(--apt-bg);
-  color: var(--apt-fg);
-  box-shadow: 0 8px 24px var(--apt-shadow);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  backdrop-filter: blur(12px) saturate(140%);
-  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease,
-    background 0.2s ease;
-}
-.ap-theme-btn:hover {
-  transform: translateY(-2px) scale(1.04);
-  color: var(--apt-accent);
-  border-color: var(--apt-accent);
-}
-.ap-theme-btn:active {
-  transform: translateY(0) scale(0.96);
-}
-.ap-theme-ico {
-  display: inline-flex;
-  animation: ap-theme-pop 0.35s ease;
-}
-@keyframes ap-theme-pop {
-  0% {
-    transform: rotate(-90deg) scale(0.4);
-    opacity: 0;
-  }
-  100% {
-    transform: rotate(0) scale(1);
-    opacity: 1;
-  }
-}
-
-.ap-theme-auto {
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 999px;
-  cursor: pointer;
-  border: 1px solid var(--apt-bd);
-  background: var(--apt-bg);
-  color: var(--apt-muted);
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-}
-.ap-theme-auto.is-on {
-  color: #fff;
-  background: var(--apt-accent);
-  border-color: var(--apt-accent);
-}
-
-/* Palette del widget per i due temi */
-.ap-theme-dock[data-ap-theme="dark"] {
-  --apt-bg: rgba(30, 24, 29, 0.72);
-  --apt-bd: rgba(233, 84, 32, 0.32);
-  --apt-fg: #f5f3f1;
-  --apt-muted: #b3aca6;
-  --apt-accent: #e95420;
-  --apt-shadow: rgba(0, 0, 0, 0.5);
-}
-.ap-theme-dock[data-ap-theme="light"] {
-  --apt-bg: rgba(255, 255, 255, 0.82);
-  --apt-bd: rgba(194, 65, 12, 0.28);
-  --apt-fg: #9a3412;
-  --apt-muted: #756a61;
-  --apt-accent: #c2410c;
-  --apt-shadow: rgba(90, 45, 18, 0.18);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ap-theme-ico {
-    animation: none;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   BARRA DI CONTROLLO UNICA — lingua · tema · sensore orario.
-   I due widget globali (LanguageSwitcher + ThemeWidget) vivono dentro un unico
-   contenitore .ap-controlbar (vedi main.tsx): una sola pillola in vetro, in
-   basso a sinistra, orizzontale. Dentro la barra i singoli tasti diventano
-   segmenti trasparenti separati da un filo divisore. Gli stili qui (contesto
-   .ap-controlbar …) sovrascrivono per specificità il posizionamento fisso e la
-   veste "a sé" che i due widget avrebbero da soli.
-   NB: le onde a tutto schermo dei widget sono portate su <body> (createPortal),
-   perché il backdrop-filter della barra le ritaglierebbe alla sua dimensione.
-   ═══════════════════════════════════════════════════════════════════════════ */
-.ap-controlbar {
-  position: fixed;
-  left: max(16px, env(safe-area-inset-left));
-  bottom: max(16px, env(safe-area-inset-bottom));
-  z-index: 2147483500;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px;
-  border-radius: 16px;
-  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
-  background: var(--apc-bg);
-  border: 1px solid var(--apc-bd);
-  box-shadow: 0 12px 34px var(--apc-shadow), 0 0 0 1px rgba(233, 84, 32, 0.05);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  backdrop-filter: blur(14px) saturate(150%);
-  /* palette di default = scuro (l'<html> ha sempre data-ap-theme, ma restiamo safe) */
-  --apc-bg: rgba(30, 24, 29, 0.72);
-  --apc-bd: rgba(233, 84, 32, 0.32);
-  --apc-fg: #f5f3f1;
-  --apc-muted: #b3aca6;
-  --apc-accent: #e95420;
-  --apc-shadow: rgba(0, 0, 0, 0.5);
-  --apc-divider: rgba(233, 84, 32, 0.22);
-  --apc-hover: rgba(233, 84, 32, 0.12);
-}
-:root[data-ap-theme="light"] .ap-controlbar {
-  --apc-bg: rgba(255, 255, 255, 0.82);
-  --apc-bd: rgba(194, 65, 12, 0.28);
-  --apc-fg: #9a3412;
-  --apc-muted: #756a61;
-  --apc-accent: #c2410c;
-  --apc-shadow: rgba(90, 45, 18, 0.18);
-  --apc-divider: rgba(194, 65, 12, 0.22);
-  --apc-hover: rgba(194, 65, 12, 0.1);
-}
-
-/* — Segmento LINGUA (annulla dock fisso + veste propria della pillola) — */
-.ap-controlbar .ap-lang-dock {
-  position: relative;
-  left: auto;
-  bottom: auto;
-  z-index: auto;
-}
-.ap-controlbar .ap-lang-trigger {
-  height: 40px;
-  padding: 0 12px;
-  border-radius: 11px;
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  color: var(--apc-fg);
-}
-.ap-controlbar .ap-lang-trigger:hover,
-.ap-controlbar .ap-lang-trigger.is-open {
-  transform: none;
-  background: var(--apc-hover);
-  border-color: transparent;
-  color: var(--apc-accent);
-}
-.ap-controlbar .ap-lang-trigger:active {
-  transform: scale(0.96);
-}
-
-/* — Filo divisore + gruppo TEMA in riga — */
-.ap-controlbar .ap-theme-dock {
-  position: relative;
-  left: auto;
-  bottom: auto;
-  z-index: auto;
-  flex-direction: row;
-  gap: 4px;
-  padding-left: 6px;
-  margin-left: 2px;
-  border-left: 1px solid var(--apc-divider);
-}
-
-/* — Segmento TEMA (luna/sole) — */
-.ap-controlbar .ap-theme-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  color: var(--apc-fg);
-}
-.ap-controlbar .ap-theme-btn:hover {
-  transform: none;
-  background: var(--apc-hover);
-  border-color: transparent;
-  color: var(--apc-accent);
-}
-.ap-controlbar .ap-theme-btn:active {
-  transform: scale(0.94);
-}
-
-/* — Segmento AUTO (sensore orario): trasparente da spento, accento da acceso — */
-.ap-controlbar .ap-theme-auto {
-  height: 40px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 11px;
-  font-size: 0.64rem;
-  background: transparent;
-  border-color: transparent;
-  color: var(--apc-muted);
-}
-.ap-controlbar .ap-theme-auto:hover {
-  background: var(--apc-hover);
-  color: var(--apc-accent);
-}
-.ap-controlbar .ap-theme-auto.is-on {
-  background: var(--apc-accent);
-  border-color: var(--apc-accent);
-  color: #fff;
-}
-
-/* Schermi molto stretti: barra un filo più compatta */
-@media (max-width: 380px) {
-  .ap-controlbar {
-    gap: 2px;
-    padding: 5px;
-  }
-  .ap-controlbar .ap-lang-trigger,
-  .ap-controlbar .ap-theme-auto {
-    height: 38px;
-  }
-  .ap-controlbar .ap-theme-btn {
-    width: 38px;
-    height: 38px;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   TEMA CHIARO per home (.hm-page) + approfondimenti (.it-page-wrapper).
-   Le pagine sono in gran parte guidate da variabili: ribaltando le variabili
-   (palette di .ms-light) si ottiene un chiaro coerente. Heroes e footer, che
-   sono pannelli scuri a sé, restano scuri di proposito (dark hero su pagina
-   chiara) per non rischiare testo bianco su fondo chiaro.
-   ═══════════════════════════════════════════════════════════════════════════ */
-html[data-ap-theme="light"] .hm-page,
 html[data-ap-theme="light"] .db-page,
-html[data-ap-theme="light"] .gp-page,
-html[data-ap-theme="light"] .pcto-page,
-html[data-ap-theme="light"] .bio-page {
+html[data-ap-theme="light"] .gp-page {
   --accent: #c2410c;
   --accent-2: #d9480f;
   --accent-3: #e8590c;
@@ -300,17 +39,10 @@ html[data-ap-theme="light"] .bio-page {
 }
 
 /* Header a vetro chiaro + titolo brand leggibile */
-html[data-ap-theme="light"] .hm-hdr,
 html[data-ap-theme="light"] .db-header,
-html[data-ap-theme="light"] .gp-header,
-html[data-ap-theme="light"] .pcto-header,
-html[data-ap-theme="light"] .bio-header {
+html[data-ap-theme="light"] .gp-header {
   background: rgba(255, 255, 255, 0.82) !important;
   border-bottom-color: var(--surface-bd) !important;
-}
-html[data-ap-theme="light"] .hm-hdr--scrolled {
-  background: rgba(255, 255, 255, 0.92) !important;
-  box-shadow: 0 8px 30px rgba(90, 45, 18, 0.1) !important;
 }
 
 /* ── Testi che erano #fff su fondo CHIARO → scuri ──
@@ -319,19 +51,9 @@ html[data-ap-theme="light"] .hm-hdr--scrolled {
    così ogni scritta resta leggibile sul proprio fondo, qualunque sia la banda.
    I testi su pulsanti/badge ad accento pieno (viola) restano bianchi: il viola
    è scuro a sufficienza anche in tema chiaro, quindi NON sono qui dentro. */
-html[data-ap-theme="light"] .hm-brand-name,
-html[data-ap-theme="light"] .hm-title,
-html[data-ap-theme="light"] .hm-card-title,
-html[data-ap-theme="light"] .hm-tl-title,
-html[data-ap-theme="light"] .hm-quick:hover,
-html[data-ap-theme="light"] .hm-action:hover,
-html[data-ap-theme="light"] .hm-card:hover .hm-card-link,
-html[data-ap-theme="light"] .hm-btn--ghost:hover,
 /* approfondimenti — titoli brand (header chiaro) */
 html[data-ap-theme="light"] .db-brand-title,
 html[data-ap-theme="light"] .gp-brand-title,
-html[data-ap-theme="light"] .pcto-brand-title,
-html[data-ap-theme="light"] .bio-brand-title,
 /* Dubliners — testo del corpo su vetro/pagina */
 html[data-ap-theme="light"] .db-fact-value,
 html[data-ap-theme="light"] .db-prose strong,
@@ -347,31 +69,13 @@ html[data-ap-theme="light"] .gp-prose--lead,
 html[data-ap-theme="light"] .gp-company-name,
 html[data-ap-theme="light"] .gp-role-label,
 html[data-ap-theme="light"] .gp-callout strong,
-html[data-ap-theme="light"] .gp-page .btn-outline-light,
-/* Bio — prose, skill, freccia liste */
-html[data-ap-theme="light"] .bio-prose strong,
-html[data-ap-theme="light"] .bio-skill-title,
-html[data-ap-theme="light"] .bio-list-item:hover .bio-list-arrow,
-html[data-ap-theme="light"] .bio-list-item:focus-visible .bio-list-arrow,
-html[data-ap-theme="light"] .bio-page .btn-outline-light {
+html[data-ap-theme="light"] .gp-page .btn-outline-light {
   color: var(--text-strong) !important;
 }
-html[data-ap-theme="light"] .hm-link:hover {
-  color: var(--text-strong);
-}
-/* Sottotitoli/righe attenuate (rgba bianco) su fondo chiaro → grigio scuro */
-html[data-ap-theme="light"] .pcto-brand-tagline {
-  color: var(--sub) !important;
-}
-
 /* Bande che restano SCURE di proposito (hero, fasce "banda", CTA "next" e
    footer): qui ri-applico la palette scura alle variabili, così i testi che le
    usano (var(--sub), var(--ink), var(--text)…) restano chiari e leggibili sul
    fondo scuro. I testi .text-white di Bootstrap, già bianchi, restano corretti. */
-html[data-ap-theme="light"] .hm-hero,
-html[data-ap-theme="light"] .hm-contact,
-html[data-ap-theme="light"] .hm-foot,
-html[data-ap-theme="light"] .hm-drawer-panel,
 html[data-ap-theme="light"] .db-hero,
 html[data-ap-theme="light"] .db-band,
 html[data-ap-theme="light"] .db-future,
@@ -383,13 +87,7 @@ html[data-ap-theme="light"] .gp-band,
 html[data-ap-theme="light"] .gp-future,
 html[data-ap-theme="light"] .gp-thanks,
 html[data-ap-theme="light"] .gp-next,
-html[data-ap-theme="light"] .gp-footer,
-html[data-ap-theme="light"] .pcto-hero,
-html[data-ap-theme="light"] .pcto-team-banner,
-html[data-ap-theme="light"] .pcto-footer,
-html[data-ap-theme="light"] .bio-hero,
-html[data-ap-theme="light"] .bio-footer,
-html[data-ap-theme="light"] .bio-page .ap-modal {
+html[data-ap-theme="light"] .gp-footer {
   --text: #f5f3f1;
   --text-strong: #ffffff;
   --sub: #b3aca6;
@@ -401,12 +99,4 @@ html[data-ap-theme="light"] .bio-page .ap-modal {
   --surface-bd: rgba(255, 255, 255, 0.1);
   --vio-soft: rgba(233, 84, 32, 0.1);
   --vio-bd: rgba(233, 84, 32, 0.28);
-}
-
-/* Card della home: superficie chiara leggibile */
-html[data-ap-theme="light"] .hm-card {
-  box-shadow: 0 10px 30px rgba(90, 45, 18, 0.13);
-}
-html[data-ap-theme="light"] .hm-card:hover {
-  box-shadow: 0 20px 44px rgba(90, 45, 18, 0.22);
 }

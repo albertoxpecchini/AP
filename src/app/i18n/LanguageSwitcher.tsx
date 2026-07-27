@@ -1,19 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Languages, Check } from "lucide-react";
+import { IcCheck, IcTranslate } from "../site/homeIcons";
 import { getLang, setLang, subscribeLang, langMeta, LANGS, type Lang } from "./langCore";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Switcher di lingua globale — montato UNA volta (in main.tsx), vive su ogni
-// pagina, accanto al widget del tema (in basso a sinistra, appena più in alto).
+// Switcher di lingua globale — primo segmento della barra di controllo
+// (ControlBar.tsx), accanto ai comandi del tema, in basso a sinistra.
 //
-//  · Pillola compatta: icona + sigla della lingua attiva (IT/EN/FR/DE).
+//  · Segmento compatto: icona + sigla della lingua attiva (IT/EN/FR/DE).
 //  · Al clic si apre, verso l'alto, l'elenco delle 4 lingue (molla + cascata),
 //    con l'indicatore "attivo" che scorre (layout animato di Motion).
 //  · Scegliendo una lingua parte un'onda a tutto schermo (cerchio che si espande
-//    dal widget, colore accento + nome della lingua): a metà corsa il sito viene
-//    ritradotto SOTTO l'onda, poi l'onda svanisce. Niente ricaricamento.
+//    dal widget, fondo della pagina + alone verde e nome della lingua): a metà
+//    corsa il sito viene ritradotto SOTTO l'onda, poi l'onda svanisce. Niente
+//    ricaricamento.
 //
 // Niente bandierine emoji: su Windows si vedono come due lettere — usiamo sigle
 // in badge + il nome della lingua, identici su ogni sistema operativo.
@@ -118,20 +119,20 @@ export default function LanguageSwitcher() {
           Portata su <body>: il backdrop-filter della barra di controllo che la
           contiene la ritaglierebbe altrimenti alla propria dimensione. */}
       {createPortal(
-        <div ref={overlayRef} className="ap-lang-wipe" aria-hidden="true">
-          <div className="ap-lang-wipe-badge">
-            <span className="ap-lang-wipe-code">{target.label}</span>
-            <span className="ap-lang-wipe-name">{target.name}</span>
+        <div ref={overlayRef} className="sb-home sb-lang-wipe" aria-hidden="true">
+          <div className="sb-lang-wipe-badge">
+            <span className="sb-lang-wipe-code">{target.label}</span>
+            <span className="sb-lang-wipe-name">{target.name}</span>
           </div>
         </div>,
         document.body,
       )}
 
-      <div className="ap-lang-dock" ref={dockRef} data-no-i18n="">
+      <div className="sb-lang-dock" ref={dockRef} data-no-i18n="">
         <AnimatePresence>
           {open && (
             <motion.ul
-              className="ap-lang-menu"
+              className="sb-lang-menu"
               role="listbox"
               aria-label="Scegli la lingua"
               initial={{ opacity: 0, y: 12, scale: 0.95 }}
@@ -152,15 +153,15 @@ export default function LanguageSwitcher() {
                       type="button"
                       role="option"
                       aria-selected={isActive}
-                      className={`ap-lang-opt${isActive ? " is-active" : ""}`}
+                      className={`sb-lang-opt${isActive ? " is-active" : ""}`}
                       onClick={() => choose(l.code)}
                     >
                       {isActive && (
-                        <motion.span layoutId="ap-lang-ink" className="ap-lang-ink" aria-hidden="true" />
+                        <motion.span layoutId="sb-lang-ink" className="sb-lang-ink" aria-hidden="true" />
                       )}
-                      <span className="ap-lang-opt-code">{l.label}</span>
-                      <span className="ap-lang-opt-name">{l.name}</span>
-                      {isActive && <Check size={15} className="ap-lang-opt-check" aria-hidden="true" />}
+                      <span className="sb-lang-code">{l.label}</span>
+                      <span className="sb-lang-name">{l.name}</span>
+                      {isActive && <IcCheck size={14} className="sb-lang-check" />}
                     </button>
                   </motion.li>
                 );
@@ -172,136 +173,17 @@ export default function LanguageSwitcher() {
         <button
           ref={triggerRef}
           type="button"
-          className={`ap-lang-trigger${open ? " is-open" : ""}`}
+          className="sb-ctl-btn sb-lang-trigger"
           onClick={() => setOpen((v) => !v)}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-label={`Lingua: ${active.name}. Cambia lingua`}
           title="Lingua / Language"
         >
-          <Languages size={17} aria-hidden="true" />
-          <span className="ap-lang-trigger-code">{active.label}</span>
+          <IcTranslate size={16} />
+          <span className="sb-ctl-code">{active.label}</span>
         </button>
       </div>
-
-      <style>{`
-        /* ── Dock (in basso a sinistra, sopra il widget del tema) ── */
-        .ap-lang-dock {
-          position: fixed;
-          left: max(16px, env(safe-area-inset-left));
-          bottom: calc(max(16px, env(safe-area-inset-bottom)) + 84px);
-          z-index: 2147483400;
-          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
-          --apl-bg: rgba(30, 24, 29, 0.72);
-          --apl-bd: rgba(233, 84, 32, 0.32);
-          --apl-fg: #f5f3f1;
-          --apl-muted: #b3aca6;
-          --apl-accent: #e95420;
-          --apl-accent-deep: #bc3d10;
-          --apl-shadow: rgba(0, 0, 0, 0.5);
-        }
-        :root[data-ap-theme="light"] .ap-lang-dock {
-          --apl-bg: rgba(255, 255, 255, 0.82);
-          --apl-bd: rgba(194, 65, 12, 0.28);
-          --apl-fg: #9a3412;
-          --apl-muted: #756a61;
-          --apl-accent: #c2410c;
-          --apl-accent-deep: #9a3412;
-          --apl-shadow: rgba(90, 45, 18, 0.18);
-        }
-
-        /* ── Pillola compatta ── */
-        .ap-lang-trigger {
-          display: inline-flex; align-items: center; gap: 7px;
-          height: 46px; padding: 0 14px 0 12px; border-radius: 14px;
-          cursor: pointer; border: 1px solid var(--apl-bd);
-          background: var(--apl-bg); color: var(--apl-fg);
-          box-shadow: 0 8px 24px var(--apl-shadow);
-          -webkit-backdrop-filter: blur(12px) saturate(140%);
-          backdrop-filter: blur(12px) saturate(140%);
-          font-family: inherit;
-          transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease, background 0.2s ease;
-        }
-        .ap-lang-trigger:hover { transform: translateY(-2px) scale(1.04); color: var(--apl-accent); border-color: var(--apl-accent); }
-        .ap-lang-trigger:active { transform: translateY(0) scale(0.97); }
-        .ap-lang-trigger.is-open { color: var(--apl-accent); border-color: var(--apl-accent); }
-        .ap-lang-trigger-code { font-weight: 800; font-size: 0.82rem; letter-spacing: 0.06em; }
-
-        /* ── Menu (sopra la pillola) ── */
-        .ap-lang-menu {
-          position: absolute; left: 0; bottom: calc(100% + 12px);
-          list-style: none; margin: 0; padding: 7px;
-          min-width: 184px; border-radius: 16px;
-          background: var(--apl-bg); border: 1px solid var(--apl-bd);
-          box-shadow: 0 18px 44px var(--apl-shadow), 0 0 0 1px rgba(233, 84, 32, 0.06);
-          -webkit-backdrop-filter: blur(16px) saturate(150%);
-          backdrop-filter: blur(16px) saturate(150%);
-          transform-origin: bottom left;
-        }
-        .ap-lang-menu li { margin: 0; padding: 0; }
-        .ap-lang-opt {
-          position: relative; isolation: isolate;
-          display: flex; align-items: center; gap: 10px; width: 100%;
-          padding: 9px 11px; border: none; border-radius: 11px; cursor: pointer;
-          background: transparent; color: var(--apl-fg);
-          font-family: inherit; font-size: 0.92rem; text-align: left;
-          transition: color 0.15s ease;
-        }
-        .ap-lang-opt:hover { color: var(--apl-accent); }
-        .ap-lang-opt:hover::before {
-          content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 11px;
-          background: rgba(233, 84, 32, 0.10);
-        }
-        .ap-lang-opt-code {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 30px; height: 24px; flex-shrink: 0; border-radius: 7px;
-          font-weight: 800; font-size: 0.72rem; letter-spacing: 0.04em;
-          background: rgba(233, 84, 32, 0.14); border: 1px solid var(--apl-bd);
-          color: var(--apl-fg);
-        }
-        .ap-lang-opt-name { font-weight: 600; flex: 1 1 auto; }
-        .ap-lang-opt-check { color: var(--apl-accent); flex-shrink: 0; }
-        .ap-lang-opt.is-active { color: var(--apl-accent); font-weight: 700; }
-        .ap-lang-opt.is-active .ap-lang-opt-code {
-          background: var(--apl-accent); border-color: var(--apl-accent); color: #fff;
-        }
-        /* indicatore "attivo" che scorre tra le voci */
-        .ap-lang-ink {
-          position: absolute; inset: 0; z-index: -1; border-radius: 11px;
-          background: rgba(233, 84, 32, 0.16);
-          border: 1px solid var(--apl-bd);
-        }
-
-        /* ── Onda a tutto schermo ── */
-        .ap-lang-wipe {
-          position: fixed; inset: 0; z-index: 2147483550;
-          pointer-events: none; opacity: 0;
-          clip-path: circle(0px at 0% 100%);
-          will-change: clip-path, opacity;
-          display: flex; align-items: center; justify-content: center;
-          background:
-            radial-gradient(120% 120% at 18% 88%, #e95420 0%, #c2410c 45%, #3f2da8 100%);
-        }
-        .ap-lang-wipe-badge {
-          display: flex; flex-direction: column; align-items: center; gap: 10px;
-          color: #fff; font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
-          transform: scale(0.7); opacity: 0;
-          transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
-        }
-        .ap-lang-wipe.is-active .ap-lang-wipe-badge { transform: scale(1); opacity: 1; }
-        .ap-lang-wipe-code {
-          font-size: clamp(3.2rem, 12vw, 6rem); font-weight: 900; line-height: 1;
-          letter-spacing: 0.02em; text-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
-        }
-        .ap-lang-wipe-name {
-          font-size: clamp(1rem, 3.4vw, 1.6rem); font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.92;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .ap-lang-trigger, .ap-lang-opt, .ap-lang-wipe-badge { transition: none; }
-        }
-      `}</style>
     </>
   );
 }

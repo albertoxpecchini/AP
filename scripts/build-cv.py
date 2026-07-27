@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
-#  Generatore CV PDF — skin "Ubuntu / Yaru" del sito (albertopecchini.it).
+#  Generatore CV PDF — skin "piattaforma Supabase" della home (albertopecchini.it).
 #  Tipografia: Ubuntu (installato a livello di sistema, embeddato/subsettato
-#  nel PDF da WeasyPrint). Palette identica al sito: crema #faf8f6, inchiostro
-#  caldo #1C1A17, arancio Yaru #e95420 (#c2410c per il testo), grigi caldi,
-#  chip arancio tenue e melanzana #2c001e (la fascia intestazione, come il
-#  footer del sito). Struttura HTML/CSS -> PDF (paged media) via WeasyPrint.
+#  nel PDF da WeasyPrint). Palette identica alla home .sb- (tema chiaro):
+#  pagina #fcfcfc, inchiostro #171717, grigi puri, verde brand
+#  hsl(153 60% 53%) / verde testo hsl(153 86% 28%), pannelli con
+#  bordo-gradiente da 1px (il marchio di fabbrica delle card .sb-panel).
+#  Struttura HTML/CSS -> PDF (paged media) via WeasyPrint.
 #
-#  Layout allineato al redesign "CV redesign in review" (Claude Design):
-#  intestazione ampia (foto 108px, nome 31px/800), pannello "in breve" a tre
-#  colonne con bordo tenue, periodi in Ubuntu Mono, competenze su due colonne,
-#  footer con nome, numerazione pagina e albertopecchini.it.
+#  Layout: intestazione in pannello chiaro (foto 108px con anello verde, nome
+#  30px/500 con tracking negativo), pannello "in breve" a tre colonne, chip
+#  neutre bordate, timeline con nodi verdi, competenze su due colonne, footer
+#  con nome, numerazione pagina e albertopecchini.it.
 #
 #  Legge scripts/cv-data.<it|en|fr|de>.json (UTF-8) e genera un PDF per lingua:
 #  public/cv-alberto-pecchini-<loc>.pdf (+ copia IT -> cv-alberto-pecchini.pdf).
@@ -34,26 +35,20 @@ PUBLIC = ROOT / "public"
 PHOTO = PUBLIC / "alberto-pecchini.jpg"
 LOCALES = ["it", "en", "fr", "de"]
 
-# --- palette del sito (Ubuntu / Yaru, tema chiaro) --------------------------
+# --- palette della home .sb- (Supabase, tema chiaro) ------------------------
 CSS_VARS = """
-  --bg:          #faf8f6;   /* crema pagina */
-  --ink:         #1c1a17;   /* inchiostro caldo */
-  --ink-soft:    #3d3846;   /* aubergine ink Yaru */
-  --card:        #ffffff;
-  --muted:       #8a8478;   /* grigio caldo per il corpo */
-  --muted-2:     #6f695f;   /* grigio caldo piu' scuro (descrizioni) */
-  --secondary:   #eae7e0;   /* superfici tenui */
-  --orange:      #e95420;   /* arancio Yaru */
-  --orange-ink:  #c2410c;   /* arancio per il testo (contrasto AA) */
-  --orange-deep: #9a3412;
-  --accent:      #f0a183;
-  --border:      rgba(233, 84, 32, 0.18);
-  --border-soft: rgba(233, 84, 32, 0.14);   /* bordo del pannello "in breve" */
-  --hair:        rgba(28, 26, 23, 0.10);
-  --chip-bg:     #f9e7de;   /* pesca tenue, opaco (una sola pillola) */
-  --chip-bd:     rgba(233, 84, 32, 0.26);
-  --aubergine:      #2c001e;  /* melanzana Ubuntu (fascia / footer del sito) */
-  --aubergine-mid:  #5e2750;
+  --bg:              #fcfcfc;   /* pagina (--sb-bg) */
+  --surface-75:      #fbfbfb;   /* fondo dei pannelli (--sb-surface-75) */
+  --surface-200:     #f0f0f0;   /* superfici tenui (--sb-surface-200) */
+  --fg:              #171717;   /* inchiostro (--sb-fg) */
+  --fg-light:        #525252;   /* testo secondario (--sb-fg-light) */
+  --fg-lighter:      #6f6f6f;   /* descrizioni (--sb-fg-lighter) */
+  --fg-muted:        #8f8f8f;   /* ruoli, note (--sb-fg-muted) */
+  --border:          #e8e8e8;   /* hairline (--sb-border) */
+  --border-strong:   #dbdbdb;   /* bordi chip/pannelli (--sb-border-strong) */
+  --border-stronger: #c7c7c7;   /* (--sb-border-stronger) */
+  --brand:           hsl(153, 60%, 53%);  /* verde Supabase (--sb-brand) */
+  --brand-text:      hsl(153, 86%, 28%);  /* verde per il testo, AA (--sb-brand-text) */
 """
 
 
@@ -79,7 +74,7 @@ def render_entry(e: dict, show_link: bool = True) -> str:
     )
     link = ""
     if show_link and e.get("link"):
-        link = f'<div class="e-link">&rsaquo;&nbsp;{esc(e["link"])}</div>'
+        link = f'<div class="e-link">{esc(e["link"])}&nbsp;&#8594;</div>'
     return f"""
       <article class="entry">
         <div class="e-period">{esc(e["period"])}</div>
@@ -94,7 +89,7 @@ def section(label: str, body: str, tight: bool = False) -> str:
     cls = "section tight" if tight else "section"
     return f"""
       <section class="{cls}">
-        <div class="sec-head"><span class="bar"></span><h2>{esc(label)}</h2><span class="rule"></span></div>
+        <div class="sec-head"><span class="dot"></span><h2>{esc(label)}</h2><span class="rule"></span></div>
         {body}
       </section>"""
 
@@ -108,13 +103,15 @@ def build_html(data: dict, photo_uri: str) -> str:
         for k, v in data["contacts"]
     )
     header = f"""
-      <header class="masthead">
-        <img class="photo" src="{photo_uri}" alt="Alberto Pecchini" />
-        <div class="id">
-          <h1>{esc(data["name"])}</h1>
-          <div class="role">{esc(data["role"])}</div>
-          <div class="tagline">{esc(data["tagline"])}</div>
-          <div class="contacts">{contact_chips}</div>
+      <header class="panel head-panel">
+        <div class="panel-inner masthead">
+          <img class="photo" src="{photo_uri}" alt="Alberto Pecchini" />
+          <div class="id">
+            <h1>{esc(data["name"])}</h1>
+            <div class="role">{esc(data["role"])}</div>
+            <div class="tagline">{esc(data["tagline"])}</div>
+            <div class="contacts">{contact_chips}</div>
+          </div>
         </div>
       </header>"""
 
@@ -142,7 +139,8 @@ def build_html(data: dict, photo_uri: str) -> str:
     )
 
     facts = f"""
-      <section class="facts">
+      <section class="panel facts-panel">
+        <div class="panel-inner facts">
         <div class="fcol">
           <div class="f-label">{esc(ui["langs"])}</div>
           {langs}
@@ -157,6 +155,7 @@ def build_html(data: dict, photo_uri: str) -> str:
           <div class="f-label sp">{esc(ui["availability"])}</div>
           <ul class="avail">{avail}</ul>
         </div>{wish_col}
+        </div>
       </section>"""
 
     # ---- competenze --------------------------------------------------------
@@ -201,113 +200,115 @@ def build_html(data: dict, photo_uri: str) -> str:
   size: A4;
   margin: 13mm;
   background: var(--bg);
-  @bottom-left   {{ content: "{running}"; font: 400 9px Ubuntu; color: var(--muted);
+  @bottom-left   {{ content: "{running}"; font: 400 9px Ubuntu; color: var(--fg-muted);
                     vertical-align: top; padding-top: 4mm; }}
   @bottom-center {{ content: counter(page) " / " counter(pages);
-                    font: 400 9px "Ubuntu Mono", monospace; color: var(--muted);
+                    font: 400 9px "Ubuntu Mono", monospace; color: var(--fg-muted);
                     vertical-align: top; padding-top: 4mm; }}
   @bottom-right  {{ content: "albertopecchini.it"; font: 500 9px Ubuntu;
-                    color: var(--orange-ink); vertical-align: top; padding-top: 4mm; }}
+                    color: var(--brand-text); vertical-align: top; padding-top: 4mm; }}
 }}
 
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-html {{ font-family: "Ubuntu", sans-serif; color: var(--ink);
+html {{ font-family: "Ubuntu", sans-serif; color: var(--fg);
         font-size: 10px; line-height: 1.45; }}
 body {{ background: var(--bg); }}
 
-/* ---- fascia intestazione (melanzana Ubuntu) ---- */
-.masthead {{
-  display: flex; align-items: center; gap: 24px;
-  background: var(--aubergine);
-  background-image: radial-gradient(120% 160% at 0% 0%, #4a0733 0%, var(--aubergine) 55%);
-  border-radius: 18px; padding: 26px 30px; color: #faf8f6;
+/* ---- pannello con bordo-gradiente da 1px (come .sb-panel della home) ---- */
+.panel {{
+  padding: 1px; border-radius: 12px;
+  background: linear-gradient(to bottom, var(--border-strong), rgba(232, 232, 232, 0.45));
   break-inside: avoid;
 }}
+.panel-inner {{ border-radius: 11px; background: var(--surface-75); }}
+
+/* ---- intestazione (pannello chiaro, titolo stile hero) ---- */
+.masthead {{ display: flex; align-items: center; gap: 24px; padding: 26px 30px; }}
 .masthead .photo {{
   width: 108px; height: 108px; border-radius: 50%; object-fit: cover;
-  border: 3px solid var(--orange); flex: 0 0 auto;
+  border: 2px solid var(--brand); flex: 0 0 auto;
 }}
 .masthead .id {{ min-width: 0; }}
-.masthead h1 {{ font-size: 31px; font-weight: 800; letter-spacing: -0.015em;
-                line-height: 1.05; }}
-.masthead .role {{ font-size: 14.5px; font-weight: 600; color: var(--accent);
-                   margin-top: 5px; }}
-.masthead .tagline {{ font-size: 11px; color: rgba(255, 255, 255, 0.72);
-                      margin-top: 8px; max-width: 56ch; line-height: 1.5; }}
-.masthead .contacts {{ display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }}
-.c-chip {{ font-size: 10px; padding: 4px 12px; border-radius: 999px;
-           background: #4a1f3d; color: #f3ede9; }}
-.c-chip .c-k {{ color: var(--accent); font-weight: 700; margin-right: 6px;
-                text-transform: uppercase; letter-spacing: 0.05em; font-size: 8.5px; }}
+.masthead h1 {{ font-size: 30px; font-weight: 500; letter-spacing: -0.02em;
+                line-height: 1.05; color: var(--fg); }}
+.masthead .role {{ font-size: 14px; font-weight: 500; color: var(--brand-text);
+                   margin-top: 5px; letter-spacing: -0.01em; }}
+.masthead .tagline {{ font-size: 10.5px; color: var(--fg-lighter);
+                      margin-top: 8px; max-width: 60ch; line-height: 1.55; }}
+.masthead .contacts {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }}
+.c-chip {{ font-size: 9.5px; padding: 3.5px 11px; border-radius: 999px;
+           background: var(--bg); border: 1px solid var(--border-strong);
+           color: var(--fg-light); }}
+.c-chip .c-k {{ color: var(--brand-text); font-weight: 500; margin-right: 6px;
+                text-transform: uppercase; letter-spacing: 0.05em; font-size: 8px; }}
 
 /* ---- "in breve" ---- */
-.facts {{
-  display: flex; margin-top: 14px;
-  background: var(--bg); border: 1px solid var(--border-soft);
-  border-radius: 14px; padding: 18px 0; break-inside: avoid;
-}}
+.facts-panel {{ margin-top: 12px; }}
+.facts {{ display: flex; padding: 17px 0; }}
 .facts .fcol {{ flex: 1.1; padding: 0 20px; }}
 .facts .fcol:last-child {{ flex: 0.9; }}
-.facts .fcol + .fcol {{ border-left: 1px solid var(--hair); }}
-.f-label {{ font-size: 9px; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 0.14em; color: var(--orange-ink); margin-bottom: 9px; }}
+.facts .fcol + .fcol {{ border-left: 1px solid var(--border); }}
+.f-label {{ font-size: 8.5px; font-weight: 500; text-transform: uppercase;
+            letter-spacing: 0.12em; color: var(--fg-muted); margin-bottom: 9px; }}
 .f-label.sp {{ margin-top: 13px; margin-bottom: 8px; }}
 .lang {{ margin-bottom: 10px; }}
 .lang-row {{ display: flex; justify-content: space-between; align-items: baseline; }}
-.lang-name {{ font-size: 11px; font-weight: 700; color: var(--ink); }}
-.lang-lvl {{ font-size: 9.5px; color: var(--muted); font-family: "Ubuntu Mono", monospace; }}
-.bar-track {{ height: 4px; border-radius: 999px; background: var(--secondary);
+.lang-name {{ font-size: 11px; font-weight: 500; color: var(--fg); }}
+.lang-lvl {{ font-size: 9.5px; color: var(--fg-muted); font-family: "Ubuntu Mono", monospace; }}
+.bar-track {{ height: 4px; border-radius: 999px; background: var(--surface-200);
               margin-top: 5px; overflow: hidden; }}
 .bar-fill {{ display: block; height: 4px; border-radius: 999px;
-             background-image: linear-gradient(90deg, var(--orange), var(--accent)); }}
+             background: var(--brand); }}
 .avail {{ list-style: none; }}
-.avail li {{ font-size: 10.5px; color: var(--ink-soft); padding-left: 12px;
+.avail li {{ font-size: 10.5px; color: var(--fg-light); padding-left: 12px;
              position: relative; margin-bottom: 5px; }}
 .avail li::before {{ content: ""; position: absolute; left: 0; top: 4px;
-                     width: 4px; height: 4px; border-radius: 50%; background: var(--orange); }}
-.wish {{ font-size: 10.5px; font-style: italic; color: var(--ink-soft); line-height: 1.6; }}
+                     width: 4px; height: 4px; border-radius: 50%; background: var(--brand); }}
+.wish {{ font-size: 10.5px; font-style: italic; color: var(--fg-light); line-height: 1.6;
+         padding-left: 10px; border-left: 2px solid var(--brand); }}
 
-/* ---- chip generici ---- */
+/* ---- chip generici (come .sb-chip della home) ---- */
 .chips {{ display: flex; flex-wrap: wrap; gap: 5px; }}
-.chip {{ font-size: 10px; font-weight: 600; padding: 3px 11px; border-radius: 999px;
-         background: var(--chip-bg); color: var(--orange-ink); }}
+.chip {{ font-size: 9.5px; font-weight: 400; padding: 3px 10px; border-radius: 999px;
+         background: var(--bg); border: 1px solid var(--border-strong);
+         color: var(--fg-light); }}
 
 /* ---- sezioni ---- */
 .section {{ margin-top: 16px; }}
 .section.tight {{ margin-top: 12px; }}
-.sec-head {{ display: flex; align-items: center; gap: 10px; margin-bottom: 13px;
+.sec-head {{ display: flex; align-items: center; gap: 9px; margin-bottom: 13px;
              break-inside: avoid; }}
-.sec-head .bar {{ width: 16px; height: 4px; border-radius: 999px; background: var(--orange);
+.sec-head .dot {{ width: 7px; height: 7px; border-radius: 50%; background: var(--brand);
                   flex: 0 0 auto; }}
-.sec-head h2 {{ font-size: 12px; font-weight: 800; text-transform: uppercase;
-                letter-spacing: 0.16em; color: var(--ink); flex: 0 0 auto; }}
-.sec-head .rule {{ flex: 1; height: 1px; background: var(--hair); }}
-.profile {{ font-size: 11.5px; color: var(--ink-soft); line-height: 1.65; }}
+.sec-head h2 {{ font-size: 13.5px; font-weight: 500; letter-spacing: -0.015em;
+                color: var(--fg); flex: 0 0 auto; white-space: nowrap; }}
+.sec-head .rule {{ flex: 1; height: 1px; background: var(--border); }}
+.profile {{ font-size: 11.5px; color: var(--fg-light); line-height: 1.65; }}
 
 /* ---- competenze (griglia a due colonne) ---- */
 .skills-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }}
 .skill-group {{ break-inside: avoid; }}
-.sk-label {{ font-size: 9.5px; font-weight: 700; text-transform: uppercase;
-             letter-spacing: 0.07em; color: var(--ink-soft); margin-bottom: 6px; }}
+.sk-label {{ font-size: 9.5px; font-weight: 500; text-transform: uppercase;
+             letter-spacing: 0.07em; color: var(--fg-lighter); margin-bottom: 6px; }}
 
-/* ---- esperienze / voci (timeline a nodo singolo) ---- */
+/* ---- esperienze / voci (timeline a nodo singolo, nodi verdi) ---- */
 .entry {{ position: relative; padding: 0 0 10px 18px;
-          border-left: 1.5px solid var(--hair); break-inside: avoid; }}
+          border-left: 1px solid var(--border); break-inside: avoid; }}
 .entry:last-child {{ padding-bottom: 2px; }}
-.entry::before {{ content: ""; position: absolute; left: -4.5px; top: 4px;
+.entry::before {{ content: ""; position: absolute; left: -4.25px; top: 4px;
                   width: 7.5px; height: 7.5px; border-radius: 50%;
-                  background: var(--orange); box-shadow: 0 0 0 3px var(--bg); }}
-.e-period {{ font-family: "Ubuntu Mono", monospace; font-size: 9.5px; font-weight: 700;
-             letter-spacing: 0.05em; text-transform: uppercase;
-             color: var(--orange-ink); margin-bottom: 4px; }}
-.e-title {{ font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.3; }}
-.e-role {{ font-size: 10.5px; font-weight: 600; color: var(--orange-ink); margin-top: 2px; }}
-.e-desc {{ font-size: 10.5px; color: var(--muted-2); line-height: 1.55; margin-top: 4px; }}
-.e-link {{ font-size: 10px; font-weight: 600; color: var(--orange-ink); margin-top: 4px; }}
+                  background: var(--brand); box-shadow: 0 0 0 3px var(--bg); }}
+.e-period {{ font-size: 9.5px; font-weight: 500; letter-spacing: 0.02em;
+             color: var(--brand-text); margin-bottom: 4px; }}
+.e-title {{ font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em;
+            color: var(--fg); line-height: 1.3; }}
+.e-role {{ font-size: 10.5px; color: var(--fg-muted); margin-top: 2px; }}
+.e-desc {{ font-size: 10.5px; color: var(--fg-lighter); line-height: 1.55; margin-top: 4px; }}
+.e-link {{ font-size: 10px; font-weight: 500; color: var(--brand-text); margin-top: 4px; }}
 
-.privacy {{ font-size: 8.5px; font-style: italic; color: var(--muted);
+.privacy {{ font-size: 8.5px; font-style: italic; color: var(--fg-muted);
             line-height: 1.4; margin-top: 10px; padding-top: 7px;
-            border-top: 1px solid var(--hair); }}
+            border-top: 1px solid var(--border); }}
 </style></head>
 <body>{body}
 </body></html>"""

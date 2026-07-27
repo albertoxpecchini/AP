@@ -1,8 +1,6 @@
 import { useEffect, useState, type ComponentType, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import {
-  BookText,
-  X,
   Layers,
   BarChart3,
   LayoutGrid,
@@ -10,6 +8,7 @@ import {
   Palette,
   ArrowUpRight,
 } from "lucide-react";
+import { IcBook, IcClose } from "./homeIcons";
 import {
   SiReact,
   SiTypescript,
@@ -110,7 +109,7 @@ export default function ReadmeModal() {
   return (
     <>
       <button type="button" className="apr-open" onClick={() => setOpen(true)} data-no-i18n>
-        <BookText size={15} aria-hidden="true" />
+        <IcBook size={15} />
         README
       </button>
 
@@ -129,7 +128,7 @@ export default function ReadmeModal() {
                   <span className="apr-bar-sub">Portfolio &amp; Personal Hub — React/TypeScript</span>
                 </div>
                 <button type="button" className="apr-close" onClick={() => setOpen(false)} aria-label="Chiudi">
-                  <X size={18} aria-hidden="true" />
+                  <IcClose size={18} />
                 </button>
               </div>
 
@@ -216,13 +215,14 @@ export default function ReadmeModal() {
         )}
 
       <style>{`
+        /* Trigger nel footer .sb-: colori dai token della home (tema nativo) */
         .apr-open {
           display: inline-flex; align-items: center; gap: 0.4rem;
           padding: 0; border: none; background: none; cursor: pointer;
-          color: #8893a0; font-family: inherit; font-size: 0.86rem;
+          color: var(--sb-fg-muted, #8893a0); font-family: inherit; font-size: 0.8rem;
           transition: color 0.15s;
         }
-        .apr-open:hover { color: #f6a583; }
+        .apr-open:hover { color: var(--sb-fg, #f6a583); }
 
         .apr-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Ubuntu", Geneva, Tahoma, sans-serif; }
         .apr-backdrop { position: absolute; inset: 0; background: rgba(4, 6, 10, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: apr-fade 0.2s ease; }

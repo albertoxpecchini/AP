@@ -1,16 +1,19 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { SiteLink as Link } from "../site/nav";
+import { SiInstagram } from "react-icons/si";
 import {
-  ArrowLeft, Instagram as IgIcon, Upload, Copy, Download, Check,
-  UserX, UserPlus, Heart, RotateCcw, AlertTriangle, ArrowDownAZ, Clock,
-  UserMinus, Sparkles, HelpCircle,
-} from "lucide-react";
+  IcArrowLeft, IcArrowRight, IcHelp, IcFile, IcUpload, IcPaste, IcRotate,
+  IcAlert, IcCopy, IcCheck, IcDownload, IcClock, IcChevronDown, IcSortAz,
+  IcUserPlus, IcUserX, IcUserMinus, IcHeart, IcSparkle,
+  IcShield, IcLock, IcWifiOff,
+} from "../site/homeIcons";
 import SiteFooter from "../site/SiteFooter";
 import Tutorial from "./Tutorial";
-import { ShieldCheck, Lock, WifiOff, ClipboardPaste } from "lucide-react";
 import { fetchCount, bumpCount, subscribeCount } from "./statsApi";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import { getPref, setPref } from "../utils/prefs";
+import "../home.css";
+import "./instagram.css";
 
 const TUTORIAL_PREF = "ap-ig-tutorial"; // "seen" quando l'utente lo chiude
 
@@ -25,10 +28,12 @@ const TUTORIAL_PREF = "ap-ig-tutorial"; // "seen" quando l'utente lo chiude
 // Con avatar (monogramma), data del follow (se presente nell'export) e ordine
 // per nome o cronologico. Tutto lato client: nessun dato lascia il dispositivo.
 //
-// Stessa struttura/stile delle altre pagine del sito (it-page-wrapper + header
-// brand + hero + SiteFooter, accento arancio Ubuntu che segue il tema globale).
-// I testi sono in italiano e il motore i18n del sito li traduce (voci nel
-// dizionario).
+// Veste "piattaforma Supabase" della home (.sb-): nav sottile 64px, hero a due
+// colonne col contatore live come pillola d'annuncio, due card-prodotto per le
+// liste, fisarmonica per l'export vecchio, banner + chip d'ordinamento + tre
+// pannelli-lista, chiusura sulla privacy a due colonne. Tema chiaro/scuro
+// nativo via token --sb-* (home.css); stili propri in instagram.css.
+// I testi sono in italiano e il motore i18n del sito li traduce.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Marchio dello strumento — finisce nell'intestazione dei report scaricati.
@@ -174,20 +179,24 @@ function dedupe(rels: Rel[]): Map<string, Rel> {
   return m;
 }
 
-// ── Avatar a monogramma (offline, privacy-safe, colori caldi Ubuntu) ─────────
-const AV_COLORS = ["#e95420", "#c2410c", "#dd4814", "#a8481f", "#b5651d", "#cc5500", "#c25e00", "#bf5b1a"];
+// ── Avatar a monogramma (offline, privacy-safe, famiglia verde del sito) ─────
+const AV_COLORS = [
+  "hsl(153, 45%, 34%)", "hsl(163, 42%, 32%)", "hsl(143, 40%, 33%)", "hsl(173, 40%, 31%)",
+  "hsl(133, 36%, 34%)", "hsl(186, 38%, 30%)", "hsl(120, 32%, 33%)", "hsl(196, 36%, 32%)",
+];
 function avatarColor(u: string): string {
   let h = 0;
   for (let i = 0; i < u.length; i++) h = (h * 31 + u.charCodeAt(i)) >>> 0;
   return AV_COLORS[h % AV_COLORS.length];
 }
 
-// Avatar a monogramma: iniziale su cerchio in colori caldi. Offline, istantaneo,
-// privacy-safe. (Le foto profilo vere non sono ottenibili in modo affidabile:
-// Instagram blocca via fingerprint TLS sia i servizi terzi sia un proxy Node.)
+// Avatar a monogramma: iniziale su cerchio nella palette del sito. Offline,
+// istantaneo, privacy-safe. (Le foto profilo vere non sono ottenibili in modo
+// affidabile: Instagram blocca via fingerprint TLS sia i servizi terzi sia un
+// proxy Node.)
 function Avatar({ user }: { user: string }) {
   return (
-    <span className="ig-avatar" style={{ background: avatarColor(user) }} aria-hidden="true">
+    <span className="sb-ig-avatar" style={{ background: avatarColor(user) }} aria-hidden="true">
       {user[0]?.toUpperCase()}
     </span>
   );
@@ -233,8 +242,9 @@ const REPORT_L: Record<Lang, Record<string, string>> = {
     madeWith: "Vergleich erstellt mit", empty: "Niemand hier" },
 };
 
-// Report HTML autonomo, nello STILE del sito (Ubuntu, arancio caldo, card), con
-// riepilogo dettagliato. Apribile offline, con link cliccabili ai profili.
+// Report HTML autonomo, nello STILE del sito (Ubuntu, palette neutra + verde
+// brand, pannelli a bordo sottile), con riepilogo dettagliato. Apribile
+// offline, con link cliccabili ai profili, chiaro e scuro come il sito.
 function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStats): string {
   const L = REPORT_L[lang];
   const locale = DATE_LOCALE[lang];
@@ -267,7 +277,7 @@ function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStat
         + `<span class="u">@${esc(r.user)}</span>`
         + (r.ts != null ? `<span class="d">${esc(fmt(r.ts))}</span>` : "")
         + `</a>`).join("\n")
-    : `<p class="empty">${esc(L.empty)} 🎉</p>`;
+    : `<p class="empty">${esc(L.empty)}</p>`;
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -279,53 +289,68 @@ function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStat
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root { --accent:#e95420; --accent-2:#c2410c; --bg:#faf8f6; --card:#fff; --ink:#14121c; --sub:#55535f; --bd:rgba(24,12,60,.10); --soft:rgba(233,84,32,.08); }
-  @media (prefers-color-scheme: dark) { :root { --bg:#1b151a; --card:#241c22; --ink:#fff; --sub:#b3aca6; --bd:rgba(255,255,255,.12); --accent-2:#f6a583; --soft:rgba(233,84,32,.12); } }
+  :root {
+    --bg:#fcfcfc; --bg-alt:#f8f8f8; --card:#fbfbfb; --soft:#f6f6f6;
+    --bd:#e8e8e8; --bd2:#dbdbdb; --bd3:#c7c7c7;
+    --ink:#171717; --sub:#6f6f6f; --muted:#8f8f8f;
+    --brand:hsl(153,60%,53%); --brand-text:hsl(153,86%,28%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#141414; --bg-alt:#181818; --card:#1c1c1c; --soft:#222;
+      --bd:#2a2a2a; --bd2:#343434; --bd3:#414141;
+      --ink:#ededed; --sub:#969696; --muted:#707070;
+      --brand-text:hsl(155,100%,42%);
+    }
+  }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Ubuntu",system-ui,-apple-system,sans-serif; padding:clamp(16px,4vw,40px); }
-  .wrap { max-width:720px; margin:0 auto; }
-  .head { background:linear-gradient(140deg,var(--accent),#bc3d10); color:#fff; border-radius:16px; padding:1.5rem 1.6rem; box-shadow:0 14px 40px rgba(233,84,32,.3); }
-  .brand { font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; opacity:.9; margin:0 0 .35rem; }
-  .head h1 { margin:0 0 .8rem; font-size:clamp(1.5rem,4vw,2rem); font-weight:700; }
-  .meta { display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; font-size:.9rem; opacity:.95; }
-  .meta b { font-weight:700; }
-  .summary { background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:1.1rem 1.2rem; margin-top:1.1rem; box-shadow:0 14px 36px rgba(60,30,12,.10); }
-  .summary h2 { margin:0 0 .9rem; font-size:1rem; letter-spacing:.04em; text-transform:uppercase; color:var(--sub); }
-  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:.7rem; }
-  .tile { background:var(--soft); border:1px solid var(--bd); border-radius:12px; padding:.7rem .8rem; display:flex; flex-direction:column; gap:.15rem; }
-  .tile.strong { background:linear-gradient(140deg,rgba(233,84,32,.14),rgba(233,84,32,.06)); border-color:rgba(233,84,32,.4); }
-  .tv { font-size:1.5rem; font-weight:700; color:var(--accent-2); }
-  .tl { font-size:.8rem; color:var(--sub); }
-  .list { background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:.5rem; margin-top:1.1rem; box-shadow:0 14px 36px rgba(60,30,12,.10); }
-  .list h2 { margin:.4rem .6rem .5rem; font-size:1rem; color:var(--ink); }
-  .row { display:flex; align-items:center; gap:.7rem; padding:.45rem .55rem; border-radius:10px; text-decoration:none; color:var(--ink); }
-  .row:hover { background:var(--soft); }
-  .av { flex:0 0 auto; width:34px; height:34px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700; }
-  .u { flex:1 1 auto; color:var(--accent-2); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .row:hover .u { text-decoration:underline; }
-  .d { flex:0 0 auto; font-size:.8rem; color:var(--sub); }
-  .empty { color:var(--sub); padding:1rem; text-align:center; }
-  .foot { color:var(--sub); font-size:.8rem; text-align:center; margin-top:1.3rem; line-height:1.6; }
-  .foot a { color:var(--accent-2); }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Ubuntu",system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.5; padding:clamp(16px,4vw,40px); -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:760px; margin:0 auto; }
+  .panel { border:1px solid var(--bd); border-radius:12px; background:var(--card); padding:1.4rem 1.5rem; }
+  .head { margin-bottom:1rem; }
+  .brand { display:inline-flex; align-items:center; gap:.4rem; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 .8rem; }
+  .brand i { width:7px; height:7px; border-radius:50%; background:var(--brand); display:inline-block; }
+  .head h1 { margin:0 0 .9rem; font-size:clamp(1.4rem,4vw,2rem); font-weight:500; letter-spacing:-.02em; line-height:1.15; }
+  .meta { display:flex; flex-wrap:wrap; gap:.35rem 1.4rem; font-size:.85rem; color:var(--sub); }
+  .meta b { font-weight:500; color:var(--ink); }
+  .summary { margin-top:1rem; }
+  .summary h2 { margin:0 0 1rem; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:500; }
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(126px,1fr)); gap:.7rem; }
+  .tile { background:var(--bg-alt); border:1px solid var(--bd); border-radius:8px; padding:.7rem .85rem; display:flex; flex-direction:column; gap:.2rem; }
+  .tile.strong { border-color:var(--bd3); background:var(--soft); }
+  .tv { font-size:1.4rem; font-weight:500; color:var(--brand-text); font-variant-numeric:tabular-nums; }
+  .tl { font-size:.78rem; color:var(--sub); }
+  .list { margin-top:1rem; padding:.55rem; }
+  .list h2 { margin:.4rem .6rem .7rem; font-size:.92rem; font-weight:500; color:var(--ink); }
+  .row { display:flex; align-items:center; gap:.6rem; padding:.4rem .5rem; border-radius:6px; text-decoration:none; color:var(--sub); }
+  .row:hover { background:var(--bg-alt); }
+  .av { flex:0 0 auto; width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:500; font-size:.82rem; }
+  .u { flex:1 1 auto; color:var(--ink); font-size:.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row:hover .u { color:var(--brand-text); }
+  .d { flex:0 0 auto; font-size:.76rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .empty { color:var(--muted); padding:1rem; text-align:center; font-size:.9rem; }
+  .foot { color:var(--muted); font-size:.78rem; text-align:center; margin-top:1.4rem; line-height:1.7; }
+  .foot b { font-weight:500; color:var(--sub); }
+  .foot a { color:var(--brand-text); }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="head">
-      <p class="brand">${esc(APP_NAME)}</p>
+    <div class="panel head">
+      <p class="brand"><i></i>${esc(APP_NAME)}</p>
       <h1>${esc(title)}</h1>
       <div class="meta">
         <span><b>${items.length}</b> ${esc(L.profiles)}</span>
         <span>${esc(L.generated)} ${esc(date)} ${esc(L.at)} ${esc(time)}</span>
       </div>
     </div>
-    <div class="summary">
+    <div class="panel summary">
       <h2>${esc(L.summary)}</h2>
       <div class="tiles">
       ${tiles}
       </div>
     </div>
-    <div class="list">
+    <div class="panel list">
       <h2>${esc(L.thisList)}: ${esc(title)} (${items.length})</h2>
       ${rows}
     </div>
@@ -341,20 +366,19 @@ function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStat
 type ResultKey = "theyFollow" | "iFollow" | "mutual" | "unfollowed" | "newFollowers";
 type SortMode = "az" | "recent";
 
-// ── Card di risultato (componente stabile: non si rimonta a ogni copia) ──────
+// ── Pannello di risultato (componente stabile: non si rimonta a ogni copia) ──
 function ResultCard({
-  title, icon, items, primary, fileName, copied, sort, locale, onCopy, onDownload,
+  title, icon, items, primary, copied, sort, locale, onCopy, onDownload,
 }: {
   title: string;
   icon: React.ReactNode;
   items: Rel[];
   primary?: boolean;
-  fileName: string;
   copied: boolean;
   sort: SortMode;
   locale: string;
   onCopy: (items: Rel[]) => void;
-  onDownload: (fileName: string, title: string, items: Rel[]) => void;
+  onDownload: (title: string, items: Rel[]) => void;
 }) {
   const sorted = useMemo(
     () => [...items].sort(sort === "recent" ? byRecent : byName),
@@ -364,37 +388,58 @@ function ResultCard({
     new Date(ts).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" });
 
   return (
-    <div className={"ig-result" + (primary ? " ig-result--primary" : "")}>
-      <div className="ig-result-head">
-        <span className="ig-result-icon" aria-hidden="true">{icon}</span>
-        <h3 className="ig-result-title">{title}</h3>
-        <span className="ig-result-count">{items.length}</span>
+    <div className={"sb-ig-card" + (primary ? " sb-ig-card--primary" : "")}>
+      <div className="sb-panel">
+        <div className="sb-panel-inner sb-ig-res-inner">
+          <div className="sb-ig-res-head">
+            {icon}
+            <h3>{title}</h3>
+            <span className="sb-ig-res-count" translate="no">{items.length}</span>
+          </div>
+
+          <div className="sb-ig-res-actions">
+            <button
+              type="button"
+              className="sb-btn sb-btn--sm sb-btn--secondary"
+              onClick={() => onCopy(sorted)}
+              disabled={!items.length}
+            >
+              {copied ? <IcCheck size={14} /> : <IcCopy size={14} />}
+              <span>{copied ? "Copiato" : "Copia"}</span>
+            </button>
+            <button
+              type="button"
+              className="sb-btn sb-btn--sm sb-btn--secondary"
+              onClick={() => onDownload(title, sorted)}
+              disabled={!items.length}
+            >
+              <IcDownload size={14} />
+              <span>Scarica</span>
+            </button>
+          </div>
+
+          {sorted.length ? (
+            <ul className="sb-ig-list">
+              {sorted.map((r) => (
+                <li key={r.user}>
+                  <a
+                    href={`https://instagram.com/${encodeURIComponent(r.user)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sb-ig-row"
+                  >
+                    <Avatar user={r.user} />
+                    <span className="sb-ig-uname" translate="no">@{r.user}</span>
+                    {r.ts != null && <span className="sb-ig-date" translate="no">{fmt(r.ts)}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="sb-ig-empty">Nessuno qui</p>
+          )}
+        </div>
       </div>
-      <div className="ig-result-actions">
-        <button type="button" className="ig-mini" onClick={() => onCopy(sorted)} disabled={!items.length}>
-          {copied ? <Check size={15} /> : <Copy size={15} />}
-          <span>{copied ? "Copiato" : "Copia"}</span>
-        </button>
-        <button type="button" className="ig-mini" onClick={() => onDownload(fileName, title, sorted)} disabled={!items.length}>
-          <Download size={15} />
-          <span>Scarica</span>
-        </button>
-      </div>
-      {sorted.length ? (
-        <ul className="ig-list">
-          {sorted.map((r) => (
-            <li key={r.user}>
-              <a href={`https://instagram.com/${encodeURIComponent(r.user)}`} target="_blank" rel="noopener noreferrer" className="ig-row">
-                <Avatar user={r.user} />
-                <span className="ig-uname">@{r.user}</span>
-                {r.ts != null && <span className="ig-date" translate="no">{fmt(r.ts)}</span>}
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="ig-empty">Nessuno qui 🎉</p>
-      )}
     </div>
   );
 }
@@ -414,6 +459,7 @@ export default function Instagram() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [analyses, setAnalyses] = useState<number | null>(null); // contatore globale live
   const [pasteErr, setPasteErr] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const fileFollowing = useRef<HTMLInputElement>(null);
   const fileFollowers = useRef<HTMLInputElement>(null);
@@ -428,6 +474,14 @@ export default function Instagram() {
     // Al primo accesso mostra il tutorial (poi ricordato via cookie/localStorage).
     if (getPref(TUTORIAL_PREF) !== "seen") setShowTutorial(true);
     return () => { document.title = prev; };
+  }, []);
+
+  // Nav "solida" dopo 60px di scroll (come la home).
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const closeTutorial = useCallback(() => {
@@ -525,7 +579,7 @@ export default function Instagram() {
 
   // Report HTML in stile sito. Nome file con marchio + lista + DATA:
   //   compare-two-lists_io-seguo-ma-non-mi-segue_2026-07-18.html
-  const downloadList = (_base: string, title: string, items: Rel[]) => {
+  const downloadList = (title: string, items: Rel[]) => {
     const isoDate = new Date().toISOString().slice(0, 10); // AAAA-MM-GG
     const fileName = `compare-two-lists_${slug(title)}_${isoDate}.html`;
     const stats: ReportStats = {
@@ -546,191 +600,226 @@ export default function Instagram() {
   };
 
   return (
-    <div className="it-page-wrapper ig-page">
+    <div className="sb-home ig-page">
       {showTutorial && <Tutorial onClose={closeTutorial} />}
 
-      {/* Header — marchio del portfolio + ritorno alla home */}
-      <header className="ig-header">
-        <div className="container">
-          <div className="d-flex align-items-center justify-content-between py-3">
-            <Link to="/" className="ig-brand text-decoration-none d-inline-flex align-items-center">
-              <span className="ig-brand-mark" aria-hidden="true">
-                <img src="/favicon.svg" alt="" width={40} height={40} />
-              </span>
-              <span className="ig-brand-text">
-                <span className="ig-brand-title">Alberto Pecchini</span>
-                <span className="ig-brand-tagline">Designer &amp; Front-end Developer</span>
-              </span>
-            </Link>
-            <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" />
+      {/* Skiplink — requisito di accessibilità (come la home) */}
+      <div className="skiplinks">
+        <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>
+      </div>
+
+      {/* ── Nav sottile: brand del sito + ritorno alla home ── */}
+      <header className={`sb-nav ${scrolled ? "sb-nav--scrolled" : ""}`}>
+        <div className="sb-container sb-nav-inner">
+          <Link to="/" className="sb-nav-brand">
+            <img src="/favicon.svg" alt="" width={28} height={28} />
+            <span className="sb-nav-brand-name" translate="no">Alberto Pecchini</span>
+            <span className="sb-ig-tagline">Designer &amp; Front-end Developer</span>
+          </Link>
+          <div className="sb-nav-right">
+            <button
+              type="button"
+              className="sb-btn sb-btn--sm sb-btn--ghost"
+              onClick={() => setShowTutorial(true)}
+              aria-haspopup="dialog"
+            >
+              <IcHelp size={15} />
+              <span>Come scarico i file da Instagram?</span>
+            </button>
+            <Link to="/" className="sb-btn sb-btn--sm sb-btn--secondary sb-btn--keep">
+              <IcArrowLeft size={15} />
               <span>Torna alla home</span>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="ig-hero">
-        <div className="container">
-          <span className="ig-hero-badge" aria-hidden="true"><IgIcon size={42} /></span>
-          <h1 className="ig-hero-title">Chi ti ha tolto il follow? 👀</h1>
-          <span className="ig-hero-rule" aria-hidden="true" />
-          <p className="ig-hero-lead">Scopri in 10 secondi chi segui che non ti ricambia.</p>
-          <p className="ig-hero-sub">
-            Carica i due file <b>following.html</b> e <b>followers.html</b> che scarichi da Instagram
-            (vanno bene anche i .json), oppure incolla le liste. Resta tutto nel tuo browser:
-            nessun login, nessun dato inviato.
-          </p>
-          <button type="button" className="ig-guide" onClick={() => setShowTutorial(true)}>
-            <HelpCircle size={16} /><span>Come scarico i file da Instagram?</span>
-          </button>
-        </div>
-      </section>
+      <main id="main-content">
+        {/* ① Hero — titolo a sinistra, contatore + spiegazione a destra */}
+        <section className="sb-ig-hero">
+          <div className="sb-container">
+            <span className="sb-ig-eyebrow" data-no-i18n translate="no">
+              <SiInstagram size={14} aria-hidden="true" /> {APP_NAME}
+            </span>
+            <div className="sb-hero-grid">
+              <div>
+                <h1 className="sb-hero-title">Chi ti ha tolto il follow?</h1>
+                <p className="sb-ig-hero-lead">Scopri in 10 secondi chi segui che non ti ricambia.</p>
+              </div>
+              <div className="sb-hero-copy sb-ig-hero-copy">
+                {analyses != null && (
+                  <p className="sb-ig-stat" role="status" aria-live="polite">
+                    <span className="sb-ig-dot" aria-hidden="true" />
+                    <span className="sb-ig-stat-num" translate="no">{analyses.toLocaleString(locale)}</span>
+                    <span>confronti effettuati con questo strumento</span>
+                  </p>
+                )}
+                <p>
+                  Carica i due file following.html e followers.html che scarichi da Instagram
+                  (vanno bene anche i .json), oppure incolla le liste. Resta tutto nel tuo browser:
+                  nessun login, nessun dato inviato.
+                </p>
+                <button type="button" className="sb-link" onClick={() => setShowTutorial(true)} aria-haspopup="dialog">
+                  <IcHelp size={15} />
+                  <span>Come scarico i file da Instagram?</span>
+                  <IcArrowRight size={15} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      {/* Strumento — a sinistra i seguiti, a destra i follower */}
-      <section className="ig-tool">
-        <div className="container">
-          <div className="ig-inputs">
-            <div className="ig-card">
-              <div className="ig-card-top">
-                <h2 className="ig-card-title">I miei seguiti</h2>
-                <span className="ig-card-file" translate="no">{nameFollowing}</span>
+        {/* ② Strumento — a sinistra i seguiti, a destra i follower */}
+        <section className="sb-container sb-ig-tool">
+          <div className="sb-ig-inputs">
+            <div className="sb-panel">
+              <div className="sb-panel-inner sb-ig-card-inner">
+                <div className="sb-ig-cardhead">
+                  <IcFile size={18} />
+                  <h2>I miei seguiti</h2>
+                  <span className="sb-ig-file" translate="no">{nameFollowing}</span>
+                </div>
+                <p className="sb-ig-hint">Il file following.html — chi segui tu</p>
+                <div className="sb-ig-btnrow">
+                  <button type="button" className="sb-btn sb-btn--sm sb-btn--secondary" onClick={() => fileFollowing.current?.click()}>
+                    <IcUpload size={15} /><span>Scegli file</span>
+                  </button>
+                  <button type="button" className="sb-btn sb-btn--sm sb-btn--ghost" onClick={() => pasteInto(setFollowing, setNameFollowing)}>
+                    <IcPaste size={15} /><span>Incolla</span>
+                  </button>
+                </div>
+                <input ref={fileFollowing} type="file" accept=".html,.htm,.txt,.json" hidden
+                  onChange={(e) => readFile(e.target.files?.[0], setFollowing, setNameFollowing)} />
+                <textarea className="sb-ig-textarea" value={following} spellCheck={false}
+                  onChange={(e) => { setFollowing(e.target.value); setNameFollowing(""); }}
+                  placeholder="…oppure incolla qui la lista" />
               </div>
-              <p className="ig-card-hint">Il file following.html — chi segui tu</p>
-              <div className="ig-btnrow">
-                <button type="button" className="ig-upload" onClick={() => fileFollowing.current?.click()}>
-                  <Upload size={16} /><span>Scegli file</span>
-                </button>
-                <button type="button" className="ig-paste" onClick={() => pasteInto(setFollowing, setNameFollowing)}>
-                  <ClipboardPaste size={16} /><span>Incolla</span>
-                </button>
-              </div>
-              <input ref={fileFollowing} type="file" accept=".html,.htm,.txt,.json" hidden
-                onChange={(e) => readFile(e.target.files?.[0], setFollowing, setNameFollowing)} />
-              <textarea className="ig-textarea" value={following} spellCheck={false}
-                onChange={(e) => { setFollowing(e.target.value); setNameFollowing(""); }}
-                placeholder="…oppure incolla qui la lista" />
             </div>
 
-            <div className="ig-card">
-              <div className="ig-card-top">
-                <h2 className="ig-card-title">I miei follower</h2>
-                <span className="ig-card-file" translate="no">{nameFollowers}</span>
+            <div className="sb-panel">
+              <div className="sb-panel-inner sb-ig-card-inner">
+                <div className="sb-ig-cardhead">
+                  <IcFile size={18} />
+                  <h2>I miei follower</h2>
+                  <span className="sb-ig-file" translate="no">{nameFollowers}</span>
+                </div>
+                <p className="sb-ig-hint">Il file followers.html — chi ti segue</p>
+                <div className="sb-ig-btnrow">
+                  <button type="button" className="sb-btn sb-btn--sm sb-btn--secondary" onClick={() => fileFollowers.current?.click()}>
+                    <IcUpload size={15} /><span>Scegli file</span>
+                  </button>
+                  <button type="button" className="sb-btn sb-btn--sm sb-btn--ghost" onClick={() => pasteInto(setFollowers, setNameFollowers)}>
+                    <IcPaste size={15} /><span>Incolla</span>
+                  </button>
+                </div>
+                <input ref={fileFollowers} type="file" accept=".html,.htm,.txt,.json" hidden
+                  onChange={(e) => readFile(e.target.files?.[0], setFollowers, setNameFollowers)} />
+                <textarea className="sb-ig-textarea" value={followers} spellCheck={false}
+                  onChange={(e) => { setFollowers(e.target.value); setNameFollowers(""); }}
+                  placeholder="…oppure incolla qui la lista" />
               </div>
-              <p className="ig-card-hint">Il file followers.html — chi ti segue</p>
-              <div className="ig-btnrow">
-                <button type="button" className="ig-upload" onClick={() => fileFollowers.current?.click()}>
-                  <Upload size={16} /><span>Scegli file</span>
-                </button>
-                <button type="button" className="ig-paste" onClick={() => pasteInto(setFollowers, setNameFollowers)}>
-                  <ClipboardPaste size={16} /><span>Incolla</span>
-                </button>
-              </div>
-              <input ref={fileFollowers} type="file" accept=".html,.htm,.txt,.json" hidden
-                onChange={(e) => readFile(e.target.files?.[0], setFollowers, setNameFollowers)} />
-              <textarea className="ig-textarea" value={followers} spellCheck={false}
-                onChange={(e) => { setFollowers(e.target.value); setNameFollowers(""); }}
-                placeholder="…oppure incolla qui la lista" />
             </div>
           </div>
 
           {/* Confronto nel tempo: chi ti ha tolto il follow rispetto a un export vecchio */}
-          <div className="ig-old">
-            <button type="button" className="ig-old-toggle" onClick={() => setShowOld((v) => !v)} aria-expanded={showOld}>
-              <Clock size={16} />
-              <span>Chi mi ha tolto il follow di recente? Confronta con un export vecchio</span>
-              <span className="ig-old-caret" style={{ transform: showOld ? "rotate(180deg)" : "none" }}>▾</span>
-            </button>
-            {showOld && (
-              <div className="ig-old-body">
-                <p className="ig-old-hint">
-                  Metti qui i follower di un export più vecchio (il followers.html di settimane fa): chi c'era allora e ora non c'è più ti ha tolto il follow.
-                </p>
-                <div className="ig-card-top">
-                  <h2 className="ig-card-title">I miei follower di prima</h2>
-                  <span className="ig-card-file" translate="no">{nameOld}</span>
-                </div>
-                <div className="ig-btnrow">
-                  <button type="button" className="ig-upload" onClick={() => fileOld.current?.click()}>
-                    <Upload size={16} /><span>Scegli file</span>
-                  </button>
-                  <button type="button" className="ig-paste" onClick={() => pasteInto(setOldFollowers, setNameOld)}>
-                    <ClipboardPaste size={16} /><span>Incolla</span>
-                  </button>
-                </div>
-                <input ref={fileOld} type="file" accept=".html,.htm,.txt,.json" hidden
-                  onChange={(e) => readFile(e.target.files?.[0], setOldFollowers, setNameOld)} />
-                <textarea className="ig-textarea" value={oldFollowers} spellCheck={false}
-                  onChange={(e) => { setOldFollowers(e.target.value); setNameOld(""); }}
-                  placeholder="…oppure incolla qui la lista dei follower di prima" />
+          <div className="sb-ig-old">
+            <div className="sb-panel sb-panel--hover">
+              <div className="sb-panel-inner">
+                <button type="button" className="sb-ig-disc" onClick={() => setShowOld((v) => !v)} aria-expanded={showOld}>
+                  <IcClock size={16} />
+                  <span className="lbl">Chi mi ha tolto il follow di recente? Confronta con un export vecchio</span>
+                  <IcChevronDown size={16} className="sb-ig-caret" />
+                </button>
+                {showOld && (
+                  <div className="sb-ig-disc-body">
+                    <p className="sb-ig-hint">
+                      Metti qui i follower di un export più vecchio (il followers.html di settimane fa): chi c'era allora e ora non c'è più ti ha tolto il follow.
+                    </p>
+                    <div className="sb-ig-cardhead">
+                      <IcClock size={18} />
+                      <h2>I miei follower di prima</h2>
+                      <span className="sb-ig-file" translate="no">{nameOld}</span>
+                    </div>
+                    <div className="sb-ig-btnrow">
+                      <button type="button" className="sb-btn sb-btn--sm sb-btn--secondary" onClick={() => fileOld.current?.click()}>
+                        <IcUpload size={15} /><span>Scegli file</span>
+                      </button>
+                      <button type="button" className="sb-btn sb-btn--sm sb-btn--ghost" onClick={() => pasteInto(setOldFollowers, setNameOld)}>
+                        <IcPaste size={15} /><span>Incolla</span>
+                      </button>
+                    </div>
+                    <input ref={fileOld} type="file" accept=".html,.htm,.txt,.json" hidden
+                      onChange={(e) => readFile(e.target.files?.[0], setOldFollowers, setNameOld)} />
+                    <textarea className="sb-ig-textarea" value={oldFollowers} spellCheck={false}
+                      onChange={(e) => { setOldFollowers(e.target.value); setNameOld(""); }}
+                      placeholder="…oppure incolla qui la lista dei follower di prima" />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {pasteErr && (
-            <p className="ig-paste-err" role="alert">
-              Il browser ha bloccato l'incolla automatico. Clicca nell'area di testo e usa Ctrl+V (o ⌘V).
+            <p className="sb-ig-alert" role="alert">
+              <IcAlert size={16} />
+              <span>Il browser ha bloccato l'incolla automatico. Clicca nell'area di testo e usa Ctrl+V (o ⌘V).</span>
             </p>
           )}
 
-          <div className="ig-controls">
-            <button type="button" className="ig-go" onClick={compare} disabled={!canCompare}>Confronta</button>
-            <button type="button" className="ig-reset" onClick={reset}>
-              <RotateCcw size={16} /><span>Cancella e ricomincia</span>
+          <div className="sb-ig-actions">
+            <button type="button" className="sb-btn sb-btn--primary sb-ig-go" onClick={compare} disabled={!canCompare}>
+              Confronta
+            </button>
+            <button type="button" className="sb-btn sb-btn--secondary" onClick={reset}>
+              <IcRotate size={15} /><span>Cancella e ricomincia</span>
             </button>
           </div>
+        </section>
 
-          {analyses != null && (
-            <p className="ig-stat" role="status" aria-live="polite">
-              <span className="ig-stat-live">
-                <span className="ig-stat-dot" aria-hidden="true" />
-                <span className="ig-stat-num" translate="no">{analyses.toLocaleString(locale)}</span>
-              </span>
-              <span className="ig-stat-label">confronti effettuati con questo strumento</span>
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* Risultati */}
-      {ran && (
-        <section className="ig-results-wrap" ref={resultsRef}>
-          <div className="container">
+        {/* ③ Risultati */}
+        {ran && (
+          <section className="sb-container sb-ig-results-sec" ref={resultsRef} aria-label="Risultati del confronto">
             {/* Banner d'avviso: il numero che conta davvero */}
-            <div className="ig-banner" role="alert">
-              <span className="ig-banner-ico" aria-hidden="true"><AlertTriangle size={22} /></span>
-              <p className="ig-banner-text">
-                <b translate="no">{result.iFollow.length}</b>{" "}
-                <span>profili che segui non ti ricambiano.</span>{" "}
-                <span>Li trovi nella lista in evidenza qui sotto.</span>
-              </p>
+            <div className="sb-panel">
+              <div className="sb-panel-inner sb-ig-banner-inner" role="alert">
+                <IcAlert size={20} />
+                <p className="sb-ig-banner-text">
+                  <b translate="no">{result.iFollow.length}</b>{" "}
+                  <span>profili che segui non ti ricambiano.</span>{" "}
+                  <span>Li trovi nella lista in evidenza qui sotto.</span>
+                </p>
+              </div>
             </div>
 
             {/* Ordinamento */}
-            <div className="ig-sort">
-              <span className="ig-sort-label">Ordina:</span>
-              <button type="button" className={"ig-chip" + (sort === "az" ? " is-on" : "")} onClick={() => setSort("az")}>
-                <ArrowDownAZ size={15} /><span>Nome (A-Z)</span>
+            <div className="sb-ig-sort">
+              <span className="sb-ig-sort-label">Ordina:</span>
+              <button type="button" className="sb-tab" aria-pressed={sort === "az"} onClick={() => setSort("az")}>
+                <IcSortAz size={15} /> Nome (A-Z)
               </button>
-              <button type="button" className={"ig-chip" + (sort === "recent" ? " is-on" : "")}
-                onClick={() => setSort("recent")} disabled={!result.hasDates}
-                title={result.hasDates ? "" : "Le date non sono presenti in questo export"}>
-                <Clock size={15} /><span>Follow più recenti</span>
+              <button
+                type="button"
+                className="sb-tab"
+                aria-pressed={sort === "recent"}
+                onClick={() => setSort("recent")}
+                disabled={!result.hasDates}
+                title={result.hasDates ? "" : "Le date non sono presenti in questo export"}
+              >
+                <IcClock size={15} /> Follow più recenti
               </button>
             </div>
 
-            <div className="ig-results">
-              <ResultCard title="Chi mi segue ma io non seguo" icon={<UserPlus size={18} />}
-                items={result.theyFollow} fileName="chi-mi-segue-ma-non-seguo.txt"
+            <div className="sb-ig-results">
+              <ResultCard title="Chi mi segue ma io non seguo" icon={<IcUserPlus size={18} />}
+                items={result.theyFollow}
                 copied={copied === "theyFollow"} sort={sort} locale={locale}
                 onCopy={(i) => copyList("theyFollow", i)} onDownload={downloadList} />
-              <ResultCard primary title="Io seguo ma non mi segue" icon={<UserX size={18} />}
-                items={result.iFollow} fileName="io-seguo-ma-non-mi-segue.txt"
+              <ResultCard primary title="Io seguo ma non mi segue" icon={<IcUserX size={18} />}
+                items={result.iFollow}
                 copied={copied === "iFollow"} sort={sort} locale={locale}
                 onCopy={(i) => copyList("iFollow", i)} onDownload={downloadList} />
-              <ResultCard title="Chi seguo e mi risegue" icon={<Heart size={18} />}
-                items={result.mutual} fileName="reciproci.txt"
+              <ResultCard title="Chi seguo e mi risegue" icon={<IcHeart size={18} />}
+                items={result.mutual}
                 copied={copied === "mutual"} sort={sort} locale={locale}
                 onCopy={(i) => copyList("mutual", i)} onDownload={downloadList} />
             </div>
@@ -738,380 +827,52 @@ export default function Instagram() {
             {/* Confronto nel tempo (solo se hai caricato un export vecchio) */}
             {result.hasOld && (
               <>
-                <h2 className="ig-section-title">Rispetto al tuo export vecchio</h2>
-                <div className="ig-results ig-results--two">
-                  <ResultCard primary title="Ti hanno tolto il follow" icon={<UserMinus size={18} />}
-                    items={result.unfollowed} fileName="ti-hanno-tolto-il-follow.txt"
+                <h2 className="sb-ig-subhead">Rispetto al tuo export vecchio</h2>
+                <div className="sb-ig-results sb-ig-results--two">
+                  <ResultCard primary title="Ti hanno tolto il follow" icon={<IcUserMinus size={18} />}
+                    items={result.unfollowed}
                     copied={copied === "unfollowed"} sort={sort} locale={locale}
                     onCopy={(i) => copyList("unfollowed", i)} onDownload={downloadList} />
-                  <ResultCard title="Nuovi follower" icon={<Sparkles size={18} />}
-                    items={result.newFollowers} fileName="nuovi-follower.txt"
+                  <ResultCard title="Nuovi follower" icon={<IcSparkle size={18} />}
+                    items={result.newFollowers}
                     copied={copied === "newFollowers"} sort={sort} locale={locale}
                     onCopy={(i) => copyList("newFollowers", i)} onDownload={downloadList} />
                 </div>
               </>
             )}
+          </section>
+        )}
+
+        {/* ④ Privacy — rassicurazione: nulla viene salvato, lo vedi solo tu */}
+        <section className="sb-section">
+          <div className="sb-container">
+            <div className="sb-open">
+              <div>
+                <h2>La tua privacy, davvero</h2>
+                <p>
+                  Questo strumento gira interamente nel tuo browser: i file e le liste che carichi non vengono inviati da nessuna parte, non passano da alcun server e non vengono salvati. Il confronto lo vedi solo tu, su questo dispositivo.
+                </p>
+              </div>
+
+              <div className="sb-panel">
+                <div className="sb-panel-inner sb-ig-priv-inner">
+                  <ul className="sb-ig-checks">
+                    <li><IcWifiOff size={17} /><span>Nessun caricamento su internet: tutto resta in locale.</span></li>
+                    <li><IcLock size={17} /><span>Nessun login, nessun account, nessun cookie di tracciamento.</span></li>
+                    <li><IcShield size={17} /><span>Niente database: appena chiudi o ricarichi la pagina, i dati spariscono.</span></li>
+                  </ul>
+                  <p className="sb-ig-fine">
+                    L'unica cosa memorizzata sul tuo dispositivo è se hai già visto il tutorial (una preferenza locale),
+                    così non ti viene riproposto. Nient'altro.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
-      )}
-
-      {/* Privacy — rassicurazione: nulla viene salvato, lo vedi solo tu */}
-      <section className="ig-privacy">
-        <div className="container">
-          <div className="ig-privacy-card">
-            <div className="ig-privacy-head">
-              <span className="ig-privacy-badge" aria-hidden="true"><ShieldCheck size={22} /></span>
-              <h2 className="ig-privacy-title">La tua privacy, davvero</h2>
-            </div>
-            <p className="ig-privacy-lead">
-              Questo strumento gira interamente nel tuo browser: i file e le liste che carichi non vengono inviati da nessuna parte, non passano da alcun server e non vengono salvati. Il confronto lo vedi solo tu, su questo dispositivo.
-            </p>
-            <ul className="ig-privacy-list">
-              <li><span aria-hidden="true"><WifiOff size={17} /></span> Nessun caricamento su internet: tutto resta in locale.</li>
-              <li><span aria-hidden="true"><Lock size={17} /></span> Nessun login, nessun account, nessun cookie di tracciamento.</li>
-              <li><span aria-hidden="true"><ShieldCheck size={17} /></span> Niente database: appena chiudi o ricarichi la pagina, i dati spariscono.</li>
-            </ul>
-            <p className="ig-privacy-fine">
-              L'unica cosa memorizzata sul tuo dispositivo è se hai già visto il tutorial (una preferenza locale),
-              così non ti viene riproposto. Nient'altro.
-            </p>
-          </div>
-        </div>
-      </section>
+      </main>
 
       <SiteFooter />
-
-      <style>{`
-        /* Stile Ubuntu/Yaru caldo che segue il TEMA GLOBALE (come le altre pagine). */
-        .ig-page {
-          --accent: #dd4814; --accent-2: #c2410c; --accent-deep: #bc3d10; --ink: #c2410c;
-          --glow: rgba(221, 72, 20, 0.35);
-          --heading: #14121c; --text: #2a2833; --sub: #55535f;
-          --surface: #ffffff; --surface-2: #faf8f6; --surface-bd: rgba(24, 12, 60, 0.10);
-          --soft: rgba(194, 65, 12, 0.07); --soft-bd: rgba(194, 65, 12, 0.22);
-          --panel: linear-gradient(160deg, #f7f2ee 0%, #f2ede9 45%, #ffffff 100%);
-          --page-bg: radial-gradient(120% 70% at 50% -10%, rgba(221, 72, 20, 0.14) 0%, transparent 55%),
-            linear-gradient(180deg, #faf8f6 0%, #f4f0ec 100%);
-          --header-bg: rgba(250, 248, 246, 0.82); --input-bg: #ffffff;
-          --btn-bd: rgba(24, 12, 60, 0.24); --btn-fg: #2a2833;
-          --card-shadow: 0 14px 36px rgba(60, 30, 12, 0.10);
-          --warn-bg: #fff4ec; --warn-bd: rgba(233, 84, 32, 0.35);
-          min-height: 100vh; font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
-          color: var(--text); background: var(--page-bg);
-        }
-        html.dark .ig-page {
-          --accent: #e95420; --accent-2: #dd4814; --accent-deep: #bc3d10; --ink: #f6a583;
-          --glow: rgba(233, 84, 32, 0.45);
-          --heading: #ffffff; --text: #f5f3f1; --sub: #b3aca6;
-          --surface: #241c22; --surface-2: #1f181d;
-          --surface-bd: rgba(255, 255, 255, 0.10);
-          --soft: rgba(233, 84, 32, 0.10); --soft-bd: rgba(233, 84, 32, 0.28);
-          --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
-          --page-bg: radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),
-            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
-          --header-bg: rgba(28, 22, 27, 0.82); --input-bg: rgba(0, 0, 0, 0.22);
-          --btn-bd: rgba(255, 255, 255, 0.34); --btn-fg: #ffffff;
-          --card-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
-          --warn-bg: rgba(233, 84, 32, 0.10); --warn-bd: rgba(233, 84, 32, 0.4);
-        }
-
-        .ig-header {
-          background: var(--header-bg); position: sticky; top: 0; z-index: 10;
-          backdrop-filter: blur(14px) saturate(120%); -webkit-backdrop-filter: blur(14px) saturate(120%);
-          border-bottom: 1px solid var(--surface-bd);
-        }
-        .ig-brand-mark {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 40px; height: 40px; border-radius: 8px; overflow: hidden; margin-right: 12px;
-          background: var(--soft); border: 1px solid var(--soft-bd);
-        }
-        .ig-brand-mark img { width: 100%; height: 100%; display: block; }
-        .ig-brand-text { display: inline-flex; flex-direction: column; line-height: 1.2; }
-        .ig-brand-title { color: var(--heading); font-weight: 700; font-size: 1.05rem; }
-        .ig-brand-tagline { color: var(--sub); font-size: 0.78rem; }
-        @media (max-width: 575.98px) { .ig-brand-tagline { display: none; } }
-        .ig-page .btn-outline-light { border-color: var(--btn-bd); color: var(--btn-fg); }
-        .ig-page .btn-outline-light:hover, .ig-page .btn-outline-light:focus {
-          background-color: var(--accent); border-color: var(--accent); color: #fff !important;
-        }
-
-        .ig-hero {
-          position: relative; overflow: hidden; text-align: center;
-          padding: clamp(2.75rem, 6vw, 4.5rem) 0 clamp(2rem, 4vw, 3rem);
-          background: radial-gradient(90% 120% at 50% 0%, var(--soft) 0%, transparent 60%), var(--panel);
-          border-bottom: 1px solid var(--surface-bd);
-        }
-        .ig-hero-badge {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 84px; height: 84px; border-radius: 22px;
-          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
-          border: 1px solid rgba(255, 255, 255, 0.28); color: #fff; margin-bottom: 1.25rem;
-          box-shadow: 0 14px 40px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-        .ig-hero-title {
-          font-size: clamp(2.1rem, 6vw, 3.75rem); line-height: 1.05; letter-spacing: -0.02em;
-          margin: 0 0 1rem; color: var(--heading); font-weight: 700;
-        }
-        .ig-hero-rule {
-          display: block; width: 64px; height: 4px; border-radius: 2px; margin: 0 auto 1.1rem;
-          background: var(--accent); box-shadow: 0 0 18px var(--glow);
-        }
-        .ig-hero-lead {
-          font-size: clamp(1.2rem, 2.6vw, 1.6rem); font-style: italic; font-weight: 600;
-          color: var(--heading); margin: 0 auto 0.85rem; max-width: 40rem;
-        }
-        .ig-hero-sub { color: var(--sub); font-size: 1.02rem; line-height: 1.6; max-width: 42rem; margin: 0 auto; }
-        .ig-hero-sub b { color: var(--heading); }
-        .ig-guide {
-          display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
-          background: var(--surface); color: var(--accent-2); border: 1px solid var(--soft-bd);
-          border-radius: 999px; padding: 0.5rem 1rem; font-family: inherit; font-size: 0.9rem;
-          font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.1s;
-        }
-        html.dark .ig-guide { color: var(--ink); }
-        .ig-guide:hover { background: var(--soft); border-color: var(--accent); transform: translateY(-1px); }
-        .ig-guide:active { transform: translateY(0); }
-
-        /* Contatore live dei confronti — riga sobria, sotto gli strumenti */
-        .ig-stat {
-          display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
-          gap: .25rem .6rem; margin: 1.4rem 0 0; font-size: .92rem; color: var(--sub);
-          text-align: center;
-        }
-        .ig-stat-live {
-          display: inline-flex; align-items: center; gap: .5rem;
-          padding: .3rem .7rem; border-radius: 999px;
-          background: var(--surface-2); border: 1px solid var(--surface-bd);
-        }
-        .ig-stat-num {
-          color: var(--accent-2); font-weight: 700; font-size: 1.05rem;
-          font-variant-numeric: tabular-nums; line-height: 1;
-        }
-        html.dark .ig-stat-num { color: var(--ink); }
-        .ig-stat-label { color: var(--sub); }
-        .ig-stat-dot {
-          width: 8px; height: 8px; border-radius: 50%; background: #2ecc71; flex: 0 0 auto;
-          box-shadow: 0 0 0 0 rgba(46,204,113,.6); animation: ig-pulse 2s infinite;
-        }
-        @keyframes ig-pulse {
-          0% { box-shadow: 0 0 0 0 rgba(46,204,113,.55); }
-          70% { box-shadow: 0 0 0 7px rgba(46,204,113,0); }
-          100% { box-shadow: 0 0 0 0 rgba(46,204,113,0); }
-        }
-
-        /* Riga bottoni file/incolla + tasto Incolla */
-        .ig-btnrow { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .ig-paste {
-          display: inline-flex; align-items: center; gap: 0.5rem;
-          background: transparent; color: var(--text); border: 1px solid var(--surface-bd);
-          border-radius: 10px; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.9rem;
-          cursor: pointer; font-family: inherit; transition: border-color 0.15s, color 0.15s, background 0.15s;
-        }
-        .ig-paste:hover { border-color: var(--accent); color: var(--accent-2); background: var(--soft); }
-        html.dark .ig-paste:hover { color: var(--ink); }
-        .ig-paste-err {
-          margin: 1rem 0 0; font-size: 0.86rem; color: var(--accent-2);
-          background: var(--soft); border: 1px solid var(--soft-bd); border-radius: 8px; padding: .55rem .75rem;
-        }
-        html.dark .ig-paste-err { color: var(--ink); }
-
-        .ig-tool { padding: clamp(2rem, 4vw, 3rem) 0; }
-        .ig-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 1.75rem); }
-        @media (max-width: 767.98px) { .ig-inputs { grid-template-columns: 1fr; } }
-
-        .ig-card {
-          background: var(--surface); border: 1px solid var(--surface-bd);
-          border-radius: 14px; padding: 1.15rem; box-shadow: var(--card-shadow);
-        }
-        .ig-card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
-        .ig-card-title { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--heading); }
-        .ig-card-file {
-          font-family: "Ubuntu", sans-serif; font-size: 0.78rem; color: var(--sub);
-          overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 50%;
-        }
-        .ig-card-hint { margin: 0.15rem 0 0.9rem; font-size: 0.86rem; color: var(--sub); }
-        .ig-upload {
-          display: inline-flex; align-items: center; gap: 0.5rem;
-          background: var(--soft); color: var(--accent-2); border: 1px solid var(--soft-bd);
-          border-radius: 10px; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.9rem;
-          cursor: pointer; transition: background 0.15s, transform 0.1s;
-        }
-        html.dark .ig-upload { color: var(--ink); }
-        .ig-upload:hover { background: rgba(233, 84, 32, 0.16); }
-        .ig-upload:active { transform: scale(0.97); }
-        .ig-textarea {
-          width: 100%; margin-top: 0.8rem; min-height: 92px; resize: vertical;
-          background: var(--input-bg); color: var(--text);
-          border: 1px solid var(--surface-bd); border-radius: 10px; padding: 0.7rem 0.8rem;
-          font-family: "Ubuntu", sans-serif; font-size: 0.85rem; line-height: 1.45;
-        }
-        .ig-textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
-
-        .ig-controls { display: flex; gap: 0.75rem; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; }
-        .ig-go {
-          flex: 1 1 auto; min-width: 200px;
-          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
-          color: #fff; border: none; border-radius: 12px; padding: 0.95rem; font-size: 1.1rem;
-          font-weight: 700; cursor: pointer; box-shadow: 0 12px 30px var(--glow);
-          transition: filter 0.15s, transform 0.1s, opacity 0.15s;
-        }
-        .ig-go:hover:not(:disabled) { filter: brightness(1.06); }
-        .ig-go:active:not(:disabled) { transform: scale(0.99); }
-        .ig-go:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
-        .ig-reset {
-          display: inline-flex; align-items: center; gap: 0.5rem;
-          background: transparent; color: var(--text); border: 1px solid var(--btn-bd);
-          border-radius: 12px; padding: 0.85rem 1.1rem; font-weight: 600; font-size: 0.95rem; cursor: pointer;
-          transition: border-color 0.15s, color 0.15s, background 0.15s;
-        }
-        .ig-reset:hover { border-color: var(--accent); color: var(--accent-2); background: var(--soft); }
-        html.dark .ig-reset:hover { color: var(--ink); }
-
-        /* Sezione "export vecchio" (confronto nel tempo) */
-        .ig-old { margin-top: 1rem; }
-        .ig-old-toggle {
-          display: flex; align-items: center; gap: 0.6rem; width: 100%; text-align: left;
-          background: var(--surface); color: var(--text); border: 1px dashed var(--soft-bd);
-          border-radius: 12px; padding: 0.8rem 1rem; font-weight: 600; font-size: 0.95rem; cursor: pointer;
-          transition: border-color 0.15s, background 0.15s;
-        }
-        .ig-old-toggle:hover { border-color: var(--accent); background: var(--soft); }
-        .ig-old-toggle > span:nth-child(2) { flex: 1 1 auto; }
-        .ig-old-caret { color: var(--sub); transition: transform 0.2s; }
-        .ig-old-body {
-          margin-top: 0.75rem; padding: 1.1rem; border: 1px solid var(--surface-bd);
-          border-radius: 12px; background: var(--surface); box-shadow: var(--card-shadow);
-          animation: ig-rise 0.3s ease both;
-        }
-        .ig-old-hint { margin: 0 0 0.9rem; font-size: 0.9rem; color: var(--sub); line-height: 1.5; }
-        .ig-old-hint b { color: var(--heading); }
-
-        /* Banner d'avviso */
-        .ig-results-wrap { padding: 0 0 clamp(2.5rem, 5vw, 4rem); }
-        .ig-banner {
-          display: flex; align-items: center; gap: 0.85rem;
-          background: var(--warn-bg); border: 1px solid var(--warn-bd); border-left: 4px solid var(--accent);
-          border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem;
-          animation: ig-rise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-        .ig-banner-ico { color: var(--accent-2); display: inline-flex; flex: 0 0 auto; }
-        html.dark .ig-banner-ico { color: var(--ink); }
-        .ig-banner-text { margin: 0; color: var(--text); font-size: 1rem; line-height: 1.4; }
-        .ig-banner-text b { color: var(--accent-2); font-size: 1.2rem; }
-        html.dark .ig-banner-text b { color: var(--ink); }
-
-        /* Ordinamento */
-        .ig-sort { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-        .ig-sort-label { color: var(--sub); font-size: 0.9rem; margin-right: 0.15rem; }
-        .ig-chip {
-          display: inline-flex; align-items: center; gap: 0.4rem;
-          background: var(--surface); color: var(--text); border: 1px solid var(--surface-bd);
-          border-radius: 999px; padding: 0.4rem 0.85rem; font-size: 0.85rem; font-weight: 600; cursor: pointer;
-          transition: border-color 0.15s, color 0.15s, background 0.15s;
-        }
-        .ig-chip:hover:not(:disabled) { border-color: var(--accent); }
-        .ig-chip.is-on { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .ig-chip:disabled { opacity: 0.45; cursor: not-allowed; }
-        .ig-section-title {
-          margin: clamp(1.5rem, 3vw, 2.25rem) 0 1rem; font-size: 1.25rem; font-weight: 700; color: var(--heading);
-        }
-        .ig-results--two { grid-template-columns: 1fr 1fr; }
-        @media (max-width: 767.98px) { .ig-results--two { grid-template-columns: 1fr; } }
-
-        .ig-results { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(1rem, 2.5vw, 1.5rem); align-items: start; }
-        @media (max-width: 900px) { .ig-results { grid-template-columns: 1fr; } }
-        .ig-result {
-          background: var(--surface); border: 1px solid var(--surface-bd); border-radius: 14px;
-          padding: 1.1rem; box-shadow: var(--card-shadow);
-          animation: ig-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-        .ig-result--primary { border-color: var(--accent); box-shadow: 0 14px 36px var(--glow); }
-        .ig-result--primary .ig-result-icon { background: var(--accent); color: #fff; border-color: var(--accent); }
-        @keyframes ig-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-
-        .ig-result-head { display: flex; align-items: center; gap: 0.6rem; }
-        .ig-result-icon {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 34px; height: 34px; border-radius: 9px; flex: 0 0 auto;
-          background: var(--soft); color: var(--accent-2); border: 1px solid var(--soft-bd);
-        }
-        html.dark .ig-result-icon { color: var(--ink); }
-        .ig-result-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--heading); flex: 1 1 auto; }
-        .ig-result-count { font-family: "Ubuntu", sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--accent-2); }
-        html.dark .ig-result-count { color: var(--ink); }
-
-        .ig-result-actions { display: flex; gap: 0.5rem; margin: 0.8rem 0; }
-        .ig-mini {
-          display: inline-flex; align-items: center; gap: 0.35rem;
-          background: var(--surface-2); color: var(--text); border: 1px solid var(--surface-bd);
-          border-radius: 8px; padding: 0.4rem 0.7rem; font-size: 0.8rem; font-weight: 600; cursor: pointer;
-          transition: background 0.15s, border-color 0.15s;
-        }
-        .ig-mini:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-2); }
-        html.dark .ig-mini:hover:not(:disabled) { color: var(--ink); }
-        .ig-mini:disabled { opacity: 0.45; cursor: not-allowed; }
-
-        /* Lista — SOLO font Ubuntu, con avatar e data */
-        .ig-list {
-          list-style: none; margin: 0; padding: 0.35rem;
-          max-height: 340px; overflow: auto;
-          background: var(--surface-2); border: 1px solid var(--surface-bd); border-radius: 10px;
-          font-family: "Ubuntu", sans-serif;
-        }
-        .ig-list li { margin: 0; }
-        .ig-row {
-          display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0.4rem; border-radius: 8px;
-          text-decoration: none; color: var(--text); transition: background 0.12s;
-        }
-        .ig-row:hover { background: var(--soft); }
-        .ig-avatar {
-          flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
-          display: inline-flex; align-items: center; justify-content: center;
-          color: #fff; font-weight: 700; font-size: 0.85rem; font-family: "Ubuntu", sans-serif;
-        }
-        .ig-uname {
-          flex: 1 1 auto; font-size: 0.92rem; color: var(--accent-2); font-weight: 500;
-          overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        html.dark .ig-uname { color: var(--ink); }
-        .ig-row:hover .ig-uname { text-decoration: underline; }
-        .ig-date { flex: 0 0 auto; font-size: 0.76rem; color: var(--sub); font-variant-numeric: tabular-nums; }
-        .ig-empty { margin: 0.6rem 0.2rem; color: var(--sub); font-size: 0.95rem; }
-
-        /* Micro-transizioni sobrie: solo bordo/ombra al passaggio del mouse. */
-        .ig-card, .ig-result { transition: border-color .15s ease, box-shadow .15s ease; }
-        .ig-card:hover { box-shadow: 0 10px 28px rgba(60, 30, 12, 0.10); }
-        html.dark .ig-card:hover { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32); }
-
-        @media (prefers-reduced-motion: reduce) {
-          .ig-result, .ig-banner, .ig-old-body, .ig-stat-dot { animation: none !important; }
-        }
-
-        /* ── Sezione privacy ──────────────────────────────────────────────── */
-        .ig-privacy { padding: 0 0 clamp(2.5rem, 5vw, 4rem); }
-        .ig-privacy-card {
-          background: var(--surface); border: 1px solid var(--surface-bd);
-          border-left: 4px solid var(--accent); border-radius: 16px;
-          padding: clamp(1.2rem, 3vw, 1.8rem); box-shadow: var(--card-shadow);
-        }
-        .ig-privacy-head { display: flex; align-items: center; gap: .7rem; margin-bottom: .8rem; }
-        .ig-privacy-badge {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 40px; height: 40px; border-radius: 11px; flex: 0 0 auto;
-          background: var(--accent); color: #fff;
-          box-shadow: 0 8px 22px var(--glow);
-        }
-        .ig-privacy-title { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--heading); }
-        .ig-privacy-lead { margin: 0 0 1rem; color: var(--text); line-height: 1.6; font-size: 1.02rem; }
-        .ig-privacy-lead b { color: var(--heading); }
-        .ig-privacy-list { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .55rem; }
-        .ig-privacy-list li { display: flex; align-items: center; gap: .6rem; color: var(--text); font-size: .95rem; }
-        .ig-privacy-list li span {
-          display: inline-flex; flex: 0 0 auto; color: var(--accent-2);
-        }
-        html.dark .ig-privacy-list li span { color: var(--ink); }
-        .ig-privacy-fine { margin: 0; color: var(--sub); font-size: .85rem; line-height: 1.5; }
-      `}</style>
     </div>
   );
 }

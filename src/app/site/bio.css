@@ -1,0 +1,253 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   /bio — pagina About rifatta sulla grammatica Supabase della home: nav
+   sottile, hero a due colonne con ritratto, prose, fact-card, gallerie
+   fotografiche, blocchi racconto, liste hobby/passioni con modale, griglia
+   competenze a chip e box dove/formazione.
+   Tema NATIVO chiaro/scuro: tutto passa dai token --sb-* definiti in
+   home.css sul wrapper .sb-home (chiaro default, scuro sotto html.dark).
+   Prefisso delle classi nuove: .sb-bio-*.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Nav: tagline accanto al brand + ritorno alla home ───────────────────── */
+.sb-bio-tagline { font-size: 0.8rem; color: var(--sb-fg-muted); white-space: nowrap; }
+@media (max-width: 639.98px) { .sb-bio-tagline { display: none; } }
+.sb-bio-back { margin-left: auto; }
+
+/* ── Hero: testo a sinistra, ritratto in pannello a destra ───────────────── */
+.sb-bio-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+@media (min-width: 1024px) { .sb-bio-hero-grid { grid-template-columns: 7fr 5fr; gap: 3rem; } }
+.sb-bio-portrait { width: 100%; max-width: 340px; margin: 0 auto; }
+@media (min-width: 1024px) { .sb-bio-portrait { margin: 0 0 0 auto; } }
+.sb-bio-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+/* ── Testata di sezione con overline ─────────────────────────────────────── */
+.sb-bio-sechead { margin-bottom: 2rem; max-width: 40rem; }
+.sb-bio-kicker {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sb-brand-text);
+}
+.sb-bio-sechead h2, .sb-bio-listhead h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--sb-fg);
+}
+.sb-bio-listhead h2 { font-size: 1.3rem; }
+.sb-bio-listhead { margin-bottom: 1.3rem; }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+.sb-bio-prose { max-width: 44rem; }
+.sb-bio-prose p { margin: 0 0 1rem; font-size: 1rem; line-height: 1.7; color: var(--sb-fg-lighter); }
+.sb-bio-prose p:last-child { margin-bottom: 0; }
+.sb-bio-prose strong { font-weight: 400; color: var(--sb-fg); }
+
+/* ── Dati essenziali: quattro fact-card ──────────────────────────────────── */
+.sb-bio-facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+@media (max-width: 1023.98px) { .sb-bio-facts { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 479.98px) { .sb-bio-facts { grid-template-columns: 1fr; } }
+.sb-bio-fact { padding: 1.1rem 1.2rem; gap: 0.25rem; }
+.sb-bio-fact-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-100);
+  color: var(--sb-brand-text);
+  margin-bottom: 0.5rem;
+}
+.sb-bio-fact-value { font-size: 1.02rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); line-height: 1.3; }
+.sb-bio-fact-label { font-size: 0.8rem; line-height: 1.45; color: var(--sb-fg-lighter); }
+
+/* ── Gallerie fotografiche ───────────────────────────────────────────────── */
+.sb-bio-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.sb-bio-gallery--two { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 767.98px) { .sb-bio-gallery, .sb-bio-gallery--two { grid-template-columns: 1fr; } }
+.sb-bio-shot {
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-75);
+}
+.sb-bio-shot img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.sb-bio-shot figcaption { padding: 0.55rem 0.9rem; font-size: 0.78rem; color: var(--sb-fg-muted); border-top: 1px solid var(--sb-border); }
+
+/* ── Blocco racconto: foto + testo affiancati ────────────────────────────── */
+.sb-bio-story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+  margin-top: 3rem;
+}
+@media (max-width: 1023.98px) { .sb-bio-story { grid-template-columns: 1fr; } }
+.sb-bio-story h3 { margin: 0 0 0.9rem; font-size: 1.2rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); }
+
+/* ── Due colonne (hobby/passioni, dove/formazione) ───────────────────────── */
+.sb-bio-twocol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+@media (max-width: 1023.98px) { .sb-bio-twocol { grid-template-columns: 1fr; } }
+
+/* ── Liste hobby / passioni (voci cliccabili → modale) ───────────────────── */
+.sb-bio-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.sb-bio-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-surface-75);
+  color: var(--sb-fg);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.92rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.sb-bio-item:hover, .sb-bio-item:focus-visible { border-color: var(--sb-border-stronger); background: var(--sb-surface-100); }
+.sb-bio-item-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-100);
+  color: var(--sb-fg-light);
+}
+.sb-bio-item .go {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--sb-fg-muted);
+  opacity: 0;
+  transform: translate(-3px, 3px);
+  transition: opacity 0.15s, transform 0.15s, color 0.15s;
+}
+.sb-bio-item:hover .go, .sb-bio-item:focus-visible .go { opacity: 1; transform: none; color: var(--sb-fg); }
+
+/* ── Griglia competenze ──────────────────────────────────────────────────── */
+.sb-bio-skillgrid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 640px) { .sb-bio-skillgrid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1280px) { .sb-bio-skillgrid { grid-template-columns: repeat(4, 1fr); } }
+.sb-bio-skill { padding: 1.3rem; gap: 0.9rem; }
+.sb-bio-skill-title { display: flex; align-items: center; gap: 0.55rem; color: var(--sb-fg); }
+.sb-bio-skill-title svg { flex-shrink: 0; color: var(--sb-fg-light); }
+.sb-bio-skill-title span { font-size: 0.95rem; font-weight: 500; letter-spacing: -0.01em; }
+.sb-bio-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.sb-bio-chips .sb-chip { padding: 0.28rem 0.7rem; font-size: 0.76rem; }
+
+/* ── Box Dove + Formazione ───────────────────────────────────────────────── */
+.sb-bio-box { padding: 1.4rem; gap: 0.9rem; }
+.sb-bio-boxlabel {
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sb-brand-text);
+}
+.sb-bio-based { display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.98rem; font-weight: 500; color: var(--sb-fg); }
+.sb-bio-based svg { flex-shrink: 0; color: var(--sb-brand-text); }
+.sb-bio-boxlead { margin: 0; font-size: 0.9rem; line-height: 1.65; color: var(--sb-fg-lighter); }
+.sb-bio-lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+.sb-bio-lines li { display: flex; align-items: center; gap: 0.55rem; font-size: 0.875rem; color: var(--sb-fg-light); }
+.sb-bio-lines svg { flex-shrink: 0; color: var(--sb-brand-text); }
+
+/* ── Modale interessi ────────────────────────────────────────────────────── */
+.sb-bio-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.sb-bio-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  width: min(92vw, 460px);
+}
+.sb-bio-modal .sb-panel-inner { max-height: 86vh; overflow-y: auto; }
+.sb-bio-modal-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--sb-border-strong);
+  background: color-mix(in srgb, var(--sb-bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  color: var(--sb-fg);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.sb-bio-modal-close:hover { background: var(--sb-surface-200); border-color: var(--sb-border-stronger); }
+.sb-bio-modal-photo img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.sb-bio-modal-body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 0.7rem; align-items: flex-start; }
+.sb-bio-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-100);
+  color: var(--sb-brand-text);
+}
+.sb-bio-modal-body h2 { margin: 0; font-size: 1.15rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); }
+.sb-bio-modal-body p { margin: 0; font-size: 0.9rem; line-height: 1.65; color: var(--sb-fg-lighter); }
+.sb-bio-modal-link { margin-top: 0.4rem; }
+
+/* ── Riduzione del movimento ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .sb-bio-item, .sb-bio-item .go, .sb-bio-modal-close { transition: none; }
+}

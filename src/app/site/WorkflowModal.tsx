@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Workflow, X } from "lucide-react";
+import { IcFlow, IcClose } from "./homeIcons";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import { lockBodyScroll, unlockBodyScroll } from "../utils/scrollLock";
 
@@ -182,7 +182,7 @@ export default function WorkflowModal() {
   return (
     <>
       <button type="button" className="apw-open" onClick={() => setOpen(true)} data-no-i18n>
-        <Workflow size={15} aria-hidden="true" />
+        <IcFlow size={15} />
         {t.open}
       </button>
 
@@ -197,7 +197,7 @@ export default function WorkflowModal() {
                   <span className="apw-bar-sub">{t.subtitle}</span>
                 </div>
                 <button type="button" className="apw-close" onClick={() => setOpen(false)} aria-label={t.close}>
-                  <X size={18} aria-hidden="true" />
+                  <IcClose size={18} />
                 </button>
               </div>
 
@@ -213,13 +213,14 @@ export default function WorkflowModal() {
         )}
 
       <style>{`
+        /* Trigger nel footer .sb-: colori dai token della home (tema nativo) */
         .apw-open {
           display: inline-flex; align-items: center; gap: 0.4rem;
           padding: 0; border: none; background: none; cursor: pointer;
-          color: #8893a0; font-family: inherit; font-size: 0.86rem;
+          color: var(--sb-fg-muted, #8893a0); font-family: inherit; font-size: 0.8rem;
           transition: color 0.15s;
         }
-        .apw-open:hover { color: #f6a583; }
+        .apw-open:hover { color: var(--sb-fg, #f6a583); }
 
         .apw-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Ubuntu", Geneva, Tahoma, sans-serif; }
         .apw-backdrop { position: absolute; inset: 0; background: rgba(4, 6, 10, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: apw-fade 0.2s ease; }

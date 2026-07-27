@@ -1,33 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SiteLink as Link } from "../site/nav";
 import SiteFooter from "../site/SiteFooter";
 import {
-  ArrowLeft,
-  MapPin,
-  GraduationCap,
-  Clock,
-  Building2,
-  Users,
-  CalendarDays,
-  Hourglass,
-  TreePine,
-  Boxes,
-  MonitorCheck,
-  Calculator,
-  FileText,
-  FolderTree,
-  ChevronRight,
-  PencilRuler,
-  Images,
-} from "lucide-react";
+  IcArrowLeft,
+  IcPin,
+  IcClock,
+  IcBuilding,
+  IcUsers,
+  IcCalendar,
+  IcHourglass,
+  IcTree,
+  IcCube,
+  IcScreenCheck,
+  IcCalculator,
+  IcFile,
+  IcSortAz,
+  IcChevronRight,
+  IcRuler,
+  IcImage,
+  type IcProps,
+} from "../site/homeIcons";
+import "../home.css";
+import "./pcto.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PCTO — Caem Group S.p.A., Castellucchio (MN) · Reparto legno · Ufficio tecnico.
 //
-// Tre sessioni di alternanza scuola-lavoro (a.s. 2023/24, 2024/25, 2025/26) svolte
-// nello stesso ente. Pagina: timeline delle esperienze + presentazione narrata del
-// percorso, con illustrazioni SVG dei legni in stile neroverde line-art (coerente
-// con la home — nessun colore fuori palette).
+// Tre sessioni di alternanza scuola-lavoro (a.s. 2023/24, 2024/25, 2025/26)
+// svolte nello stesso ente. Pagina rifatta sulla grammatica Supabase della home
+// (.sb-): nav sottile 64px, hero a due colonne, card a bordo-gradiente per le
+// tre sessioni, numeri chiave, galleria, flusso di lavoro in cinque passi,
+// capitoli narrati con illustrazione, strumenti, ore e chiusura.
+// Tema chiaro/scuro NATIVO via token --sb-* (home.css); stili in pcto.css.
 // ─────────────────────────────────────────────────────────────────────────────
 
 type PctoItem = {
@@ -89,57 +93,26 @@ function parsePeriodStart(period: string): number {
   return 0;
 }
 
-// ── Riga narrativa: illustrazione + testo (alternata) ─────────────────────────
-function StoryRow({
-  n,
-  kicker,
-  title,
-  art,
-  reverse,
-  children,
-}: {
-  n: string;
-  kicker: string;
-  title: string;
-  art: React.ReactNode;
-  reverse?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={`pcto-story-row${reverse ? " pcto-story-row--rev" : ""}`}>
-      <div className="pcto-story-art">
-        <div className="pcto-art-frame">{art}</div>
-      </div>
-      <div className="pcto-story-text">
-        <span className="pcto-story-step">{n}</span>
-        <p className="ap-kicker text-primary text-uppercase fw-semibold mb-2">{kicker}</p>
-        <h3 className="h3 fw-bold mb-3">{title}</h3>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-const FACTS = [
-  { Icon: CalendarDays, value: "3", label: "anni scolastici", note: "2023 – 2026" },
-  { Icon: Clock, value: "232 h", label: "in struttura", note: "80 + 72 + 80" },
-  { Icon: Hourglass, value: "8 h", label: "al giorno", note: "orario d'ufficio" },
-  { Icon: Users, value: "7", label: "in ufficio", note: "io compreso" },
-  { Icon: TreePine, value: "Legno", label: "il reparto", note: "ufficio tecnico" },
+const FACTS: { Icon: (p: IcProps) => JSX.Element; value: string; label: string; note: string }[] = [
+  { Icon: IcCalendar, value: "3", label: "anni scolastici", note: "2023 – 2026" },
+  { Icon: IcClock, value: "232 h", label: "in struttura", note: "80 + 72 + 80" },
+  { Icon: IcHourglass, value: "8 h", label: "al giorno", note: "orario d'ufficio" },
+  { Icon: IcUsers, value: "7", label: "in ufficio", note: "io compreso" },
+  { Icon: IcTree, value: "Legno", label: "il reparto", note: "ufficio tecnico" },
 ];
 
-const WORKFLOW = [
-  { Icon: Boxes, label: "Disegno 3D", sub: "AutoCAD — io" },
-  { Icon: MonitorCheck, label: "Validazione", sub: "i tecnici" },
-  { Icon: Calculator, label: "Calcolo", sub: "cadwork · RFEM" },
-  { Icon: FileText, label: "Preventivo", sub: "stampa A4" },
-  { Icon: FolderTree, label: "Archivio", sub: "A–Z, io" },
+const WORKFLOW: { Icon: (p: IcProps) => JSX.Element; label: string; sub: string }[] = [
+  { Icon: IcCube, label: "Disegno 3D", sub: "AutoCAD — io" },
+  { Icon: IcScreenCheck, label: "Validazione", sub: "i tecnici" },
+  { Icon: IcCalculator, label: "Calcolo", sub: "cadwork · RFEM" },
+  { Icon: IcFile, label: "Preventivo", sub: "stampa A4" },
+  { Icon: IcSortAz, label: "Archivio", sub: "A–Z, io" },
 ];
 
 const HOURS = [
-  { year: "a.s. 2023/24", h: "80 h", note: "ambiente lavorativo" },
-  { year: "a.s. 2024/25", h: "72 h", note: "un giorno festivo" },
-  { year: "a.s. 2025/26", h: "80 h", note: "apprendimento misto" },
+  { year: "a.s. 2023/24", h: "80 h", note: "ambiente lavorativo", pct: "100%" },
+  { year: "a.s. 2024/25", h: "72 h", note: "un giorno festivo", pct: "90%" },
+  { year: "a.s. 2025/26", h: "80 h", note: "apprendimento misto", pct: "100%" },
 ];
 
 // Foto di repertorio (Pexels, uso libero) — il legno strutturale dal vero.
@@ -156,116 +129,182 @@ const TOOLS = [
   { name: "Dlubal RFEM", who: "Software dell'azienda", desc: "Calcolo strutturale: peso specifico, vincoli e sezioni verificati secondo Eurocodice 5 e NTC 2018." },
 ];
 
+// Foto della galleria: se il file manca, la figure sparisce invece di lasciare
+// un riquadro rotto (la griglia si richiude da sola).
+function Shot({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <figure className="sb-pc-shot">
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        width={1600}
+        height={1067}
+        onError={() => setFailed(true)}
+      />
+      <figcaption>{alt}</figcaption>
+    </figure>
+  );
+}
+
+// ── Capitolo narrato: illustrazione in pannello + testo (alternati) ──────────
+function StoryRow({
+  n,
+  kicker,
+  title,
+  src,
+  alt,
+  reverse,
+  children,
+}: {
+  n: string;
+  kicker: string;
+  title: string;
+  src: string;
+  alt: string;
+  reverse?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={`sb-pc-story-row${reverse ? " sb-pc-story-row--rev" : ""}`}>
+      <div className="sb-pc-story-art">
+        <div className="sb-panel">
+          <div className="sb-panel-inner">
+            <img className="sb-pc-art-img" src={src} alt={alt} loading="lazy" width={1200} height={800} />
+          </div>
+        </div>
+      </div>
+      <div className="sb-pc-story-text">
+        <span className="sb-pc-step" aria-hidden="true" data-no-i18n>{n}</span>
+        <p className="sb-pc-kicker">{kicker}</p>
+        <h3>{title}</h3>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function Pcto() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, []);
+
   useEffect(() => {
     const prev = document.title;
     document.title = "PCTO · Caem Group — Alberto Pecchini";
     return () => { document.title = prev; };
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // Cronologico decrescente: le esperienze più recenti per prime.
   const sorted = [...PCTO].sort((a, b) => parsePeriodStart(b.period) - parsePeriodStart(a.period));
 
   return (
-    <div className="it-page-wrapper pcto-page">
-      {/* Header compatto: marchio + ritorno alla home */}
-      <header className="pcto-header">
-        <div className="container">
-          <div className="d-flex align-items-center justify-content-between py-3">
-            <Link to="/" className="pcto-brand text-decoration-none d-inline-flex align-items-center">
-              <span className="pcto-brand-mark" aria-hidden="true">
-                <img src="/favicon.svg" alt="" width={40} height={40} />
-              </span>
-              <span className="pcto-brand-text">
-                <span className="pcto-brand-title">Alberto Pecchini</span>
-                <span className="pcto-brand-tagline">Designer &amp; Front-end Developer</span>
-              </span>
-            </Link>
-            <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">
-              <ArrowLeft size={16} className="me-1" aria-hidden="true" />
-              <span>Torna alla home</span>
-            </Link>
-          </div>
+    <div className="sb-home pcto-page">
+      {/* Skiplink — requisito di accessibilità (come la home) */}
+      <div className="skiplinks">
+        <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>
+      </div>
+
+      {/* ── Nav sottile: brand + ritorno alla home ── */}
+      <header className={`sb-nav ${scrolled ? "sb-nav--scrolled" : ""}`}>
+        <div className="sb-container sb-nav-inner">
+          <Link to="/" className="sb-nav-brand">
+            <img src="/favicon.svg" alt="" width={28} height={28} />
+            <span className="sb-nav-brand-name" translate="no">Alberto Pecchini</span>
+            <span className="sb-pc-tagline">Ufficio tecnico · Reparto legno</span>
+          </Link>
+          <Link to="/" className="sb-btn sb-btn--sm sb-btn--secondary sb-pc-back">
+            <IcArrowLeft size={15} /> Torna alla home
+          </Link>
         </div>
       </header>
 
       <main id="main-content">
-        {/* Hero */}
-        <section className="pcto-hero bg-primary text-white">
-          <div className="container">
-            <div className="pcto-hero-inner">
-              <span className="pcto-hero-badge" aria-hidden="true">
-                <GraduationCap size={48} strokeWidth={1.75} />
-              </span>
-              <p className="ap-kicker text-uppercase fw-semibold mb-3">
-                Percorsi per le Competenze Trasversali e l'Orientamento
-              </p>
-              <h1 className="pcto-hero-title fw-bold">PCTO</h1>
-              <p className="pcto-hero-lead lead">
-                Tre anni di alternanza scuola-lavoro al <strong>Caem Group S.p.A.</strong> di
-                Castellucchio, nell'<strong>ufficio tecnico del reparto legno</strong>: dal disegno
-                in AutoCAD delle tettoie al calcolo delle strutture, fino all'archivio dei preventivi.
-                Il racconto del mio percorso CAT messo alla prova sul campo.
-              </p>
-              <p className="pcto-hero-location d-inline-flex align-items-center mb-0">
-                <MapPin size={18} className="me-2" aria-hidden="true" />
-                Via Leonardi Accordi 39, Castellucchio (MN)
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Esperienze PCTO */}
-        <section className="py-5 my-lg-4 bg-white">
-          <div className="container">
-            <div className="mb-5">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                01 — Esperienze
-              </p>
-              <h2 className="display-5 fw-bold mb-0">Le tre sessioni al Caem Group</h2>
-            </div>
-            <div className="row">
-              <div className="col-lg-9">
-                <div className="ap-timeline">
-                  {sorted.map((item) => (
-                    <div className="ap-timeline-item" key={`${item.ente}-${item.period}`}>
-                      <span className="ap-timeline-period">{item.period}</span>
-                      <h3 className="h5 fw-bold mb-1 d-flex align-items-center">
-                        <Building2 size={18} className="me-2 text-primary" aria-hidden="true" />
-                        {item.ente}
-                      </h3>
-                      <p className="fw-semibold text-primary mb-2">{item.role}</p>
-                      {item.hours && (
-                        <p className="text-muted small mb-2 d-inline-flex align-items-center">
-                          <Clock size={14} className="me-1" aria-hidden="true" /> {item.hours}
-                        </p>
-                      )}
-                      <p className="text-muted mb-3">{item.desc}</p>
-                      <div className="d-flex flex-wrap gap-2">
-                        {item.skills.map((s) => (
-                          <span key={s} className="chip chip-simple chip-primary">
-                            <span className="chip-label">{s}</span>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+        {/* ① Hero — sigla a sinistra, racconto a destra (come la home) */}
+        <section className="sb-hero" aria-labelledby="pcto-hero-title">
+          <div className="sb-container">
+            <div className="sb-hero-grid">
+              <div>
+                <p className="sb-pc-eyebrow">Percorsi per le Competenze Trasversali e l'Orientamento</p>
+                <h1 className="sb-hero-title" id="pcto-hero-title">
+                  <span translate="no">PCTO</span>
+                  <span className="sb-brandline" translate="no">Caem Group S.p.A.</span>
+                </h1>
+              </div>
+              <div className="sb-hero-copy">
+                <p>
+                  Tre anni di alternanza scuola-lavoro al <strong translate="no">Caem Group S.p.A.</strong> di
+                  Castellucchio, nell'<strong>ufficio tecnico del reparto legno</strong>: dal disegno
+                  in AutoCAD delle tettoie al calcolo delle strutture, fino all'archivio dei preventivi.
+                  Il racconto del mio percorso CAT messo alla prova sul campo.
+                </p>
+                <p className="sb-pc-place">
+                  <IcPin size={15} />
+                  <span translate="no">Via Leonardi Accordi 39, Castellucchio (MN)</span>
+                </p>
               </div>
             </div>
+            <div className="sb-hero-actions">
+              <a href="#esperienze" className="sb-btn sb-btn--primary">Le tre sessioni</a>
+              <a href="#storia" className="sb-btn sb-btn--secondary">Il racconto</a>
+            </div>
           </div>
         </section>
 
-        {/* La storia — presentazione narrata */}
-        <section className="py-5 my-lg-4 bg-light">
-          <div className="container">
-            <div className="mb-4">
-              <p className="ap-kicker text-primary text-uppercase fw-semibold mb-3">
-                02 — La mia storia
-              </p>
-              <h2 className="display-5 fw-bold mb-3">Dal disegno alla trave</h2>
-              <p className="lead text-muted mb-0" style={{ maxWidth: "52rem" }}>
-                Ho svolto il PCTO al <strong>Caem Group</strong>, gruppo nato dalla fusione dei
+        {/* ② Le tre sessioni — una card a bordo-gradiente per anno scolastico */}
+        <section id="esperienze" className="sb-section" aria-labelledby="pcto-esperienze-h">
+          <div className="sb-container">
+            <div className="sb-pc-sechead">
+              <span className="sb-pc-overline">01 — Esperienze</span>
+              <h2 id="pcto-esperienze-h">Le tre sessioni al Caem Group</h2>
+            </div>
+            <div className="sb-pc-sessions">
+              {sorted.map((item) => (
+                <article className="sb-panel sb-panel--hover" key={`${item.ente}-${item.period}`}>
+                  <div className="sb-panel-inner sb-pc-session">
+                    <span className="sb-pc-period">{item.period}</span>
+                    <div className="sb-pc-ente">
+                      <IcBuilding size={17} />
+                      <h3 translate="no">{item.ente}</h3>
+                    </div>
+                    <p className="sb-pc-role">{item.role}</p>
+                    {item.hours && (
+                      <p className="sb-pc-hourline">
+                        <IcClock size={14} /> {item.hours}
+                      </p>
+                    )}
+                    <p className="sb-pc-desc">{item.desc}</p>
+                    <div className="sb-pc-skills">
+                      {item.skills.map((s) => (
+                        <span className="sb-chip" key={s}>{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ③ La mia storia — apertura del racconto */}
+        <section id="storia" className="sb-section" aria-labelledby="pcto-storia-h">
+          <div className="sb-container">
+            <div className="sb-pc-sechead">
+              <span className="sb-pc-overline">02 — La mia storia</span>
+              <h2 id="pcto-storia-h">Dal disegno alla trave</h2>
+              <p className="sb-pc-lead">
+                Ho svolto il PCTO al <strong translate="no">Caem Group</strong>, gruppo nato dalla fusione dei
                 principali rivenditori edili mantovani. Mi hanno assegnato all'<strong>ufficio
                 tecnico del reparto legno</strong>, dove si progettano coperture e strutture
                 eco-compatibili — dal lamellare all'X-LAM, fino alle piccole tettoie. Eravamo in
@@ -275,56 +314,69 @@ export default function Pcto() {
             </div>
 
             {/* Numeri chiave */}
-            <div className="pcto-facts">
+            <div className="sb-pc-facts">
               {FACTS.map(({ Icon, value, label, note }) => (
-                <div className="pcto-fact" key={label}>
-                  <span className="pcto-fact-icon" aria-hidden="true"><Icon size={22} /></span>
-                  <span className="pcto-fact-value">{value}</span>
-                  <span className="pcto-fact-label">{label}</span>
-                  <span className="pcto-fact-note">{note}</span>
+                <div className="sb-panel" key={label}>
+                  <div className="sb-panel-inner sb-pc-fact">
+                    <span className="sb-pc-fact-icon" aria-hidden="true"><Icon size={18} /></span>
+                    <span className="sb-pc-fact-value">{value}</span>
+                    <span className="sb-pc-fact-label">{label}</span>
+                    <span className="sb-pc-fact-note">{note}</span>
+                  </div>
                 </div>
               ))}
             </div>
+          </div>
+        </section>
 
-            {/* Il legno, dal vero — galleria di foto reali */}
-            <div className="pcto-gallery-wrap">
-              <p className="pcto-flow-title">
-                <Images size={18} className="me-2" aria-hidden="true" /> Il legno, dal vero
-              </p>
-              <div className="pcto-gallery">
-                {GALLERY.map((g) => (
-                  <figure className="pcto-shot" key={g.src}>
-                    <img src={g.src} alt={g.cap} loading="lazy" width={1600} height={1067} />
-                    <figcaption>{g.cap}</figcaption>
-                  </figure>
-                ))}
-              </div>
-              <p className="pcto-gallery-credit">Immagini di repertorio · Pexels (uso libero)</p>
+        {/* ④ Il legno, dal vero — galleria di foto reali */}
+        <section className="sb-section sb-pc-tight" aria-labelledby="pcto-legno-h">
+          <div className="sb-container">
+            <h3 className="sb-pc-blockhead" id="pcto-legno-h"><IcImage size={17} /> Il legno, dal vero</h3>
+            <div className="sb-pc-gallery">
+              {GALLERY.map((g) => (
+                <Shot key={g.src} src={g.src} alt={g.cap} />
+              ))}
             </div>
+            <p className="sb-pc-credit">Immagini di repertorio · Pexels (uso libero)</p>
+          </div>
+        </section>
 
-            {/* Il flusso di lavoro */}
-            <div className="pcto-flow-wrap">
-              <p className="pcto-flow-title">Il flusso di lavoro, in cinque passi</p>
-              <div className="pcto-flow">
-                {WORKFLOW.map(({ Icon, label, sub }, i) => (
-                  <div className="pcto-flow-step" key={label}>
-                    <div className="pcto-flow-card">
-                      <span className="pcto-flow-icon" aria-hidden="true"><Icon size={24} /></span>
-                      <span className="pcto-flow-label">{label}</span>
-                      <span className="pcto-flow-sub">{sub}</span>
+        {/* ⑤ Il flusso di lavoro */}
+        <section className="sb-section sb-pc-tight" aria-labelledby="pcto-flusso-h">
+          <div className="sb-container">
+            <h3 className="sb-pc-blockhead" id="pcto-flusso-h">Il flusso di lavoro, in cinque passi</h3>
+            <div className="sb-pc-flow">
+              {WORKFLOW.map(({ Icon, label, sub }, i) => (
+                <div className="sb-pc-flow-step" key={label}>
+                  <div className="sb-panel">
+                    <div className="sb-panel-inner sb-pc-flow-card">
+                      <span className="sb-pc-flow-icon" aria-hidden="true"><Icon size={20} /></span>
+                      <span className="sb-pc-flow-label">{label}</span>
+                      <span className="sb-pc-flow-sub">{sub}</span>
                     </div>
-                    {i < WORKFLOW.length - 1 && (
-                      <ChevronRight className="pcto-flow-arrow" size={22} aria-hidden="true" />
-                    )}
                   </div>
-                ))}
-              </div>
+                  {i < WORKFLOW.length - 1 && (
+                    <IcChevronRight size={18} className="sb-pc-flow-arrow" />
+                  )}
+                </div>
+              ))}
             </div>
+          </div>
+        </section>
 
-            {/* Capitoli narrati */}
-            <div className="pcto-story">
-              <StoryRow n="①" kicker="Il reparto legno" title="Il mondo in cui sono entrato" art={<img className="pcto-art-img" src="/images/pcto-ill-tettoia.jpg" alt="Illustrazione in stile Unica: Alberto osserva una tettoia in legno" loading="lazy" width={1200} height={800} />}>
-                <p className="text-muted">
+        {/* ⑥ Capitoli narrati */}
+        <section className="sb-section sb-pc-tight" aria-label="Il racconto del percorso">
+          <div className="sb-container">
+            <div className="sb-pc-story">
+              <StoryRow
+                n="01"
+                kicker="Il reparto legno"
+                title="Il mondo in cui sono entrato"
+                src="/images/pcto-ill-tettoia.jpg"
+                alt="Illustrazione in stile Unica: Alberto osserva una tettoia in legno"
+              >
+                <p>
                   Il reparto legno del Caem progetta e fornisce strutture eco-compatibili: travi e
                   travetti in legno lamellare, coperture, solai in X-LAM. Il prodotto che ho imparato
                   a conoscere meglio è la <strong>tettoia</strong> — un sistema apparentemente
@@ -333,18 +385,31 @@ export default function Pcto() {
                 </p>
               </StoryRow>
 
-              <StoryRow n="②" kicker="Il mio strumento" title="Modellare in 3D con AutoCAD" art={<img className="pcto-art-img" src="/images/pcto-ill-autocad.jpg" alt="Illustrazione in stile Unica: Alberto modella una tettoia 3D in AutoCAD" loading="lazy" width={1200} height={800} />} reverse>
-                <p className="text-muted">
+              <StoryRow
+                n="02"
+                kicker="Il mio strumento"
+                title="Modellare in 3D con AutoCAD"
+                src="/images/pcto-ill-autocad.jpg"
+                alt="Illustrazione in stile Unica: Alberto modella una tettoia 3D in AutoCAD"
+                reverse
+              >
+                <p>
                   I programmi professionali dell'azienda erano molto complessi, così usavo quello che
-                  padroneggiavo: <strong>AutoCAD</strong>. Modellavo in <strong>3D</strong> piccole
+                  padroneggiavo: <strong translate="no">AutoCAD</strong>. Modellavo in <strong>3D</strong> piccole
                   tettoie in legno lavorando con i <strong>poligoni</strong>, con le competenze di
                   disegno tecnico imparate in terza superiore. Partivo da un wireframe — i vertici, gli
                   assi X-Y-Z — e arrivavo al volume della struttura.
                 </p>
               </StoryRow>
 
-              <StoryRow n="③" kicker="Il vocabolario del legno" title="Travi e travetti" art={<img className="pcto-art-img" src="/images/pcto-ill-travi.jpg" alt="Illustrazione in stile Unica: Alberto misura una trave accanto a un travetto" loading="lazy" width={1200} height={800} />}>
-                <p className="text-muted">
+              <StoryRow
+                n="03"
+                kicker="Il vocabolario del legno"
+                title="Travi e travetti"
+                src="/images/pcto-ill-travi.jpg"
+                alt="Illustrazione in stile Unica: Alberto misura una trave accanto a un travetto"
+              >
+                <p>
                   Ho imparato il linguaggio del legno strutturale: la <strong>trave</strong>,
                   l'elemento portante principale, e il <strong>travetto</strong>, l'orditura secondaria
                   che la affianca e regge il manto. Cambiano sezione, luce e funzione — e ogni scelta
@@ -352,11 +417,18 @@ export default function Pcto() {
                 </p>
               </StoryRow>
 
-              <StoryRow n="④" kicker="Dal disegno al calcolo" title="Quando la struttura diventa reale" art={<img className="pcto-art-img" src="/images/pcto-ill-nodi.jpg" alt="Illustrazione in stile Unica: i nodi strutturali — connessione rigida, cerniera, appoggio su fondazione" loading="lazy" width={1200} height={800} />} reverse>
-                <p className="text-muted">
+              <StoryRow
+                n="04"
+                kicker="Dal disegno al calcolo"
+                title="Quando la struttura diventa reale"
+                src="/images/pcto-ill-nodi.jpg"
+                alt="Illustrazione in stile Unica: i nodi strutturali — connessione rigida, cerniera, appoggio su fondazione"
+                reverse
+              >
+                <p>
                   Quando finivo un disegno, i tecnici lo <strong>valutavano</strong> e mi dicevano se
                   la struttura era realizzabile. Poi lo importavano nel software di carpenteria
-                  <strong> cadwork</strong> e ne verificavano la tenuta con <strong>Dlubal RFEM</strong>:
+                  <strong translate="no"> cadwork</strong> e ne verificavano la tenuta con <strong translate="no">Dlubal RFEM</strong>:
                   inserivano il <strong>peso specifico del legno</strong>, le sezioni e i vincoli, e
                   controllavano i calcoli secondo l'<strong>Eurocodice 5</strong> e le NTC 2018. Il cuore
                   erano i <strong>collegamenti</strong>: un <strong>incastro</strong> irrigidisce il nodo
@@ -366,8 +438,14 @@ export default function Pcto() {
                 </p>
               </StoryRow>
 
-              <StoryRow n="⑤" kicker="Osservare e ascoltare" title="I preventivi, in diretta" art={<img className="pcto-art-img" src="/images/pcto-ill-preventivi.jpg" alt="Illustrazione in stile Unica: stesura di un preventivo in diretta col cliente" loading="lazy" width={1200} height={800} />}>
-                <p className="text-muted">
+              <StoryRow
+                n="05"
+                kicker="Osservare e ascoltare"
+                title="I preventivi, in diretta"
+                src="/images/pcto-ill-preventivi.jpg"
+                alt="Illustrazione in stile Unica: stesura di un preventivo in diretta col cliente"
+              >
+                <p>
                   La parte che mi ha insegnato di più è stata <strong>osservare</strong>. Assistevo alla
                   stesura dei <strong>preventivi</strong>: ascoltavo le richieste del cliente in diretta
                   mentre i tecnici modificavano il progetto al computer, in tempo reale. Capire come una
@@ -376,8 +454,15 @@ export default function Pcto() {
                 </p>
               </StoryRow>
 
-              <StoryRow n="⑥" kicker="Il mio compito" title="Dare ordine: stampa e archivio" art={<img className="pcto-art-img" src="/images/pcto-ill-archivio.jpg" alt="Illustrazione in stile Unica: Alberto archivia un preventivo stampato in ordine alfabetico" loading="lazy" width={1200} height={800} />} reverse>
-                <p className="text-muted">
+              <StoryRow
+                n="06"
+                kicker="Il mio compito"
+                title="Dare ordine: stampa e archivio"
+                src="/images/pcto-ill-archivio.jpg"
+                alt="Illustrazione in stile Unica: Alberto archivia un preventivo stampato in ordine alfabetico"
+                reverse
+              >
+                <p>
                   Il mio compito operativo era l'<strong>ordine</strong>. Stampavo i preventivi in
                   <strong> A4</strong> e li archiviavo nell'area corretta, in ordine
                   <strong> alfabetico e cronologico</strong>, pronti per quando — nei giorni successivi —
@@ -386,8 +471,14 @@ export default function Pcto() {
                 </p>
               </StoryRow>
 
-              <StoryRow n="⑦" kicker="Oltre l'ufficio" title="Il magazzino dei legni" art={<img className="pcto-art-img" src="/images/pcto-ill-magazzino.jpg" alt="Illustrazione in stile Unica: Alberto fotografa le cataste di legname in magazzino" loading="lazy" width={1200} height={800} />}>
-                <p className="text-muted">
+              <StoryRow
+                n="07"
+                kicker="Oltre l'ufficio"
+                title="Il magazzino dei legni"
+                src="/images/pcto-ill-magazzino.jpg"
+                alt="Illustrazione in stile Unica: Alberto fotografa le cataste di legname in magazzino"
+              >
+                <p>
                   Ogni tanto lasciavo la scrivania per il <strong>magazzino dei legni</strong>, dove
                   travi e travetti venivano preparati. Vedere il materiale reale dietro al disegno — la
                   sezione, la fibra, il peso — mi ha fatto capire cosa significhi davvero ogni linea
@@ -395,8 +486,15 @@ export default function Pcto() {
                 </p>
               </StoryRow>
 
-              <StoryRow n="⑧" kicker="Sette scrivanie" title="L'ufficio tecnico" art={<img className="pcto-art-img" src="/images/pcto-ill-ufficio.jpg" alt="Illustrazione in stile Unica: l'ufficio tecnico con sette scrivanie e i colleghi" loading="lazy" width={1200} height={800} />} reverse>
-                <p className="text-muted">
+              <StoryRow
+                n="08"
+                kicker="Sette scrivanie"
+                title="L'ufficio tecnico"
+                src="/images/pcto-ill-ufficio.jpg"
+                alt="Illustrazione in stile Unica: l'ufficio tecnico con sette scrivanie e i colleghi"
+                reverse
+              >
+                <p>
                   In ufficio eravamo in <strong>sette</strong>, me compreso. Molti andavano e venivano
                   dal magazzino o dai cantieri, anche lontani: l'ufficio era il punto fermo dove il
                   progetto prendeva forma prima di partire. Stare in mezzo a quel ritmo, da studente,
@@ -404,527 +502,91 @@ export default function Pcto() {
                 </p>
               </StoryRow>
             </div>
+          </div>
+        </section>
 
-            {/* Gli strumenti */}
-            <div className="pcto-tools-wrap">
-              <p className="pcto-flow-title"><PencilRuler size={18} className="me-2" aria-hidden="true" />Gli strumenti</p>
-              <div className="row g-3">
-                {TOOLS.map((t) => (
-                  <div className="col-md-4" key={t.name}>
-                    <div className="pcto-tool-card h-100">
-                      <span className="pcto-tool-name">{t.name}</span>
-                      <span className="pcto-tool-who">{t.who}</span>
-                      <p className="pcto-tool-desc mb-0">{t.desc}</p>
-                    </div>
+        {/* ⑦ Gli strumenti */}
+        <section className="sb-section sb-pc-tight" aria-labelledby="pcto-strumenti-h">
+          <div className="sb-container">
+            <h3 className="sb-pc-blockhead" id="pcto-strumenti-h"><IcRuler size={17} /> Gli strumenti</h3>
+            <div className="sb-pc-tools">
+              {TOOLS.map((t) => (
+                <div className="sb-panel" key={t.name}>
+                  <div className="sb-panel-inner sb-pc-tool">
+                    <span className="sb-pc-tool-who">{t.who}</span>
+                    <span className="sb-pc-tool-name" translate="no">{t.name}</span>
+                    <p className="sb-pc-tool-desc">{t.desc}</p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Riepilogo ore */}
-            <div className="pcto-hours-wrap">
-              <p className="pcto-flow-title">Le ore in struttura</p>
-              <div className="pcto-hours">
-                {HOURS.map((h) => (
-                  <div className="pcto-hours-row" key={h.year}>
-                    <span className="pcto-hours-year">{h.year}</span>
-                    <span className="pcto-hours-bar" aria-hidden="true">
-                      <span className="pcto-hours-fill" style={{ width: h.h === "72 h" ? "90%" : "100%" }} />
-                    </span>
-                    <span className="pcto-hours-h">{h.h}</span>
-                    <span className="pcto-hours-note">{h.note}</span>
-                  </div>
-                ))}
-                <div className="pcto-hours-row pcto-hours-row--total">
-                  <span className="pcto-hours-year">Totale</span>
-                  <span className="pcto-hours-bar" aria-hidden="true" />
-                  <span className="pcto-hours-h">232 h</span>
-                  <span className="pcto-hours-note">presso il Caem Group</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Chiusura */}
-            <div className="pcto-closing">
-              <h3 className="h2 fw-bold mb-3">Perché mi sono divertito</h3>
-              <p className="mb-0">
-                Nel legno ho ritrovato lo stesso processo che amo nel <strong>web design</strong>:
-                ascoltare un cliente, trasformare la sua idea in un progetto, iterarlo e consegnarlo
-                curato fino all'ultimo dettaglio. Cambia il materiale — travi invece di pixel — ma il
-                metodo è lo stesso: <strong>disegno, precisione e ordine</strong>. È questo che mi
-                porto a casa da tre anni al Caem Group.
-              </p>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Banner full-width: tutto il team davanti alla sede Caem */}
-        <section className="pcto-team-banner" aria-label="Il team del Caem Group davanti alla sede">
+        {/* ⑧ Le ore in struttura */}
+        <section className="sb-section sb-pc-tight" aria-labelledby="pcto-ore-h">
+          <div className="sb-container">
+            <h3 className="sb-pc-blockhead" id="pcto-ore-h">Le ore in struttura</h3>
+            <div className="sb-panel">
+              <div className="sb-panel-inner sb-pc-hours">
+                {HOURS.map((h) => (
+                  <div className="sb-pc-hours-row" key={h.year}>
+                    <span className="sb-pc-hours-year">{h.year}</span>
+                    <span className="sb-pc-hours-bar" aria-hidden="true">
+                      <span className="sb-pc-hours-fill" style={{ width: h.pct }} />
+                    </span>
+                    <span className="sb-pc-hours-h">{h.h}</span>
+                    <span className="sb-pc-hours-note">{h.note}</span>
+                  </div>
+                ))}
+                <div className="sb-pc-hours-row sb-pc-hours-row--total">
+                  <span className="sb-pc-hours-year">Totale</span>
+                  <span className="sb-pc-hours-bar" aria-hidden="true" />
+                  <span className="sb-pc-hours-h">232 h</span>
+                  <span className="sb-pc-hours-note">presso il Caem Group</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ⑨ Chiusura */}
+        <section className="sb-section sb-pc-tight" aria-labelledby="pcto-chiusura-h">
+          <div className="sb-container">
+            <div className="sb-panel sb-pc-closing">
+              <div className="sb-panel-inner">
+                <h3 id="pcto-chiusura-h">Perché mi sono divertito</h3>
+                <p>
+                  Nel legno ho ritrovato lo stesso processo che amo nel <strong>web design</strong>:
+                  ascoltare un cliente, trasformare la sua idea in un progetto, iterarlo e consegnarlo
+                  curato fino all'ultimo dettaglio. Cambia il materiale — travi invece di pixel — ma il
+                  metodo è lo stesso: <strong>disegno, precisione e ordine</strong>. È questo che mi
+                  porto a casa da tre anni al Caem Group.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ⑩ Banner full-width: tutto il team davanti alla sede Caem */}
+        <section className="sb-pc-banner" aria-label="Il team del Caem Group davanti alla sede">
           <img
             src="/images/pcto-team-banner.jpg"
             alt="Illustrazione del team dell'ufficio tecnico Caem Group davanti alla sede di Castellucchio"
             loading="lazy"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
-          <div className="pcto-team-scrim" aria-hidden="true" />
-          <div className="pcto-team-overlay">
-            <div className="container">
-              <p className="pcto-team-kicker">Caem Group S.p.A. · Castellucchio (MN)</p>
-              <h2 className="pcto-team-title">Tutto il team, davanti all'azienda</h2>
+          <div className="sb-pc-banner-scrim" aria-hidden="true" />
+          <div className="sb-pc-banner-overlay">
+            <div className="sb-container">
+              <p className="sb-pc-banner-kicker" translate="no">Caem Group S.p.A. · Castellucchio (MN)</p>
+              <h2 className="sb-pc-banner-title">Tutto il team, davanti all'azienda</h2>
             </div>
           </div>
         </section>
       </main>
 
       <SiteFooter />
-
-      <style>{`
-        /* ── Look "dark premium" viola — identico al gioco Trivia ─────────────
-           Sfondo scuro, superfici "vetro" e accento viola/indaco neon (#e95420).
-           Stesse token del motore giochi (src/app/_game/ui/tokens.ts). */
-        .pcto-page {
-          --accent: #e95420;        /* viola/indaco neon */
-          --accent-2: #c2410c;      /* viola pieno */
-          --accent-3: #f39a76;      /* viola chiaro */
-          --accent-deep: #bc3d10;   /* viola profondo */
-          --accent-ink: #f6a583;    /* viola tenue su scuro */
-          --glow: rgba(233, 84, 32, 0.45);
-          --vbord: rgba(233, 84, 32, 0.34);
-          --bg0: #1d171b;
-          --bg1: #241c22;
-          --bg2: #1b151a;
-          --text: #f5f3f1;
-          --sub: #b3aca6;
-          --note: #6b7785;
-          --glass: rgba(255, 255, 255, 0.05);
-          --glass-2: rgba(255, 255, 255, 0.08);
-          --glass-bd: rgba(255, 255, 255, 0.11);
-          --bs-primary: #e95420;
-          --bs-primary-rgb: 139, 123, 255;
-          min-height: 100vh;
-          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
-          color: var(--text);
-        }
-        /* Canvas scuro continuo con alone viola in alto (come la hero del Trivia).
-           Compound .it-page-wrapper.pcto-page per battere il bianco globale. */
-        .it-page-wrapper.pcto-page {
-          background:
-            radial-gradient(120% 55% at 50% -8%, rgba(233, 84, 32, 0.20) 0%, transparent 55%),
-            linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
-          background-color: var(--bg0);
-        }
-        /* Override Bootstrap Italia → dark premium (specificità (0,3,0) per vincere) */
-        .it-page-wrapper.pcto-page .bg-primary,
-        .it-page-wrapper.pcto-page .bg-white,
-        .it-page-wrapper.pcto-page .bg-light { background-color: transparent !important; }
-        .it-page-wrapper.pcto-page .text-primary { color: var(--accent) !important; }
-        .it-page-wrapper.pcto-page .text-muted { color: var(--sub) !important; }
-        .it-page-wrapper.pcto-page .text-white { color: var(--text) !important; }
-        .pcto-page strong { color: #f4f1ff; }
-        .pcto-page .btn-outline-light {
-          color: var(--text);
-          border-color: var(--glass-bd);
-        }
-        .it-page-wrapper.pcto-page .btn-outline-light:hover,
-        .it-page-wrapper.pcto-page .btn-outline-light:focus {
-          background-color: var(--accent) !important;
-          border-color: var(--accent) !important;
-          color: #ffffff !important;
-        }
-        .it-page-wrapper.pcto-page .chip-primary,
-        .it-page-wrapper.pcto-page .chip.chip-simple.chip-primary {
-          background-color: rgba(233, 84, 32, 0.12) !important;
-          color: var(--accent) !important;
-          border-color: var(--vbord) !important;
-        }
-        .it-page-wrapper.pcto-page .chip-primary .chip-label { color: var(--accent) !important; }
-
-        /* Header — barra "vetro" scura, sticky */
-        .pcto-header {
-          background: rgba(28, 22, 27, 0.72);
-          backdrop-filter: blur(14px) saturate(120%);
-          -webkit-backdrop-filter: blur(14px) saturate(120%);
-          border-bottom: 1px solid var(--glass-bd);
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
-        .pcto-brand-mark {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 40px;
-          height: 40px;
-          border-radius: 8px;
-          overflow: hidden;
-          margin-right: 12px;
-        }
-        .pcto-brand-mark img { width: 100%; height: 100%; display: block; }
-        .pcto-brand-text { display: inline-flex; flex-direction: column; line-height: 1.2; }
-        .pcto-brand-title { color: #ffffff; font-weight: 700; font-size: 1.05rem; }
-        .pcto-brand-tagline { color: rgba(255, 255, 255, 0.7); font-size: 0.78rem; }
-        @media (max-width: 575.98px) { .pcto-brand-tagline { display: none; } }
-
-        /* Hero — canvas scuro con aloni viola (come la hero del Trivia) */
-        .pcto-hero {
-          position: relative;
-          overflow: hidden;
-          padding: clamp(3.5rem, 8vw, 6.5rem) 0;
-          background-image:
-            radial-gradient(80% 120% at 12% -10%, rgba(233, 84, 32, 0.30) 0%, transparent 55%),
-            radial-gradient(70% 120% at 100% 110%, rgba(194, 65, 12, 0.26) 0%, transparent 55%),
-            linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
-          border-bottom: 1px solid var(--glass-bd);
-        }
-        .pcto-hero > .container { position: relative; z-index: 1; }
-        .pcto-hero-inner { max-width: 50rem; }
-        .pcto-hero-badge {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 92px;
-          height: 92px;
-          border-radius: 22px;
-          background: linear-gradient(140deg, var(--accent) 0%, var(--accent-deep) 130%);
-          border: 1px solid rgba(255, 255, 255, 0.22);
-          color: #ffffff;
-          margin-bottom: 1.75rem;
-          box-shadow: 0 12px 40px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-        .pcto-hero-title {
-          font-size: clamp(3.5rem, 9vw, 5.75rem);
-          line-height: 1.02;
-          letter-spacing: -0.02em;
-          margin-bottom: 1.25rem;
-        }
-        .pcto-hero-lead {
-          color: rgba(255, 255, 255, 0.9);
-          font-size: 1.2rem;
-          max-width: 46rem;
-          margin-bottom: 1.75rem;
-        }
-        .pcto-hero-location { opacity: 0.85; }
-        .ap-kicker { letter-spacing: 0.18em; font-size: 0.875rem; }
-
-        @media (max-width: 575.98px) {
-          .pcto-hero-badge { width: 72px; height: 72px; border-radius: 18px; }
-          .pcto-hero-badge svg { width: 38px; height: 38px; }
-          .pcto-hero-lead { font-size: 1.05rem; }
-        }
-
-        /* Timeline (come il curriculum della home) */
-        .ap-timeline { position: relative; padding-left: 2rem; }
-        .ap-timeline::before {
-          content: "";
-          position: absolute;
-          left: 7px; top: 6px; bottom: 6px;
-          width: 2px;
-          background: linear-gradient(180deg, var(--vbord), rgba(233, 84, 32, 0.10));
-        }
-        .ap-timeline-item { position: relative; padding-bottom: 2rem; }
-        .ap-timeline-item:last-child { padding-bottom: 0; }
-        .ap-timeline-item::before {
-          content: "";
-          position: absolute;
-          left: -2rem; top: 4px;
-          width: 16px; height: 16px;
-          border-radius: 50%;
-          background: var(--accent);
-          border: 3px solid var(--bg0);
-          box-shadow: 0 0 0 2px var(--vbord), 0 0 14px var(--glow);
-        }
-        .ap-timeline-period {
-          display: inline-block;
-          font-size: 0.8rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--accent);
-          margin-bottom: 0.25rem;
-        }
-
-        /* Numeri chiave */
-        .pcto-facts {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 1rem;
-          margin: 2.5rem 0 3rem;
-        }
-        .pcto-fact {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 0.15rem;
-          padding: 1.25rem 0.75rem;
-          background: var(--glass);
-          border: 1px solid var(--glass-bd);
-          border-radius: 14px;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.30);
-        }
-        .pcto-fact-icon {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 46px; height: 46px;
-          border-radius: 12px;
-          background: rgba(233, 84, 32, 0.14);
-          border: 1px solid var(--vbord);
-          color: var(--accent);
-          margin-bottom: 0.4rem;
-        }
-        .pcto-fact-value { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1.1; }
-        .pcto-fact-label { font-size: 0.9rem; font-weight: 700; color: var(--accent); }
-        .pcto-fact-note { font-size: 0.78rem; color: var(--note); }
-        @media (max-width: 767.98px) {
-          .pcto-facts { grid-template-columns: repeat(2, 1fr); }
-          .pcto-fact:last-child { grid-column: 1 / -1; }
-        }
-
-        /* Galleria "Il legno, dal vero" */
-        .pcto-gallery-wrap { margin-bottom: 3.5rem; }
-        .pcto-gallery {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 1rem;
-        }
-        .pcto-shot {
-          position: relative;
-          margin: 0;
-          border-radius: 14px;
-          overflow: hidden;
-          aspect-ratio: 3 / 2;
-          border: 1px solid var(--glass-bd);
-          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.40);
-        }
-        .pcto-shot img {
-          width: 100%; height: 100%;
-          object-fit: cover; display: block;
-          transition: transform 0.45s ease;
-        }
-        .pcto-shot:hover img { transform: scale(1.05); }
-        .pcto-shot figcaption {
-          position: absolute;
-          left: 0; right: 0; bottom: 0;
-          padding: 1.6rem 0.85rem 0.6rem;
-          font-size: 0.82rem; font-weight: 700; color: #ffffff;
-          background: linear-gradient(to top, rgba(28, 22, 27, 0.92), rgba(28, 22, 27, 0));
-        }
-        .pcto-gallery-credit { margin-top: 0.6rem; font-size: 0.76rem; color: var(--note); }
-        @media (max-width: 767.98px) {
-          .pcto-gallery { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-        }
-
-        /* Flusso di lavoro */
-        .pcto-flow-wrap { margin-bottom: 3.5rem; }
-        .pcto-flow-title {
-          display: flex; align-items: center;
-          font-weight: 800; color: var(--text);
-          font-size: 1.05rem; margin-bottom: 1rem;
-        }
-        .pcto-flow-title svg { color: var(--accent); }
-        .pcto-flow {
-          display: flex;
-          align-items: stretch;
-          flex-wrap: wrap;
-          gap: 0.25rem;
-        }
-        .pcto-flow-step { display: flex; align-items: center; flex: 1 1 0; min-width: 130px; }
-        .pcto-flow-card {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 0.2rem;
-          padding: 1rem 0.5rem;
-          background: var(--glass);
-          border: 1px solid var(--glass-bd);
-          border-radius: 14px;
-          height: 100%;
-        }
-        .pcto-flow-icon {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 48px; height: 48px;
-          border-radius: 50%;
-          background: rgba(233, 84, 32, 0.14);
-          border: 1px solid var(--vbord);
-          color: var(--accent);
-          margin-bottom: 0.35rem;
-        }
-        .pcto-flow-label { font-weight: 700; color: var(--text); font-size: 0.95rem; }
-        .pcto-flow-sub { font-size: 0.76rem; color: var(--note); }
-        .pcto-flow-arrow { color: rgba(233, 84, 32, 0.60); flex-shrink: 0; margin: 0 0.1rem; }
-        @media (max-width: 767.98px) {
-          .pcto-flow { flex-direction: column; }
-          .pcto-flow-step { width: 100%; flex-direction: column; }
-          .pcto-flow-arrow { transform: rotate(90deg); margin: 0.25rem 0; }
-        }
-
-        /* Capitoli narrati */
-        .pcto-story { display: flex; flex-direction: column; gap: 2.75rem; }
-        .pcto-story-row {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          gap: 2.5rem;
-          align-items: center;
-        }
-        .pcto-story-row--rev .pcto-story-art { order: 2; }
-        .pcto-art-frame {
-          border: 1px solid var(--glass-bd);
-          border-radius: 18px;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.40);
-        }
-        .pcto-art-img {
-          width: 100%;
-          aspect-ratio: 3 / 2;
-          object-fit: cover;
-          display: block;
-        }
-        .pcto-story-step {
-          display: inline-flex;
-          align-items: center; justify-content: center;
-          width: 38px; height: 38px;
-          border-radius: 50%;
-          background: rgba(233, 84, 32, 0.14);
-          border: 1px solid var(--vbord);
-          color: var(--accent);
-          font-size: 1.2rem; font-weight: 800;
-          margin-bottom: 0.75rem;
-        }
-        .pcto-story-text .text-muted { font-size: 1.05rem; line-height: 1.7; }
-        @media (max-width: 767.98px) {
-          .pcto-story-row { grid-template-columns: 1fr; gap: 1.25rem; }
-          .pcto-story-row--rev .pcto-story-art { order: 0; }
-        }
-
-        /* Strumenti */
-        .pcto-tools-wrap { margin-top: 3.5rem; }
-        .pcto-tool-card {
-          display: flex; flex-direction: column;
-          padding: 1.25rem;
-          background: var(--glass);
-          border: 1px solid var(--glass-bd);
-          border-left: 4px solid var(--accent);
-          border-radius: 12px;
-        }
-        .pcto-tool-name { font-weight: 800; font-size: 1.15rem; color: var(--text); }
-        .pcto-tool-who {
-          font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
-          font-weight: 700; color: var(--accent); margin-bottom: 0.5rem;
-        }
-        .pcto-tool-desc { font-size: 0.92rem; color: var(--sub); line-height: 1.55; }
-
-        /* Ore in struttura */
-        .pcto-hours-wrap { margin-top: 3.5rem; }
-        .pcto-hours {
-          background: var(--glass);
-          border: 1px solid var(--glass-bd);
-          border-radius: 14px;
-          padding: 1.25rem 1.5rem;
-        }
-        .pcto-hours-row {
-          display: grid;
-          grid-template-columns: 130px 1fr auto 160px;
-          align-items: center;
-          gap: 1rem;
-          padding: 0.6rem 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .pcto-hours-row:last-child { border-bottom: none; }
-        .pcto-hours-row--total { font-weight: 800; }
-        .pcto-hours-row--total .pcto-hours-h { color: var(--text); font-size: 1.15rem; }
-        .pcto-hours-year { font-weight: 700; color: var(--accent); font-size: 0.9rem; }
-        .pcto-hours-bar {
-          height: 12px; border-radius: 6px;
-          background: rgba(255, 255, 255, 0.08);
-          overflow: hidden;
-        }
-        .pcto-hours-fill {
-          display: block; height: 100%; border-radius: 6px;
-          background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
-          box-shadow: 0 0 14px var(--glow);
-        }
-        .pcto-hours-h { font-weight: 800; color: var(--accent); }
-        .pcto-hours-note { font-size: 0.82rem; color: var(--note); text-align: right; }
-        @media (max-width: 575.98px) {
-          .pcto-hours-row { grid-template-columns: 1fr auto; }
-          .pcto-hours-bar, .pcto-hours-note { display: none; }
-        }
-
-        /* Chiusura */
-        .pcto-closing {
-          margin-top: 3.5rem;
-          padding: 2.5rem;
-          border-radius: 18px;
-          color: #ffffff;
-          background-image: linear-gradient(120deg, #f39a76 0%, #dd4814 45%, #bc3d10 100%);
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          box-shadow: 0 16px 44px rgba(221, 72, 20, 0.40);
-        }
-        .pcto-closing p { font-size: 1.15rem; line-height: 1.7; opacity: 0.96; max-width: 54rem; }
-        .pcto-closing strong { color: #ffffff; }
-        @media (max-width: 575.98px) { .pcto-closing { padding: 1.75rem; } }
-
-        /* Banner full-width del team davanti alla sede */
-        .pcto-team-banner {
-          position: relative;
-          width: 100%;
-          overflow: hidden;
-          /* fallback dark premium finché l'immagine non è presente */
-          background-image: linear-gradient(135deg, #221a20 0%, #2a1e26 55%, #241c22 100%);
-        }
-        .pcto-team-banner img {
-          display: block;
-          width: 100%;
-          height: auto;          /* immagine intera, nessun taglio */
-          position: relative;
-          z-index: 0;
-        }
-        .pcto-team-scrim {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          background-image: linear-gradient(
-            165deg,
-            rgba(28, 22, 27, 0.78) 0%,
-            rgba(28, 22, 27, 0.30) 32%,
-            rgba(28, 22, 27, 0) 58%
-          );
-        }
-        .pcto-team-overlay {
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          z-index: 2;
-          padding-top: clamp(1.25rem, 3.5vw, 2.75rem);
-        }
-        .pcto-team-kicker {
-          color: rgba(255, 255, 255, 0.88);
-          text-transform: uppercase;
-          letter-spacing: 0.16em;
-          font-weight: 600;
-          font-size: 0.875rem;
-          margin-bottom: 0.5rem;
-        }
-        .pcto-team-title {
-          color: #ffffff;
-          font-weight: 800;
-          font-size: clamp(1.85rem, 4.4vw, 3.1rem);
-          line-height: 1.05;
-          letter-spacing: -0.01em;
-          margin-bottom: 0;
-          max-width: 22ch;
-          text-shadow: 0 2px 20px rgba(0, 0, 0, 0.28);
-        }
-
-        /* Footer */
-        .pcto-footer {
-          background-color: var(--bg2);
-          color: var(--sub);
-          border-top: 1px solid var(--glass-bd);
-        }
-      `}</style>
     </div>
   );
 }

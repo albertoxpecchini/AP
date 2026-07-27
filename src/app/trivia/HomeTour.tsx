@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { X, MousePointerClick, ArrowRight } from "lucide-react";
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -72,6 +72,7 @@ export default function HomeTour({ steps, onDone, onCloseModals }: HomeTourProps
 
   // ── Misura il target, con retry finché compare (max ~1.2s). Se non compare
   //    proprio, salta il passo invece di lasciare lo schermo nero. ──
+  const scrolledFor = useRef<Set<number>>(new Set());
   useEffect(() => {
     let raf = 0, tries = 0, alive = true;
     const tick = () => {
@@ -81,6 +82,15 @@ export default function HomeTour({ steps, onDone, onCloseModals }: HomeTourProps
       const els = Array.from(document.querySelectorAll<HTMLElement>(spotlightSelector));
       const el = els.find(e => { const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0; }) ?? null;
       if (el) {
+        // Ora che il menù è una pagina che scorre, il bersaglio può stare sotto
+        // la piega: la prima volta che lo troviamo lo portiamo in vista.
+        if (!scrolledFor.current.has(idx)) {
+          scrolledFor.current.add(idx);
+          const b = el.getBoundingClientRect();
+          if (b.top < 80 || b.bottom > window.innerHeight - 80) {
+            el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+          }
+        }
         const r = el.getBoundingClientRect();
         if (r.width > 0 && r.height > 0) {
           // clampa il riquadro alla viewport: se il target è più alto/largo dello
@@ -237,12 +247,12 @@ const TOUR_CSS = `
 
   .tour-halo {
     position: fixed; border-radius: 14px; pointer-events: none;
-    box-shadow: 0 0 0 2px #ed7143, 0 0 0 5px rgba(233, 84, 32,0.35), 0 0 32px 6px rgba(47,158,90,0.45);
+    box-shadow: 0 0 0 2px #3ecf8e, 0 0 0 5px rgba(62, 207, 142,0.35), 0 0 32px 6px rgba(47,158,90,0.45);
     animation: tour-halo-pulse 1.6s ease-in-out infinite;
   }
   @keyframes tour-halo-pulse {
-    0%,100% { box-shadow: 0 0 0 2px #ed7143, 0 0 0 5px rgba(233, 84, 32,0.30), 0 0 26px 5px rgba(47,158,90,0.4); }
-    50%     { box-shadow: 0 0 0 2px #f6a583, 0 0 0 7px rgba(233, 84, 32,0.5), 0 0 40px 10px rgba(47,158,90,0.6); }
+    0%,100% { box-shadow: 0 0 0 2px #3ecf8e, 0 0 0 5px rgba(62, 207, 142,0.30), 0 0 26px 5px rgba(47,158,90,0.4); }
+    50%     { box-shadow: 0 0 0 2px #5fe3ab, 0 0 0 7px rgba(62, 207, 142,0.5), 0 0 40px 10px rgba(47,158,90,0.6); }
   }
   /* scudo invisibile che intercetta il click sui passi "info" (niente loop) */
   .tour-shield { position: fixed; pointer-events: auto; cursor: default; border-radius: 14px; }
@@ -250,10 +260,10 @@ const TOUR_CSS = `
   .tour-hint {
     position: fixed; transform: translate(-50%, -100%);
     display: inline-flex; align-items: center; gap: 5px;
-    background: linear-gradient(100deg,#e95420,#2F9E5A);
+    background: linear-gradient(100deg,#0f9d63,#2F9E5A);
     color: #fff; font-weight: 800; font-size: 0.72rem;
     padding: 5px 10px; border-radius: 999px; white-space: nowrap;
-    box-shadow: 0 6px 18px rgba(162, 51, 14,0.45); pointer-events: none;
+    box-shadow: 0 6px 18px rgba(0, 98, 57,0.45); pointer-events: none;
     font-family: "Ubuntu", sans-serif;
     animation: tour-hint-bob 1s ease-in-out infinite;
   }
@@ -262,13 +272,13 @@ const TOUR_CSS = `
   .tour-pop {
     position: fixed; z-index: 1401; pointer-events: auto;
     background: linear-gradient(160deg,#fff 0%,#fff 60%,#f3effc 100%);
-    border: 1px solid rgba(233, 84, 32,0.22);
+    border: 1px solid rgba(62, 207, 142,0.22);
     border-radius: 16px; padding: 0.8rem 1rem 0.85rem;
     box-shadow: 0 20px 50px rgba(20,10,40,0.4);
     font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
     animation: tour-pop-in 0.28s cubic-bezier(.34,1.56,.64,1) both;
   }
-  .tour-pop::before { content:""; position:absolute; width:14px; height:14px; background:#fff; border:1px solid rgba(233, 84, 32,0.22); transform:rotate(45deg); }
+  .tour-pop::before { content:""; position:absolute; width:14px; height:14px; background:#fff; border:1px solid rgba(62, 207, 142,0.22); transform:rotate(45deg); }
   .tour-arrow-left::before  { left:-8px; top:50%; margin-top:-7px; border-right:none; border-top:none; }
   .tour-arrow-right::before { right:-8px; top:50%; margin-top:-7px; border-left:none; border-bottom:none; }
   .tour-arrow-top::before   { top:-8px; left:50%; margin-left:-7px; border-right:none; border-bottom:none; }
@@ -276,34 +286,34 @@ const TOUR_CSS = `
   @keyframes tour-pop-in { from { opacity:0; transform:scale(0.92) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
 
   .tour-pop-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.3rem; }
-  .tour-pop-step { font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; background:linear-gradient(100deg,#e95420,#2F9E5A); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .tour-skip { display:inline-flex; align-items:center; gap:3px; background:rgba(233, 84, 32,0.08); border:none; cursor:pointer; color:#cf4312; font-weight:800; font-size:0.66rem; padding:3px 7px; border-radius:7px; font-family:inherit; }
-  .tour-skip:hover { background:rgba(233, 84, 32,0.16); }
-  .tour-pop-title { margin:0 0 0.28rem; font-size:1.06rem; font-weight:900; color:#271724; line-height:1.2; min-height:1.3em; }
+  .tour-pop-step { font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; background:linear-gradient(100deg,#0f9d63,#2F9E5A); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tour-skip { display:inline-flex; align-items:center; gap:3px; background:rgba(62, 207, 142,0.08); border:none; cursor:pointer; color:#0a854d; font-weight:800; font-size:0.66rem; padding:3px 7px; border-radius:7px; font-family:inherit; }
+  .tour-skip:hover { background:rgba(62, 207, 142,0.16); }
+  .tour-pop-title { margin:0 0 0.28rem; font-size:1.06rem; font-weight:900; color:#0f2019; line-height:1.2; min-height:1.3em; }
   .tour-pop-body { margin:0 0 0.65rem; font-size:0.85rem; line-height:1.5; color:#4a3d63; min-height:2.5em; }
-  .tw-caret { display:inline-block; width:2px; height:1em; vertical-align:-0.15em; background:#e95420; margin-left:1px; animation:tw-blink 0.6s step-end infinite; }
+  .tw-caret { display:inline-block; width:2px; height:1em; vertical-align:-0.15em; background:#0f9d63; margin-left:1px; animation:tw-blink 0.6s step-end infinite; }
   @keyframes tw-blink { 50% { opacity:0; } }
 
   .tour-pop-foot { display:flex; align-items:center; justify-content:flex-end; min-height:34px; }
-  .tour-next { display:inline-flex; align-items:center; gap:6px; background:linear-gradient(100deg,#e95420,#bc3d10); color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:800; font-size:0.9rem; padding:0.5rem 1.1rem; font-family:inherit; box-shadow:0 5px 16px rgba(162, 51, 14,0.4); transition:transform .12s, filter .12s; }
+  .tour-next { display:inline-flex; align-items:center; gap:6px; background:linear-gradient(100deg,#0f9d63,#046b3d); color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:800; font-size:0.9rem; padding:0.5rem 1.1rem; font-family:inherit; box-shadow:0 5px 16px rgba(0, 98, 57,0.4); transition:transform .12s, filter .12s; }
   .tour-next:hover { transform:translateY(-1px); filter:brightness(1.08); }
   .tour-next:active { transform:scale(0.97); }
-  .tour-next-on { background:linear-gradient(100deg,#2F9E5A,#e95420); animation:tour-ready 1.3s ease-in-out infinite; }
-  @keyframes tour-ready { 0%,100% { box-shadow:0 5px 16px rgba(47,158,90,0.4); } 50% { box-shadow:0 6px 22px rgba(233, 84, 32,0.6); } }
+  .tour-next-on { background:linear-gradient(100deg,#2F9E5A,#0f9d63); animation:tour-ready 1.3s ease-in-out infinite; }
+  @keyframes tour-ready { 0%,100% { box-shadow:0 5px 16px rgba(47,158,90,0.4); } 50% { box-shadow:0 6px 22px rgba(62, 207, 142,0.6); } }
   .tour-waiting { display:inline-flex; align-items:center; gap:7px; font-size:0.76rem; font-weight:700; color:#8a7aa8; }
-  .tour-waiting-dot { width:9px; height:9px; border-radius:50%; background:#e95420; animation:tour-dot 0.9s ease-in-out infinite; }
+  .tour-waiting-dot { width:9px; height:9px; border-radius:50%; background:#0f9d63; animation:tour-dot 0.9s ease-in-out infinite; }
   @keyframes tour-dot { 0%,100% { opacity:0.3; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.2); } }
 
   /* "Salta il tour" fluttuante in basso, durante una scheda aperta */
   .tour-skip-float {
     position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
     font-size: 0.78rem !important; padding: 0.5rem 0.9rem !important;
-    background: linear-gradient(100deg,#271724,#2c001e) !important;
-    color: #d4e8dc !important; border: 1px solid rgba(233, 84, 32,0.4) !important;
+    background: linear-gradient(100deg,#0f2019,#0d1a14) !important;
+    color: #d4e8dc !important; border: 1px solid rgba(62, 207, 142,0.4) !important;
     box-shadow: 0 12px 30px rgba(0,0,0,0.45);
     animation: tour-bar-in 0.32s cubic-bezier(.34,1.56,.64,1) both;
   }
-  .tour-skip-float:hover { background: linear-gradient(100deg,#3c202f,#9a3412) !important; }
+  .tour-skip-float:hover { background: linear-gradient(100deg,#12261d,#9a3412) !important; }
   @keyframes tour-bar-in { from { opacity:0; transform:translate(-50%,16px); } to { opacity:1; transform:translate(-50%,0); } }
 
   @media (prefers-reduced-motion: reduce) {

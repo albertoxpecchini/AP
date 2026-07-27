@@ -6,16 +6,16 @@ import type { IntroStep } from "../components/GameIntro";
 // Ogni passo è una "scena" autonoma: tutto è CSS/SVG inline → leggerissimo, ma
 // con animazioni stratificate (entrata in sequenza, loop continui, parallax,
 // glow, conta-su numerico) per un effetto ultra-fluido. Palette Kit Italia:
-// verde #e95420 / #2F9E5A, oro #D9A400. Le keyframes vivono in <style> in fondo,
+// verde #0f9d63 / #2F9E5A, oro #D9A400. Le keyframes vivono in <style> in fondo,
 // con prefisso `tut-` per non collidere con quelle di GameIntro (`gt-`).
 
-const GREEN = "#e95420";
+const GREEN = "#0f9d63";
 const GREEN_LITE = "#2F9E5A";
 const BLUE = "#3a7bbf";
 const ORANGE = "#b5651d";
 const GOLD = "#D9A400";
-const VIOLA = "#e95420";
-const VIOLA_LITE = "#ed7143";
+const VIOLA = "#0f9d63";
+const VIOLA_LITE = "#3ecf8e";
 
 // ── Passo 1 ─────────────────────────────────────────────────────────────────
 // "Tre tipi di domanda" — tre card che entrano a cascata, fluttuano in loop
@@ -115,7 +115,7 @@ function ScoreVisual() {
           }} />
         ))}
         <svg viewBox="0 0 132 132" width="132" height="132" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx="66" cy="66" r={R} stroke="rgba(233, 84, 32,0.14)" strokeWidth="11" fill="none" />
+          <circle cx="66" cy="66" r={R} stroke="rgba(62, 207, 142,0.14)" strokeWidth="11" fill="none" />
           <circle
             cx="66" cy="66" r={R} stroke={GREEN_LITE} strokeWidth="11" fill="none"
             strokeLinecap="round"

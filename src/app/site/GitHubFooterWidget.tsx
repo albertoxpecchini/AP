@@ -15,10 +15,11 @@ import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 // limitato a ~100 eventi / ~90 giorni, esclude i repo privati ed è cachato in
 // ritardo → il totale "a 14 giorni" era un artefatto (spesso saturava al cap).
 //
-// Coerente col resto del sito: dark premium (prefisso .apf-gh-, viola, Titillium
-// ereditato dal footer), multilingua senza motore i18n (marcato `data-no-i18n`,
-// si traduce da sé leggendo la lingua attiva), cache locale per non martellare le
-// API (non-auth = 60 richieste/ora/IP) e sparizione elegante in caso di errore.
+// Coerente con il footer Supabase-style: prefisso .sb-gh, token .sb- della home
+// (tema chiaro/scuro nativo), multilingua senza motore i18n (marcato
+// `data-no-i18n`, si traduce da sé leggendo la lingua attiva), cache locale per
+// non martellare le API (non-auth = 60 richieste/ora/IP) e sparizione elegante
+// in caso di errore.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── CONFIG ───────────────────────────────────────────────────────────────────
@@ -41,16 +42,18 @@ const LANG_COLORS: Record<string, string> = {
   Jupyter: "#DA5B0B", "Jupyter Notebook": "#DA5B0B", MDX: "#fcb32c", Lua: "#000080",
   MATLAB: "#e16737", Makefile: "#427819", Batchfile: "#C1F12E", PowerShell: "#012456",
 };
-const LANG_FALLBACK = "#e95420";
+const LANG_FALLBACK = "#3ecf8e";
 const langColor = (name: string | null) => (name && LANG_COLORS[name]) || LANG_FALLBACK;
 
-// Sfondo delle candele del grafico per livello di intensità (0-4), tono viola.
+// Sfondo delle candele del grafico per livello di intensità (0-4), scala verde
+// brand (i "quadratini" GitHub in salsa Supabase). Il livello 0 usa il token
+// overlay così resta visibile su entrambi i temi.
 const LEVEL_BG = [
-  "rgba(255, 255, 255, 0.07)",
-  "rgba(233, 84, 32, 0.34)",
-  "rgba(233, 84, 32, 0.55)",
-  "rgba(233, 84, 32, 0.78)",
-  "#a594ff",
+  "var(--sb-overlay)",
+  "hsla(153, 60%, 43%, 0.35)",
+  "hsla(153, 60%, 45%, 0.6)",
+  "hsla(153, 60%, 48%, 0.85)",
+  "hsl(153, 60%, 53%)",
 ];
 const levelBg = (lvl: number) => LEVEL_BG[Math.max(0, Math.min(4, lvl))];
 
@@ -306,57 +309,57 @@ export default function GitHubFooterWidget() {
   const sinceYear = p ? new Date(p.created_at).getFullYear() : null;
 
   return (
-    <div className="apf-gh" data-no-i18n>
+    <div className="sb-gh" data-no-i18n>
       {status === "loading" || !data || !p ? (
-        <span className="apf-gh__skeleton">{s.loading}</span>
+        <span className="sb-gh__skeleton">{s.loading}</span>
       ) : (
         <>
           {/* ── Riga 1: profilo + "su GitHub dal …" + attività live ── */}
-          <div className="apf-gh__row">
-            <a className="apf-gh__profile" href={p.html_url} target="_blank" rel="noreferrer noopener">
+          <div className="sb-gh__row">
+            <a className="sb-gh__profile" href={p.html_url} target="_blank" rel="noreferrer noopener">
               <img
-                className="apf-gh__avatar"
+                className="sb-gh__avatar"
                 src={p.avatar_url}
                 alt={`GitHub · @${p.login}`}
                 width={22}
                 height={22}
                 loading="lazy"
               />
-              <span className="apf-gh__user">@{p.login}</span>
+              <span className="sb-gh__user">@{p.login}</span>
             </a>
 
-            <span className="apf-gh__since">
+            <span className="sb-gh__since">
               {sinceYear ? s.sinceYear(sinceYear) : ""}
               {p.location ? ` · ${p.location}` : ""}
             </span>
 
-            <span className="apf-gh__act" title={s.latest}>
-              <i className="apf-gh__dot" aria-hidden="true" />
+            <span className="sb-gh__act" title={s.latest}>
+              <i className="sb-gh__dot" aria-hidden="true" />
               {data.event ? `${describeEvent(data.event, lang)} · ${timeAgo(data.event.created_at, lang)}` : s.none}
             </span>
           </div>
 
           {/* ── Riga 2: chip statistiche reali + repo in evidenza ── */}
-          <div className="apf-gh__row apf-gh__chips">
-            <span className="apf-gh__chip"><b>{p.public_repos}</b> {s.repos}</span>
-            <span className="apf-gh__chip"><b>{p.followers}</b> {s.followers}</span>
-            <span className="apf-gh__chip"><b>{p.following}</b> {s.following}</span>
+          <div className="sb-gh__row sb-gh__chips">
+            <span className="sb-gh__chip"><b>{p.public_repos}</b> {s.repos}</span>
+            <span className="sb-gh__chip"><b>{p.followers}</b> {s.followers}</span>
+            <span className="sb-gh__chip"><b>{p.following}</b> {s.following}</span>
             {agg && (
-              <span className="apf-gh__chip"><span className="apf-gh__star" aria-hidden="true">★</span> <b>{agg.totalStars}</b> {s.stars}</span>
+              <span className="sb-gh__chip"><span className="sb-gh__star" aria-hidden="true">★</span> <b>{agg.totalStars}</b> {s.stars}</span>
             )}
             {agg && agg.totalForks > 0 && (
-              <span className="apf-gh__chip"><b>{agg.totalForks}</b> {s.forks}</span>
+              <span className="sb-gh__chip"><b>{agg.totalForks}</b> {s.forks}</span>
             )}
             {p.public_gists > 0 && (
-              <span className="apf-gh__chip"><b>{p.public_gists}</b> {s.gists}</span>
+              <span className="sb-gh__chip"><b>{p.public_gists}</b> {s.gists}</span>
             )}
             {data.repo && (
-              <a className="apf-gh__chip apf-gh__repo" href={data.repo.html_url} target="_blank" rel="noreferrer noopener">
-                <span className="apf-gh__star" aria-hidden="true">★</span> {data.repo.name}
+              <a className="sb-gh__chip sb-gh__repo" href={data.repo.html_url} target="_blank" rel="noreferrer noopener">
+                <span className="sb-gh__star" aria-hidden="true">★</span> {data.repo.name}
                 {data.repo.language && (
                   <>
                     {" · "}
-                    <i className="apf-gh__langdot" style={{ background: langColor(data.repo.language) }} aria-hidden="true" />
+                    <i className="sb-gh__langdot" style={{ background: langColor(data.repo.language) }} aria-hidden="true" />
                     {" "}{data.repo.language}
                   </>
                 )}
@@ -366,14 +369,16 @@ export default function GitHubFooterWidget() {
 
           {/* ── Riga 3: grafico contribuzioni REALE + streak ── */}
           {contrib && (
-            <div className="apf-gh__spark">
-              <span className="apf-gh__spark-cap">
-                <b>{contrib.yearTotal}</b> {s.commits} · {s.lastYear}
+            <div className="sb-gh__spark">
+              <span className="sb-gh__spark-cap">
+                {/* data-count-to: il numero si "accende" salendo da 0 quando il
+                    footer arriva a vista (regia in site/footMotion.ts). */}
+                <b data-count-to={contrib.yearTotal}>{contrib.yearTotal}</b> {s.commits} · {s.lastYear}
                 {contrib.streak > 0 && <> · {s.streak(contrib.streak)}</>}
                 {contrib.longest > 0 && <> · {s.record(contrib.longest)}</>}
               </span>
               <span
-                className="apf-gh__bars"
+                className="sb-gh__bars"
                 role="img"
                 aria-label={`${contrib.yearTotal} ${s.commits} · ${s.lastYear}`}
               >
@@ -389,7 +394,7 @@ export default function GitHubFooterWidget() {
                   return (
                     <i
                       key={d.day}
-                      className="apf-gh__bar"
+                      className="sb-gh__bar"
                       style={{ height: `${h}px`, background: levelBg(d.level) }}
                       data-tip={`${d.count} ${s.commits} · ${label}`}
                       data-today={i === series.length - 1 ? "" : undefined}
@@ -402,25 +407,25 @@ export default function GitHubFooterWidget() {
 
           {/* ── Riga 4: linguaggi più usati ── */}
           {agg && agg.langs.length > 0 && (
-            <div className="apf-gh__langs">
+            <div className="sb-gh__langs">
               <span
-                className="apf-gh__langbar"
+                className="sb-gh__langbar"
                 role="img"
                 aria-label={agg.langs.map((l) => `${l.name} ${l.pct}%`).join(", ")}
               >
                 {agg.langs.map((l) => (
                   <i
                     key={l.name}
-                    className="apf-gh__langseg"
+                    className="sb-gh__langseg"
                     style={{ width: `${l.pct}%`, background: l.color }}
                     title={`${l.name} · ${l.pct}%`}
                   />
                 ))}
               </span>
-              <span className="apf-gh__langlegend">
+              <span className="sb-gh__langlegend">
                 {agg.langs.map((l) => (
-                  <span key={l.name} className="apf-gh__langitem">
-                    <i className="apf-gh__langdot" style={{ background: l.color }} aria-hidden="true" />
+                  <span key={l.name} className="sb-gh__langitem">
+                    <i className="sb-gh__langdot" style={{ background: l.color }} aria-hidden="true" />
                     {l.name} <b>{l.pct}%</b>
                   </span>
                 ))}
@@ -431,113 +436,117 @@ export default function GitHubFooterWidget() {
       )}
 
       <style>{`
-        .apf-gh {
+        /* Tutto su token .sb- (ereditati dal footer .sb-home.sb-foot):
+           il widget segue il tema chiaro/scuro nativo come il resto. */
+        .sb-gh {
           display: flex; flex-direction: column; align-items: flex-start;
           gap: 0.9rem;
-          margin-top: 1.4rem; padding-top: 1.2rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
-          font-size: 0.82rem; color: #8893a0; line-height: 1.45;
+          font-size: 0.82rem; color: var(--sb-fg-lighter); line-height: 1.45;
         }
-        .apf-gh b { color: #cdd6e0; font-weight: 700; }
-        .apf-gh__skeleton { opacity: 0.6; animation: apf-gh-pulse 1.5s ease-in-out infinite; }
-        .apf-gh__row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 0.85rem; width: 100%; }
+        .sb-gh b { color: var(--sb-fg); font-weight: 500; }
+        .sb-gh__skeleton { opacity: 0.6; animation: sb-gh-pulse 1.5s ease-in-out infinite; }
+        .sb-gh__row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 0.85rem; width: 100%; }
 
-        .apf-gh__profile { display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none; color: #cdd6e0; }
-        .apf-gh__profile:hover .apf-gh__user { color: #f6a583; }
-        .apf-gh__avatar {
+        .sb-gh__profile { display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none; color: var(--sb-fg); }
+        .sb-gh__profile:hover .sb-gh__user { color: var(--sb-brand-text); }
+        .sb-gh__avatar {
           width: 22px; height: 22px; border-radius: 50%;
-          border: 1px solid rgba(233, 84, 32, 0.35); flex-shrink: 0;
+          border: 1px solid var(--sb-border-stronger); flex-shrink: 0;
         }
-        .apf-gh__user { font-weight: 700; }
-        .apf-gh__since { color: #8893a0; }
-        .apf-gh__act { display: inline-flex; align-items: center; }
-        .apf-gh__dot {
+        .sb-gh__user { font-weight: 500; }
+        .sb-gh__since { color: var(--sb-fg-muted); }
+        .sb-gh__act { display: inline-flex; align-items: center; }
+        .sb-gh__dot {
           width: 7px; height: 7px; border-radius: 50%; margin-right: 0.5rem; flex-shrink: 0;
-          background: #57c98a; box-shadow: 0 0 0 0 rgba(87, 201, 138, 0.55);
-          animation: apf-gh-live 2.4s ease-out infinite;
+          background: var(--sb-brand); box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55);
+          animation: sb-gh-live 2.4s ease-out infinite;
         }
 
-        /* ── Chip statistiche ── */
-        .apf-gh__chips { gap: 0.5rem 0.55rem; }
-        .apf-gh__chip {
+        /* ── Chip statistiche (veste .sb-chip della home) ── */
+        .sb-gh__chips { gap: 0.5rem 0.55rem; }
+        .sb-gh__chip {
           display: inline-flex; align-items: center; gap: 0.32rem;
           padding: 0.16rem 0.6rem; border-radius: 999px;
-          background: rgba(255, 255, 255, 0.045);
-          border: 1px solid rgba(255, 255, 255, 0.09);
-          font-size: 0.78rem; color: #97a2ae; white-space: nowrap;
+          background: var(--sb-bg);
+          border: 1px solid var(--sb-border-strong);
+          font-size: 0.78rem; color: var(--sb-fg-light); white-space: nowrap;
           transition: border-color 0.15s, background 0.15s, color 0.15s;
         }
-        .apf-gh__star { color: #e3b341; }
-        a.apf-gh__repo { text-decoration: none; }
-        a.apf-gh__repo:hover { color: #e6ebf1; border-color: rgba(233, 84, 32, 0.5); background: rgba(233, 84, 32, 0.12); }
-        .apf-gh__langdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .sb-gh__star { color: #e3b341; }
+        a.sb-gh__repo { text-decoration: none; }
+        a.sb-gh__repo:hover {
+          color: var(--sb-fg);
+          border-color: var(--sb-brand);
+          background: hsla(153, 60%, 53%, 0.08);
+        }
+        .sb-gh__langdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
         /* ── Grafico dei contributi giornalieri (dati reali) ── */
-        /* Larghezza piena: si allinea ai margini del footer (come .apf-top / .apf-bottom). */
-        .apf-gh__spark { display: flex; flex-direction: column; gap: 0.45rem; width: 100%; }
-        .apf-gh__spark-cap { font-size: 0.8rem; color: #8893a0; }
-        .apf-gh__spark-cap b { color: #cdd6e0; font-weight: 700; }
-        .apf-gh__bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; height: 32px; width: 100%; }
-        .apf-gh__bar {
+        .sb-gh__spark { display: flex; flex-direction: column; gap: 0.45rem; width: 100%; }
+        .sb-gh__spark-cap { font-size: 0.8rem; color: var(--sb-fg-lighter); }
+        .sb-gh__spark-cap b { color: var(--sb-fg); font-weight: 500; }
+        .sb-gh__bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; height: 32px; width: 100%; }
+        .sb-gh__bar {
           position: relative;
           flex: 1 1 0; min-width: 4px; max-width: 40px; height: 3px;
           border-radius: 3px 3px 0 0;
           transition: filter 0.15s, transform 0.15s;
         }
-        .apf-gh__bar:hover { filter: brightness(1.3); }
-        .apf-gh__bar[data-today] { box-shadow: 0 0 0 1.5px rgba(197, 165, 255, 0.9); }
+        .sb-gh__bar:hover { filter: brightness(1.15); }
+        .sb-gh__bar[data-today] { box-shadow: 0 0 0 1.5px var(--sb-brand-text); }
 
-        /* Tooltip alla GitHub: data della candela + numero di commit del giorno */
-        .apf-gh__bar::after,
-        .apf-gh__bar::before {
+        /* Tooltip alla GitHub: colori invertiti rispetto al tema → leggibile
+           su entrambi (scuro su chiaro, chiaro su scuro). */
+        .sb-gh__bar::after,
+        .sb-gh__bar::before {
           position: absolute; left: 50%;
           opacity: 0; pointer-events: none;
           transition: opacity 0.14s ease, transform 0.14s ease;
           z-index: 6;
         }
-        .apf-gh__bar::after {
+        .sb-gh__bar::after {
           content: attr(data-tip);
           bottom: calc(100% + 9px);
           transform: translateX(-50%) translateY(4px);
           padding: 5px 9px; border-radius: 7px;
-          background: #1b2028; color: #eaeef3;
-          font-size: 0.72rem; font-weight: 600; line-height: 1; white-space: nowrap;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+          background: var(--sb-fg); color: var(--sb-bg);
+          font-size: 0.72rem; font-weight: 500; line-height: 1; white-space: nowrap;
+          box-shadow: var(--sb-shadow-card);
         }
-        .apf-gh__bar::before {
+        .sb-gh__bar::before {
           content: ""; bottom: calc(100% + 5px);
           width: 8px; height: 8px;
           transform: translateX(-50%) translateY(4px) rotate(45deg);
-          background: #1b2028;
-          border-right: 1px solid rgba(255, 255, 255, 0.14);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+          background: var(--sb-fg);
         }
-        .apf-gh__bar:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .apf-gh__bar:hover::before { opacity: 1; transform: translateX(-50%) translateY(0) rotate(45deg); }
+        .sb-gh__bar:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .sb-gh__bar:hover::before { opacity: 1; transform: translateX(-50%) translateY(0) rotate(45deg); }
         /* Barre ai bordi: la bolla non esce dai margini del footer */
-        .apf-gh__bar:first-child::after { left: 0; transform: translateX(0) translateY(4px); }
-        .apf-gh__bar:first-child:hover::after { transform: translateX(0) translateY(0); }
-        .apf-gh__bar:last-child::after { left: auto; right: 0; transform: translateX(0) translateY(4px); }
-        .apf-gh__bar:last-child:hover::after { transform: translateX(0) translateY(0); }
+        .sb-gh__bar:first-child::after { left: 0; transform: translateX(0) translateY(4px); }
+        .sb-gh__bar:first-child:hover::after { transform: translateX(0) translateY(0); }
+        .sb-gh__bar:last-child::after { left: auto; right: 0; transform: translateX(0) translateY(4px); }
+        .sb-gh__bar:last-child:hover::after { transform: translateX(0) translateY(0); }
 
         /* ── Barra dei linguaggi ── */
-        .apf-gh__langs { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
-        .apf-gh__langbar {
+        .sb-gh__langs { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+        .sb-gh__langbar {
           display: flex; height: 8px; width: 100%; border-radius: 999px; overflow: hidden;
-          gap: 2px; background: rgba(255, 255, 255, 0.05);
+          gap: 2px; background: var(--sb-overlay);
         }
-        .apf-gh__langseg { height: 100%; min-width: 4px; }
-        .apf-gh__langlegend { display: flex; flex-wrap: wrap; gap: 0.35rem 0.85rem; }
-        .apf-gh__langitem { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: #97a2ae; }
+        .sb-gh__langseg { height: 100%; min-width: 4px; }
+        .sb-gh__langlegend { display: flex; flex-wrap: wrap; gap: 0.35rem 0.85rem; }
+        .sb-gh__langitem { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: var(--sb-fg-lighter); }
 
-        @keyframes apf-gh-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.75; } }
-        @keyframes apf-gh-live {
-          0% { box-shadow: 0 0 0 0 rgba(87, 201, 138, 0.55); }
-          70% { box-shadow: 0 0 0 6px rgba(87, 201, 138, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(87, 201, 138, 0); }
+        @keyframes sb-gh-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.75; } }
+        @keyframes sb-gh-live {
+          0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55); }
+          70% { box-shadow: 0 0 0 6px hsla(153, 60%, 53%, 0); }
+          100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
         }
-        @media (max-width: 640px) { .apf-gh { font-size: 0.8rem; } }
+        @media (prefers-reduced-motion: reduce) {
+          .sb-gh__skeleton, .sb-gh__dot { animation: none; }
+        }
+        @media (max-width: 640px) { .sb-gh { font-size: 0.8rem; } }
       `}</style>
     </div>
   );

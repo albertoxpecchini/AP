@@ -14,7 +14,7 @@ export interface GameAccent {
 
 // Accento = arancio Ubuntu (Trivia è l'unico gioco rimasto).
 export const ACCENTS: Record<string, GameAccent> = {
-  trivia: { accent: "#e95420", glow: "rgba(233, 84, 32,0.45)" }, // arancio Ubuntu
+  trivia: { accent: "#0f9d63", glow: "rgba(62, 207, 142,0.45)" }, // arancio Ubuntu
 };
 
 // Superfici/testi del tema (riferimento per i componenti del motore).
