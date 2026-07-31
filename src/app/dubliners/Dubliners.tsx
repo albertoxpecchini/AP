@@ -444,7 +444,7 @@ export default function Dubliners() {
           --vio-bd: rgba(233, 84, 32, 0.28);
           --panel: linear-gradient(160deg, #221a20 0%, #2a1e26 45%, #241c22 100%);
           min-height: 100vh;
-          font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
+          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
           color: var(--text);
           background:
             radial-gradient(120% 70% at 50% -10%, rgba(233, 84, 32, 0.16) 0%, transparent 55%),

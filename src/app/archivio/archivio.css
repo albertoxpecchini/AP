@@ -503,7 +503,7 @@ html.dark .sb-ar-menu {
   border-radius: 8px;
   background: var(--sb-bg);
   box-shadow: var(--sb-shadow-card);
-  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
+  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
   font-size: 0.875rem;
 }
 .sb-ar-mi {
@@ -632,7 +632,7 @@ html.dark .sb-ar-menu {
 }
 .sb-ar-props-readme strong { font-weight: 500; color: var(--sb-fg); }
 .sb-ar-props-readme code {
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.85em;
   padding: 0.1rem 0.3rem;
   border: 1px solid var(--sb-border);

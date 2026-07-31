@@ -224,7 +224,7 @@ export default function ReadmeModal() {
         }
         .apr-open:hover { color: var(--sb-fg, #f6a583); }
 
-        .apr-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Ubuntu", Geneva, Tahoma, sans-serif; }
+        .apr-modal { position: fixed; inset: 0; z-index: 2147483200; display: flex; align-items: center; justify-content: center; padding: clamp(0.6rem, 3vw, 2rem); font-family: "Titillium Web", Geneva, Tahoma, sans-serif; }
         .apr-backdrop { position: absolute; inset: 0; background: rgba(4, 6, 10, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: apr-fade 0.2s ease; }
 
         /* Dialogo GitHub-dark: la scheda README come su github.com (tema scuro). */
@@ -307,7 +307,7 @@ export default function ReadmeModal() {
         .apr-sw { display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start; }
         .apr-sw-box { width: 74px; height: 40px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2); }
         .apr-sw-name { font-size: 0.74rem; color: #c9d1d9; font-weight: 600; }
-        .apr-sw-hex { font-size: 0.68rem; color: #8b949e; font-family: "Ubuntu Mono", monospace; }
+        .apr-sw-hex { font-size: 0.68rem; color: #8b949e; font-family: "Roboto Mono", monospace; }
 
         .apr-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.6rem; }
         .apr-btn {

@@ -8,7 +8,7 @@
    curriculum), sezione open source e CTA finale.
 
    Tema NATIVO chiaro/scuro: palette neutra (grigi puri) + verde brand Supabase
-   hsl(153 60% 53%), tipografia Ubuntu (identità del sito, al posto di Circular).
+   hsl(153 60% 53%), tipografia Titillium Web (font_italia.css, al posto di Circular).
    Il chiaro è il default; lo scuro si attiva con html.dark (tema globale).
    Prefisso: .sb- (l'archivio incorporato usa .sb-ar-, vedi archivio.css).
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -42,7 +42,7 @@
   min-height: 100vh;
   background: var(--sb-bg);
   color: var(--sb-fg);
-  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
+  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -286,7 +286,7 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sb-brand); animation: sb-ping 2.2s ease-out infinite; }
 .sb-live-sep { width: 1px; height: 12px; background: var(--sb-border-strong); }
 .sb-live-clock {
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
   color: var(--sb-fg-muted);
 }
@@ -576,7 +576,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   border-radius: 10px;
   background: #171717;
   border: 1px solid #2e2e2e;
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.82rem;
   color: #ededed;
   padding: 0.9rem 1rem 1.5rem;
@@ -1067,7 +1067,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   border-bottom: 1px solid var(--sb-border);
   background: var(--sb-surface-100);
   border-radius: 11px 11px 0 0;
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.76rem;
   color: var(--sb-fg-muted);
 }
@@ -1077,7 +1077,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   padding: 1rem 1.1rem 1.2rem;
   min-height: 320px;
   overflow-x: auto;
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.83rem;
   line-height: 1.65;
   color: var(--sb-fg-light);
@@ -1206,7 +1206,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   border: 1px solid var(--sb-border);
   border-radius: 8px;
   background: var(--sb-bg);
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.8rem;
   color: var(--sb-fg-light);
   text-decoration: none;
@@ -1216,7 +1216,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-ghcard-repo .badge {
   margin-left: auto;
   font-size: 0.66rem;
-  font-family: "Ubuntu", sans-serif;
+  font-family: "Titillium Web", sans-serif;
   color: var(--sb-fg-muted);
   border: 1px solid var(--sb-border-strong);
   border-radius: 999px;

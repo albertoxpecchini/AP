@@ -119,7 +119,7 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
       )}
 
       <style>{`
-        .pag { font-family:"Ubuntu", Geneva, Tahoma, sans-serif; }
+        .pag { font-family:"Titillium Web", Geneva, Tahoma, sans-serif; }
 
         .pag-summary {
           display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-bottom:.9rem;

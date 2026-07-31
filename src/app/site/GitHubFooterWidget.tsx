@@ -18,12 +18,18 @@ import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 // Coerente con il footer Supabase-style: prefisso .sb-gh, token .sb- della home
 // (tema chiaro/scuro nativo), multilingua senza motore i18n (marcato
 // `data-no-i18n`, si traduce da sé leggendo la lingua attiva), cache locale per
-// non martellare le API (non-auth = 60 richieste/ora/IP) e sparizione elegante
-// in caso di errore.
+// non martellare le API (non-auth = 60 richieste/ora/IP): il logo/avatar usa un
+// URL diretto (non conta sulla quota) e resta sempre visibile; solo le
+// statistiche extra spariscono elegantemente se la fetch fallisce.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── CONFIG ───────────────────────────────────────────────────────────────────
 const GITHUB_USERNAME = "albertoxpecchini";
+// Avatar via URL diretto (non API REST): non consuma la quota di 60 richieste/ora
+// per IP, quindi il logo resta visibile anche quando il resto del widget fallisce
+// per rate limit.
+const AVATAR_URL = `https://github.com/${GITHUB_USERNAME}.png`;
+const PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
 const FEATURED_REPO = "AP"; // repo in evidenza (owner = username). "" per nasconderlo.
 const CONTRIB_API = (u: string) => `https://github-contributions-api.jogruber.de/v4/${u}?y=last`;
 const CACHE_KEY = "ap-gh-widget-v3"; // v3: repo aggregati + calendario contribuzioni reale
@@ -297,9 +303,6 @@ export default function GitHubFooterWidget() {
     return () => { cancelled = true; };
   }, []);
 
-  // API irraggiungibili o rate limit superato → il widget scompare silenziosamente.
-  if (status === "error") return null;
-
   const s = STR[lang];
   const p = data?.profile ?? null;
   const agg = data?.agg ?? null;
@@ -310,24 +313,25 @@ export default function GitHubFooterWidget() {
 
   return (
     <div className="sb-gh" data-no-i18n>
-      {status === "loading" || !data || !p ? (
-        <span className="sb-gh__skeleton">{s.loading}</span>
-      ) : (
-        <>
-          {/* ── Riga 1: profilo + "su GitHub dal …" + attività live ── */}
-          <div className="sb-gh__row">
-            <a className="sb-gh__profile" href={p.html_url} target="_blank" rel="noreferrer noopener">
-              <img
-                className="sb-gh__avatar"
-                src={p.avatar_url}
-                alt={`GitHub · @${p.login}`}
-                width={22}
-                height={22}
-                loading="lazy"
-              />
-              <span className="sb-gh__user">@{p.login}</span>
-            </a>
+      {/* ── Riga 1: profilo — logo + username SEMPRE visibili (URL diretto,
+          non passa dalla API REST, quindi non sparisce per rate limit) ── */}
+      <div className="sb-gh__row">
+        <a className="sb-gh__profile" href={p?.html_url ?? PROFILE_URL} target="_blank" rel="noreferrer noopener">
+          <img
+            className="sb-gh__avatar"
+            src={AVATAR_URL}
+            alt={`GitHub · @${GITHUB_USERNAME}`}
+            width={22}
+            height={22}
+            loading="lazy"
+          />
+          <span className="sb-gh__user">@{GITHUB_USERNAME}</span>
+        </a>
 
+        {status === "loading" && <span className="sb-gh__skeleton">{s.loading}</span>}
+
+        {p && (
+          <>
             <span className="sb-gh__since">
               {sinceYear ? s.sinceYear(sinceYear) : ""}
               {p.location ? ` · ${p.location}` : ""}
@@ -335,9 +339,14 @@ export default function GitHubFooterWidget() {
 
             <span className="sb-gh__act" title={s.latest}>
               <i className="sb-gh__dot" aria-hidden="true" />
-              {data.event ? `${describeEvent(data.event, lang)} · ${timeAgo(data.event.created_at, lang)}` : s.none}
+              {data?.event ? `${describeEvent(data.event, lang)} · ${timeAgo(data.event.created_at, lang)}` : s.none}
             </span>
-          </div>
+          </>
+        )}
+      </div>
+
+      {status === "ready" && data && p && (
+        <>
 
           {/* ── Riga 2: chip statistiche reali + repo in evidenza ── */}
           <div className="sb-gh__row sb-gh__chips">

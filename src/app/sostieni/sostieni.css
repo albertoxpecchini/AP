@@ -100,7 +100,7 @@
   color: var(--sb-fg-muted);
 }
 .sb-sos-rowvalue { font-size: 0.9rem; color: var(--sb-fg); word-break: break-word; }
-.sb-sos-rowvalue.mono { font-family: "Ubuntu Mono", ui-monospace, monospace; font-size: 0.86rem; }
+.sb-sos-rowvalue.mono { font-family: "Roboto Mono", ui-monospace, monospace; font-size: 0.86rem; }
 .sb-sos-copy { flex-shrink: 0; }
 .sb-sos-copy.copied { color: var(--sb-brand-text); border-color: var(--sb-btn-bd); }
 

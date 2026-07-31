@@ -38,7 +38,7 @@
   align-items: center;
   justify-content: center;
   padding: clamp(0.6rem, 3vw, 2rem);
-  font-family: "Ubuntu", Geneva, Tahoma, sans-serif;
+  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
 }
 .apw-backdrop {
   position: absolute;
@@ -281,7 +281,7 @@ html.dark .apw-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
   border: 1px solid var(--sb-border);
   background: var(--sb-surface-100);
   color: var(--sb-fg);
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.8rem;
   white-space: nowrap;
 }
@@ -384,7 +384,7 @@ html.dark .apw-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
   background: #171717;
   border: 1px solid #2e2e2e;
   color: #ededed;
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.76rem;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
   transition: opacity 0.2s ease;

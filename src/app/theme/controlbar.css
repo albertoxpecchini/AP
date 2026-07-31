@@ -3,7 +3,7 @@
 
    Rifatta nella grammatica "piattaforma Supabase" della home (vedi home.css):
    pannello con bordo-gradiente da 1px (.sb-panel + .sb-panel-inner), segmenti
-   alti 34px con radius 6, verde brand per lo stato acceso, tipografia Ubuntu.
+   alti 34px con radius 6, verde brand per lo stato acceso, tipografia Titillium Web.
    I token arrivano da .sb-home (che la barra porta con sé), quindi il tema
    chiaro/scuro è NATIVO: chiaro di default, scuro sotto html.dark.
 

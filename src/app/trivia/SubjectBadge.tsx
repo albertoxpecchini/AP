@@ -44,7 +44,7 @@ export default function SubjectBadge({ dark, nick, chapterId, label }: SubjectBa
           display:inline-flex; align-items:center; gap:.3rem;
           background:rgba(255,255,255,0.92); border:1px solid rgba(62, 207, 142,0.25);
           border-radius:999px; padding:.18rem .5rem; box-shadow:0 2px 8px rgba(6,22,14,0.18);
-          font-family:"Ubuntu", Geneva, Tahoma, sans-serif;
+          font-family:"Titillium Web", Geneva, Tahoma, sans-serif;
           animation:trv-subjbadge-in .3s ease;
         }
         .trv-subjbadge.dark { background:rgba(20,33,26,0.92); border-color:rgba(95,208,154,0.3); }

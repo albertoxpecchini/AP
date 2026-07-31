@@ -1,8 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    SKIN UBUNTU / YARU — layer globale, caricato PER ULTIMO (vince sui token di
    theme.css a parità di selettore). Qui vive tutto ciò che rende il sito
-   "Ubuntu": font Ubuntu, arancio #E95420, melanzana, grigi caldi, selezione
-   arancio e scrollbar stile GNOME. Le pagine mantengono la loro struttura.
+   "Ubuntu": arancio #E95420, melanzana, grigi caldi, selezione arancio e
+   scrollbar stile GNOME. Tipografia da font_italia.css (Titillium Web +
+   Roboto Mono). Le pagine mantengono la loro struttura.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -14,13 +15,12 @@
   --yaru-aubergine-dark: #2c001e;
   --yaru-warm-grey: #aea79f;
 
-  --font-ubuntu: "Ubuntu", system-ui, -apple-system, "Helvetica Neue", sans-serif;
-  --font-ubuntu-mono: "Ubuntu Mono", ui-monospace, monospace;
+  --font-ubuntu: "Titillium Web", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  --font-ubuntu-mono: "Roboto Mono", ui-monospace, monospace;
 }
 
-/* ── Tipografia: Ubuntu ovunque, Ubuntu Mono per il codice ──
-   (Batte anche la Titillium dichiarata da bootstrap-italia.min.css, che non
-   viene più caricata.) */
+/* ── Tipografia da font_italia.css: Titillium Web ovunque, Roboto Mono per il
+   codice (le stesse famiglie dichiarate da bootstrap-italia.min.css). */
 html, body, button, input, select, textarea, .it-page-wrapper {
   font-family: var(--font-ubuntu);
 }

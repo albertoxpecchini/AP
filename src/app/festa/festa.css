@@ -39,7 +39,7 @@
 
   min-height: 100dvh;
   color: var(--ink);
-  font-family: "Ubuntu", system-ui, -apple-system, "Segoe UI", Tahoma,
+  font-family: "Titillium Web", system-ui, -apple-system, "Segoe UI", Tahoma,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
   background: var(--desk);
   padding: clamp(18px, 4vw, 48px) 15px 64px;

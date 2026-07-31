@@ -242,7 +242,7 @@ const REPORT_L: Record<Lang, Record<string, string>> = {
     madeWith: "Vergleich erstellt mit", empty: "Niemand hier" },
 };
 
-// Report HTML autonomo, nello STILE del sito (Ubuntu, palette neutra + verde
+// Report HTML autonomo, nello STILE del sito (Titillium Web, palette neutra + verde
 // brand, pannelli a bordo sottile), con riepilogo dettagliato. Apribile
 // offline, con link cliccabili ai profili, chiaro e scuro come il sito.
 function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStats): string {
@@ -287,7 +287,7 @@ function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStat
 <title>${esc(APP_NAME)} — ${esc(title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#fcfcfc; --bg-alt:#f8f8f8; --card:#fbfbfb; --soft:#f6f6f6;
@@ -304,7 +304,7 @@ function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStat
     }
   }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Ubuntu",system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.5; padding:clamp(16px,4vw,40px); -webkit-font-smoothing:antialiased; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Titillium Web",system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.5; padding:clamp(16px,4vw,40px); -webkit-font-smoothing:antialiased; }
   .wrap { max-width:760px; margin:0 auto; }
   .panel { border:1px solid var(--bd); border-radius:12px; background:var(--card); padding:1.4rem 1.5rem; }
   .head { margin-bottom:1rem; }

@@ -102,7 +102,7 @@
 .sb-ig-file {
   margin-left: auto;
   max-width: 45%;
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.76rem;
   color: var(--sb-fg-muted);
   overflow: hidden;
@@ -119,7 +119,7 @@
   border-radius: 6px;
   background: var(--sb-bg);
   color: var(--sb-fg);
-  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.8rem;
   line-height: 1.55;
   padding: 0.6rem 0.75rem;
