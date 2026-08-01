@@ -29,6 +29,9 @@ const MeStesso = lazy(() => import("./app/me-stesso/MeStesso.tsx"));
 const Dubliners = lazy(() => import("./app/dubliners/Dubliners.tsx"));
 const Gattopardo = lazy(() => import("./app/gattopardo/Gattopardo.tsx"));
 const Festa = lazy(() => import("./app/festa/Festa.tsx"));
+const Mima = lazy(() => import("./app/mima/Mima.tsx"));
+const MimaVeicoli = lazy(() => import("./app/mima/Veicoli.tsx"));
+const MimaLuoghi = lazy(() => import("./app/mima/Luoghi.tsx"));
 const Archivio = lazy(() => import("./app/archivio/Archivio.tsx"));
 const Sostieni = lazy(() => import("./app/sostieni/Sostieni.tsx"));
 const Instagram = lazy(() => import("./app/instagram/Instagram.tsx"));
@@ -114,6 +117,30 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Festa />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/mima"
+        element={
+          <Suspense fallback={null}>
+            <Mima />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/mima/veicoli"
+        element={
+          <Suspense fallback={null}>
+            <MimaVeicoli />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/mima/luoghi"
+        element={
+          <Suspense fallback={null}>
+            <MimaLuoghi />
           </Suspense>
         }
       />
