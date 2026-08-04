@@ -27,6 +27,7 @@ import { gradeFromPct, isGoodGrade } from "./grade";
 import { computePackageGrades, typeLabelLong } from "./packageGrades";
 import { submitScore, fetchPlayerBests, type ScoreRow } from "./leaderboardApi";
 import { saveGrades, fetchGradeRows } from "./gradesApi";
+import { PageBackdrop } from "../site/homeFx";
 import "../home.css";
 import "./trivia.css";
 
@@ -543,7 +544,12 @@ export default function Trivia() {
   // ══ MENÙ: una pagina vera, con nav e footer del sito ══
   if (phase === "menu" || phase === "gate") {
     return (
-      <div className="sb-home sb-tv-page">
+      <div className="sb-home sb-home--fx sb-tv-page">
+        {/* Il fondale sta sul MENU, non sulla partita (.sb-tv-game, più sotto):
+            lì c'è un cronometro che corre e una foto a tutto schermo per ogni
+            domanda — un'aurora dietro sarebbe rumore, e costo, nel momento
+            sbagliato. */}
+        <PageBackdrop />
         {/* Skiplink — requisito di accessibilità (come la home) */}
         <div className="skiplinks">
           <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>

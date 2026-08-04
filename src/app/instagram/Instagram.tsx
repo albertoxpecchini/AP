@@ -12,6 +12,7 @@ import Tutorial from "./Tutorial";
 import { fetchCount, bumpCount, subscribeCount } from "./statsApi";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 import { getPref, setPref } from "../utils/prefs";
+import { PageBackdrop } from "../site/homeFx";
 import "../home.css";
 import "./instagram.css";
 
@@ -600,7 +601,8 @@ export default function Instagram() {
   };
 
   return (
-    <div className="sb-home ig-page">
+    <div className="sb-home sb-home--fx ig-page">
+      <PageBackdrop />
       {showTutorial && <Tutorial onClose={closeTutorial} />}
 
       {/* Skiplink — requisito di accessibilità (come la home) */}

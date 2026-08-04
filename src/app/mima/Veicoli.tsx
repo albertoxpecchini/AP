@@ -4,6 +4,7 @@ import SiteFooter from "../site/SiteFooter";
 import {
   IcArrowLeft, IcCar, IcRuler, IcClock, IcUsers, IcCube,
 } from "../site/homeIcons";
+import { PageBackdrop, ShinyBrandline, SparkGroup } from "../site/homeFx";
 import "../home.css";
 import "./mima.css";
 import "./veicoli.css";
@@ -187,7 +188,8 @@ export default function Veicoli() {
   }, []);
 
   return (
-    <div className="sb-home mima-page">
+    <div className="sb-home sb-home--fx mima-page">
+      <PageBackdrop />
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>
       </div>
@@ -212,7 +214,7 @@ export default function Veicoli() {
             <p className="sb-mima-eyebrow"><IcCar size={14} /> Come arriviamo</p>
             <h1 className="sb-hero-title" id="veic-hero-title">
               <span>Quale auto portiamo?</span>
-              <span className="sb-brandline">Milano Marittima · 13 → 17 agosto 2026</span>
+              <ShinyBrandline text="Milano Marittima · 13 → 17 agosto 2026" className="sb-brandline" />
             </h1>
             <div className="sb-hero-copy" style={{ marginTop: "1.1rem" }}>
               <p>
@@ -383,11 +385,11 @@ export default function Veicoli() {
               preventivo reale. I km e il carburante veri del viaggio restano tracciati in MiMa,
               sezione "Come ci si arriva".
             </p>
-            <div className="sb-hero-actions">
+            <SparkGroup className="sb-hero-actions">
               <Link to="/mima" className="sb-btn sb-btn--secondary">
                 <IcArrowLeft size={16} /> Torna a MiMa
               </Link>
-            </div>
+            </SparkGroup>
           </div>
         </section>
       </main>

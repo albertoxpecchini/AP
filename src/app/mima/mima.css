@@ -114,8 +114,22 @@
 .sb-mima-cancel-chip { align-self: flex-start; }
 .sb-mima-cancel-chip svg { color: var(--sb-brand-text); }
 
-.sb-mima-map { border-radius: 10px; overflow: hidden; border: 1px solid var(--sb-border-strong); aspect-ratio: 16 / 8; }
-.sb-mima-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+.sb-mima-map {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--sb-border-strong);
+  aspect-ratio: 16 / 8;
+  /* Stessa rimappatura token di .sb-loc-map in home.css: i controlli zoom di
+     src/components/ui/map.tsx leggono i token shadcn globali (arancio
+     Ubuntu) — qui li rimappiamo ai token .sb- per la palette neutra + verde
+     brand del sito. */
+  --background: var(--sb-bg);
+  --foreground: var(--sb-fg);
+  --border: var(--sb-border-strong);
+  --accent: var(--sb-surface-200);
+  --muted-foreground: var(--sb-fg-muted);
+  --ring: var(--sb-brand);
+}
 @media (max-width: 480px) { .sb-mima-map { aspect-ratio: 4 / 3; } }
 
 /* ── Info pratiche (righe domanda/risposta, stessa grammatica di veic-why) ── */
@@ -259,6 +273,11 @@
   transition: background 0.15s, border-color 0.15s;
 }
 .sb-mima-modal-close:hover { background: var(--sb-surface-200); border-color: var(--sb-border-stronger); }
+
+/* Lo stacco sopra i bottoni della hero. Era un `style` inline sul <div>; ora
+   che il gruppo è avvolto da <SparkGroup /> (le scintille al click) il margine
+   sta qui, perché il componente rende lui l'elemento e non inoltra `style`. */
+.sb-mima-actions { margin-top: 1.4rem; }
 
 /* ── Riduzione del movimento ─────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

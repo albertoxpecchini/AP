@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, lazy, Suspense } from "react";
 import type { ReactNode } from "react";
 import { SiteLink as Link } from "./site/nav";
 import { activateLocalMode } from "./utils/local";
@@ -43,8 +43,15 @@ import {
   IcBook,
   IcCat,
   IcId,
+  IcPin,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
+import { useNavPill } from "./site/GlassMotion";
+// Effetti "pronti" della home (React Bits) — vedi site/homeFx.tsx per il
+// raccordo con tema, movimento ridotto e caricamento pigro.
+import { AuroraBackdrop, ShinyBrandline, SparkGroup, TrustedLoop } from "./site/homeFx";
+import SpotlightCard from "@/components/reactbits/SpotlightCard";
+import type { LogoItem } from "@/components/reactbits/LogoLoop";
 import {
   LiveStatus,
   NowBuilding,
@@ -61,6 +68,7 @@ import {
 import { EMAIL } from "./site/data";
 import { PROJECTS } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
+const RivaltaMap = lazy(() => import("./site/RivaltaMap"));
 import SiteFooter from "./site/SiteFooter";
 import { getLang, subscribeLang, type Lang } from "./i18n/langCore";
 import "./home.css";
@@ -547,6 +555,64 @@ const STORIES: { id: string; kind: string; quote: ReactNode }[] = [
   },
 ];
 
+// Mappa — Rivalta sul Mincio, il borgo per cui ho realizzato il sito
+// ufficiale (vedi STORIES sopra). Coordinate del borgo (Rodigo, Mantova).
+const RIVALTA_CENTER: [number, number] = [10.6771374, 45.1801924];
+const RIVALTA_GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Rivalta sul Mincio, Italia")}`;
+
+// La scocca delle card della griglia prodotti: il vetro (.sb-panel) più l'alone
+// che segue il puntatore. Sta qui e non ripetuto sette volte perché le sette
+// card sono la stessa cosa con dentro contenuti diversi — e perché l'alone deve
+// stare SOLO su queste. Le altre griglie (pagine, story-card, curriculum) hanno
+// già rim, sheen e tilt: un quarto strato lì sarebbe un tic, non un effetto.
+function ProductCard({ children }: { children: ReactNode }) {
+  return (
+    <SpotlightCard>
+      <div className="sb-panel">
+        <div className="sb-panel-inner">{children}</div>
+      </div>
+    </SpotlightCard>
+  );
+}
+
+// I marchi del nastro "Trusted by". Costante di modulo, non un array creato nel
+// render: LogoLoop rimisura la sequenza ogni volta che questa lista cambia
+// identità, e <App /> si rirenderizza a ogni scroll (vedi lo stato `scrolled`).
+// I clienti sono due: un nastro che ripete due nomi si legge come un errore, a
+// meno che la ripetizione non abbia un ritmo. Fra l'uno e l'altro c'è quindi un
+// separatore — così la sequenza che scorre è «cliente · segno · cliente · segno»
+// e il ritorno sembra una scelta invece di una mancanza di materiale.
+const TRUSTED_SEP: LogoItem = {
+  node: (
+    <span className="sb-trust-sep" aria-hidden="true">
+      ✦
+    </span>
+  ),
+};
+
+const TRUSTED_LOGOS: LogoItem[] = [
+  {
+    node: (
+      <span className="sb-trust-chip">
+        <TrustedDot /> Cascina Fontana
+      </span>
+    ),
+    href: "https://cascinafontana.xyz",
+    ariaLabel: "Cascina Fontana",
+  },
+  TRUSTED_SEP,
+  {
+    node: (
+      <span className="sb-trust-chip">
+        <TrustedDot delay={0.9} /> Rivalta sul Mincio
+      </span>
+    ),
+    href: "https://rivaltasulmincio.it",
+    ariaLabel: "Rivalta sul Mincio",
+  },
+  TRUSTED_SEP,
+];
+
 export default function App() {
   const [localMode, setLocalMode] = useState(false);
   const [docOpen, setDocOpen] = useState<{ url: string; title: string } | null>(null);
@@ -643,12 +709,21 @@ export default function App() {
   const homeRef = useRef<HTMLDivElement>(null);
   useHomeMotion(homeRef);
 
+  // La pillola della nav sta qui e non in <GlassMotion /> (che è globale):
+  // .sb-nav-link esiste solo in questa nav, e legandola al ciclo di vita di
+  // App trova il DOM già montato senza sorvegliare i cambi di rotta.
+  const navRef = useRef<HTMLElement>(null);
+  useNavPill(navRef);
+
   return (
     <div className="sb-home" ref={homeRef}>
       {/* Fondale continuo di TUTTA la pagina: è fisso alla finestra, quindi
           nessun bordo di sezione può tagliarlo a metà mentre si scorre. Fra
           una sezione e l'altra non c'è nessun confine. */}
       <div className="sb-bg" aria-hidden="true">
+        {/* L'aurora sta SOTTO la griglia: è la griglia sopra che la tiene
+            attaccata al sito invece di farla sembrare un poster incollato. */}
+        <AuroraBackdrop />
         <span className="sb-bg-grid" />
       </div>
 
@@ -667,7 +742,12 @@ export default function App() {
             {localMode ? <span className="sb-local">Local</span> : null}
           </a>
 
-          <nav className="sb-nav-links" aria-label="Primary navigation">
+          <nav className="sb-nav-links" aria-label="Primary navigation" ref={navRef}>
+            {/* Pillola di vetro che scivola sotto la voce puntata e, tolto il
+                puntatore, torna sulla sezione a schermo. Decorativa: chi
+                naviga da tastiera o con lo screen reader ha aria-current sul
+                link, che è l'informazione vera. */}
+            <span className="sb-nav-pill" aria-hidden="true" />
             {NAV.map((l) =>
               l.route ? (
                 <Link key={l.href} to={l.href} className="sb-nav-link">{l.label}</Link>
@@ -759,7 +839,7 @@ export default function App() {
             <div className="sb-hero-grid">
               <h1 className="sb-hero-title">
                 <span translate="no">Alberto Pecchini</span>
-                <span className="sb-brandline">Designer &amp; Front-end Developer</span>
+                <ShinyBrandline text="Designer & Front-end Developer" className="sb-brandline" />
               </h1>
               <div className="sb-hero-copy">
                 <p>
@@ -774,10 +854,10 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <div className="sb-hero-actions">
+            <SparkGroup className="sb-hero-actions">
               <a href="#progetti" className="sb-btn sb-btn--primary">Explore my projects</a>
               <a href="#curriculum" className="sb-btn sb-btn--secondary">View my résumé</a>
-            </div>
+            </SparkGroup>
             <NowBuilding />
           </div>
         </section>
@@ -786,43 +866,39 @@ export default function App() {
         <section id="progetti" className="sb-container sb-products" aria-label="What I do">
           {/* Card grande: sviluppo web */}
           <Link to="/archivio" className="sb-card sb-card--lg">
-            <div className="sb-panel">
-              <div className="sb-panel-inner">
-                <div className="sb-card-head">
-                  <div className="sb-card-title"><IcCode /><h3>Web development</h3></div>
-                  <p className="sb-card-desc">
-                    Every project is <strong>a complete hand-built website</strong> — designed,
-                    coded and shipped end to end with React and TypeScript.
-                  </p>
-                  <ul className="sb-checks">
-                    <li><IcCheck size={15} /> 100% responsive</li>
-                    <li><IcCheck size={15} /> Careful motion design</li>
-                    <li><IcCheck size={15} /> Easy to extend</li>
-                  </ul>
-                </div>
-                <div className="sb-card-visual">
-                  <BrowserMock />
-                </div>
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcCode /><h3>Web development</h3></div>
+                <p className="sb-card-desc">
+                  Every project is <strong>a complete hand-built website</strong> — designed,
+                  coded and shipped end to end with React and TypeScript.
+                </p>
+                <ul className="sb-checks">
+                  <li><IcCheck size={15} /> 100% responsive</li>
+                  <li><IcCheck size={15} /> Careful motion design</li>
+                  <li><IcCheck size={15} /> Easy to extend</li>
+                </ul>
               </div>
-            </div>
+              <div className="sb-card-visual">
+                <BrowserMock />
+              </div>
+            </ProductCard>
           </Link>
 
           {/* Web design */}
           <Link to="/me-stesso" className="sb-card">
-            <div className="sb-panel">
-              <div className="sb-panel-inner">
-                <div className="sb-card-head">
-                  <div className="sb-card-title"><IcPen /><h3>Web design</h3></div>
-                  <p className="sb-card-desc">
-                    Interfaces with <strong>careful typography, spacing and motion</strong> —
-                    designed twice, in light and in dark.
-                  </p>
-                </div>
-                <div className="sb-card-visual">
-                  <AaSwap />
-                </div>
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcPen /><h3>Web design</h3></div>
+                <p className="sb-card-desc">
+                  Interfaces with <strong>careful typography, spacing and motion</strong> —
+                  designed twice, in light and in dark.
+                </p>
               </div>
-            </div>
+              <div className="sb-card-visual">
+                <AaSwap />
+              </div>
+            </ProductCard>
           </Link>
 
           {/* Sviluppo assistito dall'AI */}
@@ -832,92 +908,82 @@ export default function App() {
             rel="noreferrer noopener"
             className="sb-card"
           >
-            <div className="sb-panel">
-              <div className="sb-panel-inner">
-                <div className="sb-card-head">
-                  <div className="sb-card-title"><IcSparkle /><h3>AI-assisted development</h3></div>
-                  <p className="sb-card-desc">
-                    <strong>Ship faster with AI in the loop</strong> — Claude Code, Codex and
-                    Copilot, every line reviewed.
-                  </p>
-                </div>
-                <div className="sb-card-visual">
-                  <LiveTerminal />
-                </div>
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcSparkle /><h3>AI-assisted development</h3></div>
+                <p className="sb-card-desc">
+                  <strong>Ship faster with AI in the loop</strong> — Claude Code, Codex and
+                  Copilot, every line reviewed.
+                </p>
               </div>
-            </div>
+              <div className="sb-card-visual">
+                <LiveTerminal />
+              </div>
+            </ProductCard>
           </a>
 
           {/* Giochi web */}
           <Link to="/trivia" className="sb-card">
-            <div className="sb-panel">
-              <div className="sb-panel-inner">
-                <div className="sb-card-head">
-                  <div className="sb-card-title"><IcGame /><h3>Web games</h3></div>
-                  <p className="sb-card-desc">
-                    Build <strong>playful experiences</strong> — scores, streaks, speed bonuses
-                    and a live leaderboard.
-                  </p>
-                </div>
-                <div className="sb-card-visual">
-                  <GameHud />
-                </div>
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcGame /><h3>Web games</h3></div>
+                <p className="sb-card-desc">
+                  Build <strong>playful experiences</strong> — scores, streaks, speed bonuses
+                  and a live leaderboard.
+                </p>
               </div>
-            </div>
+              <div className="sb-card-visual">
+                <GameHud />
+              </div>
+            </ProductCard>
           </Link>
 
           {/* Strumenti web */}
           <Link to="/instagram" className="sb-card">
-            <div className="sb-panel">
-              <div className="sb-panel-inner">
-                <div className="sb-card-head">
-                  <div className="sb-card-title"><IcVenn /><h3>Web tools</h3></div>
-                  <p className="sb-card-desc">
-                    Privacy-first utilities that <strong>run entirely in your browser</strong> —
-                    nothing uploaded, nothing stored.
-                  </p>
-                </div>
-                <div className="sb-card-visual">
-                  <DiffScan />
-                </div>
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcVenn /><h3>Web tools</h3></div>
+                <p className="sb-card-desc">
+                  Privacy-first utilities that <strong>run entirely in your browser</strong> —
+                  nothing uploaded, nothing stored.
+                </p>
               </div>
-            </div>
+              <div className="sb-card-visual">
+                <DiffScan />
+              </div>
+            </ProductCard>
           </Link>
 
           {/* Siti per clienti */}
           <a href="#lavori" className="sb-card">
-            <div className="sb-panel">
-              <div className="sb-panel-inner">
-                <div className="sb-card-head">
-                  <div className="sb-card-title"><IcGlobe /><h3>Client websites</h3></div>
-                  <p className="sb-card-desc">
-                    Real sites for real businesses, <strong>from brief to launch</strong> —
-                    content included.
-                  </p>
-                </div>
-                <div className="sb-card-visual">
-                  <ClientFlow />
-                </div>
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcGlobe /><h3>Client websites</h3></div>
+                <p className="sb-card-desc">
+                  Real sites for real businesses, <strong>from brief to launch</strong> —
+                  content included.
+                </p>
               </div>
-            </div>
+              <div className="sb-card-visual">
+                <ClientFlow />
+              </div>
+            </ProductCard>
           </a>
 
           {/* Area tecnica CAT */}
           <Link to="/pcto" className="sb-card">
-            <div className="sb-panel">
-              <div className="sb-panel-inner">
-                <div className="sb-card-head">
-                  <div className="sb-card-title"><IcCompass /><h3>CAT · Technical area</h3></div>
-                  <p className="sb-card-desc">
-                    From <strong>technical drawing to topography</strong> — AutoCAD, cadwork,
-                    valuation and surveying.
-                  </p>
-                </div>
-                <div className="sb-card-visual">
-                  <CatCube />
-                </div>
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcCompass /><h3>CAT · Technical area</h3></div>
+                <p className="sb-card-desc">
+                  From <strong>technical drawing to topography</strong> — AutoCAD, cadwork,
+                  valuation and surveying.
+                </p>
               </div>
-            </div>
+              <div className="sb-card-visual">
+                <CatCube />
+              </div>
+            </ProductCard>
           </Link>
         </section>
 
@@ -929,12 +995,7 @@ export default function App() {
           </p>
           <span className="sb-trusted-label">Trusted by real clients</span>
           <div className="sb-trusted" data-no-i18n>
-            <a href="https://cascinafontana.xyz" target="_blank" rel="noreferrer noopener">
-              <TrustedDot /> CASCINA FONTANA
-            </a>
-            <a href="https://rivaltasulmincio.it" target="_blank" rel="noreferrer noopener">
-              <TrustedDot delay={0.9} /> RIVALTA SUL MINCIO
-            </a>
+            <TrustedLoop logos={TRUSTED_LOGOS} />
           </div>
         </div>
 
@@ -1102,6 +1163,26 @@ export default function App() {
                 );
               })}
             </div>
+
+            <div className="sb-panel sb-loc-panel">
+              <div className="sb-panel-inner sb-loc-inner">
+                <div className="sb-loc-copy">
+                  <h4 className="sb-loc-title"><IcPin size={16} /> <span translate="no">Rivalta sul Mincio</span></h4>
+                  <p className="sb-loc-desc">
+                    The village on the Mincio river where my family's farm is, and where I
+                    designed and built the official tourist website above.
+                  </p>
+                  <a className="sb-btn sb-btn--sm sb-btn--secondary" href={RIVALTA_GMAPS} target="_blank" rel="noreferrer">
+                    <IcCompass size={16} /> Google Maps
+                  </a>
+                </div>
+                <div className="sb-loc-map">
+                  <Suspense fallback={null}>
+                    <RivaltaMap center={RIVALTA_CENTER} zoom={13} />
+                  </Suspense>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -1221,14 +1302,15 @@ export default function App() {
             <h2>
               Have a project in mind?
               <span className="sb-brandline">
-                Let's talk.<i className="sb-caret" aria-hidden="true" />
+                <ShinyBrandline text="Let's talk." />
+                <i className="sb-caret" aria-hidden="true" />
               </span>
             </h2>
             <p>For collaborations, web projects or simply to exchange ideas — I'm available.</p>
-            <div className="sb-cta-actions">
+            <SparkGroup className="sb-cta-actions">
               <a href={`mailto:${EMAIL}`} className="sb-btn sb-btn--primary"><IcMail size={16} /> Email me</a>
               <Link to="/sostieni" className="sb-btn sb-btn--secondary"><IcHeart size={16} /> Support me</Link>
-            </div>
+            </SparkGroup>
           </div>
         </section>
       </main>

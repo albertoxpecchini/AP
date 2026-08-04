@@ -41,7 +41,16 @@
 /* ── Cornice del pannello (come .sb-arch-frame della home) ───────────────── */
 .sb-ar-section { padding-top: clamp(1rem, 2vw, 2rem); }
 .sb-ar-frame { margin-top: clamp(1.4rem, 3vw, 2rem); }
-.sb-ar-frame > .sb-panel > .sb-panel-inner { background: var(--sb-bg-alt); }
+/* Questo pannello NON è di vetro, ed è una questione di funzionamento, non di
+   gusto: backdrop-filter fa da containing block a ogni position:fixed che ha
+   dentro, e qui dentro c'è .sb-ar-marquee — il rettangolo di selezione, che
+   lavora in coordinate viewport. Col vetro resterebbe imprigionato nei bordi
+   del pannello e la selezione a trascinamento andrebbe fuori registro. */
+.sb-ar-frame > .sb-panel > .sb-panel-inner {
+  background: var(--sb-bg-alt);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    IL PANNELLO — .sb-ar-ex

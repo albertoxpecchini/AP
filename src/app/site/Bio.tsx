@@ -33,6 +33,7 @@ import {
   IcExplore,
   type IcProps,
 } from "./homeIcons";
+import { PageBackdrop } from "./homeFx";
 import "../home.css";
 import "./bio.css";
 
@@ -187,7 +188,8 @@ export default function Bio() {
   const SelectedIcon = selected ? iconFor(selected.label) : null;
 
   return (
-    <div className="sb-home bio-page">
+    <div className="sb-home sb-home--fx bio-page">
+      <PageBackdrop />
       {/* Skiplink — requisito di accessibilità */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>

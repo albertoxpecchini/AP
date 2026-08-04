@@ -30,6 +30,12 @@
   --sb-fg-muted: #8f8f8f;
   --sb-brand: hsl(153, 60%, 53%);
   --sb-brand-text: hsl(153, 86%, 28%);
+  /* Banda di luce delle brandline (ShinyText). La base è lo stesso verde di
+     prima — a riposo il titolo è identico a com'era. Sul chiaro la "luce" è
+     più SCURA della base: su un fondo bianco una passata più chiara
+     sbiadirebbe il testo invece di accenderlo. */
+  --sb-shine-base: var(--sb-brand);
+  --sb-shine-hi: var(--sb-brand-text);
   --sb-btn-bg: hsl(151, 67%, 67%);
   --sb-btn-bd: hsla(155, 78%, 40%, 0.75);
   --sb-btn-bg-hover: hsl(151, 63%, 60%);
@@ -38,6 +44,21 @@
   --sb-code-num: #953800;
   --sb-code-fn: #8250df;
   --sb-shadow-card: 0 4px 20px -6px rgba(0, 0, 0, 0.1);
+
+  /* ── Vetro ──────────────────────────────────────────────────────────────
+     Le superfici delle card non sono più tinte piatte: sono lastre che
+     lasciano passare il fondale. Perché si legga come vetro servono tre
+     cose insieme, e nessuna basta da sola: la trasparenza (--bg), la
+     sfocatura di ciò che sta dietro (--blur, con un pizzico di saturazione
+     in più perché il blur slava i colori) e il filo di luce sul bordo alto
+     (--spec), che è quello che il cervello legge come "spessore". */
+  --sb-glass-bg: color-mix(in srgb, var(--sb-surface-75) 58%, transparent);
+  --sb-glass-blur: 20px;
+  --sb-glass-sat: 150%;
+  --sb-glass-spec: rgba(255, 255, 255, 0.72);
+  --sb-glass-rim: rgba(255, 255, 255, 0.55);
+  --sb-glass-shadow: 0 10px 34px -14px rgba(0, 0, 0, 0.2);
+  --sb-glass-sheen: rgba(255, 255, 255, 0.42);
 
   min-height: 100vh;
   background: var(--sb-bg);
@@ -65,6 +86,9 @@ html.dark .sb-home {
   --sb-fg-muted: #707070;
   --sb-brand: hsl(153, 60%, 53%);
   --sb-brand-text: hsl(155, 100%, 42%);
+  /* Sullo scuro il verso si ribalta: la luce è quasi bianca. */
+  --sb-shine-base: var(--sb-brand);
+  --sb-shine-hi: #eafff6;
   --sb-btn-bg: hsl(155, 100%, 19%);
   --sb-btn-bd: hsla(153, 60%, 53%, 0.3);
   --sb-btn-bg-hover: hsl(155, 74%, 25%);
@@ -73,6 +97,15 @@ html.dark .sb-home {
   --sb-code-num: #ffcda1;
   --sb-code-fn: #bda4ff;
   --sb-shadow-card: 0 4px 24px -6px rgba(0, 0, 0, 0.55);
+
+  /* Al buio il vetro è più scuro di ciò che ha dietro, non più chiaro: la
+     lastra assorbe. Il filo specular scende a un decimo — un bordo bianco
+     acceso come nel chiaro, qui, sembrerebbe un errore di rendering. */
+  --sb-glass-bg: color-mix(in srgb, var(--sb-surface-75) 52%, transparent);
+  --sb-glass-spec: rgba(255, 255, 255, 0.1);
+  --sb-glass-rim: rgba(255, 255, 255, 0.08);
+  --sb-glass-shadow: 0 10px 38px -14px rgba(0, 0, 0, 0.65);
+  --sb-glass-sheen: rgba(255, 255, 255, 0.1);
 }
 
 .sb-home ::selection { background: hsla(153, 60%, 53%, 0.35); }
@@ -94,7 +127,74 @@ html.dark .sb-home {
    quindi resta incollato alla finestra e nessun bordo di sezione può tagliarlo
    a metà scorrendo. Fra una sezione e l'altra non c'è nessun confine — sopra
    scorre solo il contenuto, che è trasparente. Il grigio di base sta su
-   .sb-home; qui ci sono solo le due velature di colore e la griglia. */
+   .sb-home; qui resta solo la griglia: le due velature di colore sono salite
+   sugli pseudo di .sb-home (vedi sotto), perché ora si muovono.
+
+   ── I due aloni ────────────────────────────────────────────────────────────
+   Stanno su ::before e ::after di .sb-home, non dentro .sb-bg, per due
+   ragioni. La prima: .sb-bg esiste solo sulla home, mentre le card di vetro
+   ora sono su ogni pagina — e una lastra che sfoca una tinta piatta è
+   indistinguibile da una lastra opaca. Così il fondale arriva ovunque senza
+   toccare il JSX di dieci pagine. La seconda: separati, i due aloni possono
+   andare alla deriva ognuno per conto suo.
+
+   z-index: -1 e non 0. Nell'ordine di pittura, i figli con z-index negativo
+   vanno subito dopo lo sfondo dell'elemento e PRIMA di tutto il contenuto;
+   con z-index: 0 finirebbero sopra il testo dei discendenti non posizionati,
+   e ogni pagina avrebbe dovuto rialzare il proprio contenuto a mano. */
+.sb-home::before,
+.sb-home::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform, translate;
+  /* Due movimenti indipendenti sullo stesso strato, su DUE proprietà diverse:
+     lo scroll scrive la deriva su `translate` (via --sb-drift, lo fa
+     site/glassMotion.ts), le keyframe qui sotto scrivono il respiro su
+     `transform`. Il browser le compone da sé — `translate` si applica prima
+     di `transform`. Se avessi infilato var(--sb-drift) dentro le keyframe,
+     l'animazione avrebbe smesso di essere compositabile e sarebbe tornata
+     sul thread principale a ogni frame di scroll. */
+  translate: 0 var(--sb-drift, 0px);
+}
+.sb-home::before {
+  background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.14), transparent 62%);
+  animation: sb-drift-a 74s ease-in-out infinite alternate;
+}
+.sb-home::after {
+  background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.1), transparent 60%);
+  animation: sb-drift-b 91s ease-in-out infinite alternate;
+}
+html.dark .sb-home::before {
+  background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.16), transparent 62%);
+}
+html.dark .sb-home::after {
+  background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.12), transparent 60%);
+}
+/* 74 e 91 secondi: due tempi che non tornano mai in fase alla stessa ora, così
+   il fondo non ha un "battito" riconoscibile. Solo transform e scale — nessun
+   ridisegno, il compositore muove due strati già dipinti. */
+@keyframes sb-drift-a {
+  from { transform: translate3d(-3vw, -2vh, 0) scale(1); }
+  to   { transform: translate3d(4vw, 3vh, 0) scale(1.09); }
+}
+@keyframes sb-drift-b {
+  from { transform: translate3d(3vw, 2vh, 0) scale(1.06); }
+  to   { transform: translate3d(-4vw, -3vh, 0) scale(1); }
+}
+/* .sb-home non vuol dire "pagina": è la classe che porta i token, e se la
+   mettono addosso anche il footer, la barra di controllo, il velo del cambio
+   lingua, il tutorial e i due modali. Ognuno di loro si porterebbe dietro la
+   sua coppia di aloni a tutto schermo — su /mima ne contavo tre sovrapposti,
+   con l'opacità che si sommava e due animazioni infinite di troppo.
+   Il fondale lo tiene solo il contenitore di pagina. */
+.sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut, .apl-dialog, .apw-dialog)::before,
+.sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut, .apl-dialog, .apw-dialog)::after {
+  content: none;
+}
+
 .sb-bg {
   position: fixed;
   inset: 0;
@@ -102,14 +202,6 @@ html.dark .sb-home {
   pointer-events: none;
   /* Strato a sé: il browser lo dipinge una volta e poi si limita a comporlo. */
   transform: translateZ(0);
-  background:
-    radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.14), transparent 62%),
-    radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.1), transparent 60%);
-}
-html.dark .sb-bg {
-  background:
-    radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.16), transparent 62%),
-    radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.12), transparent 60%);
 }
 /* Griglia tecnica: si dissolve verso il basso, così non finisce mai con una
    riga netta. Ferma, non alla deriva: il movimento lo dà lo scroll. */
@@ -130,6 +222,7 @@ html.dark .sb-bg {
 
 @media print {
   .sb-bg { display: none; }
+  .sb-home::before, .sb-home::after { content: none; }
 }
 
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
@@ -167,9 +260,10 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   border: 1px solid var(--sb-btn-bd);
   color: var(--sb-btn-fg);
 }
-.sb-nav-links { display: flex; align-items: center; gap: 0.15rem; }
+.sb-nav-links { position: relative; display: flex; align-items: center; gap: 0.15rem; }
 .sb-nav-link {
   position: relative;
+  z-index: 1;
   padding: 0.35rem 0.7rem;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -178,21 +272,45 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   transition: color 0.15s, background 0.15s;
   white-space: nowrap;
 }
+/* Il fondino all'hover è il ripiego di quando il JS non è (ancora) arrivato:
+   appena glassMotion prende in mano la nav mette --pill sulla lista e la
+   pillola diventa l'unico indicatore, senza due segnali sovrapposti. */
 .sb-nav-link:hover { color: var(--sb-fg); background: var(--sb-overlay); }
-/* Filo verde che si apre da sinistra sotto la voce puntata */
-.sb-nav-link::after {
-  content: "";
+.sb-nav-links--pill .sb-nav-link { transition: color 0.15s; }
+.sb-nav-links--pill .sb-nav-link:hover { background: transparent; }
+.sb-nav-links--pill .sb-nav-link[aria-current="location"] { color: var(--sb-fg); }
+
+/* ── Pillola di vetro ─────────────────────────────────────────────────────
+   Al posto del filo verde che si apriva sotto ogni voce c'è una sola
+   pillola che scivola da una voce all'altra. La differenza non è estetica:
+   il filo diceva "sei sopra questa", la pillola dice anche "sei DENTRO
+   questa sezione" — senza puntatore torna sulla sezione a schermo (lo
+   scrollspy sta in site/glassMotion.ts).
+
+   Un solo elemento che si muove, guidato da translate3d + scale: nessun
+   ridisegno mentre scorre. La misura di riposo è 100px, così scale() ha un
+   numero pulito con cui lavorare; il JS non tocca mai `width`. */
+.sb-nav-pill {
   position: absolute;
-  left: 0.7rem;
-  right: 0.7rem;
-  bottom: 0.12rem;
-  height: 1px;
-  background: var(--sb-brand);
-  transform: scaleX(0);
+  left: 0;
+  top: 50%;
+  z-index: 0;
+  width: 100px;
+  height: 30px;
+  margin-top: -15px;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
   transform-origin: left center;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(0, 0, 0) scaleX(1);
+  background: var(--sb-glass-bg);
+  -webkit-backdrop-filter: blur(8px) saturate(var(--sb-glass-sat));
+  backdrop-filter: blur(8px) saturate(var(--sb-glass-sat));
+  border: 1px solid color-mix(in srgb, var(--sb-brand) 30%, var(--sb-border-strong));
+  box-shadow: inset 0 1px 0 var(--sb-glass-spec);
+  transition: opacity 0.2s ease;
 }
-.sb-nav-link:hover::after { transform: scaleX(1); }
+.sb-nav-pill--on { opacity: 1; }
 .sb-nav-right { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
 .sb-burger {
   display: none;
@@ -378,20 +496,26 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 @media (min-width: 640px) { .sb-card { height: 400px; } .sb-card--lg { grid-column: span 2; } }
 @media (min-width: 1280px) { .sb-card { grid-column: span 3; } .sb-card--lg { grid-column: span 6; } }
 
-/* Pannello con bordo-gradiente da 1px (marchio di fabbrica delle card).
-   NIENTE aloni né riflessi che seguono il puntatore: scorrendo la pagina il
-   cursore attraversa una card dopo l'altra e ognuna si accendeva sotto di lui —
-   un lampeggio continuo che abbagliava e costava un ridisegno a ogni frame.
-   All'hover resta solo quello che serve a dire "questa è premibile": il bordo
-   si fa più netto e la card si solleva di 3 px. */
+/* Pannello di vetro con rim da 1px (marchio di fabbrica delle card).
+   Il bordo non è più una riga grigia uniforme: è un rim illuminato in alto a
+   sinistra che si spegne scendendo, come succede a una lastra vera sotto una
+   luce d'ambiente. È metà dell'effetto — l'altra metà è il filo specular
+   dentro .sb-panel-inner. Da soli sembrano entrambi uno sbaglio; insieme
+   danno lo spessore.
+
+   Continua a NON esserci nessun alone che segue il puntatore: quella roba si
+   accendeva su una card dopo l'altra mentre scorrevi e ridisegnava gradienti
+   grandi a ogni frame. Quello che si muove qui è solo transform (il tilt, in
+   site/glassMotion.ts) e una banda di luce che parte in ritardo. */
 .sb-panel {
   position: relative;
   height: 100%;
   padding: 1px;
   border-radius: 12px;
   background: linear-gradient(
-    to bottom,
-    var(--sb-border-strong),
+    160deg,
+    var(--sb-glass-rim),
+    var(--sb-border-strong) 38%,
     color-mix(in srgb, var(--sb-border) 45%, transparent)
   );
   transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -400,23 +524,114 @@ a.sb-card:hover .sb-panel,
 button.sb-card:hover .sb-panel,
 .sb-panel--hover:hover {
   background: var(--sb-border-stronger);
-  box-shadow: var(--sb-shadow-card);
+  box-shadow: var(--sb-shadow-card), var(--sb-glass-shadow);
 }
 /* Il sollevamento all'hover sta sul pannello, non sulla card: la card è la
-   maglia della griglia, spostarla sposterebbe anche il suo ingombro. */
-a.sb-card:hover .sb-panel,
-.sb-page-card:hover .sb-panel,
-.sb-story:hover .sb-panel {
-  transform: translateY(-3px);
+   maglia della griglia, spostarla sposterebbe anche il suo ingombro.
+
+   Col puntatore fino il sollevamento NON sta più qui: lo fa GSAP insieme al
+   tilt (site/glassMotion.ts), perché scrivono tutti e due su `transform` e
+   se restassero in due a contendersela la card sussulterebbe all'uscita.
+   Questa regola resta viva per il tocco e per i puntatori grossolani. */
+@media not all and (hover: hover) and (pointer: fine) {
+  a.sb-card:hover .sb-panel,
+  .sb-page-card:hover .sb-panel,
+  .sb-story:hover .sb-panel {
+    transform: translateY(-3px);
+  }
+}
+/* E dove il tilt c'è, `transform` esce dalla lista delle transizioni: GSAP
+   riscrive la matrice a ogni frame e una transition sopra proverebbe a
+   interpolare ognuna di quelle scritture, con l'inclinazione che arriva in
+   ritardo e struscia. Bordo e ombra continuano a sfumare. */
+@media (hover: hover) and (pointer: fine) {
+  .sb-panel { transition: background 0.2s ease, box-shadow 0.2s ease; }
 }
 .sb-panel-inner {
   position: relative;
   height: 100%;
   border-radius: 11px;
-  background: var(--sb-surface-75);
+  /* Vetro: la tinta piena lascia il posto a una lastra che fa passare il
+     fondale. saturate() rimette il colore che la sfocatura porta via. */
+  background: var(--sb-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+  backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+  box-shadow: inset 0 1px 0 var(--sb-glass-spec);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* Dove il vetro non deve andare. Non è una questione di gusto: backdrop-filter
+   fa da containing block a tutti i position:fixed che ha dentro, quindi un
+   pannello che contiene elementi ancorati alla finestra (il rettangolo di
+   selezione dell'archivio, per dirne uno) li vedrebbe collassare sui propri
+   bordi. Vale anche per le canvas WebGL delle mappe: sono opache, dietro non
+   c'è niente da sfocare, e il filtro si pagherebbe a vuoto. */
+.sb-panel--solid > .sb-panel-inner,
+.sb-panel-inner.sb-panel--solid {
+  background: var(--sb-surface-75);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Ripiego per chi non ha backdrop-filter (Firefox con il flag spento, browser
+   vecchi): senza questo le card resterebbero mezze trasparenti sul fondale,
+   cioè illeggibili. Meglio opache che a metà. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sb-panel-inner { background: var(--sb-surface-75); }
+}
+
+/* Su schermo piccolo la lastra si assottiglia: una dozzina di pannelli sfocati
+   in viewport è lavoro vero per il compositore di un telefono, e a quella
+   dimensione la profondità del blur non si legge comunque. */
+@media (max-width: 639.98px) {
+  .sb-home { --sb-glass-blur: 12px; --sb-glass-sat: 130%; }
+}
+
+/* ── Sheen ────────────────────────────────────────────────────────────────
+   Una banda di luce attraversa il vetro quando ci si SOFFERMA sopra.
+   Il punto è tutto nei 120 ms di ritardo: scorrendo la pagina il cursore
+   attraversa una card dopo l'altra, e senza quel ritardo si riaccenderebbe
+   quel lampeggio a catena che era già stato tolto una volta. Passandoci
+   sopra di corsa l'animazione non fa in tempo a cominciare.
+
+   È un'animation e non una transition apposta: uscendo a metà spazzata la
+   transition tornerebbe indietro strisciando: l'animation semplicemente non
+   c'è più, e la banda è già invisibile ai due estremi. */
+@media (hover: hover) and (pointer: fine) {
+  .sb-panel-inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    transform: translateX(-130%);
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      var(--sb-glass-sheen) 50%,
+      transparent 62%
+    );
+  }
+  a.sb-card:hover .sb-panel-inner::after,
+  button.sb-card:hover .sb-panel-inner::after,
+  .sb-page-card:hover .sb-panel-inner::after,
+  .sb-story:hover .sb-panel-inner::after,
+  .sb-panel--hover:hover > .sb-panel-inner::after {
+    animation: sb-sheen 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s 1;
+  }
+  /* Le card del footer non hanno lo sheen: il loro .sb-panel-inner è
+     overflow:visible (i tooltip del grafico GitHub devono uscire), quindi la
+     banda scivolerebbe fuori dalla card invece di essere tagliata dal bordo. */
+  .sb-foot-card .sb-panel-inner::after { content: none; }
+}
+@keyframes sb-sheen {
+  from { transform: translateX(-130%); opacity: 0; }
+  35%  { opacity: 1; }
+  to   { transform: translateX(130%); opacity: 0; }
 }
 /* Contenuto delle card prodotto */
 .sb-card-head { padding: 1.4rem 1.4rem 0; display: flex; flex-direction: column; gap: 0.6rem; }
@@ -943,26 +1158,74 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-prodfoot { text-align: center; padding-top: clamp(2.5rem, 5vw, 4rem); }
 .sb-prodfoot-tag { margin: 0 0 2rem; font-size: 0.95rem; color: var(--sb-fg-lighter); }
 .sb-prodfoot-tag strong { font-weight: 500; color: var(--sb-fg); }
+/* L'etichetta ha due filetti ai lati che si spengono allontanandosi: chiudono
+   la griglia dei prodotti e annunciano il nastro, senza tirare una riga netta
+   da parte a parte. */
 .sb-trusted-label {
-  display: block;
-  margin: 0 0 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 1.15rem;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--sb-fg-muted);
 }
-.sb-trusted { display: flex; flex-wrap: wrap; gap: 0.8rem 2.2rem; align-items: center; justify-content: center; }
-.sb-trusted a, .sb-trusted span {
+.sb-trusted-label::before,
+.sb-trusted-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--sb-border-strong));
+}
+.sb-trusted-label::after {
+  background: linear-gradient(to left, transparent, var(--sb-border-strong));
+}
+
+/* Il nastro dei clienti. Nessuna sfumatura ai bordi: le voci corrono fino al
+   bordo del contenitore. */
+.sb-trusted { display: block; }
+.sb-trusted-loop { width: 100%; }
+.sb-trusted-loop a { text-decoration: none; }
+
+/* Ogni cliente è una pillola. Il fondo è una tinta semitrasparente, NON il
+   vetro con backdrop-filter delle card: qui l'elemento si sposta a ogni frame,
+   e una sfocatura del fondale andrebbe ricampionata di continuo per ognuna
+   delle pillole in circolo. La resa è quasi la stessa, il costo no. */
+.sb-trust-chip {
   display: inline-flex;
   align-items: center;
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--sb-fg-muted);
-  text-decoration: none;
-  transition: color 0.15s;
+  gap: 0.55rem;
+  padding: 0.52rem 1.05rem;
+  border-radius: 999px;
+  border: 1px solid var(--sb-border);
+  background: color-mix(in srgb, var(--sb-surface-100) 72%, transparent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--sb-fg-lighter);
+  transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
-.sb-trusted a:hover { color: var(--sb-fg); }
+/* Il link di LogoLoop porta con sé un hover:opacity-80 di Tailwind, che
+   spegnerebbe tutta la pillola. Qui l'hover è un'altra cosa: la pillola si
+   accende di verde e si solleva di un pelo. */
+.sb-trusted-loop a:hover { opacity: 1; }
+.sb-trusted-loop a:hover .sb-trust-chip,
+.sb-trusted-loop a:focus-visible .sb-trust-chip {
+  color: var(--sb-fg);
+  border-color: color-mix(in srgb, var(--sb-brand) 55%, var(--sb-border-strong));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-brand) 13%, transparent);
+  transform: translateY(-1px);
+}
+/* Il segno fra un cliente e l'altro: piccolo, verde, non un'altra voce. */
+.sb-trust-sep {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.62rem;
+  color: color-mix(in srgb, var(--sb-brand) 65%, var(--sb-fg-muted));
+}
 
 /* ── Sezione archivio ("dashboard") ──────────────────────────────────────── */
 .sb-sechead { max-width: 40rem; margin: 0 auto; text-align: center; }
@@ -1142,6 +1405,31 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-story-quote { margin: 0; flex: 1; font-size: 0.98rem; line-height: 1.55; color: var(--sb-fg-light); }
 .sb-story-quote strong { font-weight: 400; color: var(--sb-fg); }
 .sb-story-foot { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.84rem; color: var(--sb-brand-text); }
+
+/* ── Mappa "Rivalta sul Mincio" (MapLibre, stesso pattern della mappa /mima) ── */
+.sb-loc-panel { margin-top: 1rem; }
+.sb-loc-inner { display: grid; grid-template-columns: 1fr; gap: 1.2rem; padding: 1.4rem; }
+@media (min-width: 900px) { .sb-loc-inner { grid-template-columns: 1fr 1.1fr; align-items: center; } }
+.sb-loc-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+.sb-loc-title { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 1.05rem; font-weight: 500; color: var(--sb-fg); }
+.sb-loc-desc { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+.sb-loc-map {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--sb-border-strong);
+  aspect-ratio: 16 / 9;
+  /* src/components/ui/map.tsx è generico e legge i token shadcn globali
+     (arancio Ubuntu, src/styles/theme.css): li rimappiamo qui ai token .sb-
+     così i controlli zoom ereditano la palette neutra + verde brand del sito
+     invece dell'accento arancio. */
+  --background: var(--sb-bg);
+  --foreground: var(--sb-fg);
+  --border: var(--sb-border-strong);
+  --accent: var(--sb-surface-200);
+  --muted-foreground: var(--sb-fg-muted);
+  --ring: var(--sb-brand);
+}
+@media (max-width: 480px) { .sb-loc-map { aspect-ratio: 4 / 3; } }
 
 /* ── Muro curriculum (≈ muro dei tweet) ──────────────────────────────────── */
 .sb-cv-actions { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0 2rem; }
@@ -1498,6 +1786,139 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-foot-links .apl-open:hover::after,
 .sb-foot-links .apw-open:hover::after { transform: scaleX(1); }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   EFFETTI REACT BITS
+   I componenti stanno in components/reactbits/ e il raccordo col sito in
+   site/homeFx.tsx. Qui c'è solo il vestito: dove stanno, quanto si vedono e
+   com'è fatto il loro stato di riposo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── ① Aurora, fondale della pagina ──────────────────────────────────────────
+   Vive dentro .sb-bg (fisso alla finestra) e SOTTO .sb-bg-grid. Lo shader
+   disegna la banda in alto, cioè proprio dove stanno nav e titolo: per questo
+   l'opacità è bassa e c'è una maschera che la spegne scendendo — il testo
+   della hero deve restare la cosa più leggibile della pagina, non il fondale. */
+.sb-aurora {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 34%, transparent 72%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 34%, transparent 72%);
+}
+.sb-home.dark .sb-aurora,
+html.dark .sb-aurora { opacity: 0.42; }
+/* Stato di riposo: lo stesso verde nello stesso posto, ma fermo. Con movimento
+   ridotto homeFx non monta affatto il canvas, quindi resta solo questo. */
+@media (prefers-reduced-motion: reduce) {
+  .sb-aurora {
+    background: radial-gradient(
+      120% 62% at 50% -10%,
+      color-mix(in srgb, var(--sb-brand) 26%, transparent) 0%,
+      transparent 62%
+    );
+  }
+}
+
+/* ── ② Brandline con la banda di luce ────────────────────────────────────────
+   ShinyText rende un <span> con background-clip:text, quindi ha bisogno di
+   essere un blocco dove prima c'era un <span> di blocco. */
+.sb-hero-title .sb-brandline { display: block; }
+/* Nella CTA la brandline contiene ANCHE il cursore lampeggiante: lì lo
+   ShinyText è un figlio, e non deve mandare a capo il cursore. */
+.sb-cta h2 .sb-brandline > span { display: inline; }
+
+/* ── ③ Alone che segue il puntatore, solo sulle card prodotti ────────────────
+   Le due variabili le scrive components/reactbits/SpotlightCard.tsx, una volta
+   per frame. Qui il gradiente sta fermo nel foglio di stile: il browser lo
+   ricompone spostando il centro, senza ricostruirlo da capo a ogni movimento.
+   Il valore iniziale è il centro della card, così un tocco su telefono (dove
+   non c'è nessun puntatore da seguire) accende comunque qualcosa di sensato. */
+.sb-spot {
+  position: relative;
+  display: block;
+  height: 100%;
+  border-radius: 12px;
+  --spot-x: 50%;
+  --spot-y: 50%;
+  --spot-color: color-mix(in srgb, var(--sb-brand) 22%, transparent);
+}
+.sb-spot-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  background: radial-gradient(
+    circle 220px at var(--spot-x) var(--spot-y),
+    var(--spot-color),
+    transparent 72%
+  );
+}
+.sb-card:hover .sb-spot-glow,
+.sb-card:focus-visible .sb-spot-glow,
+.sb-spot:focus-within .sb-spot-glow { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .sb-spot-glow { display: none; }
+}
+
+/* ── ③ bis · Lo stesso alone sulle pagine interne ────────────────────────────
+   Sulla home l'alone sta solo sulle sette card prodotti, avvolte una per una
+   dal componente React Bits: lì i pannelli sono tanti e con ruoli diversi
+   (codice, archivio, muro del curriculum), e accenderli tutti sarebbe un tic.
+
+   Le pagine interne sono l'opposto: i pannelli SONO il contenuto, sono pochi e
+   fanno tutti la stessa cosa. Lì l'alone vale per tutti, e invece di avvolgere
+   una cinquantina di pannelli in JSX pagina per pagina si usa lo stesso
+   meccanismo dal basso: un pseudo-elemento qui, e le due variabili scritte da
+   un solo ascoltatore delegato (vedi site/GlassMotion.tsx). Stessa resa,
+   nessuna impalcatura nel markup.
+
+   Si accende SOLO col puntatore fino: senza cursore non c'è niente da seguire,
+   e su un touch resterebbe acceso dopo il tocco senza motivo. */
+@media (hover: hover) and (pointer: fine) {
+  .sb-home--fx .sb-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    background: radial-gradient(
+      circle 220px at var(--spot-x, 50%) var(--spot-y, 50%),
+      color-mix(in srgb, var(--sb-brand) 18%, transparent),
+      transparent 72%
+    );
+  }
+  .sb-home--fx .sb-panel:hover::after { opacity: 1; }
+  /* Le card del footer no: il loro .sb-panel-inner è overflow:visible (i
+     tooltip del grafico GitHub devono poter uscire), quindi l'alone
+     sborderebbe invece di essere tagliato dal bordo. Stessa ragione per cui
+     lassù è escluso anche lo sheen. */
+  .sb-foot-card .sb-panel::after { content: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-home--fx .sb-panel::after { content: none; }
+}
+
+/* Il fondale delle pagine interne è fisso a z-index 0: senza questo il <main>,
+   che è statico, gli finirebbe SOTTO. È la stessa riga che sulla home tiene
+   .sb-main sopra a .sb-bg. Nav (sticky, z-index 50) e footer
+   (.sb-home.sb-foot, z-index 1) sono già a posto per conto loro. */
+.sb-home--fx > main { position: relative; z-index: 1; }
+
+/* ── ④ Scintille al click e nastro dei clienti ───────────────────────────────
+   ClickSpark mette un canvas in position:absolute dentro il gruppo di bottoni:
+   senza un contenitore posizionato finirebbe ancorato alla pagina. */
+.sb-hero-actions, .sb-cta-actions { position: relative; }
+
+/* Il nastro dei clienti (LogoLoop) sta con gli altri stili della coda della
+   griglia prodotti, più in alto: cerca `.sb-trust-chip`. */
+
 /* ── Riduzione del movimento ─────────────────────────────────────────────────
    Chi ha chiesto meno movimento non deve vedere NIENTE che si muova da solo:
    i loop si spengono tutti e ogni cosa resta sul fotogramma più leggibile.
@@ -1506,6 +1927,19 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
    nemmeno (i componenti controllano la media query prima di montare). */
 @media (prefers-reduced-motion: reduce) {
   .sb-menu-sheet, .sb-menu-scrim, .sb-panel, .sb-link svg, .sb-page-top .go { transition: none; }
+
+  /* Il vetro RESTA: è materia, non movimento — una lastra ferma non dà
+     fastidio a nessuno. Quello che si spegne è ciò che si muove da solo.
+     Tilt e parallasse non si montano nemmeno: stanno dentro un
+     matchMedia("(prefers-reduced-motion: no-preference)").
+
+     La regola generale qui sotto vale per i DISCENDENTI di .sb-home
+     (".sb-home *"), quindi gli aloni no: sono pseudo-elementi di .sb-home
+     stesso e continuerebbero a derivare. Vanno fermati a parte. */
+  .sb-home::before,
+  .sb-home::after { animation: none !important; }
+  .sb-panel-inner::after { content: none; }
+  .sb-nav-pill { transition: none; }
 
   .sb-home *,
   .sb-home *::before,

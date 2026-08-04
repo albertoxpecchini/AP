@@ -9,6 +9,7 @@ import { CHAPTERS, questionsForMany } from "./questions";
 import { fetchTotals } from "./leaderboardApi";
 import { chapterCoverageFrom } from "./questionStats";
 import type { ProgressMap } from "./progressApi";
+import { ShinyBrandline, SparkGroup } from "../site/homeFx";
 import { iconForChapter } from "./chapterIcons";
 import { TRIVIA_VERSION } from "./version";
 import type { QType } from "./parseTrivia";
@@ -146,7 +147,7 @@ export default function TriviaMenu({
           </span>
           <h1 className="sb-hero-title">
             <span translate="no">Trivia</span>
-            <span className="sb-brandline">Storia dell'Architettura</span>
+            <ShinyBrandline text="Storia dell'Architettura" className="sb-brandline" />
           </h1>
         </section>
         <section className="sb-container sb-section">
@@ -179,7 +180,7 @@ export default function TriviaMenu({
           <div>
             <h1 className="sb-hero-title">
               <span translate="no">Trivia</span>
-              <span className="sb-brandline">Storia dell'Architettura</span>
+              <ShinyBrandline text="Storia dell'Architettura" className="sb-brandline" />
             </h1>
             <p className="sb-tv-lead">Rispondi e scala la classifica.</p>
           </div>
@@ -189,12 +190,12 @@ export default function TriviaMenu({
             <PlayerPill nick={nick} score={playerScore} fmt={fmtScore} onClick={onChangeNick} />
           </div>
         </div>
-        <div className="sb-hero-actions">
+        <SparkGroup className="sb-hero-actions">
           <a href="#partita" className="sb-btn sb-btn--primary"><IcPlay size={15} /> Gioca</a>
           <button type="button" className="sb-btn sb-btn--secondary" onClick={onTutorial}>
             <IcBookOpen size={15} /> Come si gioca
           </button>
-        </div>
+        </SparkGroup>
       </section>
 
       {/* ② I record del giocatore + il libro di riferimento */}
@@ -402,7 +403,7 @@ export default function TriviaMenu({
         <div className="sb-container">
           <h2>
             Metti alla prova quello che sai
-            <span className="sb-brandline">Buona partita.</span>
+            <ShinyBrandline text="Buona partita." className="sb-brandline" />
           </h2>
           <p>Più rispondi giusto e veloce, più punti · classifica live</p>
           <div className="sb-cta-actions">

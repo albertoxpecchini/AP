@@ -1,11 +1,16 @@
 import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { execSync } from 'child_process'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname)
+// path.dirname(new URL(...).pathname) lascia lo slash iniziale di fronte alla
+// lettera di unità su Windows (es. "/C:/Users/..."): risolvendolo poi con
+// path.resolve() si ottiene un path raddoppiato ("C:\C:\Users\..."). fileURLToPath
+// gestisce la conversione file:// → path nativo in modo corretto su ogni piattaforma.
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Versione del gioco Trivia = 1.<numero di commit che toccano src/app/trivia/>.
 // Calcolata a build-time (anche in dev) così si aggiorna da sola ad ogni deploy.
@@ -206,7 +211,12 @@ export default defineConfig({
         // three.js + Vanta servono SOLO a /sostieni: fuori dal precache, così non
         // appesantiscono il primo accesso di chi non visita quella pagina. Vengono
         // messi in cache "al volo" la prima volta che si apre /sostieni (sotto).
-        globIgnores: ['**/three.module-*.js', '**/vanta.waves.min-*.js'],
+        //
+        // Stessa logica per Aurora (il fondale WebGL della home, che si porta
+        // dietro ogl): è un effetto, non contenuto. Chi arriva con la
+        // riduzione del movimento attiva non lo scarica nemmeno, e non ha
+        // senso farglielo precaricare comunque al primo accesso.
+        globIgnores: ['**/three.module-*.js', '**/vanta.waves.min-*.js', '**/Aurora-*.js'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html',
         // Le rotte SPA non hanno estensione → prendono il fallback a index.html.
@@ -230,9 +240,11 @@ export default defineConfig({
         skipWaiting: true,
         runtimeCaching: [
           {
-            // three.js + Vanta (sfondo vivo di /sostieni): cache-first al primo
-            // utilizzo, poi locali per 30 giorni come gli altri asset pesanti.
-            urlPattern: ({ url }) => /\/assets\/(three\.module|vanta\.waves\.min)-.*\.js$/.test(url.pathname),
+            // three.js + Vanta (sfondo vivo di /sostieni) e Aurora + ogl (fondale
+            // della home): cache-first al primo utilizzo, poi locali per 30
+            // giorni come gli altri asset pesanti.
+            urlPattern: ({ url }) =>
+              /\/assets\/(three\.module|vanta\.waves\.min|Aurora)-.*\.js$/.test(url.pathname),
             handler: 'CacheFirst',
             options: {
               cacheName: 'ap-vendor-3d',

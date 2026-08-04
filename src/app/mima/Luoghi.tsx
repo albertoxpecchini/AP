@@ -5,6 +5,7 @@ import {
   IcArrowLeft, IcCompass, IcFork, IcWaves, IcFlame, IcStore, IcMoon, IcPin,
   IcListCheck,
 } from "../site/homeIcons";
+import { PageBackdrop, ShinyBrandline, SparkGroup } from "../site/homeFx";
 import "../home.css";
 import "./mima.css";
 import "./luoghi.css";
@@ -124,7 +125,8 @@ export default function Luoghi() {
   }, []);
 
   return (
-    <div className="sb-home mima-page">
+    <div className="sb-home sb-home--fx mima-page">
+      <PageBackdrop />
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>
       </div>
@@ -149,7 +151,7 @@ export default function Luoghi() {
             <p className="sb-mima-eyebrow"><IcFork size={14} /> Dove andiamo</p>
             <h1 className="sb-hero-title" id="luoghi-hero-title">
               <span>Mangiare & uscire</span>
-              <span className="sb-brandline">Milano Marittima · Cervia</span>
+              <ShinyBrandline text="Milano Marittima · Cervia" className="sb-brandline" />
             </h1>
             <div className="sb-hero-copy" style={{ marginTop: "1.1rem" }}>
               <p>
@@ -233,7 +235,7 @@ export default function Luoghi() {
               agosto 2026, non da esperienza diretta: indirizzi, orari di apertura e menù vanno
               riverificati prima di andarci, soprattutto in alta stagione.
             </p>
-            <div className="sb-hero-actions" style={{ marginTop: "1.4rem" }}>
+            <SparkGroup className="sb-hero-actions sb-mima-actions">
               <a
                 className="sb-btn sb-btn--primary"
                 href="https://www.google.com/maps/search/?api=1&query=ristoranti+Milano+Marittima+Cervia"
@@ -245,7 +247,7 @@ export default function Luoghi() {
               <Link to="/mima" className="sb-btn sb-btn--secondary">
                 <IcArrowLeft size={16} /> Torna a MiMa
               </Link>
-            </div>
+            </SparkGroup>
           </div>
         </section>
       </main>

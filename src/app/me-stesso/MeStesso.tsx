@@ -34,6 +34,7 @@ import {
   IcMountain,
   type IcProps,
 } from "../site/homeIcons";
+import { PageBackdrop, ShinyBrandline } from "../site/homeFx";
 import "../home.css";
 import "./mestesso.css";
 
@@ -259,7 +260,8 @@ export default function MeStesso() {
   }, []);
 
   return (
-    <div className="sb-home ms-page">
+    <div className="sb-home sb-home--fx ms-page">
+      <PageBackdrop />
       {/* Skiplink — requisito di accessibilità */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>
@@ -288,7 +290,7 @@ export default function MeStesso() {
                 <span className="sb-ms-kicker">Esame di Stato 2026</span>
                 <h1 className="sb-hero-title" id="ms-hero-title">
                   <span translate="no">Alberto Pecchini</span>
-                  <span className="sb-brandline">Presentazione personale</span>
+                  <ShinyBrandline text="Presentazione personale" className="sb-brandline" />
                 </h1>
                 <div className="sb-hero-copy sb-ms-hero-copy">
                   <p>Istituto Tecnico «Carlo d'Arco» — Mantova · Indirizzo CAT · Classe 5BT</p>
@@ -860,7 +862,7 @@ export default function MeStesso() {
             />
             <h2>
               Grazie
-              <span className="sb-brandline">per l'attenzione</span>
+              <ShinyBrandline text="per l'attenzione" className="sb-brandline" />
             </h2>
             <p className="sb-ms-sign">Alberto Pecchini — Esame di Stato 2026</p>
           </div>

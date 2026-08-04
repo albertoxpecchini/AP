@@ -10,6 +10,7 @@ import {
   type DonatoreRow,
 } from "./donazioniApi";
 import SiteFooter from "../site/SiteFooter";
+import { PageBackdrop, SparkGroup } from "../site/homeFx";
 import "../home.css";
 import "./sostieni.css";
 
@@ -175,7 +176,8 @@ export default function Sostieni() {
   };
 
   return (
-    <div className="sb-home sos-page">
+    <div className="sb-home sb-home--fx sos-page">
+      <PageBackdrop />
       {/* Skiplink — requisito di accessibilità (come la home) */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>
@@ -391,11 +393,11 @@ export default function Sostieni() {
         <section className="sb-section sb-cta">
           <div className="sb-container">
             <h2>Per qualsiasi cosa, sono qui.</h2>
-            <div className="sb-cta-actions">
+            <SparkGroup className="sb-cta-actions">
               <a href={`mailto:${EMAIL}`} className="sb-btn sb-btn--primary">
                 <IcMail size={16} /> Email
               </a>
-            </div>
+            </SparkGroup>
           </div>
         </section>
       </main>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { SiteLink as Link } from "../site/nav";
 import SiteFooter from "../site/SiteFooter";
 import {
@@ -6,6 +6,8 @@ import {
   IcCompass, IcCalculator, IcCar, IcRuler, IcCart, IcClock, IcImage, IcClose,
   IcCheck, IcHelp,
 } from "../site/homeIcons";
+const MimaMap = lazy(() => import("./MimaMap"));
+import { PageBackdrop, ShinyBrandline, SparkGroup } from "../site/homeFx";
 import "../home.css";
 import "./mima.css";
 
@@ -52,8 +54,10 @@ const INFO: InfoRow[] = [
 const MAP_QUERY = `${BOOKING.hostel}, ${BOOKING.address}`;
 const GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_QUERY)}`;
 const AMAPS = `https://maps.apple.com/?q=${encodeURIComponent(MAP_QUERY)}`;
-// Mappa incorporata — funziona senza API key (embed pubblico "output=embed").
-const MAP_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(MAP_QUERY)}&output=embed`;
+
+// Mappa decorativa — centrata tra Cervia e Milano Marittima (stessa
+// grammatica della mappa di Rivalta sul Mincio in home, vedi MimaMap.tsx).
+const MIMA_CENTER: [number, number] = [12.3575, 44.2646];
 
 // Viaggio in auto — km percorsi e rifornimento. Tutto a null/vuoto finché non
 // arrivano i numeri veri: l'interfaccia mostra un placeholder "da inserire"
@@ -182,7 +186,8 @@ export default function Mima() {
   const split = useMemo(() => splitExpenses(EXPENSES, PEOPLE), []);
 
   return (
-    <div className="sb-home mima-page">
+    <div className="sb-home sb-home--fx mima-page">
+      <PageBackdrop />
       {/* Skiplink — requisito di accessibilità */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>
@@ -209,7 +214,7 @@ export default function Mima() {
             <p className="sb-mima-eyebrow"><IcSun size={14} /> Piano vacanza</p>
             <h1 className="sb-hero-title" id="mima-hero-title">
               <span>MiMa</span>
-              <span className="sb-brandline">Milano Marittima · 13 → 17 agosto 2026</span>
+              <ShinyBrandline text="Milano Marittima · 13 → 17 agosto 2026" className="sb-brandline" />
             </h1>
             <div className="sb-hero-copy" style={{ marginTop: "1.1rem" }}>
               <p>Quattro notti sulla riviera romagnola con <strong>Pekko, Jonny e Mok</strong>.</p>
@@ -220,11 +225,11 @@ export default function Mima() {
               ))}
             </div>
             <Countdown />
-            <div className="sb-hero-actions" style={{ marginTop: "1.4rem" }}>
+            <SparkGroup className="sb-hero-actions sb-mima-actions">
               <Link to="/mima/luoghi" className="sb-btn sb-btn--secondary">
                 <IcCart size={16} /> Dove mangiamo e usciamo
               </Link>
-            </div>
+            </SparkGroup>
           </div>
         </section>
 
@@ -286,12 +291,9 @@ export default function Mima() {
                 </span>
 
                 <div className="sb-mima-map">
-                  <iframe
-                    src={MAP_EMBED}
-                    title={`Mappa · ${BOOKING.hostel}`}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
+                  <Suspense fallback={null}>
+                    <MimaMap center={MIMA_CENTER} zoom={12.3} />
+                  </Suspense>
                 </div>
 
                 <div className="sb-hero-actions">

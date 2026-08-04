@@ -6,6 +6,7 @@ import App from "./app/App.tsx";
 import { disableBackspaceNavigation } from "./app/utils/keyboard.ts";
 import ControlBar from "./app/theme/ControlBar.tsx";
 import ScrollProgress from "./app/site/ScrollProgress.tsx";
+import GlassMotion from "./app/site/GlassMotion.tsx";
 import { syncTheme } from "./app/theme/themeCore.ts";
 import { startI18nEngine } from "./app/i18n/translateDom.ts";
 import { initLangAttr } from "./app/i18n/langCore.ts";
@@ -179,6 +180,10 @@ createRoot(document.getElementById("root")!).render(
     {/* Filo di avanzamento della lettura, sul bordo alto: cresce da sinistra a
         destra avvicinandosi alla fine della pagina. Anche questo su ogni pagina. */}
     <ScrollProgress />
+    {/* Movimento del vetro, su ogni pagina: la deriva degli aloni dietro alle
+        card (senza cui il blur non si leggerebbe) e il tilt delle card sotto
+        il puntatore. Non disegna niente: monta solo gli effetti. */}
+    <GlassMotion />
     {/* Vercel Speed Insights: raccoglie le metriche di performance reali (Core
         Web Vitals) su ogni pagina. Attivo solo in produzione su Vercel. */}
     <SpeedInsights />

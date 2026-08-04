@@ -20,6 +20,7 @@ import {
   IcImage,
   type IcProps,
 } from "../site/homeIcons";
+import { PageBackdrop, ShinyBrandline, SparkGroup } from "../site/homeFx";
 import "../home.css";
 import "./pcto.css";
 
@@ -210,7 +211,8 @@ export default function Pcto() {
   const sorted = [...PCTO].sort((a, b) => parsePeriodStart(b.period) - parsePeriodStart(a.period));
 
   return (
-    <div className="sb-home pcto-page">
+    <div className="sb-home sb-home--fx pcto-page">
+      <PageBackdrop />
       {/* Skiplink — requisito di accessibilità (come la home) */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>
@@ -239,7 +241,12 @@ export default function Pcto() {
                 <p className="sb-pc-eyebrow">Percorsi per le Competenze Trasversali e l'Orientamento</p>
                 <h1 className="sb-hero-title" id="pcto-hero-title">
                   <span translate="no">PCTO</span>
-                  <span className="sb-brandline" translate="no">Caem Group S.p.A.</span>
+                  {/* translate="no" resta sull'involucro: ShinyText rende un
+                      solo <span> col testo, e il nome dell'azienda non si
+                      traduce. */}
+                  <span className="sb-brandline" translate="no">
+                    <ShinyBrandline text="Caem Group S.p.A." />
+                  </span>
                 </h1>
               </div>
               <div className="sb-hero-copy">
@@ -255,10 +262,10 @@ export default function Pcto() {
                 </p>
               </div>
             </div>
-            <div className="sb-hero-actions">
+            <SparkGroup className="sb-hero-actions">
               <a href="#esperienze" className="sb-btn sb-btn--primary">Le tre sessioni</a>
               <a href="#storia" className="sb-btn sb-btn--secondary">Il racconto</a>
-            </div>
+            </SparkGroup>
           </div>
         </section>
 

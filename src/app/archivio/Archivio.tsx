@@ -30,6 +30,7 @@ import {
   IcGrad, IcVenn, IcBook, IcCode, IcTerminal, IcImage, IcBraces, IcGitCommit,
   IcGitBranch, ProjectGlyph, type IcProps,
 } from "../site/homeIcons";
+import { PageBackdrop, ShinyBrandline, SparkGroup } from "../site/homeFx";
 import "../home.css";
 import "./archivio.css";
 
@@ -1183,7 +1184,8 @@ export default function Archivio() {
   ];
 
   return (
-    <div className="sb-home ar-page">
+    <div className="sb-home sb-home--fx ar-page">
+      <PageBackdrop />
       {/* Skiplink — requisito di accessibilità (come la home) */}
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>
@@ -1222,7 +1224,7 @@ export default function Archivio() {
             <div className="sb-hero-grid">
               <h1 className="sb-hero-title" id="ar-hero-title">
                 <span>Archivio progetti</span>
-                <span className="sb-brandline">Tutto il sito, cartella per cartella</span>
+                <ShinyBrandline text="Tutto il sito, cartella per cartella" className="sb-brandline" />
               </h1>
               <div className="sb-hero-copy">
                 <p>
@@ -1233,12 +1235,12 @@ export default function Archivio() {
                 </p>
               </div>
             </div>
-            <div className="sb-hero-actions">
+            <SparkGroup className="sb-hero-actions">
               <a href="#esplora" className="sb-btn sb-btn--primary">Sfoglia l'archivio</a>
               <a href={REPO} target="_blank" rel="noreferrer noopener" className="sb-btn sb-btn--secondary">
                 <SiGithub size={16} aria-hidden="true" /> Vedi il codice su GitHub
               </a>
-            </div>
+            </SparkGroup>
 
             {/* Striscia di numeri (≈ i contatori del dashboard) */}
             <div className="sb-ar-stats">
@@ -1340,20 +1342,20 @@ export default function Archivio() {
           <div className="sb-container">
             <h2>
               Ti serve il codice?
-              <span className="sb-brandline">È tutto aperto.</span>
+              <ShinyBrandline text="È tutto aperto." className="sb-brandline" />
             </h2>
             <p>
               I sorgenti di ogni progetto sono su GitHub, oppure li scarichi in ZIP dalle
               proprietà di ciascuna voce dell'archivio.
             </p>
-            <div className="sb-cta-actions">
+            <SparkGroup className="sb-cta-actions">
               <a href={REPO} target="_blank" rel="noreferrer noopener" className="sb-btn sb-btn--primary">
                 <SiGithub size={16} aria-hidden="true" /> Vedi il codice su GitHub
               </a>
               <Link to="/" className="sb-btn sb-btn--secondary">
                 <IcArrowLeft size={16} /> Torna alla home
               </Link>
-            </div>
+            </SparkGroup>
           </div>
         </section>
       </main>
