@@ -2,13 +2,15 @@ import { Suspense, lazy, useMemo, useState } from "react";
 import { SiteLink as Link } from "../site/nav";
 import {
   IcArrowLeft, IcBookOpen, IcCalculator, IcCar, IcCompass, IcGrid, IcHelp,
-  IcListCheck, IcRanking, IcRuler, IcTrophy,
+  IcListCheck, IcPin, IcRanking, IcRuler, IcTrophy,
 } from "../site/homeIcons";
 import { ShinyBrandline, SparkGroup } from "../site/homeFx";
 import { MimaPage, Mod, KV, Meter, Tbd, type Tick } from "./MimaShell";
 import {
-  FUEL_PRICE_DEFAULT, PEOPLE, ROAD_KM_ONE_WAY, ROAD_MIN_ONE_WAY, ROUND_TRIP_KM,
-  VEHICLES, estimateOption, euro, hhmm, num, rangeKm, type Vehicle, type VehicleKey,
+  CHEAPEST_CASA, CHEAPEST_VAC, DIESEL_GAP, DIESEL_MAX_CASA, DIESEL_MAX_VAC,
+  DIESEL_MIN_CASA, DIESEL_MIN_VAC, FUEL_PRICE_DEFAULT, PEOPLE, ROAD_KM_ONE_WAY,
+  ROAD_MIN_ONE_WAY, ROUND_TRIP_KM, STATIONS, VEHICLES, estimateOption, euro,
+  hhmm, num, rangeKm, stationsIn, type Vehicle, type VehicleKey, type Zone,
 } from "./mimaData";
 import "../home.css";
 import "./mima.css";
@@ -218,10 +220,126 @@ const MARKS = [
   { to: "#mod-specifiche", n: "02", label: "Scheda tecnica" },
   { to: "#mod-matrice", n: "03", label: "Matrice criteri" },
   { to: "#mod-simulatore", n: "04", label: "Simulatore costi" },
-  { to: "#mod-ingombri", n: "05", label: "Ingombri" },
-  { to: "#mod-percorso", n: "06", label: "Percorso" },
-  { to: "#mod-verdetto", n: "07", label: "Verdetto" },
+  { to: "#mod-distributori", n: "05", label: "Distributori" },
+  { to: "#mod-ingombri", n: "06", label: "Ingombri" },
+  { to: "#mod-percorso", n: "07", label: "Percorso" },
+  { to: "#mod-verdetto", n: "08", label: "Verdetto" },
 ];
+
+// ── Distributori ─────────────────────────────────────────────────────────────
+// Prezzi veri dell'Osservaprezzi, non stime: per questo ogni riga si porta
+// dietro la data del rilevamento — un prezzo di quattro giorni fa, ad agosto,
+// è già vecchio.
+//
+// I due guadagni qui sotto servono a tenere la prosa onesta. Il primo (cambiare
+// zona) sembra un consiglio ma vale meno di un euro sull'intero viaggio; il
+// secondo (evitare il servito) ne vale dieci volte tanto. Calcolarli invece di
+// raccontarli evita di scrivere una raccomandazione sproporzionata.
+const SERVITO_MAX = Math.max(
+  ...STATIONS.map((s) => s.gasolioServito).filter((n): n is number => typeof n === "number"),
+);
+const litriAR = estimateOption("c", ROUND_TRIP_KM, 1).liters;
+const GAIN_ZONA = litriAR * DIESEL_GAP;
+const GAIN_SELF = litriAR * (SERVITO_MAX - DIESEL_MIN_VAC);
+
+function DistributoriMod() {
+  const [zona, setZona] = useState<Zone>("casa");
+  const righe = stationsIn(zona);
+  const min = righe[0].gasolioSelf;
+
+  return (
+    <Mod
+      id="mod-distributori"
+      icon={<IcPin size={14} />}
+      title="Dove fare il pieno"
+      meta={
+        <span className="sb-tabs sb-mima-veic-zonetabs">
+          {(["casa", "vacanza"] as Zone[]).map((z) => (
+            <button
+              key={z}
+              type="button"
+              className="sb-tab"
+              aria-selected={zona === z}
+              onClick={() => setZona(z)}
+            >
+              {z === "casa" ? "Rivalta" : "Cervia"}
+            </button>
+          ))}
+        </span>
+      }
+    >
+      <div className="sb-mima-kpis">
+        <div className="sb-mima-kpi">
+          <span className="sb-mima-kpi-k">Gasolio self · Rivalta</span>
+          <span className="sb-mima-kpi-v" data-no-i18n translate="no">
+            {num(DIESEL_MIN_CASA, 3)} – {num(DIESEL_MAX_CASA, 3)} €
+          </span>
+        </div>
+        <div className="sb-mima-kpi">
+          <span className="sb-mima-kpi-k">Gasolio self · Cervia</span>
+          <span className="sb-mima-kpi-v" data-no-i18n translate="no">
+            {num(DIESEL_MIN_VAC, 3)} – {num(DIESEL_MAX_VAC, 3)} €
+          </span>
+        </div>
+        <div className="sb-mima-kpi">
+          <span className="sb-mima-kpi-k">Self vs servito, peggio caso</span>
+          <span className="sb-mima-kpi-v" data-no-i18n translate="no">
+            +{num((SERVITO_MAX - DIESEL_MIN_VAC) * 100, 0)} cent/L
+          </span>
+        </div>
+      </div>
+
+      <div className="sb-mima-veic-stations">
+        <table className="sb-mima-data-table">
+          <thead>
+            <tr>
+              <th scope="col">Distributore</th>
+              <th scope="col">Gasolio self</th>
+              <th scope="col">Benzina self</th>
+              <th scope="col">Servito</th>
+              <th scope="col">Rilevato</th>
+            </tr>
+          </thead>
+          <tbody>
+            {righe.map((s) => (
+              <tr key={s.name}>
+                <th scope="row" className={s.gasolioSelf === min ? "is-best" : ""}>{s.name}</th>
+                <td className={s.gasolioSelf === min ? "is-best" : ""} data-no-i18n translate="no">
+                  {num(s.gasolioSelf, 3)} €
+                </td>
+                <td data-no-i18n translate="no">{num(s.benzinaSelf, 3)} €</td>
+                <td data-no-i18n translate="no">
+                  {s.gasolioServito ? `${num(s.gasolioServito, 3)} €` : "—"}
+                </td>
+                <td data-no-i18n translate="no">{s.updated}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="sb-mima-kv">
+        <KV k="Più conveniente qui" v={`${CHEAPEST_CASA.name} · ${num(CHEAPEST_CASA.gasolioSelf, 3)} €/L`} />
+        <KV k="Più conveniente giù" v={`${CHEAPEST_VAC.name} · ${num(CHEAPEST_VAC.gasolioSelf, 3)} €/L`} />
+        <KV k="Scegliere la zona vale" v={`${euro(GAIN_ZONA)} su tutto il viaggio`} tbd="stima" />
+        <KV k="Evitare il servito vale" v={`fino a ${euro(GAIN_SELF)} su tutto il viaggio`} tbd="stima" />
+      </div>
+
+      <p className="sb-mima-modnote">
+        In zona vacanza il gasolio costa {num(DIESEL_GAP * 100, 1)} centesimi al litro meno che a
+        casa — ma su un pieno andata e ritorno della Tucson fanno{" "}
+        <strong>{euro(GAIN_ZONA)}</strong>: vero, e irrilevante. Non organizzatevi attorno a
+        questo. Quello che pesa davvero è <strong>self contro servito</strong>: fra il servito più
+        caro ({num(SERVITO_MAX, 3)} €) e il self più conveniente ci sono{" "}
+        {num((SERVITO_MAX - DIESEL_MIN_VAC) * 100, 0)} centesimi al litro, cioè{" "}
+        <strong>{euro(GAIN_SELF)}</strong> sullo stesso viaggio — più di dieci volte tanto. I
+        prezzi vengono dall'Osservaprezzi e la colonna "rilevato" dice di quando sono: ad agosto
+        si muovono, riverificateli prima di partire.
+        <Tbd>prezzi al 5 agosto</Tbd>
+      </p>
+    </Mod>
+  );
+}
 
 // ── Simulatore ───────────────────────────────────────────────────────────────
 function SimulatoreMod() {
@@ -558,7 +676,10 @@ export default function Veicoli() {
               {/* 04 — Simulatore */}
               <SimulatoreMod />
 
-              {/* 05 — Ingombri */}
+              {/* 05 — Distributori */}
+              <DistributoriMod />
+
+              {/* 06 — Ingombri */}
               <Mod
                 id="mod-ingombri"
                 icon={<IcRuler size={14} />}

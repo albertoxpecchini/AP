@@ -195,6 +195,29 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Distributori ────────────────────────────────────────────────────────── */
+/* Trentotto righe non stanno in un modulo senza far scorrere la pagina per un
+   chilometro: qui scorrono dentro il riquadro, con l'intestazione incollata. */
+.sb-mima-veic-stations {
+  overflow: auto;
+  max-height: min(52vh, 420px);
+  border: 1px solid var(--sb-border);
+  border-radius: 10px;
+  background: var(--sb-surface-75);
+}
+.sb-mima-veic-stations .sb-mima-data-table { min-width: 34rem; }
+.sb-mima-veic-stations thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--sb-surface-100);
+}
+.sb-mima-veic-stations th,
+.sb-mima-veic-stations td { padding-inline: 0.7rem; }
+/* Le due linguette zona stanno nella testata del modulo: vanno rimpicciolite,
+   lì lo spazio è quello di una riga di testo. */
+.sb-mima-veic-zonetabs .sb-tab { height: 26px; padding-inline: 0.55rem; font-size: 0.68rem; }
+
 /* ── Ingombri in scala ───────────────────────────────────────────────────── */
 .sb-mima-veic-size { display: flex; flex-direction: column; gap: 0.55rem; }
 .sb-mima-veic-size-row { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 3.6rem; gap: 0.6rem; align-items: center; }

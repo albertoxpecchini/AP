@@ -191,8 +191,105 @@ export const ROAD_KM_ONE_WAY = 230;
 export const ROAD_MIN_ONE_WAY = 155;
 export const ROUND_TRIP_KM = ROAD_KM_ONE_WAY * 2;
 
-/** STIMA: prezzo del gasolio in autostrada, agosto 2026. */
-export const FUEL_PRICE_DEFAULT = 1.75;
+// ─────────────────────────────────────────────────────────────────────────────
+// Distributori entro 10 km da Rivalta sul Mincio, rilevati il 5 agosto 2026.
+// Prezzi REALI (dall'Osservaprezzi), non stime: per questo la data dell'ultima
+// comunicazione sta accanto a ognuno — un prezzo di tre giorni fa è un prezzo
+// di tre giorni fa, e ad agosto si muove.
+//
+// La stima precedente diceva 1,75 €/L. Era bassa di quasi il 17%: il gasolio
+// self qui intorno sta fra 2,049 e 2,159, e su un pieno andata-ritorno fa una
+// decina di euro di differenza.
+// ─────────────────────────────────────────────────────────────────────────────
+// Due insiemi, non uno: i distributori entro 10 km da casa (Rivalta sul
+// Mincio) e quelli in zona vacanza (Cervia / Cesenatico). Serve tenerli
+// separati perché il pieno di andata e quello di ritorno si fanno in posti
+// diversi — e, a sorpresa, giù costa meno.
+//
+// GPL, metano, HVO e i gasoli "premium" non sono qui: nessuno dei tre mezzi in
+// ballo li usa, e in tabella sarebbero solo rumore.
+export type Zone = "casa" | "vacanza";
+
+export interface Station {
+  name: string;
+  zone: Zone;
+  /** Ultima comunicazione rilevata (Osservaprezzi). */
+  updated: string;
+  benzinaSelf: number;
+  gasolioSelf: number;
+  /** Solo dove il servito è dichiarato e costa più del self. */
+  benzinaServito?: number;
+  gasolioServito?: number;
+}
+
+export const STATIONS: Station[] = [
+  // ── Entro 10 km da Rivalta sul Mincio ──────────────────────────────────────
+  { name: "1290", zone: "casa", updated: "03/08 12:23", benzinaSelf: 1.969, gasolioSelf: 2.049 },
+  { name: "AGEF Immobiliare", zone: "casa", updated: "03/08 09:54", benzinaSelf: 1.979, gasolioSelf: 2.049 },
+  { name: "Il Gigante Self 24H", zone: "casa", updated: "03/08 17:22", benzinaSelf: 1.975, gasolioSelf: 2.055 },
+  { name: "Ranzato Antonio", zone: "casa", updated: "05/08 07:24", benzinaSelf: 2.005, gasolioSelf: 2.074, benzinaServito: 2.215, gasolioServito: 2.284 },
+  { name: "Tamoil", zone: "casa", updated: "05/08 07:10", benzinaSelf: 1.999, gasolioSelf: 2.079 },
+  { name: "6912", zone: "casa", updated: "03/08 13:38", benzinaSelf: 1.999, gasolioSelf: 2.079 },
+  { name: "AGIP Ercoli Gilberto", zone: "casa", updated: "05/08 07:42", benzinaSelf: 2.005, gasolioSelf: 2.079, benzinaServito: 2.215, gasolioServito: 2.289 },
+  { name: "2074 Goito", zone: "casa", updated: "04/08 21:51", benzinaSelf: 2.009, gasolioSelf: 2.079, benzinaServito: 2.229, gasolioServito: 2.299 },
+  { name: "Costantin Castellucchio", zone: "casa", updated: "03/08 07:25", benzinaSelf: 1.987, gasolioSelf: 2.087 },
+  { name: "Keropetrol Gazoldo d. Ippoliti", zone: "casa", updated: "02/08 06:27", benzinaSelf: 1.969, gasolioSelf: 2.089 },
+  { name: "Distributore Tamoil", zone: "casa", updated: "03/08 08:13", benzinaSelf: 1.999, gasolioSelf: 2.099 },
+  { name: "Goito - Marsiletti", zone: "casa", updated: "05/08 09:04", benzinaSelf: 2.019, gasolioSelf: 2.099 },
+  { name: "Italia Global (Hussain Sajjad)", zone: "casa", updated: "04/08 17:50", benzinaSelf: 2.039, gasolioSelf: 2.159, benzinaServito: 2.289, gasolioServito: 2.429 },
+
+  // ── Zona vacanza: Cervia e Cesenatico ──────────────────────────────────────
+  { name: "Savio Enilive Station", zone: "vacanza", updated: "05/08 07:28", benzinaSelf: 1.964, gasolioSelf: 2.019 },
+  { name: "Cesenatico CPB Energia Italiana", zone: "vacanza", updated: "04/08 06:54", benzinaSelf: 1.964, gasolioSelf: 2.019 },
+  { name: "PV 5908 Cesenatico", zone: "vacanza", updated: "04/08 21:55", benzinaSelf: 1.969, gasolioSelf: 2.024 },
+  { name: "Eni di Paganelli Nerio", zone: "vacanza", updated: "04/08 21:54", benzinaSelf: 1.969, gasolioSelf: 2.024 },
+  { name: "Cervia SS16 km 170+616 (Madonna del Pino)", zone: "vacanza", updated: "05/08 01:39", benzinaSelf: 1.949, gasolioSelf: 2.029 },
+  { name: "Cervia SS16 km 172+211", zone: "vacanza", updated: "05/08 09:13", benzinaSelf: 1.989, gasolioSelf: 2.059 },
+  { name: "IP", zone: "vacanza", updated: "03/08 18:56", benzinaSelf: 1.947, gasolioSelf: 2.075 },
+  { name: "EGO Cervia — Viale Oriani", zone: "vacanza", updated: "04/08 09:52", benzinaSelf: 1.968, gasolioSelf: 2.078 },
+  { name: "GEP Celli Giuliano", zone: "vacanza", updated: "05/08 07:31", benzinaSelf: 1.959, gasolioSelf: 2.079, benzinaServito: 2.189, gasolioServito: 2.309 },
+  { name: "Agip Eni Galbucci", zone: "vacanza", updated: "04/08 16:22", benzinaSelf: 1.989, gasolioSelf: 2.079, benzinaServito: 2.209, gasolioServito: 2.299 },
+  { name: "Paganelli Marcello", zone: "vacanza", updated: "05/08 09:26", benzinaSelf: 1.969, gasolioSelf: 2.089 },
+  { name: "Retitalia Cesenatico", zone: "vacanza", updated: "04/08 10:22", benzinaSelf: 1.959, gasolioSelf: 2.095 },
+  { name: "Paganelli Maria Grazia", zone: "vacanza", updated: "04/08 17:16", benzinaSelf: 1.967, gasolioSelf: 2.097 },
+  { name: "Calabrina", zone: "vacanza", updated: "05/08 09:00", benzinaSelf: 1.989, gasolioSelf: 2.099 },
+  { name: "Shell Cervia — Via Romea Sud 9", zone: "vacanza", updated: "05/08 07:39", benzinaSelf: 1.999, gasolioSelf: 2.099 },
+  { name: "IP Cervia", zone: "vacanza", updated: "04/08 09:07", benzinaSelf: 2.019, gasolioSelf: 2.099, benzinaServito: 2.199, gasolioServito: 2.279 },
+  { name: "7082", zone: "vacanza", updated: "03/08 12:22", benzinaSelf: 1.999, gasolioSelf: 2.099 },
+  { name: "Vulcan Tantlon", zone: "vacanza", updated: "31/07 10:40", benzinaSelf: 1.999, gasolioSelf: 2.099, benzinaServito: 2.189, gasolioServito: 2.289 },
+  { name: "Casalboni Luca", zone: "vacanza", updated: "02/08 12:28", benzinaSelf: 1.989, gasolioSelf: 2.109 },
+  { name: "ERG", zone: "vacanza", updated: "04/08 17:19", benzinaSelf: 2.019, gasolioSelf: 2.119, benzinaServito: 2.219, gasolioServito: 2.339 },
+  { name: "Autolavaggio Bargellini Elio", zone: "vacanza", updated: "05/08 07:23", benzinaSelf: 2.019, gasolioSelf: 2.119, benzinaServito: 2.319, gasolioServito: 2.419 },
+  { name: "106736 Cesenatico", zone: "vacanza", updated: "05/08 07:14", benzinaSelf: 1.999, gasolioSelf: 2.129 },
+  { name: "Alessi Luciano", zone: "vacanza", updated: "05/08 06:12", benzinaSelf: 1.999, gasolioSelf: 2.139, benzinaServito: 2.199, gasolioServito: 2.339 },
+  { name: "Esso Malp Bollana", zone: "vacanza", updated: "31/07 18:04", benzinaSelf: 1.999, gasolioSelf: 2.139, benzinaServito: 2.239, gasolioServito: 2.379 },
+  { name: "Esso Tipiko", zone: "vacanza", updated: "31/07 18:03", benzinaSelf: 1.999, gasolioSelf: 2.139, benzinaServito: 2.239, gasolioServito: 2.379 },
+];
+
+export const stationsIn = (zone: Zone) =>
+  STATIONS.filter((s) => s.zone === zone).sort((a, b) => a.gasolioSelf - b.gasolioSelf);
+
+const dieselIn = (zone: Zone) => STATIONS.filter((s) => s.zone === zone).map((s) => s.gasolioSelf);
+const petrolIn = (zone: Zone) => STATIONS.filter((s) => s.zone === zone).map((s) => s.benzinaSelf);
+
+/** CALCOLATO: il gasolio self più basso e più alto, per zona. */
+export const DIESEL_MIN_CASA = Math.min(...dieselIn("casa"));
+export const DIESEL_MAX_CASA = Math.max(...dieselIn("casa"));
+export const DIESEL_MIN_VAC = Math.min(...dieselIn("vacanza"));
+export const DIESEL_MAX_VAC = Math.max(...dieselIn("vacanza"));
+export const PETROL_MIN_CASA = Math.min(...petrolIn("casa"));
+export const PETROL_MIN_VAC = Math.min(...petrolIn("vacanza"));
+
+export const CHEAPEST_CASA = stationsIn("casa")[0];
+export const CHEAPEST_VAC = stationsIn("vacanza")[0];
+
+// Il simulatore parte dal gasolio self più basso VICINO A CASA: è il pieno con
+// cui si parte davvero. Che giù costi ancora meno è un'informazione a sé, e la
+// pagina la dice invece di nasconderla dentro una media.
+export const FUEL_PRICE_DEFAULT = DIESEL_MIN_CASA;
+
+/** Quanto si risparmia a fare il pieno giù invece che qui, per litro. */
+export const DIESEL_GAP = DIESEL_MIN_CASA - DIESEL_MIN_VAC;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Veicoli. Consumi, emissioni e misure sono STIME su modello e allestimento più
@@ -504,6 +601,10 @@ export function savePacked(state: Record<string, boolean>) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Link esterni. Costruiti da MAP_QUERY così restano coerenti con l'indirizzo.
 // ─────────────────────────────────────────────────────────────────────────────
+/** Il gruppo WhatsApp del viaggio: è lì che si decide davvero. */
+export const WHATSAPP = "https://chat.whatsapp.com/IfEXiXbj0iP1kdpQvu1O2C";
+export const WHATSAPP_NAME = "MilanoMarittima (JMA)";
+
 const MAP_QUERY = `${BOOKING.hostel}, ${BOOKING.address}`;
 export const GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_QUERY)}`;
 export const AMAPS = `https://maps.apple.com/?q=${encodeURIComponent(MAP_QUERY)}`;
