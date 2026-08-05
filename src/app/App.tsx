@@ -49,7 +49,7 @@ import { useHomeMotion } from "./site/homeMotion";
 import { useNavPill } from "./site/GlassMotion";
 // Effetti "pronti" della home (React Bits) — vedi site/homeFx.tsx per il
 // raccordo con tema, movimento ridotto e caricamento pigro.
-import { AuroraBackdrop, ShinyBrandline, SparkGroup, TrustedLoop } from "./site/homeFx";
+import { AuroraBackdrop, ShinyBrandline, SparkGroup } from "./site/homeFx";
 import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import type { LogoItem } from "@/components/reactbits/LogoLoop";
 import {
@@ -575,42 +575,13 @@ function ProductCard({ children }: { children: ReactNode }) {
   );
 }
 
-// I marchi del nastro "Trusted by". Costante di modulo, non un array creato nel
-// render: LogoLoop rimisura la sequenza ogni volta che questa lista cambia
-// identità, e <App /> si rirenderizza a ogni scroll (vedi lo stato `scrolled`).
-// I clienti sono due: un nastro che ripete due nomi si legge come un errore, a
-// meno che la ripetizione non abbia un ritmo. Fra l'uno e l'altro c'è quindi un
-// separatore — così la sequenza che scorre è «cliente · segno · cliente · segno»
-// e il ritorno sembra una scelta invece di una mancanza di materiale.
-const TRUSTED_SEP: LogoItem = {
-  node: (
-    <span className="sb-trust-sep" aria-hidden="true">
-      ✦
-    </span>
-  ),
-};
-
-const TRUSTED_LOGOS: LogoItem[] = [
-  {
-    node: (
-      <span className="sb-trust-chip">
-        <TrustedDot /> Cascina Fontana
-      </span>
-    ),
-    href: "https://cascinafontana.xyz",
-    ariaLabel: "Cascina Fontana",
-  },
-  TRUSTED_SEP,
-  {
-    node: (
-      <span className="sb-trust-chip">
-        <TrustedDot delay={0.9} /> Rivalta sul Mincio
-      </span>
-    ),
-    href: "https://rivaltasulmincio.it",
-    ariaLabel: "Rivalta sul Mincio",
-  },
-  TRUSTED_SEP,
+// I clienti, come output di un comando. Due nomi non riempiono un nastro che
+// scorre — ma sono esattamente due righe di `ls`, e quello è un formato che di
+// righe ne vuole poche. Il sito ha già la sua grammatica da terminale
+// (.sb-codehead, .sb-term-line, .sb-cursor): qui si riusa quella.
+const CLIENTS = [
+  { host: "cascinafontana.xyz", url: "https://cascinafontana.xyz", dot: 0 },
+  { host: "rivaltasulmincio.it", url: "https://rivaltasulmincio.it", dot: 0.9 },
 ];
 
 export default function App() {
@@ -994,8 +965,46 @@ export default function App() {
             integrated like a platform.
           </p>
           <span className="sb-trusted-label">Trusted by real clients</span>
+          {/* data-no-i18n su tutto il blocco: è output di un comando, e il sito
+              tratta così anche gli altri pannelli di codice (vedi .sb-codehead
+              nella sezione «Built with»). I nomi a dominio non si traducono. */}
           <div className="sb-trusted" data-no-i18n>
-            <TrustedLoop logos={TRUSTED_LOGOS} />
+            <div className="sb-panel">
+              <div className="sb-panel-inner">
+                <div className="sb-codehead">
+                  <i /><i /><i />
+                  <span>clients — bash</span>
+                </div>
+                <div className="sb-trust-out">
+                  <p className="sb-term-line">
+                    <span className="p">$</span>
+                    <span>ls ./clients --status</span>
+                  </p>
+                  {CLIENTS.map((c) => (
+                    <a
+                      key={c.host}
+                      className="sb-trust-row"
+                      href={c.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      <span className="sb-trust-host">{c.host}</span>
+                      <span className="sb-trust-live">
+                        <TrustedDot delay={c.dot} /> LIVE
+                      </span>
+                    </a>
+                  ))}
+                  <p className="sb-term-line">
+                    <span className="c">#</span>
+                    <span className="c">2 shipped · 2 online</span>
+                  </p>
+                  <p className="sb-term-line">
+                    <span className="p">$</span>
+                    <i className="sb-cursor" aria-hidden="true" />
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

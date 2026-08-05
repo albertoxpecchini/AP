@@ -19,7 +19,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import ClickSpark from "@/components/reactbits/ClickSpark";
-import LogoLoop, { type LogoItem } from "@/components/reactbits/LogoLoop";
 import ShinyText from "@/components/reactbits/ShinyText";
 import { currentTheme, subscribeTheme, type Theme } from "../theme/themeCore";
 
@@ -171,28 +170,9 @@ export function SparkGroup({ children, className }: { children: ReactNode; class
   );
 }
 
-// ── ④ Nastro dei clienti ─────────────────────────────────────────────────────
-
-/** La riga "Trusted by real clients" come nastro continuo. LogoLoop gestisce da
- *  sé il movimento ridotto (resta fermo), quindi qui non serve la guardia.
- *
- *  Niente `fadeOut`: le sfumature ai bordi di LogoLoop sono due rettangoli di
- *  tinta piatta presi dal colore di fondo, e sopra un fondale che si muove
- *  (l'aurora) si vedevano per quello che erano — due macchie chiare ferme.
- *  Le voci adesso arrivano fino al bordo del contenitore e basta; a dare il
- *  ritmo ci pensano le pillole e il separatore (vedi .sb-trust-chip in
- *  home.css), non una dissolvenza. */
-export function TrustedLoop({ logos }: { logos: LogoItem[] }) {
-  return (
-    <LogoLoop
-      logos={logos}
-      speed={30}
-      direction="left"
-      logoHeight={20}
-      gap={20}
-      pauseOnHover
-      ariaLabel="Clients I have built websites for"
-      className="sb-trusted-loop"
-    />
-  );
-}
+// Il blocco dei clienti non sta più qui: era un nastro che scorreva (LogoLoop),
+// adesso è una finestra di terminale fatta coi pezzi che il design system ha
+// già — .sb-panel + .sb-codehead + .sb-term-line. Vive in App.tsx col resto
+// del markup della home, perché non ha niente da orchestrare: nessun canvas,
+// nessun colore da risolvere a runtime, nessun ciclo da fermare.
+// components/reactbits/LogoLoop.tsx resta nel repo ma non è più usato.
