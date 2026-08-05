@@ -182,12 +182,50 @@ function writeDevApi(route: string, importer: () => Promise<{ insert: (b: any) =
   };
 }
 
+// Lista alcolici di /mima in sviluppo. Non passa da writeDevApi perché lì c'è
+// solo la POST: qui servono anche PATCH (spunta) e DELETE (togli).
+function mimaAlcoliciDevApi() {
+  return {
+    name: "mima-alcolici-dev-api",
+    configureServer(server: any) {
+      const env = loadEnv(server.config.mode, process.cwd(), "");
+      for (const k of ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) {
+        if (env[k] && !process.env[k]) process.env[k] = env[k];
+      }
+      server.middlewares.use("/api/mima-alcolici", async (req: any, res: any) => {
+        res.setHeader("Content-Type", "application/json");
+        const method = String(req.method || "").toUpperCase();
+        if (!["POST", "PATCH", "DELETE"].includes(method)) {
+          res.statusCode = 405; res.end('{"error":"Method not allowed"}'); return;
+        }
+        let raw = "";
+        req.on("data", (c: any) => { raw += c; });
+        req.on("end", async () => {
+          try {
+            const body = raw ? JSON.parse(raw) : {};
+            const api = await import("./api/mima-alcolici");
+            const out =
+              method === "POST" ? await api.addVoce(body)
+              : method === "PATCH" ? await api.setPreso(body)
+              : await api.removeVoce(body);
+            if (!out.ok) { res.statusCode = out.status; res.end(JSON.stringify({ error: out.error })); return; }
+            res.end(JSON.stringify(out.row));
+          } catch {
+            res.statusCode = 500; res.end('{"error":"dev"}');
+          }
+        });
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     figmaAssetResolver(),
     triviaDevApi(),
     festaNotifyDevApi(),
     igStatsDevApi(),
+    mimaAlcoliciDevApi(),
     writeDevApi("/api/sponsor", async () => ({ insert: (await import("./api/sponsor")).insertDonatore })),
     writeDevApi("/api/festa-rsvp", async () => ({ insert: (await import("./api/festa-rsvp")).insertPresenza })),
     // The React and Tailwind plugins are both required for Make, even if

@@ -6,6 +6,7 @@ import {
   IcListCheck,
 } from "../site/homeIcons";
 import { PageBackdrop, ShinyBrandline, SparkGroup } from "../site/homeFx";
+import { PLACES, haversineKm, num } from "./mimaData";
 import "../home.css";
 import "./mima.css";
 import "./luoghi.css";
@@ -18,7 +19,7 @@ import "./luoghi.css";
 // andarci. Stessa grammatica .sb- del resto del sito, prefisso .sb-mima-luoghi-.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Zona = "Milano Marittima" | "Cervia" | "Pinarella";
+type Zona = "Milano Marittima" | "Cervia" | "Pinarella" | "Riccione";
 
 interface Luogo {
   nome: string;
@@ -26,6 +27,15 @@ interface Luogo {
   indirizzo?: string;
   nota: string;
   top?: string; // se presente, evidenzia la card come scelta consigliata della categoria
+  // ── Posti segnati da noi sulla mappa ──────────────────────────────────────
+  // Questi quattro campi ci sono solo dove abbiamo la scheda vera (voto,
+  // recensioni, fascia di prezzo) e le coordinate: gli altri locali restano
+  // una selezione da ricerche online, senza numeri inventati per pareggiare.
+  voto?: number;
+  recensioni?: number;
+  prezzo?: string;
+  /** Chiave in PLACES: se c'è, la card mostra la distanza dall'ostello. */
+  place?: keyof typeof PLACES;
 }
 
 interface Categoria {
@@ -40,12 +50,21 @@ interface Categoria {
 const CATEGORIE: Categoria[] = [
   {
     key: "pesce",
-    kicker: "01 — Pesce & gourmet",
+    kicker: "01 — Ristoranti",
     titolo: "Ristoranti e bagni-ristorante",
     icon: IcWaves,
-    intro: "Cucina di pesce e ristorazione più curata, tra il lungomare di Milano Marittima e il Borgo Marina di Cervia.",
+    intro: "Cucina di pesce e ristorazione più curata, tra il lungomare di Milano Marittima e il Borgo Marina di Cervia — più la churrascaria brasiliana, l'unica della lista che col pesce non c'entra niente.",
     luoghi: [
       { nome: "Acqua e Sale", zona: "Milano Marittima", nota: "Tra i ristoranti più apprezzati della zona nelle classifiche online.", top: "Il più votato" },
+      {
+        nome: "Pousada Beijaflor",
+        zona: "Milano Marittima",
+        nota: "Churrascaria brasiliana in pieno centro a MiMa: carne alla brace servita al tavolo, non cucina di mare.",
+        voto: 4.1,
+        recensioni: 2280,
+        prezzo: "10-20 €",
+        place: "beijaflor",
+      },
       { nome: "Mima Beach 272", zona: "Milano Marittima", nota: "Bagno-ristorante sulla spiaggia, tra i più frequentati per pranzo di pesce." },
       { nome: "Pino Beach 285", zona: "Milano Marittima", nota: "Pesce con terrazza vista mare, uno dei più citati per la cucina ittica." },
       { nome: "Zi Teresa", zona: "Milano Marittima", nota: "Storico dal 1947, cucina marinara informale — filetto di tonno e crudità di pesce." },
@@ -95,8 +114,36 @@ const CATEGORIE: Categoria[] = [
     kicker: "05 — Vita notturna",
     titolo: "Discoteche e street bar",
     icon: IcMoon,
-    intro: "Il cuore della movida di Milano Marittima, tra street bar e discoteche storiche.",
+    intro: "Il cuore della movida di Milano Marittima, tra street bar e discoteche storiche. Le tre col voto e la distanza sono quelle che ci siamo segnati sulla mappa.",
     luoghi: [
+      {
+        nome: "Indie Club",
+        zona: "Pinarella",
+        nota: "La più vicina all'ostello di tutte: ci si va e si torna a piedi, senza pensare a chi guida.",
+        top: "A piedi dall'ostello",
+        voto: 3.8,
+        recensioni: 1231,
+        prezzo: "20-30 €",
+        place: "indie",
+      },
+      {
+        nome: "King",
+        zona: "Pinarella",
+        nota: "Poco più su lungo la costa, ancora in zona: la fascia di prezzo più bassa fra le tre segnate.",
+        voto: 3.8,
+        recensioni: 230,
+        prezzo: "10-20 €",
+        place: "king",
+      },
+      {
+        nome: "Cocoricò",
+        zona: "Riccione",
+        nota: "Il voto più alto del gruppo, ma è fuori zona: una serata lì vuol dire mettersi in auto, andata e ritorno, e chi guida non beve.",
+        voto: 4.5,
+        recensioni: 2387,
+        prezzo: "20-70 €",
+        place: "cocorico",
+      },
       { nome: "Pineta", zona: "Milano Marittima", nota: "La discoteca storica di Milano Marittima, il locale più chic della riviera.", top: "La più storica" },
       { nome: "Villa Papeete", zona: "Milano Marittima", nota: "Villa ottocentesca nel verde: privè, ristorante, palco live e pista centrale." },
       { nome: "Caino Fashion Club", zona: "Milano Marittima", nota: "Street bar più famoso dal 1999, a due passi dalla discoteca Pineta." },
@@ -107,6 +154,13 @@ const CATEGORIE: Categoria[] = [
 ];
 
 const TOTALE_LUOGHI = CATEGORIE.reduce((n, c) => n + c.luoghi.length, 0);
+const SEGNATI = CATEGORIE.reduce((n, c) => n + c.luoghi.filter((l) => l.place).length, 0);
+
+/** Quanto dista dall'ostello, in linea d'aria. Sotto il chilometro, in metri. */
+function distDaOstello(key: keyof typeof PLACES) {
+  const km = haversineKm(PLACES.hostel, PLACES[key]);
+  return km < 1 ? `${Math.round(km * 1000)} m dall'ostello` : `${num(km, 1)} km dall'ostello`;
+}
 
 export default function Luoghi() {
   const [scrolled, setScrolled] = useState(false);
@@ -213,6 +267,18 @@ export default function Luoghi() {
                         {l.indirizzo && (
                           <p className="sb-mima-luoghi-addr"><IcPin size={13} /> {l.indirizzo}</p>
                         )}
+                        {(l.voto || l.prezzo || l.place) && (
+                          <p className="sb-mima-luoghi-meta" data-no-i18n translate="no">
+                            {l.voto != null && (
+                              <span className="sb-mima-luoghi-voto">
+                                {num(l.voto, 1)}/5
+                                {l.recensioni != null && ` (${l.recensioni.toLocaleString("it-IT")})`}
+                              </span>
+                            )}
+                            {l.prezzo && <span>{l.prezzo}</span>}
+                            {l.place && <span>{distDaOstello(l.place)}</span>}
+                          </p>
+                        )}
                         <p className="sb-mima-luoghi-nota">{l.nota}</p>
                       </div>
                     </div>
@@ -233,7 +299,11 @@ export default function Luoghi() {
             <p className="sb-mima-note" style={{ marginBottom: 0 }}>
               Selezione curata da ricerche online (recensioni, classifiche e sondaggi di zona) ad
               agosto 2026, non da esperienza diretta: indirizzi, orari di apertura e menù vanno
-              riverificati prima di andarci, soprattutto in alta stagione.
+              riverificati prima di andarci, soprattutto in alta stagione. Fanno eccezione{" "}
+              <strong>{SEGNATI} locali</strong> — quelli con voto, fascia di prezzo e distanza:
+              quelli ce li siamo segnati noi sulla mappa, e la distanza è calcolata in linea
+              d'aria dall'ostello. Le trovi anche nella tabella su{" "}
+              <Link to="/mima" className="sb-link">MiMa</Link>, modulo "Locali segnati".
             </p>
             <SparkGroup className="sb-hero-actions sb-mima-actions">
               <a
