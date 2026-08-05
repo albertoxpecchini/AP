@@ -58,3 +58,22 @@
 }
 .sb-mima-luoghi-addr svg { flex-shrink: 0; color: var(--sb-fg-muted); }
 .sb-mima-luoghi-nota { margin: 0.15rem 0 0; font-size: 0.86rem; line-height: 1.55; color: var(--sb-fg-lighter); }
+
+/* Riga della scheda mappa: c'è solo sui locali che ci siamo segnati noi, con
+   voto, fascia di prezzo e distanza dall'ostello. I tre pezzi sono separati da
+   un punto medio disegnato col bordo, non scritto nel testo: così il motore di
+   traduzione (i18n) non se lo ritrova in mezzo ai nodi. */
+.sb-mima-luoghi-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  margin: 0.1rem 0 0;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: var(--sb-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.sb-mima-luoghi-meta > span { display: inline-flex; align-items: center; }
+.sb-mima-luoghi-meta > span + span { padding-left: 0.6rem; border-left: 1px solid var(--sb-border-strong); }
+.sb-mima-luoghi-voto { color: var(--sb-brand-text); font-weight: 500; }

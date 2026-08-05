@@ -1182,49 +1182,94 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   background: linear-gradient(to left, transparent, var(--sb-border-strong));
 }
 
-/* Il nastro dei clienti. Nessuna sfumatura ai bordi: le voci corrono fino al
-   bordo del contenitore. */
-.sb-trusted { display: block; }
-.sb-trusted-loop { width: 100%; }
-.sb-trusted-loop a { text-decoration: none; }
+/* I clienti come output di un comando.
+   Qui dentro non c'è quasi niente di nuovo: il pannello col rim di vetro
+   (.sb-panel), la barra della finestra coi tre pallini (.sb-codehead), la riga
+   di terminale col prompt (.sb-term-line) e il blocchetto che lampeggia
+   (.sb-cursor) esistono già — sono gli stessi pezzi con cui sono fatti il
+   pannello di codice della sezione «Built with» e il terminale della card
+   «AI-assisted development». Di nuovo c'è solo la riga-cliente. */
+.sb-trusted {
+  display: block;
+  max-width: 32rem;
+  margin: 0 auto;
+  text-align: left;
+}
+.sb-trust-out {
+  padding: 0.9rem 1.05rem 1rem;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.8rem;
+  line-height: 1.85;
+  color: var(--sb-fg-light);
+  overflow-x: auto;
+}
+/* Tutte le righe stanno sulla STESSA griglia a colonne, prompt compreso: una
+   colonna larga un carattere per il segno ($ o #), poi il contenuto, poi lo
+   stato incolonnato a destra. È quello che fa un terminale vero — l'output non
+   è indentato a caso rispetto al comando, ci sta sotto in colonna. Le misure
+   sono in `ch` apposta: con un font monospaziato una colonna larga 1ch e uno
+   stacco di 1ch sono esattamente «segno + spazio», non un'approssimazione.
 
-/* Ogni cliente è una pillola. Il fondo è una tinta semitrasparente, NON il
-   vetro con backdrop-filter delle card: qui l'elemento si sposta a ogni frame,
-   e una sfocatura del fondale andrebbe ricampionata di continuo per ognuna
-   delle pillole in circolo. La resa è quasi la stessa, il costo no. */
-.sb-trust-chip {
-  display: inline-flex;
+   La griglia è ridichiarata solo qui dentro: .sb-term-line è condivisa col
+   terminale della card «AI-assisted development», che resta un flex. */
+.sb-trust-out .sb-term-line,
+.sb-trust-row {
+  display: grid;
+  grid-template-columns: 1ch minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.52rem 1.05rem;
-  border-radius: 999px;
-  border: 1px solid var(--sb-border);
-  background: color-mix(in srgb, var(--sb-surface-100) 72%, transparent);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  gap: 0 1ch;
+  margin: 0;
+}
+/* Le righe-cliente non hanno segno: la prima colonna resta vuota, ma esiste —
+   è quella che le tiene incolonnate sotto al comando. */
+.sb-trust-row::before { content: ""; }
+/* Il prompt e il commento vengono da .sb-term, che vive su fondo scuro sempre.
+   Questo terminale invece sta dentro un pannello di vetro, quindi sul chiaro è
+   chiaro: servono le tinte da testo, le stesse che usa .sb-code (--sb-code-*,
+   --sb-brand-text), non quelle pensate per il nero. */
+.sb-trust-out .sb-term-line .p { color: var(--sb-brand-text); }
+.sb-trust-out .sb-term-line .c { color: var(--sb-fg-muted); font-style: italic; }
+/* .sb-cursor nasce per stare in mezzo a del testo in linea, e si porta dietro
+   un margine di 2px e un vertical-align. Qui è una cella di griglia: quei 2px
+   lo butterebbero fuori dalla colonna del comando, che è esattamente la cosa
+   da evitare — il cursore deve cadere sotto la `l` di `ls`. */
+.sb-trust-out .sb-cursor {
+  margin-left: 0;
+  justify-self: start;
+  vertical-align: baseline;
+}
+
+/* La riga del cliente è un link, ma deve continuare a leggersi come output.
+   Griglia e colonne le prende dalla regola condivisa qui sopra: qui resta solo
+   ciò che la distingue, cioè che è premibile. Il fondo dell'hover sborda di
+   mezzo carattere ai lati e il padding lo rimette a posto, così il testo NON
+   si sposta dalla sua colonna quando ci passi sopra. */
+.sb-trust-row {
+  margin-inline: -0.5ch;
+  padding-inline: 0.5ch;
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.sb-trust-row:hover { background: var(--sb-overlay); }
+.sb-trust-host {
+  color: var(--sb-brand-text);
+  overflow: hidden;
   white-space: nowrap;
-  color: var(--sb-fg-lighter);
-  transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  text-overflow: ellipsis;
 }
-/* Il link di LogoLoop porta con sé un hover:opacity-80 di Tailwind, che
-   spegnerebbe tutta la pillola. Qui l'hover è un'altra cosa: la pillola si
-   accende di verde e si solleva di un pelo. */
-.sb-trusted-loop a:hover { opacity: 1; }
-.sb-trusted-loop a:hover .sb-trust-chip,
-.sb-trusted-loop a:focus-visible .sb-trust-chip {
-  color: var(--sb-fg);
-  border-color: color-mix(in srgb, var(--sb-brand) 55%, var(--sb-border-strong));
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-brand) 13%, transparent);
-  transform: translateY(-1px);
+.sb-trust-row:hover .sb-trust-host {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
-/* Il segno fra un cliente e l'altro: piccolo, verde, non un'altra voce. */
-.sb-trust-sep {
+.sb-trust-live {
   display: inline-flex;
   align-items: center;
-  font-size: 0.62rem;
-  color: color-mix(in srgb, var(--sb-brand) 65%, var(--sb-fg-muted));
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--sb-fg-muted);
 }
 
 /* ── Sezione archivio ("dashboard") ──────────────────────────────────────── */

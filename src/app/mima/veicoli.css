@@ -6,49 +6,19 @@
    .sb-mima-veic-.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Card opzione (A/B/C/D) ──────────────────────────────────────────────── */
-.sb-mima-veic-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-@media (max-width: 1023.98px) { .sb-mima-veic-cards { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 559.98px) { .sb-mima-veic-cards { grid-template-columns: 1fr; } }
+/* Le card opzione A/B/C/D che stavano qui sono state sostituite dalla
+   classifica (.sb-mima-veic-rank-*, in fondo): stessa informazione, un quarto
+   dello spazio, e l'ordine lo decide il punteggio invece dell'ordine in cui
+   sono scritte nel file. */
 
-.sb-mima-veic-card { position: relative; height: 100%; }
-.sb-mima-veic-card.is-winner .sb-panel-inner { border-color: var(--sb-brand); }
-.sb-mima-veic-card-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-  padding: 1.2rem;
-  height: 100%;
-}
-.sb-mima-veic-tag {
-  position: absolute;
-  top: -0.6rem;
-  right: 1rem;
-  z-index: 1;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background: var(--sb-brand);
-  color: #062b1a;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.sb-mima-veic-name { margin: 0; font-size: 0.98rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); }
-.sb-mima-veic-sub { font-size: 0.8rem; color: var(--sb-fg-muted); }
-.sb-mima-veic-score { display: flex; align-items: baseline; gap: 0.25rem; font-weight: 500; color: var(--sb-brand-text); }
-.sb-mima-veic-score b { font-size: 1.7rem; letter-spacing: -0.02em; }
-.sb-mima-veic-score span { font-size: 0.85rem; color: var(--sb-fg-muted); font-weight: 400; }
-.sb-mima-veic-meta { display: flex; flex-direction: column; gap: 0.3rem; margin: 0; font-size: 0.82rem; color: var(--sb-fg-lighter); }
-.sb-mima-veic-meta strong { font-weight: 500; color: var(--sb-fg); }
-
-/* ── Tabella per criterio ─────────────────────────────────────────────────── */
+/* ── Tabella per criterio ─────────────────────────────────────────────────
+   È un riquadro dati che scorre nei due sensi dentro un'altezza fissa, non una
+   tabella che allunga la pagina: così l'intestazione può incollarsi in alto e
+   la colonna dei criteri a sinistra. Senza il `max-height` lo sticky verticale
+   non avrebbe nulla a cui aggrapparsi (il contenitore non scorrerebbe). */
 .sb-mima-veic-scroll {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: min(70vh, 620px);
   border: 1px solid var(--sb-border-strong);
   border-radius: 12px;
   background: var(--sb-surface-75);
@@ -70,17 +40,67 @@
   color: var(--sb-fg-muted);
   background: var(--sb-surface-100);
 }
-.sb-mima-veic-crit { font-weight: 500; font-size: 0.88rem; color: var(--sb-fg); white-space: nowrap; }
+/* Intestazione appiccicosa in alto, criteri appiccicati a sinistra. L'angolo
+   in alto a sinistra sta sopra entrambi, altrimenti scorrendo in diagonale una
+   delle due strisce gli passerebbe sopra. */
+.sb-mima-veic-table thead th { position: sticky; top: 0; z-index: 2; }
+.sb-mima-veic-table thead th:first-child { left: 0; z-index: 4; }
+.sb-mima-veic-crit {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--sb-fg);
+  white-space: nowrap;
+  /* Opaco per forza: ci scorre sotto il contenuto delle altre colonne. */
+  background: var(--sb-surface-100);
+}
 .sb-mima-veic-crit-note { display: block; margin-top: 0.15rem; font-weight: 400; font-size: 0.72rem; color: var(--sb-fg-muted); }
-.sb-mima-veic-cell { display: flex; flex-direction: column; gap: 0.35rem; min-width: 150px; }
+/* La cella resta una cella (serve allo sticky e agli screen reader): la colonna
+   la fa il div dentro. Prima c'era `display: flex` qui, e toglieva alla <td>
+   la sua natura di cella. */
+.sb-mima-veic-cell { min-width: 150px; }
+.sb-mima-veic-cellbox { display: flex; flex-direction: column; gap: 0.35rem; }
+.sb-mima-veic-cell.is-best { background: color-mix(in srgb, var(--sb-brand) 9%, transparent); }
 .sb-mima-veic-barrow { display: flex; align-items: center; gap: 0.5rem; }
 .sb-mima-veic-bar { flex: 1; height: 5px; border-radius: 3px; background: var(--sb-surface-200); overflow: hidden; }
 .sb-mima-veic-bar > i { display: block; height: 100%; border-radius: 3px; background: var(--sb-brand); }
 .sb-mima-veic-num { font-size: 0.7rem; color: var(--sb-fg-muted); width: 22px; text-align: right; font-variant-numeric: tabular-nums; }
 .sb-mima-veic-cellnote { font-size: 0.78rem; line-height: 1.45; color: var(--sb-fg-lighter); }
 
+/* Modalità compatta: via le note, restano barre e voti. Serve a leggere la
+   matrice come una tabella di numeri invece che come dieci paragrafi. */
+.sb-mima-veic-table.is-compact th,
+.sb-mima-veic-table.is-compact td { padding: 0.5rem 0.8rem; }
+.sb-mima-veic-table.is-compact .sb-mima-veic-cellnote { display: none; }
+
+/* Riga dei totali, incollata in fondo al riquadro. */
+.sb-mima-veic-table tfoot th,
+.sb-mima-veic-table tfoot td {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: var(--sb-surface-100);
+  border-top: 1px solid var(--sb-border-strong);
+  border-bottom: none;
+  font-family: var(--mima-mono);
+  font-size: 0.74rem;
+  color: var(--sb-fg);
+  font-variant-numeric: tabular-nums;
+}
+.sb-mima-veic-table tfoot th:first-child { left: 0; z-index: 4; }
+
 /* ── Verdetto ─────────────────────────────────────────────────────────────── */
-.sb-mima-veic-verdict { padding: 1.4rem 1.5rem; gap: 0.6rem; border-left: 3px solid var(--sb-brand); }
+.sb-mima-veic-verdict {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid var(--sb-brand);
+  border-radius: 0 8px 8px 0;
+  background: var(--sb-surface-75);
+}
 .sb-mima-veic-verdict-label {
   display: inline-flex;
   align-items: center;
@@ -95,7 +115,7 @@
 .sb-mima-veic-verdict strong { font-weight: 500; color: var(--sb-fg); }
 
 /* ── Righe "perché non le altre" ──────────────────────────────────────────── */
-.sb-mima-veic-why { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
+.sb-mima-veic-why { display: flex; flex-direction: column; gap: 0.6rem; }
 .sb-mima-veic-why-row {
   display: flex;
   gap: 0.7rem;
@@ -108,3 +128,113 @@
   color: var(--sb-fg-lighter);
 }
 .sb-mima-veic-why-row strong { flex-shrink: 0; font-weight: 500; color: var(--sb-fg); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TERMINALE — moduli densi della console di /mima/veicoli. Le primitive comuni
+   (.sb-mima-mod*, -kv*, -meter*, -tbd, ticker, console, rail) stanno in
+   mima.css; qui c'è solo quello che esiste su questa pagina e basta.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Classifica ──────────────────────────────────────────────────────────── */
+.sb-mima-veic-rank { display: flex; flex-direction: column; }
+.sb-mima-veic-rank-row {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) 7rem 3.6rem;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed var(--sb-border);
+}
+.sb-mima-veic-rank-row:last-child { border-bottom: none; }
+.sb-mima-veic-rank-n {
+  font-family: var(--mima-mono);
+  font-size: 0.72rem;
+  color: var(--sb-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.sb-mima-veic-rank-row.is-winner .sb-mima-veic-rank-n { color: var(--sb-brand-text); }
+.sb-mima-veic-rank-name { min-width: 0; font-size: 0.86rem; color: var(--sb-fg-light); }
+.sb-mima-veic-rank-row.is-winner .sb-mima-veic-rank-name { font-weight: 500; color: var(--sb-fg); }
+.sb-mima-veic-rank-sub { display: block; font-size: 0.7rem; font-weight: 400; color: var(--sb-fg-muted); }
+.sb-mima-veic-rank-score {
+  justify-self: end;
+  font-family: var(--mima-mono);
+  font-size: 0.8rem;
+  color: var(--sb-fg);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 559.98px) {
+  .sb-mima-veic-rank-row { grid-template-columns: 1.4rem minmax(0, 1fr) 3.6rem; }
+  .sb-mima-veic-rank-meter { display: none; }
+}
+
+/* Le tabelle dati (.sb-mima-data*) sono salite in mima.css: le usa anche il
+   modulo dei locali su /mima, e una primitiva condivisa non può stare nel
+   foglio di una pagina sola. */
+
+/* ── Simulatore ──────────────────────────────────────────────────────────── */
+.sb-mima-veic-sim-form { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: flex-end; }
+.sb-mima-veic-sim-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.sb-mima-veic-sim-field label {
+  font-family: var(--mima-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+.sb-mima-veic-sim-field input {
+  width: 7.5rem;
+  height: 32px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 6px;
+  background: var(--sb-surface-75);
+  color: var(--sb-fg);
+  font-family: var(--mima-mono);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Ingombri in scala ───────────────────────────────────────────────────── */
+.sb-mima-veic-size { display: flex; flex-direction: column; gap: 0.55rem; }
+.sb-mima-veic-size-row { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 3.6rem; gap: 0.6rem; align-items: center; }
+.sb-mima-veic-size-name { font-size: 0.8rem; color: var(--sb-fg-light); }
+.sb-mima-veic-size-track {
+  position: relative;
+  height: 18px;
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-surface-100);
+}
+.sb-mima-veic-size-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 3px 0 0 3px;
+  background: color-mix(in srgb, var(--sb-brand) 28%, transparent);
+  border-right: 2px solid var(--sb-brand);
+}
+/* La riga del posto auto standard: il metro di paragone di tutta la sezione. */
+.sb-mima-veic-size-ref { position: absolute; top: -5px; bottom: -5px; width: 1px; background: var(--sb-fg-muted); }
+.sb-mima-veic-size-val {
+  justify-self: end;
+  font-family: var(--mima-mono);
+  font-size: 0.75rem;
+  color: var(--sb-fg);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 479.98px) {
+  .sb-mima-veic-size-row { grid-template-columns: 5rem minmax(0, 1fr) 3.4rem; }
+  .sb-mima-veic-size-name { font-size: 0.74rem; }
+}
+
+/* ── Card della scelta, nel rail ─────────────────────────────────────────── */
+.sb-mima-veic-pick { display: flex; flex-direction: column; gap: 0.2rem; }
+.sb-mima-veic-pick-name { font-size: 0.95rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); }
+.sb-mima-veic-pick-sub { font-size: 0.78rem; color: var(--sb-fg-muted); }
+
+/* ── Riduzione del movimento ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .sb-mima-veic-size-fill { transition: none; }
+}

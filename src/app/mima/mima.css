@@ -48,11 +48,10 @@
 
 /* ── Fact-card riusate per "a colpo d'occhio" e "viaggio in auto" ────────── */
 .sb-mima-tight { padding-top: 0; }
+/* Le usa ancora /mima/luoghi ("a colpo d'occhio"); su /mima e /mima/veicoli
+   hanno lasciato il posto alle KPI a filo del terminale (.sb-mima-kpis). */
 .sb-mima-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-.sb-mima-facts--4 { grid-template-columns: repeat(4, 1fr); }
-@media (max-width: 1023.98px) { .sb-mima-facts--4 { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 767.98px) { .sb-mima-facts { grid-template-columns: 1fr; } }
-@media (max-width: 479.98px) { .sb-mima-facts--4 { grid-template-columns: 1fr; } }
 .sb-mima-fact { padding: 1.1rem 1.2rem; gap: 0.25rem; }
 .sb-mima-fact-icon {
   display: inline-flex;
@@ -91,7 +90,8 @@
 .sb-mima-note { margin: 0 0 1.4rem; max-width: 44rem; font-size: 0.92rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 
 /* ── Alloggio ────────────────────────────────────────────────────────────── */
-.sb-mima-hostel { padding: 1.5rem; gap: 1rem; }
+/* Il wrapper .sb-mima-hostel non serve più: la spaziatura la dà il corpo del
+   modulo (.sb-mima-modbody). Restano le parti interne, riusate lì dentro. */
 .sb-mima-hostel-head { display: flex; align-items: flex-start; gap: 0.9rem; }
 .sb-mima-hostel-icon {
   flex-shrink: 0;
@@ -148,12 +148,9 @@
 }
 .sb-mima-info-row strong { flex-shrink: 0; min-width: 8rem; font-weight: 500; color: var(--sb-fg); }
 
-/* ── Pannelli a righe dati (conto / spese) ───────────────────────────────── */
-.sb-mima-panelpad { padding: 1.5rem; gap: 0.9rem; }
-.sb-mima-panelhead { display: flex; align-items: center; gap: 0.55rem; color: var(--sb-fg); }
-.sb-mima-panelhead svg { flex-shrink: 0; color: var(--sb-fg-light); }
-.sb-mima-panelhead span { font-size: 0.95rem; font-weight: 500; letter-spacing: -0.01em; }
-
+/* ── Righe dati (conto / spese) ──────────────────────────────────────────── */
+/* .sb-mima-panelpad e -panelhead sono spariti con i pannelli a sé stanti:
+   ora ogni blocco è un <Mod>, che porta già padding e testata. */
 .sb-mima-rows { list-style: none; margin: 0; padding: 0; }
 .sb-mima-row {
   display: flex;
@@ -194,35 +191,8 @@
 .sb-mima-balance-tag.is-credit { color: var(--sb-brand-text); }
 .sb-mima-balance-tag.is-debit { color: var(--sb-fg); }
 
-/* ── Programma: righe giorno per giorno ──────────────────────────────────── */
-.sb-mima-days { display: flex; flex-direction: column; gap: 0.6rem; }
-.sb-mima-day {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.85rem 1rem;
-  border-radius: 10px;
-  border: 1px solid var(--sb-border);
-  background: var(--sb-surface-75);
-}
-.sb-mima-day-date {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  padding: 0.4rem 0;
-  border-radius: 8px;
-  border: 1px solid var(--sb-border-strong);
-  background: var(--sb-surface-100);
-  color: var(--sb-brand-text);
-}
-.sb-mima-day-num { font-size: 0.85rem; font-weight: 500; }
-.sb-mima-day-wd { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--sb-fg-muted); }
-.sb-mima-day-body { min-width: 0; }
-.sb-mima-day-label { margin: 0; font-weight: 500; color: var(--sb-fg); }
-.sb-mima-day-desc { margin: 0.15rem 0 0; font-size: 0.85rem; color: var(--sb-fg-lighter); }
+/* Le righe "giorno per giorno" (.sb-mima-day*) sono state sostituite dalla
+   griglia 5 giorni × 4 fasce: vedi .sb-mima-cal-* più in basso. */
 
 /* ── Album ricordo (griglia + lightbox) ──────────────────────────────────── */
 .sb-mima-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
@@ -279,7 +249,579 @@
    sta qui, perché il componente rende lui l'elemento e non inoltra `style`. */
 .sb-mima-actions { margin-top: 1.4rem; }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   TERMINALE DI VIAGGIO
+   Da qui in giù vive il registro nuovo di /mima e /mima/veicoli: non più un
+   articolo con sezioni distanziate ma una console — barra di stato in cima,
+   colonna di moduli fitti, rail appiccicoso a destra. Stessi token --sb-*
+   (grigi + un solo verde), stessa famiglia di classi: cambia la densità, non
+   la tavolozza.
+
+   Tutto quello che segue è ADDITIVO. Le classi sopra (-fact, -sechead,
+   -kicker, -day, -rows, -gallery, -modal*) restano com'erano perché
+   /mima/luoghi importa questo stesso foglio e continua a usarle.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mima-page {
+  --mima-mono: "Roboto Mono", ui-monospace, monospace;
+  --mima-nav-h: 64px;      /* .sb-nav-inner */
+  --mima-ticker-h: 35px;   /* la barra di stato qui sotto */
+  --mima-stick: calc(var(--mima-nav-h) + var(--mima-ticker-h));
+}
+
+/* ── Barra di stato ──────────────────────────────────────────────────────────
+   Si incolla sotto la nav (che è alta 64px e sta a z-index 50): niente
+   sovrapposizione, solo due strati appiccicosi uno sopra l'altro. */
+.sb-mima-ticker {
+  position: sticky;
+  top: var(--mima-nav-h);
+  z-index: 40;
+  border-top: 1px solid var(--sb-border);
+  border-bottom: 1px solid var(--sb-border);
+  background: color-mix(in srgb, var(--sb-bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+}
+.sb-mima-ticker-inner {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  scrollbar-width: none;
+  font-family: var(--mima-mono);
+}
+.sb-mima-ticker-inner::-webkit-scrollbar { display: none; }
+.sb-mima-tick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.5rem 0.85rem;
+  border-right: 1px solid var(--sb-border);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+.sb-mima-tick:first-child { padding-left: 0; }
+.sb-mima-tick:last-child { border-right: none; }
+.sb-mima-tick-k { color: var(--sb-fg-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.sb-mima-tick-v { color: var(--sb-fg); font-variant-numeric: tabular-nums; }
+.sb-mima-tick-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sb-brand);
+  flex-shrink: 0;
+  animation: sb-ping 2.2s ease-out infinite;
+}
+
+/* ── Hero compatta: qui la hero introduce, non occupa uno schermo ────────── */
+.sb-mima-hero { padding-top: clamp(2rem, 4vw, 3.2rem); padding-bottom: clamp(1.2rem, 2.5vw, 1.8rem); }
+.sb-mima-hero .sb-hero-title { font-size: clamp(1.85rem, 4.2vw, 2.5rem); }
+.sb-mima-hero .sb-hero-copy p { max-width: 46rem; }
+.sb-mima-count--3 { max-width: 28rem; }
+
+/* ── Console: colonna di moduli + rail ──────────────────────────────────── */
+.sb-mima-console-sec { padding-top: 0; padding-bottom: clamp(3rem, 6vw, 4.5rem); }
+.sb-mima-console {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 21rem;
+  gap: 0.75rem;
+  align-items: start;
+}
+@media (max-width: 1279.98px) { .sb-mima-console { grid-template-columns: minmax(0, 1fr) 18rem; } }
+@media (max-width: 1023.98px) { .sb-mima-console { grid-template-columns: minmax(0, 1fr); } }
+
+.sb-mima-col { display: flex; flex-direction: column; gap: 0.75rem; min-width: 0; }
+.sb-mima-rail {
+  position: sticky;
+  top: calc(var(--mima-stick) + 0.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  /* Il rail è più alto di una schermata: incollato e basta, il suo fondo
+     resterebbe irraggiungibile. Con il tetto d'altezza scorre per conto suo
+     quando serve, e su schermi alti non compare nessuna barra in più. */
+  max-height: calc(100vh - var(--mima-stick) - 1.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+/* Sotto il collasso a una colonna il rail va in coda: né appiccicato né
+   limitato in altezza, sennò diventerebbe una finestrella dentro la pagina. */
+@media (max-width: 1023.98px) {
+  .sb-mima-rail { position: static; max-height: none; overflow-y: visible; }
+}
+
+/* ── Modulo: pannello di vetro + testata monospaziata ───────────────────── */
+/* Lo scroll-margin è quello che salva i segnalibri: senza, cliccando una voce
+   dell'indice il modulo si allinea al bordo della finestra e la sua testata
+   finisce sotto la nav e il ticker, che sono appiccicati lì sopra. */
+.sb-mima-mod { scroll-margin-top: calc(var(--mima-stick) + 0.75rem); }
+.sb-mima-mod-inner { padding: 0; gap: 0; }
+.sb-mima-modhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--sb-border);
+  background: color-mix(in srgb, var(--sb-surface-100) 55%, transparent);
+}
+.sb-mima-modtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-family: var(--mima-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--sb-fg);
+}
+.sb-mima-modicon { display: inline-flex; color: var(--sb-brand-text); }
+.sb-mima-modmeta {
+  font-family: var(--mima-mono);
+  font-size: 0.66rem;
+  color: var(--sb-fg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sb-mima-modbody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  min-width: 0;
+}
+
+/* ── Il marcatore d'onestà ───────────────────────────────────────────────── */
+.sb-mima-tbd {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px dashed var(--sb-border-stronger);
+  border-radius: 999px;
+  font-family: var(--mima-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ── Righe chiave/valore: la spina dorsale delle schede ──────────────────── */
+.sb-mima-kv { display: flex; flex-direction: column; }
+.sb-mima-kv-row {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 11rem) minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  align-items: baseline;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--sb-border);
+  font-size: 0.84rem;
+}
+.sb-mima-kv-row:last-child { border-bottom: none; }
+.sb-mima-kv-k {
+  font-family: var(--mima-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+.sb-mima-kv-v { min-width: 0; color: var(--sb-fg); font-variant-numeric: tabular-nums; }
+@media (max-width: 479.98px) { .sb-mima-kv-row { grid-template-columns: 1fr; gap: 0.1rem; } }
+
+/* ── Tabella dati: la usano i locali su /mima e scheda tecnica + simulatore
+   su /mima/veicoli. Righe strette, numeri tabellari, niente cornice: dentro un
+   modulo la cornice ce l'ha già il pannello. ───────────────────────────────── */
+.sb-mima-data { overflow-x: auto; }
+.sb-mima-data-table { width: 100%; min-width: 32rem; border-collapse: collapse; }
+.sb-mima-data-table th,
+.sb-mima-data-table td {
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px dashed var(--sb-border);
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--sb-fg-light);
+  font-variant-numeric: tabular-nums;
+}
+.sb-mima-data-table thead th {
+  border-bottom: 1px solid var(--sb-border);
+  font-family: var(--mima-mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+  white-space: nowrap;
+}
+.sb-mima-data-table tbody th {
+  font-family: var(--mima-mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+  white-space: nowrap;
+}
+.sb-mima-data-table tbody tr:last-child th,
+.sb-mima-data-table tbody tr:last-child td { border-bottom: none; }
+.sb-mima-data-table .is-best { font-weight: 500; color: var(--sb-fg); }
+.sb-mima-data-table .is-winner-col { background: color-mix(in srgb, var(--sb-brand) 7%, transparent); }
+/* Fuori zona: la riga resta leggibile ma si tira indietro. */
+.sb-mima-data-table tr.is-far th,
+.sb-mima-data-table tr.is-far td { color: var(--sb-fg-muted); }
+
+/* ── Barre di avanzamento (stessa grammatica dei punteggi di /veicoli) ───── */
+.sb-mima-meterrow { display: flex; align-items: center; gap: 0.55rem; }
+.sb-mima-meter {
+  flex: 1;
+  min-width: 2rem;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--sb-surface-200);
+  overflow: hidden;
+}
+.sb-mima-meter > i { display: block; height: 100%; border-radius: 3px; background: var(--sb-brand); }
+.sb-mima-meter.is-muted > i { background: var(--sb-border-stronger); }
+.sb-mima-meterval {
+  font-family: var(--mima-mono);
+  font-size: 0.7rem;
+  color: var(--sb-fg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── KPI a filo: separatori a capello ottenuti col gap di 1px ────────────── */
+.sb-mima-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--sb-border);
+  border-radius: 10px;
+  background: var(--sb-border);
+  overflow: hidden;
+}
+.sb-mima-kpi { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.65rem 0.75rem; background: var(--sb-surface-75); }
+.sb-mima-kpi-k {
+  font-family: var(--mima-mono);
+  font-size: 0.61rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+.sb-mima-kpi-v {
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--sb-fg);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 559.98px) { .sb-mima-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── Meteo: una colonna per giorno di viaggio ───────────────────────────── */
+.sb-mima-wx {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--sb-border);
+  border-radius: 10px;
+  background: var(--sb-border);
+  overflow: hidden;
+}
+.sb-mima-wx-day { display: flex; flex-direction: column; gap: 0.35rem; padding: 0.7rem 0.6rem; background: var(--sb-surface-75); }
+.sb-mima-wx-date {
+  font-family: var(--mima-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+.sb-mima-wx-icon { color: var(--sb-brand-text); }
+.sb-mima-wx-temp { display: flex; align-items: baseline; gap: 0.3rem; font-variant-numeric: tabular-nums; }
+.sb-mima-wx-max { font-size: 1.15rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); }
+.sb-mima-wx-min { font-size: 0.8rem; color: var(--sb-fg-muted); }
+.sb-mima-wx-label { font-size: 0.72rem; line-height: 1.35; color: var(--sb-fg-lighter); }
+.sb-mima-wx-rows { display: flex; flex-direction: column; gap: 0.12rem; margin-top: 0.15rem; }
+.sb-mima-wx-r {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  font-family: var(--mima-mono);
+  font-size: 0.63rem;
+  color: var(--sb-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.sb-mima-wx-r b { font-weight: 400; color: var(--sb-fg-light); }
+@media (max-width: 899.98px) { .sb-mima-wx { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 559.98px) { .sb-mima-wx { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── Programma: giorni in colonna, fasce in riga ──────────────────────────
+   Tabella vera, non una griglia di div: le fasce sono intestazioni di riga e i
+   giorni di colonna, e uno screen reader deve poterlo dire. Il contenitore
+   scorre in orizzontale, e siccome scorre anche la prima colonna si incolla a
+   sinistra — altrimenti scorrendo si perde di vista la fascia oraria. */
+.sb-mima-cal { overflow-x: auto; border: 1px solid var(--sb-border); border-radius: 10px; }
+.sb-mima-cal-table { width: 100%; min-width: 50rem; border-collapse: collapse; background: var(--sb-surface-75); }
+.sb-mima-cal-table th,
+.sb-mima-cal-table td {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--sb-border);
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.77rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--sb-fg-lighter);
+}
+.sb-mima-cal-table thead th,
+.sb-mima-cal-corner { background: var(--sb-surface-100); }
+.sb-mima-cal-day { display: block; font-family: var(--mima-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sb-fg); }
+.sb-mima-cal-wd { display: block; font-size: 0.62rem; color: var(--sb-fg-muted); }
+.sb-mima-cal-table th.sb-mima-cal-slot,
+.sb-mima-cal-corner {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 6rem;
+  background: var(--sb-surface-100);
+  font-family: var(--mima-mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+  vertical-align: middle;
+}
+
+/* ── Valigia ─────────────────────────────────────────────────────────────── */
+.sb-mima-check-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+@media (max-width: 767.98px) { .sb-mima-check-groups { grid-template-columns: 1fr; } }
+.sb-mima-check-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 10px;
+  background: var(--sb-surface-75);
+}
+.sb-mima-check-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.sb-mima-check-title {
+  font-family: var(--mima-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sb-fg);
+}
+.sb-mima-check-count { font-family: var(--mima-mono); font-size: 0.63rem; color: var(--sb-fg-muted); font-variant-numeric: tabular-nums; }
+.sb-mima-check-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--sb-fg-light); cursor: pointer; }
+.sb-mima-check-item input { width: 14px; height: 14px; flex-shrink: 0; accent-color: var(--sb-brand); cursor: pointer; }
+.sb-mima-check-item.is-done { color: var(--sb-fg-muted); text-decoration: line-through; }
+
+/* ── Alcolici: l'unica lista che scriviamo in tre ────────────────────────── */
+.sb-mima-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 8px;
+  background: var(--sb-surface-75);
+  font-size: 0.76rem;
+  color: var(--sb-fg-lighter);
+}
+.sb-mima-live-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--sb-fg-muted);
+}
+/* Verde e pulsante solo quando la lista è condivisa davvero: se il pallino è
+   spento, quello che scrivi resta sul tuo browser. */
+.sb-mima-live-dot.is-on { background: var(--sb-brand); animation: sb-ping 2.2s ease-out infinite; }
+
+.sb-mima-alc-form { display: flex; flex-direction: column; gap: 0.6rem; }
+.sb-mima-alc-who { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.7rem; }
+.sb-mima-alc-wholabel {
+  font-family: var(--mima-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+.sb-mima-alc-chip { cursor: pointer; }
+.sb-mima-alc-chip.is-on {
+  border-color: var(--sb-btn-bd);
+  background: color-mix(in srgb, var(--sb-brand) 12%, var(--sb-bg));
+  color: var(--sb-brand-text);
+}
+.sb-mima-alc-fields { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end; }
+.sb-mima-alc-grow { flex: 1 1 12rem; }
+.sb-mima-alc-grow input { width: 100%; }
+.sb-mima-alc-err { margin: 0; font-size: 0.8rem; color: var(--sb-fg); }
+
+.sb-mima-alc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.sb-mima-alc-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto 1.6rem;
+  gap: 0.5rem 0.7rem;
+  align-items: center;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--sb-border);
+}
+.sb-mima-alc-item:last-child { border-bottom: none; }
+.sb-mima-alc-check { display: flex; align-items: center; gap: 0.5rem; min-width: 0; cursor: pointer; }
+.sb-mima-alc-check input { width: 14px; height: 14px; flex-shrink: 0; accent-color: var(--sb-brand); cursor: pointer; }
+.sb-mima-alc-voce { min-width: 0; font-size: 0.86rem; color: var(--sb-fg); overflow-wrap: anywhere; }
+.sb-mima-alc-item.is-done .sb-mima-alc-voce { color: var(--sb-fg-muted); text-decoration: line-through; }
+.sb-mima-alc-qta {
+  font-family: var(--mima-mono);
+  font-size: 0.72rem;
+  color: var(--sb-fg-lighter);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sb-mima-alc-chi {
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  color: var(--sb-fg-muted);
+  white-space: nowrap;
+}
+.sb-mima-alc-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: var(--sb-fg-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.sb-mima-alc-del:hover { border-color: var(--sb-border-strong); background: var(--sb-surface-100); color: var(--sb-fg); }
+@media (max-width: 559.98px) {
+  .sb-mima-alc-item { grid-template-columns: minmax(0, 1fr) auto 1.6rem; }
+  .sb-mima-alc-qta { grid-column: 1 / -1; }
+}
+
+/* ── Numeri utili ────────────────────────────────────────────────────────── */
+.sb-mima-tel { display: flex; flex-direction: column; }
+.sb-mima-tel-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.15rem 1rem;
+  align-items: center;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--sb-border);
+}
+.sb-mima-tel-row:last-child { border-bottom: none; }
+.sb-mima-tel-l { font-size: 0.84rem; color: var(--sb-fg); }
+.sb-mima-tel-n {
+  justify-self: end;
+  font-family: var(--mima-mono);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--sb-brand-text);
+  font-variant-numeric: tabular-nums;
+}
+.sb-mima-tel-n.is-tbd { font-size: 0.76rem; font-weight: 400; color: var(--sb-fg-muted); }
+.sb-mima-tel-note { grid-column: 1 / -1; font-size: 0.72rem; color: var(--sb-fg-muted); }
+
+/* ── Righe host: prenotazioni e link, in monospazio ──────────────────────── */
+.sb-mima-links { display: flex; flex-direction: column; }
+.sb-mima-link-row {
+  display: grid;
+  grid-template-columns: 1ch minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.4rem 0.3rem;
+  border-radius: 6px;
+  font-family: var(--mima-mono);
+  font-size: 0.74rem;
+  color: var(--sb-fg-light);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.sb-mima-link-row:hover { background: var(--sb-surface-100); color: var(--sb-fg); }
+.sb-mima-link-mark { color: var(--sb-brand-text); }
+.sb-mima-link-host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-mima-link-tag { font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sb-fg-muted); }
+
+/* ── Segnalibri ──────────────────────────────────────────────────────────── */
+.sb-mima-marks { display: flex; flex-direction: column; }
+.sb-mima-mark {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.3rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--sb-fg-light);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.sb-mima-mark:hover { background: var(--sb-surface-100); color: var(--sb-fg); }
+.sb-mima-mark-n { font-family: var(--mima-mono); font-size: 0.63rem; color: var(--sb-fg-muted); }
+
+/* ── Cartografia ─────────────────────────────────────────────────────────── */
+.sb-mima-map--tall { aspect-ratio: 16 / 9; }
+@media (max-width: 559.98px) { .sb-mima-map--tall { aspect-ratio: 3 / 4; } }
+.sb-mima-legend { display: flex; flex-wrap: wrap; gap: 0.35rem 0.9rem; }
+.sb-mima-legend-item { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.74rem; color: var(--sb-fg-lighter); }
+.sb-mima-legend-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sb-border-stronger); flex-shrink: 0; }
+.sb-mima-legend-dot.is-primary { background: var(--sb-brand); }
+.sb-mima-coord { font-family: var(--mima-mono); font-size: 0.7rem; color: var(--sb-fg-muted); font-variant-numeric: tabular-nums; }
+
+/* I pin veri sulla mappa. Il portale di MapMarker li rende dentro il contenitore
+   .sb-mima-map, quindi ereditano la rimappatura dei token shadcn di sopra. */
+/* Il contenitore del pin è largo quanto il pallino: MarkerLabel si centra su
+   di lui con left:50% + translateX(-50%), quindi se fosse più largo
+   l'etichetta risulterebbe fuori asse rispetto al punto sulla mappa. */
+.sb-mima-pin { width: 11px; height: 11px; }
+.sb-mima-pin-dot {
+  display: block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--sb-fg);
+  border: 2px solid var(--sb-bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.sb-mima-pin-dot.is-primary { background: var(--sb-brand); }
+.sb-mima-pin-label {
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--sb-bg) 88%, transparent);
+  font-family: var(--mima-mono);
+  font-size: 0.62rem;
+  color: var(--sb-fg);
+}
+
+/* ── Minuzie di modulo ───────────────────────────────────────────────────── */
+.sb-mima-modnote { margin: 0; font-size: 0.78rem; line-height: 1.5; color: var(--sb-fg-muted); }
+.sb-mima-modnote strong { font-weight: 500; color: var(--sb-fg-light); }
+.sb-mima-src { font-family: var(--mima-mono); font-size: 0.63rem; color: var(--sb-fg-muted); }
+.sb-mima-src a { color: var(--sb-brand-text); text-decoration: none; }
+.sb-mima-src a:hover { text-decoration: underline; }
+.sb-mima-modactions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
 /* ── Riduzione del movimento ─────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .sb-mima-modal-close { transition: none; }
+  .sb-mima-tick-dot,
+  .sb-mima-live-dot.is-on { animation: none; }
+  .sb-mima-link-row,
+  .sb-mima-mark,
+  .sb-mima-alc-del { transition: none; }
 }
