@@ -5,6 +5,7 @@ import {
   IcCloud, IcCompass, IcExplore, IcFork, IcHelp, IcHome, IcImage, IcLink,
   IcListCheck, IcMoon, IcPin, IcShield, IcSun, IcTerminal, IcTrend, IcZap,
 } from "../site/homeIcons";
+import { SiWhatsapp } from "react-icons/si";
 import { ShinyBrandline, SparkGroup } from "../site/homeFx";
 import { MimaPage, Mod, KV, Meter, Tbd, useCountdown, type Tick } from "./MimaShell";
 import { AUGUST_NORMALS, useWeather, weatherInfo } from "./useWeather";
@@ -16,8 +17,8 @@ import {
   AMAPS, BOOKING, BREAKFAST_PER_PERSON_DAY, BREAKFAST_TOTAL, DAYS, EXPENSES, GMAPS,
   FAR_KM, GSEARCH, INFO, NUMBERS, PACKING, PEOPLE, PHOTOS, PLACES,
   ROAD_KM_ONE_WAY, ROAD_MIN_ONE_WAY, ROUND_TRIP_KM, SLOT_NAMES, TRIP_PLACES,
-  VENUES, FUEL_PRICE_DEFAULT, estimateOption, euro, haversineKm, hhmm,
-  loadPacked, num, savePacked, splitExpenses, type Photo,
+  VENUES, WHATSAPP, WHATSAPP_NAME, FUEL_PRICE_DEFAULT, estimateOption, euro,
+  haversineKm, hhmm, loadPacked, num, savePacked, splitExpenses, type Photo,
 } from "./mimaData";
 import "../home.css";
 import "./mima.css";
@@ -66,6 +67,7 @@ const FUEL_EST = estimateOption("c", ROUND_TRIP_KM, FUEL_PRICE_DEFAULT);
 const BUDGET_TOTAL = OUT_OF_POCKET + BREAKFAST_TOTAL + FUEL_EST.cost;
 
 const LINKS = [
+  { href: WHATSAPP, host: "chat.whatsapp.com", tag: "il gruppo" },
   { href: "https://www.hostelworld.com/", host: "hostelworld.com", tag: "prenotazione" },
   { href: GMAPS, host: "google.com/maps", tag: "hostel" },
   { href: AMAPS, host: "maps.apple.com", tag: "hostel" },
@@ -540,6 +542,9 @@ export default function Mima() {
           )}
 
           <SparkGroup className="sb-hero-actions sb-mima-actions">
+            <a className="sb-btn sb-btn--primary" href={WHATSAPP} target="_blank" rel="noreferrer">
+              <SiWhatsapp size={15} /> Il gruppo
+            </a>
             <Link to="/mima/luoghi" className="sb-btn sb-btn--secondary">
               <IcFork size={16} /> Dove mangiamo e usciamo
             </Link>
@@ -946,6 +951,22 @@ export default function Mima() {
                   {euro(FUEL_PRICE_DEFAULT)}/L. Il conto completo, auto per auto, sta in{" "}
                   <Link to="/mima/veicoli" className="sb-link">quale auto portiamo</Link>.
                   Mangiare, spiaggia e serate non sono compresi.
+                </p>
+              </Mod>
+
+              <Mod id="rail-gruppo" icon={<SiWhatsapp size={13} />} title="Il gruppo" meta="WhatsApp">
+                <div className="sb-mima-veic-pick">
+                  <span className="sb-mima-veic-pick-name">{WHATSAPP_NAME}</span>
+                  <span className="sb-mima-veic-pick-sub">Dove si decide davvero</span>
+                </div>
+                <div className="sb-mima-modactions">
+                  <a className="sb-btn sb-btn--sm sb-btn--primary" href={WHATSAPP} target="_blank" rel="noreferrer">
+                    <SiWhatsapp size={14} /> Apri il gruppo
+                  </a>
+                </div>
+                <p className="sb-mima-modnote">
+                  Questa pagina è la memoria del viaggio: quello che decidete nel gruppo finisce
+                  qui, così non va perso a scorrere la chat.
                 </p>
               </Mod>
 

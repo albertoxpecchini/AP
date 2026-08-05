@@ -504,6 +504,10 @@ export function savePacked(state: Record<string, boolean>) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Link esterni. Costruiti da MAP_QUERY così restano coerenti con l'indirizzo.
 // ─────────────────────────────────────────────────────────────────────────────
+/** Il gruppo WhatsApp del viaggio: è lì che si decide davvero. */
+export const WHATSAPP = "https://chat.whatsapp.com/IfEXiXbj0iP1kdpQvu1O2C";
+export const WHATSAPP_NAME = "MilanoMarittima (JMA)";
+
 const MAP_QUERY = `${BOOKING.hostel}, ${BOOKING.address}`;
 export const GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_QUERY)}`;
 export const AMAPS = `https://maps.apple.com/?q=${encodeURIComponent(MAP_QUERY)}`;
