@@ -17,8 +17,9 @@ import {
   AMAPS, BOOKING, BREAKFAST_PER_PERSON_DAY, BREAKFAST_TOTAL, DAYS, EXPENSES, GMAPS,
   FAR_KM, GSEARCH, INFO, NUMBERS, PACKING, PEOPLE, PHOTOS, PLACES,
   ROAD_KM_ONE_WAY, ROAD_MIN_ONE_WAY, ROUND_TRIP_KM, SLOT_NAMES, TRIP_PLACES,
-  VENUES, WHATSAPP, WHATSAPP_NAME, FUEL_PRICE_DEFAULT, estimateOption, euro,
-  haversineKm, hhmm, loadPacked, num, savePacked, splitExpenses, type Photo,
+  VENUES, WHATSAPP, WHATSAPP_NAME, CHEAPEST_CASA, DIESEL_GAP, FUEL_PRICE_DEFAULT,
+  estimateOption, euro, haversineKm, hhmm, loadPacked, num, savePacked,
+  splitExpenses, type Photo,
 } from "./mimaData";
 import "../home.css";
 import "./mima.css";
@@ -948,7 +949,10 @@ export default function Mima() {
                 </div>
                 <p className="sb-mima-modnote">
                   Carburante calcolato sulla Tucson, {ROUND_TRIP_KM} km andata e ritorno a{" "}
-                  {euro(FUEL_PRICE_DEFAULT)}/L. Il conto completo, auto per auto, sta in{" "}
+                  {num(FUEL_PRICE_DEFAULT, 3)} €/L — il gasolio self più basso entro 10 km da
+                  casa, non una stima ({CHEAPEST_CASA.name}). In zona vacanza costa{" "}
+                  {num(DIESEL_GAP * 100, 1)} centesimi in meno al litro: la lista completa dei
+                  distributori, qui e giù, sta in{" "}
                   <Link to="/mima/veicoli" className="sb-link">quale auto portiamo</Link>.
                   Mangiare, spiaggia e serate non sono compresi.
                 </p>
