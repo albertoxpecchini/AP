@@ -1,0 +1,463 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   APPROFONDIMENTI DI LETTERATURA — /dubliners e /gattopardo.
+
+   Le due pagine sono lo stesso identico impianto (copertina, l'autore, il
+   libro, i personaggi, la trama, il tema, perché conta, citazione di chiusura,
+   rimando all'altro libro): un solo foglio per tutte e due, prefisso .sb-bk-.
+   Prima erano due blocchi <style> gemelli scritti dentro i .tsx, ciascuno con
+   la sua palette arancio e nessun tema chiaro nativo — il chiaro arrivava da
+   un terzo file di override (styles/theme-auto.css, ora eliminato).
+
+   Eredita TUTTI i token e i componenti base da home.css (il wrapper è
+   .sb-home.sb-bk-page): qui vivono solo le classi nuove. Nessun colore
+   scritto a mano — tema chiaro default + scuro via html.dark, già gestiti
+   dai token. Uniche eccezioni, motivate sul posto: i testi sopra le
+   FOTOGRAFIE (copertine e banner di chiusura), che sono bianchi su velo scuro
+   in entrambi i temi perché stanno su un'immagine, non sulla pagina.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+.sb-bk-tagline { font-size: 0.8rem; color: var(--sb-fg-muted); white-space: nowrap; }
+@media (max-width: 767.98px) { .sb-bk-tagline { display: none; } }
+.sb-bk-back { margin-left: auto; }
+
+/* ── Copertina ───────────────────────────────────────────────────────────── */
+.sb-bk-page .sb-hero { padding-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+.sb-bk-hero-grid { align-items: center; }
+.sb-bk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 1.4rem;
+  border-radius: 20px;
+  border: 1px solid var(--sb-btn-bd);
+  background: var(--sb-btn-bg);
+  color: var(--sb-btn-fg);
+  box-shadow: var(--sb-shadow-card);
+}
+@media (max-width: 767.98px) {
+  .sb-bk-badge { width: 62px; height: 62px; border-radius: 16px; margin-bottom: 1.1rem; }
+  .sb-bk-badge svg { width: 34px; height: 34px; }
+}
+.sb-bk-eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sb-brand-text);
+}
+/* Filo verde sotto al titolo: chiude la sigla e apre il sottotitolo. */
+.sb-bk-rule {
+  display: block;
+  width: 64px;
+  height: 3px;
+  margin: 1.1rem 0;
+  border-radius: 2px;
+  background: var(--sb-brand);
+}
+.sb-bk-lead {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--sb-fg);
+}
+.sb-bk-note { margin: 0; font-size: 1rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+
+/* ── Cornici foto ────────────────────────────────────────────────────────── */
+.sb-bk-shot {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 3 / 2;
+  border-radius: 12px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-100);
+  box-shadow: var(--sb-shadow-card);
+  overflow: hidden;
+}
+.sb-bk-shot--portrait { aspect-ratio: 4 / 5; }
+.sb-bk-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+/* Foto mancante: al suo posto un riquadro coerente col tema, non un buco. */
+.sb-bk-shot-ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 120% at 30% 20%, var(--sb-overlay), transparent 70%),
+    var(--sb-surface-200);
+}
+.sb-bk-shot-ph-ic { color: var(--sb-fg-muted); }
+/* La didascalia sta SOPRA la foto: qui il bianco su velo scuro vale in tutti e
+   due i temi, perché il fondo è l'immagine e non la pagina. */
+.sb-bk-shot figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.8rem 0.9rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-style: italic;
+  color: #ffffff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72), transparent);
+}
+
+/* ── Testata di sezione + prosa ──────────────────────────────────────────── */
+.sb-bk-sechead { max-width: 48rem; margin-bottom: 2.2rem; }
+.sb-bk-overline {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sb-brand-text);
+}
+/* .sb-bk-h2 da sola serve ai titoli che stanno DENTRO una riga narrata, dove
+   non c'è una testata di sezione attorno (vedi "Perché è un libro importante"). */
+.sb-bk-sechead h2,
+.sb-bk-h2 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--sb-fg);
+}
+.sb-bk-sechead h2:last-child { margin-bottom: 0; }
+.sb-bk-prose {
+  margin: 0 0 0.9rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--sb-fg-lighter);
+}
+.sb-bk-prose:last-child { margin-bottom: 0; }
+.sb-bk-prose strong { font-weight: 500; color: var(--sb-fg); }
+.sb-bk-prose--lead { font-size: 1.12rem; font-weight: 500; color: var(--sb-fg); }
+/* Paragrafo a piena sezione (fuori da .sb-bk-sechead, che ha già la sua misura). */
+.sb-bk-prose--wide { max-width: 52rem; }
+
+/* ── L'autore: schede dei fatti + ritratto ───────────────────────────────── */
+.sb-bk-about {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+@media (min-width: 768px) { .sb-bk-about { grid-template-columns: 1.1fr 0.9fr; } }
+.sb-bk-facts { display: flex; flex-direction: column; gap: 0.8rem; }
+.sb-bk-fact {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  align-items: center;
+  column-gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  background: var(--sb-bg-alt);
+}
+.sb-bk-fact-ic {
+  grid-row: 1 / 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-100);
+  color: var(--sb-brand-text);
+}
+.sb-bk-fact-value { font-size: 1.15rem; font-weight: 600; line-height: 1.2; color: var(--sb-fg); }
+.sb-bk-fact-label { font-size: 0.85rem; color: var(--sb-fg-muted); }
+
+/* ── Righe narrate (testo + illustrazione) ───────────────────────────────── */
+.sb-bk-story {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .sb-bk-story { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+/* Su mobile l'immagine va sempre in cima, anche quando nel markup sta dopo. */
+@media (max-width: 767.98px) { .sb-bk-story .sb-bk-story-art { order: -1; } }
+
+/* ── Targhetta dell'opera ────────────────────────────────────────────────── */
+.sb-bk-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.15rem;
+  border: 1px solid var(--sb-border);
+  border-left: 3px solid var(--sb-brand);
+  border-radius: 10px;
+  background: var(--sb-bg-alt);
+}
+.sb-bk-tag-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--sb-surface-200);
+  color: var(--sb-brand-text);
+}
+.sb-bk-tag-text { display: inline-flex; flex-direction: column; line-height: 1.3; }
+.sb-bk-tag-name { font-weight: 600; color: var(--sb-fg); }
+.sb-bk-tag-sub { font-size: 0.84rem; color: var(--sb-fg-muted); }
+
+/* ── Griglie di schede (età, micro-trame, eventi) ────────────────────────── */
+.sb-bk-roles { display: grid; grid-template-columns: 1fr; gap: 0.9rem; }
+/* Quando la griglia segue una riga narrata invece di una testata di sezione. */
+.sb-bk-roles--spaced { margin-top: 2.25rem; }
+@media (min-width: 560px) { .sb-bk-roles { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 992px) { .sb-bk-roles { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 992px) { .sb-bk-roles--3 { grid-template-columns: repeat(3, 1fr); } }
+.sb-bk-role {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1.05rem 1.15rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  background: var(--sb-bg-alt);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.sb-bk-role:hover { transform: translateY(-3px); border-color: var(--sb-border-stronger); }
+@media (prefers-reduced-motion: reduce) { .sb-bk-role { transition: none; } }
+.sb-bk-role-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.45rem;
+  border-radius: 10px;
+  background: var(--sb-surface-200);
+  color: var(--sb-brand-text);
+}
+.sb-bk-role-label { font-weight: 600; color: var(--sb-fg); }
+.sb-bk-role-note { font-size: 0.82rem; line-height: 1.5; color: var(--sb-fg-muted); }
+
+/* ── Le quattro trappole (solo /dubliners) ───────────────────────────────── */
+.sb-bk-cards { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 2rem; }
+@media (min-width: 640px) { .sb-bk-cards { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .sb-bk-cards--4 { grid-template-columns: repeat(4, 1fr); } }
+.sb-bk-card { padding: 1.5rem 1.35rem; }
+.sb-bk-card-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-100);
+  color: var(--sb-brand-text);
+}
+.sb-bk-card-title {
+  margin: 0 0 0.45rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--sb-fg);
+}
+.sb-bk-card-desc { margin: 0; font-size: 0.94rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+
+/* ── Riquadro di rilievo (l'epifania, il matrimonio di Tancredi) ─────────── */
+.sb-bk-callout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-top: 2rem;
+  padding: 1.05rem 1.25rem;
+  border: 1px solid var(--sb-border);
+  border-left: 3px solid var(--sb-brand);
+  border-radius: 12px;
+  background: var(--sb-bg-alt);
+}
+.sb-bk-callout-ic {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--sb-surface-200);
+  color: var(--sb-brand-text);
+}
+.sb-bk-callout p { margin: 0; font-size: 0.98rem; line-height: 1.65; color: var(--sb-fg-lighter); }
+.sb-bk-callout strong { font-weight: 500; color: var(--sb-fg); }
+
+/* ── Citazione in evidenza (la frase di Tancredi) ────────────────────────── */
+.sb-bk-quote {
+  margin: 0 0 1.5rem;
+  padding: 0 0 0 1.4rem;
+  border-left: 3px solid var(--sb-brand);
+  font-size: clamp(1.3rem, 3.2vw, 1.85rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: var(--sb-fg);
+}
+.sb-bk-quote span {
+  display: block;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+
+/* ── In sintesi ──────────────────────────────────────────────────────────── */
+.sb-bk-hl {
+  max-width: 50rem;
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+  line-height: 1.5;
+  color: var(--sb-fg-light);
+}
+.sb-bk-hl strong { font-weight: 500; color: var(--sb-fg); }
+.sb-bk-chiprow { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+/* Riga di chiusura del tema ("la parola è: paralisi"). */
+.sb-bk-footline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 2rem 0 0;
+  font-size: 1rem;
+  color: var(--sb-fg-lighter);
+}
+.sb-bk-footline svg { flex-shrink: 0; color: var(--sb-fg-muted); }
+.sb-bk-footline strong { font-style: italic; font-weight: 500; color: var(--sb-brand-text); }
+
+/* ── Banner di chiusura: citazione sopra una fotografia ──────────────────────
+   Questa sezione è un'IMMAGINE a tutta larghezza. Testo bianco su velo scuro
+   in entrambi i temi: il fondo è la foto, e una foto non cambia col tema.
+   Se l'immagine manca, resta il fondo neutro e il testo è comunque leggibile. */
+.sb-bk-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: clamp(20rem, 42vw, 32rem);
+  overflow: hidden;
+  background: var(--sb-surface-200);
+}
+.sb-bk-banner img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+  image-orientation: from-image;
+}
+.sb-bk-banner-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(110deg, rgba(0, 0, 0, 0.86) 0%, rgba(0, 0, 0, 0.58) 55%, rgba(0, 0, 0, 0.32) 100%);
+}
+.sb-bk-banner-in { position: relative; z-index: 2; width: 100%; }
+.sb-bk-banner-q { margin-bottom: 0.7rem; color: var(--sb-brand); }
+.sb-bk-banner-title {
+  max-width: 24ch;
+  margin: 0 0 0.7rem;
+  font-size: clamp(1.8rem, 4.6vw, 3.1rem);
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+}
+.sb-bk-banner-title span {
+  display: block;
+  font-size: clamp(1.05rem, 2.5vw, 1.7rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.86);
+}
+.sb-bk-banner-sign {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* ── Rimando all'altro approfondimento ───────────────────────────────────── */
+.sb-bk-next { display: block; text-decoration: none; color: inherit; }
+.sb-bk-next-in { padding: clamp(1.4rem, 4vw, 2.1rem); }
+.sb-bk-next-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sb-brand-text);
+}
+.sb-bk-next-row { display: flex; align-items: center; gap: 1.05rem; }
+.sb-bk-next-ic {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  border: 1px solid var(--sb-btn-bd);
+  background: var(--sb-btn-bg);
+  color: var(--sb-btn-fg);
+}
+.sb-bk-next-text { display: flex; flex-direction: column; min-width: 0; }
+.sb-bk-next-title {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--sb-fg);
+}
+.sb-bk-next-sub {
+  margin-top: 0.3rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--sb-fg-lighter);
+}
+.sb-bk-next-arrow {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--sb-fg-muted);
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+.sb-bk-next:hover .sb-bk-next-arrow,
+.sb-bk-next:focus-visible .sb-bk-next-arrow {
+  transform: translateX(5px);
+  color: var(--sb-brand-text);
+}
+@media (prefers-reduced-motion: reduce) { .sb-bk-next-arrow { transition: none; } }
+@media (max-width: 575.98px) { .sb-bk-next-arrow { display: none; } }

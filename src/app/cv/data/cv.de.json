@@ -12,7 +12,13 @@
     "strengths": "Stärken",
     "availability": "Verfügbarkeit",
     "wish": "Zukunftswunsch",
-    "runningTitle": "Curriculum Vitae"
+    "runningTitle": "Curriculum Vitae",
+    "home": "Startseite",
+    "print": "PDF herunterladen",
+    "printHint": "Das PDF ist genau diese Seite: im Druckdialog «Als PDF speichern» wählen.",
+    "email": "E-Mail",
+    "updated": "Aktualisiert",
+    "docTitle": "Lebenslauf"
   },
   "name": "Alberto Pecchini",
   "role": "Vermessungstechniker & Website-Entwickler",
@@ -95,8 +101,8 @@
     },
     {
       "period": "fortlaufend",
-      "title": "Familienhof — Rivalta sul Mincio",
-      "role": "Landwirtschaftlicher Mitarbeiter · Logistik · Operative Koordination",
+      "title": "Landwirtschaftlicher Familienbetrieb — Rivalta sul Mincio",
+      "role": "Landwirtschaftliche Mitarbeit · Logistik · Koordination der Abläufe",
       "desc": "Pflege und Instandhaltung der Pflanzen (Bewässerung, Schnittarbeiten verschiedener Art und Größe), Transport von Material und Geräten mit Traktor und Anhänger, Heuernte von Dauerwiesen, Koordination der Arbeiten mit dem Team bei intensiven Einsätzen, logistische Unterstützung. Selbstständiger Umgang mit Landmaschinen und Problemlösung vor Ort.",
       "link": ""
     },
@@ -170,7 +176,7 @@
     {
       "period": "2024 — 2025",
       "title": "Festa del Pesce e del Luccio · Associazione Rivaltese",
-      "role": "Logistik-Freiwilliger · 2 Ausgaben",
+      "role": "Ehrenamtliche Unterstützung in der Logistik · 2 Ausgaben",
       "desc": "Logistische und organisatorische Unterstützung: Aufbau und Steuerung der Besucherströme.",
       "link": ""
     }

@@ -1,38 +1,48 @@
-// ─── MOTORE GIOCHI · Design system "dark premium" · token ───────────────────
+// ─── MOTORE GIOCHI · token ──────────────────────────────────────────────────
 //
-// Identità visiva condivisa: sfondo scuro, superfici "vetro", e un ACCENTO neon
-// diverso per ogni gioco. I componenti del motore (GameGate, e via via gli
-// altri) leggono l'accento da qui e lo applicano come CSS var --accent/--glow,
-// così lo stile è uno solo e cambia solo il colore d'identità.
+// Identità visiva dei giochi. NON è più una palette a sé: i valori sono
+// riferimenti ai token --sb-* del design system (src/app/home.css), così il
+// gioco cambia col tema del sito — chiaro di giorno, scuro di sera — invece di
+// restare scuro comunque.
+//
+// Prima qui c'era una quarta palette scritta a mano ("dark premium", grigi
+// caldi tinti melanzana) con bg0 #1d171b contro il #141414 del sito, e un
+// commento che chiamava "arancio Ubuntu" un verde. I componenti del motore
+// leggono questi valori e li applicano come CSS var --accent/--glow.
+//
+// Vanno usati SOLO dentro un sottoalbero .sb-home (le pagine dei giochi lo
+// sono): fuori da lì le var(--sb-*) non risolvono.
 
 export interface GameAccent {
-  /** Colore d'accento pieno (neon) del gioco. */
+  /** Colore d'accento pieno del gioco. */
   accent: string;
-  /** Alone/glow morbido dello stesso accento (rgba), per ombre e ring di focus. */
+  /** Alone morbido dello stesso accento, per ombre e ring di focus. */
   glow: string;
 }
 
-// Accento = arancio Ubuntu (Trivia è l'unico gioco rimasto).
+// Accento = il verde brand del sito (Trivia è l'unico gioco rimasto).
 export const ACCENTS: Record<string, GameAccent> = {
-  trivia: { accent: "#0f9d63", glow: "rgba(62, 207, 142,0.45)" }, // arancio Ubuntu
+  trivia: {
+    accent: "var(--sb-brand-text)",
+    glow: "color-mix(in srgb, var(--sb-brand) 45%, transparent)",
+  },
 };
 
-// Superfici/testi del tema (riferimento per i componenti del motore).
-// Grigi CALDI tinti melanzana, come Yaru: mai grigi freddi/bluastri.
-export const DARK = {
-  bg0: "#1d171b",
-  bg1: "#241c22",
-  text: "#f5f3f1",
-  sub: "#a39c96",
-  glass: "rgba(255,255,255,0.045)",
-  glassBorder: "rgba(255,255,255,0.09)",
+// Superfici e testi. Un solo set: sono variabili, quindi seguono già il tema —
+// non serve più una coppia DARK/LIGHT scelta a mano dal codice.
+export const SURFACE = {
+  bg0: "var(--sb-bg)",
+  bg1: "var(--sb-bg-alt)",
+  text: "var(--sb-fg)",
+  sub: "var(--sb-fg-muted)",
+  glass: "var(--sb-glass-bg)",
+  glassBorder: "var(--sb-border)",
 };
 
-export const LIGHT = {
-  bg0: "#f1efed",
-  bg1: "#f8f6f4",
-  text: "#3d3846",
-  sub: "#6e665f",
-  glass: "#ffffff",
-  glassBorder: "rgba(0,0,0,0.07)",
-};
+/**
+ * Alias di compatibilità: il motore aveva due set distinti e li sceglieva in
+ * base al tema. Ora puntano entrambi allo stesso oggetto di variabili, che si
+ * risolve da solo. Restano perché più file li importano ancora per nome.
+ */
+export const DARK = SURFACE;
+export const LIGHT = SURFACE;

@@ -8,12 +8,15 @@
 // hanno bisogno del puntatore.
 //
 // ① Deriva del fondale — i due aloni (.sb-home::before/::after) slittano con
-//    lo scroll, così sotto ogni card passa colore diverso man mano che scendi.
+//    lo scroll e seguono da lontano il puntatore, così sotto ogni card passa
+//    colore diverso man mano che scendi e la luce arriva da dove sei.
 // ② Tilt — la card si inclina verso il cursore e il rim si sposta di
 //    conseguenza.
 // ③ Quello che il puntatore illumina — rim, alone, lucido del titolo.
-// ④ Pozza d'acqua sui quadratini dei commit (site/puddle.ts).
-// ⑤ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
+// ④ I visual delle card — tre numeri (--vis-x/-y/-in) e nient'altro: sono i
+//    visual stessi, in CSS, a farci quello che devono.
+// ⑤ Pozza d'acqua sui quadratini dei commit (site/puddle.ts).
+// ⑥ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
 //
 // Regole, le stesse di site/homeMotion.ts:
 //  · un solo gsap.matchMedia() proprietario, revert() al dismount;
@@ -43,6 +46,15 @@ const TILT_DEG = 5;
 /** Cosa è "una card" per il tilt: gli stessi selettori che in home.css hanno
  *  già un hover, così non si inclina niente che non fosse già premibile. */
 const TILTABLE = "a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-panel--hover";
+
+/** Quanto si spostano gli aloni del fondale dietro al puntatore, in percentuale
+ *  del loro centro. Pochissimo e lentissimo (vedi PTR_LAG): è la luce della
+ *  stanza che si accorge di te, non un riflettore che ti insegue. */
+const PTR_SHIFT = 4;
+const PTR_LAG = 1.2;
+
+/** Riposo dei visual delle card: centro del riquadro, gesto spento. */
+const VIS_REST = { x: 0.5, y: 0.5, on: 0 };
 
 /** Dov'è arrivata la lettura, 0→1.
  *
@@ -276,7 +288,200 @@ export default function GlassMotion() {
       };
     });
 
-    // ── ④ Pozza d'acqua sui quadratini ─────────────────────────────────────
+    // ── ④ I visual delle card ──────────────────────────────────────────────
+    // Il motore di tutta la griglia prodotti. Prima ogni card si portava
+    // dietro la sua timeline GSAP con repeat:-1 — sette filmini che giravano
+    // uguali che ci fosse qualcuno a guardarli o no, sfasati fra loro, con la
+    // griglia che pulsava da sette punti diversi insieme. Adesso c'è un solo
+    // pointermove delegato che scrive TRE NUMERI sul riquadro sotto il
+    // puntatore, e i visual — in CSS, da soli — ci fanno quello che devono:
+    //
+    //   --vis-x   dove sei nel riquadro, in orizzontale, 0→1
+    //   --vis-y   idem in verticale, 0→1
+    //   --vis-in  quanto il gesto è acceso, 0→1 (sale entrando, scende uscendo)
+    //
+    // Sei visual su sette non hanno una riga di JS: la tendina chiaro/scuro, la
+    // digitazione del terminale, la lente del diff, i blocchi del browser, i
+    // fili del grafo, il sollevamento del cubo sono tutti calc() su questi due
+    // numeri. Il settimo (l'HUD di gioco) conta punti, e il CSS non sa contare.
+    //
+    // Perché i quickTo e non la scrittura diretta: una var CSS non registrata
+    // con @property non transiziona: uscendo dalla card il gesto tornerebbe a
+    // riposo di scatto. Tweenando l'oggetto di stato invece della var, la
+    // curva ce l'ha il numero — stesso mestiere di driftTo al blocco ①.
+    //
+    // Qui la media query è solo prefers-reduced-motion, e il tipo di puntatore
+    // si guarda dentro: fine e grossolano condividono lo stesso writer e lo
+    // stesso stato, e due mm.add() separati avrebbero voluto dire due
+    // proprietari della stessa variabile.
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const root = document.documentElement;
+      const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+      type Vis = typeof VIS_REST;
+      const set = (el: HTMLElement, s: Vis) => {
+        el.style.setProperty("--vis-x", `${s.x}`);
+        el.style.setProperty("--vis-y", `${s.y}`);
+        el.style.setProperty("--vis-in", `${s.on}`);
+      };
+      const clear = (el: HTMLElement) => {
+        el.style.removeProperty("--vis-x");
+        el.style.removeProperty("--vis-y");
+        el.style.removeProperty("--vis-in");
+      };
+
+      let vis: HTMLElement | null = null;
+      const st = { ...VIS_REST };
+      const write = () => {
+        if (vis) set(vis, st);
+      };
+      // Durate diverse per un motivo: la posizione deve sembrare la TUA mano
+      // (0.22s è quel poco che toglie il tremolio senza far sentire il
+      // ritardo), l'accensione è una dissolvenza e può prendersi il suo tempo.
+      const xTo = gsap.quickTo(st, "x", { duration: 0.22, ease: "power2", onUpdate: write });
+      const yTo = gsap.quickTo(st, "y", { duration: 0.22, ease: "power2", onUpdate: write });
+      const onTo = gsap.quickTo(st, "on", { duration: 0.45, ease: "power2", onUpdate: write });
+
+      // ── Il riquadro che si sta spegnendo ─────────────────────────────────
+      // Sta su un oggetto SUO e non su `st`: passando veloci da una card
+      // all'altra, l'ingresso nella card nuova fa killTweensOf(st) e la
+      // dissolvenza della vecchia morirebbe a metà strada, lasciandole le
+      // variabili addosso per sempre — cioè un gesto acceso su una card che
+      // nessuno sta guardando. Così invece la dissolvenza è intoccabile, e
+      // ce n'è al massimo una per volta.
+      let outEl: HTMLElement | null = null;
+      let outTw: gsap.core.Tween | null = null;
+      const endOut = () => {
+        outTw?.kill();
+        outTw = null;
+        if (outEl) clear(outEl);
+        outEl = null;
+      };
+
+      /** Spegne il riquadro che si sta lasciando e gli toglie le var di dosso,
+       *  così torna a valere il riposo scritto in home.css. */
+      const release = () => {
+        if (!vis) return;
+        endOut();
+        const leaving = vis;
+        vis = null;
+        gsap.killTweensOf(st);
+        const out: Vis = { ...st };
+        outEl = leaving;
+        outTw = gsap.to(out, {
+          ...VIS_REST,
+          duration: 0.55,
+          ease: "power3.out",
+          onUpdate: () => set(leaving, out),
+          onComplete: endOut,
+        });
+      };
+
+      /** Posizione del puntatore dentro il riquadro, 0→1 per lato. */
+      const at = (el: HTMLElement, cx: number, cy: number) => {
+        const r = el.getBoundingClientRect();
+        return {
+          x: gsap.utils.clamp(0, 1, (cx - r.left) / (r.width || 1)),
+          y: gsap.utils.clamp(0, 1, (cy - r.top) / (r.height || 1)),
+        };
+      };
+
+      // ── Puntatore fine: il gesto lo tieni in mano ────────────────────────
+      const ptr = { x: 0.5, y: 0.5 };
+      const ptrTo = {
+        x: gsap.quickTo(ptr, "x", {
+          duration: PTR_LAG,
+          ease: "power2",
+          onUpdate: () => root.style.setProperty("--sb-px", `${(ptr.x - 0.5) * PTR_SHIFT}%`),
+        }),
+        y: gsap.quickTo(ptr, "y", {
+          duration: PTR_LAG,
+          ease: "power2",
+          onUpdate: () => root.style.setProperty("--sb-py", `${(ptr.y - 0.5) * PTR_SHIFT}%`),
+        }),
+      };
+
+      /** Prende in carico un riquadro, partendo da dove ci sei entrato. */
+      const enter = (el: HTMLElement, s: Partial<Vis>) => {
+        // Rientrando in un riquadro che si stava ancora spegnendo, la sua
+        // dissolvenza e il writer scriverebbero le stesse var a due mani.
+        if (outEl === el) endOut();
+        vis = el;
+        gsap.killTweensOf(st);
+        Object.assign(st, VIS_REST, s);
+        write();
+      };
+
+      const onMove = (e: PointerEvent) => {
+        // Gli aloni del fondale seguono il puntatore ovunque sia, anche fuori
+        // dalle card: è il pezzo che ha preso il posto delle due keyframe da
+        // 74 e 91 secondi che derivavano a orologio.
+        ptrTo.x(e.clientX / window.innerWidth);
+        ptrTo.y(e.clientY / window.innerHeight);
+
+        const next = (e.target as HTMLElement | null)?.closest?.(".sb-card-visual") as HTMLElement | null;
+        if (next !== vis) {
+          release();
+          if (!next) return;
+          // Il gesto parte da dove sei entrato, non dal centro: entrando da
+          // destra la tendina non deve prima saltare a metà.
+          enter(next, at(next, e.clientX, e.clientY));
+          onTo(1);
+          return;
+        }
+        if (!vis) return;
+        const p = at(vis, e.clientX, e.clientY);
+        xTo(p.x);
+        yTo(p.y);
+      };
+
+      // ── Puntatore grossolano: il tocco fa una passata sola ───────────────
+      // Le card sono <Link>: senza questo il tocco navigherebbe e il gesto non
+      // si vedrebbe mai. Il riquadro del visual si mangia il tocco (è
+      // aria-hidden e decorativo), il resto della card resta il link.
+      const onTap = (e: MouseEvent) => {
+        const el = (e.target as HTMLElement | null)?.closest?.(".sb-card-visual") as HTMLElement | null;
+        if (!el) return;
+        e.preventDefault();
+        e.stopPropagation();
+        release();
+        enter(el, { x: 0, y: 0, on: 0 });
+        // Una passata da un capo all'altro e ritorno al riposo: è il gesto
+        // intero, eseguito una volta, senza che nessun timer lo ripeta.
+        gsap
+          .timeline({ onComplete: release })
+          .to(st, { on: 1, duration: 0.3, ease: "power2.out", onUpdate: write })
+          .to(st, { x: 1, y: 1, duration: 1.15, ease: "power2.inOut", onUpdate: write }, 0)
+          .to({}, { duration: 0.45 });
+      };
+
+      if (fine) document.addEventListener("pointermove", onMove, { passive: true });
+      else document.addEventListener("click", onTap, { capture: true });
+      document.addEventListener("pointerleave", release);
+      window.addEventListener("blur", release);
+      // La card sfila via da sotto un cursore fermo mentre si scorre: senza
+      // questo il gesto resterebbe acceso a mezz'aria. In cattura, come sopra.
+      document.addEventListener("scroll", release, { passive: true, capture: true });
+
+      return () => {
+        gsap.killTweensOf(st);
+        gsap.killTweensOf(ptr);
+        endOut();
+        if (vis) {
+          clear(vis);
+          vis = null;
+        }
+        root.style.removeProperty("--sb-px");
+        root.style.removeProperty("--sb-py");
+        document.removeEventListener("pointermove", onMove);
+        document.removeEventListener("click", onTap, { capture: true });
+        document.removeEventListener("pointerleave", release);
+        window.removeEventListener("blur", release);
+        document.removeEventListener("scroll", release, { capture: true });
+      };
+    });
+
+    // ── ⑤ Pozza d'acqua sui quadratini ─────────────────────────────────────
     // Vive tutta in site/puddle.ts; qui c'è solo il cancello. Si aggancia da
     // sé ai [data-puddle] presenti e a quelli che arrivano dopo (il grafico
     // del footer nasce da una fetch).
@@ -291,7 +496,7 @@ export default function GlassMotion() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ③ Pillola della nav
+// ⑥ Pillola della nav
 //
 // Questa NON è globale: `.sb-nav-link` esiste solo nella nav della home, e
 // legarla al ciclo di vita di App le fa trovare il DOM già montato senza

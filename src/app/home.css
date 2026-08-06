@@ -30,7 +30,7 @@
   --sb-fg-muted: #8f8f8f;
   --sb-brand: hsl(153, 60%, 53%);
   --sb-brand-text: hsl(153, 86%, 28%);
-  /* Banda di luce delle brandline (ShinyText). La base è lo stesso verde di
+  /* Banda di luce delle brandline (.sb-shine). La base è lo stesso verde di
      prima — a riposo il titolo è identico a com'era. Sul chiaro la "luce" è
      più SCURA della base: su un fondo bianco una passata più chiara
      sbiadirebbe il testo invece di accenderlo. */
@@ -171,40 +171,35 @@ html.dark .sb-home {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  will-change: transform, translate;
-  /* Due movimenti indipendenti sullo stesso strato, su DUE proprietà diverse:
-     lo scroll scrive la deriva su `translate` (via --sb-drift, lo fa
-     site/glassMotion.ts), le keyframe qui sotto scrivono il respiro su
-     `transform`. Il browser le compone da sé — `translate` si applica prima
-     di `transform`. Se avessi infilato var(--sb-drift) dentro le keyframe,
-     l'animazione avrebbe smesso di essere compositabile e sarebbe tornata
-     sul thread principale a ogni frame di scroll. */
-  translate: 0 var(--sb-drift, 0px);
+  will-change: translate;
+  /* Due movimenti indipendenti sullo stesso strato, tutti e due scritti da
+     site/GlassMotion.tsx e composti qui: lo scroll dà la deriva verticale
+     (--sb-drift), il puntatore dà lo scostamento (--sb-px/--sb-py). Restano
+     su `translate` e non su `transform` perché è una proprietà a sé: il
+     compositore muove uno strato già dipinto, senza ridisegnare il gradiente.
+
+     Qui c'erano due keyframe da 74 e 91 secondi che facevano derivare gli
+     aloni a orologio, sfasate apposta per non dare un "battito" riconoscibile.
+     Il punto è proprio quello: erano fatte per non farsi notare, e intanto
+     giravano per sempre. Adesso il fondale si muove per un motivo — ci sei tu
+     dall'altra parte dello schermo — e da fermo sta fermo. */
+  translate: var(--sb-px, 0%) calc(var(--sb-drift, 0px) + var(--sb-py, 0%));
 }
 .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.14), transparent 62%);
-  animation: sb-drift-a 74s ease-in-out infinite alternate;
 }
+/* Il secondo alone si sposta un po' di meno e dalla parte opposta: due strati
+   che seguono la stessa mano ma non alla stessa velocità hanno una profondità
+   che due strati solidali non hanno. */
 .sb-home::after {
   background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.1), transparent 60%);
-  animation: sb-drift-b 91s ease-in-out infinite alternate;
+  translate: calc(var(--sb-px, 0%) * -0.6) calc(var(--sb-drift, 0px) * 0.7 - var(--sb-py, 0%) * 0.6);
 }
 html.dark .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.16), transparent 62%);
 }
 html.dark .sb-home::after {
   background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.12), transparent 60%);
-}
-/* 74 e 91 secondi: due tempi che non tornano mai in fase alla stessa ora, così
-   il fondo non ha un "battito" riconoscibile. Solo transform e scale — nessun
-   ridisegno, il compositore muove due strati già dipinti. */
-@keyframes sb-drift-a {
-  from { transform: translate3d(-3vw, -2vh, 0) scale(1); }
-  to   { transform: translate3d(4vw, 3vh, 0) scale(1.09); }
-}
-@keyframes sb-drift-b {
-  from { transform: translate3d(3vw, 2vh, 0) scale(1.06); }
-  to   { transform: translate3d(-4vw, -3vh, 0) scale(1); }
 }
 /* .sb-home non vuol dire "pagina": è la classe che porta i token, e se la
    mettono addosso anche il footer, la barra di controllo, il velo del cambio
@@ -519,8 +514,9 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
    l'ombra del testo si disegna dietro alla scatola e sparisce. drop-shadow()
    invece lavora sull'alpha già dipinto, quindi segue il profilo delle lettere.
 
-   Solo la prima riga: la seconda è la brandline, e la sua banda di luce se la
-   disegna da sé in JS (components/reactbits/ShinyText.tsx). */
+   Solo la prima riga: la seconda è la brandline, che ha una regola sua
+   (.sb-shine, in fondo a questo foglio) — ma legge la stessa --gloss-x, così
+   le due righe si illuminano insieme, dalla stessa parte. */
 .sb-hero-title > span:first-child {
   background-image:
     linear-gradient(98deg, transparent 41%, var(--sb-gloss-spec) 50%, transparent 59%),
@@ -722,14 +718,16 @@ button.sb-card:hover .sb-panel,
 a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color: var(--sb-brand-text); }
 .sb-page-card .sb-page-top > svg { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease; }
 .sb-page-card:hover .sb-page-top > svg { transform: scale(1.15) rotate(-8deg); color: var(--sb-brand-text); }
-/* Le spunte si accendono una dopo l'altra, in ciclo */
-.sb-checks svg { animation: sb-tick 4.5s ease-in-out infinite; }
-.sb-checks li:nth-child(2) svg { animation-delay: 0.35s; }
-.sb-checks li:nth-child(3) svg { animation-delay: 0.7s; }
+/* Le spunte si accendono una dopo l'altra ALL'INGRESSO nella card, una volta.
+   Prima lo facevano in ciclo ogni 4,5 secondi: tre segni di spunta che
+   pulsavano per sempre accanto a tre frasi che non cambiavano mai. Adesso è
+   una risposta — arrivi, e la card ti conferma le sue tre cose. */
+a.sb-card:hover .sb-checks svg { animation: sb-tick 0.5s ease-in-out; }
+a.sb-card:hover .sb-checks li:nth-child(2) svg { animation-delay: 0.08s; }
+a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 @keyframes sb-tick {
-  0%, 70%, 100% { transform: scale(1); opacity: 0.85; }
-  8% { transform: scale(1.35); opacity: 1; }
-  16% { transform: scale(1); opacity: 1; }
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.35); }
 }
 .sb-card-desc { margin: 0; font-size: 0.875rem; line-height: 1.55; color: var(--sb-fg-lighter); }
 .sb-card-desc strong { font-weight: 400; color: var(--sb-fg); }
@@ -747,6 +745,28 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   padding: 1.25rem 1.4rem 1.4rem;
   min-height: 108px;
   transform: translate3d(0, calc(var(--sb-drift, 0px) * -0.035), 0);
+
+  /* ── I tre numeri da cui viene TUTTO il moto dei visual ─────────────────
+     Li scrive site/GlassMotion.tsx (blocco ④) sul riquadro sotto il puntatore,
+     una scrittura per frame, e li toglie uscendo: quello che si legge qui
+     sotto è quindi il fotogramma di riposo, quello che si vede a pagina ferma
+     e con movimento ridotto.
+
+     --vis-x  dove sei nel riquadro, in orizzontale, 0→1
+     --vis-y  idem in verticale, 0→1
+     --vis-in quanto il gesto è acceso, 0→1
+
+     A riposo x e y stanno a metà, e --vis-in è zero: ogni visual mostra il suo
+     stato di mezzo — il sito costruito a metà, il comando digitato a metà, la
+     tendina a metà — che è un fotogramma leggibile, non un'attesa. */
+  --vis-x: 0.5;
+  --vis-y: 0.5;
+  --vis-in: 0;
+}
+/* Su touch il riquadro si mangia il tocco per eseguire il gesto una volta
+   (vedi onTap in GlassMotion): tanto vale dire che è premibile. */
+@media (hover: none) {
+  .sb-card-visual { cursor: pointer; }
 }
 
 /* Card grande: testo a sinistra, visual a destra (da lg in su) */
@@ -762,9 +782,13 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-checks li { display: flex; align-items: center; gap: 0.55rem; font-size: 0.875rem; color: var(--sb-fg-light); }
 .sb-checks svg { color: var(--sb-brand); flex-shrink: 0; }
 
-/* Mock "browser" della card grande — si ricostruisce da solo: un cursore fa il
-   giro dei blocchi, i blocchi si accendono, la pillola passa da "building" a
-   "live". */
+/* Mock "browser" della card grande — il sito lo costruisci tu: i tre blocchi si
+   riempiono da sinistra a destra seguendo --vis-x, e in fondo alla corsa la
+   pillola passa da "building" a "live". A riposo sta a metà.
+
+   Prima c'era un cursore finto che faceva il giro di quattro blocchi
+   accendendoli a turno, in un ciclo che non finiva mai. La differenza non è di
+   quantità: là il sito si costruiva da sé mentre guardavi, qui lo costruisci. */
 .sb-browser {
   position: relative;
   width: 100%;
@@ -799,70 +823,76 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   white-space: nowrap;
 }
 .sb-browser-body { position: relative; padding: 0.9rem; display: grid; grid-template-columns: 1fr 2fr; gap: 0.6rem; }
-/* Niente luccichio di caricamento sui blocchi: era una sfumatura chiara che
-   li attraversava in continuazione, e a costruire il sito qui dentro basta
-   già il cursore che li visita accendendoli uno a uno. */
 .sb-skel {
-  --sb-lit: 0;
+  /* Quota di corsa che tocca a questo blocco. I tre blocchi si spartiscono lo
+     0→1 di --vis-x: il primo si riempie nel primo terzo, il secondo nel
+     secondo, il terzo nell'ultimo. --i (0,1,2) arriva dal markup. */
+  --p: clamp(0, calc(var(--vis-x) * 3 - var(--i, 0)), 1);
   position: relative;
   border-radius: 6px;
   background: var(--sb-surface-200);
   border: 1px solid var(--sb-border);
   overflow: hidden;
 }
-/* Contorno che si accende al passaggio del cursore finto (GSAP → --sb-lit) */
+/* Il riempimento: una barra verde che cresce da sinistra. Su scaleX e non su
+   width, così non c'è un layout da rifare mentre la mano si muove. */
+.sb-skel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--sb-brand) 26%, transparent),
+    color-mix(in srgb, var(--sb-brand) 12%, transparent));
+  transform: scaleX(var(--p));
+  transform-origin: left center;
+}
+/* Il contorno si accende sul blocco che si sta riempiendo in questo momento —
+   cioè dove sta la mano — e si spegne quando è pieno. */
 .sb-skel::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  opacity: var(--sb-lit);
+  opacity: calc(var(--p) * (1 - var(--p)) * 4 * var(--vis-in));
   box-shadow: inset 0 0 0 1.5px hsla(153, 60%, 53%, 0.75), inset 0 0 16px hsla(153, 60%, 53%, 0.3);
 }
-.sb-skel--hero { grid-column: 1 / -1; height: 56px; background:
-  linear-gradient(120deg, color-mix(in srgb, var(--sb-brand) 18%, var(--sb-surface-200)), var(--sb-surface-200)); }
+.sb-skel--hero { grid-column: 1 / -1; height: 56px; }
 .sb-skel--side { height: 84px; }
 .sb-skel--main { height: 84px; }
-.sb-skel--foot { grid-column: 1 / -1; height: 26px; }
 
-/* Pillola di stato del deploy */
+/* Pillola di stato del deploy: due parole sovrapposte che si scambiano il
+   posto sul finale della corsa. Cambiare testo davvero avrebbe voluto dire
+   tenere in piedi del JS per una parola sola. */
 .sb-browser-badge {
+  position: relative;
   flex-shrink: 0;
+  display: inline-grid;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
-  border: 1px solid var(--sb-border-strong);
-  background: var(--sb-surface-200);
+  border: 1px solid;
   font-size: 0.56rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--sb-fg-muted);
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  /* --go: 0 fino al 78% della corsa, poi sale a 1 nell'ultimo pezzo. */
+  --go: clamp(0, calc((var(--vis-x) - 0.78) * 4.5), 1);
+  background: color-mix(in srgb, var(--sb-btn-bg) calc(var(--go) * 100%), var(--sb-surface-200));
+  border-color: color-mix(in srgb, var(--sb-btn-bd) calc(var(--go) * 100%), var(--sb-border-strong));
+  box-shadow: 0 0 14px -2px hsla(153, 60%, 53%, calc(var(--go) * 0.9));
 }
-.sb-browser.is-live .sb-browser-badge {
-  background: var(--sb-btn-bg);
-  border-color: var(--sb-btn-bd);
-  color: var(--sb-btn-fg);
-  box-shadow: 0 0 14px -2px var(--sb-brand);
-}
-
-/* Cursore che visita i blocchi (posizione mossa da GSAP) */
-.sb-browser-cursor {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  border: 2px solid var(--sb-brand);
-  background: hsla(153, 60%, 53%, 0.22);
-  pointer-events: none;
-  z-index: 2;
-}
+/* Niente transition qui: --vis-x arriva già smorzato da un quickTo, e una
+   seconda curva sopra la prima farebbe solo ritardo. */
+.sb-browser-badge > span { grid-area: 1 / 1; }
+.sb-browser-badge .build { color: var(--sb-fg-muted); opacity: calc(1 - var(--go)); }
+.sb-browser-badge .live { color: var(--sb-btn-fg); opacity: var(--go); }
 
 /* Terminale (card AI) — resta scuro in entrambi i temi, come un vero terminale.
-   Digita davvero: il testo lo scrive un timeline GSAP (vedi site/homeLive). */
+   La digitazione si scorre: il comando sta tutto nel markup e --vis-x lo scopre
+   carattere per carattere. Prima lo scriveva un timeline GSAP che ciclava
+   quattro sessioni in eterno, un carattere ogni 42 millisecondi anche a
+   finestra in secondo piano. */
 .sb-term {
   position: relative;
   width: 100%;
@@ -880,12 +910,36 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-term-line { display: flex; gap: 0.5rem; white-space: nowrap; line-height: 1.7; }
 .sb-term-line .p { color: var(--sb-brand); }
 .sb-term-line .c { color: #8f8f8f; }
-.sb-term-typed { display: inline-flex; align-items: baseline; }
-.sb-term-cmd { min-height: 1em; }
-/* Filo che scorre a fondo terminale: la sessione è viva, sta ascoltando. */
-.sb-term-ants { position: absolute; left: 1rem; right: 1rem; bottom: 0.6rem; display: block; line-height: 0; }
-.sb-term-ants line { stroke: var(--sb-brand); opacity: 0.55; animation: sb-ants 0.9s linear infinite; }
-@keyframes sb-ants { to { stroke-dashoffset: -8; } }
+/* Il contenitore si tiene largo quanto il comando INTERO (--n caratteri, font
+   monospazio): senza, la riga si allargherebbe mentre si digita e il prompt
+   ballerebbe. */
+.sb-term-typed { position: relative; display: inline-block; width: calc(var(--n, 20) * 1ch); }
+/* Il taglio scopre il comando da sinistra. Cade a metà di un carattere, ma il
+   caret è largo 1ch e sta proprio lì sopra: il glifo tagliato finisce sotto il
+   blocco, esattamente come in un terminale vero. */
+.sb-term-cmd {
+  display: block;
+  min-height: 1em;
+  clip-path: inset(0 calc((1 - var(--vis-x)) * 100%) 0 0);
+}
+/* La testa di scrittura. NON lampeggia: si muove, ed è già viva così. Un caret
+   che lampeggia da fermo era, di tutta la home, l'animazione che si ripeteva
+   più spesso e diceva meno. */
+.sb-term-caret {
+  position: absolute;
+  top: 0.15em;
+  left: calc(var(--vis-x) * 100%);
+  width: 1ch;
+  height: 1.05em;
+  background: var(--sb-brand);
+}
+/* L'output arriva solo quando il comando è scritto per intero. */
+.sb-term-out { opacity: clamp(0, calc((var(--vis-x) - 0.9) * 10), 1); }
+
+/* Cursore a blocco per i terminali che NON si digitano — quello del pannello
+   clienti, che mostra un comando già dato. Sta pieno e fermo: lampeggia solo
+   finché il puntatore è sul pannello, cioè finché c'è qualcuno alla tastiera.
+   È la stessa regola del caret della CTA qui sotto. */
 .sb-cursor {
   display: inline-block;
   width: 8px;
@@ -893,8 +947,8 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   margin-left: 2px;
   vertical-align: text-bottom;
   background: var(--sb-brand);
-  animation: sb-blink 1.1s steps(1) infinite;
 }
+.sb-panel:hover .sb-cursor { animation: sb-blink 1.1s steps(1) infinite; }
 @keyframes sb-blink { 50% { opacity: 0; } }
 
 /* Chip-loghi (card siti clienti / lingue) */
@@ -912,6 +966,11 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   white-space: nowrap;
 }
 .sb-chip svg { color: var(--sb-fg-muted); }
+/* Pallino di stato. Acceso e fermo — che è poi quello che vuol dire "live":
+   un servizio in piedi non ha bisogno di sventolare. Prima ognuno emetteva un
+   anello ogni 2,6 secondi, con i delay scaglionati per riga: sulla sola tabella
+   clienti erano quattro anelli che si allargavano a turno, per sempre.
+   L'anello adesso parte una volta, sulla riga che punti. */
 .sb-chip-dot {
   display: inline-block;
   flex: none;
@@ -919,26 +978,43 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   height: 6px;
   border-radius: 50%;
   background: var(--sb-brand);
-  animation: sb-ping 2.6s ease-out infinite;
 }
 .sb-chip-dot--sm { width: 5px; height: 5px; margin-right: 0.35rem; vertical-align: 0.1em; }
+.sb-trust-row:hover .sb-chip-dot { animation: sb-ping 1.3s ease-out; }
+/* Le tre tappe restano come stavano: questa keyframe la usa anche /mima
+   (mima.css, il pallino della lista condivisa), dove il ciclo è ancora quello
+   giusto — lì il pallino dice "c'è qualcun altro che sta scrivendo adesso", ed
+   è informazione che cambia da sola. La pausa fra il 70% e il 100% è quella
+   che, in ciclo, separa un anello dal successivo. */
 @keyframes sb-ping {
   0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55); }
   70% { box-shadow: 0 0 0 7px hsla(153, 60%, 53%, 0); }
   100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
 }
 
-/* Grafo di diffusione (card siti clienti) — dal nodo centrale partono pacchetti
-   verso i due siti: è la stessa tecnica dei broadcast di Supabase Realtime,
-   una traccia "fantasma" più un tratteggio che la percorre. */
-.sb-flow { position: relative; width: 100%; max-width: 300px; height: 116px; }
+/* Grafo di diffusione (card siti clienti) — dal nodo centrale partono due fili
+   verso i due siti. Non partono più da soli ogni 3 secondi: si riempie quello
+   dalla parte in cui vai, e il sito che raggiungi si accende. Sei tu a
+   instradare, e sotto il puntatore c'è sempre esattamente un filo vivo.
+
+   --to-l e --to-r: quanto sei andato verso sinistra o verso destra, 0→1.
+   Partono dalla metà del riquadro perché lì sta il nodo. */
+.sb-flow {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  height: 116px;
+  --to-l: clamp(0, calc((0.5 - var(--vis-x)) * 2.6), 1);
+  --to-r: clamp(0, calc((var(--vis-x) - 0.5) * 2.6), 1);
+}
 .sb-flow-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .sb-flow-wires .ghost { stroke: var(--sb-border-stronger); opacity: 0.6; }
-.sb-flow-wires .pulse { stroke: var(--sb-brand); animation: sb-packet 3s linear infinite; }
-@keyframes sb-packet {
-  from { stroke-dashoffset: 322; }
-  to { stroke-dashoffset: 0; }
-}
+/* pathLength="1" sul tracciato (vedi ClientFlow): il tratteggio si misura da 0
+   a 1 comunque sia fatta la curva, e qui non serve sapere niente della
+   geometria — basta scoprirne la frazione giusta. */
+.sb-flow-wires .pulse { stroke: var(--sb-brand); stroke-dashoffset: 1; }
+.sb-flow-wires .to-left .pulse { stroke-dashoffset: calc(1 - var(--to-l)); }
+.sb-flow-wires .to-right .pulse { stroke-dashoffset: calc(1 - var(--to-r)); }
 .sb-flow-hub {
   position: absolute;
   top: 0;
@@ -951,14 +1027,13 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   place-items: center;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-bg);
-  animation: sb-hub 3s ease-out infinite;
+  /* Il nodo si illumina mentre trasmette, da qualunque parte tu stia andando. */
+  box-shadow: 0 0 16px -4px hsla(153, 60%, 53%, calc(max(var(--to-l), var(--to-r)) * 0.85));
 }
 .sb-flow-hub img { width: 20px; height: 20px; border-radius: 5px; display: block; }
-@keyframes sb-hub {
-  0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.5); }
-  60% { box-shadow: 0 0 0 12px hsla(153, 60%, 53%, 0); }
-  100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
-}
+/* Il pallino del sito raggiunto si accende: è l'arrivo del pacchetto. */
+.sb-flow-ends .to-left .sb-chip-dot { box-shadow: 0 0 0 calc(var(--to-l) * 5px) hsla(153, 60%, 53%, 0.3); }
+.sb-flow-ends .to-right .sb-chip-dot { box-shadow: 0 0 0 calc(var(--to-r) * 5px) hsla(153, 60%, 53%, 0.3); }
 .sb-flow-ends {
   position: absolute;
   left: 0;
@@ -971,8 +1046,14 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 }
 .sb-flow-ends .sb-chip { padding: 0.34rem 0.6rem; font-size: 0.7rem; gap: 0.35rem; }
 
-/* HUD di gioco (card giochi web) — gioca da sola: i punti salgono a scatti,
-   la serie s'infiamma, il voto si ribalta. */
+/* HUD di gioco (card giochi web) — il punteggio lo fai tu, con la strada che il
+   puntatore percorre dentro la card (vedi GameHud in site/homeLive).
+
+   Qui c'erano tre pillole, un "+120" che schizzava fuori a ogni round, una
+   serie che s'infiammava ogni 2,8 secondi e un voto che si ribaltava, su un
+   ciclo che ripartiva da zero all'infinito: quattro cose in movimento per dire
+   che i giochi hanno un punteggio. Restano un numero e un voto, e il numero è
+   il tuo. */
 .sb-hud { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; perspective: 500px; }
 .sb-hud-pill {
   position: relative;
@@ -988,25 +1069,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   color: var(--sb-fg-light);
   font-variant-numeric: tabular-nums;
 }
-.sb-hud-pill .up { color: var(--sb-brand-text); }
-.sb-hud-score { min-width: 3.4ch; text-align: right; }
-/* "+120" che sale e svanisce a ogni risposta giusta */
-.sb-hud-pop {
-  position: absolute;
-  right: 0.5rem;
-  top: -0.1rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--sb-brand-text);
-  opacity: 0;
-  pointer-events: none;
-  white-space: nowrap;
-}
-.sb-hud-streak { animation: sb-flicker 2.8s ease-in-out infinite; }
-@keyframes sb-flicker {
-  0%, 100% { box-shadow: 0 0 0 0 hsla(24, 92%, 55%, 0); border-color: var(--sb-border-strong); }
-  45% { box-shadow: 0 0 16px -2px hsla(24, 92%, 55%, 0.55); border-color: hsla(24, 92%, 55%, 0.5); }
-}
+.sb-hud-score { min-width: 3.4ch; text-align: right; color: var(--sb-fg); font-weight: 600; }
 .sb-hud-grade {
   display: inline-flex;
   align-items: center;
@@ -1020,15 +1083,15 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   font-weight: 700;
   font-size: 0.95rem;
   transform-style: preserve-3d;
-  animation: sb-grade-glow 2.8s ease-in-out infinite;
-}
-@keyframes sb-grade-glow {
-  0%, 100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
-  50% { box-shadow: 0 0 20px -4px var(--sb-brand); }
 }
 
-/* Diff a due liste (card strumenti) — una riga di scansione scende e le voci
-   si accendono al suo passaggio: il confronto avviene sotto gli occhi. */
+/* Diff a due liste (card strumenti) — la lente la muovi tu.
+
+   Il confronto c'è già tutto, fermo e leggibile: le righe portano il loro
+   colore, uguale a com'era. Quello che si muove è la lampada, una banda di luce
+   che sta a --vis-y e ravviva quello che attraversa. Prima scendeva da sola
+   ogni 3,6 secondi e le righe lampeggiavano a turno su quattro delay diversi:
+   una scansione che non stava esaminando niente. */
 .sb-diff { position: relative; width: 100%; max-width: 300px; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .sb-diff-col {
   border: 1px solid var(--sb-border-strong);
@@ -1042,40 +1105,36 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-diff-row { height: 9px; border-radius: 4px; background: var(--sb-surface-200); }
 .sb-diff-row--hit { background: color-mix(in srgb, var(--sb-brand) 38%, var(--sb-surface-200)); }
 .sb-diff-row--miss { background: color-mix(in srgb, #e93d5d 30%, var(--sb-surface-200)); }
-.sb-diff-row--hit, .sb-diff-row--miss { animation: sb-hit 3.6s ease-in-out infinite; }
-.sb-diff-row:nth-child(1) { animation-delay: 0.35s; }
-.sb-diff-row:nth-child(2) { animation-delay: 0.68s; }
-.sb-diff-row:nth-child(3) { animation-delay: 1.01s; }
-.sb-diff-row:nth-child(4) { animation-delay: 1.34s; }
-@keyframes sb-hit {
-  0%, 100% { transform: scaleX(1); filter: none; }
-  8% { transform: scaleX(1.03); filter: brightness(1.45) saturate(1.3); }
-  22% { transform: scaleX(1); filter: none; }
-}
+/* Niente matematica riga per riga: la banda passa SOPRA e ravviva quello che
+   copre, quale che sia. Stesso mestiere (e stessi blend) della pozza d'acqua
+   sui quadratini dei commit, più in basso in questo foglio. */
 .sb-diff-scan {
   position: absolute;
   left: -6px;
   right: -6px;
-  top: 0;
+  top: calc(var(--vis-y) * 100% - 8px);
   height: 16px;
   border-radius: 8px;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent, hsla(153, 60%, 53%, 0.3), transparent);
+  opacity: var(--vis-in);
+  background: linear-gradient(180deg, transparent, hsla(153, 60%, 53%, 0.42), transparent);
   box-shadow: 0 0 18px hsla(153, 60%, 53%, 0.45);
-  animation: sb-scan 3.6s ease-in-out infinite;
+  mix-blend-mode: multiply;
 }
-@keyframes sb-scan {
-  0% { transform: translateY(2px); opacity: 0; }
-  10% { opacity: 1; }
-  45% { transform: translateY(62px); opacity: 1; }
-  60%, 100% { transform: translateY(62px); opacity: 0; }
-}
+html.dark .sb-diff-scan { mix-blend-mode: plus-lighter; }
 
 /* Card CAT — piano cartesiano in tre dimensioni con un cubo che ci galleggia
    sopra. Vera profondità CSS (perspective + transform-style: preserve-3d), non
    un disegno che finge il 3D: il cubo ha sei facce e passandoci sopra si gira
-   davvero verso il puntatore. Il moto lo comanda GSAP (vedi CatCube in
-   site/homeLive); qui c'è solo la scena.
+   davvero verso il puntatore.
+
+   Adesso è anche CSS puro. Prima qui c'erano TRE sistemi di moto sovrapposti —
+   un galleggiamento yoyo infinito sul portacubo, un giro su sé stesso da 26
+   secondi, e l'inseguimento del puntatore — con tutto il mestiere che serviva a
+   non farli litigare sulle stesse proprietà (per questo il galleggiamento
+   stava sul portacubo e la rotazione sul cubo). Restano --vis-x e --vis-y: uno
+   lo gira, l'altro lo solleva.
+
    La catena preserve-3d NON va interrotta: stage → origin → lift → cube. */
 .sb-cat {
   position: relative;
@@ -1126,7 +1185,9 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   background: linear-gradient(to top, var(--sb-brand), transparent);
   opacity: 0.5;
 }
-/* Ombra portata sul piano, coricata come il piano */
+/* Ombra portata sul piano, coricata come il piano. Si stringe mentre il cubo
+   sale: è il solo modo per cui un oggetto che si alza si legge come alzato e
+   non come ingrandito. */
 .sb-cat-shadow {
   position: absolute;
   left: -24px;
@@ -1136,12 +1197,23 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   border-radius: 50%;
   /* Il translateZ dopo la rotazione stacca l'ombra di un pelo dal piano:
      complanari, i due si contenderebbero lo stesso pixel (z-fighting). */
-  transform: rotateX(74deg) translateZ(1px);
+  transform: rotateX(74deg) translateZ(1px) scale(calc(1 - var(--lift) * 0.24));
+  opacity: calc(1 - var(--lift) * 0.4);
   background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-fg) 26%, transparent), transparent 72%);
 }
-/* Il galleggiamento sta qui (GSAP muove la y), la rotazione sul cubo: due
-   trasformazioni separate, così non si sovrascrivono a vicenda. */
-.sb-cat-lift { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+/* --lift: quanto è alzata la mano, 0 in basso → 1 in alto. Il sollevamento
+   sta qui e la rotazione sul cubo: due trasformazioni su due elementi, così
+   non c'è una sola `transform` che debba portarle tutte e due. */
+.sb-cat-origin { --lift: calc(1 - var(--vis-y)); }
+.sb-cat-lift {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  transform: translateY(calc(var(--lift) * -16px));
+}
+/* Posa di riposo: assonometria leggibile, un vertice verso di noi. A metà
+   riquadro (--vis-x e --vis-y a 0.5) i due calc valgono esattamente questo. */
 .sb-cat-cube {
   position: absolute;
   left: -24px;
@@ -1149,8 +1221,9 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   width: 48px;
   height: 48px;
   transform-style: preserve-3d;
-  /* Posa di riposo, la stessa di CUBE_REST: vale finché GSAP non prende mano. */
-  transform: rotateX(-22deg) rotateY(32deg);
+  transform:
+    rotateX(calc(-22deg + (var(--vis-y) - 0.5) * -72deg))
+    rotateY(calc(32deg + (var(--vis-x) - 0.5) * 150deg));
 }
 .sb-cat-face {
   position: absolute;
@@ -1194,30 +1267,24 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   letter-spacing: -0.02em;
 }
 .sb-aa .lite { background: #fcfcfc; color: #171717; }
+/* La tendina sta dove sei tu. Prima scorreva avanti e indietro da sola ogni 7
+   secondi, su due keyframe che dovevano restare in fase fra loro perché il
+   manico non si staccasse dal bordo. Adesso sono la stessa var, e in fase ci
+   stanno per costruzione. */
 .sb-aa .dark {
   position: absolute;
   inset: 0;
   background: #171717;
   color: #ededed;
-  clip-path: inset(0 0 0 50%);
-  animation: sb-wipe 7s ease-in-out infinite;
-}
-@keyframes sb-wipe {
-  0%, 100% { clip-path: inset(0 0 0 64%); }
-  50% { clip-path: inset(0 0 0 22%); }
+  clip-path: inset(0 0 0 calc(var(--vis-x) * 100%));
 }
 .sb-aa-handle {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%;
+  left: calc(var(--vis-x) * 100%);
   width: 2px;
   background: var(--sb-brand);
-  animation: sb-wipe-handle 7s ease-in-out infinite;
-}
-@keyframes sb-wipe-handle {
-  0%, 100% { left: 64%; }
-  50% { left: 22%; }
 }
 .sb-aa-handle::after {
   content: "";
@@ -1397,7 +1464,15 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   letter-spacing: -0.015em;
   color: var(--sb-fg);
 }
-/* Il nome della tecnologia cambia con un piccolo lampo di luce che lo attraversa */
+/* Il nome della tecnologia si accende con un lampo di luce che lo attraversa —
+   UNA volta, nel momento in cui cambia, che è l'unico momento in cui quel
+   lampo vuol dire qualcosa. Prima ripassava ogni 5,5 secondi sulla stessa
+   parola ferma.
+
+   Il colpo riparte perché in App.tsx lo <span> ha key={nome}: cambiando
+   framework React smonta il vecchio nodo e ne monta uno nuovo, e
+   un'animazione CSS su un elemento appena nato parte da sé. Niente classi da
+   togliere e rimettere, niente animationend da ascoltare. */
 .sb-stack-title .tech {
   color: var(--sb-brand-text);
   background: linear-gradient(
@@ -1407,14 +1482,15 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
     var(--sb-brand-text) 62%
   );
   background-size: 260% 100%;
+  background-position: -60% 0;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: sb-textshine 5.5s ease-in-out infinite;
+  animation: sb-textshine 0.9s ease-out;
 }
 @keyframes sb-textshine {
-  0%, 62% { background-position: 160% 0; }
-  100% { background-position: -60% 0; }
+  from { background-position: 160% 0; }
+  to { background-position: -60% 0; }
 }
 .sb-techrow { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.6rem; }
 .sb-tech {
@@ -1770,7 +1846,9 @@ html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
   color: var(--sb-fg);
 }
 .sb-cta h2 .sb-brandline { display: block; color: var(--sb-brand); }
-/* Cursore che lampeggia in fondo all'invito: la riga sembra appena scritta */
+/* Cursore in fondo all'invito: la riga sembra appena scritta. Pieno e fermo da
+   solo — lampeggia solo mentre il puntatore è sulla sezione, che è quando c'è
+   qualcuno che potrebbe rispondere. */
 .sb-caret {
   display: inline-block;
   width: 0.42ch;
@@ -1778,8 +1856,8 @@ html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
   margin-left: 0.14em;
   vertical-align: -0.06em;
   background: var(--sb-brand);
-  animation: sb-blink 1.1s steps(1) infinite;
 }
+.sb-cta:hover .sb-caret { animation: sb-blink 1.1s steps(1) infinite; }
 .sb-cta p { margin: 0 auto 1.8rem; max-width: 34rem; font-size: 1rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 .sb-cta-actions { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
 
@@ -2015,38 +2093,71 @@ html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── ① Aurora, fondale della pagina ──────────────────────────────────────────
-   Vive dentro .sb-bg (fisso alla finestra) e SOTTO .sb-bg-grid. Lo shader
-   disegna la banda in alto, cioè proprio dove stanno nav e titolo: per questo
-   l'opacità è bassa e c'è una maschera che la spegne scendendo — il testo
-   della hero deve restare la cosa più leggibile della pagina, non il fondale. */
+   Vive dentro .sb-bg (fisso alla finestra) e SOTTO .sb-bg-grid. La banda sta in
+   alto, cioè proprio dove stanno nav e titolo: per questo l'opacità è bassa e
+   c'è una maschera che la spegne scendendo — il testo della hero deve restare
+   la cosa più leggibile della pagina, non il fondale.
+
+   Qui c'era uno shader WebGL (components/reactbits/Aurora + ogl) con un
+   requestAnimationFrame che faceva avanzare uTime per sempre: un contesto GL
+   acceso su ogni pagina del sito per una banda di colore in cima. Questo
+   gradiente era già scritto lì sotto come ripiego per il movimento ridotto ed
+   era indistinguibile a occhio dal primo fotogramma dello shader: adesso è la
+   regola, non il ripiego. Il fondale il suo movimento ce l'ha lo stesso —
+   glielo danno lo scroll e il puntatore sui due aloni di .sb-home. */
 .sb-aurora {
   position: absolute;
   inset: 0;
   z-index: 0;
   opacity: 0.5;
+  background: radial-gradient(
+    120% 62% at 50% -10%,
+    color-mix(in srgb, var(--sb-brand) 26%, transparent) 0%,
+    transparent 62%
+  );
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 34%, transparent 72%);
   mask-image: linear-gradient(to bottom, #000 0%, #000 34%, transparent 72%);
 }
 .sb-home.dark .sb-aurora,
 html.dark .sb-aurora { opacity: 0.42; }
-/* Stato di riposo: lo stesso verde nello stesso posto, ma fermo. Con movimento
-   ridotto homeFx non monta affatto il canvas, quindi resta solo questo. */
-@media (prefers-reduced-motion: reduce) {
-  .sb-aurora {
-    background: radial-gradient(
-      120% 62% at 50% -10%,
-      color-mix(in srgb, var(--sb-brand) 26%, transparent) 0%,
-      transparent 62%
-    );
-  }
-}
 
 /* ── ② Brandline con la banda di luce ────────────────────────────────────────
-   ShinyText rende un <span> con background-clip:text, quindi ha bisogno di
-   essere un blocco dove prima c'era un <span> di blocco. */
+   La banda sta dove sta il cursore nella finestra: --gloss-x è la stessa
+   variabile che illumina il titolo della hero, la scrive site/GlassMotion.tsx
+   (blocco ③) una volta per frame sulla radice, e qui si eredita e basta.
+   Attraversando la pagina le righe brand si accendono al tuo passaggio, una
+   dopo l'altra. Da fermo la luce è ferma anche lei, a metà riga.
+
+   Prima ognuna di queste righe si portava dietro un requestAnimationFrame suo
+   (components/reactbits/ShinyText) che faceva ripassare la banda ogni 3,4
+   secondi per sempre — sulla home erano due, e altre quattro sparse per il
+   sito. Il disegno è lo stesso; quello che cambia è chi lo comanda. */
+.sb-shine {
+  background-image: linear-gradient(
+    100deg,
+    var(--sb-shine-base) 40%,
+    var(--sb-shine-hi) 50%,
+    var(--sb-shine-base) 60%
+  );
+  background-size: 260% 100%;
+  background-position: var(--gloss-x, 50%) 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* Senza background-clip:text le lettere resterebbero invisibili: meglio la
+   tinta piena che una riga che non c'è. Stessa rete del titolo della hero. */
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .sb-shine {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--sb-shine-base);
+  }
+}
 .sb-hero-title .sb-brandline { display: block; }
-/* Nella CTA la brandline contiene ANCHE il cursore lampeggiante: lì lo
-   ShinyText è un figlio, e non deve mandare a capo il cursore. */
+/* Nella CTA la brandline contiene ANCHE il caret: la riga di luce è un figlio,
+   e non deve mandare a capo il cursore. */
 .sb-cta h2 .sb-brandline > span { display: inline; }
 
 /* ── ③ Alone che segue il puntatore, solo sulle card prodotti ────────────────
@@ -2141,45 +2252,46 @@ html.dark .sb-aurora { opacity: 0.42; }
    griglia prodotti, più in alto: cerca `.sb-trust-chip`. */
 
 /* ── Riduzione del movimento ─────────────────────────────────────────────────
-   Chi ha chiesto meno movimento non deve vedere NIENTE che si muova da solo:
-   i loop si spengono tutti e ogni cosa resta sul fotogramma più leggibile.
-   Restano solo le transizioni brevissime legate a un gesto dell'utente e la
-   barra di avanzamento, che è informazione. La regia GSAP dei loop non parte
-   nemmeno (i componenti controllano la media query prima di montare). */
+   Questo blocco era lungo il triplo, e non perché servisse: serviva a spegnere
+   una ventina di loop e a scegliere a mano, per ognuno, un fotogramma in cui
+   fermarlo — il diff senza la riga di scansione, la tendina Aa a metà, il
+   caret pieno, il nome del framework senza gradiente.
+
+   Adesso quei fotogrammi sono lo stato normale della pagina: i visual stanno
+   fermi per tutti, e si muovono solo mentre qualcuno li tocca. Chi ha chiesto
+   meno movimento vede semplicemente la home a riposo — che è la stessa home
+   che vedono gli altri quando staccano la mano dal mouse.
+
+   Quindi qui resta pochissimo, e quel poco è di due tipi: le transizioni
+   legate a un gesto (che si spengono) e i gesti che non partono affatto (il
+   blocco ④ di site/GlassMotion.tsx, come il tilt e la pozza, sta dentro un
+   matchMedia("(prefers-reduced-motion: no-preference)"): con movimento ridotto
+   --vis-x/-y/-in non vengono mai scritte e valgono i valori di riposo). */
 @media (prefers-reduced-motion: reduce) {
   .sb-menu-sheet, .sb-menu-scrim, .sb-panel, .sb-link svg, .sb-page-top .go { transition: none; }
-
-  /* Il vetro RESTA: è materia, non movimento — una lastra ferma non dà
-     fastidio a nessuno. Quello che si spegne è ciò che si muove da solo.
-     Tilt e parallasse non si montano nemmeno: stanno dentro un
-     matchMedia("(prefers-reduced-motion: no-preference)").
-
-     La regola generale qui sotto vale per i DISCENDENTI di .sb-home
-     (".sb-home *"), quindi gli aloni no: sono pseudo-elementi di .sb-home
-     stesso e continuerebbero a derivare. Vanno fermati a parte. */
-  .sb-home::before,
-  .sb-home::after { animation: none !important; }
-  .sb-panel-inner::after { content: none; }
+  .sb-foot-social a svg { transition: none; }
   .sb-nav-pill { transition: none; }
 
+  /* Il vetro RESTA: è materia, non movimento — una lastra ferma non dà
+     fastidio a nessuno. Sparisce la banda di luce che la attraversa. */
+  .sb-panel-inner::after { content: none; }
+
+  /* Rete di sicurezza: le poche animazioni rimaste sono tutte legate a un
+     hover (spunte, ping, caret, lampo sul nome del framework) e nessuna parte
+     da sola, ma una regola che spegne tutto costa una riga e vale per quello
+     che verrà aggiunto domani senza ripensarci. */
   .sb-home *,
   .sb-home *::before,
-  .sb-home *::after {
-    animation: none !important;
-  }
+  .sb-home *::after { animation: none !important; }
 
-  /* Stati di riposo scelti a mano, dove il fotogramma iniziale non basta. */
   .sb-bg-grid { opacity: 0.5; }
-  .sb-diff-scan, .sb-browser-cursor, .sb-flow-wires .pulse { display: none; }
-  .sb-foot-social a svg { transition: none; }
-  .sb-aa .dark { clip-path: inset(0 0 0 50%); }
-  .sb-aa-handle { left: 50%; }
+  /* Il gradiente del nome resta fermo sul suo fotogramma finale, ma senza la
+     passata di luce va tolto: fermo, è solo un testo più chiaro del dovuto. */
   .sb-stack-title .tech {
     background: none;
     -webkit-text-fill-color: currentColor;
     color: var(--sb-brand-text);
   }
-  .sb-cursor, .sb-caret { opacity: 1; }
 
   /* Pozza: non si aggancia nemmeno (il cancello è in site/GlassMotion.tsx),
      ma le celle non devono restare con la transizione appesa. */

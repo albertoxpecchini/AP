@@ -12,7 +12,13 @@
     "strengths": "Points forts",
     "availability": "Disponibilité",
     "wish": "Dans mes projets",
-    "runningTitle": "Curriculum Vitae"
+    "runningTitle": "Curriculum Vitae",
+    "home": "Accueil",
+    "print": "Télécharger le PDF",
+    "printHint": "Le PDF, c'est exactement cette page : dans la fenêtre d'impression, choisissez « Enregistrer au format PDF ».",
+    "email": "E-mail",
+    "updated": "Mis à jour",
+    "docTitle": "Curriculum Vitae"
   },
   "name": "Alberto Pecchini",
   "role": "Géomètre & développeur de sites web",
@@ -95,8 +101,8 @@
     },
     {
       "period": "en continu",
-      "title": "Ferme familiale — Rivalta sul Mincio",
-      "role": "Collaborateur agricole · Logistique · Coordination opérationnelle",
+      "title": "Exploitation agricole familiale — Rivalta sul Mincio",
+      "role": "Collaborateur agricole · Logistique · Coordination des opérations",
       "desc": "Soin et entretien des plantes (irrigation, tailles de types et tailles variés), transport de matériaux et d'équipements en tracteur avec remorque, récolte du foin de prairie permanente, coordination des opérations avec l'équipe lors des travaux intensifs, soutien logistique. Conduite autonome des engins agricoles et résolution de problèmes sur le terrain.",
       "link": ""
     },

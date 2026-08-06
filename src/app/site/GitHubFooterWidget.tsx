@@ -469,11 +469,15 @@ export default function GitHubFooterWidget() {
         .sb-gh__user { font-weight: 500; }
         .sb-gh__since { color: var(--sb-fg-muted); }
         .sb-gh__act { display: inline-flex; align-items: center; }
+        /* Acceso e fermo. L'anello che partiva ogni 2,4 secondi diceva "in
+           diretta" a proposito di dati arrivati una volta sola, al
+           caricamento: sventolava per conto suo. Adesso parte quando ci passi
+           sopra — allo stesso modo dei pallini dei clienti sulla home. */
         .sb-gh__dot {
           width: 7px; height: 7px; border-radius: 50%; margin-right: 0.5rem; flex-shrink: 0;
           background: var(--sb-brand); box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55);
-          animation: sb-gh-live 2.4s ease-out infinite;
         }
+        .sb-gh__act:hover .sb-gh__dot { animation: sb-gh-live 1.4s ease-out; }
 
         /* ── Chip statistiche (veste .sb-chip della home) ── */
         .sb-gh__chips { gap: 0.5rem 0.55rem; }

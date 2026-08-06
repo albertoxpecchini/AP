@@ -24,6 +24,7 @@ syncTheme();
 initLangAttr();
 
 const Bio = lazy(() => import("./app/site/Bio.tsx"));
+const Cv = lazy(() => import("./app/cv/Cv.tsx"));
 const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
 const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
 const MeStesso = lazy(() => import("./app/me-stesso/MeStesso.tsx"));
@@ -70,6 +71,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Bio />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/cv"
+        element={
+          <Suspense fallback={null}>
+            <Cv />
           </Suspense>
         }
       />

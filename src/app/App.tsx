@@ -69,7 +69,6 @@ import { PROJECTS } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
 const RivaltaMap = lazy(() => import("./site/RivaltaMap"));
 import SiteFooter from "./site/SiteFooter";
-import { getLang, subscribeLang, type Lang } from "./i18n/langCore";
 import "./home.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -109,7 +108,7 @@ const CV = [
   {
     period: "ongoing",
     title: "Family farm — Rivalta sul Mincio",
-    role: "Farm hand · Logistics · Operational coordination",
+    role: "Agricultural operations · Logistics · Team coordination",
     desc: "Ongoing collaboration in the family farming business. Tasks: plant care and maintenance (watering, pruning of various types and sizes), transport of materials and equipment on a tractor with trailer, hay harvesting from permanent meadow, coordinating operations with the team during intensive work, logistical support and assistance with transfers. Autonomous handling of farm equipment and on-field problem-solving.",
   },
   {
@@ -173,7 +172,7 @@ const CV = [
   {
     period: "Jun 30 — Jul 1, 2026",
     title: "Film extra — «House of Gonzaga» TV series",
-    role: "Background actor · Crowd scene · Piazza Broletto, Mantua",
+    role: "Background performer · Crowd scene · Piazza Broletto, Mantua",
     desc: "Background acting (figurazione) for the television series «House of Gonzaga», shot in the historic centre of Mantua. Part of the crowd in a night-time DJ-set scene filmed in Piazza Broletto, over two days (30 June – 1 July 2026) for around 10 hours on set.",
   },
   // --- wishlist ---
@@ -590,9 +589,6 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [archTab, setArchTab] = useState(ARCH_TABS[0].id);
   const [tech, setTech] = useState(STACK[0].id);
-  // Lingua attiva del sito: serve a servire il PDF del CV nella lingua giusta
-  // (il testo a schermo lo traduce già il motore DOM; il PDF no, è statico).
-  const [lang, setLangState] = useState<Lang>(() => getLang());
 
   const sortedCV = useMemo(() => {
     const wishes = CV.filter((c) => (c as any).wish);
@@ -601,7 +597,6 @@ export default function App() {
     return [...sorted, ...wishes];
   }, []);
 
-  const CV_PDF = `/cv-alberto-pecchini-${lang}.pdf`;
   const activeTab = ARCH_TABS.find((t) => t.id === archTab) ?? ARCH_TABS[0];
   const activeTech = STACK.find((t) => t.id === tech) ?? STACK[0];
 
@@ -615,8 +610,6 @@ export default function App() {
       setDocOpen({ url, title });
     }
   };
-
-  useEffect(() => subscribeLang(setLangState), []);
 
   useEffect(() => {
     activateLocalMode(() => {
@@ -691,8 +684,10 @@ export default function App() {
           nessun bordo di sezione può tagliarlo a metà mentre si scorre. Fra
           una sezione e l'altra non c'è nessun confine. */}
       <div className="sb-bg" aria-hidden="true">
-        {/* L'aurora sta SOTTO la griglia: è la griglia sopra che la tiene
-            attaccata al sito invece di farla sembrare un poster incollato. */}
+        {/* La banda di colore sta SOTTO la griglia: è la griglia sopra che la
+            tiene attaccata al sito invece di farla sembrare un poster
+            incollato. Il movimento del fondale non è qui: sono i due aloni di
+            .sb-home, che seguono lo scroll e il puntatore. */}
         <AuroraBackdrop />
         <span className="sb-bg-grid" />
       </div>
@@ -988,7 +983,7 @@ export default function App() {
                     >
                       <span className="sb-trust-host">{c.host}</span>
                       <span className="sb-trust-live">
-                        <TrustedDot delay={c.dot} /> LIVE
+                        <TrustedDot /> LIVE
                       </span>
                     </a>
                   ))}
@@ -1054,7 +1049,10 @@ export default function App() {
             <div className="sb-stack-grid">
               <div>
                 <h3 className="sb-stack-title">
-                  Built with <span className="tech" translate="no">{activeTech.name}</span>
+                  {/* key sul nome: cambiando framework React monta uno <span>
+                      nuovo, e il lampo di luce di .tech (che è un'animazione a
+                      colpo singolo, non più un ciclo) riparte da sé. */}
+                  Built with <span className="tech" translate="no" key={activeTech.name}>{activeTech.name}</span>
                 </h3>
                 <div className="sb-techrow" role="tablist" aria-label="Technologies">
                   {STACK.map((t) => (
@@ -1203,18 +1201,16 @@ export default function App() {
               </p>
             </div>
 
+            {/* Il CV non è più un PDF allegato: è la pagina /cv, scritta nelle
+                quattro lingue del sito. «Download» apre la stessa pagina con
+                ?print, che fa partire la stampa — il PDF È quella pagina. */}
             <div className="sb-cv-actions">
-              <button
-                type="button"
-                onClick={() => openDoc(CV_PDF, "Curriculum Vitae — Alberto Pecchini")}
-                className="sb-btn sb-btn--primary"
-                aria-haspopup="dialog"
-              >
+              <Link to="/cv" className="sb-btn sb-btn--primary">
                 <IcEye size={16} /> View CV
-              </button>
-              <a href={CV_PDF} className="sb-btn sb-btn--secondary" download>
+              </Link>
+              <Link to="/cv?print" className="sb-btn sb-btn--secondary">
                 <IcDownload size={16} /> Download (PDF)
-              </a>
+              </Link>
             </div>
 
             <div className="sb-wall">

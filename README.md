@@ -269,7 +269,7 @@ AP/
 ├── lib/serverSecurity.ts     # helper condivisi: origin check, rate-limit, diagnostica
 ├── public/                   # PDF (CV in 4 lingue + attestati), immagini, manifest PWA
 ├── scripts/
-│   ├── build-cv.py           #   CV → 4 PDF (WeasyPrint, skin .sb- della home)
+│   ├── build-cv.py           #   src/app/cv/data/*.json → 4 PDF statici (WeasyPrint)
 │   ├── build-zips.mjs        #   ZIP del sorgente per ogni progetto d'archivio
 │   ├── build-repo-tree.mjs   #   albero del repo da git → public/repo-tree.json
 │   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
@@ -282,6 +282,9 @@ AP/
 │   │   │                     #   homeIcons/homeLive/homeMotion/footMotion,
 │   │   │                     #   repoTree, PaletteModal, ScrollProgress,
 │   │   │                     #   WorkflowModal + workflow.css (diagramma in CSS)
+│   │   ├── cv/               # /cv: il curriculum come pagina (4 lingue) + stampa
+│   │   │                     #   PDF; data/cv.<lingua>.json = fonte unica, la
+│   │   │                     #   legge anche scripts/build-cv.py
 │   │   ├── theme/            # ControlBar (lingua·tema·sensore) + themeCore
 │   │   ├── trivia/           # gioco quiz + parser + API leaderboard/pagelle/progressi
 │   │   ├── bio  pcto  me-stesso  dubliners  gattopardo  festa  archivio  sostieni  instagram
@@ -439,7 +442,7 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron.
 | `npm run build` | Build statica in `dist/` (`prebuild` → ZIP + `repo-tree.json`, poi `vite build`) |
 | `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
-| `python3 scripts/build-cv.py [it en fr de]` | Rigenera i CV PDF (tutte le lingue o solo alcune) |
+| `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
 
 ---
 

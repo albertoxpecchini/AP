@@ -12,7 +12,13 @@
     "strengths": "Strengths",
     "availability": "Availability",
     "wish": "On my list",
-    "runningTitle": "Curriculum Vitae"
+    "runningTitle": "Curriculum Vitae",
+    "home": "Home",
+    "print": "Download PDF",
+    "printHint": "The PDF is exactly this page: choose «Save as PDF» in the print dialog.",
+    "email": "Email",
+    "updated": "Updated",
+    "docTitle": "Curriculum Vitae"
   },
   "name": "Alberto Pecchini",
   "role": "Surveyor & Website Developer",
@@ -83,7 +89,7 @@
       "period": "2023 — 2026",
       "title": "PCTO — Caem Group S.p.A., Castellucchio (MN)",
       "role": "Technical office · Timber department · AutoCAD 3D, cadwork",
-      "desc": "Three years of school-work alternation: 3D modelling of canopies in AutoCAD, support in drafting quotations, archiving of technical documentation. Glulam and X-LAM timber structures.",
+      "desc": "Three years on the Italian school-to-work programme (PCTO): 3D modelling of canopies in AutoCAD, support in drafting quotations, archiving of technical documentation. Glulam and X-LAM timber structures.",
       "link": ""
     },
     {
@@ -95,8 +101,8 @@
     },
     {
       "period": "ongoing",
-      "title": "Family farmstead — Rivalta sul Mincio",
-      "role": "Farm worker · Logistics · Operational coordination",
+      "title": "Family farm — Rivalta sul Mincio",
+      "role": "Agricultural operations · Logistics · Team coordination",
       "desc": "Plant care and maintenance (irrigation, pruning of various types and sizes), transport of materials and equipment by tractor with trailer, hay harvesting from permanent meadow, coordination of operations with the team during intensive work, logistical support. Independent handling of farm vehicles and problem-solving in the field.",
       "link": ""
     },
@@ -131,8 +137,8 @@
     {
       "period": "30 Jun — 1 Jul 2026",
       "title": "Background acting — TV series «House of Gonzaga»",
-      "role": "Extra · Crowd scene · Piazza Broletto, Mantova",
-      "desc": "Shot in the historic centre of Mantova. Extra in the crowd of a night scene with a DJ set, two days of filming, about 10 hours on set.",
+      "role": "Background performer · Crowd scene · Piazza Broletto, Mantova",
+      "desc": "Shot in the historic centre of Mantova. Background performer in the crowd of a night scene with a DJ set, two days of filming, about 10 hours on set.",
       "link": ""
     }
   ],
@@ -156,7 +162,7 @@
     {
       "period": "2024 — 2025",
       "title": "Parish summer camp · Parish of SS. Donato e Vigilio Martiri",
-      "role": "Volunteer animator · Rivalta sul Mincio · 6 weeks/year · 2 editions",
+      "role": "Volunteer youth leader · Rivalta sul Mincio · 6 weeks/year · 2 editions",
       "desc": "Two consecutive editions (summer 2024 and 2025), twelve weeks in total. Direct responsibility for groups of children of different ages, design and running of games, workshops and educational activities, group dynamics management, mediation, communication with parents. Reference: Fr. Andrea Grandi.",
       "link": ""
     },

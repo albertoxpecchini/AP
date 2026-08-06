@@ -75,11 +75,17 @@ function mergeHoverPaint<T extends Record<string, unknown>>(
 
 type Theme = "light" | "dark";
 
-// Check the document for an explicit theme (works with next-themes, etc.).
-// Covers both `attribute="class"` (the default) and `attribute="data-theme"`.
+// Che tema ha il documento. Il tema del sito lo scrive themeCore.ts: classe
+// `dark` su <html> più l'attributo `data-ap-theme`. La classe da sola non
+// basta: in chiaro non c'è NESSUNA classe (non esiste una `light`), quindi
+// leggendo solo quella il chiaro sarebbe indistinguibile da "non so" e la
+// mappa cadrebbe sul tema di sistema — scura su pagina chiara.
+// `data-theme` resta come ultimo fallback per next-themes & co.
 function getDocumentTheme(): Theme | null {
   if (typeof document === "undefined") return null;
   const root = document.documentElement;
+  const apTheme = root.dataset.apTheme;
+  if (apTheme === "dark" || apTheme === "light") return apTheme;
   if (root.classList.contains("dark")) return "dark";
   if (root.classList.contains("light")) return "light";
   const dataTheme = root.dataset.theme;
@@ -103,17 +109,16 @@ function useResolvedTheme(themeProp?: "light" | "dark"): Theme {
   useEffect(() => {
     if (themeProp) return; // Skip detection if theme is provided via prop
 
-    // Watch for document theme changes (e.g., next-themes toggling the class
-    // or the data-theme attribute).
+    // Cambi di tema a caldo (la barra di controllo del sito, o next-themes).
+    // Il valore va sempre risolto, anche quando torna null: uscendo dallo scuro
+    // un `if (docTheme)` salterebbe l'aggiornamento e la mappa resterebbe scura
+    // fino al reload.
     const observer = new MutationObserver(() => {
-      const docTheme = getDocumentTheme();
-      if (docTheme) {
-        setDetectedTheme(docTheme);
-      }
+      setDetectedTheme(getDocumentTheme() ?? getSystemTheme());
     });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class", "data-theme"],
+      attributeFilter: ["class", "data-ap-theme", "data-theme"],
     });
 
     // Also watch for system preference changes

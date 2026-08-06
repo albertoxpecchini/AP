@@ -5,24 +5,30 @@
 // niente di temi, di token o di preferenze dell'utente. Tutto quello che li
 // lega a questo sito sta qui:
 //
-//  · il TEMA — i componenti che disegnano su canvas (Aurora) vogliono colori
-//    veri, non var(--…): il WebGL non legge il CSS. Quindi le palette stanno
-//    qui in chiaro, derivate dai token di home.css, e si riagganciano a
-//    subscribeTheme(). Chi invece disegna in CSS (ShinyText) riceve
-//    direttamente le var e non ha bisogno di nessuna sottoscrizione.
+//  · il TEMA — chi disegna su canvas vuole colori veri, non var(--…): il canvas
+//    non legge il CSS. Quindi la palette sta qui in chiaro, derivata dai token
+//    di home.css, e si riaggancia a subscribeTheme().
 //  · il MOVIMENTO RIDOTTO — con prefers-reduced-motion attivo gli effetti non
 //    si montano nemmeno. Non è una scelta di gusto: è una richiesta esplicita
 //    dell'utente al sistema operativo, ed è la linea che il sito segue ovunque.
 //    Lo stato di riposo di ciascuno sta in home.css.
-//  · il CARICAMENTO — Aurora si porta dietro ogl (WebGL): entra da lazy(), così
-//    finisce in un chunk suo e non pesa sul primo caricamento della pagina.
+//
+// Qui dentro sono passati due effetti che adesso non ci sono più, e vale la
+// pena dire perché: erano gli ultimi due cicli che giravano senza che nessuno
+// li avesse chiesti.
+//
+//  · AURORA — uno shader WebGL (ogl) con un rAF che faceva avanzare uTime per
+//    sempre, montato su ogni pagina che usa PageBackdrop. Il gradiente fermo
+//    che home.css teneva come ripiego per il movimento ridotto era già
+//    indistinguibile a occhio dal primo fotogramma: adesso è la regola.
+//  · SHINYTEXT — due rAF che facevano ripassare una banda di luce sulle
+//    brandline ogni 3,4 secondi, per sempre. La luce c'è ancora, ma è la
+//    stessa che il titolo della hero prende dal puntatore (--gloss-x): passa
+//    quando passi tu. Vedi ShinyBrandline più sotto.
 // ─────────────────────────────────────────────────────────────────────────────
-import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import ClickSpark from "@/components/reactbits/ClickSpark";
-import ShinyText from "@/components/reactbits/ShinyText";
 import { currentTheme, subscribeTheme, type Theme } from "../theme/themeCore";
-
-const Aurora = lazy(() => import("@/components/reactbits/Aurora"));
 
 // ── Preferenze dell'utente ───────────────────────────────────────────────────
 
@@ -47,18 +53,7 @@ export function useTheme(): Theme {
   return theme;
 }
 
-// ── Palette del fondale ──────────────────────────────────────────────────────
-// Tre color-stop, da sinistra a destra. Il verde centrale è --sb-brand
-// (hsl(153 60% 53%) → #3ECF8E); i due estremi sono la stessa tinta portata
-// verso il fondo della pagina, così la banda si spegne ai lati invece di
-// finire di netto. Se cambiano i token in home.css, vanno cambiati anche qui:
-// il canvas non li può leggere.
-const AURORA_STOPS: Record<Theme, string[]> = {
-  light: ["#dff5ea", "#3ECF8E", "#dff5ea"],
-  dark: ["#0d2a20", "#3ECF8E", "#0d2a20"],
-};
-
-/** Colore delle scintille. Anche questo deve essere un colore VERO: finisce in
+/** Colore delle scintille. Deve essere un colore VERO: finisce in
  *  ctx.strokeStyle, e il canvas 2D non sa cosa farsene di una var() CSS — la
  *  scarterebbe in silenzio lasciando il nero di default. Sul chiaro serve il
  *  verde scuro (--sb-brand-text), o le scintille sparirebbero sul bianco. */
@@ -67,26 +62,18 @@ const SPARK: Record<Theme, string> = { light: "#0a854e", dark: "#3ECF8E" };
 // ── ① Fondale della hero ─────────────────────────────────────────────────────
 
 /**
- * Aurora dentro .sb-bg, SOTTO la griglia tecnica. La griglia sopra è quello che
- * tiene il fondale legato al resto del sito invece di farlo sembrare uno
- * sfondo incollato sotto.
+ * La banda di colore dentro .sb-bg, SOTTO la griglia tecnica. La griglia sopra
+ * è quello che tiene il fondale legato al resto del sito invece di farlo
+ * sembrare uno sfondo incollato sotto.
  *
- * Con movimento ridotto non monta niente: resta il gradiente fermo che home.css
- * mette su .sb-aurora, che è lo stesso verde nella stessa posizione.
+ * È un div vuoto: il colore lo mette home.css (.sb-aurora) con un gradiente
+ * fermo, e il movimento del fondale — quel poco che serve — arriva dai due
+ * aloni di .sb-home, che seguono lo scroll e il puntatore. Resta un componente
+ * e non una riga di JSX perché è montato da sei pagine diverse via
+ * PageBackdrop, e il nome dice ancora cos'è.
  */
 export function AuroraBackdrop() {
-  const reduced = useReducedMotion();
-  const theme = useTheme();
-
-  return (
-    <div className="sb-aurora" aria-hidden="true">
-      {reduced ? null : (
-        <Suspense fallback={null}>
-          <Aurora colorStops={AURORA_STOPS[theme]} amplitude={0.9} blend={0.6} speed={0.6} />
-        </Suspense>
-      )}
-    </div>
-  );
+  return <div className="sb-aurora" aria-hidden="true" />;
 }
 
 /**
@@ -114,37 +101,29 @@ export function PageBackdrop() {
 // ── ② Le brandline ───────────────────────────────────────────────────────────
 
 /**
- * La banda di luce sulle due righe brand della home ("Surveyor & Website
- * Developer" nella hero, "Let's talk." nella CTA).
+ * La banda di luce sulle righe brand ("Surveyor & Website Developer" nella
+ * hero, "Let's talk." nella CTA, e le brandline di archivio, /mima, /me-stesso).
  *
- * I colori passano come var() dentro il gradiente — è legale, ed è il motivo
- * per cui qui non serve seguire il tema: le variabili cambiano da sole con
- * html.dark. Con movimento ridotto si rende il testo normale, senza gradiente.
+ * La luce non ripassa più da sola ogni 3,4 secondi con un requestAnimationFrame
+ * per riga: è la stessa che il titolo della hero prende dal puntatore. La banda
+ * sta dove sta il cursore nella finestra (--gloss-x, la scrive
+ * site/GlassMotion.tsx) — attraversi la pagina e le righe si illuminano al tuo
+ * passaggio, una dopo l'altra. Da fermo la luce è ferma anche lei, a metà riga.
+ *
+ * La firma è rimasta quella di prima, `delay` compreso ma inerte: quattro
+ * pagine chiamano questo componente e non c'era motivo di farle cambiare tutte
+ * per un parametro che non esiste più.
  */
 export function ShinyBrandline({
   text,
   className = "",
-  delay = 2.2,
 }: {
   text: string;
   className?: string;
-  /** Pausa fra una passata e l'altra, in secondi. Il default è lungo apposta:
-   *  una luce che ripassa di continuo su un titolo diventa un lampeggio. */
+  /** @deprecated Non serve più: la luce non ripassa a tempo, la porti tu. */
   delay?: number;
 }) {
-  const reduced = useReducedMotion();
-  if (reduced) return <span className={className}>{text}</span>;
-  return (
-    <ShinyText
-      text={text}
-      className={className}
-      color="var(--sb-shine-base)"
-      shineColor="var(--sb-shine-hi)"
-      speed={3.4}
-      delay={delay}
-      spread={110}
-    />
-  );
+  return <span className={`sb-shine ${className}`.trim()}>{text}</span>;
 }
 
 // ── ③ Scintille al click ─────────────────────────────────────────────────────

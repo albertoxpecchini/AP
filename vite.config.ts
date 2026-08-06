@@ -27,6 +27,20 @@ function triviaVersion(): string {
 }
 
 
+// Data dell'ultimo commit, in ISO (es. "2026-08-06"). È quella che il footer
+// mostra come "Updated": prima lì c'era un new Date() lato client, che però
+// scriveva SEMPRE la data di oggi — cioè diceva che il sito è stato aggiornato
+// oggi anche dopo mesi di fermo. Calcolata a build-time come triviaVersion().
+function buildDate(): string {
+  try {
+    const iso = execSync('git log -1 --format=%cI', { encoding: 'utf8' }).trim()
+    if (iso) return iso.slice(0, 10)
+  } catch {
+    /* git non disponibile: si ripiega sulla data di build */
+  }
+  return new Date().toISOString().slice(0, 10)
+}
+
 function figmaAssetResolver() {
   return {
     name: 'figma-asset-resolver',
@@ -250,11 +264,10 @@ export default defineConfig({
         // appesantiscono il primo accesso di chi non visita quella pagina. Vengono
         // messi in cache "al volo" la prima volta che si apre /sostieni (sotto).
         //
-        // Stessa logica per Aurora (il fondale WebGL della home, che si porta
-        // dietro ogl): è un effetto, non contenuto. Chi arriva con la
-        // riduzione del movimento attiva non lo scarica nemmeno, e non ha
-        // senso farglielo precaricare comunque al primo accesso.
-        globIgnores: ['**/three.module-*.js', '**/vanta.waves.min-*.js', '**/Aurora-*.js'],
+        // Qui c'era anche Aurora, il fondale WebGL della home (ogl). Non c'è
+        // più nessuno shader da scaricare: la banda di colore è un gradiente
+        // CSS e il fondale si muove con lo scroll e col puntatore.
+        globIgnores: ['**/three.module-*.js', '**/vanta.waves.min-*.js'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html',
         // Le rotte SPA non hanno estensione → prendono il fallback a index.html.
@@ -278,11 +291,10 @@ export default defineConfig({
         skipWaiting: true,
         runtimeCaching: [
           {
-            // three.js + Vanta (sfondo vivo di /sostieni) e Aurora + ogl (fondale
-            // della home): cache-first al primo utilizzo, poi locali per 30
-            // giorni come gli altri asset pesanti.
+            // three.js + Vanta (sfondo vivo di /sostieni): cache-first al primo
+            // utilizzo, poi locali per 30 giorni come gli altri asset pesanti.
             urlPattern: ({ url }) =>
-              /\/assets\/(three\.module|vanta\.waves\.min|Aurora)-.*\.js$/.test(url.pathname),
+              /\/assets\/(three\.module|vanta\.waves\.min)-.*\.js$/.test(url.pathname),
             handler: 'CacheFirst',
             options: {
               cacheName: 'ap-vendor-3d',
@@ -324,6 +336,8 @@ export default defineConfig({
   define: {
     // Esposta al client come stringa, es. "1.37".
     __TRIVIA_VERSION__: JSON.stringify(triviaVersion()),
+    // Data dell'ultimo commit in ISO, es. "2026-08-06" (footer "Updated").
+    __BUILD_DATE__: JSON.stringify(buildDate()),
   },
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.

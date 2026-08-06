@@ -13,8 +13,14 @@
 #  neutre bordate, timeline con nodi verdi, competenze su due colonne, footer
 #  con nome, numerazione pagina e albertopecchini.it.
 #
-#  Legge scripts/cv-data.<it|en|fr|de>.json (UTF-8) e genera un PDF per lingua:
-#  public/cv-alberto-pecchini-<loc>.pdf (+ copia IT -> cv-alberto-pecchini.pdf).
+#  Legge src/app/cv/data/cv.<it|en|fr|de>.json (UTF-8) e genera un PDF per
+#  lingua: public/cv-alberto-pecchini-<loc>.pdf (+ copia IT ->
+#  cv-alberto-pecchini.pdf).
+#
+#  ATTENZIONE: gli stessi JSON alimentano la pagina /cv (src/app/cv/), che è la
+#  forma "viva" del curriculum e da cui si stampa il PDF vero e proprio. Questo
+#  script resta per i PDF statici gia' linkati (archivio, link storici): se si
+#  cambiano i contenuti, cambiano in un posto solo.
 #
 #  Uso:  python3 scripts/build-cv.py            # tutte le lingue
 #        python3 scripts/build-cv.py it en      # solo alcune
@@ -30,7 +36,7 @@ from pathlib import Path
 from weasyprint import HTML
 
 ROOT = Path(__file__).resolve().parent.parent
-SCRIPTS = ROOT / "scripts"
+DATA = ROOT / "src" / "app" / "cv" / "data"
 PUBLIC = ROOT / "public"
 PHOTO = PUBLIC / "alberto-pecchini.jpg"
 LOCALES = ["it", "en", "fr", "de"]
@@ -315,7 +321,7 @@ body {{ background: var(--bg); }}
 
 
 def build_locale(loc: str, photo_uri: str) -> None:
-    data = json.loads((SCRIPTS / f"cv-data.{loc}.json").read_text("utf-8"))
+    data = json.loads((DATA / f"cv.{loc}.json").read_text("utf-8"))
     out = PUBLIC / f"cv-alberto-pecchini-{loc}.pdf"
     HTML(string=build_html(data, photo_uri), base_url=str(ROOT)).write_pdf(str(out))
     size_kb = out.stat().st_size / 1024

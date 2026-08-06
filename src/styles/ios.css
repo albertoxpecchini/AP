@@ -37,11 +37,7 @@ html.ios .it-header-slim-wrapper {
   padding-top: env(safe-area-inset-top);
 }
 
-/* ── 6. Safe area — footer e sezione contatti (home indicator) ── */
-html.ios .it-footer-main {
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-}
-
+/* ── 6. Safe area — sezione contatti (home indicator) ── */
 html.ios #contatti {
   padding-bottom: calc(3rem + env(safe-area-inset-bottom));
 }

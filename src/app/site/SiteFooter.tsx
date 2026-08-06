@@ -18,6 +18,14 @@ const DATE_LOCALE: Record<Lang, string> = {
   de: "de-DE",
 };
 
+// Data dell'ultimo commit, iniettata da Vite a build-time (vite.config.ts →
+// define.__BUILD_DATE__), formato "AAAA-MM-GG". Qui c'era un new Date() lato
+// client: scriveva sempre "oggi", quindi il footer si dichiarava aggiornato
+// anche dopo mesi in cui non era cambiato nulla.
+declare const __BUILD_DATE__: string | undefined;
+const BUILD_DATE =
+  typeof __BUILD_DATE__ !== "undefined" ? __BUILD_DATE__ : null;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Footer condiviso da TUTTE le pagine (/...) — replica del footer di Supabase
 // nella grammatica .sb- della home: colonna identità+social a sinistra (come
@@ -41,13 +49,17 @@ export default function SiteFooter() {
   const footRef = useRef<HTMLElement | null>(null);
   useFootMotion(footRef);
 
-  const now = new Date();
-  const updated = now.toLocaleDateString(DATE_LOCALE[lang], {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-  const year = now.getFullYear();
+  // "T00:00:00" esplicito: senza orario la stringa "AAAA-MM-GG" viene letta
+  // come UTC e a ovest di Greenwich la data mostrata slitterebbe al giorno prima.
+  const updated = (BUILD_DATE ? new Date(`${BUILD_DATE}T00:00:00`) : new Date())
+    .toLocaleDateString(DATE_LOCALE[lang], {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  // Il copyright è l'anno corrente, non quello della build: un sito fermo da
+  // dicembre non deve mostrare l'anno vecchio a gennaio.
+  const year = new Date().getFullYear();
 
   return (
     <footer className="sb-home sb-foot" ref={footRef}>
