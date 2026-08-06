@@ -616,7 +616,7 @@ export default function Instagram() {
           <Link to="/" className="sb-nav-brand">
             <img src="/favicon.svg" alt="" width={28} height={28} />
             <span className="sb-nav-brand-name" translate="no">Alberto Pecchini</span>
-            <span className="sb-ig-tagline">Designer &amp; Front-end Developer</span>
+            <span className="sb-ig-tagline">Surveyor &amp; Website Developer</span>
           </Link>
           <div className="sb-nav-right">
             <button

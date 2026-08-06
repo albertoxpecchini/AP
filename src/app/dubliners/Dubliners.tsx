@@ -128,7 +128,7 @@ export default function Dubliners() {
               </span>
               <span className="db-brand-text">
                 <span className="db-brand-title">Alberto Pecchini</span>
-                <span className="db-brand-tagline">Designer &amp; Front-end Developer</span>
+                <span className="db-brand-tagline">Surveyor &amp; Website Developer</span>
               </span>
             </Link>
             <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">

@@ -11,7 +11,9 @@
 //    lo scroll, così sotto ogni card passa colore diverso man mano che scendi.
 // ② Tilt — la card si inclina verso il cursore e il rim si sposta di
 //    conseguenza.
-// ③ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
+// ③ Quello che il puntatore illumina — rim, alone, lucido del titolo.
+// ④ Pozza d'acqua sui quadratini dei commit (site/puddle.ts).
+// ⑤ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
 //
 // Regole, le stesse di site/homeMotion.ts:
 //  · un solo gsap.matchMedia() proprietario, revert() al dismount;
@@ -27,6 +29,7 @@
 import { useEffect } from "react";
 import type { RefObject } from "react";
 import { gsap } from "gsap";
+import { attachPuddles } from "./puddle";
 
 /** Quanto slittano gli aloni fra cima e fondo della pagina. Volutamente poco:
  *  è un cambio di luce dietro il vetro, non un fondale che scorre. */
@@ -195,22 +198,32 @@ export default function GlassMotion() {
       };
     });
 
-    // ── ③ Alone che segue il puntatore — solo sulle pagine interne ──────────
-    // Sulla home l'alone ce l'hanno solo le sette card prodotti, avvolte una
-    // per una dal componente React Bits (components/reactbits/SpotlightCard).
-    // Sulle pagine interne i pannelli SONO il contenuto: avvolgerli tutti in
-    // JSX, pagina per pagina, sarebbe stata un'impalcatura enorme per una cosa
-    // che il puntatore risolve da solo. Stessa tecnica del componente — due
-    // variabili CSS e il gradiente fermo nel foglio di stile (vedi
-    // `.sb-home--fx .sb-panel::after` in home.css) — ma per delega, come il
-    // tilt qui sopra e per le stesse ragioni.
+    // ── ③ Quello che il puntatore illumina ─────────────────────────────────
+    // Un solo pointermove delegato, una sola scrittura per frame, tre effetti
+    // che escono dallo stesso calcolo:
     //
-    // Acceso è sempre e solo UN pannello: quello sotto il cursore. Non è
-    // l'alone che era stato tolto dalla home, che si accendeva su una card
-    // dopo l'altra mentre scorrevi e ridisegnava gradienti grandi a ogni frame.
+    //  · il RIM del vetro (tutti i .sb-panel del sito). Il bordo da 1px di
+    //    .sb-panel è un gradiente, e finora il suo angolo era fisso a 160°:
+    //    la luce arrivava sempre da in alto a sinistra, anche quando il
+    //    puntatore era dall'altra parte. Adesso l'angolo lo scrive questo
+    //    ciclo, e il lato illuminato è quello da cui arrivi. Costa una
+    //    variabile CSS: il gradiente resta fermo nel foglio di stile.
+    //  · l'ALONE (solo .sb-home--fx .sb-panel, cioè le pagine interne, dove i
+    //    pannelli SONO il contenuto). Sulla home ce l'hanno già le sette card
+    //    prodotti, avvolte una per una da components/reactbits/SpotlightCard:
+    //    accenderlo anche qui vorrebbe dire dipingerlo due volte sulla stessa
+    //    card. Acceso è sempre e solo UN pannello, quello sotto il cursore —
+    //    non è l'alone tolto a suo tempo dalla home, che si accendeva su una
+    //    card dopo l'altra mentre scorrevi.
+    //  · la STRISCIA DI LUCE sul titolo della hero, via --gloss-x su <html>.
+    //    Sta sulla radice e non sull'h1 apposta: così non serve cercare
+    //    l'elemento a ogni frame, e l'eredità fa il resto. Stesso mestiere di
+    //    --sb-drift qui sopra.
     mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
+      const root = document.documentElement;
       let frame = 0;
       let lit: HTMLElement | null = null;
+      let litGlows = false;
       let clientX = 0;
       let clientY = 0;
 
@@ -218,26 +231,34 @@ export default function GlassMotion() {
         if (!el) return;
         el.style.removeProperty("--spot-x");
         el.style.removeProperty("--spot-y");
+        el.style.removeProperty("--rim-angle");
       };
 
       const write = () => {
         frame = 0;
+        root.style.setProperty("--gloss-x", `${(clientX / window.innerWidth) * 100}%`);
         if (!lit) return;
         const r = lit.getBoundingClientRect();
+        // Angolo puntatore → centro, in gradi orari a partire dall'alto; +180
+        // perché in un linear-gradient l'angolo è il verso in cui la sfumatura
+        // VA, mentre il colore chiaro sta all'inizio: la luce è dietro.
+        const deg = (Math.atan2(clientX - (r.left + r.width / 2), r.top + r.height / 2 - clientY) * 180) / Math.PI;
+        lit.style.setProperty("--rim-angle", `${(deg + 540) % 360}deg`);
+        if (!litGlows) return;
         lit.style.setProperty("--spot-x", `${clientX - r.left}px`);
         lit.style.setProperty("--spot-y", `${clientY - r.top}px`);
       };
 
       const onMove = (e: PointerEvent) => {
         const target = e.target as HTMLElement | null;
-        // closest() con un selettore composto: il pannello vale solo se sta
-        // dentro una pagina che ha chiesto gli effetti (.sb-home--fx).
-        const panel = target?.closest?.(".sb-home--fx .sb-panel") as HTMLElement | null;
+        const panel = target?.closest?.(".sb-home .sb-panel") as HTMLElement | null;
         if (panel !== lit) {
           clear(lit);
           lit = panel;
+          // Deciso una volta all'ingresso, non a ogni frame: l'alone è roba
+          // delle sole pagine interne (vedi sopra).
+          litGlows = !!panel?.closest(".sb-home--fx");
         }
-        if (!lit) return;
         clientX = e.clientX;
         clientY = e.clientY;
         // Una scrittura per frame, non una per movimento del puntatore.
@@ -250,9 +271,18 @@ export default function GlassMotion() {
         if (frame) cancelAnimationFrame(frame);
         document.removeEventListener("pointermove", onMove);
         clear(lit);
+        root.style.removeProperty("--gloss-x");
         lit = null;
       };
     });
+
+    // ── ④ Pozza d'acqua sui quadratini ─────────────────────────────────────
+    // Vive tutta in site/puddle.ts; qui c'è solo il cancello. Si aggancia da
+    // sé ai [data-puddle] presenti e a quelli che arrivano dopo (il grafico
+    // del footer nasce da una fetch).
+    mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () =>
+      attachPuddles(),
+    );
 
     return () => mm.revert();
   }, []);

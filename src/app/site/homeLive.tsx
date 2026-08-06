@@ -19,36 +19,14 @@ function motionOK() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Hero — riga di stato "in diretta" + bottoni dei progetti in corso
+   Hero — bottoni dei progetti in corso
+
+   Qui c'era anche una riga di stato "in diretta" ("Available for new projects"
+   + l'orologio di Mantova, al secondo). È stata tolta: un cartello di
+   disponibilità sopra al nome dice quanto lavoro manca, non quanto se ne fa, e
+   l'orologio costava un render al secondo per un'informazione che nessuno era
+   venuto a cercare. La hero adesso apre sul titolo.
    ═══════════════════════════════════════════════════════════════════════════ */
-
-const clock = () =>
-  new Intl.DateTimeFormat("it-IT", {
-    timeZone: "Europe/Rome",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  }).format(new Date());
-
-export function LiveStatus() {
-  const [now, setNow] = useState(clock);
-
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(clock()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  return (
-    <p className="sb-live">
-      <span className="sb-live-dot" aria-hidden="true" />
-      <span className="sb-live-txt">Available for new projects</span>
-      <span className="sb-live-sep" aria-hidden="true" />
-      <span className="sb-live-clock" data-no-i18n translate="no">
-        Mantova {now}
-      </span>
-    </p>
-  );
-}
 
 /* I lavori in corso. Se ne vede uno alla volta: per aggiungerne un altro basta
    una riga qui sotto — la giostra si adatta da sola, e con una voce sola sta
@@ -602,10 +580,15 @@ export function CatCube() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Sezione open source — muro dei commit, fermo.
-   Prima un'onda di calore lo attraversava in continuazione: 119 celle in
-   animazione perenne, un ridisegno a ogni frame anche mentre si scorreva
-   dall'altra parte della pagina. Il muro dice già tutto da fermo.
+   Sezione open source — muro dei commit.
+
+   Da fermo resta fermo: l'onda di calore che lo attraversava in continuazione
+   (119 celle in animazione perenne, un ridisegno a ogni frame anche mentre si
+   scorreva dall'altra parte della pagina) non è tornata e non torna.
+
+   Quello che c'è adesso vive solo sotto il puntatore: data-puddle accende la
+   pozza d'acqua di site/puddle.ts, che esiste finché il cursore è dentro la
+   griglia e si spegne uscendo. Ferma, non costa niente.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const WEEKS = 17;
@@ -617,7 +600,7 @@ export function ContribGraph() {
 
   return (
     <div className="sb-contrib" aria-hidden="true">
-      <div className="sb-contrib-grid">
+      <div className="sb-contrib-grid" data-puddle>
         {Array.from({ length: WEEKS * DAYS }, (_, i) => (
           <span key={i} className="sb-cell" data-lv={level(i)} />
         ))}
@@ -631,7 +614,7 @@ export function ContribGraph() {
           </b>{" "}
           commits
         </span>
-        <span className="sb-contrib-legend">
+        <span className="sb-contrib-legend" data-puddle>
           <i data-lv="0" />
           <i data-lv="1" />
           <i data-lv="2" />

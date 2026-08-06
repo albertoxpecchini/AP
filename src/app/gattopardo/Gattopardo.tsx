@@ -117,7 +117,7 @@ export default function Gattopardo() {
               </span>
               <span className="gp-brand-text">
                 <span className="gp-brand-title">Alberto Pecchini</span>
-                <span className="gp-brand-tagline">Designer &amp; Front-end Developer</span>
+                <span className="gp-brand-tagline">Surveyor &amp; Website Developer</span>
               </span>
             </Link>
             <Link to="/" className="btn btn-outline-light btn-sm fw-semibold d-inline-flex align-items-center">

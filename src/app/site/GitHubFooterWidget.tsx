@@ -18,17 +18,18 @@ import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 // Coerente con il footer Supabase-style: prefisso .sb-gh, token .sb- della home
 // (tema chiaro/scuro nativo), multilingua senza motore i18n (marcato
 // `data-no-i18n`, si traduce da sé leggendo la lingua attiva), cache locale per
-// non martellare le API (non-auth = 60 richieste/ora/IP): il logo/avatar usa un
-// URL diretto (non conta sulla quota) e resta sempre visibile; solo le
-// statistiche extra spariscono elegantemente se la fetch fallisce.
+// non martellare le API (non-auth = 60 richieste/ora/IP): il logo è il marchio
+// del sito servito in locale, quindi resta sempre visibile; solo le statistiche
+// extra spariscono elegantemente se la fetch fallisce.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── CONFIG ───────────────────────────────────────────────────────────────────
 const GITHUB_USERNAME = "albertoxpecchini";
-// Avatar via URL diretto (non API REST): non consuma la quota di 60 richieste/ora
-// per IP, quindi il logo resta visibile anche quando il resto del widget fallisce
-// per rate limit.
-const AVATAR_URL = `https://github.com/${GITHUB_USERNAME}.png`;
+// Il marchio del sito al posto della foto profilo di GitHub: qui il widget parla
+// per conto del sito, non per conto dell'account. In più è un file locale — non
+// dipende da nessuna richiesta esterna né dalla quota API (60 richieste/ora per
+// IP), quindi resta visibile anche quando il resto del widget fallisce.
+const AVATAR_URL = "/favicon.svg";
 const PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
 const FEATURED_REPO = "AP"; // repo in evidenza (owner = username). "" per nasconderlo.
 const CONTRIB_API = (u: string) => `https://github-contributions-api.jogruber.de/v4/${u}?y=last`;
@@ -390,6 +391,7 @@ export default function GitHubFooterWidget() {
                 className="sb-gh__bars"
                 role="img"
                 aria-label={`${contrib.yearTotal} ${s.commits} · ${s.lastYear}`}
+                data-puddle
               >
                 {series.map((d, i) => {
                   const h = d.count === 0 ? 3 : Math.round(5 + (d.count / sparkMax) * 23);
@@ -458,8 +460,10 @@ export default function GitHubFooterWidget() {
 
         .sb-gh__profile { display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none; color: var(--sb-fg); }
         .sb-gh__profile:hover .sb-gh__user { color: var(--sb-brand-text); }
+        /* Raggio piccolo e non tondo: il marchio .ap è un quadrato pieno, e un
+           ritaglio circolare gli mangerebbe i quattro angoli. */
         .sb-gh__avatar {
-          width: 22px; height: 22px; border-radius: 50%;
+          width: 22px; height: 22px; border-radius: 5px;
           border: 1px solid var(--sb-border-stronger); flex-shrink: 0;
         }
         .sb-gh__user { font-weight: 500; }

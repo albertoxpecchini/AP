@@ -25,6 +25,7 @@ import {
   SiPinterest,
   SiReddit,
   SiTwitch,
+  SiKick,
   SiSpotify,
   SiThreads,
   SiSteam,
@@ -60,6 +61,7 @@ export const SOCIALS: { name: string; Icon: ComponentType<{ size?: number }>; hr
   { name: "Pinterest", Icon: SiPinterest, href: "https://www.pinterest.com/albertoxpecchini" },
   { name: "Reddit", Icon: SiReddit, href: "https://www.reddit.com/user/yungpzkko" },
   { name: "Twitch", Icon: SiTwitch, href: "https://www.twitch.tv/pzkko" },
+  { name: "Kick", Icon: SiKick, href: "https://kick.com/albertoxpecchini" },
   { name: "Spotify", Icon: SiSpotify, href: "https://open.spotify.com/user/qeefs44bv4bpoa7dk8epagrxf" },
   { name: "Threads", Icon: SiThreads, href: "https://www.threads.net/@albertoxpecchini" },
   { name: "Steam", Icon: SiSteam, href: "https://steamcommunity.com/profiles/76561198971719489/" },
@@ -171,7 +173,7 @@ export const PASSIONI: Interest[] = [
 ];
 
 export const SKILLS: { emoji: string; title: string; items: string[] }[] = [
-  { emoji: "🖥️", title: "Front-end development", items: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"] },
+  { emoji: "🖥️", title: "Website development", items: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"] },
   { emoji: "🎨", title: "Design & UX", items: ["UI/UX Design", "Figma", "Design System", "Responsive Design", "Motion"] },
   { emoji: "🤖", title: "AI-assisted development", items: ["Claude Code", "Codex", "GitHub Copilot", "Gemini"] },
   { emoji: "🛠️", title: "Tools & Workflow", items: ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "Supabase"] },

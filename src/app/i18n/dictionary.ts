@@ -45,23 +45,23 @@ const RAW: Record<string, Entry> = {
   Contact: { it: "Contatti", fr: "Contact", de: "Kontakt" },
 
   // — Header / brand —
-  "Designer & Front-end Developer": {
-    it: "Designer e sviluppatore front-end",
-    fr: "Designer & développeur front-end",
-    de: "Designer & Frontend-Entwickler",
+  "Surveyor & Website Developer": {
+    it: "Perito geometra e sviluppatore website",
+    fr: "Géomètre & développeur de sites web",
+    de: "Vermessungstechniker & Website-Entwickler",
   },
   Local: { it: "Locale", fr: "Local", de: "Lokal" },
 
   // — Hero —
-  "💻 Front-end Developer · CAT Student": {
-    it: "💻 Sviluppatore front-end · Studente CAT",
-    fr: "💻 Développeur front-end · Étudiant CAT",
-    de: "💻 Frontend-Entwickler · CAT-Schüler",
+  "💻 Website Developer · CAT Student": {
+    it: "💻 Sviluppatore website · Studente CAT",
+    fr: "💻 Développeur de sites web · Étudiant CAT",
+    de: "💻 Website-Entwickler · CAT-Schüler",
   },
-  "High-school senior & front-end developer behind": {
-    it: "Studente dell'ultimo anno e sviluppatore front-end dietro a",
-    fr: "Lycéen en terminale et développeur front-end derrière",
-    de: "Schüler der Abschlussklasse und Frontend-Entwickler hinter",
+  "Surveyor & website developer behind": {
+    it: "Perito geometra e sviluppatore website dietro a",
+    fr: "Géomètre et développeur de sites web derrière",
+    de: "Vermessungstechniker und Website-Entwickler hinter",
   },
   "— a web game on the history of architecture — and client websites like": {
     it: "— un web game sulla storia dell'architettura — e siti web per clienti come",
@@ -125,10 +125,10 @@ const RAW: Record<string, Entry> = {
   "Support me": { it: "Sostienimi", fr: "Soutenez-moi", de: "Unterstütze mich" },
 
   // — Footer (home + footer condiviso) —
-  "Designer & Developer · ITT «Carlo d'Arco» — Mantua": {
-    it: "Designer e sviluppatore · ITT «Carlo d'Arco» — Mantova",
-    fr: "Designer & développeur · ITT «Carlo d'Arco» — Mantoue",
-    de: "Designer & Entwickler · ITT «Carlo d'Arco» — Mantua",
+  "Surveyor & Website Developer · ITT «Carlo d'Arco» — Mantua": {
+    it: "Perito geometra e sviluppatore website · ITT «Carlo d'Arco» — Mantova",
+    fr: "Géomètre & développeur de sites web · ITT «Carlo d'Arco» — Mantoue",
+    de: "Vermessungstechniker & Website-Entwickler · ITT «Carlo d'Arco» — Mantua",
   },
   "Alberto Pecchini — All rights reserved": {
     it: "Alberto Pecchini — Tutti i diritti riservati",
