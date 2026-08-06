@@ -15,9 +15,9 @@
     "runningTitle": "Curriculum Vitae"
   },
   "name": "Alberto Pecchini",
-  "role": "Designer & Front-end Developer",
-  "tagline": "Studente di Costruzioni e gestione del territorio · Front-end Developer · Disponibile per web design, sviluppo front-end e branding",
-  "profile": "Diplomato CAT (Costruzioni, Ambiente e Territorio) e studente di Costruzioni e gestione del territorio all'Università di Modena e Reggio Emilia, front-end developer & designer autodidatta. Unisco la formazione tecnica su progettazione e disegno con la passione per il web, costruendo interfacce moderne, veloci e curate nei dettagli. Lavoro con React, Next.js, TypeScript, Tailwind CSS e animazioni GSAP, con attenzione a user experience, tipografia e design minimalista, e integro l'intelligenza artificiale nel mio workflow di sviluppo.",
+  "role": "Perito geometra e sviluppatore website",
+  "tagline": "Studente di Costruzioni e gestione del territorio · Sviluppatore website · Disponibile per web design, sviluppo di siti web e branding",
+  "profile": "Diplomato CAT (Costruzioni, Ambiente e Territorio) e studente di Costruzioni e gestione del territorio all'Università di Modena e Reggio Emilia, perito geometra e sviluppatore website autodidatta. Unisco la formazione tecnica su progettazione e disegno con la passione per il web, costruendo interfacce moderne, veloci e curate nei dettagli. Lavoro con React, Next.js, TypeScript, Tailwind CSS e animazioni GSAP, con attenzione a user experience, tipografia e design minimalista, e integro l'intelligenza artificiale nel mio workflow di sviluppo.",
   "wishlist": "Fondare una mia testata giornalistica: andare sul campo e raccontare storie vere, senza filtri.",
   "privacy": "Autorizzo il trattamento dei dati personali contenuti nel presente CV ai sensi del Reg. UE 2016/679 (GDPR) e del D.lgs. 196/2003.",
   "contacts": [
@@ -34,7 +34,7 @@
   "strengths": ["Problem solving", "Autonomia", "Coordinamento", "Affidabilità", "Cura del dettaglio", "Apprendimento rapido"],
   "availability": ["Stage e collaborazioni", "Progetti freelance", "Lavoro da remoto"],
   "skills": [
-    ["Sviluppo front-end", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
+    ["Sviluppo website", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
     ["Design & UX", ["UI/UX Design", "Figma", "Design System", "Responsive Design", "Motion"]],
     ["AI & sviluppo assistito", ["Claude Code", "Codex", "GitHub Copilot", "Gemini"]],
     ["Strumenti & Workflow", ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "Supabase"]],
@@ -110,21 +110,21 @@
     {
       "period": "apr 2026",
       "title": "Rivalta sul Mincio — Sito web",
-      "role": "Web design & sviluppo front-end",
+      "role": "Web design & sviluppo website",
       "desc": "Sito istituzionale e turistico. Design editoriale minimalista, tipografia curata, palette calda, animazioni avanzate con GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Bento grid senza gutter, composizione guidata dalle immagini. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
       "link": "rivaltasulmincio.it"
     },
     {
       "period": "apr 2026",
       "title": "Cascina Fontana — Sito web",
-      "role": "Web design & sviluppo front-end",
+      "role": "Web design & sviluppo website",
       "desc": "Analisi delle esigenze del cliente, architettura dell'informazione, interfaccia responsive ottimizzata per presentare prodotti e servizi. Collaborazione diretta con il cliente sui contenuti. Stack: React, TypeScript, Tailwind CSS.",
       "link": "cascinafontana.xyz"
     },
     {
       "period": "2026",
       "title": "Sito portfolio personale",
-      "role": "Design & sviluppo front-end · «dark premium»",
+      "role": "Design & sviluppo website · «dark premium»",
       "desc": "Portfolio personale e hub di giochi web. Design system «dark premium», animazioni in entrata, piena accessibilità. Deploy continuo su Vercel. Stack: React, TypeScript, Vite, Tailwind CSS, Supabase.",
       "link": "albertopecchini.it"
     },

@@ -15,9 +15,9 @@
     "runningTitle": "Curriculum Vitae"
   },
   "name": "Alberto Pecchini",
-  "role": "Designer & développeur front-end",
-  "tagline": "Étudiant en Construction et gestion du territoire · Développeur front-end · Disponible pour web design, développement front-end et branding",
-  "profile": "Diplômé CAT (Construction, Environnement et Territoire) et étudiant en Construction et gestion du territoire à l'Université de Modène et Reggio d'Émilie, développeur front-end & designer autodidacte. J'allie la formation technique en conception et dessin à la passion du web, en construisant des interfaces modernes, rapides et soignées dans les détails. Je travaille avec React, Next.js, TypeScript, Tailwind CSS et les animations GSAP, avec une attention à l'expérience utilisateur, à la typographie et au design minimaliste, et j'intègre l'intelligence artificielle dans mon workflow de développement.",
+  "role": "Géomètre & développeur de sites web",
+  "tagline": "Étudiant en Construction et gestion du territoire · Développeur de sites web · Disponible pour web design, développement de sites web et branding",
+  "profile": "Diplômé CAT (Construction, Environnement et Territoire) et étudiant en Construction et gestion du territoire à l'Université de Modène et Reggio d'Émilie, géomètre et développeur de sites web autodidacte. J'allie la formation technique en conception et dessin à la passion du web, en construisant des interfaces modernes, rapides et soignées dans les détails. Je travaille avec React, Next.js, TypeScript, Tailwind CSS et les animations GSAP, avec une attention à l'expérience utilisateur, à la typographie et au design minimaliste, et j'intègre l'intelligence artificielle dans mon workflow de développement.",
   "wishlist": "Fonder mon propre média : aller sur le terrain et raconter des histoires vraies, sans filtres.",
   "privacy": "J'autorise le traitement des données personnelles contenues dans ce CV conformément au Règl. UE 2016/679 (RGPD) et au D.lgs. italien 196/2003.",
   "contacts": [
@@ -34,7 +34,7 @@
   "strengths": ["Résolution de problèmes", "Autonomie", "Coordination", "Fiabilité", "Souci du détail", "Apprentissage rapide"],
   "availability": ["Stages et collaborations", "Projets freelance", "Travail à distance"],
   "skills": [
-    ["Développement front-end", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
+    ["Développement de sites web", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
     ["Design & UX", ["UI/UX Design", "Figma", "Design System", "Responsive Design", "Motion"]],
     ["IA & développement assisté", ["Claude Code", "Codex", "GitHub Copilot", "Gemini"]],
     ["Outils & workflow", ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "Supabase"]],
@@ -110,21 +110,21 @@
     {
       "period": "avr 2026",
       "title": "Rivalta sul Mincio — Site web",
-      "role": "Web design & développement front-end",
+      "role": "Web design & développement de sites web",
       "desc": "Site institutionnel et touristique. Design éditorial minimaliste, typographie soignée, palette chaude, animations avancées avec GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Grille bento sans gouttière, composition guidée par les images. Stack : Next.js, TypeScript, GSAP, Tailwind CSS.",
       "link": "rivaltasulmincio.it"
     },
     {
       "period": "avr 2026",
       "title": "Cascina Fontana — Site web",
-      "role": "Web design & développement front-end",
+      "role": "Web design & développement de sites web",
       "desc": "Analyse des besoins du client, architecture de l'information, interface responsive optimisée pour présenter produits et services. Collaboration directe avec le client sur les contenus. Stack : React, TypeScript, Tailwind CSS.",
       "link": "cascinafontana.xyz"
     },
     {
       "period": "2026",
       "title": "Site portfolio personnel",
-      "role": "Design & développement front-end · « dark premium »",
+      "role": "Design & développement de sites web · « dark premium »",
       "desc": "Portfolio personnel et hub de jeux web. Design system « dark premium », animations d'entrée, accessibilité complète. Déploiement continu sur Vercel. Stack : React, TypeScript, Vite, Tailwind CSS, Supabase.",
       "link": "albertopecchini.it"
     },

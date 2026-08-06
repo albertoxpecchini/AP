@@ -42,8 +42,7 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
         // ── ① Entrata della hero, in cascata ──────────────────────────────
         const intro = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.8 } });
         intro
-          .from(".sb-live", { autoAlpha: 0, y: -10, duration: 0.6 })
-          .from(".sb-hero-title span", { autoAlpha: 0, y: 26, stagger: 0.09 }, "-=0.35")
+          .from(".sb-hero-title span", { autoAlpha: 0, y: 26, stagger: 0.09 })
           .from(".sb-hero-copy p", { autoAlpha: 0, y: 16, stagger: 0.08 }, "-=0.55")
           .from(".sb-hero-actions > *", { autoAlpha: 0, y: 12, stagger: 0.08 }, "-=0.5");
 
@@ -82,15 +81,16 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
       //     Spostamento limitato a pochi pixel: deve sembrare attrazione,
       //     non un bersaglio che scappa quando provi a cliccarlo.
       //
-      //     Qui NON c'è più il riflesso che seguiva il puntatore sui pannelli:
-      //     scorrendo la pagina il cursore attraversa una card dopo l'altra e
-      //     ognuna si accendeva sotto di lui — un lampeggio continuo, e un
-      //     ridisegno di gradienti grandi a ogni movimento del mouse.
+      //     Il riflesso sui pannelli non sta qui: è delegato e globale, una
+      //     scrittura per frame su UN pannello solo (site/GlassMotion.tsx ③).
+      //     Quello che era stato tolto — e che non torna — era l'alone che si
+      //     accendeva su una card dopo l'altra mentre scorrevi, ridisegnando
+      //     gradienti grandi quanto la card a ogni movimento del mouse.
       mm.add("(hover: hover) and (pointer: fine)", () => {
         const cleanups: (() => void)[] = [];
 
         const magnets = gsap.utils
-          .toArray<HTMLElement>(".sb-btn--primary, .sb-tech", scope)
+          .toArray<HTMLElement>(".sb-btn--primary, .sb-btn--secondary, .sb-tech", scope)
           .filter((btn) => !btn.closest(".sb-foot"));
         magnets.forEach((btn) => {
           const xTo = gsap.quickTo(btn, "x", { duration: 0.45, ease: "power3" });

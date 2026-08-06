@@ -15,9 +15,9 @@
     "runningTitle": "Curriculum Vitae"
   },
   "name": "Alberto Pecchini",
-  "role": "Designer & Front-end Developer",
-  "tagline": "Construction and Land Management student · Front-end Developer · Available for web design, front-end development and branding",
-  "profile": "CAT graduate (Construction, Environment and Land Surveying) and Construction and Land Management student at the University of Modena and Reggio Emilia, self-taught front-end developer & designer. I combine technical training in design and drafting with a passion for the web, building modern, fast, carefully detailed interfaces. I work with React, Next.js, TypeScript, Tailwind CSS and GSAP animations, with attention to user experience, typography and minimalist design, and I integrate artificial intelligence into my development workflow.",
+  "role": "Surveyor & Website Developer",
+  "tagline": "Construction and Land Management student · Website Developer · Available for web design, website development and branding",
+  "profile": "CAT graduate (Construction, Environment and Land Surveying) and Construction and Land Management student at the University of Modena and Reggio Emilia, surveyor and self-taught website developer. I combine technical training in design and drafting with a passion for the web, building modern, fast, carefully detailed interfaces. I work with React, Next.js, TypeScript, Tailwind CSS and GSAP animations, with attention to user experience, typography and minimalist design, and I integrate artificial intelligence into my development workflow.",
   "wishlist": "Founding my own news outlet: going into the field and telling true stories, unfiltered.",
   "privacy": "I authorise the processing of the personal data contained in this CV pursuant to EU Reg. 2016/679 (GDPR) and Italian Legislative Decree 196/2003.",
   "contacts": [
@@ -34,7 +34,7 @@
   "strengths": ["Problem solving", "Autonomy", "Coordination", "Reliability", "Attention to detail", "Fast learner"],
   "availability": ["Internships and collaborations", "Freelance projects", "Remote work"],
   "skills": [
-    ["Front-end development", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
+    ["Website development", ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS", "GSAP"]],
     ["Design & UX", ["UI/UX Design", "Figma", "Design Systems", "Responsive Design", "Motion"]],
     ["AI & assisted development", ["Claude Code", "Codex", "GitHub Copilot", "Gemini"]],
     ["Tools & workflow", ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "Supabase"]],
@@ -110,21 +110,21 @@
     {
       "period": "Apr 2026",
       "title": "Rivalta sul Mincio — Website",
-      "role": "Web design & front-end development",
+      "role": "Web design & website development",
       "desc": "Institutional and tourism website. Minimalist editorial design, refined typography, warm palette, advanced animations with GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Gutterless bento grid, image-driven composition. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
       "link": "rivaltasulmincio.it"
     },
     {
       "period": "Apr 2026",
       "title": "Cascina Fontana — Website",
-      "role": "Web design & front-end development",
+      "role": "Web design & website development",
       "desc": "Client needs analysis, information architecture, responsive interface optimised to present products and services. Direct collaboration with the client on content. Stack: React, TypeScript, Tailwind CSS.",
       "link": "cascinafontana.xyz"
     },
     {
       "period": "2026",
       "title": "Personal portfolio website",
-      "role": "Design & front-end development · «dark premium»",
+      "role": "Design & website development · «dark premium»",
       "desc": "Personal portfolio and web game hub. «Dark premium» design system, entrance animations, full accessibility. Continuous deployment on Vercel. Stack: React, TypeScript, Vite, Tailwind CSS, Supabase.",
       "link": "albertopecchini.it"
     },

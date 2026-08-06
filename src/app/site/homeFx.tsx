@@ -114,7 +114,7 @@ export function PageBackdrop() {
 // ── ② Le brandline ───────────────────────────────────────────────────────────
 
 /**
- * La banda di luce sulle due righe brand della home ("Designer & Front-end
+ * La banda di luce sulle due righe brand della home ("Surveyor & Website
  * Developer" nella hero, "Let's talk." nella CTA).
  *
  * I colori passano come var() dentro il gradiente — è legale, ed è il motivo

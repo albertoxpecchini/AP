@@ -64,7 +64,7 @@ const INTEREST_ICON: Record<string, (p: IcProps) => JSX.Element> = {
 const iconFor = (label: string) => INTEREST_ICON[label] ?? IcSparkle;
 
 const SKILL_ICON: Record<string, (p: IcProps) => JSX.Element> = {
-  "Front-end development": IcCode,
+  "Website development": IcCode,
   "Design & UX": IcPen,
   "AI-assisted development": IcSparkle,
   "Tools & Workflow": IcWrench,
@@ -201,7 +201,7 @@ export default function Bio() {
           <Link to="/" className="sb-nav-brand">
             <img src="/favicon.svg" alt="" width={28} height={28} />
             <span className="sb-nav-brand-name" translate="no">Alberto Pecchini</span>
-            <span className="sb-bio-tagline">Designer &amp; Front-end Developer</span>
+            <span className="sb-bio-tagline">Surveyor &amp; Website Developer</span>
           </Link>
           <Link to="/" className="sb-btn sb-btn--sm sb-btn--secondary sb-bio-back">
             <IcArrowLeft size={15} /> Back to home
@@ -219,7 +219,7 @@ export default function Bio() {
                   <span>Hi, I'm Alberto.</span>
                 </h1>
                 <div className="sb-hero-copy" style={{ marginTop: "1.2rem" }}>
-                  <p><strong>Designer &amp; front-end developer, raised between Rivalta sul Mincio and Mantua.</strong></p>
+                  <p><strong>Surveyor &amp; website developer, raised between Rivalta sul Mincio and Mantua.</strong></p>
                   <p>Turning ideas into elegant, fast digital experiences.</p>
                 </div>
               </div>
@@ -257,8 +257,8 @@ export default function Bio() {
                 I hold a <strong>CAT diploma</strong> — Construction, Environment and Territory —
                 from the «Carlo d'Arco» Technical Institute in Mantua, and I'm now studying{" "}
                 <strong>Construction and Land Management</strong> at the University of Modena and
-                Reggio Emilia. Outside the classroom I'm a self-taught designer and front-end
-                developer: I build responsive, fast and polished interfaces with React, Next.js,
+                Reggio Emilia. Outside the classroom I'm a self-taught website developer: I
+                build responsive, fast and polished interfaces with React, Next.js,
                 TypeScript, Tailwind CSS and GSAP.
               </p>
               <p>

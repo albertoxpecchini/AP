@@ -53,7 +53,6 @@ import { AuroraBackdrop, ShinyBrandline, SparkGroup } from "./site/homeFx";
 import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import type { LogoItem } from "@/components/reactbits/LogoLoop";
 import {
-  LiveStatus,
   NowBuilding,
   BrowserMock,
   AaSwap,
@@ -162,13 +161,13 @@ const CV = [
   {
     period: "Apr 20, 2026",
     title: "Cascina Fontana — Website",
-    role: "Web design & front-end development",
+    role: "Web design & website development",
     desc: "Design and development of the official Cascina Fontana website. Analysis of the client's needs, definition of the information architecture and creation of a responsive, carefully designed interface optimised to present the company's products and services. Direct collaboration with the client to define the content. Stack: React, TypeScript, Tailwind CSS.",
   },
   {
     period: "Apr 27, 2026",
     title: "Rivalta sul Mincio — Website",
-    role: "Web design & front-end development",
+    role: "Web design & website development",
     desc: "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography, a warm colour palette and advanced animations via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Gapless bento grids and image-led composition for immersive visual storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
   },
   {
@@ -806,15 +805,14 @@ export default function App() {
              Nessun fondale suo: usa quello continuo della pagina. */}
         <section id="home" className="sb-hero">
           <div className="sb-container">
-            <LiveStatus />
             <div className="sb-hero-grid">
               <h1 className="sb-hero-title">
                 <span translate="no">Alberto Pecchini</span>
-                <ShinyBrandline text="Designer & Front-end Developer" className="sb-brandline" />
+                <ShinyBrandline text="Surveyor & Website Developer" className="sb-brandline" />
               </h1>
               <div className="sb-hero-copy">
                 <p>
-                  High-school senior &amp; front-end developer behind <strong translate="no">Trivia</strong> — a
+                  Surveyor &amp; website developer behind <strong translate="no">Trivia</strong> — a
                   web game on the history of architecture — and client websites like{" "}
                   <strong translate="no">Rivalta sul Mincio</strong> and{" "}
                   <strong translate="no">Cascina Fontana</strong>.
@@ -1285,7 +1283,7 @@ export default function App() {
                     </div>
                   </div>
                   <p className="sb-ghcard-bio">
-                    Designer &amp; front-end developer — Mantua, Italy. CAT diploma, now
+                    Surveyor &amp; website developer — Mantua, Italy. CAT diploma, now
                     studying Construction and Land Management.
                   </p>
                   <a

@@ -60,6 +60,19 @@
   --sb-glass-shadow: 0 10px 34px -14px rgba(0, 0, 0, 0.2);
   --sb-glass-sheen: rgba(255, 255, 255, 0.42);
 
+  /* ── Lucido del titolo ──────────────────────────────────────────────────
+     Il nome della hero non è più una tinta piatta: è una superficie. Sul
+     chiaro il nero non può schiarirsi verso l'alto senza sembrare sbiadito,
+     quindi la profondità va nell'altro verso — grigio ferro in cima, nero
+     pieno in fondo — e la luce arriva tutta dalla striscia mobile (--spec) e
+     dal filo bianco sotto le lettere (--edge). */
+  --sb-gloss-hi: #52565c;
+  --sb-gloss-base: #171717;
+  --sb-gloss-low: #050505;
+  --sb-gloss-spec: rgba(255, 255, 255, 0.5);
+  --sb-gloss-edge: rgba(255, 255, 255, 0.9);
+  --sb-gloss-halo: hsla(153, 60%, 40%, 0.16);
+
   min-height: 100vh;
   background: var(--sb-bg);
   color: var(--sb-fg);
@@ -106,6 +119,15 @@ html.dark .sb-home {
   --sb-glass-rim: rgba(255, 255, 255, 0.08);
   --sb-glass-shadow: 0 10px 38px -14px rgba(0, 0, 0, 0.65);
   --sb-glass-sheen: rgba(255, 255, 255, 0.1);
+
+  /* Al buio il verso si ribalta: bianco pieno in cima, grigio in fondo, e il
+     filo sotto le lettere diventa nero — è un'ombra incisa, non un riflesso. */
+  --sb-gloss-hi: #ffffff;
+  --sb-gloss-base: #ededed;
+  --sb-gloss-low: #8e9491;
+  --sb-gloss-spec: rgba(255, 255, 255, 0.95);
+  --sb-gloss-edge: rgba(0, 0, 0, 0.55);
+  --sb-gloss-halo: hsla(153, 60%, 53%, 0.2);
 }
 
 .sb-home ::selection { background: hsla(153, 60%, 53%, 0.35); }
@@ -350,11 +372,40 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 }
 .sb-btn--primary:hover { background: var(--sb-btn-bg-hover); border-color: var(--sb-brand); }
 .sb-btn--secondary {
+  position: relative;
   background: var(--sb-bg-alt);
   border-color: var(--sb-border-strong);
   color: var(--sb-fg);
 }
 .sb-btn--secondary:hover { background: var(--sb-surface-200); border-color: var(--sb-border-stronger); }
+
+/* Riflesso sui bottoni — la stessa banda di luce delle card (@keyframes
+   sb-sheen), stesso ritardo di 120 ms: passandoci sopra di corsa per arrivare
+   altrove l'animazione non fa in tempo a partire, e la fila di bottoni non
+   lampeggia. overflow:hidden perché la banda dev'essere tagliata dai bordi
+   arrotondati, non uscire nel testo accanto. */
+@media (hover: hover) and (pointer: fine) {
+  .sb-btn--primary,
+  .sb-btn--secondary { overflow: hidden; }
+  .sb-btn--primary::after,
+  .sb-btn--secondary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-130%);
+    background: linear-gradient(105deg, transparent 38%, var(--sb-glass-sheen) 50%, transparent 62%);
+  }
+  .sb-btn--primary:hover::after,
+  .sb-btn--secondary:hover::after {
+    animation: sb-sheen 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.12s 1;
+  }
+  /* Il contenuto sopra la banda, o l'etichetta finisce sotto la luce. */
+  .sb-btn--primary > *,
+  .sb-btn--secondary > * { position: relative; z-index: 1; }
+}
 .sb-btn--ghost { background: transparent; border-color: transparent; color: var(--sb-fg-light); }
 .sb-btn--ghost:hover { color: var(--sb-fg); background: var(--sb-overlay); }
 
@@ -386,28 +437,9 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   padding-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
-/* Riga di stato "in diretta": disponibilità + orologio di Mantova */
-.sb-live {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  margin: 0 0 1.5rem;
-  padding: 0.3rem 0.8rem 0.3rem 0.6rem;
-  border: 1px solid var(--sb-border-strong);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  font-size: 0.78rem;
-  color: var(--sb-fg-lighter);
-}
-.sb-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sb-brand); animation: sb-ping 2.2s ease-out infinite; }
-.sb-live-sep { width: 1px; height: 12px; background: var(--sb-border-strong); }
-.sb-live-clock {
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-variant-numeric: tabular-nums;
-  color: var(--sb-fg-muted);
-}
+/* La pillola di stato "in diretta" (disponibilità + orologio di Mantova) stava
+   qui, sopra al titolo. Tolta: vedi la testata di site/homeLive.tsx. Il
+   keyframe sb-ping resta — lo usa .sb-chip-dot. */
 
 /* Progetti in corso — una giostra a un posto solo: un bottone vero alla volta,
    che entra da sotto ed esce da sopra. La finestrella è alta quanto il bottone
@@ -470,12 +502,46 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-hero-title {
   margin: 0;
   font-size: clamp(2.3rem, 5.4vw, 3.4rem);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.03;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: var(--sb-fg);
 }
 .sb-hero-title span { display: block; }
+
+/* Il nome come superficie lucida.
+   Due strati di gradiente, tutti e due ritagliati dalle lettere:
+    · sotto, lo smusso verticale — dà lo spessore, sta fermo;
+    · sopra, una striscia di luce larga il doppio del titolo, che scorre con
+      il puntatore (--gloss-x, scritta una volta per frame da site/
+      GlassMotion.tsx). Ferma sta a metà, dove non dà fastidio.
+   La profondità NON è un text-shadow: con -webkit-text-fill-color:transparent
+   l'ombra del testo si disegna dietro alla scatola e sparisce. drop-shadow()
+   invece lavora sull'alpha già dipinto, quindi segue il profilo delle lettere.
+
+   Solo la prima riga: la seconda è la brandline, e la sua banda di luce se la
+   disegna da sé in JS (components/reactbits/ShinyText.tsx). */
+.sb-hero-title > span:first-child {
+  background-image:
+    linear-gradient(98deg, transparent 41%, var(--sb-gloss-spec) 50%, transparent 59%),
+    linear-gradient(180deg, var(--sb-gloss-hi) 0%, var(--sb-gloss-base) 48%, var(--sb-gloss-low) 100%);
+  background-size: 260% 100%, 100% 100%;
+  background-position: var(--gloss-x, 50%) 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 var(--sb-gloss-edge)) drop-shadow(0 10px 26px var(--sb-gloss-halo));
+}
+/* Senza background-clip:text le lettere resterebbero invisibili: meglio la
+   tinta piena di prima che un titolo che non c'è. */
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .sb-hero-title > span:first-child {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    filter: none;
+  }
+}
 .sb-hero-title .sb-brandline { color: var(--sb-brand); }
 .sb-hero-copy { max-width: 36rem; }
 .sb-hero-copy p { margin: 0 0 0.7rem; font-size: 1rem; line-height: 1.6; color: var(--sb-fg-lighter); }
@@ -497,23 +563,26 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 @media (min-width: 1280px) { .sb-card { grid-column: span 3; } .sb-card--lg { grid-column: span 6; } }
 
 /* Pannello di vetro con rim da 1px (marchio di fabbrica delle card).
-   Il bordo non è più una riga grigia uniforme: è un rim illuminato in alto a
-   sinistra che si spegne scendendo, come succede a una lastra vera sotto una
-   luce d'ambiente. È metà dell'effetto — l'altra metà è il filo specular
-   dentro .sb-panel-inner. Da soli sembrano entrambi uno sbaglio; insieme
-   danno lo spessore.
+   Il bordo non è una riga grigia uniforme: è un rim illuminato che si spegne
+   allontanandosi dalla luce, come succede a una lastra vera. È metà
+   dell'effetto — l'altra metà è il filo specular dentro .sb-panel-inner. Da
+   soli sembrano entrambi uno sbaglio; insieme danno lo spessore.
 
-   Continua a NON esserci nessun alone che segue il puntatore: quella roba si
-   accendeva su una card dopo l'altra mentre scorrevi e ridisegnava gradienti
-   grandi a ogni frame. Quello che si muove qui è solo transform (il tilt, in
-   site/glassMotion.ts) e una banda di luce che parte in ritardo. */
+   La luce non è più inchiodata in alto a sinistra: col puntatore fino
+   site/GlassMotion.tsx riscrive --rim-angle e il lato acceso segue la mano.
+   Costa una variabile CSS per frame su UN pannello solo — non è l'alone che
+   era stato tolto dalla home, che ridipingeva gradienti larghi quanto la card
+   su una card dopo l'altra mentre scorrevi. */
 .sb-panel {
   position: relative;
   height: 100%;
   padding: 1px;
   border-radius: 12px;
+  /* 160deg è il riposo: luce da in alto a sinistra, come prima. Col puntatore
+     fino l'angolo lo riscrive site/GlassMotion.tsx, e il filo acceso gira
+     seguendo la mano. */
   background: linear-gradient(
-    160deg,
+    var(--rim-angle, 160deg),
     var(--sb-glass-rim),
     var(--sb-border-strong) 38%,
     color-mix(in srgb, var(--sb-border) 45%, transparent)
@@ -540,12 +609,15 @@ button.sb-card:hover .sb-panel,
     transform: translateY(-3px);
   }
 }
-/* E dove il tilt c'è, `transform` esce dalla lista delle transizioni: GSAP
-   riscrive la matrice a ogni frame e una transition sopra proverebbe a
-   interpolare ognuna di quelle scritture, con l'inclinazione che arriva in
-   ritardo e struscia. Bordo e ombra continuano a sfumare. */
+/* E dove il puntatore è fino escono dalla lista delle transizioni sia
+   `transform` sia `background`, per la stessa ragione: le riscrive tutte e due
+   qualcun altro a ogni frame — il tilt la matrice, --rim-angle il gradiente —
+   e una transition sopra proverebbe a interpolare ognuna di quelle scritture.
+   Sul transform si vedeva l'inclinazione arrivare in ritardo e strusciare; sul
+   gradiente si pagherebbe un'interpolazione di gradiente a ogni frame per un
+   filo da 1px. Resta l'ombra, che cambia solo all'hover. */
 @media (hover: hover) and (pointer: fine) {
-  .sb-panel { transition: background 0.2s ease, box-shadow 0.2s ease; }
+  .sb-panel { transition: box-shadow 0.2s ease; }
 }
 .sb-panel-inner {
   position: relative;
@@ -661,6 +733,12 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 }
 .sb-card-desc { margin: 0; font-size: 0.875rem; line-height: 1.55; color: var(--sb-fg-lighter); }
 .sb-card-desc strong { font-weight: 400; color: var(--sb-fg); }
+/* Il mock dentro la card va in controtendenza allo scroll, di tre o quattro
+   pixel: quel tanto che basta perché sembri appoggiato dietro il vetro invece
+   che stampato sopra. Non costa un listener nuovo — --sb-drift la scrive già
+   site/GlassMotion.tsx per la deriva del fondale, e qui si legge e basta. Il
+   coefficiente è negativo e minuscolo apposta: sopra i 6-7px il visual comincia
+   a uscire dal suo riquadro nelle card corte. */
 .sb-card-visual {
   flex: 1;
   display: flex;
@@ -668,6 +746,7 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   justify-content: center;
   padding: 1.25rem 1.4rem 1.4rem;
   min-height: 108px;
+  transform: translate3d(0, calc(var(--sb-drift, 0px) * -0.035), 0);
 }
 
 /* Card grande: testo a sinistra, visual a destra (da lg in su) */
@@ -1556,9 +1635,11 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   padding: 0.12rem 0.5rem;
 }
 
-/* Muro dei commit — fermo. Prima un'onda di calore lo attraversava tenendo
-   119 celle in animazione all'infinito: da sola bastava a far arrancare lo
-   scroll di tutta la pagina, per un effetto che nessuno guardava. */
+/* Muro dei commit — fermo. L'onda di calore che lo attraversava tenendo 119
+   celle in animazione all'infinito non c'è più e non torna: da sola bastava a
+   far arrancare lo scroll di tutta la pagina, per un effetto che nessuno
+   guardava. Quello che si muove adesso è la pozza (più sotto), che esiste solo
+   sotto il puntatore. */
 .sb-contrib { margin-top: 0.2rem; }
 .sb-contrib-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; }
 .sb-cell {
@@ -1586,6 +1667,97 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
 .sb-contrib-legend i[data-lv="2"] { background: hsla(153, 60%, 53%, 0.52); }
 .sb-contrib-legend i[data-lv="3"] { background: hsla(153, 60%, 53%, 0.74); }
 .sb-contrib-legend i[data-lv="4"] { background: hsla(153, 60%, 53%, 0.95); }
+
+/* ── Pozza d'acqua ────────────────────────────────────────────────────────
+   La regia sta in site/puddle.ts: qui arrivano tre variabili e basta.
+    · --pd-x / --pd-y sul contenitore → dove sta il dito;
+    · --pd-d su ogni cella, 0→1 → quanta acqua ha spostato.
+   Il gradiente degli anelli è FERMO nel foglio di stile e si muove solo il suo
+   centro: è la stessa economia dell'alone sui pannelli, e il motivo per cui
+   119 celle non costano niente.
+
+   Vale per griglia dei commit, legenda e barre del footer: chiunque porti
+   data-puddle. Il contenitore deve fare da riferimento e il ritaglio è a
+   maschera, non a overflow — il .sb-panel-inner del footer è overflow:visible
+   apposta (i tooltip delle barre devono uscire) e un overflow:hidden qui
+   dentro se li mangerebbe. */
+[data-puddle] {
+  position: relative;
+  isolation: isolate;
+}
+[data-puddle] > *:not(.sb-pd-drop) {
+  transform: scale(calc(1 + var(--pd-d, 0) * 0.52));
+  filter: brightness(calc(1 + var(--pd-d, 0) * 0.6));
+  /* Uscendo dalla griglia le celle tornano giù insieme, con calma: è l'acqua
+     che si richiude, e senza questa transizione sarebbe uno scatto secco. */
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), filter 0.42s ease;
+}
+/* Dentro la pozza il ritorno dev'essere immediato, o le celle inseguono il
+   puntatore con mezzo secondo di ritardo e l'acqua diventa gelatina. */
+[data-puddle][data-pd-on] > *:not(.sb-pd-drop) { transition: none; }
+/* Le barre del footer non sono quadratini: crescono dalla loro base, come in
+   un istogramma. Scalarle dal centro le farebbe sprofondare sotto la riga. */
+.sb-gh__bars > * { transform-origin: 50% 100%; }
+
+/* Il riverbero: anelli concentrici che NON si muovono con le celle. È lo
+   strato che fa leggere "acqua" invece di "quadratini che si gonfiano". */
+[data-puddle]::after {
+  content: "";
+  position: absolute;
+  /* inset: 0 e non un valore negativo: --pd-x/--pd-y arrivano misurate dal
+     bordo del CONTENITORE, mentre `circle at` le legge dentro la scatola di
+     questo pseudo-elemento. Allargarlo sposterebbe il centro degli anelli
+     lontano dal dito, e di quanto dipenderebbe dalla larghezza dell'elemento. */
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  background: repeating-radial-gradient(
+    circle at var(--pd-x, 50%) var(--pd-y, 50%),
+    transparent 0 7px,
+    hsla(153, 60%, 60%, 0.5) 7px 9px,
+    transparent 9px 17px
+  );
+  /* Gli anelli sbiadiscono allontanandosi dal dito invece di piastrellare
+     tutto il riquadro fino ai bordi. */
+  -webkit-mask-image: radial-gradient(circle at var(--pd-x, 50%) var(--pd-y, 50%), #000 0, transparent 78px);
+  mask-image: radial-gradient(circle at var(--pd-x, 50%) var(--pd-y, 50%), #000 0, transparent 78px);
+  mix-blend-mode: plus-lighter;
+}
+[data-puddle][data-pd-on]::after { opacity: 0.55; }
+/* Il tema qui è la classe .dark su <html>, non la preferenza di sistema: il
+   sito ha un suo interruttore e un sensore orario (vedi lo script in
+   index.html), e prefers-color-scheme direbbe la cosa sbagliata di notte.
+   Sul chiaro plus-lighter slaverebbe e basta: gli anelli devono scurire. */
+html:not(.dark) [data-puddle]::after {
+  mix-blend-mode: multiply;
+  background: repeating-radial-gradient(
+    circle at var(--pd-x, 50%) var(--pd-y, 50%),
+    transparent 0 7px,
+    hsla(153, 70%, 32%, 0.4) 7px 9px,
+    transparent 9px 17px
+  );
+}
+html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
+
+/* La goccia: un anello solo, che parte dal punto premuto e si allarga. Se ne
+   va da sé a fine animazione (animationend in site/puddle.ts). */
+.sb-pd-drop {
+  position: absolute;
+  z-index: 2;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 2px solid var(--sb-brand);
+  animation: sb-plunk 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes sb-plunk {
+  from { transform: scale(0.4); opacity: 0.85; border-width: 2px; }
+  to   { transform: scale(11); opacity: 0; border-width: 0.4px; }
+}
 
 /* ── CTA finale ──────────────────────────────────────────────────────────── */
 .sb-cta { text-align: center; }
@@ -1782,9 +1954,13 @@ a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color
   color: var(--sb-brand-text);
   background: var(--sb-overlay);
   border-color: color-mix(in srgb, var(--sb-brand) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-brand) 12%, transparent);
 }
-.sb-foot-social a svg { transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
-.sb-foot-social a:hover svg { transform: scale(1.22) rotate(-8deg); }
+/* Rimbalzo, non scivolata: la curva sfonda l'1 e torna indietro. È l'unico
+   posto del sito dove va bene — sono sedici bersagli piccoli, e il rimbalzo
+   dice quale hai preso meglio di qualunque cambio di colore. */
+.sb-foot-social a svg { transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.sb-foot-social a:hover svg { transform: scale(1.24) rotate(-8deg); }
 /* Filo sfumato (trasparente → bordo → trasparente), firma di Supabase.
    Solo un filo: l'avanzamento della lettura si misura in cima alla finestra
    (site/ScrollProgress), dove lo si vede mentre si scorre — non quaggiù, dove
@@ -2004,4 +2180,18 @@ html.dark .sb-aurora { opacity: 0.42; }
     color: var(--sb-brand-text);
   }
   .sb-cursor, .sb-caret { opacity: 1; }
+
+  /* Pozza: non si aggancia nemmeno (il cancello è in site/GlassMotion.tsx),
+     ma le celle non devono restare con la transizione appesa. */
+  [data-puddle] > * { transition: none; transform: none; filter: none; }
+  [data-puddle]::after { content: none; }
+
+  /* Parallasse dei visual: --sb-drift non viene più scritta, ma il fallback a
+     0px vale solo se la variabile non esiste — meglio azzerare qui e non
+     dipendere da chi ha smesso di scrivere. */
+  .sb-card-visual { transform: none; }
+
+  /* Lucido del titolo: il gradiente RESTA (è materia), sparisce solo la
+     striscia che inseguiva il puntatore. */
+  .sb-hero-title > span:first-child { --gloss-x: 50%; }
 }

@@ -14,10 +14,10 @@
     "fr": "Alberto Pecchini — retour en haut",
     "de": "Alberto Pecchini — nach oben"
   },
-  "Designer & Front-end Developer": {
-    "it": "Designer e sviluppatore front-end",
-    "fr": "Designer & développeur front-end",
-    "de": "Designer & Frontend-Entwickler"
+  "Surveyor & Website Developer": {
+    "it": "Perito geometra e sviluppatore website",
+    "fr": "Géomètre & développeur de sites web",
+    "de": "Vermessungstechniker & Website-Entwickler"
   },
   "Local": {
     "it": "Locale",
@@ -74,15 +74,15 @@
     "fr": "Navigation",
     "de": "Navigation"
   },
-  "💻 Front-end Developer · CAT Student": {
-    "it": "💻 Sviluppatore front-end · Studente CAT",
-    "fr": "💻 Développeur front-end · Étudiant CAT",
-    "de": "💻 Frontend-Entwickler · CAT-Schüler"
+  "💻 Website Developer · CAT Student": {
+    "it": "💻 Sviluppatore website · Studente CAT",
+    "fr": "💻 Développeur de sites web · Étudiant CAT",
+    "de": "💻 Website-Entwickler · CAT-Schüler"
   },
-  "High-school senior & front-end developer behind": {
-    "it": "Studente dell'ultimo anno e sviluppatore front-end dietro a",
-    "fr": "Lycéen en terminale et développeur front-end derrière",
-    "de": "Schüler der Abschlussklasse und Frontend-Entwickler hinter"
+  "Surveyor & website developer behind": {
+    "it": "Perito geometra e sviluppatore website dietro a",
+    "fr": "Géomètre et développeur de sites web derrière",
+    "de": "Vermessungstechniker und Website-Entwickler hinter"
   },
   "and": {
     "it": "e",
@@ -449,10 +449,10 @@
     "fr": "Rivalta sul Mincio — Site web",
     "de": "Rivalta sul Mincio — Website"
   },
-  "Web design & front-end development": {
-    "it": "Web design e sviluppo front-end",
-    "fr": "Web design & développement front-end",
-    "de": "Webdesign & Frontend-Entwicklung"
+  "Web design & website development": {
+    "it": "Web design e sviluppo website",
+    "fr": "Web design & développement de sites web",
+    "de": "Webdesign & Website-Entwicklung"
   },
   "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography, a warm colour palette and advanced animations via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Gapless bento grids and image-led composition for immersive visual storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.": {
     "it": "Progettazione e sviluppo del sito istituzionale e turistico di Rivalta sul Mincio. Design editoriale minimalista con tipografia curata, palette di colori calda e animazioni avanzate via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Bento grid senza spazi e composizione guidata dalle immagini per uno storytelling visivo immersivo. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
@@ -769,10 +769,10 @@
     "fr": "Soutenez-moi",
     "de": "Unterstütze mich"
   },
-  "Designer & Developer · ITT «Carlo d'Arco» — Mantua": {
-    "it": "Designer e sviluppatore · ITT «Carlo d'Arco» — Mantova",
-    "fr": "Designer & développeur · ITT «Carlo d'Arco» — Mantoue",
-    "de": "Designer & Entwickler · ITT «Carlo d'Arco» — Mantua"
+  "Surveyor & Website Developer · ITT «Carlo d'Arco» — Mantua": {
+    "it": "Perito geometra e sviluppatore website · ITT «Carlo d'Arco» — Mantova",
+    "fr": "Géomètre & développeur de sites web · ITT «Carlo d'Arco» — Mantoue",
+    "de": "Vermessungstechniker & Website-Entwickler · ITT «Carlo d'Arco» — Mantua"
   },
   "Alberto Pecchini — All rights reserved": {
     "it": "Alberto Pecchini — Tutti i diritti riservati",
@@ -989,10 +989,10 @@
     "fr": "Ce avec quoi je travaille",
     "de": "Womit ich arbeite"
   },
-  "Front-end development": {
-    "it": "Sviluppo front-end",
-    "fr": "Développement front-end",
-    "de": "Frontend-Entwicklung"
+  "Website development": {
+    "it": "Sviluppo website",
+    "fr": "Développement de sites web",
+    "de": "Website-Entwicklung"
   },
   "PC troubleshooting": {
     "it": "Risoluzione problemi PC",
@@ -2484,10 +2484,10 @@
     "fr": "Je suis un étudiant CAT en dernière année et, hors des bancs de l'école,",
     "de": "Ich bin CAT-Schüler im Abschlussjahr und, außerhalb der Schulbank,"
   },
-  "designer e sviluppatore front-end": {
-    "en": "a designer and front-end developer",
-    "fr": "designer et développeur front-end",
-    "de": "Designer und Frontend-Entwickler"
+  "perito geometra e sviluppatore website": {
+    "en": "a surveyor and website developer",
+    "fr": "géomètre et développeur de sites web",
+    "de": "Vermessungstechniker und Website-Entwickler"
   },
   ". Sono cresciuto a Rivalta sul Mincio, dove la mia famiglia ha le sue radici e una sua attività.": {
     "en": ". I grew up in Rivalta sul Mincio, where my family has its roots and a business.",
@@ -2899,10 +2899,10 @@
     "fr": "Alberto au travail sur un projet web",
     "de": "Alberto bei der Arbeit an einem Web-Projekt"
   },
-  "Designer & front-end developer": {
-    "en": "Designer & front-end developer",
-    "fr": "Designer & développeur front-end",
-    "de": "Designer & Frontend-Entwickler"
+  "Perito geometra e sviluppatore website": {
+    "en": "Surveyor & website developer",
+    "fr": "Géomètre & développeur de sites web",
+    "de": "Vermessungstechniker & Website-Entwickler"
   },
   "La passione più grande: creare per il web": {
     "en": "My greatest passion: creating for the web",
@@ -3399,10 +3399,10 @@
     "fr": "Alberto Pecchini — Examen d'État 2026",
     "de": "Alberto Pecchini — Staatsexamen 2026"
   },
-  "Designer & front-end developer, raised between Rivalta sul Mincio and Mantua.": {
-    "it": "Designer e sviluppatore front-end, cresciuto tra Rivalta sul Mincio e Mantova.",
-    "fr": "Designer et développeur front-end, ayant grandi entre Rivalta sul Mincio et Mantoue.",
-    "de": "Designer und Frontend-Entwickler, aufgewachsen zwischen Rivalta sul Mincio und Mantua."
+  "Surveyor & website developer, raised between Rivalta sul Mincio and Mantua.": {
+    "it": "Perito geometra e sviluppatore website, cresciuto tra Rivalta sul Mincio e Mantova.",
+    "fr": "Géomètre et développeur de sites web, ayant grandi entre Rivalta sul Mincio et Mantoue.",
+    "de": "Vermessungstechniker und Website-Entwickler, aufgewachsen zwischen Rivalta sul Mincio und Mantua."
   },
   "and I grew up in": {
     "it": "anni e sono cresciuto a",
@@ -3434,10 +3434,10 @@
     "fr": "Constructions et gestion du territoire",
     "de": "Bauwesen und Raummanagement"
   },
-  "at the University of Modena and Reggio Emilia. Outside the classroom I'm a self-taught designer and front-end developer: I build responsive, fast and polished interfaces with React, Next.js, TypeScript, Tailwind CSS and GSAP.": {
-    "it": "all'Università di Modena e Reggio Emilia. Fuori dai banchi sono un designer e sviluppatore front-end autodidatta: costruisco interfacce responsive, veloci e curate con React, Next.js, TypeScript, Tailwind CSS e GSAP.",
-    "fr": "à l'Université de Modène et Reggio d'Émilie. En dehors des cours, je suis designer et développeur front-end autodidacte : je construis des interfaces responsives, rapides et soignées avec React, Next.js, TypeScript, Tailwind CSS et GSAP.",
-    "de": "an der Universität Modena und Reggio Emilia. Außerhalb des Hörsaals bin ich autodidaktischer Designer und Frontend-Entwickler: Ich baue responsive, schnelle und sorgfältig gestaltete Interfaces mit React, Next.js, TypeScript, Tailwind CSS und GSAP."
+  "at the University of Modena and Reggio Emilia. Outside the classroom I'm a self-taught website developer: I build responsive, fast and polished interfaces with React, Next.js, TypeScript, Tailwind CSS and GSAP.": {
+    "it": "all'Università di Modena e Reggio Emilia. Fuori dai banchi sono uno sviluppatore website autodidatta: costruisco interfacce responsive, veloci e curate con React, Next.js, TypeScript, Tailwind CSS e GSAP.",
+    "fr": "à l'Université de Modène et Reggio d'Émilie. En dehors des cours, je suis développeur de sites web autodidacte : je construis des interfaces responsives, rapides et soignées avec React, Next.js, TypeScript, Tailwind CSS et GSAP.",
+    "de": "an der Universität Modena und Reggio Emilia. Außerhalb des Hörsaals bin ich autodidaktischer Website-Entwickler: Ich baue responsive, schnelle und sorgfältig gestaltete Interfaces mit React, Next.js, TypeScript, Tailwind CSS und GSAP."
   },
   "I've been giving a hand in the family business since I was a kid — not as a pastime, but as the way I learned what": {
     "it": "Fin da piccolo do una mano nell'attività di famiglia: non un passatempo, ma il modo in cui ho imparato cosa significhi",
@@ -4288,10 +4288,10 @@
     "fr": "Un seul design system sur tout le site, un seul dépôt, rien de caché — et les archives te laissent emporter les sources.",
     "de": "Ein Designsystem für die ganze Website, ein Repository, nichts Verstecktes — und im Archiv kannst du die Quellen mitnehmen."
   },
-  "Designer & front-end developer — Mantua, Italy. CAT diploma, now studying Construction and Land Management.": {
-    "it": "Designer e sviluppatore front-end — Mantova. Diploma CAT, ora studio Costruzioni e Gestione del Territorio.",
-    "fr": "Designer & développeur front-end — Mantoue, Italie. Diplôme CAT, aujourd'hui en Construction et Gestion du Territoire.",
-    "de": "Designer & Frontend-Entwickler — Mantua, Italien. CAT-Diplom, jetzt Studium Bau- und Gebietsmanagement."
+  "Surveyor & website developer — Mantua, Italy. CAT diploma, now studying Construction and Land Management.": {
+    "it": "Perito geometra e sviluppatore website — Mantova. Diploma CAT, ora studio Costruzioni e Gestione del Territorio.",
+    "fr": "Géomètre & développeur de sites web — Mantoue, Italie. Diplôme CAT, aujourd'hui en Construction et Gestion du Territoire.",
+    "de": "Vermessungstechniker & Website-Entwickler — Mantua, Italien. CAT-Diplom, jetzt Studium Bau- und Gebietsmanagement."
   },
   "this site": {
     "it": "questo sito",

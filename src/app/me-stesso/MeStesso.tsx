@@ -323,7 +323,7 @@ export default function MeStesso() {
             <div className="sb-ms-prose">
               <p>
                 Sono uno studente CAT all'ultimo anno e, fuori dai banchi,
-                <strong> designer e sviluppatore front-end</strong>. Sono cresciuto a Rivalta sul Mincio,
+                <strong> perito geometra e sviluppatore website</strong>. Sono cresciuto a Rivalta sul Mincio,
                 dove la mia famiglia ha le sue radici e una sua attività.
               </p>
             </div>
@@ -562,7 +562,7 @@ export default function MeStesso() {
                 <Shot
                   src="/images/me-stesso/web.jpg"
                   alt="Alberto al lavoro su un progetto web"
-                  caption="Designer & front-end developer"
+                  caption="Perito geometra e sviluppatore website"
                   Icon={IcCode}
                 />
               </div>
