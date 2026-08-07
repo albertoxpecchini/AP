@@ -137,6 +137,16 @@ export default function GlassMotion() {
     // CSS resta per il tocco (vedi il @media in home.css).
     mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
       let panel: HTMLElement | null = null;
+      // La misura della card si prende UNA volta, entrando, e non a ogni
+      // frame. getBoundingClientRect obbliga il browser a ricalcolare il
+      // layout se nel frattempo è stato scritto dello stile — e qui lo stile
+      // lo scrive GSAP a ogni frame, quindi ogni lettura era un layout
+      // sincrono forzato. Misurato: da 28,7 a ~15 ms per frame muovendo il
+      // puntatore sulle card.
+      //
+      // La misura si può cachare perché scade in un caso solo, lo scroll, e
+      // lì c'è già release() attaccato all'evento (in cattura, più sotto).
+      let rect: DOMRect | null = null;
       let rotX: ((v: number) => void) | null = null;
       let rotY: ((v: number) => void) | null = null;
       const clamp = gsap.utils.clamp(-TILT_DEG, TILT_DEG);
@@ -145,6 +155,7 @@ export default function GlassMotion() {
         if (!panel) return;
         const leaving = panel;
         panel = null;
+        rect = null;
         rotX = null;
         rotY = null;
         gsap.to(leaving, {
@@ -161,6 +172,7 @@ export default function GlassMotion() {
 
       const enter = (el: HTMLElement) => {
         panel = el;
+        rect = el.getBoundingClientRect();
         el.style.willChange = "transform";
         // transformPerspective sta sulla card stessa: mettere `perspective`
         // sul contenitore avrebbe voluto dire toccare il CSS di ogni griglia.
@@ -187,9 +199,9 @@ export default function GlassMotion() {
           release();
           if (next) enter(next);
         }
-        if (!panel || !rotX || !rotY) return;
+        if (!panel || !rect || !rotX || !rotY) return;
 
-        const r = panel.getBoundingClientRect();
+        const r = rect;
         const px = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
         const py = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
         // Il segno di rotateX è invertito: puntatore in basso = bordo basso
@@ -251,11 +263,17 @@ export default function GlassMotion() {
         el.style.removeProperty("--rim-angle");
       };
 
+      // Stessa cache del blocco ②, e per lo stesso motivo: qui la misura si
+      // leggeva dentro il frame, subito dopo che GSAP aveva scritto le
+      // trasformazioni del tilt sullo stesso pannello — cioè nel punto
+      // peggiore possibile per chiedere una geometria.
+      let rect: DOMRect | null = null;
+
       const write = () => {
         frame = 0;
         root.style.setProperty("--gloss-x", `${(clientX / window.innerWidth) * 100}%`);
         if (!lit) return;
-        const r = lit.getBoundingClientRect();
+        const r = (rect ??= lit.getBoundingClientRect());
         // Angolo puntatore → centro, in gradi orari a partire dall'alto; +180
         // perché in un linear-gradient l'angolo è il verso in cui la sfumatura
         // VA, mentre il colore chiaro sta all'inizio: la luce è dietro.
@@ -272,6 +290,7 @@ export default function GlassMotion() {
         if (panel !== lit) {
           clear(lit);
           lit = panel;
+          rect = null;
           // Deciso una volta all'ingresso, non a ogni frame: l'alone è roba
           // delle sole pagine interne (vedi sopra).
           litGlows = !!panel?.closest(".sb-home--fx");
@@ -282,11 +301,22 @@ export default function GlassMotion() {
         if (!frame) frame = requestAnimationFrame(write);
       };
 
+      // La misura cachata scade solo se la pagina scorre sotto il puntatore:
+      // qui non serve spegnere niente (a differenza del tilt), basta buttare
+      // via il numero e rileggerlo al movimento dopo. In cattura, perché lo
+      // scroll lo fa <body> e il suo evento non risale fino a window.
+      const stale = () => {
+        rect = null;
+      };
       document.addEventListener("pointermove", onMove, { passive: true });
+      document.addEventListener("scroll", stale, { passive: true, capture: true });
+      window.addEventListener("resize", stale);
 
       return () => {
         if (frame) cancelAnimationFrame(frame);
         document.removeEventListener("pointermove", onMove);
+        document.removeEventListener("scroll", stale, { capture: true });
+        window.removeEventListener("resize", stale);
         clear(lit);
         root.style.removeProperty("--gloss-x");
         lit = null;
@@ -323,6 +353,9 @@ export default function GlassMotion() {
 
       // ── Il riquadro sotto il puntatore ───────────────────────────────────
       let vis: HTMLElement | null = null;
+      // Misura presa una volta all'ingresso (vedi blocco ②): scade sullo
+      // scroll, e lì `leave` azzera già tutto.
+      let rect: DOMRect | null = null;
       const st = { ...VIS_REST };
       const write = () => {
         if (!vis) return;
@@ -367,11 +400,16 @@ export default function GlassMotion() {
         if (next !== vis) {
           release();
           vis = next;
-          if (!vis) return;
+          rect = next ? next.getBoundingClientRect() : null;
         }
-        const r = vis.getBoundingClientRect();
-        xTo(gsap.utils.clamp(0, 1, (e.clientX - r.left) / (r.width || 1)));
-        yTo(gsap.utils.clamp(0, 1, (e.clientY - r.top) / (r.height || 1)));
+        // Fuori da ogni riquadro non c'è niente da scrivere. Il controllo va
+        // QUI e non dentro l'if: col puntatore fuori dalle card `next` e `vis`
+        // sono tutti e due null, quindi l'if non scatta — e senza questa riga
+        // si finisce a leggere getBoundingClientRect() da null a ogni singolo
+        // movimento del mouse su tutto il resto della pagina.
+        if (!vis || !rect) return;
+        xTo(gsap.utils.clamp(0, 1, (e.clientX - rect.left) / (rect.width || 1)));
+        yTo(gsap.utils.clamp(0, 1, (e.clientY - rect.top) / (rect.height || 1)));
       };
 
       // Il puntatore può uscire dalla finestra senza passare da nessuna card,
@@ -380,6 +418,7 @@ export default function GlassMotion() {
       const leave = () => {
         release();
         vis = null;
+        rect = null;
       };
       document.addEventListener("pointermove", onMove, { passive: true });
       document.addEventListener("pointerleave", leave);

@@ -311,11 +311,15 @@ export function GameHud() {
       })
         .to({}, { duration: 2.2 })
         // Si riazzera, non salta indietro: il conteggio deve ripartire da zero
-        // e vedersi che riparte.
+        // e vedersi che riparte. Il voto va rimesso a mano insieme al
+        // punteggio: senza, per tutto il repeatDelay resta appeso il voto del
+        // giro prima, e si legge "0 punti, A+" — che è la cosa peggiore che
+        // possa dire un tabellone.
         .call(() => {
           n.v = 0;
-          shownGrade = "";
+          shownGrade = GRADES[GRADES.length - 1][1];
           score.textContent = "0";
+          grade.textContent = shownGrade;
         });
     }, el);
 

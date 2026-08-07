@@ -37,10 +37,24 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({ children, className = '',
   const point = useRef({ x: 0, y: 0 });
 
   // Il puntatore si muove molto più spesso di quanto lo schermo si aggiorni:
-  // accumulo l'ultima posizione e scrivo una volta sola per frame. Il
-  // getBoundingClientRect sta DENTRO il frame apposta — la pagina scorre sotto
-  // il puntatore fermo, quindi una misura presa una volta all'ingresso
-  // invecchierebbe subito.
+  // accumulo l'ultima posizione e scrivo una volta sola per frame.
+  //
+  // La misura della card si prende UNA volta, entrando. Stava dentro il frame,
+  // e la ragione era buona — la pagina scorre sotto un puntatore fermo e una
+  // misura vecchia sbaglierebbe — ma il prezzo era peggiore del problema:
+  // dentro il frame la lettura cade subito dopo le scritture di stile di GSAP
+  // (tilt e rim, in site/GlassMotion.tsx), e ogni lettura in quel punto
+  // costringe il browser a rifare il layout prima di rispondere. Su sette card
+  // erano tre o quattro layout sincroni per frame.
+  //
+  // La misura si butta via allo scroll e al ridimensionamento, che sono gli
+  // unici due casi in cui scade: il resto del tempo la card sta ferma.
+  const rect = useRef<DOMRect | null>(null);
+
+  const onPointerEnter = () => {
+    rect.current = ref.current?.getBoundingClientRect() ?? null;
+  };
+
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     point.current = { x: e.clientX, y: e.clientY };
     if (frame.current) return;
@@ -48,14 +62,23 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({ children, className = '',
       frame.current = 0;
       const el = ref.current;
       if (!el) return;
-      const rect = el.getBoundingClientRect();
-      el.style.setProperty('--spot-x', `${point.current.x - rect.left}px`);
-      el.style.setProperty('--spot-y', `${point.current.y - rect.top}px`);
+      const r = (rect.current ??= el.getBoundingClientRect());
+      el.style.setProperty('--spot-x', `${point.current.x - r.left}px`);
+      el.style.setProperty('--spot-y', `${point.current.y - r.top}px`);
     });
   };
 
   useEffect(() => {
+    // In cattura: su questo sito scorre <body>, non la finestra, e l'evento di
+    // scroll di un elemento non risale fino a window.
+    const stale = () => {
+      rect.current = null;
+    };
+    document.addEventListener('scroll', stale, { passive: true, capture: true });
+    window.addEventListener('resize', stale);
     return () => {
+      document.removeEventListener('scroll', stale, { capture: true });
+      window.removeEventListener('resize', stale);
       if (frame.current) cancelAnimationFrame(frame.current);
     };
   }, []);
@@ -64,6 +87,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({ children, className = '',
     <div
       ref={ref}
       className={`sb-spot ${className}`}
+      onPointerEnter={onPointerEnter}
       onPointerMove={onPointerMove}
       style={spotlightColor ? ({ '--spot-color': spotlightColor } as React.CSSProperties) : undefined}
     >

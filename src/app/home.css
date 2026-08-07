@@ -2265,15 +2265,28 @@ html.dark .sb-aurora { opacity: 0.42; }
    La pausa fra una passata e l'altra è lunga apposta: una luce che ripassa di
    continuo su un titolo smette di essere luce e diventa un lampeggio. Sono 8
    secondi, di cui la passata ne occupa poco più di uno. */
+/* DUE strati, e il secondo è quello che tiene in piedi la riga:
+
+    · sopra, la banda di luce — larga il doppio abbondante della riga, con le
+      estremità TRASPARENTI, che scorre;
+    · sotto, una tinta piena grande quanto la riga, che non si muove mai.
+
+   Il secondo non è decorazione, è la rete. Con background-clip:text le lettere
+   sono trasparenti e si vedono solo per il background che ci passa dietro:
+   dove il background non arriva, la lettera non c'è. Con un solo strato largo
+   260% e no-repeat, agli estremi della corsa il gradiente esce quasi tutto
+   dall'elemento e la riga sparisce a metà — che è esattamente quello che è
+   successo. Lo strato di fondo copre il 100% per costruzione, quindi il caso
+   peggiore adesso è "la banda non si vede passare", non "il testo non c'è".
+
+   È la stessa struttura a due strati del titolo della hero qui sopra, ed è il
+   motivo per cui quello non si è mai rotto. */
 .sb-shine {
-  background-image: linear-gradient(
-    100deg,
-    var(--sb-shine-base) 40%,
-    var(--sb-shine-hi) 50%,
-    var(--sb-shine-base) 60%
-  );
-  background-size: 260% 100%;
-  background-position: -60% 0;
+  background-image:
+    linear-gradient(100deg, transparent 38%, var(--sb-shine-hi) 50%, transparent 62%),
+    linear-gradient(var(--sb-shine-base), var(--sb-shine-base));
+  background-size: 260% 100%, 100% 100%;
+  background-position: 160% 0, 0 0;
   background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
@@ -2283,9 +2296,10 @@ html.dark .sb-aurora { opacity: 0.42; }
 /* La seconda brandline della pagina sfasata rispetto alla prima: due righe che
    si accendono insieme sembrano un errore di rendering. */
 .sb-cta .sb-shine { animation-delay: 2.6s; }
+/* Lo strato di fondo resta a 0 in tutti i fotogrammi: si muove solo la banda. */
 @keyframes sb-shine {
-  0%, 72%   { background-position: 160% 0; }
-  100%      { background-position: -60% 0; }
+  0%, 72%   { background-position: 160% 0, 0 0; }
+  100%      { background-position: -60% 0, 0 0; }
 }
 /* Senza background-clip:text le lettere resterebbero invisibili: meglio la
    tinta piena che una riga che non c'è. Stessa rete del titolo della hero. */
