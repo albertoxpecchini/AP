@@ -1582,6 +1582,102 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 }
 .sb-wall-card--wish .sb-cv-title { font-style: italic; }
 
+/* ── Garage — i tre modelli 3D ────────────────────────────────────────────
+   La palette dei modelli sta QUI e non nel componente perché è design system,
+   non geometria: gli stessi grigi delle superfici e lo stesso verde di tutto
+   il resto del sito. Le auto vere sarebbero gialla, rossa e grigio Nardò, ma
+   la home ha UN accento solo su tutte le pagine e non è il caso di aprire
+   un'eccezione per tre auto: qui sono tre modelli in creta con i vetri verdi,
+   e in monocromia si legge la forma.
+
+   Vincolo di formato: esadecimali PIATTI, niente var() e niente color-mix().
+   Questi valori attraversano getComputedStyle — che di una custom property
+   restituisce il token com'è scritto — e finiscono in uniform di WebGL: se
+   arrivasse una funzione CSS da risolvere, non c'è nessuno che la risolva.
+
+   Le due tinte per materiale sono l'ombra e la luce; il renderer ci sta in
+   mezzo con la lampada e il cielo. Da qui si ricolorano le auto senza toccare
+   una riga di TypeScript. */
+.sb-garage-wrap { margin-top: 2rem; }
+.sb-garage {
+  --gar-body-lo: #6f7a80;
+  --gar-body-hi: #eef1f3;
+  --gar-glass-lo: #1f6b4f;
+  --gar-glass-hi: #6fd6ab;
+  --gar-tyre-lo: #1e2225;
+  --gar-tyre-hi: #6a7275;
+  --gar-rim-lo: #7c868b;
+  --gar-rim-hi: #f6f8f9;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+html.dark .sb-garage {
+  /* Al buio la creta non si schiarisce: si abbassa tutta. Un'auto chiara come
+     nel tema chiaro, su una card #1c1c1c, sembrerebbe accesa da dentro. */
+  --gar-body-lo: #23282b;
+  --gar-body-hi: #8d979d;
+  --gar-glass-lo: #12402f;
+  --gar-glass-hi: #46c795;
+  --gar-tyre-lo: #101315;
+  --gar-tyre-hi: #4a5154;
+  --gar-rim-lo: #3c4245;
+  --gar-rim-hi: #c3cbcf;
+}
+@media (min-width: 640px) { .sb-garage { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .sb-garage { grid-template-columns: repeat(3, 1fr); } }
+
+.sb-car { display: flex; flex-direction: column; }
+.sb-car-inner { padding: 0.9rem 1.2rem 1.2rem; gap: 0.9rem; }
+
+/* Il palco. `touch-action: pan-y` e non `none`: il dito che scorre la pagina
+   deve poterla scorrere anche partendo da qui — di suo il palco prende solo il
+   trascinamento orizzontale. */
+.sb-car-stage {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  touch-action: pan-y;
+  cursor: grab;
+  border-radius: 10px;
+  outline-offset: 3px;
+}
+.sb-car-stage[data-grab] { cursor: grabbing; }
+.sb-car-stage:focus { outline: none; }
+.sb-car-stage:focus-visible { outline: 2px solid var(--sb-brand); }
+.sb-car-cv { display: block; width: 100%; height: 100%; }
+
+/* Il cartello si toglie di mezzo appena si è capito: al primo trascinamento
+   (data-used, che mette il componente) non torna più. */
+.sb-car-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 0.15rem;
+  transform: translateX(-50%);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.sb-car-stage:hover .sb-car-hint { opacity: 0.45; }
+.sb-car-stage[data-used] .sb-car-hint { opacity: 0; }
+
+.sb-car-id { display: flex; flex-direction: column; gap: 0.1rem; }
+.sb-car-brand { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sb-fg-muted); }
+.sb-car-name { margin: 0; font-size: 1rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); }
+
+.sb-car-specs { margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.sb-car-specs > div { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; }
+.sb-car-specs dt { font-size: 0.76rem; color: var(--sb-fg-muted); }
+.sb-car-specs dd {
+  margin: 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-fg-light);
+}
+
 /* ── Open source ─────────────────────────────────────────────────────────── */
 .sb-open { display: grid; grid-template-columns: 1fr; gap: 2.5rem; align-items: center; }
 @media (min-width: 1024px) { .sb-open { grid-template-columns: 1fr 1fr; gap: 4rem; } }

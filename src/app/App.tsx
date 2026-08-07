@@ -67,6 +67,11 @@ import { EMAIL } from "./site/data";
 import { PROJECTS } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
 const RivaltaMap = lazy(() => import("./site/RivaltaMap"));
+/* Stessa cura della mappa: la geometria delle tre auto e il loro renderer non
+   c'entrano niente con il primo schermo, e stanno in fondo alla pagina. Lazy +
+   WhenVisible = si scaricano quando ci si avvicina, e chi non arriva in fondo
+   non li paga. */
+const DreamGarage = lazy(() => import("./site/dreamCars"));
 import WhenVisible from "./site/WhenVisible";
 import SiteFooter from "./site/SiteFooter";
 import "./home.css";
@@ -1247,7 +1252,25 @@ export default function App() {
           </div>
         </section>
 
-        {/* ⑧ Open source */}
+        {/* ⑧ Garage — le tre auto, in 3D e girabili */}
+        <section id="garage" className="sb-section" aria-label="Dream garage">
+          <div className="sb-container">
+            <div className="sb-sechead">
+              <h3>And three cars I dream about</h3>
+              <p>
+                Not photos and not videos: three real 3D models, stripped down to the shape
+                and drawn live by your graphics card. Drag one to turn it in any direction.
+              </p>
+            </div>
+            <WhenVisible className="sb-garage-wrap" rootMargin="400px">
+              <Suspense fallback={null}>
+                <DreamGarage />
+              </Suspense>
+            </WhenVisible>
+          </div>
+        </section>
+
+        {/* ⑨ Open source */}
         <section className="sb-section" aria-label="Open source">
           <div className="sb-container">
             <div className="sb-open">
@@ -1302,7 +1325,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ⑨ CTA finale */}
+        {/* ⑩ CTA finale */}
         <section id="contatti" className="sb-section sb-cta">
           <div className="sb-container">
             <h2>

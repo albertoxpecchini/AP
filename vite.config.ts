@@ -324,6 +324,20 @@ export default defineConfig({
             },
           },
           {
+            // Le mesh delle tre auto del garage (public/models/cars.bin).
+            // Fuori dal precache — globPatterns prende solo js/css/html/woff2 —
+            // perché sono trecento kB per una sezione in fondo alla home: chi
+            // non ci arriva non deve pagarli. Chi ci arriva li paga una volta,
+            // poi restano qui.
+            urlPattern: ({ url }) => /^\/models\/.*\.bin$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ap-models',
+              expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 90 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
             // Immagini: cache-first, restano in locale 30 giorni.
             urlPattern: ({ request }) => request.destination === 'image',
             handler: 'CacheFirst',
