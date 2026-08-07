@@ -54,18 +54,19 @@ const BUILDING: { name: string; href: string; route?: boolean }[] = [
   { name: "Rivalta sul Mincio", href: "https://rivaltasulmincio.it" },
 ];
 
-/* Un bottone vero alla volta: entra da sotto la finestrella, esce da sopra.
-   Nel DOM ce n'è sempre uno solo — niente pile in position:absolute, niente
-   turni da sincronizzare: il bersaglio è pieno e premibile per intero.
+/** Quanto resta fermo un nome prima di dare il cambio. */
+const BUILD_HOLD = 4200;
 
-   Il turno non lo dà più un timer da 3,4 secondi. Lo dai tu: ogni volta che il
-   puntatore entra nella finestrella, si passa al nome dopo. Prima il gesto era
-   "fermalo prima che scappi" — un bersaglio che si sposta mentre lo miri —
-   adesso è "guarda cos'altro c'è". Stessa animazione, ma è una risposta invece
-   che una sveglia. */
+/* Un bottone vero alla volta: entra da sotto la finestrella, resta il tempo di
+   leggerlo e di premerlo, esce da sopra. Nel DOM ce n'è sempre uno solo —
+   niente pile in position:absolute, niente turni da sincronizzare: il bersaglio
+   è pieno e premibile per intero. E finché il puntatore (o il focus) sta
+   dentro, il turno salta: un bersaglio che scappa mentre lo miri non è un
+   bersaglio. */
 export function NowBuilding() {
   const [i, setI] = useState(0);
   const itemRef = useRef<HTMLSpanElement>(null);
+  const held = useRef(false);
   const first = useRef(true);
   const cur = BUILDING[i];
 
@@ -76,32 +77,52 @@ export function NowBuilding() {
     const item = itemRef.current;
     if (!item) return;
 
-    // Il primo nome è già al suo posto: si anima solo chi arriva dopo.
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    if (!motionOK()) return;
+    const anim = motionOK();
+    let alive = true;
+    let timer = 0;
 
-    gsap.fromTo(
-      item,
-      { yPercent: 115, autoAlpha: 0 },
-      { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out" },
-    );
+    // Il primo nome è già al suo posto: si anima solo chi arriva dopo.
+    if (first.current) first.current = false;
+    else if (anim) {
+      gsap.fromTo(
+        item,
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out" },
+      );
+    }
+
+    if (BUILDING.length > 1) {
+      const advance = () => {
+        if (alive) setI((v) => (v + 1) % BUILDING.length);
+      };
+      const turn = () => {
+        if (!alive) return;
+        if (held.current) {
+          timer = window.setTimeout(turn, BUILD_HOLD);
+          return;
+        }
+        if (anim) {
+          gsap.to(item, {
+            yPercent: -115,
+            autoAlpha: 0,
+            duration: 0.32,
+            ease: "power2.in",
+            onComplete: advance,
+          });
+        } else advance();
+      };
+      timer = window.setTimeout(turn, BUILD_HOLD);
+    }
+
     return () => {
+      alive = false;
+      window.clearTimeout(timer);
       gsap.killTweensOf(item);
     };
   }, [i]);
 
-  const next = () => {
-    if (BUILDING.length < 2) return;
-    const item = itemRef.current;
-    const advance = () => setI((v) => (v + 1) % BUILDING.length);
-    if (!item || !motionOK()) {
-      advance();
-      return;
-    }
-    gsap.to(item, { yPercent: -115, autoAlpha: 0, duration: 0.32, ease: "power2.in", onComplete: advance });
+  const hold = (on: boolean) => () => {
+    held.current = on;
   };
 
   return (
@@ -111,8 +132,10 @@ export function NowBuilding() {
         className="sb-nowbuild-slot"
         data-no-i18n
         translate="no"
-        onPointerEnter={next}
-        onFocus={next}
+        onPointerEnter={hold(true)}
+        onPointerLeave={hold(false)}
+        onFocus={hold(true)}
+        onBlur={hold(false)}
       >
         {/* key sul nome: il turno smonta il vecchio e monta il nuovo, così la
             fromTo di entrata parte sempre da un nodo pulito. */}
@@ -140,14 +163,12 @@ export function NowBuilding() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web development" — il sito lo costruisci tu
+   Card "Web development" — il sito si costruisce da solo
 
-   C'era un cursore finto che faceva il giro di quattro blocchi accendendoli, e
-   un badge che passava da "building…" a "live" per conto suo. Adesso i tre
-   blocchi si riempiono da sinistra a destra seguendo --vis-x: spingi a destra e
-   la pagina si costruisce, il badge diventa `live` in fondo alla corsa. A
-   riposo resta a metà — che è il fotogramma onesto di un lavoro in corso.
-   Tutto in CSS: qui c'è solo la scena.
+   Tre blocchi che si riempiono uno dopo l'altro, e il badge che passa da
+   "building" a "live" quando sono a posto. Via il cursore finto che faceva il
+   giro dei blocchi: era un quinto elemento in movimento per raccontare la
+   stessa cosa che raccontano i blocchi riempiendosi.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function BrowserMock() {
@@ -177,10 +198,11 @@ export function BrowserMock() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web design" — la tendina la tieni tu
+   Card "Web design" — la stessa interfaccia disegnata due volte
 
-   La stessa interfaccia disegnata due volte, chiara e scura. La tendina non
-   scorre più avanti e indietro da sola ogni 7 secondi: sta dove sei tu.
+   Una tendina scorre avanti e indietro e scopre il tema scuro sotto il chiaro.
+   È il visual più semplice dei sette e non c'era niente da togliergli: quello
+   che è cambiato è che il manico si muove su transform invece che su `left`.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function AaSwap() {
@@ -198,13 +220,16 @@ export function AaSwap() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "AI-assisted development" — la digitazione si scorre
+   Card "AI-assisted development" — il terminale digita
 
-   Il comando sta tutto nel markup; --vis-x lo scopre carattere per carattere
-   con un clip-path, e il caret sta sul bordo del taglio. È la testa di
-   scrittura: si muove, e per questo NON lampeggia più — un caret che lampeggia
-   da fermo è l'animazione più ripetitiva che ci sia, e qui non serviva a
-   niente. Arrivati in fondo compare l'output. A riposo: comando a metà.
+   Il comando sta tutto nel markup e un clip-path lo scopre da sinistra, col
+   caret sul bordo del taglio a fare da testa di scrittura. Prima lo scriveva
+   una timeline GSAP che riscriveva textContent un carattere alla volta, in
+   ciclo su quattro sessioni: un ricalcolo di layout ogni 42 millisecondi, per
+   sempre. Adesso è una keyframe, e il testo non lo tocca nessuno.
+
+   Via anche il filo di "formiche" che marciava a fondo terminale: era la terza
+   cosa in movimento dentro un riquadro che ne voleva una.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const CMD = 'claude "rifai la home"';
@@ -311,12 +336,12 @@ export function GameHud() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web tools" — la lente la muovi tu
+   Card "Web tools" — il confronto si esegue sotto gli occhi
 
-   Il confronto fra le due liste c'è già tutto, fermo e leggibile: le righe
-   portano il loro colore. Quello che si muove è la lampada — una banda di luce
-   che sta a --vis-y e ravviva quello che attraversa. Prima scendeva da sola
-   ogni 3,6 secondi e le righe lampeggiavano a turno su cinque delay diversi.
+   Una banda di luce scende sulle due liste. Le righe non lampeggiano più a
+   turno su quattro delay sfasati mentre la banda passava: il confronto lo
+   raccontano già i colori, fermi, e la banda che scende dice che è in corso.
+   Una cosa in movimento invece di cinque.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function DiffScan() {
@@ -340,14 +365,14 @@ export function DiffScan() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Client websites" — il segnale segue il dito
+   Card "Client websites" — grafo di diffusione
 
-   Dal nodo centrale partono due fili verso i due siti. Non partono più da soli
-   ogni 3 secondi: si riempie quello dalla parte in cui vai, e il pallino del
-   sito che raggiungi si accende. Sei tu a instradare.
+   Dal nodo centrale parte un pacchetto verso un sito, poi verso l'altro, e il
+   pallino di chi lo riceve si accende. Uno per volta, non tutti e due insieme:
+   così si vede che il nodo trasmette, invece di vedere due fili che pulsano.
 
-   pathLength="1" sul tracciato: così il tratteggio si misura da 0 a 1 a
-   prescindere da quanto è lungo davvero il filo, e il CSS può scrivere
+   pathLength="1" sul tracciato: il tratteggio si misura da 0 a 1 a prescindere
+   da quanto è lungo davvero il filo, e la keyframe può scrivere
    stroke-dashoffset senza sapere niente della geometria.
    ═══════════════════════════════════════════════════════════════════════════ */
 

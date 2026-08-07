@@ -1,4 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
+﻿// ─────────────────────────────────────────────────────────────────────────────
 // Movimento del vetro — globale, su OGNI pagina del sito.
 //
 // Le card sono lastre semitrasparenti (vedi i token --sb-glass-* in home.css).
@@ -8,15 +8,20 @@
 // hanno bisogno del puntatore.
 //
 // ① Deriva del fondale — i due aloni (.sb-home::before/::after) slittano con
-//    lo scroll e seguono da lontano il puntatore, così sotto ogni card passa
-//    colore diverso man mano che scendi e la luce arriva da dove sei.
+//    lo scroll, così sotto ogni card passa colore diverso man mano che scendi.
 // ② Tilt — la card si inclina verso il cursore e il rim si sposta di
 //    conseguenza.
 // ③ Quello che il puntatore illumina — rim, alone, lucido del titolo.
-// ④ I visual delle card — tre numeri (--vis-x/-y/-in) e nient'altro: sono i
-//    visual stessi, in CSS, a farci quello che devono.
+// ④ Il cubo della card CAT (--vis-x/--vis-y) e lo scostamento lento degli
+//    aloni verso il puntatore (--sb-px/--sb-py).
 // ⑤ Pozza d'acqua sui quadratini dei commit (site/puddle.ts).
 // ⑥ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
+//
+// Quello che qui NON c'è, e che è servito impararlo: il moto dei visual delle
+// card. Per un giro l'ha comandato il puntatore da questo file, e il risultato
+// erano scatti — i numeri finivano in `left`, `top`, `clip-path` e
+// `box-shadow`, che ridisegnano. Sta in home.css, in keyframe su transform e
+// opacity. Vedi il blocco ④ per il ragionamento per esteso.
 //
 // Regole, le stesse di site/homeMotion.ts:
 //  · un solo gsap.matchMedia() proprietario, revert() al dismount;
@@ -53,8 +58,8 @@ const TILTABLE = "a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-panel
 const PTR_SHIFT = 4;
 const PTR_LAG = 1.2;
 
-/** Riposo dei visual delle card: centro del riquadro, gesto spento. */
-const VIS_REST = { x: 0.5, y: 0.5, on: 0 };
+/** Riposo del riquadro sotto il puntatore: il centro. */
+const VIS_REST = { x: 0.5, y: 0.5 };
 
 /** Dov'è arrivata la lettura, 0→1.
  *
@@ -288,198 +293,116 @@ export default function GlassMotion() {
       };
     });
 
-    // ── ④ I visual delle card ──────────────────────────────────────────────
-    // Il motore di tutta la griglia prodotti. Prima ogni card si portava
-    // dietro la sua timeline GSAP con repeat:-1 — sette filmini che giravano
-    // uguali che ci fosse qualcuno a guardarli o no, sfasati fra loro, con la
-    // griglia che pulsava da sette punti diversi insieme. Adesso c'è un solo
-    // pointermove delegato che scrive TRE NUMERI sul riquadro sotto il
-    // puntatore, e i visual — in CSS, da soli — ci fanno quello che devono:
+    // ── ④ Il cubo della card CAT, e gli aloni che seguono la mano ──────────
+    // Due scritture, e vale la pena dire cosa NON c'è più qui in mezzo.
     //
-    //   --vis-x   dove sei nel riquadro, in orizzontale, 0→1
-    //   --vis-y   idem in verticale, 0→1
-    //   --vis-in  quanto il gesto è acceso, 0→1 (sale entrando, scende uscendo)
+    // Per un giro, questo blocco ha comandato tutti e sette i visual della
+    // griglia prodotti: scriveva la posizione del puntatore e i visual ci
+    // costruivano sopra il loro movimento, al posto delle keyframe. Sulla
+    // carta era ordinato — un listener solo, una scrittura per frame. Nei
+    // fatti quei numeri finivano dentro `left`, `top`, `clip-path`,
+    // `color-mix` e `box-shadow`, che sono tutte proprietà che a ogni
+    // movimento del mouse rifanno il layout o ridisegnano. Sette riquadri per
+    // volta, più il tilt della card, più il rim, più l'alone: scatti.
     //
-    // Sei visual su sette non hanno una riga di JS: la tendina chiaro/scuro, la
-    // digitazione del terminale, la lente del diff, i blocchi del browser, i
-    // fili del grafo, il sollevamento del cubo sono tutti calc() su questi due
-    // numeri. Il settimo (l'HUD di gioco) conta punti, e il CSS non sa contare.
+    // Il moto dei visual è tornato in keyframe CSS su transform e opacity
+    // (vedi home.css), che il compositore muove senza ricalcolare niente. Qui
+    // resta il puntatore dove aggiunge qualcosa senza costare: il cubo, che si
+    // orienta dentro una `transform`, e i due aloni del fondale, che scorrono
+    // dentro un `translate`.
+    //
+    //   --vis-x / --vis-y  dove sei nel riquadro sotto il puntatore, 0→1
+    //   --sb-px / --sb-py  dove sei nella finestra, con un ritardo lungo
     //
     // Perché i quickTo e non la scrittura diretta: una var CSS non registrata
-    // con @property non transiziona: uscendo dalla card il gesto tornerebbe a
-    // riposo di scatto. Tweenando l'oggetto di stato invece della var, la
-    // curva ce l'ha il numero — stesso mestiere di driftTo al blocco ①.
-    //
-    // Qui la media query è solo prefers-reduced-motion, e il tipo di puntatore
-    // si guarda dentro: fine e grossolano condividono lo stesso writer e lo
-    // stesso stato, e due mm.add() separati avrebbero voluto dire due
-    // proprietari della stessa variabile.
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    // con @property non transiziona, quindi uscendo dalla card il cubo
+    // tornerebbe dritto di scatto. Tweenando l'oggetto di stato invece della
+    // var, la curva ce l'ha il numero — stesso mestiere di driftTo al ①.
+    mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
       const root = document.documentElement;
-      const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-      type Vis = typeof VIS_REST;
-      const set = (el: HTMLElement, s: Vis) => {
-        el.style.setProperty("--vis-x", `${s.x}`);
-        el.style.setProperty("--vis-y", `${s.y}`);
-        el.style.setProperty("--vis-in", `${s.on}`);
-      };
-      const clear = (el: HTMLElement) => {
-        el.style.removeProperty("--vis-x");
-        el.style.removeProperty("--vis-y");
-        el.style.removeProperty("--vis-in");
-      };
-
+      // ── Il riquadro sotto il puntatore ───────────────────────────────────
       let vis: HTMLElement | null = null;
       const st = { ...VIS_REST };
       const write = () => {
-        if (vis) set(vis, st);
+        if (!vis) return;
+        vis.style.setProperty("--vis-x", `${st.x}`);
+        vis.style.setProperty("--vis-y", `${st.y}`);
       };
-      // Durate diverse per un motivo: la posizione deve sembrare la TUA mano
-      // (0.22s è quel poco che toglie il tremolio senza far sentire il
-      // ritardo), l'accensione è una dissolvenza e può prendersi il suo tempo.
-      const xTo = gsap.quickTo(st, "x", { duration: 0.22, ease: "power2", onUpdate: write });
-      const yTo = gsap.quickTo(st, "y", { duration: 0.22, ease: "power2", onUpdate: write });
-      const onTo = gsap.quickTo(st, "on", { duration: 0.45, ease: "power2", onUpdate: write });
+      const xTo = gsap.quickTo(st, "x", { duration: 0.5, ease: "power3", onUpdate: write });
+      const yTo = gsap.quickTo(st, "y", { duration: 0.5, ease: "power3", onUpdate: write });
 
-      // ── Il riquadro che si sta spegnendo ─────────────────────────────────
-      // Sta su un oggetto SUO e non su `st`: passando veloci da una card
-      // all'altra, l'ingresso nella card nuova fa killTweensOf(st) e la
-      // dissolvenza della vecchia morirebbe a metà strada, lasciandole le
-      // variabili addosso per sempre — cioè un gesto acceso su una card che
-      // nessuno sta guardando. Così invece la dissolvenza è intoccabile, e
-      // ce n'è al massimo una per volta.
-      let outEl: HTMLElement | null = null;
-      let outTw: gsap.core.Tween | null = null;
-      const endOut = () => {
-        outTw?.kill();
-        outTw = null;
-        if (outEl) clear(outEl);
-        outEl = null;
-      };
-
-      /** Spegne il riquadro che si sta lasciando e gli toglie le var di dosso,
-       *  così torna a valere il riposo scritto in home.css. */
+      // Uscendo, il riquadro torna al centro con gli STESSI quickTo: un tween
+      // in più sulle stesse proprietà si metterebbe a litigare con quello
+      // ancora in volo se si esce dalla card di corsa. Le var restano scritte
+      // (valgono 0.5, cioè il riposo) e non c'è niente da ripulire.
       const release = () => {
         if (!vis) return;
-        endOut();
-        const leaving = vis;
-        vis = null;
-        gsap.killTweensOf(st);
-        const out: Vis = { ...st };
-        outEl = leaving;
-        outTw = gsap.to(out, {
-          ...VIS_REST,
-          duration: 0.55,
-          ease: "power3.out",
-          onUpdate: () => set(leaving, out),
-          onComplete: endOut,
-        });
+        xTo(VIS_REST.x);
+        yTo(VIS_REST.y);
       };
 
-      /** Posizione del puntatore dentro il riquadro, 0→1 per lato. */
-      const at = (el: HTMLElement, cx: number, cy: number) => {
-        const r = el.getBoundingClientRect();
-        return {
-          x: gsap.utils.clamp(0, 1, (cx - r.left) / (r.width || 1)),
-          y: gsap.utils.clamp(0, 1, (cy - r.top) / (r.height || 1)),
-        };
-      };
-
-      // ── Puntatore fine: il gesto lo tieni in mano ────────────────────────
+      // ── Gli aloni del fondale ────────────────────────────────────────────
+      // Un ritardo lungo (PTR_LAG) e uno spostamento minimo (PTR_SHIFT): è la
+      // luce della stanza che si accorge di te, non un riflettore che ti
+      // insegue. Sopra ci gira comunque la deriva a keyframe da 74 e 91
+      // secondi, su `transform`, che è una proprietà separata da `translate`.
       const ptr = { x: 0.5, y: 0.5 };
-      const ptrTo = {
-        x: gsap.quickTo(ptr, "x", {
-          duration: PTR_LAG,
-          ease: "power2",
-          onUpdate: () => root.style.setProperty("--sb-px", `${(ptr.x - 0.5) * PTR_SHIFT}%`),
-        }),
-        y: gsap.quickTo(ptr, "y", {
-          duration: PTR_LAG,
-          ease: "power2",
-          onUpdate: () => root.style.setProperty("--sb-py", `${(ptr.y - 0.5) * PTR_SHIFT}%`),
-        }),
-      };
-
-      /** Prende in carico un riquadro, partendo da dove ci sei entrato. */
-      const enter = (el: HTMLElement, s: Partial<Vis>) => {
-        // Rientrando in un riquadro che si stava ancora spegnendo, la sua
-        // dissolvenza e il writer scriverebbero le stesse var a due mani.
-        if (outEl === el) endOut();
-        vis = el;
-        gsap.killTweensOf(st);
-        Object.assign(st, VIS_REST, s);
-        write();
-      };
+      const pxTo = gsap.quickTo(ptr, "x", {
+        duration: PTR_LAG,
+        ease: "power2",
+        onUpdate: () => root.style.setProperty("--sb-px", `${(ptr.x - 0.5) * PTR_SHIFT}%`),
+      });
+      const pyTo = gsap.quickTo(ptr, "y", {
+        duration: PTR_LAG,
+        ease: "power2",
+        onUpdate: () => root.style.setProperty("--sb-py", `${(ptr.y - 0.5) * PTR_SHIFT}%`),
+      });
 
       const onMove = (e: PointerEvent) => {
-        // Gli aloni del fondale seguono il puntatore ovunque sia, anche fuori
-        // dalle card: è il pezzo che ha preso il posto delle due keyframe da
-        // 74 e 91 secondi che derivavano a orologio.
-        ptrTo.x(e.clientX / window.innerWidth);
-        ptrTo.y(e.clientY / window.innerHeight);
+        pxTo(e.clientX / window.innerWidth);
+        pyTo(e.clientY / window.innerHeight);
 
         const next = (e.target as HTMLElement | null)?.closest?.(".sb-card-visual") as HTMLElement | null;
         if (next !== vis) {
           release();
-          if (!next) return;
-          // Il gesto parte da dove sei entrato, non dal centro: entrando da
-          // destra la tendina non deve prima saltare a metà.
-          enter(next, at(next, e.clientX, e.clientY));
-          onTo(1);
-          return;
+          vis = next;
+          if (!vis) return;
         }
-        if (!vis) return;
-        const p = at(vis, e.clientX, e.clientY);
-        xTo(p.x);
-        yTo(p.y);
+        const r = vis.getBoundingClientRect();
+        xTo(gsap.utils.clamp(0, 1, (e.clientX - r.left) / (r.width || 1)));
+        yTo(gsap.utils.clamp(0, 1, (e.clientY - r.top) / (r.height || 1)));
       };
 
-      // ── Puntatore grossolano: il tocco fa una passata sola ───────────────
-      // Le card sono <Link>: senza questo il tocco navigherebbe e il gesto non
-      // si vedrebbe mai. Il riquadro del visual si mangia il tocco (è
-      // aria-hidden e decorativo), il resto della card resta il link.
-      const onTap = (e: MouseEvent) => {
-        const el = (e.target as HTMLElement | null)?.closest?.(".sb-card-visual") as HTMLElement | null;
-        if (!el) return;
-        e.preventDefault();
-        e.stopPropagation();
+      // Il puntatore può uscire dalla finestra senza passare da nessuna card,
+      // e scorrendo la card sfila via da sotto un cursore fermo. In cattura:
+      // lo scroll qui lo fa <body>, e il suo evento non risale fino a window.
+      const leave = () => {
         release();
-        enter(el, { x: 0, y: 0, on: 0 });
-        // Una passata da un capo all'altro e ritorno al riposo: è il gesto
-        // intero, eseguito una volta, senza che nessun timer lo ripeta.
-        gsap
-          .timeline({ onComplete: release })
-          .to(st, { on: 1, duration: 0.3, ease: "power2.out", onUpdate: write })
-          .to(st, { x: 1, y: 1, duration: 1.15, ease: "power2.inOut", onUpdate: write }, 0)
-          .to({}, { duration: 0.45 });
+        vis = null;
       };
-
-      if (fine) document.addEventListener("pointermove", onMove, { passive: true });
-      else document.addEventListener("click", onTap, { capture: true });
-      document.addEventListener("pointerleave", release);
-      window.addEventListener("blur", release);
-      // La card sfila via da sotto un cursore fermo mentre si scorre: senza
-      // questo il gesto resterebbe acceso a mezz'aria. In cattura, come sopra.
-      document.addEventListener("scroll", release, { passive: true, capture: true });
+      document.addEventListener("pointermove", onMove, { passive: true });
+      document.addEventListener("pointerleave", leave);
+      window.addEventListener("blur", leave);
+      document.addEventListener("scroll", leave, { passive: true, capture: true });
 
       return () => {
         gsap.killTweensOf(st);
         gsap.killTweensOf(ptr);
-        endOut();
         if (vis) {
-          clear(vis);
+          vis.style.removeProperty("--vis-x");
+          vis.style.removeProperty("--vis-y");
           vis = null;
         }
         root.style.removeProperty("--sb-px");
         root.style.removeProperty("--sb-py");
         document.removeEventListener("pointermove", onMove);
-        document.removeEventListener("click", onTap, { capture: true });
-        document.removeEventListener("pointerleave", release);
-        window.removeEventListener("blur", release);
-        document.removeEventListener("scroll", release, { capture: true });
+        document.removeEventListener("pointerleave", leave);
+        window.removeEventListener("blur", leave);
+        document.removeEventListener("scroll", leave, { capture: true });
       };
     });
+
 
     // ── ⑤ Pozza d'acqua sui quadratini ─────────────────────────────────────
     // Vive tutta in site/puddle.ts; qui c'è solo il cancello. Si aggancia da
