@@ -171,22 +171,25 @@ html.dark .sb-home {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  will-change: translate;
-  /* Due movimenti indipendenti sullo stesso strato, tutti e due scritti da
-     site/GlassMotion.tsx e composti qui: lo scroll dà la deriva verticale
-     (--sb-drift), il puntatore dà lo scostamento (--sb-px/--sb-py). Restano
-     su `translate` e non su `transform` perché è una proprietà a sé: il
-     compositore muove uno strato già dipinto, senza ridisegnare il gradiente.
+  will-change: transform, translate;
+  /* TRE movimenti indipendenti sullo stesso strato, su DUE proprietà diverse —
+     e questa separazione è tutto il trucco:
 
-     Qui c'erano due keyframe da 74 e 91 secondi che facevano derivare gli
-     aloni a orologio, sfasate apposta per non dare un "battito" riconoscibile.
-     Il punto è proprio quello: erano fatte per non farsi notare, e intanto
-     giravano per sempre. Adesso il fondale si muove per un motivo — ci sei tu
-     dall'altra parte dello schermo — e da fermo sta fermo. */
+      · `translate` porta quello che scrive il JS a ogni frame — la deriva
+        dello scroll (--sb-drift) e lo scostamento lento verso il puntatore
+        (--sb-px/--sb-py), entrambi da site/GlassMotion.tsx;
+      · `transform` porta il respiro a keyframe qui sotto.
+
+     Il browser le compone da sé: `translate` si applica prima di `transform`.
+     Se il respiro fosse dentro le stesse coordinate del JS avrebbe smesso di
+     essere compositabile e sarebbe tornato sul thread principale a ogni frame
+     di scroll. Così invece sono tre movimenti che non si sanno l'uno
+     dell'altro, e il compositore muove uno strato già dipinto. */
   translate: var(--sb-px, 0%) calc(var(--sb-drift, 0px) + var(--sb-py, 0%));
 }
 .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.14), transparent 62%);
+  animation: sb-drift-a 74s ease-in-out infinite alternate;
 }
 /* Il secondo alone si sposta un po' di meno e dalla parte opposta: due strati
    che seguono la stessa mano ma non alla stessa velocità hanno una profondità
@@ -194,6 +197,18 @@ html.dark .sb-home {
 .sb-home::after {
   background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.1), transparent 60%);
   translate: calc(var(--sb-px, 0%) * -0.6) calc(var(--sb-drift, 0px) * 0.7 - var(--sb-py, 0%) * 0.6);
+  animation: sb-drift-b 91s ease-in-out infinite alternate;
+}
+/* 74 e 91 secondi: due tempi che non tornano mai in fase alla stessa ora, così
+   il fondo non ha un "battito" riconoscibile. Solo transform e scale — nessun
+   ridisegno, il compositore muove due strati già dipinti. */
+@keyframes sb-drift-a {
+  from { transform: translate3d(-3vw, -2vh, 0) scale(1); }
+  to   { transform: translate3d(4vw, 3vh, 0) scale(1.09); }
+}
+@keyframes sb-drift-b {
+  from { transform: translate3d(3vw, 2vh, 0) scale(1.06); }
+  to   { transform: translate3d(-4vw, -3vh, 0) scale(1); }
 }
 html.dark .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.16), transparent 62%);
@@ -746,27 +761,25 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   min-height: 108px;
   transform: translate3d(0, calc(var(--sb-drift, 0px) * -0.035), 0);
 
-  /* ── I tre numeri da cui viene TUTTO il moto dei visual ─────────────────
-     Li scrive site/GlassMotion.tsx (blocco ④) sul riquadro sotto il puntatore,
-     una scrittura per frame, e li toglie uscendo: quello che si legge qui
-     sotto è quindi il fotogramma di riposo, quello che si vede a pagina ferma
-     e con movimento ridotto.
+  /* ── Dove sta il puntatore dentro il riquadro, 0→1 per lato ─────────────
+     Le scrive site/GlassMotion.tsx (blocco ④) sul riquadro sotto il puntatore,
+     una scrittura per frame; a riposo valgono 0.5, cioè il centro.
 
-     --vis-x  dove sei nel riquadro, in orizzontale, 0→1
-     --vis-y  idem in verticale, 0→1
-     --vis-in quanto il gesto è acceso, 0→1
+     Le usa UN visual solo, il cubo della card CAT, e solo dentro una
+     `transform`. Non è un dettaglio: è la regola che tiene ferma tutta questa
+     sezione del foglio. Un visual che si muove lo fa su `transform` o su
+     `opacity` — le due proprietà che il compositore muove da solo, senza
+     rifare né layout né disegno.
 
-     A riposo x e y stanno a metà, e --vis-in è zero: ogni visual mostra il suo
-     stato di mezzo — il sito costruito a metà, il comando digitato a metà, la
-     tendina a metà — che è un fotogramma leggibile, non un'attesa. */
+     Qui c'è stato un giro in cui il puntatore comandava tutti e sette i
+     visual, e li comandava su `left`, `top`, `clip-path`, `color-mix` e
+     `box-shadow`. Ognuna di quelle, a ogni movimento del mouse, rifà layout o
+     ridisegna; moltiplicato per sette riquadri più il tilt della card, il
+     risultato erano scatti. Il moto dei visual è tornato dove stava — in
+     keyframe CSS che girano per conto loro, su transform e opacity — e il
+     puntatore è rimasto solo dove aggiungeva davvero qualcosa. */
   --vis-x: 0.5;
   --vis-y: 0.5;
-  --vis-in: 0;
-}
-/* Su touch il riquadro si mangia il tocco per eseguire il gesto una volta
-   (vedi onTap in GlassMotion): tanto vale dire che è premibile. */
-@media (hover: none) {
-  .sb-card-visual { cursor: pointer; }
 }
 
 /* Card grande: testo a sinistra, visual a destra (da lg in su) */
@@ -824,18 +837,15 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 }
 .sb-browser-body { position: relative; padding: 0.9rem; display: grid; grid-template-columns: 1fr 2fr; gap: 0.6rem; }
 .sb-skel {
-  /* Quota di corsa che tocca a questo blocco. I tre blocchi si spartiscono lo
-     0→1 di --vis-x: il primo si riempie nel primo terzo, il secondo nel
-     secondo, il terzo nell'ultimo. --i (0,1,2) arriva dal markup. */
-  --p: clamp(0, calc(var(--vis-x) * 3 - var(--i, 0)), 1);
   position: relative;
   border-radius: 6px;
   background: var(--sb-surface-200);
   border: 1px solid var(--sb-border);
   overflow: hidden;
 }
-/* Il riempimento: una barra verde che cresce da sinistra. Su scaleX e non su
-   width, così non c'è un layout da rifare mentre la mano si muove. */
+/* Il riempimento: una barra verde che cresce da sinistra, un blocco dopo
+   l'altro. Su scaleX e non su width — width rifarebbe il layout del blocco a
+   ogni frame, scaleX no: il compositore scala una texture già disegnata. */
 .sb-skel::before {
   content: "";
   position: absolute;
@@ -844,49 +854,71 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   background: linear-gradient(90deg,
     color-mix(in srgb, var(--sb-brand) 26%, transparent),
     color-mix(in srgb, var(--sb-brand) 12%, transparent));
-  transform: scaleX(var(--p));
   transform-origin: left center;
+  animation: sb-build var(--build, 7s) ease-in-out infinite;
 }
-/* Il contorno si accende sul blocco che si sta riempiendo in questo momento —
-   cioè dove sta la mano — e si spegne quando è pieno. */
-.sb-skel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: calc(var(--p) * (1 - var(--p)) * 4 * var(--vis-in));
-  box-shadow: inset 0 0 0 1.5px hsla(153, 60%, 53%, 0.75), inset 0 0 16px hsla(153, 60%, 53%, 0.3);
-}
+/* Un blocco ogni mezzo secondo: la pagina si costruisce dall'alto, come una
+   pagina vera che arriva. */
 .sb-skel--hero { grid-column: 1 / -1; height: 56px; }
 .sb-skel--side { height: 84px; }
 .sb-skel--main { height: 84px; }
+.sb-skel--side::before { animation-delay: 0.5s; }
+.sb-skel--main::before { animation-delay: 1s; }
+@keyframes sb-build {
+  0%        { transform: scaleX(0); }
+  26%, 78%  { transform: scaleX(1); }
+  92%, 100% { transform: scaleX(0); }
+}
 
 /* Pillola di stato del deploy: due parole sovrapposte che si scambiano il
-   posto sul finale della corsa. Cambiare testo davvero avrebbe voluto dire
-   tenere in piedi del JS per una parola sola. */
+   posto quando i blocchi sono a posto. Cambiare testo davvero avrebbe voluto
+   dire tenere in piedi del JS per una parola sola — così sono due opacità,
+   che il compositore incrocia senza ridisegnare niente. */
 .sb-browser-badge {
   position: relative;
   flex-shrink: 0;
   display: inline-grid;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
-  border: 1px solid;
+  border: 1px solid var(--sb-border-strong);
+  background: var(--sb-surface-200);
   font-size: 0.56rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  /* --go: 0 fino al 78% della corsa, poi sale a 1 nell'ultimo pezzo. */
-  --go: clamp(0, calc((var(--vis-x) - 0.78) * 4.5), 1);
-  background: color-mix(in srgb, var(--sb-btn-bg) calc(var(--go) * 100%), var(--sb-surface-200));
-  border-color: color-mix(in srgb, var(--sb-btn-bd) calc(var(--go) * 100%), var(--sb-border-strong));
-  box-shadow: 0 0 14px -2px hsla(153, 60%, 53%, calc(var(--go) * 0.9));
 }
-/* Niente transition qui: --vis-x arriva già smorzato da un quickTo, e una
-   seconda curva sopra la prima farebbe solo ritardo. */
-.sb-browser-badge > span { grid-area: 1 / 1; }
-.sb-browser-badge .build { color: var(--sb-fg-muted); opacity: calc(1 - var(--go)); }
-.sb-browser-badge .live { color: var(--sb-btn-fg); opacity: var(--go); }
+/* Il verde del "live" è uno strato sotto, che si accende e si spegne: così
+   anche il cambio di colore della pillola è una sola opacità, e non un
+   color-mix da ricalcolare. */
+.sb-browser-badge::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--sb-btn-bg);
+  border: 1px solid var(--sb-btn-bd);
+  box-shadow: 0 0 14px -2px var(--sb-brand);
+  animation: sb-badge-live var(--build, 7s) ease-in-out infinite;
+}
+.sb-browser-badge > span { grid-area: 1 / 1; position: relative; }
+.sb-browser-badge .build {
+  color: var(--sb-fg-muted);
+  animation: sb-badge-build var(--build, 7s) ease-in-out infinite;
+}
+.sb-browser-badge .live {
+  color: var(--sb-btn-fg);
+  animation: sb-badge-live var(--build, 7s) ease-in-out infinite;
+}
+@keyframes sb-badge-build {
+  0%, 40%   { opacity: 1; }
+  46%, 88%  { opacity: 0; }
+  94%, 100% { opacity: 1; }
+}
+@keyframes sb-badge-live {
+  0%, 40%   { opacity: 0; }
+  46%, 88%  { opacity: 1; }
+  94%, 100% { opacity: 0; }
+}
 
 /* Terminale (card AI) — resta scuro in entrambi i temi, come un vero terminale.
    La digitazione si scorre: il comando sta tutto nel markup e --vis-x lo scopre
@@ -912,29 +944,52 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-term-line .c { color: #8f8f8f; }
 /* Il contenitore si tiene largo quanto il comando INTERO (--n caratteri, font
    monospazio): senza, la riga si allargherebbe mentre si digita e il prompt
-   ballerebbe. */
-.sb-term-typed { position: relative; display: inline-block; width: calc(var(--n, 20) * 1ch); }
-/* Il taglio scopre il comando da sinistra. Cade a metà di un carattere, ma il
-   caret è largo 1ch e sta proprio lì sopra: il glifo tagliato finisce sotto il
-   blocco, esattamente come in un terminale vero. */
+   ballerebbe a ogni carattere. */
+.sb-term-typed { position: relative; display: inline-block; width: calc(var(--n, 22) * 1ch); }
+/* Il taglio scopre il comando da sinistra. È l'unica animazione di disegno
+   rimasta in questa sezione, e si può permettere: è una riga di testo di
+   duecento pixel, non un gradiente grande quanto la card. Prima qui c'era una
+   timeline GSAP che riscriveva textContent un carattere alla volta — cioè un
+   ricalcolo di layout ogni 42 millisecondi. */
 .sb-term-cmd {
   display: block;
   min-height: 1em;
-  clip-path: inset(0 calc((1 - var(--vis-x)) * 100%) 0 0);
+  clip-path: inset(0 100% 0 0);
+  animation: sb-type var(--type, 9s) ease-in-out infinite;
 }
-/* La testa di scrittura. NON lampeggia: si muove, ed è già viva così. Un caret
-   che lampeggia da fermo era, di tutta la home, l'animazione che si ripeteva
-   più spesso e diceva meno. */
+/* La testa di scrittura, larga 1ch: cadendo esattamente sul bordo del taglio
+   copre il glifo tagliato a metà, come in un terminale vero. Si muove su
+   translateX (non su `left`, che rifarebbe il layout della riga) con la stessa
+   curva e la stessa durata del taglio, così i due non si separano mai. */
 .sb-term-caret {
   position: absolute;
   top: 0.15em;
-  left: calc(var(--vis-x) * 100%);
+  left: 0;
   width: 1ch;
   height: 1.05em;
   background: var(--sb-brand);
+  animation: sb-type-caret var(--type, 9s) ease-in-out infinite;
 }
-/* L'output arriva solo quando il comando è scritto per intero. */
-.sb-term-out { opacity: clamp(0, calc((var(--vis-x) - 0.9) * 10), 1); }
+@keyframes sb-type {
+  0%        { clip-path: inset(0 100% 0 0); }
+  34%, 88%  { clip-path: inset(0 0 0 0); }
+  96%, 100% { clip-path: inset(0 100% 0 0); }
+}
+@keyframes sb-type-caret {
+  0%        { transform: translateX(0); }
+  34%, 88%  { transform: translateX(calc(var(--n, 22) * 1ch)); }
+  96%, 100% { transform: translateX(0); }
+}
+/* L'output arriva quando il comando è scritto per intero, e se ne va con lui. */
+.sb-term-out {
+  opacity: 0;
+  animation: sb-term-out var(--type, 9s) ease-in-out infinite;
+}
+@keyframes sb-term-out {
+  0%, 38%   { opacity: 0; }
+  46%, 88%  { opacity: 1; }
+  94%, 100% { opacity: 0; }
+}
 
 /* Cursore a blocco per i terminali che NON si digitano — quello del pannello
    clienti, che mostra un comando già dato. Sta pieno e fermo: lampeggia solo
@@ -997,24 +1052,27 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
    dalla parte in cui vai, e il sito che raggiungi si accende. Sei tu a
    instradare, e sotto il puntatore c'è sempre esattamente un filo vivo.
 
-   --to-l e --to-r: quanto sei andato verso sinistra o verso destra, 0→1.
-   Partono dalla metà del riquadro perché lì sta il nodo. */
-.sb-flow {
-  position: relative;
-  width: 100%;
-  max-width: 300px;
-  height: 116px;
-  --to-l: clamp(0, calc((0.5 - var(--vis-x)) * 2.6), 1);
-  --to-r: clamp(0, calc((var(--vis-x) - 0.5) * 2.6), 1);
-}
+   Un pacchetto per volta, a turno: il secondo filo parte a metà del ciclo del
+   primo. */
+.sb-flow { position: relative; width: 100%; max-width: 300px; height: 116px; }
 .sb-flow-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .sb-flow-wires .ghost { stroke: var(--sb-border-stronger); opacity: 0.6; }
 /* pathLength="1" sul tracciato (vedi ClientFlow): il tratteggio si misura da 0
    a 1 comunque sia fatta la curva, e qui non serve sapere niente della
    geometria — basta scoprirne la frazione giusta. */
-.sb-flow-wires .pulse { stroke: var(--sb-brand); stroke-dashoffset: 1; }
-.sb-flow-wires .to-left .pulse { stroke-dashoffset: calc(1 - var(--to-l)); }
-.sb-flow-wires .to-right .pulse { stroke-dashoffset: calc(1 - var(--to-r)); }
+.sb-flow-wires .pulse {
+  stroke: var(--sb-brand);
+  animation: sb-packet var(--packet, 3.4s) ease-in-out infinite;
+}
+.sb-flow-wires .to-right .pulse { animation-delay: calc(var(--packet, 3.4s) / 2); }
+/* Il tratteggio è [1, 1] su un tracciato lungo 1: con offset 1 il filo cade
+   tutto nel vuoto del tratteggio (invisibile), con offset 0 è tutto pieno.
+   Fra i due, la parte scoperta cresce dal nodo verso il sito. */
+@keyframes sb-packet {
+  0%, 8%    { stroke-dashoffset: 1; }
+  55%, 78%  { stroke-dashoffset: 0; }
+  92%, 100% { stroke-dashoffset: 1; }
+}
 .sb-flow-hub {
   position: absolute;
   top: 0;
@@ -1027,13 +1085,33 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   place-items: center;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-bg);
-  /* Il nodo si illumina mentre trasmette, da qualunque parte tu stia andando. */
-  box-shadow: 0 0 16px -4px hsla(153, 60%, 53%, calc(max(var(--to-l), var(--to-r)) * 0.85));
 }
 .sb-flow-hub img { width: 20px; height: 20px; border-radius: 5px; display: block; }
-/* Il pallino del sito raggiunto si accende: è l'arrivo del pacchetto. */
-.sb-flow-ends .to-left .sb-chip-dot { box-shadow: 0 0 0 calc(var(--to-l) * 5px) hsla(153, 60%, 53%, 0.3); }
-.sb-flow-ends .to-right .sb-chip-dot { box-shadow: 0 0 0 calc(var(--to-r) * 5px) hsla(153, 60%, 53%, 0.3); }
+/* Il nodo respira mentre trasmette. Su opacity di uno strato che ha già il suo
+   alone dipinto, non su box-shadow: un'ombra che cambia raggio va ridisegnata
+   a ogni frame, un'opacità no. */
+.sb-flow-hub::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 16px -3px var(--sb-brand);
+  animation: sb-hub var(--packet, 3.4s) ease-in-out infinite;
+}
+@keyframes sb-hub {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.9; }
+}
+/* Il pallino del sito si accende all'arrivo del suo pacchetto, in fase col
+   filo che lo serve. */
+.sb-flow-ends .sb-chip-dot { animation: sb-dot-hit var(--packet, 3.4s) ease-in-out infinite; }
+.sb-flow-ends .to-right .sb-chip-dot { animation-delay: calc(var(--packet, 3.4s) / 2); }
+@keyframes sb-dot-hit {
+  0%, 40%   { opacity: 0.45; transform: scale(1); }
+  62%       { opacity: 1; transform: scale(1.5); }
+  86%, 100% { opacity: 0.45; transform: scale(1); }
+}
 .sb-flow-ends {
   position: absolute;
   left: 0;
@@ -1105,23 +1183,29 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-diff-row { height: 9px; border-radius: 4px; background: var(--sb-surface-200); }
 .sb-diff-row--hit { background: color-mix(in srgb, var(--sb-brand) 38%, var(--sb-surface-200)); }
 .sb-diff-row--miss { background: color-mix(in srgb, #e93d5d 30%, var(--sb-surface-200)); }
-/* Niente matematica riga per riga: la banda passa SOPRA e ravviva quello che
-   copre, quale che sia. Stesso mestiere (e stessi blend) della pozza d'acqua
-   sui quadratini dei commit, più in basso in questo foglio. */
+/* La banda scende, si spegne in fondo e ricomincia dall'alto. Niente
+   matematica riga per riga e niente mix-blend-mode: il blend obbligava il
+   browser a ridisegnare tutto quello che stava sotto la banda a ogni frame,
+   e per una lampada verde su fondo chiaro non cambiava quasi niente.
+   Transform e opacity, e basta. */
 .sb-diff-scan {
   position: absolute;
   left: -6px;
   right: -6px;
-  top: calc(var(--vis-y) * 100% - 8px);
+  top: 0;
   height: 16px;
   border-radius: 8px;
   pointer-events: none;
-  opacity: var(--vis-in);
-  background: linear-gradient(180deg, transparent, hsla(153, 60%, 53%, 0.42), transparent);
-  box-shadow: 0 0 18px hsla(153, 60%, 53%, 0.45);
-  mix-blend-mode: multiply;
+  background: linear-gradient(180deg, transparent, hsla(153, 60%, 53%, 0.38), transparent);
+  box-shadow: 0 0 18px hsla(153, 60%, 53%, 0.4);
+  animation: sb-scan var(--scan, 4.2s) ease-in-out infinite;
 }
-html.dark .sb-diff-scan { mix-blend-mode: plus-lighter; }
+@keyframes sb-scan {
+  0%        { transform: translateY(2px); opacity: 0; }
+  12%       { opacity: 1; }
+  62%       { transform: translateY(62px); opacity: 1; }
+  74%, 100% { transform: translateY(62px); opacity: 0; }
+}
 
 /* Card CAT — piano cartesiano in tre dimensioni con un cubo che ci galleggia
    sopra. Vera profondità CSS (perspective + transform-style: preserve-3d), non
@@ -1197,23 +1281,52 @@ html.dark .sb-diff-scan { mix-blend-mode: plus-lighter; }
   border-radius: 50%;
   /* Il translateZ dopo la rotazione stacca l'ombra di un pelo dal piano:
      complanari, i due si contenderebbero lo stesso pixel (z-fighting). */
-  transform: rotateX(74deg) translateZ(1px) scale(calc(1 - var(--lift) * 0.24));
-  opacity: calc(1 - var(--lift) * 0.4);
+  transform: rotateX(74deg) translateZ(1px);
   background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-fg) 26%, transparent), transparent 72%);
+  animation: sb-cat-shadow var(--float, 3.4s) ease-in-out infinite alternate;
 }
-/* --lift: quanto è alzata la mano, 0 in basso → 1 in alto. Il sollevamento
-   sta qui e la rotazione sul cubo: due trasformazioni su due elementi, così
-   non c'è una sola `transform` che debba portarle tutte e due. */
-.sb-cat-origin { --lift: calc(1 - var(--vis-y)); }
+/* TRE movimenti sul cubo, e tre elementi diversi: il galleggiamento sul
+   portacubo, il giro lento sulla giostra, l'inseguimento del puntatore sul
+   cubo. Sono tutti e tre delle `transform`, e una `transform` per elemento è
+   tutto quello che si può avere — infilarle in una sola vorrebbe dire tenerle
+   in fase a mano, che è poi il motivo per cui prima ci voleva GSAP. Annidati,
+   si compongono da soli e restano tre animazioni indipendenti.
+
+   La catena preserve-3d non si interrompe: origin → lift → spin → cube. */
 .sb-cat-lift {
   position: absolute;
   left: 0;
   top: 0;
   transform-style: preserve-3d;
-  transform: translateY(calc(var(--lift) * -16px));
+  animation: sb-cat-float var(--float, 3.4s) ease-in-out infinite alternate;
 }
+@keyframes sb-cat-float {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-13px); }
+}
+@keyframes sb-cat-shadow {
+  from { transform: rotateX(74deg) translateZ(1px) scale(1); opacity: 1; }
+  to   { transform: rotateX(74deg) translateZ(1px) scale(0.78); opacity: 0.55; }
+}
+/* Giro lento su sé stesso. Si ferma quando ci passi sopra: da lì in poi
+   comanda la mano, e un cubo che continua a girare mentre provi a orientarlo
+   è un cubo che ti sfugge. */
+.sb-cat-spin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  animation: sb-cat-spin 26s linear infinite;
+}
+@keyframes sb-cat-spin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+.sb-card:hover .sb-cat-spin { animation-play-state: paused; }
 /* Posa di riposo: assonometria leggibile, un vertice verso di noi. A metà
-   riquadro (--vis-x e --vis-y a 0.5) i due calc valgono esattamente questo. */
+   riquadro (--vis-x e --vis-y a 0.5) i due calc valgono esattamente questo.
+   È l'unico posto della sezione dove il puntatore comanda ancora — e lo fa
+   dentro una transform, che è quello che qui si può fare a costo zero. */
 .sb-cat-cube {
   position: absolute;
   left: -24px;
@@ -1223,7 +1336,7 @@ html.dark .sb-diff-scan { mix-blend-mode: plus-lighter; }
   transform-style: preserve-3d;
   transform:
     rotateX(calc(-22deg + (var(--vis-y) - 0.5) * -72deg))
-    rotateY(calc(32deg + (var(--vis-x) - 0.5) * 150deg));
+    rotateY(calc(32deg + (var(--vis-x) - 0.5) * 110deg));
 }
 .sb-cat-face {
   position: absolute;
@@ -1267,30 +1380,55 @@ html.dark .sb-diff-scan { mix-blend-mode: plus-lighter; }
   letter-spacing: -0.02em;
 }
 .sb-aa .lite { background: #fcfcfc; color: #171717; }
-/* La tendina sta dove sei tu. Prima scorreva avanti e indietro da sola ogni 7
-   secondi, su due keyframe che dovevano restare in fase fra loro perché il
-   manico non si staccasse dal bordo. Adesso sono la stessa var, e in fase ci
-   stanno per costruzione. */
+/* La tendina scorre avanti e indietro e scopre lo scuro sotto il chiaro. Due
+   keyframe che devono restare in fase fra loro, o il manico si stacca dal
+   bordo: stessa durata, stessa curva, stesse percentuali. */
 .sb-aa .dark {
   position: absolute;
   inset: 0;
   background: #171717;
   color: #ededed;
-  clip-path: inset(0 0 0 calc(var(--vis-x) * 100%));
+  clip-path: inset(0 0 0 50%);
+  animation: sb-wipe var(--wipe, 8s) ease-in-out infinite;
 }
+@keyframes sb-wipe {
+  0%, 100% { clip-path: inset(0 0 0 64%); }
+  50%      { clip-path: inset(0 0 0 22%); }
+}
+/* Il manico è largo quanto tutto il riquadro e trasparente: quello che si vede
+   è il suo ::before, un filo di 2px sul bordo sinistro. Serve perché così il
+   manico può muoversi su translateX in PERCENTUALE — e la percentuale di un
+   transform si misura sulla larghezza dell'elemento, cioè su tutto il
+   riquadro. Prima si muoveva su `left`, che rifà il layout a ogni frame. */
 .sb-aa-handle {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: calc(var(--vis-x) * 100%);
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  animation: sb-wipe-handle var(--wipe, 8s) ease-in-out infinite;
+}
+.sb-aa-handle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
   width: 2px;
   background: var(--sb-brand);
 }
+@keyframes sb-wipe-handle {
+  0%, 100% { transform: translateX(64%); }
+  50%      { transform: translateX(22%); }
+}
+/* Il bottone tondo sul filo. Sta a left:0 come il filo, non a metà del manico:
+   il manico adesso è largo quanto tutto il riquadro. */
 .sb-aa-handle::after {
   content: "";
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 0;
   transform: translate(-50%, -50%);
   width: 15px;
   height: 15px;
@@ -1922,8 +2060,6 @@ html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
 .sb-menu-mail svg { color: var(--sb-brand-text); }
 
 /* ── Modale PDF: barra coerente con la home verde ────────────────────────── */
-.sb-home .ap-cv-bar { background: #1c1c1c; }
-.sb-home .ap-cv-fallback { background: var(--sb-surface-100); color: var(--sb-brand-text); border-bottom-color: var(--sb-border); }
 
 /* ── Skiplink (riusa la convenzione del sito) ────────────────────────────── */
 .sb-home .visually-hidden-focusable:not(:focus):not(:focus-within) {

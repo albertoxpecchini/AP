@@ -12,6 +12,11 @@ interface GameTutorialProps {
   steps: IntroStep[];
   accentColor: string;
   darkBg: string;
+  /**
+   * Non decide più i colori — la card li prende dai token --sb-*, che seguono
+   * già il tema. Resta perché i giochi la passano ancora; togliendola andrebbe
+   * cambiata anche ogni chiamata.
+   */
   dark?: boolean;
   /** Nodo opzionale (es. <style> di keyframes) iniettato UNA volta nell'overlay. */
   extra?: React.ReactNode;
@@ -19,6 +24,12 @@ interface GameTutorialProps {
 }
 
 const SEEN_KEY_PREFIX = "game-tutorial-seen-";
+
+// Aloni dell'accento. Derivati dal brand con color-mix perché l'accento è una
+// variabile CSS: non si può più ricavare una versione trasparente aggiungendo
+// due cifre esadecimali in fondo, come si faceva quando era un #rrggbb.
+const GLOW_SOFT = "color-mix(in srgb, var(--sb-brand) 35%, transparent)";
+const GLOW_STRONG = "color-mix(in srgb, var(--sb-brand) 65%, transparent)";
 
 export function hasSeenTutorial(gameKey: string): boolean {
   try { return localStorage.getItem(SEEN_KEY_PREFIX + gameKey) === "1"; } catch { return false; }
@@ -33,7 +44,7 @@ export const hasSeenIntro = hasSeenTutorial;
 export const resetIntro   = resetTutorial;
 
 export default function GameTutorial({
-  gameKey, steps, accentColor, darkBg, dark = false, extra, onDone,
+  gameKey, steps, accentColor, darkBg, extra, onDone,
 }: GameTutorialProps) {
   const [stepIdx, setStepIdx] = useState(0);
   const [exiting, setExiting] = useState(false);
@@ -73,11 +84,16 @@ export default function GameTutorial({
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev, finish]);
 
-  const cardBg     = dark ? "#1a2720" : "#ffffff";
-  const cardBorder = dark ? "rgba(233, 84, 32,0.22)" : "rgba(233, 84, 32,0.18)";
-  const textMain   = dark ? "#d4e8dc" : "#17271d";
-  const textSub    = dark ? "#a4c4aa" : "#3c4a41";
-  const visualBg   = dark ? "#0f1612" : "#f4f6f5";
+  // Superfici e testi della CARD dai token --sb-*: seguono il tema del sito da
+  // soli, non serve più scegliere a mano in base a `dark`. La prop resta per i
+  // chiamanti, ma non decide più i colori.
+  // Nota: header, dot e pulsanti stanno sopra il fondale aurora — quello è
+  // saturo e scuro in tutti e due i temi, quindi lì il bianco è corretto.
+  const cardBg     = "var(--sb-surface-75)";
+  const cardBorder = "var(--sb-border-strong)";
+  const textMain   = "var(--sb-fg)";
+  const textSub    = "var(--sb-fg-light)";
+  const visualBg   = "var(--sb-bg-alt)";
   const isLast     = stepIdx === steps.length - 1;
   const isFirst    = stepIdx === 0;
 
@@ -200,7 +216,9 @@ export default function GameTutorial({
               style={{
                 width: i === stepIdx ? 24 : 8, height: 8, borderRadius: 999, padding: 0, border: "none", cursor: "pointer",
                 background: i === stepIdx ? accentColor : "rgba(255,255,255,0.24)",
-                boxShadow: i === stepIdx ? `0 0 10px ${accentColor}aa` : "none",
+                // color-mix e non `${accentColor}aa`: l'accento ora è una var
+                // CSS, e appiccicarle due cifre di alpha non produce un colore.
+                boxShadow: i === stepIdx ? `0 0 10px ${GLOW_STRONG}` : "none",
                 transition: "width 0.34s cubic-bezier(.34,1.56,.64,1), background 0.3s, box-shadow 0.3s",
               }}
             />
@@ -231,7 +249,7 @@ export default function GameTutorial({
               fontSize: "1rem", fontWeight: 800, cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
               fontFamily: "inherit", position: "relative", overflow: "hidden",
-              boxShadow: `0 6px 24px ${accentColor}59`,
+              boxShadow: `0 6px 24px ${GLOW_SOFT}`,
             }}
           >
             <span className="gt-cta-shine" aria-hidden />

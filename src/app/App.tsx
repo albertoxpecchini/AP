@@ -1328,19 +1328,22 @@ export default function App() {
           <div className="ap-cv-dialog">
             <div className="ap-cv-bar">
               <span className="ap-cv-title">{docOpen.title}</span>
-              <div className="d-flex align-items-center gap-2">
-                <a href={docOpen.url} target="_blank" rel="noreferrer noopener" className="btn btn-sm btn-outline-light fw-semibold d-none d-sm-inline-flex align-items-center">
-                  <IcExternal size={15} className="me-1" /> New tab
+              {/* Pulsanti del design system (.sb-btn) al posto di quelli di
+                  Bootstrap Italia: era l'ultimo pezzo della home fuori dai
+                  token, e teneva in piedi da solo un CSS+JS interi. */}
+              <div className="ap-cv-actions">
+                <a href={docOpen.url} target="_blank" rel="noreferrer noopener" className="sb-btn sb-btn--sm sb-btn--secondary ap-cv-newtab">
+                  <IcExternal size={15} /> New tab
                 </a>
-                <a href={docOpen.url} download className="btn btn-sm btn-light fw-semibold d-inline-flex align-items-center">
-                  <IcDownload size={15} className="me-1" /> Download
+                <a href={docOpen.url} download className="sb-btn sb-btn--sm sb-btn--primary">
+                  <IcDownload size={15} /> Download
                 </a>
                 <button type="button" className="ap-cv-close" onClick={() => setDocOpen(null)} aria-label="Close the document preview">
                   <IcClose size={20} />
                 </button>
               </div>
             </div>
-            <a href={docOpen.url} target="_blank" rel="noreferrer noopener" className="ap-cv-fallback d-sm-none">
+            <a href={docOpen.url} target="_blank" rel="noreferrer noopener" className="ap-cv-fallback">
               On mobile the PDF preview may not load — tap here to open the file →
             </a>
             <iframe className="ap-cv-frame" src={`${docOpen.url}#view=FitH&toolbar=1&navpanes=0`} title={`Preview: ${docOpen.title}`} />

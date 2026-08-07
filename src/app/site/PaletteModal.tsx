@@ -7,10 +7,11 @@ import "./palette.css";
 // ─────────────────────────────────────────────────────────────────────────────
 // "Palette" — il sistema colore del sito, per intero, in una finestra sola.
 // Sta in fondo alla barra del footer (al posto del vecchio pulsante README) e
-// raccoglie TUTTE le tinte in uso: i token .sb- della home (chiaro e scuro),
-// l'arancio Ubuntu dell'identità storica, i colori del codice, quelli dei dati
-// (grafico contribuzioni, linguaggi), il "dark premium" di Trivia, e infine i
-// gradienti e le ombre — con esempio dal vivo e copia negli appunti.
+// raccoglie TUTTE le tinte in uso: i token .sb- della home (chiaro e scuro), la
+// loro copia su :root per shadcn, i colori del codice, quelli dei dati (grafico
+// contribuzioni, linguaggi), i pochi colori fissi di Trivia, l'arancio delle
+// email, e infine gradienti e ombre — con esempio dal vivo e copia negli
+// appunti.
 //
 // I valori sono trascritti dalle sorgenti (home.css, styles/theme.css,
 // _game/ui/tokens.ts, GitHubFooterWidget, scrollprogress.css) invece che letti
@@ -110,19 +111,30 @@ const GROUPS: Grp[] = [
     ],
   },
   {
-    id: "ubuntu",
-    t: "Arancio Ubuntu — identità storica",
-    s: "La prima veste del sito, ancora viva: email, PDF del curriculum, README e componenti shadcn.",
+    id: "shadcn",
+    t: "Token shadcn — mappe e componenti",
+    s: "Le stesse tinte dei token .sb-, ricopiate su :root perché Tailwind e i componenti shadcn (le mappe MapLibre) le leggono da lì. Vivono in styles/theme.css.",
     scope: ":root",
     sw: [
-      { n: "Ubuntu orange", v: "--primary", l: "#e95420", note: "il colore della firma" },
+      { n: "Primario", v: "--primary", l: "hsl(153, 60%, 53%)", note: "il verde brand, uguale nei due temi" },
+      { n: "Fondo", v: "--background", l: "#fcfcfc", d: "#141414" },
+      { n: "Testo", v: "--foreground", l: "#171717", d: "#ededed" },
+      { n: "Card", v: "--card", l: "#fbfbfb", d: "#1c1c1c" },
+      { n: "Secondario", v: "--secondary", l: "#f6f6f6", d: "#222222" },
+      { n: "Grigio testo", v: "--muted-foreground", l: "#6f6f6f", d: "#969696" },
+      { n: "Bordo", v: "--border", l: "#e8e8e8", d: "#2a2a2a" },
+      { n: "Rosso", v: "--destructive", l: "#e5484d", note: "errori, azioni distruttive" },
+    ],
+  },
+  {
+    id: "ubuntu",
+    t: "Arancio Ubuntu — identità storica",
+    s: "La prima veste del sito. Nel sito non c'è più: sopravvive nelle email transazionali e nei documenti generati dal server (api/d.ts).",
+    sw: [
+      { n: "Ubuntu orange", l: "#e95420", note: "fascia e intestazione delle email" },
       { n: "Arancio profondo", l: "#dd4814", note: "hover e stati premuti" },
-      { n: "Accento", v: "--accent", l: "#f0a183", note: "occhielli, bordi tenui" },
-      { n: "Sabbia", v: "--background", l: "#faf8f6", note: "fondo delle email" },
-      { n: "Inchiostro", v: "--foreground", l: "#1c1a17" },
-      { n: "Grigio caldo", v: "--secondary", l: "#eae7e0" },
-      { n: "Grigio testo", v: "--muted-foreground", l: "#8a8478" },
-      { n: "Rosso", v: "--destructive", l: "#c94040", note: "errori, azioni distruttive" },
+      { n: "Sabbia", l: "#faf8f6", note: "fondo delle email" },
+      { n: "Inchiostro", l: "#1c1a17", note: "testo delle email" },
       { n: "Nero footer", l: "#08090d", note: "footer delle email" },
     ],
   },
@@ -155,17 +167,16 @@ const GROUPS: Grp[] = [
   },
   {
     id: "trivia",
-    t: "Trivia — dark premium",
-    s: "Il motore giochi ha una palette sua: grigi caldi tinti melanzana (mai freddi) e un accento neon.",
+    t: "Trivia — colori a sé",
+    s: "Il gioco non ha più una palette propria: superfici e testi vengono dai token .sb- qui sopra (_game/ui/tokens.ts li rimanda e basta). Restano fissi solo i colori che NON sono interfaccia — un podio è un podio in tutti e due i temi.",
     sw: [
-      { n: "Accento", l: "#0f9d63", note: "--accent del gioco" },
-      { n: "Alone", l: "rgba(62, 207, 142, 0.45)", note: "--glow, ombre e ring di focus" },
-      { n: "Fondo 0", l: "#f1efed", d: "#1d171b" },
-      { n: "Fondo 1", l: "#f8f6f4", d: "#241c22" },
-      { n: "Testo", l: "#3d3846", d: "#f5f3f1" },
-      { n: "Sottotesto", l: "#6e665f", d: "#a39c96" },
-      { n: "Vetro", l: "#ffffff", d: "rgba(255, 255, 255, 0.045)" },
-      { n: "Bordo vetro", l: "rgba(0, 0, 0, 0.07)", d: "rgba(255, 255, 255, 0.09)" },
+      { n: "Oro", l: "linear-gradient(135deg, #f4d03f, #c8a415)", note: "primo posto" },
+      { n: "Argento", l: "linear-gradient(135deg, #cfd8dc, #9aa6ad)", note: "secondo posto" },
+      { n: "Bronzo", l: "linear-gradient(135deg, #d99c6a, #b0724c)", note: "terzo posto" },
+      { n: "Oro bonus", l: "#d9a400", note: "barra del bonus velocità nel tutorial" },
+      { n: "Blu tutorial", l: "#3a7bbf", note: "card «vero o falso»" },
+      { n: "Arancio tutorial", l: "#b5651d", note: "card «completamento»" },
+      { n: "Rosso errore", l: "#e5484d", note: "nickname non valido, voto in calo" },
     ],
   },
   {

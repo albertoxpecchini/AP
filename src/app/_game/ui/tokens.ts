@@ -28,8 +28,8 @@ export const ACCENTS: Record<string, GameAccent> = {
   },
 };
 
-// Superfici e testi. Un solo set: sono variabili, quindi seguono già il tema —
-// non serve più una coppia DARK/LIGHT scelta a mano dal codice.
+// Superfici e testi. Un solo set, non più la coppia DARK/LIGHT che il codice
+// doveva scegliere a mano: sono variabili, quindi seguono già il tema.
 export const SURFACE = {
   bg0: "var(--sb-bg)",
   bg1: "var(--sb-bg-alt)",
@@ -38,11 +38,3 @@ export const SURFACE = {
   glass: "var(--sb-glass-bg)",
   glassBorder: "var(--sb-border)",
 };
-
-/**
- * Alias di compatibilità: il motore aveva due set distinti e li sceglieva in
- * base al tema. Ora puntano entrambi allo stesso oggetto di variabili, che si
- * risolve da solo. Restano perché più file li importano ancora per nome.
- */
-export const DARK = SURFACE;
-export const LIGHT = SURFACE;

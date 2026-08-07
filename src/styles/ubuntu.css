@@ -1,95 +1,42 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SKIN UBUNTU / YARU — layer globale, caricato PER ULTIMO (vince sui token di
-   theme.css a parità di selettore). Qui vive tutto ciò che rende il sito
-   "Ubuntu": arancio #E95420, melanzana, grigi caldi, selezione arancio e
-   scrollbar stile GNOME. Tipografia da font_italia.css (Titillium Web +
-   Roboto Mono). Le pagine mantengono la loro struttura.
+   CROMATURE GLOBALI — tipografia di base, selezione del testo, scrollbar.
+   Roba che sta su <html>/<body> e non appartiene a nessuna pagina.
+
+   Il file si chiamava così perché conteneva la skin Ubuntu/Yaru: arancio
+   #e95420, melanzana, grigi caldi, e una SECONDA copia dei token shadcn con
+   valori diversi da quelli di theme.css (vinceva questa solo per via
+   dell'ordine di import). I token stanno ora in un posto solo — theme.css —
+   allineati ai --sb-* del design system, e l'arancio non c'è più da nessuna
+   parte: l'accento del sito è il verde brand.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Palette ufficiale Canonical */
-  --yaru-orange: #e95420;
-  --yaru-orange-old: #dd4814;
-  --yaru-aubergine-light: #77216f;
-  --yaru-aubergine-mid: #5e2750;
-  --yaru-aubergine-dark: #2c001e;
-  --yaru-warm-grey: #aea79f;
-
-  --font-ubuntu: "Titillium Web", system-ui, -apple-system, "Helvetica Neue", sans-serif;
-  --font-ubuntu-mono: "Roboto Mono", ui-monospace, monospace;
+  --font-site: "Titillium Web", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  --font-site-mono: "Roboto Mono", ui-monospace, monospace;
 }
 
-/* ── Tipografia da font_italia.css: Titillium Web ovunque, Roboto Mono per il
-   codice (le stesse famiglie dichiarate da bootstrap-italia.min.css). */
-html, body, button, input, select, textarea, .it-page-wrapper {
-  font-family: var(--font-ubuntu);
+/* Titillium Web ovunque, Roboto Mono per il codice (da font_italia.css). */
+html, body, button, input, select, textarea {
+  font-family: var(--font-site);
 }
 code, pre, kbd, samp {
-  font-family: var(--font-ubuntu-mono);
+  font-family: var(--font-site-mono);
 }
 
-/* ── Token shadcn/Tailwind rimappati su Yaru (chiaro) ── */
-:root {
-  --background: #fafaf8;
-  --foreground: #3d3846;
-  --card: #ffffff;
-  --card-foreground: #3d3846;
-  --popover: #ffffff;
-  --popover-foreground: #3d3846;
-  --primary: #e95420;
-  --primary-foreground: #ffffff;
-  --secondary: #f0eeec;
-  --secondary-foreground: #3d3846;
-  --muted: #f0eeec;
-  --muted-foreground: #77716b;
-  --accent: #f7e0d6;
-  --accent-foreground: #3d3846;
-  --destructive: #da3450;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.12);
-  --input-background: #f0eeec;
-  --switch-background: #c9c4bf;
-  --ring: rgba(233, 84, 32, 0.4);
-  /* GNOME: angoli generosi (finestre/card 12px) */
-  --radius: 0.75rem;
-}
-
-/* ── Token shadcn/Tailwind rimappati su Yaru (scuro) ── */
-.dark {
-  --background: #242424;
-  --foreground: #ffffff;
-  --card: #303030;
-  --card-foreground: #ffffff;
-  --popover: #303030;
-  --popover-foreground: #ffffff;
-  --primary: #e95420;
-  --primary-foreground: #ffffff;
-  --secondary: #3a3a3a;
-  --secondary-foreground: #ffffff;
-  --muted: #3a3a3a;
-  --muted-foreground: #9a9996;
-  --accent: #45383a;
-  --accent-foreground: #ffffff;
-  --destructive: #da3450;
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.12);
-  --input: #3a3a3a;
-  --ring: rgba(233, 84, 32, 0.5);
-}
-
-/* ── Selezione del testo: arancio Ubuntu, come nel terminale/GNOME ── */
+/* ── Selezione del testo: verde brand ──
+   Le pagine .sb-home ne hanno una propria (home.css), leggermente diversa;
+   questa copre tutto il resto. */
 ::selection {
-  background: var(--yaru-orange);
-  color: #ffffff;
+  background: hsla(153, 60%, 53%, 0.35);
 }
 
-/* ── Scrollbar stile GNOME: sottile, tonda, discreta ── */
+/* ── Scrollbar sottile e discreta ── */
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgba(120, 113, 108, 0.55) transparent;
+  scrollbar-color: rgba(120, 120, 120, 0.55) transparent;
 }
 html.dark {
-  scrollbar-color: rgba(154, 153, 150, 0.5) transparent;
+  scrollbar-color: rgba(150, 150, 150, 0.5) transparent;
 }
 ::-webkit-scrollbar {
   width: 10px;
@@ -99,20 +46,20 @@ html.dark {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(120, 113, 108, 0.55);
+  background: rgba(120, 120, 120, 0.55);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 113, 108, 0.8);
+  background: rgba(120, 120, 120, 0.8);
   background-clip: content-box;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: rgba(154, 153, 150, 0.5);
+  background: rgba(150, 150, 150, 0.5);
   background-clip: content-box;
 }
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(154, 153, 150, 0.75);
+  background: rgba(150, 150, 150, 0.75);
   background-clip: content-box;
 }

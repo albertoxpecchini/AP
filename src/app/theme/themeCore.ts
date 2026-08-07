@@ -24,10 +24,14 @@ export const THEME_REQUEST_EVENT = "ap-theme-request";
 const MODE_KEY = "ap-theme-mode";
 const MANUAL_KEY = "ap-theme-manual";
 
-// Colore di fondo per ogni tema (overlay di transizione + <meta theme-color>).
+// Colore di fondo per ogni tema: overlay di transizione, sfondo del primo paint
+// (--ap-boot-bg) e <meta theme-color> della barra del browser.
+// Sono ESATTAMENTE i --sb-bg di src/app/home.css: prima erano due colori a sé
+// (#faf8f6 / #1b151a) e sul chiaro la barra del browser era addirittura arancio
+// #e95420 — su una pagina bianca si vedeva. Se cambia --sb-bg, cambia qui.
 export const THEME_BG: Record<Theme, string> = {
-  light: "#faf8f6",
-  dark: "#1b151a",
+  light: "#fcfcfc",
+  dark: "#141414",
 };
 
 // Ore "chiare": dalle 08:00:00 alle 19:59:59. Tutto il resto è scuro.
@@ -78,7 +82,7 @@ export function applyTheme(theme: Theme): void {
   }
 
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "dark" ? THEME_BG.dark : "#e95420");
+  if (meta) meta.setAttribute("content", THEME_BG[theme]);
 
   try {
     window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: { theme } }));

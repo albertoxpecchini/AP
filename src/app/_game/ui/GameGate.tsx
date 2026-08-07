@@ -69,6 +69,10 @@ export default function GameGate({
     }
   };
 
+  // I token --sb-* arrivano da .sb-home, che sta sul wrapper della pagina del
+  // gioco: il gate è position:fixed ma resta dentro quel sottoalbero, quindi le
+  // var risolvono. Se un giorno il gate finisse in un portale su <body>, qui
+  // servirebbe una .sb-home propria.
   return (
     <div
       className={`gg${dark ? " gg-dark" : " gg-light"}`}
@@ -136,46 +140,38 @@ export default function GameGate({
       </div>
 
       <style>{`
+        /* Tutto dai token --sb-* (src/app/home.css): il gate segue il tema del
+           sito da solo. Le classi .gg-dark/.gg-light restano perché il gioco le
+           usa ancora per sfumature proprie, ma non portano più una palette. */
         .gg {
           position: fixed; inset: 0; z-index: 250;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
           display: flex; flex-direction: column; align-items: center; justify-content: center;
           gap: 1.6rem; padding: 1.5rem; overflow-y: auto;
           animation: gg-in .28s cubic-bezier(.2,.7,.2,1);
-          --text: #f5f3f1; --sub: #8b98a6;
-          --surface: rgba(255,255,255,0.05); --surface-bd: rgba(255,255,255,0.10);
-          --field: rgba(255,255,255,0.04); --field-bd: rgba(255,255,255,0.14);
-        }
-        .gg-dark {
+          --text: var(--sb-fg); --sub: var(--sb-fg-muted);
+          --surface: var(--sb-glass-bg); --surface-bd: var(--sb-border);
+          --field: var(--sb-bg-alt); --field-bd: var(--sb-border-strong);
           color: var(--text);
           background:
             radial-gradient(115% 80% at 50% -8%, var(--glow) 0%, transparent 52%),
-            linear-gradient(180deg, #241c22 0%, #1b151a 100%);
-        }
-        .gg-light {
-          --text: #16201a; --sub: #5a6b62;
-          --surface: #ffffff; --surface-bd: rgba(0,0,0,0.07);
-          --field: rgba(0,0,0,0.02); --field-bd: rgba(0,0,0,0.12);
-          color: var(--text);
-          background:
-            radial-gradient(115% 80% at 50% -8%, var(--glow) 0%, transparent 46%),
-            linear-gradient(180deg, #f6f8fa 0%, #eef1f4 100%);
+            linear-gradient(180deg, var(--sb-bg-alt) 0%, var(--sb-bg) 100%);
         }
         @keyframes gg-in { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:none; } }
 
         .gg-hero { display:flex; flex-direction:column; align-items:center; gap:.55rem; }
         .gg-logo {
-          display:inline-flex; padding:16px; border-radius:22px; color:#fff;
-          background:linear-gradient(140deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 55%, #000) 130%);
-          box-shadow: 0 12px 40px var(--glow), inset 0 1px 0 rgba(255,255,255,0.25);
+          display:inline-flex; padding:16px; border-radius:22px;
+          background: var(--sb-btn-bg); border:1px solid var(--sb-btn-bd); color: var(--sb-btn-fg);
+          box-shadow: 0 12px 40px var(--glow);
         }
         .gg-title {
           margin:.4rem 0 0; line-height:1; font-weight:900;
           font-size:clamp(2.2rem,9vw,3.1rem); letter-spacing:.24em; padding-left:.24em;
           color: var(--accent);
-          text-shadow: 0 0 26px var(--glow);
         }
-        .gg-light .gg-title { text-shadow:none; }
+        /* L'alone attorno alle lettere ha senso solo sul fondo scuro. */
+        .gg-dark .gg-title { text-shadow: 0 0 26px var(--glow); }
         .gg-title span { color: var(--text); }
         .gg-tag { margin:0; font-size:.9rem; font-weight:600; color: var(--sub); }
 
@@ -184,11 +180,10 @@ export default function GameGate({
           border-radius:20px; padding:1.5rem 1.35rem 1.25rem;
           display:flex; flex-direction:column; gap:.5rem;
           background: var(--surface); border:1px solid var(--surface-bd);
-          backdrop-filter: blur(18px) saturate(120%);
-          -webkit-backdrop-filter: blur(18px) saturate(120%);
-          box-shadow: 0 24px 70px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+          backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+          -webkit-backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+          box-shadow: var(--sb-glass-shadow), inset 0 1px 0 var(--sb-glass-spec);
         }
-        .gg-light .gg-card { box-shadow: 0 18px 50px rgba(20,40,30,0.12); }
 
         .gg-label {
           display:inline-flex; align-items:center; gap:.4rem; color: var(--sub);
@@ -201,23 +196,26 @@ export default function GameGate({
           transition:border-color .15s, box-shadow .15s;
         }
         .gg-inputwrap:focus-within { border-color: var(--accent); box-shadow:0 0 0 .22rem var(--glow); }
-        .gg-inputwrap.err { border-color:#ff6b6b; box-shadow:0 0 0 .22rem rgba(255,107,107,.22); }
+        /* L'errore resta rosso in tutti e due i temi: è l'unico colore che non
+           deve dipendere dal tema per essere letto come "sbagliato". */
+        .gg-inputwrap.err { border-color:#e5484d; box-shadow:0 0 0 .22rem rgba(229,72,77,.22); }
         .gg-input {
           flex:1; min-width:0; border:none; outline:none; background:transparent; color: var(--text);
           font-family:inherit; font-size:1.5rem; font-weight:800; letter-spacing:.02em; padding:.55rem 0;
         }
         .gg-input::placeholder { color: var(--sub); opacity:.55; }
         .gg-count { color: var(--sub); font-size:.78rem; font-weight:700; font-variant-numeric:tabular-nums; flex-shrink:0; }
-        .gg-msg { min-height:1.1rem; font-size:.8rem; font-weight:700; color:#ff7b7b; padding-left:.2rem; }
+        .gg-msg { min-height:1.1rem; font-size:.8rem; font-weight:700; color:#e5484d; padding-left:.2rem; }
 
         .gg-go {
           margin-top:.2rem; height:52px; width:100%;
           display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-          border:none; border-radius:14px; cursor:pointer; color: #ffffff;
+          border:1px solid var(--sb-btn-bd); border-radius:14px; cursor:pointer;
+          color: var(--sb-btn-fg); background: var(--sb-btn-bg);
           font-family:inherit; font-size:1.1rem; font-weight:900;
-          background:linear-gradient(100deg, #fff 0%, var(--accent) 28%, var(--accent) 100%);
-          box-shadow:0 10px 30px var(--glow); transition:filter .12s, transform .12s;
+          box-shadow:0 10px 30px var(--glow); transition:filter .12s, transform .12s, background .12s;
         }
+        .gg-go:hover { background: var(--sb-btn-bg-hover); }
         .gg-go:hover { filter:brightness(1.06); transform:translateY(-1px); }
         .gg-go:active { transform:scale(.985); }
 
@@ -237,8 +235,7 @@ export default function GameGate({
           font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
           padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;
         }
-        .gg-chip:hover { background: var(--glow); color: #ffffff; transform:translateY(-1px); }
-        .gg-light .gg-chip:hover { color:#fff; }
+        .gg-chip:hover { background: var(--sb-btn-bg); color: var(--sb-btn-fg); transform:translateY(-1px); }
         .gg-chip:active { transform:scale(.97); }
 
         .gg-back {

@@ -1,20 +1,26 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Pezzi "vivi" della home.
 //
-// Vivi, non in moto perpetuo. Prima ognuno di questi visual si portava dietro
-// la sua timeline GSAP con repeat:-1: il browser si costruiva da solo, il
-// terminale digitava da solo, l'HUD giocava da solo, la scansione scendeva da
-// sola. Sette filmini che giravano uguali che ci fosse qualcuno a guardarli o
-// no, sfasati fra loro, con la griglia prodotti che pulsava da sette punti
-// diversi contemporaneamente.
+// Vivi vuol dire che si muovono da soli: il browser si costruisce, il terminale
+// digita, l'HUD gioca, la scansione scende, i pacchetti partono. Quello che è
+// cambiato è QUANTA roba si muove e COME.
 //
-// Adesso la regola è una: A RIPOSO STANNO FERMI, e si muovono dove li tocchi.
-// Il moto arriva tutto da tre numeri che site/GlassMotion.tsx (blocco ④) scrive
-// sul .sb-card-visual sotto il puntatore — --vis-x, --vis-y, --vis-in — e sono
-// i visual stessi, in CSS, a farne quello che devono (vedi home.css). Qui sotto
-// resta quasi solo markup: niente useEffect, niente timeline, niente cleanup da
-// sbagliare. L'unica eccezione è GameHud, che conta punti, e il CSS non sa
-// contare.
+// Quanta: uno solo per card. L'HUD aveva quattro cose in moto insieme (punti,
+// il "+120" che schizzava, la serie che s'infiammava, il voto che si ribaltava)
+// e il browser un cursore finto che girava fra quattro blocchi. Adesso ogni
+// visual dice una cosa sola.
+//
+// Come: solo transform e opacity, e in keyframe CSS. C'è stato un giro in cui
+// il puntatore comandava tutti e sette i visual scrivendo `left`, `top`,
+// `clip-path`, `color-mix` e `box-shadow` — proprietà che rifanno layout o
+// ridisegnano a ogni movimento del mouse. Con sette riquadri più il tilt della
+// card, il risultato erano scatti. Le keyframe su transform e opacity le muove
+// il compositore, che non ha niente da ricalcolare.
+//
+// Quindi qui sotto resta quasi solo markup: il moto sta in home.css. L'unica
+// eccezione è GameHud, che conta punti, e il CSS non sa contare. Il puntatore
+// è rimasto su un visual solo, il cubo della card CAT, dove agisce dentro una
+// transform — cioè dove costa quanto le altre.
 //
 // Convenzione i18n: i contenuti che non sono prosa (numeri, nomi di progetto,
 // comandi da terminale) portano data-no-i18n + translate="no".
@@ -162,9 +168,9 @@ export function BrowserMock() {
         </span>
       </div>
       <div className="sb-browser-body">
-        <div className="sb-skel sb-skel--hero" style={{ "--i": 0 } as React.CSSProperties} />
-        <div className="sb-skel sb-skel--side" style={{ "--i": 1 } as React.CSSProperties} />
-        <div className="sb-skel sb-skel--main" style={{ "--i": 2 } as React.CSSProperties} />
+        <div className="sb-skel sb-skel--hero" />
+        <div className="sb-skel sb-skel--side" />
+        <div className="sb-skel sb-skel--main" />
       </div>
     </div>
   );
@@ -225,23 +231,22 @@ export function LiveTerminal() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web games" — il punteggio lo fai tu
+   Card "Web games" — la partita si gioca da sola
 
-   Qui c'erano tre pillole, un "+120" che saltava fuori a ogni round, una serie
-   che s'infiammava e un voto che si ribaltava, tutto su un ciclo che
-   ricominciava da zero all'infinito. Resta un numero e un voto: il punteggio
-   sale con la strada che il puntatore fa dentro la card, e il voto scatta di
-   livello mentre sale. Uscendo resta dove sei arrivato — è il tuo.
+   Qui c'erano tre pillole, un "+120" che schizzava fuori a ogni round, una
+   serie che s'infiammava e un voto che si ribaltava, su quattro round
+   incatenati: quattro cose in movimento per dire che i giochi hanno un
+   punteggio. Resta un numero che sale e un voto che scatta di livello mentre
+   sale, poi si azzera e si ricomincia.
 
-   È l'unico visual con del JS suo: il risultato è testo, e il CSS non sa
-   contare.
+   È l'unico visual con del JS: il risultato è testo, e il CSS non sa contare.
+   Costa una scrittura di textContent per frame su un nodo solo — che è
+   l'ordine di grandezza dei contatori che il sito ha già altrove.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Punteggio massimo raggiungibile, e quanti pixel di strada ci vogliono. */
 const HUD_MAX = 1480;
-const HUD_REACH = 1100;
 
-/** Soglie dei voti, dal più alto al più basso: il primo che passa vince. */
+/** Soglie dei voti sul punteggio pieno, dall'alto: il primo che passa vince. */
 const GRADES: [number, string][] = [
   [0.92, "A+"],
   [0.62, "A"],
@@ -255,68 +260,52 @@ export function GameHud() {
   useEffect(() => {
     const el = ref.current;
     if (!el || !motionOK()) return;
-    // Il puntatore comanda dall'intera card, non dal solo riquadro: si comincia
-    // a segnare già mentre si legge il testo qui accanto.
-    const zone = el.closest<HTMLElement>(".sb-card") ?? el;
     const score = el.querySelector<HTMLElement>(".sb-hud-score");
     const grade = el.querySelector<HTMLElement>(".sb-hud-grade");
     if (!score || !grade) return;
 
-    let travel = 0;
-    let last: { x: number; y: number } | null = null;
-    let frame = 0;
-    let shown = -1;
+    const ctx = gsap.context(() => {
+      const n = { v: 0 };
+      let shownGrade = "";
 
-    const paint = () => {
-      frame = 0;
-      const p = Math.min(1, travel / HUD_REACH);
-      const v = Math.round(p * HUD_MAX);
-      if (v === shown) return;
-      shown = v;
-      score.textContent = v.toLocaleString("it-IT");
-      const g = GRADES.find(([at]) => p >= at)?.[1] ?? "C";
-      if (grade.textContent !== g) {
-        grade.textContent = g;
-        // Il voto scatta solo quando cambia davvero: è l'unico momento in cui
-        // ha qualcosa da dire.
-        gsap.fromTo(grade, { rotationX: -90 }, { rotationX: 0, duration: 0.4, ease: "back.out(2)" });
-      }
-    };
+      const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.4 });
+      tl.to(n, {
+        v: HUD_MAX,
+        duration: 3.2,
+        ease: "power2.out",
+        onUpdate: () => {
+          score.textContent = Math.round(n.v).toLocaleString("it-IT");
+          const g = GRADES.find(([at]) => n.v / HUD_MAX >= at)?.[1] ?? "C";
+          if (g === shownGrade) return;
+          shownGrade = g;
+          grade.textContent = g;
+          // Il voto si ribalta solo quando cambia davvero: quattro volte in
+          // tutto il giro, non a ogni frame.
+          gsap.fromTo(grade, { rotationX: -90 }, { rotationX: 0, duration: 0.45, ease: "back.out(2)" });
+        },
+      })
+        .to({}, { duration: 2.2 })
+        // Si riazzera, non salta indietro: il conteggio deve ripartire da zero
+        // e vedersi che riparte.
+        .call(() => {
+          n.v = 0;
+          shownGrade = "";
+          score.textContent = "0";
+        });
+    }, el);
 
-    const move = (e: PointerEvent) => {
-      const now = { x: e.clientX, y: e.clientY };
-      if (last) travel += Math.hypot(now.x - last.x, now.y - last.y);
-      last = now;
-      // Una scrittura per frame, non una per movimento del puntatore.
-      if (!frame) frame = requestAnimationFrame(paint);
-    };
-    // Rientrando si riparte dal punto di ingresso: senza questo il salto fra
-    // l'ultima posizione di prima e la nuova conterebbe come strada percorsa.
-    const reset = () => {
-      last = null;
-    };
-
-    zone.addEventListener("pointermove", move, { passive: true });
-    zone.addEventListener("pointerenter", reset);
-    zone.addEventListener("pointerleave", reset);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      zone.removeEventListener("pointermove", move);
-      zone.removeEventListener("pointerenter", reset);
-      zone.removeEventListener("pointerleave", reset);
-      gsap.killTweensOf(grade);
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
     <div className="sb-hud" ref={ref} aria-hidden="true" data-no-i18n translate="no">
-      {/* Lo zero è il fotogramma di riposo: la partita non è ancora cominciata
-          perché comincia quando arrivi tu. */}
+      {/* Il valore pieno è già nel markup: con movimento ridotto il conteggio
+          non parte, e quello che resta è comunque il numero giusto. */}
       <span className="sb-hud-pill">
-        <span className="sb-hud-score">0</span>
+        <span className="sb-hud-score">1.480</span>
         <span>pt</span>
       </span>
-      <span className="sb-hud-grade">C</span>
+      <span className="sb-hud-grade">A+</span>
     </div>
   );
 }
@@ -400,18 +389,17 @@ export function ClientFlow() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "CAT" — il cubo lo giri tu
+   Card "CAT" — il cubo galleggia da solo, e si gira verso di te
 
    Piano cartesiano in tre dimensioni con un cubo che ci galleggia sopra. È 3D
-   vero (perspective + preserve-3d, sei facce), e adesso è anche CSS puro: il
-   cubo si orienta su --vis-x/--vis-y e --vis-y lo solleva dal piano stringendo
-   l'ombra. Muovendo in orizzontale lo si fa ruotare su sé stesso, alzando la
-   mano lo si alza e lo si guarda da sopra.
+   vero (perspective + preserve-3d, sei facce). Da fermo respira e gira lento
+   su sé stesso; passandoci sopra il giro si ferma e il cubo si orienta verso
+   il puntatore — orizzontale per girarlo, verticale per guardarlo da sopra o
+   da sotto.
 
-   Prima qui c'erano TRE sistemi di moto sovrapposti — un galleggiamento yoyo
-   infinito, un giro su sé stesso da 26 secondi e l'inseguimento del puntatore —
-   con tutto il mestiere che serve a non farli litigare sulle stesse proprietà.
-   Adesso c'è solo la tua mano.
+   Tre movimenti, tre elementi annidati (lift → spin → cube), una `transform`
+   per ciascuno: si compongono da soli. Prima ci voleva GSAP proprio per
+   tenerli separati; adesso lo fa l'annidamento, e qui non resta JS.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const CUBE_FACES = ["front", "back", "right", "left", "top", "bottom"] as const;
@@ -425,10 +413,12 @@ export function CatCube() {
           <span className="sb-cat-shadow" />
           <span className="sb-cat-z" />
           <span className="sb-cat-lift">
-            <span className="sb-cat-cube">
-              {CUBE_FACES.map((f) => (
-                <span key={f} className={`sb-cat-face sb-cat-face--${f}`} />
-              ))}
+            <span className="sb-cat-spin">
+              <span className="sb-cat-cube">
+                {CUBE_FACES.map((f) => (
+                  <span key={f} className={`sb-cat-face sb-cat-face--${f}`} />
+                ))}
+              </span>
             </span>
           </span>
         </span>

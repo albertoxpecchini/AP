@@ -119,6 +119,11 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
       )}
 
       <style>{`
+        /* Tutto dai token --sb-* (src/app/home.css). Prima ogni regola era
+           scritta due volte — una per il chiaro e una sotto .pag.dark — con due
+           serie di verdi e grigi a mano. Ora la coppia sparisce: i token
+           cambiano da soli col tema, e restano solo le poche regole .pag.dark
+           dove serve davvero una scelta diversa. */
         .pag { font-family:"Titillium Web", Geneva, Tahoma, sans-serif; }
 
         .pag-summary {
@@ -126,68 +131,66 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
         }
         .pag-sum-item {
           display:flex; flex-direction:column; align-items:center; gap:.1rem;
-          background:rgba(62, 207, 142,0.06); border:1px solid rgba(62, 207, 142,0.16);
+          background:var(--sb-bg-alt); border:1px solid var(--sb-border);
           border-radius:13px; padding:.6rem .3rem;
         }
-        .pag.dark .pag-sum-item { background:rgba(62, 207, 142,0.1); border-color:rgba(62, 207, 142,0.2); }
-        .pag-sum-item b { font-size:1.15rem; font-weight:900; color:#0a854d; font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
-        .pag.dark .pag-sum-item b { color:#5fe3ab; }
-        .pag-sum-item small { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:#6b8070; }
-        .pag.dark .pag-sum-item small { color:#8fc7a6; }
+        .pag-sum-item b { font-size:1.15rem; font-weight:900; color:var(--sb-brand-text); font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+        .pag-sum-item small { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--sb-fg-muted); }
 
         .pag-list { display:flex; flex-direction:column; gap:.7rem; }
         .pag-subj {
-          border:1px solid rgba(62, 207, 142,0.14); border-radius:14px; padding:.7rem .75rem .8rem;
-          background:rgba(0,0,0,0.012);
+          border:1px solid var(--sb-border); border-radius:14px; padding:.7rem .75rem .8rem;
+          background:var(--sb-bg-alt);
         }
-        .pag.dark .pag-subj { border-color:rgba(95,208,154,0.16); background:rgba(255,255,255,0.02); }
         .pag-subj-head { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; margin-bottom:.55rem; }
-        .pag-subj-name { font-weight:800; font-size:.92rem; color:#17271d; line-height:1.15; }
-        .pag.dark .pag-subj-name { color:#e4f3ea; }
-        .pag-subj-meta { display:inline-flex; align-items:center; gap:.55rem; flex-shrink:0; font-size:.66rem; font-weight:700; color:#6b8070; }
+        .pag-subj-name { font-weight:800; font-size:.92rem; color:var(--sb-fg); line-height:1.15; }
+        .pag-subj-meta { display:inline-flex; align-items:center; gap:.55rem; flex-shrink:0; font-size:.66rem; font-weight:700; color:var(--sb-fg-muted); }
         .pag-subj-meta span { display:inline-flex; align-items:center; gap:.22rem; }
-        .pag.dark .pag-subj-meta { color:#8fc7a6; }
         .pag-subj-date { opacity:.75; }
 
         .pag-cells { display:grid; grid-template-columns:repeat(3,1fr); gap:.45rem; }
         .pag-cell {
           display:flex; flex-direction:column; align-items:center; gap:.12rem;
-          border:1px solid rgba(0,0,0,0.07); border-radius:11px; padding:.5rem .3rem .45rem;
-          background:#fff; text-align:center;
+          border:1px solid var(--sb-border); border-radius:11px; padding:.5rem .3rem .45rem;
+          background:var(--sb-surface-75); text-align:center;
         }
-        .pag.dark .pag-cell { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.07); }
-        .pag-cell.todo { border-style:dashed; border-color:rgba(62, 207, 142,0.4); background:rgba(62, 207, 142,0.04); }
-        .pag.dark .pag-cell.todo { border-color:rgba(62, 207, 142,0.4); background:rgba(62, 207, 142,0.07); }
-        .pag-cell-type { font-size:.58rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#9aa89e; }
+        /* "Da fare": bordo tratteggiato verde, niente riempimento pieno. */
+        .pag-cell.todo {
+          border-style:dashed;
+          border-color:color-mix(in srgb, var(--sb-brand) 40%, transparent);
+          background:color-mix(in srgb, var(--sb-brand) 6%, transparent);
+        }
+        .pag-cell-type { font-size:.58rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--sb-fg-muted); }
         .pag-cell-grade { font-size:1.5rem; font-weight:900; line-height:1; letter-spacing:-.02em; }
-        .pag-cell-na { font-size:.82rem; font-weight:800; color:#0f9d63; line-height:1; padding:.5rem 0; text-transform:uppercase; letter-spacing:.03em; }
-        .pag.dark .pag-cell-na { color:#5fe3ab; }
-        .pag-cell-pct { font-size:.72rem; font-weight:800; color:#17271d; font-variant-numeric:tabular-nums; }
-        .pag.dark .pag-cell-pct { color:#d4e8dc; }
-        .pag-cell-meta { display:flex; flex-direction:column; align-items:center; gap:.05rem; font-size:.56rem; font-weight:700; color:#6b8070; margin-top:.1rem; }
+        .pag-cell-na { font-size:.82rem; font-weight:800; color:var(--sb-brand-text); line-height:1; padding:.5rem 0; text-transform:uppercase; letter-spacing:.03em; }
+        .pag-cell-pct { font-size:.72rem; font-weight:800; color:var(--sb-fg); font-variant-numeric:tabular-nums; }
+        .pag-cell-meta { display:flex; flex-direction:column; align-items:center; gap:.05rem; font-size:.56rem; font-weight:700; color:var(--sb-fg-muted); margin-top:.1rem; }
         .pag-cell-meta span { display:inline-flex; align-items:center; gap:.18rem; }
-        .pag.dark .pag-cell-meta { color:#8fc7a6; }
         .pag-cell-delta {
           display:inline-flex; align-items:center; gap:.15rem; margin-top:.18rem;
           font-size:.56rem; font-weight:800; border-radius:999px; padding:.08rem .35rem;
         }
-        .pag-cell-delta.up { color:#1F8A4C; background:rgba(31,138,76,0.12); }
-        .pag-cell-delta.down { color:#C0392B; background:rgba(192,57,43,0.1); }
-        .pag.dark .pag-cell-delta.up { color:#6fe0a6; background:rgba(95,208,154,0.14); }
-        .pag.dark .pag-cell-delta.down { color:#e06b5a; background:rgba(224,107,90,0.14); }
+        /* Meglio/peggio: il verde è quello del brand, il rosso resta fisso —
+           è l'unico colore che deve dire "in calo" senza dipendere dal tema. */
+        .pag-cell-delta.up { color:var(--sb-brand-text); background:color-mix(in srgb, var(--sb-brand) 14%, transparent); }
+        .pag-cell-delta.down { color:#e5484d; background:rgba(229,72,77,0.12); }
 
         .pag-load { display:flex; flex-direction:column; gap:.6rem; }
-        .pag-skel { height:78px; border-radius:14px; background:linear-gradient(90deg,rgba(0,0,0,0.05),rgba(0,0,0,0.1),rgba(0,0,0,0.05)); background-size:200% 100%; animation:pag-shim 1.3s infinite; }
-        .pag.dark .pag-skel { background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.09),rgba(255,255,255,0.04)); background-size:200% 100%; }
+        .pag-skel {
+          height:78px; border-radius:14px;
+          background:linear-gradient(90deg,var(--sb-surface-100),var(--sb-surface-200),var(--sb-surface-100));
+          background-size:200% 100%; animation:pag-shim 1.3s infinite;
+        }
         @keyframes pag-shim { from{background-position:200% 0} to{background-position:-200% 0} }
 
         .pag-empty { display:flex; flex-direction:column; align-items:center; gap:.5rem; text-align:center; padding:2.2rem 1.4rem; }
-        .pag-empty-ico { display:inline-flex; align-items:center; justify-content:center; width:62px; height:62px; border-radius:50%; background:rgba(62, 207, 142,0.1); color:#0f9d63; }
-        .pag.dark .pag-empty-ico { background:rgba(95,208,154,0.12); color:#6fe0a6; }
-        .pag-empty strong { font-size:1rem; color:#17271d; font-weight:800; }
-        .pag.dark .pag-empty strong { color:#e4f3ea; }
-        .pag-empty span { font-size:.8rem; color:#6b8070; max-width:280px; line-height:1.4; }
-        .pag.dark .pag-empty span { color:#8fc7a6; }
+        .pag-empty-ico {
+          display:inline-flex; align-items:center; justify-content:center;
+          width:62px; height:62px; border-radius:50%;
+          background:color-mix(in srgb, var(--sb-brand) 12%, transparent); color:var(--sb-brand-text);
+        }
+        .pag-empty strong { font-size:1rem; color:var(--sb-fg); font-weight:800; }
+        .pag-empty span { font-size:.8rem; color:var(--sb-fg-muted); max-width:280px; line-height:1.4; }
 
         @media (max-width:380px) {
           .pag-summary { grid-template-columns:repeat(2,1fr); }

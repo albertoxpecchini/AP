@@ -307,9 +307,17 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
       </div>
 
       <style>{`
+        /* Tutto dai token --sb-* (src/app/home.css). Prima quasi ogni regola
+           era scritta due volte — una per il chiaro e una sotto .trv-lb.dark —
+           con due serie di verdi e grigi a mano; i token cambiano da soli col
+           tema, quindi la coppia sparisce. Restano fissi solo i colori che NON
+           sono interfaccia: le medaglie del podio e i bianchi sopra la fascia
+           verde piena dell'header. */
         .trv-lb {
           position: fixed; inset: 0; z-index: 260;
-          background: rgba(10,28,17,0.62); backdrop-filter: blur(3px);
+          /* Velo scuro in tutti e due i temi: è il fondo di una modale, il suo
+             mestiere è spegnere la pagina dietro. */
+          background: rgba(10,14,11,0.62); backdrop-filter: blur(3px);
           display: flex; align-items: center; justify-content: center;
           padding: 1rem; animation: trv-lb-fade .22s ease;
           font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
@@ -319,16 +327,18 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-card {
           width: min(96vw, 480px); max-height: min(90vh, 720px);
           display: flex; flex-direction: column;
-          background: #fff; border-radius: 20px; overflow: hidden;
-          box-shadow: 0 30px 80px rgba(6,22,14,0.45), 0 2px 8px rgba(6,22,14,0.2);
+          background: var(--sb-surface-75); border-radius: 20px; overflow: hidden;
+          box-shadow: 0 30px 80px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
           animation: trv-lb-up .34s cubic-bezier(.2,.9,.3,1.1);
         }
-        .trv-lb.dark .trv-lb-card { background: #14211a; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
         @keyframes trv-lb-up { from { opacity:0; transform:translateY(16px) scale(.97) } to { opacity:1; transform:none } }
 
-        /* ── Header (Kit Italia: barra istituzionale verde) ── */
+        /* ── Header: fascia verde piena, testo bianco in entrambi i temi ── */
         .trv-lb-head {
-          background: linear-gradient(120deg, #0f9d63 0%, #04532f 55%, #0f9d63 130%);
+          background: linear-gradient(120deg,
+            var(--sb-brand-text) 0%,
+            color-mix(in srgb, var(--sb-brand-text) 72%, #000) 55%,
+            var(--sb-brand-text) 130%);
           color: #fff; flex-shrink: 0; padding: 1.1rem 1.1rem .85rem;
           position: relative; overflow: hidden;
         }
@@ -338,7 +348,6 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
           pointer-events:none;
         }
-        .trv-lb.dark .trv-lb-head { background: linear-gradient(120deg, #02351f 0%, #12261d 60%, #0d1a14 130%); }
         .trv-lb-headrow { display:flex; align-items:flex-start; justify-content:space-between; position:relative; z-index:1; }
         .trv-lb-title { display:flex; align-items:center; gap:.6rem; }
         .trv-lb-tico {
@@ -362,12 +371,12 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           background:rgba(255,255,255,0.13); border-radius:999px; padding:.2rem .6rem;
           color:rgba(255,255,255,0.78);
         }
-        .trv-lb-live.on { background:rgba(127,224,159,0.22); color:#bdf5d4; }
+        .trv-lb-live.on { background:rgba(255,255,255,0.22); color:#fff; }
         .trv-lb-live.on::before {
-          content:""; width:6px; height:6px; border-radius:50%; background:#5fe39c;
-          box-shadow:0 0 0 0 rgba(95,227,156,0.7); animation:trv-lb-blink 1.6s infinite;
+          content:""; width:6px; height:6px; border-radius:50%; background:#fff;
+          box-shadow:0 0 0 0 rgba(255,255,255,0.7); animation:trv-lb-blink 1.6s infinite;
         }
-        @keyframes trv-lb-blink { 0%{box-shadow:0 0 0 0 rgba(95,227,156,0.6)} 70%{box-shadow:0 0 0 6px rgba(95,227,156,0)} 100%{box-shadow:0 0 0 0 rgba(95,227,156,0)} }
+        @keyframes trv-lb-blink { 0%{box-shadow:0 0 0 0 rgba(255,255,255,0.6)} 70%{box-shadow:0 0 0 6px rgba(255,255,255,0)} 100%{box-shadow:0 0 0 0 rgba(255,255,255,0)} }
         .trv-lb-live.off { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); }
 
         /* ── Tab Classifica / Pagella ── */
@@ -380,63 +389,59 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           transition:background .15s, color .15s, transform .1s;
         }
         .trv-lb-tab:hover { background:rgba(255,255,255,0.2); }
-        .trv-lb-tab.act { background:#fff; color:#0a854d; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
-        .trv-lb.dark .trv-lb-tab.act { background:#0e1512; color:#5fe3ab; }
+        /* La tab attiva è un ritaglio della card sulla fascia verde: prende il
+           fondo della card, quindi segue il tema pur stando sull'header. */
+        .trv-lb-tab.act { background:var(--sb-surface-75); color:var(--sb-brand-text); box-shadow:0 2px 8px rgba(0,0,0,0.2); }
 
-        /* ── Filtri a chip con icone tematiche (scroll + fade ai bordi) ── */
-        .trv-lb-filterswrap { position:relative; flex-shrink:0; border-bottom:1px solid rgba(0,0,0,0.06); }
-        .trv-lb.dark .trv-lb-filterswrap { border-color:rgba(95,208,154,0.14); }
+        /* ── Filtri a chip (scroll + sfumature ai bordi) ── */
+        .trv-lb-filterswrap { position:relative; flex-shrink:0; border-bottom:1px solid var(--sb-border); }
         .trv-lb-filterswrap::before, .trv-lb-filterswrap::after {
           content:""; position:absolute; top:0; bottom:1px; width:22px; pointer-events:none; z-index:2;
         }
-        .trv-lb-filterswrap::before { left:0; background:linear-gradient(90deg,#fff,transparent); }
-        .trv-lb-filterswrap::after  { right:0; background:linear-gradient(270deg,#fff,transparent); }
-        .trv-lb.dark .trv-lb-filterswrap::before { background:linear-gradient(90deg,#14211a,transparent); }
-        .trv-lb.dark .trv-lb-filterswrap::after  { background:linear-gradient(270deg,#14211a,transparent); }
+        .trv-lb-filterswrap::before { left:0; background:linear-gradient(90deg,var(--sb-surface-75),transparent); }
+        .trv-lb-filterswrap::after  { right:0; background:linear-gradient(270deg,var(--sb-surface-75),transparent); }
         .trv-lb-filters {
           display:flex; gap:.4rem; padding:.7rem .9rem; overflow-x:auto; scrollbar-width:thin;
           scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch;
         }
         .trv-lb-filters::-webkit-scrollbar { height:5px; }
-        .trv-lb-filters::-webkit-scrollbar-thumb { background:rgba(62, 207, 142,0.3); border-radius:99px; }
+        .trv-lb-filters::-webkit-scrollbar-thumb { background:var(--sb-border-stronger); border-radius:99px; }
         .trv-lb-fbtn {
           display:inline-flex; align-items:center; gap:.3rem; white-space:nowrap; scroll-snap-align:start;
-          border:1.5px solid rgba(62, 207, 142,0.22); background:#fff;
-          color:#0a854d; border-radius:999px; padding:.32rem .72rem;
+          border:1.5px solid var(--sb-border-strong); background:transparent;
+          color:var(--sb-brand-text); border-radius:999px; padding:.32rem .72rem;
           font-family:inherit; font-size:.76rem; font-weight:700; cursor:pointer;
           transition:background .14s, color .14s, border-color .14s, transform .1s;
         }
         .trv-lb-fbtn .trv-lb-fico { display:inline-flex; opacity:.75; }
-        .trv-lb.dark .trv-lb-fbtn { color:#6fe0a6; background:transparent; border-color:rgba(95,208,154,0.26); }
-        .trv-lb-fbtn:hover { background:rgba(62, 207, 142,0.08); transform:translateY(-1px); }
-        .trv-lb-fbtn:focus-visible { outline:2px solid #0f9d63; outline-offset:1px; }
-        .trv-lb-fbtn.act { background:#0f9d63; color:#fff; border-color:#0f9d63; box-shadow:0 2px 8px rgba(62, 207, 142,0.34); }
+        .trv-lb-fbtn:hover { background:var(--sb-surface-200); transform:translateY(-1px); }
+        .trv-lb-fbtn:focus-visible { outline:2px solid var(--sb-brand); outline-offset:1px; }
+        .trv-lb-fbtn.act { background:var(--sb-btn-bg); color:var(--sb-btn-fg); border-color:var(--sb-btn-bd); }
         .trv-lb-fbtn.act .trv-lb-fico { opacity:1; }
-        .trv-lb.dark .trv-lb-fbtn.act { background:#3ecf8e; border-color:#3ecf8e; color:#08170f; }
 
         /* ── Body scrollabile ── */
         .trv-lb-body { flex:1; min-height:0; overflow-y:auto; padding:.9rem .85rem 1rem; scrollbar-width:thin; }
         .trv-lb-body::-webkit-scrollbar { width:7px; }
-        .trv-lb-body::-webkit-scrollbar-thumb { background:rgba(62, 207, 142,0.25); border-radius:99px; }
+        .trv-lb-body::-webkit-scrollbar-thumb { background:var(--sb-border-stronger); border-radius:99px; }
 
         .trv-lb-totalnote {
           margin:.1rem .1rem .8rem; padding:.5rem .7rem; border-radius:10px;
-          font-size:.72rem; line-height:1.35; color:#4a5c50; font-weight:600;
-          background:rgba(62, 207, 142,0.07); border:1px solid rgba(62, 207, 142,0.13);
+          font-size:.72rem; line-height:1.35; color:var(--sb-fg-light); font-weight:600;
+          background:var(--sb-bg-alt); border:1px solid var(--sb-border);
         }
-        .trv-lb.dark .trv-lb-totalnote { color:#a4c4aa; background:rgba(95,208,154,0.08); border-color:rgba(95,208,154,0.16); }
-        .trv-lb-totalnote b { color:#0f9d63; }
-        .trv-lb.dark .trv-lb-totalnote b { color:#6fe0a6; }
+        .trv-lb-totalnote b { color:var(--sb-brand-text); }
 
-        /* ── Podio ── */
+        /* ── Podio ──
+           Oro, argento e bronzo sono colori da MEDAGLIA, non da interfaccia:
+           restano fissi in tutti e due i temi, come su un podio vero. */
         .trv-lb-podium {
           list-style:none; margin:.2rem 0 1rem; padding:0;
           display:grid; grid-template-columns:1fr 1.18fr 1fr; gap:.55rem; align-items:end;
         }
         .trv-lb-podium-slot {
           display:flex; flex-direction:column; align-items:center; gap:.25rem;
-          background:linear-gradient(180deg, rgba(62, 207, 142,0.06), rgba(62, 207, 142,0.02));
-          border:1px solid rgba(62, 207, 142,0.12); border-radius:14px;
+          background:var(--sb-bg-alt);
+          border:1px solid var(--sb-border); border-radius:14px;
           padding:.7rem .4rem .6rem; text-align:center; position:relative;
           animation:trv-lb-pop .4s cubic-bezier(.2,.9,.3,1.2) both;
         }
@@ -444,27 +449,22 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-podium-slot.p1 { padding-top:1rem; background:linear-gradient(180deg, rgba(200,164,21,0.16), rgba(200,164,21,0.04)); border-color:rgba(200,164,21,0.4); animation-delay:.08s; }
         .trv-lb-podium-slot.p2 { animation-delay:0s; border-color:rgba(140,150,160,0.35); }
         .trv-lb-podium-slot.p3 { animation-delay:.16s; border-color:rgba(176,114,76,0.35); }
-        .trv-lb.dark .trv-lb-podium-slot { background:rgba(255,255,255,0.03); border-color:rgba(95,208,154,0.16); }
-        .trv-lb.dark .trv-lb-podium-slot.p1 { background:linear-gradient(180deg, rgba(214,178,40,0.18), rgba(214,178,40,0.04)); border-color:rgba(214,178,40,0.45); }
-        .trv-lb-podium-slot.me { box-shadow:0 0 0 2px rgba(62, 207, 142,0.5); }
+        .trv-lb-podium-slot.me { box-shadow:0 0 0 2px color-mix(in srgb, var(--sb-brand) 50%, transparent); }
         @keyframes trv-lb-pop { from{opacity:0; transform:translateY(14px) scale(.9)} to{opacity:1; transform:none} }
 
         .trv-lb-medal {
           display:inline-flex; align-items:center; justify-content:center; position:relative;
           width:44px; height:44px; border-radius:50%; color:#fff; margin-bottom:.15rem;
         }
-        .trv-lb-medal b { position:absolute; font-size:.6rem; font-weight:900; bottom:-2px; right:-2px; background:#fff; color:#333; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.25); }
+        .trv-lb-medal b { position:absolute; font-size:.6rem; font-weight:900; bottom:-2px; right:-2px; background:var(--sb-surface-75); color:var(--sb-fg); width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.25); }
         .trv-lb-medal.gold   { background:linear-gradient(135deg,#f4d03f,#c8a415); box-shadow:0 4px 12px rgba(200,164,21,0.45); }
         .trv-lb-medal.silver { background:linear-gradient(135deg,#cfd8dc,#9aa6ad); box-shadow:0 4px 12px rgba(150,160,170,0.4); }
         .trv-lb-medal.bronze { background:linear-gradient(135deg,#d99c6a,#b0724c); box-shadow:0 4px 12px rgba(176,114,76,0.4); }
-        .trv-lb-pnick { font-weight:800; font-size:.84rem; color:#17271d; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:.25rem; }
-        .trv-lb.dark .trv-lb-pnick { color:#e4f3ea; }
-        .trv-lb-pscore { font-weight:900; font-size:1.05rem; color:#0f9d63; font-variant-numeric:tabular-nums; line-height:1; }
+        .trv-lb-pnick { font-weight:800; font-size:.84rem; color:var(--sb-fg); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:.25rem; }
+        .trv-lb-pscore { font-weight:900; font-size:1.05rem; color:var(--sb-brand-text); font-variant-numeric:tabular-nums; line-height:1; }
         .trv-lb-podium-slot.p1 .trv-lb-pscore { font-size:1.25rem; }
-        .trv-lb.dark .trv-lb-pscore { color:#6fe0a6; }
         .trv-lb-pscore small { font-size:.55em; font-weight:700; opacity:.6; margin-left:.12em; }
-        .trv-lb-pacc { display:inline-flex; align-items:center; gap:.2rem; font-size:.66rem; font-weight:700; color:#6b8070; }
-        .trv-lb.dark .trv-lb-pacc { color:#8fc7a6; }
+        .trv-lb-pacc { display:inline-flex; align-items:center; gap:.2rem; font-size:.66rem; font-weight:700; color:var(--sb-fg-muted); }
 
         /* ── Lista (dal 4° posto) ── */
         .trv-lb-list { list-style:none; margin:0; padding:0; }
@@ -474,46 +474,39 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           animation:trv-lb-rowin .3s ease both;
         }
         @keyframes trv-lb-rowin { from{opacity:0; transform:translateX(-8px)} to{opacity:1; transform:none} }
-        .trv-lb-row:nth-child(even) { background:rgba(0,0,0,0.022); }
-        .trv-lb.dark .trv-lb-row:nth-child(even) { background:rgba(255,255,255,0.025); }
-        .trv-lb-row.me { background:rgba(62, 207, 142,0.12); box-shadow:inset 0 0 0 1.5px rgba(62, 207, 142,0.4); }
-        .trv-lb.dark .trv-lb-row.me { background:rgba(95,208,154,0.14); box-shadow:inset 0 0 0 1.5px rgba(95,208,154,0.4); }
+        .trv-lb-row:nth-child(even) { background:var(--sb-overlay); }
+        .trv-lb-row.me {
+          background:color-mix(in srgb, var(--sb-brand) 13%, transparent);
+          box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--sb-brand) 40%, transparent);
+        }
         .trv-lb-row.pulse { animation:trv-lb-pulse 1.6s ease; }
-        @keyframes trv-lb-pulse { 0%{background:rgba(95,227,156,0.4)} 100%{background:transparent} }
+        @keyframes trv-lb-pulse { 0%{background:color-mix(in srgb, var(--sb-brand) 40%, transparent)} 100%{background:transparent} }
 
-        .trv-lb-rank { display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; color:#9aa89e; font-variant-numeric:tabular-nums; }
-        .trv-lb.dark .trv-lb-rank { color:#7fa389; }
-        .trv-lb-nick { font-weight:700; color:#17271d; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:.35rem; }
-        .trv-lb.dark .trv-lb-nick { color:#d4e8dc; }
+        .trv-lb-rank { display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; color:var(--sb-fg-muted); font-variant-numeric:tabular-nums; }
+        .trv-lb-nick { font-weight:700; color:var(--sb-fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:.35rem; }
         .trv-lb-you {
           font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
-          background:#0f9d63; color:#fff; padding:.06rem .3rem; border-radius:5px; flex-shrink:0;
+          background:var(--sb-btn-bg); color:var(--sb-btn-fg); padding:.06rem .3rem; border-radius:5px; flex-shrink:0;
         }
-        .trv-lb.dark .trv-lb-you { background:#2f9e63; color:#06160e; }
         .trv-lb-acc { display:flex; align-items:center; gap:.35rem; }
-        .trv-lb-accbar { flex:1; height:5px; border-radius:99px; background:rgba(62, 207, 142,0.14); overflow:hidden; }
-        .trv-lb.dark .trv-lb-accbar { background:rgba(95,208,154,0.15); }
-        .trv-lb-accbar i { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#0f9d63,#5fc08a); transition:width .5s ease; }
-        .trv-lb-accnum { font-size:.64rem; font-weight:800; color:#0f9d63; font-variant-numeric:tabular-nums; width:28px; text-align:right; flex-shrink:0; }
-        .trv-lb.dark .trv-lb-accnum { color:#6fe0a6; }
+        .trv-lb-accbar { flex:1; height:5px; border-radius:99px; background:var(--sb-surface-200); overflow:hidden; }
+        .trv-lb-accbar i { display:block; height:100%; border-radius:99px; background:var(--sb-brand); transition:width .5s ease; }
+        .trv-lb-accnum { font-size:.64rem; font-weight:800; color:var(--sb-brand-text); font-variant-numeric:tabular-nums; width:28px; text-align:right; flex-shrink:0; }
         .trv-lb-chap {
           font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
-          color:#6b8070; background:rgba(0,0,0,0.045); padding:.16rem .45rem; border-radius:999px;
+          color:var(--sb-fg-muted); background:var(--sb-surface-200); padding:.16rem .45rem; border-radius:999px;
           overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center;
         }
-        .trv-lb.dark .trv-lb-chap { color:#8fc7a6; background:rgba(255,255,255,0.06); }
-        .trv-lb-score { font-weight:900; font-size:.98rem; color:#17271d; font-variant-numeric:tabular-nums; text-align:right; }
-        .trv-lb.dark .trv-lb-score { color:#e4f3ea; }
+        .trv-lb-score { font-weight:900; font-size:.98rem; color:var(--sb-fg); font-variant-numeric:tabular-nums; text-align:right; }
         .trv-lb-score small { font-size:.54em; font-weight:700; opacity:.5; margin-left:.12em; }
 
-        /* ── Footer "la tua posizione" ── */
+        /* ── Footer "la tua posizione": fascia piena, come l'header ── */
         .trv-lb-foot {
           flex-shrink:0; display:flex; align-items:center; gap:.6rem;
-          padding:.65rem 1rem; background:#0f9d63; color:#fff;
+          padding:.65rem 1rem; background:var(--sb-btn-bg); color:var(--sb-btn-fg);
           font-weight:700; animation:trv-lb-footin .3s ease;
         }
         @keyframes trv-lb-footin { from{transform:translateY(100%)} to{transform:none} }
-        .trv-lb.dark .trv-lb-foot { background:#1c5733; }
         .trv-lb-footlbl { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; opacity:.8; }
         .trv-lb-footrank { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
         .trv-lb-footnick { font-size:.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
@@ -522,8 +515,10 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         /* ── Skeleton di caricamento ── */
         .trv-lb-skel { padding:.4rem .2rem; }
         .trv-lb-skelrow { display:flex; align-items:center; gap:.6rem; padding:.55rem .4rem; animation:trv-lb-fade .3s both; }
-        .trv-lb-skeldot, .trv-lb-skelbar { background:linear-gradient(90deg,rgba(0,0,0,0.05),rgba(0,0,0,0.1),rgba(0,0,0,0.05)); background-size:200% 100%; animation:trv-lb-shimmer 1.3s infinite; border-radius:8px; }
-        .trv-lb.dark .trv-lb-skeldot, .trv-lb.dark .trv-lb-skelbar { background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.09),rgba(255,255,255,0.04)); background-size:200% 100%; }
+        .trv-lb-skeldot, .trv-lb-skelbar {
+          background:linear-gradient(90deg,var(--sb-surface-100),var(--sb-surface-200),var(--sb-surface-100));
+          background-size:200% 100%; animation:trv-lb-shimmer 1.3s infinite; border-radius:8px;
+        }
         .trv-lb-skeldot { width:26px; height:26px; border-radius:50%; flex-shrink:0; }
         .trv-lb-skelbar { height:11px; flex:1; }
         .trv-lb-skelbar.sm { flex:none; width:52px; }
@@ -531,12 +526,13 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
 
         /* ── Empty state ── */
         .trv-lb-empty { display:flex; flex-direction:column; align-items:center; gap:.5rem; text-align:center; padding:2.6rem 1.5rem; }
-        .trv-lb-emptyico { display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; border-radius:50%; background:rgba(62, 207, 142,0.1); color:#0f9d63; margin-bottom:.3rem; }
-        .trv-lb.dark .trv-lb-emptyico { background:rgba(95,208,154,0.12); color:#6fe0a6; }
-        .trv-lb-empty strong { font-size:1.02rem; color:#17271d; font-weight:800; }
-        .trv-lb.dark .trv-lb-empty strong { color:#e4f3ea; }
-        .trv-lb-empty span { font-size:.82rem; color:#6b8070; max-width:240px; }
-        .trv-lb.dark .trv-lb-empty span { color:#8fc7a6; }
+        .trv-lb-emptyico {
+          display:inline-flex; align-items:center; justify-content:center;
+          width:64px; height:64px; border-radius:50%;
+          background:color-mix(in srgb, var(--sb-brand) 12%, transparent); color:var(--sb-brand-text); margin-bottom:.3rem;
+        }
+        .trv-lb-empty strong { font-size:1.02rem; color:var(--sb-fg); font-weight:800; }
+        .trv-lb-empty span { font-size:.82rem; color:var(--sb-fg-muted); max-width:240px; }
 
         @media (max-width:380px) {
           .trv-lb-row { grid-template-columns:26px 1fr 60px auto; }

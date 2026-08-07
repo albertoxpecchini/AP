@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { requestToggle, subscribeTheme } from "../theme/themeCore";
+import { currentTheme, requestToggle, subscribeTheme } from "../theme/themeCore";
 import { SiteLink as Link } from "../site/nav";
 import SiteFooter from "../site/SiteFooter";
 import confetti from "canvas-confetti";
@@ -45,7 +45,6 @@ import "./trivia.css";
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GAME_KEY = "trivia";
-const DARK_KEY = "games-dark";
 const TOUR_KEY = "trivia-home-tour-seen";
 
 // Passi del tour guidato sul menù. I passi "modal" obbligano ad APRIRE la
@@ -106,13 +105,11 @@ interface Played {
 }
 
 export default function Trivia() {
-  const [dark, setDark] = useState(() => {
-    try {
-      const s = localStorage.getItem(DARK_KEY);
-      if (s !== null) return s === "1";
-      return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
-    } catch { return false; }
-  });
+  // Il tema lo decide il sito (scelta manuale o sensore orario), mai il sistema
+  // operativo: qui si legge e basta. Prima si partiva da localStorage
+  // "games-dark" con fallback a prefers-color-scheme — due sorgenti che col
+  // tema del sito non c'entravano, e che in chiaro potevano dare "scuro".
+  const [dark, setDark] = useState(() => currentTheme() === "dark");
   // Il tasto tema del gioco passa dal sistema globale (animazione + sensore).
   const toggleDark = () => requestToggle();
   useEffect(() => subscribeTheme((t) => setDark(t === "dark")), []);
@@ -503,9 +500,8 @@ export default function Trivia() {
         <GameTutorial
           gameKey={GAME_KEY}
           steps={TRIVIA_INTRO}
-          accentColor="#3ecf8e"
-          darkBg="#141414"
-          dark={dark}
+          accentColor="var(--sb-brand)"
+          darkBg="var(--sb-bg)"
           extra={TUTORIAL_KEYFRAMES}
           onDone={onTutorialDone}
         />

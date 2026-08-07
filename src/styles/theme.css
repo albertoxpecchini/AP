@@ -1,81 +1,104 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOKEN shadcn / Tailwind — UNICA definizione.
+
+   Prima questi stessi token erano dichiarati DUE volte, qui e in ubuntu.css,
+   con valori diversi: vinceva ubuntu.css solo perché importato per ultimo, e
+   il blocco .dark di questo file era rimasto in oklch grigio neutro mai
+   convertito (con --primary bianco). Bastava cambiare l'ordine degli import
+   per ritrovarsi un tema diverso.
+
+   I valori RICALCANO i token --sb-* di src/app/home.css, che sono il design
+   system vero. Non possono importarli: i --sb-* sono scoped su .sb-home,
+   mentre questi devono stare su :root perché Tailwind e i componenti shadcn
+   li leggono da lì. Sono quindi una copia — SE CAMBI home.css, cambia anche
+   qui. (Stesso patto dichiarato in app/archivio/archivio.css per il menu
+   Radix in portale.)
+
+   Consumatore reale: src/components/ui/map.tsx (le mappe MapLibre).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 @custom-variant dark (&:is(.dark *));
 
+/* ── Chiaro (default) — specchio di .sb-home in home.css ── */
 :root {
   --font-size: 16px;
-  --background: #faf8f6;
-  --foreground: #1C1A17;
-  --card: #FFFFFF;
-  --card-foreground: #1C1A17;
-  --popover: #FFFFFF;
-  --popover-foreground: #1C1A17;
-  --primary: #e95420;
-  --primary-foreground: #ffffff;
-  --secondary: #EAE7E0;
-  --secondary-foreground: #1C1A17;
-  --muted: #EAE7E0;
-  --muted-foreground: #8A8478;
-  --accent: #f0a183;
-  --accent-foreground: #1C1A17;
-  --destructive: #C94040;
+  --background: #fcfcfc;          /* --sb-bg */
+  --foreground: #171717;          /* --sb-fg */
+  --card: #fbfbfb;                /* --sb-surface-75 */
+  --card-foreground: #171717;
+  --popover: #fbfbfb;
+  --popover-foreground: #171717;
+  --primary: hsl(153, 60%, 53%);  /* --sb-brand */
+  --primary-foreground: #101010;  /* --sb-btn-fg */
+  --secondary: #f6f6f6;           /* --sb-surface-100 */
+  --secondary-foreground: #171717;
+  --muted: #f0f0f0;               /* --sb-surface-200 */
+  --muted-foreground: #6f6f6f;    /* --sb-fg-lighter */
+  --accent: #f0f0f0;
+  --accent-foreground: #171717;
+  --destructive: #e5484d;
   --destructive-foreground: #ffffff;
-  --border: rgba(233, 84, 32, 0.15);
+  --border: #e8e8e8;              /* --sb-border */
   --input: transparent;
-  --input-background: #EAE7E0;
-  --switch-background: #C8C4BB;
+  --input-background: #f6f6f6;
+  --switch-background: #c7c7c7;   /* --sb-border-stronger */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: rgba(233, 84, 32, 0.35);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --ring: hsla(153, 60%, 53%, 0.35);
+  --chart-1: hsl(153, 60%, 53%);
+  --chart-2: #0550ae;
+  --chart-3: #953800;
+  --chart-4: #8250df;
+  --chart-5: #6f6f6f;
+  --radius: 0.75rem;
+  --sidebar: #f8f8f8;             /* --sb-bg-alt */
+  --sidebar-foreground: #171717;
+  --sidebar-primary: hsl(153, 60%, 53%);
+  --sidebar-primary-foreground: #101010;
+  --sidebar-accent: #f0f0f0;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #e8e8e8;
+  --sidebar-ring: hsla(153, 60%, 53%, 0.35);
 }
 
+/* ── Scuro — specchio di html.dark .sb-home ── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --background: #141414;          /* --sb-bg */
+  --foreground: #ededed;          /* --sb-fg */
+  --card: #1c1c1c;                /* --sb-surface-75 */
+  --card-foreground: #ededed;
+  --popover: #1c1c1c;
+  --popover-foreground: #ededed;
+  --primary: hsl(153, 60%, 53%);  /* il brand non cambia col tema */
+  --primary-foreground: #ffffff;
+  --secondary: #222222;           /* --sb-surface-100 */
+  --secondary-foreground: #ededed;
+  --muted: #282828;               /* --sb-surface-200 */
+  --muted-foreground: #969696;    /* --sb-fg-lighter */
+  --accent: #282828;
+  --accent-foreground: #ededed;
+  --destructive: #e5484d;
+  --destructive-foreground: #ffffff;
+  --border: #2a2a2a;              /* --sb-border */
+  --input: #222222;
+  --input-background: #222222;
+  --switch-background: #414141;   /* --sb-border-stronger */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --ring: hsla(153, 60%, 53%, 0.5);
+  --chart-1: hsl(153, 60%, 53%);
+  --chart-2: #79c0ff;
+  --chart-3: #ffcda1;
+  --chart-4: #bda4ff;
+  --chart-5: #969696;
+  --sidebar: #181818;             /* --sb-bg-alt */
+  --sidebar-foreground: #ededed;
+  --sidebar-primary: hsl(153, 60%, 53%);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #282828;
+  --sidebar-accent-foreground: #ededed;
+  --sidebar-border: #2a2a2a;
+  --sidebar-ring: hsla(153, 60%, 53%, 0.5);
 }
 
 @theme inline {
@@ -178,30 +201,4 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
-}
-
-/* Override palette neroverde Sassuolo (sovrascrive Bootstrap Italia blue #0066cc) */
-:root {
-  --bs-primary: #e95420 !important;
-  --bs-primary-rgb: 47, 125, 74 !important;
-}
-
-.btn-outline-primary {
-  color: #c2410c !important;
-  border-color: #e95420 !important;
-}
-
-.btn-outline-primary:hover,
-.btn-outline-primary:focus {
-  background-color: #e95420 !important;
-  border-color: #e95420 !important;
-  color: #ffffff !important;
-}
-
-.text-primary {
-  color: #c2410c !important;
-}
-
-.bg-primary {
-  background-color: #e95420 !important;
 }

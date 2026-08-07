@@ -5,17 +5,26 @@ import type { IntroStep } from "../components/GameIntro";
 // ════════════════════════════════════════════════════════════════════════════
 // Ogni passo è una "scena" autonoma: tutto è CSS/SVG inline → leggerissimo, ma
 // con animazioni stratificate (entrata in sequenza, loop continui, parallax,
-// glow, conta-su numerico) per un effetto ultra-fluido. Palette Kit Italia:
-// verde #0f9d63 / #2F9E5A, oro #D9A400. Le keyframes vivono in <style> in fondo,
-// con prefisso `tut-` per non collidere con quelle di GameIntro (`gt-`).
+// glow, conta-su numerico) per un effetto ultra-fluido. Le keyframes vivono in
+// <style> in fondo, con prefisso `tut-` per non collidere con GameIntro (`gt-`).
+//
+// COLORI. Due categorie, con regole diverse:
+//  · le SUPERFICI e i TESTI delle scene vengono dai token --sb-*, così le
+//    scene si leggono sia sulla card chiara sia su quella scura. Prima erano
+//    grigi fissi (#3c4a41, #7a8a80…) tarati su una card sempre bianca;
+//  · i colori da ILLUSTRAZIONE restano fissi: sono disegni, non interfaccia.
+//    Le tre card dei tipi di domanda vanno distinte fra loro (verde/blu/
+//    arancio) e l'oro del bonus deve leggersi come "oro" in tutti e due i temi.
+//    Sopra ci sta sempre del bianco, che su un fondo pieno saturo va bene.
+// Il verde è quello del brand, così le scene non litigano col resto del sito.
 
-const GREEN = "#0f9d63";
-const GREEN_LITE = "#2F9E5A";
+const GREEN = "var(--sb-brand-text)";
+const GREEN_LITE = "var(--sb-brand)";
 const BLUE = "#3a7bbf";
 const ORANGE = "#b5651d";
 const GOLD = "#D9A400";
-const VIOLA = "#0f9d63";
-const VIOLA_LITE = "#3ecf8e";
+const VIOLA = GREEN;
+const VIOLA_LITE = GREEN_LITE;
 
 // ── Passo 1 ─────────────────────────────────────────────────────────────────
 // "Tre tipi di domanda" — tre card che entrano a cascata, fluttuano in loop
@@ -115,7 +124,7 @@ function ScoreVisual() {
           }} />
         ))}
         <svg viewBox="0 0 132 132" width="132" height="132" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx="66" cy="66" r={R} stroke="rgba(62, 207, 142,0.14)" strokeWidth="11" fill="none" />
+          <circle cx="66" cy="66" r={R} stroke="var(--sb-surface-200)" strokeWidth="11" fill="none" />
           <circle
             cx="66" cy="66" r={R} stroke={GREEN_LITE} strokeWidth="11" fill="none"
             strokeLinecap="round"
@@ -125,7 +134,7 @@ function ScoreVisual() {
               animation: "tut-ring 2.6s cubic-bezier(.4,0,.2,1) 0.3s infinite",
               // valore custom usato nelle keyframes
               ["--ring-target" as string]: `${C * (1 - pct)}`,
-              filter: `drop-shadow(0 0 6px ${GREEN_LITE}88)`,
+              filter: `drop-shadow(0 0 6px color-mix(in srgb, ${GREEN_LITE} 53%, transparent))`,
             }}
           />
         </svg>
@@ -145,17 +154,17 @@ function ScoreVisual() {
         <div style={{
           display: "flex", justifyContent: "space-between", fontSize: "0.66rem",
           fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em",
-          color: "#7a8a80", marginBottom: 5,
+          color: "var(--sb-fg-muted)", marginBottom: 5,
         }}>
           <span>Bonus velocità</span>
           <span style={{ color: GOLD, animation: "tut-blink 2.6s ease 0.3s infinite" }}>+100</span>
         </div>
-        <div style={{ height: 8, borderRadius: 999, background: "rgba(0,0,0,0.08)", overflow: "hidden" }}>
+        <div style={{ height: 8, borderRadius: 999, background: "var(--sb-surface-200)", overflow: "hidden" }}>
           <div style={{
             height: "100%", borderRadius: 999,
             background: `linear-gradient(90deg, ${GOLD}, #f2c94c)`,
             animation: "tut-drain 2.6s linear 0.3s infinite",
-            boxShadow: `0 0 10px ${GOLD}aa`,
+            boxShadow: `0 0 10px color-mix(in srgb, ${GOLD} 67%, transparent)`,
           }} />
         </div>
       </div>
@@ -181,7 +190,7 @@ function StreakVisual() {
         <span style={{
           fontWeight: 900, fontSize: "1.6rem", color: GOLD, marginLeft: 4,
           animation: "tut-mult 2.2s cubic-bezier(.34,1.56,.64,1) infinite",
-          textShadow: `0 2px 8px ${GOLD}66`,
+          textShadow: `0 2px 8px color-mix(in srgb, ${GOLD} 40%, transparent)`,
         }}>×3</span>
         <span style={{
           fontSize: "1.9rem", marginLeft: 6, display: "inline-block",
@@ -200,27 +209,27 @@ function StreakVisual() {
           <div key={r.name} style={{
             display: "flex", alignItems: "center", gap: "0.55rem",
             padding: "0.4rem 0.6rem", borderRadius: 10,
-            background: r.me ? `linear-gradient(90deg, ${GREEN}1f, ${GREEN}08)` : "rgba(0,0,0,0.04)",
-            border: r.me ? `1px solid ${GREEN}40` : "1px solid transparent",
+            background: r.me ? `linear-gradient(90deg, color-mix(in srgb, ${GREEN} 12%, transparent), color-mix(in srgb, ${GREEN} 3%, transparent))` : "var(--sb-overlay)",
+            border: r.me ? `1px solid color-mix(in srgb, ${GREEN} 25%, transparent)` : "1px solid transparent",
             animation: r.me
               ? "tut-rank-rise 3s cubic-bezier(.5,0,.2,1) infinite"
               : `tut-row-in 0.5s ease ${0.3 + i * 0.1}s both`,
           }}>
             <span style={{
               width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
-              background: r.me ? GREEN_LITE : "rgba(0,0,0,0.12)",
-              color: r.me ? "#fff" : "#7a8a80",
+              background: r.me ? GREEN_LITE : "var(--sb-border-stronger)",
+              color: r.me ? "#fff" : "var(--sb-fg-muted)",
               fontSize: "0.6rem", fontWeight: 900,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>{i + 1}</span>
             <span style={{
               fontWeight: r.me ? 900 : 700, fontSize: "0.74rem",
-              color: r.me ? GREEN : "#5a6a60", width: 52, flexShrink: 0,
+              color: r.me ? GREEN : "var(--sb-fg-light)", width: 52, flexShrink: 0,
             }}>{r.name}</span>
-            <div style={{ flex: 1, height: 6, borderRadius: 999, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+            <div style={{ flex: 1, height: 6, borderRadius: 999, background: "var(--sb-overlay)", overflow: "hidden" }}>
               <div style={{
                 height: "100%", width: r.w, borderRadius: 999,
-                background: r.me ? `linear-gradient(90deg, ${GREEN}, ${GREEN_LITE})` : "rgba(0,0,0,0.18)",
+                background: r.me ? `linear-gradient(90deg, ${GREEN}, ${GREEN_LITE})` : "var(--sb-border-stronger)",
                 animation: r.me ? "tut-bar-grow 3s ease infinite" : "none",
               }} />
             </div>
@@ -244,8 +253,8 @@ function ContextVisual() {
     <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", gap: "0.7rem" }}>
       <div style={{
         borderRadius: 14, overflow: "hidden",
-        border: `1px solid ${GREEN}33`,
-        boxShadow: `0 10px 24px ${GREEN}22`,
+        border: `1px solid color-mix(in srgb, ${GREEN} 20%, transparent)`,
+        boxShadow: `0 10px 24px color-mix(in srgb, ${GREEN} 13%, transparent)`,
         animation: "tut-card-in 0.5s cubic-bezier(.34,1.56,.64,1) both",
       }}>
         {/* banner contesto */}
@@ -261,15 +270,15 @@ function ContextVisual() {
           ))}
         </div>
         {/* domanda finta sotto */}
-        <div style={{ background: "#fff", padding: "0.85rem", display: "flex", flexDirection: "column", gap: "0.5rem", animation: "tut-row-in 0.5s ease 0.6s both" }}>
-          <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3c4a41", lineHeight: 1.4 }}>In che anno iniziò la costruzione?</span>
+        <div style={{ background: "var(--sb-surface-75)", padding: "0.85rem", display: "flex", flexDirection: "column", gap: "0.5rem", animation: "tut-row-in 0.5s ease 0.6s both" }}>
+          <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--sb-fg)", lineHeight: 1.4 }}>In che anno iniziò la costruzione?</span>
           <div style={{ display: "flex", gap: "0.4rem" }}>
             {["1882", "1905", "1926"].map((o, i) => (
               <span key={o} style={{
                 flex: 1, textAlign: "center", padding: "0.35rem", borderRadius: 8,
                 fontSize: "0.72rem", fontWeight: 800,
-                background: i === 0 ? `${GREEN}1a` : "rgba(0,0,0,0.05)",
-                color: i === 0 ? GREEN : "#7a8a80",
+                background: i === 0 ? `color-mix(in srgb, ${GREEN} 10%, transparent)` : "var(--sb-overlay)",
+                color: i === 0 ? GREEN : "var(--sb-fg-muted)",
                 border: i === 0 ? `1.5px solid ${GREEN}` : "1.5px solid transparent",
                 animation: i === 0 ? "tut-pop-soft 2.6s ease 1s infinite" : "none",
               }}>{o}</span>
@@ -294,12 +303,12 @@ function CoverageVisual() {
     <div style={{ width: "100%", maxWidth: 300, display: "flex", flexDirection: "column", gap: "1rem" }}>
       {/* barra DB esplorato */}
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.07em", color: "#7a8a80", marginBottom: 5 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.07em", color: "var(--sb-fg-muted)", marginBottom: 5 }}>
           <span>Database esplorato</span>
           <span style={{ color: VIOLA, animation: "tut-blink 3s ease 0.3s infinite" }}>68%</span>
         </div>
-        <div style={{ height: 9, borderRadius: 999, background: "rgba(0,0,0,0.08)", overflow: "hidden" }}>
-          <div style={{ height: "100%", borderRadius: 999, background: `linear-gradient(90deg, ${VIOLA}, ${VIOLA_LITE})`, animation: "tut-fill-68 2.6s cubic-bezier(.4,0,.2,1) 0.3s infinite", boxShadow: `0 0 10px ${VIOLA}88` }} />
+        <div style={{ height: 9, borderRadius: 999, background: "var(--sb-surface-200)", overflow: "hidden" }}>
+          <div style={{ height: "100%", borderRadius: 999, background: `linear-gradient(90deg, ${VIOLA}, ${VIOLA_LITE})`, animation: "tut-fill-68 2.6s cubic-bezier(.4,0,.2,1) 0.3s infinite", boxShadow: `0 0 10px color-mix(in srgb, ${VIOLA} 53%, transparent)` }} />
         </div>
       </div>
       {/* capitoli con N/T */}
@@ -308,16 +317,16 @@ function CoverageVisual() {
           <div key={c.name} style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "0.5rem 0.7rem", borderRadius: 10,
-            background: c.done ? `${VIOLA}14` : "rgba(0,0,0,0.04)",
-            border: c.done ? `1px solid ${VIOLA}3a` : "1px solid transparent",
+            background: c.done ? `color-mix(in srgb, ${VIOLA} 8%, transparent)` : "var(--sb-overlay)",
+            border: c.done ? `1px solid color-mix(in srgb, ${VIOLA} 23%, transparent)` : "1px solid transparent",
             animation: `tut-row-in 0.5s ease ${c.d}s both`,
           }}>
-            <span style={{ fontSize: "0.78rem", fontWeight: 800, color: c.done ? VIOLA : "#5a6a60" }}>{c.name}</span>
+            <span style={{ fontSize: "0.78rem", fontWeight: 800, color: c.done ? VIOLA : "var(--sb-fg-light)" }}>{c.name}</span>
             <span style={{
               fontSize: "0.74rem", fontWeight: 900, fontVariantNumeric: "tabular-nums",
               padding: "0.1rem 0.5rem", borderRadius: 999,
               color: c.done ? "#fff" : GREEN,
-              background: c.done ? VIOLA : `${GREEN}1a`,
+              background: c.done ? VIOLA : `color-mix(in srgb, ${GREEN} 10%, transparent)`,
               animation: c.done ? `tut-badge-pop 2.6s ease ${0.8 + c.d}s infinite` : "none",
             }}>{c.n}</span>
           </div>
@@ -346,21 +355,21 @@ function GradeVisual() {
         <div key={r.lab} style={{
           display: "flex", alignItems: "center", gap: "0.6rem",
           padding: "0.4rem 0.6rem", borderRadius: 11,
-          background: "rgba(0,0,0,0.04)",
+          background: "var(--sb-overlay)",
           animation: `tut-row-in 0.5s ease ${r.d}s both`,
         }}>
           <span style={{
             width: 34, height: 34, flexShrink: 0, borderRadius: 9,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontWeight: 900, fontSize: "1rem", color: "#fff",
-            background: `linear-gradient(140deg, ${r.col}, ${r.col}cc)`,
-            boxShadow: `0 4px 12px ${r.col}55`,
+            background: `linear-gradient(140deg, ${r.col}, color-mix(in srgb, ${r.col} 80%, transparent))`,
+            boxShadow: `0 4px 12px color-mix(in srgb, ${r.col} 33%, transparent)`,
             animation: `tut-stamp 2.8s cubic-bezier(.34,1.56,.64,1) ${r.d + 0.3}s infinite`,
           }}>{r.g}</span>
-          <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#3c4a41" }}>{r.lab}</span>
+          <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "var(--sb-fg)" }}>{r.lab}</span>
         </div>
       ))}
-      <p style={{ margin: "0.15rem 0 0", fontSize: "0.66rem", color: "#8a9e91", textAlign: "center", lineHeight: 1.35 }}>
+      <p style={{ margin: "0.15rem 0 0", fontSize: "0.66rem", color: "var(--sb-fg-muted)", textAlign: "center", lineHeight: 1.35 }}>
         La lettera arriva solo se rispondi a <b style={{ color: VIOLA }}>tutte</b> le domande del pacchetto.
       </p>
     </div>

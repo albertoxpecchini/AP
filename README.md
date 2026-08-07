@@ -74,25 +74,26 @@ su ogni pagina.
 - **Tema chiaro/scuro NATIVO** — non due fogli di stile, ma un set di custom properties ridichiarate
   sotto `html.dark`. Il chiaro è il default.
 - **Palette neutra + un solo colore** — grigi puri per fondali, bordi e testo; l'unica tinta è il
-  **verde brand `hsl(153 60% 53%)`**. L'arancio Ubuntu resta come **identità storica** (documentato,
-  non più dominante).
+  **verde brand `hsl(153 60% 53%)`**. Dal 2026-08 è l'unico accento su **tutte** le pagine:
+  l'arancio Ubuntu sopravvive solo nelle email transazionali (`api/d.ts`).
 - **Un fondale solo, per tutta la pagina** — `.sb-bg` è `position: fixed`: due velature radiali
   (verde e ciano) e una griglia tecnica che si dissolve verso il basso, incollate alla finestra.
   Nessun bordo di sezione può tagliarlo mentre si scorre, quindi **fra una sezione e l'altra non
   c'è nessun confine**; il contenuto scorre sopra, trasparente. Anche il footer non comincia con un
   bordo: il suo colore entra in **dissolvenza** dall'alto.
-- **Tipografia Ubuntu** — il carattere del sito resta Ubuntu (+ Ubuntu Mono; Lora solo per `/festa`),
+- **Tipografia Titillium Web** — il carattere del sito (+ Roboto Mono per il codice; Lora solo per `/festa`),
   al posto del Circular di Supabase.
 - **CSS per pagina** — ogni pagina ha il suo file accanto al componente
   (`bio.css`, `pcto.css`, `mestesso.css`, `instagram.css`, `sostieni.css`, `trivia.css`,
-  `archivio.css`, `controlbar.css`, `palette.css`, `scrollprogress.css`, `workflow.css`), importato
+  `archivio.css`, `controlbar.css`, `palette.css`, `scrollprogress.css`, `workflow.css`, più
+  `approfondimento.css` condiviso da `/dubliners` e `/gattopardo`), importato
   dal componente stesso: nessun foglio monolitico, e il code-splitting per rotta porta con sé anche
   lo stile.
 
 **La palette per intero è consultabile dal sito**: footer → **«Palette»**
 ([`PaletteModal.tsx`](src/app/site/PaletteModal.tsx)) apre una finestra con tutte le tinte in uso —
-verde brand, fondali, bordi, testo (con rapporto di contrasto), colori del codice, arancio Ubuntu,
-grafico contribuzioni, linguaggi, il «dark premium» di Trivia, gradienti e ombre — mostrate
+verde brand, fondali, bordi, testo (con rapporto di contrasto), colori del codice, token shadcn,
+grafico contribuzioni, linguaggi, i pochi colori fissi di Trivia, arancio delle email — mostrate
 **nei due temi affiancati** e copiabili negli appunti.
 
 ---
@@ -462,16 +463,16 @@ regia GSAP** · ControlBar raggiungibile da tastiera (esce al `focus`) ·
 
 ## 🎨 Palette
 
-Verde brand identico nei due temi, grigi puri intorno. L'arancio Ubuntu resta come identità storica.
+Verde brand identico nei due temi, grigi puri intorno. L'arancio Ubuntu resta solo nelle email.
 Tutto il sistema colore è documentato e copiabile dal sito (footer → **«Palette»**).
 
 ![#3ECF8E](https://img.shields.io/badge/Brand-hsl(153_60%25_53%25)-3ECF8E?style=flat-square)
 ![#fcfcfc](https://img.shields.io/badge/Fondo_chiaro-%23FCFCFC-FCFCFC?style=flat-square&labelColor=555)
 ![#141414](https://img.shields.io/badge/Fondo_scuro-%23141414-141414?style=flat-square)
 ![#171717](https://img.shields.io/badge/Inchiostro-%23171717-171717?style=flat-square)
-![#e95420](https://img.shields.io/badge/Ubuntu_storico-%23E95420-E95420?style=flat-square)
+![#e95420](https://img.shields.io/badge/Ubuntu_email-%23E95420-E95420?style=flat-square)
 
-Carattere del sito: **Ubuntu** (+ Ubuntu Mono; Lora solo per `/festa`).
+Carattere del sito: **Titillium Web** (+ Roboto Mono; Lora solo per `/festa`).
 
 ---
 

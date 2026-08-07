@@ -40,19 +40,21 @@ export default function SubjectBadge({ dark, nick, chapterId, label }: SubjectBa
       <span className="trv-subjbadge-grade" style={{ color }}>{best.best.grade.letter}</span>
       <span className="trv-subjbadge-pct">{avg}%</span>
       <style>{`
+        /* Dai token --sb-*: la coppia chiaro/scuro scritta a mano non serve più.
+           La pillola sta sopra la foto della domanda, quindi il fondo è quasi
+           pieno (92%) e non di vetro: deve staccare dall'immagine. */
         .trv-subjbadge {
           display:inline-flex; align-items:center; gap:.3rem;
-          background:rgba(255,255,255,0.92); border:1px solid rgba(62, 207, 142,0.25);
-          border-radius:999px; padding:.18rem .5rem; box-shadow:0 2px 8px rgba(6,22,14,0.18);
+          background:color-mix(in srgb, var(--sb-surface-75) 92%, transparent);
+          border:1px solid var(--sb-border-strong);
+          border-radius:999px; padding:.18rem .5rem; box-shadow:0 2px 8px rgba(0,0,0,0.18);
           font-family:"Titillium Web", Geneva, Tahoma, sans-serif;
           animation:trv-subjbadge-in .3s ease;
         }
-        .trv-subjbadge.dark { background:rgba(20,33,26,0.92); border-color:rgba(95,208,154,0.3); }
         @keyframes trv-subjbadge-in { from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none} }
-        .trv-subjbadge-lbl { font-size:.54rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#9aa89e; }
+        .trv-subjbadge-lbl { font-size:.54rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--sb-fg-muted); }
         .trv-subjbadge-grade { font-size:1rem; font-weight:900; line-height:1; }
-        .trv-subjbadge-pct { font-size:.66rem; font-weight:800; color:#6b8070; font-variant-numeric:tabular-nums; }
-        .trv-subjbadge.dark .trv-subjbadge-pct { color:#8fc7a6; }
+        .trv-subjbadge-pct { font-size:.66rem; font-weight:800; color:var(--sb-fg-light); font-variant-numeric:tabular-nums; }
       `}</style>
     </div>
   );
