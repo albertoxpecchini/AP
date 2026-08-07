@@ -755,7 +755,13 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-card-visual {
   flex: 1;
   display: flex;
-  align-items: flex-end;
+  /* Centrato, non appoggiato in fondo. Le card di questa griglia sono alte
+     quanto la più alta della riga, quindi sotto al testo resta sempre un campo
+     libero: un disegno incollato al bordo basso lo lascia vuoto in mezzo e
+     sembra caduto. Al centro di quel campo, invece, il disegno è la figura di
+     una tavola — che è quello che è. (Prima qui c'erano riquadri con la loro
+     cornice, e per quelli l'appoggio in basso aveva senso.) */
+  align-items: center;
   justify-content: center;
   padding: 1.25rem 1.4rem 1.4rem;
   min-height: 108px;
@@ -795,202 +801,370 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-checks li { display: flex; align-items: center; gap: 0.55rem; font-size: 0.875rem; color: var(--sb-fg-light); }
 .sb-checks svg { color: var(--sb-brand); flex-shrink: 0; }
 
-/* Mock "browser" della card grande — il sito lo costruisci tu: i tre blocchi si
-   riempiono da sinistra a destra seguendo --vis-x, e in fondo alla corsa la
-   pillola passa da "building" a "live". A riposo sta a metà.
+/* ═══════════════════════════════════════════════════════════════════════════
+   I DISEGNI DELLA GRIGLIA PRODOTTI
 
-   Prima c'era un cursore finto che faceva il giro di quattro blocchi
-   accendendoli a turno, in un ciclo che non finiva mai. La differenza non è di
-   quantità: là il sito si costruiva da sé mentre guardavi, qui lo costruisci. */
-.sb-browser {
-  position: relative;
+   Sette figure a tratto, tutte sulla stessa tavola di 280×132, stesso spessore
+   di linea, stesso verde. Vedi la nota in testa a site/homeLive.tsx per il
+   perché sono disegni e non più miniature di interfacce.
+
+   ── Come si muovono ──────────────────────────────────────────────────────────
+   Una cosa sola per riquadro, e su quattro proprietà soltanto:
+
+     transform, opacity      il compositore le muove senza ricalcolare niente
+     offset-distance         il browser la risolve in una transform
+     stroke-dashoffset       ridisegna — ma filetti da 1,5 px, non gradienti
+
+   Qui c'è stato un giro in cui il puntatore comandava tutti e sette i visual
+   scrivendo `left`, `top`, `clip-path`, `color-mix` e `box-shadow`: proprietà
+   che rifanno il layout o ridisegnano a ogni movimento del mouse. Con sette
+   riquadri più il tilt della card il risultato erano scatti. Il puntatore è
+   rimasto su un disegno solo, la tavola delle curve di livello, dove agisce
+   dentro una `transform` — cioè dove costa quanto le altre.
+
+   ── Il fotogramma di riposo ─────────────────────────────────────────────────
+   Ogni regola base è scritta sul fotogramma FINITO: tratti disegnati, lente
+   accesa, palla arrivata. Le keyframe partono da lì e ci tornano. Serve perché
+   spegnere un'animazione (prefers-reduced-motion) lascia l'elemento sui valori
+   della regola normale: se quelli fossero il primo fotogramma, chi ha chiesto
+   meno movimento vedrebbe sette tavole mezze vuote.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-ill {
+  /* Tre pesi di linea, e bastano: la struttura, il dettaglio, l'accento.
+     La struttura NON usa --sb-border-stronger, che è il colore dei bordi di
+     interfaccia: su una lastra di vetro un filetto da 1,5 px di quel grigio
+     sparisce. Qui serve un tratto che si veda come tratto — una matita, non
+     un bordo — e lo si ottiene dal colore del testo, molto diluito, così
+     segue il tema da sé in chiaro e in scuro. */
+  --ill-line: color-mix(in srgb, var(--sb-fg) 30%, transparent);
+  --ill-ink: color-mix(in srgb, var(--sb-fg) 45%, transparent);
+  --ill-brand: var(--sb-brand);
+
+  display: block;
   width: 100%;
-  max-width: 420px;
-  border-radius: 10px;
-  border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
-  overflow: hidden;
-  box-shadow: var(--sb-shadow-card);
+  height: auto;
+  max-width: 300px;
+  /* Nessun overflow: hidden — i tratti hanno il linecap tondo e sui bordi si
+     mangerebbe mezzo pixel di ogni estremità. */
+  overflow: visible;
+
+  /* Il valore di riposo di tutta la tavola: solo contorno. Sta QUI, sulla
+     radice, e non su un selettore tipo `.sb-ill circle` — che pure sarebbe
+     stato la cosa ovvia da scrivere.
+     `fill`, `stroke-linecap` e `stroke-linejoin` sono proprietà EREDITATE:
+     messe sulla radice scendono da sole su tutto, e chi ha un `fill` suo (i
+     satelliti, la palla, i puntini) lo applica e basta — una dichiarazione che
+     colpisce l'elemento batte sempre quella che gli arriva per eredità, a
+     prescindere dalla specificità. Con `.sb-ill circle { fill: none }`, invece,
+     la specificità c'era eccome: (0,1,1) contro (0,1,0) di `.sb-ill-sat`, e
+     vinceva il reset. Risultato: tutto quello che doveva essere pieno era
+     invisibile — i due satelliti, la palla dei rimbalzi, i puntini degli
+     insiemi e i tre bollini della testata. */
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.sb-browser-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 0.8rem;
-  border-bottom: 1px solid var(--sb-border);
-  background: var(--sb-surface-100);
+/* Questa invece non è ereditata, e va distribuita. Tiene il tratto a 1,5 px
+   veri qualunque sia la misura a cui la tavola viene disegnata: la stessa
+   figura sta in una card da 230 px e in una da 380, e un filetto che scala
+   con lei sarebbe grasso di qua e sparito di là. */
+.sb-ill * { vector-effect: non-scaling-stroke; }
+/* La card grande ha il doppio dello spazio: la tavola del progetto ci sta
+   dentro più larga, e a quella misura le quote si leggono. */
+.sb-ill--blue { max-width: 380px; }
+
+/* ── ① Sviluppo web — il progetto di una pagina ─────────────────────────────
+   Ogni tratto porta pathLength="1" e un tratteggio lungo quanto sé stesso: da
+   lì, scoprirlo è solo far scorrere stroke-dashoffset da 1 a 0, senza sapere
+   niente di quanto è lungo davvero il tracciato.
+
+   La cascata: --i è la posizione nell'elenco, il ritardo è quello. Alla fine
+   del giro il dashoffset non torna a 1 — va a -1, così il tratto scivola via
+   dalla parte opposta invece di arretrare. Un disegno che si cancella al
+   contrario sembra un errore; uno che si sfila sembra una mano. */
+.sb-ill-draw {
+  stroke: var(--ill-line);
+  stroke-width: 1.5;
+  stroke-dashoffset: 0;
+  animation: sb-ill-draw var(--blue, 9s) ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.16s);
 }
-.sb-browser-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--sb-border-stronger); }
-.sb-browser-url {
-  margin-left: 0.3rem;
-  flex: 1;
-  height: 20px;
-  border-radius: 999px;
-  background: var(--sb-surface-200);
-  border: 1px solid var(--sb-border);
-  font-size: 0.62rem;
-  line-height: 18px;
-  color: var(--sb-fg-muted);
-  padding: 0 0.7rem;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.sb-browser-body { position: relative; padding: 0.9rem; display: grid; grid-template-columns: 1fr 2fr; gap: 0.6rem; }
-.sb-skel {
-  position: relative;
-  border-radius: 6px;
-  background: var(--sb-surface-200);
-  border: 1px solid var(--sb-border);
-  overflow: hidden;
-}
-/* Il riempimento: una barra verde che cresce da sinistra, un blocco dopo
-   l'altro. Su scaleX e non su width — width rifarebbe il layout del blocco a
-   ogni frame, scaleX no: il compositore scala una texture già disegnata. */
-.sb-skel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(90deg,
-    color-mix(in srgb, var(--sb-brand) 26%, transparent),
-    color-mix(in srgb, var(--sb-brand) 12%, transparent));
-  transform-origin: left center;
-  animation: sb-build var(--build, 7s) ease-in-out infinite;
-}
-/* Un blocco ogni mezzo secondo: la pagina si costruisce dall'alto, come una
-   pagina vera che arriva. */
-.sb-skel--hero { grid-column: 1 / -1; height: 56px; }
-.sb-skel--side { height: 84px; }
-.sb-skel--main { height: 84px; }
-.sb-skel--side::before { animation-delay: 0.5s; }
-.sb-skel--main::before { animation-delay: 1s; }
-@keyframes sb-build {
-  0%        { transform: scaleX(0); }
-  26%, 78%  { transform: scaleX(1); }
-  92%, 100% { transform: scaleX(0); }
+/* I tre tratti del contenuto (blocco grande, diagonale, due colonne) sono
+   quelli che raccontano la pagina: vanno in verde, il telaio resta grigio. */
+.sb-ill--blue .sb-ill-draw:nth-child(n + 5) { stroke: var(--ill-brand); opacity: 0.85; }
+.sb-ill-dot { fill: var(--ill-line); stroke: none; }
+@keyframes sb-ill-draw {
+  0%       { stroke-dashoffset: 1; }
+  26%, 76% { stroke-dashoffset: 0; }
+  94%,100% { stroke-dashoffset: -1; }
 }
 
-/* Pillola di stato del deploy: due parole sovrapposte che si scambiano il
-   posto quando i blocchi sono a posto. Cambiare testo davvero avrebbe voluto
-   dire tenere in piedi del JS per una parola sola — così sono due opacità,
-   che il compositore incrocia senza ridisegnare niente. */
-.sb-browser-badge {
-  position: relative;
-  flex-shrink: 0;
-  display: inline-grid;
-  padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-  border: 1px solid var(--sb-border-strong);
-  background: var(--sb-surface-200);
-  font-size: 0.56rem;
-  font-weight: 500;
+/* ── ② Web design — il saggio tipografico ───────────────────────────────────
+   Il contorno resta sempre acceso; sotto, lo stesso testo pieno va e viene. È
+   una sola opacity, e sembra un cambio di materia. */
+.sb-ill-guide {
+  stroke: var(--ill-line);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.9;
+}
+.sb-ill-tick text {
+  fill: var(--ill-ink);
+  font-size: 8px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-/* Il verde del "live" è uno strato sotto, che si accende e si spegne: così
-   anche il cambio di colore della pillola è una sola opacità, e non un
-   color-mix da ricalcolare. */
-.sb-browser-badge::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: var(--sb-btn-bg);
-  border: 1px solid var(--sb-btn-bd);
-  box-shadow: 0 0 14px -2px var(--sb-brand);
-  animation: sb-badge-live var(--build, 7s) ease-in-out infinite;
+/* Il corpo è tarato perché le lettere TOCCHINO le loro guide: la A arriva alla
+   riga "cap", la a alla riga "x", tutte e due poggiano sulla "base". È tutto
+   quello che deve fare un saggio tipografico — se il testo galleggia in mezzo
+   alle righe, le righe non stanno misurando niente. */
+.sb-ill-glyph,
+.sb-ill-glyph-ink {
+  font-family: inherit;
+  font-size: 118px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-anchor: middle;
 }
-.sb-browser-badge > span { grid-area: 1 / 1; position: relative; }
-.sb-browser-badge .build {
-  color: var(--sb-fg-muted);
-  animation: sb-badge-build var(--build, 7s) ease-in-out infinite;
+.sb-ill-glyph {
+  fill: none;
+  stroke: var(--ill-brand);
+  stroke-width: 1.2;
 }
-.sb-browser-badge .live {
-  color: var(--sb-btn-fg);
-  animation: sb-badge-live var(--build, 7s) ease-in-out infinite;
+.sb-ill-glyph-ink {
+  fill: var(--ill-brand);
+  stroke: none;
+  opacity: 0.16;
+  animation: sb-ill-ink var(--ink, 7s) ease-in-out infinite;
 }
-@keyframes sb-badge-build {
-  0%, 40%   { opacity: 1; }
-  46%, 88%  { opacity: 0; }
-  94%, 100% { opacity: 1; }
-}
-@keyframes sb-badge-live {
-  0%, 40%   { opacity: 0; }
-  46%, 88%  { opacity: 1; }
-  94%, 100% { opacity: 0; }
+@keyframes sb-ill-ink {
+  0%, 12%  { opacity: 0; }
+  42%, 68% { opacity: 0.16; }
+  92%,100% { opacity: 0; }
 }
 
-/* Terminale (card AI) — resta scuro in entrambi i temi, come un vero terminale.
-   La digitazione si scorre: il comando sta tutto nel markup e --vis-x lo scopre
-   carattere per carattere. Prima lo scriveva un timeline GSAP che ciclava
-   quattro sessioni in eterno, un carattere ogni 42 millisecondi anche a
-   finestra in secondo piano. */
-.sb-term {
-  position: relative;
-  width: 100%;
-  min-height: 104px;
-  border-radius: 10px;
-  background: #171717;
-  border: 1px solid #2e2e2e;
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.82rem;
-  color: #ededed;
-  padding: 0.9rem 1rem 1.5rem;
-  text-align: left;
-  overflow: hidden;
+/* ── ③ Sviluppo con l'AI — il prisma ────────────────────────────────────────
+   Il raggio arriva, dentro il vetro piega, e il ventaglio si apre a rastrello.
+   Tutto su stroke-dashoffset: ogni tratto cresce dalla sua origine, che è poi
+   il verso in cui la luce va davvero. */
+.sb-ill-glass {
+  fill: color-mix(in srgb, var(--ill-brand) 10%, transparent);
+  stroke: none;
 }
+.sb-ill-edge { stroke: var(--ill-line); stroke-width: 1.5; }
+.sb-ill-beam {
+  stroke: var(--ill-brand);
+  stroke-width: 2;
+  stroke-dashoffset: 0;
+  animation: sb-ill-beam var(--prism, 8s) ease-in-out infinite;
+}
+.sb-ill-beam--in { animation-name: sb-ill-beam-in; }
+.sb-ill-ray {
+  stroke: var(--ill-brand);
+  stroke-width: 1.5;
+  stroke-dashoffset: 0;
+  /* I cinque raggi non hanno la stessa forza: la luce si divide, non si
+     moltiplica. Il centrale è il più pieno, gli esterni sfumano. */
+  opacity: calc(0.9 - 0.13 * var(--i));
+  animation: sb-ill-ray var(--prism, 8s) ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.07s);
+}
+@keyframes sb-ill-beam {
+  0%       { stroke-dashoffset: 1; }
+  18%, 82% { stroke-dashoffset: 0; }
+  96%,100% { stroke-dashoffset: 1; }
+}
+@keyframes sb-ill-beam-in {
+  0%, 14%  { stroke-dashoffset: 1; }
+  26%, 82% { stroke-dashoffset: 0; }
+  96%,100% { stroke-dashoffset: 1; }
+}
+@keyframes sb-ill-ray {
+  0%, 24%  { stroke-dashoffset: 1; }
+  44%, 82% { stroke-dashoffset: 0; }
+  94%,100% { stroke-dashoffset: 1; }
+}
+
+/* ── ④ Giochi web — la traiettoria ──────────────────────────────────────────
+   La palla si muove su offset-path: il browser la fa scivolare lungo il
+   tracciato risolvendolo in una transform, quindi costa quanto uno spostamento
+   qualunque. offset-rotate: 0deg perché una palla non ha un davanti — senza,
+   ruoterebbe seguendo la tangente e si vedrebbe girare.
+
+   Il tracciato dell'offset-path è lo stesso di RUN_PATH in homeLive.tsx: se si
+   tocca lì va toccato anche qui, o la palla corre su una curva che non c'è. */
+.sb-ill-ground { stroke: var(--ill-line); stroke-width: 1.5; }
+/* La traccia è verde, non grigia: è la strada che la palla ha fatto, cioè la
+   cosa che la card racconta. Tratteggiata, perché una traiettoria disegnata
+   piena diventa un filo teso e smette di sembrare un salto. */
+.sb-ill-arc {
+  stroke: var(--ill-brand);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 6;
+  opacity: 0.55;
+}
+.sb-ill-flag { stroke: var(--ill-ink); stroke-width: 1.5; }
+.sb-ill-ball {
+  fill: var(--ill-brand);
+  stroke: none;
+  offset-path: path("M14,112 Q54,16 94,112 Q127,44 160,112 Q186,70 212,112 Q233,90 254,112");
+  offset-rotate: 0deg;
+  offset-distance: 100%;
+  /* linear, e non una curva: gli anelli dei contatti partono su un ritardo
+     calcolato come frazione della corsa, e con un'accelerazione qualsiasi la
+     palla non sarebbe più dove il conto dice che è. La curva ce l'ha già il
+     tracciato. */
+  animation: sb-ill-run var(--run, 5.6s) linear infinite;
+}
+/* Gli anelli dei contatti: --at è la frazione di corsa in cui la palla arriva
+   su quel punto, misurata sulla lunghezza degli archi (un arco alto è più
+   lungo di uno basso a parità di distanza percorsa). Il ritardo esce da lì. */
+.sb-ill-hit {
+  fill: none;
+  stroke: var(--ill-brand);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: sb-ill-hit var(--run, 5.6s) ease-out infinite;
+  animation-delay: calc(var(--at) * var(--run, 5.6s) * 0.68);
+}
+/* La palla non torna indietro a fine giro: arrivata in fondo si spegne, e il
+   giro dopo si riaccende alla partenza. Un pallino che rientra strisciando
+   all'indietro racconta una cosa che non è successa. */
+@keyframes sb-ill-run {
+  0%       { offset-distance: 0%; opacity: 0; }
+  6%       { opacity: 1; }
+  68%      { offset-distance: 100%; opacity: 1; }
+  86%,100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes sb-ill-hit {
+  0%       { transform: scale(0.4); opacity: 0.85; }
+  9%, 100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ── ⑤ Strumenti web — due insiemi ──────────────────────────────────────────
+   Nessun cerchio scivola: le due lenti si ridisegnerebbero a ogni frame, e la
+   forma dell'intersezione è un dato del disegno, non un'animazione. Quello che
+   si accende è la lente, e con lei i puntini che ci stanno dentro. */
+.sb-ill-set { stroke: var(--ill-line); stroke-width: 1.5; }
+.sb-ill-lens {
+  fill: color-mix(in srgb, var(--ill-brand) 22%, transparent);
+  stroke: var(--ill-brand);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sb-ill-lens var(--venn, 6.4s) ease-in-out infinite;
+}
+.sb-ill-seed { fill: var(--ill-line); stroke: none; }
+.sb-ill-seed--in {
+  fill: var(--ill-brand);
+  animation: sb-ill-seed var(--venn, 6.4s) ease-in-out infinite;
+}
+@keyframes sb-ill-lens {
+  0%, 10%  { opacity: 0; transform: scale(0.7); }
+  34%, 76% { opacity: 1; transform: scale(1); }
+  92%,100% { opacity: 0; transform: scale(0.7); }
+}
+@keyframes sb-ill-seed {
+  0%, 16%  { opacity: 0.25; }
+  40%, 76% { opacity: 1; }
+  92%,100% { opacity: 0.25; }
+}
+
+/* ── ⑥ Siti per clienti — il globo ──────────────────────────────────────────
+   Una sola animazione per tutti e due i satelliti: al secondo basta mezzo giro
+   di ritardo per stare dalla parte opposta. Passando dietro al globo si
+   smorzano, ed è quello smorzarsi che dà la profondità — senza, l'ellisse
+   resta un anello piatto disegnato sopra. */
+.sb-ill-globe { stroke: var(--ill-line); stroke-width: 1.5; }
+/* view-box e non fill-box: i due satelliti hanno la geometria all'origine
+   (0,0) — è offset-path a portarli in orbita — quindi il riquadro del gruppo
+   parte da lì, e ruotare attorno al suo centro vorrebbe dire ruotare attorno a
+   un punto che con il globo non c'entra niente. Con view-box l'origine la
+   scelgo io, ed è il centro del globo. */
+.sb-ill-orbit {
+  transform-box: view-box;
+  transform-origin: 140px 66px;
+  transform: rotate(-14deg);
+}
+.sb-ill-track {
+  stroke: var(--ill-brand);
+  stroke-width: 1;
+  opacity: 0.4;
+}
+.sb-ill-sat {
+  fill: var(--ill-brand);
+  stroke: none;
+  offset-path: path("M52,66 A88,28 0 0,1 228,66 A88,28 0 0,1 52,66");
+  offset-rotate: 0deg;
+  offset-distance: 25%;
+  animation: sb-ill-orbit var(--orbit, 11s) linear infinite;
+}
+/* Mezzo giro di ritardo, in negativo: l'animazione parte già a metà corsa,
+   quindi il secondo satellite è dall'altra parte fin dal primo fotogramma
+   invece di aspettare mezzo giro per mettersi in posizione. */
+.sb-ill-sat--b {
+  offset-distance: 75%;
+  animation-delay: calc(var(--orbit, 11s) / -2);
+}
+/* offset-distance è dichiarata solo agli estremi: fra 0% e 100% il browser la
+   interpola da sé, e i fotogrammi in mezzo servono soltanto all'opacità. La
+   prima metà del giro passa DIETRO al globo (l'orbita è inclinata verso chi
+   guarda), ed è lì che il satellite si smorza. */
+@keyframes sb-ill-orbit {
+  0%   { offset-distance: 0%; opacity: 0.3; }
+  46%  { opacity: 0.3; }
+  56%  { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0.3; }
+}
+
+/* ── ⑦ Area tecnica CAT — le curve di livello ───────────────────────────────
+   La quota che sale: le curve si accendono una dopo l'altra dall'esterno verso
+   il centro, che è poi come si legge un rilievo. Solo opacity.
+
+   E la tavola che si orienta verso il puntatore: --vis-x e --vis-y le scrive
+   site/GlassMotion.tsx sul riquadro sotto il cursore, a riposo valgono 0.5
+   (cioè il centro, cioè tavola dritta). È l'unico posto della griglia dove il
+   puntatore comanda ancora qualcosa, e lo fa dentro una transform. */
+.sb-ill-plate {
+  width: 100%;
+  max-width: 300px;
+  perspective: 720px;
+}
+.sb-ill--topo {
+  transform: rotateX(calc((var(--vis-y, 0.5) - 0.5) * -18deg))
+             rotateY(calc((var(--vis-x, 0.5) - 0.5) * 26deg));
+  /* Nessuna transizione: la curva ce l'hanno già i quickTo che tweenano il
+     numero prima di scriverlo (una var CSS non registrata con @property non
+     transiziona — vedi il blocco ④ di site/GlassMotion.tsx). */
+}
+.sb-ill-level {
+  stroke: var(--ill-brand);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.85;
+  animation: sb-ill-level var(--topo, 6.8s) ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.22s);
+}
+.sb-ill-vertex { stroke: var(--ill-ink); stroke-width: 1.5; }
+.sb-ill-vertex-dot { fill: var(--ill-ink); stroke: none; }
+.sb-ill-cross { stroke: var(--ill-ink); stroke-width: 1; opacity: 0.7; }
+@keyframes sb-ill-level {
+  0%, 100% { opacity: 0.28; }
+  30%      { opacity: 1; }
+  62%      { opacity: 0.28; }
+}
+
+/* Righe di terminale — le usa il pannello dei clienti (la finestra `ls
+   ./clients` nella coda della griglia prodotti). Il terminale che digitava
+   dentro la card AI non c’è più: al suo posto c’è il prisma. */
 .sb-term-line { display: flex; gap: 0.5rem; white-space: nowrap; line-height: 1.7; }
 .sb-term-line .p { color: var(--sb-brand); }
 .sb-term-line .c { color: #8f8f8f; }
-/* Il contenitore si tiene largo quanto il comando INTERO (--n caratteri, font
-   monospazio): senza, la riga si allargherebbe mentre si digita e il prompt
-   ballerebbe a ogni carattere. */
-.sb-term-typed { position: relative; display: inline-block; width: calc(var(--n, 22) * 1ch); }
-/* Il taglio scopre il comando da sinistra. È l'unica animazione di disegno
-   rimasta in questa sezione, e si può permettere: è una riga di testo di
-   duecento pixel, non un gradiente grande quanto la card. Prima qui c'era una
-   timeline GSAP che riscriveva textContent un carattere alla volta — cioè un
-   ricalcolo di layout ogni 42 millisecondi. */
-.sb-term-cmd {
-  display: block;
-  min-height: 1em;
-  clip-path: inset(0 100% 0 0);
-  animation: sb-type var(--type, 9s) ease-in-out infinite;
-}
-/* La testa di scrittura, larga 1ch: cadendo esattamente sul bordo del taglio
-   copre il glifo tagliato a metà, come in un terminale vero. Si muove su
-   translateX (non su `left`, che rifarebbe il layout della riga) con la stessa
-   curva e la stessa durata del taglio, così i due non si separano mai. */
-.sb-term-caret {
-  position: absolute;
-  top: 0.15em;
-  left: 0;
-  width: 1ch;
-  height: 1.05em;
-  background: var(--sb-brand);
-  animation: sb-type-caret var(--type, 9s) ease-in-out infinite;
-}
-@keyframes sb-type {
-  0%        { clip-path: inset(0 100% 0 0); }
-  34%, 88%  { clip-path: inset(0 0 0 0); }
-  96%, 100% { clip-path: inset(0 100% 0 0); }
-}
-@keyframes sb-type-caret {
-  0%        { transform: translateX(0); }
-  34%, 88%  { transform: translateX(calc(var(--n, 22) * 1ch)); }
-  96%, 100% { transform: translateX(0); }
-}
-/* L'output arriva quando il comando è scritto per intero, e se ne va con lui. */
-.sb-term-out {
-  opacity: 0;
-  animation: sb-term-out var(--type, 9s) ease-in-out infinite;
-}
-@keyframes sb-term-out {
-  0%, 38%   { opacity: 0; }
-  46%, 88%  { opacity: 1; }
-  94%, 100% { opacity: 0; }
-}
-
 /* Cursore a blocco per i terminali che NON si digitano — quello del pannello
    clienti, che mostra un comando già dato. Lampeggia: è il segno che una
    sessione è aperta e sta aspettando, ed è anche l'animazione più a buon
@@ -1045,397 +1219,6 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   70% { box-shadow: 0 0 0 7px hsla(153, 60%, 53%, 0); }
   100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
 }
-
-/* Grafo di diffusione (card siti clienti) — dal nodo centrale partono due fili
-   verso i due siti. Non partono più da soli ogni 3 secondi: si riempie quello
-   dalla parte in cui vai, e il sito che raggiungi si accende. Sei tu a
-   instradare, e sotto il puntatore c'è sempre esattamente un filo vivo.
-
-   Un pacchetto per volta, a turno: il secondo filo parte a metà del ciclo del
-   primo. */
-.sb-flow { position: relative; width: 100%; max-width: 300px; height: 116px; }
-.sb-flow-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.sb-flow-wires .ghost { stroke: var(--sb-border-stronger); opacity: 0.6; }
-/* pathLength="1" sul tracciato (vedi ClientFlow): il tratteggio si misura da 0
-   a 1 comunque sia fatta la curva, e qui non serve sapere niente della
-   geometria — basta scoprirne la frazione giusta. */
-.sb-flow-wires .pulse {
-  stroke: var(--sb-brand);
-  animation: sb-packet var(--packet, 3.4s) ease-in-out infinite;
-}
-.sb-flow-wires .to-right .pulse { animation-delay: calc(var(--packet, 3.4s) / 2); }
-/* Il tratteggio è [1, 1] su un tracciato lungo 1: con offset 1 il filo cade
-   tutto nel vuoto del tratteggio (invisibile), con offset 0 è tutto pieno.
-   Fra i due, la parte scoperta cresce dal nodo verso il sito. */
-@keyframes sb-packet {
-  0%, 8%    { stroke-dashoffset: 1; }
-  55%, 78%  { stroke-dashoffset: 0; }
-  92%, 100% { stroke-dashoffset: 1; }
-}
-.sb-flow-hub {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  margin-left: -17px;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
-}
-.sb-flow-hub img { width: 20px; height: 20px; border-radius: 5px; display: block; }
-/* Il nodo respira mentre trasmette. Su opacity di uno strato che ha già il suo
-   alone dipinto, non su box-shadow: un'ombra che cambia raggio va ridisegnata
-   a ogni frame, un'opacità no. */
-.sb-flow-hub::after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow: 0 0 16px -3px var(--sb-brand);
-  animation: sb-hub var(--packet, 3.4s) ease-in-out infinite;
-}
-@keyframes sb-hub {
-  0%, 100% { opacity: 0.15; }
-  50%      { opacity: 0.9; }
-}
-/* Il pallino del sito si accende all'arrivo del suo pacchetto, in fase col
-   filo che lo serve. */
-.sb-flow-ends .sb-chip-dot { animation: sb-dot-hit var(--packet, 3.4s) ease-in-out infinite; }
-.sb-flow-ends .to-right .sb-chip-dot { animation-delay: calc(var(--packet, 3.4s) / 2); }
-@keyframes sb-dot-hit {
-  0%, 40%   { opacity: 0.45; transform: scale(1); }
-  62%       { opacity: 1; transform: scale(1.5); }
-  86%, 100% { opacity: 0.45; transform: scale(1); }
-}
-.sb-flow-ends {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.35rem;
-}
-.sb-flow-ends .sb-chip { padding: 0.34rem 0.6rem; font-size: 0.7rem; gap: 0.35rem; }
-
-/* HUD di gioco (card giochi web) — il punteggio lo fai tu, con la strada che il
-   puntatore percorre dentro la card (vedi GameHud in site/homeLive).
-
-   Qui c'erano tre pillole, un "+120" che schizzava fuori a ogni round, una
-   serie che s'infiammava ogni 2,8 secondi e un voto che si ribaltava, su un
-   ciclo che ripartiva da zero all'infinito: quattro cose in movimento per dire
-   che i giochi hanno un punteggio. Restano un numero e un voto, e il numero è
-   il tuo. */
-.sb-hud { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; perspective: 500px; }
-.sb-hud-pill {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 999px;
-  border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--sb-fg-light);
-  font-variant-numeric: tabular-nums;
-}
-.sb-hud-score { min-width: 3.4ch; text-align: right; color: var(--sb-fg); font-weight: 600; }
-.sb-hud-grade {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: var(--sb-btn-bg);
-  border: 1px solid var(--sb-btn-bd);
-  color: var(--sb-btn-fg);
-  font-weight: 700;
-  font-size: 0.95rem;
-  transform-style: preserve-3d;
-}
-
-/* Diff a due liste (card strumenti) — la lente la muovi tu.
-
-   Il confronto c'è già tutto, fermo e leggibile: le righe portano il loro
-   colore, uguale a com'era. Quello che si muove è la lampada, una banda di luce
-   che sta a --vis-y e ravviva quello che attraversa. Prima scendeva da sola
-   ogni 3,6 secondi e le righe lampeggiavano a turno su quattro delay diversi:
-   una scansione che non stava esaminando niente. */
-.sb-diff { position: relative; width: 100%; max-width: 300px; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-.sb-diff-col {
-  border: 1px solid var(--sb-border-strong);
-  border-radius: 8px;
-  background: var(--sb-bg);
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.sb-diff-row { height: 9px; border-radius: 4px; background: var(--sb-surface-200); }
-.sb-diff-row--hit { background: color-mix(in srgb, var(--sb-brand) 38%, var(--sb-surface-200)); }
-.sb-diff-row--miss { background: color-mix(in srgb, #e93d5d 30%, var(--sb-surface-200)); }
-/* La banda scende, si spegne in fondo e ricomincia dall'alto. Niente
-   matematica riga per riga e niente mix-blend-mode: il blend obbligava il
-   browser a ridisegnare tutto quello che stava sotto la banda a ogni frame,
-   e per una lampada verde su fondo chiaro non cambiava quasi niente.
-   Transform e opacity, e basta. */
-.sb-diff-scan {
-  position: absolute;
-  left: -6px;
-  right: -6px;
-  top: 0;
-  height: 16px;
-  border-radius: 8px;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent, hsla(153, 60%, 53%, 0.38), transparent);
-  box-shadow: 0 0 18px hsla(153, 60%, 53%, 0.4);
-  animation: sb-scan var(--scan, 4.2s) ease-in-out infinite;
-}
-@keyframes sb-scan {
-  0%        { transform: translateY(2px); opacity: 0; }
-  12%       { opacity: 1; }
-  62%       { transform: translateY(62px); opacity: 1; }
-  74%, 100% { transform: translateY(62px); opacity: 0; }
-}
-
-/* Card CAT — piano cartesiano in tre dimensioni con un cubo che ci galleggia
-   sopra. Vera profondità CSS (perspective + transform-style: preserve-3d), non
-   un disegno che finge il 3D: il cubo ha sei facce e passandoci sopra si gira
-   davvero verso il puntatore.
-
-   Adesso è anche CSS puro. Prima qui c'erano TRE sistemi di moto sovrapposti —
-   un galleggiamento yoyo infinito sul portacubo, un giro su sé stesso da 26
-   secondi, e l'inseguimento del puntatore — con tutto il mestiere che serviva a
-   non farli litigare sulle stesse proprietà (per questo il galleggiamento
-   stava sul portacubo e la rotazione sul cubo). Restano --vis-x e --vis-y: uno
-   lo gira, l'altro lo solleva.
-
-   La catena preserve-3d NON va interrotta: stage → origin → lift → cube. */
-.sb-cat {
-  position: relative;
-  width: 100%;
-  max-width: 300px;
-  height: 150px;
-  perspective: 620px;
-  perspective-origin: 50% 44%;
-}
-.sb-cat-stage { position: absolute; inset: 0; transform-style: preserve-3d; }
-
-/* Il piano: griglia coricata all'indietro, sfumata sui bordi perché non
-   finisca con un taglio netto. */
-.sb-cat-plane {
-  position: absolute;
-  left: 50%;
-  top: 78%;
-  width: 320px;
-  height: 320px;
-  margin: -160px 0 0 -160px;
-  transform: rotateX(74deg);
-  background:
-    linear-gradient(var(--sb-border-strong) 1px, transparent 1px) 0 0 / 26px 26px,
-    linear-gradient(90deg, var(--sb-border-strong) 1px, transparent 1px) 0 0 / 26px 26px;
-  -webkit-mask-image: radial-gradient(closest-side, #000 26%, transparent 74%);
-  mask-image: radial-gradient(closest-side, #000 26%, transparent 74%);
-}
-/* Assi X e Y, sul piano */
-.sb-cat-plane::before,
-.sb-cat-plane::after {
-  content: "";
-  position: absolute;
-  background: var(--sb-brand);
-  opacity: 0.5;
-}
-.sb-cat-plane::before { left: 12%; right: 12%; top: 50%; height: 1px; }
-.sb-cat-plane::after { top: 12%; bottom: 12%; left: 50%; width: 1px; }
-
-/* Origine degli assi: punto a dimensione zero da cui pende tutto il resto. */
-.sb-cat-origin { position: absolute; left: 50%; top: 78%; transform-style: preserve-3d; }
-/* Asse Z: sale dall'origine fino al cubo */
-.sb-cat-z {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 1px;
-  height: 58px;
-  background: linear-gradient(to top, var(--sb-brand), transparent);
-  opacity: 0.5;
-}
-/* Ombra portata sul piano, coricata come il piano. Si stringe mentre il cubo
-   sale: è il solo modo per cui un oggetto che si alza si legge come alzato e
-   non come ingrandito. */
-.sb-cat-shadow {
-  position: absolute;
-  left: -24px;
-  top: -7px;
-  width: 48px;
-  height: 14px;
-  border-radius: 50%;
-  /* Il translateZ dopo la rotazione stacca l'ombra di un pelo dal piano:
-     complanari, i due si contenderebbero lo stesso pixel (z-fighting). */
-  transform: rotateX(74deg) translateZ(1px);
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-fg) 26%, transparent), transparent 72%);
-  animation: sb-cat-shadow var(--float, 3.4s) ease-in-out infinite alternate;
-}
-/* TRE movimenti sul cubo, e tre elementi diversi: il galleggiamento sul
-   portacubo, il giro lento sulla giostra, l'inseguimento del puntatore sul
-   cubo. Sono tutti e tre delle `transform`, e una `transform` per elemento è
-   tutto quello che si può avere — infilarle in una sola vorrebbe dire tenerle
-   in fase a mano, che è poi il motivo per cui prima ci voleva GSAP. Annidati,
-   si compongono da soli e restano tre animazioni indipendenti.
-
-   La catena preserve-3d non si interrompe: origin → lift → spin → cube. */
-.sb-cat-lift {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform-style: preserve-3d;
-  animation: sb-cat-float var(--float, 3.4s) ease-in-out infinite alternate;
-}
-@keyframes sb-cat-float {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-13px); }
-}
-@keyframes sb-cat-shadow {
-  from { transform: rotateX(74deg) translateZ(1px) scale(1); opacity: 1; }
-  to   { transform: rotateX(74deg) translateZ(1px) scale(0.78); opacity: 0.55; }
-}
-/* Giro lento su sé stesso. Si ferma quando ci passi sopra: da lì in poi
-   comanda la mano, e un cubo che continua a girare mentre provi a orientarlo
-   è un cubo che ti sfugge. */
-.sb-cat-spin {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform-style: preserve-3d;
-  animation: sb-cat-spin 26s linear infinite;
-}
-@keyframes sb-cat-spin {
-  from { transform: rotateY(0deg); }
-  to   { transform: rotateY(360deg); }
-}
-.sb-card:hover .sb-cat-spin { animation-play-state: paused; }
-/* Posa di riposo: assonometria leggibile, un vertice verso di noi. A metà
-   riquadro (--vis-x e --vis-y a 0.5) i due calc valgono esattamente questo.
-   È l'unico posto della sezione dove il puntatore comanda ancora — e lo fa
-   dentro una transform, che è quello che qui si può fare a costo zero. */
-.sb-cat-cube {
-  position: absolute;
-  left: -24px;
-  top: -82px;
-  width: 48px;
-  height: 48px;
-  transform-style: preserve-3d;
-  transform:
-    rotateX(calc(-22deg + (var(--vis-y) - 0.5) * -72deg))
-    rotateY(calc(32deg + (var(--vis-x) - 0.5) * 110deg));
-}
-.sb-cat-face {
-  position: absolute;
-  inset: 0;
-  border: 1px solid color-mix(in srgb, var(--sb-brand) 65%, transparent);
-  background: color-mix(in srgb, var(--sb-brand) 13%, transparent);
-}
-.sb-cat-face--front { transform: translateZ(24px); }
-.sb-cat-face--back { transform: rotateY(180deg) translateZ(24px); }
-.sb-cat-face--right { transform: rotateY(90deg) translateZ(24px); }
-.sb-cat-face--left { transform: rotateY(-90deg) translateZ(24px); }
-/* Le due facce orizzontali prendono più luce: dà volume senza ombre finte. */
-.sb-cat-face--top {
-  transform: rotateX(90deg) translateZ(24px);
-  background: color-mix(in srgb, var(--sb-brand) 26%, transparent);
-}
-.sb-cat-face--bottom {
-  transform: rotateX(-90deg) translateZ(24px);
-  background: color-mix(in srgb, var(--sb-brand) 7%, transparent);
-}
-
-/* Tipografia "Aa" (card design) — la stessa interfaccia disegnata due volte:
-   una tendina scorre avanti e indietro e scopre lo scuro sotto il chiaro. */
-.sb-aa {
-  position: relative;
-  display: block;
-  width: 100%;
-  max-width: 300px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--sb-border-strong);
-}
-.sb-aa > span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  padding: 1.1rem 0;
-  font-size: 1.7rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-.sb-aa .lite { background: #fcfcfc; color: #171717; }
-/* La tendina scorre avanti e indietro e scopre lo scuro sotto il chiaro. Due
-   keyframe che devono restare in fase fra loro, o il manico si stacca dal
-   bordo: stessa durata, stessa curva, stesse percentuali. */
-.sb-aa .dark {
-  position: absolute;
-  inset: 0;
-  background: #171717;
-  color: #ededed;
-  clip-path: inset(0 0 0 50%);
-  animation: sb-wipe var(--wipe, 8s) ease-in-out infinite;
-}
-@keyframes sb-wipe {
-  0%, 100% { clip-path: inset(0 0 0 64%); }
-  50%      { clip-path: inset(0 0 0 22%); }
-}
-/* Il manico è largo quanto tutto il riquadro e trasparente: quello che si vede
-   è il suo ::before, un filo di 2px sul bordo sinistro. Serve perché così il
-   manico può muoversi su translateX in PERCENTUALE — e la percentuale di un
-   transform si misura sulla larghezza dell'elemento, cioè su tutto il
-   riquadro. Prima si muoveva su `left`, che rifà il layout a ogni frame. */
-.sb-aa-handle {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-  animation: sb-wipe-handle var(--wipe, 8s) ease-in-out infinite;
-}
-.sb-aa-handle::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 2px;
-  background: var(--sb-brand);
-}
-@keyframes sb-wipe-handle {
-  0%, 100% { transform: translateX(64%); }
-  50%      { transform: translateX(22%); }
-}
-/* Il bottone tondo sul filo. Sta a left:0 come il filo, non a metà del manico:
-   il manico adesso è largo quanto tutto il riquadro. */
-.sb-aa-handle::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translate(-50%, -50%);
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  background: var(--sb-brand);
-  box-shadow: 0 0 0 4px hsla(153, 60%, 53%, 0.22);
-}
-.sb-aa small { font-size: 0.95rem; color: var(--sb-brand); font-weight: 400; }
 
 /* Coda della griglia: tagline + "trusted by" */
 .sb-prodfoot { text-align: center; padding-top: clamp(2.5rem, 5vw, 4rem); }
@@ -2412,14 +2195,18 @@ html.dark .sb-aurora { opacity: 0.42; }
    Restano solo le transizioni brevissime legate a un gesto dell'utente e la
    barra di avanzamento, che è informazione.
 
-   Attenzione a una cosa, che qui costa cara: spegnere un'animazione lascia
-   l'elemento sui valori scritti nella sua regola normale, e per metà di questi
-   visual quei valori sono il PRIMO fotogramma, non l'ultimo. Il comando del
-   terminale, per dire, parte da clip-path: inset(0 100% 0 0) — cioè invisibile.
-   Senza le righe qui sotto, con movimento ridotto il terminale sarebbe vuoto.
-   Ogni visual con una keyframe vuole quindi il suo fotogramma di riposo
-   scritto a mano, e va scelto: il lavoro FINITO, non quello che deve ancora
-   cominciare. */
+   Sui sette disegni della griglia prodotti qui non c'è quasi niente da fare, e
+   non è un caso: le loro regole base sono scritte sul fotogramma FINITO
+   (tratti disegnati, lente accesa, palla arrivata) e le keyframe partono da lì
+   e ci ritornano. Spegnere l'animazione lascia quindi ogni tavola completa.
+
+   Prima non era così, e costava: ogni visual partiva dal PRIMO fotogramma — il
+   comando del terminale, per dire, cominciava da clip-path: inset(0 100% 0 0),
+   cioè invisibile — e ciascuno aveva bisogno qui sotto della sua riga di
+   riposo scritta a mano, da tenere in fase con la keyframe. Sette occasioni di
+   dimenticarsene. Adesso l'unica eccezione è la palla dei rimbalzi, e per un
+   motivo che si vede: ferma in fondo alla corsa resta un pallino appoggiato
+   sull'ultimo contatto, che è esattamente il fotogramma giusto. */
 @media (prefers-reduced-motion: reduce) {
   .sb-menu-sheet, .sb-menu-scrim, .sb-panel, .sb-link svg, .sb-page-top .go { transition: none; }
   .sb-foot-social a svg { transition: none; }
@@ -2440,31 +2227,16 @@ html.dark .sb-aurora { opacity: 0.42; }
 
   .sb-bg-grid { opacity: 0.5; }
 
-  /* ① Browser: la pagina è costruita e il deploy è andato. I blocchi sono già
-     pieni per conto loro (nessuna transform = scaleX(1)); qui serve solo far
-     sparire la parola di troppo, perché le due si sovrappongono. */
-  .sb-browser-badge .build { opacity: 0; }
-  .sb-browser-badge .live { opacity: 1; }
+  /* I disegni: gli anelli dei contatti sono lampi, non oggetti — fermi non
+     devono restare appesi sul terreno. La tavola delle curve di livello smette
+     anche di orientarsi verso il puntatore: --vis-x/--vis-y non le scrive più
+     nessuno (il cancello è in site/GlassMotion.tsx), ma il fallback a 0.5 vale
+     solo se la variabile non esiste, e qui è meglio non dipendere da chi ha
+     smesso di scrivere. */
+  .sb-ill-hit { opacity: 0; }
+  .sb-ill--topo { transform: none; }
 
-  /* ② Tendina Aa a metà, col manico sul bordo giusto: sono due regole diverse
-     e vanno messe in fase a mano, come lo erano le due keyframe. */
-  .sb-aa .dark { clip-path: inset(0 0 0 50%); }
-  .sb-aa-handle { transform: translateX(50%); }
-
-  /* ③ Terminale: comando scritto per intero, caret in fondo, output a video. */
-  .sb-term-cmd { clip-path: inset(0 0 0 0); }
-  .sb-term-caret { transform: translateX(calc(var(--n, 22) * 1ch)); }
-  .sb-term-out { opacity: 1; }
-
-  /* ④ Diff: la lampada sparisce, il confronto si legge lo stesso — il colore
-     delle righe non era mai stato animato. */
-  .sb-diff-scan { display: none; }
-
-  /* ⑤ Grafo: fili percorsi (dashoffset 0 è già il valore di base) e nodo a
-     luce ferma, a metà strada fra i due estremi del respiro. */
-  .sb-flow-hub::after { opacity: 0.4; }
-
-  /* ⑥ Il gradiente del nome del framework resta fermo sul suo fotogramma, ma
+  /* Il gradiente del nome del framework resta fermo sul suo fotogramma, ma
      senza la passata di luce va tolto: fermo, è solo un testo più chiaro del
      dovuto. Stessa cosa per le brandline. */
   .sb-stack-title .tech {

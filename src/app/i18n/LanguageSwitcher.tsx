@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "motion/react";
 import { IcCheck, IcTranslate } from "../site/homeIcons";
 import { getLang, setLang, subscribeLang, langMeta, LANGS, type Lang } from "./langCore";
 
@@ -10,7 +9,7 @@ import { getLang, setLang, subscribeLang, langMeta, LANGS, type Lang } from "./l
 //
 //  · Segmento compatto: icona + sigla della lingua attiva (IT/EN/FR/DE).
 //  · Al clic si apre, verso l'alto, l'elenco delle 4 lingue (molla + cascata),
-//    con l'indicatore "attivo" che scorre (layout animato di Motion).
+//    con l'indicatore "attivo" che scorre da una voce all'altra.
 //  · Scegliendo una lingua parte un'onda a tutto schermo (cerchio che si espande
 //    dal widget, fondo della pagina + alone verde e nome della lingua): a metà
 //    corsa il sito viene ritradotto SOTTO l'onda, poi l'onda svanisce. Niente
@@ -18,6 +17,23 @@ import { getLang, setLang, subscribeLang, langMeta, LANGS, type Lang } from "./l
 //
 // Niente bandierine emoji: su Windows si vedono come due lettere — usiamo sigle
 // in badge + il nome della lingua, identici su ogni sistema operativo.
+//
+// ── Perché qui non c'è più Motion ────────────────────────────────────────────
+// L'apertura del menu, la cascata delle voci e l'indicatore che scorre erano
+// tre animazioni di framer-motion (`AnimatePresence`, `layoutId`). Facevano il
+// loro mestiere, ma questo widget sta nella barra di controllo, cioè su OGNI
+// pagina del sito: erano ~124 kB di libreria (≈40 kB gzip) nel bundle iniziale
+// di chiunque aprisse qualsiasi pagina, per un menu di quattro voci che quasi
+// nessuno apre. Adesso le tre animazioni sono tre transizioni CSS in
+// controlbar.css, con le stesse curve e le stesse durate di prima:
+//
+//  · apertura     → .sb-lang-menu.is-open (opacità + scala, origine in basso)
+//  · cascata      → --i sulla voce, che diventa il transition-delay
+//  · indicatore   → --ink sull'elenco, cioè quale riga è attiva
+//
+// Il menu resta SEMPRE nel DOM (sono quattro <li>): serve per avere anche
+// l'animazione d'uscita, che con un montaggio condizionato non ci sarebbe.
+// Chiuso è `inert`, quindi fuori dal tab order e invisibile agli screen reader.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const WIPE_MS = 720;
@@ -112,6 +128,7 @@ export default function LanguageSwitcher() {
 
   const active = langMeta(lang);
   const target = langMeta(wipeTarget);
+  const activeIndex = Math.max(0, LANGS.findIndex((l) => l.code === lang));
 
   return (
     <>
@@ -129,46 +146,41 @@ export default function LanguageSwitcher() {
       )}
 
       <div className="sb-lang-dock" ref={dockRef} data-no-i18n="">
-        <AnimatePresence>
-          {open && (
-            <motion.ul
-              className="sb-lang-menu"
-              role="listbox"
-              aria-label="Scegli la lingua"
-              initial={{ opacity: 0, y: 12, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 460, damping: 34 }}
-            >
-              {LANGS.map((l, i) => {
-                const isActive = l.code === lang;
-                return (
-                  <motion.li
-                    key={l.code}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.04 + i * 0.045, type: "spring", stiffness: 500, damping: 30 }}
-                  >
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={isActive}
-                      className={`sb-lang-opt${isActive ? " is-active" : ""}`}
-                      onClick={() => choose(l.code)}
-                    >
-                      {isActive && (
-                        <motion.span layoutId="sb-lang-ink" className="sb-lang-ink" aria-hidden="true" />
-                      )}
-                      <span className="sb-lang-code">{l.label}</span>
-                      <span className="sb-lang-name">{l.name}</span>
-                      {isActive && <IcCheck size={14} className="sb-lang-check" />}
-                    </button>
-                  </motion.li>
-                );
-              })}
-            </motion.ul>
-          )}
-        </AnimatePresence>
+        <ul
+          className={`sb-lang-menu${open ? " is-open" : ""}`}
+          role="listbox"
+          aria-label="Scegli la lingua"
+          // --ink: su quale riga sta l'indicatore. Il CSS lo moltiplica per
+          // l'altezza di una voce, quindi scorre da sé quando cambia lingua.
+          style={{ "--ink": activeIndex } as React.CSSProperties}
+          // Chiuso il menu è inerte: niente tab, niente screen reader, niente
+          // clic a vuoto sopra la barra. `inert` non è ancora nei tipi di
+          // React 18, da cui il cast.
+          {...(open ? {} : ({ inert: "" } as Record<string, string>))}
+        >
+          {/* Un solo indicatore per tutto l'elenco, non uno per voce: è lui a
+              scivolare da una riga all'altra (era il `layoutId` di Motion). */}
+          <span className="sb-lang-ink" aria-hidden="true" />
+          {LANGS.map((l, i) => {
+            const isActive = l.code === lang;
+            return (
+              <li key={l.code} style={{ "--i": i } as React.CSSProperties}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={isActive}
+                  tabIndex={open ? 0 : -1}
+                  className={`sb-lang-opt${isActive ? " is-active" : ""}`}
+                  onClick={() => choose(l.code)}
+                >
+                  <span className="sb-lang-code">{l.label}</span>
+                  <span className="sb-lang-name">{l.name}</span>
+                  {isActive && <IcCheck size={14} className="sb-lang-check" />}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
 
         <button
           ref={triggerRef}

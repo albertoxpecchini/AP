@@ -155,7 +155,15 @@
 .sb-ctl.is-out .sb-ctl-grip:hover svg { transform: translateX(-1px); }
 
 /* ── Menu della lingua (si apre verso l'alto) ─────────────────────────────── */
-.sb-lang-dock { position: relative; }
+/* Le tre animazioni di questo menu — apertura, cascata delle voci, indicatore
+   che scorre — erano tre animazioni di framer-motion. Adesso sono tre
+   transizioni CSS, con le stesse curve e le stesse durate: vedi la nota in
+   testa a i18n/LanguageSwitcher.tsx per il perché (quella libreria finiva nel
+   bundle iniziale di OGNI pagina del sito).
+
+   L'altezza di una voce sta in una variabile perché serve in due posti: al
+   <li> e all'indicatore, che deve scorrere esattamente di una riga per volta. */
+.sb-lang-dock { position: relative; --lang-row: 34px; }
 .sb-lang-menu {
   position: absolute;
   left: 0;
@@ -169,8 +177,44 @@
   border: 1px solid var(--sb-border-strong);
   box-shadow: var(--sb-shadow-card);
   transform-origin: bottom left;
+
+  /* Stato chiuso. `visibility` (e non display:none) perché una transizione ha
+     bisogno di due stati calcolabili; il ritardo la spegne DOPO che opacità e
+     scala sono arrivate, così l'uscita si vede per intero. */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px) scale(0.95);
+  transition:
+    opacity 0.18s ease,
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.26s;
 }
-.sb-lang-menu li { margin: 0; padding: 0; }
+.sb-lang-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  /* In entrata la curva sfora un pelo oltre l'uno: è la molla di prima. */
+  transition:
+    opacity 0.18s ease,
+    transform 0.34s cubic-bezier(0.34, 1.4, 0.64, 1),
+    visibility 0s;
+}
+/* Cascata: ogni voce parte con il ritardo della sua posizione (--i). In uscita
+   il ritardo non c'è — si richiude tutto insieme, come faceva l'exit. */
+.sb-lang-menu li {
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sb-lang-menu.is-open li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * 45ms + 40ms);
+}
 .sb-lang-opt {
   position: relative;
   isolation: isolate;
@@ -222,15 +266,27 @@
   color: var(--sb-btn-fg);
 }
 .sb-lang-check { color: var(--sb-brand-text); flex-shrink: 0; }
-/* Indicatore che scorre tra le voci (layout animato di Motion) */
+/* Indicatore della voce attiva. È UNO solo per tutto l'elenco e sta nell'<ul>,
+   non uno per voce dentro il bottone: così cambiare lingua non lo fa sparire e
+   ricomparire altrove — scorre. La riga la dice --ink (l'indice della lingua
+   attiva), che scrive il widget. */
 .sb-lang-ink {
   position: absolute;
-  inset: 0;
-  z-index: -1;
+  left: 4px;
+  right: 4px;
+  top: 4px;
+  height: var(--lang-row);
+  z-index: 0;
   border-radius: 6px;
   background: var(--sb-surface-100);
   border: 1px solid var(--sb-border-strong);
+  transform: translateY(calc(var(--ink, 0) * var(--lang-row)));
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* Le voci stanno sopra l'indicatore: senza, il rettangolo coprirebbe il testo
+   della riga attiva. (`isolation: isolate` su .sb-lang-opt tiene il suo hover
+   dentro il proprio contesto, quindi i due non si contendono niente.) */
+.sb-lang-menu li { position: relative; z-index: 1; }
 
 /* ── Onde a tutto schermo (portate su <body>) ─────────────────────────────── */
 /* Tema: il colore lo mette il widget (THEME_BG del tema in arrivo). */
@@ -302,8 +358,18 @@
   .sb-ctl-grip,
   .sb-ctl-grip svg,
   .sb-lang-opt,
+  .sb-lang-menu,
+  .sb-lang-menu li,
+  .sb-lang-ink,
   .sb-lang-wipe-badge {
     transition: none;
+  }
+  /* Senza transizione la scala e lo scostamento resterebbero congelati sullo
+     stato chiuso: il menu va portato al suo stato finale a mano. */
+  .sb-lang-menu.is-open,
+  .sb-lang-menu.is-open li {
+    transform: none;
+    transition-delay: 0s;
   }
   .sb-ctl-ico { animation: none; }
 }

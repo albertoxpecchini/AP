@@ -12,6 +12,7 @@ import {
   ROAD_MIN_ONE_WAY, ROUND_TRIP_KM, STATIONS, VEHICLES, estimateOption, euro,
   hhmm, num, rangeKm, stationsIn, type Vehicle, type VehicleKey, type Zone,
 } from "./mimaData";
+import WhenVisible from "../site/WhenVisible";
 import "../home.css";
 import "./mima.css";
 import "./veicoli.css";
@@ -727,11 +728,11 @@ export default function Veicoli() {
 
               {/* 06 — Percorso */}
               <Mod id="mod-percorso" icon={<IcCompass size={14} />} title="Percorso" meta="Rivalta → Cervia" solid>
-                <div className="sb-mima-map sb-mima-map--tall">
+                <WhenVisible className="sb-mima-map sb-mima-map--tall">
                   <Suspense fallback={null}>
                     <MimaRouteMap variant="route" />
                   </Suspense>
-                </div>
+                </WhenVisible>
                 <div className="sb-mima-kv">
                   <KV k="Da" v="Rivalta sul Mincio (MN)" />
                   <KV k="A" v="Cervia (RA) — Meet Hostel" />

@@ -19,7 +19,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { getLang, subscribeLang, type Lang } from "./langCore";
-import { DICT, normalizeKey } from "./dictionary";
+import { ensurePack, lookup, normalizeKey } from "./dictionary";
 
 // Attributi tradotti, oltre al testo (tooltip, accessibilità, alt immagini).
 const ATTRS = ["placeholder", "title", "aria-label", "alt"] as const;
@@ -42,9 +42,7 @@ const pending = new Set<Node>();
 function render(original: string, lang: Lang): string {
   const key = normalizeKey(original);
   if (!key) return original;
-  const entry = DICT[key];
-  if (!entry) return original;
-  const t = entry[lang];
+  const t = lookup(key, lang);
   if (t == null) return original; // nessuna traduzione → resta la sorgente
   const lead = original.match(/^\s*/)?.[0] ?? "";
   const trail = original.match(/\s*$/)?.[0] ?? "";
@@ -211,10 +209,26 @@ export function startI18nEngine(): void {
   started = true;
 
   const boot = () => {
+    // Due passate, e servono tutte e due. La prima è subito, con le sole voci
+    // curate che stanno nel bundle: quello che sa tradurre lo traduce prima
+    // ancora del primo frame utile. La seconda parte quando arriva il
+    // pacchetto della lingua attiva (un chunk a sé — vedi dictionary.ts), e
+    // rifà il giro con il dizionario pieno.
+    //
+    // L'ordine non è indifferente: la richiesta del pacchetto va lanciata PRIMA
+    // della passata sincrona, così la rete parte subito e il browser scarica
+    // mentre il motore cammina sul DOM.
+    const pack = ensurePack(getLang());
     runPass("all"); // traduce ciò che è già a schermo
     observer = new MutationObserver(onMutations);
     reconnect();
-    subscribeLang(() => runPass("all")); // cambio lingua → ritraduce tutto
+    pack.then(() => runPass("all"));
+    // Cambio lingua → ritraduce tutto, e di nuovo due volte: la lingua nuova
+    // potrebbe non essere ancora scesa.
+    subscribeLang((lang) => {
+      runPass("all");
+      ensurePack(lang).then(() => runPass("all"));
+    });
   };
 
   if (document.body) boot();

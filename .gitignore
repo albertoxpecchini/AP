@@ -21,6 +21,9 @@ Thumbs.db
 content/trivia/raw/_IMPORT_REPORT.md
 public/zips
 public/repo-tree.json
+# Pacchetti di traduzione, uno per lingua: li rigenera scripts/build-i18n.mjs
+# da translations.json (la fonte, quella sì versionata) a ogni build e dev.
+src/app/i18n/generated
 
 # Log
 *.log

@@ -1,31 +1,54 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Pezzi "vivi" della home.
+// I disegni della griglia prodotti.
 //
-// Vivi vuol dire che si muovono da soli: il browser si costruisce, il terminale
-// digita, l'HUD gioca, la scansione scende, i pacchetti partono. Quello che è
-// cambiato è QUANTA roba si muove e COME.
+// ── Cos'erano ────────────────────────────────────────────────────────────────
+// Sette finti pezzi di interfaccia: una finestra di browser che si riempiva, un
+// terminale che digitava, un tabellone che contava punti, due colonne di righe
+// colorate, un grafo con due fili, un cubo su un piano, una tendina chiaro/scuro.
+// Funzionavano, ma erano tutti la stessa idea — "mettiamo dentro la card una
+// versione in miniatura della cosa" — e sette miniature di cose diverse non
+// fanno una famiglia: fanno sette schermate.
 //
-// Quanta: uno solo per card. L'HUD aveva quattro cose in moto insieme (punti,
-// il "+120" che schizzava, la serie che s'infiammava, il voto che si ribaltava)
-// e il browser un cursore finto che girava fra quattro blocchi. Adesso ogni
-// visual dice una cosa sola.
+// ── Cosa sono adesso ─────────────────────────────────────────────────────────
+// Sette DISEGNI, tutti a tratto, tutti sulla stessa tavola (viewBox 280×132),
+// stesso spessore di linea, stesso verde. Non sono più schermate: sono le
+// figure di un manuale. Guardando la griglia da lontano si vede una collezione,
+// e ogni figura si legge da sé senza etichette:
 //
-// Come: solo transform e opacity, e in keyframe CSS. C'è stato un giro in cui
-// il puntatore comandava tutti e sette i visual scrivendo `left`, `top`,
-// `clip-path`, `color-mix` e `box-shadow` — proprietà che rifanno layout o
-// ridisegnano a ogni movimento del mouse. Con sette riquadri più il tilt della
-// card, il risultato erano scatti. Le keyframe su transform e opacity le muove
-// il compositore, che non ha niente da ricalcolare.
+//   ① Sviluppo web      → il progetto di una pagina, con le quote          (si disegna)
+//   ② Web design        → un saggio tipografico sulla griglia delle linee   (si inchiostra)
+//   ③ Sviluppo con l'AI → un prisma: un raggio entra, ne escono cinque      (si apre a ventaglio)
+//   ④ Giochi web        → una traiettoria a tre rimbalzi                    (la palla corre)
+//   ⑤ Strumenti web     → due insiemi e la loro intersezione                (l'intersezione si accende)
+//   ⑥ Siti per clienti  → un globo a filo con due satelliti                 (i satelliti orbitano)
+//   ⑦ Area tecnica CAT  → curve di livello e un punto trigonometrico        (le quote salgono)
 //
-// Quindi qui sotto resta quasi solo markup: il moto sta in home.css. L'unica
-// eccezione è GameHud, che conta punti, e il CSS non sa contare. Il puntatore
-// è rimasto su un visual solo, il cubo della card CAT, dove agisce dentro una
-// transform — cioè dove costa quanto le altre.
+// ── Le regole del movimento, che non sono cambiate ───────────────────────────
+// Una cosa sola in movimento per riquadro, e quella cosa è un GESTO: qualcosa
+// che comincia, finisce e ricomincia — non un oggetto che vibra.
+//
+// Le proprietà animate sono quattro, e sono tutte a buon mercato:
+//   · transform e opacity, che muove il compositore senza ricalcolare niente;
+//   · offset-distance, che il browser risolve in una transform;
+//   · stroke-dashoffset, che ridisegna — ma qui ridisegna filetti da 1,5 px su
+//     tavole di 280×132, non gradienti grandi quanto la card. È la stessa
+//     eccezione che il grafo dei clienti si prendeva già prima.
+//
+// Qui dentro NON c'è più JavaScript. Il tabellone dei giochi era rimasto
+// l'unico visual con del codice — una timeline GSAP in ciclo infinito che
+// scriveva textContent a ogni frame per far salire un punteggio — e con lui se
+// n'è andata l'ultima animazione della griglia che girava sul thread
+// principale. Adesso il moto sta tutto in home.css, in keyframe che il browser
+// mette in pausa da sé quando la scheda passa in secondo piano.
+//
+// Ogni disegno è fermo sul suo fotogramma FINITO: i valori base del CSS sono
+// quelli di fine corsa, non di inizio. Così con prefers-reduced-motion basta
+// spegnere le animazioni e resta il disegno completo, non uno mezzo tracciato.
 //
 // Convenzione i18n: i contenuti che non sono prosa (numeri, nomi di progetto,
 // comandi da terminale) portano data-no-i18n + translate="no".
 // ─────────────────────────────────────────────────────────────────────────────
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { SiteLink } from "./nav";
 import { IcArrowUpRight } from "./homeIcons";
@@ -163,295 +186,389 @@ export function NowBuilding() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web development" — il sito si costruisce da solo
+   La tavola comune
 
-   Tre blocchi che si riempiono uno dopo l'altro, e il badge che passa da
-   "building" a "live" quando sono a posto. Via il cursore finto che faceva il
-   giro dei blocchi: era un quinto elemento in movimento per raccontare la
-   stessa cosa che raccontano i blocchi riempiendosi.
+   Tutti e sette i disegni stanno su una tavola di 280×132 e passano di qui.
+   Non è pigrizia: è la ragione per cui la griglia si legge come una collezione
+   invece che come sette schermate. Stessa area, stesso margine, stesso tratto —
+   quello che cambia è solo la figura.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function BrowserMock() {
+function Plate({ name, children }: { name: string; children: React.ReactNode }) {
   return (
-    <div className="sb-browser" aria-hidden="true">
-      <div className="sb-browser-bar">
-        <i />
-        <i />
-        <i />
-        <span className="sb-browser-url" translate="no" data-no-i18n>
-          albertopecchini.it
-        </span>
-        {/* Due parole sovrapposte che si scambiano l'opacità sul finale della
-            corsa: cambiare testo davvero avrebbe voluto dire del JS. */}
-        <span className="sb-browser-badge" translate="no" data-no-i18n>
-          <span className="build">building</span>
-          <span className="live">live</span>
-        </span>
-      </div>
-      <div className="sb-browser-body">
-        <div className="sb-skel sb-skel--hero" />
-        <div className="sb-skel sb-skel--side" />
-        <div className="sb-skel sb-skel--main" />
-      </div>
-    </div>
+    <svg
+      className={`sb-ill sb-ill--${name}`}
+      viewBox="0 0 280 132"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {children}
+    </svg>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web design" — la stessa interfaccia disegnata due volte
+   ① Card "Web development" — il progetto di una pagina
 
-   Una tendina scorre avanti e indietro e scopre il tema scuro sotto il chiaro.
-   È il visual più semplice dei sette e non c'era niente da togliergli: quello
-   che è cambiato è che il manico si muove su transform invece che su `left`.
+   Un disegno tecnico: il telaio della pagina, la testata, il blocco grande e
+   le due colonne, e ai lati le linee di quota con i trattini agli estremi —
+   quelle che su una tavola dicono quanto è lungo un pezzo. È il modo in cui
+   questo sito guarda una pagina web: come un manufatto da progettare, non come
+   uno screenshot.
+
+   Il gesto: si disegna. Ogni tratto ha pathLength="1" e un tratteggio lungo
+   quanto sé stesso, quindi scoprirlo è solo questione di far scorrere
+   stroke-dashoffset da 1 a 0 — senza sapere niente di quanto è lungo davvero.
+   I ritardi in cascata (--i) fanno il resto: prima le quote, poi il telaio,
+   poi il contenuto, come li metterebbe una mano.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function AaSwap() {
-  return (
-    <div className="sb-aa" aria-hidden="true" data-no-i18n>
-      <span className="lite">
-        Aa <small>500</small>
-      </span>
-      <span className="dark">
-        Aa <small>400</small>
-      </span>
-      <i className="sb-aa-handle" />
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   Card "AI-assisted development" — il terminale digita
-
-   Il comando sta tutto nel markup e un clip-path lo scopre da sinistra, col
-   caret sul bordo del taglio a fare da testa di scrittura. Prima lo scriveva
-   una timeline GSAP che riscriveva textContent un carattere alla volta, in
-   ciclo su quattro sessioni: un ricalcolo di layout ogni 42 millisecondi, per
-   sempre. Adesso è una keyframe, e il testo non lo tocca nessuno.
-
-   Via anche il filo di "formiche" che marciava a fondo terminale: era la terza
-   cosa in movimento dentro un riquadro che ne voleva una.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-const CMD = 'claude "rifai la home"';
-const OUT = "# 3 files changed · build ok";
-
-export function LiveTerminal() {
-  return (
-    <div className="sb-term" aria-hidden="true" data-no-i18n translate="no">
-      <div className="sb-term-line">
-        <span className="p">$</span>
-        {/* --n: quanto è lungo il comando in caratteri. Serve al CSS per
-            tenersi largo quanto il testo intero anche mentre ne mostra un
-            pezzo: senza, la riga si allargherebbe mentre digiti. */}
-        <span className="sb-term-typed" style={{ "--n": CMD.length } as React.CSSProperties}>
-          <span className="sb-term-cmd">{CMD}</span>
-          <span className="sb-term-caret" />
-        </span>
-      </div>
-      <div className="sb-term-line">
-        <span className="c sb-term-out">{OUT}</span>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web games" — la partita si gioca da sola
-
-   Qui c'erano tre pillole, un "+120" che schizzava fuori a ogni round, una
-   serie che s'infiammava e un voto che si ribaltava, su quattro round
-   incatenati: quattro cose in movimento per dire che i giochi hanno un
-   punteggio. Resta un numero che sale e un voto che scatta di livello mentre
-   sale, poi si azzera e si ricomincia.
-
-   È l'unico visual con del JS: il risultato è testo, e il CSS non sa contare.
-   Costa una scrittura di textContent per frame su un nodo solo — che è
-   l'ordine di grandezza dei contatori che il sito ha già altrove.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-const HUD_MAX = 1480;
-
-/** Soglie dei voti sul punteggio pieno, dall'alto: il primo che passa vince. */
-const GRADES: [number, string][] = [
-  [0.92, "A+"],
-  [0.62, "A"],
-  [0.3, "B"],
-  [0, "C"],
+/** I tratti, in ordine di disegno. --i diventa il ritardo della cascata. */
+const BLUEPRINT: string[] = [
+  // quote: verticale a sinistra, orizzontale in basso (linea + trattini)
+  "M22,18 L22,114 M17,18 L27,18 M17,114 L27,114",
+  "M48,124 L262,124 M48,119 L48,129 M262,119 L262,129",
+  // telaio della pagina
+  "M54,18 L256,18 A6,6 0 0,1 262,24 L262,108 A6,6 0 0,1 256,114 L54,114 A6,6 0 0,1 48,108 L48,24 A6,6 0 0,1 54,18 Z",
+  // testata
+  "M48,38 L262,38",
+  // blocco grande, con la diagonale che sulle tavole vuol dire "immagine"
+  "M64,50 L246,50 L246,80 L64,80 Z",
+  "M64,80 L246,50",
+  // due colonne in fondo
+  "M64,90 L150,90 L150,104 L64,104 Z",
+  "M160,90 L246,90 L246,104 L160,104 Z",
 ];
 
-export function GameHud() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !motionOK()) return;
-    const score = el.querySelector<HTMLElement>(".sb-hud-score");
-    const grade = el.querySelector<HTMLElement>(".sb-hud-grade");
-    if (!score || !grade) return;
-
-    const ctx = gsap.context(() => {
-      const n = { v: 0 };
-      let shownGrade = "";
-
-      const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.4 });
-      tl.to(n, {
-        v: HUD_MAX,
-        duration: 3.2,
-        ease: "power2.out",
-        onUpdate: () => {
-          score.textContent = Math.round(n.v).toLocaleString("it-IT");
-          const g = GRADES.find(([at]) => n.v / HUD_MAX >= at)?.[1] ?? "C";
-          if (g === shownGrade) return;
-          shownGrade = g;
-          grade.textContent = g;
-          // Il voto si ribalta solo quando cambia davvero: quattro volte in
-          // tutto il giro, non a ogni frame.
-          gsap.fromTo(grade, { rotationX: -90 }, { rotationX: 0, duration: 0.45, ease: "back.out(2)" });
-        },
-      })
-        .to({}, { duration: 2.2 })
-        // Si riazzera, non salta indietro: il conteggio deve ripartire da zero
-        // e vedersi che riparte. Il voto va rimesso a mano insieme al
-        // punteggio: senza, per tutto il repeatDelay resta appeso il voto del
-        // giro prima, e si legge "0 punti, A+" — che è la cosa peggiore che
-        // possa dire un tabellone.
-        .call(() => {
-          n.v = 0;
-          shownGrade = GRADES[GRADES.length - 1][1];
-          score.textContent = "0";
-          grade.textContent = shownGrade;
-        });
-    }, el);
-
-    return () => ctx.revert();
-  }, []);
-
+export function BlueprintPage() {
   return (
-    <div className="sb-hud" ref={ref} aria-hidden="true" data-no-i18n translate="no">
-      {/* Il valore pieno è già nel markup: con movimento ridotto il conteggio
-          non parte, e quello che resta è comunque il numero giusto. */}
-      <span className="sb-hud-pill">
-        <span className="sb-hud-score">1.480</span>
-        <span>pt</span>
-      </span>
-      <span className="sb-hud-grade">A+</span>
-    </div>
+    <Plate name="blue">
+      {BLUEPRINT.map((d, i) => (
+        <path
+          key={d}
+          className="sb-ill-draw"
+          d={d}
+          pathLength="1"
+          strokeDasharray="1"
+          style={{ "--i": i } as React.CSSProperties}
+        />
+      ))}
+      {/* I tre bollini della testata: fermi, e ci vogliono — sono il dettaglio
+          che dice "finestra" senza doverci disegnare una finestra intorno. */}
+      {[66, 78, 90].map((cx) => (
+        <circle key={cx} className="sb-ill-dot" cx={cx} cy={28} r={3} />
+      ))}
+    </Plate>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Web tools" — il confronto si esegue sotto gli occhi
+   ② Card "Web design" — il saggio tipografico
 
-   Una banda di luce scende sulle due liste. Le righe non lampeggiano più a
-   turno su quattro delay sfasati mentre la banda passava: il confronto lo
-   raccontano già i colori, fermi, e la banda che scende dice che è in corso.
-   Una cosa in movimento invece di cinque.
+   Le due lettere in contorno sulla griglia del disegnatore di caratteri: linea
+   di base, altezza della x, altezza delle maiuscole. È l'immagine che un
+   tipografo ha davanti tutto il giorno, ed è anche la risposta più onesta a
+   "cosa vuol dire progettare un'interfaccia": decidere dove passano le righe.
+
+   Il gesto: si inchiostra. Il contorno resta sempre, e sotto compare il pieno
+   — la stessa lettera, ripetuta e riempita, che sfuma dentro e fuori. Una sola
+   proprietà (opacity) per una cosa che sembra un cambio di materia.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function DiffScan() {
+export function TypeSpecimen() {
   return (
-    <div className="sb-diff" aria-hidden="true">
-      <div className="sb-diff-col">
-        <div className="sb-diff-row" />
-        <div className="sb-diff-row sb-diff-row--hit" />
-        <div className="sb-diff-row" />
-        <div className="sb-diff-row sb-diff-row--hit" />
-      </div>
-      <div className="sb-diff-col">
-        <div className="sb-diff-row sb-diff-row--hit" />
-        <div className="sb-diff-row sb-diff-row--miss" />
-        <div className="sb-diff-row sb-diff-row--hit" />
-        <div className="sb-diff-row" />
-      </div>
-      <span className="sb-diff-scan" />
-    </div>
+    <Plate name="type">
+      {/* La griglia: tre rette e le loro etichette. Tratteggiata, perché una
+          guida che si confonde col disegno smette di essere una guida. */}
+      <g className="sb-ill-guide">
+        <path d="M18,34 L262,34" />
+        <path d="M18,57 L262,57" />
+        <path d="M18,112 L262,112" />
+      </g>
+      <g className="sb-ill-tick" data-no-i18n>
+        <text x="18" y="30">cap</text>
+        <text x="18" y="53">x</text>
+        <text x="18" y="124">base</text>
+      </g>
+      {/* Le lettere. Due nodi sovrapposti: il contorno sempre acceso, il pieno
+          che va e viene. Stesso testo, stessa posizione — il disegno non si
+          muove di un pixel, cambia solo di che pasta è fatto. */}
+      <text className="sb-ill-glyph-ink" x="140" y="112" data-no-i18n translate="no">
+        Aa
+      </text>
+      <text className="sb-ill-glyph" x="140" y="112" data-no-i18n translate="no">
+        Aa
+      </text>
+    </Plate>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Card "Client websites" — grafo di diffusione
+   ③ Card "AI-assisted development" — il prisma
 
-   Dal nodo centrale parte un pacchetto verso un sito, poi verso l'altro, e il
-   pallino di chi lo riceve si accende. Uno per volta, non tutti e due insieme:
-   così si vede che il nodo trasmette, invece di vedere due fili che pulsano.
+   Un raggio entra, dentro il vetro piega, ed esce aperto in cinque. È esatta-
+   mente il mestiere: una richiesta sola da una parte, e dall'altra cinque
+   strade che prima non c'erano. Nessuna scintilla, nessun cervello stilizzato,
+   nessun robot — la figura di un libro di ottica.
 
-   pathLength="1" sul tracciato: il tratteggio si misura da 0 a 1 a prescindere
-   da quanto è lungo davvero il filo, e la keyframe può scrivere
-   stroke-dashoffset senza sapere niente della geometria.
+   Un solo verde, come tutto il resto del sito: il ventaglio non si apre in
+   arcobaleno, si apre in cinque intensità dello stesso colore.
+
+   Il gesto: il raggio arriva, attraversa, e il ventaglio si apre a rastrello
+   (--i sui cinque raggi). Tutto su stroke-dashoffset, quindi un tratto che
+   cresce dalla sua origine e basta.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const FLOW_PATHS = ["M130,17 C130,50 46,42 46,72", "M130,17 C130,50 214,42 214,72"];
+/** I cinque raggi in uscita: stessa origine sulla faccia destra del prisma. */
+const FAN = [
+  "M152,78 L266,40",
+  "M152,78 L266,56",
+  "M152,78 L266,72",
+  "M152,78 L266,88",
+  "M152,78 L266,104",
+];
 
-export function ClientFlow() {
+export function PrismFan() {
   return (
-    <div className="sb-flow" aria-hidden="true">
-      <svg className="sb-flow-wires" viewBox="0 0 260 92" fill="none" preserveAspectRatio="none">
-        {FLOW_PATHS.map((d, i) => (
-          <g key={d} className={i ? "to-right" : "to-left"}>
-            <path className="ghost" d={d} strokeWidth="1.5" strokeLinecap="round" />
-            <path
-              className="pulse"
-              d={d}
-              pathLength="1"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeDasharray="1"
-            />
-          </g>
+    <Plate name="prism">
+      {/* Il prisma. La velatura interna è ferma: è il vetro, non un effetto. */}
+      <path className="sb-ill-glass" d="M128,20 L164,100 L92,100 Z" />
+      <path className="sb-ill-edge" d="M128,20 L164,100 L92,100 Z" />
+
+      {/* Il raggio in arrivo, e il tratto che dentro al vetro piega verso il
+          basso: due segmenti, in fila. */}
+      <path className="sb-ill-beam" d="M14,64 L106,64" pathLength="1" strokeDasharray="1" />
+      <path className="sb-ill-beam sb-ill-beam--in" d="M106,64 L152,78" pathLength="1" strokeDasharray="1" />
+
+      {FAN.map((d, i) => (
+        <path
+          key={d}
+          className="sb-ill-ray"
+          d={d}
+          pathLength="1"
+          strokeDasharray="1"
+          style={{ "--i": i } as React.CSSProperties}
+        />
+      ))}
+    </Plate>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ④ Card "Web games" — la traiettoria
+
+   Tre rimbalzi che si abbassano, disegnati come li disegnerebbe un manuale di
+   fisica: la linea del terreno, la curva, e i punti di contatto. Un gioco non
+   è un tabellone di punti — è una cosa che si muove come ci si aspetta e poi
+   un pochino di più.
+
+   Prima qui c'era un punteggio che saliva: l'unico visual della griglia con
+   del JavaScript, una timeline in ciclo infinito che scriveva testo a ogni
+   frame per far girare tre cifre. Quello che raccontava — "i giochi hanno un
+   punteggio" — lo dice già la card a parole.
+
+   Il gesto: la palla corre. Si muove su offset-path, cioè il browser la fa
+   scivolare lungo il tracciato risolvendolo in una transform; ai contatti,
+   sotto, si apre un anello. Gli anelli sono quattro perché i contatti sono
+   quattro, e partono ai millesimi in cui la palla ci arriva davvero (le
+   frazioni sono misurate sulla lunghezza degli archi, non sulla x — un arco
+   alto è più lungo di uno basso a parità di distanza percorsa).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Il tracciato, condiviso da tre posti: la linea disegnata, l'offset-path
+ *  della palla (in home.css) e la posizione degli anelli. */
+const RUN_PATH = "M14,112 Q54,16 94,112 Q127,44 160,112 Q186,70 212,112 Q233,90 254,112";
+
+/** I contatti col terreno, con la frazione di corsa in cui la palla ci arriva.
+ *  Le frazioni sono misurate sulla LUNGHEZZA degli archi, non sulla x: il
+ *  primo salto è alto il quadruplo dell'ultimo, quindi a parità di distanza
+ *  percorsa la palla ci mette molto di più. */
+const HITS: [number, number][] = [
+  [94, 0.37],
+  [160, 0.65],
+  [212, 0.86],
+  [254, 1],
+];
+
+export function BounceRun() {
+  return (
+    <Plate name="run">
+      <path className="sb-ill-ground" d="M8,112 L272,112" />
+      {/* Il tracciato resta acceso: è la traccia del salto, e una traiettoria
+          senza traccia è solo un pallino che si sposta. */}
+      <path className="sb-ill-arc" d={RUN_PATH} />
+
+      {HITS.map(([cx, at]) => (
+        <circle
+          key={cx}
+          className="sb-ill-hit"
+          cx={cx}
+          cy={112}
+          r={8}
+          style={{ "--at": at } as React.CSSProperties}
+        />
+      ))}
+
+      {/* Il traguardo, dove la palla si ferma. Fermo anche lui. */}
+      <path className="sb-ill-flag" d="M256,112 L256,72 L276,80 L256,88" />
+
+      <circle className="sb-ill-ball" cx={0} cy={0} r={7} />
+    </Plate>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑤ Card "Web tools" — due insiemi
+
+   Il diagramma di Venn, disegnato come si deve: due cerchi, i puntini dentro,
+   e la lente in mezzo. È letteralmente quello che fa lo strumento della card —
+   prendere due elenchi e tenere quello che sta in mezzo — ed è anche l'icona
+   che quella card ha già in testa (IcVenn), quindi la figura e il titolo si
+   dicono la stessa cosa.
+
+   Il gesto: l'intersezione si accende. La lente compare crescendo dal centro e
+   i puntini che le stanno dentro si illuminano insieme a lei; gli altri
+   restano dove sono. Nessun cerchio scivola: le due lenti dovrebbero
+   ridisegnarsi a ogni frame, e la forma dell'intersezione è un dato del
+   disegno, non un'animazione.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** I due archi che formano la lente. I punti (140, 26.7) e (140, 105.3) sono
+ *  le intersezioni vere di due cerchi di raggio 52 a distanza 68. */
+const LENS = "M140,26.7 A52,52 0 0,1 140,105.3 A52,52 0 0,1 140,26.7";
+
+/** Puntini: [x, y, dentro la lente?] */
+const DOTS: [number, number, boolean][] = [
+  [82, 44, false], [66, 68, false], [88, 92, false], [104, 34, false], [76, 56, false],
+  [198, 46, false], [212, 70, false], [196, 94, false], [176, 36, false],
+  [134, 50, true], [146, 68, true], [136, 88, true], [147, 40, true],
+];
+
+export function VennSets() {
+  return (
+    <Plate name="venn">
+      <circle className="sb-ill-set" cx={106} cy={66} r={52} />
+      <circle className="sb-ill-set" cx={174} cy={66} r={52} />
+      <path className="sb-ill-lens" d={LENS} />
+      {DOTS.map(([cx, cy, inside]) => (
+        <circle
+          key={`${cx}-${cy}`}
+          className={inside ? "sb-ill-seed sb-ill-seed--in" : "sb-ill-seed"}
+          cx={cx}
+          cy={cy}
+          r={inside ? 3.2 : 2.6}
+        />
+      ))}
+    </Plate>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑥ Card "Client websites" — il globo
+
+   Un globo a filo (meridiani e paralleli) con due satelliti che gli girano
+   intorno: i due siti dei clienti, online. Prima qui c'era un grafo con un
+   nodo centrale e due fili che si accendevano a turno; diceva la stessa cosa
+   con la grammatica di uno schema di rete, che è la meno bella delle
+   grammatiche disponibili per dire "sono nel mondo".
+
+   Il gesto: i satelliti orbitano. Una sola animazione per tutti e due — al
+   secondo basta mezzo giro di ritardo per stare dalla parte opposta — e
+   passando DIETRO al globo si smorzano. È quello smorzarsi che dà la
+   profondità: senza, l'ellisse resta un anello piatto disegnato sopra.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function GlobeOrbit() {
+  return (
+    <Plate name="globe">
+      <circle className="sb-ill-globe" cx={140} cy={66} r={56} />
+      {/* Meridiani: ellissi sempre più strette, tutte centrate. */}
+      <ellipse className="sb-ill-globe" cx={140} cy={66} rx={19} ry={56} />
+      <ellipse className="sb-ill-globe" cx={140} cy={66} rx={38} ry={56} />
+      {/* Paralleli: corde orizzontali, tagliate alla misura del cerchio. */}
+      <path className="sb-ill-globe" d="M90.4,40 L189.6,40" />
+      <path className="sb-ill-globe" d="M84,66 L196,66" />
+      <path className="sb-ill-globe" d="M90.4,92 L189.6,92" />
+
+      {/* L'orbita, inclinata. Il gruppo porta la rotazione così il tracciato
+          resta un'ellisse dritta: quello che ci corre sopra non deve sapere
+          niente dell'inclinazione. */}
+      <g className="sb-ill-orbit">
+        <ellipse className="sb-ill-track" cx={140} cy={66} rx={88} ry={28} />
+        <circle className="sb-ill-sat" r={5} />
+        <circle className="sb-ill-sat sb-ill-sat--b" r={5} />
+      </g>
+    </Plate>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑦ Card "CAT · Technical area" — le curve di livello
+
+   Il terreno visto da sopra: sei curve di livello annidate e, al centro, il
+   simbolo del punto trigonometrico — triangolo con il punto dentro, quello
+   che sulle carte dell'IGM segna un vertice misurato. Questa è la card
+   dell'area tecnica del geometra: prima c'era un cubo che galleggiava su un
+   piano cartesiano, che è la topografia come se la immagina un programmatore.
+   Una carta a curve di livello è la topografia come la disegna chi la fa.
+
+   Le sei curve sono la STESSA curva, scalata e ruotata di poco: annidate in
+   modo troppo regolare sembrerebbero un bersaglio, e le curve di livello di un
+   rilievo vero non sono mai concentriche.
+
+   Due movimenti, e stavolta sono due perché sono di due nature diverse:
+    · la quota che sale — le curve si accendono una dopo l'altra dall'esterno
+      verso il centro, che è poi come si legge un rilievo;
+    · la tavola che si orienta verso il puntatore, con --vis-x/--vis-y (le
+      scrive site/GlassMotion.tsx sul riquadro sotto il cursore). È l'unico
+      posto della griglia dove il puntatore comanda ancora qualcosa, ed è
+      rimasto qui perché agisce DENTRO una transform — dove costa quanto le
+      altre. Era la stessa concessione che aveva il cubo di prima.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** La curva base, irregolare come dev'essere. Le altre sono questa in scala. */
+const CONTOUR =
+  "M140,14 C176,14 208,30 210,56 C212,82 190,104 158,112 C126,120 92,110 78,88 C64,66 74,36 100,22 C113,15 127,14 140,14 Z";
+
+/** Scala e rotazione di ciascuna curva, dalla più esterna alla più interna.
+ *  Le rotazioni non sono un vezzo: sei copie in scala pura si leggono come un
+ *  bersaglio, e le curve di livello di un rilievo vero non sono concentriche —
+ *  un versante è più ripido dell'altro, e le curve si stringono da quella
+ *  parte. Bastano pochi gradi, diversi di segno, per toglierle dal centro. */
+const LEVELS: [number, number][] = [
+  [1.12, 0],
+  [0.94, -4],
+  [0.76, 3],
+  [0.6, -6],
+  [0.44, 4],
+  [0.29, -3],
+];
+
+export function ContourPlate() {
+  return (
+    <div className="sb-ill-plate">
+      <Plate name="topo">
+        {LEVELS.map(([scale, rot], i) => (
+          <path
+            key={scale}
+            className="sb-ill-level"
+            d={CONTOUR}
+            style={
+              {
+                "--i": i,
+                transform: `rotate(${rot}deg) scale(${scale})`,
+              } as React.CSSProperties
+            }
+          />
         ))}
-      </svg>
-
-      <span className="sb-flow-hub">
-        <img src="/favicon.svg" alt="" width={20} height={20} />
-      </span>
-
-      <div className="sb-flow-ends" data-no-i18n translate="no">
-        <span className="sb-chip to-left">
-          <i className="sb-chip-dot" /> Cascina Fontana
-        </span>
-        <span className="sb-chip to-right">
-          <i className="sb-chip-dot" /> Rivalta sul Mincio
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   Card "CAT" — il cubo galleggia da solo, e si gira verso di te
-
-   Piano cartesiano in tre dimensioni con un cubo che ci galleggia sopra. È 3D
-   vero (perspective + preserve-3d, sei facce). Da fermo respira e gira lento
-   su sé stesso; passandoci sopra il giro si ferma e il cubo si orienta verso
-   il puntatore — orizzontale per girarlo, verticale per guardarlo da sopra o
-   da sotto.
-
-   Tre movimenti, tre elementi annidati (lift → spin → cube), una `transform`
-   per ciascuno: si compongono da soli. Prima ci voleva GSAP proprio per
-   tenerli separati; adesso lo fa l'annidamento, e qui non resta JS.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-const CUBE_FACES = ["front", "back", "right", "left", "top", "bottom"] as const;
-
-export function CatCube() {
-  return (
-    <div className="sb-cat" aria-hidden="true">
-      <div className="sb-cat-stage">
-        <span className="sb-cat-plane" />
-        <span className="sb-cat-origin">
-          <span className="sb-cat-shadow" />
-          <span className="sb-cat-z" />
-          <span className="sb-cat-lift">
-            <span className="sb-cat-spin">
-              <span className="sb-cat-cube">
-                {CUBE_FACES.map((f) => (
-                  <span key={f} className={`sb-cat-face sb-cat-face--${f}`} />
-                ))}
-              </span>
-            </span>
-          </span>
-        </span>
-      </div>
+        {/* Punto trigonometrico: triangolo, punto al centro, croce di
+            collimazione. Fermo — è la quota misurata, l'unica cosa della
+            tavola che non è un'interpolazione. */}
+        <path className="sb-ill-vertex" d="M138,50 L151,72 L125,72 Z" />
+        <circle className="sb-ill-vertex-dot" cx={138} cy={65} r={2.6} />
+        <path className="sb-ill-cross" d="M138,40 L138,50 M138,72 L138,82 M115,65 L125,65 M151,65 L161,65" />
+      </Plate>
     </div>
   );
 }

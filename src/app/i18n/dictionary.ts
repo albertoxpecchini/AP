@@ -18,12 +18,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { Lang } from "./langCore";
-// Store delle traduzioni del sito: chiave = testo SORGENTE, valore = le altre
-// lingue. È il file mantenuto a mano/aggiornato; `scripts/i18n-extract.mjs` fa
-// il crawl di tutte le pagine ed elenca le stringhe ancora da tradurre. Le voci
-// curate qui sotto (RAW) restano come extra (stringhe dinamiche non sempre
-// presenti nel DOM durante il crawl, es. esiti dei giochi).
-import generated from "./translations.json";
 
 export type Entry = Partial<Record<Lang, string>>;
 
@@ -1074,14 +1068,69 @@ function isTranslatableKey(k: string): boolean {
   return /\p{L}/u.test(k);
 }
 
-// Indicizza per chiave normalizzata. Prima le voci curate (RAW), poi quelle
-// generate dal crawl (che vincono in caso di sovrapposizione: sono autorevoli).
+// Indicizza per chiave normalizzata le voci curate qui sopra.
 export const DICT: Record<string, Entry> = Object.create(null);
 for (const k in RAW) {
   const key = normalizeKey(k);
   if (isTranslatableKey(key)) DICT[key] = RAW[k];
 }
-for (const k in generated) {
-  const key = normalizeKey(k);
-  if (isTranslatableKey(key)) DICT[key] = (generated as Record<string, Entry>)[k];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// I pacchetti generati — una lingua per volta
+//
+// Il grosso del dizionario (≈1000 voci) sta in translations.json, che è il
+// prodotto del crawl delle pagine. Fino a ieri era `import` in cima a questo
+// file: 230 kB di JSON con dentro tutte e quattro le lingue, nel bundle
+// iniziale di OGNI pagina del sito. Un visitatore italiano si portava a casa
+// anche francese, tedesco e inglese — e tre quarti di quella roba non li
+// avrebbe guardati mai.
+//
+// Adesso `scripts/build-i18n.mjs` lo spacchetta in quattro mappe piatte
+// (generated/<lingua>.json) e qui se ne carica UNA, quella attiva, con un
+// import() dinamico: un chunk a parte, chiesto solo se serve davvero. Cambiare
+// lingua ne chiede un'altra, che poi resta in memoria per il resto della
+// sessione.
+//
+// import.meta.glob e non quattro import() scritti a mano: se la cartella non
+// c'è ancora (qualcuno ha lanciato `vite` senza passare dal prebuild) il glob
+// restituisce una lista vuota e il sito resta nella lingua sorgente, invece di
+// non compilare.
+// ─────────────────────────────────────────────────────────────────────────────
+const PACK_LOADERS = import.meta.glob<{ default: Record<string, string> }>("./generated/*.json");
+
+const packs: Partial<Record<Lang, Record<string, string>>> = {};
+const inFlight: Partial<Record<Lang, Promise<void>>> = {};
+
+/** Carica (una volta sola) il pacchetto di `lang`. Non rifiuta mai: una lingua
+ *  che non arriva vuol dire testo nella lingua sorgente, non una pagina rotta. */
+export function ensurePack(lang: Lang): Promise<void> {
+  if (packs[lang]) return Promise.resolve();
+  const running = inFlight[lang];
+  if (running) return running;
+  const load = PACK_LOADERS[`./generated/${lang}.json`];
+  if (!load) return Promise.resolve();
+  const p = load()
+    .then((mod) => {
+      packs[lang] = mod.default;
+    })
+    .catch(() => {
+      /* pacchetto non raggiungibile: si resta sulla lingua sorgente */
+    })
+    .finally(() => {
+      delete inFlight[lang];
+    });
+  inFlight[lang] = p;
+  return p;
+}
+
+/**
+ * La traduzione di `key` in `lang`, se c'è.
+ *
+ * Prima il pacchetto generato, poi le voci curate: era già questo l'ordine di
+ * precedenza quando i due finivano nello stesso oggetto — il crawl vede il
+ * testo come sta davvero nella pagina, quindi in caso di sovrapposizione è lui
+ * ad avere ragione.
+ */
+export function lookup(key: string, lang: Lang): string | undefined {
+  return packs[lang]?.[key] ?? DICT[key]?.[lang];
 }

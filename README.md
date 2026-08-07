@@ -31,7 +31,6 @@ e tema chiaro/scuro nativo.
 [![Tailwind](https://img.shields.io/badge/Tailwind-4.1-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![React Router](https://img.shields.io/badge/React_Router-7-CA4245?style=flat-square&logo=reactrouter&logoColor=white)](https://reactrouter.com)
 [![GSAP](https://img.shields.io/badge/GSAP-3.15_+_ScrollTrigger-88CE02?style=flat-square&logo=greensock&logoColor=white)](https://gsap.com)
-[![Motion](https://img.shields.io/badge/Motion-12-FF4D8D?style=flat-square&logo=framer&logoColor=white)](https://motion.dev)
 [![PWA](https://img.shields.io/badge/PWA-Workbox-5A0FC8?style=flat-square&logo=pwa&logoColor=white)](https://vite-pwa-org.netlify.app/)
 [![Supabase](https://img.shields.io/badge/Supabase-REST_+_Realtime-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
 [![Anthropic](https://img.shields.io/badge/Claude-Fable_5-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com)
@@ -140,10 +139,14 @@ Quel che resta è diviso per responsabilità, non sparso nei componenti:
   contatori — armati da un `MutationObserver`, perché i numeri del widget GitHub arrivano dalla rete
   **dopo** il montaggio — e i **magneti**: card, icone social e chip che si sporgono al massimo di
   7 px verso il cursore, con un solo ascoltatore in delega su tutto il footer.
-- [`site/homeLive.tsx`](src/app/site/homeLive.tsx) — i visual delle card non sono fermi immagine:
-  orologio di Mantova in diretta, ticker dei progetti in corso, terminale che scrive, HUD di gioco,
-  cubo, grafico contribuzioni. Ogni pezzo monta il suo loop e lo smonta da solo — sono **contenuto**
-  della card, non decorazione della pagina.
+- [`site/homeLive.tsx`](src/app/site/homeLive.tsx) — le **sette tavole** della griglia prodotti.
+  Erano sette miniature di interfaccia (finestra di browser, terminale che digita, tabellone di
+  gioco, cubo su un piano); adesso sono sette **disegni a tratto** sulla stessa tavola di 280×132,
+  stesso spessore di linea e stesso verde — il progetto quotato di una pagina, un saggio
+  tipografico, un prisma che apre un raggio in cinque, una traiettoria a tre rimbalzi, due insiemi
+  e la loro intersezione, un globo con due satelliti, le curve di livello di un rilievo. Da lontano
+  si legge una collezione, non sette schermate. Una sola cosa in movimento per riquadro, e il
+  movimento sta **tutto in CSS**: qui dentro non è rimasta una riga di JavaScript di animazione.
 - [`site/ScrollProgress.tsx`](src/app/site/ScrollProgress.tsx) — l'avanzamento della lettura. Prima
   cresceva sul filo del footer, cioè si vedeva **solo una volta arrivati in fondo**, quando non
   serviva più; ora sta in cima alla finestra, su ogni pagina. È l'unica cosa che **resta accesa
@@ -383,7 +386,7 @@ sequenceDiagram
 | **Core** | React 18.3 · TypeScript · Vite 6.3 |
 | **Routing** | `react-router` 7 (BrowserRouter, `lazy` + `Suspense`) + mappa host → pagina per i sottodomini |
 | **Styling** | design system `.sb-` in CSS puro (custom properties, tema nativo) · Tailwind CSS 4.1 · `tw-animate-css` |
-| **Motion** | `gsap` 3.15 + ScrollTrigger (intro della hero, contatori, magneti, filo di lettura, card vive) · `motion` (Framer Motion 12) su home e switcher lingua · `canvas-confetti` in Trivia |
+| **Motion** | `gsap` 3.15 + ScrollTrigger (intro della hero, contatori, magneti, filo di lettura, tilt del vetro) · keyframe CSS per le sette tavole della griglia prodotti · `canvas-confetti` in Trivia |
 | **UI** | icone `homeIcons.tsx` disegnate a mano (outline 24×24, tratto 1.5) · `lucide-react` + `react-icons` dove serve · `@radix-ui/react-context-menu` (archivio) · diagrammi disegnati in CSS, senza librerie |
 | **i18n** | motore proprietario che traduce il DOM in IT · EN · FR · DE |
 | **PWA** | `vite-plugin-pwa` + Workbox (precache offline, auto-update) |
@@ -392,10 +395,23 @@ sequenceDiagram
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
 | **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero |
 
-> **Dipendenze rimaste indietro.** `three` e `vanta` (sfondi animati, sostituiti dalla regia GSAP)
-> e `mermaid` (il diagramma «Come funziona», ora disegnato in CSS) sono ancora elencati in
-> `package.json` — e `three`/`vanta` anche nelle esclusioni del service worker — ma **non sono più
-> importati da nessun modulo di `src/`**: non finiscono nel bundle, solo in `node_modules`.
+> **Peso del primo accesso.** Quattro cose che il browser scaricava e non guardava:
+>
+> - **maplibre-gl** (~275 kB gzip) partiva col resto della home. `React.lazy` è pigro rispetto al
+>   *render*, non allo *scroll*: la mappina in fondo veniva renderizzata al primo frame come tutto
+>   il resto, quindi il suo `import()` partiva subito. Adesso passa da
+>   [`WhenVisible`](src/app/site/WhenVisible.tsx) e si scarica quando ci si avvicina.
+> - **Le traduzioni** erano 230 kB di JSON con dentro tutte e quattro le lingue, importati in cima
+>   a `dictionary.ts`. `build-i18n.mjs` li spacchetta in quattro pacchetti e se ne carica **uno**,
+>   quello attivo.
+> - **Framer Motion** (~40 kB gzip) stava nel bundle di ogni pagina per animare il menu a tendina
+>   della lingua. Le sue tre animazioni sono tre transizioni CSS.
+> - **`three`, `vanta`, `mermaid`, `motion`**: rimasti in `package.json` dopo essere spariti dal
+>   codice. Disinstallati.
+>
+> Risultato: **−63 % sul percorso critico della home** (638 → 238 kB gzip) e **precache del service
+> worker da 2,9 MB a 1,3 MB**, con `vendor-react` e `vendor-gsap` in chunk separati — così un
+> commit sul sito non obbliga a riscaricare anche le librerie.
 
 ---
 

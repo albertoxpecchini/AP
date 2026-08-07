@@ -51,16 +51,15 @@ import { useNavPill } from "./site/GlassMotion";
 // raccordo con tema, movimento ridotto e caricamento pigro.
 import { AuroraBackdrop, ShinyBrandline, SparkGroup } from "./site/homeFx";
 import SpotlightCard from "@/components/reactbits/SpotlightCard";
-import type { LogoItem } from "@/components/reactbits/LogoLoop";
 import {
   NowBuilding,
-  BrowserMock,
-  AaSwap,
-  LiveTerminal,
-  GameHud,
-  DiffScan,
-  ClientFlow,
-  CatCube,
+  BlueprintPage,
+  TypeSpecimen,
+  PrismFan,
+  BounceRun,
+  VennSets,
+  GlobeOrbit,
+  ContourPlate,
   ContribGraph,
   TrustedDot,
 } from "./site/homeLive";
@@ -68,6 +67,7 @@ import { EMAIL } from "./site/data";
 import { PROJECTS } from "./site/projects";
 import { ArchivioExplorer } from "./archivio/Archivio";
 const RivaltaMap = lazy(() => import("./site/RivaltaMap"));
+import WhenVisible from "./site/WhenVisible";
 import SiteFooter from "./site/SiteFooter";
 import "./home.css";
 
@@ -844,7 +844,7 @@ export default function App() {
                 </ul>
               </div>
               <div className="sb-card-visual">
-                <BrowserMock />
+                <BlueprintPage />
               </div>
             </ProductCard>
           </Link>
@@ -860,7 +860,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <AaSwap />
+                <TypeSpecimen />
               </div>
             </ProductCard>
           </Link>
@@ -881,7 +881,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <LiveTerminal />
+                <PrismFan />
               </div>
             </ProductCard>
           </a>
@@ -897,7 +897,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <GameHud />
+                <BounceRun />
               </div>
             </ProductCard>
           </Link>
@@ -913,7 +913,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <DiffScan />
+                <VennSets />
               </div>
             </ProductCard>
           </Link>
@@ -929,7 +929,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <ClientFlow />
+                <GlobeOrbit />
               </div>
             </ProductCard>
           </a>
@@ -945,7 +945,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <CatCube />
+                <ContourPlate />
               </div>
             </ProductCard>
           </Link>
@@ -1181,11 +1181,14 @@ export default function App() {
                     <IcCompass size={16} /> Google Maps
                   </a>
                 </div>
-                <div className="sb-loc-map">
+                {/* La mappa non parte col resto della pagina: maplibre-gl sono
+                    ~290 kB gzip, e questa sezione sta in fondo. Si scarica
+                    quando ci si avvicina — vedi site/WhenVisible. */}
+                <WhenVisible className="sb-loc-map">
                   <Suspense fallback={null}>
                     <RivaltaMap center={RIVALTA_CENTER} zoom={13} />
                   </Suspense>
-                </div>
+                </WhenVisible>
               </div>
             </div>
           </div>

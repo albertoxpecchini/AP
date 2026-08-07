@@ -21,6 +21,7 @@ import {
   estimateOption, euro, haversineKm, hhmm, loadPacked, num, savePacked,
   splitExpenses, type Photo,
 } from "./mimaData";
+import WhenVisible from "../site/WhenVisible";
 import "../home.css";
 import "./mima.css";
 
@@ -641,11 +642,11 @@ export default function Mima() {
 
               {/* 04 — Cartografia */}
               <Mod id="mod-mappa" icon={<IcExplore size={14} />} title="Cartografia" meta="Rivalta → Cervia" solid>
-                <div className="sb-mima-map sb-mima-map--tall">
+                <WhenVisible className="sb-mima-map sb-mima-map--tall">
                   <Suspense fallback={null}>
                     <MimaRouteMap variant="trip" />
                   </Suspense>
-                </div>
+                </WhenVisible>
 
                 <div className="sb-mima-legend">
                   <span className="sb-mima-legend-item">

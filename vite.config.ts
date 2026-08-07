@@ -260,14 +260,33 @@ export default defineConfig({
         // Precache: solo app-shell e font (stabili). Le immagini NO, per non
         // appesantire il primo accesso: entrano in cache quando vengono viste.
         globPatterns: ['**/*.{js,css,html,woff2}'],
-        // three.js + Vanta servono SOLO a /sostieni: fuori dal precache, così non
-        // appesantiscono il primo accesso di chi non visita quella pagina. Vengono
-        // messi in cache "al volo" la prima volta che si apre /sostieni (sotto).
+        // ── Fuori dal precache ────────────────────────────────────────────────
+        // Il precache si scarica INTERO al primo accesso, prima ancora che si
+        // sia capito su quale pagina si è. Tutto quello che serve a una pagina
+        // sola, o a una lingua sola, lì dentro non ci va: entra in cache al
+        // volo la prima volta che serve davvero (runtimeCaching, più sotto).
         //
-        // Qui c'era anche Aurora, il fondale WebGL della home (ogl). Non c'è
-        // più nessuno shader da scaricare: la banda di colore è un gradiente
-        // CSS e il fondale si muove con lo scroll e col puntatore.
-        globIgnores: ['**/three.module-*.js', '**/vanta.waves.min-*.js'],
+        //  · vendor-map — maplibre-gl, ~290 kB gzip. Lo usano la mappina in
+        //    fondo alla home e le due pagine /mima; è già caricato solo quando
+        //    il riquadro si avvicina (site/WhenVisible.tsx), e metterlo nel
+        //    precache avrebbe rimesso in piedi esattamente il costo che quel
+        //    componente era andato a togliere.
+        //  · i18n-* — i quattro pacchetti di traduzione. Ne serve UNO, quello
+        //    della lingua attiva: precaricarli tutti e quattro sono ~265 kB per
+        //    tenersi pronti a tre lingue che quasi nessuno sceglierà.
+        //  · Trivia — il gioco, 84 kB gzip di sole domande e regole, su un sito
+        //    che è prima di tutto un portfolio.
+        //
+        // (Qui c'erano three.js e Vanta, il fondale 3D di /sostieni, e prima
+        // ancora lo shader WebGL della home: nel repo non è rimasto né l'uno né
+        // l'altro, quindi non c'è più niente da escludere.)
+        globIgnores: [
+          '**/vendor-map-*.js',
+          '**/map-*.css',
+          '**/i18n-*.js',
+          '**/Trivia-*.js',
+          '**/Trivia-*.css',
+        ],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html',
         // Le rotte SPA non hanno estensione → prendono il fallback a index.html.
@@ -291,14 +310,16 @@ export default defineConfig({
         skipWaiting: true,
         runtimeCaching: [
           {
-            // three.js + Vanta (sfondo vivo di /sostieni): cache-first al primo
-            // utilizzo, poi locali per 30 giorni come gli altri asset pesanti.
+            // Quello che il precache si lascia indietro (vedi globIgnores):
+            // maplibre, i pacchetti di lingua, il gioco. Cache-first al primo
+            // utilizzo — il nome del file porta l'hash del contenuto, quindi
+            // una copia in cache non può mai essere quella sbagliata.
             urlPattern: ({ url }) =>
-              /\/assets\/(three\.module|vanta\.waves\.min)-.*\.js$/.test(url.pathname),
+              /\/assets\/(vendor-map|i18n-|Trivia-|map-).*\.(js|css)$/.test(url.pathname),
             handler: 'CacheFirst',
             options: {
-              cacheName: 'ap-vendor-3d',
-              expiration: { maxEntries: 6, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheName: 'ap-lazy-chunks',
+              expiration: { maxEntries: 24, maxAgeSeconds: 60 * 60 * 24 * 30 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
@@ -338,6 +359,35 @@ export default defineConfig({
     __TRIVIA_VERSION__: JSON.stringify(triviaVersion()),
     // Data dell'ultimo commit in ISO, es. "2026-08-06" (footer "Updated").
     __BUILD_DATE__: JSON.stringify(buildDate()),
+  },
+
+  build: {
+    rollupOptions: {
+      output: {
+        // ── Chunk con un nome, non con quello che capita ─────────────────────
+        // Due motivi, e nessuno dei due è "fare i chunk più piccoli".
+        //
+        // ① Il service worker deve poter dire chi sta fuori dal precache
+        //    (vedi globIgnores sopra), e per dirlo gli serve un nome stabile:
+        //    `vendor-map-<hash>.js` si riconosce, `map-<hash>.js` era il nome
+        //    che rollup dava al modulo di questo repo che si chiama map.tsx —
+        //    due cose diverse con lo stesso prefisso.
+        // ② React e GSAP cambiano quando li si aggiorna, cioè quasi mai; il
+        //    codice del sito cambia a ogni commit. Tenuti insieme, ogni
+        //    ritocco a una pagina obbligava a riscaricare anche le librerie.
+        //    Separati, un deploy invalida solo la parte che è cambiata.
+        manualChunks(id: string) {
+          const pack = id.match(/src[\\/]app[\\/]i18n[\\/]generated[\\/](\w+)\.json/);
+          if (pack) return `i18n-${pack[1]}`;
+          if (!id.includes('node_modules')) return;
+          if (/[\\/]node_modules[\\/]maplibre-gl[\\/]/.test(id)) return 'vendor-map';
+          if (/[\\/]node_modules[\\/]gsap[\\/]/.test(id)) return 'vendor-gsap';
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler|react-router)[\\/]/.test(id)) {
+            return 'vendor-react';
+          }
+        },
+      },
+    },
   },
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
