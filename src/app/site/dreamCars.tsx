@@ -1,45 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Il garage — i tre modelli 3D, girabili in ogni verso.
+// Il garage — visualizzatore 3D delle tre auto.
 //
-// ── Cosa c'è dentro ──────────────────────────────────────────────────────────
-// I modelli veri, non una loro imitazione: l'Aventador, la 4C e la R8 così come
-// stanno nei file di partenza (autori e licenze in public/models/README.md),
-// passati per scripts/build-cars.mjs — che butta via quello che da fuori non si
-// vede, raddrizza, porta la lunghezza a quella di listino e semplifica da
-// trentamila triangoli a novemila. Tutte e tre stanno in public/models/cars.bin.
+// ── Cosa mostra ──────────────────────────────────────────────────────────────
+// I modelli come sono: stessa geometria, stessi materiali, stesse texture,
+// stessi colori dei file di partenza (Aventador LP 700-4, Alfa Romeo 4C, Audi
+// R8 V10 — vedi public/models/README.md). Niente è stato semplificato, tolto o
+// ricolorato. scripts/build-cars.mjs cambia solo i CONTENITORI: la geometria da
+// testo a interi binari — che sono i tipi che WebGL vuole nei suoi buffer — e
+// le texture da PNG a WebP.
 //
-// ── Perché WebGL e non un renderer a mano sul canvas 2D ──────────────────────
-// Perché la prima versione era esattamente quello, e non funzionava. Su canvas
-// 2D le facce si ordinano per profondità e si dipingono dalla più lontana (il
-// "pittore"): con tre triangoli va bene, con novemila che si compenetrano — e i
-// modelli veri si compenetrano dappertutto: il cerchio dentro la gomma, lo
-// specchietto contro il montante — l'ordine giusto NON ESISTE, e la carrozzeria
-// si vede a scaglie. Non è un difetto di precisione, è il metodo che non regge.
+// Sono 131 000 triangoli per l'Aventador, interni e motore compresi, e trenta
+// texture in tutto. Roba che si scarica solo quando la sezione arriva in vista.
 //
-// WebGL ha il buffer di profondità: decide pixel per pixel chi sta davanti, e
-// il problema sparisce del tutto. In più il disegno lo fa la scheda video, così
-// muovere l'auto costa una manciata di matrici invece di novemila riempimenti.
+// ── Perché non three.js ──────────────────────────────────────────────────────
+// Perché serve un decimo di three.js: una mesh statica, una luce, nessuna
+// ombra, nessun materiale PBR. La libreria sarebbe 160 kB gzip — più di tutta
+// la home — e questo file ne pesa sei. Quel che serve sono i due shader qui
+// sotto e una manciata di chiamate: un buffer per attributo, una texture per
+// materiale, e un `drawElements` per ogni tratto di indici.
 //
-// three.js resta fuori: sarebbe centosessanta kB gzip — più di tutta la home
-// dopo l'ultimo giro di dimagrimento — per una mesh statica, una luce, nessuna
-// ombra e nessuna texture. Quel che serve sono i due shader qui sotto.
+// ── Le tre cose che questo visualizzatore deve fare bene ─────────────────────
+// ① Il buffer di profondità. Su un modello vero le cose si compenetrano
+//    dappertutto (il cerchio dentro la gomma, lo specchietto contro il
+//    montante): ordinare le facce e dipingere dalla più lontana — che è quel
+//    che si può fare su un canvas 2D — NON basta, perché un ordine giusto non
+//    esiste. Serve che a decidere sia il pixel.
+// ② I materiali trasparenti dopo gli opachi, e senza scrivere in profondità.
+//    Se no il parabrezza nasconde l'abitacolo invece di lasciarlo vedere.
+// ③ La ripetizione delle texture. Le UV di questi modelli escono da 0…1 —
+//    quelle delle gomme arrivano a 60 — e senza GL_REPEAT il battistrada
+//    diventa una striscia stirata. Da cui le texture in potenze di due.
 //
 // ── Il movimento ─────────────────────────────────────────────────────────────
 // Rotazione libera: si trascina e l'auto gira di 360° in tutti i versi, sotto
-// compreso. Non ci sono due angoli (imbardata e beccheggio) da sommare — quelli
-// si incastrano ai poli — ma una matrice di rotazione che viene MOLTIPLICATA a
-// sinistra dallo spostamento del dito letto negli assi della camera. Comunque
-// sia messa l'auto, trascinare a destra la fa girare verso destra sullo schermo.
+// compreso. Non due angoli da sommare — quelli si incastrano ai poli — ma una
+// matrice moltiplicata a SINISTRA dallo spostamento del dito letto negli assi
+// della camera. Comunque sia messa l'auto, trascinare a destra la fa girare
+// verso destra sullo schermo.
 //
-// Da fermo il ciclo di rendering è spento: zero lavoro. Al rilascio l'abbrivio
-// si spegne da sé. L'unica cosa che parte da sola è mezzo giro di presentazione
-// quando il riquadro arriva in scena; con prefers-reduced-motion nemmeno quello.
+// Da fermo il ciclo di rendering è spento: zero lavoro.
 //
 // touch-action: pan-y sul palco, non `none`: il dito che scorre la pagina deve
 // continuare a scorrerla — qui si prende solo il trascinamento orizzontale.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect, useRef, useState } from "react";
-import { subscribeTheme } from "../theme/themeCore";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Le tre auto — la parte che si legge
@@ -92,19 +96,22 @@ const CARS: CarSpec[] = [
    Il file delle mesh
 
    Formato (little-endian), scritto da scripts/build-cars.mjs:
-     "APC2", u16 quante auto
-     per auto: u8 lunghezza-nome, nome ascii, u32 vertici, u32 triangoli
+     "APC3", u16 quante auto
+     per auto:
+       u8 lunghezza-nome, nome ascii
+       u32 vertici, u32 indici, f32 scala UV, u8 byte-per-indice, u8 materiali
+       per materiale: u8 texture (255 = nessuna), u8 r, g, b, a,
+                      u32 primo indice, u32 quanti
      riempimento a multiplo di 4
      per auto, nello stesso ordine:
        i16 ×3 posizioni (decimi di millimetro)
-       i8  ×3 normali (−127…127)
-       u8     materiale
-       u16 ×3 indici
-       riempimento a multiplo di 4
+       i8  ×3 normali        (riempimento a multiplo di 2)
+       i16 ×2 UV (× scala UV)
+       indici, a 2 o 4 byte  (riempimento a multiplo di 4)
 
-   Interi e non float perché è la scheda video a saperli leggere così com'è:
-   SHORT e BYTE sono tipi di attributo di WebGL, quindi il file si carica nei
-   buffer senza convertire niente. Il dimezzamento del peso è in regalo.
+   Interi e non float perché sono i tipi che la scheda video legge direttamente:
+   SHORT e BYTE sono tipi di attributo di WebGL, quindi il file entra nei buffer
+   senza conversioni. Il dimezzamento del peso viene in regalo.
 
    Si scarica una volta sola per tutta la pagina: il primo riquadro che arriva
    in vista fa partire la fetch, gli altri due si attaccano alla stessa promessa.
@@ -113,28 +120,49 @@ const CARS: CarSpec[] = [
 /** Decimi di millimetro → metri. Lo stesso valore sta nel convertitore. */
 const QS = 1e-4;
 
+type Draw = { tex: number; color: [number, number, number, number]; first: number; count: number };
 type Raw = {
   pos: ArrayBuffer;
   nrm: ArrayBuffer;
-  mat: ArrayBuffer;
+  uv: ArrayBuffer;
   idx: ArrayBuffer;
-  nTri: number;
+  wide: boolean;
+  uvScale: number;
+  nIdx: number;
+  draws: Draw[];
   /** Quota attorno a cui gira: la mezzeria in altezza. */
   pivot: number;
 };
 
 function decode(buf: ArrayBuffer): Map<string, Raw> {
   const dv = new DataView(buf);
-  if (dv.getUint32(0, true) !== 0x32435041) throw new Error("cars.bin: non è un APC2");
+  if (dv.getUint32(0, true) !== 0x33435041) throw new Error("cars.bin: non è un APC3");
   const count = dv.getUint16(4, true);
   let p = 6;
-  const dir: { id: string; nv: number; nt: number }[] = [];
+  const dir: (Omit<Raw, "pos" | "nrm" | "uv" | "idx" | "pivot"> & { id: string; nVert: number })[] = [];
   for (let i = 0; i < count; i++) {
     const len = dv.getUint8(p++);
     let id = "";
     for (let k = 0; k < len; k++) id += String.fromCharCode(dv.getUint8(p++));
-    dir.push({ id, nv: dv.getUint32(p, true), nt: dv.getUint32(p + 4, true) });
-    p += 8;
+    const nVert = dv.getUint32(p, true);
+    const nIdx = dv.getUint32(p + 4, true);
+    const uvScale = dv.getFloat32(p + 8, true);
+    const wide = dv.getUint8(p + 12) === 4;
+    const nMat = dv.getUint8(p + 13);
+    p += 14;
+    const draws: Draw[] = [];
+    for (let k = 0; k < nMat; k++) {
+      const tex = dv.getUint8(p);
+      const color: [number, number, number, number] = [
+        dv.getUint8(p + 1) / 255,
+        dv.getUint8(p + 2) / 255,
+        dv.getUint8(p + 3) / 255,
+        dv.getUint8(p + 4) / 255,
+      ];
+      draws.push({ tex, color, first: dv.getUint32(p + 5, true), count: dv.getUint32(p + 9, true) });
+      p += 13;
+    }
+    dir.push({ id, nVert, nIdx, uvScale, wide, draws });
   }
   p = (p + 3) & ~3;
 
@@ -142,16 +170,18 @@ function decode(buf: ArrayBuffer): Map<string, Raw> {
   for (const d of dir) {
     // slice() e non una vista: le sezioni non sono allineate come pretende un
     // Int16Array, e le copie si pagano una volta sola al caricamento.
-    const pos = buf.slice(p, p + d.nv * 6); p += d.nv * 6;
-    const nrm = buf.slice(p, p + d.nv * 3); p += d.nv * 3;
-    const mat = buf.slice(p, p + d.nv); p += d.nv;
-    const idx = buf.slice(p, p + d.nt * 6); p += d.nt * 6;
+    const pos = buf.slice(p, p + d.nVert * 6); p += d.nVert * 6;
+    const nrm = buf.slice(p, p + d.nVert * 3); p += d.nVert * 3;
+    p = (p + 1) & ~1;
+    const uv = buf.slice(p, p + d.nVert * 4); p += d.nVert * 4;
+    const bytes = d.wide ? 4 : 2;
+    const idx = buf.slice(p, p + d.nIdx * bytes); p += d.nIdx * bytes;
     p = (p + 3) & ~3;
 
     let top = 0;
     const pv = new Int16Array(pos);
     for (let i = 1; i < pv.length; i += 3) if (pv[i] > top) top = pv[i];
-    out.set(d.id, { pos, nrm, mat, idx, nTri: d.nt, pivot: top * QS * 0.5 });
+    out.set(d.id, { ...d, pos, nrm, uv, idx, pivot: top * QS * 0.5 });
   }
   return out;
 }
@@ -191,7 +221,7 @@ function mul(out: M4, a: M4, b: M4) {
  *  nell'inquadratura ci stanno sempre `worldW` metri. Se si fissasse l'angolo
  *  verticale (come fa qualunque perspective() di libreria) una card più bassa
  *  rimpicciolirebbe l'auto, e le tre auto della griglia non sarebbero più in
- *  scala fra loro. */
+ *  scala fra loro — che è metà del gusto di vederle in fila. */
 function project(out: M4, worldW: number, dist: number, aspect: number, near: number, far: number) {
   const tx = worldW / 2 / dist;
   out.fill(0);
@@ -221,64 +251,57 @@ function spin(m: M4, axis: 0 | 1, a: number) {
 /* ═══════════════════════════════════════════════════════════════════════════
    Gli shader
 
-   Il materiale viaggia come un numero per vertice (0 carrozzeria, 1 vetri,
-   2 gomma, 3 cerchio) e le due tinte — ombra e luce — si pescano da due
-   tabelle di uniform NEL VERTEX SHADER. Non è un vezzo: in GLSL ES 1.00 un
-   array di uniform si può indicizzare con un'espressione qualunque solo di
-   qua; nel fragment shader servirebbe un indice costante, e toccherebbe
-   riscrivere la scelta come una catena di mix.
-
    La luce è FISSA RISPETTO ALLA CAMERA: gira il modello, non l'illuminazione,
    come su una piattaforma girevole in uno studio fotografico.
 
-   Due facce: i modelli veri hanno pezzi aperti (i passaruota, le prese d'aria)
-   e triangoli con l'orientamento sbagliato. gl_FrontFacing rimette la normale
-   dalla parte di chi guarda, così un pannello preso dal verso sbagliato resta
-   illuminato invece di diventare una macchia nera.
+   È volutamente tenue — 55 % di ambiente. Le texture di questi modelli hanno
+   già l'ombreggiatura dipinta dentro (si chiamano "DiffuseAOSO": diffuso più
+   occlusione ambientale); rifarci sopra una luce forte vorrebbe dire ombrare
+   due volte e spegnere i colori originali, che sono esattamente la cosa da non
+   toccare. Qui la luce serve solo a far leggere il volume.
+
+   Due facce: i modelli veri hanno pezzi aperti e triangoli con l'orientamento
+   invertito. gl_FrontFacing rimette la normale dalla parte di chi guarda, così
+   un pannello preso dal verso sbagliato resta illuminato invece di diventare
+   una macchia nera.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const VERT = `
 attribute vec3 aPos;
 attribute vec3 aNrm;
-attribute float aMat;
+attribute vec2 aUv;
 uniform mat4 uMVP;
 uniform mat4 uRot;
-uniform vec3 uLo[4];
-uniform vec3 uHi[4];
 uniform float uQS;
+uniform float uUvScale;
 uniform float uPivot;
 varying vec3 vN;
-varying vec3 vLo;
-varying vec3 vHi;
+varying vec2 vUv;
 void main() {
   vec3 p = vec3(aPos.x * uQS, aPos.y * uQS - uPivot, aPos.z * uQS);
   gl_Position = uMVP * vec4(p, 1.0);
   vN = mat3(uRot) * aNrm;
-  int m = int(aMat + 0.5);
-  vLo = uLo[m];
-  vHi = uHi[m];
+  vUv = aUv * uUvScale;
 }`;
 
 const FRAG = `
 precision mediump float;
+uniform sampler2D uTex;
+uniform float uHasTex;
+uniform vec4 uColor;
 uniform vec3 uLight;
 varying vec3 vN;
-varying vec3 vLo;
-varying vec3 vHi;
+varying vec2 vUv;
 void main() {
+  vec4 tex = texture2D(uTex, vUv);
+  vec3 base = mix(vec3(1.0), tex.rgb, uHasTex) * uColor.rgb;
+  float alpha = mix(1.0, tex.a, uHasTex) * uColor.a;
+  if (alpha < 0.02) discard;
   vec3 n = normalize(vN);
   if (!gl_FrontFacing) n = -n;
-  // Una lampada e un cielo, come in uno studio fotografico. Il cielo (la
-  // componente che dipende solo da quanto una faccia guarda in su) è la
-  // ragione per cui si legge la FORMA: con la sola lampada, metà carrozzeria
-  // finisce contro il bianco e l'auto diventa una sagoma di gesso.
   float lam = max(dot(n, uLight), 0.0);
   float sky = 0.5 + 0.5 * n.y;
-  // Il profilo di taglio va più scuro: è quel poco che stacca la silhouette
-  // dal fondo chiaro della card.
-  float rim = 1.0 - abs(n.z);
-  float t = (0.06 + 0.58 * pow(lam, 0.75) + 0.36 * sky * sky) * (1.0 - 0.30 * rim * rim);
-  gl_FragColor = vec4(mix(vLo, vHi, clamp(t, 0.0, 1.0)), 1.0);
+  gl_FragColor = vec4(base * (0.55 + 0.30 * lam + 0.15 * sky), alpha);
 }`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -290,75 +313,30 @@ void main() {
 const WORLD_W = 5.6;
 const DIST = 14;
 /** Da dove viene la luce, negli assi della camera. */
-const LIGHT = [-0.44, 0.68, 0.59];
-
-type RGB = [number, number, number];
-
-/** Qualunque colore CSS → tre numeri 0…1, passando dal canvas 2D: `fillStyle`
- *  normalizza tutto quello che il browser sa leggere, e non c'è da scrivere un
- *  parser per hex, rgb(), hsl() e compagnia. */
-function rgbOf(probe: CanvasRenderingContext2D, css: string, fallback: string): RGB {
-  probe.fillStyle = fallback;
-  probe.fillStyle = css.trim() || fallback;
-  const s = String(probe.fillStyle);
-  let r = 128, g = 128, b = 128;
-  if (s[0] === "#") {
-    const h = s.length === 4 ? s[1] + s[1] + s[2] + s[2] + s[3] + s[3] : s.slice(1, 7);
-    const v = parseInt(h, 16);
-    r = (v >> 16) & 255; g = (v >> 8) & 255; b = v & 255;
-  } else {
-    const m = s.match(/[\d.]+/g);
-    if (m) { r = +m[0]; g = +m[1]; b = +m[2]; }
-  }
-  return [r / 255, g / 255, b / 255];
-}
-
-/** Le quattro coppie ombra/luce, nell'ordine dei materiali. */
-function readPal(el: HTMLElement) {
-  const probe = document.createElement("canvas").getContext("2d")!;
-  const cs = getComputedStyle(el);
-  const g = (k: string, f: string) => rgbOf(probe, cs.getPropertyValue(k), f);
-  const lo = [
-    g("--gar-body-lo", "#8d979c"),
-    g("--gar-glass-lo", "#2b7357"),
-    g("--gar-tyre-lo", "#23282b"),
-    g("--gar-rim-lo", "#7d868b"),
-  ];
-  const hi = [
-    g("--gar-body-hi", "#f3f5f6"),
-    g("--gar-glass-hi", "#8fe4c1"),
-    g("--gar-tyre-hi", "#5c6366"),
-    g("--gar-rim-hi", "#ffffff"),
-  ];
-  return {
-    lo: Float32Array.from(lo.flat()),
-    hi: Float32Array.from(hi.flat()),
-  };
-}
+const LIGHT = [-0.42, 0.66, 0.62];
 
 function compile(gl: WebGLRenderingContext, type: number, src: string) {
   const sh = gl.createShader(type)!;
   gl.shaderSource(sh, src);
   gl.compileShader(sh);
-  if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-    throw new Error(gl.getShaderInfoLog(sh) || "shader");
-  }
+  if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh) || "shader");
   return sh;
 }
 
 type Gpu = {
-  gl: WebGLRenderingContext;
   draw: (rot: M4, w: number, h: number) => void;
-  setPal: (el: HTMLElement) => void;
   destroy: () => void;
 };
 
-function makeGpu(cv: HTMLCanvasElement, raw: Raw): Gpu | null {
-  const gl = (cv.getContext("webgl", { antialias: true, alpha: true, depth: true }) ||
-    cv.getContext("experimental-webgl", { antialias: true, alpha: true, depth: true })) as
+function makeGpu(cv: HTMLCanvasElement, carId: string, raw: Raw, onTexture: () => void): Gpu | null {
+  const opts = { antialias: true, alpha: true, depth: true, premultipliedAlpha: false };
+  const gl = (cv.getContext("webgl", opts) || cv.getContext("experimental-webgl", opts)) as
     | WebGLRenderingContext
     | null;
   if (!gl) return null;
+  // Gli indici a 32 bit servono all'Aventador, che da solo supera i 65 535
+  // vertici. Se il browser non li avesse, quelle auto restano fuori.
+  if (raw.wide && !gl.getExtension("OES_element_index_uint")) return null;
 
   const prog = gl.createProgram()!;
   gl.attachShader(prog, compile(gl, gl.VERTEX_SHADER, VERT));
@@ -367,58 +345,84 @@ function makeGpu(cv: HTMLCanvasElement, raw: Raw): Gpu | null {
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
   gl.useProgram(prog);
 
-  const buf = (target: number, data: ArrayBuffer) => {
+  const mkBuf = (target: number, data: ArrayBuffer) => {
     const b = gl.createBuffer()!;
     gl.bindBuffer(target, b);
     gl.bufferData(target, data, gl.STATIC_DRAW);
     return b;
   };
-  const bPos = buf(gl.ARRAY_BUFFER, raw.pos);
-  const bNrm = buf(gl.ARRAY_BUFFER, raw.nrm);
-  const bMat = buf(gl.ARRAY_BUFFER, raw.mat);
-  const bIdx = buf(gl.ELEMENT_ARRAY_BUFFER, raw.idx);
+  const bufs = [
+    mkBuf(gl.ARRAY_BUFFER, raw.pos),
+    mkBuf(gl.ARRAY_BUFFER, raw.nrm),
+    mkBuf(gl.ARRAY_BUFFER, raw.uv),
+    mkBuf(gl.ELEMENT_ARRAY_BUFFER, raw.idx),
+  ];
 
   const aPos = gl.getAttribLocation(prog, "aPos");
   const aNrm = gl.getAttribLocation(prog, "aNrm");
-  const aMat = gl.getAttribLocation(prog, "aMat");
-  const uMVP = gl.getUniformLocation(prog, "uMVP");
-  const uRot = gl.getUniformLocation(prog, "uRot");
-  const uLight = gl.getUniformLocation(prog, "uLight");
-  const uLo = gl.getUniformLocation(prog, "uLo");
-  const uHi = gl.getUniformLocation(prog, "uHi");
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, bPos);
+  const aUv = gl.getAttribLocation(prog, "aUv");
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs[0]);
   gl.enableVertexAttribArray(aPos);
   gl.vertexAttribPointer(aPos, 3, gl.SHORT, false, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, bNrm);
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs[1]);
   gl.enableVertexAttribArray(aNrm);
   gl.vertexAttribPointer(aNrm, 3, gl.BYTE, true, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, bMat);
-  gl.enableVertexAttribArray(aMat);
-  gl.vertexAttribPointer(aMat, 1, gl.UNSIGNED_BYTE, false, 0, 0);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bIdx);
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs[2]);
+  gl.enableVertexAttribArray(aUv);
+  gl.vertexAttribPointer(aUv, 2, gl.SHORT, false, 0, 0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufs[3]);
 
-  gl.uniform1f(gl.getUniformLocation(prog, "uQS"), QS);
-  gl.uniform1f(gl.getUniformLocation(prog, "uPivot"), raw.pivot);
+  const u = (n: string) => gl.getUniformLocation(prog, n);
+  const uMVP = u("uMVP"), uRot = u("uRot"), uHasTex = u("uHasTex"), uColor = u("uColor");
+  gl.uniform1f(u("uQS"), QS);
+  gl.uniform1f(u("uUvScale"), raw.uvScale);
+  gl.uniform1f(u("uPivot"), raw.pivot);
+  gl.uniform1i(u("uTex"), 0);
   const l = Math.hypot(LIGHT[0], LIGHT[1], LIGHT[2]);
-  gl.uniform3f(uLight, LIGHT[0] / l, LIGHT[1] / l, LIGHT[2] / l);
+  gl.uniform3f(u("uLight"), LIGHT[0] / l, LIGHT[1] / l, LIGHT[2] / l);
+
+  // ── Texture ──────────────────────────────────────────────────────────────
+  // Finché non è arrivata, il materiale disegna con un pixel bianco: l'auto si
+  // vede subito nel suo colore di base e si riveste man mano.
+  const blank = gl.createTexture()!;
+  gl.bindTexture(gl.TEXTURE_2D, blank);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 255, 255, 255]));
+
+  const texes = new Map<number, WebGLTexture>();
+  const wanted = new Set(raw.draws.map((d) => d.tex).filter((t) => t !== 255));
+  const images: HTMLImageElement[] = [];
+  let alive = true;
+  for (const id of wanted) {
+    const img = new Image();
+    images.push(img);
+    img.onload = () => {
+      if (!alive) return;
+      const t = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      // Ripetizione + mipmap: le UV di questi modelli arrivano a 60, e il
+      // convertitore per questo tiene le texture in potenze di due.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      texes.set(id, t);
+      onTexture();
+    };
+    img.src = `/models/tex/${carId}-${id}.webp`;
+  }
 
   gl.enable(gl.DEPTH_TEST);
   gl.disable(gl.CULL_FACE);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.clearColor(0, 0, 0, 0);
 
-  const P = m4();
-  const MV = m4();
-  const MVP = m4();
+  const P = m4(), MV = m4(), MVP = m4();
+  const idxType = raw.wide ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+  const idxBytes = raw.wide ? 4 : 2;
 
   return {
-    gl,
-    setPal(el) {
-      const p = readPal(el);
-      gl.useProgram(prog);
-      gl.uniform3fv(uLo, p.lo);
-      gl.uniform3fv(uHi, p.hi);
-    },
     draw(rot, w, h) {
       if (!w || !h) return;
       gl.useProgram(prog);
@@ -430,10 +434,32 @@ function makeGpu(cv: HTMLCanvasElement, raw: Raw): Gpu | null {
       mul(MVP, P, MV);
       gl.uniformMatrix4fv(uMVP, false, MVP);
       gl.uniformMatrix4fv(uRot, false, rot);
-      gl.drawElements(gl.TRIANGLES, raw.nTri * 3, gl.UNSIGNED_SHORT, 0);
+
+      // I trasparenti stanno in fondo all'elenco (li ordina il convertitore):
+      // si disegnano dopo gli opachi e senza scrivere in profondità, se no il
+      // parabrezza nasconderebbe l'abitacolo invece di lasciarlo vedere.
+      let blending = false;
+      for (const d of raw.draws) {
+        const clear = d.color[3] < 1;
+        if (clear !== blending) {
+          blending = clear;
+          if (clear) { gl.enable(gl.BLEND); gl.depthMask(false); }
+          else { gl.disable(gl.BLEND); gl.depthMask(true); }
+        }
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, (d.tex !== 255 && texes.get(d.tex)) || blank);
+        gl.uniform1f(uHasTex, d.tex !== 255 && texes.has(d.tex) ? 1 : 0);
+        gl.uniform4fv(uColor, d.color);
+        gl.drawElements(gl.TRIANGLES, d.count, idxType, d.first * idxBytes);
+      }
+      if (blending) { gl.disable(gl.BLEND); gl.depthMask(true); }
     },
     destroy() {
-      for (const b of [bPos, bNrm, bMat, bIdx]) gl.deleteBuffer(b);
+      alive = false;
+      for (const img of images) img.src = "";
+      for (const b of bufs) gl.deleteBuffer(b);
+      for (const t of texes.values()) gl.deleteTexture(t);
+      gl.deleteTexture(blank);
       gl.deleteProgram(prog);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     },
@@ -448,7 +474,7 @@ function motionOK() {
   return typeof window !== "undefined" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** La posa di partenza: tre quarti anteriore sinistro, visto da in piedi. */
+/** La posa di partenza: tre quarti anteriore, visto da in piedi. */
 function restPose(): M4 {
   const m = m4();
   spin(m, 1, -0.62);
@@ -473,13 +499,16 @@ function CarModel({ car, index }: { car: CarSpec; index: number }) {
       .then((all) => {
         const raw = all.get(car.id);
         if (dead || !raw) return;
-        const gpu = makeGpu(cv, raw);
+        let repaint = () => {};
+        const gpu = makeGpu(cv, car.id, raw, () => repaint());
         if (!gpu) {
           setState("off");
           return;
         }
         setState("ok");
-        cleanup = mount(stage, cv, gpu, index);
+        const m = mount(stage, cv, gpu, index);
+        repaint = m.repaint;
+        cleanup = m.stop;
       })
       .catch(() => {
         if (!dead) setState("off");
@@ -538,14 +567,13 @@ function CarModel({ car, index }: { car: CarSpec; index: number }) {
   );
 }
 
-/** Misura, palette, gesto e ciclo di rendering: nascono e muoiono insieme. */
+/** Misura, gesto e ciclo di rendering: nascono e muoiono insieme. */
 function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: number) {
   let w = 0;
   let h = 0;
   const anim = motionOK();
 
   const rot = restPose();
-  // La presentazione: mezzo giro in più da smaltire.
   let intro = anim ? 0.95 : 0;
   if (intro) spin(rot, 1, intro);
 
@@ -555,8 +583,6 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
   let dragging = false;
   let t0 = 0;
 
-  gpu.setPal(stage);
-
   const paint = () => gpu.draw(rot, w, h);
 
   const tick = (now: number) => {
@@ -565,7 +591,7 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
     if (intro) {
       if (!t0) t0 = now;
       const k = Math.min(1, Math.max(0, now - t0 - index * 150) / 900);
-      const want = 0.95 * (1 - (1 - Math.pow(1 - k, 3)));
+      const want = 0.95 * Math.pow(1 - k, 3);
       spin(rot, 1, want - intro);
       intro = want;
       if (k < 1) more = true;
@@ -584,7 +610,6 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
     if (!raf) raf = requestAnimationFrame(tick);
   };
 
-  // ── Misura ───────────────────────────────────────────────────────────────
   const resize = () => {
     const r = stage.getBoundingClientRect();
     if (!r.width) return;
@@ -602,7 +627,6 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
   resize();
   if (intro) kick();
 
-  // ── Gesto ────────────────────────────────────────────────────────────────
   let lx = 0;
   let ly = 0;
   const K = 0.009; // radianti per pixel: un giro completo in ~700 px
@@ -657,21 +681,21 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
   stage.addEventListener("pointerup", up);
   stage.addEventListener("pointercancel", up);
   stage.addEventListener("keydown", key);
-  const offTheme = subscribeTheme(() => {
-    gpu.setPal(stage);
-    paint();
-  });
 
-  return () => {
-    ro.disconnect();
-    offTheme();
-    if (raf) cancelAnimationFrame(raf);
-    stage.removeEventListener("pointerdown", down);
-    stage.removeEventListener("pointermove", move);
-    stage.removeEventListener("pointerup", up);
-    stage.removeEventListener("pointercancel", up);
-    stage.removeEventListener("keydown", key);
-    gpu.destroy();
+  return {
+    repaint: () => {
+      if (!raf) paint();
+    },
+    stop: () => {
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      stage.removeEventListener("pointerdown", down);
+      stage.removeEventListener("pointermove", move);
+      stage.removeEventListener("pointerup", up);
+      stage.removeEventListener("pointercancel", up);
+      stage.removeEventListener("keydown", key);
+      gpu.destroy();
+    },
   };
 }
 

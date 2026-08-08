@@ -1,51 +1,70 @@
-# cars.bin — i tre modelli del garage
+# I tre modelli del garage
 
-`cars.bin` contiene le mesh delle tre auto della sezione "And three cars I dream
+`cars.bin` + `tex/` sono le tre auto della sezione "And three cars I dream
 about" in fondo alla home: Lamborghini Aventador LP 700-4, Alfa Romeo 4C,
 Audi R8 V10.
 
-## Cos'è
+## Cosa sono
 
-Un solo file binario con tre mesh, generato da `scripts/build-cars.mjs` a
-partire dai modelli originali. Il convertitore:
+I modelli **come sono**: stessa geometria, stesse normali, stesse coordinate
+texture, stessi materiali, stessi colori dei file di partenza. Niente è stato
+semplificato, tolto o ricolorato — interni, motore e sottoscocca compresi.
 
-- tiene solo quello che si vede da fuori (carrozzeria, vetri, gomme, cerchi) e
-  butta interni, motore, targhe e pinze dei freni;
-- raddrizza e porta la lunghezza a quella vera di listino, così le tre auto
-  stanno in scala fra loro;
-- semplifica da ~30 000 triangoli a ~6 500 per auto;
-- quantizza le coordinate a un decimo di millimetro (interi a 16 bit) e le
-  normali a interi a 8 bit, così i buffer si caricano in WebGL senza conversioni.
+`scripts/build-cars.mjs` cambia solo i **contenitori**, perché un browser non
+sa aprire un FBX né un OBJ:
 
-Il formato è documentato in testa a `src/app/site/dreamCars.tsx`.
+- la geometria passa da testo a interi binari — posizioni a un decimo di
+  millimetro, normali a un byte per asse, UV a interi con un fattore di scala.
+  Sono i tipi che WebGL vuole nei suoi buffer, quindi il file entra nella
+  scheda video senza conversioni;
+- le texture passano da PNG a WebP, lato massimo 512 px e potenze di due (le
+  mipmap e la ripetizione di WebGL 1 le vogliono così, e le UV di questi
+  modelli arrivano a 60: senza ripetizione il battistrada si stira).
 
-## Rigenerarlo
+L'unica cosa che i modelli si prendono dallo script è la **posa in scena**:
+centrati, appoggiati a terra, orientati col muso in avanti e portati alla loro
+lunghezza vera in metri — così le tre auto stanno in scala fra loro. È quello
+che fa qualunque visualizzatore quando inquadra un oggetto.
+
+Il formato del file è documentato in testa a `src/app/site/dreamCars.tsx`.
+
+## Quanto pesano
+
+| | |
+|---|---|
+| `cars.bin` | 4,1 MB (≈ 2,0 MB gzip) |
+| `tex/` (30 WebP) | 1,1 MB |
+| triangoli | Aventador 131 330 · 4C 31 167 · R8 32 492 |
+
+Non stanno nel precache del service worker (`globPatterns` prende solo
+js/css/html/woff2) e si scaricano **solo quando la sezione arriva in vista**:
+chi non scorre fin laggiù non li paga. Chi ci arriva li paga una volta, poi
+restano in cache (`ap-models`, vedi `vite.config.ts`).
+
+Se un giorno servisse dimezzare: metà dei triangoli dell'Aventador sono
+interni, motore e pinze dei freni, che a portiere chiuse non si vedono mai.
+
+## Rigenerarli
+
+Serve `sharp` solo per convertire le texture, e **non è** una dipendenza del
+progetto: si installa al momento e si toglie, così non pesa su ogni deploy.
 
 ```
+npm i -D sharp
 node scripts/build-cars.mjs <cartella-sorgenti>
+npm uninstall sharp
 ```
 
-dove `<cartella-sorgenti>` contiene i pacchetti originali scompattati, nei
-percorsi indicati dalla tabella `CARS` dentro lo script.
+`<cartella-sorgenti>` contiene i pacchetti originali scompattati, nei percorsi
+indicati dalla tabella `CARS` dentro lo script.
 
 ## I sorgenti
 
 **Non stanno in questo repository**: sono modelli di terzi e pesano una
-trentina di MB. Qui c'è solo il `.bin` generato.
+trentina di MB fra mesh e texture. Qui ci sono solo i file generati.
 
-## ⚠️ Attribuzione — da completare
-
-I tre modelli arrivano da pacchetti scaricati da Sketchfab. I pacchetti non
-contenevano il file di licenza, quindi **autore e licenza di ognuno vanno
-verificati sulla pagina di origine e trascritti qui sotto** prima di
-considerare la sezione pubblicabile. La gran parte dei modelli Sketchfab è
-CC-BY, che richiede il credito all'autore.
-
-| Auto | Pacchetto di origine | Autore | Licenza | Link |
-|---|---|---|---|---|
-| Aventador LP 700-4 | `2012-lamborghini-aventador-lp700-4.zip` | da compilare | da compilare | da compilare |
-| Alfa Romeo 4C | `asphalt-8-alfa-romeo-4c.zip` | da compilare | da compilare | da compilare |
-| Audi R8 V10 | `audi-r8.zip` | da compilare | da compilare | da compilare |
-
-Il modello della 4C è marcato come estratto da Asphalt 8 (Gameloft): è
-materiale di un gioco, e va valutato a parte se ci sta in una pagina pubblica.
+| Auto | Pacchetto di origine | Formato |
+|---|---|---|
+| Aventador LP 700-4 | `2012-lamborghini-aventador-lp700-4.zip` | FBX binario 7700 |
+| Alfa Romeo 4C | `asphalt-8-alfa-romeo-4c.zip` | OBJ + MTL |
+| Audi R8 V10 | `audi-r8.zip` | OBJ + MTL |

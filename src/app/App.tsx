@@ -1258,8 +1258,9 @@ export default function App() {
             <div className="sb-sechead">
               <h3>And three cars I dream about</h3>
               <p>
-                Not photos and not videos: three real 3D models, stripped down to the shape
-                and drawn live by your graphics card. Drag one to turn it in any direction.
+                Not photos and not videos: the 3D models themselves — their own paint,
+                wheels and interiors — drawn live by your graphics card. Drag one to turn
+                it in any direction.
               </p>
             </div>
             <WhenVisible className="sb-garage-wrap" rootMargin="400px">

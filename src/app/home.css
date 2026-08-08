@@ -1583,47 +1583,18 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-wall-card--wish .sb-cv-title { font-style: italic; }
 
 /* ── Garage — i tre modelli 3D ────────────────────────────────────────────
-   La palette dei modelli sta QUI e non nel componente perché è design system,
-   non geometria: gli stessi grigi delle superfici e lo stesso verde di tutto
-   il resto del sito. Le auto vere sarebbero gialla, rossa e grigio Nardò, ma
-   la home ha UN accento solo su tutte le pagine e non è il caso di aprire
-   un'eccezione per tre auto: qui sono tre modelli in creta con i vetri verdi,
-   e in monocromia si legge la forma.
+   Qui c'era la palette delle auto: due tinte per materiale, negli stessi grigi
+   del sito e con i vetri nel verde d'accento. È stata tolta perché le auto
+   adesso portano i LORO colori — quelli dei modelli originali, texture
+   comprese — e non c'è più niente da tingere dal foglio di stile.
 
-   Vincolo di formato: esadecimali PIATTI, niente var() e niente color-mix().
-   Questi valori attraversano getComputedStyle — che di una custom property
-   restituisce il token com'è scritto — e finiscono in uniform di WebGL: se
-   arrivasse una funzione CSS da risolvere, non c'è nessuno che la risolva.
-
-   Le due tinte per materiale sono l'ombra e la luce; il renderer ci sta in
-   mezzo con la lampada e il cielo. Da qui si ricolorano le auto senza toccare
-   una riga di TypeScript. */
+   Resta il vuoto attorno al modello, che è l'unica cosa che il CSS deve
+   ancora dire: quanto è grande il palco e come si comporta sotto il dito. */
 .sb-garage-wrap { margin-top: 2rem; }
 .sb-garage {
-  --gar-body-lo: #6f7a80;
-  --gar-body-hi: #eef1f3;
-  --gar-glass-lo: #1f6b4f;
-  --gar-glass-hi: #6fd6ab;
-  --gar-tyre-lo: #1e2225;
-  --gar-tyre-hi: #6a7275;
-  --gar-rim-lo: #7c868b;
-  --gar-rim-hi: #f6f8f9;
-
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-}
-html.dark .sb-garage {
-  /* Al buio la creta non si schiarisce: si abbassa tutta. Un'auto chiara come
-     nel tema chiaro, su una card #1c1c1c, sembrerebbe accesa da dentro. */
-  --gar-body-lo: #23282b;
-  --gar-body-hi: #8d979d;
-  --gar-glass-lo: #12402f;
-  --gar-glass-hi: #46c795;
-  --gar-tyre-lo: #101315;
-  --gar-tyre-hi: #4a5154;
-  --gar-rim-lo: #3c4245;
-  --gar-rim-hi: #c3cbcf;
 }
 @media (min-width: 640px) { .sb-garage { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1024px) { .sb-garage { grid-template-columns: repeat(3, 1fr); } }
