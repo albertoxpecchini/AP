@@ -230,12 +230,21 @@ export function readFbx(path, car) {
       if (!/Diffuse/i.test(String(prop))) continue;
       if (textures.has(child)) { tex = textures.get(child); break; }
     }
+    // Lucentezza: quanto riflette (SpecularFactor × SpecularColor) e quanto
+    // stretto è il riflesso (ShininessExponent). Questo file li ha davvero;
+    // gli altri due modelli quasi no — il ripiego sta in build-cars.mjs.
+    const specF = prop70(m, "SpecularFactor");
+    const specC = prop70(m, "SpecularColor");
+    const shin = prop70(m, "ShininessExponent") || prop70(m, "Shininess");
+    const sc = specC ? Math.max(...vec3(specC)) : 1;
     materials.set(m.props[0], matList.length);
     matList.push({
       name,
       tex,
       color: diff ? vec3(diff) : [0.8, 0.8, 0.8],
       alpha: opac ? (opac[4] ?? 1) : 1,
+      spec: (specF ? (specF[4] ?? 1) : 1) * sc,
+      gloss: shin ? (shin[4] ?? 0) : 0,
     });
   }
 

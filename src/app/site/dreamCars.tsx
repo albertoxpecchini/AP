@@ -101,6 +101,7 @@ const CARS: CarSpec[] = [
        u8 lunghezza-nome, nome ascii
        u32 vertici, u32 indici, f32 scala UV, u8 byte-per-indice, u8 materiali
        per materiale: u8 texture (255 = nessuna), u8 r, g, b, a,
+                      u8 riflesso, u8 durezza del riflesso,
                       u32 primo indice, u32 quanti
      riempimento a multiplo di 4
      per auto, nello stesso ordine:
@@ -120,7 +121,15 @@ const CARS: CarSpec[] = [
 /** Decimi di millimetro → metri. Lo stesso valore sta nel convertitore. */
 const QS = 1e-4;
 
-type Draw = { tex: number; color: [number, number, number, number]; first: number; count: number };
+type Draw = {
+  tex: number;
+  color: [number, number, number, number];
+  /** Quanto riflette e quanto stretto è il riflesso. */
+  spec: number;
+  gloss: number;
+  first: number;
+  count: number;
+};
 type Raw = {
   pos: ArrayBuffer;
   nrm: ArrayBuffer;
@@ -159,8 +168,15 @@ function decode(buf: ArrayBuffer): Map<string, Raw> {
         dv.getUint8(p + 3) / 255,
         dv.getUint8(p + 4) / 255,
       ];
-      draws.push({ tex, color, first: dv.getUint32(p + 5, true), count: dv.getUint32(p + 9, true) });
-      p += 13;
+      draws.push({
+        tex,
+        color,
+        spec: dv.getUint8(p + 5) / 255,
+        gloss: dv.getUint8(p + 6),
+        first: dv.getUint32(p + 7, true),
+        count: dv.getUint32(p + 11, true),
+      });
+      p += 15;
     }
     dir.push({ id, nVert, nIdx, uvScale, wide, draws });
   }
@@ -275,12 +291,18 @@ uniform mat4 uRot;
 uniform float uQS;
 uniform float uUvScale;
 uniform float uPivot;
+uniform float uDist;
 varying vec3 vN;
+varying vec3 vPos;
 varying vec2 vUv;
 void main() {
   vec3 p = vec3(aPos.x * uQS, aPos.y * uQS - uPivot, aPos.z * uQS);
   gl_Position = uMVP * vec4(p, 1.0);
   vN = mat3(uRot) * aNrm;
+  // Posizione negli assi della camera: serve al riflesso, che dipende da DOVE
+  // si guarda il punto e non solo da come è girato. La camera è ferma e ruota
+  // il modello, quindi basta la rotazione più l'allontanamento.
+  vPos = mat3(uRot) * p - vec3(0.0, 0.0, uDist);
   vUv = aUv * uUvScale;
 }`;
 
@@ -290,18 +312,57 @@ uniform sampler2D uTex;
 uniform float uHasTex;
 uniform vec4 uColor;
 uniform vec3 uLight;
+uniform float uSpec;
+uniform float uGloss;
 varying vec3 vN;
+varying vec3 vPos;
 varying vec2 vUv;
 void main() {
   vec4 tex = texture2D(uTex, vUv);
   vec3 base = mix(vec3(1.0), tex.rgb, uHasTex) * uColor.rgb;
   float alpha = mix(1.0, tex.a, uHasTex) * uColor.a;
   if (alpha < 0.02) discard;
+
   vec3 n = normalize(vN);
   if (!gl_FrontFacing) n = -n;
+  vec3 v = normalize(-vPos);
+
   float lam = max(dot(n, uLight), 0.0);
   float sky = 0.5 + 0.5 * n.y;
-  gl_FragColor = vec4(base * (0.55 + 0.30 * lam + 0.15 * sky), alpha);
+  vec3 col = base * (0.55 + 0.30 * lam + 0.15 * sky);
+
+  // ── Il riflesso ──────────────────────────────────────────────────────────
+  // Due pezzi, perché una carrozzeria fa due cose diverse.
+  //
+  // ① La lampada: il punto di luce vero e proprio, stretto. Half-vector fra
+  //    luce e sguardo (Blinn), che è il modo economico di dire "questo punto
+  //    rimanda la lampada dritta nell'occhio".
+  vec3 h = normalize(uLight + v);
+  float spot = pow(max(dot(n, h), 0.0), max(uGloss, 4.0));
+
+  // ② Lo studio: la lamiera lucida non riflette solo la lampada, riflette la
+  //    stanza — chiaro sopra, scuro sotto. Si prende la direzione riflessa
+  //    dello sguardo e si guarda se punta in su. È quel che fa leggere una
+  //    fiancata come verniciata invece che come plastica colorata, e costa
+  //    una reflect().
+  vec3 r = reflect(-v, n);
+  float room = smoothstep(-0.35, 0.75, r.y);
+
+  // Fresnel: di taglio TUTTO riflette di più, anche la vernice opaca. Senza,
+  // i fianchi dell'auto restano piatti proprio dove dovrebbero accendersi.
+  float fres = pow(1.0 - max(dot(n, v), 0.0), 4.0);
+
+  // Il riflesso si SOMMA al colore, quindi va tenuto corto: troppo, e la
+  // vernice sbianca invece di lucidarsi. La stanza pesa un quinto della
+  // lampada, e quasi tutta di taglio.
+  // Il trasparente si MESCOLA alla vernice, non ci si somma sopra: sommare
+  // sbianca il rosso invece di lucidarlo. Quanto pesa lo dice Fresnel — poco
+  // di faccia, molto di taglio, che è come si comporta una lamiera verniciata.
+  float coat = uSpec * (0.22 + 0.90 * fres);
+  col = mix(col, vec3(0.93, 0.95, 0.98) * (0.26 + 0.74 * room), clamp(coat, 0.0, 0.6));
+  // La lampada, invece, si somma: è luce che arriva, non stanza che si specchia.
+  col += uSpec * spot * 2.2;
+  gl_FragColor = vec4(col, alpha);
 }`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -374,9 +435,11 @@ function makeGpu(cv: HTMLCanvasElement, carId: string, raw: Raw, onTexture: () =
 
   const u = (n: string) => gl.getUniformLocation(prog, n);
   const uMVP = u("uMVP"), uRot = u("uRot"), uHasTex = u("uHasTex"), uColor = u("uColor");
+  const uSpec = u("uSpec"), uGloss = u("uGloss");
   gl.uniform1f(u("uQS"), QS);
   gl.uniform1f(u("uUvScale"), raw.uvScale);
   gl.uniform1f(u("uPivot"), raw.pivot);
+  gl.uniform1f(u("uDist"), DIST);
   gl.uniform1i(u("uTex"), 0);
   const l = Math.hypot(LIGHT[0], LIGHT[1], LIGHT[2]);
   gl.uniform3f(u("uLight"), LIGHT[0] / l, LIGHT[1] / l, LIGHT[2] / l);
@@ -450,6 +513,8 @@ function makeGpu(cv: HTMLCanvasElement, carId: string, raw: Raw, onTexture: () =
         gl.bindTexture(gl.TEXTURE_2D, (d.tex !== 255 && texes.get(d.tex)) || blank);
         gl.uniform1f(uHasTex, d.tex !== 255 && texes.has(d.tex) ? 1 : 0);
         gl.uniform4fv(uColor, d.color);
+        gl.uniform1f(uSpec, d.spec);
+        gl.uniform1f(uGloss, d.gloss);
         gl.drawElements(gl.TRIANGLES, d.count, idxType, d.first * idxBytes);
       }
       if (blending) { gl.disable(gl.BLEND); gl.depthMask(true); }

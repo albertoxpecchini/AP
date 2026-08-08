@@ -81,7 +81,7 @@ function readMtl(path) {
   for (const line of readFileSync(path, "utf8").split("\n")) {
     const t = line.trim();
     if (t.startsWith("newmtl ")) {
-      cur = { name: t.slice(7).trim(), tex: null, color: [0.8, 0.8, 0.8], alpha: 1 };
+      cur = { name: t.slice(7).trim(), tex: null, color: [0.8, 0.8, 0.8], alpha: 1, spec: 0, gloss: 0 };
       out.set(cur.name, cur);
     } else if (!cur) continue;
     else if (t.startsWith("map_Kd ")) {
@@ -91,7 +91,11 @@ function readMtl(path) {
     } else if (/^Kd\s/.test(t)) {
       const p = t.split(/\s+/);
       cur.color = [+p[1], +p[2], +p[3]];
-    } else if (/^d\s/.test(t)) cur.alpha = parseFloat(t.slice(2));
+    } else if (/^Ks\s/.test(t)) {
+      const p = t.split(/\s+/);
+      cur.spec = Math.max(+p[1], +p[2], +p[3]);
+    } else if (/^Ns\s/.test(t)) cur.gloss = parseFloat(t.slice(3));
+    else if (/^d\s/.test(t)) cur.alpha = parseFloat(t.slice(2));
     else if (/^Tr\s/.test(t)) cur.alpha = 1 - parseFloat(t.slice(3));
   }
   return out;
@@ -112,7 +116,7 @@ function readObj(path) {
     if (i === undefined) {
       i = matList.length;
       matIndex.set(name, i);
-      matList.push(mtl.get(name) ?? { name, tex: null, color: [0.8, 0.8, 0.8], alpha: 1 });
+      matList.push(mtl.get(name) ?? { name, tex: null, color: [0.8, 0.8, 0.8], alpha: 1, spec: 0, gloss: 0 });
     }
     mat = i;
   };
@@ -311,6 +315,8 @@ function pack(cars) {
       head.push(d.texId < 0 ? 255 : d.texId);
       head.push(Math.round(d.color[0] * 255), Math.round(d.color[1] * 255), Math.round(d.color[2] * 255));
       head.push(Math.round(d.alpha * 255));
+      head.push(Math.round(Math.min(1, d.spec) * 255));
+      head.push(Math.round(d.gloss));
       p32(head, d.first);
       p32(head, d.count);
     }
@@ -384,6 +390,29 @@ for (const car of CARS) {
     d.texId = mm.texId ?? -1;
     d.color = mm.color;
     d.alpha = mm.alpha;
+    /* Lucentezza. Si prende quella del materiale, con un pavimento: due dei
+       tre esportatori hanno lasciato Ns a 0 e Ks a 0,06 su TUTTO, verniciatura
+       compresa. Preso alla lettera vorrebbe dire una carrozzeria opaca come
+       il cartone — e un riflesso sulla carrozzeria è esattamente quel che
+       serve. Il vetro invece riflette più della lamiera, e più stretto. */
+    const glassy = mm.alpha < 1;
+    /* Il tetto conta quanto il pavimento: l'FBX dell'Aventador dichiara
+       speculare 1,0 su tutta la carrozzeria, e un riflesso additivo a quella
+       forza non lascia più vedere il colore — il rosso scuro diventava rosa. */
+    d.spec = Math.min(glassy ? 0.6 : 0.42, Math.max(mm.spec || 0, glassy ? 0.5 : 0.3));
+    /* La DUREZZA del riflesso va tenuta in un intervallo che si veda alla
+       misura in cui l'auto viene disegnata. I sorgenti dichiarano 202
+       (Aventador) e 255 (R8): a quegli esponenti il riflesso è largo come uno
+       spillo, e su una card da trecento pixel semplicemente non c'è. Fra 16 e
+       70 la lampada si legge come una lampada. */
+    const src = mm.gloss > 1 ? mm.gloss : glassy ? 110 : 34;
+    d.gloss = glassy ? Math.max(60, Math.min(130, src)) : Math.max(14, Math.min(46, src));
+    // Gomme, tappeti e plastiche interne non specchiano: se le si lascia
+    // lucide, un battistrada in controluce diventa cromato.
+    if (/tyre|tire|rubber|carpet|interior|seat|cloth|felt/i.test(mm.name || "")) {
+      d.spec = Math.min(d.spec, 0.06);
+      d.gloss = 12;
+    }
   }
   /* I materiali trasparenti vanno disegnati DOPO gli opachi, altrimenti il
      buffer di profondità nasconde quel che si dovrebbe vedere attraverso. */
