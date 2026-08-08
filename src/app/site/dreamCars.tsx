@@ -57,6 +57,14 @@ type CarSpec = {
   power: string;
   size: string;
   aria: string;
+  /** Mezzo giro sul posto, per il modello che arriva col muso dall'altra parte.
+   *  Chi mette in scena l'auto è scripts/build-cars.mjs, e il verso lo INDOVINA
+   *  (dov'è l'abitacolo, dov'è più bassa); sull'R8 indovina male. Si corregge
+   *  qui perché i sorgenti dei modelli non stanno in repository e il .bin non si
+   *  può rigenerare — vedi public/models/README.md. È una rotazione attorno
+   *  all'asse verticale dell'auto, non uno specchio: l'auto gira, e le scritte
+   *  sulla fiancata continuano a leggersi dal verso giusto. */
+  flip?: boolean;
 };
 
 const CARS: CarSpec[] = [
@@ -89,6 +97,7 @@ const CARS: CarSpec[] = [
     size: "4426 × 1904 × 1252 mm",
     aria:
       "Three-dimensional model of an Audi R8 V10. Drag it, or use the arrow keys, to turn it in any direction.",
+    flip: true,
   },
 ];
 
@@ -539,10 +548,15 @@ function motionOK() {
   return typeof window !== "undefined" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** La posa di partenza: tre quarti anteriore, visto da in piedi. */
-function restPose(): M4 {
+/** La posa di partenza: tre quarti anteriore, visto da in piedi.
+ *
+ *  Il mezzo giro di `flip` si somma all'imbardata, PRIMA del beccheggio: due
+ *  rotazioni attorno allo stesso asse si sommano, quindi sommarlo qui equivale a
+ *  far girare l'auto sul suo asse verticale — che è quel che si vuole. Girarla
+ *  dopo, con l'auto già inclinata, la ribalterebbe: si vedrebbe da sotto. */
+function restPose(flip: boolean): M4 {
   const m = m4();
-  spin(m, 1, -0.62);
+  spin(m, 1, -0.62 + (flip ? Math.PI : 0));
   spin(m, 0, 0.2);
   return m;
 }
@@ -571,7 +585,7 @@ function CarModel({ car, index }: { car: CarSpec; index: number }) {
           return;
         }
         setState("ok");
-        const m = mount(stage, cv, gpu, index);
+        const m = mount(stage, cv, gpu, index, car.flip === true);
         repaint = m.repaint;
         cleanup = m.stop;
       })
@@ -633,12 +647,12 @@ function CarModel({ car, index }: { car: CarSpec; index: number }) {
 }
 
 /** Misura, gesto e ciclo di rendering: nascono e muoiono insieme. */
-function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: number) {
+function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: number, flip: boolean) {
   let w = 0;
   let h = 0;
   const anim = motionOK();
 
-  const rot = restPose();
+  const rot = restPose(flip);
   let intro = anim ? 0.95 : 0;
   if (intro) spin(rot, 1, intro);
 

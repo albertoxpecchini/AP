@@ -57,6 +57,12 @@ const CARS = [
   },
   {
     id: "audir8",
+    // Attenzione: su questo modello pose() sbaglia a indovinare da che parte sta
+    // il muso, e l'auto esce girata al contrario. Nel .bin in repository c'è
+    // ancora così, e a rimetterla dritta è il `flip` in src/app/site/dreamCars.tsx
+    // (mezzo giro sull'asse verticale). Se un giorno si rigenera con i sorgenti
+    // in mano: prima si guarda come viene, e o si sistema qui o si toglie il
+    // `flip` — non tutti e due, o l'auto torna al contrario.
     file: "audi/m/2008 audi r8.obj",
     format: "obj",
     length: 4.426,
