@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "prebuild": "node scripts/build-zips.mjs && node scripts/build-repo-tree.mjs && node scripts/build-i18n.mjs",
+    "prebuild": "node scripts/build-trivia-version.mjs && node scripts/build-zips.mjs && node scripts/build-repo-tree.mjs && node scripts/build-i18n.mjs",
     "build": "vite build",
-    "predev": "node scripts/build-i18n.mjs",
+    "predev": "node scripts/build-trivia-version.mjs && node scripts/build-i18n.mjs",
     "dev": "vite",
     "zips": "node scripts/build-zips.mjs",
     "repo-tree": "node scripts/build-repo-tree.mjs",

@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { execSync } from 'child_process'
+import { readFileSync } from 'fs'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -13,14 +14,18 @@ import { VitePWA } from 'vite-plugin-pwa'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Versione del gioco Trivia = 1.<numero di commit che toccano src/app/trivia/>.
-// Calcolata a build-time (anche in dev) così si aggiorna da sola ad ogni deploy.
-// Se git non è disponibile (es. ambiente di build esotico) ripiega su 1.0.
+// Il conteggio NON si fa qui: lo fa scripts/build-trivia-version.mjs, che gira
+// in prebuild e lo deposita in version.json — un file versionato, che quindi
+// arriva identico ovunque. Qui si legge e basta.
+//
+// Prima questa funzione contava i commit al volo, e il numero dipendeva da
+// quanta storia aveva il builder: Vercel clona in shallow, e lo stesso codice
+// diceva "v1.56" in locale e "v1.2" in produzione (il dettaglio sta nello
+// script). Se il file manca, 1.0.
 function triviaVersion(): string {
   try {
-    const n = execSync('git rev-list --count HEAD -- src/app/trivia/', {
-      encoding: 'utf8',
-    }).trim()
-    return `1.${n || '0'}`
+    const raw = readFileSync(path.join(__dirname, 'src/app/trivia/version.json'), 'utf8')
+    return `1.${Number(JSON.parse(raw).commits) || '0'}`
   } catch {
     return '1.0'
   }
