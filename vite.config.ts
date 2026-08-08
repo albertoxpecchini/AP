@@ -368,6 +368,17 @@ export default defineConfig({
     },
   },
 
+  // ── Dipendenze da pre-impacchettare all'avvio ───────────────────────────────
+  // Queste tre stanno SOLO dentro pagine caricate a richiesta (canvas-confetti
+  // in /trivia, maplibre-gl nelle mappe, il menù contestuale in /archivio).
+  // Vite le scopriva quindi tardi, al primo ingresso nella pagina: ri-ottimizzava
+  // le dipendenze a server acceso e il chunk già chiesto dal browser diventava
+  // un 504 "Outdated Optimize Dep" → pagina bianca (vedi lazyPage in main.tsx).
+  // Dichiarandole qui, sono pronte prima che il browser le chieda.
+  optimizeDeps: {
+    include: ['canvas-confetti', 'maplibre-gl', '@radix-ui/react-context-menu'],
+  },
+
   define: {
     // Esposta al client come stringa, es. "1.37".
     __TRIVIA_VERSION__: JSON.stringify(triviaVersion()),

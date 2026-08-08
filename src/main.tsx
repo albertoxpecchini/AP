@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ComponentType } from "react";
+import { Component, lazy, Suspense, type ComponentType, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -23,20 +23,91 @@ syncTheme();
 // Lingua globale: imposta <html lang> col valore memorizzato/rilevato.
 initLangAttr();
 
-const Bio = lazy(() => import("./app/site/Bio.tsx"));
-const Cv = lazy(() => import("./app/cv/Cv.tsx"));
-const Trivia = lazy(() => import("./app/trivia/Trivia.tsx"));
-const Pcto = lazy(() => import("./app/pcto/Pcto.tsx"));
-const MeStesso = lazy(() => import("./app/me-stesso/MeStesso.tsx"));
-const Dubliners = lazy(() => import("./app/dubliners/Dubliners.tsx"));
-const Gattopardo = lazy(() => import("./app/gattopardo/Gattopardo.tsx"));
-const Festa = lazy(() => import("./app/festa/Festa.tsx"));
-const Mima = lazy(() => import("./app/mima/Mima.tsx"));
-const MimaVeicoli = lazy(() => import("./app/mima/Veicoli.tsx"));
-const MimaLuoghi = lazy(() => import("./app/mima/Luoghi.tsx"));
-const Archivio = lazy(() => import("./app/archivio/Archivio.tsx"));
-const Sostieni = lazy(() => import("./app/sostieni/Sostieni.tsx"));
-const Instagram = lazy(() => import("./app/instagram/Instagram.tsx"));
+// ── Pagine caricate a richiesta, con rete di sicurezza ──────────────────────
+//
+// Ogni pagina è un chunk a parte, scaricato al primo ingresso. Se quel
+// download fallisce, `lazy` propaga l'errore: senza error boundary il
+// <Suspense fallback={null}> qui sotto rende NIENTE, cioè pagina bianca — il
+// gioco sembra "rotto" pur essendo intatto. Succede in due casi reali:
+//
+//  ① in sviluppo, quando Vite ri-ottimizza le dipendenze mentre il server è
+//     acceso: il vecchio /node_modules/.vite/deps/<dep>.js?v=<hash> risponde
+//     504 "Outdated Optimize Dep" e l'import della pagina muore con lui
+//     (capitava a /trivia, l'unica che importa canvas-confetti);
+//  ② in produzione dopo un deploy: una scheda aperta — o il service worker col
+//     vecchio index.html in precache — chiede un chunk il cui hash non esiste
+//     più sul CDN.
+//
+// In entrambi i casi il codice della pagina va benissimo: è il file servito a
+// non esserci. E non serve richiederlo una seconda volta: quando il fetch di un
+// modulo fallisce, il browser segna QUELL'URL come errato nella module map e a
+// ogni import successivo restituisce lo stesso errore senza più uscire in rete
+// (verificato: il secondo import non genera alcuna richiesta). L'unico modo di
+// tornare in pari è ricaricare la pagina, che riparte da un index.html fresco —
+// con i nomi dei chunk aggiornati e, grazie a `registerType: 'autoUpdate'`, col
+// service worker nuovo al posto di quello che teneva in cache il vecchio indice.
+//
+// Il ricaricamento si fa UNA sola volta per pagina e per sessione: la guardia in
+// sessionStorage evita il loop se il file manca davvero. Esaurito il tentativo,
+// l'errore risale a <PageBoundary>, che mostra un messaggio invece del vuoto.
+function lazyPage(name: string, load: () => Promise<{ default: ComponentType<any> }>) {
+  return lazy(async () => {
+    try {
+      return await load();
+    } catch (err) {
+      const key = `reload-chunk-${name}`;
+      let already = true;
+      try {
+        already = sessionStorage.getItem(key) === "1";
+        if (!already) sessionStorage.setItem(key, "1");
+      } catch { already = true; } // niente sessionStorage → niente ricaricamento
+      if (already) throw err;
+      location.reload();
+      // Promise che non si risolve mai: la pagina sta già andando via, così
+      // nel frattempo non compare né l'errore né un mezzo render.
+      return await new Promise<never>(() => {});
+    }
+  });
+}
+
+// Rete di sicurezza finale: se perfino dopo il ricaricamento la pagina non si
+// carica, meglio dirlo che restare bianchi. Niente dipendenze, niente stile del
+// sito (potrebbe non essere arrivato nemmeno quello): solo il minimo leggibile.
+class PageBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <div style={{ minHeight: "100vh", display: "grid", placeContent: "center", gap: 16, padding: 24, textAlign: "center", font: "16px/1.5 system-ui, sans-serif" }}>
+        <p style={{ margin: 0 }}>Non è stato possibile caricare questa pagina.</p>
+        <p style={{ margin: 0, opacity: 0.7 }}>Controlla la connessione e riprova.</p>
+        <button
+          type="button"
+          onClick={() => { try { sessionStorage.clear(); } catch {} location.reload(); }}
+          style={{ justifySelf: "center", padding: "8px 18px", borderRadius: 6, border: "1px solid currentColor", background: "transparent", color: "inherit", font: "inherit", cursor: "pointer" }}
+        >
+          Riprova
+        </button>
+      </div>
+    );
+  }
+}
+
+const Bio = lazyPage("bio", () => import("./app/site/Bio.tsx"));
+const Cv = lazyPage("cv", () => import("./app/cv/Cv.tsx"));
+const Trivia = lazyPage("trivia", () => import("./app/trivia/Trivia.tsx"));
+const Pcto = lazyPage("pcto", () => import("./app/pcto/Pcto.tsx"));
+const MeStesso = lazyPage("me-stesso", () => import("./app/me-stesso/MeStesso.tsx"));
+const Dubliners = lazyPage("dubliners", () => import("./app/dubliners/Dubliners.tsx"));
+const Gattopardo = lazyPage("gattopardo", () => import("./app/gattopardo/Gattopardo.tsx"));
+const Festa = lazyPage("festa", () => import("./app/festa/Festa.tsx"));
+const Mima = lazyPage("mima", () => import("./app/mima/Mima.tsx"));
+const MimaVeicoli = lazyPage("mima-veicoli", () => import("./app/mima/Veicoli.tsx"));
+const MimaLuoghi = lazyPage("mima-luoghi", () => import("./app/mima/Luoghi.tsx"));
+const Archivio = lazyPage("archivio", () => import("./app/archivio/Archivio.tsx"));
+const Sostieni = lazyPage("sostieni", () => import("./app/sostieni/Sostieni.tsx"));
+const Instagram = lazyPage("instagram", () => import("./app/instagram/Instagram.tsx"));
 
 // ── Sottodomini canonici ──────────────────────────────────────────────────────
 // Se siamo su <pagina>.albertopecchini.it, serviamo DIRETTAMENTE quella pagina
@@ -58,6 +129,7 @@ const SubPage = subPath ? SUBDOMAIN_PAGE[subPath] : null;
 
 createRoot(document.getElementById("root")!).render(
   <>
+    <PageBoundary>
     <BrowserRouter>
     {SubPage ? (
       <Routes>
@@ -182,6 +254,7 @@ createRoot(document.getElementById("root")!).render(
     </Routes>
     )}
     </BrowserRouter>
+    </PageBoundary>
     {/* Barra di controllo globale — un'unica pillola in basso a sinistra:
         lingua · tema · sensore orario. Presente su ogni pagina. Sta
         rincantucciata oltre il bordo ed esce dal lato quando ci si avvicina. */}
