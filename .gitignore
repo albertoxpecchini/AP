@@ -36,3 +36,6 @@ yarn-error.log*
 
 # Bozze email generate (dati dei destinatari): mai committarle
 email/bozze/
+
+# Quarantena e storico del programma di pulizia
+.janitor/

@@ -460,6 +460,139 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron.
 | `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
 | `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
+| `npm run pulizia` | Cerca lo sporco e misura, **senza toccare niente** |
+| `npm run pulizia:applica` | Pulisce, verifica con build + benchmark, annulla da solo se qualcosa peggiora |
+| `npm run bench` | Solo benchmark: build, peso, fotogrammi — confrontati con l'ultima volta |
+| `npm run pulizia:prove` | Le prove di sicurezza del programma di pulizia (pianta file veri e controlla cosa decide) |
+
+---
+
+## 🧹 Pulizia e benchmark — `scripts/janitor/`
+
+Un programma locale che ogni due giorni toglie il peso morto dal repo e **dimostra** di non
+aver rotto niente. Non è un `rm -rf` con un cron davanti: la parte interessante è tutta nel
+come si assicura di poter girare da solo senza sorveglianza.
+
+**Niente viene cancellato.** Quello che sembra inutile finisce in `.janitor/quarantena/<data>/`
+con i percorsi originali intatti, poi la build gira davvero, poi un browser vero apre le pagine
+davvero. Se la build non passa, o se compare un 404 che prima non c'era, o un errore in console
+che prima non c'era, **tutto torna al suo posto da solo**. Il caso peggiore di un'esecuzione
+automatica è un log che dice "annullato". Solo le quarantene sopravvissute a due settimane di
+sito funzionante vengono svuotate per davvero.
+
+**Cosa cerca** — sei categorie, e nel dubbio non è sporco:
+
+| | Cosa | Come lo decide |
+| :--- | :--- | :--- |
+| 1 | Rigenerabili | `dist`, cache di Vite, log: già in `.gitignore` e ricostruiti da uno script dichiarato in `package.json` |
+| 2 | Moduli orfani in `src/` | Irraggiungibili dal grafo degli import **e** mai nominati in nessun testo del repo — due prove indipendenti |
+| 3 | Asset mai nominati in `public/` | Nessun file cita il percorso né il nome |
+| 4 | Dipendenze mai importate | Nessun `import`, nessuna menzione |
+| 5 | Duplicati esatti | Stesso SHA-1 in due percorsi — **solo segnalati**: quale sia quello buono non lo può sapere il programma |
+| 6 | Git | `git gc`, rami già confluiti in `main` |
+
+Le radici del grafo sono larghe di proposito (`index.html`, ogni file in `api/`, ogni script,
+`vite.config.ts`): una radice dimenticata renderebbe "orfano" un ramo di codice vivo. E le
+cartelle indirizzate a runtime — `/emoji/`, `/models/tex/`, `/zips/${slug}` — sono protette in
+blocco, perché il loro contenuto non compare mai per esteso nel codice e cercarlo per nome darebbe
+zero riscontri su file usatissimi.
+
+**L'ordine conta.** I rigenerabili si tolgono **dopo** la verifica, non prima: messi all'inizio,
+la build di verifica li ricreava tutti e il bilancio finale diceva onestamente `+0.0 MB`. Tolti
+alla fine, la verifica è comunque avvenuta su un albero completo e lo spazio resta libero davvero.
+Restano invece al loro posto `public/zips`, `repo-tree.json` e i pacchetti i18n (~440 kB): li rifà
+il `prebuild`, che gira su `npm run build` ma **non** su `npm run dev`, e portarli via ogni due
+giorni vorrebbe dire trovare `/archivio` senza ZIP da scaricare. Con `--tutto` se ne vanno anche
+quelli. Il bilancio distingue sempre il risparmio **definitivo** (git, file del progetto) da
+`dist` e cache, che tornano alla prima ricostruzione: spazio prestato, non guadagnato.
+
+**La storia git non si riscrive mai.** `git gc` compatta e basta: servirebbe un push forzato, e un
+push forzato automatico ogni due giorni è esattamente il modo di rompere tutto.
+
+### Il benchmark
+
+Un browser vero (Edge, via Chrome DevTools Protocol) apre le pagine costruite, le scorre tutte giù
+e tutte su, e cronometra ogni singolo fotogramma. **Zero dipendenze aggiunte**: sarebbe assurdo
+installare quaranta megabyte di Playwright dentro il programma che serve a togliere peso — Node ha
+`WebSocket` di suo, e il protocollo si parla direttamente.
+
+Si misura **due volte**, perché rispondono a due domande diverse:
+
+- **a piena potenza** → "su questo computer siamo a 60?"
+- **con la CPU 4× più lenta** → "e su un telefono di fascia media? e se domani qualcosa peggiora,
+  me ne accorgo?"
+
+La seconda non è un vezzo. Senza freno la misura **satura**: il browser non disegna oltre ~160 fps,
+e una pagina vuota segna gli stessi fps di una pagina piena — verificato, `about:blank` fa 154.
+Tutto ciò che costa meno di ~6 ms a fotogramma finisce appiattito sullo stesso numero, e un
+peggioramento del 50% resterebbe invisibile. È quindi la passata frenata quella su cui si fa il
+confronto nel tempo, ed è l'unica che sappia distinguere.
+
+Ogni pagina si misura più volte e si tiene la **mediana**: una passata sola, su una macchina che
+nel frattempo fa altro, racconta il rumore e non il sito. Le misure si accumulano in
+`.janitor/bench/`, così il peggioramento lento si vede il giorno stesso e non fra sei mesi.
+
+### Ogni due giorni, da solo
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1            # registra
+powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1 -Ora 09:30 # a un'altra ora
+powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1 -Stato     # com'è andata
+powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1 -Rimuovi   # toglilo
+```
+
+Compito dell'utente, non di sistema: niente diritti di amministratore, niente password da
+conservare. Finestra del browser invisibile, log in `.janitor/log/` (si tengono gli ultimi 20).
+Se il computer era spento a quell'ora recupera al primo avvio utile.
+
+I numeri di un'esecuzione automatica **non** sono confrontabili con quelli di `npm run bench`
+lanciato a mano: l'Utilità di pianificazione fa girare i compiti a priorità ridotta, e il browser
+misura mentre il resto del computer lavora. Il confronto prima/dopo dentro la stessa esecuzione
+resta valido — le due misure girano nello stesso turno, nelle stesse condizioni — ed è quello che
+decide se la pulizia si tiene.
+
+<details>
+<summary><strong>Cinque trappole di Windows</strong> — costate care, tutte con lo stesso sintomo: "sembra che non faccia niente"</summary>
+
+- **`.ps1` senza BOM.** PowerShell 5.1 legge i file senza BOM come ANSI. Il trattino lungo `—`
+  (UTF-8 `E2 80 94`) diventa `â€"`, e quell'ultimo carattere è una virgoletta tipografica che
+  PowerShell accetta come delimitatore di stringa: le virgolette vanno in disequilibrio e lo
+  script muore segnalando una riga che non c'entra niente. I due `.ps1` vanno tenuti **UTF-8 con
+  BOM**.
+- **`*>&1` con `$ErrorActionPreference = 'Stop'`.** PowerShell incapsula ogni riga di stderr di un
+  programma esterno in un `NativeCommandError`, che con `Stop` è un errore *terminante*: il
+  compito moriva a metà log pur essendo andato tutto bene. Si redirige a livello di processo, con
+  `Start-Process -RedirectStandardOutput`.
+- **`Start-Process -Wait` aspetta l'albero, non il processo.** Il benchmark apre un browser: un
+  solo processo di Edge rimasto indietro teneva il compito "In esecuzione" a tempo indeterminato,
+  con node già uscito e il log completo. Serve `$proc.WaitForExit()`, che guarda solo il processo
+  lanciato — e dall'altra parte `taskkill /T` per non lasciare indietro nessuno.
+- **Codepage OEM.** L'uscita UTF-8 di node, catturata da PowerShell, veniva decodificata con la
+  codepage della console: nel log `già` diventava `gi├á`. Risolta anche questa redirigendo a
+  livello di processo. I colori ANSI, poi, in un file sono solo rumore: il programma li mette solo
+  se dall'altra parte c'è un terminale vero.
+- **`.ExitCode` vuoto senza `.Handle`.** `Start-Process -PassThru` senza `-Wait` restituisce un
+  oggetto `Process` che non conserva l'handle nativo: a processo finito `.ExitCode` torna vuoto e
+  un fallimento di node passerebbe per riuscito (nel log si leggeva `uscita  ===`). Basta leggere
+  `$null = $proc.Handle` **prima** di aspettare. Verificato: senza, `''`; con, `3`.
+
+</details>
+
+Per rimettere a mano quello che è stato messo da parte: `npm run pulizia:ripristina`
+(o `npm run pulizia:elenco` per vedere le quarantene).
+
+### Che le prove le faccia il programma stesso
+
+`npm run pulizia:prove` pianta file veri nel repo, guarda cosa decide l'analisi e rimette tutto
+com'era. Sei prove, non simmetriche di proposito: due controllano che lo sporco venga **trovato**,
+le altre che il pulito **non** venga toccato — un falso negativo costa qualche kB, un falso
+positivo rompe una pagina.
+
+I nomi dei file piantati sono casuali, e non è un vezzo: scritti per esteso nel file di test
+passavano per il motivo sbagliato. L'analisi cerca il nome di un file in tutto il testo del repo,
+e il file di test fa parte del repo — bastava nominarlo perché venisse dichiarato "citato da
+qualche parte", quindi vivo. La prova sull'orfano falliva e quelle sulla protezione passavano
+senza aver verificato niente.
 
 ---
 

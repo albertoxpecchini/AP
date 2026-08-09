@@ -10,7 +10,14 @@
     "dev": "vite",
     "zips": "node scripts/build-zips.mjs",
     "repo-tree": "node scripts/build-repo-tree.mjs",
-    "i18n": "node scripts/build-i18n.mjs"
+    "i18n": "node scripts/build-i18n.mjs",
+    "preview": "vite preview",
+    "pulizia": "node scripts/janitor/pulisci.mjs",
+    "pulizia:applica": "node scripts/janitor/pulisci.mjs --applica",
+    "pulizia:elenco": "node scripts/janitor/pulisci.mjs --elenco",
+    "pulizia:ripristina": "node scripts/janitor/pulisci.mjs --ripristina ultima",
+    "pulizia:prove": "node scripts/janitor/autotest.mjs",
+    "bench": "node scripts/janitor/bench-cli.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.100.1",
