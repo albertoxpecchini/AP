@@ -43,29 +43,75 @@ initLangAttr();
 // modulo fallisce, il browser segna QUELL'URL come errato nella module map e a
 // ogni import successivo restituisce lo stesso errore senza più uscire in rete
 // (verificato: il secondo import non genera alcuna richiesta). L'unico modo di
-// tornare in pari è ricaricare la pagina, che riparte da un index.html fresco —
-// con i nomi dei chunk aggiornati e, grazie a `registerType: 'autoUpdate'`, col
-// service worker nuovo al posto di quello che teneva in cache il vecchio indice.
+// tornare in pari è ricaricare la pagina, che riparte da un index.html fresco.
 //
-// Il ricaricamento si fa UNA sola volta per pagina e per sessione: la guardia in
-// sessionStorage evita il loop se il file manca davvero. Esaurito il tentativo,
+// Il recupero è a DUE tentativi, perché il primo da solo non basta:
+//
+//  ① ricaricare. Risolve il caso ①, e in produzione risolve quando l'index.html
+//     arriva davvero dalla rete.
+//  ② se dopo il ricaricamento siamo ancora qui, il colpevole è in casa: il
+//     service worker sta servendo dalla propria cache lo STESSO index.html
+//     vecchio, quindi la pagina ricaricata richiede gli stessi chunk morti e
+//     fallisce identica. `location.reload()` non scavalca il service worker, e
+//     `cleanupOutdatedCaches` ripulisce il precache ma non `ap-lazy-chunks` —
+//     dove il chunk di Trivia sta in CacheFirst per trenta giorni. L'unica
+//     uscita è togliere di mezzo service worker e cache e ripartire dalla rete.
+//
+// Le guardie stanno in sessionStorage e si AZZERANO appena una pagina si carica:
+// così ogni guasto vero trova i due tentativi interi, invece di trovarli già
+// spesi da un singolo inciampo capitato mezz'ora prima. Esauriti entrambi,
 // l'errore risale a <PageBoundary>, che mostra un messaggio invece del vuoto.
+const PURGE_KEY = "reload-chunk-purge";
+const reloadKey = (name: string) => `reload-chunk-${name}`;
+
+function flag(key: string): boolean {
+  try {
+    if (sessionStorage.getItem(key) === "1") return true;
+    sessionStorage.setItem(key, "1");
+    return false;
+  } catch {
+    return true; // niente sessionStorage → niente ricaricamento, per non ciclare
+  }
+}
+
+// Toglie service worker e cache, poi ricarica. Ultima spiaggia: si paga il
+// riscaricamento della shell, ma solo dopo che un ricaricamento normale ha già
+// fallito — cioè quando la copia locale è dimostrabilmente quella sbagliata.
+async function purgeAndReload() {
+  try {
+    const regs = (await navigator.serviceWorker?.getRegistrations?.()) ?? [];
+    await Promise.all(regs.map((r) => r.unregister()));
+  } catch { /* niente service worker: tanto meglio */ }
+  try {
+    const names = (await caches?.keys?.()) ?? [];
+    await Promise.all(names.map((n) => caches.delete(n)));
+  } catch { /* niente Cache Storage: idem */ }
+  location.reload();
+}
+
 function lazyPage(name: string, load: () => Promise<{ default: ComponentType<any> }>) {
   return lazy(async () => {
     try {
-      return await load();
-    } catch (err) {
-      const key = `reload-chunk-${name}`;
-      let already = true;
+      const mod = await load();
+      // Caricata: i tentativi tornano disponibili per il prossimo guaio vero.
       try {
-        already = sessionStorage.getItem(key) === "1";
-        if (!already) sessionStorage.setItem(key, "1");
-      } catch { already = true; } // niente sessionStorage → niente ricaricamento
-      if (already) throw err;
-      location.reload();
+        sessionStorage.removeItem(reloadKey(name));
+        sessionStorage.removeItem(PURGE_KEY);
+      } catch { /* senza sessionStorage non c'era niente da azzerare */ }
+      return mod;
+    } catch (err) {
       // Promise che non si risolve mai: la pagina sta già andando via, così
       // nel frattempo non compare né l'errore né un mezzo render.
-      return await new Promise<never>(() => {});
+      const leaving = () => new Promise<never>(() => {});
+      if (!flag(reloadKey(name))) {
+        location.reload();
+        return await leaving();
+      }
+      if (!flag(PURGE_KEY)) {
+        void purgeAndReload();
+        return await leaving();
+      }
+      throw err;
     }
   });
 }
@@ -84,7 +130,10 @@ class PageBoundary extends Component<{ children: ReactNode }, { failed: boolean 
         <p style={{ margin: 0, opacity: 0.7 }}>Controlla la connessione e riprova.</p>
         <button
           type="button"
-          onClick={() => { try { sessionStorage.clear(); } catch {} location.reload(); }}
+          // Qui ci si arriva solo dopo che ricaricamento E ripulitura hanno già
+          // fallito: rifare un reload liscio rifarebbe la cosa che non ha
+          // funzionato. Si riparte azzerando tutto, com'è la ripulitura.
+          onClick={() => { try { sessionStorage.clear(); } catch {} void purgeAndReload(); }}
           style={{ justifySelf: "center", padding: "8px 18px", borderRadius: 6, border: "1px solid currentColor", background: "transparent", color: "inherit", font: "inherit", cursor: "pointer" }}
         >
           Riprova
