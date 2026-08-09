@@ -581,26 +581,38 @@ decide se la pulizia si tiene.
 Per rimettere a mano quello che è stato messo da parte: `npm run pulizia:ripristina`
 (o `npm run pulizia:elenco` per vedere le quarantene).
 
-### Dal Prompt dei comandi
+### Da terminale — `pulizia`
 
-Gli `npm run …` funzionano anche da `cmd`, ma sono scomodi da scrivere (e le opzioni vanno
-passate dopo un `--`). Alla radice del repo c'è `pulizia.cmd`, che fa da porta d'ingresso unica:
+Gli `npm run …` funzionano, ma sono scomodi da scrivere (e le opzioni vanno passate dopo un
+`--`). Alla radice del repo c'è `pulizia.cmd`, porta d'ingresso unica:
 
-```bat
-pulizia                     :: guarda e riferisce, non tocca niente
-pulizia applica             :: pulisce, verifica, e se serve annulla da solo
-pulizia bench               :: solo benchmark
-pulizia prove               :: le prove di sicurezza
-pulizia elenco              :: le quarantene esistenti
-pulizia ripristina          :: rimette a posto l'ultima quarantena
-pulizia pianifica           :: registra il compito ogni due giorni
-pulizia togli / pulizia stato
-```
+| | |
+| :--- | :--- |
+| `pulizia` | guarda e riferisce, non tocca niente |
+| `pulizia applica` | pulisce, verifica, e se serve annulla da solo |
+| `pulizia bench` | solo benchmark |
+| `pulizia prove` | le prove di sicurezza |
+| `pulizia elenco` | le quarantene esistenti |
+| `pulizia ripristina` | rimette a posto l'ultima quarantena |
+| `pulizia pianifica` · `togli` · `stato` | il compito ogni due giorni |
 
 Quello che scrivi in più passa dritto al programma — `pulizia applica --tutto --rami`,
 `pulizia bench --veloce --pagine /,/trivia` — e un'opzione da sola vale come analisi, quindi
 `pulizia --niente-bench` fa la cosa che ci si aspetta. Il codice di uscita si propaga, così si
-può incatenare (`pulizia applica && git status`).
+può incatenare.
+
+**PowerShell vuole il `.\`** — `.\pulizia applica` — perché di suo non esegue i file della
+cartella corrente. Non è un difetto: senza quella regola basterebbe entrare in una cartella
+qualsiasi perché un file chiamato come un comando noto venisse eseguito al posto suo. Per
+scrivere `pulizia` e basta, da qualunque cartella, una funzione nel profilo (`$PROFILE`):
+
+```powershell
+function pulizia { & 'C:\Users\pzkko\Documents\AP\pulizia.cmd' @args }
+```
+
+Da `cmd.exe`, invece, `pulizia` funziona già così com'è dalla cartella del repo: il Prompt dei
+comandi cerca anche nella directory corrente. E attenzione a non incollare i commenti insieme al
+comando: `::` è un commento di cmd, in PowerShell diventa un argomento.
 
 Due dettagli che sembrano pignoleria e non lo sono. Il file **deve** avere fine riga CRLF: con
 LF soli, `cmd.exe` legge il file a offset sbagliati, i salti a etichetta atterrano a metà riga e
