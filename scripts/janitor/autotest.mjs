@@ -30,11 +30,81 @@ const RADICE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..
 // quindi vivo — la prova sull'orfano falliva, e quelle sulla protezione
 // passavano senza aver verificato niente. Composto a pezzi, il nome non compare
 // per esteso da nessuna parte e le prove misurano quello che dicono di misurare.
-const TOKEN = '__t' + crypto.randomBytes(5).toString('hex')
-const nomeTest = (prefisso, estensione) => `${prefisso}${TOKEN}${estensione}`
+const MARCHIO = '__prova-janitor-'
+const TOKEN = MARCHIO + crypto.randomBytes(5).toString('hex') + '-'
+const nomeTest = (prefisso, estensione) => `${TOKEN}${prefisso}${estensione}`
+
+// ── Spazzata iniziale ────────────────────────────────────────────────────────
+// Su Windows un processo ucciso da fuori non esegue né `finally` né gli
+// handler dei segnali: SIGTERM non è un vero segnale, il processo viene
+// terminato e basta. E ucciso da fuori succede davvero — /cleaning lancia
+// queste prove come processo figlio e lo ammazza se si chiude la scheda.
+// È già capitato che un file piantato sopravvivesse e finisse dritto in un
+// commit. Quindi non ci si affida al morire con grazia: si pulisce all'inizio
+// quello che una corsa precedente può aver lasciato indietro. Il marchio nel
+// nome li rende riconoscibili senza possibilità di equivoco, ed è anche in
+// .gitignore, così nel frattempo non possono essere committati per sbaglio.
+function spazzaResidui() {
+  const trovati = []
+  const gira = (dir) => {
+    let voci
+    try { voci = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    for (const v of voci) {
+      if (v.name === 'node_modules' || v.name === '.git') continue
+      const p = path.join(dir, v.name)
+      if (v.isDirectory()) gira(p)
+      else if (v.name.includes(MARCHIO)) {
+        try { fs.rmSync(p, { force: true }); trovati.push(path.relative(RADICE, p)) } catch {}
+      }
+    }
+  }
+  gira(RADICE)
+
+  // Una versione precedente di queste prove infilava l'import di prova dentro
+  // src/main.tsx e lo toglieva alla fine: interrotta a metà, lasciava lì un
+  // import verso un file cancellato e l'app non partiva. Adesso non succede più
+  // (la prova 2 pianta una radice usa e getta in scripts/), ma se un repo si
+  // trascina ancora quel danno, qui si ripara da solo invece di lasciare in
+  // giro un errore incomprensibile.
+  const main = path.join(RADICE, 'src/main.tsx')
+  try {
+    const testo = fs.readFileSync(main, 'utf8')
+    if (testo.includes(MARCHIO) || /^import ".\/app\/(orfano|usato|ripristino)__t/m.test(testo)) {
+      const ripulito = testo
+        .split('\n')
+        .filter((r) => !(r.startsWith('import "') && (r.includes(MARCHIO) || /__t[0-9a-f]{10}/.test(r))))
+        .join('\n')
+      fs.writeFileSync(main, ripulito)
+      trovati.push('src/main.tsx (import di prova rimosso)')
+    }
+  } catch {}
+
+  return trovati
+}
 
 let passate = 0
 let fallite = 0
+
+// ── I file piantati devono sparire anche se qualcuno ci stacca la spina ──────
+// `finally` copre l'errore dentro la prova, non il processo ucciso da fuori: e
+// da fuori succede davvero, perché /cleaning lancia queste prove come processo
+// figlio e lo ammazza se si chiude la scheda. È già capitato — un
+// `orfano__<random>.ts` è sopravvissuto a un'interruzione ed è finito
+// dritto in un commit. Qui si tiene il conto di tutto ciò che è stato piantato
+// e lo si toglie anche su SIGTERM/SIGINT.
+const piantatiOra = new Set()
+
+function spazza() {
+  for (const rel of piantatiOra) {
+    try { fs.rmSync(path.join(RADICE, rel), { force: true }) } catch {}
+  }
+  piantatiOra.clear()
+}
+
+for (const segnale of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) {
+  process.on(segnale, () => { spazza(); process.exit(130) })
+}
+process.on('exit', spazza)
 
 function prova(nome, fn) {
   const daPulire = []
@@ -43,6 +113,7 @@ function prova(nome, fn) {
     fs.mkdirSync(path.dirname(p), { recursive: true })
     fs.writeFileSync(p, contenuto)
     daPulire.push(rel)
+    piantatiOra.add(rel)
     return rel
   }
   try {
@@ -57,6 +128,7 @@ function prova(nome, fn) {
     // Il repo deve tornare esattamente com'era, comunque sia andata.
     for (const rel of daPulire) {
       try { fs.rmSync(path.join(RADICE, rel), { force: true }) } catch {}
+      piantatiOra.delete(rel)
     }
   }
 }
@@ -65,6 +137,11 @@ const assert = (cond, messaggio) => { if (!cond) throw new Error(messaggio) }
 const sha = (p) => crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')
 
 console.log(C.forte('\n  Prove di sicurezza del programma di pulizia\n'))
+
+const residui = spazzaResidui()
+if (residui.length) {
+  console.log(C.giallo(`  (tolti ${residui.length} file lasciati da una corsa interrotta)\n`))
+}
 
 // ── 1. Trova un modulo orfano ────────────────────────────────────────────────
 prova('riconosce un modulo che nessuno importa', (pianta) => {
@@ -75,21 +152,25 @@ prova('riconosce un modulo che nessuno importa', (pianta) => {
 
 // ── 2. NON tocca un modulo importato ─────────────────────────────────────────
 prova('lascia stare un modulo che qualcuno importa', (pianta) => {
-  // Piantato E importato da un file già raggiungibile: deve risultare vivo.
+  // Serve un modulo raggiungibile da una radice del grafo. La versione di prima
+  // infilava l'import in cima a src/main.tsx e lo toglieva nel `finally` — e
+  // quando il processo veniva ucciso a metà, in main.tsx restava un import
+  // verso un file appena cancellato: l'app non partiva più. Due interruzioni
+  // ne hanno lasciati due, uno sopra l'altro.
+  //
+  // Adesso non si tocca niente di esistente: si piantano DUE file. Uno sta in
+  // scripts/, che è già una radice del grafo (li invoca npm, non un import), e
+  // importa l'altro. La catena radice → modulo è vera quanto prima, ma vive
+  // tutta dentro roba usa e getta.
   const nome = nomeTest('usato', '.ts')
   const rel = pianta(`src/app/${nome}`, 'export const usato = 1\n')
-  const mainPath = path.join(RADICE, 'src/main.tsx')
-  const originale = fs.readFileSync(mainPath, 'utf8')
-  try {
-    fs.writeFileSync(mainPath, `import "./app/${nome}"\n` + originale)
-    const a = analizza(RADICE)
-    assert(
-      !a.orfaniSrc.some((v) => v.path === rel),
-      'un modulo importato è stato scambiato per orfano',
-    )
-  } finally {
-    fs.writeFileSync(mainPath, originale)
-  }
+  pianta(`scripts/${nomeTest('radice', '.mjs')}`, `import "../src/app/${nome}"\n`)
+
+  const a = analizza(RADICE)
+  assert(
+    !a.orfaniSrc.some((v) => v.path === rel),
+    'un modulo importato è stato scambiato per orfano',
+  )
 })
 
 // ── 3. NON tocca una cartella indirizzata a runtime ──────────────────────────

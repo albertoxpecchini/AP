@@ -668,6 +668,17 @@ e il file di test fa parte del repo — bastava nominarlo perché venisse dichia
 qualche parte", quindi vivo. La prova sull'orfano falliva e quelle sulla protezione passavano
 senza aver verificato niente.
 
+**Nessun file esistente viene mai toccato.** La prova che un modulo *importato* non venga
+scambiato per orfano infilava l'import in cima a `src/main.tsx` e lo toglieva alla fine. Regge
+finché il processo muore con grazia — e su Windows non muore con grazia: `SIGTERM` non è un vero
+segnale, il processo viene terminato e `finally` non gira. Siccome `/cleaning` lancia queste
+prove come processo figlio e lo ammazza se chiudi la scheda, è successo davvero: in `main.tsx`
+sono rimasti due import verso file appena cancellati, e l'app non partiva. Ora la catena
+radice → modulo si costruisce con **due file piantati** (uno in `scripts/`, che è già una radice
+del grafo), tutto usa e getta. In più: il marchio `__prova-janitor-` nel nome è in `.gitignore`,
+così un residuo non può finire in un commit, ogni corsa spazza quelli lasciati dalle precedenti,
+e se un repo si trascina ancora il danno vecchio in `main.tsx` viene riparato da solo.
+
 ---
 
 ## ♿ Accessibilità & 🚀 Deploy
