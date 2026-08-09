@@ -134,7 +134,12 @@ function eseguiInStreaming(res, quale) {
   })
 
   const manda = (tipo, dato) => res.write(`event: ${tipo}\ndata: ${JSON.stringify(dato)}\n\n`)
-  manda('inizio', { quale, quando: new Date().toISOString() })
+  // Il comando per esteso, come lo si scriverebbe a mano: la pagina lo stampa
+  // in cima alla consolle. Un bottone che nasconde cosa esegue è un bottone di
+  // cui bisogna fidarsi; uno che lo dichiara si può controllare.
+  const comando = ['node', ...argomenti.map((a) => a.replace(RADICE.replace(/\\/g, '/'), '.').replace(RADICE, '.'))]
+    .join(' ').replace(/\\/g, '/')
+  manda('inizio', { quale, comando, quando: new Date().toISOString() })
 
   const proc = spawn(process.execPath, argomenti, { cwd: RADICE })
   let coda = ''
@@ -173,6 +178,21 @@ export function cleaningDevApi() {
               git: await statoGit(),
               quarantene: elencoQuarantene(RADICE),
             })
+          }
+
+          // ── Il rendiconto dell'ultimo lavoro ────────────────────────────
+          // Non lo ricalcola: lo legge da .janitor/ultimo.json, che pulisci.mjs
+          // scrive alla fine di ogni esecuzione — anche di quelle lanciate dal
+          // terminale. La pagina mostra quindi l'ultimo lavoro comunque sia
+          // stato avviato, e il "prima e dopo" resta lì da guardare.
+          if (rotta === '/ultimo' && req.method === 'GET') {
+            const f = path.join(RADICE, '.janitor', 'ultimo.json')
+            if (!fs.existsSync(f)) return json(res, { vuoto: true })
+            try {
+              return json(res, JSON.parse(fs.readFileSync(f, 'utf8')))
+            } catch {
+              return json(res, { vuoto: true })
+            }
           }
 
           // ── Albero dei file ─────────────────────────────────────────────

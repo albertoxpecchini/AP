@@ -340,6 +340,171 @@
   margin-top: 0.85rem;
 }
 
+/* ── Prima e dopo ─────────────────────────────────────────────────────────
+   La forma è sempre la stessa — nome, valore prima, freccia, valore dopo,
+   differenza — che si tratti di megabyte o di percentuale di fotogrammi. Si
+   impara a leggerla una volta e vale per tutto: è il motivo per cui la riga è
+   un componente solo e non tre tabelle diverse.
+   Colonne fisse, così le frecce restano incolonnate fra righe di lunghezza
+   diversa: incolonnate si legge la differenza a colpo d'occhio, sfalsate si
+   legge riga per riga. */
+.sb-cl-prima-dopo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 68rem) {
+  .sb-cl-prima-dopo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.sb-cl-sottotitolo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sb-cl-righe {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.sb-cl-riga {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5.5rem 1rem 5.5rem 5.5rem;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.22rem 0;
+  font-size: 0.82rem;
+}
+
+.sb-cl-riga-nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--sb-fg-light);
+}
+
+.sb-cl-riga-prima,
+.sb-cl-riga-dopo,
+.sb-cl-riga-delta {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.76rem;
+  text-align: right;
+}
+
+.sb-cl-riga-prima {
+  color: var(--sb-fg-lighter);
+}
+
+.sb-cl-riga-freccia {
+  color: var(--sb-fg-muted);
+  text-align: center;
+}
+
+.sb-cl-riga-dopo {
+  color: var(--sb-fg);
+  font-weight: 500;
+}
+
+.sb-cl-riga-delta {
+  color: var(--sb-fg-muted);
+}
+
+/* Un miglioramento si distingue con la tinta del marchio; un peggioramento
+   NON diventa rosso — nel sito c'è una tinta sola. Pesa di più e basta. */
+.sb-cl-riga-delta--meglio {
+  color: var(--sb-brand-text);
+  font-weight: 500;
+}
+
+.sb-cl-riga-delta--peggio {
+  color: var(--sb-fg);
+  font-weight: 500;
+}
+
+.sb-cl-riga-nota {
+  grid-column: 1 / -1;
+  margin-top: -0.15rem;
+  padding-left: 0.6rem;
+  font-size: 0.72rem;
+}
+
+.sb-cl-righe-totale {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--sb-border);
+}
+
+.sb-cl-righe-totale .sb-cl-riga-nome {
+  color: var(--sb-fg);
+  font-weight: 500;
+}
+
+/* ── Cosa è sparito, uno per uno ───────────────────────────────────────────
+   «Liberati 14.4 MB» è una promessa; l'elenco di cosa è andato via, con il
+   peso accanto a ciascuno, è un rendiconto. È la differenza fra fidarsi e
+   controllare, e questa pagina esiste per la seconda. */
+.sb-cl-sparito {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem 2rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 68rem) {
+  .sb-cl-sparito {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.sb-cl-elenco-tolti {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.sb-cl-elenco-tolti li {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.sb-cl-elenco-tolti code {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.sb-cl-segno {
+  color: var(--sb-fg-muted);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+}
+
+.sb-cl-tolto-peso {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.76rem;
+  color: var(--sb-fg-light);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.sb-cl-tolto-motivo {
+  grid-column: 2 / -1;
+  margin-top: -0.15rem;
+  font-size: 0.72rem;
+}
+
 /* ── Officina file ────────────────────────────────────────────────────────── */
 
 .sb-cl-officina {

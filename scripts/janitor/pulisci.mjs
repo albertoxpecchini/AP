@@ -123,18 +123,25 @@ function filtraRigenerabili(rigenerabili, opzioni) {
   })
 }
 
+// Restituisce l'elenco di ciò che è andato via davvero, non solo il totale.
+// Prima tornava un numero e basta: nello storico restava scritto "liberati
+// 14.4 MB" senza che nessuno potesse più sapere DA DOVE. Un programma che
+// cancella roba da solo deve saper dire cosa ha cancellato, uno per uno —
+// è la differenza fra un rendiconto e una promessa.
 function togliRigenerabili(voci) {
-  let liberati = 0
+  const tolti = []
+  const falliti = []
   for (const v of voci) {
     const p = path.join(RADICE, v.path)
     try {
       fs.rmSync(p, { recursive: true, force: true })
-      liberati += v.bytes
+      tolti.push({ path: v.path, bytes: v.bytes, motivo: v.motivo })
     } catch (err) {
+      falliti.push({ path: v.path, errore: err.message })
       console.log(C.giallo(`  non sono riuscito a togliere ${v.path}: ${err.message}`))
     }
   }
-  return liberati
+  return { tolti, falliti, liberati: tolti.reduce((s, v) => s + v.bytes, 0) }
 }
 
 function manutenzioneGit(opzioni, ramiConfluiti) {
@@ -313,9 +320,12 @@ async function principale() {
   // e lo spazio resta libero davvero.
   // Si ricontano qui perché le build appena girate hanno cambiato le carte.
   const daTogliere = filtraRigenerabili(trovaRigenerabili(RADICE), opzioni)
-  const liberati = togliRigenerabili(daTogliere)
-  console.log(`\n  ${C.verde('✓')} rigenerabili tolti: ${daTogliere.length} voci, ${peso(liberati)} ` +
-              C.grigio('(li rifà la prossima build)'))
+  const rimozione = togliRigenerabili(daTogliere)
+  console.log(`\n  ${C.verde('✓')} rigenerabili tolti: ${rimozione.tolti.length} voci, ` +
+              `${peso(rimozione.liberati)} ` + C.grigio('(li rifà la prossima build)'))
+  for (const v of rimozione.tolti) {
+    console.log(C.grigio(`      − ${v.path.padEnd(34)} ${peso(v.bytes)}`))
+  }
 
   // ── Git e chiusura ─────────────────────────────────────────────────────────
   titolo('Manutenzione git')
@@ -354,6 +364,13 @@ async function principale() {
     tipo: 'pulizia', quando: new Date().toISOString(),
     analisi: a, prima, dopo, problemi, etichetta,
     pesoPrima: primaPeso, pesoDopo: dopoPeso,
+    // Il rendiconto, riga per riga: cosa è stato cancellato, cosa messo da
+    // parte, e cosa non si è riusciti a togliere. È quello che /cleaning
+    // mostra a lavoro finito.
+    tolti: rimozione.tolti,
+    falliti: rimozione.falliti,
+    liberati: rimozione.liberati,
+    quarantenati: daQuarantena.map((v) => ({ path: v.path, bytes: v.bytes, categoria: v.categoria })),
   })
   console.log(C.grigio(`\n  Storico in ${DIR_JANITOR}/storico/ · ripristino con ` +
                        `\`npm run pulizia:ripristina\`\n`))

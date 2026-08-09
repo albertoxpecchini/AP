@@ -221,14 +221,38 @@ export async function misuraPagine(base, pagine, { headless = false, ripetizioni
   // più basso: è un 404. Qui si ascoltano le richieste fallite e gli errori in
   // console, e sono LORO a decidere se la pulizia si tiene o si annulla.
   let raccolta = { rotte: [], errori: [] }
+  // ── Solo le richieste al NOSTRO server ────────────────────────────────────
+  // Un file tolto per sbaglio può rompere una cosa sola: una richiesta a noi
+  // stessi. Un errore su un host esterno non lo abbiamo causato noi e non si
+  // ripara rimettendo a posto un file.
+  //
+  // Non è teoria: durante i collaudi l'API di GitHub — che il footer interroga
+  // — ha iniziato a rispondere 403 per troppe chiamate, e il confronto ha
+  // dichiarato «richieste rotte che prima non c'erano» su tre pagine. Nessun
+  // file era stato messo da parte, quindi non si è annullato niente; ma con una
+  // quarantena in corso quella pulizia sarebbe stata buttata via per colpa del
+  // rate limit di un servizio esterno.
+  const nostro = (url) => typeof url === 'string' && url.startsWith(base)
+  const daFare = new Map() // requestId → url, perché loadingFailed non porta l'URL
+
   try {
     await sessione.invia('Network.enable')
     await sessione.invia('Runtime.enable')
+    sessione.su('Network.requestWillBeSent', (p) => {
+      daFare.set(p.requestId, p.request?.url)
+      // La mappa non deve crescere all'infinito su una sessione lunga.
+      if (daFare.size > 4000) daFare.delete(daFare.keys().next().value)
+    })
     sessione.su('Network.loadingFailed', (p) => {
-      raccolta.rotte.push(`richiesta fallita: ${p.errorText}`)
+      const url = daFare.get(p.requestId)
+      if (!nostro(url)) return
+      let dove = url
+      try { dove = new URL(url).pathname } catch {}
+      raccolta.rotte.push(`richiesta fallita: ${dove} (${p.errorText})`)
     })
     sessione.su('Network.responseReceived', (p) => {
       if (p.response.status < 400) return
+      if (!nostro(p.response.url)) return
       // Non tutte le URL sono indirizzi: data: e blob: farebbero saltare new URL().
       let dove = p.response.url
       try { dove = new URL(p.response.url).pathname } catch { dove = dove.slice(0, 80) }

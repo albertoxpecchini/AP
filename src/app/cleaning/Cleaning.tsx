@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SiteLink as Link } from "../site/nav";
 import {
   IcArrowLeft, IcWrench, IcRotate, IcTrash, IcTerminal, IcFile, IcGitCommit,
-  IcGitBranch, IcCheck, IcPlay,
+  IcGitBranch, IcCheck, IcPlay, IcTrend,
 } from "../site/homeIcons";
 import { PageBackdrop } from "../site/homeFx";
 import "../home.css";
@@ -48,6 +48,24 @@ type Quarantena = { etichetta: string; voci: number; bytes: number };
 type Stato = { analisi: Analisi; git: StatoGit; quarantene: Quarantena[] };
 type VoceAlbero = { percorso: string; bytes: number; testo: boolean };
 
+type Pesi = { git: number; lavoro: number; dist: number; cache: number };
+type MisuraPagina = { fps: number; fpsMinimo: number; dentroBudget: number; lcp: number; errore?: string };
+type Bench = { build?: { ms: number | null; totale: number; gzJs: number }; pagine: Record<string, MisuraPagina>; frenate?: Record<string, MisuraPagina> };
+type Ultimo = {
+  vuoto?: boolean;
+  tipo?: string;
+  quando?: string;
+  pesoPrima?: Pesi;
+  pesoDopo?: Pesi;
+  tolti?: { path: string; bytes: number; motivo?: string }[];
+  falliti?: { path: string; errore: string }[];
+  quarantenati?: { path: string; bytes: number; categoria?: string }[];
+  liberati?: number;
+  problemi?: string[];
+  prima?: Bench;
+  dopo?: Bench;
+};
+
 const API = "/api/cleaning";
 
 const peso = (b: number) => (b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.round(b / 1024) + " kB");
@@ -89,6 +107,36 @@ function Pastiglia({ nome, quante }: { nome: string; quante: number }) {
   );
 }
 
+// ── Prima e dopo ────────────────────────────────────────────────────────────
+// Tutto in questa pagina è una coppia: quanto pesava / quanto pesa, quanti
+// fotogrammi tenevi / quanti ne tieni. Una riga sola che sa raccontare una
+// coppia, e la si riusa per lo spazio come per i fotogrammi — così il "prima e
+// dopo" ha sempre la stessa forma e si impara a leggerlo una volta.
+function Riga({ nome, prima, dopo, formatta, megli0Basso = true, nota }: {
+  nome: string;
+  prima: number;
+  dopo: number;
+  formatta: (n: number) => string;
+  megli0Basso?: boolean;
+  nota?: string;
+}) {
+  const delta = dopo - prima;
+  const migliorato = megli0Basso ? delta < 0 : delta > 0;
+  const uguale = Math.abs(delta) < 1e-9;
+  return (
+    <div className="sb-cl-riga">
+      <span className="sb-cl-riga-nome">{nome}</span>
+      <span className="sb-cl-riga-prima">{formatta(prima)}</span>
+      <span className="sb-cl-riga-freccia" aria-hidden="true">→</span>
+      <span className="sb-cl-riga-dopo">{formatta(dopo)}</span>
+      <span className={"sb-cl-riga-delta" + (uguale ? "" : migliorato ? " sb-cl-riga-delta--meglio" : " sb-cl-riga-delta--peggio")}>
+        {uguale ? "=" : (delta > 0 ? "+" : "−") + formatta(Math.abs(delta))}
+      </span>
+      {nota && <span className="sb-cl-nota sb-cl-riga-nota">{nota}</span>}
+    </div>
+  );
+}
+
 function Dettaglio({ nome, voci, riga }: {
   nome: string; voci: unknown[]; riga: (v: never, i: number) => React.ReactNode;
 }) {
@@ -124,6 +172,7 @@ export default function Cleaning() {
   const [scelti, setScelti] = useState<Set<string>>(new Set());
   const [avviso, setAvviso] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [ultimo, setUltimo] = useState<Ultimo | null>(null);
 
   const consolle = useRef<HTMLPreElement>(null);
   const sorgente = useRef<EventSource | null>(null);
@@ -139,6 +188,14 @@ export default function Cleaning() {
       setScelti(new Set(s.git.file.map((f) => f.percorso)));
     } catch (e) {
       setErrore((e as Error).message);
+    }
+    // Il rendiconto dell'ultimo lavoro arriva comunque, anche se lo stato
+    // fallisce: sono due cose indipendenti, e vederne una sola è meglio di
+    // vederne zero.
+    try {
+      setUltimo(await chiedi<Ultimo>("/ultimo"));
+    } catch {
+      /* nessun lavoro ancora registrato */
     }
   }, []);
 
@@ -187,6 +244,13 @@ export default function Cleaning() {
     setInCorso(cosa);
     const es = new EventSource(`${API}/esegui?cosa=${encodeURIComponent(cosa)}`);
     sorgente.current = es;
+    // Il comando vero, in cima, come se lo si fosse scritto a mano: un bottone
+    // che nasconde cosa esegue è un bottone di cui bisogna fidarsi, uno che lo
+    // dichiara si può controllare.
+    es.addEventListener("inizio", (e) => {
+      const { comando } = JSON.parse((e as MessageEvent).data);
+      setLog([`$ ${comando}`, ""]);
+    });
     es.addEventListener("riga", (e) => setLog((l) => [...l, JSON.parse((e as MessageEvent).data)]));
     es.addEventListener("fine", (e) => {
       const { codice } = JSON.parse((e as MessageEvent).data);
@@ -413,6 +477,151 @@ export default function Cleaning() {
             </div>
           </div>
         </section>
+
+        {/* ── Prima e dopo: il rendiconto dell'ultimo lavoro ── */}
+        {ultimo && !ultimo.vuoto && ultimo.pesoPrima && ultimo.pesoDopo && (
+          <section className="sb-section sb-cl-sezione-stretta" aria-label="Prima e dopo">
+            <div className="sb-container">
+              <Titolo
+                icona={<IcTrend size={16} />}
+                testo="Prima e dopo"
+                occhiello={ultimo.quando ? `Ultimo lavoro · ${new Date(ultimo.quando).toLocaleString("it-IT")}` : "Ultimo lavoro"}
+              />
+              <div className="sb-cl-prima-dopo">
+                {/* ── Spazio ── */}
+                <div className="sb-panel"><div className="sb-panel-inner">
+                  <h3 className="sb-cl-sottotitolo">Spazio</h3>
+                  <div className="sb-cl-righe">
+                    <Riga nome="cartella .git" prima={ultimo.pesoPrima.git} dopo={ultimo.pesoDopo.git} formatta={peso} />
+                    <Riga nome="file del progetto" prima={ultimo.pesoPrima.lavoro} dopo={ultimo.pesoDopo.lavoro} formatta={peso} />
+                    <Riga nome="build (dist)" prima={ultimo.pesoPrima.dist} dopo={ultimo.pesoDopo.dist} formatta={peso}
+                      nota="torna alla prossima build" />
+                    <Riga nome="cache di sviluppo" prima={ultimo.pesoPrima.cache} dopo={ultimo.pesoDopo.cache} formatta={peso}
+                      nota="si riscalda da sola" />
+                    <div className="sb-cl-righe-totale">
+                      <Riga nome="in tutto"
+                        prima={ultimo.pesoPrima.git + ultimo.pesoPrima.lavoro + ultimo.pesoPrima.dist + ultimo.pesoPrima.cache}
+                        dopo={ultimo.pesoDopo.git + ultimo.pesoDopo.lavoro + ultimo.pesoDopo.dist + ultimo.pesoDopo.cache}
+                        formatta={peso} />
+                    </div>
+                  </div>
+                  <p className="sb-cl-nota sb-cl-riepilogo">
+                    Definitivo — git più file del progetto —{" "}
+                    <strong>
+                      {peso(Math.max(0,
+                        (ultimo.pesoPrima.git - ultimo.pesoDopo.git) +
+                        (ultimo.pesoPrima.lavoro - ultimo.pesoDopo.lavoro)))}
+                    </strong>
+                    . Il resto è spazio prestato: torna appena si ricostruisce.
+                  </p>
+                </div></div>
+
+                {/* ── Fotogrammi ── */}
+                {ultimo.prima && ultimo.dopo && (
+                  <div className="sb-panel"><div className="sb-panel-inner">
+                    <h3 className="sb-cl-sottotitolo">Fotogrammi entro i 16.7 ms</h3>
+                    <div className="sb-cl-righe">
+                      {Object.entries(ultimo.dopo.pagine)
+                        .filter(([p, d]) => !d.errore && ultimo.prima?.pagine?.[p])
+                        .map(([p, d]) => (
+                          <Riga key={p} nome={p}
+                            prima={ultimo.prima!.pagine[p].dentroBudget}
+                            dopo={d.dentroBudget}
+                            formatta={(n) => n.toFixed(1) + "%"}
+                            megli0Basso={false} />
+                        ))}
+                    </div>
+                    {ultimo.prima.build && ultimo.dopo.build && (
+                      <div className="sb-cl-righe sb-cl-righe-totale">
+                        <Riga nome="js gzip" prima={ultimo.prima.build.gzJs} dopo={ultimo.dopo.build.gzJs} formatta={peso} />
+                      </div>
+                    )}
+                    <p className="sb-cl-nota sb-cl-riepilogo">
+                      {ultimo.problemi?.length
+                        ? `Annullato: ${ultimo.problemi[0]}`
+                        : "Nessuna richiesta rotta, nessun errore nuovo in console."}
+                    </p>
+                  </div></div>
+                )}
+              </div>
+
+              {/* ── Cosa è sparito, uno per uno ── */}
+              <div className="sb-cl-sparito">
+                <div>
+                  <h3 className="sb-cl-sottotitolo">
+                    File eliminati
+                    <span className="sb-chip">{ultimo.tolti?.length ?? 0}</span>
+                    {!!ultimo.liberati && <span className="sb-cl-nota">{peso(ultimo.liberati)}</span>}
+                  </h3>
+                  {!ultimo.tolti?.length && <p className="sb-cl-nota">Niente da togliere: era già pulito.</p>}
+                  {/* Quando i due numeri sembrano darsi torto — «eliminati 14.4 MB» sopra
+                      uno spazio che non cambia — la ragione è che quella roba all'inizio
+                      non c'era: l'ha ricostruita la build di verifica, e poi è stata
+                      tolta. Sono vere tutte e due, e lasciarlo indovinare sarebbe il modo
+                      più veloce di non farsi più credere. */}
+                  {!!ultimo.liberati && !!ultimo.pesoPrima && !!ultimo.pesoDopo &&
+                    (ultimo.pesoPrima.git + ultimo.pesoPrima.lavoro + ultimo.pesoPrima.dist + ultimo.pesoPrima.cache) -
+                    (ultimo.pesoDopo.git + ultimo.pesoDopo.lavoro + ultimo.pesoDopo.dist + ultimo.pesoDopo.cache)
+                      < ultimo.liberati / 2 && (
+                    <p className="sb-cl-nota sb-cl-riepilogo">
+                      Lo spazio qui sopra non cala di altrettanto perché parte di questa roba
+                      all'inizio non c'era: l'ha ricostruita la build di verifica, e poi è stata
+                      tolta. Il repo pesa come prima, non di meno.
+                    </p>
+                  )}
+                  {!!ultimo.tolti?.length && (
+                    <ul className="sb-cl-elenco-tolti">
+                      {ultimo.tolti.map((v) => (
+                        <li key={v.path}>
+                          <span className="sb-cl-segno" aria-hidden="true">−</span>
+                          <code>{v.path}</code>
+                          <span className="sb-cl-tolto-peso">{peso(v.bytes)}</span>
+                          {v.motivo && <span className="sb-cl-nota sb-cl-tolto-motivo">{v.motivo}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {!!ultimo.falliti?.length && (
+                    <ul className="sb-cl-elenco-tolti">
+                      {ultimo.falliti.map((v) => (
+                        <li key={v.path}>
+                          <span className="sb-cl-segno" aria-hidden="true">!</span>
+                          <code>{v.path}</code>
+                          <span className="sb-cl-nota">non tolto: {v.errore}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="sb-cl-sottotitolo">
+                    Messi da parte
+                    <span className="sb-chip">{ultimo.quarantenati?.length ?? 0}</span>
+                  </h3>
+                  {!ultimo.quarantenati?.length && (
+                    <p className="sb-cl-nota">
+                      Nessun orfano trovato. Quando ce ne sono, finiscono in quarantena — non
+                      cancellati — e tornano da soli se la build o il browser protestano.
+                    </p>
+                  )}
+                  {!!ultimo.quarantenati?.length && (
+                    <ul className="sb-cl-elenco-tolti">
+                      {ultimo.quarantenati.map((v) => (
+                        <li key={v.path}>
+                          <span className="sb-cl-segno" aria-hidden="true">→</span>
+                          <code>{v.path}</code>
+                          <span className="sb-cl-tolto-peso">{peso(v.bytes)}</span>
+                          {v.categoria && <span className="sb-cl-nota sb-cl-tolto-motivo">{v.categoria}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── File ── */}
         <section className="sb-section sb-cl-sezione-stretta" aria-label="File del repository">

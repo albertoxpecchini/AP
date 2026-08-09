@@ -641,7 +641,16 @@ avvisi: si distinguono per peso e bordo. Tema scuro nativo, perché i colori ven
 - **Lavori** — «Pulisci e verifica», «Benchmark», «Prove», «Solo analisi». Il log arriva
   **mentre succede**, riga per riga, via Server-Sent Events: la pulizia completa ci mette
   qualche minuto e guardarla lavorare è meglio che fissare uno spinner. Chiudere la scheda
-  ferma il processo.
+  ferma il processo. La prima riga della consolle è il **comando vero** che il bottone sta
+  lanciando (`$ node ./scripts/janitor/pulisci.mjs --applica …`): un bottone che nasconde cosa
+  esegue è un bottone di cui bisogna fidarsi, uno che lo dichiara si può controllare.
+- **Prima e dopo** — il rendiconto dell'ultimo lavoro, comunque sia stato avviato (anche dal
+  terminale: lo legge da `.janitor/ultimo.json`). Lo spazio prima → dopo riga per riga, i
+  fotogrammi entro i 16.7 ms prima → dopo pagina per pagina, e **l'elenco di ciò che è
+  sparito, uno per uno col suo peso** — perché «liberati 14.4 MB» è una promessa, mentre
+  l'elenco è un rendiconto. Se i due numeri sembrano darsi torto (roba eliminata ma spazio
+  invariato) la pagina lo dice invece di lasciarlo indovinare: succede quando quella roba
+  all'inizio non c'era ed è stata la build di verifica a ricrearla.
 - **File** — filtra, apri, modifica, `Ctrl+S`. Un file con modifiche non salvate si dichiara, e
   chiedere di chiudere la scheda costa una domanda.
 - **Commit** — i file cambiati con le spunte, il messaggio, commit e push.
