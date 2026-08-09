@@ -628,6 +628,13 @@ anche a 850 — ma serve quando l'uscita viene rediretta, `pulizia > rapporto.tx
 sporco elencato, i lavori che si guardano mentre succedono, un editor per i file del repo e il
 commit lì sotto.
 
+Veste `.sb-` come il resto del sito, non uno stile a parte: stesso guscio (fondale unico fisso,
+nav sottile con briciola che prende il bordo solo dopo lo scroll, sezioni trasparenti senza
+divisori), stessi `.sb-btn` e `.sb-panel`, classi proprie col prefisso di pagina `.sb-cl-*`, e
+**palette neutra più il solo verde del marchio** — niente rosso per gli errori né arancio per gli
+avvisi: si distinguono per peso e bordo. Tema scuro nativo, perché i colori vengono tutti da
+`var(--sb-*)` e `html.dark .sb-home` ridichiara gli stessi token.
+
 - **Sporco trovato** — cinque pastiglie per il colpo d'occhio (un numero, o una spunta), e sotto
   si aprono solo le categorie che hanno qualcosa da dire. Le voci che la pulizia di default *non*
   porta via (le rifà solo il `prebuild`) sono in grigio e dichiarate: `resta, salvo --tutto`.

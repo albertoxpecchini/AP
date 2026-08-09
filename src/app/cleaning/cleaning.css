@@ -1,105 +1,190 @@
-/* ── /cleaning ────────────────────────────────────────────────────────────────
-   Officina locale. Usa i token .sb- della piattaforma (--sb-bg, --sb-border,
-   --sb-fg-light…), così chiaro e scuro vengono da soli come nelle altre pagine:
-   qui non c'è un solo colore scritto a mano che non passi da lì.
-   ────────────────────────────────────────────────────────────────────────── */
+/* ── /cleaning — l'officina ───────────────────────────────────────────────────
+   Veste .sb- della piattaforma. Tre regole che valgono per tutto il file:
 
-.cl-pagina {
-  padding-block: 2.5rem 4rem;
-}
+   ① Nessun colore scritto a mano: solo var(--sb-*). Il tema scuro arriva da
+     sé, perché html.dark .sb-home ridichiara gli stessi token — non esiste un
+     secondo foglio per il buio.
+   ② Palette neutra più UNA tinta, il verde del marchio. Qui c'erano un rosso
+     (#d64545) per gli errori e un arancio (#d68b45) per "non salvato": due
+     colori vivi in più, in un sito che ne ammette uno. Si distinguono per
+     peso, bordo e spaziatura — che è come si distinguono le cose sul resto
+     del sito.
+   ③ Prefisso di pagina .sb-cl- su ogni classe nuova, e niente sfondi o bordi
+     di sezione: il fondale è uno solo, fisso, ed è <PageBackdrop />.
+
+   Il monospazio è "Roboto Mono", che è quello che il sito carica davvero
+   (index.html + home.css) — non Ubuntu Mono.
+   ────────────────────────────────────────────────────────────────────────── */
 
 /* Le sezioni della home respirano con clamp(4rem, 8vw, 6rem) sopra e sotto:
    giusto lì, dove ogni sezione è un capitolo da leggere scorrendo. Qui sono
-   pannelli di lavoro che si guardano insieme, e con quel respiro fra il titolo
-   e la prima riga restavano centotrenta pixel di niente. */
-.cl-pagina .sb-section {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
+   pannelli di lavoro che si guardano insieme. */
+.sb-cl-page .sb-section {
+  padding-top: 1.75rem;
+  padding-bottom: 1.75rem;
 }
 
-/* L'intestazione resta a portata di mano mentre si scorre: il ramo su cui si
-   sta lavorando e il pulsante «Aggiorna» servono soprattutto quando si è in
-   fondo, a commit fatto, ed è lì che prima sparivano. */
-.cl-testa {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  padding-block: 0.9rem;
-  background: var(--sb-bg);
-  border-bottom: 1px solid var(--sb-border);
+.sb-cl-page .sb-cl-sezione-stretta {
+  padding-top: 1rem;
 }
 
-/* ── Due colonne dove c'è spazio ──────────────────────────────────────────
-   «Sporco» e «Lavori» sono due pannelli da leggere, non da compilare: stavano
-   uno sotto l'altro occupando 1165px di larghezza per righe lunghe un terzo,
-   e per vedere il log bisognava scorrere oltre l'analisi. Affiancati si
-   guardano insieme — si lancia un lavoro e si vede lo sporco che cambia.
-   L'officina dei file resta larga tutta, che è dove serve davvero lo spazio. */
-.cl-griglia {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0 2rem;
-  align-items: start;
+/* ── Nav ──────────────────────────────────────────────────────────────────── */
+
+.sb-cl-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--sb-fg-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
-@media (max-width: 68rem) {
-  .cl-griglia {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.sb-cl-back:hover {
+  color: var(--sb-fg);
 }
 
-.cl-riquadro {
-  min-width: 0;
+.sb-cl-crumb {
+  color: var(--sb-fg-muted);
 }
 
-.cl-testa-azioni {
+.sb-cl-navtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sb-cl-ramo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+
+.sb-cl-hero {
+  padding-top: clamp(2rem, 5vw, 3.5rem);
+  padding-bottom: 0.5rem;
+}
+
+.sb-cl-eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--sb-fg-lighter);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sb-cl-h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.sb-cl-lead {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--sb-fg-light);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ── Titoli di sezione ────────────────────────────────────────────────────
+   Prima erano .sb-bk-sechead / .sb-bk-overline, che stanno in
+   approfondimento.css — un foglio che questa pagina non importa. Erano quindi
+   classi che non stilavano niente: l'occhiello usciva a 16px tondi come un
+   paragrafo qualsiasi. */
+.sb-cl-sechead {
+  margin-bottom: 0.85rem;
+}
+
+.sb-cl-overline {
+  margin: 0 0 0.2rem;
+  color: var(--sb-fg-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sb-cl-sechead h2 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
-.cl-nota {
+.sb-cl-sechead-ic {
+  display: inline-flex;
+  color: var(--sb-fg-lighter);
+}
+
+/* ── Utilità ──────────────────────────────────────────────────────────────── */
+
+.sb-cl-nota {
   color: var(--sb-fg-light);
   font-size: 0.82rem;
 }
 
-.cl-avviso {
-  margin-bottom: 1.25rem;
+.sb-cl-avviso {
+  margin-bottom: 1rem;
   padding: 0.7rem 0.9rem;
-  border: 1px solid var(--sb-border);
+  border: 1px solid var(--sb-border-strong);
   border-radius: 8px;
   background: var(--sb-surface-75);
+  box-shadow: var(--sb-shadow-card);
   font-size: 0.9rem;
-  cursor: default;
 }
 
-.cl-avviso--male {
-  border-color: color-mix(in srgb, #d64545 45%, var(--sb-border));
-  background: color-mix(in srgb, #d64545 8%, var(--sb-surface-75));
+/* Un errore non ha bisogno di essere rosso per essere un errore: qui pesa di
+   più — bordo marcato a sinistra e testo pieno invece che attenuato. */
+.sb-cl-avviso--male {
+  border-left: 3px solid var(--sb-fg);
+  color: var(--sb-fg);
+  font-weight: 500;
 }
 
-/* ── Categorie dello sporco ────────────────────────────────────────────── */
-
-/* Niente `gap` qui: la spaziatura la mettono già il padding delle pastiglie e
-   quello di .cl-cat. Sommandosi facevano due centimetri e mezzo di vuoto fra
-   il colpo d'occhio e il primo dettaglio. */
-.cl-categorie {
+/* ── Due colonne dove c'è spazio ──────────────────────────────────────────
+   «Sporco» e «Lavori» sono due pannelli da leggere, non da compilare: stavano
+   uno sotto l'altro e per vedere il log bisognava scorrere oltre l'analisi.
+   Affiancati si guardano insieme — si lancia un lavoro e si vede lo sporco
+   cambiare. L'officina dei file resta larga tutta, che è dove serve. */
+.sb-cl-griglia {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 68rem) {
+  .sb-cl-griglia {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.sb-cl-riquadro {
+  min-width: 0;
 }
 
 /* ── Il colpo d'occhio ────────────────────────────────────────────────────
    Cinque pastiglie, una per categoria: o un numero, o una spunta. Prima ogni
    categoria pulita si prendeva una riga larga tutto il pannello per dire
-   «niente», quattro volte di fila — l'occhio doveva attraversarla fino in
-   fondo per non trovarci nulla. Il "tutto pulito" resta visibile (è la notizia
-   buona, e questa pagina serve anche a farla vedere), ma in una riga sola. */
-.cl-pastiglie {
+   «niente», quattro volte di fila. Il "tutto pulito" resta visibile — è la
+   notizia buona, ed è metà del motivo per cui questa pagina esiste — ma in
+   una riga sola. Radius 999px, come ogni cosa tonda nel sito. */
+.sb-cl-categorie {
+  display: grid;
+}
+
+.sb-cl-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -107,16 +192,16 @@
   border-bottom: 1px solid var(--sb-border);
 }
 
-.cl-pastiglie:last-child {
+.sb-cl-pills:last-child {
   border-bottom: 0;
   padding-bottom: 0;
 }
 
-.cl-pastiglia {
+.sb-cl-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.2rem 0.5rem 0.2rem 0.6rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.65rem;
   border: 1px solid var(--sb-border);
   border-radius: 999px;
   background: var(--sb-surface-100);
@@ -125,51 +210,54 @@
   white-space: nowrap;
 }
 
-.cl-pastiglia-n {
-  min-width: 1.15rem;
+.sb-cl-pill-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
   padding: 0 0.25rem;
   border-radius: 999px;
   background: var(--sb-surface-200);
   color: var(--sb-fg-lighter);
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.7rem;
-  text-align: center;
 }
 
-/* Chi ha qualcosa da dire si distingue: colore del marchio, non rosso. Non è
-   un guasto, è lavoro da fare. */
-.cl-pastiglia--sporco {
+/* Chi ha qualcosa da dire si distingue con la tinta del marchio: non è un
+   guasto, è lavoro da fare. */
+.sb-cl-pill--sporco {
   border-color: color-mix(in srgb, var(--sb-brand) 45%, var(--sb-border));
   background: color-mix(in srgb, var(--sb-brand) 10%, transparent);
   color: var(--sb-fg);
 }
 
-.cl-pastiglia--sporco .cl-pastiglia-n {
+.sb-cl-pill--sporco .sb-cl-pill-n {
   background: color-mix(in srgb, var(--sb-brand) 30%, transparent);
   color: var(--sb-fg);
 }
 
-.cl-cat {
+.sb-cl-cat {
   padding-top: 0.85rem;
 }
 
-.cl-cat + .cl-cat {
+.sb-cl-cat + .sb-cl-cat {
   border-top: 1px solid var(--sb-border);
 }
 
-.cl-cat-testa {
+.sb-cl-cat-testa {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.4rem;
 }
 
-.cl-cat-nome {
-  font-weight: 600;
+.sb-cl-cat-nome {
+  font-weight: 500;
   font-size: 0.9rem;
 }
 
-.cl-cat-lista {
+.sb-cl-cat-lista {
   margin: 0;
   padding-left: 1.1rem;
   display: grid;
@@ -181,33 +269,35 @@
   overflow-wrap: anywhere;
 }
 
-.cl-cat-lista code {
+.sb-cl-cat-lista code,
+.sb-cl-editor-testa code,
+.sb-cl-storia code {
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.8rem;
 }
 
 /* Due percorsi di fila, senza niente in mezzo, si leggevano come uno solo:
    "…-it.pdfpublic/cv-alberto-pecchini.pdf". */
-.cl-cat-lista code + code::before {
+.sb-cl-cat-lista code + code::before {
   content: " = ";
   color: var(--sb-fg-lighter);
-  font-family: system-ui, sans-serif;
+  font-family: inherit;
 }
 
 /* Voci che l'analisi elenca ma che la pulizia di default NON porta via (le
    rifà solo il prebuild): vanno distinte, o la pagina prometterebbe una cosa
    che poi non fa. */
-.cl-solo-tutto {
+.sb-cl-solo-tutto {
   opacity: 0.72;
 }
 
-.cl-riepilogo {
-  margin: 0.2rem 0 0;
+.sb-cl-riepilogo {
+  margin: 0.85rem 0 0;
 }
 
-/* ── Lavori e consolle ─────────────────────────────────────────────────── */
+/* ── Lavori e consolle ────────────────────────────────────────────────────── */
 
-.cl-bottoni {
+.sb-cl-bottoni {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -215,12 +305,12 @@
   margin-bottom: 0.75rem;
 }
 
-.cl-inCorso {
+.sb-cl-inCorso {
   color: var(--sb-fg-light);
   font-size: 0.85rem;
 }
 
-.cl-consolle {
+.sb-cl-consolle {
   margin: 0.75rem 0 0;
   padding: 0.9rem 1rem;
   /* Alta abbastanza da far vedere il lavoro mentre procede, senza crescere
@@ -229,9 +319,10 @@
   min-height: 12rem;
   max-height: 26rem;
   overflow: auto;
-  border: 1px solid var(--sb-border);
+  border: 1px solid var(--sb-border-strong);
   border-radius: 10px;
   background: var(--sb-surface-100);
+  box-shadow: var(--sb-shadow-card);
   color: var(--sb-fg);
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.78rem;
@@ -241,7 +332,7 @@
   white-space: pre;
 }
 
-.cl-quarantene {
+.sb-cl-quarantene {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -249,9 +340,9 @@
   margin-top: 0.85rem;
 }
 
-/* ── Officina file ─────────────────────────────────────────────────────── */
+/* ── Officina file ────────────────────────────────────────────────────────── */
 
-.cl-officina {
+.sb-cl-officina {
   display: grid;
   grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
   gap: 1rem;
@@ -259,19 +350,21 @@
 }
 
 @media (max-width: 60rem) {
-  .cl-officina {
+  .sb-cl-officina {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.cl-elenco {
-  border: 1px solid var(--sb-border);
-  border-radius: 10px;
+.sb-cl-elenco,
+.sb-cl-editor {
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 12px;
   background: var(--sb-surface-75);
+  box-shadow: var(--sb-shadow-card);
   overflow: hidden;
 }
 
-.cl-elenco ul {
+.sb-cl-elenco ul {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -279,13 +372,13 @@
   overflow: auto;
 }
 
-.cl-elenco > ul > li.cl-nota {
+.sb-cl-vuoto-elenco {
   padding: 0.75rem 0.85rem;
 }
 
-.cl-filtro,
-.cl-messaggio,
-.cl-testo {
+.sb-cl-filtro,
+.sb-cl-messaggio,
+.sb-cl-testo {
   width: 100%;
   border: 0;
   background: transparent;
@@ -293,20 +386,13 @@
   font: inherit;
 }
 
-.cl-filtro {
+.sb-cl-filtro {
   padding: 0.65rem 0.85rem;
   border-bottom: 1px solid var(--sb-border);
   font-size: 0.85rem;
 }
 
-.cl-filtro:focus,
-.cl-messaggio:focus,
-.cl-testo:focus {
-  outline: 2px solid var(--sb-brand);
-  outline-offset: -2px;
-}
-
-.cl-file {
+.sb-cl-file {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
@@ -321,13 +407,14 @@
   cursor: pointer;
 }
 
-.cl-file:hover {
+.sb-cl-file:hover {
   background: var(--sb-surface-200);
 }
 
-.cl-file--aperto {
+.sb-cl-file--aperto {
   background: var(--sb-surface-200);
-  font-weight: 600;
+  font-weight: 500;
+  box-shadow: inset 2px 0 0 var(--sb-brand);
 }
 
 /* ── Percorsi che si accorciano dalla parte giusta ────────────────────────
@@ -337,40 +424,36 @@
    punteggiatura ai bordi, e `.gitignore` compariva come `gitignore.` — un
    nome di file sbagliato, in una pagina che serve ad aprire file.
    Due elementi invece di uno: la cartella si accorcia, il nome mai. */
-.cl-file-percorso {
+.sb-cl-file-percorso {
   display: flex;
   min-width: 0;
   align-items: baseline;
 }
 
-.cl-file-dir {
+.sb-cl-file-dir {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--sb-fg-lighter);
 }
 
-.cl-file-base {
+.sb-cl-file-base {
   flex: 0 0 auto;
   white-space: nowrap;
 }
 
-.cl-editor {
-  border: 1px solid var(--sb-border);
-  border-radius: 10px;
-  background: var(--sb-surface-75);
-  overflow: hidden;
+.sb-cl-editor {
   min-height: 26rem;
   display: flex;
   flex-direction: column;
 }
 
-.cl-vuoto {
+.sb-cl-vuoto {
   margin: auto;
   padding: 2rem;
 }
 
-.cl-editor-testa {
+.sb-cl-editor-testa {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -379,22 +462,23 @@
   border-bottom: 1px solid var(--sb-border);
 }
 
-.cl-editor-testa code {
+.sb-cl-editor-testa code {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.78rem;
 }
 
-.cl-chip--attenzione {
-  border-color: color-mix(in srgb, #d68b45 55%, var(--sb-border));
-  background: color-mix(in srgb, #d68b45 14%, transparent);
+/* "non salvato" era arancione. Un secondo colore vivo per una cosa che si
+   dice benissimo col peso: bordo pieno e testo scuro. */
+.sb-cl-chip--attenzione {
+  border-color: var(--sb-fg-lighter);
+  color: var(--sb-fg);
+  font-weight: 500;
 }
 
-.cl-testo {
+.sb-cl-testo {
   flex: 1 1 auto;
   min-height: 22rem;
   padding: 0.85rem;
@@ -407,9 +491,9 @@
   overflow-wrap: normal;
 }
 
-/* ── Commit ────────────────────────────────────────────────────────────── */
+/* ── Commit ───────────────────────────────────────────────────────────────── */
 
-.cl-cambiati {
+.sb-cl-cambiati {
   margin: 0 0 0.9rem;
   padding: 0;
   list-style: none;
@@ -419,7 +503,7 @@
   overflow: auto;
 }
 
-.cl-cambiati label {
+.sb-cl-cambiati label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -427,22 +511,29 @@
   cursor: pointer;
 }
 
-.cl-stato {
+.sb-cl-cambiati input[type="checkbox"] {
+  accent-color: var(--sb-brand);
+  flex: 0 0 auto;
+}
+
+.sb-cl-stato {
   flex: 0 0 auto;
   min-width: 3.4rem;
   padding: 0.05rem 0.35rem;
   border-radius: 4px;
   background: var(--sb-surface-200);
+  color: var(--sb-fg-light);
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.68rem;
   text-align: center;
 }
 
-.cl-stato--nuovo {
+.sb-cl-stato--nuovo {
   background: color-mix(in srgb, var(--sb-brand) 18%, transparent);
+  color: var(--sb-fg);
 }
 
-.cl-cambiato-nome {
+.sb-cl-cambiato-nome {
   border: 0;
   background: transparent;
   padding: 0;
@@ -456,13 +547,13 @@
   white-space: nowrap;
 }
 
-.cl-cambiato-nome:hover {
-  text-decoration: underline;
+.sb-cl-cambiato-nome:hover {
+  color: var(--sb-brand-text);
 }
 
-.cl-messaggio {
+.sb-cl-messaggio {
   padding: 0.7rem 0.8rem;
-  border: 1px solid var(--sb-border);
+  border: 1px solid var(--sb-border-strong);
   border-radius: 8px;
   background: var(--sb-bg);
   font-family: "Roboto Mono", ui-monospace, monospace;
@@ -470,7 +561,7 @@
   resize: vertical;
 }
 
-.cl-storia {
+.sb-cl-storia {
   margin: 1rem 0 0;
   padding: 0.85rem 0 0;
   border-top: 1px solid var(--sb-border);
@@ -480,8 +571,6 @@
   font-size: 0.8rem;
 }
 
-.cl-storia code {
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.75rem;
-  color: var(--sb-fg-light);
+.sb-cl-storia code {
+  color: var(--sb-fg-lighter);
 }
