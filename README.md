@@ -581,6 +581,35 @@ decide se la pulizia si tiene.
 Per rimettere a mano quello che è stato messo da parte: `npm run pulizia:ripristina`
 (o `npm run pulizia:elenco` per vedere le quarantene).
 
+### Dal Prompt dei comandi
+
+Gli `npm run …` funzionano anche da `cmd`, ma sono scomodi da scrivere (e le opzioni vanno
+passate dopo un `--`). Alla radice del repo c'è `pulizia.cmd`, che fa da porta d'ingresso unica:
+
+```bat
+pulizia                     :: guarda e riferisce, non tocca niente
+pulizia applica             :: pulisce, verifica, e se serve annulla da solo
+pulizia bench               :: solo benchmark
+pulizia prove               :: le prove di sicurezza
+pulizia elenco              :: le quarantene esistenti
+pulizia ripristina          :: rimette a posto l'ultima quarantena
+pulizia pianifica           :: registra il compito ogni due giorni
+pulizia togli / pulizia stato
+```
+
+Quello che scrivi in più passa dritto al programma — `pulizia applica --tutto --rami`,
+`pulizia bench --veloce --pagine /,/trivia` — e un'opzione da sola vale come analisi, quindi
+`pulizia --niente-bench` fa la cosa che ci si aspetta. Il codice di uscita si propaga, così si
+può incatenare (`pulizia applica && git status`).
+
+Due dettagli che sembrano pignoleria e non lo sono. Il file **deve** avere fine riga CRLF: con
+LF soli, `cmd.exe` legge il file a offset sbagliati, i salti a etichetta atterrano a metà riga e
+finisce per eseguire pezzi dei commenti come comandi (`"solo" non è riconosciuto come comando…`).
+È bloccato in `.gitattributes`, perché il guaio si manifesta solo dopo un clone. E la codepage si
+porta a UTF-8 per la durata del comando e si rimette com'era: a schermo non servirebbe — per una
+console vera node converte in UTF-16 e chiama `WriteConsoleW`, quindi gli accenti escono giusti
+anche a 850 — ma serve quando l'uscita viene rediretta, `pulizia > rapporto.txt`.
+
 ### Che le prove le faccia il programma stesso
 
 `npm run pulizia:prove` pianta file veri nel repo, guarda cosa decide l'analisi e rimette tutto
