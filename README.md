@@ -628,7 +628,8 @@ anche a 850 — ma serve quando l'uscita viene rediretta, `pulizia > rapporto.tx
 sporco elencato, i lavori che si guardano mentre succedono, un editor per i file del repo e il
 commit lì sotto.
 
-- **Sporco trovato** — le sei categorie, con i pesi. Le voci che la pulizia di default *non*
+- **Sporco trovato** — cinque pastiglie per il colpo d'occhio (un numero, o una spunta), e sotto
+  si aprono solo le categorie che hanno qualcosa da dire. Le voci che la pulizia di default *non*
   porta via (le rifà solo il `prebuild`) sono in grigio e dichiarate: `resta, salvo --tutto`.
 - **Lavori** — «Pulisci e verifica», «Benchmark», «Prove», «Solo analisi». Il log arriva
   **mentre succede**, riga per riga, via Server-Sent Events: la pulizia completa ci mette
@@ -642,7 +643,10 @@ commit lì sotto.
 vive dentro `configureServer`, l'aggancio che gira solo con `vite dev`: in `vite build` non viene
 nemmeno chiamato. La rotta è dietro `import.meta.env.DEV`, che rollup risolve a `false` e porta
 via insieme all'`import()`. Verificato sul build vero: nessun chunk, nessuna stringa
-`api/cleaning`, nessuna rotta `/cleaning`, nessuna classe `.cl-` nei CSS.
+`api/cleaning`, nessuna classe `.cl-` nei CSS, nessun testo della pagina. L'unica occorrenza di
+`cleaning` in `dist/` sta in `repo-tree.json`, che elenca `src/app/cleaning/Cleaning.tsx` fra i
+file del repository — è l'albero dei sorgenti che `/archivio` mostra apposta, cioè metadato che
+dice «questo file esiste», non codice che gira.
 
 La seconda difesa è sui percorsi: tutto quello che arriva dal browser passa da `dentroIlRepo()`,
 che risolve e pretende che il risultato stia sotto la radice del repo. Senza, un

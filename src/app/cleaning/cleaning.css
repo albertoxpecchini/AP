@@ -17,13 +17,45 @@
   padding-bottom: 1.5rem;
 }
 
+/* L'intestazione resta a portata di mano mentre si scorre: il ramo su cui si
+   sta lavorando e il pulsante «Aggiorna» servono soprattutto quando si è in
+   fondo, a commit fatto, ed è lì che prima sparivano. */
 .cl-testa {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
+  padding-block: 0.9rem;
+  background: var(--sb-bg);
+  border-bottom: 1px solid var(--sb-border);
+}
+
+/* ── Due colonne dove c'è spazio ──────────────────────────────────────────
+   «Sporco» e «Lavori» sono due pannelli da leggere, non da compilare: stavano
+   uno sotto l'altro occupando 1165px di larghezza per righe lunghe un terzo,
+   e per vedere il log bisognava scorrere oltre l'analisi. Affiancati si
+   guardano insieme — si lancia un lavoro e si vede lo sporco che cambia.
+   L'officina dei file resta larga tutta, che è dove serve davvero lo spazio. */
+.cl-griglia {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 2rem;
+  align-items: start;
+}
+
+@media (max-width: 68rem) {
+  .cl-griglia {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.cl-riquadro {
+  min-width: 0;
 }
 
 .cl-testa-azioni {
@@ -54,33 +86,75 @@
 
 /* ── Categorie dello sporco ────────────────────────────────────────────── */
 
+/* Niente `gap` qui: la spaziatura la mettono già il padding delle pastiglie e
+   quello di .cl-cat. Sommandosi facevano due centimetri e mezzo di vuoto fra
+   il colpo d'occhio e il primo dettaglio. */
 .cl-categorie {
   display: grid;
-  gap: 0.85rem;
 }
 
-.cl-cat {
-  padding-bottom: 0.85rem;
+/* ── Il colpo d'occhio ────────────────────────────────────────────────────
+   Cinque pastiglie, una per categoria: o un numero, o una spunta. Prima ogni
+   categoria pulita si prendeva una riga larga tutto il pannello per dire
+   «niente», quattro volte di fila — l'occhio doveva attraversarla fino in
+   fondo per non trovarci nulla. Il "tutto pulito" resta visibile (è la notizia
+   buona, e questa pagina serve anche a farla vedere), ma in una riga sola. */
+.cl-pastiglie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-bottom: 0.9rem;
   border-bottom: 1px solid var(--sb-border);
 }
 
-.cl-cat:last-of-type {
+.cl-pastiglie:last-child {
   border-bottom: 0;
   padding-bottom: 0;
 }
 
-/* Le categorie pulite stanno su una riga sola: sono la maggioranza, e non
-   devono occupare lo spazio di quelle che invece chiedono attenzione. */
-.cl-cat--pulito {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: baseline;
+.cl-pastiglia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.6rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 999px;
+  background: var(--sb-surface-100);
+  color: var(--sb-fg-light);
+  font-size: 0.76rem;
+  white-space: nowrap;
 }
 
-.cl-cat--pulito .cl-cat-esito {
+.cl-pastiglia-n {
+  min-width: 1.15rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--sb-surface-200);
   color: var(--sb-fg-lighter);
-  font-size: 0.82rem;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+/* Chi ha qualcosa da dire si distingue: colore del marchio, non rosso. Non è
+   un guasto, è lavoro da fare. */
+.cl-pastiglia--sporco {
+  border-color: color-mix(in srgb, var(--sb-brand) 45%, var(--sb-border));
+  background: color-mix(in srgb, var(--sb-brand) 10%, transparent);
+  color: var(--sb-fg);
+}
+
+.cl-pastiglia--sporco .cl-pastiglia-n {
+  background: color-mix(in srgb, var(--sb-brand) 30%, transparent);
+  color: var(--sb-fg);
+}
+
+.cl-cat {
+  padding-top: 0.85rem;
+}
+
+.cl-cat + .cl-cat {
+  border-top: 1px solid var(--sb-border);
 }
 
 .cl-cat-testa {
@@ -101,6 +175,10 @@
   display: grid;
   gap: 0.2rem;
   font-size: 0.85rem;
+  /* Un percorso lungo va a capo dove capita, anche in mezzo a una parola: in
+     due colonne "public/cv-alberto-pecchini.pdf" non ci sta intero, e senza
+     questo sfondava il pannello invece di piegarsi. */
+  overflow-wrap: anywhere;
 }
 
 .cl-cat-lista code {
@@ -145,7 +223,11 @@
 .cl-consolle {
   margin: 0.75rem 0 0;
   padding: 0.9rem 1rem;
-  max-height: 22rem;
+  /* Alta abbastanza da far vedere il lavoro mentre procede, senza crescere
+     all'infinito e spingere via il resto: il log di una pulizia completa è
+     lungo un centinaio di righe. */
+  min-height: 12rem;
+  max-height: 26rem;
   overflow: auto;
   border: 1px solid var(--sb-border);
   border-radius: 10px;
@@ -248,14 +330,29 @@
   font-weight: 600;
 }
 
-/* Il percorso conta più in fondo che in cima (src/app/… lo hanno tutti): se non
-   ci sta, si taglia a sinistra e resta leggibile il nome del file. */
-.cl-file-nome {
+/* ── Percorsi che si accorciano dalla parte giusta ────────────────────────
+   Il nome del file conta più della cartella (src/app/… ce l'hanno tutti), e
+   quindi è la cartella a doversi tagliare. Il primo tentativo era
+   `direction: rtl` su tutta la riga: taglia sì da sinistra, ma sposta anche la
+   punteggiatura ai bordi, e `.gitignore` compariva come `gitignore.` — un
+   nome di file sbagliato, in una pagina che serve ad aprire file.
+   Due elementi invece di uno: la cartella si accorcia, il nome mai. */
+.cl-file-percorso {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+}
+
+.cl-file-dir {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  direction: rtl;
-  text-align: left;
+  color: var(--sb-fg-lighter);
+}
+
+.cl-file-base {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .cl-editor {

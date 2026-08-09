@@ -48,17 +48,24 @@ async function chiedi<T>(rotta: string, opzioni?: RequestInit): Promise<T> {
 
 // ── Blocco "sporco trovato" ─────────────────────────────────────────────────
 
-function Categoria({ nome, voci, vuoto, riga }: {
-  nome: string; voci: unknown[]; vuoto: string; riga: (v: never, i: number) => React.ReactNode;
+// Le categorie pulite sono la maggioranza — ed è la notizia buona, quindi si
+// vedono comunque. Ma occupavano una riga larga tutto il pannello per dire
+// "niente", con l'occhio costretto ad attraversarla fino in fondo: quattro
+// volte di fila. Adesso sono pastiglie in fila, si leggono con un colpo
+// d'occhio, e solo quelle che hanno qualcosa da dire si aprono sotto.
+function Pastiglia({ nome, quante }: { nome: string; quante: number }) {
+  return (
+    <span className={"cl-pastiglia" + (quante ? " cl-pastiglia--sporco" : "")}>
+      {nome}
+      <span className="cl-pastiglia-n">{quante || "✓"}</span>
+    </span>
+  );
+}
+
+function Dettaglio({ nome, voci, riga }: {
+  nome: string; voci: unknown[]; riga: (v: never, i: number) => React.ReactNode;
 }) {
-  if (!voci.length) {
-    return (
-      <div className="cl-cat cl-cat--pulito">
-        <span className="cl-cat-nome">{nome}</span>
-        <span className="cl-cat-esito">{vuoto}</span>
-      </div>
-    );
-  }
+  if (!voci.length) return null;
   return (
     <div className="cl-cat">
       <div className="cl-cat-testa">
@@ -245,82 +252,91 @@ export default function Cleaning() {
         )}
         {avviso && <div className="cl-avviso" onClick={() => setAvviso(null)}>{avviso}</div>}
 
-        {/* ── Sporco ─────────────────────────────────────────────────────── */}
-        <section className="sb-section">
-          <h2 className="sb-bk-sechead">Sporco trovato</h2>
-          <div className="sb-panel"><div className="sb-panel-inner cl-categorie">
-            {!a && <p className="cl-nota">Sto guardando…</p>}
-            {a && (
-              <>
-                <Categoria nome="Rigenerabili" voci={a.rigenerabili} vuoto="niente"
-                  riga={(v: Voce) => (
-                    <li key={v.path} className={v.soloConTutto ? "cl-solo-tutto" : undefined}>
-                      <code>{v.path}</code>{" "}
-                      <span className="cl-nota">
-                        {peso(v.bytes)} — {v.motivo}
-                        {v.soloConTutto && " · resta, salvo --tutto"}
-                      </span>
-                    </li>
-                  )} />
-                <Categoria nome="Moduli orfani in src/" voci={a.orfaniSrc} vuoto="niente"
-                  riga={(v: Voce) => <li key={v.path}><code>{v.path}</code> <span className="cl-nota">{peso(v.bytes)}</span></li>} />
-                <Categoria nome="Asset mai nominati" voci={a.assetOrfani} vuoto="niente"
-                  riga={(v: Voce) => <li key={v.path}><code>{v.path}</code> <span className="cl-nota">{peso(v.bytes)}</span></li>} />
-                <Categoria nome="Dipendenze mai importate" voci={a.dipendenzeInutili} vuoto="niente"
-                  riga={(d: { nome: string; versione: string }) => <li key={d.nome}><code>{d.nome}</code> <span className="cl-nota">{d.versione}</span></li>} />
-                <Categoria nome="Duplicati" voci={a.duplicati} vuoto="niente"
-                  riga={(d: Duplicato, i: number) => (
-                    <li key={i}><span className="cl-nota">{peso(d.sprecato)} sprecati</span> {d.file.map((f) => <code key={f}>{f}</code>)}</li>
-                  )} />
-                <p className="cl-nota cl-riepilogo">
-                  {a.totali.moduliRaggiungibili} moduli raggiungibili · git: {a.git.oggettiSciolti} oggetti sciolti,
-                  pack {peso(a.git.bytesPack)}
-                  {a.git.ramiConfluiti.length > 0 && ` · ${a.git.ramiConfluiti.length} rami già confluiti`}
-                </p>
-              </>
-            )}
-          </div></div>
-        </section>
+        {/* ── Sporco + Lavori, affiancati dove c'è spazio ─────────────────── */}
+        <div className="cl-griglia">
+          <section className="sb-section cl-riquadro">
+            <h2 className="sb-bk-sechead">Sporco trovato</h2>
+            <div className="sb-panel"><div className="sb-panel-inner cl-categorie">
+              {!a && <p className="cl-nota">Sto guardando…</p>}
+              {a && (
+                <>
+                  <div className="cl-pastiglie">
+                    <Pastiglia nome="Rigenerabili" quante={a.rigenerabili.length} />
+                    <Pastiglia nome="Orfani in src/" quante={a.orfaniSrc.length} />
+                    <Pastiglia nome="Asset mai nominati" quante={a.assetOrfani.length} />
+                    <Pastiglia nome="Dipendenze inutili" quante={a.dipendenzeInutili.length} />
+                    <Pastiglia nome="Duplicati" quante={a.duplicati.length} />
+                  </div>
 
-        {/* ── Lavori ─────────────────────────────────────────────────────── */}
-        <section className="sb-section">
-          <h2 className="sb-bk-sechead">Lavori</h2>
-          <div className="cl-bottoni">
-            <button className="sb-btn sb-btn--primary" onClick={() => esegui("applica")} disabled={!!inCorso}>
-              Pulisci e verifica
-            </button>
-            <button className="sb-btn sb-btn--secondary" onClick={() => esegui("bench")} disabled={!!inCorso}>
-              Benchmark
-            </button>
-            <button className="sb-btn sb-btn--secondary" onClick={() => esegui("prove")} disabled={!!inCorso}>
-              Prove di sicurezza
-            </button>
-            <button className="sb-btn sb-btn--secondary" onClick={() => esegui("analisi")} disabled={!!inCorso}>
-              Solo analisi
-            </button>
-            {inCorso && <span className="cl-inCorso">in corso: {inCorso}…</span>}
-          </div>
-          <p className="cl-nota">
-            «Pulisci e verifica» mette da parte, ricostruisce, misura, e rimette tutto a posto da solo
-            se qualcosa peggiora. Ci mette qualche minuto: il log qui sotto arriva mentre succede.
-          </p>
-          <pre className="cl-consolle" ref={consolle}>
-            {log.length ? log.join("\n") : "Nessun lavoro ancora lanciato."}
-          </pre>
+                  <Dettaglio nome="Rigenerabili" voci={a.rigenerabili}
+                    riga={(v: Voce) => (
+                      <li key={v.path} className={v.soloConTutto ? "cl-solo-tutto" : undefined}>
+                        <code>{v.path}</code>{" "}
+                        <span className="cl-nota">
+                          {peso(v.bytes)} — {v.motivo}
+                          {v.soloConTutto && " · resta, salvo --tutto"}
+                        </span>
+                      </li>
+                    )} />
+                  <Dettaglio nome="Moduli orfani in src/" voci={a.orfaniSrc}
+                    riga={(v: Voce) => <li key={v.path}><code>{v.path}</code> <span className="cl-nota">{peso(v.bytes)}</span></li>} />
+                  <Dettaglio nome="Asset mai nominati" voci={a.assetOrfani}
+                    riga={(v: Voce) => <li key={v.path}><code>{v.path}</code> <span className="cl-nota">{peso(v.bytes)}</span></li>} />
+                  <Dettaglio nome="Dipendenze mai importate" voci={a.dipendenzeInutili}
+                    riga={(d: { nome: string; versione: string }) => <li key={d.nome}><code>{d.nome}</code> <span className="cl-nota">{d.versione}</span></li>} />
+                  <Dettaglio nome="Duplicati" voci={a.duplicati}
+                    riga={(d: Duplicato, i: number) => (
+                      <li key={i}><span className="cl-nota">{peso(d.sprecato)} sprecati</span> {d.file.map((f) => <code key={f}>{f}</code>)}</li>
+                    )} />
+                  <p className="cl-nota cl-riepilogo">
+                    {a.totali.moduliRaggiungibili} moduli raggiungibili · git: {a.git.oggettiSciolti} oggetti sciolti,
+                    pack {peso(a.git.bytesPack)}
+                    {a.git.ramiConfluiti.length > 0 && ` · ${a.git.ramiConfluiti.length} rami già confluiti`}
+                  </p>
+                </>
+              )}
+            </div></div>
+          </section>
 
-          {!!stato?.quarantene.length && (
-            <div className="cl-quarantene">
-              <span className="cl-nota">Quarantene:</span>
-              {stato.quarantene.map((q) => (
-                <span key={q.etichetta} className="sb-chip">{q.etichetta} · {q.voci} file · {peso(q.bytes)}</span>
-              ))}
-              <button className="sb-btn sb-btn--secondary sb-btn--sm" onClick={async () => {
-                try { await chiedi("/ripristina", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ etichetta: "ultima" }) }); setAvviso("Quarantena ripristinata"); ricarica(); }
-                catch (e) { setAvviso((e as Error).message); }
-              }}>Ripristina l'ultima</button>
+          <section className="sb-section cl-riquadro">
+            <h2 className="sb-bk-sechead">Lavori</h2>
+            <div className="cl-bottoni">
+              <button className="sb-btn sb-btn--primary" onClick={() => esegui("applica")} disabled={!!inCorso}>
+                Pulisci e verifica
+              </button>
+              <button className="sb-btn sb-btn--secondary" onClick={() => esegui("bench")} disabled={!!inCorso}>
+                Benchmark
+              </button>
+              <button className="sb-btn sb-btn--secondary" onClick={() => esegui("prove")} disabled={!!inCorso}>
+                Prove
+              </button>
+              <button className="sb-btn sb-btn--secondary" onClick={() => esegui("analisi")} disabled={!!inCorso}>
+                Solo analisi
+              </button>
+              {inCorso && <span className="cl-inCorso">in corso: {inCorso}…</span>}
             </div>
-          )}
-        </section>
+            <p className="cl-nota">
+              «Pulisci e verifica» mette da parte, ricostruisce, misura, e rimette tutto a posto da solo
+              se qualcosa peggiora. Ci mette qualche minuto: il log arriva mentre succede.
+            </p>
+            <pre className="cl-consolle" ref={consolle}>
+              {log.length ? log.join("\n") : "Nessun lavoro ancora lanciato."}
+            </pre>
+
+            {!!stato?.quarantene.length && (
+              <div className="cl-quarantene">
+                <span className="cl-nota">Quarantene:</span>
+                {stato.quarantene.map((q) => (
+                  <span key={q.etichetta} className="sb-chip">{q.etichetta} · {q.voci} file · {peso(q.bytes)}</span>
+                ))}
+                <button className="sb-btn sb-btn--secondary sb-btn--sm" onClick={async () => {
+                  try { await chiedi("/ripristina", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ etichetta: "ultima" }) }); setAvviso("Quarantena ripristinata"); ricarica(); }
+                  catch (e) { setAvviso((e as Error).message); }
+                }}>Ripristina l'ultima</button>
+              </div>
+            )}
+          </section>
+        </div>
 
         {/* ── File ───────────────────────────────────────────────────────── */}
         <section className="sb-section">
@@ -330,15 +346,21 @@ export default function Cleaning() {
               <input className="cl-filtro" placeholder="filtra i file…" value={filtro}
                 onChange={(e) => setFiltro(e.target.value)} />
               <ul>
-                {visibili.map((f) => (
-                  <li key={f.percorso}>
-                    <button className={"cl-file" + (aperto === f.percorso ? " cl-file--aperto" : "")}
-                      onClick={() => apri(f.percorso)} title={f.percorso}>
-                      <span className="cl-file-nome">{f.percorso}</span>
-                      <span className="cl-nota">{peso(f.bytes)}</span>
-                    </button>
-                  </li>
-                ))}
+                {visibili.map((f) => {
+                  const taglio = f.percorso.lastIndexOf("/") + 1;
+                  return (
+                    <li key={f.percorso}>
+                      <button className={"cl-file" + (aperto === f.percorso ? " cl-file--aperto" : "")}
+                        onClick={() => apri(f.percorso)} title={f.percorso}>
+                        <span className="cl-file-percorso">
+                          <span className="cl-file-dir">{f.percorso.slice(0, taglio)}</span>
+                          <span className="cl-file-base">{f.percorso.slice(taglio)}</span>
+                        </span>
+                        <span className="cl-nota">{peso(f.bytes)}</span>
+                      </button>
+                    </li>
+                  );
+                })}
                 {!visibili.length && <li className="cl-nota">Nessun file.</li>}
               </ul>
             </div>
