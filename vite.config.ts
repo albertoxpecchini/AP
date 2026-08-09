@@ -6,6 +6,10 @@ import { readFileSync } from 'fs'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+// L'officina di /cleaning: legge e scrive i file del repo e fa commit. Vive
+// tutta dentro `configureServer`, cioè solo sotto `vite dev` — in `vite build`
+// non viene nemmeno chiamata. Vedi la spiegazione in cima al file.
+import { cleaningDevApi } from './scripts/janitor/api-dev.mjs'
 
 // path.dirname(new URL(...).pathname) lascia lo slash iniziale di fronte alla
 // lettera di unità su Windows (es. "/C:/Users/..."): risolvendolo poi con
@@ -247,6 +251,7 @@ export default defineConfig({
     mimaAlcoliciDevApi(),
     writeDevApi("/api/sponsor", async () => ({ insert: (await import("./api/sponsor")).insertDonatore })),
     writeDevApi("/api/festa-rsvp", async () => ({ insert: (await import("./api/festa-rsvp")).insertPresenza })),
+    cleaningDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),

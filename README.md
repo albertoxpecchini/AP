@@ -622,6 +622,39 @@ porta a UTF-8 per la durata del comando e si rimette com'era: a schermo non serv
 console vera node converte in UTF-16 e chiama `WriteConsoleW`, quindi gli accenti escono giusti
 anche a 850 — ma serve quando l'uscita viene rediretta, `pulizia > rapporto.txt`.
 
+### `/cleaning` — l'officina, in pagina
+
+`npm run dev` → **http://localhost:5173/cleaning**. Le stesse cose del terminale, ma con lo
+sporco elencato, i lavori che si guardano mentre succedono, un editor per i file del repo e il
+commit lì sotto.
+
+- **Sporco trovato** — le sei categorie, con i pesi. Le voci che la pulizia di default *non*
+  porta via (le rifà solo il `prebuild`) sono in grigio e dichiarate: `resta, salvo --tutto`.
+- **Lavori** — «Pulisci e verifica», «Benchmark», «Prove», «Solo analisi». Il log arriva
+  **mentre succede**, riga per riga, via Server-Sent Events: la pulizia completa ci mette
+  qualche minuto e guardarla lavorare è meglio che fissare uno spinner. Chiudere la scheda
+  ferma il processo.
+- **File** — filtra, apri, modifica, `Ctrl+S`. Un file con modifiche non salvate si dichiara, e
+  chiedere di chiudere la scheda costa una domanda.
+- **Commit** — i file cambiati con le spunte, il messaggio, commit e push.
+
+**Non esiste in produzione, e non per una svista evitata.** Gli endpoint stanno in un plugin che
+vive dentro `configureServer`, l'aggancio che gira solo con `vite dev`: in `vite build` non viene
+nemmeno chiamato. La rotta è dietro `import.meta.env.DEV`, che rollup risolve a `false` e porta
+via insieme all'`import()`. Verificato sul build vero: nessun chunk, nessuna stringa
+`api/cleaning`, nessuna rotta `/cleaning`, nessuna classe `.cl-` nei CSS.
+
+La seconda difesa è sui percorsi: tutto quello che arriva dal browser passa da `dentroIlRepo()`,
+che risolve e pretende che il risultato stia sotto la radice del repo. Senza, un
+`?p=../../../../Windows/...` sarebbe bastato. `.git`, `node_modules` e i `.env` restano fuori
+comunque, e si scrivono solo file di testo — un PDF riscritto come stringa UTF-8 sarebbe corrotto
+in silenzio. Provato: traversal `400`, `.git` `400`, `.env` `400`, PDF `415`, e nessun file
+comparso fuori dal repo.
+
+Un dettaglio pratico: salvare `vite.config.ts` o qualcosa che lui importa fa **riavviare** il dev
+server, quindi la pagina si ricarica e un lavoro in corso si interrompe. È Vite che fa il suo
+mestiere, non un guasto.
+
 ### Che le prove le faccia il programma stesso
 
 `npm run pulizia:prove` pianta file veri nel repo, guarda cosa decide l'analisi e rimette tutto
