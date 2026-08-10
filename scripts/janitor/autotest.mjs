@@ -197,6 +197,44 @@ prova('trova un asset in public/ che nessuno nomina', (pianta) => {
   )
 })
 
+// ── 3c. Un inventario generato non deve tenere in vita niente ────────────────
+prova('non si fa ingannare da repo-tree.json, che elenca tutto', (pianta) => {
+  // Questo è il caso che le altre prove non potevano cogliere. Loro piantano un
+  // file nuovo, che in un elenco generato PRIMA non compare — quindi passavano
+  // anche quando la ricerca era spenta. Qui il nome finisce anche dentro
+  // l'inventario, come succede a ogni file vero del repo dopo un `npm run
+  // repo-tree`: se l'analisi lo conta come "citato", torna cieca.
+  const rel = pianta(`public/${nomeTest('mai-usato-', '.png')}`, 'finto png')
+  const albero = path.join(RADICE, 'public/repo-tree.json')
+  const originale = fs.existsSync(albero) ? fs.readFileSync(albero, 'utf8') : null
+  assert(originale, 'public/repo-tree.json non c\'è: rigeneralo con `npm run repo-tree`')
+  try {
+    // Lo si aggiunge come lo scriverebbe build-repo-tree.mjs.
+    fs.writeFileSync(albero, originale.replace(/\}\s*\]/, `},{"p":"${rel}","b":9,"d":"2026-01-01"}]`))
+    const a = analizza(RADICE)
+    assert(
+      a.assetOrfani.some((v) => v.path === rel),
+      'un asset inutilizzato è passato per vivo solo perché compare in repo-tree.json',
+    )
+  } finally {
+    fs.writeFileSync(albero, originale)
+  }
+})
+
+// ── 3d. La documentazione dentro public/ non si tocca ────────────────────────
+prova('non tocca i crediti delle immagini in public/', (pianta) => {
+  // I CREDITI-IMMAGINI.md dicono da dove viene ogni fotografia e con che
+  // licenza. Nessuno li importa — è documentazione, non un asset servito — e
+  // per l'analisi sarebbero orfani perfetti. Buttarli significherebbe perdere
+  // la prova della provenienza delle immagini del sito.
+  const rel = pianta(`public/images/${nomeTest('CREDITI-', '.md')}`, '# crediti di prova\n')
+  const a = analizza(RADICE)
+  assert(
+    !a.assetOrfani.some((v) => v.path === rel),
+    'la documentazione in public/ è stata marcata come orfana',
+  )
+})
+
 // ── 4. La quarantena è davvero reversibile ───────────────────────────────────
 prova('mette da parte e rimette a posto, byte per byte', (pianta) => {
   const rel = pianta(`src/app/${nomeTest('ripristino', '.ts')}`, 'export const x = "contenuto da conservare"\n')

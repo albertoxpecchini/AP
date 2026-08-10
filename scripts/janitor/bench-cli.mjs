@@ -16,7 +16,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { misuraTutto, PAGINE_PREDEFINITE } from './bench.mjs'
 import { C, titolo, mostraBench, mostraChunk, verdetto60, confronta } from './rapporto.mjs'
-import { etichettaOra, DIR_JANITOR } from './quarantena.mjs'
+import { etichettaOra, DIR_JANITOR, tieniGliUltimi } from './quarantena.mjs'
 
 const RADICE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const DIR_BENCH = path.join(RADICE, DIR_JANITOR, 'bench')
@@ -35,6 +35,9 @@ function ultimaMisura() {
 function salva(dato) {
   fs.mkdirSync(DIR_BENCH, { recursive: true })
   fs.writeFileSync(path.join(DIR_BENCH, `${etichettaOra()}.json`), JSON.stringify(dato, null, 2))
+  // Le misure servono per il confronto nel tempo, ma trenta bastano e avanzano:
+  // senza un tetto questa cartella cresceva a ogni esecuzione, per sempre.
+  tieniGliUltimi(DIR_BENCH, 30)
 }
 
 async function principale() {

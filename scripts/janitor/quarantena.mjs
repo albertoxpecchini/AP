@@ -97,6 +97,33 @@ export function elencoQuarantene(radice) {
 }
 
 /**
+ * Tiene gli ultimi `quanti` file .json di una cartella (i nostri nomi sono
+ * date, quindi l'ordine alfabetico è quello cronologico).
+ *
+ * I log del compito pianificato erano già limitati a 20; storico e benchmark
+ * no, e crescevano senza fine — in una sola giornata di lavoro erano diventati
+ * 18 file di storico. Un programma che nasce per non far accumulare roba non
+ * può essere lui la cosa che accumula.
+ *
+ * Sta qui e non in pulisci.mjs perché anche bench-cli.mjs ne ha bisogno, e
+ * pulisci.mjs in fondo lancia `principale()`: importarlo da lì avrebbe fatto
+ * partire una pulizia ogni volta che si chiede un benchmark.
+ */
+export function tieniGliUltimi(dir, quanti) {
+  let file
+  try {
+    file = fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort()
+  } catch {
+    return 0
+  }
+  const daTogliere = file.slice(0, Math.max(0, file.length - quanti))
+  for (const f of daTogliere) {
+    try { fs.rmSync(path.join(dir, f), { force: true }) } catch {}
+  }
+  return daTogliere.length
+}
+
+/**
  * Svuota le quarantene più vecchie di `giorni`. Questo è l'unico punto del
  * programma che cancella davvero qualcosa — e lo fa solo su roba che è già
  * sopravvissuta a una build verde e a due settimane di sito funzionante.

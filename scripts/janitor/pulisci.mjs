@@ -22,7 +22,7 @@ import { execSync } from 'node:child_process'
 // `peso` esiste in due significati: qui il peso di un file, in rapporto.mjs il
 // modo di scriverlo per gli occhi. Rinominato per non confonderli.
 import { analizza, trovaRigenerabili, pesoCartella, elenca, peso as peso_ } from './analisi.mjs'
-import { metti, ripristina, elencoQuarantene, svuotaVecchie, etichettaOra, DIR_JANITOR } from './quarantena.mjs'
+import { metti, ripristina, elencoQuarantene, svuotaVecchie, etichettaOra, tieniGliUltimi, DIR_JANITOR } from './quarantena.mjs'
 import { misuraTutto, PAGINE_PREDEFINITE } from './bench.mjs'
 import { C, peso, segno, titolo, mostraBench, verdetto60, confronta } from './rapporto.mjs'
 
@@ -192,6 +192,7 @@ function salvaStorico(dati) {
   fs.mkdirSync(dir, { recursive: true })
   fs.writeFileSync(path.join(dir, `${etichettaOra()}.json`), JSON.stringify(dati, null, 2))
   fs.writeFileSync(path.join(RADICE, DIR_JANITOR, 'ultimo.json'), JSON.stringify(dati, null, 2))
+  tieniGliUltimi(dir, 30)
 }
 
 // ── Programma ────────────────────────────────────────────────────────────────

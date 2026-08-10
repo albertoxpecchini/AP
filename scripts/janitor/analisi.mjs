@@ -177,10 +177,26 @@ export function grafoRaggiungibile(radice, tuttiIFile) {
 
 // ── Testo di tutto il repo, letto una volta sola ─────────────────────────────
 
+// ── Inventari generati: fuori dal corpus ─────────────────────────────────────
+// Sono file che elencano il repo per mestiere. Ci compare dentro il nome di
+// TUTTO, quindi alla domanda "questo nome è citato da qualche parte?" rispondono
+// sempre di sì — e la ricerca degli orfani si spegne senza dire niente.
+//
+// Non è un'ipotesi: public/repo-tree.json (l'albero che mostra /archivio)
+// elenca 134 file di public/, e teneva in vita ogni singolo asset del sito,
+// duplicati compresi. Le prove non lo vedevano perché piantano un file NUOVO,
+// che in un elenco generato prima ovviamente non c'è: il punto cieco stava
+// tutto lì. Ora c'è una prova apposta (vedi autotest.mjs).
+const INVENTARI_GENERATI = [
+  'public/repo-tree.json',        // l'albero dei sorgenti di /archivio
+  'public/zips/manifest.json',    // le dimensioni degli ZIP scaricabili
+]
+
 function corpusTesto(radice, tuttiIFile) {
   const corpus = new Map()
   for (const f of tuttiIFile) {
     if (!ESTENSIONI_TESTO.has(path.extname(f))) continue
+    if (INVENTARI_GENERATI.includes(f)) continue
     if (peso(radice, f) > 2_000_000) continue // i pacchetti i18n non nominano file
     try {
       corpus.set(f, fs.readFileSync(path.join(radice, f), 'utf8'))
@@ -278,9 +294,16 @@ function trovaAssetOrfani(radice, tuttiIFile, corpus, protette) {
   const out = []
   // Questi li chiede il browser o la piattaforma per convenzione, non il codice.
   const perConvenzione = /^public\/(favicon|apple-touch-icon|icon-|site\.webmanifest|robots\.txt|sitemap|manifest)/
+  // La documentazione dentro public/ non è un asset servito: è il foglio che
+  // spiega gli asset lì accanto. In questo repo sono i CREDITI-IMMAGINI.md, cioè
+  // provenienza e licenza di ogni fotografia — roba che non si butta perché
+  // "nessuno la importa". Nessuno la importa per definizione: è scritta per chi
+  // legge, non per chi compila.
+  const documentazione = /^public\/.*\.md$/i
   for (const f of tuttiIFile) {
     if (!f.startsWith('public/')) continue
     if (perConvenzione.test(f)) continue
+    if (documentazione.test(f)) continue
     const pubblico = '/' + f.slice('public/'.length)
     const cartella = path.dirname(f.slice('public/'.length)).replace(/\\/g, '/')
     // Sta in una cartella indirizzata a runtime? Allora non si tocca.
@@ -368,16 +391,42 @@ function analizzaGit(radice) {
   }
 }
 
+/**
+ * Le eccezioni dichiarate a mano, da scripts/janitor/protetti.json.
+ *
+ * Servono per le cose che il codice non può sapere: un CV in tedesco che il
+ * sito non linka ma che si manda a mano in una candidatura è indistinguibile,
+ * da qui dentro, da un file dimenticato. La differenza la sa solo chi lo tiene
+ * lì, e allora la scrive — col motivo accanto, perché un elenco di eccezioni
+ * senza spiegazioni diventa in sei mesi un elenco di cose che nessuno osa più
+ * togliere.
+ */
+export function leggiProtetti(radice) {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(radice, 'scripts/janitor/protetti.json'), 'utf8'))
+    return (j.voci || []).filter((v) => v && v.path)
+  } catch {
+    return []
+  }
+}
+
 export function analizza(radice) {
   const tuttiIFile = elenca(radice)
   const corpus = corpusTesto(radice, tuttiIFile)
   const raggiungibili = grafoRaggiungibile(radice, tuttiIFile)
   const protette = cartelleDinamiche(corpus)
 
+  // Le eccezioni dichiarate valgono per percorso esatto o per prefisso di
+  // cartella, e si applicano a tutto ciò che si potrebbe portare via.
+  const dichiarati = leggiProtetti(radice)
+  const dichiarato = (p) => dichiarati.some((v) => p === v.path || p.startsWith(v.path.replace(/\/?$/, '/')))
+  const senzaProtetti = (voci) => voci.filter((v) => !dichiarato(v.path))
+
   return {
     rigenerabili: trovaRigenerabili(radice),
-    orfaniSrc: trovaOrfaniSrc(radice, tuttiIFile, raggiungibili, corpus),
-    assetOrfani: trovaAssetOrfani(radice, tuttiIFile, corpus, protette),
+    orfaniSrc: senzaProtetti(trovaOrfaniSrc(radice, tuttiIFile, raggiungibili, corpus)),
+    assetOrfani: senzaProtetti(trovaAssetOrfani(radice, tuttiIFile, corpus, protette)),
+    protettiDichiarati: dichiarati,
     dipendenzeInutili: trovaDipendenzeInutili(radice, corpus),
     duplicati: trovaDuplicati(radice, tuttiIFile),
     git: analizzaGit(radice),

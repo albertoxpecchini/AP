@@ -491,6 +491,21 @@ sito funzionante vengono svuotate per davvero.
 | 5 | Duplicati esatti | Stesso SHA-1 in due percorsi — **solo segnalati**: quale sia quello buono non lo può sapere il programma |
 | 6 | Git | `git gc`, rami già confluiti in `main` |
 
+**Le eccezioni si dichiarano, col motivo.** `scripts/janitor/protetti.json` elenca le cose che
+l'analisi segnalerebbe e che invece teniamo apposta — i CV in inglese, francese e tedesco, che il
+sito non linka (la pagina `/cv` stampa sé stessa) ma che si mandano a mano in una candidatura.
+Ogni voce ha la sua ragione scritta accanto: un elenco di eccezioni senza spiegazioni diventa in
+sei mesi un elenco di cose che nessuno osa più togliere.
+
+**Due cose che gli inventari generati insegnano.** `public/repo-tree.json` è l'albero dei
+sorgenti che `/archivio` mostra: elenca 134 file di `public/`. Finché stava nel corpus di testo su
+cui l'analisi chiede «questo nome è citato da qualche parte?», la risposta era sempre sì — e la
+ricerca degli asset orfani era **spenta senza dirlo**, con ogni duplicato tenuto in vita. Le prove
+non lo vedevano perché piantano un file *nuovo*, che in un elenco generato prima ovviamente non
+c'è: ora ce n'è una che mette il nome anche dentro l'inventario. E la documentazione dentro
+`public/` (i `CREDITI-IMMAGINI.md`, provenienza e licenza di ogni fotografia) non è un asset
+servito: nessuno la importa per definizione, è scritta per chi legge. Anche quella ha la sua prova.
+
 Le radici del grafo sono larghe di proposito (`index.html`, ogni file in `api/`, ogni script,
 `vite.config.ts`): una radice dimenticata renderebbe "orfano" un ramo di codice vivo. E le
 cartelle indirizzate a runtime — `/emoji/`, `/models/tex/`, `/zips/${slug}` — sono protette in
