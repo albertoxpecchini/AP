@@ -3,7 +3,8 @@
 # Alberto Pecchini — Portfolio & Personal Hub
 
 **SPA React/TypeScript** — un portfolio personale che fa da _hub_ a un sito multi-pagina
-(bio, approfondimenti, un gioco-quiz, strumenti e sezioni evento), servito **una pagina
+(bio, curriculum che stampa sé stesso, approfondimenti, un gioco-quiz, una console di viaggio,
+strumenti e sezioni evento), servito **una pagina
 = un sottodominio**, tradotto al volo in **4 lingue** e vestito con un design system
 **«piattaforma»** — la grammatica `.sb-` rifatta sulla homepage di Supabase, verde brand
 e tema chiaro/scuro nativo.
@@ -45,18 +46,18 @@ e tema chiaro/scuro nativo.
 ## 📊 Il progetto in numeri
 
 > I badge di metrica derivano dall'API GitHub e si ricalcolano a ogni `git push`.
-> La tabella qui sotto è misurata sull'albero versionato al momento della scrittura.
+> La tabella qui sotto è misurata sull'albero versionato all'**11 agosto 2026**.
 
 | Dominio | Valore | Dettaglio |
 | :--- | :--- | :--- |
-| **Codebase** | **~31,6k LOC** in `src/` | 93 file: 40 `.tsx` (17,6k) · 32 `.ts` (4,9k) · 21 `.css` (9,2k) |
-| **Backend + tooling** | **~1,8k LOC** fuori da `src/` | 7 funzioni `api/` + `lib/` (889) · `scripts/` (893) |
-| **Dipendenze** | **13 runtime** + 9 dev | niente framework pesanti, tutto essenziale |
-| **Pagine** | **11 rotte** | 1 hub + 10 pagine `React.lazy`, code-split per rotta |
-| **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1011 voci generate |
+| **Codebase** | **~41,9k LOC** in `src/` | 123 file versionati: 52 `.tsx` (24,3k) · 37 `.ts` (6,1k) · 27 `.css` (11,5k) |
+| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 8 funzioni `api/` (828) + `lib/` (185) · `scripts/` (4,7k, di cui 2,6k il programma di pulizia) |
+| **Dipendenze** | **12 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
+| **Pagine** | **15 rotte** | 1 hub + 14 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev |
+| **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
-| **Serverless** | **7 funzioni** in `api/` | trivia · notify · festa-rsvp · sponsor · ig-stats · d · cron |
-| **Cronologia** | **336 commit** dal 2026-05-24 | 165 `feat` · 78 `fix` · 25 `style` · 15 `chore` · 6 `refactor` |
+| **Serverless** | **8 funzioni** in `api/` | trivia · notify · festa-rsvp · sponsor · ig-stats · mima-alcolici · d · cron |
+| **Cronologia** | **374 commit** dal 2026-05-24 | 181 `feat` · 88 `fix` · 27 `style` · 15 `chore` · 7 `docs` · 6 `refactor` |
 
 ---
 
@@ -68,18 +69,25 @@ colonne, griglia prodotti a 12 colonne con card a bordo-gradiente, pannello «da
 dello stack con codice vero, story-card, muro community, sezione open source, CTA finale) portata
 su ogni pagina.
 
-- **Prefisso `.sb-`** — tutti i token e le classi vivono in [`src/app/home.css`](src/app/home.css) (1528 righe),
+- **Prefisso `.sb-`** — tutti i token e le classi vivono in [`src/app/home.css`](src/app/home.css) (2333 righe),
   ereditati da footer, ControlBar, archivio e pagine interne.
 - **Tema chiaro/scuro NATIVO** — non due fogli di stile, ma un set di custom properties ridichiarate
   sotto `html.dark`. Il chiaro è il default.
 - **Palette neutra + un solo colore** — grigi puri per fondali, bordi e testo; l'unica tinta è il
   **verde brand `hsl(153 60% 53%)`**. Dal 2026-08 è l'unico accento su **tutte** le pagine:
   l'arancio Ubuntu sopravvive solo nelle email transazionali (`api/d.ts`).
-- **Un fondale solo, per tutta la pagina** — `.sb-bg` è `position: fixed`: due velature radiali
-  (verde e ciano) e una griglia tecnica che si dissolve verso il basso, incollate alla finestra.
-  Nessun bordo di sezione può tagliarlo mentre si scorre, quindi **fra una sezione e l'altra non
-  c'è nessun confine**; il contenuto scorre sopra, trasparente. Anche il footer non comincia con un
-  bordo: il suo colore entra in **dissolvenza** dall'alto.
+- **Un fondale solo, per tutta la pagina** — è `position: fixed`, quindi resta incollato alla
+  finestra: la griglia tecnica in `.sb-bg` (solo home) e **due velature radiali** — verde e ciano —
+  su `::before`/`::after` di `.sb-home`, cioè su ogni pagina. Nessun bordo di sezione può tagliarlo
+  mentre si scorre, quindi **fra una sezione e l'altra non c'è nessun confine**; il contenuto scorre
+  sopra, trasparente. Anche il footer non comincia con un bordo: il suo colore entra in
+  **dissolvenza** dall'alto.
+- **Le card sono lastre di vetro** (token `--sb-glass-*`: fondo semitrasparente, `backdrop-filter`,
+  rim chiaro). Una lastra però si legge come lastra solo se dietro passa qualcosa che cambia —
+  sfocare una tinta piatta dà lo stesso risultato di non sfocare niente. Per questo i due aloni non
+  stanno fermi: derivano con lo scroll (`site/GlassMotion.tsx`). È anche il motivo per cui sono
+  saliti sugli pseudo-elementi di `.sb-home` invece di restare dentro `.sb-bg`, che esiste solo
+  sulla home.
 - **Tipografia Titillium Web** — il carattere del sito (+ Roboto Mono per il codice; Lora solo per `/festa`),
   al posto del Circular di Supabase.
 - **CSS per pagina** — ogni pagina ha il suo file accanto al componente
@@ -99,12 +107,13 @@ grafico contribuzioni, linguaggi, i pochi colori fissi di Trivia, arancio delle 
 
 ## 🧩 La chrome globale — montata una volta, viva ovunque
 
-Tre elementi stanno **fuori dal router**, in [`src/main.tsx`](src/main.tsx), e accompagnano ogni pagina:
+Quattro elementi stanno **fuori dal router**, in [`src/main.tsx`](src/main.tsx), e accompagnano ogni pagina:
 
 | Componente | Dove | Cosa fa |
 | :--- | :--- | :--- |
 | **ControlBar** — [`theme/ControlBar.tsx`](src/app/theme/ControlBar.tsx) | in basso a sinistra | Un'unica pillola: **lingua · tema · sensore orario**. Sta rincantucciata oltre il bordo e lascia sporgere solo la linguetta; esce quando il puntatore le si **avvicina** (130 px), quando il fuoco da tastiera entra, o premendo la linguetta (unico modo sul touch, dove resta fissata). Rientra da sola dopo 620 ms, ma solo se non è sotto il puntatore, non ha il fuoco e non ha menu aperti. |
 | **ScrollProgress** — [`site/ScrollProgress.tsx`](src/app/site/ScrollProgress.tsx) | bordo alto | Il filo di avanzamento della lettura. Non usa `ScrollTrigger` (le pagine sono lazy e cambiano altezza dopo il montaggio): rimisura a ogni frame utile e ammorbidisce con `gsap.quickTo`. Con lo scroll bloccato (modali) si **congela** invece di azzerarsi. |
+| **GlassMotion** — [`site/GlassMotion.tsx`](src/app/site/GlassMotion.tsx) | non disegna niente | Monta il movimento del vetro: la **deriva** dei due aloni con lo scroll (senza cui il blur delle card non si leggerebbe), il **tilt** della card sotto il puntatore col rim che si sposta di conseguenza, e la **pozza** sui quadratini dei commit ([`puddle.ts`](src/app/site/puddle.ts)). La deriva sta dietro `prefers-reduced-motion`; tutto ciò che dipende dal puntatore anche dietro `(hover: hover) and (pointer: fine)`. |
 | **SpeedInsights** — `@vercel/speed-insights` | invisibile | Core Web Vitals reali, solo in produzione. |
 
 Il **tema globale** ([`theme/themeCore.ts`](src/app/theme/themeCore.ts)) ha una sola fonte di verità:
@@ -147,6 +156,21 @@ Quel che resta è diviso per responsabilità, non sparso nei componenti:
   e la loro intersezione, un globo con due satelliti, le curve di livello di un rilievo. Da lontano
   si legge una collezione, non sette schermate. Una sola cosa in movimento per riquadro, e il
   movimento sta **tutto in CSS**: qui dentro non è rimasta una riga di JavaScript di animazione.
+- [`site/GlassMotion.tsx`](src/app/site/GlassMotion.tsx) — il movimento **del vetro**, montato una
+  volta per tutte le pagine (vedi la tabella qui sopra). È l'unico posto in cui il puntatore comanda
+  qualcosa, e quel che comanda sono solo `transform` e `opacity`: per un giro il moto dei visual
+  delle card è passato di qui, e i numeri finivano in `left`, `top`, `clip-path` e `box-shadow` —
+  cioè in proprietà che **ridisegnano**, con gli scatti che ne conseguono. Adesso quel moto è in
+  keyframe CSS dentro `home.css`.
+- [`site/homeFx.tsx`](src/app/site/homeFx.tsx) — il raccordo fra i due componenti «React Bits»
+  ([`ClickSpark`](src/components/reactbits/ClickSpark.tsx), [`SpotlightCard`](src/components/reactbits/SpotlightCard.tsx))
+  e questo sito: quelli non sanno niente di temi né di preferenze, e tutto ciò che li lega ai token
+  `.sb-` (palette in chiaro per chi disegna su canvas, riaggancio a `subscribeTheme`, mancato
+  montaggio con `prefers-reduced-motion`) sta lì. Da qui sono passati e **spariti** gli ultimi due
+  cicli che giravano senza che nessuno li avesse chiesti: l'**aurora** (uno shader WebGL con un
+  `rAF` che avanzava per sempre — il gradiente fermo tenuto come ripiego era già indistinguibile a
+  occhio) e lo **shiny text** (una banda di luce ogni 3,4 s sulle brandline). La luce sulla
+  brandline c'è ancora, ma passa quando passi tu: è la stessa `--gloss-x` del titolo della hero.
 - [`site/ScrollProgress.tsx`](src/app/site/ScrollProgress.tsx) — l'avanzamento della lettura. Prima
   cresceva sul filo del footer, cioè si vedeva **solo una volta arrivati in fondo**, quando non
   serviva più; ora sta in cima alla finestra, su ogni pagina. È l'unica cosa che **resta accesa
@@ -172,17 +196,25 @@ I redirect `www → sottodominio` sono in [`vercel.json`](vercel.json).
 
 | Rotta | Sottodominio | Pagina | Cosa fa |
 | :--- | :--- | :--- | :--- |
-| `/` | `www` | **Home / hub** | Vetrina «piattaforma»: hero, prodotti, archivio incorporato, stack, pagine, lavori, curriculum, open source, contatti |
+| `/` | `www` | **Home / hub** | Vetrina «piattaforma»: hero, prodotti, archivio incorporato, stack, pagine, lavori, curriculum, garage 3D, open source, contatti |
 | `/bio` | `bio` | **Bio** | Pagina About: gallery + fatti essenziali |
+| `/cv` | _(solo path)_ | **CV** | Il curriculum come pagina, nelle 4 lingue — e **stampa sé stessa**: nessun PDF da servire |
 | `/trivia` | `trivia` | **Trivia** | Quiz sulla storia dell'architettura — 1003 domande, leaderboard, curiosità AI |
 | `/pcto` | `pcto` | **PCTO** | Alternanza scuola-lavoro (Caem Group) — timeline + racconto |
 | `/me-stesso` | `me-stesso` | **Me stesso** | Presentazione personale (Esame di Stato 2026) |
 | `/dubliners` | `dubliners` | **Dubliners** | Approfondimento «Gente di Dublino» (J. Joyce, 1914) |
 | `/gattopardo` | `gattopardo` | **Gattopardo** | Approfondimento «Il Gattopardo» (Tomasi di Lampedusa, 1958) |
 | `/festa` | `festa` | **Festa** | Inviti con token, RSVP e notifica email |
+| `/mima` | _(solo path)_ | **MiMa** | Console di viaggio (13–17 agosto 2026): conto alla rovescia, meteo, spese divise, valigia, lista alcolici condivisa in realtime |
+| `/mima/veicoli` | _(solo path)_ | **MiMa · veicoli** | Quale auto portare: consumi, autonomia, 38 distributori su due zone con i prezzi veri |
+| `/mima/luoghi` | _(solo path)_ | **MiMa · luoghi** | Dove mangiare e uscire fra Milano Marittima e Cervia |
 | `/archivio` | `archivio` | **Archivio** | Esploratore di progetti **e dell'albero vero del repo** |
 | `/sostieni` | `sostieni` | **Sostieni** | Dati bonifico + libro firme dei donatori |
 | `/instagram` | _(solo path)_ | **Compare Two Lists** | «Chi ti ha tolto il follow» — confronto di due liste, tutto in locale |
+
+I **sottodomini sono nove**: le pagine senza sottodominio restano a path sotto `www`. C'è poi una
+sedicesima rotta, `/cleaning`, che **esiste solo in sviluppo** — vedi
+[l'officina](#cleaning--lofficina-in-pagina).
 
 ---
 
@@ -225,8 +257,19 @@ nessun codice da toccare, nessun registro da aggiornare.
 - **40 capitoli** ordinati dal campo `ordine:` (fallback alfabetico).
 - **1003 domande** tipizzate: `multipla` (401), `vero-falso` (401), `aperta` (201), ognuna con
   spiegazione facoltativa, sinonimi accettati (`accetta:`) e foto.
-- **Versionamento automatico** — `__TRIVIA_VERSION__` è iniettata da [`vite.config.ts`](vite.config.ts) come
-  `1.<git rev-list --count HEAD -- src/app/trivia/>`: ogni deploy che tocca il modulo incrementa la _minor_ da solo.
+- **Versionamento automatico, ma versionato** — la versione è `1.<numero di commit che hanno toccato
+  src/app/trivia/>`, e il conteggio lo fa git. Git da solo però non basta: Vercel clona in
+  **shallow**, e su un clone troncato `git rev-list --count` conta solo quel che ha sotto mano —
+  lo stesso identico codice diceva `v1.56` in locale e `v1.2` in produzione. Quel numero misurava la
+  profondità del clone, non il gioco. Ora il conteggio è un **dato committato**
+  ([`version.json`](src/app/trivia/version.json)): [`build-trivia-version.mjs`](scripts/build-trivia-version.mjs)
+  lo ricalcola solo dove la storia è intera (la macchina di sviluppo) e lo riscrive solo se è
+  cresciuto; il builder usa il valore arrivato col checkout, e
+  [`vite.config.ts`](vite.config.ts) lo inietta come `__TRIVIA_VERSION__`.
+- **Foto pertinenti, a licenza libera** — [`photos.ts`](src/app/trivia/photos.ts) cerca un'immagine
+  per la domanda in cascata (Wikipedia IT → EN, poi Wikimedia Commons, poi Openverse), con cache in
+  `sessionStorage`, prefetch della domanda successiva e ripiego silenzioso su una card grafica: la
+  ricerca non può mai far aspettare il gioco.
 - **Arricchimento AI** — l'endpoint serverless [`/api/trivia`](api/trivia.ts) interroga **Claude Fable 5**
   (`@anthropic-ai/sdk`) per curiosità contestuali; accetta solo richieste dal sito (origin check +
   rate-limit), così non è usabile come proxy AI gratuito. In dev lo stesso endpoint è servito da un
@@ -236,9 +279,53 @@ nessun codice da toccare, nessun registro da aggiornare.
 
 ---
 
+## 🚗 Il garage — tre auto vere in WebGL, senza three.js
+
+In fondo alla home (`#garage`) ci sono tre modelli 3D che si girano col dito: Aventador LP 700-4,
+Alfa Romeo 4C, Audi R8 V10. Sono i modelli **come sono** — stessa geometria, stessi materiali,
+stesse texture, stessi colori dei file di partenza (131 000 triangoli per l'Aventador, interni e
+motore compresi, e trenta texture in tutto). Niente è stato semplificato o ricolorato.
+
+- [`scripts/build-cars.mjs`](scripts/build-cars.mjs) cambia solo i **contenitori**: la geometria da
+  testo (`v 1.234 5.678`) a interi binari — i tipi che WebGL vuole nei suoi buffer, quindi il file si
+  carica così com'è — e le texture da PNG a WebP. I sorgenti (30 MB, modelli di terzi) **non stanno
+  nel repository**; il risultato sì: `public/models/cars.bin` + `tex/`, con provenienza e licenze in
+  `public/models/README.md`.
+- **Niente three.js** — servirebbe un decimo della libreria (una mesh statica, una luce, nessuna
+  ombra, nessun materiale PBR) e costerebbe 160 kB gzip, più di tutta la home.
+  [`site/dreamCars.tsx`](src/app/site/dreamCars.tsx) ne pesa sei: due shader, un buffer per
+  attributo, una texture per materiale, un `drawElements` per tratto di indici.
+- Le tre cose che un visualizzatore del genere deve fare bene: il **buffer di profondità** (su un
+  modello vero le cose si compenetrano dappertutto — il cerchio dentro la gomma, lo specchietto
+  contro il montante — e un ordine giusto delle facce semplicemente non esiste: deve decidere il
+  pixel); i **materiali trasparenti dipinti dopo gli opachi e senza scrivere in profondità**, o il
+  parabrezza nasconde l'abitacolo; la **ripetizione delle texture** (le UV delle gomme arrivano a 60:
+  senza `REPEAT` il battistrada diventa una striscia stirata — da cui le texture in potenze di due).
+- La rotazione è una **matrice moltiplicata a sinistra** dallo spostamento del dito letto negli assi
+  della camera, non due angoli sommati: quelli si incastrano ai poli. Comunque sia messa l'auto,
+  trascinare a destra la fa girare verso destra. Da fermo il ciclo di rendering è **spento**, e tutto
+  si scarica solo quando la sezione si avvicina (`WhenVisible`).
+
+---
+
+## 🏞️ Rivalta sul Mincio
+
+<!-- ─────────────────────────────────────────────────────────────────────────────
+     DA SCRIVERE — sezione lasciata volutamente vuota.
+
+     Riferimenti già in repo, per quando si riempie:
+       · site/FreshWork.tsx + freshWork.css — la fascia «just shipped» sotto la
+         hero della home, con il video del sito in loop. È TEMPORANEA: si spegne
+         mettendo SHOW = false in cima a FreshWork.tsx.
+       · public/video/rivalta-sul-mincio.mp4 (3,0 MB, H.264) + .webp (poster)
+       · site/projects.tsx — la voce del progetto nell'archivio
+     ───────────────────────────────────────────────────────────────────────── -->
+
+---
+
 ## 🌍 i18n — traduzione del DOM al volo
 
-Invece di internazionalizzare undici pagine una per una, il sito **traduce il testo già renderizzato**
+Invece di internazionalizzare quindici pagine una per una, il sito **traduce il testo già renderizzato**
 ([`i18n/translateDom.ts`](src/app/i18n/translateDom.ts)):
 
 - un `MutationObserver` segue ogni cambiamento del DOM (cambio rotta, chunk lazy, ri-render di React)
@@ -251,8 +338,14 @@ Invece di internazionalizzare undici pagine una per una, il sito **traduce il te
   approfondimenti in italiano — e il valore elenca **solo** le altre lingue: la sorgente è il fallback.
   `SCRIPT`, `STYLE`, `TEXTAREA`, `CODE`, `PRE` e i nodi `data-no-i18n` non si toccano mai.
 
-Dizionario: [`dictionary.ts`](src/app/i18n/dictionary.ts) (voci curate a mano) + **1010 voci** in
-[`translations.json`](src/app/i18n/translations.json). Cambiare lingua non ricarica la pagina.
+Dizionario: [`dictionary.ts`](src/app/i18n/dictionary.ts) (poche voci curate a mano, per le stringhe
+dinamiche che il crawl non vede) + **1020 voci** in
+[`translations.json`](src/app/i18n/translations.json), che resta la **fonte unica** e si continua a
+modificare. Da lì [`build-i18n.mjs`](scripts/build-i18n.mjs) genera
+`src/app/i18n/generated/<lingua>.json` — quattro mappe piatte, rigenerate a ogni `build` e a ogni
+`dev`, fuori dal versionamento — e il motore ne carica con `import()` **solo quella attiva**:
+il visitatore italiano non si scarica più anche francese, tedesco e inglese. Cambiare lingua non
+ricarica la pagina.
 
 ---
 
@@ -260,30 +353,40 @@ Dizionario: [`dictionary.ts`](src/app/i18n/dictionary.ts) (voci curate a mano) +
 
 ```
 AP/
-├── api/                      # 7 funzioni serverless Vercel (Node)
+├── api/                      # 8 funzioni serverless Vercel (Node)
 │   ├── trivia.ts             #   curiosità AI (Claude Fable 5)
 │   ├── notify.ts             #   email dei voti Festa (Resend)
 │   ├── festa-rsvp.ts         #   scrittura RSVP blindata (service role)
 │   ├── sponsor.ts            #   firma libro donatori blindata
 │   ├── ig-stats.ts           #   contatore confronti Instagram
+│   ├── mima-alcolici.ts      #   lista condivisa MiMa: scritture blindate
 │   ├── d.ts                  #   link tracciabili: apertura + redirect + autodelete
 │   └── cron-cleanup.ts       #   pulizia giornaliera dei link scaduti (cron)
 ├── content/trivia/           # 40 capitoli .md → fonte unica delle domande Trivia
 ├── email/                    # modello email HTML (le bozze NON si committano)
 ├── lib/serverSecurity.ts     # helper condivisi: origin check, rate-limit, diagnostica
-├── public/                   # PDF (CV in 4 lingue + attestati), immagini, manifest PWA
+├── public/                   # PDF (CV + attestati), immagini, video, models/ (auto 3D),
+│                             #   zips/, manifest PWA
 ├── scripts/
 │   ├── build-cv.py           #   src/app/cv/data/*.json → 4 PDF statici (WeasyPrint)
 │   ├── build-zips.mjs        #   ZIP del sorgente per ogni progetto d'archivio
 │   ├── build-repo-tree.mjs   #   albero del repo da git → public/repo-tree.json
+│   ├── build-i18n.mjs        #   translations.json → un pacchetto per lingua
+│   ├── build-trivia-version.mjs #  versione di Trivia, contata dove la storia è intera
+│   ├── build-cars.mjs        #   FBX/OBJ + PNG → cars.bin + texture WebP (fuori CI)
+│   ├── ensure-dev-server.mjs #   il dev server è già acceso? riusalo, non riavviarlo (F5)
 │   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
+│   ├── lib/fbx.mjs           #   lettore FBX binario, per build-cars
+│   ├── janitor/              #   il programma di pulizia + benchmark (vedi più sotto)
 │   └── seed-*.js|.mjs        #   seed dei profili
 ├── src/
 │   ├── app/
 │   │   ├── App.tsx           # Home «piattaforma» + header/menu inline
-│   │   ├── home.css          # il design system .sb- (token, layout, loop CSS)
+│   │   ├── home.css          # il design system .sb- (token, layout, vetro, keyframe)
 │   │   ├── site/             # footer, nav, dati, progetti, README dei progetti,
 │   │   │                     #   homeIcons/homeLive/homeMotion/footMotion,
+│   │   │                     #   GlassMotion + puddle, homeFx, WhenVisible,
+│   │   │                     #   dreamCars (WebGL), FreshWork, RivaltaMap,
 │   │   │                     #   repoTree, PaletteModal, ScrollProgress,
 │   │   │                     #   WorkflowModal + workflow.css (diagramma in CSS)
 │   │   ├── cv/               # /cv: il curriculum come pagina (4 lingue) + stampa
@@ -291,14 +394,19 @@ AP/
 │   │   │                     #   legge anche scripts/build-cv.py
 │   │   ├── theme/            # ControlBar (lingua·tema·sensore) + themeCore
 │   │   ├── trivia/           # gioco quiz + parser + API leaderboard/pagelle/progressi
+│   │   ├── mima/             # /mima · /mima/veicoli · /mima/luoghi: guscio comune,
+│   │   │                     #   dati del viaggio, meteo, mappa del percorso
+│   │   ├── cleaning/         # /cleaning: l'officina del repo — SOLO in dev
 │   │   ├── bio  pcto  me-stesso  dubliners  gattopardo  festa  archivio  sostieni  instagram
 │   │   ├── i18n/             # motore di traduzione del DOM (IT · EN · FR · DE)
 │   │   ├── utils/            # keyboard guard, scroll lock, device, prefs
 │   │   └── _game/            # motore condiviso dei giochi (gate, tokens, leaderboard)
-│   ├── lib/                  # utilità trasversali (players)
+│   ├── components/           # reactbits/ (ClickSpark, SpotlightCard) · ui/map (maplibre)
+│   ├── lib/                  # utilità trasversali (players, utils)
 │   └── styles/               # theme.css · tailwind · fonts · ios · site · ubuntu
 ├── supabase/                 # schema .sql delle tabelle (scores, grades, players, link)
-└── vite.config.ts            # plugin React/Tailwind/PWA, asset resolver, versioning, dev-API
+└── vite.config.ts            # plugin React/Tailwind/PWA, asset resolver, versioning,
+                              #   dev-API (/api/* e gli endpoint di /cleaning)
 ```
 
 ---
@@ -338,7 +446,7 @@ sequenceDiagram
     Note over GH,VC: 2 · Build e deploy (CI)
     GH->>VC: webhook · nuovo commit su main
     activate VC
-    Note over VC: prebuild · build-zips → ZIP · build-repo-tree → repo-tree.json
+    Note over VC: prebuild · versione Trivia · ZIP · repo-tree.json · 4 pacchetti i18n
     Note over VC: vite build · Rollup → bundle JS/CSS (chunk per rotta)
     Note over VC: vite-plugin-pwa · Workbox → service worker
     VC-->>GH: deploy ok
@@ -376,6 +484,9 @@ sequenceDiagram
 | **Supabase** (REST + Realtime WS) | classifiche, pagelle, progressi, presenze, libro donatori, link tracciabili (fallback `localStorage`) | client + serverless |
 | **Anthropic Claude** (Fable 5) | curiosità del gioco Trivia | serverless `/api/trivia` |
 | **Resend** | email dei voti Festa + avviso di apertura link tracciabili | serverless `/api/notify`, `/api/d` |
+| **Wikipedia · Wikimedia Commons · Openverse** | foto pertinenti alle domande di Trivia, a licenza libera, senza API key | client (cascata, con cache) |
+| **Open-Meteo** | previsioni e medie di agosto sulle pagine `/mima` | client |
+| **Carto basemaps** | tessere delle mappe MapLibre (home, `/mima`) | client |
 
 ---
 
@@ -386,14 +497,15 @@ sequenceDiagram
 | **Core** | React 18.3 · TypeScript · Vite 6.3 |
 | **Routing** | `react-router` 7 (BrowserRouter, `lazy` + `Suspense`) + mappa host → pagina per i sottodomini |
 | **Styling** | design system `.sb-` in CSS puro (custom properties, tema nativo) · Tailwind CSS 4.1 · `tw-animate-css` |
-| **Motion** | `gsap` 3.15 + ScrollTrigger (intro della hero, contatori, magneti, filo di lettura, tilt del vetro) · keyframe CSS per le sette tavole della griglia prodotti · `canvas-confetti` in Trivia |
-| **UI** | icone `homeIcons.tsx` disegnate a mano (outline 24×24, tratto 1.5) · `lucide-react` + `react-icons` dove serve · `@radix-ui/react-context-menu` (archivio) · diagrammi disegnati in CSS, senza librerie |
-| **i18n** | motore proprietario che traduce il DOM in IT · EN · FR · DE |
+| **Motion** | `gsap` 3.15 + ScrollTrigger (intro della hero, contatori, magneti, filo di lettura, deriva e tilt del vetro) · keyframe CSS per le sette tavole della griglia prodotti · `canvas-confetti` in Trivia |
+| **UI** | icone `homeIcons.tsx` disegnate a mano (outline 24×24, tratto 1.5) · `lucide-react` + `react-icons` dove serve · `@radix-ui/react-context-menu` (archivio) · due componenti «React Bits» (ClickSpark, SpotlightCard) raccordati da `homeFx` · diagrammi disegnati in CSS, senza librerie |
+| **3D & mappe** | visualizzatore WebGL scritto a mano per le tre auto (niente three.js) · `maplibre-gl` con tessere Carto, caricata solo all'avvicinarsi |
+| **i18n** | motore proprietario che traduce il DOM in IT · EN · FR · DE, un pacchetto per lingua |
 | **PWA** | `vite-plugin-pwa` + Workbox (precache offline, auto-update) |
-| **Backend** | Supabase via REST/Realtime · 7 funzioni serverless Vercel + `lib/serverSecurity` |
+| **Backend** | Supabase via REST/Realtime · 8 funzioni serverless Vercel + `lib/serverSecurity` |
 | **AI** | `@anthropic-ai/sdk` → Claude Fable 5 (curiosità Trivia) |
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
-| **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero |
+| **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `build-cars.mjs` per i modelli 3D · `scripts/janitor/` per pulizia e benchmark |
 
 > **Peso del primo accesso.** Quattro cose che il browser scaricava e non guardava:
 >
@@ -420,9 +532,13 @@ sequenceDiagram
 Il sito è pensato per essere **a prova di abuso**, senza archiviare dati di terzi.
 
 - **Solo l'email è pubblica** — niente telefono né WhatsApp sul sito o nel CV.
-- **Scritture blindate** — RSVP, firme donatori e contatori non partono diretti dal client verso
-  Supabase: passano da un endpoint serverless con **origin check + rate-limit** e `INSERT` con
-  **service role** (la `anon key` non può iniettare dati fasulli). Le letture restano pubbliche.
+- **Scritture blindate** — RSVP, firme donatori, contatori e lista alcolici MiMa non partono diretti
+  dal client verso Supabase: passano da un endpoint serverless con **origin check + rate-limit** e
+  `INSERT` con **service role** (la `anon key` non può iniettare dati fasulli — né riempire, né
+  svuotare, la lista di qualcun altro). Le letture restano pubbliche, perché servono al realtime.
+- **L'officina non esiste in produzione** — `/cleaning` legge e riscrive i file del repo e fa
+  commit: la rotta è dietro `import.meta.env.DEV` e i suoi endpoint vivono in `configureServer`,
+  cioè solo sotto `vite dev`. Verificato sul build vero, [più sotto](#cleaning--lofficina-in-pagina).
 - **Nessun token GitHub nel front-end** — il repo è privato e l'albero dei file arriva da `git` in
   build, non da un'API autenticata.
 - **Link tracciabili usa-e-getta** — [`/api/d`](api/d.ts) apre, conta e reindirizza; **autodelete a 7 giorni**
@@ -444,8 +560,8 @@ Il sito è pensato per essere **a prova di abuso**, senza archiviare dati di ter
 ```bash
 git clone https://github.com/albertoxpecchini/AP.git && cd AP
 npm install
-npm run dev       # http://localhost:5173 — HMR attivo, middleware /api/*
-npm run build     # bundle di produzione in dist/ (prima: prebuild → ZIP + repo-tree)
+npm run dev       # http://localhost:5173 — HMR attivo, middleware /api/*, /cleaning
+npm run build     # bundle di produzione in dist/ (prima il prebuild, vedi tabella)
 ```
 
 Le chiavi vivono in un `.env` locale (non versionato, e **non** c'è un `.env.example` nel repo):
@@ -455,10 +571,12 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron.
 
 | Comando | Azione |
 | :--- | :--- |
-| `npm run dev` | Dev server Vite + middleware `/api/*` (porta 5173) |
-| `npm run build` | Build statica in `dist/` (`prebuild` → ZIP + `repo-tree.json`, poi `vite build`) |
+| `npm run dev` | Dev server Vite + middleware `/api/*` e `/cleaning` (porta 5173; `predev` → versione Trivia + pacchetti i18n) |
+| `npm run build` | Build statica in `dist/`. Il `prebuild` fa quattro cose: versione di Trivia, ZIP dei progetti, `repo-tree.json`, pacchetti i18n |
 | `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
+| `npm run i18n` | Rigenera solo `src/app/i18n/generated/<lingua>.json` da `translations.json` |
+| `node scripts/build-cars.mjs <cartella>` | Rigenera `public/models/` dai modelli 3D sorgente (che **non** stanno nel repo) |
 | `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
 | `npm run pulizia` | Cerca lo sporco e misura, **senza toccare niente** |
 | `npm run pulizia:applica` | Pulisce, verifica con build + benchmark, annulla da solo se qualcosa peggiora |
@@ -693,9 +811,10 @@ mestiere, non un guasto.
 ### Che le prove le faccia il programma stesso
 
 `npm run pulizia:prove` pianta file veri nel repo, guarda cosa decide l'analisi e rimette tutto
-com'era. Sei prove, non simmetriche di proposito: due controllano che lo sporco venga **trovato**,
-le altre che il pulito **non** venga toccato — un falso negativo costa qualche kB, un falso
-positivo rompe una pagina.
+com'era. **Otto prove**, non simmetriche di proposito: tre controllano che lo sporco venga
+**trovato**, quattro che il pulito **non** venga toccato, una che quel che è stato messo da parte
+torni indietro byte per byte — un falso negativo costa qualche kB, un falso positivo rompe una
+pagina.
 
 I nomi dei file piantati sono casuali, e non è un vezzo: scritti per esteso nel file di test
 passavano per il motivo sbagliato. L'analisi cerca il nome di un file in tutto il testo del repo,
