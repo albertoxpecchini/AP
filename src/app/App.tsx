@@ -522,10 +522,14 @@ const STORIES: { id: string; kind: string; quote: ReactNode }[] = [
   {
     id: "rivalta",
     kind: "Institutional site",
+    // La copy precedente descriveva la versione vecchia del sito (bento grid,
+    // GSAP ScrollTrigger, Next.js). Quello online adesso è l'opposto: nove
+    // pagine di HTML statico, e i numeri del paese non sono affermazioni ma un
+    // estratto OpenStreetMap pubblicato lì accanto.
     quote: (
       <>
-        Minimalist editorial design, GSAP scroll animations and{" "}
-        <strong>image-led visual storytelling</strong> for the village on the Mincio.
+        Nine pages of plain static HTML — no framework, no dependencies — and{" "}
+        <strong>every number backed by a dataset</strong> anyone can download.
       </>
     ),
   },
