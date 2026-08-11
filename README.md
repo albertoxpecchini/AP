@@ -308,18 +308,36 @@ motore compresi, e trenta texture in tutto). Niente è stato semplificato o rico
 
 ---
 
-## 🏞️ Rivalta sul Mincio
+## 🏞️ Rivalta sul Mincio — il dossier del paese
 
-<!-- ─────────────────────────────────────────────────────────────────────────────
-     DA SCRIVERE — sezione lasciata volutamente vuota.
+[**rivaltasulmincio.it**](https://rivaltasulmincio.it) è il dossier di Rivalta sul Mincio, frazione
+di Rodigo, provincia di Mantova, 46040. **Nove pagine**: il paese, i servizi, le attività, la
+comunità, il muoversi, la natura, gli eventi, e una che spiega da dove viene tutto il resto.
 
-     Riferimenti già in repo, per quando si riempie:
-       · site/FreshWork.tsx + freshWork.css — la fascia «just shipped» sotto la
-         hero della home, con il video del sito in loop. È TEMPORANEA: si spegne
-         mettendo SHOW = false in cima a FreshWork.tsx.
-       · public/video/rivalta-sul-mincio.mp4 (3,0 MB, H.264) + .webp (poster)
-       · site/projects.tsx — la voce del progetto nell'archivio
-     ───────────────────────────────────────────────────────────────────────── -->
+- **HTML statico puro.** Zero dipendenze, zero framework, nessun `package.json`: su Vercel non gira
+  nessuna build, le pagine si servono così come sono.
+- **Un assemblatore di 142 righe**, che gira solo in locale: un guscio più nove frammenti. Tenere
+  nove copie a mano della stessa nav significa che prima o poi otto sono aggiornate e una no — ed è
+  sempre quella che qualcuno apre.
+- **Indirizzi senza estensione** — `/paese`, non `/paese.html`. Il vecchio risponde comunque, con
+  un `308`.
+- **Il design system `.sb-` è portato da qui, non reinventato**: grigi puri più un solo verde, un
+  fondale fisso per tutta la pagina — fra una sezione e l'altra nessuna riga di confine — e tema
+  chiaro/scuro nativo, deciso dall'orologio **prima del primo paint**.
+- **Il movimento è vetro, e risponde a un gesto**: la card si inclina sotto il puntatore, la
+  pillola della nav segue la voce, il fondale scorre di un dodicesimo. Sta tutto in un file solo, e
+  se quel file non arriva il sito resta identico e navigabile. Niente parte da sé, e sul touch non
+  parte affatto.
+- **Nessuna API chiamata a runtime.** I dati sono un estratto **OpenStreetMap dell'11 agosto 2026**
+  — 330 punti, 74 vie, 106 incroci — pubblicato **grezzo e scaricabile**: dove il dossier e il
+  dataset non vanno d'accordo, vince il dato che si può riverificare aprendo il JSON.
+- Della **rassegna stampa** si pubblicano solo titolo, testata, data e link. Il resto è di chi
+  l'ha scritto.
+
+Da questa parte c'è solo la vetrina: [`site/FreshWork.tsx`](src/app/site/FreshWork.tsx) è la fascia
+«just shipped» sotto la hero della home, col video del sito che gira in loop (3,0 MB in H.264, in
+pausa fuori dalla finestra, fermo sul poster con `prefers-reduced-motion`). È **temporanea** e si
+spegne con una riga sola: `SHOW = false` in cima al file.
 
 ---
 
