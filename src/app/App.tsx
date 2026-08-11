@@ -73,6 +73,9 @@ const RivaltaMap = lazy(() => import("./site/RivaltaMap"));
    non li paga. */
 const DreamGarage = lazy(() => import("./site/dreamCars"));
 import WhenVisible from "./site/WhenVisible";
+/* Fascia temporanea: il sito di Rivalta appena tornato online, col video che
+   gira in loop. Si spegne con l'interruttore in cima a site/FreshWork.tsx. */
+import FreshWork from "./site/FreshWork";
 import SiteFooter from "./site/SiteFooter";
 import "./home.css";
 
@@ -830,6 +833,11 @@ export default function App() {
             <NowBuilding />
           </div>
         </section>
+
+        {/* Fascia «lavoro fresco» — temporanea, sta qui apposta: è la prima
+            cosa che si incontra scendendo dalla hero. Vedi site/FreshWork.tsx
+            per l'interruttore che la spegne. */}
+        <FreshWork />
 
         {/* ② Griglia prodotti — cosa faccio, card per card */}
         <section id="progetti" className="sb-container sb-products" aria-label="What I do">

@@ -5057,5 +5057,45 @@
     "en": "Choose a name to get your report card.",
     "fr": "Choisis un nom pour avoir ton bulletin.",
     "de": "Wähle einen Namen, um dein Zeugnis zu bekommen."
+  },
+  "Just shipped": {
+    "it": "Appena pubblicato",
+    "fr": "Tout juste en ligne",
+    "de": "Gerade veröffentlicht"
+  },
+  "is back online": {
+    "it": "è di nuovo online",
+    "fr": "est de nouveau en ligne",
+    "de": "ist wieder online"
+  },
+  "The institutional and tourist site for the village on the Mincio — rebuilt and live again.": {
+    "it": "Il sito istituzionale e turistico del borgo sul Mincio — rifatto e di nuovo online.",
+    "fr": "Le site institutionnel et touristique du village sur le Mincio — refait et de nouveau en ligne.",
+    "de": "Die institutionelle und touristische Website des Dorfes am Mincio — neu gebaut und wieder online."
+  },
+  "Every figure about the village in one place": {
+    "it": "Tutti i dati del paese in un posto solo",
+    "fr": "Toutes les données du village au même endroit",
+    "de": "Alle Daten des Dorfes an einem Ort"
+  },
+  ": services, shops, schools, roads, green areas and events, with geodata from OpenStreetMap and the rest from official sources.": {
+    "it": ": servizi, negozi, scuole, strade, verde ed eventi, con i geodati da OpenStreetMap e il resto da fonti ufficiali.",
+    "fr": " : services, commerces, écoles, routes, espaces verts et événements, avec les géodonnées d'OpenStreetMap et le reste de sources officielles.",
+    "de": ": Dienste, Geschäfte, Schulen, Straßen, Grünflächen und Veranstaltungen, mit Geodaten von OpenStreetMap und dem Rest aus offiziellen Quellen."
+  },
+  "Visit the site": {
+    "it": "Visita il sito",
+    "fr": "Visiter le site",
+    "de": "Zur Website"
+  },
+  "How it's built": {
+    "it": "Com'è fatto",
+    "fr": "Comment il est fait",
+    "de": "Wie es gebaut ist"
+  },
+  "Screen recording: a scroll through the rivaltasulmincio.it website": {
+    "it": "Registrazione dello schermo: una scorsa al sito rivaltasulmincio.it",
+    "fr": "Capture d'écran vidéo : un défilement du site rivaltasulmincio.it",
+    "de": "Bildschirmaufnahme: ein Scrollen durch die Website rivaltasulmincio.it"
   }
 }
