@@ -101,9 +101,9 @@
   align-items: baseline;
   gap: calc(var(--cvp) * 0.4);
   padding: calc(var(--cvp) * 0.22) calc(var(--cvp) * 0.7);
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
+  background: var(--sb-shape-edge), var(--sb-bg);
   font-size: calc(var(--cvp) * 0.78);
   color: var(--sb-fg-light);
   text-decoration: none;
@@ -169,9 +169,9 @@
   display: inline-flex;
   align-items: center;
   padding: calc(var(--cvp) * 0.18) calc(var(--cvp) * 0.6);
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
+  background: var(--sb-shape-edge), var(--sb-bg);
   font-size: calc(var(--cvp) * 0.75);
   color: var(--sb-fg-light);
   white-space: nowrap;
@@ -403,8 +403,8 @@
     --sb-fg-light: #525252 !important;
     --sb-fg-lighter: #6f6f6f !important;
     --sb-fg-muted: #8f8f8f !important;
-    --sb-brand: hsl(153, 60%, 53%) !important;
-    --sb-brand-text: hsl(153, 86%, 28%) !important;
+    --sb-brand: hsl(197, 100%, 49%) !important;
+    --sb-brand-text: hsl(197, 86%, 28%) !important;
     background: #ffffff !important;
     color: var(--sb-fg);
   }
@@ -419,7 +419,7 @@
     margin-left: calc(var(--cvp) * 1.5);
   }
 
-  /* Il verde dei nodi, delle barre e delle etichette deve arrivare su carta. */
+  /* L'azzurro dei nodi, delle barre e delle etichette deve arrivare su carta. */
   .sb-cvp-page,
   .sb-cvp-page * {
     -webkit-print-color-adjust: exact;

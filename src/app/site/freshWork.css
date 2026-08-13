@@ -32,7 +32,7 @@
 .sb-fresh-copy { min-width: 0; }
 
 /* La bandierina «Just shipped»: la stessa pillola del resto del sito (bordo
-   1px, radius 999px, fondo di superficie) col pallino verde che pulsa —
+   1px, radius 999px, fondo di superficie) col pallino azzurro che pulsa —
    .sb-chip-dot esiste già in home.css, qui non si ridefinisce niente. */
 .sb-fresh-flag {
   display: inline-flex;
@@ -40,8 +40,8 @@
   height: 26px;
   padding: 0 0.7rem;
   border: 1px solid var(--sb-border-strong);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge), color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -98,8 +98,8 @@
   margin: -0.15rem 0 -0.15rem 0.5rem;
   padding: 0.2rem 0.7rem;
   border: 1px solid var(--sb-border);
-  border-radius: 999px;
-  background: var(--sb-bg);
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge), var(--sb-bg);
   text-align: center;
   color: var(--sb-fg-lighter);
   /* Su schermo stretto l'indirizzo non manda a capo la barra: si taglia. */

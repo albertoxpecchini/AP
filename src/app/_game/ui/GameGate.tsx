@@ -230,7 +230,7 @@ export default function GameGate({
         }
         .gg-chip {
           display:inline-flex; align-items:center; gap:.3rem;
-          border:1.5px solid var(--accent); border-radius:999px;
+          border:1.5px solid var(--accent); clip-path:var(--sb-shape-sm);
           background:transparent; color: var(--accent);
           font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer;
           padding:.32rem .7rem; transition:filter .12s, transform .12s, background .12s;

@@ -56,8 +56,8 @@ export function useTheme(): Theme {
 /** Colore delle scintille. Deve essere un colore VERO: finisce in
  *  ctx.strokeStyle, e il canvas 2D non sa cosa farsene di una var() CSS — la
  *  scarterebbe in silenzio lasciando il nero di default. Sul chiaro serve il
- *  verde scuro (--sb-brand-text), o le scintille sparirebbero sul bianco. */
-const SPARK: Record<Theme, string> = { light: "#0a854e", dark: "#3ECF8E" };
+ *  azzurro scuro (--sb-brand-text), o le scintille sparirebbero sul bianco. */
+const SPARK: Record<Theme, string> = { light: "#0a6285", dark: "#00B3FA" };
 
 // ── ① Fondale della hero ─────────────────────────────────────────────────────
 

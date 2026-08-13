@@ -4,7 +4,7 @@
    ① Nessun colore scritto a mano: solo var(--sb-*). Il tema scuro arriva da
      sé, perché html.dark .sb-home ridichiara gli stessi token — non esiste un
      secondo foglio per il buio.
-   ② Palette neutra più UNA tinta, il verde del marchio. Qui c'erano un rosso
+   ② Palette neutra più UNA tinta, l'azzurro del marchio. Qui c'erano un rosso
      (#d64545) per gli errori e un arancio (#d68b45) per "non salvato": due
      colori vivi in più, in un sito che ne ammette uno. Si distinguono per
      peso, bordo e spaziatura — che è come si distinguono le cose sul resto
@@ -203,8 +203,8 @@
   gap: 0.4rem;
   padding: 0.2rem 0.5rem 0.2rem 0.65rem;
   border: 1px solid var(--sb-border);
-  border-radius: 999px;
-  background: var(--sb-surface-100);
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge), var(--sb-surface-100);
   color: var(--sb-fg-light);
   font-size: 0.76rem;
   white-space: nowrap;
@@ -217,7 +217,7 @@
   min-width: 1.2rem;
   height: 1.2rem;
   padding: 0 0.25rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   background: var(--sb-surface-200);
   color: var(--sb-fg-lighter);
   font-family: "Roboto Mono", ui-monospace, monospace;

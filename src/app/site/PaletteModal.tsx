@@ -47,24 +47,24 @@ interface Grp {
 const GROUPS: Grp[] = [
   {
     id: "brand",
-    t: "Verde brand",
-    s: "Il colore del sito: hsl(153 60% 53%), lo stesso verde di Supabase, usato per accenti, bordi vivi e pulsanti primari.",
+    t: "Azzurro brand",
+    s: "Il colore del sito: hsl(197 100% 49%), l'unica tinta di una palette per il resto tutta grigia — accenti, bordi vivi e pulsanti primari.",
     scope: ".sb-home",
     sw: [
-      { n: "Brand", v: "--sb-brand", l: "hsl(153, 60%, 53%)", note: "accento unico, identico nei due temi" },
-      { n: "Brand testo", v: "--sb-brand-text", l: "hsl(153, 86%, 28%)", d: "hsl(155, 100%, 42%)", note: "verde leggibile sul testo" },
-      { n: "Bottone fondo", v: "--sb-btn-bg", l: "hsl(151, 67%, 67%)", d: "hsl(155, 100%, 19%)" },
-      { n: "Bottone hover", v: "--sb-btn-bg-hover", l: "hsl(151, 63%, 60%)", d: "hsl(155, 74%, 25%)" },
-      { n: "Bottone bordo", v: "--sb-btn-bd", l: "hsla(155, 78%, 40%, 0.75)", d: "hsla(153, 60%, 53%, 0.3)" },
+      { n: "Brand", v: "--sb-brand", l: "hsl(197, 100%, 49%)", note: "accento unico, identico nei due temi" },
+      { n: "Brand testo", v: "--sb-brand-text", l: "hsl(197, 86%, 28%)", d: "hsl(197, 100%, 55%)", note: "azzurro leggibile sul testo" },
+      { n: "Bottone fondo", v: "--sb-btn-bg", l: "hsl(195, 67%, 67%)", d: "hsl(199, 100%, 19%)" },
+      { n: "Bottone hover", v: "--sb-btn-bg-hover", l: "hsl(195, 63%, 60%)", d: "hsl(199, 74%, 25%)" },
+      { n: "Bottone bordo", v: "--sb-btn-bd", l: "hsla(199, 78%, 40%, 0.75)", d: "hsla(197, 100%, 49%, 0.3)" },
       { n: "Bottone testo", v: "--sb-btn-fg", l: "#101010", d: "#ffffff" },
       { n: "Ciano di coppia", l: "hsl(192, 72%, 55%)", note: "coda del filo di lettura e delle barre di avanzamento" },
-      { n: "Selezione", l: "hsla(153, 60%, 53%, 0.35)", note: "::selection" },
+      { n: "Selezione", l: "hsla(197, 100%, 49%, 0.35)", note: "::selection" },
     ],
   },
   {
     id: "fondali",
     t: "Fondali & superfici",
-    s: "Grigi puri, senza tinta: il verde deve essere l'unica cosa colorata della pagina.",
+    s: "Grigi puri, senza tinta: l'azzurro deve essere l'unica cosa colorata della pagina.",
     scope: ".sb-home",
     sw: [
       { n: "Fondo", v: "--sb-bg", l: "#fcfcfc", d: "#141414", note: "fondo pagina" },
@@ -116,7 +116,7 @@ const GROUPS: Grp[] = [
     s: "Le stesse tinte dei token .sb-, ricopiate su :root perché Tailwind e i componenti shadcn (le mappe MapLibre) le leggono da lì. Vivono in styles/theme.css.",
     scope: ":root",
     sw: [
-      { n: "Primario", v: "--primary", l: "hsl(153, 60%, 53%)", note: "il verde brand, uguale nei due temi" },
+      { n: "Primario", v: "--primary", l: "hsl(197, 100%, 49%)", note: "l'azzurro brand, uguale nei due temi" },
       { n: "Fondo", v: "--background", l: "#fcfcfc", d: "#141414" },
       { n: "Testo", v: "--foreground", l: "#171717", d: "#ededed" },
       { n: "Card", v: "--card", l: "#fbfbfb", d: "#1c1c1c" },
@@ -141,13 +141,13 @@ const GROUPS: Grp[] = [
   {
     id: "dati",
     t: "Dati — contribuzioni GitHub",
-    s: "Le candele del grafico nel footer: cinque livelli di intensità, i quadratini di GitHub in salsa verde.",
+    s: "Le candele del grafico nel footer: cinque livelli di intensità, i quadratini di GitHub in salsa azzurra.",
     sw: [
       { n: "Livello 0", l: "rgba(0, 0, 0, 0.05)", d: "rgba(255, 255, 255, 0.07)", note: "giorno senza commit" },
-      { n: "Livello 1", l: "hsla(153, 60%, 43%, 0.35)" },
-      { n: "Livello 2", l: "hsla(153, 60%, 45%, 0.6)" },
-      { n: "Livello 3", l: "hsla(153, 60%, 48%, 0.85)" },
-      { n: "Livello 4", l: "hsl(153, 60%, 53%)", note: "giornata piena" },
+      { n: "Livello 1", l: "hsla(197, 100%, 43%, 0.35)" },
+      { n: "Livello 2", l: "hsla(197, 100%, 45%, 0.6)" },
+      { n: "Livello 3", l: "hsla(197, 100%, 48%, 0.85)" },
+      { n: "Livello 4", l: "hsl(197, 100%, 49%)", note: "giornata piena" },
     ],
   },
   {
@@ -162,7 +162,7 @@ const GROUPS: Grp[] = [
       { n: "Python", l: "#3572a5" },
       { n: "Shell", l: "#89e051" },
       { n: "Markdown", l: "#083fa1" },
-      { n: "Altro", l: "#3ecf8e", note: "fallback quando il linguaggio non è in elenco" },
+      { n: "Altro", l: "#00b3fa", note: "fallback quando il linguaggio non è in elenco" },
     ],
   },
   {
@@ -187,7 +187,7 @@ const GROUPS: Grp[] = [
     sw: [
       {
         n: "Filo di lettura",
-        l: "linear-gradient(90deg, hsl(153, 60%, 53%), hsl(192, 72%, 55%), hsl(153, 60%, 53%))",
+        l: "linear-gradient(90deg, hsl(197, 100%, 49%), hsl(192, 72%, 55%), hsl(197, 100%, 49%))",
         note: "barra in cima alla finestra e sul filo del footer",
       },
       {
@@ -204,13 +204,13 @@ const GROUPS: Grp[] = [
       },
       {
         n: "Alone della card",
-        l: "radial-gradient(circle at 30% 40%, hsla(153, 60%, 53%, 0.16), transparent 62%)",
+        l: "radial-gradient(circle at 30% 40%, hsla(197, 100%, 49%, 0.16), transparent 62%)",
         note: "segue il puntatore dentro il pannello",
       },
       {
         n: "Alone del footer",
-        l: "radial-gradient(circle at 50% 20%, hsla(153, 60%, 53%, 0.14), transparent 68%)",
-        d: "radial-gradient(circle at 50% 20%, hsla(153, 60%, 53%, 0.2), transparent 68%)",
+        l: "radial-gradient(circle at 50% 20%, hsla(197, 100%, 49%, 0.14), transparent 68%)",
+        d: "radial-gradient(circle at 50% 20%, hsla(197, 100%, 49%, 0.2), transparent 68%)",
         note: "la lampada ambientale del footer",
       },
     ],
@@ -221,7 +221,7 @@ const GROUPS: Grp[] = [
 const SHADOWS: Sw[] = [
   { n: "Ombra card", v: "--sb-shadow-card", l: "0 4px 20px -6px rgba(0, 0, 0, 0.1)", d: "0 4px 24px -6px rgba(0, 0, 0, 0.55)" },
   { n: "Ombra nav", l: "0 4px 20px rgba(0, 0, 0, 0.06)", d: "0 4px 20px rgba(0, 0, 0, 0.4)" },
-  { n: "Alone brand", l: "0 0 12px -1px hsl(153, 60%, 53%)", note: "il bagliore delle barre verdi" },
+  { n: "Alone brand", l: "0 0 12px -1px hsl(197, 100%, 49%)", note: "il bagliore delle barre azzurre" },
   { n: "Ombra modale", l: "0 30px 90px rgba(0, 0, 0, 0.6)" },
 ];
 
@@ -566,10 +566,10 @@ export default function PaletteModal() {
                               "--demo-sub": k === "l" ? "#6f6f6f" : "#969696",
                               "--demo-chip": k === "l" ? "#f6f6f6" : "#222222",
                               "--demo-bd": k === "l" ? "#dbdbdb" : "#343434",
-                              "--demo-btn": k === "l" ? "hsl(151, 67%, 67%)" : "hsl(155, 100%, 19%)",
-                              "--demo-btn-bd": k === "l" ? "hsla(155, 78%, 40%, 0.75)" : "hsla(153, 60%, 53%, 0.3)",
+                              "--demo-btn": k === "l" ? "hsl(195, 67%, 67%)" : "hsl(199, 100%, 19%)",
+                              "--demo-btn-bd": k === "l" ? "hsla(199, 78%, 40%, 0.75)" : "hsla(197, 100%, 49%, 0.3)",
                               "--demo-btn-fg": k === "l" ? "#101010" : "#ffffff",
-                              "--demo-brand": k === "l" ? "hsl(153, 86%, 28%)" : "hsl(155, 100%, 42%)",
+                              "--demo-brand": k === "l" ? "hsl(197, 86%, 28%)" : "hsl(197, 100%, 55%)",
                             } as CSSProperties
                           }
                         >

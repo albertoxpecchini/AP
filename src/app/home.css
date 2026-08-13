@@ -7,10 +7,17 @@
    griglia "template" (le pagine del sito), story-card, muro community (qui: il
    curriculum), sezione open source e CTA finale.
 
-   Tema NATIVO chiaro/scuro: palette neutra (grigi puri) + verde brand Supabase
-   hsl(153 60% 53%), tipografia Titillium Web (font_italia.css, al posto di Circular).
+   Tema NATIVO chiaro/scuro: palette neutra (grigi puri) + azzurro brand
+   hsl(197 100% 49%), tipografia Titillium Web (font_italia.css, al posto di Circular).
    Il chiaro è il default; lo scuro si attiva con html.dark (tema globale).
    Prefisso: .sb- (l'archivio incorporato usa .sb-ar-, vedi archivio.css).
+
+   ── La forma ────────────────────────────────────────────────────────────────
+   La sagoma del sito non è la stondatura: è un angolo tagliato a 45° in alto a
+   sinistra e in basso a destra. Vale per le lastre (.sb-panel), le pillole e le
+   tabelle; bottoni e controlli piccoli tengono il loro radius da 6px, perché su
+   una superficie alta 30px un taglio da 10 è più della metà del lato corto.
+   Vedi il blocco «Lo smusso» più sotto per come sono disegnate le sagome.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sb-home {
@@ -28,17 +35,17 @@
   --sb-fg-light: #525252;
   --sb-fg-lighter: #6f6f6f;
   --sb-fg-muted: #8f8f8f;
-  --sb-brand: hsl(153, 60%, 53%);
-  --sb-brand-text: hsl(153, 86%, 28%);
-  /* Banda di luce delle brandline (.sb-shine). La base è lo stesso verde di
-     prima — a riposo il titolo è identico a com'era. Sul chiaro la "luce" è
-     più SCURA della base: su un fondo bianco una passata più chiara
-     sbiadirebbe il testo invece di accenderlo. */
+  --sb-brand: hsl(197, 100%, 49%);
+  --sb-brand-text: hsl(197, 86%, 28%);
+  /* Banda di luce delle brandline (.sb-shine). La base è lo stesso azzurro del
+     brand — a riposo il titolo è la tinta piena. Sul chiaro la "luce" è più
+     SCURA della base: su un fondo bianco una passata più chiara sbiadirebbe il
+     testo invece di accenderlo. */
   --sb-shine-base: var(--sb-brand);
   --sb-shine-hi: var(--sb-brand-text);
-  --sb-btn-bg: hsl(151, 67%, 67%);
-  --sb-btn-bd: hsla(155, 78%, 40%, 0.75);
-  --sb-btn-bg-hover: hsl(151, 63%, 60%);
+  --sb-btn-bg: hsl(195, 67%, 67%);
+  --sb-btn-bd: hsla(199, 78%, 40%, 0.75);
+  --sb-btn-bg-hover: hsl(195, 63%, 60%);
   --sb-btn-fg: #101010;
   --sb-code-kw: #0550ae;
   --sb-code-num: #953800;
@@ -59,6 +66,27 @@
   --sb-glass-rim: rgba(255, 255, 255, 0.55);
   --sb-glass-shadow: 0 10px 34px -14px rgba(0, 0, 0, 0.2);
   --sb-glass-sheen: rgba(255, 255, 255, 0.42);
+  /* L'ombra della lastra non può più essere un box-shadow (clip-path la
+     ritaglia via): è una seconda lastra sfocata, e questo è il suo colore.
+     Vedi «L'ombra, che non può più essere un box-shadow» più sotto. */
+  --sb-glass-slab: rgba(0, 0, 0, 0.14);
+
+  /* ── Smusso ─────────────────────────────────────────────────────────────
+     Tre misure, e sono tre perché il taglio è in pixel assoluti mentre gli
+     elementi non lo sono: su una lastra 18px sono un angolo, su un contatore
+     alto 19px sarebbero più della metà del lato corto e la pillola diventerebbe
+     una losanga. La misura si sceglie dall'altezza, non dal ruolo.
+
+       --sb-cut-xs   contatori e micro-badge (fino a ~24px di altezza)
+       --sb-cut      pillole, tag, filtri, celle di tabella
+       --sb-cut-lg   lastre
+
+     Le sagome vere si costruiscono da qui, nel blocco «Lo smusso»: stanno in un
+     secondo .sb-home più sotto perché devono poter leggere questi tre valori
+     già dichiarati. */
+  --sb-cut-xs: 6px;
+  --sb-cut: 10px;
+  --sb-cut-lg: 18px;
 
   /* ── Lucido del titolo ──────────────────────────────────────────────────
      Il nome della hero non è più una tinta piatta: è una superficie. Sul
@@ -71,7 +99,7 @@
   --sb-gloss-low: #050505;
   --sb-gloss-spec: rgba(255, 255, 255, 0.5);
   --sb-gloss-edge: rgba(255, 255, 255, 0.9);
-  --sb-gloss-halo: hsla(153, 60%, 40%, 0.16);
+  --sb-gloss-halo: hsla(197, 100%, 40%, 0.16);
 
   min-height: 100vh;
   background: var(--sb-bg);
@@ -97,14 +125,14 @@ html.dark .sb-home {
   --sb-fg-light: #b4b4b4;
   --sb-fg-lighter: #969696;
   --sb-fg-muted: #707070;
-  --sb-brand: hsl(153, 60%, 53%);
-  --sb-brand-text: hsl(155, 100%, 42%);
+  --sb-brand: hsl(197, 100%, 49%);
+  --sb-brand-text: hsl(197, 100%, 55%);
   /* Sullo scuro il verso si ribalta: la luce è quasi bianca. */
   --sb-shine-base: var(--sb-brand);
-  --sb-shine-hi: #eafff6;
-  --sb-btn-bg: hsl(155, 100%, 19%);
-  --sb-btn-bd: hsla(153, 60%, 53%, 0.3);
-  --sb-btn-bg-hover: hsl(155, 74%, 25%);
+  --sb-shine-hi: #eaf8ff;
+  --sb-btn-bg: hsl(199, 100%, 19%);
+  --sb-btn-bd: hsla(197, 100%, 49%, 0.3);
+  --sb-btn-bg-hover: hsl(199, 74%, 25%);
   --sb-btn-fg: #ffffff;
   --sb-code-kw: #79c0ff;
   --sb-code-num: #ffcda1;
@@ -119,6 +147,7 @@ html.dark .sb-home {
   --sb-glass-rim: rgba(255, 255, 255, 0.08);
   --sb-glass-shadow: 0 10px 38px -14px rgba(0, 0, 0, 0.65);
   --sb-glass-sheen: rgba(255, 255, 255, 0.1);
+  --sb-glass-slab: rgba(0, 0, 0, 0.5);
 
   /* Al buio il verso si ribalta: bianco pieno in cima, grigio in fondo, e il
      filo sotto le lettere diventa nero — è un'ombra incisa, non un riflesso. */
@@ -127,11 +156,156 @@ html.dark .sb-home {
   --sb-gloss-low: #8e9491;
   --sb-gloss-spec: rgba(255, 255, 255, 0.95);
   --sb-gloss-edge: rgba(0, 0, 0, 0.55);
-  --sb-gloss-halo: hsla(153, 60%, 53%, 0.2);
+  --sb-gloss-halo: hsla(197, 100%, 49%, 0.2);
 }
 
-.sb-home ::selection { background: hsla(153, 60%, 53%, 0.35); }
+/* ── Lo smusso ───────────────────────────────────────────────────────────────
+   La forma del sito: un angolo tagliato a 45° in alto a sinistra e uno in basso
+   a destra. Due diagonali opposte bastano a dare una direzione alla sagoma —
+   tagliarne quattro la rimetterebbe in simmetria e tornerebbe a essere un
+   ottagono, cioè di nuovo un tondo.
+
+   Le sagome sono pronte, una per misura, e si richiamano così:
+
+     .qualcosa { clip-path: var(--sb-shape-sm); }
+
+   Sta in un secondo blocco .sb-home, dopo i token, e NON si può "semplificare"
+   in una sola sagoma con una misura variabile: le custom property vengono
+   sostituite SUBITO, sull'elemento dove sono scritte, e il valore già risolto è
+   quello che eredita. Una --sb-shape che contenesse var(--c) andrebbe a cercare
+   --c qui su .sb-home, non lo troverebbe, e l'intera proprietà diventerebbe
+   invalida (cioè vuota) prima ancora di arrivare a chi la usa. Con --sb-cut,
+   che è dichiarato qui sopra, la sostituzione riesce — ed è anche il motivo per
+   cui il tema scuro funziona da sé: le stesse dichiarazioni si ricalcolano
+   dentro html.dark .sb-home, e il filo sulle diagonali cambia colore con loro. */
+.sb-home {
+  /* Contatori e micro-badge */
+  --sb-shape-xs: polygon(
+    var(--sb-cut-xs) 0,
+    100% 0,
+    100% calc(100% - var(--sb-cut-xs)),
+    calc(100% - var(--sb-cut-xs)) 100%,
+    0 100%,
+    0 var(--sb-cut-xs)
+  );
+  /* Pillole, badge, filtri, celle di tabella */
+  --sb-shape-sm: polygon(
+    var(--sb-cut) 0,
+    100% 0,
+    100% calc(100% - var(--sb-cut)),
+    calc(100% - var(--sb-cut)) 100%,
+    0 100%,
+    0 var(--sb-cut)
+  );
+  /* Lastre: il rim esterno… */
+  --sb-shape-lg: polygon(
+    var(--sb-cut-lg) 0,
+    100% 0,
+    100% calc(100% - var(--sb-cut-lg)),
+    calc(100% - var(--sb-cut-lg)) 100%,
+    0 100%,
+    0 var(--sb-cut-lg)
+  );
+  /* …e il vetro dentro. 0.586px non è un numero magico: è quanto va stretto il
+     taglio interno perché fra le due diagonali resti esattamente 1px, come sui
+     lati dritti. L'inner è inset di 1px (il padding della lastra), e su una
+     retta a 45° un pixel in perpendicolare vale √2 di scostamento —
+     2 − √2 = 0.586. Non arrotondarlo a 1px: la diagonale verrebbe più spessa
+     dei lati, e si vede. */
+  --sb-shape-lg-in: polygon(
+    calc(var(--sb-cut-lg) - 0.586px) 0,
+    100% 0,
+    100% calc(100% - var(--sb-cut-lg) + 0.586px),
+    calc(100% - var(--sb-cut-lg) + 0.586px) 100%,
+    0 100%,
+    0 calc(var(--sb-cut-lg) - 0.586px)
+  );
+
+  /* Il filo da 1px sulle due diagonali, per gli elementi a livello singolo.
+     clip-path taglia anche il border: sui lati dritti il contorno resta, sulle
+     diagonali sparirebbe, e una pillola con due lati aperti sembra rotta.
+
+     Si ridisegna con due gradienti confinati nei quadrati d'angolo. Il 50% non
+     è a occhio: su un quadrato di lato S la linea di taglio dista S/√2
+     dall'angolo, e l'asse di un gradiente a 135° è lungo S·√2 — la metà esatta.
+     I ±0.7px attorno sono il mezzo pixel per lato che fa l'1px. */
+  --sb-shape-edge:
+    linear-gradient(
+        135deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      top left / var(--sb-cut) var(--sb-cut) no-repeat,
+    linear-gradient(
+        315deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      bottom right / var(--sb-cut) var(--sb-cut) no-repeat;
+
+  /* Gli stessi due gradienti alla misura minuta. Il quadrato d'angolo cambia,
+     il conto no: la diagonale sta sempre a metà dell'asse del gradiente. */
+  --sb-shape-edge-xs:
+    linear-gradient(
+        135deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      top left / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat,
+    linear-gradient(
+        315deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      bottom right / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat;
+
+  /* Variante per le pillole piene, dove il filo è del bordo-bottone. */
+  --sb-shape-edge-btn:
+    linear-gradient(
+        135deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      top left / var(--sb-cut) var(--sb-cut) no-repeat,
+    linear-gradient(
+        315deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      bottom right / var(--sb-cut) var(--sb-cut) no-repeat;
+  --sb-shape-edge-btn-xs:
+    linear-gradient(
+        135deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      top left / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat,
+    linear-gradient(
+        315deg,
+        transparent calc(50% - 0.7px),
+        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
+        transparent calc(50% + 0.7px)
+      )
+      bottom right / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat;
+}
+
+.sb-home ::selection { background: hsla(197, 100%, 49%, 0.35); }
 .sb-home :focus-visible { outline: 2px solid var(--sb-brand); outline-offset: 2px; border-radius: 4px; }
+/* clip-path porta via anche l'outline del focus: il contorno viene disegnato
+   fuori dalla sagoma, e la sagoma è tutto ciò che resta visibile. Su un
+   elemento tagliato la messa a fuoco si ridisegna dentro, con un'ombra inset —
+   quella non viene ritagliata perché sta già all'interno della forma. */
+.sb-home :is(.sb-tab, .sb-chip, .sb-nowbuild-btn, .sb-local):focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-brand);
+}
 .sb-home a { color: inherit; }
 
 /* Contenitore di sezione (≈ .section-container di Supabase) */
@@ -188,7 +362,7 @@ html.dark .sb-home {
   translate: var(--sb-px, 0%) calc(var(--sb-drift, 0px) + var(--sb-py, 0%));
 }
 .sb-home::before {
-  background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.14), transparent 62%);
+  background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.14), transparent 62%);
   animation: sb-drift-a 74s ease-in-out infinite alternate;
 }
 /* Il secondo alone si sposta un po' di meno e dalla parte opposta: due strati
@@ -211,7 +385,7 @@ html.dark .sb-home {
   to   { transform: translate3d(-4vw, -3vh, 0) scale(1); }
 }
 html.dark .sb-home::before {
-  background: radial-gradient(58rem 32rem at 16% -8%, hsla(153, 60%, 53%, 0.16), transparent 62%);
+  background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.16), transparent 62%);
 }
 html.dark .sb-home::after {
   background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.12), transparent 60%);
@@ -283,12 +457,14 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 }
 .sb-nav-brand img { width: 28px; height: 28px; border-radius: 7px; display: block; }
 .sb-nav-brand-name { font-size: 0.98rem; font-weight: 500; white-space: nowrap; letter-spacing: -0.01em; }
+/* Pillola piena di tinta brand: prende la sagoma delle altre, con la variante
+   brand del filo sulle diagonali (il border ci arriva solo sui lati dritti). */
 .sb-local {
   font-size: 0.66rem;
   font-weight: 700;
   padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  background: var(--sb-btn-bg);
+  clip-path: var(--sb-shape-xs);
+  background: var(--sb-shape-edge-btn-xs), var(--sb-btn-bg);
   border: 1px solid var(--sb-btn-bd);
   color: var(--sb-btn-fg);
 }
@@ -313,7 +489,7 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-nav-links--pill .sb-nav-link[aria-current="location"] { color: var(--sb-fg); }
 
 /* ── Pillola di vetro ─────────────────────────────────────────────────────
-   Al posto del filo verde che si apriva sotto ogni voce c'è una sola
+   Al posto del filo azzurro che si apriva sotto ogni voce c'è una sola
    pillola che scivola da una voce all'altra. La differenza non è estetica:
    il filo diceva "sei sopra questa", la pillola dice anche "sei DENTRO
    questa sezione" — senza puntatore torna sulla sezione a schermo (lo
@@ -330,6 +506,10 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   width: 100px;
   height: 30px;
   margin-top: -15px;
+  /* Tonda, ed è l'eccezione dichiarata allo smusso: la pillola non ha una
+     larghezza sua, se la prende con scaleX — e un taglio da 10px, stirato dallo
+     stesso fattore, si allargherebbe di voce in voce. Un raggio pieno invece
+     resta un semicerchio a qualunque scala. */
   border-radius: 999px;
   pointer-events: none;
   opacity: 0;
@@ -419,7 +599,7 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-btn--ghost { background: transparent; border-color: transparent; color: var(--sb-fg-light); }
 .sb-btn--ghost:hover { color: var(--sb-fg); background: var(--sb-overlay); }
 
-/* Link verdi "testo + freccia" */
+/* Link azzurri "testo + freccia" */
 .sb-link {
   display: inline-flex;
   align-items: center;
@@ -485,9 +665,9 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   gap: 0.35rem;
   height: 30px;
   padding: 0 0.75rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
+  background: var(--sb-shape-edge), color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
   font-size: 0.8rem;
   font-weight: 500;
   line-height: 1;
@@ -496,8 +676,11 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
+/* Il filo delle diagonali va riscritto anche qui: `background` è una scorciatoia
+   e rimpiazza TUTTI i livelli, quindi un hover che dichiarasse solo la tinta si
+   porterebbe via i due gradienti d'angolo e la pillola resterebbe aperta. */
 .sb-nowbuild-btn:hover {
-  background: var(--sb-surface-200);
+  background: var(--sb-shape-edge), var(--sb-surface-200);
   border-color: color-mix(in srgb, var(--sb-brand) 55%, var(--sb-border-strong));
 }
 .sb-nowbuild-btn svg { opacity: 0.6; transition: transform 0.2s ease, opacity 0.2s ease; }
@@ -588,7 +771,10 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   position: relative;
   height: 100%;
   padding: 1px;
-  border-radius: 12px;
+  /* La lastra è tagliata come tutto il resto. Il rim sopravvive alle diagonali
+     senza trucchi, perché qui il bordo non è un border: è lo sfondo a
+     gradiente di questo elemento, che il taglio ritaglia insieme a lui. */
+  clip-path: var(--sb-shape-lg);
   /* 160deg è il riposo: luce da in alto a sinistra, come prima. Col puntatore
      fino l'angolo lo riscrive site/GlassMotion.tsx, e il filo acceso gira
      seguendo la mano. */
@@ -598,14 +784,54 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
     var(--sb-border-strong) 38%,
     color-mix(in srgb, var(--sb-border) 45%, transparent)
   );
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 a.sb-card:hover .sb-panel,
 button.sb-card:hover .sb-panel,
 .sb-panel--hover:hover {
   background: var(--sb-border-stronger);
-  box-shadow: var(--sb-shadow-card), var(--sb-glass-shadow);
 }
+
+/* ── L'ombra, che non può più essere un box-shadow ─────────────────────────
+   clip-path ritaglia tutto quello che l'elemento dipinge, ombra esterna
+   compresa: sulla lastra tagliata un box-shadow semplicemente non esce.
+   filter: drop-shadow() la seguirebbe, ma un filter crea un backdrop root e
+   spegnerebbe il backdrop-filter di tutto ciò che ha dentro — il vetro si
+   smaterializzerebbe proprio al passaggio del mouse.
+
+   Quindi l'ombra diventa un oggetto: una seconda lastra della stessa forma,
+   sfocata e spostata in basso, appesa al contenitore che NON è ritagliato. In
+   cambio l'ombra segue lo smusso invece di arrotondarlo.
+
+   Vale per chi ha un elemento attorno a cui appenderla — le card della griglia
+   prodotti, quelle delle pagine, le story-card e le due del footer.
+   .sb-panel--hover è la lastra stessa, quindi è già ritagliata e non ha un
+   fuori in cui mettere l'ombra: lì lo stacco resta affidato al rim che si
+   accende e ai pixel di sollevamento. */
+:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-foot-card) {
+  position: relative;
+  isolation: isolate;
+}
+:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-foot-card)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  clip-path: var(--sb-shape-lg);
+  background: var(--sb-glass-slab);
+  filter: blur(12px);
+  transform: translateY(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-foot-card):hover::before { opacity: 1; }
+/* La lastra vera sta sopra la sua ombra. isolation:isolate sul contenitore
+   tiene entrambe dentro lo stesso contesto di impilamento, così l'ombra di una
+   card non può finire sopra la card accanto. Sulle card prodotti in mezzo c'è
+   .sb-spot (il componente dell'alone), che va rialzato al posto suo. */
+:is(.sb-page-card, .sb-story, .sb-foot-card) > .sb-panel,
+:is(a.sb-card, button.sb-card) > .sb-spot { position: relative; z-index: 1; }
 /* Il sollevamento all'hover sta sul pannello, non sulla card: la card è la
    maglia della griglia, spostarla sposterebbe anche il suo ingombro.
 
@@ -626,14 +852,19 @@ button.sb-card:hover .sb-panel,
    e una transition sopra proverebbe a interpolare ognuna di quelle scritture.
    Sul transform si vedeva l'inclinazione arrivare in ritardo e strusciare; sul
    gradiente si pagherebbe un'interpolazione di gradiente a ogni frame per un
-   filo da 1px. Resta l'ombra, che cambia solo all'hover. */
+   filo da 1px. L'ombra, che era l'unica a restare in lista, adesso non sta più
+   qui: è una lastra a parte appesa al contenitore, con la sua transizione. */
 @media (hover: hover) and (pointer: fine) {
-  .sb-panel { transition: box-shadow 0.2s ease; }
+  .sb-panel { transition: none; }
 }
 .sb-panel-inner {
   position: relative;
   height: 100%;
-  border-radius: 11px;
+  /* 0.586px è quanto va stretto il taglio interno perché fra le due diagonali
+     resti esattamente 1px, come sui lati dritti: l'inner è inset di 1px (il
+     padding della lastra), e su una retta a 45° un pixel in perpendicolare vale
+     √2 di scostamento — 2 − √2 = 0.586. Vedi «Lo smusso». */
+  clip-path: var(--sb-shape-lg-in);
   /* Vetro: la tinta piena lascia il posto a una lastra che fa passare il
      fondale. saturate() rimette il colore che la sfocatura porta via. */
   background: var(--sb-glass-bg);
@@ -657,6 +888,23 @@ button.sb-card:hover .sb-panel,
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+
+/* ── La lastra che deve lasciar uscire qualcosa ────────────────────────────
+   clip-path non è overflow: ritaglia TUTTO il sottoalbero, compreso ciò che è
+   position:absolute o fixed. overflow:hidden invece lascia scappare un
+   position:fixed se l'antenato non gli fa da blocco contenitore — ed è su
+   quella differenza che era costruita la barra di controllo, il cui menu delle
+   lingue si apre SOPRA la barra, cioè fuori dalla sua scatola. Ritagliata, la
+   barra se lo mangiava intero: `overflow: visible` sull'interno non serviva più
+   a niente.
+
+   Questa è l'unica via d'uscita, ed è tutta qui: dove qualcosa deve uscire, il
+   taglio si spegne su tutti e due i livelli e la lastra torna stondata. Non è
+   un compromesso nascosto — è la stessa eccezione che si fa alla pillola della
+   nav, e per lo stesso motivo: lo smusso vale per le superfici di contenuto,
+   non per i comandi che galleggiano sopra la pagina. */
+.sb-panel--vent,
+.sb-panel--vent > .sb-panel-inner { clip-path: none; }
 
 /* Ripiego per chi non ha backdrop-filter (Firefox con il flag spento, browser
    vecchi): senza questo le card resterebbero mezze trasparenti sul fondale,
@@ -689,7 +937,6 @@ button.sb-card:hover .sb-panel,
     inset: 0;
     z-index: 2;
     pointer-events: none;
-    border-radius: inherit;
     opacity: 0;
     transform: translateX(-130%);
     background: linear-gradient(
@@ -805,7 +1052,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
    I DISEGNI DELLA GRIGLIA PRODOTTI
 
    Sette figure a tratto, tutte sulla stessa tavola di 280×132, stesso spessore
-   di linea, stesso verde. Vedi la nota in testa a site/homeLive.tsx per il
+   di linea, stesso azzurro. Vedi la nota in testa a site/homeLive.tsx per il
    perché sono disegni e non più miniature di interfacce.
 
    ── Come si muovono ──────────────────────────────────────────────────────────
@@ -891,7 +1138,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   animation-delay: calc(var(--i) * 0.16s);
 }
 /* I tre tratti del contenuto (blocco grande, diagonale, due colonne) sono
-   quelli che raccontano la pagina: vanno in verde, il telaio resta grigio. */
+   quelli che raccontano la pagina: vanno in azzurro, il telaio resta grigio. */
 .sb-ill--blue .sb-ill-draw:nth-child(n + 5) { stroke: var(--ill-brand); opacity: 0.85; }
 .sb-ill-dot { fill: var(--ill-line); stroke: none; }
 @keyframes sb-ill-draw {
@@ -995,7 +1242,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
    Il tracciato dell'offset-path è lo stesso di RUN_PATH in homeLive.tsx: se si
    tocca lì va toccato anche qui, o la palla corre su una curva che non c'è. */
 .sb-ill-ground { stroke: var(--ill-line); stroke-width: 1.5; }
-/* La traccia è verde, non grigia: è la strada che la palla ha fatto, cioè la
+/* La traccia è azzurra, non grigia: è la strada che la palla ha fatto, cioè la
    cosa che la card racconta. Tratteggiata, perché una traiettoria disegnata
    piena diventa un filo teso e smette di sembrare un salto. */
 .sb-ill-arc {
@@ -1182,17 +1429,29 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 
 /* Chip-loghi (card siti clienti / lingue) */
 .sb-chiprow { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+/* Non più pillole di tinta piatta: schegge di vetro con l'angolo tagliato. Tre
+   cose insieme, le stesse delle lastre grandi — la trasparenza, la sfocatura di
+   ciò che passa dietro e il filo di luce sul bordo alto. Il filo specular non è
+   un vezzo: senza, il backdrop-filter da solo si legge come una macchia. */
 .sb-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   padding: 0.42rem 0.85rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
+  /* I due gradienti ridisegnano il bordo sulle diagonali che il clip taglia;
+     l'ultimo livello è il vetro. Vedi «Lo smusso» per il perché del 50%. */
+  background: var(--sb-shape-edge), var(--sb-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+  backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+  box-shadow: inset 0 1px 0 var(--sb-glass-spec);
   font-size: 0.8rem;
   color: var(--sb-fg-light);
   white-space: nowrap;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sb-chip { background: var(--sb-shape-edge), var(--sb-surface-75); }
 }
 .sb-chip svg { color: var(--sb-fg-muted); }
 /* Pallino di stato: emette un anello, perché è quello che vuol dire "live".
@@ -1215,9 +1474,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
    è informazione che cambia da sola. La pausa fra il 70% e il 100% è quella
    che, in ciclo, separa un anello dal successivo. */
 @keyframes sb-ping {
-  0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55); }
-  70% { box-shadow: 0 0 0 7px hsla(153, 60%, 53%, 0); }
-  100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
+  0% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55); }
+  70% { box-shadow: 0 0 0 7px hsla(197, 100%, 49%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0); }
 }
 
 /* Coda della griglia: tagline + "trusted by" */
@@ -1356,7 +1615,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   gap: 0.45rem;
   height: 34px;
   padding: 0 0.9rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid transparent;
   background: none;
   font-family: inherit;
@@ -1366,9 +1625,12 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 .sb-tab:hover { color: var(--sb-fg); }
+/* Solo la scheda scelta ha un contorno, quindi solo lei ha bisogno che il filo
+   venga ridisegnato sulle due diagonali: a riposo il bordo è trasparente e non
+   c'è niente da ricucire. */
 .sb-tab[aria-selected="true"] {
   color: var(--sb-fg);
-  background: var(--sb-surface-100);
+  background: var(--sb-shape-edge), var(--sb-surface-100);
   border-color: var(--sb-border-strong);
 }
 .sb-arch-frame .sb-panel-inner { background: var(--sb-bg-alt); }
@@ -1449,7 +1711,8 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   padding: 0.6rem 0.9rem;
   border-bottom: 1px solid var(--sb-border);
   background: var(--sb-surface-100);
-  border-radius: 11px 11px 0 0;
+  /* Nessun raggio suo: la barra della finestra sta dentro .sb-panel-inner, che
+     adesso ritaglia con clip-path — e il ritaglio del padre vale anche per lei. */
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.76rem;
   color: var(--sb-fg-muted);
@@ -1518,7 +1781,8 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   text-transform: uppercase;
   color: var(--sb-fg-muted);
   border: 1px solid var(--sb-border-strong);
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
+  background: var(--sb-shape-edge-xs);
   padding: 0.18rem 0.55rem;
   white-space: nowrap;
 }
@@ -1540,7 +1804,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   aspect-ratio: 16 / 9;
   /* src/components/ui/map.tsx è generico e legge i token shadcn globali
      (arancio Ubuntu, src/styles/theme.css): li rimappiamo qui ai token .sb-
-     così i controlli zoom ereditano la palette neutra + verde brand del sito
+     così i controlli zoom ereditano la palette neutra + azzurro brand del sito
      invece dell'accento arancio. */
   --background: var(--sb-bg);
   --foreground: var(--sb-fg);
@@ -1578,13 +1842,13 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 }
 .sb-cv-doc:hover { text-decoration: underline; text-underline-offset: 3px; }
 .sb-wall-card--wish .sb-panel {
-  background: linear-gradient(to bottom, hsla(153, 60%, 53%, 0.55), hsla(153, 60%, 53%, 0.12));
+  background: linear-gradient(to bottom, hsla(197, 100%, 49%, 0.55), hsla(197, 100%, 49%, 0.12));
 }
 .sb-wall-card--wish .sb-cv-title { font-style: italic; }
 
 /* ── Garage — i tre modelli 3D ────────────────────────────────────────────
    Qui c'era la palette delle auto: due tinte per materiale, negli stessi grigi
-   del sito e con i vetri nel verde d'accento. È stata tolta perché le auto
+   del sito e con i vetri nell'azzurro d'accento. È stata tolta perché le auto
    adesso portano i LORO colori — quelli dei modelli originali, texture
    comprese — e non c'è più niente da tingere dal foglio di stile.
 
@@ -1694,7 +1958,8 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   font-family: "Titillium Web", sans-serif;
   color: var(--sb-fg-muted);
   border: 1px solid var(--sb-border-strong);
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
+  background: var(--sb-shape-edge-xs);
   padding: 0.12rem 0.5rem;
 }
 
@@ -1710,10 +1975,10 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   border-radius: 2px;
   background: var(--sb-surface-200);
 }
-.sb-cell[data-lv="1"] { background: hsla(153, 60%, 53%, 0.3); }
-.sb-cell[data-lv="2"] { background: hsla(153, 60%, 53%, 0.52); }
-.sb-cell[data-lv="3"] { background: hsla(153, 60%, 53%, 0.74); }
-.sb-cell[data-lv="4"] { background: hsla(153, 60%, 53%, 0.95); }
+.sb-cell[data-lv="1"] { background: hsla(197, 100%, 49%, 0.3); }
+.sb-cell[data-lv="2"] { background: hsla(197, 100%, 49%, 0.52); }
+.sb-cell[data-lv="3"] { background: hsla(197, 100%, 49%, 0.74); }
+.sb-cell[data-lv="4"] { background: hsla(197, 100%, 49%, 0.95); }
 .sb-contrib-foot {
   display: flex;
   align-items: center;
@@ -1726,10 +1991,10 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-contrib-foot b { color: var(--sb-brand-text); font-weight: 500; font-variant-numeric: tabular-nums; }
 .sb-contrib-legend { display: inline-flex; align-items: center; gap: 2px; }
 .sb-contrib-legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--sb-surface-200); }
-.sb-contrib-legend i[data-lv="1"] { background: hsla(153, 60%, 53%, 0.3); }
-.sb-contrib-legend i[data-lv="2"] { background: hsla(153, 60%, 53%, 0.52); }
-.sb-contrib-legend i[data-lv="3"] { background: hsla(153, 60%, 53%, 0.74); }
-.sb-contrib-legend i[data-lv="4"] { background: hsla(153, 60%, 53%, 0.95); }
+.sb-contrib-legend i[data-lv="1"] { background: hsla(197, 100%, 49%, 0.3); }
+.sb-contrib-legend i[data-lv="2"] { background: hsla(197, 100%, 49%, 0.52); }
+.sb-contrib-legend i[data-lv="3"] { background: hsla(197, 100%, 49%, 0.74); }
+.sb-contrib-legend i[data-lv="4"] { background: hsla(197, 100%, 49%, 0.95); }
 
 /* ── Pozza d'acqua ────────────────────────────────────────────────────────
    La regia sta in site/puddle.ts: qui arrivano tre variabili e basta.
@@ -1779,7 +2044,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   background: repeating-radial-gradient(
     circle at var(--pd-x, 50%) var(--pd-y, 50%),
     transparent 0 7px,
-    hsla(153, 60%, 60%, 0.5) 7px 9px,
+    hsla(197, 100%, 60%, 0.5) 7px 9px,
     transparent 9px 17px
   );
   /* Gli anelli sbiadiscono allontanandosi dal dito invece di piastrellare
@@ -1798,7 +2063,7 @@ html:not(.dark) [data-puddle]::after {
   background: repeating-radial-gradient(
     circle at var(--pd-x, 50%) var(--pd-y, 50%),
     transparent 0 7px,
-    hsla(153, 70%, 32%, 0.4) 7px 9px,
+    hsla(197, 100%, 32%, 0.4) 7px 9px,
     transparent 9px 17px
   );
 }
@@ -1906,7 +2171,7 @@ html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
 .sb-menu-mail:hover { color: var(--sb-fg); }
 .sb-menu-mail svg { color: var(--sb-brand-text); }
 
-/* ── Modale PDF: barra coerente con la home verde ────────────────────────── */
+/* ── Modale PDF: barra coerente con la home azzurra ────────────────────────── */
 
 /* ── Skiplink (riusa la convenzione del sito) ────────────────────────────── */
 .sb-home .visually-hidden-focusable:not(:focus):not(:focus-within) {
@@ -2171,11 +2436,14 @@ html.dark .sb-aurora { opacity: 0.42; }
    ricompone spostando il centro, senza ricostruirlo da capo a ogni movimento.
    Il valore iniziale è il centro della card, così un tocco su telefono (dove
    non c'è nessun puntatore da seguire) accende comunque qualcosa di sensato. */
+/* .sb-spot avvolge la lastra ma NON è la lastra: il suo alone sta a z-index 3,
+   cioè fuori dal ritaglio di .sb-panel, e senza la stessa sagoma resterebbe un
+   rettangolo stondato acceso sopra una card tagliata. Va tagliato anche lui. */
 .sb-spot {
   position: relative;
   display: block;
   height: 100%;
-  border-radius: 12px;
+  clip-path: var(--sb-shape-lg);
   --spot-x: 50%;
   --spot-y: 50%;
   --spot-color: color-mix(in srgb, var(--sb-brand) 22%, transparent);
@@ -2184,7 +2452,6 @@ html.dark .sb-aurora { opacity: 0.42; }
   position: absolute;
   inset: 0;
   z-index: 3;
-  border-radius: inherit;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.45s ease;
@@ -2221,7 +2488,6 @@ html.dark .sb-aurora { opacity: 0.42; }
     position: absolute;
     inset: 0;
     z-index: 3;
-    border-radius: inherit;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.45s ease;

@@ -121,7 +121,7 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
       <style>{`
         /* Tutto dai token --sb-* (src/app/home.css). Prima ogni regola era
            scritta due volte — una per il chiaro e una sotto .pag.dark — con due
-           serie di verdi e grigi a mano. Ora la coppia sparisce: i token
+           serie di azzurri e grigi a mano. Ora la coppia sparisce: i token
            cambiano da soli col tema, e restano solo le poche regole .pag.dark
            dove serve davvero una scelta diversa. */
         .pag { font-family:"Titillium Web", Geneva, Tahoma, sans-serif; }
@@ -154,7 +154,7 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
           border:1px solid var(--sb-border); border-radius:11px; padding:.5rem .3rem .45rem;
           background:var(--sb-surface-75); text-align:center;
         }
-        /* "Da fare": bordo tratteggiato verde, niente riempimento pieno. */
+        /* "Da fare": bordo tratteggiato azzurro, niente riempimento pieno. */
         .pag-cell.todo {
           border-style:dashed;
           border-color:color-mix(in srgb, var(--sb-brand) 40%, transparent);
@@ -168,9 +168,9 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
         .pag-cell-meta span { display:inline-flex; align-items:center; gap:.18rem; }
         .pag-cell-delta {
           display:inline-flex; align-items:center; gap:.15rem; margin-top:.18rem;
-          font-size:.56rem; font-weight:800; border-radius:999px; padding:.08rem .35rem;
+          font-size:.56rem; font-weight:800; clip-path:var(--sb-shape-xs); padding:.08rem .35rem;
         }
-        /* Meglio/peggio: il verde è quello del brand, il rosso resta fisso —
+        /* Meglio/peggio: l'azzurro è quello del brand, il rosso resta fisso —
            è l'unico colore che deve dire "in calo" senza dipendere dal tema. */
         .pag-cell-delta.up { color:var(--sb-brand-text); background:color-mix(in srgb, var(--sb-brand) 14%, transparent); }
         .pag-cell-delta.down { color:#e5484d; background:rgba(229,72,77,0.12); }

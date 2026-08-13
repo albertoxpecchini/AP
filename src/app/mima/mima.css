@@ -38,9 +38,9 @@
   gap: 0.5rem;
   margin-top: 1.4rem;
   padding: 0.5rem 0.9rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-btn-bd);
-  background: color-mix(in srgb, var(--sb-brand) 8%, var(--sb-bg));
+  background: var(--sb-shape-edge-btn), color-mix(in srgb, var(--sb-brand) 8%, var(--sb-bg));
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--sb-brand-text);
@@ -121,7 +121,7 @@
   aspect-ratio: 16 / 8;
   /* Stessa rimappatura token di .sb-loc-map in home.css: i controlli zoom di
      src/components/ui/map.tsx leggono i token shadcn globali (arancio
-     Ubuntu) — qui li rimappiamo ai token .sb- per la palette neutra + verde
+     Ubuntu) — qui li rimappiamo ai token .sb- per la palette neutra + azzurro
      brand del sito. */
   --background: var(--sb-bg);
   --foreground: var(--sb-fg);
@@ -254,7 +254,7 @@
    Da qui in giù vive il registro nuovo di /mima e /mima/veicoli: non più un
    articolo con sezioni distanziate ma una console — barra di stato in cima,
    colonna di moduli fitti, rail appiccicoso a destra. Stessi token --sb-*
-   (grigi + un solo verde), stessa famiglia di classi: cambia la densità, non
+   (grigi + un solo azzurro), stessa famiglia di classi: cambia la densità, non
    la tavolozza.
 
    Tutto quello che segue è ADDITIVO. Le classi sopra (-fact, -sechead,
@@ -403,7 +403,7 @@
   margin-left: 0.4rem;
   padding: 0.05rem 0.4rem;
   border: 1px dashed var(--sb-border-stronger);
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   font-family: var(--mima-mono);
   font-size: 0.6rem;
   letter-spacing: 0.04em;
@@ -641,7 +641,7 @@
   border-radius: 50%;
   background: var(--sb-fg-muted);
 }
-/* Verde e pulsante solo quando la lista è condivisa davvero: se il pallino è
+/* Azzurro e pulsante solo quando la lista è condivisa davvero: se il pallino è
    spento, quello che scrivi resta sul tuo browser. */
 .sb-mima-live-dot.is-on { background: var(--sb-brand); animation: sb-ping 2.2s ease-out infinite; }
 
@@ -657,7 +657,7 @@
 .sb-mima-alc-chip { cursor: pointer; }
 .sb-mima-alc-chip.is-on {
   border-color: var(--sb-btn-bd);
-  background: color-mix(in srgb, var(--sb-brand) 12%, var(--sb-bg));
+  background: var(--sb-shape-edge-xs), color-mix(in srgb, var(--sb-brand) 12%, var(--sb-bg));
   color: var(--sb-brand-text);
 }
 .sb-mima-alc-fields { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end; }
@@ -689,7 +689,8 @@
 .sb-mima-alc-chi {
   padding: 0.05rem 0.45rem;
   border: 1px solid var(--sb-border);
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
+  background: var(--sb-shape-edge-xs);
   font-size: 0.68rem;
   color: var(--sb-fg-muted);
   white-space: nowrap;

@@ -7,7 +7,7 @@
    valori diversi da quelli di theme.css (vinceva questa solo per via
    dell'ordine di import). I token stanno ora in un posto solo — theme.css —
    allineati ai --sb-* del design system, e l'arancio non c'è più da nessuna
-   parte: l'accento del sito è il verde brand.
+   parte: l'accento del sito è l'azzurro brand.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -23,11 +23,11 @@ code, pre, kbd, samp {
   font-family: var(--font-site-mono);
 }
 
-/* ── Selezione del testo: verde brand ──
+/* ── Selezione del testo: azzurro brand ──
    Le pagine .sb-home ne hanno una propria (home.css), leggermente diversa;
    questa copre tutto il resto. */
 ::selection {
-  background: hsla(153, 60%, 53%, 0.35);
+  background: hsla(197, 100%, 49%, 0.35);
 }
 
 /* ── Scrollbar sottile e discreta ── */

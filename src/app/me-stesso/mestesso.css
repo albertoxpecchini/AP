@@ -2,7 +2,7 @@
    /me-stesso — la presentazione personale nella veste "piattaforma Supabase"
    della home (.sb-), adattata ai suoi contenuti: nav sottile con ritorno alla
    home, hero a due colonne col ritratto in pannello, sezioni numerate con
-   overline verde, fact-card, card-prodotto dei ruoli in azienda, gallerie
+   overline azzurro, fact-card, card-prodotto dei ruoli in azienda, gallerie
    fotografiche in pannello, blocchi racconto foto+testo, schema ad albero
    della scuola, bandiere dei paesi visitati, mini-storico sportivo e chiusura.
    Eredita TUTTI i token e i componenti base da home.css (il wrapper è
@@ -249,8 +249,8 @@
   gap: 0.5rem;
   height: 38px;
   padding: 0 1rem;
-  border-radius: 999px;
-  background: var(--sb-btn-bg);
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge-btn), var(--sb-btn-bg);
   border: 1px solid var(--sb-btn-bd);
   color: var(--sb-btn-fg);
   font-size: 0.875rem;

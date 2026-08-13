@@ -49,7 +49,7 @@
   text-transform: uppercase;
   color: var(--sb-brand-text);
 }
-/* Filo verde sotto al titolo: chiude la sigla e apre il sottotitolo. */
+/* Filo azzurro sotto al titolo: chiude la sigla e apre il sottotitolo. */
 .sb-bk-rule {
   display: block;
   width: 64px;

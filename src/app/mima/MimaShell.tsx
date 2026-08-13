@@ -15,7 +15,7 @@ import { TRIP_START, TRIP_END } from "./mimaData";
 // Registro: "terminale di viaggio". Le pagine non sono più articoli con
 // sezioni distanziate ma una console — colonna di moduli + rail appiccicoso —
 // costruita con gli stessi token .sb- del resto del sito: grigi neutri, un solo
-// accento verde, niente secondo colore.
+// accento azzurro, niente secondo colore.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** La nav prende il bordo solo quando c'è del contenuto che le scorre sotto. */
@@ -60,7 +60,7 @@ function useDocTitle(title: string) {
 export interface Tick {
   k: string;
   v: string;
-  /** Dato vivo (conto alla rovescia, meteo): si porta dietro il pallino verde. */
+  /** Dato vivo (conto alla rovescia, meteo): si porta dietro il pallino azzurro. */
   live?: boolean;
 }
 

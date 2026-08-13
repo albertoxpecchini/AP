@@ -13,18 +13,21 @@ import type { IntroStep } from "../components/GameIntro";
 //    scene si leggono sia sulla card chiara sia su quella scura. Prima erano
 //    grigi fissi (#3c4a41, #7a8a80…) tarati su una card sempre bianca;
 //  · i colori da ILLUSTRAZIONE restano fissi: sono disegni, non interfaccia.
-//    Le tre card dei tipi di domanda vanno distinte fra loro (verde/blu/
-//    arancio) e l'oro del bonus deve leggersi come "oro" in tutti e due i temi.
-//    Sopra ci sta sempre del bianco, che su un fondo pieno saturo va bene.
-// Il verde è quello del brand, così le scene non litigano col resto del sito.
+//    Le tre card dei tipi di domanda vanno distinte fra loro e l'oro del bonus
+//    deve leggersi come "oro" in tutti e due i temi. Sopra ci sta sempre del
+//    bianco, che su un fondo pieno saturo va bene.
+// Il primo dei tre è il brand, così le scene non litigano col resto del sito.
+// Da quando il brand è azzurro il secondo NON può più essere blu — erano due
+// card della stessa fila e la stessa tinta: è passato al viola, che resta a
+// distanza sia dall'azzurro sia dall'arancio.
 
-const GREEN = "var(--sb-brand-text)";
-const GREEN_LITE = "var(--sb-brand)";
-const BLUE = "#3a7bbf";
+const BRAND = "var(--sb-brand-text)";
+const BRAND_LITE = "var(--sb-brand)";
+const VIOLET = "#7a5bbf";
 const ORANGE = "#b5651d";
 const GOLD = "#D9A400";
-const VIOLA = GREEN;
-const VIOLA_LITE = GREEN_LITE;
+const VIOLA = BRAND;
+const VIOLA_LITE = BRAND_LITE;
 
 // ── Passo 1 ─────────────────────────────────────────────────────────────────
 // "Tre tipi di domanda" — tre card che entrano a cascata, fluttuano in loop
@@ -32,7 +35,7 @@ const VIOLA_LITE = GREEN_LITE;
 function TypesVisual() {
   const cards: { bg: string; label: string; icon: React.ReactNode; delay: number }[] = [
     {
-      bg: GREEN, label: "Scelta\nmultipla", delay: 0,
+      bg: BRAND, label: "Scelta\nmultipla", delay: 0,
       icon: (
         <svg viewBox="0 0 44 44" width="40" height="40" fill="none">
           {[8, 20, 32].map((y, i) => (
@@ -51,7 +54,7 @@ function TypesVisual() {
       ),
     },
     {
-      bg: BLUE, label: "Vero /\nFalso", delay: 0.12,
+      bg: VIOLET, label: "Vero /\nFalso", delay: 0.12,
       icon: (
         <svg viewBox="0 0 44 44" width="40" height="40" fill="none">
           <g style={{ animation: "tut-flip 3s ease-in-out infinite", transformOrigin: "22px 22px" }}>
@@ -126,7 +129,7 @@ function ScoreVisual() {
         <svg viewBox="0 0 132 132" width="132" height="132" style={{ transform: "rotate(-90deg)" }}>
           <circle cx="66" cy="66" r={R} stroke="var(--sb-surface-200)" strokeWidth="11" fill="none" />
           <circle
-            cx="66" cy="66" r={R} stroke={GREEN_LITE} strokeWidth="11" fill="none"
+            cx="66" cy="66" r={R} stroke={BRAND_LITE} strokeWidth="11" fill="none"
             strokeLinecap="round"
             strokeDasharray={C}
             strokeDashoffset={C}
@@ -134,7 +137,7 @@ function ScoreVisual() {
               animation: "tut-ring 2.6s cubic-bezier(.4,0,.2,1) 0.3s infinite",
               // valore custom usato nelle keyframes
               ["--ring-target" as string]: `${C * (1 - pct)}`,
-              filter: `drop-shadow(0 0 6px color-mix(in srgb, ${GREEN_LITE} 53%, transparent))`,
+              filter: `drop-shadow(0 0 6px color-mix(in srgb, ${BRAND_LITE} 53%, transparent))`,
             }}
           />
         </svg>
@@ -143,7 +146,7 @@ function ScoreVisual() {
           flexDirection: "column",
         }}>
           <span style={{
-            fontWeight: 900, fontSize: "2.4rem", color: GREEN_LITE, lineHeight: 1,
+            fontWeight: 900, fontSize: "2.4rem", color: BRAND_LITE, lineHeight: 1,
             animation: "tut-grade-pop 2.6s ease 0.3s infinite",
           }}>A−</span>
         </div>
@@ -209,27 +212,27 @@ function StreakVisual() {
           <div key={r.name} style={{
             display: "flex", alignItems: "center", gap: "0.55rem",
             padding: "0.4rem 0.6rem", borderRadius: 10,
-            background: r.me ? `linear-gradient(90deg, color-mix(in srgb, ${GREEN} 12%, transparent), color-mix(in srgb, ${GREEN} 3%, transparent))` : "var(--sb-overlay)",
-            border: r.me ? `1px solid color-mix(in srgb, ${GREEN} 25%, transparent)` : "1px solid transparent",
+            background: r.me ? `linear-gradient(90deg, color-mix(in srgb, ${BRAND} 12%, transparent), color-mix(in srgb, ${BRAND} 3%, transparent))` : "var(--sb-overlay)",
+            border: r.me ? `1px solid color-mix(in srgb, ${BRAND} 25%, transparent)` : "1px solid transparent",
             animation: r.me
               ? "tut-rank-rise 3s cubic-bezier(.5,0,.2,1) infinite"
               : `tut-row-in 0.5s ease ${0.3 + i * 0.1}s both`,
           }}>
             <span style={{
               width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
-              background: r.me ? GREEN_LITE : "var(--sb-border-stronger)",
+              background: r.me ? BRAND_LITE : "var(--sb-border-stronger)",
               color: r.me ? "#fff" : "var(--sb-fg-muted)",
               fontSize: "0.6rem", fontWeight: 900,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>{i + 1}</span>
             <span style={{
               fontWeight: r.me ? 900 : 700, fontSize: "0.74rem",
-              color: r.me ? GREEN : "var(--sb-fg-light)", width: 52, flexShrink: 0,
+              color: r.me ? BRAND : "var(--sb-fg-light)", width: 52, flexShrink: 0,
             }}>{r.name}</span>
             <div style={{ flex: 1, height: 6, borderRadius: 999, background: "var(--sb-overlay)", overflow: "hidden" }}>
               <div style={{
                 height: "100%", width: r.w, borderRadius: 999,
-                background: r.me ? `linear-gradient(90deg, ${GREEN}, ${GREEN_LITE})` : "var(--sb-border-stronger)",
+                background: r.me ? `linear-gradient(90deg, ${BRAND}, ${BRAND_LITE})` : "var(--sb-border-stronger)",
                 animation: r.me ? "tut-bar-grow 3s ease infinite" : "none",
               }} />
             </div>
@@ -253,12 +256,12 @@ function ContextVisual() {
     <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", gap: "0.7rem" }}>
       <div style={{
         borderRadius: 14, overflow: "hidden",
-        border: `1px solid color-mix(in srgb, ${GREEN} 20%, transparent)`,
-        boxShadow: `0 10px 24px color-mix(in srgb, ${GREEN} 13%, transparent)`,
+        border: `1px solid color-mix(in srgb, ${BRAND} 20%, transparent)`,
+        boxShadow: `0 10px 24px color-mix(in srgb, ${BRAND} 13%, transparent)`,
         animation: "tut-card-in 0.5s cubic-bezier(.34,1.56,.64,1) both",
       }}>
         {/* banner contesto */}
-        <div style={{ background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LITE})`, padding: "0.7rem 0.85rem", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+        <div style={{ background: `linear-gradient(135deg, ${BRAND}, ${BRAND_LITE})`, padding: "0.7rem 0.85rem", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
           {rows.map(r => (
             <div key={r.k} style={{
               display: "flex", alignItems: "baseline", gap: "0.45rem",
@@ -277,9 +280,9 @@ function ContextVisual() {
               <span key={o} style={{
                 flex: 1, textAlign: "center", padding: "0.35rem", borderRadius: 8,
                 fontSize: "0.72rem", fontWeight: 800,
-                background: i === 0 ? `color-mix(in srgb, ${GREEN} 10%, transparent)` : "var(--sb-overlay)",
-                color: i === 0 ? GREEN : "var(--sb-fg-muted)",
-                border: i === 0 ? `1.5px solid ${GREEN}` : "1.5px solid transparent",
+                background: i === 0 ? `color-mix(in srgb, ${BRAND} 10%, transparent)` : "var(--sb-overlay)",
+                color: i === 0 ? BRAND : "var(--sb-fg-muted)",
+                border: i === 0 ? `1.5px solid ${BRAND}` : "1.5px solid transparent",
                 animation: i === 0 ? "tut-pop-soft 2.6s ease 1s infinite" : "none",
               }}>{o}</span>
             ))}
@@ -325,8 +328,8 @@ function CoverageVisual() {
             <span style={{
               fontSize: "0.74rem", fontWeight: 900, fontVariantNumeric: "tabular-nums",
               padding: "0.1rem 0.5rem", borderRadius: 999,
-              color: c.done ? "#fff" : GREEN,
-              background: c.done ? VIOLA : `color-mix(in srgb, ${GREEN} 10%, transparent)`,
+              color: c.done ? "#fff" : BRAND,
+              background: c.done ? VIOLA : `color-mix(in srgb, ${BRAND} 10%, transparent)`,
               animation: c.done ? `tut-badge-pop 2.6s ease ${0.8 + c.d}s infinite` : "none",
             }}>{c.n}</span>
           </div>
@@ -341,8 +344,8 @@ function CoverageVisual() {
 // un mini-libretto "pagella" che si apre.
 function GradeVisual() {
   const grades = [
-    { g: "A+", lab: "Neoclassicismo · Multipla", col: GREEN_LITE, d: 0.2 },
-    { g: "A−", lab: "Torre Eiffel · Vero/Falso", col: GREEN, d: 0.5 },
+    { g: "A+", lab: "Neoclassicismo · Multipla", col: BRAND_LITE, d: 0.2 },
+    { g: "A−", lab: "Torre Eiffel · Vero/Falso", col: BRAND, d: 0.5 },
     { g: "B", lab: "Bauhaus · Completamento", col: GOLD, d: 0.8 },
   ];
   return (

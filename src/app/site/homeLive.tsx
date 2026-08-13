@@ -11,7 +11,7 @@
 //
 // ── Cosa sono adesso ─────────────────────────────────────────────────────────
 // Sette DISEGNI, tutti a tratto, tutti sulla stessa tavola (viewBox 280×132),
-// stesso spessore di linea, stesso verde. Non sono più schermate: sono le
+// stesso spessore di linea, stesso azzurro. Non sono più schermate: sono le
 // figure di un manuale. Guardando la griglia da lontano si vede una collezione,
 // e ogni figura si legge da sé senza etichette:
 //
@@ -312,7 +312,7 @@ export function TypeSpecimen() {
    strade che prima non c'erano. Nessuna scintilla, nessun cervello stilizzato,
    nessun robot — la figura di un libro di ottica.
 
-   Un solo verde, come tutto il resto del sito: il ventaglio non si apre in
+   Un solo azzurro, come tutto il resto del sito: il ventaglio non si apre in
    arcobaleno, si apre in cinque intensità dello stesso colore.
 
    Il gesto: il raggio arriva, attraversa, e il ventaglio si apre a rastrello

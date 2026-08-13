@@ -140,7 +140,7 @@ export default function ControlBar() {
         }}
       >
         {/* Una sola pillola: lingua · | · tema · sensore orario */}
-        <div className="sb-panel sb-ctl-panel">
+        <div className="sb-panel sb-panel--vent sb-ctl-panel">
           <div className="sb-panel-inner">
             <LanguageSwitcher />
             <span className="sb-ctl-div" aria-hidden="true" />

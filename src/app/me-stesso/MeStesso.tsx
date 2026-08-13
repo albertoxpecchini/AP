@@ -42,7 +42,7 @@ import "./mestesso.css";
 // «Me stesso» — presentazione personale di Alberto Pecchini (Esame di Stato
 // 2026), rifatta sulla grammatica Supabase della home (.sb-): nav sottile 64px,
 // hero a due colonne col ritratto in pannello, sezioni numerate con overline
-// verde, fact-card, card-prodotto dei ruoli in azienda, gallerie fotografiche,
+// azzurro, fact-card, card-prodotto dei ruoli in azienda, gallerie fotografiche,
 // blocchi racconto, schema ad albero della scuola, bandiere dei paesi visitati,
 // mini-storico sportivo e chiusura «Grazie».
 // Tema chiaro/scuro NATIVO via token --sb-* (home.css); stili in mestesso.css.

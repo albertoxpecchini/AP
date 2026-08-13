@@ -276,7 +276,7 @@ const TOUR_CSS = `
     background: var(--sb-btn-bg); color: var(--sb-btn-fg);
     border: 1px solid var(--sb-btn-bd);
     font-weight: 800; font-size: 0.72rem;
-    padding: 5px 10px; border-radius: 999px; white-space: nowrap;
+    padding: 5px 10px; clip-path: var(--sb-shape-xs); white-space: nowrap;
     box-shadow: 0 6px 18px var(--tour-glow); pointer-events: none;
     font-family: "Titillium Web", sans-serif;
     animation: tour-hint-bob 1s ease-in-out infinite;

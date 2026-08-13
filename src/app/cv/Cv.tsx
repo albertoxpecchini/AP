@@ -42,7 +42,7 @@ import "./cv.css";
 // Arrivando con ?print (dal bottone della home) la stampa parte da sola.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Un'icona per sezione, nel pallino verde della testata. */
+/** Un'icona per sezione, nel pallino azzurro della testata. */
 const SECTION_ICON = {
   profile: IcUser,
   skills: IcRuler,

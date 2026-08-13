@@ -20,7 +20,7 @@ export interface GameAccent {
   glow: string;
 }
 
-// Accento = il verde brand del sito (Trivia è l'unico gioco rimasto).
+// Accento = l'azzurro brand del sito (Trivia è l'unico gioco rimasto).
 export const ACCENTS: Record<string, GameAccent> = {
   trivia: {
     accent: "var(--sb-brand-text)",

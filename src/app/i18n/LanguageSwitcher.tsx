@@ -11,7 +11,7 @@ import { getLang, setLang, subscribeLang, langMeta, LANGS, type Lang } from "./l
 //  · Al clic si apre, verso l'alto, l'elenco delle 4 lingue (molla + cascata),
 //    con l'indicatore "attivo" che scorre da una voce all'altra.
 //  · Scegliendo una lingua parte un'onda a tutto schermo (cerchio che si espande
-//    dal widget, fondo della pagina + alone verde e nome della lingua): a metà
+//    dal widget, fondo della pagina + alone azzurro e nome della lingua): a metà
 //    corsa il sito viene ritradotto SOTTO l'onda, poi l'onda svanisce. Niente
 //    ricaricamento.
 //

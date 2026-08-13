@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    Filo di avanzamento della lettura — globale, sul bordo alto della finestra.
    Vive su ogni pagina (montato in main.tsx), quindi NON dipende dai token di
-   una pagina sola: si porta dietro il verde del sito.
+   una pagina sola: si porta dietro l'azzurro del sito.
 
    Impilamento: z-index 60 lo mette sopra le barre di navigazione appiccicate
    (z 50) ma SOTTO menu a tendina, cassetti e modali (z ≥ 100). Quando si apre
@@ -29,12 +29,12 @@
   width: 100%;
   transform: scaleX(0);
   transform-origin: left center;
-  background: linear-gradient(90deg, hsl(153, 60%, 53%), hsl(192, 72%, 55%), hsl(153, 60%, 53%));
-  box-shadow: 0 0 12px -1px hsl(153, 60%, 53%);
+  background: linear-gradient(90deg, hsl(197, 100%, 49%), hsl(192, 72%, 55%), hsl(197, 100%, 49%));
+  box-shadow: 0 0 12px -1px hsl(197, 100%, 49%);
 }
 
-/* Sullo scuro il filo va alzato di poco: il fondo assorbe il verde. */
-html.dark .ap-progress-fill { box-shadow: 0 0 14px -1px hsl(153, 60%, 53%); }
+/* Sullo scuro il filo va alzato di poco: il fondo assorbe l'azzurro. */
+html.dark .ap-progress-fill { box-shadow: 0 0 14px -1px hsl(197, 100%, 49%); }
 
 @media print {
   .ap-progress { display: none; }

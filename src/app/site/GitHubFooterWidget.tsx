@@ -49,18 +49,18 @@ const LANG_COLORS: Record<string, string> = {
   Jupyter: "#DA5B0B", "Jupyter Notebook": "#DA5B0B", MDX: "#fcb32c", Lua: "#000080",
   MATLAB: "#e16737", Makefile: "#427819", Batchfile: "#C1F12E", PowerShell: "#012456",
 };
-const LANG_FALLBACK = "#3ecf8e";
+const LANG_FALLBACK = "#00b3fa";
 const langColor = (name: string | null) => (name && LANG_COLORS[name]) || LANG_FALLBACK;
 
-// Sfondo delle candele del grafico per livello di intensità (0-4), scala verde
+// Sfondo delle candele del grafico per livello di intensità (0-4), scala del brand
 // brand (i "quadratini" GitHub in salsa Supabase). Il livello 0 usa il token
 // overlay così resta visibile su entrambi i temi.
 const LEVEL_BG = [
   "var(--sb-overlay)",
-  "hsla(153, 60%, 43%, 0.35)",
-  "hsla(153, 60%, 45%, 0.6)",
-  "hsla(153, 60%, 48%, 0.85)",
-  "hsl(153, 60%, 53%)",
+  "hsla(197, 100%, 43%, 0.35)",
+  "hsla(197, 100%, 45%, 0.6)",
+  "hsla(197, 100%, 48%, 0.85)",
+  "hsl(197, 100%, 49%)",
 ];
 const levelBg = (lvl: number) => LEVEL_BG[Math.max(0, Math.min(4, lvl))];
 
@@ -475,7 +475,7 @@ export default function GitHubFooterWidget() {
            sopra — allo stesso modo dei pallini dei clienti sulla home. */
         .sb-gh__dot {
           width: 7px; height: 7px; border-radius: 50%; margin-right: 0.5rem; flex-shrink: 0;
-          background: var(--sb-brand); box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55);
+          background: var(--sb-brand); box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55);
         }
         .sb-gh__act:hover .sb-gh__dot { animation: sb-gh-live 1.4s ease-out; }
 
@@ -483,8 +483,8 @@ export default function GitHubFooterWidget() {
         .sb-gh__chips { gap: 0.5rem 0.55rem; }
         .sb-gh__chip {
           display: inline-flex; align-items: center; gap: 0.32rem;
-          padding: 0.16rem 0.6rem; border-radius: 999px;
-          background: var(--sb-bg);
+          padding: 0.16rem 0.6rem; clip-path: var(--sb-shape-xs);
+          background: var(--sb-shape-edge-xs), var(--sb-bg);
           border: 1px solid var(--sb-border-strong);
           font-size: 0.78rem; color: var(--sb-fg-light); white-space: nowrap;
           transition: border-color 0.15s, background 0.15s, color 0.15s;
@@ -494,7 +494,7 @@ export default function GitHubFooterWidget() {
         a.sb-gh__repo:hover {
           color: var(--sb-fg);
           border-color: var(--sb-brand);
-          background: hsla(153, 60%, 53%, 0.08);
+          background: hsla(197, 100%, 49%, 0.08);
         }
         .sb-gh__langdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
@@ -556,9 +556,9 @@ export default function GitHubFooterWidget() {
 
         @keyframes sb-gh-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.75; } }
         @keyframes sb-gh-live {
-          0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55); }
-          70% { box-shadow: 0 0 0 6px hsla(153, 60%, 53%, 0); }
-          100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
+          0% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55); }
+          70% { box-shadow: 0 0 0 6px hsla(197, 100%, 49%, 0); }
+          100% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0); }
         }
         @media (prefers-reduced-motion: reduce) {
           .sb-gh__skeleton, .sb-gh__dot { animation: none; }

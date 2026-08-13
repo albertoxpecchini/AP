@@ -22,7 +22,7 @@ import "./cleaning.css";
 // Veste: design system .sb- della piattaforma, come le altre pagine — stesso
 // guscio (fondale unico fisso, nav sottile con briciola, sezioni trasparenti),
 // stessi bottoni, stessi pannelli. Le classi proprie hanno il prefisso della
-// pagina, `.sb-cl-*`. Palette neutra più il solo verde del marchio: qui non
+// pagina, `.sb-cl-*`. Palette neutra più il solo azzurro del marchio: qui non
 // c'è un rosso per gli errori né un arancio per gli avvisi, si distinguono
 // per peso e bordo — vedi cleaning.css.
 //

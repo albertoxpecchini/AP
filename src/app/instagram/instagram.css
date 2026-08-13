@@ -32,9 +32,9 @@
   gap: 0.45rem;
   margin: 0 0 1.4rem;
   padding: 0.3rem 0.75rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg-alt);
+  background: var(--sb-shape-edge), var(--sb-bg-alt);
   font-size: 0.78rem;
   color: var(--sb-fg-lighter);
   white-space: nowrap;
@@ -60,9 +60,9 @@
   gap: 0.5rem;
   margin: 0;
   padding: 0.32rem 0.8rem 0.32rem 0.65rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg-alt);
+  background: var(--sb-shape-edge), var(--sb-bg-alt);
   font-size: 0.82rem;
   color: var(--sb-fg-lighter);
 }
@@ -80,9 +80,9 @@
   animation: sb-ig-pulse 2s ease-out infinite;
 }
 @keyframes sb-ig-pulse {
-  0% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0.55); }
-  70% { box-shadow: 0 0 0 7px hsla(153, 60%, 53%, 0); }
-  100% { box-shadow: 0 0 0 0 hsla(153, 60%, 53%, 0); }
+  0% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55); }
+  70% { box-shadow: 0 0 0 7px hsla(197, 100%, 49%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0); }
 }
 
 /* ── Strumento: le due liste, come card prodotto ─────────────────────────── */
@@ -128,7 +128,7 @@
 }
 .sb-ig-textarea:focus {
   border-color: var(--sb-brand);
-  box-shadow: 0 0 0 3px hsla(153, 60%, 53%, 0.18);
+  box-shadow: 0 0 0 3px hsla(197, 100%, 49%, 0.18);
 }
 .sb-ig-textarea::placeholder { color: var(--sb-fg-muted); }
 
@@ -242,9 +242,9 @@ html.dark .sb-ig-alert svg { color: hsl(38, 85%, 62%); }
   font-variant-numeric: tabular-nums;
 }
 .sb-ig-res-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-/* Lista in evidenza: bordo-gradiente verde (come la card "wish" della home) */
+/* Lista in evidenza: bordo-gradiente azzurro (come la card "wish" della home) */
 .sb-ig-card--primary .sb-panel {
-  background: linear-gradient(to bottom, hsla(153, 60%, 53%, 0.55), hsla(153, 60%, 53%, 0.12));
+  background: linear-gradient(to bottom, hsla(197, 100%, 49%, 0.55), hsla(197, 100%, 49%, 0.12));
 }
 .sb-ig-card--primary .sb-ig-res-head svg { color: var(--sb-brand-text); }
 
@@ -354,8 +354,10 @@ html.dark .sb-home.sb-ig-tut { background: rgba(0, 0, 0, 0.7); }
   overflow: auto;
   padding: clamp(1.1rem, 3vw, 1.8rem);
   border: 1px solid var(--sb-border-strong);
-  border-radius: 12px;
-  background: var(--sb-bg);
+  /* Lastra tagliata come il resto. Il filo va ridisegnato sulle due diagonali:
+     il border ci arriva solo sui lati dritti. */
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge), var(--sb-bg);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
   display: grid;
   grid-template-columns: 250px 1fr;

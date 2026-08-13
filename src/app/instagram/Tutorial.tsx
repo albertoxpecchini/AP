@@ -15,10 +15,10 @@ import "./instagram.css";
 // Veste "piattaforma Supabase" come la pagina: il portale porta con sé la classe
 // .sb-home per ereditare i token (tema chiaro/scuro nativo), gli stili vivono in
 // instagram.css e le icone sono quelle della casa (homeIcons). Nei mockup il
-// segno "guarda qui" è il verde brand; il blu di Meta resta quello vero.
+// segno "guarda qui" è l'azzurro brand; il blu di Meta resta quello vero.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const HI = "hsl(153, 55%, 36%)";   // verde brand: evidenzia il punto da premere
+const HI = "hsl(197, 100%, 36%)";   // azzurro brand: evidenzia il punto da premere
 const INK = "#171717";
 const SUB = "#6f6f6f";
 const LINE = "#e8e8e8";
@@ -37,7 +37,7 @@ function Phone({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Segno "premi qui": pallino verde con anello, al posto della manina.
+// Segno "premi qui": pallino azzurro con anello, al posto della manina.
 function Tap({ x, y }: { x: number; y: number }) {
   return (
     <g>
@@ -123,7 +123,7 @@ function SiteBrowser() {
         <path d="M80.7 25.5v-1.6a1.8 1.8 0 0 1 3.6 0v1.6" />
       </g>
       <text x="91" y="31" fontSize="9.5" fill={SUB}>albertopecchini.it/instagram</text>
-      {/* hero della pagina: titolo + riga verde */}
+      {/* hero della pagina: titolo + riga azzurra */}
       <rect x="10" y="44" width="280" height="66" fill="#f8f8f8" />
       <rect x="26" y="60" width="150" height="9" rx="4.5" fill="#d4d4d4" />
       <rect x="26" y="76" width="196" height="7" rx="3.5" fill={HI} opacity="0.65" />
@@ -144,7 +144,7 @@ function SiteBrowser() {
         <rect x="166" y="190" width="80" height="8" rx="4" fill={FILL} />
       </g>
       {/* bottone Confronta */}
-      <rect x="26" y="266" width="248" height="34" rx="6" fill="hsl(151, 67%, 67%)" stroke="hsla(155, 78%, 40%, 0.75)" />
+      <rect x="26" y="266" width="248" height="34" rx="6" fill="hsl(195, 67%, 67%)" stroke="hsla(199, 78%, 40%, 0.75)" />
       <text x="150" y="288" fontSize="12" fontWeight="500" fill="#101010" textAnchor="middle">Confronta</text>
       <Tap x={252} y={283} />
     </svg>

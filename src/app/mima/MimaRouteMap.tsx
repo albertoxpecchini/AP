@@ -12,12 +12,12 @@ import { MIMA_CENTER, MIMA_ZOOM, PLACES, ROUTE, TRIP_PLACES, type Place } from "
 //             con hostel, mare e centri marcati.
 //   "route" — il viaggio intero, Rivalta sul Mincio → Cervia, col tracciato.
 //
-// Il verde è scritto per esteso perché l'API di MapLibre vuole una stringa di
+// L'azzurro è scritto per esteso perché l'API di MapLibre vuole una stringa di
 // colore, non una var CSS. È lo stesso valore di --sb-brand, che è identico in
 // chiaro e in scuro (vedi home.css): non è un secondo accento.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BRAND = "hsl(153, 60%, 53%)";
+const BRAND = "hsl(197, 100%, 49%)";
 
 const ROUTE_PINS: Place[] = [PLACES.rivalta, PLACES.hostel];
 

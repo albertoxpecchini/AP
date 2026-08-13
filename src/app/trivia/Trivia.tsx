@@ -39,7 +39,7 @@ import "./trivia.css";
 // capitoli, tipi di domanda, barra di lancio, funzioni e CTA — chiusa dal
 // footer condiviso del sito (vedi TriviaMenu.tsx). La PARTITA e i RISULTATI
 // restano a schermo intero, ma parlano la stessa lingua: pannelli a
-// bordo-gradiente, verde brand, bottoni h38/radius 6 (vedi trivia.css).
+// bordo-gradiente, azzurro brand, bottoni h38/radius 6 (vedi trivia.css).
 // Tema chiaro/scuro nativo via token --sb-*; il valore `dark` serve ancora alle
 // schede di gioco (classifica, pagella, gate, tutorial) che hanno palette propria.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -857,9 +857,9 @@ function ResStat({ value, label }: { value: string; label: string }) {
   );
 }
 
-// Colori dei coriandoli: il verde del brand e la sua variante scura.
-const CONFETTI_BRAND = "#3ecf8e";
-const CONFETTI_DEEP = "#006239";
+// Colori dei coriandoli: l'azzurro del brand e la sua variante scura.
+const CONFETTI_BRAND = "#00b3fa";
+const CONFETTI_DEEP = "#004261";
 
 // % di una lettera-voto (per confronto "miglior voto"). Coarse ma sufficiente.
 function gradeToPct(letter: string): number {

@@ -309,10 +309,10 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
       <style>{`
         /* Tutto dai token --sb-* (src/app/home.css). Prima quasi ogni regola
            era scritta due volte — una per il chiaro e una sotto .trv-lb.dark —
-           con due serie di verdi e grigi a mano; i token cambiano da soli col
+           con due serie di azzurri e grigi a mano; i token cambiano da soli col
            tema, quindi la coppia sparisce. Restano fissi solo i colori che NON
            sono interfaccia: le medaglie del podio e i bianchi sopra la fascia
-           verde piena dell'header. */
+           azzurra piena dell'header. */
         .trv-lb {
           position: fixed; inset: 0; z-index: 260;
           /* Velo scuro in tutti e due i temi: è il fondo di una modale, il suo
@@ -333,7 +333,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         }
         @keyframes trv-lb-up { from { opacity:0; transform:translateY(16px) scale(.97) } to { opacity:1; transform:none } }
 
-        /* ── Header: fascia verde piena, testo bianco in entrambi i temi ── */
+        /* ── Header: fascia azzurra piena, testo bianco in entrambi i temi ── */
         .trv-lb-head {
           background: linear-gradient(120deg,
             var(--sb-brand-text) 0%,
@@ -368,7 +368,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-live {
           display:inline-flex; align-items:center; gap:.32rem;
           font-size:.66rem; font-weight:700; letter-spacing:.02em;
-          background:rgba(255,255,255,0.13); border-radius:999px; padding:.2rem .6rem;
+          background:rgba(255,255,255,0.13); clip-path:var(--sb-shape-xs); padding:.2rem .6rem;
           color:rgba(255,255,255,0.78);
         }
         .trv-lb-live.on { background:rgba(255,255,255,0.22); color:#fff; }
@@ -383,13 +383,13 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-tabs { display:flex; gap:.4rem; margin-top:.7rem; position:relative; z-index:1; }
         .trv-lb-tab {
           flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.35rem;
-          border:none; border-radius:999px; padding:.4rem .6rem; cursor:pointer;
+          border:none; clip-path:var(--sb-shape-sm); padding:.4rem .6rem; cursor:pointer;
           font-family:inherit; font-size:.78rem; font-weight:800;
           background:rgba(255,255,255,0.13); color:rgba(255,255,255,0.82);
           transition:background .15s, color .15s, transform .1s;
         }
         .trv-lb-tab:hover { background:rgba(255,255,255,0.2); }
-        /* La tab attiva è un ritaglio della card sulla fascia verde: prende il
+        /* La tab attiva è un ritaglio della card sulla fascia azzurra: prende il
            fondo della card, quindi segue il tema pur stando sull'header. */
         .trv-lb-tab.act { background:var(--sb-surface-75); color:var(--sb-brand-text); box-shadow:0 2px 8px rgba(0,0,0,0.2); }
 
@@ -409,7 +409,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-fbtn {
           display:inline-flex; align-items:center; gap:.3rem; white-space:nowrap; scroll-snap-align:start;
           border:1.5px solid var(--sb-border-strong); background:transparent;
-          color:var(--sb-brand-text); border-radius:999px; padding:.32rem .72rem;
+          color:var(--sb-brand-text); clip-path:var(--sb-shape-sm); background:var(--sb-shape-edge); padding:.32rem .72rem;
           font-family:inherit; font-size:.76rem; font-weight:700; cursor:pointer;
           transition:background .14s, color .14s, border-color .14s, transform .1s;
         }
@@ -494,7 +494,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
         .trv-lb-accnum { font-size:.64rem; font-weight:800; color:var(--sb-brand-text); font-variant-numeric:tabular-nums; width:28px; text-align:right; flex-shrink:0; }
         .trv-lb-chap {
           font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
-          color:var(--sb-fg-muted); background:var(--sb-surface-200); padding:.16rem .45rem; border-radius:999px;
+          color:var(--sb-fg-muted); background:var(--sb-surface-200); padding:.16rem .45rem; clip-path:var(--sb-shape-xs);
           overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center;
         }
         .trv-lb-score { font-weight:900; font-size:.98rem; color:var(--sb-fg); font-variant-numeric:tabular-nums; text-align:right; }

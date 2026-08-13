@@ -10,7 +10,7 @@
      CTA finale                → Gioca
 
    La PARTITA (domande) e i RISULTATI restano a schermo intero, ma parlano la
-   stessa lingua: pannelli a bordo-gradiente, verde brand, bottoni h38/radius 6.
+   stessa lingua: pannelli a bordo-gradiente, azzurro brand, bottoni h38/radius 6.
    Eredita TUTTI i token da home.css (il wrapper è .sb-home.sb-tv-page): qui
    vivono solo le classi nuove, prefisso .sb-tv-. Tema chiaro default + scuro
    via html.dark, già gestiti dai token.
@@ -18,17 +18,17 @@
 
 .sb-tv-page,
 .sb-tv-game {
-  /* Esito di una risposta: il verde è quello del brand, il rosso è l'unico
+  /* Esito di una risposta: l'azzurro è quello del brand, il rosso è l'unico
      colore "extra" (stessa famiglia del rosso delle diff nella home). */
   --tv-ok: var(--sb-brand-text);
   --tv-no: hsl(347, 72%, 45%);
-  --tv-ok-soft: hsla(153, 60%, 53%, 0.12);
+  --tv-ok-soft: hsla(197, 100%, 49%, 0.12);
   --tv-no-soft: hsla(347, 72%, 45%, 0.1);
 }
 html.dark .sb-tv-page,
 html.dark .sb-tv-game {
   --tv-no: hsl(352, 88%, 70%);
-  --tv-ok-soft: hsla(153, 60%, 53%, 0.14);
+  --tv-ok-soft: hsla(197, 100%, 49%, 0.14);
   --tv-no-soft: hsla(352, 88%, 70%, 0.13);
 }
 
@@ -56,9 +56,9 @@ html.dark .sb-tv-game {
   gap: 0.45rem;
   margin: 0 0 1.4rem;
   padding: 0.3rem 0.75rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg-alt);
+  background: var(--sb-shape-edge), var(--sb-bg-alt);
   font-size: 0.78rem;
   color: var(--sb-fg-lighter);
   white-space: nowrap;
@@ -82,16 +82,16 @@ html.dark .sb-tv-game {
   gap: 0.55rem;
   height: 38px;
   padding: 0 0.9rem 0 0.3rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg-alt);
+  background: var(--sb-shape-edge), var(--sb-bg-alt);
   font-family: inherit;
   font-size: 0.875rem;
   color: var(--sb-fg);
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
-.sb-tv-player:hover { border-color: var(--sb-border-stronger); background: var(--sb-surface-200); }
+.sb-tv-player:hover { border-color: var(--sb-border-stronger); background: var(--sb-shape-edge), var(--sb-surface-200); }
 .sb-tv-player-badge {
   display: inline-flex;
   align-items: center;
@@ -99,8 +99,8 @@ html.dark .sb-tv-game {
   min-width: 32px;
   height: 32px;
   padding: 0 0.4rem;
-  border-radius: 999px;
-  background: var(--sb-btn-bg);
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge-btn), var(--sb-btn-bg);
   border: 1px solid var(--sb-btn-bd);
   color: var(--sb-btn-fg);
   font-size: 0.8rem;
@@ -176,8 +176,8 @@ html.dark .sb-tv-game {
   width: 22px;
   height: 22px;
   margin-right: 0.55rem;
-  border-radius: 999px;
-  background: var(--sb-btn-bg);
+  clip-path: var(--sb-shape-xs);
+  background: var(--sb-shape-edge-btn-xs), var(--sb-btn-bg);
   border: 1px solid var(--sb-btn-bd);
   color: var(--sb-btn-fg);
   font-size: 0.75rem;
@@ -234,9 +234,9 @@ html.dark .sb-tv-game {
   align-items: baseline;
   gap: 0.05rem;
   padding: 0.1rem 0.45rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
+  background: var(--sb-shape-edge-xs), var(--sb-bg);
   font-size: 0.72rem;
   color: var(--sb-fg-muted);
   font-variant-numeric: tabular-nums;
@@ -247,7 +247,7 @@ html.dark .sb-tv-game {
 .sb-tv-prog--done { border-color: var(--sb-btn-bd); background: var(--sb-btn-bg); color: var(--sb-btn-fg); }
 .sb-tv-prog--done b { color: var(--sb-btn-fg); }
 
-/* Selezionato: il bordo-gradiente diventa verde pieno e il fondo si tinge */
+/* Selezionato: il bordo-gradiente diventa azzurro pieno e il fondo si tinge */
 .sb-tv-chapter[aria-pressed="true"] .sb-panel,
 .sb-tv-type[aria-pressed="true"] .sb-panel,
 .sb-tv-all[aria-pressed="true"] .sb-panel {
@@ -322,7 +322,7 @@ html.dark .sb-tv-game {
 .sb-tv-empty-inner p { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LA PARTITA — schermo intero, stessa grammatica (pannelli, verde, h38)
+   LA PARTITA — schermo intero, stessa grammatica (pannelli, azzurro, h38)
    ═══════════════════════════════════════════════════════════════════════════ */
 .sb-tv-game {
   position: fixed;
@@ -453,7 +453,7 @@ body:has(.sb-tv-game[data-phase="playing"]) .sb-ctl {
   top: 0.7rem;
   right: 0.7rem;
   padding: 0.22rem 0.6rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid rgba(255, 255, 255, 0.24);
   background: rgba(10, 10, 10, 0.5);
   -webkit-backdrop-filter: blur(6px);
@@ -596,7 +596,7 @@ body:has(.sb-tv-game[data-phase="playing"]) .sb-ctl {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .sb-tv-open-input::placeholder { color: var(--sb-fg-muted); }
-.sb-tv-open-input:focus { border-color: var(--sb-brand); box-shadow: 0 0 0 3px hsla(153, 60%, 53%, 0.2); }
+.sb-tv-open-input:focus { border-color: var(--sb-brand); box-shadow: 0 0 0 3px hsla(197, 100%, 49%, 0.2); }
 .sb-tv-open-input.ok { border-color: var(--sb-brand); background: var(--tv-ok-soft); }
 .sb-tv-open-input.no { border-color: var(--tv-no); background: var(--tv-no-soft); }
 .sb-tv-open-send {
@@ -724,9 +724,11 @@ body:has(.sb-tv-game[data-phase="playing"]) .sb-ctl {
   max-height: 90dvh;
   display: flex;
   flex-direction: column;
-  border-radius: 12px;
+  /* Lastra tagliata come il resto. Il filo va ridisegnato sulle due
+     diagonali: il border ci arriva solo sui lati dritti. */
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border-strong);
-  background: var(--sb-bg);
+  background: var(--sb-shape-edge), var(--sb-bg);
   overflow: hidden;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
 }

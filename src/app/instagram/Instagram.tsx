@@ -180,10 +180,10 @@ function dedupe(rels: Rel[]): Map<string, Rel> {
   return m;
 }
 
-// ── Avatar a monogramma (offline, privacy-safe, famiglia verde del sito) ─────
+// ── Avatar a monogramma (offline, privacy-safe, famiglia del brand) ─────
 const AV_COLORS = [
-  "hsl(153, 45%, 34%)", "hsl(163, 42%, 32%)", "hsl(143, 40%, 33%)", "hsl(173, 40%, 31%)",
-  "hsl(133, 36%, 34%)", "hsl(186, 38%, 30%)", "hsl(120, 32%, 33%)", "hsl(196, 36%, 32%)",
+  "hsl(197, 45%, 34%)", "hsl(207, 42%, 32%)", "hsl(187, 40%, 33%)", "hsl(217, 40%, 31%)",
+  "hsl(177, 36%, 34%)", "hsl(230, 38%, 30%)", "hsl(164, 32%, 33%)", "hsl(240, 36%, 32%)",
 ];
 function avatarColor(u: string): string {
   let h = 0;
@@ -243,7 +243,7 @@ const REPORT_L: Record<Lang, Record<string, string>> = {
     madeWith: "Vergleich erstellt mit", empty: "Niemand hier" },
 };
 
-// Report HTML autonomo, nello STILE del sito (Titillium Web, palette neutra + verde
+// Report HTML autonomo, nello STILE del sito (Titillium Web, palette neutra + azzurro
 // brand, pannelli a bordo sottile), con riepilogo dettagliato. Apribile
 // offline, con link cliccabili ai profili, chiaro e scuro come il sito.
 function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStats): string {
@@ -294,14 +294,14 @@ function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStat
     --bg:#fcfcfc; --bg-alt:#f8f8f8; --card:#fbfbfb; --soft:#f6f6f6;
     --bd:#e8e8e8; --bd2:#dbdbdb; --bd3:#c7c7c7;
     --ink:#171717; --sub:#6f6f6f; --muted:#8f8f8f;
-    --brand:hsl(153,60%,53%); --brand-text:hsl(153,86%,28%);
+    --brand:hsl(197,100%,49%); --brand-text:hsl(197,86%,28%);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg:#141414; --bg-alt:#181818; --card:#1c1c1c; --soft:#222;
       --bd:#2a2a2a; --bd2:#343434; --bd3:#414141;
       --ink:#ededed; --sub:#969696; --muted:#707070;
-      --brand-text:hsl(155,100%,42%);
+      --brand-text:hsl(197,100%,55%);
     }
   }
   * { box-sizing:border-box; }

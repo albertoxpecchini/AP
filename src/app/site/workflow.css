@@ -5,7 +5,7 @@
 
    Il diagramma di sequenza è disegnato a mano con una griglia CSS: una colonna
    per partecipante, la linea di vita tratteggiata dietro, la barra di attività
-   verde dove il partecipante sta lavorando, i messaggi che scavalcano le
+   azzurro dove il partecipante sta lavorando, i messaggi che scavalcano le
    colonne da un filo all'altro. Sotto i 780px la griglia lascia il posto a un
    elenco di passi (lo decide React con matchMedia, non il CSS: markup unico).
    Uniche tinte fisse: le note tecniche, che restano scure come i terminali.
@@ -56,10 +56,12 @@
   max-height: min(92vh, 1000px);
   display: flex;
   flex-direction: column;
-  background: var(--sb-bg);
+  background: var(--sb-shape-edge), var(--sb-bg);
   color: var(--sb-fg);
   border: 1px solid var(--sb-border-strong);
-  border-radius: 16px;
+  /* Lastra tagliata come il resto. Il filo va ridisegnato sulle due
+     diagonali: il border ci arriva solo sui lati dritti. */
+  clip-path: var(--sb-shape-sm);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
   overflow: hidden;
   animation: apw-pop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
@@ -89,12 +91,12 @@ html.dark .apw-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
 .apw-tag {
   margin-left: 0.2rem;
   padding: 0.08rem 0.5rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   font-size: 0.68rem;
   font-weight: 700;
   white-space: nowrap;
   color: var(--sb-btn-fg);
-  background: var(--sb-btn-bg);
+  background: var(--sb-shape-edge-btn-xs), var(--sb-btn-bg);
   border: 1px solid var(--sb-btn-bd);
 }
 .apw-bar-sub { color: var(--sb-fg-lighter); font-size: 0.78rem; }
@@ -223,7 +225,7 @@ html.dark .apw-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
   );
   transition: opacity 0.2s ease;
 }
-/* Il partecipante sta lavorando: barra verde sul filo (come "activate") */
+/* Il partecipante sta lavorando: barra azzurra sul filo (come "activate") */
 .apw-lane[data-act="1"]::after {
   content: "";
   position: absolute;
@@ -394,7 +396,7 @@ html.dark .apw-note { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
 .apw-note-line i {
   flex: none;
   font-style: normal;
-  color: hsl(153, 60%, 53%);
+  color: hsl(197, 100%, 49%);
 }
 
 /* Partecipante messo a fuoco: il resto si spegne */
@@ -417,9 +419,9 @@ html.dark .apw-note { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
   gap: 0.4rem;
   height: 30px;
   padding: 0 0.7rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-sm);
   border: 1px solid var(--sb-border);
-  background: var(--sb-surface-100);
+  background: var(--sb-shape-edge), var(--sb-surface-100);
   color: var(--sb-fg-light);
   font-family: inherit;
   font-size: 0.76rem;
@@ -430,7 +432,9 @@ html.dark .apw-note { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
 .apw-chip:hover { color: var(--sb-fg); border-color: var(--sb-border-stronger); }
 .apw-chip.is-on {
   color: var(--sb-btn-fg);
-  background: var(--sb-btn-bg);
+  /* Acceso, il filo delle diagonali passa alla variante brand: `background` è
+     una scorciatoia e rimpiazza tutti i livelli, filo compreso. */
+  background: var(--sb-shape-edge-btn), var(--sb-btn-bg);
   border-color: var(--sb-btn-bd);
 }
 .apw-chip.is-on svg { color: currentColor; }
@@ -462,9 +466,9 @@ html.dark .apw-note { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
   align-items: center;
   gap: 0.3rem;
   padding: 0.12rem 0.45rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   border: 1px solid var(--sb-border);
-  background: var(--sb-bg);
+  background: var(--sb-shape-edge-xs), var(--sb-bg);
   white-space: nowrap;
 }
 .apw-mini svg { color: var(--sb-fg-muted); }

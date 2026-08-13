@@ -47,7 +47,7 @@ export default function SubjectBadge({ dark, nick, chapterId, label }: SubjectBa
           display:inline-flex; align-items:center; gap:.3rem;
           background:color-mix(in srgb, var(--sb-surface-75) 92%, transparent);
           border:1px solid var(--sb-border-strong);
-          border-radius:999px; padding:.18rem .5rem; box-shadow:0 2px 8px rgba(0,0,0,0.18);
+          clip-path:var(--sb-shape-xs); padding:.18rem .5rem; box-shadow:0 2px 8px rgba(0,0,0,0.18);
           font-family:"Titillium Web", Geneva, Tahoma, sans-serif;
           animation:trv-subjbadge-in .3s ease;
         }

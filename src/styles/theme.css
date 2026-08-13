@@ -28,7 +28,7 @@
   --card-foreground: #171717;
   --popover: #fbfbfb;
   --popover-foreground: #171717;
-  --primary: hsl(153, 60%, 53%);  /* --sb-brand */
+  --primary: hsl(197, 100%, 49%);  /* --sb-brand */
   --primary-foreground: #101010;  /* --sb-btn-fg */
   --secondary: #f6f6f6;           /* --sb-surface-100 */
   --secondary-foreground: #171717;
@@ -44,8 +44,8 @@
   --switch-background: #c7c7c7;   /* --sb-border-stronger */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: hsla(153, 60%, 53%, 0.35);
-  --chart-1: hsl(153, 60%, 53%);
+  --ring: hsla(197, 100%, 49%, 0.35);
+  --chart-1: hsl(197, 100%, 49%);
   --chart-2: #0550ae;
   --chart-3: #953800;
   --chart-4: #8250df;
@@ -53,12 +53,12 @@
   --radius: 0.75rem;
   --sidebar: #f8f8f8;             /* --sb-bg-alt */
   --sidebar-foreground: #171717;
-  --sidebar-primary: hsl(153, 60%, 53%);
+  --sidebar-primary: hsl(197, 100%, 49%);
   --sidebar-primary-foreground: #101010;
   --sidebar-accent: #f0f0f0;
   --sidebar-accent-foreground: #171717;
   --sidebar-border: #e8e8e8;
-  --sidebar-ring: hsla(153, 60%, 53%, 0.35);
+  --sidebar-ring: hsla(197, 100%, 49%, 0.35);
 }
 
 /* ── Scuro — specchio di html.dark .sb-home ── */
@@ -69,7 +69,7 @@
   --card-foreground: #ededed;
   --popover: #1c1c1c;
   --popover-foreground: #ededed;
-  --primary: hsl(153, 60%, 53%);  /* il brand non cambia col tema */
+  --primary: hsl(197, 100%, 49%);  /* il brand non cambia col tema */
   --primary-foreground: #ffffff;
   --secondary: #222222;           /* --sb-surface-100 */
   --secondary-foreground: #ededed;
@@ -85,20 +85,20 @@
   --switch-background: #414141;   /* --sb-border-stronger */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: hsla(153, 60%, 53%, 0.5);
-  --chart-1: hsl(153, 60%, 53%);
+  --ring: hsla(197, 100%, 49%, 0.5);
+  --chart-1: hsl(197, 100%, 49%);
   --chart-2: #79c0ff;
   --chart-3: #ffcda1;
   --chart-4: #bda4ff;
   --chart-5: #969696;
   --sidebar: #181818;             /* --sb-bg-alt */
   --sidebar-foreground: #ededed;
-  --sidebar-primary: hsl(153, 60%, 53%);
+  --sidebar-primary: hsl(197, 100%, 49%);
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #282828;
   --sidebar-accent-foreground: #ededed;
   --sidebar-border: #2a2a2a;
-  --sidebar-ring: hsla(153, 60%, 53%, 0.5);
+  --sidebar-ring: hsla(197, 100%, 49%, 0.5);
 }
 
 @theme inline {

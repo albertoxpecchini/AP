@@ -284,7 +284,8 @@ button.sb-ar-crumb:hover { color: var(--sb-fg); background: var(--sb-overlay); }
   font-variant-numeric: tabular-nums;
   color: var(--sb-fg-muted);
   border: 1px solid var(--sb-border-strong);
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
+  background: var(--sb-shape-edge-xs);
   padding: 0 0.35rem;
   line-height: 1.35;
 }
@@ -442,8 +443,8 @@ button.sb-ar-col:hover { color: var(--sb-fg-light); }
   max-width: calc(100% - 1.4rem);
   padding: 0.3rem 0.7rem;
   border: 1px solid var(--sb-border-strong);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--sb-bg) 88%, transparent);
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge), color-mix(in srgb, var(--sb-bg) 88%, transparent);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   font-size: 0.76rem;
@@ -477,7 +478,7 @@ button.sb-ar-col:hover { color: var(--sb-fg-light); }
   pointer-events: none;
   border: 1px solid var(--sb-brand);
   border-radius: 3px;
-  background: hsla(153, 60%, 53%, 0.16);
+  background: hsla(197, 100%, 49%, 0.16);
 }
 
 /* ── Menu contestuale (radix) ──────────────────────────────────────────────

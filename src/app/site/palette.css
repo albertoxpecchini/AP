@@ -49,10 +49,12 @@
   max-height: min(92vh, 1000px);
   display: flex;
   flex-direction: column;
-  background: var(--sb-bg);
+  background: var(--sb-shape-edge), var(--sb-bg);
   color: var(--sb-fg);
   border: 1px solid var(--sb-border-strong);
-  border-radius: 16px;
+  /* Lastra tagliata come il resto. Il filo va ridisegnato sulle due
+     diagonali: il border ci arriva solo sui lati dritti. */
+  clip-path: var(--sb-shape-sm);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
   overflow: hidden;
   animation: apl-pop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
@@ -82,11 +84,11 @@ html.dark .apl-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
 .apl-tag {
   margin-left: 0.2rem;
   padding: 0.08rem 0.5rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   font-size: 0.68rem;
   font-weight: 700;
   color: var(--sb-btn-fg);
-  background: var(--sb-btn-bg);
+  background: var(--sb-shape-edge-btn-xs), var(--sb-btn-bg);
   border: 1px solid var(--sb-btn-bd);
 }
 .apl-bar-sub { color: var(--sb-fg-lighter); font-size: 0.78rem; }
@@ -213,9 +215,9 @@ html.dark .apl-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
   font-size: 0.68rem;
   font-weight: 700;
   padding: 0.05rem 0.45rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   color: var(--sb-brand-text);
-  background: hsla(153, 60%, 53%, 0.14);
+  background: hsla(197, 100%, 49%, 0.14);
 }
 .apl-sub {
   margin: 0 0 0.9rem;
@@ -325,13 +327,13 @@ html.dark .apl-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
   background: color-mix(in srgb, currentColor 16%, transparent);
 }
 .apl-note { font-size: 0.7rem; opacity: 0.55; line-height: 1.35; margin-top: 0.1rem; }
-/* Rapporto di contrasto WCAG: grigio se non passa, verde a AA, pieno a AAA. */
+/* Rapporto di contrasto WCAG: grigio se non passa, azzurro a AA, pieno a AAA. */
 .apl-cr {
   font-style: normal;
   font-size: 0.62rem;
   font-weight: 700;
   padding: 0.05rem 0.35rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   opacity: 0.6;
   border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
 }
@@ -339,8 +341,8 @@ html.dark .apl-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
 .apl-cr.is-aaa {
   opacity: 1;
   color: var(--sb-brand-text);
-  border-color: hsla(153, 60%, 53%, 0.5);
-  background: hsla(153, 60%, 53%, 0.12);
+  border-color: hsla(197, 100%, 49%, 0.5);
+  background: hsla(197, 100%, 49%, 0.12);
 }
 
 /* ── Ombre ───────────────────────────────────────────────────────────────── */
@@ -409,7 +411,7 @@ html.dark .apl-dialog.sb-home { box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7); }
 }
 .apl-demo-chip {
   padding: 0.18rem 0.6rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   font-size: 0.75rem;
   background: var(--demo-chip);
   border: 1px solid var(--demo-bd);

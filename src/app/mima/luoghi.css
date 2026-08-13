@@ -30,9 +30,9 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.2rem 0.6rem;
-  border-radius: 999px;
+  clip-path: var(--sb-shape-xs);
   background: var(--sb-brand);
-  color: #062b1a;
+  color: #04222e;
   font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.04em;

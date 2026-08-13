@@ -6,15 +6,15 @@
 (bio, curriculum che stampa sé stesso, approfondimenti, un gioco-quiz, una console di viaggio,
 strumenti e sezioni evento), servito **una pagina
 = un sottodominio**, tradotto al volo in **4 lingue** e vestito con un design system
-**«piattaforma»** — la grammatica `.sb-` rifatta sulla homepage di Supabase, verde brand
+**«piattaforma»** — la grammatica `.sb-` rifatta sulla homepage di Supabase, azzurro brand
 e tema chiaro/scuro nativo.
 
 <!-- ─────────────  METRICHE LIVE (shields.io → GitHub API, auto-aggiornanti)  ───────────── -->
 
-[![Last commit](https://img.shields.io/github/last-commit/albertoxpecchini/AP/main?style=flat-square&logo=git&logoColor=white&color=3ECF8E)](https://github.com/albertoxpecchini/AP/commits/main)
+[![Last commit](https://img.shields.io/github/last-commit/albertoxpecchini/AP/main?style=flat-square&logo=git&logoColor=white&color=00B0FA)](https://github.com/albertoxpecchini/AP/commits/main)
 [![Commit activity](https://img.shields.io/github/commit-activity/m/albertoxpecchini/AP?style=flat-square&color=24B47E)](https://github.com/albertoxpecchini/AP/pulse)
 [![Created at](https://img.shields.io/github/created-at/albertoxpecchini/AP?style=flat-square&label=nato%20il&color=1C8C63)](https://github.com/albertoxpecchini/AP)
-[![Repo size](https://img.shields.io/github/repo-size/albertoxpecchini/AP?style=flat-square&color=3ECF8E)](https://github.com/albertoxpecchini/AP)
+[![Repo size](https://img.shields.io/github/repo-size/albertoxpecchini/AP?style=flat-square&color=00B0FA)](https://github.com/albertoxpecchini/AP)
 [![Top language](https://img.shields.io/github/languages/top/albertoxpecchini/AP?style=flat-square&color=3178C6)](https://github.com/albertoxpecchini/AP)
 [![Languages](https://img.shields.io/github/languages/count/albertoxpecchini/AP?style=flat-square&label=lingue&color=6EE7B7)](https://github.com/albertoxpecchini/AP)
 [![Files in src](https://img.shields.io/github/directory-file-count/albertoxpecchini/AP/src?type=file&style=flat-square&label=file%20src&color=24B47E)](https://github.com/albertoxpecchini/AP/tree/main/src)
@@ -74,10 +74,10 @@ su ogni pagina.
 - **Tema chiaro/scuro NATIVO** — non due fogli di stile, ma un set di custom properties ridichiarate
   sotto `html.dark`. Il chiaro è il default.
 - **Palette neutra + un solo colore** — grigi puri per fondali, bordi e testo; l'unica tinta è il
-  **verde brand `hsl(153 60% 53%)`**. Dal 2026-08 è l'unico accento su **tutte** le pagine:
+  **azzurro brand `hsl(197 100% 49%)`**. Dal 2026-08 è l'unico accento su **tutte** le pagine:
   l'arancio Ubuntu sopravvive solo nelle email transazionali (`api/d.ts`).
 - **Un fondale solo, per tutta la pagina** — è `position: fixed`, quindi resta incollato alla
-  finestra: la griglia tecnica in `.sb-bg` (solo home) e **due velature radiali** — verde e ciano —
+  finestra: la griglia tecnica in `.sb-bg` (solo home) e **due velature radiali** — azzurro e ciano —
   su `::before`/`::after` di `.sb-home`, cioè su ogni pagina. Nessun bordo di sezione può tagliarlo
   mentre si scorre, quindi **fra una sezione e l'altra non c'è nessun confine**; il contenuto scorre
   sopra, trasparente. Anche il footer non comincia con un bordo: il suo colore entra in
@@ -99,7 +99,7 @@ su ogni pagina.
 
 **La palette per intero è consultabile dal sito**: footer → **«Palette»**
 ([`PaletteModal.tsx`](src/app/site/PaletteModal.tsx)) apre una finestra con tutte le tinte in uso —
-verde brand, fondali, bordi, testo (con rapporto di contrasto), colori del codice, token shadcn,
+azzurro brand, fondali, bordi, testo (con rapporto di contrasto), colori del codice, token shadcn,
 grafico contribuzioni, linguaggi, i pochi colori fissi di Trivia, arancio delle email — mostrate
 **nei due temi affiancati** e copiabili negli appunti.
 
@@ -151,7 +151,7 @@ Quel che resta è diviso per responsabilità, non sparso nei componenti:
 - [`site/homeLive.tsx`](src/app/site/homeLive.tsx) — le **sette tavole** della griglia prodotti.
   Erano sette miniature di interfaccia (finestra di browser, terminale che digita, tabellone di
   gioco, cubo su un piano); adesso sono sette **disegni a tratto** sulla stessa tavola di 280×132,
-  stesso spessore di linea e stesso verde — il progetto quotato di una pagina, un saggio
+  stesso spessore di linea e stesso azzurro — il progetto quotato di una pagina, un saggio
   tipografico, un prisma che apre un raggio in cinque, una traiettoria a tre rimbalzi, due insiemi
   e la loro intersezione, un globo con due satelliti, le curve di livello di un rilievo. Da lontano
   si legge una collezione, non sette schermate. Una sola cosa in movimento per riquadro, e il
@@ -321,7 +321,7 @@ comunità, il muoversi, la natura, gli eventi, e una che spiega da dove viene tu
   sempre quella che qualcuno apre.
 - **Indirizzi senza estensione** — `/paese`, non `/paese.html`. Il vecchio risponde comunque, con
   un `308`.
-- **Il design system `.sb-` è portato da qui, non reinventato**: grigi puri più un solo verde, un
+- **Il design system `.sb-` è portato da qui, non reinventato**: grigi puri più un solo azzurro, un
   fondale fisso per tutta la pagina — fra una sezione e l'altra nessuna riga di confine — e tema
   chiaro/scuro nativo, deciso dall'orologio **prima del primo paint**.
 - **Il movimento è vetro, e risponde a un gesto**: la card si inclina sotto il puntatore, la
@@ -439,7 +439,7 @@ che il browser richiede a runtime (GitHub, Supabase, `/api`).
 > ([`WorkflowModal.tsx`](src/app/site/WorkflowModal.tsx)). Qui sotto è un blocco `mermaid`, che
 > GitHub renderizza da sé; **il sito però non usa Mermaid**. Il diagramma di sequenza è disegnato
 > a mano con una griglia CSS (`.apw-`, [`workflow.css`](src/app/site/workflow.css)): una colonna per
-> partecipante, linea di vita tratteggiata, barra di attività verde, messaggi che scavalcano le
+> partecipante, linea di vita tratteggiata, barra di attività azzurra, messaggi che scavalcano le
 > colonne. Così segue il tema chiaro/scuro del sito, parla tutte e 4 le lingue, e **sotto i 780 px
 > diventa un elenco di passi** — con lo stesso markup, è React a deciderlo via `matchMedia`.
 > Il vantaggio vero: non si porta dietro una libreria intera per un solo diagramma.
@@ -782,7 +782,7 @@ commit lì sotto.
 Veste `.sb-` come il resto del sito, non uno stile a parte: stesso guscio (fondale unico fisso,
 nav sottile con briciola che prende il bordo solo dopo lo scroll, sezioni trasparenti senza
 divisori), stessi `.sb-btn` e `.sb-panel`, classi proprie col prefisso di pagina `.sb-cl-*`, e
-**palette neutra più il solo verde del marchio** — niente rosso per gli errori né arancio per gli
+**palette neutra più il solo azzurro del marchio** — niente rosso per gli errori né arancio per gli
 avvisi: si distinguono per peso e bordo. Tema scuro nativo, perché i colori vengono tutti da
 `var(--sb-*)` e `html.dark .sb-home` ridichiara gli stessi token.
 
@@ -856,7 +856,7 @@ e se un repo si trascina ancora il danno vecchio in `main.tsx` viene riparato da
 ## ♿ Accessibilità & 🚀 Deploy
 
 **A11y:** skiplink al contenuto · landmark semantici (`main`/`nav[aria-label]`/`header`/`footer`) ·
-`aria-labelledby` sui modali · focus visibile (`:focus-visible` con outline verde brand) ·
+`aria-labelledby` sui modali · focus visibile (`:focus-visible` con outline azzurro brand) ·
 contrasto AA verificato nella finestra Palette · **`prefers-reduced-motion` onorato in tutta la
 regia GSAP** · ControlBar raggiungibile da tastiera (esce al `focus`) ·
 `Backspace` neutralizzato fuori dai campi testo (`disableBackspaceNavigation`).
@@ -869,10 +869,10 @@ regia GSAP** · ControlBar raggiungibile da tastiera (esce al `focus`) ·
 
 ## 🎨 Palette
 
-Verde brand identico nei due temi, grigi puri intorno. L'arancio Ubuntu resta solo nelle email.
+Azzurro brand identico nei due temi, grigi puri intorno. L'arancio Ubuntu resta solo nelle email.
 Tutto il sistema colore è documentato e copiabile dal sito (footer → **«Palette»**).
 
-![#3ECF8E](https://img.shields.io/badge/Brand-hsl(153_60%25_53%25)-3ECF8E?style=flat-square)
+![#00B0FA](https://img.shields.io/badge/Brand-hsl(197_100%25_49%25)-00B0FA?style=flat-square)
 ![#fcfcfc](https://img.shields.io/badge/Fondo_chiaro-%23FCFCFC-FCFCFC?style=flat-square&labelColor=555)
 ![#141414](https://img.shields.io/badge/Fondo_scuro-%23141414-141414?style=flat-square)
 ![#171717](https://img.shields.io/badge/Inchiostro-%23171717-171717?style=flat-square)

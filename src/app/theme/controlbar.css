@@ -3,7 +3,7 @@
 
    Rifatta nella grammatica "piattaforma Supabase" della home (vedi home.css):
    pannello con bordo-gradiente da 1px (.sb-panel + .sb-panel-inner), segmenti
-   alti 34px con radius 6, verde brand per lo stato acceso, tipografia Titillium Web.
+   alti 34px con radius 6, azzurro brand per lo stato acceso, tipografia Titillium Web.
    I token arrivano da .sb-home (che la barra porta con sé), quindi il tema
    chiaro/scuro è NATIVO: chiaro di default, scuro sotto html.dark.
 
@@ -46,6 +46,9 @@
 .sb-ctl.is-out .sb-ctl-slide { transform: translateX(0); }
 
 /* ── Pannello (bordo-gradiente 1px, come le card della home) ──────────────── */
+/* Stondata e non smussata: è .sb-panel--vent (vedi home.css). Il menu delle
+   lingue si apre sopra la barra, cioè fuori dalla sua scatola, e un clip-path
+   sulla lastra se lo porterebbe via tutto. */
 .sb-ctl-panel { border-radius: 10px; }
 .sb-ctl-panel .sb-panel-inner {
   flex-direction: row;
@@ -111,7 +114,7 @@
   letter-spacing: 0.02em;
 }
 
-/* Sensore orario: spento = fantasma, acceso = verde brand (come .sb-btn--primary) */
+/* Sensore orario: spento = fantasma, acceso = azzurro brand (come .sb-btn--primary) */
 .sb-ctl-auto {
   padding: 0 0.6rem;
   font-size: 0.78rem;
@@ -299,7 +302,7 @@
   clip-path: circle(0px at 50% 50%);
   will-change: clip-path, opacity;
 }
-/* Lingua: fondo della pagina + alone verde all'origine dell'onda. */
+/* Lingua: fondo della pagina + alone azzurro all'origine dell'onda. */
 .sb-home.sb-lang-wipe {
   position: fixed;
   inset: 0;
