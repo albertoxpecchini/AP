@@ -113,9 +113,10 @@
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
-  /* Il video ha già il suo bianco/nero: l'angolo in basso segue quello del
-     pannello, in alto ci pensa la barra. */
-  border-radius: 0 0 11px 11px;
+  /* Nessuna sagoma sua: da quando il pannello taglia con clip-path, l'angolo
+     in basso a destra glielo dà .sb-panel-inner e gli altri restano dritti.
+     Il raggio che c'era qui adesso litigherebbe col taglio — stondato a
+     sinistra e tondo dentro una diagonale a destra. */
   background: var(--sb-surface-200);
   object-fit: cover;
 }

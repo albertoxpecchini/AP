@@ -123,11 +123,16 @@ function FreshWorkBand() {
                 controls={still}
                 aria-label="Screen recording: a scroll through the rivaltasulmincio.it website"
               >
-                {/* Solo H.264. Il VP9 di pari qualità era più PESANTE (3,5 MB
-                    contro 3,0) su questo materiale — è una cattura dello
-                    schermo a 60fps, contenuto su cui x264 è imbattibile — e
-                    l'MP4 lo leggono tutti: un secondo file sarebbe stato
-                    peso in più per zero. */}
+                {/* Solo H.264. Il VP9 di pari qualità era più PESANTE su questo
+                    materiale — è una cattura dello schermo a 60fps, contenuto su
+                    cui x264 è imbattibile — e l'MP4 lo leggono tutti: un secondo
+                    file sarebbe stato peso in più per zero.
+
+                    La registrazione dura 2 minuti, due volte e mezzo la prima, e
+                    pesa uguale (3,9 MB): sta in un riquadro largo sui 650px,
+                    cioè metà dei 1280 del file, e a quella scala la differenza
+                    fra questa compressione e il master da 93 MB non si vede —
+                    verificata sul fotogramma peggiore, la mappa coi pin. */}
                 <source src="/video/rivalta-sul-mincio.mp4" type="video/mp4" />
               </video>
             </div>
