@@ -51,7 +51,7 @@ e tema chiaro/scuro nativo.
 | Dominio | Valore | Dettaglio |
 | :--- | :--- | :--- |
 | **Codebase** | **~41,9k LOC** in `src/` | 123 file versionati: 52 `.tsx` (24,3k) · 37 `.ts` (6,1k) · 27 `.css` (11,5k) |
-| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 8 funzioni `api/` (828) + `lib/` (185) · `scripts/` (4,7k, di cui 2,6k il programma di pulizia) |
+| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 7 funzioni `api/` + `lib/` (185) · `scripts/` (4,9k, di cui 2,6k il programma di pulizia) |
 | **Dipendenze** | **12 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
 | **Pagine** | **13 rotte** | 1 hub + 12 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev |
 | **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
@@ -388,6 +388,7 @@ AP/
 │   ├── build-i18n.mjs        #   translations.json → un pacchetto per lingua
 │   ├── build-trivia-version.mjs #  versione di Trivia, contata dove la storia è intera
 │   ├── build-cars.mjs        #   FBX/OBJ + PNG → cars.bin + texture WebP (fuori CI)
+│   ├── build-foto-mima.mjs   #   foto/mima/ → EXIF (data + GPS) → album e mappa
 │   ├── ensure-dev-server.mjs #   il dev server è già acceso? riusalo, non riavviarlo (F5)
 │   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
 │   ├── lib/fbx.mjs           #   lettore FBX binario, per build-cars
@@ -517,7 +518,7 @@ sequenceDiagram
 | **Backend** | Supabase via REST/Realtime · 8 funzioni serverless Vercel + `lib/serverSecurity` |
 | **AI** | `@anthropic-ai/sdk` → Claude Fable 5 (curiosità Trivia) |
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
-| **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `build-cars.mjs` per i modelli 3D · `scripts/janitor/` per pulizia e benchmark |
+| **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `build-cars.mjs` per i modelli 3D · `exifr` + `sharp` in `build-foto-mima.mjs` per l'album MiMa · `scripts/janitor/` per pulizia e benchmark |
 
 > **Peso del primo accesso.** Quattro cose che il browser scaricava e non guardava:
 >
@@ -589,6 +590,7 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron.
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
 | `npm run i18n` | Rigenera solo `src/app/i18n/generated/<lingua>.json` da `translations.json` |
 | `node scripts/build-cars.mjs <cartella>` | Rigenera `public/models/` dai modelli 3D sorgente (che **non** stanno nel repo) |
+| `npm run foto` | Album MiMa: legge gli EXIF delle foto in `foto/mima/` (che **non** stanno nel repo), le rimpicciolisce in `public/images/mima/` e scrive `src/app/mima/foto.json` — posizioni dal GPS, ordine da `DateTimeOriginal` |
 | `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
 | `npm run pulizia` | Cerca lo sporco e misura, **senza toccare niente** |
 | `npm run pulizia:applica` | Pulisce, verifica con build + benchmark, annulla da solo se qualcosa peggiora |

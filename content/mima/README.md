@@ -33,7 +33,36 @@ Da `dati-viaggio.ts`:
 - **`ROUTE`** — il tracciato schematico Rivalta → Cervia (A22 → A1 → A14).
 - **`TRIP_FIRST_DAY` / `TRIP_LAST_DAY`** e **`DAYS`** — per raggruppare le foto
   per giornata e dare un titolo a ogni giornata.
-- **`PHOTOS`** — l'array era già lì, vuoto: è il punto da cui ripartire.
+- **`PHOTOS`** — l'array era già lì, vuoto. Non serve più riempirlo a mano: lo
+  fa `npm run foto` (vedi sotto).
+
+## La pipeline delle foto
+
+Gli originali si buttano in **`foto/mima/`** (fuori dal repo, è in `.gitignore`
+— vedi il `LEGGIMI.md` lì dentro). Poi:
+
+```
+npm run foto
+```
+
+[`scripts/build-foto-mima.mjs`](../../scripts/build-foto-mima.mjs) legge gli
+EXIF di ogni scatto — `DateTimeOriginal` per l'ordine cronologico,
+`GPSLatitude`/`GPSLongitude` per il punto sulla mappa — rimpicciolisce le
+immagini in `public/images/mima/` (grande 1600 px + miniatura 480 px, WebP,
+**senza metadati**: le coordinate restano nel manifesto, non attaccate a ogni
+file pubblicato) e scrive **`src/app/mima/foto.json`**, che è quello che la
+pagina dell'album legge.
+
+Il manifesto contiene, per ogni foto: `src`/`mini`, dimensioni, `quando`,
+`giorno`, `ora`, `lat`/`lon`, il `luogo` (il posto di `PLACES` più vicino entro
+350 m) e `posizioneStimata` quando la posizione è stata **ereditata** da uno
+scatto vicino nel tempo (entro 30 minuti) invece che letta da quello scatto lì.
+In testa ci sono i totali, le `bounds` calcolate sulle foto vere e l'elenco
+delle giornate.
+
+Chi non ha né GPS né un vicino temporale resta nell'album, in ordine
+cronologico, senza puntino sulla mappa: è il caso tipico delle foto passate su
+WhatsApp, che i metadati li perdono per strada.
 
 ## Cose che questi file non sanno
 

@@ -11,6 +11,7 @@
     "zips": "node scripts/build-zips.mjs",
     "repo-tree": "node scripts/build-repo-tree.mjs",
     "i18n": "node scripts/build-i18n.mjs",
+    "foto": "node scripts/build-foto-mima.mjs",
     "preview": "vite preview",
     "pulizia": "node scripts/janitor/pulisci.mjs",
     "pulizia:applica": "node scripts/janitor/pulisci.mjs --applica",
@@ -41,6 +42,8 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "4.7.0",
     "archiver": "^7.0.1",
+    "exifr": "^7.1.3",
+    "sharp": "^0.35.3",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5",
     "vite-plugin-pwa": "^1.3.0"
