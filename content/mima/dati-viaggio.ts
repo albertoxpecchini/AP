@@ -142,6 +142,33 @@ export const PLACES: Record<string, Place> = {
   },
   cervia: { key: "cervia", name: "Cervia centro", role: "Centro", lon: 12.3547, lat: 44.2603 },
   mima: { key: "mima", name: "Milano Marittima", role: "La vacanza", lon: 12.348254184857065, lat: 44.277396039270975 },
+
+  // ── Due posti aggiunti dopo, sull'evidenza delle foto ──────────────────────
+  // Questi due non arrivano da una scheda di mappa come i locali qui sopra: il
+  // punto è la posizione GPS di uno scatto fatto sul posto, cioè dove si era
+  // davvero. È una coordinata più onesta di un centroide cercato a tavolino —
+  // dice dove stava chi teneva il telefono, che è esattamente la domanda a cui
+  // l'etichetta di un album deve rispondere.
+  //
+  // Senza queste due voci le foto della notte del 15 finivano sotto il
+  // Beijaflor, che è il posto noto più vicino ma sta novanta metri più in là, e
+  // quelle del tardo pomeriggio restavano senza nome perché non cadevano nel
+  // raggio di nessuno.
+  pineta: {
+    key: "pineta",
+    name: "Pineta",
+    role: "Discoteca",
+    lon: 12.348730555555557,
+    lat: 44.27621388888889,
+    kind: "Discoteca",
+  },
+  centrale: {
+    key: "centrale",
+    name: "Hotel Centrale",
+    role: "Alloggio",
+    lon: 12.351075,
+    lat: 44.28290833333333,
+  },
 };
 
 // I punti della mappa panoramica, da sud a nord. Il Cocoricò NON c'è: sta a

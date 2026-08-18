@@ -1,10 +1,10 @@
 {
-  "generato": "2026-08-18T15:48:54.060Z",
+  "generato": "2026-08-18T17:35:25.151Z",
   "fonte": "metadati EXIF delle foto originali (DateTimeOriginal, GPSLatitude/GPSLongitude)",
-  "totale": 629,
+  "totale": 628,
   "conPosizione": 612,
   "posizioneDedotta": 73,
-  "senzaPosizione": 17,
+  "senzaPosizione": 16,
   "bounds": {
     "sw": [
       10.795669444444444,
@@ -18,7 +18,7 @@
   "giorni": [
     {
       "data": "2026-08-13",
-      "n": 213,
+      "n": 212,
       "indice": 1
     },
     {
@@ -483,18 +483,6 @@
       "fonteData": "exif",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-13 16.08.35.jpg"
-    },
-    {
-      "id": "2026-08-13-16-57-17-24mpymsrn6i88",
-      "src": "/images/mima/2026-08-13-16-57-17-24mpymsrn6i88.webp",
-      "mini": "/images/mima/2026-08-13-16-57-17-24mpymsrn6i88-mini.webp",
-      "w": 736,
-      "h": 1600,
-      "quando": "2026-08-13T14:57:17.000Z",
-      "giorno": "2026-08-13",
-      "ora": "16:57",
-      "fonteData": "exif",
-      "originale": "2026-08-13 16.57.17.png"
     },
     {
       "id": "2026-08-13-18-35-41-30z7vmsrqp1s8",
@@ -4640,8 +4628,8 @@
       "fonteData": "exif",
       "lat": 44.27621388888889,
       "lon": 12.348730555555557,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 02.19.24.jpg"
     },
@@ -5082,6 +5070,8 @@
       "fonteData": "exif",
       "lat": 44.28290833333333,
       "lon": 12.351075,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.46.37.jpg"
     },
@@ -5097,6 +5087,8 @@
       "fonteData": "exif",
       "lat": 44.28281111111111,
       "lon": 12.351008333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.46.52.jpg"
     },
@@ -5112,6 +5104,8 @@
       "fonteData": "exif",
       "lat": 44.2828,
       "lon": 12.351002777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.46.54.jpg"
     },
@@ -5127,6 +5121,8 @@
       "fonteData": "exif",
       "lat": 44.28279166666667,
       "lon": 12.350999999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.46.55-1.jpg"
     },
@@ -5142,6 +5138,8 @@
       "fonteData": "exif",
       "lat": 44.28279166666667,
       "lon": 12.350999999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.46.55.jpg"
     },
@@ -5157,6 +5155,8 @@
       "fonteData": "exif",
       "lat": 44.28281111111111,
       "lon": 12.351016666666666,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.46.57.jpg"
     },
@@ -5172,6 +5172,8 @@
       "fonteData": "exif",
       "lat": 44.282805555555555,
       "lon": 12.351013888888888,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.46.58.jpg"
     },
@@ -5187,6 +5189,8 @@
       "fonteData": "exif",
       "lat": 44.28279166666667,
       "lon": 12.351008333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.47.06.jpg"
     },
@@ -5202,6 +5206,8 @@
       "fonteData": "exif",
       "lat": 44.28279166666667,
       "lon": 12.351008333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.47.07.jpg"
     },
@@ -5217,6 +5223,8 @@
       "fonteData": "exif",
       "lat": 44.282805555555555,
       "lon": 12.351002777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 18.47.09.jpg"
     },
@@ -5232,6 +5240,8 @@
       "fonteData": "exif",
       "lat": 44.28286388888889,
       "lon": 12.351158333333332,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.03.43.jpg"
     },
@@ -5247,6 +5257,8 @@
       "fonteData": "exif",
       "lat": 44.28286388888889,
       "lon": 12.351158333333332,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.03.44.jpg"
     },
@@ -5262,6 +5274,8 @@
       "fonteData": "exif",
       "lat": 44.28286388888889,
       "lon": 12.351158333333332,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.03.46.jpg"
     },
@@ -5277,6 +5291,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351122222222221,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.03.47.jpg"
     },
@@ -5292,6 +5308,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351122222222221,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.03.48.jpg"
     },
@@ -5307,6 +5325,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351122222222221,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.03.49.jpg"
     },
@@ -5322,6 +5342,8 @@
       "fonteData": "exif",
       "lat": 44.28284722222222,
       "lon": 12.35113611111111,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.03.54.jpg"
     },
@@ -5337,6 +5359,8 @@
       "fonteData": "exif",
       "lat": 44.28292777777778,
       "lon": 12.351044444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.18.48.jpg"
     },
@@ -5352,6 +5376,8 @@
       "fonteData": "exif",
       "lat": 44.282891666666664,
       "lon": 12.351049999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.18.51.jpg"
     },
@@ -5367,6 +5393,8 @@
       "fonteData": "exif",
       "lat": 44.282891666666664,
       "lon": 12.351049999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.18.52.jpg"
     },
@@ -5382,6 +5410,8 @@
       "fonteData": "exif",
       "lat": 44.282891666666664,
       "lon": 12.351049999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.18.53.jpg"
     },
@@ -5397,6 +5427,8 @@
       "fonteData": "exif",
       "lat": 44.282891666666664,
       "lon": 12.351049999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.18.54.jpg"
     },
@@ -5412,6 +5444,8 @@
       "fonteData": "exif",
       "lat": 44.282891666666664,
       "lon": 12.351049999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.18.55.jpg"
     },
@@ -5427,6 +5461,8 @@
       "fonteData": "exif",
       "lat": 44.282891666666664,
       "lon": 12.351049999999999,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.18.55-1.jpg"
     },
@@ -5442,6 +5478,8 @@
       "fonteData": "exif",
       "lat": 44.28168888888889,
       "lon": 12.35216111111111,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.55.08.jpg"
     },
@@ -5457,6 +5495,8 @@
       "fonteData": "exif",
       "lat": 44.28165555555555,
       "lon": 12.352141666666666,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.55.09.jpg"
     },
@@ -5472,6 +5512,8 @@
       "fonteData": "exif",
       "lat": 44.28165,
       "lon": 12.35215,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.55.10.jpg"
     },
@@ -5487,6 +5529,8 @@
       "fonteData": "exif",
       "lat": 44.28165,
       "lon": 12.352144444444445,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.55.11.jpg"
     },
@@ -5502,6 +5546,8 @@
       "fonteData": "exif",
       "lat": 44.28165555555555,
       "lon": 12.352138888888888,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.55.13.jpg"
     },
@@ -5517,6 +5563,8 @@
       "fonteData": "exif",
       "lat": 44.281666666666666,
       "lon": 12.352130555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 19.55.14.jpg"
     },
@@ -5532,6 +5580,8 @@
       "fonteData": "exif",
       "lat": 44.28284444444444,
       "lon": 12.351075,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 21.50.43.jpg"
     },
@@ -5547,6 +5597,8 @@
       "fonteData": "exif",
       "lat": 44.28284444444444,
       "lon": 12.351075,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 21.50.44.jpg"
     },
@@ -5562,6 +5614,8 @@
       "fonteData": "exif",
       "lat": 44.28288333333333,
       "lon": 12.351058333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 21.50.46.jpg"
     },
@@ -5577,6 +5631,8 @@
       "fonteData": "exif",
       "lat": 44.28295555555555,
       "lon": 12.351133333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 21.58.04.jpg"
     },
@@ -5592,6 +5648,8 @@
       "fonteData": "exif",
       "lat": 44.28296944444445,
       "lon": 12.351133333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 21.58.09.jpg"
     },
@@ -5607,6 +5665,8 @@
       "fonteData": "exif",
       "lat": 44.282802777777775,
       "lon": 12.350958333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.06.jpg"
     },
@@ -5622,6 +5682,8 @@
       "fonteData": "exif",
       "lat": 44.282802777777775,
       "lon": 12.350958333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.11.jpg"
     },
@@ -5637,6 +5699,8 @@
       "fonteData": "exif",
       "lat": 44.28281111111111,
       "lon": 12.350966666666666,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.13.jpg"
     },
@@ -5652,6 +5716,8 @@
       "fonteData": "exif",
       "lat": 44.28281111111111,
       "lon": 12.350966666666666,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.14.jpg"
     },
@@ -5667,6 +5733,8 @@
       "fonteData": "exif",
       "lat": 44.28281111111111,
       "lon": 12.350966666666666,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.16.jpg"
     },
@@ -5682,6 +5750,8 @@
       "fonteData": "exif",
       "lat": 44.28283611111111,
       "lon": 12.351002777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.17.jpg"
     },
@@ -5697,6 +5767,8 @@
       "fonteData": "exif",
       "lat": 44.28283611111111,
       "lon": 12.351002777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.19.jpg"
     },
@@ -5712,6 +5784,8 @@
       "fonteData": "exif",
       "lat": 44.28283611111111,
       "lon": 12.351002777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.21.jpg"
     },
@@ -5727,6 +5801,8 @@
       "fonteData": "exif",
       "lat": 44.28283611111111,
       "lon": 12.351002777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.05.23.jpg"
     },
@@ -5742,6 +5818,8 @@
       "fonteData": "exif",
       "lat": 44.28288611111111,
       "lon": 12.35113611111111,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.47.39.jpg"
     },
@@ -5757,6 +5835,8 @@
       "fonteData": "exif",
       "lat": 44.28290833333333,
       "lon": 12.351144444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 22.47.46.jpg"
     },
@@ -5772,6 +5852,8 @@
       "fonteData": "exif",
       "lat": 44.28295555555555,
       "lon": 12.351088888888889,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.00.42.jpg"
     },
@@ -5787,6 +5869,8 @@
       "fonteData": "exif",
       "lat": 44.28293333333333,
       "lon": 12.351105555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.00.43.jpg"
     },
@@ -5802,6 +5886,8 @@
       "fonteData": "exif",
       "lat": 44.28293611111111,
       "lon": 12.351105555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.00.47.jpg"
     },
@@ -5817,6 +5903,8 @@
       "fonteData": "exif",
       "lat": 44.28293333333333,
       "lon": 12.351105555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.00.50.jpg"
     },
@@ -5832,6 +5920,8 @@
       "fonteData": "exif",
       "lat": 44.28293333333333,
       "lon": 12.351105555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.00.51.jpg"
     },
@@ -5847,6 +5937,8 @@
       "fonteData": "exif",
       "lat": 44.281575,
       "lon": 12.351794444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.03.44.jpg"
     },
@@ -5862,6 +5954,8 @@
       "fonteData": "exif",
       "lat": 44.281638888888885,
       "lon": 12.351647222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.03.57.jpg"
     },
@@ -5877,6 +5971,8 @@
       "fonteData": "exif",
       "lat": 44.281638888888885,
       "lon": 12.351647222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.03.58.jpg"
     },
@@ -5892,6 +5988,8 @@
       "fonteData": "exif",
       "lat": 44.281638888888885,
       "lon": 12.351647222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-15 23.03.59.jpg"
     },
@@ -5907,6 +6005,8 @@
       "fonteData": "exif",
       "lat": 44.281702777777774,
       "lon": 12.352180555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.09.05.jpg"
     },
@@ -5922,6 +6022,8 @@
       "fonteData": "exif",
       "lat": 44.2817,
       "lon": 12.352163888888889,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.09.09-1.jpg"
     },
@@ -5937,6 +6039,8 @@
       "fonteData": "exif",
       "lat": 44.281702777777774,
       "lon": 12.352130555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.09.09.jpg"
     },
@@ -5952,6 +6056,8 @@
       "fonteData": "exif",
       "lat": 44.281702777777774,
       "lon": 12.352130555555556,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.09.13.jpg"
     },
@@ -5967,6 +6073,8 @@
       "fonteData": "exif",
       "lat": 44.28164722222222,
       "lon": 12.35158611111111,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.12.26.jpg"
     },
@@ -5982,6 +6090,8 @@
       "fonteData": "exif",
       "lat": 44.28163611111111,
       "lon": 12.351575,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.12.28.jpg"
     },
@@ -5997,6 +6107,8 @@
       "fonteData": "exif",
       "lat": 44.281619444444445,
       "lon": 12.351572222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.12.37.jpg"
     },
@@ -6012,6 +6124,8 @@
       "fonteData": "exif",
       "lat": 44.281619444444445,
       "lon": 12.351566666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.12.40.jpg"
     },
@@ -6027,6 +6141,8 @@
       "fonteData": "exif",
       "lat": 44.281619444444445,
       "lon": 12.351566666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.12.41.jpg"
     },
@@ -6042,6 +6158,8 @@
       "fonteData": "exif",
       "lat": 44.281619444444445,
       "lon": 12.351572222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.12.42.jpg"
     },
@@ -6058,6 +6176,8 @@
       "lat": 44.281619444444445,
       "lon": 12.351572222222222,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 00.14.06.jpg"
     },
@@ -6073,6 +6193,8 @@
       "fonteData": "exif",
       "lat": 44.28296388888889,
       "lon": 12.351030555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 10.56.01.jpg"
     },
@@ -6088,6 +6210,8 @@
       "fonteData": "exif",
       "lat": 44.28296388888889,
       "lon": 12.351030555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 10.56.03.jpg"
     },
@@ -6104,6 +6228,8 @@
       "lat": 44.28296388888889,
       "lon": 12.351030555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 11.08.32.jpg"
     },
@@ -6361,6 +6487,8 @@
       "lat": 44.281238888888886,
       "lon": 12.348030555555557,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.09.05.jpg"
     },
@@ -6377,6 +6505,8 @@
       "lat": 44.281238888888886,
       "lon": 12.348030555555557,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.09.08.jpg"
     },
@@ -6392,6 +6522,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348030555555557,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.03.jpg"
     },
@@ -6407,6 +6539,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348030555555557,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.04.jpg"
     },
@@ -6422,6 +6556,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348033333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.14.jpg"
     },
@@ -6437,6 +6573,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348033333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.16.jpg"
     },
@@ -6452,6 +6590,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348033333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.24.jpg"
     },
@@ -6467,6 +6607,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348033333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.37.jpg"
     },
@@ -6482,6 +6624,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348033333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.39.jpg"
     },
@@ -6497,6 +6641,8 @@
       "fonteData": "exif",
       "lat": 44.281238888888886,
       "lon": 12.348033333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 19.24.40.jpg"
     },
@@ -6551,6 +6697,8 @@
       "fonteData": "exif",
       "lat": 44.28102222222222,
       "lon": 12.353430555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.24.37.jpg"
     },
@@ -6566,6 +6714,8 @@
       "fonteData": "exif",
       "lat": 44.28102222222222,
       "lon": 12.353452777777777,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.25.07.jpg"
     },
@@ -6581,6 +6731,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.25.43.jpg"
     },
@@ -6596,6 +6748,8 @@
       "fonteData": "exif",
       "lat": 44.28103333333333,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.25.45.jpg"
     },
@@ -6611,6 +6765,8 @@
       "fonteData": "exif",
       "lat": 44.28103611111111,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.25.47.jpg"
     },
@@ -6626,6 +6782,8 @@
       "fonteData": "exif",
       "lat": 44.28103611111111,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.25.50.jpg"
     },
@@ -6641,6 +6799,8 @@
       "fonteData": "exif",
       "lat": 44.28103611111111,
       "lon": 12.353447222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.25.52.jpg"
     },
@@ -6656,6 +6816,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353441666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.16.jpg"
     },
@@ -6671,6 +6833,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.18.jpg"
     },
@@ -6686,6 +6850,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.20.jpg"
     },
@@ -6701,6 +6867,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353447222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.24.jpg"
     },
@@ -6716,6 +6884,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.35345,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.27.jpg"
     },
@@ -6731,6 +6901,8 @@
       "fonteData": "exif",
       "lat": 44.281025,
       "lon": 12.35345,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.43.jpg"
     },
@@ -6746,6 +6918,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.45.jpg"
     },
@@ -6761,6 +6935,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353447222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.47.jpg"
     },
@@ -6776,6 +6952,8 @@
       "fonteData": "exif",
       "lat": 44.281025,
       "lon": 12.353447222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.26.51.jpg"
     },
@@ -6791,6 +6969,8 @@
       "fonteData": "exif",
       "lat": 44.281025,
       "lon": 12.353441666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.27.52.jpg"
     },
@@ -6806,6 +6986,8 @@
       "fonteData": "exif",
       "lat": 44.281025,
       "lon": 12.353441666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.27.58.jpg"
     },
@@ -6821,6 +7003,8 @@
       "fonteData": "exif",
       "lat": 44.281025,
       "lon": 12.353441666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.28.02.jpg"
     },
@@ -6836,6 +7020,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.29.11.jpg"
     },
@@ -6851,6 +7037,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.35345,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.29.13.jpg"
     },
@@ -6866,6 +7054,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.35345,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.29.17.jpg"
     },
@@ -6881,6 +7071,8 @@
       "fonteData": "exif",
       "lat": 44.28103611111111,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.29.48.jpg"
     },
@@ -6896,6 +7088,8 @@
       "fonteData": "exif",
       "lat": 44.28103333333333,
       "lon": 12.353444444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.29.52.jpg"
     },
@@ -6911,6 +7105,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353441666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.30.04.jpg"
     },
@@ -6926,6 +7122,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353430555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.30.09.jpg"
     },
@@ -6941,6 +7139,8 @@
       "fonteData": "exif",
       "lat": 44.28102777777778,
       "lon": 12.353427777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.30.14.jpg"
     },
@@ -6957,6 +7157,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.13-1.jpg"
     },
     {
@@ -6972,6 +7174,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.13-2.jpg"
     },
     {
@@ -6987,6 +7191,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.13.jpg"
     },
     {
@@ -7002,6 +7208,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.14-2.jpg"
     },
     {
@@ -7017,6 +7225,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.14-3.jpg"
     },
     {
@@ -7032,6 +7242,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.14.jpg"
     },
     {
@@ -7047,6 +7259,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.15-1.jpg"
     },
     {
@@ -7062,6 +7276,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.15-2.jpg"
     },
     {
@@ -7077,6 +7293,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.15-3.jpg"
     },
     {
@@ -7092,6 +7310,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.15.jpg"
     },
     {
@@ -7107,6 +7327,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.16-1.jpg"
     },
     {
@@ -7122,6 +7344,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.16-2.jpg"
     },
     {
@@ -7137,6 +7361,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.16-3.jpg"
     },
     {
@@ -7152,6 +7378,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.16-4.jpg"
     },
     {
@@ -7167,6 +7395,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.16.jpg"
     },
     {
@@ -7182,6 +7412,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.17-1.jpg"
     },
     {
@@ -7197,6 +7429,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.17-2.jpg"
     },
     {
@@ -7212,6 +7446,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.17-3.jpg"
     },
     {
@@ -7227,6 +7463,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.17.jpg"
     },
     {
@@ -7242,6 +7480,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.18-1.jpg"
     },
     {
@@ -7257,6 +7497,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.18-2.jpg"
     },
     {
@@ -7272,6 +7514,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.18-3.jpg"
     },
     {
@@ -7287,6 +7531,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.18.jpg"
     },
     {
@@ -7302,6 +7548,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.19-1.jpg"
     },
     {
@@ -7317,6 +7565,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.19-2.jpg"
     },
     {
@@ -7332,6 +7582,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.19-3.jpg"
     },
     {
@@ -7347,6 +7599,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.19.jpg"
     },
     {
@@ -7362,6 +7616,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.20-1.jpg"
     },
     {
@@ -7377,6 +7633,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.20-3.jpg"
     },
     {
@@ -7392,6 +7650,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.20.jpg"
     },
     {
@@ -7407,6 +7667,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.21-1.jpg"
     },
     {
@@ -7422,6 +7684,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.21-2.jpg"
     },
     {
@@ -7437,6 +7701,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.21.jpg"
     },
     {
@@ -7452,6 +7718,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.22-1.jpg"
     },
     {
@@ -7467,6 +7735,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.22-2.jpg"
     },
     {
@@ -7482,6 +7752,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.22-3.jpg"
     },
     {
@@ -7497,6 +7769,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.22.jpg"
     },
     {
@@ -7512,6 +7786,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.23-1.jpg"
     },
     {
@@ -7527,6 +7803,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.23-2.jpg"
     },
     {
@@ -7542,6 +7820,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.23-3.jpg"
     },
     {
@@ -7557,6 +7837,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.23.jpg"
     },
     {
@@ -7572,6 +7854,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.24-1.jpg"
     },
     {
@@ -7587,6 +7871,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.24-2.jpg"
     },
     {
@@ -7602,6 +7888,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.24-3.jpg"
     },
     {
@@ -7617,6 +7905,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.24.jpg"
     },
     {
@@ -7632,6 +7922,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.25-1.jpg"
     },
     {
@@ -7647,6 +7939,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.25-2.jpg"
     },
     {
@@ -7662,6 +7956,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.25-3.jpg"
     },
     {
@@ -7677,6 +7973,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.25.jpg"
     },
     {
@@ -7692,6 +7990,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.26-1.jpg"
     },
     {
@@ -7707,6 +8007,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.26-2.jpg"
     },
     {
@@ -7722,6 +8024,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.26-3.jpg"
     },
     {
@@ -7737,6 +8041,8 @@
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
       "posizioneStimata": true,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "originale": "2026-08-16 21.53.26.jpg"
     },
     {
@@ -7751,6 +8057,8 @@
       "fonteData": "exif",
       "lat": 44.28294722222222,
       "lon": 12.351080555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.59.02.jpg"
     },
@@ -7766,6 +8074,8 @@
       "fonteData": "exif",
       "lat": 44.28284166666666,
       "lon": 12.351008333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.59.22.jpg"
     },
@@ -7781,6 +8091,8 @@
       "fonteData": "exif",
       "lat": 44.28284166666666,
       "lon": 12.351008333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 21.59.25.jpg"
     },
@@ -7796,6 +8108,8 @@
       "fonteData": "exif",
       "lat": 44.282875,
       "lon": 12.351002777777778,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.21.jpg"
     },
@@ -7811,6 +8125,8 @@
       "fonteData": "exif",
       "lat": 44.282802777777775,
       "lon": 12.350763888888888,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.24.jpg"
     },
@@ -7826,6 +8142,8 @@
       "fonteData": "exif",
       "lat": 44.282802777777775,
       "lon": 12.350758333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.26.jpg"
     },
@@ -7841,6 +8159,8 @@
       "fonteData": "exif",
       "lat": 44.2828,
       "lon": 12.35075,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.29.jpg"
     },
@@ -7856,6 +8176,8 @@
       "fonteData": "exif",
       "lat": 44.282802777777775,
       "lon": 12.35076111111111,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.31.jpg"
     },
@@ -7871,6 +8193,8 @@
       "fonteData": "exif",
       "lat": 44.28283333333333,
       "lon": 12.350813888888888,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.39.jpg"
     },
@@ -7886,6 +8210,8 @@
       "fonteData": "exif",
       "lat": 44.28283611111111,
       "lon": 12.350813888888888,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.40.jpg"
     },
@@ -7901,6 +8227,8 @@
       "fonteData": "exif",
       "lat": 44.28284722222222,
       "lon": 12.350816666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 22.53.42.jpg"
     },
@@ -7916,6 +8244,8 @@
       "fonteData": "exif",
       "lat": 44.28288611111111,
       "lon": 12.350958333333333,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.11.jpg"
     },
@@ -7931,6 +8261,8 @@
       "fonteData": "exif",
       "lat": 44.282875,
       "lon": 12.350897222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.12.jpg"
     },
@@ -7946,6 +8278,8 @@
       "fonteData": "exif",
       "lat": 44.282875,
       "lon": 12.350888888888889,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.14.jpg"
     },
@@ -7961,6 +8295,8 @@
       "fonteData": "exif",
       "lat": 44.282872222222224,
       "lon": 12.350872222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.18.jpg"
     },
@@ -7976,6 +8312,8 @@
       "fonteData": "exif",
       "lat": 44.282872222222224,
       "lon": 12.350866666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.21.jpg"
     },
@@ -7991,6 +8329,8 @@
       "fonteData": "exif",
       "lat": 44.28307222222222,
       "lon": 12.351072222222221,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.44.jpg"
     },
@@ -8006,6 +8346,8 @@
       "fonteData": "exif",
       "lat": 44.283233333333335,
       "lon": 12.3512,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.50.jpg"
     },
@@ -8021,6 +8363,8 @@
       "fonteData": "exif",
       "lat": 44.28331111111111,
       "lon": 12.351247222222222,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.52.jpg"
     },
@@ -8036,6 +8380,8 @@
       "fonteData": "exif",
       "lat": 44.283316666666664,
       "lon": 12.351275,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.00.55.jpg"
     },
@@ -8051,6 +8397,8 @@
       "fonteData": "exif",
       "lat": 44.28290555555555,
       "lon": 12.351144444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.48.jpg"
     },
@@ -8066,6 +8414,8 @@
       "fonteData": "exif",
       "lat": 44.28290555555555,
       "lon": 12.351144444444444,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.50.jpg"
     },
@@ -8081,6 +8431,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.52.jpg"
     },
@@ -8096,6 +8448,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.53.jpg"
     },
@@ -8111,6 +8465,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.54-1.jpg"
     },
@@ -8126,6 +8482,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.54-2.jpg"
     },
@@ -8141,6 +8499,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.54.jpg"
     },
@@ -8156,6 +8516,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.56.jpg"
     },
@@ -8171,6 +8533,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.57-1.jpg"
     },
@@ -8186,6 +8550,8 @@
       "fonteData": "exif",
       "lat": 44.282916666666665,
       "lon": 12.351141666666667,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.34.57.jpg"
     },
@@ -8201,6 +8567,8 @@
       "fonteData": "exif",
       "lat": 44.28317222222222,
       "lon": 12.350827777777777,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.23.jpg"
     },
@@ -8216,6 +8584,8 @@
       "fonteData": "exif",
       "lat": 44.28317222222222,
       "lon": 12.350827777777777,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.24-1.jpg"
     },
@@ -8231,6 +8601,8 @@
       "fonteData": "exif",
       "lat": 44.28317222222222,
       "lon": 12.350827777777777,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.24.jpg"
     },
@@ -8246,6 +8618,8 @@
       "fonteData": "exif",
       "lat": 44.28307777777778,
       "lon": 12.350880555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.25.jpg"
     },
@@ -8261,6 +8635,8 @@
       "fonteData": "exif",
       "lat": 44.28308611111111,
       "lon": 12.350855555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.26.jpg"
     },
@@ -8276,6 +8652,8 @@
       "fonteData": "exif",
       "lat": 44.28307222222222,
       "lon": 12.350897222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.40.jpg"
     },
@@ -8291,6 +8669,8 @@
       "fonteData": "exif",
       "lat": 44.28307222222222,
       "lon": 12.350897222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.41-1.jpg"
     },
@@ -8306,6 +8686,8 @@
       "fonteData": "exif",
       "lat": 44.28307222222222,
       "lon": 12.350897222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.41.jpg"
     },
@@ -8321,6 +8703,8 @@
       "fonteData": "exif",
       "lat": 44.28307222222222,
       "lon": 12.350897222222223,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.35.42.jpg"
     },
@@ -8472,8 +8856,8 @@
       "fonteData": "exif",
       "lat": 44.276183333333336,
       "lon": 12.351705555555554,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.53.43.jpg"
     },
@@ -8489,8 +8873,8 @@
       "fonteData": "exif",
       "lat": 44.27619444444444,
       "lon": 12.351677777777777,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.53.50.jpg"
     },
@@ -8506,8 +8890,8 @@
       "fonteData": "exif",
       "lat": 44.27618888888889,
       "lon": 12.351672222222222,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.53.53.jpg"
     },
@@ -8523,8 +8907,8 @@
       "fonteData": "exif",
       "lat": 44.27558888888889,
       "lon": 12.351644444444444,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.31.jpg"
     },
@@ -8540,8 +8924,8 @@
       "fonteData": "exif",
       "lat": 44.27560555555556,
       "lon": 12.351652777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.45.jpg"
     },
@@ -8557,8 +8941,8 @@
       "fonteData": "exif",
       "lat": 44.2756,
       "lon": 12.351652777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.46.jpg"
     },
@@ -8574,8 +8958,8 @@
       "fonteData": "exif",
       "lat": 44.2756,
       "lon": 12.351652777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.47.jpg"
     },
@@ -8591,8 +8975,8 @@
       "fonteData": "exif",
       "lat": 44.2756,
       "lon": 12.351652777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.48.jpg"
     },
@@ -8608,8 +8992,8 @@
       "fonteData": "exif",
       "lat": 44.2756,
       "lon": 12.351652777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.50-1.jpg"
     },
@@ -8625,8 +9009,8 @@
       "fonteData": "exif",
       "lat": 44.2756,
       "lon": 12.351652777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.50.jpg"
     },
@@ -8642,8 +9026,8 @@
       "fonteData": "exif",
       "lat": 44.2756,
       "lon": 12.351652777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.55.51.jpg"
     },
@@ -8659,8 +9043,8 @@
       "fonteData": "exif",
       "lat": 44.27560555555556,
       "lon": 12.351638888888889,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.56.24.jpg"
     },
@@ -8676,8 +9060,8 @@
       "fonteData": "exif",
       "lat": 44.27558888888889,
       "lon": 12.351630555555555,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.56.32-1.jpg"
     },
@@ -8693,8 +9077,8 @@
       "fonteData": "exif",
       "lat": 44.27558888888889,
       "lon": 12.351638888888889,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.56.32.jpg"
     },
@@ -8710,8 +9094,8 @@
       "fonteData": "exif",
       "lat": 44.275619444444445,
       "lon": 12.351661111111111,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.56.37.jpg"
     },
@@ -8727,8 +9111,8 @@
       "fonteData": "exif",
       "lat": 44.275619444444445,
       "lon": 12.351666666666667,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-16 23.56.38.jpg"
     },
@@ -8846,8 +9230,8 @@
       "fonteData": "exif",
       "lat": 44.275925,
       "lon": 12.348875000000001,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 00.06.09.jpg"
     },
@@ -8863,8 +9247,8 @@
       "fonteData": "exif",
       "lat": 44.275908333333334,
       "lon": 12.34885,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 00.06.11.jpg"
     },
@@ -8880,8 +9264,8 @@
       "fonteData": "exif",
       "lat": 44.275891666666666,
       "lon": 12.348702777777778,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 00.06.19.jpg"
     },
@@ -8897,8 +9281,8 @@
       "fonteData": "exif",
       "lat": 44.27589444444445,
       "lon": 12.348736111111112,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 00.06.20.jpg"
     },
@@ -8914,8 +9298,8 @@
       "fonteData": "exif",
       "lat": 44.276047222222225,
       "lon": 12.347994444444446,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 00.21.51.jpg"
     },
@@ -8931,8 +9315,8 @@
       "fonteData": "exif",
       "lat": 44.27609722222222,
       "lon": 12.347955555555556,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 00.22.17.jpg"
     },
@@ -8948,8 +9332,8 @@
       "fonteData": "exif",
       "lat": 44.27607777777778,
       "lon": 12.347941666666667,
-      "luogo": "Pousada Beijaflor",
-      "luogoKey": "beijaflor",
+      "luogo": "Pineta",
+      "luogoKey": "pineta",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 00.22.18.jpg"
     },
@@ -9195,6 +9579,8 @@
       "fonteData": "exif",
       "lat": 44.28296388888889,
       "lon": 12.350833333333332,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 05.24.37.jpg"
     },
@@ -9210,6 +9596,8 @@
       "fonteData": "exif",
       "lat": 44.28296388888889,
       "lon": 12.350833333333332,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 05.24.38.jpg"
     },
@@ -9225,6 +9613,8 @@
       "fonteData": "exif",
       "lat": 44.28296666666667,
       "lon": 12.350880555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 05.24.39.jpg"
     },
@@ -9240,6 +9630,8 @@
       "fonteData": "exif",
       "lat": 44.28296666666667,
       "lon": 12.350880555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 05.24.40.jpg"
     },
@@ -9255,6 +9647,8 @@
       "fonteData": "exif",
       "lat": 44.28296666666667,
       "lon": 12.350880555555555,
+      "luogo": "Hotel Centrale",
+      "luogoKey": "centrale",
       "macchina": "Apple iPhone 16 Pro",
       "originale": "2026-08-17 05.24.41.jpg"
     },

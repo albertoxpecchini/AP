@@ -143,7 +143,7 @@ export const CATEGORIE: Categoria[] = [
         prezzo: "20-70 €",
         place: "cocorico",
       },
-      { nome: "Pineta", zona: "Milano Marittima", nota: "La discoteca storica di Milano Marittima, il locale più chic della riviera.", top: "La più storica" },
+      { nome: "Pineta", zona: "Milano Marittima", nota: "La discoteca storica di Milano Marittima, il locale più chic della riviera.", top: "La più storica", place: "pineta" },
       { nome: "Villa Papeete", zona: "Milano Marittima", nota: "Villa ottocentesca nel verde: privè, ristorante, palco live e pista centrale." },
       { nome: "Caino Fashion Club", zona: "Milano Marittima", nota: "Street bar più famoso dal 1999, a due passi dalla discoteca Pineta." },
       { nome: "Zouk Santana", zona: "Milano Marittima", nota: "Il più grande e storico street bar della zona, 14 postazioni bar." },
