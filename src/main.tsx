@@ -151,9 +151,6 @@ const MeStesso = lazyPage("me-stesso", () => import("./app/me-stesso/MeStesso.ts
 const Dubliners = lazyPage("dubliners", () => import("./app/dubliners/Dubliners.tsx"));
 const Gattopardo = lazyPage("gattopardo", () => import("./app/gattopardo/Gattopardo.tsx"));
 const Festa = lazyPage("festa", () => import("./app/festa/Festa.tsx"));
-const Mima = lazyPage("mima", () => import("./app/mima/Mima.tsx"));
-const MimaVeicoli = lazyPage("mima-veicoli", () => import("./app/mima/Veicoli.tsx"));
-const MimaLuoghi = lazyPage("mima-luoghi", () => import("./app/mima/Luoghi.tsx"));
 const Archivio = lazyPage("archivio", () => import("./app/archivio/Archivio.tsx"));
 const Sostieni = lazyPage("sostieni", () => import("./app/sostieni/Sostieni.tsx"));
 const Instagram = lazyPage("instagram", () => import("./app/instagram/Instagram.tsx"));
@@ -270,30 +267,6 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Festa />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/mima"
-        element={
-          <Suspense fallback={null}>
-            <Mima />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/mima/veicoli"
-        element={
-          <Suspense fallback={null}>
-            <MimaVeicoli />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/mima/luoghi"
-        element={
-          <Suspense fallback={null}>
-            <MimaLuoghi />
           </Suspense>
         }
       />

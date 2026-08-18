@@ -53,10 +53,10 @@ e tema chiaro/scuro nativo.
 | **Codebase** | **~41,9k LOC** in `src/` | 123 file versionati: 52 `.tsx` (24,3k) · 37 `.ts` (6,1k) · 27 `.css` (11,5k) |
 | **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 8 funzioni `api/` (828) + `lib/` (185) · `scripts/` (4,7k, di cui 2,6k il programma di pulizia) |
 | **Dipendenze** | **12 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
-| **Pagine** | **15 rotte** | 1 hub + 14 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev |
+| **Pagine** | **13 rotte** | 1 hub + 12 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev |
 | **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
-| **Serverless** | **8 funzioni** in `api/` | trivia · notify · festa-rsvp · sponsor · ig-stats · mima-alcolici · d · cron |
+| **Serverless** | **7 funzioni** in `api/` | trivia · notify · festa-rsvp · sponsor · ig-stats · d · cron |
 | **Cronologia** | **374 commit** dal 2026-05-24 | 181 `feat` · 88 `fix` · 27 `style` · 15 `chore` · 7 `docs` · 6 `refactor` |
 
 ---
@@ -205,9 +205,6 @@ I redirect `www → sottodominio` sono in [`vercel.json`](vercel.json).
 | `/dubliners` | `dubliners` | **Dubliners** | Approfondimento «Gente di Dublino» (J. Joyce, 1914) |
 | `/gattopardo` | `gattopardo` | **Gattopardo** | Approfondimento «Il Gattopardo» (Tomasi di Lampedusa, 1958) |
 | `/festa` | `festa` | **Festa** | Inviti con token, RSVP e notifica email |
-| `/mima` | _(solo path)_ | **MiMa** | Console di viaggio (13–17 agosto 2026): conto alla rovescia, meteo, spese divise, valigia, lista alcolici condivisa in realtime |
-| `/mima/veicoli` | _(solo path)_ | **MiMa · veicoli** | Quale auto portare: consumi, autonomia, 38 distributori su due zone con i prezzi veri |
-| `/mima/luoghi` | _(solo path)_ | **MiMa · luoghi** | Dove mangiare e uscire fra Milano Marittima e Cervia |
 | `/archivio` | `archivio` | **Archivio** | Esploratore di progetti **e dell'albero vero del repo** |
 | `/sostieni` | `sostieni` | **Sostieni** | Dati bonifico + libro firme dei donatori |
 | `/instagram` | _(solo path)_ | **Compare Two Lists** | «Chi ti ha tolto il follow» — confronto di due liste, tutto in locale |
@@ -377,7 +374,6 @@ AP/
 │   ├── festa-rsvp.ts         #   scrittura RSVP blindata (service role)
 │   ├── sponsor.ts            #   firma libro donatori blindata
 │   ├── ig-stats.ts           #   contatore confronti Instagram
-│   ├── mima-alcolici.ts      #   lista condivisa MiMa: scritture blindate
 │   ├── d.ts                  #   link tracciabili: apertura + redirect + autodelete
 │   └── cron-cleanup.ts       #   pulizia giornaliera dei link scaduti (cron)
 ├── content/trivia/           # 40 capitoli .md → fonte unica delle domande Trivia
@@ -412,8 +408,6 @@ AP/
 │   │   │                     #   legge anche scripts/build-cv.py
 │   │   ├── theme/            # ControlBar (lingua·tema·sensore) + themeCore
 │   │   ├── trivia/           # gioco quiz + parser + API leaderboard/pagelle/progressi
-│   │   ├── mima/             # /mima · /mima/veicoli · /mima/luoghi: guscio comune,
-│   │   │                     #   dati del viaggio, meteo, mappa del percorso
 │   │   ├── cleaning/         # /cleaning: l'officina del repo — SOLO in dev
 │   │   ├── bio  pcto  me-stesso  dubliners  gattopardo  festa  archivio  sostieni  instagram
 │   │   ├── i18n/             # motore di traduzione del DOM (IT · EN · FR · DE)
@@ -503,8 +497,8 @@ sequenceDiagram
 | **Anthropic Claude** (Fable 5) | curiosità del gioco Trivia | serverless `/api/trivia` |
 | **Resend** | email dei voti Festa + avviso di apertura link tracciabili | serverless `/api/notify`, `/api/d` |
 | **Wikipedia · Wikimedia Commons · Openverse** | foto pertinenti alle domande di Trivia, a licenza libera, senza API key | client (cascata, con cache) |
-| **Open-Meteo** | previsioni e medie di agosto sulle pagine `/mima` | client |
-| **Carto basemaps** | tessere delle mappe MapLibre (home, `/mima`) | client |
+| **Open-Meteo** | previsioni e medie stagionali su `/festa` | client |
+| **Carto basemaps** | tessere della mappa MapLibre in fondo alla home | client |
 
 ---
 
@@ -550,10 +544,10 @@ sequenceDiagram
 Il sito è pensato per essere **a prova di abuso**, senza archiviare dati di terzi.
 
 - **Solo l'email è pubblica** — niente telefono né WhatsApp sul sito o nel CV.
-- **Scritture blindate** — RSVP, firme donatori, contatori e lista alcolici MiMa non partono diretti
+- **Scritture blindate** — RSVP, firme donatori e contatori non partono diretti
   dal client verso Supabase: passano da un endpoint serverless con **origin check + rate-limit** e
-  `INSERT` con **service role** (la `anon key` non può iniettare dati fasulli — né riempire, né
-  svuotare, la lista di qualcun altro). Le letture restano pubbliche, perché servono al realtime.
+  `INSERT` con **service role** (la `anon key` non può iniettare dati fasulli). Le letture restano
+  pubbliche, perché servono al realtime.
 - **L'officina non esiste in produzione** — `/cleaning` legge e riscrive i file del repo e fa
   commit: la rotta è dietro `import.meta.env.DEV` e i suoi endpoint vivono in `configureServer`,
   cioè solo sotto `vite dev`. Verificato sul build vero, [più sotto](#cleaning--lofficina-in-pagina).

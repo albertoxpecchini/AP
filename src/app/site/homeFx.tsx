@@ -102,7 +102,7 @@ export function PageBackdrop() {
 
 /**
  * La banda di luce sulle righe brand ("Surveyor & Website Developer" nella
- * hero, "Let's talk." nella CTA, e le brandline di archivio, /mima, /me-stesso).
+ * hero, "Let's talk." nella CTA, e le brandline di archivio e /me-stesso).
  *
  * La luce non ripassa più da sola ogni 3,4 secondi con un requestAnimationFrame
  * per riga: è la stessa che il titolo della hero prende dal puntatore. La banda

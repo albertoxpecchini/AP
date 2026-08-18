@@ -1,9 +1,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// mimaData — unica fonte dei dati del viaggio MiMa (Milano Marittima, 13–17
-// agosto 2026: Pekko, Jonny, Mok). Prima stavano duplicati dentro Mima.tsx e
-// Veicoli.tsx; ora che le due pagine condividono ticker, mappa e stime
-// carburante devono per forza leggere gli stessi numeri, altrimenti il totale
-// scritto in cima alla pagina e quello calcolato in fondo divergono.
+// ARCHIVIO — dati del viaggio MiMa (Milano Marittima, 13–17 agosto 2026:
+// Pekko, Jonny, Mok).
+//
+// Il viaggio è finito il 17 agosto 2026 e le pagine che leggevano questo file
+// (/mima, /mima/veicoli, /mima/luoghi: console di viaggio, conto alla rovescia,
+// meteo, lista alcolici condivisa, confronto veicoli) sono state cancellate il
+// 18 agosto 2026. Restano i DATI, perché al posto del piano vacanza va un
+// album fotografico con mappa: le foto verranno posizionate e messe in ordine
+// cronologico leggendo i loro metadati EXIF (GPS + DateTimeOriginal), e i punti
+// qui sotto — ostello, spiaggia, locali, tracciato del viaggio — servono da
+// riferimento per la mappa e da etichetta per gli scatti che ci cadono vicino.
+//
+// Nessun modulo dell'app importa più questo file: sta in content/ come fonte,
+// non in src/. Il codice delle vecchie pagine è nella storia di git (ultimo
+// commit che le conteneva: quello prima della cancellazione).
+//
+// Vedi anche: content/mima/luoghi.ts — la selezione di ristoranti, piadinerie,
+// gelaterie e locali notturni che stava dentro /mima/luoghi.
 //
 // ── Regola d'onestà ──────────────────────────────────────────────────────────
 // Ogni valore qui dentro è di uno di questi tipi, e l'interfaccia lo dichiara:

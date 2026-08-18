@@ -19,7 +19,7 @@ import { spawn, execSync } from 'node:child_process'
 import { apriBrowser, vai } from './cdp.mjs'
 import { pesoCartella } from './analisi.mjs'
 
-export const PAGINE_PREDEFINITE = ['/', '/archivio', '/mima', '/trivia']
+export const PAGINE_PREDEFINITE = ['/', '/archivio', '/me-stesso', '/trivia']
 
 const BUDGET_60 = 1000 / 60 // 16.67 ms: il tempo che ha un fotogramma a 60 Hz
 

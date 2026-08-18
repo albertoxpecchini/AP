@@ -393,8 +393,9 @@ html.dark .sb-home::after {
 /* .sb-home non vuol dire "pagina": è la classe che porta i token, e se la
    mettono addosso anche il footer, la barra di controllo, il velo del cambio
    lingua, il tutorial e i due modali. Ognuno di loro si porterebbe dietro la
-   sua coppia di aloni a tutto schermo — su /mima ne contavo tre sovrapposti,
-   con l'opacità che si sommava e due animazioni infinite di troppo.
+   sua coppia di aloni a tutto schermo — su una pagina sola ne ho contati tre
+   sovrapposti, con l'opacità che si sommava e due animazioni infinite di
+   troppo.
    Il fondale lo tiene solo il contenitore di pagina. */
 .sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut, .apl-dialog, .apw-dialog)::before,
 .sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut, .apl-dialog, .apw-dialog)::after {
@@ -1468,10 +1469,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   animation: sb-ping 4.2s ease-out infinite;
 }
 .sb-chip-dot--sm { width: 5px; height: 5px; margin-right: 0.35rem; vertical-align: 0.1em; }
-/* Le tre tappe restano come stavano: questa keyframe la usa anche /mima
-   (mima.css, il pallino della lista condivisa), dove il ciclo è ancora quello
-   giusto — lì il pallino dice "c'è qualcun altro che sta scrivendo adesso", ed
-   è informazione che cambia da sola. La pausa fra il 70% e il 100% è quella
+/* Le tre tappe restano come stavano. La pausa fra il 70% e il 100% è quella
    che, in ciclo, separa un anello dal successivo. */
 @keyframes sb-ping {
   0% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55); }
@@ -1790,7 +1788,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-story-quote strong { font-weight: 400; color: var(--sb-fg); }
 .sb-story-foot { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.84rem; color: var(--sb-brand-text); }
 
-/* ── Mappa "Rivalta sul Mincio" (MapLibre, stesso pattern della mappa /mima) ── */
+/* ── Mappa "Rivalta sul Mincio" (MapLibre) ─────────────────────────────────── */
 .sb-loc-panel { margin-top: 1rem; }
 .sb-loc-inner { display: grid; grid-template-columns: 1fr; gap: 1.2rem; padding: 1.4rem; }
 @media (min-width: 900px) { .sb-loc-inner { grid-template-columns: 1fr 1.1fr; align-items: center; } }
