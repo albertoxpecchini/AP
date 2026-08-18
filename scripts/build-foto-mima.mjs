@@ -108,6 +108,27 @@ function oraRomana(date) {
   }).format(date);
 }
 
+/**
+ * La data letta dal NOME del file, per gli scatti che hanno perso gli EXIF.
+ *
+ * Le foto arrivate dal gruppo si chiamano tutte "2026-08-16 21.53.13.jpg", con
+ * eventuale "-1", "-2" per i doppioni: dentro al nome c'è l'istante vero dello
+ * scatto, che è esattamente il dato che l'EXIF non ha più. È un ripiego molto
+ * migliore della data di modifica del file — quella dice quando il file è stato
+ * COPIATO, e basta ricopiare la cartella su un altro disco per veder saltare
+ * l'ordine cronologico di tutto l'album.
+ *
+ * Si legge come ora locale italiana, che è quella in cui si è scattato.
+ */
+function dataDalNome(nomeFile) {
+  const m = nomeFile.match(/(\d{4})-(\d{2})-(\d{2})[ _T](\d{2})[.:-](\d{2})[.:-](\d{2})/);
+  if (!m) return null;
+  // Agosto in Italia è CEST, +02:00. Scriverlo esplicito evita che il fuso del
+  // computer che lancia lo script sposti tutte le foto di un'ora.
+  const d = new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}+02:00`);
+  return Number.isNaN(+d) ? null : d;
+}
+
 // ── I posti noti, letti da content/mima/dati-viaggio.ts ──────────────────────
 // Si legge il file come testo invece di importarlo: è TypeScript, e node non lo
 // esegue. Serve solo l'oggetto PLACES, e le sue righe hanno una forma fissa.
@@ -177,13 +198,17 @@ async function metadati(file) {
 
   const st = await stat(file);
   const grezza = exif?.DateTimeOriginal || exif?.CreateDate || exif?.ModifyDate;
-  const quando = grezza instanceof Date && !Number.isNaN(+grezza) ? grezza : null;
+  const daExif = grezza instanceof Date && !Number.isNaN(+grezza) ? grezza : null;
+  // In ordine di fiducia: l'EXIF dello scatto, poi l'istante scritto nel nome
+  // del file, e solo se non c'è nemmeno quello la data di modifica.
+  const daNome = daExif ? null : dataDalNome(basename(file));
 
   return {
-    quando: quando || st.mtime,
-    // Se la data viene dal filesystem e non dall'EXIF va detto: la data di
-    // modifica di un file è la data in cui è stato COPIATO, non scattato.
-    dataIncerta: !quando,
+    quando: daExif || daNome || st.mtime,
+    fonteData: daExif ? "exif" : daNome ? "nome" : "file",
+    // Solo il filesystem è davvero incerto: dice quando il file è stato
+    // COPIATO, non scattato. Il nome invece l'istante ce l'ha scritto dentro.
+    dataIncerta: !daExif && !daNome,
     lat: typeof exif?.latitude === "number" ? exif.latitude : null,
     lon: typeof exif?.longitude === "number" ? exif.longitude : null,
     macchina: [exif?.Make, exif?.Model].filter(Boolean).join(" ").trim() || null,
@@ -319,6 +344,7 @@ async function main() {
       giorno: giornoRomano(f.quando),
       ora: oraRomana(f.quando),
       dataIncerta: f.dataIncerta || undefined,
+      fonteData: f.fonteData,
       lat: f.lat ?? undefined,
       lon: f.lon ?? undefined,
       // La posizione non è stata letta da QUESTO scatto: è quella di uno
@@ -372,8 +398,10 @@ async function main() {
   console.log(`  ${voci.length} foto nel manifesto  (${nuove} ricodificate ora, il resto era già pronto)`);
   console.log(`  ${piazzate.length} sulla mappa — di cui ${manifesto.posizioneDedotta} con posizione dedotta dallo scatto vicino`);
   if (senza) console.log(`  ${senza} senza posizione: restano nell'album, in ordine cronologico, ma senza puntino`);
+  const dalNome = voci.filter((v) => v.fonteData === "nome").length;
   const incerte = voci.filter((v) => v.dataIncerta).length;
-  if (incerte) console.log(`  ${incerte} senza data EXIF: ordinate per data del file, che è quando è stato copiato`);
+  if (dalNome) console.log(`  ${dalNome} senza data EXIF: ordinate con l'istante scritto nel nome del file`);
+  if (incerte) console.log(`  ${incerte} senza data né in EXIF né nel nome: ordinate per data del file, che è quando è stato copiato`);
   console.log("");
   console.log("  Per giornata:");
   for (const g of giorni) console.log(`    ${g.data}  ${String(g.n).padStart(4)} foto`);
