@@ -117,9 +117,15 @@ function stampaEmail(a, oggetto, righe) {
 
 // ── I tre endpoint, versione finta ───────────────────────────────────────────
 
+// Stessa normalizzazione di codiceGiusto() in lib/scattiAccesso.ts: minuscole e
+// via gli spazi. Un codice si consegna a voce e si riscrive come capita — se il
+// gemello locale fosse più severo di quello vero, in locale si vedrebbe fallire
+// un codice che in produzione passa.
+const normalizza = (s) => String(s ?? '').trim().toLowerCase().replace(/\s+/g, '')
+
 function richiestaFinta(req, res, corpo, base) {
-  const codice = (process.env.SHOOTING_CODICE || CODICE_FINTO).trim().toLowerCase()
-  if (String(corpo?.codice ?? '').trim().toLowerCase() !== codice) {
+  const codice = normalizza(process.env.SHOOTING_CODICE || CODICE_FINTO)
+  if (normalizza(corpo?.codice) !== codice) {
     return json(res, 403, { errore: 'codice', error: 'Il codice non è quello giusto.' })
   }
   const man = manifesto()
