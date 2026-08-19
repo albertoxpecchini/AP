@@ -1,15 +1,17 @@
 // ─── Shooting: dagli scatti originali ai due manifesti ───────────────────────
 //
 // Fratello di build-foto-mima.mjs, con una differenza che cambia tutto: qui le
-// foto NON diventano pubbliche. Sono ritratti di persone, e l'unica cosa che
-// esce dal computer è il fatto che quella sessione esiste — data, luogo, quanti
-// scatti, con che macchina. Le immagini restano in locale.
+// foto NON diventano pubbliche. Sono ritratti di persone, e quello che esce dal
+// computer è il racconto della sessione — data, luogo, quanti scatti, con che
+// macchina, come si chiama, e sei sagome sfocate da 24 px. Le immagini restano
+// in locale, e da lì escono solo con un permesso (vedi lib/scattiAccesso.ts).
 //
 // Per questo lo script scrive DUE manifesti, e sono separati apposta:
 //
-//   src/app/shooting/sessioni.json   PUBBLICO, versionato. Solo i numeri e le
-//                                    date. Nessun nome di persona, nessun nome
-//                                    di file, nessuna immagine.
+//   src/app/shooting/sessioni.json   PUBBLICO, versionato. Date, luoghi, numeri,
+//                                    il titolo della sessione e sei impronte
+//                                    sfocate da 24 px. Nessun nome di file,
+//                                    nessuna immagine vera.
 //   foto/shooting/.web/manifesto.json  PRIVATO, dentro foto/ che è in
 //                                    .gitignore. Qui c'è tutto: titoli, scatti,
 //                                    misure, indirizzi delle immagini.
@@ -156,10 +158,14 @@ function ilPiuComune(valori) {
 }
 
 // ── Le sessioni ──────────────────────────────────────────────────────────────
-// L'ordine, il titolo e il luogo stanno in foto/shooting/sessioni.json, che è
-// dentro foto/ e quindi FUORI dal repo. Non è pigrizia: il titolo di una
-// sessione è il nome di una persona, e un file versionato finirebbe su GitHub
-// anche senza una sola foto allegata.
+// L'ordine, il titolo e il luogo si scrivono in foto/shooting/sessioni.json,
+// che sta dentro foto/ e quindi fuori dal repo: la SORGENTE resta lì, insieme
+// alle foto, e il repo non ha bisogno di sapere quali cartelle esistono su
+// questo computer.
+//
+// Il titolo però, da quando le schede lo mostrano, viene copiato nel manifesto
+// pubblico — cioè è una decisione presa, non una svista: chi lo cambia qui lo
+// sta cambiando anche sul sito, e quel valore finisce nella storia di git.
 
 async function leggiSessioni() {
   const cartelle = (await readdir(SRC_DIR, { withFileTypes: true }))
@@ -402,10 +408,28 @@ async function main() {
     private_.push({ id: s.id, titolo: s.titolo, cartella: s.cartella, nota: s.nota, foto: voci });
 
     // ── La voce PUBBLICA: quello che può vedere chiunque ─────────────────────
-    // Data, luogo, quanti scatti, con che attrezzatura. Nient'altro: niente
-    // titolo (è il nome di una persona), niente nomi di file, niente immagini.
+    // Data, luogo, quanti scatti, con che attrezzatura, il titolo della
+    // sessione, e una manciata di anteprime.
+    //
+    // Sulle anteprime: sono le stesse impronte sfocate che riempiono le celle
+    // della griglia mentre le miniature arrivano — 24 px di lato lungo, che è
+    // la misura in cui una persona è una macchia di colore e nient'altro. Non
+    // si genera niente di nuovo per il pubblico, e soprattutto non si alza la
+    // misura: a 24 px non c'è niente da recuperare, a 200 px comincerebbe a
+    // esserci. Se ne prendono POCHE e distribuite lungo la sessione, perché
+    // questo file finisce dentro al bundle e ogni impronta è ~300 byte di
+    // base64 che non si comprime.
+    const quante = Math.min(6, voci.length);
+    const passo = voci.length / quante;
+    const anteprime = Array.from({ length: quante }, (_, k) => {
+      const v = voci[Math.floor(k * passo)];
+      return { blur: v.blur, w: v.w, h: v.h };
+    });
+
     pubbliche.push({
       id: s.id,
+      titolo: s.titolo,
+      anteprime,
       data: giorni[0],
       giorno: etichettaGiorno(giorni[0]),
       giorni: giorni.length > 1 ? giorni : undefined,
@@ -454,7 +478,7 @@ async function main() {
   console.log("");
   console.log(`  ${relative(root, WEB_DIR)}${sep} pesa ${mb(pesoTotale)}  (media ${kb(pesoTotale / Math.max(1, totale))} a scatto, mini + medio)`);
   console.log(`  privato:  ${relative(root, MANIFESTO_PRIVATO)}   (fuori dal repo, con dentro tutto)`);
-  console.log(`  pubblico: ${relative(root, MANIFESTO_PUBBLICO)}  (versionato: solo date, luoghi e numeri)`);
+  console.log(`  pubblico: ${relative(root, MANIFESTO_PUBBLICO)}  (versionato: date, luoghi, numeri, titoli e sagome)`);
 
   if (rotte.length) {
     console.log("");

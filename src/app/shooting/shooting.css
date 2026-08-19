@@ -203,6 +203,36 @@
 }
 .sb-sh-lucchetto svg { flex: none; margin-top: 0.22rem; }
 
+/* ── Le sagome ────────────────────────────────────────────────────────────── */
+/* Sei impronte da 24 px di lato lungo, tirate a 46 px di larghezza. La sfocatura
+   qui sopra non è quella che protegge — quella è già cotta dentro l'immagine,
+   che di pixel ne ha ventiquattro: è solo per togliere la scalettatura
+   dell'ingrandimento. Alzare queste misure non farebbe un effetto più bello,
+   farebbe una foto. */
+
+.sb-sh-anteprime {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 1rem;
+}
+
+.sb-sh-anteprima {
+  display: block;
+  width: 46px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--sb-border);
+  clip-path: var(--sb-shape-xs);
+  filter: blur(1.5px) saturate(115%);
+  /* Il filtro sfoca anche il bordo, che diventa un alone: si taglia via. */
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .sb-sh-anteprima { width: 38px; }
+}
+
 /* ── Chiedere il permesso ─────────────────────────────────────────────────── */
 /* Il bottone e il modulo stanno DENTRO la scheda, sotto il lucchetto: la
    richiesta riguarda quella sessione lì, e una finestra che si apre in mezzo

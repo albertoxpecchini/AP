@@ -30,9 +30,20 @@ export interface Estremi {
   max: number;
 }
 
+/** Un'impronta sfocata da 24 px: la sagoma di uno scatto, non lo scatto. */
+export interface Anteprima {
+  blur: string;
+  w: number;
+  h: number;
+}
+
 export interface SessionePubblica {
   /** Progressivo — "s1", "s2". È il nome della cartella a NON essere pubblico. */
   id: string;
+  /** Come si chiama la sessione. */
+  titolo: string;
+  /** Sei impronte sfocate distribuite lungo la sessione: si vede il ritmo, non le facce. */
+  anteprime: Anteprima[];
   /** Giorno dello shooting, YYYY-MM-DD. */
   data: string;
   /** Lo stesso giorno scritto per esteso: "mercoledì 19 agosto 2026". */

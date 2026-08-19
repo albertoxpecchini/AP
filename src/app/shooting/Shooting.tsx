@@ -352,11 +352,12 @@ function Sessione({
           <div className="sb-sh-scheda-testa">
             <h2 id={`sess-${s.id}`}>
               <span data-no-i18n translate="no">{s.giorno}</span>
-              {v.titolo && (
-                <span className="sb-sh-chi" data-no-i18n translate="no">
-                  {v.titolo}
-                </span>
-              )}
+              {/* Il titolo arriva dal manifesto pubblico, quindi c'è per tutti;
+                  quello privato ha la precedenza solo se la sessione è stata
+                  ribattezzata senza rilanciare `npm run scatti`. */}
+              <span className="sb-sh-chi" data-no-i18n translate="no">
+                {v.titolo ?? s.titolo}
+              </span>
             </h2>
             <span className="sb-sh-conta" data-no-i18n translate="no">
               <IcImage size={13} /> {s.n}
@@ -378,6 +379,23 @@ function Sessione({
           </div>
 
           <Ferri s={s} />
+
+          {/* Le sagome: sei impronte da 24 px prese lungo la sessione, tirate
+              grandi quanto un'unghia. Servono a far vedere che dall'altra parte
+              c'è qualcosa — il ritmo, i colori di quella notte — senza mostrare
+              niente di nessuno. Sono decorative anche per uno screen reader:
+              non c'è un contenuto da leggere, c'è una macchia. */}
+          {!v.foto && s.anteprime?.length > 0 && (
+            <div className="sb-sh-anteprime" aria-hidden="true">
+              {s.anteprime.map((a, i) => (
+                <span
+                  key={i}
+                  className="sb-sh-anteprima"
+                  style={{ aspectRatio: `${a.w} / ${a.h}`, backgroundImage: `url("${a.blur}")` }}
+                />
+              ))}
+            </div>
+          )}
 
           {!v.foto && (
             <>

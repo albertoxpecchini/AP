@@ -1,10 +1,43 @@
 {
-  "generato": "2026-08-19T08:43:39.871Z",
+  "generato": "2026-08-19T11:59:51.711Z",
   "fonte": "metadati EXIF degli scatti originali (DateTimeOriginal, Model, LensModel, ISO, FocalLength, FNumber)",
   "totale": 89,
   "sessioni": [
     {
       "id": "s1",
+      "titolo": "Ginger",
+      "anteprime": [
+        {
+          "blur": "data:image/webp;base64,UklGRsoAAABXRUJQVlA4IL4AAACQBACdASoQABgAPu1kqU2ppaOiMAgBMB2JbACdMoEUdhNA76CBlGlRqAGwcoAA/vvc2qv4w6bKtVHzE+H4FtoXZw3s+uB+sHiIk3s+P8sQ3GKRbuJ0isWHqkzveoFDnWurE2CgMKCEDv9N5XkN79A5NQQ20XkpnhYrxS7Fh9kHGUAoz/UnF6Xa+/nETVW1fHz1nHLMTTceGE+JQSrWQ4LdEYjlzUdOxPW/9OIMDZicSSNzQt+avvAa1MDIuJAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRsYAAABXRUJQVlA4ILoAAABwBACdASoQABgAPu1iqU2ppaOiMAgBMB2JbAC7L1yVe6tWov+K/ApSzTdjAAD+/nM34tD/FAn5tleA069IXQcf5qYfbBdLGbx79RnH6PfzHjW9qn8Aw0v/PSqoVm28CAw0w/9raMqOvfK/bbt5An1vB691e//O9t12P+i/p1rPIjwQ6Oij4IZ8fpSn0uNCtCHA9+Rrn2vo51M6vj0tSlQRh39KoCC21m2cy4cSX87FAYe/HS9Q0mgAAAA=",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAADwAwCdASoQABgAPu1iqU2ppaOiMAgBMB2JbACsH8ADAaM8NS3Km8rgAP70IBN8mf21g9AehaJCYCrT7wPybutNNYlc4FGf5+qMKhNUDCCszHyMA/Q6E0uymN1t+HykAuLoJhnPP6rPc+tUnNtBfGJ7NlxsrkDNxcSbWaNzz6ZNKFVoyO5KWwCHp/q9/EG1eKDgAAAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRrAAAABXRUJQVlA4IKQAAAAQBACdASoQABgAPu1krU6ppaSiMAgBMB2JbACdH8AJWeNuRDLGBILlAAD+/WcQ0z8u189Pa5Ea/wl6CpFxPA8He7rdLI89W9FhGYcHEc4+623ogMjVx7ogO6FvnA7neXYBaezr2SnjysoDnQ2FfaE+vnZ6M2bcoAMNyMeajKG7j/IU/UMXq01rhFHzfZpLWVXCSrtJmrSt6sPKKvZRhDzkQwAAAA==",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRtAAAABXRUJQVlA4IMQAAABwBACdASoQABgAPu1kq04ppaQiMAgBMB2JbACdAGlcs6R9AsStwuPHlWFFAAD+/m3LFfUfFv3rwrH6/p5ELaACPgnYA745nX2k94/jq/946pTuedfsgsFgaCAFcLTjd934GHuT/YZOQ5GV/T04CIDxQ++jtIcQj2IY95zNqjoDbNYxEc9qj9JPbo7hzgctvB3e393aCW0rt6TJu5iGN63bi7flghQmmycIq31SuudJIV7DTSnlRtLbpGT2qoHlAcb3gAAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAADwAwCdASoQABgAPu1kqU2ppaOiMAgBMB2JagBTABfB7OuhY9khYlqAAP7+FYAEC9613OyHzuv9NPRjVTC1EPaCx5DG4qKaoacB8imrhkZThuudQ9f6ONzZ6Bsv4VwPMEGF7/vTdDWFnjM/Fm9Rgg6E/0lZcblMn20A/w0Nt4mE9iyZuTziSxfR38JPzZOd29WFDogAAAA=",
+          "w": 1200,
+          "h": 1800
+        }
+      ],
       "data": "2026-08-19",
       "giorno": "mercoledì 19 agosto 2026",
       "ora": {
@@ -30,6 +63,39 @@
     },
     {
       "id": "s2",
+      "titolo": "Angy",
+      "anteprime": [
+        {
+          "blur": "data:image/webp;base64,UklGRrgAAABXRUJQVlA4IKwAAABQBACdASoQABgAPu1iqU2ppaOiMAgBMB2JbABTAFwALVl1PpL0hYTl2XeAAP792e6ighVugqfYgvjeWR6CiR93tkmvApveuvBv9+6PKAitWtiW2/jpMXCYy2D9ZRu4O+Yvuuw6iEXQVD/taQOy8f4VQOie8ld0WvFCaF1Zm0k6QM29t7MCcWfVzfxSQniMWbWEDdHPvgHtAk9HybL6Y+uizlZfWZFbNxRYAAAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRrIAAABXRUJQVlA4IKYAAABQBACdASoQABgAPu1kqU2ppaQiMAgBMB2JbAC7ACHfg1964LuZpv1licPAAP70HdjLOBBEoLopdY5183/EpwexTYfL8IXiFmgD93rJbIxlwHZEAfE+lAP2OfiI16xlwSXLeSJWtbJ/bzKlNmJXr/0Nm1s28bjpIieai2BrHgus+zVlH6tuJTNZvELs1FmsnLrWwraYbe3CaZSYnJd68hPpSTfA8AAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRqoAAABXRUJQVlA4IJ4AAADwAwCdASoQABgALrV2u12jqampiYC0SyAF2P4AMDXoiqENVnVTbfZgAP75vqcwG0BYTCGG2OWvMSgnZx2mB/4DgrvP5fzbi5VAK+GGAlGTlcsJ1c/aL81StK0AG/KxjFzwAuHejo7kXAqANFKiW6wshj5FV1xV+Y27hhv5EwfFZZYmkaV87vaLmZ6Lf1ZVrmGu4JiGUJy3AfwqrSgAAA==",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAADwAwCdASoQABgALrV2u12jqampiYC0SzAF2AIeAKbM8PX21I6Kkf8AAP75DQxDisUDgJ9xFdWq6gnjmy4Gzz9F6/5OE3NTCqB201ewqMsWMpmt5qNrTgeOa1bfQqbalYwAxhCOKEK1WEe5BVJvlEEcFHfZio0csGw4ngI+spAAAA==",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRpYAAABXRUJQVlA4IIoAAAAQBACdASoQABgAPu1iqU2ppaQiMAgBMB2JZgC7IExJW18lmsG/A1EAAAD+/nM33/a6qtO32xPhqB35viwhPEll/GtrPh19zmSkZ0D5cj2RVdKOWeAASpAfrQY9BvKix7DPGfGet5eBNisd6WcEzi0B/fqho/Bvd9i2INDL4gqUw/DhvnBABw/KAAA=",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRrQAAABXRUJQVlA4IKgAAAAwBACdASoQABgAPu1krU6ppaSiMAgBMB2JbACw7GlgD8RrSbcRqZfyL4AA/v5ItlYCCsvs2/4RZ99Cvj9U9JPIqLLI+wlUFyAlKcwNzzNDNWd/djRPa/EPUgvJtomF8w+u8kjvLzhMiV1kq496YG9G2mLadPz/8UiURtOXJCpZP/q8CrCBHf0VwZikurq68FF9L3QUJNirSeB2a+OUGrb74OqnseDaAAA=",
+          "w": 1200,
+          "h": 1800
+        }
+      ],
       "data": "2026-08-19",
       "giorno": "mercoledì 19 agosto 2026",
       "ora": {
@@ -55,6 +121,39 @@
     },
     {
       "id": "s3",
+      "titolo": "Insieme",
+      "anteprime": [
+        {
+          "blur": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAACQBACdASoQABgAPu1iqU2ppaQiMAgBMB2JaAC7MoAltEo6WPdb4X2n/l1iAxgA/vynd34toa+jDOG9ojrp6RAiZCYepWbvgG2Xff0sUuA5f7LOiAsmz5gR/CE07Pu2102ODjz1Fv2WY6JZ7T8GrHslKL9dHpZfRHg442776mjZdxnvfekhoZH51q+Rks3fYeitZpCJn6Gwfg1RUznowAAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRtoAAABXRUJQVlA4IM4AAAAwBQCdASoQABgAPu1mq04ppaQiMAgBMB2JbACdMoFAAdJz/2yKuSjSO3Zxi3JYbNlggAD++9/MjnjqQ5kc4q1ZrVsFatnPd9YV09r47E/2Pu2o5nuFjCBaSE/psE4kejj/1DOX7B97R11uJi0OPQHwb+0SSAbdcjA78tWrP86jPsW51uKenDeMBs4sDIUfXawBXaIob5uGcDjMXC8TlhLl6d1Ft0GzrycOoO1WakW5zkl8hFjelpde3F9JvZ7pxBpavliYlWNHQ/etAAAAAA==",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRrQAAABXRUJQVlA4IKgAAABQBACdASoQABgAPu1iqU2ppaQiMAgBMB2JbACdMoAKRqffJhuZxNyrML2AAP79UsKbKrrsrdPtB6Ku20QAgRy4/A91Wk7mS/hQz1gGWgO9tERzzLf+zq2bkIF8uLsR/fyznWCje26sGVr+B/d713nj09/fD5weDjolCAbP2ahC9n2CynGTV4EF6NoSqzm0Zhjdk1rbX6QCq2oyKKUjZ03RdliyeDgAAAA=",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRr4AAABXRUJQVlA4ILIAAABQBACdASoQABgAPu1mq04ppaQiMAgBMB2JZAC7MoAlq0o6ekJ9Kf+Ro26AAP79nYKrKbOTH+5Ck9FGrTNvXjFw4Bl3DR3psQoZdPD/Dd37H+V/OTmWsFJGeo9Lfni/8m8Osy2A0MIrTb8VNHI4t75ROnn7MQYlyFOq4I+OdxnSBd1+oAEosFmX5GLlGLOPE09hwi3GnOi8kFgbfE3bvuMQ6sffxtc/C1P7dN1RfvufXAAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAABwBACdASoQABgAPu1orU6ppiSiMAgBMB2JbAC7LwAB0aZZWIzdaiUb3fK/AAD+9B1xfazO8EwrnwwZM4s7YdEizviR80ik3QH8z5olOIqoNAxj1uC+4kxxnEOXrb5EwTg/LmWKYIh9RqnxcaOpaU+49neQOfFFGm/z20J2v8NZK7A65OTwEnObrKxFm7KcMZLkwntdR93rXbMsn74ksAAA",
+          "w": 1200,
+          "h": 1800
+        },
+        {
+          "blur": "data:image/webp;base64,UklGRsQAAABXRUJQVlA4ILgAAACwBACdASoQABgAPu1yrU+pp6QiMAgBMB2JbAAdooRGaUdHrZZ5oYfEWZmxpKnAAP79m7TWZ/4dZD00tAutaNu1tnu9FRVvJah8pLa1zpTd6V6w46UTrC0g5D9ec8pvdKKxr/eJiD+xEsEcCKv1tpwIDC0wN8jP+P98IBU+LNT/se+zUf3LibQNjncMEpomGISwMKyMby7akF25WpoyyZaAnCvgYnxJ+d4A7m6JqIn6z9BDz6SN8AAA",
+          "w": 1200,
+          "h": 1800
+        }
+      ],
       "data": "2026-08-19",
       "giorno": "mercoledì 19 agosto 2026",
       "ora": {
