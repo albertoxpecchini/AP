@@ -286,6 +286,13 @@ export default defineConfig({
           // esclusione il SW servirebbe index.html (la home) al posto di lasciar
           // scattare il rewrite Vercel → /api/d → 302 verso il documento.
           /^\/d\//,
+          // Gli endpoint /api/*, per lo stesso motivo — e stavolta non era una
+          // riga di prudenza: la pagina della decisione di /shooting
+          // (/api/scatti-accesso?id=…) si APRE in una scheda, cioè è una
+          // navigazione, e il service worker rispondeva con la home. La
+          // richiesta era lì, il token giusto, il server rispondeva bene a
+          // curl: a servire la pagina sbagliata era la copia in cache.
+          /^\/api\//,
         ],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
