@@ -1788,6 +1788,37 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 .sb-story-quote strong { font-weight: 400; color: var(--sb-fg); }
 .sb-story-foot { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.84rem; color: var(--sb-brand-text); }
 
+/* ── Shooting ──────────────────────────────────────────────────────────────
+   La sezione che porta a /shooting. Stessa impaginazione del pannello della
+   mappa qui sotto — copy a sinistra, il resto a destra — perché è lo stesso
+   ruolo: una cosa che sta fuori dal sito, raccontata da dentro.
+
+   Niente immagini: sono ritratti, e questa pagina è pubblica. Al loro posto ci
+   sono i numeri (che vengono dal manifesto pubblico) e i ferri del mestiere. */
+.sb-shot-panel { margin-top: 1rem; }
+.sb-shot-inner { display: grid; grid-template-columns: 1fr; gap: 1.4rem; padding: 1.4rem; }
+@media (min-width: 900px) { .sb-shot-inner { grid-template-columns: 1.4fr 1fr; align-items: center; } }
+.sb-shot-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+.sb-shot-title { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 1.05rem; font-weight: 500; color: var(--sb-fg); }
+.sb-shot-desc { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+.sb-shot-desc strong { font-weight: 400; color: var(--sb-fg); }
+
+.sb-shot-side { display: flex; flex-direction: column; gap: 1rem; }
+.sb-shot-numeri { display: flex; gap: clamp(1.5rem, 4vw, 2.5rem); }
+.sb-shot-numero { display: flex; flex-direction: column; gap: 0.1rem; }
+.sb-shot-numero-v { font-size: clamp(1.7rem, 3.5vw, 2.3rem); font-weight: 400; line-height: 1; letter-spacing: -0.03em; color: var(--sb-fg); }
+.sb-shot-numero-k { font-size: 0.78rem; color: var(--sb-fg-muted); }
+.sb-shot-ferri { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.sb-shot-ferri li {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--sb-fg-lighter);
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-surface-100);
+  clip-path: var(--sb-shape-xs);
+}
+
 /* ── Mappa "Rivalta sul Mincio" (MapLibre) ─────────────────────────────────── */
 .sb-loc-panel { margin-top: 1rem; }
 .sb-loc-inner { display: grid; grid-template-columns: 1fr; gap: 1.2rem; padding: 1.4rem; }

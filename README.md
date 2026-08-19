@@ -53,7 +53,7 @@ e tema chiaro/scuro nativo.
 | **Codebase** | **~41,9k LOC** in `src/` | 123 file versionati: 52 `.tsx` (24,3k) · 37 `.ts` (6,1k) · 27 `.css` (11,5k) |
 | **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 7 funzioni `api/` + `lib/` (185) · `scripts/` (4,9k, di cui 2,6k il programma di pulizia) |
 | **Dipendenze** | **12 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
-| **Pagine** | **13 rotte** | 1 hub + 12 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev |
+| **Pagine** | **14 rotte** | 1 hub + 13 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev · `/shooting` è pubblica ma le sue foto no |
 | **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
 | **Serverless** | **7 funzioni** in `api/` | trivia · notify · festa-rsvp · sponsor · ig-stats · d · cron |
@@ -205,13 +205,21 @@ I redirect `www → sottodominio` sono in [`vercel.json`](vercel.json).
 | `/dubliners` | `dubliners` | **Dubliners** | Approfondimento «Gente di Dublino» (J. Joyce, 1914) |
 | `/gattopardo` | `gattopardo` | **Gattopardo** | Approfondimento «Il Gattopardo» (Tomasi di Lampedusa, 1958) |
 | `/festa` | `festa` | **Festa** | Inviti con token, RSVP e notifica email |
+| `/mima` | _(solo path)_ | **MiMa · album** | Le foto di Milano Marittima su mappa e scaletta, ordinate dagli EXIF |
+| `/shooting` | _(solo path)_ | **Shooting** | I ritratti: data, luogo e attrezzatura per tutti; **le foto solo in locale** |
 | `/archivio` | `archivio` | **Archivio** | Esploratore di progetti **e dell'albero vero del repo** |
 | `/sostieni` | `sostieni` | **Sostieni** | Dati bonifico + libro firme dei donatori |
 | `/instagram` | _(solo path)_ | **Compare Two Lists** | «Chi ti ha tolto il follow» — confronto di due liste, tutto in locale |
 
 I **sottodomini sono nove**: le pagine senza sottodominio restano a path sotto `www`. C'è poi una
-sedicesima rotta, `/cleaning`, che **esiste solo in sviluppo** — vedi
+quindicesima rotta, `/cleaning`, che **esiste solo in sviluppo** — vedi
 [l'officina](#cleaning--lofficina-in-pagina).
+
+`/shooting` è pubblica, ma le sue foto no: le immagini stanno in `foto/shooting/`, fuori dal repo, e
+l'unico indirizzo che le serve vive dentro `configureServer` — cioè solo sotto `vite dev`. Chi apre
+la pagina dal sito pubblicato vede le schede delle sessioni (data, luogo, quanti scatti, con che
+macchina) e nient'altro, perché di là le foto non sono mai state caricate. Vedi
+`foto/shooting/LEGGIMI.md`.
 
 ---
 
@@ -389,6 +397,8 @@ AP/
 │   ├── build-trivia-version.mjs #  versione di Trivia, contata dove la storia è intera
 │   ├── build-cars.mjs        #   FBX/OBJ + PNG → cars.bin + texture WebP (fuori CI)
 │   ├── build-foto-mima.mjs   #   foto/mima/ → EXIF (data + GPS) → album e mappa
+│   ├── build-foto-shooting.mjs # foto/shooting/ → EXIF → due manifesti: uno pubblico, uno no
+│   ├── shooting-api-dev.mjs  #   /scatti-privati/… — le foto dei ritratti, solo sotto vite dev
 │   ├── ensure-dev-server.mjs #   il dev server è già acceso? riusalo, non riavviarlo (F5)
 │   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
 │   ├── lib/fbx.mjs           #   lettore FBX binario, per build-cars
@@ -591,7 +601,7 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron.
 | `npm run i18n` | Rigenera solo `src/app/i18n/generated/<lingua>.json` da `translations.json` |
 | `node scripts/build-cars.mjs <cartella>` | Rigenera `public/models/` dai modelli 3D sorgente (che **non** stanno nel repo) |
 | `npm run foto` | Album MiMa: legge gli EXIF delle foto in `foto/mima/` (che **non** stanno nel repo), le rimpicciolisce in `public/images/mima/` e scrive `src/app/mima/foto.json` — posizioni dal GPS, ordine da `DateTimeOriginal` |
-| `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
+| `npm run scatti` | Shooting: legge gli EXIF di `foto/shooting/<sessione>/` e scrive **due** manifesti — `src/app/shooting/sessioni.json` (versionato: date, luoghi, conteggi) e `foto/shooting/.web/manifesto.json` (fuori dal repo: gli scatti). Le immagini restano in `foto/`, mai in `public/` || `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
 | `npm run pulizia` | Cerca lo sporco e misura, **senza toccare niente** |
 | `npm run pulizia:applica` | Pulisce, verifica con build + benchmark, annulla da solo se qualcosa peggiora |
 | `npm run bench` | Solo benchmark: build, peso, fotogrammi — confrontati con l'ultima volta |

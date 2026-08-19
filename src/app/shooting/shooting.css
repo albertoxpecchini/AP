@@ -1,0 +1,435 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   /shooting — i ritratti.
+
+   Stili propri della pagina, tutti col prefisso .sb-sh-. Colori, ombre e
+   sagome smussate vengono dai token --sb-* di home.css: qui dentro non c'è un
+   solo valore di colore scritto a mano, così il tema scuro arriva da sé senza
+   un secondo foglio.
+
+   La regola della pagina, la stessa di /mima: le uniche cose colorate sono le
+   foto. Tutto il resto sta sui grigi, e l'azzurro compare solo dove indica
+   qualcosa — il focus, e la riga di stato quando l'album è aperto.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.sb-sh-tagline {
+  font-size: 0.78rem;
+  color: var(--sb-fg-muted);
+  padding-left: 0.6rem;
+  margin-left: 0.55rem;
+  border-left: 1px solid var(--sb-border-strong);
+  white-space: nowrap;
+}
+@media (max-width: 640px) { .sb-sh-tagline { display: none; } }
+
+.sb-sh-indietro { margin-left: auto; }
+
+/* ── Apertura ─────────────────────────────────────────────────────────────── */
+
+.sb-sh-testata {
+  padding-top: clamp(3rem, 7vw, 5rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.sb-sh-kicker {
+  margin: 0 0 0.9rem;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+
+.sb-sh-titolo {
+  margin: 0 0 1.4rem;
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+.sb-sh-titolo span { display: block; }
+.sb-sh-titolo .sb-brandline {
+  color: var(--sb-brand-text);
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+  letter-spacing: -0.02em;
+  margin-top: 0.5rem;
+}
+
+.sb-sh-copy { max-width: 44rem; }
+.sb-sh-copy p {
+  margin: 0 0 0.7rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--sb-fg-lighter);
+}
+.sb-sh-copy p:last-child { margin-bottom: 0; }
+.sb-sh-copy strong { font-weight: 400; color: var(--sb-fg); }
+
+/* Le cifre: numeri grossi, etichette piccole, nessun riquadro attorno. */
+.sb-sh-cifre {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-top: 2rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--sb-border);
+}
+.sb-sh-cifra { display: flex; flex-direction: column; gap: 0.15rem; }
+.sb-sh-cifra-v {
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--sb-fg);
+}
+.sb-sh-cifra-k { font-size: 0.78rem; color: var(--sb-fg-muted); letter-spacing: 0.02em; }
+
+/* ── La riga di stato ─────────────────────────────────────────────────────── */
+/* Dice in che metà del mondo si sta guardando la pagina: col manifesto privato
+   (io, in locale) o senza (tutti gli altri). È l'unica cosa che cambia fra le
+   due versioni, e va detta invece di lasciarla indovinare. */
+
+.sb-sh-stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 1.6rem 0 0;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.82rem;
+  color: var(--sb-fg-light);
+  border: 1px solid var(--sb-border);
+  background: var(--sb-surface-100);
+  clip-path: var(--sb-shape-xs);
+}
+.sb-sh-stato code {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--sb-fg);
+}
+.sb-sh-stato svg { flex: none; }
+.sb-sh-stato--aperto { color: var(--sb-brand-text); border-color: var(--sb-border-strong); }
+.sb-sh-stato--attesa { color: var(--sb-fg-muted); }
+
+/* ── Le sessioni ──────────────────────────────────────────────────────────── */
+
+.sb-sh-elenco { padding-bottom: clamp(3rem, 6vw, 5rem); }
+
+.sb-sh-sessione { padding-top: clamp(2.5rem, 5vw, 4rem); }
+
+.sb-sh-scheda-inner { padding: clamp(1.1rem, 2.5vw, 1.6rem); }
+
+.sb-sh-scheda-testa {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem 1rem;
+  flex-wrap: wrap;
+}
+.sb-sh-scheda-testa h2 {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--sb-fg);
+}
+
+/* Il nome della sessione: c'è solo in locale, e si vede che è un'aggiunta —
+   monospaziato, dietro un filo azzurro, come il numero di giornata di /mima. */
+.sb-sh-chi {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--sb-fg-muted);
+  padding-bottom: 0.15rem;
+  border-bottom: 2px solid var(--sb-brand);
+}
+
+.sb-sh-conta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--sb-fg-muted);
+}
+
+.sb-sh-scheda-righe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  margin-top: 0.7rem;
+}
+.sb-sh-riga {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--sb-fg-light);
+}
+.sb-sh-riga svg { color: var(--sb-fg-muted); }
+
+/* I ferri del mestiere: macchina, obiettivo, escursioni. Pillole spente, sono
+   dati non azioni. */
+.sb-sh-ferri {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sb-sh-ferri li {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--sb-fg-lighter);
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-surface-100);
+  clip-path: var(--sb-shape-xs);
+}
+
+.sb-sh-lucchetto,
+.sb-sh-nota {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--sb-border);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--sb-fg-muted);
+}
+.sb-sh-lucchetto svg { flex: none; margin-top: 0.22rem; }
+
+/* ── La griglia ───────────────────────────────────────────────────────────── */
+/* A colonne, non a celle quadrate: qui i formati contano. In uno shooting i
+   verticali sono la maggioranza, e ritagliarli quadrati vorrebbe dire tagliare
+   la testa o i piedi a ogni miniatura. Le colonne CSS tengono le proporzioni
+   vere di ognuna, e siccome l'altezza di ogni cella è nota PRIMA che l'immagine
+   arrivi (aspect-ratio dal manifesto), niente si sposta mentre si scorre. */
+
+.sb-sh-griglia {
+  margin-top: 1.2rem;
+  columns: 2;
+  column-gap: 8px;
+}
+@media (min-width: 640px) { .sb-sh-griglia { columns: 3; } }
+@media (min-width: 1000px) { .sb-sh-griglia { columns: 4; } }
+@media (min-width: 1400px) { .sb-sh-griglia { columns: 5; } }
+
+.sb-sh-cella {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 0;
+  border: 1px solid var(--sb-border);
+  background-color: var(--sb-surface-100);
+  /* L'anteprima sfocata da 24 px, che arriva col manifesto: è già qui quando la
+     miniatura vera è ancora per strada. */
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  cursor: pointer;
+  break-inside: avoid;
+  clip-path: var(--sb-shape-xs);
+  transition: border-color 0.15s ease;
+}
+.sb-sh-cella img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sb-sh-cella.is-carica img { opacity: 1; }
+.sb-sh-cella:hover { border-color: var(--sb-border-stronger); }
+.sb-sh-cella:hover img { transform: scale(1.04); }
+/* Il clip-path taglia anche l'outline del focus: torna dentro, come ombra. */
+.sb-sh-cella:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--sb-brand); }
+
+/* L'ora, in basso a sinistra, solo al passaggio: sempre accesa sarebbe una
+   griglia di scritte, non di foto. */
+.sb-sh-cella-ora {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 0.15rem 0.35rem;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.sb-sh-cella:hover .sb-sh-cella-ora,
+.sb-sh-cella:focus-visible .sb-sh-cella-ora { opacity: 1; }
+
+/* ── Il visore ────────────────────────────────────────────────────────────── */
+
+.sb-sh-visore {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3.6rem 0.6rem 1rem;
+  background: color-mix(in srgb, var(--sb-bg) 90%, transparent);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+
+.sb-sh-visore-barra {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem clamp(0.7rem, 3vw, 1.4rem);
+}
+.sb-sh-visore-chi {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--sb-fg);
+}
+.sb-sh-visore-conta {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--sb-fg-muted);
+}
+.sb-sh-visore-comandi { display: flex; align-items: center; gap: 0.4rem; }
+
+.sb-sh-visore-corpo {
+  grid-column: 2;
+  margin: 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+/* La tela ha già le proporzioni dello scatto: la foto non "compare" cambiando
+   la geometria di quello che c'è attorno, e la didascalia non salta quando si
+   passa da un verticale a un orizzontale. */
+.sb-sh-visore-tela {
+  position: relative;
+  max-width: 100%;
+  max-height: calc(100vh - 10rem);
+  min-height: 0;
+  overflow: hidden;
+  cursor: zoom-in;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-surface-100);
+}
+.sb-sh-visore-tela.is-zoom { cursor: zoom-out; }
+.sb-sh-visore-tela img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* L'ingrandimento serve a guardare la messa a fuoco, che è l'unica ragione per
+   cui si vuole la qualità piena: 2,6× sull'originale è ~1:1 su uno schermo
+   normale. L'origine della trasformazione segue il puntatore, così si esplora
+   la foto muovendo il mouse invece di trascinare. */
+.sb-sh-visore-tela.is-zoom img { transform: scale(2.6); }
+
+.sb-sh-visore-didascalia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  color: var(--sb-fg-light);
+  text-align: center;
+}
+.sb-sh-visore-ora,
+.sb-sh-visore-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.sb-sh-visore-zoom { color: var(--sb-fg-muted); }
+.sb-sh-visore-dati {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.76rem;
+  color: var(--sb-fg-lighter);
+}
+
+/* Qualità: spenta finché si guarda la versione da 1800 px, accesa quando
+   l'originale ha preso il suo posto. È un'informazione, non un vanto: dice
+   quale file si sta guardando davvero. */
+.sb-sh-qualita {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.4rem;
+  color: var(--sb-fg-muted);
+  border: 1px dashed var(--sb-border-stronger);
+  clip-path: var(--sb-shape-xs);
+}
+.sb-sh-qualita.is-piena {
+  color: var(--sb-brand-text);
+  border-style: solid;
+  border-color: var(--sb-border-strong);
+}
+
+.sb-sh-visore-freccia {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--sb-fg-light);
+  cursor: pointer;
+  clip-path: var(--sb-shape-xs);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.sb-sh-visore-freccia:hover:not(:disabled) { color: var(--sb-fg); border-color: var(--sb-border-stronger); }
+.sb-sh-visore-freccia:disabled { opacity: 0.3; cursor: default; }
+.sb-sh-visore-freccia:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--sb-brand); }
+.sb-sh-visore-freccia--prima { grid-column: 1; }
+.sb-sh-visore-freccia--dopo { grid-column: 3; }
+
+/* ── Schermi piccoli ──────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .sb-sh-visore { padding: 3.2rem 0.4rem 0.8rem; grid-template-columns: 1fr; }
+  .sb-sh-visore-corpo { grid-column: 1; }
+  /* Le frecce in fondo: ai lati, su un telefono, rubano metà larghezza alla
+     foto. E comunque lì si scorre con il dito. */
+  .sb-sh-visore-freccia { position: absolute; bottom: 0.8rem; }
+  .sb-sh-visore-freccia--prima { left: 1rem; }
+  .sb-sh-visore-freccia--dopo { right: 1rem; }
+  .sb-sh-visore-tela { max-height: calc(100vh - 13rem); }
+  .sb-sh-conta { margin-left: 0; }
+}
+
+/* ── Movimento ────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .sb-sh-cella,
+  .sb-sh-cella img,
+  .sb-sh-cella-ora,
+  .sb-sh-visore-tela img,
+  .sb-sh-visore-freccia { transition: none; }
+  .sb-sh-cella:hover img { transform: none; }
+}

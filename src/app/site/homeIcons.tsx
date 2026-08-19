@@ -633,6 +633,24 @@ export const IcImage = (p: IcProps) => (
   </Ic>
 );
 
+/* ── Shooting: la macchina e il diaframma ── */
+
+export const IcCamera = (p: IcProps) => (
+  <Ic {...p}>
+    <path d="M3 8.5a2 2 0 0 1 2-2h2.2l1.3-2.1a1 1 0 0 1 .85-.47h5.3a1 1 0 0 1 .85.47L16.8 6.5H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <circle cx="12" cy="12.8" r="3.6" />
+  </Ic>
+);
+
+/* Le sei lamelle di un diaframma: il triangolo dentro il cerchio è quello che
+   si vede davvero guardando dentro un obiettivo. */
+export const IcAperture = (p: IcProps) => (
+  <Ic {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 3v7.3M20.8 7.5l-6.3 3.6M20.8 16.5h-7.3M12 21v-7.3M3.2 16.5l6.3-3.6M3.2 7.5h7.3" />
+  </Ic>
+);
+
 /* ── PCTO: ore, validazione, calcolo ── */
 
 export const IcHourglass = (p: IcProps) => (

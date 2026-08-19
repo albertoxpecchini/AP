@@ -44,6 +44,8 @@ import {
   IcCat,
   IcId,
   IcPin,
+  IcCamera,
+  IcAperture,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
 import { useNavPill } from "./site/GlassMotion";
@@ -65,6 +67,10 @@ import {
 } from "./site/homeLive";
 import { EMAIL } from "./site/data";
 import { PROJECTS } from "./site/projects";
+// Il manifesto PUBBLICO degli shooting: date, luoghi e conteggi, niente foto.
+// La sezione in fondo alla home legge di qui i suoi numeri, così restano veri
+// anche dopo il prossimo `npm run scatti`.
+import { SESSIONI } from "./shooting/sessioni";
 import { ArchivioExplorer } from "./archivio/Archivio";
 const RivaltaMap = lazy(() => import("./site/RivaltaMap"));
 /* Stessa cura della mappa: la geometria delle tre auto e il loro renderer non
@@ -1265,6 +1271,62 @@ export default function App() {
         </section>
 
         {/* ⑧ Garage — le tre auto, in 3D e girabili */}
+        {/* ⑦bis Shooting — l'altra metà, quella senza tastiera.
+             I numeri non sono scritti a mano: vengono da src/app/shooting/
+             sessioni.json, il manifesto PUBBLICO che `npm run scatti` genera
+             leggendo gli EXIF. Le foto no: quelle non escono da casa, e questa
+             sezione lo dice invece di lasciarlo scoprire a chi clicca. */}
+        <section id="shooting" className="sb-section" aria-label="Photography">
+          <div className="sb-container">
+            <div className="sb-sechead">
+              <h3>And on the other side of the lens</h3>
+              <p>
+                I take portraits of people — as an amateur, and with no illusions about it.
+                A Canon EOS 4000D with its kit lens, or the iPhone 16 Pro when the camera
+                stayed home.
+              </p>
+            </div>
+
+            <div className="sb-panel sb-shot-panel">
+              <div className="sb-panel-inner sb-shot-inner">
+                <div className="sb-shot-copy">
+                  <h4 className="sb-shot-title">
+                    <IcCamera size={16} /> <span>Shooting</span>
+                  </h4>
+                  <p className="sb-shot-desc">
+                    <strong>The photos of people are not published.</strong> What stays online
+                    is what can be told about a session — the date, the place, how many frames,
+                    which gear — and those numbers come from the files' own metadata. The album
+                    itself opens only on the machine where the photos are.
+                  </p>
+                  <Link to="/shooting" className="sb-btn sb-btn--sm sb-btn--secondary">
+                    <IcAperture size={16} /> See the sessions
+                  </Link>
+                </div>
+
+                <div className="sb-shot-side">
+                  <div className="sb-shot-numeri">
+                    {[
+                      { k: "frames", v: String(SESSIONI.totale) },
+                      { k: SESSIONI.sessioni.length === 1 ? "session" : "sessions", v: String(SESSIONI.sessioni.length) },
+                    ].map((n) => (
+                      <div key={n.k} className="sb-shot-numero">
+                        <span className="sb-shot-numero-v" data-no-i18n translate="no">{n.v}</span>
+                        <span className="sb-shot-numero-k">{n.k}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <ul className="sb-shot-ferri" data-no-i18n translate="no">
+                    <li>Canon EOS 4000D</li>
+                    <li>EF-S 18–55 mm</li>
+                    <li>iPhone 16 Pro</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="garage" className="sb-section" aria-label="Dream garage">
           <div className="sb-container">
             <div className="sb-sechead">
