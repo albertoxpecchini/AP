@@ -105,22 +105,38 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const SAGOMA = (t) =>
   `polygon(${t}px 0,100% 0,100% calc(100% - ${t}px),calc(100% - ${t}px) 100%,0 100%,0 ${t}px)`
 const BOTTONE = (primario) =>
-  `display:inline-block;padding:9px 16px;border-radius:6px;font:inherit;font-size:14px;cursor:pointer;` +
+  `display:inline-block;padding:8px 16px;border-radius:6px;font:inherit;font-size:14px;font-weight:400;cursor:pointer;` +
   (primario
-    ? 'background:#72c7e3;border:1px solid #2d8fbe;color:#101010'
+    ? 'background:#72c7e3;border:1px solid #3e9bc4;color:#171717'
     : 'background:#f8f8f8;border:1px solid #dbdbdb;color:#171717')
 
 function paginetta(titolo, corpo) {
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(titolo)} · Shooting (locale)</title></head>
-<body style="margin:0;padding:0 16px;background:#fcfcfc;font-family:'Titillium Web',Segoe UI,Arial,sans-serif;color:#171717">
-<div style="max-width:560px;margin:0 auto;padding:8vh 0">
-<div style="padding:1px;background:#dbdbdb;clip-path:${SAGOMA(18)}">
-<div style="background:#fbfbfb;clip-path:${SAGOMA(17.414)}">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(titolo)} · Shooting (locale)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap">
+<style>
+  body { margin:0; padding:clamp(4rem,8vw,6rem) clamp(1.25rem,4vw,5rem); background:#fcfcfc; color:#171717;
+         font-family:'Titillium Web',Geneva,Tahoma,sans-serif; font-size:16px; line-height:1.5; }
+  .velo, .griglia { position:fixed; inset:0; z-index:-1; pointer-events:none; }
+  .velo { background:radial-gradient(58rem 32rem at 16% -8%, hsla(197,100%,49%,.14), transparent 62%); }
+  .griglia { opacity:.7;
+    background:linear-gradient(#e8e8e8 1px, transparent 1px) 0 0/64px 64px,
+               linear-gradient(90deg,#e8e8e8 1px, transparent 1px) 0 0/64px 64px;
+    -webkit-mask-image:radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
+    mask-image:radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%); }
+  ::selection { background:hsla(197,100%,49%,.35); }
+  :focus-visible { outline:2px solid #00b3fa; outline-offset:2px; border-radius:4px; }
+  button:focus-visible { outline:none; box-shadow:inset 0 0 0 2px #00b3fa; }
+</style></head>
+<body>
+<div class="velo"></div><div class="griglia"></div>
+<div style="max-width:40rem;margin:0 auto">
+<div style="padding:1px;background:#dbdbdb;background-image:linear-gradient(160deg,rgba(255,255,255,.55),#dbdbdb 38%,rgba(232,232,232,.45));clip-path:${SAGOMA(18)}">
+<div style="background:#fbfbfb;background:color-mix(in srgb,#fbfbfb 58%,transparent);backdrop-filter:blur(20px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.72);clip-path:${SAGOMA(17.414)}">
 <div style="padding:18px 22px;border-bottom:1px solid #e8e8e8">
-<p style="margin:0 0 5px;font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:#8f8f8f">Shooting · prova locale</p>
-<h1 style="margin:0;font-size:20px;font-weight:600;line-height:1.3">${esc(titolo)}</h1></div>
-<div style="padding:20px 22px;font-size:15px;line-height:1.65;color:#525252">${corpo}</div>
+<p style="margin:0 0 6px;font-size:11.52px;letter-spacing:.12em;text-transform:uppercase;color:#8f8f8f">Shooting · prova locale</p>
+<h1 style="margin:0;font-size:23.2px;font-weight:500;letter-spacing:-.015em;line-height:29px">${esc(titolo)}</h1></div>
+<div style="padding:20px 22px;font-size:15.2px;line-height:1.6;color:#6f6f6f">${corpo}</div>
 </div></div></div></body></html>`
 }
 
