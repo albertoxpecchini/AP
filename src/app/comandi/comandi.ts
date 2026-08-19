@@ -142,6 +142,18 @@ export const GRUPPI: Gruppo[] = [
         ],
       },
       {
+        cmd: "npm run scatti:carica -- s1",
+        breve: "Porta UNA sessione nel secchio privato, perché qualcuno possa vederla da lontano.",
+        dettaglio:
+          "/shooting può dare a una persona il permesso di vedere i propri ritratti, e per vederli da fuori le foto devono stare da qualche parte che non sia questo computer. Quel posto è un bucket Supabase PRIVATO: nessun indirizzo pubblico, si apre solo con una firma che il server rilascia a chi ha un permesso vivo, e la firma scade in un'ora. Sale tutto — miniatura, versione media e originale — così chi è ritratto scarica i suoi scatti a piena risoluzione. È un comando a parte, e vuole il nome della sessione scritto per esteso: caricare le foto di qualcuno è una decisione, non l'effetto collaterale di un altro comando. Quello che non si nomina resta qui.",
+        file: "scripts/scatti-carica.mjs",
+        opzioni: [
+          ["npm run scatti:carica", "senza argomenti: dice quali sessioni sono già di sopra"],
+          ["npm run scatti:togli -- s1", "la toglie dal bucket, permessi già dati compresi"],
+        ],
+        nota: "Se il bucket risulta pubblico il comando si ferma e lo dice: un secchio pubblico manderebbe all'aria tutto il resto del meccanismo. Le sessioni mai caricate restano irraggiungibili comunque, anche a permesso dato — su /shooting il modulo compare solo dove chiedere ha senso.",
+      },
+      {
         cmd: "node scripts/foto-zone.mjs",
         breve: "Dice dove si sono fermati, per poter dare un nome ai posti.",
         dettaglio:
