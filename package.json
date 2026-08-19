@@ -12,6 +12,7 @@
     "repo-tree": "node scripts/build-repo-tree.mjs",
     "i18n": "node scripts/build-i18n.mjs",
     "foto": "node scripts/build-foto-mima.mjs",
+    "scatti": "node scripts/build-foto-shooting.mjs",
     "preview": "vite preview",
     "pulizia": "node scripts/janitor/pulisci.mjs",
     "pulizia:applica": "node scripts/janitor/pulisci.mjs --applica",

@@ -1,0 +1,82 @@
+{
+  "generato": "2026-08-19T08:43:39.871Z",
+  "fonte": "metadati EXIF degli scatti originali (DateTimeOriginal, Model, LensModel, ISO, FocalLength, FNumber)",
+  "totale": 89,
+  "sessioni": [
+    {
+      "id": "s1",
+      "data": "2026-08-19",
+      "giorno": "mercoledì 19 agosto 2026",
+      "ora": {
+        "da": "01:02",
+        "a": "01:40"
+      },
+      "luogo": "Rivalta sul Mincio",
+      "n": 46,
+      "macchina": "Canon EOS 4000D",
+      "obiettivo": "EF-S18-55mm f/3.5-5.6 III",
+      "iso": {
+        "min": 640,
+        "max": 3200
+      },
+      "focale": {
+        "min": 18,
+        "max": 55
+      },
+      "apertura": {
+        "min": 3.5,
+        "max": 5.6
+      }
+    },
+    {
+      "id": "s2",
+      "data": "2026-08-19",
+      "giorno": "mercoledì 19 agosto 2026",
+      "ora": {
+        "da": "01:02",
+        "a": "01:43"
+      },
+      "luogo": "Rivalta sul Mincio",
+      "n": 30,
+      "macchina": "Canon EOS 4000D",
+      "obiettivo": "EF-S18-55mm f/3.5-5.6 III",
+      "iso": {
+        "min": 400,
+        "max": 3200
+      },
+      "focale": {
+        "min": 24,
+        "max": 55
+      },
+      "apertura": {
+        "min": 4,
+        "max": 5.6
+      }
+    },
+    {
+      "id": "s3",
+      "data": "2026-08-19",
+      "giorno": "mercoledì 19 agosto 2026",
+      "ora": {
+        "da": "01:00",
+        "a": "01:24"
+      },
+      "luogo": "Rivalta sul Mincio",
+      "n": 13,
+      "macchina": "Canon EOS 4000D",
+      "obiettivo": "EF-S18-55mm f/3.5-5.6 III",
+      "iso": {
+        "min": 800,
+        "max": 3200
+      },
+      "focale": {
+        "min": 30,
+        "max": 55
+      },
+      "apertura": {
+        "min": 4.5,
+        "max": 5.6
+      }
+    }
+  ]
+}

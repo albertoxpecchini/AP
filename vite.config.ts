@@ -10,6 +10,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 // tutta dentro `configureServer`, cioè solo sotto `vite dev` — in `vite build`
 // non viene nemmeno chiamata. Vedi la spiegazione in cima al file.
 import { cleaningDevApi } from './scripts/janitor/api-dev.mjs'
+// Le foto degli shooting sono ritratti di persone e restano in locale: questo
+// plugin è l'unico modo di vederle, e anche lui vive solo dentro
+// `configureServer`. Vedi scripts/shooting-api-dev.mjs.
+import { shootingDevApi } from './scripts/shooting-api-dev.mjs'
 
 // path.dirname(new URL(...).pathname) lascia lo slash iniziale di fronte alla
 // lettera di unità su Windows (es. "/C:/Users/..."): risolvendolo poi con
@@ -214,6 +218,7 @@ export default defineConfig({
     writeDevApi("/api/sponsor", async () => ({ insert: (await import("./api/sponsor")).insertDonatore })),
     writeDevApi("/api/festa-rsvp", async () => ({ insert: (await import("./api/festa-rsvp")).insertPresenza })),
     cleaningDevApi(),
+    shootingDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),
