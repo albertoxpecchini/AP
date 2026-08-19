@@ -1,0 +1,376 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   /comandi — l'indice dei programmi che il progetto lancia da terminale.
+
+   Stili propri della pagina, tutti col prefisso .sb-cmd-. Colori, ombre e
+   sagome smussate vengono dai token --sb-* di home.css: qui dentro non c'è un
+   solo valore di colore scritto a mano, così il tema scuro arriva da sé senza
+   un secondo foglio.
+
+   La regola della pagina: l'unica cosa monospaziata è ciò che si scrive
+   davvero in una finestra di terminale — il comando, il percorso di un file,
+   un'opzione. Tutto il resto è prosa, e sta nel carattere del sito.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.sb-cmd-tagline {
+  font-size: 0.78rem;
+  color: var(--sb-fg-muted);
+  padding-left: 0.6rem;
+  margin-left: 0.55rem;
+  border-left: 1px solid var(--sb-border-strong);
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .sb-cmd-tagline { display: none; }
+}
+
+.sb-cmd-indietro { margin-left: auto; }
+
+/* ── Apertura ─────────────────────────────────────────────────────────────── */
+
+.sb-cmd-testata {
+  padding-top: clamp(3rem, 7vw, 5rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.sb-cmd-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.9rem;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+
+.sb-cmd-titolo {
+  margin: 0 0 1.4rem;
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+.sb-cmd-titolo span { display: block; }
+.sb-cmd-titolo .sb-brandline {
+  color: var(--sb-brand-text);
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+  letter-spacing: -0.02em;
+  margin-top: 0.5rem;
+}
+
+.sb-cmd-copy { max-width: 44rem; }
+.sb-cmd-copy p {
+  margin: 0 0 0.7rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--sb-fg-lighter);
+}
+.sb-cmd-copy p:last-child { margin-bottom: 0; }
+.sb-cmd-copy strong { font-weight: 400; color: var(--sb-fg); }
+
+/* Tre numeri, senza riquadro intorno: una cornice attorno a tre cifre è una
+   cornice attorno a niente. */
+.sb-cmd-cifre {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-top: 2rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--sb-border);
+}
+.sb-cmd-cifra { display: flex; flex-direction: column; gap: 0.15rem; }
+.sb-cmd-cifra-v {
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--sb-fg);
+}
+.sb-cmd-cifra-k {
+  font-size: 0.78rem;
+  color: var(--sb-fg-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ── La barra: ricerca a sinistra, scorciatoie a destra ───────────────────── */
+
+.sb-cmd-barra {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.7rem 1rem;
+  padding-top: clamp(2rem, 4vw, 3rem);
+}
+
+.sb-cmd-cerca {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 32px;
+  min-width: 0;
+  flex: 1 1 12rem;
+  max-width: 20rem;
+  padding: 0 0.55rem;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 6px;
+  background: var(--sb-bg);
+  color: var(--sb-fg-muted);
+  transition: border-color 0.15s;
+}
+.sb-cmd-cerca:focus-within { border-color: var(--sb-brand); }
+.sb-cmd-cerca input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--sb-fg);
+}
+.sb-cmd-cerca input::placeholder { color: var(--sb-fg-muted); }
+.sb-cmd-cerca input::-webkit-search-cancel-button { display: none; }
+.sb-cmd-cerca button {
+  display: inline-flex;
+  border: none;
+  background: none;
+  padding: 2px;
+  border-radius: 4px;
+  color: var(--sb-fg-muted);
+  cursor: pointer;
+}
+.sb-cmd-cerca button:hover { color: var(--sb-fg); }
+
+.sb-cmd-conta {
+  margin: 0;
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--sb-fg-muted);
+}
+
+/* Le scorciatoie ai gruppi. Non sono bottoni: sono un sommario, e un sommario
+   fatto di bottoni pesa più di quello che indica. */
+.sb-cmd-ancore {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+.sb-cmd-ancore a {
+  color: var(--sb-fg-lighter);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sb-cmd-ancore a:hover {
+  color: var(--sb-brand-text);
+  border-bottom-color: var(--sb-brand);
+}
+
+/* ── Sezioni ──────────────────────────────────────────────────────────────── */
+
+.sb-cmd-sez { padding-top: clamp(2.5rem, 5vw, 4rem); scroll-margin-top: 84px; }
+
+.sb-cmd-sechead {
+  margin-bottom: 1.2rem;
+  max-width: 44rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--sb-border);
+}
+.sb-cmd-sechead h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--sb-fg);
+}
+.sb-cmd-sechead p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--sb-fg-lighter);
+}
+
+/* Due colonne solo quando ci stanno per davvero: una scheda di comando è fatta
+   di righe lunghe, e a 40 rem diventa una colonna di parole spezzate. */
+.sb-cmd-griglia {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1000px) {
+  .sb-cmd-griglia { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ── Una voce ─────────────────────────────────────────────────────────────── */
+
+.sb-cmd-voce > .sb-panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: clamp(1rem, 2vw, 1.4rem);
+}
+
+.sb-cmd-riga {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Il comando è la cosa per cui si è aperta la pagina: sta in cima, in
+   monospaziato, e può andare a capo invece di scorrere via — un comando
+   tagliato a metà non si può copiare a occhio. */
+.sb-cmd-cmd {
+  flex: 1 1 14rem;
+  min-width: 0;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--sb-fg);
+  overflow-wrap: anywhere;
+}
+.sb-cmd-prompt {
+  color: var(--sb-brand);
+  margin-right: 0.5rem;
+  user-select: none;
+}
+
+.sb-cmd-copia { flex: none; }
+
+/* Per chi non si lancia da una finestra di terminale (la console del browser,
+   un tasto di VS Code): al posto di «Copia», che copierebbe una cosa da non
+   incollare lì. */
+.sb-cmd-tag {
+  flex: none;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: var(--sb-fg-muted);
+  padding: 0.2rem 0.5rem;
+  background: var(--sb-shape-edge-xs), var(--sb-surface-200);
+  clip-path: var(--sb-shape-xs);
+}
+
+.sb-cmd-breve {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--sb-fg);
+}
+.sb-cmd-dett {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--sb-fg-lighter);
+}
+
+/* ── Cosa esegue, cosa lascia ─────────────────────────────────────────────── */
+
+.sb-cmd-dati {
+  margin: 0.2rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--sb-border);
+}
+.sb-cmd-dato {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+.sb-cmd-dato dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+  width: 4.6rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: var(--sb-fg-muted);
+}
+.sb-cmd-dato dd {
+  margin: 0;
+  min-width: 0;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--sb-fg-light);
+  overflow-wrap: anywhere;
+}
+.sb-cmd-esce {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── Le opzioni ───────────────────────────────────────────────────────────── */
+
+.sb-cmd-opzioni {
+  margin: 0.2rem 0 0;
+  padding: 0.7rem 0 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-top: 1px solid var(--sb-border);
+}
+.sb-cmd-opzioni li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.sb-cmd-opzioni code {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.76rem;
+  color: var(--sb-fg);
+  padding: 0.15rem 0.4rem;
+  background: var(--sb-shape-edge-xs), var(--sb-surface-100);
+  clip-path: var(--sb-shape-xs);
+  overflow-wrap: anywhere;
+}
+.sb-cmd-opzioni span {
+  flex: 1 1 10rem;
+  min-width: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--sb-fg-lighter);
+}
+
+/* ── La nota ──────────────────────────────────────────────────────────────── */
+/* Un filo verticale invece di un riquadro: dentro una lastra già smussata, una
+   seconda scatola è una scatola di troppo. */
+.sb-cmd-nota {
+  margin: 0.2rem 0 0;
+  padding-left: 0.8rem;
+  border-left: 2px solid var(--sb-border-stronger);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--sb-fg-muted);
+}
+
+/* ── Niente da mostrare ───────────────────────────────────────────────────── */
+
+.sb-cmd-vuoto {
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+.sb-cmd-vuoto p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--sb-fg-lighter);
+}
+.sb-cmd-vuoto strong {
+  font-weight: 400;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  color: var(--sb-fg);
+}
+
+/* Il fuoco non si ridichiara: `.sb-home :focus-visible` in home.css disegna già
+   l'anello azzurro su tutto quello che sta qui dentro, e le uniche superfici
+   tagliate col clip-path — la pillola e i codici delle opzioni — non prendono
+   il fuoco perché non sono interattive. */

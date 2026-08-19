@@ -157,6 +157,10 @@ const Mima = lazyPage("mima", () => import("./app/mima/Mima.tsx"));
 // sotto `vite dev`. Vedi src/app/shooting/sessioni.ts.
 const Shooting = lazyPage("shooting", () => import("./app/shooting/Shooting.tsx"));
 const Archivio = lazyPage("archivio", () => import("./app/archivio/Archivio.tsx"));
+// /comandi è l'indice dei programmi che il progetto lancia da terminale: la
+// pagina è pubblica e racconta soltanto, non esegue niente. Vedi
+// src/app/comandi/comandi.ts.
+const Comandi = lazyPage("comandi", () => import("./app/comandi/Comandi.tsx"));
 const Sostieni = lazyPage("sostieni", () => import("./app/sostieni/Sostieni.tsx"));
 const Instagram = lazyPage("instagram", () => import("./app/instagram/Instagram.tsx"));
 
@@ -296,6 +300,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Archivio />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/comandi"
+        element={
+          <Suspense fallback={null}>
+            <Comandi />
           </Suspense>
         }
       />
