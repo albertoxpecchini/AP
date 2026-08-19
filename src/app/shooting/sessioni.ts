@@ -76,8 +76,9 @@ export interface Scatto {
   ho: number;
   /** Anteprima sfocata da 24 px, incorporata: riempie la cella all'istante zero. */
   blur: string;
-  quando: string;
-  giorno: string;
+  /** Ci sono nel manifesto locale; l'album firmato di un ospite non li porta. */
+  quando?: string;
+  giorno?: string;
   ora: string;
   dataIncerta?: boolean;
   iso?: number;
@@ -117,13 +118,27 @@ export type StatoAlbum =
   | { stato: "aperto"; sessioni: Map<string, SessionePrivata>; totale: number }
   | { stato: "manca" };
 
+/**
+ * Due casi in cui il manifesto locale va IGNORATO anche stando in locale:
+ *
+ *  · `?accesso=…` — sto aprendo il link di un ospite. Deve vedersi quello che
+ *    vede lui, non la mia copia: altrimenti il link non lo si può controllare.
+ *  · `?pubblico` — voglio guardare la pagina com'è da fuori, lucchetti e
+ *    modulo compresi, senza spegnere il server o cercare un altro computer.
+ */
+function scavalcato(): boolean {
+  if (typeof window === "undefined") return false;
+  const q = new URLSearchParams(window.location.search);
+  return q.has("accesso") || q.has("pubblico");
+}
+
 export function useAlbumPrivato(): StatoAlbum {
   const [album, setAlbum] = useState<StatoAlbum>(() =>
-    isLocalhost() ? { stato: "attesa" } : { stato: "chiuso" },
+    isLocalhost() && !scavalcato() ? { stato: "attesa" } : { stato: "chiuso" },
   );
 
   useEffect(() => {
-    if (!isLocalhost()) return;
+    if (!isLocalhost() || scavalcato()) return;
     let vivo = true;
     fetch("/scatti-privati/manifesto.json", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
@@ -146,6 +161,110 @@ export function useAlbumPrivato(): StatoAlbum {
   }, []);
 
   return album;
+}
+
+// ── L'ospite autorizzato ─────────────────────────────────────────────────────
+//
+// L'altra metà del meccanismo: chi ha chiesto di vedere una sessione, e ha
+// ricevuto il link. Il token sta nell'indirizzo (`/shooting?accesso=…`), vale
+// 24 ore, e da solo non basta — è il server a decidere, guardando la tabella,
+// e a firmare uno per uno gli indirizzi delle immagini. Qui non c'è nessun
+// controllo da aggirare: senza una risposta del server non esiste nemmeno un
+// URL da chiedere.
+
+export interface AlbumOspite {
+  titolo: string;
+  /** Il nome di chi ha chiesto: serve a dire «questo link è tuo». */
+  nome: string;
+  sessione: string;
+  /** Quando muore l'accesso, ISO. */
+  scade: string;
+  /** Quanto vale la firma delle immagini, in secondi. */
+  firmaSecondi: number;
+  foto: Scatto[];
+}
+
+export type StatoOspite =
+  | { stato: "niente" }
+  | { stato: "attesa" }
+  | { stato: "aperto"; album: AlbumOspite }
+  | { stato: "scaduto" }
+  | { stato: "chiuso" };
+
+/** Il token dall'indirizzo, se c'è. */
+function tokenDallUrl(): string | null {
+  if (typeof window === "undefined") return null;
+  const t = new URLSearchParams(window.location.search).get("accesso");
+  return t && t.length > 20 ? t : null;
+}
+
+export function useAccessoOspite(): StatoOspite {
+  const [stato, setStato] = useState<StatoOspite>(() =>
+    tokenDallUrl() ? { stato: "attesa" } : { stato: "niente" },
+  );
+
+  useEffect(() => {
+    const t = tokenDallUrl();
+    if (!t) return;
+    let vivo = true;
+
+    const chiedi = () =>
+      fetch(`/api/scatti-accesso?album=${encodeURIComponent(t)}`, { cache: "no-store" })
+        .then(async (r) => {
+          const dati = await r.json().catch(() => ({}));
+          if (!vivo) return;
+          if (r.ok && dati?.ok) {
+            setStato({ stato: "aperto", album: dati as AlbumOspite });
+            return;
+          }
+          setStato({ stato: dati?.errore === "scaduto" ? "scaduto" : "chiuso" });
+        })
+        .catch(() => {
+          if (vivo) setStato({ stato: "chiuso" });
+        });
+
+    void chiedi();
+
+    // Gli indirizzi delle immagini sono firmati e scadono. Chi lascia la pagina
+    // aperta un pomeriggio si ritroverebbe una griglia di riquadri vuoti: il
+    // manifesto si richiede da solo poco prima, e le firme tornano fresche.
+    const ogni = 50 * 60_000;
+    const timer = window.setInterval(() => void chiedi(), ogni);
+    return () => {
+      vivo = false;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  return stato;
+}
+
+/** Le sessioni per cui ha senso chiedere: quelle davvero caricate nel bucket. */
+export function useSessioniAperte(): Set<string> | null {
+  const [aperte, setAperte] = useState<Set<string> | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    fetch("/api/scatti-accesso?disponibili=1")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((d) => {
+        if (vivo) setAperte(new Set<string>(Array.isArray(d?.sessioni) ? d.sessioni : []));
+      })
+      // Se l'endpoint non c'è (o non risponde) non si promette niente a nessuno:
+      // insieme vuoto, e il modulo non compare.
+      .catch(() => { if (vivo) setAperte(new Set<string>()); });
+    return () => { vivo = false; };
+  }, []);
+  return aperte;
+}
+
+/** Quanto manca, detto come lo direbbe una persona: «22 ore», «40 minuti». */
+export function quantoManca(iso: string): string {
+  const ms = new Date(iso).getTime() - Date.now();
+  if (ms <= 0) return "scaduto";
+  const min = Math.round(ms / 60_000);
+  if (min < 60) return `${min} minut${min === 1 ? "o" : "i"}`;
+  const ore = Math.round(min / 60);
+  return `${ore} or${ore === 1 ? "a" : "e"}`;
 }
 
 // ── Formattine ───────────────────────────────────────────────────────────────

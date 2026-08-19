@@ -221,6 +221,17 @@ la pagina dal sito pubblicato vede le schede delle sessioni (data, luogo, quanti
 macchina) e nient'altro, perché di là le foto non sono mai state caricate. Vedi
 `foto/shooting/LEGGIMI.md`.
 
+**E il permesso**, per chi le foto ha motivo di vederle — chi c'è dentro, prima di tutti. Si chiede
+dal modulo della scheda, serve un codice consegnato a voce (`SHOOTING_CODICE`), la richiesta finisce
+in una tabella privata e arriva un'email con chi ha chiesto e da dove. La decisione si prende da una
+pagina, **con un POST e non con un GET**: gli scanner delle caselle di posta pre-aprono i link, e un
+link che autorizza da solo verrebbe cliccato dal primo antivirus di passaggio. Autorizzando parte un
+link che vale **24 ore**, revocabile, e serve le immagini da un bucket **privato** con indirizzi
+firmati che scadono in un'ora. Nel bucket ci va solo quello che ci metti tu, una sessione alla volta
+(`npm run scatti:carica`). Codice: [lib/scattiAccesso.ts](lib/scattiAccesso.ts),
+[api/scatti-richiesta.ts](api/scatti-richiesta.ts), [api/scatti-accesso.ts](api/scatti-accesso.ts),
+schema [supabase/shooting_richieste.sql](supabase/shooting_richieste.sql).
+
 ---
 
 ## 🗃️ Archivio — l'albero vero del repository
@@ -590,7 +601,8 @@ npm run build     # bundle di produzione in dist/ (prima il prebuild, vedi tabel
 Le chiavi vivono in un `.env` locale (non versionato, e **non** c'è un `.env.example` nel repo):
 `ANTHROPIC_API_KEY` per le curiosità di Trivia, `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`
 per le letture dal client, `SUPABASE_SERVICE_ROLE_KEY` per gli endpoint blindati e i link
-tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron.
+tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron, `SHOOTING_CODICE` per il modulo di
+/shooting (il codice che si consegna a voce: **senza, il modulo si chiude**, non si apre).
 
 | Comando | Azione |
 | :--- | :--- |
@@ -602,6 +614,8 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron.
 | `node scripts/build-cars.mjs <cartella>` | Rigenera `public/models/` dai modelli 3D sorgente (che **non** stanno nel repo) |
 | `npm run foto` | Album MiMa: legge gli EXIF delle foto in `foto/mima/` (che **non** stanno nel repo), le rimpicciolisce in `public/images/mima/` e scrive `src/app/mima/foto.json` — posizioni dal GPS, ordine da `DateTimeOriginal` |
 | `npm run scatti` | Shooting: legge gli EXIF di `foto/shooting/<sessione>/` e scrive **due** manifesti — `src/app/shooting/sessioni.json` (versionato: date, luoghi, conteggi) e `foto/shooting/.web/manifesto.json` (fuori dal repo: gli scatti). Le immagini restano in `foto/`, mai in `public/` || `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
+| `npm run scatti:carica -- s1` | Porta UNA sessione nel bucket privato di Supabase (miniature, versione media e originali). Senza argomenti dice cosa c'è di sopra. È l'unico modo perché un autorizzato possa vederla da remoto |
+| `npm run scatti:togli -- s1` | La toglie dal bucket: da lì in poi non la vede più nessuno, permessi già dati compresi |
 | `npm run pulizia` | Cerca lo sporco e misura, **senza toccare niente** |
 | `npm run pulizia:applica` | Pulisce, verifica con build + benchmark, annulla da solo se qualcosa peggiora |
 | `npm run bench` | Solo benchmark: build, peso, fotogrammi — confrontati con l'ultima volta |

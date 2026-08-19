@@ -72,3 +72,54 @@ questo computer, e non per una spunta da qualche parte:
 Sul sito pubblicato le foto quindi non sono nascoste: non ci sono. Chi apre
 `/shooting` da fuori vede le schede col lucchetto, e la pagina non prova
 nemmeno a chiedere le immagini.
+
+## Dare il permesso a qualcuno
+
+C'è un'eccezione, ed è voluta: chi è ritratto può chiedere di vedere i propri
+scatti. Il giro è questo.
+
+**Una volta sola, per preparare il terreno:**
+
+1. In Supabase, SQL Editor → esegui `supabase/shooting_richieste.sql`.
+2. Sempre in Supabase, Storage → nuovo bucket **`scatti`**, con «Public bucket»
+   **spento**. (Se te lo dimentichi, `npm run scatti:carica` si ferma e te lo
+   dice: un bucket pubblico manderebbe all'aria tutto il resto.)
+3. Nelle variabili d'ambiente — `.env` in locale, Vercel in produzione — metti
+   `SHOOTING_CODICE`: la parola che consegni a voce a chi può chiedere. Senza,
+   il modulo **si chiude**, non si apre a tutti.
+
+**Ogni volta che vuoi rendere chiedibile una sessione:**
+
+```
+npm run scatti:carica -- s1     # miniature, versione media E originali
+npm run scatti:carica           # senza argomenti: cosa c'è già di sopra
+npm run scatti:togli  -- s1     # rimangiarsi tutto
+```
+
+Le sessioni che non carichi restano irraggiungibili comunque, anche se dessi un
+permesso: `/shooting` mostra il modulo solo dove chiedere ha senso.
+
+**Poi funziona da sé:** qualcuno compila → ti arriva un'email con chi ha chiesto,
+cosa ha scritto e da dove → apri il link, che porta a una pagina con due bottoni
+(la decisione è un POST apposta: gli antivirus delle caselle di posta aprono i
+link da soli, e un link che autorizza da solo verrebbe premuto da una macchina)
+→ se autorizzi, gli arriva un link che vale **24 ore** e che puoi revocare
+quando vuoi dalla stessa pagina. Le immagini arrivano con indirizzi firmati che
+scadono in un'ora, e alla prima apertura ti avvisa un'email.
+
+Nome, email e motivo di chi chiede si cancellano da soli dopo trenta giorni
+(`/api/cron-cleanup`). È scritto anche nel modulo, sopra la spunta.
+
+### Provarlo senza account
+
+`npm run dev` senza le chiavi di Supabase usa un magazzino finto: le richieste
+finiscono in `.web/richieste-dev.json`, le email le stampa il terminale coi link
+cliccabili, e il codice del modulo è `prova-locale`. Il giro completo — chiedo,
+autorizzo, apro, revoco — si prova per intero su questo computer.
+
+Due indirizzi comodi mentre lavori:
+
+- `/shooting?pubblico` — la pagina com'è vista da fuori, lucchetti e modulo
+  compresi, senza spegnere niente;
+- `/shooting?accesso=<token>` — quello che vede l'ospite (il manifesto locale
+  viene ignorato apposta, altrimenti il link non si potrebbe controllare).

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SiteLink as Link } from "../site/nav";
 import SiteFooter from "../site/SiteFooter";
 import {
@@ -14,20 +14,28 @@ import {
   IcAperture,
   IcDownload,
   IcExpand,
+  IcCheck,
+  IcSend,
 } from "../site/homeIcons";
 import { PageBackdrop } from "../site/homeFx";
 import { lockBodyScroll, unlockBodyScroll } from "../utils/scrollLock";
 import {
   SESSIONI,
   useAlbumPrivato,
+  useAccessoOspite,
+  useSessioniAperte,
+  quantoManca,
   arco,
   pesoUmano,
   type SessionePubblica,
-  type SessionePrivata,
   type Scatto,
 } from "./sessioni";
 import "../home.css";
 import "./shooting.css";
+
+// Il modulo della richiesta non serve a chi ha già le foto (io, o un ospite
+// autorizzato) e nemmeno a chi passa e basta: scende solo quando si apre.
+const Modulo = lazy(() => import("./Modulo"));
 
 // ─────────────────────────────────────────────────────────────────────────────
 // /shooting — i ritratti, e la riga di confine che li tiene in casa.
@@ -42,6 +50,13 @@ import "./shooting.css";
 // Quindi questa stessa pagina, aperta da me in locale, ha in più le gallerie; e
 // aperta da chiunque altro mostra le schede con il lucchetto. Non sono due
 // pagine: è la stessa, con o senza il manifesto privato.
+//
+// C'è un terzo caso, ed è il permesso: chi ha motivo di vedere una sessione la
+// chiede dal modulo (serve un codice che do a voce), io ricevo un'email con chi
+// ha chiesto e da dove, e se autorizzo gli arriva un link che vale 24 ore. In
+// quel caso le foto arrivano da un bucket privato, con indirizzi firmati che
+// scadono in un'ora — vedi lib/scattiAccesso.ts. Le sessioni che non ho
+// caricato là dentro restano irraggiungibili comunque, anche a permesso dato.
 //
 // Registro: la grammatica .sb- del resto del sito, e la disciplina di /mima —
 // le uniche cose colorate sono le foto.
@@ -311,20 +326,25 @@ function Visore({
   );
 }
 
+
 // ── Una sessione ─────────────────────────────────────────────────────────────
-// Stessa scheda in tutti e due i casi. Cambia cosa c'è sotto: il lucchetto —
-// che è quello che vede chiunque — oppure la griglia.
+// La scheda è sempre la stessa. Cambia cosa c'è sotto, e sono tre casi:
+//
+//   · ho le foto (io in locale, oppure un ospite autorizzato) → la griglia;
+//   · non le ho ma la sessione è caricata               → il modulo per chiedere;
+//   · non le ho e non è caricata                        → il lucchetto e basta.
 function Sessione({
-  s,
-  privata,
-  chiuso,
+  v,
+  puoChiedere,
   onApri,
 }: {
-  s: SessionePubblica;
-  privata?: SessionePrivata;
-  chiuso: boolean;
+  v: Vista;
+  puoChiedere: boolean;
   onApri: (i: number) => void;
 }) {
+  const [modulo, setModulo] = useState(false);
+  const s = v.s;
+
   return (
     <section className="sb-sh-sessione" aria-labelledby={`sess-${s.id}`}>
       <div className="sb-panel sb-sh-scheda">
@@ -332,9 +352,9 @@ function Sessione({
           <div className="sb-sh-scheda-testa">
             <h2 id={`sess-${s.id}`}>
               <span data-no-i18n translate="no">{s.giorno}</span>
-              {privata && (
+              {v.titolo && (
                 <span className="sb-sh-chi" data-no-i18n translate="no">
-                  {privata.titolo}
+                  {v.titolo}
                 </span>
               )}
             </h2>
@@ -359,22 +379,39 @@ function Sessione({
 
           <Ferri s={s} />
 
-          {chiuso && (
-            <p className="sb-sh-lucchetto">
-              <IcLock size={14} />
-              <span>
-                Le foto di questa sessione restano private: sono ritratti, e non sono state
-                pubblicate. Qui c'è quello che si può dire — quando, dove, quante.
-              </span>
-            </p>
+          {!v.foto && (
+            <>
+              <p className="sb-sh-lucchetto">
+                <IcLock size={14} />
+                <span>
+                  Le foto di questa sessione restano private: sono ritratti, e non sono state
+                  pubblicate. Qui c'è quello che si può dire — quando, dove, quante.
+                </span>
+              </p>
+              {puoChiedere && !modulo && (
+                <button
+                  type="button"
+                  className="sb-btn sb-btn--sm sb-btn--secondary sb-sh-chiedi"
+                  onClick={() => setModulo(true)}
+                >
+                  <IcSend size={15} /> Chiedi di vedere le foto
+                </button>
+              )}
+              {modulo && (
+                <Suspense fallback={null}>
+                  <Modulo sessione={s.id} onChiudi={() => setModulo(false)} />
+                </Suspense>
+              )}
+            </>
           )}
-          {privata?.nota && <p className="sb-sh-nota">{privata.nota}</p>}
+
+          {v.nota && <p className="sb-sh-nota">{v.nota}</p>}
         </div>
       </div>
 
-      {privata && (
+      {v.foto && (
         <div className="sb-sh-griglia">
-          {privata.foto.map((f, i) => (
+          {v.foto.map((f, i) => (
             <Cella key={f.id} f={f} indice={i} onApri={() => onApri(i)} />
           ))}
         </div>
@@ -383,9 +420,23 @@ function Sessione({
   );
 }
 
+// ── Cosa sta guardando la pagina, sessione per sessione ──────────────────────
+interface Vista {
+  s: SessionePubblica;
+  /** Il nome della sessione: c'è solo con le foto, e non è mai nel repo. */
+  titolo: string | null;
+  foto: Scatto[] | null;
+  nota: string | null;
+}
+
 export default function Shooting() {
   const scrolled = useScrolled();
+  // Le tre sorgenti possibili, in ordine di fiducia: il manifesto in locale
+  // (io), l'album firmato di un ospite autorizzato, e niente (tutti gli altri).
   const album = useAlbumPrivato();
+  const ospite = useAccessoOspite();
+  const aperte = useSessioniAperte();
+
   const [aperta, setAperta] = useState<{ sessione: string; i: number } | null>(null);
 
   useEffect(() => {
@@ -397,21 +448,36 @@ export default function Shooting() {
   }, []);
 
   const privati = album.stato === "aperto" ? album.sessioni : null;
-  const chiuso = album.stato === "chiuso" || album.stato === "manca";
+  const ospiteAlbum = ospite.stato === "aperto" ? ospite.album : null;
 
-  const sessioneAperta = aperta && privati ? privati.get(aperta.sessione) : null;
+  const viste = useMemo<Vista[]>(
+    () =>
+      SESSIONI.sessioni.map((s) => {
+        const priv = privati?.get(s.id);
+        const osp = ospiteAlbum?.sessione === s.id ? ospiteAlbum : null;
+        return {
+          s,
+          titolo: priv?.titolo ?? osp?.titolo ?? null,
+          foto: priv?.foto ?? osp?.foto ?? null,
+          nota: priv?.nota ?? null,
+        };
+      }),
+    [privati, ospiteAlbum],
+  );
+
+  const corrente = aperta ? viste.find((v) => v.s.id === aperta.sessione) : null;
 
   const vai = useCallback(
     (delta: number) => {
       setAperta((a) => {
-        if (!a || !privati) return a;
-        const s = privati.get(a.sessione);
-        if (!s) return a;
+        if (!a) return a;
+        const v = viste.find((x) => x.s.id === a.sessione);
+        if (!v?.foto) return a;
         const n = a.i + delta;
-        return n >= 0 && n < s.foto.length ? { ...a, i: n } : a;
+        return n >= 0 && n < v.foto.length ? { ...a, i: n } : a;
       });
     },
-    [privati],
+    [viste],
   );
 
   const cifre = useMemo(() => {
@@ -422,6 +488,10 @@ export default function Shooting() {
       { k: macchine.length === 1 ? "macchina" : "macchine", v: String(macchine.length) },
     ];
   }, []);
+
+  // Chi ha un link — buono, scaduto o spento che sia — non deve leggere la riga
+  // di stato di chi non ne ha uno: la sua situazione è un'altra.
+  const conLink = ospite.stato !== "niente";
 
   return (
     <div className="sb-home sb-home--fx sb-sh">
@@ -468,8 +538,8 @@ export default function Shooting() {
             <p>
               <strong>Le foto delle persone non le pubblico.</strong> Di ogni sessione resta qui
               quello che si può dire — la data, il posto, quanti scatti, con che attrezzatura — e
-              quei numeri vengono dai metadati dei file, non da me. L'album vero si apre solo dal
-              computer su cui sono le foto.
+              quei numeri vengono dai metadati dei file, non da me. Le foto si vedono solo con un
+              permesso, che chiedi qui sotto e do io, una persona alla volta.
             </p>
           </div>
           <div className="sb-sh-cifre">
@@ -483,41 +553,77 @@ export default function Shooting() {
             ))}
           </div>
 
-          <p className={`sb-sh-stato sb-sh-stato--${album.stato}`}>
-            {album.stato === "aperto" && (
-              <>
-                <IcCamera size={14} /> Album aperto: sei sul computer di casa.
-              </>
-            )}
-            {album.stato === "attesa" && (
-              <>
-                <IcAperture size={14} /> Cerco l'album…
-              </>
-            )}
-            {album.stato === "manca" && (
-              <>
-                <IcAperture size={14} /> Sei in locale ma il manifesto non c'è: lancia{" "}
-                <code data-no-i18n translate="no">npm run scatti</code>.
-              </>
-            )}
-            {album.stato === "chiuso" && (
-              <>
-                <IcLock size={14} /> Gli scatti non sono su questo sito: non sono mai stati
-                caricati.
-              </>
-            )}
-          </p>
+          {/* ── La riga di stato ───────────────────────────────────────────── */}
+          {conLink ? (
+            <p className={`sb-sh-stato sb-sh-stato--${ospite.stato === "aperto" ? "aperto" : ospite.stato === "attesa" ? "attesa" : "manca"}`}>
+              {ospite.stato === "attesa" && (
+                <>
+                  <IcAperture size={14} /> Controllo il tuo link…
+                </>
+              )}
+              {ospite.stato === "aperto" && (
+                <>
+                  <IcCheck size={14} />{" "}
+                  <span>
+                    Ciao <strong data-no-i18n translate="no">{ospite.album.nome}</strong>: questo
+                    link è tuo e vale ancora{" "}
+                    <strong data-no-i18n translate="no">{quantoManca(ospite.album.scade)}</strong>.
+                  </span>
+                </>
+              )}
+              {ospite.stato === "scaduto" && (
+                <>
+                  <IcClock size={14} /> Questo link è scaduto. Se ti serve ancora, chiedimelo e te
+                  ne mando un altro.
+                </>
+              )}
+              {ospite.stato === "chiuso" && (
+                <>
+                  <IcLock size={14} /> Questo link non vale (più). Può essere stato revocato, o non
+                  è quello giusto.
+                </>
+              )}
+            </p>
+          ) : (
+            <p className={`sb-sh-stato sb-sh-stato--${album.stato}`}>
+              {album.stato === "aperto" && (
+                <>
+                  <IcCamera size={14} /> Album aperto: sei sul computer di casa.
+                </>
+              )}
+              {album.stato === "attesa" && (
+                <>
+                  <IcAperture size={14} /> Cerco l'album…
+                </>
+              )}
+              {album.stato === "manca" && (
+                <>
+                  <IcAperture size={14} /> Sei in locale ma il manifesto non c'è: lancia{" "}
+                  <code data-no-i18n translate="no">npm run scatti</code>.
+                </>
+              )}
+              {album.stato === "chiuso" && (
+                <>
+                  <IcLock size={14} /> Gli scatti non sono su questo sito. Per vederli serve un
+                  permesso: si chiede qui sotto.
+                </>
+              )}
+            </p>
+          )}
         </section>
 
         {/* ── Le sessioni ──────────────────────────────────────────────────── */}
         <section className="sb-container sb-sh-elenco" aria-label="Sessioni">
-          {SESSIONI.sessioni.map((s) => (
+          {viste.map((v) => (
             <Sessione
-              key={s.id}
-              s={s}
-              privata={privati?.get(s.id)}
-              chiuso={chiuso}
-              onApri={(i) => setAperta({ sessione: s.id, i })}
+              key={v.s.id}
+              v={v}
+              // Il modulo compare solo dove chiedere ha davvero un senso: la
+              // sessione dev'essere caricata, non devo già averla io in locale,
+              // e non devo già averla in mano — chi ha il link di UNA sessione
+              // può comunque chiedere le altre.
+              puoChiedere={!!aperte?.has(v.s.id) && album.stato === "chiuso" && !v.foto}
+              onApri={(i) => setAperta({ sessione: v.s.id, i })}
             />
           ))}
         </section>
@@ -525,11 +631,11 @@ export default function Shooting() {
 
       <SiteFooter />
 
-      {sessioneAperta && aperta && (
+      {corrente?.foto && aperta && (
         <Visore
-          foto={sessioneAperta.foto}
+          foto={corrente.foto}
           i={aperta.i}
-          titolo={sessioneAperta.titolo}
+          titolo={corrente.titolo ?? ""}
           onChiudi={() => setAperta(null)}
           onVai={vai}
         />

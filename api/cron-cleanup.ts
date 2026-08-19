@@ -63,5 +63,24 @@ export default async function handler(req: any, res: any) {
     return res.status(502).json({ error: "Cancellazione fallita" });
   }
 
-  return res.status(200).json({ ok: true, purged: scaduti.length });
+  // 4) Le richieste di accesso alle foto degli shooting
+  //
+  // Qui non si cancella per "scadenza dell'accesso" ma per ETÀ della richiesta:
+  // dentro ci sono il nome, l'email e il motivo di una persona, e trenta giorni
+  // sono più che abbastanza per ricordarsi di una decisione presa. Va via tutto,
+  // in qualunque stato sia — autorizzata, rifiutata o mai guardata: un permesso
+  // dura al massimo 24 ore, quindi a un mese di distanza non c'è più niente di
+  // vivo da tenere. È la promessa scritta nel modulo, ed è questo che la
+  // mantiene.
+  const limite = new Date(Date.now() - 30 * 86400_000).toISOString();
+  let richieste = 0;
+  try {
+    const r = await fetch(
+      `${s.url}/rest/v1/shooting_richieste?creata_il=lt.${encodeURIComponent(limite)}`,
+      { method: "DELETE", headers: { ...sHeaders(s.key), Prefer: "return=representation" } },
+    );
+    if (r.ok) richieste = ((await r.json()) as any[]).length;
+  } catch { /* best-effort: al prossimo giro */ }
+
+  return res.status(200).json({ ok: true, purged: scaduti.length, richieste });
 }

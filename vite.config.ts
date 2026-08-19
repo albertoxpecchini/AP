@@ -14,6 +14,10 @@ import { cleaningDevApi } from './scripts/janitor/api-dev.mjs'
 // plugin è l'unico modo di vederle, e anche lui vive solo dentro
 // `configureServer`. Vedi scripts/shooting-api-dev.mjs.
 import { shootingDevApi } from './scripts/shooting-api-dev.mjs'
+// Il permesso di vedere le foto (modulo, decisione, album firmato) provato in
+// locale: col .env configurato chiama il codice vero di api/scatti-*.ts, senza
+// usa un magazzino finto e stampa le email in console.
+import { scattiDevApi } from './scripts/scatti-api-dev.mjs'
 
 // path.dirname(new URL(...).pathname) lascia lo slash iniziale di fronte alla
 // lettera di unità su Windows (es. "/C:/Users/..."): risolvendolo poi con
@@ -219,6 +223,7 @@ export default defineConfig({
     writeDevApi("/api/festa-rsvp", async () => ({ insert: (await import("./api/festa-rsvp")).insertPresenza })),
     cleaningDevApi(),
     shootingDevApi(),
+    scattiDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),
