@@ -8,6 +8,7 @@
 // Richiede la env RESEND_API_KEY (lato server, NON esposta al client).
 
 import { collectDiagnostics, getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity.js";
+import { guscio, righe } from "../lib/emailStile.js";
 
 export const config = {
   runtime: "nodejs",
@@ -44,9 +45,29 @@ const PRESENZA_LABEL: Record<VotePayload["presenza"], string> = {
   no: "🙁 Non riesce a venire",
 };
 
-function esc(s: string): string {
-  return String(s).replace(/[&<>"]/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+/** L'email del voto: oggetto e corpo, senza spedire niente (così si può anche
+ *  guardare, con `node scripts/anteprima-email.mjs`).
+ *
+ *  La veste è quella di tutte le altre — la home — e non più il verde della
+ *  pagina della festa: le email arrivano tutte nella stessa casella, e una
+ *  casella con quattro palette diverse non è quattro sezioni, è disordine. */
+export function emailVoto(p: VotePayload, diagHtml = ""): { subject: string; html: string } {
+  const presenza = PRESENZA_LABEL[p.presenza] ?? p.presenza;
+  const giorno = GIORNO_LABEL[p.giorno] ?? p.giorno;
+
+  const html = guscio(
+    "Nuovo voto per la festa",
+    `Festa · ${giorno}`,
+    `${righe([
+      ["Giorno", giorno],
+      ["Nome", p.nome],
+      ["Presenza", presenza],
+      ["Cibo d'asporto", p.cibo || "—"],
+    ])}
+    ${diagHtml}`,
+  );
+
+  return { subject: `Festa ${p.giorno}/06: ${p.nome} ha votato (${p.presenza})`, html };
 }
 
 /** Invia l'email del voto. Non lancia: ritorna esito così il chiamante decide.
@@ -55,25 +76,7 @@ export async function sendVoteEmail(p: VotePayload, diagHtml = ""): Promise<Send
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, status: 500, detail: "RESEND_API_KEY mancante" };
 
-  const nome = esc(p.nome);
-  const presenza = PRESENZA_LABEL[p.presenza] ?? esc(p.presenza);
-  const giorno = GIORNO_LABEL[p.giorno] ?? esc(p.giorno);
-  const cibo = p.cibo ? esc(p.cibo) : "—";
-
-  const html = `
-    <div style="font-family:'Titillium Web',Arial,sans-serif;max-width:520px;margin:0 auto;color:#1c1a17">
-      <div style="background:#2F7D4A;color:#fff;padding:18px 22px;border-radius:12px 12px 0 0">
-        <h2 style="margin:0;font-size:20px">🎉 Nuovo voto per la festa</h2>
-        <p style="margin:6px 0 0;font-size:14px;opacity:.92">${giorno}</p>
-      </div>
-      <div style="border:1px solid #e2e0da;border-top:none;border-radius:0 0 12px 12px;padding:20px 22px">
-        <p style="margin:0 0 12px"><strong>Giorno:</strong> ${giorno}</p>
-        <p style="margin:0 0 12px"><strong>Nome:</strong> ${nome}</p>
-        <p style="margin:0 0 12px"><strong>Presenza:</strong> ${presenza}</p>
-        <p style="margin:0"><strong>Cibo d'asporto:</strong> ${cibo}</p>
-      </div>
-      ${diagHtml}
-    </div>`;
+  const { subject, html } = emailVoto(p, diagHtml);
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -82,12 +85,7 @@ export async function sendVoteEmail(p: VotePayload, diagHtml = ""): Promise<Send
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from: FROM,
-        to: DEST,
-        subject: `Festa ${p.giorno}/06: ${p.nome} ha votato (${p.presenza})`,
-        html,
-      }),
+      body: JSON.stringify({ from: FROM, to: DEST, subject, html }),
     });
     if (!res.ok) {
       return { ok: false, status: res.status, detail: await res.text() };

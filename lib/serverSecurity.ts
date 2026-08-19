@@ -11,11 +11,16 @@
 //   · sameOriginOk              — accetta solo richieste che arrivano dal sito
 //   · collectDiagnostics        — riepilogo tecnico di CHI invia (per l'email)
 //
+// Il riquadro HTML della diagnostica è montato coi pezzi di ./emailStile.ts,
+// che è lo stile unico delle email: qui dentro non ci sono più colori propri.
+//
 // NB sui dati diagnostici: IP, località e device sono DATI PERSONALI (per l'IP
 // vale la sentenza UE Breyer). Qui vengono solo allegati all'email che l'utente
 // invia deliberatamente (una sua azione volontaria sul form), a fini anti-abuso.
 // Non vengono salvati da nessuna parte: nessun archivio, niente da esfiltrare.
 // La località da IP è approssimativa (spesso la centrale dell'operatore).
+
+import { nota, righe, riquadro } from "./emailStile.js";
 
 type Req = { headers?: Record<string, string | string[] | undefined>; method?: string };
 
@@ -163,23 +168,13 @@ export function collectDiagnostics(req: Req): { rows: [string, string][]; html: 
     ["Provenienza", referer],
   ];
 
-  const esc = (s: string) =>
-    String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
-
-  const trList = rows
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:4px 10px 4px 0;color:#6b675f;white-space:nowrap">${esc(k)}</td>` +
-        `<td style="padding:4px 0;color:#1c1a17;font-weight:600">${esc(v)}</td></tr>`,
-    )
-    .join("");
-
-  const html = `
-    <div style="margin-top:16px;border:1px solid #e2e0da;border-radius:12px;padding:14px 16px;background:#faf9f6">
-      <p style="margin:0 0 8px;font-size:13px;color:#6b675f">📍 Diagnostica invio (chi ha compilato)</p>
-      <table style="border-collapse:collapse;font-size:13px">${trList}</table>
-      <p style="margin:10px 0 0;font-size:11px;color:#9a958c">Dati approssimativi da IP/browser, allegati solo a questa email e non archiviati.</p>
-    </div>`;
+  const html = riquadro(
+    "Chi ha compilato",
+    `${righe(rows)}
+      <div style="margin-top:10px">${nota(
+        "Dati approssimativi da IP e browser, allegati solo a questa email e non archiviati.",
+      )}</div>`,
+  );
 
   return { rows, html };
 }

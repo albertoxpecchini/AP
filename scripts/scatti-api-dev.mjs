@@ -97,14 +97,31 @@ function html(res, stato, s) {
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
 
+// La veste delle paginette locali è una COPIA A MANO di lib/emailStile.ts: qui
+// siamo in un .mjs che gira dentro il server di sviluppo, e importare il modulo
+// TypeScript vorrebbe dire pretendere che Node sappia spogliarlo dai tipi. Se
+// cambia lo stile là, questa segue — ma se resta indietro non succede niente a
+// nessuno: sono pagine che vede solo chi ha il repo aperto.
+const SAGOMA = (t) =>
+  `polygon(${t}px 0,100% 0,100% calc(100% - ${t}px),calc(100% - ${t}px) 100%,0 100%,0 ${t}px)`
+const BOTTONE = (primario) =>
+  `display:inline-block;padding:9px 16px;border-radius:6px;font:inherit;font-size:14px;cursor:pointer;` +
+  (primario
+    ? 'background:#72c7e3;border:1px solid #2d8fbe;color:#101010'
+    : 'background:#f8f8f8;border:1px solid #dbdbdb;color:#171717')
+
 function paginetta(titolo, corpo) {
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(titolo)} · Shooting (locale)</title></head>
-<body style="margin:0;background:#fcfcfc;font-family:'Titillium Web',Segoe UI,Arial,sans-serif;color:#171717">
-<div style="max-width:560px;margin:10vh auto;padding:0 16px">
-<div style="border:1px solid #e8e8e8;background:#fff;padding:24px">
-<p style="margin:0 0 6px;font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8f8f8f">Shooting · prova locale</p>
-<h1 style="margin:0 0 16px;font-size:22px;font-weight:500">${esc(titolo)}</h1>${corpo}</div></div></body></html>`
+<body style="margin:0;padding:0 16px;background:#fcfcfc;font-family:'Titillium Web',Segoe UI,Arial,sans-serif;color:#171717">
+<div style="max-width:560px;margin:0 auto;padding:8vh 0">
+<div style="padding:1px;background:#dbdbdb;clip-path:${SAGOMA(18)}">
+<div style="background:#fbfbfb;clip-path:${SAGOMA(17.414)}">
+<div style="padding:18px 22px;border-bottom:1px solid #e8e8e8">
+<p style="margin:0 0 5px;font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:#8f8f8f">Shooting · prova locale</p>
+<h1 style="margin:0;font-size:20px;font-weight:600;line-height:1.3">${esc(titolo)}</h1></div>
+<div style="padding:20px 22px;font-size:15px;line-height:1.65;color:#525252">${corpo}</div>
+</div></div></div></body></html>`
 }
 
 function stampaEmail(a, oggetto, righe) {
@@ -167,14 +184,14 @@ function richiestaFinta(req, res, corpo, base) {
 function paginaFinta(riga, tokenAdmin, titolo) {
   const attiva = riga.stato === 'autorizzata' && riga.accesso_scade_il && new Date(riga.accesso_scade_il) > new Date()
   const bottoni = riga.stato === 'in_attesa'
-    ? `<button name="esito" value="si" style="padding:10px 20px;font:inherit;background:#00b3fa;border:1px solid #0a6285;cursor:pointer">Autorizza per ${ORE} ore</button>
-       <button name="esito" value="no" style="padding:10px 20px;font:inherit;color:#525252;background:#f6f6f6;border:1px solid #e8e8e8;cursor:pointer">Rifiuta</button>`
+    ? `<button name="esito" value="si" style="${BOTTONE(true)};margin:0 8px 8px 0">Autorizza per ${ORE} ore</button>
+       <button name="esito" value="no" style="${BOTTONE(false)};margin:0 8px 8px 0">Rifiuta</button>`
     : attiva
-      ? `<button name="esito" value="revoca" style="padding:10px 20px;font:inherit;color:#525252;background:#f6f6f6;border:1px solid #e8e8e8;cursor:pointer">Revoca adesso</button>`
+      ? `<button name="esito" value="revoca" style="${BOTTONE(false)}">Revoca adesso</button>`
       : ''
-  const riga2 = (k, v) => `<tr><td style="padding:5px 12px 5px 0;color:#8f8f8f;white-space:nowrap">${esc(k)}</td><td style="padding:5px 0">${esc(v)}</td></tr>`
+  const riga2 = (k, v) => `<tr><td style="padding:5px 12px 5px 0;color:#8f8f8f;white-space:nowrap;vertical-align:top">${esc(k)}</td><td style="padding:5px 0;color:#171717">${esc(v)}</td></tr>`
   return paginetta('Richiesta di accesso', `
-    <p style="margin:0 0 16px;color:#8f8f8f;font-size:14px">Stato: ${esc(riga.stato)}</p>
+    <p style="margin:0 0 16px;color:#8f8f8f;font-size:12px">Stato: ${esc(riga.stato)}</p>
     <table style="width:100%;border-collapse:collapse;font-size:14px">
       ${riga2('Nome', riga.nome)}${riga2('Email', riga.email)}${riga2('Sessione', titolo)}
       ${riga2('Rapporto', riga.rapporto)}${riga2('Motivo', riga.motivo || '—')}${riga2('Aperture', riga.aperture)}
@@ -185,7 +202,7 @@ function paginaFinta(riga, tokenAdmin, titolo) {
 function decisioneFinta(res, corpo, base) {
   const righe = registro()
   const riga = righe.find((r) => r.id === corpo?.id && r.admin_hash === impronta(String(corpo?.t ?? '')))
-  if (!riga) return html(res, 404, paginetta('Link non valido', '<p style="margin:0;color:#525252">Non è quello giusto, o non c\'è più.</p>'))
+  if (!riga) return html(res, 404, paginetta('Link non valido', '<p style="margin:0">Non è quello giusto, o non c\'è più.</p>'))
 
   const man = manifesto()
   const titolo = man?.sessioni?.find((s) => s.id === riga.sessione)?.titolo ?? riga.sessione
@@ -199,17 +216,17 @@ function decisioneFinta(res, corpo, base) {
     stampaEmail(riga.email, `Le foto di ${titolo} — accesso per ${ORE} ore`, [
       `apri: ${base}/shooting?accesso=${encodeURIComponent(token)}`,
     ])
-    return html(res, 200, paginetta('Autorizzata', `<p style="margin:0;color:#525252">${esc(riga.nome)} può vedere ${esc(titolo)} per ${ORE} ore. Il link è stampato nel terminale.</p>`))
+    return html(res, 200, paginetta('Autorizzata', `<p style="margin:0">${esc(riga.nome)} può vedere ${esc(titolo)} per ${ORE} ore. Il link è stampato nel terminale.</p>`))
   }
   if (corpo.esito === 'no') {
     riga.stato = 'rifiutata'; salva(righe)
-    return html(res, 200, paginetta('Rifiutata', '<p style="margin:0;color:#525252">Nessuna email a nessuno.</p>'))
+    return html(res, 200, paginetta('Rifiutata', '<p style="margin:0">Nessuna email a nessuno.</p>'))
   }
   if (corpo.esito === 'revoca') {
     riga.stato = 'revocata'; riga.accesso_hash = null; riga.accesso_scade_il = null; salva(righe)
-    return html(res, 200, paginetta('Revocato', '<p style="margin:0;color:#525252">Il link è spento.</p>'))
+    return html(res, 200, paginetta('Revocato', '<p style="margin:0">Il link è spento.</p>'))
   }
-  return html(res, 400, paginetta('Non ho capito', '<p style="margin:0;color:#525252">Azione sconosciuta.</p>'))
+  return html(res, 400, paginetta('Non ho capito', '<p style="margin:0">Azione sconosciuta.</p>'))
 }
 
 function albumFinto(res, token) {
@@ -305,7 +322,7 @@ export function scattiDevApi() {
             const righe = registro()
             const tok = url.searchParams.get('t') ?? ''
             const riga = righe.find((r) => r.id === id && r.admin_hash === impronta(tok))
-            if (!riga) return html(res, 404, paginetta('Link non valido', '<p style="margin:0;color:#525252">Non è quello giusto, o non c\'è più.</p>'))
+            if (!riga) return html(res, 404, paginetta('Link non valido', '<p style="margin:0">Non è quello giusto, o non c\'è più.</p>'))
             const man = manifesto()
             const titolo = man?.sessioni?.find((s) => s.id === riga.sessione)?.titolo ?? riga.sessione
             return html(res, 200, paginaFinta(riga, tok, titolo))

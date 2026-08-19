@@ -35,6 +35,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import {
+  bottone, bottoneModulo, esc, forte, guscio, nota, pagina as paginaStile, righe, testo,
+} from "./emailStile.js";
 
 export const BUCKET = "scatti";
 export const DEST = "pzkko@yahoo.com";
@@ -96,8 +99,9 @@ export interface ManifestoBucket {
 
 // ── Utilità ──────────────────────────────────────────────────────────────────
 
-export const esc = (s: unknown): string =>
-  String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+// L'escape sta con lo stile delle email, che è chi lo usa di più; di qui esce
+// ancora col suo nome perché lo importano le funzioni serverless.
+export { esc };
 
 /** Un token che non si indovina: 32 byte veri, scritti in base64url. */
 export function nuovoToken(): string {
@@ -267,51 +271,9 @@ export async function firma(
 }
 
 // ── Email ────────────────────────────────────────────────────────────────────
-// Stessa grammatica del sito, non quella della festa: grigi neutri, un solo
-// azzurro, niente arrotondamenti grossi. I colori sono i token .sb- tradotti in
-// esadecimale, perché l'hsl() e le custom property nelle email non si possono
-// usare (Outlook le butta via).
-
-const C = {
-  fg: "#171717",
-  fgLight: "#525252",
-  fgMuted: "#8f8f8f",
-  bordo: "#e8e8e8",
-  fondo: "#fcfcfc",
-  superficie: "#f6f6f6",
-  brand: "#00b3fa",
-  brandTesto: "#0a6285",
-};
-
-function guscio(titolo: string, occhiello: string, corpo: string): string {
-  return `
-<div style="background:${C.fondo};padding:24px 12px;font-family:'Titillium Web',Segoe UI,Arial,sans-serif">
-  <div style="max-width:560px;margin:0 auto;border:1px solid ${C.bordo};background:#fff">
-    <div style="border-bottom:1px solid ${C.bordo};padding:18px 22px">
-      <p style="margin:0 0 4px;font-family:'Roboto Mono',Consolas,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:${C.fgMuted}">${esc(occhiello)}</p>
-      <h1 style="margin:0;font-size:20px;font-weight:500;color:${C.fg}">${esc(titolo)}</h1>
-    </div>
-    <div style="padding:20px 22px">${corpo}</div>
-  </div>
-</div>`;
-}
-
-function righe(dati: [string, string][]): string {
-  return `<table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:14px">${dati
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:5px 12px 5px 0;color:${C.fgMuted};white-space:nowrap;vertical-align:top">${esc(k)}</td>` +
-        `<td style="padding:5px 0;color:${C.fg}">${esc(v)}</td></tr>`,
-    )
-    .join("")}</table>`;
-}
-
-function bottone(href: string, testo: string, primario: boolean): string {
-  const sfondo = primario ? C.brand : C.superficie;
-  const testoCol = primario ? "#101010" : C.fgLight;
-  const bordo = primario ? C.brandTesto : C.bordo;
-  return `<a href="${esc(href)}" style="display:inline-block;padding:10px 18px;margin:0 8px 8px 0;font-size:14px;text-decoration:none;color:${testoCol};background:${sfondo};border:1px solid ${bordo}">${esc(testo)}</a>`;
-}
+// Il disegno non è più qui: guscio, righe, bottoni e paginette stanno in
+// ./emailStile.ts, che è la faccia unica di TUTTE le email del sito — quella
+// della home. Qui restano solo le parole.
 
 /** L'email che arriva A TE: chi ha chiesto, cosa ha scritto, e i due bottoni. */
 export function emailRichiesta(
@@ -334,19 +296,17 @@ export function emailRichiesta(
       ["Motivo", r.motivo || "—"],
       ["Richiesta", dataItaliana(r.creata_il)],
     ])}
-    <p style="margin:18px 0 10px;font-size:14px;line-height:1.6;color:${C.fgLight}">
-      Il bottone apre una pagina di conferma: la decisione si prende lì, con un secondo tocco.
-      Serve perché gli scanner delle caselle di posta aprono i link da soli, e un link che
-      autorizza da solo sarebbe autorizzato dal primo antivirus che passa.
-    </p>
-    <p style="margin:0 0 14px">
-      ${bottone(link, "Apri e decidi", true)}
-    </p>
-    <p style="margin:0;font-size:12px;line-height:1.6;color:${C.fgMuted}">
-      Se autorizzi, a ${esc(r.nome)} arriva un link che vale ${ORE_ACCESSO} ore e che puoi
-      revocare quando vuoi dalla stessa pagina. Questo link scade fra ${GIORNI_DECISIONE} giorni.
-      Se non fai niente, non succede niente.
-    </p>
+    <div style="margin-top:18px">${testo(
+      `Il bottone apre una pagina di conferma: la decisione si prende lì, con un secondo tocco.
+       Serve perché gli scanner delle caselle di posta aprono i link da soli, e un link che
+       autorizza da solo sarebbe autorizzato dal primo antivirus che passa.`,
+    )}</div>
+    <p style="margin:0 0 14px">${bottone(link, "Apri e decidi")}</p>
+    ${nota(
+      `Se autorizzi, a ${esc(r.nome)} arriva un link che vale ${ORE_ACCESSO} ore e che puoi
+       revocare quando vuoi dalla stessa pagina. Questo link scade fra ${GIORNI_DECISIONE} giorni.
+       Se non fai niente, non succede niente.`,
+    )}
     ${diagHtml}`,
   );
   return { subject: `Shooting · ${r.nome} chiede di vedere ${etichettaSessione}`, html };
@@ -364,18 +324,16 @@ export function emailAutorizzato(
     "Le foto sono tue per le prossime 24 ore",
     "Shooting · accesso autorizzato",
     `
-    <p style="margin:0 0 14px;font-size:15px;line-height:1.65;color:${C.fgLight}">
-      Ciao ${esc(r.nome)}, ho autorizzato la tua richiesta per <strong style="color:${C.fg};font-weight:600">${esc(etichettaSessione)}</strong>.
-      Il link qui sotto apre l'album e scade <strong style="color:${C.fg};font-weight:600">${esc(dataItaliana(r.accesso_scade_il || new Date()))}</strong>.
-    </p>
-    <p style="margin:0 0 16px">${bottone(link, "Apri l'album", true)}</p>
-    <p style="margin:0 0 10px;font-size:13px;line-height:1.65;color:${C.fgLight}">
-      Dentro trovi le foto a piena risoluzione, scaricabili una per una. Il link è personale:
-      tienilo per te, perché chiunque ce l'abbia entra al posto tuo finché non scade.
-    </p>
-    <p style="margin:0;font-size:12px;line-height:1.6;color:${C.fgMuted}">
-      Se hai bisogno di più tempo scrivimi e te ne mando un altro.
-    </p>`,
+    ${testo(
+      `Ciao ${esc(r.nome)}, ho autorizzato la tua richiesta per ${forte(etichettaSessione)}.
+       Il link qui sotto apre l'album e scade ${forte(dataItaliana(r.accesso_scade_il || new Date()))}.`,
+    )}
+    <p style="margin:0 0 16px">${bottone(link, "Apri l'album")}</p>
+    ${testo(
+      `Dentro trovi le foto a piena risoluzione, scaricabili una per una. Il link è personale:
+       tienilo per te, perché chiunque ce l'abbia entra al posto tuo finché non scade.`,
+    )}
+    ${nota("Se hai bisogno di più tempo scrivimi e te ne mando un altro.")}`,
   );
   return { subject: `Le foto di ${etichettaSessione} — accesso per 24 ore`, html };
 }
@@ -396,10 +354,10 @@ export function emailPrimaApertura(
       ["Aperto", dataItaliana(new Date())],
       ["Scade", r.accesso_scade_il ? dataItaliana(r.accesso_scade_il) : "—"],
     ])}
-    <p style="margin:16px 0 0;font-size:12px;line-height:1.6;color:${C.fgMuted}">
-      Arriva una volta sola, alla prima apertura. Le aperture successive le conta la tabella
-      e basta.
-    </p>
+    <div style="margin-top:16px">${nota(
+      `Arriva una volta sola, alla prima apertura. Le aperture successive le conta la tabella
+       e basta.`,
+    )}</div>
     ${diagHtml}`,
   );
   return { subject: `Shooting · ${r.nome} ha aperto ${etichettaSessione}`, html };
@@ -430,8 +388,9 @@ export async function invia(to: string, subject: string, html: string): Promise<
 
 // ── La paginetta delle decisioni ─────────────────────────────────────────────
 // La apri tu dal telefono, quindi è una pagina vera e non un JSON: stessa
-// palette del sito, tema chiaro, nessuna dipendenza. Il modulo fa POST, e
-// questo è il motivo per cui esiste (vedi la nota in cima al file).
+// lastra e stessa palette delle email (./emailStile.ts), chiara o scura come ce
+// l'hai tu. Il modulo fa POST, e questo è il motivo per cui esiste (vedi la
+// nota in cima al file).
 
 export function paginaDecisione(r: Richiesta, tokenAdmin: string, etichetta: string): string {
   const stati: Record<Stato, string> = {
@@ -443,18 +402,20 @@ export function paginaDecisione(r: Richiesta, tokenAdmin: string, etichetta: str
   const attiva = r.stato === "autorizzata" && !!r.accesso_scade_il && new Date(r.accesso_scade_il) > new Date();
 
   const azioni = r.stato === "in_attesa"
-    ? `<button name="esito" value="si" style="padding:10px 20px;font:inherit;color:#101010;background:${C.brand};border:1px solid ${C.brandTesto};cursor:pointer">Autorizza per ${ORE_ACCESSO} ore</button>
-       <button name="esito" value="no" style="padding:10px 20px;font:inherit;color:${C.fgLight};background:${C.superficie};border:1px solid ${C.bordo};cursor:pointer">Rifiuta</button>`
+    ? `${bottoneModulo("esito", "si", `Autorizza per ${ORE_ACCESSO} ore`)}
+       ${bottoneModulo("esito", "no", "Rifiuta", false)}`
     : attiva
-      ? `<button name="esito" value="revoca" style="padding:10px 20px;font:inherit;color:${C.fgLight};background:${C.superficie};border:1px solid ${C.bordo};cursor:pointer">Revoca l'accesso adesso</button>`
+      ? bottoneModulo("esito", "revoca", "Revoca l'accesso adesso", false)
       : "";
 
   return pagina(
     "Richiesta di accesso",
     `
-    <p style="margin:0 0 18px;font-size:14px;color:${C.fgMuted}">La richiesta è ${esc(stati[r.stato])}${
-      attiva ? `, e scade ${esc(dataItaliana(r.accesso_scade_il!))}` : ""
-    }.</p>
+    <div style="margin:0 0 18px">${nota(
+      `La richiesta è ${esc(stati[r.stato])}${
+        attiva ? `, e scade ${esc(dataItaliana(r.accesso_scade_il!))}` : ""
+      }.`,
+    )}</div>
     ${righe([
       ["Nome", r.nome],
       ["Email", r.email],
@@ -477,16 +438,5 @@ export function paginaDecisione(r: Richiesta, tokenAdmin: string, etichetta: str
 }
 
 export function pagina(titolo: string, corpo: string): string {
-  return `<!doctype html><html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>${esc(titolo)} · Shooting</title></head>
-<body style="margin:0;background:${C.fondo};font-family:'Titillium Web',Segoe UI,Arial,sans-serif;color:${C.fg}">
-<div style="max-width:560px;margin:10vh auto;padding:0 16px">
-  <div style="border:1px solid ${C.bordo};background:#fff;padding:24px">
-    <p style="margin:0 0 6px;font-family:'Roboto Mono',Consolas,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:${C.fgMuted}">Shooting</p>
-    <h1 style="margin:0 0 16px;font-size:22px;font-weight:500">${esc(titolo)}</h1>
-    ${corpo}
-  </div>
-</div></body></html>`;
+  return paginaStile(titolo, corpo, "Shooting");
 }

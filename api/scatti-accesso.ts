@@ -23,6 +23,7 @@
 // Env: VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY
 
 import { collectDiagnostics, getClientIp, rateLimit } from "../lib/serverSecurity.js";
+import { forte, nota } from "../lib/emailStile.js";
 import {
   aggiorna, dataItaliana, emailAutorizzato, emailPrimaApertura, esc, firma, impronta,
   invia, manifestoBucket, nuovoToken, origine, pagina, paginaDecisione, perAccesso, perId,
@@ -77,7 +78,7 @@ export default async function handler(req: any, res: any) {
     }
     const r = await richiestaAdmin(body?.id, body?.t);
     if (!r) {
-      return html(res, 404, pagina("Link non valido", "<p style=\"margin:0;color:#525252\">Questo link non vale più: o è scaduto, o non è quello giusto.</p>"));
+      return html(res, 404, pagina("Link non valido", "<p style=\"margin:0\">Questo link non vale più: o è scaduto, o non è quello giusto.</p>"));
     }
     return decidi(req, res, r, String(body?.esito ?? ""), String(body?.t ?? ""));
   }
@@ -85,11 +86,11 @@ export default async function handler(req: any, res: any) {
   // ── La pagina della decisione ──────────────────────────────────────────────
   if (req.method === "GET" && typeof q.id === "string") {
     const gate = rateLimit(`scatti-admin:${getClientIp(req) || "ignoto"}`, 30, 60_000);
-    if (!gate.ok) return html(res, 429, pagina("Troppi tentativi", "<p style=\"margin:0;color:#525252\">Riprova fra un minuto.</p>"));
+    if (!gate.ok) return html(res, 429, pagina("Troppi tentativi", "<p style=\"margin:0\">Riprova fra un minuto.</p>"));
 
     const r = await richiestaAdmin(q.id, q.t);
     if (!r) {
-      return html(res, 404, pagina("Link non valido", "<p style=\"margin:0;color:#525252\">Questo link non vale più: o è scaduto, o non è quello giusto.</p>"));
+      return html(res, 404, pagina("Link non valido", "<p style=\"margin:0\">Questo link non vale più: o è scaduto, o non è quello giusto.</p>"));
     }
     const man = await manifestoBucket(r.sessione);
     return html(res, 200, paginaDecisione(r, String(q.t), man?.titolo ?? r.sessione));
@@ -117,7 +118,7 @@ async function decidi(req: any, res: any, r: Richiesta, esito: string, tokenAdmi
       accesso_hash: impronta(tokenAccesso),
       accesso_scade_il: scade,
     });
-    if (!ok) return html(res, 503, pagina("Non ha funzionato", "<p style=\"margin:0;color:#525252\">La decisione non è stata registrata. Riprova.</p>"));
+    if (!ok) return html(res, 503, pagina("Non ha funzionato", "<p style=\"margin:0\">La decisione non è stata registrata. Riprova.</p>"));
 
     const mail = emailAutorizzato({ ...r, accesso_scade_il: scade }, tokenAccesso, etichetta, origine(req));
     const inviata = await invia(r.email, mail.subject, mail.html);
@@ -127,12 +128,12 @@ async function decidi(req: any, res: any, r: Richiesta, esito: string, tokenAdmi
       200,
       pagina(
         "Autorizzata",
-        `<p style="margin:0 0 10px;color:#525252">${esc(r.nome)} può vedere <strong style="color:#171717">${esc(etichetta)}</strong> fino a <strong style="color:#171717">${esc(dataItaliana(scade))}</strong>.</p>
-         <p style="margin:0;color:${inviata ? "#8f8f8f" : "#525252"}">${
+        `<p style="margin:0 0 10px">${esc(r.nome)} può vedere ${forte(etichetta)} fino a ${forte(dataItaliana(scade))}.</p>
+         ${
            inviata
-             ? `Il link è appena partito verso ${esc(r.email)}.`
-             : "⚠ L'email però non è partita: l'accesso è attivo ma il link non è arrivato a nessuno. Controlla RESEND_API_KEY."
-         }</p>`,
+             ? nota(`Il link è appena partito verso ${esc(r.email)}.`)
+             : `<p style="margin:0">⚠ L'email però non è partita: l'accesso è attivo ma il link non è arrivato a nessuno. Controlla RESEND_API_KEY.</p>`
+         }`,
       ),
     );
   }
@@ -144,7 +145,7 @@ async function decidi(req: any, res: any, r: Richiesta, esito: string, tokenAdmi
       200,
       pagina(
         "Rifiutata",
-        `<p style="margin:0;color:#525252">Non è partita nessuna email: ${esc(r.nome)} non riceve niente. La riga si cancella da sola entro trenta giorni.</p>`,
+        `<p style="margin:0">Non è partita nessuna email: ${esc(r.nome)} non riceve niente. La riga si cancella da sola entro trenta giorni.</p>`,
       ),
     );
   }
@@ -156,12 +157,12 @@ async function decidi(req: any, res: any, r: Richiesta, esito: string, tokenAdmi
       200,
       pagina(
         "Revocato",
-        `<p style="margin:0;color:#525252">Il link di ${esc(r.nome)} è spento da adesso. Se ha una scheda aperta, alla prossima immagine non riceve più niente.</p>`,
+        `<p style="margin:0">Il link di ${esc(r.nome)} è spento da adesso. Se ha una scheda aperta, alla prossima immagine non riceve più niente.</p>`,
       ),
     );
   }
 
-  return html(res, 400, pagina("Non ho capito", "<p style=\"margin:0;color:#525252\">Azione sconosciuta.</p>"));
+  return html(res, 400, pagina("Non ho capito", "<p style=\"margin:0\">Azione sconosciuta.</p>"));
 }
 
 // ── Il manifesto firmato ─────────────────────────────────────────────────────

@@ -289,6 +289,15 @@ export const GRUPPI: Gruppo[] = [
         nota: "Serve Python con WeasyPrint e il font Ubuntu installato a sistema. È l'unico comando del progetto che non è né Node né npm.",
       },
       {
+        cmd: "node scripts/anteprima-email.mjs",
+        breve: "Fa vedere tutte le email del sito senza spedirne nessuna.",
+        dettaglio:
+          "Un'email si guarda solo quando è arrivata, e per farla arrivare bisogna spedirla: qui invece vengono costruite tutte con dati finti — il voto della festa, il link aperto, le tre dello shooting — e scritte su disco insieme a un indice da aprire nel browser. Serve dopo ogni ritocco a lib/emailStile.ts, che è la faccia unica di tutte quante: i colori sono quelli della home, tradotti in esadecimale perché nelle email le variabili CSS non arrivano. Non tocca né Resend né Supabase.",
+        file: "scripts/anteprima-email.mjs",
+        esce: ["una cartella nel temporaneo di sistema (il percorso lo stampa alla fine)"],
+        nota: "Anche lo scuro: le pagine seguono il tema del sistema, quindi per vederlo si cambia tema a Windows e si ricarica.",
+      },
+      {
         cmd: 'node --env-file=.env scripts/make-link.mjs "<url-o-file>" "<etichetta>"',
         breve: "Crea un link corto tracciabile che scade da solo.",
         dettaglio:
