@@ -41,7 +41,7 @@ import {
 
 export const BUCKET = "scatti";
 export const DEST = "pzkko@yahoo.com";
-export const FROM = "Shooting <shooting@albertopecchini.it>";
+export const FROM = "Alberto Pecchini <shooting@albertopecchini.it>";
 
 /** Quanto vive un accesso autorizzato. */
 export const ORE_ACCESSO = 24;

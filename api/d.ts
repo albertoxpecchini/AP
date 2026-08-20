@@ -25,7 +25,7 @@ import { esc, guscio, nota, pagina, righe } from "../lib/emailStile.js";
 export const config = { runtime: "nodejs" };
 
 const DEST = "pzkko@yahoo.com";
-const FROM = "Link tracker <link@albertopecchini.it>";
+const FROM = "Alberto Pecchini <link@albertopecchini.it>";
 
 function supa(): { url: string; key: string } | null {
   const url = process.env.VITE_SUPABASE_URL?.replace(/\/+$/, "");

@@ -30,7 +30,7 @@ export interface SendResult { ok: boolean; status: number; detail?: string }
 
 // Dominio verificato su Resend → invio dal proprio dominio (più affidabile).
 const DEST = "pzkko@yahoo.com";
-const FROM = "Festa Alberto <festa@albertopecchini.it>";
+const FROM = "Alberto Pecchini <festa@albertopecchini.it>";
 
 const GIORNO_LABEL: Record<VotePayload["giorno"], string> = {
   "27": "Sabato 27 giugno",
