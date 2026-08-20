@@ -70,47 +70,6 @@ function figmaAssetResolver() {
   }
 }
 
-function triviaDevApi() {
-  return {
-    name: 'trivia-dev-api',
-    configureServer(server: any) {
-      const env = loadEnv(server.config.mode, process.cwd(), '')
-      const apiKey = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY
-
-      server.middlewares.use('/api/trivia', async (req: any, res: any) => {
-        if (!apiKey) {
-          res.statusCode = 500
-          res.end(JSON.stringify({ error: 'ANTHROPIC_API_KEY mancante nel file .env' }))
-          return
-        }
-        const { Anthropic } = await import('@anthropic-ai/sdk')
-        const client = new Anthropic({ apiKey })
-        const url = new URL(req.url, 'http://localhost')
-        const word = url.searchParams.get('word') ?? ''
-        if (word.length < 3) { res.statusCode = 400; res.end('{}'); return }
-        try {
-          const msg = await client.messages.create({
-            model: 'claude-fable-5',
-            // Fable 5 pensa sempre: max_tokens copre pensiero + risposta, effort
-            // "low" perché è solo una curiosità di 1-2 frasi (come api/trivia.ts).
-            max_tokens: 2048,
-            output_config: { effort: 'low' },
-            messages: [{ role: 'user', content: `Genera una breve curiosità o fatto interessante sulla parola italiana "${word.toUpperCase()}" in 1-2 frasi. Scrivi direttamente il fatto senza premesse.` }],
-          })
-          const textBlock = msg.content.find((b: any) => b.type === 'text')
-          const text = textBlock ? textBlock.text : ''
-          res.setHeader('Content-Type', 'application/json')
-          res.end(JSON.stringify({ word, trivia: text.trim() }))
-        } catch (err: any) {
-          console.error('[trivia]', err?.message)
-          res.statusCode = 500
-          res.end('{}')
-        }
-      })
-    },
-  }
-}
-
 // Festa · /api/notify in sviluppo: invia l'email del voto via Resend (stesso
 // helper della funzione serverless), così l'invito si testa end-to-end in locale.
 // Senza RESEND_API_KEY non invia, ma logga il voto in console.
@@ -216,7 +175,6 @@ function writeDevApi(route: string, importer: () => Promise<{ insert: (b: any) =
 export default defineConfig({
   plugins: [
     figmaAssetResolver(),
-    triviaDevApi(),
     festaNotifyDevApi(),
     igStatsDevApi(),
     writeDevApi("/api/sponsor", async () => ({ insert: (await import("./api/sponsor")).insertDonatore })),

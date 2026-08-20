@@ -16,7 +16,7 @@
 // e rifarlo a vuoto sporca `git status` a ogni `npm run dev`.
 //
 // Il punto 3 esiste perché il modo peggiore di scoprire che manca una chiave è
-// dalla pagina, con un 500 e nessuna spiegazione: i plugin in vite.config.ts
+// dalla pagina, con una lista vuota e nessuna spiegazione: i plugin in vite.config.ts
 // leggono le env una volta sola, all'avvio, e poi tacciono. Meglio dirlo prima,
 // in chiaro, sapendo che «manca» quasi sempre vuol dire «funziona in finta»,
 // non «è rotto».
@@ -177,11 +177,6 @@ export function diagnosi() {
   const ha = (...nomi) => nomi.every((n) => k.has(n))
   const righe = []
 
-  righe.push(
-    ha('ANTHROPIC_API_KEY')
-      ? voce(OK(), '/api/trivia', 'curiosità vere (Fable 5)')
-      : voce(FORSE(), '/api/trivia', 'senza ANTHROPIC_API_KEY risponde 500: il gioco resta giocabile')
-  )
   righe.push(
     ha('VITE_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY')
       ? voce(OK(), 'scritture Supabase', 'sponsor, RSVP e richieste vanno sul database vero')

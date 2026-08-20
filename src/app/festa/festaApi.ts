@@ -10,8 +10,10 @@
 // Schema tabella in supabase/festa_presenze.sql:
 //   id, nome, presenza ('pomeriggio'|'sera'|'no'), cibo, created_at
 //
-// Se non configurate, lavora in modalità "solo locale" (localStorage), così la
-// pagina resta funzionante anche senza backend.
+// Se non configurate, la LETTURA lavora in modalità "solo locale"
+// (localStorage), così la pagina resta funzionante anche senza backend. La
+// scrittura invece passa da /api/festa-rsvp, che inserisce con la service-role
+// e della anon key non sa che farsene: vedi submitPresenza.
 
 export type Presenza = "pomeriggio" | "sera" | "no";
 
@@ -35,6 +37,7 @@ const LOCAL_KEY = "festa-presenze-local";
 const URL  = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/+$/, "");
 const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
+/** Vero quando le LETTURE pubbliche (lista + realtime) possono partire. */
 export const festaConfigured = Boolean(URL && ANON);
 
 const restHeaders = () => ({
@@ -65,20 +68,32 @@ const sanitize = (row: PresenzaRow): PresenzaRow => ({
 export async function submitPresenza(row: PresenzaRow): Promise<PresenzaRow> {
   const clean = sanitize(row);
 
-  if (!festaConfigured) {
-    const stored = { ...clean, id: Date.now(), created_at: new Date().toISOString() };
-    writeLocal([stored, ...readLocal()]);
-    return stored;
+  // Scrittura via endpoint blindato (origine + rate-limit, insert con
+  // service-role). Si prova SEMPRE, anche senza anon key: quella serve alle
+  // letture, non a questo. (Stessa logica in sostieni/donazioniApi.ts.)
+  let res: Response | null = null;
+  try {
+    res = await fetch("/api/festa-rsvp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(clean),
+    });
+  } catch {
+    res = null; // rete assente, o endpoint non montato (sito statico)
   }
 
-  // Scrittura via endpoint blindato (origine + rate-limit, insert con service-role).
-  const res = await fetch("/api/festa-rsvp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(clean),
-  });
-  if (!res.ok) throw new Error(`submitPresenza ${res.status}: ${await res.text()}`);
-  return (await res.json()) as PresenzaRow;
+  if (res?.ok) return (await res.json()) as PresenzaRow;
+
+  // 503 = il server non ha le env Supabase, cioè "niente backend": lì si
+  // ripiega in locale. Ogni altro rifiuto (400, 429, 502) resta un errore
+  // vero e viene lanciato, come prima.
+  if (res && res.status !== 503) {
+    throw new Error(`submitPresenza ${res.status}: ${await res.text()}`);
+  }
+
+  const stored = { ...clean, id: Date.now(), created_at: new Date().toISOString() };
+  writeLocal([stored, ...readLocal()]);
+  return stored;
 }
 
 /** Elenco presenze di un dato giorno, dal più recente (newest-first). */

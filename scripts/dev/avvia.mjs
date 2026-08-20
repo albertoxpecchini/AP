@@ -11,14 +11,14 @@
 //     secondo `vite` con un EADDRINUSE e nient'altro. Se il colpevole era un
 //     dev server rimasto acceso da una sessione F5, la soluzione era andarlo a
 //     cercare col Task Manager.
-//  2. i crash. `vite dev` qui monta otto middleware /api/* scritti in casa
+//  2. i crash. `vite dev` qui monta sette middleware /api/* scritti in casa
 //     (vite.config.ts): un errore non gestito in uno di quelli, o un modulo
 //     che non compila, e il processo se ne va. Chi stava guardando la pagina
 //     vede solo che il sito «non risponde più».
 //  3. le chiavi. I plugin leggono il .env una volta sola, all'avvio. Senza
-//     ANTHROPIC_API_KEY /api/trivia risponde 500, senza RESEND le email si
-//     stampano in console: cose normalissime in locale, ma scoprirle dalla
-//     pagina costa mezz'ora di indagine ogni volta.
+//     VITE_SUPABASE_ANON_KEY le liste pubbliche restano vuote, senza RESEND le
+//     email si stampano in console: cose normalissime in locale, ma scoprirle
+//     dalla pagina costa mezz'ora di indagine ogni volta.
 //
 // Questo file è la risposta ai tre punti: prima di partire guarda chi c'è sulla
 // porta e si prende il posto se è roba nostra, poi tiene Vite in piedi

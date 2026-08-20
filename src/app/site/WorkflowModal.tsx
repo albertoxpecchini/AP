@@ -12,7 +12,7 @@ import "./workflow.css";
 // ─────────────────────────────────────────────────────────────────────────────
 // "Come funziona" — il GIRO DEI DATI del sito come diagramma di sequenza: dallo
 // sviluppo locale al deploy Vercel, fino ai dati live a runtime (GitHub API,
-// Supabase, funzioni serverless → Anthropic / Resend).
+// Supabase, funzioni serverless → Resend).
 //
 // Lo STESSO diagramma è nel README (blocco ```mermaid); qui però NON si usa
 // Mermaid: il diagramma è disegnato con la griglia .apw- in veste .sb- (vedi
@@ -29,7 +29,7 @@ type Copy = {
   p1: string; p2: string; p3: string; p4: string;
   ask: string; newCommit: string; deployOk: string; spa: string;
   profileEvents: string; sparkline: string; leaderboards: string;
-  word: string; curiosity: string; festaVote: string; sendEmail: string;
+  festaVote: string; sendEmail: string;
   steps: string; actors: string; req: string; res: string; hint: string;
 };
 
@@ -43,8 +43,8 @@ const T: Record<Lang, Copy> = {
     ask: "«fai la modifica X»", newCommit: "nuovo commit su main", deployOk: "deploy ok",
     spa: "SPA React + service worker (precache offline)",
     profileEvents: "profilo / eventi", sparkline: "sparkline dei commit",
-    leaderboards: "classifiche + aggiornamenti live", word: "parola",
-    curiosity: "curiosità (testo)", festaVote: "voto Festa", sendEmail: "invio email",
+    leaderboards: "classifiche + aggiornamenti live",
+    festaVote: "voto Festa", sendEmail: "invio email",
     steps: "passi", actors: "partecipanti", req: "richiesta", res: "risposta",
     hint: "tocca un partecipante per seguirne il filo",
   },
@@ -57,8 +57,8 @@ const T: Record<Lang, Copy> = {
     ask: "«make change X»", newCommit: "new commit on main", deployOk: "deploy ok",
     spa: "React SPA + service worker (offline precache)",
     profileEvents: "profile / events", sparkline: "commit sparkline",
-    leaderboards: "leaderboards + live updates", word: "word",
-    curiosity: "fun fact (text)", festaVote: "party RSVP", sendEmail: "send email",
+    leaderboards: "leaderboards + live updates",
+    festaVote: "party RSVP", sendEmail: "send email",
     steps: "steps", actors: "participants", req: "request", res: "response",
     hint: "tap a participant to follow its thread",
   },
@@ -71,8 +71,8 @@ const T: Record<Lang, Copy> = {
     ask: "« fais la modif X »", newCommit: "nouveau commit sur main", deployOk: "déploiement ok",
     spa: "SPA React + service worker (precache hors-ligne)",
     profileEvents: "profil / événements", sparkline: "sparkline des commits",
-    leaderboards: "classements + màj live", word: "mot",
-    curiosity: "anecdote (texte)", festaVote: "vote fête", sendEmail: "envoi email",
+    leaderboards: "classements + màj live",
+    festaVote: "vote fête", sendEmail: "envoi email",
     steps: "étapes", actors: "participants", req: "requête", res: "réponse",
     hint: "touchez un participant pour suivre son fil",
   },
@@ -85,8 +85,8 @@ const T: Record<Lang, Copy> = {
     ask: "„mach Änderung X\"", newCommit: "neuer Commit auf main", deployOk: "Deploy ok",
     spa: "React SPA + Service Worker (Offline-Precache)",
     profileEvents: "Profil / Events", sparkline: "Commit-Sparkline",
-    leaderboards: "Ranglisten + Live-Updates", word: "Wort",
-    curiosity: "Fun Fact (Text)", festaVote: "Fest-Zusage", sendEmail: "E-Mail senden",
+    leaderboards: "Ranglisten + Live-Updates",
+    festaVote: "Fest-Zusage", sendEmail: "E-Mail senden",
     steps: "Schritte", actors: "Teilnehmer", req: "Anfrage", res: "Antwort",
     hint: "auf einen Teilnehmer tippen, um seinem Faden zu folgen",
   },
@@ -151,12 +151,6 @@ function script(c: Copy): Step[] {
     { k: "msg", from: EXT, to: BR, parts: [code("JSON"), txt(`→ ${c.sparkline}`)], reply: true },
     { k: "msg", from: BR, to: EXT, parts: [code("Supabase"), dot(), code("REST + Realtime WS")] },
     { k: "msg", from: EXT, to: BR, parts: [txt(c.leaderboards)], reply: true },
-    { k: "act", p: VC, on: true },
-    { k: "msg", from: BR, to: VC, parts: [code("GET /api/trivia"), dot(), txt(c.word)] },
-    { k: "msg", from: VC, to: EXT, parts: [code("Anthropic Claude (Fable 5)")] },
-    { k: "msg", from: EXT, to: VC, parts: [txt(c.curiosity)], reply: true },
-    { k: "msg", from: VC, to: BR, parts: [code("JSON"), txt("(cache 24 h)")], reply: true },
-    { k: "act", p: VC, on: false },
     { k: "act", p: VC, on: true },
     { k: "msg", from: BR, to: VC, parts: [code("POST /api/notify"), dot(), txt(c.festaVote)] },
     { k: "msg", from: VC, to: EXT, parts: [code("Resend"), dot(), txt(c.sendEmail)] },

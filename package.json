@@ -28,7 +28,6 @@
     "bench": "node scripts/janitor/bench-cli.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.100.1",
     "@radix-ui/react-context-menu": "2.2.6",
     "@vercel/speed-insights": "^2.0.0",
     "canvas-confetti": "1.9.4",

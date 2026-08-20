@@ -10,8 +10,15 @@
 // Schema tabella in supabase/donatori.sql:
 //   id, nome, tipo ('donatore'|'sponsor'), importo, messaggio, link, created_at
 //
-// Se non configurate, lavora in modalità "solo locale" (localStorage), così il
-// libro resta funzionante anche senza backend.
+// Se non configurate, la LETTURA lavora in modalità "solo locale"
+// (localStorage), così il libro resta funzionante anche senza backend.
+//
+// La SCRITTURA no: quella passa da /api/sponsor, che inserisce con la
+// service-role e non ha bisogno della anon key. Vale la pena distinguere,
+// perché sono due chiavi diverse in due posti diversi: legarle insieme voleva
+// dire che un ambiente con la sola service-role (il .env di sviluppo, per
+// mesi) mandava le firme in localStorage senza dirlo a nessuno, mentre
+// l'endpoint che avrebbe potuto scriverle stava lì acceso.
 
 export type Tipo = "donatore" | "sponsor";
 
@@ -33,6 +40,7 @@ const LOCAL_KEY = "donatori-local";
 const URL  = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/+$/, "");
 const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
+/** Vero quando le LETTURE pubbliche (lista + realtime) possono partire. */
 export const donazioniConfigured = Boolean(URL && ANON);
 
 const restHeaders = () => ({
@@ -69,20 +77,33 @@ const sanitize = (row: DonatoreRow): DonatoreRow => ({
 export async function submitDonatore(row: DonatoreRow): Promise<DonatoreRow> {
   const clean = sanitize(row);
 
-  if (!donazioniConfigured) {
-    const stored = { ...clean, id: Date.now(), created_at: new Date().toISOString() };
-    writeLocal([stored, ...readLocal()]);
-    return stored;
+  // Scrittura via endpoint blindato (origine + rate-limit, insert con
+  // service-role). Si prova SEMPRE, anche senza anon key: quella serve alle
+  // letture, non a questo.
+  let res: Response | null = null;
+  try {
+    res = await fetch("/api/sponsor", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(clean),
+    });
+  } catch {
+    res = null; // rete assente, o endpoint non montato (sito statico)
   }
 
-  // Scrittura via endpoint blindato (origine + rate-limit, insert con service-role).
-  const res = await fetch("/api/sponsor", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(clean),
-  });
-  if (!res.ok) throw new Error(`submitDonatore ${res.status}: ${await res.text()}`);
-  return (await res.json()) as DonatoreRow;
+  if (res?.ok) return (await res.json()) as DonatoreRow;
+
+  // 503 è l'unico "no" che vuol dire davvero niente backend: lo restituisce
+  // insertDonatore quando al server mancano URL o chiave. Ogni altro rifiuto
+  // (400 dati non validi, 429 rate-limit, 502 DB irraggiungibile) deve
+  // arrivare in faccia a chi ha compilato, non diventare un finto «salvato».
+  if (res && res.status !== 503) {
+    throw new Error(`submitDonatore ${res.status}: ${await res.text()}`);
+  }
+
+  const stored = { ...clean, id: Date.now(), created_at: new Date().toISOString() };
+  writeLocal([stored, ...readLocal()]);
+  return stored;
 }
 
 /** Elenco firme dal più recente (newest-first). */

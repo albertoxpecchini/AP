@@ -1,7 +1,7 @@
 // ─── Contatore confronti "Compare Two Lists" — endpoint hardenizzato ─────────
 //
 // L'incremento NON parte direttamente dal client verso Supabase: passa da qui,
-// con controllo d'origine + rate-limit (come /api/trivia). La lettura è pubblica.
+// con controllo d'origine + rate-limit (come /api/sponsor). La lettura è pubblica.
 //
 // NB: gli helper di sicurezza sono INLINE (non importati da ../lib) di proposito:
 // su Vercel le funzioni girano come ESM e un import relativo senza estensione

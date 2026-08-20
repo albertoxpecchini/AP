@@ -34,7 +34,6 @@ e tema chiaro/scuro nativo.
 [![GSAP](https://img.shields.io/badge/GSAP-3.15_+_ScrollTrigger-88CE02?style=flat-square&logo=greensock&logoColor=white)](https://gsap.com)
 [![PWA](https://img.shields.io/badge/PWA-Workbox-5A0FC8?style=flat-square&logo=pwa&logoColor=white)](https://vite-pwa-org.netlify.app/)
 [![Supabase](https://img.shields.io/badge/Supabase-REST_+_Realtime-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
-[![Anthropic](https://img.shields.io/badge/Claude-Fable_5-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com)
 [![Vercel](https://img.shields.io/badge/Vercel-hosting_+_cron-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com)
 
 🔗 **Live:** [albertopecchini.it](https://albertopecchini.it) · **Repo:** [albertoxpecchini/AP](https://github.com/albertoxpecchini/AP) · **Autore:** [@albertoxpecchini](https://github.com/albertoxpecchini)
@@ -51,12 +50,12 @@ e tema chiaro/scuro nativo.
 | Dominio | Valore | Dettaglio |
 | :--- | :--- | :--- |
 | **Codebase** | **~41,9k LOC** in `src/` | 123 file versionati: 52 `.tsx` (24,3k) · 37 `.ts` (6,1k) · 27 `.css` (11,5k) |
-| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 7 funzioni `api/` + `lib/` (185) · `scripts/` (4,9k, di cui 2,6k il programma di pulizia) |
-| **Dipendenze** | **12 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
+| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 8 funzioni `api/` + `lib/` (185) · `scripts/` (4,9k, di cui 2,6k il programma di pulizia) |
+| **Dipendenze** | **11 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
 | **Pagine** | **14 rotte** | 1 hub + 13 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev · `/shooting` è pubblica ma le sue foto no |
 | **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
-| **Serverless** | **7 funzioni** in `api/` | trivia · notify · festa-rsvp · sponsor · ig-stats · d · cron |
+| **Serverless** | **8 funzioni** in `api/` | notify · festa-rsvp · sponsor · ig-stats · scatti-richiesta · scatti-accesso · d · cron |
 | **Cronologia** | **374 commit** dal 2026-05-24 | 181 `feat` · 88 `fix` · 27 `style` · 15 `chore` · 7 `docs` · 6 `refactor` |
 
 ---
@@ -199,7 +198,7 @@ I redirect `www → sottodominio` sono in [`vercel.json`](vercel.json).
 | `/` | `www` | **Home / hub** | Vetrina «piattaforma»: hero, prodotti, archivio incorporato, stack, pagine, lavori, curriculum, garage 3D, open source, contatti |
 | `/bio` | `bio` | **Bio** | Pagina About: gallery + fatti essenziali |
 | `/cv` | _(solo path)_ | **CV** | Il curriculum come pagina, nelle 4 lingue — e **stampa sé stessa**: nessun PDF da servire |
-| `/trivia` | `trivia` | **Trivia** | Quiz sulla storia dell'architettura — 1003 domande, leaderboard, curiosità AI |
+| `/trivia` | `trivia` | **Trivia** | Quiz sulla storia dell'architettura — 1003 domande, leaderboard, foto pertinenti |
 | `/pcto` | `pcto` | **PCTO** | Alternanza scuola-lavoro (Caem Group) — timeline + racconto |
 | `/me-stesso` | `me-stesso` | **Me stesso** | Presentazione personale (Esame di Stato 2026) |
 | `/dubliners` | `dubliners` | **Dubliners** | Approfondimento «Gente di Dublino» (J. Joyce, 1914) |
@@ -286,10 +285,6 @@ nessun codice da toccare, nessun registro da aggiornare.
   per la domanda in cascata (Wikipedia IT → EN, poi Wikimedia Commons, poi Openverse), con cache in
   `sessionStorage`, prefetch della domanda successiva e ripiego silenzioso su una card grafica: la
   ricerca non può mai far aspettare il gioco.
-- **Arricchimento AI** — l'endpoint serverless [`/api/trivia`](api/trivia.ts) interroga **Claude Fable 5**
-  (`@anthropic-ai/sdk`) per curiosità contestuali; accetta solo richieste dal sito (origin check +
-  rate-limit), così non è usabile come proxy AI gratuito. In dev lo stesso endpoint è servito da un
-  middleware di Vite, con la chiave letta dal `.env`.
 - Punteggio con bonus velocità, serie con trofei, voto finale in stile americano (A–F), pagelle e
   classifica **live** (Supabase Realtime, con fallback `localStorage`).
 
@@ -388,11 +383,12 @@ ricarica la pagina.
 ```
 AP/
 ├── api/                      # 8 funzioni serverless Vercel (Node)
-│   ├── trivia.ts             #   curiosità AI (Claude Fable 5)
 │   ├── notify.ts             #   email dei voti Festa (Resend)
 │   ├── festa-rsvp.ts         #   scrittura RSVP blindata (service role)
 │   ├── sponsor.ts            #   firma libro donatori blindata
 │   ├── ig-stats.ts           #   contatore confronti Instagram
+│   ├── scatti-richiesta.ts   #   modulo /shooting: la richiesta di vedere le foto
+│   ├── scatti-accesso.ts     #   la decisione, e l'album firmato per chi è ammesso
 │   ├── d.ts                  #   link tracciabili: apertura + redirect + autodelete
 │   └── cron-cleanup.ts       #   pulizia giornaliera dei link scaduti (cron)
 ├── content/trivia/           # 40 capitoli .md → fonte unica delle domande Trivia
@@ -502,12 +498,6 @@ sequenceDiagram
     VC-->>BR: albero del repo (generato in build da git)
     BR->>EXT: Supabase · REST + Realtime WS
     EXT-->>BR: classifiche + aggiornamenti live
-    BR->>VC: GET /api/trivia · parola
-    activate VC
-    VC->>EXT: Anthropic Claude (Fable 5)
-    EXT-->>VC: curiosità (testo)
-    VC-->>BR: JSON (cache 24 h)
-    deactivate VC
     BR->>VC: POST /api/notify · voto Festa
     activate VC
     VC->>EXT: Resend · invio email
@@ -521,7 +511,6 @@ sequenceDiagram
 | **GitHub API** (pubblica) | profilo, repo aggregati, linguaggi nel footer | client (cache 60 min) |
 | **jogruber `github-contributions-api`** | grafico contribuzioni reale, senza token | client |
 | **Supabase** (REST + Realtime WS) | classifiche, pagelle, progressi, presenze, libro donatori, link tracciabili (fallback `localStorage`) | client + serverless |
-| **Anthropic Claude** (Fable 5) | curiosità del gioco Trivia | serverless `/api/trivia` |
 | **Resend** | email dei voti Festa + avviso di apertura link tracciabili | serverless `/api/notify`, `/api/d` |
 | **Wikipedia · Wikimedia Commons · Openverse** | foto pertinenti alle domande di Trivia, a licenza libera, senza API key | client (cascata, con cache) |
 | **Open-Meteo** | previsioni e medie stagionali su `/festa` | client |
@@ -542,7 +531,6 @@ sequenceDiagram
 | **i18n** | motore proprietario che traduce il DOM in IT · EN · FR · DE, un pacchetto per lingua |
 | **PWA** | `vite-plugin-pwa` + Workbox (precache offline, auto-update) |
 | **Backend** | Supabase via REST/Realtime · 8 funzioni serverless Vercel + `lib/serverSecurity` |
-| **AI** | `@anthropic-ai/sdk` → Claude Fable 5 (curiosità Trivia) |
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
 | **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `build-cars.mjs` per i modelli 3D · `exifr` + `sharp` in `build-foto-mima.mjs` per l'album MiMa · `scripts/janitor/` per pulizia e benchmark |
 
@@ -604,10 +592,12 @@ npm run build     # bundle di produzione in dist/ (prima il prebuild, vedi tabel
 ```
 
 Le chiavi vivono in un `.env` locale (non versionato, e **non** c'è un `.env.example` nel repo):
-`ANTHROPIC_API_KEY` per le curiosità di Trivia, `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`
-per le letture dal client, `SUPABASE_SERVICE_ROLE_KEY` per gli endpoint blindati e i link
-tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron, `SHOOTING_CODICE` per il modulo di
-/shooting (il codice che si consegna a voce: **senza, il modulo si chiude**, non si apre).
+`VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` per le **letture** dal client (lista donatori,
+presenze, classifiche, realtime), `SUPABASE_SERVICE_ROLE_KEY` per le **scritture** — gli endpoint
+blindati e i link tracciabili — `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron,
+`SHOOTING_CODICE` per il modulo di /shooting (il codice che si consegna a voce: **senza, il modulo
+si chiude**, non si apre). Le due chiavi Supabase sono indipendenti: con la sola service role le
+scritture partono lo stesso, le liste pubbliche restano vuote.
 
 | Comando | Azione |
 | :--- | :--- |
@@ -644,15 +634,15 @@ si sta guardando. Il prezzo era che il secondo `vite` moriva con `EADDRINUSE` e 
 senza dire chi ci fosse dentro. Il colpevole, nove volte su dieci, era un dev server rimasto
 acceso da una sessione F5 di mezz'ora prima.
 
-**I crash.** Sotto `vite dev` questo repo monta otto middleware `/api/*` scritti in casa
+**I crash.** Sotto `vite dev` questo repo monta sette middleware `/api/*` scritti in casa
 (`vite.config.ts`). Un errore non gestito in uno di quelli e il processo se ne va: chi stava
 guardando la pagina vede solo che il sito ha smesso di rispondere, e la spiegazione è in un
 terminale che nel frattempo è finito sotto altre finestre.
 
 **Le chiavi.** I plugin leggono il `.env` una volta sola, all'avvio, e poi tacciono. Senza
-`ANTHROPIC_API_KEY` `/api/trivia` risponde 500, senza `RESEND_API_KEY` le email si stampano in
-console invece di partire: cose normalissime in locale, ma scoprirle dalla pagina costa
-mezz'ora di indagine ogni volta.
+`VITE_SUPABASE_ANON_KEY` le liste pubbliche restano vuote, senza `RESEND_API_KEY` le email si
+stampano in console invece di partire: cose normalissime in locale, ma scoprirle dalla pagina
+costa mezz'ora di indagine ogni volta.
 
 **Cosa fa adesso.** All'avvio guarda chi c'è sulla 5173 e distingue tre casi: un dev server
 nostro rimasto acceso (lo ferma e prende il posto), un Vite che non abbiamo avviato noi (idem,
@@ -673,8 +663,8 @@ secondi, e ha spento un dev server sanissimo proprio mentre trasformava i moduli
 pagina aperta nel browser. Adesso tre connessioni rifiutate di fila valgono un riavvio; una
 risposta lenta vale un'annotazione, e si interviene solo se dura due minuti.
 
-E infine dice, in chiaro, cosa funzionerà: una riga per `/api/trivia`, le scritture Supabase, le
-email, il modulo `/shooting`, le foto degli shooting. Verde = come in produzione, giallo =
+E infine dice, in chiaro, cosa funzionerà: una riga per le scritture Supabase, le letture dal
+client, le email, il modulo `/shooting`, le foto degli shooting. Verde = come in produzione, giallo =
 funziona ma finge, rosso = chiuso. I valori delle chiavi non escono da lì: si guardano solo i
 nomi.
 
