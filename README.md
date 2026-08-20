@@ -410,7 +410,12 @@ AP/
 │   ├── build-foto-mima.mjs   #   foto/mima/ → EXIF (data + GPS) → album e mappa
 │   ├── build-foto-shooting.mjs # foto/shooting/ → EXIF → due manifesti: uno pubblico, uno no
 │   ├── shooting-api-dev.mjs  #   /scatti-privati/… — le foto dei ritratti, solo sotto vite dev
-│   ├── ensure-dev-server.mjs #   il dev server è già acceso? riusalo, non riavviarlo (F5)
+│   ├── dev/                  #   la sala macchine del dev server (vedi più sotto)
+│   │   ├── avvia.mjs         #     supervisore: porta, preparativi, riavvii, log
+│   │   ├── porta.mjs         #     chi occupa la 5173 — e se è Vite, di chi è
+│   │   ├── preparativi.mjs   #     controlli, artefatti rigenerabili, diagnosi delle chiavi
+│   │   ├── stato.mjs         #     .dev/: stato, impronte, log rotante, kill dell'albero
+│   │   └── tinte.mjs         #     colori e righe di diagnosi, uguali per tutti i comandi
 │   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
 │   ├── lib/fbx.mjs           #   lettore FBX binario, per build-cars
 │   ├── janitor/              #   il programma di pulizia + benchmark (vedi più sotto)
@@ -606,7 +611,11 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron, `SHOOTING
 
 | Comando | Azione |
 | :--- | :--- |
-| `npm run dev` | Dev server Vite + middleware `/api/*` e `/cleaning` (porta 5173; `predev` → versione Trivia + pacchetti i18n) |
+| `npm run dev` | Dev server sorvegliato: libera la porta 5173, prepara gli artefatti, tiene Vite in piedi. Ctrl+C spegne tutto (vedi «La sala macchine») |
+| `npm run dev:sfondo` | Lo stesso, ma staccato: restituisce il terminale. È quello che lancia il tasto F5 di VS Code |
+| `npm run dev:stato` | Chi è acceso, su che porta, da quanto — e cosa funziona davvero con le chiavi che ci sono |
+| `npm run dev:ferma` | Spegne il dev server e tutti i suoi figli |
+| `npm run dev:log` | Le ultime righe del server acceso (`-- --segui` per restare in ascolto) |
 | `npm run build` | Build statica in `dist/`. Il `prebuild` fa quattro cose: versione di Trivia, ZIP dei progetti, `repo-tree.json`, pacchetti i18n |
 | `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
@@ -620,6 +629,76 @@ tracciabili, `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron, `SHOOTING
 | `npm run pulizia:applica` | Pulisce, verifica con build + benchmark, annulla da solo se qualcosa peggiora |
 | `npm run bench` | Solo benchmark: build, peso, fotogrammi — confrontati con l'ultima volta |
 | `npm run pulizia:prove` | Le prove di sicurezza del programma di pulizia (pianta file veri e controlla cosa decide) |
+
+---
+
+## 🛠️ La sala macchine — `scripts/dev/`
+
+`npm run dev` non lancia più `vite` e basta. Prima faceva questo, e in locale le cose andavano
+male sempre negli stessi tre modi.
+
+**La porta.** `strictPort: true` è una scelta voluta — il debug di Edge, il benchmark del
+janitor e i link che ci si scambia puntano tutti alla 5173, e un Vite che ripiega da solo sulla
+5174 è peggio di uno che non parte: le pagine si aprono, ma su un server che non è quello che
+si sta guardando. Il prezzo era che il secondo `vite` moriva con `EADDRINUSE` e una riga sola,
+senza dire chi ci fosse dentro. Il colpevole, nove volte su dieci, era un dev server rimasto
+acceso da una sessione F5 di mezz'ora prima.
+
+**I crash.** Sotto `vite dev` questo repo monta otto middleware `/api/*` scritti in casa
+(`vite.config.ts`). Un errore non gestito in uno di quelli e il processo se ne va: chi stava
+guardando la pagina vede solo che il sito ha smesso di rispondere, e la spiegazione è in un
+terminale che nel frattempo è finito sotto altre finestre.
+
+**Le chiavi.** I plugin leggono il `.env` una volta sola, all'avvio, e poi tacciono. Senza
+`ANTHROPIC_API_KEY` `/api/trivia` risponde 500, senza `RESEND_API_KEY` le email si stampano in
+console invece di partire: cose normalissime in locale, ma scoprirle dalla pagina costa
+mezz'ora di indagine ogni volta.
+
+**Cosa fa adesso.** All'avvio guarda chi c'è sulla 5173 e distingue tre casi: un dev server
+nostro rimasto acceso (lo ferma e prende il posto), un Vite che non abbiamo avviato noi (idem,
+dicendolo), o un programma che non c'entra niente — e lì non si spara a niente: si dice chi è,
+con nome e pid, e si offre `--porta auto`. Poi prepara gli artefatti rigenerabili, ma solo
+quelli che servono davvero: i pacchetti i18n si rifanno se `translations.json` si è mosso, la
+versione di Trivia se `HEAD` si è mosso. Il vecchio `predev` li rifaceva entrambi a ogni avvio,
+e siccome `version.json` è un file **versionato**, ogni `npm run dev` sporcava `git status`.
+
+Poi accende Vite e resta a guardarlo. Se muore lo riaccende, con un'attesa che raddoppia a ogni
+tentativo; se muore cinque volte in un minuto smette, perché a quel punto il problema è nel
+codice e riavviare all'infinito non fa che seppellire l'errore vero sotto dieci stack trace
+uguali. Ogni cinque secondi bussa a `/@vite/client`: un processo vivo non è un server che
+risponde — un ciclo infinito in un middleware lascia `node.exe` nella lista dei processi e il
+browser che gira a vuoto. Ma **rifiuto e ritardo non sono la stessa cosa**, e la prima versione
+di questo pezzo li confondeva: contava per morto anche il server che ci metteva più di quattro
+secondi, e ha spento un dev server sanissimo proprio mentre trasformava i moduli della prima
+pagina aperta nel browser. Adesso tre connessioni rifiutate di fila valgono un riavvio; una
+risposta lenta vale un'annotazione, e si interviene solo se dura due minuti.
+
+E infine dice, in chiaro, cosa funzionerà: una riga per `/api/trivia`, le scritture Supabase, le
+email, il modulo `/shooting`, le foto degli shooting. Verde = come in produzione, giallo =
+funziona ma finge, rosso = chiuso. I valori delle chiavi non escono da lì: si guardano solo i
+nomi.
+
+```bash
+npm run dev                      # in primo piano, Ctrl+C spegne tutto
+npm run dev:sfondo               # staccato: restituisce il terminale (lo usa F5)
+npm run dev:stato                # acceso? su che porta? da quanto? con quali chiavi?
+npm run dev:ferma                # spegne il server e tutti i suoi figli
+npm run dev:log -- --segui       # le ultime righe, e resta in ascolto
+npm run dev -- --porta auto      # la prima porta libera dalla 5173 in su
+npm run dev -- --rete --apri     # esponi sulla rete di casa e apri il browser
+```
+
+**Due dettagli che valgono il codice che costano.** Il primo: la sonda bussa sia a `127.0.0.1`
+sia a `[::1]`. Su Windows `localhost` è tutti e due, e un dev server può restare in ascolto solo
+sul secondo — chiedendo al solo IPv4 si riceve un rifiuto, si conclude «porta libera», e poi
+Vite muore con `Port 5173 is already in use` da un processo che nessuno riesce a trovare
+(anche `netstat -ano -p tcp` mostra solo l'IPv4: quel `-p tcp` è la ragione per cui il colpevole
+sembrava invisibile). Il secondo: si ferma sempre l'**albero** dei processi, mai il solo padre.
+Vite lancia esbuild e compagnia; uccidere il capo lasciava in giro figli che tenevano ancora la
+porta, e al giro dopo «Vite non parte» — con la colpa addosso a Vite.
+
+Tutto quello che il supervisore vede finisce anche in `.dev/log/`, un file per avvio, gli ultimi
+cinque, ripulito dai colori. `.dev/` sta fuori dal repository: è roba della singola macchina.
 
 ---
 

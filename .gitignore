@@ -25,6 +25,11 @@ public/repo-tree.json
 # da translations.json (la fonte, quella sì versionata) a ogni build e dev.
 src/app/i18n/generated
 
+
+# Sala macchine del dev server: stato di chi è acceso, impronte dei preparativi
+# e log degli ultimi avvii. Roba della singola macchina, mai del repository.
+.dev/
+
 # Log
 *.log
 npm-debug.log*
