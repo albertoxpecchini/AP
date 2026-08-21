@@ -2293,39 +2293,6 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   padding: 0.12rem 0.5rem;
 }
 
-/* Muro dei commit — fermo. L'onda di calore che lo attraversava tenendo 119
-   celle in animazione all'infinito non c'è più e non torna: da sola bastava a
-   far arrancare lo scroll di tutta la pagina, per un effetto che nessuno
-   guardava. Quello che si muove adesso è la pozza (più sotto), che esiste solo
-   sotto il puntatore. */
-.sb-contrib { margin-top: 0.2rem; }
-.sb-contrib-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; }
-.sb-cell {
-  aspect-ratio: 1;
-  border-radius: 2px;
-  background: var(--sb-surface-200);
-}
-.sb-cell[data-lv="1"] { background: hsla(197, 100%, 49%, 0.3); }
-.sb-cell[data-lv="2"] { background: hsla(197, 100%, 49%, 0.52); }
-.sb-cell[data-lv="3"] { background: hsla(197, 100%, 49%, 0.74); }
-.sb-cell[data-lv="4"] { background: hsla(197, 100%, 49%, 0.95); }
-.sb-contrib-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  margin-top: 0.55rem;
-  font-size: 0.72rem;
-  color: var(--sb-fg-muted);
-}
-.sb-contrib-foot b { color: var(--sb-brand-text); font-weight: 500; font-variant-numeric: tabular-nums; }
-.sb-contrib-legend { display: inline-flex; align-items: center; gap: 2px; }
-.sb-contrib-legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--sb-surface-200); }
-.sb-contrib-legend i[data-lv="1"] { background: hsla(197, 100%, 49%, 0.3); }
-.sb-contrib-legend i[data-lv="2"] { background: hsla(197, 100%, 49%, 0.52); }
-.sb-contrib-legend i[data-lv="3"] { background: hsla(197, 100%, 49%, 0.74); }
-.sb-contrib-legend i[data-lv="4"] { background: hsla(197, 100%, 49%, 0.95); }
-
 /* ── Pozza d'acqua ────────────────────────────────────────────────────────
    La regia sta in site/puddle.ts: qui arrivano tre variabili e basta.
     · --pd-x / --pd-y sul contenitore → dove sta il dito;

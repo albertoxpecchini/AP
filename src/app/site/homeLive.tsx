@@ -614,19 +614,6 @@ export function ContourPlate() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Sezione open source — muro dei commit.
-
-   Da fermo resta fermo: l'onda di calore che lo attraversava in continuazione
-   (119 celle in animazione perenne, un ridisegno a ogni frame anche mentre si
-   scorreva dall'altra parte della pagina) non è tornata e non torna.
-
-   Quello che c'è adesso vive solo sotto il puntatore: data-puddle accende la
-   pozza d'acqua di site/puddle.ts, che esiste finché il cursore è dentro la
-   griglia e si spegne uscendo. Ferma, non costa niente. È il posto dove questa
-   idea era già stata messa alla prova prima di portarla su tutte le card.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════════════════
    IL MURO DEI COMMIT — il numero scritto coi quadratini
 
    Preso dalla sezione "Open source from day one" di supabase.com, che è la
@@ -655,8 +642,18 @@ export function ContourPlate() {
    colonne lo zero e l'otto diventano lo stesso disegno.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** I commit del repository. Un numero solo, letto da due posti. */
-const COMMITS = 1200;
+/** I commit del repository. Il numero NON è scritto qui: sta in commits.json,
+ *  che lo rigenera scripts/build-repo-tree.mjs a ogni build con la storia
+ *  completa sotto mano. Prima era un 1200 messo a mano — il conto vero era 400,
+ *  cioè il sito dichiarava il triplo dei commit che aveva davvero, e nessuno
+ *  poteva accorgersene perché non c'era niente con cui confrontarlo.
+ *
+ *  Il file è generato E versionato, come src/app/trivia/version.json: su Vercel
+ *  il clone è troncato e `git rev-list` conterebbe dieci commit, quindi il
+ *  valore buono dev'essere già nel repo quando la build parte. Vedi la nota
+ *  lunga in build-repo-tree.mjs per le tre fonti e il loro ordine. */
+import commitsData from "./commits.json";
+const COMMITS: number = commitsData.count;
 
 /** 1200 → "1.2K". La stessa forma abbreviata che Supabase usa per le stelle:
  *  sotto il migliaio il numero si scrive per intero, sopra si accorcia. */
@@ -771,41 +768,6 @@ export function CommitWall() {
         />
       ))}
     </svg>
-  );
-}
-
-const WEEKS = 17;
-const DAYS = 7;
-
-export function ContribGraph() {
-  // Intensità pseudo-casuale ma stabile: stesso disegno a ogni render.
-  const level = (i: number) => [0, 1, 1, 2, 0, 3, 2, 1, 4, 0, 2, 3, 1, 0][i % 14];
-
-  return (
-    <div className="sb-contrib" aria-hidden="true">
-      <div className="sb-contrib-grid" data-puddle>
-        {Array.from({ length: WEEKS * DAYS }, (_, i) => (
-          <span key={i} className="sb-cell" data-lv={level(i)} />
-        ))}
-      </div>
-      <div className="sb-contrib-foot">
-        <span>
-          {/* Il valore finale è già nel markup: se il conteggio non parte
-              (movimento ridotto), il numero resta comunque giusto. */}
-          <b data-count-to={COMMITS} data-count-suffix="+" data-no-i18n translate="no">
-            {COMMITS.toLocaleString("it-IT")}+
-          </b>{" "}
-          commits
-        </span>
-        <span className="sb-contrib-legend" data-puddle>
-          <i data-lv="0" />
-          <i data-lv="1" />
-          <i data-lv="2" />
-          <i data-lv="3" />
-          <i data-lv="4" />
-        </span>
-      </div>
-    </div>
   );
 }
 

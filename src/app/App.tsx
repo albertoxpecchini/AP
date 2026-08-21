@@ -62,7 +62,6 @@ import {
   VennSets,
   GlobeOrbit,
   ContourPlate,
-  ContribGraph,
   CommitWall,
   TrustedDot,
 } from "./site/homeLive";
@@ -1394,7 +1393,6 @@ export default function App() {
                     <IcFolder size={15} /> albertoxpecchini/AP
                     <span className="badge">this site</span>
                   </a>
-                  <ContribGraph />
                 </div>
               </div>
 
