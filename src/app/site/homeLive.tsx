@@ -328,6 +328,24 @@ export function TypeSpecimen() {
    Il gesto: il raggio arriva, attraversa, e il ventaglio si apre a rastrello
    (--i sui cinque raggi). Tutto su stroke-dashoffset, quindi un tratto che
    cresce dalla sua origine e basta.
+
+   ── E la riga di comando che si riscrive ────────────────────────────────────
+   Sotto al prisma c'è una pillola con dentro un comando. Viene dalla card
+   Edge Functions di Supabase, dove al centro del globo sta `$ supabase
+   functions deploy` e l'ultima parola, al passaggio del puntatore, si cancella
+   e si riscrive in `serve`. È il modo più breve che conosca per dire "questa
+   cosa la guidi da riga di comando" senza disegnare un terminale.
+
+   Loro lo fanno con typed.js: una libreria che scrive textContent lettera per
+   lettera. Qui non serve, e infatti non c'è — la card AI un terminale a
+   JavaScript ce l'aveva già avuto, ed era stato tolto proprio per quello. Le
+   due parole sono due span, e a scriverle è la LARGHEZZA che cresce a scatti
+   di un carattere (steps(), misure in ch): la stessa resa, zero JavaScript.
+
+   Sì, la larghezza è una proprietà di layout — la sola di tutta la griglia.
+   Costa poco lo stesso per due motivi: con steps() i fotogrammi veri sono
+   dieci in tutto invece di uno per frame, e la pillola è in posizione assoluta,
+   quindi il ricalcolo si ferma dentro di lei e non tocca la card.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** I cinque raggi in uscita: stessa origine sulla faccia destra del prisma. */
@@ -341,27 +359,39 @@ const FAN = [
 
 export function PrismFan() {
   return (
-    <Plate name="prism">
-      {/* Il prisma. La velatura interna è ferma: è il vetro, non un effetto. */}
-      <path className="sb-ill-glass" d="M128,20 L164,100 L92,100 Z" />
-      <path className="sb-ill-edge" d="M128,20 L164,100 L92,100 Z" />
+    <div className="sb-ill-stage">
+      <Plate name="prism">
+        {/* Il prisma. La velatura interna è ferma: è il vetro, non un effetto. */}
+        <path className="sb-ill-glass" d="M128,20 L164,100 L92,100 Z" />
+        <path className="sb-ill-edge" d="M128,20 L164,100 L92,100 Z" />
 
-      {/* Il raggio in arrivo, e il tratto che dentro al vetro piega verso il
-          basso: due segmenti, in fila. */}
-      <path className="sb-ill-beam" d="M14,64 L106,64" pathLength="1" strokeDasharray="1" />
-      <path className="sb-ill-beam sb-ill-beam--in" d="M106,64 L152,78" pathLength="1" strokeDasharray="1" />
+        {/* Il raggio in arrivo, e il tratto che dentro al vetro piega verso il
+            basso: due segmenti, in fila. */}
+        <path className="sb-ill-beam" d="M14,64 L106,64" pathLength="1" strokeDasharray="1" />
+        <path className="sb-ill-beam sb-ill-beam--in" d="M106,64 L152,78" pathLength="1" strokeDasharray="1" />
 
-      {FAN.map((d, i) => (
-        <path
-          key={d}
-          className="sb-ill-ray"
-          d={d}
-          pathLength="1"
-          strokeDasharray="1"
-          style={{ "--i": i } as React.CSSProperties}
-        />
-      ))}
-    </Plate>
+        {FAN.map((d, i) => (
+          <path
+            key={d}
+            className="sb-ill-ray"
+            d={d}
+            pathLength="1"
+            strokeDasharray="1"
+            style={{ "--i": i } as React.CSSProperties}
+          />
+        ))}
+      </Plate>
+
+      {/* Il comando. data-no-i18n perché è un comando, non prosa: il motore
+          i18n non lo tocca, e non deve — "review" tradotto smetterebbe di
+          essere lungo sei caratteri e la larghezza in ch andrebbe a farsi
+          benedire. */}
+      <span className="sb-typebar" aria-hidden="true" data-no-i18n translate="no">
+        <span className="sb-typebar-p">$</span> claude code{" "}
+        <span className="sb-typebar-w sb-typebar-w--a">review</span>
+        <span className="sb-typebar-w sb-typebar-w--b">ship</span>
+      </span>
+    </div>
   );
 }
 

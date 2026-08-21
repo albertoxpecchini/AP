@@ -1251,6 +1251,83 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   94%,100% { stroke-dashoffset: 1; }
 }
 
+/* ── ③ bis · La riga di comando che si riscrive ──────────────────────────────
+   La pillola sotto al prisma, presa dalla card Edge Functions di Supabase: lì
+   sta in mezzo al globo e dice `$ supabase functions deploy`, e al passaggio
+   del puntatore l'ultima parola si cancella e diventa `serve`.
+
+   Loro usano typed.js, che scrive textContent lettera per lettera. Qui le
+   parole sono due span e a scriverle è la LARGHEZZA, che cresce e cala a
+   scatti di un carattere: steps() come curva, misure in ch. Stessa resa, zero
+   JavaScript — e la card AI un terminale a JavaScript ce l'aveva già avuto,
+   tolto proprio per quello.
+
+   È l'unica animazione di layout della griglia, e si può fare per due motivi:
+   con steps() i fotogrammi veri sono dieci in tutto (non uno per frame), e la
+   pillola è in posizione assoluta — il ricalcolo si ferma dentro di lei.
+
+   Il raggio è 6px e non lo smusso a 45° della casa: la regola sta in testa al
+   foglio, nel blocco «Lo smusso». Su una superficie alta 26px un taglio da 10
+   sarebbe più della metà del lato corto, e la pillola smetterebbe di essere
+   una pillola per diventare un rombo. */
+.sb-ill-stage {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+.sb-typebar {
+  position: absolute;
+  left: 50%;
+  top: 76%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  /* inline-block e NON inline-flex: un flex container butta via gli spazi fra
+     i suoi figli, perché li tratta come elementi e non come testo. Con flex la
+     pillola leggeva "$claude codeship" — tre parole incollate, e il gap in ch
+     non le separava perché lo spazio vero era già stato mangiato. Qui dentro
+     c'è una riga di testo con due span dentro: va impaginata come testo. */
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: 6px;
+  background: var(--sb-surface-100);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: var(--sb-fg-lighter);
+}
+.sb-typebar-p { color: var(--sb-brand); }
+/* overflow: hidden è quello che fa il taglio; la larghezza fa il resto.
+   vertical-align: bottom tiene le due parole appoggiate alla stessa riga —
+   un inline-block allineato alla base si sposta di qualche pixel quando il
+   contenuto viene tagliato, e la pillola ballerebbe mentre scrive. */
+.sb-typebar-w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: var(--sb-brand-text);
+  animation-duration: 2.2s;
+  animation-iteration-count: 1;
+  /* both: finita la scrittura la parola RESTA dov'è finita, invece di tornare
+     al valore della regola. Il ritorno lo fa l'uscita dal puntatore, che porta
+     via il nome dell'animazione — e allora sì che si torna qui. */
+  animation-fill-mode: both;
+}
+/* Sei caratteri, sei scatti. La misura è scritta due volte, qui e nel testo del
+   componente: se cambia la parola vanno cambiate tutte e due. */
+.sb-typebar-w--a { width: 6ch; animation-timing-function: steps(6); }
+.sb-typebar-w--b { width: 0;   animation-timing-function: steps(4); }
+@keyframes sb-type-out {
+  0%, 14%   { width: 6ch; }
+  46%, 100% { width: 0; }
+}
+@keyframes sb-type-in {
+  0%, 52%   { width: 0; }
+  84%, 100% { width: 4ch; }
+}
+
+
 /* ── ④ Giochi web — la traiettoria ──────────────────────────────────────────
    La palla si muove su offset-path: il browser la fa scivolare lungo il
    tracciato risolvendolo in una transform, quindi costa quanto uno spostamento
@@ -1486,6 +1563,10 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   .sb-card:focus-visible .sb-ill-beam--in   { animation-name: sb-ill-beam-in; }
   .sb-card:hover .sb-ill-ray,
   .sb-card:focus-visible .sb-ill-ray        { animation-name: sb-ill-ray; }
+  .sb-card:hover .sb-typebar-w--a,
+  .sb-card:focus-visible .sb-typebar-w--a   { animation-name: sb-type-out; }
+  .sb-card:hover .sb-typebar-w--b,
+  .sb-card:focus-visible .sb-typebar-w--b   { animation-name: sb-type-in; }
 
   .sb-card:hover .sb-ill-ball,
   .sb-card:focus-visible .sb-ill-ball       { animation-name: sb-ill-run; }
@@ -1507,7 +1588,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
      resta la tavola finita, che è già il disegno per intero. */
   @media (prefers-reduced-motion: reduce) {
     .sb-card:hover .sb-ill *,
-    .sb-card:focus-visible .sb-ill *        { animation-name: none; }
+    .sb-card:focus-visible .sb-ill *,
+    .sb-card:hover .sb-typebar-w,
+    .sb-card:focus-visible .sb-typebar-w    { animation-name: none; }
   }
 }
 
