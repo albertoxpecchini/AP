@@ -1076,6 +1076,14 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
    spegnere un'animazione (prefers-reduced-motion) lascia l'elemento sui valori
    della regola normale: se quelli fossero il primo fotogramma, chi ha chiesto
    meno movimento vedrebbe sette tavole mezze vuote.
+
+   Da quando il gesto parte solo al passaggio del puntatore, quel fotogramma di
+   riposo non è più soltanto una rete di sicurezza per prefers-reduced-motion:
+   è quello che si vede per la maggior parte del tempo, su ogni card che non
+   stai puntando e su tutti i telefoni. Le regole qui sotto hanno durata, curva
+   e ritardo ma NESSUN animation-name — il nome lo aggiunge l'hover, in fondo
+   al foglio, sotto «Il gesto parte al passaggio». Se aggiungi una figura,
+   scrivila con la stessa regola: valori di arrivo qui, nome là.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sb-ill {
@@ -1135,7 +1143,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   stroke: var(--ill-line);
   stroke-width: 1.5;
   stroke-dashoffset: 0;
-  animation: sb-ill-draw var(--blue, 9s) ease-in-out infinite;
+  animation-duration: var(--blue, 9s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
   animation-delay: calc(var(--i) * 0.16s);
 }
 /* I tre tratti del contenuto (blocco grande, diagonale, due colonne) sono
@@ -1184,7 +1194,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   fill: var(--ill-brand);
   stroke: none;
   opacity: 0.16;
-  animation: sb-ill-ink var(--ink, 7s) ease-in-out infinite;
+  animation-duration: var(--ink, 7s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 @keyframes sb-ill-ink {
   0%, 12%  { opacity: 0; }
@@ -1205,9 +1217,12 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   stroke: var(--ill-brand);
   stroke-width: 2;
   stroke-dashoffset: 0;
-  animation: sb-ill-beam var(--prism, 8s) ease-in-out infinite;
+  animation-duration: var(--prism, 8s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
-.sb-ill-beam--in { animation-name: sb-ill-beam-in; }
+/* Il secondo segmento ha una keyframe sua (parte quando il primo è arrivato):
+   il nome, come per tutti gli altri, glielo dà il blocco «Il gesto» in fondo. */
 .sb-ill-ray {
   stroke: var(--ill-brand);
   stroke-width: 1.5;
@@ -1215,7 +1230,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   /* I cinque raggi non hanno la stessa forza: la luce si divide, non si
      moltiplica. Il centrale è il più pieno, gli esterni sfumano. */
   opacity: calc(0.9 - 0.13 * var(--i));
-  animation: sb-ill-ray var(--prism, 8s) ease-in-out infinite;
+  animation-duration: var(--prism, 8s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
   animation-delay: calc(var(--i) * 0.07s);
 }
 @keyframes sb-ill-beam {
@@ -1263,7 +1280,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
      calcolato come frazione della corsa, e con un'accelerazione qualsiasi la
      palla non sarebbe più dove il conto dice che è. La curva ce l'ha già il
      tracciato. */
-  animation: sb-ill-run var(--run, 5.6s) linear infinite;
+  animation-duration: var(--run, 5.6s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 /* Gli anelli dei contatti: --at è la frazione di corsa in cui la palla arriva
    su quel punto, misurata sulla lunghezza degli archi (un arco alto è più
@@ -1275,7 +1294,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   transform-box: fill-box;
   transform-origin: center;
   opacity: 0;
-  animation: sb-ill-hit var(--run, 5.6s) ease-out infinite;
+  animation-duration: var(--run, 5.6s);
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
   animation-delay: calc(var(--at) * var(--run, 5.6s) * 0.68);
 }
 /* La palla non torna indietro a fine giro: arrivata in fondo si spegne, e il
@@ -1303,12 +1324,16 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   stroke-width: 1.5;
   transform-box: fill-box;
   transform-origin: center;
-  animation: sb-ill-lens var(--venn, 6.4s) ease-in-out infinite;
+  animation-duration: var(--venn, 6.4s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 .sb-ill-seed { fill: var(--ill-line); stroke: none; }
 .sb-ill-seed--in {
   fill: var(--ill-brand);
-  animation: sb-ill-seed var(--venn, 6.4s) ease-in-out infinite;
+  animation-duration: var(--venn, 6.4s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 @keyframes sb-ill-lens {
   0%, 10%  { opacity: 0; transform: scale(0.7); }
@@ -1348,7 +1373,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   offset-path: path("M52,66 A88,28 0 0,1 228,66 A88,28 0 0,1 52,66");
   offset-rotate: 0deg;
   offset-distance: 25%;
-  animation: sb-ill-orbit var(--orbit, 11s) linear infinite;
+  animation-duration: var(--orbit, 11s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 /* Mezzo giro di ritardo, in negativo: l'animazione parte già a metà corsa,
    quindi il secondo satellite è dall'altra parte fin dal primo fotogramma
@@ -1395,7 +1422,9 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   transform-box: fill-box;
   transform-origin: center;
   opacity: 0.85;
-  animation: sb-ill-level var(--topo, 6.8s) ease-in-out infinite;
+  animation-duration: var(--topo, 6.8s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
   animation-delay: calc(var(--i) * 0.22s);
 }
 .sb-ill-vertex { stroke: var(--ill-ink); stroke-width: 1.5; }
@@ -1405,6 +1434,81 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   0%, 100% { opacity: 0.28; }
   30%      { opacity: 1; }
   62%      { opacity: 0.28; }
+}
+
+/* ── IL GESTO PARTE AL PASSAGGIO ─────────────────────────────────────────────
+   Ripreso dalla griglia prodotti di Supabase, che è il modello di questa
+   sezione. Lì dentro, da fermo, non si muove NIENTE: il nastro dello Storage e
+   quello delle Data APIs stanno in `pause` e ripartono con `group-hover:run`,
+   il terminale delle Edge Functions comincia a digitare solo dopo 200 ms di
+   passaggio, i cursori del Realtime sono immobili finché non entri nella card.
+   È quello che fa sembrare quella griglia viva senza renderla fastidiosa: sette
+   figure che si agitano tutte insieme sono un albero di Natale, sette figure
+   ferme di cui una si anima sotto la tua mano sono un meccanismo.
+
+   Qui prima era il contrario: dieci animazioni in ciclo infinito, tutte accese
+   sempre, anche con la sezione fuori schermo e anche su un telefono che non ha
+   un cursore da passare. Adesso il verso è quello di Supabase.
+
+   ── Come, senza rompere il fotogramma di riposo ─────────────────────────────
+   La via ovvia — `animation-play-state: paused`, e `running` sull'hover — qui
+   NON funziona, ed è istruttivo il perché. Un'animazione in pausa applica
+   comunque il suo fotogramma corrente, che al tempo zero è lo 0%; e lo 0% di
+   queste keyframe è il disegno VUOTO (dashoffset a 1, opacity a 0, lente in
+   scala 0.7). Si sarebbero viste sette tavole bianche in attesa di una carezza.
+
+   Quindi le regole base non hanno più un `animation-name`: hanno durata, curva
+   e ritardo, ma nessun nome, e senza nome non animano. L'elemento resta sui
+   valori della sua regola — che in questo foglio sono già, per scelta
+   dichiarata più su, il fotogramma FINITO. Il nome arriva da qui, e solo
+   mentre il puntatore è sulla card. Fuori dall'hover l'animazione non è in
+   pausa: non esiste, e non costa niente al compositore.
+
+   Uscendo a metà corsa il disegno torna di scatto al suo stato finito. È il
+   comportamento giusto: lo stato finito è il disegno completo, non un
+   fotogramma a caso, quindi si legge come una figura che si ricompone.
+
+   `hover: hover` e `pointer: fine` chiudono fuori i telefoni, dove un hover o
+   non c'è o resta appiccicato dopo il tocco: lì restano le sette tavole
+   disegnate, ferme, che è esattamente quello che Supabase serve da mobile
+   (vedi `disableAnimation = isPlaying || isMobile` nel loro FunctionsVisual).
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (hover: hover) and (pointer: fine) {
+  .sb-card:hover .sb-ill-draw,
+  .sb-card:focus-visible .sb-ill-draw       { animation-name: sb-ill-draw; }
+
+  .sb-card:hover .sb-ill-glyph-ink,
+  .sb-card:focus-visible .sb-ill-glyph-ink  { animation-name: sb-ill-ink; }
+
+  .sb-card:hover .sb-ill-beam,
+  .sb-card:focus-visible .sb-ill-beam       { animation-name: sb-ill-beam; }
+  .sb-card:hover .sb-ill-beam--in,
+  .sb-card:focus-visible .sb-ill-beam--in   { animation-name: sb-ill-beam-in; }
+  .sb-card:hover .sb-ill-ray,
+  .sb-card:focus-visible .sb-ill-ray        { animation-name: sb-ill-ray; }
+
+  .sb-card:hover .sb-ill-ball,
+  .sb-card:focus-visible .sb-ill-ball       { animation-name: sb-ill-run; }
+  .sb-card:hover .sb-ill-hit,
+  .sb-card:focus-visible .sb-ill-hit        { animation-name: sb-ill-hit; }
+
+  .sb-card:hover .sb-ill-lens,
+  .sb-card:focus-visible .sb-ill-lens       { animation-name: sb-ill-lens; }
+  .sb-card:hover .sb-ill-seed--in,
+  .sb-card:focus-visible .sb-ill-seed--in   { animation-name: sb-ill-seed; }
+
+  .sb-card:hover .sb-ill-sat,
+  .sb-card:focus-visible .sb-ill-sat        { animation-name: sb-ill-orbit; }
+
+  .sb-card:hover .sb-ill-level,
+  .sb-card:focus-visible .sb-ill-level      { animation-name: sb-ill-level; }
+
+  /* Chi ha chiesto meno movimento non riceve il gesto nemmeno sull'hover: gli
+     resta la tavola finita, che è già il disegno per intero. */
+  @media (prefers-reduced-motion: reduce) {
+    .sb-card:hover .sb-ill *,
+    .sb-card:focus-visible .sb-ill *        { animation-name: none; }
+  }
 }
 
 /* Righe di terminale — le usa il pannello dei clienti (la finestra `ls

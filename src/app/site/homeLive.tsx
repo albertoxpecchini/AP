@@ -23,9 +23,19 @@
 //   ⑥ Siti per clienti  → un globo a filo con due satelliti                 (i satelliti orbitano)
 //   ⑦ Area tecnica CAT  → curve di livello e un punto trigonometrico        (le quote salgono)
 //
-// ── Le regole del movimento, che non sono cambiate ───────────────────────────
+// ── Le regole del movimento ──────────────────────────────────────────────────
 // Una cosa sola in movimento per riquadro, e quella cosa è un GESTO: qualcosa
 // che comincia, finisce e ricomincia — non un oggetto che vibra.
+//
+// E il gesto NON parte da solo: da fermo la griglia è ferma, e ogni figura si
+// anima solo mentre il puntatore è sulla sua card. È la regola della griglia
+// prodotti di Supabase, da cui questa sezione è presa: lì i nastri stanno in
+// `pause` e ripartono con `group-hover:run`, e il terminale delle Edge
+// Functions aspetta 200 ms prima di digitare. Sette figure che si agitano
+// tutte insieme sono un albero di Natale; sette figure ferme di cui una si
+// muove sotto la tua mano sono un meccanismo. Il come sta in home.css, nel
+// blocco «Il gesto parte al passaggio» — e il come non è ovvio, perché mettere
+// in pausa queste animazioni le congelerebbe sul fotogramma VUOTO.
 //
 // Le proprietà animate sono quattro, e sono tutte a buon mercato:
 //   · transform e opacity, che muove il compositore senza ricalcolare niente;
