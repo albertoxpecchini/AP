@@ -245,7 +245,7 @@ const ARCH_TABS = [
     id: "featured",
     label: "Featured",
     Icon: IcStar,
-    urls: ["/trivia", "/instagram", "https://cascinafontana.xyz"],
+    urls: ["/shooting", "https://rivaltasulmincio.it", "https://cascinafontana.xyz"],
   },
   {
     id: "maturita",
@@ -552,16 +552,6 @@ const STORIES: { id: string; kind: string; quote: ReactNode }[] = [
     ),
   },
   {
-    id: "trivia",
-    kind: "Web game",
-    quote: (
-      <>
-        A quiz on the history of architecture designed{" "}
-        <strong>as a real game</strong> — scoring, streaks, trophies and a live leaderboard.
-      </>
-    ),
-  },
-  {
     id: "instagram",
     kind: "Web tool",
     quote: (
@@ -827,14 +817,10 @@ export default function App() {
               </h1>
               <div className="sb-hero-copy">
                 <p>
-                  Surveyor &amp; website developer behind <strong translate="no">Trivia</strong> — a
-                  web game on the history of architecture — and client websites like{" "}
-                  <strong translate="no">Rivalta sul Mincio</strong> and{" "}
-                  <strong translate="no">Cascina Fontana</strong>.
-                </p>
-                <p>
-                  Building elegant, fast web experiences with React, TypeScript and careful
-                  motion design — from a playful quiz game to real-world business sites.
+                  I build client websites —{" "}
+                  <strong translate="no">Rivalta sul Mincio</strong>,{" "}
+                  <strong translate="no">Cascina Fontana</strong> — with React and
+                  TypeScript. And I photograph people.
                 </p>
               </div>
             </div>

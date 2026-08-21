@@ -5192,5 +5192,15 @@
     "it": "dalla tua scheda video.",
     "fr": "par ta carte graphique.",
     "de": "von deiner Grafikkarte."
+  },
+  "I build client websites —": {
+    "it": "Costruisco siti per clienti —",
+    "fr": "Je construis des sites pour des clients —",
+    "de": "Ich baue Websites für Kunden —"
+  },
+  "— with React and TypeScript. And I photograph people.": {
+    "it": "— con React e TypeScript. E fotografo le persone.",
+    "fr": "— avec React et TypeScript. Et je photographie les gens.",
+    "de": "— mit React und TypeScript. Und ich fotografiere Menschen."
   }
 }
