@@ -2048,7 +2048,19 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 
 /* ── Open source ─────────────────────────────────────────────────────────── */
 .sb-open { display: grid; grid-template-columns: 1fr; gap: 2.5rem; align-items: center; }
-@media (min-width: 1024px) { .sb-open { grid-template-columns: 1fr 1fr; gap: 4rem; } }
+/* Da lg in su la sezione è a due colonne, ma il contenuto sta TUTTO nella
+   prima: testo sopra, pannello del profilo sotto. La seconda resta vuota
+   apposta — è il posto del muro dei commit, che è un fondale e un fondale ha
+   bisogno di fondo. È la stessa composizione di Supabase (contenuto a
+   sinistra, griglia a destra a tutta altezza); prima invece il pannello
+   occupava la metà destra, e il muro ci finiva sotto senza vedersi.
+   align-items: start perché adesso la colonna piena è una sola: centrare
+   verticalmente due righe impilate non ha più niente da bilanciare. */
+@media (min-width: 1024px) {
+  .sb-open { grid-template-columns: 1fr 1fr; gap: 2rem 4rem; align-items: start; }
+  .sb-open > :first-child { grid-column: 1; grid-row: 1; }
+  .sb-open > .sb-panel { grid-column: 1; grid-row: 2; }
+}
 .sb-open h2 {
   margin: 0 0 1rem;
   font-size: clamp(1.6rem, 3.4vw, 2.2rem);
@@ -2058,6 +2070,108 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 }
 .sb-open p { margin: 0 0 1rem; font-size: 0.95rem; line-height: 1.65; color: var(--sb-fg-lighter); }
 .sb-open p strong { font-weight: 400; color: var(--sb-fg); }
+/* ── IL MURO DEI COMMIT ──────────────────────────────────────────────────────
+   Il fondale della metà destra: una griglia di quadratini dove quelli accesi
+   scrivono il numero dei commit. Viene dalla sezione "Open source from day
+   one" di supabase.com — stessa sezione, stesso posto — dove a essere scritto
+   è il conteggio delle stelle. Il carattere a pixel e la griglia stanno in
+   site/homeLive.tsx, qui c'è solo come si veste e come si accende.
+
+   Sta SOTTO al pannello del profilo, non accanto: è la lastra di vetro che
+   aveva bisogno di qualcosa da sfocare (vedi la nota in testa al componente).
+   Da qui la scaletta: il muro a z-index 0, tutto il resto della sezione a 1.
+
+   Il prefisso è .sb-cwall e non .sb-wall perché .sb-wall È GIÀ PRESO: è il muro
+   del curriculum, poco più su, quello a colonne da 1 a 4. Un `.sb-wall {
+   display: block }` scritto qui gli spegneva le colonne e gli impilava le
+   schede una sotto l'altra — senza errori, senza avvisi, solo un muro storto
+   due sezioni più in là.
+
+   La maschera radiale è la stessa loro, ed è quello che tiene insieme la cosa:
+   senza, la griglia finirebbe di netto contro il bordo della colonna e si
+   leggerebbe come un riquadro appiccicato lì. Sfumando, diventa un fondale.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sb-open { position: relative; }
+/* Testo e pannello stanno sopra al muro. La riga è generica perché i figli
+   della sezione sono due e nessuno dei due ha un ruolo di sfondo — l'unico che
+   ce l'ha è il muro, che se lo riprende sotto. */
+.sb-open > * { position: relative; z-index: 1; }
+
+.sb-cwall-wrap {
+  z-index: 0;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  /* Sfuma verso il nulla su tutti i lati: la griglia non ha un bordo, ha una
+     fine. -webkit- serve ancora a Safari, che su mask-image non è arrivato. */
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 25%, transparent 75%);
+          mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 25%, transparent 75%);
+}
+/* Da lg in su il muro esce dal flusso e occupa la metà destra, quella che il
+   contenuto ha lasciato libera apposta.
+
+   Tiene la sua proporzione (44 colonne × 25 righe) invece di allungarsi a
+   tutta altezza, e sta al centro. Il motivo è preserveAspectRatio="slice": lo
+   slice riempie il riquadro e taglia quello che avanza, quindi in una colonna
+   alta il doppio di quanto è larga tagliava metà griglia — restavano "2K" e
+   mezzo, con l'1 e il punto fuori dal bordo. Con la proporzione giusta lo
+   slice non ha più niente da tagliare, e il numero si legge intero.
+
+   Il vuoto che resta sopra e sotto non si vede: la maschera radiale spegne la
+   griglia molto prima di arrivarci. */
+@media (min-width: 1024px) {
+  .sb-cwall-wrap {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50%;
+  }
+}
+.sb-cwall { display: block; width: 100%; height: 100%; }
+
+/* I cinque livelli del rumore di fondo. Sono volutamente fiochi: il fondo deve
+   restare fondo, e il salto di luce fra lui e il numero è tutto quello che fa
+   leggere il numero. */
+.sb-cwall-cell { fill: var(--sb-overlay); }
+.sb-cwall-cell[data-lv="1"] { fill: hsla(197, 100%, 49%, 0.07); }
+.sb-cwall-cell[data-lv="2"] { fill: hsla(197, 100%, 49%, 0.1); }
+.sb-cwall-cell[data-lv="3"] { fill: hsla(197, 100%, 49%, 0.13); }
+.sb-cwall-cell[data-lv="4"] { fill: hsla(197, 100%, 49%, 0.16); }
+
+/* Le celle del numero. Anche loro hanno cinque livelli, ma stretti e in alto:
+   il numero non è una macchia di tinta piatta, è fatto di quadratini che si
+   somigliano — come quelli veri di un grafo delle contribuzioni. */
+.sb-cwall-cell--on { fill: hsla(197, 100%, 49%, 0.8); }
+.sb-cwall-cell--on[data-lv="1"] { fill: hsla(197, 100%, 49%, 0.95); }
+.sb-cwall-cell--on[data-lv="2"] { fill: hsl(197, 100%, 49%); }
+.sb-cwall-cell--on[data-lv="3"] { fill: hsla(197, 100%, 49%, 0.85); }
+.sb-cwall-cell--on[data-lv="4"] { fill: hsla(197, 100%, 49%, 0.9); }
+
+/* L'accensione. Una volta sola, all'ingresso in scena: il muro si apre da
+   sinistra a destra e il numero emerge mezzo secondo dopo che il rumore è
+   passato di lì (il ritardo per cella è --d, lo calcola il componente).
+
+   `backwards` è il pezzo che conta: senza, durante il ritardo la cella starebbe
+   già sul valore della regola normale — cioè accesa — e si vedrebbe il muro
+   intero comparire di colpo e poi rianimarsi. Con backwards il ritardo lo passa
+   sul primo fotogramma, invisibile.
+
+   La regola base è lo stato ACCESO, come per i disegni della griglia prodotti
+   più su: chi ha chiesto meno movimento, o chi arriva con l'animazione già
+   spenta, vede il muro finito e non una tavola vuota. */
+.sb-cwall-cell {
+  opacity: 1;
+  animation: sb-cwall-in 0.5s ease both;
+  animation-delay: var(--d, 0s);
+}
+@keyframes sb-cwall-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-cwall-cell { animation: none; }
+}
+
 .sb-ghcard-inner { padding: 1.5rem; gap: 1rem; }
 .sb-ghcard-id { display: flex; align-items: center; gap: 0.9rem; }
 .sb-ghcard-id img {

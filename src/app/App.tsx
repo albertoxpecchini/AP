@@ -63,6 +63,7 @@ import {
   GlobeOrbit,
   ContourPlate,
   ContribGraph,
+  CommitWall,
   TrustedDot,
 } from "./site/homeLive";
 import { EMAIL } from "./site/data";
@@ -1396,6 +1397,19 @@ export default function App() {
                   <ContribGraph />
                 </div>
               </div>
+
+              {/* Il muro dei commit: fondale della metà destra, sotto al
+                  pannello. Va per ULTIMO fra i figli di .sb-open — da lg in su
+                  esce dal flusso e l'ordine non conta, sotto resta una colonna
+                  sola e finisce in fondo, che è dove Supabase lo mette da
+                  mobile. Montato all'ingresso in scena e non prima: sono 1.100
+                  rect, e l'accensione a cascata deve partire quando la sezione
+                  si vede, non mentre è ancora due schermate più giù. Margine 0
+                  perché qui non c'è niente da precaricare — a differenza del
+                  garage 3D, che è il caso per cui WhenVisible era nato. */}
+              <WhenVisible className="sb-cwall-wrap" rootMargin="0px">
+                <CommitWall />
+              </WhenVisible>
             </div>
           </div>
         </section>

@@ -596,6 +596,154 @@ export function ContourPlate() {
    idea era già stata messa alla prova prima di portarla su tutte le card.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   IL MURO DEI COMMIT — il numero scritto coi quadratini
+
+   Preso dalla sezione "Open source from day one" di supabase.com, che è la
+   stessa sezione di questa pagina. Lì il fondale della metà destra è un finto
+   grafo delle contribuzioni dove le celle accese compongono il conteggio delle
+   stelle del repo (108.2K). È l'unico pezzo grosso della loro home che è tutto
+   codice, senza un solo SVG disegnato a mano: il numero non è un'immagine, è
+   una maschera di pixel accesi dentro una griglia di rumore.
+
+   Qui il numero è quello che il sito conta già: i commit di questo repository.
+   Vive in COMMITS, una volta sola — lo leggono sia il muro sia la riga sotto
+   al grafico del profilo, che prima si portava lo stesso 1200 scritto a mano
+   in due posti diversi.
+
+   ── Perché sta DIETRO alla lastra, non accanto ──────────────────────────────
+   Il muro passa sotto al pannello del profilo GitHub. La regola sta scritta in
+   testa a site/GlassMotion.tsx: una lastra semitrasparente si legge come
+   lastra solo se dietro c'è qualcosa che cambia, perché sfocare una tinta
+   piatta dà lo stesso risultato che non sfocare niente. Fin qui, dietro quel
+   pannello, c'era il fondo della pagina e basta. Adesso c'è una griglia, e il
+   vetro ha finalmente qualcosa da sfocare.
+
+   ── Il carattere ────────────────────────────────────────────────────────────
+   Cinque colonne per sette righe a glifo, un pixel di spazio fra uno e
+   l'altro: la misura minima in cui una cifra resta una cifra — sotto le cinque
+   colonne lo zero e l'otto diventano lo stesso disegno.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** I commit del repository. Un numero solo, letto da due posti. */
+const COMMITS = 1200;
+
+/** 1200 → "1.2K". La stessa forma abbreviata che Supabase usa per le stelle:
+ *  sotto il migliaio il numero si scrive per intero, sopra si accorcia. */
+function kFormat(n: number): string {
+  return n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + "K" : String(n);
+}
+
+/** Il carattere a pixel: 5 colonne × 7 righe per glifo, "1" = acceso. */
+const GLYPHS: Record<string, string[]> = {
+  "0": ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
+  "1": ["00100", "01100", "00100", "00100", "00100", "00100", "01110"],
+  "2": ["01110", "10001", "00001", "00110", "01000", "10000", "11111"],
+  "3": ["01110", "10001", "00001", "00110", "00001", "10001", "01110"],
+  "4": ["00010", "00110", "01010", "10010", "11111", "00010", "00010"],
+  "5": ["11111", "10000", "11110", "00001", "00001", "10001", "01110"],
+  "6": ["01110", "10001", "10000", "11110", "10001", "10001", "01110"],
+  "7": ["11111", "00001", "00010", "00100", "01000", "01000", "01000"],
+  "8": ["01110", "10001", "10001", "01110", "10001", "10001", "01110"],
+  "9": ["01110", "10001", "10001", "01111", "00001", "10001", "01110"],
+  ".": ["00000", "00000", "00000", "00000", "00000", "00000", "00100"],
+  K: ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+};
+
+/** Le celle accese del testo, in coordinate del testo (0,0 = il suo angolo
+ *  alto a sinistra). Un Set di "x,y": la griglia poi chiede a lui, cella per
+ *  cella, se le tocca far parte del numero. */
+function pixelMask(text: string): Set<string> {
+  const mask = new Set<string>();
+  let x = 0;
+  for (const ch of text) {
+    const g = GLYPHS[ch];
+    if (g) {
+      for (let r = 0; r < g.length; r++) {
+        for (let c = 0; c < g[r].length; c++) {
+          if (g[r][c] === "1") mask.add(x + c + "," + r);
+        }
+      }
+    }
+    x += 6; // 5 di glifo + 1 di spazio
+  }
+  return mask;
+}
+
+/* ── La griglia ──────────────────────────────────────────────────────────────
+   Misure in unità di viewBox: cella 3, spazio 0,5. Le colonne sono meno di
+   quelle di Supabase (44 contro 72) perché il numero è più corto — "1.2K" sono
+   quattro glifi contro sei — e la proporzione fra testo e fondo va tenuta, o
+   il numero galleggia in mezzo al rumore invece di riempirlo. */
+const CELL = 3;
+const GAP = 0.5;
+const COLS = 44;
+const ROWS = 25;
+
+const WALL_TEXT = kFormat(COMMITS);
+const WALL_MASK = pixelMask(WALL_TEXT);
+const TEXT_X = Math.floor((COLS - (WALL_TEXT.length * 6 - 1)) / 2);
+const TEXT_Y = Math.floor((ROWS - 7) / 2);
+
+/** Rumore di fondo ripetibile: xorshift con seme fisso, così il muro è lo
+ *  stesso disegno a ogni render e a ogni ricarica. Un fondale che cambia da
+ *  solo a ogni visita è un fondale che si fa notare. */
+function makeWall() {
+  let seed = 0x9e3779b9;
+  const rand = () => {
+    seed ^= seed << 13;
+    seed ^= seed >>> 17;
+    seed ^= seed << 5;
+    return (seed >>> 0) / 0xffffffff;
+  };
+  const cells: { c: number; r: number; lv: number; on: boolean }[] = [];
+  for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < ROWS; r++) {
+      const v = rand();
+      cells.push({
+        c,
+        r,
+        lv: v < 0.45 ? 0 : v < 0.65 ? 1 : v < 0.8 ? 2 : v < 0.92 ? 3 : 4,
+        on: WALL_MASK.has(c - TEXT_X + "," + (r - TEXT_Y)),
+      });
+    }
+  }
+  return cells;
+}
+
+const WALL = makeWall();
+const WALL_W = COLS * (CELL + GAP) - GAP;
+const WALL_H = ROWS * (CELL + GAP) - GAP;
+
+export function CommitWall() {
+  return (
+    <svg
+      className="sb-cwall"
+      viewBox={"0 0 " + WALL_W + " " + WALL_H}
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      {WALL.map(({ c, r, lv, on }) => (
+        <rect
+          key={c + "-" + r}
+          className={on ? "sb-cwall-cell sb-cwall-cell--on" : "sb-cwall-cell"}
+          x={c * (CELL + GAP)}
+          y={r * (CELL + GAP)}
+          width={CELL}
+          height={CELL}
+          rx={1}
+          data-lv={lv}
+          /* Il ritardo dell'accensione: il fondo si apre da sinistra a destra,
+             il numero arriva dopo che il fondo è passato di lì. Due tempi e non
+             uno — accendendoli insieme il numero nascerebbe già dentro il
+             rumore, invece di emergerne. */
+          style={{ "--d": (on ? 0.3 : 0) + c * 0.02 + r * 0.01 + "s" } as React.CSSProperties}
+        />
+      ))}
+    </svg>
+  );
+}
+
 const WEEKS = 17;
 const DAYS = 7;
 
@@ -614,8 +762,8 @@ export function ContribGraph() {
         <span>
           {/* Il valore finale è già nel markup: se il conteggio non parte
               (movimento ridotto), il numero resta comunque giusto. */}
-          <b data-count-to="1200" data-count-suffix="+" data-no-i18n translate="no">
-            1.200+
+          <b data-count-to={COMMITS} data-count-suffix="+" data-no-i18n translate="no">
+            {COMMITS.toLocaleString("it-IT")}+
           </b>{" "}
           commits
         </span>
