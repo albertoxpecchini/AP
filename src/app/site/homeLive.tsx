@@ -274,47 +274,6 @@ export function BlueprintPage() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ② Card "Web design" — il saggio tipografico
-
-   Le due lettere in contorno sulla griglia del disegnatore di caratteri: linea
-   di base, altezza della x, altezza delle maiuscole. È l'immagine che un
-   tipografo ha davanti tutto il giorno, ed è anche la risposta più onesta a
-   "cosa vuol dire progettare un'interfaccia": decidere dove passano le righe.
-
-   Il gesto: si inchiostra. Il contorno resta sempre, e sotto compare il pieno
-   — la stessa lettera, ripetuta e riempita, che sfuma dentro e fuori. Una sola
-   proprietà (opacity) per una cosa che sembra un cambio di materia.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-export function TypeSpecimen() {
-  return (
-    <Plate name="type">
-      {/* La griglia: tre rette e le loro etichette. Tratteggiata, perché una
-          guida che si confonde col disegno smette di essere una guida. */}
-      <g className="sb-ill-guide">
-        <path d="M18,34 L262,34" />
-        <path d="M18,57 L262,57" />
-        <path d="M18,112 L262,112" />
-      </g>
-      <g className="sb-ill-tick" data-no-i18n>
-        <text x="18" y="30">cap</text>
-        <text x="18" y="53">x</text>
-        <text x="18" y="124">base</text>
-      </g>
-      {/* Le lettere. Due nodi sovrapposti: il contorno sempre acceso, il pieno
-          che va e viene. Stesso testo, stessa posizione — il disegno non si
-          muove di un pixel, cambia solo di che pasta è fatto. */}
-      <text className="sb-ill-glyph-ink" x="140" y="112" data-no-i18n translate="no">
-        Aa
-      </text>
-      <text className="sb-ill-glyph" x="140" y="112" data-no-i18n translate="no">
-        Aa
-      </text>
-    </Plate>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    ③ Card "AI-assisted development" — il prisma
 
    Un raggio entra, dentro il vetro piega, ed esce aperto in cinque. È esatta-
@@ -396,115 +355,6 @@ export function PrismFan() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ④ Card "Web games" — la traiettoria
-
-   Tre rimbalzi che si abbassano, disegnati come li disegnerebbe un manuale di
-   fisica: la linea del terreno, la curva, e i punti di contatto. Un gioco non
-   è un tabellone di punti — è una cosa che si muove come ci si aspetta e poi
-   un pochino di più.
-
-   Prima qui c'era un punteggio che saliva: l'unico visual della griglia con
-   del JavaScript, una timeline in ciclo infinito che scriveva testo a ogni
-   frame per far girare tre cifre. Quello che raccontava — "i giochi hanno un
-   punteggio" — lo dice già la card a parole.
-
-   Il gesto: la palla corre. Si muove su offset-path, cioè il browser la fa
-   scivolare lungo il tracciato risolvendolo in una transform; ai contatti,
-   sotto, si apre un anello. Gli anelli sono quattro perché i contatti sono
-   quattro, e partono ai millesimi in cui la palla ci arriva davvero (le
-   frazioni sono misurate sulla lunghezza degli archi, non sulla x — un arco
-   alto è più lungo di uno basso a parità di distanza percorsa).
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/** Il tracciato, condiviso da tre posti: la linea disegnata, l'offset-path
- *  della palla (in home.css) e la posizione degli anelli. */
-const RUN_PATH = "M14,112 Q54,16 94,112 Q127,44 160,112 Q186,70 212,112 Q233,90 254,112";
-
-/** I contatti col terreno, con la frazione di corsa in cui la palla ci arriva.
- *  Le frazioni sono misurate sulla LUNGHEZZA degli archi, non sulla x: il
- *  primo salto è alto il quadruplo dell'ultimo, quindi a parità di distanza
- *  percorsa la palla ci mette molto di più. */
-const HITS: [number, number][] = [
-  [94, 0.37],
-  [160, 0.65],
-  [212, 0.86],
-  [254, 1],
-];
-
-export function BounceRun() {
-  return (
-    <Plate name="run">
-      <path className="sb-ill-ground" d="M8,112 L272,112" />
-      {/* Il tracciato resta acceso: è la traccia del salto, e una traiettoria
-          senza traccia è solo un pallino che si sposta. */}
-      <path className="sb-ill-arc" d={RUN_PATH} />
-
-      {HITS.map(([cx, at]) => (
-        <circle
-          key={cx}
-          className="sb-ill-hit"
-          cx={cx}
-          cy={112}
-          r={8}
-          style={{ "--at": at } as React.CSSProperties}
-        />
-      ))}
-
-      {/* Il traguardo, dove la palla si ferma. Fermo anche lui. */}
-      <path className="sb-ill-flag" d="M256,112 L256,72 L276,80 L256,88" />
-
-      <circle className="sb-ill-ball" cx={0} cy={0} r={7} />
-    </Plate>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ⑤ Card "Web tools" — due insiemi
-
-   Il diagramma di Venn, disegnato come si deve: due cerchi, i puntini dentro,
-   e la lente in mezzo. È letteralmente quello che fa lo strumento della card —
-   prendere due elenchi e tenere quello che sta in mezzo — ed è anche l'icona
-   che quella card ha già in testa (IcVenn), quindi la figura e il titolo si
-   dicono la stessa cosa.
-
-   Il gesto: l'intersezione si accende. La lente compare crescendo dal centro e
-   i puntini che le stanno dentro si illuminano insieme a lei; gli altri
-   restano dove sono. Nessun cerchio scivola: le due lenti dovrebbero
-   ridisegnarsi a ogni frame, e la forma dell'intersezione è un dato del
-   disegno, non un'animazione.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/** I due archi che formano la lente. I punti (140, 26.7) e (140, 105.3) sono
- *  le intersezioni vere di due cerchi di raggio 52 a distanza 68. */
-const LENS = "M140,26.7 A52,52 0 0,1 140,105.3 A52,52 0 0,1 140,26.7";
-
-/** Puntini: [x, y, dentro la lente?] */
-const DOTS: [number, number, boolean][] = [
-  [82, 44, false], [66, 68, false], [88, 92, false], [104, 34, false], [76, 56, false],
-  [198, 46, false], [212, 70, false], [196, 94, false], [176, 36, false],
-  [134, 50, true], [146, 68, true], [136, 88, true], [147, 40, true],
-];
-
-export function VennSets() {
-  return (
-    <Plate name="venn">
-      <circle className="sb-ill-set" cx={106} cy={66} r={52} />
-      <circle className="sb-ill-set" cx={174} cy={66} r={52} />
-      <path className="sb-ill-lens" d={LENS} />
-      {DOTS.map(([cx, cy, inside]) => (
-        <circle
-          key={`${cx}-${cy}`}
-          className={inside ? "sb-ill-seed sb-ill-seed--in" : "sb-ill-seed"}
-          cx={cx}
-          cy={cy}
-          r={inside ? 3.2 : 2.6}
-        />
-      ))}
-    </Plate>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    ⑥ Card "Client websites" — il globo
 
    Un globo a filo (meridiani e paralleli) con due satelliti che gli girano
@@ -539,6 +389,91 @@ export function GlobeOrbit() {
         <circle className="sb-ill-sat" r={5} />
         <circle className="sb-ill-sat sb-ill-sat--b" r={5} />
       </g>
+    </Plate>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ④ Card "Fotografia" — il diaframma
+
+   La figura che sta dentro ogni obiettivo: il barilotto, le tacche dei
+   diaframmi intorno, e l'apertura esagonale in mezzo. È il disegno che un
+   manuale di fotografia mette a pagina due, ed è anche l'unica cosa di questo
+   mestiere che si può mostrare senza mostrare le facce di nessuno — che è poi
+   la regola della pagina /shooting.
+
+   Il gesto: si chiude il diaframma. L'esagono scala verso il centro e torna.
+   Una sola transform, con transform-box: fill-box perché l'origine dev'essere
+   il centro della FIGURA e non quello della tavola.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Le sei tacche dei diaframmi, fra il raggio 36 e il 46, ogni 60°. */
+const STOPS = [
+  "M176,66 L186,66",
+  "M158,97.2 L163,105.8",
+  "M122,97.2 L117,105.8",
+  "M104,66 L94,66",
+  "M122,34.8 L117,26.2",
+  "M158,34.8 L163,26.2",
+];
+
+export function IrisPlate() {
+  return (
+    <Plate name="iris">
+      {/* Il barilotto: due cerchi, uno dentro l'altro. */}
+      <circle className="sb-ill-barrel" cx={140} cy={66} r={46} />
+      <circle className="sb-ill-barrel" cx={140} cy={66} r={36} />
+      {STOPS.map((d) => (
+        <path key={d} className="sb-ill-stop" d={d} />
+      ))}
+      {/* L'apertura. Il pieno velato sta sotto al contorno: è luce che passa,
+          non una campitura. */}
+      <path className="sb-ill-iris-fill" d="M166,66 L153,88.5 L127,88.5 L114,66 L127,43.5 L153,43.5 Z" />
+      <path className="sb-ill-iris" d="M166,66 L153,88.5 L127,88.5 L114,66 L127,43.5 L153,43.5 Z" />
+    </Plate>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑥ Card "Auto" — il quadrante
+
+   Un contagiri: l'arco, le tacche, la lancetta. Non una macchina disegnata —
+   una macchina disegnata a tratto diventa un logo, e i loghi in questa griglia
+   non ce ne sono. Il quadrante invece è uno strumento, come le curve di
+   livello della card accanto e il diaframma di quella sopra: tre figure che
+   misurano qualcosa.
+
+   Il gesto: la lancetta sale. Da ferma sta in alto — cioè a fondo scala, il
+   fotogramma finito — e al passaggio riparte dal minimo e ci risale.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Le nove tacche del quadrante, dal minimo al massimo: fra 60 e 50 di raggio,
+ *  ogni 22,5° sul mezzo giro alto. Le tre finali sono la zona rossa. */
+const DIAL = [
+  "M80,96 L90,96",
+  "M84.6,73.0 L93.8,77.3",
+  "M97.6,53.6 L105.1,60.2",
+  "M117.0,40.6 L121.9,49.3",
+  "M140,36 L140,46",
+  "M163.0,40.6 L158.1,49.3",
+  "M182.4,53.6 L174.9,60.2",
+  "M195.4,73.0 L186.2,77.3",
+  "M200,96 L190,96",
+];
+
+export function GaugePlate() {
+  return (
+    <Plate name="gauge">
+      <path className="sb-ill-dial" d="M80,96 A60,60 0 0,1 200,96" />
+      {DIAL.map((d, i) => (
+        <path key={d} className={i >= 6 ? "sb-ill-tickmark sb-ill-tickmark--red" : "sb-ill-tickmark"} d={d} />
+      ))}
+      {/* La lancetta è disegnata dritta in su e ruota: così la geometria non sa
+          niente dell'angolo, e l'angolo è l'unica cosa che si anima. */}
+      <g className="sb-ill-needle">
+        <path d="M140,96 L140,52" />
+      </g>
+      <circle className="sb-ill-hub" cx={140} cy={96} r={4.5} />
     </Plate>
   );
 }

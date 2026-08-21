@@ -5097,5 +5097,100 @@
     "it": "Registrazione dello schermo: una scorsa al sito rivaltasulmincio.it",
     "fr": "Capture d'écran vidéo : un défilement du site rivaltasulmincio.it",
     "de": "Bildschirmaufnahme: ein Scrollen durch die Website rivaltasulmincio.it"
+  },
+  "Websites": {
+    "it": "Siti web",
+    "fr": "Sites web",
+    "de": "Websites"
+  },
+  "Designed, written and shipped": {
+    "it": "Progettati, scritti e pubblicati",
+    "fr": "Conçus, écrits et publiés",
+    "de": "Entworfen, geschrieben und veröffentlicht"
+  },
+  "end to end": {
+    "it": "da cima a fondo",
+    "fr": "de bout en bout",
+    "de": "von Anfang bis Ende"
+  },
+  "— React and TypeScript, no page builders.": {
+    "it": "— React e TypeScript, nessun page builder.",
+    "fr": "— React et TypeScript, sans page builder.",
+    "de": "— React und TypeScript, kein Baukasten."
+  },
+  "Light and dark, both drawn": {
+    "it": "Chiaro e scuro, disegnati entrambi",
+    "fr": "Clair et sombre, tous deux dessinés",
+    "de": "Hell und dunkel, beide gezeichnet"
+  },
+  "Source downloadable": {
+    "it": "Sorgente scaricabile",
+    "fr": "Source téléchargeable",
+    "de": "Quellcode herunterladbar"
+  },
+  "Two real businesses online,": {
+    "it": "Due attività vere online,",
+    "fr": "Deux entreprises réelles en ligne,",
+    "de": "Zwei echte Betriebe online,"
+  },
+  "Claude Code, Codex, Copilot —": {
+    "it": "Claude Code, Codex, Copilot —",
+    "fr": "Claude Code, Codex, Copilot —",
+    "de": "Claude Code, Codex, Copilot —"
+  },
+  "every line reviewed": {
+    "it": "ogni riga revisionata",
+    "fr": "chaque ligne relue",
+    "de": "jede Zeile geprüft"
+  },
+  "Portraits, as an amateur.": {
+    "it": "Ritratti, da amatore.",
+    "fr": "Des portraits, en amateur.",
+    "de": "Porträts, als Amateur."
+  },
+  "The frames stay private": {
+    "it": "Gli scatti restano privati",
+    "fr": "Les photos restent privées",
+    "de": "Die Aufnahmen bleiben privat"
+  },
+  "— only the numbers are public.": {
+    "it": "— pubblici sono solo i numeri.",
+    "fr": "— seuls les chiffres sont publics.",
+    "de": "— öffentlich sind nur die Zahlen."
+  },
+  "Surveying · university": {
+    "it": "Geometra · università",
+    "fr": "Géomètre · université",
+    "de": "Vermessung · Universität"
+  },
+  "Construction and Land Management, after the": {
+    "it": "Costruzioni e Gestione del Territorio, dopo il",
+    "fr": "Construction et gestion du territoire, après le",
+    "de": "Bauwesen und Landmanagement, nach dem"
+  },
+  "— AutoCAD, topography, valuation.": {
+    "it": "— AutoCAD, topografia, estimo.",
+    "fr": "— AutoCAD, topographie, estimation.",
+    "de": "— AutoCAD, Topografie, Wertermittlung."
+  },
+  "Cars": {
+    "it": "Auto",
+    "fr": "Voitures",
+    "de": "Autos"
+  },
+  "Three I dream about,": {
+    "it": "Tre che sogno,",
+    "fr": "Trois dont je rêve,",
+    "de": "Drei, von denen ich träume,"
+  },
+  "drawn live in 3D": {
+    "it": "disegnate dal vivo in 3D",
+    "fr": "dessinées en direct en 3D",
+    "de": "live in 3D gezeichnet"
+  },
+  "by your graphics card.": {
+    "it": "dalla tua scheda video.",
+    "fr": "par ta carte graphique.",
+    "de": "von deiner Grafikkarte."
   }
 }

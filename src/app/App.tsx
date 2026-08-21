@@ -46,6 +46,9 @@ import {
   IcPin,
   IcCamera,
   IcAperture,
+  IcCamera,
+  IcRuler,
+  IcCar,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
 import { useNavPill } from "./site/GlassMotion";
@@ -56,11 +59,10 @@ import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import {
   NowBuilding,
   BlueprintPage,
-  TypeSpecimen,
   PrismFan,
-  BounceRun,
-  VennSets,
   GlobeOrbit,
+  IrisPlate,
+  GaugePlate,
   ContourPlate,
   CommitWall,
   TrustedDot,
@@ -849,21 +851,33 @@ export default function App() {
             per l'interruttore che la spegne. */}
         <FreshWork />
 
-        {/* ② Griglia prodotti — cosa faccio, card per card */}
+        {/* ② Griglia — sei card, sei tinte, una riga di testo l'una.
+
+            Erano sette e parlavano tutte lo stesso azzurro, con due o tre frasi
+            a testa: da lontano si leggevano come un blocco solo. Adesso ogni
+            card porta il suo accento in --sb-accent, e da lì scende su tutto —
+            icona, disegno, spunte, alone. Le tinte stanno in home.css, blocco
+            «La tavolozza».
+
+            Cosa è uscito e perché: "Web design" (era lo stesso mestiere della
+            prima card, detto due volte), "Web games" e "Web tools" (Trivia e
+            l'utility di Instagram, che non sono più il lavoro di adesso). Cosa
+            è entrato: le fotografie, i due clienti veri con il loro nome, e le
+            auto — che stavano già in pagina ma seicento pixel più in basso. */}
         <section id="progetti" className="sb-container sb-products" aria-label="What I do">
-          {/* Card grande: sviluppo web */}
-          <Link to="/archivio" className="sb-card sb-card--lg">
+          {/* Siti web — la card grande */}
+          <Link to="/archivio" className="sb-card sb-card--lg" data-acc="blu">
             <ProductCard>
               <div className="sb-card-head">
-                <div className="sb-card-title"><IcCode /><h3>Web development</h3></div>
+                <div className="sb-card-title"><IcCode /><h3>Websites</h3></div>
                 <p className="sb-card-desc">
-                  Every project is <strong>a complete hand-built website</strong> — designed,
-                  coded and shipped end to end with React and TypeScript.
+                  Designed, written and shipped <strong>end to end</strong> — React and
+                  TypeScript, no page builders.
                 </p>
                 <ul className="sb-checks">
                   <li><IcCheck size={15} /> 100% responsive</li>
-                  <li><IcCheck size={15} /> Careful motion design</li>
-                  <li><IcCheck size={15} /> Easy to extend</li>
+                  <li><IcCheck size={15} /> Light and dark, both drawn</li>
+                  <li><IcCheck size={15} /> Source downloadable</li>
                 </ul>
               </div>
               <div className="sb-card-visual">
@@ -872,83 +886,13 @@ export default function App() {
             </ProductCard>
           </Link>
 
-          {/* Web design */}
-          <Link to="/me-stesso" className="sb-card">
+          {/* I due clienti veri, con il loro nome */}
+          <a href="#lavori" className="sb-card" data-acc="verde">
             <ProductCard>
               <div className="sb-card-head">
-                <div className="sb-card-title"><IcPen /><h3>Web design</h3></div>
+                <div className="sb-card-title"><IcGlobe /><h3>Rivalta · Cascina Fontana</h3></div>
                 <p className="sb-card-desc">
-                  Interfaces with <strong>careful typography, spacing and motion</strong> —
-                  designed twice, in light and in dark.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <TypeSpecimen />
-              </div>
-            </ProductCard>
-          </Link>
-
-          {/* Sviluppo assistito dall'AI */}
-          <a
-            href="https://github.com/albertoxpecchini"
-            target="_blank"
-            rel="noreferrer noopener"
-            className="sb-card"
-          >
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcSparkle /><h3>AI-assisted development</h3></div>
-                <p className="sb-card-desc">
-                  <strong>Ship faster with AI in the loop</strong> — Claude Code, Codex and
-                  Copilot, every line reviewed.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <PrismFan />
-              </div>
-            </ProductCard>
-          </a>
-
-          {/* Giochi web */}
-          <Link to="/trivia" className="sb-card">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcGame /><h3>Web games</h3></div>
-                <p className="sb-card-desc">
-                  Build <strong>playful experiences</strong> — scores, streaks, speed bonuses
-                  and a live leaderboard.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <BounceRun />
-              </div>
-            </ProductCard>
-          </Link>
-
-          {/* Strumenti web */}
-          <Link to="/instagram" className="sb-card">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcVenn /><h3>Web tools</h3></div>
-                <p className="sb-card-desc">
-                  Privacy-first utilities that <strong>run entirely in your browser</strong> —
-                  nothing uploaded, nothing stored.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <VennSets />
-              </div>
-            </ProductCard>
-          </Link>
-
-          {/* Siti per clienti */}
-          <a href="#lavori" className="sb-card">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcGlobe /><h3>Client websites</h3></div>
-                <p className="sb-card-desc">
-                  Real sites for real businesses, <strong>from brief to launch</strong> —
-                  content included.
+                  Two real businesses online, <strong>from brief to launch</strong>.
                 </p>
               </div>
               <div className="sb-card-visual">
@@ -957,14 +901,51 @@ export default function App() {
             </ProductCard>
           </a>
 
-          {/* Area tecnica CAT */}
-          <Link to="/pcto" className="sb-card">
+          {/* Sviluppo assistito dall'AI */}
+          <a
+            href="https://github.com/albertoxpecchini"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="sb-card"
+            data-acc="viola"
+          >
             <ProductCard>
               <div className="sb-card-head">
-                <div className="sb-card-title"><IcCompass /><h3>CAT · Technical area</h3></div>
+                <div className="sb-card-title"><IcSparkle /><h3>AI-assisted development</h3></div>
                 <p className="sb-card-desc">
-                  From <strong>technical drawing to topography</strong> — AutoCAD, cadwork,
-                  valuation and surveying.
+                  Claude Code, Codex, Copilot — <strong>every line reviewed</strong>.
+                </p>
+              </div>
+              <div className="sb-card-visual">
+                <PrismFan />
+              </div>
+            </ProductCard>
+          </a>
+
+          {/* Fotografia */}
+          <Link to="/shooting" className="sb-card" data-acc="rosa">
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcCamera /><h3>Photography</h3></div>
+                <p className="sb-card-desc">
+                  Portraits, as an amateur. <strong>The frames stay private</strong> — only
+                  the numbers are public.
+                </p>
+              </div>
+              <div className="sb-card-visual">
+                <IrisPlate />
+              </div>
+            </ProductCard>
+          </Link>
+
+          {/* Università e area tecnica */}
+          <Link to="/pcto" className="sb-card" data-acc="ambra">
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcRuler /><h3>Surveying · university</h3></div>
+                <p className="sb-card-desc">
+                  Construction and Land Management, after the <strong>CAT diploma</strong> —
+                  AutoCAD, topography, valuation.
                 </p>
               </div>
               <div className="sb-card-visual">
@@ -972,6 +953,21 @@ export default function App() {
               </div>
             </ProductCard>
           </Link>
+
+          {/* Auto */}
+          <a href="#garage" className="sb-card" data-acc="rosso">
+            <ProductCard>
+              <div className="sb-card-head">
+                <div className="sb-card-title"><IcCar /><h3>Cars</h3></div>
+                <p className="sb-card-desc">
+                  Three I dream about, <strong>drawn live in 3D</strong> by your graphics card.
+                </p>
+              </div>
+              <div className="sb-card-visual">
+                <GaugePlate />
+              </div>
+            </ProductCard>
+          </a>
         </section>
 
         {/* Coda della griglia: tagline + clienti */}

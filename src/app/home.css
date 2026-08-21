@@ -754,8 +754,29 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 @media (min-width: 640px) { .sb-products { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1280px) { .sb-products { grid-template-columns: repeat(12, 1fr); } }
 .sb-card { display: block; text-decoration: none; color: inherit; }
-@media (min-width: 640px) { .sb-card { height: 400px; } .sb-card--lg { grid-column: span 2; } }
-@media (min-width: 1280px) { .sb-card { grid-column: span 3; } .sb-card--lg { grid-column: span 6; } }
+/* Le card sono SEI, ed è un numero che va sistemato a mano su ogni misura:
+   una grande più cinque. Con le regole di prima — grande da 6 colonne su 12,
+   le altre da 3 — la seconda fila ne teneva quattro e ne aveva tre: restava un
+   buco in fondo a destra grande quanto una card.
+
+   Da 1280 in su: grande 6 + due da 3 fanno la prima fila, e le ultime tre
+   passano a 4 colonne l'una, che di nuovo fa 12. A due colonne il conto non
+   torna mai (cinque è dispari), quindi l'ultima si prende tutta la riga.
+
+   L'altezza è scesa da 400 a 360: il testo adesso è una riga per card, e a 400
+   il disegno galleggiava in mezzo a un campo vuoto. */
+@media (min-width: 640px) {
+  .sb-card { height: 360px; }
+  .sb-card--lg { grid-column: span 2; }
+}
+@media (min-width: 640px) and (max-width: 1279.98px) {
+  .sb-card:last-child { grid-column: span 2; }
+}
+@media (min-width: 1280px) {
+  .sb-card { grid-column: span 3; }
+  .sb-card--lg { grid-column: span 6; }
+  .sb-card:nth-child(n + 4) { grid-column: span 4; }
+}
 
 /* Pannello di vetro con rim da 1px (marchio di fabbrica delle card).
    Il bordo non è una riga grigia uniforme: è un rim illuminato che si spegne
@@ -977,8 +998,12 @@ button.sb-card:hover .sb-panel,
 .sb-card-title svg {
   flex-shrink: 0;
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease;
+  /* L'icona porta l'accento della card fin da ferma: è il primo pezzo di
+     colore che si incontra leggendo, e senza di lei il titolo resta grigio
+     mentre il disegno sotto è colorato — due metà che non si parlano. */
+  color: var(--sb-accent, var(--sb-brand));
 }
-a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color: var(--sb-brand-text); }
+a.sb-card:hover .sb-card-title svg { transform: scale(1.18) rotate(-8deg); color: var(--sb-accent-text, var(--sb-brand-text)); }
 .sb-page-card .sb-page-top > svg { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease; }
 .sb-page-card:hover .sb-page-top > svg { transform: scale(1.15) rotate(-8deg); color: var(--sb-brand-text); }
 /* Le spunte si accendono una dopo l'altra ALL'INGRESSO nella card, una volta.
@@ -1036,6 +1061,69 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   --vis-y: 0.5;
 }
 
+
+/* ── LA TAVOLOZZA ────────────────────────────────────────────────────────────
+   Il sito ha parlato un azzurro solo per tutta la sua vita. Era una scelta, e
+   aveva una ragione — un colore solo non può stonare — ma il conto lo pagava
+   la griglia: sei figure diverse che dicono sei mestieri diversi, tutte della
+   stessa tinta, da lontano sono un blocco unico. «È tutto molto uguale» era
+   esatto, e non era colpa dei disegni.
+
+   Sei tinte, una per card. Non sono sei colori scelti a occhio: sono sei TONI
+   dello stesso impianto — stessa costruzione (tinta, saturazione, chiarezza),
+   distribuiti sul giro cromatico in modo che nessuna coppia si confonda a
+   colpo d'occhio, e con la chiarezza scelta perché reggano sia sul fondo
+   bianco sia su quello nero.
+
+   Come si propaga: la card dichiara `data-acc="verde"`, la regola qui sotto
+   scrive --sb-accent, e da lì il colore scende DA SOLO su icona, disegno,
+   spunte, alone e pillola — perché tutti quanti leggono --sb-accent invece di
+   --sb-brand. Aggiungere una card colorata è una riga di HTML, non un giro nel
+   foglio di stile.
+
+   --sb-brand resta l'azzurro e resta il colore del SITO: nav, bottoni, link,
+   footer. L'accento è il colore della COSA di cui una card parla. */
+.sb-home {
+  --sb-acc-blu: 197 100% 49%;
+  --sb-acc-verde: 152 70% 40%;
+  --sb-acc-viola: 268 78% 62%;
+  --sb-acc-rosa: 330 76% 55%;
+  --sb-acc-ambra: 38 92% 50%;
+  --sb-acc-rosso: 12 84% 55%;
+
+  /* A riposo l'accento È il brand: tutto quello che non dichiara una tinta sua
+     continua a essere azzurro come prima, e niente si è spostato per sbaglio. */
+  --sb-accent-hsl: var(--sb-acc-blu);
+  --sb-accent: hsl(var(--sb-accent-hsl));
+  --sb-accent-text: color-mix(in srgb, hsl(var(--sb-accent-hsl)) 78%, #000);
+}
+
+/* IL PUNTO DELICATO, e va spiegato perché al primo giro non funzionava.
+
+   Una custom property NON è una formula che si rivaluta strada facendo: il
+   `var()` viene risolto DOVE la proprietà è dichiarata, e quello che scende ai
+   figli è il risultato. Scrivendo --sb-accent solo qui sopra, su .sb-home,
+   `hsl(var(--sb-accent-hsl))` si risolveva una volta sola con l'azzurro, e le
+   card ereditavano azzurro qualunque data-acc portassero. Le sei tinte erano
+   dichiarate e non si vedeva niente.
+
+   Quindi --sb-accent va RIDICHIARATO sulla card, dove --sb-accent-hsl ha già
+   il valore suo. Questa regola vale per tutte le card e non nomina nessun
+   colore: i colori li mettono le sei righe qui sotto, una proprietà l'una. */
+.sb-card {
+  --sb-accent: hsl(var(--sb-accent-hsl));
+  --sb-accent-text: color-mix(in srgb, hsl(var(--sb-accent-hsl)) 78%, #000);
+}
+html.dark .sb-card {
+  --sb-accent-text: color-mix(in srgb, hsl(var(--sb-accent-hsl)) 82%, #fff);
+}
+.sb-card[data-acc="blu"] { --sb-accent-hsl: var(--sb-acc-blu); }
+.sb-card[data-acc="verde"] { --sb-accent-hsl: var(--sb-acc-verde); }
+.sb-card[data-acc="viola"] { --sb-accent-hsl: var(--sb-acc-viola); }
+.sb-card[data-acc="rosa"] { --sb-accent-hsl: var(--sb-acc-rosa); }
+.sb-card[data-acc="ambra"] { --sb-accent-hsl: var(--sb-acc-ambra); }
+.sb-card[data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
+
 /* Card grande: testo a sinistra, visual a destra (da lg in su) */
 .sb-card--lg .sb-panel-inner { flex-direction: column; }
 @media (min-width: 1024px) {
@@ -1047,7 +1135,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
 /* Elenco spunte (card grande) */
 .sb-checks { list-style: none; margin: 0.4rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
 .sb-checks li { display: flex; align-items: center; gap: 0.55rem; font-size: 0.875rem; color: var(--sb-fg-light); }
-.sb-checks svg { color: var(--sb-brand); flex-shrink: 0; }
+.sb-checks svg { color: var(--sb-accent, var(--sb-brand)); flex-shrink: 0; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    I DISEGNI DELLA GRIGLIA PRODOTTI
@@ -1095,7 +1183,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
      segue il tema da sé in chiaro e in scuro. */
   --ill-line: color-mix(in srgb, var(--sb-fg) 30%, transparent);
   --ill-ink: color-mix(in srgb, var(--sb-fg) 45%, transparent);
-  --ill-brand: var(--sb-brand);
+  --ill-brand: var(--sb-accent, var(--sb-brand));
 
   display: block;
   width: 100%;
@@ -1156,52 +1244,6 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   0%       { stroke-dashoffset: 1; }
   26%, 76% { stroke-dashoffset: 0; }
   94%,100% { stroke-dashoffset: -1; }
-}
-
-/* ── ② Web design — il saggio tipografico ───────────────────────────────────
-   Il contorno resta sempre acceso; sotto, lo stesso testo pieno va e viene. È
-   una sola opacity, e sembra un cambio di materia. */
-.sb-ill-guide {
-  stroke: var(--ill-line);
-  stroke-width: 1;
-  stroke-dasharray: 3 4;
-  opacity: 0.9;
-}
-.sb-ill-tick text {
-  fill: var(--ill-ink);
-  font-size: 8px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-/* Il corpo è tarato perché le lettere TOCCHINO le loro guide: la A arriva alla
-   riga "cap", la a alla riga "x", tutte e due poggiano sulla "base". È tutto
-   quello che deve fare un saggio tipografico — se il testo galleggia in mezzo
-   alle righe, le righe non stanno misurando niente. */
-.sb-ill-glyph,
-.sb-ill-glyph-ink {
-  font-family: inherit;
-  font-size: 118px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  text-anchor: middle;
-}
-.sb-ill-glyph {
-  fill: none;
-  stroke: var(--ill-brand);
-  stroke-width: 1.2;
-}
-.sb-ill-glyph-ink {
-  fill: var(--ill-brand);
-  stroke: none;
-  opacity: 0.16;
-  animation-duration: var(--ink, 7s);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-@keyframes sb-ill-ink {
-  0%, 12%  { opacity: 0; }
-  42%, 68% { opacity: 0.16; }
-  92%,100% { opacity: 0; }
 }
 
 /* ── ③ Sviluppo con l'AI — il prisma ────────────────────────────────────────
@@ -1297,7 +1339,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   white-space: nowrap;
   color: var(--sb-fg-lighter);
 }
-.sb-typebar-p { color: var(--sb-brand); }
+.sb-typebar-p { color: var(--sb-accent, var(--sb-brand)); }
 /* overflow: hidden è quello che fa il taglio; la larghezza fa il resto.
    vertical-align: bottom tiene le due parole appoggiate alla stessa riga —
    un inline-block allineato alla base si sposta di qualche pixel quando il
@@ -1306,7 +1348,7 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
-  color: var(--sb-brand-text);
+  color: var(--sb-accent-text, var(--sb-brand-text));
   animation-duration: 2.2s;
   animation-iteration-count: 1;
   /* both: finita la scrittura la parola RESTA dov'è finita, invece di tornare
@@ -1327,101 +1369,6 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   84%, 100% { width: 4ch; }
 }
 
-
-/* ── ④ Giochi web — la traiettoria ──────────────────────────────────────────
-   La palla si muove su offset-path: il browser la fa scivolare lungo il
-   tracciato risolvendolo in una transform, quindi costa quanto uno spostamento
-   qualunque. offset-rotate: 0deg perché una palla non ha un davanti — senza,
-   ruoterebbe seguendo la tangente e si vedrebbe girare.
-
-   Il tracciato dell'offset-path è lo stesso di RUN_PATH in homeLive.tsx: se si
-   tocca lì va toccato anche qui, o la palla corre su una curva che non c'è. */
-.sb-ill-ground { stroke: var(--ill-line); stroke-width: 1.5; }
-/* La traccia è azzurra, non grigia: è la strada che la palla ha fatto, cioè la
-   cosa che la card racconta. Tratteggiata, perché una traiettoria disegnata
-   piena diventa un filo teso e smette di sembrare un salto. */
-.sb-ill-arc {
-  stroke: var(--ill-brand);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 6;
-  opacity: 0.55;
-}
-.sb-ill-flag { stroke: var(--ill-ink); stroke-width: 1.5; }
-.sb-ill-ball {
-  fill: var(--ill-brand);
-  stroke: none;
-  offset-path: path("M14,112 Q54,16 94,112 Q127,44 160,112 Q186,70 212,112 Q233,90 254,112");
-  offset-rotate: 0deg;
-  offset-distance: 100%;
-  /* linear, e non una curva: gli anelli dei contatti partono su un ritardo
-     calcolato come frazione della corsa, e con un'accelerazione qualsiasi la
-     palla non sarebbe più dove il conto dice che è. La curva ce l'ha già il
-     tracciato. */
-  animation-duration: var(--run, 5.6s);
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-/* Gli anelli dei contatti: --at è la frazione di corsa in cui la palla arriva
-   su quel punto, misurata sulla lunghezza degli archi (un arco alto è più
-   lungo di uno basso a parità di distanza percorsa). Il ritardo esce da lì. */
-.sb-ill-hit {
-  fill: none;
-  stroke: var(--ill-brand);
-  stroke-width: 1.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  opacity: 0;
-  animation-duration: var(--run, 5.6s);
-  animation-timing-function: ease-out;
-  animation-iteration-count: infinite;
-  animation-delay: calc(var(--at) * var(--run, 5.6s) * 0.68);
-}
-/* La palla non torna indietro a fine giro: arrivata in fondo si spegne, e il
-   giro dopo si riaccende alla partenza. Un pallino che rientra strisciando
-   all'indietro racconta una cosa che non è successa. */
-@keyframes sb-ill-run {
-  0%       { offset-distance: 0%; opacity: 0; }
-  6%       { opacity: 1; }
-  68%      { offset-distance: 100%; opacity: 1; }
-  86%,100% { offset-distance: 100%; opacity: 0; }
-}
-@keyframes sb-ill-hit {
-  0%       { transform: scale(0.4); opacity: 0.85; }
-  9%, 100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* ── ⑤ Strumenti web — due insiemi ──────────────────────────────────────────
-   Nessun cerchio scivola: le due lenti si ridisegnerebbero a ogni frame, e la
-   forma dell'intersezione è un dato del disegno, non un'animazione. Quello che
-   si accende è la lente, e con lei i puntini che ci stanno dentro. */
-.sb-ill-set { stroke: var(--ill-line); stroke-width: 1.5; }
-.sb-ill-lens {
-  fill: color-mix(in srgb, var(--ill-brand) 22%, transparent);
-  stroke: var(--ill-brand);
-  stroke-width: 1.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation-duration: var(--venn, 6.4s);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-.sb-ill-seed { fill: var(--ill-line); stroke: none; }
-.sb-ill-seed--in {
-  fill: var(--ill-brand);
-  animation-duration: var(--venn, 6.4s);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-@keyframes sb-ill-lens {
-  0%, 10%  { opacity: 0; transform: scale(0.7); }
-  34%, 76% { opacity: 1; transform: scale(1); }
-  92%,100% { opacity: 0; transform: scale(0.7); }
-}
-@keyframes sb-ill-seed {
-  0%, 16%  { opacity: 0.25; }
-  40%, 76% { opacity: 1; }
-  92%,100% { opacity: 0.25; }
-}
 
 /* ── ⑥ Siti per clienti — il globo ──────────────────────────────────────────
    Una sola animazione per tutti e due i satelliti: al secondo basta mezzo giro
@@ -1471,6 +1418,62 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   56%  { opacity: 1; }
   92%  { opacity: 1; }
   100% { offset-distance: 100%; opacity: 0.3; }
+}
+
+/* ── ④ Fotografia — il diaframma ─────────────────────────────────────────────
+   Barilotto, tacche dei diaframmi, apertura esagonale. Il gesto è uno solo: si
+   chiude. Una transform su fill-box, perché l'origine dev'essere il centro
+   della figura e non quello della tavola. */
+.sb-ill-barrel { stroke: var(--ill-line); stroke-width: 1.5; }
+.sb-ill-stop { stroke: var(--ill-ink); stroke-width: 1.5; }
+.sb-ill-iris {
+  stroke: var(--ill-brand);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-duration: var(--iris, 6.2s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+.sb-ill-iris-fill {
+  fill: color-mix(in srgb, var(--ill-brand) 16%, transparent);
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-duration: var(--iris, 6.2s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes sb-ill-iris {
+  0%, 12%   { transform: scale(1); }
+  46%, 58%  { transform: scale(0.48); }
+  92%, 100% { transform: scale(1); }
+}
+
+/* ── ⑥ Auto — il quadrante ───────────────────────────────────────────────────
+   L'arco, nove tacche (le ultime tre in zona rossa) e la lancetta. La lancetta
+   è disegnata dritta in su e ruota: la geometria non sa niente dell'angolo, e
+   l'angolo è l'unica cosa che si anima.
+
+   view-box e non fill-box, come per l'orbita del globo: il perno sta a
+   (140, 96), che è un punto della TAVOLA — con fill-box ruoterebbe attorno al
+   centro del proprio riquadro, cioè a metà della sua lunghezza. */
+.sb-ill-dial { stroke: var(--ill-line); stroke-width: 1.5; }
+.sb-ill-tickmark { stroke: var(--ill-ink); stroke-width: 1.5; }
+.sb-ill-tickmark--red { stroke: var(--ill-brand); }
+.sb-ill-needle path { stroke: var(--ill-brand); stroke-width: 2; }
+.sb-ill-needle {
+  transform-box: view-box;
+  transform-origin: 140px 96px;
+  transform: rotate(70deg);
+  animation-duration: var(--gauge, 5.4s);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-iteration-count: infinite;
+}
+.sb-ill-hub { fill: var(--ill-ink); stroke: none; }
+@keyframes sb-ill-needle {
+  0%       { transform: rotate(-70deg); }
+  62%,100% { transform: rotate(70deg); }
 }
 
 /* ── ⑦ Area tecnica CAT — le curve di livello ───────────────────────────────
@@ -1554,9 +1557,6 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   .sb-card:hover .sb-ill-draw,
   .sb-card:focus-visible .sb-ill-draw       { animation-name: sb-ill-draw; }
 
-  .sb-card:hover .sb-ill-glyph-ink,
-  .sb-card:focus-visible .sb-ill-glyph-ink  { animation-name: sb-ill-ink; }
-
   .sb-card:hover .sb-ill-beam,
   .sb-card:focus-visible .sb-ill-beam       { animation-name: sb-ill-beam; }
   .sb-card:hover .sb-ill-beam--in,
@@ -1568,15 +1568,13 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
   .sb-card:hover .sb-typebar-w--b,
   .sb-card:focus-visible .sb-typebar-w--b   { animation-name: sb-type-in; }
 
-  .sb-card:hover .sb-ill-ball,
-  .sb-card:focus-visible .sb-ill-ball       { animation-name: sb-ill-run; }
-  .sb-card:hover .sb-ill-hit,
-  .sb-card:focus-visible .sb-ill-hit        { animation-name: sb-ill-hit; }
+  .sb-card:hover .sb-ill-iris,
+  .sb-card:hover .sb-ill-iris-fill,
+  .sb-card:focus-visible .sb-ill-iris,
+  .sb-card:focus-visible .sb-ill-iris-fill  { animation-name: sb-ill-iris; }
 
-  .sb-card:hover .sb-ill-lens,
-  .sb-card:focus-visible .sb-ill-lens       { animation-name: sb-ill-lens; }
-  .sb-card:hover .sb-ill-seed--in,
-  .sb-card:focus-visible .sb-ill-seed--in   { animation-name: sb-ill-seed; }
+  .sb-card:hover .sb-ill-needle,
+  .sb-card:focus-visible .sb-ill-needle     { animation-name: sb-ill-needle; }
 
   .sb-card:hover .sb-ill-sat,
   .sb-card:focus-visible .sb-ill-sat        { animation-name: sb-ill-orbit; }
