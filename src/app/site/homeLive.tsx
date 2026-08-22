@@ -27,8 +27,8 @@
 // visto succedere davvero, e non le deve decifrare.
 //
 //   ① Siti web          → una finestra e tre echi di sé stessa       (gli echi si aprono)
-//   ② Rivalta e Cascina → un piano di tre quarti, due spilli,
-//                          e sotto i due domini che sono online      (gli spilli saltano)
+//   ② Rivalta e Cascina → un globo a reticolo, due punti e la linea
+//                          che li unisce, con sopra i due domini     (un impulso passa)
 //   ③ Sviluppo con l'IA → due cursori e tre bollicine, una accesa    (i puntini battono)
 //   ④ Fotografia        → un provino a contatto, un fotogramma solo
 //                          cerchiato — e nessun volto, perché non si
@@ -53,11 +53,13 @@
 // parte al passaggio» — e il come non è ovvio, perché mettere in pausa queste
 // animazioni le congelerebbe sul primo fotogramma, che è quello vuoto.
 //
-// Le proprietà animate sono tre, e sono tutte a buon mercato: transform e
-// opacity, che il compositore muove senza ricalcolare niente, e fill su cerchi
-// da 3 px (i vertici del volume). L'unica animazione di layout è la pillola del
-// comando, che cresce di un carattere alla volta: perché lì si possa fare sta
-// scritto in home.css, sopra .sb-typebar.
+// Le proprietà animate sono quattro, e sono tutte a buon mercato: transform e
+// opacity, che il compositore muove senza ricalcolare niente; fill su cerchi da
+// 3 px (i vertici del volume); e lo scostamento di un tratteggio su un tracciato
+// solo (l'impulso del globo), che ridipinge un trattino da tredici unità e
+// nient'altro. L'unica animazione di layout è la pillola del comando, che cresce
+// di un carattere alla volta: perché lì si possa fare sta scritto in home.css,
+// sopra .sb-typebar.
 //
 // Qui dentro NON c'è JavaScript. Il moto sta tutto in home.css, in keyframe che
 // il browser mette in pausa da sé quando la scheda passa in secondo piano.
@@ -333,30 +335,124 @@ export function BlueprintPage() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ② Card «Rivalta e Cascina Fontana» — il piano e i due spilli
+   ② Card «Rivalta e Cascina Fontana» — il globo, e la linea fra i due
 
-   Rifatta sulla tavola Vector di Supabase, che è fatta di due pezzi: un
-   oggetto in assonometria al centro e, in basso, le righe con il marchio di
-   chi ci sta dentro (lì OpenAI e Hugging Face). Qui l'oggetto è il terreno —
-   un piano quadrettato visto di tre quarti — e le due righe sono i due domini
-   che stanno online davvero. È la stessa impaginazione, e dice una cosa vera
-   invece di una categoria.
+   Qui c'era un piano di tre quarti con due spilli piantati sopra. Diceva la
+   cosa giusta — due posti, due clienti — ma la diceva con la figura di un
+   plastico: un piano quadrettato non è la Terra, e uno spillo è una puntina da
+   bacheca. Il globo non ha bisogno di essere spiegato a nessuno.
 
-   I due spilli stanno piantati nel piano, uno acceso della tinta della card e
-   uno no: sono due, e sono due perché i clienti sono due.
+   Adesso è la tavola della card Edge Functions di Supabase — la stessa da cui
+   viene già la pillola del comando della card ③ (vedi «③ bis» nel foglio):
+   una sfera a reticolo più grande della card e tagliata dai suoi bordi, e
+   sopra una rete di segmenti dritti e diagonali a 45° che cala da un pezzo di
+   interfaccia e finisce su dei punti. Lì i punti sono le regioni in cui gira
+   una funzione, e la rete dice «questa roba sta in più posti». Qui i punti
+   sono due, sono i due clienti, e fra loro c'è la linea che li unisce: che è
+   l'unica cosa che questa card deve dire.
 
-   Il gesto: gli spilli fanno un saltello, sfalsato.
+   Le due righe con i domini restano — sono la seconda metà della tavola
+   Vector, e sono due siti che stanno online davvero — ma passano in ALTO,
+   dove nella foto sta la pillola: da sotto di loro cala il filo che entra nel
+   globo e arriva sul primo punto. In basso non potevano più stare, perché da
+   metà tavola in giù adesso c'è la sfera.
+
+   ── Il reticolo, senza una curva calcolata a mano ───────────────────────────
+   Un cerchio disegnato su una sfera — parallelo o meridiano — visto in
+   proiezione ortografica è SEMPRE un'ellisse. Quindi il globo non è una
+   collezione di curve campionate punto per punto: sono dodici <ellipse> con
+   rx, ry e una rotazione — sette paralleli e cinque meridiani — più il cerchio
+   del bordo, e il conto che le trova sta qui sotto in una dozzina di righe. Il
+   guadagno non è la brevità: è che la sfera si può girare, perché si sposta il
+   polo e il reticolo si rifà da sé.
+
+   Le ellissi sono intere e non tagliate a metà, quindi si vedono anche i fili
+   che passano dietro: è quello che fa una sfera vuota invece di una palla, ed
+   è così anche nella foto.
+
+   Il gesto: un impulso parte da Rivalta e arriva a Cascina lungo la linea che
+   le unisce. Si muove quello e basta, ed è la cosa che la card dice.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Le sei righe del piano: tre per verso, interpolate sui lati del rombo. */
-const PLANE_LINES = [
-  "M115,56 L215,99",
-  "M90,67 L190,109",
-  "M65,78 L165,120",
-  "M165,56 L65,99",
-  "M190,67 L90,109",
-  "M215,78 L115,120",
-];
+/** Il globo: il centro cade sotto il bordo basso della tavola e il raggio è
+    più largo della tavola stessa, così se ne vede la calotta, tagliata da tre
+    lati. Un globo che ci sta tutto dentro è un mappamondo da scrivania. */
+const GLOBE = { cx: 146, cy: 214, r: 172 };
+
+/* Dove punta l'asse polare, e sono i due soli numeri da toccare per girare la
+   sfera: quanto lontano dal centro cade il polo (in raggi: 0 in mezzo, 1 sul
+   bordo) e con che angolo sopra l'orizzonte. Quanto l'asse venga verso di noi
+   si ricava da sé, ed è quello che schiaccia i paralleli — più il polo va
+   verso il bordo, più le ellissi si chiudono. */
+const POLE_D = 0.86;
+const POLE_A = 52;
+
+const rad = (deg: number) => (deg * Math.PI) / 180;
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
+/** L'asse polare in coordinate schermo: x a destra, y in su, z verso di noi. */
+const POLE = {
+  x: POLE_D * Math.cos(rad(POLE_A)),
+  y: POLE_D * Math.sin(rad(POLE_A)),
+  z: Math.sqrt(1 - POLE_D * POLE_D),
+};
+
+type Ellisse = { cx: number; cy: number; rx: number; ry: number; rot: number };
+
+/* I paralleli. Quello alla latitudine φ è un cerchio di raggio cos φ su un
+   piano perpendicolare all'asse, scostato di sin φ lungo l'asse: proiettato
+   diventa un'ellisse centrata sull'ombra di quello scostamento, larga cos φ
+   per il verso perpendicolare all'asse e schiacciata dalla z per il verso
+   dell'asse. La rotazione è la stessa per tutti, perché l'asse è uno solo. */
+const PARALLELI: Ellisse[] = [72, 54, 36, 18, 0, -18, -36].map((lat) => {
+  const s = Math.sin(rad(lat));
+  const c = Math.cos(rad(lat));
+  return {
+    cx: r2(GLOBE.cx + GLOBE.r * s * POLE.x),
+    cy: r2(GLOBE.cy - GLOBE.r * s * POLE.y),
+    rx: r2(GLOBE.r * c),
+    ry: r2(GLOBE.r * c * POLE.z),
+    rot: 90 - POLE_A,
+  };
+});
+
+/* I meridiani. Il piano di un meridiano contiene l'asse, quindi la sua normale
+   è perpendicolare all'asse e gira con l'angolo del meridiano. Un cerchio
+   massimo proiettato è un'ellisse centrata sul centro della sfera, larga
+   quanto il raggio nel verso perpendicolare all'ombra della normale e
+   schiacciata di quanto la normale punta verso di noi.
+
+   Gli angoli partono da 18 e non da 0 per un motivo pratico: a 0 la normale
+   sta tutta nel piano dello schermo, il meridiano si vede di taglio ed è un
+   segmento — cioè un'ellisse con ry a zero, che nessun browser disegna. */
+const MERIDIANI: Ellisse[] = [18, 54, 90, 126, 162].map((ang) => {
+  const ct = Math.cos(rad(ang));
+  const st = Math.sin(rad(ang));
+  const nx = -ct * Math.sin(rad(POLE_A)) - st * POLE.z * Math.cos(rad(POLE_A));
+  const ny = ct * Math.cos(rad(POLE_A)) - st * POLE.z * Math.sin(rad(POLE_A));
+  const nz = st * POLE_D;
+  return {
+    cx: GLOBE.cx,
+    cy: GLOBE.cy,
+    rx: GLOBE.r,
+    ry: r2(GLOBE.r * Math.abs(nz)),
+    // Il meno è il salto fra le due convenzioni: in matematica la y va in su,
+    // in SVG in giù, e con lei cambia verso anche l'angolo.
+    rot: r2((-Math.atan2(nx, -ny) * 180) / Math.PI),
+  };
+});
+
+/** La linea fra i due clienti: giù di 45°, poi dritta. È scritta una volta
+    sola perché la percorrono in due — la linea stessa e l'impulso che le passa
+    sopra, che è la stessa `d` disegnata una seconda volta. */
+const LINK = "M64,88 L88,112 H178";
+
+/** Un filo del reticolo. La rotazione è un attributo transform e non una
+    proprietà CSS: sull'ellisse ci sono già cx e cy, e girarla dal foglio
+    vorrebbe dire dichiarare anche un transform-origin per ognuna. */
+function Filo({ e }: { e: Ellisse }) {
+  return <ellipse cx={e.cx} cy={e.cy} rx={e.rx} ry={e.ry} transform={`rotate(${e.rot} ${e.cx} ${e.cy})`} />;
+}
 
 /** Il marchietto delle due righe: un mappamondo da 16px. */
 function RowMark() {
@@ -368,28 +464,41 @@ function RowMark() {
   );
 }
 
-/** Uno spillo: ombra sul piano, gambo, testa. `on` = quello acceso. */
-function Pin({ x, y, h, on, i }: { x: number; y: number; h: number; on?: boolean; i: number }) {
-  return (
-    <g className={`sb-ill-pin${on ? " sb-ill-pin--on" : ""}`} style={{ "--i": i } as React.CSSProperties}>
-      <ellipse className="sb-ill-pinshadow" cx={x} cy={y} rx={7} ry={2.6} />
-      <path className="sb-ill-pinstem" d={`M${x},${y} L${x},${y - h}`} />
-      <circle className="sb-ill-pinhead" cx={x} cy={y - h - 5} r={5.5} />
-      <circle className="sb-ill-pincore" cx={x} cy={y - h - 5} r={2} />
-    </g>
-  );
-}
-
 export function GlobeOrbit() {
   return (
-    <div className="sb-ill-stage">
-      <Plate name="iso">
-        <path className="sb-ill-plane" d="M140,46 L240,88 L140,130 L40,88 Z" />
-        {PLANE_LINES.map((d) => (
-          <path key={d} className="sb-ill-planeline" d={d} />
-        ))}
-        <Pin x={108} y={80} h={34} on i={0} />
-        <Pin x={176} y={98} h={26} i={1} />
+    <div className="sb-ill-stage sb-ill-stage--globe">
+      <Plate name="globe">
+        {/* Il reticolo si prende la stessa maschera della carta millimetrata —
+            quella che Plate() dichiara con il prefisso del suo nome — così i
+            fili svaniscono ai bordi invece di finire tagliati di netto, e la
+            sfera non litiga con i quadretti che ha sotto. */}
+        <g className="sb-ill-mesh" mask="url(#sb-pf-globe-m)">
+          {PARALLELI.map((e) => (
+            <Filo key={`p${e.cy}`} e={e} />
+          ))}
+          {MERIDIANI.map((e) => (
+            <Filo key={`m${e.ry}-${e.rot}`} e={e} />
+          ))}
+          <circle className="sb-ill-limb" cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r} />
+        </g>
+
+        {/* Il filo che cala da sotto le righe, e le due code della rete: una
+            finisce su un puntino, l'altra esce dal bordo destro e non finisce
+            affatto. La rete non comincia e non finisce dentro la card. */}
+        <path className="sb-ill-wire" d="M64,42 V88" />
+        <path className="sb-ill-wire" d="M64,88 L44,108 H20" />
+        <path className="sb-ill-wire" d="M178,112 L200,90 H280" />
+        <circle className="sb-ill-tip" cx={20} cy={108} r={2.6} />
+
+        {/* La linea fra i due, e sopra l'impulso che la percorre. */}
+        <path className="sb-ill-link" d={LINK} />
+        <path className="sb-ill-pulse" d={LINK} />
+
+        {/* Rivalta, accesa della tinta della card; Cascina, in tratto. Due
+            punti e non due bandierine: su una sfera un punto è un posto. */}
+        <circle className="sb-ill-halo" cx={64} cy={88} r={10} />
+        <circle className="sb-ill-node sb-ill-node--on" cx={64} cy={88} r={4.2} />
+        <circle className="sb-ill-node" cx={178} cy={112} r={4.2} />
       </Plate>
 
       {/* Le due righe con il marchio. Sono HTML e non SVG perché sono testo

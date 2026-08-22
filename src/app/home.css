@@ -1260,7 +1260,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 /* ═══════════════════════════════════════════════════════════════════════════
    I DISEGNI DELLA GRIGLIA PRODOTTI
 
-   Sei tavole da 280×132, stesso terreno, stessi tre pesi di linea. Vedi la
+   Sei tavole da 280×170, stesso terreno, stessi tre pesi di linea. Vedi la
    nota in testa a site/homeLive.tsx per che cosa disegnano e da quale tavola
    di Supabase viene ciascuna.
 
@@ -1286,9 +1286,11 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    che la card porta addosso: qui non è mai scritta a mano.
 
    ── Come si muovono ─────────────────────────────────────────────────────────
-   Una cosa sola per riquadro, e su tre proprietà soltanto — transform, opacity
-   e (per i vertici del volume) fill su cerchi da 3px. Niente che rifaccia il
-   layout, tranne la pillola del comando, che è un caso a parte e spiegato lì.
+   Una cosa sola per riquadro, e su quattro proprietà soltanto — transform,
+   opacity, fill su cerchi da 3px (i vertici del volume) e lo scostamento di un
+   tratteggio su un tracciato solo (l'impulso del globo). Niente che rifaccia
+   il layout, tranne la pillola del comando, che è un caso a parte e spiegato
+   lì.
 
    ── Il fotogramma di riposo ─────────────────────────────────────────────────
    Ogni regola base è scritta sul fotogramma FINITO: finestra composta, anello
@@ -1331,6 +1333,20 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 /* Il palco: serve alle due tavole che hanno sopra dell'HTML (le righe con i
    domini, la pillola del comando). */
 .sb-ill-stage { position: relative; width: 100%; }
+/* Una sola tavola si centra in modo SICURO, ed è quella del globo. Il perché è
+   una proporzione: fra i 1024 e i 1280 le card di questa griglia sono larghe e
+   basse, e una tavola 280×170 viene più alta dello spazio che le resta —
+   sborda di tre o quattro dozzine di pixel. Centrata, quel di più esce metà di
+   sotto e metà di SOPRA: alle altre cinque non importa, hanno la figura in
+   mezzo, ma qui in cima ci sono due righe di testo, e uscendo di sopra
+   finivano addosso all'ultima riga della card.
+
+   `safe center` è la parola per dirlo in una riga: centra finché ci sta, e
+   quando non ci sta più torna ad allineare in alto, così il di più esce tutto
+   dal bordo BASSO — che è esattamente dove un globo vuole essere tagliato. I
+   browser che non la conoscono buttano via la dichiarazione e restano al
+   centro, cioè a com'era. */
+.sb-ill-stage--globe { align-self: safe center; }
 
 /* ── ① Siti web — la finestra e i suoi echi ─────────────────────────────────
    Gli echi sono quattro <use> della stessa forma. La rotazione sta in CSS e
@@ -1356,32 +1372,57 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   animation-delay: calc(var(--i) * 0.06s);
 }
 
-/* ── ② Rivalta e Cascina Fontana — il piano e i due spilli ─────────────────*/
-.sb-ill-plane {
-  fill: color-mix(in srgb, var(--ill-acc) 7%, transparent);
-  stroke: var(--ill-ink);
-  stroke-width: 1.5;
+/* ── ② Rivalta e Cascina Fontana — il globo e la linea fra i due ───────────
+   Il reticolo della sfera è un tono più forte della carta millimetrata che ha
+   sotto e uno più debole della struttura: uguale ai quadretti sparirebbe,
+   uguale alla figura la coprirebbe. Il bordo della sfera è l'unico filo del
+   globo che sta sulla riga della struttura, perché è quello che dice dove
+   finisce la palla. */
+.sb-ill-mesh {
+  fill: none;
+  stroke: color-mix(in srgb, var(--sb-fg) 17%, transparent);
+  stroke-width: 0.9;
 }
-.sb-ill-planeline { stroke: var(--ill-grid); stroke-width: 1; }
-.sb-ill-pinshadow { fill: color-mix(in srgb, var(--sb-fg) 13%, transparent); }
-.sb-ill-pinstem { stroke: var(--ill-ink); stroke-width: 1.5; }
-/* La testa è piena del colore del fondo, non trasparente: il gambo le
-   passerebbe attraverso e sembrerebbe uno spillo trasparente. */
-.sb-ill-pinhead { fill: var(--sb-bg); stroke: var(--ill-ink); stroke-width: 1.5; }
-.sb-ill-pincore { fill: var(--ill-line); }
-.sb-ill-pin--on .sb-ill-pinhead { fill: var(--ill-acc); stroke: none; }
-.sb-ill-pin--on .sb-ill-pincore { fill: var(--sb-bg); }
-.sb-ill-pin {
-  transform-box: view-box;
+.sb-ill-limb { stroke: var(--ill-line); stroke-width: 1.2; }
+/* I fili che entrano ed escono dal quadro, e i puntini in cui finiscono: la
+   rete non comincia e non finisce dentro la card. */
+.sb-ill-wire { stroke: var(--ill-line); stroke-width: 1.2; }
+.sb-ill-tip { fill: var(--ill-line); }
+/* La linea fra i due clienti è il tratto più marcato della tavola: è la cosa
+   che la card dice. I due punti sono uno acceso e uno no, come lo erano le
+   teste dei due spilli di prima — e quello spento è pieno del colore del
+   fondo e non trasparente, se no la linea gli passerebbe attraverso. */
+.sb-ill-link { stroke: var(--ill-ink); stroke-width: 1.7; }
+.sb-ill-node { fill: var(--sb-bg); stroke: var(--ill-ink); stroke-width: 1.6; }
+.sb-ill-node--on { fill: var(--ill-acc); stroke: none; }
+.sb-ill-halo { fill: color-mix(in srgb, var(--ill-acc) 20%, transparent); }
+/* L'impulso che va da Rivalta a Cascina. Non è un oggetto in più che si
+   sposta: è la STESSA linea, disegnata una seconda volta con un tratteggio
+   fatto di un trattino corto e di un vuoto lunghissimo — a muoverlo è lo
+   scostamento del tratteggio, e non c'è nient'altro da ridipingere.
+
+   A riposo lo scostamento lo porta oltre la fine del tracciato, dove un
+   tratteggio non disegna niente: il fotogramma finito è l'impulso ARRIVATO,
+   cioè la linea pulita fra i due punti. È la stessa regola delle altre cinque
+   tavole, e qui viene gratis. */
+.sb-ill-pulse {
+  stroke: var(--ill-acc);
+  stroke-width: 3;
+  stroke-dasharray: 13 400;
+  stroke-dashoffset: -138;
   animation-duration: 1.5s;
-  animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
-  animation-delay: calc(var(--i) * 0.14s);
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Due passaggi, come i tre battiti dei puntini della card ③: uno solo si
+     perde se il puntatore entra da un angolo, tre diventano un semaforo. */
+  animation-iteration-count: 2;
 }
-/* Le due righe con il marchio, sotto al piano. */
+/* Le due righe con il marchio, in alto: è il posto della pillola nella tavola
+   da cui viene il globo, e da sotto di loro cala il filo che entra nella
+   sfera. In basso non ci stanno più — da metà tavola in giù c'è il globo. */
 .sb-illrows {
   position: absolute;
   left: 1rem;
-  bottom: 0.35rem;
+  top: 0.15rem;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -1570,8 +1611,12 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 @keyframes sb-ill-echo {
   50% { transform: rotate(calc(var(--r) * 2.2)); opacity: calc(var(--o) * 1.5); }
 }
-@keyframes sb-ill-bob {
-  40% { transform: translateY(-7px); }
+/* L'impulso parte da dentro il primo punto — a 13 il trattino sta tutto prima
+   dell'inizio del tracciato, quindi non si vede — e finisce oltre l'ultimo,
+   dove di nuovo non si vede. In mezzo attraversa la linea una volta sola. */
+@keyframes sb-ill-hop {
+  0% { stroke-dashoffset: 13; }
+  100% { stroke-dashoffset: -138; }
 }
 @keyframes sb-ill-dots {
   0%, 100% { transform: translateY(0); opacity: 0.55; }
@@ -1632,8 +1677,8 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   .sb-card:hover .sb-ill-echo,
   .sb-card:focus-visible .sb-ill-echo { animation-name: sb-ill-echo; }
 
-  .sb-card:hover .sb-ill-pin,
-  .sb-card:focus-visible .sb-ill-pin { animation-name: sb-ill-bob; }
+  .sb-card:hover .sb-ill-pulse,
+  .sb-card:focus-visible .sb-ill-pulse { animation-name: sb-ill-hop; }
 
   .sb-card:hover .sb-ill-bubble--on .sb-ill-bdot,
   .sb-card:focus-visible .sb-ill-bubble--on .sb-ill-bdot { animation-name: sb-ill-dots; }
