@@ -60,7 +60,7 @@ export function ProjectIcon({ thumb, size = 32 }: { thumb?: string; size?: numbe
 export const PROJECTS: Project[] = [
   {
     id: "pcto",
-    category: "Work placement · PCTO",
+    category: "Work placement — PCTO",
     date: "2023 — 2026",
     modified: "2026-06-21",
     title: "PCTO",
@@ -222,7 +222,7 @@ export const EXTERNAL_URLS = ["https://rivaltasulmincio.it", "https://cascinafon
 export function typeLabel(kind: ProjectKind): string {
   switch (kind) {
     case "game": return "Gioco web";
-    case "page": return "Pagina · approfondimento";
+    case "page": return "Pagina — approfondimento";
     case "site": return "Sito web";
     case "tool": return "Strumento web";
     case "doc":  return "Documento PDF";

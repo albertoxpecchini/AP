@@ -321,7 +321,7 @@ export default function GitHubFooterWidget() {
           <img
             className="sb-gh__avatar"
             src={AVATAR_URL}
-            alt={`GitHub · @${GITHUB_USERNAME}`}
+            alt={`GitHub — @${GITHUB_USERNAME}`}
             width={22}
             height={22}
             loading="lazy"
@@ -335,12 +335,12 @@ export default function GitHubFooterWidget() {
           <>
             <span className="sb-gh__since">
               {sinceYear ? s.sinceYear(sinceYear) : ""}
-              {p.location ? ` · ${p.location}` : ""}
+              {p.location ? ` — ${p.location}` : ""}
             </span>
 
             <span className="sb-gh__act" title={s.latest}>
               <i className="sb-gh__dot" aria-hidden="true" />
-              {data?.event ? `${describeEvent(data.event, lang)} · ${timeAgo(data.event.created_at, lang)}` : s.none}
+              {data?.event ? `${describeEvent(data.event, lang)} — ${timeAgo(data.event.created_at, lang)}` : s.none}
             </span>
           </>
         )}
@@ -368,7 +368,7 @@ export default function GitHubFooterWidget() {
                 <span className="sb-gh__star" aria-hidden="true">★</span> {data.repo.name}
                 {data.repo.language && (
                   <>
-                    {" · "}
+                    {" — "}
                     <i className="sb-gh__langdot" style={{ background: langColor(data.repo.language) }} aria-hidden="true" />
                     {" "}{data.repo.language}
                   </>
@@ -383,14 +383,14 @@ export default function GitHubFooterWidget() {
               <span className="sb-gh__spark-cap">
                 {/* data-count-to: il numero si "accende" salendo da 0 quando il
                     footer arriva a vista (regia in site/footMotion.ts). */}
-                <b data-count-to={contrib.yearTotal}>{contrib.yearTotal}</b> {s.commits} · {s.lastYear}
-                {contrib.streak > 0 && <> · {s.streak(contrib.streak)}</>}
-                {contrib.longest > 0 && <> · {s.record(contrib.longest)}</>}
+                <b data-count-to={contrib.yearTotal}>{contrib.yearTotal}</b> {s.commits} — {s.lastYear}
+                {contrib.streak > 0 && <>, {s.streak(contrib.streak)}</>}
+                {contrib.longest > 0 && <>, {s.record(contrib.longest)}</>}
               </span>
               <span
                 className="sb-gh__bars"
                 role="img"
-                aria-label={`${contrib.yearTotal} ${s.commits} · ${s.lastYear}`}
+                aria-label={`${contrib.yearTotal} ${s.commits} — ${s.lastYear}`}
                 data-puddle
               >
                 {series.map((d, i) => {
@@ -407,7 +407,7 @@ export default function GitHubFooterWidget() {
                       key={d.day}
                       className="sb-gh__bar"
                       style={{ height: `${h}px`, background: levelBg(d.level) }}
-                      data-tip={`${d.count} ${s.commits} · ${label}`}
+                      data-tip={`${d.count} ${s.commits} — ${label}`}
                       data-today={i === series.length - 1 ? "" : undefined}
                     />
                   );
@@ -429,7 +429,7 @@ export default function GitHubFooterWidget() {
                     key={l.name}
                     className="sb-gh__langseg"
                     style={{ width: `${l.pct}%`, background: l.color }}
-                    title={`${l.name} · ${l.pct}%`}
+                    title={`${l.name} — ${l.pct}%`}
                   />
                 ))}
               </span>

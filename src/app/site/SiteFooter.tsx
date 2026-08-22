@@ -70,7 +70,7 @@ export default function SiteFooter() {
               <div className="sb-panel-inner sb-foot-pad">
                 <div className="sb-foot-id">
                   <Link to="/" className="sb-foot-name" aria-label="Torna alla home" translate="no">Alberto Pecchini</Link>
-                  <p className="sb-foot-role">Surveyor &amp; Website Developer · ITT «Carlo d'Arco» — Mantua</p>
+                  <p className="sb-foot-role">Surveyor &amp; Website Developer, ITT «Carlo d'Arco» — Mantua</p>
                   <div className="sb-foot-social">
                     {SOCIALS.map(({ name, Icon, href }) => (
                       <a
@@ -104,7 +104,7 @@ export default function SiteFooter() {
           <span>© {year} Alberto Pecchini — All rights reserved</span>
           <div className="sb-foot-links">
             <PaletteModal />
-            <span className="sb-foot-sep" aria-hidden="true">·</span>
+            <span className="sb-foot-sep" aria-hidden="true">—</span>
             <WorkflowModal />
           </div>
           <span>Updated {updated}</span>

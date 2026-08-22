@@ -99,37 +99,37 @@ const CV = [
   {
     period: "Sep 2018 — Jun 2021",
     title: "Lower secondary school — Mantua",
-    role: "Istituto Redentore · «Beato Contardo Ferrini» Student House Foundation",
+    role: "Istituto Redentore — «Beato Contardo Ferrini» Student House Foundation",
     desc: "A three-year programme with a solid grounding in Italian, mathematics, history, science and English. Development of study method and cross-disciplinary skills. Diploma achieved with merit.",
   },
   {
     period: "2021 — 2026",
     title: "«Carlo d'Arco» Technical Institute — Mantua",
-    role: "CAT diploma · Construction, Environment and Territory · Class 5T",
+    role: "CAT diploma — Construction, Environment and Territory, Class 5T",
     desc: "A five-year technical programme. Core subjects: architectural design and technical drawing (AutoCAD), topography and instrumental surveying, valuation and real-estate appraisal, site management, applied physics, mathematics and technical English. School code MNTL009017. Diploma achieved in 2026.",
   },
   {
     period: "2026 — present",
     title: "University of Modena and Reggio Emilia — «Enzo Ferrari» Eng. Dept.",
-    role: "BSc in Construction and Land Management · Full-time",
+    role: "BSc in Construction and Land Management — Full-time",
     desc: "Enrolled in the professional bachelor's degree in Construction and Land Management, continuing on from the CAT technical track. Admission through the TOLC-LP entrance test, passed in July 2026.",
   },
   {
     period: "2019 — present",
     title: "Online sales — Vinted & Subito",
-    role: "E-commerce · Commercial photography · Customer care",
+    role: "E-commerce — Commercial photography, Customer care",
     desc: "End-to-end management of the entire sales cycle on Vinted and Subito: product appraisal, market pricing, photography with a Canon EOS 4000D and iPhone 16 Pro, listing, communication with prospective buyers, negotiation, shipping and feedback handling. First sale in December 2019. A systematic personal activity since autumn 2024. Categories: clothing, film collectibles, tech devices (Apple Watch, Nintendo Switch, Flipper Zero).",
   },
   {
     period: "ongoing",
     title: "Family farm — Rivalta sul Mincio",
-    role: "Agricultural operations · Logistics · Team coordination",
+    role: "Agricultural operations — Logistics, Team coordination",
     desc: "Ongoing collaboration in the family farming business. Tasks: plant care and maintenance (watering, pruning of various types and sizes), transport of materials and equipment on a tractor with trailer, hay harvesting from permanent meadow, coordinating operations with the team during intensive work, logistical support and assistance with transfers. Autonomous handling of farm equipment and on-field problem-solving.",
   },
   {
     period: "Dec 19, 2023",
     title: "Workers' Safety Course — Low Risk",
-    role: "Certificate of attendance · LTO Mantua / FORMA · Lombardy Region (ATS Val Padana) · 4 hours e-learning",
+    role: "Certificate of attendance — LTO Mantua / FORMA, Lombardy Region (ATS Val Padana), 4 hours e-learning",
     desc: "Course compliant with the State–Regions Agreement of 21 December 2011 (Legislative Decree 81/08, Art. 37), aimed at office workers. Contents: electrical risk, falls from height, microclimate and lighting, display screens, work organisation and work-related stress, first-aid procedures, signage and fire safety (evacuation procedures). Certificate issued as a student by the Mantua Territorial Employability Laboratory.",
     pdf: "/attestato-sicurezza-lavoratori-rischio-basso.pdf",
     pdfLabel: "Open certificate (PDF)",
@@ -137,26 +137,26 @@ const CV = [
   {
     period: "Aug 11 — 25, 2024",
     title: "CES IELTS Test Centre — Dublin, Ireland",
-    role: "General English Intensive · 26 lessons/week · Level C1",
+    role: "General English Intensive — 26 lessons/week, Level C1",
     desc: "Intensive general English course at the CES centre on Dame Court, Dublin 2. Four weeks of full immersion focused on speaking, writing, reading and listening at advanced level (C1). Passed the IELTS exam at the end of the course. Independent exploration of the area: Howth, Balbriggan, North Bull Island, Bray, Greystones, Glendalough, Powerscourt Estate and Galway.",
     pdf: "/attestato-ces-ielts-c1.pdf",
     pdfLabel: "Open certificate (PDF)",
   },
   {
     period: "2024 — 2025",
-    title: "Parish summer camp · SS. Donato e Vigilio Martiri Parish",
-    role: "Volunteer youth leader · Rivalta sul Mincio · 6 weeks/year · 2 editions",
+    title: "Parish summer camp — SS. Donato e Vigilio Martiri Parish",
+    role: "Volunteer youth leader — Rivalta sul Mincio, 6 weeks/year, 2 editions",
     desc: "Volunteer youth-leader service during the parish summer camp (Grest) — two consecutive editions (summer 2024 and 2025), for a total of twelve weeks. Direct responsibility for groups of children of different ages. Planning and running games, workshops and educational activities. Managing group dynamics, mediation, communication with parents. Reference: Fr. Andrea Grandi.",
   },
   {
     period: "Summer 2024",
-    title: "CRED · Rodigo Secondary School",
-    role: "Volunteer educational support · Municipality of Rodigo · 2 weeks",
+    title: "CRED — Rodigo Secondary School",
+    role: "Volunteer educational support — Municipality of Rodigo, 2 weeks",
     desc: "Educational support and youth activities during the Municipality of Rodigo's summer day camp. Assisting educators in running activities, managing groups, individual support for pupils and organising structured and free play.",
   },
   {
     period: "Jul 23 — Aug 1, 2025",
-    title: "Paris · Le Havre · Rouen · Étretat — France",
+    title: "Paris, Le Havre, Rouen, Étretat — France",
     role: "Cultural trip",
     desc: "An itinerary across Normandy and Île-de-France: the cliffs of Étretat, the Gothic cathedral of Rouen, the historic port of Le Havre and the main museums and quarters of Paris.",
   },
@@ -169,7 +169,7 @@ const CV = [
   {
     period: "Mar 22 — 23, 2026",
     title: "Polling clerk — Section 5, Rivalta sul Mincio",
-    role: "Electoral operations · Municipality of Rodigo · Referendum",
+    role: "Electoral operations — Municipality of Rodigo, Referendum",
     desc: "Official appointment as a polling clerk at electoral section no. 5 of Rivalta sul Mincio (Municipality of Rodigo) for the Referendum of 22–23 March 2026. Tasks: verifying voters' identity, managing voting operations, counting ballots, drafting reports and transmitting results. Paid appointment with a fee of €119.60.",
   },
   {
@@ -187,14 +187,14 @@ const CV = [
   {
     period: "Jun 30 — Jul 1, 2026",
     title: "Film extra — «House of Gonzaga» TV series",
-    role: "Background performer · Crowd scene · Piazza Broletto, Mantua",
+    role: "Background performer — Crowd scene, Piazza Broletto, Mantua",
     desc: "Background acting (figurazione) for the television series «House of Gonzaga», shot in the historic centre of Mantua. Part of the crowd in a night-time DJ-set scene filmed in Piazza Broletto, over two days (30 June – 1 July 2026) for around 10 hours on set.",
   },
   // --- wishlist ---
   {
     period: "✦ wish",
     title: "Found my own news outlet",
-    role: "Independent journalism · Reportage · Publishing",
+    role: "Independent journalism — Reportage, Publishing",
     desc: "To build a personal news medium: go out into the field and tell true stories without filters, with the same drive and courage I admire in those who stop at nothing to get the story.",
     wish: true,
   },
@@ -439,7 +439,7 @@ const { data } = await supabase
 ● Leggo l'HTML salvato e i componenti…
 ● Riscrivo App.tsx, home.css e le icone
 
-3 files changed · build ok`,
+3 files changed, build ok`,
   },
 ];
 
@@ -913,13 +913,14 @@ export default function App() {
               <div className="sb-card-head">
                 <div className="sb-card-title"><IcCode /><h3>Websites</h3></div>
                 <p className="sb-card-desc">
-                  Designed, written and shipped <strong>end to end</strong> — React and
-                  TypeScript, no page builders.
+                  Conceived, written and carried into port{" "}
+                  <strong>from the first line to the last</strong> — React and TypeScript,
+                  and never a page builder.
                 </p>
                 <ul className="sb-checks">
-                  <li><IcCheck size={15} /> 100% responsive</li>
-                  <li><IcCheck size={15} /> Light and dark, both drawn</li>
-                  <li><IcCheck size={15} /> Source downloadable</li>
+                  <li><IcCheck size={15} /> They bend to every screen</li>
+                  <li><IcCheck size={15} /> The day and the night, both drawn</li>
+                  <li><IcCheck size={15} /> The source goes home with you</li>
                 </ul>
               </div>
               <div className="sb-card-visual">
@@ -932,9 +933,10 @@ export default function App() {
           <a href="#lavori" className="sb-card" data-acc="verde">
             <ProductCard>
               <div className="sb-card-head">
-                <div className="sb-card-title"><IcGlobe /><h3>Rivalta · Cascina Fontana</h3></div>
+                <div className="sb-card-title"><IcGlobe /><h3>Rivalta e Cascina Fontana</h3></div>
                 <p className="sb-card-desc">
-                  Two real businesses online, <strong>from brief to launch</strong>.
+                  Two true businesses to which I gave a face,{" "}
+                  <strong>from the first word to the day they appeared</strong>.
                 </p>
               </div>
               <div className="sb-card-visual">
@@ -955,7 +957,8 @@ export default function App() {
               <div className="sb-card-head">
                 <div className="sb-card-title"><IcSparkle /><h3>AI-assisted development</h3></div>
                 <p className="sb-card-desc">
-                  Claude Code, Codex, Copilot — <strong>every line reviewed</strong>.
+                  Claude Code, Codex, Copilot — machines that write, and{" "}
+                  <strong>not one line passes without my eye upon it</strong>.
                 </p>
               </div>
               <div className="sb-card-visual">
@@ -970,8 +973,8 @@ export default function App() {
               <div className="sb-card-head">
                 <div className="sb-card-title"><IcCamera /><h3>Photography</h3></div>
                 <p className="sb-card-desc">
-                  Portraits, as an amateur. <strong>The frames stay private</strong> — only
-                  the numbers are public.
+                  Portraits, by a lover of the craft. <strong>The faces stay mine
+                  alone</strong> — to the world I hand the number, never the image.
                 </p>
               </div>
               <div className="sb-card-visual">
@@ -984,10 +987,10 @@ export default function App() {
           <Link to="/pcto" className="sb-card" data-acc="ambra">
             <ProductCard>
               <div className="sb-card-head">
-                <div className="sb-card-title"><IcRuler /><h3>Surveying · university</h3></div>
+                <div className="sb-card-title"><IcRuler /><h3>Surveying and university</h3></div>
                 <p className="sb-card-desc">
                   Construction and Land Management, after the <strong>CAT diploma</strong> —
-                  AutoCAD, topography, valuation.
+                  AutoCAD, topography, and the art of weighing what a thing is worth.
                 </p>
               </div>
               <div className="sb-card-visual">
@@ -1002,7 +1005,8 @@ export default function App() {
               <div className="sb-card-head">
                 <div className="sb-card-title"><IcCar /><h3>Cars</h3></div>
                 <p className="sb-card-desc">
-                  Three I dream about, <strong>drawn live in 3D</strong> by your graphics card.
+                  Three I dream of, <strong>drawn alive in three dimensions</strong> by the
+                  card inside your own machine.
                 </p>
               </div>
               <div className="sb-card-visual">
@@ -1015,8 +1019,8 @@ export default function App() {
         {/* Coda della griglia: tagline + clienti */}
         <div className="sb-container sb-prodfoot">
           <p className="sb-prodfoot-tag">
-            <strong>One person, end to end.</strong> Design, code, content and deploy —
-            integrated like a platform.
+            <strong>One hand alone, from the beginning to the end.</strong> Drawing, code,
+            words and the setting to work — one single body.
           </p>
           <span className="sb-trusted-label">Trusted by real clients</span>
           {/* data-no-i18n su tutto il blocco: è output di un comando, e il sito
@@ -1050,7 +1054,7 @@ export default function App() {
                   ))}
                   <p className="sb-term-line">
                     <span className="c">#</span>
-                    <span className="c">2 shipped · 2 online</span>
+                    <span className="c">2 shipped, 2 online</span>
                   </p>
                   <p className="sb-term-line">
                     <span className="p">$</span>
@@ -1150,7 +1154,7 @@ export default function App() {
                   rel="noreferrer noopener"
                 >
                   <span>Read the docs</span>
-                  <span translate="no">· {activeTech.name}</span>
+                  <span translate="no">— {activeTech.name}</span>
                   <IcArrowRight size={15} />
                 </a>
               </div>
