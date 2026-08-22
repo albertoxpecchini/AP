@@ -46,8 +46,6 @@ import {
   IcPin,
   IcCamera,
   IcAperture,
-  IcCamera,
-  IcRuler,
   IcCar,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
