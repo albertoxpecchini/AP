@@ -2281,21 +2281,28 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
 /* I cinque livelli del rumore di fondo. Sono volutamente fiochi: il fondo deve
    restare fondo, e il salto di luce fra lui e il numero è tutto quello che fa
-   leggere il numero. */
+   leggere il numero.
+
+   Qui l'azzurro era scritto a mano, hsla(197 100% 49%) dieci volte di fila, e
+   si vedeva: da quando la sezione «Open source» è viola, il muro era l'unica
+   cosa rimasta blu dentro di essa — la nav sopra aveva già cambiato tinta. Un
+   colore battuto a macchina è un colore che non può seguire niente. Adesso
+   leggono --sb-accent e le opacità restano quelle di prima, prese con
+   color-mix invece che con la quarta cifra di hsla. */
 .sb-cwall-cell { fill: var(--sb-overlay); }
-.sb-cwall-cell[data-lv="1"] { fill: hsla(197, 100%, 49%, 0.07); }
-.sb-cwall-cell[data-lv="2"] { fill: hsla(197, 100%, 49%, 0.1); }
-.sb-cwall-cell[data-lv="3"] { fill: hsla(197, 100%, 49%, 0.13); }
-.sb-cwall-cell[data-lv="4"] { fill: hsla(197, 100%, 49%, 0.16); }
+.sb-cwall-cell[data-lv="1"] { fill: color-mix(in srgb, var(--sb-accent) 7%, transparent); }
+.sb-cwall-cell[data-lv="2"] { fill: color-mix(in srgb, var(--sb-accent) 10%, transparent); }
+.sb-cwall-cell[data-lv="3"] { fill: color-mix(in srgb, var(--sb-accent) 13%, transparent); }
+.sb-cwall-cell[data-lv="4"] { fill: color-mix(in srgb, var(--sb-accent) 16%, transparent); }
 
 /* Le celle del numero. Anche loro hanno cinque livelli, ma stretti e in alto:
    il numero non è una macchia di tinta piatta, è fatto di quadratini che si
    somigliano — come quelli veri di un grafo delle contribuzioni. */
-.sb-cwall-cell--on { fill: hsla(197, 100%, 49%, 0.8); }
-.sb-cwall-cell--on[data-lv="1"] { fill: hsla(197, 100%, 49%, 0.95); }
-.sb-cwall-cell--on[data-lv="2"] { fill: hsl(197, 100%, 49%); }
-.sb-cwall-cell--on[data-lv="3"] { fill: hsla(197, 100%, 49%, 0.85); }
-.sb-cwall-cell--on[data-lv="4"] { fill: hsla(197, 100%, 49%, 0.9); }
+.sb-cwall-cell--on { fill: color-mix(in srgb, var(--sb-accent) 80%, transparent); }
+.sb-cwall-cell--on[data-lv="1"] { fill: color-mix(in srgb, var(--sb-accent) 95%, transparent); }
+.sb-cwall-cell--on[data-lv="2"] { fill: var(--sb-accent); }
+.sb-cwall-cell--on[data-lv="3"] { fill: color-mix(in srgb, var(--sb-accent) 85%, transparent); }
+.sb-cwall-cell--on[data-lv="4"] { fill: color-mix(in srgb, var(--sb-accent) 90%, transparent); }
 
 /* L'accensione. Una volta sola, all'ingresso in scena: il muro si apre da
    sinistra a destra e il numero emerge mezzo secondo dopo che il rumore è

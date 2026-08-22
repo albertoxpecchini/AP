@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "prebuild": "node scripts/build-trivia-version.mjs && node scripts/build-zips.mjs && node scripts/build-repo-tree.mjs && node scripts/build-i18n.mjs",
+    "prebuild": "node scripts/build-trivia-version.mjs && node scripts/build-commits.mjs && node scripts/build-zips.mjs && node scripts/build-repo-tree.mjs && node scripts/build-i18n.mjs",
     "build": "vite build",
     "dev": "node scripts/dev/avvia.mjs",
     "dev:sfondo": "node scripts/dev/avvia.mjs --sfondo",
@@ -14,6 +14,7 @@
     "dev:vite": "vite",
     "zips": "node scripts/build-zips.mjs",
     "repo-tree": "node scripts/build-repo-tree.mjs",
+    "commits": "node scripts/build-commits.mjs",
     "i18n": "node scripts/build-i18n.mjs",
     "foto": "node scripts/build-foto-mima.mjs",
     "scatti": "node scripts/build-foto-shooting.mjs",

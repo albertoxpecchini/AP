@@ -578,15 +578,17 @@ export function ContourPlate() {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** I commit del repository. Il numero NON è scritto qui: sta in commits.json,
- *  che lo rigenera scripts/build-repo-tree.mjs a ogni build con la storia
+ *  che lo rigenera scripts/build-commits.mjs a ogni build con la storia
  *  completa sotto mano. Prima era un 1200 messo a mano — il conto vero era 400,
  *  cioè il sito dichiarava il triplo dei commit che aveva davvero, e nessuno
  *  poteva accorgersene perché non c'era niente con cui confrontarlo.
  *
- *  Il file è generato E versionato, come src/app/trivia/version.json: su Vercel
- *  il clone è troncato e `git rev-list` conterebbe dieci commit, quindi il
- *  valore buono dev'essere già nel repo quando la build parte. Vedi la nota
- *  lunga in build-repo-tree.mjs per le tre fonti e il loro ordine. */
+ *  Il file è generato E versionato, con lo stesso patto di
+ *  src/app/trivia/version.json — e dalla stessa forma di script, che ne è la
+ *  copia: su Vercel il clone è troncato e `git rev-list` conterebbe dieci
+ *  commit, quindi il valore buono dev'essere già nel repo quando la build
+ *  parte, e non può mai tornare indietro. Vedi la nota lunga in
+ *  build-commits.mjs per le tre regole e le due fonti. */
 import commitsData from "./commits.json";
 const COMMITS: number = commitsData.count;
 
