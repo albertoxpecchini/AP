@@ -1085,7 +1085,12 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
      cornice, e per quelli l'appoggio in basso aveva senso.) */
   align-items: center;
   justify-content: center;
-  padding: 1.25rem 1.4rem 1.4rem;
+  /* Niente margine laterale: le tavole arrivano ai bordi della lastra.
+     È la differenza fra un'illustrazione incorniciata e un pezzo di prodotto
+     — la provinatura della card Fotografia continua fuori dalla card, e può
+     farlo solo se il taglio è il bordo della card e non un padding. Sopra un
+     po' d'aria resta, per staccare il disegno dall'ultima riga di testo. */
+  padding: 1rem 0 0;
   min-height: 108px;
   transform: translate3d(0, calc(var(--sb-drift, 0px) * -0.035), 0);
 
@@ -1255,163 +1260,243 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 /* ═══════════════════════════════════════════════════════════════════════════
    I DISEGNI DELLA GRIGLIA PRODOTTI
 
-   Sette figure a tratto, tutte sulla stessa tavola di 280×132, stesso spessore
-   di linea, stesso azzurro. Vedi la nota in testa a site/homeLive.tsx per il
-   perché sono disegni e non più miniature di interfacce.
+   Sei tavole da 280×132, stesso terreno, stessi tre pesi di linea. Vedi la
+   nota in testa a site/homeLive.tsx per che cosa disegnano e da quale tavola
+   di Supabase viene ciascuna.
 
-   ── Come si muovono ──────────────────────────────────────────────────────────
-   Una cosa sola per riquadro, e su quattro proprietà soltanto:
+   ── Il terreno, che prima non c'era ─────────────────────────────────────────
+   Le figure erano tratti sospesi nel vuoto della card. Le quattro tavole di
+   Supabase — Realtime, Vector, Storage, Postgres — non sono mai sospese:
+   hanno sotto una carta a quadretti che sfuma, e sopra pezzi di interfaccia
+   veri. È quello che le fa sembrare pezzi di prodotto invece che illustrazioni,
+   ed è la sola differenza che contava.
 
-     transform, opacity      il compositore le muove senza ricalcolare niente
-     offset-distance         il browser la risolve in una transform
-     stroke-dashoffset       ridisegna — ma filetti da 1,5 px, non gradienti
+   Tre strati, sempre in quest'ordine: carta millimetrata mascherata a sfumare,
+   alone della tinta della card, figura. I primi due li mette Plate() una volta
+   per tutte; il terzo cambia.
 
-   Qui c'è stato un giro in cui il puntatore comandava tutti e sette i visual
-   scrivendo `left`, `top`, `clip-path`, `color-mix` e `box-shadow`: proprietà
-   che rifanno il layout o ridisegnano a ogni movimento del mouse. Con sette
-   riquadri più il tilt della card il risultato erano scatti. Il puntatore è
-   rimasto su un disegno solo, la tavola delle curve di livello, dove agisce
-   dentro una `transform` — cioè dove costa quanto le altre.
+   ── I pesi di linea ─────────────────────────────────────────────────────────
+   Tre, e bastano: --ill-grid per il terreno, --ill-line per la struttura,
+   --ill-ink per quello che sta davanti. Nessuno dei tre è un colore di
+   interfaccia (--sb-border e compagnia): quelli, su una lastra di vetro,
+   spariscono. Sono tutti e tre il colore del testo diluito, così seguono il
+   tema da sé, in chiaro come in scuro.
+
+   Il quarto colore è la tinta della card, --sb-accent, e arriva dal data-acc
+   che la card porta addosso: qui non è mai scritta a mano.
+
+   ── Come si muovono ─────────────────────────────────────────────────────────
+   Una cosa sola per riquadro, e su tre proprietà soltanto — transform, opacity
+   e (per i vertici del volume) fill su cerchi da 3px. Niente che rifaccia il
+   layout, tranne la pillola del comando, che è un caso a parte e spiegato lì.
 
    ── Il fotogramma di riposo ─────────────────────────────────────────────────
-   Ogni regola base è scritta sul fotogramma FINITO: tratti disegnati, lente
-   accesa, palla arrivata. Le keyframe partono da lì e ci tornano. Serve perché
-   spegnere un'animazione (prefers-reduced-motion) lascia l'elemento sui valori
-   della regola normale: se quelli fossero il primo fotogramma, chi ha chiesto
-   meno movimento vedrebbe sette tavole mezze vuote.
+   Ogni regola base è scritta sul fotogramma FINITO: finestra composta, anello
+   sul suo fotogramma, lancetta a fondo scala. Le keyframe partono di lì e ci
+   tornano. Serve perché spegnere un'animazione (prefers-reduced-motion) lascia
+   l'elemento sui valori della regola normale: se quelli fossero il primo
+   fotogramma, chi ha chiesto meno movimento vedrebbe sei tavole a metà.
 
-   Da quando il gesto parte solo al passaggio del puntatore, quel fotogramma di
-   riposo non è più soltanto una rete di sicurezza per prefers-reduced-motion:
-   è quello che si vede per la maggior parte del tempo, su ogni card che non
-   stai puntando e su tutti i telefoni. Le regole qui sotto hanno durata, curva
-   e ritardo ma NESSUN animation-name — il nome lo aggiunge l'hover, in fondo
-   al foglio, sotto «Il gesto parte al passaggio». Se aggiungi una figura,
-   scrivila con la stessa regola: valori di arrivo qui, nome là.
+   E da quando il gesto parte solo al passaggio del puntatore, quel fotogramma
+   non è più una rete di sicurezza: è quello che si vede quasi sempre, su ogni
+   card che non stai puntando e su tutti i telefoni. Le regole qui sotto hanno
+   durata, curva e ritardo ma NESSUN animation-name — il nome lo aggiunge
+   l'hover, in fondo al blocco. Se aggiungi una figura, scrivila così: valori
+   di arrivo qui, nome là.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sb-ill {
-  /* Tre pesi di linea, e bastano: la struttura, il dettaglio, l'accento.
-     La struttura NON usa --sb-border-stronger, che è il colore dei bordi di
-     interfaccia: su una lastra di vetro un filetto da 1,5 px di quel grigio
-     sparisce. Qui serve un tratto che si veda come tratto — una matita, non
-     un bordo — e lo si ottiene dal colore del testo, molto diluito, così
-     segue il tema da sé in chiaro e in scuro. */
-  --ill-line: color-mix(in srgb, var(--sb-fg) 30%, transparent);
-  --ill-ink: color-mix(in srgb, var(--sb-fg) 45%, transparent);
-  --ill-brand: var(--sb-accent, var(--sb-brand));
+  --ill-grid: color-mix(in srgb, var(--sb-fg) 10%, transparent);
+  --ill-line: color-mix(in srgb, var(--sb-fg) 32%, transparent);
+  --ill-ink: color-mix(in srgb, var(--sb-fg) 52%, transparent);
+  --ill-fill: color-mix(in srgb, var(--sb-fg) 6%, transparent);
+  --ill-acc: var(--sb-accent, var(--sb-brand));
 
   display: block;
   width: 100%;
   height: auto;
-  max-width: 300px;
-  /* Nessun overflow: hidden — i tratti hanno il linecap tondo e sui bordi si
-     mangerebbe mezzo pixel di ogni estremità. */
-  overflow: visible;
-
-  /* Il valore di riposo di tutta la tavola: solo contorno. Sta QUI, sulla
-     radice, e non su un selettore tipo `.sb-ill circle` — che pure sarebbe
-     stato la cosa ovvia da scrivere.
-     `fill`, `stroke-linecap` e `stroke-linejoin` sono proprietà EREDITATE:
-     messe sulla radice scendono da sole su tutto, e chi ha un `fill` suo (i
-     satelliti, la palla, i puntini) lo applica e basta — una dichiarazione che
-     colpisce l'elemento batte sempre quella che gli arriva per eredità, a
-     prescindere dalla specificità. Con `.sb-ill circle { fill: none }`, invece,
-     la specificità c'era eccome: (0,1,1) contro (0,1,0) di `.sb-ill-sat`, e
-     vinceva il reset. Risultato: tutto quello che doveva essere pieno era
-     invisibile — i due satelliti, la palla dei rimbalzi, i puntini degli
-     insiemi e i tre bollini della testata. */
-  fill: none;
+  /* currentColor della tavola È la tinta della card: se la legge l'alone
+     radiale dentro Plate(), che così non ha bisogno di sapere quale sia. */
+  color: var(--ill-acc);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-/* Questa invece non è ereditata, e va distribuita. Tiene il tratto a 1,5 px
-   veri qualunque sia la misura a cui la tavola viene disegnata: la stessa
-   figura sta in una card da 230 px e in una da 380, e un filetto che scala
-   con lei sarebbe grasso di qua e sparito di là. */
-.sb-ill * { vector-effect: non-scaling-stroke; }
-/* La card grande ha il doppio dello spazio: la tavola del progetto ci sta
-   dentro più larga, e a quella misura le quote si leggono. */
-.sb-ill--blue { max-width: 380px; }
+/* Il quadretto del terreno. Sta dentro <pattern>, che è nei <defs>: si stila
+   da qui come qualsiasi altro elemento SVG. */
+.sb-ill-gridline {
+  fill: none;
+  stroke: var(--ill-grid);
+  stroke-width: 0.6;
+}
+/* Il palco: serve alle due tavole che hanno sopra dell'HTML (le righe con i
+   domini, la pillola del comando). */
+.sb-ill-stage { position: relative; width: 100%; }
 
-/* ── ① Sviluppo web — il progetto di una pagina ─────────────────────────────
-   Ogni tratto porta pathLength="1" e un tratteggio lungo quanto sé stesso: da
-   lì, scoprirlo è solo far scorrere stroke-dashoffset da 1 a 0, senza sapere
-   niente di quanto è lungo davvero il tracciato.
+/* ── ① Siti web — la finestra e i suoi echi ─────────────────────────────────
+   Gli echi sono quattro <use> della stessa forma. La rotazione sta in CSS e
+   non nell'attributo transform per una ragione precisa: una transform CSS
+   sostituisce l'attributo per intero, quindi tenerne una in ciascun posto
+   vuol dire perderne una. La posizione viaggia su x/y del <use>, che sono
+   attributi di geometria e non vengono toccati. */
+.sb-ill-frame { fill: var(--sb-bg); stroke: var(--ill-ink); stroke-width: 1.6; }
+.sb-ill-line { stroke: var(--ill-line); stroke-width: 1.3; }
+.sb-ill-dot { fill: var(--ill-line); }
+.sb-ill-block { fill: var(--ill-fill); stroke: var(--ill-line); stroke-width: 1.1; }
+.sb-ill-block--hi {
+  fill: color-mix(in srgb, var(--ill-acc) 20%, transparent);
+  stroke: color-mix(in srgb, var(--ill-acc) 60%, transparent);
+}
+.sb-ill-echo {
+  transform-box: view-box;
+  transform-origin: 140px 85px;
+  transform: rotate(var(--r));
+  opacity: var(--o);
+  animation-duration: 1.6s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-delay: calc(var(--i) * 0.06s);
+}
 
-   La cascata: --i è la posizione nell'elenco, il ritardo è quello. Alla fine
-   del giro il dashoffset non torna a 1 — va a -1, così il tratto scivola via
-   dalla parte opposta invece di arretrare. Un disegno che si cancella al
-   contrario sembra un errore; uno che si sfila sembra una mano. */
-.sb-ill-draw {
-  stroke: var(--ill-line);
+/* ── ② Rivalta e Cascina Fontana — il piano e i due spilli ─────────────────*/
+.sb-ill-plane {
+  fill: color-mix(in srgb, var(--ill-acc) 7%, transparent);
+  stroke: var(--ill-ink);
   stroke-width: 1.5;
-  stroke-dashoffset: 0;
-  animation-duration: var(--blue, 9s);
+}
+.sb-ill-planeline { stroke: var(--ill-grid); stroke-width: 1; }
+.sb-ill-pinshadow { fill: color-mix(in srgb, var(--sb-fg) 13%, transparent); }
+.sb-ill-pinstem { stroke: var(--ill-ink); stroke-width: 1.5; }
+/* La testa è piena del colore del fondo, non trasparente: il gambo le
+   passerebbe attraverso e sembrerebbe uno spillo trasparente. */
+.sb-ill-pinhead { fill: var(--sb-bg); stroke: var(--ill-ink); stroke-width: 1.5; }
+.sb-ill-pincore { fill: var(--ill-line); }
+.sb-ill-pin--on .sb-ill-pinhead { fill: var(--ill-acc); stroke: none; }
+.sb-ill-pin--on .sb-ill-pincore { fill: var(--sb-bg); }
+.sb-ill-pin {
+  transform-box: view-box;
+  animation-duration: 1.5s;
+  animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
+  animation-delay: calc(var(--i) * 0.14s);
+}
+/* Le due righe con il marchio, sotto al piano. */
+.sb-illrows {
+  position: absolute;
+  left: 1rem;
+  bottom: 0.35rem;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+.sb-illrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--sb-fg-light);
+}
+.sb-illrow svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--ill-acc, var(--sb-brand));
+  stroke-width: 1.3;
+}
+
+/* ── ③ Sviluppo con l'IA — cursori e bollicine ─────────────────────────────*/
+.sb-ill-bubble rect {
+  fill: var(--sb-surface-100);
+  stroke: var(--ill-line);
+  stroke-width: 1.3;
+}
+.sb-ill-bdot { fill: var(--ill-line); }
+.sb-ill-bubble--on rect {
+  fill: color-mix(in srgb, var(--ill-acc) 16%, var(--sb-surface-100));
+  stroke: color-mix(in srgb, var(--ill-acc) 65%, transparent);
+}
+.sb-ill-bubble--on .sb-ill-bdot {
+  fill: var(--ill-acc);
+  animation-duration: 1.1s;
   animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  animation-iteration-count: 3;
   animation-delay: calc(var(--i) * 0.16s);
 }
-/* I tre tratti del contenuto (blocco grande, diagonale, due colonne) sono
-   quelli che raccontano la pagina: vanno in azzurro, il telaio resta grigio. */
-.sb-ill--blue .sb-ill-draw:nth-child(n + 5) { stroke: var(--ill-brand); opacity: 0.85; }
-.sb-ill-dot { fill: var(--ill-line); stroke: none; }
-@keyframes sb-ill-draw {
-  0%       { stroke-dashoffset: 1; }
-  26%, 76% { stroke-dashoffset: 0; }
-  94%,100% { stroke-dashoffset: -1; }
+.sb-ill-cursor {
+  fill: color-mix(in srgb, var(--sb-fg) 60%, transparent);
+  transform-box: view-box;
+  transform: translate(var(--x), var(--y));
+  animation-duration: 2.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sb-ill-cursor--b { fill: var(--ill-acc); animation-delay: 0.3s; }
+
+/* ── ④ Fotografia — la provinatura ─────────────────────────────────────────*/
+.sb-ill-tile {
+  fill: var(--ill-fill);
+  stroke: color-mix(in srgb, var(--sb-fg) 13%, transparent);
+  stroke-width: 1.1;
+}
+.sb-ill-tileglyph { fill: none; stroke: var(--ill-line); stroke-width: 1.3; }
+.sb-ill-tilesel {
+  fill: color-mix(in srgb, var(--ill-acc) 12%, transparent);
+  stroke: var(--ill-acc);
+  stroke-width: 1.8;
+  transform-box: view-box;
+  animation-duration: 2s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* ── ③ Sviluppo con l'AI — il prisma ────────────────────────────────────────
-   Il raggio arriva, dentro il vetro piega, e il ventaglio si apre a rastrello.
-   Tutto su stroke-dashoffset: ogni tratto cresce dalla sua origine, che è poi
-   il verso in cui la luce va davvero. */
-.sb-ill-glass {
-  fill: color-mix(in srgb, var(--ill-brand) 10%, transparent);
-  stroke: none;
+/* ── ⑤ Il geometra — il volume in assonometria ─────────────────────────────*/
+.sb-ill-cubeface { fill: color-mix(in srgb, var(--ill-acc) 9%, transparent); stroke: none; }
+.sb-ill-cubeline { fill: none; stroke: var(--ill-ink); stroke-width: 1.6; }
+.sb-ill-cubehidden {
+  fill: none;
+  stroke: var(--ill-line);
+  stroke-width: 1;
+  stroke-dasharray: 3 3.5;
 }
-.sb-ill-edge { stroke: var(--ill-line); stroke-width: 1.5; }
-.sb-ill-beam {
-  stroke: var(--ill-brand);
-  stroke-width: 2;
-  stroke-dashoffset: 0;
-  animation-duration: var(--prism, 8s);
+.sb-ill-vertex-dot {
+  fill: var(--sb-bg);
+  stroke: var(--ill-acc);
+  stroke-width: 1.6;
+  animation-duration: 1.4s;
   animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  animation-delay: calc(var(--i) * 0.08s);
 }
-/* Il secondo segmento ha una keyframe sua (parte quando il primo è arrivato):
-   il nome, come per tutti gli altri, glielo dà il blocco «Il gesto» in fondo. */
-.sb-ill-ray {
-  stroke: var(--ill-brand);
-  stroke-width: 1.5;
-  stroke-dashoffset: 0;
-  /* I cinque raggi non hanno la stessa forza: la luce si divide, non si
-     moltiplica. Il centrale è il più pieno, gli esterni sfumano. */
-  opacity: calc(0.9 - 0.13 * var(--i));
-  animation-duration: var(--prism, 8s);
+.sb-ill-mote {
+  fill: var(--ill-acc);
+  opacity: 0.4;
+  transform-box: view-box;
+  animation-duration: 2.6s;
   animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-delay: calc(var(--i) * 0.07s);
+  animation-delay: calc(var(--i) * 0.25s);
 }
-@keyframes sb-ill-beam {
-  0%       { stroke-dashoffset: 1; }
-  18%, 82% { stroke-dashoffset: 0; }
-  96%,100% { stroke-dashoffset: 1; }
+.sb-ill-quote { fill: none; stroke: var(--ill-line); stroke-width: 1.2; }
+
+/* ── ⑥ Auto — il quadrante ─────────────────────────────────────────────────*/
+.sb-ill-dial { stroke: var(--ill-line); stroke-width: 1.6; }
+.sb-ill-tickmark { stroke: var(--ill-line); stroke-width: 1.6; }
+.sb-ill-tickmark--red { stroke: var(--ill-acc); }
+/* La lancetta è disegnata dritta in su e ruota: la geometria non sa niente
+   dell'angolo, e l'angolo è l'unica cosa che si anima. A riposo sta a fondo
+   scala. */
+.sb-ill-needle {
+  transform-box: view-box;
+  transform-origin: 140px 124px;
+  transform: rotate(72deg);
+  animation-duration: 1.8s;
+  animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
 }
-@keyframes sb-ill-beam-in {
-  0%, 14%  { stroke-dashoffset: 1; }
-  26%, 82% { stroke-dashoffset: 0; }
-  96%,100% { stroke-dashoffset: 1; }
-}
-@keyframes sb-ill-ray {
-  0%, 24%  { stroke-dashoffset: 1; }
-  44%, 82% { stroke-dashoffset: 0; }
-  94%,100% { stroke-dashoffset: 1; }
-}
+.sb-ill-needle path { stroke: var(--ill-ink); stroke-width: 2; }
+.sb-ill-needle--ghost { transform: rotate(calc(72deg - var(--d))); opacity: var(--o); }
+.sb-ill-needle--ghost path { stroke: var(--ill-acc); }
+.sb-ill-hub { fill: var(--ill-ink); }
 
 /* ── ③ bis · La riga di comando che si riscrive ──────────────────────────────
-   La pillola sotto al prisma, presa dalla card Edge Functions di Supabase: lì
-   sta in mezzo al globo e dice `$ supabase functions deploy`, e al passaggio
-   del puntatore l'ultima parola si cancella e diventa `serve`.
+   La pillola sulla tavola dell'IA, presa dalla card Edge Functions di
+   Supabase: lì sta in mezzo al globo e dice `$ supabase functions deploy`, e
+   al passaggio del puntatore l'ultima parola si cancella e diventa `serve`.
 
    Loro usano typed.js, che scrive textContent lettera per lettera. Qui le
    parole sono due span e a scriverle è la LARGHEZZA, che cresce e cala a
@@ -1427,16 +1512,11 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    foglio, nel blocco «Lo smusso». Su una superficie alta 26px un taglio da 10
    sarebbe più della metà del lato corto, e la pillola smetterebbe di essere
    una pillola per diventare un rombo. */
-.sb-ill-stage {
-  position: relative;
-  width: 100%;
-  max-width: 300px;
-}
 .sb-typebar {
   position: absolute;
   left: 50%;
-  top: 76%;
-  transform: translate(-50%, -50%);
+  bottom: 0.4rem;
+  transform: translateX(-50%);
   z-index: 1;
   /* inline-block e NON inline-flex: un flex container butta via gli spazi fra
      i suoi figli, perché li tratta come elementi e non come testo. Con flex la
@@ -1474,228 +1554,108 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 /* Sei caratteri, sei scatti. La misura è scritta due volte, qui e nel testo del
    componente: se cambia la parola vanno cambiate tutte e due. */
 .sb-typebar-w--a { width: 6ch; animation-timing-function: steps(6); }
-.sb-typebar-w--b { width: 0;   animation-timing-function: steps(4); }
+.sb-typebar-w--b { width: 0; animation-timing-function: steps(4); }
 @keyframes sb-type-out {
-  0%, 14%   { width: 6ch; }
+  0%, 14% { width: 6ch; }
   46%, 100% { width: 0; }
 }
 @keyframes sb-type-in {
-  0%, 52%   { width: 0; }
+  0%, 52% { width: 0; }
   84%, 100% { width: 4ch; }
 }
 
-
-/* ── ⑥ Siti per clienti — il globo ──────────────────────────────────────────
-   Una sola animazione per tutti e due i satelliti: al secondo basta mezzo giro
-   di ritardo per stare dalla parte opposta. Passando dietro al globo si
-   smorzano, ed è quello smorzarsi che dà la profondità — senza, l'ellisse
-   resta un anello piatto disegnato sopra. */
-.sb-ill-globe { stroke: var(--ill-line); stroke-width: 1.5; }
-/* view-box e non fill-box: i due satelliti hanno la geometria all'origine
-   (0,0) — è offset-path a portarli in orbita — quindi il riquadro del gruppo
-   parte da lì, e ruotare attorno al suo centro vorrebbe dire ruotare attorno a
-   un punto che con il globo non c'entra niente. Con view-box l'origine la
-   scelgo io, ed è il centro del globo. */
-.sb-ill-orbit {
-  transform-box: view-box;
-  transform-origin: 140px 66px;
-  transform: rotate(-14deg);
+/* ── Le keyframe ─────────────────────────────────────────────────────────────
+   Tutte partono e finiscono sul fotogramma di riposo: quello che si vede
+   uscendo dalla card è la figura composta, non un fotogramma a caso. */
+@keyframes sb-ill-echo {
+  50% { transform: rotate(calc(var(--r) * 2.2)); opacity: calc(var(--o) * 1.5); }
 }
-.sb-ill-track {
-  stroke: var(--ill-brand);
-  stroke-width: 1;
-  opacity: 0.4;
+@keyframes sb-ill-bob {
+  40% { transform: translateY(-7px); }
 }
-.sb-ill-sat {
-  fill: var(--ill-brand);
-  stroke: none;
-  offset-path: path("M52,66 A88,28 0 0,1 228,66 A88,28 0 0,1 52,66");
-  offset-rotate: 0deg;
-  offset-distance: 25%;
-  animation-duration: var(--orbit, 11s);
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
+@keyframes sb-ill-dots {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  40% { transform: translateY(-2.5px); opacity: 1; }
 }
-/* Mezzo giro di ritardo, in negativo: l'animazione parte già a metà corsa,
-   quindi il secondo satellite è dall'altra parte fin dal primo fotogramma
-   invece di aspettare mezzo giro per mettersi in posizione. */
-.sb-ill-sat--b {
-  offset-distance: 75%;
-  animation-delay: calc(var(--orbit, 11s) / -2);
+@keyframes sb-ill-drift {
+  50% { transform: translate(calc(var(--x) + 14px), calc(var(--y) - 9px)); }
 }
-/* offset-distance è dichiarata solo agli estremi: fra 0% e 100% il browser la
-   interpola da sé, e i fotogrammi in mezzo servono soltanto all'opacità. La
-   prima metà del giro passa DIETRO al globo (l'orbita è inclinata verso chi
-   guarda), ed è lì che il satellite si smorza. */
-@keyframes sb-ill-orbit {
-  0%   { offset-distance: 0%; opacity: 0.3; }
-  46%  { opacity: 0.3; }
-  56%  { opacity: 1; }
-  92%  { opacity: 1; }
-  100% { offset-distance: 100%; opacity: 0.3; }
+@keyframes sb-ill-sel {
+  0%, 12% { transform: translate(0, 0); }
+  50%, 62% { transform: translate(128px, 84px); }
+  100% { transform: translate(0, 0); }
 }
-
-/* ── ④ Fotografia — il diaframma ─────────────────────────────────────────────
-   Barilotto, tacche dei diaframmi, apertura esagonale. Il gesto è uno solo: si
-   chiude. Una transform su fill-box, perché l'origine dev'essere il centro
-   della figura e non quello della tavola. */
-.sb-ill-barrel { stroke: var(--ill-line); stroke-width: 1.5; }
-.sb-ill-stop { stroke: var(--ill-ink); stroke-width: 1.5; }
-.sb-ill-iris {
-  stroke: var(--ill-brand);
-  stroke-width: 1.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation-duration: var(--iris, 6.2s);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+@keyframes sb-ill-vtx {
+  0%, 100% { fill: var(--sb-bg); }
+  45% { fill: var(--ill-acc); }
 }
-.sb-ill-iris-fill {
-  fill: color-mix(in srgb, var(--ill-brand) 16%, transparent);
-  stroke: none;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation-duration: var(--iris, 6.2s);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+@keyframes sb-ill-mote {
+  50% { transform: translateY(-6px); opacity: 0.9; }
 }
-@keyframes sb-ill-iris {
-  0%, 12%   { transform: scale(1); }
-  46%, 58%  { transform: scale(0.48); }
-  92%, 100% { transform: scale(1); }
-}
-
-/* ── ⑥ Auto — il quadrante ───────────────────────────────────────────────────
-   L'arco, nove tacche (le ultime tre in zona rossa) e la lancetta. La lancetta
-   è disegnata dritta in su e ruota: la geometria non sa niente dell'angolo, e
-   l'angolo è l'unica cosa che si anima.
-
-   view-box e non fill-box, come per l'orbita del globo: il perno sta a
-   (140, 96), che è un punto della TAVOLA — con fill-box ruoterebbe attorno al
-   centro del proprio riquadro, cioè a metà della sua lunghezza. */
-.sb-ill-dial { stroke: var(--ill-line); stroke-width: 1.5; }
-.sb-ill-tickmark { stroke: var(--ill-ink); stroke-width: 1.5; }
-.sb-ill-tickmark--red { stroke: var(--ill-brand); }
-.sb-ill-needle path { stroke: var(--ill-brand); stroke-width: 2; }
-.sb-ill-needle {
-  transform-box: view-box;
-  transform-origin: 140px 96px;
-  transform: rotate(70deg);
-  animation-duration: var(--gauge, 5.4s);
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  animation-iteration-count: infinite;
-}
-.sb-ill-hub { fill: var(--ill-ink); stroke: none; }
 @keyframes sb-ill-needle {
-  0%       { transform: rotate(-70deg); }
-  62%,100% { transform: rotate(70deg); }
+  0% { transform: rotate(-72deg); }
+  100% { transform: rotate(72deg); }
+}
+@keyframes sb-ill-needle-ghost {
+  0% { transform: rotate(-72deg); }
+  100% { transform: rotate(calc(72deg - var(--d))); }
 }
 
-/* ── ⑦ Area tecnica CAT — le curve di livello ───────────────────────────────
-   La quota che sale: le curve si accendono una dopo l'altra dall'esterno verso
-   il centro, che è poi come si legge un rilievo. Solo opacity.
+/* ═══════════════════════════════════════════════════════════════════════════
+   IL GESTO PARTE AL PASSAGGIO
 
-   E la tavola che si orienta verso il puntatore: --vis-x e --vis-y le scrive
-   site/GlassMotion.tsx sul riquadro sotto il cursore, a riposo valgono 0.5
-   (cioè il centro, cioè tavola dritta). È l'unico posto della griglia dove il
-   puntatore comanda ancora qualcosa, e lo fa dentro una transform. */
-.sb-ill-plate {
-  width: 100%;
-  max-width: 300px;
-  perspective: 720px;
-}
-.sb-ill--topo {
-  transform: rotateX(calc((var(--vis-y, 0.5) - 0.5) * -18deg))
-             rotateY(calc((var(--vis-x, 0.5) - 0.5) * 26deg));
-  /* Nessuna transizione: la curva ce l'hanno già i quickTo che tweenano il
-     numero prima di scriverlo (una var CSS non registrata con @property non
-     transiziona — vedi il blocco ④ di site/GlassMotion.tsx). */
-}
-.sb-ill-level {
-  stroke: var(--ill-brand);
-  stroke-width: 1.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  opacity: 0.85;
-  animation-duration: var(--topo, 6.8s);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-delay: calc(var(--i) * 0.22s);
-}
-.sb-ill-vertex { stroke: var(--ill-ink); stroke-width: 1.5; }
-.sb-ill-vertex-dot { fill: var(--ill-ink); stroke: none; }
-.sb-ill-cross { stroke: var(--ill-ink); stroke-width: 1; opacity: 0.7; }
-@keyframes sb-ill-level {
-  0%, 100% { opacity: 0.28; }
-  30%      { opacity: 1; }
-  62%      { opacity: 0.28; }
-}
-
-/* ── IL GESTO PARTE AL PASSAGGIO ─────────────────────────────────────────────
-   Ripreso dalla griglia prodotti di Supabase, che è il modello di questa
-   sezione. Lì dentro, da fermo, non si muove NIENTE: il nastro dello Storage e
-   quello delle Data APIs stanno in `pause` e ripartono con `group-hover:run`,
-   il terminale delle Edge Functions comincia a digitare solo dopo 200 ms di
-   passaggio, i cursori del Realtime sono immobili finché non entri nella card.
-   È quello che fa sembrare quella griglia viva senza renderla fastidiosa: sette
-   figure che si agitano tutte insieme sono un albero di Natale, sette figure
-   ferme di cui una si anima sotto la tua mano sono un meccanismo.
-
-   Qui prima era il contrario: dieci animazioni in ciclo infinito, tutte accese
-   sempre, anche con la sezione fuori schermo e anche su un telefono che non ha
-   un cursore da passare. Adesso il verso è quello di Supabase.
+   Da ferma la griglia è ferma. Una figura si anima solo mentre il puntatore
+   (o il focus da tastiera) sta sulla sua card. È la regola della griglia
+   prodotti di Supabase, da cui questa sezione viene: sei figure che si
+   agitano tutte insieme sono un albero di Natale, sei figure ferme di cui una
+   si muove sotto la tua mano sono un meccanismo.
 
    ── Come, senza rompere il fotogramma di riposo ─────────────────────────────
    La via ovvia — `animation-play-state: paused`, e `running` sull'hover — qui
    NON funziona, ed è istruttivo il perché. Un'animazione in pausa applica
    comunque il suo fotogramma corrente, che al tempo zero è lo 0%; e lo 0% di
-   queste keyframe è il disegno VUOTO (dashoffset a 1, opacity a 0, lente in
-   scala 0.7). Si sarebbero viste sette tavole bianche in attesa di una carezza.
+   queste keyframe è la lancetta al minimo, l'anello sul primo fotogramma. Si
+   sarebbero viste sei tavole in attesa di una carezza.
 
-   Quindi le regole base non hanno più un `animation-name`: hanno durata, curva
-   e ritardo, ma nessun nome, e senza nome non animano. L'elemento resta sui
+   Quindi le regole base non hanno un `animation-name`: hanno durata, curva e
+   ritardo, ma nessun nome, e senza nome non animano. L'elemento resta sui
    valori della sua regola — che in questo foglio sono già, per scelta
    dichiarata più su, il fotogramma FINITO. Il nome arriva da qui, e solo
    mentre il puntatore è sulla card. Fuori dall'hover l'animazione non è in
    pausa: non esiste, e non costa niente al compositore.
 
-   Uscendo a metà corsa il disegno torna di scatto al suo stato finito. È il
-   comportamento giusto: lo stato finito è il disegno completo, non un
-   fotogramma a caso, quindi si legge come una figura che si ricompone.
-
    `hover: hover` e `pointer: fine` chiudono fuori i telefoni, dove un hover o
-   non c'è o resta appiccicato dopo il tocco: lì restano le sette tavole
-   disegnate, ferme, che è esattamente quello che Supabase serve da mobile
-   (vedi `disableAnimation = isPlaying || isMobile` nel loro FunctionsVisual).
+   non c'è o resta appiccicato dopo il tocco: lì restano le sei tavole
+   disegnate, ferme, che è esattamente quello che Supabase serve da mobile.
    ═══════════════════════════════════════════════════════════════════════════ */
 @media (hover: hover) and (pointer: fine) {
-  .sb-card:hover .sb-ill-draw,
-  .sb-card:focus-visible .sb-ill-draw       { animation-name: sb-ill-draw; }
+  .sb-card:hover .sb-ill-echo,
+  .sb-card:focus-visible .sb-ill-echo { animation-name: sb-ill-echo; }
 
-  .sb-card:hover .sb-ill-beam,
-  .sb-card:focus-visible .sb-ill-beam       { animation-name: sb-ill-beam; }
-  .sb-card:hover .sb-ill-beam--in,
-  .sb-card:focus-visible .sb-ill-beam--in   { animation-name: sb-ill-beam-in; }
-  .sb-card:hover .sb-ill-ray,
-  .sb-card:focus-visible .sb-ill-ray        { animation-name: sb-ill-ray; }
+  .sb-card:hover .sb-ill-pin,
+  .sb-card:focus-visible .sb-ill-pin { animation-name: sb-ill-bob; }
+
+  .sb-card:hover .sb-ill-bubble--on .sb-ill-bdot,
+  .sb-card:focus-visible .sb-ill-bubble--on .sb-ill-bdot { animation-name: sb-ill-dots; }
+  .sb-card:hover .sb-ill-cursor,
+  .sb-card:focus-visible .sb-ill-cursor { animation-name: sb-ill-drift; }
   .sb-card:hover .sb-typebar-w--a,
-  .sb-card:focus-visible .sb-typebar-w--a   { animation-name: sb-type-out; }
+  .sb-card:focus-visible .sb-typebar-w--a { animation-name: sb-type-out; }
   .sb-card:hover .sb-typebar-w--b,
-  .sb-card:focus-visible .sb-typebar-w--b   { animation-name: sb-type-in; }
+  .sb-card:focus-visible .sb-typebar-w--b { animation-name: sb-type-in; }
 
-  .sb-card:hover .sb-ill-iris,
-  .sb-card:hover .sb-ill-iris-fill,
-  .sb-card:focus-visible .sb-ill-iris,
-  .sb-card:focus-visible .sb-ill-iris-fill  { animation-name: sb-ill-iris; }
+  .sb-card:hover .sb-ill-tilesel,
+  .sb-card:focus-visible .sb-ill-tilesel { animation-name: sb-ill-sel; }
+
+  .sb-card:hover .sb-ill-vertex-dot,
+  .sb-card:focus-visible .sb-ill-vertex-dot { animation-name: sb-ill-vtx; }
+  .sb-card:hover .sb-ill-mote,
+  .sb-card:focus-visible .sb-ill-mote { animation-name: sb-ill-mote; }
 
   .sb-card:hover .sb-ill-needle,
-  .sb-card:focus-visible .sb-ill-needle     { animation-name: sb-ill-needle; }
-
-  .sb-card:hover .sb-ill-sat,
-  .sb-card:focus-visible .sb-ill-sat        { animation-name: sb-ill-orbit; }
-
-  .sb-card:hover .sb-ill-level,
-  .sb-card:focus-visible .sb-ill-level      { animation-name: sb-ill-level; }
+  .sb-card:focus-visible .sb-ill-needle { animation-name: sb-ill-needle; }
+  .sb-card:hover .sb-ill-needle--ghost,
+  .sb-card:focus-visible .sb-ill-needle--ghost { animation-name: sb-ill-needle-ghost; }
 
   /* Chi ha chiesto meno movimento non riceve il gesto nemmeno sull'hover: gli
      resta la tavola finita, che è già il disegno per intero. */
@@ -1703,7 +1663,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
     .sb-card:hover .sb-ill *,
     .sb-card:focus-visible .sb-ill *,
     .sb-card:hover .sb-typebar-w,
-    .sb-card:focus-visible .sb-typebar-w    { animation-name: none; }
+    .sb-card:focus-visible .sb-typebar-w { animation-name: none; }
   }
 }
 
@@ -3267,15 +3227,6 @@ html.dark .sb-aurora { opacity: 0.42; }
   .sb-home *::after { animation: none !important; }
 
   .sb-bg-grid { opacity: 0.5; }
-
-  /* I disegni: gli anelli dei contatti sono lampi, non oggetti — fermi non
-     devono restare appesi sul terreno. La tavola delle curve di livello smette
-     anche di orientarsi verso il puntatore: --vis-x/--vis-y non le scrive più
-     nessuno (il cancello è in site/GlassMotion.tsx), ma il fallback a 0.5 vale
-     solo se la variabile non esiste, e qui è meglio non dipendere da chi ha
-     smesso di scrivere. */
-  .sb-ill-hit { opacity: 0; }
-  .sb-ill--topo { transform: none; }
 
   /* Il gradiente del nome del framework resta fermo sul suo fotogramma, ma
      senza la passata di luce va tolto: fermo, è solo un testo più chiaro del
