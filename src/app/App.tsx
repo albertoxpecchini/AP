@@ -64,6 +64,7 @@ import {
   ContourPlate,
   CommitWall,
   TrustedDot,
+  COMMITS,
 } from "./site/homeLive";
 import { EMAIL } from "./site/data";
 import { PROJECTS } from "./site/projects";
@@ -831,7 +832,23 @@ export default function App() {
 
       <main id="main-content" className="sb-main">
         {/* ① Hero — titolo a sinistra, testo a destra (come Supabase).
-             Nessun fondale suo: usa quello continuo della pagina. */}
+             Nessun fondale suo: usa quello continuo della pagina.
+
+             ── A che serve questa pagina, detto nel primo schermo ────────────
+             Prima la hero diceva chi sono e cosa so fare, e poi lasciava un
+             campo vuoto alto duecento pixel prima di qualsiasi cosa da
+             guardare: sotto arrivava una fascia su UN cliente, e la griglia
+             dei progetti cominciava a 1043px — cioè fuori dal primo schermo,
+             su un portatile. Un portfolio che al primo sguardo non fa vedere
+             niente di quello che ha fatto è un biglietto da visita.
+
+             Adesso il primo schermo dice le due cose per cui il sito esiste —
+             guarda i progetti, e conosci chi li ha fatti — e le dice con
+             quello che ha: due bottoni che sono quelle due cose, tre numeri
+             veri (progetti, siti online, commit) al posto del vuoto nella
+             colonna di destra, e la griglia che comincia subito sotto e si
+             affaccia dentro la piega. La fascia «lavoro fresco» è scesa dopo
+             la griglia: è un cliente solo, e viene dopo il lavoro. */}
         <section id="home" className="sb-hero">
           <div className="sb-container">
             <div className="sb-hero-grid">
@@ -841,25 +858,40 @@ export default function App() {
               </h1>
               <div className="sb-hero-copy">
                 <p>
-                  I build client websites —{" "}
+                  <strong>This is my portfolio.</strong> Client websites —{" "}
                   <strong translate="no">Rivalta sul Mincio</strong>,{" "}
-                  <strong translate="no">Cascina Fontana</strong> — with React and
-                  TypeScript. And I photograph people.
+                  <strong translate="no">Cascina Fontana</strong> — and every page of this
+                  one, designed and built end to end with React and TypeScript.
                 </p>
+                {/* I numeri non sono decorazione: sono la sola cosa del primo
+                    schermo che si può controllare. Nessuno è scritto a mano —
+                    i progetti li conta l'elenco, i clienti la lista dei
+                    domini, i commit il file che genera la build. Salgono
+                    arrivando a vista: [data-count-to] è la stessa regia dei
+                    contatori del resto della home (site/homeMotion.ts ②). */}
+                <ul className="sb-hero-stats">
+                  <li>
+                    <b data-count-to={PROJECTS.filter((p) => p.kind !== "doc").length}>0</b>
+                    <span>projects in the archive</span>
+                  </li>
+                  <li>
+                    <b data-count-to={CLIENTS.length}>0</b>
+                    <span>client sites online</span>
+                  </li>
+                  <li>
+                    <b data-count-to={COMMITS}>0</b>
+                    <span>public commits</span>
+                  </li>
+                </ul>
               </div>
             </div>
             <SparkGroup className="sb-hero-actions">
               <a href="#progetti" className="sb-btn sb-btn--primary">Explore my projects</a>
-              <a href="#curriculum" className="sb-btn sb-btn--secondary">View my résumé</a>
+              <Link to="/bio" className="sb-btn sb-btn--secondary">Get to know me</Link>
             </SparkGroup>
             <NowBuilding />
           </div>
         </section>
-
-        {/* Fascia «lavoro fresco» — temporanea, sta qui apposta: è la prima
-            cosa che si incontra scendendo dalla hero. Vedi site/FreshWork.tsx
-            per l'interruttore che la spegne. */}
-        <FreshWork />
 
         {/* ② Griglia — sei card, sei tinte, una riga di testo l'una.
 
@@ -1029,6 +1061,14 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        {/* Fascia «lavoro fresco» — temporanea. Stava sopra la griglia, cioè
+            fra la hero e i progetti: mezzo schermo su UN cliente prima ancora
+            di aver fatto vedere il resto. Adesso arriva subito dopo la riga
+            dei clienti, che è il posto dove uno dei due nomi appena letti si
+            apre e si muove. Vedi site/FreshWork.tsx per l'interruttore che la
+            spegne. */}
+        <FreshWork />
 
         {/* ③ Archivio — la "dashboard": il pannello dell'archivio incorporato */}
         <section id="archivio" className="sb-section" data-acc="blu">

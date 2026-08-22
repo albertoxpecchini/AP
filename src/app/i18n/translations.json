@@ -5228,6 +5228,41 @@
     "fr": "par ta carte graphique.",
     "de": "von deiner Grafikkarte."
   },
+  "This is my portfolio.": {
+    "it": "Questo è il mio portfolio.",
+    "fr": "Voici mon portfolio.",
+    "de": "Das ist mein Portfolio."
+  },
+  "Client websites —": {
+    "it": "Siti per clienti —",
+    "fr": "Des sites pour des clients —",
+    "de": "Websites für Kunden —"
+  },
+  "— and every page of this one, designed and built end to end with React and TypeScript.": {
+    "it": "— e ogni pagina di questo, disegnata e costruita da capo a fondo con React e TypeScript.",
+    "fr": "— et chaque page de celui-ci, conçue et développée de bout en bout avec React et TypeScript.",
+    "de": "— und jede Seite dieser Website, von Anfang bis Ende mit React und TypeScript entworfen und gebaut."
+  },
+  "projects in the archive": {
+    "it": "progetti in archivio",
+    "fr": "projets dans les archives",
+    "de": "Projekte im Archiv"
+  },
+  "client sites online": {
+    "it": "siti per clienti online",
+    "fr": "sites clients en ligne",
+    "de": "Kunden-Websites online"
+  },
+  "public commits": {
+    "it": "commit pubblici",
+    "fr": "commits publics",
+    "de": "öffentliche Commits"
+  },
+  "Get to know me": {
+    "it": "Conosci chi sono",
+    "fr": "Faire connaissance",
+    "de": "Lerne mich kennen"
+  },
   "I build client websites —": {
     "it": "Costruisco siti per clienti —",
     "fr": "Je construis des sites pour des clients —",

@@ -590,7 +590,10 @@ export function ContourPlate() {
  *  parte, e non può mai tornare indietro. Vedi la nota lunga in
  *  build-commits.mjs per le tre regole e le due fonti. */
 import commitsData from "./commits.json";
-const COMMITS: number = commitsData.count;
+/** Esportato perché lo legge anche la hero (App.tsx): il numero resta uno,
+ *  letto da un file solo, e non c'è modo che due punti della pagina ne
+ *  dichiarino due diversi. */
+export const COMMITS: number = commitsData.count;
 
 /** 1200 → "1.2K". La stessa forma abbreviata che Supabase usa per le stelle:
  *  sotto il migliaio il numero si scrive per intero, sopra si accorcia. */

@@ -44,6 +44,7 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
         intro
           .from(".sb-hero-title span", { autoAlpha: 0, y: 26, stagger: 0.09 })
           .from(".sb-hero-copy p", { autoAlpha: 0, y: 16, stagger: 0.08 }, "-=0.55")
+          .from(".sb-hero-stats li", { autoAlpha: 0, y: 12, stagger: 0.07 }, "-=0.45")
           .from(".sb-hero-actions > *", { autoAlpha: 0, y: 12, stagger: 0.08 }, "-=0.5");
 
         // ── ② Contatori: i numeri si "accendono" arrivando a vista ────────

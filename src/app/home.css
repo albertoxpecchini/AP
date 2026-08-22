@@ -625,10 +625,16 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 /* Niente fondale proprio e niente overflow:hidden: il fondo della hero è il
    fondale continuo della pagina (.sb-bg). Così scendendo non si vede nessuna
    riga dove "finisce la hero e comincia il resto". */
+/* Le misure di prima erano 8,5rem sopra e 4 sotto, e su un portatile
+   spingevano la prima card a 1043px: il primo schermo di un portfolio non
+   faceva vedere un solo progetto. Adesso il respiro sopra è quello che serve a
+   staccare il titolo dalla nav, e sotto quello che serve a non incollare la
+   griglia ai bottoni — la griglia si affaccia dentro la piega, che è tutto il
+   punto. Il vuoto che restava a destra del titolo lo riempiono i tre numeri. */
 .sb-hero {
   position: relative;
-  padding-top: clamp(3rem, 9vw, 8.5rem);
-  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+  padding-top: clamp(2.5rem, 5vw, 4.5rem);
+  padding-bottom: clamp(1.75rem, 3vw, 2.5rem);
 }
 
 /* La pillola di stato "in diretta" (disponibilità + orologio di Mantova) stava
@@ -745,7 +751,47 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 .sb-hero-copy p { margin: 0 0 0.7rem; font-size: 1rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 .sb-hero-copy p:last-child { margin-bottom: 0; }
 .sb-hero-copy strong { font-weight: 400; color: var(--sb-fg); }
+/* «This is my portfolio» è l'unica cosa in grassetto vero della hero: è la
+   frase che dice a cosa serve la pagina, e le altre strong della riga sono
+   nomi di clienti, che pesano già di loro. */
+.sb-hero-copy p > strong:first-child { font-weight: 600; }
 .sb-hero-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.6rem; }
+
+/* ── I tre numeri ────────────────────────────────────────────────────────────
+   Stanno nella colonna di destra, sotto la riga di testo, e non allungano la
+   hero di un pixel: prima lì sotto c'era il vuoto, perché la colonna è alta
+   quanto il titolo accanto e la riga di testo ne occupava metà.
+   Tre colonne fisse e mai in fila libera: con flex-wrap i tre numeri si
+   spezzavano a 1024px e in colonna sul telefono, e ogni volta che andavano a
+   capo restava appeso il filo verticale del separatore — un trattino che non
+   separa più niente. A colonne fisse quello che va a capo è l'etichetta, den-
+   tro la sua colonna, e la riga resta una riga a qualsiasi misura e in
+   qualsiasi lingua (il tedesco è lungo il doppio dell'italiano). */
+.sb-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+  max-width: 30rem;
+  margin: 1.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sb-hero-stats li { display: flex; flex-direction: column; gap: 0.15rem; }
+.sb-hero-stats b {
+  font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--sb-fg);
+  font-variant-numeric: tabular-nums;
+}
+.sb-hero-stats span {
+  font-size: 0.74rem;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
 
 /* ── Griglia prodotti ────────────────────────────────────────────────────── */
 .sb-products {
