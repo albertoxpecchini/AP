@@ -176,7 +176,7 @@ export default function Sostieni() {
   };
 
   return (
-    <div className="sb-home sb-home--fx sos-page">
+    <div className="sb-home sb-home--fx sos-page" data-acc="rosso">
       <PageBackdrop />
       {/* Skiplink — requisito di accessibilità (come la home) */}
       <div className="skiplinks">

@@ -16,6 +16,8 @@
 //    aloni verso il puntatore (--sb-px/--sb-py).
 // ⑤ Pozza d'acqua sui quadratini dei commit (site/puddle.ts).
 // ⑥ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
+// ⑦ Tinta della nav — la sezione a schermo passa il suo data-acc all'<header>;
+//    anche questa è roba della home soltanto.
 //
 // Quello che qui NON c'è, e che è servito impararlo: il moto dei visual delle
 // card. Per un giro l'ha comandato il puntatore da questo file, e il risultato
@@ -586,4 +588,65 @@ export function useNavPill(navRef: RefObject<HTMLElement | null>) {
       gsap.killTweensOf(pill);
     };
   }, [navRef]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ⑦ La tinta della nav
+//
+// Le sei tinte stanno sulle sezioni (data-acc, vedi il blocco «La tavolozza»
+// in home.css). La nav però è sticky: sta sopra tutte le sezioni e non è
+// dentro nessuna, quindi non può ereditare niente. Se resta azzurra mentre
+// sotto scorre una sezione verde, è l'unico pezzo di pagina che non ha capito
+// dove sei.
+//
+// Quindi la tinta gliela si scrive: stesso data-acc della sezione a schermo,
+// copiato sull'<header>. Da lì in giù ci pensa il CSS — pillola, bottone
+// Contact, badge Local. Il passaggio è una dissolvenza perché .sb-btn e
+// .sb-nav-pill hanno già una transizione sui colori: non c'è animazione da
+// scrivere, solo un attributo da cambiare al momento giusto.
+//
+// Perché un observer suo e non quello della pillola: lo scrollspy della
+// pillola guarda solo le sezioni che hanno una voce in nav (tre), mentre le
+// tinte sono otto. Stesso rootMargin, però, così il colore e la pillola si
+// muovono sullo stesso fotogramma invece di rincorrersi.
+//
+// Sull'hero e sulla CTA finale l'attributo si toglie: lì non c'è una tinta,
+// c'è il sito, e il sito è azzurro.
+// ─────────────────────────────────────────────────────────────────────────────
+export function useNavAccent(barRef: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar) return;
+
+    const sections = Array.from(document.querySelectorAll<HTMLElement>("section[data-acc]"));
+    if (!sections.length) return;
+
+    const visible = new Set<Element>();
+    let current: string | null = null;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) visible.add(e.target);
+          else visible.delete(e.target);
+        }
+        // La prima in ordine di documento fra quelle a schermo: scorrendo in
+        // giù la tinta cambia quando la sezione nuova arriva sotto la nav, non
+        // quando la vecchia è uscita del tutto.
+        const hit = sections.find((el) => visible.has(el));
+        const next = hit?.dataset.acc ?? null;
+        if (next === current) return;
+        current = next;
+        if (next) bar.setAttribute("data-acc", next);
+        else bar.removeAttribute("data-acc");
+      },
+      { rootMargin: "-64px 0px -66% 0px", threshold: 0 },
+    );
+    sections.forEach((el) => io.observe(el));
+
+    return () => {
+      io.disconnect();
+      bar.removeAttribute("data-acc");
+    };
+  }, [barRef]);
 }

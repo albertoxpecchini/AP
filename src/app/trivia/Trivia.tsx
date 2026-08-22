@@ -540,7 +540,7 @@ export default function Trivia() {
   // ══ MENÙ: una pagina vera, con nav e footer del sito ══
   if (phase === "menu" || phase === "gate") {
     return (
-      <div className="sb-home sb-home--fx sb-tv-page">
+      <div className="sb-home sb-home--fx sb-tv-page" data-acc="ambra">
         {/* Il fondale sta sul MENU, non sulla partita (.sb-tv-game, più sotto):
             lì c'è un cronometro che corre e una foto a tutto schermo per ogni
             domanda — un'aurora dietro sarebbe rumore, e costo, nel momento

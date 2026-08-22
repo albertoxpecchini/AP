@@ -1184,7 +1184,7 @@ export default function Archivio() {
   ];
 
   return (
-    <div className="sb-home sb-home--fx ar-page">
+    <div className="sb-home sb-home--fx ar-page" data-acc="blu">
       <PageBackdrop />
       {/* Skiplink — requisito di accessibilità (come la home) */}
       <div className="skiplinks">

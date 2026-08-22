@@ -260,7 +260,7 @@ export default function MeStesso() {
   }, []);
 
   return (
-    <div className="sb-home sb-home--fx ms-page">
+    <div className="sb-home sb-home--fx ms-page" data-acc="ambra">
       <PageBackdrop />
       {/* Skiplink — requisito di accessibilità */}
       <div className="skiplinks">

@@ -188,7 +188,7 @@ export default function Bio() {
   const SelectedIcon = selected ? iconFor(selected.label) : null;
 
   return (
-    <div className="sb-home sb-home--fx bio-page">
+    <div className="sb-home sb-home--fx bio-page" data-acc="blu">
       <PageBackdrop />
       {/* Skiplink — requisito di accessibilità */}
       <div className="skiplinks">

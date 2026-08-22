@@ -145,7 +145,7 @@ export default function Cv() {
   }, []);
 
   return (
-    <div className="sb-home sb-home--fx sb-cvp-page">
+    <div className="sb-home sb-home--fx sb-cvp-page" data-acc="ambra">
       <PageBackdrop />
 
       <div className="skiplinks">

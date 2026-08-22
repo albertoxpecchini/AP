@@ -137,7 +137,7 @@ export default function Dubliners() {
   }, []);
 
   return (
-    <div className="sb-home sb-home--fx sb-bk-page">
+    <div className="sb-home sb-home--fx sb-bk-page" data-acc="ambra">
       <PageBackdrop />
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Vai al contenuto principale</a>

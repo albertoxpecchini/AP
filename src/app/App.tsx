@@ -51,7 +51,7 @@ import {
   IcCar,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
-import { useNavPill } from "./site/GlassMotion";
+import { useNavPill, useNavAccent } from "./site/GlassMotion";
 // Effetti "pronti" della home (React Bits) — vedi site/homeFx.tsx per il
 // raccordo con tema, movimento ridotto e caricamento pigro.
 import { AuroraBackdrop, ShinyBrandline, SparkGroup } from "./site/homeFx";
@@ -688,6 +688,12 @@ export default function App() {
   const navRef = useRef<HTMLElement>(null);
   useNavPill(navRef);
 
+  // …e la tinta della nav, che è la stessa storia: la sezione a schermo le
+  // passa il suo data-acc, così la barra in cima non resta l'unico pezzo
+  // azzurro sopra una sezione verde.
+  const navBarRef = useRef<HTMLElement>(null);
+  useNavAccent(navBarRef);
+
   return (
     <div className="sb-home" ref={homeRef}>
       {/* Fondale continuo di TUTTA la pagina: è fisso alla finestra, quindi
@@ -709,7 +715,7 @@ export default function App() {
       </div>
 
       {/* ── Nav ── */}
-      <header className={`sb-nav ${scrolled ? "sb-nav--scrolled" : ""}`}>
+      <header className={`sb-nav ${scrolled ? "sb-nav--scrolled" : ""}`} ref={navBarRef}>
         <div className="sb-container sb-nav-inner">
           <a href="#home" className="sb-nav-brand" aria-label="Alberto Pecchini — back to top">
             <img src="/favicon.svg" alt="" width={28} height={28} />
@@ -1007,7 +1013,7 @@ export default function App() {
         </div>
 
         {/* ③ Archivio — la "dashboard": il pannello dell'archivio incorporato */}
-        <section id="archivio" className="sb-section">
+        <section id="archivio" className="sb-section" data-acc="blu">
           <div className="sb-container">
             <div className="sb-sechead">
               <h3>Browse the featured projects without leaving the home</h3>
@@ -1049,7 +1055,7 @@ export default function App() {
         </section>
 
         {/* ④ Stack — "Built with …" con switcher e codice vero */}
-        <section className="sb-section" aria-label="Stack">
+        <section className="sb-section" aria-label="Stack" data-acc="viola">
           <div className="sb-container">
             <div className="sb-stack-grid">
               <div>
@@ -1105,7 +1111,7 @@ export default function App() {
         </section>
 
         {/* ⑤ Le altre pagine (≈ griglia template) */}
-        <section className="sb-section" aria-label="Pages">
+        <section className="sb-section" aria-label="Pages" data-acc="ambra">
           <div className="sb-container">
             <div className="sb-splithead">
               <div>
@@ -1137,7 +1143,7 @@ export default function App() {
         </section>
 
         {/* ⑥ Story-card dei progetti di punta */}
-        <section id="lavori" className="sb-section" aria-label="Featured work">
+        <section id="lavori" className="sb-section" aria-label="Featured work" data-acc="verde">
           <div className="sb-container">
             <div className="sb-splithead">
               <h3>How the featured projects are built</h3>
@@ -1200,7 +1206,7 @@ export default function App() {
         </section>
 
         {/* ⑦ Curriculum — muro di card (≈ muro community) */}
-        <section id="curriculum" className="sb-section" aria-label="Résumé">
+        <section id="curriculum" className="sb-section" aria-label="Résumé" data-acc="ambra">
           <div className="sb-container">
             <div className="sb-sechead">
               <h3>Education &amp; experience</h3>
@@ -1258,7 +1264,7 @@ export default function App() {
              sessioni.json, il manifesto PUBBLICO che `npm run scatti` genera
              leggendo gli EXIF. Le foto no: quelle non escono da casa, e questa
              sezione lo dice invece di lasciarlo scoprire a chi clicca. */}
-        <section id="shooting" className="sb-section" aria-label="Photography">
+        <section id="shooting" className="sb-section" aria-label="Photography" data-acc="rosa">
           <div className="sb-container">
             <div className="sb-sechead">
               <h3>And on the other side of the lens</h3>
@@ -1309,7 +1315,7 @@ export default function App() {
           </div>
         </section>
 
-        <section id="garage" className="sb-section" aria-label="Dream garage">
+        <section id="garage" className="sb-section" aria-label="Dream garage" data-acc="rosso">
           <div className="sb-container">
             <div className="sb-sechead">
               <h3>And three cars I dream about</h3>
@@ -1328,7 +1334,7 @@ export default function App() {
         </section>
 
         {/* ⑨ Open source */}
-        <section className="sb-section" aria-label="Open source">
+        <section className="sb-section" aria-label="Open source" data-acc="viola">
           <div className="sb-container">
             <div className="sb-open">
               <div>

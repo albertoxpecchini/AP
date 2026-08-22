@@ -521,7 +521,10 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   backdrop-filter: blur(8px) saturate(var(--sb-glass-sat));
   border: 1px solid color-mix(in srgb, var(--sb-brand) 30%, var(--sb-border-strong));
   box-shadow: inset 0 1px 0 var(--sb-glass-spec);
-  transition: opacity 0.2s ease;
+  /* La border-color legge --sb-brand, che sulla nav cambia con la sezione a
+     schermo (useNavAccent): senza questa transizione il filo della pillola
+     salterebbe da una tinta all'altra mentre le altre cose in nav sfumano. */
+  transition: opacity 0.2s ease, border-color 0.45s ease;
 }
 .sb-nav-pill--on { opacity: 1; }
 .sb-nav-right { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
@@ -1075,14 +1078,20 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
    colpo d'occhio, e con la chiarezza scelta perché reggano sia sul fondo
    bianco sia su quello nero.
 
-   Come si propaga: la card dichiara `data-acc="verde"`, la regola qui sotto
-   scrive --sb-accent, e da lì il colore scende DA SOLO su icona, disegno,
-   spunte, alone e pillola — perché tutti quanti leggono --sb-accent invece di
-   --sb-brand. Aggiungere una card colorata è una riga di HTML, non un giro nel
-   foglio di stile.
+   Come si propaga: chi porta la tinta dichiara `data-acc="verde"`, la regola
+   qui sotto scrive --sb-accent, e da lì il colore scende DA SOLO su tutto
+   quello che ha sotto — icona, disegno, spunte, alone, pillola, bottoni.
+   Colorare qualcosa è una riga di HTML, non un giro nel foglio di stile.
 
-   --sb-brand resta l'azzurro e resta il colore del SITO: nav, bottoni, link,
-   footer. L'accento è il colore della COSA di cui una card parla. */
+   E non lo portano più solo le card. Le sei tinte sono nate nella griglia, ma
+   una tinta che si ferma al bordo della griglia è un francobollo: sotto, il
+   sito tornava azzurro come se la griglia non fosse successa. Adesso data-acc
+   sta anche sulle sezioni della home, sulla nav (che segue la sezione a
+   schermo) e sulla radice delle pagine interne — l'archivio è blu, i lavori
+   sono verdi, le fotografie rosa, e ci si arriva scorrendo, non a scatti.
+
+   Resta azzurro quello che è il sito e non una cosa del sito: l'hero, la CTA
+   finale, il footer della home. */
 .sb-home {
   --sb-acc-blu: 197 100% 49%;
   --sb-acc-verde: 152 70% 40%;
@@ -1103,26 +1112,86 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
    Una custom property NON è una formula che si rivaluta strada facendo: il
    `var()` viene risolto DOVE la proprietà è dichiarata, e quello che scende ai
    figli è il risultato. Scrivendo --sb-accent solo qui sopra, su .sb-home,
-   `hsl(var(--sb-accent-hsl))` si risolveva una volta sola con l'azzurro, e le
-   card ereditavano azzurro qualunque data-acc portassero. Le sei tinte erano
+   `hsl(var(--sb-accent-hsl))` si risolveva una volta sola con l'azzurro, e i
+   figli ereditavano azzurro qualunque data-acc portassero. Le sei tinte erano
    dichiarate e non si vedeva niente.
 
-   Quindi --sb-accent va RIDICHIARATO sulla card, dove --sb-accent-hsl ha già
-   il valore suo. Questa regola vale per tutte le card e non nomina nessun
-   colore: i colori li mettono le sei righe qui sotto, una proprietà l'una. */
-.sb-card {
+   Quindi --sb-accent va RIDICHIARATO dove --sb-accent-hsl ha già il valore
+   suo, cioè sull'elemento che porta data-acc. La regola qui sotto non nomina
+   nessun colore: i colori li mettono le sei righe in fondo, una l'una.
+
+   ── data-acc non è più roba da card ────────────────────────────────────────
+   Il selettore era `.sb-card[data-acc="…"]`, e le tinte finivano dove finiva
+   la griglia. Adesso è `[data-acc]` e basta: lo porta una card, una <section>
+   della home, la radice di una pagina interna, la nav. Quello che sta sotto
+   si ritinge, e non c'è una riga di CSS in più da scrivere per farlo.
+
+   ── Perché qui dentro si riscrive anche --sb-brand ─────────────────────────
+   Il sito legge --sb-brand in quasi trecento punti sparsi su una quarantina
+   di file: link, bottoni, bordi accesi, contorni di focus, tratti dei
+   disegni. Ritingerli a uno a uno voleva dire toccarli tutti adesso e
+   ricordarsene ogni volta dopo. Invece dentro un sottoalbero con data-acc il
+   brand È la tinta: quei punti seguono da sé, senza sapere niente, e una
+   pagina nuova si colora con un attributo invece che con un giro nel foglio.
+
+   Fuori da un data-acc --sb-brand resta l'azzurro e resta il colore del sito:
+   l'hero, la CTA finale, il footer della home. La nav invece la tinta se la
+   cambia mentre scorri — non è CSS, è la sezione a schermo che se la porta
+   dietro: vedi useNavPill in site/GlassMotion.tsx. */
+/* Il perché di quell'`html` davanti, che sembra un vezzo e non lo è.
+
+   Su una pagina interna la tinta la porta la RADICE, che è lo stesso elemento
+   che ha .sb-home addosso: <div class="sb-home sb-home--fx pcto-page"
+   data-acc="ambra">. Le due regole si contendono lo stesso elemento, e allora
+   conta la specificità:
+
+     .sb-home            0,1,0     in chiaro sono pari, e vince chi viene
+     [data-acc]          0,1,0   /   dopo nel foglio — cioè questa. Passa.
+     html.dark .sb-home  0,2,1     in scuro NON sono pari: vince .sb-home,
+     [data-acc]          0,1,0   /   e la tinta non arriva.
+
+   Ed è esattamente com'era andata: in chiaro il pcto era ambra, in scuro
+   tornava azzurro tranne il bottone (l'unica proprietà che avevo scritto
+   anche nel blocco .dark, quindi l'unica alla pari). Un baco che il build non
+   può vedere e che si becca solo aprendo la pagina in scuro.
+
+   Rimedio: `html [data-acc]` (0,1,1) batte .sb-home in chiaro senza dipendere
+   dall'ordine, e `html.dark [data-acc]` (0,2,1) va alla pari con la regola
+   scura, dove l'ordine ce l'ha buono. Il prezzo è che ogni proprietà tinta va
+   scritta in tutti e due i blocchi: il blocco scuro non è una rifinitura del
+   chiaro, è una lista completa. Se ne aggiungi una, aggiungila due volte. */
+html [data-acc] {
   --sb-accent: hsl(var(--sb-accent-hsl));
   --sb-accent-text: color-mix(in srgb, hsl(var(--sb-accent-hsl)) 78%, #000);
+
+  --sb-brand: var(--sb-accent);
+  --sb-brand-text: var(--sb-accent-text);
+
+  /* I bottoni non leggono il brand: hanno tre tinte loro, scelte a mano
+     perché l'azzurro pieno, come fondo di un bottone, è troppo. Vanno quindi
+     ricostruite dalla tinta — con lo stesso verso dell'originale: schiarita
+     sul chiaro, affondata sullo scuro, bordo dal tono da testo. */
+  --sb-btn-bg: color-mix(in srgb, var(--sb-accent) 58%, #fff);
+  --sb-btn-bg-hover: color-mix(in srgb, var(--sb-accent) 70%, #fff);
+  --sb-btn-bd: color-mix(in srgb, var(--sb-accent-text) 75%, transparent);
 }
-html.dark .sb-card {
+html.dark [data-acc] {
+  --sb-accent: hsl(var(--sb-accent-hsl));
   --sb-accent-text: color-mix(in srgb, hsl(var(--sb-accent-hsl)) 82%, #fff);
+
+  --sb-brand: var(--sb-accent);
+  --sb-brand-text: var(--sb-accent-text);
+
+  --sb-btn-bg: color-mix(in srgb, var(--sb-accent) 32%, #000);
+  --sb-btn-bg-hover: color-mix(in srgb, var(--sb-accent) 42%, #000);
+  --sb-btn-bd: color-mix(in srgb, var(--sb-accent) 30%, transparent);
 }
-.sb-card[data-acc="blu"] { --sb-accent-hsl: var(--sb-acc-blu); }
-.sb-card[data-acc="verde"] { --sb-accent-hsl: var(--sb-acc-verde); }
-.sb-card[data-acc="viola"] { --sb-accent-hsl: var(--sb-acc-viola); }
-.sb-card[data-acc="rosa"] { --sb-accent-hsl: var(--sb-acc-rosa); }
-.sb-card[data-acc="ambra"] { --sb-accent-hsl: var(--sb-acc-ambra); }
-.sb-card[data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
+html [data-acc="blu"] { --sb-accent-hsl: var(--sb-acc-blu); }
+html [data-acc="verde"] { --sb-accent-hsl: var(--sb-acc-verde); }
+html [data-acc="viola"] { --sb-accent-hsl: var(--sb-acc-viola); }
+html [data-acc="rosa"] { --sb-accent-hsl: var(--sb-acc-rosa); }
+html [data-acc="ambra"] { --sb-accent-hsl: var(--sb-acc-ambra); }
+html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
 /* Card grande: testo a sinistra, visual a destra (da lg in su) */
 .sb-card--lg .sb-panel-inner { flex-direction: column; }

@@ -196,7 +196,7 @@ export default function Mima() {
   );
 
   return (
-    <div className="sb-home sb-home--fx sb-mima">
+    <div className="sb-home sb-home--fx sb-mima" data-acc="rosa">
       <PageBackdrop />
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">Skip to main content</a>

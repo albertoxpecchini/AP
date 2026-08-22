@@ -176,7 +176,7 @@ export default function Comandi() {
   ];
 
   return (
-    <div className="sb-home sb-home--fx sb-cmd">
+    <div className="sb-home sb-home--fx sb-cmd" data-acc="viola">
       <PageBackdrop />
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">

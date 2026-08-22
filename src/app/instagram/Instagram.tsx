@@ -601,7 +601,7 @@ export default function Instagram() {
   };
 
   return (
-    <div className="sb-home sb-home--fx ig-page">
+    <div className="sb-home sb-home--fx ig-page" data-acc="viola">
       <PageBackdrop />
       {showTutorial && <Tutorial onClose={closeTutorial} />}
 

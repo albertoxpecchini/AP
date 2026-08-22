@@ -512,7 +512,7 @@ export default function Shooting() {
   const conLink = ospite.stato !== "niente";
 
   return (
-    <div className="sb-home sb-home--fx sb-sh">
+    <div className="sb-home sb-home--fx sb-sh" data-acc="rosa">
       <PageBackdrop />
       <div className="skiplinks">
         <a className="visually-hidden-focusable" href="#main-content">

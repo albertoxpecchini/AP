@@ -211,7 +211,7 @@ export default function Pcto() {
   const sorted = [...PCTO].sort((a, b) => parsePeriodStart(b.period) - parsePeriodStart(a.period));
 
   return (
-    <div className="sb-home sb-home--fx pcto-page">
+    <div className="sb-home sb-home--fx pcto-page" data-acc="ambra">
       <PageBackdrop />
       {/* Skiplink — requisito di accessibilità (come la home) */}
       <div className="skiplinks">

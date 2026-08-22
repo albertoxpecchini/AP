@@ -331,7 +331,7 @@ export default function Cleaning() {
   const a = stato?.analisi;
 
   return (
-    <div className="sb-home sb-home--fx sb-cl-page">
+    <div className="sb-home sb-home--fx sb-cl-page" data-acc="viola">
       <PageBackdrop />
 
       <div className="skiplinks">
