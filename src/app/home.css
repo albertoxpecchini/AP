@@ -2007,10 +2007,11 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 .sb-splithead p { margin: 0.6rem 0 0; max-width: 34rem; font-size: 0.95rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 
-/* ── Griglia "pagine" (≈ template) ───────────────────────────────────────── */
-.sb-pages { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-@media (min-width: 640px) { .sb-pages { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .sb-pages { grid-template-columns: repeat(3, 1fr); } }
+/* ── Card "pagina" ──────────────────────────────────────────────────────────
+   La griglia .sb-pages non c'è più: le sei pagine della home adesso sono lo
+   scaffale qui sotto. Le classi della card restano perché non erano solo sue —
+   il menu di Trivia ci monta le sue card-funzione (sb-tv-func sb-page-card), e
+   da lì prendono rim, sheen, tilt e la freccia che si accende all'hover. */
 .sb-page-card { display: block; text-decoration: none; color: inherit; }
 .sb-page-inner { padding: 1.3rem; gap: 0.7rem; }
 .sb-page-top { display: flex; align-items: center; justify-content: space-between; color: var(--sb-fg-light); }
@@ -2018,6 +2019,296 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-page-card:hover .go { opacity: 1; transform: none; color: var(--sb-fg); }
 .sb-page-inner h4 { margin: 0; font-size: 0.95rem; font-weight: 500; color: var(--sb-fg); }
 .sb-page-inner p { margin: 0; font-size: 0.84rem; line-height: 1.55; color: var(--sb-fg-lighter); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   IL MURO DELLE SEI PAGINE
+   Sei lastre affiancate: cinque chiuse di taglio, una aperta. Si sceglie col
+   puntatore, col Tab o con un dito, e quella aperta si prende tutto lo spazio
+   che le altre non usano.
+
+   Perché non è più una griglia. Sei card di vetro uguali dicono «elenco»: si
+   scorrono con gli occhi e non ci si ferma su nessuna — è lo stesso guaio che
+   aveva la griglia dei mestieri prima delle sei tinte, un piano di roba tutta
+   uguale. Qui invece ce n'è una sola aperta alla volta, e le altre cinque
+   stanno come dorsi di libri sullo scaffale: si riconoscono dalla tinta e dal
+   nome scritto di taglio.
+
+   Come si muove. Non è la larghezza ad animarsi, è flex-grow, da 0 a 1: le
+   larghezze vere le calcola il flexbox da sé, quindi la somma torna a ogni
+   fotogramma e non c'è un istante in cui le lastre escono dal contenitore o
+   lasciano un buco. A metà del cambio quella che si chiude e quella che si
+   apre hanno grow 0,5 l'una e si passano lo spazio a mano.
+
+   Perché non si può fare con grid-template-columns, che sarebbe più diretto:
+   la traccia chiusa è in px e quella aperta in fr, e fra unità diverse il
+   browser non interpola — passerebbe di scatto. Due numeri puri, invece, si
+   interpolano sempre.
+
+   ── Le tinte, e perché qui vanno accese ─────────────────────────────────────
+   Sono le sei di casa (blocco «La tavolozza»), ma cambiano mestiere: lì sono
+   un accento su fondo bianco, qui sono IL FONDO di una lastra alta mezzo
+   schermo. Un accento ingrandito così diventa una parete di tinta piatta,
+   quindi ognuna è una coppia di toni — --pg-a e --pg-b — presi a cavallo del
+   giro cromatico: il verde vira al lime, l'ambra all'arancio, il blu
+   all'indaco. È lo stesso trucco delle copertine di Supabase da cui viene
+   questa sezione, ed è quello che le fa sembrare accese invece che colorate.
+
+   ── Il velo, che non è una rifinitura ───────────────────────────────────────
+   Testo bianco su arancio pieno sta a 3:1: sotto la soglia, e non di poco. Il
+   velo scuro (::before) parte da trasparente in cima e arriva a 0,78 in fondo,
+   così la lastra resta accesa dove c'è solo il disegno e diventa scura dove
+   c'è da leggere. Tutto il testo — targhetta, nome, riga, link — sta nel terzo
+   basso apposta: non è una scelta di impaginazione, è dove il contrasto passa.
+   Se un giorno il testo si sposta più in su, il velo va rifatto con lui.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sb-shelf {
+  --slat-rail: 4.75rem;   /* il dorso: quanto resta di una lastra chiusa */
+  --slat-body: 21rem;     /* larghezza minima del testo, vedi .sb-slat-body */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  isolation: isolate;
+}
+
+.sb-slat {
+  position: relative;
+  /* In colonna il pezzo che comanda è `height`, quindi flex-basis deve stare
+     ad auto: su un contenitore in colonna la base è l'altezza, e vincerebbe
+     lei — la lastra aperta resterebbe alta come un dorso. In fila (≥960px) si
+     ribalta tutto e la base torna a essere la misura. */
+  flex: 0 0 auto;
+  min-width: 0;
+  overflow: hidden;
+  clip-path: var(--sb-shape-lg);
+  background: linear-gradient(155deg, var(--pg-a) 0%, var(--pg-b) 100%);
+  color: #fff;
+  transition: height 0.55s cubic-bezier(0.22, 0.61, 0.36, 1), flex-grow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+/* Il velo. Vedi il cappello qui sopra: senza, metà delle tinte non regge il
+   testo bianco. */
+.sb-slat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 12%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
+  pointer-events: none;
+}
+
+/* Il bersaglio: tutta la lastra, sotto ai contenuti ma sopra al fondo. Il testo
+   (z 3) non gli ruba i clic perché non li accetta — pointer-events: none — e il
+   solo pezzo che li riprende è il link «Open the page». */
+.sb-slat-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* clip-path porta via l'outline (vedi in cima al foglio): la messa a fuoco si
+   ridisegna dentro, e qui è bianca perché il fondo è tinta piena. */
+.sb-home .sb-slat-hit:focus-visible {
+  outline: none;
+  /* Bianco, e sotto un filo scuro: da sole due righe bianche su ambra piena si
+     perdono, mentre il doppio filo si stacca da qualsiasi delle sei tinte. */
+  box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px rgba(0, 0, 0, 0.5);
+}
+@media (hover: hover) and (pointer: fine) {
+  .sb-slat:not([data-open="true"]):hover { filter: brightness(1.08); }
+}
+
+.sb-slat-mark {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.35rem;
+  z-index: 3;
+  display: inline-flex;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+}
+
+/* Il glifo in filigrana. Vive nella metà alta, dove la lastra è accesa e non
+   c'è testo: sotto il 55% comincia il velo, e lì sotto non deve arrivare. */
+.sb-slat-ghost {
+  position: absolute;
+  top: 12%;
+  right: 6%;
+  z-index: 0;
+  display: inline-flex;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.9);
+  transform-origin: 70% 30%;
+  transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+}
+.sb-slat[data-open="true"] .sb-slat-ghost {
+  opacity: 0.16;
+  transform: none;
+  transition-delay: 0.12s;
+}
+/* Il glifo esce dal componente a 200px: in colonna la lastra aperta è meno
+   alta e il campo libero sopra il testo è la metà, quindi qui si rimpicciolisce
+   (a 200 finirebbe dietro alle righe). */
+.sb-slat-ghost svg { width: 132px; height: 132px; }
+
+/* Il nome sul dorso. Di taglio quando le lastre stanno in fila, disteso
+   accanto all'icona quando si impilano. Sta in fondo, cioè dentro la parte
+   scura del velo: è lì che il bianco si legge. */
+.sb-slat-rail {
+  position: absolute;
+  z-index: 3;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  top: 1.55rem;
+  left: 3.9rem;
+}
+.sb-slat[data-open="true"] .sb-slat-rail { opacity: 0; }
+
+/* Il pannello. min-width tiene il testo impaginato alla larghezza che avrà da
+   aperto anche mentre la lastra è ancora stretta: senza, durante il mezzo
+   secondo dell'apertura le righe si riscriverebbero da una parola per riga in
+   giù, e si vedrebbe. Quello che sborda lo taglia overflow: hidden. */
+.sb-slat-body {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-width: var(--slat-body);
+  padding: 1.4rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.6rem);
+  transition: opacity 0.3s ease, transform 0.42s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0s linear 0.42s;
+  pointer-events: none;
+}
+.sb-slat[data-open="true"] .sb-slat-body {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.36s ease 0.14s, transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.14s,
+    visibility 0s;
+}
+
+/* La targhetta: stessa sagoma e stessa misura di .sb-story-kind, ma qui il
+   filo e il fondo sono di luce — sotto non c'è una card di vetro, c'è tinta. */
+.sb-slat-kind {
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.55rem;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  clip-path: var(--sb-shape-xs);
+  white-space: nowrap;
+}
+.sb-slat-name {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.sb-slat-line {
+  margin: 0;
+  max-width: 32rem;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.sb-slat-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  font-size: 0.88rem;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  pointer-events: auto;
+}
+.sb-slat-go svg { transition: transform 0.2s ease; }
+.sb-slat-go:hover svg { transform: translateX(3px); }
+.sb-home .sb-slat-go:focus-visible { outline-color: #fff; }
+
+/* Le sei coppie. Nell'ordine dello scaffale — verde, ambra, blu, rosso, viola,
+   rosa — e sono in quest'ordine perché due tinte vicine di giro cromatico non
+   devono mai toccarsi: da chiuse restano due dorsi da 76 px, e due dorsi simili
+   accanto sembrano lo stesso libro stampato due volte. */
+.sb-slat[data-acc="verde"] { --pg-a: hsl(155 88% 32%); --pg-b: hsl(96 72% 42%); }
+.sb-slat[data-acc="ambra"] { --pg-a: hsl(40 98% 50%); --pg-b: hsl(18 94% 50%); }
+.sb-slat[data-acc="blu"]   { --pg-a: hsl(197 100% 47%); --pg-b: hsl(232 92% 56%); }
+.sb-slat[data-acc="rosso"] { --pg-a: hsl(6 88% 52%); --pg-b: hsl(340 84% 46%); }
+.sb-slat[data-acc="viola"] { --pg-a: hsl(258 90% 60%); --pg-b: hsl(288 78% 52%); }
+.sb-slat[data-acc="rosa"]  { --pg-a: hsl(330 90% 56%); --pg-b: hsl(4 90% 58%); }
+
+/* Sotto i 960 px lo scaffale si corica: sei lastre in colonna, chiuse a
+   un'altezza da riga d'elenco. In fila non ci starebbero — cinque dorsi più il
+   pannello aperto vogliono almeno una ventina di rem di testo, e sotto quella
+   soglia il pannello diventerebbe più stretto della sua stessa impaginazione. */
+.sb-slat { height: var(--slat-rail); }
+.sb-slat[data-open="true"] { height: 21rem; }
+
+@media (min-width: 960px) {
+  .sb-shelf {
+    flex-direction: row;
+    height: clamp(22rem, 36vw, 27rem);
+  }
+  .sb-slat {
+    height: auto;
+    flex: 0 1 var(--slat-rail);
+  }
+  .sb-slat[data-open="true"] {
+    height: auto;
+    flex-grow: 1;
+  }
+  .sb-slat-ghost svg { width: 200px; height: 200px; }
+  /* In fila il nome torna di taglio, e si legge dal basso verso l'alto: è il
+     verso dei dorsi in libreria. */
+  .sb-slat-rail {
+    top: auto;
+    left: 1.4rem;
+    bottom: 1.5rem;
+    max-height: calc(100% - 6rem);
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sb-slat,
+  .sb-slat-body,
+  .sb-slat-rail,
+  .sb-slat-go svg {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+}
 
 /* ── Story-card dei progetti di punta ────────────────────────────────────── */
 .sb-stories { display: grid; grid-template-columns: 1fr; gap: 1rem; }

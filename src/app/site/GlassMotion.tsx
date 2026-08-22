@@ -624,28 +624,40 @@ export function useNavAccent(barRef: RefObject<HTMLElement | null>) {
     const visible = new Set<Element>();
     let current: string | null = null;
 
+    const apply = () => {
+      // La prima in ordine di documento fra quelle a schermo: scorrendo in
+      // giù la tinta cambia quando la sezione nuova arriva sotto la nav, non
+      // quando la vecchia è uscita del tutto.
+      const hit = sections.find((el) => visible.has(el));
+      const next = hit?.dataset.acc ?? null;
+      if (next === current) return;
+      current = next;
+      if (next) bar.setAttribute("data-acc", next);
+      else bar.removeAttribute("data-acc");
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting) visible.add(e.target);
           else visible.delete(e.target);
         }
-        // La prima in ordine di documento fra quelle a schermo: scorrendo in
-        // giù la tinta cambia quando la sezione nuova arriva sotto la nav, non
-        // quando la vecchia è uscita del tutto.
-        const hit = sections.find((el) => visible.has(el));
-        const next = hit?.dataset.acc ?? null;
-        if (next === current) return;
-        current = next;
-        if (next) bar.setAttribute("data-acc", next);
-        else bar.removeAttribute("data-acc");
+        apply();
       },
       { rootMargin: "-64px 0px -66% 0px", threshold: 0 },
     );
     sections.forEach((el) => io.observe(el));
 
+    // Una sezione può cambiare tinta stando ferma: lo scaffale delle sei
+    // pagine porta il data-acc della lastra aperta, e quella si apre con un
+    // clic, non con uno scroll. Senza questo, la nav resterebbe sulla tinta
+    // che aveva l'ultima volta che l'observer si è svegliato.
+    const mo = new MutationObserver(apply);
+    sections.forEach((el) => mo.observe(el, { attributeFilter: ["data-acc"] }));
+
     return () => {
       io.disconnect();
+      mo.disconnect();
       bar.removeAttribute("data-acc");
     };
   }, [barRef]);
