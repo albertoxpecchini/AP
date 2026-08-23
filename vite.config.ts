@@ -365,6 +365,17 @@ export default defineConfig({
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
   server: {
+    // host: true → ascolta su 0.0.0.0, non solo sul loopback. Serve perché il
+    // sito si apra anche dal telefono e dagli altri computer sotto lo stesso
+    // Wi-Fi: all'avvio Vite stampa l'indirizzo di rete (http://10.x.x.x:5173/)
+    // ed è quello da digitare sull'altro apparecchio. Su Windows la prima volta
+    // serve anche la regola del firewall in ingresso sulla 5173 (vedi README).
+    //
+    // Cosa NON segue su quell'indirizzo, di proposito: le foto private degli
+    // shooting (/scatti-privati/*, scripts/shooting-api-dev.mjs risponde 403 a
+    // chi non è il loopback) e le funzioni che si accendono solo su localhost
+    // (l'officina dei comandi in App.tsx, src/app/utils/local.ts).
+    host: true,
     port: 5173,
     strictPort: true,
   },

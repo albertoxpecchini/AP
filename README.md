@@ -406,12 +406,7 @@ AP/
 │   ├── build-foto-mima.mjs   #   foto/mima/ → EXIF (data + GPS) → album e mappa
 │   ├── build-foto-shooting.mjs # foto/shooting/ → EXIF → due manifesti: uno pubblico, uno no
 │   ├── shooting-api-dev.mjs  #   /scatti-privati/… — le foto dei ritratti, solo sotto vite dev
-│   ├── dev/                  #   la sala macchine del dev server (vedi più sotto)
-│   │   ├── avvia.mjs         #     supervisore: porta, preparativi, riavvii, log
-│   │   ├── porta.mjs         #     chi occupa la 5173 — e se è Vite, di chi è
-│   │   ├── preparativi.mjs   #     controlli, artefatti rigenerabili, diagnosi delle chiavi
-│   │   ├── stato.mjs         #     .dev/: stato, impronte, log rotante, kill dell'albero
-│   │   └── tinte.mjs         #     colori e righe di diagnosi, uguali per tutti i comandi
+│   ├── scatti-carica.mjs     #   porta una sessione nel bucket privato di Supabase
 │   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
 │   ├── lib/fbx.mjs           #   lettore FBX binario, per build-cars
 │   ├── janitor/              #   il programma di pulizia + benchmark (vedi più sotto)
@@ -587,7 +582,7 @@ Il sito è pensato per essere **a prova di abuso**, senza archiviare dati di ter
 ```bash
 git clone https://github.com/albertoxpecchini/AP.git && cd AP
 npm install
-npm run dev       # http://localhost:5173 — HMR attivo, middleware /api/*, /cleaning
+npm run dev       # localhost:5173 — e 10.x.x.x:5173 dal telefono (vedi più sotto)
 npm run build     # bundle di produzione in dist/ (prima il prebuild, vedi tabella)
 ```
 
@@ -601,11 +596,7 @@ scritture partono lo stesso, le liste pubbliche restano vuote.
 
 | Comando | Azione |
 | :--- | :--- |
-| `npm run dev` | Dev server sorvegliato: libera la porta 5173, prepara gli artefatti, tiene Vite in piedi. Ctrl+C spegne tutto (vedi «La sala macchine») |
-| `npm run dev:sfondo` | Lo stesso, ma staccato: restituisce il terminale. È quello che lancia il tasto F5 di VS Code |
-| `npm run dev:stato` | Chi è acceso, su che porta, da quanto — e cosa funziona davvero con le chiavi che ci sono |
-| `npm run dev:ferma` | Spegne il dev server e tutti i suoi figli |
-| `npm run dev:log` | Le ultime righe del server acceso (`-- --segui` per restare in ascolto) |
+| `npm run dev` | Vite sulla 5173, in ascolto anche sulla rete di casa: l'indirizzo `10.x.x.x` stampato all'avvio si apre dal telefono sotto lo stesso Wi-Fi (vedi «Il server di sviluppo»). Prima parte il `predev`: i pacchetti i18n |
 | `npm run build` | Build statica in `dist/`. Il `prebuild` fa quattro cose: versione di Trivia, ZIP dei progetti, `repo-tree.json`, pacchetti i18n |
 | `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
@@ -622,73 +613,79 @@ scritture partono lo stesso, le liste pubbliche restano vuote.
 
 ---
 
-## 🛠️ La sala macchine — `scripts/dev/`
+## 📡 Il server di sviluppo — e come aprirlo dal telefono
 
-`npm run dev` non lancia più `vite` e basta. Prima faceva questo, e in locale le cose andavano
-male sempre negli stessi tre modi.
+`npm run dev` è `vite` e basta. Davanti ha un solo `predev`, `build-i18n.mjs`: i quattro
+pacchetti di traduzione non stanno nel repository (li ignora `.gitignore`), quindi senza quel
+passaggio un clone appena fatto non compilerebbe. Sono 60 millisecondi, e non toccano niente di
+versionato — la versione di Trivia, che invece scrive un file versionato, è rimasta di là nel
+`prebuild`, dove sporca `git status` solo quando serve davvero.
 
-**La porta.** `strictPort: true` è una scelta voluta — il debug di Edge, il benchmark del
-janitor e i link che ci si scambia puntano tutti alla 5173, e un Vite che ripiega da solo sulla
-5174 è peggio di uno che non parte: le pagine si aprono, ma su un server che non è quello che
-si sta guardando. Il prezzo era che il secondo `vite` moriva con `EADDRINUSE` e una riga sola,
-senza dire chi ci fosse dentro. Il colpevole, nove volte su dieci, era un dev server rimasto
-acceso da una sessione F5 di mezz'ora prima.
+La configurazione sta tutta in tre righe di `vite.config.ts`:
 
-**I crash.** Sotto `vite dev` questo repo monta sette middleware `/api/*` scritti in casa
-(`vite.config.ts`). Un errore non gestito in uno di quelli e il processo se ne va: chi stava
-guardando la pagina vede solo che il sito ha smesso di rispondere, e la spiegazione è in un
-terminale che nel frattempo è finito sotto altre finestre.
-
-**Le chiavi.** I plugin leggono il `.env` una volta sola, all'avvio, e poi tacciono. Senza
-`VITE_SUPABASE_ANON_KEY` le liste pubbliche restano vuote, senza `RESEND_API_KEY` le email si
-stampano in console invece di partire: cose normalissime in locale, ma scoprirle dalla pagina
-costa mezz'ora di indagine ogni volta.
-
-**Cosa fa adesso.** All'avvio guarda chi c'è sulla 5173 e distingue tre casi: un dev server
-nostro rimasto acceso (lo ferma e prende il posto), un Vite che non abbiamo avviato noi (idem,
-dicendolo), o un programma che non c'entra niente — e lì non si spara a niente: si dice chi è,
-con nome e pid, e si offre `--porta auto`. Poi prepara gli artefatti rigenerabili, ma solo
-quelli che servono davvero: i pacchetti i18n si rifanno se `translations.json` si è mosso, la
-versione di Trivia se `HEAD` si è mosso. Il vecchio `predev` li rifaceva entrambi a ogni avvio,
-e siccome `version.json` è un file **versionato**, ogni `npm run dev` sporcava `git status`.
-
-Poi accende Vite e resta a guardarlo. Se muore lo riaccende, con un'attesa che raddoppia a ogni
-tentativo; se muore cinque volte in un minuto smette, perché a quel punto il problema è nel
-codice e riavviare all'infinito non fa che seppellire l'errore vero sotto dieci stack trace
-uguali. Ogni cinque secondi bussa a `/@vite/client`: un processo vivo non è un server che
-risponde — un ciclo infinito in un middleware lascia `node.exe` nella lista dei processi e il
-browser che gira a vuoto. Ma **rifiuto e ritardo non sono la stessa cosa**, e la prima versione
-di questo pezzo li confondeva: contava per morto anche il server che ci metteva più di quattro
-secondi, e ha spento un dev server sanissimo proprio mentre trasformava i moduli della prima
-pagina aperta nel browser. Adesso tre connessioni rifiutate di fila valgono un riavvio; una
-risposta lenta vale un'annotazione, e si interviene solo se dura due minuti.
-
-E infine dice, in chiaro, cosa funzionerà: una riga per le scritture Supabase, le letture dal
-client, le email, il modulo `/shooting`, le foto degli shooting. Verde = come in produzione, giallo =
-funziona ma finge, rosso = chiuso. I valori delle chiavi non escono da lì: si guardano solo i
-nomi.
-
-```bash
-npm run dev                      # in primo piano, Ctrl+C spegne tutto
-npm run dev:sfondo               # staccato: restituisce il terminale (lo usa F5)
-npm run dev:stato                # acceso? su che porta? da quanto? con quali chiavi?
-npm run dev:ferma                # spegne il server e tutti i suoi figli
-npm run dev:log -- --segui       # le ultime righe, e resta in ascolto
-npm run dev -- --porta auto      # la prima porta libera dalla 5173 in su
-npm run dev -- --rete --apri     # esponi sulla rete di casa e apri il browser
+```ts
+server: { host: true, port: 5173, strictPort: true }
 ```
 
-**Due dettagli che valgono il codice che costano.** Il primo: la sonda bussa sia a `127.0.0.1`
-sia a `[::1]`. Su Windows `localhost` è tutti e due, e un dev server può restare in ascolto solo
-sul secondo — chiedendo al solo IPv4 si riceve un rifiuto, si conclude «porta libera», e poi
-Vite muore con `Port 5173 is already in use` da un processo che nessuno riesce a trovare
-(anche `netstat -ano -p tcp` mostra solo l'IPv4: quel `-p tcp` è la ragione per cui il colpevole
-sembrava invisibile). Il secondo: si ferma sempre l'**albero** dei processi, mai il solo padre.
-Vite lancia esbuild e compagnia; uccidere il capo lasciava in giro figli che tenevano ancora la
-porta, e al giro dopo «Vite non parte» — con la colpa addosso a Vite.
+`host: true` è la riga che conta. Senza, Vite ascolta solo sul loopback e il sito esiste
+soltanto per il computer che lo sta servendo; con, ascolta su tutte le interfacce e all'avvio
+stampa due indirizzi invece di uno:
 
-Tutto quello che il supervisore vede finisce anche in `.dev/log/`, un file per avvio, gli ultimi
-cinque, ripulito dai colori. `.dev/` sta fuori dal repository: è roba della singola macchina.
+```
+➜  Local:   http://localhost:5173/
+➜  Network: http://10.1.114.45:5173/
+```
+
+Il secondo è quello da digitare sul telefono, sul tablet o sull'altro computer, purché siano
+sotto lo stesso Wi-Fi. È un indirizzo che il router assegna in DHCP: **cambia** quando la rete
+lo rinnova o si passa a un altro Wi-Fi, e la riga giusta è sempre quella stampata all'avvio, non
+quella scritta qui. L'aggiornamento a caldo segue: la pagina aperta sul telefono si ricarica da
+sé come quella sul monitor, perché il client HMR si attacca allo stesso indirizzo da cui è
+arrivata la pagina.
+
+**Su Windows serve una volta sola la regola del firewall.** Vite ascolta, ma il firewall scarta
+le connessioni in ingresso prima che arrivino: dal telefono si vede solo una pagina che non
+carica mai, senza un errore che spieghi perché. Da un PowerShell **come amministratore**:
+
+```powershell
+New-NetFirewallRule -DisplayName "Vite dev 5173 (rete di casa)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5173 -Profile Any -RemoteAddress LocalSubnet
+```
+
+`-RemoteAddress LocalSubnet` è la parte che tiene la cosa in casa: la porta si apre solo verso
+gli apparecchi della propria rete, non verso il mondo. `-Profile Any` serve perché Windows
+classifichi pure il Wi-Fi come rete «pubblica» — capita sempre, e senza quel flag la regola
+resterebbe spenta proprio quando serve. Non c'è bisogno di dichiarare privata la rete. Per
+toglierla, quando non serve più:
+
+```powershell
+Remove-NetFirewallRule -DisplayName "Vite dev 5173 (rete di casa)"
+```
+
+**Cosa non segue su quell'indirizzo, di proposito.** Le foto private degli shooting
+(`/scatti-privati/*`) rispondono `403` a chiunque non sia il loopback: `shooting-api-dev.mjs`
+guarda l'indirizzo di chi chiede, e un `--host` non deve bastare a mettere in rete i ritratti di
+qualcuno. Allo stesso modo l'officina dei comandi si accende solo su `localhost`
+(`src/app/utils/local.ts`), quindi dal telefono non compare. Tutto il resto — le pagine, gli
+endpoint `/api/*`, `/cleaning` — c'è come sul monitor.
+
+**La porta è fissa.** `strictPort: true` è voluto: il debug di Edge, il benchmark del janitor e
+i link che ci si scambia puntano tutti alla 5173, e un Vite che ripiega da solo sulla 5174 è
+peggio di uno che non parte — le pagine si aprono, ma su un server che non è quello che si sta
+guardando. Il prezzo è che un secondo `vite` muore con `EADDRINUSE`. Nove volte su dieci il
+colpevole è un dev server rimasto acceso da una sessione F5 di prima; per trovarlo e spegnerlo:
+
+```powershell
+Get-NetTCPConnection -LocalPort 5173 -State Listen | Select-Object OwningProcess
+Stop-Process -Id <pid>
+```
+
+Su Windows conviene guardare lì e non in `netstat -ano -p tcp`: `localhost` è IPv4 **e** IPv6
+insieme, Vite si mette in ascolto su `::` (che serve tutti e due), e quel `-p tcp` mostra solo
+l'IPv4 — motivo per cui il processo colpevole sembrava invisibile.
+
+Il tasto **F5** di VS Code lancia la stessa cosa: l'attività `dev: assicura server Vite` in
+`.vscode/tasks.json` accende Vite come attività di sfondo, aspetta il `ready in` e poi apre
+Edge in debug su `localhost:5173`. Se il server è già acceso, VS Code riusa quello.
 
 ---
 

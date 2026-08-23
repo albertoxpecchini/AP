@@ -46,11 +46,11 @@ export const GRUPPI: Gruppo[] = [
     voci: [
       {
         cmd: "npm run dev",
-        breve: "Accende il server di sviluppo su localhost:5173.",
+        breve: "Accende il server di sviluppo su localhost:5173 — e sulla rete di casa.",
         dettaglio:
           "Vite con l'aggiornamento a caldo, più tutto quello che esiste SOLO qui: gli endpoint /api/*, l'officina /cleaning e le foto degli shooting su /scatti-privati/*. Vivono dentro configureServer, l'aggancio che gira solo in sviluppo — sul sito pubblicato quelle rotte non sono protette, non ci sono proprio.",
         file: "vite.config.ts",
-        nota: "Prima parte il predev: numero di versione di Trivia e pacchetti i18n. La porta è fissa (strictPort), quindi un secondo vite sulla stessa porta fallisce invece di scivolare sulla 5174.",
+        nota: "Vite ascolta su tutte le interfacce (host: true): all'avvio stampa anche un indirizzo 10.x.x.x da aprire dal telefono, purché sotto lo stesso Wi-Fi e con la porta 5173 aperta nel firewall. Prima parte il predev, che rifà i pacchetti i18n. La porta è fissa (strictPort), quindi un secondo vite sulla stessa porta fallisce invece di scivolare sulla 5174.",
       },
       {
         cmd: "npm run build",
