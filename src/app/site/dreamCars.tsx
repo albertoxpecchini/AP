@@ -382,6 +382,8 @@ void main() {
  *  la 4C è più corta di ottanta centimetri e si deve vedere. */
 const WORLD_W = 5.6;
 const DIST = 14;
+/** Quanto aspetta ogni auto prima di fare la sua entrata. Vedi `mount`. */
+const INTRO_GAP = 420;
 /** Da dove viene la luce, negli assi della camera. */
 const LIGHT = [-0.42, 0.66, 0.62];
 
@@ -398,8 +400,28 @@ type Gpu = {
   destroy: () => void;
 };
 
+/** Quanti pixel veri per pixel CSS. Vedi RESA qui sotto. */
+function pixelRatio() {
+  const dpr = (typeof window !== "undefined" && window.devicePixelRatio) || 1;
+  // Sotto i 640 px il riquadro è largo quanto lo schermo e il telefono ha il
+  // budget più stretto di tutti: lì si sta a uno e basta.
+  if (typeof window !== "undefined" && window.matchMedia("(max-width: 639.98px)").matches) return 1;
+  return Math.min(1.5, dpr);
+}
+
 function makeGpu(cv: HTMLCanvasElement, carId: string, raw: Raw, onTexture: () => void): Gpu | null {
-  const opts = { antialias: true, alpha: true, depth: true, premultipliedAlpha: false };
+  // ── L'antialiasing, e perché non sempre ────────────────────────────────────
+  // L'MSAA e il sovracampionamento del DPR fanno lo stesso mestiere: smussare
+  // il bordo. Su uno schermo a due pixel per pixel il secondo l'ha già fatto,
+  // e pagare anche il primo vuol dire un buffer multicampione per tre contesti
+  // che disegnano 131 000 triangoli a testa. Sui monitor a un pixel, dove il
+  // gradino si vedrebbe davvero, l'MSAA resta.
+  const opts = {
+    antialias: ((typeof window !== "undefined" && window.devicePixelRatio) || 1) < 1.5,
+    alpha: true,
+    depth: true,
+    premultipliedAlpha: false,
+  };
   const gl = (cv.getContext("webgl", opts) || cv.getContext("experimental-webgl", opts)) as
     | WebGLRenderingContext
     | null;
@@ -464,25 +486,67 @@ function makeGpu(cv: HTMLCanvasElement, carId: string, raw: Raw, onTexture: () =
   const wanted = new Set(raw.draws.map((d) => d.tex).filter((t) => t !== 255));
   const images: HTMLImageElement[] = [];
   let alive = true;
+
+  /* ── Una texture per fotogramma, e un disegno solo ────────────────────────
+     Le trenta texture arrivano tutte nello stesso mezzo secondo, e prima
+     ognuna faceva il suo lavoro nell'istante in cui atterrava: texImage2D,
+     generateMipmap — che ridimensiona l'immagine fino a 1×1 — e poi un
+     ridisegno COMPLETO dell'auto. Trenta volte, sul filo principale, mentre
+     arrivano i quattro megabyte di geometria e mentre la pagina sta ancora
+     scorrendo. È lì che lo scroll si inchiodava arrivando al garage.
+
+     Adesso chi atterra si mette in coda, e la coda si smaltisce a una texture
+     per fotogramma: il lavoro è lo stesso ma spalmato, e ogni fotogramma paga
+     un upload e un disegno invece di trenta di fila. Si vede l'auto rivestirsi
+     a strati, che è quello che il cappello di questo file già prometteva.
+
+     img.decode() e non img.onload: decodifica il WebP fuori dal filo
+     principale e avvisa a immagine pronta, così il texImage2D non se la trova
+     ancora da spacchettare. Dove non c'è si torna a onload, che è il patto di
+     prima. */
+  const coda: { id: number; img: HTMLImageElement }[] = [];
+  let scarico = 0;
+
+  const scarica = () => {
+    scarico = 0;
+    if (!alive) return;
+    const next = coda.shift();
+    if (!next) return;
+    const t = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, next.img);
+    // Ripetizione + mipmap: le UV di questi modelli arrivano a 60, e il
+    // convertitore per questo tiene le texture in potenze di due.
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    texes.set(next.id, t);
+    onTexture();
+    if (coda.length) scarico = requestAnimationFrame(scarica);
+  };
+  const accoda = (id: number, img: HTMLImageElement) => {
+    if (!alive) return;
+    coda.push({ id, img });
+    if (!scarico) scarico = requestAnimationFrame(scarica);
+  };
+
   for (const id of wanted) {
     const img = new Image();
     images.push(img);
-    img.onload = () => {
-      if (!alive) return;
-      const t = gl.createTexture()!;
-      gl.bindTexture(gl.TEXTURE_2D, t);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      // Ripetizione + mipmap: le UV di questi modelli arrivano a 60, e il
-      // convertitore per questo tiene le texture in potenze di due.
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      gl.generateMipmap(gl.TEXTURE_2D);
-      texes.set(id, t);
-      onTexture();
-    };
-    img.src = `/models/tex/${carId}-${id}.webp`;
+    const pronta = () => accoda(id, img);
+    if (typeof img.decode === "function") {
+      img.src = `/models/tex/${carId}-${id}.webp`;
+      img.decode().then(pronta, () => {
+        /* decode() rifiuta anche solo perché il src è stato azzerato al
+           dismount: non c'è niente da salvare, la texture semplicemente non
+           arriva e il materiale resta al suo colore di base. */
+      });
+    } else {
+      img.onload = pronta;
+      img.src = `/models/tex/${carId}-${id}.webp`;
+    }
   }
 
   gl.enable(gl.DEPTH_TEST);
@@ -530,6 +594,8 @@ function makeGpu(cv: HTMLCanvasElement, carId: string, raw: Raw, onTexture: () =
     },
     destroy() {
       alive = false;
+      if (scarico) cancelAnimationFrame(scarico);
+      coda.length = 0;
       for (const img of images) img.src = "";
       for (const b of bufs) gl.deleteBuffer(b);
       for (const t of texes.values()) gl.deleteTexture(t);
@@ -669,7 +735,7 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
     let more = false;
     if (intro) {
       if (!t0) t0 = now;
-      const k = Math.min(1, Math.max(0, now - t0 - index * 150) / 900);
+      const k = Math.min(1, (now - t0) / 900);
       const want = 0.95 * Math.pow(1 - k, 3);
       spin(rot, 1, want - intro);
       intro = want;
@@ -689,12 +755,20 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
     if (!raf) raf = requestAnimationFrame(tick);
   };
 
+  // ── RESA ────────────────────────────────────────────────────────────────
+  // Era `min(2, dpr)`, cioè il massimo che uno schermo retina può chiedere. Il
+  // costo di questo visualizzatore sta quasi tutto nei FRAMMENTI — niente culling
+  // (i modelli hanno triangoli invertiti, vedi gli shader), un `discard` che
+  // spegne l'early-Z, e un frag shader con due pow(), una reflect() e una
+  // smoothstep() — e i frammenti vanno con l'AREA. Da 2 a 1,5 è il 44 % in meno
+  // di pixel da tingere, per tre auto insieme, e su una carrozzeria lucida la
+  // differenza a occhio non c'è: non ci sono bordi netti da tenere.
   const resize = () => {
     const r = stage.getBoundingClientRect();
     if (!r.width) return;
     w = r.width;
     h = r.height;
-    const k = Math.min(2, window.devicePixelRatio || 1);
+    const k = pixelRatio();
     cv.width = Math.round(w * k);
     cv.height = Math.round(h * k);
     cv.style.width = `${w}px`;
@@ -704,7 +778,19 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
   const ro = new ResizeObserver(resize);
   ro.observe(stage);
   resize();
-  if (intro) kick();
+
+  // ── L'entrata, una alla volta ─────────────────────────────────────────────
+  // Lo sfalsamento c'era già, ma stava DENTRO il ciclo: tutte e tre le auto
+  // facevano partire il loro requestAnimationFrame subito e ridisegnavano
+  // 131 000 triangoli a ogni fotogramma anche solo per aspettare il proprio
+  // turno — e nello stesso mezzo secondo in cui arrivano le trenta texture.
+  // Adesso chi deve aspettare aspetta da fermo, e il ciclo lo accende quando
+  // tocca a lei.
+  let avvio = 0;
+  if (intro) {
+    if (index) avvio = window.setTimeout(kick, index * INTRO_GAP);
+    else kick();
+  }
 
   let lx = 0;
   let ly = 0;
@@ -767,6 +853,7 @@ function mount(stage: HTMLDivElement, cv: HTMLCanvasElement, gpu: Gpu, index: nu
     },
     stop: () => {
       ro.disconnect();
+      clearTimeout(avvio);
       if (raf) cancelAnimationFrame(raf);
       stage.removeEventListener("pointerdown", down);
       stage.removeEventListener("pointermove", move);

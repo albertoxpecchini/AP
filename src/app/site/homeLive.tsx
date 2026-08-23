@@ -71,7 +71,7 @@
 // Convenzione i18n: i contenuti che non sono prosa (numeri, nomi di progetto,
 // domini, comandi da terminale) portano data-no-i18n + translate="no".
 // ─────────────────────────────────────────────────────────────────────────────
-import { useLayoutEffect, useRef, useState } from "react";
+import { memo, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { SiteLink } from "./nav";
 import { IcArrowUpRight } from "./homeIcons";
@@ -109,7 +109,7 @@ const BUILD_HOLD = 4200;
    è pieno e premibile per intero. E finché il puntatore (o il focus) sta
    dentro, il turno salta: un bersaglio che scappa mentre lo miri non è un
    bersaglio. */
-export function NowBuilding() {
+export const NowBuilding = memo(function NowBuilding() {
   const [i, setI] = useState(0);
   const itemRef = useRef<HTMLSpanElement>(null);
   const held = useRef(false);
@@ -206,7 +206,7 @@ export function NowBuilding() {
       </span>
     </div>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA TAVOLA COMUNE — adesso è una tavola, non un foglio trasparente
@@ -301,7 +301,7 @@ const ECHOES: [number, number][] = [
   [4.5, 0.38],
 ];
 
-export function BlueprintPage() {
+export const BlueprintPage = memo(function BlueprintPage() {
   return (
     <Plate name="win">
       <defs>
@@ -332,7 +332,7 @@ export function BlueprintPage() {
       <use className="sb-ill-front" href="#sb-win" x={35} y={20} />
     </Plate>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ② Card «Rivalta e Cascina Fontana» — il globo, e la linea fra i due
@@ -464,7 +464,7 @@ function RowMark() {
   );
 }
 
-export function GlobeOrbit() {
+export const GlobeOrbit = memo(function GlobeOrbit() {
   return (
     <div className="sb-ill-stage sb-ill-stage--globe">
       <Plate name="globe">
@@ -517,7 +517,7 @@ export function GlobeOrbit() {
       </span>
     </div>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ③ Card «Sviluppo assistito dall'IA» — due cursori e tre bollicine
@@ -560,7 +560,7 @@ function Bubble({ x, y, on }: { x: number; y: number; on?: boolean }) {
   );
 }
 
-export function PrismFan() {
+export const PrismFan = memo(function PrismFan() {
   return (
     <div className="sb-ill-stage">
       <Plate name="live">
@@ -590,7 +590,7 @@ export function PrismFan() {
       </span>
     </div>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ④ Card «Fotografia» — la provinatura
@@ -644,7 +644,7 @@ function TileGlyph({ kind, cx, cy }: { kind: number; cx: number; cy: number }) {
   );
 }
 
-export function IrisPlate() {
+export const IrisPlate = memo(function IrisPlate() {
   return (
     <Plate name="film">
       {TILE_Y.map((y, r) =>
@@ -660,7 +660,7 @@ export function IrisPlate() {
       <rect className="sb-ill-tilesel" x={TILE_X[1]} y={TILE_Y[1]} width={TILE_W} height={TILE_H} rx={7} />
     </Plate>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ⑤ Card «Il geometra e l'università» — il volume in assonometria
@@ -699,7 +699,7 @@ const MOTES: [number, number][] = [
   [40, 124],
 ];
 
-export function ContourPlate() {
+export const ContourPlate = memo(function ContourPlate() {
   return (
     <Plate name="cube">
       <path className="sb-ill-cubeface" d={CUBE_TOP} />
@@ -734,7 +734,7 @@ export function ContourPlate() {
       <path className="sb-ill-quote" d="M52,68 L52,106 M47,68 L57,68 M47,106 L57,106" />
     </Plate>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ⑥ Card «Auto» — il quadrante
@@ -763,7 +763,7 @@ const DIAL = [
   "M210,124 L198,124",
 ];
 
-export function GaugePlate() {
+export const GaugePlate = memo(function GaugePlate() {
   return (
     <Plate name="gauge">
       <path className="sb-ill-dial" d="M70,124 A70,70 0 0,1 210,124" />
@@ -784,7 +784,7 @@ export function GaugePlate() {
       <circle className="sb-ill-hub" cx={140} cy={124} r={5} />
     </Plate>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    IL MURO DEI COMMIT — il numero scritto coi quadratini
@@ -890,10 +890,27 @@ const WALL_MASK = pixelMask(WALL_TEXT);
 const TEXT_X = Math.floor((COLS - (WALL_TEXT.length * 6 - 1)) / 2);
 const TEXT_Y = Math.floor((ROWS - 7) / 2);
 
+/** Una cella già pronta da dare a React.
+ *
+ *  Tutto quello che serve al <rect> è calcolato QUI, una volta sola al primo
+ *  caricamento del modulo: classe, coordinate, livello e — soprattutto —
+ *  l'oggetto `style`. Sono 1.100 celle, e con lo `style` costruito dentro il
+ *  render erano 1.100 oggetti nuovi a ogni giro, quindi 1.100 confronti che
+ *  fallivano sempre. Adesso il riferimento è lo stesso e React non tocca
+ *  niente. */
+type Cell = {
+  key: string;
+  cls: string;
+  x: number;
+  y: number;
+  lv: number;
+  style: React.CSSProperties;
+};
+
 /** Rumore di fondo ripetibile: xorshift con seme fisso, così il muro è lo
  *  stesso disegno a ogni render e a ogni ricarica. Un fondale che cambia da
  *  solo a ogni visita è un fondale che si fa notare. */
-function makeWall() {
+function makeWall(): Cell[] {
   let seed = 0x9e3779b9;
   const rand = () => {
     seed ^= seed << 13;
@@ -901,15 +918,22 @@ function makeWall() {
     seed ^= seed << 5;
     return (seed >>> 0) / 0xffffffff;
   };
-  const cells: { c: number; r: number; lv: number; on: boolean }[] = [];
+  const cells: Cell[] = [];
   for (let c = 0; c < COLS; c++) {
     for (let r = 0; r < ROWS; r++) {
       const v = rand();
+      const on = WALL_MASK.has(c - TEXT_X + "," + (r - TEXT_Y));
       cells.push({
-        c,
-        r,
+        key: c + "-" + r,
+        cls: on ? "sb-cwall-cell sb-cwall-cell--on" : "sb-cwall-cell",
+        x: c * (CELL + GAP),
+        y: r * (CELL + GAP),
         lv: v < 0.45 ? 0 : v < 0.65 ? 1 : v < 0.8 ? 2 : v < 0.92 ? 3 : 4,
-        on: WALL_MASK.has(c - TEXT_X + "," + (r - TEXT_Y)),
+        /* Il ritardo dell'accensione: il fondo si apre da sinistra a destra,
+           il numero arriva dopo che il fondo è passato di lì. Due tempi e non
+           uno — accendendoli insieme il numero nascerebbe già dentro il
+           rumore, invece di emergerne. */
+        style: { "--d": (on ? 0.3 : 0) + c * 0.02 + r * 0.01 + "s" } as React.CSSProperties,
       });
     }
   }
@@ -920,7 +944,11 @@ const WALL = makeWall();
 const WALL_W = COLS * (CELL + GAP) - GAP;
 const WALL_H = ROWS * (CELL + GAP) - GAP;
 
-export function CommitWall() {
+/* memo, e qui pesa: il muro è 1.100 <rect> e non prende nessuna prop, ma vive
+   dentro App insieme a tutto il resto della home. Senza, ogni setState della
+   pagina — la scheda dell'archivio, la tecnologia dello stack — lo faceva
+   ridisegnare per intero. */
+export const CommitWall = memo(function CommitWall() {
   return (
     <svg
       className="sb-cwall"
@@ -928,26 +956,22 @@ export function CommitWall() {
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
     >
-      {WALL.map(({ c, r, lv, on }) => (
+      {WALL.map((cell) => (
         <rect
-          key={c + "-" + r}
-          className={on ? "sb-cwall-cell sb-cwall-cell--on" : "sb-cwall-cell"}
-          x={c * (CELL + GAP)}
-          y={r * (CELL + GAP)}
+          key={cell.key}
+          className={cell.cls}
+          x={cell.x}
+          y={cell.y}
           width={CELL}
           height={CELL}
           rx={1}
-          data-lv={lv}
-          /* Il ritardo dell'accensione: il fondo si apre da sinistra a destra,
-             il numero arriva dopo che il fondo è passato di lì. Due tempi e non
-             uno — accendendoli insieme il numero nascerebbe già dentro il
-             rumore, invece di emergerne. */
-          style={{ "--d": (on ? 0.3 : 0) + c * 0.02 + r * 0.01 + "s" } as React.CSSProperties}
+          data-lv={cell.lv}
+          style={cell.style}
         />
       ))}
     </svg>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Riga "trusted by" — stato di servizio accanto a ogni cliente.

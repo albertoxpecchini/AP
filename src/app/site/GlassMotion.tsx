@@ -9,6 +9,8 @@
 //
 // ① Deriva del fondale — i due aloni (.sb-home::before/::after) slittano con
 //    lo scroll, così sotto ogni card passa colore diverso man mano che scendi.
+//    Qui sta anche la QUIETE: a pagina ferma il respiro degli aloni si mette in
+//    pausa, perché è lui che tiene svegli tutti i backdrop-filter della pagina.
 // ② Tilt — la card si inclina verso il cursore e il rim si sposta di
 //    conseguenza.
 // ③ Quello che il puntatore illumina — rim, alone, lucido del titolo.
@@ -113,16 +115,49 @@ export default function GlassMotion() {
         if (!frame) frame = requestAnimationFrame(update);
       };
 
+      // ── La quiete ────────────────────────────────────────────────────────
+      // Il respiro a keyframe degli aloni (home.css, @keyframes sb-drift-a/b)
+      // non finisce mai, e questo NON costa per sé: sono due strati che il
+      // compositore sposta. Costa per quello che ha davanti — ogni lastra di
+      // vetro ha un backdrop-filter, e un backdrop-filter si rifà ogni volta
+      // che cambia il suo sfondo. Con la deriva sempre viva, una pagina ferma
+      // continua a risfocare una dozzina di pannelli a 60 al secondo.
+      //
+      // Quindi: dopo un secondo e mezzo che non si scorre e non si muove il
+      // puntatore, `sb-quiet` mette in pausa la deriva; al primo dei due
+      // gesti riparte. Nessuno vede una deriva da 74 secondi mentre sta fermo
+      // a leggere, e appena la pagina si muove il fondo si muove con lei.
+      //
+      // Sta in QUESTO blocco perché è già quello che possiede l'ascolto dello
+      // scroll, ed è già dentro `prefers-reduced-motion: no-preference` —
+      // dove il movimento è spento non c'è niente da mettere in pausa.
+      const QUIETE = 1500;
+      let quiet = 0;
+      const sveglia = () => {
+        root.classList.remove("sb-quiet");
+        clearTimeout(quiet);
+        quiet = window.setTimeout(() => root.classList.add("sb-quiet"), QUIETE);
+      };
+      const risveglio = () => {
+        sveglia();
+        schedule();
+      };
+
       update();
+      sveglia();
       // capture: true — vedi readProgress(). Lo scroll qui lo fa <body>, e il
       // suo evento non risale fino a window.
-      document.addEventListener("scroll", schedule, { passive: true, capture: true });
-      window.addEventListener("resize", schedule);
+      document.addEventListener("scroll", risveglio, { passive: true, capture: true });
+      window.addEventListener("resize", risveglio);
+      document.addEventListener("pointermove", sveglia, { passive: true });
 
       return () => {
         if (frame) cancelAnimationFrame(frame);
-        document.removeEventListener("scroll", schedule, { capture: true });
-        window.removeEventListener("resize", schedule);
+        clearTimeout(quiet);
+        root.classList.remove("sb-quiet");
+        document.removeEventListener("scroll", risveglio, { capture: true });
+        window.removeEventListener("resize", risveglio);
+        document.removeEventListener("pointermove", sveglia);
         gsap.killTweensOf(drift);
         root.style.removeProperty("--sb-drift");
       };

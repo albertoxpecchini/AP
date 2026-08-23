@@ -384,6 +384,34 @@ html.dark .sb-home {
   from { transform: translate3d(3vw, 2vh, 0) scale(1.06); }
   to   { transform: translate3d(-4vw, -3vh, 0) scale(1); }
 }
+
+/* ── E qui il conto vero della deriva, che non è quello che sembra ───────────
+   Muovere due strati già dipinti costa poco: quella riga qui sopra è vera. Il
+   conto lo pagano i VETRI. Ogni .sb-panel-inner ha un backdrop-filter, e un
+   backdrop-filter si rifà ogni volta che cambia quello che ha DIETRO — e
+   dietro c'è questa deriva, che non si ferma mai. Risultato: una dozzina di
+   lastre che si risfocano a ogni fotogramma, in eterno, su una pagina ferma
+   che nessuno sta toccando. Sul garage sono tre lastre con sopra tre canvas
+   WebGL.
+
+   Due rimedi, uno per famiglia di dispositivi.
+
+   ① Sul touch la deriva non c'è. Gli aloni restano — sono due velature di
+      colore, si vedono lo stesso — ma stanno fermi, e con loro tutti i vetri.
+      È lo stesso ragionamento del blur ridotto sotto i 640 px: il compositore
+      di un telefono ha un budget che qui va speso per lo scorrimento.
+   ② Sul desktop la deriva si ferma quando la pagina è ferma. La classe la
+      mette e la toglie site/GlassMotion.tsx ①, che ha già i listener di
+      scroll e di puntatore: al primo dei due riparte. Qui `paused` va bene, a
+      differenza delle tavole della griglia (vedi «Il gesto parte al
+      passaggio»): quelle avevano uno 0% vuoto da proteggere, queste no —
+      si congelano dove sono, che è un fotogramma buono come gli altri. */
+@media (hover: none) {
+  .sb-home::before,
+  .sb-home::after { animation: none; }
+}
+html.sb-quiet .sb-home::before,
+html.sb-quiet .sb-home::after { animation-play-state: paused; }
 html.dark .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.16), transparent 62%);
 }
@@ -2119,6 +2147,12 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   flex-direction: column;
   gap: 0.5rem;
   isolation: isolate;
+  /* Da 960px in su lo scaffale ha un'altezza sua (vedi in fondo al blocco),
+     quindi i 550 ms di flex-grow si consumano tutti qui dentro: con questo il
+     browser non risale a rifare il layout della sezione e della pagina a ogni
+     fotogramma. In colonna l'altezza la fanno ancora le lastre, ma lì non c'è
+     hover — si apre con un tocco, una volta. */
+  contain: layout;
 }
 
 .sb-slat {
@@ -2134,6 +2168,13 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   background: linear-gradient(155deg, var(--pg-a) 0%, var(--pg-b) 100%);
   color: #fff;
   transition: height 0.55s cubic-bezier(0.22, 0.61, 0.36, 1), flex-grow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* Dentro la lastra non c'è NIENTE in flusso: glifi, dorso e pannello sono
+     tutti in position:absolute, quindi il contenuto non ha mai deciso la sua
+     misura. Dichiararlo al browser vuol dire che i 550 ms di apertura non gli
+     fanno rimisurare sei sottoalberi a ogni fotogramma. `paint` è gratis: c'è
+     già overflow:hidden più il clip-path, quindi da qui non usciva niente
+     comunque. */
+  contain: layout paint;
 }
 /* Il velo. Vedi il cappello qui sopra: senza, metà delle tinte non regge il
    testo bianco. */
@@ -2174,8 +2215,17 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
      perdono, mentre il doppio filo si stacca da qualsiasi delle sei tinte. */
   box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px rgba(0, 0, 0, 0.5);
 }
+/* Il dorso si schiarisce sotto il puntatore. Era un `filter: brightness(1.08)`,
+   ed è la cosa peggiore da mettere proprio qui: un filter promuove la lastra a
+   strato suo e la fa ri-rasterizzare — e questa lastra, nello stesso momento,
+   sta animando la sua larghezza. Una velatura bianca in più fra le due tinte fa
+   la stessa cosa a occhio e costa un ridisegno di un dorso da 76 px. */
 @media (hover: hover) and (pointer: fine) {
-  .sb-slat:not([data-open="true"]):hover { filter: brightness(1.08); }
+  .sb-slat:not([data-open="true"]):hover {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+      linear-gradient(155deg, var(--pg-a) 0%, var(--pg-b) 100%);
+  }
 }
 
 .sb-slat-mark {
