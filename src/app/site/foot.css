@@ -1,0 +1,833 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FOOTBAR — il fondo del sito, rifatto da capo
+   Vive su OGNI pagina, quindi è il pezzo di CSS che il browser incontra più
+   volte di qualunque altro: qui dentro ogni riga si paga tante volte quante
+   sono le pagine del sito. È il motivo per cui questo giro è stato scritto
+   togliendo lavoro invece che aggiungendone.
+
+   ── Cosa è cambiato, e perché ──────────────────────────────────────────────
+   ① LA MAPPA. Prima erano due card affiancate: a sinistra identità + social
+      schiacciati in una colonna da 21rem, a destra la dashboard GitHub. I
+      diciassette social stavano in un francobollo e la dashboard aveva il
+      doppio dello spazio pur avendo meno da dire. Adesso sono tre bande:
+      firma + polso GitHub in alto (due lastre), il MURO dei social a tutta
+      larghezza sotto, e la barra finale. I social hanno la larghezza che
+      serve per crescere; l'istogramma ha l'altezza che serve per leggersi.
+
+   ② LA FORMA. Lo smusso del sito non si fa più con clip-path ma con
+      `border-radius` + `corner-shape: bevel`. È la stessa sagoma — 45° in
+      alto a sinistra e in basso a destra — disegnata però dal box decoration
+      invece che da un ritaglio, e questo risolve in un colpo i tre guai che
+      il clip-path si porta dietro, quelli documentati in home.css:
+        · il bordo sopravvive alle diagonali da sé (niente più gradienti
+          d'angolo da riportarsi dietro a ogni cambio di background);
+        · l'ombra esterna e l'outline del focus seguono lo smusso invece di
+          essere tagliati via (niente più ombra-oggetto appesa al contenitore);
+        · niente ritaglia il sottoalbero, quindi i tooltip escono dalla lastra
+          senza che nessuno debba spegnere un overflow.
+      Dove `corner-shape` non c'è si ricade sui token --sb-shape-* di sempre.
+
+   ③ IL MOVIMENTO. Qui dentro non gira più una riga di JavaScript. Prima il
+      footer teneva acceso GSAP + ScrollTrigger su ogni pagina del sito per
+      fare tre cose — contatore, magneti, pozza d'acqua sull'istogramma — e
+      ognuna delle tre scriveva nel DOM a ogni fotogramma mentre il puntatore
+      era qui sotto. Misurato in Edge sulla build di produzione, quattro
+      secondi di puntatore nel footer costavano 694 ricalcoli di stile.
+      Adesso:
+        · il contatore è un @property <integer> + counter() su una timeline
+          di scroll — nessun tween, nessun MutationObserver;
+        · i magneti sono spariti e al loro posto c'è un sollevamento di
+          composizione (translate/scale), che non tocca il layout;
+        · l'onda sull'istogramma la fanno i selettori fratelli con :has(),
+          quindi si ricalcola quando cambi barra e non sessanta volte al
+          secondo.
+      Vedi anche la nota in cima a SiteFooter.tsx.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Proprietà tipate ────────────────────────────────────────────────────────
+   Registrarle non è un vezzo: una custom property non registrata è una
+   stringa, e una stringa non si interpola. --sb-foot-near deve poter
+   transitare (è l'onda dell'istogramma) e --sb-foot-n deve poter essere
+   ANIMATA come numero intero, che è tutto il trucco del contatore. */
+@property --sb-foot-near {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --sb-foot-n {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+/* ═══ ① Il guscio ══════════════════════════════════════════════════════════ */
+
+/* .sb-home addosso al footer serve per i token (e quindi per il tema nativo),
+   ma il footer non è una pagina: niente min-height, e il fondale a tutto
+   schermo glielo spegne già home.css. */
+.sb-home.sb-foot {
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+  /* Il colore entra in dissolvenza dall'alto: scendendo non si deve vedere il
+     punto in cui la pagina finisce e comincia il footer. Nessun bordo, nessun
+     fondo netto — è la regola del sito, un fondale solo per tutta la pagina. */
+  background: linear-gradient(to bottom, transparent, var(--sb-bg-alt) 14rem);
+  /* Il contenitore di query: da qui in giù le misure si prendono sulla
+     larghezza del FOOTER, non su quella della finestra. Serve perché il
+     footer è lo stesso oggetto in pagine con margini diversi, e perché la
+     lastra dell'istogramma deve poter decidere da sé quanti giorni mostrare. */
+  container: sb-foot / inline-size;
+}
+
+/* L'alone che si accende arrivando in fondo.
+   È l'UNICA animazione autonoma del footer, e non annuncia contenuto: è
+   atmosfera, come i due veli radiali della home. Gira su animation-timeline:
+   view(), cioè è lo scroll a dettarne l'avanzamento — non un timer. Non costa
+   main thread perché si muove solo l'opacità, e va in pari da sé anche se
+   arrivi qui con un salto di ancora. */
+.sb-foot-aura {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 26rem;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  background:
+    radial-gradient(48rem 20rem at 18% 0%, color-mix(in oklab, var(--sb-brand) 13%, transparent), transparent 66%),
+    radial-gradient(40rem 18rem at 86% 12%, color-mix(in oklab, var(--sb-brand) 8%, transparent), transparent 62%);
+}
+@supports (animation-timeline: view()) {
+  .sb-foot-aura {
+    animation: sb-foot-aura linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 78%;
+  }
+}
+@keyframes sb-foot-aura {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Senza timeline di scroll l'alone resterebbe a zero per sempre: là si accende
+   e basta, che è il fotogramma giusto e non un'animazione. */
+@supports not (animation-timeline: view()) {
+  .sb-foot-aura { opacity: 1; }
+}
+
+.sb-foot-wrap {
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  /* Aria in fondo per la barra fissa lingua/tema, che sta in basso a sinistra:
+     senza, a fine scroll coprirebbe il © e la riga finale. */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 5.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.4rem);
+}
+
+/* ═══ ② La lastra ══════════════════════════════════════════════════════════
+   Due livelli come le card della home — un rim a gradiente da 1px e il vetro
+   dentro — ma tagliati col bevel invece che col clip-path. Il rim resta uno
+   sfondo a gradiente sul livello esterno: `corner-shape` smussa anche quello,
+   quindi il filo diagonale viene fuori da sé e i quattro gradienti d'angolo
+   dei token --sb-shape-edge-* qui non servono più. */
+.sb-foot-slab {
+  position: relative;
+  padding: 1px;
+  min-width: 0;
+  background: linear-gradient(
+    160deg,
+    var(--sb-glass-rim),
+    var(--sb-border-strong) 38%,
+    color-mix(in srgb, var(--sb-border) 45%, transparent)
+  );
+  transition: background 0.2s ease;
+  /* Ripiego: dove non c'è corner-shape la sagoma torna a essere il ritaglio
+     di sempre, con i suoi limiti noti. */
+  clip-path: var(--sb-shape-lg);
+}
+.sb-foot-slab__in {
+  position: relative;
+  height: 100%;
+  clip-path: var(--sb-shape-lg-in);
+  background: var(--sb-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+  backdrop-filter: blur(var(--sb-glass-blur)) saturate(var(--sb-glass-sat));
+  box-shadow: inset 0 1px 0 var(--sb-glass-spec);
+  padding: clamp(1.1rem, 2.2cqi, 1.6rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+@supports (corner-shape: bevel) {
+  .sb-foot-slab {
+    clip-path: none;
+    border-radius: var(--sb-cut-lg) 0 var(--sb-cut-lg) 0;
+    corner-shape: bevel;
+    /* E siccome adesso l'ombra non viene più tagliata via, torna a essere un
+       box-shadow onesto invece della lastra sfocata appesa al contenitore. */
+    transition: background 0.2s ease, box-shadow 0.25s ease;
+  }
+  .sb-foot-slab:hover {
+    background: var(--sb-border-stronger);
+    box-shadow: var(--sb-shadow-card);
+  }
+  .sb-foot-slab__in {
+    clip-path: none;
+    /* 1px di raggio in meno perché fra le due diagonali resti esattamente 1px,
+       come sui lati dritti: col bevel il conto è banale — il raggio è la
+       distanza dall'angolo lungo il lato, e l'inner è inset di 1px. Niente
+       0.586px, che serviva solo perché il poligono ragiona in perpendicolare. */
+    border-radius: calc(var(--sb-cut-lg) - 1px) 0 calc(var(--sb-cut-lg) - 1px) 0;
+    corner-shape: bevel;
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sb-foot-slab__in { background: var(--sb-surface-75); }
+}
+
+/* Il titolino di ogni lastra: maiuscoletto spaziato, il registro alto del
+   sito. text-box toglie il piombo sopra e sotto la riga, così lo spazio fra
+   titolo e contenuto è quello scritto qui e non quello che decide il font —
+   su un maiuscoletto piccolo si vede eccome. */
+.sb-foot-h {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--sb-fg-muted);
+}
+@supports (text-box: trim-both cap alphabetic) {
+  .sb-foot-h { text-box: trim-both cap alphabetic; }
+}
+
+/* ═══ ③ Banda 1 — firma e polso ════════════════════════════════════════════ */
+
+.sb-foot-deck {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 2vw, 1.4rem);
+  align-items: stretch;
+}
+/* Le query stanno sul CONTENITORE, non sulla finestra: il footer è largo
+   quanto la pagina che lo ospita, e una pagina con margini stretti non deve
+   ereditare il layout di una finestra larga. */
+@container sb-foot (min-width: 56rem) {
+  .sb-foot-deck { grid-template-columns: minmax(0, 17rem) minmax(0, 1fr); }
+}
+
+.sb-foot-sign { display: flex; flex-direction: column; gap: 0.35rem; height: 100%; }
+.sb-foot-name {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: clamp(1.15rem, 2.4cqi, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--sb-fg);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+@supports (text-box: trim-both cap alphabetic) {
+  .sb-foot-name { text-box: trim-both cap alphabetic; }
+}
+.sb-foot-name:hover { color: var(--sb-brand-text); }
+.sb-foot-role {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--sb-fg-lighter);
+  /* pretty invece di balance: la riga è lunga, e balance su tre righe di testo
+     corrente le pareggia a scapito della prima, che è quella che si legge.
+     pretty si limita a non lasciare una parola sola in fondo. */
+  text-wrap: pretty;
+  max-width: 34ch;
+}
+/* L'unico recapito pubblico del sito, in fondo alla firma. */
+.sb-foot-mail {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  padding: 0.22rem 0.6rem;
+  font-size: 0.78rem;
+  color: var(--sb-fg-light);
+  text-decoration: none;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+@supports (corner-shape: bevel) {
+  .sb-foot-mail { corner-shape: bevel; }
+}
+.sb-foot-mail:hover {
+  color: var(--sb-brand-text);
+  border-color: color-mix(in oklab, var(--sb-brand) 40%, transparent);
+  background-color: var(--sb-overlay);
+}
+
+/* Il filo che chiude la firma, stessa grammatica del filo della barra finale.
+   margin-top: auto lo spinge in fondo alla lastra, così la colonna di
+   sinistra ha un piede anche quando è più corta di quella accanto. */
+.sb-foot-sign-rule {
+  height: 1px;
+  margin-top: auto;
+  background: linear-gradient(to right, var(--sb-border-strong), transparent);
+}
+
+/* ═══ ④ Il muro dei social ═════════════════════════════════════════════════
+   Prima: diciassette icone nude, una accanto all'altra dentro 21rem, senza
+   nome — si riconoscevano solo quelle famose e le altre erano indovinelli.
+   Adesso: una piastrella per ciascuno, icona sopra e nome sotto, su una
+   griglia auto-fill a tutta larghezza. Aggiungerne uno non stringe niente:
+   la griglia si riempie da sé e va a capo quando serve. */
+.sb-foot-wall {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.4rem;
+}
+.sb-foot-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.35rem 0.6rem;
+  height: 100%;
+  text-decoration: none;
+  color: var(--sb-fg-muted);
+  border: 1px solid transparent;
+  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  /* Una superficie appena percettibile anche a riposo: senza, le piastrelle
+     non sono piastrelle — sono venti icone che galleggiano su un vuoto, e il
+     muro non si legge come muro finché non ci passi sopra. */
+  background-color: color-mix(in oklab, var(--sb-fg) 2.5%, transparent);
+  /* linear() è una curva campionata: questa sfonda l'1 e rientra — un rimbalzo
+     secco che con un cubic-bezier a due punti non si scrive. Sono venti
+     bersagli piccoli: il rimbalzo dice quale hai preso meglio di qualunque
+     cambio di colore. */
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    translate 0.34s linear(0, 0.34 12%, 0.78 26%, 1.06 42%, 1.02 58%, 1);
+}
+@supports (corner-shape: bevel) {
+  .sb-foot-tile { corner-shape: bevel; }
+}
+.sb-foot-tile svg {
+  flex-shrink: 0;
+  transition: scale 0.34s linear(0, 0.4 14%, 1.14 44%, 0.98 66%, 1);
+}
+.sb-foot-tile__n {
+  font-size: 0.7rem;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--sb-fg-muted);
+  transition: color 0.18s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .sb-foot-tile:hover {
+    color: var(--sb-brand-text);
+    background-color: var(--sb-overlay);
+    border-color: color-mix(in oklab, var(--sb-brand) 34%, transparent);
+    translate: 0 -3px;
+  }
+  .sb-foot-tile:hover svg { scale: 1.18; }
+  .sb-foot-tile:hover .sb-foot-tile__n { color: var(--sb-fg-light); }
+}
+/* Col bevel il focus torna a essere un outline vero, che segue lo smusso:
+   niente più box-shadow inset a fare finta di essere un contorno. */
+.sb-foot-tile:focus-visible {
+  outline: 2px solid var(--sb-brand);
+  outline-offset: 2px;
+  color: var(--sb-brand-text);
+}
+
+/* ═══ ⑤ La barra finale ════════════════════════════════════════════════════ */
+
+.sb-foot-rule {
+  height: 2px;
+  margin-top: clamp(1rem, 2.5vw, 1.8rem);
+  border-radius: 999px;
+  background: linear-gradient(to right, transparent, var(--sb-border-stronger), transparent);
+}
+.sb-foot-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--sb-fg-muted);
+}
+/* Al posto di «Palette — Come funziona», che erano due finestre di
+   documentazione su un sito che la documentazione ce l'ha nel README: qui in
+   fondo l'unica cosa che serve davvero è tornare su. */
+.sb-foot-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.75rem;
+  font: inherit;
+  color: var(--sb-fg-light);
+  background-color: transparent;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+@supports (corner-shape: bevel) {
+  .sb-foot-top { corner-shape: bevel; }
+}
+.sb-foot-top svg { transition: translate 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+.sb-foot-top:hover {
+  color: var(--sb-brand-text);
+  border-color: color-mix(in oklab, var(--sb-brand) 40%, transparent);
+  background-color: var(--sb-overlay);
+}
+.sb-foot-top:hover svg { translate: 0 -2px; }
+
+/* ═══ ⑥ Il polso GitHub ════════════════════════════════════════════════════
+   Prima stava in un <style> dentro il componente: cinquecento righe di CSS
+   ricreate come elemento a ogni montaggio del footer, cioè a ogni pagina.
+   Adesso è un foglio come tutti gli altri, e il browser lo analizza una volta. */
+
+.sb-gh {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--sb-fg-lighter);
+  container: sb-gh / inline-size;
+}
+.sb-gh b { color: var(--sb-fg); font-weight: 500; }
+
+/* ── Riga d'identità ── */
+.sb-gh__id { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 0.8rem; }
+.sb-gh__profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  color: var(--sb-fg);
+  font-weight: 500;
+}
+.sb-gh__profile:hover { color: var(--sb-brand-text); }
+/* Il marchio .ap è un quadrato pieno: un ritaglio circolare gli mangerebbe i
+   quattro angoli, quindi qui la sagoma è quella del sito e non un tondo. */
+.sb-gh__avatar {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--sb-border-stronger);
+  border-radius: 5px 0 5px 0;
+  flex-shrink: 0;
+}
+@supports (corner-shape: bevel) {
+  .sb-gh__avatar { corner-shape: bevel; }
+}
+.sb-gh__since { color: var(--sb-fg-muted); }
+.sb-gh__act { display: inline-flex; align-items: center; min-width: 0; }
+/* Acceso e fermo. L'anello parte quando ci passi sopra, non da solo: i dati
+   arrivano una volta sola al caricamento, e un «in diretta» che pulsa per
+   conto suo direbbe una cosa falsa. */
+.sb-gh__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  background: var(--sb-brand);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--sb-brand) 55%, transparent);
+}
+.sb-gh__act:hover .sb-gh__dot { animation: sb-gh-live 1.4s ease-out; }
+@keyframes sb-gh-live {
+  0%   { box-shadow: 0 0 0 0 color-mix(in oklab, var(--sb-brand) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 6px color-mix(in oklab, var(--sb-brand) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--sb-brand) 0%, transparent); }
+}
+.sb-gh__skeleton { opacity: 0.6; animation: sb-gh-pulse 1.5s ease-in-out infinite; }
+@keyframes sb-gh-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.75; } }
+
+/* ── Chip statistiche ── */
+.sb-gh__chips { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+.sb-gh__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0.16rem 0.6rem;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  background-color: var(--sb-bg);
+  font-size: 0.78rem;
+  color: var(--sb-fg-light);
+  white-space: nowrap;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+@supports (corner-shape: bevel) {
+  .sb-gh__chip { corner-shape: bevel; }
+}
+@supports not (corner-shape: bevel) {
+  /* Senza bevel il bordo sulle diagonali sparirebbe: torna il filo disegnato
+     coi due gradienti d'angolo, come in tutto il resto del sito. */
+  .sb-gh__chip {
+    border-radius: 0;
+    clip-path: var(--sb-shape-xs);
+    background: var(--sb-shape-edge-xs), var(--sb-bg);
+  }
+}
+.sb-gh__star { color: #e3b341; }
+a.sb-gh__chip { text-decoration: none; }
+a.sb-gh__chip:hover {
+  color: var(--sb-fg);
+  border-color: var(--sb-brand);
+  background-color: color-mix(in oklab, var(--sb-brand) 8%, transparent);
+}
+.sb-gh__langdot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ═══ ⑦ L'ISTOGRAMMA ═══════════════════════════════════════════════════════
+   Il pezzo forte, e quello che è cambiato di più.
+
+   Prima: trenta stecchini alti 3–28px con l'altezza scritta a mano in uno
+   style inline, il colore preso da cinque hsla() fisse (quindi sordo alle sei
+   tinte di data-acc), un bersaglio da 4px da centrare col mouse, e un tooltip
+   sempre presente — trenta pseudo-elementi con opacity: 0 dentro il layout —
+   con due regole apposta per il primo e per l'ultimo perché la bolla non
+   uscisse dal footer.
+
+   Adesso:
+    · NOVANTUN giorni invece di trenta (tredici settimane), e quanti se ne
+      vedano lo decide una @container query, non la finestra;
+    · la colonna è alta tutta la fascia, quindi il bersaglio è alto 60px e non
+      3 — si prende senza mirare;
+    · il colore esce da color-mix(in oklab) fra il velo e --sb-brand secondo il
+      livello: una scala percettivamente regolare, e soprattutto una scala che
+      segue la tinta della pagina invece di essere azzurra per decreto;
+    · le bande del fine settimana e la linea della media danno una griglia a
+      cui appoggiare l'occhio (senza, un istogramma è solo una siepe);
+    · l'onda del puntatore la fanno i fratelli con :has(), quindi si ricalcola
+      quando CAMBI barra e non a ogni fotogramma come faceva la pozza;
+    · il tooltip esiste solo mentre serve (display: none → block con
+      transition-behavior allow-discrete e @starting-style) e si posiziona da
+      sé con l'ancoraggio CSS: justify-self: anchor-center lo centra sulla
+      barra e lo rientra quando toccherebbe il bordo — le due regole per il
+      primo e per l'ultimo figlio non servono più. */
+
+.sb-gh__chart {
+  position: relative;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.sb-gh__cap {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--sb-fg-lighter);
+}
+.sb-gh__cap b { color: var(--sb-fg); font-weight: 500; }
+
+/* Il contatore, senza una riga di JavaScript.
+   --sb-foot-n è registrata come <integer>, quindi si può interpolare; il
+   valore d'arrivo lo mette il componente in uno style inline e la keyframe
+   dice solo da dove partire. counter() lo stampa. La timeline è view(): il
+   numero sale mentre il footer entra in scena e si ferma lì — ed è già al suo
+   valore se il footer è in vista fin dal caricamento, che è esattamente il
+   caso limite per cui il vecchio contatore aveva bisogno di un osservatore
+   delle mutazioni e di un controllo sul rettangolo. */
+.sb-gh__count { counter-reset: sb-n var(--sb-foot-n); }
+.sb-gh__count::after { content: counter(sb-n); }
+@keyframes sb-gh-count { from { --sb-foot-n: 0; } }
+@supports (animation-timeline: view()) {
+  .sb-gh__count {
+    animation: sb-gh-count linear both;
+    animation-timeline: view();
+    animation-range: entry 12% entry 58%;
+  }
+}
+
+/* ── La fascia ── */
+.sb-gh__plot {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 2px;
+  height: 3.75rem;
+  /* La linea di base: l'istogramma poggia su qualcosa invece di galleggiare. */
+  border-bottom: 1px solid var(--sb-border-strong);
+}
+/* La media del periodo, tratteggiata. --sb-gh-avg arriva dal componente come
+   frazione 0–1 dell'altezza: è l'unico numero che il JS calcola per il
+   disegno, ed è uno solo per tutto il grafico. */
+.sb-gh__plot::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--sb-gh-avg, 0) * 100%);
+  height: 1px;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to right,
+    color-mix(in oklab, var(--sb-fg-muted) 55%, transparent) 0 4px,
+    transparent 4px 9px
+  );
+}
+
+/* La colonna. È alta tutta la fascia — è il bersaglio — e la barra vera è il
+   suo ::before, appoggiato in fondo da align-content: end. */
+.sb-gh__bar {
+  /* Flex e non griglia, e la ragione è una trappola che è costata un giro:
+     con `display: grid; align-content: end` la riga si dimensiona sul
+     contenuto, quindi l'altezza in percentuale del ::before non ha un
+     riferimento definito contro cui risolversi — diventa `auto`, cioè zero, e
+     tutte le barre restavano allo zoccolo di 2px. Il contenitore flex invece
+     ha un'altezza definita (la colonna è stirata dentro .sb-gh__plot, che è
+     alto 3.75rem), e lì la percentuale si risolve. */
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  /* La banda del fine settimana. Sta sulla COLONNA, non sulla barra, così
+     attraversa tutta l'altezza e si legge come una riga di griglia. */
+  background-color: var(--sb-gh-band, transparent);
+}
+/* Appena accennata: deve essere una riga di griglia sotto i dati, non un dato.
+   Al 4% le bande erano la cosa più visibile del grafico — sabato e domenica
+   gridavano più dei commit. */
+.sb-gh__bar[data-wk] { --sb-gh-band: color-mix(in oklab, var(--sb-fg) 2%, transparent); }
+.sb-gh__bar::before {
+  content: "";
+  flex: none;
+  width: 100%;
+  /* 2px di zoccolo anche a zero: un giorno vuoto deve restare visibile come
+     giorno, altrimenti l'asse ha dei buchi e sembra che manchi il dato. */
+  height: calc(2px + var(--sb-gh-v, 0) * (100% - 2px));
+  border-radius: 2px 2px 0 0;
+  /* La scala del calore. oklab e non srgb: mescolando in sRGB i gradini
+     centrali si spengono, e una scala di intensità con la gobba in mezzo dice
+     il falso.
+
+     E la tinta è --sb-brand, non cinque hsla() scritte a mano come prima. Nel
+     footer quel token vale l'azzurro anche dentro una pagina con data-acc, ed
+     è voluto: il footer è il sito, non una cosa del sito, quindi ridichiara i
+     token suoi (vedi il blocco degli accenti in home.css). Il guadagno non è
+     il ritingersi — è che la scala non ha più un colore proprio da tenere in
+     fase a mano con la palette. */
+  --sb-gh-zero: color-mix(in oklab, var(--sb-fg) 12%, transparent);
+  --sb-gh-ink: color-mix(in oklab, var(--sb-brand) calc(var(--sb-gh-l, 0) * 25%), var(--sb-gh-zero));
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--sb-gh-ink) 72%, transparent),
+    var(--sb-gh-ink)
+  );
+  translate: 0 calc(var(--sb-foot-near) * -4px);
+  scale: calc(1 + var(--sb-foot-near) * 0.06) 1;
+  transition:
+    --sb-foot-near 0.24s ease,
+    translate 0.24s ease,
+    scale 0.24s ease,
+    opacity 0.24s ease,
+    filter 0.24s ease;
+}
+/* Oggi: un filo acceso attorno alla colonna, non un anello attorno alla barra
+   (che a cinque pixel di larghezza diventava una macchia). */
+.sb-gh__bar[data-today] { --sb-gh-band: color-mix(in oklab, var(--sb-brand) 12%, transparent); }
+.sb-gh__bar[data-today]::before {
+  box-shadow: 0 -1px 0 1px color-mix(in oklab, var(--sb-brand-text) 60%, transparent);
+}
+
+/* ── L'onda, coi fratelli ──────────────────────────────────────────────────
+   Due gradini per lato. Il costo è quello di un cambio di :hover — cinque
+   elementi invalidati quando passi da una colonna all'altra — invece dei
+   novantuno che la pozza riscriveva a ogni fotogramma. */
+@media (hover: hover) and (pointer: fine) {
+  .sb-gh__bar:hover { --sb-foot-near: 1; }
+  .sb-gh__bar:hover + .sb-gh__bar,
+  .sb-gh__bar:has(+ .sb-gh__bar:hover) { --sb-foot-near: 0.55; }
+  .sb-gh__bar:hover + .sb-gh__bar + .sb-gh__bar,
+  .sb-gh__bar:has(+ .sb-gh__bar + .sb-gh__bar:hover) { --sb-foot-near: 0.24; }
+  .sb-gh__bar::before { filter: brightness(calc(1 + var(--sb-foot-near) * 0.28)); }
+  /* Il resto del grafico si ritira di un soffio: è quello che fa emergere la
+     colonna sotto il dito, più di qualunque cosa si faccia alla colonna. */
+  .sb-gh__plot:has(.sb-gh__bar:hover) .sb-gh__bar::before {
+    opacity: calc(0.5 + var(--sb-foot-near) * 0.5);
+  }
+}
+
+/* ── Il tooltip, con l'ancoraggio CSS ──────────────────────────────────────
+   display: none finché non serve. Sono novantun barre: tenere altrettante
+   bolle nel layout con opacity: 0 vuol dire far misurare al browser novantun
+   scatole che nessuno guarderà mai. transition-behavior: allow-discrete fa
+   transitare anche `display`, e @starting-style dà il fotogramma di partenza
+   a un elemento che al fotogramma prima non c'era. */
+.sb-gh__bar::after {
+  content: attr(data-tip);
+  display: none;
+  position: absolute;
+  z-index: 6;
+  width: max-content;
+  max-width: 16rem;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background-color: var(--sb-fg);
+  color: var(--sb-bg);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.2;
+  box-shadow: var(--sb-shadow-card);
+  pointer-events: none;
+  opacity: 0;
+  translate: 0 4px;
+  transition: opacity 0.14s ease, translate 0.14s ease, display 0.14s allow-discrete;
+}
+@supports (position-area: block-start) {
+  .sb-gh__bar::after {
+    /* L'ancora implicita di uno pseudo-elemento è l'elemento che lo genera:
+       niente anchor-name da inventare, e nessun nome ripetuto novantun volte.
+       span-all dà alla bolla tutta la larghezza in cui rientrare,
+       anchor-center la centra sulla colonna, e il rientro ai bordi lo fa il
+       browser — che è tutto quello che facevano a mano le due regole
+       :first-child / :last-child di prima. */
+    position-area: block-start span-all;
+    justify-self: anchor-center;
+    margin-bottom: 9px;
+    position-try-fallbacks: flip-block;
+  }
+}
+@supports not (position-area: block-start) {
+  .sb-gh__bar::after {
+    bottom: calc(100% + 9px);
+    left: 50%;
+    margin-left: -8rem;
+    width: 16rem;
+    text-align: center;
+  }
+}
+.sb-gh__bar:hover::after,
+.sb-gh__bar:focus-visible::after {
+  display: block;
+  opacity: 1;
+  translate: 0 0;
+}
+@starting-style {
+  .sb-gh__bar:hover::after,
+  .sb-gh__bar:focus-visible::after { opacity: 0; translate: 0 4px; }
+}
+
+/* ── L'asse sotto il grafico ── */
+.sb-gh__axis {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--sb-fg-muted);
+}
+.sb-gh__scale { display: inline-flex; align-items: center; gap: 3px; }
+.sb-gh__scale i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px 0 2px 0;
+  background-color: color-mix(
+    in oklab,
+    var(--sb-brand) calc(var(--sb-gh-l, 0) * 25%),
+    color-mix(in oklab, var(--sb-fg) 12%, transparent)
+  );
+}
+@supports (corner-shape: bevel) {
+  .sb-gh__scale i { corner-shape: bevel; }
+}
+
+/* Quanti giorni si vedano lo decide la larghezza del GRAFICO, non quella
+   della finestra. Sotto una certa misura le colonne diventano più strette del
+   gap e il grafico smette di essere leggibile: meglio meno giorni e barre
+   vere. Le colonne di troppo sono le PRIME, cioè le più vecchie: quello che
+   si taglia è la coda della storia, non i giorni appena passati. */
+@container sb-gh (max-width: 42rem) {
+  .sb-gh__bar:nth-child(-n + 31) { display: none; }
+}
+@container sb-gh (max-width: 26rem) {
+  .sb-gh__bar:nth-child(-n + 61) { display: none; }
+  .sb-gh__plot { gap: 3px; }
+}
+
+/* E l'etichetta a sinistra dell'asse deve dire il giorno da cui parte QUELLO
+   che si sta vedendo. Il componente rende tutte e tre le date possibili e qui
+   se ne accende una: è l'unico modo di tenerla d'accordo col taglio delle
+   colonne, che è una decisione del foglio di stile e non del JavaScript. */
+.sb-gh__from[data-span="60"],
+.sb-gh__from[data-span="30"] { display: none; }
+@container sb-gh (max-width: 42rem) {
+  .sb-gh__from[data-span="91"] { display: none; }
+  .sb-gh__from[data-span="60"] { display: inline; }
+}
+@container sb-gh (max-width: 26rem) {
+  .sb-gh__from[data-span="60"] { display: none; }
+  .sb-gh__from[data-span="30"] { display: inline; }
+}
+
+/* ── Barra dei linguaggi ── */
+.sb-gh__langs { display: flex; flex-direction: column; gap: 0.5rem; }
+.sb-gh__langbar {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: var(--sb-overlay);
+}
+.sb-gh__langseg { height: 100%; min-width: 4px; }
+.sb-gh__langlegend { display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; }
+.sb-gh__langitem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  color: var(--sb-fg-lighter);
+}
+
+/* Il numero vero, per chi legge con lo schermo: counter() vive nel content di
+   uno pseudo-elemento, e non tutte le tecnologie assistive lo raccontano. */
+.sb-foot-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ═══ ⑧ Meno movimento ═════════════════════════════════════════════════════
+   Chi ha chiesto meno movimento non deve vedere NIENTE che si muova da solo.
+   Le regole base qui sopra sono già scritte sul fotogramma finito — barre alla
+   loro altezza, contatore al suo numero — quindi spegnere basta. */
+@media (prefers-reduced-motion: reduce) {
+  .sb-foot-aura { animation: none; opacity: 1; }
+  .sb-gh__count { animation: none; }
+  .sb-gh__skeleton { animation: none; }
+  .sb-gh__act:hover .sb-gh__dot { animation: none; }
+  .sb-foot-tile,
+  .sb-foot-tile svg,
+  .sb-foot-top svg,
+  .sb-gh__bar::before { transition: none; }
+}

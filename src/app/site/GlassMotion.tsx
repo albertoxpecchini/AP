@@ -16,9 +16,8 @@
 //    conseguenza.
 // ③ Quello che il puntatore illumina — rim, alone, lucido del titolo.
 // ④ Il cubo della card CAT (--vis-x/--vis-y).
-// ⑤ Pozza d'acqua sui quadratini dei commit (site/puddle.ts).
-// ⑥ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
-// ⑦ Tinta della nav — la sezione a schermo passa il suo data-acc all'<header>;
+// ⑤ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
+// ⑥ Tinta della nav — la sezione a schermo passa il suo data-acc all'<header>;
 //    anche questa è roba della home soltanto.
 //
 // Quello che qui NON c'è, e che è servito impararlo: il moto dei visual delle
@@ -48,7 +47,6 @@
 import { useEffect } from "react";
 import type { RefObject } from "react";
 import { gsap } from "gsap";
-import { attachPuddles } from "./puddle";
 import { apriAura, auraViva, chiudiAura, muoviAura } from "./aura";
 
 /** Quanto slittano gli aloni fra cima e fondo della pagina. Volutamente poco:
@@ -516,13 +514,14 @@ export default function GlassMotion() {
     });
 
 
-    // ── ⑤ Pozza d'acqua sui quadratini ─────────────────────────────────────
-    // Vive tutta in site/puddle.ts; qui c'è solo il cancello. Si aggancia da
-    // sé ai [data-puddle] presenti e a quelli che arrivano dopo (il grafico
-    // del footer nasce da una fetch).
-    mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () =>
-      attachPuddles(),
-    );
+    // Qui c'era il cancello della pozza d'acqua (site/puddle.ts): un
+    // MutationObserver sull'intero <body> che a ogni raffica di mutazioni
+    // React rifaceva un querySelectorAll("[data-puddle]") per agganciare
+    // l'effetto ai contenitori arrivati dalla rete. L'unico che lo portava era
+    // l'istogramma del footer, e l'effetto costava una custom property
+    // riscritta su ogni cella a ogni fotogramma. Adesso l'onda la fa il CSS
+    // coi selettori fratelli (site/foot.css), e sono spariti sia l'osservatore
+    // globale sia le scritture per fotogramma.
 
     return () => mm.revert();
   }, []);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { SiteLink as Link } from "./nav";
 import SiteFooter from "./SiteFooter";
 import { HOBBY, PASSIONI, SKILLS, type Interest } from "./data";
@@ -34,8 +34,18 @@ import {
   type IcProps,
 } from "./homeIcons";
 import { PageBackdrop } from "./homeFx";
+import WhenVisible from "./WhenVisible";
 import "../home.css";
 import "./bio.css";
+
+/* La mappa stava in home, in coda ai progetti in evidenza, dove non diceva
+   niente del lavoro. Qui il paese è già l'argomento. Resta pigra due volte:
+   lazy perché maplibre-gl sono ~290 kB gzip, e dentro WhenVisible perché
+   React.lazy è pigro rispetto al RENDER, non rispetto allo SCROLL. */
+const RivaltaMap = lazy(() => import("./RivaltaMap"));
+// Coordinate del borgo (Rodigo, Mantova).
+const RIVALTA_CENTER: [number, number] = [10.6771374, 45.1801924];
+const RIVALTA_GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Rivalta sul Mincio, Italia")}`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // «Bio» — pagina About di Alberto Pecchini, rifatta sulla grammatica Supabase
@@ -412,7 +422,7 @@ export default function Bio() {
                 <div className="sb-panel-inner sb-bio-box">
                   <span className="sb-bio-boxlabel">Where I'm based</span>
                   <p className="sb-bio-based">
-                    <IcPin size={16} aria-hidden="true" /> Rivalta sul Mincio · Mantua, Italy
+                    <IcPin size={16} aria-hidden="true" /> Rivalta sul Mincio — Mantua, Italy
                   </p>
                   <p className="sb-bio-boxlead">
                     I live and work where I grew up, a few kilometres from Mantua, and I'm available
@@ -451,6 +461,37 @@ export default function Bio() {
                     </li>
                   </ul>
                 </div>
+              </div>
+            </div>
+
+            {/* Il paese, sulla carta. Arrivava dalla home, dove stava in coda
+                ai progetti in evidenza e non diceva niente del lavoro: qui sta
+                sotto il riquadro che dichiara dove vivo, che è il suo posto.
+                Non parte col resto della pagina — vedi il cappello in cima. */}
+            <div className="sb-panel sb-bio-mappa">
+              <div className="sb-panel-inner sb-bio-mappa-inner">
+                <div className="sb-bio-mappa-copy">
+                  <h3 className="sb-bio-mappa-title">
+                    <IcPin size={16} aria-hidden="true" /> <span translate="no">Rivalta sul Mincio</span>
+                  </h3>
+                  <p className="sb-bio-mappa-desc">
+                    The village on the Mincio river where my family's farm is, and where I
+                    designed and built the official tourist website.
+                  </p>
+                  <a
+                    className="sb-btn sb-btn--sm sb-btn--secondary"
+                    href={RIVALTA_GMAPS}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <IcExplore size={16} aria-hidden="true" /> Google Maps
+                  </a>
+                </div>
+                <WhenVisible className="sb-bio-map">
+                  <Suspense fallback={null}>
+                    <RivaltaMap center={RIVALTA_CENTER} zoom={13} />
+                  </Suspense>
+                </WhenVisible>
               </div>
             </div>
 

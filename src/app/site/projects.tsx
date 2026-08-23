@@ -41,6 +41,10 @@ export interface Project {
   githubRepo?: string;
   screenshotUrl?: string;
   previewImg?: string;
+  /** Registrazione dello schermo del sito, H.264. Vedi site/SitePreview.tsx. */
+  previewVideo?: string;
+  /** Fotogramma di copertina del video: si vede prima che parta, e se non parte. */
+  previewPoster?: string;
 }
 
 // Glyph del progetto (lucide). I siti esterni usano il globo.
@@ -133,6 +137,11 @@ export const PROJECTS: Project[] = [
     kind: "tool",
     thumb: "instagram",
     srcDir: "src/app/instagram",
+    // Da produrre a mano: cattura di /instagram a 1280×720, per stare in
+    // rapporto con il video di Rivalta e con cascina-preview.png. Finché il
+    // file non c'è, SitePreview mostra la cornice vuota col glifo — non
+    // un'immagine rotta.
+    previewImg: "/instagram-preview.png",
     desc: "A privacy-first tool that compares two lists right in your browser. Built for Instagram: load your following.html and followers.html and instantly see who doesn't follow you back, who you don't follow back and your mutuals — with monogram avatars, follow dates, name/chronological sorting, a compare-over-time mode, an illustrated step-by-step tutorial and downloadable HTML reports. Nothing is uploaded, nothing is stored: the comparison runs entirely client-side.",
     tags: ["React", "TypeScript", "Client-side", "Privacy", "UI/UX"],
   },
@@ -148,6 +157,8 @@ export const PROJECTS: Project[] = [
     tags: ["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Minimal design"],
     githubRepo: "albertoxpecchini/rivaltasulmincio",
     screenshotUrl: "https://rivaltasulmincio.it",
+    previewVideo: "/video/rivalta-sul-mincio.mp4",
+    previewPoster: "/video/rivalta-sul-mincio.webp",
   },
   {
     id: "cascina-fontana",

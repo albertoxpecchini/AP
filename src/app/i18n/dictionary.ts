@@ -119,11 +119,17 @@ const RAW: Record<string, Entry> = {
   "Support me": { it: "Sostienimi", fr: "Soutenez-moi", de: "Unterstütze mich" },
 
   // — Footer (home + footer condiviso) —
-  "Surveyor & Website Developer · ITT «Carlo d'Arco» — Mantua": {
-    it: "Perito geometra e sviluppatore website · ITT «Carlo d'Arco» — Mantova",
-    fr: "Géomètre & développeur de sites web · ITT «Carlo d'Arco» — Mantoue",
-    de: "Vermessungstechniker & Website-Entwickler · ITT «Carlo d'Arco» — Mantua",
+  // La chiave deve essere la stringa ESATTA che sta nel DOM: il motore i18n
+  // confronta il nodo di testo così com'è. Qui c'era ancora il punto mediano,
+  // tolto dal footer quando è sparito da tutto il testo visibile — e la riga
+  // restava in inglese in tutte e tre le lingue.
+  "Surveyor & Website Developer, ITT «Carlo d'Arco» — Mantua": {
+    it: "Perito geometra e sviluppatore website, ITT «Carlo d'Arco» — Mantova",
+    fr: "Géomètre & développeur de sites web, ITT «Carlo d'Arco» — Mantoue",
+    de: "Vermessungstechniker & Website-Entwickler, ITT «Carlo d'Arco» — Mantua",
   },
+  Elsewhere: { it: "Altrove", fr: "Ailleurs", de: "Anderswo" },
+  "Back to top": { it: "Torna su", fr: "Revenir en haut", de: "Nach oben" },
   "Alberto Pecchini — All rights reserved": {
     it: "Alberto Pecchini — Tutti i diritti riservati",
     fr: "Alberto Pecchini — Tous droits réservés",

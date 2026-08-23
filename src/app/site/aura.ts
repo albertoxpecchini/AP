@@ -45,7 +45,7 @@
  *  hanno la classe ma non gli pseudo-elementi. Se ne aggiungi una lì,
  *  aggiungila anche qui. */
 const RADICE =
-  ".sb-home:not(.sb-foot):not(.sb-ctl):not(.sb-lang-wipe):not(.sb-tv-modal):not(.sb-ig-tut):not(.apl-dialog):not(.apw-dialog)";
+  ".sb-home:not(.sb-foot):not(.sb-ctl):not(.sb-lang-wipe):not(.sb-tv-modal):not(.sb-ig-tut)";
 
 /** Durata di comodo delle tre animazioni. Non è un tempo: sono in pausa e non
  *  scorrono mai da sole. È solo il fondoscala su cui si legge la posizione —

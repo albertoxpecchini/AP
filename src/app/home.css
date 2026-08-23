@@ -435,7 +435,15 @@ html.dark .sb-home {
   .sb-home::after { animation: none; }
 }
 html.sb-quiet .sb-home::before,
-html.sb-quiet .sb-home::after { animation-play-state: paused; }
+html.sb-quiet .sb-home::after,
+/* Il fondale del garage sta nella stessa quiete: è l'altra cosa che si muove
+   da sola sulla home, e sta per giunta sopra tre canvas WebGL. */
+html.sb-quiet /* I token delle tinte sono a componenti separate da SPAZI («12 84% 55%»),
+   quindi l alfa vuole la forma con la barra: hsl(var(--x) / .62). Scritto
+   `hsla(var(--x), .62)` il colore è invalido, il background non si applica e
+   non se ne accorge nessuno — non il build, non il foglio: solo la sezione
+   che resta grigia. */
+.sb-garage-bg i { animation-play-state: paused; }
 html.dark .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.16), transparent 62%);
 }
@@ -449,8 +457,8 @@ html.dark .sb-home::after {
    sovrapposti, con l'opacità che si sommava e due animazioni infinite di
    troppo.
    Il fondale lo tiene solo il contenitore di pagina. */
-.sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut, .apl-dialog, .apw-dialog)::before,
-.sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut, .apl-dialog, .apw-dialog)::after {
+.sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut)::before,
+.sb-home:is(.sb-foot, .sb-ctl, .sb-lang-wipe, .sb-tv-modal, .sb-ig-tut)::after {
   content: none;
 }
 
@@ -931,11 +939,11 @@ button.sb-card:hover .sb-panel,
    .sb-panel--hover è la lastra stessa, quindi è già ritagliata e non ha un
    fuori in cui mettere l'ombra: lì lo stacco resta affidato al rim che si
    accende e ai pixel di sollevamento. */
-:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-foot-card) {
+:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story) {
   position: relative;
   isolation: isolate;
 }
-:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-foot-card)::before {
+:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story)::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -948,12 +956,12 @@ button.sb-card:hover .sb-panel,
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
-:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-foot-card):hover::before { opacity: 1; }
+:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story):hover::before { opacity: 1; }
 /* La lastra vera sta sopra la sua ombra. isolation:isolate sul contenitore
    tiene entrambe dentro lo stesso contesto di impilamento, così l'ombra di una
    card non può finire sopra la card accanto. Sulle card prodotti in mezzo c'è
    .sb-spot (il componente dell'alone), che va rialzato al posto suo. */
-:is(.sb-page-card, .sb-story, .sb-foot-card) > .sb-panel,
+:is(.sb-page-card, .sb-story) > .sb-panel,
 :is(a.sb-card, button.sb-card) > .sb-spot { position: relative; z-index: 1; }
 /* Il sollevamento all'hover sta sul pannello, non sulla card: la card è la
    maglia della griglia, spostarla sposterebbe anche il suo ingombro.
@@ -1076,10 +1084,6 @@ button.sb-card:hover .sb-panel,
   .sb-panel--hover:hover > .sb-panel-inner::after {
     animation: sb-sheen 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s 1;
   }
-  /* Le card del footer non hanno lo sheen: il loro .sb-panel-inner è
-     overflow:visible (i tooltip del grafico GitHub devono uscire), quindi la
-     banda scivolerebbe fuori dalla card invece di essere tagliata dal bordo. */
-  .sb-foot-card .sb-panel-inner::after { content: none; }
 }
 @keyframes sb-sheen {
   from { transform: translateX(-130%); opacity: 0; }
@@ -2662,10 +2666,24 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   }
 }
 
-/* ── Story-card dei progetti di punta ────────────────────────────────────── */
+/* ── Story-card dei progetti di punta ──────────────────────────────────────
+   Erano tre schede di solo testo — nome, targhetta, una frase — in una griglia
+   da QUATTRO colonne: a schermo largo l'ultima restava vuota, e tre riquadri
+   identici e scoloriti erano il modo peggiore di far vedere il lavoro vero.
+
+   Adesso la griglia è «uno grande e due»: Rivalta prende il riquadro doppio
+   con dentro il video del sito, Cascina e lo strumento si impilano di fianco.
+   E ogni scheda porta il suo `data-acc`, così bordo, piede, glifo e alone
+   scendono dalla tavolozza invece di essere tutti azzurri (vedi il blocco «La
+   tavolozza»: basta l'attributo, il CSS della tinta è già scritto). */
 .sb-stories { display: grid; grid-template-columns: 1fr; gap: 1rem; }
 @media (min-width: 640px) { .sb-stories { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1280px) { .sb-stories { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1024px) {
+  .sb-stories { grid-template-columns: repeat(3, 1fr); }
+  /* Due colonne per due file: il riquadro grande è alto quanto le due schede
+     di fianco messe insieme, ed è lì che sta il video. */
+  .sb-story--lead { grid-column: span 2; grid-row: span 2; }
+}
 .sb-story { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
 .sb-story-inner { padding: 1.4rem; gap: 1rem; }
 .sb-story-top { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
@@ -2685,13 +2703,108 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-story-quote strong { font-weight: 400; color: var(--sb-fg); }
 .sb-story-foot { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.84rem; color: var(--sb-brand-text); }
 
-/* ── Shooting ──────────────────────────────────────────────────────────────
-   La sezione che porta a /shooting. Stessa impaginazione del pannello della
-   mappa qui sotto — copy a sinistra, il resto a destra — perché è lo stesso
-   ruolo: una cosa che sta fuori dal sito, raccontata da dentro.
+/* La riga del dominio e le etichette, sotto il nome. Sono i metadati che le
+   schede non avevano: dove porta il collegamento, e con che cosa è fatto. */
+.sb-story-host {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  color: var(--sb-fg-muted);
+}
+.sb-story-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.sb-story-tags li {
+  font-size: 0.7rem;
+  color: var(--sb-fg-lighter);
+  padding: 0.12rem 0.42rem;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-surface-100);
+  clip-path: var(--sb-shape-xs);
+}
 
-   Niente immagini: sono ritratti, e questa pagina è pubblica. Al loro posto ci
-   sono i numeri (che vengono dal manifesto pubblico) e i ferri del mestiere. */
+/* ── La finestra di browser delle anteprime (site/SitePreview.tsx) ──────────
+   Stessa barra a tre pallini dei pannelli di codice: il contenuto è la cattura
+   di un sito, quindi la cornice non è un vezzo — è il suo contesto. */
+/* .sb-panel porta height:100%, che qui è la cosa sbagliata: la cornice è un
+   pannello DENTRO un altro pannello, e in una colonna flex si allungava oltre
+   il video lasciando trecento pixel di vuoto bianco sotto la registrazione. */
+.sb-shotframe { height: auto; flex: 0 0 auto; margin-bottom: 0.2rem; }
+.sb-shotframe-inner { height: auto; }
+.sb-shotframe-inner { padding: 0; overflow: hidden; height: auto; }
+.sb-shotframe-bar { border-bottom: 1px solid var(--sb-border); }
+.sb-shotframe-url {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: var(--sb-fg-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sb-shotframe-media { display: block; aspect-ratio: 16 / 9; background: var(--sb-surface-200); }
+.sb-shotframe-video,
+.sb-shotframe-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Il ripiego: cornice giusta, glifo del progetto al centro. Si vede finché lo
+   screenshot non esiste, e se un giorno il file sparisce. */
+.sb-shotframe-empty { display: grid; place-items: center; color: var(--sb-fg-muted); }
+/* La scheda grande è alta quanto le due di fianco messe insieme, e quell'altezza
+   va riempita da qualcosa. Provate e scartate, in ordine:
+     · cornice a 16/9 in cima → trecento pixel di buco fra citazione ed etichette;
+     · cornice allungata con `object-fit: cover` → tagliava i fianchi del video,
+       e i fianchi di una cattura di schermo sono testo.
+   Quindi la cornice si allunga e il video ci sta DENTRO intero (`contain`), con le
+   sue bande sopra e sotto: è come lo mostrerebbe un lettore video, e il buco
+   sparisce perché lo spazio se lo prende la cornice invece della citazione. */
+@media (min-width: 1024px) {
+  .sb-story--lead .sb-shotframe { flex: 1 1 auto; min-height: 0; }
+  .sb-story--lead .sb-shotframe-inner { display: flex; flex-direction: column; height: 100%; }
+  .sb-story--lead .sb-shotframe-media { flex: 1 1 auto; aspect-ratio: auto; min-height: 0; }
+  .sb-story--lead .sb-shotframe-video,
+  .sb-story--lead .sb-shotframe-img { object-fit: contain; }
+  .sb-story--lead .sb-story-quote { flex: 0 0 auto; }
+}
+
+/* ── Shooting ──────────────────────────────────────────────────────────────
+   La sezione che porta a /shooting. Copy a sinistra, numeri e ferri a destra.
+
+   Le foto vere non ci sono e non ci saranno: sono ritratti, e questa pagina è
+   pubblica. Ma il manifesto pubblico porta, per ogni sessione, sei IMPRONTE
+   SFOCATE da 24px in webp base64 — la sagoma di uno scatto, non lo scatto.
+   Tre sessioni, diciotto impronte: sono loro il fondale della fascia. Si vede
+   il ritmo di uno shooting senza pubblicare una faccia, che è esattamente
+   quello che la sezione dichiara di fare invece di lasciarlo scoprire.
+
+   Sono `background-image` inline da base64: nessuna richiesta di rete, nessun
+   layout shift, e il rapporto di ogni tessera arriva dal manifesto. */
+.sb-shot-band { position: relative; margin-top: 1rem; overflow: hidden; contain: paint; }
+.sb-shot-mosaic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+  pointer-events: none;
+}
+@media (max-width: 720px) { .sb-shot-mosaic { grid-template-columns: repeat(3, 1fr); } }
+.sb-shot-tile { background-size: cover; background-position: center; }
+/* Il velo del contrasto è una VELATURA in background-image, non un `filter`:
+   un filter promuoverebbe la fascia a strato suo e la farebbe ri-rasterizzare
+   — stessa regola dello scaffale delle sei pagine. */
+.sb-shot-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(100deg, var(--sb-bg) 42%, color-mix(in srgb, var(--sb-bg) 88%, transparent) 66%, color-mix(in srgb, var(--sb-bg) 44%, transparent) 100%), radial-gradient(130% 120% at 100% 0%, transparent 34%, color-mix(in srgb, var(--sb-bg) 40%, transparent) 100%);
+}
+/* Il testo DEVE dichiararsi posizionato. Un elemento statico dipinge sotto
+   QUALUNQUE fratello posizionato con z-index >= 0, anche se viene dopo nel
+   documento: senza queste righe il velo copriva titolo, descrizione, bottone
+   e numeri, e la fascia usciva vuota con le sole targhette dei ferri. */
+.sb-shot-band .sb-shot-copy,
+.sb-shot-band .sb-shot-side { position: relative; z-index: 2; }
+/* Una fascia ha bisogno di respiro: sotto una certa altezza il mosaico non si
+   legge e resta solo una striscia sfocata. */
+.sb-shot-band .sb-shot-inner { min-height: 15rem; align-items: center; padding: 1.8rem 1.6rem; }
+
 .sb-shot-panel { margin-top: 1rem; }
 .sb-shot-inner { display: grid; grid-template-columns: 1fr; gap: 1.4rem; padding: 1.4rem; }
 @media (min-width: 900px) { .sb-shot-inner { grid-template-columns: 1.4fr 1fr; align-items: center; } }
@@ -2716,38 +2829,67 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   clip-path: var(--sb-shape-xs);
 }
 
-/* ── Mappa "Rivalta sul Mincio" (MapLibre) ─────────────────────────────────── */
-.sb-loc-panel { margin-top: 1rem; }
-.sb-loc-inner { display: grid; grid-template-columns: 1fr; gap: 1.2rem; padding: 1.4rem; }
-@media (min-width: 900px) { .sb-loc-inner { grid-template-columns: 1fr 1.1fr; align-items: center; } }
-.sb-loc-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 0.7rem; }
-.sb-loc-title { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 1.05rem; font-weight: 500; color: var(--sb-fg); }
-.sb-loc-desc { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--sb-fg-lighter); }
-.sb-loc-map {
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--sb-border-strong);
-  aspect-ratio: 16 / 9;
-  /* src/components/ui/map.tsx è generico e legge i token shadcn globali
-     (arancio Ubuntu, src/styles/theme.css): li rimappiamo qui ai token .sb-
-     così i controlli zoom ereditano la palette neutra + azzurro brand del sito
-     invece dell'accento arancio. */
-  --background: var(--sb-bg);
-  --foreground: var(--sb-fg);
-  --border: var(--sb-border-strong);
-  --accent: var(--sb-surface-200);
-  --muted-foreground: var(--sb-fg-muted);
-  --ring: var(--sb-brand);
-}
-@media (max-width: 480px) { .sb-loc-map { aspect-ratio: 4 / 3; } }
+/* La mappa MapLibre di Rivalta stava qui, in fondo ai progetti in evidenza,
+   dove non raccontava niente del lavoro. È passata alla bio, sezione «Based &
+   trained», dove il paese è già l'argomento: le regole sono adesso
+   `.sb-bio-map*` in site/bio.css, col rimappaggio dei token shadcn appresso. */
 
-/* ── Muro curriculum (≈ muro dei tweet) ──────────────────────────────────── */
+/* ── Muro curriculum (≈ muro dei tweet) ──────────────────────────────────────
+   Sedici schede, che erano più schermate di qualunque altra sezione della home.
+   A riposo se ne vede UNA FILA; la seconda si intravede sfocata sotto la
+   sfumatura, e il bottone apre il resto (site/CvWall.tsx).
+
+   ── PERCHÉ NON PIÙ `columns` ──────────────────────────────────────────────
+   Il muro era un masonry a colonne, da 1 a 4. Con `columns` la «prima fila»
+   NON ESISTE: il contenuto scorre per colonne, e una `max-height` non taglia
+   in basso — apre altre colonne di lato, e le schede in eccesso escono dal
+   fianco invece di sfumare. Con la griglia la fila è una fila. Si perde
+   l'incastro masonry, si guadagna un taglio orizzontale vero. */
 .sb-cv-actions { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0 2rem; }
-.sb-wall { columns: 1; column-gap: 1rem; }
-@media (min-width: 640px) { .sb-wall { columns: 2; } }
-@media (min-width: 1024px) { .sb-wall { columns: 3; } }
-@media (min-width: 1440px) { .sb-wall { columns: 4; } }
-.sb-wall-card { break-inside: avoid; margin: 0 0 1rem; }
+.sb-wall { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+@media (min-width: 640px) { .sb-wall { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .sb-wall { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1440px) { .sb-wall { grid-template-columns: repeat(4, 1fr); } }
+.sb-wall-card { margin: 0; }
+
+/* Il collasso. `max-height` aperta è un valore grande e FISSO, non `none`: fra
+   `none` e una misura il browser non interpola, e la transizione non partirebbe
+   — la stessa ragione per cui lo scaffale anima `flex-grow` e non `width`. */
+.sb-wall-wrap {
+  --wall-shut: 26rem;
+  position: relative;
+  overflow: hidden;
+  max-height: 300rem;
+  transition: max-height 620ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.sb-wall-wrap[data-open="false"] {
+  max-height: var(--wall-shut);
+  /* Stessa grammatica del muro dei commit: la griglia non ha un bordo, ha una
+     fine. Qui la fine è in basso, perché è lì che il muro continua. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 58%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0, #000 58%, transparent 100%);
+}
+/* La sfocatura sulla fila che si intravede. È un velo con `backdrop-filter`,
+   NON un `filter: blur()` sul contenitore: quello promuoverebbe tutto il muro a
+   strato suo e lo farebbe ri-rasterizzare a ogni fotogramma — è la lezione già
+   pagata sullo scaffale, dove `filter: brightness()` è stato tolto per questo. */
+.sb-wall-wrap[data-open="false"]::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 55%);
+          mask-image: linear-gradient(to bottom, transparent 0, #000 55%);
+}
+.sb-wall-actions { display: flex; justify-content: center; margin-top: 1.25rem; }
+.sb-wall-more svg { transition: transform 240ms ease; }
+.sb-wall-more[aria-expanded="true"] svg { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .sb-wall-wrap { transition-duration: 0.01ms; }
+  .sb-wall-more svg { transition-duration: 0.01ms; }
+}
 .sb-wall-inner { padding: 1.1rem 1.2rem; gap: 0.45rem; }
 .sb-cv-period { font-size: 0.8rem; font-weight: 500; color: var(--sb-brand-text); }
 .sb-cv-title { margin: 0; font-size: 0.92rem; font-weight: 500; line-height: 1.35; color: var(--sb-fg); }
@@ -2780,8 +2922,89 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
    Resta il vuoto attorno al modello, che è l'unica cosa che il CSS deve
    ancora dire: quanto è grande il palco e come si comporta sotto il dito. */
-.sb-garage-wrap { margin-top: 2rem; }
+/* ── Il fondale che si muove dietro le auto ────────────────────────────────
+   Deroga dichiarata a due regole di casa, chiesta apposta: «nessuna sezione ha
+   bg proprio» e «niente loop CSS infiniti». Mitigazioni, tutte già in uso
+   altrove nel foglio:
+
+     · non è un background sulla <section>: è uno strato contenuto dentro
+       .sb-garage-wrap, con `contain: paint` e z-index sotto le auto;
+     · si anima SOLO `transform`. Mai background-position, mai filter, mai
+       box-shadow: quelle ridipingono, e qui sotto ci sono tre canvas WebGL;
+     · sta dentro WhenVisible (rootMargin 400px): fuori schermo non esiste;
+     · si ferma su touch, con prefers-reduced-motion, e con `html.sb-quiet`
+       dopo 1,5s di fermo — vedi il blocco del fondale continuo più su. */
+/* NIENTE `contain: paint` qui: ritaglia i discendenti alla propria scatola, e
+   il fondale qui sotto vive apposta OLTRE i bordi delle tre schede. Con la
+   containment sul contenitore il colore veniva tagliato via e la sezione
+   restava grigia — invisibile in tema chiaro. Il ritaglio sta sul fondale. */
+.sb-garage-wrap { position: relative; margin-top: 2rem; contain: layout; }
+.sb-garage-bg {
+  position: absolute;
+  /* Deborda molto oltre le tre schede: sopra e sotto ci sono i sei rem di
+     respiro della sezione, ed è LÌ che il colore si vede. Dietro le lastre di
+     vetro, in tema chiaro, sparirebbe quasi del tutto. */
+  inset: -34% -10%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: paint;
+}
+.sb-garage-bg i {
+  position: absolute;
+  display: block;
+  width: 74%;
+  height: 104%;
+  border-radius: 50%;
+  will-change: transform;
+}
+.sb-garage-bg i:nth-child(1) {
+  left: -6%;
+  top: -18%;
+  background: radial-gradient(closest-side, hsl(var(--sb-acc-rosso) / 0.62), transparent 72%);
+  animation: sb-garage-drift-a 52s ease-in-out infinite alternate;
+}
+.sb-garage-bg i:nth-child(2) {
+  right: -10%;
+  top: 6%;
+  background: radial-gradient(closest-side, hsl(var(--sb-acc-ambra) / 0.48), transparent 72%);
+  animation: sb-garage-drift-b 61s ease-in-out infinite alternate;
+}
+.sb-garage-bg i:nth-child(3) {
+  left: 26%;
+  bottom: -26%;
+  background: radial-gradient(closest-side, hsl(var(--sb-acc-viola) / 0.36), transparent 72%);
+  animation: sb-garage-drift-c 47s ease-in-out infinite alternate;
+}
+@keyframes sb-garage-drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(14%, 8%, 0) scale(1.18); }
+}
+@keyframes sb-garage-drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1.12); }
+  to   { transform: translate3d(-16%, 12%, 0) scale(0.94); }
+}
+@keyframes sb-garage-drift-c {
+  from { transform: translate3d(0, 0, 0) scale(0.96); }
+  to   { transform: translate3d(10%, -14%, 0) scale(1.2); }
+}
+/* Sul fondo quasi nero del tema scuro le stesse alfe si spengono: il nero
+   assorbe, e la sezione tornava grigia come prima. Una spinta sola. */
+html.dark .sb-garage-bg i:nth-child(1) { background: radial-gradient(closest-side, hsl(var(--sb-acc-rosso) / 0.6), transparent 72%); }
+html.dark .sb-garage-bg i:nth-child(2) { background: radial-gradient(closest-side, hsl(var(--sb-acc-ambra) / 0.44), transparent 72%); }
+html.dark .sb-garage-bg i:nth-child(3) { background: radial-gradient(closest-side, hsl(var(--sb-acc-viola) / 0.4), transparent 72%); }
+
+/* Sul touch la deriva non si nota e costa uguale: ferma, come gli aloni. */
+@media (hover: none) {
+  .sb-garage-bg i { animation: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-garage-bg i { animation: none; }
+}
+
 .sb-garage {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
@@ -3010,97 +3233,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   padding: 0.12rem 0.5rem;
 }
 
-/* ── Pozza d'acqua ────────────────────────────────────────────────────────
-   La regia sta in site/puddle.ts: qui arrivano tre variabili e basta.
-    · --pd-x / --pd-y sul contenitore → dove sta il dito;
-    · --pd-d su ogni cella, 0→1 → quanta acqua ha spostato.
-   Il gradiente degli anelli è FERMO nel foglio di stile e si muove solo il suo
-   centro: è la stessa economia dell'alone sui pannelli, e il motivo per cui
-   119 celle non costano niente.
-
-   Vale per griglia dei commit, legenda e barre del footer: chiunque porti
-   data-puddle. Il contenitore deve fare da riferimento e il ritaglio è a
-   maschera, non a overflow — il .sb-panel-inner del footer è overflow:visible
-   apposta (i tooltip delle barre devono uscire) e un overflow:hidden qui
-   dentro se li mangerebbe. */
-[data-puddle] {
-  position: relative;
-  isolation: isolate;
-}
-[data-puddle] > *:not(.sb-pd-drop) {
-  transform: scale(calc(1 + var(--pd-d, 0) * 0.52));
-  filter: brightness(calc(1 + var(--pd-d, 0) * 0.6));
-  /* Uscendo dalla griglia le celle tornano giù insieme, con calma: è l'acqua
-     che si richiude, e senza questa transizione sarebbe uno scatto secco. */
-  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), filter 0.42s ease;
-}
-/* Dentro la pozza il ritorno dev'essere immediato, o le celle inseguono il
-   puntatore con mezzo secondo di ritardo e l'acqua diventa gelatina. */
-[data-puddle][data-pd-on] > *:not(.sb-pd-drop) { transition: none; }
-/* Le barre del footer non sono quadratini: crescono dalla loro base, come in
-   un istogramma. Scalarle dal centro le farebbe sprofondare sotto la riga. */
-.sb-gh__bars > * { transform-origin: 50% 100%; }
-
-/* Il riverbero: anelli concentrici che NON si muovono con le celle. È lo
-   strato che fa leggere "acqua" invece di "quadratini che si gonfiano". */
-[data-puddle]::after {
-  content: "";
-  position: absolute;
-  /* inset: 0 e non un valore negativo: --pd-x/--pd-y arrivano misurate dal
-     bordo del CONTENITORE, mentre `circle at` le legge dentro la scatola di
-     questo pseudo-elemento. Allargarlo sposterebbe il centro degli anelli
-     lontano dal dito, e di quanto dipenderebbe dalla larghezza dell'elemento. */
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.32s ease;
-  background: repeating-radial-gradient(
-    circle at var(--pd-x, 50%) var(--pd-y, 50%),
-    transparent 0 7px,
-    hsla(197, 100%, 60%, 0.5) 7px 9px,
-    transparent 9px 17px
-  );
-  /* Gli anelli sbiadiscono allontanandosi dal dito invece di piastrellare
-     tutto il riquadro fino ai bordi. */
-  -webkit-mask-image: radial-gradient(circle at var(--pd-x, 50%) var(--pd-y, 50%), #000 0, transparent 78px);
-  mask-image: radial-gradient(circle at var(--pd-x, 50%) var(--pd-y, 50%), #000 0, transparent 78px);
-  mix-blend-mode: plus-lighter;
-}
-[data-puddle][data-pd-on]::after { opacity: 0.55; }
-/* Il tema qui è la classe .dark su <html>, non la preferenza di sistema: il
-   sito ha un suo interruttore e un sensore orario (vedi lo script in
-   index.html), e prefers-color-scheme direbbe la cosa sbagliata di notte.
-   Sul chiaro plus-lighter slaverebbe e basta: gli anelli devono scurire. */
-html:not(.dark) [data-puddle]::after {
-  mix-blend-mode: multiply;
-  background: repeating-radial-gradient(
-    circle at var(--pd-x, 50%) var(--pd-y, 50%),
-    transparent 0 7px,
-    hsla(197, 100%, 32%, 0.4) 7px 9px,
-    transparent 9px 17px
-  );
-}
-html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
-
-/* La goccia: un anello solo, che parte dal punto premuto e si allarga. Se ne
-   va da sé a fine animazione (animationend in site/puddle.ts). */
-.sb-pd-drop {
-  position: absolute;
-  z-index: 2;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 50%;
-  pointer-events: none;
-  border: 2px solid var(--sb-brand);
-  animation: sb-plunk 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-@keyframes sb-plunk {
-  from { transform: scale(0.4); opacity: 0.85; border-width: 2px; }
-  to   { transform: scale(11); opacity: 0; border-width: 0.4px; }
-}
-
 /* ── CTA finale ──────────────────────────────────────────────────────────── */
 .sb-cta { text-align: center; }
 .sb-cta h2 {
@@ -3217,135 +3349,6 @@ html.dark [data-puddle]::after { mix-blend-mode: plus-lighter; }
   .sb-nav-right .sb-btn:not(.sb-btn--keep) { display: none; }
   .sb-burger { display: inline-flex; }
 }
-
-/* ── Footer condiviso (.sb-foot) — replica del footer Supabase ────────────
-   Vive su OGNI pagina: porta con sé la classe .sb-home per ereditare i token
-   (e quindi il tema nativo chiaro/scuro), ma annulla il min-height da pagina.
-   Il movimento (cascata d'ingresso, magneti, contatori) è diretto da
-   site/footMotion.ts.
-
-   Non è un blocco a sé: niente bordo in cima, niente alone che il suo stesso
-   overflow tagliava a metà. Il colore entra in dissolvenza dall'alto, così
-   scendendo non si vede il punto in cui la pagina "finisce". */
-.sb-home.sb-foot {
-  min-height: 0;
-  background: linear-gradient(to bottom, transparent, var(--sb-bg-alt) 14rem);
-  position: relative;
-  z-index: 1;
-}
-.sb-foot-wrap {
-  position: relative;
-  z-index: 1;
-  padding-top: clamp(2.5rem, 5vw, 4rem);
-  /* Il fondo lascia spazio alla barra fissa lingua/tema (in basso a sinistra):
-     senza questa aria coprirebbe il © e le righe finali a fine scroll. */
-  padding-bottom: calc(env(safe-area-inset-bottom) + 5.5rem);
-}
-/* Griglia alla Supabase: identità+social a sinistra (≈ colonna del logo),
-   mini-dashboard GitHub a destra (≈ colonne di link). Le due colonne sono card
-   .sb-panel come quelle della home: stesso bordo-gradiente, stesso riflesso. */
-.sb-foot-grid { display: grid; grid-template-columns: 1fr; gap: 1.1rem; align-items: stretch; }
-@media (min-width: 1024px) { .sb-foot-grid { grid-template-columns: 2fr 5fr; gap: 1.25rem; } }
-/* Le card del footer stanno più basse delle card della home: il footer è una
-   coda, non una vetrina — bordo appena accennato finché non ci passi sopra. */
-.sb-foot-card { min-width: 0; }
-.sb-foot-card .sb-panel-inner { background: color-mix(in srgb, var(--sb-bg) 82%, transparent); }
-.sb-foot-card:hover .sb-panel {
-  background: var(--sb-border-stronger);
-  box-shadow: var(--sb-shadow-card);
-}
-.sb-foot-pad {
-  padding: clamp(1.1rem, 2.4vw, 1.5rem);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0;
-}
-/* Il widget GitHub ha bollette che escono dai suoi bordi (i tooltip delle
-   candele del grafico): l'interno della card qui NON taglia. */
-.sb-foot-card .sb-panel-inner { overflow: visible; }
-.sb-foot-name {
-  display: inline-block;
-  font-size: 1.05rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--sb-fg);
-  text-decoration: none;
-}
-.sb-foot-name:hover { color: var(--sb-brand-text); }
-.sb-foot-role { margin: 0.3rem 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--sb-fg-lighter); }
-.sb-foot-social { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1.3rem; max-width: 21rem; }
-/* Le icone social sono magnetiche (footMotion muove la <a> con x/y): il
-   transform dell'hover sta quindi sull'icona DENTRO, non sul contenitore —
-   altrimenti i due si sovrascriverebbero a vicenda. */
-.sb-foot-social a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  color: var(--sb-fg-muted);
-  border: 1px solid transparent;
-  transition: color 0.18s, background 0.18s, border-color 0.18s;
-  will-change: transform;
-}
-.sb-foot-social a:hover {
-  color: var(--sb-brand-text);
-  background: var(--sb-overlay);
-  border-color: color-mix(in srgb, var(--sb-brand) 35%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-brand) 12%, transparent);
-}
-/* Rimbalzo, non scivolata: la curva sfonda l'1 e torna indietro. È l'unico
-   posto del sito dove va bene — sono sedici bersagli piccoli, e il rimbalzo
-   dice quale hai preso meglio di qualunque cambio di colore. */
-.sb-foot-social a svg { transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.sb-foot-social a:hover svg { transform: scale(1.24) rotate(-8deg); }
-/* Filo sfumato (trasparente → bordo → trasparente), firma di Supabase.
-   Solo un filo: l'avanzamento della lettura si misura in cima alla finestra
-   (site/ScrollProgress), dove lo si vede mentre si scorre — non quaggiù, dove
-   diceva "sei in fondo" quando ormai ci eri arrivato. */
-.sb-foot-hairline {
-  height: 2px;
-  margin-top: clamp(2rem, 4vw, 3rem);
-  border-radius: 999px;
-  background: linear-gradient(to right, transparent, var(--sb-border-stronger), transparent);
-}
-.sb-foot-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
-  flex-wrap: wrap;
-  padding-top: 1.2rem;
-  font-size: 0.8rem;
-  color: var(--sb-fg-muted);
-}
-.sb-foot-links { display: inline-flex; align-items: center; gap: 0.6rem; }
-.sb-foot-sep { color: var(--sb-border-stronger); }
-/* I due pulsanti in fondo (Palette · Come funziona) prendono la sottolineatura
-   che si apre da sinistra della nav, e sono magnetici come le icone social. */
-.sb-foot-links .apl-open,
-.sb-foot-links .apw-open {
-  position: relative;
-  padding-bottom: 2px;
-  will-change: transform;
-}
-.sb-foot-links .apl-open::after,
-.sb-foot-links .apw-open::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--sb-brand);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.sb-foot-links .apl-open:hover::after,
-.sb-foot-links .apw-open:hover::after { transform: scaleX(1); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    EFFETTI REACT BITS
@@ -3512,11 +3515,6 @@ html.dark .sb-aurora { opacity: 0.42; }
     );
   }
   .sb-home--fx .sb-panel:hover::after { opacity: 1; }
-  /* Le card del footer no: il loro .sb-panel-inner è overflow:visible (i
-     tooltip del grafico GitHub devono poter uscire), quindi l'alone
-     sborderebbe invece di essere tagliato dal bordo. Stessa ragione per cui
-     lassù è escluso anche lo sheen. */
-  .sb-foot-card .sb-panel::after { content: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sb-home--fx .sb-panel::after { content: none; }
@@ -3556,7 +3554,6 @@ html.dark .sb-aurora { opacity: 0.42; }
    sull'ultimo contatto, che è esattamente il fotogramma giusto. */
 @media (prefers-reduced-motion: reduce) {
   .sb-menu-sheet, .sb-menu-scrim, .sb-panel, .sb-link svg, .sb-page-top .go { transition: none; }
-  .sb-foot-social a svg { transition: none; }
   .sb-nav-pill { transition: none; }
 
   /* Il vetro RESTA: è materia, non movimento — una lastra ferma non dà
@@ -3587,11 +3584,6 @@ html.dark .sb-aurora { opacity: 0.42; }
     -webkit-text-fill-color: currentColor;
     color: var(--sb-shine-base);
   }
-
-  /* Pozza: non si aggancia nemmeno (il cancello è in site/GlassMotion.tsx),
-     ma le celle non devono restare con la transizione appesa. */
-  [data-puddle] > * { transition: none; transform: none; filter: none; }
-  [data-puddle]::after { content: none; }
 
   /* Parallasse dei visual: --sb-drift non viene più scritta, ma il fallback a
      0px vale solo se la variabile non esiste — meglio azzerare qui e non

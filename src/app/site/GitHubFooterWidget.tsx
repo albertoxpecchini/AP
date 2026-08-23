@@ -1,26 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mini-dashboard GitHub per il footer — numeri REALI (nessun dato inventato).
-//  · Profilo, chip statistiche (repo · follower · following · ⭐ stelle totali ·
-//    fork · gist), "su GitHub dal …" e location.
+// Il polso GitHub — mini-dashboard del footer, numeri REALI (niente inventato).
+//  · Profilo, chip statistiche (repo · follower · seguiti · ⭐ stelle totali ·
+//    fork · gist), «su GitHub dal …» e località.
 //  · Ultima attività pubblica (dal feed eventi — l'unico uso in cui è affidabile).
-//  · Grafico contribuzioni REALE (i "quadratini verdi" del profilo) via un proxy
-//    pubblico gratuito e senza token (jogruber v4), con totale ultimo anno e
-//    streak 🔥 / record calcolati dalla vera serie giornaliera.
+//  · ISTOGRAMMA delle contribuzioni REALI (i «quadratini verdi» del profilo) via
+//    un proxy pubblico gratuito e senza token (jogruber v4), con totale
+//    dell'ultimo anno e streak 🔥 / record calcolati dalla vera serie giornaliera.
 //  · Barra dei linguaggi più usati, colori ufficiali linguist.
 //
-// Perché non usiamo più il feed eventi per contare i commit: /events/public è
-// limitato a ~100 eventi / ~90 giorni, esclude i repo privati ed è cachato in
-// ritardo → il totale "a 14 giorni" era un artefatto (spesso saturava al cap).
+// Perché il feed eventi non conta i commit: /events/public è limitato a ~100
+// eventi / ~90 giorni, esclude i repo privati ed è cachato in ritardo → il
+// totale «a 14 giorni» era un artefatto (spesso saturava al cap).
 //
-// Coerente con il footer Supabase-style: prefisso .sb-gh, token .sb- della home
-// (tema chiaro/scuro nativo), multilingua senza motore i18n (marcato
-// `data-no-i18n`, si traduce da sé leggendo la lingua attiva), cache locale per
-// non martellare le API (non-auth = 60 richieste/ora/IP): il logo è il marchio
-// del sito servito in locale, quindi resta sempre visibile; solo le statistiche
-// extra spariscono elegantemente se la fetch fallisce.
+// ── Cos'è cambiato in questo giro ───────────────────────────────────────────
+// ① Il CSS non sta più qui dentro. C'erano cinquecento righe in un <style> in
+//    fondo al JSX: un elemento di stile ricreato a ogni montaggio del footer,
+//    cioè su ogni pagina del sito. Adesso è site/foot.css, che il browser
+//    analizza una volta sola.
+// ② L'istogramma disegna 91 giorni invece di 30, e non decide più niente in
+//    JavaScript: altezza e livello escono come due numeri in una custom
+//    property, il colore lo compone il foglio con color-mix(in oklab) a
+//    partire dal token --sb-brand (invece delle cinque hsla() fisse che
+//    stavano qui e andavano tenute in fase a mano con la palette), e quanti
+//    giorni si vedano lo decide una @container query.
+// ③ Via `data-puddle`: l'effetto acqua riscriveva una custom property su ogni
+//    cella a ogni fotogramma. L'onda adesso è tutta in CSS, coi fratelli e
+//    :has() — vedi foot.css.
+// ④ Il contatore non è più un tween GSAP con osservatore delle mutazioni: è
+//    un @property <integer> animato su animation-timeline: view(). Qui resta
+//    solo il numero d'arrivo, passato come variabile.
+//
+// Multilingua senza motore i18n (è marcato `data-no-i18n`: si traduce da sé
+// leggendo la lingua attiva), cache locale per non martellare le API
+// (non-auth = 60 richieste/ora/IP): il logo è il marchio del sito servito in
+// locale, quindi resta sempre visibile; solo le statistiche extra spariscono
+// elegantemente se la fetch fallisce.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── CONFIG ───────────────────────────────────────────────────────────────────
@@ -33,9 +50,14 @@ const AVATAR_URL = "/favicon.svg";
 const PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
 const FEATURED_REPO = "AP"; // repo in evidenza (owner = username). "" per nasconderlo.
 const CONTRIB_API = (u: string) => `https://github-contributions-api.jogruber.de/v4/${u}?y=last`;
-const CACHE_KEY = "ap-gh-widget-v3"; // v3: repo aggregati + calendario contribuzioni reale
+const CACHE_KEY = "ap-gh-widget-v4"; // v4: serie a 91 giorni per il nuovo istogramma
 const CACHE_TTL = 60 * 60 * 1000; // 60 min (cold load = 3 chiamate GitHub + 1 proxy)
-const SPARK_DAYS = 30; // giorni mostrati nel grafico contribuzioni
+// Tredici settimane. Non è un numero tondo per caso: con 91 colonne il grafico
+// mostra un trimestre intero, che è il periodo in cui su questo repo si vede
+// davvero un andamento — a trenta giorni si vedeva solo l'ultima settimana
+// buona o l'ultima settimana storta. Quante colonne restino a schermo lo
+// decide la @container query in foot.css, che taglia sempre le più vecchie.
+const SPARK_DAYS = 91;
 const TOP_LANGS = 4; // linguaggi mostrati nella barra
 
 // Colori ufficiali dei linguaggi (GitHub linguist), sottoinsieme + fallback viola.
@@ -52,19 +74,7 @@ const LANG_COLORS: Record<string, string> = {
 const LANG_FALLBACK = "#00b3fa";
 const langColor = (name: string | null) => (name && LANG_COLORS[name]) || LANG_FALLBACK;
 
-// Sfondo delle candele del grafico per livello di intensità (0-4), scala del brand
-// brand (i "quadratini" GitHub in salsa Supabase). Il livello 0 usa il token
-// overlay così resta visibile su entrambi i temi.
-const LEVEL_BG = [
-  "var(--sb-overlay)",
-  "hsla(197, 100%, 43%, 0.35)",
-  "hsla(197, 100%, 45%, 0.6)",
-  "hsla(197, 100%, 48%, 0.85)",
-  "hsl(197, 100%, 49%)",
-];
-const levelBg = (lvl: number) => LEVEL_BG[Math.max(0, Math.min(4, lvl))];
-
-// Locale per le date del grafico (tooltip delle barre), come nel footer.
+// Locale per le date del grafico (tooltip delle colonne), come nel footer.
 const DATE_LOCALE: Record<Lang, string> = {
   it: "it-IT",
   en: "en-GB",
@@ -92,10 +102,10 @@ interface JogruberResp { total?: Record<string, number>; contributions?: Jogrube
 
 // ── Stringhe localizzate (il widget si traduce da sé: è marcato data-no-i18n) ─
 const STR: Record<Lang, {
-  loading: string; none: string; latest: string;
+  loading: string; none: string; latest: string; offline: string;
   repos: string; followers: string; following: string;
   stars: string; forks: string; gists: string;
-  commits: string; lastYear: string;
+  commits: string; lastYear: string; less: string; more: string; today: string;
   sinceYear: (y: number) => string; streak: (n: number) => string; record: (n: number) => string;
   now: string; min: string; hour: string; day: string; month: string;
   rel: (n: number, w: string) => string;
@@ -104,10 +114,10 @@ const STR: Record<Lang, {
   star: (r: string) => string; fork: (r: string) => string; other: (r: string) => string;
 }> = {
   it: {
-    loading: "carico l'attività GitHub…", none: "nessuna attività pubblica recente", latest: "Ultima attività",
+    offline: "statistiche GitHub non disponibili adesso", loading: "carico l'attività GitHub…", none: "nessuna attività pubblica recente", latest: "Ultima attività",
     repos: "repo", followers: "follower", following: "seguiti",
     stars: "stelle", forks: "fork", gists: "gist",
-    commits: "commit", lastYear: "ultimo anno",
+    commits: "commit", lastYear: "ultimo anno", less: "meno", more: "più", today: "oggi",
     sinceYear: (y) => `su GitHub dal ${y}`, streak: (n) => `🔥 ${n} giorni di fila`, record: (n) => `record ${n}`,
     now: "adesso", min: "min", hour: "h", day: "g", month: "mesi", rel: (n, w) => `${n} ${w} fa`,
     push: (n, r) => `push di ${n} commit su ${r}`, create: (r) => `nuovo elemento su ${r}`,
@@ -115,10 +125,10 @@ const STR: Record<Lang, {
     star: (r) => `star a ${r}`, fork: (r) => `fork di ${r}`, other: (r) => `attività su ${r}`,
   },
   en: {
-    loading: "loading GitHub activity…", none: "no recent public activity", latest: "Latest activity",
+    offline: "GitHub stats unavailable right now", loading: "loading GitHub activity…", none: "no recent public activity", latest: "Latest activity",
     repos: "repos", followers: "followers", following: "following",
     stars: "stars", forks: "forks", gists: "gists",
-    commits: "commits", lastYear: "last year",
+    commits: "commits", lastYear: "last year", less: "less", more: "more", today: "today",
     sinceYear: (y) => `on GitHub since ${y}`, streak: (n) => `🔥 ${n}-day streak`, record: (n) => `best ${n}`,
     now: "just now", min: "min", hour: "h", day: "d", month: "mo", rel: (n, w) => `${n} ${w} ago`,
     push: (n, r) => `pushed ${n} commit${n > 1 ? "s" : ""} to ${r}`, create: (r) => `created on ${r}`,
@@ -126,10 +136,10 @@ const STR: Record<Lang, {
     star: (r) => `starred ${r}`, fork: (r) => `forked ${r}`, other: (r) => `activity on ${r}`,
   },
   fr: {
-    loading: "chargement de l'activité GitHub…", none: "aucune activité publique récente", latest: "Dernière activité",
+    offline: "statistiques GitHub indisponibles pour le moment", loading: "chargement de l'activité GitHub…", none: "aucune activité publique récente", latest: "Dernière activité",
     repos: "dépôts", followers: "abonnés", following: "abonnements",
     stars: "étoiles", forks: "forks", gists: "gists",
-    commits: "commits", lastYear: "l'an dernier",
+    commits: "commits", lastYear: "l'an dernier", less: "moins", more: "plus", today: "aujourd'hui",
     sinceYear: (y) => `sur GitHub depuis ${y}`, streak: (n) => `🔥 ${n} jours d'affilée`, record: (n) => `record ${n}`,
     now: "à l'instant", min: "min", hour: "h", day: "j", month: "mois", rel: (n, w) => `il y a ${n} ${w}`,
     push: (n, r) => `push de ${n} commit sur ${r}`, create: (r) => `création sur ${r}`,
@@ -137,10 +147,10 @@ const STR: Record<Lang, {
     star: (r) => `étoile à ${r}`, fork: (r) => `fork de ${r}`, other: (r) => `activité sur ${r}`,
   },
   de: {
-    loading: "GitHub-Aktivität wird geladen…", none: "keine aktuelle öffentliche Aktivität", latest: "Letzte Aktivität",
+    offline: "GitHub-Statistiken gerade nicht verfügbar", loading: "GitHub-Aktivität wird geladen…", none: "keine aktuelle öffentliche Aktivität", latest: "Letzte Aktivität",
     repos: "Repos", followers: "Follower", following: "folgt",
     stars: "Sterne", forks: "Forks", gists: "Gists",
-    commits: "Commits", lastYear: "letztes Jahr",
+    commits: "Commits", lastYear: "letztes Jahr", less: "weniger", more: "mehr", today: "heute",
     sinceYear: (y) => `auf GitHub seit ${y}`, streak: (n) => `🔥 ${n} Tage in Folge`, record: (n) => `Rekord ${n}`,
     now: "gerade eben", min: "Min.", hour: "Std.", day: "T", month: "Mon.", rel: (n, w) => `vor ${n} ${w}`,
     push: (n, r) => `${n} Commit${n > 1 ? "s" : ""} zu ${r} gepusht`, create: (r) => `erstellt in ${r}`,
@@ -245,6 +255,10 @@ function writeCache(d: Data): void {
   try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), ...d })); } catch { /* storage non disponibile */ }
 }
 
+/** Data locale a mezzanotte: `new Date("2026-08-23")` sarebbe letta come UTC e
+ *  a ovest di Greenwich mostrerebbe il giorno prima. */
+const atMidnight = (iso: string) => new Date(`${iso}T00:00:00`);
+
 export default function GitHubFooterWidget() {
   const [lang, setLang] = useState<Lang>(() => getLang());
   const [data, setData] = useState<Data | null>(null);
@@ -309,14 +323,41 @@ export default function GitHubFooterWidget() {
   const agg = data?.agg ?? null;
   const contrib = data?.contrib ?? null;
   const series = contrib?.series ?? [];
-  const sparkMax = Math.max(1, ...series.map((d) => d.count));
   const sinceYear = p ? new Date(p.created_at).getFullYear() : null;
+
+  // Il massimo è la scala del grafico; la media è la riga tratteggiata. Sono
+  // gli unici due numeri che il JavaScript calcola per il disegno: tutto il
+  // resto (colore, sagoma, quanti giorni si vedono) lo fa il foglio di stile.
+  //
+  // La scala è la RADICE, non lineare, e non è un abbellimento: i commit al
+  // giorno sono una distribuzione con la coda lunga — quasi tutti i giorni
+  // stanno fra 1 e 3, e una giornata di lavoro grosso da trenta fa da massimo.
+  // Su scala lineare quella giornata si prende tutta l'altezza e tutte le
+  // altre diventano indistinguibili da zero: il grafico dice «un giorno ho
+  // lavorato», che non è l'informazione. Con la radice un giorno da 1 su un
+  // massimo di 30 vale il 18% dell'altezza invece del 3%, e i giorni normali
+  // tornano a essere leggibili senza che il picco smetta di essere il picco.
+  const sparkMax = Math.max(1, ...series.map((d) => d.count));
+  const scala = (n: number) => Math.sqrt(Math.max(0, n) / sparkMax);
+  const avg = series.length
+    ? scala(series.reduce((a, d) => a + d.count, 0) / series.length)
+    : 0;
+
+  // Le tre date d'inizio possibili: il grafico ne mostra 91, 60 o 30 colonne a
+  // seconda di quanto è largo, e l'etichetta a sinistra deve dire il giorno da
+  // cui parte QUELLO che si sta vedendo. Le rende tutte e tre; a scegliere è la
+  // @container query, che è la sola a sapere quante colonne sono a schermo.
+  const fmtDay = (iso: string) =>
+    atMidnight(iso).toLocaleDateString(DATE_LOCALE[lang], { day: "numeric", month: "short" });
+  const spans: { span: number; label: string }[] = [91, 60, 30]
+    .filter((n) => series.length >= n)
+    .map((n) => ({ span: n, label: fmtDay(series[series.length - n].day) }));
 
   return (
     <div className="sb-gh" data-no-i18n>
-      {/* ── Riga 1: profilo — logo + username SEMPRE visibili (URL diretto,
+      {/* ── Riga 1: identità — logo + username SEMPRE visibili (URL diretto,
           non passa dalla API REST, quindi non sparisce per rate limit) ── */}
-      <div className="sb-gh__row">
+      <div className="sb-gh__id">
         <a className="sb-gh__profile" href={p?.html_url ?? PROFILE_URL} target="_blank" rel="noreferrer noopener">
           <img
             className="sb-gh__avatar"
@@ -326,10 +367,15 @@ export default function GitHubFooterWidget() {
             height={22}
             loading="lazy"
           />
-          <span className="sb-gh__user">@{GITHUB_USERNAME}</span>
+          <span>@{GITHUB_USERNAME}</span>
         </a>
 
         {status === "loading" && <span className="sb-gh__skeleton">{s.loading}</span>}
+        {/* La quota non autenticata di GitHub è 60 richieste/ora per IP, e una
+            visita ne spende tre: capita davvero di arrivare a quota. Prima in
+            quel caso restava un riquadro vuoto largo mezza pagina, che sembra
+            un guasto; adesso dice cos'è successo. */}
+        {status === "error" && <span className="sb-gh__since">{s.offline}</span>}
 
         {p && (
           <>
@@ -348,9 +394,79 @@ export default function GitHubFooterWidget() {
 
       {status === "ready" && data && p && (
         <>
+          {/* ── Riga 2: l'istogramma. Sta PRIMA delle chip, e non è un
+              dettaglio d'ordine: è il pezzo con dentro l'informazione, le chip
+              sono il contorno. Prima veniva dopo, e la cosa che si guarda per
+              ultima non è mai quella che conta. ── */}
+          {contrib && (
+            <figure className="sb-gh__chart">
+              <figcaption className="sb-gh__cap">
+                <span>
+                  {/* Il numero sale da 0 mentre il footer entra in scena. Il
+                      valore d'arrivo è qui, come variabile; a muoverlo è una
+                      keyframe su timeline di scroll (foot.css). */}
+                  <b
+                    className="sb-gh__count"
+                    style={{ "--sb-foot-n": contrib.yearTotal } as CSSProperties}
+                    aria-hidden="true"
+                  />
+                  <span className="sb-foot-sr">{contrib.yearTotal}</span>
+                  {" "}{s.commits} — {s.lastYear}
+                </span>
+                {contrib.streak > 0 && <span>{s.streak(contrib.streak)}</span>}
+                {contrib.longest > 0 && <span>{s.record(contrib.longest)}</span>}
+              </figcaption>
 
-          {/* ── Riga 2: chip statistiche reali + repo in evidenza ── */}
-          <div className="sb-gh__row sb-gh__chips">
+              <div
+                className="sb-gh__plot"
+                role="img"
+                aria-label={`${contrib.yearTotal} ${s.commits} — ${s.lastYear}`}
+                style={{ "--sb-gh-avg": avg.toFixed(3) } as CSSProperties}
+              >
+                {series.map((d, i) => {
+                  const date = atMidnight(d.day);
+                  const wd = date.getDay(); // 0 = domenica, 6 = sabato
+                  const label = date.toLocaleDateString(DATE_LOCALE[lang], {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                  });
+                  return (
+                    <i
+                      key={d.day}
+                      className="sb-gh__bar"
+                      style={{
+                        "--sb-gh-v": scala(d.count).toFixed(3),
+                        "--sb-gh-l": d.level,
+                      } as CSSProperties}
+                      data-tip={`${d.count} ${s.commits} — ${label}`}
+                      data-wk={wd === 0 || wd === 6 ? "" : undefined}
+                      data-today={i === series.length - 1 ? "" : undefined}
+                    />
+                  );
+                })}
+              </div>
+
+              <div className="sb-gh__axis">
+                <span>
+                  {spans.map(({ span, label }) => (
+                    <span key={span} className="sb-gh__from" data-span={span}>{label}</span>
+                  ))}
+                </span>
+                <span className="sb-gh__scale">
+                  {s.less}
+                  {[0, 1, 2, 3, 4].map((l) => (
+                    <i key={l} style={{ "--sb-gh-l": l } as CSSProperties} />
+                  ))}
+                  {s.more}
+                </span>
+                <span>{s.today}</span>
+              </div>
+            </figure>
+          )}
+
+          {/* ── Riga 3: chip statistiche reali + repo in evidenza ── */}
+          <div className="sb-gh__chips">
             <span className="sb-gh__chip"><b>{p.public_repos}</b> {s.repos}</span>
             <span className="sb-gh__chip"><b>{p.followers}</b> {s.followers}</span>
             <span className="sb-gh__chip"><b>{p.following}</b> {s.following}</span>
@@ -364,7 +480,7 @@ export default function GitHubFooterWidget() {
               <span className="sb-gh__chip"><b>{p.public_gists}</b> {s.gists}</span>
             )}
             {data.repo && (
-              <a className="sb-gh__chip sb-gh__repo" href={data.repo.html_url} target="_blank" rel="noreferrer noopener">
+              <a className="sb-gh__chip" href={data.repo.html_url} target="_blank" rel="noreferrer noopener">
                 <span className="sb-gh__star" aria-hidden="true">★</span> {data.repo.name}
                 {data.repo.language && (
                   <>
@@ -376,45 +492,6 @@ export default function GitHubFooterWidget() {
               </a>
             )}
           </div>
-
-          {/* ── Riga 3: grafico contribuzioni REALE + streak ── */}
-          {contrib && (
-            <div className="sb-gh__spark">
-              <span className="sb-gh__spark-cap">
-                {/* data-count-to: il numero si "accende" salendo da 0 quando il
-                    footer arriva a vista (regia in site/footMotion.ts). */}
-                <b data-count-to={contrib.yearTotal}>{contrib.yearTotal}</b> {s.commits} — {s.lastYear}
-                {contrib.streak > 0 && <>, {s.streak(contrib.streak)}</>}
-                {contrib.longest > 0 && <>, {s.record(contrib.longest)}</>}
-              </span>
-              <span
-                className="sb-gh__bars"
-                role="img"
-                aria-label={`${contrib.yearTotal} ${s.commits} — ${s.lastYear}`}
-                data-puddle
-              >
-                {series.map((d, i) => {
-                  const h = d.count === 0 ? 3 : Math.round(5 + (d.count / sparkMax) * 23);
-                  // Data locale (mezzanotte locale → nessuno slittamento di giorno),
-                  // con giorno della settimana, alla GitHub.
-                  const label = new Date(`${d.day}T00:00:00`).toLocaleDateString(DATE_LOCALE[lang], {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                  });
-                  return (
-                    <i
-                      key={d.day}
-                      className="sb-gh__bar"
-                      style={{ height: `${h}px`, background: levelBg(d.level) }}
-                      data-tip={`${d.count} ${s.commits} — ${label}`}
-                      data-today={i === series.length - 1 ? "" : undefined}
-                    />
-                  );
-                })}
-              </span>
-            </div>
-          )}
 
           {/* ── Riga 4: linguaggi più usati ── */}
           {agg && agg.langs.length > 0 && (
@@ -445,126 +522,6 @@ export default function GitHubFooterWidget() {
           )}
         </>
       )}
-
-      <style>{`
-        /* Tutto su token .sb- (ereditati dal footer .sb-home.sb-foot):
-           il widget segue il tema chiaro/scuro nativo come il resto. */
-        .sb-gh {
-          display: flex; flex-direction: column; align-items: flex-start;
-          gap: 0.9rem;
-          font-size: 0.82rem; color: var(--sb-fg-lighter); line-height: 1.45;
-        }
-        .sb-gh b { color: var(--sb-fg); font-weight: 500; }
-        .sb-gh__skeleton { opacity: 0.6; animation: sb-gh-pulse 1.5s ease-in-out infinite; }
-        .sb-gh__row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 0.85rem; width: 100%; }
-
-        .sb-gh__profile { display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none; color: var(--sb-fg); }
-        .sb-gh__profile:hover .sb-gh__user { color: var(--sb-brand-text); }
-        /* Raggio piccolo e non tondo: il marchio .ap è un quadrato pieno, e un
-           ritaglio circolare gli mangerebbe i quattro angoli. */
-        .sb-gh__avatar {
-          width: 22px; height: 22px; border-radius: 5px;
-          border: 1px solid var(--sb-border-stronger); flex-shrink: 0;
-        }
-        .sb-gh__user { font-weight: 500; }
-        .sb-gh__since { color: var(--sb-fg-muted); }
-        .sb-gh__act { display: inline-flex; align-items: center; }
-        /* Acceso e fermo. L'anello che partiva ogni 2,4 secondi diceva "in
-           diretta" a proposito di dati arrivati una volta sola, al
-           caricamento: sventolava per conto suo. Adesso parte quando ci passi
-           sopra — allo stesso modo dei pallini dei clienti sulla home. */
-        .sb-gh__dot {
-          width: 7px; height: 7px; border-radius: 50%; margin-right: 0.5rem; flex-shrink: 0;
-          background: var(--sb-brand); box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55);
-        }
-        .sb-gh__act:hover .sb-gh__dot { animation: sb-gh-live 1.4s ease-out; }
-
-        /* ── Chip statistiche (veste .sb-chip della home) ── */
-        .sb-gh__chips { gap: 0.5rem 0.55rem; }
-        .sb-gh__chip {
-          display: inline-flex; align-items: center; gap: 0.32rem;
-          padding: 0.16rem 0.6rem; clip-path: var(--sb-shape-xs);
-          background: var(--sb-shape-edge-xs), var(--sb-bg);
-          border: 1px solid var(--sb-border-strong);
-          font-size: 0.78rem; color: var(--sb-fg-light); white-space: nowrap;
-          transition: border-color 0.15s, background 0.15s, color 0.15s;
-        }
-        .sb-gh__star { color: #e3b341; }
-        a.sb-gh__repo { text-decoration: none; }
-        a.sb-gh__repo:hover {
-          color: var(--sb-fg);
-          border-color: var(--sb-brand);
-          background: hsla(197, 100%, 49%, 0.08);
-        }
-        .sb-gh__langdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-
-        /* ── Grafico dei contributi giornalieri (dati reali) ── */
-        .sb-gh__spark { display: flex; flex-direction: column; gap: 0.45rem; width: 100%; }
-        .sb-gh__spark-cap { font-size: 0.8rem; color: var(--sb-fg-lighter); }
-        .sb-gh__spark-cap b { color: var(--sb-fg); font-weight: 500; }
-        .sb-gh__bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; height: 32px; width: 100%; }
-        .sb-gh__bar {
-          position: relative;
-          flex: 1 1 0; min-width: 4px; max-width: 40px; height: 3px;
-          border-radius: 3px 3px 0 0;
-          transition: filter 0.15s, transform 0.15s;
-        }
-        .sb-gh__bar:hover { filter: brightness(1.15); }
-        .sb-gh__bar[data-today] { box-shadow: 0 0 0 1.5px var(--sb-brand-text); }
-
-        /* Tooltip alla GitHub: colori invertiti rispetto al tema → leggibile
-           su entrambi (scuro su chiaro, chiaro su scuro). */
-        .sb-gh__bar::after,
-        .sb-gh__bar::before {
-          position: absolute; left: 50%;
-          opacity: 0; pointer-events: none;
-          transition: opacity 0.14s ease, transform 0.14s ease;
-          z-index: 6;
-        }
-        .sb-gh__bar::after {
-          content: attr(data-tip);
-          bottom: calc(100% + 9px);
-          transform: translateX(-50%) translateY(4px);
-          padding: 5px 9px; border-radius: 7px;
-          background: var(--sb-fg); color: var(--sb-bg);
-          font-size: 0.72rem; font-weight: 500; line-height: 1; white-space: nowrap;
-          box-shadow: var(--sb-shadow-card);
-        }
-        .sb-gh__bar::before {
-          content: ""; bottom: calc(100% + 5px);
-          width: 8px; height: 8px;
-          transform: translateX(-50%) translateY(4px) rotate(45deg);
-          background: var(--sb-fg);
-        }
-        .sb-gh__bar:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .sb-gh__bar:hover::before { opacity: 1; transform: translateX(-50%) translateY(0) rotate(45deg); }
-        /* Barre ai bordi: la bolla non esce dai margini del footer */
-        .sb-gh__bar:first-child::after { left: 0; transform: translateX(0) translateY(4px); }
-        .sb-gh__bar:first-child:hover::after { transform: translateX(0) translateY(0); }
-        .sb-gh__bar:last-child::after { left: auto; right: 0; transform: translateX(0) translateY(4px); }
-        .sb-gh__bar:last-child:hover::after { transform: translateX(0) translateY(0); }
-
-        /* ── Barra dei linguaggi ── */
-        .sb-gh__langs { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
-        .sb-gh__langbar {
-          display: flex; height: 8px; width: 100%; border-radius: 999px; overflow: hidden;
-          gap: 2px; background: var(--sb-overlay);
-        }
-        .sb-gh__langseg { height: 100%; min-width: 4px; }
-        .sb-gh__langlegend { display: flex; flex-wrap: wrap; gap: 0.35rem 0.85rem; }
-        .sb-gh__langitem { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: var(--sb-fg-lighter); }
-
-        @keyframes sb-gh-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.75; } }
-        @keyframes sb-gh-live {
-          0% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55); }
-          70% { box-shadow: 0 0 0 6px hsla(197, 100%, 49%, 0); }
-          100% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .sb-gh__skeleton, .sb-gh__dot { animation: none; }
-        }
-        @media (max-width: 640px) { .sb-gh { font-size: 0.8rem; } }
-      `}</style>
     </div>
   );
 }

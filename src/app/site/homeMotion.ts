@@ -48,8 +48,9 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
           .from(".sb-hero-actions > *", { autoAlpha: 0, y: 12, stagger: 0.08 }, "-=0.5");
 
         // ── ② Contatori: i numeri si "accendono" arrivando a vista ────────
-        // Il footer ha una regia sua (site/footMotion.ts): i suoi contatori
-        // restano fuori da qui, o partirebbero due volte sulla home.
+        // Il footer resta fuori: i suoi numeri non li muove più GSAP ma una
+        // keyframe CSS su timeline di scroll (site/foot.css), e due registi
+        // sullo stesso elemento si contenderebbero il textContent.
         const counters = gsap.utils
           .toArray<HTMLElement>("[data-count-to]", scope)
           .filter((el) => !el.closest(".sb-foot"));

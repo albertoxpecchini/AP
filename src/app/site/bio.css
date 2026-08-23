@@ -251,3 +251,34 @@
 @media (prefers-reduced-motion: reduce) {
   .sb-bio-item, .sb-bio-item .go, .sb-bio-modal-close { transition: none; }
 }
+
+/* ── Mappa "Rivalta sul Mincio" (MapLibre) ────────────────────────────────────
+   Arriva dalla home, dove stava in coda ai progetti in evidenza (`.sb-loc-*`)
+   e non raccontava niente del lavoro. Qui sta sotto il riquadro «Where I'm
+   based», che il paese lo nomina già.
+
+   Il rimappaggio dei token qui sotto DEVE viaggiare con lei: senza, i comandi
+   dello zoom tornano arancio Ubuntu in mezzo alla pagina. */
+.sb-bio-mappa { margin-top: 1rem; }
+.sb-bio-mappa-inner { display: grid; grid-template-columns: 1fr; gap: 1.2rem; padding: 1.4rem; }
+@media (min-width: 900px) { .sb-bio-mappa-inner { grid-template-columns: 1fr 1.1fr; align-items: center; } }
+.sb-bio-mappa-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+.sb-bio-mappa-title { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 1.05rem; font-weight: 500; color: var(--sb-fg); }
+.sb-bio-mappa-desc { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--sb-fg-lighter); }
+.sb-bio-map {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--sb-border-strong);
+  aspect-ratio: 16 / 9;
+  /* src/components/ui/map.tsx è generico e legge i token shadcn globali
+     (arancio Ubuntu, src/styles/theme.css): li rimappiamo qui ai token .sb-
+     così i controlli zoom ereditano la palette neutra + azzurro brand del sito
+     invece dell'accento arancio. */
+  --background: var(--sb-bg);
+  --foreground: var(--sb-fg);
+  --border: var(--sb-border-strong);
+  --accent: var(--sb-surface-200);
+  --muted-foreground: var(--sb-fg-muted);
+  --ring: var(--sb-brand);
+}
+@media (max-width: 480px) { .sb-bio-map { aspect-ratio: 4 / 3; } }

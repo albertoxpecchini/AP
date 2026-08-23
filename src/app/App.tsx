@@ -24,7 +24,6 @@ import {
   IcExternal,
   IcDownload,
   IcEye,
-  IcFile,
   IcMail,
   IcHeart,
   IcCheck,
@@ -37,9 +36,7 @@ import {
   IcPen,
   IcGame,
   IcVenn,
-  IcCompass,
   IcRuler,
-  IcPin,
   IcCamera,
   IcAperture,
   IcCar,
@@ -69,11 +66,9 @@ import { PROJECTS } from "./site/projects";
 // anche dopo il prossimo `npm run scatti`.
 import { SESSIONI } from "./shooting/sessioni";
 import { ArchivioExplorer } from "./archivio/Archivio";
-const RivaltaMap = lazy(() => import("./site/RivaltaMap"));
-/* Stessa cura della mappa: la geometria delle tre auto e il loro renderer non
-   c'entrano niente con il primo schermo, e stanno in fondo alla pagina. Lazy +
-   WhenVisible = si scaricano quando ci si avvicina, e chi non arriva in fondo
-   non li paga. */
+/* La geometria delle tre auto e il loro renderer non c'entrano niente con il
+   primo schermo. Lazy + WhenVisible = si scaricano quando ci si avvicina, e chi
+   non ci passa non li paga. */
 const DreamGarage = lazy(() => import("./site/dreamCars"));
 import WhenVisible from "./site/WhenVisible";
 /* Lo scaffale delle sei pagine (§⑤). Sta in un file suo perché la lastra si
@@ -83,6 +78,12 @@ import PagesShelf from "./site/PagesShelf";
 /* Fascia temporanea: il sito di Rivalta appena tornato online, col video che
    gira in loop. Si spegne con l'interruttore in cima a site/FreshWork.tsx. */
 import FreshWork from "./site/FreshWork";
+/* La finestra di browser delle schede in evidenza: video, screenshot o ripiego.
+   Vedi il cappello di site/SitePreview.tsx per il perché non riusa FreshWork. */
+import SitePreview from "./site/SitePreview";
+/* Il muro del curriculum, con il suo «Mostra tutto». In un file suo per la
+   stessa ragione dello scaffale: lo stato qui rifaceva tutta la home. */
+import CvWall from "./site/CvWall";
 import SiteFooter from "./site/SiteFooter";
 import "./home.css";
 
@@ -484,11 +485,24 @@ function highlight(code: string, lang: StackEntry["lang"]): ReactNode[] {
   return out;
 }
 
+// Le impronte del fondale della fascia fotografia: sei per sessione, 24px
+// l'una, in webp base64 dentro il manifesto pubblico. Sono SAGOME, non
+// scatti — l'unica cosa di uno shooting che può stare su una pagina aperta.
+// Ne bastano dodici a riempire la griglia; le altre restano dove sono.
+const SHOT_TILES = SESSIONI.sessioni.flatMap((s) => s.anteprime ?? []).slice(0, 12);
+
 // ── Story-card dei progetti di punta ────────────────────────────────────────
-const STORIES: { id: string; kind: string; quote: ReactNode }[] = [
+// `acc` è la tinta della scheda: da sola ritinge bordo, glifo, piede e alone
+// (blocco «La tavolozza» in home.css). `lead` è la scheda grande, quella che
+// prende il riquadro doppio — ce n'è UNA sola, ed è quella che ha il video.
+// Titolo, indirizzo, etichette e anteprima non si scrivono qui: si leggono da
+// PROJECTS, che resta la fonte unica di verità.
+const STORIES: { id: string; kind: string; acc: string; lead?: boolean; quote: ReactNode }[] = [
   {
     id: "rivalta",
     kind: "Institutional site",
+    acc: "verde",
+    lead: true,
     // La copy precedente descriveva la versione vecchia del sito (bento grid,
     // GSAP ScrollTrigger, Next.js). Quello online adesso è l'opposto: nove
     // pagine di HTML statico, e i numeri del paese non sono affermazioni ma un
@@ -503,6 +517,7 @@ const STORIES: { id: string; kind: string; quote: ReactNode }[] = [
   {
     id: "cascina-fontana",
     kind: "Business site",
+    acc: "ambra",
     quote: (
       <>
         A responsive, carefully designed interface built{" "}
@@ -513,6 +528,7 @@ const STORIES: { id: string; kind: string; quote: ReactNode }[] = [
   {
     id: "instagram",
     kind: "Web tool",
+    acc: "viola",
     quote: (
       <>
         Who doesn't follow you back, computed{" "}
@@ -522,10 +538,9 @@ const STORIES: { id: string; kind: string; quote: ReactNode }[] = [
   },
 ];
 
-// Mappa — Rivalta sul Mincio, il borgo per cui ho realizzato il sito
-// ufficiale (vedi STORIES sopra). Coordinate del borgo (Rodigo, Mantova).
-const RIVALTA_CENTER: [number, number] = [10.6771374, 45.1801924];
-const RIVALTA_GMAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Rivalta sul Mincio, Italia")}`;
+// La mappa di Rivalta stava qui sotto, in coda ai progetti in evidenza. È
+// passata alla bio («Based & trained»), dove il paese è già l'argomento: le
+// coordinate e il collegamento a Google Maps vivono adesso in site/Bio.tsx.
 
 // La scocca delle card della griglia prodotti: il vetro (.sb-panel) più l'alone
 // che segue il puntatore. Sta qui e non ripetuto sette volte perché le sette
@@ -1026,6 +1041,108 @@ export default function App() {
             spegne. */}
         <FreshWork />
 
+        {/* ② Fotografia — l'altra metà, quella senza tastiera.
+
+             I numeri non sono scritti a mano: vengono da src/app/shooting/
+             sessioni.json, il manifesto PUBBLICO che `npm run scatti` genera
+             leggendo gli EXIF. Le foto no: quelle non escono da casa, e questa
+             sezione lo dice invece di lasciarlo scoprire a chi clicca.
+
+             Il fondale della fascia sono le IMPRONTE dello stesso manifesto:
+             sagome sfocate da 24px, sei per sessione. Fanno vedere il ritmo di
+             uno shooting senza pubblicare una faccia — che è il patto della
+             sezione, mantenuto anche da come è fatta. */}
+        <section id="shooting" className="sb-section" aria-label="Photography" data-acc="rosa">
+          <div className="sb-container">
+            <div className="sb-sechead">
+              <h3>And on the other side of the lens</h3>
+              <p>
+                I take portraits of people — as an amateur, and with no illusions about it.
+                A Canon EOS 4000D with its kit lens, or the iPhone 16 Pro when the camera
+                stayed home.
+              </p>
+            </div>
+
+            <div className="sb-panel sb-shot-band">
+              <div className="sb-panel-inner sb-shot-inner">
+                {/* Le tessere e il velo stanno SOTTO (z-index 0 e 1), il testo
+                    sopra. Il velo è una velatura in background-image e non un
+                    filter: un filter promuoverebbe la fascia a strato suo. */}
+                <div className="sb-shot-mosaic" aria-hidden="true">
+                  {SHOT_TILES.map((t, i) => (
+                    <span
+                      key={i}
+                      className="sb-shot-tile"
+                      style={{ backgroundImage: `url("${t.blur}")` }}
+                    />
+                  ))}
+                </div>
+                <div className="sb-shot-veil" aria-hidden="true" />
+
+                <div className="sb-shot-copy">
+                  <h4 className="sb-shot-title">
+                    <IcCamera size={16} /> <span>Shooting</span>
+                  </h4>
+                  <p className="sb-shot-desc">
+                    <strong>The photos of people are not published.</strong> What stays online
+                    is what can be told about a session — the date, the place, how many frames,
+                    which gear — and those numbers come from the files' own metadata. Even the
+                    shapes behind this panel are 24px blurs, never the frames themselves.
+                  </p>
+                  <Link to="/shooting" className="sb-btn sb-btn--sm sb-btn--secondary">
+                    <IcAperture size={16} /> See the sessions
+                  </Link>
+                </div>
+
+                <div className="sb-shot-side">
+                  <div className="sb-shot-numeri">
+                    {[
+                      { k: "frames", v: String(SESSIONI.totale) },
+                      { k: SESSIONI.sessioni.length === 1 ? "session" : "sessions", v: String(SESSIONI.sessioni.length) },
+                    ].map((n) => (
+                      <div key={n.k} className="sb-shot-numero">
+                        <span className="sb-shot-numero-v" data-no-i18n translate="no">{n.v}</span>
+                        <span className="sb-shot-numero-k">{n.k}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <ul className="sb-shot-ferri" data-no-i18n translate="no">
+                    <li>Canon EOS 4000D</li>
+                    <li>EF-S 18–55 mm</li>
+                    <li>iPhone 16 Pro</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ③ Garage — le tre auto, in 3D e girabili. Il fondale colorato che
+             si muove dietro i modelli è tutto in home.css (.sb-garage-bg). */}
+        <section id="garage" className="sb-section" aria-label="Dream garage" data-acc="rosso">
+          <div className="sb-container">
+            <div className="sb-sechead">
+              <h3>And three cars I dream about</h3>
+              <p>
+                Not photos and not videos: the 3D models themselves — their own paint,
+                wheels and interiors — drawn live by your graphics card. Drag one to turn
+                it in any direction.
+              </p>
+            </div>
+            <WhenVisible className="sb-garage-wrap" rootMargin="400px">
+              {/* Il fondale sta DENTRO WhenVisible apposta: fuori schermo non
+                  è montato, quindi non c'è niente da animare. I tre <i> sono
+                  vuoti — colore, posizione e deriva stanno in home.css. */}
+              <div className="sb-garage-bg" aria-hidden="true">
+                <i /><i /><i />
+              </div>
+              <Suspense fallback={null}>
+                <DreamGarage />
+              </Suspense>
+            </WhenVisible>
+          </div>
+        </section>
+
         {/* ③ Archivio — la "dashboard": il pannello dell'archivio incorporato */}
         <section id="archivio" className="sb-section" data-acc="blu">
           <div className="sb-container">
@@ -1146,14 +1263,38 @@ export default function App() {
                 const p = projectByI(s.id);
                 if (!p) return null;
                 const external = !p.url.startsWith("/");
+                // L'indirizzo com'è scritto sulla barra: senza schema per i
+                // siti veri, com'è per le pagine di casa.
+                const host = external ? p.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : p.url;
+                const cls = `sb-story${s.lead ? " sb-story--lead" : ""}`;
                 const inner = (
                   <div className="sb-panel">
                     <div className="sb-panel-inner sb-story-inner">
+                      <SitePreview
+                        label={host}
+                        video={p.previewVideo}
+                        poster={p.previewPoster}
+                        img={p.previewImg}
+                        thumb={p.thumb}
+                        alt={
+                          p.previewVideo
+                            ? `Screen recording: a scroll through the ${p.title} website`
+                            : `Screenshot of ${p.title}`
+                        }
+                      />
                       <div className="sb-story-top">
                         <span className="sb-story-name" translate="no">{p.title}</span>
                         <span className="sb-story-kind">{s.kind}</span>
                       </div>
+                      <span className="sb-story-host" data-no-i18n translate="no">{host}</span>
                       <p className="sb-story-quote">{s.quote}</p>
+                      {p.tags && (
+                        <ul className="sb-story-tags" data-no-i18n translate="no">
+                          {p.tags.slice(0, 3).map((t) => (
+                            <li key={t}>{t}</li>
+                          ))}
+                        </ul>
+                      )}
                       <span className="sb-story-foot">
                         Open the project {external ? <IcExternal size={14} /> : <IcArrowRight size={14} />}
                       </span>
@@ -1161,39 +1302,24 @@ export default function App() {
                   </div>
                 );
                 return external ? (
-                  <a key={s.id} href={p.url} target="_blank" rel="noreferrer noopener" className="sb-story">
+                  <a
+                    key={s.id}
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className={cls}
+                    data-acc={s.acc}
+                  >
                     {inner}
                   </a>
                 ) : (
-                  <Link key={s.id} to={p.url} className="sb-story">
+                  <Link key={s.id} to={p.url} className={cls} data-acc={s.acc}>
                     {inner}
                   </Link>
                 );
               })}
             </div>
 
-            <div className="sb-panel sb-loc-panel">
-              <div className="sb-panel-inner sb-loc-inner">
-                <div className="sb-loc-copy">
-                  <h4 className="sb-loc-title"><IcPin size={16} /> <span translate="no">Rivalta sul Mincio</span></h4>
-                  <p className="sb-loc-desc">
-                    The village on the Mincio river where my family's farm is, and where I
-                    designed and built the official tourist website above.
-                  </p>
-                  <a className="sb-btn sb-btn--sm sb-btn--secondary" href={RIVALTA_GMAPS} target="_blank" rel="noreferrer">
-                    <IcCompass size={16} /> Google Maps
-                  </a>
-                </div>
-                {/* La mappa non parte col resto della pagina: maplibre-gl sono
-                    ~290 kB gzip, e questa sezione sta in fondo. Si scarica
-                    quando ci si avvicina — vedi site/WhenVisible. */}
-                <WhenVisible className="sb-loc-map">
-                  <Suspense fallback={null}>
-                    <RivaltaMap center={RIVALTA_CENTER} zoom={13} />
-                  </Suspense>
-                </WhenVisible>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -1219,111 +1345,13 @@ export default function App() {
               </Link>
             </div>
 
-            <div className="sb-wall">
-              {sortedCV.map((item) => (
-                <div
-                  className={`sb-wall-card${(item as any).wish ? " sb-wall-card--wish" : ""}`}
-                  key={item.title}
-                >
-                  <div className="sb-panel">
-                    <div className="sb-panel-inner sb-wall-inner">
-                      <span className="sb-cv-period">{item.period}</span>
-                      <h4 className="sb-cv-title">{item.title}</h4>
-                      <p className="sb-cv-role">{item.role}</p>
-                      <p className="sb-cv-desc">{item.desc}</p>
-                      {(item as any).pdf && (
-                        <button
-                          type="button"
-                          onClick={() => openDoc((item as any).pdf, item.title)}
-                          className="sb-cv-doc"
-                          aria-haspopup="dialog"
-                        >
-                          <IcFile size={15} />
-                          <span>{(item as any).pdfLabel || "Open document (PDF)"}</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* Sedici schede: a riposo se ne vede una fila, il resto sfocato
+                sotto la sfumatura. Stato e collasso stanno in site/CvWall.tsx
+                — qui rifarebbero anche il muro dei commit e l'archivio. */}
+            <CvWall items={sortedCV as any} onOpenDoc={openDoc} />
           </div>
         </section>
 
-        {/* ⑧ Garage — le tre auto, in 3D e girabili */}
-        {/* ⑦bis Shooting — l'altra metà, quella senza tastiera.
-             I numeri non sono scritti a mano: vengono da src/app/shooting/
-             sessioni.json, il manifesto PUBBLICO che `npm run scatti` genera
-             leggendo gli EXIF. Le foto no: quelle non escono da casa, e questa
-             sezione lo dice invece di lasciarlo scoprire a chi clicca. */}
-        <section id="shooting" className="sb-section" aria-label="Photography" data-acc="rosa">
-          <div className="sb-container">
-            <div className="sb-sechead">
-              <h3>And on the other side of the lens</h3>
-              <p>
-                I take portraits of people — as an amateur, and with no illusions about it.
-                A Canon EOS 4000D with its kit lens, or the iPhone 16 Pro when the camera
-                stayed home.
-              </p>
-            </div>
-
-            <div className="sb-panel sb-shot-panel">
-              <div className="sb-panel-inner sb-shot-inner">
-                <div className="sb-shot-copy">
-                  <h4 className="sb-shot-title">
-                    <IcCamera size={16} /> <span>Shooting</span>
-                  </h4>
-                  <p className="sb-shot-desc">
-                    <strong>The photos of people are not published.</strong> What stays online
-                    is what can be told about a session — the date, the place, how many frames,
-                    which gear — and those numbers come from the files' own metadata. The album
-                    itself opens only on the machine where the photos are.
-                  </p>
-                  <Link to="/shooting" className="sb-btn sb-btn--sm sb-btn--secondary">
-                    <IcAperture size={16} /> See the sessions
-                  </Link>
-                </div>
-
-                <div className="sb-shot-side">
-                  <div className="sb-shot-numeri">
-                    {[
-                      { k: "frames", v: String(SESSIONI.totale) },
-                      { k: SESSIONI.sessioni.length === 1 ? "session" : "sessions", v: String(SESSIONI.sessioni.length) },
-                    ].map((n) => (
-                      <div key={n.k} className="sb-shot-numero">
-                        <span className="sb-shot-numero-v" data-no-i18n translate="no">{n.v}</span>
-                        <span className="sb-shot-numero-k">{n.k}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <ul className="sb-shot-ferri" data-no-i18n translate="no">
-                    <li>Canon EOS 4000D</li>
-                    <li>EF-S 18–55 mm</li>
-                    <li>iPhone 16 Pro</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="garage" className="sb-section" aria-label="Dream garage" data-acc="rosso">
-          <div className="sb-container">
-            <div className="sb-sechead">
-              <h3>And three cars I dream about</h3>
-              <p>
-                Not photos and not videos: the 3D models themselves — their own paint,
-                wheels and interiors — drawn live by your graphics card. Drag one to turn
-                it in any direction.
-              </p>
-            </div>
-            <WhenVisible className="sb-garage-wrap" rootMargin="400px">
-              <Suspense fallback={null}>
-                <DreamGarage />
-              </Suspense>
-            </WhenVisible>
-          </div>
-        </section>
 
         {/* ⑨ Open source */}
         <section className="sb-section" aria-label="Open source" data-acc="viola">
