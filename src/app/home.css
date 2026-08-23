@@ -349,17 +349,39 @@ html.dark .sb-home {
   /* TRE movimenti indipendenti sullo stesso strato, su DUE proprietà diverse —
      e questa separazione è tutto il trucco:
 
-      · `translate` porta quello che scrive il JS a ogni frame — la deriva
-        dello scroll (--sb-drift) e lo scostamento lento verso il puntatore
-        (--sb-px/--sb-py), entrambi da site/GlassMotion.tsx;
+      · `translate` porta quello che comanda il JS — la deriva dello scroll e
+        lo scostamento lento verso il puntatore;
       · `transform` porta il respiro a keyframe qui sotto.
 
      Il browser le compone da sé: `translate` si applica prima di `transform`.
      Se il respiro fosse dentro le stesse coordinate del JS avrebbe smesso di
      essere compositabile e sarebbe tornato sul thread principale a ogni frame
      di scroll. Così invece sono tre movimenti che non si sanno l'uno
-     dell'altro, e il compositore muove uno strato già dipinto. */
-  translate: var(--sb-px, 0%) calc(var(--sb-drift, 0px) + var(--sb-py, 0%));
+     dell'altro, e il compositore muove uno strato già dipinto.
+
+     ── Quel `translate` qui non c'è più, e il perché conta ──────────────────
+     C'era scritto `translate: var(--sb-px) calc(var(--sb-drift) + ...)`, e le
+     tre variabili le scriveva site/GlassMotion.tsx su <html> a ogni
+     fotogramma. Sembrava la cosa giusta — una scrittura sola, l'eredità fa il
+     resto — ed è invece il singolo pezzo più caro che questo sito abbia mai
+     avuto: una custom property è EREDITATA, quindi cambiarne una sulla radice
+     obbliga il motore a ricalcolare lo stile di ogni nodo che potrebbe
+     leggerla. Misurato su una build di produzione, con 2.845 nodi:
+
+         ricalcolo dello stile, per fotogramma      18,6 ms
+         con le stesse quantità scritte altrove      0,23 ms
+
+     A ogni movimento del mouse e a ogni fotogramma di scroll, su ogni pagina
+     del sito. Registrarle con @property non salva niente (18,6 → 16,4).
+
+     Adesso i due aloni li muovono tre animazioni in pausa per ciascuno, che si
+     SCORRONO invece di essere riscritte: si veda site/aura.ts. Le Web
+     Animations si possono appendere agli pseudo-elementi, e il compositore le
+     muove senza toccare lo stile di nessuno.
+
+     Quello che resta qui è il RIPOSO: dove stanno gli aloni prima che il JS
+     arrivi, e dove restano per chi ha chiesto meno movimento. */
+  translate: 0 0;
 }
 .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.14), transparent 62%);
@@ -370,7 +392,9 @@ html.dark .sb-home {
    che due strati solidali non hanno. */
 .sb-home::after {
   background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.1), transparent 60%);
-  translate: calc(var(--sb-px, 0%) * -0.6) calc(var(--sb-drift, 0px) * 0.7 - var(--sb-py, 0%) * 0.6);
+  /* I coefficienti del secondo alone (0,7 sulla deriva, −0,6 sul puntatore)
+     stanno adesso nelle keyframe delle sue animazioni — vedi `terna` in
+     site/aura.ts. */
   animation: sb-drift-b 91s ease-in-out infinite alternate;
 }
 /* 74 e 91 secondi: due tempi che non tornano mai in fase alla stessa ora, così
@@ -1120,7 +1144,13 @@ a.sb-card:hover .sb-checks li:nth-child(3) svg { animation-delay: 0.16s; }
      po' d'aria resta, per staccare il disegno dall'ultima riga di testo. */
   padding: 1rem 0 0;
   min-height: 108px;
-  transform: translate3d(0, calc(var(--sb-drift, 0px) * -0.035), 0);
+  /* La parallasse la scrive site/GlassMotion.tsx ① direttamente qui sopra,
+     come `transform` inline. Passava per una var (--sb-drift), e non si può:
+     una custom property è ereditata, quindi scriverla su questo elemento
+     invalidava tutta la tavola SVG che ha dentro, a ogni fotogramma di
+     scroll. Qui resta il riposo — dove sta il disegno prima che il JS arrivi
+     e per chi ha chiesto meno movimento. */
+  transform: translate3d(0, 0, 0);
 
   /* ── Dove sta il puntatore dentro il riquadro, 0→1 per lato ─────────────
      Le scrive site/GlassMotion.tsx (blocco ④) sul riquadro sotto il puntatore,

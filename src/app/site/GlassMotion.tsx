@@ -7,15 +7,15 @@
 // niente. Qui vive quel "qualcosa che cambia", più le due interazioni che
 // hanno bisogno del puntatore.
 //
-// ① Deriva del fondale — i due aloni (.sb-home::before/::after) slittano con
-//    lo scroll, così sotto ogni card passa colore diverso man mano che scendi.
-//    Qui sta anche la QUIETE: a pagina ferma il respiro degli aloni si mette in
-//    pausa, perché è lui che tiene svegli tutti i backdrop-filter della pagina.
+// ① Il fondale che si muove — i due aloni (.sb-home::before/::after) slittano
+//    con lo scroll e si scostano piano verso il puntatore, così sotto ogni
+//    card passa colore diverso man mano che scendi. Qui sta anche la QUIETE: a
+//    pagina ferma il respiro degli aloni si mette in pausa, perché è lui che
+//    tiene svegli tutti i backdrop-filter della pagina.
 // ② Tilt — la card si inclina verso il cursore e il rim si sposta di
 //    conseguenza.
 // ③ Quello che il puntatore illumina — rim, alone, lucido del titolo.
-// ④ Il cubo della card CAT (--vis-x/--vis-y) e lo scostamento lento degli
-//    aloni verso il puntatore (--sb-px/--sb-py).
+// ④ Il cubo della card CAT (--vis-x/--vis-y).
 // ⑤ Pozza d'acqua sui quadratini dei commit (site/puddle.ts).
 // ⑥ Pillola della nav — vedi useNavPill in fondo, che però NON è globale.
 // ⑦ Tinta della nav — la sezione a schermo passa il suo data-acc all'<header>;
@@ -31,7 +31,14 @@
 //  · un solo gsap.matchMedia() proprietario, revert() al dismount;
 //  · niente split del testo traducibile (il motore i18n cammina sui nodi);
 //  · solo transform e opacity — quello che era stato tolto dalla home, e per
-//    cui era stato tolto, erano gradienti grandi ridisegnati a ogni frame.
+//    cui era stato tolto, erano gradienti grandi ridisegnati a ogni frame;
+//  · NIENTE custom property su <html> a ogni fotogramma. È la regola nuova, e
+//    è costata cara impararla: una custom property è ereditata, quindi
+//    cambiarne una sulla radice fa ricalcolare lo stile di TUTTO il documento
+//    — 18,6 ms per fotogramma su questa home, contro 0,23 se lo stesso numero
+//    finisce su una foglia. Quello che deve muoversi a 60 al secondo si scrive
+//    sull'elemento che lo consuma, o non passa dalla cascata per niente
+//    (site/aura.ts).
 //
 // Niente ScrollTrigger per la deriva, per la stessa ragione per cui non lo usa
 // site/ScrollProgress.tsx: le pagine sono lazy e cambiano altezza dopo il
@@ -42,6 +49,7 @@ import { useEffect } from "react";
 import type { RefObject } from "react";
 import { gsap } from "gsap";
 import { attachPuddles } from "./puddle";
+import { apriAura, auraViva, chiudiAura, muoviAura } from "./aura";
 
 /** Quanto slittano gli aloni fra cima e fondo della pagina. Volutamente poco:
  *  è un cambio di luce dietro il vetro, non un fondale che scorre. */
@@ -89,19 +97,55 @@ export default function GlassMotion() {
   useEffect(() => {
     const mm = gsap.matchMedia();
 
-    // ── ① Deriva del fondale ────────────────────────────────────────────────
-    // Scrive una sola variabile CSS sul <html>; i due pseudo la consumano
-    // nella loro proprietà `translate`, che è separata da `transform` — dove
-    // invece gira il respiro a keyframe. Due movimenti sullo stesso strato
-    // senza che nessuno dei due sovrascriva l'altro.
+    // ── ① Il fondale che si muove — deriva, puntatore e quiete ─────────────
+    // Un blocco solo per tutti e tre, perché muovono lo stesso oggetto: i due
+    // aloni di .sb-home::before/::after.
+    //
+    //   deriva      slittano scendendo, così sotto ogni lastra passa colore
+    //               diverso man mano che leggi;
+    //   puntatore   si scostano di pochissimo verso di te, con un ritardo
+    //               lungo — la luce della stanza che si accorge di te, non un
+    //               riflettore che ti insegue;
+    //   quiete      a pagina ferma il respiro a keyframe si mette in pausa.
+    //
+    // ── Perché NON sono più tre variabili CSS ────────────────────────────────
+    // Erano --sb-drift, --sb-px e --sb-py, scritte su <html> a ogni fotogramma.
+    // Costava 18,6 ms di ricalcolo dello stile PER FOTOGRAMMA, misurati su una
+    // build di produzione: una custom property è ereditata, quindi cambiarne
+    // una sulla radice fa ricalcolare lo stile di tutto il documento. Con le
+    // stesse quantità scritte fuori dalla radice: 0,23 ms. Ottantuno volte.
+    // Il come sta in site/aura.ts; qui restano i numeri e gli ascolti.
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const root = document.documentElement;
-      const drift = { v: 0 };
-      const driftTo = gsap.quickTo(drift, "v", {
-        duration: 0.5,
-        ease: "power2",
-        onUpdate: () => root.style.setProperty("--sb-drift", `${drift.v}px`),
-      });
+      let aura = apriAura(DRIFT_PX, PTR_SHIFT / 2);
+
+      // Lo stato che si tweena. I quickTo danno la curva ai NUMERI, e i numeri
+      // finiscono nel currentTime delle animazioni: stesso mestiere di prima,
+      // solo che il traguardo non è più una variabile nella cascata.
+      const st = { deriva: 0, px: 0.5, py: 0.5 };
+      let visual: HTMLElement[] = [];
+      const raccogliVisual = () => Array.from(document.querySelectorAll<HTMLElement>(".sb-card-visual"));
+      const scrivi = () => {
+        // Cambiando rotta la radice di pagina è un altro nodo: le animazioni
+        // appese al vecchio se ne sono andate con lui, e vanno riaperte.
+        if (!auraViva(aura)) aura = apriAura(DRIFT_PX, PTR_SHIFT / 2);
+        muoviAura(aura, st.deriva, st.px, st.py);
+        // La parallasse dei sei disegni leggeva la stessa --sb-drift. Adesso
+        // si scrive loro addosso la TRASFORMAZIONE GIÀ FATTA, e non la
+        // variabile: scriverci la variabile è stato il primo tentativo, e
+        // spostava il problema invece di toglierlo — un .sb-card-visual ha
+        // dentro una tavola SVG da una cinquantina di nodi, e una custom
+        // property è ereditata, quindi ne invalidava il sottoalbero intero.
+        // Nella traccia erano 324 elementi ricalcolati a ogni fotogramma.
+        // `transform` non si eredita: invalida quell'elemento e basta.
+        if (!visual.length || !visual[0].isConnected) visual = raccogliVisual();
+        const y = st.deriva * DRIFT_PX * -0.035;
+        for (const v of visual) v.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
+      };
+
+      const derivaTo = gsap.quickTo(st, "deriva", { duration: 0.5, ease: "power2", onUpdate: scrivi });
+      const pxTo = gsap.quickTo(st, "px", { duration: PTR_LAG, ease: "power2", onUpdate: scrivi });
+      const pyTo = gsap.quickTo(st, "py", { duration: PTR_LAG, ease: "power2", onUpdate: scrivi });
 
       let frame = 0;
       const update = () => {
@@ -109,7 +153,7 @@ export default function GlassMotion() {
         // Con lo scroll bloccato (menu, modali) il body va in position:fixed:
         // la pagina "si accorcia" e il fondale schizzerebbe. Lo congelo.
         if (document.body.dataset.scrollLockY !== undefined) return;
-        driftTo(readProgress() * DRIFT_PX);
+        derivaTo(readProgress());
       };
       const schedule = () => {
         if (!frame) frame = requestAnimationFrame(update);
@@ -127,10 +171,6 @@ export default function GlassMotion() {
       // puntatore, `sb-quiet` mette in pausa la deriva; al primo dei due
       // gesti riparte. Nessuno vede una deriva da 74 secondi mentre sta fermo
       // a leggere, e appena la pagina si muove il fondo si muove con lei.
-      //
-      // Sta in QUESTO blocco perché è già quello che possiede l'ascolto dello
-      // scroll, ed è già dentro `prefers-reduced-motion: no-preference` —
-      // dove il movimento è spento non c'è niente da mettere in pausa.
       const QUIETE = 1500;
       let quiet = 0;
       const sveglia = () => {
@@ -138,18 +178,25 @@ export default function GlassMotion() {
         clearTimeout(quiet);
         quiet = window.setTimeout(() => root.classList.add("sb-quiet"), QUIETE);
       };
+      const puntatore = (e: PointerEvent) => {
+        sveglia();
+        pxTo(e.clientX / window.innerWidth);
+        pyTo(e.clientY / window.innerHeight);
+      };
       const risveglio = () => {
         sveglia();
         schedule();
       };
 
+      visual = raccogliVisual();
       update();
+      scrivi();
       sveglia();
       // capture: true — vedi readProgress(). Lo scroll qui lo fa <body>, e il
       // suo evento non risale fino a window.
       document.addEventListener("scroll", risveglio, { passive: true, capture: true });
       window.addEventListener("resize", risveglio);
-      document.addEventListener("pointermove", sveglia, { passive: true });
+      document.addEventListener("pointermove", puntatore, { passive: true });
 
       return () => {
         if (frame) cancelAnimationFrame(frame);
@@ -157,12 +204,12 @@ export default function GlassMotion() {
         root.classList.remove("sb-quiet");
         document.removeEventListener("scroll", risveglio, { capture: true });
         window.removeEventListener("resize", risveglio);
-        document.removeEventListener("pointermove", sveglia);
-        gsap.killTweensOf(drift);
-        root.style.removeProperty("--sb-drift");
+        document.removeEventListener("pointermove", puntatore);
+        gsap.killTweensOf(st);
+        chiudiAura(aura);
+        for (const v of visual) v.style.removeProperty("transform");
       };
     });
-
     // ── ② Tilt ──────────────────────────────────────────────────────────────
     // Per delega su document, non un listener per pannello: i .sb-panel del
     // sito sono centinaia e su alcune pagine compaiono dopo (lazy). Così ce
@@ -281,12 +328,22 @@ export default function GlassMotion() {
     //    card. Acceso è sempre e solo UN pannello, quello sotto il cursore —
     //    non è l'alone tolto a suo tempo dalla home, che si accendeva su una
     //    card dopo l'altra mentre scorrevi.
-    //  · la STRISCIA DI LUCE sul titolo della hero, via --gloss-x su <html>.
-    //    Sta sulla radice e non sull'h1 apposta: così non serve cercare
-    //    l'elemento a ogni frame, e l'eredità fa il resto. Stesso mestiere di
-    //    --sb-drift qui sopra.
+    //  · la STRISCIA DI LUCE sul titolo della hero, via --gloss-x.
+    //    Stava sulla radice «così non serve cercare l'elemento a ogni frame, e
+    //    l'eredità fa il resto», ed era il ragionamento sbagliato: l'eredità
+    //    non è gratis, è il motivo per cui il motore deve ricalcolare lo stile
+    //    di ogni nodo del documento. Cercare l'elemento costa una volta sola
+    //    (si cachea, e si ricontrolla solo se è uscito dal DOM); scriverci
+    //    sopra costa zero, perché sotto non ha nessuno.
     mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
-      const root = document.documentElement;
+      // L'unico che legge --gloss-x è la prima riga del titolo della hero
+      // (home.css, .sb-hero-title > span:first-child). Su una pagina interna
+      // non c'è, e allora non c'è niente da scrivere.
+      let titolo: HTMLElement | null = null;
+      const cercaTitolo = () => {
+        if (!titolo || !titolo.isConnected) titolo = document.querySelector(".sb-hero-title > span");
+        return titolo;
+      };
       let frame = 0;
       let lit: HTMLElement | null = null;
       let litGlows = false;
@@ -308,7 +365,7 @@ export default function GlassMotion() {
 
       const write = () => {
         frame = 0;
-        root.style.setProperty("--gloss-x", `${(clientX / window.innerWidth) * 100}%`);
+        cercaTitolo()?.style.setProperty("--gloss-x", `${(clientX / window.innerWidth) * 100}%`);
         if (!lit) return;
         const r = (rect ??= lit.getBoundingClientRect());
         // Angolo puntatore → centro, in gradi orari a partire dall'alto; +180
@@ -355,13 +412,14 @@ export default function GlassMotion() {
         document.removeEventListener("scroll", stale, { capture: true });
         window.removeEventListener("resize", stale);
         clear(lit);
-        root.style.removeProperty("--gloss-x");
+        titolo?.style.removeProperty("--gloss-x");
+        titolo = null;
         lit = null;
       };
     });
 
-    // ── ④ Il cubo della card CAT, e gli aloni che seguono la mano ──────────
-    // Due scritture, e vale la pena dire cosa NON c'è più qui in mezzo.
+    // ── ④ Il cubo della card CAT ───────────────────────────────────────────
+    // Una scrittura sola, e vale la pena dire cosa NON c'è più qui in mezzo.
     //
     // Per un giro, questo blocco ha comandato tutti e sette i visual della
     // griglia prodotti: scriveva la posizione del puntatore e i visual ci
@@ -375,19 +433,20 @@ export default function GlassMotion() {
     // Il moto dei visual è tornato in keyframe CSS su transform e opacity
     // (vedi home.css), che il compositore muove senza ricalcolare niente. Qui
     // resta il puntatore dove aggiunge qualcosa senza costare: il cubo, che si
-    // orienta dentro una `transform`, e i due aloni del fondale, che scorrono
-    // dentro un `translate`.
+    // orienta dentro una `transform`.
     //
     //   --vis-x / --vis-y  dove sei nel riquadro sotto il puntatore, 0→1
-    //   --sb-px / --sb-py  dove sei nella finestra, con un ritardo lungo
+    //
+    // Gli aloni del fondale stavano qui, e scrivevano --sb-px/--sb-py su
+    // <html>: sono saliti al blocco ①, dove adesso si muovono senza passare
+    // dalla cascata. Il perché sta lì e in site/aura.ts — in due parole,
+    // costavano 18,6 ms di ricalcolo dello stile a ogni movimento del mouse.
     //
     // Perché i quickTo e non la scrittura diretta: una var CSS non registrata
     // con @property non transiziona, quindi uscendo dalla card il cubo
     // tornerebbe dritto di scatto. Tweenando l'oggetto di stato invece della
     // var, la curva ce l'ha il numero — stesso mestiere di driftTo al ①.
     mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
-      const root = document.documentElement;
-
       // ── Il riquadro sotto il puntatore ───────────────────────────────────
       let vis: HTMLElement | null = null;
       // Misura presa una volta all'ingresso (vedi blocco ②): scade sullo
@@ -412,27 +471,7 @@ export default function GlassMotion() {
         yTo(VIS_REST.y);
       };
 
-      // ── Gli aloni del fondale ────────────────────────────────────────────
-      // Un ritardo lungo (PTR_LAG) e uno spostamento minimo (PTR_SHIFT): è la
-      // luce della stanza che si accorge di te, non un riflettore che ti
-      // insegue. Sopra ci gira comunque la deriva a keyframe da 74 e 91
-      // secondi, su `transform`, che è una proprietà separata da `translate`.
-      const ptr = { x: 0.5, y: 0.5 };
-      const pxTo = gsap.quickTo(ptr, "x", {
-        duration: PTR_LAG,
-        ease: "power2",
-        onUpdate: () => root.style.setProperty("--sb-px", `${(ptr.x - 0.5) * PTR_SHIFT}%`),
-      });
-      const pyTo = gsap.quickTo(ptr, "y", {
-        duration: PTR_LAG,
-        ease: "power2",
-        onUpdate: () => root.style.setProperty("--sb-py", `${(ptr.y - 0.5) * PTR_SHIFT}%`),
-      });
-
       const onMove = (e: PointerEvent) => {
-        pxTo(e.clientX / window.innerWidth);
-        pyTo(e.clientY / window.innerHeight);
-
         const next = (e.target as HTMLElement | null)?.closest?.(".sb-card-visual") as HTMLElement | null;
         if (next !== vis) {
           release();
@@ -464,14 +503,11 @@ export default function GlassMotion() {
 
       return () => {
         gsap.killTweensOf(st);
-        gsap.killTweensOf(ptr);
         if (vis) {
           vis.style.removeProperty("--vis-x");
           vis.style.removeProperty("--vis-y");
           vis = null;
         }
-        root.style.removeProperty("--sb-px");
-        root.style.removeProperty("--sb-py");
         document.removeEventListener("pointermove", onMove);
         document.removeEventListener("pointerleave", leave);
         window.removeEventListener("blur", leave);
