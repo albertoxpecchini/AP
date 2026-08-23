@@ -33,11 +33,17 @@ import { getLang, subscribeLang, type Lang } from "../i18n/langCore";
 //    un @property <integer> animato su animation-timeline: view(). Qui resta
 //    solo il numero d'arrivo, passato come variabile.
 //
+// ⑤ Le due fonti non si trascinano più a fondo a vicenda. Il calendario delle
+//    contribuzioni sta su un proxy senza quota, il resto su api.github.com,
+//    che di quota ne ha 60/ora per IP e la esaurisce sul serio. Prima un 403
+//    sul profilo faceva `throw` e portava via tutto, grafico compreso — che
+//    era arrivato benissimo dall'altro servizio. Adesso ogni fonte risponde
+//    per sé, dove manca si ripiega sulla copia locale anche scaduta, e se il
+//    problema è la quota il widget dice fra quanti minuti passa.
+//
 // Multilingua senza motore i18n (è marcato `data-no-i18n`: si traduce da sé
-// leggendo la lingua attiva), cache locale per non martellare le API
-// (non-auth = 60 richieste/ora/IP): il logo è il marchio del sito servito in
-// locale, quindi resta sempre visibile; solo le statistiche extra spariscono
-// elegantemente se la fetch fallisce.
+// leggendo la lingua attiva), cache locale per non martellare le API: il logo
+// è il marchio del sito servito in locale, quindi resta sempre visibile.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── CONFIG ───────────────────────────────────────────────────────────────────
@@ -94,7 +100,7 @@ interface DayCount { day: string; count: number; level: number }
 interface LangStat { name: string; pct: number; color: string }
 interface RepoAgg { totalStars: number; totalForks: number; langs: LangStat[] }
 interface Contrib { series: DayCount[]; yearTotal: number; streak: number; longest: number }
-interface Data { profile: GhProfile; event: GhEvent | null; repo: GhRepo | null; agg: RepoAgg | null; contrib: Contrib | null }
+interface Data { profile: GhProfile | null; event: GhEvent | null; repo: GhRepo | null; agg: RepoAgg | null; contrib: Contrib | null }
 
 // Risposta del proxy jogruber v4
 interface JogruberDay { date: string; count: number; level: number }
@@ -102,7 +108,7 @@ interface JogruberResp { total?: Record<string, number>; contributions?: Jogrube
 
 // ── Stringhe localizzate (il widget si traduce da sé: è marcato data-no-i18n) ─
 const STR: Record<Lang, {
-  loading: string; none: string; latest: string; offline: string;
+  loading: string; none: string; latest: string; offline: string; limited: (m: number) => string;
   repos: string; followers: string; following: string;
   stars: string; forks: string; gists: string;
   commits: string; lastYear: string; less: string; more: string; today: string;
@@ -114,7 +120,9 @@ const STR: Record<Lang, {
   star: (r: string) => string; fork: (r: string) => string; other: (r: string) => string;
 }> = {
   it: {
-    offline: "statistiche GitHub non disponibili adesso", loading: "carico l'attività GitHub…", none: "nessuna attività pubblica recente", latest: "Ultima attività",
+    offline: "statistiche GitHub non disponibili adesso",
+    limited: (m) => `quota GitHub esaurita — torna fra ${m} min`,
+    loading: "carico l'attività GitHub…", none: "nessuna attività pubblica recente", latest: "Ultima attività",
     repos: "repo", followers: "follower", following: "seguiti",
     stars: "stelle", forks: "fork", gists: "gist",
     commits: "commit", lastYear: "ultimo anno", less: "meno", more: "più", today: "oggi",
@@ -125,7 +133,9 @@ const STR: Record<Lang, {
     star: (r) => `star a ${r}`, fork: (r) => `fork di ${r}`, other: (r) => `attività su ${r}`,
   },
   en: {
-    offline: "GitHub stats unavailable right now", loading: "loading GitHub activity…", none: "no recent public activity", latest: "Latest activity",
+    offline: "GitHub stats unavailable right now",
+    limited: (m) => `GitHub rate limit reached — back in ${m} min`,
+    loading: "loading GitHub activity…", none: "no recent public activity", latest: "Latest activity",
     repos: "repos", followers: "followers", following: "following",
     stars: "stars", forks: "forks", gists: "gists",
     commits: "commits", lastYear: "last year", less: "less", more: "more", today: "today",
@@ -136,7 +146,9 @@ const STR: Record<Lang, {
     star: (r) => `starred ${r}`, fork: (r) => `forked ${r}`, other: (r) => `activity on ${r}`,
   },
   fr: {
-    offline: "statistiques GitHub indisponibles pour le moment", loading: "chargement de l'activité GitHub…", none: "aucune activité publique récente", latest: "Dernière activité",
+    offline: "statistiques GitHub indisponibles pour le moment",
+    limited: (m) => `quota GitHub atteint — de retour dans ${m} min`,
+    loading: "chargement de l'activité GitHub…", none: "aucune activité publique récente", latest: "Dernière activité",
     repos: "dépôts", followers: "abonnés", following: "abonnements",
     stars: "étoiles", forks: "forks", gists: "gists",
     commits: "commits", lastYear: "l'an dernier", less: "moins", more: "plus", today: "aujourd'hui",
@@ -147,7 +159,9 @@ const STR: Record<Lang, {
     star: (r) => `étoile à ${r}`, fork: (r) => `fork de ${r}`, other: (r) => `activité sur ${r}`,
   },
   de: {
-    offline: "GitHub-Statistiken gerade nicht verfügbar", loading: "GitHub-Aktivität wird geladen…", none: "keine aktuelle öffentliche Aktivität", latest: "Letzte Aktivität",
+    offline: "GitHub-Statistiken gerade nicht verfügbar",
+    limited: (m) => `GitHub-Kontingent erschöpft — in ${m} Min. wieder da`,
+    loading: "GitHub-Aktivität wird geladen…", none: "keine aktuelle öffentliche Aktivität", latest: "Letzte Aktivität",
     repos: "Repos", followers: "Follower", following: "folgt",
     stars: "Sterne", forks: "Forks", gists: "Gists",
     commits: "Commits", lastYear: "letztes Jahr", less: "weniger", more: "mehr", today: "heute",
@@ -242,17 +256,31 @@ function buildContrib(j: JogruberResp): Contrib | null {
   return { series, yearTotal, streak, longest };
 }
 
-function readCache(): Data | null {
+/** La copia locale, con la sua età. Chi legge decide cosa farne: `fresca` vuol
+ *  dire «non serve uscire in rete», scaduta vuol dire «riprova, ma tienila da
+ *  parte» — vedi la rete di sicurezza nell'effetto qui sotto. */
+function readCache(): { fresca: boolean; data: Data } | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
     const c = JSON.parse(raw) as { at: number } & Data;
-    if (!c.at || Date.now() - c.at > CACHE_TTL) return null;
-    return { profile: c.profile, event: c.event, repo: c.repo, agg: c.agg ?? null, contrib: c.contrib ?? null };
+    if (!c.at || !c.profile) return null;
+    return {
+      fresca: Date.now() - c.at <= CACHE_TTL,
+      data: { profile: c.profile, event: c.event, repo: c.repo, agg: c.agg ?? null, contrib: c.contrib ?? null },
+    };
   } catch { return null; }
 }
 function writeCache(d: Data): void {
   try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), ...d })); } catch { /* storage non disponibile */ }
+}
+
+/** Minuti che mancano al ripristino della quota, letti dall'intestazione della
+ *  risposta 403. Serve a dire QUANDO invece di dire «adesso no». */
+function minutiAlRipristino(r: Response): number | null {
+  const reset = Number(r.headers.get("x-ratelimit-reset"));
+  if (!reset) return null;
+  return Math.max(1, Math.ceil((reset * 1000 - Date.now()) / 60000));
 }
 
 /** Data locale a mezzanotte: `new Date("2026-08-23")` sarebbe letta come UTC e
@@ -263,6 +291,8 @@ export default function GitHubFooterWidget() {
   const [lang, setLang] = useState<Lang>(() => getLang());
   const [data, setData] = useState<Data | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  // Minuti al ripristino della quota GitHub; null = non è quello il problema.
+  const [limite, setLimite] = useState<number | null>(null);
 
   useEffect(() => subscribeLang(setLang), []);
 
@@ -270,49 +300,84 @@ export default function GitHubFooterWidget() {
     let cancelled = false;
 
     const cached = readCache();
-    if (cached) { setData(cached); setStatus("ready"); return; }
+    // Copia fresca: non si esce nemmeno in rete. È il modo principale con cui
+    // questo widget non consuma la quota (60 richieste/ora per IP, e una
+    // visita ne spende tre).
+    if (cached?.fresca) { setData(cached.data); setStatus("ready"); return; }
 
     const gh = (path: string) =>
-      fetch(`https://api.github.com${path}`, { headers: { Accept: "application/vnd.github+json" } });
+      fetch(`https://api.github.com${path}`, { headers: { Accept: "application/vnd.github+json" } })
+        .catch(() => null);
 
     (async () => {
-      try {
-        // Il calendario contribuzioni è su un proxy esterno: se cade non deve
-        // abbattere il resto → lo isoliamo con .catch(() => null).
-        const contribP: Promise<JogruberResp | null> = fetch(CONTRIB_API(GITHUB_USERNAME))
-          .then((r) => (r.ok ? (r.json() as Promise<JogruberResp>) : null))
-          .catch(() => null);
+      // ── Le fonti sono DUE, e indipendenti ────────────────────────────────
+      // Il calendario delle contribuzioni sta su un proxy pubblico che non ha
+      // quota; profilo, eventi e repo stanno su api.github.com, che ce l'ha e
+      // che si esaurisce davvero. Prima un 403 sul profilo faceva `throw` e
+      // buttava via TUTTO — istogramma compreso, che però era arrivato benissimo
+      // dall'altro servizio. Da fuori sembrava che il footer fosse rotto,
+      // mentre il pezzo che conta era lì pronto da disegnare.
+      // Adesso ogni fonte risponde per sé e si mostra quello che è arrivato.
+      const contribP: Promise<JogruberResp | null> = fetch(CONTRIB_API(GITHUB_USERNAME))
+        .then((r) => (r.ok ? (r.json() as Promise<JogruberResp>) : null))
+        .catch(() => null);
 
-        const [pRes, eRes, rRes, cj] = await Promise.all([
-          gh(`/users/${GITHUB_USERNAME}`),
-          gh(`/users/${GITHUB_USERNAME}/events/public?per_page=100`),
-          gh(`/users/${GITHUB_USERNAME}/repos?per_page=100&sort=pushed`),
-          contribP,
-        ]);
-        if (!pRes.ok) throw new Error("GitHub profile unavailable");
+      const [pRes, eRes, rRes, cj] = await Promise.all([
+        gh(`/users/${GITHUB_USERNAME}`),
+        gh(`/users/${GITHUB_USERNAME}/events/public?per_page=100`),
+        gh(`/users/${GITHUB_USERNAME}/repos?per_page=100&sort=pushed`),
+        contribP,
+      ]);
+      if (cancelled) return;
 
-        const profile = (await pRes.json()) as GhProfile;
-        const events = eRes.ok ? ((await eRes.json()) as GhEvent[]) : [];
-        const repos = rRes.ok ? ((await rRes.json()) as GhRepo[]) : [];
-        const list = Array.isArray(events) ? events : [];
-        const repoList = Array.isArray(repos) ? repos : [];
+      // Quota esaurita: GitHub risponde 403 con l'ora del ripristino. Vale la
+      // pena distinguerlo da un guasto — è una cosa che passa da sola, e si
+      // può dire fra quanto.
+      const quotaFinita = !!pRes && pRes.status === 403;
+      if (quotaFinita && pRes) setLimite(minutiAlRipristino(pRes));
 
-        const agg = repoList.length ? aggregateRepos(repoList) : null;
-        const featured = FEATURED_REPO
-          ? repoList.find((r) => r.name.toLowerCase() === FEATURED_REPO.toLowerCase()) ?? null
-          : null;
+      const jsonOk = async <T,>(r: Response | null): Promise<T | null> => {
+        if (!r || !r.ok) return null;
+        try { return (await r.json()) as T; } catch { return null; }
+      };
 
-        let contrib: Contrib | null = null;
-        try { if (cj) contrib = buildContrib(cj); } catch { contrib = null; }
+      const profileVivo = await jsonOk<GhProfile>(pRes);
+      const events = (await jsonOk<GhEvent[]>(eRes)) ?? [];
+      const repos = (await jsonOk<GhRepo[]>(rRes)) ?? [];
+      const list = Array.isArray(events) ? events : [];
+      const repoList = Array.isArray(repos) ? repos : [];
 
-        if (cancelled) return;
-        const next: Data = { profile, event: list[0] ?? null, repo: featured, agg, contrib };
-        setData(next);
-        setStatus("ready");
-        writeCache(next);
-      } catch {
-        if (!cancelled) setStatus("error");
-      }
+      let contribVivo: Contrib | null = null;
+      try { if (cj) contribVivo = buildContrib(cj); } catch { contribVivo = null; }
+
+      if (cancelled) return;
+
+      // La rete di sicurezza: dove la chiamata non ha risposto si ripiega sulla
+      // copia locale scaduta. Numeri di ieri sono infinitamente meglio di una
+      // scusa — e il grafico, che viene dall'altra fonte, resta di oggi.
+      const vecchio = cached?.data ?? null;
+      const profile = profileVivo ?? vecchio?.profile ?? null;
+      const contrib = contribVivo ?? vecchio?.contrib ?? null;
+      const agg = repoList.length ? aggregateRepos(repoList) : vecchio?.agg ?? null;
+      const featured = repoList.length
+        ? (FEATURED_REPO
+            ? repoList.find((r) => r.name.toLowerCase() === FEATURED_REPO.toLowerCase()) ?? null
+            : null)
+        : vecchio?.repo ?? null;
+      const event = list[0] ?? vecchio?.event ?? null;
+
+      // «Pronto» vuol dire che c'è qualcosa da mostrare, non che è arrivato
+      // tutto: col profilo scaduto e l'istogramma fresco il footer ha comunque
+      // il suo pezzo forte.
+      if (!profile && !contrib) { setStatus("error"); return; }
+      const next: Data = { profile, event, repo: featured, agg, contrib };
+      setData(next);
+      setStatus("ready");
+
+      // Si riscrive la copia SOLO se il profilo è arrivato davvero: rinfrescare
+      // la data su dati ripescati dalla cache vecchia vorrebbe dire dichiararli
+      // freschi e non riprovare per un'altra ora.
+      if (profileVivo) writeCache(next);
     })();
 
     return () => { cancelled = true; };
@@ -372,10 +437,13 @@ export default function GitHubFooterWidget() {
 
         {status === "loading" && <span className="sb-gh__skeleton">{s.loading}</span>}
         {/* La quota non autenticata di GitHub è 60 richieste/ora per IP, e una
-            visita ne spende tre: capita davvero di arrivare a quota. Prima in
-            quel caso restava un riquadro vuoto largo mezza pagina, che sembra
-            un guasto; adesso dice cos'è successo. */}
-        {status === "error" && <span className="sb-gh__since">{s.offline}</span>}
+            visita ne spende tre: capita davvero di arrivare a quota. Se è
+            quello, si dice anche fra quanto passa — è un'attesa, non un
+            guasto. Il messaggio compare anche quando il grafico c'è, perché
+            spiega perché mancano le chip. */}
+        {(status === "error" || (status === "ready" && !p)) && (
+          <span className="sb-gh__since">{limite ? s.limited(limite) : s.offline}</span>
+        )}
 
         {p && (
           <>
@@ -392,12 +460,18 @@ export default function GitHubFooterWidget() {
         )}
       </div>
 
-      {status === "ready" && data && p && (
+      {status === "ready" && data && (
         <>
           {/* ── Riga 2: l'istogramma. Sta PRIMA delle chip, e non è un
               dettaglio d'ordine: è il pezzo con dentro l'informazione, le chip
               sono il contorno. Prima veniva dopo, e la cosa che si guarda per
-              ultima non è mai quella che conta. ── */}
+              ultima non è mai quella che conta.
+
+              Il suo `if` guarda SOLO contrib, e non il profilo: i due dati
+              vengono da servizi diversi, e il calendario delle contribuzioni
+              arriva da uno che non ha quota. Prima bastava un 403 su
+              api.github.com — che qui capita per davvero — perché sparisse
+              anche il grafico, che era lì pronto. ── */}
           {contrib && (
             <figure className="sb-gh__chart">
               <figcaption className="sb-gh__cap">
@@ -465,33 +539,36 @@ export default function GitHubFooterWidget() {
             </figure>
           )}
 
-          {/* ── Riga 3: chip statistiche reali + repo in evidenza ── */}
-          <div className="sb-gh__chips">
-            <span className="sb-gh__chip"><b>{p.public_repos}</b> {s.repos}</span>
-            <span className="sb-gh__chip"><b>{p.followers}</b> {s.followers}</span>
-            <span className="sb-gh__chip"><b>{p.following}</b> {s.following}</span>
-            {agg && (
-              <span className="sb-gh__chip"><span className="sb-gh__star" aria-hidden="true">★</span> <b>{agg.totalStars}</b> {s.stars}</span>
-            )}
-            {agg && agg.totalForks > 0 && (
-              <span className="sb-gh__chip"><b>{agg.totalForks}</b> {s.forks}</span>
-            )}
-            {p.public_gists > 0 && (
-              <span className="sb-gh__chip"><b>{p.public_gists}</b> {s.gists}</span>
-            )}
-            {data.repo && (
-              <a className="sb-gh__chip" href={data.repo.html_url} target="_blank" rel="noreferrer noopener">
-                <span className="sb-gh__star" aria-hidden="true">★</span> {data.repo.name}
-                {data.repo.language && (
-                  <>
-                    {" — "}
-                    <i className="sb-gh__langdot" style={{ background: langColor(data.repo.language) }} aria-hidden="true" />
-                    {" "}{data.repo.language}
-                  </>
-                )}
-              </a>
-            )}
-          </div>
+          {/* ── Riga 3: chip statistiche reali + repo in evidenza.
+              Queste sì che dipendono dal profilo: sono i suoi numeri. ── */}
+          {p && (
+            <div className="sb-gh__chips">
+              <span className="sb-gh__chip"><b>{p.public_repos}</b> {s.repos}</span>
+              <span className="sb-gh__chip"><b>{p.followers}</b> {s.followers}</span>
+              <span className="sb-gh__chip"><b>{p.following}</b> {s.following}</span>
+              {agg && (
+                <span className="sb-gh__chip"><span className="sb-gh__star" aria-hidden="true">★</span> <b>{agg.totalStars}</b> {s.stars}</span>
+              )}
+              {agg && agg.totalForks > 0 && (
+                <span className="sb-gh__chip"><b>{agg.totalForks}</b> {s.forks}</span>
+              )}
+              {p.public_gists > 0 && (
+                <span className="sb-gh__chip"><b>{p.public_gists}</b> {s.gists}</span>
+              )}
+              {data.repo && (
+                <a className="sb-gh__chip" href={data.repo.html_url} target="_blank" rel="noreferrer noopener">
+                  <span className="sb-gh__star" aria-hidden="true">★</span> {data.repo.name}
+                  {data.repo.language && (
+                    <>
+                      {" — "}
+                      <i className="sb-gh__langdot" style={{ background: langColor(data.repo.language) }} aria-hidden="true" />
+                      {" "}{data.repo.language}
+                    </>
+                  )}
+                </a>
+              )}
+            </div>
+          )}
 
           {/* ── Riga 4: linguaggi più usati ── */}
           {agg && agg.langs.length > 0 && (
