@@ -1318,44 +1318,53 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 /* ═══════════════════════════════════════════════════════════════════════════
    I DISEGNI DELLA GRIGLIA PRODOTTI
 
-   Sei tavole da 280×170, stesso terreno, stessi tre pesi di linea. Vedi la
-   nota in testa a site/homeLive.tsx per che cosa disegnano e da quale tavola
-   di Supabase viene ciascuna.
+   Sei tavole da 280×170, stesso terreno, stessi pesi di linea. Vedi la nota in
+   testa a site/homeLive.tsx per che cosa disegnano e da quale tavola di
+   Supabase viene ciascuna.
 
-   ── Il terreno, che prima non c'era ─────────────────────────────────────────
-   Le figure erano tratti sospesi nel vuoto della card. Le quattro tavole di
-   Supabase — Realtime, Vector, Storage, Postgres — non sono mai sospese:
-   hanno sotto una carta a quadretti che sfuma, e sopra pezzi di interfaccia
-   veri. È quello che le fa sembrare pezzi di prodotto invece che illustrazioni,
-   ed è la sola differenza che contava.
+   ── Il giro di adesso: la LUCE ──────────────────────────────────────────────
+   Le tavole avevano già il terreno (carta millimetrata + alone), e stavano in
+   piedi. Quello che non avevano era il colore: il 95 % dell'inchiostro era
+   grigio, e la tinta della card faceva da guarnizione — un anello qui, un
+   puntino là. Sei tavole grigie in fila tornavano a essere «tutto molto
+   uguale», che è il difetto per cui erano nate le sei tinte.
 
-   Tre strati, sempre in quest'ordine: carta millimetrata mascherata a sfumare,
-   alone della tinta della card, figura. I primi due li mette Plate() una volta
-   per tutte; il terzo cambia.
+   Adesso la tinta è la LUCE della tavola, e arriva in quattro modi, sempre gli
+   stessi:
+
+     ① l'alone, più forte e a due fermate (lo mette Plate);
+     ② la carta millimetrata ridisegnata NELLA TINTA dentro una macchia stretta
+        al centro: il colore non è steso sopra, esce da sotto (Plate);
+     ③ i pieni e i tratti del soggetto, che prendono un gradiente della tinta
+        invece di un grigio — `acc("nome")` in homeLive.tsx;
+     ④ il bagliore: lo stesso tracciato disegnato una prima volta largo e quasi
+        trasparente, come le insegne al neon (.sb-ill-bloom).
+
+   Il bagliore non è un feGaussianBlur apposta: un filtro costa un buffer
+   sfocato per tavola, ridipinto ogni volta che qualcosa dentro si muove. Due
+   tracciati invece di uno costano una passata di disegno e nient'altro.
 
    ── I pesi di linea ─────────────────────────────────────────────────────────
    Tre, e bastano: --ill-grid per il terreno, --ill-line per la struttura,
    --ill-ink per quello che sta davanti. Nessuno dei tre è un colore di
    interfaccia (--sb-border e compagnia): quelli, su una lastra di vetro,
    spariscono. Sono tutti e tre il colore del testo diluito, così seguono il
-   tema da sé, in chiaro come in scuro.
-
-   Il quarto colore è la tinta della card, --sb-accent, e arriva dal data-acc
-   che la card porta addosso: qui non è mai scritta a mano.
+   tema da sé, in chiaro come in scuro. Il quarto colore è --sb-accent, e
+   arriva dal data-acc che la card porta addosso: qui non è mai scritto a mano.
 
    ── Come si muovono ─────────────────────────────────────────────────────────
-   Una cosa sola per riquadro, e su quattro proprietà soltanto — transform,
-   opacity, fill su cerchi da 3px (i vertici del volume) e lo scostamento di un
-   tratteggio su un tracciato solo (l'impulso del globo). Niente che rifaccia
-   il layout, tranne la pillola del comando, che è un caso a parte e spiegato
-   lì.
+   Una cosa sola per riquadro, e su tre proprietà soltanto — transform, opacity
+   e lo scostamento di un tratteggio su un tracciato solo (l'impulso del
+   globo). Niente che rifaccia il layout, tranne la pillola del comando, che è
+   un caso a parte e spiegato lì.
 
    ── Il fotogramma di riposo ─────────────────────────────────────────────────
-   Ogni regola base è scritta sul fotogramma FINITO: finestra composta, anello
-   sul suo fotogramma, lancetta a fondo scala. Le keyframe partono di lì e ci
-   tornano. Serve perché spegnere un'animazione (prefers-reduced-motion) lascia
-   l'elemento sui valori della regola normale: se quelli fossero il primo
-   fotogramma, chi ha chiesto meno movimento vedrebbe sei tavole a metà.
+   Ogni regola base è scritta sul fotogramma FINITO: finestra composta, impulso
+   arrivato, lancetta a fondo scala con tutte le spie accese. Le keyframe
+   partono di lì e ci tornano. Serve perché spegnere un'animazione
+   (prefers-reduced-motion) lascia l'elemento sui valori della regola normale:
+   se quelli fossero il primo fotogramma, chi ha chiesto meno movimento
+   vedrebbe sei tavole a metà.
 
    E da quando il gesto parte solo al passaggio del puntatore, quel fotogramma
    non è più una rete di sicurezza: è quello che si vede quasi sempre, su ogni
@@ -1375,11 +1384,29 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   display: block;
   width: 100%;
   height: auto;
-  /* currentColor della tavola È la tinta della card: se la legge l'alone
-     radiale dentro Plate(), che così non ha bisogno di sapere quale sia. */
+  /* currentColor della tavola È la tinta della card: se lo leggono l'alone,
+     la macchia di luce e i gradienti dentro Plate(), che così non hanno
+     bisogno di sapere quale sia. */
   color: var(--ill-acc);
   stroke-linecap: round;
   stroke-linejoin: round;
+  /* Il respiro al passaggio: la tavola si avvicina di un soffio. Su transform,
+     cioè senza rifare né layout né disegno. */
+  transform: scale(1);
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+/* Il testo dentro le tavole — indirizzo, targhette, quote, cifre del quadrante
+   — è sempre lo stesso carattere: il mono del sito. Sono pezzi di strumento,
+   non prosa. */
+/* :where() e non `.sb-ill text`: un selettore discendente pesa 0,1,1 e batterebbe
+   le classi (0,1,0) che qui sotto danno a ogni scritta il suo colore — la
+   targhetta bianca sul fotogramma scelto veniva grigio inchiostro, e non si
+   capiva perché. Dentro :where() questa regola pesa ZERO, quindi è davvero
+   quello che dice di essere: il valore di partenza, che chiunque scavalca. */
+:where(.sb-ill text) {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  fill: var(--ill-ink);
+  stroke: none;
 }
 /* Il quadretto del terreno. Sta dentro <pattern>, che è nei <defs>: si stila
    da qui come qualsiasi altro elemento SVG. */
@@ -1388,6 +1415,32 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   stroke: var(--ill-grid);
   stroke-width: 0.6;
 }
+/* Lo stesso quadretto nella tinta, che si vede solo dentro la macchia di luce.
+   Va più carico del grigio: mascherato com'è, sui bordi della macchia arriva
+   già dimezzato. */
+.sb-ill-gridline--acc {
+  stroke: color-mix(in srgb, var(--ill-acc) 42%, transparent);
+  stroke-width: 0.7;
+}
+/* L'alone. A riposo sta un po' sotto al suo massimo, così l'hover ha dove
+   salire: è l'unica differenza fra tavola guardata e tavola no che si veda
+   anche su una figura ferma. */
+.sb-ill-glow {
+  opacity: 0.82;
+  transition: opacity 0.45s ease;
+}
+/* Il bagliore: il tracciato ripassato largo e trasparente. Ogni figura che ne
+   ha uno lo disegna PRIMA del tratto, così la luce esce da sotto. */
+.sb-ill-bloom {
+  fill: none;
+  stroke: var(--ill-acc);
+  stroke-width: 7;
+  opacity: 0.16;
+  transition: opacity 0.45s ease;
+}
+.sb-ill-bloom--roof { stroke-width: 10; opacity: 0.13; }
+.sb-ill-bloom--red { stroke-width: 9; opacity: 0.26; }
+
 /* Il palco: serve alle due tavole che hanno sopra dell'HTML (le righe con i
    domini, la pillola del comando). */
 .sb-ill-stage { position: relative; width: 100%; }
@@ -1407,20 +1460,42 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-ill-stage--globe { align-self: safe center; }
 
 /* ── ① Siti web — la finestra e i suoi echi ─────────────────────────────────
-   Gli echi sono quattro <use> della stessa forma. La rotazione sta in CSS e
-   non nell'attributo transform per una ragione precisa: una transform CSS
-   sostituisce l'attributo per intero, quindi tenerne una in ciascun posto
-   vuol dire perderne una. La posizione viaggia su x/y del <use>, che sono
-   attributi di geometria e non vengono toccati. */
+   La sagoma è quella della casa: due tagli a 45°, in alto a sinistra e in
+   basso a destra. La disegna un tracciato solo (WIN_D in homeLive.tsx), che
+   percorrono in quattro — il bagliore, i tre echi e la cornice.
+
+   La rotazione degli echi sta in CSS e non nell'attributo transform per una
+   ragione precisa: una transform CSS sostituisce l'attributo per intero,
+   quindi tenerne una in ciascun posto vuol dire perderne una. La posizione
+   viaggia su x/y del <use>, che sono attributi di geometria e non si toccano. */
 .sb-ill-frame { fill: var(--sb-bg); stroke: var(--ill-ink); stroke-width: 1.6; }
 .sb-ill-line { stroke: var(--ill-line); stroke-width: 1.3; }
 .sb-ill-dot { fill: var(--ill-line); }
 .sb-ill-block { fill: var(--ill-fill); stroke: var(--ill-line); stroke-width: 1.1; }
-.sb-ill-block--hi {
-  fill: color-mix(in srgb, var(--ill-acc) 20%, transparent);
-  stroke: color-mix(in srgb, var(--ill-acc) 60%, transparent);
+/* La pillola dell'indirizzo, nella barra. Stessa costruzione della barra di
+   FreshWork: fondo di superficie, filo intorno, testo smorzato. */
+.sb-ill-urlbar { fill: var(--sb-surface-100); stroke: var(--ill-grid); stroke-width: 1; }
+.sb-ill-url { font-size: 9px; fill: var(--sb-fg-lighter); letter-spacing: -0.2px; }
+/* La hero della pagina disegnata: l'unico pieno della tinta della finestra. */
+.sb-ill-hero {
+  fill: color-mix(in srgb, var(--ill-acc) 15%, transparent);
+  stroke: color-mix(in srgb, var(--ill-acc) 55%, transparent);
+  stroke-width: 1.2;
 }
+/* Le due righe del titolo, la zolla della gronda, la linea fra i due clienti e
+   l'arco della zona rossa non hanno qui il loro colore: lo portano come
+   ATTRIBUTO, ed è il gradiente della tinta che Plate() dichiara con l'id della
+   tavola (acc("nome") in homeLive.tsx). Il colore va tolto di qui, non
+   raddoppiato: una proprietà di foglio batte l'attributo di presentazione, e
+   il gradiente non arriverebbe mai a destinazione. */
+.sb-ill-brand { stroke: none; }
+.sb-ill-brand--dim { opacity: 0.42; }
+.sb-ill-cta { stroke: none; opacity: 0.85; }
+/* Gli echi: profili della tinta, sventagliati dietro alla finestra. */
 .sb-ill-echo {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ill-acc) 75%, transparent);
+  stroke-width: 1.4;
   transform-box: view-box;
   transform-origin: 140px 85px;
   transform: rotate(var(--r));
@@ -1431,29 +1506,49 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 
 /* ── ② Rivalta e Cascina Fontana — il globo e la linea fra i due ───────────
-   Il reticolo della sfera è un tono più forte della carta millimetrata che ha
-   sotto e uno più debole della struttura: uguale ai quadretti sparirebbe,
-   uguale alla figura la coprirebbe. Il bordo della sfera è l'unico filo del
-   globo che sta sulla riga della struttura, perché è quello che dice dove
-   finisce la palla. */
+   Tre strati di luce sulla palla, e nessun filtro: la calotta illuminata
+   (.sb-ill-ball, che porta il gradiente radiale dichiarato nella figura), il
+   reticolo che si spegne scendendo e il bordo acceso di striscio. */
+/* Il fill è un attributo sulla figura e non una proprietà qui: la tavola
+   dichiara fill="none" sulla radice, e quello scende su tutti i figli — una
+   regola di foglio senza fill lascerebbe la calotta invisibile. */
+.sb-ill-ball { stroke: none; }
 .sb-ill-mesh {
   fill: none;
-  stroke: color-mix(in srgb, var(--sb-fg) 17%, transparent);
+  /* Solo tinta diluita, senza grigio di mezzo: mescolare due colori già
+     trasparenti dimezzava l'alfa e il reticolo veniva fuori smorto. */
+  stroke: color-mix(in srgb, var(--ill-acc) 34%, transparent);
   stroke-width: 0.9;
 }
-.sb-ill-limb { stroke: var(--ill-line); stroke-width: 1.2; }
+/* Il bordo della sfera è l'unico filo del globo con un peso da struttura: è
+   quello che dice dove finisce la palla. Lo stroke è il gradiente dichiarato
+   nella figura — acceso in alto a sinistra, spento in basso a destra. */
+.sb-ill-limb { fill: none; stroke: url(#sb-globe-rim); stroke-width: 1.6; }
 /* I fili che entrano ed escono dal quadro, e i puntini in cui finiscono: la
    rete non comincia e non finisce dentro la card. */
 .sb-ill-wire { stroke: var(--ill-line); stroke-width: 1.2; }
 .sb-ill-tip { fill: var(--ill-line); }
 /* La linea fra i due clienti è il tratto più marcato della tavola: è la cosa
-   che la card dice. I due punti sono uno acceso e uno no, come lo erano le
-   teste dei due spilli di prima — e quello spento è pieno del colore del
-   fondo e non trasparente, se no la linea gli passerebbe attraverso. */
-.sb-ill-link { stroke: var(--ill-ink); stroke-width: 1.7; }
-.sb-ill-node { fill: var(--sb-bg); stroke: var(--ill-ink); stroke-width: 1.6; }
+   che la card dice, ed è l'unica della tinta piena. */
+.sb-ill-link { fill: none; stroke-width: 2.1; }
+.sb-ill-node { fill: var(--sb-bg); stroke: var(--ill-acc); stroke-width: 1.8; }
 .sb-ill-node--on { fill: var(--ill-acc); stroke: none; }
-.sb-ill-halo { fill: color-mix(in srgb, var(--ill-acc) 20%, transparent); }
+.sb-ill-halo { fill: color-mix(in srgb, var(--ill-acc) 26%, transparent); }
+/* L'anello che si allarga all'arrivo dell'impulso. A riposo è finito: allargato
+   del tutto e ormai trasparente, cioè invisibile — che è il fotogramma giusto,
+   perché a riposo l'impulso è già arrivato. */
+.sb-ill-ping {
+  fill: none;
+  stroke: var(--ill-acc);
+  stroke-width: 2;
+  transform-box: view-box;
+  transform-origin: 178px 112px;
+  transform: scale(2.6);
+  opacity: 0;
+  animation-duration: 1.5s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-iteration-count: 2;
+}
 /* L'impulso che va da Rivalta a Cascina. Non è un oggetto in più che si
    sposta: è la STESSA linea, disegnata una seconda volta con un tratteggio
    fatto di un trattino corto e di un vuoto lunghissimo — a muoverlo è lo
@@ -1461,17 +1556,16 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
    A riposo lo scostamento lo porta oltre la fine del tracciato, dove un
    tratteggio non disegna niente: il fotogramma finito è l'impulso ARRIVATO,
-   cioè la linea pulita fra i due punti. È la stessa regola delle altre cinque
-   tavole, e qui viene gratis. */
+   cioè la linea pulita fra i due punti. */
 .sb-ill-pulse {
-  stroke: var(--ill-acc);
-  stroke-width: 3;
+  stroke: color-mix(in srgb, var(--ill-acc) 55%, #fff);
+  stroke-width: 3.6;
   stroke-dasharray: 13 400;
   stroke-dashoffset: -138;
   animation-duration: 1.5s;
   animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
-  /* Due passaggi, come i tre battiti dei puntini della card ③: uno solo si
-     perde se il puntatore entra da un angolo, tre diventano un semaforo. */
+  /* Due passaggi, come i battiti dei puntini della card ③: uno solo si perde
+     se il puntatore entra da un angolo, tre diventano un semaforo. */
   animation-iteration-count: 2;
 }
 /* Le due righe con il marchio, in alto: è il posto della pillola nella tavola
@@ -1503,7 +1597,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   stroke-width: 1.3;
 }
 
-/* ── ③ Sviluppo con l'IA — cursori e bollicine ─────────────────────────────*/
+/* ── ③ Sviluppo con l'IA — due cursori, e i loro nomi ──────────────────────*/
 .sb-ill-bubble rect {
   fill: var(--sb-surface-100);
   stroke: var(--ill-line);
@@ -1511,8 +1605,8 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 .sb-ill-bdot { fill: var(--ill-line); }
 .sb-ill-bubble--on rect {
-  fill: color-mix(in srgb, var(--ill-acc) 16%, var(--sb-surface-100));
-  stroke: color-mix(in srgb, var(--ill-acc) 65%, transparent);
+  fill: color-mix(in srgb, var(--ill-acc) 18%, var(--sb-surface-100));
+  stroke: color-mix(in srgb, var(--ill-acc) 70%, transparent);
 }
 .sb-ill-bubble--on .sb-ill-bdot {
   fill: var(--ill-acc);
@@ -1521,41 +1615,83 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   animation-iteration-count: 3;
   animation-delay: calc(var(--i) * 0.16s);
 }
+/* Il cursore e la sua targhetta si muovono insieme: la transform sta sul
+   gruppo, non sulla freccia. */
 .sb-ill-cursor {
-  fill: color-mix(in srgb, var(--sb-fg) 60%, transparent);
   transform-box: view-box;
   transform: translate(var(--x), var(--y));
   animation-duration: 2.4s;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
-.sb-ill-cursor--b { fill: var(--ill-acc); animation-delay: 0.3s; }
+.sb-ill-caret { fill: color-mix(in srgb, var(--sb-fg) 60%, transparent); stroke: none; }
+.sb-ill-tag { fill: color-mix(in srgb, var(--sb-fg) 60%, transparent); stroke: none; }
+.sb-ill-tagtext { font-size: 10px; fill: var(--sb-bg); }
+/* Il secondo cursore è la macchina, e porta la tinta della card. */
+.sb-ill-cursor--b { animation-delay: 0.3s; }
+.sb-ill-cursor--b .sb-ill-caret,
+.sb-ill-cursor--b .sb-ill-tag { fill: var(--ill-acc); }
+.sb-ill-cursor--b .sb-ill-tagtext { fill: #fff; }
 
-/* ── ④ Fotografia — la provinatura ─────────────────────────────────────────*/
+/* ── ④ Fotografia — il provino a contatto ──────────────────────────────────*/
 .sb-ill-tile {
   fill: var(--ill-fill);
   stroke: color-mix(in srgb, var(--sb-fg) 13%, transparent);
   stroke-width: 1.1;
 }
 .sb-ill-tileglyph { fill: none; stroke: var(--ill-line); stroke-width: 1.3; }
+/* Il fotogramma scelto: cornice, bagliore e targhetta saltano insieme, quindi
+   la transform sta sul gruppo. */
 .sb-ill-tilesel {
-  fill: color-mix(in srgb, var(--ill-acc) 12%, transparent);
-  stroke: var(--ill-acc);
-  stroke-width: 1.8;
   transform-box: view-box;
   animation-duration: 2s;
   animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
 }
+.sb-ill-selbloom {
+  fill: none;
+  stroke: var(--ill-acc);
+  stroke-width: 7;
+  opacity: 0.2;
+  transition: opacity 0.45s ease;
+}
+.sb-ill-selbox {
+  fill: color-mix(in srgb, var(--ill-acc) 16%, transparent);
+  stroke: var(--ill-acc);
+  stroke-width: 2;
+}
+.sb-ill-seltag { fill: var(--ill-acc); stroke: none; }
+.sb-ill-seltext { font-size: 8px; fill: #fff; letter-spacing: -0.2px; }
 
-/* ── ⑤ Il geometra — il volume in assonometria ─────────────────────────────*/
-.sb-ill-cubeface { fill: color-mix(in srgb, var(--ill-acc) 9%, transparent); stroke: none; }
-.sb-ill-cubeline { fill: none; stroke: var(--ill-ink); stroke-width: 1.6; }
-.sb-ill-cubehidden {
+/* ── ⑤ Il geometra — la tettoia in assonometria ────────────────────────────
+   Le convenzioni del disegno tecnico, e sono quelle: il tratteggio fine per
+   quello che sta sotto o dietro (l'ingombro a terra, il pilastro lontano), il
+   tratto pieno per la struttura, la falda in tinta trasparente, e la quota con
+   il numero. */
+.sb-ill-cadhidden {
   fill: none;
   stroke: var(--ill-line);
   stroke-width: 1;
   stroke-dasharray: 3 3.5;
 }
-.sb-ill-vertex-dot {
+.sb-ill-roof {
+  stroke: none;
+  /* Il gradiente arriva pieno: qui si diluisce, ed è la falda vista in
+     trasparenza — sotto ci si deve vedere il travetto. */
+  opacity: 0.3;
+}
+.sb-ill-rafter { fill: none; stroke: color-mix(in srgb, var(--ill-acc) 55%, transparent); stroke-width: 1.2; }
+.sb-ill-cadline { fill: none; stroke: var(--ill-ink); stroke-width: 1.7; }
+/* La costa della falda: pieno della tinta, un tono più carico del piano, così
+   lo spessore si stacca dalla faccia che ha sopra. */
+.sb-ill-eave {
+  fill: color-mix(in srgb, var(--ill-acc) 42%, transparent);
+  stroke: var(--ill-ink);
+  stroke-width: 1;
+}
+/* I pilastri portano: sono il tratto più grosso della tavola dopo la falda. */
+.sb-ill-post { fill: none; stroke: var(--ill-ink); stroke-width: 2.6; }
+/* I punti notevoli. Sono quadratini e non pallini apposta: lo snap di un CAD
+   si disegna così, e chi ha usato AutoCAD lo riconosce prima di leggerlo. */
+.sb-ill-snap {
   fill: var(--sb-bg);
   stroke: var(--ill-acc);
   stroke-width: 1.6;
@@ -1563,34 +1699,54 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   animation-timing-function: ease-in-out;
   animation-delay: calc(var(--i) * 0.08s);
 }
-.sb-ill-mote {
-  fill: var(--ill-acc);
-  opacity: 0.4;
-  transform-box: view-box;
-  animation-duration: 2.6s;
-  animation-timing-function: ease-in-out;
-  animation-delay: calc(var(--i) * 0.25s);
-}
 .sb-ill-quote { fill: none; stroke: var(--ill-line); stroke-width: 1.2; }
+.sb-ill-quotenum { font-size: 10px; fill: var(--sb-fg-light); }
 
-/* ── ⑥ Auto — il quadrante ─────────────────────────────────────────────────*/
-.sb-ill-dial { stroke: var(--ill-line); stroke-width: 1.6; }
+/* ── ⑥ Auto — il contagiri ─────────────────────────────────────────────────*/
+.sb-ill-dial { fill: none; stroke: var(--ill-line); stroke-width: 1.6; }
 .sb-ill-tickmark { stroke: var(--ill-line); stroke-width: 1.6; }
 .sb-ill-tickmark--red { stroke: var(--ill-acc); }
+.sb-ill-dialnum { font-size: 11px; fill: var(--sb-fg-light); }
+.sb-ill-dialunit { font-size: 8px; fill: var(--sb-fg-lighter); letter-spacing: 0.3px; }
+/* La zona rossa: un arco della tinta appoggiato sul quadrante, dalla settima
+   tacca al fondo scala. È la tinta della card usata per quello che è — un
+   limite. */
+.sb-ill-redline { fill: none; stroke-width: 3.4; }
+/* La barretta che tiene le spie in fila: un pezzo di strumento, non un
+   contorno decorativo. */
+.sb-ill-shiftbar {
+  fill: color-mix(in srgb, var(--sb-surface-100) 82%, transparent);
+  stroke: var(--ill-grid);
+  stroke-width: 1;
+}
+/* Le spie del cambio. A riposo sono tutte accese, perché a riposo la lancetta
+   è a fondo scala: il fotogramma finito. */
+.sb-ill-shift {
+  fill: var(--ill-acc);
+  stroke: none;
+  opacity: 1;
+  animation-duration: 1.8s;
+  animation-timing-function: steps(1, end);
+}
 /* La lancetta è disegnata dritta in su e ruota: la geometria non sa niente
    dell'angolo, e l'angolo è l'unica cosa che si anima. A riposo sta a fondo
    scala. */
 .sb-ill-needle {
   transform-box: view-box;
   transform-origin: 140px 124px;
-  transform: rotate(72deg);
+  /* 81° e non 72: a 72 la lancetta ferma cadeva addosso alla cifra 8, e una
+     lancetta che copre un numero del quadrante è un disegno sbagliato. A 81 sta
+     fra l'otto e il fondo scala, che è anche il posto giusto — a riposo il
+     motore è al limite. */
+  transform: rotate(81deg);
   animation-duration: 1.8s;
   animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
 }
-.sb-ill-needle path { stroke: var(--ill-ink); stroke-width: 2; }
-.sb-ill-needle--ghost { transform: rotate(calc(72deg - var(--d))); opacity: var(--o); }
+.sb-ill-needle path { stroke: var(--ill-ink); stroke-width: 2.2; }
+.sb-ill-needle-glow { stroke: var(--ill-acc) !important; stroke-width: 7 !important; opacity: 0.22; }
+.sb-ill-needle--ghost { transform: rotate(calc(81deg - var(--d))); opacity: var(--o); }
 .sb-ill-needle--ghost path { stroke: var(--ill-acc); }
-.sb-ill-hub { fill: var(--ill-ink); }
+.sb-ill-hub { fill: var(--ill-ink); stroke: none; }
 
 /* ── ③ bis · La riga di comando che si riscrive ──────────────────────────────
    La pillola sulla tavola dell'IA, presa dalla card Edge Functions di
@@ -1667,7 +1823,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    Tutte partono e finiscono sul fotogramma di riposo: quello che si vede
    uscendo dalla card è la figura composta, non un fotogramma a caso. */
 @keyframes sb-ill-echo {
-  50% { transform: rotate(calc(var(--r) * 2.2)); opacity: calc(var(--o) * 1.5); }
+  50% { transform: rotate(calc(var(--r) * 2.2)); opacity: calc(var(--o) * 1.35); }
 }
 /* L'impulso parte da dentro il primo punto — a 13 il trattino sta tutto prima
    dell'inizio del tracciato, quindi non si vede — e finisce oltre l'ultimo,
@@ -1675,6 +1831,14 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 @keyframes sb-ill-hop {
   0% { stroke-dashoffset: 13; }
   100% { stroke-dashoffset: -138; }
+}
+/* L'anello dell'arrivo: parte piccolo e pieno quando l'impulso è a fine corsa,
+   si allarga e svanisce. Fino al 70 % non si vede, perché fino al 70 %
+   l'impulso è ancora per strada. */
+@keyframes sb-ill-ping {
+  0%, 68% { transform: scale(1); opacity: 0; }
+  74% { transform: scale(1); opacity: 0.75; }
+  100% { transform: scale(2.6); opacity: 0; }
 }
 @keyframes sb-ill-dots {
   0%, 100% { transform: translateY(0); opacity: 0.55; }
@@ -1688,20 +1852,27 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   50%, 62% { transform: translate(128px, 84px); }
   100% { transform: translate(0, 0); }
 }
-@keyframes sb-ill-vtx {
+/* Lo snap: il quadratino si riempie della tinta quando il punto viene
+   agganciato, e torna vuoto. */
+@keyframes sb-ill-snap {
   0%, 100% { fill: var(--sb-bg); }
   45% { fill: var(--ill-acc); }
 }
-@keyframes sb-ill-mote {
-  50% { transform: translateY(-6px); opacity: 0.9; }
-}
 @keyframes sb-ill-needle {
-  0% { transform: rotate(-72deg); }
-  100% { transform: rotate(72deg); }
+  0% { transform: rotate(-81deg); }
+  100% { transform: rotate(81deg); }
 }
 @keyframes sb-ill-needle-ghost {
-  0% { transform: rotate(-72deg); }
-  100% { transform: rotate(calc(72deg - var(--d))); }
+  0% { transform: rotate(-81deg); }
+  100% { transform: rotate(calc(81deg - var(--d))); }
+}
+/* Le spie si accendono in fila mentre la lancetta sale, una ogni tanti giri.
+   steps(1, end) come curva: una spia è accesa o spenta, non c'è una via di
+   mezzo — e con gli scatti i fotogrammi veri sono due per spia, non uno per
+   frame. Il ritardo lo dà --i, che è la posizione della spia nella fila. */
+@keyframes sb-ill-shift {
+  0%, 55% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1717,8 +1888,8 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    La via ovvia — `animation-play-state: paused`, e `running` sull'hover — qui
    NON funziona, ed è istruttivo il perché. Un'animazione in pausa applica
    comunque il suo fotogramma corrente, che al tempo zero è lo 0%; e lo 0% di
-   queste keyframe è la lancetta al minimo, l'anello sul primo fotogramma. Si
-   sarebbero viste sei tavole in attesa di una carezza.
+   queste keyframe è la lancetta al minimo, le spie spente. Si sarebbero viste
+   sei tavole in attesa di una carezza.
 
    Quindi le regole base non hanno un `animation-name`: hanno durata, curva e
    ritardo, ma nessun nome, e senza nome non animano. L'elemento resta sui
@@ -1727,16 +1898,62 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    mentre il puntatore è sulla card. Fuori dall'hover l'animazione non è in
    pausa: non esiste, e non costa niente al compositore.
 
+   Qui dentro sta anche l'ACCENSIONE della tavola: alone e bagliori salgono al
+   massimo e la figura si avvicina di un soffio. Sono transizioni su opacity e
+   transform — due proprietà che il compositore muove da solo — e scattano una
+   volta all'entrata e una all'uscita, non a ogni fotogramma.
+
    `hover: hover` e `pointer: fine` chiudono fuori i telefoni, dove un hover o
    non c'è o resta appiccicato dopo il tocco: lì restano le sei tavole
    disegnate, ferme, che è esattamente quello che Supabase serve da mobile.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ── E una volta sola, arrivando a vista ─────────────────────────────────────
+   Gli stessi nomi, accesi da un attributo che la regia mette sulla card quando
+   entra in scena e toglie tre secondi e mezzo dopo (site/homeMotion.ts ③).
+   Serve dove un puntatore non esiste: sul telefono la griglia è la prima cosa
+   che si incontra scendendo, e restava sei disegni fermi per sempre.
+
+   Perché è un blocco a parte e non tre selettori in più su quelli dell'hover:
+   quelli stanno dentro @media (hover: hover), che è esattamente il posto in
+   cui questa regola NON deve stare. Se aggiungi un gesto, aggiungilo in tutti
+   e due i blocchi. */
+.sb-card[data-play] .sb-ill { transform: scale(1.03); }
+.sb-card[data-play] .sb-ill-glow { opacity: 1; }
+.sb-card[data-play] .sb-ill-bloom { opacity: 0.3; }
+.sb-card[data-play] .sb-ill-bloom--red { opacity: 0.45; }
+.sb-card[data-play] .sb-ill-selbloom { opacity: 0.38; }
+.sb-card[data-play] .sb-ill-echo { animation-name: sb-ill-echo; }
+.sb-card[data-play] .sb-ill-pulse { animation-name: sb-ill-hop; }
+.sb-card[data-play] .sb-ill-ping { animation-name: sb-ill-ping; }
+.sb-card[data-play] .sb-ill-bubble--on .sb-ill-bdot { animation-name: sb-ill-dots; }
+.sb-card[data-play] .sb-ill-cursor { animation-name: sb-ill-drift; }
+.sb-card[data-play] .sb-typebar-w--a { animation-name: sb-type-out; }
+.sb-card[data-play] .sb-typebar-w--b { animation-name: sb-type-in; }
+.sb-card[data-play] .sb-ill-tilesel { animation-name: sb-ill-sel; }
+.sb-card[data-play] .sb-ill-snap { animation-name: sb-ill-snap; }
+.sb-card[data-play] .sb-ill-needle { animation-name: sb-ill-needle; }
+.sb-card[data-play] .sb-ill-needle--ghost { animation-name: sb-ill-needle-ghost; }
+.sb-card[data-play] .sb-ill-shift { animation-name: sb-ill-shift; }
+
 @media (hover: hover) and (pointer: fine) {
+  .sb-card:hover .sb-ill,
+  .sb-card:focus-visible .sb-ill { transform: scale(1.03); }
+  .sb-card:hover .sb-ill-glow,
+  .sb-card:focus-visible .sb-ill-glow { opacity: 1; }
+  .sb-card:hover .sb-ill-bloom,
+  .sb-card:focus-visible .sb-ill-bloom { opacity: 0.3; }
+  .sb-card:hover .sb-ill-bloom--red,
+  .sb-card:focus-visible .sb-ill-bloom--red { opacity: 0.45; }
+  .sb-card:hover .sb-ill-selbloom,
+  .sb-card:focus-visible .sb-ill-selbloom { opacity: 0.38; }
+
   .sb-card:hover .sb-ill-echo,
   .sb-card:focus-visible .sb-ill-echo { animation-name: sb-ill-echo; }
 
   .sb-card:hover .sb-ill-pulse,
   .sb-card:focus-visible .sb-ill-pulse { animation-name: sb-ill-hop; }
+  .sb-card:hover .sb-ill-ping,
+  .sb-card:focus-visible .sb-ill-ping { animation-name: sb-ill-ping; }
 
   .sb-card:hover .sb-ill-bubble--on .sb-ill-bdot,
   .sb-card:focus-visible .sb-ill-bubble--on .sb-ill-bdot { animation-name: sb-ill-dots; }
@@ -1750,23 +1967,27 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   .sb-card:hover .sb-ill-tilesel,
   .sb-card:focus-visible .sb-ill-tilesel { animation-name: sb-ill-sel; }
 
-  .sb-card:hover .sb-ill-vertex-dot,
-  .sb-card:focus-visible .sb-ill-vertex-dot { animation-name: sb-ill-vtx; }
-  .sb-card:hover .sb-ill-mote,
-  .sb-card:focus-visible .sb-ill-mote { animation-name: sb-ill-mote; }
+  .sb-card:hover .sb-ill-snap,
+  .sb-card:focus-visible .sb-ill-snap { animation-name: sb-ill-snap; }
 
   .sb-card:hover .sb-ill-needle,
   .sb-card:focus-visible .sb-ill-needle { animation-name: sb-ill-needle; }
   .sb-card:hover .sb-ill-needle--ghost,
   .sb-card:focus-visible .sb-ill-needle--ghost { animation-name: sb-ill-needle-ghost; }
+  .sb-card:hover .sb-ill-shift,
+  .sb-card:focus-visible .sb-ill-shift { animation-name: sb-ill-shift; }
 
   /* Chi ha chiesto meno movimento non riceve il gesto nemmeno sull'hover: gli
-     resta la tavola finita, che è già il disegno per intero. */
+     resta la tavola finita, che è già il disegno per intero — e nemmeno
+     l'accensione, che è un movimento anche lei. */
   @media (prefers-reduced-motion: reduce) {
     .sb-card:hover .sb-ill *,
     .sb-card:focus-visible .sb-ill *,
     .sb-card:hover .sb-typebar-w,
     .sb-card:focus-visible .sb-typebar-w { animation-name: none; }
+    .sb-card:hover .sb-ill,
+    .sb-card:focus-visible .sb-ill { transform: none; }
+    .sb-ill, .sb-ill-glow, .sb-ill-bloom, .sb-ill-selbloom { transition: none; }
   }
 }
 

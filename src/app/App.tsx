@@ -53,11 +53,11 @@ import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import {
   NowBuilding,
   BlueprintPage,
-  PrismFan,
+  LiveCursors,
   GlobeOrbit,
-  IrisPlate,
+  ContactSheet,
   GaugePlate,
-  ContourPlate,
+  CanopyPlate,
   CommitWall,
   TrustedDot,
   COMMITS,
@@ -914,7 +914,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <PrismFan />
+                <LiveCursors />
               </div>
             </ProductCard>
           </a>
@@ -930,7 +930,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <IrisPlate />
+                <ContactSheet />
               </div>
             </ProductCard>
           </Link>
@@ -946,7 +946,7 @@ export default function App() {
                 </p>
               </div>
               <div className="sb-card-visual">
-                <ContourPlate />
+                <CanopyPlate />
               </div>
             </ProductCard>
           </Link>

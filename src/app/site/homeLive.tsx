@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // I disegni della griglia prodotti.
 //
-// ── Due giri, e questo è il terzo ────────────────────────────────────────────
+// ── Tre giri, e questo è il quarto ───────────────────────────────────────────
 // Prima erano sette finte schermate — una finestra che si riempiva, un
 // terminale che digitava, un tabellone che contava punti. Tutte la stessa idea
 // («mettiamo dentro la card una miniatura della cosa»), e sette miniature di
@@ -13,28 +13,44 @@
 // erano tratti sospesi nel vuoto, e nel vuoto un disegno tecnico sembra una
 // clipart.
 //
-// Adesso stanno su un TERRENO, che è quello che hanno le quattro tavole di
-// Supabase da cui vengono (Realtime, Vector, Storage, Postgres Database) e che
-// era la sola cosa che mancava. Tre strati, sempre gli stessi:
+// Al terzo giro hanno preso un TERRENO — la carta millimetrata e l'alone che
+// hanno le quattro tavole di Supabase da cui vengono (Realtime, Vector,
+// Storage, Postgres Database) — e hanno smesso di galleggiare.
+//
+// Restava un difetto, ed era il più grosso: erano GRIGIE. Il 95 % dell'inchio-
+// stro era il colore del testo diluito, e la tinta della card faceva da
+// guarnizione — un anello qui, un puntino là. Sei tavole grigie in fila
+// tornavano a essere «tutto molto uguale», che è esattamente il difetto per cui
+// erano nate le sei tinte.
+//
+// Adesso la tinta è la LUCE della tavola, e gli strati sono quattro:
 //
 //   ① la carta millimetrata, che sfuma ai bordi;
-//   ② l'alone della tinta della card, che dà un centro alla figura;
-//   ③ la figura, con sopra pezzi di interfaccia veri — pillole, riquadri,
-//      cursori, righe con il marchio.
+//   ② l'alone della tinta, a due fermate;
+//   ③ lo stesso quadretto, ma della tinta, dentro una macchia stretta al
+//      centro: il colore non è steso sopra la carta, esce da sotto;
+//   ④ la figura, accesa dove è il soggetto e grigia dove è contorno, con sopra
+//      pezzi di interfaccia veri — e un FATTO vero, uno per tavola.
 //
-// Il terzo strato è quello che separa un'illustrazione da un pezzo di prodotto:
-// un cursore e una bollicina «sta scrivendo» sono cose che il lettore ha già
-// visto succedere davvero, e non le deve decifrare.
+// Il quarto strato è quello che separa un'illustrazione da un pezzo di
+// prodotto, e il fatto vero è quello che separa un pezzo di prodotto da un
+// pezzo di prodotto QUALUNQUE: un indirizzo che è questo indirizzo, il nome di
+// chi muove il cursore, il corpo macchina con cui sono scattate le foto, la
+// quota di un modello che ho disegnato davvero.
 //
-//   ① Siti web          → una finestra e tre echi di sé stessa       (gli echi si aprono)
-//   ② Rivalta e Cascina → un globo a reticolo, due punti e la linea
-//                          che li unisce, con sopra i due domini     (un impulso passa)
-//   ③ Sviluppo con l'IA → due cursori e tre bollicine, una accesa    (i puntini battono)
+//   ① Siti web          → una finestra con la sagoma della casa e il suo
+//                          indirizzo, e tre echi di sé stessa        (gli echi si aprono)
+//   ② Rivalta e Cascina → un globo illuminato, due punti e la linea
+//                          che li unisce, con sopra i due domini     (un impulso passa e arriva)
+//   ③ Sviluppo con l'IA → due cursori con la targhetta del nome —
+//                          «Alberto» e «Claude» — e le bollicine     (i puntini battono)
 //   ④ Fotografia        → un provino a contatto, un fotogramma solo
-//                          cerchiato — e nessun volto, perché non si
-//                          pubblicano                                (l'anello salta)
-//   ⑤ Il geometra       → un volume in assonometria, vertici e quota (i vertici si agganciano)
-//   ⑥ Auto              → un contagiri con la scia della lancetta    (la lancetta sale)
+//                          acceso e targato EOS 4000D — e nessun
+//                          volto, perché non si pubblicano           (il fotogramma salta)
+//   ⑤ Il geometra       → la tettoia in legno in assonometria, con
+//                          l'ingombro a terra e la quota             (i punti si agganciano)
+//   ⑥ Auto              → un contagiri intero: cifre, zona rossa,
+//                          spie del cambio, scia della lancetta      (la lancetta sale)
 //
 // Da quale tavola loro viene ciascuna, e perché quella lì, sta scritto sopra
 // ogni figura.
@@ -53,13 +69,24 @@
 // parte al passaggio» — e il come non è ovvio, perché mettere in pausa queste
 // animazioni le congelerebbe sul primo fotogramma, che è quello vuoto.
 //
-// Le proprietà animate sono quattro, e sono tutte a buon mercato: transform e
-// opacity, che il compositore muove senza ricalcolare niente; fill su cerchi da
-// 3 px (i vertici del volume); e lo scostamento di un tratteggio su un tracciato
-// solo (l'impulso del globo), che ridipinge un trattino da tredici unità e
-// nient'altro. L'unica animazione di layout è la pillola del comando, che cresce
-// di un carattere alla volta: perché lì si possa fare sta scritto in home.css,
-// sopra .sb-typebar.
+// Al passaggio, oltre al gesto, la tavola si ACCENDE: alone e bagliori salgono
+// al massimo e la figura si avvicina di un soffio. Sono transizioni su opacity
+// e transform — le due proprietà che il compositore muove da solo — e scattano
+// una volta entrando e una uscendo, non a ogni fotogramma.
+//
+// Le proprietà animate sono tre, e sono tutte a buon mercato: transform e
+// opacity, che il compositore muove senza ricalcolare niente; fill su otto
+// quadratini da 6 px (i punti di aggancio della tettoia); e lo scostamento di
+// un tratteggio su un tracciato solo (l'impulso del globo), che ridipinge un
+// trattino da tredici unità e nient'altro. L'unica animazione di layout è la
+// pillola del comando, che cresce di un carattere alla volta: perché lì si
+// possa fare sta scritto in home.css, sopra .sb-typebar.
+//
+// E niente filtri SVG: la luce delle figure sono due passate di tracciato (una
+// larga e trasparente, una fine e piena), non un feGaussianBlur. Un filtro
+// costa un buffer sfocato per tavola, ridipinto ogni volta che qualcosa dentro
+// si muove; per sei tavole in una griglia che deve restare fluida mentre la
+// pagina scorre, non vale il cambio.
 //
 // Qui dentro NON c'è JavaScript. Il moto sta tutto in home.css, in keyframe che
 // il browser mette in pausa da sé quando la scheda passa in secondo piano.
@@ -209,44 +236,62 @@ export const NowBuilding = memo(function NowBuilding() {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LA TAVOLA COMUNE — adesso è una tavola, non un foglio trasparente
+   LA TAVOLA COMUNE — carta, LUCE, figura
 
-   Tutte e sei le figure stanno su 280×132 e passano di qui. Fin qui la tavola
-   era vuota e il disegno galleggiava; le figure di Supabase da cui viene
-   questa griglia — Realtime, Vector, Storage, Postgres — non galleggiano, e la
-   ragione è che sotto hanno un TERRENO. Sono tre strati, sempre gli stessi:
+   Tutte e sei le figure stanno su 280×170 e passano di qui. Gli strati erano
+   tre — carta millimetrata, un alone della tinta, la figura — e la tavola si
+   leggeva come un disegno a matita: il 95 % dell'inchiostro era grigio, e la
+   tinta della card faceva da guarnizione. Sei tavole grigie una accanto
+   all'altra tornavano a essere «tutto molto uguale», che è esattamente il
+   difetto per cui erano nate le sei tinte.
 
-     ① la carta millimetrata, che sfuma ai bordi e dice «qui si progetta»;
-     ② un alone della tinta della card, che dà un centro alla figura;
-     ③ la figura, in tratto pieno, con sopra pezzi di interfaccia veri —
-        pillole, riquadri, cursori, righe con il marchio.
+   Adesso gli strati sono QUATTRO, e quello nuovo è la luce:
 
-   Il terzo strato è quello che fa la differenza fra un'illustrazione e un
-   prodotto: un cursore e una bollicina «sta scrivendo» sono cose che il
-   lettore ha già visto succedere sul serio, quindi la figura non la deve
-   decifrare. Le quattro tavole loro sono fatte tutte così, e da qui in giù
-   lo sono anche queste.
+     ① la carta millimetrata, che sfuma ai bordi;
+     ② l'alone della tinta, più forte di prima e a due fermate;
+     ③ lo STESSO quadretto, ma della tinta, dentro una macchia stretta al
+        centro: è quello che fa sembrare la carta illuminata invece che
+        colorata — il colore non è steso sopra, esce da sotto;
+     ④ la figura, accesa dove è il soggetto e grigia dove è contorno, con
+        sopra pezzi di interfaccia veri (pillole, targhette, quote, EXIF).
 
-   ── La sfumatura, e perché è una maschera ───────────────────────────────────
-   La griglia non può finire di netto: un rettangolo di quadretti dentro una
-   card è una texture applicata, e si vede che è incollata. Sfuma con una
-   maschera radiale — bianco pieno al centro, trasparente ai bordi — che è
-   l'unico modo di far sparire un pattern SVG senza disegnargli sopra un velo
-   del colore del fondo. Quel velo qui non funzionerebbe: sotto c'è vetro, e
-   dietro al vetro c'è la pagina che scorre, non una tinta piatta.
+   ── L'alone e il bagliore: perché non c'è un solo filtro ────────────────────
+   La luce di una figura sottile si fa in due passate: lo stesso tracciato
+   disegnato una prima volta largo e quasi trasparente (il bagliore), e una
+   seconda volta fine e pieno (il tratto). È il trucco delle insegne al neon, e
+   costa due tracciati invece di uno. Un feGaussianBlur darebbe una luce più
+   morbida e costerebbe un buffer sfocato per tavola, ridipinto a ogni
+   fotogramma in cui qualcosa dentro si muove: su sei tavole, per una griglia
+   che deve restare fluida mentre la pagina scorre, non vale il cambio.
+
+   ── I quattro id di ogni tavola ─────────────────────────────────────────────
+   Gli id devono essere unici nel documento, quindi ognuno porta il nome della
+   tavola come coda. La forma è sempre la stessa, e le figure li chiamano per
+   nome senza che Plate() glieli passi:
+
+     sb-pg-<nome>    il quadretto          sb-pw-<nome>   l'alone della tinta
+     sb-pf-<nome>    la sfumatura ai bordi sb-ps-<nome>   la macchia di luce
+     sb-ag-<nome>    il gradiente della tinta, per i tratti e i pieni accesi
+
+   La scorciatoia `acc("nome")` scrive l'ultimo, che è quello che serve dentro
+   le figure.
 
    ── L'alone prende la tinta da sé ───────────────────────────────────────────
-   Lo stop del gradiente è `currentColor`, e il colore della tavola è
-   --sb-accent (vedi .sb-ill nel foglio). Quindi l'alone della card blu è blu e
-   quello della card rosa è rosa senza che qui dentro ci sia scritto un colore:
-   la tinta arriva dal data-acc della card, come tutto il resto.
+   Gli stop dei gradienti sono `currentColor`, e il colore della tavola è
+   --sb-accent (vedi .sb-ill nel foglio). Quindi la tavola della card blu è blu
+   e quella della card rosa è rosa senza che qui dentro ci sia scritto un
+   colore: la tinta arriva dal data-acc della card, come tutto il resto.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/** Il gradiente della tinta di una tavola: acceso in alto, affondato in basso.
+ *  Va nei `fill` e negli `stroke` della figura — mai un colore scritto a mano. */
+const acc = (name: string) => `url(#sb-ag-${name})`;
+
 function Plate({ name, children }: { name: string; children: React.ReactNode }) {
-  // Gli id devono essere unici nel documento: sei tavole, sei prefissi.
   const grid = `sb-pg-${name}`;
   const fade = `sb-pf-${name}`;
   const glow = `sb-pw-${name}`;
+  const spot = `sb-ps-${name}`;
   return (
     <svg
       className={`sb-ill sb-ill--${name}`}
@@ -259,6 +304,15 @@ function Plate({ name, children }: { name: string; children: React.ReactNode }) 
         <pattern id={grid} width="11" height="11" patternUnits="userSpaceOnUse">
           <path className="sb-ill-gridline" d="M11,0 L0,0 L0,11" />
         </pattern>
+        {/* Il quadretto della tinta. Stesso passo e stessa origine dell'altro:
+            i due reticoli devono cadere sulla stessa riga, o si vedrebbero due
+            carte sovrapposte invece di una carta accesa in mezzo. */}
+        <pattern id={`${grid}-a`} width="11" height="11" patternUnits="userSpaceOnUse">
+          <path className="sb-ill-gridline sb-ill-gridline--acc" d="M11,0 L0,0 L0,11" />
+        </pattern>
+
+        {/* La sfumatura ai bordi. Una maschera e non un velo del colore del
+            fondo: sotto c'è vetro, e dietro al vetro la pagina che scorre. */}
         <radialGradient id={fade} cx="50%" cy="50%" r="72%">
           <stop offset="0%" stopColor="#fff" stopOpacity="1" />
           <stop offset="58%" stopColor="#fff" stopOpacity="0.72" />
@@ -267,15 +321,41 @@ function Plate({ name, children }: { name: string; children: React.ReactNode }) 
         <mask id={`${fade}-m`}>
           <rect width="280" height="170" fill={`url(#${fade})`} />
         </mask>
-        <radialGradient id={glow} cx="50%" cy="54%" r="54%">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.22" />
+
+        {/* La macchia di luce: stretta, centrata sul soggetto. */}
+        <radialGradient id={spot} cx="50%" cy="52%" r="40%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="1" />
+          <stop offset="70%" stopColor="#fff" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <mask id={`${spot}-m`}>
+          <rect width="280" height="170" fill={`url(#${spot})`} />
+        </mask>
+
+        {/* L'alone. Due fermate e non una: la prima dà il centro caldo, la
+            seconda la campitura larga che stacca la figura dalla card. */}
+        <radialGradient id={glow} cx="50%" cy="52%" r="60%">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="0.34" />
+          <stop offset="46%" stopColor="currentColor" stopOpacity="0.13" />
           <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
         </radialGradient>
+
+        {/* Il gradiente dei tratti accesi. Scende in diagonale, come la luce
+            delle lastre grandi dello scaffale: una figura di un colore solo è
+            una figura ritagliata, una che sfuma è una figura illuminata. */}
+        <linearGradient id={`sb-ag-${name}`} x1="0" y1="0" x2="0.45" y2="1">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0.45" />
+        </linearGradient>
       </defs>
+
       <g mask={`url(#${fade}-m)`}>
         <rect width="280" height="170" fill={`url(#${grid})`} />
       </g>
       <rect className="sb-ill-glow" width="280" height="170" fill={`url(#${glow})`} />
+      <g mask={`url(#${spot}-m)`}>
+        <rect width="280" height="170" fill={`url(#${grid}-a)`} />
+      </g>
       {children}
     </svg>
   );
@@ -285,51 +365,105 @@ function Plate({ name, children }: { name: string; children: React.ReactNode }) 
    ① Card «Siti web» — la finestra e i suoi echi
 
    Rifatta sulla tavola Postgres Database di Supabase: un glifo grande, in
-   tratto pieno, e dietro tre copie di sé stesso ruotate di pochi gradi e quasi
-   trasparenti. Le copie non sono un'ombra — sono la stessa forma stampata più
-   volte, e quello che dicono è «non è un esemplare, è un mestiere»: di
-   finestre come questa ne escono a ripetizione.
+   tratto pieno, e dietro tre copie di sé stesso ruotate di pochi gradi. Le
+   copie non sono un'ombra — sono la stessa forma stampata più volte, e quello
+   che dicono è «non è un esemplare, è un mestiere».
+
+   ── Due cose che prima non c'erano, e sono il punto ─────────────────────────
+   LA SAGOMA. La finestra non ha più gli angoli tondi: ha l'angolo tagliato a
+   45° in alto a sinistra e in basso a destra, che è la forma del sito (vedi
+   «La forma» in home.css). La miniatura della card «Siti web» adesso è
+   riconoscibilmente una pagina fatta qui, e non una finestra qualunque.
+
+   L'INDIRIZZO. Nella barra c'è la pillola con albertopecchini.it. È lo stesso
+   pezzo della finestra di FreshWork, ed è quello che trasforma un disegno di
+   browser in QUESTA pagina: la card grande della griglia contiene la miniatura
+   della pagina che la sta mostrando.
+
+   Gli echi sono la sola SAGOMA, non la finestra intera: tre profili della
+   tinta, sventagliati. Ripetere anche il contenuto voleva dire tre pagine
+   sfocate una sull'altra; il profilo solo è una risma, che è quello che si
+   voleva dire.
 
    Il gesto: al passaggio gli echi si aprono un altro po', come un mazzo di
-   carte che si sventaglia, e tornano. Una transform sola per copia.
+   carte, e tornano. Una transform sola per copia.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/** La finestra: 208×130, con i due tagli a 45° della casa. Il taglio è 12, in
+ *  proporzione lo stesso che le lastre grandi portano a schermo. */
+const WIN_D = "M13,1 L209,1 L209,119 L197,131 L1,131 L1,13 Z";
 
 /** I tre echi dietro alla finestra: rotazione e opacità, dal più lontano. */
 const ECHOES: [number, number][] = [
-  [-9, 0.16],
-  [-4.5, 0.26],
-  [4.5, 0.38],
+  [-9, 0.3],
+  [-4.5, 0.45],
+  [4.5, 0.62],
 ];
 
 export const BlueprintPage = memo(function BlueprintPage() {
   return (
     <Plate name="win">
       <defs>
-        {/* La finestra, disegnata una volta sola all'origine: le quattro copie
-            sono quattro <use>, cioè quattro riferimenti, non quattro disegni. */}
+        {/* La sola sagoma: la percorrono il bagliore, i tre echi e la cornice
+            della finestra vera. Un tracciato, quattro usi. */}
+        <path id="sb-win-sil" d={WIN_D} />
+
+        {/* La finestra intera, disegnata una volta all'origine e portata sul
+            posto dal <use>: così la geometria resta leggibile in coordinate
+            sue, che partono da zero. */}
         <g id="sb-win">
-          <rect className="sb-ill-frame" x="1" y="1" width="208" height="130" rx="11" />
-          <path className="sb-ill-line" d="M1,29 L209,29" />
-          <circle className="sb-ill-dot" cx="16" cy="14" r="3" />
-          <circle className="sb-ill-dot" cx="27" cy="14" r="3" />
-          <circle className="sb-ill-dot" cx="38" cy="14" r="3" />
-          <rect className="sb-ill-block" x="16" y="43" width="52" height="72" rx="5" />
-          <rect className="sb-ill-block sb-ill-block--hi" x="78" y="43" width="114" height="34" rx="5" />
-          <rect className="sb-ill-block" x="78" y="85" width="114" height="12" rx="4" />
-          <rect className="sb-ill-block" x="78" y="103" width="72" height="12" rx="4" />
+          <use className="sb-ill-frame" href="#sb-win-sil" />
+          <path className="sb-ill-line" d="M1,31 L209,31" />
+          <circle className="sb-ill-dot" cx="17" cy="16" r="3" />
+          <circle className="sb-ill-dot" cx="28" cy="16" r="3" />
+          <circle className="sb-ill-dot" cx="39" cy="16" r="3" />
+          {/* La pillola dell'indirizzo. Il testo è un <text> e non HTML perché
+              deve viaggiare col <use>: è dentro la finestra, e la finestra è
+              un riferimento che si sposta. */}
+          <rect className="sb-ill-urlbar" x="58" y="8.5" width="112" height="15" rx="7.5" />
+          <text className="sb-ill-url" x="114" y="19" textAnchor="middle" data-no-i18n>
+            albertopecchini.it
+          </text>
+
+          <rect className="sb-ill-block" x="16" y="45" width="50" height="70" rx="5" />
+          {/* Il riquadro acceso: è la hero della pagina disegnata, ed è l'unico
+              pieno della tinta di tutta la finestra. Dentro, le due righe del
+              titolo — la prima piena, la seconda smorzata: è il ritmo di una
+              hero vera, non due barre a caso. */}
+          <rect className="sb-ill-hero" x="76" y="45" width="117" height="38" rx="6" />
+          <rect className="sb-ill-brand" x="86" y="55" width="66" height="7" rx="3.5" fill={acc("win")} />
+          <rect
+            className="sb-ill-brand sb-ill-brand--dim"
+            x="86"
+            y="67"
+            width="44"
+            height="5"
+            rx="2.5"
+            fill={acc("win")}
+          />
+
+          <rect className="sb-ill-block" x="76" y="91" width="117" height="11" rx="4" />
+          <rect className="sb-ill-block" x="76" y="107" width="68" height="11" rx="4" />
+          {/* Il bottone: la stessa sagoma della casa, in piccolo. */}
+          <path className="sb-ill-cta" d="M154,105 L193,105 L193,114 L188,119 L149,119 L149,110 Z" fill={acc("win")} />
         </g>
       </defs>
+
+      {/* Il bagliore: la sagoma percorsa una prima volta larga e trasparente.
+          Sta sotto agli echi, così la luce esce da dietro la risma intera. */}
+      <use className="sb-ill-bloom" href="#sb-win-sil" x={35} y={20} />
+
       {ECHOES.map(([rot, op], i) => (
         <use
           key={rot}
           className="sb-ill-echo"
-          href="#sb-win"
+          href="#sb-win-sil"
           x={35}
           y={20}
           style={{ "--r": `${rot}deg`, "--o": op, "--i": i } as React.CSSProperties}
         />
       ))}
-      <use className="sb-ill-front" href="#sb-win" x={35} y={20} />
+      <use href="#sb-win" x={35} y={20} />
     </Plate>
   );
 });
@@ -337,25 +471,17 @@ export const BlueprintPage = memo(function BlueprintPage() {
 /* ═══════════════════════════════════════════════════════════════════════════
    ② Card «Rivalta e Cascina Fontana» — il globo, e la linea fra i due
 
-   Qui c'era un piano di tre quarti con due spilli piantati sopra. Diceva la
-   cosa giusta — due posti, due clienti — ma la diceva con la figura di un
-   plastico: un piano quadrettato non è la Terra, e uno spillo è una puntina da
-   bacheca. Il globo non ha bisogno di essere spiegato a nessuno.
+   È la tavola della card Edge Functions di Supabase — la stessa da cui viene
+   la pillola del comando della card ③: una sfera a reticolo più grande della
+   card e tagliata dai suoi bordi, e sopra una rete di segmenti dritti e
+   diagonali a 45° che cala da un pezzo di interfaccia e finisce su dei punti.
+   Lì i punti sono le regioni in cui gira una funzione; qui sono due, sono i
+   due clienti, e fra loro c'è la linea che li unisce — l'unica cosa che questa
+   card deve dire.
 
-   Adesso è la tavola della card Edge Functions di Supabase — la stessa da cui
-   viene già la pillola del comando della card ③ (vedi «③ bis» nel foglio):
-   una sfera a reticolo più grande della card e tagliata dai suoi bordi, e
-   sopra una rete di segmenti dritti e diagonali a 45° che cala da un pezzo di
-   interfaccia e finisce su dei punti. Lì i punti sono le regioni in cui gira
-   una funzione, e la rete dice «questa roba sta in più posti». Qui i punti
-   sono due, sono i due clienti, e fra loro c'è la linea che li unisce: che è
-   l'unica cosa che questa card deve dire.
-
-   Le due righe con i domini restano — sono la seconda metà della tavola
-   Vector, e sono due siti che stanno online davvero — ma passano in ALTO,
-   dove nella foto sta la pillola: da sotto di loro cala il filo che entra nel
-   globo e arriva sul primo punto. In basso non potevano più stare, perché da
-   metà tavola in giù adesso c'è la sfera.
+   Le due righe con i domini stanno in alto, dove nella tavola loro sta la
+   pillola: da sotto di loro cala il filo che entra nella sfera e arriva sul
+   primo punto.
 
    ── Il reticolo, senza una curva calcolata a mano ───────────────────────────
    Un cerchio disegnato su una sfera — parallelo o meridiano — visto in
@@ -366,12 +492,16 @@ export const BlueprintPage = memo(function BlueprintPage() {
    guadagno non è la brevità: è che la sfera si può girare, perché si sposta il
    polo e il reticolo si rifà da sé.
 
-   Le ellissi sono intere e non tagliate a metà, quindi si vedono anche i fili
-   che passano dietro: è quello che fa una sfera vuota invece di una palla, ed
-   è così anche nella foto.
+   ── La sfera adesso è ILLUMINATA ────────────────────────────────────────────
+   Prima era un reticolo grigio: un disegno di sfera. Adesso ha addosso tre
+   cose che una palla nello spazio ha davvero — una calotta di luce in alto a
+   sinistra, il bordo acceso dove la luce lo prende di striscio, e il reticolo
+   che si spegne scendendo. Sono tre gradienti e nessun filtro: la sfera non è
+   dipinta, è accesa dalla tinta della card.
 
    Il gesto: un impulso parte da Rivalta e arriva a Cascina lungo la linea che
-   le unisce. Si muove quello e basta, ed è la cosa che la card dice.
+   le unisce, e all'arrivo l'anello di Cascina si allarga una volta. Due tempi,
+   ma un gesto solo — è la stessa cosa che succede, vista partire e arrivare.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** Il globo: il centro cade sotto il bordo basso della tavola e il raggio è
@@ -443,8 +573,8 @@ const MERIDIANI: Ellisse[] = [18, 54, 90, 126, 162].map((ang) => {
 });
 
 /** La linea fra i due clienti: giù di 45°, poi dritta. È scritta una volta
-    sola perché la percorrono in due — la linea stessa e l'impulso che le passa
-    sopra, che è la stessa `d` disegnata una seconda volta. */
+    sola perché la percorrono in tre — la linea, il suo bagliore e l'impulso,
+    che sono la stessa `d` disegnata tre volte. */
 const LINK = "M64,88 L88,112 H178";
 
 /** Un filo del reticolo. La rotazione è un attributo transform e non una
@@ -468,17 +598,39 @@ export const GlobeOrbit = memo(function GlobeOrbit() {
   return (
     <div className="sb-ill-stage sb-ill-stage--globe">
       <Plate name="globe">
+        <defs>
+          {/* La luce sulla palla: il centro sta in alto a sinistra rispetto al
+              globo, non al riquadro, ed è per questo che i due numeri sono
+              così spostati — il centro della sfera cade sotto la tavola. */}
+          <radialGradient id="sb-globe-lit" cx="34%" cy="22%" r="52%">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.3" />
+            <stop offset="60%" stopColor="currentColor" stopOpacity="0.07" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+          </radialGradient>
+          {/* Il bordo: acceso dove la luce lo prende di striscio, spento
+              dall'altra parte. Un cerchio con un gradiente lineare sopra fa
+              esattamente questo, e costa un tracciato. */}
+          <linearGradient id="sb-globe-rim" x1="0.1" y1="0" x2="0.9" y2="1">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.9" />
+            <stop offset="55%" stopColor="currentColor" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0.05" />
+          </linearGradient>
+        </defs>
+
         {/* Il reticolo si prende la stessa maschera della carta millimetrata —
             quella che Plate() dichiara con il prefisso del suo nome — così i
             fili svaniscono ai bordi invece di finire tagliati di netto, e la
             sfera non litiga con i quadretti che ha sotto. */}
-        <g className="sb-ill-mesh" mask="url(#sb-pf-globe-m)">
-          {PARALLELI.map((e) => (
-            <Filo key={`p${e.cy}`} e={e} />
-          ))}
-          {MERIDIANI.map((e) => (
-            <Filo key={`m${e.ry}-${e.rot}`} e={e} />
-          ))}
+        <g mask="url(#sb-pf-globe-m)">
+          <circle className="sb-ill-ball" cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r} fill="url(#sb-globe-lit)" />
+          <g className="sb-ill-mesh">
+            {PARALLELI.map((e) => (
+              <Filo key={`p${e.cy}`} e={e} />
+            ))}
+            {MERIDIANI.map((e) => (
+              <Filo key={`m${e.ry}-${e.rot}`} e={e} />
+            ))}
+          </g>
           <circle className="sb-ill-limb" cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r} />
         </g>
 
@@ -490,15 +642,19 @@ export const GlobeOrbit = memo(function GlobeOrbit() {
         <path className="sb-ill-wire" d="M178,112 L200,90 H280" />
         <circle className="sb-ill-tip" cx={20} cy={108} r={2.6} />
 
-        {/* La linea fra i due, e sopra l'impulso che la percorre. */}
-        <path className="sb-ill-link" d={LINK} />
+        {/* La linea fra i due: il bagliore sotto, il tratto sopra, e l'impulso
+            che la percorre. */}
+        <path className="sb-ill-bloom" d={LINK} />
+        <path className="sb-ill-link" d={LINK} stroke={acc("globe")} />
         <path className="sb-ill-pulse" d={LINK} />
 
-        {/* Rivalta, accesa della tinta della card; Cascina, in tratto. Due
-            punti e non due bandierine: su una sfera un punto è un posto. */}
-        <circle className="sb-ill-halo" cx={64} cy={88} r={10} />
-        <circle className="sb-ill-node sb-ill-node--on" cx={64} cy={88} r={4.2} />
-        <circle className="sb-ill-node" cx={178} cy={112} r={4.2} />
+        {/* Rivalta, accesa della tinta della card; Cascina, in tratto, con
+            l'anello che si allarga quando l'impulso arriva. Due punti e non
+            due bandierine: su una sfera un punto è un posto. */}
+        <circle className="sb-ill-halo" cx={64} cy={88} r={11} />
+        <circle className="sb-ill-node sb-ill-node--on" cx={64} cy={88} r={4.6} />
+        <circle className="sb-ill-ping" cx={178} cy={112} r={4.6} />
+        <circle className="sb-ill-node" cx={178} cy={112} r={4.6} />
       </Plate>
 
       {/* Le due righe con il marchio. Sono HTML e non SVG perché sono testo
@@ -520,26 +676,53 @@ export const GlobeOrbit = memo(function GlobeOrbit() {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ③ Card «Sviluppo assistito dall'IA» — due cursori e tre bollicine
+   ③ Card «Sviluppo assistito dall'IA» — due cursori, e i loro nomi
 
-   Rifatta sulla tavola Realtime di Supabase: due cursori su un foglio a
-   quadretti e le bollicine dei tre puntini, quelle di «sta scrivendo», una
-   sola accesa. Lì dicono «più persone sullo stesso documento»; qui la seconda
-   persona è la macchina, ed è esattamente il mestiere della card — si scrive
-   in due, e uno dei due non è umano.
+   È la tavola Realtime di Supabase: due cursori su un foglio a quadretti e le
+   bollicine dei tre puntini, quelle di «sta scrivendo». Lì dicono «più persone
+   sullo stesso documento»; qui la seconda persona è la macchina, ed è
+   esattamente il mestiere della card — si scrive in due, e uno dei due non è
+   umano.
 
-   Il prisma che c'era prima era una bella figura di ottica e non diceva
-   questo: diceva «una domanda entra, cinque risposte escono», che è come uno
-   immagina l'IA prima di lavorarci.
+   ── I nomi, che sono la cosa nuova ──────────────────────────────────────────
+   Nella tavola loro ogni cursore porta la targhetta con il nome di chi lo
+   muove, ed è quella targhetta a dire che le persone sono due e diverse. Senza,
+   erano due frecce. Adesso ci sono: «Alberto» in grigio e «Claude» nella tinta
+   della card. Non c'è una didascalia che spieghi la figura — la figura si
+   spiega da sé, ed è la cosa più specifica che questa tavola potesse dire.
 
-   La pillola col comando resta dov'era, ed è ancora il pezzo più onesto della
-   tavola: dice che questa roba la si guida da riga di comando.
+   Le bollicine sono scese da tre a due, una per cursore. Tre erano una in più
+   di quanti erano quelli che scrivevano: una bollicina senza nessuno sotto è
+   una decorazione.
 
-   Il gesto: i tre puntini della bollicina accesa battono a turno.
+   La pillola col comando resta, ed è il pezzo più onesto della tavola: dice
+   che questa roba la si guida da riga di comando.
+
+   Il gesto: i tre puntini della bollicina accesa battono a turno, e i due
+   cursori derivano — come due mani vere su un documento.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** La sagoma del cursore, disegnata all'origine e portata sul posto da CSS. */
 const CURSOR_D = "M0,0 L0,15 L4.2,11.2 L6.8,17 L9.6,15.8 L7,10.2 L12,10.2 Z";
+
+/** Un cursore con la sua targhetta. La larghezza della targhetta è scritta a
+ *  mano perché dentro un SVG il testo non misura la scatola che lo contiene:
+ *  sono 6,2px per carattere del mono a 10px, più il respiro ai lati. */
+function Caret({ name, x, y, on }: { name: string; x: number; y: number; on?: boolean }) {
+  const w = name.length * 6.2 + 13;
+  return (
+    <g
+      className={`sb-ill-cursor${on ? " sb-ill-cursor--b" : ""}`}
+      style={{ "--x": `${x}px`, "--y": `${y}px` } as React.CSSProperties}
+    >
+      <path className="sb-ill-caret" d={CURSOR_D} />
+      <rect className="sb-ill-tag" x={9} y={13} width={w} height={19} rx={5} />
+      <text className="sb-ill-tagtext" x={9 + w / 2} y={26.5} textAnchor="middle" data-no-i18n>
+        {name}
+      </text>
+    </g>
+  );
+}
 
 /** Una bollicina «sta scrivendo»: pillola e tre puntini. */
 function Bubble({ x, y, on }: { x: number; y: number; on?: boolean }) {
@@ -560,23 +743,14 @@ function Bubble({ x, y, on }: { x: number; y: number; on?: boolean }) {
   );
 }
 
-export const PrismFan = memo(function PrismFan() {
+export const LiveCursors = memo(function LiveCursors() {
   return (
     <div className="sb-ill-stage">
       <Plate name="live">
-        <Bubble x={74} y={14} />
-        <path
-          className="sb-ill-cursor"
-          d={CURSOR_D}
-          style={{ "--x": "46px", "--y": "36px" } as React.CSSProperties}
-        />
-        <Bubble x={112} y={64} on />
-        <Bubble x={186} y={96} />
-        <path
-          className="sb-ill-cursor sb-ill-cursor--b"
-          d={CURSOR_D}
-          style={{ "--x": "166px", "--y": "66px" } as React.CSSProperties}
-        />
+        <Bubble x={30} y={10} />
+        <Caret name="Alberto" x={44} y={40} />
+        <Bubble x={158} y={30} on />
+        <Caret name="Claude" x={162} y={62} on />
       </Plate>
 
       {/* Il comando. data-no-i18n perché è un comando, non prosa: il motore
@@ -593,22 +767,29 @@ export const PrismFan = memo(function PrismFan() {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ④ Card «Fotografia» — la provinatura
+   ④ Card «Fotografia» — il provino a contatto
 
-   Rifatta sulla tavola Storage di Supabase: una griglia di riquadri con dentro
-   il glifo del tipo di file, uno solo evidenziato dall'anello. Lì sono
-   immagini, documenti e video; qui sono tutti fotogrammi, perché è un provino
-   a contatto — la striscia che il fotografo guarda per scegliere.
+   È la tavola Storage di Supabase: una griglia di riquadri con dentro il glifo
+   del tipo di file, uno solo evidenziato. Lì sono immagini, documenti e video;
+   qui sono tutti fotogrammi, perché è un provino a contatto — la striscia che
+   il fotografo guarda per scegliere.
 
    E ha la stessa ragione della riga di testo della card: i volti non si
    pubblicano. Un provino di riquadri vuoti è la figura esatta di «ci sono, e
    non ve li faccio vedere».
 
+   Il fotogramma scelto adesso è ACCESO — pieno della tinta, bordo spesso,
+   bagliore intorno — e porta la targhetta con il corpo macchina, che è vero:
+   le sessioni di questo sito sono tutte scattate con una Canon EOS 4000D (lo
+   dice sessioni.json, che è generato dagli EXIF). È il pezzo di interfaccia
+   vera di questa tavola, come l'indirizzo lo è della ①.
+
    L'ultima colonna esce dal bordo destro apposta: la griglia continua fuori
    dalla card, e una griglia tagliata dal bordo è più grande di una che ci sta
    dentro tutta.
 
-   Il gesto: l'anello salta a un altro fotogramma, come si scorre un provino.
+   Il gesto: il fotogramma scelto salta a un altro riquadro, con la targhetta
+   appresso — come si scorre un provino.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const TILE_W = 56;
@@ -644,7 +825,9 @@ function TileGlyph({ kind, cx, cy }: { kind: number; cx: number; cy: number }) {
   );
 }
 
-export const IrisPlate = memo(function IrisPlate() {
+export const ContactSheet = memo(function ContactSheet() {
+  const sx = TILE_X[1];
+  const sy = TILE_Y[1];
   return (
     <Plate name="film">
       {TILE_Y.map((y, r) =>
@@ -655,98 +838,164 @@ export const IrisPlate = memo(function IrisPlate() {
           </g>
         )),
       )}
-      {/* Il fotogramma scelto: anello della tinta della card. Sta sopra a tutti
-          gli altri perché è l'ultimo disegnato. */}
-      <rect className="sb-ill-tilesel" x={TILE_X[1]} y={TILE_Y[1]} width={TILE_W} height={TILE_H} rx={7} />
+
+      {/* Il fotogramma scelto. È un gruppo e non un rettangolo perché adesso
+          si porta dietro la targhetta: la transform del gesto sta sul gruppo,
+          e cornice e targhetta saltano insieme. Sta sopra a tutti gli altri
+          perché è l'ultimo disegnato. */}
+      <g className="sb-ill-tilesel">
+        <rect className="sb-ill-selbloom" x={sx} y={sy} width={TILE_W} height={TILE_H} rx={7} />
+        <rect className="sb-ill-selbox" x={sx} y={sy} width={TILE_W} height={TILE_H} rx={7} />
+        <rect className="sb-ill-seltag" x={sx + 2} y={sy + TILE_H - 13} width={TILE_W - 4} height={11} rx={3} />
+        <text
+          className="sb-ill-seltext"
+          x={sx + TILE_W / 2}
+          y={sy + TILE_H - 4.5}
+          textAnchor="middle"
+          data-no-i18n
+        >
+          EOS 4000D
+        </text>
+      </g>
     </Plate>
   );
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ⑤ Card «Il geometra e l'università» — il volume in assonometria
+   ⑤ Card «Il geometra e l'università» — la tettoia
 
-   Rifatta sulla tavola Vector di Supabase — il cubo a filo con i punti intorno
-   — perché quella figura, per una volta, è più vera nel mio mestiere che nel
-   loro: un volume in assonometria con i vertici agganciati è quello che si
-   disegna in AutoCAD, ed è quello che ho fatto per tre anni sulle tettoie in
-   legno del reparto di Caem.
+   Qui c'era un cubo in assonometria con i vertici agganciati. Diceva la cosa
+   giusta a metà — «si modella in tre dimensioni» — ma la diceva con la figura
+   che un cubo ha in ogni manuale di ogni mestiere: un solido di riferimento.
+   Il mio PCTO non è stato un cubo. Sono stati tre anni all'ufficio tecnico del
+   reparto legno del Caem Group a modellare in AutoCAD delle TETTOIE: pilastri,
+   travi, travetti e falda.
 
-   Le curve di livello che c'erano prima erano una bella carta, ma erano il
-   rilievo di un terreno; questa card parla di modellazione e di misura, e la
-   misura qui c'è — la linea di quota a sinistra, con i trattini agli estremi.
+   Quindi adesso la tavola disegna una tettoia a falda unica, in assonometria
+   isometrica, con le convenzioni che quel disegno ha davvero:
 
-   Il gesto: i vertici si accendono uno dopo l'altro, come quando il disegno
-   aggancia i punti notevoli.
+     · l'ingombro a terra tratteggiato — la proiezione in pianta, che sul
+       foglio si tira sempre;
+     · la falda in tinta e trasparente, con i quattro travetti sopra;
+     · la linea di quota con il numero, che è la ragione per cui una tavola è
+       una tavola e non un'illustrazione;
+     · i vertici che si agganciano, uno dopo l'altro, come fa lo snap quando il
+       cursore passa sui punti notevoli.
+
+   Le coordinate non sono a occhio: sono la proiezione isometrica standard
+   (X = (x−y)·cos30, Y = (x+y)/2 − z) di una tettoia da 4,4 × 2,8 metri, alta
+   2,10 al colmo e 1,45 alla gronda, con 35 cm di sporto. Il conto sta in
+   scripts/, non serve rifarlo: quello che conta è che il disegno è misurato,
+   e che il numero della quota è l'altezza vera di quel modello.
+
+   Il gesto: i vertici si agganciano uno dopo l'altro.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CUBE_TOP = "M140,28 L208,68 L140,108 L72,68 Z";
-const CUBE_EDGES = "M72,68 L72,106 M208,68 L208,106 M140,108 L140,146";
-const CUBE_BOTTOM = "M72,106 L140,146 L208,106";
-const VERTICES: [number, number][] = [
-  [140, 28],
-  [208, 68],
-  [140, 108],
-  [72, 68],
-  [72, 106],
-  [140, 146],
-  [208, 106],
-];
-/** Quattro punti sospesi: il pulviscolo intorno al modello. */
-const MOTES: [number, number][] = [
-  [246, 44],
-  [258, 98],
-  [28, 56],
-  [40, 124],
+/** La falda, con lo sporto: il quadrilatero che si vede per primo.
+
+    ── Perché la vista è BASSA e non isometrica pura ───────────────────────────
+    Con l'isometrica da manuale (la y di schermo pesata 0,5) la falda si mangia
+    la tavola: si guarda la tettoia dall'alto, si vede quasi solo il piano, e
+    quattro pilastri sotto un piano largo sono un tavolo. Qui la y pesa 0,34 —
+    l'occhio è più basso — e allora si vede il PROSPETTO: pilastri alti, falda
+    di scorcio, e sotto ci si passa. È la stessa vista con cui si presenta una
+    tettoia al cliente, e non è un vezzo grafico: è quello che la fa leggere.
+
+    Le coordinate vengono dalla proiezione X = (x−y)·cos30·s, Y = (x+y)·0,34·s −
+    z·s di una tettoia da 3,80 × 2,40 metri, alta 2,50 al colmo e 1,90 alla
+    gronda, con 30 cm di sporto e s = 22 px/m. */
+const ROOF = "M128.7,34.2 L212.5,67.2 L155.3,106.1 L71.5,73.2 Z";
+/** Lo SPESSORE della falda, sui due bordi bassi: la faccia di gronda e la
+ *  costa di lato. Senza, il piano inclinato resta il ripiano di un tavolo; con
+ *  quattro pixel e mezzo di spessore diventa quello che è — una copertura. */
+const EAVE =
+  "M71.5,73.2 L155.3,106.1 L155.3,110.6 L71.5,77.7 Z M155.3,106.1 L212.5,67.2 L212.5,71.7 L155.3,110.6 Z";
+/** I quattro travetti, dalla gronda al colmo. */
+const RAFTERS =
+  "M148.9,42.2 L91.7,81.1 M163.3,47.9 L106.2,86.8 M177.8,53.5 L120.7,92.5 M192.3,59.2 L135.1,98.2";
+/** I tre pilastri che si vedono. */
+const POSTS = "M201.1,123.8 L201.1,68.8 M155.3,141.8 L155.3,100 M82.9,113.3 L82.9,71.5";
+/** Il quarto, quello lontano: passa dietro alla falda, quindi è nascosto — e
+ *  un tratto nascosto, sul foglio, si tratteggia. */
+const POST_HIDDEN = "M128.7,95.4 L128.7,40.4";
+/** Le due travi che portano i travetti, in testa ai pilastri. */
+const BEAMS = "M128.7,40.4 L201.1,68.8 M82.9,71.5 L155.3,100";
+/** L'ingombro a terra: la pianta della tettoia, tratteggiata. Sul foglio si
+ *  tira sempre, ed è quello che appoggia la figura per terra invece di
+ *  lasciarla galleggiare. */
+const FOOTPRINT = "M128.7,95.4 L201.1,123.8 L155.3,141.8 L82.9,113.3 Z";
+/** I punti notevoli che lo snap aggancia: i quattro angoli della falda e i tre
+ *  piedi dei pilastri che si vedono. Le teste dei pilastri sono escluse
+ *  apposta: cadono a una decina di pixel dagli angoli della falda, e due
+ *  quadratini appaiati si leggono come un errore di disegno. */
+const SNAPS: [number, number][] = [
+  [128.7, 34.2],
+  [212.5, 67.2],
+  [155.3, 106.1],
+  [71.5, 73.2],
+  [201.1, 123.8],
+  [155.3, 141.8],
+  [82.9, 113.3],
 ];
 
-export const ContourPlate = memo(function ContourPlate() {
+export const CanopyPlate = memo(function CanopyPlate() {
   return (
-    <Plate name="cube">
-      <path className="sb-ill-cubeface" d={CUBE_TOP} />
-      <path className="sb-ill-cubeline" d={CUBE_TOP} />
-      <path className="sb-ill-cubeline" d={CUBE_EDGES} />
-      <path className="sb-ill-cubeline" d={CUBE_BOTTOM} />
-      {/* Gli spigoli nascosti, tratteggiati: è la convenzione del disegno
-          tecnico, e da sola dice che il volume è pieno e non una scatola
-          aperta. */}
-      <path className="sb-ill-cubehidden" d="M72,68 L208,68 M140,68 L140,108" />
-      {VERTICES.map(([cx, cy], i) => (
-        <circle
+    <Plate name="cad">
+      {/* L'ingombro a terra sta sotto a tutto: è il piano su cui la tettoia
+          appoggia, e il disegno tecnico lo mette per primo. */}
+      <path className="sb-ill-cadhidden" d={FOOTPRINT} />
+      <path className="sb-ill-cadhidden" d={POST_HIDDEN} />
+
+      <path className="sb-ill-bloom sb-ill-bloom--roof" d={ROOF} />
+      <path className="sb-ill-roof" d={ROOF} fill={acc("cad")} />
+      <path className="sb-ill-rafter" d={RAFTERS} />
+      <path className="sb-ill-cadline" d={ROOF} />
+      <path className="sb-ill-cadline" d={BEAMS} />
+      <path className="sb-ill-eave" d={EAVE} />
+      <path className="sb-ill-post" d={POSTS} />
+
+      {SNAPS.map(([cx, cy], i) => (
+        <rect
           key={`${cx}-${cy}`}
-          className="sb-ill-vertex-dot"
-          cx={cx}
-          cy={cy}
-          r={3}
+          className="sb-ill-snap"
+          x={cx - 3.2}
+          y={cy - 3.2}
+          width={6.4}
+          height={6.4}
           style={{ "--i": i } as React.CSSProperties}
         />
       ))}
-      {MOTES.map(([cx, cy], i) => (
-        <circle
-          key={`${cx}-${cy}`}
-          className="sb-ill-mote"
-          cx={cx}
-          cy={cy}
-          r={1.8}
-          style={{ "--i": i } as React.CSSProperties}
-        />
-      ))}
-      {/* La linea di quota: quella che su una tavola dice quanto è alto. */}
-      <path className="sb-ill-quote" d="M52,68 L52,106 M47,68 L57,68 M47,106 L57,106" />
+
+      {/* La quota dell'altezza. Sta sul pilastro ALTO — quello davanti a
+          destra, dal piede alla trave — e non su uno degli altri: la falda è
+          unica, quindi i quattro pilastri non sono alti uguale, e quotare il
+          più basso vorrebbe dire scrivere un numero che non è l'altezza della
+          tettoia. Sono i 2,50 metri al colmo del modello. */}
+      <path className="sb-ill-quote" d="M234,68.8 L234,123.8 M229,68.8 L239,68.8 M229,123.8 L239,123.8" />
+      <text className="sb-ill-quotenum" x="234" y="62" textAnchor="middle" data-no-i18n>
+        2.50
+      </text>
     </Plate>
   );
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ⑥ Card «Auto» — il quadrante
+   ⑥ Card «Auto» — il contagiri
 
-   Il contagiri resta: è già uno strumento, cioè la stessa famiglia delle
-   altre. Quello che cambia è che adesso sta su una tavola invece che nel
-   vuoto, e che la lancetta si porta dietro due copie sbiadite di sé stessa —
-   la scia. È lo stesso trucco degli echi della finestra, applicato a una cosa
-   che si muove invece che a una che si ripete.
+   Il contagiri resta: è già uno strumento, cioè la stessa famiglia delle altre
+   tavole. Quello che cambia è che adesso è uno strumento COMPLETO, e non un
+   semicerchio con una lancetta:
 
-   Il gesto: la lancetta sale da fondo scala. Da ferma sta in alto, cioè al
-   massimo — il fotogramma finito.
+     · le cifre sul quadrante, ogni due mila giri;
+     · l'arco della zona rossa, che è la tinta della card usata per quello che
+       la tinta della card è — un limite;
+     · le cinque spie del cambio in cima, quelle che sui motori veri si
+       accendono a una a una avvicinandosi al fuorigiri;
+     · la lancetta, con due copie sbiadite di sé stessa dietro — la scia.
+
+   Il gesto: la lancetta sale da fondo scala, la scia la insegue, le spie si
+   accendono in fila. Da ferma sta in alto, cioè al massimo, con tutte le spie
+   accese: il fotogramma finito.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** Le nove tacche del quadrante, dal minimo al massimo: fra 60 e 50 di raggio,
@@ -763,25 +1012,70 @@ const DIAL = [
   "M210,124 L198,124",
 ];
 
+/** Le cifre, dove cadono le tacche pari: 2, 4, 6, 8 mila giri. Stanno su un
+ *  raggio più corto delle tacche, dentro il quadrante. */
+const NUMBERS: [string, number, number][] = [
+  ["2", 101.2, 111.1],
+  ["4", 123.9, 88.4],
+  ["6", 156.1, 88.4],
+  ["8", 178.8, 111.1],
+];
+
+/** La zona rossa: un arco appoggiato sul quadrante, dalla settima tacca (7000
+ *  giri, la prima rossa) al fondo scala. Stesso raggio del quadrante — 70 —
+ *  perché è una fascia sul bordo, non un secondo arco più dentro. */
+const REDLINE = "M189.5,74.5 A70,70 0 0,1 210,124";
+
+/** Le cinque spie del cambio, in cima. Stanno in fila dentro una barretta, e
+ *  non sparse su un arco: su un volante vero sono un pezzo unico, e cinque
+ *  pallini che galleggiano sopra un quadrante sembrano cinque pallini. */
+const SHIFT = [112, 126, 140, 154, 168];
+const SHIFT_Y = 42;
+
 export const GaugePlate = memo(function GaugePlate() {
   return (
     <Plate name="gauge">
+      <rect className="sb-ill-shiftbar" x="98" y="31" width="84" height="22" rx="11" />
+      {SHIFT.map((cx, i) => (
+        <circle
+          key={cx}
+          className="sb-ill-shift"
+          cx={cx}
+          cy={SHIFT_Y}
+          r={3.6}
+          style={{ "--i": i } as React.CSSProperties}
+        />
+      ))}
+
       <path className="sb-ill-dial" d="M70,124 A70,70 0 0,1 210,124" />
       {DIAL.map((d, i) => (
         <path key={d} className={i >= 6 ? "sb-ill-tickmark sb-ill-tickmark--red" : "sb-ill-tickmark"} d={d} />
       ))}
+      {NUMBERS.map(([n, x, y]) => (
+        <text key={n} className="sb-ill-dialnum" x={x} y={y} textAnchor="middle" data-no-i18n>
+          {n}
+        </text>
+      ))}
+
+      <path className="sb-ill-bloom sb-ill-bloom--red" d={REDLINE} />
+      <path className="sb-ill-redline" d={REDLINE} stroke={acc("gauge")} />
+
       {/* La scia: due lancette identiche, dietro, in ritardo di qualche grado.
           La lancetta vera è l'ultima. */}
-      <g className="sb-ill-needle sb-ill-needle--ghost" style={{ "--d": "17deg", "--o": 0.14 } as React.CSSProperties}>
+      <g className="sb-ill-needle sb-ill-needle--ghost" style={{ "--d": "17deg", "--o": 0.16 } as React.CSSProperties}>
         <path d="M140,124 L140,58" />
       </g>
-      <g className="sb-ill-needle sb-ill-needle--ghost" style={{ "--d": "8.5deg", "--o": 0.26 } as React.CSSProperties}>
+      <g className="sb-ill-needle sb-ill-needle--ghost" style={{ "--d": "8.5deg", "--o": 0.3 } as React.CSSProperties}>
         <path d="M140,124 L140,58" />
       </g>
       <g className="sb-ill-needle">
+        <path className="sb-ill-needle-glow" d="M140,124 L140,58" />
         <path d="M140,124 L140,58" />
       </g>
-      <circle className="sb-ill-hub" cx={140} cy={124} r={5} />
+      <circle className="sb-ill-hub" cx={140} cy={124} r={5.5} />
+      <text className="sb-ill-dialunit" x={140} y={144} textAnchor="middle" data-no-i18n>
+        rpm ×1000
+      </text>
     </Plate>
   );
 });

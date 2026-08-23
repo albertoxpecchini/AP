@@ -73,12 +73,42 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
           });
         });
 
+        // ── ③ Le sei tavole della griglia: il gesto, UNA volta, a vista ────
+        // Il gesto di ogni tavola parte al passaggio del puntatore (home.css,
+        // «Il gesto parte al passaggio»), e va bene finché un puntatore c'è.
+        // Su un telefono non c'è: la griglia è la prima cosa che si incontra
+        // scendendo, e restava sei disegni fermi per sempre.
+        //
+        // Qui la tavola si gioca il suo gesto una volta sola, quando entra in
+        // scena, e poi torna ferma. Non è il reveal allo scroll che questa
+        // pagina non vuole — il disegno c'è già, intero, e non compare: è la
+        // stessa regola dei contatori qui sopra, che partono da zero arrivando
+        // a vista perché quello è il momento in cui qualcuno li guarda.
+        //
+        // Il come: un attributo sulla card, che in home.css accende gli stessi
+        // animation-name dell'hover, e che si toglie da sé quando il gesto è
+        // finito — se restasse, l'hover non potrebbe più farlo ripartire.
+        const GESTO = 3600;
+        const timers: number[] = [];
+        gsap.utils.toArray<HTMLElement>(".sb-products .sb-card", scope).forEach((card) => {
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top 88%",
+            once: true,
+            onEnter: () => {
+              card.dataset.play = "";
+              timers.push(window.setTimeout(() => delete card.dataset.play, GESTO));
+            },
+          });
+        });
+
         return () => {
           intro.kill();
+          timers.forEach(clearTimeout);
         };
       });
 
-      // ── ③ Bottoni "magnetici": si sporgono verso il cursore ─────────────
+      // ── ④ Bottoni "magnetici": si sporgono verso il cursore ─────────────
       //     Spostamento limitato a pochi pixel: deve sembrare attrazione,
       //     non un bersaglio che scappa quando provi a cliccarlo.
       //
