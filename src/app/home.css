@@ -1636,18 +1636,61 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-ill-cursor--b .sb-ill-tag { fill: var(--ill-acc); }
 .sb-ill-cursor--b .sb-ill-tagtext { fill: #fff; }
 
-/* ── ④ Fotografia — il provino a contatto ──────────────────────────────────*/
+/* ── ④ Fotografia — il provino a contatto, e la revisione ──────────────────
+   Tre cose si muovono, tutte e tre sullo stesso orologio da 8s con la battuta
+   a 2s: la lente si ferma su quattro fotogrammi, il segno di matita si
+   disegna quando la lente arriva, e la riga della targhetta cambia con lei.
+
+   Il ritardo è come si tengono in fila: --i è il numero della fermata, e ogni
+   fermata vale 2s. Quindi ogni elemento gira sullo stesso ciclo da 8s, sfasato
+   di un quarto rispetto al precedente, e il tutto si richiude senza salti.
+
+   `animation-fill-mode: backwards` sta sui segni e NON sulle righe della
+   targhetta, ed è la differenza fra le due il pezzo da capire. Un elemento in
+   ritardo, senza, resta sui valori della sua regola. Per un segno quei valori
+   sono il fotogramma FINITO, cioè il tratto già tirato: senza `backwards` si
+   vedrebbero quattro segni sul foglio sparire a uno a uno per essere
+   ridisegnati, invece del foglio che si pulisce tutto insieme appena il gesto
+   comincia. Per una riga della targhetta, invece, la regola dice già spenta —
+   tranne la prima, che da ferma è quella che si legge — e `backwards` farebbe
+   il danno all'incontrario: il suo 0 % è il fotogramma ACCESO, e le quattro
+   righe si accenderebbero tutte insieme una sull'altra. */
 .sb-ill-tile {
   fill: var(--ill-fill);
   stroke: color-mix(in srgb, var(--sb-fg) 13%, transparent);
   stroke-width: 1.1;
 }
 .sb-ill-tileglyph { fill: none; stroke: var(--ill-line); stroke-width: 1.3; }
-/* Il fotogramma scelto: cornice, bagliore e targhetta saltano insieme, quindi
-   la transform sta sul gruppo. */
+/* Il segno della matita dermografica. Il tracciato si scopre da un capo
+   all'altro — dasharray e dashoffset — e siccome ogni segno dichiara
+   pathLength=100, la stessa coppia di numeri vale per la croce e per il
+   cerchio, che sono lunghi il doppio l'uno dell'altro.
+
+   Da fermo il segno è tirato per intero: offset a zero. */
+.sb-ill-mark {
+  fill: none;
+  stroke: var(--ill-ink);
+  stroke-width: 2;
+  opacity: 0.55;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  animation-duration: 8s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-delay: calc(var(--i) * 2s);
+  animation-fill-mode: backwards;
+}
+/* Quello che si tiene: cerchiato, e della tinta. Il grigio dice scartato, la
+   tinta dice scelto — non serve altro per leggere il provino. */
+.sb-ill-mark--keep {
+  stroke: var(--ill-acc);
+  stroke-width: 2;
+  opacity: 0.85;
+}
+/* La lente: cornice, bagliore e targhetta si spostano insieme, quindi la
+   transform sta sul gruppo. */
 .sb-ill-tilesel {
   transform-box: view-box;
-  animation-duration: 2s;
+  animation-duration: 8s;
   animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
 }
 .sb-ill-selbloom {
@@ -1663,7 +1706,18 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   stroke-width: 2;
 }
 .sb-ill-seltag { fill: var(--ill-acc); stroke: none; }
-.sb-ill-seltext { font-size: 8px; fill: #fff; letter-spacing: -0.2px; }
+/* Le quattro righe della targhetta stanno una sull'altra: da ferma si vede la
+   prima, e durante il gesto ognuna ha il suo quarto di ciclo. */
+.sb-ill-seltext {
+  font-size: 8px;
+  fill: #fff;
+  letter-spacing: -0.2px;
+  opacity: 0;
+  animation-duration: 8s;
+  animation-timing-function: linear;
+  animation-delay: calc(var(--i) * 2s);
+}
+.sb-ill-seltext--on { opacity: 1; }
 
 /* ── ⑤ Il geometra — la tettoia in assonometria ────────────────────────────
    Le convenzioni del disegno tecnico, e sono quelle: il tratteggio fine per
@@ -1706,32 +1760,50 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-ill-quote { fill: none; stroke: var(--ill-line); stroke-width: 1.2; }
 .sb-ill-quotenum { font-size: 10px; fill: var(--sb-fg-light); }
 
-/* ── ⑥ Auto — il contagiri ─────────────────────────────────────────────────*/
+/* ── ⑥ Auto — il contagiri ─────────────────────────────────────────────────
+   Qui in cima c'era .sb-ill-shiftbar: una pastiglia chiara con dentro cinque
+   pallini della tinta. Se n'è andata, e vale la pena dire perché — era l'unica
+   SUPERFICIE OPACA di tutte e sei le tavole. Sei figure fatte di tratti, alone
+   e carta millimetrata, e in mezzo un rettangolo pieno del colore del pannello:
+   il primo posto in cui cadeva l'occhio era quello, e non diceva niente.
+
+   Al suo posto ci sono tre dettagli che uno strumento vero ha davvero: le
+   mezze tacche, le tre spie di controllo e la freccia del cambio. La quarta
+   provata — la marcia in mezzo al quadrante — è stata tolta, e il perché sta
+   in homeLive.tsx sopra alla figura. */
 .sb-ill-dial { fill: none; stroke: var(--ill-line); stroke-width: 1.6; }
 .sb-ill-tickmark { stroke: var(--ill-line); stroke-width: 1.6; }
 .sb-ill-tickmark--red { stroke: var(--ill-acc); }
+/* Le mezze tacche: la scala fine, ogni 500 giri. Del colore del terreno e
+   sottili, perché su uno strumento vero si leggono solo se le si cerca — se
+   pesassero quanto le piene sarebbero un pettine, non una scala. */
+.sb-ill-minor { stroke: var(--ill-grid); stroke-width: 1.2; }
 .sb-ill-dialnum { font-size: 11px; fill: var(--sb-fg-light); }
 .sb-ill-dialunit { font-size: 8px; fill: var(--sb-fg-lighter); letter-spacing: 0.3px; }
 /* La zona rossa: un arco della tinta appoggiato sul quadrante, dalla settima
    tacca al fondo scala. È la tinta della card usata per quello che è — un
    limite. */
 .sb-ill-redline { fill: none; stroke-width: 3.4; }
-/* La barretta che tiene le spie in fila: un pezzo di strumento, non un
-   contorno decorativo. */
-.sb-ill-shiftbar {
-  fill: color-mix(in srgb, var(--sb-surface-100) 82%, transparent);
-  stroke: var(--ill-grid);
-  stroke-width: 1;
+/* Le tre spie di controllo: olio, temperatura, batteria. SPENTE, e devono
+   restarlo — una spia accesa su un cruscotto vuol dire che qualcosa non va.
+   Quindi tratto sottile del colore della struttura, e nessuna tinta: sono lì
+   per farsi riconoscere dalla forma, non per accendersi. */
+.sb-ill-spia {
+  fill: none;
+  stroke: var(--ill-line);
+  stroke-width: 1.5;
+  opacity: 0.85;
 }
-/* Le spie del cambio. A riposo sono tutte accese, perché a riposo la lancetta
-   è a fondo scala: il fotogramma finito. */
-.sb-ill-shift {
-  fill: var(--ill-acc);
-  stroke: none;
+/* La freccia del cambio: la spia che dice «cambia marcia adesso». È l'unica
+   che si accende, ed è quella che deve. A riposo è accesa, perché a riposo la
+   lancetta è a fondo scala. */
+.sb-ill-uplamp {
   opacity: 1;
   animation-duration: 1.8s;
   animation-timing-function: steps(1, end);
 }
+.sb-ill-uparrow { stroke: none; }
+
 /* La lancetta è disegnata dritta in su e ruota: la geometria non sa niente
    dell'angolo, e l'angolo è l'unica cosa che si anima. A riposo sta a fondo
    scala. */
@@ -1851,10 +1923,32 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 @keyframes sb-ill-drift {
   50% { transform: translate(calc(var(--x) + 14px), calc(var(--y) - 9px)); }
 }
+/* La revisione del provino. Otto secondi con la battuta a due: la lente arriva
+   su una fermata ogni quarto di ciclo e ci resta ferma quasi tutto il tempo —
+   il trasferimento è il 7 %, cioè poco più di mezzo secondo. Gli scostamenti
+   sono le fermate di homeLive.tsx meno il fotogramma tenuto (STOPS meno KEEP):
+   in alto a sinistra, in alto a destra, in basso a sinistra, e a casa. */
 @keyframes sb-ill-sel {
-  0%, 12% { transform: translate(0, 0); }
-  50%, 62% { transform: translate(128px, 84px); }
+  0%, 18% { transform: translate(0, 0); }
+  25%, 43% { transform: translate(-128px, -42px); }
+  50%, 68% { transform: translate(64px, -42px); }
+  75%, 93% { transform: translate(-64px, 42px); }
   100% { transform: translate(0, 0); }
+}
+/* Il segno di matita: si tira in poco più di un secondo — il tempo in cui la
+   lente sta ferma sopra al fotogramma — e resta fino alla fine del suo ciclo.
+   A metterlo al suo turno è il ritardo, non la keyframe (.sb-ill-mark). */
+@keyframes sb-ill-mark {
+  0% { stroke-dashoffset: 100; }
+  14%, 100% { stroke-dashoffset: 0; }
+}
+/* Il turno della riga sulla targhetta: accesa il suo primo quarto di ciclo, e
+   spenta negli ultimi tre centesimi di quel quarto — cioè esattamente quando
+   la riga seguente, che parte due secondi dopo, si accende. Il cambio è netto,
+   e non c'è mai un istante con due righe una sull'altra. */
+@keyframes sb-ill-tagswap {
+  0%, 22% { opacity: 1; }
+  25%, 100% { opacity: 0; }
 }
 /* Lo snap: il quadratino si riempie della tinta quando il punto viene
    agganciato, e torna vuoto. */
@@ -1870,13 +1964,21 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   0% { transform: rotate(-81deg); }
   100% { transform: rotate(calc(81deg - var(--d))); }
 }
-/* Le spie si accendono in fila mentre la lancetta sale, una ogni tanti giri.
-   steps(1, end) come curva: una spia è accesa o spenta, non c'è una via di
-   mezzo — e con gli scatti i fotogrammi veri sono due per spia, non uno per
-   frame. Il ritardo lo dà --i, che è la posizione della spia nella fila. */
-@keyframes sb-ill-shift {
-  0%, 55% { opacity: 0; }
-  100% { opacity: 1; }
+/* La freccia del cambio si accende sul finale della salita, quando la lancetta
+   è ormai nel rosso. steps(1, end) come curva: una spia è accesa o spenta, non
+   c'è una via di mezzo — e con gli scatti i fotogrammi veri sono due in tutto,
+   non uno per frame.
+
+   Dove cade il 55 % va scritto con attenzione, e le cinque spie che stavano qui
+   prima lo scrivevano SBAGLIATO: erano «0 %, 55 % { opacity: 0 } 100 % {
+   opacity: 1 }», e con steps(1, end) un tratto fra due fotogrammi tiene il
+   valore del PRIMO fino in fondo — quindi il tratto da 55 a 100 valeva zero
+   tutto intero, e le spie non si accendevano mai durante il gesto. Si vedevano
+   accese solo da ferme, dove a tenerle su era la regola normale. Il valore
+   nuovo va sul fotogramma in cui la spia deve accendersi, non su quello dopo. */
+@keyframes sb-ill-uplamp {
+  0% { opacity: 0; }
+  55%, 100% { opacity: 1; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1921,6 +2023,16 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    quelli stanno dentro @media (hover: hover), che è esattamente il posto in
    cui questa regola NON deve stare. Se aggiungi un gesto, aggiungilo in tutti
    e due i blocchi. */
+/* Quanto dura il gesto giocato a vista, tavola per tavola: lo legge da qui
+   site/homeMotion.ts ③, che è chi lo aspetta. Sta nel foglio e non nel
+   TypeScript perché è una durata di animazione, e le animazioni che misura
+   stanno tutte qui sopra. Cinque tavole si giocano un gesto da un paio di
+   secondi; la ④ è la revisione di un provino e ne dura otto. Con un tempo solo
+   per tutte, o il provino restava tagliato a metà strada o le altre cinque si
+   ripetevano tre volte. In millisecondi, che è come li vuole setTimeout. */
+.sb-products .sb-card { --sb-gesto: 3600ms; }
+.sb-products .sb-card:has(.sb-ill--film) { --sb-gesto: 8200ms; }
+
 .sb-card[data-play] .sb-ill { transform: scale(1.03); }
 .sb-card[data-play] .sb-ill-glow { opacity: 1; }
 .sb-card[data-play] .sb-ill-bloom { opacity: 0.3; }
@@ -1934,10 +2046,12 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-card[data-play] .sb-typebar-w--a { animation-name: sb-type-out; }
 .sb-card[data-play] .sb-typebar-w--b { animation-name: sb-type-in; }
 .sb-card[data-play] .sb-ill-tilesel { animation-name: sb-ill-sel; }
+.sb-card[data-play] .sb-ill-mark { animation-name: sb-ill-mark; }
+.sb-card[data-play] .sb-ill-seltext { animation-name: sb-ill-tagswap; }
 .sb-card[data-play] .sb-ill-snap { animation-name: sb-ill-snap; }
 .sb-card[data-play] .sb-ill-needle { animation-name: sb-ill-needle; }
 .sb-card[data-play] .sb-ill-needle--ghost { animation-name: sb-ill-needle-ghost; }
-.sb-card[data-play] .sb-ill-shift { animation-name: sb-ill-shift; }
+.sb-card[data-play] .sb-ill-uplamp { animation-name: sb-ill-uplamp; }
 
 @media (hover: hover) and (pointer: fine) {
   .sb-card:hover .sb-ill,
@@ -1970,6 +2084,10 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
   .sb-card:hover .sb-ill-tilesel,
   .sb-card:focus-visible .sb-ill-tilesel { animation-name: sb-ill-sel; }
+  .sb-card:hover .sb-ill-mark,
+  .sb-card:focus-visible .sb-ill-mark { animation-name: sb-ill-mark; }
+  .sb-card:hover .sb-ill-seltext,
+  .sb-card:focus-visible .sb-ill-seltext { animation-name: sb-ill-tagswap; }
 
   .sb-card:hover .sb-ill-snap,
   .sb-card:focus-visible .sb-ill-snap { animation-name: sb-ill-snap; }
@@ -1978,8 +2096,8 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   .sb-card:focus-visible .sb-ill-needle { animation-name: sb-ill-needle; }
   .sb-card:hover .sb-ill-needle--ghost,
   .sb-card:focus-visible .sb-ill-needle--ghost { animation-name: sb-ill-needle-ghost; }
-  .sb-card:hover .sb-ill-shift,
-  .sb-card:focus-visible .sb-ill-shift { animation-name: sb-ill-shift; }
+  .sb-card:hover .sb-ill-uplamp,
+  .sb-card:focus-visible .sb-ill-uplamp { animation-name: sb-ill-uplamp; }
 
   /* Chi ha chiesto meno movimento non riceve il gesto nemmeno sull'hover: gli
      resta la tavola finita, che è già il disegno per intero — e nemmeno

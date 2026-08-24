@@ -89,7 +89,25 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
         // Il come: un attributo sulla card, che in home.css accende gli stessi
         // animation-name dell'hover, e che si toglie da sé quando il gesto è
         // finito — se restasse, l'hover non potrebbe più farlo ripartire.
+        //
+        // Quanto dura il gesto non è più lo stesso per tutte e sei: cinque si
+        // giocano un paio di secondi, la ④ è la revisione di un provino a
+        // contatto e ne dura otto. Il numero lo porta la card addosso, in una
+        // proprietà del foglio (--sb-gesto), e si legge una volta sola — la
+        // prima volta che quella card entra in scena.
+        //
+        // L'unità va guardata, e non è pignoleria: nel foglio quei valori sono
+        // scritti in millisecondi, ma getComputedStyle li restituisce
+        // normalizzati in secondi — "8200ms" torna indietro come "8.2s". Un
+        // parseFloat e via avrebbe dato 8,2 millisecondi, cioè l'attributo
+        // tolto prima del primo fotogramma e il gesto mai visto.
         const GESTO = 3600;
+        const durata = (card: HTMLElement) => {
+          const v = getComputedStyle(card).getPropertyValue("--sb-gesto").trim();
+          const n = parseFloat(v);
+          if (!Number.isFinite(n) || n <= 0) return GESTO;
+          return v.endsWith("ms") ? n : n * 1000;
+        };
         const timers: number[] = [];
         gsap.utils.toArray<HTMLElement>(".sb-products .sb-card", scope).forEach((card) => {
           ScrollTrigger.create({
@@ -98,7 +116,7 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
             once: true,
             onEnter: () => {
               card.dataset.play = "";
-              timers.push(window.setTimeout(() => delete card.dataset.play, GESTO));
+              timers.push(window.setTimeout(() => delete card.dataset.play, durata(card)));
             },
           });
         });

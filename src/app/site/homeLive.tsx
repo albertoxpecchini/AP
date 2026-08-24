@@ -44,13 +44,14 @@
 //                          che li unisce, con sopra i due domini     (un impulso passa e arriva)
 //   ③ Sviluppo con l'IA → due cursori con la targhetta del nome —
 //                          «Alberto» e «Claude» — e le bollicine     (i puntini battono)
-//   ④ Fotografia        → un provino a contatto, un fotogramma solo
-//                          acceso e targato EOS 4000D — e nessun
-//                          volto, perché non si pubblicano           (il fotogramma salta)
+//   ④ Fotografia        → un provino a contatto rivisto con la matita:
+//                          quattro fermate, tre croci e un cerchio —
+//                          e nessun volto, perché non si pubblicano  (la revisione, otto secondi)
 //   ⑤ Il geometra       → la tettoia in legno in assonometria, con
 //                          l'ingombro a terra e la quota             (i punti si agganciano)
-//   ⑥ Auto              → un contagiri intero: cifre, zona rossa,
-//                          spie del cambio, scia della lancetta      (la lancetta sale)
+//   ⑥ Auto              → un contagiri intero: mezze tacche, cifre,
+//                          zona rossa, le tre spie di controllo e la
+//                          freccia del cambio                        (la lancetta sale)
 //
 // Da quale tavola loro viene ciascuna, e perché quella lì, sta scritto sopra
 // ogni figura.
@@ -58,6 +59,12 @@
 // ── Le regole del movimento ──────────────────────────────────────────────────
 // Una cosa sola in movimento per riquadro, e quella cosa è un GESTO: qualcosa
 // che comincia, finisce e ricomincia — non un oggetto che vibra.
+//
+// Una cosa sola non vuol dire un elemento solo. La tavola ④ ne muove tre —
+// la lente, i segni della matita e la riga della targhetta — ma sono tre parti
+// dello stesso gesto, la revisione di un provino, tenute insieme da un unico
+// orologio da otto secondi con la battuta a due. La prova che è un gesto e non
+// tre è che nessuna delle tre, da sola, si capirebbe.
 //
 // E il gesto NON parte da solo: da fermo la griglia è ferma, e ogni figura si
 // anima solo mentre il puntatore è sulla sua card. È la regola della griglia
@@ -77,10 +84,12 @@
 // Le proprietà animate sono tre, e sono tutte a buon mercato: transform e
 // opacity, che il compositore muove senza ricalcolare niente; fill su otto
 // quadratini da 6 px (i punti di aggancio della tettoia); e lo scostamento di
-// un tratteggio su un tracciato solo (l'impulso del globo), che ridipinge un
-// trattino da tredici unità e nient'altro. L'unica animazione di layout è la
-// pillola del comando, che cresce di un carattere alla volta: perché lì si
-// possa fare sta scritto in home.css, sopra .sb-typebar.
+// un tratteggio, che ridipinge il tracciato che ha sotto e nient'altro —
+// l'impulso del globo, che è un trattino da tredici unità, e i quattro segni
+// di matita del provino, che sono tre croci e un cerchio grandi quanto un
+// fotogramma. L'unica animazione di layout è la pillola del comando, che cresce
+// di un carattere alla volta: perché lì si possa fare sta scritto in home.css,
+// sopra .sb-typebar.
 //
 // E niente filtri SVG: la luce delle figure sono due passate di tracciato (una
 // larga e trasparente, una fine e piena), non un feGaussianBlur. Un filtro
@@ -767,7 +776,7 @@ export const LiveCursors = memo(function LiveCursors() {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ④ Card «Fotografia» — il provino a contatto
+   ④ Card «Fotografia» — il provino a contatto, e la revisione
 
    È la tavola Storage di Supabase: una griglia di riquadri con dentro il glifo
    del tipo di file, uno solo evidenziato. Lì sono immagini, documenti e video;
@@ -778,24 +787,113 @@ export const LiveCursors = memo(function LiveCursors() {
    pubblicano. Un provino di riquadri vuoti è la figura esatta di «ci sono, e
    non ve li faccio vedere».
 
-   Il fotogramma scelto adesso è ACCESO — pieno della tinta, bordo spesso,
-   bagliore intorno — e porta la targhetta con il corpo macchina, che è vero:
-   le sessioni di questo sito sono tutte scattate con una Canon EOS 4000D (lo
-   dice sessioni.json, che è generato dagli EXIF). È il pezzo di interfaccia
-   vera di questa tavola, come l'indirizzo lo è della ①.
+   ── La revisione, che è il giro nuovo ───────────────────────────────────────
+   Qui succedeva una cosa sola e durava due secondi: la cornice del fotogramma
+   scelto saltava su un altro riquadro e tornava indietro. Era il gesto giusto
+   per la tavola sbagliata — un provino a contatto non serve a guardare UN
+   fotogramma, serve a sceglierne uno fra tanti, e quella scelta è un lavoro
+   che dura.
 
-   L'ultima colonna esce dal bordo destro apposta: la griglia continua fuori
-   dalla card, e una griglia tagliata dal bordo è più grande di una che ci sta
-   dentro tutta.
+   Adesso la tavola fa il lavoro intero, e ci mette otto secondi:
 
-   Il gesto: il fotogramma scelto salta a un altro riquadro, con la targhetta
-   appresso — come si scorre un provino.
+     · la lente si ferma su quattro fotogrammi, uno dopo l'altro, due secondi
+       per fermata;
+     · a ogni fermata il fotogramma riceve il suo segno di matita, tirato lì
+       per lì — tre croci agli scarti e un cerchio a quello che si tiene;
+     · e la targhetta viaggia con la lente cambiando riga a ogni fermata: il
+       corpo macchina, l'obiettivo, l'apertura, l'ISO.
+
+   È il gesto vero della matita dermografica sui provini: si guarda, si segna,
+   e alla fine sul foglio resta scritto quale si stampa. Il cerchio sborda dal
+   fotogramma e non chiude il giro dov'era partito, perché una mano non lo
+   chiude mai — un cerchio perfetto sarebbe stampato, non tirato.
+
+   Tre cose che si muovono sono due più di quante ne ammetta la regola in testa
+   al file. Non è uno strappo: la regola dice una cosa sola per riquadro e
+   quella cosa è un GESTO, e qui il gesto è uno — la revisione. Lente, segni e
+   targhetta stanno tutti e tre sullo stesso orologio da otto secondi con la
+   battuta a due, e nessuno dei tre si capirebbe da solo.
+
+   ── I quattro dati della targhetta sono VERI ────────────────────────────────
+   Non sono EXIF inventati per fare atmosfera: li ha scritti negli scatti la
+   macchina, e li rilegge scripts/build-foto-shooting.mjs quando genera
+   shooting/sessioni.json. Le sessioni di questo sito sono ottantanove scatti
+   fatti tutti con lo stesso corpo e lo stesso obiettivo — Canon EOS 4000D ed
+   EF-S 18-55mm f/3.5-5.6 III — e l'ISO più alto che c'è dentro è 3200.
+
+   L'ultima colonna e l'ultima riga escono dal bordo apposta: la griglia
+   continua fuori dalla card, e una griglia tagliata dal bordo è più grande di
+   una che ci sta tutta dentro. Per questo le quattro fermate stanno tutte
+   nelle colonne e nelle righe INTERE — una lente ferma su un fotogramma
+   tagliato a metà è una lente fuori posto.
+
+   Il fotogramma di riposo è la revisione FINITA: la lente parcheggiata sul
+   fotogramma tenuto, i quattro segni sul foglio, la targhetta sul corpo
+   macchina. Chi ha chiesto meno movimento vede il provino già scelto, e non
+   una scelta a metà.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const TILE_W = 56;
 const TILE_H = 34;
 const TILE_X = [14, 78, 142, 206, 270];
 const TILE_Y = [12, 54, 96, 138];
+
+/** Il fotogramma che si tiene. La lente parte di qui e ci torna, ed è l'unico
+ *  che prende il cerchio invece della croce. */
+const KEEP: [number, number] = [TILE_X[2], TILE_Y[1]];
+
+/** Le tre fermate, nell'ordine in cui la lente le fa: in alto a sinistra, in
+ *  alto a destra, in basso a sinistra — e poi a casa. Gli scostamenti da KEEP
+ *  sono ricopiati in home.css dentro @keyframes sb-ill-sel, che è il posto in
+ *  cui il movimento si scrive: se sposti una fermata, spostala anche là. */
+const STOPS: [number, number][] = [
+  [TILE_X[0], TILE_Y[0]],
+  [TILE_X[3], TILE_Y[0]],
+  [TILE_X[1], TILE_Y[2]],
+];
+
+/** Le quattro righe della targhetta, una per fermata. Ci stanno tutte dentro i
+ *  52 px della targhetta: dieci caratteri del mono a 8 px sono 48. */
+const EXIF = ["EOS 4000D", "EF-S 18-55", "f/3.5-5.6", "ISO 3200"];
+
+/** La croce di uno scarto. I due tratti non si incrociano precisi e sbordano
+ *  di un pelo dal fotogramma: una croce simmetrica sembra un glifo, questa
+ *  sembra una matita. */
+function cross(x: number, y: number): string {
+  return `M${x + 10},${y + 7} L${x + 47},${y + 28} M${x + 45},${y + 6} L${x + 9},${y + 27}`;
+}
+
+/** Il cerchio di quello che si tiene: due mezzi giri di ellisse e una coda che
+ *  passa oltre il punto di partenza.
+ *
+ *  Tre numeri, e nessuno dei tre è a occhio. È largo 7 px più del fotogramma
+ *  per parte: sotto, il giro passava esattamente per i due angoli bassi della
+ *  targhetta, e siccome sono della stessa tinta si leggevano come una macchia
+ *  sola invece che come una riga sopra a un cerchio. Ed è storto di sei gradi,
+ *  che è la cosa che lo fa sembrare tirato invece che stampato — un'ellisse in
+ *  bolla, per quanto sbilenca la si disegni, resta un ovale di clipart. */
+const LOOP_ROT = -6;
+
+function loop(x: number, y: number): string {
+  const cx = x + TILE_W / 2;
+  const cy = y + TILE_H / 2;
+  const rx = 35;
+  const ry = 25;
+  const cf = Math.cos(rad(LOOP_ROT));
+  const sf = Math.sin(rad(LOOP_ROT));
+  /* Il punto a θ gradi sull'ellisse, girata di LOOP_ROT intorno al centro. Il
+     giro va scritto due volte — qui nei punti e nel terzo numero del comando A
+     — perché l'arco SVG vuole gli estremi in coordinate del foglio e
+     l'inclinazione a parte. */
+  const p = (deg: number) => {
+    const a = rad(deg);
+    const c = Math.cos(a);
+    const s = Math.sin(a);
+    return `${r2(cx + rx * c * cf - ry * s * sf)},${r2(cy + rx * c * sf + ry * s * cf)}`;
+  };
+  const A = `A${rx},${ry} ${LOOP_ROT}`;
+  return `M${p(100)} ${A} 1 1 ${p(280)} ${A} 1 1 ${p(100)} ${A} 0 1 ${p(118)}`;
+}
 
 /** Tre glifi, a rotazione: paesaggio, diaframma, ritratto. */
 function TileGlyph({ kind, cx, cy }: { kind: number; cx: number; cy: number }) {
@@ -826,8 +924,7 @@ function TileGlyph({ kind, cx, cy }: { kind: number; cx: number; cy: number }) {
 }
 
 export const ContactSheet = memo(function ContactSheet() {
-  const sx = TILE_X[1];
-  const sy = TILE_Y[1];
+  const [kx, ky] = KEEP;
   return (
     <Plate name="film">
       {TILE_Y.map((y, r) =>
@@ -839,23 +936,55 @@ export const ContactSheet = memo(function ContactSheet() {
         )),
       )}
 
-      {/* Il fotogramma scelto. È un gruppo e non un rettangolo perché adesso
-          si porta dietro la targhetta: la transform del gesto sta sul gruppo,
-          e cornice e targhetta saltano insieme. Sta sopra a tutti gli altri
-          perché è l'ultimo disegnato. */}
+      {/* I segni della matita. Ognuno si disegna da sé nel momento in cui la
+          lente arriva sul suo fotogramma, e a tenerli in fila è --i: è il
+          numero della fermata, e in home.css diventa il ritardo — due secondi
+          a fermata.
+
+          pathLength=100 su tutti e quattro: così il tratteggio che li scopre
+          si scrive una volta sola nel foglio (dasharray 100, offset da 100 a
+          zero) e vale tanto per la croce, che è lunga un'ottantina di unità,
+          quanto per il cerchio, che ne misura duecento. Senza, ogni segno
+          avrebbe voluto la sua lunghezza vera scritta a mano. */}
+      <path
+        className="sb-ill-mark sb-ill-mark--keep"
+        d={loop(kx, ky)}
+        pathLength={100}
+        style={{ "--i": 0 } as React.CSSProperties}
+      />
+      {STOPS.map(([x, y], i) => (
+        <path
+          key={`${x}-${y}`}
+          className="sb-ill-mark"
+          d={cross(x, y)}
+          pathLength={100}
+          style={{ "--i": i + 1 } as React.CSSProperties}
+        />
+      ))}
+
+      {/* La lente: cornice, bagliore e targhetta si spostano insieme, quindi
+          la transform sta sul gruppo. È l'ultima disegnata, quindi sta sopra a
+          tutto — anche ai segni, che sono sul foglio. */}
       <g className="sb-ill-tilesel">
-        <rect className="sb-ill-selbloom" x={sx} y={sy} width={TILE_W} height={TILE_H} rx={7} />
-        <rect className="sb-ill-selbox" x={sx} y={sy} width={TILE_W} height={TILE_H} rx={7} />
-        <rect className="sb-ill-seltag" x={sx + 2} y={sy + TILE_H - 13} width={TILE_W - 4} height={11} rx={3} />
-        <text
-          className="sb-ill-seltext"
-          x={sx + TILE_W / 2}
-          y={sy + TILE_H - 4.5}
-          textAnchor="middle"
-          data-no-i18n
-        >
-          EOS 4000D
-        </text>
+        <rect className="sb-ill-selbloom" x={kx} y={ky} width={TILE_W} height={TILE_H} rx={7} />
+        <rect className="sb-ill-selbox" x={kx} y={ky} width={TILE_W} height={TILE_H} rx={7} />
+        <rect className="sb-ill-seltag" x={kx + 2} y={ky + TILE_H - 13} width={TILE_W - 4} height={11} rx={3} />
+        {/* Le quattro righe sono impilate una sull'altra e si danno il turno
+            con l'opacità. La prima è quella accesa da ferma: il corpo
+            macchina, che è il dato che questa tavola porta da sempre. */}
+        {EXIF.map((riga, i) => (
+          <text
+            key={riga}
+            className={i === 0 ? "sb-ill-seltext sb-ill-seltext--on" : "sb-ill-seltext"}
+            x={kx + TILE_W / 2}
+            y={ky + TILE_H - 4.5}
+            textAnchor="middle"
+            style={{ "--i": i } as React.CSSProperties}
+            data-no-i18n
+          >
+            {riga}
+          </text>
+        ))}
       </g>
     </Plate>
   );
@@ -983,22 +1112,47 @@ export const CanopyPlate = memo(function CanopyPlate() {
    ⑥ Card «Auto» — il contagiri
 
    Il contagiri resta: è già uno strumento, cioè la stessa famiglia delle altre
-   tavole. Quello che cambia è che adesso è uno strumento COMPLETO, e non un
-   semicerchio con una lancetta:
+   tavole. Quello che cambia, di giro in giro, è quanto è uno strumento VERO.
 
-     · le cifre sul quadrante, ogni due mila giri;
-     · l'arco della zona rossa, che è la tinta della card usata per quello che
-       la tinta della card è — un limite;
-     · le cinque spie del cambio in cima, quelle che sui motori veri si
-       accendono a una a una avvicinandosi al fuorigiri;
-     · la lancetta, con due copie sbiadite di sé stessa dietro — la scia.
+   ── Cosa se n'è andato ──────────────────────────────────────────────────────
+   In cima c'era una pillola chiara con dentro cinque pallini della tinta: le
+   spie del cambio, quelle che sui motori da corsa si accendono a una a una
+   avvicinandosi al fuorigiri. Erano sbagliate due volte. Sbagliate di forma:
+   una pastiglia bianca appoggiata sopra alla carta millimetrata era l'unica
+   superficie opaca di tutte e sei le tavole, e si vedeva solo quella. E
+   sbagliate di sostanza: cinque pallini in fila non sono cinque spie, sono
+   cinque pallini — nessuno dei cinque diceva di che cosa fosse la spia.
 
-   Il gesto: la lancetta sale da fondo scala, la scia la insegue, le spie si
-   accendono in fila. Da ferma sta in alto, cioè al massimo, con tutte le spie
-   accese: il fotogramma finito.
+   ── Cosa c'è adesso, e perché ognuna delle tre cose ci sta ──────────────────
+     · LE MEZZE TACCHE. Una fra ogni coppia di tacche piene, cioè ogni cinque-
+       cento giri, corte la metà e del colore del terreno. È la prima cosa che
+       distingue il quadrante di uno strumento dal disegno di un quadrante: su
+       una scala vera si legge anche fra un numero e l'altro.
+     · LE TRE SPIE DI CONTROLLO, in fila in basso, e sono glifi VERI —
+       pressione dell'olio, temperatura del refrigerante, batteria. Stanno
+       SPENTE, ed è la cosa giusta: su un cruscotto una spia accesa vuol dire
+       che qualcosa non va, e questa è la tavola di tre auto sognate, non di un
+       guasto. Le si riconosce dalla FORMA, che è l'unica cosa che un pallino
+       non poteva fare.
+     · LA FRECCIA DEL CAMBIO, in cima, dove stava la pillola: la spia che sulle
+       auto vere si accende per dire «cambia marcia adesso». Una sola, grande,
+       della tinta, e senza scatola intorno — il posto della vecchia pastiglia,
+       fatto di luce invece che di superficie.
+
+   ── E una quarta provata e tolta ────────────────────────────────────────────
+   LA MARCIA, la cifra grande in mezzo al quadrante. Ci stava, ed è dove ogni
+   cruscotto moderno la mette — ma lì dentro una cifra sola, per quanto grande,
+   la si legge come una cifra della scala: il sei della marcia cadeva a un dito
+   dal sei dei seimila giri, e i due si guardavano. Perché funzionasse ci voleva
+   una scatola intorno, cioè esattamente la superficie opaca appena tolta dalla
+   cima. Non vale il prezzo.
+
+   Il gesto: la lancetta sale da fondo scala, la scia la insegue e sul finale
+   si accende la freccia. Da ferma sta in alto, cioè al massimo, con la freccia
+   accesa: il fotogramma finito.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Le nove tacche del quadrante, dal minimo al massimo: fra 60 e 50 di raggio,
+/** Le nove tacche del quadrante, dal minimo al massimo: fra 70 e 58 di raggio,
  *  ogni 22,5° sul mezzo giro alto. Le tre finali sono la zona rossa. */
 const DIAL = [
   "M70,124 L82,124",
@@ -1011,6 +1165,18 @@ const DIAL = [
   "M204.7,97.2 L193.6,101.8",
   "M210,124 L198,124",
 ];
+
+/** Le mezze tacche: una in mezzo a ogni coppia di tacche piene, cioè ogni
+ *  cinquecento giri. Sono le uniche coordinate del quadrante che non stanno
+ *  scritte a mano, e il conto è quello dell'arco — il punto a θ gradi sul
+ *  raggio r sta in (140 − r·cos θ, 124 − r·sin θ), con θ da sinistra in su.
+ *  Vanno da 70 a 64: la metà delle piene, che arrivano a 58. */
+const MINOR = Array.from({ length: 8 }, (_, k) => {
+  const a = rad(11.25 + k * 22.5);
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  return `M${r2(140 - 70 * c)},${r2(124 - 70 * s)} L${r2(140 - 64 * c)},${r2(124 - 64 * s)}`;
+});
 
 /** Le cifre, dove cadono le tacche pari: 2, 4, 6, 8 mila giri. Stanno su un
  *  raggio più corto delle tacche, dentro il quadrante. */
@@ -1026,28 +1192,58 @@ const NUMBERS: [string, number, number][] = [
  *  perché è una fascia sul bordo, non un secondo arco più dentro. */
 const REDLINE = "M189.5,74.5 A70,70 0 0,1 210,124";
 
-/** Le cinque spie del cambio, in cima. Stanno in fila dentro una barretta, e
- *  non sparse su un arco: su un volante vero sono un pezzo unico, e cinque
- *  pallini che galleggiano sopra un quadrante sembrano cinque pallini. */
-const SHIFT = [112, 126, 140, 154, 168];
-const SHIFT_Y = 42;
+/** La freccia del cambio: la spia «cambia marcia», in cima al quadrante. È una
+ *  sagoma piena e non un contorno perché una spia è luce, e la luce non ha un
+ *  bordo più scuro di sé. */
+const UPARROW = "M140,29 L149.5,42 H143.5 V49.5 H136.5 V42 H130.5 Z";
+
+/* ── Le tre spie di controllo ────────────────────────────────────────────────
+   Disegnate all'origine, dentro una scatola larga 18 e alta una quindicina, e
+   portate sul posto da un transform: così le coordinate di ognuna si leggono
+   per quello che sono — un bidoncino, un termometro, una batteria — e spostare
+   la fila è un numero solo.
+
+   Sono glifi da cruscotto, cioè quelli che stanno sul libretto: il bidoncino
+   dell'olio con la goccia che cade dal beccuccio, il termometro con le onde
+   del liquido sotto, e la batteria con i due morsetti e il più e il meno. */
+const SPIE: [string, string][] = [
+  [
+    "olio",
+    "M-7,0 H0 a2.5,2.5 0 0 1 2.5,2.5 v1.5 a2.5,2.5 0 0 1 -2.5,2.5 H-7 a2.5,2.5 0 0 1 -2.5,-2.5" +
+      " v-1.5 a2.5,2.5 0 0 1 2.5,-2.5 Z M1.6,1 L6.4,-2.6 M6.4,-1.4 c-2,2.5 -2,4.5 0,4.5" +
+      " c2,0 2,-2 0,-4.5 Z",
+  ],
+  [
+    "temperatura",
+    "M0,-7 L0,-1 M-4,-4.5 H-1.4 M-4,-1.8 H-1.4 M-2.8,1.9 a2.8,2.8 0 1 0 5.6,0 a2.8,2.8 0 1 0 -5.6,0" +
+      " M-8.5,8 q2.1,-2.3 4.25,0 t4.25,0 t4.25,0 t4.25,0",
+  ],
+  [
+    "batteria",
+    "M-7.5,-2 h15 a1.5,1.5 0 0 1 1.5,1.5 v5 a1.5,1.5 0 0 1 -1.5,1.5 h-15" +
+      " a1.5,1.5 0 0 1 -1.5,-1.5 v-5 a1.5,1.5 0 0 1 1.5,-1.5 Z" +
+      " M-5,-2 V-4.5 H-2 V-2 M2,-2 V-4.5 H5 V-2 M-5.4,3 h3.6 M-3.6,1.2 v3.6 M1.8,3 h3.6",
+  ],
+];
+
+/** Dove cade la fila: sotto alla scritta dell'unità, spaziata di 28. */
+const SPIE_X = [112, 140, 168];
+const SPIE_Y = 154;
 
 export const GaugePlate = memo(function GaugePlate() {
   return (
     <Plate name="gauge">
-      <rect className="sb-ill-shiftbar" x="98" y="31" width="84" height="22" rx="11" />
-      {SHIFT.map((cx, i) => (
-        <circle
-          key={cx}
-          className="sb-ill-shift"
-          cx={cx}
-          cy={SHIFT_Y}
-          r={3.6}
-          style={{ "--i": i } as React.CSSProperties}
-        />
-      ))}
+      {/* La spia del cambio. Bagliore e sagoma stanno nello stesso gruppo
+          perché si accendono insieme: è una lampadina, non due. */}
+      <g className="sb-ill-uplamp">
+        <path className="sb-ill-bloom" d={UPARROW} />
+        <path className="sb-ill-uparrow" d={UPARROW} fill={acc("gauge")} />
+      </g>
 
       <path className="sb-ill-dial" d="M70,124 A70,70 0 0,1 210,124" />
+      {MINOR.map((d) => (
+        <path key={d} className="sb-ill-minor" d={d} />
+      ))}
       {DIAL.map((d, i) => (
         <path key={d} className={i >= 6 ? "sb-ill-tickmark sb-ill-tickmark--red" : "sb-ill-tickmark"} d={d} />
       ))}
@@ -1076,6 +1272,11 @@ export const GaugePlate = memo(function GaugePlate() {
       <text className="sb-ill-dialunit" x={140} y={144} textAnchor="middle" data-no-i18n>
         rpm ×1000
       </text>
+
+      {/* Le tre spie di controllo, spente. */}
+      {SPIE.map(([nome, d], i) => (
+        <path key={nome} className="sb-ill-spia" d={d} transform={`translate(${SPIE_X[i]} ${SPIE_Y})`} />
+      ))}
     </Plate>
   );
 });
