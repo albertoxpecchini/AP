@@ -163,6 +163,10 @@ const Archivio = lazyPage("archivio", () => import("./app/archivio/Archivio.tsx"
 const Comandi = lazyPage("comandi", () => import("./app/comandi/Comandi.tsx"));
 const Sostieni = lazyPage("sostieni", () => import("./app/sostieni/Sostieni.tsx"));
 const Instagram = lazyPage("instagram", () => import("./app/instagram/Instagram.tsx"));
+// /soldi non è un estratto conto: è un contatore. Due rilevamenti veri, un
+// tasso fisso, e una formula che da lì ricava ogni istante successivo — vedi
+// src/app/soldi/soldi.ts.
+const Soldi = lazyPage("soldi", () => import("./app/soldi/Soldi.tsx"));
 
 // ── /cleaning — l'officina del repo, solo in locale ──────────────────────────
 // Legge e riscrive i file del repo e fa commit: roba che su un sito pubblico
@@ -324,6 +328,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Instagram />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/soldi"
+        element={
+          <Suspense fallback={null}>
+            <Soldi />
           </Suspense>
         }
       />
