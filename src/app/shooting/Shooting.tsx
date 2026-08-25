@@ -73,75 +73,6 @@ function useScrolled(threshold = 60) {
   return scrolled;
 }
 
-// ── I marchi ─────────────────────────────────────────────────────────────────
-// Chi si fa ritrarre a volte ha un suo segno, e quello sì che può stare sul
-// sito pubblicato: è un disegno, non una faccia. È anche l'unica cosa colorata
-// della pagina che non sia una foto, ed è voluta — un logo scolorito non è più
-// quel logo.
-//
-// La mappa sta QUI e non in sessioni.json perché quel file lo riscrive da capo
-// `npm run scatti` a ogni giro, e una riga aggiunta a mano sparirebbe al primo
-// scatto nuovo. La chiave è il TITOLO, non l'id: gli id sono progressivi
-// ("s1", "s2") e cambiano di posto se cambia l'ordine delle sessioni.
-interface Logo {
-  /** 360 px di larghezza: basta a ogni uso qui dentro, anche su schermo 2×. */
-  piccolo: string;
-  /** 760 px, per i 3× — il browser lo chiede solo se gli serve davvero. */
-  grande: string;
-  w: number;
-  h: number;
-}
-
-const LOGHI: Record<string, Logo> = {
-  ginger: {
-    piccolo: "/images/shooting/ginger-logo-360.webp",
-    grande: "/images/shooting/ginger-logo-760.webp",
-    w: 360,
-    h: 130,
-  },
-};
-
-function logoDi(titolo: string | null | undefined): Logo | null {
-  return titolo ? (LOGHI[titolo.trim().toLowerCase()] ?? null) : null;
-}
-
-// In testata il marchio fa da insegna di tutta la sezione, non della sola
-// sessione: è lo stesso file, promosso a segno della pagina.
-const MARCHIO_SEZIONE = LOGHI.ginger;
-
-// Sempre `alt=""`: il nome sta già scritto in chiaro a un centimetro di
-// distanza — accanto nella scheda, accanto nel visore, e in testata sotto c'è
-// il titolo "Shooting" — e ripeterlo nell'alt lo farebbe leggere due volte a
-// chi usa uno screen reader.
-function Marchio({
-  logo,
-  variante,
-  sizes,
-  subito = false,
-}: {
-  logo: Logo;
-  variante: "testata" | "scheda" | "visore";
-  sizes: string;
-  subito?: boolean;
-}) {
-  return (
-    <img
-      className={`sb-sh-marchio sb-sh-marchio--${variante}`}
-      src={logo.piccolo}
-      srcSet={`${logo.piccolo} 360w, ${logo.grande} 760w`}
-      sizes={sizes}
-      width={logo.w}
-      height={logo.h}
-      alt=""
-      aria-hidden="true"
-      // In testata è già a schermo all'apertura: chiederlo pigro vorrebbe dire
-      // vederlo arrivare in ritardo apposta.
-      loading={subito ? "eager" : "lazy"}
-      decoding="async"
-    />
-  );
-}
-
 // ── I dati tecnici di una sessione, in riga ──────────────────────────────────
 function Ferri({ s }: { s: SessionePubblica }) {
   const diaframma = s.apertura
@@ -221,14 +152,12 @@ function Visore({
   foto,
   i,
   titolo,
-  logo,
   onChiudi,
   onVai,
 }: {
   foto: Scatto[];
   i: number;
   titolo: string;
-  logo: Logo | null;
   onChiudi: () => void;
   onVai: (delta: number) => void;
 }) {
@@ -308,7 +237,6 @@ function Visore({
     >
       <div className="sb-sh-visore-barra">
         <span className="sb-sh-visore-chi" data-no-i18n translate="no">
-          {logo && <Marchio logo={logo} variante="visore" sizes="62px" />}
           {titolo}
           <span className="sb-sh-visore-conta">
             {i + 1} / {foto.length}
@@ -416,10 +344,6 @@ function Sessione({
 }) {
   const [modulo, setModulo] = useState(false);
   const s = v.s;
-  // Il titolo pubblico basta a trovare il marchio; quello privato ha la
-  // precedenza solo se la sessione è stata ribattezzata senza rilanciare
-  // `npm run scatti`, come per il nome mostrato qui sotto.
-  const logo = logoDi(v.titolo ?? s.titolo);
 
   return (
     <section className="sb-sh-sessione" aria-labelledby={`sess-${s.id}`}>
@@ -439,8 +363,6 @@ function Sessione({
               <IcImage size={13} /> {s.n}
             </span>
           </div>
-
-          {logo && <Marchio logo={logo} variante="scheda" sizes="92px" />}
 
           <div className="sb-sh-scheda-righe">
             {s.luogo && (
@@ -619,16 +541,6 @@ export default function Shooting() {
           <p className="sb-sh-kicker" data-no-i18n translate="no">
             Ritratti · da dilettante
           </p>
-          {/* In testata l'altezza è un clamp, quindi la larghezza cambia con lo
-              schermo: ~116 px sotto i 700, fino a 177 sopra. Dirlo al browser
-              serve — con un solo "180px" un telefono a 3× chiedeva il file da
-              760 per disegnarne 115. */}
-          <Marchio
-            logo={MARCHIO_SEZIONE}
-            variante="testata"
-            sizes="(max-width: 700px) 120px, 180px"
-            subito
-          />
           <h1 className="sb-sh-titolo">
             <span>Shooting</span>
             <span className="sb-brandline">
@@ -742,7 +654,6 @@ export default function Shooting() {
           foto={corrente.foto}
           i={aperta.i}
           titolo={corrente.titolo ?? ""}
-          logo={logoDi(corrente.titolo ?? corrente.s.titolo)}
           onChiudi={() => setAperta(null)}
           onVai={vai}
         />

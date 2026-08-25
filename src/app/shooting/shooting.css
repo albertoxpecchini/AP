@@ -83,55 +83,6 @@
 }
 .sb-sh-cifra-k { font-size: 0.78rem; color: var(--sb-fg-muted); letter-spacing: 0.02em; }
 
-/* ── Il marchio ───────────────────────────────────────────────────────────── */
-/* Il segno di chi è stato ritratto: un disegno, non una faccia, e quindi
-   l'unica cosa di quelle sessioni che può stare sul sito pubblicato.
-
-   Compare in tre punti — la testata, la scheda della sessione, la barra del
-   visore — e in tutti e tre si misura in ALTEZZA. La larghezza se la prende da
-   sé: il file porta con sé le proporzioni (2,77:1), e gli attributi width e
-   height le dicono al browser prima che l'immagine arrivi, così la riga non
-   balla mentre carica.
-
-   È l'unico colore della pagina che non venga da una foto, ed è un'eccezione
-   dichiarata alla regola qui in cima: un logo scolorito non è più quel logo.
-
-   Il filo chiaro sotto al tema scuro non è un vezzo. Una delle tre lettere è
-   di un nero lucido, e su un fondo #141414 sparirebbe: il drop-shadow le
-   ridisegna il bordo, e sulle altre due — che stanno sui caldi — non si vede. */
-
-.sb-sh-marchio {
-  display: block;
-  width: auto;
-  max-width: 100%;
-  /* .sb-panel-inner è un flex a colonna, e la stretch di default vince sulle
-     proporzioni di un'immagine: senza questa riga il marchio nella scheda
-     veniva tirato per tutta la larghezza della lastra — 1124 px invece di 89. */
-  align-self: flex-start;
-}
-html.dark .sb-sh-marchio {
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5))
-    drop-shadow(0 2px 10px rgba(255, 255, 255, 0.14));
-}
-
-.sb-sh-marchio--testata {
-  height: clamp(2.6rem, 6vw, 4rem);
-  margin: 0 0 1.2rem;
-}
-
-.sb-sh-marchio--scheda {
-  height: 2rem;
-  margin: 0.9rem 0 0;
-}
-
-/* Nella barra del visore sta in riga con il nome, che è allineato alla base
-   insieme al contatore. Il marchio no: lui si centra, altrimenti appenderebbe
-   tutta la riga alla propria altezza. */
-.sb-sh-marchio--visore {
-  height: 1.4rem;
-  align-self: center;
-}
-
 /* ── La riga di stato ─────────────────────────────────────────────────────── */
 /* Dice in che metà del mondo si sta guardando la pagina: col manifesto privato
    (io, in locale) o senza (tutti gli altri). È l'unica cosa che cambia fra le
