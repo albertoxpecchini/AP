@@ -127,6 +127,25 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
         };
       });
 
+      // ── ②b Meno movimento: i contatori non si "accendono", ma il numero
+      //     dev'esserci lo stesso. Senza questo ramo il ramo "no-preference"
+      //     qui sopra non gira mai, e i tre <b data-count-to> del primo
+      //     schermo — progetti, siti clienti, commit — restano sullo 0 di
+      //     partenza scritto nel JSX: l'unica cosa concreta della hero che
+      //     dice "zero". Stesso formato del contatore animato (it-IT), solo
+      //     senza il conteggio. Il footer ha già il suo fotogramma finito in
+      //     CSS (site/foot.css ⑧), quindi resta fuori come di là.
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.utils
+          .toArray<HTMLElement>("[data-count-to]", scope)
+          .filter((el) => !el.closest(".sb-foot"))
+          .forEach((el) => {
+            const to = Number(el.dataset.countTo || 0);
+            const suffix = el.dataset.countSuffix || "";
+            el.textContent = to.toLocaleString("it-IT") + suffix;
+          });
+      });
+
       // ── ④ Bottoni "magnetici": si sporgono verso il cursore ─────────────
       //     Spostamento limitato a pochi pixel: deve sembrare attrazione,
       //     non un bersaglio che scappa quando provi a cliccarlo.
