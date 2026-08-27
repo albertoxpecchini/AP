@@ -167,12 +167,14 @@ const CV = [
     title: "Cascina Fontana — Website",
     role: "Web design & website development",
     desc: "Design and development of the official Cascina Fontana website. Analysis of the client's needs, definition of the information architecture and creation of a responsive, carefully designed interface optimised to present the company's products and services. Direct collaboration with the client to define the content. Stack: React, TypeScript, Tailwind CSS.",
+    pin: true,
   },
   {
     period: "Apr 27, 2026",
     title: "Rivalta sul Mincio — Website",
     role: "Web design & website development",
     desc: "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography and a warm palette. Rebuilt as nine pages of plain static HTML — no framework and no dependencies — with every figure about the village backed by a public OpenStreetMap dataset. Stack: HTML, CSS, JavaScript.",
+    pin: true,
   },
   {
     period: "Jun 30 — Jul 1, 2026",
@@ -558,10 +560,16 @@ export default function App() {
   const [tech, setTech] = useState(STACK[0].id);
 
   const sortedCV = useMemo(() => {
+    const byDateDesc = (a: typeof CV[number], b: typeof CV[number]) =>
+      parsePeriodStart(b.period) - parsePeriodStart(a.period);
+    // Il muro apre con UNA fila a riposo: per data pura, in cima finivano la
+    // comparsa in TV e lo scrutinio di seggio. Su una pagina che vende siti,
+    // in testa ci vanno i due siti clienti (pin: true); poi tutto il resto per
+    // data, e in fondo i desideri.
+    const pinned = CV.filter((c) => (c as any).pin).sort(byDateDesc);
+    const rest = CV.filter((c) => !(c as any).pin && !(c as any).wish).sort(byDateDesc);
     const wishes = CV.filter((c) => (c as any).wish);
-    const items = CV.filter((c) => !(c as any).wish);
-    const sorted = items.slice().sort((a, b) => parsePeriodStart(b.period) - parsePeriodStart(a.period));
-    return [...sorted, ...wishes];
+    return [...pinned, ...rest, ...wishes];
   }, []);
 
   const activeTab = ARCH_TABS.find((t) => t.id === archTab) ?? ARCH_TABS[0];
