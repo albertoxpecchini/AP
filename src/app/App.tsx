@@ -38,6 +38,10 @@ import {
   IcVenn,
   IcRuler,
   IcCamera,
+  IcUser,
+  IcBook,
+  IcCat,
+  IcId,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
 import { useNavPill, useNavAccent } from "./site/GlassMotion";
@@ -60,10 +64,6 @@ import { PROJECTS } from "./site/projects";
 import { LANGS } from "./i18n/langCore";
 import { ArchivioExplorer } from "./archivio/Archivio";
 import WhenVisible from "./site/WhenVisible";
-/* Lo scaffale delle sei pagine (§⑤). Sta in un file suo perché la lastra si
-   apre al passaggio del puntatore: con lo stato qui, ogni mouseenter
-   ridisegnava tutta la home. Vedi il cappello di site/PagesShelf.tsx. */
-import PagesShelf from "./site/PagesShelf";
 /* Fascia temporanea: il sito di Rivalta appena tornato online, col video che
    gira in loop. Si spegne con l'interruttore in cima a site/FreshWork.tsx. */
 import FreshWork from "./site/FreshWork";
@@ -228,6 +228,18 @@ const NAV = [
   { href: "/bio", label: "About", route: true },
   { href: "#curriculum", label: "Résumé" },
   { href: "/sostieni", label: "Support", route: true },
+];
+
+// Le altre pagine del sito, come riga di link e non più come scaffale a mezzo
+// schermo: quattro nate per la scuola (le prime), poi il profilo lungo e la
+// pagina di sostegno. Lo scaffale vero è ancora in site/PagesShelf.tsx.
+const MORE_PAGES = [
+  { title: "About Me", url: "/me-stesso", Icon: IcUser },
+  { title: "PCTO", url: "/pcto", Icon: IcRuler },
+  { title: "Dubliners", url: "/dubliners", Icon: IcBook },
+  { title: "The Leopard", url: "/gattopardo", Icon: IcCat },
+  { title: "Bio", url: "/bio", Icon: IcId },
+  { title: "Support", url: "/sostieni", Icon: IcHeart },
 ];
 
 // ── Sezione archivio: schede che filtrano il pannello dell'archivio ─────────
@@ -1198,15 +1210,32 @@ export default function App() {
           </div>
         </section>
 
-        {/* ⑤ Le altre pagine — lo scaffale delle sei lastre.
-
-            Sta tutto in site/PagesShelf.tsx, stato compreso: la lastra si apre
-            al PASSAGGIO del puntatore, e finché quello stato viveva qui ogni
-            mouseenter ridisegnava l'intera home — muro dei commit, archivio
-            incorporato, snippet ritokenizzato. La sezione se la rende lui
-            perché il suo data-acc è quello della lastra aperta, e da lì la
-            tinta sale fino alla nav (useNavAccent in site/GlassMotion.tsx). */}
-        <PagesShelf />
+        {/* Le altre pagine del sito. Era uno scaffale a mezzo schermo che
+            metteva in vetrina quattro pagine d'esame di Maturità — craft, ma
+            «studente», e proprio dove la pagina deve dire «assumimi». Adesso è
+            una riga: chi vuole ci va, chi cerca un sito non ci inciampa. Lo
+            scaffale (site/PagesShelf.tsx) resta nel repo, non più montato. */}
+        <section className="sb-section" aria-label="Pages" data-acc="viola">
+          <div className="sb-container">
+            <div className="sb-splithead">
+              <div>
+                <h3>Other pages on this site</h3>
+                <p>
+                  Built with the same hand and the same design system — some for
+                  school, some to keep the lights on.
+                </p>
+              </div>
+              <Link to="/archivio" className="sb-btn sb-btn--sm sb-btn--secondary">View them all</Link>
+            </div>
+            <div className="sb-morelinks">
+              {MORE_PAGES.map((p) => (
+                <Link key={p.url} to={p.url} className="sb-btn sb-btn--sm sb-btn--ghost">
+                  <p.Icon size={15} /> <span>{p.title}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* ⑦ Curriculum — muro di card (≈ muro community) */}
         <section id="curriculum" className="sb-section" aria-label="Résumé" data-acc="ambra">

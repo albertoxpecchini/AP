@@ -2447,6 +2447,11 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 .sb-splithead p { margin: 0.6rem 0 0; max-width: 34rem; font-size: 0.95rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 
+/* «Altre pagine del sito»: una riga di link al posto dello scaffale a mezzo
+   schermo. I bottoni sono i .sb-btn--ghost di casa; qui vanno solo disposti. */
+.sb-morelinks { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.6rem; }
+.sb-morelinks .sb-btn { gap: 0.45rem; }
+
 /* ── Card "pagina" ──────────────────────────────────────────────────────────
    La griglia .sb-pages non c'è più: le sei pagine della home adesso sono lo
    scaffale qui sotto. Le classi della card restano perché non erano solo sue —

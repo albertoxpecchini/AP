@@ -4139,15 +4139,15 @@
     "fr": "Tout le site tourne sur ce stack — pas de CMS, pas de page builder. De vrais extraits du dépôt, un par technologie.",
     "de": "Die ganze Website läuft auf diesem Stack — kein CMS, keine Page-Builder. Echte Snippets aus dem Repository, eines pro Technologie."
   },
-  "Six more pages I designed and built": {
-    "it": "Altre sei pagine disegnate e costruite da me",
-    "fr": "Six autres pages que j'ai conçues et développées",
-    "de": "Sechs weitere Seiten, von mir entworfen und gebaut"
+  "Other pages on this site": {
+    "it": "Altre pagine del sito",
+    "fr": "Autres pages du site",
+    "de": "Weitere Seiten dieser Website"
   },
-  "Other projects of mine — some born for school, some to support myself. Different subjects, the same hand and the same design system as this page.": {
-    "it": "Altri miei progetti — alcuni nati per la scuola, altri per mantenermi. Argomenti diversi, la stessa mano e lo stesso design system di questa pagina.",
-    "fr": "D'autres de mes projets — certains nés pour l'école, d'autres pour subvenir à mes besoins. Des sujets différents, la même main et le même design system que cette page.",
-    "de": "Weitere Projekte von mir — manche für die Schule entstanden, manche um mich zu finanzieren. Andere Themen, dieselbe Hand und dasselbe Designsystem wie diese Seite."
+  "Built with the same hand and the same design system — some for school, some to keep the lights on.": {
+    "it": "Costruite con la stessa mano e lo stesso design system — alcune per la scuola, altre per tirare avanti.",
+    "fr": "Construites de la même main et avec le même design system — certaines pour l'école, d'autres pour joindre les deux bouts.",
+    "de": "Mit derselben Hand und demselben Designsystem gebaut — manche für die Schule, manche um über die Runden zu kommen."
   },
   "Open the page": {
     "it": "Apri la pagina",
