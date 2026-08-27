@@ -54,10 +54,10 @@ import {
   CanopyPlate,
   CommitWall,
   TrustedDot,
-  COMMITS,
 } from "./site/homeLive";
 import { EMAIL } from "./site/data";
 import { PROJECTS } from "./site/projects";
+import { LANGS } from "./i18n/langCore";
 import { ArchivioExplorer } from "./archivio/Archivio";
 import WhenVisible from "./site/WhenVisible";
 /* Lo scaffale delle sei pagine (§⑤). Sta in un file suo perché la lastra si
@@ -813,24 +813,26 @@ export default function App() {
                   <strong translate="no">Cascina Fontana</strong> — and every page of this
                   one, designed and built end to end with React and TypeScript.
                 </p>
-                {/* I numeri non sono decorazione: sono la sola cosa del primo
-                    schermo che si può controllare. Nessuno è scritto a mano —
-                    i progetti li conta l'elenco, i clienti la lista dei
-                    domini, i commit il file che genera la build. Salgono
-                    arrivando a vista: [data-count-to] è la stessa regia dei
-                    contatori del resto della home (site/homeMotion.ts ②). */}
+                {/* I tre numeri sono la sola cosa verificabile del primo
+                    schermo, e nessuno è scritto a mano: i clienti li conta la
+                    lista dei domini, i progetti l'elenco, le lingue il
+                    pacchetto i18n. Ora dicono le cose che un cliente pesa —
+                    consegne vere e la cura — invece di «421 commit», che a chi
+                    deve comprare un sito non dice niente. Salgono arrivando a
+                    vista: [data-count-to] è la stessa regia dei contatori del
+                    resto della home (site/homeMotion.ts ②). */}
                 <ul className="sb-hero-stats">
                   <li>
-                    <b data-count-to={PROJECTS.filter((p) => p.kind !== "doc").length}>0</b>
-                    <span>projects in the archive</span>
-                  </li>
-                  <li>
                     <b data-count-to={CLIENTS.length}>0</b>
-                    <span>client sites online</span>
+                    <span>client sites, live</span>
                   </li>
                   <li>
-                    <b data-count-to={COMMITS}>0</b>
-                    <span>public commits</span>
+                    <b data-count-to={PROJECTS.filter((p) => p.kind !== "doc").length}>0</b>
+                    <span>projects shipped end to end</span>
+                  </li>
+                  <li>
+                    <b data-count-to={LANGS.length}>0</b>
+                    <span>languages, hand-translated</span>
                   </li>
                 </ul>
               </div>

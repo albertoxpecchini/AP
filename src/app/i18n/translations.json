@@ -5169,20 +5169,20 @@
     "fr": "— et chaque page de celui-ci, conçue et développée de bout en bout avec React et TypeScript.",
     "de": "— und jede Seite dieser Website, von Anfang bis Ende mit React und TypeScript entworfen und gebaut."
   },
-  "projects in the archive": {
-    "it": "progetti in archivio",
-    "fr": "projets dans les archives",
-    "de": "Projekte im Archiv"
+  "client sites, live": {
+    "it": "siti per clienti, online",
+    "fr": "sites clients, en ligne",
+    "de": "Kunden-Websites, live"
   },
-  "client sites online": {
-    "it": "siti per clienti online",
-    "fr": "sites clients en ligne",
-    "de": "Kunden-Websites online"
+  "projects shipped end to end": {
+    "it": "progetti portati a termine da soli",
+    "fr": "projets menés de bout en bout",
+    "de": "Projekte von A bis Z umgesetzt"
   },
-  "public commits": {
-    "it": "commit pubblici",
-    "fr": "commits publics",
-    "de": "öffentliche Commits"
+  "languages, hand-translated": {
+    "it": "lingue, tradotte a mano",
+    "fr": "langues, traduites à la main",
+    "de": "Sprachen, von Hand übersetzt"
   },
   "Get to know me": {
     "it": "Conosci chi sono",
