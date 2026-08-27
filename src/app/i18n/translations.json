@@ -3884,6 +3884,21 @@
     "fr": "Découvrir mes projets",
     "de": "Meine Projekte entdecken"
   },
+  "Currently building": {
+    "it": "In lavorazione",
+    "fr": "En chantier",
+    "de": "In Arbeit"
+  },
+  "Show all": {
+    "it": "Mostra tutti",
+    "fr": "Tout afficher",
+    "de": "Alle anzeigen"
+  },
+  "Show less": {
+    "it": "Mostra meno",
+    "fr": "Afficher moins",
+    "de": "Weniger anzeigen"
+  },
   "View my résumé": {
     "it": "Guarda il curriculum",
     "fr": "Voir mon CV",

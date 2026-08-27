@@ -88,7 +88,7 @@ export default function CvWall({ items, onOpenDoc }: CvWallProps) {
           aria-expanded={open}
           aria-controls={wallId}
         >
-          {open ? "Show less" : `Show all ${items.length}`}
+          {open ? "Show less" : <>Show all <span translate="no">{items.length}</span></>}
           <IcChevronDown size={15} />
         </button>
       </div>
