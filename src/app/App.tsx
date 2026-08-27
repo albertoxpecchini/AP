@@ -38,7 +38,6 @@ import {
   IcVenn,
   IcRuler,
   IcCamera,
-  IcAperture,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
 import { useNavPill, useNavAccent } from "./site/GlassMotion";
@@ -59,10 +58,6 @@ import {
 } from "./site/homeLive";
 import { EMAIL } from "./site/data";
 import { PROJECTS } from "./site/projects";
-// Il manifesto PUBBLICO degli shooting: date, luoghi e conteggi, niente foto.
-// La sezione in fondo alla home legge di qui i suoi numeri, così restano veri
-// anche dopo il prossimo `npm run scatti`.
-import { SESSIONI } from "./shooting/sessioni";
 import { ArchivioExplorer } from "./archivio/Archivio";
 import WhenVisible from "./site/WhenVisible";
 /* Lo scaffale delle sei pagine (§⑤). Sta in un file suo perché la lastra si
@@ -478,12 +473,6 @@ function highlight(code: string, lang: StackEntry["lang"]): ReactNode[] {
   if (last < code.length) out.push(code.slice(last));
   return out;
 }
-
-// Le impronte del fondale della fascia fotografia: sei per sessione, 24px
-// l'una, in webp base64 dentro il manifesto pubblico. Sono SAGOME, non
-// scatti — l'unica cosa di uno shooting che può stare su una pagina aperta.
-// Ne bastano dodici a riempire la griglia; le altre restano dove sono.
-const SHOT_TILES = SESSIONI.sessioni.flatMap((s) => s.anteprime ?? []).slice(0, 12);
 
 // ── Story-card dei progetti di punta ────────────────────────────────────────
 // `acc` è la tinta della scheda: da sola ritinge bordo, glifo, piede e alone
@@ -1018,81 +1007,11 @@ export default function App() {
             spegne. */}
         <FreshWork />
 
-        {/* ② Fotografia — l'altra metà, quella senza tastiera.
-
-             I numeri non sono scritti a mano: vengono da src/app/shooting/
-             sessioni.json, il manifesto PUBBLICO che `npm run scatti` genera
-             leggendo gli EXIF. Le foto no: quelle non escono da casa, e questa
-             sezione lo dice invece di lasciarlo scoprire a chi clicca.
-
-             Il fondale della fascia sono le IMPRONTE dello stesso manifesto:
-             sagome sfocate da 24px, sei per sessione. Fanno vedere il ritmo di
-             uno shooting senza pubblicare una faccia — che è il patto della
-             sezione, mantenuto anche da come è fatta. */}
-        <section id="shooting" className="sb-section" aria-label="Photography" data-acc="rosa">
-          <div className="sb-container">
-            <div className="sb-sechead">
-              <h3>And on the other side of the lens</h3>
-              <p>
-                I take portraits of people — as an amateur, and with no illusions about it.
-                A Canon EOS 4000D with its kit lens, or the iPhone 16 Pro when the camera
-                stayed home.
-              </p>
-            </div>
-
-            <div className="sb-panel sb-shot-band">
-              <div className="sb-panel-inner sb-shot-inner">
-                {/* Le tessere e il velo stanno SOTTO (z-index 0 e 1), il testo
-                    sopra. Il velo è una velatura in background-image e non un
-                    filter: un filter promuoverebbe la fascia a strato suo. */}
-                <div className="sb-shot-mosaic" aria-hidden="true">
-                  {SHOT_TILES.map((t, i) => (
-                    <span
-                      key={i}
-                      className="sb-shot-tile"
-                      style={{ backgroundImage: `url("${t.blur}")` }}
-                    />
-                  ))}
-                </div>
-                <div className="sb-shot-veil" aria-hidden="true" />
-
-                <div className="sb-shot-copy">
-                  <h4 className="sb-shot-title">
-                    <IcCamera size={16} /> <span>Shooting</span>
-                  </h4>
-                  <p className="sb-shot-desc">
-                    <strong>The photos of people are not published.</strong> What stays online
-                    is what can be told about a session — the date, the place, how many frames,
-                    which gear — and those numbers come from the files' own metadata. Even the
-                    shapes behind this panel are 24px blurs, never the frames themselves.
-                  </p>
-                  <Link to="/shooting" className="sb-btn sb-btn--sm sb-btn--secondary">
-                    <IcAperture size={16} /> See the sessions
-                  </Link>
-                </div>
-
-                <div className="sb-shot-side">
-                  <div className="sb-shot-numeri">
-                    {[
-                      { k: "frames", v: String(SESSIONI.totale) },
-                      { k: SESSIONI.sessioni.length === 1 ? "session" : "sessions", v: String(SESSIONI.sessioni.length) },
-                    ].map((n) => (
-                      <div key={n.k} className="sb-shot-numero">
-                        <span className="sb-shot-numero-v" data-no-i18n translate="no">{n.v}</span>
-                        <span className="sb-shot-numero-k">{n.k}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <ul className="sb-shot-ferri" data-no-i18n translate="no">
-                    <li>Canon EOS 4000D</li>
-                    <li>EF-S 18–55 mm</li>
-                    <li>iPhone 16 Pro</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* La fascia «fotografia» stava qui: un intero schermo su ritratti
+             amatoriali, con la copy che lo diceva pure («as an amateur, and
+             with no illusions about it»). Su una pagina che vende siti era un
+             passo indietro. Il mestiere resta detto nella card «Fotografia»
+             della griglia, che porta a /shooting per chi vuole i numeri. */}
 
         {/* ③ Archivio — la "dashboard": il pannello dell'archivio incorporato */}
         <section id="archivio" className="sb-section" data-acc="blu">
