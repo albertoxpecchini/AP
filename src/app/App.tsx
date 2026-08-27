@@ -78,11 +78,13 @@ import "./home.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Home "piattaforma" — rifatta da zero sulla homepage di Supabase e adattata
-// ai contenuti del sito: nav sottile, hero a due colonne, griglia prodotti,
-// pannello archivio (il "dashboard"), switcher dello stack con codice vero,
-// griglia delle pagine, story-card dei progetti, muro del curriculum, sezione
-// open source e CTA finale. Tema chiaro/scuro nativo (vedi home.css), testi in
-// inglese come il resto della home. Header e menu sono inline qui dentro.
+// ai contenuti del sito. Ordine del <main>: hero a due colonne, griglia
+// prodotti (cinque card), terminale clienti + fascia «lavoro fresco»,
+// story-card dei due siti clienti, pannello archivio (il "dashboard"),
+// switcher dello stack con codice vero, riga delle altre pagine, muro del
+// curriculum, sezione open source e CTA finale. Tema chiaro/scuro nativo
+// (vedi home.css), testi in inglese tradotti a runtime dal motore i18n.
+// Header e menu sono inline qui dentro.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CV = [
@@ -1112,7 +1114,7 @@ export default function App() {
              passo indietro. Il mestiere resta detto nella card «Fotografia»
              della griglia, che porta a /shooting per chi vuole i numeri. */}
 
-        {/* ③ Archivio — la "dashboard": il pannello dell'archivio incorporato */}
+        {/* ④ Archivio — la "dashboard": il pannello dell'archivio incorporato */}
         <section id="archivio" className="sb-section" data-acc="blu">
           <div className="sb-container">
             <div className="sb-sechead">
@@ -1154,7 +1156,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ④ Stack — "Built with …" con switcher e codice vero */}
+        {/* ⑤ Stack — "Built with …" con switcher e codice vero */}
         <section className="sb-section" aria-label="Stack" data-acc="viola">
           <div className="sb-container">
             <div className="sb-stack-grid">
@@ -1237,7 +1239,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ⑦ Curriculum — muro di card (≈ muro community) */}
+        {/* ⑥ Curriculum — muro di card (≈ muro community) */}
         <section id="curriculum" className="sb-section" aria-label="Résumé" data-acc="ambra">
           <div className="sb-container">
             <div className="sb-sechead">
@@ -1267,7 +1269,7 @@ export default function App() {
         </section>
 
 
-        {/* ⑨ Open source */}
+        {/* ⑦ Open source */}
         <section className="sb-section" aria-label="Open source" data-acc="viola">
           <div className="sb-container">
             <div className="sb-open">
@@ -1334,7 +1336,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ⑩ CTA finale */}
+        {/* ⑧ CTA finale */}
         <section id="contatti" className="sb-section sb-cta">
           <div className="sb-container">
             <h2>
