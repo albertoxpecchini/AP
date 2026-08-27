@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 import { SiteLink as Link } from "./site/nav";
 import { activateLocalMode } from "./utils/local";
@@ -39,7 +39,6 @@ import {
   IcRuler,
   IcCamera,
   IcAperture,
-  IcCar,
 } from "./site/homeIcons";
 import { useHomeMotion } from "./site/homeMotion";
 import { useNavPill, useNavAccent } from "./site/GlassMotion";
@@ -53,7 +52,6 @@ import {
   LiveCursors,
   GlobeOrbit,
   ContactSheet,
-  GaugePlate,
   CanopyPlate,
   CommitWall,
   TrustedDot,
@@ -66,10 +64,6 @@ import { PROJECTS } from "./site/projects";
 // anche dopo il prossimo `npm run scatti`.
 import { SESSIONI } from "./shooting/sessioni";
 import { ArchivioExplorer } from "./archivio/Archivio";
-/* La geometria delle tre auto e il loro renderer non c'entrano niente con il
-   primo schermo. Lazy + WhenVisible = si scaricano quando ci si avvicina, e chi
-   non ci passa non li paga. */
-const DreamGarage = lazy(() => import("./site/dreamCars"));
 import WhenVisible from "./site/WhenVisible";
 /* Lo scaffale delle sei pagine (§⑤). Sta in un file suo perché la lastra si
    apre al passaggio del puntatore: con lo stato qui, ogni mouseenter
@@ -860,19 +854,18 @@ export default function App() {
           </div>
         </section>
 
-        {/* ② Griglia — sei card, sei tinte, una riga di testo l'una.
+        {/* ② Griglia — cinque card, cinque tinte, una riga di testo l'una.
 
-            Erano sette e parlavano tutte lo stesso azzurro, con due o tre frasi
-            a testa: da lontano si leggevano come un blocco solo. Adesso ogni
-            card porta il suo accento in --sb-accent, e da lì scende su tutto —
-            icona, disegno, spunte, alone. Le tinte stanno in home.css, blocco
-            «La tavolozza».
+            Ogni card porta il suo accento in --sb-accent, e da lì scende su
+            tutto — icona, disegno, spunte, alone. Le tinte stanno in home.css,
+            blocco «La tavolozza».
 
-            Cosa è uscito e perché: "Web design" (era lo stesso mestiere della
-            prima card, detto due volte), "Web games" e "Web tools" (Trivia e
-            l'utility di Instagram, che non sono più il lavoro di adesso). Cosa
-            è entrato: le fotografie, i due clienti veri con il loro nome, e le
-            auto — che stavano già in pagina ma seicento pixel più in basso. */}
+            Cosa dice la griglia: siti (la card grande), i due clienti veri,
+            lo sviluppo con l'AI, la fotografia e l'area geometra/università.
+            Le auto e la loro sezione 3D sono uscite: non c'entravano niente
+            con il lavoro che questa pagina vende. La griglia era «una grande
+            più cinque» a sei totali; adesso è «una grande più quattro», e la
+            seconda fila si ripartisce in due mezzi da 6 colonne (home.css). */}
         <section id="progetti" className="sb-container sb-products" aria-label="What I do">
           {/* Siti web — la card grande */}
           <Link to="/archivio" className="sb-card sb-card--lg" data-acc="blu">
@@ -965,22 +958,6 @@ export default function App() {
               </div>
             </ProductCard>
           </Link>
-
-          {/* Auto */}
-          <a href="#garage" className="sb-card" data-acc="rosso">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcCar /><h3>Cars</h3></div>
-                <p className="sb-card-desc">
-                  Three I dream of, <strong>drawn alive in three dimensions</strong> by the
-                  card inside your own machine.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <GaugePlate />
-              </div>
-            </ProductCard>
-          </a>
         </section>
 
         {/* Coda della griglia: tagline + clienti */}
@@ -1114,32 +1091,6 @@ export default function App() {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* ③ Garage — le tre auto, in 3D e girabili. Il fondale colorato che
-             si muove dietro i modelli è tutto in home.css (.sb-garage-bg). */}
-        <section id="garage" className="sb-section" aria-label="Dream garage" data-acc="rosso">
-          <div className="sb-container">
-            <div className="sb-sechead">
-              <h3>And three cars I dream about</h3>
-              <p>
-                Not photos and not videos: the 3D models themselves — their own paint,
-                wheels and interiors — drawn live by your graphics card. Drag one to turn
-                it in any direction.
-              </p>
-            </div>
-            <WhenVisible className="sb-garage-wrap" rootMargin="400px">
-              {/* Il fondale sta DENTRO WhenVisible apposta: fuori schermo non
-                  è montato, quindi non c'è niente da animare. I tre <i> sono
-                  vuoti — colore, posizione e deriva stanno in home.css. */}
-              <div className="sb-garage-bg" aria-hidden="true">
-                <i /><i /><i />
-              </div>
-              <Suspense fallback={null}>
-                <DreamGarage />
-              </Suspense>
-            </WhenVisible>
           </div>
         </section>
 

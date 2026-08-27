@@ -415,8 +415,7 @@ html.dark .sb-home {
    backdrop-filter si rifà ogni volta che cambia quello che ha DIETRO — e
    dietro c'è questa deriva, che non si ferma mai. Risultato: una dozzina di
    lastre che si risfocano a ogni fotogramma, in eterno, su una pagina ferma
-   che nessuno sta toccando. Sul garage sono tre lastre con sopra tre canvas
-   WebGL.
+   che nessuno sta toccando.
 
    Due rimedi, uno per famiglia di dispositivi.
 
@@ -435,15 +434,7 @@ html.dark .sb-home {
   .sb-home::after { animation: none; }
 }
 html.sb-quiet .sb-home::before,
-html.sb-quiet .sb-home::after,
-/* Il fondale del garage sta nella stessa quiete: è l'altra cosa che si muove
-   da sola sulla home, e sta per giunta sopra tre canvas WebGL. */
-html.sb-quiet /* I token delle tinte sono a componenti separate da SPAZI («12 84% 55%»),
-   quindi l alfa vuole la forma con la barra: hsl(var(--x) / .62). Scritto
-   `hsla(var(--x), .62)` il colore è invalido, il background non si applica e
-   non se ne accorge nessuno — non il build, non il foglio: solo la sezione
-   che resta grigia. */
-.sb-garage-bg i { animation-play-state: paused; }
+html.sb-quiet .sb-home::after { animation-play-state: paused; }
 html.dark .sb-home::before {
   background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.16), transparent 62%);
 }
@@ -863,14 +854,14 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 @media (min-width: 640px) { .sb-products { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1280px) { .sb-products { grid-template-columns: repeat(12, 1fr); } }
 .sb-card { display: block; text-decoration: none; color: inherit; }
-/* Le card sono SEI, ed è un numero che va sistemato a mano su ogni misura:
-   una grande più cinque. Con le regole di prima — grande da 6 colonne su 12,
-   le altre da 3 — la seconda fila ne teneva quattro e ne aveva tre: restava un
-   buco in fondo a destra grande quanto una card.
+/* Le card sono CINQUE: una grande più quattro, un numero che va sistemato a
+   mano su ogni misura.
 
-   Da 1280 in su: grande 6 + due da 3 fanno la prima fila, e le ultime tre
-   passano a 4 colonne l'una, che di nuovo fa 12. A due colonne il conto non
-   torna mai (cinque è dispari), quindi l'ultima si prende tutta la riga.
+   Da 1280 in su: grande da 6 colonne su 12 + due da 3 fanno la prima fila
+   (6 + 3 + 3 = 12); le ultime due passano a 6 colonne l'una, due mezzi che
+   di nuovo fanno 12. A due colonne (640–1279) la grande si prende la riga
+   intera e le altre quattro riempiono due file da due: il conto torna senza
+   eccezioni.
 
    L'altezza è scesa da 400 a 360: il testo adesso è una riga per card, e a 400
    il disegno galleggiava in mezzo a un campo vuoto. */
@@ -878,13 +869,10 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   .sb-card { height: 360px; }
   .sb-card--lg { grid-column: span 2; }
 }
-@media (min-width: 640px) and (max-width: 1279.98px) {
-  .sb-card:last-child { grid-column: span 2; }
-}
 @media (min-width: 1280px) {
   .sb-card { grid-column: span 3; }
   .sb-card--lg { grid-column: span 6; }
-  .sb-card:nth-child(n + 4) { grid-column: span 4; }
+  .sb-card:nth-child(n + 4) { grid-column: span 6; }
 }
 
 /* Pannello di vetro con rim da 1px (marchio di fabbrica delle card).
@@ -3031,154 +3019,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   background: linear-gradient(to bottom, hsla(197, 100%, 49%, 0.55), hsla(197, 100%, 49%, 0.12));
 }
 .sb-wall-card--wish .sb-cv-title { font-style: italic; }
-
-/* ── Garage — i tre modelli 3D ────────────────────────────────────────────
-   Qui c'era la palette delle auto: due tinte per materiale, negli stessi grigi
-   del sito e con i vetri nell'azzurro d'accento. È stata tolta perché le auto
-   adesso portano i LORO colori — quelli dei modelli originali, texture
-   comprese — e non c'è più niente da tingere dal foglio di stile.
-
-   Resta il vuoto attorno al modello, che è l'unica cosa che il CSS deve
-   ancora dire: quanto è grande il palco e come si comporta sotto il dito. */
-/* ── Il fondale che si muove dietro le auto ────────────────────────────────
-   Deroga dichiarata a due regole di casa, chiesta apposta: «nessuna sezione ha
-   bg proprio» e «niente loop CSS infiniti». Mitigazioni, tutte già in uso
-   altrove nel foglio:
-
-     · non è un background sulla <section>: è uno strato contenuto dentro
-       .sb-garage-wrap, con `contain: paint` e z-index sotto le auto;
-     · si anima SOLO `transform`. Mai background-position, mai filter, mai
-       box-shadow: quelle ridipingono, e qui sotto ci sono tre canvas WebGL;
-     · sta dentro WhenVisible (rootMargin 400px): fuori schermo non esiste;
-     · si ferma su touch, con prefers-reduced-motion, e con `html.sb-quiet`
-       dopo 1,5s di fermo — vedi il blocco del fondale continuo più su. */
-/* NIENTE `contain: paint` qui: ritaglia i discendenti alla propria scatola, e
-   il fondale qui sotto vive apposta OLTRE i bordi delle tre schede. Con la
-   containment sul contenitore il colore veniva tagliato via e la sezione
-   restava grigia — invisibile in tema chiaro. Il ritaglio sta sul fondale. */
-.sb-garage-wrap { position: relative; margin-top: 2rem; contain: layout; }
-.sb-garage-bg {
-  position: absolute;
-  /* Deborda molto oltre le tre schede: sopra e sotto ci sono i sei rem di
-     respiro della sezione, ed è LÌ che il colore si vede. Dietro le lastre di
-     vetro, in tema chiaro, sparirebbe quasi del tutto. */
-  inset: -34% -10%;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  contain: paint;
-}
-.sb-garage-bg i {
-  position: absolute;
-  display: block;
-  width: 74%;
-  height: 104%;
-  border-radius: 50%;
-  will-change: transform;
-}
-.sb-garage-bg i:nth-child(1) {
-  left: -6%;
-  top: -18%;
-  background: radial-gradient(closest-side, hsl(var(--sb-acc-rosso) / 0.62), transparent 72%);
-  animation: sb-garage-drift-a 52s ease-in-out infinite alternate;
-}
-.sb-garage-bg i:nth-child(2) {
-  right: -10%;
-  top: 6%;
-  background: radial-gradient(closest-side, hsl(var(--sb-acc-ambra) / 0.48), transparent 72%);
-  animation: sb-garage-drift-b 61s ease-in-out infinite alternate;
-}
-.sb-garage-bg i:nth-child(3) {
-  left: 26%;
-  bottom: -26%;
-  background: radial-gradient(closest-side, hsl(var(--sb-acc-viola) / 0.36), transparent 72%);
-  animation: sb-garage-drift-c 47s ease-in-out infinite alternate;
-}
-@keyframes sb-garage-drift-a {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(14%, 8%, 0) scale(1.18); }
-}
-@keyframes sb-garage-drift-b {
-  from { transform: translate3d(0, 0, 0) scale(1.12); }
-  to   { transform: translate3d(-16%, 12%, 0) scale(0.94); }
-}
-@keyframes sb-garage-drift-c {
-  from { transform: translate3d(0, 0, 0) scale(0.96); }
-  to   { transform: translate3d(10%, -14%, 0) scale(1.2); }
-}
-/* Sul fondo quasi nero del tema scuro le stesse alfe si spengono: il nero
-   assorbe, e la sezione tornava grigia come prima. Una spinta sola. */
-html.dark .sb-garage-bg i:nth-child(1) { background: radial-gradient(closest-side, hsl(var(--sb-acc-rosso) / 0.6), transparent 72%); }
-html.dark .sb-garage-bg i:nth-child(2) { background: radial-gradient(closest-side, hsl(var(--sb-acc-ambra) / 0.44), transparent 72%); }
-html.dark .sb-garage-bg i:nth-child(3) { background: radial-gradient(closest-side, hsl(var(--sb-acc-viola) / 0.4), transparent 72%); }
-
-/* Sul touch la deriva non si nota e costa uguale: ferma, come gli aloni. */
-@media (hover: none) {
-  .sb-garage-bg i { animation: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sb-garage-bg i { animation: none; }
-}
-
-.sb-garage {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-@media (min-width: 640px) { .sb-garage { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .sb-garage { grid-template-columns: repeat(3, 1fr); } }
-
-.sb-car { display: flex; flex-direction: column; }
-.sb-car-inner { padding: 0.9rem 1.2rem 1.2rem; gap: 0.9rem; }
-
-/* Il palco. `touch-action: pan-y` e non `none`: il dito che scorre la pagina
-   deve poterla scorrere anche partendo da qui — di suo il palco prende solo il
-   trascinamento orizzontale. */
-.sb-car-stage {
-  position: relative;
-  aspect-ratio: 3 / 2;
-  touch-action: pan-y;
-  cursor: grab;
-  border-radius: 10px;
-  outline-offset: 3px;
-}
-.sb-car-stage[data-grab] { cursor: grabbing; }
-.sb-car-stage:focus { outline: none; }
-.sb-car-stage:focus-visible { outline: 2px solid var(--sb-brand); }
-.sb-car-cv { display: block; width: 100%; height: 100%; }
-
-/* Il cartello si toglie di mezzo appena si è capito: al primo trascinamento
-   (data-used, che mette il componente) non torna più. */
-.sb-car-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 0.15rem;
-  transform: translateX(-50%);
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sb-fg-muted);
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-.sb-car-stage:hover .sb-car-hint { opacity: 0.45; }
-.sb-car-stage[data-used] .sb-car-hint { opacity: 0; }
-
-.sb-car-id { display: flex; flex-direction: column; gap: 0.1rem; }
-.sb-car-brand { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sb-fg-muted); }
-.sb-car-name { margin: 0; font-size: 1rem; font-weight: 500; letter-spacing: -0.01em; color: var(--sb-fg); }
-
-.sb-car-specs { margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
-.sb-car-specs > div { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; }
-.sb-car-specs dt { font-size: 0.76rem; color: var(--sb-fg-muted); }
-.sb-car-specs dd {
-  margin: 0;
-  font-size: 0.8rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--sb-fg-light);
-}
 
 /* ── Open source ─────────────────────────────────────────────────────────── */
 .sb-open { display: grid; grid-template-columns: 1fr; gap: 2.5rem; align-items: center; }
