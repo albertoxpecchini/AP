@@ -1007,6 +1007,83 @@ export default function App() {
             spegne. */}
         <FreshWork />
 
+        {/* Story-card dei progetti di punta — spostata qui, subito dopo la
+            fascia «lavoro fresco»: griglia (cosa faccio) → terminale clienti e
+            «appena pubblicato» (è vero) → QUESTA (ecco come sono fatti i due
+            siti veri). Prima stava all'80% dello scroll, dopo archivio, stack
+            e scaffale — cioè il blocco che vende di più era l'ultimo a
+            comparire. */}
+        <section id="lavori" className="sb-section" aria-label="Featured work" data-acc="verde">
+          <div className="sb-container">
+            <div className="sb-splithead">
+              <h3>How the featured projects are built</h3>
+              <Link to="/archivio" className="sb-btn sb-btn--sm sb-btn--secondary">More in the archive</Link>
+            </div>
+            <div className="sb-stories">
+              {STORIES.map((s) => {
+                const p = projectByI(s.id);
+                if (!p) return null;
+                const external = !p.url.startsWith("/");
+                // L'indirizzo com'è scritto sulla barra: senza schema per i
+                // siti veri, com'è per le pagine di casa.
+                const host = external ? p.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : p.url;
+                const cls = `sb-story${s.lead ? " sb-story--lead" : ""}`;
+                const inner = (
+                  <div className="sb-panel">
+                    <div className="sb-panel-inner sb-story-inner">
+                      <SitePreview
+                        label={host}
+                        video={p.previewVideo}
+                        poster={p.previewPoster}
+                        img={p.previewImg}
+                        thumb={p.thumb}
+                        alt={
+                          p.previewVideo
+                            ? `Screen recording: a scroll through the ${p.title} website`
+                            : `Screenshot of ${p.title}`
+                        }
+                      />
+                      <div className="sb-story-top">
+                        <span className="sb-story-name" translate="no">{p.title}</span>
+                        <span className="sb-story-kind">{s.kind}</span>
+                      </div>
+                      <span className="sb-story-host" data-no-i18n translate="no">{host}</span>
+                      <p className="sb-story-quote">{s.quote}</p>
+                      {p.tags && (
+                        <ul className="sb-story-tags" data-no-i18n translate="no">
+                          {p.tags.slice(0, 3).map((t) => (
+                            <li key={t}>{t}</li>
+                          ))}
+                        </ul>
+                      )}
+                      <span className="sb-story-foot">
+                        Open the project {external ? <IcExternal size={14} /> : <IcArrowRight size={14} />}
+                      </span>
+                    </div>
+                  </div>
+                );
+                return external ? (
+                  <a
+                    key={s.id}
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className={cls}
+                    data-acc={s.acc}
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <Link key={s.id} to={p.url} className={cls} data-acc={s.acc}>
+                    {inner}
+                  </Link>
+                );
+              })}
+            </div>
+
+          </div>
+        </section>
+
         {/* La fascia «fotografia» stava qui: un intero schermo su ritratti
              amatoriali, con la copy che lo diceva pure («as an amateur, and
              with no illusions about it»). Su una pagina che vende siti era un
@@ -1120,78 +1197,6 @@ export default function App() {
             perché il suo data-acc è quello della lastra aperta, e da lì la
             tinta sale fino alla nav (useNavAccent in site/GlassMotion.tsx). */}
         <PagesShelf />
-
-        {/* ⑥ Story-card dei progetti di punta */}
-        <section id="lavori" className="sb-section" aria-label="Featured work" data-acc="verde">
-          <div className="sb-container">
-            <div className="sb-splithead">
-              <h3>How the featured projects are built</h3>
-              <Link to="/archivio" className="sb-btn sb-btn--sm sb-btn--secondary">More in the archive</Link>
-            </div>
-            <div className="sb-stories">
-              {STORIES.map((s) => {
-                const p = projectByI(s.id);
-                if (!p) return null;
-                const external = !p.url.startsWith("/");
-                // L'indirizzo com'è scritto sulla barra: senza schema per i
-                // siti veri, com'è per le pagine di casa.
-                const host = external ? p.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : p.url;
-                const cls = `sb-story${s.lead ? " sb-story--lead" : ""}`;
-                const inner = (
-                  <div className="sb-panel">
-                    <div className="sb-panel-inner sb-story-inner">
-                      <SitePreview
-                        label={host}
-                        video={p.previewVideo}
-                        poster={p.previewPoster}
-                        img={p.previewImg}
-                        thumb={p.thumb}
-                        alt={
-                          p.previewVideo
-                            ? `Screen recording: a scroll through the ${p.title} website`
-                            : `Screenshot of ${p.title}`
-                        }
-                      />
-                      <div className="sb-story-top">
-                        <span className="sb-story-name" translate="no">{p.title}</span>
-                        <span className="sb-story-kind">{s.kind}</span>
-                      </div>
-                      <span className="sb-story-host" data-no-i18n translate="no">{host}</span>
-                      <p className="sb-story-quote">{s.quote}</p>
-                      {p.tags && (
-                        <ul className="sb-story-tags" data-no-i18n translate="no">
-                          {p.tags.slice(0, 3).map((t) => (
-                            <li key={t}>{t}</li>
-                          ))}
-                        </ul>
-                      )}
-                      <span className="sb-story-foot">
-                        Open the project {external ? <IcExternal size={14} /> : <IcArrowRight size={14} />}
-                      </span>
-                    </div>
-                  </div>
-                );
-                return external ? (
-                  <a
-                    key={s.id}
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className={cls}
-                    data-acc={s.acc}
-                  >
-                    {inner}
-                  </a>
-                ) : (
-                  <Link key={s.id} to={p.url} className={cls} data-acc={s.acc}>
-                    {inner}
-                  </Link>
-                );
-              })}
-            </div>
-
-          </div>
-        </section>
 
         {/* ⑦ Curriculum — muro di card (≈ muro community) */}
         <section id="curriculum" className="sb-section" aria-label="Résumé" data-acc="ambra">
