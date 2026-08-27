@@ -16,19 +16,7 @@ import {
 } from "lucide-react";
 import {
   SiInstagram,
-  SiTiktok,
-  SiX,
-  SiYoutube,
   SiGithub,
-  SiTelegram,
-  SiSnapchat,
-  SiPinterest,
-  SiReddit,
-  SiTwitch,
-  SiKick,
-  SiSpotify,
-  SiThreads,
-  SiSteam,
   SiVinted,
   SiOpenstreetmap,
   SiEbay,
@@ -49,25 +37,20 @@ export const NAV_LINKS: { href: string; label: string; route?: boolean }[] = [
   { href: "/#contatti", label: "Contact" },
 ];
 
-// Social del footer.
+// Social del footer. Erano diciassette — Snapchat, Kick, Steam, Spotify,
+// Twitch, Pinterest, Reddit, Threads, TikTok, X, YouTube, Telegram — cioè un
+// muro di presenze personali su una pagina che vende servizi, e un cliente che
+// finisce sul profilo Twitch è un piccolo danno. Restano le cinque che
+// c'entrano con il lavoro: GitHub (il portfolio vero), Instagram (il recapito
+// del README), OpenStreetMap (i dati del sito di Rivalta vengono di lì), e
+// Vinted + Subito, che il CV cita come esperienza vera di vendita e foto.
+// Manca LinkedIn: appena c'è l'indirizzo, va in cima a questa lista.
 export const SOCIALS: { name: string; Icon: ComponentType<{ size?: number }>; href: string }[] = [
-  { name: "Instagram", Icon: SiInstagram, href: "https://www.instagram.com/albertoxpecchini" },
-  { name: "TikTok", Icon: SiTiktok, href: "https://www.tiktok.com/@albertoxpecchini" },
-  { name: "X (Twitter)", Icon: SiX, href: "https://x.com/ygpzk" },
-  { name: "YouTube", Icon: SiYoutube, href: "https://www.youtube.com/@alberto-h7y3h" },
   { name: "GitHub", Icon: SiGithub, href: "https://github.com/albertoxpecchini" },
-  { name: "Telegram", Icon: SiTelegram, href: "https://t.me/albertopecchini" },
-  { name: "Snapchat", Icon: SiSnapchat, href: "https://www.snapchat.com/add/albertoxpecchini" },
-  { name: "Pinterest", Icon: SiPinterest, href: "https://www.pinterest.com/albertoxpecchini" },
-  { name: "Reddit", Icon: SiReddit, href: "https://www.reddit.com/user/yungpzkko" },
-  { name: "Twitch", Icon: SiTwitch, href: "https://www.twitch.tv/pzkko" },
-  { name: "Kick", Icon: SiKick, href: "https://kick.com/albertoxpecchini" },
-  { name: "Spotify", Icon: SiSpotify, href: "https://open.spotify.com/user/qeefs44bv4bpoa7dk8epagrxf" },
-  { name: "Threads", Icon: SiThreads, href: "https://www.threads.net/@albertoxpecchini" },
-  { name: "Steam", Icon: SiSteam, href: "https://steamcommunity.com/profiles/76561198971719489/" },
+  { name: "Instagram", Icon: SiInstagram, href: "https://www.instagram.com/albertoxpecchini" },
+  { name: "OpenStreetMap", Icon: SiOpenstreetmap, href: "https://www.openstreetmap.org/user/albertoxpecchini" },
   { name: "Vinted", Icon: SiVinted, href: "https://www.vinted.it/member/237170304" },
   { name: "Subito.it", Icon: SiEbay, href: "https://www.subito.it/utente/127591135" },
-  { name: "OpenStreetMap", Icon: SiOpenstreetmap, href: "https://www.openstreetmap.org/user/albertoxpecchini" },
 ];
 
 export type Interest = {

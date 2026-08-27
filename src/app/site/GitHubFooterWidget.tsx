@@ -385,7 +385,6 @@ export default function GitHubFooterWidget() {
 
   const s = STR[lang];
   const p = data?.profile ?? null;
-  const agg = data?.agg ?? null;
   const contrib = data?.contrib ?? null;
   const series = contrib?.series ?? [];
   const sinceYear = p ? new Date(p.created_at).getFullYear() : null;
@@ -539,64 +538,14 @@ export default function GitHubFooterWidget() {
             </figure>
           )}
 
-          {/* ── Riga 3: chip statistiche reali + repo in evidenza.
-              Queste sì che dipendono dal profilo: sono i suoi numeri. ── */}
-          {p && (
-            <div className="sb-gh__chips">
-              <span className="sb-gh__chip"><b>{p.public_repos}</b> {s.repos}</span>
-              <span className="sb-gh__chip"><b>{p.followers}</b> {s.followers}</span>
-              <span className="sb-gh__chip"><b>{p.following}</b> {s.following}</span>
-              {agg && (
-                <span className="sb-gh__chip"><span className="sb-gh__star" aria-hidden="true">★</span> <b>{agg.totalStars}</b> {s.stars}</span>
-              )}
-              {agg && agg.totalForks > 0 && (
-                <span className="sb-gh__chip"><b>{agg.totalForks}</b> {s.forks}</span>
-              )}
-              {p.public_gists > 0 && (
-                <span className="sb-gh__chip"><b>{p.public_gists}</b> {s.gists}</span>
-              )}
-              {data.repo && (
-                <a className="sb-gh__chip" href={data.repo.html_url} target="_blank" rel="noreferrer noopener">
-                  <span className="sb-gh__star" aria-hidden="true">★</span> {data.repo.name}
-                  {data.repo.language && (
-                    <>
-                      {" — "}
-                      <i className="sb-gh__langdot" style={{ background: langColor(data.repo.language) }} aria-hidden="true" />
-                      {" "}{data.repo.language}
-                    </>
-                  )}
-                </a>
-              )}
-            </div>
-          )}
-
-          {/* ── Riga 4: linguaggi più usati ── */}
-          {agg && agg.langs.length > 0 && (
-            <div className="sb-gh__langs">
-              <span
-                className="sb-gh__langbar"
-                role="img"
-                aria-label={agg.langs.map((l) => `${l.name} ${l.pct}%`).join(", ")}
-              >
-                {agg.langs.map((l) => (
-                  <i
-                    key={l.name}
-                    className="sb-gh__langseg"
-                    style={{ width: `${l.pct}%`, background: l.color }}
-                    title={`${l.name} — ${l.pct}%`}
-                  />
-                ))}
-              </span>
-              <span className="sb-gh__langlegend">
-                {agg.langs.map((l) => (
-                  <span key={l.name} className="sb-gh__langitem">
-                    <i className="sb-gh__langdot" style={{ background: l.color }} aria-hidden="true" />
-                    {l.name} <b>{l.pct}%</b>
-                  </span>
-                ))}
-              </span>
-            </div>
-          )}
+          {/* Qui c'erano le chip (repo, follower, seguiti, stelle) e la barra
+              dei linguaggi. Su un profilo giovane quei numeri sono tutti 0 o 1
+              e dicono «inattivo» proprio dove serve dire il contrario; e la
+              barra segnava «HTML 100%», perché il linguist di GitHub conta i
+              byte e su questo repo vince l'HTML generato dalla build — cioè
+              smentiva il «React & TypeScript» di tutta la pagina. L'istogramma
+              qui sopra (1055 commit nell'anno, la fila, il record) è il
+              segnale vero di costanza e resta. */}
         </>
       )}
     </div>
