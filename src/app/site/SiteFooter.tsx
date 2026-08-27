@@ -147,7 +147,7 @@ export default function SiteFooter() {
 
         {/* ── ③ la barra finale ── */}
         <div className="sb-foot-bar">
-          <span>© {year} Alberto Pecchini — All rights reserved</span>
+          <span>© {year} Alberto Pecchini — code under MIT, content reserved</span>
           <button type="button" className="sb-foot-top" onClick={toTop}>
             <ArrowUp size={14} aria-hidden="true" />
             Back to top

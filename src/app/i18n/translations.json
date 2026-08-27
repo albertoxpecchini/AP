@@ -454,10 +454,10 @@
     "fr": "Web design & développement de sites web",
     "de": "Webdesign & Website-Entwicklung"
   },
-  "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography, a warm colour palette and advanced animations via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Gapless bento grids and image-led composition for immersive visual storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.": {
-    "it": "Progettazione e sviluppo del sito istituzionale e turistico di Rivalta sul Mincio. Design editoriale minimalista con tipografia curata, palette di colori calda e animazioni avanzate via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Bento grid senza spazi e composizione guidata dalle immagini per uno storytelling visivo immersivo. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
-    "fr": "Conception et développement du site institutionnel et touristique de Rivalta sul Mincio. Design éditorial minimaliste avec une typographie soignée, une palette de couleurs chaleureuse et des animations avancées via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Grilles bento sans espaces et composition guidée par l'image pour un storytelling visuel immersif. Stack : Next.js, TypeScript, GSAP, Tailwind CSS.",
-    "de": "Konzeption und Entwicklung der institutionellen und touristischen Website von Rivalta sul Mincio. Minimalistisches Editorial-Design mit sorgfältiger Typografie, warmer Farbpalette und fortgeschrittenen Animationen via GSAP ScrollTrigger (Pinning, Stacking, Parallax-Scrubbing). Lückenlose Bento-Grids und bildgeführte Komposition für immersives visuelles Storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS."
+  "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography and a warm palette. Rebuilt as nine pages of plain static HTML — no framework and no dependencies — with every figure about the village backed by a public OpenStreetMap dataset. Stack: HTML, CSS, JavaScript.": {
+    "it": "Progettazione e sviluppo del sito istituzionale e turistico di Rivalta sul Mincio. Design editoriale minimalista con tipografia curata e palette calda. Rifatto in nove pagine di HTML statico puro — nessun framework e nessuna dipendenza — con ogni numero del paese che poggia su un dataset pubblico di OpenStreetMap. Stack: HTML, CSS, JavaScript.",
+    "fr": "Conception et développement du site institutionnel et touristique de Rivalta sul Mincio. Design éditorial minimaliste avec une typographie soignée et une palette chaleureuse. Reconstruit en neuf pages de HTML statique pur — sans framework ni dépendances — chaque chiffre sur le village s'appuyant sur un jeu de données public OpenStreetMap. Stack : HTML, CSS, JavaScript.",
+    "de": "Konzeption und Entwicklung der institutionellen und touristischen Website von Rivalta sul Mincio. Minimalistisches Editorial-Design mit sorgfältiger Typografie und warmer Farbpalette. Neu aufgebaut als neun Seiten reines statisches HTML — ohne Framework und ohne Abhängigkeiten — wobei jede Kennzahl zum Ort auf einem öffentlichen OpenStreetMap-Datensatz beruht. Stack: HTML, CSS, JavaScript."
   },
   "Apr 20, 2026": {
     "it": "20 apr 2026",
@@ -774,10 +774,10 @@
     "fr": "Géomètre & développeur de sites web, ITT «Carlo d'Arco» — Mantoue",
     "de": "Vermessungstechniker & Website-Entwickler, ITT «Carlo d'Arco» — Mantua"
   },
-  "Alberto Pecchini — All rights reserved": {
-    "it": "Alberto Pecchini — Tutti i diritti riservati",
-    "fr": "Alberto Pecchini — Tous droits réservés",
-    "de": "Alberto Pecchini — Alle Rechte vorbehalten"
+  "Alberto Pecchini — code under MIT, content reserved": {
+    "it": "Alberto Pecchini — codice sotto MIT, contenuti riservati",
+    "fr": "Alberto Pecchini — code sous licence MIT, contenu réservé",
+    "de": "Alberto Pecchini — Code unter MIT, Inhalte vorbehalten"
   },
   "Updated": {
     "it": "Aggiornato",

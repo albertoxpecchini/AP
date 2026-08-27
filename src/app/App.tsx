@@ -183,7 +183,7 @@ const CV = [
     period: "Apr 27, 2026",
     title: "Rivalta sul Mincio — Website",
     role: "Web design & website development",
-    desc: "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography, a warm colour palette and advanced animations via GSAP ScrollTrigger (pinning, stacking, parallax scrubbing). Gapless bento grids and image-led composition for immersive visual storytelling. Stack: Next.js, TypeScript, GSAP, Tailwind CSS.",
+    desc: "Design and development of the institutional and tourist website for Rivalta sul Mincio. Minimalist editorial design with careful typography and a warm palette. Rebuilt as nine pages of plain static HTML — no framework and no dependencies — with every figure about the village backed by a public OpenStreetMap dataset. Stack: HTML, CSS, JavaScript.",
   },
   {
     period: "Jun 30 — Jul 1, 2026",
