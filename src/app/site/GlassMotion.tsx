@@ -48,6 +48,7 @@ import { useEffect } from "react";
 import type { RefObject } from "react";
 import { gsap } from "gsap";
 import { apriAura, auraViva, chiudiAura, muoviAura } from "./aura";
+import { apriMacchie, chiudiMacchie, macchieVive, muoviMacchie } from "./macchie";
 
 /** Quanto slittano gli aloni fra cima e fondo della pagina. Volutamente poco:
  *  è un cambio di luce dietro il vetro, non un fondale che scorre. */
@@ -116,6 +117,9 @@ export default function GlassMotion() {
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const root = document.documentElement;
       let aura = apriAura(DRIFT_PX, PTR_SHIFT / 2);
+      // Le macchie del fondale viaggiano sulla STESSA deriva degli aloni: è la
+      // posizione nella pagina, e leggerla due volte non avrebbe senso.
+      let macchie = apriMacchie();
 
       // Lo stato che si tweena. I quickTo danno la curva ai NUMERI, e i numeri
       // finiscono nel currentTime delle animazioni: stesso mestiere di prima,
@@ -128,6 +132,10 @@ export default function GlassMotion() {
         // appese al vecchio se ne sono andate con lui, e vanno riaperte.
         if (!auraViva(aura)) aura = apriAura(DRIFT_PX, PTR_SHIFT / 2);
         muoviAura(aura, st.deriva, st.px, st.py);
+        // Le macchie del fondale: stessa deriva, cioè la stessa posizione
+        // nella pagina. Scendendo cambia l'umore cromatico — vedi site/macchie.ts.
+        if (!macchieVive(macchie)) macchie = apriMacchie();
+        muoviMacchie(macchie, st.deriva);
         // La parallasse dei sei disegni leggeva la stessa --sb-drift. Adesso
         // si scrive loro addosso la TRASFORMAZIONE GIÀ FATTA, e non la
         // variabile: scriverci la variabile è stato il primo tentativo, e
@@ -205,6 +213,7 @@ export default function GlassMotion() {
         document.removeEventListener("pointermove", puntatore);
         gsap.killTweensOf(st);
         chiudiAura(aura);
+        chiudiMacchie(macchie);
         for (const v of visual) v.style.removeProperty("transform");
       };
     });

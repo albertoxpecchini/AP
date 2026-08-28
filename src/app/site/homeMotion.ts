@@ -74,56 +74,19 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
           });
         });
 
-        // ── ③ Le cinque schede della griglia: il gesto, UNA volta, a vista ──
-        // Il gesto di ogni scheda parte al passaggio del puntatore (home.css,
-        // «Il gesto parte al passaggio»), e va bene finché un puntatore c'è.
-        // Su un telefono non c'è: la griglia è la prima cosa che si incontra
-        // scendendo, e restava cinque mosaici fermi per sempre.
+        // Qui c’era il blocco ③: le cinque schede si giocavano il loro gesto una
+        // volta sola arrivando a vista, con un ScrollTrigger per card che metteva
+        // [data-play] e un setTimeout che lo toglieva dopo --sb-gesto ms. Serviva
+        // perché il gesto partiva solo al passaggio del puntatore, e sul telefono
+        // un puntatore non c’è: la griglia restava cinque mosaici fermi per sempre.
         //
-        // Qui la scheda si gioca il suo gesto una volta sola, quando entra in
-        // scena, e poi torna ferma. Non è il reveal allo scroll che questa
-        // pagina non vuole — il disegno c'è già, intero, e non compare: è la
-        // stessa regola dei contatori qui sopra, che partono da zero arrivando
-        // a vista perché quello è il momento in cui qualcuno li guarda.
-        //
-        // Il come: un attributo sulla card, che in home.css accende gli stessi
-        // animation-name dell'hover, e che si toglie da sé quando il gesto è
-        // finito — se restasse, l'hover non potrebbe più farlo ripartire.
-        //
-        // Quanto dura: adesso il mosaico è un gesto solo, uguale per tutte e
-        // cinque — un loop da ~4 s. Il numero lo porta la card addosso, in una
-        // proprietà del foglio (--sb-gesto), e si legge una volta sola — la
-        // prima volta che quella card entra in scena. (Le vecchie tavole
-        // avevano due tempi: cinque brevi e il provino a otto secondi.)
-        //
-        // L'unità va guardata, e non è pignoleria: nel foglio quel valore è
-        // scritto in millisecondi, ma getComputedStyle lo restituisce
-        // normalizzato in secondi — "4200ms" torna indietro come "4.2s". Un
-        // parseFloat e via avrebbe dato 4,2 millisecondi, cioè l'attributo
-        // tolto prima del primo fotogramma e il gesto mai visto.
-        const GESTO = 3600;
-        const durata = (card: HTMLElement) => {
-          const v = getComputedStyle(card).getPropertyValue("--sb-gesto").trim();
-          const n = parseFloat(v);
-          if (!Number.isFinite(n) || n <= 0) return GESTO;
-          return v.endsWith("ms") ? n : n * 1000;
-        };
-        const timers: number[] = [];
-        gsap.utils.toArray<HTMLElement>(".sb-products .sb-card", scope).forEach((card) => {
-          ScrollTrigger.create({
-            trigger: card,
-            start: "top 88%",
-            once: true,
-            onEnter: () => {
-              card.dataset.play = "";
-              timers.push(window.setTimeout(() => delete card.dataset.play, durata(card)));
-            },
-          });
-        });
+        // Adesso i mosaici girano SEMPRE, e il nome dell’animazione sta nella regola
+        // base del foglio (home.css, «Sempre vive»). Quindi non c’è più niente da
+        // accendere: via cinque ScrollTrigger, cinque timer e una lettura di
+        // getComputedStyle per card.
 
         return () => {
           intro.kill();
-          timers.forEach(clearTimeout);
         };
       });
 

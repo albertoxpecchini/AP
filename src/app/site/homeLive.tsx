@@ -31,29 +31,35 @@
 // la scheda lo dice con una custom property, --mo-lit, scritta dal modificatore
 // .sb-mosaic--<tema>.
 //
-// ── Le regole del movimento, invariate ───────────────────────────────────────
-// Una cosa sola in movimento per riquadro, ed è un GESTO: le tessere si posano,
-// quella accesa fa il suo giro, e tutto torna fermo. Il gesto NON parte da solo
-// — da fermo la griglia è ferma. Si anima solo mentre il puntatore è sulla card
-// (home.css, «Il gesto parte al passaggio»), o una volta sola quando la card
-// entra a vista sul telefono (site/homeMotion.ts ③, che mette e toglie
-// [data-play] dopo --sb-gesto ms).
+// ── Le regole del movimento ──────────────────────────────────────────────────
+// SEMPRE VIVE. Prima il gesto partiva solo al passaggio del puntatore, o una
+// volta sola entrando a vista, e fuori di lì le schede stavano ferme: era la
+// regola della griglia prodotti di Supabase, e per sei tavole tecniche era
+// giusta — sei disegni al tratto che si agitano insieme sono un albero di
+// Natale. Il mosaico non è un disegno tecnico: è un pannello, e un pannello
+// fermo è un pannello spento. Adesso gira sempre, e il nome dell'animazione sta
+// nella regola BASE del foglio (home.css, «Sempre vive»).
+//
+// Le cinque schede sono SFASATE di mezzo secondo l'una dall'altra, tessere e
+// targa sullo stesso tempo: cinque mosaici che battono all'unisono sono un
+// mosaico grande, cinque a giro sono cinque cose vive.
 //
 // Le proprietà animate sono due, e tutte e due a buon mercato: transform e
 // opacity, che il compositore muove senza ricalcolare niente. Niente filtri,
-// niente tratteggi, niente animazioni di layout. Qui dentro NON c'è
-// JavaScript.
+// niente tratteggi, niente animazioni di layout. Il browser sospende da sé le
+// animazioni CSS quando la scheda passa in secondo piano, e nessun JavaScript
+// gira per tenerle in moto — il solo JS di questo file è il turno della targa.
 //
-// Ogni tavola è ferma sul suo fotogramma FINITO: i valori base del CSS sono
-// quelli di fine corsa — tessere posate, tessera accesa a casa. Le regole base
-// non hanno animation-name; il nome lo aggiunge l'hover (o [data-play]). Così
-// con prefers-reduced-motion basta non aggiungere il nome e resta il mosaico
-// completo, non uno a metà.
+// Chi ha chiesto meno movimento le trova ferme sul fotogramma finito: le
+// keyframe cominciano e finiscono là, quindi «ferme» vuol dire il mosaico
+// intero, non uno a metà, e la targa resta sulla sua prima riga.
 //
 // Da dove viene: il canvas «Sistema blueprint tecnico animato», Turno 3. Le
 // cinque schede stanno anche come artboard .dc.html a sé, una per tema.
 //
-// Convenzione i18n: qui non c'è prosa da tradurre — il mosaico è tutto forme.
+// Convenzione i18n: il mosaico è tutto forme e non ha prosa. Ce l'ha la targa,
+// e le sue righe passano dal dizionario come tutto il resto — tranne i nomi
+// propri, che portano noI18n.
 // ─────────────────────────────────────────────────────────────────────────────
 import { memo, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
@@ -212,27 +218,31 @@ export const NowBuilding = memo(function NowBuilding() {
    e le cinque keyframe la portano su celle vere della griglia — mai in un
    buco, mai fuori dai bordi.
 
-   ── Il fotogramma di riposo ────────────────────────────────────────────────
-   Le regole base in home.css (.sb-mosaic-tile, .sb-mosaic-lit) hanno durata e
-   curva ma NIENTE animation-name: l'elemento resta sui valori di fine corsa —
-   tessere posate all'opacità piena, tessera accesa a casa. Il nome arriva solo
-   con [data-play] o :hover. Vedi la nota lunga in testa al file.
+   ── Il moto ────────────────────────────────────────────────────────────────
+   Gira sempre, in loop da 4 s, e le cinque schede sono sfasate di mezzo
+   secondo l'una dall'altra (home.css, «Sempre vive»). Le keyframe cominciano e
+   finiscono sullo stesso fotogramma — tessere posate, tessera accesa a casa —
+   quindi il giro si chiude, e con prefers-reduced-motion, che toglie il nome
+   dell'animazione, resta il mosaico intero.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** Le tessere della griglia: x, y, larghezza, opacità, ritardo di posa (s).
  *  L'altezza è sempre 74. Ricopiate dal canvas, Turno 3. */
 const MOSAIC_FIELD: [number, number, number, number, number][] = [
   [30, 26, 72, 0.9, 0], [110, 26, 72, 0.35, 0.11], [190, 26, 152, 1, 0.22], [350, 26, 72, 0.5, 0.44], [430, 26, 72, 0.2, 0.55],
+  [510, 26, 72, 0.62, 0.66],
   [30, 108, 72, 0.5, 0.11], [110, 108, 72, 0.95, 0.22], [270, 108, 72, 0.25, 0.44], [350, 108, 72, 0.75, 0.55], [430, 108, 72, 0.3, 0.66], [510, 108, 72, 0.9, 0.77],
   [30, 190, 72, 0.25, 0.22], [110, 190, 72, 0.85, 0.33], [190, 190, 72, 0.4, 0.44], [270, 190, 72, 1, 0.55], [350, 190, 152, 0.3, 0.66], [510, 190, 72, 0.6, 0.88],
   [30, 272, 72, 0.7, 0.33], [110, 272, 72, 0.2, 0.44], [190, 272, 72, 0.45, 0.55], [350, 272, 72, 0.9, 0.77], [430, 272, 72, 0.25, 0.88], [510, 272, 72, 0.55, 0.99],
 ];
 
-/** La tessera avorio in alto a destra: è quella su cui SIEDE il marchio. Sta
- *  fuori dalla griglia colorata perché ha un fill suo, e le sue coordinate
- *  sono le stesse che il marchio usa per posarcisi sopra (vedi .sb-mocard-mark
- *  in home.css: top 7 %, right 4 %, cioè questa tessera). */
-const MOSAIC_PAPER: [number, number, number, number, number] = [510, 26, 72, 0.94, 0.66];
+/* Qui c'era MOSAIC_PAPER: la tessera avorio in alto a destra, disegnata fuori
+   dalla griglia colorata perché aveva un fill suo. Esisteva per un motivo solo
+   — reggere il marchio .ap, che ci sedeva sopra. Tolto il marchio restava un
+   quadrato bianco nello stesso angolo di tutte e cinque le schede, cioè
+   esattamente il difetto per cui il marchio se n'era andato: un elemento
+   chiaro, identico, ripetuto cinque volte, che si prende l'occhio prima del
+   mosaico. Adesso quella cella è una tessera come le altre, ed è nel campo. */
 
 /** La casa della tessera accesa, prima che la keyframe la porti in giro. */
 const LIT = { x: 190, y: 108, w: 72, h: 74 };
@@ -316,14 +326,6 @@ export const Mosaic = memo(function Mosaic({ topic }: { topic: MosaicTopic }) {
             style={{ "--o": o, animationDelay: `${d}s` } as React.CSSProperties}
           />
         ))}
-        <rect
-          className="sb-mosaic-paper"
-          x={MOSAIC_PAPER[0]}
-          y={MOSAIC_PAPER[1]}
-          width={MOSAIC_PAPER[2]}
-          height={74}
-          style={{ "--o": MOSAIC_PAPER[3], animationDelay: `${MOSAIC_PAPER[4]}s` } as React.CSSProperties}
-        />
       </g>
 
       {/* la tessera accesa: l'unica piena, e l'unica che cambia posto */}
@@ -336,77 +338,218 @@ export const Mosaic = memo(function Mosaic({ topic }: { topic: MosaicTopic }) {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LA SCHEDA — il mosaico al vivo, il marchio e la targa
+   LA SCHEDA — mosaico al vivo, riflessi e targa viva
 
-   Questa è la card della griglia prodotti, 1:1 col canvas «Sistema blueprint
-   tecnico animato», Turno 3. Non è «una card con dentro un disegno»: è la
-   regola dichiarata al Turno 2 del canvas — 90 % grafica, 10 % targa e
-   marchio. Quindi qui NON c'è né una descrizione né un elenco di spunte: la
-   grafica prende la scheda intera al vivo, e a parlare restano due righe.
+   La card della griglia prodotti. Viene dal canvas «Sistema blueprint tecnico
+   animato», Turno 3, e ne tiene la regola: 90 % grafica, 10 % targa. Niente
+   descrizioni, niente elenchi di spunte — la grafica prende la scheda intera
+   al vivo, e a parlare restano due righe.
 
-   Le tre cose sopra al mosaico, e perché ognuna:
+   ── Cos'è cambiato rispetto al canvas ──────────────────────────────────────
+   IL MARCHIO NON C'È PIÙ. Sul canvas ogni scheda portava un quadrato di carta
+   avorio in alto a destra col `.ap` dentro. Cinque marchi identici in una
+   griglia sola sono un timbro ripetuto cinque volte sulla stessa pagina: chi
+   guarda ha già letto il nome nell'header, e il quadrato bianco era la cosa
+   più luminosa della scheda — cioè si prendeva l'occhio prima del mosaico. La
+   tessera di carta del mosaico resta dov'era: adesso è solo un tassello di un
+   altro materiale, un fermo per l'occhio in mezzo alle tinte.
 
-     · IL MARCHIO. Un quadrato di carta avorio in alto a destra, con dentro
-       il `.ap` della tinta della scheda. Non galleggia: cade esattamente sulla
-       tessera avorio del mosaico (quella a 510,26), che è lì apposta per
-       reggerlo — è il marchio stampato su un tassello, non un adesivo.
-     · LA TARGA. In basso a sinistra, su un velo quasi nero, con l'angolo alto
-       a destra tagliato: due righe, il nome e cos'è. Il taglio è la sagoma del
-       sito in piccolo, e serve a non farla leggere come una didascalia
-       incollata.
-     · LA CORNICE. Non è disegnata qui: è .sb-panel + .sb-panel-inner, cioè la
-       stessa lastra di tutto il sito — ed è da lì che il canvas l'aveva presa
-       (stessa formula di gradiente, stesso 1 px di rim, stesso smusso). Va in
-       versione `--solid`: dietro al mosaico non c'è niente da sfocare, e un
-       backdrop-filter si pagherebbe a vuoto.
+   ── I riflessi ─────────────────────────────────────────────────────────────
+   Tre, e sono tre cose diverse, non tre copie della stessa:
 
-   Il mosaico sta dentro .sb-card-visual, che è il riquadro che
-   site/GlassMotion.tsx muove in controtendenza allo scroll. Sborda di 8 px per
-   lato apposta: la deriva è di tre o quattro pixel, e senza il margine
-   scoprirebbe un filo di fondo sul bordo alto.
+     · LA VELATURA. Un gradiente diagonale fisso, chiaro in alto a sinistra e
+       trasparente in basso: è la luce ambientale sulla lastra, quella che c'è
+       anche quando non succede niente. Ferma.
+     · LA PASSATA. Una banda di luce stretta che attraversa la scheda in
+       diagonale, in loop. È il riflesso vero — quello che dice «questa cosa è
+       lucida». Sfasata per scheda, così non passano tutte insieme.
+     · IL BORDO ACCESO. Un filo della tinta lungo il taglio in alto a sinistra,
+       che respira. Sta sul bordo e non dentro: è la luce che prende lo spigolo
+       di striscio, come sulle lastre grandi dello scaffale.
+
+   Tutti e tre su transform e opacity, e nessuno è un filter: una scheda che
+   sfoca costa un buffer per card ridipinto a ogni fotogramma, e qui le schede
+   sono cinque, tutte accese insieme, su una pagina che deve restare fluida
+   mentre scorre.
+
+   ── La targa è VIVA ────────────────────────────────────────────────────────
+   Il titolo e il sottotitolo non sono più due stringhe ferme: ogni scheda ha
+   una LISTA di righe e le dà a turno, entrando da sotto e uscendo da sopra.
+   Il titolo cambia con lei quando la voce ha un titolo suo — così la targa non
+   è una didascalia ma un pannello che aggiorna.
+
+   Un turno per scheda ogni ~4,6 s, sfasato di mezzo secondo l'una dall'altra:
+   cinque targhe che cambiano allo stesso istante sono un tabellone
+   dell'aeroporto, cinque che cambiano a giro sono un pannello vivo.
+
+   E il turno SALTA finché il puntatore (o il focus) sta sulla scheda: un testo
+   che cambia mentre lo stai leggendo è un testo che non si finisce di leggere.
+   È la stessa regola di NowBuilding, qui sopra.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Il marchio `.ap`, lo stesso tracciato di public/favicon.svg. La tinta è
- *  quella della scheda: fill currentColor, e il colore lo mette il CSS. */
-function ApMark() {
-  return (
-    <svg viewBox="50 185 310 190" aria-hidden="true" focusable="false">
-      <path
-        fill="currentColor"
-        d="M58.44 315.0V275.16H93.0V315.0Z M213.24 232.44V282.36Q213.72 288.12 215.16 290.4Q216.6 292.68 221.16 293.64L220.2 317.88Q207.96 317.88 200.64 316.2Q193.32 314.52 185.88 309.48Q168.6 317.88 150.6 317.88Q113.4 317.88 113.4 278.52Q113.4 259.32 123.72 251.28Q134.04 243.24 155.4 241.8L181.08 239.88V232.44Q181.08 225.0 177.72 222.24Q174.36 219.48 166.92 219.48L121.8 221.4L120.84 199.08Q146.52 192.12 169.68 192.12Q192.84 192.12 203.04 201.72Q213.24 211.32 213.24 232.44ZM159.24 264.12Q145.8 265.32 145.8 278.52Q145.8 291.72 157.56 291.72Q166.68 291.72 177.48 288.84L181.08 287.88V262.2Z M243.96 365.4V195.0H275.88V201.48Q291.48 192.12 303.24 192.12Q327.48 192.12 339.0 206.64Q350.52 221.16 350.52 255.96Q350.52 290.76 337.8 304.32Q325.08 317.88 296.04 317.88Q288.12 317.88 279.0 316.44L276.12 315.96V365.4ZM297.0 220.92Q288.12 220.92 279.0 224.52L276.12 225.72V288.6Q286.92 290.04 293.64 290.04Q307.56 290.04 312.72 281.88Q317.88 273.72 317.88 254.04Q317.88 220.92 297.0 220.92Z"
-      />
-    </svg>
-  );
-}
+/** Una voce della targa: la riga grande e quella piccola in mono.
+ *
+ *  I due flag sono SEPARATI, e serve che lo siano: quasi tutte le voci hanno un
+ *  titolo che è un nome proprio — un dominio, «Claude Code», un corpo macchina
+ *  — e un sottotitolo che è prosa, da tradurre. Con un flag solo sulla riga
+ *  intera la scheda dei siti restava con «websites» in inglese sotto a un nome
+ *  italiano, e quella dell'IA con «AI-assisted development». */
+type Riga = {
+  title: string;
+  sub: string;
+  /** Il titolo è un nome proprio: il motore i18n non lo tocca. */
+  noI18n?: boolean;
+  /** Anche il sottotitolo lo è (sigle, misure, modelli di obiettivo). */
+  subNoI18n?: boolean;
+};
+
+/** Gli attributi che spengono il motore i18n su un nodo. */
+const FERMO = { "data-no-i18n": true, translate: "no" as const };
+
+/** Quanto resta ferma una riga prima di dare il cambio. */
+const PLATE_HOLD = 4600;
+
+/** Il giro delle targhe. Ogni scheda ne ha tre: la prima è quella che si vede
+ *  da ferma (e quella che resta con prefers-reduced-motion), le altre due
+ *  dicono un FATTO — un numero, un nome, un dato vero — perché una targa che
+ *  gira per dire tre volte la stessa cosa con parole diverse è un fastidio. */
+const PLATE: Record<MosaicTopic, Riga[]> = {
+  web: [
+    { title: "Rivalta e Cascina Fontana", sub: "websites", noI18n: true },
+    { title: "rivaltasulmincio.it", sub: "online, and the village in every datum", noI18n: true },
+    { title: "cascinafontana.xyz", sub: "online, from the first word", noI18n: true },
+  ],
+  archive: [
+    { title: "Project archive", sub: "all the works" },
+    { title: "React and TypeScript", sub: "and never a page builder" },
+    { title: "The source goes home with you", sub: "every project, open" },
+  ],
+  claude: [
+    { title: "Claude Code", sub: "AI-assisted development", noI18n: true },
+    { title: "Codex, Copilot", sub: "machines that write", noI18n: true },
+    { title: "Not one line unread", sub: "my eye upon all of it" },
+  ],
+  photo: [
+    { title: "Photography", sub: "shots" },
+    { title: "Canon EOS 4000D", sub: "EF-S 18-55mm, ISO 3200", noI18n: true, subNoI18n: true },
+    { title: "The faces stay mine alone", sub: "the number, never the image" },
+  ],
+  autocad: [
+    { title: "Surveying", sub: "and university" },
+    { title: "CAT diploma", sub: "Construction, Environment and Territory" },
+    { title: "AutoCAD, topography", sub: "and weighing what a thing is worth" },
+  ],
+};
+
+/** Di quanto parte sfasato il giro di ogni scheda, in millisecondi. */
+const PLATE_STAGGER: Record<MosaicTopic, number> = {
+  web: 0,
+  archive: 520,
+  claude: 1040,
+  photo: 1560,
+  autocad: 2080,
+};
 
 /** Il contenuto di una scheda. Chi la usa ci mette intorno il suo <Link> o la
  *  sua <a> con className="sb-card" e il data-acc della tinta — la scheda non sa
- *  dove porta, e non deve. `sub` è la riga piccola in mono. */
-export const MosaicCard = memo(function MosaicCard({
-  topic,
-  title,
-  sub,
-  noI18n,
-}: {
-  topic: MosaicTopic;
-  title: string;
-  sub: string;
-  /** Per i nomi propri — «Rivalta e Cascina Fontana», «Claude Code» — che il
-   *  motore i18n non deve toccare. */
-  noI18n?: boolean;
-}) {
+ *  dove porta, e non deve. */
+export const MosaicCard = memo(function MosaicCard({ topic }: { topic: MosaicTopic }) {
+  const righe = PLATE[topic];
+  const [i, setI] = useState(0);
+  const rowRef = useRef<HTMLSpanElement>(null);
+  const held = useRef(false);
+  const first = useRef(true);
+  const cur = righe[i];
+
+  // useLayoutEffect e non useEffect: la riga nuova deve trovarsi già fuori
+  // dalla finestrella al primo frame, altrimenti lampeggia al suo posto prima
+  // di salire.
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    if (!row || righe.length < 2) return;
+
+    const anim = motionOK();
+    // Con movimento ridotto la targa non gira affatto: resta la prima riga,
+    // che è quella scritta per stare ferma.
+    if (!anim) return;
+
+    let alive = true;
+    let timer = 0;
+
+    // La prima riga è già al suo posto: si anima solo chi arriva dopo. E lo
+    // sfasamento si paga UNA volta, al primo giro — dopo, il ritmo è quello di
+    // tutte e la sfasatura resta perché resta il ritardo iniziale.
+    const primo = first.current;
+    if (primo) first.current = false;
+    else {
+      gsap.fromTo(
+        row,
+        { yPercent: 108, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.42, ease: "power3.out" },
+      );
+    }
+
+    const advance = () => {
+      if (alive) setI((v) => (v + 1) % righe.length);
+    };
+    const turn = () => {
+      if (!alive) return;
+      if (held.current) {
+        timer = window.setTimeout(turn, PLATE_HOLD);
+        return;
+      }
+      gsap.to(row, {
+        yPercent: -108,
+        autoAlpha: 0,
+        duration: 0.3,
+        ease: "power2.in",
+        onComplete: advance,
+      });
+    };
+    timer = window.setTimeout(turn, PLATE_HOLD + (primo ? PLATE_STAGGER[topic] : 0));
+
+    return () => {
+      alive = false;
+      window.clearTimeout(timer);
+      gsap.killTweensOf(row);
+    };
+  }, [i, righe, topic]);
+
+  const hold = (on: boolean) => () => {
+    held.current = on;
+  };
+
   return (
     <div className="sb-panel">
       <div className="sb-panel-inner sb-panel--solid sb-mocard">
         <div className="sb-card-visual">
           <Mosaic topic={topic} />
         </div>
-        <span className="sb-mocard-mark" aria-hidden="true">
-          <ApMark />
-        </span>
-        <span className="sb-mocard-plate">
-          <h3 {...(noI18n ? { "data-no-i18n": true, translate: "no" as const } : {})}>{title}</h3>
-          <span className="sb-mocard-sub">{sub}</span>
+
+        {/* I riflessi. Tre span vuoti e nessuna immagine: sono tre gradienti,
+            e il CSS sa già dove metterli. aria-hidden perché non dicono
+            niente — sono la lucidatura della lastra. */}
+        <span className="sb-mocard-sheen" aria-hidden="true" />
+        <span className="sb-mocard-sweep" aria-hidden="true" />
+        <span className="sb-mocard-edge" aria-hidden="true" />
+
+        <span
+          className="sb-mocard-plate"
+          onPointerEnter={hold(true)}
+          onPointerLeave={hold(false)}
+          onFocus={hold(true)}
+          onBlur={hold(false)}
+        >
+          {/* La finestrella: overflow nascosto, e dentro una riga sola. key
+              sull'indice, così la fromTo di entrata parte da un nodo pulito. */}
+          <span className="sb-mocard-slot">
+            <span className="sb-mocard-row" key={i} ref={rowRef}>
+              <h3 {...(cur.noI18n ? FERMO : {})}>{cur.title}</h3>
+              <span className="sb-mocard-sub" {...(cur.subNoI18n ? FERMO : {})}>
+                {cur.sub}
+              </span>
+            </span>
+          </span>
         </span>
       </div>
     </div>

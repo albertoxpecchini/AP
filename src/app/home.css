@@ -473,6 +473,166 @@ html.dark .sb-home::after {
   -webkit-mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
   mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE MACCHIE DEL FONDALE — il colore che ti abbraccia
+
+   Nove macchie in tutto: tre TAVOLOZZE da tre. Scendendo, la tavolozza cambia
+   — blu e viola in cima, ambra e rosa a metà, verde e blu in fondo — e il
+   cambio è una dissolvenza, non uno stacco. Il colore lo scorre
+   site/macchie.ts (tre animazioni di opacità in pausa, scrubbate dallo
+   scroll); il movimento è qui, ed è una keyframe che gira per conto suo.
+
+   ── Perché stanno ai BORDI ─────────────────────────────────────────────────
+   Perché il centro è dove sta il testo. Una macchia satura sotto a un
+   paragrafo lo rende illeggibile, e nessuna quantità di opacità aggiusta la
+   cosa: il contrasto cambia man mano che la macchia si sposta, quindi una riga
+   leggibile adesso è una riga illeggibile fra tre secondi.
+
+   Con le macchie ai bordi e il centro mascherato si ottengono tutte e due le
+   cose: il colore è acceso quanto si vuole dove non c'è niente da leggere, e
+   il testo resta sul fondo pulito. Ed è anche la ragione per cui l'effetto è
+   quello di essere ABBRACCIATI dal colore invece che immersi — la luce arriva
+   dai lati e da sotto, come da una stanza attorno, non da uno schermo dietro.
+
+   La maschera è il pezzo che fa il lavoro:
+   `radial-gradient(ellipse 56% 46% at 50% 46%, transparent 0%, #000 74%)` —
+   trasparente in mezzo (cioè: non dipingere), pieno ai bordi.
+
+   ── Cosa costa ─────────────────────────────────────────────────────────────
+   Le macchie sono radial-gradient, non filter: blur. È la differenza fra un
+   gradiente che il browser dipinge una volta e un buffer sfocato da rifare a
+   ogni fotogramma in cui qualcosa si muove — e qui qualcosa si muove sempre.
+   Un radial-gradient con gli stop morbidi È già una macchia sfocata, e costa
+   quanto un riempimento.
+
+   Il movimento è tutto su `transform`, che il compositore muove da solo. Le
+   tre tavolozze sono tre strati compositi; sopra ci passa l'opacità scrubbata,
+   che è l'altra proprietà gratis. Nessuna delle due tocca layout o disegno.
+
+   ── E dietro al vetro ──────────────────────────────────────────────────────
+   Le lastre della pagina hanno un backdrop-filter, che si rifà ogni volta che
+   cambia lo sfondo dietro. Le macchie che si muovono per sempre lo terrebbero
+   acceso a 60 al secondo anche a pagina ferma. Per questo si fermano con la
+   quiete, esattamente come la deriva degli aloni: `.sb-quiet` (la mette
+   site/GlassMotion.tsx dopo un secondo e mezzo senza scroll né puntatore)
+   mette in pausa anche loro. Fermo a leggere non paghi niente; appena la
+   pagina si muove, il fondo si muove con lei.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-blobs {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Le macchie sporgono dai bordi apposta (left: -18vw, right: -20vw), ed è
+     quello che le fa sembrare più grandi della finestra invece che appoggiate
+     dentro. Ma sporgere allarga l'area di scorrimento, e su telefono si
+     otteneva una pagina che scorre in orizzontale.
+     La maschera qui sotto NON basta: mascherare toglie i pixel, non
+     l'ingombro. Serve il ritaglio vero. */
+  overflow: hidden;
+  /* Il buco al centro: è questo che tiene il testo leggibile e che fa
+     l'abbraccio. Vedi la nota qui sopra. */
+  -webkit-mask-image: radial-gradient(ellipse 56% 46% at 50% 46%, transparent 0%, #000 74%);
+  mask-image: radial-gradient(ellipse 56% 46% at 50% 46%, transparent 0%, #000 74%);
+}
+
+/* Una tavolozza. L'opacità la scrive site/macchie.ts con un'animazione in
+   pausa; questo è il valore che si vede se quel codice non gira (browser senza
+   Web Animations, o JS che non è ancora arrivato): la prima tavolozza accesa,
+   le altre due spente. */
+.sb-blobset {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.sb-blobset--a { opacity: 1; }
+
+/* Le macchie. Tre posizioni fisse — sinistra, destra, fondo — uguali per tutte
+   e tre le tavolozze: quello che cambia da una tavolozza all'altra è solo il
+   COLORE, così la dissolvenza è un cambio di tinta e non uno spostamento. */
+.sb-blob {
+  position: absolute;
+  border-radius: 50%;
+  /* transform: il compositore la muove da solo. translateZ(0) per chiedere il
+     layer subito, invece di farglielo promuovere al primo fotogramma. */
+  transform: translate3d(0, 0, 0);
+}
+.sb-blob--1 {
+  left: -18vw;
+  top: 4vh;
+  width: 62vw;
+  height: 62vw;
+  animation: sb-blob-a 26s ease-in-out infinite alternate;
+}
+.sb-blob--2 {
+  right: -20vw;
+  top: 22vh;
+  width: 58vw;
+  height: 58vw;
+  animation: sb-blob-b 31s ease-in-out infinite alternate;
+}
+.sb-blob--3 {
+  left: 24vw;
+  bottom: -26vh;
+  width: 66vw;
+  height: 66vw;
+  animation: sb-blob-c 37s ease-in-out infinite alternate;
+}
+
+/* I colori, tavolozza per tavolozza. Sono le stesse sei tinte della griglia
+   prodotti (blocco «La tavolozza»): il fondale non introduce colori nuovi, usa
+   quelli che la pagina ha già — altrimenti scendendo si attraverserebbero due
+   sistemi di colore diversi.
+
+   Gli stop sono due e il secondo è trasparente al 70 %: è quello che rende la
+   macchia una MACCHIA e non un cerchio: il bordo non arriva mai. */
+.sb-blobset--a .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-acc-blu) / 0.78), transparent 70%); }
+.sb-blobset--a .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-acc-viola) / 0.72), transparent 70%); }
+.sb-blobset--a .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-acc-blu) / 0.6), transparent 70%); }
+
+.sb-blobset--b .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-acc-ambra) / 0.72), transparent 70%); }
+.sb-blobset--b .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-acc-rosa) / 0.78), transparent 70%); }
+.sb-blobset--b .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-acc-viola) / 0.62), transparent 70%); }
+
+.sb-blobset--c .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-acc-verde) / 0.72), transparent 70%); }
+.sb-blobset--c .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-acc-blu) / 0.78), transparent 70%); }
+.sb-blobset--c .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-acc-verde) / 0.6), transparent 70%); }
+
+/* In chiaro le macchie vanno tenute più basse: su fondo bianco una tinta
+   satura al 55 % è una macchia di vernice, e il testo grigio che ci passa
+   sopra perde contrasto. In scuro invece possono spingere — è lì che
+   «accesissimo» funziona, perché il colore ha il nero attorno che lo regge. */
+.sb-blobs { opacity: 0.62; }
+html.dark .sb-blobs { opacity: 1; }
+
+@keyframes sb-blob-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(8vw, 6vh, 0) scale(1.18); }
+}
+@keyframes sb-blob-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-7vw, 9vh, 0) scale(0.92); }
+}
+@keyframes sb-blob-c {
+  from { transform: translate3d(0, 0, 0) scale(0.95); }
+  to { transform: translate3d(-10vw, -7vh, 0) scale(1.15); }
+}
+
+/* La quiete: fermo a leggere, le macchie si fermano. Non è per risparmiare sul
+   loro conto — sono due strati che il compositore sposta — ma per quello che
+   hanno DAVANTI: ogni lastra di vetro della pagina ha un backdrop-filter, e un
+   backdrop-filter si rifà ogni volta che cambia il suo sfondo. Stessa regola
+   della deriva degli aloni, stesso interruttore. */
+.sb-quiet .sb-blob { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sb-blob { animation: none; }
+}
+@media print {
+  .sb-blobs { display: none; }
+}
+
 /* Il contenuto scorre SOPRA il fondale (che è a z-index 0). Solo la home:
    le altre pagine usano .sb-home senza fondale e non devono ritrovarsi un
    contesto di impilamento in più attorno al loro contenuto. */
@@ -853,27 +1013,47 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
    tutte. Serviva perché la card grande aveva dentro un testo lungo e un elenco
    di spunte, quindi voleva più larghezza delle altre.
 
-   Adesso le schede sono cinque UGUALI (mosaico, marchio, targa), quindi la
-   griglia può fare quello che fa il canvas: auto-fit su una larghezza minima,
-   e le colonne le decide il browser. Tre sul desktop (due righe: 3 + 2), due
-   sul tablet, una sul telefono — senza che qui sia scritto nessuno di quei
-   numeri.
+   Adesso le schede sono cinque UGUALI (mosaico e targa), e la griglia le
+   dispone DUE sopra e TRE sotto. L'ordine è quello del DOM: siti web e
+   archivio in prima fila, poi IA, fotografia e geometra.
 
-   La larghezza minima è 320px e non i 260 del canvas, e il motivo è che là il
-   contenitore era largo 1020: 260 minimi in 1020 danno tre colonne, gli stessi
-   260 nel contenitore di questo sito (~1200) ne danno quattro, e la seconda
-   riga restava con una scheda sola in mezzo al vuoto. A 320 il conto torna
-   qui: quattro colonne vorrebbero 4×320 + 3×22 = 1346px, che il contenitore
-   non ha.
+   ── Perché 2 + 3 e non 3 + 2 ───────────────────────────────────────────────
+   Perché la prima fila è quella che si legge, e in prima fila ci vanno le due
+   cose che questa pagina vende: i siti fatti per due clienti veri, e l'archivio
+   di tutto il resto. Due schede su una riga sono più larghe, quindi il mosaico
+   respira e la targa ha spazio per righe lunghe. Le altre tre sono il contorno
+   — con che cosa lo faccio, e da dove vengo — e stanno bene più strette.
+
+   ── Come è scritto, e perché non è auto-fit ────────────────────────────────
+   Qui c'era `repeat(auto-fit, minmax(320px, 1fr))`, che lasciava contare al
+   browser. Non si può più: auto-fit riempie le righe fino a dove ci sta, e con
+   cinque schede uguali dà 3 + 2, che è l'opposto di quello che serve. Il conto
+   torna a essere esplicito, ed è quello classico su SEI colonne: le prime due
+   ne prendono 3 a testa (3 + 3 = 6), le altre tre ne prendono 2 (2 + 2 + 2 =
+   6). Due righe piene, nessun buco, e nessun `nth-child` con eccezioni.
+
+   A due colonne (640–1023) le prime due stanno in fila e le altre tre vanno a
+   capo — una resta spaiata, ed è giusto così: è l'ultima, e una riga finale
+   con una scheda sola su due colonne è meno peggio che schiacciarne tre su una
+   larghezza da telefono. Sotto i 640 è una colonna sola.
 
    Niente altezza fissa: la scheda ha un rapporto suo (.sb-mocard,
-   aspect-ratio 460/278), e l'altezza scende di lì. L'altezza a 360px serviva
-   quando dentro c'era del testo di lunghezza variabile da pareggiare. */
+   aspect-ratio 460/278), e l'altezza scende di lì. */
 .sb-products {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr;
   gap: 22px;
   padding-top: clamp(2rem, 4vw, 3rem);
+}
+@media (min-width: 640px) {
+  .sb-products { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .sb-products { grid-template-columns: repeat(6, 1fr); }
+  /* le due della prima riga */
+  .sb-products .sb-card:nth-child(-n + 2) { grid-column: span 3; }
+  /* le tre della seconda */
+  .sb-products .sb-card:nth-child(n + 3) { grid-column: span 2; }
 }
 .sb-card { display: block; text-decoration: none; color: inherit; }
 
@@ -1261,11 +1441,11 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    sfuma insieme (mo-late). Loop di 4 s.
 
    ── Il fotogramma di riposo ────────────────────────────────────────────────
-   Come per le vecchie tavole: le regole base hanno durata e curva ma NIENTE
-   animation-name — l'elemento resta a fine corsa (tessere posate, tessera
-   accesa a casa, modulo visibile). Il nome lo aggiunge [data-play] (la regia,
-   una volta, a vista) o :hover, in fondo al blocco. prefers-reduced-motion non
-   aggiunge il nome e basta: resta il mosaico intero.
+   Le keyframe cominciano e finiscono sullo stesso fotogramma — tessere posate,
+   tessera accesa a casa, modulo visibile — quindi il giro si chiude e non c'è
+   mai uno stacco. È anche quello che rende gratis prefers-reduced-motion:
+   togliendo l'animation-name resta il mosaico intero, non uno a metà.
+   Il blocco «Sempre vive», in fondo, è dove i nomi si mettono e si tolgono.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* La scocca: .sb-panel + .sb-panel-inner, cioè la lastra di tutto il sito — ed
@@ -1326,9 +1506,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   animation-iteration-count: infinite;
 }
 
-/* La tessera di carta in alto a destra: quella su cui siede il marchio. Si
-   posa con le altre (eredita mo-tile da .sb-mosaic-tile), e cambia solo fill. */
-.sb-mosaic-paper { fill: #f7f4ec; }
 
 /* La tessera accesa: l'unica piena. transform-box: view-box perché mo-lit-*
    la sposta in coordinate del viewBox. Due animazioni sovrapposte — il giro
@@ -1354,66 +1531,163 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-mosaic--photo { --mo-lit: mo-lit-d; }
 .sb-mosaic--autocad { --mo-lit: mo-lit-e; }
 
-/* ── Il marchio ──────────────────────────────────────────────────────────────
-   Un quadrato di carta con dentro il `.ap` della tinta. Le percentuali sono
-   quelle del canvas, e non sono a occhio: a 7 % dall'alto e 4 % da destra il
-   quadrato cade ESATTAMENTE sulla tessera di carta del mosaico (quella a
-   510,26 su 596×360). Il marchio è stampato su un tassello, non appoggiato
-   sopra al disegno — ed è per questo che la tessera sotto è avorio. */
-.sb-mocard-mark {
-  position: absolute;
-  top: 7%;
-  right: 4%;
-  width: clamp(40px, 16%, 60px);
-  aspect-ratio: 1;
-  background: #f7f4ec;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* La tinta della scheda, che l'SVG dentro legge come currentColor. */
-  color: var(--sb-accent, var(--sb-brand));
-  /* Sopra al mosaico, sotto alla targa. */
-  z-index: 1;
-}
-.sb-mocard-mark svg { width: 64%; height: auto; display: block; }
+/* ── I RIFLESSI ──────────────────────────────────────────────────────────────
+   Tre strati, e sono tre cose diverse. Tutti e tre `pointer-events: none` e
+   dentro l'overflow della lastra, quindi nessuno sborda dallo smusso.
 
-/* ── La targa ────────────────────────────────────────────────────────────────
+   Niente filter da nessuna parte: una scheda che sfoca costa un buffer per
+   card ridipinto a ogni fotogramma in cui qualcosa dentro si muove — e qui le
+   schede sono cinque, tutte accese insieme, su una pagina che deve restare
+   fluida mentre scorre. La morbidezza la danno i gradienti, che sono già
+   sfumati per natura e non costano niente in più. */
+
+/* ① La velatura: la luce ambientale sulla lastra. Ferma — è quella che c'è
+      anche quando non succede niente, e se si muovesse smetterebbe di essere
+      ambiente. */
+.sb-mocard-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    148deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.05) 26%,
+    transparent 52%
+  );
+}
+
+/* ② La passata: la banda di luce che attraversa in diagonale, in loop. È il
+      riflesso vero, quello che dice «questa cosa è lucida».
+
+      Larga il doppio della scheda e girata di 22°, così entra da fuori e esce
+      da fuori: una banda che nasce e muore dentro al riquadro si legge come un
+      lampo, non come un riflesso che passa. Lo sfasamento per scheda è più giù
+      (.sb-card:nth-child), e serve perché cinque passate simultanee sono un
+      lampeggio. */
+.sb-mocard-sweep {
+  position: absolute;
+  top: -60%;
+  left: -100%;
+  width: 60%;
+  height: 220%;
+  z-index: 2;
+  pointer-events: none;
+  transform: rotate(22deg) translate3d(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 34%,
+    rgba(255, 255, 255, 0.26) 50%,
+    rgba(255, 255, 255, 0.06) 66%,
+    transparent 100%
+  );
+  animation: sb-mocard-sweep 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ③ Il bordo acceso: un filo della tinta lungo il taglio in alto a sinistra,
+      che respira. Sta SUL bordo e non dentro — è la luce che prende lo spigolo
+      di striscio, come sulle lastre grandi dello scaffale. Il gradiente si
+      spegne prima di metà: un filo che gira tutto intorno sarebbe una cornice,
+      e la cornice ce l'ha già la lastra. */
+.sb-mocard-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-top: 1px solid transparent;
+  border-left: 1px solid transparent;
+  border-image: linear-gradient(
+      140deg,
+      var(--sb-accent, var(--sb-brand)) 0%,
+      color-mix(in srgb, var(--sb-accent, var(--sb-brand)) 40%, transparent) 26%,
+      transparent 54%
+    )
+    1;
+  animation: sb-mocard-edge 4.6s ease-in-out infinite;
+}
+
+@keyframes sb-mocard-sweep {
+  /* La passata occupa un terzo del giro; i due terzi restanti sono il buio fra
+     un riflesso e l'altro. Senza la pausa non è una passata, è uno strobo. */
+  0%, 4% { transform: rotate(22deg) translate3d(0, 0, 0); opacity: 0; }
+  10% { opacity: 1; }
+  38% { opacity: 1; }
+  44%, 100% { transform: rotate(22deg) translate3d(380%, 0, 0); opacity: 0; }
+}
+@keyframes sb-mocard-edge {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* ── LA TARGA ────────────────────────────────────────────────────────────────
    Due righe su un velo quasi nero, in basso a sinistra, con l'angolo alto a
    destra tagliato a 45°: è la sagoma del sito in piccolo, e serve a non farla
    leggere come una didascalia incollata sopra all'immagine.
 
-   Il velo è scritto a mano e non è un token, per la stessa ragione della carta
-   del marchio: sotto c'è sempre un mosaico saturo, in chiaro come in scuro, e
-   una targa che seguisse il tema in chiaro diventerebbe bianca su colore —
-   cioè illeggibile. Il testo è avorio e grigio chiaro fissi, in coppia col
-   velo. */
+   Il velo è scritto a mano e non è un token: sotto c'è sempre un mosaico
+   saturo, in chiaro come in scuro, e una targa che seguisse il tema in chiaro
+   diventerebbe bianca su colore — cioè illeggibile. Il testo è avorio e grigio
+   chiaro fissi, in coppia col velo.
+
+   ── La finestrella ─────────────────────────────────────────────────────────
+   La targa GIRA: site/homeLive.tsx le dà tre righe a turno, che entrano da
+   sotto ed escono da sopra. Il taglio lo fa .sb-mocard-slot con overflow
+   hidden; l'altezza è fissata in `em` e non in px perché le due righe dentro
+   hanno font-size in clamp(), quindi la finestrella deve scalare con loro o a
+   una certa larghezza taglierebbe il sottotitolo.
+
+   La larghezza NON è fissa: la targa si allarga sulla riga più lunga del giro.
+   Fissarla avrebbe voluto dire misurare a mano la stringa più lunga di cinque
+   schede per quattro lingue. */
 .sb-mocard-plate {
   position: absolute;
   bottom: 0;
   left: 0;
-  z-index: 2;
+  z-index: 4;
+  max-width: 88%;
   padding: 15px 20px 16px;
   background: rgba(8, 8, 10, 0.82);
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  display: block;
+}
+.sb-mocard-slot {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  /* Le due righe più il loro interlinea, in em del contenitore: titolo ~1.35em
+     + sub ~1.5em + i 2px di gap. */
+  height: 3.05em;
+  font-size: clamp(14px, 2.4vw, 17px);
+}
+.sb-mocard-row {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  /* will-change no: la riga vive pochi secondi e GSAP la smonta. Dichiararlo
+     terrebbe un layer per scheda acceso per sempre, per un'animazione che gira
+     un terzo del tempo. */
 }
 .sb-mocard-plate h3 {
   margin: 0;
-  font-size: clamp(14px, 2.4vw, 17px);
+  font-size: 1em;
+  line-height: 1.35;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #f7f4ec;
+  white-space: nowrap;
 }
 .sb-mocard-sub {
   font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: clamp(9px, 1.6vw, 10.5px);
+  font-size: 0.62em;
+  line-height: 1.5;
   color: #9a9a9a;
+  white-space: nowrap;
 }
 
-/* ── Le keyframe ─────────────────────────────────────────────────────────────
-   Tutte partono e finiscono sul fotogramma di riposo. */
+/* ── Le keyframe del mosaico ─────────────────────────────────────────────────
+   Tutte tornano al punto da cui partono: il giro si chiude, e da fermo il
+   mosaico è quello di sempre. */
 @keyframes mo-tile {
   0%, 3% { opacity: 0; transform: scale(0.84); }
   15%, 100% { opacity: var(--o, 1); transform: scale(1); }
@@ -1457,53 +1731,68 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   IL GESTO PARTE AL PASSAGGIO
+   SEMPRE VIVE
 
-   Stessa regola delle vecchie tavole: da ferma la griglia è ferma. Il gesto si
-   gioca solo mentre il puntatore (o il focus) è sulla card — o una volta sola
-   quando la card entra a vista, via [data-play] messo da site/homeMotion.ts ③
-   e tolto dopo --sb-gesto ms. Le regole base non hanno animation-name: senza
-   nome non animano, e l'elemento resta sul fotogramma finito. Il nome è qui.
+   Prima il gesto partiva solo al passaggio del puntatore, o una volta sola
+   entrando a vista — e fuori di lì le cinque schede stavano ferme. La regola
+   veniva dalla griglia prodotti di Supabase, e per SEI TAVOLE TECNICHE era
+   giusta: sei disegni al tratto che si agitano insieme sono un albero di
+   Natale.
 
-   Se aggiungi un gesto, aggiungilo in TUTTI E DUE i blocchi — [data-play] e
-   @media (hover: hover) — come già per le vecchie tavole.
+   Il mosaico non è un disegno tecnico, è un pannello — e un pannello fermo è
+   un pannello spento. Quindi adesso gira sempre, e la regola di prima si
+   rovescia: il nome dell'animazione sta nella regola BASE, non nell'hover.
+
+   ── Cosa costa ─────────────────────────────────────────────────────────────
+   Le proprietà animate sono due, transform e opacity, che il compositore muove
+   da solo senza rifare né layout né disegno. Il browser sospende da sé tutte
+   le animazioni CSS quando la scheda va in secondo piano, e ScrollTrigger non
+   c'entra più niente: nessun JavaScript gira per tenerle in moto.
+
+   Chi ha chiesto meno movimento le trova ferme sul loro fotogramma finito —
+   e siccome le keyframe cominciano e finiscono là, «ferme» vuol dire il
+   mosaico intero, non uno a metà.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Un solo tempo per tutte e cinque: il mosaico è un gesto da ~4 s. */
-.sb-products .sb-card { --sb-gesto: 4200ms; }
+.sb-mosaic-tile { animation-name: mo-tile; }
+.sb-mosaic-lit { animation-name: var(--mo-lit), mo-late; }
 
-.sb-card[data-play] .sb-mosaic { transform: scale(1.02); }
-.sb-card[data-play] .sb-mosaic-tile { animation-name: mo-tile; }
-.sb-card[data-play] .sb-mosaic-lit { animation-name: var(--mo-lit), mo-late; }
+/* Lo sfasamento: cinque mosaici che battono all'unisono sono un solo mosaico
+   grande. Mezzo secondo l'uno dall'altro basta a scollarli, e il negativo è
+   quello che serve — un ritardo positivo li terrebbe fermi all'inizio, un
+   negativo li fa partire già a giro avviato. Gli stessi numeri li porta la
+   targa in site/homeLive.tsx (PLATE_STAGGER), così testo e tessere di una
+   scheda si muovono sullo stesso tempo. */
+.sb-products .sb-card:nth-child(1) .sb-mosaic-lit { animation-delay: 0s, 0s; }
+.sb-products .sb-card:nth-child(2) .sb-mosaic-lit { animation-delay: -0.52s, -0.52s; }
+.sb-products .sb-card:nth-child(3) .sb-mosaic-lit { animation-delay: -1.04s, -1.04s; }
+.sb-products .sb-card:nth-child(4) .sb-mosaic-lit { animation-delay: -1.56s, -1.56s; }
+.sb-products .sb-card:nth-child(5) .sb-mosaic-lit { animation-delay: -2.08s, -2.08s; }
 
-@media (prefers-reduced-motion: reduce) {
-  .sb-card[data-play] .sb-mosaic-tile,
-  .sb-card[data-play] .sb-mosaic-lit { animation-name: none; }
-  .sb-card[data-play] .sb-mosaic { transform: none; }
-}
+.sb-products .sb-card:nth-child(2) .sb-mocard-sweep { animation-delay: -1.4s; }
+.sb-products .sb-card:nth-child(3) .sb-mocard-sweep { animation-delay: -2.8s; }
+.sb-products .sb-card:nth-child(4) .sb-mocard-sweep { animation-delay: -4.2s; }
+.sb-products .sb-card:nth-child(5) .sb-mocard-sweep { animation-delay: -5.6s; }
 
+/* Il passaggio del puntatore non fa più partire niente — gira già tutto. Gli
+   resta l'ACCENSIONE: la tavola si avvicina di un soffio e la passata di luce
+   si fa più netta. Due transizioni, una entrando e una uscendo. */
 @media (hover: hover) and (pointer: fine) {
   .sb-card:hover .sb-mosaic,
-  .sb-card:focus-visible .sb-mosaic { transform: scale(1.02); }
+  .sb-card:focus-visible .sb-mosaic { transform: scale(1.03); }
+  .sb-card:hover .sb-mocard-sheen,
+  .sb-card:focus-visible .sb-mocard-sheen { opacity: 1.35; }
+}
 
-  .sb-card:hover .sb-mosaic-tile,
-  .sb-card:focus-visible .sb-mosaic-tile { animation-name: mo-tile; }
-
-  .sb-card:hover .sb-mosaic-lit,
-  .sb-card:focus-visible .sb-mosaic-lit { animation-name: var(--mo-lit), mo-late; }
-
-  /* Chi ha chiesto meno movimento non riceve il gesto nemmeno sull'hover: gli
-     resta il mosaico intero, che è già il disegno per intero — e nemmeno
-     l'accensione, che è un movimento anche lei. */
-  @media (prefers-reduced-motion: reduce) {
-    .sb-card:hover .sb-mosaic-tile,
-    .sb-card:focus-visible .sb-mosaic-tile,
-    .sb-card:hover .sb-mosaic-lit,
-    .sb-card:focus-visible .sb-mosaic-lit { animation-name: none; }
-    .sb-card:hover .sb-mosaic,
-    .sb-card:focus-visible .sb-mosaic { transform: none; }
-    .sb-mosaic { transition: none; }
-  }
+@media (prefers-reduced-motion: reduce) {
+  .sb-mosaic-tile,
+  .sb-mosaic-lit,
+  .sb-mocard-sweep,
+  .sb-mocard-edge { animation-name: none; }
+  .sb-mocard-sweep { opacity: 0; }
+  .sb-mosaic { transition: none; }
+  .sb-card:hover .sb-mosaic,
+  .sb-card:focus-visible .sb-mosaic { transform: none; }
 }
 
 /* Righe di terminale — le usa il pannello dei clienti (la finestra `ls

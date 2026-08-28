@@ -5343,5 +5343,65 @@
     "it": "e l’università",
     "fr": "et l’université",
     "de": "und die Universität"
+  },
+  "online, and the village in every datum": {
+    "it": "online, e il paese in ogni suo dato",
+    "fr": "en ligne, et le village dans chaque donnée",
+    "de": "online, und das Dorf in jedem Datum"
+  },
+  "online, from the first word": {
+    "it": "online, dalla prima parola",
+    "fr": "en ligne, dès le premier mot",
+    "de": "online, vom ersten Wort an"
+  },
+  "React and TypeScript": {
+    "it": "React e TypeScript",
+    "fr": "React et TypeScript",
+    "de": "React und TypeScript"
+  },
+  "and never a page builder": {
+    "it": "e mai un page builder",
+    "fr": "et jamais un page builder",
+    "de": "und niemals ein Page-Builder"
+  },
+  "every project, open": {
+    "it": "ogni progetto, aperto",
+    "fr": "chaque projet, ouvert",
+    "de": "jedes Projekt, offen"
+  },
+  "machines that write": {
+    "it": "macchine che scrivono",
+    "fr": "des machines qui écrivent",
+    "de": "Maschinen, die schreiben"
+  },
+  "Not one line unread": {
+    "it": "Non una riga non letta",
+    "fr": "Pas une ligne non lue",
+    "de": "Keine Zeile ungelesen"
+  },
+  "my eye upon all of it": {
+    "it": "il mio occhio su tutto",
+    "fr": "mon œil sur le tout",
+    "de": "mein Auge auf allem"
+  },
+  "the number, never the image": {
+    "it": "il numero, mai l’immagine",
+    "fr": "le nombre, jamais l’image",
+    "de": "die Zahl, nie das Bild"
+  },
+  "AutoCAD, topography": {
+    "it": "AutoCAD, topografia",
+    "fr": "AutoCAD, topographie",
+    "de": "AutoCAD, Topografie"
+  },
+  "and weighing what a thing is worth": {
+    "it": "e l’arte di pesare quanto vale una cosa",
+    "fr": "et l’art de peser ce que vaut une chose",
+    "de": "und die Kunst zu wiegen, was etwas wert ist"
+  },
+  "Construction, Environment and Territory": {
+    "it": "Costruzioni, Ambiente e Territorio",
+    "fr": "Construction, Environnement et Territoire",
+    "de": "Bau, Umwelt und Territorium"
   }
 }

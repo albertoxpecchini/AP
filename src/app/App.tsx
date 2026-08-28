@@ -679,6 +679,29 @@ export default function App() {
             incollato. Il movimento del fondale non è qui: sono i due aloni di
             .sb-home, che seguono lo scroll e il puntatore. */}
         <AuroraBackdrop />
+
+        {/* Le macchie: tre tavolozze sovrapposte che si danno il cambio
+            scendendo. Stanno ai BORDI della finestra — il centro è mascherato,
+            perché è dove sta il testo. Il colore lo scorre site/macchie.ts, il
+            movimento è una keyframe in home.css. */}
+        <div className="sb-blobs">
+          <div className="sb-blobset sb-blobset--a">
+            <span className="sb-blob sb-blob--1" />
+            <span className="sb-blob sb-blob--2" />
+            <span className="sb-blob sb-blob--3" />
+          </div>
+          <div className="sb-blobset sb-blobset--b">
+            <span className="sb-blob sb-blob--1" />
+            <span className="sb-blob sb-blob--2" />
+            <span className="sb-blob sb-blob--3" />
+          </div>
+          <div className="sb-blobset sb-blobset--c">
+            <span className="sb-blob sb-blob--1" />
+            <span className="sb-blob sb-blob--2" />
+            <span className="sb-blob sb-blob--3" />
+          </div>
+        </div>
+
         <span className="sb-bg-grid" />
       </div>
 
@@ -869,15 +892,19 @@ export default function App() {
             blueprint tecnico animato», Turno 3: archivio→viola, siti→blu,
             IA→ambra, foto→rosa, geometra→verde. */}
         <section id="progetti" className="sb-container sb-products" aria-label="What I do">
-          {/* Archivio progetti — la scheda viola */}
-          <Link to="/archivio" className="sb-card" data-acc="viola">
-            <MosaicCard topic="archive" title="Project archive" sub="all the works" />
-          </Link>
+          {/* ── Prima riga: due schede larghe ─────────────────────────────── */}
 
           {/* I due clienti veri, con il loro nome — la scheda blu */}
           <a href="#lavori" className="sb-card" data-acc="blu">
-            <MosaicCard topic="web" title="Rivalta e Cascina Fontana" sub="websites" noI18n />
+            <MosaicCard topic="web" />
           </a>
+
+          {/* Archivio progetti — la scheda viola */}
+          <Link to="/archivio" className="sb-card" data-acc="viola">
+            <MosaicCard topic="archive" />
+          </Link>
+
+          {/* ── Seconda riga: tre schede ──────────────────────────────────── */}
 
           {/* Sviluppo assistito dall'AI — la scheda ambra */}
           <a
@@ -887,17 +914,17 @@ export default function App() {
             className="sb-card"
             data-acc="ambra"
           >
-            <MosaicCard topic="claude" title="Claude Code" sub="AI-assisted development" noI18n />
+            <MosaicCard topic="claude" />
           </a>
 
           {/* Fotografia — la scheda rosa */}
           <Link to="/shooting" className="sb-card" data-acc="rosa">
-            <MosaicCard topic="photo" title="Photography" sub="shots" />
+            <MosaicCard topic="photo" />
           </Link>
 
           {/* Università e area tecnica — la scheda verde */}
           <Link to="/pcto" className="sb-card" data-acc="verde">
-            <MosaicCard topic="autocad" title="Surveying" sub="and university" />
+            <MosaicCard topic="autocad" />
           </Link>
         </section>
 
