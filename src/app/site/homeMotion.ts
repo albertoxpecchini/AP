@@ -74,13 +74,13 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
           });
         });
 
-        // ── ③ Le sei tavole della griglia: il gesto, UNA volta, a vista ────
-        // Il gesto di ogni tavola parte al passaggio del puntatore (home.css,
+        // ── ③ Le cinque schede della griglia: il gesto, UNA volta, a vista ──
+        // Il gesto di ogni scheda parte al passaggio del puntatore (home.css,
         // «Il gesto parte al passaggio»), e va bene finché un puntatore c'è.
         // Su un telefono non c'è: la griglia è la prima cosa che si incontra
-        // scendendo, e restava sei disegni fermi per sempre.
+        // scendendo, e restava cinque mosaici fermi per sempre.
         //
-        // Qui la tavola si gioca il suo gesto una volta sola, quando entra in
+        // Qui la scheda si gioca il suo gesto una volta sola, quando entra in
         // scena, e poi torna ferma. Non è il reveal allo scroll che questa
         // pagina non vuole — il disegno c'è già, intero, e non compare: è la
         // stessa regola dei contatori qui sopra, che partono da zero arrivando
@@ -90,16 +90,16 @@ export function useHomeMotion(root: RefObject<HTMLElement | null>) {
         // animation-name dell'hover, e che si toglie da sé quando il gesto è
         // finito — se restasse, l'hover non potrebbe più farlo ripartire.
         //
-        // Quanto dura il gesto non è più lo stesso per tutte e sei: cinque si
-        // giocano un paio di secondi, la ④ è la revisione di un provino a
-        // contatto e ne dura otto. Il numero lo porta la card addosso, in una
+        // Quanto dura: adesso il mosaico è un gesto solo, uguale per tutte e
+        // cinque — un loop da ~4 s. Il numero lo porta la card addosso, in una
         // proprietà del foglio (--sb-gesto), e si legge una volta sola — la
-        // prima volta che quella card entra in scena.
+        // prima volta che quella card entra in scena. (Le vecchie tavole
+        // avevano due tempi: cinque brevi e il provino a otto secondi.)
         //
-        // L'unità va guardata, e non è pignoleria: nel foglio quei valori sono
-        // scritti in millisecondi, ma getComputedStyle li restituisce
-        // normalizzati in secondi — "8200ms" torna indietro come "8.2s". Un
-        // parseFloat e via avrebbe dato 8,2 millisecondi, cioè l'attributo
+        // L'unità va guardata, e non è pignoleria: nel foglio quel valore è
+        // scritto in millisecondi, ma getComputedStyle lo restituisce
+        // normalizzato in secondi — "4200ms" torna indietro come "4.2s". Un
+        // parseFloat e via avrebbe dato 4,2 millisecondi, cioè l'attributo
         // tolto prima del primo fotogramma e il gesto mai visto.
         const GESTO = 3600;
         const durata = (card: HTMLElement) => {

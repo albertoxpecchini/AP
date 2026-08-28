@@ -5313,5 +5313,35 @@
     "it": "Disegno, codice, parole e messa in opera — un corpo solo.",
     "fr": "Dessin, code, mots et mise en œuvre — un seul corps.",
     "de": "Zeichnung, Code, Worte und Inbetriebnahme — ein einziger Leib."
+  },
+  "Project archive": {
+    "it": "Archivio progetti",
+    "fr": "Archive des projets",
+    "de": "Projektarchiv"
+  },
+  "all the works": {
+    "it": "tutti i lavori",
+    "fr": "tous les travaux",
+    "de": "alle Arbeiten"
+  },
+  "websites": {
+    "it": "siti web",
+    "fr": "sites web",
+    "de": "Websites"
+  },
+  "shots": {
+    "it": "scatti",
+    "fr": "prises de vue",
+    "de": "Aufnahmen"
+  },
+  "Surveying": {
+    "it": "Il geometra",
+    "fr": "Le géomètre",
+    "de": "Der Vermesser"
+  },
+  "and university": {
+    "it": "e l’università",
+    "fr": "et l’université",
+    "de": "und die Universität"
   }
 }

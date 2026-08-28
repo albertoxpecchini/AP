@@ -26,18 +26,14 @@ import {
   IcEye,
   IcMail,
   IcHeart,
-  IcCheck,
   IcStar,
   IcFolder,
   IcGrad,
   IcGlobe,
-  IcSparkle,
-  IcCode,
   IcPen,
   IcGame,
   IcVenn,
   IcRuler,
-  IcCamera,
   IcUser,
   IcBook,
   IcCat,
@@ -48,14 +44,9 @@ import { useNavPill, useNavAccent } from "./site/GlassMotion";
 // Effetti "pronti" della home (React Bits) — vedi site/homeFx.tsx per il
 // raccordo con tema, movimento ridotto e caricamento pigro.
 import { AuroraBackdrop, ShinyBrandline, SparkGroup } from "./site/homeFx";
-import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import {
   NowBuilding,
-  BlueprintPage,
-  LiveCursors,
-  GlobeOrbit,
-  ContactSheet,
-  CanopyPlate,
+  MosaicCard,
   CommitWall,
   TrustedDot,
 } from "./site/homeLive";
@@ -541,20 +532,12 @@ const STORIES: { id: string; kind: string; acc: string; lead?: boolean; quote: R
 // passata alla bio («Based & trained»), dove il paese è già l'argomento: le
 // coordinate e il collegamento a Google Maps vivono adesso in site/Bio.tsx.
 
-// La scocca delle card della griglia prodotti: il vetro (.sb-panel) più l'alone
-// che segue il puntatore. Sta qui e non ripetuto sette volte perché le sette
-// card sono la stessa cosa con dentro contenuti diversi — e perché l'alone deve
-// stare SOLO su queste. Le altre griglie (pagine, story-card, curriculum) hanno
-// già rim, sheen e tilt: un quarto strato lì sarebbe un tic, non un effetto.
-function ProductCard({ children }: { children: ReactNode }) {
-  return (
-    <SpotlightCard>
-      <div className="sb-panel">
-        <div className="sb-panel-inner">{children}</div>
-      </div>
-    </SpotlightCard>
-  );
-}
+// Qui c'era ProductCard: la scocca delle card della griglia prodotti — il vetro
+// (.sb-panel) avvolto in SpotlightCard, l'alone che segue il puntatore. Se n'è
+// andata con le sei tavole blueprint: la scheda del mosaico si porta la sua
+// scocca dietro (site/homeLive.tsx, MosaicCard), ed è una lastra `--solid` —
+// dietro a un mosaico che copre la card al vivo non c'è niente da sfocare, e
+// l'alone del puntatore non ha più una superficie vuota su cui posarsi.
 
 // I clienti, come output di un comando. Due nomi non riempiono un nastro che
 // scorre — ma sono esattamente due righe di `ls`, e quello è un formato che di
@@ -878,98 +861,43 @@ export default function App() {
             Le auto e la loro sezione 3D sono uscite: non c'entravano niente
             con il lavoro che questa pagina vende. La griglia era «una grande
             più cinque» a sei totali; adesso è «una grande più quattro», e la
-            seconda fila si ripartisce in due mezzi da 6 colonne (home.css). */}
+            seconda fila si ripartisce in due mezzi da 6 colonne (home.css).
+
+            Il visual di ogni card è lo stesso componente <Mosaic>, cambiato di
+            tema (traiettoria + modulo) e di accento — vedi la nota in testa a
+            site/homeLive.tsx. L'accento di ogni card viene dal canvas «Sistema
+            blueprint tecnico animato», Turno 3: archivio→viola, siti→blu,
+            IA→ambra, foto→rosa, geometra→verde. */}
         <section id="progetti" className="sb-container sb-products" aria-label="What I do">
-          {/* Siti web — la card grande */}
-          <Link to="/archivio" className="sb-card sb-card--lg" data-acc="blu">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcCode /><h3>Websites</h3></div>
-                <p className="sb-card-desc">
-                  Conceived, written and carried into port{" "}
-                  <strong>from the first line to the last</strong> — React and TypeScript,
-                  and never a page builder.
-                </p>
-                <ul className="sb-checks">
-                  <li><IcCheck size={15} /> They bend to every screen</li>
-                  <li><IcCheck size={15} /> The day and the night, both drawn</li>
-                  <li><IcCheck size={15} /> The source goes home with you</li>
-                </ul>
-              </div>
-              <div className="sb-card-visual">
-                <BlueprintPage />
-              </div>
-            </ProductCard>
+          {/* Archivio progetti — la scheda viola */}
+          <Link to="/archivio" className="sb-card" data-acc="viola">
+            <MosaicCard topic="archive" title="Project archive" sub="all the works" />
           </Link>
 
-          {/* I due clienti veri, con il loro nome */}
-          <a href="#lavori" className="sb-card" data-acc="verde">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcGlobe /><h3>Rivalta e Cascina Fontana</h3></div>
-                <p className="sb-card-desc">
-                  Two true businesses to which I gave a face,{" "}
-                  <strong>from the first word to the day they appeared</strong>.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <GlobeOrbit />
-              </div>
-            </ProductCard>
+          {/* I due clienti veri, con il loro nome — la scheda blu */}
+          <a href="#lavori" className="sb-card" data-acc="blu">
+            <MosaicCard topic="web" title="Rivalta e Cascina Fontana" sub="websites" noI18n />
           </a>
 
-          {/* Sviluppo assistito dall'AI */}
+          {/* Sviluppo assistito dall'AI — la scheda ambra */}
           <a
             href="https://github.com/albertoxpecchini"
             target="_blank"
             rel="noreferrer noopener"
             className="sb-card"
-            data-acc="viola"
+            data-acc="ambra"
           >
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcSparkle /><h3>AI-assisted development</h3></div>
-                <p className="sb-card-desc">
-                  Claude Code, Codex, Copilot — machines that write, and{" "}
-                  <strong>not one line passes without my eye upon it</strong>.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <LiveCursors />
-              </div>
-            </ProductCard>
+            <MosaicCard topic="claude" title="Claude Code" sub="AI-assisted development" noI18n />
           </a>
 
-          {/* Fotografia */}
+          {/* Fotografia — la scheda rosa */}
           <Link to="/shooting" className="sb-card" data-acc="rosa">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcCamera /><h3>Photography</h3></div>
-                <p className="sb-card-desc">
-                  Portraits, by a lover of the craft. <strong>The faces stay mine
-                  alone</strong> — to the world I hand the number, never the image.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <ContactSheet />
-              </div>
-            </ProductCard>
+            <MosaicCard topic="photo" title="Photography" sub="shots" />
           </Link>
 
-          {/* Università e area tecnica */}
-          <Link to="/pcto" className="sb-card" data-acc="ambra">
-            <ProductCard>
-              <div className="sb-card-head">
-                <div className="sb-card-title"><IcRuler /><h3>Surveying and university</h3></div>
-                <p className="sb-card-desc">
-                  Construction and Land Management, after the <strong>CAT diploma</strong> —
-                  AutoCAD, topography, and the art of weighing what a thing is worth.
-                </p>
-              </div>
-              <div className="sb-card-visual">
-                <CanopyPlate />
-              </div>
-            </ProductCard>
+          {/* Università e area tecnica — la scheda verde */}
+          <Link to="/pcto" className="sb-card" data-acc="verde">
+            <MosaicCard topic="autocad" title="Surveying" sub="and university" />
           </Link>
         </section>
 
