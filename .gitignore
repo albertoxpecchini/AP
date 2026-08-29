@@ -53,3 +53,7 @@ foto/**
 # su Windows non gira nemmeno il `finally` — resterebbero lì: ignorati, non
 # possono finire in un commit per sbaglio. (È già successo.)
 __prova-janitor-*
+
+# Copie di sicurezza del libro dei donatori (scripts/sostieni-libro.mjs --reset).
+# Dentro ci sono nomi e messaggi di persone: restano sul disco, non nel repo.
+.backup-donatori-*.json

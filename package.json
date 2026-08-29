@@ -16,6 +16,8 @@
     "scatti": "node scripts/build-foto-shooting.mjs",
     "scatti:carica": "node scripts/scatti-carica.mjs",
     "scatti:togli": "node scripts/scatti-carica.mjs --togli",
+    "libro": "node scripts/sostieni-libro.mjs",
+    "libro:reset": "node scripts/sostieni-libro.mjs --reset",
     "preview": "vite preview",
     "pulizia": "node scripts/janitor/pulisci.mjs",
     "pulizia:applica": "node scripts/janitor/pulisci.mjs --applica",

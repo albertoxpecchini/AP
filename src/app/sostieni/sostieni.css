@@ -158,6 +158,25 @@
 .sb-sos-thanks strong { display: block; font-weight: 500; color: var(--sb-fg); }
 .sb-sos-thanks p { margin: 0.15rem 0 0; font-size: 0.875rem; color: var(--sb-fg-lighter); }
 
+/* Firma rifiutata (parolacce, link di spam, campi vuoti): il "no" sta dentro
+   il form, sopra al bottone, non in un alert() del browser. Ambra e non rosso:
+   è una cosa da correggere, non un guasto. */
+.sb-sos-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid hsla(38, 80%, 45%, 0.4);
+  background: color-mix(in srgb, hsl(38, 90%, 50%) 9%, var(--sb-bg));
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--sb-fg-light);
+}
+.sb-sos-alert svg { color: hsl(38, 80%, 42%); flex-shrink: 0; margin-top: 0.12rem; }
+html.dark .sb-sos-alert svg { color: hsl(38, 85%, 62%); }
+
 /* ── Libro: chi è passato di qui ─────────────────────────────────────────── */
 .sb-sos-note { margin: 1.2rem 0 0; text-align: center; font-size: 0.84rem; color: var(--sb-fg-muted); }
 .sb-sos-subhead {

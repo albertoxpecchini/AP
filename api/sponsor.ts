@@ -9,6 +9,7 @@
 // Import con estensione .js: su Vercel le funzioni sono ESM.
 
 import { getClientIp, rateLimit, sameOriginOk } from "../lib/serverSecurity.js";
+import { testoHaParolacce, testoHaLink, linkPulito } from "../lib/parolacce.js";
 
 export const config = { runtime: "nodejs" };
 
@@ -36,8 +37,28 @@ function sanitize(row: any) {
     tipo: row?.tipo === "sponsor" ? "sponsor" : "donatore",
     importo: trimOrNull(row?.importo, 20),
     messaggio: trimOrNull(row?.messaggio, 280),
-    link: trimOrNull(row?.link, 200),
+    // Il link è di chi compra lo sponsor, e va in un href della pagina: qui
+    // dentro passa solo un http/https vero (linkPulito butta via il resto).
+    link: linkPulito(trimOrNull(row?.link, 200)),
   };
+}
+
+// ─── Il filtro ───────────────────────────────────────────────────────────────
+// Il libro è pubblico e la firma non passa da nessuna approvazione: appare
+// subito, in una pagina che è la mia. Il primo che è passato di qui ha lasciato
+// un insulto, quindi il controllo si fa qui — lato server, dove non lo si
+// aggira con curl — e non solo nel form.
+//
+// Niente stelline al posto delle lettere: la firma viene rifiutata e chi
+// scrive lo legge. Un asterisco al posto di una parola resta un insulto in
+// mostra, e lascia il "gioco" aperto a chi ci prova.
+const MOTIVO_PAROLACCE = "Il testo contiene parole non consentite: riscrivilo, per favore.";
+const MOTIVO_LINK = "Niente indirizzi web nel nome o nel messaggio.";
+
+function motivoRifiuto(clean: { nome: string; messaggio: string | null }): string | null {
+  if (testoHaParolacce(clean.nome) || testoHaParolacce(clean.messaggio ?? "")) return MOTIVO_PAROLACCE;
+  if (testoHaLink(clean.nome) || testoHaLink(clean.messaggio ?? "")) return MOTIVO_LINK;
+  return null;
 }
 
 type Result = { ok: true; row: any } | { ok: false; status: number; error: string };
@@ -46,6 +67,8 @@ type Result = { ok: true; row: any } | { ok: false; status: number; error: strin
 export async function insertDonatore(input: any): Promise<Result> {
   const clean = sanitize(input);
   if (!clean.nome) return { ok: false, status: 400, error: "Nome mancante" };
+  const motivo = motivoRifiuto(clean);
+  if (motivo) return { ok: false, status: 400, error: motivo };
   const s = supa();
   if (!s) return { ok: false, status: 503, error: "Backend non configurato" };
   try {

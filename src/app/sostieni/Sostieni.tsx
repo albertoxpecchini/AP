@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { SiteLink as Link } from "../site/nav";
 import {
   IcHeart, IcMail, IcArrowLeft, IcCheck, IcCopy, IcSend, IcLoader, IcCrown,
-  IcGift, IcBook,
+  IcGift, IcBook, IcAlert,
 } from "../site/homeIcons";
 import { EMAIL } from "../site/data";
 import {
   submitDonatore, fetchDonatori, subscribeDonatori, donazioniConfigured,
-  type DonatoreRow,
+  motivoRifiuto, type DonatoreRow,
 } from "./donazioniApi";
 import SiteFooter from "../site/SiteFooter";
 import { PageBackdrop, SparkGroup } from "../site/homeFx";
@@ -83,6 +83,12 @@ export default function Sostieni() {
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
 
+  // Perché una firma è stata rifiutata (parolacce, link, campi vuoti). Il
+  // filtro vero sta su /api/sponsor: questo lo anticipa e lo scrive sotto al
+  // form, invece di aprire un alert() che non dice niente a nessuno.
+  const [erroreFirma, setErroreFirma] = useState<string | null>(null);
+  const [erroreSponsor, setErroreSponsor] = useState<string | null>(null);
+
   const [spName, setSpName] = useState("");
   const [spLink, setSpLink] = useState("");
   const [spMsg, setSpMsg] = useState("");
@@ -124,6 +130,9 @@ export default function Sostieni() {
   const signBook = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nome.trim() || sending) return;
+    const motivo = motivoRifiuto(nome, messaggio);
+    if (motivo) { setErroreFirma(motivo); return; }
+    setErroreFirma(null);
     setSending(true);
     try {
       const saved = await submitDonatore({
@@ -137,7 +146,14 @@ export default function Sostieni() {
       setTimeout(() => setDone(false), 4000);
     } catch (err) {
       console.error("[sostieni] firma fallita", err);
-      alert("Non sono riuscito a registrare la firma. Riprova tra poco.");
+      // Se il server ha detto perché (filtro, rate-limit), si mostra la sua
+      // frase: è già scritta per essere letta da chi ha compilato.
+      const detto = err instanceof Error ? err.message : "";
+      setErroreFirma(
+        detto && !detto.startsWith("submitDonatore")
+          ? detto
+          : "Non sono riuscito a registrare la firma. Riprova tra poco.",
+      );
     } finally {
       setSending(false);
     }
@@ -154,10 +170,12 @@ export default function Sostieni() {
   };
 
   const proceedSponsor = async () => {
-    if (!spName.trim()) {
-      alert("Inserisci almeno il nome o il brand.");
-      return;
-    }
+    // Stesso filtro della firma: qui però il testo finisce anche dentro
+    // un'email che parte a nome di chi compila, quindi si controlla PRIMA di
+    // aprire il client di posta.
+    const motivo = motivoRifiuto(spName, spMsg);
+    if (motivo) { setErroreSponsor(motivo); return; }
+    setErroreSponsor(null);
     try {
       const saved = await submitDonatore({
         nome: spName,
@@ -273,13 +291,21 @@ export default function Sostieni() {
                       <div className="sb-sos-field">
                         <label htmlFor="sos-nome">Il tuo nome</label>
                         <input id="sos-nome" type="text" maxLength={40} placeholder="Es. Mario R."
-                          value={nome} onChange={(e) => setNome(e.target.value)} required />
+                          value={nome}
+                          onChange={(e) => { setNome(e.target.value); setErroreFirma(null); }} required />
                       </div>
                       <div className="sb-sos-field">
                         <label htmlFor="sos-msg">Due parole (facoltative)</label>
                         <textarea id="sos-msg" maxLength={280} rows={2} placeholder="Un saluto…"
-                          value={messaggio} onChange={(e) => setMessaggio(e.target.value)} />
+                          value={messaggio}
+                          onChange={(e) => { setMessaggio(e.target.value); setErroreFirma(null); }} />
                       </div>
+                      {erroreFirma && (
+                        <p className="sb-sos-alert" role="alert">
+                          <IcAlert size={16} />
+                          <span>{erroreFirma}</span>
+                        </p>
+                      )}
                       <div className="sb-sos-actions">
                         <button type="submit" className="sb-btn sb-btn--primary" disabled={!nome.trim() || sending}>
                           {sending
@@ -309,7 +335,8 @@ export default function Sostieni() {
                     <div className="sb-sos-field">
                       <label htmlFor="sos-spname">Nome / Brand</label>
                       <input id="sos-spname" type="text" maxLength={40} placeholder="La tua attività"
-                        value={spName} onChange={(e) => setSpName(e.target.value)} />
+                        value={spName}
+                        onChange={(e) => { setSpName(e.target.value); setErroreSponsor(null); }} />
                     </div>
                     <div className="sb-sos-field">
                       <label htmlFor="sos-splink">Link (sito o social)</label>
@@ -319,8 +346,15 @@ export default function Sostieni() {
                     <div className="sb-sos-field">
                       <label htmlFor="sos-spmsg">Messaggio (facoltativo)</label>
                       <textarea id="sos-spmsg" maxLength={280} rows={2} placeholder="Cosa vorresti promuovere?"
-                        value={spMsg} onChange={(e) => setSpMsg(e.target.value)} />
+                        value={spMsg}
+                        onChange={(e) => { setSpMsg(e.target.value); setErroreSponsor(null); }} />
                     </div>
+                    {erroreSponsor && (
+                      <p className="sb-sos-alert" role="alert">
+                        <IcAlert size={16} />
+                        <span>{erroreSponsor}</span>
+                      </p>
+                    )}
                     <div className="sb-sos-actions">
                       <button type="button" className="sb-btn sb-btn--secondary" onClick={() => proceedSponsor()}>
                         <IcMail size={15} /> Scrivimi via email

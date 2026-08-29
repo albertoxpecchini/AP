@@ -20,6 +20,11 @@
 // mesi) mandava le firme in localStorage senza dirlo a nessuno, mentre
 // l'endpoint che avrebbe potuto scriverle stava lì acceso.
 
+// Il filtro (parolacce, insulti, link di spam) è lo STESSO del server: la lista
+// vive in lib/parolacce.ts e la usano tutt'e due. Qui serve solo a dirlo subito
+// a chi scrive, senza un giro in rete; la porta chiusa è quella di /api/sponsor.
+import { testoHaParolacce, testoHaLink, linkPulito } from "../../../lib/parolacce";
+
 export type Tipo = "donatore" | "sponsor";
 
 export interface DonatoreRow {
@@ -70,12 +75,30 @@ const sanitize = (row: DonatoreRow): DonatoreRow => ({
   tipo: row.tipo === "sponsor" ? "sponsor" : "donatore",
   importo: trimOrNull(row.importo, 20),
   messaggio: trimOrNull(row.messaggio, 280),
-  link: trimOrNull(row.link, 200),
+  link: linkPulito(trimOrNull(row.link, 200)),
 });
+
+/**
+ * Motivo per cui una firma non è accettabile, in italiano e già pronto da
+ * mostrare — oppure null se va bene. Le stesse regole di /api/sponsor: qui
+ * anticipano il no, lì lo impongono.
+ */
+export function motivoRifiuto(nome: string, messaggio?: string | null): string | null {
+  const testo = `${nome} ${messaggio ?? ""}`;
+  if (!nome.trim()) return "Serve almeno il nome.";
+  if (testoHaParolacce(testo)) return "Il testo contiene parole non consentite: riscrivilo, per favore.";
+  if (testoHaLink(testo)) return "Niente indirizzi web nel nome o nel messaggio.";
+  return null;
+}
 
 /** Firma il libro. Ritorna la riga salvata (o quella locale di fallback). */
 export async function submitDonatore(row: DonatoreRow): Promise<DonatoreRow> {
   const clean = sanitize(row);
+
+  // Anche il ripiego locale passa dal filtro: senza, bastava staccare la rete
+  // per vedersi la parolaccia stampata nel libro (e restarci, in quel browser).
+  const motivo = motivoRifiuto(clean.nome, clean.messaggio);
+  if (motivo) throw new Error(motivo);
 
   // Scrittura via endpoint blindato (origine + rate-limit, insert con
   // service-role). Si prova SEMPRE, anche senza anon key: quella serve alle
@@ -98,7 +121,11 @@ export async function submitDonatore(row: DonatoreRow): Promise<DonatoreRow> {
   // (400 dati non validi, 429 rate-limit, 502 DB irraggiungibile) deve
   // arrivare in faccia a chi ha compilato, non diventare un finto «salvato».
   if (res && res.status !== 503) {
-    throw new Error(`submitDonatore ${res.status}: ${await res.text()}`);
+    // Il server risponde con { error } in italiano (filtro, rate-limit): quel
+    // testo è già la frase da mostrare, non va sepolto in un messaggio tecnico.
+    let detto = "";
+    try { detto = String((await res.clone().json())?.error ?? ""); } catch {}
+    throw new Error(detto || `submitDonatore ${res.status}: ${await res.text()}`);
   }
 
   const stored = { ...clean, id: Date.now(), created_at: new Date().toISOString() };
@@ -106,10 +133,18 @@ export async function submitDonatore(row: DonatoreRow): Promise<DonatoreRow> {
   return stored;
 }
 
+/**
+ * Ultimo filtro, in lettura: una riga che non passerebbe oggi il controllo non
+ * si mostra, da qualunque parte sia entrata — dal libro vecchio, da una
+ * scrittura diretta sul database, da un domani in cui la lista si allunga.
+ */
+export const firmaMostrabile = (r: DonatoreRow): boolean =>
+  !motivoRifiuto(r.nome ?? "", r.messaggio);
+
 /** Elenco firme dal più recente (newest-first). */
 export async function fetchDonatori(limit = 200): Promise<DonatoreRow[]> {
   if (!donazioniConfigured) {
-    return readLocal().slice(0, limit);
+    return readLocal().filter(firmaMostrabile).slice(0, limit);
   }
 
   const params = new URLSearchParams({
@@ -119,11 +154,14 @@ export async function fetchDonatori(limit = 200): Promise<DonatoreRow[]> {
   });
   const res = await fetch(`${URL}/rest/v1/${TABLE}?${params}`, { headers: restHeaders() });
   if (!res.ok) throw new Error(`fetchDonatori ${res.status}: ${await res.text()}`);
-  return (await res.json()) as DonatoreRow[];
+  return ((await res.json()) as DonatoreRow[]).filter(firmaMostrabile);
 }
 
 // ─── Realtime: nuove firme in tempo reale ──────────────────────────────────
-export function subscribeDonatori(onInsert: (row: DonatoreRow) => void): Unsubscribe {
+export function subscribeDonatori(onGrezzo: (row: DonatoreRow) => void): Unsubscribe {
+  // Anche le firme che arrivano in tempo reale passano dal filtro.
+  const onInsert = (row: DonatoreRow) => { if (firmaMostrabile(row)) onGrezzo(row); };
+
   // ── Modalità statica/locale: niente backend, ma comunque "live" tra schede ──
   if (!donazioniConfigured) {
     const onStorage = (ev: StorageEvent) => {
