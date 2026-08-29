@@ -93,6 +93,8 @@
   margin-top: 2rem;
 }
 .sb-bio-gallery--two { grid-template-columns: repeat(2, 1fr); }
+.sb-bio-gallery--one { grid-template-columns: 1fr; }
+.sb-bio-gallery--one .sb-bio-shot img { aspect-ratio: 16 / 9; }
 @media (max-width: 767.98px) { .sb-bio-gallery, .sb-bio-gallery--two { grid-template-columns: 1fr; } }
 .sb-bio-shot {
   margin: 0;

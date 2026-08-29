@@ -7,11 +7,7 @@ import {
   IcPin,
   IcCake,
   IcCalendar,
-  IcSprout,
-  IcTractor,
-  IcPark,
   IcWaves,
-  IcScreen,
   IcRuler,
   IcCompass,
   IcBuilding,
@@ -42,7 +38,7 @@ import "./mestesso.css";
 // «Me stesso» — presentazione personale di Alberto Pecchini (Esame di Stato
 // 2026), rifatta sulla grammatica Supabase della home (.sb-): nav sottile 64px,
 // hero a due colonne col ritratto in pannello, sezioni numerate con overline
-// azzurro, fact-card, card-prodotto dei ruoli in azienda, gallerie fotografiche,
+// azzurro, fact-card, gallerie fotografiche,
 // blocchi racconto, schema ad albero della scuola, bandiere dei paesi visitati,
 // mini-storico sportivo e chiusura «Grazie».
 // Tema chiaro/scuro NATIVO via token --sb-* (home.css); stili in mestesso.css.
@@ -185,13 +181,6 @@ const FACTS = [
   { Icon: IcCalendar, value: "5 anni", label: "di percorso, che oggi si concludono qui" },
 ];
 
-const RUOLI = [
-  { Icon: IcTractor, label: "Macchine operatrici", note: "guida e lavori in cascina" },
-  { Icon: IcPark, label: "Parchi & giardini", note: "cura del verde delle proprietà" },
-  { Icon: IcWaves, label: "Piscine & arredi esterni", note: "manutenzione con mio padre" },
-  { Icon: IcScreen, label: "Tutto il digitale", note: "ordini, preventivi, usato online" },
-];
-
 const PERCORSO = [
   { Icon: IcRuler, title: "Disegno e progetto", desc: "Progettare con metodo e precisione, dall'AutoCAD fino al dettaglio." },
   { Icon: IcCompass, title: "Metodo e rigore", desc: "Ragionare per problemi e risolverli un passo alla volta — anche scrivendo codice." },
@@ -323,8 +312,8 @@ export default function MeStesso() {
             <div className="sb-ms-prose">
               <p>
                 Sono uno studente CAT all'ultimo anno e, fuori dai banchi,
-                <strong> perito geometra e sviluppatore website</strong>. Sono cresciuto a Rivalta sul Mincio,
-                dove la mia famiglia ha le sue radici e una sua attività.
+                <strong> perito geometra e sviluppatore website</strong>. Sono cresciuto a Rivalta sul
+                Mincio, un borgo sul fiume in provincia di Mantova.
               </p>
             </div>
 
@@ -353,95 +342,11 @@ export default function MeStesso() {
           </div>
         </section>
 
-        {/* ③ Le mie radici */}
-        <section className="sb-section" aria-labelledby="ms-radici">
-          <div className="sb-container">
-            <div className="sb-ms-sechead">
-              <span className="sb-ms-kicker">02 — Le mie radici</span>
-              <h2 id="ms-radici">La mia famiglia e l'azienda</h2>
-            </div>
-
-            <div className="sb-ms-story">
-              <div>
-                <div className="sb-ms-prose">
-                  <p>
-                    La mia storia parte da <strong translate="no">Rivalta sul Mincio</strong> e dalla mia famiglia. Fin da
-                    piccolo sono cresciuto dando una mano nell'attività di casa: non un passatempo, ma il
-                    modo in cui ho imparato cosa significhi <strong>lavorare davvero</strong>.
-                  </p>
-                  <p>
-                    Con mio padre mi occupo della manutenzione di <strong>parchi e arredi esterni</strong> —
-                    le piscine, il verde, gli spazi delle proprietà — e guido le <strong>macchine
-                    operatrici</strong> della cascina. Un lavoro concreto, fatto di mani, stagioni e
-                    attenzione ai dettagli.
-                  </p>
-                  <p>
-                    In azienda ho preso in carico tutto il <strong>lato digitale</strong>: gli ordini online,
-                    le foto satellitari che servono a preparare i preventivi e gli annunci per la vendita
-                    dell'usato. È qui che le mie due anime — quella pratica e quella informatica — si
-                    incontrano.
-                  </p>
-                </div>
-                <div className="sb-ms-badge">
-                  <span className="sb-ms-badge-ic" aria-hidden="true"><IcSprout size={18} /></span>
-                  <span className="sb-ms-badge-text">
-                    <span className="sb-ms-badge-name">Cascina &amp; azienda di famiglia</span>
-                    <span className="sb-ms-badge-sub" translate="no">Rivalta sul Mincio (MN)</span>
-                  </span>
-                </div>
-              </div>
-              <div>
-                <Shot
-                  src="/images/me-stesso/cascina.jpg"
-                  alt="La cascina di famiglia a Rivalta sul Mincio"
-                  Icon={IcSprout}
-                />
-              </div>
-            </div>
-
-            {/* Cosa faccio in azienda */}
-            <div className="sb-ms-roles">
-              {RUOLI.map(({ Icon, label, note }) => (
-                <div className="sb-panel" key={label}>
-                  <div className="sb-panel-inner sb-ms-role">
-                    <span className="sb-ms-role-ic" aria-hidden="true"><Icon size={19} /></span>
-                    <span className="sb-ms-role-label">{label}</span>
-                    <span className="sb-ms-role-note">{note}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Galleria del lavoro */}
-            <div className="sb-ms-gallery">
-              <Shot
-                src="/images/me-stesso/trattore.jpg"
-                alt="Il Landini L25 Testacalda del 1957, la macchina operatrice storica di famiglia"
-                caption="Landini L25 Testacalda · 1957"
-                Icon={IcTractor}
-                focus="50% 72%"
-              />
-              <Shot
-                src="/images/me-stesso/manutenzione.jpg"
-                alt="Manutenzione del verde e degli arredi esterni"
-                caption="Manutenzione esterni"
-                Icon={IcPark}
-              />
-              <Shot
-                src="/images/me-stesso/azienda-digitale.jpg"
-                alt="Il lato digitale: preventivi e foto satellitari"
-                caption="Il digitale dell'azienda"
-                Icon={IcScreen}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ④ Il mio percorso */}
+        {/* ③ Il mio percorso */}
         <section className="sb-section" aria-labelledby="ms-percorso">
           <div className="sb-container">
             <div className="sb-ms-sechead">
-              <span className="sb-ms-kicker">03 — Il mio percorso</span>
+              <span className="sb-ms-kicker">02 — Il mio percorso</span>
               <h2 id="ms-percorso">Perché ho scelto il CAT</h2>
             </div>
             <div className="sb-ms-prose">
@@ -498,11 +403,11 @@ export default function MeStesso() {
           </div>
         </section>
 
-        {/* ⑤ Il restauro — dove tutto è iniziato */}
+        {/* ④ Il restauro — dove tutto è iniziato */}
         <section className="sb-section" aria-labelledby="ms-restauro">
           <div className="sb-container">
             <div className="sb-ms-sechead">
-              <span className="sb-ms-kicker">04 — Il restauro</span>
+              <span className="sb-ms-kicker">03 — Il restauro</span>
               <h2 id="ms-restauro">Dove è iniziato tutto</h2>
             </div>
 
@@ -548,11 +453,11 @@ export default function MeStesso() {
           </div>
         </section>
 
-        {/* ⑥ Le mie passioni */}
+        {/* ⑤ Le mie passioni */}
         <section className="sb-section" aria-labelledby="ms-passioni">
           <div className="sb-container">
             <div className="sb-ms-sechead">
-              <span className="sb-ms-kicker">05 — Le mie passioni</span>
+              <span className="sb-ms-kicker">04 — Le mie passioni</span>
               <h2 id="ms-passioni">Ciò che mi muove</h2>
             </div>
 
@@ -742,7 +647,7 @@ export default function MeStesso() {
               </div>
               <div className="sb-ms-prose">
                 <p>
-                  Le discoteche non fanno per me: meglio organizzare <strong>piccole feste in cascina</strong>,
+                  Le discoteche non fanno per me: meglio organizzare <strong>piccole feste in campagna</strong>,
                   dove c'è più tranquillità e ci si gode davvero le persone. E poi c'è il volontariato — per
                   due estati ho fatto l'<strong>animatore al Grest</strong> di Rivalta e ho dato una mano al
                   <strong translate="no"> CRED</strong> di Rodigo, con i bambini. Stare in mezzo agli altri, guidare un
@@ -751,8 +656,8 @@ export default function MeStesso() {
               </div>
               <div className="sb-ms-gallery sb-ms-gallery--two">
                 <Shot
-                  src="/images/me-stesso/festa-cascina.jpg"
-                  alt="Una piccola festa organizzata in cascina"
+                  src="/images/me-stesso/festa.jpg"
+                  alt="Una piccola festa tra amici"
                   Icon={IcUsers}
                 />
                 <Shot
@@ -811,11 +716,11 @@ export default function MeStesso() {
           </div>
         </section>
 
-        {/* ⑦ Il mio domani */}
+        {/* ⑥ Il mio domani */}
         <section className="sb-section" aria-labelledby="ms-domani">
           <div className="sb-container">
             <div className="sb-ms-sechead">
-              <span className="sb-ms-kicker">06 — Il mio domani</span>
+              <span className="sb-ms-kicker">05 — Il mio domani</span>
               <h2 id="ms-domani">Il mio futuro</h2>
             </div>
             <div className="sb-ms-story">
@@ -850,7 +755,7 @@ export default function MeStesso() {
           </div>
         </section>
 
-        {/* ⑧ Grazie — chiusura */}
+        {/* ⑦ Grazie — chiusura */}
         <section className="sb-section sb-cta sb-ms-thanks" aria-label="Grazie per l'attenzione">
           <div className="sb-container">
             <Shot

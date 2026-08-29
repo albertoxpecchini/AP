@@ -105,12 +105,6 @@ const CV = [
     desc: "End-to-end management of the entire sales cycle on Vinted and Subito: product appraisal, market pricing, photography with a Canon EOS 4000D and iPhone 16 Pro, listing, communication with prospective buyers, negotiation, shipping and feedback handling. First sale in December 2019. A systematic personal activity since autumn 2024. Categories: clothing, film collectibles, tech devices (Apple Watch, Nintendo Switch, Flipper Zero).",
   },
   {
-    period: "ongoing",
-    title: "Family farm — Rivalta sul Mincio",
-    role: "Agricultural operations — Logistics, Team coordination",
-    desc: "Ongoing collaboration in the family farming business. Tasks: plant care and maintenance (watering, pruning of various types and sizes), transport of materials and equipment on a tractor with trailer, hay harvesting from permanent meadow, coordinating operations with the team during intensive work, logistical support and assistance with transfers. Autonomous handling of farm equipment and on-field problem-solving.",
-  },
-  {
     period: "Dec 19, 2023",
     title: "Workers' Safety Course — Low Risk",
     role: "Certificate of attendance — LTO Mantua / FORMA, Lombardy Region (ATS Val Padana), 4 hours e-learning",

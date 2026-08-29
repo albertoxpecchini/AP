@@ -792,8 +792,6 @@ const RAW: Record<string, Entry> = {
   "72 h": { en: "72 h", fr: "72 h", de: "72 h" },
   "Caem Group S.p.A.": { en: "Caem Group S.p.A.", fr: "Caem Group S.p.A.", de: "Caem Group S.p.A." },
   "Caem Group S.p.A. · Castellucchio (MN)": { en: "Caem Group S.p.A. · Castellucchio (MN)", fr: "Caem Group S.p.A. · Castellucchio (MN)", de: "Caem Group S.p.A. · Castellucchio (MN)" },
-  "Rivalta sul Mincio (MN)": { en: "Rivalta sul Mincio (MN)", fr: "Rivalta sul Mincio (MN)", de: "Rivalta sul Mincio (MN)" },
-  "Landini L25 Testacalda · 1957": { en: "Landini L25 Testacalda · 1957", fr: "Landini L25 Testacalda · 1957", de: "Landini L25 Testacalda · 1957" },
   "Unicollege Mantova": { en: "Unicollege Mantova", fr: "Unicollege Mantova", de: "Unicollege Mantova" },
   "Santagnese10 Officina Creativa": { en: "Santagnese10 Officina Creativa", fr: "Santagnese10 Officina Creativa", de: "Santagnese10 Officina Creativa" },
   "San Marino": { en: "San Marino", fr: "Saint-Marin", de: "San Marino" },

@@ -22,7 +22,7 @@ Il racconto del percorso è illustrato attraverso i boschi.
 **Tecnologie:** AutoCAD 3D, strutture in legno.`,
 
   "me-stesso": `## About Me — presentazione personale
-La mia presentazione per l'Esame di Maturità 2026: chi sono, le radici nell'azienda di famiglia a Rivalta, il percorso CAT, le passioni (web, viaggi, tiro, moto) e il futuro.
+La mia presentazione per l'Esame di Maturità 2026: chi sono, le radici a Rivalta, il percorso CAT, le passioni (web, viaggi, tiro, moto) e il futuro.
 
 **Caratteristiche**
 - Un unico scroll narrato

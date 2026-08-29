@@ -25,8 +25,6 @@ import {
   IcUsers,
   IcPalette,
   IcBrick,
-  IcTractor,
-  IcScreen,
   IcStore,
   IcWrench,
   IcImage,
@@ -66,8 +64,6 @@ const INTEREST_ICON: Record<string, (p: IcProps) => JSX.Element> = {
   "Time with friends": IcUsers,
   "Web design": IcPalette,
   "Restoration": IcBrick,
-  "Working the land": IcTractor,
-  "Digitising the business": IcScreen,
   "Volunteering": IcHeart,
   "Building a business": IcStore,
 };
@@ -80,7 +76,6 @@ const SKILL_ICON: Record<string, (p: IcProps) => JSX.Element> = {
   "Tools & Workflow": IcWrench,
   "CAT technical area": IcCompass,
   "IT & multimedia": IcImage,
-  "On the ground": IcTractor,
   "Languages": IcGlobe,
 };
 
@@ -260,8 +255,7 @@ export default function Bio() {
             <div className="sb-bio-prose">
               <p>
                 My name is Alberto Pecchini, I'm {age} and I grew up in{" "}
-                <strong>Rivalta sul Mincio</strong>, a village in the province of Mantua where my
-                family has both its roots and its business.
+                <strong>Rivalta sul Mincio</strong>, a village in the province of Mantua.
               </p>
               <p>
                 I hold a <strong>CAT diploma</strong> — Construction, Environment and Territory —
@@ -270,18 +264,6 @@ export default function Bio() {
                 Reggio Emilia. Outside the classroom I'm a self-taught website developer: I
                 build responsive, fast and polished interfaces with React, Next.js,
                 TypeScript, Tailwind CSS and GSAP.
-              </p>
-              <p>
-                I've been giving a hand in the family business since I was a kid — not as a
-                pastime, but as the way I learned what <strong>real work</strong> means. With my
-                father I look after parks, pools and outdoor spaces, and I drive the farm
-                machinery. It's concrete work, made of hands, seasons and attention to detail.
-              </p>
-              <p>
-                In the business I've also taken over everything <strong>digital</strong>: online
-                orders, the satellite imagery we use to prepare quotes, the listings for
-                second-hand sales. That's where my two sides — the hands-on one and the digital
-                one — meet.
               </p>
             </div>
 
@@ -298,23 +280,12 @@ export default function Bio() {
               ))}
             </div>
 
-            {/* Dove sono cresciuto e cosa faccio, in tre scatti */}
-            <div className="sb-bio-gallery">
+            {/* Dove sono cresciuto e cosa faccio, in uno scatto */}
+            <div className="sb-bio-gallery sb-bio-gallery--one">
               <Photo
                 src="/images/me-stesso/rivalta.jpg"
                 alt="Rivalta sul Mincio, where I grew up"
                 caption="Between Rivalta and Mantua"
-              />
-              <Photo
-                src="/images/me-stesso/cascina.jpg"
-                alt="The family farm in Rivalta sul Mincio"
-                caption="The family farm"
-              />
-              <Photo
-                src="/images/me-stesso/trattore.jpg"
-                alt="The Landini L25 Testacalda from 1957, the family's historic machine"
-                caption="Landini L25 Testacalda · 1957"
-                focus="50% 72%"
               />
             </div>
 
@@ -475,8 +446,8 @@ export default function Bio() {
                     <IcPin size={16} aria-hidden="true" /> <span translate="no">Rivalta sul Mincio</span>
                   </h3>
                   <p className="sb-bio-mappa-desc">
-                    The village on the Mincio river where my family's farm is, and where I
-                    designed and built the official tourist website.
+                    The village on the Mincio river where I grew up, and where I designed
+                    and built the official tourist website.
                   </p>
                   <a
                     className="sb-btn sb-btn--sm sb-btn--secondary"

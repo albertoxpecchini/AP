@@ -85,7 +85,7 @@ export const PROJECTS: Project[] = [
     kind: "page",
     thumb: "mestesso",
     srcDir: "src/app/me-stesso",
-    desc: "My personal presentation for the 2026 final state exam: who I am, my roots in the family business in Rivalta, the CAT path, my passions (web, travel, shooting, motorbikes) and the future — a single narrated scroll built with my neroverde design system, in the style of /pcto.",
+    desc: "My personal presentation for the 2026 final state exam: who I am, my roots in Rivalta, the CAT path, my passions (web, travel, shooting, motorbikes) and the future — a single narrated scroll built with my neroverde design system, in the style of /pcto.",
     tags: ["Presentation", "Design system", "Storytelling", "React"],
   },
   {

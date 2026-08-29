@@ -9,8 +9,6 @@ import {
   Users,
   Palette,
   BrickWall,
-  Tractor,
-  MonitorSmartphone,
   HeartHandshake,
   Store,
 } from "lucide-react";
@@ -105,8 +103,8 @@ export const HOBBY: Interest[] = [
     Icon: Users,
     emoji: "🎉",
     label: "Time with friends",
-    img: "/images/me-stesso/festa-cascina.jpg",
-    desc: "Clubs aren't my thing: I'd rather organise small parties at the farm, where it's quieter and you actually get to enjoy the people around you. Real company over crowded places, every time.",
+    img: "/images/me-stesso/festa.jpg",
+    desc: "Clubs aren't my thing: I'd rather organise small parties out in the countryside, where it's quieter and you actually get to enjoy the people around you. Real company over crowded places, every time.",
   },
 ];
 
@@ -124,20 +122,6 @@ export const PASSIONI: Interest[] = [
     label: "Restoration",
     img: "/images/me-stesso/restauro-1.jpg",
     desc: "Everything really started here. In 2018, aged twelve, I took a restoration course at the Mantua Seminary — today Unicollege Mantova — one of the youth projects run by Santagnese10 Officina Creativa. With work gloves on I cleaned up and repaired old brick and cobblestone walls: the first time I put my hands on a historic building, and it stayed with me. Not long after, I chose the CAT programme.",
-  },
-  {
-    Icon: Tractor,
-    emoji: "🚜",
-    label: "Working the land",
-    img: "/images/me-stesso/trattore.jpg",
-    desc: "I grew up lending a hand in the family business — not as a pastime, but as the way I learned what real work means. I drive the farm machinery, including the Landini L25 Testacalda from 1957, and with my father I look after parks, pools and outdoor spaces. Concrete work, made of hands, seasons and attention to detail.",
-  },
-  {
-    Icon: MonitorSmartphone,
-    emoji: "💻",
-    label: "Digitising the business",
-    img: "/images/me-stesso/azienda-digitale.jpg",
-    desc: "In the family business I've taken over everything digital: online orders, the satellite imagery we use to prepare quotes, and the listings for second-hand sales. It's where my two sides — the hands-on one and the digital one — meet, and where I first saw that software can make real work lighter.",
   },
   {
     Icon: HeartHandshake,
@@ -162,6 +146,5 @@ export const SKILLS: { emoji: string; title: string; items: string[] }[] = [
   { emoji: "🛠️", title: "Tools & Workflow", items: ["Git & GitHub", "Vite", "Vercel", "VS Code", "PowerShell", "Supabase"] },
   { emoji: "📐", title: "CAT technical area", items: ["AutoCAD", "cadwork", "Topography", "Valuation", "Technical drawing / CAD", "Advanced Excel"] },
   { emoji: "🪟", title: "IT & multimedia", items: ["PC troubleshooting", "Windows", "Linux Ubuntu", "Commercial photography", "DaVinci Resolve", "Canva"] },
-  { emoji: "🚜", title: "On the ground", items: ["Tractors & forklifts", "Grounds & pool upkeep", "Site logistics", "Team coordination"] },
   { emoji: "🌍", title: "Languages", items: ["Italian — native", "English — C1 (IELTS)"] },
 ];

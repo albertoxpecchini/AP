@@ -576,15 +576,6 @@ export const IcBrick = (p: IcProps) => (
   </Ic>
 );
 
-export const IcTractor = (p: IcProps) => (
-  <Ic {...p}>
-    <circle cx="7.2" cy="15.6" r="4.4" />
-    <circle cx="18.5" cy="17.6" r="2.5" />
-    <path d="M11.6 15.6V8.6H6.2" />
-    <path d="M11.6 13h4.9l2 3.4" />
-  </Ic>
-);
-
 export const IcScreen = (p: IcProps) => (
   <Ic {...p}>
     <rect x="3" y="4.5" width="18" height="12.5" rx="2" />
@@ -690,31 +681,13 @@ export const IcExplore = (p: IcProps) => (
   </Ic>
 );
 
-/* ── /me-stesso: scuola, cascina, sport, strada, futuro ── */
+/* ── /me-stesso: scuola, sport, strada, futuro ── */
 
 export const IcCalendar = (p: IcProps) => (
   <Ic {...p}>
     <rect x="3" y="5.2" width="18" height="15.3" rx="2" />
     <path d="M8 3.2v4M16 3.2v4M3 10h18" />
     <circle cx="8.4" cy="14" r="0.85" fill="currentColor" stroke="none" />
-  </Ic>
-);
-
-/* Germoglio: lo stelo con due foglie — la cascina di famiglia. */
-export const IcSprout = (p: IcProps) => (
-  <Ic {...p}>
-    <path d="M12 20.5V10.2" />
-    <path d="M12 14.4c-3.3 0-5.9-2.6-5.9-5.9 3.3 0 5.9 2.6 5.9 5.9z" />
-    <path d="M12 11.6c0-3.3 2.6-5.9 5.9-5.9 0 3.3-2.6 5.9-5.9 5.9z" />
-  </Ic>
-);
-
-/* Albero a chioma tonda: il verde dei parchi e dei giardini (il conifero
-   IcTree, più giù, resta quello dei boschi del PCTO). */
-export const IcPark = (p: IcProps) => (
-  <Ic {...p}>
-    <circle cx="12" cy="8.9" r="6.4" />
-    <path d="M12 15.3v5.2M8.4 20.5h7.2" />
   </Ic>
 );
 
