@@ -69,10 +69,44 @@
   min-height: 0;
   position: relative;
   z-index: 1;
-  /* Il colore entra in dissolvenza dall'alto: scendendo non si deve vedere il
+  /* ── Il velo: come il footer si prende il fondale ────────────────────────
+     Il colore entra in dissolvenza dall'alto: scendendo non si deve vedere il
      punto in cui la pagina finisce e comincia il footer. Nessun bordo, nessun
-     fondo netto — è la regola del sito, un fondale solo per tutta la pagina. */
-  background: linear-gradient(to bottom, transparent, var(--sb-bg-alt) 14rem);
+     fondo netto — è la regola del sito, un fondale solo per tutta la pagina.
+
+     Qui c'era `linear-gradient(to bottom, transparent, var(--sb-bg-alt) 14rem)`
+     e una riga si vedeva lo stesso. Il motivo non è che la sfumatura fosse
+     corta: è che partiva di scatto. L'opacità di un gradiente a due tappe sale
+     in modo LINEARE, quindi al primo pixel del footer la pendenza passa da
+     zero al suo valore pieno di colpo — e dietro c'è un fondale che in quel
+     punto sta ancora salendo di intensità per conto suo (le macchie sono fisse
+     alla finestra, e scendendo si accendono). Due pendenze opposte che
+     s'incontrano non fanno una dissolvenza: fanno una CRESTA. Misurata in Edge
+     sul tema scuro, colonna a 30 px dal bordo, il verde faceva 49 → 66 → 24:
+     quel massimo, 34 px dentro il footer, era la riga che si vedeva. Allungare
+     i 14rem non serviva — spostava la cresta più in basso, non la toglieva.
+
+     Adesso l'opacità sale con una smoothstep (3t²−2t³) campionata in otto
+     tratti: una curva che alle due estremità vale zero E HA PENDENZA ZERO. In
+     cima nasce dal nulla senza spigolo — niente cresta da incontrare, il velo
+     accompagna il fondale invece di tagliarlo — e in fondo arriva al pieno
+     addolcendosi, quindi non lascia nemmeno il gradino opposto, quello dove la
+     sfumatura finisce e comincia il colore piatto. Con una rampa lineare quei
+     due spigoli ci sono per forza, per quanto la si allunghi; con questa non
+     ci sono a nessuna lunghezza. I 28rem sono il respiro, non la cura. */
+  --sb-foot-fade: 28rem;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--sb-bg-alt) 0%, transparent) 0,
+    color-mix(in srgb, var(--sb-bg-alt) 4%, transparent) calc(var(--sb-foot-fade) * 0.125),
+    color-mix(in srgb, var(--sb-bg-alt) 16%, transparent) calc(var(--sb-foot-fade) * 0.25),
+    color-mix(in srgb, var(--sb-bg-alt) 32%, transparent) calc(var(--sb-foot-fade) * 0.375),
+    color-mix(in srgb, var(--sb-bg-alt) 50%, transparent) calc(var(--sb-foot-fade) * 0.5),
+    color-mix(in srgb, var(--sb-bg-alt) 68%, transparent) calc(var(--sb-foot-fade) * 0.625),
+    color-mix(in srgb, var(--sb-bg-alt) 84%, transparent) calc(var(--sb-foot-fade) * 0.75),
+    color-mix(in srgb, var(--sb-bg-alt) 96%, transparent) calc(var(--sb-foot-fade) * 0.875),
+    var(--sb-bg-alt) var(--sb-foot-fade)
+  );
   /* Il contenitore di query: da qui in giù le misure si prendono sulla
      larghezza del FOOTER, non su quella della finestra. Serve perché il
      footer è lo stesso oggetto in pagine con margini diversi, e perché la
@@ -89,13 +123,50 @@
 .sb-foot-aura {
   position: absolute;
   inset: 0 0 auto;
-  height: 26rem;
+  height: 30rem;
   pointer-events: none;
   z-index: 0;
   opacity: 0;
+  /* I due centri stanno DENTRO il footer (30% e 44% dell'alone), non più sul
+     suo filo superiore. Prima erano `at 18% 0%` e `at 86% 12%`: un alone che
+     ha il massimo sul bordo dell'elemento è un alone tagliato a metà, e il
+     taglio si vede — su una pagina interna, dove il fondale non ha macchie a
+     coprire, era una riga netta larga tutto lo schermo esattamente al primo
+     pixel del footer. Spostati in giù, i due massimi cadono dove il velo qui
+     sopra sta passando dal 15 al 30 per cento: l'alone non nasconde più il
+     confine, ci si appoggia. */
   background:
-    radial-gradient(48rem 20rem at 18% 0%, color-mix(in oklab, var(--sb-brand) 13%, transparent), transparent 66%),
-    radial-gradient(40rem 18rem at 86% 12%, color-mix(in oklab, var(--sb-brand) 8%, transparent), transparent 62%);
+    radial-gradient(52rem 22rem at 18% 30%, color-mix(in oklab, var(--sb-brand) 13%, transparent), transparent 66%),
+    radial-gradient(44rem 20rem at 86% 44%, color-mix(in oklab, var(--sb-brand) 8%, transparent), transparent 62%);
+  /* E la garanzia che sul filo non resti niente: la stessa smoothstep del velo,
+     qui come maschera. Spostare i centri abbassa il valore sul bordo ma non lo
+     azzera (a 9rem da un raggio di 22rem l'alone vale ancora un terzo del suo
+     massimo, e un terzo si vede benissimo). Questa lo porta a zero, e ci
+     arriva con pendenza zero: nessun filo, da nessuna parte. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0) 0%,
+    rgb(0 0 0 / 0.04) 6%,
+    rgb(0 0 0 / 0.16) 12%,
+    rgb(0 0 0 / 0.32) 17%,
+    rgb(0 0 0 / 0.5) 23%,
+    rgb(0 0 0 / 0.68) 29%,
+    rgb(0 0 0 / 0.84) 35%,
+    rgb(0 0 0 / 0.96) 40%,
+    rgb(0 0 0 / 1) 46%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0) 0%,
+    rgb(0 0 0 / 0.04) 6%,
+    rgb(0 0 0 / 0.16) 12%,
+    rgb(0 0 0 / 0.32) 17%,
+    rgb(0 0 0 / 0.5) 23%,
+    rgb(0 0 0 / 0.68) 29%,
+    rgb(0 0 0 / 0.84) 35%,
+    rgb(0 0 0 / 0.96) 40%,
+    rgb(0 0 0 / 1) 46%
+  );
 }
 @supports (animation-timeline: view()) {
   .sb-foot-aura {
