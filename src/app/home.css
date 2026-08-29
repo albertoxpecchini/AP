@@ -2549,10 +2549,15 @@ html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
 .sb-kick-slot { display: block; position: relative; overflow: hidden; height: 1.4em; }
 .sb-kick-row { display: block; line-height: 1.4; white-space: nowrap; }
 
+/* Il passo fra le due finestre è un token e non un numero scritto qui, perché
+   non serve solo alla griglia: i due campi di tessere lo leggono per sapere di
+   quanto devono sbordare l'uno verso l'altro (site/videoWindow.css, «Dove i due
+   campi si incontrano»). Cambiare il passo qui muove anche la fusione. */
 .sb-works-grid {
+  --sb-works-gap: clamp(2.75rem, 5.5vw, 4rem);
   display: grid;
   grid-template-columns: 1fr;
-  gap: clamp(2.75rem, 5.5vw, 4rem);
+  gap: var(--sb-works-gap);
 }
 @media (min-width: 1024px) {
   .sb-works-grid { grid-template-columns: repeat(2, 1fr); }

@@ -87,7 +87,12 @@
    la finestra era già in dissolvenza prima di cominciare. */
 .sb-vwm-field {
   position: absolute;
-  inset: -48px -40px -40px;
+  /* I due sbordi laterali sono separati perché il lato che guarda il vicino non
+     si comporta come quello che guarda il margine della pagina: vedi «Dove i
+     due campi si incontrano». Di norma valgono uguale, ed è il campo di prima. */
+  --vwm-l: 40px;
+  --vwm-r: 40px;
+  inset: -48px calc(-1 * var(--vwm-r)) -40px calc(-1 * var(--vwm-l));
   z-index: 0;
   pointer-events: none;
   display: grid;
@@ -96,8 +101,88 @@
   /* La maglia del mosaico: la tessera si adatta alla larghezza e il vuoto resta
      fisso a 8 — è il vuoto a fare il passo, come nelle schede prodotto. */
   gap: 8px;
-  -webkit-mask-image: radial-gradient(68% 64% at 50% 50%, #000 42%, transparent 100%);
-  mask-image: radial-gradient(68% 64% at 50% 50%, #000 42%, transparent 100%);
+  /* Due maschere che si moltiplicano (`intersect`): la radiale di sempre, che
+     spegne il piano verso l'esterno, e la rampa laterale qui sotto, che di suo
+     non fa niente — `--vwm-fade: 0px` la rende piena. Si accende solo sul lato
+     interno delle due colonne, ed è tutta la fusione. */
+  --vwm-dir: to right;
+  --vwm-fade: 0px;
+  -webkit-mask-image:
+    radial-gradient(68% 64% at 50% 50%, #000 42%, transparent 100%),
+    var(--vwm-blend);
+  mask-image:
+    radial-gradient(68% 64% at 50% 50%, #000 42%, transparent 100%),
+    var(--vwm-blend);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* ── Dove i due campi si incontrano ─────────────────────────────────────────
+   Le due finestre stanno affiancate e ognuna porta il suo piano di tessere: a
+   sinistra il verde di Rivalta, a destra l'ambra di Cascina Fontana. Ogni campo
+   sbordava di 40px per lato e finiva lì, di netto — e la radiale che lo spegne
+   verso l'esterno, sul fianco, vale ancora 46 % (a metà larghezza si è fatto
+   0,5/0,68 = 0,74 del raggio, cioè poco più di metà strada verso il
+   trasparente). Risultato: nel varco fra le due finestre il verde si fermava a
+   quasi metà inchiostro e l'ambra ripartiva da lì. Due tappeti accostati, con
+   la giunta in mezzo.
+
+   Adesso ognuno dei due si allunga verso l'altro di ESATTAMENTE il passo della
+   griglia — `--sb-works-gap`, il token che home.css usa per il `gap` — e su
+   quel tratto si dissolve. Il conto torna da sé: il campo di sinistra arriva
+   dove comincia la finestra di destra, quello di destra dove finisce la
+   finestra di sinistra, quindi nessuno dei due invade il video del vicino e i
+   due si sovrappongono su tutto e solo il varco.
+
+   La rampa è la stessa smoothstep del footer (3t²−2t³), e qui il motivo è
+   aritmetico prima che estetico: s(t) + s(1−t) = 1 esatto, quindi mentre il
+   verde scende l'ambra sale della stessa quantità e l'inchiostro totale non ha
+   né un buco né una gobba a metà strada. Con due rampe lineari il conto
+   tornerebbe uguale, ma resterebbe lo spigolo alle due estremità — proprio
+   contro il filo delle finestre, che è dove si guarda.
+
+   Le due maglie hanno lo stesso passo e sono quasi in fase — a 1440px lo
+   scarto è un quarto di tessera (590px di distanza fra i due campi, 94,6 di
+   passo) — e le righe sono allineate esatte, perché i due campi hanno la stessa
+   altezza. Nel varco, quindi, non si vedono due tessere accostate ma UNA
+   tessera che cambia tinta: il verde scende e l'ambra sale dentro lo stesso
+   riquadro. È lì che le due tinte si fondono davvero.
+
+   Solo da 1024px in su, che è dove le due finestre stanno affiancate: sotto
+   sono incolonnate, con in mezzo il testo di due schede, e non si incontrano.
+
+   `odd`/`even` e non `first`/`last`: la griglia ha due colonne fisse, quindi è
+   la parità a dire da che parte sta una scheda, e il conto continua a tornare
+   se un giorno le schede tornano tre. Il `:not(:last-child)` è per il caso di
+   una sola: una scheda che non ha vicino non deve allungarsi verso nessuno. */
+@media (min-width: 1024px) {
+  .sb-works-grid > .sb-work:nth-child(odd):not(:last-child) .sb-vwm-field {
+    --vwm-r: var(--sb-works-gap);
+    --vwm-fade: var(--sb-works-gap);
+  }
+  .sb-works-grid > .sb-work:nth-child(even) .sb-vwm-field {
+    --vwm-l: var(--sb-works-gap);
+    --vwm-fade: var(--sb-works-gap);
+    --vwm-dir: to left;
+  }
+}
+
+/* La rampa. Le tappe sono la smoothstep campionata in otto tratti, misurate
+   dal fondo della direzione: con `to right` il 100 % è il fianco destro, con
+   `to left` è il sinistro — la stessa lista serve i due lati. */
+.sb-vwm-field {
+  --vwm-blend: linear-gradient(
+    var(--vwm-dir),
+    rgb(0 0 0 / 1) calc(100% - var(--vwm-fade)),
+    rgb(0 0 0 / 0.957) calc(100% - var(--vwm-fade) * 0.875),
+    rgb(0 0 0 / 0.844) calc(100% - var(--vwm-fade) * 0.75),
+    rgb(0 0 0 / 0.684) calc(100% - var(--vwm-fade) * 0.625),
+    rgb(0 0 0 / 0.5) calc(100% - var(--vwm-fade) * 0.5),
+    rgb(0 0 0 / 0.316) calc(100% - var(--vwm-fade) * 0.375),
+    rgb(0 0 0 / 0.156) calc(100% - var(--vwm-fade) * 0.25),
+    rgb(0 0 0 / 0.043) calc(100% - var(--vwm-fade) * 0.125),
+    rgb(0 0 0 / 0) 100%
+  );
 }
 
 /* Quanto inchiostro mettono le tessere. Serve un fattore e non due liste di
