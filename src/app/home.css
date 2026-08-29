@@ -603,7 +603,7 @@ html.dark .sb-home::after {
    satura al 55 % è una macchia di vernice, e il testo grigio che ci passa
    sopra perde contrasto. In scuro invece possono spingere — è lì che
    «accesissimo» funziona, perché il colore ha il nero attorno che lo regge. */
-.sb-blobs { opacity: 0.62; }
+.sb-blobs { opacity: 1; }
 html.dark .sb-blobs { opacity: 1; }
 
 @keyframes sb-blob-a {
@@ -611,11 +611,11 @@ html.dark .sb-blobs { opacity: 1; }
   to { transform: translate3d(8vw, 6vh, 0) scale(1.18); }
 }
 @keyframes sb-blob-b {
-  from { transform: translate3d(0, 0, 0) scale(1.1); }
-  to { transform: translate3d(-7vw, 9vh, 0) scale(0.92); }
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-7vw, 9vh, 0) scale(1.92); }
 }
 @keyframes sb-blob-c {
-  from { transform: translate3d(0, 0, 0) scale(0.95); }
+  from { transform: translate3d(0, 0, 0) scale(1); }
   to { transform: translate3d(-10vw, -7vh, 0) scale(1.15); }
 }
 
@@ -1109,11 +1109,11 @@ button.sb-card:hover .sb-panel,
    .sb-panel--hover è la lastra stessa, quindi è già ritagliata e non ha un
    fuori in cui mettere l'ombra: lì lo stacco resta affidato al rim che si
    accende e ai pixel di sollevamento. */
-:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story) {
+:is(a.sb-card, button.sb-card, .sb-page-card) {
   position: relative;
   isolation: isolate;
 }
-:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story)::before {
+:is(a.sb-card, button.sb-card, .sb-page-card)::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -1126,12 +1126,12 @@ button.sb-card:hover .sb-panel,
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
-:is(a.sb-card, button.sb-card, .sb-page-card, .sb-story):hover::before { opacity: 1; }
+:is(a.sb-card, button.sb-card, .sb-page-card):hover::before { opacity: 1; }
 /* La lastra vera sta sopra la sua ombra. isolation:isolate sul contenitore
    tiene entrambe dentro lo stesso contesto di impilamento, così l'ombra di una
    card non può finire sopra la card accanto. Sulle card prodotti in mezzo c'è
    .sb-spot (il componente dell'alone), che va rialzato al posto suo. */
-:is(.sb-page-card, .sb-story) > .sb-panel,
+.sb-page-card > .sb-panel,
 :is(a.sb-card, button.sb-card) > .sb-spot { position: relative; z-index: 1; }
 /* Il sollevamento all'hover sta sul pannello, non sulla card: la card è la
    maglia della griglia, spostarla sposterebbe anche il suo ingombro.
@@ -1142,8 +1142,7 @@ button.sb-card:hover .sb-panel,
    Questa regola resta viva per il tocco e per i puntatori grossolani. */
 @media not all and (hover: hover) and (pointer: fine) {
   a.sb-card:hover .sb-panel,
-  .sb-page-card:hover .sb-panel,
-  .sb-story:hover .sb-panel {
+  .sb-page-card:hover .sb-panel {
     transform: translateY(-3px);
   }
 }
@@ -1250,7 +1249,6 @@ button.sb-card:hover .sb-panel,
   a.sb-card:hover .sb-panel-inner::after,
   button.sb-card:hover .sb-panel-inner::after,
   .sb-page-card:hover .sb-panel-inner::after,
-  .sb-story:hover .sb-panel-inner::after,
   .sb-panel--hover:hover > .sb-panel-inner::after {
     animation: sb-sheen 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s 1;
   }
@@ -2372,7 +2370,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
     visibility 0s;
 }
 
-/* La targhetta: stessa sagoma e stessa misura di .sb-story-kind, ma qui il
+/* La targhetta: stessa sagoma e stessa misura di .sb-works-kind, ma qui il
    filo e il fondo sono di luce — sotto non c'è una card di vetro, c'è tinta. */
 .sb-slat-kind {
   font-size: 0.68rem;
@@ -2471,100 +2469,194 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   }
 }
 
-/* ── Story-card dei progetti di punta ──────────────────────────────────────
-   Erano tre schede di solo testo — nome, targhetta, una frase — in una griglia
-   da QUATTRO colonne: a schermo largo l'ultima restava vuota, e tre riquadri
-   identici e scoloriti erano il modo peggiore di far vedere il lavoro vero.
+/* ── I PROGETTI IN EVIDENZA ─────────────────────────────────────────────────
+   Com'erano: tre story-card in una griglia «uno grande e due» — nome,
+   targhetta, citazione, etichette, e in cima una finestrella con l'anteprima.
+   Il difetto era di proporzione: l'anteprima è la SOLA cosa che dimostra
+   qualcosa, e la si era ridotta a un francobollo sopra a cinque righe di
+   testo. Le regole che tenevano insieme quel castello — il riquadro doppio,
+   il video in `contain` per riempirlo, la citazione a flex 0 per non
+   sfondarlo — erano quattro toppe su un'idea sbagliata.
 
-   Adesso la griglia è «uno grande e due»: Rivalta prende il riquadro doppio
-   con dentro il video del sito, Cascina e lo strumento si impilano di fianco.
-   E ogni scheda porta il suo `data-acc`, così bordo, piede, glifo e alone
-   scendono dalla tavolozza invece di essere tutti azzurri (vedi il blocco «La
-   tavolozza»: basta l'attributo, il CSS della tinta è già scritto). */
-.sb-stories { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-@media (min-width: 640px) { .sb-stories { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) {
-  .sb-stories { grid-template-columns: repeat(3, 1fr); }
-  /* Due colonne per due file: il riquadro grande è alto quanto le due schede
-     di fianco messe insieme, ed è lì che sta il video. */
-  .sb-story--lead { grid-column: span 2; grid-row: span 2; }
+   Come sono: DUE finestre grandi, una per cliente vero, e l'anteprima È la
+   sezione. Il testo sta accanto, non sopra, e si è ridotto a quello che serve:
+   che tipo di lavoro è, come si chiama, una frase, e dove porta.
+
+   La terza scheda (/instagram) è uscita: è uno strumento, non un lavoro
+   commissionato, e questa sezione racconta come nascono i lavori per i
+   clienti. Resta nell'archivio, con gli altri strumenti.
+
+   ── Perché due colonne e non una fila ──────────────────────────────────────
+   Perché ogni finestra poggia su un campo di tessere che le sborda intorno
+   (site/videoWindow.css), e i due campi hanno bisogno di non incontrarsi: se si
+   toccano smettono di essere due piani e diventano un fondo unico screziato.
+   Il `gap` resta più largo di ogni altra griglia della pagina, ma meno di
+   quando qui c'era l'anello — il campo sfuma sui bordi e non ha bisogno di
+   altrettanto spazio vuoto per finire. */
+.sb-works-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
-.sb-story { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
-.sb-story-inner { padding: 1.4rem; gap: 1rem; }
-.sb-story-top { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
-.sb-story-name { font-size: 0.95rem; font-weight: 500; color: var(--sb-fg); letter-spacing: -0.01em; }
-.sb-story-kind {
-  font-size: 0.68rem;
-  letter-spacing: 0.07em;
+.sb-works-title { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+.sb-works-title h3 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--sb-fg);
+  text-wrap: balance;
+}
+/* Il titolo è nero in chiaro e bianco in scuro, non azzurro. La banda di luce
+   resta — è quella che corre su tutte le brandline del sito — ma smette di
+   portarsi dietro il colore del marchio: .sb-shine dipinge il testo con
+   --sb-shine-base, e qui quella base è semplicemente il colore del testo.
+   L'azzurro sta bene su «Surveyor & Website Developer» e su «Let's talk.», che
+   sono due firme; un titolo di sezione è un titolo di sezione, e in una pagina
+   dove ogni scheda ha già la sua tinta era una quinta voce colorata. */
+.sb-works-title h3 .sb-shine {
+  --sb-shine-base: var(--sb-fg);
+  --sb-shine-hi: var(--sb-fg-muted);
+}
+html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
+
+/* Il sopratitolo vivo (site/homeLive.tsx, LiveKicker). Il pallino è quello dei
+   chip «LIVE» del terminale clienti: stesso segno, stesso significato — questa
+   riga sta dicendo qualcosa adesso. */
+.sb-kick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--sb-fg-muted);
-  border: 1px solid var(--sb-border-strong);
-  clip-path: var(--sb-shape-xs);
-  background: var(--sb-shape-edge-xs);
-  padding: 0.18rem 0.55rem;
-  white-space: nowrap;
+  color: var(--sb-accent-text, var(--sb-brand-text));
 }
-.sb-story-quote { margin: 0; flex: 1; font-size: 0.98rem; line-height: 1.55; color: var(--sb-fg-light); }
-.sb-story-quote strong { font-weight: 400; color: var(--sb-fg); }
-.sb-story-foot { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.84rem; color: var(--sb-brand-text); }
+.sb-kick-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--sb-accent, var(--sb-brand));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-accent, var(--sb-brand)) 22%, transparent);
+}
+/* La finestrella che taglia la riga in uscita. L'altezza è in em perché il
+   testo è in rem e deve poter crescere senza che il taglio resti indietro. */
+.sb-kick-slot { display: block; position: relative; overflow: hidden; height: 1.4em; }
+.sb-kick-row { display: block; line-height: 1.4; white-space: nowrap; }
 
-/* La riga del dominio e le etichette, sotto il nome. Sono i metadati che le
-   schede non avevano: dove porta il collegamento, e con che cosa è fatto. */
-.sb-story-host {
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.74rem;
-  color: var(--sb-fg-muted);
+.sb-works-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.75rem, 5.5vw, 4rem);
 }
-.sb-story-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
-.sb-story-tags li {
-  font-size: 0.7rem;
-  color: var(--sb-fg-lighter);
-  padding: 0.12rem 0.42rem;
-  border: 1px solid var(--sb-border);
-  background: var(--sb-surface-100);
-  clip-path: var(--sb-shape-xs);
-}
-
-/* ── La finestra di browser delle anteprime (site/SitePreview.tsx) ──────────
-   Stessa barra a tre pallini dei pannelli di codice: il contenuto è la cattura
-   di un sito, quindi la cornice non è un vezzo — è il suo contesto. */
-/* .sb-panel porta height:100%, che qui è la cosa sbagliata: la cornice è un
-   pannello DENTRO un altro pannello, e in una colonna flex si allungava oltre
-   il video lasciando trecento pixel di vuoto bianco sotto la registrazione. */
-.sb-shotframe { height: auto; flex: 0 0 auto; margin-bottom: 0.2rem; }
-.sb-shotframe-inner { height: auto; }
-.sb-shotframe-inner { padding: 0; overflow: hidden; height: auto; }
-.sb-shotframe-bar { border-bottom: 1px solid var(--sb-border); }
-.sb-shotframe-url {
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.7rem;
-  color: var(--sb-fg-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.sb-shotframe-media { display: block; aspect-ratio: 16 / 9; background: var(--sb-surface-200); }
-.sb-shotframe-video,
-.sb-shotframe-img { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* Il ripiego: cornice giusta, glifo del progetto al centro. Si vede finché lo
-   screenshot non esiste, e se un giorno il file sparisce. */
-.sb-shotframe-empty { display: grid; place-items: center; color: var(--sb-fg-muted); }
-/* La scheda grande è alta quanto le due di fianco messe insieme, e quell'altezza
-   va riempita da qualcosa. Provate e scartate, in ordine:
-     · cornice a 16/9 in cima → trecento pixel di buco fra citazione ed etichette;
-     · cornice allungata con `object-fit: cover` → tagliava i fianchi del video,
-       e i fianchi di una cattura di schermo sono testo.
-   Quindi la cornice si allunga e il video ci sta DENTRO intero (`contain`), con le
-   sue bande sopra e sotto: è come lo mostrerebbe un lettore video, e il buco
-   sparisce perché lo spazio se lo prende la cornice invece della citazione. */
 @media (min-width: 1024px) {
-  .sb-story--lead .sb-shotframe { flex: 1 1 auto; min-height: 0; }
-  .sb-story--lead .sb-shotframe-inner { display: flex; flex-direction: column; height: 100%; }
-  .sb-story--lead .sb-shotframe-media { flex: 1 1 auto; aspect-ratio: auto; min-height: 0; }
-  .sb-story--lead .sb-shotframe-video,
-  .sb-story--lead .sb-shotframe-img { object-fit: contain; }
-  .sb-story--lead .sb-story-quote { flex: 0 0 auto; }
+  .sb-works-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.sb-work {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Il testo accanto alla finestra.
+
+   `sb-works-kind` diceva che tipo di sito è — «sito istituzionale», «sito
+   aziendale» — in una targhetta grigia. Adesso dice A CHE PUNTO È, ed è
+   l'etichetta della fascia «lavoro fresco», che da qui sopra è sparita: stessa
+   sagoma, stesso pallino che pulsa, stesso testo nella tinta. Quella fascia
+   diceva una cosa sola e la diceva bene — «questo è appena stato messo
+   online» — ma la diceva a mezzo schermo, e una notizia non può restare in
+   pagina per sempre. Ridotta a etichetta invece che a fascia, la stessa cosa
+   continua a essere vera senza pretendere il posto d'onore.
+
+   Che tipo di sito sia lo dice già la frase sotto, e meglio: «nove pagine di
+   HTML statico» è più informativo di «sito istituzionale». */
+.sb-works-say { display: flex; flex-direction: column; gap: 0.55rem; }
+.sb-works-kind {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--sb-accent-text, var(--sb-brand-text));
+  border: 1px solid var(--sb-border-strong);
+  clip-path: var(--sb-shape-sm);
+  background: var(--sb-shape-edge), color-mix(in srgb, var(--sb-surface-75) 78%, transparent);
+}
+/* Il pallino prende la tinta della scheda, e con lui il suo anello: sb-ping ha
+   l'azzurro scritto dentro la keyframe, e un pallino verde con l'alone azzurro
+   si vede subito. Qui l'anello è la stessa tinta del pallino, presa da
+   --sb-accent — che è la ragione per cui la keyframe è una copia e non un
+   riuso: le keyframe non si riscrivono a metà. */
+.sb-works-kind .sb-chip-dot {
+  background: var(--sb-accent, var(--sb-brand));
+  animation: sb-works-ping 4.2s ease-out infinite;
+}
+@keyframes sb-works-ping {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sb-accent, var(--sb-brand)) 55%, transparent); }
+  70% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--sb-accent, var(--sb-brand)) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sb-accent, var(--sb-brand)) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-works-kind .sb-chip-dot { animation: none; }
+}
+.sb-works-name {
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--sb-fg);
+}
+.sb-works-quote {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--sb-fg-light);
+  max-width: 42ch;
+}
+.sb-works-quote strong { font-weight: 400; color: var(--sb-fg); }
+.sb-works-foot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+  font-size: 0.86rem;
+  color: var(--sb-accent-text, var(--sb-brand-text));
+}
+.sb-works-foot svg { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.sb-work:hover .sb-works-foot svg { transform: translate(3px, -3px); }
+
+/* Il passaggio del puntatore: qui non c'è quasi niente da scrivere, ed è il
+   guadagno di aver fatto della finestra una lastra del sito. Il rim che si
+   accende, l'inclinazione e il riflesso che passa arrivano da .sb-panel--hover
+   come su ogni altra scheda della home; qui si aggiunge solo l'ombra, che si
+   fa più piena — la finestra non si alza, si stacca di più dal piano.
+
+   Il sollevamento in translateY che c'era prima è uscito: la lastra si inclina
+   già sotto il puntatore (site/GlassMotion.tsx le scrive il transform inline),
+   e una regola CSS sullo stesso transform non avrebbe avuto voce in capitolo. */
+@media (hover: hover) and (pointer: fine) {
+  .sb-work:hover .sb-vwm::after { opacity: 0.9; }
+}
+
+/* Qui c'era il blocco «Story-card dei progetti di punta» e, sotto, quello
+   della finestra di browser delle anteprime (.sb-shotframe*, il vestito di
+   site/SitePreview.tsx). Se ne sono andati insieme al componente: il file era
+   usato solo da questa sezione, e la disciplina del video è passata dentro
+   site/VideoWindowMosaic.tsx. */
 
 /* La mappa MapLibre di Rivalta stava qui, in fondo ai progetti in evidenza,
    dove non raccontava niente del lavoro. È passata alla bio, sezione «Based &
@@ -2708,8 +2800,8 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   aspect-ratio: 2 / 1;
   /* Sfuma verso il nulla su tutti i lati: la griglia non ha un bordo, ha una
      fine. -webkit- serve ancora a Safari, che su mask-image non è arrivato. */
-  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 25%, transparent 75%);
-          mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 25%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 80% 70%, #000 25%, transparent 100%);
+          mask-image: radial-gradient(ellipse 70% 80% at 80% 57%, #000 25%, transparent 100%);
 }
 /* Da lg in su il muro esce dal flusso e occupa la metà destra, quella che il
    contenuto ha lasciato libera apposta.

@@ -4219,16 +4219,6 @@
     "fr": "Comment naissent les projets à la une",
     "de": "Wie die vorgestellten Projekte entstehen"
   },
-  "Institutional site": {
-    "it": "Sito istituzionale",
-    "fr": "Site institutionnel",
-    "de": "Institutionelle Website"
-  },
-  "Business site": {
-    "it": "Sito aziendale",
-    "fr": "Site d'entreprise",
-    "de": "Firmen-Website"
-  },
   "Web game": {
     "it": "Gioco web",
     "fr": "Jeu web",
@@ -5099,35 +5089,10 @@
     "fr": "Tout juste en ligne",
     "de": "Gerade veröffentlicht"
   },
-  "is back online": {
-    "it": "è di nuovo online",
-    "fr": "est de nouveau en ligne",
-    "de": "ist wieder online"
-  },
-  "The institutional and tourist site for the village on the Mincio — rebuilt and live again.": {
-    "it": "Il sito istituzionale e turistico del borgo sul Mincio — rifatto e di nuovo online.",
-    "fr": "Le site institutionnel et touristique du village sur le Mincio — refait et de nouveau en ligne.",
-    "de": "Die institutionelle und touristische Website des Dorfes am Mincio — neu gebaut und wieder online."
-  },
-  "Every figure about the village in one place": {
-    "it": "Tutti i dati del paese in un posto solo",
-    "fr": "Toutes les données du village au même endroit",
-    "de": "Alle Daten des Dorfes an einem Ort"
-  },
-  ": services, shops, schools, roads, green areas and events, with geodata from OpenStreetMap and the rest from official sources.": {
-    "it": ": servizi, negozi, scuole, strade, verde ed eventi, con i geodati da OpenStreetMap e il resto da fonti ufficiali.",
-    "fr": " : services, commerces, écoles, routes, espaces verts et événements, avec les géodonnées d'OpenStreetMap et le reste de sources officielles.",
-    "de": ": Dienste, Geschäfte, Schulen, Straßen, Grünflächen und Veranstaltungen, mit Geodaten von OpenStreetMap und dem Rest aus offiziellen Quellen."
-  },
-  "Visit the site": {
-    "it": "Visita il sito",
-    "fr": "Visiter le site",
-    "de": "Zur Website"
-  },
-  "How it's built": {
-    "it": "Com'è fatto",
-    "fr": "Comment il est fait",
-    "de": "Wie es gebaut ist"
+  "Live and maintained": {
+    "it": "Online e seguito",
+    "fr": "En ligne et suivi",
+    "de": "Online und betreut"
   },
   "Screen recording: a scroll through the rivaltasulmincio.it website": {
     "it": "Registrazione dello schermo: una scorsa al sito rivaltasulmincio.it",
@@ -5403,5 +5368,40 @@
     "it": "Costruzioni, Ambiente e Territorio",
     "fr": "Construction, Environnement et Territoire",
     "de": "Bau, Umwelt und Territorium"
+  },
+  "briefed with the client": {
+    "it": "il brief, col cliente",
+    "fr": "le brief, avec le client",
+    "de": "das Briefing, mit dem Kunden"
+  },
+  "written line by line": {
+    "it": "scritto riga per riga",
+    "fr": "écrit ligne par ligne",
+    "de": "Zeile für Zeile geschrieben"
+  },
+  "shipped and kept alive": {
+    "it": "messo online e tenuto in vita",
+    "fr": "mis en ligne et maintenu",
+    "de": "veröffentlicht und am Leben gehalten"
+  },
+  "nine static pages": {
+    "it": "nove pagine statiche",
+    "fr": "neuf pages statiques",
+    "de": "neun statische Seiten"
+  },
+  "zero dependencies": {
+    "it": "zero dipendenze",
+    "fr": "zéro dépendance",
+    "de": "null Abhängigkeiten"
+  },
+  "OpenStreetMap data": {
+    "it": "dati OpenStreetMap",
+    "fr": "données OpenStreetMap",
+    "de": "OpenStreetMap-Daten"
+  },
+  "responsive layout": {
+    "it": "impaginazione responsive",
+    "fr": "mise en page responsive",
+    "de": "responsives Layout"
   }
 }

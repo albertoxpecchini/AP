@@ -199,6 +199,79 @@ export const NowBuilding = memo(function NowBuilding() {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   IL SOPRATITOLO VIVO — la riga in mono sopra a un titolo di sezione
+
+   Tre modi in cui un lavoro nasce, che si danno il cambio. Non è
+   decorazione: è la risposta alla domanda che il titolo sotto pone («come
+   nascono i progetti in evidenza»), data un pezzo alla volta invece che in un
+   paragrafo che nessuno legge.
+
+   La meccanica è quella di NowBuilding e delle targhe delle schede: una riga
+   alla volta nel DOM, che entra da sotto ed esce da sopra, dentro una
+   finestrella con l'overflow nascosto. Con prefers-reduced-motion non gira:
+   resta la prima riga, che è scritta per stare ferma.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Quanto resta ferma una riga del sopratitolo. Più lunga del giro delle
+ *  targhe: questa è una riga che si legge, non un dato che si scorre. */
+const KICK_HOLD = 5200;
+
+const KICKS = ["briefed with the client", "written line by line", "shipped and kept alive"];
+
+export const LiveKicker = memo(function LiveKicker() {
+  const [i, setI] = useState(0);
+  const rowRef = useRef<HTMLSpanElement>(null);
+  const first = useRef(true);
+
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    if (!row || !motionOK()) return;
+
+    let alive = true;
+    let timer = 0;
+
+    if (first.current) first.current = false;
+    else {
+      gsap.fromTo(
+        row,
+        { yPercent: 110, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.42, ease: "power3.out" },
+      );
+    }
+
+    timer = window.setTimeout(() => {
+      if (!alive) return;
+      gsap.to(row, {
+        yPercent: -110,
+        autoAlpha: 0,
+        duration: 0.3,
+        ease: "power2.in",
+        onComplete: () => {
+          if (alive) setI((v) => (v + 1) % KICKS.length);
+        },
+      });
+    }, KICK_HOLD);
+
+    return () => {
+      alive = false;
+      window.clearTimeout(timer);
+      gsap.killTweensOf(row);
+    };
+  }, [i]);
+
+  return (
+    <span className="sb-kick">
+      <i className="sb-kick-dot" aria-hidden="true" />
+      <span className="sb-kick-slot">
+        <span className="sb-kick-row" key={i} ref={rowRef}>
+          {KICKS[i]}
+        </span>
+      </span>
+    </span>
+  );
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
    IL MOSAICO — una griglia di tessere, una sola accesa
 
    Cinque schede, un solo componente. La griglia di tessere è identica per

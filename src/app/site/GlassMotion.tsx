@@ -61,7 +61,7 @@ const TILT_DEG = 5;
 
 /** Cosa è "una card" per il tilt: gli stessi selettori che in home.css hanno
  *  già un hover, così non si inclina niente che non fosse già premibile. */
-const TILTABLE = "a.sb-card, button.sb-card, .sb-page-card, .sb-story, .sb-panel--hover";
+const TILTABLE = "a.sb-card, button.sb-card, .sb-page-card, .sb-panel--hover";
 
 /** Quanto si spostano gli aloni del fondale dietro al puntatore, in percentuale
  *  del loro centro. Pochissimo e lentissimo (vedi PTR_LAG): è la luce della

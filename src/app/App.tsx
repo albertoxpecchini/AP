@@ -47,6 +47,7 @@ import { AuroraBackdrop, ShinyBrandline, SparkGroup } from "./site/homeFx";
 import {
   NowBuilding,
   MosaicCard,
+  LiveKicker,
   CommitWall,
   TrustedDot,
 } from "./site/homeLive";
@@ -55,12 +56,12 @@ import { PROJECTS } from "./site/projects";
 import { LANGS } from "./i18n/langCore";
 import { ArchivioExplorer } from "./archivio/Archivio";
 import WhenVisible from "./site/WhenVisible";
-/* Fascia temporanea: il sito di Rivalta appena tornato online, col video che
-   gira in loop. Si spegne con l'interruttore in cima a site/FreshWork.tsx. */
-import FreshWork from "./site/FreshWork";
-/* La finestra di browser delle schede in evidenza: video, screenshot o ripiego.
-   Vedi il cappello di site/SitePreview.tsx per il perché non riusa FreshWork. */
-import SitePreview from "./site/SitePreview";
+/* La finestra video dei progetti in evidenza, con l’anello di tessere che le
+   gira intorno. Viene dall’artboard «Finestra video mosaico» e ha preso il
+   posto di site/SitePreview.tsx, che era usato solo qui ed è stato cancellato:
+   la disciplina del video (parte a vista, si ferma uscendo, resta fermo con
+   movimento ridotto) è passata dentro al componente nuovo. */
+import VideoWindowMosaic from "./site/VideoWindowMosaic";
 /* Il muro del curriculum, con il suo «Mostra tutto». In un file suo per la
    stessa ragione dello scaffale: lo stato qui rifaceva tutta la home. */
 import CvWall from "./site/CvWall";
@@ -481,18 +482,34 @@ function highlight(code: string, lang: StackEntry["lang"]): ReactNode[] {
   return out;
 }
 
-// ── Story-card dei progetti di punta ────────────────────────────────────────
-// `acc` è la tinta della scheda: da sola ritinge bordo, glifo, piede e alone
-// (blocco «La tavolozza» in home.css). `lead` è la scheda grande, quella che
-// prende il riquadro doppio — ce n'è UNA sola, ed è quella che ha il video.
-// Titolo, indirizzo, etichette e anteprima non si scrivono qui: si leggono da
-// PROJECTS, che resta la fonte unica di verità.
-const STORIES: { id: string; kind: string; acc: string; lead?: boolean; quote: ReactNode }[] = [
+// ── I progetti in evidenza ──────────────────────────────────────────────────
+// Due, e sono i due siti fatti per clienti veri. `acc` è la tinta: da sola
+// ritinge il campo di tessere, il caret e l'etichetta (blocco «La tavolozza»
+// in home.css). Titolo, indirizzo e anteprima non si scrivono qui — si leggono
+// da PROJECTS, che resta la fonte unica di verità.
+//
+// `kind` non dice più che tipo di sito è ma A CHE PUNTO È, ed è quel che resta
+// della fascia «lavoro fresco» che stava più in su: quella diceva a mezzo
+// schermo che rivaltasulmincio.it era appena tornato online, e una notizia
+// tenuta in pagina invecchia. Ridotta a etichetta, la stessa cosa continua a
+// essere vera. Che tipo di sito sia lo dice già `quote`, e con più sostanza.
+//
+// `lines` sono le righe che girano nel piede della finestra, ed è la parte
+// VIVA del testo: tre dati a testa, e ognuno è un fatto verificabile, non un
+// aggettivo. Una riga che gira per dire tre volte «bello» è un fastidio; una
+// che gira per dire «nove pagine», «zero dipendenze», «dati OpenStreetMap» è
+// una scheda tecnica che si legge da sola.
+const STORIES: {
+  id: string;
+  kind: string;
+  acc: string;
+  quote: ReactNode;
+  lines: string[];
+}[] = [
   {
     id: "rivalta",
-    kind: "Institutional site",
+    kind: "Just shipped",
     acc: "verde",
-    lead: true,
     // La copy precedente descriveva la versione vecchia del sito (bento grid,
     // GSAP ScrollTrigger, Next.js). Quello online adesso è l'opposto: nove
     // pagine di HTML statico, e i numeri del paese non sono affermazioni ma un
@@ -503,10 +520,11 @@ const STORIES: { id: string; kind: string; acc: string; lead?: boolean; quote: R
         <strong>every number backed by a dataset</strong> anyone can download.
       </>
     ),
+    lines: ["nine static pages", "zero dependencies", "OpenStreetMap data"],
   },
   {
     id: "cascina-fontana",
-    kind: "Business site",
+    kind: "Live and maintained",
     acc: "ambra",
     quote: (
       <>
@@ -514,18 +532,12 @@ const STORIES: { id: string; kind: string; acc: string; lead?: boolean; quote: R
         <strong>with the client, for the client</strong> — from brief to launch.
       </>
     ),
+    lines: ["React and TypeScript", "responsive layout", "from brief to launch"],
   },
-  {
-    id: "instagram",
-    kind: "Web tool",
-    acc: "viola",
-    quote: (
-      <>
-        Who doesn't follow you back, computed{" "}
-        <strong>entirely in your browser</strong> — nothing uploaded, nothing stored.
-      </>
-    ),
-  },
+  // /instagram («Compare Two Lists») stava qui come terza scheda. È uscito: è
+  // uno strumento, non un progetto commissionato, e questa sezione racconta
+  // COME NASCONO i lavori per i clienti. Resta nell'archivio, dove sta con gli
+  // altri strumenti.
 ];
 
 // La mappa di Rivalta stava qui sotto, in coda ai progetti in evidenza. È
@@ -978,13 +990,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* Fascia «lavoro fresco» — temporanea. Stava sopra la griglia, cioè
-            fra la hero e i progetti: mezzo schermo su UN cliente prima ancora
-            di aver fatto vedere il resto. Adesso arriva subito dopo la riga
-            dei clienti, che è il posto dove uno dei due nomi appena letti si
-            apre e si muove. Vedi site/FreshWork.tsx per l'interruttore che la
-            spegne. */}
-        <FreshWork />
+        {/* Qui stava la fascia «lavoro fresco»: mezzo schermo per dire che
+            rivaltasulmincio.it era tornato online, col video del sito che
+            girava in loop. Era vera quando è stata scritta, e una notizia che
+            resta in pagina diventa una notizia vecchia. Il sito non è sparito:
+            sta qui sotto, fra i progetti in evidenza, che è il posto dove le
+            cose durano. Il componente e il suo foglio sono stati cancellati; i
+            video no, li usa l'anteprima. */}
 
         {/* Story-card dei progetti di punta — spostata qui, subito dopo la
             fascia «lavoro fresco»: griglia (cosa faccio) → terminale clienti e
@@ -992,54 +1004,79 @@ export default function App() {
             siti veri). Prima stava all'80% dello scroll, dopo archivio, stack
             e scaffale — cioè il blocco che vende di più era l'ultimo a
             comparire. */}
-        <section id="lavori" className="sb-section" aria-label="Featured work" data-acc="verde">
+        {/* ③ I progetti in evidenza.
+
+             Com'era: tre story-card affiancate, ognuna con una miniatura del
+             sito, un titolo, un indirizzo, una citazione e tre etichette. Il
+             risultato era una griglia di riquadri parlanti in cui l'anteprima —
+             cioè la sola cosa che dimostra qualcosa — era il pezzo più piccolo.
+
+             Com'è: DUE finestre grandi, una per cliente vero, e l'anteprima è
+             la sezione. Ognuna poggia su un campo di tessere della tinta da cui
+             sbuca sui quattro lati: è il vocabolario delle cinque schede della
+             griglia prodotti — tessere, una tinta sola — portato su un oggetto
+             diverso, così le due sezioni si leggono come due capitoli e non
+             come due siti. Il campo è fermo, e la finestra è una lastra come
+             tutte le altre della pagina: il mosaico qui fa da pavimento, non
+             da cornice.
+
+             Il movimento è tutto nel testo, tranne una banda che attraversa il
+             video una volta per giro. Il sopratitolo della sezione gira sui tre
+             modi in cui un lavoro nasce; il piede di ogni finestra gira su tre
+             dati veri di quel progetto. */}
+        <section id="lavori" className="sb-section sb-works" aria-label="Featured work" data-acc="verde">
           <div className="sb-container">
-            <div className="sb-splithead">
-              <h3>How the featured projects are built</h3>
+            <div className="sb-works-head">
+              <div className="sb-works-title">
+                <LiveKicker />
+                {/* Il titolo prende la banda di luce delle brandline: è la
+                    stessa che passa su «Surveyor & Website Developer» nella
+                    hero e su «Let's talk.» nella CTA, e la porta il puntatore —
+                    attraversi la pagina e la riga si illumina al tuo passaggio. */}
+                <h3><ShinyBrandline text="How the featured projects are built" /></h3>
+              </div>
               <Link to="/archivio" className="sb-btn sb-btn--sm sb-btn--secondary">More in the archive</Link>
             </div>
-            <div className="sb-stories">
-              {STORIES.map((s) => {
+
+            <div className="sb-works-grid">
+              {STORIES.map((s, i) => {
                 const p = projectByI(s.id);
                 if (!p) return null;
                 const external = !p.url.startsWith("/");
                 // L'indirizzo com'è scritto sulla barra: senza schema per i
                 // siti veri, com'è per le pagine di casa.
                 const host = external ? p.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : p.url;
-                const cls = `sb-story${s.lead ? " sb-story--lead" : ""}`;
                 const inner = (
-                  <div className="sb-panel">
-                    <div className="sb-panel-inner sb-story-inner">
-                      <SitePreview
-                        label={host}
-                        video={p.previewVideo}
-                        poster={p.previewPoster}
-                        img={p.previewImg}
-                        thumb={p.thumb}
-                        alt={
-                          p.previewVideo
-                            ? `Screen recording: a scroll through the ${p.title} website`
-                            : `Screenshot of ${p.title}`
-                        }
-                      />
-                      <div className="sb-story-top">
-                        <span className="sb-story-name" translate="no">{p.title}</span>
-                        <span className="sb-story-kind">{s.kind}</span>
-                      </div>
-                      <span className="sb-story-host" data-no-i18n translate="no">{host}</span>
-                      <p className="sb-story-quote">{s.quote}</p>
-                      {p.tags && (
-                        <ul className="sb-story-tags" data-no-i18n translate="no">
-                          {p.tags.slice(0, 3).map((t) => (
-                            <li key={t}>{t}</li>
-                          ))}
-                        </ul>
-                      )}
-                      <span className="sb-story-foot">
+                  <>
+                    <VideoWindowMosaic
+                      src={p.previewVideo}
+                      poster={p.previewPoster}
+                      img={p.previewImg}
+                      thumb={p.thumb}
+                      url={host}
+                      lines={s.lines}
+                      alt={
+                        p.previewVideo
+                          ? `Screen recording: a scroll through the ${p.title} website`
+                          : `Screenshot of ${p.title}`
+                      }
+                      loop={11}
+                      // Mezzo giro di scarto fra le due: due finestre che
+                      // pulsano all'unisono sono una finestra sola grande.
+                      phase={i * 0.5}
+                    />
+                    <div className="sb-works-say">
+                      <span className="sb-works-kind">
+                        <i className="sb-chip-dot sb-chip-dot--sm" aria-hidden="true" />
+                        {s.kind}
+                      </span>
+                      <span className="sb-works-name" translate="no">{p.title}</span>
+                      <p className="sb-works-quote">{s.quote}</p>
+                      <span className="sb-works-foot">
                         Open the project {external ? <IcExternal size={14} /> : <IcArrowRight size={14} />}
                       </span>
                     </div>
-                  </div>
+                  </>
                 );
                 return external ? (
                   <a
@@ -1047,19 +1084,18 @@ export default function App() {
                     href={p.url}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className={cls}
+                    className="sb-work"
                     data-acc={s.acc}
                   >
                     {inner}
                   </a>
                 ) : (
-                  <Link key={s.id} to={p.url} className={cls} data-acc={s.acc}>
+                  <Link key={s.id} to={p.url} className="sb-work" data-acc={s.acc}>
                     {inner}
                   </Link>
                 );
               })}
             </div>
-
           </div>
         </section>
 
