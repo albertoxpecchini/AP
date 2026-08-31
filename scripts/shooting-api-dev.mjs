@@ -6,8 +6,7 @@
 //   /scatti-privati/w/<file>.webp    le versioni rimpicciolite (foto/shooting/.web/)
 //   /scatti-privati/o/<cart>/<file>  l'originale, non ricodificato
 //
-// Stesso principio di scripts/janitor/api-dev.mjs: tutto vive dentro
-// `configureServer`, l'aggancio che gira SOLO con `vite dev`. In `vite build`
+// Tutto vive dentro `configureServer`, l'aggancio che gira SOLO con `vite dev`. In `vite build`
 // questo modulo non viene nemmeno chiamato, quindi sul sito pubblicato quelle
 // tre rotte non sono "protette": non ci sono. E le immagini che servirebbero
 // stanno in foto/, che è in .gitignore e non viene copiata in dist/ da niente.

@@ -11,7 +11,6 @@ import { chapterCoverageFrom } from "./questionStats";
 import type { ProgressMap } from "./progressApi";
 import { ShinyBrandline, SparkGroup } from "../site/homeFx";
 import { iconForChapter } from "./chapterIcons";
-import { TRIVIA_VERSION } from "./version";
 import type { QType } from "./parseTrivia";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -143,7 +142,7 @@ export default function TriviaMenu({
         <section className="sb-container sb-tv-hero">
           <span className="sb-tv-eyebrow">
             <IcBrain size={14} />
-            <span translate="no" data-no-i18n>Trivia v{TRIVIA_VERSION}</span>
+            <span translate="no" data-no-i18n>Trivia</span>
           </span>
           <h1 className="sb-hero-title">
             <span translate="no">Trivia</span>
@@ -172,8 +171,6 @@ export default function TriviaMenu({
       <section className="sb-container sb-tv-hero">
         <span className="sb-tv-eyebrow">
           <IcBrain size={14} />
-          <span translate="no" data-no-i18n>Trivia v{TRIVIA_VERSION}</span>
-          <span data-no-i18n>·</span>
           <span>gioco gratuito</span>
         </span>
         <div className="sb-hero-grid">

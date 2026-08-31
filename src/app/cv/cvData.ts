@@ -1,10 +1,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // I dati del curriculum — UNA sola fonte di verità per le quattro lingue.
 //
-// I quattro JSON in cv/data/ sono gli stessi file che legge anche
-// scripts/build-cv.py: la pagina /cv e il PDF generato dallo script raccontano
-// quindi sempre le stesse cose. Qui i JSON vengono solo tipizzati e messi in
-// una mappa per lingua.
+// I quattro JSON in cv/data/ sono la fonte di tutto: qui vengono solo
+// tipizzati e messi in una mappa per lingua. I PDF statici in public/ si
+// stampano dalla pagina /cv, quindi vanno rifatti a ogni modifica di questi
+// file.
 //
 // Attenzione: questi contenuti sono GIÀ scritti in quattro lingue, quindi la
 // pagina li marca `data-no-i18n` — il motore di traduzione del DOM

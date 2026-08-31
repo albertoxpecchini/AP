@@ -45,15 +45,6 @@ foto/**
 !foto/*/
 !foto/*/LEGGIMI.md
 
-# Quarantena e storico del programma di pulizia
-.janitor/
-
-# File che scripts/janitor/autotest.mjs pianta nel repo per verificare cosa
-# decide l'analisi. Li toglie da sé, ma se il processo viene ucciso a metà —
-# su Windows non gira nemmeno il `finally` — resterebbero lì: ignorati, non
-# possono finire in un commit per sbaglio. (È già successo.)
-__prova-janitor-*
-
 # Copie di sicurezza del libro dei donatori (scripts/sostieni-libro.mjs --reset).
 # Dentro ci sono nomi e messaggi di persone: restano sul disco, non nel repo.
 .backup-donatori-*.json

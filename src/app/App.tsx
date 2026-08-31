@@ -1312,8 +1312,7 @@ export default function App() {
                   mobile. Montato all'ingresso in scena e non prima: sono 1.100
                   rect, e l'accensione a cascata deve partire quando la sezione
                   si vede, non mentre è ancora due schermate più giù. Margine 0
-                  perché qui non c'è niente da precaricare — a differenza del
-                  garage 3D, che è il caso per cui WhenVisible era nato. */}
+                  perché qui non c'è niente da precaricare. */}
               <WhenVisible className="sb-cwall-wrap" rootMargin="0px">
                 <CommitWall />
               </WhenVisible>

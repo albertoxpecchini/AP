@@ -48,7 +48,7 @@ export const GRUPPI: Gruppo[] = [
         cmd: "npm run dev",
         breve: "Accende il server di sviluppo su localhost:5173 — e sulla rete di casa.",
         dettaglio:
-          "Vite con l'aggiornamento a caldo, più tutto quello che esiste SOLO qui: gli endpoint /api/*, l'officina /cleaning e le foto degli shooting su /scatti-privati/*. Vivono dentro configureServer, l'aggancio che gira solo in sviluppo — sul sito pubblicato quelle rotte non sono protette, non ci sono proprio.",
+          "Vite con l'aggiornamento a caldo, più tutto quello che esiste SOLO qui: gli endpoint /api/* e le foto degli shooting su /scatti-privati/*. Vivono dentro configureServer, l'aggancio che gira solo in sviluppo — sul sito pubblicato quelle rotte non sono protette, non ci sono proprio.",
         file: "vite.config.ts",
         nota: "Vite ascolta su tutte le interfacce (host: true): all'avvio stampa anche un indirizzo 10.x.x.x da aprire dal telefono, purché sotto lo stesso Wi-Fi e con la porta 5173 aperta nel firewall. Prima parte il predev, che rifà i pacchetti i18n. La porta è fissa (strictPort), quindi un secondo vite sulla stessa porta fallisce invece di scivolare sulla 5174.",
       },
@@ -56,7 +56,7 @@ export const GRUPPI: Gruppo[] = [
         cmd: "npm run build",
         breve: "Costruisce il sito statico in dist/.",
         dettaglio:
-          "È lo stesso comando che gira su Vercel a ogni push su main. Prima di vite build parte il prebuild, che rifà quattro cose in fila: il numero di versione di Trivia, gli ZIP dell'archivio, la fotografia del repository e i pacchetti di traduzione.",
+          "È lo stesso comando che gira su Vercel a ogni push su main. Prima di vite build parte il prebuild, che rifà quattro cose in fila: l'elenco dei commit, gli ZIP dell'archivio, la fotografia del repository e i pacchetti di traduzione.",
         file: "vite.config.ts",
         esce: ["dist/"],
       },
@@ -64,7 +64,7 @@ export const GRUPPI: Gruppo[] = [
         cmd: "npm run preview",
         breve: "Serve la dist/ già costruita, senza niente di sviluppo intorno.",
         dettaglio:
-          "La cosa più vicina al sito pubblicato che si possa aprire in casa: nessun middleware, nessun /api, nessuna officina. Se una pagina funziona in dev e si rompe qui, il colpevole è quasi sempre qualcosa che esisteva solo grazie al server di sviluppo.",
+          "La cosa più vicina al sito pubblicato che si possa aprire in casa: nessun middleware, nessun /api. Se una pagina funziona in dev e si rompe qui, il colpevole è quasi sempre qualcosa che esisteva solo grazie al server di sviluppo.",
       },
     ],
   },
@@ -100,15 +100,6 @@ export const GRUPPI: Gruppo[] = [
         file: "scripts/build-i18n.mjs",
         esce: ["src/app/i18n/generated/<lingua>.json"],
         nota: "La cartella generata è rigenerabile e sta in .gitignore. Il dizionario sorgente non si tocca: resta lui la fonte unica.",
-      },
-      {
-        cmd: "node scripts/build-trivia-version.mjs",
-        breve: "Ricalcola il numero di versione di Trivia, ma solo dove la storia git è intera.",
-        dettaglio:
-          "La versione è «1.<commit che hanno toccato Trivia>». Vercel però clona in shallow, e lì lo stesso codice diceva v1.2 mentre in locale diceva v1.56: quel numero misurava la profondità del clone, non il gioco. Così il conteggio si fa solo quando la storia c'è tutta, si scrive in un file versionato, e il builder usa il valore arrivato col checkout.",
-        file: "scripts/build-trivia-version.mjs",
-        esce: ["src/app/trivia/version.json"],
-        nota: "Non ha un alias npm perché non serve: gira da solo sia nel prebuild che nel predev.",
       },
     ],
   },
@@ -167,105 +158,6 @@ export const GRUPPI: Gruppo[] = [
         ],
         nota: "Non scrive niente e non tocca nessun file: è un rapporto, si può rilanciare mentre le foto stanno ancora arrivando.",
       },
-      {
-        cmd: "node scripts/build-cars.mjs <cartella>",
-        breve: "Rimette i tre modelli 3D del garage in un formato che il browser apre.",
-        dettaglio:
-          "Un FBX binario e due OBJ diventano geometria binaria e texture WebP: stessi vertici, stesse normali, stesse UV, stessi materiali. Non si semplifica e non si ricolora niente — cambiano solo i contenitori. L'unica cosa che il modello si prende dallo script è la posa in scena: centrato, appoggiato a terra, muso in avanti, alla sua lunghezza vera in metri.",
-        file: "scripts/build-cars.mjs",
-        esce: ["public/models/"],
-        nota: "I modelli sorgente non stanno nel repository: la cartella si passa come argomento.",
-      },
-    ],
-  },
-
-  // ── Pulizia e benchmark ────────────────────────────────────────────────────
-  {
-    id: "pulizia",
-    titolo: "Pulizia e benchmark",
-    intro:
-      "Un programma locale che toglie il peso morto dal repository e deve dimostrare di non aver rotto niente. Non cancella: mette in quarantena, ricostruisce, misura con un browser vero, e se qualcosa peggiora rimette tutto a posto da solo.",
-    voci: [
-      {
-        cmd: "npm run pulizia",
-        breve: "Cerca lo sporco e misura, senza toccare niente.",
-        dettaglio:
-          "Sei categorie, in ordine di quanto è sicuro toccarle: file rigenerabili, moduli in src/ che nessuno importa, asset in public/ che nessun testo nomina, dipendenze mai importate, duplicati esatti e roba di git. La regola che tiene insieme tutto è che nel dubbio non è sporco: ogni candidato deve superare due prove indipendenti, e chi viene nominato in modo dinamico è protetto in blocco.",
-        file: "scripts/janitor/pulisci.mjs",
-        opzioni: [
-          ["-- --niente-bench", "salta il benchmark e riferisce e basta"],
-          ["-- --rami", "guarda anche i rami git già confluiti in main"],
-          ["-- --tutto", "conta come sporco anche gli inventari che rifà il prebuild"],
-        ],
-      },
-      {
-        cmd: "npm run pulizia:applica",
-        breve: "Pulisce, verifica, e se qualcosa peggiora annulla da solo.",
-        dettaglio:
-          "L'ordine è tutto: si misura prima, si mette in quarantena, si ricostruisce, si misura dopo. Se la build fallisce, o compare un 404 che prima non c'era, o un errore in console che prima non c'era, tutto quello che era stato messo da parte torna al suo posto. Il caso peggiore di un'esecuzione senza sorveglianza è un log che dice «annullato».",
-        file: "scripts/janitor/pulisci.mjs",
-        opzioni: [
-          ["-- --headless", "finestra del browser invisibile"],
-          ["-- --pagine /,/trivia", "misura solo queste pagine"],
-          ["-- --ripetizioni 2", "quante passate per pagina (predefinito 3, si tiene la mediana)"],
-        ],
-        nota: "Niente viene cancellato: quello che sembra inutile finisce in .janitor/quarantena/<data>/ coi percorsi originali intatti, e si svuota per davvero solo dopo due settimane di sito funzionante.",
-      },
-      {
-        cmd: "npm run pulizia:elenco",
-        breve: "Le quarantene che esistono in questo momento.",
-        dettaglio:
-          "Cosa è stato messo da parte, quando, e quanto pesa. Serve a decidere se c'è qualcosa da riprendere prima che venga svuotata per davvero.",
-        file: "scripts/janitor/pulisci.mjs",
-      },
-      {
-        cmd: "npm run pulizia:ripristina",
-        breve: "Rimette a posto l'ultima quarantena.",
-        dettaglio:
-          "Il ripristino automatico scatta da solo quando la verifica va male; questo è quello a mano, per quando ci si accorge dopo che serviva qualcosa. I percorsi originali sono conservati, quindi ogni file torna esattamente da dove era stato preso.",
-        file: "scripts/janitor/pulisci.mjs",
-      },
-      {
-        cmd: "npm run pulizia:prove",
-        breve: "Le prove di sicurezza del programma di pulizia.",
-        dettaglio:
-          "Un programma che porta via roba da solo ogni due giorni deve poter dimostrare che sa quello che fa: qui si piantano file veri nel repository, si guarda cosa decide l'analisi, e poi si rimette tutto com'era. Le prove non sono simmetriche di proposito — due controllano che lo sporco venga trovato, le altre due, più importanti, che il pulito non venga toccato.",
-        file: "scripts/janitor/autotest.mjs",
-      },
-      {
-        cmd: "npm run bench",
-        breve: "Solo benchmark: costruisce, misura i fotogrammi, confronta con l'ultima volta.",
-        dettaglio:
-          "Un browser vero (Edge, parlato direttamente via Chrome DevTools Protocol: zero dipendenze aggiunte) apre le pagine costruite, le scorre tutte giù e tutte su e cronometra ogni fotogramma. Si misura due volte, a piena potenza e con la CPU quattro volte più lenta: senza freno la misura satura — una pagina vuota segna gli stessi fps di una pagina piena — ed è la passata frenata l'unica che sappia distinguere un peggioramento.",
-        file: "scripts/janitor/bench-cli.mjs",
-        esce: [".janitor/bench/"],
-        opzioni: [
-          ["-- --veloce", "salta la build e misura la dist che c'è"],
-          ["-- --headless", "finestra invisibile, come nel compito pianificato"],
-          ["-- --pagine /,/trivia", "misura solo queste pagine"],
-          ["-- --ripetizioni 5", "quante passate per pagina"],
-        ],
-      },
-      {
-        cmd: "pulizia",
-        breve: "La stessa cosa dal Prompt dei comandi, senza il -- di npm.",
-        dettaglio:
-          "Alla radice del repository c'è un file .cmd che fa da porta d'ingresso unica: pulizia, pulizia applica, pulizia bench, pulizia prove, pulizia elenco, pulizia ripristina, e pulizia pianifica · togli · stato per il compito automatico. Quello che si scrive in più passa dritto al programma, e un'opzione da sola vale come analisi — quindi «pulizia --niente-bench» fa la cosa che ci si aspetta. Il codice di uscita si propaga, così si può incatenare.",
-        file: "pulizia.cmd",
-      },
-      {
-        cmd: "powershell -ExecutionPolicy Bypass -File scripts\\janitor\\pianifica.ps1",
-        breve: "Registra il compito che fa la pulizia da solo ogni due giorni.",
-        dettaglio:
-          "Compito dell'utente, non di sistema: niente diritti di amministratore, niente password da conservare. Finestra del browser invisibile e log in .janitor/log/, di cui si tengono gli ultimi venti. Se il computer era spento a quell'ora, recupera al primo avvio utile.",
-        file: "scripts/janitor/pianifica.ps1",
-        opzioni: [
-          ["-Ora 09:30", "a un'altra ora (predefinito 13:00)"],
-          ["-Stato", "quando ha girato e quando girerà"],
-          ["-Rimuovi", "toglie il compito"],
-        ],
-        nota: "I numeri di un'esecuzione automatica non sono confrontabili con quelli di npm run bench lanciato a mano: l'Utilità di pianificazione fa girare i compiti a priorità ridotta. Il confronto prima/dopo dentro la stessa esecuzione resta valido, ed è quello che decide se la pulizia si tiene.",
-      },
     ],
   },
 
@@ -276,18 +168,6 @@ export const GRUPPI: Gruppo[] = [
     intro:
       "Comandi che si lanciano poche volte l'anno, o una volta sola. Stanno qui perché quando servono non ci si ricorda mai come si scrivevano.",
     voci: [
-      {
-        cmd: "python3 scripts/build-cv.py",
-        breve: "Rigenera i PDF statici del curriculum, uno per lingua.",
-        dettaglio:
-          "Legge gli stessi JSON che alimentano la pagina /cv e ne stampa un PDF per lingua, con la stessa pelle del sito. Il curriculum «vivo» resta la pagina, che stampa sé stessa: questi PDF esistono per i link storici e per l'archivio, e per mandarli a mano in una candidatura.",
-        file: "scripts/build-cv.py",
-        esce: ["public/cv-alberto-pecchini-<lingua>.pdf"],
-        opzioni: [
-          ["python3 scripts/build-cv.py it en", "solo alcune lingue (predefinito: tutte e quattro)"],
-        ],
-        nota: "Serve Python con WeasyPrint e il font Ubuntu installato a sistema. È l'unico comando del progetto che non è né Node né npm.",
-      },
       {
         cmd: "node scripts/anteprima-email.mjs",
         breve: "Fa vedere tutte le email del sito senza spedirne nessuna.",
@@ -305,34 +185,6 @@ export const GRUPPI: Gruppo[] = [
         file: "scripts/make-link.mjs",
         opzioni: [["--days 14", "quanto dura prima di scadere (predefinito 7 giorni)"]],
         nota: "Le chiavi vivono in un .env locale, non versionato.",
-      },
-      {
-        cmd: "node scripts/seed-online-profile.mjs",
-        breve: "Pianta un profilo giocatore finto su Supabase, per provare Trivia.",
-        dettaglio:
-          "Usa le stesse identiche chiamate del client — lo stesso upsert, gli stessi insert, la stessa funzione per la pagella — così quello che si vede provando è quello che vedrebbe un giocatore vero. L'identificativo lo assegna il database e viene stampato a fine corsa.",
-        file: "scripts/seed-online-profile.mjs",
-        opzioni: [
-          ["--url … --key …", "indirizzo e chiave pubblica, se non sono già nel .env"],
-          ["--dry", "stampa cosa scriverebbe, senza toccare il database"],
-        ],
-        nota: "La chiave pubblica non può cancellare: per rimuovere il profilo di prova, lo script stampa in fondo l'SQL da incollare nel pannello.",
-      },
-      {
-        cmd: "scripts/seed-local-profile.js",
-        breve: "Lo stesso profilo finto, ma tutto dentro il browser.",
-        dettaglio:
-          "Non è un comando da terminale: si apre il sito, F12, si incolla tutto il file nella console e si ricarica. Riempie le chiavi di localStorage che il gioco usa quando Supabase non è configurato — la modalità «solo locale». Per annullare, le cinque chiavi da togliere sono stampate in fondo.",
-        file: "scripts/seed-local-profile.js",
-        fuoriDalTerminale: true,
-      },
-      {
-        cmd: "node scripts/ensure-dev-server.mjs",
-        breve: "Accende il server di sviluppo solo se non è già acceso.",
-        dettaglio:
-          "Non si lancia a mano quasi mai: è l'attività che parte con F5 in VS Code, prima che il debugger apra Edge. Se il server è già su da una sessione precedente lo riusa invece di riavviarlo — con la porta fissa, un secondo vite morirebbe subito con EADDRINUSE.",
-        file: "scripts/ensure-dev-server.mjs",
-        fuoriDalTerminale: true,
       },
     ],
   },

@@ -50,9 +50,9 @@ e tema chiaro/scuro nativo.
 | Dominio | Valore | Dettaglio |
 | :--- | :--- | :--- |
 | **Codebase** | **~41,9k LOC** in `src/` | 123 file versionati: 52 `.tsx` (24,3k) · 37 `.ts` (6,1k) · 27 `.css` (11,5k) |
-| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 8 funzioni `api/` + `lib/` (185) · `scripts/` (4,9k, di cui 2,6k il programma di pulizia) |
+| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 8 funzioni `api/` + `lib/` (185) · `scripts/` (2,3k) |
 | **Dipendenze** | **11 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
-| **Pagine** | **14 rotte** | 1 hub + 13 pagine `React.lazy`, code-split per rotta · `/cleaning` esiste **solo** in dev · `/shooting` è pubblica ma le sue foto no |
+| **Pagine** | **13 rotte** | 1 hub + 12 pagine `React.lazy`, code-split per rotta · `/shooting` è pubblica ma le sue foto no |
 | **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
 | **Serverless** | **8 funzioni** in `api/` | notify · festa-rsvp · sponsor · ig-stats · scatti-richiesta · scatti-accesso · d · cron |
@@ -195,7 +195,7 @@ I redirect `www → sottodominio` sono in [`vercel.json`](vercel.json).
 
 | Rotta | Sottodominio | Pagina | Cosa fa |
 | :--- | :--- | :--- | :--- |
-| `/` | `www` | **Home / hub** | Vetrina «piattaforma»: hero, prodotti, archivio incorporato, stack, pagine, lavori, curriculum, garage 3D, open source, contatti |
+| `/` | `www` | **Home / hub** | Vetrina «piattaforma»: hero, prodotti, archivio incorporato, stack, pagine, lavori, curriculum, open source, contatti |
 | `/bio` | `bio` | **Bio** | Pagina About: gallery + fatti essenziali |
 | `/cv` | _(solo path)_ | **CV** | Il curriculum come pagina, nelle 4 lingue — e **stampa sé stessa**: nessun PDF da servire |
 | `/trivia` | `trivia` | **Trivia** | Quiz sulla storia dell'architettura — 1003 domande, leaderboard, foto pertinenti |
@@ -210,9 +210,7 @@ I redirect `www → sottodominio` sono in [`vercel.json`](vercel.json).
 | `/sostieni` | `sostieni` | **Sostieni** | Dati bonifico + libro firme dei donatori |
 | `/instagram` | _(solo path)_ | **Compare Two Lists** | «Chi ti ha tolto il follow» — confronto di due liste, tutto in locale |
 
-I **sottodomini sono nove**: le pagine senza sottodominio restano a path sotto `www`. C'è poi una
-quindicesima rotta, `/cleaning`, che **esiste solo in sviluppo** — vedi
-[l'officina](#cleaning--lofficina-in-pagina).
+I **sottodomini sono nove**: le pagine senza sottodominio restano a path sotto `www`.
 
 `/shooting` è pubblica, ma le sue foto no: le immagini stanno in `foto/shooting/`, fuori dal repo, e
 l'unico indirizzo che le serve vive dentro `configureServer` — cioè solo sotto `vite dev`. Chi apre
@@ -272,50 +270,12 @@ nessun codice da toccare, nessun registro da aggiornare.
 - **40 capitoli** ordinati dal campo `ordine:` (fallback alfabetico).
 - **1003 domande** tipizzate: `multipla` (401), `vero-falso` (401), `aperta` (201), ognuna con
   spiegazione facoltativa, sinonimi accettati (`accetta:`) e foto.
-- **Versionamento automatico, ma versionato** — la versione è `1.<numero di commit che hanno toccato
-  src/app/trivia/>`, e il conteggio lo fa git. Git da solo però non basta: Vercel clona in
-  **shallow**, e su un clone troncato `git rev-list --count` conta solo quel che ha sotto mano —
-  lo stesso identico codice diceva `v1.56` in locale e `v1.2` in produzione. Quel numero misurava la
-  profondità del clone, non il gioco. Ora il conteggio è un **dato committato**
-  ([`version.json`](src/app/trivia/version.json)): [`build-trivia-version.mjs`](scripts/build-trivia-version.mjs)
-  lo ricalcola solo dove la storia è intera (la macchina di sviluppo) e lo riscrive solo se è
-  cresciuto; il builder usa il valore arrivato col checkout, e
-  [`vite.config.ts`](vite.config.ts) lo inietta come `__TRIVIA_VERSION__`.
 - **Foto pertinenti, a licenza libera** — [`photos.ts`](src/app/trivia/photos.ts) cerca un'immagine
   per la domanda in cascata (Wikipedia IT → EN, poi Wikimedia Commons, poi Openverse), con cache in
   `sessionStorage`, prefetch della domanda successiva e ripiego silenzioso su una card grafica: la
   ricerca non può mai far aspettare il gioco.
 - Punteggio con bonus velocità, serie con trofei, voto finale in stile americano (A–F), pagelle e
   classifica **live** (Supabase Realtime, con fallback `localStorage`).
-
----
-
-## 🚗 Il garage — tre auto vere in WebGL, senza three.js
-
-In fondo alla home (`#garage`) ci sono tre modelli 3D che si girano col dito: Aventador LP 700-4,
-Alfa Romeo 4C, Audi R8 V10. Sono i modelli **come sono** — stessa geometria, stessi materiali,
-stesse texture, stessi colori dei file di partenza (131 000 triangoli per l'Aventador, interni e
-motore compresi, e trenta texture in tutto). Niente è stato semplificato o ricolorato.
-
-- [`scripts/build-cars.mjs`](scripts/build-cars.mjs) cambia solo i **contenitori**: la geometria da
-  testo (`v 1.234 5.678`) a interi binari — i tipi che WebGL vuole nei suoi buffer, quindi il file si
-  carica così com'è — e le texture da PNG a WebP. I sorgenti (30 MB, modelli di terzi) **non stanno
-  nel repository**; il risultato sì: `public/models/cars.bin` + `tex/`, con provenienza e licenze in
-  `public/models/README.md`.
-- **Niente three.js** — servirebbe un decimo della libreria (una mesh statica, una luce, nessuna
-  ombra, nessun materiale PBR) e costerebbe 160 kB gzip, più di tutta la home.
-  [`site/dreamCars.tsx`](src/app/site/dreamCars.tsx) ne pesa sei: due shader, un buffer per
-  attributo, una texture per materiale, un `drawElements` per tratto di indici.
-- Le tre cose che un visualizzatore del genere deve fare bene: il **buffer di profondità** (su un
-  modello vero le cose si compenetrano dappertutto — il cerchio dentro la gomma, lo specchietto
-  contro il montante — e un ordine giusto delle facce semplicemente non esiste: deve decidere il
-  pixel); i **materiali trasparenti dipinti dopo gli opachi e senza scrivere in profondità**, o il
-  parabrezza nasconde l'abitacolo; la **ripetizione delle texture** (le UV delle gomme arrivano a 60:
-  senza `REPEAT` il battistrada diventa una striscia stirata — da cui le texture in potenze di due).
-- La rotazione è una **matrice moltiplicata a sinistra** dallo spostamento del dito letto negli assi
-  della camera, non due angoli sommati: quelli si incastrano ai poli. Comunque sia messa l'auto,
-  trascinare a destra la fa girare verso destra. Da fermo il ciclo di rendering è **spento**, e tutto
-  si scarica solo quando la sezione si avvicina (`WhenVisible`).
 
 ---
 
@@ -394,23 +354,17 @@ AP/
 ├── content/trivia/           # 40 capitoli .md → fonte unica delle domande Trivia
 ├── email/                    # modello email HTML (le bozze NON si committano)
 ├── lib/serverSecurity.ts     # helper condivisi: origin check, rate-limit, diagnostica
-├── public/                   # PDF (CV + attestati), immagini, video, models/ (auto 3D),
-│                             #   zips/, manifest PWA
+├── public/                   # PDF (CV + attestati), immagini, video, zips/, manifest PWA
 ├── scripts/
-│   ├── build-cv.py           #   src/app/cv/data/*.json → 4 PDF statici (WeasyPrint)
 │   ├── build-zips.mjs        #   ZIP del sorgente per ogni progetto d'archivio
 │   ├── build-repo-tree.mjs   #   albero del repo da git → public/repo-tree.json
 │   ├── build-i18n.mjs        #   translations.json → un pacchetto per lingua
-│   ├── build-trivia-version.mjs #  versione di Trivia, contata dove la storia è intera
-│   ├── build-cars.mjs        #   FBX/OBJ + PNG → cars.bin + texture WebP (fuori CI)
 │   ├── build-foto-mima.mjs   #   foto/mima/ → EXIF (data + GPS) → album e mappa
 │   ├── build-foto-shooting.mjs # foto/shooting/ → EXIF → due manifesti: uno pubblico, uno no
 │   ├── shooting-api-dev.mjs  #   /scatti-privati/… — le foto dei ritratti, solo sotto vite dev
 │   ├── scatti-carica.mjs     #   porta una sessione nel bucket privato di Supabase
 │   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
-│   ├── lib/fbx.mjs           #   lettore FBX binario, per build-cars
-│   ├── janitor/              #   il programma di pulizia + benchmark (vedi più sotto)
-│   └── seed-*.js|.mjs        #   seed dei profili
+│   └── build-commits.mjs     #   ultimi commit da git → src/app/site/commits.json
 ├── src/
 │   ├── app/
 │   │   ├── App.tsx           # Home «piattaforma» + header/menu inline
@@ -418,15 +372,13 @@ AP/
 │   │   ├── site/             # footer, nav, dati, progetti, README dei progetti,
 │   │   │                     #   homeIcons/homeLive/homeMotion/footMotion,
 │   │   │                     #   GlassMotion + puddle, homeFx, WhenVisible,
-│   │   │                     #   dreamCars (WebGL), FreshWork, RivaltaMap,
+│   │   │                     #   FreshWork, RivaltaMap,
 │   │   │                     #   repoTree, PaletteModal, ScrollProgress,
 │   │   │                     #   WorkflowModal + workflow.css (diagramma in CSS)
 │   │   ├── cv/               # /cv: il curriculum come pagina (4 lingue) + stampa
-│   │   │                     #   PDF; data/cv.<lingua>.json = fonte unica, la
-│   │   │                     #   legge anche scripts/build-cv.py
+│   │   │                     #   PDF; data/cv.<lingua>.json = fonte unica
 │   │   ├── theme/            # ControlBar (lingua·tema·sensore) + themeCore
 │   │   ├── trivia/           # gioco quiz + parser + API leaderboard/pagelle/progressi
-│   │   ├── cleaning/         # /cleaning: l'officina del repo — SOLO in dev
 │   │   ├── bio  pcto  me-stesso  dubliners  gattopardo  festa  archivio  sostieni  instagram
 │   │   ├── i18n/             # motore di traduzione del DOM (IT · EN · FR · DE)
 │   │   ├── utils/            # keyboard guard, scroll lock, device, prefs
@@ -435,8 +387,8 @@ AP/
 │   ├── lib/                  # utilità trasversali (players, utils)
 │   └── styles/               # theme.css · tailwind · fonts · ios · site · ubuntu
 ├── supabase/                 # schema .sql delle tabelle (scores, grades, players, link)
-└── vite.config.ts            # plugin React/Tailwind/PWA, asset resolver, versioning,
-                              #   dev-API (/api/* e gli endpoint di /cleaning)
+└── vite.config.ts            # plugin React/Tailwind/PWA, asset resolver,
+                              #   dev-API (/api/* e le foto degli shooting)
 ```
 
 ---
@@ -469,7 +421,7 @@ sequenceDiagram
     Note over Dev,CC: 1 · Sviluppo locale (codifiche)
     Dev->>CC: "fai la modifica X"
     activate CC
-    Note over CC: build-cv.py → 4× PDF · make-link.mjs → link tracciabili
+    Note over CC: make-link.mjs → link tracciabili
     CC->>GH: git commit + push → main
     deactivate CC
 
@@ -527,7 +479,7 @@ sequenceDiagram
 | **PWA** | `vite-plugin-pwa` + Workbox (precache offline, auto-update) |
 | **Backend** | Supabase via REST/Realtime · 8 funzioni serverless Vercel + `lib/serverSecurity` |
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
-| **Tooling** | `build-cv.py` (WeasyPrint → 4 PDF) · `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `build-cars.mjs` per i modelli 3D · `exifr` + `sharp` in `build-foto-mima.mjs` per l'album MiMa · `scripts/janitor/` per pulizia e benchmark |
+| **Tooling** | `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `exifr` + `sharp` in `build-foto-mima.mjs` per l'album MiMa |
 
 > **Peso del primo accesso.** Quattro cose che il browser scaricava e non guardava:
 >
@@ -558,9 +510,6 @@ Il sito è pensato per essere **a prova di abuso**, senza archiviare dati di ter
   dal client verso Supabase: passano da un endpoint serverless con **origin check + rate-limit** e
   `INSERT` con **service role** (la `anon key` non può iniettare dati fasulli). Le letture restano
   pubbliche, perché servono al realtime.
-- **L'officina non esiste in produzione** — `/cleaning` legge e riscrive i file del repo e fa
-  commit: la rotta è dietro `import.meta.env.DEV` e i suoi endpoint vivono in `configureServer`,
-  cioè solo sotto `vite dev`. Verificato sul build vero, [più sotto](#cleaning--lofficina-in-pagina).
 - **Nessun token GitHub nel front-end** — il repo è privato e l'albero dei file arriva da `git` in
   build, non da un'API autenticata.
 - **Link tracciabili usa-e-getta** — [`/api/d`](api/d.ts) apre, conta e reindirizza; **autodelete a 7 giorni**
@@ -597,19 +546,14 @@ scritture partono lo stesso, le liste pubbliche restano vuote.
 | Comando | Azione |
 | :--- | :--- |
 | `npm run dev` | Vite sulla 5173, in ascolto anche sulla rete di casa: l'indirizzo `10.x.x.x` stampato all'avvio si apre dal telefono sotto lo stesso Wi-Fi (vedi «Il server di sviluppo»). Prima parte il `predev`: i pacchetti i18n |
-| `npm run build` | Build statica in `dist/`. Il `prebuild` fa quattro cose: versione di Trivia, ZIP dei progetti, `repo-tree.json`, pacchetti i18n |
+| `npm run build` | Build statica in `dist/`. Il `prebuild` fa quattro cose: elenco dei commit, ZIP dei progetti, `repo-tree.json`, pacchetti i18n |
 | `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
 | `npm run i18n` | Rigenera solo `src/app/i18n/generated/<lingua>.json` da `translations.json` |
-| `node scripts/build-cars.mjs <cartella>` | Rigenera `public/models/` dai modelli 3D sorgente (che **non** stanno nel repo) |
 | `npm run foto` | Album MiMa: legge gli EXIF delle foto in `foto/mima/` (che **non** stanno nel repo), le rimpicciolisce in `public/images/mima/` e scrive `src/app/mima/foto.json` — posizioni dal GPS, ordine da `DateTimeOriginal` |
-| `npm run scatti` | Shooting: legge gli EXIF di `foto/shooting/<sessione>/` e scrive **due** manifesti — `src/app/shooting/sessioni.json` (versionato: date, luoghi, conteggi) e `foto/shooting/.web/manifesto.json` (fuori dal repo: gli scatti). Le immagini restano in `foto/`, mai in `public/` || `python3 scripts/build-cv.py [it en fr de]` | Rigenera i PDF statici del CV da `src/app/cv/data/` (il CV "vivo" è la pagina `/cv`, che stampa sé stessa) |
+| `npm run scatti` | Shooting: legge gli EXIF di `foto/shooting/<sessione>/` e scrive **due** manifesti — `src/app/shooting/sessioni.json` (versionato: date, luoghi, conteggi) e `foto/shooting/.web/manifesto.json` (fuori dal repo: gli scatti). Le immagini restano in `foto/`, mai in `public/` |
 | `npm run scatti:carica -- s1` | Porta UNA sessione nel bucket privato di Supabase (miniature, versione media e originali). Senza argomenti dice cosa c'è di sopra. È l'unico modo perché un autorizzato possa vederla da remoto |
 | `npm run scatti:togli -- s1` | La toglie dal bucket: da lì in poi non la vede più nessuno, permessi già dati compresi |
-| `npm run pulizia` | Cerca lo sporco e misura, **senza toccare niente** |
-| `npm run pulizia:applica` | Pulisce, verifica con build + benchmark, annulla da solo se qualcosa peggiora |
-| `npm run bench` | Solo benchmark: build, peso, fotogrammi — confrontati con l'ultima volta |
-| `npm run pulizia:prove` | Le prove di sicurezza del programma di pulizia (pianta file veri e controlla cosa decide) |
 
 ---
 
@@ -666,9 +610,9 @@ Remove-NetFirewallRule -DisplayName "Vite dev 5173 (rete di casa)"
 guarda l'indirizzo di chi chiede, e un `--host` non deve bastare a mettere in rete i ritratti di
 qualcuno. Allo stesso modo l'officina dei comandi si accende solo su `localhost`
 (`src/app/utils/local.ts`), quindi dal telefono non compare. Tutto il resto — le pagine, gli
-endpoint `/api/*`, `/cleaning` — c'è come sul monitor.
+endpoint `/api/*` — c'è come sul monitor.
 
-**La porta è fissa.** `strictPort: true` è voluto: il debug di Edge, il benchmark del janitor e
+**La porta è fissa.** `strictPort: true` è voluto: il debug di Edge e
 i link che ci si scambia puntano tutti alla 5173, e un Vite che ripiega da solo sulla 5174 è
 peggio di uno che non parte — le pagine si aprono, ma su un server che non è quello che si sta
 guardando. Il prezzo è che un secondo `vite` muore con `EADDRINUSE`. Nove volte su dieci il
@@ -686,256 +630,6 @@ l'IPv4 — motivo per cui il processo colpevole sembrava invisibile.
 Il tasto **F5** di VS Code lancia la stessa cosa: l'attività `dev: assicura server Vite` in
 `.vscode/tasks.json` accende Vite come attività di sfondo, aspetta il `ready in` e poi apre
 Edge in debug su `localhost:5173`. Se il server è già acceso, VS Code riusa quello.
-
----
-
-## 🧹 Pulizia e benchmark — `scripts/janitor/`
-
-Un programma locale che ogni due giorni toglie il peso morto dal repo e **dimostra** di non
-aver rotto niente. Non è un `rm -rf` con un cron davanti: la parte interessante è tutta nel
-come si assicura di poter girare da solo senza sorveglianza.
-
-**Niente viene cancellato.** Quello che sembra inutile finisce in `.janitor/quarantena/<data>/`
-con i percorsi originali intatti, poi la build gira davvero, poi un browser vero apre le pagine
-davvero. Se la build non passa, o se compare un 404 che prima non c'era, o un errore in console
-che prima non c'era, **tutto torna al suo posto da solo**. Il caso peggiore di un'esecuzione
-automatica è un log che dice "annullato". Solo le quarantene sopravvissute a due settimane di
-sito funzionante vengono svuotate per davvero.
-
-**Cosa cerca** — sei categorie, e nel dubbio non è sporco:
-
-| | Cosa | Come lo decide |
-| :--- | :--- | :--- |
-| 1 | Rigenerabili | `dist`, cache di Vite, log: già in `.gitignore` e ricostruiti da uno script dichiarato in `package.json` |
-| 2 | Moduli orfani in `src/` | Irraggiungibili dal grafo degli import **e** mai nominati in nessun testo del repo — due prove indipendenti |
-| 3 | Asset mai nominati in `public/` | Nessun file cita il percorso né il nome |
-| 4 | Dipendenze mai importate | Nessun `import`, nessuna menzione |
-| 5 | Duplicati esatti | Stesso SHA-1 in due percorsi — **solo segnalati**: quale sia quello buono non lo può sapere il programma |
-| 6 | Git | `git gc`, rami già confluiti in `main` |
-
-**Le eccezioni si dichiarano, col motivo.** `scripts/janitor/protetti.json` elenca le cose che
-l'analisi segnalerebbe e che invece teniamo apposta — i CV in inglese, francese e tedesco, che il
-sito non linka (la pagina `/cv` stampa sé stessa) ma che si mandano a mano in una candidatura.
-Ogni voce ha la sua ragione scritta accanto: un elenco di eccezioni senza spiegazioni diventa in
-sei mesi un elenco di cose che nessuno osa più togliere.
-
-**Due cose che gli inventari generati insegnano.** `public/repo-tree.json` è l'albero dei
-sorgenti che `/archivio` mostra: elenca 134 file di `public/`. Finché stava nel corpus di testo su
-cui l'analisi chiede «questo nome è citato da qualche parte?», la risposta era sempre sì — e la
-ricerca degli asset orfani era **spenta senza dirlo**, con ogni duplicato tenuto in vita. Le prove
-non lo vedevano perché piantano un file *nuovo*, che in un elenco generato prima ovviamente non
-c'è: ora ce n'è una che mette il nome anche dentro l'inventario. E la documentazione dentro
-`public/` (i `CREDITI-IMMAGINI.md`, provenienza e licenza di ogni fotografia) non è un asset
-servito: nessuno la importa per definizione, è scritta per chi legge. Anche quella ha la sua prova.
-
-Le radici del grafo sono larghe di proposito (`index.html`, ogni file in `api/`, ogni script,
-`vite.config.ts`): una radice dimenticata renderebbe "orfano" un ramo di codice vivo. E le
-cartelle indirizzate a runtime — `/emoji/`, `/models/tex/`, `/zips/${slug}` — sono protette in
-blocco, perché il loro contenuto non compare mai per esteso nel codice e cercarlo per nome darebbe
-zero riscontri su file usatissimi.
-
-**L'ordine conta.** I rigenerabili si tolgono **dopo** la verifica, non prima: messi all'inizio,
-la build di verifica li ricreava tutti e il bilancio finale diceva onestamente `+0.0 MB`. Tolti
-alla fine, la verifica è comunque avvenuta su un albero completo e lo spazio resta libero davvero.
-Restano invece al loro posto `public/zips`, `repo-tree.json` e i pacchetti i18n (~440 kB): li rifà
-il `prebuild`, che gira su `npm run build` ma **non** su `npm run dev`, e portarli via ogni due
-giorni vorrebbe dire trovare `/archivio` senza ZIP da scaricare. Con `--tutto` se ne vanno anche
-quelli. Il bilancio distingue sempre il risparmio **definitivo** (git, file del progetto) da
-`dist` e cache, che tornano alla prima ricostruzione: spazio prestato, non guadagnato.
-
-**La storia git non si riscrive mai.** `git gc` compatta e basta: servirebbe un push forzato, e un
-push forzato automatico ogni due giorni è esattamente il modo di rompere tutto.
-
-### Il benchmark
-
-Un browser vero (Edge, via Chrome DevTools Protocol) apre le pagine costruite, le scorre tutte giù
-e tutte su, e cronometra ogni singolo fotogramma. **Zero dipendenze aggiunte**: sarebbe assurdo
-installare quaranta megabyte di Playwright dentro il programma che serve a togliere peso — Node ha
-`WebSocket` di suo, e il protocollo si parla direttamente.
-
-Si misura **due volte**, perché rispondono a due domande diverse:
-
-- **a piena potenza** → "su questo computer siamo a 60?"
-- **con la CPU 4× più lenta** → "e su un telefono di fascia media? e se domani qualcosa peggiora,
-  me ne accorgo?"
-
-La seconda non è un vezzo. Senza freno la misura **satura**: il browser non disegna oltre ~160 fps,
-e una pagina vuota segna gli stessi fps di una pagina piena — verificato, `about:blank` fa 154.
-Tutto ciò che costa meno di ~6 ms a fotogramma finisce appiattito sullo stesso numero, e un
-peggioramento del 50% resterebbe invisibile. È quindi la passata frenata quella su cui si fa il
-confronto nel tempo, ed è l'unica che sappia distinguere.
-
-Ogni pagina si misura più volte e si tiene la **mediana**: una passata sola, su una macchina che
-nel frattempo fa altro, racconta il rumore e non il sito. Le misure si accumulano in
-`.janitor/bench/`, così il peggioramento lento si vede il giorno stesso e non fra sei mesi.
-
-### Ogni due giorni, da solo
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1            # registra
-powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1 -Ora 09:30 # a un'altra ora
-powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1 -Stato     # com'è andata
-powershell -ExecutionPolicy Bypass -File scripts\janitor\pianifica.ps1 -Rimuovi   # toglilo
-```
-
-Compito dell'utente, non di sistema: niente diritti di amministratore, niente password da
-conservare. Finestra del browser invisibile, log in `.janitor/log/` (si tengono gli ultimi 20).
-Se il computer era spento a quell'ora recupera al primo avvio utile.
-
-I numeri di un'esecuzione automatica **non** sono confrontabili con quelli di `npm run bench`
-lanciato a mano: l'Utilità di pianificazione fa girare i compiti a priorità ridotta, e il browser
-misura mentre il resto del computer lavora. Il confronto prima/dopo dentro la stessa esecuzione
-resta valido — le due misure girano nello stesso turno, nelle stesse condizioni — ed è quello che
-decide se la pulizia si tiene.
-
-<details>
-<summary><strong>Cinque trappole di Windows</strong> — costate care, tutte con lo stesso sintomo: "sembra che non faccia niente"</summary>
-
-- **`.ps1` senza BOM.** PowerShell 5.1 legge i file senza BOM come ANSI. Il trattino lungo `—`
-  (UTF-8 `E2 80 94`) diventa `â€"`, e quell'ultimo carattere è una virgoletta tipografica che
-  PowerShell accetta come delimitatore di stringa: le virgolette vanno in disequilibrio e lo
-  script muore segnalando una riga che non c'entra niente. I due `.ps1` vanno tenuti **UTF-8 con
-  BOM**.
-- **`*>&1` con `$ErrorActionPreference = 'Stop'`.** PowerShell incapsula ogni riga di stderr di un
-  programma esterno in un `NativeCommandError`, che con `Stop` è un errore *terminante*: il
-  compito moriva a metà log pur essendo andato tutto bene. Si redirige a livello di processo, con
-  `Start-Process -RedirectStandardOutput`.
-- **`Start-Process -Wait` aspetta l'albero, non il processo.** Il benchmark apre un browser: un
-  solo processo di Edge rimasto indietro teneva il compito "In esecuzione" a tempo indeterminato,
-  con node già uscito e il log completo. Serve `$proc.WaitForExit()`, che guarda solo il processo
-  lanciato — e dall'altra parte `taskkill /T` per non lasciare indietro nessuno.
-- **Codepage OEM.** L'uscita UTF-8 di node, catturata da PowerShell, veniva decodificata con la
-  codepage della console: nel log `già` diventava `gi├á`. Risolta anche questa redirigendo a
-  livello di processo. I colori ANSI, poi, in un file sono solo rumore: il programma li mette solo
-  se dall'altra parte c'è un terminale vero.
-- **`.ExitCode` vuoto senza `.Handle`.** `Start-Process -PassThru` senza `-Wait` restituisce un
-  oggetto `Process` che non conserva l'handle nativo: a processo finito `.ExitCode` torna vuoto e
-  un fallimento di node passerebbe per riuscito (nel log si leggeva `uscita  ===`). Basta leggere
-  `$null = $proc.Handle` **prima** di aspettare. Verificato: senza, `''`; con, `3`.
-
-</details>
-
-Per rimettere a mano quello che è stato messo da parte: `npm run pulizia:ripristina`
-(o `npm run pulizia:elenco` per vedere le quarantene).
-
-### Da terminale — `pulizia`
-
-Gli `npm run …` funzionano, ma sono scomodi da scrivere (e le opzioni vanno passate dopo un
-`--`). Alla radice del repo c'è `pulizia.cmd`, porta d'ingresso unica:
-
-| | |
-| :--- | :--- |
-| `pulizia` | guarda e riferisce, non tocca niente |
-| `pulizia applica` | pulisce, verifica, e se serve annulla da solo |
-| `pulizia bench` | solo benchmark |
-| `pulizia prove` | le prove di sicurezza |
-| `pulizia elenco` | le quarantene esistenti |
-| `pulizia ripristina` | rimette a posto l'ultima quarantena |
-| `pulizia pianifica` · `togli` · `stato` | il compito ogni due giorni |
-
-Quello che scrivi in più passa dritto al programma — `pulizia applica --tutto --rami`,
-`pulizia bench --veloce --pagine /,/trivia` — e un'opzione da sola vale come analisi, quindi
-`pulizia --niente-bench` fa la cosa che ci si aspetta. Il codice di uscita si propaga, così si
-può incatenare.
-
-**PowerShell vuole il `.\`** — `.\pulizia applica` — perché di suo non esegue i file della
-cartella corrente. Non è un difetto: senza quella regola basterebbe entrare in una cartella
-qualsiasi perché un file chiamato come un comando noto venisse eseguito al posto suo. Per
-scrivere `pulizia` e basta, da qualunque cartella, una funzione nel profilo (`$PROFILE`):
-
-```powershell
-function pulizia { & 'C:\Users\pzkko\Documents\AP\pulizia.cmd' @args }
-```
-
-Da `cmd.exe`, invece, `pulizia` funziona già così com'è dalla cartella del repo: il Prompt dei
-comandi cerca anche nella directory corrente. E attenzione a non incollare i commenti insieme al
-comando: `::` è un commento di cmd, in PowerShell diventa un argomento.
-
-Due dettagli che sembrano pignoleria e non lo sono. Il file **deve** avere fine riga CRLF: con
-LF soli, `cmd.exe` legge il file a offset sbagliati, i salti a etichetta atterrano a metà riga e
-finisce per eseguire pezzi dei commenti come comandi (`"solo" non è riconosciuto come comando…`).
-È bloccato in `.gitattributes`, perché il guaio si manifesta solo dopo un clone. E la codepage si
-porta a UTF-8 per la durata del comando e si rimette com'era: a schermo non servirebbe — per una
-console vera node converte in UTF-16 e chiama `WriteConsoleW`, quindi gli accenti escono giusti
-anche a 850 — ma serve quando l'uscita viene rediretta, `pulizia > rapporto.txt`.
-
-### `/cleaning` — l'officina, in pagina
-
-`npm run dev` → **http://localhost:5173/cleaning**. Le stesse cose del terminale, ma con lo
-sporco elencato, i lavori che si guardano mentre succedono, un editor per i file del repo e il
-commit lì sotto.
-
-Veste `.sb-` come il resto del sito, non uno stile a parte: stesso guscio (fondale unico fisso,
-nav sottile con briciola che prende il bordo solo dopo lo scroll, sezioni trasparenti senza
-divisori), stessi `.sb-btn` e `.sb-panel`, classi proprie col prefisso di pagina `.sb-cl-*`, e
-**palette neutra più il solo azzurro del marchio** — niente rosso per gli errori né arancio per gli
-avvisi: si distinguono per peso e bordo. Tema scuro nativo, perché i colori vengono tutti da
-`var(--sb-*)` e `html.dark .sb-home` ridichiara gli stessi token.
-
-- **Sporco trovato** — cinque pastiglie per il colpo d'occhio (un numero, o una spunta), e sotto
-  si aprono solo le categorie che hanno qualcosa da dire. Le voci che la pulizia di default *non*
-  porta via (le rifà solo il `prebuild`) sono in grigio e dichiarate: `resta, salvo --tutto`.
-- **Lavori** — «Pulisci e verifica», «Benchmark», «Prove», «Solo analisi». Il log arriva
-  **mentre succede**, riga per riga, via Server-Sent Events: la pulizia completa ci mette
-  qualche minuto e guardarla lavorare è meglio che fissare uno spinner. Chiudere la scheda
-  ferma il processo. La prima riga della consolle è il **comando vero** che il bottone sta
-  lanciando (`$ node ./scripts/janitor/pulisci.mjs --applica …`): un bottone che nasconde cosa
-  esegue è un bottone di cui bisogna fidarsi, uno che lo dichiara si può controllare.
-- **Prima e dopo** — il rendiconto dell'ultimo lavoro, comunque sia stato avviato (anche dal
-  terminale: lo legge da `.janitor/ultimo.json`). Lo spazio prima → dopo riga per riga, i
-  fotogrammi entro i 16.7 ms prima → dopo pagina per pagina, e **l'elenco di ciò che è
-  sparito, uno per uno col suo peso** — perché «liberati 14.4 MB» è una promessa, mentre
-  l'elenco è un rendiconto. Se i due numeri sembrano darsi torto (roba eliminata ma spazio
-  invariato) la pagina lo dice invece di lasciarlo indovinare: succede quando quella roba
-  all'inizio non c'era ed è stata la build di verifica a ricrearla.
-- **File** — filtra, apri, modifica, `Ctrl+S`. Un file con modifiche non salvate si dichiara, e
-  chiedere di chiudere la scheda costa una domanda.
-- **Commit** — i file cambiati con le spunte, il messaggio, commit e push.
-
-**Non esiste in produzione, e non per una svista evitata.** Gli endpoint stanno in un plugin che
-vive dentro `configureServer`, l'aggancio che gira solo con `vite dev`: in `vite build` non viene
-nemmeno chiamato. La rotta è dietro `import.meta.env.DEV`, che rollup risolve a `false` e porta
-via insieme all'`import()`. Verificato sul build vero: nessun chunk, nessuna stringa
-`api/cleaning`, nessuna classe `.cl-` nei CSS, nessun testo della pagina. L'unica occorrenza di
-`cleaning` in `dist/` sta in `repo-tree.json`, che elenca `src/app/cleaning/Cleaning.tsx` fra i
-file del repository — è l'albero dei sorgenti che `/archivio` mostra apposta, cioè metadato che
-dice «questo file esiste», non codice che gira.
-
-La seconda difesa è sui percorsi: tutto quello che arriva dal browser passa da `dentroIlRepo()`,
-che risolve e pretende che il risultato stia sotto la radice del repo. Senza, un
-`?p=../../../../Windows/...` sarebbe bastato. `.git`, `node_modules` e i `.env` restano fuori
-comunque, e si scrivono solo file di testo — un PDF riscritto come stringa UTF-8 sarebbe corrotto
-in silenzio. Provato: traversal `400`, `.git` `400`, `.env` `400`, PDF `415`, e nessun file
-comparso fuori dal repo.
-
-Un dettaglio pratico: salvare `vite.config.ts` o qualcosa che lui importa fa **riavviare** il dev
-server, quindi la pagina si ricarica e un lavoro in corso si interrompe. È Vite che fa il suo
-mestiere, non un guasto.
-
-### Che le prove le faccia il programma stesso
-
-`npm run pulizia:prove` pianta file veri nel repo, guarda cosa decide l'analisi e rimette tutto
-com'era. **Otto prove**, non simmetriche di proposito: tre controllano che lo sporco venga
-**trovato**, quattro che il pulito **non** venga toccato, una che quel che è stato messo da parte
-torni indietro byte per byte — un falso negativo costa qualche kB, un falso positivo rompe una
-pagina.
-
-I nomi dei file piantati sono casuali, e non è un vezzo: scritti per esteso nel file di test
-passavano per il motivo sbagliato. L'analisi cerca il nome di un file in tutto il testo del repo,
-e il file di test fa parte del repo — bastava nominarlo perché venisse dichiarato "citato da
-qualche parte", quindi vivo. La prova sull'orfano falliva e quelle sulla protezione passavano
-senza aver verificato niente.
-
-**Nessun file esistente viene mai toccato.** La prova che un modulo *importato* non venga
-scambiato per orfano infilava l'import in cima a `src/main.tsx` e lo toglieva alla fine. Regge
-finché il processo muore con grazia — e su Windows non muore con grazia: `SIGTERM` non è un vero
-segnale, il processo viene terminato e `finally` non gira. Siccome `/cleaning` lancia queste
-prove come processo figlio e lo ammazza se chiudi la scheda, è successo davvero: in `main.tsx`
-sono rimasti due import verso file appena cancellati, e l'app non partiva. Ora la catena
-radice → modulo si costruisce con **due file piantati** (uno in `scripts/`, che è già una radice
-del grafo), tutto usa e getta. In più: il marchio `__prova-janitor-` nel nome è in `.gitignore`,
-così un residuo non può finire in un commit, ogni corsa spazza quelli lasciati dalle precedenti,
-e se un repo si trascina ancora il danno vecchio in `main.tsx` viene riparato da solo.
 
 ---
 

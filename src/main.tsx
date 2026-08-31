@@ -168,18 +168,6 @@ const Instagram = lazyPage("instagram", () => import("./app/instagram/Instagram.
 // src/app/soldi/soldi.ts.
 const Soldi = lazyPage("soldi", () => import("./app/soldi/Soldi.tsx"));
 
-// ── /cleaning — l'officina del repo, solo in locale ──────────────────────────
-// Legge e riscrive i file del repo e fa commit: roba che su un sito pubblico
-// non deve nemmeno esistere. `import.meta.env.DEV` è una costante che Vite
-// sostituisce a build-time, quindi in produzione questo diventa `null` e rollup
-// porta via con sé anche l'import() qui dentro — la pagina non finisce in un
-// chunk, non c'è un URL che risponde, non c'è un interruttore da ricordarsi.
-// Dall'altra parte gli endpoint stanno in un plugin che vive dentro
-// `configureServer`, cioè solo sotto `vite dev`.
-const Cleaning = import.meta.env.DEV
-  ? lazyPage("cleaning", () => import("./app/cleaning/Cleaning.tsx"))
-  : null;
-
 // ── Sottodomini canonici ──────────────────────────────────────────────────────
 // Se siamo su <pagina>.albertopecchini.it, serviamo DIRETTAMENTE quella pagina
 // alla root del sottodominio: l'URL resta pulito (nessun /path aggiunto) e non
@@ -209,16 +197,6 @@ createRoot(document.getElementById("root")!).render(
     ) : (
     <Routes>
       <Route path="/" element={<App />} />
-      {Cleaning && (
-        <Route
-          path="/cleaning"
-          element={
-            <Suspense fallback={null}>
-              <Cleaning />
-            </Suspense>
-          }
-        />
-      )}
       <Route
         path="/bio"
         element={

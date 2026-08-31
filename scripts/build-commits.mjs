@@ -1,9 +1,7 @@
 // ─── Numero di commit del repository, tenuto nel repository ──────────────────
 //
 // È il numero del muro dei commit, in home, sezione «Open source dal primo
-// giorno». Stesso identico patto di scripts/build-trivia-version.mjs, e per lo
-// stesso motivo — questo file ne è la copia, applicata al conto intero invece
-// che ai soli commit di Trivia:
+// giorno». Il patto è uno solo:
 //
 //   il conto si fa dove la storia c'è tutta, e si TRASPORTA dove non c'è.
 //

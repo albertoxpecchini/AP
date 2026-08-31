@@ -2,14 +2,9 @@ import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { execSync } from 'child_process'
-import { readFileSync } from 'fs'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-// L'officina di /cleaning: legge e scrive i file del repo e fa commit. Vive
-// tutta dentro `configureServer`, cioè solo sotto `vite dev` — in `vite build`
-// non viene nemmeno chiamata. Vedi la spiegazione in cima al file.
-import { cleaningDevApi } from './scripts/janitor/api-dev.mjs'
 // Le foto degli shooting sono ritratti di persone e restano in locale: questo
 // plugin è l'unico modo di vederle, e anche lui vive solo dentro
 // `configureServer`. Vedi scripts/shooting-api-dev.mjs.
@@ -25,29 +20,10 @@ import { scattiDevApi } from './scripts/scatti-api-dev.mjs'
 // gestisce la conversione file:// → path nativo in modo corretto su ogni piattaforma.
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Versione del gioco Trivia = 1.<numero di commit che toccano src/app/trivia/>.
-// Il conteggio NON si fa qui: lo fa scripts/build-trivia-version.mjs, che gira
-// in prebuild e lo deposita in version.json — un file versionato, che quindi
-// arriva identico ovunque. Qui si legge e basta.
-//
-// Prima questa funzione contava i commit al volo, e il numero dipendeva da
-// quanta storia aveva il builder: Vercel clona in shallow, e lo stesso codice
-// diceva "v1.56" in locale e "v1.2" in produzione (il dettaglio sta nello
-// script). Se il file manca, 1.0.
-function triviaVersion(): string {
-  try {
-    const raw = readFileSync(path.join(__dirname, 'src/app/trivia/version.json'), 'utf8')
-    return `1.${Number(JSON.parse(raw).commits) || '0'}`
-  } catch {
-    return '1.0'
-  }
-}
-
-
 // Data dell'ultimo commit, in ISO (es. "2026-08-06"). È quella che il footer
 // mostra come "Updated": prima lì c'era un new Date() lato client, che però
 // scriveva SEMPRE la data di oggi — cioè diceva che il sito è stato aggiornato
-// oggi anche dopo mesi di fermo. Calcolata a build-time come triviaVersion().
+// oggi anche dopo mesi di fermo. Calcolata a build-time.
 function buildDate(): string {
   try {
     const iso = execSync('git log -1 --format=%cI', { encoding: 'utf8' }).trim()
@@ -179,7 +155,6 @@ export default defineConfig({
     igStatsDevApi(),
     writeDevApi("/api/sponsor", async () => ({ insert: (await import("./api/sponsor")).insertDonatore })),
     writeDevApi("/api/festa-rsvp", async () => ({ insert: (await import("./api/festa-rsvp")).insertPresenza })),
-    cleaningDevApi(),
     shootingDevApi(),
     scattiDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
@@ -271,20 +246,6 @@ export default defineConfig({
             },
           },
           {
-            // Le mesh delle tre auto del garage (public/models/cars.bin).
-            // Fuori dal precache — globPatterns prende solo js/css/html/woff2 —
-            // perché sono trecento kB per una sezione in fondo alla home: chi
-            // non ci arriva non deve pagarli. Chi ci arriva li paga una volta,
-            // poi restano qui.
-            urlPattern: ({ url }) => /^\/models\/.*\.bin$/.test(url.pathname),
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'ap-models',
-              expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 90 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
             // Immagini: cache-first, restano in locale 30 giorni.
             urlPattern: ({ request }) => request.destination === 'image',
             handler: 'CacheFirst',
@@ -327,8 +288,6 @@ export default defineConfig({
   },
 
   define: {
-    // Esposta al client come stringa, es. "1.37".
-    __TRIVIA_VERSION__: JSON.stringify(triviaVersion()),
     // Data dell'ultimo commit in ISO, es. "2026-08-06" (footer "Updated").
     __BUILD_DATE__: JSON.stringify(buildDate()),
   },

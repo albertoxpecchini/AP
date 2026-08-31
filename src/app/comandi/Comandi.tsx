@@ -20,14 +20,14 @@ import "./comandi.css";
 //
 // Il repository è pieno di programmi che girano una volta ogni tanto: uno che
 // legge gli EXIF delle foto, uno che impacchetta il sorgente per l'archivio,
-// uno che mette in quarantena il peso morto e lo rimette a posto se la build
-// peggiora. Ognuno spiega sé stesso in cima al proprio file — ma per leggere
+// uno che rifà l'albero del repo da git. Ognuno spiega sé stesso in cima al
+// proprio file — ma per leggere
 // quella spiegazione bisogna già sapere che il file esiste, ed è esattamente
 // la cosa che non si sa.
 //
 // Questa pagina è l'indice: il comando esatto da incollare, cosa produce, e
 // il motivo per cui esiste. I testi stanno in comandi.ts, qui c'è solo la
-// forma — più un filtro, perché a venticinque voci scorrere non basta più.
+// forma — più un filtro, perché a una dozzina di voci scorrere non basta più.
 //
 // Registro: la grammatica .sb- del resto del sito. L'unica cosa monospaziata
 // è quello che si scrive davvero nel terminale, e l'azzurro compare solo dove
@@ -214,8 +214,7 @@ export default function Comandi() {
               Il sito non è solo le pagine che si vedono. Dietro ci sono programmi che girano una
               volta ogni tanto e che <strong>lasciano nel repository il loro risultato</strong>: chi
               legge i metadati delle foto e ne ricava una mappa, chi impacchetta il codice sorgente
-              da scaricare, chi mette in quarantena il peso morto e lo rimette a posto se la build
-              peggiora.
+              da scaricare, chi rifà l'albero del repository da git.
             </p>
             <p>
               Ognuno di questi programmi si spiega in cima al proprio file — ma per leggere quella
@@ -243,7 +242,7 @@ export default function Comandi() {
               type="search"
               value={cerca}
               onChange={(e) => setCerca(e.target.value)}
-              placeholder="foto, quarantena, EXIF, --headless…"
+              placeholder="foto, EXIF, ZIP, traduzioni…"
               aria-label="Cerca fra i comandi"
             />
             {cerca && (
