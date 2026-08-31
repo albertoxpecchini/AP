@@ -78,4 +78,3 @@ export function makeNickStorage(key: string): NickStorage {
   };
 }
 
-export { normalizza as _normalizeForTest };

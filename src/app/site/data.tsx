@@ -26,15 +26,6 @@ import {
 // contatto diretto lo chiede via email.
 export const EMAIL = "pzkko@yahoo.com";
 
-// Voci di navigazione. Gli href sono assoluti (con /#ancora) così funzionano
-// anche dalla pagina Bio; "About" è una rotta a sé (route: true).
-export const NAV_LINKS: { href: string; label: string; route?: boolean }[] = [
-  { href: "/#progetti", label: "Work" },
-  { href: "/bio", label: "About", route: true },
-  { href: "/#curriculum", label: "Résumé" },
-  { href: "/#contatti", label: "Contact" },
-];
-
 // Social del footer. Erano diciassette — Snapchat, Kick, Steam, Spotify,
 // Twitch, Pinterest, Reddit, Threads, TikTok, X, YouTube, Telegram — cioè un
 // muro di presenze personali su una pagina che vende servizi, e un cliente che

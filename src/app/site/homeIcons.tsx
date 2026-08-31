@@ -224,14 +224,6 @@ export const IcGlobe = (p: IcProps) => (
   </Ic>
 );
 
-export const IcFlow = (p: IcProps) => (
-  <Ic {...p}>
-    <rect x="3" y="3" width="7.5" height="7.5" rx="1.8" />
-    <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8" />
-    <path d="M6.75 10.5v4.25a2 2 0 0 0 2 2h4.75" />
-  </Ic>
-);
-
 export const IcSparkle = (p: IcProps) => (
   <Ic {...p}>
     <path d="M10 4.5c.55 3.6 2.15 5.2 5.75 5.75-3.6.55-5.2 2.15-5.75 5.75-.55-3.6-2.15-5.2-5.75-5.75 3.6-.55 5.2-2.15 5.75-5.75z" />
@@ -573,31 +565,6 @@ export const IcBrick = (p: IcProps) => (
     <rect x="3" y="5" width="18" height="14.5" rx="1.5" />
     <path d="M3 9.8h18M3 14.7h18" />
     <path d="M8.5 5v4.8M15.5 5v4.8M12 9.8v4.9M8.5 14.7v4.8M15.5 14.7v4.8" />
-  </Ic>
-);
-
-export const IcScreen = (p: IcProps) => (
-  <Ic {...p}>
-    <rect x="3" y="4.5" width="18" height="12.5" rx="2" />
-    <path d="M12 17v3.5M8 20.5h8" />
-  </Ic>
-);
-
-/* Finestra del browser: cornice, barra dell'indirizzo, due pallini. */
-export const IcBrowser = (p: IcProps) => (
-  <Ic {...p}>
-    <rect x="2.5" y="4" width="19" height="16" rx="2" />
-    <path d="M2.5 9h19" />
-    <circle cx="5.6" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
-    <circle cx="8" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
-    <path d="M11 6.5h7.5" />
-  </Ic>
-);
-
-/* Servizi remoti: la nuvola delle API esterne. */
-export const IcCloud = (p: IcProps) => (
-  <Ic {...p}>
-    <path d="M7.4 18.5a4.4 4.4 0 0 1-.5-8.77 5.3 5.3 0 0 1 10.1 1.05 3.86 3.86 0 0 1-.6 7.72H7.4z" />
   </Ic>
 );
 

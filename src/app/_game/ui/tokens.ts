@@ -27,14 +27,3 @@ export const ACCENTS: Record<string, GameAccent> = {
     glow: "color-mix(in srgb, var(--sb-brand) 45%, transparent)",
   },
 };
-
-// Superfici e testi. Un solo set, non più la coppia DARK/LIGHT che il codice
-// doveva scegliere a mano: sono variabili, quindi seguono già il tema.
-export const SURFACE = {
-  bg0: "var(--sb-bg)",
-  bg1: "var(--sb-bg-alt)",
-  text: "var(--sb-fg)",
-  sub: "var(--sb-fg-muted)",
-  glass: "var(--sb-glass-bg)",
-  glassBorder: "var(--sb-border)",
-};

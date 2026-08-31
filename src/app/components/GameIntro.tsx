@@ -35,14 +35,6 @@ export function hasSeenTutorial(gameKey: string): boolean {
   try { return localStorage.getItem(SEEN_KEY_PREFIX + gameKey) === "1"; } catch { return false; }
 }
 
-export function resetTutorial(gameKey: string): void {
-  try { localStorage.removeItem(SEEN_KEY_PREFIX + gameKey); } catch {}
-}
-
-// Alias per compatibilità con il vecchio nome usato in Angoli.tsx
-export const hasSeenIntro = hasSeenTutorial;
-export const resetIntro   = resetTutorial;
-
 export default function GameTutorial({
   gameKey, steps, accentColor, darkBg, extra, onDone,
 }: GameTutorialProps) {

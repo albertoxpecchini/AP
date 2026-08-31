@@ -9,9 +9,8 @@
 //
 // ── Perché decidere è un POST ────────────────────────────────────────────────
 // Il link nell'email non decide niente: apre una pagina. Gli scanner antivirus
-// e i "link protetti" delle caselle di posta PRE-APRONO i link in arrivo — sta
-// scritto anche in cima ad api/d.ts, dove il danno era solo un contatore
-// sballato. Qui un GET che autorizza verrebbe cliccato dal primo antivirus di
+// e i "link protetti" delle caselle di posta PRE-APRONO i link in arrivo.
+// Qui un GET che autorizza verrebbe cliccato dal primo antivirus di
 // passaggio, e la foto sarebbe autorizzata da una macchina. Un modulo, invece,
 // nessuno scanner lo compila.
 //

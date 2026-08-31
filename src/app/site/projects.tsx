@@ -138,10 +138,10 @@ export const PROJECTS: Project[] = [
     thumb: "instagram",
     srcDir: "src/app/instagram",
     // Da produrre a mano: cattura di /instagram a 1280×720, per stare in
-    // rapporto con il video di Rivalta e con cascina-preview.png. Finché il
+    // rapporto con il video di Rivalta e con cascina-preview.webp. Finché il
     // file non c'è, SitePreview mostra la cornice vuota col glifo — non
     // un'immagine rotta.
-    previewImg: "/instagram-preview.png",
+    previewImg: "/instagram-preview.webp",
     desc: "A privacy-first tool that compares two lists right in your browser. Built for Instagram: load your following.html and followers.html and instantly see who doesn't follow you back, who you don't follow back and your mutuals — with monogram avatars, follow dates, name/chronological sorting, a compare-over-time mode, an illustrated step-by-step tutorial and downloadable HTML reports. Nothing is uploaded, nothing is stored: the comparison runs entirely client-side.",
     tags: ["React", "TypeScript", "Client-side", "Privacy", "UI/UX"],
   },
@@ -171,7 +171,7 @@ export const PROJECTS: Project[] = [
     desc: "Website for Cascina Fontana. Polished design and a responsive layout optimised to present the business and the services it offers.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
     screenshotUrl: "https://cascinafontana.xyz",
-    previewImg: "/cascina-preview.png",
+    previewImg: "/cascina-preview.webp",
   },
 ];
 
@@ -201,20 +201,6 @@ export const MATERIALS: Project[] = [
   },
 ];
 
-// Emoji per ogni progetto (riga "categoria" della card della home).
-export const PROJECT_EMOJI: Record<string, string> = {
-  "PCTO": "🪵",
-  "About Me": "🎓",
-  "Dubliners": "📖",
-  "The Leopard": "🐆",
-  "Trivia": "🧠",
-  "Compare Two Lists": "👀",
-  "Rivalta sul Mincio": "🏞️",
-  "Cascina Fontana": "🏡",
-  "Curriculum Vitae": "📄",
-  "Attestato sicurezza lavoratori": "📜",
-};
-
 // Cartella "in evidenza": tutti i materiali per l'Esame di Maturità 2026.
 // L'ordine segue quello qui sotto; questi progetti vengono mostrati SOLO dentro
 // la cartella e tolti dalla griglia "Work" per non duplicarli.
@@ -223,9 +209,6 @@ export const MATURITA_URLS = ["/me-stesso", "/pcto", "/dubliners", "/gattopardo"
 // Cartella "Giochi Web · In evidenza": i web game del progetto (oggi solo Trivia).
 // Anche questi vengono tolti dalla griglia "Work" per non duplicarli.
 export const GAMES_URLS = ["/trivia"];
-
-// Siti esterni (clienti).
-export const EXTERNAL_URLS = ["https://rivaltasulmincio.it", "https://cascinafontana.xyz"];
 
 // ── Helper condivisi ────────────────────────────────────────────────────────
 

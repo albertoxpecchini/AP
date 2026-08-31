@@ -188,22 +188,6 @@ export function createScoreApi<Row extends BaseScoreRow>(cfg: ScoreApiConfig<Row
 
 // ─── Helper di aggregazione condivisi ───────────────────────────────────────
 
-/**
- * Somma del MIGLIOR punteggio per gruppo (partizione). Le righe devono già
- * essere filtrate sul giocatore. Usato dal badge "punteggio totale" del menu.
- */
-export function sumBestByGroup<Row extends BaseScoreRow>(rows: Row[], key: keyof Row): number {
-  const best = new Map<unknown, number>();
-  for (const r of rows) {
-    const g = r[key];
-    const prev = best.get(g) ?? 0;
-    if ((r.score || 0) > prev) best.set(g, r.score || 0);
-  }
-  let total = 0;
-  for (const v of best.values()) total += v;
-  return total;
-}
-
 export interface TotalAgg {
   nick: string;
   score: number;     // somma dei best per gruppo singolo

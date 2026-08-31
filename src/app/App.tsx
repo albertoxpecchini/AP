@@ -409,11 +409,7 @@ const { data } = await supabase
     lang: "json",
     code: `{
   "rewrites": [
-    { "source": "/d/:id", "destination": "/api/d?id=:id" },
     { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "crons": [
-    { "path": "/api/cron-cleanup", "schedule": "0 3 * * *" }
   ]
 }`,
   },

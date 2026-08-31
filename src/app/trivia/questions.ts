@@ -27,8 +27,6 @@ export const CHAPTERS: Chapter[] = Object.entries(modules)
 
 export const ALL_QUESTIONS: Question[] = CHAPTERS.flatMap(c => c.questions);
 
-export const TOTAL_QUESTIONS = ALL_QUESTIONS.length;
-
 /**
  * Domande dai capitoli e tipi selezionati.
  *  • `chapterIds` vuoto → tutti i capitoli.

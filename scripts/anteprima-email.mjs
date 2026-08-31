@@ -26,7 +26,6 @@ await build({
   stdin: {
     contents: `
       export { emailVoto } from "./api/notify.js";
-      export { emailApertura } from "./api/d.js";
       export {
         emailRichiesta, emailAutorizzato, emailPrimaApertura, paginaDecisione, pagina,
       } from "./lib/scattiAccesso.js";
@@ -83,7 +82,6 @@ const richiesta = {
 const base = "https://albertopecchini.it";
 const pezzi = [
   ["voto-festa", "Festa · nuovo voto", M.emailVoto({ nome: "Marco", presenza: "sera", giorno: "27", cibo: "porchetta" }, diag).html],
-  ["link-aperto", "Link · prima apertura", M.emailApertura("Curriculum per lo studio", "https://albertopecchini.it/cv.pdf", diag).html],
   ["scatti-richiesta", "Shooting · la richiesta (arriva a te)", M.emailRichiesta(richiesta, "token-finto", "Sessione di marzo", base, diag).html],
   ["scatti-autorizzato", "Shooting · l'accesso (arriva a chi ha chiesto)", M.emailAutorizzato(richiesta, "token-finto", "Sessione di marzo", base).html],
   ["scatti-apertura", "Shooting · album aperto", M.emailPrimaApertura(richiesta, "Sessione di marzo", diag).html],

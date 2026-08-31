@@ -24,9 +24,8 @@
 //   · In tabella i token NON ci sono: c'è il loro SHA-256. Il valore vero vive
 //     solo dentro le due email. Una tabella letta non autorizza nessuno.
 //   · La decisione NON si prende con un GET. Gli scanner antivirus e i
-//     "link protetti" delle caselle di posta pre-aprono i link in arrivo — è
-//     scritto anche in cima ad api/d.ts, dove il problema era solo un contatore
-//     sballato. Qui un GET pre-aperto autorizzerebbe una richiesta da solo.
+//     "link protetti" delle caselle di posta pre-aprono i link in arrivo.
+//     Qui un GET pre-aperto autorizzerebbe una richiesta da solo.
 //     Quindi il link della mail apre una PAGINA, e l'autorizzazione parte da un
 //     bottone che fa POST. Nessuno scanner compila moduli.
 //

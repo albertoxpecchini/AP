@@ -45,17 +45,17 @@ e tema chiaro/scuro nativo.
 ## 📊 Il progetto in numeri
 
 > I badge di metrica derivano dall'API GitHub e si ricalcolano a ogni `git push`.
-> La tabella qui sotto è misurata sull'albero versionato all'**11 agosto 2026**.
+> La tabella qui sotto è misurata sull'albero versionato al **31 agosto 2026**.
 
 | Dominio | Valore | Dettaglio |
 | :--- | :--- | :--- |
-| **Codebase** | **~41,9k LOC** in `src/` | 123 file versionati: 52 `.tsx` (24,3k) · 37 `.ts` (6,1k) · 27 `.css` (11,5k) |
-| **Backend + tooling** | **~5,7k LOC** fuori da `src/` | 8 funzioni `api/` + `lib/` (185) · `scripts/` (2,3k) |
-| **Dipendenze** | **11 runtime** + 10 dev | niente framework pesanti, tutto essenziale |
+| **Codebase** | **~41,2k LOC** in `src/` | 115 file versionati: 52 `.tsx` (22,5k) · 37 `.ts` (5,9k) · 26 `.css` (12,8k) |
+| **Backend + tooling** | **~4,4k LOC** fuori da `src/` | 6 funzioni `api/` (786) + `lib/` (1,2k) · `scripts/` (2,5k) |
+| **Dipendenze** | **13 runtime** + 12 dev | niente framework pesanti, tutto essenziale |
 | **Pagine** | **13 rotte** | 1 hub + 12 pagine `React.lazy`, code-split per rotta · `/shooting` è pubblica ma le sue foto no |
 | **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
-| **Serverless** | **8 funzioni** in `api/` | notify · festa-rsvp · sponsor · ig-stats · scatti-richiesta · scatti-accesso · d · cron |
+| **Serverless** | **6 funzioni** in `api/` | notify · festa-rsvp · sponsor · ig-stats · scatti-richiesta · scatti-accesso |
 | **Cronologia** | **374 commit** dal 2026-05-24 | 181 `feat` · 88 `fix` · 27 `style` · 15 `chore` · 7 `docs` · 6 `refactor` |
 
 ---
@@ -74,7 +74,7 @@ su ogni pagina.
   sotto `html.dark`. Il chiaro è il default.
 - **Palette neutra + un solo colore** — grigi puri per fondali, bordi e testo; l'unica tinta è il
   **azzurro brand `hsl(197 100% 49%)`**. Dal 2026-08 è l'unico accento su **tutte** le pagine:
-  l'arancio Ubuntu sopravvive solo nelle email transazionali (`api/d.ts`).
+  l'arancio Ubuntu sopravvive solo nelle email transazionali (`lib/emailStile.ts`).
 - **Un fondale solo, per tutta la pagina** — è `position: fixed`, quindi resta incollato alla
   finestra: la griglia tecnica in `.sb-bg` (solo home) e **due velature radiali** — azzurro e ciano —
   su `::before`/`::after` di `.sb-home`, cioè su ogni pagina. Nessun bordo di sezione può tagliarlo
@@ -342,17 +342,14 @@ ricarica la pagina.
 
 ```
 AP/
-├── api/                      # 8 funzioni serverless Vercel (Node)
+├── api/                      # 6 funzioni serverless Vercel (Node)
 │   ├── notify.ts             #   email dei voti Festa (Resend)
 │   ├── festa-rsvp.ts         #   scrittura RSVP blindata (service role)
 │   ├── sponsor.ts            #   firma libro donatori blindata
 │   ├── ig-stats.ts           #   contatore confronti Instagram
 │   ├── scatti-richiesta.ts   #   modulo /shooting: la richiesta di vedere le foto
-│   ├── scatti-accesso.ts     #   la decisione, e l'album firmato per chi è ammesso
-│   ├── d.ts                  #   link tracciabili: apertura + redirect + autodelete
-│   └── cron-cleanup.ts       #   pulizia giornaliera dei link scaduti (cron)
+│   └── scatti-accesso.ts     #   la decisione, e l'album firmato per chi è ammesso
 ├── content/trivia/           # 40 capitoli .md → fonte unica delle domande Trivia
-├── email/                    # modello email HTML (le bozze NON si committano)
 ├── lib/serverSecurity.ts     # helper condivisi: origin check, rate-limit, diagnostica
 ├── public/                   # PDF (CV + attestati), immagini, video, zips/, manifest PWA
 ├── scripts/
@@ -363,7 +360,6 @@ AP/
 │   ├── build-foto-shooting.mjs # foto/shooting/ → EXIF → due manifesti: uno pubblico, uno no
 │   ├── shooting-api-dev.mjs  #   /scatti-privati/… — le foto dei ritratti, solo sotto vite dev
 │   ├── scatti-carica.mjs     #   porta una sessione nel bucket privato di Supabase
-│   ├── make-link.mjs         #   link tracciabili usa-e-getta (solo in locale)
 │   └── build-commits.mjs     #   ultimi commit da git → src/app/site/commits.json
 ├── src/
 │   ├── app/
@@ -386,7 +382,7 @@ AP/
 │   ├── components/           # reactbits/ (ClickSpark, SpotlightCard) · ui/map (maplibre)
 │   ├── lib/                  # utilità trasversali (players, utils)
 │   └── styles/               # theme.css · tailwind · fonts · ios · site · ubuntu
-├── supabase/                 # schema .sql delle tabelle (scores, grades, players, link)
+├── supabase/                 # schema .sql delle tabelle (scores, grades, players, richieste)
 └── vite.config.ts            # plugin React/Tailwind/PWA, asset resolver,
                               #   dev-API (/api/* e le foto degli shooting)
 ```
@@ -421,7 +417,6 @@ sequenceDiagram
     Note over Dev,CC: 1 · Sviluppo locale (codifiche)
     Dev->>CC: "fai la modifica X"
     activate CC
-    Note over CC: make-link.mjs → link tracciabili
     CC->>GH: git commit + push → main
     deactivate CC
 
@@ -457,8 +452,8 @@ sequenceDiagram
 | :--- | :--- | :--- |
 | **GitHub API** (pubblica) | profilo, repo aggregati, linguaggi nel footer | client (cache 60 min) |
 | **jogruber `github-contributions-api`** | grafico contribuzioni reale, senza token | client |
-| **Supabase** (REST + Realtime WS) | classifiche, pagelle, progressi, presenze, libro donatori, link tracciabili (fallback `localStorage`) | client + serverless |
-| **Resend** | email dei voti Festa + avviso di apertura link tracciabili | serverless `/api/notify`, `/api/d` |
+| **Supabase** (REST + Realtime WS) | classifiche, pagelle, progressi, presenze, libro donatori (fallback `localStorage`) | client + serverless |
+| **Resend** | email dei voti Festa e delle richieste di /shooting | serverless `/api/notify`, `/api/scatti-*` |
 | **Wikipedia · Wikimedia Commons · Openverse** | foto pertinenti alle domande di Trivia, a licenza libera, senza API key | client (cascata, con cache) |
 | **Open-Meteo** | previsioni e medie stagionali su `/festa` | client |
 | **Carto basemaps** | tessere della mappa MapLibre in fondo alla home | client |
@@ -477,7 +472,7 @@ sequenceDiagram
 | **3D & mappe** | visualizzatore WebGL scritto a mano per le tre auto (niente three.js) · `maplibre-gl` con tessere Carto, caricata solo all'avvicinarsi |
 | **i18n** | motore proprietario che traduce il DOM in IT · EN · FR · DE, un pacchetto per lingua |
 | **PWA** | `vite-plugin-pwa` + Workbox (precache offline, auto-update) |
-| **Backend** | Supabase via REST/Realtime · 8 funzioni serverless Vercel + `lib/serverSecurity` |
+| **Backend** | Supabase via REST/Realtime · 6 funzioni serverless Vercel + `lib/serverSecurity` |
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
 | **Tooling** | `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `exifr` + `sharp` in `build-foto-mima.mjs` per l'album MiMa |
 
@@ -512,11 +507,6 @@ Il sito è pensato per essere **a prova di abuso**, senza archiviare dati di ter
   pubbliche, perché servono al realtime.
 - **Nessun token GitHub nel front-end** — il repo è privato e l'albero dei file arriva da `git` in
   build, non da un'API autenticata.
-- **Link tracciabili usa-e-getta** — [`/api/d`](api/d.ts) apre, conta e reindirizza; **autodelete a 7 giorni**
-  (cron [`/api/cron-cleanup`](api/cron-cleanup.ts), protetto da `CRON_SECRET`), avviso via email alla
-  **prima apertura**. I link si creano **solo in locale** con [`make-link.mjs`](scripts/make-link.mjs) —
-  nessun endpoint pubblico, meno superficie d'attacco. La diagnostica del «chi» (IP, device, area)
-  finisce **solo nell'email**, mai archiviata.
 - **Header di sicurezza + CSP** in [`vercel.json`](vercel.json): CSP con allow-list esplicita delle
   origini `connect-src`, HSTS 2 anni, `X-Frame-Options: DENY`, `Permissions-Policy` che spegne
   camera/microfono/geolocalizzazione/pagamenti, COOP `same-origin`.
@@ -538,8 +528,7 @@ npm run build     # bundle di produzione in dist/ (prima il prebuild, vedi tabel
 Le chiavi vivono in un `.env` locale (non versionato, e **non** c'è un `.env.example` nel repo):
 `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` per le **letture** dal client (lista donatori,
 presenze, classifiche, realtime), `SUPABASE_SERVICE_ROLE_KEY` per le **scritture** — gli endpoint
-blindati e i link tracciabili — `RESEND_API_KEY` per le email, `CRON_SECRET` per il cron,
-`SHOOTING_CODICE` per il modulo di /shooting (il codice che si consegna a voce: **senza, il modulo
+blindati — `RESEND_API_KEY` per le email, `SHOOTING_CODICE` per il modulo di /shooting (il codice che si consegna a voce: **senza, il modulo
 si chiude**, non si apre). Le due chiavi Supabase sono indipendenti: con la sola service role le
 scritture partono lo stesso, le liste pubbliche restano vuote.
 
@@ -642,8 +631,7 @@ regia GSAP** · ControlBar raggiungibile da tastiera (esce al `focus`) ·
 `Backspace` neutralizzato fuori dai campi testo (`disableBackspaceNavigation`).
 
 **Deploy:** SPA statica → **Vercel** (`buildCommand: npm run build`, output `dist/`, branch `main`
-= produzione), con funzioni serverless in `api/`, redirect `www → sottodominio`, rewrite di
-`/d/:id` e un **cron** giornaliero alle 03:00 per la pulizia dei link.
+= produzione), con funzioni serverless in `api/` e i redirect `www → sottodominio`.
 
 ---
 

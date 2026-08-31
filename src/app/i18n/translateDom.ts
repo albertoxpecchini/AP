@@ -234,8 +234,3 @@ export function startI18nEngine(): void {
   if (document.body) boot();
   else document.addEventListener("DOMContentLoaded", boot, { once: true });
 }
-
-/** Forza una ritraduzione completa (usata dal widget a metà animazione). */
-export function retranslateAll(): void {
-  if (started) runPass("all");
-}

@@ -46,9 +46,6 @@ export function getAccountNick(): string {
 export function setAccountNick(nick: string) {
   try { localStorage.setItem(ACCOUNT_KEY, nick.slice(0, 10)); } catch {}
 }
-export function clearAccountNick() {
-  try { localStorage.removeItem(ACCOUNT_KEY); } catch {}
-}
 
 function readLocalList(): Player[] {
   try {
