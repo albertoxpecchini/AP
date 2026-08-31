@@ -49,10 +49,10 @@ e tema chiaro/scuro nativo.
 
 | Dominio | Valore | Dettaglio |
 | :--- | :--- | :--- |
-| **Codebase** | **~41,2k LOC** in `src/` | 115 file versionati: 52 `.tsx` (22,5k) · 37 `.ts` (5,9k) · 26 `.css` (12,8k) |
-| **Backend + tooling** | **~4,4k LOC** fuori da `src/` | 6 funzioni `api/` (786) + `lib/` (1,2k) · `scripts/` (2,5k) |
+| **Codebase** | **~40,3k LOC** in `src/` | 111 file versionati: 50 `.tsx` (22,2k) · 36 `.ts` (5,8k) · 25 `.css` (12,4k) |
+| **Backend + tooling** | **~3,8k LOC** fuori da `src/` | 6 funzioni `api/` (785) + `lib/` (1,2k) · `scripts/` (1,9k) |
 | **Dipendenze** | **13 runtime** + 12 dev | niente framework pesanti, tutto essenziale |
-| **Pagine** | **13 rotte** | 1 hub + 12 pagine `React.lazy`, code-split per rotta · `/shooting` è pubblica ma le sue foto no |
+| **Pagine** | **15 rotte** | 1 hub + 14 pagine `React.lazy`, code-split per rotta · `/shooting` è pubblica ma le sue foto no |
 | **Lingue UI** | **4** — IT · EN · FR · DE | motore i18n che traduce il DOM live · 1020 voci, spacchettate in un pacchetto per lingua |
 | **Trivia — quiz** | **1003 domande** su 40 capitoli | 401 multipla · 401 vero/falso · 201 aperta |
 | **Serverless** | **6 funzioni** in `api/` | notify · festa-rsvp · sponsor · ig-stats · scatti-richiesta · scatti-accesso |
@@ -204,7 +204,6 @@ I redirect `www → sottodominio` sono in [`vercel.json`](vercel.json).
 | `/dubliners` | `dubliners` | **Dubliners** | Approfondimento «Gente di Dublino» (J. Joyce, 1914) |
 | `/gattopardo` | `gattopardo` | **Gattopardo** | Approfondimento «Il Gattopardo» (Tomasi di Lampedusa, 1958) |
 | `/festa` | `festa` | **Festa** | Inviti con token, RSVP e notifica email |
-| `/mima` | _(solo path)_ | **MiMa · album** | Le foto di Milano Marittima su mappa e scaletta, ordinate dagli EXIF |
 | `/shooting` | _(solo path)_ | **Shooting** | I ritratti: data, luogo e attrezzatura per tutti; **le foto solo in locale** |
 | `/archivio` | `archivio` | **Archivio** | Esploratore di progetti **e dell'albero vero del repo** |
 | `/sostieni` | `sostieni` | **Sostieni** | Dati bonifico + libro firme dei donatori |
@@ -356,7 +355,6 @@ AP/
 │   ├── build-zips.mjs        #   ZIP del sorgente per ogni progetto d'archivio
 │   ├── build-repo-tree.mjs   #   albero del repo da git → public/repo-tree.json
 │   ├── build-i18n.mjs        #   translations.json → un pacchetto per lingua
-│   ├── build-foto-mima.mjs   #   foto/mima/ → EXIF (data + GPS) → album e mappa
 │   ├── build-foto-shooting.mjs # foto/shooting/ → EXIF → due manifesti: uno pubblico, uno no
 │   ├── shooting-api-dev.mjs  #   /scatti-privati/… — le foto dei ritratti, solo sotto vite dev
 │   ├── scatti-carica.mjs     #   porta una sessione nel bucket privato di Supabase
@@ -474,7 +472,7 @@ sequenceDiagram
 | **PWA** | `vite-plugin-pwa` + Workbox (precache offline, auto-update) |
 | **Backend** | Supabase via REST/Realtime · 6 funzioni serverless Vercel + `lib/serverSecurity` |
 | **Insight** | `@vercel/speed-insights` (Core Web Vitals reali) |
-| **Tooling** | `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `exifr` + `sharp` in `build-foto-mima.mjs` per l'album MiMa |
+| **Tooling** | `archiver` per gli ZIP · `build-repo-tree.mjs` per l'albero · `build-i18n.mjs` per i pacchetti lingua · `exifr` + `sharp` in `build-foto-shooting.mjs` per i manifesti degli shooting |
 
 > **Peso del primo accesso.** Quattro cose che il browser scaricava e non guardava:
 >
@@ -539,7 +537,6 @@ scritture partono lo stesso, le liste pubbliche restano vuote.
 | `npm run zips` | Rigenera solo `public/zips/` + il manifest delle dimensioni |
 | `npm run repo-tree` | Rigenera solo `public/repo-tree.json` dall'albero git |
 | `npm run i18n` | Rigenera solo `src/app/i18n/generated/<lingua>.json` da `translations.json` |
-| `npm run foto` | Album MiMa: legge gli EXIF delle foto in `foto/mima/` (che **non** stanno nel repo), le rimpicciolisce in `public/images/mima/` e scrive `src/app/mima/foto.json` — posizioni dal GPS, ordine da `DateTimeOriginal` |
 | `npm run scatti` | Shooting: legge gli EXIF di `foto/shooting/<sessione>/` e scrive **due** manifesti — `src/app/shooting/sessioni.json` (versionato: date, luoghi, conteggi) e `foto/shooting/.web/manifesto.json` (fuori dal repo: gli scatti). Le immagini restano in `foto/`, mai in `public/` |
 | `npm run scatti:carica -- s1` | Porta UNA sessione nel bucket privato di Supabase (miniature, versione media e originali). Senza argomenti dice cosa c'è di sopra. È l'unico modo perché un autorizzato possa vederla da remoto |
 | `npm run scatti:togli -- s1` | La toglie dal bucket: da lì in poi non la vede più nessuno, permessi già dati compresi |

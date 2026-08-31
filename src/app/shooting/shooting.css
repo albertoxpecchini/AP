@@ -6,7 +6,7 @@
    solo valore di colore scritto a mano, così il tema scuro arriva da sé senza
    un secondo foglio.
 
-   La regola della pagina, la stessa di /mima: le uniche cose colorate sono le
+   La regola della pagina: le uniche cose colorate sono le
    foto. Tutto il resto sta sui grigi, e l'azzurro compare solo dove indica
    qualcosa — il focus, e la riga di stato quando l'album è aperto.
    ───────────────────────────────────────────────────────────────────────── */
@@ -136,7 +136,7 @@
 }
 
 /* Il nome della sessione: c'è solo in locale, e si vede che è un'aggiunta —
-   monospaziato, dietro un filo azzurro, come il numero di giornata di /mima. */
+   monospaziato, dietro un filo azzurro. */
 .sb-sh-chi {
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.78rem;

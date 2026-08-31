@@ -109,22 +109,13 @@ export const GRUPPI: Gruppo[] = [
     id: "foto",
     titolo: "Le foto",
     intro:
-      "Gli originali non stanno nel repository: la cartella foto/ è in .gitignore. Questi comandi si lanciano a mano sul computer dove le foto ci sono davvero, e nel repository ci va solo il risultato.",
+      "Gli originali non stanno nel repository: la cartella foto/ è in .gitignore. Questi comandi si lanciano a mano sul computer dove le foto ci sono davvero, e nel repository ci va solo il racconto della sessione — mai le immagini.",
     voci: [
-      {
-        cmd: "npm run foto",
-        breve: "Album MiMa: dalle foto originali alle immagini per il web, più il manifesto.",
-        dettaglio:
-          "Legge gli EXIF di ogni scatto in foto/mima/, ne fa una versione grande e una miniatura in WebP senza metadati, e scrive il manifesto che la pagina /mima legge davvero. Niente è messo in ordine a mano: il punto sulla mappa viene da GPSLatitude/GPSLongitude, l'ordine da DateTimeOriginal, il nome del posto dall'elenco in content/mima/.",
-        file: "scripts/build-foto-mima.mjs",
-        esce: ["public/images/mima/", "src/app/mima/foto.json"],
-        nota: "È incrementale: ogni file in uscita porta in fondo al nome un'impronta dell'originale, quindi una foto già convertita non si riconverte. Non gira nel prebuild — su Vercel gli originali non ci sono, e ricodificare 300 immagini a ogni deploy sarebbe assurdo.",
-      },
       {
         cmd: "npm run scatti",
         breve: "Shooting: scrive due manifesti separati, e le foto restano in casa.",
         dettaglio:
-          "Fratello del comando qui sopra, con la differenza che cambia tutto: sono ritratti di persone, e le immagini non diventano pubbliche. Esce un manifesto PUBBLICO con solo date, luoghi e conteggi, e uno PRIVATO — dentro foto/, che nessuna build attraversa — con titoli, scatti e misure. Le miniature finiscono accanto agli originali, mai in public/: public/ viene copiata in dist/ da ogni build, quindi una foto messa lì sarebbe a un deploy di distanza dall'essere pubblica.",
+          "La differenza con ogni altro inventario del progetto cambia tutto: sono ritratti di persone, e le immagini non diventano pubbliche. Esce un manifesto PUBBLICO con solo date, luoghi e conteggi, e uno PRIVATO — dentro foto/, che nessuna build attraversa — con titoli, scatti e misure. Le miniature finiscono accanto agli originali, mai in public/: public/ viene copiata in dist/ da ogni build, quindi una foto messa lì sarebbe a un deploy di distanza dall'essere pubblica.",
         file: "scripts/build-foto-shooting.mjs",
         esce: [
           "src/app/shooting/sessioni.json",
@@ -143,20 +134,6 @@ export const GRUPPI: Gruppo[] = [
           ["npm run scatti:togli -- s1", "la toglie dal bucket, permessi già dati compresi"],
         ],
         nota: "Se il bucket risulta pubblico il comando si ferma e lo dice: un secchio pubblico manderebbe all'aria tutto il resto del meccanismo. Le sessioni mai caricate restano irraggiungibili comunque, anche a permesso dato — su /shooting il modulo compare solo dove chiedere ha senso.",
-      },
-      {
-        cmd: "node scripts/foto-zone.mjs",
-        breve: "Dice dove si sono fermati, per poter dare un nome ai posti.",
-        dettaglio:
-          "Raggruppa il GPS delle foto per vicinanza: se venti scatti cadono nello stesso fazzoletto di cinquanta metri, lì dentro c'è qualcosa che la mappa può nominare invece di piantarci sopra una coordinata nuda. Stampa i gruppi in ordine di grandezza, segna quali cadono vicino a un posto già noto e quali sono da battezzare, con un link alla mappa per riconoscerli al volo.",
-        file: "scripts/foto-zone.mjs",
-        opzioni: [
-          [
-            "node scripts/foto-zone.mjs 5 80",
-            "gruppi da 5 foto in su, raggio 80 metri (predefinito: 3 e 60)",
-          ],
-        ],
-        nota: "Non scrive niente e non tocca nessun file: è un rapporto, si può rilanciare mentre le foto stanno ancora arrivando.",
       },
     ],
   },

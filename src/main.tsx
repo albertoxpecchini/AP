@@ -151,7 +151,6 @@ const MeStesso = lazyPage("me-stesso", () => import("./app/me-stesso/MeStesso.ts
 const Dubliners = lazyPage("dubliners", () => import("./app/dubliners/Dubliners.tsx"));
 const Gattopardo = lazyPage("gattopardo", () => import("./app/gattopardo/Gattopardo.tsx"));
 const Festa = lazyPage("festa", () => import("./app/festa/Festa.tsx"));
-const Mima = lazyPage("mima", () => import("./app/mima/Mima.tsx"));
 // /shooting è pubblica, ma le foto no: la pagina esiste per tutti e mostra le
 // gallerie solo dove il manifesto privato risponde, cioè sul computer di casa
 // sotto `vite dev`. Vedi src/app/shooting/sessioni.ts.
@@ -258,14 +257,6 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Suspense fallback={null}>
             <Festa />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/mima"
-        element={
-          <Suspense fallback={null}>
-            <Mima />
           </Suspense>
         }
       />

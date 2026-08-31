@@ -35,9 +35,9 @@ yarn-error.log*
 .env
 .env.local
 
-# Foto originali di MiMa: sono centinaia, pesano GB, e nel repo ci va solo la
-# versione rimpicciolita che genera `npm run foto` (public/images/mima/).
-# Il LEGGIMI.md invece sì, resta versionato: spiega cosa mettere qui dentro.
+# Le foto originali: sono migliaia e pesano GB. Nel repo non ci va NESSUNA
+# immagine — degli shooting esce solo il racconto della sessione, mai gli
+# scatti. Il LEGGIMI.md invece sì, resta versionato: spiega cosa mettere qui.
 foto/**
 !foto/*/
 !foto/*/LEGGIMI.md

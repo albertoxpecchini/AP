@@ -12,7 +12,6 @@
     "repo-tree": "node scripts/build-repo-tree.mjs",
     "commits": "node scripts/build-commits.mjs",
     "i18n": "node scripts/build-i18n.mjs",
-    "foto": "node scripts/build-foto-mima.mjs",
     "scatti": "node scripts/build-foto-shooting.mjs",
     "scatti:carica": "node scripts/scatti-carica.mjs",
     "scatti:togli": "node scripts/scatti-carica.mjs --togli",

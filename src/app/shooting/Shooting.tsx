@@ -58,7 +58,7 @@ const Modulo = lazy(() => import("./Modulo"));
 // scadono in un'ora — vedi lib/scattiAccesso.ts. Le sessioni che non ho
 // caricato là dentro restano irraggiungibili comunque, anche a permesso dato.
 //
-// Registro: la grammatica .sb- del resto del sito, e la disciplina di /mima —
+// Registro: la grammatica .sb- del resto del sito —
 // le uniche cose colorate sono le foto.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -511,6 +511,11 @@ export default function Shooting() {
   // di stato di chi non ne ha uno: la sua situazione è un'altra.
   const conLink = ospite.stato !== "niente";
 
+  // Registro vuoto. Non è un guasto: è il caso in cui non c'è ancora niente da
+  // raccontare, e allora la pagina non deve mostrare tre zeri, una riga di
+  // stato che rimanda a un modulo che non c'è, e un vuoto sotto al titolo.
+  const vuoto = SESSIONI.sessioni.length === 0;
+
   return (
     <div className="sb-home sb-home--fx sb-sh" data-acc="rosa">
       <PageBackdrop />
@@ -557,10 +562,10 @@ export default function Shooting() {
               <strong>Le foto delle persone non le pubblico.</strong> Di ogni sessione resta qui
               quello che si può dire — la data, il posto, quanti scatti, con che attrezzatura — e
               quei numeri vengono dai metadati dei file, non da me. Le foto si vedono solo con un
-              permesso, che chiedi qui sotto e do io, una persona alla volta.
+              permesso, che do io, una persona alla volta.
             </p>
           </div>
-          <div className="sb-sh-cifre">
+          {!vuoto && <div className="sb-sh-cifre">
             {cifre.map((c) => (
               <div key={c.k} className="sb-sh-cifra">
                 <span className="sb-sh-cifra-v" data-no-i18n translate="no">
@@ -569,10 +574,14 @@ export default function Shooting() {
                 <span className="sb-sh-cifra-k">{c.k}</span>
               </div>
             ))}
-          </div>
+          </div>}
 
           {/* ── La riga di stato ───────────────────────────────────────────── */}
-          {conLink ? (
+          {vuoto ? (
+            <p className="sb-sh-stato sb-sh-stato--attesa">
+              <IcCamera size={14} /> Il registro è vuoto: la prossima sessione comparirà qui.
+            </p>
+          ) : conLink ? (
             <p className={`sb-sh-stato sb-sh-stato--${ospite.stato === "aperto" ? "aperto" : ospite.stato === "attesa" ? "attesa" : "manca"}`}>
               {ospite.stato === "attesa" && (
                 <>
@@ -631,7 +640,7 @@ export default function Shooting() {
         </section>
 
         {/* ── Le sessioni ──────────────────────────────────────────────────── */}
-        <section className="sb-container sb-sh-elenco" aria-label="Sessioni">
+        {!vuoto && <section className="sb-container sb-sh-elenco" aria-label="Sessioni">
           {viste.map((v) => (
             <Sessione
               key={v.s.id}
@@ -644,7 +653,7 @@ export default function Shooting() {
               onApri={(i) => setAperta({ sessione: v.s.id, i })}
             />
           ))}
-        </section>
+        </section>}
       </main>
 
       <SiteFooter />

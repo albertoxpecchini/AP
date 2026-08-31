@@ -1,8 +1,9 @@
 // ─── Shooting: dagli scatti originali ai due manifesti ───────────────────────
 //
-// Fratello di build-foto-mima.mjs, con una differenza che cambia tutto: qui le
-// foto NON diventano pubbliche. Sono ritratti di persone, e quello che esce dal
-// computer è il racconto della sessione — data, luogo, quanti scatti, con che
+// Legge gli EXIF degli scatti, con una differenza che cambia tutto rispetto a
+// ogni altro inventario del progetto: qui le foto NON diventano pubbliche. Sono
+// ritratti di persone, e quello che esce dal computer è il racconto della
+// sessione — data, luogo, quanti scatti, con che
 // macchina, come si chiama, e sei sagome sfocate da 24 px. Le immagini restano
 // in locale, e da lì escono solo con un permesso (vedi lib/scattiAccesso.ts).
 //
