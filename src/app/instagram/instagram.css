@@ -80,9 +80,9 @@
   animation: sb-ig-pulse 2s ease-out infinite;
 }
 @keyframes sb-ig-pulse {
-  0% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55); }
-  70% { box-shadow: 0 0 0 7px hsla(197, 100%, 49%, 0); }
-  100% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0); }
+  0% { box-shadow: 0 0 0 0 hsla(132, 100%, 47%, 0.55); }
+  70% { box-shadow: 0 0 0 7px hsla(132, 100%, 47%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(132, 100%, 47%, 0); }
 }
 
 /* ── Strumento: le due liste, come card prodotto ─────────────────────────── */
@@ -128,7 +128,7 @@
 }
 .sb-ig-textarea:focus {
   border-color: var(--sb-brand);
-  box-shadow: 0 0 0 3px hsla(197, 100%, 49%, 0.18);
+  box-shadow: 0 0 0 3px hsla(132, 100%, 47%, 0.18);
 }
 .sb-ig-textarea::placeholder { color: var(--sb-fg-muted); }
 
@@ -244,7 +244,7 @@ html.dark .sb-ig-alert svg { color: hsl(38, 85%, 62%); }
 .sb-ig-res-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 /* Lista in evidenza: bordo-gradiente azzurro (come la card "wish" della home) */
 .sb-ig-card--primary .sb-panel {
-  background: linear-gradient(to bottom, hsla(197, 100%, 49%, 0.55), hsla(197, 100%, 49%, 0.12));
+  background: linear-gradient(to bottom, hsla(132, 100%, 47%, 0.55), hsla(132, 100%, 47%, 0.12));
 }
 .sb-ig-card--primary .sb-ig-res-head svg { color: var(--sb-brand-text); }
 

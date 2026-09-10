@@ -705,6 +705,10 @@ export default function App() {
         </div>
 
         <span className="sb-bg-grid" />
+        {/* La grana fotografica: sta SOPRA griglia e macchie perché è la
+            pellicola su cui è stampato tutto il resto, non un elemento del
+            disegno. Vedi «La grana» in home.css. */}
+        <span className="sb-bg-grain" />
       </div>
 
       {/* Skiplinks — requisito di accessibilità */}

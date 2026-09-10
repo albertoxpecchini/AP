@@ -118,13 +118,13 @@ function paginetta(titolo, corpo) {
   body { margin:0; padding:clamp(4rem,8vw,6rem) clamp(1.25rem,4vw,5rem); background:#fcfcfc; color:#171717;
          font-family:'Titillium Web',Geneva,Tahoma,sans-serif; font-size:16px; line-height:1.5; }
   .velo, .griglia { position:fixed; inset:0; z-index:-1; pointer-events:none; }
-  .velo { background:radial-gradient(58rem 32rem at 16% -8%, hsla(197,100%,49%,.14), transparent 62%); }
+  .velo { background:radial-gradient(58rem 32rem at 16% -8%, hsla(132, 100%, 47%,.14), transparent 62%); }
   .griglia { opacity:.7;
     background:linear-gradient(#e8e8e8 1px, transparent 1px) 0 0/64px 64px,
                linear-gradient(90deg,#e8e8e8 1px, transparent 1px) 0 0/64px 64px;
     -webkit-mask-image:radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
     mask-image:radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%); }
-  ::selection { background:hsla(197,100%,49%,.35); }
+  ::selection { background:hsla(132, 100%, 47%,.35); }
   :focus-visible { outline:2px solid #00b3fa; outline-offset:2px; border-radius:4px; }
   button:focus-visible { outline:none; box-shadow:inset 0 0 0 2px #00b3fa; }
 </style></head>

@@ -137,7 +137,7 @@
 .sb-sos-field input:focus,
 .sb-sos-field textarea:focus {
   border-color: var(--sb-brand);
-  box-shadow: 0 0 0 3px hsla(197, 100%, 49%, 0.18);
+  box-shadow: 0 0 0 3px hsla(132, 100%, 47%, 0.18);
 }
 .sb-sos-field input::placeholder,
 .sb-sos-field textarea::placeholder { color: var(--sb-fg-muted); }

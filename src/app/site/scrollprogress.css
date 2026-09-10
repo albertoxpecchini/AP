@@ -29,12 +29,12 @@
   width: 100%;
   transform: scaleX(0);
   transform-origin: left center;
-  background: linear-gradient(90deg, hsl(197, 100%, 49%), hsl(192, 72%, 55%), hsl(197, 100%, 49%));
-  box-shadow: 0 0 12px -1px hsl(197, 100%, 49%);
+  background: linear-gradient(90deg, hsl(132, 100%, 47%), hsl(96, 82%, 55%), hsl(132, 100%, 47%));
+  box-shadow: 0 0 12px -1px hsl(132, 100%, 47%);
 }
 
 /* Sullo scuro il filo va alzato di poco: il fondo assorbe l'azzurro. */
-html.dark .ap-progress-fill { box-shadow: 0 0 14px -1px hsl(197, 100%, 49%); }
+html.dark .ap-progress-fill { box-shadow: 0 0 14px -1px hsl(132, 100%, 47%); }
 
 @media print {
   .ap-progress { display: none; }

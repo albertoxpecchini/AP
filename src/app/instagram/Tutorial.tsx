@@ -18,7 +18,7 @@ import "./instagram.css";
 // segno "guarda qui" è l'azzurro brand; il blu di Meta resta quello vero.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const HI = "hsl(197, 100%, 36%)";   // azzurro brand: evidenzia il punto da premere
+const HI = "hsl(140, 92%, 27%)";   // azzurro brand: evidenzia il punto da premere
 const INK = "#171717";
 const SUB = "#6f6f6f";
 const LINE = "#e8e8e8";
@@ -111,7 +111,7 @@ function SiteBrowser() {
   return (
     <svg viewBox="0 0 300 340" role="img" aria-hidden="true">
       <rect x="4" y="4" width="292" height="332" rx="16" fill={INK} />
-      <rect x="10" y="10" width="280" height="320" rx="12" fill="#fcfcfc" />
+      <rect x="10" y="10" width="280" height="320" rx="12" fill="#f4f5f2" />
       {/* barra del browser + url del sito */}
       <rect x="10" y="10" width="280" height="34" rx="12" fill="#f0f0f0" />
       <circle cx="26" cy="27" r="4" fill="#c7c7c7" />

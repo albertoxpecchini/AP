@@ -9,7 +9,7 @@
       <!-- Fondo chiaro del sito (--sb-bg). Lo riscrive themeCore.applyTheme al
            cambio tema; qui c'era un arancio, che sulla barra del browser mobile
            non c'entrava niente col bianco della pagina. -->
-      <meta name="theme-color" content="#fcfcfc" />
+      <meta name="theme-color" content="#f4f5f2" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="apple-mobile-web-app-title" content="Alberto Pecchini" />
@@ -54,7 +54,7 @@
             // Stessi valori di THEME_BG in src/app/theme/themeCore.ts, che a
             // loro volta sono i --sb-bg di src/app/home.css: se non combaciano
             // si vede un lampo di colore prima che React monti.
-            de.style.setProperty("--ap-boot-bg", theme === "dark" ? "#141414" : "#fcfcfc");
+            de.style.setProperty("--ap-boot-bg", theme === "dark" ? "#0d0f0c" : "#f4f5f2");
             localStorage.setItem("games-dark", theme === "dark" ? "1" : "0");
             localStorage.setItem("ms-theme", theme);
           } catch (e) {}
@@ -62,7 +62,7 @@
       </script>
       <!-- Sfondo fisso fin dal primo paint: evita il flash nero/bianco quando si
            cambia rotta (es. dal gioco → home) prima che React monti. -->
-      <style>html, body { height: 100%; margin: 0; background: var(--ap-boot-bg, #fcfcfc); } #root { height: 100%; }</style>
+      <style>html, body { height: 100%; margin: 0; background: var(--ap-boot-bg, #f4f5f2); } #root { height: 100%; }</style>
     </head>
 
     <body>

@@ -284,7 +284,7 @@
 
 /* ── Chiusura: pannello con bordo azzurro e fondo appena tinto ─────────────── */
 .sb-pc-closing.sb-panel {
-  background: linear-gradient(to bottom, hsla(197, 100%, 49%, 0.55), hsla(197, 100%, 49%, 0.12));
+  background: linear-gradient(to bottom, hsla(132, 100%, 47%, 0.55), hsla(132, 100%, 47%, 0.12));
 }
 .sb-pc-closing .sb-panel-inner {
   padding: clamp(1.6rem, 4vw, 2.6rem);

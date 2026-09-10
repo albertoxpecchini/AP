@@ -41,20 +41,20 @@ export const esc = (s: unknown): string =>
 
 /** I token di .sb-home, tema chiaro. */
 export const C = {
-  bg: "#fcfcfc",            // --sb-bg
-  bgAlt: "#f8f8f8",         // --sb-bg-alt
-  superficie: "#fbfbfb",    // --sb-surface-75
-  superficie100: "#f6f6f6", // --sb-surface-100
-  superficie200: "#f0f0f0", // --sb-surface-200
-  bordo: "#e8e8e8",         // --sb-border
-  bordoForte: "#dbdbdb",    // --sb-border-strong
-  bordoPiuForte: "#c7c7c7", // --sb-border-stronger
-  fg: "#171717",            // --sb-fg
-  fgLight: "#525252",       // --sb-fg-light
-  fgLighter: "#6f6f6f",     // --sb-fg-lighter
-  fgMuted: "#8f8f8f",       // --sb-fg-muted
-  brand: "#00b3fa",         // --sb-brand       hsl(197 100% 49%)
-  brandTesto: "#0a6285",    // --sb-brand-text  hsl(197 86% 28%)
+  bg: "#f4f5f2",            // --sb-bg
+  bgAlt: "#eff1ec",         // --sb-bg-alt
+  superficie: "#f2f4f0",    // --sb-surface-75
+  superficie100: "#ecefe8", // --sb-surface-100
+  superficie200: "#e5e9e0", // --sb-surface-200
+  bordo: "#dde2d7",         // --sb-border
+  bordoForte: "#ced5c6",    // --sb-border-strong
+  bordoPiuForte: "#b6c0ac", // --sb-border-stronger
+  fg: "#12160f",            // --sb-fg
+  fgLight: "#4a5145",       // --sb-fg-light
+  fgLighter: "#666d60",     // --sb-fg-lighter
+  fgMuted: "#878e80",       // --sb-fg-muted
+  brand: "#00e62a",         // --sb-brand       hsl(132 100% 45%)
+  brandTesto: "#077338",    // --sb-brand-text  hsl(140 88% 24%)
   btnBg: "#72c7e3",         // --sb-btn-bg      hsl(195 67% 67%)
   btnBd: "#3e9bc4",         // --sb-btn-bd      hsla(199 78% 40% / .75) appiattito
   // ATTENZIONE, non è --sb-btn-fg. Nella home i bottoni primari sono quasi
@@ -62,7 +62,7 @@ export const C = {
   // `.sb-btn--primary { color: var(--sb-btn-fg) }`: il nero #101010 del token
   // non arriva mai a schermo, l'etichetta è --sb-fg. Misurato sulla home vera,
   // non dedotto dal CSS: rgb(23,23,23) sul chiaro, rgb(237,237,237) sullo scuro.
-  btnFg: "#171717",
+  btnFg: "#12160f",
 };
 
 // I caratteri e i pesi sono quelli caricati da index.html (font_italia.css):
@@ -90,7 +90,7 @@ const sagoma = (t: number) =>
  * piena dichiarata prima — che è --sb-border-strong, cioè il colore del filo.
  */
 const RIM = `background:${C.bordoForte};background-image:linear-gradient(160deg,#fefefe,${C.bordoForte} 38%,#f3f3f3)`;
-const RIM_SCURO = "background:#343434 !important;background-image:linear-gradient(160deg,#272727,#343434 38%,#1e1e1e) !important";
+const RIM_SCURO = "background:#31382e !important;background-image:linear-gradient(160deg,#272727,#31382e 38%,#1e1e1e) !important";
 /** Nelle pagine i canali alfa ci sono davvero, quindi il rim è quello vero,
  *  copiato tale e quale: sopra i veli azzurri lascia passare il fondale, cosa
  *  che la versione appiattita non può fare. */
@@ -125,18 +125,18 @@ function lastra(
 /** Lo scuro: gli stessi nomi ridichiarati, come html.dark .sb-home. */
 const SCURO = `
     @media (prefers-color-scheme: dark) {
-      .e-bg    { background:#141414 !important; }   /* --sb-bg */
+      .e-bg    { background:#0d0f0c !important; }   /* --sb-bg */
       .e-rim   { ${RIM_SCURO}; }
-      .e-card  { background:#1c1c1c !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.1) !important; }
-      .e-slab  { background:#222222 !important; }   /* --sb-surface-100 */
-      .e-slab-rim { background:#2a2a2a !important; background-image:none !important; }
-      .e-sep   { border-color:#2a2a2a !important; }
-      .e-fg    { color:#ededed !important; }        /* --sb-fg */
-      .e-body  { color:#969696 !important; }        /* --sb-fg-lighter */
-      .e-mut   { color:#707070 !important; }        /* --sb-fg-muted */
+      .e-card  { background:#151814 !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.1) !important; }
+      .e-slab  { background:#1b1f19 !important; }   /* --sb-surface-100 */
+      .e-slab-rim { background:#262b24 !important; background-image:none !important; }
+      .e-sep   { border-color:#262b24 !important; }
+      .e-fg    { color:#eaeee7 !important; }        /* --sb-fg */
+      .e-body  { color:#929a8c !important; }        /* --sb-fg-lighter */
+      .e-mut   { color:#6b7266 !important; }        /* --sb-fg-muted */
       .e-link  { color:#1abeff !important; }        /* --sb-brand-text */
-      .e-btn-p { background:#004261 !important; border-color:#00648f !important; color:#ededed !important; }
-      .e-btn-s { background:#181818 !important; border-color:#343434 !important; color:#ededed !important; }
+      .e-btn-p { background:#004261 !important; border-color:#00648f !important; color:#eaeee7 !important; }
+      .e-btn-s { background:#111310 !important; border-color:#31382e !important; color:#eaeee7 !important; }
     }`;
 
 /**
@@ -149,7 +149,7 @@ const SCURO = `
  */
 const FONDALE = `
     .p-velo, .p-velo2, .p-griglia { position:fixed; inset:0; z-index:-1; pointer-events:none; }
-    .p-velo  { background:radial-gradient(58rem 32rem at 16% -8%, hsla(197,100%,49%,.14), transparent 62%);
+    .p-velo  { background:radial-gradient(58rem 32rem at 16% -8%, hsla(132, 100%, 47%,.14), transparent 62%);
                animation:deriva-a 74s ease-in-out infinite alternate; }
     .p-velo2 { background:radial-gradient(52rem 30rem at 88% 2%, hsla(192,72%,55%,.1), transparent 60%);
                animation:deriva-b 91s ease-in-out infinite alternate; }
@@ -165,21 +165,21 @@ const FONDALE = `
     @keyframes deriva-b { from { transform:translate3d(3vw,2vh,0) scale(1.06); }   to { transform:translate3d(-4vw,-3vh,0) scale(1); } }
     @media (prefers-reduced-motion: reduce) { .p-velo, .p-velo2 { animation:none; } }
     @media (prefers-color-scheme: dark) {
-      .p-velo  { background:radial-gradient(58rem 32rem at 16% -8%, hsla(197,100%,49%,.16), transparent 62%); }
+      .p-velo  { background:radial-gradient(58rem 32rem at 16% -8%, hsla(132, 100%, 47%,.16), transparent 62%); }
       .p-velo2 { background:radial-gradient(52rem 30rem at 88% 2%, hsla(192,72%,55%,.12), transparent 60%); }
       .p-griglia { background:
-        linear-gradient(#2a2a2a 1px, transparent 1px) 0 0 / 64px 64px,
-        linear-gradient(90deg, #2a2a2a 1px, transparent 1px) 0 0 / 64px 64px; }
+        linear-gradient(#262b24 1px, transparent 1px) 0 0 / 64px 64px,
+        linear-gradient(90deg, #262b24 1px, transparent 1px) 0 0 / 64px 64px; }
     }
     /* Lo scuro spegnerebbe il vetro con la tinta piena delle email (.e-card):
        qui la lastra sta sopra il fondale, quindi torna trasparente al 52%,
        che è --sb-glass-bg di html.dark. Questa regola sta dopo, e vince. */
     @media (prefers-color-scheme: dark) {
-      .e-glass { background:color-mix(in srgb, #1c1c1c 52%, transparent) !important; }
+      .e-glass { background:color-mix(in srgb, #151814 52%, transparent) !important; }
     }
     /* Il fuoco e la selezione della home, uguali. Sulla lastra tagliata
        l'outline sparirebbe col clip-path, quindi lì diventa un'ombra interna. */
-    ::selection { background:hsla(197,100%,49%,.35); }
+    ::selection { background:hsla(132, 100%, 47%,.35); }
     :focus-visible { outline:2px solid ${C.brand}; outline-offset:2px; border-radius:4px; }
     button:focus-visible { outline:none; box-shadow:inset 0 0 0 2px ${C.brand}; }`;
 

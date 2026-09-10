@@ -27,7 +27,7 @@ code, pre, kbd, samp {
    Le pagine .sb-home ne hanno una propria (home.css), leggermente diversa;
    questa copre tutto il resto. */
 ::selection {
-  background: hsla(197, 100%, 49%, 0.35);
+  background: hsla(132, 100%, 47%, 0.35);
 }
 
 /* ── Scrollbar sottile e discreta ── */

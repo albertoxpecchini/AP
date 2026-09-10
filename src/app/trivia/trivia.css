@@ -22,13 +22,13 @@
      colore "extra" (stessa famiglia del rosso delle diff nella home). */
   --tv-ok: var(--sb-brand-text);
   --tv-no: hsl(347, 72%, 45%);
-  --tv-ok-soft: hsla(197, 100%, 49%, 0.12);
+  --tv-ok-soft: hsla(132, 100%, 47%, 0.12);
   --tv-no-soft: hsla(347, 72%, 45%, 0.1);
 }
 html.dark .sb-tv-page,
 html.dark .sb-tv-game {
   --tv-no: hsl(352, 88%, 70%);
-  --tv-ok-soft: hsla(197, 100%, 49%, 0.14);
+  --tv-ok-soft: hsla(132, 100%, 47%, 0.14);
   --tv-no-soft: hsla(352, 88%, 70%, 0.13);
 }
 
@@ -596,7 +596,7 @@ body:has(.sb-tv-game[data-phase="playing"]) .sb-ctl {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .sb-tv-open-input::placeholder { color: var(--sb-fg-muted); }
-.sb-tv-open-input:focus { border-color: var(--sb-brand); box-shadow: 0 0 0 3px hsla(197, 100%, 49%, 0.2); }
+.sb-tv-open-input:focus { border-color: var(--sb-brand); box-shadow: 0 0 0 3px hsla(132, 100%, 47%, 0.2); }
 .sb-tv-open-input.ok { border-color: var(--sb-brand); background: var(--tv-ok-soft); }
 .sb-tv-open-input.no { border-color: var(--tv-no); background: var(--tv-no-soft); }
 .sb-tv-open-send {

@@ -30,8 +30,8 @@ const MANUAL_KEY = "ap-theme-manual";
 // (#faf8f6 / #1b151a) e sul chiaro la barra del browser era addirittura arancio
 // #e95420 — su una pagina bianca si vedeva. Se cambia --sb-bg, cambia qui.
 export const THEME_BG: Record<Theme, string> = {
-  light: "#fcfcfc",
-  dark: "#141414",
+  light: "#f4f5f2",
+  dark: "#0d0f0c",
 };
 
 // Ore "chiare": dalle 08:00:00 alle 19:59:59. Tutto il resto è scuro.

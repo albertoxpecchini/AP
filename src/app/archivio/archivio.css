@@ -478,7 +478,7 @@ button.sb-ar-col:hover { color: var(--sb-fg-light); }
   pointer-events: none;
   border: 1px solid var(--sb-brand);
   border-radius: 3px;
-  background: hsla(197, 100%, 49%, 0.16);
+  background: hsla(132, 100%, 47%, 0.16);
 }
 
 /* ── Menu contestuale (radix) ──────────────────────────────────────────────
@@ -486,22 +486,22 @@ button.sb-ar-col:hover { color: var(--sb-fg-light); }
    per ereditarietà, quindi li ripete qui (stessi valori di home.css: chiaro di
    default, scuro sotto html.dark). */
 .sb-ar-menu {
-  --sb-bg: #fcfcfc;
-  --sb-border: #e8e8e8;
-  --sb-border-strong: #dbdbdb;
-  --sb-fg: #171717;
-  --sb-fg-light: #525252;
-  --sb-fg-muted: #8f8f8f;
+  --sb-bg: #f4f5f2;
+  --sb-border: #dde2d7;
+  --sb-border-strong: #ced5c6;
+  --sb-fg: #12160f;
+  --sb-fg-light: #4a5145;
+  --sb-fg-muted: #878e80;
   --sb-overlay: rgba(0, 0, 0, 0.05);
   --sb-shadow-card: 0 4px 20px -6px rgba(0, 0, 0, 0.1);
 }
 html.dark .sb-ar-menu {
-  --sb-bg: #141414;
-  --sb-border: #2a2a2a;
-  --sb-border-strong: #343434;
-  --sb-fg: #ededed;
-  --sb-fg-light: #b4b4b4;
-  --sb-fg-muted: #707070;
+  --sb-bg: #0d0f0c;
+  --sb-border: #262b24;
+  --sb-border-strong: #31382e;
+  --sb-fg: #eaeee7;
+  --sb-fg-light: #b0b8ab;
+  --sb-fg-muted: #6b7266;
   --sb-overlay: rgba(255, 255, 255, 0.07);
   --sb-shadow-card: 0 4px 24px -6px rgba(0, 0, 0, 0.55);
 }

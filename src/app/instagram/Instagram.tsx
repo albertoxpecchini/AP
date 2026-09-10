@@ -291,17 +291,17 @@ function buildReportHtml(title: string, items: Rel[], lang: Lang, st: ReportStat
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:#fcfcfc; --bg-alt:#f8f8f8; --card:#fbfbfb; --soft:#f6f6f6;
-    --bd:#e8e8e8; --bd2:#dbdbdb; --bd3:#c7c7c7;
-    --ink:#171717; --sub:#6f6f6f; --muted:#8f8f8f;
-    --brand:hsl(197,100%,49%); --brand-text:hsl(197,86%,28%);
+    --bg:#f4f5f2; --bg-alt:#eff1ec; --card:#f2f4f0; --soft:#ecefe8;
+    --bd:#dde2d7; --bd2:#ced5c6; --bd3:#b6c0ac;
+    --ink:#12160f; --sub:#666d60; --muted:#878e80;
+    --brand:hsl(132, 100%, 47%); --brand-text:hsl(140, 88%, 24%);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg:#141414; --bg-alt:#181818; --card:#1c1c1c; --soft:#222;
-      --bd:#2a2a2a; --bd2:#343434; --bd3:#414141;
-      --ink:#ededed; --sub:#969696; --muted:#707070;
-      --brand-text:hsl(197,100%,55%);
+      --bg:#0d0f0c; --bg-alt:#111310; --card:#151814; --soft:#1b1f19;
+      --bd:#262b24; --bd2:#31382e; --bd3:#3f4839;
+      --ink:#eaeee7; --sub:#929a8c; --muted:#6b7266;
+      --brand-text:hsl(132, 100%, 62%);
     }
   }
   * { box-sizing:border-box; }

@@ -7,8 +7,14 @@
    griglia "template" (le pagine del sito), story-card, muro community (qui: il
    curriculum), sezione open source e CTA finale.
 
-   Tema NATIVO chiaro/scuro: palette neutra (grigi puri) + azzurro brand
-   hsl(197 100% 49%), tipografia Titillium Web (font_italia.css, al posto di Circular).
+   Tema NATIVO chiaro/scuro. La palette è "Euroshit" (settembre 2026): grigi
+   CEMENTO — non più neutri, ma freddi con dentro una punta di verde — e brand
+   VERDE FLUO hsl(132 100% 45/50%), il verde delle stelle sulla copertina e
+   della stampa sulle felpe. Il verso è quello delle reference: asfalto, flash
+   da paparazzo, un solo colore acceso sopra. Prima era grigio puro + azzurro
+   hsl(197 100% 49%); se serve tornarci, i punti sono questo blocco, il blocco
+   html.dark qui sotto, --sb-acc-* più giù, e i sei file elencati in fondo.
+   Tipografia invariata: Titillium Web (font_italia.css).
    Il chiaro è il default; lo scuro si attiva con html.dark (tema globale).
    Prefisso: .sb- (l'archivio incorporato usa .sb-ar-, vedi archivio.css).
 
@@ -21,32 +27,53 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sb-home {
-  /* ── Palette CHIARA (default) ── */
-  --sb-bg: #fcfcfc;
-  --sb-bg-alt: #f8f8f8;
-  --sb-surface-75: #fbfbfb;
-  --sb-surface-100: #f6f6f6;
-  --sb-surface-200: #f0f0f0;
-  --sb-overlay: rgba(0, 0, 0, 0.05);
-  --sb-border: #e8e8e8;
-  --sb-border-strong: #dbdbdb;
-  --sb-border-stronger: #c7c7c7;
-  --sb-fg: #171717;
-  --sb-fg-light: #525252;
-  --sb-fg-lighter: #6f6f6f;
-  --sb-fg-muted: #8f8f8f;
-  --sb-brand: hsl(197, 100%, 49%);
-  --sb-brand-text: hsl(197, 86%, 28%);
-  /* Banda di luce delle brandline (.sb-shine). La base è lo stesso azzurro del
+  /* ── Palette CHIARA (default) ──────────────────────────────────────────────
+     I grigi non sono più neutri: sono CEMENTO, cioè grigi freddi con una punta
+     di verde dentro (hue 100–120, saturazione 3–6%). Da soli non si leggono
+     come "verdi" — si leggono come asfalto in una foto col flash — ma tolgono
+     al fondo quell'aria da foglio di carta che il grigio puro aveva, e fanno
+     da terra al fluo senza litigarci. Il verso è quello delle reference: luce
+     dura, superficie sporca, un solo colore acceso sopra. */
+  --sb-bg: #f4f5f2;
+  --sb-bg-alt: #eff1ec;
+  --sb-surface-75: #f2f4f0;
+  --sb-surface-100: #ecefe8;
+  --sb-surface-200: #e5e9e0;
+  --sb-overlay: rgba(20, 30, 18, 0.055);
+  --sb-border: #dde2d7;
+  --sb-border-strong: #ced5c6;
+  --sb-border-stronger: #b6c0ac;
+  --sb-fg: #12160f;
+  --sb-fg-light: #4a5145;
+  --sb-fg-lighter: #666d60;
+  --sb-fg-muted: #878e80;
+  /* Il verde fluo delle stelle e della stampa sulle felpe. Sul CHIARO la tinta
+     piena (#00e62a) su bianco è illeggibile — è un colore fatto per accendersi
+     al buio — quindi il brand resta il fluo (bordi, aloni, tratti, dove è
+     superficie e non testo) ma --sb-brand-text scende a un verde bosco che sul
+     testo regge il contrasto. È la stessa distinzione che aveva l'azzurro. */
+  --sb-brand: hsl(132, 100%, 45%);
+  --sb-brand-text: hsl(140, 88%, 24%);
+  /* Banda di luce delle brandline (.sb-shine). La base è lo stesso verde del
      brand — a riposo il titolo è la tinta piena. Sul chiaro la "luce" è più
      SCURA della base: su un fondo bianco una passata più chiara sbiadirebbe il
      testo invece di accenderlo. */
-  --sb-shine-base: var(--sb-brand);
+  --sb-shine-base: var(--sb-brand-display);
   --sb-shine-hi: var(--sb-brand-text);
-  --sb-btn-bg: hsl(195, 67%, 67%);
-  --sb-btn-bd: hsla(199, 78%, 40%, 0.75);
-  --sb-btn-bg-hover: hsl(195, 63%, 60%);
-  --sb-btn-fg: #101010;
+  /* ── Il verde dei TITOLONI ────────────────────────────────────────────────
+     Serve un terzo verde, e la ragione è misurata, non estetica: il fluo pieno
+     su fondo cemento dà 1.55:1 di contrasto — sotto il 3:1 che WCAG chiede
+     anche solo per il testo grande. Come SUPERFICIE (bordi, aloni, tratti,
+     fondi di bottone) il fluo va benissimo ed è il colore del sito; come
+     INCHIOSTRO su fondo chiaro non si legge e basta.
+     Quindi: --sb-brand resta il fluo, e i titoli usano questo, che sul chiaro
+     è un verde bosco acceso (6.1:1) e sullo scuro torna a essere il fluo vero,
+     dove di contrasto ne ha 14:1. */
+  --sb-brand-display: hsl(142, 96%, 26%);
+  --sb-btn-bg: hsl(132, 62%, 62%);
+  --sb-btn-bd: hsla(140, 76%, 30%, 0.75);
+  --sb-btn-bg-hover: hsl(132, 66%, 55%);
+  --sb-btn-fg: #0a1207;
   --sb-code-kw: #0550ae;
   --sb-code-num: #953800;
   --sb-code-fn: #8250df;
@@ -69,7 +96,7 @@
   /* L'ombra della lastra non può più essere un box-shadow (clip-path la
      ritaglia via): è una seconda lastra sfocata, e questo è il suo colore.
      Vedi «L'ombra, che non può più essere un box-shadow» più sotto. */
-  --sb-glass-slab: rgba(0, 0, 0, 0.14);
+  --sb-glass-slab: rgba(12, 22, 8, 0.16);
 
   /* ── Smusso ─────────────────────────────────────────────────────────────
      Tre misure, e sono tre perché il taglio è in pixel assoluti mentre gli
@@ -94,12 +121,12 @@
      quindi la profondità va nell'altro verso — grigio ferro in cima, nero
      pieno in fondo — e la luce arriva tutta dalla striscia mobile (--spec) e
      dal filo bianco sotto le lettere (--edge). */
-  --sb-gloss-hi: #52565c;
-  --sb-gloss-base: #171717;
-  --sb-gloss-low: #050505;
+  --sb-gloss-hi: #4e5650;
+  --sb-gloss-base: #12160f;
+  --sb-gloss-low: #040603;
   --sb-gloss-spec: rgba(255, 255, 255, 0.5);
   --sb-gloss-edge: rgba(255, 255, 255, 0.9);
-  --sb-gloss-halo: hsla(197, 100%, 40%, 0.16);
+  --sb-gloss-halo: hsla(132, 100%, 38%, 0.18);
 
   min-height: 100vh;
   background: var(--sb-bg);
@@ -111,29 +138,37 @@
 }
 
 html.dark .sb-home {
-  /* ── Palette SCURA ── */
-  --sb-bg: #141414;
-  --sb-bg-alt: #181818;
-  --sb-surface-75: #1c1c1c;
-  --sb-surface-100: #222222;
-  --sb-surface-200: #282828;
-  --sb-overlay: rgba(255, 255, 255, 0.07);
-  --sb-border: #2a2a2a;
-  --sb-border-strong: #343434;
-  --sb-border-stronger: #414141;
-  --sb-fg: #ededed;
-  --sb-fg-light: #b4b4b4;
-  --sb-fg-lighter: #969696;
-  --sb-fg-muted: #707070;
-  --sb-brand: hsl(197, 100%, 49%);
-  --sb-brand-text: hsl(197, 100%, 55%);
-  /* Sullo scuro il verso si ribalta: la luce è quasi bianca. */
-  --sb-shine-base: var(--sb-brand);
-  --sb-shine-hi: #eaf8ff;
-  --sb-btn-bg: hsl(199, 100%, 19%);
-  --sb-btn-bd: hsla(197, 100%, 49%, 0.3);
-  --sb-btn-bg-hover: hsl(199, 74%, 25%);
-  --sb-btn-fg: #ffffff;
+  /* ── Palette SCURA ────────────────────────────────────────────────────────
+     Qui il tema è a casa sua: è l'asfalto notturno delle reference. Il nero
+     non è neutro, è verdastro-freddo (hue 100, sat 6–9%) — l'asfalto sotto un
+     flash non è mai grigio pulito — e sopra ci va il fluo pieno, che al buio
+     può stare anche sul testo senza sbiadire. */
+  --sb-bg: #0d0f0c;
+  --sb-bg-alt: #111310;
+  --sb-surface-75: #151814;
+  --sb-surface-100: #1b1f19;
+  --sb-surface-200: #222720;
+  --sb-overlay: rgba(190, 255, 180, 0.075);
+  --sb-border: #262b24;
+  --sb-border-strong: #31382e;
+  --sb-border-stronger: #3f4839;
+  --sb-fg: #eaeee7;
+  --sb-fg-light: #b0b8ab;
+  --sb-fg-lighter: #929a8c;
+  --sb-fg-muted: #6b7266;
+  /* Al buio il fluo è quello vero delle stelle, senza sconti. */
+  --sb-brand: hsl(132, 100%, 50%);
+  --sb-brand-text: hsl(132, 100%, 62%);
+  /* Sullo scuro il verso si ribalta: la luce è quasi bianca — ma una bianca
+     virata al verde, che è come si spegne un fluo, non come si spegne un blu. */
+  --sb-shine-base: var(--sb-brand-display);
+  --sb-shine-hi: #e9ffe4;
+  /* Al buio il titolone può essere il fluo vero: 14:1 di contrasto. */
+  --sb-brand-display: hsl(132, 100%, 50%);
+  --sb-btn-bg: hsl(136, 92%, 15%);
+  --sb-btn-bd: hsla(132, 100%, 50%, 0.32);
+  --sb-btn-bg-hover: hsl(136, 74%, 21%);
+  --sb-btn-fg: #f2fff0;
   --sb-code-kw: #79c0ff;
   --sb-code-num: #ffcda1;
   --sb-code-fn: #bda4ff;
@@ -143,20 +178,20 @@ html.dark .sb-home {
      lastra assorbe. Il filo specular scende a un decimo — un bordo bianco
      acceso come nel chiaro, qui, sembrerebbe un errore di rendering. */
   --sb-glass-bg: color-mix(in srgb, var(--sb-surface-75) 52%, transparent);
-  --sb-glass-spec: rgba(255, 255, 255, 0.1);
-  --sb-glass-rim: rgba(255, 255, 255, 0.08);
-  --sb-glass-shadow: 0 10px 38px -14px rgba(0, 0, 0, 0.65);
-  --sb-glass-sheen: rgba(255, 255, 255, 0.1);
-  --sb-glass-slab: rgba(0, 0, 0, 0.5);
+  --sb-glass-spec: rgba(226, 255, 216, 0.11);
+  --sb-glass-rim: rgba(226, 255, 216, 0.085);
+  --sb-glass-shadow: 0 10px 38px -14px rgba(0, 0, 0, 0.72);
+  --sb-glass-sheen: rgba(226, 255, 216, 0.1);
+  --sb-glass-slab: rgba(0, 0, 0, 0.58);
 
   /* Al buio il verso si ribalta: bianco pieno in cima, grigio in fondo, e il
      filo sotto le lettere diventa nero — è un'ombra incisa, non un riflesso. */
   --sb-gloss-hi: #ffffff;
-  --sb-gloss-base: #ededed;
-  --sb-gloss-low: #8e9491;
+  --sb-gloss-base: #eaeee7;
+  --sb-gloss-low: #8b9488;
   --sb-gloss-spec: rgba(255, 255, 255, 0.95);
-  --sb-gloss-edge: rgba(0, 0, 0, 0.55);
-  --sb-gloss-halo: hsla(197, 100%, 49%, 0.2);
+  --sb-gloss-edge: rgba(0, 0, 0, 0.6);
+  --sb-gloss-halo: hsla(132, 100%, 50%, 0.24);
 }
 
 /* ── Lo smusso ───────────────────────────────────────────────────────────────
@@ -296,7 +331,7 @@ html.dark .sb-home {
       bottom right / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat;
 }
 
-.sb-home ::selection { background: hsla(197, 100%, 49%, 0.35); }
+.sb-home ::selection { background: hsla(132, 100%, 47%, 0.35); }
 .sb-home :focus-visible { outline: 2px solid var(--sb-brand); outline-offset: 2px; border-radius: 4px; }
 /* clip-path porta via anche l'outline del focus: il contorno viene disegnato
    fuori dalla sagoma, e la sagoma è tutto ciò che resta visibile. Su un
@@ -384,7 +419,7 @@ html.dark .sb-home {
   translate: 0 0;
 }
 .sb-home::before {
-  background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.14), transparent 62%);
+  background: radial-gradient(58rem 32rem at 16% -8%, hsla(132, 100%, 47%, 0.14), transparent 62%);
   animation: sb-drift-a 74s ease-in-out infinite alternate;
 }
 /* Il secondo alone si sposta un po' di meno e dalla parte opposta: due strati
@@ -436,7 +471,7 @@ html.dark .sb-home {
 html.sb-quiet .sb-home::before,
 html.sb-quiet .sb-home::after { animation-play-state: paused; }
 html.dark .sb-home::before {
-  background: radial-gradient(58rem 32rem at 16% -8%, hsla(197, 100%, 49%, 0.16), transparent 62%);
+  background: radial-gradient(58rem 32rem at 16% -8%, hsla(132, 100%, 47%, 0.16), transparent 62%);
 }
 html.dark .sb-home::after {
   background: radial-gradient(52rem 30rem at 88% 2%, hsla(192, 72%, 55%, 0.12), transparent 60%);
@@ -472,6 +507,39 @@ html.dark .sb-home::after {
     linear-gradient(90deg, var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px;
   -webkit-mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
   mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
+}
+
+/* ── La grana ────────────────────────────────────────────────────────────────
+   Quello che tiene insieme le tre reference non è solo il fluo: è che sono
+   tutte e tre FOTOGRAFIE, e sporche — asfalto, flash, ISO alto. Su un fondo
+   digitale pulito il verde acido sembra un errore di picker; sopra una grana
+   diventa una stampa. Basta pochissimo: a 0.055 di opacità non la "vedi", ma
+   se la togli te ne accorgi.
+
+   È un turbolenza SVG in un data URI, non un PNG: sta in una riga, non è un
+   file da scaricare, e non ha una risoluzione da sbagliare. baseFrequency
+   alta = grana fine (pellicola); più bassa sarebbe nuvola.
+
+   Fermo di proposito: una grana che si muove è rumore video, e a 60fps
+   ridisegnerebbe l'intero fondale a ogni frame per un effetto che nessuno
+   guarda. Questo strato il browser lo dipinge una volta sola. */
+.sb-bg-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Su fondo chiaro la grana deve SCURIRE (multiply): in screen sbiancherebbe
+     e sparirebbe. Sullo scuro il verso si ribalta, vedi più sotto. */
+  mix-blend-mode: multiply;
+}
+html.dark .sb-bg-grain {
+  opacity: 0.085;
+  mix-blend-mode: screen;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* La grana è ferma, quindi non è un problema di movimento — ma per chi
+     riduce gli effetti è comunque una texture in più su cui l'occhio lavora. */
+  .sb-bg-grain { opacity: 0.03; }
 }
 /* ═══════════════════════════════════════════════════════════════════════════
    LE MACCHIE DEL FONDALE — il colore che ti abbraccia
@@ -587,17 +655,32 @@ html.dark .sb-home::after {
 
    Gli stop sono due e il secondo è trasparente al 70 %: è quello che rende la
    macchia una MACCHIA e non un cerchio: il bordo non arriva mai. */
-.sb-blobset--a .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-acc-blu) / 0.78), transparent 70%); }
-.sb-blobset--a .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-acc-viola) / 0.72), transparent 70%); }
-.sb-blobset--a .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-acc-blu) / 0.6), transparent 70%); }
+/* ── Perché il fondale ha tinte SUE, e non più le sei della griglia ──────────
+   Prima queste macchie leggevano --sb-acc-*, e finché gli accenti erano sei
+   varianti tenui attorno all'azzurro il fondale ne usciva coerente. Con la
+   palette fluo non funziona più: gli accenti adesso sono sei tinte SATURE e
+   lontane tra loro (blu elettrico, viola, magenta), e il fondale diventava una
+   pozza blu-viola sotto un sito verde — si vedeva a occhio, la home sembrava
+   viola. Le tre tavolozze restano tre, ma sono declinazioni del fluo: verde
+   pieno, verde-giallo acido, verde-abete freddo. Il fondale ora ACCOMPAGNA il
+   brand invece di contraddirlo. */
+.sb-home {
+  --sb-blob-fluo: 132 100% 45%;   /* il verde delle stelle */
+  --sb-blob-acido: 96 92% 48%;    /* verso il giallo: il fluo sotto il flash */
+  --sb-blob-abete: 158 78% 32%;   /* verso il blu: l'ombra, non un secondo colore */
+}
 
-.sb-blobset--b .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-acc-ambra) / 0.72), transparent 70%); }
-.sb-blobset--b .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-acc-rosa) / 0.78), transparent 70%); }
-.sb-blobset--b .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-acc-viola) / 0.62), transparent 70%); }
+.sb-blobset--a .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.72), transparent 70%); }
+.sb-blobset--a .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-abete) / 0.7), transparent 70%); }
+.sb-blobset--a .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.55), transparent 70%); }
 
-.sb-blobset--c .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-acc-verde) / 0.72), transparent 70%); }
-.sb-blobset--c .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-acc-blu) / 0.78), transparent 70%); }
-.sb-blobset--c .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-acc-verde) / 0.6), transparent 70%); }
+.sb-blobset--b .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-acido) / 0.66), transparent 70%); }
+.sb-blobset--b .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.72), transparent 70%); }
+.sb-blobset--b .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-abete) / 0.6), transparent 70%); }
+
+.sb-blobset--c .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.7), transparent 70%); }
+.sb-blobset--c .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-acido) / 0.62), transparent 70%); }
+.sb-blobset--c .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-abete) / 0.58), transparent 70%); }
 
 /* In chiaro le macchie vanno tenute più basse: su fondo bianco una tinta
    satura al 55 % è una macchia di vernice, e il testo grigio che ci passa
@@ -957,7 +1040,7 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
     filter: none;
   }
 }
-.sb-hero-title .sb-brandline { color: var(--sb-brand); }
+.sb-hero-title .sb-brandline { color: var(--sb-brand-display); }
 .sb-hero-copy { max-width: 36rem; }
 .sb-hero-copy p { margin: 0 0 0.7rem; font-size: 1rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 .sb-hero-copy p:last-child { margin-bottom: 0; }
@@ -1298,16 +1381,23 @@ button.sb-card:hover .sb-panel,
    Resta azzurro quello che è il sito e non una cosa del sito: l'hero, la CTA
    finale, il footer della home. */
 .sb-home {
-  --sb-acc-blu: 197 100% 49%;
-  --sb-acc-verde: 152 70% 40%;
-  --sb-acc-viola: 268 78% 62%;
-  --sb-acc-rosa: 330 76% 55%;
-  --sb-acc-ambra: 38 92% 50%;
-  --sb-acc-rosso: 12 84% 55%;
+  /* Le sei tinte restano sei, e restano distinguibili — servono a dire "questa
+     sezione non è quella di prima", non a fare arcobaleno. Ma sono state tirate
+     tutte verso la famiglia del fluo: saturazioni alte, niente tinte polverose.
+     Il "verde" ora È il verde delle stelle, cioè il brand, perché era assurdo
+     che la sezione verde fosse più spenta del colore del sito. */
+  --sb-acc-blu: 214 100% 56%;   /* il blu elettrico della felpa "MAZZINI BABY" */
+  --sb-acc-verde: 132 100% 45%; /* il fluo delle stelle: è il brand (sul chiaro) */
+  --sb-acc-viola: 272 90% 65%;
+  --sb-acc-rosa: 328 92% 58%;
+  --sb-acc-ambra: 46 100% 50%;
+  --sb-acc-rosso: 6 92% 57%;
 
   /* A riposo l'accento È il brand: tutto quello che non dichiara una tinta sua
-     continua a essere azzurro come prima, e niente si è spostato per sbaglio. */
-  --sb-accent-hsl: var(--sb-acc-blu);
+     è il verde fluo, e niente si è spostato per sbaglio. (Prima puntava a
+     --sb-acc-blu perché il brand ERA l'azzurro; ora che il brand è il fluo
+     questa riga deve seguirlo, o a riposo il sito resterebbe blu.) */
+  --sb-accent-hsl: var(--sb-acc-verde);
   --sb-accent: hsl(var(--sb-accent-hsl));
   --sb-accent-text: color-mix(in srgb, hsl(var(--sb-accent-hsl)) 78%, #000);
 }
@@ -1371,6 +1461,10 @@ html [data-acc] {
 
   --sb-brand: var(--sb-accent);
   --sb-brand-text: var(--sb-accent-text);
+  /* Sul chiaro il titolone non può essere la tinta piena (vedi
+     --sb-brand-display): dentro un data-acc si ricostruisce affondando
+     l'accento, così ogni sezione ha il SUO titolo, leggibile. */
+  --sb-brand-display: color-mix(in srgb, var(--sb-accent) 62%, #05230f);
 
   /* I bottoni non leggono il brand: hanno tre tinte loro, scelte a mano
      perché l'azzurro pieno, come fondo di un bottone, è troppo. Vanno quindi
@@ -1386,11 +1480,18 @@ html.dark [data-acc] {
 
   --sb-brand: var(--sb-accent);
   --sb-brand-text: var(--sb-accent-text);
+  /* Al buio la tinta piena si legge: il titolone È l'accento. */
+  --sb-brand-display: var(--sb-accent);
 
   --sb-btn-bg: color-mix(in srgb, var(--sb-accent) 32%, #000);
   --sb-btn-bg-hover: color-mix(in srgb, var(--sb-accent) 42%, #000);
   --sb-btn-bd: color-mix(in srgb, var(--sb-accent) 30%, transparent);
 }
+/* Al buio il fluo va pieno, come --sb-brand: se l'accento restasse al 45%
+   mentre il brand è al 50%, a riposo (dove accento e brand sono lo stesso
+   verde) si vedrebbero due verdi diversi accostati. */
+html.dark .sb-home { --sb-acc-verde: 132 100% 50%; }
+
 html [data-acc="blu"] { --sb-accent-hsl: var(--sb-acc-blu); }
 html [data-acc="verde"] { --sb-accent-hsl: var(--sb-acc-verde); }
 html [data-acc="viola"] { --sb-accent-hsl: var(--sb-acc-viola); }
@@ -1858,9 +1959,9 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 /* Le tre tappe restano come stavano. La pausa fra il 70% e il 100% è quella
    che, in ciclo, separa un anello dal successivo. */
 @keyframes sb-ping {
-  0% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0.55); }
-  70% { box-shadow: 0 0 0 7px hsla(197, 100%, 49%, 0); }
-  100% { box-shadow: 0 0 0 0 hsla(197, 100%, 49%, 0); }
+  0% { box-shadow: 0 0 0 0 hsla(132, 100%, 47%, 0.55); }
+  70% { box-shadow: 0 0 0 7px hsla(132, 100%, 47%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(132, 100%, 47%, 0); }
 }
 
 /* Coda della griglia: tagline + "trusted by" */
@@ -2421,7 +2522,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    accanto sembrano lo stesso libro stampato due volte. */
 .sb-slat[data-acc="verde"] { --pg-a: hsl(155 88% 32%); --pg-b: hsl(96 72% 42%); }
 .sb-slat[data-acc="ambra"] { --pg-a: hsl(40 98% 50%); --pg-b: hsl(18 94% 50%); }
-.sb-slat[data-acc="blu"]   { --pg-a: hsl(197 100% 47%); --pg-b: hsl(232 92% 56%); }
+.sb-slat[data-acc="blu"]   { --pg-a: hsl(132 100% 45%); --pg-b: hsl(158 84% 34%); }
 .sb-slat[data-acc="rosso"] { --pg-a: hsl(6 88% 52%); --pg-b: hsl(340 84% 46%); }
 .sb-slat[data-acc="viola"] { --pg-a: hsl(258 90% 60%); --pg-b: hsl(288 78% 52%); }
 .sb-slat[data-acc="rosa"]  { --pg-a: hsl(330 90% 56%); --pg-b: hsl(4 90% 58%); }
@@ -2744,7 +2845,7 @@ html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
 }
 .sb-cv-doc:hover { text-decoration: underline; text-underline-offset: 3px; }
 .sb-wall-card--wish .sb-panel {
-  background: linear-gradient(to bottom, hsla(197, 100%, 49%, 0.55), hsla(197, 100%, 49%, 0.12));
+  background: linear-gradient(to bottom, hsla(132, 100%, 47%, 0.55), hsla(132, 100%, 47%, 0.12));
 }
 .sb-wall-card--wish .sb-cv-title { font-style: italic; }
 
@@ -2929,7 +3030,7 @@ html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
   line-height: 1.15;
   color: var(--sb-fg);
 }
-.sb-cta h2 .sb-brandline { display: block; color: var(--sb-brand); }
+.sb-cta h2 .sb-brandline { display: block; color: var(--sb-brand-display); }
 /* Cursore che lampeggia in fondo all'invito: la riga sembra appena scritta. */
 .sb-caret {
   display: inline-block;

@@ -390,21 +390,21 @@
      !important perché a batterli c'è `html.dark .sb-home`, che di specificità
      ne ha di più: senza, in tema scuro si stamperebbe testo grigio su nero. */
   .sb-cvp-page {
-    --sb-bg: #fcfcfc !important;
-    --sb-bg-alt: #f8f8f8 !important;
-    --sb-surface-75: #fbfbfb !important;
-    --sb-surface-100: #f6f6f6 !important;
-    --sb-surface-200: #f0f0f0 !important;
+    --sb-bg: #f4f5f2 !important;
+    --sb-bg-alt: #eff1ec !important;
+    --sb-surface-75: #f2f4f0 !important;
+    --sb-surface-100: #ecefe8 !important;
+    --sb-surface-200: #e5e9e0 !important;
     --sb-overlay: rgba(0, 0, 0, 0.05) !important;
-    --sb-border: #e8e8e8 !important;
-    --sb-border-strong: #dbdbdb !important;
-    --sb-border-stronger: #c7c7c7 !important;
-    --sb-fg: #171717 !important;
-    --sb-fg-light: #525252 !important;
-    --sb-fg-lighter: #6f6f6f !important;
-    --sb-fg-muted: #8f8f8f !important;
-    --sb-brand: hsl(197, 100%, 49%) !important;
-    --sb-brand-text: hsl(197, 86%, 28%) !important;
+    --sb-border: #dde2d7 !important;
+    --sb-border-strong: #ced5c6 !important;
+    --sb-border-stronger: #b6c0ac !important;
+    --sb-fg: #12160f !important;
+    --sb-fg-light: #4a5145 !important;
+    --sb-fg-lighter: #666d60 !important;
+    --sb-fg-muted: #878e80 !important;
+    --sb-brand: hsl(132, 100%, 47%) !important;
+    --sb-brand-text: hsl(140, 88%, 24%) !important;
     background: #ffffff !important;
     color: var(--sb-fg);
   }

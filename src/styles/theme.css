@@ -19,86 +19,89 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Palette "Euroshit" (settembre 2026): cemento + verde fluo. Come sempre, i
+   valori qui sono la COPIA di quelli di home.css — se cambia là, cambia qui. */
+
 /* ── Chiaro (default) — specchio di .sb-home in home.css ── */
 :root {
   --font-size: 16px;
-  --background: #fcfcfc;          /* --sb-bg */
-  --foreground: #171717;          /* --sb-fg */
-  --card: #fbfbfb;                /* --sb-surface-75 */
-  --card-foreground: #171717;
-  --popover: #fbfbfb;
-  --popover-foreground: #171717;
-  --primary: hsl(197, 100%, 49%);  /* --sb-brand */
-  --primary-foreground: #101010;  /* --sb-btn-fg */
-  --secondary: #f6f6f6;           /* --sb-surface-100 */
-  --secondary-foreground: #171717;
-  --muted: #f0f0f0;               /* --sb-surface-200 */
-  --muted-foreground: #6f6f6f;    /* --sb-fg-lighter */
-  --accent: #f0f0f0;
-  --accent-foreground: #171717;
+  --background: #f4f5f2;          /* --sb-bg */
+  --foreground: #12160f;          /* --sb-fg */
+  --card: #f2f4f0;                /* --sb-surface-75 */
+  --card-foreground: #12160f;
+  --popover: #f2f4f0;
+  --popover-foreground: #12160f;
+  --primary: hsl(132, 100%, 45%);  /* --sb-brand */
+  --primary-foreground: #0a1207;  /* --sb-btn-fg */
+  --secondary: #ecefe8;           /* --sb-surface-100 */
+  --secondary-foreground: #12160f;
+  --muted: #e5e9e0;               /* --sb-surface-200 */
+  --muted-foreground: #666d60;    /* --sb-fg-lighter */
+  --accent: #e5e9e0;
+  --accent-foreground: #12160f;
   --destructive: #e5484d;
   --destructive-foreground: #ffffff;
-  --border: #e8e8e8;              /* --sb-border */
+  --border: #dde2d7;              /* --sb-border */
   --input: transparent;
-  --input-background: #f6f6f6;
-  --switch-background: #c7c7c7;   /* --sb-border-stronger */
+  --input-background: #ecefe8;
+  --switch-background: #b6c0ac;   /* --sb-border-stronger */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: hsla(197, 100%, 49%, 0.35);
-  --chart-1: hsl(197, 100%, 49%);
-  --chart-2: #0550ae;
-  --chart-3: #953800;
-  --chart-4: #8250df;
-  --chart-5: #6f6f6f;
+  --ring: hsla(132, 100%, 45%, 0.35);
+  --chart-1: hsl(132, 100%, 45%);
+  --chart-2: #1f6feb;
+  --chart-3: #8a5a00;
+  --chart-4: #9a5cf0;
+  --chart-5: #666d60;
   --radius: 0.75rem;
-  --sidebar: #f8f8f8;             /* --sb-bg-alt */
-  --sidebar-foreground: #171717;
-  --sidebar-primary: hsl(197, 100%, 49%);
-  --sidebar-primary-foreground: #101010;
-  --sidebar-accent: #f0f0f0;
-  --sidebar-accent-foreground: #171717;
-  --sidebar-border: #e8e8e8;
-  --sidebar-ring: hsla(197, 100%, 49%, 0.35);
+  --sidebar: #eff1ec;             /* --sb-bg-alt */
+  --sidebar-foreground: #12160f;
+  --sidebar-primary: hsl(132, 100%, 45%);
+  --sidebar-primary-foreground: #0a1207;
+  --sidebar-accent: #e5e9e0;
+  --sidebar-accent-foreground: #12160f;
+  --sidebar-border: #dde2d7;
+  --sidebar-ring: hsla(132, 100%, 45%, 0.35);
 }
 
 /* ── Scuro — specchio di html.dark .sb-home ── */
 .dark {
-  --background: #141414;          /* --sb-bg */
-  --foreground: #ededed;          /* --sb-fg */
-  --card: #1c1c1c;                /* --sb-surface-75 */
-  --card-foreground: #ededed;
-  --popover: #1c1c1c;
-  --popover-foreground: #ededed;
-  --primary: hsl(197, 100%, 49%);  /* il brand non cambia col tema */
+  --background: #0d0f0c;          /* --sb-bg */
+  --foreground: #eaeee7;          /* --sb-fg */
+  --card: #151814;                /* --sb-surface-75 */
+  --card-foreground: #eaeee7;
+  --popover: #151814;
+  --popover-foreground: #eaeee7;
+  --primary: hsl(132, 100%, 50%);  /* al buio il fluo va pieno */
   --primary-foreground: #ffffff;
-  --secondary: #222222;           /* --sb-surface-100 */
-  --secondary-foreground: #ededed;
-  --muted: #282828;               /* --sb-surface-200 */
-  --muted-foreground: #969696;    /* --sb-fg-lighter */
-  --accent: #282828;
-  --accent-foreground: #ededed;
+  --secondary: #1b1f19;           /* --sb-surface-100 */
+  --secondary-foreground: #eaeee7;
+  --muted: #222720;               /* --sb-surface-200 */
+  --muted-foreground: #929a8c;    /* --sb-fg-lighter */
+  --accent: #222720;
+  --accent-foreground: #eaeee7;
   --destructive: #e5484d;
   --destructive-foreground: #ffffff;
-  --border: #2a2a2a;              /* --sb-border */
-  --input: #222222;
-  --input-background: #222222;
-  --switch-background: #414141;   /* --sb-border-stronger */
+  --border: #262b24;              /* --sb-border */
+  --input: #1b1f19;
+  --input-background: #1b1f19;
+  --switch-background: #3f4839;   /* --sb-border-stronger */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: hsla(197, 100%, 49%, 0.5);
-  --chart-1: hsl(197, 100%, 49%);
-  --chart-2: #79c0ff;
-  --chart-3: #ffcda1;
-  --chart-4: #bda4ff;
-  --chart-5: #969696;
-  --sidebar: #181818;             /* --sb-bg-alt */
-  --sidebar-foreground: #ededed;
-  --sidebar-primary: hsl(197, 100%, 49%);
+  --ring: hsla(132, 100%, 50%, 0.5);
+  --chart-1: hsl(132, 100%, 50%);
+  --chart-2: #7fb8ff;
+  --chart-3: #ffd98a;
+  --chart-4: #c9a8ff;
+  --chart-5: #929a8c;
+  --sidebar: #111310;             /* --sb-bg-alt */
+  --sidebar-foreground: #eaeee7;
+  --sidebar-primary: hsl(132, 100%, 50%);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #282828;
-  --sidebar-accent-foreground: #ededed;
-  --sidebar-border: #2a2a2a;
-  --sidebar-ring: hsla(197, 100%, 49%, 0.5);
+  --sidebar-accent: #222720;
+  --sidebar-accent-foreground: #eaeee7;
+  --sidebar-border: #262b24;
+  --sidebar-ring: hsla(132, 100%, 50%, 0.5);
 }
 
 @theme inline {
