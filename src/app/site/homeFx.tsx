@@ -77,13 +77,39 @@ export function AuroraBackdrop() {
 }
 
 /**
+ * Il CIELO: i quattro strati del fondale Frutiger Aero.
+ *
+ * Sta qui, e non scritto a mano dentro App.tsx, perché il fondale deve essere
+ * lo STESSO sulla home e sulle sei pagine interne che montano <PageBackdrop />.
+ * Scritto solo nella home, il sito si sarebbe ritrovato con due fondali
+ * diversi: cielo sulla home, il vecchio gradiente ovunque altro.
+ *
+ * L'ordine dei nodi È l'ordine di pittura — nessuno di questi ha uno z-index,
+ * quindi vince chi viene dopo. Dal fondo: il gradiente del cielo, il velo di
+ * nuvole lontane, i cumuli davanti, il sole. Vedi «IL CIELO» in home.css.
+ */
+export function SkyBackdrop() {
+  return (
+    <>
+      <span className="sb-bg-grid" />
+      <span className="sb-bg-clouds-far" />
+      <span className="sb-bg-clouds" />
+      <span className="sb-bg-sun" />
+    </>
+  );
+}
+
+/**
  * Il fondale per le pagine INTERNE.
  *
- * Sulla home il contenitore fisso .sb-bg esiste già (e contiene anche la
- * griglia tecnica), quindi lì basta <AuroraBackdrop /> da solo. Le altre pagine
- * non hanno nessun fondale: questo componente porta il contenitore, ma NON la
- * griglia — quella è decorazione della home, e copiarla ovunque cambierebbe
- * l'aspetto delle pagine molto più di quanto sia stato chiesto.
+ * Sulla home il contenitore fisso .sb-bg esiste già, quindi lì gli strati sono
+ * montati direttamente. Le altre pagine non hanno nessun fondale: questo
+ * componente porta il contenitore E il cielo.
+ *
+ * Prima portava solo l'aurora e NON la griglia tecnica, perché quella era
+ * decorazione della home. Col cielo il ragionamento si ribalta: il cielo non è
+ * una decorazione di una pagina, è il fondale del sito — lasciarlo fuori dalle
+ * pagine interne vorrebbe dire due sfondi diversi a seconda di dove sei.
  *
  * Va usato insieme alla classe `sb-home--fx` sulla radice della pagina: è
  * quella che alza il <main> sopra al fondale (il fondale è fixed a z-index 0, e
@@ -94,6 +120,7 @@ export function PageBackdrop() {
   return (
     <div className="sb-bg" aria-hidden="true">
       <AuroraBackdrop />
+      <SkyBackdrop />
     </div>
   );
 }

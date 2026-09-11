@@ -43,7 +43,7 @@ import { useHomeMotion } from "./site/homeMotion";
 import { useNavPill, useNavAccent } from "./site/GlassMotion";
 // Effetti "pronti" della home (React Bits) — vedi site/homeFx.tsx per il
 // raccordo con tema, movimento ridotto e caricamento pigro.
-import { AuroraBackdrop, ShinyBrandline, SparkGroup } from "./site/homeFx";
+import { AuroraBackdrop, ShinyBrandline, SkyBackdrop, SparkGroup } from "./site/homeFx";
 import {
   NowBuilding,
   MosaicCard,
@@ -682,12 +682,11 @@ export default function App() {
             .sb-home, che seguono lo scroll e il puntatore. */}
         <AuroraBackdrop />
 
-        {/* Il cielo, e sopra le nuvole: il fondale Frutiger Aero. Vanno per
-            primi perché sono il FONDO — senza z-index l'ordine di pittura è
-            l'ordine del documento, e messi in coda coprivano le macchie.
-            Vedi «Il CIELO» e «Le NUVOLE» in home.css. */}
-        <span className="sb-bg-grid" />
-        <span className="sb-bg-clouds" />
+        {/* Il cielo: gradiente, nuvole lontane, cumuli, sole. È un componente
+            condiviso perché lo montano anche le pagine interne, via
+            PageBackdrop — se stesse scritto qui, il sito avrebbe il cielo
+            sulla home e il fondale vecchio ovunque altro. */}
+        <SkyBackdrop />
 
         {/* Le macchie: tre tavolozze sovrapposte che si danno il cambio
             scendendo. Stanno ai BORDI della finestra — il centro è mascherato,

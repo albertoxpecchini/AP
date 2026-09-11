@@ -467,76 +467,183 @@ html.dark .sb-home::after {
   /* Strato a sé: il browser lo dipinge una volta e poi si limita a comporlo. */
   transform: translateZ(0);
 }
-/* ── Il CIELO ────────────────────────────────────────────────────────────────
-   Qui c'era la griglia tecnica da 64px: due gradienti a righe, la firma dei
-   siti-piattaforma. È la cosa più lontana dal Frutiger Aero che ci fosse nel
-   fondale, e va sostituita, non attenuata.
+/* ═══════════════════════════════════════════════════════════════════════════
+   IL CIELO — il fondale, rifatto da zero come Frutiger Aero
 
-   Al suo posto un cielo: azzurro-lilla in alto che scende verso il fondo
-   pagina, cioè il cielo della reference. Non è una tinta piatta ma tre stop —
-   il cielo vero è più chiaro all'orizzonte che allo zenit, e sono quei due
-   gradi di differenza a farlo leggere come cielo invece che come rettangolo
-   colorato. Sopra ci vanno le nuvole (.sb-bg-clouds) e le macchie fluo. */
+   Prima qui c'erano tre cose sovrapposte per stratificazione storica: la
+   griglia tecnica da 64px (eredità Supabase), poi un cielo aggiunto sopra, e
+   sopra ancora le nove macchie fluo — che erano nate per il tema "asfalto" e
+   si portavano dietro un fondale che con l'Aero non c'entra niente. Il
+   risultato era un cielo che si intravedeva sotto una pozza verde.
+
+   Adesso il fondale è UNA cosa sola e ha una regola: è un cielo. Quattro
+   strati, dal fondo in su, e ognuno fa un mestiere solo.
+
+     1. .sb-bg-grid      il cielo: il gradiente di fondo
+     2. .sb-bg-clouds    i cumuli grossi, davanti
+     3. .sb-bg-clouds-far un velo più fine e più lento, dietro
+     4. .sb-bg-sun       il sole: l'alone caldo da cui viene la luce
+
+   ── Come sono fatte le nuvole ──────────────────────────────────────────────
+   Una feTurbulence, ma la catena ha un passaggio che al primo giro mancava e
+   che è tutta la differenza fra "nuvole" e "muffa":
+
+     feTurbulence      rumore frattale — ma su TUTTI E QUATTRO i canali
+     feColorMatrix     ⚠ il passaggio che mancava: butta via il colore
+     feComponentTransfer  scolpisce: cosa è nuvola e cosa è cielo
+
+   Senza il feColorMatrix il rumore è colorato — rosso, verde e blu random —
+   e il fill bianco del <rect> non conta niente, perché il filtro rimpiazza la
+   sorgente. Venivano fuori nuvole a puntini rosa e verdi. La matrice forza
+   R=G=B=1 (bianco pieno) e mette nel canale ALPHA il rumore del solo canale
+   rosso: bianco uniforme, opacità variabile. Cioè una nuvola.
+
+   La curva del feComponentTransfer è quella che decide la FORMA, e va
+   MISURATA, non scelta a occhio. Il primo giro aveva '0 0 0 0.3 1', che a
+   schermo sembrava ragionevole: rendendola su canvas e contando i pixel,
+   copriva lo 0,0% di superficie solida con alpha media 21 su 255. Quello che
+   leggevo come «nuvole» era il cielo sotto. feTurbulence restituisce valori
+   stretti attorno a 0.5, quindi una curva che parte con tre zeri e arriva a
+   0.3 butta via quasi tutto il segnale.
+
+   Il metro, contando i pixel del PNG reso:
+     solidi    quanta superficie è nuvola piena (alpha > 190)
+     visibili  quanta è almeno accennata      (alpha > 60)
+
+   Sotto il 5% di solidi è cielo sereno; sopra il 60% di visibili è overcast e
+   il bianco si mangia la pagina. La misura scelta, '0 0 0 1 1' a 0.005 con 4
+   ottave, dà 12,5% di solidi su 41,9% di visibili: cumuli definiti con del
+   cielo vero in mezzo, che è la reference. Sono i VUOTI fra una nuvola e
+   l'altra a far leggere le gobbe, non il bordo delle nuvole — ed è per questo
+   che «più nuvole» non è mai la risposta giusta.
+
+   Ferme, tutte e due: un fondale che si ridisegna a ogni frame costa l'intera
+   superficie della finestra. Il movimento ce l'ha il sole, che è un elemento
+   solo e si muove in transform (vedi più sotto).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Il cielo. Non è una tinta piatta: il cielo vero è più chiaro verso
+      l'orizzonte che allo zenit, e sono quei due gradi di differenza a farlo
+      leggere come cielo invece che come rettangolo azzurro. In fondo sfuma
+      verso --sb-bg, così il contenuto della pagina non galleggia su un
+      taglio netto. */
 .sb-bg-grid {
   position: absolute;
   inset: 0;
   opacity: 1;
+  /* L'azzurro tiene per quasi tutta la pagina. Sfumando a --sb-bg già al 62%
+     la metà bassa tornava bianca e il cielo sembrava una fascia incollata in
+     cima: la reference è cielo dall'alto in basso, e il fondo pagina è solo
+     l'orizzonte — più chiaro, non assente. */
   background: linear-gradient(
     180deg,
-    hsl(208 100% 84%) 0%,
-    hsl(200 96% 90%) 22%,
-    color-mix(in srgb, var(--sb-bg) 82%, transparent) 58%,
-    var(--sb-bg) 100%
+    hsl(214 94% 64%) 0%,
+    hsl(210 96% 72%) 16%,
+    hsl(205 95% 80%) 38%,
+    hsl(200 94% 86%) 62%,
+    hsl(196 90% 90%) 82%,
+    color-mix(in srgb, var(--sb-bg) 55%, hsl(194 88% 92%)) 100%
   );
 }
 html.dark .sb-bg-grid {
-  /* Di notte lo stesso cielo, ma è il blu di città: scuro, virato al verde in
-     basso dove incontra l'asfalto del fondo pagina. */
+  /* Di notte resta un cielo, non diventa un muro nero: blu profondo in alto
+     che scende all'asfalto verdastro del fondo pagina. */
   background: linear-gradient(
     180deg,
-    hsl(206 62% 16%) 0%,
-    hsl(196 46% 12%) 26%,
-    color-mix(in srgb, var(--sb-bg) 86%, transparent) 62%,
-    var(--sb-bg) 100%
+    hsl(218 68% 17%) 0%,
+    hsl(210 58% 13%) 22%,
+    hsl(200 40% 10%) 44%,
+    color-mix(in srgb, var(--sb-bg) 82%, hsl(190 30% 12%)) 68%,
+    var(--sb-bg) 92%
   );
 }
 
-/* ── Le NUVOLE ───────────────────────────────────────────────────────────────
-   Il fondale canonico del Frutiger Aero è un cielo, e la reference dei font è
-   esattamente quello: nuvole bianche sfilacciate su un azzurro-lilla.
-
-   Qui c'era la grana fotografica — la stessa feTurbulence, ma a baseFrequency
-   alta, che dà pellicola. La nuvola si ottiene dallo STESSO filtro girato al
-   contrario: frequenza bassa (0.011 invece di 0.82) e molte ottave, così le
-   macchie diventano larghe e frastagliate invece che puntiformi. Il
-   feComponentTransfer è quello che le rende nuvole e non nebbia uniforme: la
-   curva taglia via i mezzitoni, e restano fiocchi bianchi con dei vuoti in
-   mezzo.
-
-   Resta ferma, per la ragione di prima: un fondale che si ridisegna a ogni
-   frame costa l'intera superficie della finestra, e nessuno lo guarda. Il
-   movimento del fondale ce l'hanno già le macchie, che sono nove elementi
-   piccoli e composti dalla GPU. */
+/* 2. I cumuli, davanti. Coprono tutta la pagina e non più una fascia in alto:
+      nella reference il cielo È il fondale, dall'alto in basso. La maschera
+      non li spegne, li DIRADA scendendo — restano nuvole anche in fondo, ma
+      abbastanza fioche da lasciar leggere quello che ci sta sopra. */
 .sb-bg-clouds {
   position: absolute;
-  inset: -10%;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='600'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 0.25 0.75 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='900' height='600' filter='url(%23c)' fill='%23fff'/%3E%3C/svg%3E");
-  background-size: cover;
-  /* Le nuvole stanno in ALTO: un cielo che arriva fino ai piedi è una nebbia.
-     La maschera le dissolve prima di metà pagina, dove comincia il contenuto. */
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 26%, transparent 72%);
-  mask-image: linear-gradient(180deg, #000 0%, #000 26%, transparent 72%);
+  inset: 0;
+  opacity: 1;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='520'><filter id='c' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.005' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 1 1'/></feComponentTransfer></filter><rect width='800' height='520' filter='url(%23c)'/></svg>");
+  /* 100%: alla scala 1:1 del riquadro del filtro i cumuli hanno la misura per
+     cui la baseFrequency è stata scelta. Ingrandendoli (130%) si sgranavano in
+     due macchie sole per schermata. */
+  background-size: 100% auto;
+  background-position: 50% 0;
+  background-repeat: repeat;
+  /* La maschera DIRADA scendendo, non spegne: il cielo della reference è cielo
+     dall'alto in basso. Restano nuvole anche in fondo, abbastanza fioche da
+     lasciar leggere quello che ci passa sopra. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 46%, rgba(0, 0, 0, 0.6) 74%, rgba(0, 0, 0, 0.3) 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 46%, rgba(0, 0, 0, 0.6) 74%, rgba(0, 0, 0, 0.3) 100%);
 }
-html.dark .sb-bg-clouds {
-  /* Di notte il cielo non sparisce, si spegne: le stesse nuvole molto più
-     fioche, che è quello che si vede davvero guardando in su in città. */
-  opacity: 0.14;
+/* 3. Il velo dietro, a una scala diversa e con un seed diverso: due strati
+      dello stesso rumore alla stessa scala sarebbero la stessa nuvola due
+      volte, e si vedrebbe. */
+.sb-bg-clouds-far {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='600'><filter id='c' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.0085' numOctaves='3' seed='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0.15 0.75 1'/></feComponentTransfer></filter><rect width='900' height='600' filter='url(%23c)'/></svg>");
+  /* Più grande dei cumuli davanti: è quello che dà la profondità. Due strati
+     alla stessa scala sarebbero la stessa nuvola due volte. */
+  background-size: 165% auto;
+  background-position: 20% 6%;
+  background-repeat: repeat;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 92%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 92%);
 }
+html.dark .sb-bg-clouds { opacity: 0.2; }
+html.dark .sb-bg-clouds-far { opacity: 0.12; }
+
+/* 4. Il sole. È la firma dell'Aero più delle nuvole stesse: un alone caldo in
+      alto, fuori dall'angolo, che dà una DIREZIONE alla luce — ed è la stessa
+      direzione da cui arriva il lucido sulle pillole e sulle lastre (dall'alto
+      in giù). Senza, il vetro sembra illuminato da nessuna parte.
+
+      Si muove, piano: è l'unico elemento animato del fondale, ed è uno solo
+      che trasla — il compositore lo sposta senza ridisegnare niente. */
+.sb-bg-sun {
+  position: absolute;
+  top: -28vh;
+  left: 52%;
+  width: 92vw;
+  height: 92vw;
+  transform: translate3d(-50%, 0, 0);
+  background: radial-gradient(
+    circle,
+    rgba(255, 252, 232, 0.95) 0%,
+    rgba(255, 246, 200, 0.5) 18%,
+    rgba(255, 240, 190, 0.22) 34%,
+    transparent 62%
+  );
+  animation: sb-sun 42s ease-in-out infinite alternate;
+}
+html.dark .sb-bg-sun {
+  /* Di notte il sole è una luna: piccola, fredda, e molto più discreta. */
+  background: radial-gradient(
+    circle,
+    rgba(214, 240, 255, 0.3) 0%,
+    rgba(180, 220, 255, 0.13) 20%,
+    transparent 52%
+  );
+}
+@keyframes sb-sun {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(-46%, 4vh, 0); }
+}
+.sb-quiet .sb-bg-sun { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
-  .sb-bg-clouds { opacity: 0.3; }
-  html.dark .sb-bg-clouds { opacity: 0.1; }
+  .sb-bg-sun { animation: none; }
 }
+@media print {
+  .sb-bg-clouds,
+  .sb-bg-clouds-far,
+  .sb-bg-sun { display: none; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    LE MACCHIE DEL FONDALE — il colore che ti abbraccia
 
@@ -661,34 +768,44 @@ html.dark .sb-bg-clouds {
    pieno, verde-giallo acido, verde-abete freddo. Il fondale ora ACCOMPAGNA il
    brand invece di contraddirlo. */
 .sb-home {
-  --sb-blob-fluo: 132 100% 45%;   /* il verde delle stelle */
-  --sb-blob-acido: 96 92% 48%;    /* verso il giallo: il fluo sotto il flash */
-  --sb-blob-abete: 158 78% 32%;   /* verso il blu: l'ombra, non un secondo colore */
+  /* ── Le macchie, che adesso sono FOSCHIA ─────────────────────────────────
+     Erano il verde fluo del tema asfalto: nove macchie sature che dovevano
+     mettere loro il colore, perché sotto c'era un grigio piatto. Con il cielo
+     sotto quel mestiere non esiste più — e infatti coprivano le nuvole.
+
+     Restano nove, restano mosse dal loro driver (site/macchie.ts) e dalle
+     keyframe qui sotto: cambiano mestiere. Adesso sono la foschia del cielo —
+     lo strato di aria colorata che sta fra l'occhio e le nuvole, e che nella
+     reference è quel velo lilla che tinge i bordi. Tinte del cielo, non del
+     brand, e opacità da velo, non da vernice. */
+  --sb-blob-lilla: 254 84% 78%;    /* il lilla della reference */
+  --sb-blob-ciano: 192 92% 74%;    /* l'azzurro che schiarisce verso il sole */
+  --sb-blob-pesca: 28 96% 80%;     /* il caldo dalla parte del sole */
 }
 
-.sb-blobset--a .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.72), transparent 70%); }
-.sb-blobset--a .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-abete) / 0.7), transparent 70%); }
-.sb-blobset--a .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.55), transparent 70%); }
+.sb-blobset--a .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-lilla) / 0.5), transparent 70%); }
+.sb-blobset--a .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-ciano) / 0.42), transparent 70%); }
+.sb-blobset--a .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-lilla) / 0.34), transparent 70%); }
 
-.sb-blobset--b .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-acido) / 0.66), transparent 70%); }
-.sb-blobset--b .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.72), transparent 70%); }
-.sb-blobset--b .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-abete) / 0.6), transparent 70%); }
+.sb-blobset--b .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-pesca) / 0.4), transparent 70%); }
+.sb-blobset--b .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-lilla) / 0.48), transparent 70%); }
+.sb-blobset--b .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-ciano) / 0.36), transparent 70%); }
 
-.sb-blobset--c .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-fluo) / 0.7), transparent 70%); }
-.sb-blobset--c .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-acido) / 0.62), transparent 70%); }
-.sb-blobset--c .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-abete) / 0.58), transparent 70%); }
+.sb-blobset--c .sb-blob--1 { background: radial-gradient(circle, hsl(var(--sb-blob-ciano) / 0.46), transparent 70%); }
+.sb-blobset--c .sb-blob--2 { background: radial-gradient(circle, hsl(var(--sb-blob-lilla) / 0.44), transparent 70%); }
+.sb-blobset--c .sb-blob--3 { background: radial-gradient(circle, hsl(var(--sb-blob-pesca) / 0.3), transparent 70%); }
 
-/* In chiaro le macchie vanno tenute più basse: su fondo bianco una tinta
-   satura al 55 % è una macchia di vernice, e il testo grigio che ci passa
-   sopra perde contrasto. In scuro invece possono spingere — è lì che
-   «accesissimo» funziona, perché il colore ha il nero attorno che lo regge. */
-/* Le macchie cedono il passo al cielo. Erano a 1 quando il fondale sotto era
-   un grigio piatto e il colore lo dovevano mettere loro; adesso sotto c'è un
-   cielo con le nuvole, e a piena opacità lo coprivano quasi tutto — restava
-   una fascia azzurra in cima e basta. A 0.5 le due cose si vedono tutte e
-   due: il verde continua ad abbracciare i bordi, il cielo resta cielo. */
-.sb-blobs { opacity: 0.5; }
-html.dark .sb-blobs { opacity: 0.62; }
+/* Da velo, non da vernice: sotto c'è un cielo che deve restare visibile.
+
+   z-index -1, e non è un dettaglio: .sb-blobs aveva `z-index: 0` mentre gli
+   strati del cielo non ne hanno nessuno (`auto`). A parità di posizione nel
+   flusso vince chi ha lo z-index esplicito, quindi la foschia finiva SOPRA le
+   nuvole e le anneghiava — il cielo si vedeva, le nuvole no. Stessa trappola
+   di .sb-aurora, che era lì per lo stesso motivo. Il fondale è tutto dentro
+   .sb-bg, che è già un contesto di impilamento suo, quindi il -1 resta
+   confinato lì e non fa sparire niente sotto la pagina. */
+.sb-blobs { opacity: 0.42; z-index: -1; }
+html.dark .sb-blobs { opacity: 0.3; }
 
 @keyframes sb-blob-a {
   from { transform: translate3d(0, 0, 0) scale(1); }
@@ -3253,21 +3370,24 @@ html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
    era indistinguibile a occhio dal primo fotogramma dello shader: adesso è la
    regola, non il ripiego. Il fondale il suo movimento ce l'ha lo stesso —
    glielo danno lo scroll e il puntatore sui due aloni di .sb-home. */
+/* L'aurora: l'alone del brand in cima alla pagina. Col cielo sotto NON deve
+   più dipingere niente — era un velo verde a tutta larghezza sopra il fondale,
+   e sopra un cielo diventa una foschia verde che si mangia le nuvole.
+
+   Due cose la rendevano invisibile solo per fortuna, e vanno dette perché è il
+   genere di dettaglio che riappare al primo refactor: aveva `z-index: 0` e gli
+   strati del cielo non ne hanno nessuno, quindi vinceva lei e finiva SOPRA —
+   non sotto, come il nome «fondale» lascerebbe pensare.
+
+   Resta dichiarata e resta montata (la chiamano la home e sei pagine interne
+   via PageBackdrop): semplicemente non dipinge più. Rimuoverla avrebbe voluto
+   dire toccare sette punti per spegnere un gradiente. */
 .sb-aurora {
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: 0.5;
-  background: radial-gradient(
-    120% 62% at 50% -10%,
-    color-mix(in srgb, var(--sb-brand) 26%, transparent) 0%,
-    transparent 62%
-  );
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 34%, transparent 72%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 34%, transparent 72%);
+  display: none;
 }
-.sb-home.dark .sb-aurora,
-html.dark .sb-aurora { opacity: 0.42; }
 
 /* ── ② Brandline con la banda di luce ────────────────────────────────────────
    Una banda di luce ripassa sulla riga ogni tanto. Il disegno è lo stesso di
