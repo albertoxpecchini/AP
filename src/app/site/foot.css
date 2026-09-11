@@ -234,7 +234,7 @@
 @supports (corner-shape: bevel) {
   .sb-foot-slab {
     clip-path: none;
-    border-radius: var(--sb-cut-lg) 0 var(--sb-cut-lg) 0;
+    border-radius: var(--sb-radius-lg);
     corner-shape: bevel;
     /* E siccome adesso l'ombra non viene più tagliata via, torna a essere un
        box-shadow onesto invece della lastra sfocata appesa al contenitore. */
@@ -250,7 +250,7 @@
        come sui lati dritti: col bevel il conto è banale — il raggio è la
        distanza dall'angolo lungo il lato, e l'inner è inset di 1px. Niente
        0.586px, che serviva solo perché il poligono ragiona in perpendicolare. */
-    border-radius: calc(var(--sb-cut-lg) - 1px) 0 calc(var(--sb-cut-lg) - 1px) 0;
+    border-radius: calc(var(--sb-radius-lg) - 1px);
     corner-shape: bevel;
   }
 }
@@ -327,7 +327,7 @@
   color: var(--sb-fg-light);
   text-decoration: none;
   border: 1px solid var(--sb-border-strong);
-  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  border-radius: var(--sb-radius-xs);
   transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
 @supports (corner-shape: bevel) {
@@ -373,7 +373,7 @@
   text-decoration: none;
   color: var(--sb-fg-muted);
   border: 1px solid transparent;
-  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  border-radius: var(--sb-radius-xs);
   /* Una superficie appena percettibile anche a riposo: senza, le piastrelle
      non sono piastrelle — sono venti icone che galleggiano su un vuoto, e il
      muro non si legge come muro finché non ci passi sopra. */
@@ -449,7 +449,7 @@
   color: var(--sb-fg-light);
   background-color: transparent;
   border: 1px solid var(--sb-border-strong);
-  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  border-radius: var(--sb-radius-xs);
   cursor: pointer;
   transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
@@ -534,7 +534,7 @@
   gap: 0.32rem;
   padding: 0.16rem 0.6rem;
   border: 1px solid var(--sb-border-strong);
-  border-radius: var(--sb-cut-xs) 0 var(--sb-cut-xs) 0;
+  border-radius: var(--sb-radius-xs);
   background-color: var(--sb-bg);
   font-size: 0.78rem;
   color: var(--sb-fg-light);

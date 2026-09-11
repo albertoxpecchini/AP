@@ -98,22 +98,34 @@
      Vedi «L'ombra, che non può più essere un box-shadow» più sotto. */
   --sb-glass-slab: rgba(12, 22, 8, 0.16);
 
-  /* ── Smusso ─────────────────────────────────────────────────────────────
-     Tre misure, e sono tre perché il taglio è in pixel assoluti mentre gli
-     elementi non lo sono: su una lastra 18px sono un angolo, su un contatore
-     alto 19px sarebbero più della metà del lato corto e la pillola diventerebbe
-     una losanga. La misura si sceglie dall'altezza, non dal ruolo.
+  /* ── Il lucido Aero ───────────────────────────────────────────────────────
+     Quello che distingue il vetro di Vista dal "glassmorphism" di oggi non è
+     la sfocatura — ce l'hanno tutti e due — è il RIFLESSO: una lente di luce
+     che occupa la metà ALTA della superficie e si ferma di netto a metà, come
+     il riflesso del cielo su una plastica bombata. Il taglio netto a metà è la
+     firma dell'epoca; sfumarlo per tutta l'altezza dà di nuovo un gradiente
+     qualunque.
+       --gloss-top  la luce in cima, quasi bianca
+       --gloss-mid  dove la lente si spegne, appena prima di metà altezza
+       --gloss-cut  la percentuale a cui taglia (sotto è vetro nudo)
+     Vedi «.sb-aero» più sotto per come sono montati. */
+  --sb-aero-gloss-top: rgba(255, 255, 255, 0.78);
+  --sb-aero-gloss-mid: rgba(255, 255, 255, 0.18);
+  --sb-aero-gloss-cut: 48%;
+  /* L'alone colorato che l'Aero mette SOTTO gli elementi vivi: non è un'ombra
+     (che è grigia e cade in basso), è la tinta stessa che sfiata all'esterno. */
+  --sb-aero-halo: 0 0 22px -4px color-mix(in srgb, var(--sb-brand) 55%, transparent);
+  --sb-aero-bevel: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
 
-       --sb-cut-xs   contatori e micro-badge (fino a ~24px di altezza)
-       --sb-cut      pillole, tag, filtri, celle di tabella
-       --sb-cut-lg   lastre
-
-     Le sagome vere si costruiscono da qui, nel blocco «Lo smusso»: stanno in un
-     secondo .sb-home più sotto perché devono poter leggere questi tre valori
-     già dichiarati. */
-  --sb-cut-xs: 6px;
-  --sb-cut: 10px;
-  --sb-cut-lg: 18px;
+  /* ── Le misure della curva ──────────────────────────────────────────────
+     Restano tre e restano nominate com'erano (--sb-cut-*), perché il footer e
+     qualche pagina le leggono ancora. Non sono più tagli a 45°: sono i raggi
+     "piccoli", quelli da usare dove una pillola piena non sta — un angolo di
+     lastra dentro un'altra lastra, per dire. I raggi veri del sito sono
+     --sb-radius-* nel blocco «La forma». */
+  --sb-cut-xs: 10px;
+  --sb-cut: 14px;
+  --sb-cut-lg: 20px;
 
   /* ── Lucido del titolo ──────────────────────────────────────────────────
      Il nome della hero non è più una tinta piatta: è una superficie. Sul
@@ -131,10 +143,29 @@
   min-height: 100vh;
   background: var(--sb-bg);
   color: var(--sb-fg);
-  font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+  font-family: var(--font-site);
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── I titoli ────────────────────────────────────────────────────────────────
+   Tutto ciò che è titolo passa al display, in un posto solo: h1–h4, la hero,
+   i titoli di sezione, la CTA. Il Y2K qui non è il peso — è la LARGHEZZA
+   (wdth 100, l'estremo largo dell'asse) più un tracking negativo che chiude
+   le lettere una sull'altra finché il blocco di testo diventa una massa. Con
+   wdth basso e tracking normale si otterrebbe un grassetto qualunque. */
+.sb-home h1,
+.sb-home h2,
+.sb-home h3,
+.sb-home h4,
+.sb-home .sb-hero-title,
+.sb-home .sb-sec-title,
+.sb-home .sb-cta h2 {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 100, "opsz" 48;
+  font-weight: 800;
+  letter-spacing: -0.028em;
 }
 
 html.dark .sb-home {
@@ -184,6 +215,14 @@ html.dark .sb-home {
   --sb-glass-sheen: rgba(226, 255, 216, 0.1);
   --sb-glass-slab: rgba(0, 0, 0, 0.58);
 
+  /* Al buio la lente non può essere bianca al 78%: sarebbe una macchia di
+     latte. Si abbassa molto, e resta comunque lei a dare la bombatura. */
+  --sb-aero-gloss-top: rgba(233, 255, 228, 0.16);
+  --sb-aero-gloss-mid: rgba(233, 255, 228, 0.04);
+  --sb-aero-gloss-cut: 48%;
+  --sb-aero-halo: 0 0 26px -4px color-mix(in srgb, var(--sb-brand) 62%, transparent);
+  --sb-aero-bevel: inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+
   /* Al buio il verso si ribalta: bianco pieno in cima, grigio in fondo, e il
      filo sotto le lettere diventa nero — è un'ombra incisa, non un riflesso. */
   --sb-gloss-hi: #ffffff;
@@ -194,141 +233,73 @@ html.dark .sb-home {
   --sb-gloss-halo: hsla(132, 100%, 50%, 0.24);
 }
 
-/* ── Lo smusso ───────────────────────────────────────────────────────────────
-   La forma del sito: un angolo tagliato a 45° in alto a sinistra e uno in basso
-   a destra. Due diagonali opposte bastano a dare una direzione alla sagoma —
-   tagliarne quattro la rimetterebbe in simmetria e tornerebbe a essere un
-   ottagono, cioè di nuovo un tondo.
+/* ── La forma: dallo smusso alla PILLOLA ─────────────────────────────────────
+   Qui c'era lo smusso — un angolo tagliato a 45° in alto a sinistra e uno in
+   basso a destra, disegnato con clip-path: polygon(). Era la forma del sito
+   quando il sito era modellato sulla home di Supabase: spigolo, direzione,
+   niente stondature. È esattamente il contrario del Frutiger Aero, che è tutto
+   raggi grossi, riflessi e superfici gonfie.
 
-   Le sagome sono pronte, una per misura, e si richiamano così:
+   Le sagome restano, e restano con gli STESSI NOMI, perché sono richiamate 76
+   volte in 13 fogli di stile: cambiare qui la definizione ritinge la forma di
+   tutto il sito senza toccare nessuno di quei 76 punti. Ma adesso sono
+   rettangoli PIENI, e la curva la mette --sb-radius-* col border-radius.
 
-     .qualcosa { clip-path: var(--sb-shape-sm); }
+     .qualcosa { clip-path: var(--sb-shape-sm); }   ← invariato, dove sta
 
-   Sta in un secondo blocco .sb-home, dopo i token, e NON si può "semplificare"
-   in una sola sagoma con una misura variabile: le custom property vengono
-   sostituite SUBITO, sull'elemento dove sono scritte, e il valore già risolto è
-   quello che eredita. Una --sb-shape che contenesse var(--c) andrebbe a cercare
-   --c qui su .sb-home, non lo troverebbe, e l'intera proprietà diventerebbe
-   invalida (cioè vuota) prima ancora di arrivare a chi la usa. Con --sb-cut,
-   che è dichiarato qui sopra, la sostituzione riesce — ed è anche il motivo per
-   cui il tema scuro funziona da sé: le stesse dichiarazioni si ricalcolano
-   dentro html.dark .sb-home, e il filo sulle diagonali cambia colore con loro. */
+   Perché tenere un clip-path che non taglia più niente invece di cancellarlo:
+   perché serve ancora. Sulle lastre di vetro il clip è quello che impedisce
+   allo pseudo-elemento del riflesso (::before, che è un blocco bianco sfumato)
+   di debordare oltre l'angolo tondo — border-radius da solo non ritaglia i
+   figli posizionati, e senza il clip il lucido spunterebbe fuori dagli angoli.
+   `inset()` con un raggio fa esattamente questo, e in più il raggio lo eredita
+   da --sb-radius-*, così forma e clip non possono più andare fuori sincrono.
+
+   ── I raggi ────────────────────────────────────────────────────────────────
+   Tre, come erano tre i tagli, e per la stessa ragione: la misura si sceglie
+   dall'altezza dell'elemento, non dal suo ruolo. La differenza è che adesso i
+   piccoli sono PIÙ tondi in proporzione, non meno: su una pillola alta 24px un
+   raggio da 12 la chiude a semicerchio, ed è proprio la forma che si vuole —
+   il bottone di Vista è una pillola, non un rettangolo appena addolcito. */
 .sb-home {
+  --sb-radius-xs: 999px;  /* contatori e micro-badge: pillola piena */
+  --sb-radius-sm: 999px;  /* pillole, tag, filtri: pillola piena */
+  --sb-radius-lg: 20px;   /* lastre: tondo generoso, ma resta un rettangolo */
+
   /* Contatori e micro-badge */
-  --sb-shape-xs: polygon(
-    var(--sb-cut-xs) 0,
-    100% 0,
-    100% calc(100% - var(--sb-cut-xs)),
-    calc(100% - var(--sb-cut-xs)) 100%,
-    0 100%,
-    0 var(--sb-cut-xs)
-  );
+  --sb-shape-xs: inset(0 round var(--sb-radius-xs));
   /* Pillole, badge, filtri, celle di tabella */
-  --sb-shape-sm: polygon(
-    var(--sb-cut) 0,
-    100% 0,
-    100% calc(100% - var(--sb-cut)),
-    calc(100% - var(--sb-cut)) 100%,
-    0 100%,
-    0 var(--sb-cut)
-  );
+  --sb-shape-sm: inset(0 round var(--sb-radius-sm));
   /* Lastre: il rim esterno… */
-  --sb-shape-lg: polygon(
-    var(--sb-cut-lg) 0,
-    100% 0,
-    100% calc(100% - var(--sb-cut-lg)),
-    calc(100% - var(--sb-cut-lg)) 100%,
-    0 100%,
-    0 var(--sb-cut-lg)
-  );
-  /* …e il vetro dentro. 0.586px non è un numero magico: è quanto va stretto il
-     taglio interno perché fra le due diagonali resti esattamente 1px, come sui
-     lati dritti. L'inner è inset di 1px (il padding della lastra), e su una
-     retta a 45° un pixel in perpendicolare vale √2 di scostamento —
-     2 − √2 = 0.586. Non arrotondarlo a 1px: la diagonale verrebbe più spessa
-     dei lati, e si vede. */
-  --sb-shape-lg-in: polygon(
-    calc(var(--sb-cut-lg) - 0.586px) 0,
-    100% 0,
-    100% calc(100% - var(--sb-cut-lg) + 0.586px),
-    calc(100% - var(--sb-cut-lg) + 0.586px) 100%,
-    0 100%,
-    0 calc(var(--sb-cut-lg) - 0.586px)
-  );
+  --sb-shape-lg: inset(0 round var(--sb-radius-lg));
+  /* …e il vetro dentro. La lastra ha 1px di padding, quindi l'inner sta 1px
+     più dentro e il suo raggio va stretto di altrettanto, o la curva interna
+     resterebbe concentrica solo per finta e si vedrebbe un filo più spesso in
+     curva che sui lati dritti. (Prima qui c'era 0.586px, che era lo stesso
+     conto fatto su una diagonale a 45°: 2 − √2.) */
+  --sb-shape-lg-in: inset(0 round calc(var(--sb-radius-lg) - 1px));
 
-  /* Il filo da 1px sulle due diagonali, per gli elementi a livello singolo.
-     clip-path taglia anche il border: sui lati dritti il contorno resta, sulle
-     diagonali sparirebbe, e una pillola con due lati aperti sembra rotta.
+  /* ── I fili sulle diagonali: non servono più ────────────────────────────
+     Qui c'erano quattro pacchetti di gradienti che ridisegnavano a mano il
+     bordo da 1px sui due angoli tagliati. Servivano perché clip-path taglia
+     via anche il border: sui lati dritti il contorno restava, sulle diagonali
+     spariva, e una pillola con due lati aperti sembra rotta.
 
-     Si ridisegna con due gradienti confinati nei quadrati d'angolo. Il 50% non
-     è a occhio: su un quadrato di lato S la linea di taglio dista S/√2
-     dall'angolo, e l'asse di un gradiente a 135° è lungo S·√2 — la metà esatta.
-     I ±0.7px attorno sono il mezzo pixel per lato che fa l'1px. */
-  --sb-shape-edge:
-    linear-gradient(
-        135deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      top left / var(--sb-cut) var(--sb-cut) no-repeat,
-    linear-gradient(
-        315deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      bottom right / var(--sb-cut) var(--sb-cut) no-repeat;
+     Con la forma tonda il problema non esiste: inset() con un raggio non
+     amputa nessun lato, e il border segue la curva da sé. I quattro token
+     restano DICHIARATI, a 'none', perché sono scritti in 29 punti sparsi su
+     13 fogli, quasi sempre dentro una background shorthand:
 
-  /* Gli stessi due gradienti alla misura minuta. Il quadrato d'angolo cambia,
-     il conto no: la diagonale sta sempre a metà dell'asse del gradiente. */
-  --sb-shape-edge-xs:
-    linear-gradient(
-        135deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      top left / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat,
-    linear-gradient(
-        315deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-border-strong) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      bottom right / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat;
+       background: var(--sb-shape-edge), var(--sb-glass-bg);
 
-  /* Variante per le pillole piene, dove il filo è del bordo-bottone. */
-  --sb-shape-edge-btn:
-    linear-gradient(
-        135deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      top left / var(--sb-cut) var(--sb-cut) no-repeat,
-    linear-gradient(
-        315deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      bottom right / var(--sb-cut) var(--sb-cut) no-repeat;
-  --sb-shape-edge-btn-xs:
-    linear-gradient(
-        135deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      top left / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat,
-    linear-gradient(
-        315deg,
-        transparent calc(50% - 0.7px),
-        var(--sb-btn-bd) calc(50% - 0.7px) calc(50% + 0.7px),
-        transparent calc(50% + 0.7px)
-      )
-      bottom right / var(--sb-cut-xs) var(--sb-cut-xs) no-repeat;
+     Toglierli renderebbe invalida l'intera dichiarazione in tutti e 29 —
+     niente filo E niente fondo. A 'none' il layer sparisce e il fondo resta.
+     Se un giorno il sito torna spigoloso, la vecchia definizione è nella
+     storia di git (commit 701ff2d e precedenti). */
+  --sb-shape-edge: none;
+  --sb-shape-edge-xs: none;
+  --sb-shape-edge-btn: none;
+  --sb-shape-edge-btn-xs: none;
 }
 
 .sb-home ::selection { background: hsla(132, 100%, 47%, 0.35); }
@@ -496,50 +467,75 @@ html.dark .sb-home::after {
   /* Strato a sé: il browser lo dipinge una volta e poi si limita a comporlo. */
   transform: translateZ(0);
 }
-/* Griglia tecnica: si dissolve verso il basso, così non finisce mai con una
-   riga netta. Ferma, non alla deriva: il movimento lo dà lo scroll. */
+/* ── Il CIELO ────────────────────────────────────────────────────────────────
+   Qui c'era la griglia tecnica da 64px: due gradienti a righe, la firma dei
+   siti-piattaforma. È la cosa più lontana dal Frutiger Aero che ci fosse nel
+   fondale, e va sostituita, non attenuata.
+
+   Al suo posto un cielo: azzurro-lilla in alto che scende verso il fondo
+   pagina, cioè il cielo della reference. Non è una tinta piatta ma tre stop —
+   il cielo vero è più chiaro all'orizzonte che allo zenit, e sono quei due
+   gradi di differenza a farlo leggere come cielo invece che come rettangolo
+   colorato. Sopra ci vanno le nuvole (.sb-bg-clouds) e le macchie fluo. */
 .sb-bg-grid {
   position: absolute;
   inset: 0;
-  opacity: 0.7;
-  background:
-    linear-gradient(var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px,
-    linear-gradient(90deg, var(--sb-border) 1px, transparent 1px) 0 0 / 64px 64px;
-  -webkit-mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
-  mask-image: radial-gradient(130% 96% at 50% -4%, #000 12%, transparent 68%);
+  opacity: 1;
+  background: linear-gradient(
+    180deg,
+    hsl(208 100% 84%) 0%,
+    hsl(200 96% 90%) 22%,
+    color-mix(in srgb, var(--sb-bg) 82%, transparent) 58%,
+    var(--sb-bg) 100%
+  );
+}
+html.dark .sb-bg-grid {
+  /* Di notte lo stesso cielo, ma è il blu di città: scuro, virato al verde in
+     basso dove incontra l'asfalto del fondo pagina. */
+  background: linear-gradient(
+    180deg,
+    hsl(206 62% 16%) 0%,
+    hsl(196 46% 12%) 26%,
+    color-mix(in srgb, var(--sb-bg) 86%, transparent) 62%,
+    var(--sb-bg) 100%
+  );
 }
 
-/* ── La grana ────────────────────────────────────────────────────────────────
-   Quello che tiene insieme le tre reference non è solo il fluo: è che sono
-   tutte e tre FOTOGRAFIE, e sporche — asfalto, flash, ISO alto. Su un fondo
-   digitale pulito il verde acido sembra un errore di picker; sopra una grana
-   diventa una stampa. Basta pochissimo: a 0.055 di opacità non la "vedi", ma
-   se la togli te ne accorgi.
+/* ── Le NUVOLE ───────────────────────────────────────────────────────────────
+   Il fondale canonico del Frutiger Aero è un cielo, e la reference dei font è
+   esattamente quello: nuvole bianche sfilacciate su un azzurro-lilla.
 
-   È un turbolenza SVG in un data URI, non un PNG: sta in una riga, non è un
-   file da scaricare, e non ha una risoluzione da sbagliare. baseFrequency
-   alta = grana fine (pellicola); più bassa sarebbe nuvola.
+   Qui c'era la grana fotografica — la stessa feTurbulence, ma a baseFrequency
+   alta, che dà pellicola. La nuvola si ottiene dallo STESSO filtro girato al
+   contrario: frequenza bassa (0.011 invece di 0.82) e molte ottave, così le
+   macchie diventano larghe e frastagliate invece che puntiformi. Il
+   feComponentTransfer è quello che le rende nuvole e non nebbia uniforme: la
+   curva taglia via i mezzitoni, e restano fiocchi bianchi con dei vuoti in
+   mezzo.
 
-   Fermo di proposito: una grana che si muove è rumore video, e a 60fps
-   ridisegnerebbe l'intero fondale a ogni frame per un effetto che nessuno
-   guarda. Questo strato il browser lo dipinge una volta sola. */
-.sb-bg-grain {
+   Resta ferma, per la ragione di prima: un fondale che si ridisegna a ogni
+   frame costa l'intera superficie della finestra, e nessuno lo guarda. Il
+   movimento del fondale ce l'hanno già le macchie, che sono nove elementi
+   piccoli e composti dalla GPU. */
+.sb-bg-clouds {
   position: absolute;
-  inset: 0;
-  opacity: 0.055;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-  /* Su fondo chiaro la grana deve SCURIRE (multiply): in screen sbiancherebbe
-     e sparirebbe. Sullo scuro il verso si ribalta, vedi più sotto. */
-  mix-blend-mode: multiply;
+  inset: -10%;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='600'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 0.25 0.75 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='900' height='600' filter='url(%23c)' fill='%23fff'/%3E%3C/svg%3E");
+  background-size: cover;
+  /* Le nuvole stanno in ALTO: un cielo che arriva fino ai piedi è una nebbia.
+     La maschera le dissolve prima di metà pagina, dove comincia il contenuto. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 26%, transparent 72%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 26%, transparent 72%);
 }
-html.dark .sb-bg-grain {
-  opacity: 0.085;
-  mix-blend-mode: screen;
+html.dark .sb-bg-clouds {
+  /* Di notte il cielo non sparisce, si spegne: le stesse nuvole molto più
+     fioche, che è quello che si vede davvero guardando in su in città. */
+  opacity: 0.14;
 }
 @media (prefers-reduced-motion: reduce) {
-  /* La grana è ferma, quindi non è un problema di movimento — ma per chi
-     riduce gli effetti è comunque una texture in più su cui l'occhio lavora. */
-  .sb-bg-grain { opacity: 0.03; }
+  .sb-bg-clouds { opacity: 0.3; }
+  html.dark .sb-bg-clouds { opacity: 0.1; }
 }
 /* ═══════════════════════════════════════════════════════════════════════════
    LE MACCHIE DEL FONDALE — il colore che ti abbraccia
@@ -686,8 +682,13 @@ html.dark .sb-bg-grain {
    satura al 55 % è una macchia di vernice, e il testo grigio che ci passa
    sopra perde contrasto. In scuro invece possono spingere — è lì che
    «accesissimo» funziona, perché il colore ha il nero attorno che lo regge. */
-.sb-blobs { opacity: 1; }
-html.dark .sb-blobs { opacity: 1; }
+/* Le macchie cedono il passo al cielo. Erano a 1 quando il fondale sotto era
+   un grigio piatto e il colore lo dovevano mettere loro; adesso sotto c'è un
+   cielo con le nuvole, e a piena opacità lo coprivano quasi tutto — restava
+   una fascia azzurra in cima e basta. A 0.5 le due cose si vedono tutte e
+   due: il verde continua ad abbracciare i bordi, il cielo resta cielo. */
+.sb-blobs { opacity: 0.5; }
+html.dark .sb-blobs { opacity: 0.62; }
 
 @keyframes sb-blob-a {
   from { transform: translate3d(0, 0, 0) scale(1); }
@@ -741,6 +742,25 @@ html.dark .sb-blobs { opacity: 1; }
    Compare solo quando c'è del contenuto che le scorre sotto. */
 .sb-nav--scrolled { border-bottom-color: var(--sb-border); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); }
 html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
+
+/* Il lucido sulla nav. Una barra di vetro senza riflesso, in mezzo a bottoni e
+   card che ce l'hanno tutti, è l'unico pezzo piatto rimasto e si nota. Qui la
+   lente è molto più bassa che altrove (0.34) perché la nav è alta 64px e le sta
+   sempre addosso del testo: al valore pieno i link nella metà alta si
+   sbiancherebbero. */
+.sb-nav::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--sb-aero-gloss-top) 0%,
+    transparent var(--sb-aero-gloss-cut)
+  );
+  opacity: 0.34;
+}
+.sb-nav-inner { position: relative; z-index: 1; }
 .sb-nav-inner { display: flex; align-items: center; gap: 1rem; height: 64px; }
 .sb-nav-brand {
   display: inline-flex;
@@ -833,39 +853,82 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
 }
 .sb-burger:hover { color: var(--sb-fg); background: var(--sb-overlay); }
 
-/* ── Bottoni (misure e vesti Supabase: h 38px, radius 6, bordo) ──────────── */
+/* ── Bottoni ────────────────────────────────────────────────────────────────
+   Erano i bottoni di Supabase: 38px, radius 6, un bordo, fondo piatto. Adesso
+   sono PILLOLE Aero, ed è qui che lo stile si vede più che in ogni altro
+   punto del sito. Tre cose insieme, e servono tutte e tre:
+
+     1. radius 999px — la pillola, non il rettangolo addolcito;
+     2. il lucido (::before) che occupa la metà alta e taglia netto;
+     3. il bevel scuro sotto (--sb-aero-bevel), che è quello che fa sembrare
+        il bottone BOMBATO invece che stampato.
+
+   Il testo va in semibold: su una superficie lucida un 400 sembra slavato. */
 .sb-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   height: 38px;
-  padding: 0 1rem;
-  border-radius: 6px;
+  padding: 0 1.15rem;
+  border-radius: 999px;
   font-family: inherit;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
   border: 1px solid transparent;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.12s ease;
 }
-.sb-btn--sm { height: 32px; padding: 0 0.8rem; font-size: 0.8rem; }
+.sb-btn--sm { height: 32px; padding: 0 0.95rem; font-size: 0.8rem; }
+
+/* Il lucido. Sta su .sb-btn--primary/.sb-btn--secondary e non su .sb-btn
+   perché i ghost non hanno superficie: una lente di luce su niente si vede
+   come un rettangolo chiaro sospeso. */
+.sb-btn--primary::before,
+.sb-btn--secondary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    var(--sb-aero-gloss-top) 0%,
+    var(--sb-aero-gloss-mid) var(--sb-aero-gloss-cut),
+    transparent var(--sb-aero-gloss-cut)
+  );
+}
+/* Il contenuto deve stare SOPRA il lucido, o il lucido lo sbianca. */
+.sb-btn > * { position: relative; z-index: 1; }
+
 .sb-btn--primary {
   position: relative;
   background: var(--sb-btn-bg);
   border-color: var(--sb-btn-bd);
   color: var(--sb-btn-fg);
+  box-shadow: var(--sb-aero-bevel), var(--sb-aero-halo);
 }
-.sb-btn--primary:hover { background: var(--sb-btn-bg-hover); border-color: var(--sb-brand); }
+.sb-btn--primary:hover {
+  background: var(--sb-btn-bg-hover);
+  border-color: var(--sb-brand);
+  /* L'alone si allarga: nell'Aero il feedback è la luce, non lo spostamento. */
+  box-shadow: var(--sb-aero-bevel),
+    0 0 30px -2px color-mix(in srgb, var(--sb-brand) 70%, transparent);
+}
+.sb-btn--primary:active { transform: translateY(1px); }
 .sb-btn--secondary {
   position: relative;
   background: var(--sb-bg-alt);
   border-color: var(--sb-border-strong);
   color: var(--sb-fg);
+  box-shadow: var(--sb-aero-bevel);
 }
 .sb-btn--secondary:hover { background: var(--sb-surface-200); border-color: var(--sb-border-stronger); }
+.sb-btn--secondary:active { transform: translateY(1px); }
 
 /* Riflesso sui bottoni — la stessa banda di luce delle card (@keyframes
    sb-sheen), stesso ritardo di 120 ms: passandoci sopra di corsa per arrivare
@@ -1243,11 +1306,12 @@ button.sb-card:hover .sb-panel,
 .sb-panel-inner {
   position: relative;
   height: 100%;
-  /* 0.586px è quanto va stretto il taglio interno perché fra le due diagonali
-     resti esattamente 1px, come sui lati dritti: l'inner è inset di 1px (il
-     padding della lastra), e su una retta a 45° un pixel in perpendicolare vale
-     √2 di scostamento — 2 − √2 = 0.586. Vedi «Lo smusso». */
+  /* Il raggio interno sta 1px più stretto di quello esterno, che è il padding
+     della lastra: senza quella differenza la curva interna e quella esterna
+     non sarebbero concentriche e il filo sembrerebbe più spesso in curva che
+     sui lati dritti. Vedi «La forma». */
   clip-path: var(--sb-shape-lg-in);
+  border-radius: calc(var(--sb-radius-lg) - 1px);
   /* Vetro: la tinta piena lascia il posto a una lastra che fa passare il
      fondale. saturate() rimette il colore che la sfocatura porta via. */
   background: var(--sb-glass-bg);
@@ -1258,6 +1322,30 @@ button.sb-card:hover .sb-panel,
   display: flex;
   flex-direction: column;
 }
+
+/* La lente Aero sulla lastra: la stessa dei bottoni, alla scala della card.
+   È ::before e non un background in più perché il vetro sotto ha già il suo
+   (--sb-glass-bg) e la lente deve poterlo attraversare senza sostituirlo.
+
+   z-index 0 con il contenuto della card a 1 (regola qui sotto): senza,
+   la lente finirebbe sopra il testo e lo sbiancherebbe nella metà alta. */
+.sb-panel-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--sb-aero-gloss-top) 0%,
+    var(--sb-aero-gloss-mid) var(--sb-aero-gloss-cut),
+    transparent var(--sb-aero-gloss-cut)
+  );
+  /* Sulle lastre la lente va tenuta più bassa che sui bottoni: una card è
+     grande, e al 78% di bianco diventerebbe una lastra di latte. */
+  opacity: 0.5;
+}
+.sb-panel-inner > * { position: relative; z-index: 1; }
 
 /* Dove il vetro non deve andare. Non è una questione di gusto: backdrop-filter
    fa da containing block a tutti i position:fixed che ha dentro, quindi un
@@ -1746,8 +1834,16 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   z-index: 4;
   max-width: 88%;
   padding: 15px 20px 16px;
-  background: rgba(8, 8, 10, 0.82);
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  /* La targa era tagliata a 45° nell'angolo alto-destro (l'ultimo polygon()
+     rimasto nel foglio). Adesso quell'angolo è TONDO e grosso: è la stessa
+     mossa del resto del sito, e la targa siede nell'angolo basso-sinistro
+     della card, quindi gli altri tre angoli restano vivi per combaciare con
+     la lastra che la contiene. */
+  background: rgba(8, 10, 8, 0.78);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  border-top-right-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
   display: block;
 }
 .sb-mocard-slot {

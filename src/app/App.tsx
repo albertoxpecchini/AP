@@ -682,6 +682,13 @@ export default function App() {
             .sb-home, che seguono lo scroll e il puntatore. */}
         <AuroraBackdrop />
 
+        {/* Il cielo, e sopra le nuvole: il fondale Frutiger Aero. Vanno per
+            primi perché sono il FONDO — senza z-index l'ordine di pittura è
+            l'ordine del documento, e messi in coda coprivano le macchie.
+            Vedi «Il CIELO» e «Le NUVOLE» in home.css. */}
+        <span className="sb-bg-grid" />
+        <span className="sb-bg-clouds" />
+
         {/* Le macchie: tre tavolozze sovrapposte che si danno il cambio
             scendendo. Stanno ai BORDI della finestra — il centro è mascherato,
             perché è dove sta il testo. Il colore lo scorre site/macchie.ts, il
@@ -704,11 +711,6 @@ export default function App() {
           </div>
         </div>
 
-        <span className="sb-bg-grid" />
-        {/* La grana fotografica: sta SOPRA griglia e macchie perché è la
-            pellicola su cui è stampato tutto il resto, non un elemento del
-            disegno. Vedi «La grana» in home.css. */}
-        <span className="sb-bg-grain" />
       </div>
 
       {/* Skiplinks — requisito di accessibilità */}
