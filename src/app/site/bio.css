@@ -76,7 +76,7 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 999px;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-surface-100);
   color: var(--sb-brand-text);
@@ -98,7 +98,7 @@
 @media (max-width: 767.98px) { .sb-bio-gallery, .sb-bio-gallery--two { grid-template-columns: 1fr; } }
 .sb-bio-shot {
   margin: 0;
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-surface-75);
@@ -135,7 +135,7 @@
   width: 100%;
   text-align: left;
   padding: 0.7rem 0.9rem;
-  border-radius: 10px;
+  border-radius: 18px;
   border: 1px solid var(--sb-border);
   background: var(--sb-surface-75);
   color: var(--sb-fg);
@@ -152,7 +152,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 999px;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-surface-100);
   color: var(--sb-fg-light);
@@ -222,7 +222,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: 999px;
   border: 1px solid var(--sb-border-strong);
   background: color-mix(in srgb, var(--sb-bg) 82%, transparent);
   -webkit-backdrop-filter: blur(4px);
@@ -240,7 +240,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 9px;
+  border-radius: 18px;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-surface-100);
   color: var(--sb-brand-text);
@@ -268,7 +268,7 @@
 .sb-bio-mappa-title { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 1.05rem; font-weight: 500; color: var(--sb-fg); }
 .sb-bio-mappa-desc { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--sb-fg-lighter); }
 .sb-bio-map {
-  border-radius: 10px;
+  border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--sb-border-strong);
   aspect-ratio: 16 / 9;

@@ -3,7 +3,7 @@
 
    Rifatta nella grammatica "piattaforma Supabase" della home (vedi home.css):
    pannello con bordo-gradiente da 1px (.sb-panel + .sb-panel-inner), segmenti
-   alti 34px con radius 6, azzurro brand per lo stato acceso, tipografia Titillium Web.
+   alti 34px a PILLOLA (radius 999), verde fluo per lo stato acceso, tipografia del sito.
    I token arrivano da .sb-home (che la barra porta con sé), quindi il tema
    chiaro/scuro è NATIVO: chiaro di default, scuro sotto html.dark.
 
@@ -49,13 +49,13 @@
 /* Stondata e non smussata: è .sb-panel--vent (vedi home.css). Il menu delle
    lingue si apre sopra la barra, cioè fuori dalla sua scatola, e un clip-path
    sulla lastra se lo porterebbe via tutto. */
-.sb-ctl-panel { border-radius: 10px; }
+.sb-ctl-panel { border-radius: 18px; }
 .sb-ctl-panel .sb-panel-inner {
   flex-direction: row;
   align-items: center;
   gap: 2px;
   padding: 5px;
-  border-radius: 9px;
+  border-radius: 17px;
   /* Pieno, non a vetro: la barra galleggia sui contenuti e il testo sotto non
      deve mai trasparire. */
   background: var(--sb-bg-alt);
@@ -71,7 +71,7 @@
   background: var(--sb-border-strong);
 }
 
-/* ── Segmenti (misure Supabase ridotte: h 34, radius 6) ──────────────────── */
+/* ── Segmenti (h 34, a pillola: la forma Aero del sito) ─────────────────── */
 .sb-ctl-btn {
   display: inline-flex;
   align-items: center;
@@ -80,7 +80,7 @@
   height: 34px;
   min-width: 34px;
   padding: 0 0.5rem;
-  border-radius: 6px;
+  border-radius: 999px;
   border: 1px solid transparent;
   background: none;
   font-family: inherit;
@@ -141,7 +141,7 @@
   justify-content: center;
   padding: 0;
   border: 1px solid var(--sb-border-strong);
-  border-radius: 6px;
+  border-radius: 999px;
   background: var(--sb-surface-100);
   color: var(--sb-fg-muted);
   cursor: pointer;
@@ -175,7 +175,7 @@
   margin: 0;
   padding: 4px;
   min-width: 190px;
-  border-radius: 8px;
+  border-radius: 999px;
   background: var(--sb-bg);
   border: 1px solid var(--sb-border-strong);
   box-shadow: var(--sb-shadow-card);
@@ -228,7 +228,7 @@
   height: 34px;
   padding: 0 0.55rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   background: none;
   color: var(--sb-fg-light);
   font-family: inherit;
@@ -243,7 +243,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: 6px;
+  border-radius: 999px;
   background: var(--sb-overlay);
 }
 .sb-lang-code {
@@ -253,7 +253,7 @@
   width: 28px;
   height: 22px;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: 999px;
   border: 1px solid var(--sb-border);
   background: var(--sb-surface-100);
   font-size: 0.68rem;
@@ -280,7 +280,7 @@
   top: 4px;
   height: var(--lang-row);
   z-index: 0;
-  border-radius: 6px;
+  border-radius: 999px;
   background: var(--sb-surface-100);
   border: 1px solid var(--sb-border-strong);
   transform: translateY(calc(var(--ink, 0) * var(--lang-row)));

@@ -113,7 +113,7 @@
   max-width: 20rem;
   padding: 0 0.55rem;
   border: 1px solid var(--sb-border-strong);
-  border-radius: 6px;
+  border-radius: 999px;
   background: var(--sb-bg);
   color: var(--sb-fg-muted);
   transition: border-color 0.15s;
@@ -136,7 +136,7 @@
   border: none;
   background: none;
   padding: 2px;
-  border-radius: 4px;
+  border-radius: 999px;
   color: var(--sb-fg-muted);
   cursor: pointer;
 }

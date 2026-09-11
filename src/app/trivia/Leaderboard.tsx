@@ -320,7 +320,7 @@ export default function Leaderboard({ dark, myNick, justSubmitted, onClose }: Le
           background: rgba(10,14,11,0.62); backdrop-filter: blur(3px);
           display: flex; align-items: center; justify-content: center;
           padding: 1rem; animation: trv-lb-fade .22s ease;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: var(--font-site);
         }
         @keyframes trv-lb-fade { from { opacity:0 } to { opacity:1 } }
 

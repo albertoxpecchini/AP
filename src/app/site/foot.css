@@ -14,18 +14,20 @@
       larghezza sotto, e la barra finale. I social hanno la larghezza che
       serve per crescere; l'istogramma ha l'altezza che serve per leggersi.
 
-   ② LA FORMA. Lo smusso del sito non si fa più con clip-path ma con
-      `border-radius` + `corner-shape: bevel`. È la stessa sagoma — 45° in
-      alto a sinistra e in basso a destra — disegnata però dal box decoration
-      invece che da un ritaglio, e questo risolve in un colpo i tre guai che
-      il clip-path si porta dietro, quelli documentati in home.css:
-        · il bordo sopravvive alle diagonali da sé (niente più gradienti
-          d'angolo da riportarsi dietro a ogni cambio di background);
-        · l'ombra esterna e l'outline del focus seguono lo smusso invece di
-          essere tagliati via (niente più ombra-oggetto appesa al contenitore);
-        · niente ritaglia il sottoalbero, quindi i tooltip escono dalla lastra
-          senza che nessuno debba spegnere un overflow.
-      Dove `corner-shape` non c'è si ricade sui token --sb-shape-* di sempre.
+   ② LA FORMA. Il footer è TONDO, come il resto del sito dopo il passaggio al
+      Frutiger Aero: lastre a raggio largo, pillole piene sui pezzi bassi.
+
+      Qui c'era `corner-shape: bevel`, che disegnava lo smusso a 45° del sito
+      di allora — ed è il motivo per cui questo file era sopravvissuto al
+      restyle senza cambiare forma: il bevel è un meccanismo PARALLELO ai
+      token --sb-shape-*, quindi ridefinire quelli non lo toccava. Se un
+      giorno si cerca un pezzo rimasto spigoloso, si cerca `corner-shape`.
+
+      Resta vero il motivo per cui qui non si usa il clip-path, che valeva
+      per il bevel e vale per il raggio: il ritaglio taglia via l'ombra
+      esterna e l'outline del focus, e ritaglia il sottoalbero (i tooltip non
+      escono più dalla lastra). Col border-radius il bordo segue la curva da
+      sé e l'ombra resta un box-shadow onesto.
 
    ③ IL MOVIMENTO. Qui dentro non gira più una riga di JavaScript. Prima il
       footer teneva acceso GSAP + ScrollTrigger su ogni pagina del sito per
@@ -93,25 +95,44 @@
      addolcendosi, quindi non lascia nemmeno il gradino opposto, quello dove la
      sfumatura finisce e comincia il colore piatto. Con una rampa lineare quei
      due spigoli ci sono per forza, per quanto la si allunghi; con questa non
-     ci sono a nessuna lunghezza. I 28rem sono il respiro, non la cura. */
+     ci sono a nessuna lunghezza. I 28rem sono il respiro, non la cura.
+
+     ── Il colore del velo, che col cielo è cambiato ─────────────────────────
+     La curva resta esattamente questa; quello che è cambiato è COSA ci si
+     dissolve dentro. Era --sb-bg-alt, cioè il grigio cemento della pagina: su
+     un fondale a cielo diventava una fascia opaca che spegneva le nuvole
+     nell'ultima schermata, e il footer si staccava come un blocco incollato.
+
+     Adesso il velo si dissolve nell'ORIZZONTE: il cielo più chiaro e più
+     lattiginoso di dove il cielo tocca terra. Non copre il fondale, lo
+     continua — è la stessa cosa che fa il gradiente del cielo in fondo alla
+     sua corsa, e infatti i due si incontrano senza che si veda dove. */
   --sb-foot-fade: 28rem;
+  --sb-foot-velo: color-mix(in srgb, hsl(196 88% 92%) 78%, var(--sb-bg-alt));
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--sb-bg-alt) 0%, transparent) 0,
-    color-mix(in srgb, var(--sb-bg-alt) 4%, transparent) calc(var(--sb-foot-fade) * 0.125),
-    color-mix(in srgb, var(--sb-bg-alt) 16%, transparent) calc(var(--sb-foot-fade) * 0.25),
-    color-mix(in srgb, var(--sb-bg-alt) 32%, transparent) calc(var(--sb-foot-fade) * 0.375),
-    color-mix(in srgb, var(--sb-bg-alt) 50%, transparent) calc(var(--sb-foot-fade) * 0.5),
-    color-mix(in srgb, var(--sb-bg-alt) 68%, transparent) calc(var(--sb-foot-fade) * 0.625),
-    color-mix(in srgb, var(--sb-bg-alt) 84%, transparent) calc(var(--sb-foot-fade) * 0.75),
-    color-mix(in srgb, var(--sb-bg-alt) 96%, transparent) calc(var(--sb-foot-fade) * 0.875),
-    var(--sb-bg-alt) var(--sb-foot-fade)
+    color-mix(in srgb, var(--sb-foot-velo) 0%, transparent) 0,
+    color-mix(in srgb, var(--sb-foot-velo) 4%, transparent) calc(var(--sb-foot-fade) * 0.125),
+    color-mix(in srgb, var(--sb-foot-velo) 16%, transparent) calc(var(--sb-foot-fade) * 0.25),
+    color-mix(in srgb, var(--sb-foot-velo) 32%, transparent) calc(var(--sb-foot-fade) * 0.375),
+    color-mix(in srgb, var(--sb-foot-velo) 50%, transparent) calc(var(--sb-foot-fade) * 0.5),
+    color-mix(in srgb, var(--sb-foot-velo) 68%, transparent) calc(var(--sb-foot-fade) * 0.625),
+    color-mix(in srgb, var(--sb-foot-velo) 84%, transparent) calc(var(--sb-foot-fade) * 0.75),
+    color-mix(in srgb, var(--sb-foot-velo) 96%, transparent) calc(var(--sb-foot-fade) * 0.875),
+    var(--sb-foot-velo) var(--sb-foot-fade)
   );
   /* Il contenitore di query: da qui in giù le misure si prendono sulla
      larghezza del FOOTER, non su quella della finestra. Serve perché il
      footer è lo stesso oggetto in pagine con margini diversi, e perché la
      lastra dell'istogramma deve poter decidere da sé quanti giorni mostrare. */
   container: sb-foot / inline-size;
+}
+
+/* Di notte l'orizzonte non è lattiginoso: è il blu che si spegne nell'asfalto.
+   Senza questa riga il velo resterebbe l'azzurro chiaro del giorno e in fondo
+   alla pagina scura comparirebbe una fascia lattiginosa. */
+html.dark .sb-home.sb-foot {
+  --sb-foot-velo: color-mix(in srgb, hsl(200 40% 10%) 72%, var(--sb-bg-alt));
 }
 
 /* L'alone che si accende arrivando in fondo.
@@ -231,28 +252,30 @@
   flex-direction: column;
   gap: 1rem;
 }
-@supports (corner-shape: bevel) {
-  .sb-foot-slab {
-    clip-path: none;
-    border-radius: var(--sb-radius-lg);
-    corner-shape: bevel;
-    /* E siccome adesso l'ombra non viene più tagliata via, torna a essere un
-       box-shadow onesto invece della lastra sfocata appesa al contenitore. */
-    transition: background 0.2s ease, box-shadow 0.25s ease;
-  }
-  .sb-foot-slab:hover {
-    background: var(--sb-border-stronger);
-    box-shadow: var(--sb-shadow-card);
-  }
-  .sb-foot-slab__in {
-    clip-path: none;
-    /* 1px di raggio in meno perché fra le due diagonali resti esattamente 1px,
-       come sui lati dritti: col bevel il conto è banale — il raggio è la
-       distanza dall'angolo lungo il lato, e l'inner è inset di 1px. Niente
-       0.586px, che serviva solo perché il poligono ragiona in perpendicolare. */
-    border-radius: calc(var(--sb-radius-lg) - 1px);
-    corner-shape: bevel;
-  }
+/* Qui c'era `corner-shape: bevel`: le lastre del footer erano tagliate a 45°
+   come tutto il resto del sito di allora. Col Frutiger Aero lo smusso non
+   esiste — via il bevel, resta il raggio, e la lastra diventa tonda come le
+   card della home.
+
+   Resta invece vero (e utile) il motivo per cui qui NON si usa il clip-path:
+   il ritaglio taglierebbe via l'ombra esterna e l'outline del focus, e
+   ritaglierebbe il sottoalbero, che è il guaio documentato in home.css. Col
+   border-radius il bordo segue la curva da sé, l'ombra resta un box-shadow
+   onesto e i tooltip escono dalla lastra senza spegnere nessun overflow. */
+.sb-foot-slab {
+  clip-path: none;
+  border-radius: var(--sb-radius-lg);
+  transition: background 0.2s ease, box-shadow 0.25s ease;
+}
+.sb-foot-slab:hover {
+  background: var(--sb-border-stronger);
+  box-shadow: var(--sb-shadow-card);
+}
+.sb-foot-slab__in {
+  clip-path: none;
+  /* 1px di raggio in meno perché la curva interna resti concentrica con
+     quella esterna: l'inner è inset di 1px (il padding della lastra). */
+  border-radius: calc(var(--sb-radius-lg) - 1px);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .sb-foot-slab__in { background: var(--sb-surface-75); }
@@ -330,9 +353,7 @@
   border-radius: var(--sb-radius-xs);
   transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
-@supports (corner-shape: bevel) {
-  .sb-foot-mail { corner-shape: bevel; }
-}
+.sb-foot-mail { border-radius: 999px; }
 .sb-foot-mail:hover {
   color: var(--sb-brand-text);
   border-color: color-mix(in oklab, var(--sb-brand) 40%, transparent);
@@ -388,9 +409,7 @@
     border-color 0.18s ease,
     translate 0.34s linear(0, 0.34 12%, 0.78 26%, 1.06 42%, 1.02 58%, 1);
 }
-@supports (corner-shape: bevel) {
-  .sb-foot-tile { corner-shape: bevel; }
-}
+.sb-foot-tile { border-radius: 999px; }
 .sb-foot-tile svg {
   flex-shrink: 0;
   transition: scale 0.34s linear(0, 0.4 14%, 1.14 44%, 0.98 66%, 1);
@@ -453,9 +472,7 @@
   cursor: pointer;
   transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
-@supports (corner-shape: bevel) {
-  .sb-foot-top { corner-shape: bevel; }
-}
+.sb-foot-top { border-radius: 999px; }
 .sb-foot-top svg { transition: translate 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 .sb-foot-top:hover {
   color: var(--sb-brand-text);
@@ -497,12 +514,10 @@
   width: 22px;
   height: 22px;
   border: 1px solid var(--sb-border-stronger);
-  border-radius: 5px 0 5px 0;
+  border-radius: 999px;
   flex-shrink: 0;
 }
-@supports (corner-shape: bevel) {
-  .sb-gh__avatar { corner-shape: bevel; }
-}
+.sb-gh__avatar { border-radius: 50%; }
 .sb-gh__since { color: var(--sb-fg-muted); }
 .sb-gh__act { display: inline-flex; align-items: center; min-width: 0; }
 /* Acceso e fermo. L'anello parte quando ci passi sopra, non da solo: i dati
@@ -541,18 +556,10 @@
   white-space: nowrap;
   transition: border-color 0.15s, background-color 0.15s, color 0.15s;
 }
-@supports (corner-shape: bevel) {
-  .sb-gh__chip { corner-shape: bevel; }
-}
-@supports not (corner-shape: bevel) {
-  /* Senza bevel il bordo sulle diagonali sparirebbe: torna il filo disegnato
-     coi due gradienti d'angolo, come in tutto il resto del sito. */
-  .sb-gh__chip {
-    border-radius: 0;
-    clip-path: var(--sb-shape-xs);
-    background: var(--sb-shape-edge-xs), var(--sb-bg);
-  }
-}
+.sb-gh__chip { border-radius: 999px; }
+/* Qui c'era il ripiego per i browser senza corner-shape, che ridisegnava il
+   filo sulle diagonali con due gradienti d'angolo. Senza smusso non ci sono
+   diagonali e il bordo non sparisce da nessuna parte: il ripiego non serve. */
 .sb-gh__star { color: #e3b341; }
 a.sb-gh__chip { text-decoration: none; }
 a.sb-gh__chip:hover {
@@ -690,7 +697,7 @@ a.sb-gh__chip:hover {
   /* 2px di zoccolo anche a zero: un giorno vuoto deve restare visibile come
      giorno, altrimenti l'asse ha dei buchi e sembra che manchi il dato. */
   height: calc(2px + var(--sb-gh-v, 0) * (100% - 2px));
-  border-radius: 2px 2px 0 0;
+  border-radius: 4px 4px 0 0;
   /* La scala del calore. oklab e non srgb: mescolando in sRGB i gradini
      centrali si spengono, e una scala di intensità con la gobba in mezzo dice
      il falso.
@@ -815,16 +822,14 @@ a.sb-gh__chip:hover {
 .sb-gh__scale i {
   width: 9px;
   height: 9px;
-  border-radius: 2px 0 2px 0;
+  border-radius: 999px;
   background-color: color-mix(
     in oklab,
     var(--sb-brand) calc(var(--sb-gh-l, 0) * 25%),
     color-mix(in oklab, var(--sb-fg) 12%, transparent)
   );
 }
-@supports (corner-shape: bevel) {
-  .sb-gh__scale i { corner-shape: bevel; }
-}
+.sb-gh__scale i { border-radius: 3px; }
 
 /* Quanti giorni si vedano lo decide la larghezza del GRAFICO, non quella
    della finestra. Sotto una certa misura le colonne diventano più strette del

@@ -278,7 +278,7 @@ const TOUR_CSS = `
     font-weight: 800; font-size: 0.72rem;
     padding: 5px 10px; clip-path: var(--sb-shape-xs); white-space: nowrap;
     box-shadow: 0 6px 18px var(--tour-glow); pointer-events: none;
-    font-family: "Titillium Web", sans-serif;
+    font-family: var(--font-site);
     animation: tour-hint-bob 1s ease-in-out infinite;
   }
   @keyframes tour-hint-bob { 0%,100% { transform: translate(-50%,-100%); } 50% { transform: translate(-50%, calc(-100% - 5px)); } }
@@ -291,7 +291,7 @@ const TOUR_CSS = `
     border: 1px solid var(--sb-border-strong);
     border-radius: 16px; padding: 0.8rem 1rem 0.85rem;
     box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-    font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+    font-family: var(--font-site);
     animation: tour-pop-in 0.28s cubic-bezier(.34,1.56,.64,1) both;
   }
   .tour-pop::before { content:""; position:absolute; width:14px; height:14px; background:var(--sb-surface-75); border:1px solid var(--sb-border-strong); transform:rotate(45deg); }

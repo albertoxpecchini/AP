@@ -145,7 +145,7 @@ export default function GameGate({
            usa ancora per sfumature proprie, ma non portano più una palette. */
         .gg {
           position: fixed; inset: 0; z-index: 250;
-          font-family: "Titillium Web", Geneva, Tahoma, sans-serif;
+          font-family: var(--font-site);
           display: flex; flex-direction: column; align-items: center; justify-content: center;
           gap: 1.6rem; padding: 1.5rem; overflow-y: auto;
           animation: gg-in .28s cubic-bezier(.2,.7,.2,1);

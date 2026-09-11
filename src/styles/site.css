@@ -43,7 +43,7 @@ section[id] { scroll-margin-top: 84px; }
   height: min(92vh, 100%);
   background: var(--sb-surface-75);
   border: 1px solid var(--sb-border-strong);
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
 }

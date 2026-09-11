@@ -116,7 +116,7 @@
   min-height: 96px;
   resize: vertical;
   border: 1px solid var(--sb-border-strong);
-  border-radius: 6px;
+  border-radius: 999px;
   background: var(--sb-bg);
   color: var(--sb-fg);
   font-family: "Roboto Mono", ui-monospace, monospace;
@@ -142,7 +142,7 @@
   padding: 0.9rem 1.1rem;
   background: none;
   border: none;
-  border-radius: 11px;
+  border-radius: 18px;
   font-family: inherit;
   font-size: 0.875rem;
   text-align: left;
@@ -170,7 +170,7 @@
   gap: 0.6rem;
   margin: 1rem 0 0;
   padding: 0.7rem 0.9rem;
-  border-radius: 8px;
+  border-radius: 999px;
   border: 1px solid hsla(38, 80%, 45%, 0.4);
   background: color-mix(in srgb, hsl(38, 90%, 50%) 9%, var(--sb-bg));
   font-size: 0.86rem;
@@ -255,7 +255,7 @@ html.dark .sb-ig-alert svg { color: hsl(38, 85%, 62%); }
   max-height: 340px;
   overflow: auto;
   border: 1px solid var(--sb-border);
-  border-radius: 8px;
+  border-radius: 999px;
   background: var(--sb-bg);
 }
 .sb-ig-list li { margin: 0; }
@@ -264,7 +264,7 @@ html.dark .sb-ig-alert svg { color: hsl(38, 85%, 62%); }
   align-items: center;
   gap: 0.6rem;
   padding: 0.35rem 0.4rem;
-  border-radius: 6px;
+  border-radius: 999px;
   text-decoration: none;
   color: var(--sb-fg-light);
   transition: background 0.12s;
@@ -320,7 +320,7 @@ html.dark .sb-ig-alert svg { color: hsl(38, 85%, 62%); }
   .sb-ig-go { min-width: 0; }
   .sb-ig-file { max-width: 40%; }
   /* Su schermo stretto la riga del contatore va a capo: da pillola a riquadro. */
-  .sb-ig-stat { align-items: flex-start; border-radius: 10px; padding: 0.5rem 0.7rem; }
+  .sb-ig-stat { align-items: flex-start; border-radius: 18px; padding: 0.5rem 0.7rem; }
   .sb-ig-dot { margin-top: 0.42rem; }
 }
 
@@ -404,7 +404,7 @@ html.dark .sb-home.sb-ig-tut { background: rgba(0, 0, 0, 0.7); }
   margin-top: 0.8rem !important;
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--sb-border);
-  border-radius: 8px;
+  border-radius: 999px;
   background: var(--sb-surface-100);
   font-size: 0.84rem !important;
   color: var(--sb-fg-muted) !important;

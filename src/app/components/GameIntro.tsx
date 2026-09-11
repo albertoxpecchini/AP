@@ -95,7 +95,7 @@ export default function GameTutorial({
       style={{
         position: "fixed", inset: 0, zIndex: 300,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: '"Titillium Web", Geneva, Tahoma, sans-serif',
+        fontFamily: 'var(--font-site)',
         padding: "1rem",
         opacity: exiting ? 0 : 1,
         transition: "opacity 0.36s ease",

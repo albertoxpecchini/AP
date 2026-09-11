@@ -303,7 +303,7 @@ html.dark .sb-home {
 }
 
 .sb-home ::selection { background: hsla(132, 100%, 47%, 0.35); }
-.sb-home :focus-visible { outline: 2px solid var(--sb-brand); outline-offset: 2px; border-radius: 4px; }
+.sb-home :focus-visible { outline: 2px solid var(--sb-brand); outline-offset: 2px; border-radius: 999px; }
 /* clip-path porta via anche l'outline del focus: il contorno viene disegnato
    fuori dalla sagoma, e la sagoma è tutto ciò che resta visibile. Su un
    elemento tagliato la messa a fuoco si ridisegna dentro, con un'ombra inset —
@@ -887,7 +887,7 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   color: var(--sb-fg);
   flex-shrink: 0;
 }
-.sb-nav-brand img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+.sb-nav-brand img { width: 28px; height: 28px; border-radius: 999px; display: block; }
 .sb-nav-brand-name { font-size: 0.98rem; font-weight: 500; white-space: nowrap; letter-spacing: -0.01em; }
 /* Pillola piena di tinta brand: prende la sagoma delle altre, con la variante
    brand del filo sulle diagonali (il border ci arriva solo sui lati dritti). */
@@ -905,7 +905,7 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   position: relative;
   z-index: 1;
   padding: 0.35rem 0.7rem;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 0.875rem;
   color: var(--sb-fg-light);
   text-decoration: none;
@@ -966,7 +966,7 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   color: var(--sb-fg-light);
   cursor: pointer;
   padding: 8px;
-  border-radius: 6px;
+  border-radius: 999px;
 }
 .sb-burger:hover { color: var(--sb-fg); background: var(--sb-overlay); }
 
@@ -2270,7 +2270,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-trust-row {
   margin-inline: -0.5ch;
   padding-inline: 0.5ch;
-  border-radius: 4px;
+  border-radius: 999px;
   color: inherit;
   text-decoration: none;
   transition: background 0.15s ease;
@@ -2379,7 +2379,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   justify-content: center;
   width: 46px;
   height: 46px;
-  border-radius: 10px;
+  border-radius: 18px;
   border: 1px solid transparent;
   background: none;
   color: var(--sb-fg-muted);
@@ -3213,7 +3213,7 @@ html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
   gap: 0.5rem;
   padding: 0.65rem 0.8rem;
   border: 1px solid var(--sb-border);
-  border-radius: 8px;
+  border-radius: 999px;
   background: var(--sb-bg);
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.8rem;
@@ -3225,7 +3225,7 @@ html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
 .sb-ghcard-repo .badge {
   margin-left: auto;
   font-size: 0.66rem;
-  font-family: "Titillium Web", sans-serif;
+  font-family: var(--font-site);
   color: var(--sb-fg-muted);
   border: 1px solid var(--sb-border-strong);
   clip-path: var(--sb-shape-xs);
@@ -3336,7 +3336,7 @@ html.dark .sb-works-title h3 .sb-shine { --sb-shine-hi: #ffffff; }
   background: var(--sb-btn-bg);
   color: var(--sb-btn-fg);
   padding: 0.5rem 0.9rem;
-  border-radius: 8px;
+  border-radius: 999px;
   text-decoration: none;
 }
 

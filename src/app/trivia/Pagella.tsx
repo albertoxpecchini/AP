@@ -124,7 +124,7 @@ export default function Pagella({ dark, nick, compact = false }: PagellaProps) {
            serie di azzurri e grigi a mano. Ora la coppia sparisce: i token
            cambiano da soli col tema, e restano solo le poche regole .pag.dark
            dove serve davvero una scelta diversa. */
-        .pag { font-family:"Titillium Web", Geneva, Tahoma, sans-serif; }
+        .pag { font-family:var(--font-site); }
 
         .pag-summary {
           display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-bottom:.9rem;

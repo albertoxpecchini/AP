@@ -126,7 +126,7 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 999px;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-surface-100);
   color: var(--sb-brand-text);
@@ -142,7 +142,7 @@
 @media (max-width: 519.98px) { .sb-pc-gallery { grid-template-columns: 1fr; } }
 .sb-pc-shot {
   margin: 0;
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-surface-75);
@@ -167,7 +167,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 18px;
   border: 1px solid var(--sb-border-strong);
   background: var(--sb-surface-100);
   color: var(--sb-brand-text);
