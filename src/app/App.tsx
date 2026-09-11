@@ -893,11 +893,12 @@ export default function App() {
             più cinque» a sei totali; adesso è «una grande più quattro», e la
             seconda fila si ripartisce in due mezzi da 6 colonne (home.css).
 
-            Il visual di ogni card è lo stesso componente <Mosaic>, cambiato di
-            tema (traiettoria + modulo) e di accento — vedi la nota in testa a
-            site/homeLive.tsx. L'accento di ogni card viene dal canvas «Sistema
-            blueprint tecnico animato», Turno 3: archivio→viola, siti→blu,
-            IA→ambra, foto→rosa, geometra→verde. */}
+            Il visual di ogni card è lo stesso componente <MosaicScene>,
+            cambiato di tema: stesso guscio — fondo di tinta, aurora, bolle,
+            rifinitura — e dentro un oggetto diverso per scheda. Vedi la nota
+            in testa a site/mosaicScene.tsx. L'accento di ogni card viene dal
+            canvas «Sistema blueprint tecnico animato», Turno 3:
+            archivio→viola, siti→blu, IA→ambra, foto→rosa, geometra→verde. */}
         <section id="progetti" className="sb-container sb-products" aria-label="What I do">
           {/* ── Prima riga: due schede larghe ─────────────────────────────── */}
 

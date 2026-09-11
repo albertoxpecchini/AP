@@ -1317,6 +1317,14 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   .sb-products .sb-card:nth-child(-n + 2) { grid-column: span 3; }
   /* le tre della seconda */
   .sb-products .sb-card:nth-child(n + 3) { grid-column: span 2; }
+
+  /* Sulle due schede larghe il palco si stringe a sinistra. Il centro OTTICO
+     di queste schede non è il loro centro geometrico: la targa occupa l'angolo
+     basso-sinistro e il numero quello alto-destro, e un oggetto messo a metà
+     esatta si vede spinto a destra, verso il vuoto. Togliendo un quarto della
+     larghezza dal bordo destro l'oggetto torna dov'era stato disegnato — sopra
+     la targa, che è il rapporto delle tavole da cui viene. */
+  .sb-products .sb-card:nth-child(-n + 2) .mo-palco { right: 26%; }
 }
 .sb-card { display: block; text-decoration: none; color: inherit; }
 
@@ -1781,59 +1789,696 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   transform: translate3d(0, 0, 0);
 }
 
-.sb-mosaic {
-  width: 100%;
-  height: 100%;
-  display: block;
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE SCENE — il vestito di site/mosaicScene.tsx
+
+   Cinque scene, un guscio solo. Il guscio è qui sopra (fondo, aurora, velo,
+   bolle, numero, rifinitura); gli oggetti — pila, browser, orbita, iride, cubo
+   — stanno più giù, uno per blocco.
+
+   ── La tinta ───────────────────────────────────────────────────────────────
+   Uno solo, e arriva da fuori: currentColor su .mo-scena è --sb-accent, cioè
+   il data-acc della card. Il fondo, il velo e le bolle lo prendono da lì.
+
+   Le tavole da cui le scene vengono erano verdi tutte e cinque e avevano il
+   gradiente cucito a mano (#04241a → #085239 → #0f9463 → #63dfa2). Qui il
+   gradiente è la MODULAZIONE della tinta, non una lista di verdi: stessa
+   direzione, stesse fermate, ma i colori nascono da color-mix fra currentColor
+   e il nero, così le cinque schede hanno la stessa profondità in cinque tinte
+   diverse. Il verde del geometra torna a essere quasi quello delle tavole,
+   perché a quel punto la formula e la tavola dicono la stessa cosa.
+
+   ── I bianchi restano bianchi ──────────────────────────────────────────────
+   Tutto quello che è VETRO — bordi, riflessi, lamelle, facce del cubo, bolle —
+   è bianco a opacità, non tinta schiarita. È luce riflessa, e la luce sulla
+   scheda viola non è viola. È la stessa ragione per cui i moduli del mosaico
+   di prima erano avorio fisso.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mo-scena {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
   color: var(--sb-accent, var(--sb-brand));
-  /* L'accensione al passaggio: un soffio di scala. Transizione su transform
-     soltanto — il compositore la muove da solo. Scatta una volta entrando e
-     una uscendo, non a ogni fotogramma. */
+  /* Il font delle tavole era Hanken Grotesk; qui dentro di testo c'è il numero
+     e la parola «Apri» del browser finto, e prendono quello del sito. */
+  font-family: inherit;
+  /* L'accensione al passaggio: un soffio di scala, come aveva il mosaico. */
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.sb-mosaic-bg {
-  fill: currentColor;
-  opacity: 0.07;
+/* ① IL FONDO. La tinta dal cupo al pieno, in diagonale — la stessa scala
+      tonale delle tavole, ricavata dalla tinta invece che scritta a mano. */
+/* Il nero di fondo è NEUTRO, non verde. Le tavole scurivano il verde con altri
+   verdi (#04241a, #05221a) e funzionava perché la tinta era una sola. Qui la
+   tinta è cinque: un nero verde sotto l'ambra dà oliva, sotto il rosa dà
+   fango. Nero puro allungato con un filo della tinta stessa scurisce ogni
+   accento restando quell'accento — l'ambra resta ambra fino in fondo. */
+.mo-fondo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    168deg,
+    color-mix(in srgb, currentColor 30%, #070709) 0%,
+    color-mix(in srgb, currentColor 58%, #0a0a0d) 34%,
+    color-mix(in srgb, currentColor 92%, #101014) 64%,
+    color-mix(in srgb, currentColor 64%, #ffffff) 100%
+  );
 }
 
-/* Le tessere. transform-box: fill-box perché mo-tile le scala dal loro centro;
-   durata e curva qui, il nome più giù. Il ritardo di posa (--o e
-   animation-delay) è inline nel markup, tessera per tessera. */
-.sb-mosaic-tile {
-  fill: currentColor;
-  opacity: var(--o, 1);
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  animation-duration: 4s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  animation-iteration-count: infinite;
+/* ② L'AURORA. L'unico blur della scena, e ci sta: è UN elemento per scheda che
+      si muove pianissimo. Senza, la scena è una campitura piatta.
+
+      Le tavole la tenevano a blur(46-50px) su una scheda alta 775px; qui la
+      scheda è bassa e larga, e 40px danno la stessa morbidezza in proporzione. */
+.mo-aurora {
+  position: absolute;
+  left: -20%;
+  top: -30%;
+  width: 130%;
+  height: 110%;
+  filter: blur(40px);
+  opacity: 0.72;
+  background:
+    radial-gradient(
+      45% 60% at 40% 46%,
+      color-mix(in srgb, currentColor 55%, #ffffff) 0%,
+      transparent 70%
+    ),
+    radial-gradient(40% 50% at 74% 28%, rgba(214, 255, 255, 0.6) 0%, transparent 72%);
+  animation: mo-aurora var(--mo-loop, 13s) ease-in-out infinite;
 }
 
-
-/* La tessera accesa: l'unica piena. transform-box: view-box perché mo-lit-*
-   la sposta in coordinate del viewBox. Due animazioni sovrapposte — il giro
-   (--mo-lit) e la sfumata d'ingresso (mo-late) — quindi durata e curva sono
-   in coppia; i nomi arrivano insieme più giù. */
-.sb-mosaic-lit {
-  transform-box: view-box;
-  animation-duration: 4s, 4s;
-  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1), linear;
-  animation-iteration-count: infinite, infinite;
+/* ③ IL VELO. La luce calda che sale dal bordo basso: dà alla scena un
+      pavimento. Fermo, come la velatura della lastra. */
+.mo-velo {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 80% at 50% 112%,
+    rgba(255, 255, 255, 0.42) 0%,
+    transparent 58%
+  );
 }
-.sb-mosaic-lit-cell { fill: currentColor; }
 
-/* Il modulo dentro la tessera. Avorio pieno; i ritagli tornano alla tinta. */
-.sb-mosaic-mod { fill: #f7f4ec; }
-.sb-mosaic-mod--cut { fill: currentColor; }
+/* ④ IL PALCO. Dove sta l'oggetto.
 
-/* Quale keyframe è la traiettoria di ogni tema. Solo una custom property: la
-   legge .sb-mosaic-lit quando il gesto parte, e a riposo non serve a nessuno. */
-.sb-mosaic--archive { --mo-lit: mo-lit-a; }
-.sb-mosaic--web { --mo-lit: mo-lit-b; }
-.sb-mosaic--claude { --mo-lit: mo-lit-c; }
-.sb-mosaic--photo { --mo-lit: mo-lit-d; }
-.sb-mosaic--autocad { --mo-lit: mo-lit-e; }
+      Tre vincoli, e insieme decidono tutto:
+
+      · LA TARGA. Occupa l'angolo basso-sinistro fino a metà scheda e le sta
+        SOPRA (z-index 4). L'oggetto quindi non può stare centrato in verticale
+        sulla scheda intera, o gli taglia i piedi: il palco finisce dove
+        comincia la targa.
+      · IL NUMERO. Sta in alto a destra e vuole aria.
+      · GLI OGGETTI SBORDANO DA SOLI. La pila entra da destra con un
+        translate3d, il browser galleggia, il cubo ruota: le keyframe li
+        portano fuori dai loro riquadri apposta. Se il palco è largo quanto la
+        scheda, quel fuori finisce oltre il bordo e l'oggetto viene tagliato.
+        Quindi il palco è RIENTRATO, e il margine è quello che le keyframe si
+        mangiano.
+
+      Il risultato è un riquadro alto due terzi, largo poco meno della scheda e
+      appoggiato in alto — con dentro l'oggetto centrato. */
+.mo-palco {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  /* Il palco è centrato in verticale sui due terzi alti invece che appoggiato
+     in alto. Appoggiato, la finestra del browser — che è l'oggetto più alto e
+     per giunta galleggia — usciva dal bordo superiore su telefono, dove la
+     card è stretta e l'oggetto occupa quasi tutto il palco: si perdeva la
+     barra con l'indirizzo, cioè la parte che dice che è un browser. */
+  top: 4%;
+  height: 62%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 950px;
+  /* Gli oggetti hanno tutti una misura massima in px: su una scheda stretta
+     scalano in %, su una larga si fermano. Una scheda larga il doppio non deve
+     avere un oggetto largo il doppio — deve avere più aria intorno. */
+  pointer-events: none;
+}
+
+/* ⑤ LE BOLLE. Dalle tavole, identiche: salgono da sotto il bordo, crescono un
+      filo e svaniscono. Bianche di luce con un velo di tinta dentro. */
+.mo-bolla {
+  position: absolute;
+  bottom: -8%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 32% 26%,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.14) 40%,
+    color-mix(in srgb, currentColor 30%, transparent) 68%,
+    transparent 71%
+  );
+  box-shadow: inset 0 0 9px rgba(255, 255, 255, 0.55);
+  animation: mo-rise linear infinite;
+}
+
+/* ⑥ IL NUMERO. In alto a destra, dove sulle tavole c'era accanto al titolo:
+      qui l'angolo basso è della targa. Sottile e trasparente — è un indice, non
+      un'insegna. */
+.mo-num {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  z-index: 4;
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.42);
+  text-shadow: 0 1px 10px rgba(0, 30, 18, 0.4);
+}
+
+/* ⑦ LA RIFINITURA. Il filo chiaro sul bordo interno e la passata di luce: i
+      due strati che le tavole avevano in fondo. Il filo è fermo; la passata
+      gira sul giro lungo, sfasata per scheda più sotto. */
+.mo-rim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -80px 90px -70px rgba(255, 255, 255, 0.3);
+}
+.mo-gloss {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 26%;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  animation: mo-gloss var(--mo-loop, 13s) ease-in-out infinite;
+}
+
+/* ── ① ARCHIVIO — la pila che sfoglia ─────────────────────────────────────── */
+/* La pila sta in un riquadro suo, centrato sul palco. Le carte dentro sono in
+   absolute e centrate sul riquadro: mo-flip le porta da destra-basso a
+   sinistra-alto, quindi il riquadro deve stare al centro e non a sinistra, o
+   metà del viaggio finisce fuori dalla scheda. */
+.mo-pila {
+  position: relative;
+  width: 54%;
+  max-width: 190px;
+  aspect-ratio: 4 / 3;
+  transform-style: preserve-3d;
+}
+.mo-carta {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin: -37.5% 0 0 -50%;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.5),
+    color-mix(in srgb, currentColor 22%, rgba(255, 255, 255, 0.2)) 46%,
+    rgba(255, 255, 255, 0.06)
+  );
+  box-shadow:
+    0 22px 44px -16px rgba(0, 20, 12, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  padding: 11px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  animation: mo-flip var(--mo-loop, 13s) cubic-bezier(0.55, 0, 0.45, 1) infinite;
+}
+.mo-carta i {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ── ② SITI WEB — la finestra che scrive ──────────────────────────────────── */
+/* La finestra è l'oggetto più ALTO delle cinque scene: barra, corpo 16/10 e
+   riflesso sotto, tutto in colonna. Gli altri quattro sono quadrati o tondi e
+   stanno nel palco per costruzione; questo no, e va misurato sull'ALTEZZA.
+
+   Il palco è il 70% di una card 460/278, cioè alto circa il 42% della sua
+   larghezza. La finestra, col suo 16/10 più barra e riflesso, viene alta circa
+   0,78 volte la propria larghezza: perché ci stia, deve essere larga al
+   massimo poco più della metà della card. Il 52% è quella misura, verificata
+   su telefono a 390px — dove prima la barra dell'indirizzo finiva sopra il
+   bordo della lastra, cioè si perdeva il pezzo che dice che è un browser. */
+.mo-browser-wrap {
+  width: 52%;
+  max-width: 236px;
+}
+@media (min-width: 1024px) {
+  /* Sulla scheda larga della prima riga il palco è rientrato del 26% a destra:
+     lì la finestra può tornare a respirare senza rischiare il taglio. */
+  .sb-products .sb-card:nth-child(1) .mo-browser-wrap { width: 78%; }
+}
+.mo-browser {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: linear-gradient(
+    158deg,
+    rgba(255, 255, 255, 0.46),
+    color-mix(in srgb, currentColor 20%, rgba(255, 255, 255, 0.18)) 48%,
+    rgba(255, 255, 255, 0.08)
+  );
+  box-shadow:
+    0 30px 60px -20px rgba(0, 20, 12, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: mo-float var(--mo-loop, 12s) ease-in-out infinite;
+}
+.mo-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  height: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.12));
+}
+.mo-dots { display: flex; gap: 5px; flex: none; }
+.mo-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+.mo-dots i:nth-child(2) { background: rgba(255, 255, 255, 0.62); }
+.mo-dots i:nth-child(3) { background: rgba(255, 255, 255, 0.45); }
+.mo-omni {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 16px;
+  padding: 0 8px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+}
+.mo-lock {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex: none;
+  background: color-mix(in srgb, currentColor 70%, #000);
+}
+.mo-type-slot { flex: 1; overflow: hidden; }
+/* L'indirizzo che si scrive: una barra che cresce a scatti. steps() e non
+   lineare — una barra che scorre liscia è una barra di caricamento, a scatti
+   è qualcuno che digita. */
+.mo-type {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, currentColor 60%, #000);
+  animation: mo-type var(--mo-loop, 12s) steps(22, end) infinite;
+}
+.mo-caret {
+  width: 1.5px;
+  height: 9px;
+  flex: none;
+  background: color-mix(in srgb, currentColor 70%, #000);
+  animation: mo-caret 1s steps(1) infinite;
+}
+.mo-browser-body {
+  aspect-ratio: 16 / 10;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.08));
+}
+.mo-hero {
+  height: 34%;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.55),
+    color-mix(in srgb, currentColor 35%, rgba(255, 255, 255, 0.3))
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.mo-cols { display: flex; gap: 8px; flex: 1; }
+.mo-cols i {
+  flex: 1;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.28);
+}
+.mo-cols i:nth-child(2) { background: rgba(255, 255, 255, 0.2); }
+.mo-cols i:nth-child(3) { background: rgba(255, 255, 255, 0.14); }
+.mo-row { display: flex; align-items: center; gap: 9px; }
+.mo-btn {
+  height: 18px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.6));
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, currentColor 78%, #000);
+}
+.mo-rule {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.4);
+}
+/* Il riflesso sotto la finestra: la stacca dal fondo e le dà un appoggio.
+
+   È in POSITION: ABSOLUTE, e non è un dettaglio. Nel flusso, i suoi 38px si
+   sommavano all'altezza della finestra: il riquadro veniva alto 175px dentro
+   un palco di 140 — misurato su telefono — e siccome è centrato, l'eccesso
+   usciva METÀ sopra, portando la barra dell'indirizzo fuori dalla lastra. Un
+   riflesso è un'ombra: non deve occupare spazio, deve solo starci sotto. */
+.mo-browser-wrap { position: relative; }
+.mo-browser-refl {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 100%;
+  height: 38px;
+  margin-top: 4px;
+  border-radius: 0 0 14px 14px;
+  transform: scaleY(-1);
+  opacity: 0.26;
+  filter: blur(2px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent);
+  pointer-events: none;
+}
+
+/* ── ③ IA — gli anelli in orbita ──────────────────────────────────────────── */
+/* L'orbita è quadrata e si misura sull'ALTEZZA del palco, non sulla larghezza:
+   è l'unico oggetto tondo, e un tondo che segue la larghezza su una scheda
+   larga il doppio diventa una luna. Il tetto in px la ferma dove la vuole il
+   disegno. */
+.mo-orbita {
+  position: relative;
+  height: 100%;
+  max-height: 150px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+.mo-orbita-alone {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, currentColor 60%, #ffffff) 0%,
+    transparent 65%
+  );
+  filter: blur(20px);
+  animation: mo-pulse var(--mo-loop, 14s) ease-in-out infinite;
+}
+.mo-anello {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-top-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 18px color-mix(in srgb, currentColor 45%, transparent);
+  transform-style: preserve-3d;
+  animation: mo-orbit linear infinite;
+}
+/* Il punto di luce sul bordo: senza, un cerchio che ruota su sé stesso non si
+   vede girare. */
+.mo-anello i {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 30%,
+    #ffffff,
+    color-mix(in srgb, currentColor 70%, #ffffff)
+  );
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
+}
+.mo-nucleo {
+  position: relative;
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 28%,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.9) 18%,
+    color-mix(in srgb, currentColor 55%, #ffffff) 48%,
+    color-mix(in srgb, currentColor 85%, #000) 100%
+  );
+  box-shadow:
+    0 22px 50px -14px rgba(0, 20, 12, 0.8),
+    inset 0 -10px 24px rgba(0, 30, 20, 0.4),
+    0 0 40px color-mix(in srgb, currentColor 50%, transparent);
+  animation: mo-orb var(--mo-loop, 14s) ease-in-out infinite;
+}
+.mo-nucleo i {
+  position: absolute;
+  left: 18%;
+  top: 10%;
+  width: 40%;
+  height: 26%;
+  border-radius: 50%;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), transparent);
+  filter: blur(1px);
+}
+
+/* ── ④ FOTOGRAFIA — l'iride ───────────────────────────────────────────────── */
+/* Stessa regola dell'orbita: tondo, quindi si misura sull'altezza e ha un
+   tetto. */
+.mo-iride {
+  position: relative;
+  height: 100%;
+  max-height: 150px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.62);
+  background: radial-gradient(
+    circle at 36% 30%,
+    rgba(255, 255, 255, 0.5),
+    color-mix(in srgb, currentColor 75%, #000) 72%
+  );
+  box-shadow:
+    0 26px 56px -18px rgba(0, 20, 12, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    0 0 44px color-mix(in srgb, currentColor 40%, transparent);
+}
+/* Le lamelle: sei spicchi che si ritirano verso il bordo.
+
+   Sulle tavole erano quasi bianche (0.72 in testa) e stavano bene perché il
+   fondo era verde scuro e le lamelle ci si stampavano sopra. Qui il fondo è la
+   tinta a piena forza e sei spicchi chiari sovrapposti, quando l'iride è
+   aperta, si sommano in una macchia bianca che si mangia l'obiettivo: il rosa
+   diventava un disco latte.
+
+   Quindi la lamella è TINTA con un filo di luce sul taglio, non luce con un
+   filo di tinta. Il bianco resta dov'era utile — lo spigolo illuminato — e il
+   corpo dello spicchio scurisce la tinta invece di schiarirla. */
+.mo-lamella {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 50%;
+  transform-origin: 50% 100%;
+  clip-path: polygon(20% 0, 80% 0, 50% 100%);
+  background: linear-gradient(
+    96deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.28) 10%,
+    color-mix(in srgb, currentColor 70%, #000) 46%,
+    color-mix(in srgb, currentColor 82%, #000) 100%
+  );
+  opacity: 0.9;
+  animation: mo-iride var(--mo-loop, 12s) cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.mo-pupilla {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11%;
+  aspect-ratio: 1;
+  margin: -5.5% 0 0 -5.5%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 30%,
+    #ffffff,
+    color-mix(in srgb, currentColor 60%, #ffffff) 55%,
+    color-mix(in srgb, currentColor 80%, #000)
+  );
+  box-shadow: 0 0 26px rgba(255, 255, 255, 0.9);
+}
+/* Lo scatto: un fotogramma bianco all'88% del giro. */
+.mo-flash {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  animation: mo-flash var(--mo-loop, 12s) steps(1) infinite;
+}
+.mo-bokeh {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.3) 55%,
+    transparent 72%
+  );
+  filter: blur(3px);
+  animation: mo-bokeh ease-in-out infinite;
+}
+
+/* ── ⑤ GEOMETRA — il cubo e il piano ──────────────────────────────────────── */
+/* Il piano quadrettato: il terreno sotto al cubo.
+
+   Sulle tavole prendeva la metà bassa di una scheda alta 775px e aveva tutto
+   lo spazio per sfumare. Qui la scheda è bassa, e sotto al 44% c'è già la
+   targa: il piano finiva schiacciato in una striscia dove la maschera lo
+   spegneva quasi del tutto, e in pratica non si vedeva.
+
+   Adesso parte più in alto — passa DIETRO al cubo, che è l'orizzonte giusto
+   per un piano in prospettiva — ed è un filo più marcato, perché sotto c'è il
+   verde pieno e non il verde cupo delle tavole. */
+.mo-piano-wrap {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  top: 30%;
+  bottom: 0;
+  overflow: hidden;
+  perspective: 620px;
+}
+/* Le righe del reticolo sono SCURE, non chiare.
+
+   Sulle tavole erano bianche e si vedevano: il piano stava sul verde cupo
+   della metà alta. Qui il piano sta in basso, e il fondo in basso è la tinta
+   schiarita col bianco — righe bianche su quasi-bianco non esistono, ed è
+   esattamente com'era venuta la scheda del geometra al primo giro.
+
+   Una riga scura invece funziona su tutte e cinque le tinte, perché il fondo
+   si schiarisce sempre verso il basso. È anche più giusta come disegno: su un
+   foglio da rilievo il reticolo è inchiostro, non luce. */
+/* L'altezza del piano è in PX e non in %, ed è la correzione che lo ha reso
+   visibile.
+
+   Sulle tavole era `inset: -40% 0` dentro un riquadro alto ~310px: il 40% in
+   più sopra e sotto dava al piano ~560px di profondità da proiettare, e
+   ruotato di 74° restava un pezzo di pavimento. Qui il riquadro è alto 168px,
+   il -40% dava ~300px, e ruotato veniva fuori una striscia alta VENTIQUATTRO
+   pixel — misurata, non dedotta — per giunta spinta sopra il bordo del suo
+   contenitore, cioè ritagliata via. Il piano c'era e non si vedeva.
+
+   Un'altezza fissa non dipende da quanto è bassa la scheda: 420px di piano
+   ruotati di 74° danno la fuga che il disegno vuole, su qualunque card. */
+.mo-piano {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 420px;
+  transform-origin: 50% 0;
+  background-image:
+    linear-gradient(rgba(0, 30, 20, 0.34) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 30, 20, 0.34) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: mo-piano var(--mo-loop, 15s) linear infinite;
+  /* Sfuma a monte (dove l'orizzonte sparisce) e resta leggibile a valle. */
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 34%, rgba(0, 0, 0, 0.5));
+  mask-image: linear-gradient(180deg, transparent, #000 34%, rgba(0, 0, 0, 0.5));
+}
+/* Il cubo vive dentro al palco come gli altri oggetti — non in un riquadro suo
+   in absolute sulla scheda, che era la disposizione delle tavole e qui gli
+   faceva ignorare il rientro del palco (finiva sotto il numero e oltre il
+   bordo destro). */
+.mo-cubo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 900px;
+}
+/* Il cubo è l'unico oggetto a misura FISSA, e deve esserlo: le sei facce si
+   montano con translateZ, che non accetta percentuali. Un lato in % con lo Z
+   in px è un cubo che si apre o si chiude a ogni larghezza di finestra.
+   96px di lato — mezzo lato 48 — è la misura che sta nel palco anche sulla
+   scheda stretta della seconda riga, dove il palco è largo ~230px. */
+.mo-cubo {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  transform-style: preserve-3d;
+  animation: mo-spin var(--mo-loop, 15s) linear infinite;
+}
+.mo-faccia {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.34),
+    color-mix(in srgb, currentColor 25%, transparent)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+/* Mezzo lato: 96 / 2. Sta in una variabile perché i sei valori devono restare
+   d'accordo fra loro e con la larghezza qui sopra — sei numeri scritti a mano
+   sono sei occasioni di aprire il cubo. */
+.mo-cubo { --z: 48px; }
+.mo-f-front { transform: translateZ(var(--z)); }
+.mo-f-back { transform: translateZ(calc(var(--z) * -1)) rotateY(180deg); border-color: rgba(255, 255, 255, 0.5); }
+.mo-f-right { transform: rotateY(90deg) translateZ(var(--z)); border-color: rgba(255, 255, 255, 0.62); }
+.mo-f-left { transform: rotateY(-90deg) translateZ(var(--z)); border-color: rgba(255, 255, 255, 0.62); }
+.mo-f-top { transform: rotateX(90deg) translateZ(var(--z)); border-color: rgba(255, 255, 255, 0.85); }
+.mo-f-bottom { transform: rotateX(-90deg) translateZ(var(--z)); border-color: rgba(255, 255, 255, 0.42); }
+/* La scala graduata: nove tacche che si accendono a turno. */
+/* La scala graduata sul bordo sinistro. Si ferma al 46% in basso: sotto
+   comincia la targa, e le tacche le finivano dietro. */
+.mo-scala {
+  position: absolute;
+  left: 14px;
+  top: 10%;
+  bottom: 46%;
+  width: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.mo-scala i {
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.9);
+  animation: mo-tick ease-in-out infinite;
+}
 
 /* ── I RIFLESSI ──────────────────────────────────────────────────────────────
    Tre strati, e sono tre cose diverse. Tutti e tre `pointer-events: none` e
@@ -1997,49 +2642,95 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   white-space: nowrap;
 }
 
-/* ── Le keyframe del mosaico ─────────────────────────────────────────────────
-   Tutte tornano al punto da cui partono: il giro si chiude, e da fermo il
-   mosaico è quello di sempre. */
-@keyframes mo-tile {
-  0%, 3% { opacity: 0; transform: scale(0.84); }
-  15%, 100% { opacity: var(--o, 1); transform: scale(1); }
+/* ── Le keyframe delle scene ─────────────────────────────────────────────────
+   Ricopiate dalle tavole con i loro tempi e le loro curve, rinominate col
+   prefisso di casa. Tutte tornano al punto da cui partono: il giro si chiude, e
+   da fermo la scena è quella intera — che è anche quello che rende gratis
+   prefers-reduced-motion (in fondo al file). */
+
+/* Il guscio: aurora, bolle, passata. */
+@keyframes mo-aurora {
+  0%, 100% { transform: translate(-8%, 2%) rotate(-10deg) scale(1.15); }
+  50% { transform: translate(8%, -6%) rotate(8deg) scale(1.35); }
 }
-@keyframes mo-late {
-  0%, 26% { opacity: 0; }
-  32%, 100% { opacity: 1; }
+@keyframes mo-rise {
+  0% { transform: translateY(8%) scale(0.85); opacity: 0; }
+  14% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { transform: translateY(-780%) scale(1.15); opacity: 0; }
 }
-/* Le cinque traiettorie della tessera accesa: casa → due scatti su celle vere
-   della griglia → casa. Gli scostamenti (80 in x, 82 in y) sono il passo
-   della maglia. */
-@keyframes mo-lit-a {
-  0%, 30% { transform: translate(0, 0); }
-  40%, 50% { transform: translate(160px, 0); }
-  60%, 70% { transform: translate(160px, 82px); }
-  80%, 100% { transform: translate(0, 0); }
+@keyframes mo-gloss {
+  0%, 68% { transform: translateX(-130%) skewX(-20deg); }
+  100% { transform: translateX(240%) skewX(-20deg); }
 }
-@keyframes mo-lit-b {
-  0%, 30% { transform: translate(0, 0); }
-  40%, 50% { transform: translate(-160px, 0); }
-  60%, 70% { transform: translate(-160px, -82px); }
-  80%, 100% { transform: translate(0, 0); }
+
+/* ① La pila che sfoglia. */
+@keyframes mo-flip {
+  0% { transform: translate3d(30%, 10%, -360px) rotateY(-40deg); opacity: 0; }
+  12% { opacity: 0.95; }
+  52% { transform: translate3d(0, 0, 0) rotateY(-14deg); opacity: 1; }
+  86% { transform: translate3d(-30%, -10%, 220px) rotateY(-2deg); opacity: 0; }
+  100% { transform: translate3d(-30%, -10%, 220px) rotateY(-2deg); opacity: 0; }
 }
-@keyframes mo-lit-c {
-  0%, 30% { transform: translate(0, 0); }
-  40%, 50% { transform: translate(0, 82px); }
-  60%, 70% { transform: translate(80px, 82px); }
-  80%, 100% { transform: translate(0, 0); }
+
+/* ② La finestra che scrive. */
+@keyframes mo-float {
+  0%, 100% { transform: translateY(0) rotateX(7deg) rotateZ(-1deg); }
+  50% { transform: translateY(-8px) rotateX(4deg) rotateZ(1deg); }
 }
-@keyframes mo-lit-d {
-  0%, 30% { transform: translate(0, 0); }
-  40%, 50% { transform: translate(80px, 0); }
-  60%, 70% { transform: translate(80px, -82px); }
-  80%, 100% { transform: translate(0, 0); }
+@keyframes mo-type {
+  0%, 8% { width: 0; }
+  46%, 54% { width: 100%; }
+  92%, 100% { width: 0; }
 }
-@keyframes mo-lit-e {
-  0%, 30% { transform: translate(0, 0); }
-  40%, 50% { transform: translate(240px, 0); }
-  60%, 70% { transform: translate(240px, 82px); }
-  80%, 100% { transform: translate(0, 0); }
+@keyframes mo-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ③ Gli anelli in orbita. */
+@keyframes mo-orbit {
+  0% { transform: rotateX(72deg) rotateZ(0deg); }
+  100% { transform: rotateX(72deg) rotateZ(360deg); }
+}
+@keyframes mo-pulse {
+  0%, 100% { transform: scale(0.9); opacity: 0.18; }
+  50% { transform: scale(1.25); opacity: 0.5; }
+}
+@keyframes mo-orb {
+  0%, 100% { transform: translateY(-5px) scale(1); }
+  50% { transform: translateY(5px) scale(1.04); }
+}
+
+/* ④ L'iride e lo scatto. */
+@keyframes mo-iride {
+  0% { transform: rotate(var(--r)) translateY(0); }
+  22% { transform: rotate(calc(var(--r) + 15deg)) translateY(-46%); }
+  60% { transform: rotate(calc(var(--r) + 15deg)) translateY(-46%); }
+  84%, 100% { transform: rotate(var(--r)) translateY(0); }
+}
+@keyframes mo-bokeh {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.28; }
+  50% { transform: translate(6px, -10px) scale(1.18); opacity: 0.6; }
+}
+@keyframes mo-flash {
+  0%, 84% { opacity: 0; }
+  88% { opacity: 0.8; }
+  95%, 100% { opacity: 0; }
+}
+
+/* ⑤ Il cubo, il piano e le tacche. */
+@keyframes mo-spin {
+  0% { transform: rotateX(-22deg) rotateY(0deg); }
+  100% { transform: rotateX(-22deg) rotateY(360deg); }
+}
+@keyframes mo-piano {
+  0% { transform: rotateX(74deg) translateY(0); }
+  100% { transform: rotateX(74deg) translateY(40px); }
+}
+@keyframes mo-tick {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2066,20 +2757,21 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    mosaico intero, non uno a metà.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.sb-mosaic-tile { animation-name: mo-tile; }
-.sb-mosaic-lit { animation-name: var(--mo-lit), mo-late; }
+/* Lo sfasamento della passata di luce. Le cinque scene hanno già un giro lungo
+   diverso l'una dall'altra (site/mosaicScene.tsx, LOOP: 12, 13, 14, 12, 15 s),
+   quindi non battono mai all'unisono da sole; la passata invece parte dallo
+   stesso bordo in tutte, e cinque bagliori che entrano insieme si leggono come
+   un lampeggio unico. Il ritardo è negativo — un positivo terrebbe la passata
+   ferma fuori scena all'inizio, un negativo la fa partire a giro avviato. */
+.sb-products .sb-card:nth-child(2) .mo-gloss { animation-delay: -2.4s; }
+.sb-products .sb-card:nth-child(3) .mo-gloss { animation-delay: -4.8s; }
+.sb-products .sb-card:nth-child(4) .mo-gloss { animation-delay: -7.2s; }
+.sb-products .sb-card:nth-child(5) .mo-gloss { animation-delay: -9.6s; }
 
-/* Lo sfasamento: cinque mosaici che battono all'unisono sono un solo mosaico
-   grande. Mezzo secondo l'uno dall'altro basta a scollarli, e il negativo è
-   quello che serve — un ritardo positivo li terrebbe fermi all'inizio, un
-   negativo li fa partire già a giro avviato. Gli stessi numeri li porta la
-   targa in site/homeLive.tsx (PLATE_STAGGER), così testo e tessere di una
-   scheda si muovono sullo stesso tempo. */
-.sb-products .sb-card:nth-child(1) .sb-mosaic-lit { animation-delay: 0s, 0s; }
-.sb-products .sb-card:nth-child(2) .sb-mosaic-lit { animation-delay: -0.52s, -0.52s; }
-.sb-products .sb-card:nth-child(3) .sb-mosaic-lit { animation-delay: -1.04s, -1.04s; }
-.sb-products .sb-card:nth-child(4) .sb-mosaic-lit { animation-delay: -1.56s, -1.56s; }
-.sb-products .sb-card:nth-child(5) .sb-mosaic-lit { animation-delay: -2.08s, -2.08s; }
+/* E le due schede con lo stesso giro (siti e foto, 12 s) partono comunque
+   scollate: senza questo, la finestra che scrive e l'iride che apre battono
+   sullo stesso fotogramma per tutta la vita della pagina. */
+.sb-products .sb-card:nth-child(4) .mo-scena { animation-delay: -3s; }
 
 .sb-products .sb-card:nth-child(2) .sb-mocard-sweep { animation-delay: -1.4s; }
 .sb-products .sb-card:nth-child(3) .sb-mocard-sweep { animation-delay: -2.8s; }
@@ -2087,24 +2779,69 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-products .sb-card:nth-child(5) .sb-mocard-sweep { animation-delay: -5.6s; }
 
 /* Il passaggio del puntatore non fa più partire niente — gira già tutto. Gli
-   resta l'ACCENSIONE: la tavola si avvicina di un soffio e la passata di luce
+   resta l'ACCENSIONE: la scena si avvicina di un soffio e la passata di luce
    si fa più netta. Due transizioni, una entrando e una uscendo. */
 @media (hover: hover) and (pointer: fine) {
-  .sb-card:hover .sb-mosaic,
-  .sb-card:focus-visible .sb-mosaic { transform: scale(1.03); }
+  .sb-card:hover .mo-scena,
+  .sb-card:focus-visible .mo-scena { transform: scale(1.03); }
   .sb-card:hover .sb-mocard-sheen,
   .sb-card:focus-visible .sb-mocard-sheen { opacity: 1.35; }
 }
 
+/* Meno movimento: si spengono i NOMI, e siccome ogni keyframe comincia e
+   finisce sullo stesso fotogramma quello che resta è la scena intera e ferma —
+   il cubo posato, l'iride aperta, la finestra al suo posto. Le due cose che
+   sparirebbero a metà (la carta della pila, che a giro fermo è trasparente, e
+   il lampo dello scatto) si fissano a mano sul loro fotogramma buono. */
 @media (prefers-reduced-motion: reduce) {
-  .sb-mosaic-tile,
-  .sb-mosaic-lit,
+  .mo-aurora,
+  .mo-bolla,
+  .mo-gloss,
+  .mo-carta,
+  .mo-browser,
+  .mo-type,
+  .mo-caret,
+  .mo-anello,
+  .mo-orbita-alone,
+  .mo-nucleo,
+  .mo-lamella,
+  .mo-bokeh,
+  .mo-flash,
+  .mo-cubo,
+  .mo-piano,
+  .mo-scala i,
   .sb-mocard-sweep,
   .sb-mocard-edge { animation-name: none; }
+
   .sb-mocard-sweep { opacity: 0; }
-  .sb-mosaic { transition: none; }
-  .sb-card:hover .sb-mosaic,
-  .sb-card:focus-visible .sb-mosaic { transform: none; }
+  .mo-gloss { opacity: 0; }
+  .mo-flash { opacity: 0; }
+  /* La pila a giro fermo: una carta sola, dritta e visibile. Le altre tre
+     starebbero una sopra l'altra nello stesso punto. */
+  .mo-carta { opacity: 0; transform: none; }
+  .mo-carta:nth-child(2) { opacity: 1; }
+  /* L'indirizzo scritto per intero invece che a metà digitazione. */
+  .mo-type { width: 100%; }
+
+  /* Due scene NON hanno un buon fotogramma di riposo, e vanno messe a posto a
+     mano — verificate in Edge con prefers-reduced-motion, non dedotte.
+
+     ① L'IRIDE. Le sei lamelle condividono una keyframe sola e si distinguono
+        per --r, che è la loro rotazione: è la keyframe a distribuirle sul
+        giro. Ferme, la rotazione non viene applicata e le sei lamelle si
+        sovrappongono tutte in cima — un solo spicchio invece di un diaframma.
+        Qui gliela riapplico io, ferma e aperta. */
+  .mo-lamella { transform: rotate(var(--r)) translateY(-46%); }
+
+  /* ② IL CUBO. mo-spin porta sia l'inclinazione (rotateX -22°) sia il giro:
+        fermo, il cubo perde anche l'inclinazione e si presenta di faccia, cioè
+        come un quadrato. Gli lascio una posa di tre quarti, che è quella in cui
+        un cubo si legge come un cubo. */
+  .mo-cubo { transform: rotateX(-22deg) rotateY(-38deg); }
+
+  .mo-scena { transition: none; }
+  .sb-card:hover .mo-scena,
+  .sb-card:focus-visible .mo-scena { transform: none; }
 }
 
 /* Righe di terminale — le usa il pannello dei clienti (la finestra `ls

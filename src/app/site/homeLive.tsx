@@ -65,6 +65,7 @@ import { memo, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { SiteLink } from "./nav";
 import { IcArrowUpRight } from "./homeIcons";
+import { MosaicScene, type MosaicTopic } from "./mosaicScene";
 
 /** Il movimento decorativo si accende solo se l'utente non l'ha disattivato. */
 function motionOK() {
@@ -272,143 +273,26 @@ export const LiveKicker = memo(function LiveKicker() {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   IL MOSAICO — una griglia di tessere, una sola accesa
+   IL MOSAICO — dove sono finite le tessere
 
-   Cinque schede, un solo componente. La griglia di tessere è identica per
-   tutte; cambiano tre cose, e solo quelle:
+   Qui c'era il mosaico: una griglia di ventiquattro <rect> della tinta a
+   opacità sparse, con UNA tessera piena che girava fra le celle e un modulo
+   disegnato dentro — pila, finestra, asterisco, macchina, A. Un solo
+   meccanismo per cinque schede, che era il punto: i sei giri precedenti erano
+   costati sei disegni tecnici da mantenere uno per uno.
 
-     · l'accento          → currentColor, dal data-acc della card;
-     · la traiettoria     → --mo-lit, scritta da .sb-mosaic--<tema> in home.css,
-                             sceglie fra mo-lit-a … mo-lit-e;
-     · il modulo          → il disegnino dentro la tessera accesa, uno switch
-                             qui sotto.
+   Il sesto giro tiene quella regola e cambia l'oggetto. Le cinque scene non
+   sono più tessere piatte ma oggetti di vetro che girano su un fondo di tinta
+   — la pila che sfoglia, la finestra che scrive, gli anelli in orbita, l'iride
+   che apre, il cubo che ruota. Il disegno viene da cinque tavole preparate a
+   parte; quello che è cambiato per entrare qui — la tinta che non è più verde,
+   il formato sdraiato, la targa che resta la nostra — sta scritto in testa a
+   site/mosaicScene.tsx, che è dove vivono adesso.
 
-   ── La geometria ───────────────────────────────────────────────────────────
-   viewBox 596×360, lo stesso del canvas da cui il mosaico viene. È la
-   proporzione esatta delle vecchie tavole (280×170 = 1,647; 596×360 = 1,656):
-   la card non se n'è accorta. Le tessere stanno su una maglia da 80×82 con
-   qualche buco; due sono larghe il doppio. La tessera accesa parte da (190,108)
-   e le cinque keyframe la portano su celle vere della griglia — mai in un
-   buco, mai fuori dai bordi.
-
-   ── Il moto ────────────────────────────────────────────────────────────────
-   Gira sempre, in loop da 4 s, e le cinque schede sono sfasate di mezzo
-   secondo l'una dall'altra (home.css, «Sempre vive»). Le keyframe cominciano e
-   finiscono sullo stesso fotogramma — tessere posate, tessera accesa a casa —
-   quindi il giro si chiude, e con prefers-reduced-motion, che toglie il nome
-   dell'animazione, resta il mosaico intero.
+   Quello che NON è cambiato è il contorno: la scheda è sempre .sb-mocard,
+   l'accento arriva sempre dal data-acc della card, la targa gira sempre con
+   PLATE qui sotto, e i tre riflessi della lastra sono sempre quelli.
    ═══════════════════════════════════════════════════════════════════════════ */
-
-/** Le tessere della griglia: x, y, larghezza, opacità, ritardo di posa (s).
- *  L'altezza è sempre 74. Ricopiate dal canvas, Turno 3. */
-const MOSAIC_FIELD: [number, number, number, number, number][] = [
-  [30, 26, 72, 0.9, 0], [110, 26, 72, 0.35, 0.11], [190, 26, 152, 1, 0.22], [350, 26, 72, 0.5, 0.44], [430, 26, 72, 0.2, 0.55],
-  [510, 26, 72, 0.62, 0.66],
-  [30, 108, 72, 0.5, 0.11], [110, 108, 72, 0.95, 0.22], [270, 108, 72, 0.25, 0.44], [350, 108, 72, 0.75, 0.55], [430, 108, 72, 0.3, 0.66], [510, 108, 72, 0.9, 0.77],
-  [30, 190, 72, 0.25, 0.22], [110, 190, 72, 0.85, 0.33], [190, 190, 72, 0.4, 0.44], [270, 190, 72, 1, 0.55], [350, 190, 152, 0.3, 0.66], [510, 190, 72, 0.6, 0.88],
-  [30, 272, 72, 0.7, 0.33], [110, 272, 72, 0.2, 0.44], [190, 272, 72, 0.45, 0.55], [350, 272, 72, 0.9, 0.77], [430, 272, 72, 0.25, 0.88], [510, 272, 72, 0.55, 0.99],
-];
-
-/* Qui c'era MOSAIC_PAPER: la tessera avorio in alto a destra, disegnata fuori
-   dalla griglia colorata perché aveva un fill suo. Esisteva per un motivo solo
-   — reggere il marchio .ap, che ci sedeva sopra. Tolto il marchio restava un
-   quadrato bianco nello stesso angolo di tutte e cinque le schede, cioè
-   esattamente il difetto per cui il marchio se n'era andato: un elemento
-   chiaro, identico, ripetuto cinque volte, che si prende l'occhio prima del
-   mosaico. Adesso quella cella è una tessera come le altre, ed è nel campo. */
-
-/** La casa della tessera accesa, prima che la keyframe la porti in giro. */
-const LIT = { x: 190, y: 108, w: 72, h: 74 };
-
-type MosaicTopic = "archive" | "web" | "claude" | "photo" | "autocad";
-
-/** Il modulo dentro la tessera accesa. Coordinate in coordinate del riquadro,
- *  con la tessera a casa (190,108). I ritagli — quelli che devono lasciar
- *  vedere la tinta sotto — portano la classe --cut e prendono currentColor. */
-function MosaicModule({ topic }: { topic: MosaicTopic }) {
-  switch (topic) {
-    case "archive":
-      return (
-        <>
-          <rect className="sb-mosaic-mod" x={206} y={124} width={16} height={8} />
-          <rect className="sb-mosaic-mod" x={206} y={132} width={40} height={12} opacity={0.7} />
-          <rect className="sb-mosaic-mod" x={206} y={146} width={40} height={12} opacity={0.45} />
-        </>
-      );
-    case "web":
-      return (
-        <>
-          <rect className="sb-mosaic-mod" x={204} y={126} width={44} height={8} />
-          <rect className="sb-mosaic-mod" x={204} y={136} width={44} height={26} opacity={0.55} />
-          <circle className="sb-mosaic-mod sb-mosaic-mod--cut" cx={210} cy={130} r={1.6} />
-        </>
-      );
-    case "claude":
-      return (
-        <g className="sb-mosaic-mod">
-          <rect x={222} y={123} width={8} height={44} rx={4} />
-          <rect x={222} y={123} width={8} height={44} rx={4} transform="rotate(45 226 145)" />
-          <rect x={222} y={123} width={8} height={44} rx={4} transform="rotate(90 226 145)" />
-          <rect x={222} y={123} width={8} height={44} rx={4} transform="rotate(135 226 145)" />
-        </g>
-      );
-    case "photo":
-      return (
-        <>
-          <rect className="sb-mosaic-mod" x={210} y={124} width={12} height={7} />
-          <rect className="sb-mosaic-mod" x={203} y={131} width={46} height={30} rx={3} opacity={0.72} />
-          <circle className="sb-mosaic-mod sb-mosaic-mod--cut" cx={226} cy={146} r={9} />
-          <circle cx={226} cy={146} r={9} fill="none" stroke="#f7f4ec" strokeWidth={2} opacity={0.85} />
-        </>
-      );
-    case "autocad":
-      return (
-        <>
-          <polygon className="sb-mosaic-mod" points="226,118 248,170 236,170 226,148 216,170 204,170" />
-          <rect className="sb-mosaic-mod sb-mosaic-mod--cut" x={213} y={150} width={26} height={6} />
-        </>
-      );
-  }
-}
-
-/* memo: le cinque schede vivono dentro App insieme al resto della home, e non
-   prendono prop che cambiano. Senza, ogni setState della pagina le
-   ridisegnava — e sono ventiquattro <rect> più il modulo, per cinque. */
-export const Mosaic = memo(function Mosaic({ topic }: { topic: MosaicTopic }) {
-  return (
-    <svg
-      className={`sb-mosaic sb-mosaic--${topic}`}
-      viewBox="0 0 596 360"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      {/* il fondo: una campitura sola della tinta, appena percettibile */}
-      <rect className="sb-mosaic-bg" width="596" height="360" />
-
-      <g className="sb-mosaic-field">
-        {MOSAIC_FIELD.map(([x, y, w, o, d]) => (
-          <rect
-            key={`${x}-${y}`}
-            className="sb-mosaic-tile"
-            x={x}
-            y={y}
-            width={w}
-            height={74}
-            style={{ "--o": o, animationDelay: `${d}s` } as React.CSSProperties}
-          />
-        ))}
-      </g>
-
-      {/* la tessera accesa: l'unica piena, e l'unica che cambia posto */}
-      <g className="sb-mosaic-lit">
-        <rect className="sb-mosaic-lit-cell" x={LIT.x} y={LIT.y} width={LIT.w} height={LIT.h} />
-        <MosaicModule topic={topic} />
-      </g>
-    </svg>
-  );
-});
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA SCHEDA — mosaico al vivo, riflessi e targa viva
@@ -596,7 +480,7 @@ export const MosaicCard = memo(function MosaicCard({ topic }: { topic: MosaicTop
     <div className="sb-panel">
       <div className="sb-panel-inner sb-panel--solid sb-mocard">
         <div className="sb-card-visual">
-          <Mosaic topic={topic} />
+          <MosaicScene topic={topic} />
         </div>
 
         {/* I riflessi. Tre span vuoti e nessuna immagine: sono tre gradienti,
