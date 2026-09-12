@@ -1,5 +1,31 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Le scene della griglia prodotti — il mosaico, sesto giro.
+// Le scene della griglia prodotti — il mosaico, settimo giro.
+//
+// ── Il settimo giro, cioè cosa è cambiato adesso ────────────────────────
+// È arrivata una tavola nuova delle stesse cinque scene. Gli oggetti sono
+// quelli — pila, browser, orbita, obiettivo, cubo — e l'impianto non si
+// muove: quello che segue qui sotto, dalle tre ragioni in poi, vale ancora
+// tutto. Le differenze prese da questo giro sono cinque, di dettaglio:
+//
+//   · IL BROWSER HA IL SOLCO. L'indirizzo che si scrive cresce dentro una
+//     guida chiara invece che nel vuoto: si vedono il pieno e il vuoto, e la
+//     barra torna a leggersi come testo che compare invece che come un
+//     caricamento. Il lucchetto da pallino tondo diventa linguetta, che è la
+//     forma dell'icona che sta prima di un indirizzo.
+//   · IL RESPIRO NON DERIVA PIÙ. Nucleo e pupilla pulsano di sola scala; il
+//     translateY se n'è andato. La ragione sta sulla keyframe, in home.css.
+//   · IL BOKEH SCENDE DA CINQUE A TRE. Sono i tre delle tavole, nei loro
+//     punti: su una card bassa tre cerchi sfocati sono già il fondo, cinque
+//     erano una foschia.
+//   · IL RETICOLO DEL GEOMETRA TORNA BIANCO. Era scuro dal giro prima, e per
+//     una ragione buona; quello che lo rende di nuovo possibile è la maschera
+//     girata, non il colore. La nota sta sulla regola, in home.css.
+//   · LA SCALA GRADUATA ESCE. Sulle tavole nuove non c'è più.
+//
+// Quello che NON è arrivato dalle tavole nuove è il backdrop-filter, che
+// loro rimettono su ogni superficie di vetro. Vale la stessa ragione di
+// sempre, scritta più sotto sotto «Il costo»: cinque schede accese insieme,
+// un buffer sfocato per ognuna, ridipinto a ogni fotogramma.
 //
 // ── Da dove vengono ──────────────────────────────────────────────────────────
 // Le cinque scene arrivano da una tavola preparata a parte («Mosaico, giro 7»):
@@ -190,6 +216,7 @@ function ScenaWeb() {
           <span className="mo-omni">
             <i className="mo-lock" />
             <span className="mo-type-slot">
+              <i className="mo-type-track" />
               <i className="mo-type" />
             </span>
             <i className="mo-caret" />
@@ -282,8 +309,6 @@ function Bokeh() {
     { l: 12, t: 20, s: 44, dur: 11, d: 0 },
     { l: 72, t: 14, s: 30, dur: 9, d: -2.4 },
     { l: 80, t: 52, s: 52, dur: 13, d: -5.1 },
-    { l: 28, t: 58, s: 26, dur: 10, d: -1.2 },
-    { l: 52, t: 24, s: 36, dur: 12, d: -6.8 },
   ];
   return (
     <>
@@ -331,31 +356,19 @@ function ScenaGeometra() {
   );
 }
 
-/** Il piano quadrettato e la scala graduata: stanno FUORI dal palco perché non
- *  sono l'oggetto, sono il terreno su cui sta — il piano prende la scheda in
- *  tutta la larghezza e la scala siede sul bordo sinistro. */
+/** Il piano quadrettato: sta FUORI dal palco perché non è l'oggetto, è il
+ *  terreno su cui sta — prende la scheda in tutta la larghezza.
+ *
+ *  La scala graduata — nove tacche sul bordo sinistro, che si accendevano a
+ *  turno — è USCITA con questo giro: sulle tavole nuove non c'è più. Era
+ *  l'unico pezzo della scena che non fosse né il cubo né il suo terreno, e
+ *  toglierla lascia la scheda più carica delle cinque con due oggetti invece
+ *  di tre. Con lei se ne vanno nove elementi animati e la keyframe mo-tick. */
 function FondoGeometra() {
-  const tacche = [7, 12, 7, 7, 12, 7, 7, 12, 7];
   return (
-    <>
-      <div className="mo-piano-wrap">
-        <div className="mo-piano" />
-      </div>
-      <div className="mo-scala">
-        {tacche.map((w, i) => (
-          <i
-            key={i}
-            style={
-              {
-                width: w,
-                animationDuration: `${2.4 + (i % 3) * 0.6}s`,
-                animationDelay: `${-(i * 0.3).toFixed(1)}s`,
-              } as React.CSSProperties
-            }
-          />
-        ))}
-      </div>
-    </>
+    <div className="mo-piano-wrap">
+      <div className="mo-piano" />
+    </div>
   );
 }
 

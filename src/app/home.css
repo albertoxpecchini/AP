@@ -2140,20 +2140,47 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   border: 1px solid rgba(255, 255, 255, 0.7);
   overflow: hidden;
 }
+/* Il lucchetto è diventato una LINGUETTA: non più un pallino tondo ma un
+   rettangolino con le spalle arrotondate in alto, che è la forma che ha sulle
+   tavole nuove. A 5×6px la differenza si vede — un pallino accanto a una barra
+   orizzontale legge come un secondo puntino della fila dei tre, una linguetta
+   legge come l'icona che sta prima dell'indirizzo. */
 .mo-lock {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
+  width: 5px;
+  height: 6px;
+  border-radius: 1px 1px 2px 2px;
   flex: none;
   background: color-mix(in srgb, currentColor 70%, #000);
 }
-.mo-type-slot { flex: 1; overflow: hidden; }
+/* Lo slot è RELATIVO perché adesso porta due strati sovrapposti, la guida e la
+   barra che la riempie. */
+.mo-type-slot {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+}
+/* LA GUIDA, che prima non c'era. Sulle tavole l'indirizzo si scrive DENTRO un
+   solco: una barra chiara ferma, lunga tutto lo slot, e sopra quella che
+   cresce. Senza, la barra che si allunga nel vuoto non si legge come testo che
+   compare — si legge come una barra di caricamento, che è esattamente quello
+   che steps() era stato messo lì a evitare. Col solco, il pieno e il vuoto si
+   vedono tutti e due e il gesto diventa «sta scrivendo». */
+.mo-type-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: color-mix(in srgb, currentColor 26%, rgba(255, 255, 255, 0.26));
+}
 /* L'indirizzo che si scrive: una barra che cresce a scatti. steps() e non
    lineare — una barra che scorre liscia è una barra di caricamento, a scatti
    è qualcuno che digita. */
 .mo-type {
+  position: absolute;
+  left: 0;
+  top: 0;
   display: block;
-  height: 3px;
+  height: 4px;
   border-radius: 2px;
   background: color-mix(in srgb, currentColor 60%, #000);
   animation: mo-type var(--mo-loop, 12s) steps(22, end) infinite;
@@ -2403,28 +2430,19 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   overflow: hidden;
   perspective: 620px;
 }
-/* Le righe del reticolo sono SCURE, non chiare.
+/* Le righe del reticolo sono BIANCHE, come sulle tavole.
 
-   Sulle tavole erano bianche e si vedevano: il piano stava sul verde cupo
-   della metà alta. Qui il piano sta in basso, e il fondo in basso è la tinta
-   schiarita col bianco — righe bianche su quasi-bianco non esistono, ed è
-   esattamente com'era venuta la scheda del geometra al primo giro.
+   Al giro prima erano scure, e la ragione era buona: il fondo della scheda si
+   schiarisce scendendo, e righe bianche sul quasi-bianco del bordo basso
+   sparivano. Le tavole nuove le rifanno bianche, ed è la scelta che tengo —
+   ma la scelta da sola non bastava, perché il fondo di queste card non è
+   quello delle tavole. Quello che la rende leggibile è la MASCHERA, che è
+   girata (vedi sotto): il piano adesso si spegne proprio dove il fondo
+   diventa chiaro, quindi le righe bianche non ci arrivano mai.
 
-   Una riga scura invece funziona su tutte e cinque le tinte, perché il fondo
-   si schiarisce sempre verso il basso. È anche più giusta come disegno: su un
-   foglio da rilievo il reticolo è inchiostro, non luce. */
-/* L'altezza del piano è in PX e non in %, ed è la correzione che lo ha reso
-   visibile.
-
-   Sulle tavole era `inset: -40% 0` dentro un riquadro alto ~310px: il 40% in
-   più sopra e sotto dava al piano ~560px di profondità da proiettare, e
-   ruotato di 74° restava un pezzo di pavimento. Qui il riquadro è alto 168px,
-   il -40% dava ~300px, e ruotato veniva fuori una striscia alta VENTIQUATTRO
-   pixel — misurata, non dedotta — per giunta spinta sopra il bordo del suo
-   contenitore, cioè ritagliata via. Il piano c'era e non si vedeva.
-
-   Un'altezza fissa non dipende da quanto è bassa la scheda: 420px di piano
-   ruotati di 74° danno la fuga che il disegno vuole, su qualunque card. */
+   Dove il piano vive — la fascia di mezzo, tinta piena — il bianco è la riga
+   giusta: è luce su vetro, come tutto il resto della scena, invece
+   dell'inchiostro che era l'unico pezzo scuro fuori dalla pupilla. */
 .mo-piano {
   position: absolute;
   top: 0;
@@ -2433,13 +2451,28 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   height: 420px;
   transform-origin: 50% 0;
   background-image:
-    linear-gradient(rgba(0, 30, 20, 0.34) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 30, 20, 0.34) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+  /* 36px e non 40: è il passo delle tavole nuove, e la fuga viene un filo più
+     fitta — che su una card bassa è quello che serve, perché di file di
+     quadretti prima dell'orizzonte se ne vedono poche. */
+  background-size: 36px 36px;
   animation: mo-piano var(--mo-loop, 15s) linear infinite;
-  /* Sfuma a monte (dove l'orizzonte sparisce) e resta leggibile a valle. */
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 34%, rgba(0, 0, 0, 0.5));
-  mask-image: linear-gradient(180deg, transparent, #000 34%, rgba(0, 0, 0, 0.5));
+  /* LA MASCHERA È GIRATA, ed è la mossa che rende possibile il bianco.
+
+     Prima sfumava a monte e teneva il piano vivo a valle
+     (transparent → #000 34% → 0.5): il reticolo arrivava fino al bordo basso, cioè fin dentro la
+     zona dove il fondo è tinta schiarita col bianco. Con righe scure andava;
+     con righe bianche quella coda è invisibile per costruzione.
+
+     Adesso è quella delle tavole — piena in basso e spenta verso l'alto — ma
+     applicata al contrario di come la si legge: il piano è RUOTATO di 74°,
+     quindi il suo BASSO in coordinate locali è l'orizzonte lontano e il suo
+     ALTO è il bordo vicino. Sfumare verso l'alto vuol dire spegnere il piano
+     mentre scende verso la targa e tenerlo pieno nella fascia di mezzo, dove
+     il fondo è tinta piena e il bianco si stacca. */
+  -webkit-mask-image: linear-gradient(to top, #000 22%, transparent 92%);
+  mask-image: linear-gradient(to top, #000 22%, transparent 92%);
 }
 /* Il cubo vive dentro al palco come gli altri oggetti — non in un riquadro suo
    in absolute sulla scheda, che era la disposizione delle tavole e qui gli
@@ -2484,24 +2517,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .mo-f-left { transform: rotateY(-90deg) translateZ(var(--z)); border-color: rgba(255, 255, 255, 0.62); }
 .mo-f-top { transform: rotateX(90deg) translateZ(var(--z)); border-color: rgba(255, 255, 255, 0.85); }
 .mo-f-bottom { transform: rotateX(-90deg) translateZ(var(--z)); border-color: rgba(255, 255, 255, 0.42); }
-/* La scala graduata: nove tacche che si accendono a turno. */
-/* La scala graduata sul bordo sinistro. Si ferma al 46% in basso: sotto
-   comincia la targa, e le tacche le finivano dietro. */
-.mo-scala {
-  position: absolute;
-  left: 14px;
-  top: 10%;
-  bottom: 46%;
-  width: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.mo-scala i {
-  height: 1.5px;
-  background: rgba(255, 255, 255, 0.9);
-  animation: mo-tick ease-in-out infinite;
-}
 
 /* ── I RIFLESSI ──────────────────────────────────────────────────────────────
    Tre strati, e sono tre cose diverse. Tutti e tre `pointer-events: none` e
@@ -2715,9 +2730,21 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   0%, 100% { transform: scale(0.9); opacity: 0.18; }
   50% { transform: scale(1.25); opacity: 0.5; }
 }
+/* Il RESPIRO: solo scala, niente deriva.
+
+   Prima mo-orb portava anche un translateY di ±5px, cioè il nucleo saliva e
+   scendeva mentre pulsava. Sulle tavole nuove è aero-breath, che è scala e
+   basta — e hanno ragione loro per un motivo che si vede solo montato: il
+   nucleo sta dentro due anelli che NON si spostano, e un centro che scorre su
+   e giu' dentro un'orbita ferma si legge come un centro fuori asse, non come
+   qualcosa che respira. Da fermo il sistema deve stare sul suo centro.
+
+   Vale anche per la pupilla dell'obiettivo, che ha lo stesso problema dentro
+   la sua ghiera. Il galleggiamento di tutta la lente resta — quello e'
+   mo-float, e muove l'oggetto intero, non il suo nucleo rispetto al guscio. */
 @keyframes mo-orb {
-  0%, 100% { transform: translateY(-5px) scale(1); }
-  50% { transform: translateY(5px) scale(1.04); }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
 }
 
 /* ④ Il bokeh. La lente non ha keyframe sue: galleggia con mo-float e la
@@ -2735,10 +2762,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 @keyframes mo-piano {
   0% { transform: rotateX(74deg) translateY(0); }
   100% { transform: rotateX(74deg) translateY(40px); }
-}
-@keyframes mo-tick {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 1; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2821,7 +2844,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   .mo-bokeh,
   .mo-cubo,
   .mo-piano,
-  .mo-scala i,
   .sb-mocard-sweep,
   .sb-mocard-edge { animation-name: none; }
 
