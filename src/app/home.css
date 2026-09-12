@@ -2873,6 +2873,139 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   LE SCENE AL BUIO
+
+   Fino a qui le scene non avevano NESSUNA regola scura — zero `html.dark` in
+   tutto il reparto — e non era una scelta: era un buco. Il fondo nasce da un
+   color-mix fra la tinta e il BIANCO, e il bianco non sa niente del tema.
+   Risultato: su una home che al buio è asfalto notturno (--sb-bg #0d0f0c, un
+   nero verdastro-freddo) restavano cinque rettangoli quasi luminosi, gli unici
+   della pagina. Il resto del sito il tema lo segue da sempre — fondale,
+   griglia, nuvole, sole e blob hanno tutti il loro blocco scuro.
+
+   ── La regola: si affonda la TINTA, non si spegne la scena ───────────────
+   La scorciatoia sarebbe stata abbassare l'opacità di tutto, o buttarci sopra
+   un velo nero: due modi per ottenere cinque schede grigie e spente, cioè per
+   perdere le tinte che sono il motivo per cui le schede sono cinque e non una.
+
+   Invece è la stessa scala di prima — stesso verso, stesse fermate — col
+   bianco sostituito dal nero della palette scura. La tinta resta al suo posto
+   nella mescola: la scheda dei siti è blu notte, quella del geometra verde
+   scuro, e si riconoscono ancora a colpo d'occhio. Cambia il fondo su cui la
+   tinta è stesa, non quanta tinta c'è.
+
+   ── E i bianchi restano bianchi ────────────────────────────────────
+   Il vetro degli oggetti — bordi, riflessi, facce del cubo, bolle — non si
+   tocca: è LUCE, e la luce al buio non si spegne, si vede meglio. Su un fondo
+   affondato quei bianchi guadagnano lo stacco che sul chiaro dovevano rubare.
+   È la stessa ragione per cui erano bianchi e non tinta schiarita.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* IL FONDO. Stessa scala, il bianco diventa il nero della palette. */
+html.dark .mo-fondo {
+  background:
+    radial-gradient(
+      88% 50% at 50% 86%,
+      color-mix(in srgb, currentColor 22%, #12160f) 0%,
+      transparent 72%
+    ),
+    linear-gradient(
+      178deg,
+      color-mix(in srgb, currentColor 30%, #161a13) 0%,
+      color-mix(in srgb, currentColor 42%, #12160f) 22%,
+      color-mix(in srgb, currentColor 34%, #0d100b) 58%,
+      color-mix(in srgb, currentColor 22%, #090c08) 100%
+    );
+}
+
+/* L'AURORA regge di più: al buio è lei a fare la luce dentro la scena, ed è
+   quello che tiene la scheda viva invece che nera. */
+html.dark .mo-aurora { opacity: 0.5; }
+
+/* IL VELO era luce calda dal basso su un fondo chiaro. Al buio quel bianco
+   sarebbe una foschia sopra l'asfalto: scende a un accenno. */
+html.dark .mo-velo {
+  background: radial-gradient(
+    120% 80% at 50% 112%,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 58%
+  );
+}
+
+/* LA RIFINITURA. Il filo chiaro sul bordo si attenua: al buio un filo bianco
+   pieno sul perimetro è una cornice, non un riflesso. */
+html.dark .mo-rim {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* LA SCRITTA si ribalta. Sul chiaro è un gloss SCURO — la metà affondata
+   della tinta — e qui sparirebbe dentro il fondo. Stessa costruzione,
+   gradiente ritagliato col filo di luce in cima e l'ombra portata sotto, ma
+   nella metà CHIARA della tinta; e l'alone che la staccava, bianco sul
+   chiaro, qui è nero. */
+html.dark .sb-mocard-plate h3 {
+  background-image: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    color-mix(in srgb, currentColor 26%, #ffffff) 38%,
+    color-mix(in srgb, currentColor 58%, #e8f0ea) 74%,
+    color-mix(in srgb, currentColor 72%, #b9c9be) 100%
+  );
+  filter:
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 3px rgba(0, 0, 0, 0.65))
+    drop-shadow(0 3px 10px rgba(0, 0, 0, 0.7));
+}
+
+/* L'AMBRA E IL VERDE VANNO ABBASSATI, le altre tre no.
+
+   Con la stessa mescola per tutte e cinque, al buio le schede 03 e 05 si
+   vedevano molto più accese delle altre: non è un errore della formula, è che
+   una tinta non pesa quanto la sua percentuale. A parità di mescola il giallo
+   e il verde portano molta più luce del blu e del viola — stanno in cima alla
+   curva di luminosità, gli altri in fondo. Sul chiaro non si notava perché il
+   bianco sotto livellava tutto; sul nero la differenza viene fuori intera.
+
+   Quindi le due tinte chiare prendono meno spazio nella mescola. Non è un
+   ritocco a occhio su un caso particolare: è la correzione che serve perché
+   le cinque schede pesino UGUALE, che era lo scopo della formula.
+
+   Il selettore è sulla tinta e non sulla posizione: se un giorno la griglia
+   cambia ordine, la correzione resta attaccata al colore giusto. */
+html.dark [data-acc="ambra"] .mo-fondo,
+html.dark [data-acc="verde"] .mo-fondo {
+  background:
+    radial-gradient(
+      88% 50% at 50% 86%,
+      color-mix(in srgb, currentColor 14%, #12160f) 0%,
+      transparent 72%
+    ),
+    linear-gradient(
+      178deg,
+      color-mix(in srgb, currentColor 20%, #161a13) 0%,
+      color-mix(in srgb, currentColor 28%, #12160f) 22%,
+      color-mix(in srgb, currentColor 22%, #0d100b) 58%,
+      color-mix(in srgb, currentColor 15%, #090c08) 100%
+    );
+}
+
+/* Il riflesso sotto la finestra del browser: sul chiaro e' un appoggio, al
+   buio diventa una banda chiara che galleggia sotto l'oggetto senza motivo -
+   sul fondo affondato non c'e' niente che possa riflettere cosi'. */
+html.dark .mo-browser-refl { opacity: 0.1; }
+
+/* IL RETICOLO del geometra: bianco al 50% su un fondo affondato è troppo, e
+   il piano si mangia la scheda. Torna a essere un accenno. */
+html.dark .mo-piano {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.28) 1px, transparent 1px);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
    SEMPRE VIVE
 
    Prima il gesto partiva solo al passaggio del puntatore, o una volta sola
