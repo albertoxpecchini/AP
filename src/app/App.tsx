@@ -62,6 +62,10 @@ import WhenVisible from "./site/WhenVisible";
    la disciplina del video (parte a vista, si ferma uscendo, resta fermo con
    movimento ridotto) è passata dentro al componente nuovo. */
 import VideoWindowMosaic from "./site/VideoWindowMosaic";
+/* Le due miniature disegnate dei siti — Rivalta e Cascina Fontana. Prendono il
+   posto del filmato e dello screenshot dentro la finestra qui sopra: vedi la
+   nota in testa a site/sitePreviewScene.tsx. */
+import { MINIATURE } from "./site/sitePreviewScene";
 /* Il muro del curriculum, con il suo «Mostra tutto». In un file suo per la
    stessa ragione dello scaffale: lo stato qui rifaceva tutta la home. */
 import CvWall from "./site/CvWall";
@@ -1042,9 +1046,14 @@ export default function App() {
                 // L'indirizzo com'è scritto sulla barra: senza schema per i
                 // siti veri, com'è per le pagine di casa.
                 const host = external ? p.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : p.url;
+                const Miniatura = MINIATURE[s.id];
                 const inner = (
                   <>
                     <VideoWindowMosaic
+                      // I due siti veri hanno una miniatura disegnata, che
+                      // racconta che cosa c'è dentro invece di far vedere la
+                      // home che scorre. Dove c'è, il video non si monta.
+                      scene={Miniatura ? <Miniatura /> : undefined}
                       src={p.previewVideo}
                       poster={p.previewPoster}
                       img={p.previewImg}

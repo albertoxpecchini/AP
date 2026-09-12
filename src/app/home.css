@@ -1834,16 +1834,36 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    tinta è cinque: un nero verde sotto l'ambra dà oliva, sotto il rosa dà
    fango. Nero puro allungato con un filo della tinta stessa scurisce ogni
    accento restando quell'accento — l'ambra resta ambra fino in fondo. */
+/* La scala è ROVESCIATA rispetto al giro prima, ed è la mossa della tavola
+   nuova: lì il chiaro sta in ALTO e la tinta affonda scendendo, invece di
+   partire cupa e schiarire in fondo.
+
+   Il motivo non è di gusto: la targa sta in basso a sinistra ed è un velo quasi
+   nero. Col vecchio verso le finiva sotto il punto più chiaro della scheda —
+   nero su quasi-bianco, il contrasto più duro della pagina, proprio nell'angolo
+   dove c'è il testo. Adesso la targa siede sul fondo pieno e il salto si
+   chiude.
+
+   Le fermate sono quelle della tavola (0 / 22 / 58 / 100), i colori no: là
+   erano cinque oklch scritti a mano per scheda, qui nascono da color-mix fra
+   currentColor e il bianco o il nero, così le cinque schede hanno la stessa
+   profondità in cinque tinte diverse. Vedi la nota ① in testa a mosaicScene. */
 .mo-fondo {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    168deg,
-    color-mix(in srgb, currentColor 30%, #070709) 0%,
-    color-mix(in srgb, currentColor 58%, #0a0a0d) 34%,
-    color-mix(in srgb, currentColor 92%, #101014) 64%,
-    color-mix(in srgb, currentColor 64%, #ffffff) 100%
-  );
+  background:
+    radial-gradient(
+      88% 50% at 50% 86%,
+      color-mix(in srgb, currentColor 12%, #ffffff) 0%,
+      transparent 72%
+    ),
+    linear-gradient(
+      178deg,
+      color-mix(in srgb, currentColor 22%, #ffffff) 0%,
+      color-mix(in srgb, currentColor 62%, #ffffff) 22%,
+      color-mix(in srgb, currentColor 96%, #0a0a0d) 58%,
+      color-mix(in srgb, currentColor 58%, #101014) 100%
+    );
 }
 
 /* ② L'AURORA. L'unico blur della scena, e ci sta: è UN elemento per scheda che
@@ -1984,47 +2004,75 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 
 /* ── ① ARCHIVIO — la pila che sfoglia ─────────────────────────────────────── */
-/* La pila sta in un riquadro suo, centrato sul palco. Le carte dentro sono in
-   absolute e centrate sul riquadro: mo-flip le porta da destra-basso a
-   sinistra-alto, quindi il riquadro deve stare al centro e non a sinistra, o
-   metà del viaggio finisce fuori dalla scheda. */
+/* La pila sta in un riquadro suo, centrato sul palco. Prima il riquadro doveva
+   per forza stare al centro perché mo-flip portava le carte da destra-basso a
+   sinistra-alto e metà del viaggio sarebbe finita fuori dalla scheda; adesso il
+   ventaglio è fermo e largo poco più di una carta, quindi il centro è una
+   scelta di disegno e non un vincolo. */
+/* La pila è quadrata e galleggia tutta insieme: il movimento è UNO per scena,
+   non uno per carta. Le tre carte dentro sono in absolute e centrate sul
+   riquadro; le due di dietro sono ruotate in versi opposti e traslate di poco,
+   ed è tutto il ventaglio. */
 .mo-pila {
   position: relative;
-  width: 54%;
-  max-width: 190px;
-  aspect-ratio: 4 / 3;
-  transform-style: preserve-3d;
+  width: 62%;
+  max-width: 196px;
+  aspect-ratio: 1 / 1;
+  animation: mo-float var(--mo-loop, 13s) ease-in-out infinite;
 }
 .mo-carta {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  margin: -37.5% 0 0 -50%;
+  width: 52%;
+  aspect-ratio: 3 / 4;
+  margin: 0;
   border-radius: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  background: linear-gradient(
-    155deg,
-    rgba(255, 255, 255, 0.5),
-    color-mix(in srgb, currentColor 22%, rgba(255, 255, 255, 0.2)) 46%,
-    rgba(255, 255, 255, 0.06)
-  );
-  box-shadow:
-    0 22px 44px -16px rgba(0, 20, 12, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
-  padding: 11px;
   box-sizing: border-box;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.3),
+    color-mix(in srgb, currentColor 18%, rgba(255, 255, 255, 0.1)) 54%,
+    rgba(255, 255, 255, 0.08)
+  );
+}
+/* Le due di dietro: stessa carta, girata e spostata. Niente contenuto — a
+   quell'inclinazione le righe si leggerebbero come sporco. */
+.mo-carta--retro1 { transform: translate(-50%, -50%) rotate(-10deg) translateX(-20%); }
+.mo-carta--retro2 {
+  transform: translate(-50%, -50%) rotate(7deg) translateX(16%);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.38),
+    color-mix(in srgb, currentColor 20%, rgba(255, 255, 255, 0.14)) 54%,
+    rgba(255, 255, 255, 0.12)
+  );
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+/* Quella davanti: dritta, più chiara, e l'unica che porta il testo finto. */
+.mo-carta--fronte {
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   gap: 7px;
-  animation: mo-flip var(--mo-loop, 13s) cubic-bezier(0.55, 0, 0.45, 1) infinite;
+  padding: 14px 12px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.52),
+    color-mix(in srgb, currentColor 24%, rgba(255, 255, 255, 0.22)) 50%,
+    rgba(255, 255, 255, 0.14)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 16px 26px -16px rgba(0, 20, 12, 0.75);
 }
 .mo-carta i {
   display: block;
   height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.9);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.92);
 }
 
 /* ── ② SITI WEB — la finestra che scrive ──────────────────────────────────── */
@@ -2146,27 +2194,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 .mo-cols i:nth-child(2) { background: rgba(255, 255, 255, 0.2); }
 .mo-cols i:nth-child(3) { background: rgba(255, 255, 255, 0.14); }
-.mo-row { display: flex; align-items: center; gap: 9px; }
-.mo-btn {
-  height: 18px;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.6));
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, currentColor 78%, #000);
-}
-.mo-rule {
-  flex: 1;
-  height: 3px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.4);
-}
 /* Il riflesso sotto la finestra: la stacca dal fondo e le dà un appoggio.
 
    È in POSITION: ABSOLUTE, e non è un dettaglio. Nel flusso, i suoi 38px si
@@ -2217,13 +2244,23 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   filter: blur(20px);
   animation: mo-pulse var(--mo-loop, 14s) ease-in-out infinite;
 }
+/* Il piano su cui gira l'anello. L'inclinazione sta QUI e non nella keyframe:
+   prima mo-orbit portava sia il rotateX(72deg) sia il giro, quindi i due anelli
+   erano per forza sullo stesso piano e il sistema si leggeva piatto. Separati,
+   ogni anello ha il suo assetto (il secondo è anche ruotato su Z) e il tondo
+   diventa una sfera. È anche quello che rende gratis prefers-reduced-motion:
+   ferma la keyframe, l'inclinazione resta. */
+.mo-piano-orbita {
+  position: absolute;
+  pointer-events: none;
+}
 .mo-anello {
   position: absolute;
+  inset: 0;
   border-radius: 50%;
   border: 1.5px solid rgba(255, 255, 255, 0.6);
   border-top-color: rgba(255, 255, 255, 0.95);
   box-shadow: 0 0 18px color-mix(in srgb, currentColor 45%, transparent);
-  transform-style: preserve-3d;
   animation: mo-orbit linear infinite;
 }
 /* Il punto di luce sul bordo: senza, un cerchio che ruota su sé stesso non si
@@ -2272,79 +2309,65 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   filter: blur(1px);
 }
 
-/* ── ④ FOTOGRAFIA — l'iride ───────────────────────────────────────────────── */
+/* ── ④ FOTOGRAFIA — l'obiettivo ───────────────────────────────────────────── */
 /* Stessa regola dell'orbita: tondo, quindi si misura sull'altezza e ha un
-   tetto. */
-.mo-iride {
+   tetto. Galleggia come la finestra del browser — è l'unico movimento della
+   scena insieme al respiro della pupilla e al bokeh. */
+.mo-lente {
   position: relative;
   height: 100%;
   max-height: 150px;
   aspect-ratio: 1;
   border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.62);
-  background: radial-gradient(
-    circle at 36% 30%,
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    160deg,
     rgba(255, 255, 255, 0.5),
-    color-mix(in srgb, currentColor 75%, #000) 72%
+    color-mix(in srgb, currentColor 20%, rgba(255, 255, 255, 0.18)) 58%,
+    rgba(255, 255, 255, 0.1)
   );
   box-shadow:
-    0 26px 56px -18px rgba(0, 20, 12, 0.8),
-    inset 0 2px 0 rgba(255, 255, 255, 0.7),
-    0 0 44px color-mix(in srgb, currentColor 40%, transparent);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 18px 30px -16px rgba(0, 20, 12, 0.8);
+  animation: mo-float var(--mo-loop, 12s) ease-in-out infinite;
 }
-/* Le lamelle: sei spicchi che si ritirano verso il bordo.
-
-   Sulle tavole erano quasi bianche (0.72 in testa) e stavano bene perché il
-   fondo era verde scuro e le lamelle ci si stampavano sopra. Qui il fondo è la
-   tinta a piena forza e sei spicchi chiari sovrapposti, quando l'iride è
-   aperta, si sommano in una macchia bianca che si mangia l'obiettivo: il rosa
-   diventava un disco latte.
-
-   Quindi la lamella è TINTA con un filo di luce sul taglio, non luce con un
-   filo di tinta. Il bianco resta dov'era utile — lo spigolo illuminato — e il
-   corpo dello spicchio scurisce la tinta invece di schiarirla. */
-.mo-lamella {
+/* La ghiera: un filo dentro al bordo, che dà lo spessore del barilotto. */
+.mo-ghiera {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 50%;
-  transform-origin: 50% 100%;
-  clip-path: polygon(20% 0, 80% 0, 50% 100%);
-  background: linear-gradient(
-    96deg,
-    rgba(255, 255, 255, 0.6) 0%,
-    rgba(255, 255, 255, 0.28) 10%,
-    color-mix(in srgb, currentColor 70%, #000) 46%,
-    color-mix(in srgb, currentColor 82%, #000) 100%
-  );
-  opacity: 0.9;
-  animation: mo-iride var(--mo-loop, 12s) cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  inset: 10%;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
+/* La pupilla è l'unica cosa SCURA delle cinque scene, ed è quello che la fa
+   leggere come vetro invece che come un disco: sotto la luce c'è il buio
+   dell'obiettivo. Respira sul giro corto. */
 .mo-pupilla {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 11%;
+  width: 46%;
   aspect-ratio: 1;
-  margin: -5.5% 0 0 -5.5%;
   border-radius: 50%;
   background: radial-gradient(
-    circle at 34% 30%,
-    #ffffff,
-    color-mix(in srgb, currentColor 60%, #ffffff) 55%,
-    color-mix(in srgb, currentColor 80%, #000)
+    circle at 36% 30%,
+    rgba(255, 255, 255, 0.92),
+    color-mix(in srgb, currentColor 62%, #ffffff) 46%,
+    color-mix(in srgb, currentColor 88%, #000) 100%
   );
-  box-shadow: 0 0 26px rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  animation: mo-orb var(--mo-loop, 12s) ease-in-out infinite;
 }
-/* Lo scatto: un fotogramma bianco all'88% del giro. */
-.mo-flash {
+/* Il riflesso obliquo sulla calotta: due terzi dell'effetto «è curva». */
+.mo-riflesso {
   position: absolute;
-  inset: 0;
-  background: #ffffff;
-  opacity: 0;
-  animation: mo-flash var(--mo-loop, 12s) steps(1) infinite;
+  left: 18%;
+  top: 17%;
+  width: 32%;
+  height: 15%;
+  border-radius: 50%;
+  transform: rotate(-24deg);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.08));
+  filter: blur(1px);
 }
 .mo-bokeh {
   position: absolute;
@@ -2664,14 +2687,8 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   100% { transform: translateX(240%) skewX(-20deg); }
 }
 
-/* ① La pila che sfoglia. */
-@keyframes mo-flip {
-  0% { transform: translate3d(30%, 10%, -360px) rotateY(-40deg); opacity: 0; }
-  12% { opacity: 0.95; }
-  52% { transform: translate3d(0, 0, 0) rotateY(-14deg); opacity: 1; }
-  86% { transform: translate3d(-30%, -10%, 220px) rotateY(-2deg); opacity: 0; }
-  100% { transform: translate3d(-30%, -10%, 220px) rotateY(-2deg); opacity: 0; }
-}
+/* ① La pila non ha più una keyframe sua: galleggia con mo-float, come la
+      finestra e la lente. */
 
 /* ② La finestra che scrive. */
 @keyframes mo-float {
@@ -2689,9 +2706,10 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 }
 
 /* ③ Gli anelli in orbita. */
+/* Solo il giro: l'inclinazione la dà .mo-piano-orbita, vedi la nota lì. */
 @keyframes mo-orbit {
-  0% { transform: rotateX(72deg) rotateZ(0deg); }
-  100% { transform: rotateX(72deg) rotateZ(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 @keyframes mo-pulse {
   0%, 100% { transform: scale(0.9); opacity: 0.18; }
@@ -2702,21 +2720,11 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   50% { transform: translateY(5px) scale(1.04); }
 }
 
-/* ④ L'iride e lo scatto. */
-@keyframes mo-iride {
-  0% { transform: rotate(var(--r)) translateY(0); }
-  22% { transform: rotate(calc(var(--r) + 15deg)) translateY(-46%); }
-  60% { transform: rotate(calc(var(--r) + 15deg)) translateY(-46%); }
-  84%, 100% { transform: rotate(var(--r)) translateY(0); }
-}
+/* ④ Il bokeh. La lente non ha keyframe sue: galleggia con mo-float e la
+      pupilla respira con mo-orb, che sono già scritte qui sopra. */
 @keyframes mo-bokeh {
   0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.28; }
   50% { transform: translate(6px, -10px) scale(1.18); opacity: 0.6; }
-}
-@keyframes mo-flash {
-  0%, 84% { opacity: 0; }
-  88% { opacity: 0.8; }
-  95%, 100% { opacity: 0; }
 }
 
 /* ⑤ Il cubo, il piano e le tacche. */
@@ -2769,8 +2777,9 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .sb-products .sb-card:nth-child(5) .mo-gloss { animation-delay: -9.6s; }
 
 /* E le due schede con lo stesso giro (siti e foto, 12 s) partono comunque
-   scollate: senza questo, la finestra che scrive e l'iride che apre battono
-   sullo stesso fotogramma per tutta la vita della pagina. */
+   scollate: senza questo, la finestra che scrive e la lente che galleggia
+   battono sullo stesso fotogramma per tutta la vita della pagina — e adesso che
+   galleggiano tutte e due su mo-float si vedrebbe ancora di più. */
 .sb-products .sb-card:nth-child(4) .mo-scena { animation-delay: -3s; }
 
 .sb-products .sb-card:nth-child(2) .sb-mocard-sweep { animation-delay: -1.4s; }
@@ -2790,23 +2799,26 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
 /* Meno movimento: si spengono i NOMI, e siccome ogni keyframe comincia e
    finisce sullo stesso fotogramma quello che resta è la scena intera e ferma —
-   il cubo posato, l'iride aperta, la finestra al suo posto. Le due cose che
-   sparirebbero a metà (la carta della pila, che a giro fermo è trasparente, e
-   il lampo dello scatto) si fissano a mano sul loro fotogramma buono. */
+   il cubo posato, la lente al suo posto, la finestra al suo posto.
+
+   Le due scene che qui si rompevano non si rompono più, ed è successo da sé
+   rifacendole: la pila non ha più carte che volano (sono tre, ferme, disposte
+   in CSS) e l'iride non esiste più — la lente da ferma è già una lente. Restava
+   anche il lampo dello scatto da spegnere a mano: è uscito con l'iride. */
 @media (prefers-reduced-motion: reduce) {
   .mo-aurora,
   .mo-bolla,
   .mo-gloss,
-  .mo-carta,
+  .mo-pila,
   .mo-browser,
   .mo-type,
   .mo-caret,
   .mo-anello,
   .mo-orbita-alone,
   .mo-nucleo,
-  .mo-lamella,
+  .mo-lente,
+  .mo-pupilla,
   .mo-bokeh,
-  .mo-flash,
   .mo-cubo,
   .mo-piano,
   .mo-scala i,
@@ -2815,28 +2827,17 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
   .sb-mocard-sweep { opacity: 0; }
   .mo-gloss { opacity: 0; }
-  .mo-flash { opacity: 0; }
-  /* La pila a giro fermo: una carta sola, dritta e visibile. Le altre tre
-     starebbero una sopra l'altra nello stesso punto. */
-  .mo-carta { opacity: 0; transform: none; }
-  .mo-carta:nth-child(2) { opacity: 1; }
   /* L'indirizzo scritto per intero invece che a metà digitazione. */
   .mo-type { width: 100%; }
 
-  /* Due scene NON hanno un buon fotogramma di riposo, e vanno messe a posto a
-     mano — verificate in Edge con prefers-reduced-motion, non dedotte.
+  /* Resta UNA scena da mettere a posto a mano, ed è il cubo — verificata in
+     Edge con prefers-reduced-motion, non dedotta. mo-spin porta sia
+     l'inclinazione (rotateX -22°) sia il giro: fermo, il cubo perde anche
+     l'inclinazione e si presenta di faccia, cioè come un quadrato. Gli lascio
+     una posa di tre quarti, che è quella in cui un cubo si legge come un cubo.
 
-     ① L'IRIDE. Le sei lamelle condividono una keyframe sola e si distinguono
-        per --r, che è la loro rotazione: è la keyframe a distribuirle sul
-        giro. Ferme, la rotazione non viene applicata e le sei lamelle si
-        sovrappongono tutte in cima — un solo spicchio invece di un diaframma.
-        Qui gliela riapplico io, ferma e aperta. */
-  .mo-lamella { transform: rotate(var(--r)) translateY(-46%); }
-
-  /* ② IL CUBO. mo-spin porta sia l'inclinazione (rotateX -22°) sia il giro:
-        fermo, il cubo perde anche l'inclinazione e si presenta di faccia, cioè
-        come un quadrato. Gli lascio una posa di tre quarti, che è quella in cui
-        un cubo si legge come un cubo. */
+     L'orbita aveva lo stesso difetto e adesso non ce l'ha più: l'inclinazione
+     è uscita dalla keyframe ed è finita su .mo-piano-orbita. */
   .mo-cubo { transform: rotateX(-22deg) rotateY(-38deg); }
 
   .mo-scena { transition: none; }

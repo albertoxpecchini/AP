@@ -45,3 +45,6 @@ foto/**
 # Copie di sicurezza del libro dei donatori (scripts/sostieni-libro.mjs --reset).
 # Dentro ci sono nomi e messaggi di persone: restano sul disco, non nel repo.
 .backup-donatori-*.json
+
+# Il log e il pid del dev server sorvegliato (scripts/dev-stabile.mjs)
+.dev/

@@ -2,13 +2,19 @@
 // Le scene della griglia prodotti — il mosaico, sesto giro.
 //
 // ── Da dove vengono ──────────────────────────────────────────────────────────
-// Le cinque scene arrivano da altrettante tavole preparate a parte («Cover 1
-// Archivio» … «Cover 5 Geometra»): schede 4:5 su fondo verde, con un oggetto di
-// vetro al centro, un'aurora sfocata dietro, le bolle che salgono e una targa in
-// basso. Il disegno degli oggetti è loro — la pila che sfoglia, il browser che
-// scrive, gli anelli in orbita, l'iride che respira, il cubo che gira. Quello
-// che segue non è un copia-incolla: è lo stesso disegno rimesso in casa, e le
-// tre cose che sono cambiate sono cambiate perché DOVEVANO.
+// Le cinque scene arrivano da una tavola preparata a parte («Mosaico, giro 7»):
+// schede 4:5 su cinque fondi diversi, con un oggetto di vetro al centro,
+// un'aurora sfocata dietro, le bolle che salgono e una targa in basso. Il
+// disegno degli oggetti è suo — la pila a ventaglio, il browser che scrive, gli
+// anelli in orbita, l'obiettivo, il cubo che gira. Quello che segue non è un
+// copia-incolla: è lo stesso disegno rimesso in casa, e le tre cose che sono
+// cambiate sono cambiate perché DOVEVANO.
+//
+// Rispetto al giro prima, due oggetti sono NUOVI e tre si sono semplificati:
+// l'archivio non sfoglia più, è una pila ferma a ventaglio; la fotografia non
+// è più un diaframma a sei lamelle, è un obiettivo. Le ragioni stanno in testa
+// alle rispettive funzioni, e in tutti e due i casi la scena nuova costa meno
+// di quella vecchia.
 //
 //   ① LA TINTA NON È PIÙ VERDE. Le tavole erano verdi tutte e cinque: fondo
 //      #085239, accento #7dffc4, un gradiente cucito a mano per scheda. Ma la
@@ -39,11 +45,12 @@
 //
 // ── Il costo, che qui è il vincolo vero ──────────────────────────────────────
 // Le tavole erano UNA per pagina e potevano permettersi tutto. Qui sono CINQUE,
-// tutte accese insieme, su una home che deve restare fluida mentre scorre. Le
-// tavole usavano backdrop-filter su ogni carta di vetro e blur(46px) sull'aurora
-// di ognuna: cinque volte quella roba è un buffer sfocato per scheda ridipinto a
-// ogni fotogramma, ed è esattamente la spesa che home.css si era tolta dai
-// riflessi («niente filter da nessuna parte», nota ai riflessi).
+// tutte accese insieme, su una home che deve restare fluida mentre scorre. La
+// tavola usava backdrop-filter su ogni superficie di vetro — la finestra, le
+// carte, la lente, la targa — e blur(36px) sull'aurora di ognuna: cinque volte
+// quella roba è un buffer sfocato per scheda ridipinto a ogni fotogramma, ed è
+// esattamente la spesa che home.css si era tolta dai riflessi («niente filter
+// da nessuna parte», nota ai riflessi). I backdrop-filter non sono arrivati.
 //
 // Quindi:
 //   · l'aurora tiene il suo blur — è UN elemento per scheda, fermo salvo una
@@ -132,28 +139,30 @@ function Bolle({ topic }: { topic: MosaicTopic }) {
   );
 }
 
-/* ── ① ARCHIVIO — la pila che sfoglia ────────────────────────────────────────
-   Quattro carte in prospettiva che entrano da destra, si mettono dritte e se ne
-   vanno verso chi guarda (mo-flip). Sfasate di un quarto di giro l'una
-   dall'altra, così ce n'è sempre una al centro e la pila non si svuota mai.
+/* ── ① ARCHIVIO — la pila a ventaglio ────────────────────────────────────────
+   Tre carte sovrapposte e sventagliate: due dietro, ruotate in versi opposti, e
+   quella davanti dritta col suo testo finto.
 
-   Le righe dentro le carte sono quattro barre di larghezza scalata: da lontano
-   leggono come testo, ed è tutto quello che devono fare. */
-function ScenaArchivio({ loop }: { loop: number }) {
+   Prima erano QUATTRO e VOLAVANO: entravano da destra col mo-flip, si mettevano
+   dritte e uscivano verso chi guarda, sfasate di un quarto di giro. Si leggeva
+   come una presentazione che scorre, non come un archivio — e per tenere sempre
+   una carta al centro ne serviva una in più che sfarfallava ai bordi.
+
+   Ferma, la pila dice la stessa cosa in meno pezzi: tre carte, nessuna keyframe,
+   e il solo movimento è il galleggiamento lento di tutto il gruppo. Le righe
+   dentro la carta di sopra restano quattro barre di larghezza scalata: da
+   lontano leggono come testo, ed è tutto quello che devono fare. */
+function ScenaArchivio() {
   return (
     <div className="mo-pila">
-      {[0, 1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="mo-carta"
-          style={{ animationDelay: `${-(i * loop) / 4}s` } as React.CSSProperties}
-        >
-          <i style={{ width: "44%" }} />
-          <i style={{ width: "84%", opacity: 0.62 }} />
-          <i style={{ width: "70%", opacity: 0.48 }} />
-          <i style={{ width: "78%", opacity: 0.34 }} />
-        </div>
-      ))}
+      <span className="mo-carta mo-carta--retro1" />
+      <span className="mo-carta mo-carta--retro2" />
+      <span className="mo-carta mo-carta--fronte">
+        <i style={{ width: "46%" }} />
+        <i style={{ width: "86%", opacity: 0.6 }} />
+        <i style={{ width: "72%", opacity: 0.46 }} />
+        <i style={{ width: "80%", opacity: 0.32 }} />
+      </span>
     </div>
   );
 }
@@ -161,8 +170,12 @@ function ScenaArchivio({ loop }: { loop: number }) {
 /* ── ② SITI WEB — la finestra che scrive ─────────────────────────────────────
    Il browser delle tavole: barra coi tre pallini, l'indirizzo che si scrive da
    solo (mo-type, steps) col caret che lampeggia, e sotto un'impaginazione finta
-   — una fascia grande, tre colonne, un bottone. Tutto galleggia piano
-   (mo-float).
+   — una fascia grande e tre colonne. Tutto galleggia piano (mo-float).
+
+   La riga col bottone «Apri» è uscita. Era l'unica parola dentro le cinque
+   scene, a 8px e dentro un oggetto già piccolo: da lontano non si leggeva, e da
+   vicino era una parola in italiano dentro un disegno che non ne ha nessun'altra
+   — la targa della scheda, che di parole ne ha, gli sta sotto a due centimetri.
 
    Il riflesso sotto la finestra è restato: è quello che la stacca dal fondo e
    la fa sembrare appoggiata su qualcosa invece che incollata. */
@@ -187,10 +200,6 @@ function ScenaWeb() {
           <div className="mo-cols">
             <i /><i /><i />
           </div>
-          <div className="mo-row">
-            <span className="mo-btn">Apri</span>
-            <i className="mo-rule" />
-          </div>
         </div>
       </div>
       <div className="mo-browser-refl" />
@@ -199,35 +208,39 @@ function ScenaWeb() {
 }
 
 /* ── ③ IA — gli anelli in orbita ─────────────────────────────────────────────
-   Un nucleo di vetro che respira (mo-orb) dentro tre anelli inclinati a 72°
-   che girano (mo-orbit), quello di mezzo al contrario. Ogni anello porta un
-   punto di luce sul bordo: senza, un cerchio che ruota su sé stesso non si vede
+   Un nucleo di vetro che respira (mo-orb) dentro DUE anelli inclinati che girano
+   (mo-orbit), il secondo al contrario e più stretto. Ogni anello porta un punto
+   di luce sul bordo: senza, un cerchio che ruota su sé stesso non si vede
    girare.
+
+   Erano tre. Il terzo stava al 28% di inset, cioè quasi addosso al nucleo, e a
+   quella misura l'anello e il suo punto di luce si leggevano come un bordo del
+   nucleo che tremola invece che come un'orbita. Due anelli su piani diversi
+   bastano a dire «sistema», e il punto di luce di ognuno si vede.
 
    L'alone dietro pulsa sul giro lungo (mo-pulse) ed è l'unico blur della scena
    dopo l'aurora. */
 function ScenaIA({ loop }: { loop: number }) {
   const anelli = [
-    { inset: 0, dur: loop, dir: "normal" },
-    { inset: 14, dur: +(loop * 0.72).toFixed(1), dir: "reverse" },
-    { inset: 28, dur: +(loop * 0.52).toFixed(1), dir: "normal" },
+    { inset: 2, tilt: "rotateX(70deg)", dur: loop, dir: "normal" },
+    { inset: 18, tilt: "rotateX(62deg) rotateZ(18deg)", dur: +(loop * 0.72).toFixed(1), dir: "reverse" },
   ];
   return (
     <div className="mo-orbita">
       <div className="mo-orbita-alone" />
       {anelli.map((a, i) => (
-        <div
-          key={i}
-          className="mo-anello"
-          style={
-            {
-              inset: `${a.inset}%`,
-              animationDuration: `${a.dur}s`,
-              animationDirection: a.dir,
-            } as React.CSSProperties
-          }
-        >
-          <i />
+        <div key={i} className="mo-piano-orbita" style={{ inset: `${a.inset}%`, transform: a.tilt }}>
+          <div
+            className="mo-anello"
+            style={
+              {
+                animationDuration: `${a.dur}s`,
+                animationDirection: a.dir,
+              } as React.CSSProperties
+            }
+          >
+            <i />
+          </div>
         </div>
       ))}
       <div className="mo-nucleo">
@@ -237,42 +250,38 @@ function ScenaIA({ loop }: { loop: number }) {
   );
 }
 
-/* ── ④ FOTOGRAFIA — l'iride che apre e chiude ────────────────────────────────
-   Sei lamelle a spicchio su un anello, ognuna ruotata di 60° in più della
-   precedente e tutte sulla stessa keyframe (mo-iride): si aprono, restano
-   aperte per metà giro, si richiudono. Sfasate di pochissimo l'una dall'altra —
-   un diaframma vero non scatta tutto insieme, si avvita.
+/* ── ④ FOTOGRAFIA — l'obiettivo ──────────────────────────────────────────────
+   Una lente di vetro: la ghiera, la pupilla scura che respira (mo-orb) e il
+   riflesso obliquo che la fa sembrare curva. Galleggia piano come la finestra
+   del browser.
 
-   Il lampo bianco (mo-flash) arriva all'88% del giro, dura un fotogramma e se
-   ne va: è lo scatto. Il bokeh dietro sono cerchi sfocati che respirano. */
+   Prima era un DIAFRAMMA: sei lamelle a spicchio sulla stessa keyframe, che si
+   aprivano e richiudevano, più un lampo bianco a fine giro. Costava sei
+   elementi animati per scheda ed era il posto dove prefers-reduced-motion si
+   rompeva — ferme, le sei lamelle si sovrapponevano tutte in cima e l'iride
+   diventava uno spicchio solo, quindi in fondo al foglio c'era una regola che
+   gliela riapriva a mano.
+
+   La lente non ha quel problema: da ferma è già una lente. Restano il bokeh
+   dietro, che è quello che dice «fotografia» più del meccanismo, e il respiro
+   della pupilla. */
 function ScenaFoto() {
   return (
-    <div className="mo-iride">
-      {[0, 1, 2, 3, 4, 5].map((i) => (
-        <span
-          key={i}
-          className="mo-lamella"
-          style={
-            {
-              "--r": `${i * 60}deg`,
-              animationDelay: `${-(i * 0.06).toFixed(2)}s`,
-            } as React.CSSProperties
-          }
-        />
-      ))}
+    <div className="mo-lente">
+      <span className="mo-ghiera" />
       <span className="mo-pupilla" />
-      <span className="mo-flash" />
+      <span className="mo-riflesso" />
     </div>
   );
 }
 
-/** Il bokeh della scena fotografica: sta fuori dall'iride perché va sparso su
+/** Il bokeh della scena fotografica: sta fuori dalla lente perché va sparso su
  *  tutta la scheda, non dentro all'obiettivo. */
 function Bokeh() {
   const k = [
-    { l: 12, t: 18, s: 44, dur: 11, d: 0 },
-    { l: 68, t: 12, s: 30, dur: 9, d: -2.4 },
-    { l: 82, t: 44, s: 52, dur: 13, d: -5.1 },
+    { l: 12, t: 20, s: 44, dur: 11, d: 0 },
+    { l: 72, t: 14, s: 30, dur: 9, d: -2.4 },
+    { l: 80, t: 52, s: 52, dur: 13, d: -5.1 },
     { l: 28, t: 58, s: 26, dur: 10, d: -1.2 },
     { l: 52, t: 24, s: 36, dur: 12, d: -6.8 },
   ];
@@ -390,7 +399,7 @@ export const MosaicScene = memo(function MosaicScene({ topic }: { topic: MosaicT
       {topic === "autocad" && <FondoGeometra />}
 
       <div className="mo-palco">
-        {topic === "archive" && <ScenaArchivio loop={loop} />}
+        {topic === "archive" && <ScenaArchivio />}
         {topic === "web" && <ScenaWeb />}
         {topic === "claude" && <ScenaIA loop={loop} />}
         {topic === "photo" && <ScenaFoto />}

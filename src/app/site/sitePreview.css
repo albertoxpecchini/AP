@@ -1,0 +1,693 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE DUE MINIATURE DEI SITI — il vestito
+
+   Il componente sta in site/sitePreviewScene.tsx; qui c'è dove stanno le cose e
+   come si muovono.
+
+   ── Il palco che si scala ───────────────────────────────────────────────────
+   Le tavole sono 1280×720 con le misure in px assolute. Qui la finestra è larga
+   mezza colonna e cambia con la pagina, quindi il palco resta 1280×720 esatti e
+   si rimpicciolisce tutto insieme, con una scala sola.
+
+   È una transform su un elemento solo, quindi non costa niente e non rifà il
+   layout — e soprattutto tiene i RAPPORTI del disegno a qualunque larghezza,
+   che è l'unica cosa che una tavola di quel tipo non sopporta di perdere.
+
+   `transform-origin: 0 0` e non il centro: l'origine al centro avrebbe voluto
+   anche una traslazione per rimettere il palco nell'angolo, e due transform
+   invece di una si sbagliano a ogni ritocco.
+
+   ── Perché il fattore arriva da JavaScript ──────────────────────────────────
+   Il primo tentativo era tutto in CSS: `container-type: inline-size` sul guscio
+   e `transform: scale(calc(100cqw / 1280))` sul palco. Non funziona, e non è
+   una questione di supporto — misurato in Edge: `container-type` si applica e
+   `100cqw` risolve alla larghezza giusta, ma la dichiarazione intera viene
+   scartata (`CSS.supports` dice false).
+
+   La ragione è che `scale()` vuole un NUMERO, e una lunghezza divisa per un
+   numero resta una lunghezza: 100cqw/1280 è «548px diviso 1280», cioè 0,43px,
+   che come fattore di scala non significa niente. Per avere un numero puro
+   servirebbe lunghezza ÷ lunghezza, che i browser non risolvono ancora.
+
+   Le alternative erano ridisegnare le due tavole in `em` — cioè rifarle — o
+   accettare tre righe di JavaScript. Il componente osserva la larghezza del
+   guscio e scrive `--sp-k`, che qui sotto è solo un numero. Il ripiego, se lo
+   script non gira, è 1: il palco si vede a grandezza naturale e tagliato, che è
+   brutto ma non rotto.
+
+   ── Un giro solo, di quattro secondi ────────────────────────────────────────
+   Tutte le animazioni delle due tavole battono su 4s. Non le ho allungate: due
+   miniature affiancate che respirano insieme, a questa scala, si leggono come
+   una cosa sola che respira — ed è giusto così, sono due schede della stessa
+   riga. Quello che le tiene distinte è che gli oggetti dentro sono sfasati fra
+   loro, non che le schede siano sfasate fra loro.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sp {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* 1280×720 è la tavola com'è stata disegnata. --sp-k è il rapporto fra la
+   larghezza che c'è e quella lì, e lo scrive il componente. */
+.sp-palco {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1280px;
+  height: 720px;
+  transform-origin: 0 0;
+  transform: scale(var(--sp-k, 1));
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.sp-corpo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.sp-vignetta {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Il marchio: è un'immagine vera, quindi niente da inventare. Il fondo bianco
+   sotto serve perché il favicon è trasparente e sulle due tavole finisce una su
+   crema e una su vinaccia. */
+.sp-marchio {
+  background: #fff;
+  object-fit: contain;
+  flex: none;
+}
+/* La passata di luce sul titolo, uguale nelle due tavole a meno del colore. */
+.sp-titolo {
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+}
+.sp-passata {
+  position: absolute;
+  top: -20%;
+  left: 0;
+  height: 140%;
+  pointer-events: none;
+  animation: sp-passata 4s ease-in-out infinite;
+}
+
+/* ═══ ① RIVALTA — chiara, di bastone ═══════════════════════════════════════ */
+
+.sp--rivalta .sp-palco {
+  font-family: var(--font-site);
+  color: #3a3330;
+  background:
+    radial-gradient(70% 60% at 4% 0%, #f6e3e8 0%, rgba(246, 227, 232, 0) 62%),
+    radial-gradient(60% 70% at 100% 38%, #fdeadb 0%, rgba(253, 234, 219, 0) 66%),
+    radial-gradient(80% 60% at 50% 108%, #f9ece6 0%, rgba(249, 236, 230, 0) 70%),
+    linear-gradient(180deg, #fdfaf7 0%, #fbf5f1 100%);
+}
+.sp--rivalta .sp-corpo { gap: 26px; padding: 150px 76px 72px; }
+.sp--rivalta .sp-vignetta { box-shadow: inset 0 0 120px 0 rgba(140, 90, 70, 0.07); }
+
+/* La pergola: sei campate a volta, appese in cima e in ondeggio. */
+.sp-pergola {
+  position: absolute;
+  left: -3%;
+  right: -3%;
+  top: 56px;
+  display: flex;
+  align-items: flex-start;
+  transform-origin: 50% 0;
+  animation: sp-ondeggio 4s ease-in-out infinite;
+}
+.sp-campata {
+  flex: 1;
+  height: 54px;
+  border-bottom: 2.5px solid rgba(168, 146, 88, 0.5);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+/* I grappoli e le foglie appesi alla pergola: ondeggiano con lei. */
+.sp-tralci {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 44px;
+  height: 80px;
+  transform-origin: 50% 0;
+  animation: sp-ondeggio 4s ease-in-out infinite;
+}
+.sp-grappolo {
+  position: absolute;
+  top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: 22px;
+  transform: rotate(9deg);
+}
+.sp-grappolo i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(160, 54, 72, 0.32);
+}
+.sp-grappolo i:nth-child(n + 4) { background: rgba(160, 54, 72, 0.26); }
+.sp-grappolo i:nth-child(6) { background: rgba(160, 54, 72, 0.2); }
+.sp-foglia {
+  position: absolute;
+  top: 6px;
+  width: 17px;
+  height: 17px;
+  border-radius: 0 62% 0 62%;
+  background: rgba(168, 146, 88, 0.32);
+  transform: rotate(-14deg);
+}
+.sp-foglia:nth-of-type(even) { transform: rotate(16deg); }
+
+/* I petali: salgono e girano su sé stessi svanendo. */
+.sp-petali { position: absolute; inset: 0; pointer-events: none; }
+.sp-petali i {
+  position: absolute;
+  border-radius: 0 64% 0 64%;
+  background: rgba(160, 54, 72, 0.28);
+  animation: sp-sale 4s linear infinite;
+}
+.sp-petali i:nth-child(even) { background: rgba(168, 146, 88, 0.32); }
+
+.sp--rivalta .sp-insegna {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: sp-galleggia 4s ease-in-out infinite;
+}
+.sp-dove {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #7a635c;
+}
+.sp-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #8c2740;
+  animation: sp-battito 2s ease-in-out infinite;
+}
+
+.sp--rivalta .sp-titolo { padding: 4px 10px; }
+.sp--rivalta .sp-titolo h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 88px;
+  font-weight: 300;
+  line-height: 1.04;
+  letter-spacing: -0.022em;
+  color: #332c29;
+}
+.sp--rivalta .sp-titolo p {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: 88px;
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.022em;
+  color: #8c2740;
+}
+.sp--rivalta .sp-passata {
+  width: 26%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
+}
+
+.sp-numeri {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 6px;
+}
+.sp-numero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 22px;
+  border-radius: 14px;
+  border: 1px solid #eddfd6;
+  background: linear-gradient(180deg, #fefbf8, #f7ece5);
+  animation: sp-solleva 4s ease-in-out infinite;
+}
+.sp-numero .sp-n {
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #332c29;
+}
+.sp-numero .sp-u { font-size: 20px; color: #786561; }
+.sp-numero .sp-che { font-size: 15px; line-height: 1.2; color: #786561; }
+
+.sp-meteo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 18px 9px 14px;
+  border-radius: 999px;
+  border: 1px solid #ecdcd3;
+  background: rgba(255, 255, 255, 0.72);
+}
+.sp-sole {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  box-shadow: inset -5px 2px 0 0 #a68a4f;
+}
+.sp-gradi { display: flex; align-items: baseline; gap: 2px; font-size: 24px; line-height: 1; color: #332c29; }
+/* La finestrella del rullo: alta un'em, taglia tutto il resto. */
+.sp-rullo-slot { display: inline-block; height: 1em; overflow: hidden; }
+.sp-rullo { display: block; animation: sp-rullo 4s ease-in-out infinite; }
+.sp-rullo span { display: block; height: 1em; line-height: 1em; }
+.sp-grado { color: #786561; }
+.sp-riga { width: 1px; height: 18px; background: #e6d5cc; }
+.sp-cielo { font-size: 17px; line-height: 1; color: #6b5852; }
+
+/* ═══ ② CASCINA FONTANA — scura, graziata ══════════════════════════════════ */
+
+.sp--cascina .sp-palco {
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  color: #fdf8f3;
+  background: linear-gradient(178deg, #4d1d31 0%, #3c1526 52%, #260e18 100%);
+}
+.sp--cascina .sp-corpo { gap: 22px; padding: 72px 90px; }
+.sp--cascina .sp-vignetta { box-shadow: inset 0 0 160px 20px rgba(24, 8, 14, 0.45); }
+
+/* I due aloni: quello grande pulsa ed è la luce che viene da dietro, quello
+   d'oro in alto a destra è fermo e serve a non far morire l'angolo. */
+.sp-alone {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: 1100px;
+  height: 620px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(146, 58, 84, 0.55), rgba(110, 40, 62, 0.22) 52%, rgba(38, 14, 24, 0) 74%);
+  filter: blur(40px);
+  animation: sp-respiro 4s ease-in-out infinite;
+}
+.sp-alone-oro {
+  position: absolute;
+  right: -60px;
+  top: -80px;
+  width: 520px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(216, 171, 92, 0.16), rgba(216, 171, 92, 0) 70%);
+  filter: blur(30px);
+}
+
+.sp-tralcio {
+  position: absolute;
+  left: 78px;
+  top: 70px;
+  width: 180px;
+  height: 220px;
+  transform-origin: 70% 0;
+  animation: sp-ondeggio-forte 4s ease-in-out infinite;
+}
+.sp-ramo {
+  position: absolute;
+  left: 96px;
+  top: 0;
+  width: 74px;
+  height: 104px;
+  border-left: 2px solid rgba(216, 171, 92, 0.42);
+  border-bottom: 2px solid rgba(216, 171, 92, 0.42);
+  border-radius: 0 0 0 92%;
+}
+.sp-uva { position: absolute; display: flex; flex-wrap: wrap; gap: 4px; }
+.sp-uva i { border-radius: 50%; background: rgba(178, 63, 96, 0.46); }
+.sp-uva--grande { left: 24px; top: 96px; width: 64px; transform: rotate(6deg); }
+.sp-uva--grande i { width: 17px; height: 17px; }
+.sp-uva--piccola { left: 44px; top: 150px; width: 42px; transform: rotate(-8deg); }
+.sp-uva--piccola i { width: 15px; height: 15px; background: rgba(178, 63, 96, 0.3); }
+
+/* Le spighe: ondeggiano al contrario del tralcio, così il campo non respira
+   tutto dalla stessa parte. */
+.sp-spighe {
+  position: absolute;
+  right: 96px;
+  bottom: 56px;
+  display: flex;
+  align-items: flex-end;
+  gap: 26px;
+  transform-origin: 50% 100%;
+  animation: sp-ondeggio-contro 4s ease-in-out infinite;
+}
+.sp-spiga { position: relative; width: 34px; }
+.sp-spiga--alta { height: 160px; }
+.sp-spiga--bassa { height: 126px; }
+.sp-stelo { position: absolute; left: 16px; width: 2px; }
+.sp-spiga--alta .sp-stelo { top: 34px; height: 126px; background: rgba(253, 248, 243, 0.3); }
+.sp-spiga--bassa .sp-stelo { top: 28px; height: 98px; background: rgba(216, 171, 92, 0.34); }
+.sp-chicchi { position: absolute; left: 0; width: 34px; }
+.sp-chicchi i {
+  position: absolute;
+  width: 9px;
+  height: 20px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sp-chicchi i:first-child { left: 3px; transform: rotate(34deg); }
+.sp-chicchi i:last-child { left: 24px; transform: rotate(-34deg); }
+.sp-spiga--alta { color: rgba(253, 248, 243, 0.8); }
+.sp-spiga--bassa { color: rgba(216, 171, 92, 0.85); }
+.sp-spiga--bassa .sp-chicchi i { width: 9px; height: 18px; }
+
+.sp-pulviscolo { position: absolute; inset: 0; pointer-events: none; }
+.sp-pulviscolo i {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(216, 171, 92, 0.62);
+  animation: sp-sale-dritto 4s linear infinite;
+}
+.sp-pulviscolo i:nth-child(even) { background: rgba(253, 248, 243, 0.55); }
+
+.sp--cascina .sp-insegna {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  animation: sp-galleggia 4s ease-in-out infinite;
+}
+.sp-nome { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.sp-nome-forte { font-size: 25px; font-weight: 700; line-height: 1.1; color: #fdf8f3; }
+.sp-nome-sotto { font-size: 15px; line-height: 1.1; color: rgba(253, 248, 243, 0.72); }
+
+.sp-occhiello { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.sp-occhiello span {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #d8ab5c;
+}
+.sp-filo {
+  width: 120px;
+  height: 2px;
+  border-radius: 2px;
+  background: #d8ab5c;
+  animation: sp-filo 4s ease-in-out infinite;
+}
+
+.sp--cascina .sp-titolo { padding: 6px 14px; }
+.sp--cascina .sp-titolo h1 {
+  margin: 0;
+  font-family: "Lora", Georgia, serif;
+  font-size: 74px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: #fdf8f3;
+}
+.sp--cascina .sp-passata {
+  width: 22%;
+  background: linear-gradient(90deg, rgba(253, 248, 243, 0), rgba(253, 248, 243, 0.16), rgba(253, 248, 243, 0));
+}
+
+/* La tavola dei numeri: l'unica cosa chiara della scheda, quindi è dove va
+   l'occhio — ed è dove stanno i dati. */
+.sp-tavola {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin-top: 8px;
+  padding: 16px 10px;
+  border-radius: 16px;
+  background: #fdf8f3;
+  box-shadow: 0 24px 44px -28px rgba(20, 6, 12, 0.8);
+}
+.sp-voce {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0 30px;
+  animation: sp-solleva 4s ease-in-out infinite;
+}
+.sp-voce + .sp-voce { border-left: 1px solid #ecdcd8; }
+.sp-voce .sp-n { font-size: 38px; font-weight: 800; line-height: 1; color: #8e1f3d; }
+.sp-voce .sp-che { font-size: 14px; line-height: 1.2; color: #6d4c53; }
+
+/* ═══ LE SCRITTE ALLE PICCOLE SCHERMATE ═════════════════════════════════════
+   Il palco si scala tutto insieme, e questa è la sua virtù — i rapporti del
+   disegno restano quelli a qualunque larghezza. Ma è anche il suo guaio: la
+   scala non distingue fra un titolo da 88px e un'etichetta da 14, e li divide
+   per lo stesso numero. MISURATO in Edge, prima di questo blocco:
+
+     viewport   k       titolo         .sp-che (l'etichetta)
+     ────────────────────────────────────────────────────────
+      375px    0,262    23,1px          3,7px
+      414px    0,291    25,6px          4,4px
+     1024px    0,344    30,3px          4,8px   ← il peggio, non il telefono
+     1440px    0,428    37,7px          6,0px
+
+   Il titolo sopravvive sempre. Le etichette no, e a NESSUNA larghezza: perfino
+   a 1440px stanno a 6px, che è sotto la soglia in cui una parola si legge
+   invece di indovinarsi. Il minimo del sito per il testo secondario è 10px —
+   il piede della finestra (.sb-vwm-foot) sta a 10,5.
+
+   E il punto di sofferenza massima è 1024px, non 360: è lì che la griglia dei
+   lavori passa a due colonne mentre la pagina è ancora stretta, quindi ogni
+   finestra prende mezza colonna di 984px. Sul telefono la scheda è a tutta
+   larghezza e respira di più. Una correzione tarata «sul mobile» avrebbe
+   mancato proprio il caso peggiore.
+
+   ── Perché non si scala meno ────────────────────────────────────────────────
+   Alzare --sp-k romperebbe il disegno: il palco è 1280×720 e la finestra è
+   16:9, quindi la scala NON è una scelta di gusto — è il rapporto che fa
+   combaciare le due cose. Cambiarlo taglia la tavola.
+
+   ── Cosa si fa invece: si accorcia la gerarchia ─────────────────────────────
+   A schermo stretto i corpi piccoli si alzano e i titoli si abbassano. La
+   tavola a grandezza naturale ha un rapporto titolo/etichetta di 88:14, cioè
+   6,3 — una gerarchia da manifesto, che a un quarto di scala diventa «una riga
+   grande e due righe di niente». Qui scende attorno a 3, che è la gerarchia di
+   una scheda: il titolo comanda ancora, ma i dati si leggono.
+
+   I dati sono il contenuto di queste miniature — sono la ragione per cui
+   valgono più di uno screenshot (vedi la nota in testa al componente). Se i
+   numeri si leggono e le etichette no, la miniatura ha perso il suo perché.
+
+   Le soglie sono quelle della griglia dei lavori (1024px, dove passa a due
+   colonne) più una a 1280px, che è dove la mezza colonna torna larga. */
+
+/* ── La taratura di base: vale a OGNI larghezza ───────────────────────
+   Non è un ritocco per il telefono, ed è il punto in cui mi ero sbagliato al
+   primo giro: la misura dice che le etichette stanno sotto i 7px anche a 1440,
+   perché lì la finestra è mezza colonna di 548px e k vale 0,43. La tavola è
+   disegnata per essere guardata a 1280 PIENI, e nella sezione dei lavori non
+   lo è mai — nemmeno sul monitor grande. Quindi la gerarchia si accorcia
+   sempre, e gli scatti qui sotto la spingono ancora dove la colonna si
+   stringe di più. */
+/* I titoli scendono: a questa scala 88px non sono una scelta tipografica,
+   sono solo quello che resta dopo la divisione. */
+.sp--rivalta .sp-titolo h1,
+.sp--rivalta .sp-titolo p { font-size: 72px; }
+.sp--cascina .sp-titolo h1 { font-size: 62px; }
+
+/* I numeri tengono il loro peso — sono il soggetto della tavola. */
+.sp-numero .sp-n { font-size: 50px; }
+.sp-voce .sp-n { font-size: 48px; }
+.sp-numero .sp-u { font-size: 30px; }
+
+/* Le etichette salgono, e sono il motivo di tutto il blocco. Da 14–15px
+   (che rendono 4–5) a 26: a k=0,34 fanno 8,8px, a k=0,43 fanno 11,1. */
+.sp-numero .sp-che,
+.sp-voce .sp-che { font-size: 30px; line-height: 1.15; }
+
+/* I sopratitoli in maiuscoletto sono il caso peggiore: lo spazio fra le
+   lettere, a quattro pixel, li fa diventare una fila di puntini. Il corpo
+   sale e la spaziatura si stringe — a questa resa 0,22em è un fiume. */
+.sp-dove { font-size: 30px; letter-spacing: 0.12em; gap: 13px; }
+.sp-occhiello span { font-size: 30px; letter-spacing: 0.11em; }
+
+.sp-cielo { font-size: 30px; }
+.sp-gradi { font-size: 40px; }
+.sp-nome-forte { font-size: 42px; }
+.sp-nome-sotto { font-size: 30px; }
+
+/* I riquadri crescono con quello che contengono, se no il testo più grande
+   ci sbatte dentro. */
+.sp-numero { padding: 22px 24px; gap: 7px; }
+.sp-voce { padding: 0 24px; gap: 6px; }
+.sp-numeri { gap: 14px; }
+
+/* ── Sotto i 1024: una colonna, e si allarga il respiro ─────────────────────
+   Qui la scheda è a tutta larghezza e k risale un poco, ma il palco resta
+   fitto: la tavola è disegnata per essere guardata a 1280, e a un terzo di
+   scala quattro riquadri affiancati diventano quattro strisce. Invece di
+   stringere ancora i corpi si allarga il respiro — meno padding sui fianchi
+   del palco — e si alza il minimo di un altro scatto. */
+@media (max-width: 1023px) {
+  .sp--rivalta .sp-corpo { gap: 22px; padding: 140px 48px 60px; }
+  .sp--cascina .sp-corpo { gap: 20px; padding: 64px 56px; }
+
+  .sp--rivalta .sp-titolo h1,
+  .sp--rivalta .sp-titolo p { font-size: 78px; }
+  .sp--cascina .sp-titolo h1 { font-size: 66px; }
+
+  .sp-numero .sp-che,
+  .sp-voce .sp-che { font-size: 30px; }
+  .sp-numero .sp-u { font-size: 30px; }
+  .sp-dove { font-size: 30px; }
+  .sp-occhiello span { font-size: 30px; }
+  .sp-nome-sotto { font-size: 30px; }
+  .sp-cielo { font-size: 30px; }
+}
+
+/* ── Sotto i 600: la tavola si sfoltisce ────────────────────────────────────
+   Qui non basta più ritoccare i corpi. La striscia del meteo di Rivalta è la
+   prima a cadere: è un contorno — «sereno a Rivalta, ora» — e occupa una riga
+   intera che serve ai quattro numeri, che sono il contenuto. Sparisce lei, non
+   si stringono loro.
+
+   Delle quattro voci restano le prime tre, in tutte e due le tavole: la quarta
+   («127,2 ha di zone umide», «2 operatori fissi») è la meno parlante, e tre
+   riquadri a questa larghezza sono larghi quanto quattro a 1024 — cioè la
+   misura in cui il numero e la sua etichetta stanno sulla stessa riga invece
+   di spezzarsi.
+
+   Si nasconde col CSS e non con una lista diversa nel componente: la tavola
+   resta UNA, con tutti i suoi dati nel markup, e il foglio decide quanti ce ne
+   stanno. Il giorno che la finestra torna larga, tornano da soli. */
+@media (max-width: 599px) {
+  .sp-meteo { display: none; }
+  .sp-numero:nth-child(4),
+  .sp-voce:nth-child(4) { display: none; }
+
+  .sp--rivalta .sp-corpo { gap: 26px; padding: 150px 40px 76px; }
+  .sp--cascina .sp-corpo { gap: 24px; padding: 72px 48px; }
+
+  /* Il titolo cede: a 22px resi ha margine, le etichette non ne hanno. */
+  .sp--rivalta .sp-titolo h1,
+  .sp--rivalta .sp-titolo p { font-size: 78px; }
+  .sp--cascina .sp-titolo h1 { font-size: 66px; }
+
+  /* Qui k scende a 0,26 — il minimo di tutta la pagina. Per portare una
+     etichetta ai 10px del sito serve un corpo di 39, e i numeri le stanno
+     sopra di poco: la gerarchia si schiaccia a 2, che a questa misura è
+     giusta. Una scheda larga 330px non è un manifesto. */
+  .sp-numero .sp-n { font-size: 62px; }
+  .sp-voce .sp-n { font-size: 60px; }
+  .sp-numero .sp-u { font-size: 30px; }
+  .sp-numero .sp-che,
+  .sp-voce .sp-che { font-size: 40px; }
+  .sp-dove { font-size: 39px; letter-spacing: 0.1em; gap: 14px; }
+  .sp-occhiello span { font-size: 39px; letter-spacing: 0.1em; }
+  .sp-nome-forte { font-size: 50px; }
+  .sp-nome-sotto { font-size: 39px; }
+
+  .sp-numero { padding: 26px 24px; gap: 8px; }
+  .sp-voce { padding: 0 26px; gap: 7px; }
+  .sp-numeri { gap: 16px; }
+
+  /* Il marchio e il punto crescono con le scritte: restavano due granelli. */
+  .sp-punto { width: 11px; height: 11px; }
+  .sp-filo { width: 150px; height: 3px; }
+}
+
+/* ═══ Le keyframe ══════════════════════════════════════════════════════════
+   Ricopiate dalle due tavole coi loro tempi, rinominate col prefisso di casa e
+   unificate dove facevano la stessa cosa (rv-sway e cf-sway erano due nomi per
+   un ondeggio, a due ampiezze diverse). Tutte tornano al punto da cui partono:
+   il giro si chiude, e da fermo la miniatura è quella intera. */
+
+@keyframes sp-ondeggio {
+  0%, 100% { transform: rotate(-0.5deg) translateY(0); }
+  50% { transform: rotate(0.5deg) translateY(5px); }
+}
+@keyframes sp-ondeggio-forte {
+  0%, 100% { transform: rotate(-1.2deg) translateY(0); }
+  50% { transform: rotate(1.2deg) translateY(4px); }
+}
+@keyframes sp-ondeggio-contro {
+  0%, 100% { transform: rotate(1.6deg); }
+  50% { transform: rotate(-1.6deg); }
+}
+@keyframes sp-sale {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  18% { opacity: 0.55; }
+  80% { opacity: 0.3; }
+  100% { transform: translateY(-74px) rotate(42deg); opacity: 0; }
+}
+@keyframes sp-sale-dritto {
+  0% { transform: translateY(0) scale(0.9); opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.35; }
+  100% { transform: translateY(-90px) scale(1.1); opacity: 0; }
+}
+/* La passata attraversa il palco, che è largo 1280: il viaggio è in px perché
+   il palco non cambia mai misura — si scala, ma non si ridimensiona. */
+@keyframes sp-passata {
+  0% { transform: translateX(-40%); }
+  100% { transform: translateX(1340px); }
+}
+@keyframes sp-battito {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+@keyframes sp-rullo {
+  0%, 38% { transform: translateY(0); }
+  48%, 88% { transform: translateY(-1em); }
+  100% { transform: translateY(0); }
+}
+@keyframes sp-galleggia {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes sp-solleva {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes sp-respiro {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.75; }
+  50% { transform: translate(-50%, -50%) scale(1.07); opacity: 1; }
+}
+@keyframes sp-filo {
+  0%, 100% { transform: scaleX(0.45); opacity: 0.6; }
+  50% { transform: scaleX(1); opacity: 1; }
+}
+
+/* Meno movimento: si spengono i NOMI, e siccome ogni keyframe comincia e
+   finisce sullo stesso fotogramma quello che resta è la miniatura intera e
+   ferma. L'unica che sparirebbe a metà è il pulviscolo — petali e mote partono
+   e finiscono trasparenti — quindi si fissano a mano sul loro fotogramma
+   visibile. */
+@media (prefers-reduced-motion: reduce) {
+  .sp-pergola,
+  .sp-tralci,
+  .sp-petali i,
+  .sp-punto,
+  .sp-passata,
+  .sp-rullo,
+  .sp-numero,
+  .sp-voce,
+  .sp-alone,
+  .sp-tralcio,
+  .sp-spighe,
+  .sp-pulviscolo i,
+  .sp-filo,
+  .sp--rivalta .sp-insegna,
+  .sp--cascina .sp-insegna { animation-name: none; }
+
+  .sp-passata { opacity: 0; }
+  .sp-petali i,
+  .sp-pulviscolo i { opacity: 0.4; }
+  .sp-filo { transform: scaleX(1); opacity: 1; }
+}

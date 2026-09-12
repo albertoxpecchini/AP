@@ -45,6 +45,14 @@ import { ProjectIcon } from "./projects";
 import "./videoWindow.css";
 
 export interface VideoWindowMosaicProps {
+  /** Una miniatura DISEGNATA, che prende il posto del filmato (vedi
+   *  site/sitePreviewScene.tsx). Viene prima di tutto il resto: dove c'è, il
+   *  video non si monta nemmeno, quindi niente <video> e niente osservatore.
+   *
+   *  È la strada buona per i due siti veri — un filmato mostra com'è fatta la
+   *  home, il disegno mostra che cosa c'è dentro — e costa una frazione: il
+   *  .mp4 di Rivalta pesa 5,5 MB, la sua miniatura è markup. */
+  scene?: React.ReactNode;
   /** Il .mp4 dell'anteprima. Senza, si prova con `img`; senza nemmeno quello,
    *  resta il ripiego col glifo del progetto. */
   src?: string;
@@ -133,6 +141,7 @@ function Campo() {
 }
 
 function VideoWindowMosaicBase({
+  scene,
   src,
   poster,
   img,
@@ -181,7 +190,9 @@ function VideoWindowMosaicBase({
           </div>
 
           <div className="sb-vwm-media">
-            {src ? (
+            {scene ? (
+              scene
+            ) : src ? (
               <Filmato src={src} poster={poster} alt={alt} />
             ) : img ? (
               <Scatto src={img} thumb={thumb} alt={alt} />
