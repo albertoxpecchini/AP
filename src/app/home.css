@@ -1924,8 +1924,13 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
       appoggiato in alto — con dentro l'oggetto centrato. */
 .mo-palco {
   position: absolute;
-  left: 6%;
-  right: 6%;
+  /* Il rientro era 6% per parte, e serviva a due cose che adesso non ci sono
+     più: scansare il numero in alto a destra e la targa nell'angolo basso a
+     sinistra. La scritta è centrata sotto l'oggetto e il numero non c'è più,
+     quindi il palco può prendersi quasi tutta la scheda — resta il margine
+     che le keyframe si mangiano quando gli oggetti sbordano dal riquadro. */
+  left: 4%;
+  right: 4%;
   /* Il palco è centrato in verticale sui due terzi alti invece che appoggiato
      in alto. Appoggiato, la finestra del browser — che è l'oggetto più alto e
      per giunta galleggia — usciva dal bordo superiore su telefono, dove la
@@ -1989,26 +1994,6 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   );
   box-shadow: inset 0 0 9px rgba(255, 255, 255, 0.55);
   animation: mo-rise linear infinite;
-}
-
-/* ⑥ IL NUMERO. In alto a destra, dove sulle tavole c'era accanto al titolo:
-      qui l'angolo basso è della targa. Sottile e trasparente — è un indice, non
-      un'insegna. */
-.mo-num {
-  position: absolute;
-  top: 10px;
-  right: 16px;
-  z-index: 4;
-  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  /* Era bianco al 42%, e sul fondo pieno di prima si leggeva appena. Sul
-     fondo tenue nuovo sparirebbe del tutto: adesso è la TINTA affondata,
-     cioè lo stesso colore della scheda portato al buio. Resta un indice
-     discreto senza diventare invisibile. */
-  color: color-mix(in srgb, currentColor 70%, #0d1b16);
-  opacity: 0.45;
 }
 
 /* ⑦ LA RIFINITURA. Il filo chiaro sul bordo interno e la passata di luce: i
@@ -2700,58 +2685,107 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    La larghezza NON è fissa: si allarga sulla riga più lunga del giro. */
 .sb-mocard-plate {
   position: absolute;
-  bottom: 0;
+  /* CENTRATA, non più nell'angolo. Stava in basso a sinistra perché era un
+     riquadro: un rettangolo di fondo che occupa un angolo è una targa, e una
+     targa sta in un angolo. Senza fondo è solo una scritta, e una scritta
+     sotto un oggetto centrato va sotto il centro dell'oggetto — come la
+     didascalia di una figura, non come un'etichetta appiccicata.
+
+     left/right a 0 con text-align:center la tiene in mezzo qualunque cosa
+     dica: le tre righe che girano hanno lunghezze diverse, e ancorarla a un
+     bordo le avrebbe fatte ballare da un lato. */
   left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 4;
-  max-width: 88%;
-  /* Il padding resta — è quello che tiene il testo lontano dallo spigolo
-     della lastra — ma non disegna più nessun fondo. */
-  padding: 15px 20px 18px;
+  padding: 0 18px 20px;
+  text-align: center;
   display: block;
 }
 .sb-mocard-slot {
   display: block;
   position: relative;
   overflow: hidden;
-  /* Le due righe più il loro interlinea, in em del contenitore: titolo ~1.35em
-     + sub ~1.5em + i 2px di gap. */
-  height: 3.05em;
-  font-size: clamp(14px, 2.4vw, 17px);
+  /* UNA riga sola adesso, in em del contenitore. Era 3.05em perché dentro ci
+     stavano titolo e sottotitolo più il gap; con il sottotitolo via basta
+     l'interlinea del titolo, e la finestrella si accorcia di due terzi.
+     Resta in em e non in px perché il titolo ha font-size in clamp(): la
+     finestrella deve scalare con lui o a una certa larghezza lo taglia. */
+  height: 1.35em;
+  font-size: clamp(15px, 2.5vw, 19px);
 }
 .sb-mocard-row {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: block;
 }
-/* Il titolo: tinta affondata quasi al nero, non nero puro. Così ogni scheda
-   ha il suo titolo — il blu ha un titolo blu-notte, l'ambra uno bruno — e la
-   riga appartiene alla scena invece di starci sopra.
+/* LA SCRITTA È DI VETRO, non di inchiostro.
 
-   L'ombra bianca è un ALONE, non una sfumatura in basso: il testo passa sopra
-   il fondo tenue ma anche sopra il piano quadrettato del geometra e le bolle,
-   e un alone lo stacca da qualunque cosa gli finisca sotto. */
+   Era `color` piatto — prima avorio sul velo nero, poi tinta affondata quasi
+   al nero sul fondo chiaro — e in tutti e due i casi era una scritta OPACA
+   appoggiata su una scena fatta tutta di vetro e di luce. Stonava per
+   materiale, non per colore: l'unica cosa piatta in mezzo a cinque oggetti
+   lucidi.
+
+   Adesso è lucida anche lei, e lo è col meccanismo del vetro vero:
+
+   · il GRADIENTE ritagliato sul testo (background-clip: text) le dà il
+     passaggio chiaro-scuro che ha una superficie curva presa dalla luce —
+     più chiara in cima, dove batte, più satura sotto;
+   · il filo di LUCE in cima (drop-shadow bianco verso l'alto, 1px) è lo
+     stesso specular che hanno il rim delle card e i bordi degli oggetti;
+   · l'OMBRA sotto (drop-shadow nella tinta affondata) è quella che la stacca
+     dal fondo e le dà spessore — senza, il gradiente da solo la farebbe
+     sparire nella scena invece che galleggiarci sopra.
+
+   drop-shadow e non text-shadow: text-shadow disegna dietro al COLORE del
+   testo, e qui il colore è trasparente (il gradiente passa dal background),
+   quindi un text-shadow verrebbe fuori come una macchia piena dietro le
+   lettere. drop-shadow segue la forma dipinta, che è quello che serve.
+
+   Il filter sta sull'H3, cioè su un elemento di testo fermo dentro una
+   finestrella che già trasla: non è un filtro su una superficie grande che
+   si ridipinge, è il contorno di due parole. */
 .sb-mocard-plate h3 {
   margin: 0;
   font-size: 1em;
   line-height: 1.35;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: color-mix(in srgb, currentColor 34%, #0a1410);
+  font-weight: 800;
+  letter-spacing: -0.015em;
   white-space: nowrap;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.55),
-    0 0 12px rgba(255, 255, 255, 0.75);
-}
-.sb-mocard-sub {
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.62em;
-  line-height: 1.5;
-  /* Più chiaro del titolo ma non grigio spento: è la stessa tinta, tenuta
-     indietro. Il grigio #9a9a9a di prima era tarato sul velo nero e su un
-     fondo chiaro diventa illeggibile. */
-  color: color-mix(in srgb, currentColor 46%, #243029);
-  white-space: nowrap;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  /* IL GRADIENTE È SCURO, non chiaro — e al primo tentativo non lo era.
+
+     Partiva da bianco puro e finiva a metà tinta: è il gloss di una scritta
+     che sta su un fondo SCURO, dove il bianco è il colore del testo e il
+     gradiente serve solo a dargli una curva. Qui il fondo è chiaro, e quella
+     scala produceva scritte sbiadite — "Il geometra" sul verde non si
+     leggeva. Il lucido non è fatto di bianco: è fatto di CONTRASTO fra una
+     parte in luce e una in ombra.
+
+     Quindi la scala è rovesciata sul tono ma non sul verso: sta tutta nella
+     metà scura della tinta, dal più chiaro in cima (dove batte la luce) al
+     quasi nero in fondo. Il filo bianco dello specular resta, ma è quello del
+     drop-shadow qui sotto, che tocca solo il bordo superiore delle lettere —
+     e su una scritta scura si vede, mentre dentro un gradiente chiaro si
+     perdeva. */
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, currentColor 52%, #f4f8f6) 0%,
+    color-mix(in srgb, currentColor 72%, #1a2b24) 34%,
+    color-mix(in srgb, currentColor 60%, #0b1410) 72%,
+    color-mix(in srgb, currentColor 42%, #070d0a) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter:
+    /* Lo specular in cima: il filo di luce sul bordo alto delle lettere. */
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.95))
+    /* L'alone chiaro tutt'intorno: è quello che stacca la scritta scura da
+       quello che le passa sotto — il piano quadrettato, le bolle, l'ombra
+       dell'oggetto. Senza, sul geometra la scritta finisce dentro il reticolo. */
+    drop-shadow(0 0 2px rgba(255, 255, 255, 0.9))
+    /* L'ombra portata: dà lo spessore e la fa galleggiare sopra la scena. */
+    drop-shadow(0 3px 8px color-mix(in srgb, currentColor 40%, #0a1310));
 }
 
 /* ── Le keyframe delle scene ─────────────────────────────────────────────────

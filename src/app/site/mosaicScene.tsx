@@ -102,16 +102,6 @@ import { memo } from "react";
 
 export type MosaicTopic = "archive" | "web" | "claude" | "photo" | "autocad";
 
-/** Il numero in alto a destra, come sulle tavole. L'ordine è quello della
- *  griglia in App.tsx, non quello dei file: la scheda dei siti è la prima. */
-const NUM: Record<MosaicTopic, string> = {
-  web: "01",
-  archive: "02",
-  claude: "03",
-  photo: "04",
-  autocad: "05",
-};
-
 /* ── Le bolle ────────────────────────────────────────────────────────────────
    Dalle tavole, stessa formula aritmetica: niente Math.random(), così la maglia
    è identica a ogni ricarica e due schede vicine non si ritrovano con le bolle
@@ -420,10 +410,6 @@ export const MosaicScene = memo(function MosaicScene({ topic }: { topic: MosaicT
       </div>
 
       <Bolle topic={topic} />
-
-      {/* Il numero della tavola, in alto a destra: sulle tavole stava in basso
-          accanto al titolo, ma lì la targa è nostra e occupa l'angolo. */}
-      <span className="mo-num">{NUM[topic]}</span>
 
       {/* La rifinitura: il filo chiaro sul bordo interno e la passata di luce.
           Sono i due strati che le tavole avevano in fondo, e fanno lo stesso

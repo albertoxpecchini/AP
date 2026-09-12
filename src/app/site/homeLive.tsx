@@ -344,20 +344,18 @@ export const LiveKicker = memo(function LiveKicker() {
    È la stessa regola di NowBuilding, qui sopra.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Una voce della targa: la riga grande e quella piccola in mono.
+/** Una voce della targa: UNA riga, e basta.
  *
- *  I due flag sono SEPARATI, e serve che lo siano: quasi tutte le voci hanno un
- *  titolo che è un nome proprio — un dominio, «Claude Code», un corpo macchina
- *  — e un sottotitolo che è prosa, da tradurre. Con un flag solo sulla riga
- *  intera la scheda dei siti restava con «websites» in inglese sotto a un nome
- *  italiano, e quella dell'IA con «AI-assisted development». */
+ *  Prima ce n'erano due — il titolo e un sottotitolo in mono — e con loro due
+ *  flag i18n separati, perché il titolo era quasi sempre un nome proprio da non
+ *  tradurre mentre il sottotitolo era prosa. Adesso la riga è una: la scheda
+ *  dice una cosa sola, e quello che stava sotto è stato assorbito nella riga
+ *  dove valeva la pena tenerlo. Un flag solo, quindi, e nessun caso ambiguo. */
 type Riga = {
   title: string;
-  sub: string;
-  /** Il titolo è un nome proprio: il motore i18n non lo tocca. */
+  /** La riga è un nome proprio (un dominio, una sigla, un corpo macchina):
+   *  il motore i18n non la tocca. */
   noI18n?: boolean;
-  /** Anche il sottotitolo lo è (sigle, misure, modelli di obiettivo). */
-  subNoI18n?: boolean;
 };
 
 /** Gli attributi che spengono il motore i18n su un nodo. */
@@ -369,32 +367,46 @@ const PLATE_HOLD = 4600;
 /** Il giro delle targhe. Ogni scheda ne ha tre: la prima è quella che si vede
  *  da ferma (e quella che resta con prefers-reduced-motion), le altre due
  *  dicono un FATTO — un numero, un nome, un dato vero — perché una targa che
- *  gira per dire tre volte la stessa cosa con parole diverse è un fastidio. */
+ *  gira per dire tre volte la stessa cosa con parole diverse è un fastidio.
+ *
+ *  ── Le righe sono state riscritte, e il sottotitolo è sparito ───────────
+ *  Ogni voce era due righe: un titolo e sotto una riga in mono. Adesso è una
+ *  sola, e non è un taglio a metà — le quindici righe sono rifatte perché
+ *  ognuna reggesse da sola. Dove il sottotitolo diceva la cosa importante è
+ *  lui a essere diventato la riga ("online, dalla prima parola" valeva più del
+ *  dominio nudo); dove il titolo bastava, il sottotitolo se n'è andato senza
+ *  lasciare niente ("Fotografia" non aveva bisogno di "scatti" sotto).
+ *
+ *  La regola che le tiene insieme: la PRIMA riga dice che cos'è la scheda, in
+ *  due o tre parole, perché è quella che si vede da fermo e deve rispondere
+ *  alla domanda "dove sto cliccando". Le altre due dicono qualcosa che non si
+ *  indovina dal disegno — un dominio vero, una macchina vera, una scelta di
+ *  mestiere. Nessuna delle tre è un sinonimo delle altre. */
 const PLATE: Record<MosaicTopic, Riga[]> = {
   web: [
-    { title: "Rivalta e Cascina Fontana", sub: "websites", noI18n: true },
-    { title: "rivaltasulmincio.it", sub: "online, and the village in every datum", noI18n: true },
-    { title: "cascinafontana.xyz", sub: "online, from the first word", noI18n: true },
+    { title: "Siti web" },
+    { title: "rivaltasulmincio.it", noI18n: true },
+    { title: "cascinafontana.xyz", noI18n: true },
   ],
   archive: [
-    { title: "Project archive", sub: "all the works" },
-    { title: "React and TypeScript", sub: "and never a page builder" },
-    { title: "The source goes home with you", sub: "every project, open" },
+    { title: "Archivio progetti" },
+    { title: "React e TypeScript", noI18n: true },
+    { title: "Il sorgente ve lo portate a casa" },
   ],
   claude: [
-    { title: "Claude Code", sub: "AI-assisted development", noI18n: true },
-    { title: "Codex, Copilot", sub: "machines that write", noI18n: true },
-    { title: "Not one line unread", sub: "my eye upon all of it" },
+    { title: "Claude Code", noI18n: true },
+    { title: "Codex, Copilot", noI18n: true },
+    { title: "Non una riga non letta" },
   ],
   photo: [
-    { title: "Photography", sub: "shots" },
-    { title: "Canon EOS 4000D", sub: "EF-S 18-55mm, ISO 3200", noI18n: true, subNoI18n: true },
-    { title: "The faces stay mine alone", sub: "the number, never the image" },
+    { title: "Fotografia" },
+    { title: "Canon EOS 4000D", noI18n: true },
+    { title: "I volti restano miei soltanto" },
   ],
   autocad: [
-    { title: "Surveying", sub: "and university" },
-    { title: "CAT diploma", sub: "Construction, Environment and Territory" },
-    { title: "AutoCAD, topography", sub: "and weighing what a thing is worth" },
+    { title: "Il geometra" },
+    { title: "Diploma CAT", noI18n: true },
+    { title: "AutoCAD e topografia", noI18n: true },
   ],
 };
 
@@ -502,9 +514,6 @@ export const MosaicCard = memo(function MosaicCard({ topic }: { topic: MosaicTop
           <span className="sb-mocard-slot">
             <span className="sb-mocard-row" key={i} ref={rowRef}>
               <h3 {...(cur.noI18n ? FERMO : {})}>{cur.title}</h3>
-              <span className="sb-mocard-sub" {...(cur.subNoI18n ? FERMO : {})}>
-                {cur.sub}
-              </span>
             </span>
           </span>
         </span>
