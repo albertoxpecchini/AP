@@ -1318,13 +1318,16 @@ html.dark .sb-nav--scrolled { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
   /* le tre della seconda */
   .sb-products .sb-card:nth-child(n + 3) { grid-column: span 2; }
 
-  /* Sulle due schede larghe il palco si stringe a sinistra. Il centro OTTICO
-     di queste schede non è il loro centro geometrico: la targa occupa l'angolo
-     basso-sinistro e il numero quello alto-destro, e un oggetto messo a metà
-     esatta si vede spinto a destra, verso il vuoto. Togliendo un quarto della
-     larghezza dal bordo destro l'oggetto torna dov'era stato disegnato — sopra
-     la targa, che è il rapporto delle tavole da cui viene. */
-  .sb-products .sb-card:nth-child(-n + 2) .mo-palco { right: 26%; }
+  /* Qui il palco delle due schede larghe si stringeva a destra del 26%, per
+     mettere l'oggetto «sopra la targa»: quando la targa era un riquadro nero
+     che occupava metà del bordo basso, il centro ottico della scheda era
+     davvero spostato a sinistra, e l'oggetto centrato sul serio sembrava
+     scappare verso il vuoto di destra.
+
+     Con la targa ridotta a due righe di testo quel peso non c'è più, e la
+     correzione è diventata il difetto: misurato, portava l'oggetto 59px a
+     sinistra del centro, e sulle due schede più grandi della pagina si vedeva
+     benissimo. Tolta, le cinque schede sono centrate tutte allo stesso modo. */
 }
 .sb-card { display: block; text-decoration: none; color: inherit; }
 
@@ -1827,42 +1830,40 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ① IL FONDO. La tinta dal cupo al pieno, in diagonale — la stessa scala
-      tonale delle tavole, ricavata dalla tinta invece che scritta a mano. */
-/* Il nero di fondo è NEUTRO, non verde. Le tavole scurivano il verde con altri
-   verdi (#04241a, #05221a) e funzionava perché la tinta era una sola. Qui la
-   tinta è cinque: un nero verde sotto l'ambra dà oliva, sotto il rosa dà
-   fango. Nero puro allungato con un filo della tinta stessa scurisce ogni
-   accento restando quell'accento — l'ambra resta ambra fino in fondo. */
-/* La scala è ROVESCIATA rispetto al giro prima, ed è la mossa della tavola
-   nuova: lì il chiaro sta in ALTO e la tinta affonda scendendo, invece di
-   partire cupa e schiarire in fondo.
+/* ① IL FONDO — e qui è successa la correzione grossa di questo giro.
 
-   Il motivo non è di gusto: la targa sta in basso a sinistra ed è un velo quasi
-   nero. Col vecchio verso le finiva sotto il punto più chiaro della scheda —
-   nero su quasi-bianco, il contrasto più duro della pagina, proprio nell'angolo
-   dove c'è il testo. Adesso la targa siede sul fondo pieno e il salto si
-   chiude.
+      Le cinque tinte erano PIENE: il fondo andava da un 22% di tinta in cima
+      a un 96% a metà scheda, cioè praticamente il colore puro. Cinque schede
+      così, una accanto all'altra, sono la prima cosa che si vede aprendo il
+      sito — e quello che si vedeva era un campionario di colori accesi, non
+      un pannello. Il problema non erano le tinte (sono quelle del sito, e
+      vanno bene dove stanno: nav, sezioni, pagine interne); era la QUANTITÀ
+      di tinta stesa su una superficie grande.
 
-   Le fermate sono quelle della tavola (0 / 22 / 58 / 100), i colori no: là
-   erano cinque oklch scritti a mano per scheda, qui nascono da color-mix fra
-   currentColor e il bianco o il nero, così le cinque schede hanno la stessa
-   profondità in cinque tinte diverse. Vedi la nota ① in testa a mosaicScene. */
+      Adesso la scala è la stessa — stesso verso, stesse fermate, stessa
+      profondità — ma tutta spostata verso il chiaro: si parte da un velo di
+      tinta e si arriva a metà tinta, invece di arrivare al colore pieno. La
+      scheda resta riconoscibilmente blu, viola, ambra, rosa o verde, e smette
+      di gridare. L'oggetto di vetro ci guadagna due volte: su un fondo tenue
+      il bianco dei bordi si stacca, mentre sul colore pieno ci affogava.
+
+      Il nero di fondo resta NEUTRO, non tinto, per la ragione di prima: un
+      nero verde sotto l'ambra dà oliva, sotto il rosa dà fango. */
 .mo-fondo {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
       88% 50% at 50% 86%,
-      color-mix(in srgb, currentColor 12%, #ffffff) 0%,
+      color-mix(in srgb, currentColor 6%, #ffffff) 0%,
       transparent 72%
     ),
     linear-gradient(
       178deg,
-      color-mix(in srgb, currentColor 22%, #ffffff) 0%,
-      color-mix(in srgb, currentColor 62%, #ffffff) 22%,
-      color-mix(in srgb, currentColor 96%, #0a0a0d) 58%,
-      color-mix(in srgb, currentColor 58%, #101014) 100%
+      color-mix(in srgb, currentColor 10%, #ffffff) 0%,
+      color-mix(in srgb, currentColor 26%, #ffffff) 22%,
+      color-mix(in srgb, currentColor 46%, #ffffff) 58%,
+      color-mix(in srgb, currentColor 34%, #f3f5f7) 100%
     );
 }
 
@@ -1894,9 +1895,11 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 .mo-velo {
   position: absolute;
   inset: 0;
+  /* Era al 42%: su un fondo già chiaro quel bianco è una lavatura che
+     spegne la tinta proprio dove c'è il testo. Basta molto meno. */
   background: radial-gradient(
     120% 80% at 50% 112%,
-    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0.2) 0%,
     transparent 58%
   );
 }
@@ -1928,8 +1931,22 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
      per giunta galleggia — usciva dal bordo superiore su telefono, dove la
      card è stretta e l'oggetto occupa quasi tutto il palco: si perdeva la
      barra con l'indirizzo, cioè la parte che dice che è un browser. */
-  top: 4%;
-  height: 62%;
+  /* IL PALCO OCCUPA TUTTA LA SCHEDA, e adesso può.
+
+     Era alto il 62% appoggiato in alto (top 4%), e la ragione era la targa:
+     un velo nero opaco che si mangiava l'angolo basso fino a metà scheda, e
+     un oggetto centrato sulla scheda intera ci finiva sotto coi piedi.
+
+     La targa adesso è testo nudo senza fondo. Non copre più niente, quindi
+     il vincolo cade e l'oggetto può stare dove il disegno lo vuole: al
+     centro esatto della sua scheda, tutte e cinque uguali — che è anche
+     quello che dice la tavola da cui vengono, «la composizione è sempre
+     simmetrica».
+
+     Il fondo resta un filo più alto (bottom 12%) perché sotto ci passano le
+     due righe di testo: centrato sullo spazio LIBERO, non sulla lastra. */
+  top: 0;
+  bottom: 22%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1942,6 +1959,22 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
 
 /* ⑤ LE BOLLE. Dalle tavole, identiche: salgono da sotto il bordo, crescono un
       filo e svaniscono. Bianche di luce con un velo di tinta dentro. */
+/* SU TELEFONO IL PALCO SI ALZA ANCORA.
+
+   La card stretta è alta quasi quanto è larga, e gli oggetti — che hanno
+   misure in % della larghezza — ci arrivano dentro grossi. Col bottom al 22%
+   la finestra del browser finiva ad appoggiarsi sul titolo: niente stacco fra
+   il disegno e la riga di testo, che è la cosa che si nota per prima su uno
+   schermo piccolo, dove le due cose sono vicine per forza.
+
+   Verificato a 390px in Edge, non dedotto. */
+@media (max-width: 639px) {
+  .mo-palco { bottom: 30%; }
+  /* E la finestra si stringe: è l'oggetto più alto dei cinque e l'unico che
+     su questa larghezza toccava il testo. */
+  .mo-browser-wrap { width: 46%; }
+}
+
 .mo-bolla {
   position: absolute;
   bottom: -8%;
@@ -1970,8 +2003,12 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.42);
-  text-shadow: 0 1px 10px rgba(0, 30, 18, 0.4);
+  /* Era bianco al 42%, e sul fondo pieno di prima si leggeva appena. Sul
+     fondo tenue nuovo sparirebbe del tutto: adesso è la TINTA affondata,
+     cioè lo stesso colore della scheda portato al buio. Resta un indice
+     discreto senza diventare invisibile. */
+  color: color-mix(in srgb, currentColor 70%, #0d1b16);
+  opacity: 0.45;
 }
 
 /* ⑦ LA RIFINITURA. Il filo chiaro sul bordo interno e la passata di luce: i
@@ -1983,8 +2020,8 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   z-index: 3;
   pointer-events: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -80px 90px -70px rgba(255, 255, 255, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 0 0 1px color-mix(in srgb, currentColor 14%, transparent);
 }
 .mo-gloss {
   position: absolute;
@@ -2066,7 +2103,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 0 0 1px rgba(255, 255, 255, 0.6),
-    0 16px 26px -16px rgba(0, 20, 12, 0.75);
+    0 14px 24px -16px color-mix(in srgb, currentColor 55%, #0d1b16);
 }
 .mo-carta i {
   display: block;
@@ -2091,9 +2128,18 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   max-width: 236px;
 }
 @media (min-width: 1024px) {
-  /* Sulla scheda larga della prima riga il palco è rientrato del 26% a destra:
-     lì la finestra può tornare a respirare senza rischiare il taglio. */
-  .sb-products .sb-card:nth-child(1) .mo-browser-wrap { width: 78%; }
+  /* La scheda della prima riga è larga il doppio, e la finestra ci va in
+     proporzione — ma in PERCENTUALE di una card doppia il 78% diventava un
+     oggetto enorme, e siccome il palco ha i suoi rientri l'insieme si
+     leggeva spostato a sinistra invece che centrato.
+
+     Un tetto in px la ferma: la finestra cresce finché ha senso e poi si
+     ferma, e quello che avanza diventa aria — uguale a destra e a sinistra.
+     Una scheda larga il doppio non vuole un oggetto largo il doppio. */
+  .sb-products .sb-card:nth-child(1) .mo-browser-wrap {
+    width: 62%;
+    max-width: 300px;
+  }
 }
 .mo-browser {
   border-radius: 12px;
@@ -2106,7 +2152,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
     rgba(255, 255, 255, 0.08)
   );
   box-shadow:
-    0 30px 60px -20px rgba(0, 20, 12, 0.8),
+    0 24px 46px -22px color-mix(in srgb, currentColor 50%, #0d1b16),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   animation: mo-float var(--mo-loop, 12s) ease-in-out infinite;
 }
@@ -2320,7 +2366,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
     color-mix(in srgb, currentColor 85%, #000) 100%
   );
   box-shadow:
-    0 22px 50px -14px rgba(0, 20, 12, 0.8),
+    0 18px 40px -18px color-mix(in srgb, currentColor 50%, #0d1b16),
     inset 0 -10px 24px rgba(0, 30, 20, 0.4),
     0 0 40px color-mix(in srgb, currentColor 50%, transparent);
   animation: mo-orb var(--mo-loop, 14s) ease-in-out infinite;
@@ -2358,7 +2404,7 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     inset 0 0 0 1px rgba(255, 255, 255, 0.6),
-    0 18px 30px -16px rgba(0, 20, 12, 0.8);
+    0 16px 28px -18px color-mix(in srgb, currentColor 50%, #0d1b16);
   animation: mo-float var(--mo-loop, 12s) ease-in-out infinite;
 }
 /* La ghiera: un filo dentro al bordo, che dà lo spessore del barilotto. */
@@ -2421,11 +2467,13 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    Adesso parte più in alto — passa DIETRO al cubo, che è l'orizzonte giusto
    per un piano in prospettiva — ed è un filo più marcato, perché sotto c'è il
    verde pieno e non il verde cupo delle tavole. */
+/* Il piano scende un filo perché il palco adesso è centrato sulla scheda
+   intera: l'orizzonte deve restare dietro al cubo, non sopra. */
 .mo-piano-wrap {
   position: absolute;
   left: -30%;
   right: -30%;
-  top: 30%;
+  top: 38%;
   bottom: 0;
   overflow: hidden;
   perspective: 620px;
@@ -2478,11 +2526,26 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
    in absolute sulla scheda, che era la disposizione delle tavole e qui gli
    faceva ignorare il rientro del palco (finiva sotto il numero e oltre il
    bordo destro). */
+/* IL CUBO ERA FUORI ASSE, e la ragione non era dove sembrava.
+
+   Il wrap è largo quanto il palco; il cubo dentro è 96px fissi e centrato
+   dal flex, quindi in coordinate di layout è già a metà esatta. Ma la
+   `perspective` dichiarata qui ha come punto di fuga il centro del WRAP, e
+   un oggetto in prospettiva si proietta verso quel punto: su una scheda larga
+   il wrap è molto più largo del cubo, la fuga cade lontano, e le facce si
+   aprono tutte verso un lato. Il cubo si vedeva spinto a destra pur essendo
+   centrato — misurare il contenitore diceva 0 e l'occhio diceva di no, ed
+   erano tutti e due giusti.
+
+   Il rimedio è dare alla prospettiva un'origine esplicita: 50% 50% la
+   inchioda al centro del cubo, così la fuga è dove sta l'oggetto e le facce
+   si aprono simmetriche. */
 .mo-cubo-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
   perspective: 900px;
+  perspective-origin: 50% 50%;
 }
 /* Il cubo è l'unico oggetto a misura FISSA, e deve esserlo: le sei facce si
    montano con translateZ, che non accetta percentuali. Un lato in % con lo Z
@@ -2607,43 +2670,43 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   50% { opacity: 1; }
 }
 
-/* ── LA TARGA ────────────────────────────────────────────────────────────────
-   Due righe su un velo quasi nero, in basso a sinistra, con l'angolo alto a
-   destra tagliato a 45°: è la sagoma del sito in piccolo, e serve a non farla
-   leggere come una didascalia incollata sopra all'immagine.
+/* ── LA TARGA ────────────────────────────────────────────────────────
+   Due righe in basso a sinistra: il titolo e, sotto, la riga in mono.
 
-   Il velo è scritto a mano e non è un token: sotto c'è sempre un mosaico
-   saturo, in chiaro come in scuro, e una targa che seguisse il tema in chiaro
-   diventerebbe bianca su colore — cioè illeggibile. Il testo è avorio e grigio
-   chiaro fissi, in coppia col velo.
+   ── Il riquadro nero non c'è più ───────────────────────────────────
+   Era un velo quasi nero (rgba(8,10,8,.78)) con backdrop-filter, appoggiato
+   nell'angolo basso-sinistro con UN angolo tondo e gli altri tre vivi. Sulla
+   scheda satura di prima aveva una ragione: sotto c'era colore pieno, e un
+   testo chiaro ci sarebbe affogato. Ma il risultato era un rettangolo nero
+   incollato su una scena chiara — la cosa più pesante della griglia, e la
+   griglia è la prima cosa che si vede aprendo il sito.
 
-   ── La finestrella ─────────────────────────────────────────────────────────
+   Adesso che il fondo è tenue il velo non serve più a niente: il testo può
+   essere SCURO e appoggiarsi direttamente sulla scena, come la didascalia di
+   una fotografia. Quello che lo tiene leggibile non è più un fondo ma il
+   contrasto suo — tinta affondata quasi al nero — più un alone bianco
+   morbido che gli fa da distacco dove sotto passa l'oggetto di vetro.
+
+   Con il velo se ne va anche il suo backdrop-filter: erano cinque superfici
+   sfocate, una per scheda, ridipinte a ogni fotogramma. La stessa spesa che
+   le scene si erano tolte.
+
+   ── La finestrella ─────────────────────────────────────────────
    La targa GIRA: site/homeLive.tsx le dà tre righe a turno, che entrano da
    sotto ed escono da sopra. Il taglio lo fa .sb-mocard-slot con overflow
-   hidden; l'altezza è fissata in `em` e non in px perché le due righe dentro
-   hanno font-size in clamp(), quindi la finestrella deve scalare con loro o a
-   una certa larghezza taglierebbe il sottotitolo.
+   hidden; l'altezza è in `em` e non in px perché le righe dentro hanno
+   font-size in clamp(), quindi la finestrella scala con loro.
 
-   La larghezza NON è fissa: la targa si allarga sulla riga più lunga del giro.
-   Fissarla avrebbe voluto dire misurare a mano la stringa più lunga di cinque
-   schede per quattro lingue. */
+   La larghezza NON è fissa: si allarga sulla riga più lunga del giro. */
 .sb-mocard-plate {
   position: absolute;
   bottom: 0;
   left: 0;
   z-index: 4;
   max-width: 88%;
-  padding: 15px 20px 16px;
-  /* La targa era tagliata a 45° nell'angolo alto-destro (l'ultimo polygon()
-     rimasto nel foglio). Adesso quell'angolo è TONDO e grosso: è la stessa
-     mossa del resto del sito, e la targa siede nell'angolo basso-sinistro
-     della card, quindi gli altri tre angoli restano vivi per combaciare con
-     la lastra che la contiene. */
-  background: rgba(8, 10, 8, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  backdrop-filter: blur(10px) saturate(140%);
-  border-top-right-radius: 18px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  /* Il padding resta — è quello che tiene il testo lontano dallo spigolo
+     della lastra — ma non disegna più nessun fondo. */
+  padding: 15px 20px 18px;
   display: block;
 }
 .sb-mocard-slot {
@@ -2659,25 +2722,36 @@ html [data-acc="rosso"] { --sb-accent-hsl: var(--sb-acc-rosso); }
   display: flex;
   flex-direction: column;
   gap: 2px;
-  /* will-change no: la riga vive pochi secondi e GSAP la smonta. Dichiararlo
-     terrebbe un layer per scheda acceso per sempre, per un'animazione che gira
-     un terzo del tempo. */
 }
+/* Il titolo: tinta affondata quasi al nero, non nero puro. Così ogni scheda
+   ha il suo titolo — il blu ha un titolo blu-notte, l'ambra uno bruno — e la
+   riga appartiene alla scena invece di starci sopra.
+
+   L'ombra bianca è un ALONE, non una sfumatura in basso: il testo passa sopra
+   il fondo tenue ma anche sopra il piano quadrettato del geometra e le bolle,
+   e un alone lo stacca da qualunque cosa gli finisca sotto. */
 .sb-mocard-plate h3 {
   margin: 0;
   font-size: 1em;
   line-height: 1.35;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.01em;
-  color: #f7f4ec;
+  color: color-mix(in srgb, currentColor 34%, #0a1410);
   white-space: nowrap;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 12px rgba(255, 255, 255, 0.75);
 }
 .sb-mocard-sub {
   font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.62em;
   line-height: 1.5;
-  color: #9a9a9a;
+  /* Più chiaro del titolo ma non grigio spento: è la stessa tinta, tenuta
+     indietro. Il grigio #9a9a9a di prima era tarato sul velo nero e su un
+     fondo chiaro diventa illeggibile. */
+  color: color-mix(in srgb, currentColor 46%, #243029);
   white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 /* ── Le keyframe delle scene ─────────────────────────────────────────────────
