@@ -4,7 +4,7 @@ Portfolio di Alberto Pecchini — diplomato geometra, web designer, graphic desi
 
 Sito **statico, senza framework**: le pagine HTML sono generate in fase di build da dati e template scritti in JavaScript; nel browser gira solo il JavaScript scritto a mano per le interazioni. Nessun cookie di tracciamento, nessuna dipendenza a runtime, font ospitati localmente.
 
-Online su Vercel: <https://albertopecchiniit.vercel.app> (il dominio albertopecchini.it va ancora collegato al progetto Vercel).
+Online su <https://www.albertopecchini.it> (albertopecchini.it rimanda a www).
 
 ## Indice
 
@@ -252,12 +252,14 @@ In console la build riporta il numero di pagine e miniature scritte e, se ce ne 
 - [ ] Sostituire o rimuovere i progetti con `sample: true`; quando non ce ne sono più, portare `site.showSampleNotice` a `false`.
 - [ ] Rileggere privacy e cookie policy (`src/templates/pages/legal.js`) e aggiornare `site.legal.updated`. Se si aggiungono strumenti di analisi o servizi di terze parti, la cookie policy va aggiornata.
 - [ ] Decidere l’invio del modulo contatti (`site.form.endpoint`).
-- [ ] Collegare il dominio albertopecchini.it al progetto Vercel; `site.url` è già impostato su quello.
+- [ ] Sistemare il DNS di albertopecchini.it: il dominio senza www ha ancora un record A verso il vecchio hosting Aruba (62.149.128.40) accanto a quello di Vercel (216.198.79.1). Deve restare solo quello di Vercel, altrimenti chi digita l’indirizzo senza www ottiene a caso il sito o un errore di connessione.
 - [ ] Controllare `public/og.png` e il manifest (`public/site.webmanifest`).
 
 ## Pubblicazione
 
 `dist/` è un sito statico e funziona su qualsiasi hosting. Il progetto Vercel `albertopecchini.it` è collegato a questo repository GitHub (`albertoxpecchini/AP`) con **Root Directory** = `albertopecchini.it`, framework Vite, Node 24: ogni push su `main` produce un deploy di produzione, gli altri rami un’anteprima.
+
+Domini di produzione: `www.albertopecchini.it` e `albertopecchini.it` (che rimanda a www con un 308). Gli indirizzi `*.vercel.app` del progetto sono protetti da Vercel Authentication (accesso solo con login Vercel), i domini personalizzati no.
 
 `vercel.json` imposta URL puliti con barra finale (come i percorsi generati), cache di un anno sugli asset con hash, cache di trenta giorni su `media/` e `art/`, e le intestazioni `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`. `404.html` viene servita in automatico.
 

@@ -25,7 +25,7 @@ Sito statico senza framework: i contenuti stanno in `albertopecchini.it/src/data
 
 ## Pubblicazione
 
-Il progetto Vercel `albertopecchini.it` è collegato a questo repository con *Root Directory* `albertopecchini.it`: ogni push su `main` va in produzione.
+Il progetto Vercel `albertopecchini.it` è collegato a questo repository con *Root Directory* `albertopecchini.it`: ogni push su `main` va in produzione. Il sito è online su <https://www.albertopecchini.it>.
 
 ## Storia
 
