@@ -1,0 +1,14 @@
+{
+  "name": "Alberto Pecchini — Diplomato geometra, Web Designer, Graphic Designer",
+  "short_name": "A. Pecchini",
+  "lang": "it",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f3f1ec",
+  "theme_color": "#f3f1ec",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

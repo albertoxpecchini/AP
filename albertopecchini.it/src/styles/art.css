@@ -1,0 +1,74 @@
+/* Tavole generate (src/art): colori e tratti. Le classi a-* sono usate dentro gli SVG. */
+
+.art {
+  --art-bg: var(--c-paper-2);
+  --art-ink: var(--c-ink);
+  --art-mute: rgb(16 17 15 / 0.5);
+  --art-soft: rgb(16 17 15 / 0.08);
+  --art-soft-2: rgb(16 17 15 / 0.16);
+  --art-accent: var(--c-minio);
+  --art-inv: var(--c-paper);
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-mono);
+}
+
+.art--ink {
+  --art-bg: var(--c-ink-2);
+  --art-ink: var(--c-paper);
+  --art-mute: rgb(243 241 236 / 0.52);
+  --art-soft: rgb(243 241 236 / 0.07);
+  --art-soft-2: rgb(243 241 236 / 0.15);
+  --art-accent: var(--c-minio-bright);
+  --art-inv: var(--c-ink);
+}
+
+.art--tint {
+  --art-bg: var(--c-paper-3);
+}
+
+.art--bare {
+  --art-bg: transparent;
+}
+
+.a-bg { fill: var(--art-bg); }
+.a-fill { fill: var(--art-ink); }
+.a-soft { fill: var(--art-soft); }
+.a-soft2 { fill: var(--art-soft-2); }
+.a-acc { fill: var(--art-accent); }
+.a-inv { fill: var(--art-inv); }
+.a-none { fill: none; }
+
+.a-s, .a-s2, .a-sb, .a-sa, .a-si { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.a-s { stroke: var(--art-ink); stroke-width: 1.4; }
+.a-s2 { stroke: var(--art-mute); stroke-width: 1; }
+.a-sb { stroke: var(--art-ink); stroke-width: 3; }
+.a-sa { stroke: var(--art-accent); stroke-width: 1.6; }
+.a-si { stroke: var(--art-inv); stroke-width: 1.4; }
+.a-dash { stroke-dasharray: 6 5; }
+.a-dashdot { stroke-dasharray: 14 5 2 5; }
+.a-dots { stroke-width: 2.2; stroke-linecap: round; }
+.a-fill.a-s { fill: var(--art-ink); }
+.a-acc.a-s { fill: var(--art-accent); }
+.a-soft.a-s, .a-soft.a-s2 { fill: var(--art-soft); }
+.a-soft2.a-s, .a-soft2.a-s2 { fill: var(--art-soft-2); }
+.a-bg.a-s, .a-bg.a-s2 { fill: var(--art-bg); }
+
+/* toni dei rendering "clay" */
+.art { --art-r0: #dcd8cf; --art-r1: #f8f7f3; --art-r2: #e2dfd7; --art-r3: #c3bfb4; --art-r4: #86837a; --art-r5: rgb(16 17 15 / 0.17); }
+.art--ink { --art-r0: #141513; --art-r1: #42433e; --art-r2: #2e2f2b; --art-r3: #1f201d; --art-r4: #0b0c0a; --art-r5: rgb(0 0 0 / 0.5); }
+.a-r0 { fill: var(--art-r0); }
+.a-r1 { fill: var(--art-r1); }
+.a-r2 { fill: var(--art-r2); }
+.a-r3 { fill: var(--art-r3); }
+.a-r4 { fill: var(--art-r4); }
+.a-r5 { fill: var(--art-r5); }
+
+.a-t, .a-tm, .a-ta, .a-ti { font-family: var(--font-mono); stroke: none; }
+.a-t { fill: var(--art-ink); }
+.a-tm { fill: var(--art-mute); }
+.a-ta { fill: var(--art-accent); }
+.a-ti { fill: var(--art-inv); }
+.a-sans { font-family: var(--font-sans); }
+.a-serif { font-family: var(--font-serif); }

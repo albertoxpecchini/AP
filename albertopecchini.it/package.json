@@ -1,6 +1,7 @@
 {
   "name": "albertopecchini.it",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Portfolio di Alberto Pecchini — diplomato geometra, web designer, graphic designer. Sito statico generato da dati e template con Vite.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +9,13 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": ">=20.19"
+  },
   "devDependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
     "vite": "^8.3.0"
   }
 }

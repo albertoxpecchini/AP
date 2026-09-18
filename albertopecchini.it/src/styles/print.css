@@ -1,0 +1,75 @@
+/* Stampa: pensata soprattutto per il curriculum (/studio/profilo/). */
+
+@media print {
+  :root {
+    --bg: #fff;
+    --bg-2: #f4f4f2;
+    --fg: #000;
+    --muted: #444;
+  }
+
+  @page {
+    margin: 16mm 14mm;
+  }
+
+  html {
+    font-size: 11pt;
+  }
+
+  .site-header,
+  .menu,
+  .site-footer,
+  .progress,
+  .curtain,
+  .cursor,
+  .preview,
+  .lightbox,
+  .skip,
+  .crumbs,
+  .cv__actions,
+  .cs-nav,
+  .cs-next,
+  .pf__bar {
+    display: none !important;
+  }
+
+  .cv,
+  .legal,
+  .phead,
+  .cs-hero {
+    padding-top: 0 !important;
+  }
+
+  .js [data-reveal],
+  .js [data-reveal] .w__i,
+  .js [data-reveal] .media__inner {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  [data-theme] {
+    --bg: #fff;
+    --fg: #000;
+    --muted: #444;
+    --line: #bbb;
+    --line-strong: #666;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  a {
+    text-decoration: none !important;
+  }
+
+  .cv__sec,
+  .cs-sec,
+  .sitem,
+  .mstep {
+    break-inside: avoid;
+  }
+
+  .tag {
+    border-color: #999;
+  }
+}

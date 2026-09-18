@@ -1,0 +1,144 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOKEN DI DESIGN — unica fonte per colori, tipografia, spazi, raggi, movimento.
+   I breakpoint non possono vivere in custom properties: sono documentati qui e
+   usati con gli stessi valori in tutti i fogli.
+
+   Breakpoint (mobile-first, min-width):
+     sm  480px   telefoni larghi
+     md  768px   tablet
+     lg  1024px  laptop
+     xl  1280px  desktop
+     2xl 1600px  schermi grandi
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Colore — carta, inchiostro, minio */
+  --c-paper: #f3f1ec;
+  --c-paper-2: #eae7e0;
+  --c-paper-3: #dedad1;
+  --c-ink: #10110f;
+  --c-ink-2: #1b1c19;
+  --c-ink-3: #2b2c28;
+  --c-graphite: #5a5b55;
+  --c-minio: #e5481f;
+  --c-minio-deep: #b5360f;
+  --c-minio-bright: #ff6a3d;
+
+  /* Ruoli semantici (tema chiaro) */
+  --bg: var(--c-paper);
+  --bg-2: var(--c-paper-2);
+  --bg-3: var(--c-paper-3);
+  --fg: var(--c-ink);
+  --muted: var(--c-graphite);
+  --line: rgb(16 17 15 / 0.16);
+  --line-strong: rgb(16 17 15 / 0.42);
+  --accent: var(--c-minio);
+  --accent-text: var(--c-minio-deep);
+  --on-accent: var(--c-ink); /* inchiostro su minio: 4,8:1 (chiaro) · 6,6:1 (scuro) — il bianco non arriva ad AA */
+  --focus: var(--c-minio-deep);
+
+  /* Tipografia */
+  --font-sans: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', 'Times New Roman', serif;
+
+  --fs-mega: clamp(3.25rem, 1.2rem + 10.4vw, 12.5rem);
+  --fs-display: clamp(2.75rem, 1.4rem + 6.4vw, 8rem);
+  --fs-h1: clamp(2.375rem, 1.5rem + 4.2vw, 5.5rem);
+  --fs-h2: clamp(1.875rem, 1.3rem + 2.6vw, 3.75rem);
+  --fs-h3: clamp(1.375rem, 1.15rem + 1vw, 2rem);
+  --fs-h4: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+  --fs-lead: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.6875rem;
+
+  --lh-tight: 0.94;
+  --lh-snug: 1.12;
+  --lh-body: 1.6;
+  --track-label: 0.08em;
+  --track-display: -0.035em;
+
+  /* Spazi (base 4px) */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
+  --sp-9: 6rem;
+  --sp-10: 8rem;
+  --section: clamp(4.5rem, 3rem + 7.5vw, 11rem);
+  --gutter: clamp(1rem, 0.4rem + 3vw, 3.5rem);
+  --col-gap: clamp(0.75rem, 0.4rem + 1.4vw, 2rem);
+  --max: 105rem;
+  --header-h: 4rem;
+
+  /* Raggi: il linguaggio è ortogonale, i raggi sono minimi */
+  --r-0: 0;
+  --r-1: 2px;
+  --r-2: 6px;
+  --r-3: 12px;
+  --r-device: 2.25rem;
+  --r-full: 999px;
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --t-1: 0.2s;
+  --t-2: 0.45s;
+  --t-3: 0.8s;
+  --t-4: 1.2s;
+
+  /* Livelli */
+  --z-header: 50;
+  --z-menu: 60;
+  --z-lightbox: 80;
+  --z-cursor: 90;
+  --z-curtain: 100;
+
+  color-scheme: light;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 4.75rem;
+  }
+}
+
+/* Tema scuro: si applica a sezioni intere con [data-theme="ink"] */
+[data-theme='ink'] {
+  --bg: var(--c-ink);
+  --bg-2: var(--c-ink-2);
+  --bg-3: var(--c-ink-3);
+  --fg: var(--c-paper);
+  --muted: #a5a59c;
+  --line: rgb(243 241 236 / 0.17);
+  --line-strong: rgb(243 241 236 / 0.45);
+  --accent: var(--c-minio-bright);
+  --accent-text: var(--c-minio-bright);
+  --focus: var(--c-minio-bright);
+  color-scheme: dark;
+}
+
+[data-theme='paper'] {
+  --bg: var(--c-paper);
+  --bg-2: var(--c-paper-2);
+  --bg-3: var(--c-paper-3);
+  --fg: var(--c-ink);
+  --muted: var(--c-graphite);
+  --line: rgb(16 17 15 / 0.16);
+  --line-strong: rgb(16 17 15 / 0.42);
+  --accent: var(--c-minio);
+  --accent-text: var(--c-minio-deep);
+  --focus: var(--c-minio-deep);
+  color-scheme: light;
+}
+
+[data-theme='tint'] {
+  --bg: var(--c-paper-2);
+  --bg-2: var(--c-paper-3);
+}

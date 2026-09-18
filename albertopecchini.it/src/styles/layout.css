@@ -1,0 +1,1252 @@
+/* Struttura globale: barra di avanzamento, header, menu mobile, footer, tendina. */
+
+/* ── Avanzamento di lettura ───────────────────────────────────────────────── */
+
+.progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: calc(var(--z-header) + 1);
+  height: 2px;
+  pointer-events: none;
+}
+
+.progress__bar {
+  display: block;
+  height: 100%;
+  background: var(--c-minio);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.site-header {
+  --h-fg: var(--c-ink);
+  --h-muted: var(--c-graphite);
+  --h-line: rgb(16 17 15 / 0.16);
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: var(--z-header);
+  color: var(--h-fg);
+  transition: transform var(--t-2) var(--ease-out), background-color var(--t-2) ease, color var(--t-2) ease, border-color var(--t-2) ease;
+  border-bottom: 1px solid transparent;
+}
+
+[data-header-theme='ink'] .site-header:not(.is-solid) {
+  --h-fg: var(--c-paper);
+  --h-muted: #a5a59c;
+  --h-line: rgb(243 241 236 / 0.2);
+}
+
+.site-header.is-solid {
+  background: rgb(243 241 236 / 0.9);
+  border-bottom-color: var(--h-line);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+
+.site-header.is-hidden {
+  transform: translateY(-101%);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: var(--header-h);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-right: auto;
+  color: inherit;
+}
+
+.monogram {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  overflow: visible;
+}
+
+.logo__text {
+  display: grid;
+  line-height: 1.1;
+}
+
+.logo__name {
+  font-size: 0.9375rem;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.logo__role {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--h-muted, var(--muted));
+  white-space: nowrap;
+}
+
+/* il monogramma si ridisegna al passaggio e all'ingresso della pagina */
+.monogram path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.js .logo .monogram path {
+  animation: draw 1.3s var(--ease-in-out) both;
+}
+
+.js .logo .monogram__stem { animation-delay: 0.15s; }
+.js .logo .monogram__p { animation-delay: 0.3s; }
+
+.monogram__node {
+  transform-origin: 23.5px 5px;
+  transition: transform var(--t-2) var(--ease-out), fill var(--t-2) ease;
+}
+
+@media (hover: hover) {
+  .logo:hover .monogram path {
+    animation: draw 0.9s var(--ease-in-out) both;
+  }
+
+  .logo:hover .monogram__node {
+    fill: var(--c-minio);
+    transform: scale(1.5);
+  }
+}
+
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.site-nav,
+.site-header__clock,
+.site-header__cta {
+  display: none;
+}
+
+/* bottone menu */
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.25rem 0 0.75rem;
+  color: inherit;
+}
+
+.menu-toggle__label {
+  color: inherit;
+}
+
+.menu-toggle__icon {
+  position: relative;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+}
+
+.menu-toggle__icon i {
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  height: 1.5px;
+  background: currentColor;
+  transition: transform var(--t-2) var(--ease-out), top var(--t-2) var(--ease-out);
+}
+
+.menu-toggle__icon i:first-child { top: 0.7rem; }
+.menu-toggle__icon i:last-child { top: 1.2rem; }
+
+.menu-toggle__icon.is-open i:first-child { top: 0.95rem; transform: rotate(45deg); }
+.menu-toggle__icon.is-open i:last-child { top: 0.95rem; transform: rotate(-45deg); }
+
+@media (min-width: 1100px) {
+  .menu-toggle:not(.menu-toggle--close) {
+    display: none;
+  }
+
+  .site-nav,
+  .site-header__cta {
+    display: block;
+  }
+
+  .site-header__cta {
+    display: inline-flex;
+  }
+
+  .logo {
+    margin-right: 0;
+  }
+
+  .site-nav {
+    margin-inline: auto;
+  }
+
+  .site-nav__list {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.25rem, 1vw, 1rem);
+  }
+
+  .site-nav__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .site-nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    padding: 0.85rem 0.7rem;
+    font-size: 0.9375rem;
+    font-weight: 480;
+    letter-spacing: -0.01em;
+  }
+
+  .site-nav__n {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.06em;
+    color: var(--h-muted);
+    transition: color var(--t-1) ease;
+  }
+
+  .site-nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0.55rem;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--t-2) var(--ease-out);
+  }
+
+  .site-nav__link:hover::after,
+  .site-nav__link[aria-current]::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .site-nav__link[aria-current] .site-nav__n {
+    color: var(--c-minio);
+  }
+
+  .site-nav__item--sub .site-nav__link {
+    padding-right: 0.15rem;
+  }
+
+  .site-nav__item--sub .site-nav__link::after {
+    right: 0.15rem;
+  }
+
+  .site-nav__toggle {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-right: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--h-muted);
+    transition: transform var(--t-2) var(--ease-out);
+  }
+
+  .site-nav__item--sub:hover .site-nav__toggle,
+  .site-nav__toggle[aria-expanded='true'] {
+    transform: rotate(45deg);
+  }
+
+  .subnav {
+    position: absolute;
+    top: 100%;
+    left: -0.5rem;
+    width: 23rem;
+    padding-top: 0.6rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.4rem);
+    transition: opacity var(--t-1) ease, transform var(--t-2) var(--ease-out), visibility 0s linear var(--t-2);
+  }
+
+  /* hover per il mouse; da tastiera e touch si apre con il bottone (classe .is-open) */
+  .site-nav__item--sub:hover .subnav,
+  .subnav.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  .subnav__list {
+    background: var(--c-paper);
+    color: var(--c-ink);
+    border: 1px solid rgb(16 17 15 / 0.2);
+    box-shadow: 0 1.5rem 3rem -1.5rem rgb(0 0 0 / 0.3);
+  }
+
+  .subnav__list li + li {
+    border-top: 1px solid rgb(16 17 15 / 0.12);
+  }
+
+  .subnav__link {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: 0.1rem 0.5rem;
+    padding: 0.9rem 1rem;
+    transition: background-color var(--t-1) ease;
+  }
+
+  .subnav__link .label {
+    grid-row: span 2;
+    padding-top: 0.2rem;
+    color: var(--c-minio-deep);
+  }
+
+  .subnav__label {
+    font-weight: 560;
+    letter-spacing: -0.015em;
+  }
+
+  .subnav__note {
+    font-size: 0.8125rem;
+    color: var(--c-graphite);
+  }
+
+  .subnav__link:hover,
+  .subnav__link[aria-current] {
+    background: var(--c-paper-2);
+  }
+}
+
+@media (min-width: 1360px) {
+  .site-header__clock {
+    display: flex;
+    gap: 0.5rem;
+    color: var(--h-muted);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ── Menu mobile ──────────────────────────────────────────────────────────── */
+
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.7s var(--ease-in-out);
+}
+
+.menu.is-open {
+  clip-path: inset(0 0 0 0);
+}
+
+.menu__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 25%) 0 0 / 100% 100%,
+    linear-gradient(transparent, transparent);
+  opacity: 0.6;
+}
+
+.menu__top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  border-bottom: 1px solid var(--line);
+}
+
+.menu__top .logo__role {
+  color: var(--muted);
+}
+
+.menu__body {
+  position: relative;
+  display: grid;
+  gap: 2.5rem;
+  align-content: start;
+  padding-block: clamp(1.5rem, 5vh, 3.5rem);
+}
+
+.menu__item {
+  border-bottom: 1px solid var(--line);
+}
+
+.menu__link {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 0.7rem;
+}
+
+.menu__link .label {
+  min-width: 1.75rem;
+  color: var(--accent);
+}
+
+.menu__text {
+  font-size: clamp(2.25rem, 10.5vw, 4.5rem);
+  font-weight: 540;
+  font-stretch: 88%;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.menu__link[aria-current] .menu__text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: -0.02em;
+}
+
+.menu__sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  padding: 0 0 1rem 2.75rem;
+}
+
+.menu__sub a {
+  display: inline-block;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.menu__aside {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem 1rem;
+}
+
+.menu__block {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  font-size: var(--fs-small);
+}
+
+.menu__block .label {
+  margin-bottom: 0.35rem;
+}
+
+.menu__block--cta {
+  grid-column: 1 / -1;
+}
+
+.menu__block--cta .btn {
+  width: 100%;
+}
+
+.menu__social {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.menu__foot {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-block: 1rem;
+  border-top: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ingresso scaglionato delle voci */
+.menu__item,
+.menu__block {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition: opacity var(--t-2) ease, transform var(--t-3) var(--ease-out);
+}
+
+.menu.is-open .menu__item,
+.menu.is-open .menu__block {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.25s + var(--i, 0) * 55ms);
+}
+
+@media (min-width: 768px) {
+  .menu__body {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--col-gap);
+    align-content: center;
+  }
+
+  .menu__aside {
+    grid-template-columns: 1fr;
+    align-content: end;
+    padding-left: 2rem;
+    border-left: 1px solid var(--line);
+  }
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+/* La chiusura del sito, in cinque tempi: invito a tutta larghezza · filo ·
+   riga editoriale (identità, pagine, recapiti) · riga legale · firma.
+   Palette propria, un gradino più profonda dell'inchiostro delle sezioni, e un
+   solo accento. Griglia a dodici colonne in tre campate da quattro: gli assi
+   verticali cadono sempre alle colonne 1, 5 e 9. Niente riquadri, niente
+   colonne da modello: tipografia, filo e spazio. */
+
+footer.site-footer {
+  --bg: #0d0d0c;
+  --fg: #f1f0ec;
+  --muted: #92918c;
+  --line: #2a2a27;
+  --line-strong: #3b3b37;
+  --accent: var(--c-minio);
+  --accent-text: var(--c-minio);
+  --focus: var(--c-minio-bright);
+  --cols: repeat(12, minmax(0, 1fr));
+  position: relative;
+  /* lo spazio cresce arrivando in fondo: la pagina rallenta prima di chiudersi */
+  padding-block: clamp(6rem, 3.5rem + 9vw, 14rem) clamp(1.5rem, 3vw, 3rem);
+}
+
+.site-footer__inner {
+  margin-inline: auto;
+}
+
+/* link con sottolineatura che entra da sinistra ed esce verso destra:
+   la posizione cambia di colpo, si anima solo la lunghezza */
+.site-footer .uline {
+  display: inline-block;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) no-repeat 100% 100% / 0 1px;
+  background-origin: content-box;
+  transition: background-size 0.45s var(--ease-out), color 0.3s ease;
+}
+
+@media (hover: hover) {
+  .site-footer .uline:hover {
+    color: inherit;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+  }
+}
+
+.site-footer .uline:focus-visible {
+  background-position: 0 100%;
+  background-size: 100% 1px;
+}
+
+.dot--accent {
+  background: var(--accent);
+}
+
+/* ── 1 · Invito ───────────────────────────────────────────────────────────── */
+
+.foot-cta__eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  margin-bottom: clamp(2rem, 1rem + 3.5vw, 4.5rem);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.foot-cta__eyebrow p:first-child {
+  color: var(--fg);
+}
+
+.foot-cta__title {
+  font-size: clamp(2.75rem, 0.25rem + 10.6vw, 14rem);
+  font-weight: 540;
+  font-stretch: 86%;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.foot-cta__row {
+  display: grid;
+  gap: 1.75rem var(--col-gap);
+  margin-top: clamp(2.5rem, 1rem + 4.5vw, 5.5rem);
+}
+
+.foot-cta__note {
+  max-width: 34ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* L'invito: testo che "scorre" verso l'alto e freccia in un anello sottile che
+   si riempie del colore d'accento. Sul telefono diventa una riga intera, alta
+   quanto un pollice, chiusa da due fili. */
+.cta {
+  --ring: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 1.1rem;
+  border-block: 1px solid var(--line);
+  color: var(--fg);
+  font-size: clamp(1.375rem, 1rem + 1.5vw, 2.5rem);
+  font-weight: 500;
+  font-stretch: 94%;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.cta__label {
+  min-width: 0;
+}
+
+.cta__roll {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding-block: 0.06em;
+}
+
+/* il testo in uscita sfuma mentre sale, quello in entrata si accende:
+   così nessun residuo resta visibile ai bordi del riquadro */
+.cta__roll > span {
+  display: block;
+  transition: transform 0.55s var(--ease-out), opacity 0.3s ease 0.15s;
+}
+
+.cta__roll::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding-block: 0.06em;
+  opacity: 0;
+  transform: translateY(105%);
+  transition: transform 0.55s var(--ease-out), opacity 0.3s ease;
+}
+
+.cta__arrow {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--ring);
+  height: var(--ring);
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 1.25rem;
+  transition: background-color 0.5s var(--ease-out), border-color 0.5s var(--ease-out), color 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+
+.cta__arrow .icon {
+  transition: transform 0.5s var(--ease-out);
+}
+
+.cta:focus-visible .cta__roll > span {
+  transform: translateY(-105%);
+  opacity: 0;
+}
+
+.cta:focus-visible .cta__roll::after {
+  transform: none;
+  opacity: 1;
+}
+
+.cta:focus-visible .cta__arrow {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  transform: translateX(0.3rem);
+}
+
+.cta:focus-visible .cta__arrow .icon {
+  transform: translateX(0.12rem);
+}
+
+@media (hover: hover) {
+  .cta:hover .cta__roll > span {
+    transform: translateY(-105%);
+    opacity: 0;
+  }
+
+  .cta:hover .cta__roll::after {
+    transform: none;
+    opacity: 1;
+  }
+
+  .cta:hover .cta__arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+    transform: translateX(0.3rem);
+  }
+
+  .cta:hover .cta__arrow .icon {
+    transform: translateX(0.12rem);
+  }
+}
+
+.cta:active .cta__arrow {
+  transform: translateX(0.3rem) scale(0.94);
+}
+
+/* ── 2 · Filo ─────────────────────────────────────────────────────────────── */
+
+.foot-rule {
+  height: 1px;
+  margin-top: clamp(4rem, 2rem + 6vw, 8rem);
+  background: var(--line);
+  transform-origin: left center;
+}
+
+/* ── 3 · Riga editoriale: identità · pagine · recapiti ───────────────────── */
+
+.foot-meta {
+  display: grid;
+  gap: 2.75rem var(--col-gap);
+  padding-top: clamp(2.5rem, 1.5rem + 2.5vw, 4rem);
+}
+
+.foot-meta__name {
+  display: inline-block;
+  padding-block: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+@media (hover: hover) {
+  .foot-meta__name:hover {
+    color: var(--accent);
+  }
+}
+
+.foot-meta__tag {
+  margin-top: 0.35rem;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.foot-meta__areas {
+  display: grid;
+  gap: 0;
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.foot-meta__areas a {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr);
+  gap: 0 0.5rem;
+  padding-block: 0.7rem;
+}
+
+.foot-meta__area {
+  color: var(--fg);
+}
+
+.foot-meta__voci {
+  justify-self: start;
+  color: var(--muted);
+  background: linear-gradient(currentColor, currentColor) no-repeat 100% 100% / 0 1px;
+  background-origin: content-box;
+  transition: color 0.3s ease, background-size 0.45s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .foot-meta__areas a:hover .foot-meta__voci {
+    color: var(--fg);
+    background-position: 0 100%;
+    background-size: 100% 1px;
+  }
+}
+
+.foot-meta__areas a:focus-visible .foot-meta__voci {
+  color: var(--fg);
+  background-position: 0 100%;
+  background-size: 100% 1px;
+}
+
+/* pagine: sul telefono due colonne da tre, comode per il pollice */
+.foot-meta__nav ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.5rem;
+}
+
+.foot-meta__nav a {
+  padding-block: 0.6rem;
+  font-size: var(--fs-body);
+  font-weight: 480;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+}
+
+.foot-meta__nav a[aria-current]::before {
+  content: '';
+  display: inline-block;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 0.12em;
+}
+
+.foot-meta__contact {
+  display: grid;
+  justify-items: start;
+  font-size: var(--fs-body);
+  letter-spacing: -0.01em;
+}
+
+.foot-meta__contact a {
+  padding-block: 0.45rem;
+}
+
+.foot-meta__contact p {
+  margin-top: 0.6rem;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ── 4 · Riga legale ──────────────────────────────────────────────────────── */
+
+.foot-legal {
+  display: grid;
+  gap: 1.25rem var(--col-gap);
+  margin-top: clamp(3.5rem, 2rem + 4vw, 6rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.foot-legal__id {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.foot-legal__id p:first-child {
+  color: var(--fg);
+}
+
+.foot-legal__policy,
+.foot-legal__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.75rem;
+  color: var(--fg);
+}
+
+/* sul telefono prima i bersagli da toccare (social, poi privacy e cookie),
+   in fondo il titolare */
+.foot-legal__social {
+  order: -2;
+}
+
+.foot-legal__policy {
+  order: -1;
+}
+
+.foot-legal__policy .uline {
+  padding-block: 0.75rem;
+}
+
+.foot-legal .ext {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding-block: 0.75rem;
+}
+
+.foot-legal .ext .icon {
+  font-size: 0.875rem;
+  transition: transform 0.45s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .foot-legal .ext:hover .icon {
+    transform: translate(0.15rem, -0.15rem);
+  }
+}
+
+/* ── 5 · Firma ────────────────────────────────────────────────────────────── */
+
+.foot-sign {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: center;
+  margin-top: clamp(3.5rem, 2rem + 5vw, 8rem);
+}
+
+.foot-sign__mark {
+  display: block;
+  width: clamp(9rem, 42vw, 26rem);
+  color: var(--fg);
+}
+
+.foot-sign__float {
+  display: block;
+  will-change: transform;
+}
+
+.sig {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+/* tratto sottile: il marchio, non il pittogramma del header */
+.sig__mark path {
+  stroke-width: 0.34;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.3s var(--ease-in-out);
+}
+
+.sig__stem { transition-delay: 0.2s; }
+.sig__p { transition-delay: 0.4s; }
+
+/* linee di costruzione: appena percettibili, si accendono al passaggio */
+.sig__guides {
+  stroke-width: 0.14;
+  opacity: 0.4;
+  transition: opacity 0.6s ease;
+}
+
+.sig__guide--bowl {
+  stroke-dasharray: 0.7 0.7;
+}
+
+.sig__node {
+  transform-origin: 23.5px 5px;
+  transition: transform 0.5s var(--ease-out), fill 0.5s ease;
+}
+
+.js [data-reveal='draw'] .sig__mark path {
+  stroke-dashoffset: 1;
+}
+
+.js [data-reveal='draw'] .sig__guides {
+  opacity: 0;
+  transition-delay: 1s;
+}
+
+.js [data-reveal='draw'] .sig__node {
+  opacity: 0;
+  transition: opacity 0.4s ease 0.2s, transform 0.5s var(--ease-out), fill 0.5s ease;
+}
+
+.js [data-reveal='draw'].is-in .sig__node {
+  opacity: 1;
+}
+
+/* la riga di chiusura compare quando il tratto è quasi finito */
+.js [data-reveal='draw'] .foot-sign__meta {
+  opacity: 0;
+  transition: opacity var(--t-3) ease 0.6s;
+}
+
+.js [data-reveal='draw'].is-in .foot-sign__meta {
+  opacity: 1;
+}
+
+.js [data-reveal='draw'].is-in .sig__mark path {
+  stroke-dashoffset: 0;
+}
+
+.js [data-reveal='draw'].is-in .sig__guides {
+  opacity: 0.4;
+}
+
+@media (hover: hover) {
+  .foot-sign__mark:hover .sig__guides,
+  .js [data-reveal='draw'].is-in .foot-sign__mark:hover .sig__guides {
+    opacity: 0.85;
+    transition-delay: 0s;
+  }
+
+  .foot-sign__mark:hover .sig__node {
+    fill: var(--accent);
+    transform: scale(1.8);
+  }
+}
+
+.foot-sign__mark:focus-visible .sig__node {
+  fill: var(--accent);
+  transform: scale(1.8);
+}
+
+.foot-sign__meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.foot-sign__meta .label {
+  font-size: 0.75rem;
+}
+
+.foot-sign__top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  color: var(--fg);
+}
+
+.foot-sign__top .label {
+  color: inherit;
+}
+
+.foot-sign__top .icon {
+  transition: transform 0.45s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .foot-sign__top:hover .icon {
+    transform: translateY(-0.2rem);
+  }
+}
+
+/* ── Tablet e desktop: tre campate da quattro colonne ─────────────────────── */
+
+@media (min-width: 768px) {
+  .foot-cta__row {
+    grid-template-columns: var(--cols);
+    align-items: end;
+  }
+
+  .cta {
+    grid-column: 1 / 9;
+    display: inline-flex;
+    justify-self: start;
+    justify-content: flex-start;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding-block: 0.5rem;
+    border-block: 0;
+  }
+
+  .cta__arrow {
+    --ring: clamp(3.25rem, 2rem + 1.6vw, 4rem);
+  }
+
+  .foot-cta__note {
+    grid-column: 9 / 13;
+    padding-bottom: 0.6rem;
+  }
+
+  .foot-meta,
+  .foot-legal {
+    grid-template-columns: var(--cols);
+  }
+
+  .foot-meta__brand,
+  .foot-legal__id {
+    grid-column: 1 / 5;
+  }
+
+  .foot-meta__nav,
+  .foot-legal__policy {
+    grid-column: 5 / 9;
+  }
+
+  .foot-meta__contact,
+  .foot-legal__social {
+    grid-column: 9 / 13;
+  }
+
+  .foot-legal__policy,
+  .foot-legal__social {
+    order: 0;
+  }
+
+  /* su tablet i tre social stanno in colonna, come le tre righe del titolare */
+  .foot-legal__social {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .foot-meta__nav ul {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .foot-meta__nav a {
+    padding-block: 0.3rem;
+  }
+
+  .foot-meta__name {
+    padding-block: 0.25rem;
+  }
+
+  .foot-meta__areas {
+    gap: 0.3rem;
+    margin-top: 1.5rem;
+  }
+
+  .foot-meta__areas a {
+    padding-block: 0.15rem;
+  }
+
+  .foot-meta__contact a {
+    padding-block: 0.3rem;
+  }
+
+  .foot-legal__policy,
+  .foot-legal__social {
+    align-content: start;
+  }
+
+  .foot-legal__policy .uline,
+  .foot-legal .ext {
+    padding-block: 0.15rem;
+  }
+
+  .foot-sign {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    justify-items: start;
+    gap: var(--col-gap);
+  }
+
+  .foot-sign__mark {
+    width: clamp(9rem, 22vw, 26rem);
+  }
+
+  .foot-sign__meta {
+    grid-template-columns: auto auto;
+    justify-content: end;
+    gap: 2.5rem;
+    padding-bottom: 0.35rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .foot-legal__social {
+    flex-direction: row;
+    gap: 0 1.75rem;
+  }
+
+  .foot-cta__row {
+    margin-top: clamp(4rem, 2rem + 3vw, 6rem);
+  }
+
+  .foot-meta__areas {
+    margin-top: 2rem;
+  }
+}
+
+/* ── Tendina di transizione tra le pagine ─────────────────────────────────── */
+
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-curtain);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.curtain__panel {
+  position: absolute;
+  inset: 0;
+  background: var(--c-ink);
+  transform: translateY(101%);
+}
+
+.curtain__mark {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  color: var(--c-paper);
+  opacity: 0;
+}
+
+.curtain__mark .monogram {
+  width: 4rem;
+  height: 4rem;
+  stroke-width: 1.6;
+}
+
+.curtain__mark .label {
+  color: #a5a59c;
+}
+
+/* uscita: il pannello sale a coprire */
+.is-leaving .curtain {
+  visibility: visible;
+}
+
+.is-leaving .curtain__panel {
+  transform: none;
+  transition: transform 0.55s var(--ease-in-out);
+}
+
+.is-leaving .curtain__mark {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.25s;
+}
+
+.is-leaving .curtain__mark .monogram path {
+  animation: draw 0.7s var(--ease-in-out) 0.2s both;
+}
+
+/* ingresso: parte coperto, poi il pannello esce verso l'alto */
+.is-entering .curtain {
+  visibility: visible;
+}
+
+.is-entering .curtain__panel {
+  transform: none;
+}
+
+.is-entering .curtain__mark {
+  opacity: 1;
+}
+
+.is-entering.is-entered .curtain__panel {
+  transform: translateY(-101%);
+  transition: transform 0.7s var(--ease-in-out);
+}
+
+.is-entering.is-entered .curtain__mark {
+  opacity: 0;
+  transform: translateY(-3rem);
+  transition: opacity 0.3s ease, transform 0.7s var(--ease-in-out);
+}

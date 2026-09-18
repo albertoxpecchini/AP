@@ -1,0 +1,462 @@
+/* Reset essenziale, tipografia di base, utilità e sistema di rivelazione. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1.5rem);
+  scrollbar-gutter: stable;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+body.is-locked {
+  overflow: hidden;
+}
+
+[data-theme] {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote, address {
+  margin: 0;
+}
+
+ul, ol {
+  padding: 0;
+  list-style: none;
+}
+
+address {
+  font-style: normal;
+}
+
+img, svg, video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+summary {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+main:focus {
+  outline: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ── Utilità ──────────────────────────────────────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: calc(var(--z-curtain) + 1);
+  padding: 0.75rem 1rem;
+  background: var(--c-ink);
+  color: var(--c-paper);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform var(--t-1) var(--ease-out);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+.container {
+  width: min(100% - var(--gutter) * 2, var(--max));
+  margin-inline: auto;
+}
+
+.container--wide {
+  width: min(100% - var(--gutter) * 2, 120rem);
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+/* ── Tipografia ───────────────────────────────────────────────────────────── */
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* parole lunghe (nomi di dominio, termini tecnici) non devono mai allargare la pagina */
+h1, h2, h3, h4, p, dd, li, a, figcaption {
+  overflow-wrap: break-word;
+}
+
+.h1, .h2, .h3, .h4 {
+  font-weight: 560;
+  font-stretch: 94%;
+  letter-spacing: var(--track-display);
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+
+.h1 { font-size: var(--fs-h1); }
+.h2 { font-size: var(--fs-h2); line-height: 1; }
+.h3 { font-size: var(--fs-h3); line-height: 1.08; letter-spacing: -0.025em; }
+.h4 { font-size: var(--fs-h4); line-height: 1.2; letter-spacing: -0.015em; font-stretch: 100%; }
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.42;
+  letter-spacing: -0.012em;
+  color: var(--fg);
+  text-wrap: pretty;
+  max-width: 42ch;
+}
+
+.serif-i {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: -0.01em;
+}
+
+/* il corsivo graziato appare più piccolo del grottesco: lo compensiamo nei titoli */
+.h1 .serif-i, .h2 .serif-i, .w__i.serif-i, .hero__claim .serif-i {
+  font-size: 1.07em;
+  line-height: 0.9;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* ── Elementi grafici ricorrenti ──────────────────────────────────────────── */
+
+.rule {
+  height: 1px;
+  background: var(--line-strong);
+}
+
+/* righello: tacche ogni 8px, più lunghe ogni 40 */
+.rule--ticks {
+  position: relative;
+  height: 9px;
+  background:
+    linear-gradient(var(--line-strong), var(--line-strong)) 0 0 / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 40px) 0 0 / 100% 9px no-repeat,
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 8px) 0 0 / 100% 5px no-repeat;
+}
+
+.dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--muted);
+  vertical-align: 0.02em;
+}
+
+.dot--live {
+  background: #2f9e5b;
+  box-shadow: 0 0 0 0 rgb(47 158 91 / 0.5);
+  animation: pulse 2.4s ease-out infinite;
+}
+
+@keyframes pulse {
+  70% { box-shadow: 0 0 0 0.6rem rgb(47 158 91 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(47 158 91 / 0); }
+}
+
+/* crocini di registro agli angoli di un riquadro */
+.mark {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--fg), var(--fg)) center / 100% 1px no-repeat,
+    linear-gradient(var(--fg), var(--fg)) center / 1px 100% no-repeat;
+  opacity: 0.7;
+}
+
+.mark--tl { top: -8px; left: -8px; }
+.mark--tr { top: -8px; right: -8px; }
+.mark--bl { bottom: -8px; left: -8px; }
+.mark--br { bottom: -8px; right: -8px; }
+
+.icon {
+  flex: none;
+}
+
+.icon--flip {
+  transform: rotate(180deg);
+}
+
+/* ── Tooltip (attributo data-tooltip) ─────────────────────────────────────── */
+
+[data-tooltip] {
+  position: relative;
+}
+
+/* Il tooltip esiste solo al passaggio o al fuoco: da nascosto non deve
+   occupare spazio (vicino al bordo allargherebbe la pagina). */
+[data-tooltip]::after {
+  --tip-from: translate(-50%, 4px);
+  --tip-to: translate(-50%, 0);
+  content: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.6rem);
+  z-index: 5;
+  padding: 0.4rem 0.6rem;
+  background: var(--c-ink);
+  color: var(--c-paper);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid rgb(243 241 236 / 0.2);
+  transform: var(--tip-to);
+  pointer-events: none;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  content: attr(data-tooltip);
+  animation: tip var(--t-1) var(--ease-out) both;
+}
+
+@keyframes tip {
+  from { opacity: 0; transform: var(--tip-from); }
+  to { opacity: 1; transform: var(--tip-to); }
+}
+
+/* contrassegni negli angoli a destra: il tooltip si allinea al bordo */
+.card > .sample[data-tooltip]::after,
+.fcard > .sample[data-tooltip]::after {
+  --tip-from: translate(0, 4px);
+  --tip-to: translate(0, 0);
+  left: auto;
+  right: 0;
+}
+
+/* ── Rivelazione allo scorrimento ─────────────────────────────────────────── */
+/* Attiva solo con JS (classe .js su <html>): senza JS tutto è visibile. */
+
+.js [data-reveal] {
+  --d: 0ms;
+}
+
+.js [data-reveal='up'] {
+  opacity: 0;
+  transform: translate3d(0, 1.75rem, 0);
+  transition: opacity var(--t-3) var(--ease-out) var(--d), transform var(--t-3) var(--ease-out) var(--d);
+}
+
+.js [data-reveal='fade'] {
+  opacity: 0;
+  transition: opacity var(--t-3) ease var(--d);
+}
+
+.js [data-reveal='scale'] {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity var(--t-3) var(--ease-out) var(--d), transform var(--t-4) var(--ease-out) var(--d);
+}
+
+/* "clip": si apre il riquadro marcato [data-clip] (non l'intero elemento, così
+   crocini e didascalie fuori dal riquadro non vengono tagliati) */
+.js [data-reveal='clip'] [data-clip],
+.js [data-reveal='clip'][data-clip] {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path var(--t-4) var(--ease-out) var(--d);
+}
+
+.js [data-reveal='clip'] .media__inner,
+.js [data-reveal='clip'] .cover__inner {
+  transform: scale(1.12);
+  transition: transform 1.6s var(--ease-out) var(--d);
+}
+
+.js [data-reveal='clip'] .media__caption,
+.js [data-reveal='clip'] .hero__caption,
+.js [data-reveal='clip'] .mark {
+  opacity: 0;
+  transition: opacity var(--t-3) ease calc(var(--d) + 0.5s);
+}
+
+/* "line": un filo che si stende da sinistra */
+.js [data-reveal='line'] {
+  transform: scaleX(0);
+  transition: transform var(--t-4) var(--ease-out) var(--d);
+}
+
+/* "draw": il tratto si disegna (regole sui path in layout.css, sezione footer) */
+
+.js [data-reveal='words'] .w__i {
+  transform: translate3d(0, 108%, 0);
+  transition: transform 0.95s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 32ms + var(--d, 0ms));
+}
+
+.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.js [data-reveal='clip'].is-in [data-clip],
+.js [data-reveal='clip'].is-in[data-clip] {
+  clip-path: inset(0 0 0 0);
+}
+
+.js [data-reveal='clip'].is-in .media__inner,
+.js [data-reveal='clip'].is-in .cover__inner,
+.js [data-reveal='words'].is-in .w__i {
+  transform: none;
+}
+
+.js [data-reveal='clip'].is-in .media__caption,
+.js [data-reveal='clip'].is-in .hero__caption,
+.js [data-reveal='clip'].is-in .mark {
+  opacity: 0.7;
+}
+
+.js [data-reveal='clip'].is-in .media__caption,
+.js [data-reveal='clip'].is-in .hero__caption {
+  opacity: 1;
+}
+
+.words {
+  display: inline;
+}
+
+.w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.08em 0.06em 0.14em;
+  margin: -0.08em -0.06em -0.14em;
+}
+
+.w__i {
+  display: inline-block;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js [data-reveal],
+  .js [data-reveal] [data-clip],
+  .js [data-reveal] .w__i,
+  .js [data-reveal] .media__inner,
+  .js [data-reveal] .cover__inner,
+  .js [data-reveal] .media__caption,
+  .js [data-reveal] .hero__caption,
+  .js [data-reveal] .sig__guides,
+  .js [data-reveal] .foot-sign__meta {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  .js [data-reveal='draw'] .sig__mark path {
+    stroke-dashoffset: 0 !important;
+  }
+}
