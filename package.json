@@ -1,0 +1,16 @@
+{
+  "$comment": "Il progetto vero è in albertopecchini.it/. Questo file esiste solo perché i comandi funzionino anche lanciati dalla radice del repository, senza dover ricordare il `cd`.",
+  "name": "ap",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix albertopecchini.it run dev",
+    "build": "npm --prefix albertopecchini.it run build",
+    "preview": "npm --prefix albertopecchini.it run preview",
+    "email": "npm --prefix albertopecchini.it run email --",
+    "email:new": "npm --prefix albertopecchini.it run email:new --",
+    "email:list": "npm --prefix albertopecchini.it run email:list",
+    "email:profiles": "npm --prefix albertopecchini.it run email:profiles",
+    "email:theme": "npm --prefix albertopecchini.it run email:theme"
+  }
+}

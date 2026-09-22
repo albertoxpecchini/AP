@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Email generate: gli output si rigenerano dal file di input, che invece si tiene.
+# Il tema email è derivato da src/styles/tokens.css e si rigenera da solo.
+emails/out/
+emails/logs/
+config/email-theme.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,0 +1,53 @@
+{
+  "$comment": "UNICA FONTE per gli account mittente. Non duplicare questi dati nel codice.",
+  "version": 1,
+  "defaultProfile": null,
+  "profiles": [
+    {
+      "key": "yahoo",
+      "label": "Personale",
+      "provider": "Yahoo Mail",
+      "email": "pzkko@yahoo.com",
+      "use": "personale",
+      "footerId": "yahoo",
+      "aliases": ["yahoo", "personale", "privato", "pzkko@yahoo.com", "pzkko"]
+    },
+    {
+      "key": "proton",
+      "label": "Lavoro / Azienda",
+      "provider": "Proton Mail",
+      "email": "pecchini@protonmail.com",
+      "use": "lavoro",
+      "footerId": "proton",
+      "aliases": [
+        "proton",
+        "protonmail",
+        "lavoro",
+        "azienda",
+        "professionale",
+        "studio",
+        "pecchini@protonmail.com",
+        "pecchini"
+      ]
+    },
+    {
+      "key": "gmail",
+      "label": "Università",
+      "provider": "Gmail",
+      "email": "398893@studenti.unimore.it",
+      "use": "universita",
+      "footerId": "gmail",
+      "aliases": [
+        "gmail",
+        "google",
+        "universita",
+        "università",
+        "unimore",
+        "studenti",
+        "ateneo",
+        "398893@studenti.unimore.it",
+        "398893"
+      ]
+    }
+  ]
+}

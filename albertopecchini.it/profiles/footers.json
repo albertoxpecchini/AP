@@ -1,0 +1,169 @@
+{
+  "$comment": "Libreria firme versionata. `current` punta alla versione attiva di ogni profilo. Le versioni non vengono mai sovrascritte in silenzio: ADD_VERSION accoda, REPLACE archivia la precedente.",
+  "version": 1,
+  "footers": {
+    "yahoo": {
+      "current": "v1",
+      "versions": [
+        {
+          "id": "v1",
+          "createdAt": "2026-09-18",
+          "source": "seed",
+          "heading": "Alberto Pecchini",
+          "name": "Alberto Pecchini",
+          "role": "Diplomato geometra",
+          "org": "Disegno tecnico · Web · Grafica",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pzkko@yahoo.com",
+              "href": "mailto:pzkko@yahoo.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 351 0355506",
+              "href": "tel:+393510355506"
+            }
+          ],
+          "address": "Rivalta sul Mincio (MN)",
+          "links": [
+            {
+              "label": "albertopecchini.it",
+              "url": "https://albertopecchini.it"
+            }
+          ],
+          "social": [
+            {
+              "label": "Instagram",
+              "url": "https://www.instagram.com/albertoxpecchini/",
+              "handle": "@albertoxpecchini"
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    "proton": {
+      "current": "v1",
+      "versions": [
+        {
+          "id": "v1",
+          "createdAt": "2026-09-18",
+          "source": "seed",
+          "heading": "Alberto Pecchini",
+          "name": "Alberto Pecchini",
+          "role": "Diplomato geometra — non iscritto all’albo",
+          "org": "Rilievo · CAD · 3D · Web · Identità visive",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pecchini@protonmail.com",
+              "href": "mailto:pecchini@protonmail.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 351 0355506",
+              "href": "tel:+393510355506"
+            }
+          ],
+          "address": "Rivalta sul Mincio (MN) · Mantova e provincia",
+          "links": [
+            {
+              "label": "albertopecchini.it",
+              "url": "https://albertopecchini.it"
+            }
+          ],
+          "social": [
+            {
+              "label": "GitHub",
+              "url": "https://github.com/albertoxpecchini",
+              "handle": "albertoxpecchini"
+            },
+            {
+              "label": "Instagram",
+              "url": "https://www.instagram.com/albertoxpecchini/",
+              "handle": "@albertoxpecchini"
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    "gmail": {
+      "current": "v2",
+      "versions": [
+        {
+          "id": "v1",
+          "createdAt": "2026-09-18",
+          "source": "seed",
+          "heading": "Alberto Pecchini",
+          "name": "Alberto Pecchini",
+          "role": "Studente",
+          "org": "Università degli Studi di Modena e Reggio Emilia",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "398893@studenti.unimore.it",
+              "href": "mailto:398893@studenti.unimore.it"
+            }
+          ],
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [
+            "Matricola 398893"
+          ]
+        },
+        {
+          "id": "v2",
+          "createdAt": "2026-09-18",
+          "source": "add_version",
+          "replaces": null,
+          "heading": "Alberto Pecchini",
+          "name": "Alberto Pecchini",
+          "role": "Studente — matricola 398893",
+          "org": "Università degli Studi di Modena e Reggio Emilia",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "398893@studenti.unimore.it",
+              "href": "mailto:398893@studenti.unimore.it"
+            }
+          ],
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": []
+        },
+        {
+          "id": "v3",
+          "createdAt": "2026-09-18",
+          "source": "add_version",
+          "replaces": null,
+          "heading": "Alberto Pecchini",
+          "name": "Alberto Pecchini",
+          "role": "Matricola 398893",
+          "org": "Dipartimento di Ingegneria \"Enzo Ferrari\" — Costruzioni e Gestione del Territorio (classe L-P01)",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "398893@studenti.unimore.it",
+              "href": "mailto:398893@studenti.unimore.it"
+            }
+          ],
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": []
+        }
+      ]
+    }
+  }
+}
