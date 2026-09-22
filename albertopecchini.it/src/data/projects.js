@@ -25,17 +25,24 @@ export const categories = [
   { key: 'altro', label: 'Altro' },
 ]
 
-/** Le tre aree del portfolio, ognuna con la propria pagina. */
-export const areas = {
+/** Le aree del portfolio, ognuna con la propria pagina.
+ *  `hidden: true` = area senza lavori reali da mostrare: la pagina non viene
+ *  generata e l'area sparisce da menù, indici e rimandi. Togliere `hidden`
+ *  quando c'è almeno un progetto pubblicato di quell'area. */
+export const allAreas = {
   tecnico: { label: 'Progetti tecnici', short: 'Tecnico', href: '/portfolio/tecnico/' },
   web: { label: 'Progetti web', short: 'Web', href: '/portfolio/web/' },
-  grafica: { label: 'Progetti grafici', short: 'Grafica', href: '/portfolio/grafica/' },
+  grafica: { label: 'Progetti grafici', short: 'Grafica', href: '/portfolio/grafica/', hidden: true },
 }
+
+/** Le aree effettivamente pubblicate. `allAreas` resta la fonte per le briciole
+ *  di navigazione dei singoli progetti, che devono funzionare comunque. */
+export const areas = Object.fromEntries(Object.entries(allAreas).filter(([, a]) => !a.hidden))
 
 const img = (art, options, alt, caption) => ({ art, ...options, alt, caption })
 const shot = (file, width, height, alt, caption) => ({ src: `/media/web/${file}`, width, height, alt, caption })
 
-export const projects = [
+const allProjects = [
   // ═══ TECNICO ═══════════════════════════════════════════════════════════════
   {
     slug: 'recupero-annesso-rustico',
@@ -952,6 +959,16 @@ export const projects = [
     sample: true,
   },
 ]
+
+// ── Progetti dimostrativi ────────────────────────────────────────────────────
+// I progetti con `sample: true` restano nel file ma non vengono pubblicati:
+// sono modelli di come si presenta un lavoro di quel tipo, pronti da riattivare
+// uno alla volta sostituendoli con un incarico reale (basta togliere `sample`).
+// Portare `showSamples` a `true` per rivederli tutti online, contrassegnati
+// dal rombo ◇ (l'avviso si regola con `showSampleNotice` in site.js).
+export const showSamples = false
+
+export const projects = showSamples ? allProjects : allProjects.filter((p) => !p.sample)
 
 // ── Selettori ────────────────────────────────────────────────────────────────
 

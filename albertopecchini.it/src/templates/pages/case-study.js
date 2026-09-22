@@ -1,6 +1,6 @@
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
-import { areas, nextOf } from '../../data/projects.js'
+import { allAreas, nextOf } from '../../data/projects.js'
 import { BRANDS } from '../../art/brand.js'
 import { button, media, deviceStage, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark } from '../components/ui.js'
 import { projectHref, previewOf } from '../components/project.js'
@@ -35,7 +35,7 @@ const sec = (i, body, extraClass = '', theme = '') => {
 }
 
 export function caseStudyPage(p) {
-  const area = areas[p.area]
+  const area = allAreas[p.area]
   const next = nextOf(p.slug)
   const nextPv = previewOf(next)
   const brand = p.brand && BRANDS[p.brand]
@@ -175,7 +175,7 @@ export const caseStudyLd = (p, abs) => ({
   dateCreated: String(p.year),
   inLanguage: 'it',
   creator: { '@id': abs('/#person') },
-  genre: areas[p.area].label,
+  genre: allAreas[p.area].label,
   keywords: [...p.types, ...p.technologies].join(', '),
   locationCreated: { '@type': 'Place', name: p.location },
 })

@@ -20,7 +20,7 @@ const dms = (v, [pos, neg]) => {
 }
 const COORDS = `${dms(site.location.lat, ['N', 'S'])} · ${dms(site.location.lon, ['E', 'W'])}`
 
-export function layout({ route, title, description, body, assets, jsonld = [], headerTheme = 'paper', pageClass, ogImage = '/og.png', noindex = false, hideCta = false }) {
+export function layout({ route, title, description, body, assets, jsonld = [], headerTheme = 'paper', pageClass, ogImage = '/og.png', noindex = false, hideCta = false, head = '' }) {
   const fullTitle = route.path === '/' ? title : `${title} — ${site.name}`
   const url = abs(route.canonical || route.path)
 
@@ -63,6 +63,7 @@ setTimeout(function(){if(!c.contains('is-ready')){c.remove('js','is-entering');c
 </script>
 ${jsonld.map((data) => `<script type="application/ld+json">${jsonLd(data)}</script>`)}
 <script type="speculationrules">{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/media/*"}}]},"eagerness":"moderate"}]}</script>
+${head}
 </head>
 <body class="${cx('page', pageClass)}" data-header-theme="${headerTheme}">
 <a class="skip" href="#main">Vai al contenuto</a>
@@ -307,7 +308,7 @@ export const personLd = () => ({
   email: `mailto:${site.contact.email}`,
   address: { '@type': 'PostalAddress', addressLocality: site.location.city, addressRegion: site.location.region, postalCode: site.location.cap, addressCountry: site.location.country },
   knowsAbout: ['Rilievo topografico', 'Catasto', 'AutoCAD', 'BIM', 'Web design', 'Sviluppo frontend', 'Brand identity', 'Graphic design'],
-  sameAs: site.social.filter((s) => !/linkedin\.com\/?$/.test(s.url)).map((s) => s.url),
+  sameAs: site.social.map((s) => s.url),
 })
 
 export const serviceLd = () => ({

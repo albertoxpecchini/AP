@@ -52,7 +52,7 @@ export function serviziPage() {
                 <p class="sarea__lead serif-i">${esc(a.lead)}</p>
                 <p class="sarea__intro">${esc(a.intro)}</p>
                 ${media(a.art, { ratio: '4/3', caption: null, className: 'sarea__art' })}
-                ${textLink({ href: a.portfolio, label: `Progetti: ${a.title.toLowerCase()}` })}
+                ${a.portfolio ? textLink({ href: a.portfolio, label: `Progetti: ${a.title.toLowerCase()}` }) : ''}
               </div>
             </div>
             <ol class="sarea__list">
@@ -263,10 +263,6 @@ export function studioPage() {
       </div>
     </section>
 
-    <section class="sfull" aria-label="Lo studio">
-      ${media(photos.studio, { ratio: '21/9', parallax: 0.1, className: 'sfull__media' })}
-    </section>
-
     <section class="section sval">
       <div class="container">
         ${sectionHead({ index: 'C', label: 'Valori', title: 'Quello su cui non tratto' })}
@@ -291,7 +287,11 @@ export function studioPage() {
 
 const cvList = (items) => html`
   <ol class="cv__list">
-    ${items.map((e) => `<li><span class="label cv__period">${esc(e.period)}</span><div><h3 class="h4">${esc(e.title)}</h3><p>${esc(e.role)}</p></div></li>`)}
+    ${items.map(
+      (e) => `<li><span class="label cv__period">${esc(e.period)}</span><div><h3 class="h4">${esc(e.title)}</h3><p>${esc(e.role)}</p>${
+        e.detail?.length ? `<ul class="cv__detail">${e.detail.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''
+      }</div></li>`,
+    )}
   </ol>
 `
 
@@ -324,6 +324,10 @@ export function profiloPage() {
         <section class="cv__sec">
           <h2 class="label">Competenze</h2>
           <div class="cv__skills">${profile.skills.map((g) => `<div><h3 class="h4">${esc(g.group)}</h3>${tagList(g.items)}</div>`)}</div>
+        </section>
+        <section class="cv__sec">
+          <h2 class="label">Attestati e certificazioni</h2>
+          <ul class="cv__plain">${profile.certifications.map((c) => `<li><span>${esc(c.title)} — ${esc(c.issuer)}</span><span class="label">${esc(c.year)}</span></li>`)}</ul>
         </section>
         <section class="cv__sec cv__sec--cols">
           <div><h2 class="label">Lingue</h2><ul class="cv__plain">${profile.languages.map((l) => `<li><span>${esc(l.name)}</span><span class="label">${esc(l.level)}</span></li>`)}</ul></div>

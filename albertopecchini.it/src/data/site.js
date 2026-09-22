@@ -6,6 +6,8 @@
 //  elenca in console finché non vengono compilati e tolti dalla lista.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { areas } from './projects.js'
+
 export const site = {
   url: 'https://albertopecchini.it',
   lang: 'it',
@@ -68,7 +70,6 @@ export const site = {
   social: [
     { key: 'instagram', label: 'Instagram', handle: '@albertoxpecchini', url: 'https://www.instagram.com/albertoxpecchini/' },
     { key: 'github', label: 'GitHub', handle: 'albertoxpecchini', url: 'https://github.com/albertoxpecchini' },
-    { key: 'linkedin', label: 'LinkedIn', handle: 'Alberto Pecchini', url: 'https://www.linkedin.com/' },
   ],
 
   // `from` indica da quando si è liberi: lasciarlo vuoto se la disponibilità
@@ -80,10 +81,15 @@ export const site = {
   },
 
   // Modulo contatti. Con `endpoint` vuoto il modulo compone una email nel client
-  // di posta del visitatore; con un endpoint (Formspree, Web3Forms, una propria
-  // API…) invia i dati in POST come JSON e si aspetta una risposta 2xx.
+  // di posta del visitatore; con un endpoint invia i dati in POST come JSON e si
+  // aspetta una risposta 2xx. Qui punta alla funzione serverless `api/contatti.js`,
+  // che consegna la richiesta via email (Resend) e via WhatsApp (CallMeBot).
   form: {
-    endpoint: '',
+    endpoint: '/api/contatti',
+    // Chiave pubblica di Cloudflare Turnstile: finisce nell'HTML, non è un segreto
+    // (il segreto è TURNSTILE_SECRET_KEY, variabile d'ambiente su Vercel).
+    // Lasciandola vuota il riquadro antispam sparisce e il modulo resta funzionante.
+    turnstileSiteKey: '',
     subject: 'Richiesta dal sito — ',
     projectTypes: [
       'Rilievo o restituzione grafica',
@@ -99,7 +105,8 @@ export const site = {
   },
 
   // Mostra il contrassegno ◇ sui progetti dimostrativi (`sample: true` in projects.js).
-  // Portare a `false` quando il portfolio contiene solo lavori reali.
+  // Oggi non ha effetto: i dimostrativi non vengono pubblicati (`showSamples`
+  // in projects.js). Serve solo se li si rimette online, per dichiararli.
   showSampleNotice: true,
 }
 
@@ -108,11 +115,15 @@ export const nav = [
   {
     label: 'Portfolio',
     href: '/portfolio/',
+    // Le voci d'area seguono le aree pubblicate: un'area nascosta
+    // (`hidden` in src/data/projects.js) sparisce da sola anche dai menù.
     children: [
       { label: 'Tutti i progetti', href: '/portfolio/', note: 'Indice completo con filtri' },
-      { label: 'Progetti tecnici', href: '/portfolio/tecnico/', note: 'Rilievi, CAD, 3D, pratiche' },
-      { label: 'Progetti web', href: '/portfolio/web/', note: 'Siti, landing, interfacce' },
-      { label: 'Progetti grafici', href: '/portfolio/grafica/', note: 'Brand, stampa, editoria' },
+      ...[
+        { key: 'tecnico', label: 'Progetti tecnici', href: '/portfolio/tecnico/', note: 'Rilievi, CAD, 3D, pratiche' },
+        { key: 'web', label: 'Progetti web', href: '/portfolio/web/', note: 'Siti, landing, interfacce' },
+        { key: 'grafica', label: 'Progetti grafici', href: '/portfolio/grafica/', note: 'Brand, stampa, editoria' },
+      ].filter((c) => areas[c.key]),
     ],
   },
   { label: 'Servizi', href: '/servizi/' },
@@ -146,9 +157,4 @@ export const stats = [
 
 // Percorsi (dot-path) che contengono ancora valori segnaposto.
 // Togliere la voce dalla lista dopo aver inserito il dato reale.
-export const placeholders = [
-  'site.social[linkedin].url — profilo LinkedIn',
-  'stats[clients].value — numero di clienti',
-  'studio: fotografia dello studio (src/data/studio.js → photos.studio)',
-  'projects: i progetti con `sample: true` sono dimostrativi',
-]
+export const placeholders = []

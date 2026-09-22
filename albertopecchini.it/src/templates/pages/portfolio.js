@@ -60,7 +60,9 @@ export function portfolioPage() {
         <div class="container pf__bar-inner">
           <div class="pf__cats" role="group" aria-label="Filtra per categoria">
             <button class="chip is-active" type="button" data-filter-cat="" aria-pressed="true">Tutti<sup>${count(projects.length)}</sup></button>
-            ${categories.map((c) => `<button class="chip" type="button" data-filter-cat="${c.key}" aria-pressed="false">${esc(c.label)}<sup>${count(catCount(c.key))}</sup></button>`)}
+            ${categories
+              .filter((c) => catCount(c.key)) // una categoria senza progetti non è un filtro: si toglie
+              .map((c) => `<button class="chip" type="button" data-filter-cat="${c.key}" aria-pressed="false">${esc(c.label)}<sup>${count(catCount(c.key))}</sup></button>`)}
           </div>
           <div class="pf__more">
             <button class="pf__toggle label" type="button" aria-expanded="false" aria-controls="pf-advanced" data-filter-advanced>${icon('plus')}<span>Altri filtri</span><span class="pf__badge" data-filter-badge hidden>0</span></button>
@@ -123,7 +125,9 @@ function areaLinks(current) {
 export function tecnicoPage() {
   const list = byArea('tecnico')
   const allTypes = types(list)
-  const showcase = bySlug('recupero-annesso-rustico')
+  // Il confronto prima/dopo esiste solo se un progetto pubblicato lo porta con sé:
+  // con i dimostrativi nascosti la sezione si toglie da sola.
+  const showcase = bySlug('recupero-annesso-rustico') || list.find((p) => p.compare)
   return html`
     ${pageHead({
       crumbs: [{ label: 'Home', href: '/' }, { label: 'Portfolio', href: '/portfolio/' }, { label: 'Tecnico', href: '/portfolio/tecnico/' }],
@@ -171,17 +175,21 @@ export function tecnicoPage() {
       </div>
     </section>
 
-    <section class="section cmp-sec" data-theme="tint">
-      <div class="container cmp-sec__grid">
-        <div class="cmp-sec__copy">
-          <p class="label"><span class="sec-head__index">±</span>Prima / dopo</p>
-          <h2 class="h2" data-reveal="words">${splitWords('Lo stesso fronte, due stati.', { accent: ['due', 'stati.'] })}</h2>
-          <p class="lead" data-reveal="up">Trascina il cursore per confrontare lo stato di fatto con il progetto di recupero dell’annesso rustico. Stessa geometria, stesse quote: cambia solo ciò che l’intervento ha toccato.</p>
-          ${textLink({ href: projectHref(showcase), label: 'Il progetto completo' })}
-        </div>
-        ${compare(showcase.compare)}
-      </div>
-    </section>
+    ${showcase?.compare
+      ? html`
+          <section class="section cmp-sec" data-theme="tint">
+            <div class="container cmp-sec__grid">
+              <div class="cmp-sec__copy">
+                <p class="label"><span class="sec-head__index">±</span>Prima / dopo</p>
+                <h2 class="h2" data-reveal="words">${splitWords('Lo stesso fronte, due stati.', { accent: ['due', 'stati.'] })}</h2>
+                <p class="lead" data-reveal="up">Trascina il cursore per confrontare lo stato di fatto con il progetto di recupero. Stessa geometria, stesse quote: cambia solo ciò che l’intervento ha toccato.</p>
+                ${textLink({ href: projectHref(showcase), label: 'Il progetto completo' })}
+              </div>
+              ${compare(showcase.compare)}
+            </div>
+          </section>
+        `
+      : ''}
 
     ${sampleLegendSection()}
     ${areaLinks('tecnico')}

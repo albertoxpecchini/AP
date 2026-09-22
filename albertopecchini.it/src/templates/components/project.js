@@ -2,7 +2,7 @@
 
 import { html, esc } from '../html.js'
 import { media, browserMockup, sampleMark, icon } from './ui.js'
-import { areas, categories } from '../../data/projects.js'
+import { allAreas, categories } from '../../data/projects.js'
 
 const catLabel = (key) => categories.find((c) => c.key === key)?.label || key
 
@@ -55,7 +55,7 @@ export function featureCard(p, i, total) {
       <a class="fcard__link" href="${projectHref(p)}" data-cursor="Apri">
         <div class="fcard__media">${cover(p, { ratio: '16/10', lazy: i > 0 })}</div>
         <div class="fcard__body">
-          <p class="label fcard__meta"><span>${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span><span>${esc(p.code)}</span><span>${esc(areas[p.area].short)} · ${p.year}</span></p>
+          <p class="label fcard__meta"><span>${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span><span>${esc(p.code)}</span><span>${esc(allAreas[p.area].short)} · ${p.year}</span></p>
           <h3 class="fcard__title h3">${esc(p.title)}</h3>
           <p class="fcard__sub">${esc(p.subtitle)}</p>
         </div>
@@ -81,7 +81,7 @@ export function indexRow(p, i) {
         <span class="irow__n label">${String(i + 1).padStart(3, '0')}</span>
         <span class="irow__title">${esc(p.title)}</span>
         <span class="irow__type label">${esc(p.types.slice(0, 2).join(' · '))}</span>
-        <span class="irow__area label">${esc(areas[p.area].short)}</span>
+        <span class="irow__area label">${esc(allAreas[p.area].short)}</span>
         <span class="irow__year label">${p.year}</span>
         <span class="irow__arrow" aria-hidden="true">${icon('arrowUpRight')}</span>
       </a>

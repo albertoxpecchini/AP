@@ -56,7 +56,9 @@ export const serviceAreas = [
     intro:
       'Marchi costruiti con geometria dichiarata, sistemi visivi semplici da applicare, stampati che arrivano in tipografia già corretti. Meno effetti, più regole.',
     art: { art: 'brandmark', brand: 'tavolato', construction: true, alt: 'Costruzione geometrica di un marchio' },
-    portfolio: '/portfolio/grafica/',
+    // Nessun rimando al portfolio: l'area Grafica è nascosta finché non c'è un
+    // lavoro reale (`hidden` su allAreas.grafica). Il servizio resta offerto.
+    portfolio: null,
     services: [
       { title: 'Logo', text: 'Marchio e logotipo disegnati su griglia, con versioni positiva, negativa e a un colore, dimensione minima e area di rispetto.', output: 'File vettoriali · scheda d’uso' },
       { title: 'Branding', text: 'Palette, tipografia, tono, applicazioni: un sistema completo raccolto in un manuale breve, scritto per chi lo userà ogni giorno.', output: 'Manuale di identità · libreria file' },

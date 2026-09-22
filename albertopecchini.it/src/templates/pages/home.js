@@ -1,6 +1,6 @@
 import { html, esc } from '../html.js'
 import { site, stats, cta } from '../../data/site.js'
-import { projects, featured, byArea, bySlug } from '../../data/projects.js'
+import { projects, featured, byArea, bySlug, areas } from '../../data/projects.js'
 import { serviceAreas } from '../../data/services.js'
 import { steps } from '../../data/method.js'
 import { bio, photos, facts } from '../../data/studio.js'
@@ -88,7 +88,9 @@ function disciplines() {
   const cards = [
     { area: serviceAreas[0], count: byArea('tecnico').length, href: '/portfolio/tecnico/', image: { art: 'section', bare: true, tone: 'tint', alt: 'Sezione trasversale di un edificio' } },
     { area: serviceAreas[1], count: byArea('web').length, href: '/portfolio/web/', image: { art: 'webpage', site: 'edilcorte', device: 'desktop', tall: false, alt: 'Pagina principale di un sito web' } },
-    { area: serviceAreas[2], count: byArea('grafica').length, href: '/portfolio/grafica/', image: { art: 'poster', brand: 'argini', alt: 'Serie di manifesti' } },
+    // La grafica resta una delle tre discipline anche senza progetti pubblicati:
+    // finché l'area è nascosta la scheda rimanda ai servizi invece che al portfolio.
+    { area: serviceAreas[2], count: byArea('grafica').length, href: areas.grafica ? '/portfolio/grafica/' : '/servizi/#grafica', image: { art: 'poster', brand: 'argini', alt: 'Serie di manifesti' } },
   ]
   return html`
     <section class="section intro" id="discipline" data-section="Discipline">
@@ -103,11 +105,11 @@ function disciplines() {
           ${cards.map(
             (c, i) => html`
               <a class="disc__card" href="${c.href}" data-reveal="up" style="--d:${i * 110}ms" data-cursor="Vedi">
-                <div class="disc__top label"><span>${c.area.letter} — ${esc(c.area.title)}</span><span>${String(c.count).padStart(2, '0')} progetti</span></div>
+                <div class="disc__top label"><span>${c.area.letter} — ${esc(c.area.title)}</span>${c.count ? `<span>${String(c.count).padStart(2, '0')} progetti</span>` : ''}</div>
                 ${media(c.image, { ratio: '4/3', reveal: null, caption: null, className: 'disc__media' })}
                 <h2 class="disc__title h3">${esc(c.area.lead)}</h2>
                 <p class="disc__list">${c.area.services.slice(0, 5).map((s) => esc(s.title)).join(' · ')}</p>
-                <span class="link disc__link"><span class="link__label">${esc(c.area.title === 'Digitale' ? 'Progetti web' : c.area.title === 'Grafica' ? 'Progetti grafici' : 'Progetti tecnici')}</span>${icon('arrow')}</span>
+                <span class="link disc__link"><span class="link__label">${esc(c.count ? (c.area.title === 'Digitale' ? 'Progetti web' : c.area.title === 'Grafica' ? 'Progetti grafici' : 'Progetti tecnici') : 'Come lavoro')}</span>${icon('arrow')}</span>
               </a>
             `,
           )}

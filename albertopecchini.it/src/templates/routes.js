@@ -2,7 +2,7 @@
 // Usata dal plugin `plugins/site-pages.js` sia in sviluppo sia in build.
 
 import { site, placeholders } from '../data/site.js'
-import { projects, areas } from '../data/projects.js'
+import { projects, areas, allAreas } from '../data/projects.js'
 import { renderArt } from '../art/index.js'
 import { layout, personLd, serviceLd, breadcrumbLd, abs } from './layout.js'
 import { homePage } from './pages/home.js'
@@ -59,14 +59,21 @@ export const routes = [
     headerTheme: 'ink',
     jsonld: () => [crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: 'Web', href: '/portfolio/web/' })],
   },
-  {
-    path: '/portfolio/grafica/',
-    priority: 0.8,
-    title: 'Progetti grafici — logo, brand identity, stampa, segnaletica',
-    description: 'Marchi costruiti su griglia, restyling, immagine coordinata, manifesti, packaging, pittogrammi e modelli: il graphic design con il rigore di una tavola tecnica.',
-    render: graficaPage,
-    jsonld: () => [crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: 'Grafica', href: '/portfolio/grafica/' })],
-  },
+  // L'area Grafica è nascosta finché non c'è un lavoro reale da mostrare
+  // (`hidden` su allAreas.grafica in src/data/projects.js): la pagina
+  // /portfolio/grafica/ non viene generata e graficaPage resta pronta.
+  ...(areas.grafica
+    ? [
+        {
+          path: '/portfolio/grafica/',
+          priority: 0.8,
+          title: 'Progetti grafici — logo, brand identity, stampa, segnaletica',
+          description: 'Marchi costruiti su griglia, restyling, immagine coordinata, manifesti, packaging, pittogrammi e modelli: il graphic design con il rigore di una tavola tecnica.',
+          render: graficaPage,
+          jsonld: () => [crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: 'Grafica', href: '/portfolio/grafica/' })],
+        },
+      ]
+    : []),
   ...projects.map((p) => ({
     path: `/portfolio/${p.slug}/`,
     priority: p.featured ? 0.7 : 0.6,
@@ -74,7 +81,7 @@ export const routes = [
     title: `${p.title} — ${p.subtitle}`,
     description: p.summary,
     render: () => caseStudyPage(p),
-    jsonld: () => [caseStudyLd(p, abs), crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: areas[p.area].short, href: areas[p.area].href }, { label: p.title, href: `/portfolio/${p.slug}/` })],
+    jsonld: () => [caseStudyLd(p, abs), crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: allAreas[p.area].short, href: allAreas[p.area].href }, { label: p.title, href: `/portfolio/${p.slug}/` })],
   })),
   {
     path: '/servizi/',
@@ -115,6 +122,8 @@ export const routes = [
     description: 'Scrivimi per un rilievo, una pratica, un sito web o un’identità visiva. Studio a Mantova, risposta entro un giorno lavorativo.',
     render: contattiPage,
     hideCta: true, // la pagina è già la chiamata all'azione: niente CTA che rimanda a sé stessa
+    // Turnstile serve solo qui: lo script non viene caricato sulle altre pagine.
+    head: site.form.turnstileSiteKey ? '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>' : '',
     jsonld: () => [crumbs({ label: 'Contatti', href: '/contatti/' }), serviceLd()],
   },
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
@@ -153,6 +162,7 @@ export function renderRoute(pathname, { assets }) {
     headerTheme: route.headerTheme,
     noindex: route.noindex,
     hideCta: route.hideCta,
+    head: route.head,
     pageClass: route.is404 ? 'page--404' : route.path === '/' ? 'page--home' : undefined,
   })
   return { html: page, status }
