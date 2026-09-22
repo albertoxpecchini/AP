@@ -22,6 +22,7 @@ Online su <https://www.albertopecchini.it> (albertopecchini.it rimanda a www).
 - [Build](#build)
 - [Prima di andare online](#prima-di-andare-online)
 - [Pubblicazione](#pubblicazione)
+- [Generatore di email](#generatore-di-email)
 - [Convenzioni](#convenzioni)
 
 ## Avvio rapido
@@ -58,6 +59,13 @@ src/data/*.js  ──►  src/templates/*.js  ──►  HTML
 albertopecchini.it/
 ├─ plugins/
 │  └─ site-pages.js        plugin Vite: rende le pagine in dev, le scrive in build
+├─ api/
+│  └─ contatti.js          funzione serverless del modulo contatti (Resend + CallMeBot)
+├─ tools/
+│  └─ email-generator/     generatore di email HTML (vedi il suo README)
+├─ emails/                 input, output e allegati delle email generate
+├─ config/                 account mittente e tema email derivato dal CSS
+├─ profiles/               archivio firme versionato
 ├─ public/                 servito così com’è alla radice del sito
 │  ├─ favicon.svg · favicon-32.png · apple-touch-icon.png · icon-512.png · site.webmanifest
 │  ├─ og.png               immagine per le anteprime social (1200×630)
@@ -68,7 +76,7 @@ albertopecchini.it/
 ├─ src/
 │  ├─ data/                CONTENUTI: l’unica cosa da toccare per aggiornare il sito
 │  │  ├─ site.js           identità, contatti, dati legali, social, navigazione, CTA, numeri, segnaposto
-│  │  ├─ projects.js       portfolio: categorie, aree e l’array dei progetti
+│  │  ├─ projects.js       portfolio: categorie, aree, progetti e i due interruttori di pubblicazione
 │  │  ├─ services.js       tre aree di servizi, pacchetti, FAQ
 │  │  ├─ method.js         le sette fasi del metodo
 │  │  └─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
@@ -106,7 +114,7 @@ albertopecchini.it/
 | --- | --- |
 | `/` | Home: hero con i tre ruoli, progetti in evidenza, servizi, studio, numeri |
 | `/portfolio/` | Indice completo con filtri (categoria, anno, settore, tecnologia, tipologia) |
-| `/portfolio/tecnico/` · `/portfolio/web/` · `/portfolio/grafica/` | Le tre aree |
+| `/portfolio/tecnico/` · `/portfolio/web/` | Le aree pubblicate (Grafica è nascosta, vedi [Progetti](#progetti)) |
 | `/portfolio/<slug>/` | Case study in nove sezioni, uno per ogni progetto in `projects.js` |
 | `/servizi/` | Servizi per area, con ciò che viene consegnato; pacchetti e FAQ |
 | `/metodo/` | Le sette fasi del lavoro |
@@ -126,6 +134,8 @@ Le rotte sono definite in `src/templates/routes.js`: ogni voce ha percorso, `tit
 | cambiare titolo e invito del footer (`closing`), riga sotto il nome (`tagline`) | `src/data/site.js` |
 | cambiare i numeri della sezione statistiche | `src/data/site.js → stats` |
 | aggiungere, togliere o modificare un progetto | `src/data/projects.js` |
+| pubblicare (o rinascondere) i progetti dimostrativi | `src/data/projects.js → showSamples` |
+| rimettere online un’area del portfolio | `src/data/projects.js → allAreas` (togliere `hidden`) |
 | modificare i servizi, i pacchetti, le FAQ | `src/data/services.js` |
 | modificare le sette fasi del metodo | `src/data/method.js` |
 | modificare biografia, fotografie, timeline, valori, curriculum | `src/data/studio.js` |
@@ -149,9 +159,41 @@ Campi principali:
 - `cover` e `images`: copertina e galleria (vedi [Immagini](#immagini)).
 - `web`: per i progetti web, gli screenshot dei mockup e il dominio (`url`).
 - `featured: true` porta il progetto nello scorrimento orizzontale della home.
-- `sample: true` lo contrassegna come **dimostrativo** (◇): mostra come si presenta un lavoro di quel tipo e va sostituito con un lavoro reale o rimosso.
+- `sample: true` lo contrassegna come **dimostrativo**: mostra come si presenta un lavoro di quel tipo, ma oggi non viene pubblicato (vedi sotto).
 
-Progetti reali oggi nel portfolio: rivaltasulmincio.it, cascinafontana.xyz, dariodonelli (sul dominio Vercel finché dariodonelli.it non è attivo), il sito stesso e il PCTO in Caem Group. Gli altri sono dimostrativi.
+### Progetti dimostrativi
+
+Il file contiene 20 progetti, ma **online ne vanno solo 5**: quelli reali. Gli altri
+sono modelli scritti per mostrare come si presenta un lavoro di quel tipo, e restano
+nel file come traccia da riempire.
+
+A decidere è un interruttore solo, in cima ai selettori di `src/data/projects.js`:
+
+```js
+export const showSamples = false   // true = pubblica anche i dimostrativi, col rombo ◇
+```
+
+`projects` è la vista filtrata che usa tutto il sito (pagine, filtri, sitemap, numeri);
+`allProjects` resta l’array completo. Per promuovere un dimostrativo a lavoro vero basta
+sostituirne i contenuti e togliergli `sample: true`: compare da solo.
+
+I cinque reali: il PCTO in Caem Group, rivaltasulmincio.it, cascinafontana.xyz,
+dariodonelli (sul dominio Vercel finché dariodonelli.it non è attivo) e questo sito.
+
+### Aree nascoste
+
+Senza i dimostrativi l’area **Grafica** resterebbe a zero progetti, così è nascosta —
+la pagina non viene generata e l’area sparisce da menù, indici, sitemap e rimandi:
+
+```js
+grafica: { label: 'Progetti grafici', …, hidden: true }   // src/data/projects.js → allAreas
+```
+
+Togliendo `hidden` torna tutto, a patto che l’area abbia almeno un progetto pubblicato.
+`areas` sono le aree pubblicate, `allAreas` tutte quante: le briciole di navigazione dei
+singoli progetti leggono `allAreas`, così un case study funziona anche se la sua area è
+nascosta. La grafica resta comunque fra le tre discipline in home e fra i servizi: la
+scheda rimanda a `/servizi/#grafica` invece che al portfolio.
 
 ## Immagini
 
@@ -185,7 +227,9 @@ ffmpeg -i originale.jpg -map_metadata -1 -vf "scale=1600:-1:flags=lanczos" -c:v 
 
 ### Ritratto
 
-`public/media/studio/ritratto.webp` (1400×1750, rapporto 4:5, senza metadati) è ricavato da una fotografia del 2024 in formato DNG. Su Windows il DNG si decodifica con il codec **Raw Image Extension** di Microsoft (PowerShell, `System.Windows.Media.Imaging.BitmapDecoder`; il codec non applica l’orientamento EXIF, quindi la rotazione va fatta a parte), poi si ritaglia e si converte con ffmpeg. La fotografia dello studio (`photos.studio`) è ancora una tavola segnaposto.
+`public/media/studio/ritratto.webp` (1400×1750, rapporto 4:5, senza metadati) è ricavato da una fotografia del 2024 in formato DNG. Su Windows il DNG si decodifica con il codec **Raw Image Extension** di Microsoft (PowerShell, `System.Windows.Media.Imaging.BitmapDecoder`; il codec non applica l’orientamento EXIF, quindi la rotazione va fatta a parte), poi si ritaglia e si converte con ffmpeg. È l’unica fotografia del sito: la pagina Studio
+mostra il ritratto e basta. Per aggiungere una fotografia dello studio serve rimettere sia
+la voce in `photos` sia la fascia a tutta larghezza in `src/templates/pages/info.js`.
 
 ### Screenshot dei progetti web
 
@@ -203,7 +247,9 @@ Le versioni `Tall` scorrono al passaggio del puntatore; le loro altezze vanno ri
 
 ## Modulo contatti
 
-Con `site.form.endpoint` vuoto il modulo, dopo la validazione, compone una email nel programma di posta del visitatore. Indicando un endpoint (Formspree, Web3Forms, una propria API…) i dati partono in `POST` come JSON; una risposta 2xx mostra lo stato di successo, qualsiasi altra lo stato di errore. Tipi di progetto e fasce di budget si cambiano in `site.form`.
+Con `site.form.endpoint` vuoto il modulo, dopo la validazione, compone una email nel programma di posta del visitatore. Indicando un endpoint i dati partono in `POST` come JSON; una risposta 2xx mostra lo stato di successo, qualsiasi altra lo stato di errore. Tipi di progetto e fasce di budget si cambiano in `site.form`.
+
+Oggi l’endpoint è `/api/contatti`: una funzione serverless (`api/contatti.js`, eseguita da Vercel) che consegna la richiesta via email con **Resend** e via WhatsApp con **CallMeBot**. Legge tutto dalle variabili d’ambiente — `RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO`, `CALLMEBOT_PHONE`, `CALLMEBOT_APIKEY`, `TURNSTILE_SECRET_KEY` — che vanno impostate nel progetto Vercel e **non stanno nel repository**. L’antispam Cloudflare Turnstile si attiva compilando `site.form.turnstileSiteKey` (chiave pubblica, finisce nell’HTML); lasciandola vuota il riquadro sparisce e il modulo resta funzionante.
 
 ## Dati personali e titolo professionale
 
@@ -248,10 +294,11 @@ In console la build riporta il numero di pagine e miniature scritte e, se ce ne 
 
 ## Prima di andare online
 
-- [ ] Compilare i segnaposto elencati dalla build: profilo LinkedIn, numero di clienti, fotografia dello studio.
-- [ ] Sostituire o rimuovere i progetti con `sample: true`; quando non ce ne sono più, portare `site.showSampleNotice` a `false`.
+- [x] Segnaposto: `placeholders` in `src/data/site.js` è vuoto e la build non segnala più niente. LinkedIn è stato tolto dai social (il link puntava alla homepage del servizio), la fotografia dello studio è stata rimossa insieme alla sua sezione.
+- [x] Progetti dimostrativi: non vengono pubblicati (`showSamples: false`), l’area Grafica è nascosta perché ne restava senza. Vanno sostituiti con lavori veri, uno alla volta — vedi [Progetti](#progetti).
 - [ ] Rileggere privacy e cookie policy (`src/templates/pages/legal.js`) e aggiornare `site.legal.updated`. Se si aggiungono strumenti di analisi o servizi di terze parti, la cookie policy va aggiornata.
-- [ ] Decidere l’invio del modulo contatti (`site.form.endpoint`).
+- [ ] Modulo contatti: `site.form.endpoint` punta a `/api/contatti`. Verificare che su Vercel siano impostate le variabili d’ambiente che la funzione si aspetta (`RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO`, `CALLMEBOT_PHONE`, `CALLMEBOT_APIKEY`, `TURNSTILE_SECRET_KEY`) e provare un invio vero in produzione.
+- [ ] Antispam: `site.form.turnstileSiteKey` è vuota, quindi il riquadro Turnstile non compare. Compilarla (chiave pubblica, non è un segreto) se il modulo inizia a ricevere spam.
 - [ ] Sistemare il DNS di albertopecchini.it: il dominio senza www ha ancora un record A verso il vecchio hosting Aruba (62.149.128.40) accanto a quello di Vercel (216.198.79.1). Deve restare solo quello di Vercel, altrimenti chi digita l’indirizzo senza www ottiene a caso il sito o un errore di connessione.
 - [ ] Controllare `public/og.png` e il manifest (`public/site.webmanifest`).
 
@@ -262,6 +309,24 @@ In console la build riporta il numero di pagine e miniature scritte e, se ce ne 
 Domini di produzione: `www.albertopecchini.it` e `albertopecchini.it` (che rimanda a www con un 308). Gli indirizzi `*.vercel.app` del progetto sono protetti da Vercel Authentication (accesso solo con login Vercel), i domini personalizzati no.
 
 `vercel.json` imposta URL puliti con barra finale (come i percorsi generati), cache di un anno sugli asset con hash, cache di trenta giorni su `media/` e `art/`, e le intestazioni `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`. `404.html` viene servita in automatico.
+
+## Generatore di email
+
+`tools/email-generator/` trasforma appunti e file in un'email HTML autosufficiente,
+pronta da incollare nel composer di Yahoo, Proton o Gmail. Vive nello stesso
+repository perché **riusa il linguaggio visivo del sito**: legge `src/styles/tokens.css`
+e ne ricava colori, scala tipografica e spazi, senza mai modificarlo.
+
+```bash
+npm run email:new preventivo-studio    # copia EMAIL_INPUT_TEMPLATE.md in emails/in/
+npm run email emails/in/2026-09-18-preventivo-studio.md
+```
+
+Il risultato è un solo file da leggere: `emails/out/<data>_<nome>/report.md`.
+
+Gli account mittente stanno in `config/sender-profiles.json`, le firme — versionate —
+in `profiles/footers.json`. Istruzioni complete in
+[`tools/email-generator/README.md`](tools/email-generator/README.md).
 
 ## Convenzioni
 
