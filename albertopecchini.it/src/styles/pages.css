@@ -853,7 +853,7 @@
   gap: 1.5rem;
 }
 
-.cv__list li {
+.cv__list > li {
   display: grid;
   gap: 0.35rem;
 }
@@ -861,6 +861,28 @@
 .cv__list p {
   color: var(--muted);
   max-width: 60ch;
+}
+
+/* Voci puntate sotto un'esperienza: cosa è stato fatto davvero nell'incarico. */
+.cv__detail {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.cv__detail li {
+  display: grid;
+  grid-template-columns: 0.85rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.cv__detail li::before {
+  content: '—';
+  color: var(--accent-text);
 }
 
 .cv__skills {
@@ -912,7 +934,7 @@
     align-content: start;
   }
 
-  .cv__list li {
+  .cv__list > li {
     grid-template-columns: 8rem minmax(0, 1fr);
     gap: 1rem;
   }

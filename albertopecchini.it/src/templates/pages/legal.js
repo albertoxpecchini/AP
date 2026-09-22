@@ -53,7 +53,22 @@ export function privacyPage() {
         </ul>`,
       },
       { title: 'Per quanto tempo', body: '<p>Le richieste che non si trasformano in un incarico vengono cancellate entro 12 mesi. I dati dei clienti sono conservati per 10 anni, come richiesto dalla normativa fiscale. I log tecnici dell’hosting seguono i tempi del fornitore, di norma non oltre 30 giorni.</p>' },
-      { title: 'A chi possono essere comunicati', body: '<p>Ai fornitori che rendono possibile il servizio — hosting del sito e casella di posta elettronica — nominati, ove necessario, responsabili del trattamento. Se un fornitore ha sede fuori dallo Spazio Economico Europeo, il trasferimento avviene sulla base di decisioni di adeguatezza o clausole contrattuali standard. I dati non vengono venduti né ceduti a terzi per finalità di marketing.</p>' },
+      {
+        title: 'A chi possono essere comunicati',
+        body: `<p>Ai fornitori che rendono possibile il servizio, nominati, ove necessario, responsabili del trattamento:</p>
+        <ul>
+          <li><strong>Vercel Inc.</strong> — hosting del sito e del modulo di contatto.</li>
+          <li><strong>Resend (Plus Five Five, Inc.)</strong> — recapito via email dei messaggi inviati dal modulo.</li>
+          <li><strong>CallMeBot</strong> — notifica su WhatsApp dei messaggi inviati dal modulo, così da poterti rispondere prima.</li>
+          <li><strong>Cloudflare, Inc.</strong> — servizio antispam Turnstile, che distingue le persone dai programmi automatici (vedi «Protezione antispam»).</li>
+          <li><strong>Il fornitore della casella di posta</strong> su cui ricevo e conservo i messaggi.</li>
+        </ul>
+        <p>Se un fornitore ha sede fuori dallo Spazio Economico Europeo, il trasferimento avviene sulla base di decisioni di adeguatezza o clausole contrattuali standard. I dati non vengono venduti né ceduti a terzi per finalità di marketing.</p>`,
+      },
+      {
+        title: 'Protezione antispam',
+        body: '<p>Il modulo di contatto è protetto da <strong>Cloudflare Turnstile</strong>, che verifica che a scrivere sia una persona e non un programma automatico. Per farlo analizza il comportamento del browser durante la compilazione e riceve l’indirizzo IP; nella maggior parte dei casi la verifica è invisibile e non richiede alcuna azione. Turnstile non installa cookie di profilazione e non viene usato per tracciarti su altri siti. La base giuridica è il legittimo interesse a proteggere il sito dagli invii automatici (art. 6, par. 1, lett. f GDPR). Insieme al messaggio registro anche l’indirizzo IP di provenienza e il momento dell’invio, per la stessa finalità di sicurezza.</p>',
+      },
       {
         title: 'I tuoi diritti',
         body: `<p>Puoi chiedere in ogni momento l’accesso ai tuoi dati, la rettifica, la cancellazione, la limitazione del trattamento, la portabilità, e puoi opporti al trattamento (artt. 15–22 GDPR). Basta una email a <a href="mailto:${site.contact.email}">${esc(site.contact.email)}</a>: rispondo entro 30 giorni.</p>

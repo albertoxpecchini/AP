@@ -71,6 +71,13 @@ export function contattiPage() {
                   <label for="privacy">Ho letto l’<a href="/privacy/">informativa sulla privacy</a> e acconsento al trattamento dei dati per ricevere risposta.<span class="field__req" aria-hidden="true"> *</span></label>
                   <p class="field__error" id="privacy-error" role="alert" hidden></p>
                 </div>
+                ${site.form.turnstileSiteKey &&
+                html`
+                  <div class="field field--full form__turnstile" data-field>
+                    <div class="cf-turnstile" data-turnstile data-sitekey="${esc(site.form.turnstileSiteKey)}" data-language="it" data-appearance="interaction-only" data-response-field="false"></div>
+                    <p class="field__error" id="turnstile-error" role="alert" hidden></p>
+                  </div>
+                `}
               </div>
               <div class="form__foot">
                 <button class="btn btn--primary btn--lg form__submit" type="submit" data-form-submit>

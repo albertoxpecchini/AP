@@ -1,7 +1,8 @@
 // Modulo di contatto: validazione lato client e stati idle → loading → successo | errore.
 //
-// Invio: se il form ha un `data-endpoint` i dati partono in POST (JSON);
-// altrimenti viene composta una email nel programma di posta del visitatore.
+// Invio: se il form ha un `data-endpoint` i dati partono in POST (JSON) verso la
+// funzione serverless, che consegna via email e WhatsApp; altrimenti viene
+// composta una email nel programma di posta del visitatore.
 
 import { $, $$ } from './utils.js'
 
@@ -14,6 +15,74 @@ const RULES = {
   privacy: (_, field) => (!field.checked ? 'Per inviare serve il consenso al trattamento dei dati.' : ''),
 }
 
+// ── Turnstile ────────────────────────────────────────────────────────────────
+// Il riquadro è invisibile finché Cloudflare non sospetta un bot; in quel caso
+// chiede una conferma. Lo script è caricato solo su /contatti/ ed è asincrono,
+// quindi al momento dell'invio potrebbe non essere ancora pronto: `getToken`
+// attende il gettone e, se non arriva, lascia partire la richiesta lo stesso —
+// sarà il server a decidere, con gli altri filtri ancora attivi.
+
+function initTurnstile(form) {
+  const box = $('[data-turnstile]', form)
+  if (!box) return null
+
+  let widgetId = null
+  let pending = null
+  let token = ''
+
+  const render = () => {
+    if (widgetId !== null || !window.turnstile) return
+    widgetId = window.turnstile.render(box, {
+      sitekey: box.dataset.sitekey,
+      language: 'it',
+      appearance: 'interaction-only',
+      callback: (value) => {
+        token = value
+        pending?.resolve(value)
+        pending = null
+      },
+      'error-callback': () => {
+        pending?.resolve('')
+        pending = null
+      },
+      'expired-callback': () => {
+        token = ''
+      },
+    })
+  }
+
+  // Lo script arriva con `async defer`: se non c'è ancora, lo si attende.
+  if (window.turnstile) render()
+  else {
+    const timer = setInterval(() => {
+      if (!window.turnstile) return
+      clearInterval(timer)
+      render()
+    }, 150)
+    setTimeout(() => clearInterval(timer), 15_000)
+  }
+
+  return {
+    getToken: () => {
+      if (token) return Promise.resolve(token)
+      if (widgetId === null) render()
+      if (widgetId === null) return Promise.resolve('') // script mai arrivato
+      return new Promise((resolve) => {
+        pending = { resolve }
+        setTimeout(() => {
+          if (!pending) return
+          pending.resolve('')
+          pending = null
+        }, 8000)
+      })
+    },
+    reset: () => {
+      token = ''
+      if (widgetId !== null) window.turnstile?.reset(widgetId)
+    },
+  }
+}
+
 export function initForm() {
   const form = $('[data-form]')
   if (!form) return
@@ -24,6 +93,10 @@ export function initForm() {
   const counter = $('[data-form-counter]', form)
   const idleLabel = submitLabel.textContent
   const touched = new Set()
+  const turnstile = initTurnstile(form)
+  // Momento in cui la pagina è stata aperta: il server scarta gli invii
+  // arrivati dopo pochi istanti, perché nessuno compila un modulo così in fretta.
+  let openedAt = Date.now()
 
   const validate = (field) => {
     const rule = RULES[field.name]
@@ -78,16 +151,33 @@ export function initForm() {
     try {
       const endpoint = form.dataset.endpoint
       if (endpoint) {
+        const token = turnstile ? await turnstile.getToken() : ''
         const controller = new AbortController()
-        const timer = setTimeout(() => controller.abort(), 12_000)
+        const timer = setTimeout(() => controller.abort(), 20_000)
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ ...data, _subject: form.dataset.subject + data.tipo }),
+          body: JSON.stringify({ ...data, privacy: true, _subject: form.dataset.subject + data.tipo, _t: openedAt, _turnstile: token }),
           signal: controller.signal,
         })
         clearTimeout(timer)
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+        if (!response.ok) {
+          // Il server spiega cosa non va: meglio il suo messaggio di uno generico.
+          const payload = await response.json().catch(() => null)
+          turnstile?.reset()
+          if (payload?.fields?.length) {
+            const first = fields.find((f) => payload.fields.includes(f.name))
+            setState('error', payload.error || 'Controlla i campi evidenziati.')
+            first?.focus()
+            return
+          }
+          if (payload?.error) {
+            setState('error', payload.error)
+            return
+          }
+          throw new Error(`HTTP ${response.status}`)
+        }
         doneText.textContent = `Grazie ${data.nome.split(' ')[0]}: ho ricevuto la richiesta e ti rispondo entro un giorno lavorativo all’indirizzo ${data.email}.`
       } else {
         await new Promise((resolve) => setTimeout(resolve, 650))
@@ -114,6 +204,8 @@ export function initForm() {
     $$('.field__error', form).forEach((el) => (el.hidden = true))
     if (counter) counter.textContent = `0 / ${message.maxLength}`
     done.hidden = true
+    turnstile?.reset()
+    openedAt = Date.now()
     setState('idle')
     form.elements.nome.focus()
   })

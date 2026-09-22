@@ -1345,6 +1345,17 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   overflow: hidden;
 }
 
+/* Verifica antispam: con `interaction-only` il riquadro compare solo quando
+   Cloudflare chiede una conferma, altrimenti la cella resta vuota e chiusa. */
+.form__turnstile:empty,
+.form__turnstile:not(:has(iframe)) {
+  display: none;
+}
+
+.form__turnstile {
+  margin-top: 0.5rem;
+}
+
 .form__foot {
   display: flex;
   flex-wrap: wrap;

@@ -62,11 +62,21 @@
     text-decoration: none !important;
   }
 
-  .cv__sec,
+  /* Le sezioni con le voci puntate sono troppo lunghe per stare in una pagina:
+     si lascia spezzare la sezione, ma mai la singola esperienza. */
+  .cv__list li,
   .cs-sec,
   .sitem,
   .mstep {
     break-inside: avoid;
+  }
+
+  .cv__sec {
+    break-inside: auto;
+  }
+
+  .cv__sec > h2 {
+    break-after: avoid;
   }
 
   .tag {
