@@ -27,7 +27,7 @@ export const timeline = [
   { year: '2021', title: 'I.T.T. «Carlo d’Arco», Mantova', text: 'Inizio del percorso in Costruzioni, Ambiente e Territorio: disegno tecnico, topografia, estimo, gestione del cantiere.', tag: 'Formazione' },
   { year: '2023', title: 'Ufficio tecnico, reparto legno', text: 'Prima di tre sessioni di PCTO in Caem Group a Castellucchio: modellazione 3D di tettoie, preventivi, archivio tecnico. Strutture in lamellare e X-LAM.', tag: 'Tecnico' },
   { year: '2024', title: 'Dublino, inglese C1', text: 'Corso intensivo al CES di Dublino e certificazione IELTS. Documentazione tecnica e strumenti di sviluppo si leggono in inglese: meglio farlo bene.', tag: 'Formazione' },
-  { year: '2026', title: 'Primi siti per clienti', text: 'Online il sito dello studio dell’ing. Dario Donelli, il dossier informativo di Rivalta sul Mincio e il sito dell’azienda agricola Cascina Fontana. Next.js, React, TypeScript.', tag: 'Web' },
+  { year: '2026', title: 'Primi siti per clienti', text: 'Online il sito dello studio dell’ing. Dario Donelli, il dossier informativo di Rivalta sul Mincio e il sito dell’azienda agricola Cascina Fontana. React, Vite, TypeScript.', tag: 'Web' },
   { year: '2026', title: 'Diploma CAT', text: 'Diploma di Costruzioni, Ambiente e Territorio dopo cinque anni di AutoCAD, rilievo strumentale ed estimo.', tag: 'Tecnico' },
   { year: '2026', title: 'Università di Modena e Reggio Emilia', text: 'Immatricolazione al corso di laurea in Costruzioni e gestione del territorio, Dipartimento di Ingegneria «Enzo Ferrari».', tag: 'Formazione' },
 ]
@@ -100,12 +100,12 @@ export const profile = {
     },
     {
       period: '2026',
-      title: 'Ing. Dario Donelli — studio di ingegneria',
-      role: 'Identità visiva, web design e sviluppo frontend · React, Vite, OpenStreetMap, Vercel',
+      title: 'Ing. Dario Donelli — sito dello studio tecnico',
+      role: 'Progetto, design e sviluppo · React, Vite, SVG',
       detail: [
-        'Identità costruita sul segno della targa dello studio: scala di grigi, tipografia incisa, griglia in filigrana.',
-        'Pagina unica con sei sezioni numerate, mappa OpenStreetMap senza cookie di profilazione e quindi senza banner.',
-        'Fotografia dello studio e SEO tecnica; online su dariodonelli.vercel.app.',
+        'Sito a pagina singola in bianco e nero, costruito sulla targa dello studio.',
+        'Apertura animata allo scorrimento in solo CSS e carta della provincia di Mantova in SVG.',
+        'Mappa OpenStreetMap senza cookie di profilazione; dominio e pubblicazione su Vercel.',
       ],
     },
     {
