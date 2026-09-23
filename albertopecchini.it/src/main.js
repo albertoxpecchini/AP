@@ -7,6 +7,7 @@ import { initHero, initHScroll, initMethod, initSpy, initSectionIndicator } from
 import { initFilters } from './client/filters.js'
 import { initLightbox, initCompare, initCopy } from './client/widgets.js'
 import { initForm } from './client/form.js'
+import { initCanvas } from './client/canvas.js'
 
 const modules = [
   initTransitions,
@@ -27,6 +28,7 @@ const modules = [
   initCompare,
   initCopy,
   initForm,
+  initCanvas,
   initParallax,
   initMagnetic,
   initCursor,

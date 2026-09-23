@@ -11,6 +11,7 @@ import { caseStudyPage, caseStudyLd } from './pages/case-study.js'
 import { serviziPage, metodoPage, studioPage, profiloPage } from './pages/info.js'
 import { contattiPage } from './pages/contact.js'
 import { privacyPage, cookiePage, notFoundPage } from './pages/legal.js'
+import { stilePage } from './pages/stile.js'
 
 const websiteLd = () => ({
   '@context': 'https://schema.org',
@@ -126,6 +127,16 @@ export const routes = [
     head: site.form.turnstileSiteKey ? '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>' : '',
     jsonld: () => [crumbs({ label: 'Contatti', href: '/contatti/' }), serviceLd()],
   },
+  {
+    path: '/stile/',
+    priority: 0.4,
+    title: 'Stile — il sistema visivo del sito',
+    description: 'Colore, tipografia, forma, movimento e componenti di albertopecchini.it in cinque tavole su un piano navigabile: ingrandisci e spostati come su un tavolo da disegno.',
+    render: stilePage,
+    pageClass: 'page--stile',
+    noFooter: true, // la pagina è il piano a tutto schermo: niente chiusura sotto
+    jsonld: () => [crumbs({ label: 'Stile', href: '/stile/' })],
+  },
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
   { path: '/cookie/', priority: 0.2, title: 'Cookie policy', description: 'Il sito non usa cookie di profilazione: ecco cosa viene salvato nel browser e perché.', render: cookiePage, hideCta: true },
   {
@@ -163,7 +174,7 @@ export function renderRoute(pathname, { assets }) {
     noindex: route.noindex,
     hideCta: route.hideCta,
     head: route.head,
-    pageClass: route.is404 ? 'page--404' : route.path === '/' ? 'page--home' : undefined,
+    pageClass: route.pageClass || (route.is404 ? 'page--404' : route.path === '/' ? 'page--home' : undefined),
   })
   return { html: page, status }
 }

@@ -1,7 +1,7 @@
 // Componenti legati ai progetti: card, riga d'indice, copertina.
 
 import { html, esc } from '../html.js'
-import { media, browserMockup, sampleMark, icon } from './ui.js'
+import { media, deviceMockup, sampleMark, icon } from './ui.js'
 import { allAreas, categories } from '../../data/projects.js'
 
 const catLabel = (key) => categories.find((c) => c.key === key)?.label || key
@@ -12,14 +12,14 @@ export const projectHref = (p) => `/portfolio/${p.slug}/`
 export const filterAttrs = (p) =>
   ` data-project data-cat="${esc(p.categories.join(' '))}" data-area="${p.area}" data-year="${p.year}" data-sector="${esc(p.sector)}" data-tech="${esc(p.technologies.join('|'))}" data-type="${esc(p.types.join('|'))}"`
 
-/** Copertina: i progetti web stanno in una finestra di browser, gli altri in tavola. */
+/** Copertina: i progetti web stanno su un MacBook, gli altri in tavola. */
 export function cover(p, { ratio = '4/3', lazy = true, parallax = false } = {}) {
   if (p.area === 'web' && p.web) {
     return html`
       <div class="cover cover--web" style="--ratio:${ratio}" data-reveal="clip">
         <div class="cover__frame" data-clip>
           <div class="cover__inner"${parallax ? ' data-parallax="0.05"' : ''}>
-            ${browserMockup({ domain: p.web.domain, screen: p.web.desktop, lazy })}
+            ${deviceMockup('laptop', { domain: p.web.domain, screen: p.web.desktop, lazy })}
           </div>
         </div>
       </div>

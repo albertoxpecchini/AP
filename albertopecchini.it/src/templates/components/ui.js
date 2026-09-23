@@ -212,47 +212,44 @@ export function media(image, { ratio, caption, reveal = 'clip', parallax = false
 }
 
 // ── Mockup dispositivi ───────────────────────────────────────────────────────
+// Cornici del file Figma «Device Mockups (iMac, Macbook, iPad, iPhone)» della
+// Figma Community: MacBook Pro per il desktop, iPad Pro 12,9″ per il tablet,
+// iPhone 14 Pro per lo smartphone. Le immagini dei dispositivi stanno in
+// public/media/mockup/ (bordo trasparente ritagliato); lo schermo è un riquadro
+// sopra l'immagine con le quote del livello «Paste image here» del file, scritte
+// in percentuale in components.css. Sull'iPhone l'isola dinamica torna sopra lo
+// screenshot, come nel file.
 
-/** Finestra di browser realistica. `tall` abilita lo scorrimento della pagina al passaggio. */
-export function browserMockup({ domain, screen, tall, className, lazy = true, label }) {
-  const scroll = Boolean(tall)
-  return html`
-    <div class="${cx('browser', scroll && 'browser--scroll', className)}"${scroll ? ' data-scroll-preview tabindex="0" role="group"' : ''}${scroll ? ` aria-label="${esc(label || `Anteprima scorrevole di ${domain}`)}"` : ''}>
-      <div class="browser__bar" aria-hidden="true">
-        <span class="browser__dots"><i></i><i></i><i></i></span>
-        <span class="browser__tab"><span class="browser__fav"></span>${esc(domain)}</span>
-        <span class="browser__url"><svg viewBox="0 0 12 12" width="9" height="9" aria-hidden="true"><path d="M3 5V3.6a3 3 0 0 1 6 0V5M2 5h8v6H2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>${esc(domain)}</span>
-        <span class="browser__actions"><i></i><i></i></span>
-      </div>
-      <div class="browser__screen">
-        <div class="browser__page">${picture(tall || screen, { lazy })}</div>
-      </div>
-    </div>
-  `
+const DEVICES = {
+  laptop: { src: '/media/mockup/macbook-pro.webp', width: 1244, height: 736, on: '' },
+  tablet: { src: '/media/mockup/ipad-pro.webp', width: 906, height: 1180, on: ' su tablet' },
+  phone: { src: '/media/mockup/iphone-14-pro.webp', width: 720, height: 1466, on: ' su smartphone' },
 }
 
-export function phoneMockup({ screen, tall, className, lazy = true, label }) {
-  const scroll = Boolean(tall)
-  return html`
-    <div class="${cx('phone', scroll && 'phone--scroll', className)}"${scroll ? ` data-scroll-preview tabindex="0" role="group" aria-label="${esc(label || 'Anteprima scorrevole su smartphone')}"` : ''}>
-      <span class="phone__island" aria-hidden="true"></span>
-      <div class="phone__screen"><div class="phone__page">${picture(tall || screen, { lazy })}</div></div>
-    </div>
-  `
-}
+const island = (loading) =>
+  `<img class="device__island" src="/media/mockup/iphone-14-pro-isola.png" width="313" height="92" alt="" loading="${loading}" decoding="async">` +
+  `<img class="device__camera" src="/media/mockup/iphone-14-pro-camera.png" width="69" height="75" alt="" loading="${loading}" decoding="async">`
 
-export function tabletMockup({ screen, className, lazy = true }) {
+/**
+ * Dispositivo con lo screenshot sullo schermo: `laptop`, `tablet` o `phone`.
+ * `tall` abilita lo scorrimento della pagina al passaggio.
+ */
+export function deviceMockup(kind, { domain, screen, tall, className, lazy = true, label }) {
+  const d = DEVICES[kind]
+  const scroll = Boolean(tall)
+  const loading = lazy ? 'lazy' : 'eager'
   return html`
-    <div class="${cx('tablet', className)}">
-      <span class="tablet__cam" aria-hidden="true"></span>
-      <div class="tablet__screen">${picture(screen, { lazy })}</div>
+    <div class="${cx('device', `device--${kind}`, className)}"${scroll ? ` data-scroll-preview tabindex="0" role="group" aria-label="${esc(label || `Anteprima scorrevole di ${domain}${d.on}`)}"` : ''}>
+      <img class="device__frame" src="${d.src}" width="${d.width}" height="${d.height}" alt="" loading="${loading}" decoding="async">
+      <div class="device__screen"><div class="device__page">${picture(tall || screen, { lazy })}</div></div>
+      ${kind === 'phone' && island(loading)}
     </div>
   `
 }
 
 /**
- * Scena completa desktop + tablet + smartphone per un progetto web.
- * `scroll`: true = browser e telefono scorrono al passaggio · 'desktop' = solo il browser
+ * Scena completa MacBook + iPad + iPhone per un progetto web.
+ * `scroll`: true = portatile e telefono scorrono al passaggio · 'desktop' = solo il portatile
  * (meno byte quando la scena è in cima alla pagina) · false = immagini ferme.
  */
 export function deviceStage(project, { lazy = true, scroll = true, className } = {}) {
@@ -260,9 +257,9 @@ export function deviceStage(project, { lazy = true, scroll = true, className } =
   if (!w) return ''
   return html`
     <div class="${cx('stage', className)}">
-      ${browserMockup({ domain: w.domain, screen: w.desktop, tall: scroll && w.desktopTall, lazy, className: 'stage__desktop' })}
-      ${w.tablet && tabletMockup({ screen: w.tablet, lazy: true, className: 'stage__tablet' })}
-      ${w.mobile && phoneMockup({ screen: w.mobile, tall: scroll === true && w.mobileTall, lazy, className: 'stage__phone' })}
+      ${deviceMockup('laptop', { domain: w.domain, screen: w.desktop, tall: scroll && w.desktopTall, lazy, className: 'stage__desktop' })}
+      ${w.tablet && deviceMockup('tablet', { domain: w.domain, screen: w.tablet, lazy: true, className: 'stage__tablet' })}
+      ${w.mobile && deviceMockup('phone', { domain: w.domain, screen: w.mobile, tall: scroll === true && w.mobileTall, lazy, className: 'stage__phone' })}
     </div>
   `
 }

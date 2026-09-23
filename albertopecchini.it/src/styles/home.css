@@ -164,9 +164,9 @@
 
 .hero__web {
   display: grid;
-  align-items: start;
+  align-items: center;
   height: 100%;
-  padding: 8% 7% 0;
+  padding: 0 7%;
   background: var(--c-ink-2);
 }
 
@@ -789,14 +789,14 @@
 
 .webt__stage {
   position: relative;
-  padding: 0 0 14% 0;
+  padding: 0 0 10% 0;
 }
 
 .webt__phone {
   position: absolute;
-  right: 5%;
-  bottom: 6%;
-  width: 25%;
+  right: 2%;
+  bottom: 0;
+  width: 21%;
 }
 
 .webt__caption {
@@ -829,13 +829,12 @@
   }
 
   .webt__stage {
-    padding: 0 8% 10% 0;
+    padding: 0 14% 6% 0;
   }
 
   .webt__phone {
     right: 0;
-    bottom: 0;
-    width: 22%;
+    width: 20%;
   }
 }
 

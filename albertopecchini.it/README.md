@@ -71,6 +71,7 @@ albertopecchini.it/
 │  ├─ og.png               immagine per le anteprime social (1200×630)
 │  ├─ icons.svg            sprite delle icone
 │  └─ media/
+│     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone)
 │     ├─ studio/           fotografie dello studio (ritratto.webp)
 │     └─ web/              screenshot dei progetti web (<prefisso>-desktop.webp, -tablet, -mobile, -*-tall)
 ├─ src/
@@ -79,7 +80,8 @@ albertopecchini.it/
 │  │  ├─ projects.js       portfolio: categorie, aree, progetti e i due interruttori di pubblicazione
 │  │  ├─ services.js       tre aree di servizi, pacchetti, FAQ
 │  │  ├─ method.js         le sette fasi del metodo
-│  │  └─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
+│  │  ├─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
+│  │  └─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
 │  ├─ templates/
 │  │  ├─ routes.js         tabella delle rotte (percorso, title, description, dati strutturati) + sitemap, robots, miniature
 │  │  ├─ layout.js         <html> completo: head, header, footer, JSON-LD, firma
@@ -87,7 +89,7 @@ albertopecchini.it/
 │  │  ├─ components/
 │  │  │  ├─ ui.js          icone, monogramma, bottoni, intestazioni di sezione, media, mockup, schede dati
 │  │  │  └─ project.js     card, riga d’indice, copertina e anteprima di un progetto
-│  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), contact, legal (privacy, cookie, 404)
+│  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), contact, legal (privacy, cookie, 404), stile (sistema visivo)
 │  ├─ art/                 generatori SVG delle tavole segnaposto
 │  │  ├─ index.js          registro: renderArt({ art, variant, tone, … })
 │  │  ├─ kit.js            primitive di disegno (squadratura, quote, tratteggi, testi)
@@ -99,8 +101,9 @@ albertopecchini.it/
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
+│  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate
 │  │  └─ utils.js          selettori, scroll, focus trap, reduced motion
-│  ├─ styles/              token → base → componenti → layout → pagine → stampa
+│  ├─ styles/              token → base → componenti → layout → pagine → stile → stampa
 │  ├─ main.js              entry JavaScript: avvia i moduli client
 │  └─ style.css            entry CSS: importa src/styles/* nell’ordine giusto
 ├─ vite.config.js
@@ -121,6 +124,7 @@ albertopecchini.it/
 | `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
 | `/contatti/` | Modulo di contatto, recapiti, area operativa |
+| `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
 | `404.html` | Pagina non trovata (servita in automatico da Vercel) |
 
@@ -245,6 +249,16 @@ I mockup usano cinque immagini per progetto in `public/media/web/`, catturate co
 
 Le versioni `Tall` scorrono al passaggio del puntatore; le loro altezze vanno riportate in `projects.js`. Prima dello scatto: animazioni disattivate, elementi `.reveal` visibili, immagini caricate (`loading=eager`), `prefers-reduced-motion` emulato per le pagine con hero a scorrimento.
 
+I mockup usano le cornici del file Figma [Device Mockups (iMac, Macbook, iPad, iPhone)](https://www.figma.com/design/7c1VwTtOkwA0GmVSf23dFg/Device-Mockups--iMac--Macbook--iPad--iPhone---Community-) (Figma Community): `deviceMockup(kind, …)` in `ui.js` le usa in copertine, hero, home e scene dei progetti.
+
+| `kind` | Dispositivo | Screenshot | File in `public/media/mockup/` |
+| --- | --- | --- | --- |
+| `laptop` | MacBook Pro | `web.desktop` / `desktopTall` | `macbook-pro.webp` (1244×736) |
+| `tablet` | iPad Pro 12,9″ | `web.tablet` | `ipad-pro.webp` (906×1180) |
+| `phone` | iPhone 14 Pro | `web.mobile` / `mobileTall` | `iphone-14-pro.webp` (720×1466) + isola e fotocamera in PNG |
+
+Le immagini vengono dai livelli del file, con il bordo trasparente ritagliato e convertite in WebP; nell’iPad lo schermo (sempre coperto dallo screenshot) è riempito di nero per alleggerire il file. Lo schermo è un riquadro sopra l’immagine con le quote del livello «Paste image here», in percentuale in `components.css`: se si cambia un’immagine vanno ricalcolate. Lo screenshot riempie lo schermo dall’alto (`object-fit: cover`); sull’iPhone l’isola dinamica sta sopra lo screenshot, come nel file. L’iMac e l’Apple Watch del file non si usano: lo schermo dell’iMac è 16:9 e taglierebbe gli screenshot 16:10.
+
 ## Modulo contatti
 
 Con `site.form.endpoint` vuoto il modulo, dopo la validazione, compone una email nel programma di posta del visitatore. Indicando un endpoint i dati partono in `POST` come JSON; una risposta 2xx mostra lo stato di successo, qualsiasi altra lo stato di errore. Tipi di progetto e fasce di budget si cambiano in `site.form`.
@@ -262,19 +276,20 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 ## Stili
 
-`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `layout` → `home` → `portfolio` → `pages` → `print`.
+`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `layout` → `home` → `portfolio` → `pages` → `stile` → `print`.
 
 - **Token** (`tokens.css`): palette carta / inchiostro / minio (`#E5481F`), scala tipografica, spazi, raggi, durate ed easing. È il primo file da aprire per cambiare l’aspetto.
 - **Caratteri**: Archivo Variable (asse `wdth`) per i testi, IBM Plex Mono per etichette e dati, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
 - **Reveal** (`base.css`): `data-reveal` con i tipi `fade`, `up`, `clip`, `line`, `draw`; tutto disattivato con `prefers-reduced-motion`.
 - **Footer** (`layout.css`): composizione unica, palette scoperta su `footer.site-footer`, firma con monogramma a tratto sottile.
+- **Stile** (`stile.css`): il piano navigabile della pagina `/stile/` e le sue tavole, a misure fisse in px (sono fogli inquadrati dalla finestra, non layout fluidi).
 - **Stampa** (`print.css`): la pagina `/studio/profilo/` è pensata per essere stampata come curriculum.
 
 ## JavaScript del browser
 
 `src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill.
 
-Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, orologio, barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti.
+Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, orologio, barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile.
 
 ## Build
 

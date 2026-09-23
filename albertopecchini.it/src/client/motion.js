@@ -247,7 +247,7 @@ export function initHoverPreview() {
 
 export function initScrollPreview() {
   $$('[data-scroll-preview]').forEach((el) => {
-    const page = $('.browser__page, .phone__page', el)
+    const page = $('.device__page', el)
     const screen = page?.parentElement
     if (!page || !screen) return
 

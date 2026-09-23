@@ -4,7 +4,7 @@ import { projects, featured, byArea, bySlug, areas } from '../../data/projects.j
 import { serviceAreas } from '../../data/services.js'
 import { steps } from '../../data/method.js'
 import { bio, photos, facts } from '../../data/studio.js'
-import { button, textLink, sectionHead, media, picture, browserMockup, phoneMockup, stat, icon, splitWords } from '../components/ui.js'
+import { button, textLink, sectionHead, media, picture, deviceMockup, stat, icon, splitWords } from '../components/ui.js'
 import { featureCard, indexRow } from '../components/project.js'
 import { COORDS } from '../layout.js'
 
@@ -16,7 +16,7 @@ const heroSlides = () => {
     {
       key: 'web',
       caption: `FIG. 02 — ${web.web.domain} · 2026`,
-      body: `<div class="hero__web" data-theme="ink">${browserMockup({ domain: web.web.domain, screen: web.web.desktop, lazy: false })}</div>`,
+      body: `<div class="hero__web" data-theme="ink">${deviceMockup('laptop', { domain: web.web.domain, screen: web.web.desktop, lazy: false })}</div>`,
     },
     { key: 'grafica', caption: 'FIG. 03 — Costruzione geometrica di un marchio', body: picture({ art: 'brandmark', brand: 'tavolato', construction: true, alt: 'Costruzione geometrica di un marchio su griglia' }, { lazy: false }) },
   ]
@@ -168,8 +168,8 @@ function webTeaser() {
         </div>
         <div class="webt__visual" data-reveal="up">
           <div class="webt__stage">
-            ${browserMockup({ domain: p.web.domain, screen: p.web.desktop, tall: p.web.desktopTall, className: 'webt__browser' })}
-            ${phoneMockup({ screen: p.web.mobile, tall: p.web.mobileTall, className: 'webt__phone' })}
+            ${deviceMockup('laptop', { domain: p.web.domain, screen: p.web.desktop, tall: p.web.desktopTall, className: 'webt__laptop' })}
+            ${deviceMockup('phone', { domain: p.web.domain, screen: p.web.mobile, tall: p.web.mobileTall, className: 'webt__phone' })}
           </div>
           <p class="label webt__caption"><span>${esc(p.web.domain)} · ${p.year}</span><span class="hint-hover">Passa il puntatore per scorrere la pagina</span><span class="hint-touch">Tocca lo schermo per scorrere la pagina</span></p>
         </div>

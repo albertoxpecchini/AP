@@ -73,7 +73,7 @@ ${mobileMenu(route)}
 <main id="main" tabindex="-1">
 ${body}
 </main>
-${footer({ route, compact: hideCta })}
+${!route.noFooter && footer({ route, compact: hideCta })}
 ${globals()}
 ${assets.scripts.map((s) => `<script type="module" src="${s}"></script>`)}
 </body>
@@ -186,7 +186,7 @@ function footer({ route, compact = false }) {
   const year = new Date().getFullYear()
   const mail = `mailto:${site.contact.email}`
   const tel = `tel:${site.contact.phone.replace(/\s/g, '')}`
-  const pages = [{ label: 'Home', href: '/' }, ...nav.map(({ label, href }) => ({ label, href }))]
+  const pages = [{ label: 'Home', href: '/' }, ...nav.map(({ label, href }) => ({ label, href })), { label: 'Stile', href: '/stile/' }]
   const legal = site.legal.albo ? `${site.legal.albo.collegio} · n. ${site.legal.albo.numero}` : site.legal.note
   const label = compact ? closing.labelCompact : closing.label
 
