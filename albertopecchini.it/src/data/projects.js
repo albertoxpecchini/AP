@@ -386,37 +386,40 @@ const allProjects = [
 
   // ═══ WEB ═══════════════════════════════════════════════════════════════════
   {
-    slug: 'rivalta-sul-mincio',
+    // Il dominio con il trattino, come albertopecchini-it: con `trailingSlash`
+    // Vercel tratta «.it» come l'estensione di un file e toglie la barra finale.
+    // vercel.json porta qui /portfolio/rivalta-sul-mincio/ e /portfolio/rivaltasulmincio.it.
+    slug: 'rivaltasulmincio-it',
     code: 'AP-26-W01',
     title: 'Rivalta sul Mincio',
-    subtitle: 'Il paese, in ogni suo dato',
+    subtitle: 'Un paese sul Mincio, letto luogo per luogo',
     area: 'web',
     categories: ['web'],
     types: ['Sito web', 'UI/UX', 'Sviluppo frontend', 'Dati aperti'],
     client: 'Progetto indipendente',
-    sector: 'Territorio e comunità',
+    sector: 'Territorio e informazione locale',
     location: 'Rivalta sul Mincio, Rodigo (MN)',
     year: 2026,
-    services: ['Ricerca e raccolta dati', 'Architettura dei contenuti', 'Web design', 'Sviluppo frontend', 'Illustrazioni'],
-    technologies: ['Next.js', 'TypeScript', 'Tailwind CSS', 'GSAP', 'OpenStreetMap', 'Vercel'],
-    summary: 'Un dossier informativo su un paese di tremila abitanti: servizi, strade, natura, eventi. Geodati da OpenStreetMap, il resto da fonti ufficiali e stampa locale.',
+    services: ['Architettura dei contenuti', 'Web design', 'Sviluppo frontend', 'Integrazione dati OpenStreetMap', 'Fotografia'],
+    technologies: ['Vite', 'TypeScript', 'OpenStreetMap', 'Leaflet', 'Web Animations API', 'Vercel'],
+    summary: 'Un atlante digitale di Rivalta sul Mincio: 184 luoghi da OpenStreetMap su mappa e in 124 schede, il meteo della stazione del paese, un giornale locale e la fonte di ogni dato.',
     description:
-      'Rivalta è la frazione più popolosa del Comune di Rodigo, affacciata sulle Valli del Mincio. Le informazioni su servizi, orari, strade ed eventi erano sparse tra sito del Comune, pagine social e memoria delle persone. Le ho raccolte in un posto solo.',
-    goal: 'Dare a chi abita o visita il paese un’unica fonte ordinata e aggiornata, in cui ogni numero dichiari da dove viene.',
+      'Rivalta sul Mincio è una frazione di Rodigo, in provincia di Mantova, affacciata sulla Riserva Naturale Valli del Mincio. Il sito non è il portale del Comune né una guida turistica: è un atlante del paese fatto di dati verificabili, in cui ogni numero dice da dove viene e quando è stato controllato.',
+    goal: 'Serve a chi abita a Rivalta, a chi ne è originario e a chi ci passa, per sapere cosa c’è in paese, dove si trova e da quale fonte arriva ogni informazione.',
     problem:
-      'I dati di un paese piccolo sono tanti, eterogenei e invecchiano in fretta. Un sito vetrina non bastava: serviva una struttura capace di reggere diciassette sezioni senza diventare un elenco illeggibile.',
+      'Le informazioni su Rivalta stanno in posti diversi — OpenStreetMap, la stazione meteo del paese, il sito del Comune, le locandine delle associazioni — ognuno con il suo formato e la sua data. Metterle insieme senza inventare nulla voleva dire tenere ogni dato legato alla sua fonte e poterlo aggiornare senza rifare le pagine.',
     strategy:
-      'Trattarlo come un rilievo: prima si misura, poi si disegna. Geodati estratti da OpenStreetMap, una pagina «Dati e fonti» che documenta ogni cifra, un registro pubblico degli aggiornamenti e un’identità illustrata che cambia con le stagioni.',
+      'Prima delle pagine ho scritto le regole: diciannove documenti di specifica, dal contratto architetturale ai colori. I dati vivono in file JSON separati dall’interfaccia e ogni pagina è HTML statico generato al build, senza framework. L’aspetto è quello di uno strumento da consultare: carta crema a quadretti, pannelli marrone scuro, etichette in monospace, coordinate e date di aggiornamento accanto ai numeri.',
     development: [
-      { title: 'Dati', text: '954 edifici, 74 assi viari e 127 ettari di zone umide mappati nell’area di studio; stazione meteo letta in tempo reale.' },
-      { title: 'Struttura', text: 'Diciassette sezioni — dal paese alla storia, da «Mangiare» a «Muoversi» — con ricerca interna e rassegna stampa collegata agli articoli originali.' },
-      { title: 'Interfaccia', text: 'Tema scuro, tipografia larga, illustrazioni vettoriali stagionali e pagine evento con identità propria per Sagra, Palio e Color Walk.' },
+      { title: 'Dati', text: 'Uno script interroga OpenStreetMap entro 2,5 km dal paese, traduce i tag in 9 categorie e 71 tipi e confronta il risultato con l’archivio: gli identificativi non cambiano e un luogo sparito resta, segnato come rimosso.' },
+      { title: 'Mappa', text: 'Leaflet con i marker raggruppati per categoria, caricato solo quando la mappa entra nello schermo; sul telefono la scheda del luogo sale dal basso. L’elenco dei luoghi ne è l’alternativa testuale completa, leggibile anche senza JavaScript.' },
+      { title: 'Meteo', text: 'La stazione MeteoMincio non ha API: due funzioni su Vercel leggono i suoi file, li normalizzano e li tengono in cache per 60 secondi e 15 minuti. La pagina dice anche quando il dato è vecchio o non arriva.' },
     ],
-    result: 'Un sito pubblico, fatto da una persona sola e con il codice in chiaro, che il paese usa per sapere cosa c’è, dove e quando.',
+    result: 'Il sito è online in beta su rivaltasulmincio.it con 132 pagine statiche, circa 3 KB di JavaScript all’apertura e nessun sistema di tracciamento. Il giornale è partito con la Sagra dei Patroni 2026, pubblicata insieme alla locandina originale degli organizzatori.',
     metrics: [
-      { value: '17', label: 'Sezioni' },
-      { value: '954', label: 'Edifici mappati' },
-      { value: '74', label: 'Strade censite' },
+      { value: '184', label: 'Luoghi da OpenStreetMap' },
+      { value: '50', label: 'Fotografie originali' },
+      { value: '132', label: 'Pagine statiche generate' },
     ],
     web: {
       url: 'https://www.rivaltasulmincio.it',
@@ -426,13 +429,14 @@ const allProjects = [
       tablet: shot('rivalta-tablet.webp', 720, 1036, 'Home page di rivaltasulmincio.it su tablet'),
       mobile: shot('rivalta-mobile.webp', 600, 1298, 'Home page di rivaltasulmincio.it su smartphone'),
       mobileTall: shot('rivalta-mobile-tall.webp', 600, 4000, 'Home page di rivaltasulmincio.it su smartphone, pagina intera'),
-      palette: ['#15151A', '#F2F0EB', '#E0637A', '#E8B76A', '#8B6FB8'],
+      palette: ['#F3EDE0', '#1F1A16', '#4A2B1A', '#A63A1A', '#E9E1D0'],
     },
     cover: shot('rivalta-desktop.webp', 1200, 750, 'Home page di rivaltasulmincio.it'),
+    // La home è già nei dispositivi in apertura: la galleria mostra le pagine interne.
     images: [
-      shot('rivalta-desktop.webp', 1200, 750, 'Home page di rivaltasulmincio.it su desktop', 'Home — desktop 1440 px'),
-      shot('rivalta-tablet.webp', 720, 1036, 'Home page di rivaltasulmincio.it su tablet', 'Home — tablet 820 px'),
-      shot('rivalta-mobile.webp', 600, 1298, 'Home page di rivaltasulmincio.it su smartphone', 'Home — smartphone 390 px'),
+      shot('rivalta-mappa-desktop.webp', 1200, 750, 'La mappa di rivaltasulmincio.it con i marker per categoria e la scheda della chiesa dei Santi Vigilio e Donato aperta', 'Mappa — desktop 1440 px'),
+      shot('rivalta-luogo-tablet.webp', 720, 960, 'La scheda della chiesa dei Santi Vigilio e Donato su rivaltasulmincio.it: fotografia, dati del luogo e mappa', 'Scheda di un luogo — tablet 820 px'),
+      shot('rivalta-mappa-mobile.webp', 600, 1298, 'La mappa di rivaltasulmincio.it su smartphone, con la scheda del luogo aperta dal basso', 'Mappa, scheda dal basso — smartphone 390 px'),
     ],
     featured: true,
     sample: false,

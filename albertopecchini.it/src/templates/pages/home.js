@@ -10,7 +10,7 @@ import { COORDS } from '../layout.js'
 
 // Le tre figure dell'hero: una per disciplina, sincronizzate con l'elenco dei ruoli.
 const heroSlides = () => {
-  const web = bySlug('rivalta-sul-mincio')
+  const web = bySlug('rivaltasulmincio-it')
   return [
     { key: 'tecnico', caption: 'FIG. 01 — Pianta piano terra · scala 1:100', body: picture({ art: 'floorplan', variant: 'casa', code: 'AP-26-004', alt: 'Pianta architettonica quotata di un’abitazione' }, { lazy: false }) },
     {
