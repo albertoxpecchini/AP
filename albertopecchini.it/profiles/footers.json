@@ -94,7 +94,7 @@
       ]
     },
     "gmail": {
-      "current": "v2",
+      "current": "v4",
       "versions": [
         {
           "id": "v1",
@@ -162,6 +162,42 @@
           "links": [],
           "social": [],
           "notes": []
+        },
+        {
+          "id": "v4",
+          "createdAt": "2026-09-22",
+          "source": "add_version",
+          "replaces": null,
+          "heading": "Alberto Pecchini",
+          "logo": {
+            "file": "src/assets/email/unimore-logo.png",
+            "alt": "Università degli Studi di Modena e Reggio Emilia",
+            "width": 168,
+            "padding": 14
+          },
+          "name": "Alberto Pecchini",
+          "role": "Studente al 1° anno — matricola 223824",
+          "org": "Costruzioni e gestione del territorio (L-P01) · Dipartimento di Ingegneria \"Enzo Ferrari\" · Università degli Studi di Modena e Reggio Emilia",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email di ateneo",
+              "value": "398893@studenti.unimore.it",
+              "href": "mailto:398893@studenti.unimore.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 351 0355506",
+              "href": "tel:+393510355506"
+            }
+          ],
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [
+            "Anno accademico 2026/2027 — percorso comune, PDS0-2026"
+          ]
         }
       ]
     }

@@ -5,7 +5,67 @@
 // inline e a blocchi) e produce markup con stili INLINE, perché i client di posta
 // scartano con frequenza i fogli incorporati. Le classi restano come appiglio per
 // i pochi client che onorano <style>.
+import fs from 'node:fs'
+import path from 'node:path'
 import { escapeHtml } from './util.js'
+import { paths } from './paths.js'
+
+// Varianti del pulsante «:::bottone». Per i marchi colori e glifo sono quelli
+// ufficiali; il verde WhatsApp è #008069 (quello dei pulsanti di WhatsApp Web)
+// perché con il bianco regge il contrasto AA (4,9:1): il #25D366 del logo si
+// ferma a 2:1. Il glifo è un PNG: Gmail e Outlook non mostrano l'SVG.
+const BUTTON_VARIANTS = {
+  whatsapp: { background: '#008069', color: '#ffffff', icon: 'src/assets/email/whatsapp-glyph.png' },
+}
+
+const iconCache = new Map()
+
+/** Icona del pulsante → data URI, come il logo della firma. */
+function iconDataUri(file) {
+  if (!file) return ''
+  if (!iconCache.has(file)) {
+    const full = path.resolve(paths.root, file)
+    iconCache.set(file, fs.existsSync(full) ? `data:image/png;base64,${fs.readFileSync(full).toString('base64')}` : '')
+  }
+  return iconCache.get(file)
+}
+
+/** Righe del blocco pulsante → { label, url }: l'URL è la riga che inizia con http(s). */
+function parseButton(lines) {
+  const clean = lines.map((line) => line.trim()).filter(Boolean)
+  const url = clean.find((line) => /^https?:\/\/\S+$/i.test(line)) ?? ''
+  const label = clean.filter((line) => line !== url).join(' ') || url
+  return { label, url }
+}
+
+/**
+ * Pulsante «a prova di client»: tabella con fondo sul <td> (Outlook) e padding
+ * sul link (tutta l'area è cliccabile negli altri client). Sotto, il link in
+ * chiaro per chi ha le immagini bloccate o un client che non rende il pulsante.
+ */
+function renderButton(variant, lines, theme, st) {
+  const { label, url } = parseButton(lines)
+  if (!url) return label ? `<p style="${st.p}">${renderInline(label, st)}</p>` : ''
+
+  const c = theme.color
+  const look = BUTTON_VARIANTS[variant] ?? { background: c.ink, color: c.paper, icon: '' }
+  const icon = iconDataUri(look.icon)
+  const href = escapeHtml(url)
+  const sp = theme.space
+
+  const iconHtml = icon
+    ? `<img src="${icon}" width="24" height="24" alt="" style="display:inline-block;width:24px;height:24px;border:0;outline:none;vertical-align:middle;margin:0 10px 0 0;" />`
+    : ''
+
+  return [
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:${sp.s2}px 0 ${sp.s3}px;border-collapse:separate;">`,
+    `<tr><td align="center" bgcolor="${look.background}" style="background:${look.background};border-radius:999px;">`,
+    `<a href="${href}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 28px 14px ${icon ? 22 : 28}px;font-family:${theme.font.sans};font-size:17px;line-height:24px;font-weight:600;color:${look.color};text-decoration:none;border-radius:999px;">`,
+    `${iconHtml}<span style="color:${look.color};vertical-align:middle;">${escapeHtml(label)}</span></a>`,
+    `</td></tr></table>`,
+    `<p style="${st.small}">Link diretto: <a href="${href}" style="${st.link}word-break:break-all;">${href}</a></p>`,
+  ].join('')
+}
 
 /** Stili inline dei blocchi, derivati dal tema. */
 function styles(theme) {
@@ -124,6 +184,20 @@ export function renderMarkdown(markdown, theme) {
       }
       i += 1
       out.push(`<pre style="${st.pre}"><code style="${st.preCode}">${escapeHtml(buffer.join('\n'))}</code></pre>`)
+      continue
+    }
+
+    // Pulsante: «:::bottone [variante]», etichetta e URL su righe proprie, «:::».
+    const button = /^:::\s*(?:bottone|pulsante)\b\s*([\w-]*)/i.exec(line.trim())
+    if (button) {
+      const buffer = []
+      i += 1
+      while (i < lines.length && !/^:::/.test(lines[i].trim())) {
+        buffer.push(lines[i])
+        i += 1
+      }
+      i += 1
+      out.push(renderButton(button[1].toLowerCase(), buffer, theme, st))
       continue
     }
 
@@ -273,6 +347,11 @@ export function markdownToText(markdown) {
     .replace(/\r\n/g, '\n')
     // Le tabelle si convertono prima che il resto della pulizia le smonti.
     .replace(/(?:^\s*\|.*\n)+/gm, (block) => `${tableToText(block.replace(/\n$/, ''))}\n`)
+    // Pulsante → «Etichetta: URL», prima che la pulizia dei «:::» lo smonti.
+    .replace(/^:::\s*(?:bottone|pulsante)\b[^\n]*\n([\s\S]*?)^:::[ \t]*$/gim, (_, body) => {
+      const { label, url } = parseButton(body.split('\n'))
+      return url && label !== url ? `${label}: ${url}` : label
+    })
     .replace(/[ \t]{2,}\n/g, '\n')
     .replace(/```[\w-]*\n([\s\S]*?)```/g, (_, code) => code.trim())
     .replace(/^:::\s*nota\s*/gim, '')
@@ -285,7 +364,8 @@ export function markdownToText(markdown) {
     .replace(/~~([^~]+)~~/g, '$1')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/^>\s?/gm, '')
-    .replace(/^\s*[-*+]\s+/gm, '— ')
+    // [ \t] e non \s: con /m, \s* ingoierebbe la riga vuota prima dell'elenco.
+    .replace(/^[ \t]*[-*+]\s+/gm, '— ')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }

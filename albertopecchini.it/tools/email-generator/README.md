@@ -91,6 +91,17 @@ Il preventivo resta valido 30 giorni.
 :::
 ```
 
+Per un pulsante (etichetta e URL su righe proprie; sotto compare anche il link
+in chiaro). Con la variante `whatsapp` il pulsante prende verde e logo di
+WhatsApp; senza variante usa i colori del tema:
+
+```text
+:::bottone whatsapp
+Entra nel gruppo WhatsApp
+https://chat.whatsapp.com/CODICE
+:::
+```
+
 Se il materiale contiene a sua volta un blocco di codice, si racchiude la sezione
 in una recinzione più lunga (quattro apici inversi invece di tre).
 

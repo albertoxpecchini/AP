@@ -7,6 +7,7 @@
 //   REPLACE        idem, ma il report dichiara la sostituzione esplicita
 // Le versioni precedenti restano nel file e possono essere ripristinate a mano.
 import fs from 'node:fs'
+import path from 'node:path'
 import { paths } from './paths.js'
 import { escapeHtml } from './util.js'
 
@@ -226,6 +227,33 @@ export function writeFootersMarkdown(data = loadFooters()) {
 /**
  * Footer in HTML: riquadro dedicato, tema scuro coerente con `[data-theme='ink']`.
  */
+/**
+ * Logo della firma → data URI.
+ * `footer.logo` è { file, alt, width }: `file` è relativo alla radice del sito.
+ * Un file assente non è un errore: la firma esce semplicemente senza logo.
+ */
+export function resolveFooterLogo(footer) {
+  const logo = footer?.logo
+  if (!logo?.file) return null
+
+  const file = path.resolve(paths.root, logo.file)
+  if (!fs.existsSync(file)) return null
+
+  const ext = path.extname(file).toLowerCase()
+  const mime = ext === '.png' ? 'image/png' : ext === '.gif' ? 'image/gif' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : null
+  // Niente SVG: Gmail, Outlook e Apple Mail non lo mostrano.
+  if (!mime) return null
+
+  const base64 = fs.readFileSync(file).toString('base64')
+  return {
+    src: `data:${mime};base64,${base64}`,
+    alt: logo.alt ?? '',
+    width: Number(logo.width) || 180,
+    padding: Number(logo.padding) || 12,
+    bytes: base64.length,
+  }
+}
+
 export function renderFooterHtml(footer, theme) {
   if (!footer) return ''
   const c = theme.color
@@ -236,6 +264,20 @@ export function renderFooterHtml(footer, theme) {
   const labelStyle = `font-family:${mono};font-size:${theme.size.label}px;letter-spacing:${theme.tracking.label};text-transform:uppercase;color:${c.darkMuted};`
   const linkStyle = `color:${c.darkAccent};text-decoration:none;`
   const rows = []
+
+  // Logo dell'ente, sopra il nome. Si incorpora come data URI: i client di
+  // posta bloccano le immagini remote, e l'SVG non è supportato quasi da
+  // nessuno — per questo il file di riferimento è un PNG.
+  // Il logo NON si ritocca: i marchi istituzionali vanno riprodotti come sono.
+  // Poiché il pannello della firma è scuro e il logo è pensato per fondo
+  // chiaro, si dà al logo un riquadro chiaro suo, che fa da «carta».
+  const logo = resolveFooterLogo(footer)
+  if (logo) {
+    const pad = logo.padding ?? 12
+    rows.push(
+      `<tr><td style="padding:0 0 ${sp.s5}px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:${c.paper};border-radius:${theme.radius.r2};padding:${pad}px ${pad + 2}px;line-height:0;"><img src="${logo.src}" alt="${escapeHtml(logo.alt)}" width="${logo.width}" style="display:block;width:${logo.width}px;max-width:100%;height:auto;border:0;" /></td></tr></table></td></tr>`,
+    )
+  }
 
   if (footer.name) {
     rows.push(

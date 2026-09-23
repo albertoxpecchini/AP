@@ -8,7 +8,7 @@
 import { markdownToText } from './markdown.js'
 
 const GREETING_RE = /^(gentile|gentilissim|egregi|spettabile|buongiorno|buonasera|salve|ciao|caro|cara)\b/i
-const CLOSING_RE = /(cordiali saluti|distinti saluti|cordialmente|a presto|grazie e (?:a presto|buona)|un saluto|buon lavoro|resto a disposizione|in attesa di)/i
+const CLOSING_RE = /(cordiali saluti|distinti saluti|cordialmente|a presto|ci sentiamo|grazie e (?:a presto|buona)|un saluto|buon lavoro|resto a disposizione|in attesa di)/i
 
 const CLOSINGS = {
   formale: 'Cordiali saluti,',
@@ -25,7 +25,9 @@ export function hasGreeting(text) {
 }
 
 export function hasClosing(text) {
-  const tail = String(text ?? '').trim().split(/\n/).slice(-6).join('\n')
+  // Righe unite con uno spazio: «cordiali» a fine riga e «saluti» a capo
+  // sono comunque un saluto, e non va aggiunto un secondo congedo.
+  const tail = String(text ?? '').trim().split(/\n/).slice(-6).join(' ').replace(/\s+/g, ' ')
   return CLOSING_RE.test(tail)
 }
 
