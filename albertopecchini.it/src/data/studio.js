@@ -27,7 +27,7 @@ export const timeline = [
   { year: '2021', title: 'I.T.T. «Carlo d’Arco», Mantova', text: 'Inizio del percorso in Costruzioni, Ambiente e Territorio: disegno tecnico, topografia, estimo, gestione del cantiere.', tag: 'Formazione' },
   { year: '2023', title: 'Ufficio tecnico, reparto legno', text: 'Prima di tre sessioni di PCTO in Caem Group a Castellucchio: modellazione 3D di tettoie, preventivi, archivio tecnico. Strutture in lamellare e X-LAM.', tag: 'Tecnico' },
   { year: '2024', title: 'Dublino, inglese C1', text: 'Corso intensivo al CES di Dublino e certificazione IELTS. Documentazione tecnica e strumenti di sviluppo si leggono in inglese: meglio farlo bene.', tag: 'Formazione' },
-  { year: '2026', title: 'Primi siti per clienti', text: 'Online il sito dello studio dell’ing. Dario Donelli e quello dell’azienda agricola Cascina Fontana; in proprio, l’atlante digitale di Rivalta sul Mincio. React, Vite, TypeScript.', tag: 'Web' },
+  { year: '2026', title: 'Primi siti per clienti', text: 'Online il sito dello studio dell’ing. Dario Donelli; in proprio, l’atlante digitale di Rivalta sul Mincio e il sito di Cascina Fontana, l’azienda agricola di famiglia. React, Vite, TypeScript, JavaScript vanilla.', tag: 'Web' },
   { year: '2026', title: 'Diploma CAT', text: 'Diploma di Costruzioni, Ambiente e Territorio dopo cinque anni di AutoCAD, rilievo strumentale ed estimo.', tag: 'Tecnico' },
   { year: '2026', title: 'Università di Modena e Reggio Emilia', text: 'Immatricolazione al corso di laurea in Costruzioni e gestione del territorio, Dipartimento di Ingegneria «Enzo Ferrari».', tag: 'Formazione' },
 ]
@@ -120,9 +120,13 @@ export const profile = {
     },
     {
       period: '2026',
-      title: 'Cascina Fontana — azienda agricola',
-      role: 'Web design e sviluppo · React, TypeScript, Tailwind CSS',
-      detail: ['Sito vetrina con presentazione dell’azienda, dei prodotti e dei recapiti, ottimizzato per la consultazione da smartphone.'],
+      title: 'Cascina Fontana — sito dell’azienda agricola di famiglia',
+      role: 'Contenuti, fotografia, design e sviluppo · Vite, HTML, CSS, JavaScript',
+      detail: [
+        'Cinque pagine in HTML, CSS e JavaScript vanilla, senza dipendenze a runtime né cookie.',
+        'Testi scritti con mio padre, fotografie mie; sei produzioni con il calendario dei dodici mesi.',
+        'Rifatto a settembre 2026 al posto di un’applicazione React in quattro lingue.',
+      ],
     },
     {
       period: '2019 — oggi',
