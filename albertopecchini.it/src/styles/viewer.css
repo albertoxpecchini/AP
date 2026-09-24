@@ -435,13 +435,6 @@
   }
 }
 
-/* dove c'è l'indice laterale delle sezioni del case study, il riquadro gli lascia spazio */
-@media (min-width: 1280px) {
-  .cs-sec--sheets .cs-sec__grid {
-    padding-right: 2.5rem;
-  }
-}
-
 /* ── Pagina /portfolio/tavole/ ─────────────────────────────────────────── */
 
 body.page--tavole {

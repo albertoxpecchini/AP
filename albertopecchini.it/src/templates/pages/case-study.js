@@ -19,11 +19,14 @@ const SECTIONS = [
   ['dati', 'Dati progetto'],
 ]
 
-// Nei progetti con tavole vere la galleria diventa il visualizzatore
-const labelOf = (p, i) => (i === 6 && p.sheets ? 'Tavole' : SECTIONS[i][1])
+// Le sezioni di un progetto: con le tavole vere la galleria diventa «Tavole» (il
+// visualizzatore); con le fotografie si aggiunge una sezione subito dopo.
+const sectionsOf = (p) =>
+  SECTIONS.flatMap(([id, label]) => (id === 'galleria' ? [[id, p.sheets ? 'Tavole' : label], ...(p.photos ? [['fotografie', 'Fotografie']] : [])] : [[id, label]]))
 
-const sec = (i, body, extraClass = '', theme = '', label = SECTIONS[i][1]) => {
-  const [id] = SECTIONS[i]
+const sec = (list, id, body, extraClass = '', theme = '') => {
+  const i = list.findIndex(([key]) => key === id)
+  const label = list[i][1]
   const n = String(i + 1).padStart(2, '0')
   return html`
     <section class="cs-sec ${extraClass}" id="${id}" data-spy aria-labelledby="cs-${id}"${theme && ` data-theme="${theme}"`}>
@@ -38,6 +41,26 @@ const sec = (i, body, extraClass = '', theme = '', label = SECTIONS[i][1]) => {
   `
 }
 
+/** Le fotografie di un progetto, a gruppi, in colonne; si aprono nel lightbox. */
+function photoSection(p) {
+  let index = 0
+  const total = p.photos.groups.reduce((n, g) => n + g.items.length, 0)
+  return html`
+    <p class="cs-lead" data-reveal="up">${esc(p.photos.lead)}</p>
+    ${p.photos.groups.map(
+      (g, k) => html`
+        <div class="cs-photos__group">
+          <h3 class="cs-photos__title"><span class="label">${String(k + 1).padStart(2, '0')}</span>${esc(g.title)}<span class="label">${g.items.length} foto</span></h3>
+          <div class="cs-photos">
+            ${g.items.map((im) => media(im, { zoom: true, group: `${p.slug}-foto`, index: index++, reveal: 'fade' }))}
+          </div>
+        </div>
+      `,
+    )}
+    <p class="label cs-gallery__hint">${icon('expand')} ${total} fotografie · seleziona una foto per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</p>
+  `
+}
+
 export function caseStudyPage(p) {
   const area = allAreas[p.area]
   const next = nextOf(p.slug)
@@ -45,6 +68,8 @@ export function caseStudyPage(p) {
   const brand = p.brand && BRANDS[p.brand]
   const palette = brand ? brand.palette : p.web?.palette
   const isWeb = p.area === 'web' && p.web
+  const list = sectionsOf(p)
+  const section = (id, body, extraClass, theme) => sec(list, id, body, extraClass, theme)
 
   return html`
     <article class="cs">
@@ -71,12 +96,12 @@ export function caseStudyPage(p) {
 
       <nav class="cs-nav" aria-label="Sezioni del case study" data-spy-nav>
         <ol>
-          ${SECTIONS.map(([id], i) => `<li><a href="#${id}" data-tooltip="${esc(labelOf(p, i))}"><span class="label">${String(i + 1).padStart(2, '0')}</span><span class="sr-only"> ${esc(labelOf(p, i))}</span></a></li>`)}
+          ${list.map(([id, label], i) => `<li><a href="#${id}" data-tooltip="${esc(label)}"><span class="label">${String(i + 1).padStart(2, '0')}</span><span class="sr-only"> ${esc(label)}</span></a></li>`)}
         </ol>
       </nav>
 
-      ${sec(
-        0,
+      ${section(
+        'overview',
         html`
           <p class="cs-lead" data-reveal="up">${esc(p.description)}</p>
           <p data-reveal="up">${esc(p.summary)}</p>
@@ -87,26 +112,26 @@ export function caseStudyPage(p) {
           ${isWeb && p.web.url ? `<div data-reveal="up">${button({ href: p.web.url, label: `Visita ${p.web.domain}`, variant: 'ghost', iconName: 'arrowUpRight', external: true })}</div>` : ''}
         `,
       )}
-      ${sec(1, `<p class="cs-big" data-reveal="up">${esc(p.goal)}</p>`)}
-      ${sec(2, `<p class="cs-lead" data-reveal="up">${esc(p.problem)}</p>`, 'cs-sec--tint', 'tint')}
-      ${sec(
-        3,
+      ${section('obiettivo', `<p class="cs-big" data-reveal="up">${esc(p.goal)}</p>`)}
+      ${section('problema', `<p class="cs-lead" data-reveal="up">${esc(p.problem)}</p>`, 'cs-sec--tint', 'tint')}
+      ${section(
+        'strategia',
         html`
           <p class="cs-lead" data-reveal="up">${esc(p.strategy)}</p>
           ${palette ? `<div class="cs-block" data-reveal="up"><p class="label">Palette</p>${swatches(palette)}</div>` : ''}
           ${p.typefaces ? `<div class="cs-block" data-reveal="up"><p class="label">Tipografia</p>${specimens(p.typefaces)}</div>` : ''}
         `,
       )}
-      ${sec(
-        4,
+      ${section(
+        'sviluppo',
         html`
           <ol class="cs-steps">
             ${p.development.map((d, i) => `<li class="cs-step" data-reveal="up" style="--d:${i * 70}ms"><span class="cs-step__n label">${String(i + 1).padStart(2, '0')}</span><h3 class="cs-step__title h4">${esc(d.title)}</h3><p>${esc(d.text)}</p></li>`)}
           </ol>
         `,
       )}
-      ${sec(
-        5,
+      ${section(
+        'risultato',
         html`
           <p class="cs-big" data-reveal="up">${esc(p.result)}</p>
           <ul class="cs-metrics">
@@ -117,18 +142,16 @@ export function caseStudyPage(p) {
         'ink',
       )}
       ${p.sheets
-        ? sec(
-            6,
+        ? section(
+            'galleria',
             html`
               ${sheetViewer([{ project: p, sheets: p.sheets }])}
               <p class="label cs-gallery__hint">${icon('expand')} Trascina per spostarti · Ctrl + rotella o due dita per ingrandire · frecce per cambiare tavola · doppio clic per avvicinarti</p>
             `,
             'cs-sec--wide cs-sec--sheets',
-            '',
-            labelOf(p, 6),
           )
-        : sec(
-            6,
+        : section(
+            'galleria',
             html`
               ${p.compare ? compare(p.compare) : ''}
               <div class="cs-gallery cs-gallery--${p.area}">
@@ -138,8 +161,9 @@ export function caseStudyPage(p) {
             `,
             'cs-sec--wide',
           )}
-      ${sec(
-        7,
+      ${p.photos ? section('fotografie', photoSection(p), 'cs-sec--wide cs-sec--photos') : ''}
+      ${section(
+        'tecnologie',
         html`
           <div class="cs-tech" data-reveal="up">
             <p class="label">${isWeb ? 'Stack e strumenti' : 'Software e strumenti'}</p>
@@ -151,8 +175,8 @@ export function caseStudyPage(p) {
           </div>
         `,
       )}
-      ${sec(
-        8,
+      ${section(
+        'dati',
         html`
           <div class="cs-data" data-reveal="up">
             ${dataSheet(p)}

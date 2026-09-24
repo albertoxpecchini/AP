@@ -1128,6 +1128,65 @@
   padding: 8px;
 }
 
+/* Fotografie di un progetto: gruppi con titolo, foto in colonne con le proporzioni vere */
+.cs-photos__group {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+.cs-photos__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.9rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-h4);
+  font-weight: 560;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.cs-photos__title .label:first-child {
+  color: var(--accent-text);
+}
+
+.cs-photos__title .label:last-child {
+  margin-left: auto;
+}
+
+.cs-photos {
+  columns: 2;
+  column-gap: var(--col-gap);
+}
+
+.cs-photos > .media {
+  break-inside: avoid;
+  margin-bottom: var(--col-gap);
+}
+
+@media (min-width: 768px) {
+  .cs-photos {
+    columns: 3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .cs-photos {
+    columns: 4;
+  }
+}
+
+/* tavole e fotografie arrivano al bordo destro: dove c'è l'indice laterale
+   delle sezioni (da 1280 px) gli lasciano spazio */
+@media (min-width: 1280px) {
+  .cs-sec--sheets .cs-sec__grid,
+  .cs-sec--photos .cs-sec__grid {
+    padding-right: 2.5rem;
+  }
+}
+
 .cs-gallery__hint {
   display: flex;
   align-items: center;
