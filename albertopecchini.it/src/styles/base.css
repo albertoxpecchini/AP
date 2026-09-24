@@ -241,15 +241,25 @@ p {
   vertical-align: 0.02em;
 }
 
+/* l'alone si allarga di 0,6rem per lato e svanisce: scala e opacità di un
+   pseudo-elemento, animate dalla GPU senza ridipingere la pagina */
 .dot--live {
+  position: relative;
   background: #2f9e5b;
-  box-shadow: 0 0 0 0 rgb(47 158 91 / 0.5);
+}
+
+.dot--live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgb(47 158 91 / 0.5);
   animation: pulse 2.4s ease-out infinite;
 }
 
 @keyframes pulse {
-  70% { box-shadow: 0 0 0 0.6rem rgb(47 158 91 / 0); }
-  100% { box-shadow: 0 0 0 0 rgb(47 158 91 / 0); }
+  from { transform: scale(1); opacity: 1; }
+  70%, to { transform: scale(3.4); opacity: 0; }
 }
 
 /* crocini di registro agli angoli di un riquadro */

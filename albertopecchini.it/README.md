@@ -101,7 +101,7 @@ albertopecchini.it/
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
-│  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate
+│  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate, griglia in WebGL
 │  │  └─ utils.js          selettori, scroll, focus trap, reduced motion
 │  ├─ styles/              token → base → componenti → layout → pagine → stile → stampa
 │  ├─ main.js              entry JavaScript: avvia i moduli client

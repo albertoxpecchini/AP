@@ -40,6 +40,7 @@ const sub = (left, right, { top = false, muted = false, plain = false } = {}) =>
 const board = (b, content) => html`
   <article class="board" id="tavola-${b.key}" data-board="${b.key}" style="--x:${b.x}px;--y:${b.y}px;--w:${b.w}px;--h:${b.h}px" aria-labelledby="tavola-${b.key}-nome">
     <h2 class="board__name label" id="tavola-${b.key}-nome"><span>${esc(b.title)}</span><span aria-hidden="true">${b.w} × ${b.h}</span></h2>
+    <span class="board__ring" aria-hidden="true"></span>
     <div class="board__frame" data-theme="paper">${content}</div>
   </article>
 `
