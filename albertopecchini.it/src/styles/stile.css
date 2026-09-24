@@ -15,9 +15,6 @@ body.page--stile {
 }
 
 .canvas {
-  --z: 1;
-  --bx: 0px;
-  --by: 0px;
   position: fixed;
   inset: 0;
   z-index: 1;
@@ -26,15 +23,26 @@ body.page--stile {
   color: var(--c-ink);
 }
 
-/* griglia di punti che scala con lo zoom e sparisce quando è troppo fitta */
+/* Griglia di punti che scala con lo zoom e sparisce quando è troppo fitta.
+   Di norma la disegna uno shader WebGL in un <canvas> figlio (.is-gl); il
+   gradiente resta per i dispositivi senza accelerazione grafica, e canvas.js
+   ne aggiorna misura, posizione e opacità direttamente su questo elemento. */
 .canvas__bg {
   position: absolute;
   inset: 0;
   background-image: radial-gradient(rgb(16 17 15 / 0.22) 1px, transparent 1.4px);
-  background-size: calc(24px * var(--z)) calc(24px * var(--z));
-  background-position: var(--bx) var(--by);
-  opacity: clamp(0, (var(--z) - 0.3) * 2, 1);
+  background-size: 24px 24px;
   pointer-events: none;
+}
+
+.canvas__bg.is-gl {
+  background: none;
+}
+
+.canvas__bg > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .canvas__viewport {
@@ -59,6 +67,9 @@ body.page--stile {
   user-select: none;
 }
 
+/* will-change resta sempre: senza, Chromium rasterizzerebbe di nuovo le
+   tavole a ogni spostamento di frazioni di pixel (per allineare il testo) e a
+   ogni cambio di scala; con, le ricompone come texture sulla GPU */
 .canvas__world {
   position: absolute;
   top: 0;
@@ -82,6 +93,9 @@ body.page--stile {
 }
 
 /* ── Tavola: cornice e nome ───────────────────────────────────────────────── */
+/* Ciò che cambia con lo zoom (controscala del nome, spessore dell'anello)
+   lo scrive canvas.js come trasformazione su elementi con un layer proprio:
+   la GPU li ricompone senza ridipingere le tavole. */
 
 .board {
   position: absolute;
@@ -90,20 +104,29 @@ body.page--stile {
   width: var(--w);
 }
 
-/* il nome sta sopra la cornice e resta della stessa misura a ogni zoom;
-   quando la tavola è più stretta del nome, il nome si accorcia con i puntini */
+/* l'ombra sta sotto l'anello, l'anello sotto la cornice */
+.board::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 30px 70px -40px rgb(16 17 15 / 0.45);
+  pointer-events: none;
+}
+
+/* il nome sta sopra la cornice e resta della stessa misura a ogni zoom
+   (scale(1/zoom)); quando la tavola è più stretta del nome, il nome si
+   accorcia con i puntini (max-width) */
 .board__name {
   position: absolute;
   bottom: 100%;
   left: 0;
-  max-width: calc(var(--w) * var(--z) - 6px);
   padding-bottom: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transform: scale(calc(1 / var(--z)));
   transform-origin: 0 100%;
   transition: color var(--t-1) ease;
+  will-change: transform;
 }
 
 .board__name span + span {
@@ -114,6 +137,22 @@ body.page--stile {
   color: var(--c-ink);
 }
 
+/* anello minio della tavola corrente: un rettangolo pieno dietro la cornice
+   che sporge di 1,5 px di schermo per lato, qualunque sia lo zoom */
+.board__ring {
+  position: absolute;
+  inset: 0;
+  background: var(--c-minio);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-2) ease;
+  will-change: transform;
+}
+
+.board.is-current .board__ring {
+  opacity: 1;
+}
+
 .board__frame {
   position: relative;
   min-height: var(--h);
@@ -122,12 +161,7 @@ body.page--stile {
   color: var(--fg);
   font-size: 17px;
   line-height: 1.6;
-  box-shadow: 0 0 0 1px rgb(16 17 15 / 0.14), 0 30px 70px -40px rgb(16 17 15 / 0.45);
-  transition: box-shadow var(--t-2) ease;
-}
-
-.board.is-current .board__frame {
-  box-shadow: 0 0 0 1px rgb(16 17 15 / 0.14), 0 0 0 calc(1.5px / var(--z)) var(--c-minio), 0 30px 70px -40px rgb(16 17 15 / 0.45);
+  box-shadow: 0 0 0 1px rgb(16 17 15 / 0.14);
 }
 
 /* Senza JS il piano diventa una pagina lunga: tavole una sotto l'altra. */
@@ -452,6 +486,30 @@ body.page--stile {
   opacity: 1;
 }
 
+/* tavole fuori dallo schermo (.is-off, da canvas.js): le animazioni a ciclo
+   si fermano e riprendono da dove erano quando la tavola rientra. I selettori
+   pesano più delle regole .js .board.is-live … che le avviano, perché la
+   scorciatoia animation lì rimette animation-play-state a running. */
+.js .board.is-off .dot--live::after,
+.js .board.is-live.is-off .bd-hero__ticks i.is-active::after,
+.js .board.is-live.is-off .bd-hero__cue-line::after,
+.js .board.is-live.is-off .bd-ease__knob {
+  animation-play-state: paused;
+}
+
+/* Nel piano i bottoni non sono magnetici: il will-change: transform di .btn
+   qui creerebbe solo layer in più (e altri, per sovrapposizione, attorno). */
+.board .btn {
+  will-change: auto;
+}
+
+/* Il testo SVG delle tavole (la pianta in copertina) si disegna in
+   geometria: senza, a ogni cambio di zoom Chromium ricalcola la dimensione
+   dei caratteri sullo schermo e rasterizza di nuovo la tavola. */
+.board svg text {
+  text-rendering: geometricPrecision;
+}
+
 /* stati «passaggio» mostrati fermi (e rifatti a ciclo da canvas.js) */
 .board .btn.is-hover {
   color: var(--on-accent);
@@ -730,8 +788,11 @@ body.page--stile {
   transform: translate3d(0, 104%, 0);
 }
 
+/* backwards e non both: lo stato finale coincide con quello di base, e
+   un'animazione che resta «piena» a fine corsa terrebbe le parole su un
+   layer proprio, che per sovrapposizione ne promuove altri nella pianta */
 .js .board.is-live .bd-hero__word > span {
-  animation: bd-rise 1.2s var(--ease-out) 0.1s both;
+  animation: bd-rise 1.2s var(--ease-out) 0.1s backwards;
 }
 
 .js .board.is-live .bd-hero__word--2 > span {
@@ -1153,9 +1214,19 @@ body.page--stile {
   line-height: 1;
 }
 
-/* il carattere variabile respira: peso e larghezza cambiano insieme */
+/* Il carattere variabile respira: peso e larghezza cambiano insieme. È
+   l'unica animazione a ciclo che la GPU non può fare da sola (ogni passo
+   rifà il layout del testo) e, finché gira, il browser ricalcola sul thread
+   principale anche tutte le altre: perciò respira solo sulla tavola
+   corrente, abbastanza grande da vedersi e a piano fermo. */
 .js .board.is-live .bd-type__glyph--sans {
   animation: bd-breathe 7s var(--ease-in-out) 1.4s infinite;
+}
+
+.js .canvas.is-moving .board.is-live .bd-type__glyph--sans,
+.js .canvas.is-far .board.is-live .bd-type__glyph--sans,
+.js .board.is-live:not(.is-current) .bd-type__glyph--sans {
+  animation-play-state: paused;
 }
 
 @keyframes bd-breathe {
@@ -1549,7 +1620,9 @@ body.page--stile {
   margin-top: 6px;
 }
 
-/* un cursore corre avanti e indietro con la curva della sua colonna */
+/* un cursore corre avanti e indietro con la curva della sua colonna; si
+   muove con una traslazione (lunga quanto la pista meno il cursore), che la
+   GPU anima da sola, invece che con left, che rifarebbe il layout */
 .bd-ease__track {
   position: relative;
   height: 1px;
@@ -1561,6 +1634,13 @@ body.page--stile {
   position: absolute;
   top: -4px;
   left: 0;
+  width: calc(100% - 9px);
+  height: 9px;
+}
+
+.bd-ease__knob::before {
+  content: '';
+  display: block;
   width: 9px;
   height: 9px;
   border-radius: 50%;
@@ -1572,7 +1652,7 @@ body.page--stile {
 }
 
 @keyframes bd-run {
-  to { left: calc(100% - 9px); }
+  to { transform: translateX(100%); }
 }
 
 .bd-durs {
