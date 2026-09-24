@@ -8,6 +8,7 @@ import { initFilters } from './client/filters.js'
 import { initLightbox, initCompare, initCopy } from './client/widgets.js'
 import { initForm } from './client/form.js'
 import { initCanvas } from './client/canvas.js'
+import { initViewer } from './client/viewer.js'
 
 const modules = [
   initTransitions,
@@ -29,6 +30,7 @@ const modules = [
   initCopy,
   initForm,
   initCanvas,
+  initViewer,
   initParallax,
   initMagnetic,
   initCursor,

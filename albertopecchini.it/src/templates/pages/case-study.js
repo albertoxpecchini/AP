@@ -5,6 +5,7 @@ import { BRANDS } from '../../art/brand.js'
 import { button, media, deviceStage, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark } from '../components/ui.js'
 import { projectHref, previewOf } from '../components/project.js'
 import { compare, swatches, specimens } from './portfolio.js'
+import { sheetViewer } from '../components/viewer.js'
 
 const SECTIONS = [
   ['overview', 'Overview'],
@@ -18,8 +19,11 @@ const SECTIONS = [
   ['dati', 'Dati progetto'],
 ]
 
-const sec = (i, body, extraClass = '', theme = '') => {
-  const [id, label] = SECTIONS[i]
+// Nei progetti con tavole vere la galleria diventa il visualizzatore
+const labelOf = (p, i) => (i === 6 && p.sheets ? 'Tavole' : SECTIONS[i][1])
+
+const sec = (i, body, extraClass = '', theme = '', label = SECTIONS[i][1]) => {
+  const [id] = SECTIONS[i]
   const n = String(i + 1).padStart(2, '0')
   return html`
     <section class="cs-sec ${extraClass}" id="${id}" data-spy aria-labelledby="cs-${id}"${theme && ` data-theme="${theme}"`}>
@@ -67,7 +71,7 @@ export function caseStudyPage(p) {
 
       <nav class="cs-nav" aria-label="Sezioni del case study" data-spy-nav>
         <ol>
-          ${SECTIONS.map(([id, label], i) => `<li><a href="#${id}" data-tooltip="${esc(label)}"><span class="label">${String(i + 1).padStart(2, '0')}</span><span class="sr-only"> ${esc(label)}</span></a></li>`)}
+          ${SECTIONS.map(([id], i) => `<li><a href="#${id}" data-tooltip="${esc(labelOf(p, i))}"><span class="label">${String(i + 1).padStart(2, '0')}</span><span class="sr-only"> ${esc(labelOf(p, i))}</span></a></li>`)}
         </ol>
       </nav>
 
@@ -112,17 +116,28 @@ export function caseStudyPage(p) {
         'cs-sec--ink',
         'ink',
       )}
-      ${sec(
-        6,
-        html`
-          ${p.compare ? compare(p.compare) : ''}
-          <div class="cs-gallery cs-gallery--${p.area}">
-            ${p.images.map((im, i) => media(im, { zoom: true, group: p.slug, index: i, marks: p.area === 'tecnico', ratio: isWeb ? (i === 0 ? '16/10' : i === 1 ? '3/4' : '9/16') : undefined }))}
-          </div>
-          <p class="label cs-gallery__hint">${icon('expand')} Seleziona un’immagine per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</p>
-        `,
-        'cs-sec--wide',
-      )}
+      ${p.sheets
+        ? sec(
+            6,
+            html`
+              ${sheetViewer([{ project: p, sheets: p.sheets }])}
+              <p class="label cs-gallery__hint">${icon('expand')} Trascina per spostarti · Ctrl + rotella o due dita per ingrandire · frecce per cambiare tavola · doppio clic per avvicinarti</p>
+            `,
+            'cs-sec--wide cs-sec--sheets',
+            '',
+            labelOf(p, 6),
+          )
+        : sec(
+            6,
+            html`
+              ${p.compare ? compare(p.compare) : ''}
+              <div class="cs-gallery cs-gallery--${p.area}">
+                ${p.images.map((im, i) => media(im, { zoom: true, group: p.slug, index: i, marks: p.area === 'tecnico', ratio: isWeb ? (i === 0 ? '16/10' : i === 1 ? '3/4' : '9/16') : undefined }))}
+              </div>
+              <p class="label cs-gallery__hint">${icon('expand')} Seleziona un’immagine per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</p>
+            `,
+            'cs-sec--wide',
+          )}
       ${sec(
         7,
         html`

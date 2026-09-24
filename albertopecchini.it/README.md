@@ -62,7 +62,8 @@ albertopecchini.it/
 ├─ api/
 │  └─ contatti.js          funzione serverless del modulo contatti (Resend + CallMeBot)
 ├─ tools/
-│  └─ email-generator/     generatore di email HTML (vedi il suo README)
+│  ├─ email-generator/     generatore di email HTML (vedi il suo README)
+│  └─ tavole/              conversione DWG e PDF → SVG per il visualizzatore (vedi il suo README)
 ├─ emails/                 input, output e allegati delle email generate
 ├─ config/                 account mittente e tema email derivato dal CSS
 ├─ profiles/               archivio firme versionato
@@ -73,6 +74,7 @@ albertopecchini.it/
 │  └─ media/
 │     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone)
 │     ├─ studio/           fotografie dello studio (ritratto.webp)
+│     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf, copertina.webp
 │     └─ web/              screenshot dei progetti web (<prefisso>-desktop.webp, -tablet, -mobile, -*-tall)
 ├─ src/
 │  ├─ data/                CONTENUTI: l’unica cosa da toccare per aggiornare il sito
@@ -88,8 +90,9 @@ albertopecchini.it/
 │  │  ├─ html.js           tag `html`, `esc`, `attrs`, `cx`, `pad`, `jsonLd`
 │  │  ├─ components/
 │  │  │  ├─ ui.js          icone, monogramma, bottoni, intestazioni di sezione, media, mockup, schede dati
-│  │  │  └─ project.js     card, riga d’indice, copertina e anteprima di un progetto
-│  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), contact, legal (privacy, cookie, 404), stile (sistema visivo)
+│  │  │  ├─ project.js     card, riga d’indice, copertina e anteprima di un progetto
+│  │  │  └─ viewer.js      visualizzatore delle tavole (case study e pagina Tavole)
+│  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), contact, legal (privacy, cookie, 404), stile (sistema visivo), tavole (visualizzatore)
 │  ├─ art/                 generatori SVG delle tavole segnaposto
 │  │  ├─ index.js          registro: renderArt({ art, variant, tone, … })
 │  │  ├─ kit.js            primitive di disegno (squadratura, quote, tratteggi, testi)
@@ -102,6 +105,7 @@ albertopecchini.it/
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
 │  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate, griglia in WebGL
+│  │  ├─ viewer.js         visualizzatore delle tavole: zoom vettoriale, spostamento, gesti, tastiera, schermo intero
 │  │  └─ utils.js          selettori, scroll, focus trap, reduced motion
 │  ├─ styles/              token → base → componenti → layout → pagine → stile → stampa
 │  ├─ main.js              entry JavaScript: avvia i moduli client
@@ -124,6 +128,7 @@ albertopecchini.it/
 | `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
 | `/contatti/` | Modulo di contatto, recapiti, area operativa |
+| `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa |
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
 | `404.html` | Pagina non trovata (servita in automatico da Vercel) |
@@ -138,6 +143,7 @@ Le rotte sono definite in `src/templates/routes.js`: ogni voce ha percorso, `tit
 | cambiare titolo e invito del footer (`closing`), riga sotto il nome (`tagline`) | `src/data/site.js` |
 | cambiare i numeri della sezione statistiche | `src/data/site.js → stats` |
 | aggiungere, togliere o modificare un progetto | `src/data/projects.js` |
+| aggiungere una tavola al visualizzatore | i file in `public/media/tavole/<slug>/` (vedi `tools/tavole/`), poi `sheets` in `src/data/projects.js` |
 | pubblicare (o rinascondere) i progetti dimostrativi | `src/data/projects.js → showSamples` |
 | rimettere online un’area del portfolio | `src/data/projects.js → allAreas` (togliere `hidden`) |
 | modificare i servizi, i pacchetti, le FAQ | `src/data/services.js` |
@@ -162,12 +168,13 @@ Campi principali:
 - `summary` (card e meta description), `description`, `goal`, `problem`, `strategy`, `process`, `result`, `metrics`, `learned`: le sezioni del case study.
 - `cover` e `images`: copertina e galleria (vedi [Immagini](#immagini)).
 - `web`: per i progetti web, gli screenshot dei mockup e il dominio (`url`).
+- `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Se ci sono, nel case study la galleria diventa la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
 - `featured: true` porta il progetto nello scorrimento orizzontale della home.
 - `sample: true` lo contrassegna come **dimostrativo**: mostra come si presenta un lavoro di quel tipo, ma oggi non viene pubblicato (vedi sotto).
 
 ### Progetti dimostrativi
 
-Il file contiene 20 progetti, ma **online ne vanno solo 5**: quelli reali. Gli altri
+Il file contiene 24 progetti, ma **online ne vanno solo 9**: quelli reali. Gli altri
 sono modelli scritti per mostrare come si presenta un lavoro di quel tipo, e restano
 nel file come traccia da riempire.
 
@@ -181,7 +188,9 @@ export const showSamples = false   // true = pubblica anche i dimostrativi, col 
 `allProjects` resta l’array completo. Per promuovere un dimostrativo a lavoro vero basta
 sostituirne i contenuti e togliergli `sample: true`: compare da solo.
 
-I cinque reali: il PCTO in Caem Group, rivaltasulmincio.it, cascinafontana.xyz,
+I nove reali: il PCTO in Caem Group, i quattro lavori di quinta con le tavole vere
+(progetto stradale, bar-caffetteria del tema d’esame, layout di cantiere, relazione
+sul Museo dei Mestieri del Fiume), rivaltasulmincio.it, cascinafontana.xyz,
 dariodonelli (sul dominio Vercel finché dariodonelli.it non è attivo) e questo sito.
 
 ### Aree nascoste
@@ -228,6 +237,26 @@ Con ffmpeg, disponibile sulla macchina di sviluppo:
 ```bash
 ffmpeg -i originale.jpg -map_metadata -1 -vf "scale=1600:-1:flags=lanczos" -c:v libwebp -quality 82 -compression_level 6 -preset photo public/media/progetti/<slug>/01.webp
 ```
+
+### Tavole vere
+
+I disegni dei lavori tecnici non sono tavole generate: sono i file veri, esportati dal
+DWG o dal PDF di AutoCAD in SVG vettoriale, così nel visualizzatore si ingrandiscono
+fino ai dettagli senza sgranare. Ogni tavola ha quattro file in
+`public/media/tavole/<slug>/` — `NN.svg`, la miniatura `NN.webp` (1200 px),
+`NN-mini.webp` (320 px) per l’elenco e `NN.pdf` da scaricare — e si dichiara in
+`sheets` con l’aiuto `sheet(slug, 'NN', { title, alt, note, h, scale, from })`.
+Le pagine di una relazione sono immagini: `full` indica la versione grande (1600 px).
+
+Il visualizzatore (`src/templates/components/viewer.js` e `src/client/viewer.js`)
+muove il foglio con `transform` durante i gesti e, a vista ferma, gli dà la misura vera
+perché il browser ridisegni l’SVG nitido a quella scala. Trascinare sposta, Ctrl +
+rotella o due dita ingrandiscono, il doppio clic avvicina, le frecce cambiano tavola,
+F adatta; c’è lo schermo intero. Nei case study la rotella e il dito scorrono la
+pagina finché la tavola non è ingrandita.
+
+Come si convertono i file, e cosa si controlla prima di pubblicarli (indirizzi, nomi,
+volti), è spiegato in [`tools/tavole/README.md`](tools/tavole/README.md).
 
 ### Ritratto
 
@@ -276,20 +305,21 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 ## Stili
 
-`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `layout` → `home` → `portfolio` → `pages` → `stile` → `print`.
+`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `layout` → `home` → `portfolio` → `pages` → `stile` → `viewer` → `print`.
 
 - **Token** (`tokens.css`): palette carta / inchiostro / minio (`#E5481F`), scala tipografica, spazi, raggi, durate ed easing. È il primo file da aprire per cambiare l’aspetto.
 - **Caratteri**: Archivo Variable (asse `wdth`) per i testi, IBM Plex Mono per etichette e dati, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
 - **Reveal** (`base.css`): `data-reveal` con i tipi `fade`, `up`, `clip`, `line`, `draw`; tutto disattivato con `prefers-reduced-motion`.
 - **Footer** (`layout.css`): composizione unica, palette scoperta su `footer.site-footer`, firma con monogramma a tratto sottile.
 - **Stile** (`stile.css`): il piano navigabile della pagina `/stile/` e le sue tavole, a misure fisse in px (sono fogli inquadrati dalla finestra, non layout fluidi).
+- **Visualizzatore** (`viewer.css`): le tavole vere, nel case study, nella pagina `/portfolio/tavole/` e a schermo intero.
 - **Stampa** (`print.css`): la pagina `/studio/profilo/` è pensata per essere stampata come curriculum.
 
 ## JavaScript del browser
 
 `src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill.
 
-Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, orologio, barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile.
+Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, orologio, barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile, visualizzatore delle tavole.
 
 ## Build
 
