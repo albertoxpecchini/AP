@@ -1,0 +1,672 @@
+/* Visualizzatore delle tavole (src/templates/components/viewer.js,
+   src/client/viewer.js). Tre assetti dello stesso componente:
+     · nel case study: riquadro con piano, riga dati e elenco delle tavole
+     · .viewer--page: la pagina /portfolio/tavole/, a tutta finestra sotto l'header
+     · .is-full: schermo intero, sopra tutto il resto
+   Il piano ha lo stesso linguaggio della pagina Stile: carta 3 con la griglia di
+   punti, pannelli carta traslucidi, strumenti in monospace da 44 px. */
+
+.viewer {
+  --viewer-stage-h: clamp(17rem, 72vw, 44rem);
+  display: grid;
+  grid-template-areas:
+    'stage'
+    'tools'
+    'info'
+    'panel';
+  grid-template-columns: minmax(0, 1fr);
+  border: 1px solid var(--line);
+  background: var(--c-paper);
+  color: var(--c-ink);
+}
+
+/* ── Piano ─────────────────────────────────────────────────────────────── */
+
+.viewer__stage {
+  grid-area: stage;
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: var(--viewer-stage-h);
+  overflow: hidden;
+  background-color: var(--c-paper-3);
+  background-image: radial-gradient(rgb(16 17 15 / 0.2) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  outline: none;
+  /* un dito scorre la pagina; con la tavola ingrandita la sposta */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.viewer__stage:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--focus);
+}
+
+.js .viewer.is-ready .viewer__stage {
+  cursor: grab;
+}
+
+.viewer.is-dragging .viewer__stage {
+  cursor: grabbing;
+}
+
+.viewer.is-zoomed .viewer__stage,
+.viewer--page .viewer__stage,
+.viewer.is-full .viewer__stage {
+  touch-action: none;
+}
+
+/* Foglio: prima dello script è centrato nel piano; dopo lo posiziona
+   viewer.js con left/top a 0, transform e misura in px. */
+.viewer__sheet {
+  position: relative;
+  height: calc(100% - 2rem);
+  max-width: calc(100% - 2rem);
+  aspect-ratio: var(--ratio);
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgb(16 17 15 / 0.08),
+    0 30px 60px -36px rgb(16 17 15 / 0.5);
+}
+
+.viewer.is-ready .viewer__sheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  max-width: none;
+  aspect-ratio: auto;
+  transform-origin: 0 0;
+}
+
+.viewer.is-moving .viewer__sheet {
+  will-change: transform;
+}
+
+.viewer__img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.viewer__img--full {
+  opacity: 0;
+  transition: opacity var(--t-2) ease;
+}
+
+.viewer__img--full.is-in {
+  opacity: 1;
+}
+
+.viewer__status,
+.viewer__hint {
+  position: absolute;
+  z-index: 2;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  background: rgb(243 241 236 / 0.92);
+  color: var(--c-ink);
+  pointer-events: none;
+}
+
+.viewer__status {
+  top: 12px;
+  left: 12px;
+}
+
+.viewer__hint {
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  padding: 10px 14px;
+  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: 0.03em;
+  opacity: 0;
+  transition: opacity var(--t-2) ease;
+}
+
+.viewer.is-hinting .viewer__hint {
+  opacity: 1;
+}
+
+/* ── Strumenti: una riga sotto il piano; da tablet in su, sopra il piano in
+      basso a destra ───────────────────────────────────────────────────── */
+
+.viewer__tools {
+  grid-area: tools;
+  z-index: 3;
+  display: flex;
+  border-top: 1px solid var(--line);
+  background: var(--c-paper);
+}
+
+.viewer__tools > * {
+  flex: 1;
+}
+
+@media (min-width: 900px) {
+  .viewer__tools {
+    grid-area: stage;
+    align-self: end;
+    justify-self: end;
+    margin: 10px;
+    border: 1px solid var(--line);
+    background: rgb(243 241 236 / 0.94);
+    box-shadow: 0 24px 48px -32px rgb(16 17 15 / 0.45);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  }
+
+  .viewer__tools > * {
+    flex: none;
+  }
+}
+
+.no-js .viewer__tools,
+.no-js .viewer__hint,
+.no-js .viewer__status {
+  display: none;
+}
+
+.viewer__tool {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  border-left: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--c-ink);
+  transition: background-color var(--t-1) ease;
+}
+
+.viewer__tool:first-child {
+  border-left: 0;
+}
+
+.viewer__tool .icon {
+  font-size: 1rem;
+}
+
+.viewer__zoom {
+  min-width: 60px;
+  font-variant-numeric: tabular-nums;
+}
+
+.viewer__count {
+  min-width: 64px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-graphite);
+}
+
+@media (hover: hover) {
+  button.viewer__tool:hover {
+    background: var(--c-paper-2);
+  }
+}
+
+/* sul telefono il numero della tavola sta già nella riga dati */
+@media (max-width: 599px) {
+  .viewer__count {
+    display: none;
+  }
+}
+
+@media (max-width: 359px) {
+  .viewer__tool {
+    min-width: 38px;
+    padding: 0 4px;
+  }
+}
+
+/* ── Riga dati della tavola ────────────────────────────────────────────── */
+
+.viewer__info {
+  grid-area: info;
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.viewer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+}
+
+.viewer__meta span:first-child {
+  color: var(--accent-text);
+}
+
+.viewer__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  font-size: var(--fs-h4);
+  font-weight: 560;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.viewer__project {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--c-graphite);
+}
+
+.viewer__note {
+  max-width: 70ch;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--c-graphite);
+}
+
+.viewer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.viewer__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 0.3em;
+  transition: color var(--t-1) ease, text-decoration-color var(--t-1) ease;
+}
+
+.viewer__link .icon {
+  font-size: 1rem;
+  color: var(--accent-text);
+}
+
+@media (hover: hover) {
+  .viewer__link:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* ── Elenco delle tavole ───────────────────────────────────────────────── */
+
+.viewer__panel {
+  grid-area: panel;
+  min-width: 0;
+  border-top: 1px solid var(--line);
+}
+
+.viewer__list ol {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.viewer__list {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.viewer__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 4px 8px;
+  width: 11.5rem;
+  height: 100%;
+  padding: 10px 12px;
+  border-right: 1px solid var(--line);
+  color: var(--c-ink);
+  transition: background-color var(--t-1) ease, color var(--t-1) ease;
+}
+
+.viewer__mini {
+  grid-row: 1 / -1;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  background: var(--c-paper-3);
+}
+
+.viewer__mini img {
+  display: block;
+  max-width: 48px;
+  max-height: 48px;
+  width: auto;
+  height: auto;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgb(16 17 15 / 0.1);
+}
+
+.viewer__item-n {
+  align-self: end;
+  font-size: 0.625rem;
+}
+
+.viewer__item-title {
+  align-self: start;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.viewer__item[aria-current] {
+  background: var(--c-ink);
+  color: var(--c-paper);
+}
+
+.viewer__item[aria-current] .viewer__item-n {
+  color: var(--c-minio-bright);
+}
+
+.viewer__item[aria-current] .viewer__mini {
+  background: var(--c-ink-3);
+}
+
+@media (hover: hover) {
+  .viewer__item:not([aria-current]):hover {
+    background: var(--c-paper-2);
+  }
+}
+
+.viewer__item:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* ── Case study, da tablet in su: elenco a destra del piano ───────────── */
+
+@media (min-width: 900px) {
+  .viewer {
+    --viewer-stage-h: clamp(26rem, 70vh, 46rem);
+    grid-template-areas:
+      'stage panel'
+      'info panel';
+    grid-template-columns: minmax(0, 1fr) 17.5rem;
+  }
+
+  .viewer__panel {
+    /* l'elenco non allunga il riquadro: scorre dentro l'altezza di piano e riga dati */
+    contain: size;
+    overflow-y: auto;
+    border-top: 0;
+    border-left: 1px solid var(--line);
+    scrollbar-width: thin;
+  }
+
+  .viewer__list {
+    overflow: visible;
+  }
+
+  .viewer__list ol {
+    display: block;
+    overflow: visible;
+  }
+
+  .viewer__item {
+    width: auto;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+/* dove c'è l'indice laterale delle sezioni del case study, il riquadro gli lascia spazio */
+@media (min-width: 1280px) {
+  .cs-sec--sheets .cs-sec__grid {
+    padding-right: 2.5rem;
+  }
+}
+
+/* ── Pagina /portfolio/tavole/ ─────────────────────────────────────────── */
+
+body.page--tavole {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+:root:has(.page--tavole) {
+  scrollbar-gutter: auto;
+}
+
+.viewer--page,
+.viewer.is-full {
+  position: fixed;
+  inset: var(--header-h) 0 0;
+  z-index: 1;
+  grid-template-areas:
+    'stage'
+    'tools'
+    'info'
+    'panel';
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  border: 0;
+}
+
+.viewer.is-full {
+  inset: 0;
+  z-index: var(--z-lightbox);
+}
+
+.viewer--page .viewer__stage,
+.viewer.is-full .viewer__stage {
+  height: auto;
+  min-height: 0;
+}
+
+.viewer--page .viewer__info,
+.viewer.is-full .viewer__info {
+  gap: 0.3rem;
+  padding: 0.75rem 1rem;
+}
+
+.viewer--page .viewer__note,
+.viewer.is-full .viewer__note {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.viewer--page .viewer__links,
+.viewer.is-full .viewer__links {
+  margin-top: 0;
+}
+
+.viewer__head {
+  display: none;
+}
+
+.viewer__group-title {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  /* un solo nastro di miniature per tutti i progetti */
+  .viewer--page .viewer__list,
+  .viewer.is-full .viewer__list {
+    display: flex;
+  }
+
+  .viewer--page .viewer__group,
+  .viewer.is-full .viewer__group {
+    display: contents;
+  }
+
+  .viewer--page .viewer__list ol,
+  .viewer.is-full .viewer__list ol {
+    flex: none;
+    overflow: visible;
+  }
+
+  .viewer--page .viewer__item,
+  .viewer.is-full .viewer__item {
+    width: 10.5rem;
+    padding-block: 8px;
+  }
+
+  .viewer--page .viewer__mini,
+  .viewer.is-full .viewer__mini {
+    width: 40px;
+    height: 40px;
+  }
+
+  .viewer--page .viewer__mini img,
+  .viewer.is-full .viewer__mini img {
+    max-width: 36px;
+    max-height: 36px;
+  }
+
+  .viewer--page .viewer__info .viewer__note,
+  .viewer.is-full .viewer__info .viewer__note {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .viewer--page,
+  .viewer.is-full {
+    grid-template-areas:
+      'panel stage'
+      'panel info';
+    grid-template-columns: 20rem minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .viewer.is-full:not(.viewer--page) {
+    grid-template-areas:
+      'stage panel'
+      'info panel';
+    grid-template-columns: minmax(0, 1fr) 17.5rem;
+  }
+
+  .viewer--page .viewer__panel {
+    display: flex;
+    flex-direction: column;
+    contain: none;
+    border-left: 0;
+    border-right: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .viewer--page .viewer__head {
+    display: block;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .viewer__h1 {
+    font-size: 26px;
+    font-weight: 560;
+    font-stretch: 94%;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .viewer__lead {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--c-graphite);
+  }
+
+  .viewer--page .viewer__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .viewer--page .viewer__group-title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: grid;
+    gap: 2px;
+    padding: 12px 18px 10px;
+    border-bottom: 1px solid var(--line);
+    background: var(--c-paper-2);
+    font-size: 0.9375rem;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  .viewer--page .viewer__group-title a {
+    color: var(--c-ink);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color var(--t-1) ease;
+  }
+
+  .viewer--page .viewer__group-title a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .viewer--page .viewer__item {
+    padding-inline: 18px;
+    /* un indirizzo con #tavola non la fa finire sotto il titolo del progetto */
+    scroll-margin-top: 4.5rem;
+  }
+
+  .viewer--page .viewer__info {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: 2rem;
+  }
+
+  .viewer--page .viewer__links {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+}
+
+/* senza JavaScript la pagina scorre e l'elenco apre i disegni */
+.no-js body.page--tavole {
+  height: auto;
+  overflow: visible;
+}
+
+.no-js .viewer--page {
+  position: static;
+  margin-top: var(--header-h);
+}
+
+.no-js .viewer--page .viewer__stage {
+  height: 60vh;
+}
+
+@media print {
+  .viewer__tools,
+  .viewer__panel {
+    display: none;
+  }
+}

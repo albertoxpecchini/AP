@@ -12,6 +12,7 @@ import { serviziPage, metodoPage, studioPage, profiloPage } from './pages/info.j
 import { contattiPage } from './pages/contact.js'
 import { privacyPage, cookiePage, notFoundPage } from './pages/legal.js'
 import { stilePage } from './pages/stile.js'
+import { tavolePage, sheetCount } from './pages/tavole.js'
 
 const websiteLd = () => ({
   '@context': 'https://schema.org',
@@ -75,6 +76,16 @@ export const routes = [
         },
       ]
     : []),
+  {
+    path: '/portfolio/tavole/',
+    priority: 0.7,
+    title: 'Tavole — il visualizzatore dei disegni',
+    description: `${sheetCount()} tavole dei miei progetti tecnici, dal DWG allo schermo: progetto stradale, esame di Stato, layout di cantiere. Ingrandisci, spostati sul foglio, scarica il PDF.`,
+    render: tavolePage,
+    pageClass: 'page--tavole',
+    noFooter: true, // il visualizzatore occupa tutta la finestra: niente chiusura sotto
+    jsonld: () => [crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: 'Tavole', href: '/portfolio/tavole/' })],
+  },
   ...projects.map((p) => ({
     path: `/portfolio/${p.slug}/`,
     priority: p.featured ? 0.7 : 0.6,

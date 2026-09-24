@@ -18,6 +18,10 @@ const ICON_PATHS = {
   expand: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
   check: 'm5 12 5 5 9-10',
   copy: 'M9 9h10v11H9zM5 15V4h10',
+  minus: 'M5 12h14',
+  download: 'M12 4v11m-5-5 5 5 5-5M5 20h14',
+  shrink: 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5',
+  fit: 'M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M9 9h6v6H9z',
 }
 
 export const icon = (name, { size = '1em', className } = {}) =>

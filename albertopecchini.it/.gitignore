@@ -18,6 +18,11 @@ emails/out/
 emails/logs/
 config/email-theme.json
 
+# Tavole: i file intermedi della conversione (DWG, DXF, SVG grezzi) non si tengono;
+# nel repository vanno solo i file finali in public/media/tavole/.
+tools/tavole/lavoro/
+tools/tavole/__pycache__/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
