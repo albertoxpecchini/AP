@@ -1,0 +1,57 @@
+{
+ "src": "lavoro/strada.fixed.dxf",
+ "lw": 0.13,
+ "darken": true,
+ "sheets": [
+  {
+   "out": "lavoro/strada-01.raw.svg",
+   "box": [
+    2270,
+    380,
+    4130,
+    1650
+   ],
+   "space": 200000
+  },
+  {
+   "out": "lavoro/strada-02.raw.svg",
+   "box": [
+    4570,
+    380,
+    5430,
+    1000
+   ],
+   "space": 200000
+  },
+  {
+   "out": "lavoro/strada-03.raw.svg",
+   "box": [
+    5582,
+    380,
+    6442,
+    1000
+   ],
+   "space": 200000
+  },
+  {
+   "out": "lavoro/strada-04.raw.svg",
+   "box": [
+    6582,
+    378,
+    7442,
+    998
+   ],
+   "space": 200000
+  },
+  {
+   "out": "lavoro/strada-05.raw.svg",
+   "box": [
+    7582,
+    380,
+    8442,
+    1000
+   ],
+   "space": 200000
+  }
+ ]
+}
