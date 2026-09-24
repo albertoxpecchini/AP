@@ -42,6 +42,197 @@ export const areas = Object.fromEntries(Object.entries(allAreas).filter(([, a]) 
 const img = (art, options, alt, caption) => ({ art, ...options, alt, caption })
 const shot = (file, width, height, alt, caption) => ({ src: `/media/web/${file}`, width, height, alt, caption })
 
+// ── Tavole vere ──────────────────────────────────────────────────────────────
+// Ogni tavola di `sheets` sta in /public/media/tavole/<slug>/: <n>.svg è il
+// disegno vettoriale che il visualizzatore ingrandisce, <n>.webp la miniatura
+// (1200 px di larghezza, width/height sono le sue misure), <n>-mini.webp quella
+// da 320 px per l'elenco delle tavole e <n>.pdf il file da scaricare. `full` sostituisce l'SVG quando la tavola è un'immagine (le pagine
+// di una relazione), `pdf: null` toglie il download. `from` dice da che file
+// viene la tavola; `scale` e `paper` finiscono nella riga dati del visualizzatore.
+const sheet = (slug, n, { title, alt, note, w = 1200, h, scale = null, paper = 'A3', from = 'DWG', full = null, pdf }) => ({
+  id: `${slug}-${n}`,
+  n,
+  title,
+  alt,
+  note,
+  scale,
+  paper,
+  from,
+  src: full || `/media/tavole/${slug}/${n}.svg`,
+  thumb: `/media/tavole/${slug}/${n}.webp`,
+  mini: `/media/tavole/${slug}/${n}-mini.webp`,
+  pdf: pdf === undefined ? `/media/tavole/${slug}/${n}.pdf` : pdf,
+  width: w,
+  height: h,
+})
+
+/** La miniatura di una tavola come immagine (anteprime, galleria). */
+const sheetImage = (s) => ({ src: s.thumb, width: s.width, height: s.height, alt: s.alt, caption: `TAV. ${s.n} — ${s.title}` })
+
+/** Copertina di un progetto con tavole: copertina.webp, 2000 px (1600 per il museo), dalla tavola più rappresentativa. */
+const sheetCover = (slug, width, height, alt) => ({ src: `/media/tavole/${slug}/copertina.webp`, width, height, alt })
+
+const STRADA = 'progetto-stradale'
+const stradaSheets = [
+  sheet(STRADA, '01', {
+    title: 'Studio del tracciato',
+    h: 820,
+    alt: 'Quattro planimetrie sulla stessa carta a curve di livello: due tracciolini con i cerchi del compasso e due poligonali d’asse tra i punti A e B',
+    note: 'Due tracciolini da A a B a pendenza costante del 5,3%, con il compasso aperto a 37,74 m tra una curva di livello e l’altra, e le due poligonali d’asse che ne ricavo: A-1-2-3-4-B di 968 m e A-1-2-B di 892 m.',
+  }),
+  sheet(STRADA, '02', {
+    title: 'Costruzione dei raccordi',
+    h: 866,
+    alt: 'Poligonale d’asse A-1-2-3-4-B con i cerchi di raggio 80 m costruiti sui vertici',
+    note: 'Il tracciato definitivo segue il secondo tracciolino: cinque rettifili, quattro vertici e su ogni vertice il cerchio di raggio 80 m che raccorda i due lati.',
+  }),
+  sheet(STRADA, '03', {
+    title: 'Curve circolari',
+    h: 866,
+    alt: 'Asse stradale con i quattro raccordi circolari di raggio 80 m e le lunghezze di rettifili e archi',
+    note: 'Quattro curve di raggio 80 m con deviazioni di 67,1°, 67,6°, 67,0° e 10,3°: 296 m di archi sui 934 m dell’asse, con rettifili e archi quotati uno per uno.',
+  }),
+  sheet(STRADA, '04', {
+    title: 'Picchettamento',
+    h: 866,
+    alt: 'Asse stradale con i 28 picchetti numerati e le tracce delle sezioni trasversali',
+    note: '28 picchetti numerati da A a B, dove l’asse incrocia le curve di livello e nei punti notevoli del tracciato, con le tracce delle sezioni trasversali.',
+  }),
+  sheet(STRADA, '05', {
+    title: 'Planimetria di progetto',
+    h: 866,
+    alt: 'Planimetria della strada di progetto larga 10 metri, con le tracce delle sezioni e il corso d’acqua nel fondovalle',
+    note: 'La strada finita sulla carta: piattaforma di 10 m, le tracce delle 28 sezioni e il corso d’acqua attraversato nel fondovalle.',
+  }),
+  sheet(STRADA, '06', {
+    title: 'Profilo longitudinale',
+    h: 848,
+    from: 'PDF',
+    alt: 'Profilo longitudinale con la linea del terreno, le tre livellette di progetto e la tabella di picchetti, distanze e quote',
+    note: 'Terreno e progetto lungo i 934 m dell’asse, con le altezze esagerate dieci volte: tre livellette (−6,52%, 0%, +4,45%), quote del terreno e di progetto, distanze parziali e progressive dei 28 picchetti.',
+  }),
+  sheet(STRADA, '07', {
+    title: 'Sezioni trasversali',
+    h: 848,
+    from: 'PDF',
+    alt: 'Tavola con le 28 sezioni trasversali, lo sterro campito in rosso e il riporto in giallo',
+    note: 'Le 28 sezioni, una per picchetto: piattaforma di 10 m, cunetta di 0,90 × 0,30 m dal lato in scavo, scarpate con pendenza 2 su 3. In rosso lo sterro, in giallo il riporto.',
+  }),
+  sheet(STRADA, '08', {
+    title: 'Calcolo dei volumi',
+    h: 848,
+    from: 'Excel',
+    alt: 'Tabella di calcolo dei volumi di sterro e riporto per i 27 tronchi, con i totali e la legenda dei colori',
+    note: 'Il foglio Excel: aree di sterro e riporto delle sezioni, volume di ogni tronco con il metodo delle sezioni ragguagliate, totali e saldo.',
+  }),
+]
+
+const CANTIERE = 'layout-cantiere'
+const cantiereSheets = [
+  sheet(CANTIERE, '01', {
+    title: 'Inquadramento',
+    h: 1697,
+    from: 'PDF',
+    alt: 'Planimetria del lotto con l’area di cantiere recintata, gli accessi dalla strada, la legenda dei simboli e la tabella delle dotazioni',
+    note: 'Il lotto intero con l’area di cantiere, gli accessi dalla strada, la legenda dei simboli e la dotazione del cantiere. Il nome della strada è stato tolto.',
+  }),
+  sheet(CANTIERE, '02', {
+    title: 'Layout di cantiere',
+    h: 1697,
+    from: 'PDF',
+    alt: 'Layout di cantiere con l’edificio, il raggio d’azione dell’autogru, depositi, baracche, parcheggio e percorso dei mezzi',
+    note: 'L’area recintata in dettaglio: il raggio d’azione dell’autogru, le baracche, i depositi, le postazioni fisse, i servizi e il percorso dei mezzi.',
+  }),
+  sheet(CANTIERE, '03', {
+    title: 'Pianta piano terra',
+    h: 848,
+    from: 'PDF',
+    alt: 'Pianta del piano terra con magazzino, portico, uffici e servizi, cucina, lavanderia e ingresso',
+    note: 'L’edificio da costruire: il magazzino al centro con il portico, a sinistra ingresso, cucina e lavanderia, a destra uffici, servizi e WC.',
+  }),
+  sheet(CANTIERE, '04', {
+    title: 'Pianta piano primo',
+    h: 848,
+    from: 'PDF',
+    alt: 'Pianta del piano primo con due camere, bagno, disimpegno e magazzino',
+    note: 'Al piano primo due camere, un bagno e il disimpegno sull’ala di sinistra, e il magazzino sopra quello del piano terra.',
+  }),
+]
+
+const BAR = 'bar-caffetteria-esame-di-stato'
+const barSheet = (n, o) => sheet(BAR, n, { h: 849, scale: '1:100', ...o })
+const barSheets = [
+  barSheet('01', {
+    title: 'Planimetria generale',
+    scale: '1:500',
+    alt: 'Planimetria generale a colori del parco con il bar-caffetteria, l’orto, i percorsi e le alberature',
+    note: 'Il parco intorno al bar: percorsi pedonali dal disegno organico, prati e alberature, l’orto didattico e le strutture leggere, con il commento al progetto del verde.',
+  }),
+  barSheet('02', {
+    title: 'Prospetti',
+    alt: 'Prospetti nord, est, ovest e sud del bar con le quote di livello e i gazebo',
+    note: 'I quattro prospetti con le quote di livello da 0,00 a 3,50 m, le travi lignee a vista in copertura e i gazebo in legno accanto all’edificio.',
+  }),
+  barSheet('03', {
+    title: 'Pianta delle coperture',
+    alt: 'Pianta delle coperture quotata, 13,90 per 14,40 metri',
+    note: 'La copertura del blocco principale, 13,90 × 14,40 m, con le travi lignee sul bordo e le coperture delle tre strutture esterne.',
+  }),
+  barSheet('04', {
+    title: 'Pianta e prospetti ribaltati',
+    alt: 'Pianta del bar con i quattro prospetti ribaltati sui lati',
+    note: 'La pianta con i quattro prospetti ribaltati sui lati, per leggere insieme la distribuzione interna e le aperture.',
+  }),
+  barSheet('05', {
+    title: 'Pianta arredata',
+    alt: 'Pianta arredata con il bancone, i tavoli, la cucina, i servizi igienici e i gazebo',
+    note: 'La sala bar con il bancone e i tavoli, la cucina, il laboratorio, i due blocchi di servizi e le tre strutture esterne arredate.',
+  }),
+  barSheet('06', {
+    title: 'Pianta quotata',
+    alt: 'Pianta quotata del bar con le misure interne ed esterne',
+    note: 'Le quote di pianta: ingombri esterni, spessori dei muri, aperture e dimensioni delle strutture esterne, 4,20 × 2,70 m.',
+  }),
+  barSheet('07', {
+    title: 'Quadro funzionale e superfici',
+    alt: 'Pianta con le schede dei locali, il quadro delle superfici e le verifiche dei rapporti aeroilluminanti',
+    note: 'Destinazioni d’uso, superfici e verifica del rapporto aeroilluminante di 1/8, locale per locale: la sala bar ha 24,26 m² di aperture contro i 13,4 richiesti.',
+  }),
+  barSheet('08', {
+    title: 'Sezione A-A',
+    alt: 'Pianta con la traccia della sezione e la sezione A-A del bar',
+    note: 'La traccia in pianta e la sezione A-A, con la nota sui vuoti chiusi ricavati nella copertura.',
+  }),
+]
+
+const MUSEO = 'museo-mestieri-del-fiume'
+// Le pagine della relazione sono immagini: `full` a 1600 px per lo zoom, un solo
+// PDF per tutte. Nomi dei compagni e volti sono oscurati sia nelle pagine sia nel PDF.
+const museoSheet = (n, o) =>
+  sheet(MUSEO, n, { w: 800, h: 1132, paper: 'A4', from: 'Word', full: `/media/tavole/${MUSEO}/${n}-full.webp`, pdf: `/media/tavole/${MUSEO}/relazione.pdf`, ...o })
+const museoSheets = [
+  museoSheet('01', {
+    title: 'Introduzione',
+    alt: 'Prima pagina della relazione, con la fotografia del museo e l’introduzione alla visita',
+    note: 'Il museo, il Loghino Ariello e la riserva delle Valli del Mincio: com’è andata la mattina della visita.',
+  }),
+  museoSheet('02', {
+    title: 'Oggetti esposti',
+    alt: 'Seconda pagina con le fotografie e le descrizioni del corno, del tostacaffè e del cardatore',
+    note: 'Tre oggetti descritti uno per uno: un grande corno con l’anello per appenderlo, un tostacaffè di inizio Novecento e un cardatore per la lana.',
+  }),
+  museoSheet('03', {
+    title: 'Impressioni personali',
+    alt: 'Terza pagina con le impressioni personali sulla visita',
+    note: 'Le impressioni personali: la mia è sulla stufa in ghisa della cucina d’epoca. Nomi dei compagni e volti sono oscurati.',
+  }),
+  museoSheet('04', {
+    title: 'Conclusioni',
+    alt: 'Quarta pagina con le conclusioni e le fotografie della giornata',
+    note: 'Il legame tra lavoro, risorse naturali e manualità nel territorio del Mincio. Le fotografie in cui si riconoscono i compagni sono sfocate.',
+  }),
+]
+
 const allProjects = [
   // ═══ TECNICO ═══════════════════════════════════════════════════════════════
   {
@@ -177,6 +368,163 @@ const allProjects = [
       img('canopy', { code: 'AP-24-001', tone: 'ink', bare: true }, 'Modello a fil di ferro della stessa tettoia', 'Vista wireframe del modello'),
       img('titleblock', {}, 'Squadratura e cartiglio usati per le tavole', 'Impaginazione delle tavole'),
     ],
+    featured: false,
+    sample: false,
+  },
+  {
+    slug: STRADA,
+    code: 'AP-26-T01',
+    title: 'Progetto stradale da A a B',
+    subtitle: 'Dal tracciolino ai metri cubi di scavo, su una carta a curve di livello',
+    area: 'tecnico',
+    categories: ['tecnico', 'cad'],
+    types: ['Progetto stradale', 'Topografia', 'Planimetrie', 'Profili', 'Sezioni', 'Computo'],
+    client: 'Esercitazione di topografia — classe 5ª BT',
+    sector: 'Infrastrutture stradali',
+    location: 'I.T.T. «Carlo d’Arco», Mantova',
+    year: 2026,
+    services: ['Tracciolini a pendenza costante', 'Poligonale d’asse e curve circolari', 'Picchettamento', 'Profilo longitudinale e livellette', 'Sezioni trasversali', 'Calcolo dei movimenti di terra'],
+    technologies: ['AutoCAD LT', 'Excel'],
+    summary: 'Una strada di 934 m tra due punti di una carta a curve di livello: due tracciolini al 5,3%, quattro curve di raggio 80 m, 28 picchetti, profilo, sezioni e il calcolo dei 23.447 m³ di scavo.',
+    description:
+      'Un progetto stradale completo, dal primo tracciato sulla carta al conto della terra da muovere: collegare il punto A, a quota 300 m, con il punto B, a quota 286 m, su una carta con le curve di livello ogni 2 m e un corso d’acqua nel fondovalle.',
+    goal: 'Tracciare una strada che scenda nel fondovalle e risalga dall’altra parte con pendenze regolari, e arrivare a sapere quanta terra scavare e quanta riportare.',
+    problem:
+      'Tra A e B ci sono 31 metri da scendere e 17 da risalire, con il fondovalle a quota 269 e il corso d’acqua da attraversare. La linea più breve è impraticabile: la strada deve seguire il terreno, e ogni scelta in pianta cambia il profilo, le sezioni e i volumi.',
+    strategy:
+      'Ho seguito il metodo in ordine. Prima i tracciolini, spezzate a pendenza costante del 5,3% costruite con il compasso aperto a 37,74 m tra una curva di livello e l’altra; poi le poligonali d’asse che li regolarizzano, le curve, i picchetti, e solo alla fine profilo, sezioni e volumi. Ho confrontato due ipotesi e ho sviluppato la seconda.',
+    development: [
+      { title: 'Tracciato', text: 'Due tracciolini da A a B e due poligonali d’asse, A-1-2-3-4-B di 968 m e A-1-2-B di 892 m. Quella definitiva segue il secondo tracciolino con quattro vertici.' },
+      { title: 'Curve', text: 'Quattro curve circolari di raggio 80 m, con deviazioni di 67,1°, 67,6°, 67,0° e 10,3°: 296 m di archi sui 934 m dell’asse, picchettato in 28 punti da A a B.' },
+      { title: 'Profilo', text: 'Altezze esagerate dieci volte e tre livellette: −6,52% per 475,75 m fino al fondovalle, un tratto in piano di 76,16 m e +4,45% per 382,06 m fino a B. Lo scavo più profondo, 5,22 m, è al picchetto 26.' },
+      { title: 'Volumi', text: '28 sezioni con piattaforma di 10 m, aree di sterro e riporto misurate in AutoCAD e un foglio Excel che calcola i volumi con le sezioni ragguagliate: 23.447 m³ di scavo e 569 m³ di riporto.' },
+    ],
+    result: 'Otto tavole e un foglio di calcolo che si tengono insieme: la strada scende e risale lungo 934 m e il bilancio delle terre chiude con 22.878 m³ di scavo in eccesso, da portare via.',
+    metrics: [
+      { value: '934 m', label: 'Lunghezza dell’asse' },
+      { value: '28', label: 'Picchetti e sezioni' },
+      { value: '23.447 m³', label: 'Volume di sterro' },
+    ],
+    sheets: stradaSheets,
+    cover: sheetCover(STRADA, 2000, 1366, stradaSheets[0].alt),
+    images: stradaSheets.map((s) => sheetImage(s)),
+    featured: true,
+    sample: false,
+  },
+  {
+    slug: BAR,
+    code: 'AP-26-T03',
+    title: 'Bar-caffetteria in un’area verde',
+    subtitle: '«Officina del gusto e orto della salute»: il tema d’esame in otto tavole',
+    area: 'tecnico',
+    categories: ['tecnico', 'cad'],
+    types: ['Progettazione', 'Planimetrie', 'Prospetti', 'Sezioni', 'Verifiche igienico-sanitarie', 'CAD'],
+    client: 'Esame di Stato 2026 — Progettazione, Costruzioni e Impianti',
+    sector: 'Ristorazione e verde pubblico',
+    location: 'I.T.T. «Carlo d’Arco», Mantova',
+    year: 2026,
+    services: ['Planimetria generale del parco', 'Piante, prospetti e sezione', 'Quadro delle superfici', 'Verifica dei rapporti aeroilluminanti', 'Strutture leggere in legno'],
+    technologies: ['AutoCAD LT'],
+    summary: 'Il tema d’esame di Progettazione, Costruzioni e Impianti: un bar-caffetteria di 161 m² in un parco con orto didattico, due gazebo e una struttura per l’orto, in otto tavole A3 con superfici e verifiche aeroilluminanti.',
+    description:
+      'Il primo quesito della seconda parte chiedeva un bar-caffetteria dentro un parco pensato per scoprire il mondo agricolo, «Officina del gusto e orto della salute». Ho disegnato il parco in scala 1:500 e l’edificio in scala 1:100, dalla pianta arredata alla sezione, con il quadro delle superfici scritto direttamente sulle tavole.',
+    goal: 'Un locale aperto sul verde, con i servizi per il pubblico e per il personale separati, e i conti delle superfici e dell’illuminazione naturale che tornano locale per locale.',
+    problem:
+      'Un programma fitto per un edificio di un piano: sala per il pubblico, bancone, cucina, laboratorio, due blocchi di servizi, strutture esterne e il parco intorno. La sala e i locali di lavoro dovevano rispettare il rapporto aeroilluminante di 1/8, e i servizi senza finestre andavano risolti con l’aerazione meccanica.',
+    strategy:
+      'Ho tenuto l’edificio compatto, 13,90 × 14,40 m con struttura portante in cemento armato, e l’ho aperto verso il parco con ampie vetrate. Le travi lignee a vista in copertura non portano nulla: fanno da schermatura solare e disegnano il prospetto. Fuori, tre strutture leggere in legno di 4,20 × 2,70 m con telo in PVC, reversibili e senza impermeabilizzare il suolo.',
+    development: [
+      { title: 'Parco', text: 'Planimetria in scala 1:500 con percorsi pedonali dal disegno organico, prati e alberature irregolari, l’orto didattico collegato al bar e il commento al progetto del verde.' },
+      { title: 'Edificio', text: 'Pianta arredata, pianta quotata, pianta delle coperture, quattro prospetti e la sezione A-A in scala 1:100, con le quote di livello da 0,00 a 3,50 m.' },
+      { title: 'Verifiche', text: 'Una scheda per locale e il riepilogo delle superfici: 161,24 m² interni, 34,02 m² di strutture esterne, 195,26 m² in tutto. Sala bar e laboratorio superano il rapporto aeroilluminante di 1/8.' },
+    ],
+    result: 'Otto tavole A3 con cartiglio, scale e quadro delle superfici. La sala bar, 107 m², ha 24,26 m² di superfici aeroilluminanti: quasi il doppio dei 13,4 richiesti.',
+    metrics: [
+      { value: '161,24 m²', label: 'Superficie interna' },
+      { value: '8', label: 'Tavole A3' },
+      { value: '24,26 m²', label: 'Aperture della sala bar' },
+    ],
+    sheets: barSheets,
+    cover: sheetCover(BAR, 2000, 1415, barSheets[0].alt),
+    images: barSheets.map((s) => sheetImage(s)),
+    featured: true,
+    sample: false,
+  },
+  {
+    slug: CANTIERE,
+    code: 'AP-26-T02',
+    title: 'Layout di cantiere',
+    subtitle: 'Gru, baracche e depositi per un edificio a elementi prefabbricati',
+    area: 'tecnico',
+    categories: ['tecnico', 'cad'],
+    types: ['Cantiere', 'Sicurezza', 'Planimetrie', 'CAD'],
+    client: 'Esercitazione — classe 5ª BT',
+    sector: 'Organizzazione del cantiere',
+    location: 'I.T.T. «Carlo d’Arco», Mantova',
+    year: 2026,
+    services: ['Layout di cantiere', 'Legenda dei simboli', 'Dotazione del cantiere', 'Piante dell’edificio'],
+    technologies: ['AutoCAD LT'],
+    summary: 'Il layout di cantiere per un edificio a elementi prefabbricati: recinzione, due accessi, autogru, due baracche, depositi e postazioni fisse, con una legenda di 24 simboli e le piante dell’edificio.',
+    description:
+      'Un edificio con magazzino, portico, uffici e abitazione, montato con pilastri, travi, solai e pannelli prefabbricati. Qui il progetto è il cantiere: dove entrano i camion con gli elementi, dove lavora la gru, dove si appoggiano pilastri e pannelli in attesa del montaggio, dove stanno uffici, servizi e depositi.',
+    goal: 'Organizzare l’area perché mezzi pesanti, gru e persone non si intralcino, e perché ogni zona del cantiere si riconosca a colpo d’occhio sulla tavola.',
+    problem:
+      'Gli elementi prefabbricati arrivano con trasporti eccezionali e li solleva un’autogru: servono un accesso carrabile adatto, una viabilità interna che regga i mezzi e un’area di deposito raggiungibile dalla gru, oltre a uffici, servizi e depositi per chi ci lavora.',
+    strategy:
+      'Ho diviso l’area in zone con una funzione sola e un simbolo per ciascuna: 24 voci di legenda, dalla recinzione al quadro principale. Accanto alla legenda la dotazione del cantiere è scritta per esteso, così la tavola si legge anche senza conoscere i simboli.',
+    development: [
+      { title: 'Inquadramento', text: 'Il lotto intero, la strada, i due accessi, uno carrabile e uno pedonale, e la recinzione alta 2 m intorno all’area di cantiere.' },
+      { title: 'Layout', text: 'L’autogru con il suo raggio d’azione; la baracca A per l’ufficio di cantiere e la direzione lavori, con WC e pronto soccorso; la baracca B per l’impresa e la guardiola; depositi, postazioni per malta e ferro, parcheggio e percorso dei mezzi.' },
+      { title: 'Edificio', text: 'Le piante del piano terra e del piano primo: magazzino con portico, uffici e servizi, cucina, lavanderia, due camere e un bagno.' },
+    ],
+    result: 'Quattro tavole A3 in cui il cantiere si capisce prima ancora di leggere la legenda: un accesso per i mezzi e uno per le persone, un posto per ogni materiale e la gru al centro del lavoro.',
+    metrics: [
+      { value: '24', label: 'Voci di legenda' },
+      { value: '2', label: 'Accessi, carrabile e pedonale' },
+      { value: '2,00 m', label: 'Altezza della recinzione' },
+    ],
+    sheets: cantiereSheets,
+    cover: sheetCover(CANTIERE, 2000, 1250, 'L’area di cantiere: l’edificio in costruzione, il raggio d’azione dell’autogru, depositi e baracche'),
+    images: cantiereSheets.map((s) => sheetImage(s)),
+    featured: false,
+    sample: false,
+  },
+  {
+    slug: MUSEO,
+    code: 'AP-25-T04',
+    title: 'Museo dei Mestieri del Fiume',
+    subtitle: 'Una mattina al museo etnografico del mio paese, in quattro pagine',
+    area: 'tecnico',
+    categories: ['altro'],
+    types: ['Relazione', 'Territorio', 'Impaginazione'],
+    client: 'Educazione civica — classe 5ª BT',
+    sector: 'Cultura e territorio',
+    location: 'Rivalta sul Mincio, Rodigo (MN)',
+    year: 2025,
+    services: ['Relazione di visita', 'Schede degli oggetti', 'Impaginazione'],
+    technologies: ['Word'],
+    summary: 'La relazione sull’uscita didattica al Museo Etnografico dei Mestieri del Fiume di Rivalta sul Mincio: il percorso della visita, tre oggetti descritti uno per uno e le impressioni personali.',
+    description:
+      'Il 15 novembre 2025 la classe ha visitato il Museo Etnografico dei Mestieri del Fiume a Rivalta sul Mincio, il paese dove vivo. La guida era un operatore del Parco del Mincio; la visita è partita dal Loghino Ariello e ha attraversato la cucina ricostruita di un pescatore-contadino e il cortile con barche, reti e trappole.',
+    goal: 'Raccontare la visita in modo che si capisca cosa conserva il museo e perché conta per chi vive lungo il Mincio: la vita quotidiana, i mestieri della palude, il rapporto tra le persone e il fiume.',
+    problem:
+      'Un museo di oggetti d’uso, non di opere con la didascalia: per descriverli bisognava ascoltare la guida, guardarli da vicino e ricostruire a cosa servivano, come si usavano e in che epoca.',
+    strategy:
+      'Ho diviso la relazione in quattro parti — introduzione, oggetti osservati, impressioni personali, conclusioni — e ho messo ogni oggetto accanto alla sua fotografia, con il testo che le scorre intorno.',
+    development: [
+      { title: 'Percorso', text: 'La riserva delle Valli del Mincio e la storia della valle, dalle palafitte agli Etruschi alla regolazione delle acque nel Medioevo; poi la cucina d’epoca e gli attrezzi del cortile, con il mestiere del calafato.' },
+      { title: 'Oggetti', text: 'Tre schede: un grande corno con l’anello per appenderlo, usato come contenitore e per richiamare il bestiame; un tostacaffè domestico di inizio Novecento; un cardatore manuale per la lana.' },
+      { title: 'Impressioni', text: 'Nelle impressioni personali ho scritto della stufa in ghisa della cucina: tutto, dalle pentole al tostacaffè, era organizzato intorno a lei.' },
+    ],
+    result: 'Quattro pagine A4 impaginate in Word, con le fotografie accanto ai testi. Nelle pagine pubblicate qui i nomi dei compagni di classe e le fotografie in cui si riconoscono sono oscurati.',
+    metrics: [
+      { value: '4', label: 'Pagine A4' },
+      { value: '3', label: 'Oggetti descritti' },
+      { value: '15.11.2025', label: 'Data della visita' },
+    ],
+    sheets: museoSheets,
+    cover: sheetCover(MUSEO, 1600, 1000, 'La prima pagina della relazione: il titolo, l’introduzione e la fotografia del museo'),
+    images: museoSheets.map((s) => sheetImage(s)),
     featured: false,
     sample: false,
   },
@@ -985,6 +1333,8 @@ export const years = () => [...new Set(projects.map((p) => p.year))].sort((a, b)
 export const sectors = () => [...new Set(projects.map((p) => p.sector))].sort((a, b) => a.localeCompare(b, 'it'))
 export const technologies = () => [...new Set(projects.flatMap((p) => p.technologies))].sort((a, b) => a.localeCompare(b, 'it'))
 export const types = (list = projects) => [...new Set(list.flatMap((p) => p.types))].sort((a, b) => a.localeCompare(b, 'it'))
+/** Progetti con tavole vere da sfogliare nel visualizzatore (/portfolio/tavole/). */
+export const withSheets = () => projects.filter((p) => p.sheets?.length)
 
 /** Progetto successivo nell'ordine del portfolio (ciclico). */
 export const nextOf = (slug) => {
