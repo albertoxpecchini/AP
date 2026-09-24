@@ -12,6 +12,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { paths } from './paths.js'
+import { fontFaceCss } from './font-css.js'
 
 // Sottoinsieme scelto: solo latin, asse del peso. ~32 KB → ~43 KB in base64.
 const ARCHIVO_WOFF2 = path.join(
@@ -51,15 +52,7 @@ export function buildEmbeddedFontCss({ embed = true } = {}) {
   const buffer = fs.readFileSync(ARCHIVO_WOFF2)
   const base64 = buffer.toString('base64')
 
-  // `font-weight: 100 900` dichiara l'asse variabile; i client che non
-  // supportano le varianti variabili ricadono sul peso statico più vicino.
-  const css = `@font-face {
-      font-family: 'Archivo Variable';
-      font-style: normal;
-      font-display: swap;
-      font-weight: 100 900;
-      src: url(data:font/woff2;charset=utf-8;base64,${base64}) format('woff2-variations');
-    }`
+  const css = fontFaceCss(base64)
 
   return {
     available: true,

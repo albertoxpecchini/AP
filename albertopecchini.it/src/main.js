@@ -10,6 +10,15 @@ import { initForm } from './client/form.js'
 import { initCanvas } from './client/canvas.js'
 import { initViewer } from './client/viewer.js'
 
+// Il compositore email (/email/) porta con sé i moduli del generatore (tools/email-generator):
+// si carica in un pezzo a parte, solo sulla sua pagina, così le altre non ne pagano il peso.
+function initEmail() {
+  if (!document.querySelector('[data-email]')) return
+  import('./client/email.js')
+    .then((m) => m.initEmail())
+    .catch((error) => console.error('[site] initEmail:', error))
+}
+
 const modules = [
   initTransitions,
   initHeader,
@@ -31,6 +40,7 @@ const modules = [
   initForm,
   initCanvas,
   initViewer,
+  initEmail,
   initParallax,
   initMagnetic,
   initCursor,

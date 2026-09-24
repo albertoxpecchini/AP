@@ -5,29 +5,14 @@
 // inline e a blocchi) e produce markup con stili INLINE, perché i client di posta
 // scartano con frequenza i fogli incorporati. Le classi restano come appiglio per
 // i pochi client che onorano <style>.
-import fs from 'node:fs'
-import path from 'node:path'
 import { escapeHtml } from './util.js'
-import { paths } from './paths.js'
 
 // Varianti del pulsante «:::bottone». Per i marchi colori e glifo sono quelli
 // ufficiali; il verde WhatsApp è #008069 (quello dei pulsanti di WhatsApp Web)
 // perché con il bianco regge il contrasto AA (4,9:1): il #25D366 del logo si
 // ferma a 2:1. Il glifo è un PNG: Gmail e Outlook non mostrano l'SVG.
-const BUTTON_VARIANTS = {
+export const BUTTON_VARIANTS = {
   whatsapp: { background: '#008069', color: '#ffffff', icon: 'src/assets/email/whatsapp-glyph.png' },
-}
-
-const iconCache = new Map()
-
-/** Icona del pulsante → data URI, come il logo della firma. */
-function iconDataUri(file) {
-  if (!file) return ''
-  if (!iconCache.has(file)) {
-    const full = path.resolve(paths.root, file)
-    iconCache.set(file, fs.existsSync(full) ? `data:image/png;base64,${fs.readFileSync(full).toString('base64')}` : '')
-  }
-  return iconCache.get(file)
 }
 
 /** Righe del blocco pulsante → { label, url }: l'URL è la riga che inizia con http(s). */
@@ -43,13 +28,13 @@ function parseButton(lines) {
  * sul link (tutta l'area è cliccabile negli altri client). Sotto, il link in
  * chiaro per chi ha le immagini bloccate o un client che non rende il pulsante.
  */
-function renderButton(variant, lines, theme, st) {
+function renderButton(variant, lines, theme, st, iconOf) {
   const { label, url } = parseButton(lines)
   if (!url) return label ? `<p style="${st.p}">${renderInline(label, st)}</p>` : ''
 
   const c = theme.color
   const look = BUTTON_VARIANTS[variant] ?? { background: c.ink, color: c.paper, icon: '' }
-  const icon = iconDataUri(look.icon)
+  const icon = iconOf(look.icon)
   const href = escapeHtml(url)
   const sp = theme.space
 
@@ -159,9 +144,12 @@ function renderTable(rows, st) {
  * Converte Markdown in HTML per email.
  * @param {string} markdown
  * @param {object} theme
+ * @param {{icon?: (file: string) => string}} [options] `icon` risolve il file di un'icona in data URI
+ *   (nel generatore è `iconDataUri` di assets.js; nel browser una mappa già codificata)
  */
-export function renderMarkdown(markdown, theme) {
+export function renderMarkdown(markdown, theme, { icon } = {}) {
   const st = styles(theme)
+  const iconOf = typeof icon === 'function' ? icon : () => ''
   const lines = String(markdown ?? '').replace(/\r\n/g, '\n').split('\n')
   const out = []
   let i = 0
@@ -197,7 +185,7 @@ export function renderMarkdown(markdown, theme) {
         i += 1
       }
       i += 1
-      out.push(renderButton(button[1].toLowerCase(), buffer, theme, st))
+      out.push(renderButton(button[1].toLowerCase(), buffer, theme, st, iconOf))
       continue
     }
 

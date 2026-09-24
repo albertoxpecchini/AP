@@ -1,6 +1,6 @@
 // Report finale: l'unico documento che l'utente deve leggere dopo la generazione.
 // Non contiene il corpo dell'email, solo ciò che serve a decidere se inviarla.
-import { formatBytes } from './sources.js'
+import { formatBytes } from './util.js'
 import { formatDateIt } from './util.js'
 
 const STATUS_LABEL = {

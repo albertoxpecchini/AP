@@ -13,6 +13,7 @@ import { contattiPage } from './pages/contact.js'
 import { privacyPage, cookiePage, notFoundPage } from './pages/legal.js'
 import { stilePage } from './pages/stile.js'
 import { tavolePage, sheetCount } from './pages/tavole.js'
+import { emailPage } from './pages/email.js'
 
 const websiteLd = () => ({
   '@context': 'https://schema.org',
@@ -147,6 +148,19 @@ export const routes = [
     pageClass: 'page--stile',
     noFooter: true, // la pagina è il piano a tutto schermo: niente chiusura sotto
     jsonld: () => [crumbs({ label: 'Stile', href: '/stile/' })],
+  },
+  {
+    // Strumento privato: non è nei menu, nel footer, nella sitemap né nei motori
+    // di ricerca (noindex + X-Robots-Tag in vercel.json). Si raggiunge solo dal
+    // link diretto, che porta anche la chiave di accesso: /email/?k=…
+    path: '/email/',
+    title: 'Compositore email',
+    description: 'Strumento privato per scrivere, controllare, migliorare con l’IA e copiare le email di Alberto Pecchini.',
+    render: emailPage,
+    pageClass: 'page--email',
+    noindex: true,
+    noFooter: true,
+    hideCta: true,
   },
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
   { path: '/cookie/', priority: 0.2, title: 'Cookie policy', description: 'Il sito non usa cookie di profilazione: ecco cosa viene salvato nel browser e perché.', render: cookiePage, hideCta: true },

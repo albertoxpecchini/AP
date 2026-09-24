@@ -81,7 +81,7 @@ export function validate({ input, profile, footer, bodyMarkdown, html, attachmen
       break
     }
 
-    const bytes = Buffer.byteLength(html, 'utf8')
+    const bytes = new TextEncoder().encode(html).length
     if (bytes > GMAIL_CLIP_BYTES) {
       warnings.push(
         `L’HTML pesa ${(bytes / 1024).toFixed(0)} KB: Gmail tronca oltre ${Math.round(GMAIL_CLIP_BYTES / 1024)} KB e mostra «Visualizza messaggio completo». Il font incorporato è la voce principale; usare email-lite.html per Gmail.`,

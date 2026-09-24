@@ -254,7 +254,10 @@ Un modulo per responsabilità, in `tools/email-generator/src/`:
 | `sources.js` | lettura delle fonti, verifica degli allegati |
 | `theme.js` | derivazione del tema dal CSS del sito |
 | `fonts.js` | incorporamento del carattere |
-| `footers.js` | archivio firme versionato e resa del footer |
+| `footers.js` | archivio firme versionato, logo della firma in data URI |
+| `footer-html.js` | resa del footer in HTML e testo (modulo puro) |
+| `assets.js` | icone dei pulsanti in data URI |
+| `font-css.js` | regola @font-face del carattere incorporato (modulo puro) |
 | `compose.js` | saluto, chiusura, struttura del corpo |
 | `markdown.js` | Markdown → HTML con stili inline, e → testo |
 | `template.js` | impianto HTML dell'email |
@@ -264,6 +267,13 @@ Un modulo per responsabilità, in `tools/email-generator/src/`:
 | `generate.js` | orchestrazione |
 
 Il JavaScript vive solo nell'anteprima: dentro l'email non ce n'è.
+
+I moduli di resa — `compose.js`, `markdown.js`, `template.js`, `footer-html.js`,
+`font-css.js`, `validate.js`, `report.js`, `util.js` — non toccano il disco: gli
+stessi file girano anche nel browser, nel compositore in pagina (`/email/`, vedi
+il README del sito), che produce email identiche a quelle di `npm run email`.
+Lettura di file, firme, tema e immagini restano nei moduli Node (`footers.js`,
+`assets.js`, `fonts.js`, `theme.js`, `sources.js`, `generate.js`).
 
 ## Regola sui dati
 

@@ -23,6 +23,7 @@ Online su <https://www.albertopecchini.it> (albertopecchini.it rimanda a www).
 - [Prima di andare online](#prima-di-andare-online)
 - [Pubblicazione](#pubblicazione)
 - [Generatore di email](#generatore-di-email)
+- [Compositore email online](#compositore-email-online)
 - [Convenzioni](#convenzioni)
 
 ## Avvio rapido
@@ -132,6 +133,7 @@ albertopecchini.it/
 | `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa |
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
+| `/email/` | Compositore email, strumento privato: non è nei menu né nella sitemap, ha `noindex` e si apre solo dal link con la chiave (vedi [Compositore email online](#compositore-email-online)) |
 | `404.html` | Pagina non trovata (servita in automatico da Vercel) |
 
 Le rotte sono definite in `src/templates/routes.js`: ogni voce ha percorso, `title`, `description`, funzione di rendering e dati strutturati (schema.org: `WebSite`, `Person`, `Service`, `BreadcrumbList`, `CreativeWork` per i case study). Sitemap e robots derivano dalla stessa tabella.
@@ -374,6 +376,61 @@ Il risultato è un solo file da leggere: `emails/out/<data>_<nome>/report.md`.
 Gli account mittente stanno in `config/sender-profiles.json`, le firme — versionate —
 in `profiles/footers.json`. Istruzioni complete in
 [`tools/email-generator/README.md`](tools/email-generator/README.md).
+
+## Compositore email online
+
+`/email/` è il generatore in pagina: si sceglie da dove parte l’email (scuola,
+personale, aziendale — gli stessi account di `config/sender-profiles.json`, con le
+firme di `profiles/footers.json`), si compila con i tasti della guida (il Markdown
+del generatore funziona), si copia l’output, la si fa migliorare da **Claude Opus 5.5**
+e si leggono statistiche, peso, lunghezza e segnalazioni. In fondo c’è la rubrica:
+preferiti, indirizzi nuovi (salvati nel browser) e i contatti conosciuti di
+`src/data/rubrica.js`.
+
+**L’output è la stessa email del generatore da riga di comando**, non un’imitazione:
+nel browser girano i suoi moduli puri (`compose.js`, `markdown.js`, `template.js`,
+`footer-html.js`, `validate.js`, `report.js`), con tema, firma, logo e icone che
+il template mette nel blocco JSON della pagina e il carattere Archivo scaricato e
+incorporato in base64 come fa `fonts.js`. La zona «Output» mostra lo stato
+(READY / WARNING / MISSING_REQUIRED_DATA) con errori e avvisi di `validate.js`,
+l’anteprima in un iframe e le viste email.txt, report.md e sorgente; si scaricano
+`email.html`, `email-lite.html`, `email.txt`, `report.md`, il file di input per
+`emails/in/` (che rigenera la stessa email con `npm run email`) e una bozza `.eml`.
+Verificato byte per byte: per lo stesso input pagina e CLI producono file identici.
+Il modulo del browser (`src/client/email.js`) si carica solo su questa pagina, in un
+pezzo a parte, così le altre non ne pagano il peso.
+
+È uno strumento privato. La pagina non compare nei menu, nel footer, nella sitemap
+né nei motori di ricerca (`noindex` nel `<head>` e `X-Robots-Tag` in `vercel.json`):
+si raggiunge solo dal link diretto, che porta anche la chiave di accesso:
+
+```
+https://www.albertopecchini.it/email/?k=<EMAIL_TOOL_KEY>
+```
+
+Al primo accesso la chiave viene salvata nel browser e tolta dall’indirizzo. Senza
+chiave la pagina funziona lo stesso, ma i tasti dell’IA restano spenti.
+
+L’IA passa da `api/email-ai.js`, funzione serverless Vercel che usa l’SDK ufficiale
+`@anthropic-ai/sdk` (unica dipendenza di runtime del progetto). Due variabili
+d’ambiente, da impostare su Vercel in *Production*, *Preview* e *Development* e
+**mai nel repository** (in locale stanno in `.env.local`, escluso da Git):
+
+| Variabile | Valore | Se manca |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | la chiave della Claude API (console.anthropic.com) | l’IA risponde «non configurata» |
+| `EMAIL_TOOL_KEY` | una stringa casuale lunga: è la chiave del link | la funzione rifiuta ogni richiesta |
+
+Ogni richiesta porta la chiave nell’intestazione `X-Email-Key`; la funzione la
+confronta a tempo costante, limita a 60 richieste l’ora per IP e chiede al modello
+una risposta in JSON (oggetto, testo, modifiche, consigli, oggetti alternativi,
+voto). Il conto Anthropic deve avere credito: senza, la pagina mostra il messaggio
+«Il conto Anthropic non ha credito».
+
+File: `src/templates/pages/email.js` (markup), `src/client/email.js` (logica),
+`src/styles/email.css` (aspetto), `src/data/rubrica.js` (mittenti, toni, contatti),
+`api/email-ai.js` (funzione). In locale, per provare anche l’IA, serve `vercel dev`
+(vedi [Modulo contatti](#modulo-contatti)).
 
 ## Convenzioni
 

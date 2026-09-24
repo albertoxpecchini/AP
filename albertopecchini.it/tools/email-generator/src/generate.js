@@ -12,7 +12,8 @@ import { resolveSender } from './senders.js'
 import { loadEmailTheme } from './theme.js'
 import { buildEmbeddedFontCss } from './fonts.js'
 import { readSource, checkAttachments } from './sources.js'
-import { getFooter, learnFooter, renderFooterText } from './footers.js'
+import { getFooter, learnFooter, renderFooterText, resolveFooterLogo } from './footers.js'
+import { iconDataUri } from './assets.js'
 import { composeBody, buildPreheader } from './compose.js'
 import { renderMarkdown, markdownToText } from './markdown.js'
 import { renderEmailHtml } from './template.js'
@@ -80,7 +81,7 @@ export function generateEmail(inputFile, options = {}) {
     senderName: footer?.name ?? '',
   })
 
-  const bodyHtml = renderMarkdown(composed.markdown, theme)
+  const bodyHtml = renderMarkdown(composed.markdown, theme, { icon: iconDataUri })
   const preheader = buildPreheader(composed.markdown)
 
   const attachmentList = attachments.map((file) => ({
@@ -98,6 +99,7 @@ export function generateEmail(inputFile, options = {}) {
     subtitle: '',
     bodyHtml,
     footer,
+    footerLogo: resolveFooterLogo(footer),
     attachments: attachmentList,
     links: input.links,
     theme,

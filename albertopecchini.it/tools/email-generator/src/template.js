@@ -9,7 +9,7 @@
 // pensato per la posta: una colonna da 600px, nessuna unità viewport, niente
 // posizionamento assoluto, niente JavaScript.
 import { escapeHtml } from './util.js'
-import { renderFooterHtml } from './footers.js'
+import { renderFooterHtml } from './footer-html.js'
 
 // GIF trasparente di 1px: Outlook comprime le celle prive di contenuto, e un
 // `&nbsp;` imporrebbe l'altezza di una riga di testo.
@@ -41,6 +41,7 @@ export function renderEmailHtml({
   subtitle,
   bodyHtml,
   footer,
+  footerLogo = null,
   attachments = [],
   links = [],
   theme,
@@ -132,7 +133,7 @@ export function renderEmailHtml({
       </td></tr>`
     : ''
 
-  const footerHtml = renderFooterHtml(footer, theme)
+  const footerHtml = renderFooterHtml(footer, theme, footerLogo)
   const footerBlock = footerHtml
     ? `<tr><td style="padding:${sp.s5}px ${gutter}px ${sp.s6}px;">${footerHtml}</td></tr>`
     : ''
