@@ -182,6 +182,8 @@ export function picture(image, { lazy = true, sizes, className } = {}) {
       decoding: 'async',
       fetchpriority: lazy ? null : 'high',
       sizes,
+      // versione grande per il lightbox, quando l'immagine in pagina è ridotta
+      'data-full': image.full,
     })}>`
   }
   const { caption, ...spec } = image

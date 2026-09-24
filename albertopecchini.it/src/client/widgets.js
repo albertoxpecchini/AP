@@ -20,13 +20,14 @@ export function initLightbox() {
   let unlock
   let release
 
-  /** Copia del contenuto del riquadro: <img> nuovo per i file, clone per le tavole SVG. */
+  /** Copia del contenuto del riquadro: <img> nuovo per i file (nella versione grande,
+   *  se c'è `data-full`), clone per le tavole SVG. */
   const contentOf = (trigger) => {
     const source = $('.pic, .art', trigger.closest('.media__frame') || trigger)
     if (!source) return null
     if (source.tagName === 'IMG') {
       const img = new Image()
-      img.src = source.currentSrc || source.src
+      img.src = source.dataset.full || source.currentSrc || source.src
       img.alt = source.alt
       img.className = 'pic'
       return img

@@ -73,6 +73,7 @@ albertopecchini.it/
 │  ├─ icons.svg            sprite delle icone
 │  └─ media/
 │     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone)
+│     ├─ progetti/         fotografie dei progetti, una cartella per progetto: NN.webp (griglia) e NN-full.webp (lightbox)
 │     ├─ studio/           fotografie dello studio (ritratto.webp)
 │     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf, copertina.webp
 │     └─ web/              screenshot dei progetti web (<prefisso>-desktop.webp, -tablet, -mobile, -*-tall)
@@ -168,6 +169,7 @@ Campi principali:
 - `summary` (card e meta description), `description`, `goal`, `problem`, `strategy`, `process`, `result`, `metrics`, `learned`: le sezioni del case study.
 - `cover` e `images`: copertina e galleria (vedi [Immagini](#immagini)).
 - `web`: per i progetti web, gli screenshot dei mockup e il dominio (`url`).
+- `photos`: fotografie del progetto a gruppi (`{ lead, groups: [{ title, items }] }`). Nel case study hanno una sezione **Fotografie** tutta loro, subito dopo la galleria o le tavole, in colonne con le proporzioni vere; si aprono nel lightbox.
 - `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Se ci sono, nel case study la galleria diventa la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
 - `featured: true` porta il progetto nello scorrimento orizzontale della home.
 - `sample: true` lo contrassegna come **dimostrativo**: mostra come si presenta un lavoro di quel tipo, ma oggi non viene pubblicato (vedi sotto).
@@ -190,7 +192,7 @@ sostituirne i contenuti e togliergli `sample: true`: compare da solo.
 
 I nove reali: il PCTO in Caem Group, i quattro lavori di quinta con le tavole vere
 (progetto stradale, bar-caffetteria del tema d’esame, layout di cantiere, relazione
-sul Museo dei Mestieri del Fiume), rivaltasulmincio.it, cascinafontana.xyz,
+sul Museo dei Mestieri del Fiume, con 61 fotografie della visita), rivaltasulmincio.it, cascinafontana.xyz,
 dariodonelli (sul dominio Vercel finché dariodonelli.it non è attivo) e questo sito.
 
 ### Aree nascoste
@@ -230,7 +232,7 @@ Per sostituire una tavola basta cambiare la voce; il file va in `public/`:
 { src: '/media/progetti/annesso-rustico/01.webp', width: 1600, height: 1200, alt: '…', caption: '…' }
 ```
 
-`width` e `height` servono a riservare lo spazio ed evitare salti di layout. Formato consigliato: WebP, lato lungo 1600–2000 px, senza metadati (una fotografia scattata con il telefono contiene le coordinate GPS).
+`width` e `height` servono a riservare lo spazio ed evitare salti di layout. Con `full` (per esempio `…/01-full.webp`) il lightbox apre una versione più grande di quella in pagina: le fotografie stanno in griglia a 720 px e a tutto schermo a 1600. Formato consigliato: WebP, lato lungo 1600–2000 px, senza metadati (una fotografia scattata con il telefono contiene le coordinate GPS).
 
 Con ffmpeg, disponibile sulla macchina di sviluppo:
 
@@ -301,7 +303,7 @@ Scelte fatte apposta, da non cambiare senza motivo:
 - Il titolo è **«Diplomato geometra»**: «Geometra» e «Perito geometra» sono titoli riservati agli iscritti all’albo.
 - `site.legal.piva` e `site.legal.albo` sono `null`: i template nascondono da soli i blocchi che li mostrerebbero e al loro posto compare `site.legal.note`.
 - In footer e contatti si pubblica solo il comune. L’indirizzo completo (`site.location.address`) compare unicamente nella privacy policy, dove il titolare del trattamento va identificato per legge. Non va nei dati strutturati.
-- Le fotografie pubblicate sono prive di metadati EXIF.
+- Le fotografie pubblicate sono prive di metadati EXIF (niente coordinate GPS). Nelle fotografie di gruppo, uscite o visite non si pubblicano persone riconoscibili: si scelgono le foto senza persone o si ritagliano.
 
 ## Stili
 
