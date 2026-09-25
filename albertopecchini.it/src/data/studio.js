@@ -10,9 +10,23 @@ export const bio = {
   ],
 }
 
-// Fotografie. Il ritratto è una fotografia reale in public/media/studio/.
+// Fotografie reali in public/media/studio/. Ritratto e avatar vengono dalla
+// stessa fototessera (1240×1594), scontornata con tools/scontorna.mjs: fondo
+// trasparente, il volto è quello della foto. Il ritratto ha sopra la testa un
+// margine vuoto, perché la parallasse sposta l'immagine del 7% nel riquadro.
 export const photos = {
-  portrait: { src: '/media/studio/ritratto.webp', width: 1400, height: 1750, alt: 'Alberto Pecchini seduto su una panca di pietra davanti a un muro intonacato, con la giacca da moto e il casco in mano', caption: 'FIG. 01 — Ritratto, 2024' },
+  portrait: { src: '/media/studio/fototessera.webp', width: 1000, height: 1250, alt: 'Alberto Pecchini in primo piano, di fronte, con un maglione blu scuro', caption: 'FIG. 01 — Ritratto' },
+  // La testa della stessa fototessera, in un quadrato, per il saluto in cima alla home.
+  avatar: { src: '/media/studio/fototessera-avatar.webp', width: 192, height: 192, alt: '' },
+  // Scontornata (fondo trasparente): in /studio/ esce dal riquadro scuro. Le misure
+  // sono della versione grande; `small` è la variante per i telefoni.
+  curious: {
+    src: '/media/studio/curioso-1600.webp',
+    small: '/media/studio/curioso-900.webp',
+    width: 1600,
+    height: 1130,
+    alt: 'Alberto Pecchini guarda incuriosito lo schermo di un vecchio iPhone bianco che tiene in mano',
+  },
 }
 
 export const facts = [

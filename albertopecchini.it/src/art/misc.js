@@ -66,12 +66,26 @@ const RIVERS = {
 
 const GARDA = [[45.44, 10.69], [45.47, 10.72], [45.505, 10.725], [45.55, 10.715], [45.58, 10.7], [45.63, 10.7], [45.72, 10.74], [45.72, 10.64], [45.66, 10.6], [45.61, 10.55], [45.6, 10.52], [45.57, 10.55], [45.54, 10.56], [45.5, 10.53], [45.465, 10.54], [45.455, 10.58], [45.475, 10.6], [45.495, 10.607], [45.47, 10.62], [45.445, 10.65]]
 
-export function areamap({ w = 1200, h = 900, tone = 'paper', label } = {}) {
+// `base`: la carta illustrata di tools/cartina (gpt-image-2) fa da fondo con
+// acque, rilievi e campi; sopra restano in vettoriale, dalle stesse coordinate,
+// reticolo, raggi, città, scritte e scala grafica, che così restano esatti.
+// `solo: 'acque'`: solo lago e fiumi, senza scritte: è il riferimento che
+// tools/cartina manda al modello perché ridisegni la geografia al posto giusto.
+export function areamap({ w = 1200, h = 900, tone = 'paper', label, base, solo } = {}) {
   const scale = w / 165 // px per km
   const X = (lon) => w / 2 + (lon - CENTER.lon) * KM_LON * scale
   const Y = (lat) => h / 2 - (lat - CENTER.lat) * KM_LAT * scale
   const P = ([lat, lon]) => [X(lon), Y(lat)]
-  let out = ''
+  const acque = () =>
+    path(blob(GARDA.map(P)), 'a-soft2 a-s') +
+    Object.entries(RIVERS)
+      .map(([name, pts]) => path(blob(pts.map(P), false), name === 'Po' ? 'a-s' : 'a-s2', name === 'Po' ? ' style="stroke-width:2.4"' : ' style="stroke-width:1.5"'))
+      .join('') +
+    // laghi di Mantova
+    path(blob([[45.168, 10.73], [45.172, 10.765], [45.165, 10.79], [45.156, 10.812], [45.148, 10.818], [45.153, 10.8], [45.16, 10.78], [45.161, 10.75]].map(P)), 'a-soft2 a-s')
+  if (solo === 'acque') return svg({ w, h, tone, label: 'Riferimento: lago e fiumi', body: acque() })
+
+  let out = base ? `<image href="${base}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/><g class="a-halo">` : ''
 
   // reticolo geografico ogni 15′
   for (let lon = 9.75; lon <= 12; lon += 0.25) {
@@ -81,15 +95,10 @@ export function areamap({ w = 1200, h = 900, tone = 'paper', label } = {}) {
     out += line(0, Y(lat), w, Y(lat), 'a-s2') + text(6, Y(lat) - 5, `${Math.floor(lat)}°${String(Math.round((lat % 1) * 60)).padStart(2, '0')}′N`, { c: 'a-tm', size: 10 })
   }
 
-  // lago di Garda e fiumi
-  out += path(blob(GARDA.map(P)), 'a-soft2 a-s')
+  // lago di Garda e fiumi: disegnati qui solo se non c'è la carta illustrata
+  if (!base) out += acque()
   out += text(X(10.63), Y(45.56), 'GARDA', { c: 'a-tm', size: 10, anchor: 'middle', spacing: '.2em' })
-  for (const [name, pts] of Object.entries(RIVERS)) {
-    out += path(blob(pts.map(P), false), name === 'Po' ? 'a-s' : 'a-s2', name === 'Po' ? ' style="stroke-width:2.4"' : ' style="stroke-width:1.5"')
-  }
   out += text(X(11.22), Y(45.035), 'PO', { c: 'a-tm', size: 10, spacing: '.2em' }) + text(X(10.745), Y(45.3), 'MINCIO', { c: 'a-tm', size: 10, spacing: '.2em', rotate: -80 })
-  // laghi di Mantova
-  out += path(blob([[45.168, 10.73], [45.172, 10.765], [45.165, 10.79], [45.156, 10.812], [45.148, 10.818], [45.153, 10.8], [45.16, 10.78], [45.161, 10.75]].map(P)), 'a-soft2 a-s')
 
   // raggi d'azione
   for (const km of [10, 25, 50]) {
@@ -113,6 +122,7 @@ export function areamap({ w = 1200, h = 900, tone = 'paper', label } = {}) {
   out += rect(40, h - 58, 25 * scale + 40, 38, 'a-bg') + line(56, h - 34, 56 + 25 * scale, h - 34, 'a-sb') + line(56, h - 40, 56, h - 28, 'a-s') + line(56 + 25 * scale, h - 40, 56 + 25 * scale, h - 28, 'a-s')
   out += text(56, h - 44, '0', { c: 'a-tm', size: 10 }) + text(56 + 25 * scale, h - 44, '25 km', { c: 'a-tm', size: 10, anchor: 'end' })
   out += poly([[w - 60, 78], [w - 50, 46], [w - 40, 78], [w - 50, 70]], 'a-fill') + text(w - 50, 38, 'N', { size: 12, anchor: 'middle', weight: 500 })
+  if (base) out += '</g>'
 
   return svg({ w, h, tone, label: label || 'Carta dell’area operativa: Mantova con raggi di 10, 25 e 50 chilometri', body: out })
 }

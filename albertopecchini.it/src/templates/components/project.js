@@ -48,16 +48,24 @@ export function projectCard(p, { span = 6, lazy = true, headingLevel = 3, previe
   `
 }
 
-/** Card larga per lo scorrimento orizzontale dei progetti in evidenza. */
-export function featureCard(p, i, total) {
+/**
+ * Card di un sito per il carosello della home: MacBook e iPhone con gli
+ * screenshot fermi (niente anteprima scorrevole), dominio e stato online.
+ */
+export function siteCard(p, i) {
+  const w = p.web
   return html`
-    <article class="fcard">
-      <a class="fcard__link" href="${projectHref(p)}" data-cursor="Apri">
-        <div class="fcard__media">${cover(p, { ratio: '16/10', lazy: i > 0 })}</div>
-        <div class="fcard__body">
-          <p class="label fcard__meta"><span>${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span><span>${esc(p.code)}</span><span>${esc(allAreas[p.area].short)} · ${p.year}</span></p>
-          <h3 class="fcard__title h3">${esc(p.title)}</h3>
-          <p class="fcard__sub">${esc(p.subtitle)}</p>
+    <article class="wcard" data-carousel-item data-reveal="up" style="--d:${(i % 2) * 120}ms">
+      <a class="wcard__link" href="${projectHref(p)}" data-cursor="Apri">
+        <div class="wcard__stage">
+          ${deviceMockup('laptop', { domain: w.domain, screen: w.desktop, className: 'wcard__laptop' })}
+          ${w.mobile && deviceMockup('phone', { domain: w.domain, screen: w.mobile, className: 'wcard__phone' })}
+        </div>
+        <div class="wcard__body">
+          <p class="label wcard__meta"><span class="wcard__n">${String(i + 1).padStart(2, '0')}</span><span class="wcard__domain">${w.url ? '<span class="dot dot--live" aria-hidden="true"></span>' : ''}${esc(w.name || w.domain)}</span><span>${p.year}</span></p>
+          <h3 class="wcard__title h3"><span>${esc(p.title)}</span><span class="wcard__arrow" aria-hidden="true">${icon('arrowUpRight')}</span></h3>
+          <p class="wcard__sub">${esc(p.subtitle)}</p>
+          <p class="label wcard__foot">${esc(p.client)} · ${esc(p.types.slice(0, 2).join(' · '))}</p>
         </div>
       </a>
       ${sampleMark(p)}

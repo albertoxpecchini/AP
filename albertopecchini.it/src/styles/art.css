@@ -69,6 +69,9 @@
 .a-t { fill: var(--art-ink); }
 .a-tm { fill: var(--art-mute); }
 .a-ta { fill: var(--art-accent); }
+/* carta con fondo illustrato (areamap con `base`): le scritte hanno un alone
+   di carta per restare leggibili sopra acque, rilievi e campi */
+.a-halo text { paint-order: stroke; stroke: var(--c-paper); stroke-width: 3px; stroke-linejoin: round; }
 .a-ti { fill: var(--art-inv); }
 .a-sans { font-family: var(--font-sans); }
 .a-serif { font-family: var(--font-serif); }

@@ -15,3 +15,4 @@ export function tavolePage() {
 }
 
 export const sheetCount = () => withSheets().reduce((n, p) => n + p.sheets.length, 0)
+export const hasSheets = () => withSheets().length > 0

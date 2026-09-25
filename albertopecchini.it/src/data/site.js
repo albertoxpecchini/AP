@@ -6,7 +6,7 @@
 //  elenca in console finché non vengono compilati e tolti dalla lista.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { areas } from './projects.js'
+import { areas, showSheets } from './projects.js'
 
 export const site = {
   url: 'https://albertopecchini.it',
@@ -124,7 +124,7 @@ export const nav = [
         { key: 'web', label: 'Progetti web', href: '/portfolio/web/', note: 'Siti, landing, interfacce' },
         { key: 'grafica', label: 'Progetti grafici', href: '/portfolio/grafica/', note: 'Brand, stampa, editoria' },
       ].filter((c) => areas[c.key]),
-      { label: 'Tavole', href: '/portfolio/tavole/', note: 'I disegni da ingrandire e scaricare' },
+      ...(showSheets ? [{ label: 'Tavole', href: '/portfolio/tavole/', note: 'I disegni da ingrandire e scaricare' }] : []),
     ],
   },
   { label: 'Servizi', href: '/servizi/' },

@@ -23,6 +23,12 @@ config/email-theme.json
 tools/tavole/lavoro/
 tools/tavole/__pycache__/
 
+# Immagini di gpt-image-2: i fogli e le candidate non si tengono; nel repository
+# vanno solo i file scelti in public/media/ (copertine, figurine, carta).
+tools/copertine/lavoro/
+tools/figurine/lavoro/
+tools/cartina/lavoro/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

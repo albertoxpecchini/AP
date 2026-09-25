@@ -1,6 +1,6 @@
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
-import { button, media, icon, splitWords, breadcrumb } from '../components/ui.js'
+import { button, media, icon, splitWords, breadcrumb, figurina } from '../components/ui.js'
 import { COORDS } from '../layout.js'
 
 const field = ({ id, label, type = 'text', required = false, autocomplete, hint, inputmode, pattern, placeholder }) => html`
@@ -35,7 +35,10 @@ export function contattiPage() {
         <div class="cnt__grid">
           <div class="cnt__intro">
             <p class="label" data-reveal="fade"><span class="sec-head__index">05</span>Contatti</p>
-            <h1 class="cnt__title" data-reveal="words">${splitWords('Parliamo del progetto.', { accent: ['progetto.'] })}</h1>
+            <div class="cnt__head">
+              <h1 class="cnt__title" data-reveal="words">${splitWords('Parliamo del progetto.', { accent: ['progetto.'] })}</h1>
+              ${figurina('contatti', { className: 'cnt__fig', lazy: false })}
+            </div>
             <p class="lead" data-reveal="up">Due righe bastano: cosa ti serve, dove, entro quando. ${esc(site.contact.reply)}</p>
 
             <p class="cnt__avail label" data-reveal="up"><span class="dot${site.availability.open ? ' dot--live' : ''}"></span>${esc(site.availability.label)} — da ${esc(site.availability.from)}</p>
@@ -115,7 +118,7 @@ export function contattiPage() {
           <p class="label cmap__coords">${COORDS}</p>
           ${button({ href: osm, label: 'Apri in OpenStreetMap', variant: 'ghost', iconName: 'arrowUpRight', external: true })}
         </div>
-        <div class="cmap__map">${media({ art: 'areamap', alt: 'Carta dell’area operativa: Mantova al centro con raggi di 10, 25 e 50 chilometri' }, { ratio: '4/3', marks: true, caption: 'FIG. 01 — Area operativa · proiezione equirettangolare · scala grafica in carta' })}</div>
+        <div class="cmap__map">${media({ art: 'areamap', base: '/media/mappa/area-operativa.webp', alt: 'Carta illustrata dell’area operativa: il lago di Garda, il Mincio, i laghi di Mantova e il Po, con Mantova al centro e raggi di 10, 25 e 50 chilometri' }, { ratio: '4/3', marks: true, caption: 'FIG. 01 — Area operativa · proiezione equirettangolare · scala grafica in carta' })}</div>
       </div>
     </section>
   `

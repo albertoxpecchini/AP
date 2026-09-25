@@ -15,6 +15,7 @@ Online su <https://www.albertopecchini.it> (albertopecchini.it rimanda a www).
 - [Dove si mettono le mani](#dove-si-mettono-le-mani)
 - [Progetti](#progetti)
 - [Immagini](#immagini)
+- [Fonti delle immagini](#fonti-delle-immagini)
 - [Modulo contatti](#modulo-contatti)
 - [Dati personali e titolo professionale](#dati-personali-e-titolo-professionale)
 - [Stili](#stili)
@@ -63,8 +64,13 @@ albertopecchini.it/
 ├─ api/
 │  └─ contatti.js          funzione serverless del modulo contatti (Resend + CallMeBot)
 ├─ tools/
+│  ├─ replicate.mjs        client di Replicate in comune tra copertine, figurine e scontorno
+│  ├─ scontorna.mjs        toglie il fondo a una foto (bria/remove-background) e ne rifinisce i capelli
+│  ├─ copertine/           copertine e gallerie illustrate dei progetti non web, gpt-image-2 su Replicate (vedi il suo README)
+│  ├─ figurine/            figurine scontornate: nove per immagine, gpt-image-2 su Replicate (vedi il suo README)
+│  ├─ cartina/             fondo illustrato della carta dell’area operativa (/contatti/), gpt-image-2 su Replicate
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
-│  └─ tavole/              conversione DWG e PDF → SVG per il visualizzatore (vedi il suo README)
+│  └─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza (vedi il suo README)
 ├─ emails/                 input, output e allegati delle email generate
 ├─ config/                 account mittente e tema email derivato dal CSS
 ├─ profiles/               archivio firme versionato
@@ -73,10 +79,11 @@ albertopecchini.it/
 │  ├─ og.png               immagine per le anteprime social (1200×630)
 │  ├─ icons.svg            sprite delle icone
 │  └─ media/
+│     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine
 │     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone)
-│     ├─ progetti/         fotografie dei progetti, una cartella per progetto: NN.webp (griglia) e NN-full.webp (lightbox)
-│     ├─ studio/           fotografie dello studio (ritratto.webp)
-│     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf, copertina.webp
+│     ├─ progetti/         fotografie dei progetti, una cartella per progetto: NN.webp (griglia) e NN-full.webp (lightbox), copertina.webp
+│     ├─ studio/           fotografie reali (primo piano, avatar, figura scontornata)
+│     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf
 │     └─ web/              screenshot dei progetti web (<prefisso>-desktop.webp, -tablet, -mobile, -*-tall)
 ├─ src/
 │  ├─ data/                CONTENUTI: l’unica cosa da toccare per aggiornare il sito
@@ -102,13 +109,26 @@ albertopecchini.it/
 │  ├─ client/              JavaScript del browser, un modulo per ambito
 │  │  ├─ chrome.js         header, sottomenu, orologio, menu mobile, avanzamento, transizioni
 │  │  ├─ motion.js         reveal, contatori, parallasse, cursore, elementi magnetici, anteprime
-│  │  ├─ sections.js       hero, scorrimento orizzontale, timeline del metodo, indice laterale
+│  │  ├─ sections.js       hero, carosello dei siti, timeline del metodo, indice laterale
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
 │  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate, griglia in WebGL
 │  │  ├─ viewer.js         visualizzatore delle tavole: zoom vettoriale, spostamento, gesti, tastiera, schermo intero
+│  │  ├─ dwg-sheet.js      una tavola letta dal DWG dentro il visualizzatore: worker, canvas base e di dettaglio
 │  │  └─ utils.js          selettori, scroll, focus trap, reduced motion
+│  ├─ dwg/                 lettore di file DWG scritto da zero, gira nel browser (vedi «Tavole vere»)
+│  │  ├─ bits.js           lettore di bit: i tipi della specifica (B, BS, BD, DD, MC, MS, H, TU…)
+│  │  ├─ file.js           struttura R2004+: intestazione cifrata, mappa delle pagine, sezioni, LZ77
+│  │  ├─ objects.js        mappa degli oggetti, classi, intestazione comune, flussi stringhe e handle
+│  │  ├─ entities.js       decodifica campo per campo di entità e tabelle (layer, tipi di linea, blocchi)
+│  │  ├─ header.js         le variabili d’intestazione che servono (LTSCALE, PDMODE…)
+│  │  ├─ dwg.js            lettura completa: indice, tabelle, spazio modello, blocchi, ordine di disegno
+│  │  ├─ geom.js           trasformazioni, archi e bulge, NURBS, ellissi, motivi di tratteggio, palette ACI
+│  │  ├─ mtext.js          interprete dei codici di formato dei testi multilinea
+│  │  ├─ scene.js          dal modello alla scena: tracciati per stile, riempimenti, tratteggi, testi
+│  │  ├─ render.js         disegno della scena su canvas 2D, impaginazione dei testi
+│  │  └─ worker.js         scarica, legge e disegna fuori dal thread della pagina
 │  ├─ styles/              token → base → componenti → layout → pagine → stile → stampa
 │  ├─ main.js              entry JavaScript: avvia i moduli client
 │  └─ style.css            entry CSS: importa src/styles/* nell’ordine giusto
@@ -130,9 +150,10 @@ albertopecchini.it/
 | `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
 | `/contatti/` | Modulo di contatto, recapiti, area operativa |
-| `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa |
+| `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. **Oggi spenta**: esiste solo con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
+| `/crediti/` | Crediti e fonti delle immagini (testi in `src/data/crediti.js`), linkata nel footer |
 | `/email/` | Compositore email, strumento privato: non è nei menu né nella sitemap, ha `noindex` e si apre solo dal link con la chiave (vedi [Compositore email online](#compositore-email-online)) |
 | `404.html` | Pagina non trovata (servita in automatico da Vercel) |
 
@@ -172,8 +193,8 @@ Campi principali:
 - `cover` e `images`: copertina e galleria (vedi [Immagini](#immagini)).
 - `web`: per i progetti web, gli screenshot dei mockup e il dominio (`url`).
 - `photos`: fotografie del progetto a gruppi (`{ lead, groups: [{ title, items }] }`). Nel case study hanno una sezione **Fotografie** tutta loro, subito dopo la galleria o le tavole, in colonne con le proporzioni vere; si aprono nel lightbox.
-- `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Se ci sono, nel case study la galleria diventa la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
-- `featured: true` porta il progetto nello scorrimento orizzontale della home.
+- `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Si vedono solo con `showSheets = true`: allora nel case study la galleria diventa la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
+- Il carosello della home mostra tutti i progetti web (area `web` con `web` compilato): su desktop è una griglia ferma, su telefono e tablet scorre col dito. `featured: true` li mette in testa.
 - `sample: true` lo contrassegna come **dimostrativo**: mostra come si presenta un lavoro di quel tipo, ma oggi non viene pubblicato (vedi sotto).
 
 ### Progetti dimostrativi
@@ -194,7 +215,8 @@ sostituirne i contenuti e togliergli `sample: true`: compare da solo.
 
 I nove reali: il PCTO in Caem Group, i quattro lavori di quinta con le tavole vere
 (progetto stradale, bar-caffetteria del tema d’esame, layout di cantiere, relazione
-sul Museo dei Mestieri del Fiume, con 61 fotografie della visita), rivaltasulmincio.it, cascinafontana.xyz,
+sul Museo dei Mestieri del Fiume, con 80 fotografie della giornata, compagni di classe
+compresi), rivaltasulmincio.it, cascinafontana.xyz,
 dariodonelli (sul dominio Vercel finché dariodonelli.it non è attivo) e questo sito.
 
 ### Aree nascoste
@@ -244,29 +266,66 @@ ffmpeg -i originale.jpg -map_metadata -1 -vf "scale=1600:-1:flags=lanczos" -c:v 
 
 ### Tavole vere
 
-I disegni dei lavori tecnici non sono tavole generate: sono i file veri, esportati dal
-DWG o dal PDF di AutoCAD in SVG vettoriale, così nel visualizzatore si ingrandiscono
-fino ai dettagli senza sgranare. Ogni tavola ha quattro file in
-`public/media/tavole/<slug>/` — `NN.svg`, la miniatura `NN.webp` (1200 px),
-`NN-mini.webp` (320 px) per l’elenco e `NN.pdf` da scaricare — e si dichiara in
+**Oggi non si mostrano.** Dal 26 settembre 2026 il sito non fa vedere i documenti dei
+progetti — tavole, PDF, pagine della relazione — ma solo illustrazioni: copertina e
+galleria di ogni progetto non web vengono da [`tools/copertine`](tools/copertine/README.md)
+(richiesta di Alberto: «mai mostrare i documenti»). I dati e il visualizzatore restano:
+`showSheets` in `src/data/projects.js` è l'interruttore. Spento, i progetti escono
+senza `sheets`, il case study mostra la galleria di `images`, la pagina
+`/portfolio/tavole/` non viene generata e la voce «Tavole» sparisce dal menù. Acceso,
+torna tutto com'era. I file in `public/media/tavole/` restano anche perché fanno da
+riferimento alle illustrazioni.
+
+I disegni dei lavori tecnici non sono tavole generate: sono i file veri. Ogni tavola
+sta in `public/media/tavole/<slug>/` con la miniatura `NN.webp` (1200 px),
+`NN-mini.webp` (320 px) per l’elenco e `NN.pdf` da scaricare, e si dichiara in
 `sheets` con l’aiuto `sheet(slug, 'NN', { title, alt, note, h, scale, from })`.
-Le pagine di una relazione sono immagini: `full` indica la versione grande (1600 px).
+Le pagine di una relazione sono immagini: `full` indica la versione grande (1600 px);
+le tavole stampate da AutoCAD in PDF hanno il disegno in `NN.svg`.
+
+**Le tavole DWG restano DWG.** Il file `.dwg` sta così com’è nella cartella della
+tavola e il browser lo legge da solo: `src/dwg/` è un lettore del formato scritto da
+zero (nessuna libreria, nessuna conversione) che apre i file di AutoCAD 2010–2018
+(AC1024, AC1027, AC1032): decifra l’intestazione, ricompone le sezioni compresse,
+decodifica bit per bit entità e tabelle (linee, polilinee, archi, cerchi, ellissi,
+spline, testi e testi multilinea, quote, tratteggi pieni e a motivo, blocchi anche
+annidati, layer, tipi di linea, spessori, colori veri e trasparenze, ordine di
+disegno) e disegna tutto su canvas. Una tavola è un riquadro dello spazio modello:
+`sheet(slug, 'NN', { dwg: 'file.dwg', box: [x0, y0, x1, y1], darken })`, con il
+riquadro in unità del disegno (`h` si ricava da solo). `darken` scurisce i colori
+chiari pensati per lo sfondo nero di AutoCAD; `paper` (A3, A4…) dà la larghezza del
+foglio, da cui gli spessori di linea in millimetri. Lo stesso DWG serve più tavole:
+viene scaricato e letto una volta sola, in un worker, e ogni foglio ne mostra il suo
+riquadro. Su schermo il foglio ha una base a 2048 px e, ingrandendo, si ridisegna la
+parte visibile alla scala dello schermo, quindi resta nitido a qualunque zoom.
 
 Il visualizzatore (`src/templates/components/viewer.js` e `src/client/viewer.js`)
 muove il foglio con `transform` durante i gesti e, a vista ferma, gli dà la misura vera
-perché il browser ridisegni l’SVG nitido a quella scala. Trascinare sposta, Ctrl +
-rotella o due dita ingrandiscono, il doppio clic avvicina, le frecce cambiano tavola,
-F adatta; c’è lo schermo intero. Nei case study la rotella e il dito scorrono la
-pagina finché la tavola non è ingrandita.
+perché il browser ridisegni l’SVG o il DWG nitido a quella scala. Trascinare sposta,
+Ctrl + rotella o due dita ingrandiscono, il doppio clic avvicina, le frecce cambiano
+tavola, F adatta; c’è lo schermo intero. Nei case study la rotella e il dito scorrono
+la pagina finché la tavola non è ingrandita. Senza JavaScript l’elenco apre il file
+stesso (il DWG o l’SVG).
 
-Come si convertono i file, e cosa si controlla prima di pubblicarli (indirizzi, nomi,
-volti), è spiegato in [`tools/tavole/README.md`](tools/tavole/README.md).
+Come si preparano le tavole da PDF, e cosa si controlla prima di pubblicare qualunque
+tavola (indirizzi, nomi, volti), è spiegato in
+[`tools/tavole/README.md`](tools/tavole/README.md).
 
-### Ritratto
+La tavola non fa né da copertina né da galleria: ogni progetto non web ha
+un'illustrazione in assonometria come copertina (`drawnCover` in `projects.js`, file in
+`public/media/progetti/<slug>/copertina.webp`) e tre viste nella galleria
+(`drawnView`, file `vista-NN.webp` e `vista-NN-full.webp` nella stessa cartella),
+disegnate da gpt-image-2 su Replicate con le tavole come riferimento. Come si generano:
+[`tools/copertine/README.md`](tools/copertine/README.md).
 
-`public/media/studio/ritratto.webp` (1400×1750, rapporto 4:5, senza metadati) è ricavato da una fotografia del 2024 in formato DNG. Su Windows il DNG si decodifica con il codec **Raw Image Extension** di Microsoft (PowerShell, `System.Windows.Media.Imaging.BitmapDecoder`; il codec non applica l’orientamento EXIF, quindi la rotazione va fatta a parte), poi si ritaglia e si converte con ffmpeg. È l’unica fotografia del sito: la pagina Studio
-mostra il ritratto e basta. Per aggiungere una fotografia dello studio serve rimettere sia
-la voce in `photos` sia la fascia a tutta larghezza in `src/templates/pages/info.js`.
+### Fotografie
+
+Le fotografie reali stanno in `public/media/studio/` e sono dichiarate in `photos` (`src/data/studio.js`):
+
+- `fototessera.webp` (1000×1250, 4:5) e `fototessera-avatar.webp` (192×192): la fototessera `Downloads/_8006413_pp.jpg` (1240×1594) scontornata con `node tools/scontorna.mjs <foto>`, che manda la foto a bria/remove-background su Replicate e ne usa solo la maschera: i pixel restano quelli originali. Lo script rifinisce i bordi dei capelli dal colore (il fondo bianco è noto) e toglie l’alone chiaro che sulle pagine scure si vedrebbe. Il ritratto ha 106 px vuoti sopra la testa, perché la parallasse sposta l’immagine del 7% nel riquadro: `ffmpeg -i scontornata.png -vf "format=rgba,pad=1360:1700:60:106:color=0x00000000,scale=1000:1250:flags=lanczos,format=yuva420p" -c:v libwebp -quality 88 fototessera.webp`; l’avatar è il quadrato `crop=1240:1240:0:20` ridotto a 192 px, su un disco di carta (`background` in `.hero__avatar img`).
+- `curioso-1600.webp` / `curioso-900.webp`: la figura scontornata (fondo trasparente) che in /studio/ esce dal riquadro scuro.
+
+Se una fotografia arriva in DNG: il codec **Raw Image Extension** di Microsoft la decodifica da PowerShell (`System.Windows.Media.Imaging.BitmapDecoder`; non applica l’orientamento EXIF, quindi la rotazione va fatta a parte), poi si ritaglia e si converte con ffmpeg, sempre con `-map_metadata -1`.
 
 ### Screenshot dei progetti web
 
@@ -291,6 +350,29 @@ I mockup usano le cornici del file Figma [Device Mockups (iMac, Macbook, iPad, i
 | `phone` | iPhone 14 Pro | `web.mobile` / `mobileTall` | `iphone-14-pro.webp` (720×1466) + isola e fotocamera in PNG |
 
 Le immagini vengono dai livelli del file, con il bordo trasparente ritagliato e convertite in WebP; nell’iPad lo schermo (sempre coperto dallo screenshot) è riempito di nero per alleggerire il file. Lo schermo è un riquadro sopra l’immagine con le quote del livello «Paste image here», in percentuale in `components.css`: se si cambia un’immagine vanno ricalcolate. Lo screenshot riempie lo schermo dall’alto (`object-fit: cover`); sull’iPhone l’isola dinamica sta sopra lo screenshot, come nel file. L’iMac e l’Apple Watch del file non si usano: lo schermo dell’iMac è 16:9 e taglierebbe gli screenshot 16:10.
+
+### Figurine
+
+Servizi, fasi del metodo (in `/metodo/` e in home), lavori trasversali, strumenti dello studio, le parti sul web (sezioni 02 e 03 della home, `/portfolio/web/`, case study dei siti), contatti e 404 hanno una piccola illustrazione scontornata: `figurina(nome)` in `ui.js`, file in `public/media/figurine/`, misure in `src/data/figurine.js` (generato). Nascono da [`tools/figurine`](tools/figurine/README.md): un’immagine di gpt-image-2 con nove figurine, ritagliate in automatico. Un nome senza file non disegna nulla.
+
+## Fonti delle immagini
+
+Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.albertopecchini.it/crediti/), linkata nel footer (`src/data/crediti.js`). Quando entra un’immagine di provenienza nuova, va aggiunta in tutti e due i posti.
+
+| Immagini | Dove stanno | Fonte |
+| --- | --- | --- |
+| Copertine e gallerie dei progetti non web (strada, bar-caffetteria, cantiere, tettoie, museo) | `public/media/progetti/<slug>/copertina.webp`, `vista-NN*.webp` | Generate con **openai/gpt-image-2** (OpenAI) su [Replicate](https://replicate.com/openai/gpt-image-2), con le tavole originali o le fotografie del museo come riferimento — [`tools/copertine`](tools/copertine/README.md) |
+| Figurine | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
+| Fondo della carta dell’area operativa (/contatti/) | `public/media/mappa/area-operativa.webp` | Generato con **openai/gpt-image-2** su Replicate dal riferimento di lago e fiumi di `areamap({ solo: 'acque' })`; reticolo, raggi, città, nomi e scala restano vettoriali, da `areamap({ base })` in `src/art/misc.js` — `tools/cartina/cartina.mjs` |
+| Ritratto e avatar | `public/media/studio/fototessera*.webp` | Fototessera di Alberto Pecchini, scontornata con bria/remove-background su Replicate (volto non ritoccato) |
+| Figura scontornata di /studio/ | `public/media/studio/curioso-*.webp` | Fotografia di Alberto Pecchini, scontornata con l’IA su Replicate |
+| Fotografie del museo | `public/media/progetti/museo-mestieri-del-fiume/` | Scattate durante l’uscita del 15.11.2025; le due fotografie d’epoca (60, 61) riprendono materiale esposto nel museo |
+| Tavole (oggi non pubblicate, riferimento delle illustrazioni) | `public/media/tavole/` | Elaborati originali di Alberto Pecchini (AutoCAD LT), I.T.T. «Carlo d’Arco» |
+| Disegni dei progetti dimostrativi, piante e marchi di esempio | `src/art/` → `/art/<slug>.svg` | Disegnati dal codice del sito |
+| Screenshot dei siti | `public/media/web/` | Catture dei siti di Alberto Pecchini |
+| MacBook, iPad, iPhone | `public/media/mockup/` | File della Figma Community [Device Mockups (iMac, Macbook, iPad, iPhone)](https://www.figma.com/community/file/1172125330560103197/device-mockups-imac-macbook-ipad-iphone), licenza CC BY 4.0 |
+| Icone, monogramma, firma, favicon, `og.png` | `public/`, `ui.js` | Disegnati per il sito |
+| Caratteri | `@fontsource/*` | Archivo, IBM Plex Mono, Instrument Serif — SIL Open Font License |
 
 ## Modulo contatti
 
@@ -382,7 +464,7 @@ in `profiles/footers.json`. Istruzioni complete in
 `/email/` è il generatore in pagina: si sceglie da dove parte l’email (scuola,
 personale, aziendale — gli stessi account di `config/sender-profiles.json`, con le
 firme di `profiles/footers.json`), si compila con i tasti della guida (il Markdown
-del generatore funziona), si copia l’output, la si fa migliorare da **Claude Opus 5.5**
+del generatore funziona), si copia l’output, la si fa migliorare dall’IA (**Claude Opus** con l’abbonamento in locale, **IBM Granite 4.2 8B** online)
 e si leggono statistiche, peso, lunghezza e segnalazioni. In fondo c’è la rubrica:
 preferiti, indirizzi nuovi (salvati nel browser) e i contatti conosciuti di
 `src/data/rubrica.js`.
@@ -411,26 +493,99 @@ https://www.albertopecchini.it/email/?k=<EMAIL_TOOL_KEY>
 Al primo accesso la chiave viene salvata nel browser e tolta dall’indirizzo. Senza
 chiave la pagina funziona lo stesso, ma i tasti dell’IA restano spenti.
 
-L’IA passa da `api/email-ai.js`, funzione serverless Vercel che usa l’SDK ufficiale
-`@anthropic-ai/sdk` (unica dipendenza di runtime del progetto). Due variabili
-d’ambiente, da impostare su Vercel in *Production*, *Preview* e *Development* e
-**mai nel repository** (in locale stanno in `.env.local`, escluso da Git):
+L’IA passa da `api/email-ai.js`. In locale usa Claude con l’abbonamento (vedi
+[sotto](#in-locale-con-labbonamento-claude)); online è una funzione serverless
+Vercel che parla con [Granite 4.2 8B](https://huggingface.co/ibm-granite/granite-4.2-8b) (IBM, Apache 2.0)
+attraverso un qualsiasi endpoint compatibile con l’API OpenAI (Chat Completions),
+con `fetch` e nessun SDK: il sito non ha dipendenze di runtime. In produzione il
+modello lo serve **OpenRouter** (`ibm-granite/granite-4.2-8b`, qualche decina di centesimi di dollaro
+ogni mille richieste); in locale **Ollama** (`granite4.2:8b`, Q4_K_M, 5,3 GB: sta in
+8 GB di VRAM) o vLLM. La funzione su Vercel non vede il computer di casa: un modello
+locale serve solo per le prove in locale.
+
+Variabili d’ambiente, da impostare su Vercel in *Production*, *Preview* e
+*Development*; i segreti **mai nel repository** (in locale stanno in `.env.local`,
+escluso da Git):
 
 | Variabile | Valore | Se manca |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | la chiave della Claude API (console.anthropic.com) | l’IA risponde «non configurata» |
 | `EMAIL_TOOL_KEY` | una stringa casuale lunga: è la chiave del link | la funzione rifiuta ogni richiesta |
+| `EMAIL_AI_API_KEY` | la chiave di OpenRouter (openrouter.ai → Keys) | l’IA risponde «non configurata»; con un server locale non serve |
+| `EMAIL_AI_BASE_URL` | facoltativa; di serie `https://openrouter.ai/api/v1` | — (Ollama: `http://localhost:11434/v1`, vLLM: `http://localhost:8000/v1`) |
+| `EMAIL_AI_MODEL` | facoltativa; di serie `ibm-granite/granite-4.2-8b` | — (Ollama: `granite4.2:8b`) |
 
 Ogni richiesta porta la chiave nell’intestazione `X-Email-Key`; la funzione la
 confronta a tempo costante, limita a 60 richieste l’ora per IP e chiede al modello
-una risposta in JSON (oggetto, testo, modifiche, consigli, oggetti alternativi,
-voto). Il conto Anthropic deve avere credito: senza, la pagina mostra il messaggio
-«Il conto Anthropic non ha credito».
+una risposta in JSON con schema (oggetto, testo, modifiche, consigli, oggetti
+alternativi, voto); se il server non accetta schema o controlli del ragionamento,
+ripiega sulla richiesta semplice. Lo «Sforzo» della pagina regola il ragionamento
+di Granite: *Rapido* senza ragionamento (temperatura 0,2), *Normale* con ragionamento
+breve — il miglior compromesso, 5–10 s in locale su una RTX 3060 Ti — e *Accurato*
+con ragionamento esteso (migliaia di token: in locale oltre un minuto, su Vercel
+rischia il limite di 60 s). Dopo la risposta la funzione rimette il congedo
+dell’originale se il modello l’ha perso (con `hasClosing` del generatore) e gli
+a capo Markdown tra «Cordiali saluti,» e il nome. Il costo mostrato è quello che
+riporta OpenRouter; in locale è «gratis».
 
 File: `src/templates/pages/email.js` (markup), `src/client/email.js` (logica),
 `src/styles/email.css` (aspetto), `src/data/rubrica.js` (mittenti, toni, contatti),
-`api/email-ai.js` (funzione). In locale, per provare anche l’IA, serve `vercel dev`
-(vedi [Modulo contatti](#modulo-contatti)).
+`api/email-ai.js` (funzione).
+
+### In locale, con l’abbonamento Claude
+
+Alberto usa `/email/` solo dal suo computer, e lì l’IA è **Claude Opus con
+l’abbonamento Claude** (Max), senza chiave API e senza costi in più. `npm run dev`
+serve anche le funzioni di `api/` con le variabili di `.env.local`
+(`plugins/api-dev.js`, solo in sviluppo: `vercel dev` non serve), e con
+`EMAIL_AI_PROVIDER=claude-code` la funzione lancia Claude Code sul computer:
+
+```bash
+npm run dev                  # poi http://localhost:5173/email/
+```
+
+In locale la chiave di accesso non serve: la aggiunge il dev server alle
+richieste che partono da questo computer e dalla pagina stessa
+(`Sec-Fetch-Site: same-origin`); una richiesta da un altro sito aperto nel browser
+resta senza chiave e riceve 401.
+
+La funzione chiama `claude -p` con il prompt di sistema e lo schema JSON dello
+strumento, `--model opus` e lo «Sforzo» della pagina come `--effort`. Claude
+Code gira **senza strumenti** (`--tools ""`), in modalità `--restricted` (niente
+impostazioni né hook dell’utente), senza MCP, comandi o sessioni salvate, in una
+cartella temporanea vuota e senza le variabili `ANTHROPIC_*`: se vedesse
+`ANTHROPIC_API_KEY` userebbe la chiave invece dell’abbonamento. Il testo
+dell’email quindi non può far eseguire nulla sul computer. Tempi misurati:
+10–18 s per richiesta. Le richieste consumano i limiti di utilizzo
+dell’abbonamento, gli stessi delle sessioni di Claude Code; al limite la pagina
+lo dice. Serve Claude Code da riga di comando (`claude` nel PATH) collegato
+all’account: `claude auth status` deve dire `"authMethod": "claude.ai"`.
+
+**Consumi in diretta.** Sotto l’IA c’è il pannello «Consumi dell’IA»:
+
+- *Limiti dell’abbonamento* (sessione di 5 ore, settimana, settimana per modello)
+  con l’ora dell’azzeramento. Li legge `GET /api/email-ai?limiti` lanciando
+  `claude -p /usage`, che non consuma token: all’apertura, ogni minuto con la
+  scheda in vista e con «Aggiorna limiti». Ogni richiesta li aggiorna anche
+  dall’evento `rate_limit_event` di Claude Code.
+- *Richiesta in corso*: con `Accept: application/x-ndjson` la funzione risponde
+  in streaming (`--output-format stream-json`) e manda fase (attesa, ragiona,
+  scrive), token di ragionamento stimati e token di risposta stimati; la riga
+  «adesso» del registro e la riga di stato si aggiornano mentre Claude lavora.
+- *Contatori* per oggi, 7 giorni o tutto: richieste ed errori, token in e out
+  (con il ragionamento), tempo medio e totale, valore a prezzi API
+  (`total_cost_usd`, una stima: con l’abbonamento non si paga).
+- *Registro* delle ultime 30 richieste; ne tiene 500 nel localStorage del
+  browser (`ap:email:usage`), si scarica in CSV per Excel e si azzera.
+
+Variabili facoltative: `EMAIL_AI_CLAUDE_MODEL` (di serie `opus`),
+`EMAIL_AI_CLAUDE_BIN` (di serie `claude`). **Su Vercel `EMAIL_AI_PROVIDER` non va
+impostata**: lì Claude Code non c’è, e il login dell’abbonamento non si mette su un
+server. Per tornare a Granite in locale basta togliere la riga da `.env.local`;
+Ollama con il modello scaricato fa da ripiego gratuito:
+
+```bash
+ollama pull granite4.2:8b    # una volta, 5,3 GB
+```
 
 ## Convenzioni
 

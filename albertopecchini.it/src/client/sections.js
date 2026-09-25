@@ -1,4 +1,4 @@
-// Comportamenti legati a sezioni specifiche: hero, scorrimento orizzontale,
+// Comportamenti legati a sezioni specifiche: hero, carosello dei siti,
 // timeline del metodo, indice laterale dei case study.
 
 import { $, $$, onScroll, clamp, reducedMotion } from './utils.js'
@@ -72,77 +72,80 @@ export function initHero() {
   schedule()
 }
 
-// ── Scorrimento orizzontale dei progetti selezionati ─────────────────────────
+// ── Carosello dei siti ───────────────────────────────────────────────────────
+// Lo scorrimento è quello nativo (scroll-snap): su desktop la griglia sta ferma
+// e il viewport non scorre, quindi contatore, barra e frecce restano nascosti.
 
-export function initHScroll() {
-  const section = $('[data-hscroll]')
+export function initCarousel() {
+  const section = $('[data-carousel]')
   if (!section) return
-  const viewport = $('[data-hscroll-viewport]', section)
-  const track = $('[data-hscroll-track]', section)
-  const bar = $('[data-hscroll-bar]', section)
-  const current = $('[data-hscroll-current]', section)
-  const cards = $$('.fcard:not(.fcard--end)', track)
-  const media = matchMedia('(min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference)')
-  let distance = 0
-  let top = 0
+  const viewport = $('[data-carousel-viewport]', section)
+  const items = $$('[data-carousel-item]', viewport)
+  const sites = items.filter((el) => !el.classList.contains('wcard--end')).length
+  const bar = $('[data-carousel-bar]', section)
+  const current = $('[data-carousel-current]', section)
+  const prev = $('[data-carousel-prev]', section)
+  const next = $('[data-carousel-next]', section)
 
-  const paint = (progress) => {
-    if (bar) bar.style.transform = `scaleX(${clamp(0.06 + progress * 0.94, 0, 1)})`
-    if (current) current.textContent = String(Math.min(cards.length, Math.floor(progress * cards.length * 0.999) + 1)).padStart(2, '0')
+  const start = () => viewport.getBoundingClientRect().left + (parseFloat(getComputedStyle(viewport).scrollPaddingLeft) || 0)
+
+  // la card più vicina al bordo d'aggancio
+  const active = () => {
+    const left = start()
+    let best = 0
+    let dist = Infinity
+    items.forEach((el, i) => {
+      const d = Math.abs(el.getBoundingClientRect().left - left)
+      if (d < dist) {
+        dist = d
+        best = i
+      }
+    })
+    return best
   }
 
-  const measure = () => {
-    const pinned = media.matches
-    section.classList.toggle('is-pinned', pinned)
-    if (!pinned) {
-      section.style.removeProperty('--hscroll-h')
-      track.style.transform = ''
-      return
-    }
-    distance = Math.max(0, track.scrollWidth - window.innerWidth)
-    section.style.setProperty('--hscroll-h', `${distance + window.innerHeight}px`)
-    top = section.getBoundingClientRect().top + window.scrollY
+  let frame = 0
+  const paint = () => {
+    frame = 0
+    const max = viewport.scrollWidth - viewport.clientWidth
+    const scrollable = max > 4
+    section.classList.toggle('is-scrollable', scrollable)
+    viewport.tabIndex = scrollable ? 0 : -1
+    const x = viewport.scrollLeft
+    const progress = scrollable ? clamp(x / max, 0, 1) : 1
+    if (bar) bar.style.transform = `scaleX(${(1 / Math.max(1, items.length) + progress * (1 - 1 / Math.max(1, items.length))).toFixed(4)})`
+    const index = scrollable ? (x >= max - 4 ? items.length - 1 : active()) : 0
+    if (current) current.textContent = String(Math.min(sites, index + 1)).padStart(2, '0')
+    if (prev) prev.disabled = !scrollable || x <= 4
+    if (next) next.disabled = !scrollable || x >= max - 4
+  }
+  const schedule = () => {
+    if (!frame) frame = requestAnimationFrame(paint)
   }
 
-  measure()
-  addEventListener('resize', measure)
-  addEventListener('load', measure)
-  document.fonts?.ready.then(measure)
+  const go = (step) => {
+    const target = items[clamp(active() + step, 0, items.length - 1)]
+    const left = viewport.scrollLeft + target.getBoundingClientRect().left - start()
+    viewport.scrollTo({ left, behavior: reducedMotion() ? 'auto' : 'smooth' })
+  }
 
-  onScroll((y) => {
-    if (!section.classList.contains('is-pinned')) return
-    const progress = distance ? clamp((y - top) / distance, 0, 1) : 0
-    track.style.transform = `translate3d(${(-progress * distance).toFixed(1)}px, 0, 0)`
-    paint(progress)
-  })
-
-  // senza pin: avanzamento dallo scroll nativo
-  viewport.addEventListener(
-    'scroll',
-    () => {
-      if (section.classList.contains('is-pinned')) return
-      const max = viewport.scrollWidth - viewport.clientWidth
-      paint(max ? viewport.scrollLeft / max : 0)
-    },
-    { passive: true },
-  )
-
-  // tastiera: quando una card riceve il fuoco la porta in vista
-  track.addEventListener('focusin', (e) => {
-    const card = e.target.closest('.fcard')
-    if (!card || !section.classList.contains('is-pinned') || !distance) return
-    const target = clamp(card.offsetLeft - (window.innerWidth - card.offsetWidth) / 2, 0, distance)
-    window.scrollTo({ top: top + target, behavior: 'auto' })
-  })
-
-  // frecce della tastiera sullo scorrimento nativo
+  prev?.addEventListener('click', () => go(-1))
+  next?.addEventListener('click', () => go(1))
   viewport.addEventListener('keydown', (e) => {
-    if (section.classList.contains('is-pinned') || e.target !== viewport) return
-    if (e.key === 'ArrowRight') viewport.scrollBy({ left: viewport.clientWidth * 0.8, behavior: 'smooth' })
-    if (e.key === 'ArrowLeft') viewport.scrollBy({ left: -viewport.clientWidth * 0.8, behavior: 'smooth' })
+    if (!section.classList.contains('is-scrollable')) return
+    if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      go(1)
+    }
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      go(-1)
+    }
   })
-
-  paint(0)
+  viewport.addEventListener('scroll', schedule, { passive: true })
+  addEventListener('resize', schedule)
+  addEventListener('load', schedule)
+  paint()
 }
 
 // ── Metodo: cerchio graduato e timeline ──────────────────────────────────────

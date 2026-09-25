@@ -14,9 +14,10 @@ import { projectHref } from './project.js'
 // larghezza massima sullo schermo, in px CSS: i disegni vettoriali reggono
 // ingrandimenti forti, le pagine raster si fermano al doppio della loro misura
 const MAX_VECTOR = 16000
-const isVector = (s) => s.src.endsWith('.svg')
+const MAX_DWG = 40000 // il DWG si ridisegna nitido a qualunque scala
+const isVector = (s) => s.src.endsWith('.svg') || !!s.dwg
 
-const fromLabel = { DWG: 'da DWG', PDF: 'da PDF', Excel: 'da Excel', Word: 'da Word' }
+const fromLabel = { DWG: 'DWG originale', PDF: 'da PDF', Excel: 'da Excel', Word: 'da Word' }
 
 /** Riga dati di una tavola: numero, scala, formato, file d'origine. */
 const metaOf = (s, total) => [`Tav. ${s.n} / ${pad(total)}`, s.scale && `Scala ${s.scale}`, s.paper, fromLabel[s.from] || s.from].filter(Boolean)
@@ -32,7 +33,11 @@ const item = (s, p, total) => html`
       'data-thumb': s.thumb,
       'data-w': s.width,
       'data-h': s.height,
-      'data-max': isVector(s) ? MAX_VECTOR : s.width * 4,
+      'data-max': s.dwg ? MAX_DWG : isVector(s) ? MAX_VECTOR : s.width * 4,
+      'data-dwg': s.dwg,
+      'data-box': s.box && s.box.join(','),
+      'data-darken': s.darken ? '1' : null,
+      'data-paper': s.dwg ? s.paper : null,
       'data-title': s.title,
       'data-alt': s.alt,
       'data-note': s.note,

@@ -331,7 +331,7 @@ p {
 
 /* contrassegni negli angoli a destra: il tooltip si allinea al bordo */
 .card > .sample[data-tooltip]::after,
-.fcard > .sample[data-tooltip]::after {
+.wcard > .sample[data-tooltip]::after {
   --tip-from: translate(0, 4px);
   --tip-to: translate(0, 0);
   left: auto;

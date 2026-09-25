@@ -3,6 +3,7 @@
 import { html, esc, attrs, cx, pad } from '../html.js'
 import { renderArt, isSheet } from '../../art/index.js'
 import { site } from '../../data/site.js'
+import { figurine } from '../../data/figurine.js'
 
 // ── Icone (inline, 1em) ──────────────────────────────────────────────────────
 
@@ -190,6 +191,27 @@ export function picture(image, { lazy = true, sizes, className } = {}) {
   return renderArt(spec)
 }
 
+// ── Figurine ─────────────────────────────────────────────────────────────────
+// Piccole illustrazioni scontornate (tools/figurine) accanto a servizi, fasi,
+// strumenti. Sono decorative: il testo accanto dice già cosa rappresentano.
+
+/** Nome di una figurina: le parti unite, minuscole, senza accenti né simboli («Modellazione 3D» → modellazione-3d). */
+export const figName = (...parts) =>
+  parts
+    .join('-')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
+/** La figurina `name`, se è stata ritagliata; altrimenti niente. */
+export function figurina(name, { className, lazy = true } = {}) {
+  const f = figurine[name]
+  if (!f) return ''
+  return `<img${attrs({ class: cx('fig', className), src: `/media/figurine/${name}.webp`, width: f.w, height: f.h, alt: '', loading: lazy ? 'lazy' : 'eager', decoding: 'async', draggable: 'false' })}>`
+}
+
 /**
  * Riquadro immagine con rapporto fisso, crocini di registro e didascalia opzionale.
  * `zoom` lo rende apribile nel lightbox (gruppo = galleria di appartenenza).
@@ -261,11 +283,12 @@ export function deviceMockup(kind, { domain, screen, tall, className, lazy = tru
 export function deviceStage(project, { lazy = true, scroll = true, className } = {}) {
   const w = project.web
   if (!w) return ''
+  const domain = w.name || w.domain
   return html`
     <div class="${cx('stage', className)}">
-      ${deviceMockup('laptop', { domain: w.domain, screen: w.desktop, tall: scroll && w.desktopTall, lazy, className: 'stage__desktop' })}
-      ${w.tablet && deviceMockup('tablet', { domain: w.domain, screen: w.tablet, lazy: true, className: 'stage__tablet' })}
-      ${w.mobile && deviceMockup('phone', { domain: w.domain, screen: w.mobile, tall: scroll === true && w.mobileTall, lazy, className: 'stage__phone' })}
+      ${deviceMockup('laptop', { domain, screen: w.desktop, tall: scroll && w.desktopTall, lazy, className: 'stage__desktop' })}
+      ${w.tablet && deviceMockup('tablet', { domain, screen: w.tablet, lazy: true, className: 'stage__tablet' })}
+      ${w.mobile && deviceMockup('phone', { domain, screen: w.mobile, tall: scroll === true && w.mobileTall, lazy, className: 'stage__phone' })}
     </div>
   `
 }

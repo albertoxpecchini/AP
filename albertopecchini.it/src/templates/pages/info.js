@@ -5,7 +5,7 @@ import { site } from '../../data/site.js'
 import { serviceAreas, bundles, faq } from '../../data/services.js'
 import { methodIntro, steps, principles } from '../../data/method.js'
 import { bio, photos, facts, timeline, approach, values, tools, profile } from '../../data/studio.js'
-import { button, textLink, media, tagList, icon, splitWords, breadcrumb, sectionHead, monogram } from '../components/ui.js'
+import { button, textLink, media, tagList, icon, splitWords, breadcrumb, sectionHead, monogram, figurina, figName } from '../components/ui.js'
 import { signature } from './home.js'
 
 const head = ({ crumbs, index, label, title, accent, lead, meta }) => html`
@@ -59,6 +59,7 @@ export function serviziPage() {
               ${a.services.map(
                 (s, i) => html`
                   <li class="sitem" data-reveal="up">
+                    ${figurina(figName(a.key, s.title), { className: 'sitem__fig' })}
                     <span class="sitem__n label">${a.letter}.${String(i + 1).padStart(2, '0')}</span>
                     <h3 class="sitem__title h3">${esc(s.title)}</h3>
                     <p class="sitem__text">${esc(s.text)}</p>
@@ -79,7 +80,7 @@ export function serviziPage() {
           ${bundles.map(
             (b, i) => html`
               <li class="bund__card" data-reveal="up" style="--d:${i * 90}ms">
-                <p class="bund__code">${esc(b.code)}</p>
+                <div class="bund__top"><p class="bund__code">${esc(b.code)}</p>${figurina(figName('lavori', b.code), { className: 'bund__fig' })}</div>
                 <h3 class="h3">${esc(b.title)}</h3>
                 <p>${esc(b.text)}</p>
                 ${tagList(b.parts)}
@@ -177,7 +178,10 @@ export function metodoPage() {
             (s, i) => html`
               <li class="mstep" data-method-step="${i}" data-gon="${s.gon}" data-title="${esc(s.title)}" id="${s.key}">
                 <div class="mstep__marker" aria-hidden="true"><span></span></div>
-                <p class="mstep__n" aria-hidden="true">${s.n}</p>
+                <div class="mstep__head">
+                  <p class="mstep__n" aria-hidden="true">${s.n}</p>
+                  ${figurina(figName('metodo', s.key), { className: 'mstep__fig' })}
+                </div>
                 <div class="mstep__body">
                   <h2 class="mstep__title h2"><span class="sr-only">Fase ${s.n}: </span>${esc(s.title)}</h2>
                   <p class="mstep__text">${esc(s.text)}</p>
@@ -215,15 +219,25 @@ export function studioPage() {
           <div class="shero__copy">
             <p class="label" data-reveal="fade"><span class="sec-head__index">03</span>Studio · Chi sono</p>
             <h1 class="shero__title" data-reveal="words">${splitWords(bio.headline, { accent: ['codice,', 'sezione.'] })}</h1>
-            <dl class="shero__facts" data-reveal="up">
-              ${facts.map((f) => `<div><dt class="label">${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`)}
-              ${site.legal.albo
-                ? `<div><dt class="label">Albo</dt><dd>${esc(site.legal.albo.collegio)} · n. ${esc(site.legal.albo.numero)}</dd></div>`
-                : `<div><dt class="label">Qualifica</dt><dd>${esc(site.legal.note)}</dd></div>`}
-            </dl>
           </div>
-          <div class="shero__photo">${media(photos.portrait, { ratio: '4/5', marks: true, lazy: false, parallax: true })}</div>
+          <dl class="shero__facts" data-reveal="up">
+            ${facts.map((f) => `<div><dt class="label">${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`)}
+            ${site.legal.albo
+              ? `<div><dt class="label">Albo</dt><dd>${esc(site.legal.albo.collegio)} · n. ${esc(site.legal.albo.numero)}</dd></div>`
+              : `<div><dt class="label">Qualifica</dt><dd>${esc(site.legal.note)}</dd></div>`}
+          </dl>
         </div>
+
+        <figure class="spop" data-reveal="pop">
+          <div class="spop__stage">
+            <div class="spop__panel" aria-hidden="true"></div>
+            <img class="spop__figure" src="${photos.curious.src}" srcset="${photos.curious.small} 900w, ${photos.curious.src} 1600w" sizes="(min-width: 900px) 60vw, 100vw" width="${photos.curious.width}" height="${photos.curious.height}" alt="${esc(photos.curious.alt)}" fetchpriority="high" decoding="async">
+          </div>
+          <figcaption class="spop__cap">
+            <span class="spop__quote">Prima per <em class="serif-i">curiosità</em>, poi per mestiere.</span>
+            <span class="label spop__tag">FIG. 01 — Ritratto</span>
+          </figcaption>
+        </figure>
       </div>
     </header>
 
@@ -276,7 +290,7 @@ export function studioPage() {
       <div class="container">
         ${sectionHead({ index: 'D', label: 'Strumenti', title: 'Con cosa lavoro' })}
         <div class="stools__grid">
-          ${tools.map((g) => `<div data-reveal="up"><h3 class="label">${esc(g.group)}</h3><ul>${g.items.map((it) => `<li>${esc(it)}</li>`).join('')}</ul></div>`)}
+          ${tools.map((g) => `<div data-reveal="up">${figurina(figName('strumenti', g.group), { className: 'stools__fig' })}<h3 class="label">${esc(g.group)}</h3><ul>${g.items.map((it) => `<li>${esc(it)}</li>`).join('')}</ul></div>`)}
         </div>
       </div>
     </section>

@@ -43,13 +43,27 @@ const img = (art, options, alt, caption) => ({ art, ...options, alt, caption })
 const shot = (file, width, height, alt, caption) => ({ src: `/media/web/${file}`, width, height, alt, caption })
 
 // ── Tavole vere ──────────────────────────────────────────────────────────────
+// NON SI MOSTRANO: dal 26.09.2026 il sito non fa vedere i documenti dei progetti
+// (tavole, PDF, pagine della relazione), solo le illustrazioni: copertina e
+// galleria nascono da tools/copertine (richiesta di Alberto: «mai mostrare i
+// documenti»). I dati restano qui: con `showSheets = true` tornano la sezione
+// «Tavole» dei case study, la pagina /portfolio/tavole/ e la sua voce nel menù.
+export const showSheets = false
+
 // Ogni tavola di `sheets` sta in /public/media/tavole/<slug>/: <n>.svg è il
 // disegno vettoriale che il visualizzatore ingrandisce, <n>.webp la miniatura
 // (1200 px di larghezza, width/height sono le sue misure), <n>-mini.webp quella
 // da 320 px per l'elenco delle tavole e <n>.pdf il file da scaricare. `full` sostituisce l'SVG quando la tavola è un'immagine (le pagine
 // di una relazione), `pdf: null` toglie il download. `from` dice da che file
 // viene la tavola; `scale` e `paper` finiscono nella riga dati del visualizzatore.
-const sheet = (slug, n, { title, alt, note, w = 1200, h, scale = null, paper = 'A3', from = 'DWG', full = null, pdf }) => ({
+//
+// TAVOLE DWG: con `dwg` (nome del file .dwg nella cartella della tavola) e `box`
+// (x0, y0, x1, y1: il riquadro dello spazio modello, in unità del disegno) la
+// tavola È il DWG, letto e disegnato nel browser da src/dwg/ senza conversioni;
+// non serve l'SVG e `h` si ricava dalle proporzioni del riquadro. `darken`
+// scurisce i colori chiari pensati per lo sfondo nero di AutoCAD; `paper` dà
+// la larghezza del foglio, da cui gli spessori di linea in millimetri.
+const sheet = (slug, n, { title, alt, note, w = 1200, h, scale = null, paper = 'A3', from = 'DWG', full = null, pdf, dwg = null, box = null, darken = false }) => ({
   id: `${slug}-${n}`,
   n,
   title,
@@ -58,49 +72,71 @@ const sheet = (slug, n, { title, alt, note, w = 1200, h, scale = null, paper = '
   scale,
   paper,
   from,
-  src: full || `/media/tavole/${slug}/${n}.svg`,
+  dwg: dwg ? `/media/tavole/${slug}/${dwg}` : null,
+  box,
+  darken,
+  src: dwg ? `/media/tavole/${slug}/${dwg}` : full || `/media/tavole/${slug}/${n}.svg`,
   thumb: `/media/tavole/${slug}/${n}.webp`,
   mini: `/media/tavole/${slug}/${n}-mini.webp`,
   pdf: pdf === undefined ? `/media/tavole/${slug}/${n}.pdf` : pdf,
   width: w,
-  height: h,
+  height: box ? Math.round((w * (box[3] - box[1])) / (box[2] - box[0])) : h,
 })
 
-/** La miniatura di una tavola come immagine (anteprime, galleria). */
-const sheetImage = (s) => ({ src: s.thumb, width: s.width, height: s.height, alt: s.alt, caption: `TAV. ${s.n} — ${s.title}` })
+/** Copertina di un progetto con tavole: non la tavola, ma un'illustrazione in
+ *  assonometria del progetto, che fa da miniatura e da copertina. Nasce da
+ *  tools/copertine/ (gpt-image-2 su Replicate, con le tavole come riferimento);
+ *  1920 × 1280 con margine di carta, così regge i ritagli 4:3 e 16:9. */
+const drawnCover = (slug, alt) => ({ src: `/media/progetti/${slug}/copertina.webp`, width: 1920, height: 1280, alt })
 
-/** Copertina di un progetto con tavole: copertina.webp, 2000 px (1600 per il museo), dalla tavola più rappresentativa. */
-const sheetCover = (slug, width, height, alt) => ({ src: `/media/tavole/${slug}/copertina.webp`, width, height, alt })
+/** Le altre illustrazioni di un progetto, per la galleria del case study: stesso
+ *  strumento e stesso disegno delle copertine (tools/copertine, `viste`). 1600 × 900
+ *  in pagina, `-full` a piena risoluzione per il lightbox. `ai` fa dire alla
+ *  galleria che sono illustrazioni generate. */
+const drawnView = (slug, n, alt, caption) => ({
+  src: `/media/progetti/${slug}/vista-${n}.webp`,
+  full: `/media/progetti/${slug}/vista-${n}-full.webp`,
+  width: 1600,
+  height: 900,
+  alt,
+  caption,
+  ai: true,
+})
+
+const TETTOIE = 'tettoie-legno-lamellare'
 
 const STRADA = 'progetto-stradale'
+// le prime cinque tavole sono riquadri del DWG; i colori del file sono pensati
+// per lo sfondo scuro di AutoCAD e sul bianco si scuriscono
+const stradaDwg = (box) => ({ dwg: 'progetto-stradale.dwg', box, darken: true })
 const stradaSheets = [
   sheet(STRADA, '01', {
     title: 'Studio del tracciato',
-    h: 820,
+    ...stradaDwg([2270, 380, 4130, 1650]),
     alt: 'Quattro planimetrie sulla stessa carta a curve di livello: due tracciolini con i cerchi del compasso e due poligonali d’asse tra i punti A e B',
     note: 'Due tracciolini da A a B a pendenza costante del 5,3%, con il compasso aperto a 37,74 m tra una curva di livello e l’altra, e le due poligonali d’asse che ne ricavo: A-1-2-3-4-B di 968 m e A-1-2-B di 892 m.',
   }),
   sheet(STRADA, '02', {
     title: 'Costruzione dei raccordi',
-    h: 866,
+    ...stradaDwg([4570, 380, 5430, 1000]),
     alt: 'Poligonale d’asse A-1-2-3-4-B con i cerchi di raggio 80 m costruiti sui vertici',
     note: 'Il tracciato definitivo segue il secondo tracciolino: cinque rettifili, quattro vertici e su ogni vertice il cerchio di raggio 80 m che raccorda i due lati.',
   }),
   sheet(STRADA, '03', {
     title: 'Curve circolari',
-    h: 866,
+    ...stradaDwg([5582, 380, 6442, 1000]),
     alt: 'Asse stradale con i quattro raccordi circolari di raggio 80 m e le lunghezze di rettifili e archi',
     note: 'Quattro curve di raggio 80 m con deviazioni di 67,1°, 67,6°, 67,0° e 10,3°: 296 m di archi sui 934 m dell’asse, con rettifili e archi quotati uno per uno.',
   }),
   sheet(STRADA, '04', {
     title: 'Picchettamento',
-    h: 866,
+    ...stradaDwg([6582, 378, 7442, 998]),
     alt: 'Asse stradale con i 28 picchetti numerati e le tracce delle sezioni trasversali',
     note: '28 picchetti numerati da A a B, dove l’asse incrocia le curve di livello e nei punti notevoli del tracciato, con le tracce delle sezioni trasversali.',
   }),
   sheet(STRADA, '05', {
     title: 'Planimetria di progetto',
-    h: 866,
+    ...stradaDwg([7582, 380, 8442, 1000]),
     alt: 'Planimetria della strada di progetto larga 10 metri, con le tracce delle sezioni e il corso d’acqua nel fondovalle',
     note: 'La strada finita sulla carta: piattaforma di 10 m, le tracce delle 28 sezioni e il corso d’acqua attraversato nel fondovalle.',
   }),
@@ -160,7 +196,9 @@ const cantiereSheets = [
 ]
 
 const BAR = 'bar-caffetteria-esame-di-stato'
-const barSheet = (n, o) => sheet(BAR, n, { h: 849, scale: '1:100', ...o })
+// ogni tavola è una squadratura A3 (42 × 29,7 unità, scala 1:100) nello spazio modello del DWG
+const barBox = (n) => [2296.2 + 50 * (n - 1), 2014.13, 2338.22 + 50 * (n - 1), 2043.85]
+const barSheet = (n, o) => sheet(BAR, n, { scale: '1:100', dwg: 'bar-caffetteria.dwg', box: barBox(Number(n)), ...o })
 const barSheets = [
   barSheet('01', {
     title: 'Planimetria generale',
@@ -233,9 +271,11 @@ const museoSheets = [
   }),
 ]
 
-// Le fotografie della visita, scelte tra le 162 scattate quel giorno: solo quelle
-// senza compagni, insegnanti o guida riconoscibili, alcune ritagliate per lasciarli
-// fuori. WebP senza metadati (niente GPS): 720 px per la griglia, 1600 per il lightbox.
+// Le fotografie della visita, scelte tra le 162 scattate quel giorno. Dal 25.09.2026
+// ci sono anche i compagni di classe (Alberto ne ha l'autorizzazione, 62–80); restano
+// fuori le foto in cui si riconoscono insegnanti o guida, e alcune delle prime sono
+// ritagliate per lasciarli fuori. WebP senza metadati (niente GPS): 720 px per la
+// griglia, 1600 per il lightbox.
 const foto = (n, width, height, caption, alt) => ({
   src: `/media/progetti/${MUSEO}/${n}.webp`,
   full: `/media/progetti/${MUSEO}/${n}-full.webp`,
@@ -245,8 +285,37 @@ const foto = (n, width, height, caption, alt) => ({
   caption,
 })
 const museoPhotos = {
-  lead: 'La mattina al museo, stanza per stanza: la cucina del cannaiolo, gli animali della valle, la canna, la caccia e la pesca. Ho tenuto le fotografie in cui non si riconoscono compagni, insegnanti o guida; alcune sono ritagliate per lasciarli fuori.',
+  lead: 'La mattina con la classe, dalla strada in bicicletta al pontile sul Mincio, e poi il museo stanza per stanza: la cucina del cannaiolo, gli animali della valle, la canna, la caccia e la pesca.',
   groups: [
+    {
+      title: 'In bicicletta fino al museo',
+      items: [
+        foto('62', 720, 540, 'Il ritrovo prima di partire', 'La classe radunata su una piazza lastricata accanto alla base di un monumento, sotto gli alberi d’autunno'),
+        foto('63', 720, 540, 'In attesa della partenza', 'Quattro compagni di classe in piedi sulla piazza, con giacche e felpe invernali'),
+        foto('64', 720, 540, 'Pronti a partire', 'Tre compagni di classe con le mani in tasca sulla piazza coperta di foglie'),
+        foto('65', 720, 960, 'Le biciclette pronte', 'Due compagni di classe sorridenti davanti alle biciclette, sotto gli alberi'),
+        foto('66', 720, 960, 'In sella', 'La strada vista dal manubrio: la mano sul freno e i compagni in bicicletta dietro'),
+        foto('67', 720, 960, 'La sosta al monumento ai caduti', 'I compagni con le biciclette davanti all’obelisco del monumento ai caduti, con la croce in cima'),
+        foto('68', 720, 960, 'La piazza delle Grazie', 'Compagni in bicicletta sulla piazza del santuario delle Grazie, con il portico e la facciata della chiesa'),
+        foto('69', 720, 960, 'Davanti al santuario', 'Un compagno con la bicicletta davanti al portico ad archi del santuario delle Grazie'),
+      ],
+    },
+    {
+      title: 'La classe al museo',
+      items: [
+        foto('70', 720, 960, 'In ascolto', 'Due compagne di classe in ascolto nella sala del museo, sotto il soffitto di travi'),
+        foto('71', 720, 960, 'Tra una sala e l’altra', 'Un compagno e una compagna di classe nella sala del museo, con le travi di legno a vista'),
+        foto('72', 720, 960, 'Un selfie con un compagno', 'Autoscatto di Alberto con un compagno di classe alle spalle, nella sala con le travi a vista'),
+        foto('73', 720, 960, 'Le schede degli attrezzi', 'Due compagni di classe leggono i fogli con i disegni degli attrezzi'),
+        foto('74', 720, 540, 'Un selfie a tre', 'Autoscatto di tre compagni di classe sorridenti nella sala del museo'),
+        foto('75', 720, 960, 'In posa davanti ai pannelli', 'Due compagni di classe in posa davanti a un pannello rosso del museo e a un fascio di canne'),
+        foto('76', 720, 960, 'Sotto le nasse', 'Compagni di classe nella sala della pesca, sotto le nasse appese al soffitto di legno'),
+        foto('77', 720, 960, 'La donnola, in mano a un compagno', 'Un compagno di classe guarda da vicino la donnola imbalsamata che tiene in mano'),
+        foto('78', 720, 960, 'Sul pontile del Mincio', 'Compagni di classe sul pontile di legno davanti al museo, con il Mincio e le sponde alberate alle spalle'),
+        foto('79', 720, 960, 'La pausa sulla panchina', 'Tre compagni di classe seduti su una panchina di pietra nel prato del museo'),
+        foto('80', 720, 960, 'Nel prato davanti al museo', 'Due compagni di classe accanto a una panchina nel prato, davanti agli edifici rossi del museo'),
+      ],
+    },
     {
       title: 'Il museo e il fiume',
       items: [
@@ -427,7 +496,7 @@ const allProjects = [
     sample: true,
   },
   {
-    slug: 'tettoie-legno-lamellare',
+    slug: TETTOIE,
     code: 'AP-24-001',
     title: 'Tettoie in legno lamellare',
     subtitle: 'Modellazione 3D in ufficio tecnico, reparto legno',
@@ -460,11 +529,11 @@ const allProjects = [
       { value: '72 — 80 h', label: 'Per sessione' },
       { value: 'GL24h', label: 'Lamellare e X-LAM' },
     ],
-    cover: img('canopy', { code: 'AP-24-001' }, 'Assonometria di una tettoia in legno lamellare a falda unica'),
+    cover: drawnCover(TETTOIE, 'Illustrazione in assonometria: una tettoia in legno lamellare a falda unica addossata a una casa, con i pilastri, le travi e i travetti color miele e la copertura in lamiera minio posata solo in parte, sopra un’auto e un tavolo da giardino'),
     images: [
-      img('canopy', { code: 'AP-24-001' }, 'Assonometria di una tettoia in legno lamellare a falda unica', 'TAV. 03 — Assonometria strutturale'),
-      img('canopy', { code: 'AP-24-001', tone: 'ink', bare: true }, 'Modello a fil di ferro della stessa tettoia', 'Vista wireframe del modello'),
-      img('titleblock', {}, 'Squadratura e cartiglio usati per le tavole', 'Impaginazione delle tavole'),
+      drawnView(TETTOIE, '01', 'Illustrazione in esploso assonometrico di una tettoia in legno lamellare: plinti, pilastri, travi principali, travetti, tavolato e lamiera sollevati uno sopra l’altro, con le piastre e le staffe d’acciaio in minio', 'La tettoia in esploso'),
+      drawnView(TETTOIE, '02', 'Illustrazione dell’interno del magazzino di un’azienda del legno: cataste di travi lamellari e pannelli X-LAM, una macchina a controllo numerico sul fondo, un tirocinante e un tecnico che misurano la testa di una trave, un carrello elevatore minio', 'In magazzino, tra travi e pannelli'),
+      drawnView(TETTOIE, '03', 'Illustrazione di una tettoia in legno lamellare addossata a una casa, vista dal giardino: pilastri e travetti color miele, il bordo della copertura in minio, sotto un’auto e un tavolo con le sedie', 'La tettoia finita'),
     ],
     featured: false,
     sample: false,
@@ -504,8 +573,12 @@ const allProjects = [
       { value: '23.447 m³', label: 'Volume di sterro' },
     ],
     sheets: stradaSheets,
-    cover: sheetCover(STRADA, 2000, 1366, stradaSheets[0].alt),
-    images: stradaSheets.map((s) => sheetImage(s)),
+    cover: drawnCover(STRADA, 'Illustrazione in assonometria: un blocco di collina a curve di livello con la strada di progetto in minio che scende nel fondovalle, attraversa il corso d’acqua e risale; sul fronte del blocco, il profilo longitudinale'),
+    images: [
+      drawnView(STRADA, '01', 'Illustrazione a volo d’uccello della strada finita: scende il versante con lunghi rettifili e curve, attraversa il torrente nel fondovalle su un piccolo ponte e risale il pendio opposto, con la linea di mezzeria in minio', 'La strada nella valle'),
+      drawnView(STRADA, '02', 'Illustrazione in assonometria di una fetta di collina tagliata di traverso alla strada: la piattaforma di 10 metri incassata nel pendio, la cunetta dal lato a monte, la scarpata a valle, con lo scavo in minio e il riporto in giallo sulla faccia tagliata', 'Sterro e riporto in una sezione'),
+      drawnView(STRADA, '03', 'Illustrazione di un versante erboso: un topografo di spalle alla stazione totale sul treppiede e una fila di picchetti con la testa minio che scende a valle seguendo le curve della futura strada, oltre il torrente e su per il pendio opposto', 'Il picchettamento dell’asse'),
+    ],
     featured: true,
     sample: false,
   },
@@ -543,8 +616,12 @@ const allProjects = [
       { value: '24,26 m²', label: 'Aperture della sala bar' },
     ],
     sheets: barSheets,
-    cover: sheetCover(BAR, 2000, 1415, barSheets[0].alt),
-    images: barSheets.map((s) => sheetImage(s)),
+    cover: drawnCover(BAR, 'Illustrazione in assonometria del parco: il bar-caffetteria a un piano con le travi di legno a vista, la terrazza con gli ombrelloni tra i due gazebo, la piazza a quadrifoglio con la fontana, gli alberi e l’orto didattico'),
+    images: [
+      drawnView(BAR, '01', 'Illustrazione del bar-caffetteria visto dal prato: l’edificio a un piano verde oliva e grigio con le grandi vetrate e le travi di legno a vista, la terrazza con gli ombrelloni minio tra i due gazebo, le persone ai tavoli e l’orto a lato', 'Il bar visto dal parco'),
+      drawnView(BAR, '02', 'Illustrazione dell’interno della sala bar: il lungo bancone con il fronte minio e gli sgabelli, i tavolini, la parete di vetrate aperta sul parco con i gazebo e le teste delle travi di legno fuori', 'Dentro la sala bar'),
+      drawnView(BAR, '03', 'Illustrazione in assonometria del bar senza tetto, con i muri tagliati a metà altezza: la sala con il bancone minio e i tavoli, la cucina, il laboratorio, i due blocchi di servizi, e fuori la terrazza con i gazebo', 'La pianta arredata, in volume'),
+    ],
     featured: true,
     sample: false,
   },
@@ -582,8 +659,12 @@ const allProjects = [
       { value: '2,00 m', label: 'Altezza della recinzione' },
     ],
     sheets: cantiereSheets,
-    cover: sheetCover(CANTIERE, 2000, 1250, 'L’area di cantiere: l’edificio in costruzione, il raggio d’azione dell’autogru, depositi e baracche'),
-    images: cantiereSheets.map((s) => sheetImage(s)),
+    cover: drawnCover(CANTIERE, 'Illustrazione in assonometria del cantiere: l’edificio prefabbricato in montaggio, l’autogru in minio con il suo raggio d’azione, la recinzione, le baracche, i depositi e i mezzi'),
+    images: [
+      drawnView(CANTIERE, '01', 'Illustrazione dentro il cantiere: l’autogru minio solleva un pannello prefabbricato di calcestruzzo guidato da due operai con il gilet ad alta visibilità, accanto a pilastri e travi già montati', 'Il montaggio con l’autogru'),
+      drawnView(CANTIERE, '02', 'Illustrazione dell’ingresso carrabile del cantiere: un autoarticolato con una lunga trave prefabbricata passa dal cancello aperto nella recinzione; dentro le baracche, il bagno chimico, i bancali e, davanti all’edificio in costruzione, l’autogru minio che solleva una trave', 'L’arrivo di una trave'),
+      drawnView(CANTIERE, '03', 'Illustrazione in assonometria dell’edificio finito sul suo lotto: il magazzino alto al centro con il portico minio sul fronte, l’ala a due piani con l’abitazione, l’ala degli uffici, il piazzale, i parcheggi e gli alberi giovani', 'L’edificio finito'),
+    ],
     featured: false,
     sample: false,
   },
@@ -591,7 +672,7 @@ const allProjects = [
     slug: MUSEO,
     code: 'AP-25-T04',
     title: 'Museo dei Mestieri del Fiume',
-    subtitle: 'Una mattina al museo etnografico del mio paese, in quattro pagine e 61 fotografie',
+    subtitle: 'Una mattina al museo etnografico del mio paese, in quattro pagine e 80 fotografie',
     area: 'tecnico',
     categories: ['altro'],
     types: ['Relazione', 'Territorio', 'Fotografia', 'Impaginazione'],
@@ -601,7 +682,7 @@ const allProjects = [
     year: 2025,
     services: ['Relazione di visita', 'Schede degli oggetti', 'Fotografie', 'Impaginazione'],
     technologies: ['Word'],
-    summary: 'La relazione sull’uscita didattica al Museo Etnografico dei Mestieri del Fiume di Rivalta sul Mincio, con 61 fotografie della visita: la cucina del cannaiolo, gli animali della valle, gli attrezzi della canna, della caccia e della pesca.',
+    summary: 'La relazione sull’uscita didattica al Museo Etnografico dei Mestieri del Fiume di Rivalta sul Mincio, con 80 fotografie della giornata: la strada in bicicletta con la classe, la cucina del cannaiolo, gli animali della valle, gli attrezzi della canna, della caccia e della pesca.',
     description:
       'Il 15 novembre 2025 la classe ha visitato il Museo Etnografico dei Mestieri del Fiume a Rivalta sul Mincio, il paese dove vivo, arrivandoci in bicicletta da Mantova per Montanara e le Grazie. La guida era un operatore del Parco del Mincio; la visita è partita dal Loghino Ariello e ha attraversato la cucina ricostruita di un pescatore-contadino e il cortile con barche, reti e trappole.',
     goal: 'Raccontare la visita in modo che si capisca cosa conserva il museo e perché conta per chi vive lungo il Mincio: la vita quotidiana, i mestieri della palude, il rapporto tra le persone e il fiume.',
@@ -614,15 +695,19 @@ const allProjects = [
       { title: 'Oggetti', text: 'Tre schede: un grande corno con l’anello per appenderlo, usato come contenitore e per richiamare il bestiame; un tostacaffè domestico di inizio Novecento; un cardatore manuale per la lana.' },
       { title: 'Impressioni', text: 'Nelle impressioni personali ho scritto della stufa in ghisa della cucina: tutto, dalle pentole al tostacaffè, era organizzato intorno a lei.' },
     ],
-    result: 'Quattro pagine A4 impaginate in Word e 61 fotografie della visita, dal plastico della valle alla barca da pesca. Nelle pagine pubblicate qui i nomi dei compagni di classe e le fotografie in cui si riconoscono sono oscurati.',
+    result: 'Quattro pagine A4 impaginate in Word e 80 fotografie della giornata, dalla partenza in bicicletta con la classe alla barca da pesca.',
     metrics: [
       { value: '4', label: 'Pagine A4' },
-      { value: '61', label: 'Fotografie della visita' },
+      { value: '80', label: 'Fotografie della visita' },
       { value: '15.11.2025', label: 'Data della visita' },
     ],
     sheets: museoSheets,
-    cover: { src: `/media/progetti/${MUSEO}/copertina.webp`, width: 1600, height: 1000, alt: 'La sala della pesca del museo: la barca, le reti al soffitto e un video sulla valle del Mincio' },
-    images: museoSheets.map((s) => sheetImage(s)),
+    cover: drawnCover(MUSEO, 'Illustrazione in assonometria del museo sul Mincio: gli edifici rurali rossi intorno al prato, il pontile di legno con la barca da pesca, il canneto sull’altra sponda e le biciclette della classe all’ingresso'),
+    images: [
+      drawnView(MUSEO, '01', 'Illustrazione della cucina d’epoca ricostruita nel museo: la stufa in ghisa minio al centro, il tavolo con la rete e la pentola, le mensole con il tostacaffè, il macinino e i fiaschi impagliati', 'La cucina del cannaiolo'),
+      drawnView(MUSEO, '02', 'Illustrazione da catalogo dei tre oggetti descritti nella relazione: un grande corno con l’anello per appenderlo, un tostacaffè di inizio Novecento con il manico di legno e un cardatore per la lana, ciascuno con un cartellino legato da un filo minio', 'Il corno, il tostacaffè, il cardatore'),
+      drawnView(MUSEO, '03', 'Illustrazione della sala della pesca del museo: la barca piatta e stretta di legno con remi, pertica e reti, le nasse con la rete minio appese alle travi del soffitto e le fascine di canna contro il muro', 'La barca e le nasse'),
+    ],
     photos: museoPhotos,
     featured: false,
     sample: false,
@@ -944,7 +1029,7 @@ const allProjects = [
   {
     slug: 'albertopecchini-it',
     code: 'AP-26-W03',
-    title: 'albertopecchini.it',
+    title: 'Alberto Pecchini',
     subtitle: 'Il sito che stai guardando',
     area: 'web',
     categories: ['web', 'grafica'],
@@ -976,18 +1061,20 @@ const allProjects = [
     web: {
       url: 'https://albertopecchini.it',
       domain: 'albertopecchini.it',
-      desktop: shot('ap-desktop.webp', 1200, 750, 'Home page di albertopecchini.it su desktop'),
-      desktopTall: shot('ap-desktop-tall.webp', 1200, 2833, 'Home page di albertopecchini.it, pagina intera'),
-      tablet: shot('ap-tablet.webp', 720, 1036, 'Home page di albertopecchini.it su tablet'),
-      mobile: shot('ap-mobile.webp', 600, 1298, 'Home page di albertopecchini.it su smartphone'),
-      mobileTall: shot('ap-mobile-tall.webp', 600, 4000, 'Home page di albertopecchini.it su smartphone, pagina intera'),
+      // Nome mostrato al posto del dominio (carosello, anteprime scorrevoli).
+      name: 'Alberto Pecchini',
+      desktop: shot('ap-desktop.webp', 1200, 750, 'Home page di Alberto Pecchini su desktop'),
+      desktopTall: shot('ap-desktop-tall.webp', 1200, 2833, 'Home page di Alberto Pecchini, pagina intera'),
+      tablet: shot('ap-tablet.webp', 720, 1036, 'Home page di Alberto Pecchini su tablet'),
+      mobile: shot('ap-mobile.webp', 600, 1298, 'Home page di Alberto Pecchini su smartphone'),
+      mobileTall: shot('ap-mobile-tall.webp', 600, 4000, 'Home page di Alberto Pecchini su smartphone, pagina intera'),
       palette: ['#F3F1EC', '#EAE7E0', '#10110F', '#5A5B55', '#E5481F'],
     },
-    cover: shot('ap-desktop.webp', 1200, 750, 'Home page di albertopecchini.it'),
+    cover: shot('ap-desktop.webp', 1200, 750, 'Home page di Alberto Pecchini'),
     images: [
-      shot('ap-desktop.webp', 1200, 750, 'Home page di albertopecchini.it su desktop', 'Home — desktop 1440 px'),
-      shot('ap-tablet.webp', 720, 1036, 'Home page di albertopecchini.it su tablet', 'Home — tablet 820 px'),
-      shot('ap-mobile.webp', 600, 1298, 'Home page di albertopecchini.it su smartphone', 'Home — smartphone 390 px'),
+      shot('ap-desktop.webp', 1200, 750, 'Home page di Alberto Pecchini su desktop', 'Home — desktop 1440 px'),
+      shot('ap-tablet.webp', 720, 1036, 'Home page di Alberto Pecchini su tablet', 'Home — tablet 820 px'),
+      shot('ap-mobile.webp', 600, 1298, 'Home page di Alberto Pecchini su smartphone', 'Home — smartphone 390 px'),
     ],
     featured: false,
     sample: false,
@@ -1421,7 +1508,11 @@ const allProjects = [
 // dal rombo ◇ (l'avviso si regola con `showSampleNotice` in site.js).
 export const showSamples = false
 
-export const projects = showSamples ? allProjects : allProjects.filter((p) => !p.sample)
+const published = showSamples ? allProjects : allProjects.filter((p) => !p.sample)
+
+// Con le tavole spente i progetti escono senza `sheets`: il case study mostra la
+// galleria di `images` e withSheets() è vuoto, quindi niente /portfolio/tavole/.
+export const projects = showSheets ? published : published.map(({ sheets, ...p }) => p)
 
 // ── Selettori ────────────────────────────────────────────────────────────────
 

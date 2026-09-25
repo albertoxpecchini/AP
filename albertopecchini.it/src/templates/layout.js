@@ -248,6 +248,7 @@ function footer({ route, compact = false }) {
           <ul class="foot-legal__policy">
             <li><a class="uline" href="/privacy/">Privacy</a></li>
             <li><a class="uline" href="/cookie/">Cookie</a></li>
+            <li><a class="uline" href="/crediti/">Crediti immagini</a></li>
           </ul>
           <ul class="foot-legal__social">
             ${site.social.map((s) => `<li><a class="ext" href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}${icon('arrowUpRight')}<span class="sr-only"> (nuova scheda)</span></a></li>`)}

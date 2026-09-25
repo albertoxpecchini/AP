@@ -564,16 +564,121 @@
   padding-top: 0.2rem;
 }
 
-.shero__photo {
-  max-width: 30rem;
-  padding: 8px;
-}
 
 @media (min-width: 900px) {
   .shero__grid {
     grid-template-columns: minmax(0, 7fr) minmax(0, 4.4fr);
     gap: clamp(2rem, 6vw, 7rem);
     align-items: end;
+  }
+}
+
+/* Ritratto che esce dal riquadro: la figura scontornata è più alta del pannello
+   scuro e ne supera il bordo superiore; il bordo inferiore la taglia (clip-path
+   aperto sopra e ai lati). All'ingresso sale da dentro il pannello. */
+.spop {
+  position: relative;
+  margin-top: clamp(3rem, 7vw, 7rem);
+}
+
+.spop__stage {
+  position: relative;
+  clip-path: inset(-60% -12% 0 -12%);
+}
+
+.spop__panel {
+  position: absolute;
+  inset: auto 0 0;
+  height: 62%;
+  background:
+    radial-gradient(ellipse 58% 90% at 46% 100%, rgb(229 72 31 / 0.5), rgb(255 138 76 / 0.16) 48%, transparent 78%),
+    var(--c-ink);
+}
+
+.spop__figure {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 1.5s var(--ease-out);
+}
+
+.spop__cap {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  margin-top: 1rem;
+}
+
+.spop__quote {
+  font-size: clamp(1.5rem, 0.9rem + 1.8vw, 2.75rem);
+  font-weight: 540;
+  font-stretch: 94%;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.spop__tag {
+  color: var(--muted);
+}
+
+.js [data-reveal='pop'] .spop__figure {
+  transform: translate3d(0, 30%, 0);
+}
+
+.js [data-reveal='pop'] .spop__cap {
+  opacity: 0;
+  transition: opacity var(--t-3) ease 0.7s;
+}
+
+.js [data-reveal='pop'].is-in .spop__figure {
+  transform: none;
+}
+
+.js [data-reveal='pop'].is-in .spop__cap {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .js [data-reveal='pop'].is-in .spop__stage:hover .spop__figure {
+    transform: translate3d(0, -3%, 0);
+  }
+}
+
+@media (min-width: 900px) {
+  .spop__stage {
+    height: clamp(24rem, 40vw, 42rem);
+  }
+
+  .spop__panel {
+    height: 64%;
+    background:
+      radial-gradient(ellipse 42% 95% at 66% 100%, rgb(229 72 31 / 0.5), rgb(255 138 76 / 0.16) 48%, transparent 78%),
+      var(--c-ink);
+  }
+
+  .spop__figure {
+    position: absolute;
+    right: 4%;
+    bottom: 0;
+    width: auto;
+    height: 100%;
+  }
+
+  /* la frase sta nel pannello, a sinistra della figura */
+  .spop__cap {
+    position: absolute;
+    left: clamp(1.5rem, 3vw, 3rem);
+    bottom: clamp(1.5rem, 3vw, 3rem);
+    z-index: 1;
+    max-width: 28%;
+    margin: 0;
+    color: var(--c-paper);
+  }
+
+  .spop__tag {
+    color: #a5a59c;
   }
 }
 
@@ -1375,4 +1480,131 @@
 
 .nf__mark {
   display: none;
+}
+
+/* ── Figurine (servizi, lavori trasversali, metodo, strumenti, contatti, 404) ── */
+/* Ogni figurina sta in un riquadro quadrato fisso (--box) e vi si adatta con
+   object-fit, appoggiata in basso: alte o larghe che siano, occupano lo stesso
+   spazio e i titoli accanto restano allineati. */
+
+.sitem__fig,
+.bund__fig,
+.mstep__fig,
+.stools__fig,
+.cnt__fig,
+.nf__fig {
+  width: var(--box);
+  height: var(--box);
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+
+/* servizi: la figurina fa da terza colonna e si inclina al passaggio */
+.sitem {
+  --box: clamp(4.5rem, 3rem + 4vw, 7rem);
+  grid-template-columns: 3.75rem minmax(0, 1fr) auto;
+}
+
+.sitem > :not(.sitem__n):not(.sitem__fig) {
+  grid-column: 2;
+}
+
+.sitem__fig {
+  grid-column: 3;
+  grid-row: 1 / span 3;
+  margin-left: clamp(0.75rem, 2vw, 1.5rem);
+  object-position: 50% 0;
+  transition: transform var(--t-3) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .sitem:hover .sitem__fig {
+    transform: rotate(-4deg) translateY(-3px) scale(1.04);
+  }
+}
+
+.bund__top {
+  --box: clamp(5.5rem, 3.5rem + 4vw, 8rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.bund__fig {
+  object-position: 100% 100%;
+  transition: transform var(--t-3) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .bund__card:hover .bund__fig {
+    transform: rotate(3deg) scale(1.05);
+  }
+}
+
+/* metodo: grigia finché la fase non è attiva o fatta, come il numero a contorno */
+.mstep__head {
+  --box: clamp(6rem, 3rem + 12vw, 9rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.mstep__fig {
+  transform-origin: bottom left;
+  transition: filter var(--t-3) ease, opacity var(--t-3) ease, transform var(--t-3) var(--ease-out);
+}
+
+.js .mstep:not(.is-active):not(.is-done) .mstep__fig {
+  filter: grayscale(1);
+  opacity: 0.45;
+  transform: scale(0.94);
+}
+
+@media (min-width: 1024px) {
+  .mstep__head {
+    --box: clamp(8rem, 11vw, 11rem);
+    display: grid;
+    justify-items: start;
+    gap: 1.75rem;
+  }
+
+  .mstep__fig {
+    object-position: 0 100%;
+  }
+}
+
+.stools__fig {
+  --box: clamp(6rem, 4rem + 4vw, 8rem);
+  margin-bottom: 1.5rem;
+  object-position: 0 100%;
+}
+
+.cnt__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.cnt__fig {
+  --box: clamp(5rem, 2.5rem + 8vw, 9.5rem);
+  flex-shrink: 0;
+  object-position: 100% 0;
+}
+
+.nf__fig {
+  --box: clamp(8rem, 5rem + 12vw, 15rem);
+  margin-top: 1rem;
+  object-position: 0 100%;
+}
+
+@media (min-width: 1024px) {
+  .nf__fig {
+    position: absolute;
+    right: 0;
+    bottom: clamp(2rem, 5vw, 5rem);
+    object-position: 100% 100%;
+  }
 }

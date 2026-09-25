@@ -1,11 +1,11 @@
 import { html, esc } from '../html.js'
 import { site, stats, cta } from '../../data/site.js'
-import { projects, featured, byArea, bySlug, areas } from '../../data/projects.js'
+import { projects, byArea, bySlug, areas } from '../../data/projects.js'
 import { serviceAreas } from '../../data/services.js'
 import { steps } from '../../data/method.js'
 import { bio, photos, facts } from '../../data/studio.js'
-import { button, textLink, sectionHead, media, picture, deviceMockup, stat, icon, splitWords } from '../components/ui.js'
-import { featureCard, indexRow } from '../components/project.js'
+import { button, textLink, sectionHead, media, picture, deviceMockup, stat, icon, splitWords, figurina, figName } from '../components/ui.js'
+import { siteCard, indexRow } from '../components/project.js'
 import { COORDS } from '../layout.js'
 
 // Le tre figure dell'hero: una per disciplina, sincronizzate con l'elenco dei ruoli.
@@ -22,16 +22,37 @@ const heroSlides = () => {
   ]
 }
 
+// I siti mostrati nel carosello: prima quelli in evidenza, poi gli altri.
+const webSites = () => [...byArea('web')].filter((p) => p.web).sort((a, b) => Number(b.featured) - Number(a.featured))
+
+const NUMBERS = ['Zero', 'Un', 'Due', 'Tre', 'Quattro', 'Cinque', 'Sei', 'Sette', 'Otto', 'Nove', 'Dieci']
+const sitesPhrase = (n) => (n === 1 ? 'Un sito' : `${NUMBERS[n] || n} siti`)
+
+// «Qui sotto»: quattro domande che rimandano alle sezioni della pagina.
+const heroDoors = () => {
+  const n = webSites().length
+  return [
+    { href: '#siti', n: '02', text: `${sitesPhrase(n)}, tutti da aprire` },
+    { href: '#web', n: '03', text: 'Si può progettare un sito in scala?' },
+    { href: '#metodo', n: '06', text: 'Cosa succede dopo il primo incontro?' },
+    { href: '#studio', n: '07', text: 'Chi c’è dietro?' },
+  ]
+}
+
 function hero() {
   const slides = heroSlides()
   return html`
     <section class="hero" data-section="Intro" aria-labelledby="hero-title">
+      <div class="hero__glow" aria-hidden="true"></div>
       <div class="hero__lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="container hero__wrap">
-        <div class="hero__meta label" data-reveal="fade">
-          <span>${esc(site.edition)}</span>
-          <span class="hero__meta-mid">${esc(site.location.city)} — Italia</span>
-          <span>${COORDS}</span>
+        <div class="hero__hello" data-reveal="up" style="--d:60ms">
+          <p class="hero__hi">
+            <span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" alt="" decoding="async" fetchpriority="high">${site.availability.open ? '<span class="hero__avatar-dot" aria-hidden="true"></span>' : ''}</span>
+            <span class="hero__hi-text">Ciao, sono</span>
+          </p>
+          <p class="hero__place label">${esc(site.location.city)} — Italia<span class="hero__coords"> · ${COORDS}</span></p>
+          <p class="hero__avail label"><span class="dot${site.availability.open ? ' dot--live' : ''}" aria-hidden="true"></span>${esc(site.availability.label)}</p>
         </div>
 
         <h1 class="hero__title" id="hero-title">
@@ -65,20 +86,31 @@ function hero() {
           </figure>
 
           <div class="hero__pitch">
-            <p class="hero__claim" data-reveal="up" style="--d:300ms">Progetto <em class="serif-i">spazi,</em> strumenti e <em class="serif-i">identità</em> digitali.</p>
-            <p class="hero__lead" data-reveal="up" style="--d:380ms">Diplomato geometra, in provincia di Mantova. Rilevo e disegno edifici, sviluppo siti web, costruisco marchi: con lo stesso metodo e la stessa tolleranza.</p>
+            <p class="hero__claim" data-reveal="up" style="--d:300ms">Disegno case, siti e marchi. Scendi a <em class="serif-i">curiosare.</em></p>
+            <p class="hero__lead" data-reveal="up" style="--d:380ms">Diplomato geometra, vivo a ${esc(site.location.city)}. Rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi: con lo stesso metodo e la stessa cura.</p>
             <div class="hero__actions" data-reveal="up" style="--d:460ms">
-              ${button({ href: '/portfolio/', label: 'Guarda i progetti', size: 'lg', magnetic: true })}
+              ${button({ href: '#discipline', label: 'Comincia da qui', iconName: 'arrowDown', size: 'lg', magnetic: true })}
               ${button({ href: cta.href, label: cta.label, variant: 'ghost', size: 'lg' })}
             </div>
           </div>
         </div>
 
-        <div class="hero__foot label" data-reveal="fade" style="--d:600ms">
-          <span class="hero__avail"><span class="dot${site.availability.open ? ' dot--live' : ''}"></span>${esc(site.availability.label)}</span>
-          <a class="scroll-cue" href="#discipline"><span class="scroll-cue__line" aria-hidden="true"></span><span>Scorri</span></a>
-          <span>Attivo dal ${site.activeSince}</span>
-        </div>
+        <nav class="hero__next" aria-label="Cosa trovi scendendo" data-reveal="up" style="--d:560ms">
+          <p class="hero__next-label label"><span class="scroll-cue__line" aria-hidden="true"></span>Qui sotto</p>
+          <ol class="hero__doors">
+            ${heroDoors().map(
+              (d) => html`
+                <li>
+                  <a class="hero__door" href="${d.href}">
+                    <span class="label hero__door-n">${d.n}</span>
+                    <span class="hero__door-text">${esc(d.text)}</span>
+                    <span class="hero__door-icon" aria-hidden="true">${icon('arrowDown')}</span>
+                  </a>
+                </li>
+              `,
+            )}
+          </ol>
+        </nav>
       </div>
     </section>
   `
@@ -86,7 +118,8 @@ function hero() {
 
 function disciplines() {
   const cards = [
-    { area: serviceAreas[0], count: byArea('tecnico').length, href: '/portfolio/tecnico/', image: { art: 'section', bare: true, tone: 'tint', alt: 'Sezione trasversale di un edificio' } },
+    // niente disegni tecnici in vista: l'area si presenta con l'illustrazione di un suo progetto
+    { area: serviceAreas[0], count: byArea('tecnico').length, href: '/portfolio/tecnico/', image: { ...bySlug('layout-cantiere').cover, alt: 'Illustrazione in assonometria di un cantiere con l’autogru in minio' } },
     { area: serviceAreas[1], count: byArea('web').length, href: '/portfolio/web/', image: { art: 'webpage', site: 'edilcorte', device: 'desktop', tall: false, alt: 'Pagina principale di un sito web' } },
     // La grafica resta una delle tre discipline anche senza progetti pubblicati:
     // finché l'area è nascosta la scheda rimanda ai servizi invece che al portfolio.
@@ -119,59 +152,63 @@ function disciplines() {
   `
 }
 
+// Carosello dei siti: su desktop una griglia ferma, su telefono e tablet
+// una fila che scorre col dito (scroll-snap nativo, vedi initCarousel).
 function selected() {
-  const list = featured()
+  const list = webSites()
+  const allOnline = list.every((p) => p.web.url)
+  const total = String(list.length).padStart(2, '0')
   return html`
-    <section class="hscroll" data-hscroll data-section="Progetti" aria-labelledby="sel-title">
-      <div class="hscroll__sticky">
-        <div class="container hscroll__head">
-          <p class="label"><span class="sec-head__index">02</span>Progetti selezionati</p>
-          <h2 class="h2 hscroll__title" id="sel-title">Lavori <em class="serif-i">scelti</em></h2>
-          <div class="hscroll__tools">
-            <p class="label hscroll__count" aria-hidden="true"><span data-hscroll-current>01</span> / ${String(list.length).padStart(2, '0')}</p>
-            ${textLink({ href: '/portfolio/', label: `Tutti i progetti (${projects.length})` })}
+    <section class="section wsel" id="siti" data-carousel data-section="Siti web" aria-labelledby="sel-title">
+      <div class="container wsel__head">
+        <p class="label" data-reveal="fade"><span class="sec-head__index">02</span>Siti web</p>
+        <h2 class="h2 wsel__title" id="sel-title" data-reveal="up">${sitesPhrase(list.length)}${allOnline ? ', <em class="serif-i">tutti online</em>' : ''}</h2>
+        <div class="wsel__aside">
+          ${figurina('computer-siti', { className: 'wsel__fig' })}
+          <p class="wsel__lead" data-reveal="up">Progettati e scritti a mano, dal primo schizzo alla messa online. Sono tutti pubblicati: puoi aprirli e provarli davvero.</p>
+          <div class="wsel__tools" data-reveal="fade">${textLink({ href: '/portfolio/web/', label: 'Tutti i progetti web' })}</div>
+        </div>
+      </div>
+      <div class="wsel__viewport" data-carousel-viewport tabindex="-1" role="region" aria-label="Siti web">
+        <div class="wsel__track">
+          ${list.map((p, i) => siteCard(p, i))}
+          <div class="wcard wcard--end" data-carousel-item>
+            <a class="wcard__all" href="/portfolio/" data-cursor="Vai">
+              <span class="label">Non solo siti</span>
+              <span class="h3">Strade, edifici, cantieri: i progetti tecnici</span>
+              <span class="wcard__all-foot"><span class="label">Tutti i progetti (${projects.length})</span>${icon('arrow')}</span>
+            </a>
           </div>
         </div>
-        <div class="hscroll__viewport" data-hscroll-viewport tabindex="0" role="region" aria-label="Progetti selezionati, scorrimento orizzontale">
-          <div class="hscroll__track" data-hscroll-track>
-            ${list.map((p, i) => featureCard(p, i, list.length))}
-            <div class="fcard fcard--end">
-              <a class="fcard__all" href="/portfolio/" data-cursor="Vai">
-                <span class="label">Indice completo</span>
-                <span class="h2">${projects.length} progetti</span>
-                <span class="fcard__all-icon">${icon('arrow')}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="container hscroll__bar" aria-hidden="true"><span data-hscroll-bar></span></div>
+      </div>
+      <div class="container wsel__foot">
+        <div class="wsel__bar" aria-hidden="true"><span data-carousel-bar></span></div>
+        <p class="label wsel__count" aria-hidden="true"><span data-carousel-current>01</span> / ${total}</p>
+        <button class="wsel__btn" type="button" data-carousel-prev aria-label="Sito precedente" disabled>${icon('arrowLeft')}</button>
+        <button class="wsel__btn" type="button" data-carousel-next aria-label="Sito successivo">${icon('arrow')}</button>
       </div>
     </section>
   `
 }
 
+// Come si lavora sul web: solo testo. I siti veri sono già nel carosello qui sopra.
 function webTeaser() {
-  const p = bySlug('cascina-fontana')
   return html`
-    <section class="section webt" data-theme="ink" data-section="Web">
+    <section class="section webt" id="web" data-theme="ink" data-section="Web">
       <div class="container webt__grid">
         <div class="webt__copy">
           <p class="label" data-reveal="fade"><span class="sec-head__index">03</span>Web design e sviluppo</p>
           <h2 class="h1 webt__title" data-reveal="words">${splitWords('Anche un sito si progetta in scala.', { accent: ['scala.'] })}</h2>
+          ${figurina('computer-postazione', { className: 'webt__desk' })}
+        </div>
+        <div class="webt__side">
           <p class="lead" data-reveal="up">Struttura prima dell’estetica, contenuti veri prima dei layout, prestazioni misurate. Scrivo il codice a mano: niente temi, niente page builder.</p>
           <ul class="webt__points" data-reveal="up">
-            <li><span class="label">01</span>Mobile progettato a parte, non ridotto</li>
-            <li><span class="label">02</span>HTML semantico, accessibile da tastiera</li>
-            <li><span class="label">03</span>Dominio, hosting e sorgenti intestati a te</li>
+            <li><span class="label">01</span><span>Mobile progettato a parte, non ridotto</span>${figurina('computer-mobile', { className: 'webt__fig' })}</li>
+            <li><span class="label">02</span><span>HTML semantico, accessibile da tastiera</span>${figurina('computer-tastiera', { className: 'webt__fig' })}</li>
+            <li><span class="label">03</span><span>Dominio, hosting e sorgenti intestati a te</span>${figurina('computer-dominio', { className: 'webt__fig' })}</li>
           </ul>
-          <div data-reveal="up">${button({ href: '/portfolio/web/', label: 'Progetti web', variant: 'light' })}</div>
-        </div>
-        <div class="webt__visual" data-reveal="up">
-          <div class="webt__stage">
-            ${deviceMockup('laptop', { domain: p.web.domain, screen: p.web.desktop, tall: p.web.desktopTall, className: 'webt__laptop' })}
-            ${deviceMockup('phone', { domain: p.web.domain, screen: p.web.mobile, tall: p.web.mobileTall, className: 'webt__phone' })}
-          </div>
-          <p class="label webt__caption"><span>${esc(p.web.domain)} · ${p.year}</span><span class="hint-hover">Passa il puntatore per scorrere la pagina</span><span class="hint-touch">Tocca lo schermo per scorrere la pagina</span></p>
+          <div data-reveal="up">${textLink({ href: '/servizi/#digitale', label: 'I servizi web' })}</div>
         </div>
       </div>
     </section>
@@ -225,7 +262,7 @@ function numbers() {
 
 function method() {
   return html`
-    <section class="section mth" data-section="Metodo">
+    <section class="section mth" id="metodo" data-section="Metodo">
       <div class="container">
         ${sectionHead({ index: '06', label: 'Metodo di lavoro', title: 'Sette fasi, sempre le stesse', lead: 'Dal primo incontro all’assistenza dopo la consegna: sai sempre a che punto siamo e cosa succede dopo.', link: { href: '/metodo/', label: 'Il metodo nel dettaglio' } })}
         <div class="mth__scroll" role="region" aria-label="Le sette fasi del metodo" data-scroll-region data-reveal="fade">
@@ -234,6 +271,7 @@ function method() {
               (s, i) => html`
                 <li class="mth__step" style="--i:${i}">
                   <span class="mth__node" aria-hidden="true"></span>
+                  ${figurina(figName('metodo', s.key), { className: 'mth__fig' })}
                   <span class="mth__n">${s.n}</span>
                   <span class="mth__title">${esc(s.title)}</span>
                   <span class="mth__time label">${esc(s.time)}</span>
@@ -249,7 +287,7 @@ function method() {
 
 function studio() {
   return html`
-    <section class="section std" data-section="Studio">
+    <section class="section std" id="studio" data-section="Studio">
       <div class="container std__grid">
         <div class="std__photo">${media(photos.portrait, { ratio: '4/5', marks: true, parallax: true })}</div>
         <div class="std__copy">

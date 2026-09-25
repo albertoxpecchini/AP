@@ -1400,3 +1400,18 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
     color: var(--accent-text);
   }
 }
+
+/* ── Figurine ─────────────────────────────────────────────────────────────── */
+/* Illustrazioni scontornate (tools/figurine), sempre decorative. Il bordo
+   chiaro sagomato è nel file: sulla carta sparisce, sul fondo scuro le fa
+   sembrare adesivi. */
+
+.fig {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}

@@ -10,7 +10,7 @@
 //
 // Tutto lo stato vive nella pagina e nel localStorage di questo browser (bozza
 // corrente, bozze salvate, preferiti, indirizzi nuovi, chiave di accesso).
-// L'unica chiamata di rete verso terzi è /api/email-ai, che parla con Claude.
+// L'unica chiamata di rete verso terzi è /api/email-ai, che parla con Granite.
 
 import { $, $$, announce } from './utils.js'
 import { renderEmailHtml } from '../../tools/email-generator/src/template.js'
@@ -23,8 +23,13 @@ import { formatDateIt, todayIso, slugify } from '../../tools/email-generator/src
 import archivoUrl from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url'
 
 const API = '/api/email-ai'
-const LS = { key: 'ap:email:key', draft: 'ap:email:draft', fav: 'ap:email:fav', contacts: 'ap:email:contacts', drafts: 'ap:email:drafts' }
-const PRICE = { input: 4 / 1e6, output: 20 / 1e6 } // dollari per token, Claude Opus 5.5
+// Sul dev server di questo computer (`npm run dev`) la chiave di accesso la
+// aggiunge il server stesso (plugins/api-dev.js): la pagina non la chiede.
+const LOCAL_DEV = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
+const keyHeader = (key) => (key ? { 'X-Email-Key': key } : {})
+const LS = { key: 'ap:email:key', draft: 'ap:email:draft', fav: 'ap:email:fav', contacts: 'ap:email:contacts', drafts: 'ap:email:drafts', usage: 'ap:email:usage', limits: 'ap:email:limits' }
+const USAGE_MAX = 500 // richieste tenute nel registro dei consumi
+const USAGE_ROWS = 30 // righe mostrate nella tabella
 const GMAIL_CLIP_BYTES = 102 * 1024
 
 const STATUS_LABEL = {
@@ -72,6 +77,11 @@ const AI_LABELS = {
   oggetto: 'Proponi oggetti',
   giudizio: 'Giudizio',
 }
+
+const EFFORT_LABEL = { low: 'Rapido', medium: 'Normale', high: 'Accurato' }
+
+// Fasi di una richiesta a Claude Code, come le riporta la funzione in streaming.
+const PHASES = { avvio: 'Claude Code si avvia', richiesta: 'richiesta inviata, attesa del modello', ragiona: 'Claude ragiona', scrive: 'Claude scrive la risposta' }
 
 // ── Destinatari e righe ──────────────────────────────────────────────────────
 
@@ -269,6 +279,10 @@ export function initEmail() {
     accessText: $('[data-em-access-text]', root),
     accessForm: $('[data-em-access-form]', root),
     accessInput: $('[data-em-access-input]', root),
+    usageRows: $('[data-em-usage-rows]', root),
+    limits: $('[data-em-limits]', root),
+    limitsAt: $('[data-em-limits-at]', root),
+    limitsNote: $('[data-em-limits-note]', root),
   }
 
   const state = { sender: data.senders[0]?.key, tone: 'professionale', to: '', cc: '', bcc: '', subject: '', body: '', links: '', attachments: '', signature: true }
@@ -277,6 +291,10 @@ export function initEmail() {
   let favs = new Set(store.get(LS.fav, []))
   let aiProposal = null
   let aiBusy = false
+  let aiProvider = ''
+  let live = null
+  let usage = store.get(LS.usage, []).filter((e) => e && e.t)
+  let limits = store.get(LS.limits, null)
   let saveTimer = null
   let frameTimer = null
   let current = null
@@ -957,7 +975,7 @@ export function initEmail() {
     if (aiBusy || !AI_LABELS[action]) return
     readFields()
     const key = store.get(LS.key, '')
-    if (!key) {
+    if (!key && !LOCAL_DEV) {
       setAiStatus('Serve la chiave di accesso: inseriscila nel riquadro in cima alla pagina.', 'error')
       showAccessForm(true)
       return
@@ -983,32 +1001,281 @@ export function initEmail() {
     const button = $(`[data-em-ai="${action}"]`, els.ai)
     button?.classList.add('is-busy')
     const started = Date.now()
-    const tick = setInterval(() => setAiStatus(`${AI_LABELS[action]}: l’IA sta lavorando… ${Math.round((Date.now() - started) / 1000)} s`), 1000)
+    // La richiesta in corso è la prima riga del registro dei consumi, aggiornata
+    // dagli eventi che Claude Code manda mentre lavora.
+    live = { t: started, action, effort: payload.effort, phase: '', thinking: 0, output: 0 }
+    const showLive = () => {
+      setAiStatus(liveText(live))
+      renderUsageLog()
+    }
+    const tick = setInterval(showLive, 1000)
     setAiStatus(`${AI_LABELS[action]}: invio…`)
+    renderUsageLog()
     try {
-      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Email-Key': key }, body: JSON.stringify(payload) })
-      const json = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(json.error || `Errore ${res.status}`)
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/x-ndjson, application/json', ...keyHeader(key) },
+        body: JSON.stringify(payload),
+      })
+      const streamed = /ndjson/.test(res.headers.get('content-type') || '')
+      const json = streamed
+        ? await readStream(res, (event) => {
+            if (event.type === 'limits') mergeLimits(event.limits)
+            if (event.type === 'progress') {
+              Object.assign(live, { phase: event.phase, thinking: event.thinking, output: event.output })
+              showLive()
+            }
+          })
+        : await res.json().catch(() => ({}))
+      if (!res.ok || !json?.ok) throw new Error(json?.error || `Errore ${res.status}`)
+      logUsage({ ok: true, ms: Date.now() - started, model: json.model, ...json.usage })
+      if (json.limits) mergeLimits(json.limits)
       aiProposal = { action, ...json.result }
       renderAi(json)
       const secs = Math.round((Date.now() - started) / 10) / 100
       setAiStatus(`${AI_LABELS[action]}: pronto in ${secs.toLocaleString('it-IT')} s. Leggi la proposta e applicala se ti convince.`, 'ok')
     } catch (error) {
-      setAiStatus(error instanceof TypeError ? 'Funzione /api/email-ai non raggiungibile: online funziona su Vercel; in locale serve «vercel dev».' : String(error.message || error), 'error')
+      const message = error instanceof TypeError ? 'Funzione /api/email-ai non raggiungibile: online funziona su Vercel; in locale avvia «npm run dev».' : String(error.message || error)
+      logUsage({ ok: false, ms: Date.now() - started, error: message })
+      setAiStatus(message, 'error')
     } finally {
       clearInterval(tick)
+      live = null
+      renderUsageLog()
       aiBusy = false
       els.ai.classList.remove('is-busy')
       button?.classList.remove('is-busy')
     }
   }
 
+  /** Legge una risposta NDJSON: gli eventi intermedi a onEvent, l'ultimo (done/error) come esito. */
+  async function readStream(res, onEvent) {
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    let final = null
+    const take = (line) => {
+      if (!line.trim()) return
+      const event = JSON.parse(line)
+      if (event.type === 'done' || event.type === 'error') final = event
+      else onEvent(event)
+    }
+    for (;;) {
+      const { value, done } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      let nl
+      while ((nl = buffer.indexOf('\n')) >= 0) {
+        take(buffer.slice(0, nl))
+        buffer = buffer.slice(nl + 1)
+      }
+    }
+    take(buffer)
+    return final || { ok: false, error: 'La risposta si è interrotta prima della fine.' }
+  }
+
+  // ── Consumi dell'IA ──────────────────────────────────────────────────────
+  // Registro delle richieste (in questo browser), contatori per periodo e
+  // limiti dell'abbonamento Claude: dal comando /usage all'apertura e ogni
+  // minuto, dall'evento che accompagna ogni richiesta mentre Claude lavora.
+
+  function liveText(l) {
+    const secs = Math.round((Date.now() - l.t) / 1000)
+    const parts = [`${AI_LABELS[l.action]}: ${PHASES[l.phase] || 'l’IA sta lavorando'}… ${secs} s`]
+    if (l.thinking) parts.push(`≈ ${num.format(l.thinking)} token di ragionamento`)
+    if (l.output) parts.push(`≈ ${num.format(l.output)} token di risposta`)
+    return parts.join(' · ')
+  }
+
+  function logUsage(entry) {
+    const { action, effort } = live || {}
+    usage.push({ t: live?.t || Date.now(), action, effort, model: '', input: 0, output: 0, reasoning: 0, apiValue: null, cost: null, ...entry })
+    usage = usage.slice(-USAGE_MAX)
+    store.set(LS.usage, usage)
+    renderUsageStats()
+  }
+
+  const usageRange = () => $('input[name="em-usage-range"]:checked', root)?.value || 'today'
+  const sameDay = (a, b) => new Date(a).toDateString() === new Date(b).toDateString()
+  const dur = (ms) => `${(ms / 1000).toLocaleString('it-IT', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`
+  const usd = (v, digits = 2) => v.toLocaleString('it-IT', { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits })
+
+  function renderUsageStats() {
+    const now = Date.now()
+    const range = usageRange()
+    const list = usage.filter((e) => (range === 'today' ? sameDay(e.t, now) : range === 'week' ? now - e.t < 7 * 864e5 : true))
+    const ok = list.filter((e) => e.ok)
+    const sum = (key, from = list) => from.reduce((n, e) => n + (Number(e[key]) || 0), 0)
+    const errors = list.length - ok.length
+    const values = list.filter((e) => typeof e.apiValue === 'number')
+    const paid = sum('cost')
+    const set = (key, value, note) => {
+      $(`[data-em-usage-stat="${key}"]`, root).textContent = value
+      $(`[data-em-usage-note="${key}"]`, root).textContent = note
+    }
+    set('requests', num.format(list.length), errors ? `di cui ${num.format(errors)} con errore` : 'nessun errore')
+    set('input', num.format(sum('input')), 'prompt, istruzioni e testo')
+    set('output', num.format(sum('output')), `di cui ${num.format(sum('reasoning'))} di ragionamento`)
+    set('time', ok.length ? dur(sum('ms', ok) / ok.length) : '—', `totale ${dur(sum('ms'))}`)
+    if (values.length) set('value', usd(sum('apiValue', values)), paid ? `speso davvero ${usd(paid, 4)}` : 'stima a prezzi API: con l’abbonamento non si paga')
+    else set('value', paid ? usd(paid, 4) : usd(0), paid ? 'speso sul fornitore' : 'nessun costo registrato')
+    renderUsageLog()
+  }
+
+  function renderUsageLog() {
+    const now = Date.now()
+    const when = (t) =>
+      sameDay(t, now)
+        ? new Date(t).toLocaleTimeString('it-IT')
+        : new Date(t).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+    const cell = (v, cls = '') => `<td${cls ? ` class="${cls}"` : ''}>${v}</td>`
+    const rows = usage
+      .slice(-USAGE_ROWS)
+      .reverse()
+      .map((e) =>
+        [
+          `<tr class="${e.ok ? '' : 'is-error'}">`,
+          cell(esc(when(e.t))),
+          cell(esc(AI_LABELS[e.action] || e.action || '—')),
+          cell(esc(EFFORT_LABEL[e.effort] || '—')),
+          cell(esc(String(e.model || '—').replace(/ · .*$/, ''))),
+          cell(dur(e.ms || 0), 'num'),
+          cell(e.ok ? num.format(e.input) : '—', 'num'),
+          cell(e.ok ? num.format(e.output) : '—', 'num'),
+          cell(e.ok ? num.format(e.reasoning) : '—', 'num'),
+          cell(typeof e.apiValue === 'number' ? usd(e.apiValue, 4) : typeof e.cost === 'number' ? usd(e.cost, 4) : '—', 'num'),
+          cell(e.ok ? 'ok' : `<span title="${esc(e.error)}">${esc(String(e.error || 'errore').slice(0, 60))}</span>`),
+          '</tr>',
+        ].join(''),
+      )
+    if (live) {
+      rows.unshift(
+        [
+          '<tr class="is-live">',
+          cell('<span class="dot em-busy-dot"></span>adesso'),
+          cell(esc(AI_LABELS[live.action])),
+          cell(esc(EFFORT_LABEL[live.effort] || '—')),
+          cell('…'),
+          cell(dur(now - live.t), 'num'),
+          cell('…', 'num'),
+          cell(live.output ? `≈ ${num.format(live.output)}` : '…', 'num'),
+          cell(live.thinking ? `≈ ${num.format(live.thinking)}` : '…', 'num'),
+          cell('…', 'num'),
+          cell(esc({ richiesta: 'attesa', ragiona: 'ragiona', scrive: 'scrive' }[live.phase] || 'in corso')),
+          '</tr>',
+        ].join(''),
+      )
+    }
+    els.usageRows.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="10" class="em-table__empty">Nessuna richiesta registrata in questo browser.</td></tr>'
+  }
+
+  function exportUsage() {
+    if (!usage.length) return setAiStatus('Il registro dei consumi è vuoto.', 'error')
+    const dec = (v, d) => (typeof v === 'number' ? v.toFixed(d).replace('.', ',') : '')
+    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+    const head = ['data e ora', 'azione', 'sforzo', 'modello', 'durata (s)', 'token in', 'token out', 'di cui ragionamento', 'valore API (USD)', 'costo (USD)', 'esito']
+    const lines = usage.map((e) =>
+      [new Date(e.t).toLocaleString('it-IT'), AI_LABELS[e.action] || e.action, EFFORT_LABEL[e.effort] || '', e.model, dec((e.ms || 0) / 1000, 1), e.input, e.output, e.reasoning, dec(e.apiValue, 4), dec(e.cost, 4), e.ok ? 'ok' : e.error]
+        .map(q)
+        .join(';'),
+    )
+    // BOM e punto e virgola: Excel in italiano apre il file senza chiedere nulla.
+    download(`consumi-ia-${todayIso()}.csv`, `﻿${[head.map(q).join(';'), ...lines].join('\r\n')}`, 'text/csv;charset=utf-8')
+  }
+
+  function clearUsage() {
+    if (!usage.length || !confirm('Azzerare il registro dei consumi di questo browser? I limiti dell’abbonamento non cambiano.')) return
+    usage = []
+    store.set(LS.usage, usage)
+    renderUsageStats()
+  }
+
+  function mergeLimits(next) {
+    if (!next?.windows) return
+    const map = new Map((limits?.windows || []).map((w) => [w.key, w]))
+    for (const w of next.windows) map.set(w.key, w)
+    const order = (key) => ['five_hour', 'seven_day'].indexOf(key) + 1 || 9
+    limits = { ...limits, ...next, windows: [...map.values()].sort((a, b) => order(a.key) - order(b.key)) }
+    store.set(LS.limits, limits)
+    renderLimits()
+  }
+
+  function resetText(isoDate) {
+    const d = new Date(isoDate)
+    const hm = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+    if (sameDay(d, Date.now())) return `alle ${hm}`
+    if (sameDay(d, Date.now() + 864e5)) return `domani alle ${hm}`
+    return `${d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })} alle ${hm}`
+  }
+
+  function renderLimits() {
+    const windows = limits?.windows || []
+    if (!windows.length) {
+      els.limits.innerHTML = ''
+      els.limitsAt.textContent = '—'
+      els.limitsNote.textContent =
+        aiProvider === 'claude-code' ? 'Limiti dell’abbonamento non ancora letti: premi «Aggiorna limiti».' : 'I limiti dell’abbonamento compaiono qui quando l’IA è Claude Code (in locale, con npm run dev).'
+      return
+    }
+    els.limits.innerHTML = windows
+      .map(
+        (w) => `<div class="em-gauge${w.pct >= 80 ? ' is-high' : ''}">
+          <div class="em-gauge__head"><span class="label">${esc(w.label)}</span><span class="label">${w.pct}% usato</span></div>
+          <div class="em-gauge__bar"><span class="em-gauge__fill" style="width:${Math.min(100, Math.max(0, w.pct))}%"></span></div>
+          <p class="em-gauge__note">${w.resetsAt ? `Si azzera ${esc(resetText(w.resetsAt))}.` : ''}</p>
+        </div>`,
+      )
+      .join('')
+    const at = new Date(limits.at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    els.limitsAt.textContent = `Limiti letti alle ${at}${limits.source === 'richiesta' ? ' (dall’ultima richiesta)' : ''}`
+    els.limitsNote.textContent =
+      limits.status === 'rejected'
+        ? 'Limite raggiunto: le richieste a Claude sono ferme fino all’azzeramento.'
+        : limits.status === 'allowed_warning'
+          ? 'Sei vicino al limite dell’abbonamento.'
+          : 'Sessione e settimana sono condivise con Claude Code e claude.ai: contano anche le altre sessioni aperte.'
+  }
+
+  let limitsBusy = false
+  async function refreshLimits(manual = false) {
+    if (aiProvider !== 'claude-code' || limitsBusy) return
+    limitsBusy = true
+    const chipEl = $('[data-em-limits-refresh]', root)
+    if (manual && chipEl) chipEl.textContent = 'Aggiorno…'
+    try {
+      const res = await fetch(`${API}?limiti=1`, { headers: keyHeader(store.get(LS.key, '')) })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json.ok) throw new Error(json.error || `Errore ${res.status}`)
+      mergeLimits(json.limits)
+    } catch (error) {
+      if (manual) setAiStatus(`Limiti non aggiornati: ${error.message || error}`, 'error')
+    } finally {
+      limitsBusy = false
+      if (chipEl) chipEl.textContent = 'Aggiorna limiti'
+    }
+  }
+
+  // Ogni minuto, solo con la scheda in vista e nessuna richiesta in corso.
+  let limitsWatched = false
+  function watchLimits() {
+    if (aiProvider !== 'claude-code') return
+    refreshLimits()
+    if (limitsWatched) return
+    limitsWatched = true
+    setInterval(() => document.visibilityState === 'visible' && !aiBusy && refreshLimits(), 60_000)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && Date.now() - new Date(limits?.at || 0) > 60_000) refreshLimits()
+    })
+  }
+
   function renderAi({ result, usage, model }) {
     els.aiResult.hidden = false
     els.aiAction.textContent = AI_LABELS[aiProposal.action]
     if (usage) {
-      const cost = usage.input * PRICE.input + usage.output * PRICE.output
-      els.aiUsage.textContent = `${num.format(usage.input)} token in · ${num.format(usage.output)} out · ≈ ${cost.toLocaleString('it-IT', { style: 'currency', currency: 'USD', minimumFractionDigits: 3, maximumFractionDigits: 3 })}`
+      // Il costo lo dà il fornitore (OpenRouter); in locale è zero; con
+      // l'abbonamento Claude la funzione manda una nota al posto del prezzo.
+      const cost = usage.note ? usage.note : usage.cost === 0 ? 'gratis' : typeof usage.cost === 'number' ? `≈ ${usage.cost.toLocaleString('it-IT', { style: 'currency', currency: 'USD', minimumFractionDigits: 4, maximumFractionDigits: 4 })}` : ''
+      els.aiUsage.textContent = [`${num.format(usage.input)} token in`, `${num.format(usage.output)} out`, usage.reasoning ? `di cui ${num.format(usage.reasoning)} di ragionamento` : '', cost].filter(Boolean).join(' · ')
     } else els.aiUsage.textContent = ''
     if (model) els.aiModel.textContent = model
     const score = Number(result.score)
@@ -1058,24 +1325,27 @@ export function initEmail() {
 
   async function checkAccess() {
     const key = store.get(LS.key, '')
-    if (!key) {
+    if (!key && !LOCAL_DEV) {
       setAccess('warn', 'Chiave di accesso mancante: l’IA resta spenta, tutto il resto funziona.')
       showAccessForm(true)
       return
     }
     setAccess('', 'Controllo del collegamento…')
     try {
-      const res = await fetch(API, { headers: { 'X-Email-Key': key } })
+      const res = await fetch(API, { headers: keyHeader(key) })
       const json = await res.json().catch(() => ({}))
       if (res.ok) {
-        setAccess(json.configured ? 'ok' : 'warn', json.configured ? `IA collegata · ${json.model}` : 'Chiave giusta, ma sul server manca ANTHROPIC_API_KEY.')
+        setAccess(json.configured ? 'ok' : 'warn', json.configured ? `IA collegata · ${json.model}` : 'Chiave giusta, ma sul server manca EMAIL_AI_API_KEY.')
         if (json.model) els.aiModel.textContent = json.model
+        aiProvider = json.provider || ''
+        renderLimits()
+        watchLimits()
       } else if (res.status === 401) {
         setAccess('warn', 'Chiave di accesso errata: controlla il link.')
         showAccessForm(true)
       } else setAccess('warn', json.error || `Servizio IA non disponibile (${res.status}).`)
     } catch {
-      setAccess('warn', 'Funzione /api/email-ai non raggiungibile: online funziona su Vercel; in locale serve «vercel dev».')
+      setAccess('warn', 'Funzione /api/email-ai non raggiungibile: online funziona su Vercel; in locale avvia «npm run dev».')
     }
   }
 
@@ -1260,6 +1530,9 @@ export function initEmail() {
       return
     }
     if (t.dataset.emAiApply) return applyAi(t.dataset.emAiApply)
+    if ('emLimitsRefresh' in t.dataset) return refreshLimits(true)
+    if ('emUsageCsv' in t.dataset) return exportUsage()
+    if ('emUsageClear' in t.dataset) return clearUsage()
     if ('emAccessEdit' in t.dataset) return showAccessForm(els.accessForm.hidden)
     if ('emContactsExport' in t.dataset) return exportContacts()
     if (t.dataset.pickSubject !== undefined) {
@@ -1287,6 +1560,7 @@ export function initEmail() {
   els.form.addEventListener('change', update)
   $$('input[name="mittente"]', root).forEach((r) => r.addEventListener('change', update))
   $$('input[name="em-view"]', root).forEach((r) => r.addEventListener('change', () => showView(currentView())))
+  $$('input[name="em-usage-range"]', root).forEach((r) => r.addEventListener('change', renderUsageStats))
   els.search.addEventListener('input', renderContacts)
   els.contactForm.addEventListener('submit', addContact)
   $('[data-em-contacts-import]', root).addEventListener('change', (e) => {
@@ -1325,6 +1599,8 @@ export function initEmail() {
   showView(currentView())
   update()
   els.autosave.textContent = 'Bozza salvata in automatico'
+  renderUsageStats()
+  renderLimits()
   initAccess()
   loadFont()
 }

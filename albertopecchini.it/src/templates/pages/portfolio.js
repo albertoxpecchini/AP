@@ -2,7 +2,7 @@ import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
 import { projects, categories, areas, byArea, years, sectors, technologies, types, bySlug } from '../../data/projects.js'
 import { BRANDS } from '../../art/brand.js'
-import { button, textLink, media, deviceStage, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark } from '../components/ui.js'
+import { button, textLink, media, deviceStage, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark, figurina } from '../components/ui.js'
 import { projectCard, projectHref, filterAttrs } from '../components/project.js'
 
 // Ritmo della griglia: larghezze in dodicesimi, ripetute ogni sei card.
@@ -15,13 +15,16 @@ const sampleLegend = () =>
     ? `<p class="legend label"><span class="sample" aria-hidden="true">◇</span> I progetti contrassegnati sono dimostrativi: mostrano come presento un lavoro di quel tipo.</p>`
     : ''
 
-function pageHead({ crumbs, index, label, title, accent = [], lead, meta }) {
+// `fig`: nome di una figurina da mettere accanto al titolo (vedi figurina() in ui.js)
+function pageHead({ crumbs, index, label, title, accent = [], lead, meta, fig }) {
+  const h1 = `<h1 class="phead__title" data-reveal="words">${splitWords(title, { accent })}</h1>`
+  const art = fig ? figurina(fig, { className: 'phead__fig', lazy: false }) : ''
   return html`
     <header class="phead">
       <div class="container">
         ${breadcrumb(crumbs)}
         <div class="phead__top label" data-reveal="fade"><span><span class="sec-head__index">${index}</span>${esc(label)}</span><span>${esc(meta)}</span></div>
-        <h1 class="phead__title" data-reveal="words">${splitWords(title, { accent })}</h1>
+        ${art ? `<div class="phead__row">${h1}${art}</div>` : h1}
         <div class="rule rule--ticks" aria-hidden="true"></div>
         <p class="phead__lead lead" data-reveal="up">${esc(lead)}</p>
       </div>
@@ -230,6 +233,7 @@ export function webPage() {
         accent: ['aggiornano.'],
         lead: 'Ogni progetto parte da un problema concreto e finisce online: qui trovi obiettivo, soluzione, tecnologie e — quando il sito è pubblico — il link per provarlo.',
         meta: `${count(list.length)} progetti · ${count(list.filter((p) => p.web?.url).length)} online`,
+        fig: 'computer-codice',
       })}
 
       <section class="webl">

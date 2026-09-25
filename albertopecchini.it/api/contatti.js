@@ -179,7 +179,7 @@ async function sendEmail(d, meta) {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from: process.env.CONTACT_FROM || 'Sito albertopecchini.it <onboarding@resend.dev>',
+      from: process.env.CONTACT_FROM || 'Sito Alberto Pecchini <onboarding@resend.dev>',
       to: [to],
       // Rispondere alla notifica scrive direttamente a chi ha compilato il modulo.
       reply_to: `${d.nome} <${d.email}>`,

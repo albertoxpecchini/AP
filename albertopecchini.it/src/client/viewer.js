@@ -4,7 +4,8 @@
 // frecce per cambiare tavola (o per spostarti, quando la tavola è ingrandita),
 // + e − per lo zoom, F o 0 per adattarla allo schermo.
 //
-// Il foglio è un <img> dentro .viewer__sheet. Durante i gesti si muove solo con
+// Il foglio è un <img> dentro .viewer__sheet; per le tavole DWG sono due canvas
+// disegnati da src/client/dwg-sheet.js leggendo il file DWG. Durante i gesti si muove solo con
 // transform, che la GPU applica senza ridisegnare; quando la vista si ferma il
 // foglio prende la misura vera (width/height) e il browser ridisegna l'SVG
 // nitido a quella scala. Prima che l'SVG arrivi si vede la miniatura WebP.
@@ -14,6 +15,7 @@
 // nella pagina /portfolio/tavole/, il visualizzatore prende tutti i gesti.
 
 import { $, $$, clamp, reducedMotion, lockPage, trapFocus, announce } from './utils.js'
+import { createDwgLayer } from './dwg-sheet.js'
 
 const SETTLE_MS = 180 // quanto dopo l'ultimo movimento la vista si considera ferma
 const BASE = 1000 // larghezza del foglio a zoom 1, in px CSS
@@ -78,6 +80,7 @@ function setup(root) {
   const view = { x: 0, y: 0, z: 1 }
   const target = { x: 0, y: 0, z: 1 }
   let raf = null
+  let dwg = null // la tavola DWG corrente, se il foglio viene da un DWG
   let pending = null
   let lastT = 0
   let settleTimer = 0
@@ -117,10 +120,14 @@ function setup(root) {
     apply()
   }
 
+  // a vista ferma la tavola DWG ridisegna la parte visibile alla scala vera
+  const renderDwg = () => dwg?.render({ x: view.x, y: view.y, w: base.w * zc, h: base.h * zc, sw, sh })
+
   const settle = () => {
     moving = false
     root.classList.remove('is-moving')
     commit()
+    renderDwg()
   }
 
   let applied = ''
@@ -232,6 +239,15 @@ function setup(root) {
   const loadFull = (s) => {
     const mine = ++token
     $$('.viewer__img--full', sheetEl).forEach((img) => img.remove())
+    dwg?.destroy()
+    dwg = null
+    if (s.dwg) {
+      // la tavola si legge dal DWG: il worker lo decodifica, i canvas la disegnano
+      const layer = createDwgLayer(sheetEl, s, { onStatus: (t) => mine === token && setStatus(t) })
+      dwg = layer
+      layer.ready.then(() => mine === token && renderDwg())
+      return
+    }
     if (s.src === s.thumb) return setStatus('')
     setStatus('Carico il disegno…', 250)
     const img = new Image()

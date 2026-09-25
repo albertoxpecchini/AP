@@ -103,6 +103,29 @@
 .viewer__img--full.is-in {
   opacity: 1;
 }
+/* Tavole DWG: la base copre tutto il foglio, il dettaglio solo la parte
+   visibile (misure in % del foglio, così seguono lo zoom senza ridisegnare) */
+.viewer__dwg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--t-2) ease;
+}
+.viewer__dwg.is-in,
+.viewer__dwg--detail {
+  opacity: 1;
+}
+.viewer__dwg--detail {
+  inset: auto;
+  transition: none;
+}
+.viewer__dwg[hidden] {
+  display: none;
+}
 
 .viewer__status,
 .viewer__hint {

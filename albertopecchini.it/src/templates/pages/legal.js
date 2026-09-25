@@ -4,7 +4,8 @@
 
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
-import { button, breadcrumb, monogram, splitWords } from '../components/ui.js'
+import { button, breadcrumb, monogram, splitWords, figurina } from '../components/ui.js'
+import { crediti } from '../../data/crediti.js'
 
 const updated = () => new Date(site.legal.updated).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
 
@@ -104,6 +105,16 @@ export function cookiePage() {
   })
 }
 
+export function creditiPage() {
+  return legalShell({
+    crumb: 'Crediti',
+    href: '/crediti/',
+    title: 'Crediti e fonti delle immagini',
+    intro: crediti.intro,
+    sections: crediti.sections,
+  })
+}
+
 // ── 404 ──────────────────────────────────────────────────────────────────────
 
 export function notFoundPage() {
@@ -130,6 +141,7 @@ export function notFoundPage() {
           <li><a href="/servizi/">Servizi</a></li><li><a href="/studio/">Studio</a></li><li><a href="/metodo/">Metodo</a></li><li><a href="/contatti/">Contatti</a></li>
         </ul>
         <div class="nf__mark">${monogram()}</div>
+        ${figurina('404', { className: 'nf__fig', lazy: false })}
       </div>
     </section>
   `

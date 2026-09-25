@@ -72,6 +72,15 @@ const STATS = [
   ['recipients', 'Destinatari', 'A, Cc e Ccn'],
 ]
 
+// Contatori dei consumi dell'IA: i valori li scrive src/client/email.js.
+const USAGE_STATS = [
+  ['requests', 'Richieste'],
+  ['input', 'Token in'],
+  ['output', 'Token out'],
+  ['time', 'Tempo medio'],
+  ['value', 'Valore a prezzi API'],
+]
+
 const VIEWS = [
   ['html', 'Email HTML'],
   ['text', 'email.txt'],
@@ -276,7 +285,7 @@ export function emailPage() {
 
         <!-- 04 · IA -->
         <section class="em-block" id="ia" aria-labelledby="em-h-ia">
-          ${blockHead('04', 'Migliora con l’intelligenza artificiale', '<p class="label" data-em-ai-model>Claude Opus 5.5</p>')}
+          ${blockHead('04', 'Migliora con l’intelligenza artificiale', '<p class="label" data-em-ai-model>Granite 4.2 8B</p>')}
           <h2 class="sr-only" id="em-h-ia">Intelligenza artificiale</h2>
           <div class="em-ai">
             <div class="em-ai__actions" role="group" aria-label="Azioni">
@@ -320,6 +329,59 @@ export function emailPage() {
                 ${chip('Solo il testo', 'data-em-ai-apply="body"')}
                 ${chip('Scarta', 'data-em-ai-apply="discard"')}
               </div>
+            </div>
+          </div>
+
+          <div class="em-usage" data-em-usage>
+            <div class="em-usage__head">
+              <p class="label em-usage__title">Consumi dell’IA</p>
+              <p class="label" data-em-limits-at>—</p>
+            </div>
+            <div class="em-gauges em-gauges--limits" data-em-limits></div>
+            <p class="em-gauge__note em-usage__note" data-em-limits-note></p>
+            <div class="em-usage__bar">
+              <fieldset class="em-seg">
+                <legend class="label">Periodo</legend>
+                <label><input type="radio" name="em-usage-range" value="today" checked><span>Oggi</span></label>
+                <label><input type="radio" name="em-usage-range" value="week"><span>7 giorni</span></label>
+                <label><input type="radio" name="em-usage-range" value="all"><span>Tutto</span></label>
+              </fieldset>
+              <div class="em-actions em-actions--tight">
+                ${chip('Aggiorna limiti', 'data-em-limits-refresh')}
+                ${chip('Scarica CSV', 'data-em-usage-csv')}
+                ${chip('Azzera registro', 'data-em-usage-clear')}
+              </div>
+            </div>
+            <div class="em-stats em-stats--usage">
+              ${USAGE_STATS.map(
+                ([key, label]) => html`
+                  <div class="em-stat">
+                    <p class="em-stat__value" data-em-usage-stat="${key}">0</p>
+                    <p class="em-stat__label label">${esc(label)}</p>
+                    <p class="em-stat__note" data-em-usage-note="${key}"></p>
+                  </div>
+                `,
+              )}
+            </div>
+            <div class="em-usage__log">
+              <table class="em-table">
+                <caption class="sr-only">Registro delle richieste all’IA, dalla più recente</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Quando</th>
+                    <th scope="col">Azione</th>
+                    <th scope="col">Sforzo</th>
+                    <th scope="col">Modello</th>
+                    <th scope="col" class="num">Tempo</th>
+                    <th scope="col" class="num">Token in</th>
+                    <th scope="col" class="num">Token out</th>
+                    <th scope="col" class="num">Ragion.</th>
+                    <th scope="col" class="num">Valore API</th>
+                    <th scope="col">Esito</th>
+                  </tr>
+                </thead>
+                <tbody data-em-usage-rows></tbody>
+              </table>
             </div>
           </div>
         </section>

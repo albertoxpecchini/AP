@@ -3,7 +3,7 @@
 
 import { initHeader, initClock, initMenu, initProgress, initTransitions, initActions } from './client/chrome.js'
 import { initReveal, initCounters, initParallax, initCursor, initMagnetic, initHoverPreview, initScrollPreview } from './client/motion.js'
-import { initHero, initHScroll, initMethod, initSpy, initSectionIndicator } from './client/sections.js'
+import { initHero, initCarousel, initMethod, initSpy, initSectionIndicator } from './client/sections.js'
 import { initFilters } from './client/filters.js'
 import { initLightbox, initCompare, initCopy } from './client/widgets.js'
 import { initForm } from './client/form.js'
@@ -30,7 +30,7 @@ const modules = [
   initReveal,
   initCounters,
   initHero,
-  initHScroll,
+  initCarousel,
   initMethod,
   initSpy,
   initSectionIndicator,

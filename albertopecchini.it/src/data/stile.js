@@ -7,7 +7,7 @@
 //  cambia un colore o una misura, va aggiornata anche la voce corrispondente.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const canvasTitle = 'albertopecchini.it — sistema visivo'
+export const canvasTitle = 'Alberto Pecchini — sistema visivo'
 
 // Tavole sul piano: chiave, indice, titolo, posizione e misura in px.
 // 80 px tra una tavola e l'altra; il titolo del piano sta 330 px sopra.

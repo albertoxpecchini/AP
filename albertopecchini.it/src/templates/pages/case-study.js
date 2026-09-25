@@ -2,7 +2,7 @@ import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
 import { allAreas, nextOf } from '../../data/projects.js'
 import { BRANDS } from '../../art/brand.js'
-import { button, media, deviceStage, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark } from '../components/ui.js'
+import { button, media, deviceStage, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark, figurina } from '../components/ui.js'
 import { projectHref, previewOf } from '../components/project.js'
 import { compare, swatches, specimens } from './portfolio.js'
 import { sheetViewer } from '../components/viewer.js'
@@ -20,11 +20,15 @@ const SECTIONS = [
 ]
 
 // Le sezioni di un progetto: con le tavole vere la galleria diventa «Tavole» (il
-// visualizzatore); con le fotografie si aggiunge una sezione subito dopo.
+// visualizzatore, solo con `showSheets` acceso in projects.js); con le
+// fotografie si aggiunge una sezione subito dopo.
 const sectionsOf = (p) =>
   SECTIONS.flatMap(([id, label]) => (id === 'galleria' ? [[id, p.sheets ? 'Tavole' : label], ...(p.photos ? [['fotografie', 'Fotografie']] : [])] : [[id, label]]))
 
-const sec = (list, id, body, extraClass = '', theme = '') => {
+// Le figurine delle sezioni dei progetti web (tools/figurine, foglio «computer»).
+const WEB_FIGS = { risultato: 'computer-lighthouse', tecnologie: 'computer-stack', dati: 'computer-lancio' }
+
+const sec = (list, id, body, extraClass = '', theme = '', fig = '') => {
   const i = list.findIndex(([key]) => key === id)
   const label = list[i][1]
   const n = String(i + 1).padStart(2, '0')
@@ -34,6 +38,7 @@ const sec = (list, id, body, extraClass = '', theme = '') => {
         <header class="cs-sec__head">
           <p class="cs-sec__n" aria-hidden="true" data-reveal="up">${n}</p>
           <h2 class="cs-sec__label label" id="cs-${id}"><span class="sr-only">${n} — </span>${esc(label)}</h2>
+          ${fig && figurina(fig, { className: 'cs-sec__fig' })}
         </header>
         <div class="cs-sec__body">${body}</div>
       </div>
@@ -57,7 +62,7 @@ function photoSection(p) {
         </div>
       `,
     )}
-    <p class="label cs-gallery__hint">${icon('expand')} ${total} fotografie · seleziona una foto per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</p>
+    <p class="label cs-gallery__hint">${icon('expand')}<span>${total} fotografie · seleziona una foto per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</span></p>
   `
 }
 
@@ -69,7 +74,7 @@ export function caseStudyPage(p) {
   const palette = brand ? brand.palette : p.web?.palette
   const isWeb = p.area === 'web' && p.web
   const list = sectionsOf(p)
-  const section = (id, body, extraClass, theme) => sec(list, id, body, extraClass, theme)
+  const section = (id, body, extraClass, theme) => sec(list, id, body, extraClass, theme, isWeb ? WEB_FIGS[id] : '')
 
   return html`
     <article class="cs">
@@ -109,7 +114,7 @@ export function caseStudyPage(p) {
             <p class="label">Servizi forniti</p>
             <ul class="cs-list">${p.services.map((s, i) => `<li><span class="label">${String(i + 1).padStart(2, '0')}</span>${esc(s)}</li>`)}</ul>
           </div>
-          ${isWeb && p.web.url ? `<div data-reveal="up">${button({ href: p.web.url, label: `Visita ${p.web.domain}`, variant: 'ghost', iconName: 'arrowUpRight', external: true })}</div>` : ''}
+          ${isWeb && p.web.url ? `<div data-reveal="up">${button({ href: p.web.url, label: p.web.name ? 'Visita il sito' : `Visita ${p.web.domain}`, variant: 'ghost', iconName: 'arrowUpRight', external: true })}</div>` : ''}
         `,
       )}
       ${section('obiettivo', `<p class="cs-big" data-reveal="up">${esc(p.goal)}</p>`)}
@@ -146,7 +151,7 @@ export function caseStudyPage(p) {
             'galleria',
             html`
               ${sheetViewer([{ project: p, sheets: p.sheets }])}
-              <p class="label cs-gallery__hint">${icon('expand')} Trascina per spostarti · Ctrl + rotella o due dita per ingrandire · frecce per cambiare tavola · doppio clic per avvicinarti</p>
+              <p class="label cs-gallery__hint">${icon('expand')}<span>Trascina per spostarti · Ctrl + rotella o due dita per ingrandire · frecce per cambiare tavola · doppio clic per avvicinarti</span></p>
             `,
             'cs-sec--wide cs-sec--sheets',
           )
@@ -157,7 +162,7 @@ export function caseStudyPage(p) {
               <div class="cs-gallery cs-gallery--${p.area}">
                 ${p.images.map((im, i) => media(im, { zoom: true, group: p.slug, index: i, marks: p.area === 'tecnico', ratio: isWeb ? (i === 0 ? '16/10' : i === 1 ? '3/4' : '9/16') : undefined }))}
               </div>
-              <p class="label cs-gallery__hint">${icon('expand')} Seleziona un’immagine per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</p>
+              <p class="label cs-gallery__hint">${icon('expand')}<span>${p.images.some((im) => im.ai) ? 'Illustrazioni generate con l’intelligenza artificiale (<a href="/crediti/">crediti</a>) · ' : ''}Seleziona un’immagine per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</span></p>
             `,
             'cs-sec--wide',
           )}

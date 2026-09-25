@@ -38,6 +38,50 @@
   from { transform: scaleY(0); }
 }
 
+/* Luce calda che sale dal basso, a cavallo della piega: metà nell'hero e metà
+   nella sezione che segue (.hero + .intro::before), stessa ellisse centrata sul
+   confine, così il passaggio non si vede. Respira piano: c'è qualcosa, qui sotto. */
+.hero,
+.hero + .intro {
+  --glow-rx: 120vw;
+  --glow-ry: min(34svh, 18rem);
+  --glow: rgb(229 72 31 / 0.26), rgb(255 138 76 / 0.12) 42%, rgb(255 184 128 / 0.04) 72%, transparent 100%;
+}
+
+.hero__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(var(--glow-rx) var(--glow-ry) at 50% 100%, var(--glow));
+}
+
+.hero + .intro {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero + .intro::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: var(--glow-ry);
+  pointer-events: none;
+  background: radial-gradient(var(--glow-rx) var(--glow-ry) at 50% 0%, var(--glow));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__glow,
+  .hero + .intro::before {
+    animation: glow 6s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes glow {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
 .hero__wrap {
   position: relative;
   container-type: inline-size;
@@ -47,21 +91,85 @@
   align-content: start;
 }
 
-.hero__meta {
+/* prima riga: il saluto (volto, «Ciao, sono» in corsivo graziato), il luogo, la disponibilità */
+.hero__hello {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 1rem;
+  padding-bottom: 0.8rem;
 }
 
-.hero__meta > span:last-child,
-.hero__meta-mid {
+.hero__place {
   display: none;
 }
 
-@media (min-width: 420px) {
-  .hero__meta-mid {
+.hero__hi {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.hero__avatar {
+  position: relative;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.hero__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  /* la fototessera è scontornata: il disco di carta le fa da fondo */
+  background: var(--bg-3);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--accent);
+}
+
+.hero__avatar-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: #2f9e5b;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.hero__hi-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.75rem, 1.2rem + 1.7vw, 2.75rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.hero__avail {
+  display: none;
+  color: var(--fg);
+}
+
+@media (min-width: 600px) {
+  .hero__avail {
     display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero__hello {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .hero__place {
+    display: block;
+  }
+
+  .hero__avail {
+    justify-self: end;
   }
 }
 
@@ -265,7 +373,14 @@
   }
 }
 
+/* su telefono l'invito sta subito sotto il nome, prima della figura: il blocco
+   di testo si scioglie e i suoi pezzi prendono posto nella griglia dell'hero */
+.hero__pitch {
+  display: contents;
+}
+
 .hero__claim {
+  order: -2;
   font-size: clamp(1.75rem, 1.1rem + 3.2vw, 3rem);
   font-weight: 540;
   font-stretch: 94%;
@@ -275,38 +390,90 @@
 }
 
 .hero__lead {
-  margin-top: 1rem;
+  order: 1;
   max-width: 36ch;
   color: var(--muted);
 }
 
 .hero__actions {
+  order: 2;
   display: grid;
   gap: 0.6rem;
-  margin-top: 1.5rem;
 }
 
-.hero__foot {
+/* «Qui sotto»: quattro porte verso le sezioni della pagina, scritte come domande */
+.hero__next {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 2.25rem;
+}
+
+.hero__next-label {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1rem;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--line);
-}
-
-.hero__foot > span:last-child {
-  display: none;
-}
-
-.scroll-cue {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  min-height: 2.75rem;
+  gap: 0.65rem;
   color: var(--fg);
+}
+
+.hero__next-label .scroll-cue__line {
+  height: 1.5rem;
+}
+
+.hero__doors {
+  display: grid;
+  border-top: 1px solid var(--line-strong);
+}
+
+.hero__door {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.85rem 0.25rem 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  isolation: isolate;
+}
+
+/* al passaggio la porta si scalda dal basso */
+.hero__door::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgb(229 72 31 / 0.16), rgb(229 72 31 / 0));
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform var(--t-2) var(--ease-out);
+}
+
+.hero__door-n {
+  color: var(--accent-text);
+}
+
+.hero__door-text {
+  font-size: 1.0625rem;
+  font-weight: 540;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.hero__door-icon {
+  font-size: 1.1rem;
+  transition: transform var(--t-2) var(--ease-out), color var(--t-2) ease;
+}
+
+@media (hover: hover) {
+  .hero__door:hover::before {
+    transform: scaleY(1);
+  }
+
+  .hero__door:hover .hero__door-icon {
+    color: var(--accent);
+    transform: translateY(0.3rem);
+  }
 }
 
 .scroll-cue__line {
@@ -341,8 +508,22 @@
 }
 
 @media (min-width: 768px) {
-  .hero__meta > span:last-child {
+  .hero,
+  .hero + .intro {
+    --glow-rx: min(96vw, 76rem);
+    --glow-ry: min(52svh, 32rem);
+  }
+
+  .hero__pitch {
     display: block;
+  }
+
+  .hero__lead {
+    margin-top: 1rem;
+  }
+
+  .hero__actions {
+    margin-top: 1.5rem;
   }
 
   /* da tablet in su il nome sta su una riga, a tutta larghezza */
@@ -369,14 +550,15 @@
     grid-row: 1 / span 2;
   }
 
-  .hero__foot > span:last-child {
-    display: block;
+  .hero__doors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--col-gap);
   }
 }
 
 @media (min-width: 1100px) {
   .hero__wrap {
-    grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
     padding-block: 1.25rem 1.5rem;
   }
 
@@ -400,7 +582,7 @@
     align-self: start;
   }
 
-  /* La cornice è limitata in altezza (54svh): quando il limite scatta, il
+  /* La cornice è limitata in altezza (41svh): quando il limite scatta, il
      rapporto 4:3 ne riduce anche la larghezza. La figura intera — crocini e
      didascalia compresi — si stringe di conseguenza e resta centrata nella
      colonna, invece di lasciare un vuoto a destra. */
@@ -409,11 +591,11 @@
     grid-row: 1;
     align-self: start;
     justify-self: center;
-    width: min(100%, calc(max(17rem, 54svh) * 4 / 3));
+    width: min(100%, calc(max(17rem, 41svh) * 4 / 3));
   }
 
   .hero__frame {
-    max-height: max(17rem, 54svh);
+    max-height: max(17rem, 41svh);
   }
 
   .hero__pitch {
@@ -431,8 +613,77 @@
     justify-items: stretch;
   }
 
-  .hero__foot {
-    margin-top: clamp(1rem, 2vh, 2rem);
+  /* «Parliamo del progetto» sta già nell'header: qui resta solo l'invito a scendere */
+  .hero__actions .btn--ghost {
+    display: none;
+  }
+
+  .hero__next {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    gap: var(--col-gap);
+    align-items: stretch;
+    margin-top: clamp(1rem, 2.4vh, 2rem);
+  }
+
+  .hero__next-label {
+    align-self: center;
+  }
+
+  .hero__doors {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 0;
+  }
+
+  .hero__door {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 0.6rem 0.75rem;
+    min-height: 4.6rem;
+    padding: 0.8rem 0.9rem 0.95rem;
+    border-bottom: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .hero__door-text {
+    grid-column: 1 / -1;
+    align-self: end;
+    font-size: 1rem;
+  }
+
+  .hero__door-icon {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+/* schermi larghi ma bassi (1280×720, 1366×768): testi un filo più piccoli,
+   così le porte «Qui sotto» affacciano sul bordo della prima schermata */
+@media (min-width: 1100px) and (max-height: 820px) {
+  .hero__hi-text {
+    font-size: 2rem;
+  }
+
+  .hero__avatar {
+    width: 2.375rem;
+    height: 2.375rem;
+  }
+
+  .hero__claim {
+    font-size: clamp(1.75rem, 0.6rem + 1.5vw, 2.25rem);
+  }
+
+  .hero__lead {
+    margin-top: 0.75rem;
+    font-size: var(--fs-small);
+  }
+
+  .hero__visual {
+    width: min(100%, calc(max(15rem, 36svh) * 4 / 3));
+  }
+
+  .hero__frame {
+    max-height: max(15rem, 36svh);
   }
 }
 
@@ -565,88 +816,223 @@
   }
 }
 
-/* ── 02 · Progetti selezionati (scorrimento orizzontale) ──────────────────── */
+/* ── 02 · Siti web ────────────────────────────────────────────────────────── */
+/* Telefono e tablet: una fila che scorre col dito (scroll-snap nativo).
+   Desktop: griglia ferma a due colonne, niente scorrimento né anteprime mobili. */
 
-.hscroll {
-  position: relative;
+.wsel {
   border-top: 1px solid var(--line);
 }
 
-/* colonna esplicita: il binario (max-content) non deve allargare la griglia */
-.hscroll__sticky {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1.5rem;
-  padding-block: var(--section) clamp(2rem, 4vw, 4rem);
-}
-
-.hscroll__head {
+.wsel__head {
   display: grid;
   gap: 1rem;
+  margin-bottom: clamp(1.75rem, 4vw, 4.5rem);
 }
 
-.hscroll__tools {
+.wsel__title {
+  max-width: 13ch;
+}
+
+.wsel__aside {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.wsel__lead {
+  max-width: 42ch;
+  color: var(--muted);
+}
+
+.wsel__tools {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem 1.5rem;
+  gap: 0.75rem 1.5rem;
 }
 
-.hscroll__count {
+/* sotto la fila: avanzamento, contatore e frecce, solo quando la fila scorre
+   davvero (lo decide initCarousel); senza JS resta lo scorrimento col dito */
+.wsel__foot {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.js .wsel.is-scrollable .wsel__foot {
+  display: flex;
+}
+
+.wsel__count {
+  margin-inline: 1rem 0.35rem;
   color: var(--fg);
   font-variant-numeric: tabular-nums;
 }
 
-.hscroll__viewport {
+.wsel__btn {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 1.05rem;
+  transition: background-color var(--t-1) ease, color var(--t-1) ease, opacity var(--t-1) ease;
+}
+
+.wsel__btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .wsel__btn:not(:disabled):hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+}
+
+.wsel__viewport {
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 
-.hscroll__viewport::-webkit-scrollbar {
+.wsel__viewport::-webkit-scrollbar {
   display: none;
 }
 
-.hscroll__track {
+.wsel__track {
   display: flex;
   gap: var(--col-gap);
   width: max-content;
   padding-inline: var(--gutter);
 }
 
-.fcard {
+.wcard {
   position: relative;
-  width: min(84vw, 60rem);
-  scroll-snap-align: center;
   flex: none;
+  width: min(84vw, 30rem);
+  scroll-snap-align: start;
 }
 
-.fcard__link {
+.wcard__link {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
+  align-content: start;
 }
 
-.fcard__meta {
+/* il banco: carta scura con una luce calda dietro al portatile */
+.wcard__stage {
+  position: relative;
+  display: grid;
+  align-content: center;
+  aspect-ratio: 16 / 11;
+  padding: 7% 17% 9% 6%;
+  overflow: hidden;
+  background: var(--bg-2);
+  isolation: isolate;
+}
+
+.wcard__stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 62% 58% at 46% 56%, rgb(229 72 31 / 0.16), rgb(255 138 76 / 0.06) 55%, transparent 100%);
+  opacity: 0.55;
+  transition: opacity var(--t-3) ease;
+}
+
+.wcard__laptop,
+.wcard__phone {
+  transition: transform 1.1s var(--ease-out);
+}
+
+.wcard__phone {
+  position: absolute;
+  right: 7%;
+  bottom: 7%;
+  width: 16.5%;
+  filter: drop-shadow(0 0.6rem 1rem rgb(16 17 15 / 0.18));
+}
+
+.wcard__meta {
   display: flex;
+  align-items: center;
   gap: 1.25rem;
 }
 
-.fcard__meta span:first-child {
+.wcard__n {
   color: var(--accent-text);
 }
 
-.fcard__title {
-  margin-top: 0.35rem;
+.wcard__domain {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--fg);
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
 
-.fcard__sub {
+.wcard__domain .dot {
+  flex: none;
+  margin-right: 0.55rem;
+}
+
+.wcard__meta > span:last-child {
+  margin-left: auto;
+}
+
+.wcard__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.2rem;
+}
+
+.wcard__arrow {
+  flex: none;
+  font-size: 0.8em;
+  transition: transform var(--t-2) var(--ease-out), color var(--t-2) ease;
+}
+
+.wcard__sub {
   color: var(--muted);
 }
 
-.fcard > .sample {
+.wcard__foot {
+  margin-top: 0.35rem;
+  color: var(--muted);
+}
+
+@media (hover: hover) {
+  .wcard__link:hover .wcard__stage::before {
+    opacity: 1;
+  }
+
+  .wcard__link:hover .wcard__laptop {
+    transform: translateY(-2.5%);
+  }
+
+  .wcard__link:hover .wcard__phone {
+    transform: translateY(-7%);
+  }
+
+  .wcard__link:hover .wcard__arrow {
+    color: var(--accent);
+    transform: translate(0.25rem, -0.25rem);
+  }
+}
+
+.wcard > .sample {
   position: absolute;
   top: 0.6rem;
   right: 0.6rem;
@@ -655,119 +1041,138 @@
   border-radius: 50%;
 }
 
-.fcard--end {
-  width: min(70vw, 28rem);
+/* ultima tessera della fila: rimanda al resto del portfolio */
+.wcard--end {
   display: grid;
+  width: min(66vw, 20rem);
 }
 
-.fcard__all {
+.wcard__all {
   display: grid;
   align-content: space-between;
   gap: 2rem;
-  min-height: 100%;
-  aspect-ratio: 4 / 5;
-  padding: clamp(1.25rem, 2.5vw, 2.5rem);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
   border: 1px solid var(--line-strong);
   transition: background-color var(--t-2) ease, color var(--t-2) ease;
 }
 
-.fcard__all-icon {
-  font-size: 2.5rem;
-  transition: transform var(--t-2) var(--ease-out);
+.wcard__all-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1.25rem;
+}
+
+.wcard__all-foot .label {
+  color: var(--fg);
 }
 
 @media (hover: hover) {
-  .fcard__all:hover {
+  .wcard__all:hover {
     background: var(--fg);
     color: var(--bg);
   }
 
-  .fcard__all:hover .label {
+  .wcard__all:hover .label {
     color: inherit;
-  }
-
-  .fcard__all:hover .fcard__all-icon {
-    transform: translateX(0.75rem);
   }
 }
 
-.hscroll__bar {
+.wsel__bar {
+  flex: 1;
   height: 1px;
   background: var(--line);
 }
 
-.hscroll__bar span {
+.wsel__bar span {
   display: block;
+  width: 100%;
   height: 3px;
   margin-top: -1px;
-  width: 100%;
   background: var(--fg);
-  transform: scaleX(0.1);
+  transform: scaleX(0.2);
   transform-origin: left;
-  will-change: transform;
 }
 
-/* su desktop lo scorrimento verticale guida quello orizzontale */
-@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .js .hscroll.is-pinned {
-    height: var(--hscroll-h, 300vh);
+@media (min-width: 600px) {
+  .wcard {
+    width: min(62vw, 32rem);
   }
 
-  .js .hscroll.is-pinned .hscroll__sticky {
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    padding-block: calc(var(--header-h) + 1rem) 1.5rem;
-    overflow: hidden;
+  .wcard--end {
+    width: min(40vw, 20rem);
   }
+}
 
-  .js .hscroll.is-pinned .hscroll__viewport {
-    overflow: visible;
-    scroll-snap-type: none;
-    display: grid;
-    align-items: center;
-  }
-
-  .js .hscroll.is-pinned .hscroll__track {
-    will-change: transform;
-  }
-
-  .js .hscroll.is-pinned .fcard {
-    width: min(52vw, calc((100svh - 22rem) * 1.6));
-  }
-
-  .js .hscroll.is-pinned .fcard--end {
-    width: 24rem;
-  }
-
-  .hscroll__head {
+@media (min-width: 1024px) {
+  .wsel__head {
     grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 4fr);
     align-items: end;
     gap: var(--col-gap);
   }
 
-  .hscroll__tools {
-    justify-content: flex-end;
+  .wsel__head > .label {
+    align-self: start;
+    padding-top: 0.6rem;
+  }
+
+  .wsel__tools {
+    justify-content: flex-start;
+  }
+
+  .wsel__viewport {
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .wsel__track {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(3rem, 5vw, 5.5rem) var(--col-gap);
+    width: min(100% - var(--gutter) * 2, var(--max));
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  .wcard {
+    width: auto;
+  }
+
+  /* colonne sfalsate, come le schede delle discipline */
+  .wcard:nth-child(even) {
+    margin-top: clamp(3rem, 7vw, 8rem);
+  }
+
+  .wcard--end,
+  .js .wsel.is-scrollable .wsel__foot {
+    display: none;
   }
 }
 
 /* ── 03 · Web ─────────────────────────────────────────────────────────────── */
+/* Solo testo: il titolo a sinistra, metodo e tre punti a destra. */
 
 .webt__grid {
   display: grid;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .webt__copy {
   display: grid;
   gap: 1.5rem;
-  justify-items: start;
   align-content: start;
 }
 
 .webt__title {
   max-width: 11ch;
+}
+
+.webt__side {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+  align-content: end;
 }
 
 .webt__points {
@@ -787,54 +1192,11 @@
   color: var(--accent);
 }
 
-.webt__stage {
-  position: relative;
-  padding: 0 0 10% 0;
-}
-
-.webt__phone {
-  position: absolute;
-  right: 2%;
-  bottom: 0;
-  width: 21%;
-}
-
-.webt__caption {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.25rem 1rem;
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line);
-}
-
-/* l'istruzione cambia con il tipo di puntatore */
-.hint-touch { display: none; }
-
-@media (hover: none) {
-  .hint-hover { display: none; }
-  .hint-touch { display: inline; }
-}
-
-.webt__caption span:first-child {
-  color: var(--fg);
-}
-
 @media (min-width: 1024px) {
   .webt__grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(2rem, 5vw, 6rem);
-    align-items: center;
-  }
-
-  .webt__stage {
-    padding: 0 14% 6% 0;
-  }
-
-  .webt__phone {
-    right: 0;
-    width: 20%;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(2rem, 6vw, 7rem);
+    align-items: end;
   }
 }
 
@@ -1208,4 +1570,53 @@
     left: 2rem;
     top: 1.3rem;
   }
+}
+
+/* ── 06 · Metodo: figurine delle fasi ─────────────────────────────────────── */
+/* stessa altezza per tutte, così i numeri restano allineati; si colorano
+   insieme al pallino quando la sezione entra in vista */
+.mth__fig {
+  width: clamp(4.5rem, 3rem + 3vw, 6.25rem);
+  height: clamp(3.75rem, 2.5rem + 3vw, 5.25rem);
+  margin-bottom: 0.5rem;
+  object-fit: contain;
+  object-position: 0 100%;
+  transition: filter var(--t-3) ease calc(var(--i) * 90ms), opacity var(--t-3) ease calc(var(--i) * 90ms);
+}
+
+.js .mth__scroll:not(.is-in) .mth__fig {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+/* ── 02 e 03 · Figurine del computer ──────────────────────────────────────── */
+/* Stesso riquadro fisso delle altre figurine (vedi pages.css): alte o larghe,
+   occupano lo stesso spazio. */
+.webt__desk,
+.webt__fig,
+.wsel__fig {
+  width: var(--box);
+  height: var(--box);
+  object-fit: contain;
+}
+
+.webt__desk {
+  --box: clamp(9rem, 5rem + 12vw, 17rem);
+  margin-top: clamp(0.5rem, 2vw, 2rem);
+  object-position: 0 100%;
+}
+
+.webt__points li {
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.webt__fig {
+  --box: clamp(3.25rem, 2.5rem + 2vw, 4.5rem);
+  margin-left: 1rem;
+}
+
+.wsel__fig {
+  --box: clamp(6rem, 4rem + 4vw, 8.5rem);
+  object-position: 0 100%;
 }

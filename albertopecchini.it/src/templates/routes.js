@@ -10,9 +10,9 @@ import { portfolioPage, tecnicoPage, webPage, graficaPage } from './pages/portfo
 import { caseStudyPage, caseStudyLd } from './pages/case-study.js'
 import { serviziPage, metodoPage, studioPage, profiloPage } from './pages/info.js'
 import { contattiPage } from './pages/contact.js'
-import { privacyPage, cookiePage, notFoundPage } from './pages/legal.js'
+import { privacyPage, cookiePage, creditiPage, notFoundPage } from './pages/legal.js'
 import { stilePage } from './pages/stile.js'
-import { tavolePage, sheetCount } from './pages/tavole.js'
+import { tavolePage, sheetCount, hasSheets } from './pages/tavole.js'
 import { emailPage } from './pages/email.js'
 
 const websiteLd = () => ({
@@ -77,16 +77,22 @@ export const routes = [
         },
       ]
     : []),
-  {
-    path: '/portfolio/tavole/',
-    priority: 0.7,
-    title: 'Tavole — il visualizzatore dei disegni',
-    description: `${sheetCount()} tavole dei miei progetti tecnici, dal DWG allo schermo: progetto stradale, esame di Stato, layout di cantiere. Ingrandisci, spostati sul foglio, scarica il PDF.`,
-    render: tavolePage,
-    pageClass: 'page--tavole',
-    noFooter: true, // il visualizzatore occupa tutta la finestra: niente chiusura sotto
-    jsonld: () => [crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: 'Tavole', href: '/portfolio/tavole/' })],
-  },
+  // Le tavole vere si vedono solo con `showSheets` acceso (src/data/projects.js):
+  // spento, la pagina non viene generata e la voce sparisce dal menù.
+  ...(hasSheets()
+    ? [
+        {
+          path: '/portfolio/tavole/',
+          priority: 0.7,
+          title: 'Tavole — il visualizzatore dei disegni',
+          description: `${sheetCount()} tavole dei miei progetti tecnici, dal DWG allo schermo: progetto stradale, esame di Stato, layout di cantiere. Ingrandisci, spostati sul foglio, scarica il PDF.`,
+          render: tavolePage,
+          pageClass: 'page--tavole',
+          noFooter: true, // il visualizzatore occupa tutta la finestra: niente chiusura sotto
+          jsonld: () => [crumbs({ label: 'Portfolio', href: '/portfolio/' }, { label: 'Tavole', href: '/portfolio/tavole/' })],
+        },
+      ]
+    : []),
   ...projects.map((p) => ({
     path: `/portfolio/${p.slug}/`,
     priority: p.featured ? 0.7 : 0.6,
@@ -143,7 +149,7 @@ export const routes = [
     path: '/stile/',
     priority: 0.4,
     title: 'Stile — il sistema visivo del sito',
-    description: 'Colore, tipografia, forma, movimento e componenti di albertopecchini.it in cinque tavole su un piano navigabile: ingrandisci e spostati come su un tavolo da disegno.',
+    description: 'Colore, tipografia, forma, movimento e componenti del sito di Alberto Pecchini in cinque tavole su un piano navigabile: ingrandisci e spostati come su un tavolo da disegno.',
     render: stilePage,
     pageClass: 'page--stile',
     noFooter: true, // la pagina è il piano a tutto schermo: niente chiusura sotto
@@ -164,6 +170,7 @@ export const routes = [
   },
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
   { path: '/cookie/', priority: 0.2, title: 'Cookie policy', description: 'Il sito non usa cookie di profilazione: ecco cosa viene salvato nel browser e perché.', render: cookiePage, hideCta: true },
+  { path: '/crediti/', priority: 0.2, title: 'Crediti e fonti delle immagini', description: 'Da dove vengono le immagini del sito: disegni e foto originali, illustrazioni generate con gpt-image-2, mockup della Figma Community.', render: creditiPage, hideCta: true },
   {
     path: '/404/',
     file: '404.html',

@@ -1187,13 +1187,29 @@
   }
 }
 
+/* Icona + un solo <span> di testo: se il testo va a capo, l'icona resta sulla
+   prima riga e i link (i crediti delle illustrazioni) scorrono nella frase
+   invece di diventare colonne a sé. */
 .cs-gallery__hint {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.6rem;
   text-transform: none;
   letter-spacing: 0.02em;
   font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.cs-gallery__hint > .icon {
+  flex: none;
+  margin-top: 0.3em;
+}
+
+.cs-gallery__hint a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: var(--line-strong);
 }
 
 .cs-data {
@@ -1328,5 +1344,48 @@
   .cs-next:hover .cs-next__arrow {
     color: var(--accent);
     transform: translateX(1.5rem);
+  }
+}
+
+/* ── Figurine: testata delle pagine d'area e sezioni dei case study web ───── */
+
+.phead__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.phead__row .phead__title {
+  min-width: 0;
+}
+
+.phead__fig,
+.cs-sec__fig {
+  width: var(--box);
+  height: var(--box);
+  object-fit: contain;
+}
+
+.phead__fig {
+  --box: clamp(5.5rem, 2rem + 12vw, 15rem);
+  flex-shrink: 0;
+  /* in basso come il testo del titolo, che ha lo stesso padding sotto */
+  margin-bottom: clamp(1.5rem, 3vw, 3rem);
+  object-position: 100% 100%;
+}
+
+.cs-sec__fig {
+  --box: clamp(4.5rem, 3rem + 4vw, 8.5rem);
+  align-self: center;
+  margin-left: auto;
+  object-position: 100% 50%;
+}
+
+@media (min-width: 1024px) {
+  .cs-sec__fig {
+    align-self: flex-start;
+    margin: 0.5rem 0 0;
+    object-position: 0 0;
   }
 }

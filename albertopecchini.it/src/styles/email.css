@@ -954,9 +954,93 @@
   border-top: 1px solid var(--line-strong);
 }
 
+/* ── 04 · Consumi dell'IA: limiti, contatori, registro ───────────────────── */
+
+.em-usage {
+  display: grid;
+  gap: var(--sp-5);
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line-strong);
+}
+
+.em-usage__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-4);
+}
+
+.em-usage__head .label { color: var(--muted); }
+.em-usage__head .em-usage__title { color: var(--fg); }
+
+.em-gauges--limits { margin-top: 0; }
+.em-gauges--limits:empty { display: none; }
+.em-usage__note { margin-top: calc(var(--sp-3) * -1); }
+
+.em-usage__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--sp-3) var(--sp-5);
+}
+
+.em-stats--usage { grid-template-columns: repeat(auto-fill, minmax(min(9rem, 100%), 1fr)); }
+.em-stats--usage .em-stat__value { font-size: clamp(1.4rem, 1.15rem + 0.9vw, 1.9rem); }
+
+/* La tabella scorre da sola sul telefono: la pagina resta ferma. */
+.em-usage__log {
+  overflow-x: auto;
+  border: 1px solid var(--line-strong);
+}
+
+.em-table {
+  width: 100%;
+  min-width: 52rem;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.em-table th,
+.em-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.em-table th {
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--bg-2);
+}
+
+.em-table .num { text-align: right; }
+.em-table tbody tr:last-child td { border-bottom: 0; }
+.em-table tr.is-error td { color: var(--accent-text); }
+.em-table tr.is-live td { background: var(--bg-2); }
+.em-table__empty { color: var(--muted); }
+
+/* Richiesta in corso. Nome proprio: .dot--live è il punto «Disponibile» del sito. */
+.em-table .em-busy-dot {
+  margin-right: 0.5em;
+  background: var(--accent);
+  animation: em-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes em-pulse {
+  50% { opacity: 0.25; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .em-ring__bar,
   .em-gauge__fill { transition: none; }
+  .em-table .em-busy-dot { animation: none; }
 }
 
 @media print {
