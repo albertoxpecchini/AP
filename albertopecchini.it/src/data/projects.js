@@ -14,6 +14,8 @@
 //  quel tipo. Va sostituito con un lavoro reale (o rimosso) prima della messa online.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { catture } from './catture.js'
+
 /** Categorie dei filtri principali (l'ordine è quello della barra filtri). */
 export const categories = [
   { key: 'tecnico', label: 'Tecnico' },
@@ -40,7 +42,20 @@ export const allAreas = {
 export const areas = Object.fromEntries(Object.entries(allAreas).filter(([, a]) => !a.hidden))
 
 const img = (art, options, alt, caption) => ({ art, ...options, alt, caption })
-const shot = (file, width, height, alt, caption) => ({ src: `/media/web/${file}`, width, height, alt, caption })
+
+// Catture dei siti in /media/web/: tools/catture le rifà quando un sito cambia e
+// scrive in catture.js misure e versione di ogni file (le misure qui sotto valgono
+// solo per un file che il manifesto non conosce ancora).
+const shot = (file, width, height, alt, caption) => {
+  const c = catture[file]
+  return { src: `/media/web/${file}${c ? `?v=${c.v}` : ''}`, width: c?.w ?? width, height: c?.h ?? height, alt, caption }
+}
+// Pagina intera a strisce (<prefisso>-01.webp, -02…): quante sono lo decide la cattura.
+const strisce = (prefisso, alt) =>
+  Object.keys(catture)
+    .filter((f) => f.startsWith(`${prefisso}-`) && /-\d+\.webp$/.test(f))
+    .sort()
+    .map((f, i) => shot(f, 0, 0, i ? '' : alt))
 
 // ── Tavole vere ──────────────────────────────────────────────────────────────
 // NON SI MOSTRANO: dal 26.09.2026 il sito non fa vedere i documenti dei progetti
@@ -1070,17 +1085,11 @@ const allProjects = [
       mobileTall: shot('ap-mobile-tall.webp', 600, 4000, 'Home page di Alberto Pecchini su smartphone, pagina intera'),
       palette: ['#F3F1EC', '#EAE7E0', '#10110F', '#5A5B55', '#E5481F'],
     },
-    // La home intera su iPhone 18 Pro, in una sezione tutta sua: cinque strisce
-    // della stessa cattura (402 px @2x), una sotto l'altra. Vedi il README, «iPhone 18 Pro».
+    // La home intera su iPhone 18 Pro, in una sezione tutta sua: strisce della
+    // stessa cattura (402 px @2x), una sotto l'altra. Vedi il README, «iPhone 18 Pro».
     iphone: {
       lead: 'La home di Alberto Pecchini su iPhone, pagina intera: dal saluto con la pianta del piano terra fino al piè di pagina, sotto l’isola dinamica e la barra di Safari.',
-      pages: [
-        shot('ap-iphone-01.webp', 804, 4652, 'Home page di Alberto Pecchini su iPhone, pagina intera: saluto e nome, pianta del piano terra, siti web, discipline, servizi, numeri, metodo, studio, indice dei progetti e piè di pagina'),
-        shot('ap-iphone-02.webp', 804, 4652, ''),
-        shot('ap-iphone-03.webp', 804, 4652, ''),
-        shot('ap-iphone-04.webp', 804, 4652, ''),
-        shot('ap-iphone-05.webp', 804, 4648, ''),
-      ],
+      pages: strisce('ap-iphone', 'Home page di Alberto Pecchini su iPhone, pagina intera: saluto e nome, pianta del piano terra, siti web, discipline, servizi, numeri, metodo, studio, indice dei progetti e piè di pagina'),
     },
     cover: shot('ap-desktop.webp', 1200, 750, 'Home page di Alberto Pecchini'),
     images: [

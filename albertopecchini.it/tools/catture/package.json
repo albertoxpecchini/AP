@@ -1,0 +1,14 @@
+{
+  "$comment": "Dipendenze del solo strumento delle catture: stanno qui e non nel package.json del sito, così Vercel non le installa a ogni build. Vedi README.md.",
+  "name": "catture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "controlla": "node catture.mjs --controlla",
+    "scatta": "node catture.mjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.12.0",
+    "sharp": "^0.35.4"
+  }
+}

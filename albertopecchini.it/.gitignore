@@ -29,6 +29,9 @@ tools/copertine/lavoro/
 tools/figurine/lavoro/
 tools/cartina/lavoro/
 
+# Catture dei siti: l'ultima impronta di ogni sito. In CI sta nella cache delle Actions.
+tools/catture/stato.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -6,6 +6,7 @@ Repository di **albertopecchini.it**, il portfolio di Alberto Pecchini: diplomat
 AP/
 ├─ albertopecchini.it/   il sito: sorgenti, contenuti, build (vedi il suo README)
 ├─ package.json          scorciatoie per lanciare i comandi dalla radice, senza `cd`
+├─ .github/workflows/    catture.yml: rifà le catture dei siti del portfolio quando cambiano
 └─ .vscode/              F5 in VS Code avvia il server di sviluppo e apre Edge sul sito
 ```
 
@@ -33,6 +34,8 @@ Si riaccende tutto con due interruttori in `src/data/projects.js` — spiegati n
 ## Pubblicazione
 
 Il progetto Vercel `albertopecchini.it` è collegato a questo repository con *Root Directory* `albertopecchini.it`: ogni push su `main` va in produzione. Il sito è online su <https://www.albertopecchini.it>.
+
+Su `main` scrive anche GitHub Actions: ogni ora il workflow **Catture dei siti** controlla Rivalta, Cascina Fontana, Dario Donelli e questo sito e, se uno è cambiato, fa un commit con le catture nuove (vedi [albertopecchini.it/tools/catture](albertopecchini.it/tools/catture/README.md)). Prima di un push: `git pull --rebase`.
 
 ## Storia
 

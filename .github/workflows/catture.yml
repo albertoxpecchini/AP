@@ -1,0 +1,106 @@
+# Catture dei siti nei progetti web del portfolio (Rivalta, Cascina Fontana, questo
+# sito, Dario Donelli). Ogni ora guarda se uno dei siti online è cambiato; se sì lo
+# rifotografa e pubblica le nuove immagini in public/media/web/ con un commit.
+# Lo strumento è albertopecchini.it/tools/catture/ (vedi il suo README).
+
+name: Catture dei siti
+
+on:
+  schedule:
+    # GitHub può ritardare di qualche minuto le esecuzioni programmate
+    - cron: '17 * * * *'
+  push:
+    # quando cambia lo strumento si rifà tutto (i file identici non producono commit)
+    paths:
+      - .github/workflows/catture.yml
+      - albertopecchini.it/tools/catture/**
+  workflow_dispatch:
+    inputs:
+      siti:
+        description: 'Siti da rifare, separati da spazi (rivalta, cascina, ap, dd). Vuoto = quelli cambiati'
+        required: false
+        default: ''
+      forza:
+        description: 'Rifai anche se non sono cambiati'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: catture-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  catture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: albertopecchini.it
+    env:
+      TZ: Europe/Rome
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      # l'ultima impronta di ogni sito sta nella cache delle Actions, non nel repository
+      - name: Ultimo stato
+        uses: actions/cache/restore@v4
+        with:
+          path: albertopecchini.it/tools/catture/stato.json
+          key: catture-stato-${{ github.run_id }}
+          restore-keys: catture-stato-
+
+      - name: Quali siti sono cambiati
+        id: controllo
+        env:
+          SITI: ${{ inputs.siti }}
+          FORZA: ${{ inputs.forza && '--forza' || '' }}
+        run: node tools/catture/catture.mjs --controlla $FORZA $SITI
+
+      - name: Dipendenze
+        if: steps.controllo.outputs.siti != ''
+        run: npm ci --prefix tools/catture --no-audit --no-fund
+
+      - name: Catture
+        id: catture
+        if: steps.controllo.outputs.siti != ''
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+          SITI: ${{ steps.controllo.outputs.siti }}
+        run: node tools/catture/catture.mjs --forza $SITI
+
+      # anche se un sito è fallito, quelli riusciti si pubblicano
+      - name: Pubblica
+        id: pubblica
+        if: always() && steps.catture.outcome != 'skipped'
+        env:
+          MESSAGGIO: ${{ steps.catture.outputs.messaggio || 'Catture aggiornate' }}
+        run: |
+          git add -A public/media/web src/data/catture.js
+          if git diff --cached --quiet; then
+            echo "Nessuna cattura cambiata: niente da pubblicare."
+            exit 0
+          fi
+          # autore = chi ha avviato il workflow: con il piano Hobby Vercel pubblica solo i commit del titolare
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git commit -m "$MESSAGGIO" -m "Rifatte da .github/workflows/catture.yml: il sito online era cambiato."
+          for tentativo in 1 2 3; do
+            git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            sleep 10
+          done
+          exit 1
+
+      # lo stato si salva solo se le immagini sono state pubblicate, altrimenti si rifà al prossimo giro
+      - name: Salva lo stato
+        if: always() && steps.catture.outcome != 'skipped' && steps.pubblica.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: albertopecchini.it/tools/catture/stato.json
+          key: catture-stato-${{ github.run_id }}

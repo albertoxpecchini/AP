@@ -69,6 +69,7 @@ albertopecchini.it/
 │  ├─ copertine/           copertine e gallerie illustrate dei progetti non web, gpt-image-2 su Replicate (vedi il suo README)
 │  ├─ figurine/            figurine scontornate: nove per immagine, gpt-image-2 su Replicate (vedi il suo README)
 │  ├─ cartina/             fondo illustrato della carta dell’area operativa (/contatti/), gpt-image-2 su Replicate
+│  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
 │  └─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza (vedi il suo README)
 ├─ emails/                 input, output e allegati delle email generate
@@ -331,7 +332,7 @@ Se una fotografia arriva in DNG: il codec **Raw Image Extension** di Microsoft l
 
 ### Screenshot dei progetti web
 
-I mockup usano cinque immagini per progetto in `public/media/web/`, catturate con Edge headless e convertite in WebP:
+I mockup usano cinque immagini per progetto in `public/media/web/`, catturate con Chromium headless e convertite in WebP:
 
 | Chiave | Viewport | File |
 | --- | --- | --- |
@@ -341,7 +342,9 @@ I mockup usano cinque immagini per progetto in `public/media/web/`, catturate co
 | `web.mobile` | 390×844 @2x | 600×1298 |
 | `web.mobileTall` | pagina intera, tagliata a 2600 px | 600×4000 |
 
-Le versioni `Tall` scorrono al passaggio del puntatore; le loro altezze vanno riportate in `projects.js`. Prima dello scatto: animazioni disattivate, elementi `.reveal` visibili, immagini caricate (`loading=eager`), `prefers-reduced-motion` emulato per le pagine con hero a scorrimento.
+Le versioni `Tall` scorrono al passaggio del puntatore. Prima dello scatto: animazioni disattivate, `prefers-reduced-motion` emulato, tutta la pagina fatta scorrere perché reveal e immagini pigre partano, immagini e tessere delle mappe caricate.
+
+**Si aggiornano da sole.** Le catture di Rivalta, Cascina Fontana, Dario Donelli e di questo sito (home, gallerie delle pagine interne, strisce dell’iPhone) le fa [`tools/catture`](tools/catture/README.md): ogni ora il workflow `.github/workflows/catture.yml` guarda se l’HTML dei siti online è cambiato e, se sì, li rifotografa e fa un commit con le immagini nuove (solo quelle che si vedono diverse). Misure e versione dei file stanno in `src/data/catture.js` (generato): `shot()` in `projects.js` ne prende larghezza e altezza e aggiunge `?v=<impronta>` all’indirizzo, così dopo un aggiornamento i browser non mostrano la copia vecchia rimasta in cache. Per aggiungere un sito o una cattura si tocca `tools/catture/siti.js`.
 
 I mockup usano le cornici del file Figma [Device Mockups (iMac, Macbook, iPad, iPhone)](https://www.figma.com/design/7c1VwTtOkwA0GmVSf23dFg/Device-Mockups--iMac--Macbook--iPad--iPhone---Community-) (Figma Community): `deviceMockup(kind, …)` in `ui.js` le usa in copertine, hero, home e scene dei progetti.
 
@@ -361,7 +364,7 @@ Il case study di questo sito (sezione **iPhone**) e la pagina Contatti (sezione 
 - `iphoneSite({ domain, pages })` è un sito in Safari: la pagina parte sotto la barra di stato e scorre al passaggio dietro la barra degli indirizzi, con lo stesso `data-scroll-preview` degli altri mockup (più lento: `data-scroll-speed`, `data-scroll-max`).
 - Il tastierino della pagina Contatti è in `src/templates/pages/contact.js` e prende il numero da `site.contact.phone`. Nell’HTML il numero è intero; `src/client/phone.js` lo ricompone cifra per cifra quando il telefono entra per metà nello schermo e lo azzera quando ne esce. Il tasto verde è un vero link `tel:`. Con il movimento ridotto il numero resta fermo.
 
-La pagina intera di `iphone.pages` (`public/media/web/ap-iphone-01…05.webp`) è una cattura della home online con un viewport di 402×812 a 2x (Chromium, user agent di iPhone, `prefers-reduced-motion` emulato, tutta la pagina fatta scorrere prima dello scatto perché le immagini si carichino), scattata a strisce con `clip` e `captureBeyondViewport` (oggi cinque, 804×4652) e convertita in WebP (qualità 78). Le strisce restano sotto i 16.384 px: oltre quel limite Chromium ripete i pezzi di pagina in una cattura unica. Se cambia la home va rifatta: numero e altezze delle strisce vanno riportati in `projects.js`. Rifatta il 26.09.2026 sulla home nuova.
+La pagina intera di `iphone.pages` (`public/media/web/ap-iphone-01.webp`, `-02`…) è una cattura della home online con un viewport di 402×812 a 2x (Chromium, user agent di iPhone, `prefers-reduced-motion` emulato, tutta la pagina fatta scorrere prima dello scatto perché le immagini si carichino), scattata a strisce con `clip` e `captureBeyondViewport` (oggi cinque, 804×4652) e convertita in WebP (qualità 78). Le strisce restano sotto i 16.384 px: oltre quel limite Chromium ripete i pezzi di pagina in una cattura unica. La rifà da sola `tools/catture` quando cambia la home: `strisce('ap-iphone', alt)` in `projects.js` prende numero e altezze delle strisce da `src/data/catture.js`.
 
 ### Figurine
 
@@ -449,6 +452,8 @@ In console la build riporta il numero di pagine e miniature scritte e, se ce ne 
 ## Pubblicazione
 
 `dist/` è un sito statico e funziona su qualsiasi hosting. Il progetto Vercel `albertopecchini.it` è collegato a questo repository GitHub (`albertoxpecchini/AP`) con **Root Directory** = `albertopecchini.it`, framework Vite, Node 24: ogni push su `main` produce un deploy di produzione, gli altri rami un’anteprima.
+
+Su `main` scrive anche il workflow delle catture (`.github/workflows/catture.yml`, vedi [`tools/catture`](tools/catture/README.md)): quando uno dei siti mostrati nel portfolio cambia, fa un commit con le immagini nuove. Prima di un push conviene quindi un `git pull --rebase`.
 
 Domini di produzione: `www.albertopecchini.it` e `albertopecchini.it` (che rimanda a www con un 308). Gli indirizzi `*.vercel.app` del progetto sono protetti da Vercel Authentication (accesso solo con login Vercel), i domini personalizzati no.
 
