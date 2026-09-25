@@ -293,6 +293,82 @@ export function deviceStage(project, { lazy = true, scroll = true, className } =
   `
 }
 
+// ── iPhone 18 Pro ────────────────────────────────────────────────────────────
+// Cornice vettoriale «IPhone 18 Pro Vector.svg» di Rafael Fernandez, da Wikimedia
+// Commons, in licenza CC BY-SA 4.0: dove compare va citata (`iphoneCredit`).
+// Schermo e isola dinamica ricalcano le quote del disegno (73 × 150 mm), in
+// percentuale in components.css; dentro lo schermo le misure sono in punti iOS,
+// su uno schermo largo 402, e seguono la larghezza del telefono.
+
+const IPHONE = {
+  src: '/media/mockup/iphone-18-pro.svg',
+  width: 438,
+  height: 900,
+  source: 'https://commons.wikimedia.org/wiki/File:IPhone_18_Pro_Vector.svg',
+}
+
+const statusBar = html`
+  <div class="iphone__status" aria-hidden="true">
+    <span class="iphone__time">9:41</span>
+    <span class="iphone__icons">
+      <svg viewBox="0 0 19 12" width="19" height="12" fill="currentColor"><rect y="7.5" width="3.2" height="4.5" rx="1"/><rect x="5.1" y="5.2" width="3.2" height="6.8" rx="1"/><rect x="10.2" y="2.7" width="3.2" height="9.3" rx="1"/><rect x="15.3" width="3.2" height="12" rx="1" opacity=".3"/></svg>
+      <svg viewBox="0 0 17 12" width="17" height="12" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M1.6 4.6a10 10 0 0 1 13.8 0M4.4 7.5a6 6 0 0 1 8.2 0"/><circle cx="8.5" cy="10.3" r="1.6" fill="currentColor" stroke="none"/></svg>
+      <svg viewBox="0 0 28 13" width="28" height="13" fill="currentColor"><rect width="25" height="13" rx="4.3" opacity=".35"/><path d="M4.3 0H18v13H4.3A4.3 4.3 0 0 1 0 8.7V4.3A4.3 4.3 0 0 1 4.3 0z"/><path d="M26.4 4.3v4.4c.9-.3 1.4-1.2 1.4-2.2s-.5-1.9-1.4-2.2z" opacity=".4"/></svg>
+    </span>
+  </div>
+`
+
+/** Il credito della cornice, obbligatorio con la licenza CC BY-SA. */
+export const iphoneCredit = ({ className } = {}) =>
+  `<p class="${cx('iphone-credit label', className)}">Cornice iPhone 18 Pro: <a href="${IPHONE.source}" target="_blank" rel="noopener">Rafael Fernandez, Wikimedia Commons<span class="sr-only"> (si apre in una nuova scheda)</span></a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.it" target="_blank" rel="noopener" hreflang="en">CC BY-SA 4.0<span class="sr-only"> (si apre in una nuova scheda)</span></a></p>`
+
+/**
+ * iPhone 18 Pro con `screen` sullo schermo, sotto la barra di stato e l'isola.
+ * `attrs` finisce sul contenitore (per esempio lo scorrimento al passaggio).
+ */
+export function iphone(screen, { className, lazy = true, attrs: extra = {} } = {}) {
+  return html`
+    <div${attrs({ class: cx('iphone', className), ...extra })}>
+      <img class="iphone__frame" src="${IPHONE.src}" width="${IPHONE.width}" height="${IPHONE.height}" alt="" loading="${lazy ? 'lazy' : 'eager'}" decoding="async">
+      <div class="iphone__screen">
+        ${screen}
+        ${statusBar}
+        <span class="iphone__home" aria-hidden="true"></span>
+      </div>
+      <span class="iphone__island" aria-hidden="true"></span>
+    </div>
+  `
+}
+
+/**
+ * Un sito web in Safari su iPhone: la pagina intera (`pages`, strisce una sotto
+ * l'altra) scorre al passaggio come negli altri mockup, sotto la barra degli indirizzi.
+ */
+export function iphoneSite({ domain, pages, label, lazy = true, className }) {
+  return iphone(
+    html`
+      <div class="iphone__view">
+        <div class="device__page">${pages.map((page) => picture(page, { lazy }))}</div>
+      </div>
+      <div class="iphone__safari" aria-hidden="true">
+        <span class="iphone__glass iphone__glass--round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></span>
+        <span class="iphone__glass iphone__url">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 9h8M8 12.5h8M8 16h5"/></svg>
+          <span>${esc(domain)}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15"/></svg>
+        </span>
+        <span class="iphone__glass iphone__glass--round"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18.5" cy="12" r="2"/></svg></span>
+      </div>
+    `,
+    {
+      className: cx('iphone--site', className),
+      lazy,
+      // la pagina è lunga: scorre più piano delle anteprime dei portatili
+      attrs: { 'data-scroll-preview': true, 'data-scroll-speed': 700, 'data-scroll-max': 16, tabindex: 0, role: 'group', 'aria-label': label || `Anteprima scorrevole di ${domain} su iPhone` },
+    },
+  )
+}
+
 // ── Dati ─────────────────────────────────────────────────────────────────────
 
 export const sampleMark = (project) =>

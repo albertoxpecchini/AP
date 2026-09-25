@@ -40,6 +40,7 @@ export const crediti = {
       body: `<ul>
         <li><strong>Gli screenshot</strong> sono catture dei siti che ho progettato e sviluppato.</li>
         <li><strong>MacBook, iPad e iPhone</strong> intorno agli screenshot vengono dal file <a href="${figma}" target="_blank" rel="noopener">Device Mockups (iMac, Macbook, iPad, iPhone)<span class="sr-only"> (nuova scheda)</span></a> della Figma Community, pubblicato con licenza <a href="https://creativecommons.org/licenses/by/4.0/deed.it" target="_blank" rel="noopener">CC BY 4.0<span class="sr-only"> (nuova scheda)</span></a>. Le immagini sono ritagliate e convertite in WebP.</li>
+        <li><strong>L’iPhone 18 Pro</strong> del case study di questo sito e della pagina contatti è il disegno vettoriale <a href="https://commons.wikimedia.org/wiki/File:IPhone_18_Pro_Vector.svg" target="_blank" rel="noopener">IPhone 18 Pro Vector.svg<span class="sr-only"> (nuova scheda)</span></a> di Rafael Fernandez, da Wikimedia Commons, con licenza <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.it" target="_blank" rel="noopener">CC BY-SA 4.0<span class="sr-only"> (nuova scheda)</span></a>; il credito compare anche sotto ogni telefono.</li>
       </ul>`,
     },
     {

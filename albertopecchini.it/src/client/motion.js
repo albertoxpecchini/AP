@@ -250,12 +250,15 @@ export function initScrollPreview() {
     const page = $('.device__page', el)
     const screen = page?.parentElement
     if (!page || !screen) return
+    // pixel al secondo e durata massima: le pagine lunghe (iPhone) li alzano
+    const speed = Number(el.dataset.scrollSpeed) || 260
+    const longest = Number(el.dataset.scrollMax) || 9
 
     const start = () => {
       const distance = page.offsetHeight - screen.offsetHeight
       if (distance <= 8) return
       el.style.setProperty('--scroll-to', `${-distance}px`)
-      el.style.setProperty('--scroll-time', `${clamp(distance / 260, 2.5, 9).toFixed(1)}s`)
+      el.style.setProperty('--scroll-time', `${clamp(distance / speed, 2.5, longest).toFixed(1)}s`)
       el.classList.add('is-scrolling')
     }
     const stop = () => el.classList.remove('is-scrolling')

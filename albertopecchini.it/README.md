@@ -80,8 +80,8 @@ albertopecchini.it/
 │  ├─ icons.svg            sprite delle icone
 │  └─ media/
 │     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine
-│     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone)
-│     ├─ progetti/         fotografie dei progetti, una cartella per progetto: NN.webp (griglia) e NN-full.webp (lightbox), copertina.webp
+│     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone) e l’iPhone 18 Pro vettoriale
+│     ├─ progetti/         una cartella per progetto: fotografie NN.webp (griglia) e NN-full.webp (lightbox), copertina.webp e vista-NN.webp illustrate
 │     ├─ studio/           fotografie reali (primo piano, avatar, figura scontornata)
 │     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf
 │     └─ web/              screenshot dei progetti web (<prefisso>-desktop.webp, -tablet, -mobile, -*-tall)
@@ -113,6 +113,7 @@ albertopecchini.it/
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
+│  │  ├─ phone.js          tastierino dell’iPhone nella pagina Contatti: ricompone il numero quando entra nello schermo
 │  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate, griglia in WebGL
 │  │  ├─ viewer.js         visualizzatore delle tavole: zoom vettoriale, spostamento, gesti, tastiera, schermo intero
 │  │  ├─ dwg-sheet.js      una tavola letta dal DWG dentro il visualizzatore: worker, canvas base e di dettaglio
@@ -149,7 +150,7 @@ albertopecchini.it/
 | `/metodo/` | Le sette fasi del lavoro |
 | `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
-| `/contatti/` | Modulo di contatto, recapiti, area operativa |
+| `/contatti/` | Modulo di contatto, recapiti, telefono (un iPhone con il numero sul tastierino), area operativa |
 | `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. **Oggi spenta**: esiste solo con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
@@ -192,6 +193,7 @@ Campi principali:
 - `summary` (card e meta description), `description`, `goal`, `problem`, `strategy`, `process`, `result`, `metrics`, `learned`: le sezioni del case study.
 - `cover` e `images`: copertina e galleria (vedi [Immagini](#immagini)).
 - `web`: per i progetti web, gli screenshot dei mockup e il dominio (`url`).
+- `iphone`: per un progetto web, la pagina intera su iPhone 18 Pro (`{ lead, pages }`, `pages` = strisce della stessa cattura una sotto l’altra). Nel case study ha una sezione **iPhone** tutta sua, dopo la galleria; la pagina scorre al passaggio. Vedi [iPhone 18 Pro](#iphone-18-pro).
 - `photos`: fotografie del progetto a gruppi (`{ lead, groups: [{ title, items }] }`). Nel case study hanno una sezione **Fotografie** tutta loro, subito dopo la galleria o le tavole, in colonne con le proporzioni vere; si aprono nel lightbox.
 - `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Si vedono solo con `showSheets = true`: allora nel case study la galleria diventa la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
 - Il carosello della home mostra tutti i progetti web (area `web` con `web` compilato): su desktop è una griglia ferma, su telefono e tablet scorre col dito. `featured: true` li mette in testa.
@@ -351,6 +353,16 @@ I mockup usano le cornici del file Figma [Device Mockups (iMac, Macbook, iPad, i
 
 Le immagini vengono dai livelli del file, con il bordo trasparente ritagliato e convertite in WebP; nell’iPad lo schermo (sempre coperto dallo screenshot) è riempito di nero per alleggerire il file. Lo schermo è un riquadro sopra l’immagine con le quote del livello «Paste image here», in percentuale in `components.css`: se si cambia un’immagine vanno ricalcolate. Lo screenshot riempie lo schermo dall’alto (`object-fit: cover`); sull’iPhone l’isola dinamica sta sopra lo screenshot, come nel file. L’iMac e l’Apple Watch del file non si usano: lo schermo dell’iMac è 16:9 e taglierebbe gli screenshot 16:10.
 
+### iPhone 18 Pro
+
+Il case study di questo sito (sezione **iPhone**) e la pagina Contatti (sezione **Telefono**) usano una seconda cornice: `public/media/mockup/iphone-18-pro.svg`, il disegno vettoriale [IPhone 18 Pro Vector.svg](https://commons.wikimedia.org/wiki/File:IPhone_18_Pro_Vector.svg) di **Rafael Fernandez** da Wikimedia Commons, in licenza [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). La licenza chiede di citare l’autore dove l’immagine compare: `iphoneCredit()` in `ui.js` scrive la riga sotto ogni telefono, e non va tolta. Il file è quello originale, con in testa solo la nota di attribuzione.
+
+- `iphone(screen)` in `ui.js` mette qualsiasi contenuto sullo schermo, sotto barra di stato, isola dinamica e indicatore home. Schermo e isola ricalcano le quote del disegno (73 × 150 mm) in percentuale in `components.css`; dentro lo schermo si misura in punti iOS con `--pt`, 1/402 della larghezza dello schermo (unità `cqi`), così tutto scala con il telefono.
+- `iphoneSite({ domain, pages })` è un sito in Safari: la pagina parte sotto la barra di stato e scorre al passaggio dietro la barra degli indirizzi, con lo stesso `data-scroll-preview` degli altri mockup (più lento: `data-scroll-speed`, `data-scroll-max`).
+- Il tastierino della pagina Contatti è in `src/templates/pages/contact.js` e prende il numero da `site.contact.phone`. Nell’HTML il numero è intero; `src/client/phone.js` lo ricompone cifra per cifra quando il telefono entra per metà nello schermo e lo azzera quando ne esce. Il tasto verde è un vero link `tel:`. Con il movimento ridotto il numero resta fermo.
+
+La pagina intera di `iphone.pages` (`public/media/web/ap-iphone-01…05.webp`) è una cattura della home online con un viewport di 402×812 a 2x (Chromium, user agent di iPhone, `prefers-reduced-motion` emulato, tutta la pagina fatta scorrere prima dello scatto perché le immagini si carichino), scattata a strisce con `clip` e `captureBeyondViewport` (oggi cinque, 804×4652) e convertita in WebP (qualità 78). Le strisce restano sotto i 16.384 px: oltre quel limite Chromium ripete i pezzi di pagina in una cattura unica. Se cambia la home va rifatta: numero e altezze delle strisce vanno riportati in `projects.js`. Rifatta il 26.09.2026 sulla home nuova.
+
 ### Figurine
 
 Servizi, fasi del metodo (in `/metodo/` e in home), lavori trasversali, strumenti dello studio, le parti sul web (sezioni 02 e 03 della home, `/portfolio/web/`, case study dei siti), contatti e 404 hanno una piccola illustrazione scontornata: `figurina(nome)` in `ui.js`, file in `public/media/figurine/`, misure in `src/data/figurine.js` (generato). Nascono da [`tools/figurine`](tools/figurine/README.md): un’immagine di gpt-image-2 con nove figurine, ritagliate in automatico. Un nome senza file non disegna nulla.
@@ -371,6 +383,7 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | Disegni dei progetti dimostrativi, piante e marchi di esempio | `src/art/` → `/art/<slug>.svg` | Disegnati dal codice del sito |
 | Screenshot dei siti | `public/media/web/` | Catture dei siti di Alberto Pecchini |
 | MacBook, iPad, iPhone | `public/media/mockup/` | File della Figma Community [Device Mockups (iMac, Macbook, iPad, iPhone)](https://www.figma.com/community/file/1172125330560103197/device-mockups-imac-macbook-ipad-iphone), licenza CC BY 4.0 |
+| iPhone 18 Pro (case study di questo sito, /contatti/) | `public/media/mockup/iphone-18-pro.svg` | [IPhone 18 Pro Vector.svg](https://commons.wikimedia.org/wiki/File:IPhone_18_Pro_Vector.svg) di Rafael Fernandez, Wikimedia Commons, licenza CC BY-SA 4.0; il credito compare sotto ogni telefono (`iphoneCredit()`) |
 | Icone, monogramma, firma, favicon, `og.png` | `public/`, `ui.js` | Disegnati per il sito |
 | Caratteri | `@fontsource/*` | Archivo, IBM Plex Mono, Instrument Serif — SIL Open Font License |
 

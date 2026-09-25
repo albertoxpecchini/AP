@@ -1144,6 +1144,266 @@
   }
 }
 
+/* Telefono: l'iPhone con il numero sul tastierino, accanto al testo */
+
+.ccall {
+  padding-top: 0;
+}
+
+.ccall__grid {
+  display: grid;
+  gap: 3rem;
+  padding-top: clamp(3rem, 7vw, 7rem);
+  border-top: 1px solid var(--line-strong);
+}
+
+.ccall__copy {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+  align-content: center;
+}
+
+.ccall__num {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ccall__phone {
+  justify-self: center;
+  width: min(100%, 20rem);
+}
+
+@media (min-width: 1024px) {
+  .ccall__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6.4fr);
+    gap: clamp(2rem, 6vw, 7rem);
+    align-items: center;
+  }
+
+  .ccall__phone {
+    order: -1;
+    width: min(100%, 23rem);
+  }
+}
+
+/* Il tastierino dell'app Telefono (iOS 26), in punti su uno schermo largo 402 */
+
+.dial {
+  position: absolute;
+  inset: 0;
+}
+
+.dial__number {
+  position: absolute;
+  top: calc(168 * var(--pt));
+  right: calc(20 * var(--pt));
+  left: calc(20 * var(--pt));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(48 * var(--pt));
+  font-size: calc(40 * var(--pt));
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.dial__name {
+  position: absolute;
+  top: calc(220 * var(--pt));
+  right: 0;
+  left: 0;
+  font-size: calc(17 * var(--pt));
+  line-height: calc(22 * var(--pt));
+  text-align: center;
+  color: #0068cc;
+}
+
+.dial__pad {
+  position: absolute;
+  top: calc(265 * var(--pt));
+  left: calc(59.9 * var(--pt));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(17.4 * var(--pt)) calc(23.2 * var(--pt));
+  width: calc(282.2 * var(--pt));
+}
+
+.dial__key,
+.dial__call,
+.dial__del {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.dial__key {
+  background: #fafafa;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.07),
+    inset 0 2px 1px rgb(255 255 255 / 0.95),
+    0 5px 14px rgb(0 0 0 / 0.06);
+  transition: background-color 0.3s ease;
+}
+
+/* il tasto premuto: si scurisce subito e torna chiaro piano */
+.dial__key.is-down {
+  background: #d9d9de;
+  transition: none;
+}
+
+.dial__digit {
+  font-size: calc(37 * var(--pt));
+  line-height: calc(40 * var(--pt));
+}
+
+.dial__sub {
+  height: calc(12 * var(--pt));
+  margin-top: calc(2 * var(--pt));
+  padding-left: 0.22em;
+  font-size: calc(10 * var(--pt));
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  line-height: calc(12 * var(--pt));
+}
+
+.dial__key[data-key='0'] .dial__sub {
+  padding-left: 0;
+  font-size: calc(14 * var(--pt));
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.dial__key--sym .dial__digit {
+  font-size: calc(38 * var(--pt));
+}
+
+.dial__key[data-key='*'] .dial__digit {
+  padding-top: calc(14 * var(--pt));
+  font-size: calc(46 * var(--pt));
+}
+
+.dial__call {
+  grid-column: 2;
+  color: #fff;
+  background: #34c759;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28), 0 6px 16px rgb(52 199 89 / 0.28);
+  transition: filter var(--t-1) ease, transform var(--t-2) var(--ease-out);
+}
+
+.dial__call svg {
+  width: 46%;
+  height: 46%;
+}
+
+.dial__call:active {
+  transform: scale(0.94);
+}
+
+.dial__call:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .dial__call:hover {
+    filter: brightness(0.92);
+  }
+}
+
+/* a numero composto il tasto verde chiama l'attenzione, due volte e basta */
+.dial.is-dialed .dial__call {
+  animation: dial-ring 1.6s var(--ease-out) 0.2s 2;
+}
+
+@keyframes dial-ring {
+  from {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28), 0 6px 16px rgb(52 199 89 / 0.28), 0 0 0 0 rgb(52 199 89 / 0.5);
+  }
+
+  to {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28), 0 6px 16px rgb(52 199 89 / 0.28), 0 0 0 calc(20 * var(--pt)) rgb(52 199 89 / 0);
+  }
+}
+
+.dial__del {
+  grid-column: 3;
+  color: #8a8a8e;
+}
+
+.dial__del svg {
+  width: 39%;
+  height: auto;
+}
+
+.dial.is-empty .dial__del {
+  visibility: hidden;
+}
+
+.dial__bar {
+  position: absolute;
+  right: calc(21 * var(--pt));
+  bottom: calc(21 * var(--pt));
+  left: calc(20.5 * var(--pt));
+  display: flex;
+  gap: calc(8.5 * var(--pt));
+  height: calc(62 * var(--pt));
+}
+
+.dial__tabs,
+.dial__search {
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.94);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.08), 0 0 0 1px rgb(0 0 0 / 0.06);
+}
+
+.dial__tabs {
+  display: flex;
+  flex: 1;
+  padding: calc(4 * var(--pt));
+}
+
+.dial__tab {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(3 * var(--pt));
+  border-radius: 99px;
+  font-size: calc(11 * var(--pt));
+  font-weight: 500;
+  line-height: calc(13 * var(--pt));
+}
+
+.dial__tab svg {
+  width: calc(24 * var(--pt));
+  height: calc(24 * var(--pt));
+}
+
+.dial__tab--on {
+  font-weight: 600;
+  color: #0068cc;
+  background: rgb(120 120 128 / 0.14);
+}
+
+.dial__search {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(62 * var(--pt));
+}
+
+.dial__search svg {
+  width: calc(26 * var(--pt));
+  height: calc(26 * var(--pt));
+}
+
 .cmap__grid {
   display: grid;
   gap: 2.5rem;

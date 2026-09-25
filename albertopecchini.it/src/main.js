@@ -9,6 +9,7 @@ import { initLightbox, initCompare, initCopy } from './client/widgets.js'
 import { initForm } from './client/form.js'
 import { initCanvas } from './client/canvas.js'
 import { initViewer } from './client/viewer.js'
+import { initDialer } from './client/phone.js'
 
 // Il compositore email (/email/) porta con sé i moduli del generatore (tools/email-generator):
 // si carica in un pezzo a parte, solo sulla sua pagina, così le altre non ne pagano il peso.
@@ -38,6 +39,7 @@ const modules = [
   initCompare,
   initCopy,
   initForm,
+  initDialer,
   initCanvas,
   initViewer,
   initEmail,

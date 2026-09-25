@@ -594,6 +594,219 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   }
 }
 
+/* ── iPhone 18 Pro ────────────────────────────────────────────────────────── */
+/* Cornice vettoriale da Wikimedia Commons (vedi ui.js). Schermo e isola ricalcano
+   le quote del disegno, 73 × 150 mm: schermo da 3,05 a 69,95 mm in larghezza e
+   da 2,5 a 147,5 in altezza, raggio 10,5; isola larga 15,6 e alta 6,2 a 4,96 dal
+   bordo. Dentro lo schermo si misura in punti iOS: --pt è 1/402 della sua
+   larghezza, così barra di stato e tasti crescono e calano con il telefono. */
+
+.iphone {
+  position: relative;
+  color: #000;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.iphone__frame {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.iphone__screen {
+  --pt: calc(100cqi / 402);
+  position: absolute;
+  top: 1.6667%;
+  left: 4.1793%;
+  width: 91.6414%;
+  height: 96.6667%;
+  overflow: hidden;
+  border-radius: 15.6955% / 7.2414%;
+  container-type: inline-size;
+  background: #fff;
+}
+
+.iphone__island {
+  position: absolute;
+  top: 3.3072%;
+  left: 39.315%;
+  width: 21.37%;
+  height: 4.1334%;
+  border-radius: 999px;
+  background: #000;
+}
+
+/* l'obiettivo della fotocamera, appena visibile nel nero dell'isola */
+.iphone__island::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 80.79%;
+  width: 22.824%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background:
+    radial-gradient(circle at 38% 36%, rgb(59 42 120 / 0.55) 0 9%, transparent 10%),
+    radial-gradient(closest-side, #000 0 41%, #171717 41% 53%, #0c0c0c 53%);
+}
+
+.iphone__status {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  height: calc(62 * var(--pt));
+  pointer-events: none;
+}
+
+.iphone__time,
+.iphone__icons {
+  position: absolute;
+  top: calc(20 * var(--pt));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(116 * var(--pt));
+  height: calc(26 * var(--pt));
+}
+
+.iphone__time {
+  left: calc(16 * var(--pt));
+  font-size: calc(17 * var(--pt));
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.iphone__icons {
+  left: calc(269 * var(--pt));
+  gap: calc(6 * var(--pt));
+}
+
+.iphone__icons svg {
+  width: calc(19 * var(--pt));
+  height: calc(12 * var(--pt));
+}
+
+.iphone__icons svg:nth-child(2) {
+  width: calc(17 * var(--pt));
+}
+
+.iphone__icons svg:nth-child(3) {
+  width: calc(28 * var(--pt));
+  height: calc(13 * var(--pt));
+}
+
+.iphone__home {
+  position: absolute;
+  bottom: calc(8 * var(--pt));
+  left: 50%;
+  z-index: 2;
+  width: calc(139 * var(--pt));
+  height: calc(5 * var(--pt));
+  border-radius: 99px;
+  translate: -50% 0;
+  background: #000;
+}
+
+/* Un sito in Safari: la pagina parte sotto la barra di stato, del colore della
+   carta, e scorre dietro la barra degli indirizzi in vetro. */
+.iphone--site .iphone__screen {
+  background: #f3f1ec;
+}
+
+.iphone__view {
+  position: absolute;
+  inset: calc(62 * var(--pt)) 0 0;
+  overflow: hidden;
+}
+
+.iphone__view::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: calc(10 * var(--pt));
+  background: linear-gradient(#f3f1ec, rgb(243 241 236 / 0));
+  pointer-events: none;
+}
+
+/* in fondo resta il posto della barra: il piè di pagina non ci finisce sotto */
+.iphone--site .device__page {
+  padding-bottom: calc(96 * var(--pt));
+  background: #0d0d0c;
+}
+
+.iphone__safari {
+  position: absolute;
+  right: calc(14 * var(--pt));
+  bottom: calc(24 * var(--pt));
+  left: calc(14 * var(--pt));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--pt));
+  height: calc(48 * var(--pt));
+}
+
+.iphone__glass {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.74);
+  -webkit-backdrop-filter: blur(16px) saturate(1.7);
+  backdrop-filter: blur(16px) saturate(1.7);
+  box-shadow: 0 6px 22px rgb(16 17 15 / 0.14), 0 0 0 0.5px rgb(16 17 15 / 0.08);
+}
+
+.iphone__glass--round {
+  flex: none;
+  width: calc(48 * var(--pt));
+}
+
+.iphone__glass svg {
+  width: calc(22 * var(--pt));
+  height: calc(22 * var(--pt));
+}
+
+.iphone__url {
+  flex: 1;
+  gap: calc(8 * var(--pt));
+  padding-inline: calc(16 * var(--pt));
+  font-size: calc(15 * var(--pt));
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.iphone__url span {
+  flex: 1;
+  text-align: center;
+}
+
+.iphone__url svg {
+  width: calc(18 * var(--pt));
+  height: calc(18 * var(--pt));
+}
+
+/* credito della cornice (CC BY-SA) sotto il telefono */
+.iphone-credit {
+  margin-top: 0.9rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.iphone-credit a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
 /* ── Scheda dati (cartiglio) ──────────────────────────────────────────────── */
 
 .sheet {
