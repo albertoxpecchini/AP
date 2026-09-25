@@ -1196,6 +1196,51 @@
   font-size: 0.75rem;
 }
 
+/* la pagina intera su iPhone: il telefono a sinistra, il testo in basso a destra */
+.cs-iphone {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.cs-iphone__phone {
+  justify-self: center;
+  width: min(100%, 20rem);
+}
+
+.cs-iphone__copy {
+  display: grid;
+  gap: 1.25rem;
+  align-content: end;
+}
+
+.cs-iphone__hint {
+  align-items: flex-start;
+}
+
+.cs-iphone__hint .icon {
+  flex: none;
+  margin-top: 0.1em;
+}
+
+@media (min-width: 768px) {
+  .cs-iphone {
+    grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: end;
+  }
+
+  .cs-iphone__phone {
+    width: 100%;
+  }
+}
+
+/* con il movimento ridotto la pagina resta ferma: niente istruzioni per farla scorrere */
+@media (prefers-reduced-motion: reduce) {
+  .cs-iphone__hint {
+    display: none;
+  }
+}
+
 .cs-data {
   display: grid;
   gap: 0;

@@ -73,7 +73,7 @@ albertopecchini.it/
 │  ├─ og.png               immagine per le anteprime social (1200×630)
 │  ├─ icons.svg            sprite delle icone
 │  └─ media/
-│     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone)
+│     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone) e l’iPhone 18 Pro vettoriale
 │     ├─ progetti/         fotografie dei progetti, una cartella per progetto: NN.webp (griglia) e NN-full.webp (lightbox)
 │     ├─ studio/           fotografie dello studio (ritratto.webp)
 │     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf, copertina.webp
@@ -106,6 +106,7 @@ albertopecchini.it/
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
+│  │  ├─ phone.js          tastierino dell’iPhone nella pagina Contatti: ricompone il numero quando entra nello schermo
 │  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate, griglia in WebGL
 │  │  ├─ viewer.js         visualizzatore delle tavole: zoom vettoriale, spostamento, gesti, tastiera, schermo intero
 │  │  └─ utils.js          selettori, scroll, focus trap, reduced motion
@@ -129,7 +130,7 @@ albertopecchini.it/
 | `/metodo/` | Le sette fasi del lavoro |
 | `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
-| `/contatti/` | Modulo di contatto, recapiti, area operativa |
+| `/contatti/` | Modulo di contatto, recapiti, telefono (un iPhone con il numero sul tastierino), area operativa |
 | `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa |
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
@@ -171,6 +172,7 @@ Campi principali:
 - `summary` (card e meta description), `description`, `goal`, `problem`, `strategy`, `process`, `result`, `metrics`, `learned`: le sezioni del case study.
 - `cover` e `images`: copertina e galleria (vedi [Immagini](#immagini)).
 - `web`: per i progetti web, gli screenshot dei mockup e il dominio (`url`).
+- `iphone`: per un progetto web, la pagina intera su iPhone 18 Pro (`{ lead, pages }`, `pages` = strisce della stessa cattura una sotto l’altra). Nel case study ha una sezione **iPhone** tutta sua, dopo la galleria; la pagina scorre al passaggio. Vedi [iPhone 18 Pro](#iphone-18-pro).
 - `photos`: fotografie del progetto a gruppi (`{ lead, groups: [{ title, items }] }`). Nel case study hanno una sezione **Fotografie** tutta loro, subito dopo la galleria o le tavole, in colonne con le proporzioni vere; si aprono nel lightbox.
 - `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Se ci sono, nel case study la galleria diventa la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
 - `featured: true` porta il progetto nello scorrimento orizzontale della home.
@@ -291,6 +293,16 @@ I mockup usano le cornici del file Figma [Device Mockups (iMac, Macbook, iPad, i
 | `phone` | iPhone 14 Pro | `web.mobile` / `mobileTall` | `iphone-14-pro.webp` (720×1466) + isola e fotocamera in PNG |
 
 Le immagini vengono dai livelli del file, con il bordo trasparente ritagliato e convertite in WebP; nell’iPad lo schermo (sempre coperto dallo screenshot) è riempito di nero per alleggerire il file. Lo schermo è un riquadro sopra l’immagine con le quote del livello «Paste image here», in percentuale in `components.css`: se si cambia un’immagine vanno ricalcolate. Lo screenshot riempie lo schermo dall’alto (`object-fit: cover`); sull’iPhone l’isola dinamica sta sopra lo screenshot, come nel file. L’iMac e l’Apple Watch del file non si usano: lo schermo dell’iMac è 16:9 e taglierebbe gli screenshot 16:10.
+
+### iPhone 18 Pro
+
+Il case study di questo sito (sezione **iPhone**) e la pagina Contatti (sezione **Telefono**) usano una seconda cornice: `public/media/mockup/iphone-18-pro.svg`, il disegno vettoriale [IPhone 18 Pro Vector.svg](https://commons.wikimedia.org/wiki/File:IPhone_18_Pro_Vector.svg) di **Rafael Fernandez** da Wikimedia Commons, in licenza [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). La licenza chiede di citare l’autore dove l’immagine compare: `iphoneCredit()` in `ui.js` scrive la riga sotto ogni telefono, e non va tolta. Il file è quello originale, con in testa solo la nota di attribuzione.
+
+- `iphone(screen)` in `ui.js` mette qualsiasi contenuto sullo schermo, sotto barra di stato, isola dinamica e indicatore home. Schermo e isola ricalcano le quote del disegno (73 × 150 mm) in percentuale in `components.css`; dentro lo schermo si misura in punti iOS con `--pt`, 1/402 della larghezza dello schermo (unità `cqi`), così tutto scala con il telefono.
+- `iphoneSite({ domain, pages })` è un sito in Safari: la pagina parte sotto la barra di stato e scorre al passaggio dietro la barra degli indirizzi, con lo stesso `data-scroll-preview` degli altri mockup (più lento: `data-scroll-speed`, `data-scroll-max`).
+- Il tastierino della pagina Contatti è in `src/templates/pages/contact.js` e prende il numero da `site.contact.phone`. Nell’HTML il numero è intero; `src/client/phone.js` lo ricompone cifra per cifra quando il telefono entra per metà nello schermo e lo azzera quando ne esce. Il tasto verde è un vero link `tel:`. Con il movimento ridotto il numero resta fermo.
+
+La pagina intera di `iphone.pages` (`public/media/web/ap-iphone-01…04.webp`) è una cattura della home online con un viewport di 402×812 a 2x (Chromium, user agent di iPhone, `prefers-reduced-motion` emulato, tutta la pagina fatta scorrere prima dello scatto perché le immagini si carichino), tagliata in quattro strisce da 804×5532 e convertita in WebP (qualità 78). Se cambia la home va rifatta: le altezze delle strisce vanno riportate in `projects.js`.
 
 ## Modulo contatti
 

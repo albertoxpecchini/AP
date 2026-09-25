@@ -2,7 +2,7 @@ import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
 import { allAreas, nextOf } from '../../data/projects.js'
 import { BRANDS } from '../../art/brand.js'
-import { button, media, deviceStage, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark } from '../components/ui.js'
+import { button, media, deviceStage, iphoneSite, iphoneCredit, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark } from '../components/ui.js'
 import { projectHref, previewOf } from '../components/project.js'
 import { compare, swatches, specimens } from './portfolio.js'
 import { sheetViewer } from '../components/viewer.js'
@@ -20,9 +20,14 @@ const SECTIONS = [
 ]
 
 // Le sezioni di un progetto: con le tavole vere la galleria diventa «Tavole» (il
-// visualizzatore); con le fotografie si aggiunge una sezione subito dopo.
+// visualizzatore); con le fotografie o con la pagina intera su iPhone si aggiunge
+// una sezione subito dopo.
 const sectionsOf = (p) =>
-  SECTIONS.flatMap(([id, label]) => (id === 'galleria' ? [[id, p.sheets ? 'Tavole' : label], ...(p.photos ? [['fotografie', 'Fotografie']] : [])] : [[id, label]]))
+  SECTIONS.flatMap(([id, label]) =>
+    id === 'galleria'
+      ? [[id, p.sheets ? 'Tavole' : label], ...(p.photos ? [['fotografie', 'Fotografie']] : []), ...(p.iphone ? [['iphone', 'iPhone']] : [])]
+      : [[id, label]],
+  )
 
 const sec = (list, id, body, extraClass = '', theme = '') => {
   const i = list.findIndex(([key]) => key === id)
@@ -58,6 +63,22 @@ function photoSection(p) {
       `,
     )}
     <p class="label cs-gallery__hint">${icon('expand')} ${total} fotografie · seleziona una foto per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</p>
+  `
+}
+
+/** La pagina intera del sito su iPhone 18 Pro, che scorre al passaggio. */
+function iphoneSection(p) {
+  return html`
+    <div class="cs-iphone">
+      <figure class="cs-iphone__phone" data-reveal="up">
+        ${iphoneSite({ domain: p.web.domain, pages: p.iphone.pages })}
+        <figcaption>${iphoneCredit()}</figcaption>
+      </figure>
+      <div class="cs-iphone__copy">
+        <p class="cs-lead" data-reveal="up">${esc(p.iphone.lead)}</p>
+        <p class="label cs-gallery__hint cs-iphone__hint" data-reveal="up">${icon('arrowDown')} Passa sopra lo schermo o raggiungilo con Tab: la pagina scorre fino in fondo · sul telefono tocca per avviare, ritocca per tornare in cima</p>
+      </div>
+    </div>
   `
 }
 
@@ -162,6 +183,7 @@ export function caseStudyPage(p) {
             'cs-sec--wide',
           )}
       ${p.photos ? section('fotografie', photoSection(p), 'cs-sec--wide cs-sec--photos') : ''}
+      ${p.iphone ? section('iphone', iphoneSection(p), 'cs-sec--iphone') : ''}
       ${section(
         'tecnologie',
         html`
