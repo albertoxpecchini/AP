@@ -983,6 +983,17 @@ const allProjects = [
       mobileTall: shot('ap-mobile-tall.webp', 600, 4000, 'Home page di albertopecchini.it su smartphone, pagina intera'),
       palette: ['#F3F1EC', '#EAE7E0', '#10110F', '#5A5B55', '#E5481F'],
     },
+    // La home intera su iPhone 18 Pro, in una sezione tutta sua: quattro strisce
+    // della stessa cattura (402 px @2x), una sotto l'altra. Vedi il README, «iPhone 18 Pro».
+    iphone: {
+      lead: 'La home di albertopecchini.it su iPhone, pagina intera: dall’apertura con la pianta del piano terra fino al piè di pagina, sotto l’isola dinamica e la barra di Safari.',
+      pages: [
+        shot('ap-iphone-01.webp', 804, 5532, 'Home page di albertopecchini.it su iPhone, pagina intera: nome, pianta del piano terra, discipline, progetti, studio e piè di pagina'),
+        shot('ap-iphone-02.webp', 804, 5532, ''),
+        shot('ap-iphone-03.webp', 804, 5532, ''),
+        shot('ap-iphone-04.webp', 804, 5532, ''),
+      ],
+    },
     cover: shot('ap-desktop.webp', 1200, 750, 'Home page di albertopecchini.it'),
     images: [
       shot('ap-desktop.webp', 1200, 750, 'Home page di albertopecchini.it su desktop', 'Home — desktop 1440 px'),
