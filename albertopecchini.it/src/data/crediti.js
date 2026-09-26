@@ -16,6 +16,9 @@ export const crediti = {
       <ul>
         <li><strong>Le copertine e le gallerie dei progetti tecnici</strong> — il progetto stradale, il bar-caffetteria, il layout di cantiere, le tettoie in legno lamellare e il Museo dei Mestieri del Fiume: illustrazioni in assonometria e scene disegnate che hanno come riferimento le tavole originali dei progetti e, per il museo, le mie fotografie. Mostrano i progetti, non sono i progetti: le tavole vere non sono pubblicate sul sito.</li>
         <li><strong>Le figurine</strong> dei servizi, delle fasi del metodo, dei lavori trasversali, degli strumenti, delle sezioni sul web (home, progetti web e case study dei siti), della pagina contatti e della pagina 404.</li>
+        <li><strong>Le due mascotte</strong> — la chiocciola gigante africana e la tartaruga di terra, gli animali di casa — che custodiscono la testata e il piè di pagina. Il disegno è del modello; gli occhi che seguono il puntatore, si incrociano sul naso e sbattono le palpebre sono aggiunti dal codice del sito sopra l’immagine.</li>
+        <li><strong>Le sagome dei tasti</strong> di testata e piè di pagina, sassi e carta strappata: il modello ha disegnato le forme vuote, il sito ci scrive sopra e le rende premibili.</li>
+        <li><strong>Le mini immagini del piè di pagina</strong>: busta, telefono, mappa, scatola del codice, cartello «torna su», lucchetto della privacy e quadro dei crediti.</li>
         <li><strong>Il fondo della carta dell’area operativa</strong> nella pagina contatti: acque, rilievi e campi disegnati dal modello sulla geometria di lago e fiumi ricavata dalle coordinate. Reticolo, raggi, città, nomi e scala grafica sono disegnati dal codice del sito sulle stesse coordinate, e restano esatti.</li>
       </ul>`,
     },

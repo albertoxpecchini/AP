@@ -4,6 +4,7 @@ import { html, esc, attrs, cx, pad } from '../html.js'
 import { renderArt, isSheet } from '../../art/index.js'
 import { site } from '../../data/site.js'
 import { figurine } from '../../data/figurine.js'
+import { mascotte } from '../../data/mascotte.js'
 
 // ── Icone (inline, 1em) ──────────────────────────────────────────────────────
 
@@ -23,6 +24,9 @@ const ICON_PATHS = {
   download: 'M12 4v11m-5-5 5 5 5-5M5 20h14',
   shrink: 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5',
   fit: 'M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M9 9h6v6H9z',
+  arrowUp: 'M12 20V5m-6 6 6-6 6 6',
+  mail: 'M3.5 6h17v12h-17zM3.5 7l8.5 6.5L20.5 7',
+  menu: 'M4 7h16M4 12h16M4 17h16',
 }
 
 export const icon = (name, { size = '1em', className } = {}) =>
@@ -84,8 +88,8 @@ export const signature = ({ className } = {}) => {
 `
 }
 
-export const logo = ({ compact = false } = {}) => html`
-  <a class="logo" href="/">
+export const logo = ({ compact = false, className } = {}) => html`
+  <a class="${cx('logo', className)}" href="/">
     ${monogram()}
     <span class="${cx('logo__text', compact && 'logo__text--compact')}">
       <span class="logo__name">${esc(site.name)}</span>
@@ -210,6 +214,80 @@ export function figurina(name, { className, lazy = true } = {}) {
   const f = figurine[name]
   if (!f) return ''
   return `<img${attrs({ class: cx('fig', className), src: `/media/figurine/${name}.webp`, width: f.w, height: f.h, alt: '', loading: lazy ? 'lazy' : 'eager', decoding: 'async', draggable: 'false' })}>`
+}
+
+// ── Tasti «sasso» ────────────────────────────────────────────────────────────
+// I tasti di testata e piè di pagina: una sagoma irregolare disegnata da
+// gpt-image-2 (foglio «tasti» in tools/figurine/fogli.js), resa premibile e in
+// rilievo dal CSS (src/styles/pebble.css) e inclinata dal puntatore
+// (src/client/pebble.js). Il testo lo mette il sito, la sagoma è vuota.
+//
+// Tre toni: «carta» (chiaro, scritta in inchiostro), «minio» (l'accento, per la
+// chiamata all'azione) e «inchiostro» (scuro, scritta in carta: sul fondo scuro
+// del piè di pagina per le voci secondarie). Le sagome larghe si alternano con
+// `shape` (0, 1, 2…) così due tasti vicini non sono mai uguali; `round`
+// prende la sagoma quasi tonda per i tasti con la sola icona.
+// Se la sagoma non è ancora stata ritagliata, il tasto si disegna in CSS.
+
+const PEBBLES = {
+  carta: { wide: ['tasto-carta-1', 'tasto-carta-2', 'tasto-carta-3', 'tasto-carta-4'], round: 'tasto-carta-tondo' },
+  minio: { wide: ['tasto-minio-1', 'tasto-minio-2'], round: 'tasto-carta-tondo' },
+  inchiostro: { wide: ['tasto-inchiostro-1'], round: 'tasto-inchiostro-tondo' },
+}
+
+/**
+ * @param {{href?: string, label: string, tone?: 'carta'|'minio'|'inchiostro', size?: 'sm'|'md'|'lg',
+ *          shape?: number, round?: boolean, iconName?: string, iconBefore?: boolean, fig?: string,
+ *          srLabel?: string, external?: boolean, current?: boolean, type?: string, className?: string, attrs?: object}} o
+ */
+export function pebble({ href, label, tone = 'carta', size = 'md', shape = 0, round = false, iconName, iconBefore = false, fig, srLabel, external = false, current = false, type, className, attrs: extra = {} }) {
+  const set = PEBBLES[tone] || PEBBLES.carta
+  const name = round ? set.round : set.wide[shape % set.wide.length]
+  const has = Boolean(figurine[name])
+  const ico = iconName ? `<span class="pb__icon" aria-hidden="true">${icon(iconName)}</span>` : fig ? `<span class="pb__fig" aria-hidden="true">${figurina(fig, { lazy: true })}</span>` : ''
+  // con `srLabel` il nome accessibile è l'attributo aria-label: niente testo visibile
+  const text = srLabel ? '' : `<span class="pb__label">${esc(label)}</span>`
+  const inner =
+    `<span class="pb__side" aria-hidden="true"></span>` +
+    `<span class="pb__top"><span class="pb__face" aria-hidden="true"></span>${iconBefore ? ico : ''}${text}${iconBefore ? '' : ico}${external ? '<span class="sr-only"> (nuova scheda)</span>' : ''}</span>`
+  const common = {
+    class: cx('pb', `pb--${tone}`, `pb--${size}`, round && 'pb--round', !has && 'pb--fallback', current && 'is-current', className),
+    style: has ? `--pb-img:url(/media/figurine/${name}.webp)` : null,
+    'aria-current': current ? 'page' : null,
+    'aria-label': srLabel || null,
+    'data-pebble': true,
+    ...extra,
+  }
+  if (href) return `<a${attrs({ ...common, href, target: external && '_blank', rel: external && 'noopener' })}>${inner}</a>`
+  return `<button${attrs({ ...common, type: type || 'button' })}>${inner}</button>`
+}
+
+// ── Mascotte ─────────────────────────────────────────────────────────────────
+// La chiocciola gigante africana e la tartaruga di terra (tools/mascotte),
+// custodi di testata e piè di pagina. L'immagine ha gli occhi bianchi; sopra ci
+// stanno due occhi del sito, con la pupilla che segue il puntatore e la
+// palpebra che sbatte (src/client/mascot.js). Il «naso» è la zona in cui il
+// puntatore fa incrociare gli occhi. Centri e semiassi (x, rx in % della
+// larghezza; y, ry in % dell'altezza) in src/data/mascotte.js.
+//
+// `crop`: ritaglio in percentuale dell'immagine ({ x, y, w, h }), per mostrare
+// solo la testa quando lo spazio è poco (la testata).
+
+export function mascot(name, { className, crop, lazy = true, decorative = true } = {}) {
+  const m = mascotte[name]
+  if (!m) return ''
+  const ar = (m.w / m.h).toFixed(4)
+  const eye = (e, i) =>
+    `<span class="masc__eye" style="--x:${e.x}%;--y:${e.y}%;--rx:${e.rx}%;--ry:${e.ry}%;--skin:${e.skin}" data-eye="${i}"><span class="masc__pupil"></span><span class="masc__lid"></span></span>`
+  const nose = m.nose ? `<span class="masc__nose" style="--x:${m.nose.x}%;--y:${m.nose.y}%;--rx:${m.nose.rx}%;--ry:${m.nose.ry}%"></span>` : ''
+  const body =
+    `<span class="masc__body">` +
+    `<img class="masc__img" src="/media/mascotte/${name}.webp" width="${m.w}" height="${m.h}" alt="${decorative ? '' : esc(m.alt)}" loading="${lazy ? 'lazy' : 'eager'}" decoding="async" draggable="false">` +
+    m.eyes.map(eye).join('') +
+    nose +
+    `</span>`
+  const style = crop ? `--ar:${ar};--cx:${crop.x};--cy:${crop.y};--cw:${crop.w};--ch:${crop.h}` : `--ar:${ar}`
+  return `<span${attrs({ class: cx('masc', `masc--${name}`, crop && 'masc--crop', className), style, 'data-mascot': name, 'aria-hidden': decorative ? 'true' : null, role: decorative ? null : 'img', 'aria-label': decorative ? null : m.alt })}>${body}</span>`
 }
 
 /**

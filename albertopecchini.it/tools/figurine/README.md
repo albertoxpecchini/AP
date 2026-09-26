@@ -13,7 +13,7 @@ nove figurine in una griglia 3 × 3. Lo script poi le ritaglia una per una.
 
 | File | Cosa è |
 | --- | --- |
-| `fogli.js` | lo stile comune e i cinque fogli (tecnico, digitale, grafica, metodo, computer), nove figurine ciascuno, nell'ordine della griglia |
+| `fogli.js` | lo stile comune e i fogli (tecnico, digitale, grafica, metodo, computer, chrome, tasti), nove figurine ciascuno, nell'ordine della griglia; un foglio può avere `stile` e `intro` propri e alzare la misura dei ritagli con `max` |
 | `figurine.mjs` | lo script: genera un foglio, lo ritaglia, scarica un foglio già pagato |
 | `lavoro/` | i fogli PNG con il JSON dell'input (esclusi da Git) |
 | `../../src/data/figurine.js` | generato dal ritaglio: nomi e misure delle figurine pronte |
@@ -51,6 +51,8 @@ dati con `figName()`:
 | metodo (`/metodo/`, home) | `metodo-<key>`: `metodo-ascolto` |
 | strumenti (`/studio/`) | `strumenti-<gruppo>`: `strumenti-rilievo-e-disegno` |
 | contatti, 404 | `contatti`, `404` |
+| piè di pagina (recapiti, social, torna su, note legali) | `chrome-email`, `chrome-telefono`, `chrome-sede`, `chrome-orari`, `chrome-instagram`, `chrome-github`, `chrome-su`, `chrome-privacy`, `chrome-crediti` |
+| tasti «sasso» di testata e piè di pagina (`pebble()` in ui.js, sagome vuote senza bordo adesivo, ritagli fino a 960 px) | `tasto-carta-1…4`, `tasto-carta-tondo`, `tasto-minio-1…2`, `tasto-inchiostro-1`, `tasto-inchiostro-tondo` |
 | home, sezione 03 «Web design e sviluppo» | `computer-postazione` accanto al titolo; `computer-mobile`, `computer-tastiera`, `computer-dominio` sui tre punti |
 | home, sezione 02 «Siti web» | `computer-siti` |
 | `/portfolio/web/` | `computer-codice` nella testata (`pageHead({ fig })`) |

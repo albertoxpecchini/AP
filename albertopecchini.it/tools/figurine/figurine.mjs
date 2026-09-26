@@ -24,7 +24,7 @@ const PROVA = process.env.FIGURINE_PROVA
 const OUT = PROVA ? resolve(PROVA) : join(ROOT, 'public/media/figurine')
 const MANIFEST = PROVA ? join(resolve(PROVA), 'figurine.js') : join(ROOT, 'src/data/figurine.js')
 const GRID = 3
-const MAX = 440 // lato lungo massimo: basta per 220 px CSS su schermi 2x (la più grande, la 404, arriva a 240)
+const MAX = 440 // lato lungo massimo: basta per 220 px CSS su schermi 2x (la più grande, la 404, arriva a 240); un foglio può alzarlo con `max`
 
 const foglio = (nome) => fogli[nome] || die(`nessun foglio «${nome}». Disponibili: ${Object.keys(fogli).join(', ')}`)
 
@@ -32,7 +32,8 @@ async function genera(nome) {
   const f = foglio(nome)
   const elenco = f.figurine.map((x, i) => `${i + 1}. ${x.soggetto}.`).join('\n')
   const input = {
-    prompt: `${STILE}\n\nThe nine figurine, row by row, left to right:\n${elenco}`,
+    // un foglio può avere uno stile e un'introduzione propri (i tasti)
+    prompt: `${f.stile || STILE}\n\n${f.intro || 'The nine figurine, row by row, left to right:'}\n${elenco}`,
     aspect_ratio: '2048x2048',
     quality: 'high',
     number_of_images: 1,
@@ -148,7 +149,7 @@ async function ritaglia(nome, file) {
         crop[o + 3] = keep ? alfa(px[i + 3]) : 0
       }
     }
-    const scale = Math.min(1, MAX / Math.max(cw, ch))
+    const scale = Math.min(1, (f.max || MAX) / Math.max(cw, ch))
     const [ow, oh] = [Math.round(cw * scale), Math.round(ch * scale)]
     const out = join(OUT, `${fig.nome}.webp`)
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', `${cw}x${ch}`, '-i', '-', '-vf', `scale=${ow}:${oh}:flags=lanczos`, '-c:v', 'libwebp', '-pix_fmt', 'yuva420p', '-quality', '88', '-compression_level', '6', '-map_metadata', '-1', out], { input: crop })

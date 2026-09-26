@@ -1,4 +1,5 @@
-/* Struttura globale: barra di avanzamento, header, menu mobile, footer, tendina. */
+/* Struttura globale: barra di avanzamento, header, menu mobile, footer, tendina.
+   I tasti «sasso» (.pb) stanno in pebble.css, le mascotte (.masc) in mascot.css. */
 
 /* ── Avanzamento di lettura ───────────────────────────────────────────────── */
 
@@ -20,6 +21,10 @@
 }
 
 /* ── Header ───────────────────────────────────────────────────────────────── */
+/* Una griglia a tre colonne (1fr auto 1fr): quello che sta in mezzo è sempre
+   centrato esattamente, qualunque larghezza abbiano i lati. Sul telefono:
+   tasto del menu · marchio con la chiocciola · tasto dei contatti. Sul
+   desktop la stessa griglia sta dentro la nav: voci · marchio · voci + invito. */
 
 .site-header {
   --h-fg: var(--c-ink);
@@ -40,7 +45,7 @@
 }
 
 .site-header.is-solid {
-  background: rgb(243 241 236 / 0.9);
+  background: rgb(243 241 236 / 0.92);
   border-bottom-color: var(--h-line);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
@@ -51,23 +56,62 @@
 }
 
 .site-header__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  height: var(--header-h);
+}
+
+.site-nav {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.site-nav__list {
+  display: none;
+}
+
+.menu-toggle {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+
+.site-header__mail {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+
+/* il marchio: la chiocciola (solo la testa) accanto al monogramma e al nome */
+.site-header__brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  height: var(--header-h);
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.site-header__masc {
+  --masc-w: 3.1rem;
+  flex: none;
+  /* la testa sbuca un filo sotto la linea del nome e il collo sfuma nella barra */
+  margin-bottom: -0.4rem;
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 97%);
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 97%);
 }
 
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  margin-right: auto;
+  gap: 0.6rem;
   color: inherit;
 }
 
 .monogram {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
   flex: none;
   overflow: visible;
 }
@@ -78,8 +122,8 @@
 }
 
 .logo__name {
-  font-size: 0.9375rem;
-  font-weight: 620;
+  font-size: 1.0625rem;
+  font-weight: 640;
   letter-spacing: -0.02em;
   white-space: nowrap;
 }
@@ -127,74 +171,53 @@
   to { stroke-dashoffset: 0; }
 }
 
-.site-nav,
-.site-header__clock,
-.site-header__cta {
-  display: none;
-}
-
-/* bottone menu */
-.menu-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-height: 2.75rem;
-  padding: 0 0.25rem 0 0.75rem;
-  color: inherit;
-}
-
-.menu-toggle__label {
-  color: inherit;
-}
-
-.menu-toggle__icon {
-  position: relative;
-  display: block;
-  width: 2rem;
-  height: 2rem;
-}
-
-.menu-toggle__icon i {
-  position: absolute;
-  left: 0.25rem;
-  right: 0.25rem;
-  height: 1.5px;
-  background: currentColor;
-  transition: transform var(--t-2) var(--ease-out), top var(--t-2) var(--ease-out);
-}
-
-.menu-toggle__icon i:first-child { top: 0.7rem; }
-.menu-toggle__icon i:last-child { top: 1.2rem; }
-
-.menu-toggle__icon.is-open i:first-child { top: 0.95rem; transform: rotate(45deg); }
-.menu-toggle__icon.is-open i:last-child { top: 0.95rem; transform: rotate(-45deg); }
-
-@media (min-width: 1100px) {
-  .menu-toggle:not(.menu-toggle--close) {
+/* telefoni stretti: niente chiocciola né qualifica, il nome resta (più piccolo) */
+@media (max-width: 379px) {
+  .site-header__masc,
+  .logo__role {
     display: none;
   }
 
-  .site-nav,
-  .site-header__cta {
-    display: block;
+  .logo__name {
+    font-size: 0.9375rem;
   }
 
-  .site-header__cta {
-    display: inline-flex;
+  .monogram {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  .menu-toggle:not(.menu-toggle--close),
+  .site-header__mail {
+    display: none;
   }
 
-  .logo {
-    margin-right: 0;
+  .site-header__inner {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .site-nav {
-    margin-inline: auto;
+    grid-column: 1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 2rem);
   }
 
   .site-nav__list {
     display: flex;
     align-items: center;
-    gap: clamp(0.25rem, 1vw, 1rem);
+    gap: 0.4rem;
+  }
+
+  .site-nav__list--l {
+    justify-self: end;
+  }
+
+  .site-nav__list--r {
+    justify-self: start;
   }
 
   .site-nav__item {
@@ -203,85 +226,40 @@
     align-items: center;
   }
 
-  .site-nav__link {
-    position: relative;
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.45rem;
-    padding: 0.85rem 0.7rem;
-    font-size: 0.9375rem;
-    font-weight: 480;
-    letter-spacing: -0.01em;
+  .site-nav__item--cta {
+    margin-left: 0.35rem;
   }
 
-  .site-nav__n {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.06em;
-    color: var(--h-muted);
-    transition: color var(--t-1) ease;
-  }
-
-  .site-nav__link::after {
-    content: '';
-    position: absolute;
-    left: 0.7rem;
-    right: 0.7rem;
-    bottom: 0.55rem;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform var(--t-2) var(--ease-out);
-  }
-
-  .site-nav__link:hover::after,
-  .site-nav__link[aria-current]::after {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-
-  .site-nav__link[aria-current] .site-nav__n {
-    color: var(--c-minio);
-  }
-
-  .site-nav__item--sub .site-nav__link {
-    padding-right: 0.15rem;
-  }
-
-  .site-nav__item--sub .site-nav__link::after {
-    right: 0.15rem;
-  }
-
+  /* il «+» del sottomenu: solo per tastiera e touch, col mouse basta passarci */
   .site-nav__toggle {
     display: grid;
     place-items: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    margin-right: 0.35rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin: 0 0.1rem 0.3rem 0;
     font-size: 0.75rem;
     color: var(--h-muted);
-    transition: transform var(--t-2) var(--ease-out);
+    transition: transform var(--t-2) var(--ease-out), color var(--t-1) ease;
   }
 
   .site-nav__item--sub:hover .site-nav__toggle,
   .site-nav__toggle[aria-expanded='true'] {
+    color: var(--h-fg);
     transform: rotate(45deg);
   }
 
   .subnav {
     position: absolute;
     top: 100%;
-    left: -0.5rem;
+    left: -0.25rem;
     width: 23rem;
-    padding-top: 0.6rem;
+    padding-top: 0.5rem;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-0.4rem);
     transition: opacity var(--t-1) ease, transform var(--t-2) var(--ease-out), visibility 0s linear var(--t-2);
   }
 
-  /* hover per il mouse; da tastiera e touch si apre con il bottone (classe .is-open) */
   .site-nav__item--sub:hover .subnav,
   .subnav.is-open {
     opacity: 1;
@@ -331,12 +309,11 @@
   }
 }
 
-@media (min-width: 1360px) {
-  .site-header__clock {
-    display: flex;
-    gap: 0.5rem;
-    color: var(--h-muted);
-    font-variant-numeric: tabular-nums;
+/* tra 1100 e 1279 px i tasti si stringono un po' */
+@media (min-width: 1100px) and (max-width: 1279px) {
+  .site-nav__link.pb--sm .pb__top,
+  .site-header__cta.pb--sm .pb__top {
+    padding-inline: 0.9rem;
   }
 }
 
@@ -424,19 +401,8 @@
 .menu__sub {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 0.5rem;
-  padding: 0 0 1rem 2.75rem;
-}
-
-.menu__sub a {
-  display: inline-block;
-  padding: 0.5rem 0.8rem;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-full);
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  gap: 0.5rem 0.4rem;
+  padding: 0.25rem 0 1.1rem 2.75rem;
 }
 
 .menu__aside {
@@ -456,17 +422,20 @@
   margin-bottom: 0.35rem;
 }
 
-.menu__block--cta {
-  grid-column: 1 / -1;
+.menu__note {
+  color: var(--muted);
+  font-size: 0.8125rem;
 }
 
-.menu__block--cta .btn {
-  width: 100%;
+.menu__block--cta {
+  grid-column: 1 / -1;
+  justify-items: start;
 }
 
 .menu__social {
-  display: grid;
-  gap: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.4rem;
 }
 
 .menu__foot {
@@ -478,6 +447,10 @@
   padding-block: 1rem;
   border-top: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
+}
+
+.menu__foot .dot {
+  margin-right: 0.5rem;
 }
 
 /* ingresso scaglionato delle voci */
@@ -511,12 +484,10 @@
 }
 
 /* ── Footer ───────────────────────────────────────────────────────────────── */
-/* La chiusura del sito, in cinque tempi: invito a tutta larghezza · filo ·
-   riga editoriale (identità, pagine, recapiti) · riga legale · firma.
-   Palette propria, un gradino più profonda dell'inchiostro delle sezioni, e un
-   solo accento. Griglia a dodici colonne in tre campate da quattro: gli assi
-   verticali cadono sempre alle colonne 1, 5 e 9. Niente riquadri, niente
-   colonne da modello: tipografia, filo e spazio. */
+/* La chiusura del sito, tutta centrata, dall'alto in basso: invito e due
+   tasti · fila delle pagine · marchio custodito dalle mascotte · recapiti con
+   le mini immagini · note legali e credito · torna su. Palette propria, un
+   gradino più profonda dell'inchiostro delle sezioni, e un solo accento. */
 
 footer.site-footer {
   --bg: #0d0d0c;
@@ -527,18 +498,19 @@ footer.site-footer {
   --accent: var(--c-minio);
   --accent-text: var(--c-minio);
   --focus: var(--c-minio-bright);
-  --cols: repeat(12, minmax(0, 1fr));
   position: relative;
-  /* lo spazio cresce arrivando in fondo: la pagina rallenta prima di chiudersi */
-  padding-block: clamp(6rem, 3.5rem + 9vw, 14rem) clamp(1.5rem, 3vw, 3rem);
+  padding-block: clamp(5rem, 3rem + 7vw, 11rem) clamp(2.5rem, 2rem + 2vw, 4.5rem);
+  text-align: center;
 }
 
 .site-footer__inner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(3rem, 1.5rem + 4.5vw, 6rem);
   margin-inline: auto;
 }
 
-/* link con sottolineatura che entra da sinistra ed esce verso destra:
-   la posizione cambia di colpo, si anima solo la lunghezza */
+/* link con sottolineatura che entra da sinistra ed esce verso destra */
 .site-footer .uline {
   display: inline-block;
   text-decoration: none;
@@ -564,360 +536,112 @@ footer.site-footer {
   background: var(--accent);
 }
 
-/* ── 1 · Invito ───────────────────────────────────────────────────────────── */
-
-.foot-cta__eyebrow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 2rem;
-  margin-bottom: clamp(2rem, 1rem + 3.5vw, 4.5rem);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
+/* sul fondo scuro i tasti non hanno bisogno d'ombra */
+.site-footer .pb__side,
+.menu .pb__side {
+  filter: none;
 }
 
-.foot-cta__eyebrow p:first-child {
+/* ── 1 · Invito ── */
+
+.foot-cta {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  max-width: 62rem;
+}
+
+.foot-cta__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   color: var(--fg);
+  font-size: 0.75rem;
 }
 
 .foot-cta__title {
-  font-size: clamp(2.75rem, 0.25rem + 10.6vw, 14rem);
+  font-size: clamp(2.5rem, 1rem + 5.6vw, 6.25rem);
   font-weight: 540;
   font-stretch: 86%;
-  letter-spacing: -0.045em;
-  line-height: 0.9;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
   text-wrap: balance;
 }
 
-.foot-cta__row {
-  display: grid;
-  gap: 1.75rem var(--col-gap);
-  margin-top: clamp(2.5rem, 1rem + 4.5vw, 5.5rem);
-}
-
 .foot-cta__note {
-  max-width: 34ch;
+  max-width: 42ch;
   font-size: var(--fs-small);
   line-height: 1.5;
   color: var(--muted);
 }
 
-/* L'invito: testo che "scorre" verso l'alto e freccia in un anello sottile che
-   si riempie del colore d'accento. Sul telefono diventa una riga intera, alta
-   quanto un pollice, chiusa da due fili. */
-.cta {
-  --ring: 3.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding-block: 1.1rem;
-  border-block: 1px solid var(--line);
-  color: var(--fg);
-  font-size: clamp(1.375rem, 1rem + 1.5vw, 2.5rem);
-  font-weight: 500;
-  font-stretch: 94%;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
-.cta__label {
-  min-width: 0;
-}
-
-.cta__roll {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  padding-block: 0.06em;
-}
-
-/* il testo in uscita sfuma mentre sale, quello in entrata si accende:
-   così nessun residuo resta visibile ai bordi del riquadro */
-.cta__roll > span {
-  display: block;
-  transition: transform 0.55s var(--ease-out), opacity 0.3s ease 0.15s;
-}
-
-.cta__roll::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  display: block;
-  padding-block: 0.06em;
-  opacity: 0;
-  transform: translateY(105%);
-  transition: transform 0.55s var(--ease-out), opacity 0.3s ease;
-}
-
-.cta__arrow {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: var(--ring);
-  height: var(--ring);
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  font-size: 1.25rem;
-  transition: background-color 0.5s var(--ease-out), border-color 0.5s var(--ease-out), color 0.5s var(--ease-out), transform 0.5s var(--ease-out);
-}
-
-.cta__arrow .icon {
-  transition: transform 0.5s var(--ease-out);
-}
-
-.cta:focus-visible .cta__roll > span {
-  transform: translateY(-105%);
-  opacity: 0;
-}
-
-.cta:focus-visible .cta__roll::after {
-  transform: none;
-  opacity: 1;
-}
-
-.cta:focus-visible .cta__arrow {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-  transform: translateX(0.3rem);
-}
-
-.cta:focus-visible .cta__arrow .icon {
-  transform: translateX(0.12rem);
-}
-
-@media (hover: hover) {
-  .cta:hover .cta__roll > span {
-    transform: translateY(-105%);
-    opacity: 0;
-  }
-
-  .cta:hover .cta__roll::after {
-    transform: none;
-    opacity: 1;
-  }
-
-  .cta:hover .cta__arrow {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--on-accent);
-    transform: translateX(0.3rem);
-  }
-
-  .cta:hover .cta__arrow .icon {
-    transform: translateX(0.12rem);
-  }
-}
-
-.cta:active .cta__arrow {
-  transform: translateX(0.3rem) scale(0.94);
-}
-
-/* ── 2 · Filo ─────────────────────────────────────────────────────────────── */
-
-.foot-rule {
-  height: 1px;
-  margin-top: clamp(4rem, 2rem + 6vw, 8rem);
-  background: var(--line);
-  transform-origin: left center;
-}
-
-/* ── 3 · Riga editoriale: identità · pagine · recapiti ───────────────────── */
-
-.foot-meta {
-  display: grid;
-  gap: 2.75rem var(--col-gap);
-  padding-top: clamp(2.5rem, 1.5rem + 2.5vw, 4rem);
-}
-
-.foot-meta__name {
-  display: inline-block;
-  padding-block: 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  line-height: 1.2;
-  text-transform: uppercase;
-  transition: color 0.3s ease;
-}
-
-@media (hover: hover) {
-  .foot-meta__name:hover {
-    color: var(--accent);
-  }
-}
-
-.foot-meta__tag {
-  margin-top: 0.35rem;
-  font-size: var(--fs-small);
-  color: var(--muted);
-}
-
-.foot-meta__areas {
-  display: grid;
-  gap: 0;
-  margin-top: 1rem;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-}
-
-.foot-meta__areas a {
-  display: grid;
-  grid-template-columns: 4.25rem minmax(0, 1fr);
-  gap: 0 0.5rem;
-  padding-block: 0.7rem;
-}
-
-.foot-meta__area {
-  color: var(--fg);
-}
-
-.foot-meta__voci {
-  justify-self: start;
-  color: var(--muted);
-  background: linear-gradient(currentColor, currentColor) no-repeat 100% 100% / 0 1px;
-  background-origin: content-box;
-  transition: color 0.3s ease, background-size 0.45s var(--ease-out);
-}
-
-@media (hover: hover) {
-  .foot-meta__areas a:hover .foot-meta__voci {
-    color: var(--fg);
-    background-position: 0 100%;
-    background-size: 100% 1px;
-  }
-}
-
-.foot-meta__areas a:focus-visible .foot-meta__voci {
-  color: var(--fg);
-  background-position: 0 100%;
-  background-size: 100% 1px;
-}
-
-/* pagine: sul telefono due colonne da tre, comode per il pollice */
-.foot-meta__nav ul {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 1.5rem;
-}
-
-.foot-meta__nav a {
-  padding-block: 0.6rem;
-  font-size: var(--fs-body);
-  font-weight: 480;
-  letter-spacing: -0.01em;
-  line-height: 1.5;
-}
-
-.foot-meta__nav a[aria-current]::before {
-  content: '';
-  display: inline-block;
-  width: 0.35rem;
-  height: 0.35rem;
-  margin-right: 0.6rem;
-  border-radius: 50%;
-  background: var(--accent);
-  vertical-align: 0.12em;
-}
-
-.foot-meta__contact {
-  display: grid;
-  justify-items: start;
-  font-size: var(--fs-body);
-  letter-spacing: -0.01em;
-}
-
-.foot-meta__contact a {
-  padding-block: 0.45rem;
-}
-
-.foot-meta__contact p {
-  margin-top: 0.6rem;
-  font-size: var(--fs-small);
-  line-height: 1.5;
-  color: var(--muted);
-}
-
-/* ── 4 · Riga legale ──────────────────────────────────────────────────────── */
-
-.foot-legal {
-  display: grid;
-  gap: 1.25rem var(--col-gap);
-  margin-top: clamp(3.5rem, 2rem + 4vw, 6rem);
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
-  font-size: 0.75rem;
-  line-height: 1.5;
-}
-
-.foot-legal__id {
-  display: grid;
-  gap: 0.15rem;
-}
-
-.foot-legal__id p:first-child {
-  color: var(--fg);
-}
-
-.foot-legal__policy,
-.foot-legal__social {
+.foot-cta__row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 1.75rem;
-  color: var(--fg);
+  justify-content: center;
+  gap: 1rem 1.25rem;
+  margin-top: 0.75rem;
 }
 
-/* sul telefono prima i bersagli da toccare (social, poi privacy e cookie),
-   in fondo il titolare */
-.foot-legal__social {
-  order: -2;
+/* ── 2 · Le pagine ── */
+
+.foot-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 0.5rem;
 }
 
-.foot-legal__policy {
-  order: -1;
-}
-
-.foot-legal__policy .uline {
-  padding-block: 0.75rem;
-}
-
-.foot-legal .ext {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding-block: 0.75rem;
-}
-
-.foot-legal .ext .icon {
-  font-size: 0.875rem;
-  transition: transform 0.45s var(--ease-out);
-}
-
-@media (hover: hover) {
-  .foot-legal .ext:hover .icon {
-    transform: translate(0.15rem, -0.15rem);
-  }
-}
-
-/* ── 5 · Firma ────────────────────────────────────────────────────────────── */
+/* ── 3 · Il marchio custodito ── */
 
 .foot-sign {
   display: grid;
-  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
   justify-items: center;
-  margin-top: clamp(3.5rem, 2rem + 5vw, 8rem);
+  column-gap: clamp(0.75rem, 3vw, 3.5rem);
+  width: 100%;
+  max-width: 70rem;
+}
+
+.foot-sign__guard {
+  --masc-w: clamp(5.5rem, 24vw, 15rem);
+}
+
+.foot-sign__guard--l {
+  justify-self: end;
+}
+
+.foot-sign__guard--r {
+  justify-self: start;
 }
 
 .foot-sign__mark {
   display: block;
-  width: clamp(9rem, 42vw, 26rem);
+  width: clamp(6rem, 22vw, 14rem);
   color: var(--fg);
 }
 
 .foot-sign__float {
   display: block;
   will-change: transform;
+}
+
+.foot-sign__name {
+  grid-column: 1 / -1;
+  margin-top: 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 620;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.foot-sign__tag {
+  grid-column: 1 / -1;
+  margin-top: 0.4rem;
+  font-size: var(--fs-small);
+  color: var(--muted);
 }
 
 .sig {
@@ -972,22 +696,32 @@ footer.site-footer {
   opacity: 1;
 }
 
-/* la riga di chiusura compare quando il tratto è quasi finito */
-.js [data-reveal='draw'] .foot-sign__meta {
-  opacity: 0;
-  transition: opacity var(--t-3) ease 0.6s;
-}
-
-.js [data-reveal='draw'].is-in .foot-sign__meta {
-  opacity: 1;
-}
-
 .js [data-reveal='draw'].is-in .sig__mark path {
   stroke-dashoffset: 0;
 }
 
 .js [data-reveal='draw'].is-in .sig__guides {
   opacity: 0.4;
+}
+
+/* le mascotte e le scritte arrivano quando il tratto è quasi finito */
+.js [data-reveal='draw'] .foot-sign__guard,
+.js [data-reveal='draw'] .foot-sign__name,
+.js [data-reveal='draw'] .foot-sign__tag {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity var(--t-3) ease 0.5s, transform var(--t-4) var(--ease-out) 0.5s;
+}
+
+.js [data-reveal='draw'] .foot-sign__guard--r {
+  transition-delay: 0.7s;
+}
+
+.js [data-reveal='draw'].is-in .foot-sign__guard,
+.js [data-reveal='draw'].is-in .foot-sign__name,
+.js [data-reveal='draw'].is-in .foot-sign__tag {
+  opacity: 1;
+  transform: none;
 }
 
 @media (hover: hover) {
@@ -1008,165 +742,104 @@ footer.site-footer {
   transform: scale(1.8);
 }
 
-.foot-sign__meta {
+/* ── 4 · Recapiti ── */
+
+.foot-data {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5rem 1rem;
   width: 100%;
+  max-width: 72rem;
 }
 
-.foot-sign__meta .label {
-  font-size: 0.75rem;
+.foot-data__cell {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.35rem;
 }
 
-.foot-sign__top {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 2.75rem;
+.foot-data__fig {
+  height: 5.5rem;
+  width: auto;
+  margin-bottom: 0.6rem;
+}
+
+.foot-data__main {
+  font-size: var(--fs-body);
+  font-weight: 540;
+  letter-spacing: -0.01em;
   color: var(--fg);
 }
 
-.foot-sign__top .label {
-  color: inherit;
+.foot-data__sub {
+  max-width: 30ch;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
-.foot-sign__top .icon {
-  transition: transform 0.45s var(--ease-out);
+.foot-data__social {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 0.4rem;
+  margin-block: 0.15rem 0.35rem;
 }
 
-@media (hover: hover) {
-  .foot-sign__top:hover .icon {
-    transform: translateY(-0.2rem);
-  }
+/* ── 5 · Note legali e credito ── */
+
+.foot-legal {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  border-top: 1px solid var(--line);
 }
 
-/* ── Tablet e desktop: tre campate da quattro colonne ─────────────────────── */
+.foot-legal__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 0.4rem;
+  margin-bottom: 0.5rem;
+}
 
-@media (min-width: 768px) {
-  .foot-cta__row {
-    grid-template-columns: var(--cols);
-    align-items: end;
-  }
+.foot-legal__id,
+.foot-legal__credit {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  text-wrap: balance;
+}
 
-  .cta {
-    grid-column: 1 / 9;
-    display: inline-flex;
-    justify-self: start;
-    justify-content: flex-start;
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    padding-block: 0.5rem;
-    border-block: 0;
-  }
+.foot-legal__id {
+  color: var(--fg);
+}
 
-  .cta__arrow {
-    --ring: clamp(3.25rem, 2rem + 1.6vw, 4rem);
-  }
+.foot-legal__credit a {
+  color: var(--fg);
+}
 
-  .foot-cta__note {
-    grid-column: 9 / 13;
-    padding-bottom: 0.6rem;
-  }
+/* ── 6 · Torna su ── */
 
-  .foot-meta,
-  .foot-legal {
-    grid-template-columns: var(--cols);
-  }
+.foot-top {
+  margin-top: -0.5rem;
+}
 
-  .foot-meta__brand,
-  .foot-legal__id {
-    grid-column: 1 / 5;
-  }
-
-  .foot-meta__nav,
-  .foot-legal__policy {
-    grid-column: 5 / 9;
-  }
-
-  .foot-meta__contact,
-  .foot-legal__social {
-    grid-column: 9 / 13;
-  }
-
-  .foot-legal__policy,
-  .foot-legal__social {
-    order: 0;
-  }
-
-  /* su tablet i tre social stanno in colonna, come le tre righe del titolare */
-  .foot-legal__social {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .foot-meta__nav ul {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .foot-meta__nav a {
-    padding-block: 0.3rem;
-  }
-
-  .foot-meta__name {
-    padding-block: 0.25rem;
-  }
-
-  .foot-meta__areas {
-    gap: 0.3rem;
-    margin-top: 1.5rem;
-  }
-
-  .foot-meta__areas a {
-    padding-block: 0.15rem;
-  }
-
-  .foot-meta__contact a {
-    padding-block: 0.3rem;
-  }
-
-  .foot-legal__policy,
-  .foot-legal__social {
-    align-content: start;
-  }
-
-  .foot-legal__policy .uline,
-  .foot-legal .ext {
-    padding-block: 0.15rem;
-  }
-
-  .foot-sign {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: end;
-    justify-items: start;
-    gap: var(--col-gap);
-  }
-
-  .foot-sign__mark {
-    width: clamp(9rem, 22vw, 26rem);
-  }
-
-  .foot-sign__meta {
-    grid-template-columns: auto auto;
-    justify-content: end;
-    gap: 2.5rem;
-    padding-bottom: 0.35rem;
+@media (min-width: 800px) {
+  .foot-data {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1200px) {
-  .foot-legal__social {
-    flex-direction: row;
-    gap: 0 1.75rem;
-  }
-
   .foot-cta__row {
-    margin-top: clamp(4rem, 2rem + 3vw, 6rem);
+    margin-top: 1.25rem;
   }
 
-  .foot-meta__areas {
-    margin-top: 2rem;
+  .foot-data__fig {
+    height: 6.5rem;
   }
 }
 

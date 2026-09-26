@@ -4,6 +4,8 @@
 @import './styles/base.css';
 @import './styles/art.css';
 @import './styles/components.css';
+@import './styles/pebble.css';
+@import './styles/mascot.css';
 @import './styles/layout.css';
 @import './styles/home.css';
 @import './styles/portfolio.css';

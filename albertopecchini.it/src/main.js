@@ -10,6 +10,8 @@ import { initForm } from './client/form.js'
 import { initCanvas } from './client/canvas.js'
 import { initViewer } from './client/viewer.js'
 import { initDialer } from './client/phone.js'
+import { initPebbles } from './client/pebble.js'
+import { initMascots } from './client/mascot.js'
 
 // Il compositore email (/email/) porta con sé i moduli del generatore (tools/email-generator):
 // si carica in un pezzo a parte, solo sulla sua pagina, così le altre non ne pagano il peso.
@@ -40,6 +42,8 @@ const modules = [
   initCopy,
   initForm,
   initDialer,
+  initPebbles,
+  initMascots,
   initCanvas,
   initViewer,
   initEmail,

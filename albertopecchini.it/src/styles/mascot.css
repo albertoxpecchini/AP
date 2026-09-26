@@ -1,0 +1,123 @@
+/* ── Mascotte ──────────────────────────────────────────────────────────────
+   La chiocciola e la tartaruga (tools/mascotte). Sull'immagine, che ha gli
+   occhi bianchi, stanno due occhi del sito: un disco bianco con la pupilla che
+   segue il puntatore (--px/--py da src/client/mascot.js) e la palpebra del
+   colore della pelle che scende per sbattere. Centri e semiassi arrivano in
+   percentuale dell'immagine (--x, --y, --rx, --ry) da src/data/mascotte.js.
+   .masc--crop mostra solo un ritaglio (la testa, in testata). */
+
+.masc {
+  position: relative;
+  display: block;
+  width: var(--masc-w, 100%);
+  aspect-ratio: var(--ar);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.masc__body {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 70%;
+}
+
+.masc__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-user-drag: none;
+}
+
+/* il disco copre l'occhio disegnato (un filo più piccolo, così il contorno a inchiostro resta) */
+.masc__eye {
+  --k: 0.9;
+  position: absolute;
+  left: calc(var(--x) - var(--rx) * var(--k));
+  top: calc(var(--y) - var(--ry) * var(--k));
+  width: calc(var(--rx) * 2 * var(--k));
+  height: calc(var(--ry) * 2 * var(--k));
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.masc__pupil {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46%;
+  height: 46%;
+  border-radius: 50%;
+  background: #10110f;
+  translate: -50% -50%;
+  transform: translate(var(--px, 0px), var(--py, 0px));
+  transition: transform 0.1s ease-out;
+}
+
+/* senza puntatore le pupille vagano più lente */
+.masc.is-idle .masc__pupil {
+  transition-duration: 0.4s;
+}
+
+/* la palpebra: parte sopra l'occhio, scende per sbattere; a metà quando gli occhi si incrociano */
+.masc__lid {
+  position: absolute;
+  inset: -3% 0 0;
+  background: var(--skin, #8b7d6b);
+  transform: translateY(-101%);
+  transition: transform 0.08s ease-in;
+}
+
+.masc__eye.is-blink .masc__lid {
+  transform: translateY(0);
+}
+
+.masc.is-cross .masc__lid {
+  transform: translateY(-56%);
+  transition-duration: 0.2s;
+}
+
+.masc.is-cross .masc__eye.is-blink .masc__lid {
+  transform: translateY(0);
+}
+
+/* la zona del naso: invisibile, la usa lo script per la distanza */
+.masc__nose {
+  position: absolute;
+  left: calc(var(--x) - var(--rx));
+  top: calc(var(--y) - var(--ry));
+  width: calc(var(--rx) * 2);
+  height: calc(var(--ry) * 2);
+  border-radius: 50%;
+}
+
+/* con gli occhi incrociati la mascotte vibra un po' */
+.masc.is-cross .masc__body {
+  animation: masc-wiggle 0.5s ease-in-out infinite;
+}
+
+@keyframes masc-wiggle {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50% { transform: rotate(1.2deg); }
+}
+
+/* ritaglio: il riquadro ha la misura del ritaglio, il corpo si sposta dietro */
+.masc--crop {
+  overflow: hidden;
+  aspect-ratio: calc(var(--cw) / var(--ch) * var(--ar));
+}
+
+.masc--crop .masc__body {
+  inset: auto;
+  left: calc(-1 * var(--cx) / var(--cw) * 100%);
+  top: calc(-1 * var(--cy) / var(--ch) * 100%);
+  width: calc(100% * 100 / var(--cw));
+  aspect-ratio: var(--ar);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masc.is-cross .masc__body {
+    animation: none;
+  }
+}

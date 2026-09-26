@@ -96,4 +96,52 @@ export const fogli = {
       { nome: 'computer-lancio', soggetto: 'an open laptop with a small vermilion rocket launching out of the screen, leaving a dashed curved trail and a few puffs of smoke' },
     ],
   },
+
+  // ── Testata e piè di pagina ─────────────────────────────────────────────────
+  // Le mini immagini dei recapiti e delle voci del footer: stesse regole delle
+  // altre figurine (bordo adesivo compreso), così stanno bene sul fondo scuro.
+  chrome: {
+    titolo: 'Le mini immagini del piè di pagina: recapiti, sede, orari, social, torna su, note legali',
+    figurine: [
+      { nome: 'chrome-email', soggetto: 'an open envelope with a folded letter sticking out, a small vermilion wax seal on the flap' },
+      { nome: 'chrome-telefono', soggetto: 'a smartphone standing upright with a vermilion phone-handset symbol on its screen and three small curved ring lines beside it' },
+      { nome: 'chrome-sede', soggetto: 'a small folded paper map with a river and fields, and a tall vermilion location pin standing on it' },
+      { nome: 'chrome-orari', soggetto: 'a desk calendar page with a grid of blank days, one day circled in vermilion, and a small round alarm clock leaning on it' },
+      { nome: 'chrome-instagram', soggetto: 'a compact retro camera seen from the front, its round lens with a vermilion ring' },
+      { nome: 'chrome-github', soggetto: 'a small cardboard box of code: an open box with a floating pair of curly braces and a vermilion git-branch symbol (three dots joined by lines)' },
+      { nome: 'chrome-su', soggetto: 'a wooden signpost with a single arrow-shaped sign pointing straight up, the arrow sign vermilion' },
+      { nome: 'chrome-privacy', soggetto: 'a document sheet with text lines and a closed padlock resting on it, the padlock body vermilion' },
+      { nome: 'chrome-crediti', soggetto: 'a small framed picture of a house on an easel with a paper tag hanging from the corner, the tag vermilion' },
+    ],
+  },
+}
+
+// ── Tasti ───────────────────────────────────────────────────────────────────
+// Le sagome irregolari dei tasti di testata e piè di pagina: sassi di fiume,
+// carta strappata. Sono piene e vuote dentro: il testo lo mette il sito, il
+// codice le rende premibili e in rilievo (`pebble()` in ui.js). Stile proprio,
+// senza il bordo adesivo, e ritagli grandi (`max`) perché i tasti del piè di
+// pagina sono larghi.
+
+export const STILE_TASTI = `A sheet of nine separate flat button shapes, arranged in a precise 3 × 3 grid on a fully transparent background, for the navigation bar of a designer's website.
+Each shape is one flat, irregular, organic silhouette — like a smooth river pebble seen from above, or a piece of hand-torn paper with softly rounded, slightly uneven edges — centred in its own cell and filling about 85% of the cell width. Leave clear empty space between cells: nothing touches, nothing overlaps. Do not draw the grid.
+Style, identical for all nine: a flat matte fill in the colour named for each shape, with a crisp, uniform ink outline (#10110f) about 8 px wide on the light and vermilion shapes, and a crisp off-white outline (#f3f1ec) about 8 px wide on the dark shapes. A barely visible paper grain inside the fill, a faint hand-drawn feel, like the identity of a high-end architecture studio.
+Completely empty inside: no text, no letters, no numbers, no icons, no symbols, no shadows, no gradients, no highlights, no bevel, no 3D, no background, no frames, no watermark.`
+
+fogli.tasti = {
+  titolo: 'Le nove sagome dei tasti: carta, minio, inchiostro',
+  stile: STILE_TASTI,
+  intro: 'The nine shapes, row by row, left to right:',
+  max: 960,
+  figurine: [
+    { nome: 'tasto-carta-1', soggetto: 'a wide (about 3:1) smooth pebble shape, paper-white fill (#f3f1ec), ink outline' },
+    { nome: 'tasto-carta-2', soggetto: 'a wide (about 3:1) torn-paper shape with slightly wavy edges, paper-white fill (#f3f1ec), ink outline' },
+    { nome: 'tasto-carta-3', soggetto: 'a wide (about 3:1) pebble shape with one gently bulging side, paper-white fill (#f3f1ec), ink outline' },
+    { nome: 'tasto-carta-4', soggetto: 'a wide (about 3:1) pebble shape, a little tilted, paper-white fill (#f3f1ec), ink outline' },
+    { nome: 'tasto-carta-tondo', soggetto: 'an almost round, slightly irregular pebble shape (about 1:1), paper-white fill (#f3f1ec), ink outline' },
+    { nome: 'tasto-minio-1', soggetto: 'a very wide (about 4:1) smooth pebble shape, vermilion fill (#e5481f), ink outline' },
+    { nome: 'tasto-minio-2', soggetto: 'a very wide (about 4:1) torn-paper shape with slightly wavy edges, vermilion fill (#e5481f), ink outline' },
+    { nome: 'tasto-inchiostro-1', soggetto: 'a wide (about 3:1) smooth pebble shape, near-black ink fill (#10110f), off-white outline' },
+    { nome: 'tasto-inchiostro-tondo', soggetto: 'an almost round, slightly irregular pebble shape (about 1:1), near-black ink fill (#10110f), off-white outline' },
+  ],
 }

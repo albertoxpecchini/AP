@@ -67,7 +67,8 @@ albertopecchini.it/
 │  ├─ replicate.mjs        client di Replicate in comune tra copertine, figurine e scontorno
 │  ├─ scontorna.mjs        toglie il fondo a una foto (bria/remove-background) e ne rifinisce i capelli
 │  ├─ copertine/           copertine e gallerie illustrate dei progetti non web, gpt-image-2 su Replicate (vedi il suo README)
-│  ├─ figurine/            figurine scontornate: nove per immagine, gpt-image-2 su Replicate (vedi il suo README)
+│  ├─ figurine/            figurine scontornate: nove per immagine, gpt-image-2 su Replicate; anche le sagome dei tasti e le mini immagini del piè di pagina (vedi il suo README)
+│  ├─ mascotte/            la chiocciola e la tartaruga, gpt-image-2 su Replicate; occhi trovati dallo script (vedi il suo README)
 │  ├─ cartina/             fondo illustrato della carta dell’area operativa (/contatti/), gpt-image-2 su Replicate
 │  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
@@ -80,7 +81,8 @@ albertopecchini.it/
 │  ├─ og.png               immagine per le anteprime social (1200×630)
 │  ├─ icons.svg            sprite delle icone
 │  └─ media/
-│     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine
+│     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine; tasto-*.webp sono le sagome dei tasti, chrome-*.webp le mini immagini del piè di pagina
+│     ├─ mascotte/         lumaca.webp e tartaruga.webp, le mascotte, generate da tools/mascotte
 │     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone) e l’iPhone 18 Pro vettoriale
 │     ├─ progetti/         una cartella per progetto: fotografie NN.webp (griglia) e NN-full.webp (lightbox), copertina.webp e vista-NN.webp illustrate
 │     ├─ studio/           fotografie reali (primo piano, avatar, figura scontornata)
@@ -93,13 +95,15 @@ albertopecchini.it/
 │  │  ├─ services.js       tre aree di servizi, pacchetti, FAQ
 │  │  ├─ method.js         le sette fasi del metodo
 │  │  ├─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
-│  │  └─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
+│  │  ├─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
+│  │  ├─ figurine.js       generato da tools/figurine: nomi e misure delle figurine ritagliate
+│  │  └─ mascotte.js       generato da tools/mascotte: misure, occhi e naso delle mascotte
 │  ├─ templates/
 │  │  ├─ routes.js         tabella delle rotte (percorso, title, description, dati strutturati) + sitemap, robots, miniature
-│  │  ├─ layout.js         <html> completo: head, header, footer, JSON-LD, firma
+│  │  ├─ layout.js         <html> completo: head, header e footer (centrati, tasti «sasso», mascotte), JSON-LD, firma
 │  │  ├─ html.js           tag `html`, `esc`, `attrs`, `cx`, `pad`, `jsonLd`
 │  │  ├─ components/
-│  │  │  ├─ ui.js          icone, monogramma, bottoni, intestazioni di sezione, media, mockup, schede dati
+│  │  │  ├─ ui.js          icone, monogramma, bottoni, tasti «sasso» (pebble), mascotte, intestazioni di sezione, media, mockup, schede dati
 │  │  │  ├─ project.js     card, riga d’indice, copertina e anteprima di un progetto
 │  │  │  └─ viewer.js      visualizzatore delle tavole (case study e pagina Tavole)
 │  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), contact, legal (privacy, cookie, 404), stile (sistema visivo), tavole (visualizzatore)
@@ -108,7 +112,9 @@ albertopecchini.it/
 │  │  ├─ kit.js            primitive di disegno (squadratura, quote, tratteggi, testi)
 │  │  └─ floorplan · building · survey · axon · brand · web · misc
 │  ├─ client/              JavaScript del browser, un modulo per ambito
-│  │  ├─ chrome.js         header, sottomenu, orologio, menu mobile, avanzamento, transizioni
+│  │  ├─ chrome.js         header, sottomenu, menu mobile, avanzamento, transizioni
+│  │  ├─ pebble.js         tasti «sasso»: inclinazione verso il puntatore, stato premuto
+│  │  ├─ mascot.js         mascotte: occhi che seguono il puntatore, si incrociano sul naso, sbattono, si guardano intorno
 │  │  ├─ motion.js         reveal, contatori, parallasse, cursore, elementi magnetici, anteprime
 │  │  ├─ sections.js       hero, carosello dei siti, timeline del metodo, indice laterale
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
@@ -131,7 +137,7 @@ albertopecchini.it/
 │  │  ├─ scene.js          dal modello alla scena: tracciati per stile, riempimenti, tratteggi, testi
 │  │  ├─ render.js         disegno della scena su canvas 2D, impaginazione dei testi
 │  │  └─ worker.js         scarica, legge e disegna fuori dal thread della pagina
-│  ├─ styles/              token → base → componenti → layout → pagine → stile → stampa
+│  ├─ styles/              token → base → componenti → tasti (pebble) → mascotte (mascot) → layout → pagine → stile → stampa
 │  ├─ main.js              entry JavaScript: avvia i moduli client
 │  └─ style.css            entry CSS: importa src/styles/* nell’ordine giusto
 ├─ vite.config.js
@@ -368,7 +374,11 @@ La pagina intera di `iphone.pages` (`public/media/web/ap-iphone-01.webp`, `-02`�
 
 ### Figurine
 
-Servizi, fasi del metodo (in `/metodo/` e in home), lavori trasversali, strumenti dello studio, le parti sul web (sezioni 02 e 03 della home, `/portfolio/web/`, case study dei siti), contatti e 404 hanno una piccola illustrazione scontornata: `figurina(nome)` in `ui.js`, file in `public/media/figurine/`, misure in `src/data/figurine.js` (generato). Nascono da [`tools/figurine`](tools/figurine/README.md): un’immagine di gpt-image-2 con nove figurine, ritagliate in automatico. Un nome senza file non disegna nulla.
+Servizi, fasi del metodo (in `/metodo/` e in home), lavori trasversali, strumenti dello studio, le parti sul web (sezioni 02 e 03 della home, `/portfolio/web/`, case study dei siti), contatti e 404 hanno una piccola illustrazione scontornata: `figurina(nome)` in `ui.js`, file in `public/media/figurine/`, misure in `src/data/figurine.js` (generato). Nascono da [`tools/figurine`](tools/figurine/README.md): un’immagine di gpt-image-2 con nove figurine, ritagliate in automatico. Un nome senza file non disegna nulla. Dallo stesso strumento vengono le **sagome dei tasti** (`tasto-*.webp`, foglio `tasti`, senza bordo adesivo e con ritagli fino a 960 px) e le **mini immagini del piè di pagina** (`chrome-*.webp`: busta, telefono, mappa, calendario, macchina fotografica, scatola del codice, cartello «torna su», lucchetto, quadro).
+
+### Mascotte
+
+La **chiocciola gigante africana** e la **tartaruga di terra**, gli animali di Alberto, custodiscono il sito: la testa della chiocciola accanto al marchio nella testata, tutte e due ai lati della firma nel piè di pagina. Sono due immagini di gpt-image-2 (`public/media/mascotte/`) fatte da [`tools/mascotte`](tools/mascotte/README.md), che trova gli occhi da solo e scrive `src/data/mascotte.js`; il naso si segna a mano. `mascot(nome, { crop })` in `ui.js` mette sopra l’immagine gli occhi del sito e `src/client/mascot.js` li muove: ogni pupilla segue il puntatore per conto suo, sul naso gli occhi si incrociano e la mascotte vibra, ogni tanto sbattono le palpebre e senza puntatore (telefono, mouse fermo) si guardano intorno.
 
 ## Fonti delle immagini
 
@@ -377,7 +387,8 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | Immagini | Dove stanno | Fonte |
 | --- | --- | --- |
 | Copertine e gallerie dei progetti non web (strada, bar-caffetteria, cantiere, tettoie, museo) | `public/media/progetti/<slug>/copertina.webp`, `vista-NN*.webp` | Generate con **openai/gpt-image-2** (OpenAI) su [Replicate](https://replicate.com/openai/gpt-image-2), con le tavole originali o le fotografie del museo come riferimento — [`tools/copertine`](tools/copertine/README.md) |
-| Figurine | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
+| Figurine, sagome dei tasti (`tasto-*.webp`), mini immagini del piè di pagina (`chrome-*.webp`) | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
+| Mascotte: chiocciola gigante africana e tartaruga di terra | `public/media/mascotte/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/mascotte`](tools/mascotte/README.md); gli occhi mobili sono disegnati dal codice del sito |
 | Fondo della carta dell’area operativa (/contatti/) | `public/media/mappa/area-operativa.webp` | Generato con **openai/gpt-image-2** su Replicate dal riferimento di lago e fiumi di `areamap({ solo: 'acque' })`; reticolo, raggi, città, nomi e scala restano vettoriali, da `areamap({ base })` in `src/art/misc.js` — `tools/cartina/cartina.mjs` |
 | Ritratto e avatar | `public/media/studio/fototessera*.webp` | Fototessera di Alberto Pecchini, scontornata con bria/remove-background su Replicate (volto non ritoccato) |
 | Figura scontornata di /studio/ | `public/media/studio/curioso-*.webp` | Fotografia di Alberto Pecchini, scontornata con l’IA su Replicate |
@@ -407,12 +418,14 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 ## Stili
 
-`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `layout` → `home` → `portfolio` → `pages` → `stile` → `viewer` → `print`.
+`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `pebble` → `mascot` → `layout` → `home` → `portfolio` → `pages` → `stile` → `viewer` → `email` → `print`.
 
 - **Token** (`tokens.css`): palette carta / inchiostro / minio (`#E5481F`), scala tipografica, spazi, raggi, durate ed easing. È il primo file da aprire per cambiare l’aspetto.
 - **Caratteri**: Archivo Variable (asse `wdth`) per i testi, IBM Plex Mono per etichette e dati, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
 - **Reveal** (`base.css`): `data-reveal` con i tipi `fade`, `up`, `clip`, `line`, `draw`; tutto disattivato con `prefers-reduced-motion`.
-- **Footer** (`layout.css`): composizione unica, palette scoperta su `footer.site-footer`, firma con monogramma a tratto sottile.
+- **Header e footer** (`layout.css`): tutti e due centrati e simmetrici su una griglia `1fr auto 1fr`, con il marchio in mezzo. Nella testata: tre voci · chiocciola e marchio · due voci e invito (sotto i 1100 px: menu · marchio · contatti). Nel piè di pagina, dall’alto: invito e due tasti, fila delle pagine, firma custodita dalle due mascotte, recapiti con le mini immagini, note legali con il credito «Sito di Alberto Pecchini», torna su. Palette scoperta su `footer.site-footer`.
+- **Tasti «sasso»** (`pebble.css`, markup da `pebble()` in `ui.js`): la sagoma irregolare è un’immagine di gpt-image-2 (`public/media/figurine/tasto-*.webp`) stirata sul tasto; sotto c’è lo spessore (la stessa sagoma come maschera, piena di un colore d’ombra, spostata di `--pb-depth`). Al passaggio la faccia si solleva e il tasto si inclina verso il puntatore (`--tx`/`--ty` da `pebble.js`), premendo scende sullo spessore. Tre toni (carta, minio, inchiostro), tre misure, la variante tonda per la sola icona; senza sagoma ritagliata la forma è disegnata in CSS.
+- **Mascotte** (`mascot.css`, markup da `mascot()` in `ui.js`): sopra l’immagine, ai centri segnati in `src/data/mascotte.js`, stanno due occhi del sito (disco bianco, pupilla mossa da `--px`/`--py`, palpebra del colore della pelle) e la zona del naso; `.masc--crop` mostra un ritaglio (la testa della chiocciola in testata, sfumata in basso da una maschera).
 - **Stile** (`stile.css`): il piano navigabile della pagina `/stile/` e le sue tavole, a misure fisse in px (sono fogli inquadrati dalla finestra, non layout fluidi).
 - **Visualizzatore** (`viewer.css`): le tavole vere, nel case study, nella pagina `/portfolio/tavole/` e a schermo intero.
 - **Stampa** (`print.css`): la pagina `/studio/profilo/` è pensata per essere stampata come curriculum.
@@ -421,7 +434,7 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 `src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill.
 
-Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, orologio, barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile, visualizzatore delle tavole.
+Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, tasti «sasso» che si inclinano e si premono, mascotte con gli occhi che seguono il puntatore (si incrociano sul naso, sbattono le palpebre, si guardano intorno senza puntatore), barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile, visualizzatore delle tavole.
 
 ## Build
 

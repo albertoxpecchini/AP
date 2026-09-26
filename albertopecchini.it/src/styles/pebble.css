@@ -1,0 +1,235 @@
+/* ── Tasti «sasso» ─────────────────────────────────────────────────────────
+   Una sagoma irregolare disegnata da gpt-image-2 (tools/figurine, foglio
+   «tasti»), resa premibile e in rilievo: sotto la faccia c'è lo spessore (la
+   stessa sagoma, piena di un colore d'ombra, spostata in basso di --pb-depth).
+   Al passaggio la faccia si solleva e il tasto si inclina verso il puntatore
+   (--tx/--ty da src/client/pebble.js); premendo, la faccia scende sullo
+   spessore. Senza sagoma ritagliata (.pb--fallback) la forma è fatta in CSS.
+   Il markup lo scrive pebble() in src/templates/components/ui.js. */
+
+.pb {
+  --pb-depth: 0.3rem;
+  --pb-fg: var(--c-ink);
+  --pb-fg-hover: var(--c-minio-deep);
+  --pb-shade: #6b665d;
+  --pb-fill: var(--c-paper);
+  --pb-edge: var(--c-ink);
+  --pb-lift: 0.1rem;
+  --tx: 0;
+  --ty: 0;
+  position: relative;
+  display: inline-block;
+  padding: 0 0 var(--pb-depth);
+  border: 0;
+  background: none;
+  color: var(--pb-fg);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 580;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transform: perspective(30rem) rotateX(calc(var(--ty) * -10deg)) rotateY(calc(var(--tx) * 10deg));
+  transition: transform 0.4s var(--ease-out);
+}
+
+/* lo spessore: la sagoma piena del colore d'ombra, sotto la faccia */
+.pb__side {
+  position: absolute;
+  inset: var(--pb-depth) 0 0;
+  background: var(--pb-shade);
+  -webkit-mask: var(--pb-img) center / 100% 100% no-repeat;
+  mask: var(--pb-img) center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* la faccia con il testo: si solleva e scende */
+.pb__top {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.35rem;
+  transition: transform 0.16s var(--ease-out);
+}
+
+.pb__face {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--pb-img) center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.pb__label {
+  transition: color var(--t-1) ease;
+}
+
+.pb__icon {
+  display: grid;
+  place-items: center;
+  font-size: 1.05em;
+  transition: transform var(--t-2) var(--ease-out);
+}
+
+/* una figurina al posto dell'icona */
+.pb__fig {
+  display: block;
+  width: 2.1em;
+  height: 2.1em;
+  margin-block: -0.6em;
+  flex: none;
+}
+
+.pb__fig .fig {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ── Toni ── */
+
+.pb--minio {
+  --pb-fg: var(--c-ink);
+  --pb-fg-hover: var(--c-ink);
+  --pb-shade: #7c2308;
+  --pb-fill: var(--c-minio);
+}
+
+.pb--inchiostro {
+  --pb-fg: var(--c-paper);
+  --pb-fg-hover: var(--c-minio-bright);
+  --pb-shade: #5a5a54;
+  --pb-fill: var(--c-ink);
+  --pb-edge: var(--c-paper);
+}
+
+/* ── Misure ── */
+
+.pb--sm {
+  font-size: 0.875rem;
+}
+
+.pb--sm .pb__top {
+  min-height: 2.5rem;
+  padding: 0.45rem 1.15rem;
+  gap: 0.45rem;
+}
+
+.pb--lg {
+  --pb-depth: 0.4rem;
+  font-size: 1.125rem;
+}
+
+.pb--lg .pb__top {
+  min-height: 3.5rem;
+  padding: 0.85rem 2.1rem;
+  gap: 0.9rem;
+}
+
+/* solo icona: quasi tondo */
+.pb--round .pb__top {
+  width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+}
+
+.pb--round.pb--sm .pb__top {
+  width: 2.5rem;
+  min-height: 2.5rem;
+}
+
+.pb--round.pb--lg .pb__top {
+  width: 3.5rem;
+  min-height: 3.5rem;
+}
+
+.pb--round .pb__icon {
+  font-size: 1.25rem;
+}
+
+/* ── Stati ── */
+
+@media (hover: hover) {
+  .pb:hover .pb__top {
+    transform: translateY(calc(var(--pb-lift) * -1));
+  }
+
+  .pb:hover .pb__label {
+    color: var(--pb-fg-hover);
+  }
+
+  .pb:hover .pb__icon {
+    transform: translateX(0.15rem);
+  }
+
+  .pb--round:hover .pb__icon {
+    transform: none;
+  }
+}
+
+.pb:active .pb__top,
+.pb.is-pressed .pb__top {
+  transform: translateY(calc(var(--pb-depth) - 1px));
+  transition-duration: 0.06s;
+}
+
+.pb:focus-visible {
+  outline: none;
+}
+
+.pb:focus-visible .pb__top {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+/* la pagina corrente: un punto di minio davanti al testo */
+.pb.is-current .pb__label {
+  color: var(--pb-fg-hover);
+}
+
+.pb.is-current .pb__label::before {
+  content: '';
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  margin-right: 0.45em;
+  border-radius: 50%;
+  background: var(--c-minio);
+  vertical-align: 0.1em;
+}
+
+/* ── Senza sagoma: la forma in CSS ── */
+
+.pb--fallback .pb__face,
+.pb--fallback .pb__side {
+  border-radius: 55% 45% 50% 50% / 45% 55% 45% 55%;
+}
+
+.pb--fallback .pb__face {
+  background: var(--pb-fill);
+  border: 2px solid var(--pb-edge);
+}
+
+.pb--fallback .pb__side {
+  -webkit-mask: none;
+  mask: none;
+}
+
+/* Il tasto è un blocco che ruota: senza movimento resta piatto */
+@media (prefers-reduced-motion: reduce) {
+  .pb {
+    transform: none !important;
+  }
+}

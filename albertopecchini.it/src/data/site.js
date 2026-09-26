@@ -9,7 +9,8 @@
 import { areas, showSheets } from './projects.js'
 
 export const site = {
-  url: 'https://albertopecchini.it',
+  // Con il www: l'apice fa 308 verso www.albertopecchini.it, e i link al sito vanno sempre lì.
+  url: 'https://www.albertopecchini.it',
   lang: 'it',
   locale: 'it_IT',
 

@@ -27,6 +27,7 @@ tools/tavole/__pycache__/
 # vanno solo i file scelti in public/media/ (copertine, figurine, carta).
 tools/copertine/lavoro/
 tools/figurine/lavoro/
+tools/mascotte/lavoro/
 tools/cartina/lavoro/
 
 # Catture dei siti: l'ultima impronta di ogni sito. In CI sta nella cache delle Actions.

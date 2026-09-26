@@ -74,7 +74,7 @@
   --gutter: clamp(1rem, 0.4rem + 3vw, 3.5rem);
   --col-gap: clamp(0.75rem, 0.4rem + 1.4vw, 2rem);
   --max: 105rem;
-  --header-h: 4rem;
+  --header-h: 4.5rem;
 
   /* Raggi: il linguaggio è ortogonale, i raggi sono minimi */
   --r-0: 0;
@@ -105,7 +105,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --header-h: 4.75rem;
+    --header-h: 5.25rem;
   }
 }
 
