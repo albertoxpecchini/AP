@@ -14,6 +14,8 @@ import { privacyPage, cookiePage, creditiPage, notFoundPage } from './pages/lega
 import { stilePage } from './pages/stile.js'
 import { tavolePage, sheetCount, hasSheets } from './pages/tavole.js'
 import { emailPage } from './pages/email.js'
+import { assistenzaPage, assistenzaContattiPage } from './pages/assistenza.js'
+import { assistenza } from '../data/assistenza.js'
 
 const websiteLd = () => ({
   '@context': 'https://schema.org',
@@ -168,6 +170,26 @@ export const routes = [
     noFooter: true,
     hideCta: true,
   },
+  {
+    // «Better Call Pekko»: l'assistenza informatica come il sito americano del
+    // 2008 di Pekko, «the computer guy», tutto in inglese. Pagine autonome
+    // (standalone): niente guscio del portfolio, stile e script in linea nel
+    // template. Ogni banner porta a /contatti/assistenza/, mai a /contatti/.
+    path: assistenza.path,
+    priority: 0.6,
+    title: assistenza.titolo,
+    description: assistenza.descrizione,
+    render: assistenzaPage,
+    standalone: true,
+  },
+  {
+    path: assistenza.contatti,
+    priority: 0.5,
+    title: assistenza.titoloContatti,
+    description: assistenza.descrizioneContatti,
+    render: assistenzaContattiPage,
+    standalone: true,
+  },
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
   { path: '/cookie/', priority: 0.2, title: 'Cookie policy', description: 'Il sito non usa cookie di profilazione: ecco cosa viene salvato nel browser e perché.', render: cookiePage, hideCta: true },
   { path: '/crediti/', priority: 0.2, title: 'Crediti e fonti delle immagini', description: 'Da dove vengono le immagini del sito: disegni e foto originali, illustrazioni generate con gpt-image-2, mockup della Figma Community.', render: creditiPage, hideCta: true },
@@ -195,6 +217,8 @@ export function renderRoute(pathname, { assets }) {
   const wanted = normalize(pathname)
   const route = routes.find((r) => r.path === wanted) || routes.find((r) => r.is404)
   const status = route.is404 ? 404 : 200
+  // Le pagine autonome producono da sole l'intero documento.
+  if (route.standalone) return { html: route.render({ route, assets }), status }
   const page = layout({
     route,
     title: route.title,

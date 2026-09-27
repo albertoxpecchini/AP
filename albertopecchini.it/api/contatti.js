@@ -1,4 +1,5 @@
-// Ricezione del modulo di contatto (/contatti/).
+// Ricezione dei moduli di contatto: /contatti/ (modulo «contatti») e
+// /contatti/assistenza/ (modulo «assistenza», la pagina «Better Call Pekko»).
 //
 // Funzione serverless Vercel, runtime Node. Il percorso è /api/contatti e gira
 // sotto lo stesso dominio del sito: nessuna dipendenza da installare e i dati
@@ -21,17 +22,46 @@ const MAX_BODY = 16 * 1024 // 16 KB: il modulo ne produce meno di 3
 const MIN_FILL_SECONDS = 3 // sotto questa soglia ha compilato un bot
 const RATE_LIMIT = { max: 5, windowMs: 60 * 60 * 1000 } // 5 invii l'ora per IP
 
-const TYPES = [
-  'Rilievo o restituzione grafica',
-  'Pratica edilizia o catastale',
-  'Modellazione 3D, BIM o rendering',
-  'Sito web o landing page',
-  'Logo e identità visiva',
-  'Grafica e materiale stampato',
-  'Un progetto che unisce più ambiti',
-  'Altro',
-]
-const BUDGETS = ['Da definire insieme', 'Fino a 1.000 €', '1.000 — 3.000 €', '3.000 — 6.000 €', 'Oltre 6.000 €']
+// I due moduli: stesse regole, voci diverse. `extra` è il campo facoltativo a
+// scelta chiusa (budget per i progetti, urgenza per l'assistenza). Le voci
+// devono coincidere con quelle di src/data/site.js e src/data/assistenza.js.
+const FORMS = {
+  contatti: {
+    subject: 'Richiesta dal sito',
+    head: 'Modulo di contatto · MOD. 01',
+    types: [
+      'Rilievo o restituzione grafica',
+      'Pratica edilizia o catastale',
+      'Modellazione 3D, BIM o rendering',
+      'Sito web o landing page',
+      'Logo e identità visiva',
+      'Grafica e materiale stampato',
+      'Un progetto che unisce più ambiti',
+      'Altro',
+    ],
+    extra: { name: 'budget', label: 'Budget', options: ['Da definire insieme', 'Fino a 1.000 €', '1.000 — 3.000 €', '3.000 — 6.000 €', 'Oltre 6.000 €'] },
+  },
+  assistenza: {
+    subject: 'Richiesta di assistenza',
+    head: 'Better Call Pekko · MOD. 02',
+    types: [
+      'Virus / slow PC',
+      'Duplicate files & messy folders',
+      'Printer or scanner not working',
+      'Speakers, sound, microphone, drivers',
+      'Windows install or restore',
+      'Office install or problems',
+      'Change operating system',
+      'Documents: layout or format conversion',
+      'Backup & data recovery',
+      'Wi-Fi & home network',
+      'Phone full or slow',
+      'New PC setup',
+      'Some other computer trouble',
+    ],
+    extra: { name: 'urgenza', label: 'Urgenza', options: ['Whenever', 'This week', 'By tomorrow', 'NOW, it’s an emergency!!!'] },
+  },
+}
 
 // ── Limite di frequenza ──────────────────────────────────────────────────────
 // Memoria dell'istanza: si azzera a ogni avvio a freddo. Non è una barriera
@@ -58,26 +88,27 @@ function rateLimited(ip) {
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '')
 
 function validate(body) {
+  const form = FORMS[body.modulo] || FORMS.contatti
   const data = {
     nome: str(body.nome, 120),
     email: str(body.email, 180),
     telefono: str(body.telefono, 40),
     tipo: str(body.tipo, 80),
-    budget: str(body.budget, 40),
+    extra: str(body[form.extra.name], 40),
     messaggio: str(body.messaggio, 2000),
   }
   const errors = []
   if (data.nome.length < 2) errors.push('nome')
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email)) errors.push('email')
   if (data.telefono && !/^[+0-9 ()./-]{6,20}$/.test(data.telefono)) errors.push('telefono')
-  if (!TYPES.includes(data.tipo)) errors.push('tipo')
-  if (data.budget && !BUDGETS.includes(data.budget)) data.budget = ''
+  if (!form.types.includes(data.tipo)) errors.push('tipo')
+  if (data.extra && !form.extra.options.includes(data.extra)) data.extra = ''
   if (data.messaggio.length < 20) errors.push('messaggio')
   if (body.privacy !== true && body.privacy !== 'on' && body.privacy !== 'true') errors.push('privacy')
   // Un ritorno a capo infilato nel nome non deve poter alterare le intestazioni
   // della email in uscita.
   if (/[\r\n]/.test(data.nome + data.email + data.tipo)) errors.push('nome')
-  return { data, errors }
+  return { data, errors, form }
 }
 
 // ── Verifica Turnstile ───────────────────────────────────────────────────────
@@ -107,7 +138,7 @@ async function verifyTurnstile(token, ip) {
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ESCAPES[c])
 
-function emailHtml(d, meta) {
+function emailHtml(d, meta, form) {
   const row = (label, value) =>
     value
       ? `<tr><td style="padding:10px 16px;border-bottom:1px solid #e6e2d9;font:600 11px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;white-space:nowrap;vertical-align:top">${esc(label)}</td><td style="padding:10px 16px;border-bottom:1px solid #e6e2d9;font:400 15px/1.6 -apple-system,Segoe UI,sans-serif;color:#1c1a17">${value}</td></tr>`
@@ -116,14 +147,14 @@ function emailHtml(d, meta) {
   return `<!doctype html><html lang="it"><body style="margin:0;padding:24px;background:#f3f1ec">
 <table role="presentation" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;width:100%;background:#fffdf8;border:1px solid #e6e2d9;border-radius:4px">
 <tr><td style="padding:20px 16px;border-bottom:2px solid #1c1a17">
-<p style="margin:0;font:600 11px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:#8a8478">Modulo di contatto · MOD. 01</p>
+<p style="margin:0;font:600 11px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:#8a8478">${esc(form.head)}</p>
 <p style="margin:6px 0 0;font:600 20px/1.3 -apple-system,Segoe UI,sans-serif;color:#1c1a17">${esc(d.tipo)}</p>
 </td></tr>
 <tr><td style="padding:0"><table role="presentation" cellpadding="0" cellspacing="0" width="100%">
 ${row('Nome', esc(d.nome))}
 ${row('Email', `<a href="mailto:${esc(d.email)}" style="color:#1c1a17">${esc(d.email)}</a>`)}
 ${row('Telefono', d.telefono ? `<a href="tel:${esc(d.telefono.replace(/[^\d+]/g, ''))}" style="color:#1c1a17">${esc(d.telefono)}</a>` : '')}
-${row('Budget', esc(d.budget))}
+${row(form.extra.label, esc(d.extra))}
 </table></td></tr>
 <tr><td style="padding:20px 16px">
 <p style="margin:0 0 10px;font:600 11px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8478">Messaggio</p>
@@ -135,14 +166,14 @@ ${row('Budget', esc(d.budget))}
 </table></body></html>`
 }
 
-const emailText = (d, meta) =>
+const emailText = (d, meta, form) =>
   [
-    `Modulo di contatto — ${d.tipo}`,
+    `${form.subject} — ${d.tipo}`,
     '',
     `Nome:     ${d.nome}`,
     `Email:    ${d.email}`,
     d.telefono ? `Telefono: ${d.telefono}` : null,
-    d.budget ? `Budget:   ${d.budget}` : null,
+    d.extra ? `${form.extra.label.padEnd(9)}${d.extra}` : null,
     '',
     'Messaggio:',
     d.messaggio,
@@ -153,15 +184,15 @@ const emailText = (d, meta) =>
     .join('\n')
 
 // CallMeBot passa il testo in una query: niente HTML, solo il grassetto di WhatsApp.
-const whatsappText = (d) =>
+const whatsappText = (d, form) =>
   [
-    '*Richiesta dal sito*',
+    `*${form.subject}*`,
     d.tipo,
     '',
     `*${d.nome}*`,
     d.email,
     d.telefono || null,
-    d.budget ? `Budget: ${d.budget}` : null,
+    d.extra ? `${form.extra.label}: ${d.extra}` : null,
     '',
     d.messaggio.length > 600 ? d.messaggio.slice(0, 600) + '…' : d.messaggio,
   ]
@@ -170,7 +201,7 @@ const whatsappText = (d) =>
 
 // ── Consegna ─────────────────────────────────────────────────────────────────
 
-async function sendEmail(d, meta) {
+async function sendEmail(d, meta, form) {
   const key = process.env.RESEND_API_KEY
   const to = process.env.CONTACT_TO
   if (!key || !to) return { ok: false, reason: 'non configurato' }
@@ -183,9 +214,9 @@ async function sendEmail(d, meta) {
       to: [to],
       // Rispondere alla notifica scrive direttamente a chi ha compilato il modulo.
       reply_to: `${d.nome} <${d.email}>`,
-      subject: `Richiesta dal sito — ${d.tipo}`,
-      html: emailHtml(d, meta),
-      text: emailText(d, meta),
+      subject: `${form.subject} — ${d.tipo}`,
+      html: emailHtml(d, meta, form),
+      text: emailText(d, meta, form),
     }),
     signal: AbortSignal.timeout(10_000),
   })
@@ -193,12 +224,12 @@ async function sendEmail(d, meta) {
   return { ok: true }
 }
 
-async function sendWhatsApp(d) {
+async function sendWhatsApp(d, form) {
   const phone = process.env.CALLMEBOT_PHONE
   const apikey = process.env.CALLMEBOT_APIKEY
   if (!phone || !apikey) return { ok: false, reason: 'non configurato' }
 
-  const query = new URLSearchParams({ phone, apikey, text: whatsappText(d) })
+  const query = new URLSearchParams({ phone, apikey, text: whatsappText(d, form) })
   const res = await fetch(`https://api.callmebot.com/whatsapp.php?${query}`, { signal: AbortSignal.timeout(10_000) })
   if (!res.ok) return { ok: false, reason: `HTTP ${res.status}` }
   return { ok: true }
@@ -254,7 +285,7 @@ export default async function handler(req, res) {
     return json(res, 429, { ok: false, error: 'Hai già inviato alcune richieste: riprova tra un’ora oppure scrivimi direttamente via email.' })
   }
 
-  const { data, errors } = validate(body)
+  const { data, errors, form } = validate(body)
   if (errors.length) return json(res, 422, { ok: false, error: 'Alcuni campi non sono validi.', fields: errors })
 
   const check = await verifyTurnstile(body._turnstile, ip)
@@ -265,7 +296,7 @@ export default async function handler(req, res) {
     ip,
   }
 
-  const [email, whatsapp] = await Promise.allSettled([sendEmail(data, meta), sendWhatsApp(data)])
+  const [email, whatsapp] = await Promise.allSettled([sendEmail(data, meta, form), sendWhatsApp(data, form)])
   const outcome = (r) => (r.status === 'fulfilled' ? r.value : { ok: false, reason: String(r.reason).slice(0, 200) })
   const mail = outcome(email)
   const wa = outcome(whatsapp)

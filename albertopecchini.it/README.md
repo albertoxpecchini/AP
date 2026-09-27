@@ -83,6 +83,7 @@ albertopecchini.it/
 │  └─ media/
 │     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine; tasto-*.webp sono le sagome dei tasti, chrome-*.webp le mini immagini del piè di pagina
 │     ├─ mascotte/         lumaca.webp e tartaruga.webp, le mascotte, generate da tools/mascotte
+│     ├─ assistenza/       ritagli, sfondi, foto stock, avatar e annunci (ad-*.jpg|gif) di «Better Call Pekko», da tools/assistenza
 │     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone) e l’iPhone 18 Pro vettoriale
 │     ├─ progetti/         una cartella per progetto: fotografie NN.webp (griglia) e NN-full.webp (lightbox), copertina.webp e vista-NN.webp illustrate
 │     ├─ studio/           fotografie reali (primo piano, avatar, figura scontornata)
@@ -97,7 +98,9 @@ albertopecchini.it/
 │  │  ├─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
 │  │  ├─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
 │  │  ├─ figurine.js       generato da tools/figurine: nomi e misure delle figurine ritagliate
-│  │  └─ mascotte.js       generato da tools/mascotte: misure, occhi e naso delle mascotte
+│  │  ├─ mascotte.js       generato da tools/mascotte: misure, occhi e naso delle mascotte
+│  │  ├─ assistenza.js     contenuti (in inglese) delle pagine «Better Call Pekko» (/assistenza/, /contatti/assistenza/)
+│  │  ├─ assistenza-media.js  generato da tools/assistenza: misure delle immagini di public/media/assistenza/
 │  ├─ templates/
 │  │  ├─ routes.js         tabella delle rotte (percorso, title, description, dati strutturati) + sitemap, robots, miniature
 │  │  ├─ layout.js         <html> completo: head, header e footer (centrati, tasti «sasso», mascotte), JSON-LD, firma
@@ -162,6 +165,8 @@ albertopecchini.it/
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
 | `/crediti/` | Crediti e fonti delle immagini (testi in `src/data/crediti.js`), linkata nel footer |
+| `/assistenza/` | «Better Call Pekko»: l’assistenza informatica come il sito americano del 2008 di un «computer guy at law», tutto in inglese — 960 px fissi, colonna blu coi tasti gialli, video di consulenza, annunci di aziende che non esistono, profilo «About Pekko» in stile MySpace, listino 2009, forum phpBB, telefonini e provider del 2009, pagamenti e donazioni PayPal, e-card, coupon, commenti in stile SMS, webcam coi filtri brutti, colonne pubblicitarie ai lati dello schermo, pop-up d’ingresso; Alberto qui si chiama **Pekko** e il nome vero resta solo nel credito del footer. Pagina **autonoma** (`standalone` in `routes.js`): niente guscio del sito, stile e script in linea in `src/templates/pages/assistenza.js`; contenuti in `src/data/assistenza.js`, immagini da [`tools/assistenza`](tools/assistenza/README.md). Ogni banner porta a `/contatti/assistenza/` |
+| `/contatti/assistenza/` | I contatti dell’assistenza, stesso stile e stessa lingua: telefono, WhatsApp, email e un modulo che parla con `api/contatti.js` come quello di `/contatti/` (`modulo: 'assistenza'`, voci in inglese per tipo di guaio e urgenza) |
 | `/email/` | Compositore email, strumento privato: non è nei menu né nella sitemap, ha `noindex` e si apre solo dal link con la chiave (vedi [Compositore email online](#compositore-email-online)) |
 | `404.html` | Pagina non trovata (servita in automatico da Vercel) |
 
@@ -389,6 +394,7 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | Copertine e gallerie dei progetti non web (strada, bar-caffetteria, cantiere, tettoie, museo) | `public/media/progetti/<slug>/copertina.webp`, `vista-NN*.webp` | Generate con **openai/gpt-image-2** (OpenAI) su [Replicate](https://replicate.com/openai/gpt-image-2), con le tavole originali o le fotografie del museo come riferimento — [`tools/copertine`](tools/copertine/README.md) |
 | Figurine, sagome dei tasti (`tasto-*.webp`), mini immagini del piè di pagina (`chrome-*.webp`) | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
 | Mascotte: chiocciola gigante africana e tartaruga di terra | `public/media/mascotte/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/mascotte`](tools/mascotte/README.md); gli occhi mobili sono disegnati dal codice del sito |
+| Ingredienti e annunci di «Better Call Pekko» (/assistenza/) | `public/media/assistenza/` | Gli ingredienti (ritagli di Alberto in completi sgargianti, foto stock finte, oggetti, avatar, tre sfondi) sono generati con **openai/gpt-image-2** su Replicate, il volto dalla fototessera data come riferimento; gli annunci `ad-*` sono composti a strati in HTML da [`tools/assistenza`](tools/assistenza/README.md) (testo, starburst e nastri del sito) e fotografati con il browser headless; le GIF montano i fotogrammi con ffmpeg |
 | Fondo della carta dell’area operativa (/contatti/) | `public/media/mappa/area-operativa.webp` | Generato con **openai/gpt-image-2** su Replicate dal riferimento di lago e fiumi di `areamap({ solo: 'acque' })`; reticolo, raggi, città, nomi e scala restano vettoriali, da `areamap({ base })` in `src/art/misc.js` — `tools/cartina/cartina.mjs` |
 | Ritratto e avatar | `public/media/studio/fototessera*.webp` | Fototessera di Alberto Pecchini, scontornata con bria/remove-background su Replicate (volto non ritoccato) |
 | Figura scontornata di /studio/ | `public/media/studio/curioso-*.webp` | Fotografia di Alberto Pecchini, scontornata con l’IA su Replicate |

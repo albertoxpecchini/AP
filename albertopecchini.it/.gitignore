@@ -29,6 +29,7 @@ tools/copertine/lavoro/
 tools/figurine/lavoro/
 tools/mascotte/lavoro/
 tools/cartina/lavoro/
+tools/assistenza/lavoro/
 
 # Catture dei siti: l'ultima impronta di ogni sito. In CI sta nella cache delle Actions.
 tools/catture/stato.json
