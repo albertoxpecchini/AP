@@ -42,6 +42,7 @@ ${noindex ? '<meta name="robots" content="noindex, follow">' : `<link rel="canon
 <link rel="author" href="${esc(site.url)}">
 <meta name="theme-color" content="#f3f1ec">
 <meta name="format-detection" content="telephone=no">
+<meta name="google-adsense-account" content="ca-pub-6444827793145583">
 <meta property="og:type" content="${route.ogType || 'website'}">
 <meta property="og:site_name" content="${esc(site.name)}">
 <meta property="og:locale" content="${site.locale}">
