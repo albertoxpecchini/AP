@@ -17,6 +17,12 @@
 
 import { site } from './site.js'
 
+// Con SITE=bcp (la build del progetto Vercel di bettercallpekko.it) le due pagine
+// stanno alla radice del dominio; altrimenti vivono dentro il sito serio.
+export const BCP = typeof process !== 'undefined' && process.env?.SITE === 'bcp'
+const PATH = BCP ? '/' : '/assistenza/'
+const CONTATTI = BCP ? '/contact/' : '/contatti/assistenza/'
+
 const cifre = site.contact.phone.replace(/\D/g, '') // 393510355506
 const nazionale = cifre.replace(/^39/, '')
 // Il numero come lo scrivono gli spot americani: 351-035-5506.
@@ -25,8 +31,12 @@ const bello = nazionale.length === 10 ? `${nazionale.slice(0, 3)}-${nazionale.sl
 const INDIRIZZO = `${site.location.address}, ${site.location.cap} ${site.location.city} (${site.location.province}), Italy`
 
 export const assistenza = {
-  path: '/assistenza/',
-  contatti: '/contatti/assistenza/',
+  path: PATH,
+  contatti: CONTATTI,
+  // Il dominio delle due pagine e i loro indirizzi lì: canonical e og:url ci puntano
+  // anche dalla copia che resta dentro il sito serio.
+  dominio: 'https://bettercallpekko.it',
+  urlPubblici: { '/assistenza/': '/', '/contatti/assistenza/': '/contact/' },
   lang: 'en',
   nome: 'Better Call Pekko',
   titolo: 'In Computer Trouble? Better Call Pekko! — I’m the computer guy. Computer repair in Rivalta sul Mincio (Mantova, Italy)',
@@ -58,10 +68,10 @@ export const assistenza = {
     { label: 'Forum', href: '#forum' },
     { label: 'Coupons', href: '#coupons' },
     { label: 'Donate', href: '#donate' },
-    { label: 'Contact', href: '/contatti/assistenza/', contatti: true },
+    { label: 'Contact', href: CONTATTI, contatti: true },
   ],
 
-  striscia: `${bello} SI PARLA ITALIANO ● VIA BELVEDERE 1, RIVALTA SUL MINCIO (MN) ● I’M THE COMPUTER GUY`,
+  striscia: `${bello} SI PARLA ITALIANO ● VIA BELVEDERE 1, RIVALTA SUL MINCIO (MN) ● I’M THE COMPUTER GUY ● BETTERCALLPEKKO.IT`,
 
   popup: {
     barra: 'FREE CONSULTATION — Pekko, the computer guy',
@@ -198,18 +208,18 @@ export const assistenza = {
   social: {
     titolo: 'FIND PEKKO ON',
     reti: [
-      { nome: 'Instagram', href: site.social.find((s) => s.key === 'instagram')?.url || '/contatti/assistenza/', colore: '#c13584', vero: true },
-      { nome: 'GitHub', href: site.social.find((s) => s.key === 'github')?.url || '/contatti/assistenza/', colore: '#333', vero: true },
+      { nome: 'Instagram', href: site.social.find((s) => s.key === 'instagram')?.url || CONTATTI, colore: '#c13584', vero: true },
+      { nome: 'GitHub', href: site.social.find((s) => s.key === 'github')?.url || CONTATTI, colore: '#333', vero: true },
       { nome: 'MSN Messenger', href: `mailto:${site.contact.email}`, colore: '#2e8b57', nota: `add me: ${site.contact.email}`, vero: true },
-      { nome: 'MySpace', href: '/contatti/assistenza/', colore: '#0a5ea8', nota: 'top 8 below' },
-      { nome: 'Facebook', href: '/contatti/assistenza/', colore: '#3b5998', nota: 'ask Pekko' },
-      { nome: 'Twitter', href: '/contatti/assistenza/', colore: '#33ccff', nota: '140 chars max' },
-      { nome: 'Skype', href: '/contatti/assistenza/', colore: '#00aff0', nota: 'ask for the name' },
-      { nome: 'Netlog', href: '/contatti/assistenza/', colore: '#ff6600', nota: 'RIP' },
-      { nome: 'Badoo', href: '/contatti/assistenza/', colore: '#ff4d6d', nota: 'no' },
-      { nome: 'YouTube', href: '/contatti/assistenza/', colore: '#cc0000', nota: 'channel 47' },
-      { nome: 'Flickr', href: '/contatti/assistenza/', colore: '#ff0084', nota: '9 photos' },
-      { nome: 'Digg', href: '/contatti/assistenza/', colore: '#1b6fb6', nota: 'digg it!' },
+      { nome: 'MySpace', href: CONTATTI, colore: '#0a5ea8', nota: 'top 8 below' },
+      { nome: 'Facebook', href: CONTATTI, colore: '#3b5998', nota: 'ask Pekko' },
+      { nome: 'Twitter', href: CONTATTI, colore: '#33ccff', nota: '140 chars max' },
+      { nome: 'Skype', href: CONTATTI, colore: '#00aff0', nota: 'ask for the name' },
+      { nome: 'Netlog', href: CONTATTI, colore: '#ff6600', nota: 'RIP' },
+      { nome: 'Badoo', href: CONTATTI, colore: '#ff4d6d', nota: 'no' },
+      { nome: 'YouTube', href: CONTATTI, colore: '#cc0000', nota: 'channel 47' },
+      { nome: 'Flickr', href: CONTATTI, colore: '#ff0084', nota: '9 photos' },
+      { nome: 'Digg', href: CONTATTI, colore: '#1b6fb6', nota: 'digg it!' },
     ],
     condividi: ['Digg', 'del.icio.us', 'StumbleUpon', 'reddit', 'Facebook', 'MySpace', 'Twitter', 'e-mail'],
   },

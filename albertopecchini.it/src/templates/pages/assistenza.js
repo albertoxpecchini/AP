@@ -12,7 +12,8 @@
 // con i filtri brutti, pop-up d'ingresso. Tutto in inglese, come chiede Alberto,
 // che qui si chiama Pekko. Sui telefoni la pagina si vede rimpicciolita
 // (viewport a 960 px), come nel 2008. Le Impact sono bianche con i bordi
-// colorati e l'estrusione in 3D, sempre.
+// colorati e l'estrusione in 3D, sempre. Le stesse pagine sono il sito intero di
+// bettercallpekko.it (progetto Vercel a parte, build con SITE=bcp: vedi routes.js).
 //
 // Contenuti in src/data/assistenza.js; immagini di tools/assistenza (ingredienti
 // di gpt-image-2 e annunci composti da rendi.mjs) con le misure nel manifest
@@ -74,15 +75,15 @@ function satisfied() {
     { t: 'f', href: A.contatti, title: 'Facebook (ask Pekko)', bg: '#3b5998' },
     { t: 'd', href: A.contatti, title: 'Digg it! (Digg is gone. Pekko is not.)', bg: '#1b6fb6' },
   ]
-  return `<div class="sat">${i3('ANOTHER SATISFIED CUSTOMER?', 'w', 22)}<ul class="soc">${soc.map((s) => `<li><a href="${s.href}" title="${esc(s.title)}" style="background:${s.bg}"${s.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${s.t}</a></li>`).join('')}</ul>${i3('TELL YOUR VIRUS-INFECTED FRIENDS!!!!', 'y', 19)}<div style="margin-top:14px">${logo(true)}</div><span class="aptv">AP tv</span></div>`
+  return `<div class="sat">${i3('ANOTHER SATISFIED CUSTOMER?', 'w', 22)}<ul class="soc">${soc.map((s) => `<li><a href="${s.href}" title="${esc(s.title)}" style="background:${s.bg}"${s.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${s.t}</a></li>`).join('')}</ul>${i3('TELL YOUR VIRUS-INFECTED FRIENDS!!!!', 'y', 19)}<div style="margin-top:14px">${logo(true)}</div>${i3('BETTERCALLPEKKO.IT', 'y', 12)}<br><span class="aptv">AP tv</span></div>`
 }
 
 function foot() {
   return html`
     <footer class="foot">
       <p class="cause"><a href="#donate">${esc(A.piede.cause)}</a></p>
-      <p class="addr"><b>PEKKO</b> · ${esc(A.indirizzo)} · <a href="${A.tel}">${esc(A.telefono)}</a> · <a href="mailto:${A.email}">${esc(A.email)}</a> · <a href="${A.mappa}" target="_blank" rel="noopener">map</a> · SI PARLA ITALIANO</p>
-      <p><a href="${A.contatti}">About &amp; Contact</a> &nbsp;|&nbsp; <a href="#" data-eula>Terms of Use</a> &nbsp;|&nbsp; <a href="/privacy/">Privacy Policy</a> &nbsp;|&nbsp; <a href="/crediti/">Image credits</a> &nbsp;|&nbsp; <a href="${A.paypal}" target="_blank" rel="noopener">Donate</a> &nbsp;|&nbsp; <a href="/">The serious website</a></p>
+      <p class="addr"><b>PEKKO</b> · <a href="${esc(A.dominio)}/">bettercallpekko.it</a> · ${esc(A.indirizzo)} · <a href="${A.tel}">${esc(A.telefono)}</a> · <a href="mailto:${A.email}">${esc(A.email)}</a> · <a href="${A.mappa}" target="_blank" rel="noopener">map</a> · SI PARLA ITALIANO</p>
+      <p><a href="${A.contatti}">About &amp; Contact</a> &nbsp;|&nbsp; <a href="#" data-eula>Terms of Use</a> &nbsp;|&nbsp; <a href="${esc(site.url)}/privacy/">Privacy Policy</a> &nbsp;|&nbsp; <a href="${esc(site.url)}/crediti/">Image credits</a> &nbsp;|&nbsp; <a href="${A.paypal}" target="_blank" rel="noopener">Donate</a> &nbsp;|&nbsp; <a href="${esc(site.url)}/">The serious website</a></p>
       <p>${esc(A.piede.legale)}</p>
       <p>${esc(A.piede.ia)}</p>
       <p>${esc(A.piede.aggiornato)} · ${esc(A.piede.visitatore)}<span class="counter" data-counter>0001337</span> · Copyright © 2006–${new Date().getFullYear()} Pekko. All rights reserved. No rights reversed.</p>
@@ -115,6 +116,7 @@ function popup() {
 
 function shell({ path, title, description, body, image, head = '' }) {
   const m = media[image]
+  const canon = A.dominio + (A.urlPubblici[path] || path)
   return html`<!doctype html>
 <html lang="${A.lang}">
 <head>
@@ -122,7 +124,7 @@ function shell({ path, title, description, body, image, head = '' }) {
 <meta name="viewport" content="width=960">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
-<link rel="canonical" href="${esc(site.url + path)}">
+<link rel="canonical" href="${esc(canon)}">
 <meta name="author" content="${esc(site.name)}">
 <link rel="author" href="${esc(site.url)}">
 <meta name="theme-color" content="#eae41f">
@@ -132,8 +134,8 @@ function shell({ path, title, description, body, image, head = '' }) {
 <meta property="og:locale" content="en_US">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
-<meta property="og:url" content="${esc(site.url + path)}">
-${m && `<meta property="og:image" content="${esc(site.url + m.src)}"><meta property="og:image:width" content="${m.w}"><meta property="og:image:height" content="${m.h}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${esc(site.url + m.src)}">`}
+<meta property="og:url" content="${esc(canon)}">
+${m && `<meta property="og:image" content="${esc(A.dominio + m.src)}"><meta property="og:image:width" content="${m.w}"><meta property="og:image:height" content="${m.h}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${esc(A.dominio + m.src)}">`}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -694,7 +696,7 @@ export function assistenzaContattiPage() {
               <div class="hp" aria-hidden="true"><label for="as-sito">Leave this field empty</label><input id="as-sito" name="sito" type="text" tabindex="-1" autocomplete="off"></div>
               <div class="f full check" data-f>
                 <input id="as-privacy" name="privacy" type="checkbox" required aria-required="true" aria-describedby="as-privacy-err">
-                <label for="as-privacy">I have read the <a href="/privacy/">privacy policy</a> (it’s in Italian — si parla italiano) and agree to be answered. <b aria-hidden="true">*</b><small id="as-privacy-err" role="alert" hidden></small></label>
+                <label for="as-privacy">I have read the <a href="${esc(site.url)}/privacy/">privacy policy</a> (it’s in Italian — si parla italiano) and agree to be answered. <b aria-hidden="true">*</b><small id="as-privacy-err" role="alert" hidden></small></label>
               </div>
               ${site.form.turnstileSiteKey && `<div class="f full"><div class="cf-turnstile" data-turnstile data-sitekey="${esc(site.form.turnstileSiteKey)}" data-language="en" data-appearance="interaction-only" data-response-field="false"></div></div>`}
             </div>
@@ -1255,3 +1257,22 @@ const JS = `
   });
 })();
 `
+
+// ── La 404 di bettercallpekko.it ─────────────────────────────────────────────
+// Solo nella build SITE=bcp (routes.js → bcpRoutes): il sito serio ha la sua.
+
+export function assistenzaNotFoundPage() {
+  const body = html`
+    <div class="wrap" style="padding:40px 0">
+      <div class="sec" style="text-align:center;padding:30px 20px">
+        ${i3('404?!', 'r', 90)}<br>
+        ${i3('PAGE NOT FOUND. BETTER CALL PEKKO!', 'b', 30)}
+        <p style="margin:16px 0;font:14px/1.5 Arial,sans-serif">This page doesn’t exist. It never did. Not even in 2006.<br>The computer guy can’t fix a link, but he can fix your computer.</p>
+        <p><a class="red" href="${A.path}">BACK TO THE HOME PAGE</a> &nbsp; <a class="red" href="${A.contatti}">CONTACT PEKKO</a> &nbsp; <a class="red" href="${A.tel}">CALL ${esc(A.telefono)}</a></p>
+        <p style="margin-top:14px"><a href="${esc(site.url)}/">The serious website</a> · SI PARLA ITALIANO</p>
+      </div>
+      ${foot()}
+    </div>
+  `
+  return shell({ path: '/404/', title: '404 — Better Call Pekko', description: 'Page not found. Better call Pekko.', body, image: 'ad-header' })
+}

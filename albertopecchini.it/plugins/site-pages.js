@@ -16,6 +16,12 @@ const ROUTES_MODULE = '/src/templates/routes.js'
 const ENTRY_JS = 'src/main.js'
 const ENTRY_CSS = 'src/style.css'
 
+// SITE=bcp costruisce il sito di bettercallpekko.it (progetto Vercel a parte, stesso
+// repository): solo le rotte di `bcpRoutes`, niente sitemap/robots generati (stanno
+// in public/bcp/), e di public/ solo ciò che quelle pagine usano.
+const BCP = process.env.SITE === 'bcp'
+const BCP_PUBLIC = ['media/assistenza', 'media/mascotte/lumaca.webp', 'media/mascotte/tartaruga.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png']
+
 export default function sitePages() {
   let config
 
@@ -34,6 +40,7 @@ export default function sitePages() {
         appType: isPreview ? 'mpa' : 'custom',
         build: {
           manifest: true,
+          copyPublicDir: !BCP,
           rolldownOptions: { input: { main: ENTRY_JS, style: ENTRY_CSS } },
         },
       }
@@ -102,7 +109,8 @@ export default function sitePages() {
       }
 
       const routesUrl = pathToFileURL(path.resolve(config.root, '.' + ROUTES_MODULE)).href
-      const { routes, renderRoute, renderSitemap, renderRobots, placeholderReport, artFiles } = await import(routesUrl)
+      const { routes: tutte, activeRoutes, renderRoute, renderSitemap, renderRobots, placeholderReport, artFiles } = await import(routesUrl)
+      const routes = activeRoutes || tutte
 
       const write = async (file, body) => {
         const target = path.join(outDir, file)
@@ -117,15 +125,22 @@ export default function sitePages() {
         await write(route.file || path.join(route.path, 'index.html'), html)
         count++
       }
-      const thumbs = artFiles(await artCss())
-      for (const file of thumbs) await write(file.path, file.body)
-      await write('sitemap.xml', renderSitemap())
-      await write('robots.txt', renderRobots())
+      let thumbs = []
+      if (BCP) {
+        const pub = path.resolve(config.root, 'public')
+        for (const f of BCP_PUBLIC) await fs.cp(path.join(pub, f), path.join(outDir, f), { recursive: true })
+        for (const f of await fs.readdir(path.join(pub, 'bcp'))) await fs.copyFile(path.join(pub, 'bcp', f), path.join(outDir, f))
+      } else {
+        thumbs = artFiles(await artCss())
+        for (const file of thumbs) await write(file.path, file.body)
+        await write('sitemap.xml', renderSitemap())
+        await write('robots.txt', renderRobots())
+      }
       // il manifest di Vite non serve online
       await fs.rm(path.join(outDir, '.vite'), { recursive: true, force: true })
 
-      config.logger.info(`\n  site-pages · ${count} pagine · ${thumbs.length} miniature · sitemap.xml · robots.txt`)
-      const todo = placeholderReport()
+      config.logger.info(`\n  site-pages · ${count} pagine · ${thumbs.length} miniature · ${BCP ? 'bettercallpekko.it (SITE=bcp)' : 'sitemap.xml · robots.txt'}`)
+      const todo = BCP ? [] : placeholderReport()
       if (todo.length) {
         config.logger.warn(
           `\n  site-pages · ${todo.length} dati ancora segnaposto in src/data (da compilare prima della messa online):\n` +

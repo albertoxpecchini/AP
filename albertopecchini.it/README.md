@@ -476,6 +476,10 @@ Su `main` scrive anche il workflow delle catture (`.github/workflows/catture.yml
 
 Domini di produzione: `www.albertopecchini.it` e `albertopecchini.it` (che rimanda a www con un 308). Gli indirizzi `*.vercel.app` del progetto sono protetti da Vercel Authentication (accesso solo con login Vercel), i domini personalizzati no.
 
+**bettercallpekko.it** è il dominio delle sole pagine «Better Call Pekko» (`/assistenza/` e `/contatti/assistenza/`): un **secondo progetto Vercel** collegato allo stesso repository, con Root Directory `albertopecchini.it` e la variabile d’ambiente `SITE=bcp`. Con quella variabile la build produce solo la parodia alla radice (`/`), i contatti in `/contact/`, una `404.html` sua, `robots.txt` e `sitemap.xml` presi da `public/bcp/` e, di `public/`, soltanto `media/assistenza/`, le due mascotte e le icone (`plugins/site-pages.js`, `bcpRoutes` in `routes.js`; i percorsi li sceglie `src/data/assistenza.js`). Le funzioni di `api/` ci sono anche lì: nel nuovo progetto vanno copiate le variabili del modulo di contatto (`RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM`, `CALLMEBOT_PHONE`, `CALLMEBOT_APIKEY`, ed eventualmente `TURNSTILE_SECRET_KEY`, aggiungendo il dominio al widget su Cloudflare). Le due pagine restano raggiungibili anche sul sito serio, con canonical sul dominio e fuori dalla sitemap (`sitemap: false`).
+
+Per attivarlo: su Vercel «Add New Project» dallo stesso repository `albertoxpecchini/AP`, Root Directory `albertopecchini.it`, framework Vite, variabile `SITE=bcp` (Production e Preview), poi Settings → Domains con `bettercallpekko.it` e `www.bettercallpekko.it` (www che rimanda all’apice); nel DNS di Aruba i record che Vercel indica (A sull’apice, CNAME su www). In locale: `SITE=bcp npm run build && npm run preview`.
+
 `vercel.json` imposta URL puliti con barra finale (come i percorsi generati), cache di un anno sugli asset con hash, cache di trenta giorni su `media/` e `art/`, e le intestazioni `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`. `404.html` viene servita in automatico.
 
 ## Generatore di email

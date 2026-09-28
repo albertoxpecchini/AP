@@ -14,8 +14,8 @@ import { privacyPage, cookiePage, creditiPage, notFoundPage } from './pages/lega
 import { stilePage } from './pages/stile.js'
 import { tavolePage, sheetCount, hasSheets } from './pages/tavole.js'
 import { emailPage } from './pages/email.js'
-import { assistenzaPage, assistenzaContattiPage } from './pages/assistenza.js'
-import { assistenza } from '../data/assistenza.js'
+import { assistenzaPage, assistenzaContattiPage, assistenzaNotFoundPage } from './pages/assistenza.js'
+import { assistenza, BCP } from '../data/assistenza.js'
 
 const websiteLd = () => ({
   '@context': 'https://schema.org',
@@ -181,6 +181,9 @@ export const routes = [
     description: assistenza.descrizione,
     render: assistenzaPage,
     standalone: true,
+    // Le due pagine hanno il loro dominio (bettercallpekko.it, vedi bcpRoutes) e la
+    // loro sitemap (public/bcp/): fuori da quella del sito serio.
+    sitemap: false,
   },
   {
     path: assistenza.contatti,
@@ -189,6 +192,7 @@ export const routes = [
     description: assistenza.descrizioneContatti,
     render: assistenzaContattiPage,
     standalone: true,
+    sitemap: false,
   },
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
   { path: '/cookie/', priority: 0.2, title: 'Cookie policy', description: 'Il sito non usa cookie di profilazione: ecco cosa viene salvato nel browser e perché.', render: cookiePage, hideCta: true },
@@ -206,6 +210,20 @@ export const routes = [
   },
 ]
 
+// ── bettercallpekko.it ───────────────────────────────────────────────────────
+// Il dominio della parodia è un progetto Vercel a parte, costruito dallo stesso
+// repository con SITE=bcp: il sito è fatto solo di queste pagine, con i percorsi
+// alla radice (src/data/assistenza.js sceglie / e /contact/). Le immagini che
+// servono e i file di public/bcp/ (robots.txt, sitemap.xml) li copia il plugin.
+export const bcpRoutes = [
+  { path: '/', priority: 1, title: assistenza.titolo, description: assistenza.descrizione, render: assistenzaPage, standalone: true },
+  { path: '/contact/', priority: 0.8, title: assistenza.titoloContatti, description: assistenza.descrizioneContatti, render: assistenzaContattiPage, standalone: true },
+  { path: '/404/', file: '404.html', is404: true, noindex: true, title: '404 — Better Call Pekko', description: 'Page not found. Better call Pekko.', render: assistenzaNotFoundPage, standalone: true },
+]
+
+/** Le rotte del sito che si sta costruendo o servendo. */
+export const activeRoutes = BCP ? bcpRoutes : routes
+
 const normalize = (pathname) => {
   let p = pathname.replace(/index\.html$/, '')
   if (!p.endsWith('/') && !p.endsWith('.html')) p += '/'
@@ -215,7 +233,7 @@ const normalize = (pathname) => {
 /** Renderizza la pagina di un percorso. Restituisce { html, status }. */
 export function renderRoute(pathname, { assets }) {
   const wanted = normalize(pathname)
-  const route = routes.find((r) => r.path === wanted) || routes.find((r) => r.is404)
+  const route = activeRoutes.find((r) => r.path === wanted) || activeRoutes.find((r) => r.is404)
   const status = route.is404 ? 404 : 200
   // Le pagine autonome producono da sole l'intero documento.
   if (route.standalone) return { html: route.render({ route, assets }), status }
@@ -238,7 +256,7 @@ export function renderRoute(pathname, { assets }) {
 export function renderSitemap() {
   const today = new Date().toISOString().slice(0, 10)
   const urls = routes
-    .filter((r) => !r.noindex && !r.devOnly)
+    .filter((r) => !r.noindex && !r.devOnly && r.sitemap !== false)
     .map((r) => `  <url><loc>${abs(r.path)}</loc><lastmod>${today}</lastmod><priority>${r.priority ?? 0.5}</priority></url>`)
     .join('\n')
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`

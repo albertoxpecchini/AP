@@ -143,7 +143,7 @@ export const logo = ({ scale = 1, dark = false, w = 230, ...p } = {}) =>
 const EULA = `END USER LICENSE AGREEMENT. IMPORTANT — READ CAREFULLY: By calling, e-mailing, thinking about, or standing near Pekko ("the Computer Guy") you agree to be bound by the terms of this Agreement. 1. GRANT OF LICENSE. The Computer Guy grants you a non-exclusive, non-transferable right to have your computer looked at, sighed over, and eventually fixed. 2. RESTRICTIONS. You may not download "free" screensavers, install seventeen toolbars, or click "YES" on anything that says "YOUR PC IS INFECTED" in red letters. 3. DUPLICATE FILES. All copies of copies of copies of your holiday photos remain your responsibility until proven otherwise. 4. PRINTERS. The Computer Guy makes no warranty, express or implied, that any printer will ever print again; printers are governed by separate, older laws. 5. WINDOWS VISTA. See Section 4. 6. GOVERNING LAW. This Agreement shall be governed by the laws of Rivalta sul Mincio and the ancient customs of the Mincio river. 7. ENTIRE AGREEMENT. Any other agreement is a duplicate and will be deleted with your permission. Si parla italiano. kthxbai.`
 
 const STRIP = 30 // il nastro rosso «want emails» in fondo alla testata
-const BANDA = (testo = 'BETTER CALL PEKKO') => box(txt(testo, { x: 12, y: 8, size: 12, color: '#fff', spacing: '.1em' }) + txt(`${TEL} · SI PARLA ITALIANO`, { right: 12, y: 9, size: 9, color: '#fff', font: 'th', weight: 'bold' }), { x: 0, bottom: 0, w: 390, h: 26, bg: '#e21212' })
+const BANDA = (testo = 'BETTERCALLPEKKO.IT') => box(txt(testo, { x: 12, y: 8, size: 12, color: '#fff', spacing: '.1em' }) + txt(`${TEL} · SI PARLA ITALIANO`, { right: 12, y: 9, size: 9, color: '#fff', font: 'th', weight: 'bold' }), { x: 0, bottom: 0, w: 390, h: 26, bg: '#e21212' })
 
 // ── Gli annunci ──────────────────────────────────────────────────────────────
 
@@ -364,7 +364,7 @@ export const annunci = {
         strati: [
           txt('WARRANT OUT<br>FOR YOUR HARD DRIVE?', { x: 16, y: 14, w: 250, size: 22, color: '#000', font: 'ser', spacing: '.04em', lh: 1.2 }),
           txt('I KNOW A GUY<br>WHO KNOWS A GUY<br>WHO WILL TAKE CARE OF IT.', { x: 16, y: 122, w: 220, size: 16, color: '#f3cf4a', font: 'ser', lh: 1.3 }),
-          txt('BETTER CALL PEKKO', { x: 16, y: 200, size: 18, color: '#fff', font: 'ser', spacing: '.12em' }),
+          txt('BETTERCALLPEKKO.IT', { x: 16, y: 200, size: 18, color: '#fff', font: 'ser', spacing: '.12em' }),
           txt(`Pekko — I'm the computer guy · ${TEL}`, { x: 16, y: 226, size: 11, color: '#f3cf4a', font: 'ser', italic: true }),
         ],
         senzaBanda: true,
