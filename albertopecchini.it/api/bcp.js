@@ -16,7 +16,8 @@
 
 export const config = { runtime: 'nodejs' }
 
-const PATH = 'bcp/db.json'
+// BCP_BLOB_PATH solo per le prove in locale contro lo store vero, su un documento a parte
+const PATH = process.env.BCP_BLOB_PATH || 'bcp/db.json'
 const MAX_BODY = 8 * 1024
 const CAP = { threads: 60, replies: 40, guestbook: 150, shout: 60, scores: 10, online: 80 }
 const ONLINE_MS = 5 * 60 * 1000
@@ -36,12 +37,19 @@ async function backend() {
     const blob = await import('@vercel/blob')
     return {
       async read() {
-        const r = await blob.get(PATH, { access: 'private', useCache: false }).catch((e) => {
+        // Prima l'ETag vero (head), poi il contenuto (get). La lettura del JSON arriva
+        // compressa con un ETag «debole» che ifMatch non accetta; in quest'ordine, se
+        // qualcuno scrive nel mezzo, il nostro ifMatch fallisce e si riprova: non si
+        // sovrascrive mai una versione più recente.
+        const meta = await blob.head(PATH).catch((e) => {
           if (e instanceof blob.BlobNotFoundError) return null
           throw e
         })
+        if (!meta) return { db: SEED(), etag: null }
+        const r = await blob.get(PATH, { access: 'private', useCache: false })
+        if (process.env.BCP_DEBUG) console.warn('bcp read:', meta.etag, r && r.blob && r.blob.etag)
         if (!r || !r.stream) return { db: SEED(), etag: null }
-        return { db: await new Response(r.stream).json(), etag: r.blob.etag }
+        return { db: await new Response(r.stream).json(), etag: meta.etag }
       },
       async write(db, etag) {
         try {
@@ -55,6 +63,7 @@ async function backend() {
           return true
         } catch (e) {
           // ETag cambiato nel frattempo (o creato da un'altra richiesta): si riprova
+          if (process.env.BCP_DEBUG) console.warn('bcp write:', e.constructor.name, e.message)
           if (e instanceof blob.BlobPreconditionFailedError || /already exists|precondition/i.test(e.message)) return false
           throw e
         }
@@ -80,14 +89,14 @@ async function backend() {
 
 /** Legge, applica `change` e riscrive; in caso di conflitto riprova con i dati nuovi. */
 async function update(store, change) {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 9; i++) {
     const { db, etag } = await store.read()
     const esito = change(db)
     if (esito && esito.error) return { db, error: esito.error }
     if (await store.write(db, etag)) return { db }
-    await new Promise((r) => setTimeout(r, 60 + Math.random() * 200))
+    await new Promise((r) => setTimeout(r, (80 + Math.random() * 220) * (1 + i / 2)))
   }
-  throw new Error('troppi conflitti di scrittura')
+  throw Object.assign(new Error('troppi conflitti di scrittura'), { occupato: true })
 }
 
 // ── Vista pubblica ───────────────────────────────────────────────────────────
@@ -335,6 +344,7 @@ export default async function handler(req, res) {
     if (error) return json(res, 422, { ok: false, error, ...pubblico(db) })
     return json(res, 200, { ok: true, ...pubblico(db) })
   } catch (err) {
+    if (err.occupato) return json(res, 503, { ok: false, error: 'too many ppl clicking at once. try again in a sec' })
     console.error('bcp:', err)
     return json(res, 500, { ok: false, error: 'something broke. its not ur fault. better call pekko' })
   }
