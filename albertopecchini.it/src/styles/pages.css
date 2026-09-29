@@ -1160,6 +1160,159 @@
   }
 }
 
+/* ── Studio: tempo libero (Better Call Saul) e domande personali ──────────── */
+
+.sfree__grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.sfree__text {
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+}
+
+.sfree__p {
+  max-width: 56ch;
+  color: var(--muted);
+}
+
+.sfree__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+  margin-top: 0.5rem;
+}
+
+.sfree__device {
+  width: min(100%, 44rem);
+  justify-self: center;
+}
+
+.sfree__answers {
+  display: grid;
+  gap: 1.5rem var(--col-gap);
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.sfree__answers > div {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-strong);
+}
+
+.sfree__answers dd {
+  max-width: 48ch;
+}
+
+@media (min-width: 768px) {
+  .sfree__answers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .sfree__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+/* legenda come quella di una tavola: numero · elemento · cosa richiama · dove */
+.sleg {
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+.sleg__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.sleg__head h3 {
+  color: var(--fg);
+}
+
+.sleg__row {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.35rem 1rem;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.sleg__n {
+  grid-row: span 3;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  line-height: 1.9;
+  color: var(--accent-text);
+}
+
+.sleg__site {
+  font-weight: 560;
+  letter-spacing: -0.012em;
+  line-height: 1.35;
+}
+
+.sleg__ref {
+  max-width: 62ch;
+  color: var(--muted);
+}
+
+.sleg__where {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.sleg__note {
+  max-width: 72ch;
+  margin-top: 1.5rem;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .sleg__row {
+    grid-template-columns: 3rem minmax(0, 4fr) minmax(0, 5fr) minmax(0, 3fr);
+    gap: 1.5rem;
+    align-items: baseline;
+  }
+
+  .sleg__n {
+    grid-row: auto;
+  }
+}
+
+.sfaq__lead {
+  max-width: 34ch;
+  color: var(--muted);
+}
+
+.sfaq__group + .sfaq__group {
+  margin-top: 2.5rem;
+}
+
+.sfaq__name {
+  padding-bottom: 0.75rem;
+  color: var(--accent-text);
+}
+
+/* dentro un gruppo il primo elemento è il nome: il filo sopra va alla prima domanda */
+.sfaq__name + .faq__item {
+  border-top: 1px solid var(--line-strong);
+}
+
 /* ── Profilo / curriculum ─────────────────────────────────────────────────── */
 
 .cv {

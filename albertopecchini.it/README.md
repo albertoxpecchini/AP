@@ -98,6 +98,7 @@ albertopecchini.it/
 │  │  ├─ informatica.js    la pagina /servizi/informatica/: gruppi, versioni di Windows e Office, regalo, passaggi, regole, FAQ
 │  │  ├─ method.js         le sette fasi del metodo
 │  │  ├─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
+│  │  ├─ tempo-libero.js   /studio/: Better Call Saul e bettercallpekko.it con la legenda dei riferimenti, domande personali (risposte vuote = non pubblicate)
 │  │  ├─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
 │  │  ├─ figurine.js       generato da tools/figurine: nomi e misure delle figurine ritagliate
 │  │  ├─ mascotte.js       generato da tools/mascotte: misure, occhi e naso delle mascotte
@@ -161,7 +162,7 @@ albertopecchini.it/
 | `/servizi/` | Servizi per area (A tecnico, B digitale, C grafica, D informatica), con ciò che viene consegnato; pacchetti e FAQ |
 | `/servizi/informatica/` | L’assistenza informatica sul serio: i servizi dell’area D in quattro gruppi, le versioni di Windows (XP → 11, LTSC, ARM64, Server) e di Office (Click-to-Run, installazione personalizzata, MSI, Mac), l’installazione di Windows o Office in regalo al primo intervento sopra i 50 € (il lavoro, non la licenza), come si svolge un intervento, regole, FAQ e invito con telefono, WhatsApp e modulo (`/contatti/?tipo=Assistenza%20informatica#modulo` preseleziona la voce). Dati in `src/data/informatica.js`, servizi in `src/data/services.js` (campo `group`) |
 | `/metodo/` | Le sette fasi del lavoro |
-| `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti |
+| `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti; in fondo «Tempo libero» (Better Call Saul, bettercallpekko.it e la legenda dei suoi riferimenti, spiegati con parole nostre: niente battute della serie citate alla lettera) e le domande personali (serie TV, natura e animali, veicoli, vacanze, amici). Testi in `src/data/tempo-libero.js`, compilati da Alberto nel documento «Studio — tempo libero e FAQ personali»: una risposta vuota non compare, le righe della legenda con `ok: false` aspettano la sua conferma, e finché ne mancano la build le elenca tra i segnaposto |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
 | `/contatti/` | Modulo di contatto, recapiti, telefono (un iPhone con il numero sul tastierino), area operativa |
 | `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. **Oggi spenta**: esiste solo con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |

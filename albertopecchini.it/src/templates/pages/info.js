@@ -5,7 +5,8 @@ import { site } from '../../data/site.js'
 import { serviceAreas, bundles, faq } from '../../data/services.js'
 import { methodIntro, steps, principles } from '../../data/method.js'
 import { bio, photos, facts, timeline, approach, values, tools, profile } from '../../data/studio.js'
-import { button, textLink, media, tagList, icon, splitWords, breadcrumb, sectionHead, monogram, figurina, figName } from '../components/ui.js'
+import { saga, faqPersonali } from '../../data/tempo-libero.js'
+import { button, textLink, media, tagList, icon, splitWords, breadcrumb, sectionHead, monogram, figurina, figName, deviceMockup } from '../components/ui.js'
 import { signature } from './home.js'
 
 export const head = ({ crumbs, index, label, title, accent, lead, meta }) => html`
@@ -291,6 +292,71 @@ export function studioPage() {
         ${sectionHead({ index: 'D', label: 'Strumenti', title: 'Con cosa lavoro' })}
         <div class="stools__grid">
           ${tools.map((g) => `<div data-reveal="up">${figurina(figName('strumenti', g.group), { className: 'stools__fig' })}<h3 class="label">${esc(g.group)}</h3><ul>${g.items.map((it) => `<li>${esc(it)}</li>`).join('')}</ul></div>`)}
+        </div>
+      </div>
+    </section>
+
+    ${tempoLibero()}
+    ${domandePersonali()}
+  `
+}
+
+// ── /studio/: tempo libero e domande personali ───────────────────────────────
+// Testi in src/data/tempo-libero.js. La legenda mostra solo i riferimenti
+// confermati; risposte vuote e gruppi vuoti non compaiono.
+
+function tempoLibero() {
+  const legenda = saga.legenda.filter((r) => r.ok)
+  const risposte = saga.risposte.filter((r) => r.a.trim())
+  return html`
+    <section class="section sfree" id="tempo-libero">
+      <div class="container">
+        ${sectionHead({ index: 'E', label: saga.label, title: saga.title })}
+        <div class="sfree__grid">
+          <div class="sfree__text">
+            ${saga.intro.map((p, i) => `<p class="${i === 0 ? 'lead' : 'sfree__p'}" data-reveal="up">${esc(p)}</p>`)}
+            <div class="sfree__actions" data-reveal="up">
+              ${button({ href: saga.sito.url, label: `Apri ${saga.sito.nome}`, external: true })}
+              ${textLink({ href: '/servizi/informatica/', label: 'La versione seria: Informatica' })}
+            </div>
+          </div>
+          <div class="sfree__device" data-reveal="up">${deviceMockup('laptop', { domain: saga.sito.nome, tall: saga.sito.cattura, label: `Anteprima scorrevole di ${saga.sito.nome}` })}</div>
+        </div>
+        ${risposte.length ? html`<dl class="sfree__answers">${risposte.map((r) => `<div data-reveal="up"><dt class="label">${esc(r.q)}</dt><dd>${esc(r.a)}</dd></div>`)}</dl>` : ''}
+        <div class="sleg">
+          <div class="sleg__head" data-reveal="fade"><h3 class="label">Legenda dei riferimenti di ${esc(saga.sito.nome)}</h3><p class="label">${legenda.length} voci</p></div>
+          <ol class="sleg__list">
+            ${legenda.map(
+              (r, i) => `<li class="sleg__row" data-reveal="up"><span class="sleg__n">${String(i + 1).padStart(2, '0')}</span><p class="sleg__site">${esc(r.sito)}</p><p class="sleg__ref">${esc(r.richiama)}</p><p class="sleg__where">${esc(r.dove)}</p></li>`,
+            )}
+          </ol>
+          <p class="sleg__note" data-reveal="up">${esc(saga.nota)}</p>
+        </div>
+      </div>
+    </section>
+  `
+}
+
+function domandePersonali() {
+  const gruppi = faqPersonali.gruppi.map((g) => ({ ...g, voci: g.voci.filter((v) => v.a.trim()) })).filter((g) => g.voci.length)
+  if (!gruppi.length) return ''
+  return html`
+    <section class="section faq sfaq" data-theme="tint" id="domande">
+      <div class="container faq__grid">
+        <div>
+          <p class="label"><span class="sec-head__index">F</span>${esc(faqPersonali.label)}</p>
+          <h2 class="h2" data-reveal="words">${splitWords(faqPersonali.title)}</h2>
+          <p class="sfaq__lead" data-reveal="up">${esc(faqPersonali.lead)}</p>
+        </div>
+        <div class="faq__list">
+          ${gruppi.map(
+            (g) => html`
+              <div class="sfaq__group">
+                <h3 class="label sfaq__name">${esc(g.nome)}</h3>
+                ${g.voci.map((v) => `<details class="faq__item"><summary><span>${esc(v.q)}</span>${icon('plus')}</summary><p>${esc(v.a)}</p></details>`)}
+              </div>
+            `,
+          )}
         </div>
       </div>
     </section>
