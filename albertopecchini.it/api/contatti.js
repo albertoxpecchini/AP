@@ -58,6 +58,8 @@ const FORMS = {
       'Wi-Fi & home network',
       'Phone full or slow',
       'New PC setup',
+      'I want a website!!!',
+      'Logo or graphics',
       'Some other computer trouble',
     ],
     extra: { name: 'urgenza', label: 'Urgenza', options: ['Whenever', 'This week', 'By tomorrow', 'NOW, it’s an emergency!!!'] },

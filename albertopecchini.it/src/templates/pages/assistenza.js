@@ -48,7 +48,7 @@ const i3 = (text, tone = 'r', size = 30) => `<span class="i3 ${tone}" style="fon
 const logo = (dark = false) => `<span class="logo${dark ? ' dark' : ''}"><span class="s">"Better Call Pekko!"</span><span class="n">Pekko</span><span class="q">I'M THE COMPUTER GUY</span></span>`
 
 const nav = (attiva = '', prefisso = '') =>
-  `<ul class="nav">${A.menu.map((v) => `<li><a href="${v.href.startsWith('#') ? prefisso + v.href : v.href}"${v.href === attiva ? ' class="on"' : ''}>${esc(v.label)}</a></li>`).join('')}</ul>`
+  `<ul class="nav">${A.menu.map((v) => `<li><a href="${v.href.startsWith('#') ? prefisso + v.href : v.href}"${v.href === attiva ? ' class="on"' : ''}>${esc(v.label)}${v.nuovo ? '<i class="nw blink">NEW!</i>' : ''}</a></li>`).join('')}</ul>`
 
 const sec = (id, title, inner, sub) => `<section class="sec" id="${id}"><h2>${i3(title, 'r', 34)}${sub ? `<small>${esc(sub)}</small>` : ''}</h2>${inner}</section>`
 
@@ -161,6 +161,20 @@ function popup() {
         </div>
       </div>
     </div>
+    <div class="pop" data-segreto hidden role="dialog" aria-modal="true" aria-labelledby="sg-t">
+      <div class="win" style="width:480px">
+        <div class="bar"><span>★ secret.exe — Pekko Mode</span><button class="x" type="button" data-segreto-close aria-label="Close">✕</button></div>
+        <div class="body">
+          <span class="dance">${img('ad-web-dance', 'Pekko dancing, in silhouette', { w: 160, h: 600 })}</span>
+          <div>
+            <h2 id="sg-t" class="i3 r" style="font-size:28px">${esc(W.segreto.titolo)}</h2>
+            <p>${esc(W.segreto.testo)}</p>
+            <p><b class="counter" data-likes="segreto">0</b> ${esc(W.segreto.conta)}</p>
+            <p><button class="red" type="button" data-segreto-close>BACK 2 WORK</button></p>
+          </div>
+        </div>
+      </div>
+    </div>
   `
 }
 
@@ -232,6 +246,10 @@ function mid() {
       </div>
       <blockquote class="saul"><p>“${esc(A.monologo)}”</p><cite>— pekko, on channel 47 at 3 am</cite></blockquote>
       <div class="midlike">${like('page', 'Like Better Call Pekko')} · <a href="#donate">share it »</a></div>
+      <div class="latest">
+        <p class="ab3">NEW!!! pekko also makes websites. just launched:</p>
+        <div class="lts">${W.siti.slice(0, 3).map((s, i) => `<a href="#explorer" data-pex-open="${i}"><span class="bar"><i></i><i></i><i></i></span><img src="${s.anteprima.src}" width="186" height="116" alt="${esc(`The home page of ${s.dominio}`)}" loading="lazy" decoding="async"><b>${esc(s.tab)}</b></a>`)}</div>
+      </div>
       <p class="special">${i3(A.slogan, 'r', 20)}</p>
     </div>
   `
@@ -253,10 +271,148 @@ function bottom() {
   `
 }
 
-function consultations() {
-  const s = A.servizi
+/** Righe a due colonne della tabella dei servizi: [titolo, testo] a coppie. */
+function righe(s) {
   const rows = []
   for (let i = 0; i < s.length; i += 2) rows.push(`<tr>${[s[i], s[i + 1]].filter(Boolean).map(([t, d]) => `<td><b>${esc(t)}</b> — ${esc(d)}</td>`).join('')}</tr>`)
+  return rows.join('')
+}
+
+// ── Websites: i siti veri di Alberto, raccontati da Pekko ────────────────────
+// Gli annunci (ad-web-*, btn-*) nascono nel canvas di Claude Design e li rende
+// tools/assistenza/design.mjs; le catture dei siti sono quelle vere del portfolio
+// (public/media/web, rifatte ogni ora), più quella di questa pagina (shot-bcp).
+
+const W = A.web
+const urlBarra = (u) => u.replace(/^https:/, 'http:').replace(/\/?$/, '/')
+const cattura = (s) => s.cattura || (media['shot-bcp'] && { src: media['shot-bcp'].src, width: media['shot-bcp'].w, height: media['shot-bcp'].h })
+const ctaWeb = `${A.contatti}?tipo=${encodeURIComponent(W.ctaTipo)}#form`
+
+/** Pekko Explorer 6: un browser del 2008 con una scheda per sito e la cattura vera da scorrere. */
+function explorer() {
+  const S = W.siti
+  return html`
+    <div class="pexwrap" id="explorer">
+      <div class="pex" data-pex>
+        <div class="pex-title"><span data-pex-title>${esc(S[0].nome)} — Pekko Explorer 6</span><i></i><i></i><i class="x"></i></div>
+        <div class="pex-tabs" role="tablist" aria-label="Pekko’s websites">
+          ${S.map((s, i) => `<button type="button" role="tab" id="pex-t${i}" aria-controls="pex-p${i}" aria-selected="${i === 0}" tabindex="${i ? -1 : 0}" data-pex-tab data-url="${esc(urlBarra(s.url))}" data-href="${esc(s.url)}" data-title="${esc(s.nome)} — Pekko Explorer 6">${esc(s.tab)}</button>`)}
+        </div>
+        <div class="pex-bar"><button type="button" class="pex-nav" data-pex-step="-1" aria-label="Previous site">◀</button><button type="button" class="pex-nav" data-pex-step="1" aria-label="Next site">▶</button><span class="pex-url" data-pex-url>${esc(urlBarra(S[0].url))}</span><a class="pex-go" href="${esc(S[0].url)}" target="_blank" rel="noopener" data-pex-go>Go »</a></div>
+        <div class="pex-view" data-pex-view tabindex="0" aria-label="Screenshot of the website: scroll it">
+          ${S.map((s, i) => {
+            const c = cattura(s)
+            const dentro = c ? `<img src="${c.src}" width="${c.width}" height="${c.height}" alt="${esc(`The whole home page of ${s.dominio}`)}" loading="lazy" decoding="async">` : `<p class="here">${i3('U R ALREADY HERE!!!', 'r', 40)}</p>`
+            return `<div role="tabpanel" id="pex-p${i}" aria-labelledby="pex-t${i}" data-pex-pane${i ? ' hidden' : ''}>${dentro}</div>`
+          })}
+        </div>
+        <div class="pex-status">Done · real screenshot, redone every hour · Internet | Protected Mode: on (lol)</div>
+      </div>
+      ${S.map(
+        (s, i) => html`
+          <div class="pex-info" data-pex-info${i ? ' hidden' : ''}>
+            <h3>${esc(s.nome)} <small>${esc(s.dominio)}${s.anno ? ` · ${s.anno}` : ''}</small></h3>
+            <p>${esc(s.testo)}</p>
+            <div class="nums">${s.numeri.map(([v, l]) => `<span><b>${esc(v)}</b>${esc(l)}</span>`).join('')}</div>
+            ${chips(s.tech || [], 'net')}
+            <p class="acts">${like(`site-${s.slug}`, 'Like this site')} <a class="red" href="${esc(s.url)}" target="_blank" rel="noopener">Visit ${esc(s.tab)} »</a></p>
+          </div>
+        `,
+      )}
+    </div>
+  `
+}
+
+/** Il webring dei siti di Pekko: precedente, a caso, successivo (questa pagina è l'ultima). */
+function webring() {
+  const S = W.siti
+  const altri = S.slice(0, -1).map((s) => s.url)
+  const link = (href, testo, attrs = '') => `<a href="${esc(href)}" target="_blank" rel="noopener"${attrs}>${testo}</a>`
+  return `<div class="ring2"><span>☆ PEKKO’S WEBRING ☆</span><span>${link(S[S.length - 2].url, '« prev')} | ${link(altri[0], 'random', ` data-ring-random="${esc(JSON.stringify(altri))}"`)} | ${link(S[0].url, 'next »')}</span><small>${S.length} sites · members since 2006*</small></div>`
+}
+
+/** I bottoncini 88×31, come nei webring del 2006: portano ai siti veri. */
+function bottoni88() {
+  const S = W.siti
+  const lista = [
+    ['btn-rivalta', S[0].url, 'rivaltasulmincio.it'],
+    ['btn-cascina', S[1].url, 'cascinafontana.xyz'],
+    ['btn-donelli', S[2].url, 'Ing. Dario Donelli'],
+    ['btn-ap', site.url, 'Alberto Pecchini, the serious website'],
+    ['btn-bcp', `${A.dominio}/`, 'Better Call Pekko!!!'],
+    ['btn-hand', '#websites', 'Hand coded'],
+    ['btn-cookie', '#websites', '0 cookies, 0 trackers'],
+    ['btn-vite', 'https://vite.dev/', 'Powered by Vite'],
+    ['btn-html', `https://validator.w3.org/nu/?doc=${encodeURIComponent(`${A.dominio}/`)}`, 'HTML5, valid-ish (check it yourself)'],
+    ['btn-ita', A.contatti, 'Si parla italiano'],
+    ['btn-eyes', '', 'Best viewed with eyes'],
+    ['btn-tortoise', 'segreto', 'Secured by a tortoise'],
+  ]
+  return `<div class="b88">${lista
+    .map(([n, href, alt]) => {
+      const im = img(n, alt, { w: 88, h: 31 })
+      if (!href) return `<span>${im}</span>`
+      if (href === 'segreto') return `<button type="button" data-tortoise title="${esc(alt)}">${im}</button>`
+      const fuori = href.startsWith('http')
+      return `<a href="${esc(href)}" title="${esc(alt)}"${fuori ? ' target="_blank" rel="noopener"' : ''}>${im}</a>`
+    })
+    .join('')}</div>`
+}
+
+function websites() {
+  const S = W.siti
+  const [serio] = S.filter((s) => s.slug === 'albertopecchini-it')
+  return html`
+    <section class="sec" id="websites">
+      <h2>${i3(W.titolo, 'b', 34)}<small>${esc(W.sotto)}</small></h2>
+      <a class="ad full" href="#explorer">${img('ad-web-header', 'Pekko web design 2.0 (beta): websites that don’t suck!!! Pekko points at his real websites: rivaltasulmincio.it, cascinafontana.xyz, Ing. Dario Donelli, albertopecchini.it', { w: 960, h: 200 })}</a>
+      <div class="in">
+        <p class="lead">${esc(W.intro)}</p>
+        <div class="cols">
+          <div class="c1">${explorer()}</div>
+          <div class="c300">
+            ${ad(serio.ad, serio.alt, { w: 300, h: 250, href: serio.url, ext: true, title: 'The serious website (opens in a new window)' })}
+            <p class="note" style="text-align:center">same guy, different font · <a href="${esc(site.url)}" target="_blank" rel="noopener">the serious website »</a></p>
+            ${ad('ad-web-cantiere', 'No website? Pekko is already digging. Free consultation', { w: 300, h: 100, href: ctaWeb })}
+            <div style="margin-top:8px">${webring()}</div>
+            <div class="wid" style="margin-top:8px"><h4>Want one?</h4>free consultation, written quote item by item, 1 person from start 2 finish. <a href="${ctaWeb}">tell pekko about ur site »</a></div>
+          </div>
+        </div>
+        <p class="h3">The real sites (click = visit 4 real)</p>
+        <div class="webads">
+          ${S.slice(0, 3).map((s) => `<div>${ad(s.ad, s.alt, { w: 300, h: 250, href: s.url, ext: true, title: `${s.dominio} (opens in a new window)` })}<div class="eclike">${like(`site-${s.slug}`, 'Like')}</div></div>`)}
+        </div>
+      </div>
+      ${img('ad-web-howto', 'How Pekko makes a website, in 7 steps, no WordPress, no templates: 1 listen, 2 analyse, 3 design (2 or 3 ideas on paper), 4 build (HTML, CSS and JS written by hand), 5 review (2 rounds included), 6 launch (online on your domain, source files included), 7 help (first 30 days included)', { w: 960, h: 300, cls: 'full' })}
+      <div class="in cols">
+        <div class="c1">
+          <p class="h3" style="margin-top:0">What Pekko does on the web</p>
+          <table class="svc">${righe(W.servizi)}</table>
+          <p class="h3">Frequently asked questions (by real ppl, probably)</p>
+          <dl class="faq">${W.faq.map(([q, a]) => `<dt>${esc(q)}</dt><dd>${esc(a)}</dd>`).join('')}</dl>
+          <p class="cta"><a class="red" href="${ctaWeb}">${esc(W.cta)} ASK PEKKO »</a> <span class="note">free consultation · written quote · si parla italiano</span></p>
+        </div>
+        <div class="c160">${ad('ad-web-dance', '3 KB of JavaScript: that’s rivaltasulmincio.it on opening. Dance like nobody’s downloading. Pekko web design', { w: 160, h: 600, href: S[0].url, ext: true })}</div>
+      </div>
+      <div class="in cols" style="padding-top:0">
+        <div class="c486">${img('ad-web-metro', 'What’s in a Pekko website: 3 KB of JavaScript on opening, 0 cookies and trackers, works on your phone from 320 to 1920 px, written by hand, your domain and hosting set up, the source files are yours', { w: 486, h: 280 })}</div>
+        <div class="c1">
+          <p class="h3" style="margin-top:0">${esc(W.altro.titolo)}</p>
+          <table class="svc one">${W.altro.voci.map(([t, d]) => `<tr><td><b>${esc(t)}</b> — ${esc(d)}</td></tr>`).join('')}</table>
+          <p style="margin:6px 0 0;font:11px Verdana,sans-serif">${esc(W.altro.nota)} <a href="${esc(site.url)}" target="_blank" rel="noopener">albertopecchini.it »</a></p>
+          <p class="h3">Link 2 pekko (88×31 buttons)</p>
+          ${bottoni88()}
+        </div>
+      </div>
+    </section>
+  `
+}
+
+/** «Lo sapevi?»: un fatto vero alla volta, nella colonna destra. */
+const sapevi = () =>
+  `<div class="dyk" data-dyk="${esc(JSON.stringify(W.sapevi))}"><h4 class="blink">DID U KNOW???</h4><p data-dyk-t>${esc(W.sapevi[0])}</p><button type="button" class="xp" data-dyk-next>next fact »</button></div>`
+
+function consultations() {
   return sec(
     'consultations',
     'CONSULTATIONS',
@@ -264,7 +420,7 @@ function consultations() {
       <div class="in cols">
         <div class="c1">
           <p class="h3">What Pekko can do for you (free consultation · si parla italiano)</p>
-          <table class="svc">${rows.join('')}</table>
+          <table class="svc">${righe(A.servizi)}</table>
           <p class="h3">Windows versions handled</p>
           ${chips(A.windows)}
           <p class="h3">Office versions handled</p>
@@ -310,7 +466,7 @@ function about() {
             ${B.staff.map((s) => `<div class="member">${s.img.startsWith('/') ? `<img src="${s.img}" alt="${esc(s.nome)}" width="96" height="96" loading="lazy">` : img(s.img, s.nome, { w: 96, h: 96 })}<b>${esc(s.nome)}</b><i>${esc(s.ruolo)}</i><span>${esc(s.nota)}</span></div>`).join('')}
           </div>
           <p class="h3">Sites by Pekko</p>
-          <p>${B.siti.map((s) => `<a href="${s.href}"${s.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${esc(s.label)}</a>`).join(' · ')} · <a href="${A.contatti}">yours?</a></p>
+          <p>${B.siti.map((s) => `<a href="${s.href}"${s.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${esc(s.label)}</a>`).join(' · ')} · <a href="${ctaWeb}">yours?</a> · <a href="#websites">see them all »</a></p>
         </div>
         <div class="c340">
           <p class="h3">${esc(B.albumTitolo)}</p>
@@ -616,6 +772,8 @@ function donate() {
           <p class="h3">Link to us!!!</p>
           <p class="note">copy this code and paste it on ur myspace, ur blog or ur geocities page:</p>
           <textarea class="linkus" readonly rows="2" data-select-all aria-label="Banner code">&lt;a href="${esc(PAGINA)}"&gt;&lt;img src="${esc(A.dominio + src('ad-million'))}" alt="Better Call Pekko!" width="468" height="60"&gt;&lt;/a&gt;</textarea>
+          <p class="note" style="display:flex;align-items:center;gap:6px">or the 88×31 button ${img('btn-bcp', 'Better Call Pekko!!! 88×31 button', { w: 88, h: 31 })}</p>
+          <textarea class="linkus" readonly rows="2" data-select-all aria-label="88×31 button code">&lt;a href="${esc(PAGINA)}"&gt;&lt;img src="${esc(A.dominio + src('btn-bcp'))}" alt="Better Call Pekko!" width="88" height="31"&gt;&lt;/a&gt;</textarea>
         </div>
         <div class="c340">
           <p class="h3">${esc(S.titolo)}</p>
@@ -650,12 +808,13 @@ export function assistenzaPage() {
   const body = html`
     ${sides()}
     <div class="wrap">
-      <div class="adhead">${ad('ad-million', 'Congratulations!!! You are the 1,000,000th visitor! Click here to claim your prize', { w: 468, h: 60, eager: true })}</div>
+      <div class="adhead">${ad('ad-million', 'Congratulations!!! You are the 1,000,000th visitor! Click here to claim your prize', { w: 468, h: 60, eager: true })}${ad('ad-web-468', 'Need a website? Pekko makes them too!!! 4 real, see them', { w: 468, h: 60, eager: true, href: '#websites' })}</div>
       <a class="hdr" href="${A.contatti}">${img('ad-header', 'Better Call Pekko! Pekko, I’m the computer guy. Want emails from Pekko? Click here!!!', { w: 960, h: 234, eager: true })}</a>
       <div class="content">
         <div class="left">
           ${nav()}
           ${ad('ad-fixed-my-pc', 'Pekko fixed my PC!!!!', { w: 158, h: 155, href: '#testimonials' })}
+          ${ad('ad-web-tile', 'Pekko makes websites!!!', { w: 158, h: 155, href: '#websites' })}
           ${ad('ad-ambulance', 'PC ambulance', { w: 150, h: 70 })}
           <p class="sm">SI PARLA ITALIANO<br>${esc(A.telefono)}<br>RIVALTA SUL MINCIO</p>
         </div>
@@ -665,11 +824,13 @@ export function assistenzaPage() {
           <a class="red blink" href="${A.tel}" style="display:block;margin:8px 0 0;width:152px;text-align:center;padding:6px 0">CALL NOW!</a>
           <p class="sm" style="color:#000;text-align:center;width:152px;margin-top:8px">Rivalta sul Mincio (MN)<br>house calls &amp; remote<br><a href="${A.mappa}" target="_blank" rel="noopener">map »</a></p>
           <p class="sm" style="color:#000;text-align:center;width:152px">visitors: <span class="counter" data-counter style="font-size:11px">-------</span></p>
+          ${sapevi()}
         </div>
       </div>
       ${img('ad-welcome', 'Welcome, PC abusers!', { w: 960, h: 86, cls: 'welcome' })}
       ${bottom()}
       ${strip()}
+      ${websites()}
       ${consultations()}
       ${about()}
       ${prices()}
@@ -722,6 +883,7 @@ export function assistenzaContattiPage() {
         <div class="left">
           ${nav(A.contatti, A.path)}
           ${ad('ad-fixed-my-pc', 'Pekko fixed my PC!!!!', { w: 158, h: 155, href: `${A.path}#testimonials` })}
+          ${ad('ad-web-tile', 'Pekko makes websites!!!', { w: 158, h: 155, href: `${A.path}#websites` })}
           ${ad('ad-ambulance', 'PC ambulance', { w: 150, h: 70, href: A.tel })}
           <p class="sm">SI PARLA ITALIANO</p>
         </div>
@@ -735,7 +897,7 @@ export function assistenzaContattiPage() {
             <a class="red" href="mailto:${A.email}">E-mail</a>
             <a class="pp" href="${A.paypal}" target="_blank" rel="noopener">Donate</a>
           </div>
-          <p style="text-align:center"><a href="mailto:${A.email}">${esc(A.email)}</a> · ${esc(site.contact.reply)} · si parla italiano</p>
+          <p style="text-align:center"><a href="mailto:${A.email}">${esc(A.email)}</a> · answers within 1 business day · si parla italiano</p>
           <div class="office">
             <div>
               <p class="h3">${esc(C.ufficio)}</p>
@@ -820,6 +982,8 @@ export function assistenzaNotFoundPage() {
         <p style="margin:16px 0;font:14px/1.5 Arial,sans-serif">this page doesnt exist. it never did. not even in 2006.<br>the computer guy cant fix a link, but he can fix ur computer.</p>
         <p><a class="red" href="${A.path}">BACK TO THE HOME PAGE</a> &nbsp; <a class="red" href="${A.contatti}">CONTACT PEKKO</a> &nbsp; <a class="red" href="${A.tel}">CALL ${esc(A.telefono)}</a></p>
         <p style="margin-top:14px"><a href="${esc(site.url)}/">The serious website</a> · SI PARLA ITALIANO</p>
+        <p style="margin:16px 0 6px;font:12px Verdana,sans-serif">or maybe u were looking 4 one of pekkos websites:</p>
+        <div style="display:flex;justify-content:center">${bottoni88()}</div>
       </div>
       ${foot()}
     </div>
@@ -1078,10 +1242,19 @@ p{margin:0 0 6px}
 .frm.is-done .form,.frm.is-done .ffoot{display:none}
 @media print{.left,.right,.side,.adhead,.hdr,.bottom,.strip,.pop,.welcome,.foot,.sec:not(#coupons){display:none!important}body{background:#fff}.wrap{width:auto}}
 @media (prefers-reduced-motion:reduce){.blink,.strip span{animation:none}.strip span{padding-left:0}.cam .walk{transition:none}}
-.mid{min-height:700px}
+.mid{min-height:880px}
 .saul{position:absolute;left:20px;top:484px;width:600px;margin:0;padding:10px 14px;background:#fff8c6;border:2px solid #c9a800;box-shadow:3px 3px 0 rgba(0,0,0,.25);font:italic 13px/1.45 Georgia,'Times New Roman',serif;color:#3a2600}
 .saul p{margin:0 0 4px}.saul cite{font:bold 10px Verdana,sans-serif;color:#7a0000;font-style:normal}
 .mid .midlike{position:absolute;left:20px;top:612px;width:600px;text-align:center;font:11px Verdana,sans-serif}
+.mid .latest{position:absolute;left:20px;top:650px;width:600px}
+.mid .latest .ab3{margin:0 0 6px;text-align:center;font-size:14px}
+.lts{display:flex;justify-content:space-between}
+.lts a{display:block;width:192px;padding:3px;border:1px solid #23466f;border-radius:5px 5px 2px 2px;background:#eef1f5;box-shadow:2px 2px 0 rgba(0,0,0,.3);text-decoration:none;text-align:center}
+.lts a:hover{outline:2px solid #e21212}
+.lts .bar{display:flex;justify-content:flex-end;gap:2px;height:10px;margin:-3px -3px 3px;padding:2px 3px;border-radius:5px 5px 0 0;background:linear-gradient(#7fa3cc,#23466f)}
+.lts .bar i{width:8px;height:6px;border-radius:1px;background:#cfe0f5}.lts .bar i:last-child{background:#e2553a}
+.lts img{width:186px;height:116px;object-fit:cover;object-position:top;border:1px solid #9fb3cc}
+.lts b{display:block;margin-top:3px;font:bold 11px Tahoma,Verdana,sans-serif;color:#0a35d6}
 .mid .special{bottom:10px}
 .lk{display:inline-flex;align-items:center;gap:4px;font:11px 'Lucida Grande',Tahoma,Verdana,sans-serif;color:#333}
 .lk button,.suit button{font:bold 11px 'Lucida Grande',Tahoma,sans-serif;color:#3b5998;background:linear-gradient(#fff,#e6eaf2);border:1px solid #9aa9c8;border-radius:2px;padding:2px 6px;cursor:pointer}
@@ -1128,6 +1301,60 @@ input.hp{position:absolute;left:-9999px;width:1px;height:1px}
 .ecdone .sharebar{margin:6px 0 0}
 .linkus{width:100%;font:11px 'Courier New',monospace;border:2px inset #999;padding:4px;resize:none}
 .bcp-off .frmk,.bcp-off [data-shout-form],.bcp-off [data-post-form]{opacity:.55}
+.adhead{gap:10px}
+.nav a{position:relative}
+.nav .nw{position:absolute;right:3px;top:1px;padding:1px 3px;border-radius:2px;background:#e21212;color:#fff;font:bold 8px/1.2 Verdana,sans-serif;font-style:normal;text-shadow:none;transform:rotate(8deg)}
+.nav a:hover .nw,.nav a.on .nw{background:#ffe600;color:#000}
+.dyk{width:152px;margin-top:8px;border:2px solid #000;background:#fff;padding:6px;font:10px/1.35 Verdana,sans-serif;text-align:left}
+.dyk h4{margin:0 0 4px;font:bold 11px 'Arial Black',Arial,sans-serif;color:#e21212}
+.dyk p{margin:0 0 6px;min-height:68px}
+.dyk .xp{padding:3px 8px;font-size:10px}
+.ad.full img,img.full{width:100%;height:auto}
+.c160{width:160px;flex:none}.c486{width:486px;flex:none}
+.pex{border:1px solid #23466f;border-radius:7px 7px 3px 3px;background:#eef1f5;box-shadow:3px 3px 0 rgba(0,0,0,.35);overflow:hidden;font:11px Tahoma,Verdana,sans-serif}
+.pex-title{display:flex;align-items:center;gap:4px;height:24px;padding:0 5px 0 10px;background:linear-gradient(#7fa3cc,#3b6394 48%,#23466f 52%,#3a6aa0);color:#fff;font:bold 12px Tahoma,Verdana,sans-serif;text-shadow:0 1px 1px #0b2340}
+.pex-title span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pex-title i{width:22px;height:15px;border:1px solid #1c3a63;border-radius:3px;background:linear-gradient(#e2edfa,#7fa3cc)}
+.pex-title i.x{background:linear-gradient(#ff9d8a,#d42a12);border-color:#6b0f0f}
+.pex-tabs{display:flex;gap:2px;padding:4px 6px 0;background:linear-gradient(#dfe7f1,#c9d6e6);border-bottom:1px solid #8aa0bd}
+.pex-tabs button{max-width:132px;padding:4px 9px;border:1px solid #8aa0bd;border-bottom:0;border-radius:4px 4px 0 0;background:linear-gradient(#f4f7fb,#d5e0ee);font:11px Tahoma,Verdana,sans-serif;color:#000;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pex-tabs button:hover{background:linear-gradient(#fff,#e6eef8)}
+.pex-tabs button[aria-selected=true]{position:relative;top:1px;background:#fff;font-weight:bold}
+.pex-bar{display:flex;align-items:center;gap:4px;padding:4px 6px;background:linear-gradient(#fff,#e6edf5);border-bottom:1px solid #9fb3cc}
+.pex-nav{width:24px;height:24px;padding:0;border:1px solid #0b3a7d;border-radius:50%;background:radial-gradient(circle at 40% 30%,#bfe3ff,#3d8ee0 45%,#0f4fa8);color:#fff;font:bold 10px/22px Tahoma,sans-serif;text-align:center;cursor:pointer}
+.pex-url{flex:1;height:22px;padding:0 6px;border:1px solid #7f9db9;background:#fff;font:12px/20px Tahoma,Verdana,sans-serif;white-space:nowrap;overflow:hidden}
+.pex-go{padding:3px 10px;border:1px solid #1d6b10;border-radius:3px;background:linear-gradient(#9df08a,#3fbf2a 48%,#2a9c18 52%,#4ccb35);color:#fff;font:bold 11px Tahoma,Verdana,sans-serif;text-decoration:none;text-shadow:0 1px 1px #1d6b10}
+.pex-go:hover{color:#fff;filter:brightness(1.1)}
+.pex-view{height:360px;overflow:auto;background:#fff}
+.pex-view img{width:100%;height:auto}
+.pex-view [hidden]{display:none}
+.pex-view .here{margin:0;padding:140px 10px;text-align:center;background:#fdea0a}
+.pex-status{padding:3px 8px;background:#dfe7f1;border-top:1px solid #9fb3cc;font:10px Tahoma,Verdana,sans-serif;color:#333}
+.pex-info{margin-top:8px;padding:8px 10px;border:2px solid #000;background:#f4f8ff;font:12px/1.4 Verdana,sans-serif}
+.pex-info[hidden]{display:none}
+.pex-info h3{margin:0 0 4px;font:bold 17px 'Trebuchet MS',Verdana,sans-serif;color:#0a35d6}
+.pex-info h3 small{font:11px Verdana,sans-serif;color:#555}
+.pex-info .acts{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 0}
+.nums{display:flex;gap:6px;margin:6px 0}
+.nums span{flex:1;padding:4px;border:1px solid #6c86b8;background:#fff;text-align:center;font:10px/1.2 Verdana,sans-serif;color:#0d2560}
+.nums b{display:block;margin-bottom:2px;font:24px/1 Impact,'Arial Black',sans-serif;color:#e21212}
+.webads{display:flex;justify-content:space-between}
+.webads>div{width:300px}
+.ring2{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:2px ridge #bbb;background:linear-gradient(#fff,#ddd);font:bold 11px Verdana,sans-serif;text-align:center}
+.ring2 small{font:9px Verdana,sans-serif;color:#555}
+.faq{margin:0;font:11px/1.4 Verdana,sans-serif}
+.faq dt{margin-top:6px;font-weight:bold;color:#0a35d6}
+.faq dt::before{content:'Q: ';color:#e21212}
+.faq dd{margin:2px 0 0 18px}
+.cta{display:flex;align-items:center;gap:10px;margin:12px 0 0}
+.cta .red{font-size:15px;padding:8px 16px}
+.svc.one td{width:auto}
+.b88{display:flex;flex-wrap:wrap;gap:6px}
+.b88 a,.b88 span,.b88 button{display:block;width:88px;height:31px;padding:0;border:0;background:none}
+.b88 button{cursor:pointer}
+.b88 a:hover img,.b88 button:hover img{outline:2px solid #e21212}
+.win .body .dance{width:160px;height:330px;flex:none;overflow:hidden;border:2px solid #000}
+.win .body .dance img{width:160px;height:auto;margin-top:-110px}
 
 `
 
@@ -1594,6 +1821,69 @@ const JS = `
 
   $$('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });
 
+  // ── Pekko Explorer: una scheda per sito, la barra dell'indirizzo e il tasto Go veri
+  $$('[data-pex]').forEach(function (px) {
+    var tabs = $$('[data-pex-tab]', px), panes = $$('[data-pex-pane]', px), infos = $$('[data-pex-info]', px.parentNode);
+    var url = $('[data-pex-url]', px), go = $('[data-pex-go]', px), title = $('[data-pex-title]', px), view = $('[data-pex-view]', px), cur = 0;
+    var apri = function (i, focus) {
+      cur = (i + tabs.length) % tabs.length;
+      tabs.forEach(function (t, j) { t.setAttribute('aria-selected', j === cur ? 'true' : 'false'); t.tabIndex = j === cur ? 0 : -1; });
+      panes.forEach(function (p, j) { p.hidden = j !== cur; });
+      infos.forEach(function (p, j) { p.hidden = j !== cur; });
+      var t = tabs[cur];
+      url.textContent = t.getAttribute('data-url'); go.href = t.getAttribute('data-href'); title.textContent = t.getAttribute('data-title');
+      view.scrollTop = 0;
+      if (focus) t.focus();
+    };
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { apri(i); });
+      t.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); apri(cur + (e.key === 'ArrowRight' ? 1 : -1), true); }
+      });
+    });
+    $$('[data-pex-step]', px).forEach(function (b) { b.addEventListener('click', function () { apri(cur + (+b.getAttribute('data-pex-step'))); }); });
+    $$('[data-pex-open]').forEach(function (a) { a.addEventListener('click', function () { apri(+a.getAttribute('data-pex-open')); }); });
+  });
+
+  // ── Lo sapevi? Un fatto vero alla volta
+  var dyk = $('[data-dyk]');
+  if (dyk) {
+    var fatti = [];
+    try { fatti = JSON.parse(dyk.getAttribute('data-dyk')); } catch (e) {}
+    var fn = Math.floor(Math.random() * fatti.length), ft = $('[data-dyk-t]', dyk);
+    var mostraFatto = function () { if (fatti.length) ft.textContent = fatti[fn % fatti.length]; };
+    mostraFatto();
+    $('[data-dyk-next]', dyk).addEventListener('click', function () { fn++; mostraFatto(); });
+    setInterval(function () { if (!document.hidden) { fn++; mostraFatto(); } }, 12000);
+  }
+
+  // ── Webring: «random» sceglie un sito vero a caso
+  $$('[data-ring-random]').forEach(function (a) {
+    a.addEventListener('click', function () { try { var l = JSON.parse(a.getAttribute('data-ring-random')); a.href = l[Math.floor(Math.random() * l.length)]; } catch (e) {} });
+  });
+
+  // ── Il segreto: il codice Konami, o cinque colpi alla tartaruga (per chi non ha le frecce)
+  var segreto = $('[data-segreto]');
+  var apriSegreto = function () {
+    if (!segreto) { window.alert('U FOUND THE SECRET!!! (the good part is on the home page)'); return; }
+    segreto.hidden = false; document.body.classList.add('has-popup');
+    if (LS.get('bcp-segreto') !== '1') { LS.set('bcp-segreto', '1'); call({ a: 'like', k: 'segreto' }); }
+    var c = $('[data-segreto-close]', segreto); if (c) c.focus();
+  };
+  if (segreto) $$('[data-segreto-close]', segreto).forEach(function (b) { b.addEventListener('click', function () { segreto.hidden = true; document.body.classList.remove('has-popup'); }); });
+  var KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'], kpos = 0;
+  document.addEventListener('keydown', function (e) {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    var k = e.key && e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    kpos = k === KONAMI[kpos] ? kpos + 1 : (k === KONAMI[0] ? 1 : 0);
+    if (kpos === KONAMI.length) { kpos = 0; apriSegreto(); }
+    if (e.key === 'Escape' && segreto && !segreto.hidden) { segreto.hidden = true; document.body.classList.remove('has-popup'); }
+  });
+  var colpi = 0;
+  $$('[data-tortoise]').forEach(function (b) {
+    b.addEventListener('click', function () { if (++colpi >= 5) { colpi = 0; b.title = 'Secured by a tortoise'; apriSegreto(); } else b.title = 'the tortoise felt that. ' + (5 - colpi) + ' more…'; });
+  });
+
   // ── Il giro vero: una visita (nuova solo la prima volta nella scheda), poi un aggiornamento ogni 30 s
   var nuovoVisitatore = false;
   try { nuovoVisitatore = sessionStorage.getItem('bcp-seen') !== '1'; sessionStorage.setItem('bcp-seen', '1'); } catch (e) {}
@@ -1603,6 +1893,11 @@ const JS = `
   // ── Modulo dei contatti: stesse regole di /contatti/, messaggi in inglese
   var form = $('[data-saul-form]');
   if (!form) return;
+  // ?tipo=… (dai tasti «ur website next?») sceglie già la voce giusta
+  try {
+    var qTipo = new URLSearchParams(location.search).get('tipo'), sTipo = form.elements.tipo;
+    if (qTipo && sTipo) for (var oi = 0; oi < sTipo.options.length; oi++) if (sTipo.options[oi].value === qTipo) sTipo.selectedIndex = oi;
+  } catch (e) {}
   var box = $('[data-turnstile]', form), fstatus = $('[data-status]', form), done = $('[data-done]', form), frm = form.closest('.frm');
   var token = '', widget = null;
   var rendi = function () { if (!box || widget !== null || !window.turnstile) return; widget = window.turnstile.render(box, { sitekey: box.getAttribute('data-sitekey'), language: 'en', appearance: 'interaction-only', callback: function (t) { token = t; }, 'expired-callback': function () { token = ''; }, 'error-callback': function () { token = ''; } }); };

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pekko web design 2.0 — header</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Comfortaa:wght@700&family=Varela+Round&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#eae41f;font-family:Verdana,Geneva,sans-serif}
+.i3{font-family:Impact,Anton,'Arial Black',sans-serif;text-transform:uppercase;line-height:1;color:#fff;paint-order:stroke fill;letter-spacing:.02em;white-space:nowrap}
+.i3b{-webkit-text-stroke:3px #0a35d6;text-shadow:1px 1px 0 #001a66,2px 2px 0 #001a66,3px 3px 0 #001a66,4px 4px 0 #001a66,6px 7px 6px rgba(0,0,0,.55)}
+.i3r{-webkit-text-stroke:2px #e21212;text-shadow:1px 1px 0 #8a0000,2px 2px 0 #8a0000,3px 3px 0 #8a0000,5px 6px 5px rgba(0,0,0,.5)}
+.sky{background:linear-gradient(180deg,#e2f6ff 0%,#9adaff 46%,#4fb0ec 50%,#1f7fcf 100%)}
+.stripes{background:repeating-linear-gradient(135deg,rgba(255,255,255,.16) 0 5px,rgba(255,255,255,0) 5px 11px)}
+.glow{background:radial-gradient(ellipse at center,rgba(255,255,255,.9) 0%,rgba(255,255,255,0) 70%)}
+.logo{font-family:Comfortaa,'Varela Round',sans-serif;font-weight:700;letter-spacing:-.03em;background:linear-gradient(180deg,#ffe16b 0%,#ffa200 48%,#ff6a00 52%,#ff3d00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff) drop-shadow(0 3px 3px rgba(0,30,80,.45))}
+.mirror{transform:scaleY(-1);opacity:.3;-webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 55%);mask-image:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 55%)}
+.beta{background:linear-gradient(180deg,#ffa060 0%,#ff6a10 50%,#e24c00 51%,#ff7a24 100%);border:1px solid #a83700;border-radius:5px;box-shadow:0 2px 3px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.6)}
+.pill{background:linear-gradient(180deg,#ff6b6b 0%,#e81010 50%,#c40000 51%,#e21212 100%);border:1px solid #7a0000;border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 3px rgba(0,0,0,.3)}
+.win{background:#eef1f5;border:1px solid #23466f;border-radius:7px 7px 3px 3px;box-shadow:0 5px 12px rgba(0,20,60,.5)}
+.glass{background:linear-gradient(180deg,#7fa3cc 0%,#3b6394 48%,#23466f 52%,#3a6aa0 100%)}
+.tool{background:linear-gradient(180deg,#ffffff 0%,#dfe7f1 100%);border-bottom:1px solid #9fb3cc}
+.back{background:radial-gradient(circle at 40% 30%,#bfe3ff 0%,#3d8ee0 45%,#0f4fa8 100%);border:1px solid #0b3a7d;border-radius:50%}
+.go{background:linear-gradient(180deg,#8fe07a 0%,#3fae2a 50%,#2a8f18 51%,#4cbb35 100%);border:1px solid #1d6b10;border-radius:3px}
+.band{background:linear-gradient(180deg,#1747e8 0%,#0a35d6 50%,#002a9e 100%);border-top:2px solid #ffe600}
+.burst{clip-path:polygon(100.0% 50.0%,88.3% 57.6%,96.2% 69.1%,82.4% 71.7%,85.4% 85.4%,71.7% 82.4%,69.1% 96.2%,57.6% 88.3%,50.0% 100.0%,42.4% 88.3%,30.9% 96.2%,28.3% 82.4%,14.6% 85.4%,17.6% 71.7%,3.8% 69.1%,11.7% 57.6%,0.0% 50.0%,11.7% 42.4%,3.8% 30.9%,17.6% 28.3%,14.6% 14.6%,28.3% 17.6%,30.9% 3.8%,42.4% 11.7%,50.0% 0.0%,57.6% 11.7%,69.1% 3.8%,71.7% 17.6%,85.4% 14.6%,82.4% 28.3%,96.2% 30.9%,88.3% 42.4%);background:radial-gradient(circle at 45% 40%,#fff9a8 0%,#ffe600 45%,#ffb800 100%)}
+@keyframes f4{0%{opacity:1}25%{opacity:0}100%{opacity:0}}
+.fr{animation:f4 8s step-end infinite}
+.fr2{animation-delay:-6s}.fr3{animation-delay:-4s}.fr4{animation-delay:-2s}
+@keyframes pulse{0%{transform:rotate(-12deg) scale(1)}25%{transform:rotate(-6deg) scale(1.12)}50%{transform:rotate(-12deg) scale(1)}75%{transform:rotate(-6deg) scale(1.12)}}
+.pulse{animation:pulse 8s step-end infinite}
+@keyframes twinkle{0%{opacity:1}25%{opacity:.15}50%{opacity:1}75%{opacity:.15}}
+.tw{animation:twinkle 8s step-end infinite}
+.tw2{animation-delay:-2s}
+</style>
+</helmet>
+<div data-out="ad-web-header" data-frames="4" data-period="8000" class="sky" style="width: 960px; height: 200px; position: relative; overflow: hidden">
+<div class="stripes" style="position: absolute; left: 0; top: 0; width: 960px; height: 200px"></div>
+<div class="glow" style="position: absolute; left: -40px; top: -30px; width: 330px; height: 170px"></div>
+
+<div class="logo" style="position: absolute; left: 16px; top: 12px; font-size: 66px; line-height: 1">pekko</div>
+<div class="logo mirror" style="position: absolute; left: 16px; top: 72px; font-size: 66px; line-height: 1">pekko</div>
+<div class="beta" style="position: absolute; left: 196px; top: 14px; padding: 2px 7px; transform: rotate(14deg); font: bold 12px Verdana, sans-serif; color: #ffffff; letter-spacing: .06em">BETA</div>
+<div style="position: absolute; left: 20px; top: 116px; font-family: 'Varela Round', sans-serif; font-size: 21px; color: #ffffff; text-shadow: 0 1px 0 #0b3c6e, 0 2px 3px rgba(0,0,0,.35); white-space: nowrap">web design <b style="color: #ffe600">2.0</b></div>
+<div style="position: absolute; left: 21px; top: 146px; font: bold 11px Verdana, sans-serif; color: #dff3ff; text-shadow: 0 1px 1px #0b3c6e; white-space: nowrap">hand-coded in rivalta sul mincio, italy</div>
+<svg class="tw" style="position: absolute; left: 176px; top: 62px" width="18" height="18" viewBox="0 0 18 18"><path d="M9 0 L10.6 7.4 L18 9 L10.6 10.6 L9 18 L7.4 10.6 L0 9 L7.4 7.4 Z" fill="#ffffff"></path></svg>
+<svg class="tw tw2" style="position: absolute; left: 8px; top: 8px" width="12" height="12" viewBox="0 0 18 18"><path d="M9 0 L10.6 7.4 L18 9 L10.6 10.6 L9 18 L7.4 10.6 L0 9 L7.4 7.4 Z" fill="#ffffff"></path></svg>
+<svg class="tw tw2" style="position: absolute; left: 232px; top: 104px" width="14" height="14" viewBox="0 0 18 18"><path d="M9 0 L10.6 7.4 L18 9 L10.6 10.6 L9 18 L7.4 10.6 L0 9 L7.4 7.4 Z" fill="#fff6a0"></path></svg>
+
+<div class="pill" style="position: absolute; left: 266px; top: 14px; padding: 3px 11px; font: bold 11px Verdana, sans-serif; color: #ffffff; white-space: nowrap">NEW!!! PEKKO ALSO MAKES</div>
+<div class="i3 i3b" style="position: absolute; left: 262px; top: 38px; font-size: 68px">WEBSITES</div>
+<div class="i3 i3r" style="position: absolute; left: 265px; top: 112px; font-size: 31px">THAT DON’T SUCK!!!</div>
+<div style="position: absolute; left: 268px; top: 152px; font: bold 11px Verdana, sans-serif; color: #ffffff; text-shadow: 0 1px 1px #002a6e; white-space: nowrap">4 real ones. scroll down. click them.</div>
+
+<div class="win" style="position: absolute; left: 548px; top: 12px; width: 252px; height: 158px; overflow: hidden">
+<div class="glass" style="position: absolute; left: 0; top: 0; width: 252px; height: 16px">
+<div style="position: absolute; left: 6px; top: 2px; font: bold 9px Tahoma, Verdana, sans-serif; color: #ffffff; text-shadow: 0 1px 1px #0b2340">Pekko Explorer 6</div>
+<div style="position: absolute; right: 24px; top: 3px; width: 13px; height: 9px; border: 1px solid #1c3a63; border-radius: 2px; background: linear-gradient(#cfe0f5, #7fa3cc)"></div>
+<div style="position: absolute; right: 5px; top: 3px; width: 16px; height: 9px; border: 1px solid #6b0f0f; border-radius: 2px; background: linear-gradient(#ff9d8a, #d42a12)"></div>
+</div>
+<div class="tool" style="position: absolute; left: 0; top: 16px; width: 252px; height: 21px">
+<div class="back" style="position: absolute; left: 4px; top: 2px; width: 15px; height: 15px"></div>
+<svg style="position: absolute; left: 8px; top: 6px" width="8" height="8" viewBox="0 0 8 8"><path d="M6 0 L1 4 L6 8 Z" fill="#ffffff"></path></svg>
+<div style="position: absolute; left: 24px; top: 3px; width: 196px; height: 13px; background: #ffffff; border: 1px solid #7f9db9"></div>
+<div style="position: absolute; left: 27px; top: 6px; width: 8px; height: 8px; background: #e21212; border-radius: 1px"></div>
+<div class="fr" style="position: absolute; left: 38px; top: 5px; font: 9px Tahoma, Verdana, sans-serif; color: #000000; white-space: nowrap">http://www.rivaltasulmincio.it/</div>
+<div class="fr fr2" style="position: absolute; left: 38px; top: 5px; font: 9px Tahoma, Verdana, sans-serif; color: #000000; white-space: nowrap">http://www.cascinafontana.xyz/</div>
+<div class="fr fr3" style="position: absolute; left: 38px; top: 5px; font: 9px Tahoma, Verdana, sans-serif; color: #000000; white-space: nowrap">http://dariodonelli.vercel.app/</div>
+<div class="fr fr4" style="position: absolute; left: 38px; top: 5px; font: 9px Tahoma, Verdana, sans-serif; color: #000000; white-space: nowrap">http://www.albertopecchini.it/</div>
+<div class="go" style="position: absolute; left: 224px; top: 3px; width: 22px; height: 13px; font: bold 8px Tahoma, sans-serif; color: #ffffff; text-align: center; line-height: 13px">Go</div>
+</div>
+<div style="position: absolute; left: 0; top: 37px; width: 252px; height: 111px; overflow: hidden; background: #ffffff">
+<img class="fr" src="/_blob/9ad24ab536f5a909937e11de28590325" alt="" style="position: absolute; left: 0; top: 0; width: 252px; height: 158px">
+<img class="fr fr2" src="/_blob/236e04adccdeac9f234ae787f10019c3" alt="" style="position: absolute; left: 0; top: 0; width: 252px; height: 158px">
+<img class="fr fr3" src="/_blob/4b5e4809c34b8c761e9de561d68e818e" alt="" style="position: absolute; left: 0; top: 0; width: 252px; height: 158px">
+<img class="fr fr4" src="/_blob/6615ceb7f343a21ab73412e3d2bbe6fa" alt="" style="position: absolute; left: 0; top: 0; width: 252px; height: 158px">
+</div>
+<div style="position: absolute; left: 0; top: 148px; width: 252px; height: 10px; background: #dfe7f1; border-top: 1px solid #9fb3cc; font: 7px Tahoma, sans-serif; color: #333333; line-height: 9px; padding-left: 4px; box-sizing: border-box">Done · Internet | Protected Mode: on (lol)</div>
+</div>
+
+<div class="burst pulse" style="position: absolute; left: 498px; top: 112px; width: 86px; height: 86px"></div>
+<div class="fr" style="position: absolute; left: 498px; top: 139px; width: 86px; font: 900 12px/1 'Arial Black', Arial, sans-serif; color: #e21212; text-align: center; transform: rotate(-12deg)">0<br>COOKIES!</div>
+<div class="fr fr2" style="position: absolute; left: 498px; top: 139px; width: 86px; font: 900 12px/1 'Arial Black', Arial, sans-serif; color: #e21212; text-align: center; transform: rotate(-12deg)">HAND<br>CODED!</div>
+<div class="fr fr3" style="position: absolute; left: 498px; top: 139px; width: 86px; font: 900 12px/1 'Arial Black', Arial, sans-serif; color: #e21212; text-align: center; transform: rotate(-12deg)">NO<br>TEMPLATES!</div>
+<div class="fr fr4" style="position: absolute; left: 498px; top: 139px; width: 86px; font: 900 12px/1 'Arial Black', Arial, sans-serif; color: #e21212; text-align: center; transform: rotate(-12deg)">UR SITE<br>NEXT?</div>
+
+<div class="band" style="position: absolute; left: 0; top: 178px; width: 960px; height: 22px"></div>
+<div style="position: absolute; left: 14px; top: 183px; font: bold 11px Verdana, sans-serif; color: #ffffff; white-space: nowrap; letter-spacing: .02em">★ RIVALTASULMINCIO.IT &nbsp;★ CASCINAFONTANA.XYZ &nbsp;★ ING. DARIO DONELLI &nbsp;★ ALBERTOPECCHINI.IT &nbsp;★ <span style="color: #ffe600">UR WEBSITE NEXT?</span></div>
+
+<img src="/_blob/635314818af4e306e38206c3631bd7ad" alt="" style="position: absolute; right: -14px; bottom: 0; height: 204px">
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":200}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

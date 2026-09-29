@@ -33,7 +33,9 @@ let memoria = null
 let memoriaEtag = 0
 
 async function backend() {
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  // BCP_STORE=memory vince sulla chiave: in locale .env.local ha il token vero, e
+  // senza questa precedenza le prove scriverebbero nel database di produzione.
+  if (process.env.BLOB_READ_WRITE_TOKEN && process.env.BCP_STORE !== 'memory') {
     const blob = await import('@vercel/blob')
     return {
       async read() {

@@ -20,7 +20,8 @@ const ENTRY_CSS = 'src/style.css'
 // repository): solo le rotte di `bcpRoutes`, niente sitemap/robots generati (stanno
 // in public/bcp/), e di public/ solo ciò che quelle pagine usano.
 const BCP = process.env.SITE === 'bcp'
-const BCP_PUBLIC = ['media/assistenza', 'media/mascotte/lumaca.webp', 'media/mascotte/tartaruga.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png']
+// media/web: le catture dei siti veri (rifatte ogni ora dal bot) per la sezione Websites.
+const BCP_PUBLIC = ['media/assistenza', 'media/web', 'media/mascotte/lumaca.webp', 'media/mascotte/tartaruga.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png']
 
 export default function sitePages() {
   let config

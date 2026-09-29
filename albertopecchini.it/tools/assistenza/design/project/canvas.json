@@ -1,0 +1,42 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-09-29T12:40:00Z" },
+  "title": "Better Call Pekko — banner",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 960, "h": 200, "title": "ad-web-header · 960×200 · GIF" },
+    "Top468.dc.html": { "x": 1040, "y": 0, "w": 468, "h": 60, "title": "ad-web-468 · 468×60 · GIF" },
+    "Tile.dc.html": { "x": 1588, "y": 0, "w": 158, "h": 155, "title": "ad-web-tile · 158×155 · GIF" },
+    "Rivalta.dc.html": { "x": 0, "y": 580, "w": 300, "h": 250, "title": "ad-web-rivalta · 300×250" },
+    "Cascina.dc.html": { "x": 380, "y": 580, "w": 300, "h": 250, "title": "ad-web-cascina · 300×250" },
+    "Donelli.dc.html": { "x": 760, "y": 580, "w": 300, "h": 250, "title": "ad-web-donelli · 300×250" },
+    "Twin.dc.html": { "x": 1140, "y": 580, "w": 300, "h": 250, "title": "ad-web-twin · 300×250" },
+    "Infografica.dc.html": { "x": 0, "y": 1210, "w": 960, "h": 300, "title": "ad-web-howto · 960×300" },
+    "Metro.dc.html": { "x": 1040, "y": 1210, "w": 486, "h": 280, "title": "ad-web-metro · 486×280" },
+    "Dance.dc.html": { "x": 1606, "y": 1210, "w": 160, "h": 600, "title": "ad-web-dance · 160×600 · GIF" },
+    "Cantiere.dc.html": { "x": 0, "y": 2190, "w": 300, "h": 100, "title": "ad-web-cantiere · 300×100 · GIF" },
+    "Bottoni.dc.html": { "x": 380, "y": 2190, "w": 420, "h": 180, "title": "88×31 buttons" }
+  },
+  "order": [
+    "Main.dc.html",
+    "Top468.dc.html",
+    "Tile.dc.html",
+    "Rivalta.dc.html",
+    "Cascina.dc.html",
+    "Donelli.dc.html",
+    "Twin.dc.html",
+    "Infografica.dc.html",
+    "Metro.dc.html",
+    "Dance.dc.html",
+    "Cantiere.dc.html",
+    "Bottoni.dc.html"
+  ],
+  "notes": {
+    "t1": { "x": 0, "y": -260, "text": "PEKKO MAKES WEBSITES — headers", "kind": "title1", "maxW": 1746 },
+    "t2": { "x": 0, "y": 320, "text": "The real sites, 300×250", "kind": "title1", "maxW": 1440 },
+    "t3": { "x": 0, "y": 950, "text": "Graphics: how-to, what u get, dance", "kind": "title1", "maxW": 1766 },
+    "t4": { "x": 0, "y": 1930, "text": "Small stuff: under construction, 88×31", "kind": "title1", "maxW": 800 }
+  },
+  "designSystems": []
+}

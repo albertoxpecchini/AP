@@ -148,6 +148,76 @@ The nine photographs, row by row, left to right:`,
       { nome: 'avatar-9', soggetto: 'a bearded man in a bathrobe holding a coffee mug, half asleep' },
     ],
   },
+
+  // ── Terzo giro (29.09.2026): la sezione «Pekko makes websites» ─────────────
+  // Gli annunci nuovi nascono nel canvas di Claude Design (tools/assistenza/design):
+  // questi fogli danno loro Pekko web designer, le foto stock sui siti e le
+  // icone lucide del «Web 2.0».
+  'ritagli-c': {
+    titolo: 'Pekko web designer a mezzo busto',
+    intro: RITAGLI('Every cut-out shows him from the waist up, facing the camera, in a different loud 2008 suit, playing the part of a 2008 web designer in a local-TV commercial.'),
+    max: 1000,
+    figurine: [
+      { nome: 'web-tastiera', soggetto: 'electric-blue suit, orange shirt, pink tie: a beige computer keyboard slung across his body on a strap like a keytar, fingers on the keys, rock-star face' },
+      { nome: 'web-monitor', soggetto: 'canary-yellow suit, purple satin shirt, orange-and-blue polka-dot tie: lifting a beige CRT monitor above his head with both arms like a trophy, triumphant' },
+      { nome: 'web-indica', soggetto: 'shiny purple suit, lime-green shirt, yellow tie: body turned to the left, pointing with his whole left arm stretched out towards the left edge of the picture, looking at the viewer with an open-mouth “look at this” smile' },
+      { nome: 'web-casco', soggetto: 'orange suit, white shirt, thin black tie, a yellow construction hard hat on his head: a bricklayer’s trowel in one hand and a black floppy disk in the other, proud' },
+      { nome: 'web-mouse', soggetto: 'lime-green suit, pink shirt: hugging an oversized glossy white computer mouse as big as his chest (the cable dangles), grinning' },
+      { nome: 'web-cuffie', soggetto: 'teal suit, white shirt, gold tie, a call-centre headset with a microphone: presenting with his open right palm, customer-service smile' },
+      { nome: 'web-sbircia', soggetto: 'red-and-black plaid jacket, turquoise shirt: peeking over the top edge of an open silver laptop that he holds up in front of his chin, eyebrows raised, mischievous' },
+      { nome: 'web-lente', soggetto: 'navy pinstripe suit, red shirt, white tie: holding a big magnifying glass in front of his right eye, the eye hugely magnified, detective face' },
+      { nome: 'web-evviva', soggetto: 'white suit, black shirt, silver tie: both fists in the air, mouth wide open, celebrating like his website just went online' },
+    ],
+  },
+  'ritagli-d': {
+    titolo: 'Pekko a figura intera: surf sulla tastiera, balli per le silhouette',
+    intro: RITAGLI('Every cut-out shows him full length, head to shoes, in a different loud 2008 suit with brown or two-tone shoes.'),
+    max: 1000,
+    figurine: [
+      { nome: 'full-surf', soggetto: 'canary-yellow suit, purple shirt: surfing on a long beige computer keyboard used as a surfboard, knees bent, arms out for balance, the keyboard is part of the cut-out' },
+      { nome: 'full-ballo-1', soggetto: 'shiny purple suit: dancing, right arm pointing up to the sky, left hand on the hip, one knee bent, disco pose' },
+      { nome: 'full-ballo-2', soggetto: 'lime-green suit: dancing, jumping in the air with both knees tucked up and arms spread wide' },
+      { nome: 'full-ballo-3', soggetto: 'orange suit: dancing the robot, elbows bent at right angles, stiff, head tilted' },
+      { nome: 'full-ballo-4', soggetto: 'teal suit: dancing, sliding sideways on one foot, arms swinging, big smile' },
+      { nome: 'full-portatile', soggetto: 'red-and-black plaid jacket, turquoise shirt: sitting cross-legged on the floor with an open silver laptop on his lap, typing, looking up at the camera' },
+      { nome: 'full-cantiere', soggetto: 'orange suit and a yellow hard hat: standing next to an orange traffic cone (part of the cut-out), a shovel in one hand, thumbs up with the other' },
+      { nome: 'full-freccia', soggetto: 'navy pinstripe suit: leaning with one elbow on a giant white computer mouse-pointer arrow as tall as he is (the arrow is part of the cut-out, flat white with a thick black outline), legs crossed at the ankles, smug' },
+      { nome: 'full-valigetta', soggetto: 'white suit, black shirt: walking briskly to the right carrying a black laptop bag, pointing ahead with the other hand, determined' },
+    ],
+  },
+  icone: {
+    titolo: 'Icone lucide del «Web 2.0»',
+    intro: `A sheet of nine separate glossy icons from a 2007 "Web 2.0" stock icon pack, on a fully transparent background, arranged in a precise 3 × 3 grid: each icon centred in its own cell, filling about 70% of the cell; wide fully transparent gaps, nothing touches, nothing overlaps, the grid itself is not drawn. Every icon is a shiny 3D-rendered object with the 2007 aqua look: saturated candy colours, a big white glossy highlight across the top half, a soft mirror reflection fading below it, a slight drop shadow. No text, no letters, no numbers, no brand logos.
+The nine icons, row by row, left to right:`,
+    max: 400,
+    figurine: [
+      { nome: 'ico-globo', soggetto: 'a blue-and-green glossy globe with a white mouse-pointer arrow orbiting around it on a thin ring' },
+      { nome: 'ico-pin', soggetto: 'a glossy red map pin, round head, pointing down, with a tiny shadow under the tip' },
+      { nome: 'ico-lucchetto', soggetto: 'a glossy golden padlock, closed' },
+      { nome: 'ico-lente', soggetto: 'a glossy magnifying glass with a chrome rim and a blue-tinted glass lens' },
+      { nome: 'ico-fumetto', soggetto: 'a glossy lime-green speech bubble, empty' },
+      { nome: 'ico-busta', soggetto: 'a glossy sky-blue envelope, closed, with a white flap' },
+      { nome: 'ico-ingranaggio', soggetto: 'a glossy silver gear wheel with an orange centre' },
+      { nome: 'ico-stella', soggetto: 'a glossy yellow five-pointed star with an orange rim' },
+      { nome: 'ico-feed', soggetto: 'an orange rounded square with three white broadcast arcs and a dot in the lower-left corner, glossy' },
+    ],
+  },
+  stock3: {
+    titolo: 'Foto stock finte per gli annunci dei siti web',
+    intro: FOTO_INCORNICIATE('Each photograph looks like a cheap 2008 stock photo. No real people: any faces are generic. No logos, no brand marks, no readable text; computer and phone screens show plain colour or abstract blurred coloured blocks.'),
+    max: 900,
+    figurine: [
+      { nome: 'stock-stretta', soggetto: 'a hand in a suit sleeve reaching out of the screen of a beige CRT monitor to shake the hand of a smiling man sitting at the desk, cheesy fake composite' },
+      { nome: 'stock-fieno', soggetto: 'a round hay bale in a golden wheat field at sunset with an open silver laptop balanced on top of it, the screen glowing' },
+      { nome: 'stock-nonna', soggetto: 'a delighted grandmother in a cardigan at a kitchen table pointing at the screen of a beige desktop computer with a CRT monitor, flash photo' },
+      { nome: 'stock-ingegnere', soggetto: 'a man in a white hard hat and a high-visibility vest on a building site holding a rolled-up blueprint under one arm and an open laptop in the other hand, thumbs up, generic face' },
+      { nome: 'stock-campanile', soggetto: 'the brick bell tower of a small Italian village church against a blue sky, with a big white Wi-Fi symbol (three arcs and a dot) floating next to it, obviously pasted in' },
+      { nome: 'stock-lumaca-tastiera', soggetto: 'a garden snail crawling slowly across the keys of a beige computer keyboard, macro shot' },
+      { nome: 'stock-scrivania', soggetto: 'a messy 2008 web designer desk at night: two CRT monitors covered in coloured sticky notes, a tangle of cables, an energy drink can, a lava lamp, a pile of CDs' },
+      { nome: 'stock-mucca-laptop', soggetto: 'a dairy cow in a barn sniffing an open silver laptop that stands on a bale of straw' },
+      { nome: 'stock-telefonino', soggetto: 'a hand holding a 2009 touchscreen smartphone that shows a colourful web page made of blurred coloured blocks, over a café table' },
+    ],
+  },
 }
 
 // ── Sfondi opachi (una immagine ciascuno) ────────────────────────────────────
@@ -167,6 +237,11 @@ export const spot = {
     titolo: 'Strada di campagna con il PC sul ciglio (manifesto della colonna destra)',
     aspect: '2:3',
     prompt: `A straight empty country road between flat green fields in the Po valley, Italy, near a river with poplar trees, pale overcast sky, a wooden telephone pole; a beige desktop tower PC with a beige CRT monitor standing alone on the gravel roadside in the lower third of the picture. Cheap 2008 stock-photo look, slightly desaturated, slightly soft. No people. ${FOTO}`,
+  },
+  'bg-web': {
+    titolo: 'Lo «studio web» di Pekko, vuoto (sezione Websites)',
+    aspect: '3:2',
+    prompt: `A cheap local-TV commercial set for a 2008 "web design studio", completely empty, no people: a long white desk in the foreground with two beige CRT monitors showing colourful blurred web pages made of coloured blocks, a beige keyboard, a mouse on a mouse pad, a potted plant; behind it a whiteboard with a hand-drawn website wireframe made only of boxes and lines, wood panelling, a small Italian flag on a brass pole on the right, a framed certificate with no readable text. Shot straight on from the front, eye level, harsh flat studio lighting, slightly overexposed. ${FOTO}`,
   },
 }
 

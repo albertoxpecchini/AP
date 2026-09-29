@@ -17,6 +17,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { site } from './site.js'
+import { projects } from './projects.js'
 
 // Con SITE=bcp (la build del progetto Vercel di bettercallpekko.it) le due pagine
 // stanno alla radice del dominio; altrimenti vivono dentro il sito serio.
@@ -32,6 +33,15 @@ const bello = nazionale.length === 10 ? `${nazionale.slice(0, 3)}-${nazionale.sl
 // Solo il comune: l'indirizzo di casa non si pubblica (richiesta di Alberto, 29.09.2026).
 const DOVE = `${site.location.city} (${site.location.province}), Italy`
 
+// I siti veri di Alberto, dal portfolio (src/data/projects.js): stesso indirizzo e
+// stessa cattura a pagina intera (rifatta ogni ora da tools/catture), raccontati
+// da Pekko. Fatti e numeri sono quelli delle schede dei progetti, niente di inventato.
+const PRJ = Object.fromEntries(projects.map((p) => [p.slug, p]))
+const sito = (slug, extra) => {
+  const p = PRJ[slug]
+  return { slug, nome: p.title, url: p.web.url, dominio: p.web.domain, cattura: p.web.desktopTall, anteprima: p.web.desktop, anno: p.year, tech: p.technologies, ...extra }
+}
+
 export const assistenza = {
   path: PATH,
   contatti: CONTATTI,
@@ -43,9 +53,9 @@ export const assistenza = {
   api: '/api/bcp/',
   lang: 'en',
   nome: 'Better Call Pekko',
-  titolo: 'In Computer Trouble? Better Call Pekko! — I’m the computer guy. Computer repair in Rivalta sul Mincio (Mantova, Italy)',
+  titolo: 'In Computer Trouble? Better Call Pekko! — I’m the computer guy (and I make websites). Computer repair & web design in Rivalta sul Mincio (Mantova, Italy)',
   descrizione:
-    'pekko fixes computers: virus removal, duplicate files, printers that wont print, speakers, drivers, windows and office installs, system restore, os changes, documents, phones, wi-fi. rivalta sul mincio (mantova), house calls and remote help. si parla italiano.',
+    'pekko fixes computers: virus removal, duplicate files, printers that wont print, drivers, windows and office installs, phones, wi-fi. and he makes real websites, hand-coded: rivaltasulmincio.it, cascinafontana.xyz, ing. dario donelli. rivalta sul mincio (mantova), house calls and remote help. si parla italiano.',
   titoloContatti: 'Contact Pekko — free consultation, si parla italiano',
   descrizioneContatti: 'phone, whatsapp, e-mail or the form: tell pekko what ur computer did and get an answer within 1 business day. rivalta sul mincio (mantova, italy), house calls and remote help.',
 
@@ -63,6 +73,7 @@ export const assistenza = {
 
   menu: [
     { label: 'Consultations', href: '#consultations' },
+    { label: 'Websites!!!', href: '#websites', nuovo: true },
     { label: 'About Pekko', href: '#about' },
     { label: 'Prices', href: '#prices' },
     { label: 'Testimonials', href: '#testimonials' },
@@ -75,7 +86,7 @@ export const assistenza = {
     { label: 'Contact', href: CONTATTI, contatti: true },
   ],
 
-  striscia: `${bello} ● SI PARLA ITALIANO ● RIVALTA SUL MINCIO (MN) ● I’M THE COMPUTER GUY ● IT’S ALL GOOD, MAN! ● WWW.BETTERCALLPEKKO.IT`,
+  striscia: `${bello} ● SI PARLA ITALIANO ● RIVALTA SUL MINCIO (MN) ● I’M THE COMPUTER GUY ● I ALSO MAKE WEBSITES, REAL ONES ● IT’S ALL GOOD, MAN! ● WWW.BETTERCALLPEKKO.IT`,
 
   popup: {
     barra: 'FREE CONSULTATION — Pekko, the computer guy',
@@ -118,7 +129,7 @@ export const assistenza = {
     ['Passwords & e-mail', 'accounts, logins, two factor. yes i will guess it. its the cat.'],
     ['Inside cleaning & parts', 'ssd, ram, fans, thermal paste. the pc stops sounding like a hairdryer.'],
     ['Macs too', 'yes, they break. same prices, slightly more sighing. no genius required.'],
-    ['Websites', 'i also make websites. this one took a afternoon in 2006 (allegedly).'],
+    ['Websites', 'i also make websites. real ones, hand-coded, online right now: see WEBSITES!!! (this one took a afternoon in 2006, allegedly).'],
   ],
   windows: ['Windows 11', 'Windows 10', 'Windows 10 / 11 Enterprise LTSC', 'Windows ARM64', 'Windows 8.1', 'Windows 8', 'Windows 7', 'Windows Vista', 'Windows XP', 'Windows Server'],
   office: ['Office 365', 'Office 2024', 'Office 2021', 'Office 2019', 'Office 2016', 'Office 2013', 'Office 2010', 'Office for Mac'],
@@ -161,8 +172,110 @@ export const assistenza = {
     siti: [
       { label: 'rivaltasulmincio.it', href: 'https://www.rivaltasulmincio.it' },
       { label: 'cascinafontana.xyz', href: 'https://www.cascinafontana.xyz' },
+      { label: 'ing. dario donelli', href: PRJ['dario-donelli'].web.url },
       { label: 'the serious website', href: site.url },
     ],
+  },
+
+  // ── «Pekko makes websites»: il lavoro vero, più di tutto i siti ──────────────
+  // Gli annunci della sezione vengono dal canvas di Claude Design (tools/assistenza/design).
+  web: {
+    titolo: 'PEKKO MAKES WEBSITES',
+    sotto: 'real ones · hand-coded · online right now · click them',
+    intro:
+      'yes, the computer guy also makes websites. not the 2008 kind like this one (this one is a joke, on purpose): real sites 4 a village, a farm, an engineer and himself. written by hand, no wordpress, no templates, no trackers, fast on a phone. open them in pekko explorer, scroll, then visit them 4 real:',
+    siti: [
+      sito('rivaltasulmincio-it', {
+        tab: 'rivaltasulmincio.it',
+        ad: 'ad-web-rivalta',
+        alt: '184 places. 1 village. 0 trackers. rivaltasulmincio.it, now in beta! Visit rivaltasulmincio.it',
+        testo: 'an atlas of my village on the mincio. 184 places from openstreetmap on a map and in 124 cards, the weather from the village station, a local newspaper, and next 2 every number: where it comes from and when it was checked. 132 static pages, ~3 kb of javascript when it opens, no tracking. its in beta (the honest kind).',
+        numeri: [['184', 'places'], ['132', 'pages'], ['~3 kb', 'of js on load']],
+      }),
+      sito('cascina-fontana', {
+        tab: 'cascinafontana.xyz',
+        ad: 'ad-web-cascina',
+        alt: 'Hay! This website has 0 cookies. Cascina Fontana, est. 2007, Rodigo. cascinafontana.xyz',
+        testo: 'the farm of my family in rodigo, since 2007: milk 4 grana padano, corn, wheat, alfalfa, and hay, firewood and flowers sold at the farm. 5 pages of plain html, css and javascript, photos i took myself, a 12-month calendar 4 every product and 1 single action: call. no cookies, nothing from third parties.',
+        numeri: [['5', 'pages'], ['221', 'lines of js'], ['0', 'cookies']],
+      }),
+      sito('dario-donelli', {
+        tab: 'ing. dario donelli',
+        ad: 'ad-web-donelli',
+        alt: 'Serious engineer. Serious website. Ing. Dario Donelli, Rivalta sul Mincio — pekko wore a tie for this one',
+        testo: 'the studio of an engineer in rivalta sul mincio. black and white like the metal plate on his door, the name lands while u scroll (pure css, no libraries) and a map of the mantova province drawn in svg with the right projection: 21 towns, the mincio, the lakes, the park. ~90 kb of code, 0 profiling cookies. pekko wore a tie.',
+        numeri: [['1', 'page'], ['22', 'places on the map'], ['90 kb', 'of code']],
+      }),
+      {
+        ...sito('albertopecchini-it', {}),
+        url: site.url,
+        tab: 'the serious twin',
+        ad: 'ad-web-twin',
+        alt: 'Same guy. Different font. Pekko fixes computers — Alberto Pecchini: houses, websites & brands',
+        testo: 'pekkos serious twin. same guy, different font: the portfolio of alberto pecchini, in italian. houses, websites, brands and computers. pages generated from data, technical drawings drawn by code, a snail and a tortoise whose eyes follow ur mouse. 0 frameworks, 0 tracking cookies.',
+        numeri: [['0', 'frameworks'], ['0', 'tracking cookies'], ['2', 'pets on the staff']],
+      },
+      {
+        slug: 'bettercallpekko',
+        nome: 'Better Call Pekko',
+        url: 'https://www.bettercallpekko.it/',
+        dominio: 'bettercallpekko.it',
+        cattura: null, // la cattura di questa pagina: media['shot-bcp'] (vedi il template)
+        tab: 'bettercallpekko.it',
+        tech: ['HTML', 'CSS', 'JavaScript', 'Vercel Blob', 'Claude Design', 'GIF (a lot)'],
+        testo: 'this one. u r here. built like its 2008 on purpose: 960 px, gifs, impact in 3d. but the visitor counter, the likes, the forum, the guestbook and the shoutbox r real, and the banners r drawn in vector with real fonts b4 becoming gifs. the only website where pekko is allowed 2 blink.',
+        numeri: [['2008', 'on purpose'], ['100%', 'real counters'], ['1', 'tortoise moderator']],
+      },
+    ],
+    servizi: [
+      ['Websites', '4 professionals, shops, villages and farms. clear structure, real texts, fast. online with domain and hosting set up.'],
+      ['Landing pages', '1 page, 1 goal: a call, a sign-up, a sale. u see from day 1 if it works.'],
+      ['UI/UX', 'wireframes and clickable prototypes in figma, tried on real ppl b4 writing a line of code.'],
+      ['Frontend', 'semantic html, modern css, javascript or typescript. react only when it really helps. animations yes, gratuitous ones no.'],
+      ['Responsive', 'the phone is not a tiny desktop: layouts designed 4 the thumb and checked from 320 2 1920 px.'],
+      ['Maintenance', 'updates, fixes, new pages, backups. the guy who built it is the guy who answers.'],
+      ['Speed & SEO', 'sites u already have: speed, accessibility, technical seo. before and after measured with lighthouse.'],
+      ['Logos & graphics', 'logos drawn on a grid, colours, business cards, flyers, posters. delivered in vector.'],
+    ],
+    faq: [
+      ['do i need a website if i have facebook?', 'facebook is a rented room. a website is ur house: ur address, ur rules, and google finds it. keep both if u like.'],
+      ['wordpress?', 'no. pekko writes the pages by hand: nothing 2 update every week, nothing 4 hackers 2 guess, nothing that slows it down.'],
+      ['how long does it take?', 'u get a date at the start, and if it slips u r the first 2 know. a one-pager is quicker than a village atlas with 184 places.'],
+      ['how much?', 'a written quote, item by item, so u see what u can remove. the consultation is free. the sigh too.'],
+      ['who owns it?', 'u do. the source files come with the site, always, with a note that explains how they r organised.'],
+      ['can i change the texts myself?', 'yes, or pekko does it. the first 30 days of help r included, and after that he still picks up the phone.'],
+      ['cookie banner?', 'no trackers = no "accept all cookies" wall in front of ur visitors. this site has a fake 2008 pop-up instead. sorry.'],
+    ],
+    altro: {
+      titolo: 'Other stuff Pekko does (4 real)',
+      voci: [
+        ['Drawings', 'houses, roads and building sites in autocad: plans, sections, road profiles, cubic metres of dirt. diploma in construction & surveying, class of 2026.'],
+        ['3D models', 'glulam timber roofs modelled in 3d at a real timber company, during school internships, with the quote followed live with the customer.'],
+        ['Graphics', 'logos, colours, business cards, posters, the letterhead of the serious twin.'],
+        ['Computers', 'the whole rest of this page.'],
+      ],
+      nota: 'the serious version, in italian, with the whole portfolio:',
+    },
+    // «Lo sapevi?»: fatti veri, uno alla volta nella colonna destra.
+    sapevi: [
+      'rivaltasulmincio.it knows 184 places. pekko checked where every single one comes from.',
+      'cascinafontana.xyz has exactly 221 lines of javascript. pekko counted them. twice.',
+      'the map on dario donellis website was drawn in svg, with the right projection 4 mantova.',
+      'on the serious website the snail and the tortoise follow ur mouse with their eyes. try it.',
+      'this website was last updated on 06/28/2006, the day pekko was born.',
+      'every banner on this page was drawn in vector, with real fonts, then baked into a gif. like its 2008.',
+      'the photos of pekko in loud suits come from 1 id photo and a lot of ai. the suits r not for sale (yet).',
+      'the tortoise moderates the forum. it has never been hacked.',
+      'pekkos websites have 0 tracking cookies. pekko accepts real cookies (the ones u eat).',
+      'there is a secret on this page. ↑ ↑ ↓ ↓ ← → ← → B A',
+    ],
+    segreto: {
+      titolo: 'U FOUND THE SECRET!!!',
+      testo: 'the konami code still works in 2026. pekko is proud of u. the tortoise is not impressed. as a reward: pekko dancing, and the knowledge that u r a person of culture.',
+      conta: 'ppl found it so far (4 real)',
+    },
+    cta: 'UR WEBSITE NEXT?',
+    ctaTipo: 'I want a website!!!',
   },
 
   prezzi: {
@@ -184,6 +297,7 @@ export const assistenza = {
       ['Cell phone contacts backup', '€10', 'all brands, even the bitten one'],
       ['Document re-layout', 'from €19', 'thesis, cv, menu, flyer'],
       ['Format conversion', '€10', 'first file free (coupon)'],
+      ['Website', 'ASK', 'written quote, item by item. consultation free'],
       ['Hourly rate', '€20/h', '4 everything else'],
       ['House call', '€10', 'around rivalta sul mincio · free over €100'],
       ['Mac surcharge', '€0', 'same price, 30% more sighing'],
@@ -274,7 +388,7 @@ export const assistenza = {
     sotto: 'CAM 1 · PEKKO’S OFFICE · RIVALTA SUL MINCIO',
     filtri: ['Normal', 'Sepia', 'Negative', 'Thermal', 'Pixelate', 'Mirror', 'Night vision', '2009'],
     aiuto: 'pekko walks by every few seconds. press USE MY WEBCAM 2 put urself in his office (the picture never leaves ur computer). then choose a ugly filter and take a snapshot.',
-    passanti: ['cut-punta', 'cut-pollici', 'cut-telefono', 'cut-boh', 'cut-stampante', 'cut-pistole', 'cut-laptop', 'cut-braccia', 'cut-cartello'],
+    passanti: ['cut-punta', 'cut-pollici', 'cut-telefono', 'cut-boh', 'cut-stampante', 'cut-pistole', 'cut-laptop', 'cut-braccia', 'cut-cartello', 'web-tastiera', 'web-mouse', 'web-evviva', 'web-lente', 'web-monitor', 'web-cuffie'],
     shoutTitolo: 'SHOUTBOX (real, public, live)',
     shoutNota: 'say hi. every1 sees it. no links. pekko reads it when hes not fixing printers',
   },
@@ -332,6 +446,8 @@ export const assistenza = {
     'Wi-Fi & home network',
     'Phone full or slow',
     'New PC setup',
+    'I want a website!!!',
+    'Logo or graphics',
     'Some other computer trouble',
   ],
   urgenze: ['Whenever', 'This week', 'By tomorrow', 'NOW, it’s an emergency!!!'],
@@ -339,7 +455,7 @@ export const assistenza = {
   piede: {
     cause: 'CHECK OUT PEKKO’S PHILANTHROPIC CAUSES: THE SAVE THE FLOPPY DISK FOUNDATION (1.44 MB OF HOPE)',
     legale: 'not affiliated with any tv network, law firm, chicken restaurant or fruit company. companies advertised on this page do not exist, except pekko. opinions about laptops with a bite in them r opinions.',
-    ia: 'the photos of pekko in loud suits, the stock photos, the avatars and the props r generated with ai from pekkos id photo and composed by hand; the banners r built like its 2008. see the image credits.',
+    ia: 'the photos of pekko in loud suits, the stock photos, the avatars, the icons and the props r generated with ai from pekkos id photo and composed by hand; the banners r drawn in vector (claude design, real fonts) and baked into gifs like its 2008. the website screenshots r real. see the image credits.',
     aggiornato: 'Last updated: 06/28/2006',
     visitatore: 'you are visitor #',
   },

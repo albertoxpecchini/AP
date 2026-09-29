@@ -106,6 +106,57 @@ forzarne uno. Serve ffmpeg nel PATH.
 Le aziende non esistono e la pagina lo dichiara. Su Apple si scherza senza nominarla e
 senza dire cose false («the bitten one», «no Genius required», «not affiliated with any fruit»).
 
+## Il canvas di Claude Design (dal 29.09.2026)
+
+I banner della sezione **«Pekko makes websites»** (i siti veri di Alberto) e i bottoni 88×31
+non passano più da `annunci.js`: sono **artboard vettoriali** nel canvas di Claude Design
+[«Better Call Pekko — banner»](https://claude.ai/artifact/EqJtdNAsANcHWZd8cLVBck), con font veri
+presi da Google Fonts (Impact 3D del sito accanto a Comfortaa e Varela Round del «Web 2.0»,
+Lobster, Bebas Neue e Alfa Slab One del 2012, Archivo e Instrument Serif del sito serio,
+Open Sans «Metro», Silkscreen per i pixel, Black Ops One, Permanent Marker…). Le animazioni
+sono CSS dentro l'artboard: il canvas le mostra in movimento, lo script le ferma fotogramma
+per fotogramma.
+
+- `design/project/` è la copia locale del canvas (`canvas.json` + un `.dc.html` per
+  artboard, in markup letterale: niente `{{…}}`, così il browser headless lo legge com'è).
+- `design/assets.json` dice da quale file di `public/` viene ogni immagine caricata nel
+  canvas (`/_blob/<id>`).
+- `design.mjs` apre ogni artboard con puppeteer-core (quello di `tools/catture`), aspetta i
+  font, e per ogni elemento con `data-out="<nome>"` scrive `public/media/assistenza/<nome>`:
+  JPEG a densità 2× per i fissi, PNG per i bottoni, GIF a 1× per quelli con
+  `data-frames`/`data-period` (fotogrammi presi a metà di ogni intervallo del ciclo).
+  Aggiorna il manifest come `rendi.mjs`.
+- Se Alberto modifica un artboard a mano nel canvas, prima si rilegge il canvas (strumento
+  Artifact, `read` del file) e si aggiorna la copia in `design/project/`, poi si rende.
+
+```bash
+node tools/assistenza/design.mjs lista                 # artboard e uscite
+node tools/assistenza/design.mjs tutti --prova         # solo i PNG dei fotogrammi in lavoro/design/
+node tools/assistenza/design.mjs tutti                 # rende tutto in public/media/assistenza/
+node tools/assistenza/design.mjs ad-web-header btn-bcp # solo queste uscite
+```
+
+| Artboard | Uscita | Misura | Cosa è |
+| --- | --- | --- | --- |
+| `Main` | `ad-web-header` (GIF, 4) | 960 × 200 | «pekko web design 2.0 BETA — WEBSITES THAT DON’T SUCK!!!», Pekko che indica il finto browser dove girano i quattro siti veri |
+| `Top468` | `ad-web-468` (GIF, 3) | 468 × 60 | «NEED A WEBSITE? / PEKKO MAKES THEM TOO!!! / 4 REAL», in testata accanto al milionesimo visitatore |
+| `Tile` | `ad-web-tile` (GIF, 2) | 158 × 155 | «PEKKO MAKES WEBSITES!!!» nella colonna blu |
+| `Rivalta` | `ad-web-rivalta` | 300 × 250 | «184 PLACES. 1 VILLAGE. 0 TRACKERS.», mappa vera, spilli lucidi, «NOW IN BETA!» |
+| `Cascina` | `ad-web-cascina` | 300 × 250 | «Hay! This website has 0 cookies», kraft e polaroid del 2012 |
+| `Donelli` | `ad-web-donelli` | 300 × 250 | «Serious engineer. Serious website.», targa in bianco e nero, post-it di Pekko |
+| `Twin` | `ad-web-twin` | 300 × 250 | «SAME GUY. Different font.»: Pekko contro Alberto, il sito serio |
+| `Infografica` | `ad-web-howto` | 960 × 300 | «how pekko makes a website»: le 7 fasi vere del metodo, flat 2013 |
+| `Metro` | `ad-web-metro` | 486 × 280 | la schermata Start di Windows 8 con cosa c’è in un sito di Pekko |
+| `Dance` | `ad-web-dance` (GIF, 4) | 160 × 600 | silhouette che ballano: «3 KB of javascript. dance like nobody’s downloading» |
+| `Cantiere` | `ad-web-cantiere` (GIF, 2) | 300 × 100 | «NO WEBSITE? PEKKO IS ALREADY DIGGING.», lampeggiante |
+| `Bottoni` | `btn-*` (PNG; `btn-bcp` GIF) | 88 × 31 | i bottoni dei siti veri, 0 cookies, hand coded, si parla italiano, secured by a tortoise… |
+
+Gli ingredienti nuovi (fogli di `spot.js`): `ritagli-c` (Pekko web designer a mezzo busto:
+`web-*`), `ritagli-d` (figura intera: surf, balli per le silhouette, cantiere, freccia del
+mouse…), `icone` (icone lucide «Web 2.0»: `ico-*`), `stock3` (foto stock finte sui siti),
+`bg-web` (lo studio web vuoto). Cinque predizioni high il 29.09.2026. `shot-bcp.webp` è la
+cattura della pagina stessa, per la scheda «bettercallpekko.it» di Pekko Explorer.
+
 ## Regole imparate
 
 - **Il modello disegna bene gli ingredienti, male i banner finiti**: se gli si chiedono

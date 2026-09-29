@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What's in a Pekko website — Start screen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#180052}
+.tile{position:absolute;box-sizing:border-box;padding:8px 10px;color:#ffffff;font-family:'Open Sans',sans-serif;overflow:hidden}
+.big{font-weight:300;font-size:44px;line-height:1;letter-spacing:-.02em}
+.lab{position:absolute;left:10px;bottom:8px;right:8px;font-weight:600;font-size:11px;line-height:1.2}
+</style>
+</helmet>
+<div data-out="ad-web-metro" style="width: 486px; height: 280px; position: relative; overflow: hidden; background: #180052">
+<div style="position: absolute; left: 18px; top: 8px; font-family: 'Open Sans', sans-serif; font-weight: 300; font-size: 32px; color: #ffffff">Start</div>
+<div style="position: absolute; right: 56px; top: 12px; text-align: right; font-family: 'Open Sans', sans-serif; color: #ffffff; line-height: 1.15"><div style="font-size: 16px; font-weight: 300">pekko</div><div style="font-size: 10px; opacity: .8">web designer</div></div>
+<div style="position: absolute; right: 18px; top: 12px; width: 32px; height: 32px; overflow: hidden; background: #5e8eb1">
+<img src="/_blob/003e6d2f0b03551fa2fa7db7ced2bb08" alt="" style="position: absolute; left: -12px; top: -2px; width: 58px">
+</div>
+
+<div class="tile" style="left: 18px; top: 62px; width: 226px; height: 100px; background: #00aba9">
+<div class="big">3 KB</div>
+<div class="lab">of javascript when rivaltasulmincio.it opens. it flies</div>
+</div>
+<div class="tile" style="left: 250px; top: 62px; width: 110px; height: 100px; background: #e3a21a">
+<div class="big">0</div>
+<div class="lab">cookies, 0 trackers, 0 banners</div>
+</div>
+<div class="tile" style="left: 366px; top: 62px; width: 110px; height: 100px; background: #2d89ef">
+<svg width="34" height="40" viewBox="0 0 24 28" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"><rect x="5" y="2" width="14" height="24" rx="2.5"></rect><path d="M10 22.5h4"></path></svg>
+<div class="lab">works on ur phone. 320 → 1920 px</div>
+</div>
+
+<div class="tile" style="left: 18px; top: 168px; width: 110px; height: 100px; background: #00a300">
+<div class="big" style="font-size: 38px; font-weight: 400">&lt;/&gt;</div>
+<div class="lab">written by hand, no templates</div>
+</div>
+<div class="tile" style="left: 134px; top: 168px; width: 226px; height: 100px; background: #ff0097">
+<img src="/_blob/3865f160d3fe814737bf726ad2caa2ee" alt="" style="position: absolute; right: 0; top: 0; width: 84px; height: 100px; object-fit: cover">
+<div style="font-weight: 300; font-size: 23px; line-height: 1.05">ur domain,<br>ur site</div>
+<div class="lab" style="right: 92px">domain &amp; hosting set up 4 u</div>
+</div>
+<div class="tile" style="left: 366px; top: 168px; width: 110px; height: 100px; background: #b91d47">
+<div class="big" style="font-size: 34px; font-weight: 400">SRC</div>
+<div class="lab">the source files r yours. always</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":486,"height":280}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

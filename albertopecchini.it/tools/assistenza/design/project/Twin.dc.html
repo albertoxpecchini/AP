@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Same guy, different font</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;700&family=Comic+Neue:wght@700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#eae41f}
+.i3{font-family:Impact,Anton,'Arial Black',sans-serif;text-transform:uppercase;line-height:1;color:#fff;paint-order:stroke fill;letter-spacing:.02em;white-space:nowrap}
+.i3r{-webkit-text-stroke:2px #e21212;text-shadow:1px 1px 0 #8a0000,2px 2px 0 #8a0000,3px 3px 0 #8a0000,4px 5px 4px rgba(0,0,0,.45)}
+.i3y{-webkit-text-stroke:2px #f0a500;text-shadow:1px 1px 0 #8a5a00,2px 2px 0 #8a5a00,3px 3px 0 #8a5a00}
+.yellow{clip-path:polygon(0 0,58% 0,44% 100%,0 100%);background:repeating-linear-gradient(135deg,rgba(255,255,255,.22) 0 5px,rgba(255,255,255,0) 5px 11px),linear-gradient(180deg,#fff45a 0%,#fdea0a 60%,#f2c500 100%)}
+.cut{clip-path:polygon(58% 0,100% 0,100% 100%,44% 100%)}
+</style>
+</helmet>
+<div data-out="ad-web-twin" style="width: 300px; height: 250px; position: relative; overflow: hidden; background: #f3f1ec">
+<div class="yellow" style="position: absolute; left: 0; top: 0; width: 300px; height: 250px"></div>
+<svg style="position: absolute; left: 0; top: 0" width="300" height="250" viewBox="0 0 300 250"><line x1="174" y1="0" x2="132" y2="250" stroke="#10110f" stroke-width="2"></line></svg>
+<img src="/_blob/003e6d2f0b03551fa2fa7db7ced2bb08" alt="" style="position: absolute; left: -22px; bottom: 34px; height: 162px">
+<div class="cut" style="position: absolute; left: 0; top: 0; width: 300px; height: 216px">
+<img src="/_blob/0be226f1df4e42998d7ea07cf6ceb884" alt="" style="position: absolute; right: -10px; bottom: 0; height: 178px">
+</div>
+<div class="i3 i3r" style="position: absolute; left: 10px; top: 8px; font-size: 34px">PEKKO</div>
+<div style="position: absolute; left: 11px; top: 44px; font-family: 'Comic Neue', 'Comic Sans MS', cursive; font-weight: 700; font-size: 13px; color: #7a0000">fixes computers!!!</div>
+<div style="position: absolute; right: 10px; top: 10px; text-align: right; font-family: Archivo, sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -.01em; color: #10110f">Alberto Pecchini</div>
+<div style="position: absolute; right: 10px; top: 29px; text-align: right; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 14px; line-height: 1.05; color: #5a5b55">houses, websites<br>&amp; brands.</div>
+<div style="position: absolute; left: 0; top: 216px; width: 300px; height: 34px; background: #10110f"></div>
+<div class="i3 i3y" style="position: absolute; left: 12px; top: 222px; font-size: 21px">SAME GUY.</div>
+<div style="position: absolute; left: 124px; top: 218px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 26px; line-height: 1; color: #f3f1ec; white-space: nowrap">Different font<span style="color: #e5481f">.</span></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":300,"height":250}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
