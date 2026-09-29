@@ -39,7 +39,8 @@ export const assistenza = {
   // indirizzi: canonical e og:url ci puntano sempre.
   dominio: 'https://www.bettercallpekko.it',
   urlPubblici: { '/assistenza/': '/', '/contatti/assistenza/': '/contact/' },
-  api: '/api/bcp',
+  // con la barra finale: vercel.json ha trailingSlash e senza passerebbe da un 308
+  api: '/api/bcp/',
   lang: 'en',
   nome: 'Better Call Pekko',
   titolo: 'In Computer Trouble? Better Call Pekko! — I’m the computer guy. Computer repair in Rivalta sul Mincio (Mantova, Italy)',
