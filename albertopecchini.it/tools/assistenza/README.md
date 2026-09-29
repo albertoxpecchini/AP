@@ -34,6 +34,30 @@ Le immagini nascono in due passi, così sembrano del 2008 e non del 2026:
 | `../../src/data/assistenza.js` | i contenuti delle due pagine (in inglese): testi, listino, forum, commenti, coupon, social… |
 | `../../src/templates/pages/assistenza.js` | le due pagine autonome (stile e script in linea) |
 
+## Le parti vive (dal 29.09.2026)
+
+Contavisite, persone online, like, condivisioni, sondaggio, classifica del gioco, forum,
+guestbook, shoutbox ed e-card sono veri: li gestisce **`api/bcp.js`**, una funzione sola che
+tiene tutto in un documento JSON privato su **Vercel Blob** (`bcp/db.json`). Legge sempre
+dall'origine (`useCache: false`) e riscrive con `ifMatch` sull'ETag: due scritture insieme non
+si cancellano, chi perde riprova. Il contenuto iniziale (discussioni e recensioni del 2009) sta in
+`src/data/bcp-seed.js` e il template lo stampa nell'HTML, così la pagina regge anche senza
+JavaScript o col database spento (l'API risponde `offline`).
+
+- **Attivazione**: Vercel → Storage → Create → Blob (privato) → collegarlo al progetto `bcp`:
+  Vercel aggiunge `BLOB_READ_WRITE_TOKEN` e al deploy successivo tutto si accende.
+- **Protezioni**: campo trappola, 3 s minimi dall'apertura, massimo 4 messaggi al minuto per IP
+  (in memoria, l'IP non si salva), niente link né HTML, nomi 2–24 caratteri («pekko» è riservato),
+  liste troncate (60 discussioni, 40 risposte, 150 firme, 60 messaggi nella shoutbox).
+- **Moderazione**: con la variabile `BCP_ADMIN_KEY` impostata nel progetto, una POST a
+  `/api/bcp` con `{ "a": "del", "key": "…", "what": "thread|reply|gb|shout", "id": "…" }` cancella
+  (per le risposte `id` è `<id discussione>:<indice>`); oppure si modifica o cancella
+  `bcp/db.json` dalla pagina dello store su Vercel.
+- **In locale**: `BCP_STORE=memory npm run dev` usa un database in memoria (si azzera a ogni
+  riavvio o modifica di `api/bcp.js`).
+- **Costi**: sul piano gratuito di Vercel Blob ogni azione è una lettura e una scrittura del
+  documento; le letture della pagina passano dalla cache della rete di Vercel per 8 secondi.
+
 Token e chiamate a Replicate: `tools/replicate.mjs`, in comune con copertine, figurine e
 mascotte (il token sta in `.env.local`, vedi [`tools/copertine/README.md`](../copertine/README.md)).
 

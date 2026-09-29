@@ -67,6 +67,10 @@ export function privacyPage() {
         <p>Se un fornitore ha sede fuori dallo Spazio Economico Europeo, il trasferimento avviene sulla base di decisioni di adeguatezza o clausole contrattuali standard. I dati non vengono venduti né ceduti a terzi per finalità di marketing.</p>`,
       },
       {
+        title: 'Better Call Pekko (bettercallpekko.it)',
+        body: '<p>Le pagine di <strong>bettercallpekko.it</strong> hanno un forum, un guestbook, una shoutbox, un sondaggio, una classifica e dei contatori. Quello che scrivi lì (un nome o soprannome a tua scelta e il messaggio) è <strong>pubblico</strong> e resta visibile finché non lo cancello: non scrivere numeri di telefono, indirizzi o dati di altre persone. I testi sono salvati su <strong>Vercel Blob</strong> (Vercel Inc.); l’indirizzo IP non viene salvato, serve solo per qualche minuto, in memoria, a limitare gli invii ripetuti. Like, voto e nome si ricordano nel tuo browser (archiviazione locale), non sul server. Per far togliere un tuo messaggio scrivimi: lo cancello. La base giuridica è il consenso che dai pubblicando.</p>',
+      },
+      {
         title: 'Protezione antispam',
         body: '<p>Il modulo di contatto è protetto da <strong>Cloudflare Turnstile</strong>, che verifica che a scrivere sia una persona e non un programma automatico. Per farlo analizza il comportamento del browser durante la compilazione e riceve l’indirizzo IP; nella maggior parte dei casi la verifica è invisibile e non richiede alcuna azione. Turnstile non installa cookie di profilazione e non viene usato per tracciarti su altri siti. La base giuridica è il legittimo interesse a proteggere il sito dagli invii automatici (art. 6, par. 1, lett. f GDPR). Insieme al messaggio registro anche l’indirizzo IP di provenienza e il momento dell’invio, per la stessa finalità di sicurezza.</p>',
       },

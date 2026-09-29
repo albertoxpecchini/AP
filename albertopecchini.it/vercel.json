@@ -7,7 +7,9 @@
   "trailingSlash": true,
   "redirects": [
     { "source": "/portfolio/rivalta-sul-mincio/", "destination": "/portfolio/rivaltasulmincio-it/", "permanent": true },
-    { "source": "/portfolio/rivaltasulmincio.it", "destination": "/portfolio/rivaltasulmincio-it/", "permanent": true }
+    { "source": "/portfolio/rivaltasulmincio.it", "destination": "/portfolio/rivaltasulmincio-it/", "permanent": true },
+    { "source": "/assistenza/", "destination": "https://www.bettercallpekko.it/", "permanent": false },
+    { "source": "/contatti/assistenza/", "destination": "https://www.bettercallpekko.it/contact/", "permanent": false }
   ],
   "headers": [
     {

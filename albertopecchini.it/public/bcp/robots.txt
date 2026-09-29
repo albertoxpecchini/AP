@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://bettercallpekko.it/sitemap.xml
+Sitemap: https://www.bettercallpekko.it/sitemap.xml

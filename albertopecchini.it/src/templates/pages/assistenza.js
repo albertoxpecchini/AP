@@ -1,33 +1,37 @@
-// «Better Call Pekko» — /assistenza/ e /contatti/assistenza/.
+// «Better Call Pekko» — bettercallpekko.it (e /assistenza/, /contatti/assistenza/
+// nel sito serio, che su Vercel rimandano al dominio).
 //
 // Due pagine autonome, fuori dal guscio del portfolio (route.standalone in
 // routes.js): niente testata, piè di pagina, font o bundle del sito. Tutto ciò
 // che serve sta qui dentro — stile e script in linea — perché la pagina deve
-// sembrare il sito americano del 2008 di Pekko, «the computer guy»: 960 px
-// fissi, colonna blu a sinistra con i tasti gialli in rilievo, pannello giallo
-// dei «video di consulenza», manifesto a destra, striscia «WELCOME», colonne
-// pubblicitarie ai lati dello schermo, annunci di aziende che non esistono,
-// profilo in stile MySpace, listino, forum phpBB, telefonini e provider del
-// 2009, pagamenti e donazioni PayPal, coupon, commenti in stile SMS, webcam
-// con i filtri brutti, pop-up d'ingresso. Tutto in inglese, come chiede Alberto,
-// che qui si chiama Pekko. Sui telefoni la pagina si vede rimpicciolita
-// (viewport a 960 px), come nel 2008. Le Impact sono bianche con i bordi
-// colorati e l'estrusione in 3D, sempre. Le stesse pagine sono il sito intero di
-// bettercallpekko.it (progetto Vercel a parte, build con SITE=bcp: vedi routes.js).
+// sembrare il sito americano del 2008 di Pekko, «the computer guy», alla Saul
+// Goodman: 960 px fissi, colonna blu coi tasti gialli, pannello dei «video di
+// consulenza», manifesto, striscia «WELCOME», colonne pubblicitarie ai lati,
+// aziende che non esistono, profilo MySpace, listino, forum, telefonini e
+// provider del 2009, pagamenti e donazioni PayPal, coupon, webcam coi filtri
+// brutti, pop-up d'ingresso. Tutto in inglese, paragrafi in minuscolo
+// sgrammaticato; le Impact sono bianche coi bordi colorati e l'estrusione in 3D.
 //
-// Contenuti in src/data/assistenza.js; immagini di tools/assistenza (ingredienti
-// di gpt-image-2 e annunci composti da rendi.mjs) con le misure nel manifest
-// generato src/data/assistenza-media.js. Un'immagine elencata ma non ancora
-// resa diventa un riquadro di testo (`.fake`). Il modulo della pagina contatti
-// parla con api/contatti.js come quello di /contatti/ (stesse trappole antibot,
-// stesso Turnstile), con `modulo: 'assistenza'`.
+// Le parti vive sono vere e passano da api/bcp.js (Vercel Blob): contavisite e
+// persone online, like, condivisioni, sondaggio, record del gioco, forum con
+// discussioni e risposte, guestbook, shoutbox, e-card con link da mandare. I
+// testi degli utenti entrano nel DOM solo come testo (textContent), mai come
+// HTML. L'HTML stampa già il contenuto iniziale (src/data/bcp-seed.js), così la
+// pagina regge anche senza JavaScript o col database spento.
+//
+// Contenuti in src/data/assistenza.js; immagini di tools/assistenza con le
+// misure nel manifest generato src/data/assistenza-media.js. Il modulo della
+// pagina contatti parla con api/contatti.js come quello di /contatti/.
 
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
 import { assistenza as A } from '../../data/assistenza.js'
 import { media } from '../../data/assistenza-media.js'
+import { seed } from '../../data/bcp-seed.js'
 
+const S0 = seed()
 const src = (name) => media[name]?.src || ''
+const PAGINA = A.dominio + '/'
 
 /** Un'immagine del manifest, o il riquadro di testo se non è ancora stata resa. */
 function img(name, alt, { w, h, cls = '', eager = false } = {}) {
@@ -50,20 +54,55 @@ const sec = (id, title, inner, sub) => `<section class="sec" id="${id}"><h2>${i3
 
 const chips = (lista, cls = '') => `<div class="chips ${cls}">${lista.map((w) => `<span>${esc(w)}</span>`).join('')}</div>`
 
-const EULA = `<p><b>END USER LICENSE AGREEMENT — IMPORTANT, READ CAREFULLY.</b> By calling, e-mailing, thinking about, or standing near Pekko ("the Computer Guy") you agree to be bound by this Agreement.</p><p><b>1. GRANT OF LICENSE.</b> The Computer Guy grants you a non-exclusive, non-transferable right to have your computer looked at, sighed over, and eventually fixed.</p><p><b>2. RESTRICTIONS.</b> You may not download "free" screensavers, install seventeen toolbars, or click YES on anything that says YOUR PC IS INFECTED in red letters.</p><p><b>3. DUPLICATE FILES.</b> All copies of copies of copies of your holiday photos remain your responsibility until proven otherwise.</p><p><b>4. PRINTERS.</b> The Computer Guy makes no warranty, express or implied, that any printer will ever print again; printers are governed by separate, older laws.</p><p><b>5. WINDOWS VISTA.</b> See section 4.</p><p><b>6. GOVERNING LAW.</b> This Agreement is governed by the laws of Rivalta sul Mincio and the ancient customs of the Mincio river.</p><p><b>7. ENTIRE AGREEMENT.</b> Any other agreement is a duplicate and will be deleted with your permission. Si parla italiano. kthxbai.</p>`
+/** «Mi piace» vero: il conteggio arriva dall'API, il click si ricorda nel browser. */
+const like = (k, label = 'Like') => `<span class="lk"><button type="button" data-like="${k}"><i>👍</i> ${esc(label)}</button> <b data-likes="${k}">0</b> <small>ppl like this</small></span>`
+
+/** Data «all'americana» del 2009: 03/14/2009 11:52 PM. */
+function quando(ts) {
+  const d = new Date(ts)
+  const p = (x) => String(x).padStart(2, '0')
+  const h = d.getUTCHours() + 2
+  return `${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())}/${d.getUTCFullYear()} ${p(((h + 11) % 12) + 1)}:${p(d.getUTCMinutes())} ${h % 24 < 12 ? 'AM' : 'PM'}`
+}
+
+const shareHref = (k) => {
+  const u = encodeURIComponent(PAGINA)
+  const t = encodeURIComponent(A.shareTesto)
+  return {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
+    twitter: `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
+    whatsapp: `https://wa.me/?text=${t}%20${u}`,
+    telegram: `https://t.me/share/url?url=${u}&text=${t}`,
+    reddit: `https://www.reddit.com/submit?url=${u}&title=${t}`,
+    email: `mailto:?subject=${t}&body=${u}`,
+    copy: PAGINA,
+  }[k]
+}
+
+/** Barra delle condivisioni vere, con i contatori. */
+const sharebar = (small = false) =>
+  `<div class="sharebar${small ? ' sm' : ''}">${A.condividi
+    .map((s) => `<a href="${shareHref(s.k)}" data-share="${s.k}" style="background:${s.colore}"${s.k === 'copy' || s.k === 'email' ? '' : ' target="_blank" rel="noopener"'}>${esc(s.nome)} <b data-shares="${s.k}">0</b></a>`)
+    .join('')}</div>`
+
+// Campi comuni dei moduli vivi: nome (ricordato nel browser), trappola per i bot.
+const nomeCampo = (id) => `<input class="nm" name="name" id="${id}" maxlength="24" placeholder="ur name" autocomplete="nickname" required>`
+const trappola = '<input class="hp" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">'
+
+const EULA = `<p><b>END USER LICENSE AGREEMENT — IMPORTANT, READ CAREFULLY.</b> By calling, e-mailing, thinking about, or standing near Pekko ("the Computer Guy") you agree to be bound by this Agreement.</p><p><b>1. GRANT OF LICENSE.</b> The Computer Guy grants you a non-exclusive, non-transferable right to have your computer looked at, sighed over, and eventually fixed.</p><p><b>2. RESTRICTIONS.</b> You may not download "free" screensavers, install seventeen toolbars, or click YES on anything that says YOUR PC IS INFECTED in red letters.</p><p><b>3. DUPLICATE FILES.</b> All copies of copies of copies of your holiday photos remain your responsibility until proven otherwise.</p><p><b>4. PRINTERS.</b> The Computer Guy makes no warranty, express or implied, that any printer will ever print again; printers are governed by separate, older laws.</p><p><b>5. WINDOWS VISTA.</b> See section 4.</p><p><b>6. GOVERNING LAW.</b> This Agreement is governed by the laws of Rivalta sul Mincio and the ancient customs of the Mincio river.</p><p><b>7. PUBLIC POSTS.</b> What you write in the forum, guestbook and shoutbox is public. Don't post phone numbers, addresses or other people's data. The tortoise deletes what it doesn't like.</p><p><b>8. ENTIRE AGREEMENT.</b> Any other agreement is a duplicate and will be deleted with your permission. Si parla italiano. It's all good, man.</p>`
 
 // ── Pezzi comuni ─────────────────────────────────────────────────────────────
 
-const strip = () => `<div class="strip" aria-hidden="true"><span>${(esc(A.striscia) + ' &nbsp;●&nbsp; ').repeat(6)}</span></div>`
+const strip = () => `<div class="strip" aria-hidden="true"><span>${(esc(A.striscia) + ' &nbsp;●&nbsp; ').repeat(4)}</span></div>`
 
-const sides = (prefisso = '') => html`
+const sides = () => html`
   <div class="side sl" aria-label="Advertisements (fake)">
-    ${ad('ad-sky-outfit', 'Pekko’s Outfit: menswear since 2006, 50% off all suits, dress like Pekko!', { w: 160, h: 600 })}
+    ${ad('ad-sky-outfit', 'Pekko’s Outfit: menswear since 2006, 50% off all suits, dress like Pekko!', { w: 160, h: 600, href: `${A.path}#about` })}
     ${ad('ad-sky-donate', 'Buy Pekko a coffee: donate via PayPal', { w: 160, h: 300, href: A.paypal, ext: true, title: 'Donate via PayPal (opens PayPal)' })}
   </div>
   <div class="side sr" aria-label="Advertisements (fake)">
     ${ad('ad-sky-mac', 'Think different? Think cheaper. PC & Mac repair from €25, no Genius required', { w: 160, h: 600 })}
-    ${ad('ad-sky-forum', 'Pekko’s forum: 1,337 members, register free', { w: 160, h: 300, href: `${prefisso}#forum` })}
+    ${ad('ad-sky-forum', 'Pekko’s forum: register free', { w: 160, h: 300, href: `${A.path}#forum` })}
   </div>
 `
 
@@ -71,9 +110,9 @@ function satisfied() {
   const soc = [
     { t: 'ig', href: A.instagram || A.contatti, title: 'Instagram', bg: '#c13584' },
     { t: 'gh', href: A.github || A.contatti, title: 'GitHub', bg: '#333' },
-    { t: 'my', href: A.contatti, title: 'MySpace (we miss you)', bg: '#0a5ea8' },
-    { t: 'f', href: A.contatti, title: 'Facebook (ask Pekko)', bg: '#3b5998' },
-    { t: 'd', href: A.contatti, title: 'Digg it! (Digg is gone. Pekko is not.)', bg: '#1b6fb6' },
+    { t: 'wa', href: A.whatsapp, title: 'WhatsApp', bg: '#25a244' },
+    { t: '@', href: `mailto:${A.email}`, title: 'E-mail', bg: '#2e5fb8' },
+    { t: '$', href: A.paypal, title: 'PayPal', bg: '#003087' },
   ]
   return `<div class="sat">${i3('ANOTHER SATISFIED CUSTOMER?', 'w', 22)}<ul class="soc">${soc.map((s) => `<li><a href="${s.href}" title="${esc(s.title)}" style="background:${s.bg}"${s.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${s.t}</a></li>`).join('')}</ul>${i3('TELL YOUR VIRUS-INFECTED FRIENDS!!!!', 'y', 19)}<div style="margin-top:14px">${logo(true)}</div>${i3('BETTERCALLPEKKO.IT', 'y', 12)}<br><span class="aptv">AP tv</span></div>`
 }
@@ -82,11 +121,11 @@ function foot() {
   return html`
     <footer class="foot">
       <p class="cause"><a href="#donate">${esc(A.piede.cause)}</a></p>
-      <p class="addr"><b>PEKKO</b> · <a href="${esc(A.dominio)}/">bettercallpekko.it</a> · ${esc(A.indirizzo)} · <a href="${A.tel}">${esc(A.telefono)}</a> · <a href="mailto:${A.email}">${esc(A.email)}</a> · <a href="${A.mappa}" target="_blank" rel="noopener">map</a> · SI PARLA ITALIANO</p>
+      <p class="addr"><b>PEKKO</b> · <a href="${esc(A.dominio)}/">www.bettercallpekko.it</a> · ${esc(A.dove)} · <a href="${A.tel}">${esc(A.telefono)}</a> · <a href="mailto:${A.email}">${esc(A.email)}</a> · SI PARLA ITALIANO · ${esc(A.slogan)}</p>
       <p><a href="${A.contatti}">About &amp; Contact</a> &nbsp;|&nbsp; <a href="#" data-eula>Terms of Use</a> &nbsp;|&nbsp; <a href="${esc(site.url)}/privacy/">Privacy Policy</a> &nbsp;|&nbsp; <a href="${esc(site.url)}/crediti/">Image credits</a> &nbsp;|&nbsp; <a href="${A.paypal}" target="_blank" rel="noopener">Donate</a> &nbsp;|&nbsp; <a href="${esc(site.url)}/">The serious website</a></p>
       <p>${esc(A.piede.legale)}</p>
       <p>${esc(A.piede.ia)}</p>
-      <p>${esc(A.piede.aggiornato)} · ${esc(A.piede.visitatore)}<span class="counter" data-counter>0001337</span> · Copyright © 2006–${new Date().getFullYear()} Pekko. All rights reserved. No rights reversed.</p>
+      <p>${esc(A.piede.aggiornato)} · ${esc(A.piede.visitatore)}<span class="counter" data-counter>-------</span> · <span data-online>?</span> online now · Copyright © 2006–${new Date().getFullYear()} Pekko. All rights reserved. No rights reversed.</p>
       <p class="credit"><a href="${esc(site.url)}" rel="author">Site by ${esc(site.name)}</a> · ${esc(site.location.city)} (${esc(site.location.province)}), Italy</p>
     </footer>
     <div class="pop" data-eula-pop hidden role="dialog" aria-modal="true" aria-label="Terms of Use">
@@ -111,8 +150,30 @@ function popup() {
         </div>
       </div>
     </div>
+    <div class="pop" data-ecard-pop hidden role="dialog" aria-modal="true" aria-labelledby="ec-t">
+      <div class="win" style="width:440px">
+        <div class="bar"><span>✉ You've got an e-card!!!</span><button class="x" type="button" data-ecard-close aria-label="Close">✕</button></div>
+        <div style="padding:12px;text-align:center">
+          <h2 id="ec-t" class="i3 r" style="font-size:26px" data-ecard-title>YOU'VE GOT AN E-CARD!</h2>
+          <div data-ecard-img style="margin:8px auto;width:390px"></div>
+          <p data-ecard-msg></p>
+          <p><button class="red" type="button" data-ecard-close>LOL THX</button> <a class="red" href="#ecards" data-ecard-close>SEND ONE BACK</a></p>
+        </div>
+      </div>
+    </div>
   `
 }
+
+// I dati per lo script: API, immagini degli avatar e delle e-card, indirizzo pubblico.
+const datiScript = () =>
+  JSON.stringify({
+    api: A.api,
+    pagina: PAGINA,
+    path: A.path,
+    avatars: Object.fromEntries(Array.from({ length: 9 }, (_, i) => [i + 1, src(`avatar-${i + 1}`)])),
+    ecards: A.ecard.carte.map((c) => src(c.ad)),
+    shareTesto: A.shareTesto,
+  }).replace(/</g, '\\u003c')
 
 function shell({ path, title, description, body, image, head = '' }) {
   const m = media[image]
@@ -144,6 +205,7 @@ ${head}
 </head>
 <body>
 ${body}
+<script type="application/json" id="bcp-data">${datiScript()}</script>
 <script>${JS}</script>
 </body>
 </html>`
@@ -168,12 +230,9 @@ function mid() {
         <a class="i3 b tel" href="${A.tel}" style="font-size:38px">${esc(A.telefono)}</a>
         <span class="ab3" style="display:block;font-size:12px">SI PARLA ITALIANO · NOT TOLL FREE · <a class="blink" href="${A.contatti}">CALL NOW!!!</a></span>
       </div>
-      <div class="facts">
-        <div><b>WHO IS PEKKO?</b><br>I'm the computer guy. I repair computers. Born ${esc(A.nascita)}.</div>
-        <div><b>WHERE?</b><br>${esc(A.indirizzo)}. House calls, remote help, 3 AM on channel 47.</div>
-        <div><b>WHAT?</b><br>PC · Mac · phones · printers · Wi-Fi · Windows · Office · viruses · duplicates · sighs. <a href="#about">More about Pekko »</a></div>
-      </div>
-      <p class="special">Today's special: a free sigh with every consultation. Ask about our duplicate-file amnesty program. w00t!</p>
+      <blockquote class="saul"><p>“${esc(A.monologo)}”</p><cite>— pekko, on channel 47 at 3 am</cite></blockquote>
+      <div class="midlike">${like('page', 'Like Better Call Pekko')} · <a href="#donate">share it »</a></div>
+      <p class="special">${i3(A.slogan, 'r', 20)}</p>
     </div>
   `
 }
@@ -187,7 +246,7 @@ function bottom() {
           ${ad('ad-vista', 'Have you or someone you know been affected by the tragedy of Windows Vista? Pekko can help!', { w: 264, h: 187 })}
           ${ad('ad-hermanos', 'Los Backups Hermanos — ¡Que seguro! (a company that does not exist)', { w: 222, h: 186 })}
         </div>
-        ${ad('ad-fashion', 'Pekko’s Outfit, menswear since 2006: 50% off all suits. Dress like Pekko! Fashion show', { w: 486, h: 205 })}
+        ${ad('ad-fashion', 'Pekko’s Outfit, menswear since 2006: 50% off all suits. Dress like Pekko! Fashion show', { w: 486, h: 205, href: '#about' })}
       </div>
       <div class="br">${satisfied()}</div>
     </div>
@@ -250,14 +309,12 @@ function about() {
           <div class="staff">
             ${B.staff.map((s) => `<div class="member">${s.img.startsWith('/') ? `<img src="${s.img}" alt="${esc(s.nome)}" width="96" height="96" loading="lazy">` : img(s.img, s.nome, { w: 96, h: 96 })}<b>${esc(s.nome)}</b><i>${esc(s.ruolo)}</i><span>${esc(s.nota)}</span></div>`).join('')}
           </div>
-          <p class="h3">Pekko's top 8</p>
-          <div class="top8">${B.top8.map((t, i) => `<span><b>${i + 1}.</b> ${esc(t)}</span>`).join('')}</div>
           <p class="h3">Sites by Pekko</p>
           <p>${B.siti.map((s) => `<a href="${s.href}"${s.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${esc(s.label)}</a>`).join(' · ')} · <a href="${A.contatti}">yours?</a></p>
         </div>
         <div class="c340">
           <p class="h3">${esc(B.albumTitolo)}</p>
-          <div class="album">${B.album.map((n, i) => `<a href="${A.contatti}" title="Outfit #${i + 1}">${img(n, `Pekko’s outfit #${i + 1}`, { w: 100, h: 100 })}</a>`).join('')}</div>
+          <div class="album">${B.album.map((n, i) => `<div class="suit">${img(n, `Pekko’s outfit #${i + 1}`, { w: 100, h: 100 })}<button type="button" data-like="suit-${i + 1}" title="like this suit">👍 <b data-likes="suit-${i + 1}">0</b></button></div>`).join('')}</div>
           <p style="font:10px Verdana,sans-serif;color:#555;margin:4px 0 8px">${esc(B.albumNota)}</p>
           ${ad('ad-dairy', 'Mincio Dairy Call Center: press 1 for milk, 2 for tech support, 3 to moo (does not exist)', { w: 300, h: 250 })}
           <div style="height:8px"></div>
@@ -314,7 +371,7 @@ function tv() {
           <div class="ring">
             <p class="h3 blink">FREE RINGTONES!!!</p>
             ${A.suonerie.map((s) => `<button type="button" data-suono="${s.suono}">▶ ${esc(s.nome)}</button>`)}
-            <p style="font:9px Verdana,sans-serif;color:#555;margin:4px 0 0">Plays through your speakers. If your speakers are mute, you know who to call.</p>
+            <p style="font:9px Verdana,sans-serif;color:#555;margin:4px 0 0">plays thru ur speakers. if ur speakers r mute, u know who 2 call.</p>
           </div>
           ${ad('ad-toolbar', 'Download the Better Call Pekko toolbar — free! Contains 0 viruses (probably)', { w: 468, h: 60, attrs: 'data-toolbar' })}
           <p data-toolbar-msg hidden style="margin:6px 0 0;padding:6px;border:2px solid #003c74;background:#fff;font:bold 11px Tahoma,sans-serif"></p>
@@ -325,43 +382,44 @@ function tv() {
   )
 }
 
+// Il guestbook stampato dal server (l'archivio iniziale): lo script lo rifà coi dati veri.
+const gbVoce = (g) => `<div class="cmt">${g.av ? img(`avatar-${g.av}`, `${g.by}'s webcam photo`, { w: 48, h: 48 }) : '<span class="noav">no photo</span>'}<div><b>${esc(g.by)}</b> <small>${esc(quando(g.ts))}</small><p>${esc(g.text)}</p></div></div>`
+
 function testimonials() {
   const S = A.sondaggio
+  const G = A.guestbook
   return sec(
     'testimonials',
     'TESTIMONIALS',
     html`
       <div class="in cols">
         <div class="c1">
-          <p class="h3">Pekko worked for me!!!! (${A.commenti.length} comments)</p>
-          ${A.commenti.map(
-            (c) => html`
-              <div class="cmt${c.comic ? ' comic' : ''}${c.moderato ? ' mod' : ''}">
-                ${c.avatar ? img(c.avatar, `${c.chi}'s webcam photo`, { w: 48, h: 48 }) : '<span class="noav">no photo</span>'}
-                <div><b>${esc(c.chi)}</b> <small>${esc(c.quando)}</small><p>${esc(c.testo)}</p></div>
-              </div>
-            `,
-          )}
-          <div class="frmk">
+          <p class="h3">${esc(G.titolo)} (<span data-gb-count>${S0.guestbook.length}</span> comments)</p>
+          <form class="frmk" data-gb-form>
             <p class="h3">Leave a comment</p>
-            <p style="font:11px Verdana,sans-serif">Comments are moderated by Pekko's turtle. Expect delays. (The button takes you to the contact page, where comments actually arrive.)</p>
-            <p><input placeholder="Your name" size="18"> <input placeholder="Your e-mail" size="26"></p>
-            <p><textarea rows="3" cols="58" placeholder="omg pekko…"></textarea></p>
-            <a class="red" href="${A.contatti}">SUBMIT COMMENT</a>
-          </div>
+            <p class="note">${esc(G.nota)}</p>
+            <p class="row2">${nomeCampo('gb-name')} <select name="av" data-av-select aria-label="Choose ur avatar"><option value="0">no photo</option>${Array.from({ length: 9 }, (_, i) => `<option value="${i + 1}">avatar #${i + 1}</option>`).join('')}</select> <span class="avprev" data-av-prev></span></p>
+            <p><textarea name="text" rows="3" maxlength="300" placeholder="omg pekko…" required aria-label="Your comment"></textarea></p>
+            ${trappola}
+            <p><button class="red" type="submit">POST COMMENT</button> <span class="st" data-st></span></p>
+          </form>
+          <div data-gb-list>${S0.guestbook.map(gbVoce).join('')}</div>
         </div>
         <div class="c340">
           <div class="poll" data-poll data-grazie="${esc(S.grazie)}">
             <p class="h3">Poll</p>
             <p><b>${esc(S.domanda)}</b></p>
-            ${S.voci.map((v, i) => `<label><input type="radio" name="poll" value="${i}"> ${esc(v)}</label><div class="bar" data-bar="${S.risultati[i]}" hidden></div>`)}
+            ${S.voci.map((v, i) => `<label><input type="radio" name="poll" value="${i}"> ${esc(v)} <span class="pct" data-pct="${i}"></span></label><div class="bar" data-bar="${i}" hidden></div>`)}
             <p style="margin:6px 0 0"><button class="xp" type="button" data-vote>Vote</button> <span data-poll-msg></span></p>
+            <p class="note"><span data-poll-tot>0</span> votes so far</p>
           </div>
           <div class="game" data-game data-vinto="${esc(A.gioco.vinto)}" data-href="${A.contatti}">
             <p class="h3">${esc(A.gioco.titolo)}</p>
             <p style="font:10px Verdana,sans-serif;margin:0 0 4px">${esc(A.gioco.aiuto)}</p>
             <div class="arena">${img('prop-virus', 'A green virus. Punch it.', { w: 56, h: 60 })}<span class="ouch">OUCH!</span></div>
-            <p style="margin:6px 0 0"><b>HITS: <span data-hits>0</span>/3</b> <span data-game-msg></span></p>
+            <p style="margin:6px 0 0"><b>HITS: <span data-hits>0</span>/3</b> · <b>TIME: <span data-time>0.00</span>s</b> <span data-game-msg></span></p>
+            <p class="h3" style="margin-top:8px">Hall of fame</p>
+            <ol class="scores" data-scores><li>no scores yet. be the first!!!</li></ol>
           </div>
           <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
             ${ad('ad-turtle', 'Turtle Insurance Co. — slow, steady, insured (does not exist)', { w: 180, h: 150 })}
@@ -374,7 +432,7 @@ function testimonials() {
         </div>
       </div>
     `,
-    'Real comments from real people who do not exist',
+    'real comments from real ppl (and some from 2009)',
   )
 }
 
@@ -384,20 +442,27 @@ function ecards() {
     'ecards',
     'E-CARDS',
     html`
-      <form class="ecform" data-ecard data-fatto="${esc(E.fatto)}" data-nota="${esc(E.fattoNota)}">
-        <span>To:</span><input name="to" placeholder="friend's name" maxlength="40">
-        <span>From:</span><input name="from" placeholder="your name" maxlength="40">
+      <form class="ecform" data-ecard>
+        <span>To:</span><input name="to" placeholder="friend's name" maxlength="30" required>
+        <span>From:</span><input name="from" placeholder="ur name" maxlength="30" required>
         <span>E-card #</span><select name="n">${E.carte.map((_, i) => `<option>${i + 1}</option>`)}</select>
         <button class="red" type="submit">Submit</button>
       </form>
-      <div class="ecdone" data-ecard-done hidden></div>
+      <p class="note" style="margin:6px 10px 0">${esc(E.aiuto)} · <b data-ecards-tot>0</b> e-cards sent so far</p>
+      <div class="ecdone" data-ecard-done hidden>
+        <p><b>ur e-card is ready!!!</b> send this link 2 ur friend:</p>
+        <p><input class="eclink" data-ecard-link readonly aria-label="E-card link"></p>
+        <p class="sharebar sm" data-ecard-share></p>
+      </div>
       <div class="ecgrid">
-        ${E.carte.map((c, i) => `<div class="ec"><span class="num">#${i + 1}</span>${ad(c.ad, c.alt, { w: 390, h: 270 })}</div>`)}
+        ${E.carte.map((c, i) => `<div class="ec"><span class="num">#${i + 1}</span>${ad(c.ad, c.alt, { w: 390, h: 270, href: '#ecards' })}<div class="eclike">${like(`ecard-${i + 1}`)}</div></div>`)}
       </div>
     `,
     E.intro,
   )
 }
+
+const shoutVoce = (s) => `<p><b${s.by === 'pekko' ? ' class="me"' : ''}>${esc(s.by)}:</b> ${esc(s.text)} <small>${esc(quando(s.ts))}</small></p>`
 
 function webcam() {
   const W = A.webcam
@@ -419,25 +484,31 @@ function webcam() {
           </div>
           <div class="bar"><button type="button" data-cam-on>USE MY WEBCAM</button><button type="button" data-cam-off>STOP</button><button type="button" data-cam-shot>SNAPSHOT</button></div>
           <div class="bar" data-cam-filters>${W.filtri.map((f, i) => `<button type="button" data-filter="${f.toLowerCase()}"${i === 0 ? ' class="on"' : ''}>${esc(f)}</button>`)}</div>
-          <p class="status" data-cam-status>Viewers online: 3 · Stream quality: 56k</p>
+          <p class="status" data-cam-status><span data-online>?</span> ppl online now · stream quality: 56k</p>
           <div class="shot" data-cam-shotbox hidden></div>
         </div>
         <div class="c1">
           <p class="h3">${esc(W.titolo)}</p>
           <p>${esc(W.aiuto)}</p>
-          <div class="chat" data-chat data-risposte="${esc(JSON.stringify(W.risposte))}">
-            <div class="log" data-chat-log>${W.chat.map(([who, t]) => `<p><b${who === 'pekko' ? ' class="me"' : ''}>${esc(who)}:</b> ${esc(t)}</p>`)}</div>
-            <form data-chat-form><input placeholder="say something to pekko…" maxlength="120" aria-label="Chat message"><button class="xp" type="submit">Send</button></form>
+          <p class="h3">${esc(W.shoutTitolo)}</p>
+          <div class="chat">
+            <div class="log" data-shout-list>${S0.shout.map(shoutVoce).join('')}</div>
+            <form data-shout-form>${nomeCampo('sh-name')}<input name="text" maxlength="140" placeholder="say something…" required aria-label="Shout">${trappola}<button class="xp" type="submit">Shout!</button></form>
           </div>
-          <div class="wid" style="margin-top:8px">
-            <h4>Webcam schedule</h4>
-            Mon–Fri 9–18: Pekko at his desk (sometimes) · Sat: turtle patrol · Sun: offline (church, salami) · 3 AM: on TV, channel 47
-          </div>
+          <p class="note">${esc(W.shoutNota)} <span class="st" data-st-shout></span></p>
         </div>
       </div>
     `,
-    'Cam 1 · Pekko’s office · Via Belvedere 1, Rivalta sul Mincio',
+    'Cam 1 · Pekko’s office · Rivalta sul Mincio',
   )
+}
+
+// Il forum stampato dal server: righe della tabella (lo script le rifà coi dati veri).
+const ultima = (t) => t.posts[t.posts.length - 1]
+const forumRiga = (t) => {
+  const u = ultima(t)
+  const ico = t.locked ? '🔒' : t.sticky ? '📌' : t.hot ? '🔥' : '📄'
+  return `<tr class="${t.sticky ? 'sticky' : ''}${t.locked ? ' locked' : ''}"><td><span class="ico">${ico}</span> <a href="#forum" data-thread-open="${esc(t.id)}">${esc(t.title)}</a>${t.hot ? ' <em>HOT</em>' : ''}</td><td>${esc(t.by)}</td><td class="n">${t.posts.length - 1}</td><td>${esc(quando(u.ts))}<br><small>by ${esc(u.by)}</small></td></tr>`
 }
 
 function forum() {
@@ -448,12 +519,18 @@ function forum() {
     html`
       <div class="in">
         <table class="fr">
-          <tr><th style="width:52%">Topic</th><th>Author</th><th>Replies</th><th>Last post</th></tr>
-          ${F.argomenti.map(
-            (t) => `<tr class="${t.sticky ? 'sticky' : ''}${t.chiuso ? ' locked' : ''}"><td><span class="ico">${t.chiuso ? '🔒' : t.sticky ? '📌' : t.hot ? '🔥' : '📄'}</span> <a href="${A.contatti}">${esc(t.titolo)}</a>${t.hot ? ' <em>HOT</em>' : ''}</td><td>${esc(t.chi)}</td><td class="n">${t.risposte.toLocaleString('en-US')}</td><td>${esc(t.quando)}<br><small>by ${esc(t.ultimo)}</small></td></tr>`,
-          )}
+          <thead><tr><th style="width:52%">Topic</th><th>Author</th><th>Replies</th><th>Last post</th></tr></thead>
+          <tbody data-forum>${S0.threads.map(forumRiga).join('')}</tbody>
         </table>
-        <p style="font:10px Verdana,sans-serif;color:#555;margin:6px 0 0">${esc(F.nota)} · <a href="${A.contatti}">Register</a> · <a href="${A.contatti}">Log in</a> · <a href="${A.contatti}">FAQ</a> · <a href="${A.contatti}">Memberlist</a> · <a href="${A.contatti}">Usergroups</a></p>
+        <div class="thread" data-thread hidden></div>
+        <form class="frmk" data-post-form>
+          <p class="h3">Start a new topic</p>
+          <p class="note">${esc(F.nota)}</p>
+          <p class="row2">${nomeCampo('fo-name')} <input name="title" maxlength="80" placeholder="topic title (e.g. HELP my pc is possessed)" required style="width:420px" aria-label="Topic title"></p>
+          <p><textarea name="text" rows="3" maxlength="600" placeholder="describe the drama…" required aria-label="Your post"></textarea></p>
+          ${trappola}
+          <p><button class="red" type="submit">POST NEW TOPIC</button> <span class="st" data-st></span></p>
+        </form>
       </div>
     `,
     F.sotto,
@@ -496,7 +573,7 @@ function coupons(lista = A.coupon) {
     'COUPONS',
     html`
       <div class="in">
-        <p style="text-align:center;margin:0 0 8px"><button class="red" type="button" data-print>PRINT THIS PAGE</button> <span style="font:10px Verdana,sans-serif">(coupons only, we’re not monsters)</span></p>
+        <p style="text-align:center;margin:0 0 8px"><button class="red" type="button" data-print>PRINT THIS PAGE</button> <span style="font:10px Verdana,sans-serif">(coupons only, we r not monsters)</span></p>
         <div class="coupons">
           ${lista.map(
             (c) => html`
@@ -505,7 +582,7 @@ function coupons(lista = A.coupon) {
                 <span class="code">${esc(c.codice)}</span>
                 ${i3(c.titolo, 'r', 24)}
                 <p>${esc(c.testo)}</p>
-                <small>${esc(c.scade)} · Not valid with other offers · Limit one per customer · Pekko reserves the right to sigh.</small>
+                <small>${esc(c.scade)} · not valid with other offers · limit one per customer · pekko reserves the right 2 sigh.</small>
                 <span class="bc" aria-hidden="true"></span>
               </div>
             `,
@@ -513,7 +590,7 @@ function coupons(lista = A.coupon) {
         </div>
       </div>
     `,
-    'Print them. Screenshot them. Just call.',
+    'print them. screenshot them. just call.',
   )
 }
 
@@ -522,7 +599,7 @@ function donate() {
   const S = A.social
   return sec(
     'donate',
-    'PAYMENTS, DONATIONS & SOCIAL',
+    'PAYMENTS, DONATIONS & SHARE',
     html`
       <div class="in cols">
         <div class="c1">
@@ -534,17 +611,20 @@ function donate() {
             <a class="pp" href="${A.paypal}" target="_blank" rel="noopener">${esc(P.donaTasto)}</a>
             <p style="font:10px Verdana,sans-serif;color:#555;margin:6px 0 0">${esc(P.donaNota)}</p>
           </div>
-          <p class="h3">Share this page</p>
-          <div class="share">${S.condividi.map((s) => `<a href="${A.contatti}" title="${esc(s)} (2009)">${esc(s)}</a>`).join('')}</div>
+          <p class="h3">Share this page (4 real) · <span data-shares-tot>0</span> shares</p>
+          ${sharebar()}
+          <p class="h3">Link to us!!!</p>
+          <p class="note">copy this code and paste it on ur myspace, ur blog or ur geocities page:</p>
+          <textarea class="linkus" readonly rows="2" data-select-all aria-label="Banner code">&lt;a href="${esc(PAGINA)}"&gt;&lt;img src="${esc(A.dominio + src('ad-million'))}" alt="Better Call Pekko!" width="468" height="60"&gt;&lt;/a&gt;</textarea>
         </div>
         <div class="c340">
           <p class="h3">${esc(S.titolo)}</p>
-          <div class="soc2">${S.reti.map((r) => `<a href="${r.href}" style="background:${r.colore}"${r.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''} title="${esc(r.nota || r.nome)}"><b>${esc(r.nome)}</b>${r.nota ? `<small>${esc(r.nota)}</small>` : '<small>real!</small>'}</a>`).join('')}</div>
-          <p style="font:10px Verdana,sans-serif;color:#555;margin:6px 0 0">Instagram, GitHub and the e-mail are real. The rest is 2009.</p>
+          <div class="soc2">${S.reti.map((r) => `<a href="${r.href}" style="background:${r.colore}"${r.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}><b>${esc(r.nome)}</b><small>${esc(r.nota)}</small></a>`).join('')}</div>
+          <div class="midlike" style="margin-top:10px">${like('page', 'Like Better Call Pekko')}</div>
         </div>
       </div>
     `,
-    'Cash, cards, PayPal, salami',
+    'cash, cards, paypal, salami',
   )
 }
 
@@ -554,9 +634,9 @@ function extras() {
     'MORE STUFF!!!',
     html`
       <div class="in extras">
-        <div class="wid"><h4>Webring</h4>« <a href="${A.contatti}">prev</a> | ${esc(A.webring)} | <a href="${A.contatti}">next</a> »<br><br><h4>Guestbook</h4><a href="${A.contatti}">Sign my guestbook!</a><br>Add me on MSN: <a href="mailto:${A.email}">${esc(A.email)}</a><br>Bookmark this page (CTRL+D)</div>
-        <div class="wid"><h4>Hit counter</h4><span class="counter" data-counter>0001337</span> visitors since 2006<br><br><h4>Badges</h4><div class="badges">${A.badges.map((b) => `<span${/construction/i.test(b) ? ' class="uc"' : ''}>${esc(b)}</span>`)}</div></div>
-        <div class="wid"><h4>Philanthropic causes</h4>The Save the Floppy Disk Foundation: 1.44 MB of hope. <a href="${A.paypal}" target="_blank" rel="noopener">Donate a floppy »</a><br><br><h4>Site map</h4>${A.menu.map((v) => `<a href="${v.href}">${esc(v.label)}</a>`).join(' · ')}</div>
+        <div class="wid"><h4>Guestbook</h4><a href="#testimonials">sign my guestbook!</a> (<span data-gb-count>${S0.guestbook.length}</span> signatures)<br>add me on msn: <a href="mailto:${A.email}">${esc(A.email)}</a> (its e-mail now lol)<br>bookmark this page (CTRL+D)<br><br><h4>Forum</h4><a href="#forum"><span data-forum-count>${S0.threads.length}</span> topics</a> · <a href="#webcam">shoutbox</a></div>
+        <div class="wid"><h4>Hit counter (real)</h4><span class="counter" data-counter>-------</span> visitors since 2006*<br><span data-online>?</span> online now<br><small>*counting started in 2026, dont tell anyone</small><br><br><h4>Badges</h4><div class="badges">${A.badges.map((b) => `<span${/construction/i.test(b) ? ' class="uc"' : ''}>${esc(b)}</span>`)}</div></div>
+        <div class="wid"><h4>Philanthropic causes</h4>the save the floppy disk foundation: 1.44 mb of hope. <a href="${A.paypal}" target="_blank" rel="noopener">donate a floppy »</a><br><br><h4>Site map</h4>${A.menu.map((v) => `<a href="${v.href}">${esc(v.label)}</a>`).join(' · ')}</div>
       </div>
       <div class="in" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding-top:0">
         ${ad('ad-million', 'Congratulations!!! You are the 1,000,000th visitor! Click here to claim your prize', { w: 468, h: 60 })}
@@ -577,13 +657,14 @@ export function assistenzaPage() {
           ${nav()}
           ${ad('ad-fixed-my-pc', 'Pekko fixed my PC!!!!', { w: 158, h: 155, href: '#testimonials' })}
           ${ad('ad-ambulance', 'PC ambulance', { w: 150, h: 70 })}
-          <p class="sm">SI PARLA ITALIANO<br>${esc(A.telefono)}<br>VIA BELVEDERE 1</p>
+          <p class="sm">SI PARLA ITALIANO<br>${esc(A.telefono)}<br>RIVALTA SUL MINCIO</p>
         </div>
         ${mid()}
         <div class="right">
           ${ad('ad-poster', 'Better Call Pekko: every night at 3 AM on channel 47', { w: 152, h: 378 })}
           <a class="red blink" href="${A.tel}" style="display:block;margin:8px 0 0;width:152px;text-align:center;padding:6px 0">CALL NOW!</a>
-          <p class="sm" style="color:#000;text-align:center;width:152px;margin-top:8px">Via Belvedere 1<br>Rivalta sul Mincio (MN)<br><a href="${A.mappa}" target="_blank" rel="noopener">map »</a></p>
+          <p class="sm" style="color:#000;text-align:center;width:152px;margin-top:8px">Rivalta sul Mincio (MN)<br>house calls &amp; remote<br><a href="${A.mappa}" target="_blank" rel="noopener">map »</a></p>
+          <p class="sm" style="color:#000;text-align:center;width:152px">visitors: <span class="counter" data-counter style="font-size:11px">-------</span></p>
         </div>
       </div>
       ${img('ad-welcome', 'Welcome, PC abusers!', { w: 960, h: 86, cls: 'welcome' })}
@@ -633,7 +714,7 @@ const select = ({ id, label, options, required = false, placeholder }) => html`
 export function assistenzaContattiPage() {
   const C = A.contattiPagina
   const body = html`
-    ${sides(A.path)}
+    ${sides()}
     <div class="wrap">
       <div class="adhead">${ad('ad-toolbar', 'Download the Better Call Pekko toolbar — free!', { w: 468, h: 60, eager: true, attrs: 'data-toolbar' })}<p data-toolbar-msg hidden style="margin:0 0 0 10px;padding:6px;border:2px solid #003c74;background:#fff;font:bold 11px Tahoma,sans-serif;max-width:300px"></p></div>
       <a class="hdr" href="${A.path}">${img('ad-header', 'Better Call Pekko! Pekko, I’m the computer guy', { w: 960, h: 234, eager: true })}</a>
@@ -658,17 +739,17 @@ export function assistenzaContattiPage() {
           <div class="office">
             <div>
               <p class="h3">${esc(C.ufficio)}</p>
-              <p><b>PEKKO — I'm the computer guy</b><br>${esc(A.indirizzo)}<br>${esc(A.telefono)} · <a href="${A.mappa}" target="_blank" rel="noopener">Get directions (opens a map)</a></p>
-              <p style="font:11px Verdana,sans-serif;color:#7a0000">${esc(C.ufficioNota)}</p>
+              <p><b>PEKKO — I'm the computer guy</b><br>${esc(C.ufficioTesto)}</p>
+              <p>${esc(A.telefono)} · <a href="${A.mappa}" target="_blank" rel="noopener">see rivalta on the map</a></p>
             </div>
-            <a class="map" href="${A.mappa}" target="_blank" rel="noopener" title="Open the map"><span class="river"></span><span class="road"></span><span class="pin">★</span><span class="lbl">PEKKO<br>Via Belvedere 1</span><span class="you">YOU ARE HERE →</span></a>
+            <a class="map" href="${A.mappa}" target="_blank" rel="noopener" title="Open the map"><span class="river"></span><span class="road"></span><span class="pin">★</span><span class="lbl">PEKKO HQ<br>Rivalta sul Mincio</span><span class="you">YOU ARE HERE →</span></a>
           </div>
           <p class="h3">How it works</p>
           <ol class="steps">${C.passi.map((p) => `<li>${esc(p)}</li>`)}</ol>
           <p class="h3">Windows &amp; Office versions handled</p>
           ${chips(A.windows)}
           ${chips(A.office, 'off')}
-          <p style="font:11px Verdana,sans-serif;color:#7a0000;margin:8px 0 0">Windows or Office installed and set up free with your first repair over €50 (with your own licence — no pirate copies).</p>
+          <p style="font:11px Verdana,sans-serif;color:#7a0000;margin:8px 0 0">windows or office installed and set up free with ur first repair over €50 (with ur own licence — no pirate copies).</p>
           <p class="h3">${esc(A.pagamenti.titolo)}</p>
           <div class="pay">${A.pagamenti.lista.map((p) => `<span>${esc(p)}</span>`).join('')}</div>
         </div>
@@ -690,7 +771,7 @@ export function assistenzaContattiPage() {
               ${select({ id: 'urgenza', label: 'How urgent?', options: A.urgenze, placeholder: 'You decide' })}
               <div class="f full" data-f>
                 <label for="as-messaggio">Tell Pekko what happened <b aria-hidden="true">*</b></label>
-                <textarea id="as-messaggio" name="messaggio" required aria-required="true" minlength="20" maxlength="2000" aria-describedby="as-messaggio-err" placeholder="What computer it is, since when, what you already tried, whether it’s on fire…"></textarea>
+                <textarea id="as-messaggio" name="messaggio" required aria-required="true" minlength="20" maxlength="2000" aria-describedby="as-messaggio-err" placeholder="what computer it is, since when, what u already tried, whether its on fire…"></textarea>
                 <small id="as-messaggio-err" role="alert" hidden></small>
               </div>
               <div class="hp" aria-hidden="true"><label for="as-sito">Leave this field empty</label><input id="as-sito" name="sito" type="text" tabindex="-1" autocomplete="off"></div>
@@ -714,7 +795,7 @@ export function assistenzaContattiPage() {
       <div style="display:flex;gap:6px;justify-content:space-between;margin:8px 0">
         ${ad('ad-getspace', 'Get $pace now!!! I can prove that virus isn’t yours', { w: 301, h: 389, href: A.path })}
         <div style="display:flex;flex-direction:column;gap:6px">
-          ${ad('ad-fashion', 'Pekko’s Outfit: dress like Pekko!', { w: 486, h: 205, href: A.path })}
+          ${ad('ad-fashion', 'Pekko’s Outfit: dress like Pekko!', { w: 486, h: 205, href: `${A.path}#about` })}
           <div style="display:flex;gap:6px">${ad('ad-vista', 'Affected by the tragedy of Windows Vista? Pekko can help', { w: 264, h: 187, href: A.tel })}${ad('ad-hermanos', 'Los Backups Hermanos (does not exist)', { w: 222, h: 186, href: A.path })}</div>
         </div>
         <div>${satisfied()}</div>
@@ -725,6 +806,25 @@ export function assistenzaContattiPage() {
   `
   const head = site.form.turnstileSiteKey ? '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>' : ''
   return shell({ path: A.contatti, title: A.titoloContatti, description: A.descrizioneContatti, body, image: 'ad-header', head })
+}
+
+// ── La 404 di bettercallpekko.it ─────────────────────────────────────────────
+// Solo nella build SITE=bcp (routes.js → bcpRoutes): il sito serio ha la sua.
+
+export function assistenzaNotFoundPage() {
+  const body = html`
+    <div class="wrap" style="padding:40px 0">
+      <div class="sec" style="text-align:center;padding:30px 20px">
+        ${i3('404?!', 'r', 90)}<br>
+        ${i3('PAGE NOT FOUND. BETTER CALL PEKKO!', 'b', 30)}
+        <p style="margin:16px 0;font:14px/1.5 Arial,sans-serif">this page doesnt exist. it never did. not even in 2006.<br>the computer guy cant fix a link, but he can fix ur computer.</p>
+        <p><a class="red" href="${A.path}">BACK TO THE HOME PAGE</a> &nbsp; <a class="red" href="${A.contatti}">CONTACT PEKKO</a> &nbsp; <a class="red" href="${A.tel}">CALL ${esc(A.telefono)}</a></p>
+        <p style="margin-top:14px"><a href="${esc(site.url)}/">The serious website</a> · SI PARLA ITALIANO</p>
+      </div>
+      ${foot()}
+    </div>
+  `
+  return shell({ path: '/404/', title: '404 — Better Call Pekko', description: 'Page not found. Better call Pekko.', body, image: 'ad-header' })
 }
 
 // ── Stile ────────────────────────────────────────────────────────────────────
@@ -914,7 +1014,7 @@ p{margin:0 0 6px}
 .fr .ico{font-size:12px}
 .fr em{font:bold 9px Verdana,sans-serif;color:#fff;background:#e21212;padding:1px 4px;border-radius:2px;font-style:normal}
 .fr tr.sticky td{background:#fff8c6}
-.fr tr.locked td a{color:#777;text-decoration:line-through}
+.fr tr.locked:not(.sticky) td a{color:#777;text-decoration:line-through}
 .fr small{color:#777;font-size:9px}
 .coupons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cp{position:relative;border:3px dashed #000;background:#fff;padding:12px 140px 10px 14px;min-height:150px}
@@ -978,25 +1078,381 @@ p{margin:0 0 6px}
 .frm.is-done .form,.frm.is-done .ffoot{display:none}
 @media print{.left,.right,.side,.adhead,.hdr,.bottom,.strip,.pop,.welcome,.foot,.sec:not(#coupons){display:none!important}body{background:#fff}.wrap{width:auto}}
 @media (prefers-reduced-motion:reduce){.blink,.strip span{animation:none}.strip span{padding-left:0}.cam .walk{transition:none}}
+.mid{min-height:700px}
+.saul{position:absolute;left:20px;top:484px;width:600px;margin:0;padding:10px 14px;background:#fff8c6;border:2px solid #c9a800;box-shadow:3px 3px 0 rgba(0,0,0,.25);font:italic 13px/1.45 Georgia,'Times New Roman',serif;color:#3a2600}
+.saul p{margin:0 0 4px}.saul cite{font:bold 10px Verdana,sans-serif;color:#7a0000;font-style:normal}
+.mid .midlike{position:absolute;left:20px;top:612px;width:600px;text-align:center;font:11px Verdana,sans-serif}
+.mid .special{bottom:10px}
+.lk{display:inline-flex;align-items:center;gap:4px;font:11px 'Lucida Grande',Tahoma,Verdana,sans-serif;color:#333}
+.lk button,.suit button{font:bold 11px 'Lucida Grande',Tahoma,sans-serif;color:#3b5998;background:linear-gradient(#fff,#e6eaf2);border:1px solid #9aa9c8;border-radius:2px;padding:2px 6px;cursor:pointer}
+.lk button:hover,.suit button:hover{background:#d8dfea}
+.lk button.on,.suit button.on{background:#3b5998;color:#fff;border-color:#29447e}
+.lk b{color:#3b5998}.lk small{font-size:10px;color:#666}
+.album .suit{border:2px solid #000;background:#fff;padding:2px;text-align:center}
+.album .suit img,.album .suit .fake{width:96px;height:96px;object-fit:contain;object-position:top;display:block}
+.album .suit button{margin:2px 0 1px;width:100%}
+.album .suit button b{color:inherit}
+.sharebar{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 8px}
+.sharebar a{display:inline-block;padding:5px 8px;border-radius:3px;color:#fff;text-decoration:none;font:bold 11px Tahoma,Verdana,sans-serif;box-shadow:inset 0 10px 0 rgba(255,255,255,.15),1px 1px 0 #000;border:1px solid rgba(0,0,0,.35)}
+.sharebar a:hover{filter:brightness(1.15);color:#fff}
+.sharebar a b{display:inline-block;margin-left:2px;padding:0 4px;background:#fff;color:#000;border-radius:2px;font-size:10px}
+.note{font:10px/1.35 Verdana,sans-serif;color:#555;margin:2px 0 6px}
+.st{font:bold 11px Verdana,sans-serif}.st.ok{color:#1d8b2b}.st.err{color:#c00}
+.frmk{margin:0 0 8px}
+.frmk .row2{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.frmk input.nm{width:150px}
+.frmk textarea{width:100%;font:12px Arial,sans-serif;border:2px inset #999;padding:3px}
+.frmk select{font:12px Arial,sans-serif}
+.avprev img{width:32px;height:32px;border:1px solid #000;vertical-align:middle}
+input.hp{position:absolute;left:-9999px;width:1px;height:1px}
+.thread{margin:8px 0;border:2px solid #6c86b8;background:#fff}
+.thread h3{margin:0;padding:6px 8px;background:linear-gradient(#c9d6ee,#a4b8dc);font:bold 13px Verdana,sans-serif;color:#0d2560;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.post{display:flex;border-top:1px solid #dde}
+.post .who{width:140px;flex:none;padding:6px;background:#e8eef7;font:bold 11px Verdana,sans-serif;color:#0000cc;word-break:break-word}
+.post .who small{display:block;font-weight:normal;color:#777;font-size:9px}
+.post .who small.mod{color:#c00;font-weight:bold}
+.post .txt{padding:6px 8px;font:12px/1.45 Verdana,sans-serif;white-space:pre-wrap;word-break:break-word}
+.thread form{padding:6px 8px;border-top:1px solid #dde;background:#f4f8ff;margin:0}
+.thread form p{margin:4px 0}
+.thread form textarea{width:100%;font:12px Arial,sans-serif;border:2px inset #999;padding:3px}
+.thread form input.nm{width:150px;font:12px Arial,sans-serif;border:2px inset #999;padding:3px}
+.thread .note{padding:6px 8px;margin:0}
+.fr em.new{background:#1d8b2b}
+.scores{margin:4px 0 0 22px;padding:0;font:11px Verdana,sans-serif;text-align:left}
+.scores li{margin:0 0 2px}
+.poll .pct{color:#c00;font-weight:bold}
+.chat .log p small{color:#999;font-size:9px}
+.chat input.nm{flex:0 0 90px;width:90px}
+.eclink{width:100%;font:12px 'Courier New',monospace;border:2px inset #999;padding:3px}
+.eclike{background:#fff;padding:3px 6px;border:1px solid #ccc;border-top:0}
+.ecdone .sharebar{margin:6px 0 0}
+.linkus{width:100%;font:11px 'Courier New',monospace;border:2px inset #999;padding:4px;resize:none}
+.bcp-off .frmk,.bcp-off [data-shout-form],.bcp-off [data-post-form]{opacity:.55}
+
 `
 
 // ── Script ───────────────────────────────────────────────────────────────────
-// Ogni pezzo si attiva solo se trova i propri elementi: pop-up d'ingresso,
-// termini d'uso, contavisite, toolbar finta, e-card, sondaggio, gioco del virus,
-// suonerie (sintetizzate con WebAudio, niente file), webcam (falso ufficio con
-// Pekko che passa; con il permesso, la webcam del visitatore, che non lascia
-// mai il suo computer), chat finta, stampa, modulo dei contatti.
+// Ogni pezzo si attiva solo se trova i propri elementi. Le parti vive parlano con
+// api/bcp.js: una visita all'apertura (nuova solo la prima volta nella scheda),
+// un aggiornamento ogni 30 s, e ogni azione restituisce lo stato intero. Nomi,
+// like e voto si ricordano nel browser; i testi degli utenti entrano nel DOM solo
+// con textContent. Pop-up d'ingresso, termini d'uso, toolbar finta, suonerie
+// sintetizzate, webcam (che non lascia mai il computer), stampa, modulo contatti.
 
 const JS = `
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var D = {};
+  try { D = JSON.parse(document.getElementById('bcp-data').textContent); } catch (e) {}
+  var API = D.api || '/api/bcp';
+  var aperta = Date.now();
+  var LS = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  var S = null, offline = false, filoAperto = null;
 
+  var el = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined && text !== null) e.textContent = text; return e; };
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  var quando = function (ts) { var d = new Date(ts), h = d.getHours(); return pad(d.getMonth() + 1) + '/' + pad(d.getDate()) + '/' + d.getFullYear() + ' ' + pad(h % 12 || 12) + ':' + pad(d.getMinutes()) + ' ' + (h < 12 ? 'AM' : 'PM'); };
+
+  // ── L'API: ogni risposta porta lo stato intero, e la pagina si ridisegna
+  function call(body) {
+    var opt = body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true } : { method: 'GET' };
+    return fetch(API, opt)
+      .then(function (r) { return r.json().catch(function () { return { ok: false, error: 'the server said something weird' }; }); })
+      .then(function (j) {
+        if (j.offline) { offline = true; document.documentElement.classList.add('bcp-off'); }
+        if (j.visits !== undefined) { S = j; render(); }
+        return j;
+      })
+      .catch(function () { return { ok: false, error: 'no internet?? (or the server is on fire)' }; });
+  }
+
+  function render() {
+    if (!S) return;
+    $$('[data-counter]').forEach(function (c) { c.textContent = ('0000000' + S.visits).slice(-7); });
+    $$('[data-online]').forEach(function (c) { c.textContent = S.online; });
+    $$('[data-likes]').forEach(function (b) { b.textContent = S.likes[b.getAttribute('data-likes')] || 0; });
+    var tot = 0;
+    for (var k in S.shares) tot += S.shares[k];
+    $$('[data-shares]').forEach(function (b) { b.textContent = S.shares[b.getAttribute('data-shares')] || 0; });
+    $$('[data-shares-tot]').forEach(function (b) { b.textContent = tot; });
+    $$('[data-ecards-tot]').forEach(function (b) { b.textContent = S.ecards; });
+    $$('[data-gb-count]').forEach(function (b) { b.textContent = S.guestbook.length; });
+    $$('[data-forum-count]').forEach(function (b) { b.textContent = S.threads.length; });
+    renderPoll(); renderScores(); renderGb(); renderForum(); renderShout(); segnaLike();
+  }
+
+  // ── Nome ricordato nel browser, stato dei moduli, invio
+  var nome = LS.get('bcp-name') || '';
+  $$('input.nm').forEach(function (i) { if (nome) i.value = nome; });
+  function stato(form, testo, ok) {
+    var s = $('[data-st]', form) || $('[data-st-shout]');
+    if (!s) return;
+    s.textContent = testo;
+    s.className = 'st ' + (ok ? 'ok' : 'err');
+  }
+  function invia(form, extra, fatto) {
+    var dati = { _t: aperta };
+    new FormData(form).forEach(function (v, k) { dati[k] = v; });
+    for (var k in extra) dati[k] = extra[k];
+    if (dati.name) { nome = dati.name; LS.set('bcp-name', nome); $$('input.nm').forEach(function (i) { if (!i.value) i.value = nome; }); }
+    var btn = $('button[type=submit]', form);
+    if (btn) btn.disabled = true;
+    stato(form, 'sending…', true);
+    call(dati).then(function (j) {
+      if (btn) btn.disabled = false;
+      if (j.ok) { stato(form, 'posted!!! w00t', true); if (fatto) fatto(j); }
+      else stato(form, j.error || 'error. better call pekko', false);
+    });
+  }
+
+  // ── Like (veri) e condivisioni (vere)
+  function segnaLike() { $$('[data-like]').forEach(function (b) { b.classList.toggle('on', LS.get('bcp-like-' + b.getAttribute('data-like')) === '1'); }); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-like]') : null;
+    if (b) {
+      var k = b.getAttribute('data-like'), chiave = 'bcp-like-' + k, gia = LS.get(chiave) === '1';
+      LS.set(chiave, gia ? '0' : '1'); segnaLike();
+      call({ a: 'like', k: k, undo: gia }).then(function (j) { if (!j.ok) { LS.set(chiave, gia ? '1' : '0'); segnaLike(); } });
+      return;
+    }
+    var a = e.target.closest ? e.target.closest('[data-share]') : null;
+    if (a) {
+      var net = a.getAttribute('data-share');
+      call({ a: 'share', k: net });
+      if (net === 'copy') {
+        e.preventDefault();
+        var u = a.getAttribute('href');
+        var ok = function () { var b2 = a.querySelector('b'); a.firstChild.textContent = 'Copied!!! '; if (b2) a.appendChild(b2); };
+        if (navigator.clipboard) navigator.clipboard.writeText(u).then(ok, function () { window.prompt('copy this link:', u); });
+        else window.prompt('copy this link:', u);
+      }
+    }
+  });
+  $$('[data-select-all]').forEach(function (t) { t.addEventListener('focus', function () { t.select(); }); });
+
+  // ── Sondaggio vero
+  var poll = $('[data-poll]');
+  function renderPoll() {
+    if (!poll || !S) return;
+    var tot = 0; S.poll.forEach(function (n) { tot += n; });
+    $('[data-poll-tot]', poll).textContent = tot;
+    if (LS.get('bcp-voted') === null) return;
+    $$('[data-bar]', poll).forEach(function (b) { var i = +b.getAttribute('data-bar'); b.hidden = false; b.style.width = (tot ? Math.round(S.poll[i] * 100 / tot) : 0) + '%'; });
+    $$('[data-pct]', poll).forEach(function (s) { var i = +s.getAttribute('data-pct'); s.textContent = (tot ? Math.round(S.poll[i] * 100 / tot) : 0) + '% (' + S.poll[i] + ')'; });
+    $('[data-vote]', poll).disabled = true;
+    $('[data-poll-msg]', poll).textContent = poll.getAttribute('data-grazie');
+  }
+  if (poll) $('[data-vote]', poll).addEventListener('click', function () {
+    var sel = $('input[name=poll]:checked', poll);
+    if (!sel) { $('[data-poll-msg]', poll).textContent = 'pick one! any one.'; return; }
+    LS.set('bcp-voted', sel.value);
+    call({ a: 'vote', i: +sel.value }).then(function (j) {
+      if (!j.ok) { LS.del('bcp-voted'); $('[data-poll-msg]', poll).textContent = j.error || 'vote failed. the tortoise ate it'; }
+      renderPoll();
+    });
+  });
+
+  // ── Punch the virus, con la classifica vera
+  var game = $('[data-game]');
+  function renderScores() {
+    var ol = $('[data-scores]');
+    if (!ol || !S) return;
+    ol.textContent = '';
+    if (!S.scores.length) { ol.appendChild(el('li', '', 'no scores yet. be the first!!!')); return; }
+    S.scores.forEach(function (s) { var li = el('li'); li.appendChild(el('b', '', s.by)); li.appendChild(document.createTextNode(' — ' + (s.ms / 1000).toFixed(2) + 's')); ol.appendChild(li); });
+  }
+  if (game) {
+    var arena = $('.arena', game), virus = $('img, .fake', arena), ouch = $('.ouch', arena), hitsEl = $('[data-hits]', game), timeEl = $('[data-time]', game), msg = $('[data-game-msg]', game);
+    var hits = 0, inizio = 0, orologio = 0, fine = false;
+    var muovi = function () { virus.style.left = Math.floor(Math.random() * (arena.clientWidth - 60)) + 'px'; virus.style.top = Math.floor(Math.random() * (arena.clientHeight - 60)) + 'px'; };
+    var salta = setInterval(muovi, 700);
+    var nuovaPartita = function () { hits = 0; inizio = 0; fine = false; hitsEl.textContent = '0'; timeEl.textContent = '0.00'; msg.textContent = ''; virus.style.transform = ''; clearInterval(salta); salta = setInterval(muovi, 700); };
+    arena.addEventListener('click', function (e) {
+      if (fine) return;
+      if (!inizio) { inizio = Date.now(); orologio = setInterval(function () { timeEl.textContent = ((Date.now() - inizio) / 1000).toFixed(2); }, 50); }
+      if (e.target !== virus) return;
+      hits++;
+      hitsEl.textContent = hits;
+      ouch.style.display = 'block';
+      setTimeout(function () { ouch.style.display = 'none'; }, 300);
+      muovi();
+      if (hits < 3) return;
+      fine = true;
+      var ms = Date.now() - inizio;
+      clearInterval(orologio); clearInterval(salta);
+      timeEl.textContent = (ms / 1000).toFixed(2);
+      virus.style.transform = 'rotate(180deg)';
+      msg.textContent = game.getAttribute('data-vinto') + ' ';
+      var premio = el('a', '', 'FREE CONSULTATION »'); premio.href = game.getAttribute('data-href'); msg.appendChild(premio);
+      msg.appendChild(document.createTextNode(' · '));
+      var ancora = el('button', 'xp', 'play again'); ancora.type = 'button'; ancora.addEventListener('click', nuovaPartita); msg.appendChild(ancora);
+      setTimeout(function () {
+        var n = window.prompt('U DID IT IN ' + (ms / 1000).toFixed(2) + 's!!! enter ur name 4 the hall of fame:', nome);
+        if (!n) return;
+        nome = n.slice(0, 24); LS.set('bcp-name', nome);
+        call({ a: 'score', name: nome, ms: ms }).then(function (j) { if (!j.ok) msg.appendChild(document.createTextNode(' (' + (j.error || 'score not saved') + ')')); });
+      }, 350);
+    });
+  }
+
+  // ── Guestbook vero
+  var gbList = $('[data-gb-list]');
+  function renderGb() {
+    if (!gbList || !S) return;
+    gbList.textContent = '';
+    S.guestbook.forEach(function (g) {
+      var c = el('div', 'cmt');
+      if (g.av && D.avatars && D.avatars[g.av]) { var im = el('img'); im.src = D.avatars[g.av]; im.alt = g.by + "'s webcam photo"; im.width = 48; im.height = 48; im.loading = 'lazy'; c.appendChild(im); }
+      else c.appendChild(el('span', 'noav', 'no photo'));
+      var d = el('div');
+      d.appendChild(el('b', '', g.by)); d.appendChild(document.createTextNode(' ')); d.appendChild(el('small', '', quando(g.ts)));
+      d.appendChild(el('p', '', g.text));
+      c.appendChild(d); gbList.appendChild(c);
+    });
+  }
+  var gbForm = $('[data-gb-form]');
+  if (gbForm) {
+    var avSel = $('[data-av-select]', gbForm), avPrev = $('[data-av-prev]', gbForm);
+    var anteprima = function () { avPrev.textContent = ''; var v = avSel.value; if (v !== '0' && D.avatars && D.avatars[v]) { var im = el('img'); im.src = D.avatars[v]; im.alt = ''; avPrev.appendChild(im); } };
+    avSel.addEventListener('change', anteprima);
+    gbForm.addEventListener('submit', function (e) { e.preventDefault(); invia(gbForm, { a: 'gb', av: +avSel.value }, function () { gbForm.elements.text.value = ''; }); });
+  }
+
+  // ── Forum vero: discussioni, risposte, argomenti nuovi
+  var tbody = $('[data-forum]'), filo = $('[data-thread]');
+  var ultima = function (t) { return t.posts[t.posts.length - 1]; };
+  function renderForum() {
+    if (!tbody || !S) return;
+    var lista = S.threads.slice().sort(function (a, b) { if (!!b.sticky !== !!a.sticky) return b.sticky ? 1 : -1; return ultima(b).ts - ultima(a).ts; });
+    tbody.textContent = '';
+    lista.forEach(function (t) {
+      var tr = el('tr', (t.sticky ? 'sticky' : '') + (t.locked ? ' locked' : ''));
+      var td = el('td');
+      td.appendChild(el('span', 'ico', t.locked ? '🔒' : t.sticky ? '📌' : t.hot ? '🔥' : '📄'));
+      td.appendChild(document.createTextNode(' '));
+      var a = el('a', '', t.title); a.href = '#forum'; a.setAttribute('data-thread-open', t.id); td.appendChild(a);
+      if (t.hot) { td.appendChild(document.createTextNode(' ')); td.appendChild(el('em', '', 'HOT')); }
+      if (Date.now() - ultima(t).ts < 86400000) { td.appendChild(document.createTextNode(' ')); td.appendChild(el('em', 'new', 'NEW!')); }
+      tr.appendChild(td);
+      tr.appendChild(el('td', '', t.by));
+      tr.appendChild(el('td', 'n', String(t.posts.length - 1)));
+      var ul = el('td'); ul.appendChild(document.createTextNode(quando(ultima(t).ts))); ul.appendChild(el('br')); ul.appendChild(el('small', '', 'by ' + ultima(t).by)); tr.appendChild(ul);
+      tbody.appendChild(tr);
+    });
+    if (filoAperto) apriFilo(filoAperto, true);
+  }
+  function apriFilo(id, silenzioso) {
+    if (!filo) return;
+    var fonte = S ? S.threads : [];
+    var t = null;
+    fonte.forEach(function (x) { if (x.id === id) t = x; });
+    if (!t) return;
+    filoAperto = id;
+    var bozza = filo.querySelector('textarea') ? filo.querySelector('textarea').value : '';
+    filo.textContent = '';
+    filo.hidden = false;
+    var h = el('h3', '', t.title + '  '); var chiudi = el('button', 'xp', 'close ✕'); chiudi.type = 'button'; chiudi.addEventListener('click', function () { filo.hidden = true; filoAperto = null; }); h.appendChild(chiudi); filo.appendChild(h);
+    t.posts.forEach(function (p) {
+      var r = el('div', 'post');
+      var w = el('div', 'who', p.by); w.appendChild(el('small', '', quando(p.ts))); if (p.by === 'pekko') w.appendChild(el('small', 'mod', '★ admin'));
+      r.appendChild(w); r.appendChild(el('div', 'txt', p.text)); filo.appendChild(r);
+    });
+    if (t.locked) filo.appendChild(el('p', 'note', '🔒 topic locked. call pekko instead.'));
+    else {
+      var f = el('form');
+      var n = el('input', 'nm'); n.name = 'name'; n.maxLength = 24; n.placeholder = 'ur name'; n.required = true; n.value = nome;
+      var ta = el('textarea'); ta.name = 'text'; ta.rows = 3; ta.maxLength = 600; ta.placeholder = 'reply…'; ta.required = true; ta.value = bozza;
+      var hp = el('input', 'hp'); hp.name = 'sito'; hp.tabIndex = -1; hp.setAttribute('aria-hidden', 'true'); hp.autocomplete = 'off';
+      var b = el('button', 'red', 'POST REPLY'); b.type = 'submit';
+      var st = el('span', 'st'); st.setAttribute('data-st', '');
+      var p1 = el('p'); p1.appendChild(n); f.appendChild(p1); f.appendChild(ta); f.appendChild(hp);
+      var p2 = el('p'); p2.appendChild(b); p2.appendChild(document.createTextNode(' ')); p2.appendChild(st); f.appendChild(p2);
+      f.addEventListener('submit', function (e) { e.preventDefault(); invia(f, { a: 'reply', id: id }, function () { var t2 = filo.querySelector('textarea'); if (t2) t2.value = ''; }); });
+      filo.appendChild(f);
+    }
+    if (!silenzioso) filo.scrollIntoView({ block: 'nearest' });
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('[data-thread-open]') : null;
+    if (!a) return;
+    e.preventDefault();
+    if (!S) { window.alert('the forum is loading… (or the database is on vacation)'); return; }
+    apriFilo(a.getAttribute('data-thread-open'));
+  });
+  var postForm = $('[data-post-form]');
+  if (postForm) postForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    invia(postForm, { a: 'post' }, function (j) {
+      postForm.elements.title.value = ''; postForm.elements.text.value = '';
+      var nuovo = null; j.threads.forEach(function (t) { if (!t.sticky && (!nuovo || t.ts > nuovo.ts)) nuovo = t; });
+      if (nuovo) apriFilo(nuovo.id);
+    });
+  });
+
+  // ── Shoutbox vera
+  var shout = $('[data-shout-list]');
+  function renderShout() {
+    if (!shout || !S) return;
+    var giu = shout.scrollTop + shout.clientHeight >= shout.scrollHeight - 20;
+    shout.textContent = '';
+    S.shout.forEach(function (s) {
+      var p = el('p'); var b = el('b', s.by === 'pekko' ? 'me' : '', s.by + ':');
+      p.appendChild(b); p.appendChild(document.createTextNode(' ' + s.text + ' ')); p.appendChild(el('small', '', quando(s.ts)));
+      shout.appendChild(p);
+    });
+    if (giu) shout.scrollTop = shout.scrollHeight;
+  }
+  if (shout) shout.scrollTop = shout.scrollHeight;
+  var shForm = $('[data-shout-form]');
+  if (shForm) shForm.addEventListener('submit', function (e) { e.preventDefault(); invia(shForm, { a: 'shout' }, function () { shForm.elements.text.value = ''; shout.scrollTop = shout.scrollHeight; }); });
+
+  // ── E-card vere: un link da mandare, che all'amico apre la cartolina
+  var ec = $('[data-ecard]');
+  if (ec) ec.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var n = ec.elements.n.value, to = ec.elements.to.value.trim(), from = ec.elements.from.value.trim();
+    var url = (D.pagina || location.origin + '/') + '?ecard=' + n + '&to=' + encodeURIComponent(to) + '&from=' + encodeURIComponent(from);
+    var box = $('[data-ecard-done]');
+    $('[data-ecard-link]', box).value = url;
+    var t = from + ' sent u an e-card from Better Call Pekko!!! open it: ';
+    var reti = [
+      ['whatsapp', 'WhatsApp', '#25a244', 'https://wa.me/?text=' + encodeURIComponent(t + url)],
+      ['email', 'E-mail', '#666', 'mailto:?subject=' + encodeURIComponent('u got an e-card!!!') + '&body=' + encodeURIComponent(t + url)],
+      ['telegram', 'Telegram', '#2aa3df', 'https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(t)],
+      ['facebook', 'Facebook', '#3b5998', 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url)],
+      ['copy', 'Copy link', '#111', url]
+    ];
+    var bar = $('[data-ecard-share]', box); bar.textContent = '';
+    reti.forEach(function (r) { var a = el('a', '', r[1] + ' '); a.href = r[3]; a.style.background = r[2]; a.setAttribute('data-share', r[0]); if (r[0] !== 'copy' && r[0] !== 'email') { a.target = '_blank'; a.rel = 'noopener'; } bar.appendChild(a); });
+    box.hidden = false;
+    box.scrollIntoView({ block: 'nearest' });
+    call({ a: 'ecard' });
+  });
+  var q = null;
+  try { q = new URLSearchParams(location.search); } catch (e) {}
+  var ecPop = $('[data-ecard-pop]');
+  var ecN = q ? parseInt(q.get('ecard'), 10) : 0;
+  if (ecPop && ecN >= 1 && ecN <= 6) {
+    var da = (q.get('from') || 'someone').slice(0, 30), a2 = (q.get('to') || 'u').slice(0, 30);
+    $('[data-ecard-title]', ecPop).textContent = da + ' SENT U AN E-CARD!!!';
+    var box2 = $('[data-ecard-img]', ecPop);
+    if (D.ecards && D.ecards[ecN - 1]) { var im2 = el('img'); im2.src = D.ecards[ecN - 1]; im2.alt = 'E-card #' + ecN; im2.width = 390; im2.height = 270; box2.appendChild(im2); }
+    $('[data-ecard-msg]', ecPop).textContent = 'to: ' + a2 + ' · from: ' + da + ' · delivered by Better Call Pekko (faster than snail express)';
+    ecPop.hidden = false;
+    $$('[data-ecard-close]', ecPop).forEach(function (b) { b.addEventListener('click', function () { ecPop.hidden = true; }); });
+  }
+
+  // ── Pop-up d'ingresso: una volta per scheda (non se si arriva da una e-card)
   var pop = $('[data-popup]');
   if (pop) {
     var KEY = 'ap:bcp-popup';
-    var visto = false;
-    try { visto = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+    var visto = !!(ecPop && !ecPop.hidden);
+    try { visto = visto || sessionStorage.getItem(KEY) === '1'; } catch (e) {}
     var apri = function () { pop.hidden = false; document.body.classList.add('has-popup'); var f = $('[data-popup-focus]', pop); if (f) f.focus(); };
     var chiudi = function () { pop.hidden = true; document.body.classList.remove('has-popup'); try { sessionStorage.setItem(KEY, '1'); } catch (e) {} };
     if (!visto) apri();
@@ -1012,60 +1468,18 @@ const JS = `
     eula.addEventListener('click', function (e) { if (e.target === eula) eula.hidden = true; });
   }
 
-  var n = 1337;
-  try { n = Number(localStorage.getItem('ap:bcp-visite') || 1337) + 1; localStorage.setItem('ap:bcp-visite', String(n)); } catch (e) { n = 1338; }
-  $$('[data-counter]').forEach(function (c) { c.textContent = ('0000000' + n).slice(-7); });
-
   $$('[data-toolbar]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
       var m = $('[data-toolbar-msg]');
       if (!m) return;
-      m.textContent = 'Toolbar installed successfully! Restart your computer 4 times to complete. (Nothing was installed. Better call Pekko.)';
+      m.textContent = 'toolbar installed successfully! restart ur computer 4 times 2 complete. (nothing was installed. better call pekko.)';
       m.hidden = false;
       m.scrollIntoView({ block: 'nearest' });
     });
   });
 
-  var ec = $('[data-ecard]');
-  if (ec) ec.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var to = (ec.elements.to.value || '').trim() || 'your friend';
-    var box = $('[data-ecard-done]');
-    box.textContent = 'E-card #' + ec.elements.n.value + ' ' + ec.getAttribute('data-fatto') + ' ' + to + '! ' + ec.getAttribute('data-nota');
-    box.hidden = false;
-    box.scrollIntoView({ block: 'nearest' });
-  });
-
-  var poll = $('[data-poll]');
-  if (poll) $('[data-vote]', poll).addEventListener('click', function () {
-    var sel = $('input[name=poll]:checked', poll);
-    if (!sel) { $('[data-poll-msg]', poll).textContent = 'Pick one! Any one.'; return; }
-    $$('[data-bar]', poll).forEach(function (b) { b.hidden = false; b.title = b.getAttribute('data-bar') + '%'; setTimeout(function () { b.style.width = b.getAttribute('data-bar') + '%'; }, 30); });
-    $('[data-poll-msg]', poll).textContent = poll.getAttribute('data-grazie');
-    $('[data-vote]', poll).disabled = true;
-  });
-
-  var game = $('[data-game]');
-  if (game) {
-    var arena = $('.arena', game), virus = $('img, .fake', arena), ouch = $('.ouch', arena), hitsEl = $('[data-hits]', game), msg = $('[data-game-msg]', game), hits = 0;
-    var muovi = function () { virus.style.left = Math.floor(Math.random() * (arena.clientWidth - 60)) + 'px'; virus.style.top = Math.floor(Math.random() * (arena.clientHeight - 60)) + 'px'; };
-    var timer = setInterval(muovi, 700);
-    virus.addEventListener('click', function () {
-      if (hits >= 3) return;
-      hits++;
-      hitsEl.textContent = hits;
-      ouch.style.display = 'block';
-      setTimeout(function () { ouch.style.display = 'none'; }, 350);
-      muovi();
-      if (hits === 3) {
-        clearInterval(timer);
-        virus.style.transform = 'rotate(180deg)';
-        msg.innerHTML = game.getAttribute('data-vinto') + ' <a href="' + game.getAttribute('data-href') + '">FREE CONSULTATION »</a>';
-      }
-    });
-  }
-
+  // ── Suonerie: sintetizzate al volo
   var actx = null;
   var audio = function () { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; if (!actx) actx = new C(); if (actx.state === 'suspended') actx.resume(); return actx; };
   var gain = function (c, v) { var g = c.createGain(); g.gain.value = v; g.connect(c.destination); return g; };
@@ -1080,23 +1494,24 @@ const JS = `
   $$('[data-suono]').forEach(function (b) {
     b.addEventListener('click', function () {
       var c = audio();
-      if (!c) { b.textContent = 'No sound. Have you tried turning it off and on again?'; return; }
+      if (!c) { b.textContent = 'no sound. have u tried turning it off and on again?'; return; }
       try { SUONI[b.getAttribute('data-suono')](c); } catch (e) {}
-      var nome = b.textContent.replace(/^[▶♪] /, '');
-      b.textContent = '♪ ' + nome;
-      setTimeout(function () { b.textContent = '▶ ' + nome; }, 4500);
+      var n = b.textContent.replace(/^[▶♪] /, '');
+      b.textContent = '♪ ' + n;
+      setTimeout(function () { b.textContent = '▶ ' + n; }, 4500);
     });
   });
 
+  // ── Office webcam: finto ufficio con Pekko che passa, o la webcam vera (che resta sul computer)
   var cam = $('[data-cam]');
   if (cam) {
     var screen = $('[data-cam-screen]', cam), still = $('.still', cam), walk = $('[data-cam-walk]', cam), video = $('[data-cam-video]', cam), canvas = $('[data-cam-canvas]', cam), status = $('[data-cam-status]', cam), clock = $('[data-cam-clock]', cam), live = $('[data-cam-live]', cam), shotbox = $('[data-cam-shotbox]', cam);
     var walkers = (cam.getAttribute('data-cam-walkers') || '').split(',').filter(Boolean);
     var stream = null, filter = 'normal', raf = 0;
+    var statoCam = function (t) { status.textContent = t || ((S ? S.online : '?') + ' ppl online now · stream quality: 56k'); };
     var FILTERS = { normal: '', sepia: 'sepia(1) contrast(1.2)', negative: 'invert(1)', thermal: 'hue-rotate(200deg) saturate(4) contrast(1.4)', mirror: '', 'night vision': 'grayscale(1) sepia(1) hue-rotate(60deg) saturate(3) brightness(1.2) contrast(1.3)', '2009': 'contrast(1.3) saturate(1.7) brightness(1.1) blur(.6px)', pixelate: '' };
-    var tick = function () { var d = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; }, h = d.getHours(); clock.textContent = '06/28/2006 ' + p(h % 12 || 12) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) + (h < 12 ? ' AM' : ' PM'); };
+    var tick = function () { var d = new Date(), h = d.getHours(); clock.textContent = '06/28/2006 ' + pad(h % 12 || 12) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + (h < 12 ? ' AM' : ' PM'); };
     tick(); setInterval(tick, 1000);
-    setInterval(function () { if (!stream) status.textContent = 'Viewers online: ' + (1 + Math.floor(Math.random() * 7)) + ' · Stream quality: 56k'; }, 6000);
     var passa = function () {
       if (stream || !walkers.length || !walk) return;
       var dir = Math.random() < 0.5;
@@ -1122,12 +1537,12 @@ const JS = `
       if (stream) ctx.drawImage(video, 0, 0, 320 * k, 240 * k);
       else { if (still && still.naturalWidth) ctx.drawImage(still, -20 * k, 0, 360 * k, 240 * k); disegnaWalk(ctx, k); }
     };
-    var render = function () {
+    var render2 = function () {
       if (filter !== 'pixelate') return;
       var ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       disegna(ctx, canvas.width / 320);
-      raf = requestAnimationFrame(render);
+      raf = requestAnimationFrame(render2);
     };
     var setFilter = function (f) {
       filter = f;
@@ -1140,23 +1555,23 @@ const JS = `
       if (walk) walk.style.visibility = (pix || stream) ? 'hidden' : '';
       video.hidden = !(stream && !pix);
       cancelAnimationFrame(raf);
-      if (pix) render();
+      if (pix) render2();
     };
     $$('[data-filter]', cam).forEach(function (b) { b.addEventListener('click', function () { setFilter(b.getAttribute('data-filter')); }); });
     $('[data-cam-on]', cam).addEventListener('click', function () {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status.textContent = 'Webcam not supported by this browser. Have you tried Internet Explorer 6? (Please don’t.)'; return; }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { statoCam('webcam not supported by this browser. have u tried internet explorer 6? (plz dont.)'); return; }
       navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: false }).then(function (s) {
         stream = s; video.srcObject = s;
-        live.textContent = 'LIVE FROM YOUR ROOM';
-        status.textContent = 'You are now in Pekko’s office. The picture never leaves your computer.';
+        live.textContent = 'LIVE FROM UR ROOM';
+        statoCam('u r now in pekkos office. the picture never leaves ur computer.');
         setFilter(filter);
-      }).catch(function () { status.textContent = 'Webcam not found. Have you tried turning it off and on again?'; });
+      }).catch(function () { statoCam('webcam not found. have u tried turning it off and on again?'); });
     });
     $('[data-cam-off]', cam).addEventListener('click', function () {
       if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
       video.srcObject = null;
       live.textContent = 'LIVE · 56k';
-      status.textContent = 'Viewers online: 3 · Stream quality: 56k';
+      statoCam();
       setFilter(filter);
     });
     $('[data-cam-shot]', cam).addEventListener('click', function () {
@@ -1169,68 +1584,62 @@ const JS = `
       try { ctx.filter = 'none'; } catch (e) {}
       ctx.fillStyle = '#fff'; ctx.font = 'bold 10px Courier New'; ctx.fillText(clock.textContent, 6, 232);
       var url;
-      try { url = c.toDataURL('image/jpeg', 0.6); } catch (e) { status.textContent = 'Snapshot failed. The camera is shy.'; return; }
+      try { url = c.toDataURL('image/jpeg', 0.6); } catch (e) { statoCam('snapshot failed. the camera is shy.'); return; }
       shotbox.hidden = false;
-      shotbox.innerHTML = '<img src="' + url + '" alt="Snapshot"><a href="' + url + '" download="pekko-office-cam.jpg" style="color:#ffe600;font:10px Verdana,sans-serif">Save to My Documents</a>';
-    });
-  }
-
-  var chat = $('[data-chat]');
-  if (chat) {
-    var log = $('[data-chat-log]', chat), cform = $('form', chat), risposte = [], k = 0;
-    try { risposte = JSON.parse(chat.getAttribute('data-risposte') || '[]'); } catch (e) {}
-    var aggiungi = function (who, t, me) { var p = document.createElement('p'), b = document.createElement('b'); if (me) b.className = 'me'; b.textContent = who + ':'; p.appendChild(b); p.appendChild(document.createTextNode(' ' + t)); log.appendChild(p); log.scrollTop = log.scrollHeight; };
-    cform.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var inp = $('input', cform), t = inp.value.trim();
-      if (!t) return;
-      aggiungi('you', t, false);
-      inp.value = '';
-      if (risposte.length) setTimeout(function () { aggiungi('pekko', risposte[k++ % risposte.length], true); }, 900 + Math.random() * 1200);
+      shotbox.textContent = '';
+      var im = el('img'); im.src = url; im.alt = 'Snapshot'; shotbox.appendChild(im);
+      var dl = el('a', '', 'Save to My Documents'); dl.href = url; dl.download = 'pekko-office-cam.jpg'; dl.style.cssText = 'color:#ffe600;font:10px Verdana,sans-serif'; shotbox.appendChild(dl);
     });
   }
 
   $$('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });
 
+  // ── Il giro vero: una visita (nuova solo la prima volta nella scheda), poi un aggiornamento ogni 30 s
+  var nuovoVisitatore = false;
+  try { nuovoVisitatore = sessionStorage.getItem('bcp-seen') !== '1'; sessionStorage.setItem('bcp-seen', '1'); } catch (e) {}
+  call({ a: 'hit', nuovo: nuovoVisitatore });
+  setInterval(function () { if (!document.hidden && !offline) call(); }, 30000);
+
+  // ── Modulo dei contatti: stesse regole di /contatti/, messaggi in inglese
   var form = $('[data-saul-form]');
   if (!form) return;
   var box = $('[data-turnstile]', form), fstatus = $('[data-status]', form), done = $('[data-done]', form), frm = form.closest('.frm');
-  var apertoAlle = Date.now(), token = '', widget = null;
+  var token = '', widget = null;
   var rendi = function () { if (!box || widget !== null || !window.turnstile) return; widget = window.turnstile.render(box, { sitekey: box.getAttribute('data-sitekey'), language: 'en', appearance: 'interaction-only', callback: function (t) { token = t; }, 'expired-callback': function () { token = ''; }, 'error-callback': function () { token = ''; } }); };
   if (box) { var giri = 0, iv = setInterval(function () { rendi(); if (widget !== null || ++giri > 100) clearInterval(iv); }, 150); }
   var gettone = function () { return new Promise(function (ok) { if (!box || token) return ok(token); var t = 0, w = setInterval(function () { if (token || ++t > 50) { clearInterval(w); ok(token); } }, 160); }); };
   var REGOLE = {
-    nome: function (v) { return v.trim().length < 2 ? 'Tell Pekko your name.' : ''; },
-    email: function (v) { return !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(v.trim()) ? 'A real e-mail address, so Pekko can answer.' : ''; },
-    telefono: function (v) { return v.trim() && !/^[+0-9 ()./-]{6,20}$/.test(v.trim()) ? 'Digits, spaces and the country code only (e.g. +39 333 000 0000).' : ''; },
-    tipo: function (v) { return v ? '' : 'Pick your trouble.'; },
-    messaggio: function (v) { return v.trim().length < 20 ? 'A couple more words: at least 20 characters (now ' + v.trim().length + ').' : ''; },
-    privacy: function (v, el) { return el.checked ? '' : 'Pekko needs your consent to answer.'; }
+    nome: function (v) { return v.trim().length < 2 ? 'tell pekko ur name.' : ''; },
+    email: function (v) { return !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(v.trim()) ? 'a real e-mail address, so pekko can answer.' : ''; },
+    telefono: function (v) { return v.trim() && !/^[+0-9 ()./-]{6,20}$/.test(v.trim()) ? 'digits, spaces and the country code only (e.g. +39 333 000 0000).' : ''; },
+    tipo: function (v) { return v ? '' : 'pick ur trouble.'; },
+    messaggio: function (v) { return v.trim().length < 20 ? 'a couple more words: at least 20 characters (now ' + v.trim().length + ').' : ''; },
+    privacy: function (v, el2) { return el2.checked ? '' : 'pekko needs ur consent 2 answer.'; }
   };
-  var campi = $$('input, select, textarea', form).filter(function (el) { return REGOLE[el.name]; });
-  var controlla = function (el) {
-    var m = REGOLE[el.name](el.value, el), f = el.closest('[data-f]'), err = $('small', f);
+  var campi = $$('input, select, textarea', form).filter(function (x) { return REGOLE[x.name]; });
+  var controlla = function (x) {
+    var m = REGOLE[x.name](x.value, x), f = x.closest('[data-f]'), err = $('small', f);
     f.classList.toggle('bad', !!m);
-    el.setAttribute('aria-invalid', m ? 'true' : 'false');
+    x.setAttribute('aria-invalid', m ? 'true' : 'false');
     err.textContent = m; err.hidden = !m;
     return !m;
   };
-  campi.forEach(function (el) {
-    el.addEventListener('blur', function () { controlla(el); });
-    el.addEventListener(el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input', function () { if (el.closest('[data-f]').classList.contains('bad')) controlla(el); });
+  campi.forEach(function (x) {
+    x.addEventListener('blur', function () { controlla(x); });
+    x.addEventListener(x.type === 'checkbox' || x.tagName === 'SELECT' ? 'change' : 'input', function () { if (x.closest('[data-f]').classList.contains('bad')) controlla(x); });
   });
-  var stato = function (s, testo) { frm.classList.toggle('is-loading', s === 'loading'); form.setAttribute('aria-busy', s === 'loading' ? 'true' : 'false'); fstatus.textContent = testo || (s === 'loading' ? 'Sending…' : ''); };
+  var statoF = function (s, testo) { frm.classList.toggle('is-loading', s === 'loading'); form.setAttribute('aria-busy', s === 'loading' ? 'true' : 'false'); fstatus.textContent = testo || (s === 'loading' ? 'sending…' : ''); };
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var cattivi = campi.filter(function (el) { return !controlla(el); });
-    if (cattivi.length) { stato('error', cattivi.length === 1 ? 'Check the highlighted field.' : 'Check the ' + cattivi.length + ' highlighted fields.'); cattivi[0].focus(); return; }
+    var cattivi = campi.filter(function (x) { return !controlla(x); });
+    if (cattivi.length) { statoF('error', cattivi.length === 1 ? 'check the highlighted field.' : 'check the ' + cattivi.length + ' highlighted fields.'); cattivi[0].focus(); return; }
     if (form.elements.sito.value) return;
     var dati = {};
     new FormData(form).forEach(function (v, key) { dati[key] = v; });
     delete dati.sito;
-    stato('loading');
+    statoF('loading');
     gettone().then(function (t) {
-      dati.privacy = true; dati.modulo = 'assistenza'; dati._t = apertoAlle; dati._turnstile = t;
+      dati.privacy = true; dati.modulo = 'assistenza'; dati._t = aperta; dati._turnstile = t;
       var ctrl = new AbortController(), timer = setTimeout(function () { ctrl.abort(); }, 20000);
       return fetch(form.getAttribute('data-endpoint'), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(dati), signal: ctrl.signal })
         .then(function (r) { clearTimeout(timer); return r.json().catch(function () { return null; }).then(function (p) { return { ok: r.ok, p: p }; }); });
@@ -1239,40 +1648,21 @@ const JS = `
         if (widget !== null && window.turnstile) window.turnstile.reset(widget);
         token = '';
         if (res.p && res.p.fields && res.p.fields.length) {
-          var primo = campi.filter(function (el) { return res.p.fields.indexOf(el.name) !== -1; })[0];
-          stato('error', 'Check the highlighted fields.');
+          var primo = campi.filter(function (x) { return res.p.fields.indexOf(x.name) !== -1; })[0];
+          statoF('error', 'check the highlighted fields.');
           if (primo) { primo.closest('[data-f]').classList.add('bad'); primo.focus(); }
           return;
         }
-        stato('error', (res.p && res.p.error) || 'It didn’t go through. Call Pekko, it’s faster.');
+        statoF('error', (res.p && res.p.error) || 'it didnt go thru. call pekko, its faster.');
         return;
       }
-      stato('idle');
+      statoF('idle');
       frm.classList.add('is-done');
       done.hidden = false;
       done.focus();
     }).catch(function () {
-      stato('error', navigator.onLine ? 'It didn’t go through. Try again in a minute, or call Pekko, or write to ' + form.getAttribute('data-mail') + '.' : 'You seem to be offline. Which, to be fair, is a computer problem.');
+      statoF('error', navigator.onLine ? 'it didnt go thru. try again in a minute, or call pekko, or write to ' + form.getAttribute('data-mail') + '.' : 'u seem to be offline. wich, to be fair, is a computer problem.');
     });
   });
 })();
 `
-
-// ── La 404 di bettercallpekko.it ─────────────────────────────────────────────
-// Solo nella build SITE=bcp (routes.js → bcpRoutes): il sito serio ha la sua.
-
-export function assistenzaNotFoundPage() {
-  const body = html`
-    <div class="wrap" style="padding:40px 0">
-      <div class="sec" style="text-align:center;padding:30px 20px">
-        ${i3('404?!', 'r', 90)}<br>
-        ${i3('PAGE NOT FOUND. BETTER CALL PEKKO!', 'b', 30)}
-        <p style="margin:16px 0;font:14px/1.5 Arial,sans-serif">This page doesn’t exist. It never did. Not even in 2006.<br>The computer guy can’t fix a link, but he can fix your computer.</p>
-        <p><a class="red" href="${A.path}">BACK TO THE HOME PAGE</a> &nbsp; <a class="red" href="${A.contatti}">CONTACT PEKKO</a> &nbsp; <a class="red" href="${A.tel}">CALL ${esc(A.telefono)}</a></p>
-        <p style="margin-top:14px"><a href="${esc(site.url)}/">The serious website</a> · SI PARLA ITALIANO</p>
-      </div>
-      ${foot()}
-    </div>
-  `
-  return shell({ path: '/404/', title: '404 — Better Call Pekko', description: 'Page not found. Better call Pekko.', body, image: 'ad-header' })
-}

@@ -167,7 +167,7 @@ export const annunci = {
           t3d('"Better Call Pekko!"', { x: 400, y: 14, size: 50, font: 'scr', color: '#fffbe6', tone: 'k', sw: 1.5, n: 3, blur: 4, rotate: -4, w: 380, align: 'center' }),
           t3d('PEKKO', { x: 392, y: 84, size: 78, tone: 'r', sw: 3, n: 5, w: 392, align: 'center', spacing: '.03em' }),
           txt("I'M THE COMPUTER GUY", { x: 392, y: 166, size: 13, spacing: '.32em', w: 392, align: 'center' }),
-          txt(`${TEL} &nbsp;·&nbsp; VIA BELVEDERE 1, RIVALTA SUL MINCIO (MN) &nbsp;·&nbsp; SI PARLA ITALIANO`, { x: 386, y: 186, size: 9, color: '#7a0000', w: 404, align: 'center', font: 'th', weight: 'bold' }),
+          txt(`${TEL} &nbsp;·&nbsp; RIVALTA SUL MINCIO (MN) &nbsp;·&nbsp; IT’S ALL GOOD, MAN! &nbsp;·&nbsp; SI PARLA ITALIANO`, { x: 386, y: 186, size: 9, color: '#7a0000', w: 404, align: 'center', font: 'th', weight: 'bold' }),
           box('', { x: 790, y: 0, w: 170, h: 234 - STRIP, bg: 'radial-gradient(circle at 55% 35%,#fff27a,#f5c400 60%,#dda200)' }),
           img(fig, { ...p, bottom: STRIP }),
           box(txt('WANT EMAILS FROM PEKKO? CLICK HERE!!!', { x: 0, y: 6, w: 960, align: 'center', size: 17, color: '#ffe600', italic: true, shadow: '2px 2px 0 #000' }), { x: 0, bottom: 0, w: 960, h: STRIP, bg: '#e21212' }),
