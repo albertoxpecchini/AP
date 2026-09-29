@@ -52,7 +52,7 @@ export function informaticaPage() {
       <div class="container">
         ${media(area.art, { ratio: '16/9', caption: null, className: 'itc__cover', lazy: false })}
         <dl class="itc__facts">
-          ${facts.map((f, i) => `<div data-reveal="up" style="--d:${i * 70}ms"><dt class="label">${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`)}
+          ${facts.map((f, i) => `<div data-reveal="up" style="--d:${i * 45}ms"><dt class="label">${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`)}
         </dl>
       </div>
     </section>
@@ -123,7 +123,7 @@ export function informaticaPage() {
       <div class="container">
         ${sectionHead({ index: '→', label: 'Come si svolge', title: 'Cinque passaggi, nessuna sorpresa' })}
         <ol class="its__grid">
-          ${it.steps.map((s, i) => `<li data-reveal="up" style="--d:${i * 80}ms"><span class="its__n">0${i + 1}</span><h3 class="h4">${esc(s.title)}</h3><p>${esc(s.text)}</p></li>`)}
+          ${it.steps.map((s, i) => `<li data-reveal="up" style="--d:${i * 50}ms"><span class="its__n">0${i + 1}</span><h3 class="h4">${esc(s.title)}</h3><p>${esc(s.text)}</p></li>`)}
         </ol>
       </div>
     </section>
@@ -132,7 +132,7 @@ export function informaticaPage() {
       <div class="container">
         ${sectionHead({ index: '∑', label: 'Regole fisse', title: 'Quello che vale per ogni computer' })}
         <ul class="prin__grid">
-          ${it.rules.map((p, i) => `<li data-reveal="up" style="--d:${i * 80}ms"><span class="label">0${i + 1}</span><h3 class="h3">${esc(p.title)}</h3><p>${esc(p.text)}</p></li>`)}
+          ${it.rules.map((p, i) => `<li data-reveal="up" style="--d:${i * 50}ms"><span class="label">0${i + 1}</span><h3 class="h3">${esc(p.title)}</h3><p>${esc(p.text)}</p></li>`)}
         </ul>
       </div>
     </section>

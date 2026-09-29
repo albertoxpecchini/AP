@@ -55,7 +55,7 @@ export function projectCard(p, { span = 6, lazy = true, headingLevel = 3, previe
 export function siteCard(p, i) {
   const w = p.web
   return html`
-    <article class="wcard" data-carousel-item data-reveal="up" style="--d:${(i % 2) * 120}ms">
+    <article class="wcard" data-carousel-item data-reveal="up" style="--d:${(i % 2) * 70}ms">
       <a class="wcard__link" href="${projectHref(p)}" data-cursor="Apri">
         <div class="wcard__stage">
           ${deviceMockup('laptop', { domain: w.domain, screen: w.desktop, className: 'wcard__laptop' })}

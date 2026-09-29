@@ -543,7 +543,7 @@
 .dial__needle {
   transform-origin: 200px 200px;
   transform: rotate(var(--angle, 0deg));
-  transition: transform 1s var(--ease-out);
+  transition: transform 0.7s var(--ease-out);
   stroke: var(--accent);
   stroke-width: 2;
   fill: none;
@@ -880,7 +880,7 @@
   display: block;
   width: 100%;
   height: auto;
-  transition: transform 1.5s var(--ease-out);
+  transition: transform 1s var(--ease-out);
 }
 
 .spop__cap {
@@ -909,7 +909,7 @@
 
 .js [data-reveal='pop'] .spop__cap {
   opacity: 0;
-  transition: opacity var(--t-3) ease 0.7s;
+  transition: opacity var(--t-3) ease 0.45s;
 }
 
 .js [data-reveal='pop'].is-in .spop__figure {
@@ -983,7 +983,7 @@
 }
 
 .js .sbio__mark .monogram path {
-  animation: draw 2.4s var(--ease-in-out) 0.2s both;
+  animation: draw 1.6s var(--ease-in-out) 0.15s both;
 }
 
 .sbio__text {
@@ -1103,20 +1103,6 @@
 
   .stl__node::before {
     top: 0.9rem;
-  }
-}
-
-.sfull__media .media__frame {
-  aspect-ratio: 4 / 3;
-}
-
-.sfull__media .media__caption {
-  padding-inline: var(--gutter);
-}
-
-@media (min-width: 768px) {
-  .sfull__media .media__frame {
-    aspect-ratio: 21 / 9;
   }
 }
 

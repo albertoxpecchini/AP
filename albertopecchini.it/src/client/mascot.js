@@ -46,19 +46,26 @@ export function initMascots() {
     return { x: r.left + r.width / 2, y: r.top + r.height / 2, rx: r.width / 2, ry: r.height / 2 }
   }
 
-  /** Ogni occhio guarda il punto (tx, ty) dello schermo; `full` = a fondo corsa. */
-  const look = (m, tx, ty, full = false) => {
-    for (const { eye, pupil } of m.eyes) {
+  /** Dove guarda ogni occhio per vedere il punto (tx, ty) dello schermo; `full` = a fondo corsa. */
+  const aim = (m, tx, ty, full = false) =>
+    m.eyes.map(({ eye, pupil }) => {
       const b = box(eye)
-      if (!b.rx) continue
+      if (!b.rx) return null
       const dx = tx - b.x
       const dy = ty - b.y
       const d = Math.hypot(dx, dy) || 1
       const k = full ? 1 : Math.min(1, d / (b.rx * NEAR))
-      pupil.style.setProperty('--px', `${((dx / d) * b.rx * ROOM * k).toFixed(1)}px`)
-      pupil.style.setProperty('--py', `${((dy / d) * b.ry * ROOM * k).toFixed(1)}px`)
-    }
-  }
+      return [pupil, ((dx / d) * b.rx * ROOM * k).toFixed(1), ((dy / d) * b.ry * ROOM * k).toFixed(1)]
+    })
+
+  const apply = (moves) =>
+    moves.forEach((move) => {
+      if (!move) return
+      move[0].style.setProperty('--px', `${move[1]}px`)
+      move[0].style.setProperty('--py', `${move[2]}px`)
+    })
+
+  const look = (m, tx, ty, full) => apply(aim(m, tx, ty, full))
 
   const onNose = (m) => {
     if (!m.nose || px === null) return false
@@ -75,17 +82,21 @@ export function initMascots() {
 
   const update = () => {
     raf = null
+    const moves = []
+    const crosses = []
     for (const m of mascots) {
       if (!m.visible) continue
       const cross = onNose(m)
-      setCross(m, cross)
+      crosses.push([m, cross])
       if (cross) {
         const b = box(m.nose)
-        look(m, b.x, b.y, true)
+        moves.push(...aim(m, b.x, b.y, true))
       } else if (px !== null) {
-        look(m, px, py)
+        moves.push(...aim(m, px, py))
       }
     }
+    crosses.forEach(([m, cross]) => setCross(m, cross))
+    apply(moves)
   }
   const schedule = () => {
     raf ??= requestAnimationFrame(update)

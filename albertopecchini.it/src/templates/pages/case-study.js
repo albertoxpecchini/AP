@@ -151,7 +151,7 @@ export function caseStudyPage(p) {
         'sviluppo',
         html`
           <ol class="cs-steps">
-            ${p.development.map((d, i) => `<li class="cs-step" data-reveal="up" style="--d:${i * 70}ms"><span class="cs-step__n label">${String(i + 1).padStart(2, '0')}</span><h3 class="cs-step__title h4">${esc(d.title)}</h3><p>${esc(d.text)}</p></li>`)}
+            ${p.development.map((d, i) => `<li class="cs-step" data-reveal="up" style="--d:${i * 45}ms"><span class="cs-step__n label">${String(i + 1).padStart(2, '0')}</span><h3 class="cs-step__title h4">${esc(d.title)}</h3><p>${esc(d.text)}</p></li>`)}
           </ol>
         `,
       )}
@@ -159,8 +159,8 @@ export function caseStudyPage(p) {
         'risultato',
         html`
           <p class="cs-big" data-reveal="up">${esc(p.result)}</p>
-          <ul class="cs-metrics">
-            ${p.metrics.map((m, i) => `<li data-reveal="up" style="--d:${i * 90}ms"><span class="cs-metrics__v">${esc(m.value)}</span><span class="label">${esc(m.label)}</span></li>`)}
+          <ul class="cs-metrics${p.metrics.some((m) => m.value.length > 6) ? ' cs-metrics--fit' : ''}">
+            ${p.metrics.map((m, i) => `<li data-reveal="up" style="--d:${i * 55}ms"><span class="cs-metrics__v">${esc(m.value)}</span><span class="label">${esc(m.label)}</span></li>`)}
           </ul>
         `,
         'cs-sec--ink',

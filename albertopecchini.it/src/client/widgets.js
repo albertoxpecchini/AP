@@ -27,7 +27,7 @@ export function initLightbox() {
     if (!source) return null
     if (source.tagName === 'IMG') {
       const img = new Image()
-      img.src = source.dataset.full || source.currentSrc || source.src
+      img.src = source.dataset.full || source.src
       img.alt = source.alt
       img.className = 'pic'
       return img

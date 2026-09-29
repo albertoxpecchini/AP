@@ -79,7 +79,7 @@ export function serviziPage() {
         <ul class="bund__grid">
           ${bundles.map(
             (b, i) => html`
-              <li class="bund__card" data-reveal="up" style="--d:${i * 90}ms">
+              <li class="bund__card" data-reveal="up" style="--d:${i * 55}ms">
                 <div class="bund__top"><p class="bund__code">${esc(b.code)}</p>${figurina(figName('lavori', b.code), { className: 'bund__fig' })}</div>
                 <h3 class="h3">${esc(b.title)}</h3>
                 <p>${esc(b.text)}</p>
@@ -201,7 +201,7 @@ export function metodoPage() {
       <div class="container">
         ${sectionHead({ index: '∑', label: 'Regole fisse', title: 'Quattro cose che non cambiano mai' })}
         <ul class="prin__grid">
-          ${principles.map((p, i) => `<li data-reveal="up" style="--d:${i * 80}ms"><span class="label">0${i + 1}</span><h3 class="h3">${esc(p.title)}</h3><p>${esc(p.text)}</p></li>`)}
+          ${principles.map((p, i) => `<li data-reveal="up" style="--d:${i * 50}ms"><span class="label">0${i + 1}</span><h3 class="h3">${esc(p.title)}</h3><p>${esc(p.text)}</p></li>`)}
         </ul>
       </div>
     </section>
@@ -255,7 +255,7 @@ export function studioPage() {
       <div class="container">
         ${sectionHead({ index: 'A', label: 'Approccio al lavoro', title: 'Tre abitudini, prima che tre principi' })}
         <ol class="sapp__grid">
-          ${approach.map((a, i) => `<li data-reveal="up" style="--d:${i * 90}ms"><span class="sapp__n">${a.n}</span><h3 class="h3">${esc(a.title)}</h3><p>${esc(a.text)}</p></li>`)}
+          ${approach.map((a, i) => `<li data-reveal="up" style="--d:${i * 55}ms"><span class="sapp__n">${a.n}</span><h3 class="h3">${esc(a.title)}</h3><p>${esc(a.text)}</p></li>`)}
         </ol>
       </div>
     </section>
@@ -281,7 +281,7 @@ export function studioPage() {
       <div class="container">
         ${sectionHead({ index: 'C', label: 'Valori', title: 'Quello su cui non tratto' })}
         <ul class="sval__grid">
-          ${values.map((v, i) => `<li data-reveal="up" style="--d:${i * 70}ms"><span class="label">0${i + 1}</span><h3 class="h3">${esc(v.title)}</h3><p>${esc(v.text)}</p></li>`)}
+          ${values.map((v, i) => `<li data-reveal="up" style="--d:${i * 45}ms"><span class="label">0${i + 1}</span><h3 class="h3">${esc(v.title)}</h3><p>${esc(v.text)}</p></li>`)}
         </ul>
       </div>
     </section>

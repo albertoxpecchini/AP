@@ -1,4 +1,4 @@
-// "Chrome" del sito: header, sottomenu, orologio, menu mobile, avanzamento,
+// "Chrome" del sito: header, sottomenu, menu mobile, avanzamento,
 // transizioni di pagina, torna su.
 
 import { $, $$, onScroll, lockPage, trapFocus, reducedMotion } from './utils.js'
@@ -48,20 +48,6 @@ export function initHeader() {
   })
 }
 
-// ── Ora locale di Mantova ────────────────────────────────────────────────────
-
-export function initClock() {
-  const targets = $$('[data-clock]')
-  if (!targets.length) return
-  const format = new Intl.DateTimeFormat('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
-  const tick = () => {
-    const now = format.format(new Date())
-    targets.forEach((t) => (t.textContent = now))
-  }
-  tick()
-  setInterval(tick, 20_000)
-}
-
 // ── Menu mobile a tutto schermo ──────────────────────────────────────────────
 
 export function initMenu() {
@@ -90,7 +76,7 @@ export function initMenu() {
     openBtn.setAttribute('aria-expanded', 'false')
     unlock?.()
     release?.()
-    closeTimer = setTimeout(() => (menu.hidden = true), reducedMotion() ? 0 : 700)
+    closeTimer = setTimeout(() => (menu.hidden = true), reducedMotion() ? 0 : 500)
     if (focus) openBtn.focus({ preventScroll: true })
   }
 
@@ -120,7 +106,7 @@ export function initTransitions() {
   // ingresso: la pagina nasce coperta (classe messa dallo script in <head>)
   if (root.classList.contains('is-entering')) {
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-entered')))
-    setTimeout(() => root.classList.remove('is-entering', 'is-entered'), 950)
+    setTimeout(() => root.classList.remove('is-entering', 'is-entered'), 640)
   }
 
   // ritorno dalla cache del browser: nessuna tendina rimasta a metà
@@ -148,7 +134,7 @@ export function initTransitions() {
       sessionStorage.setItem('ap:nav', '1')
     } catch {}
     root.classList.add('is-leaving')
-    setTimeout(() => (location.href = url.href), 580)
+    setTimeout(() => (location.href = url.href), 360)
   })
 }
 

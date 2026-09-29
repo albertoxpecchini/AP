@@ -466,7 +466,7 @@ body.page--stile {
 .js .board [data-bd='clip'] .mark,
 .js .board [data-bd='clip'] figcaption {
   opacity: 0;
-  transition: opacity var(--t-3) ease calc(var(--d) + 0.5s);
+  transition: opacity var(--t-3) ease calc(var(--d) + 0.3s);
 }
 
 .js .board.is-live [data-bd] {
@@ -495,12 +495,6 @@ body.page--stile {
 .js .board.is-live.is-off .bd-hero__cue-line::after,
 .js .board.is-live.is-off .bd-ease__knob {
   animation-play-state: paused;
-}
-
-/* Nel piano i bottoni non sono magnetici: il will-change: transform di .btn
-   qui creerebbe solo layer in più (e altri, per sovrapposizione, attorno). */
-.board .btn {
-  will-change: auto;
 }
 
 /* Il testo SVG delle tavole (la pianta in copertina) si disegna in
@@ -792,11 +786,11 @@ body.page--stile {
    un'animazione che resta «piena» a fine corsa terrebbe le parole su un
    layer proprio, che per sovrapposizione ne promuove altri nella pianta */
 .js .board.is-live .bd-hero__word > span {
-  animation: bd-rise 1.2s var(--ease-out) 0.1s backwards;
+  animation: bd-rise 0.85s var(--ease-out) 0.05s backwards;
 }
 
 .js .board.is-live .bd-hero__word--2 > span {
-  animation-delay: 0.22s;
+  animation-delay: 0.13s;
 }
 
 @keyframes bd-rise {

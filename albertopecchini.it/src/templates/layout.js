@@ -65,7 +65,7 @@ ${assets.preloadFonts.map((f) => `<link rel="preload" href="${f}" as="font" type
 ${assets.styles.map((s) => `<link rel="stylesheet" href="${s}">`)}
 <script>
 (function(d){var c=d.documentElement.classList;c.remove('no-js');c.add('js');
-try{if(sessionStorage.getItem('ap:nav')==='1'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){c.add('is-entering')}sessionStorage.removeItem('ap:nav')}catch(e){}
+try{if(sessionStorage.getItem('ap:nav')==='1'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){c.add('is-entering','nav-in')}sessionStorage.removeItem('ap:nav')}catch(e){}
 setTimeout(function(){if(!c.contains('is-ready')){c.remove('js','is-entering');c.add('no-js')}},4000);
 })(document);
 </script>
@@ -127,7 +127,7 @@ function header(route) {
         <nav class="site-nav" aria-label="Navigazione principale">
           <ul class="site-nav__list site-nav__list--l">${nav.slice(0, NAV_SPLIT).map((it, i) => navItem(route, it, i))}</ul>
           <div class="site-header__brand">
-            ${mascot('lumaca', { className: 'site-header__masc', crop: HEAD_CROP, lazy: false })}
+            ${mascot('lumaca', { className: 'site-header__masc', crop: HEAD_CROP, lazy: false, sizes: '8.2rem' })}
             ${logo()}
           </div>
           <ul class="site-nav__list site-nav__list--r">

@@ -1,4 +1,6 @@
-/* Punto d'ingresso degli stili. L'ordine conta: token → base → componenti → layout → pagine. */
+/* Punto d'ingresso degli stili. L'ordine conta: token → base → componenti → layout → pagine.
+   stile.css, viewer.css ed email.css non stanno qui: li collega il plugin site-pages
+   solo alle pagine che li usano (PAGE_CSS). */
 @import './styles/fonts.css';
 @import './styles/tokens.css';
 @import './styles/base.css';
@@ -10,7 +12,4 @@
 @import './styles/home.css';
 @import './styles/portfolio.css';
 @import './styles/pages.css';
-@import './styles/stile.css';
-@import './styles/viewer.css';
-@import './styles/email.css';
 @import './styles/print.css';

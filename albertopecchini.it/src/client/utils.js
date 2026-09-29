@@ -6,6 +6,9 @@ export const $$ = (selector, root = document) => [...root.querySelectorAll(selec
 export const clamp = (v, min, max) => Math.min(max, Math.max(min, v))
 export const lerp = (a, b, t) => a + (b - a) * t
 
+/** Come lerp, ma `t` vale per un fotogramma a 60 Hz: a 120 Hz ogni passo è più corto, la velocità resta quella. */
+export const damp = (a, b, t, dt) => lerp(a, b, 1 - Math.pow(1 - t, Math.min(dt, 64) / 16.667))
+
 export const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches
 export const finePointer = () => matchMedia('(hover: hover) and (pointer: fine)').matches
 

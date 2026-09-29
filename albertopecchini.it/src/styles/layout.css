@@ -144,11 +144,11 @@
 }
 
 .js .logo .monogram path {
-  animation: draw 1.3s var(--ease-in-out) both;
+  animation: draw 0.9s var(--ease-in-out) both;
 }
 
-.js .logo .monogram__stem { animation-delay: 0.15s; }
-.js .logo .monogram__p { animation-delay: 0.3s; }
+.js .logo .monogram__stem { animation-delay: 0.1s; }
+.js .logo .monogram__p { animation-delay: 0.2s; }
 
 .monogram__node {
   transform-origin: 23.5px 5px;
@@ -157,7 +157,7 @@
 
 @media (hover: hover) {
   .logo:hover .monogram path {
-    animation: draw 0.9s var(--ease-in-out) both;
+    animation: draw 0.7s var(--ease-in-out) both;
   }
 
   .logo:hover .monogram__node {
@@ -328,7 +328,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   clip-path: inset(0 0 100% 0);
-  transition: clip-path 0.7s var(--ease-in-out);
+  transition: clip-path 0.5s var(--ease-in-out);
 }
 
 .menu.is-open {
@@ -465,7 +465,7 @@
 .menu.is-open .menu__block {
   opacity: 1;
   transform: none;
-  transition-delay: calc(0.25s + var(--i, 0) * 55ms);
+  transition-delay: calc(0.14s + var(--i, 0) * 38ms);
 }
 
 @media (min-width: 768px) {
@@ -656,11 +656,11 @@ footer.site-footer {
   stroke-width: 0.34;
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
-  transition: stroke-dashoffset 1.3s var(--ease-in-out);
+  transition: stroke-dashoffset 0.95s var(--ease-in-out);
 }
 
-.sig__stem { transition-delay: 0.2s; }
-.sig__p { transition-delay: 0.4s; }
+.sig__stem { transition-delay: 0.12s; }
+.sig__p { transition-delay: 0.25s; }
 
 /* linee di costruzione: appena percettibili, si accendono al passaggio */
 .sig__guides {
@@ -684,7 +684,7 @@ footer.site-footer {
 
 .js [data-reveal='draw'] .sig__guides {
   opacity: 0;
-  transition-delay: 1s;
+  transition-delay: 0.7s;
 }
 
 .js [data-reveal='draw'] .sig__node {
@@ -710,11 +710,11 @@ footer.site-footer {
 .js [data-reveal='draw'] .foot-sign__tag {
   opacity: 0;
   transform: translateY(1.25rem);
-  transition: opacity var(--t-3) ease 0.5s, transform var(--t-4) var(--ease-out) 0.5s;
+  transition: opacity var(--t-3) ease 0.3s, transform var(--t-4) var(--ease-out) 0.3s;
 }
 
 .js [data-reveal='draw'] .foot-sign__guard--r {
-  transition-delay: 0.7s;
+  transition-delay: 0.45s;
 }
 
 .js [data-reveal='draw'].is-in .foot-sign__guard,
@@ -888,16 +888,16 @@ footer.site-footer {
 
 .is-leaving .curtain__panel {
   transform: none;
-  transition: transform 0.55s var(--ease-in-out);
+  transition: transform 0.34s var(--ease-in-out);
 }
 
 .is-leaving .curtain__mark {
   opacity: 1;
-  transition: opacity 0.3s ease 0.25s;
+  transition: opacity 0.2s ease 0.12s;
 }
 
 .is-leaving .curtain__mark .monogram path {
-  animation: draw 0.7s var(--ease-in-out) 0.2s both;
+  animation: draw 0.5s var(--ease-in-out) 0.08s both;
 }
 
 /* ingresso: parte coperto, poi il pannello esce verso l'alto */
@@ -915,11 +915,11 @@ footer.site-footer {
 
 .is-entering.is-entered .curtain__panel {
   transform: translateY(-101%);
-  transition: transform 0.7s var(--ease-in-out);
+  transition: transform 0.5s var(--ease-in-out);
 }
 
 .is-entering.is-entered .curtain__mark {
   opacity: 0;
   transform: translateY(-3rem);
-  transition: opacity 0.3s ease, transform 0.7s var(--ease-in-out);
+  transition: opacity 0.22s ease, transform 0.5s var(--ease-in-out);
 }

@@ -49,9 +49,9 @@ src/data/*.js  ──►  src/templates/*.js  ──►  HTML
                       stringhe HTML)           └─ build: scritto in dist/<rotta>/index.html
 ```
 
-- **`plugins/site-pages.js`** è un plugin Vite. In sviluppo intercetta le richieste HTML, carica `src/templates/routes.js` con `ssrLoadModule` e rende la pagina; in build, dopo il bundle di JS e CSS, scrive ogni rotta in `dist/`, aggiunge `404.html`, `sitemap.xml`, `robots.txt` e le miniature SVG, poi elimina il manifest di Vite.
+- **`plugins/site-pages.js`** è un plugin Vite. In sviluppo intercetta le richieste HTML, carica `src/templates/routes.js` con `ssrLoadModule` e rende la pagina; in build, dopo il bundle di JS e CSS, scrive ogni rotta in `dist/`, aggiunge `404.html`, `sitemap.xml`, `robots.txt` e le miniature SVG, poi elimina il manifest di Vite. A ogni pagina collega i fogli delle pagine speciali che usa (`PAGE_CSS`) e passa l’HTML a **`plugins/responsive-images.js`**, che aggiunge `srcset`/`sizes` e scrive le versioni ridotte delle immagini (vedi [Build](#build)).
 - **I template** sono moduli ESM puri: nessun import di CSS o immagini, così girano identici in Node e nel dev server. `src/templates/html.js` fornisce il tag `html` (appiattisce gli array e scarta `false` e `null`), `esc` per l’escape e `attrs` per gli attributi.
-- **Vite** si occupa solo di `src/main.js` (JavaScript) e `src/style.css` (CSS e font): i file finiscono in `dist/assets/` con hash nel nome e il layout li collega leggendo il manifest. Il font principale viene precaricato per evitare il flash sui titoli.
+- **Vite** si occupa solo di `src/main.js` (JavaScript), `src/style.css` (CSS e font) e dei tre fogli delle pagine speciali (`stile.css`, `viewer.css`, `email.css`): i file finiscono in `dist/assets/` con hash nel nome e il layout li collega leggendo il manifest. Il font principale viene precaricato per evitare il flash sui titoli.
 - **Le immagini segnaposto** non sono file: sono disegni SVG generati in build da `src/art/` (piante, prospetti, nuvole di punti, marchi, manifesti…). Si sostituiscono con fotografie reali cambiando una riga nei dati.
 - **Progressive enhancement**: ogni pagina è completa senza JavaScript. I moduli client si attivano solo se trovano i propri elementi e rispettano `prefers-reduced-motion`.
 
@@ -60,7 +60,9 @@ src/data/*.js  ──►  src/templates/*.js  ──►  HTML
 ```
 albertopecchini.it/
 ├─ plugins/
-│  └─ site-pages.js        plugin Vite: rende le pagine in dev, le scrive in build
+│  ├─ site-pages.js        plugin Vite: rende le pagine in dev, le scrive in build
+│  ├─ responsive-images.js in build: srcset, sizes e versioni ridotte delle immagini di /media/
+│  └─ api-dev.js           in dev: serve le funzioni di api/
 ├─ api/
 │  └─ contatti.js          funzione serverless del modulo contatti (Resend + CallMeBot)
 ├─ tools/
@@ -79,15 +81,14 @@ albertopecchini.it/
 ├─ public/                 servito così com’è alla radice del sito
 │  ├─ favicon.svg · favicon-32.png · apple-touch-icon.png · icon-512.png · site.webmanifest
 │  ├─ og.png               immagine per le anteprime social (1200×630)
-│  ├─ icons.svg            sprite delle icone
 │  └─ media/
 │     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine; tasto-*.webp sono le sagome dei tasti, chrome-*.webp le mini immagini del piè di pagina
 │     ├─ mascotte/         lumaca.webp e tartaruga.webp, le mascotte, generate da tools/mascotte
 │     ├─ assistenza/       ritagli, sfondi, foto stock, avatar e annunci (ad-*.jpg|gif) di «Better Call Pekko», da tools/assistenza
 │     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone) e l’iPhone 18 Pro vettoriale
 │     ├─ progetti/         una cartella per progetto: fotografie NN.webp (griglia) e NN-full.webp (lightbox), copertina.webp e vista-NN.webp illustrate
-│     ├─ studio/           fotografie reali (primo piano, avatar, figura scontornata)
-│     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf
+│     ├─ studio/           fotografie reali (fototessera, avatar, figura scontornata)
+│     ├─ tavole/           le tavole vere, una cartella per progetto: NN.svg, NN.webp, NN-mini.webp, NN.pdf (online solo se una pagina le mostra)
 │     └─ web/              screenshot dei progetti web (<prefisso>-desktop.webp, -tablet, -mobile, -*-tall)
 ├─ src/
 │  ├─ data/                CONTENUTI: l’unica cosa da toccare per aggiornare il sito
@@ -141,9 +142,9 @@ albertopecchini.it/
 │  │  ├─ scene.js          dal modello alla scena: tracciati per stile, riempimenti, tratteggi, testi
 │  │  ├─ render.js         disegno della scena su canvas 2D, impaginazione dei testi
 │  │  └─ worker.js         scarica, legge e disegna fuori dal thread della pagina
-│  ├─ styles/              token → base → componenti → tasti (pebble) → mascotte (mascot) → layout → pagine → stile → stampa
-│  ├─ main.js              entry JavaScript: avvia i moduli client
-│  └─ style.css            entry CSS: importa src/styles/* nell’ordine giusto
+│  ├─ styles/              token → base → componenti → tasti (pebble) → mascotte (mascot) → layout → pagine → stampa; a parte stile, viewer, email
+│  ├─ main.js              entry JavaScript: avvia i moduli client (piano, visualizzatore ed email a richiesta)
+│  └─ style.css            entry CSS: importa src/styles/* nell’ordine giusto (tranne i fogli delle pagine speciali)
 ├─ vite.config.js
 ├─ vercel.json             URL puliti, cache, intestazioni di sicurezza
 └─ package.json
@@ -252,6 +253,8 @@ nascosta. La grafica resta comunque fra le tre discipline in home e fra i serviz
 scheda rimanda a `/servizi/#grafica` invece che al portfolio.
 
 ## Immagini
+
+Le cartelle `lavoro/` degli strumenti (fogli e candidate di gpt-image-2, esclusi da Git) di copertine, figurine, mascotte e cartina, e le vecchie versioni dei banner di Pekko (`tools/assistenza/lavoro/vecchie/`), sono state archiviate il 29.09.2026 fuori dal repository, in `Documents\AP-archivio\lavoro-2026-09-29\`: servono solo per rifare un ritaglio da un foglio già pagato. Gli strumenti ricreano `lavoro/` da soli alla prossima generazione.
 
 ### Tavole generate (segnaposto)
 
@@ -428,11 +431,12 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 ## Stili
 
-`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `pebble` → `mascot` → `layout` → `home` → `portfolio` → `pages` → `stile` → `viewer` → `email` → `print`.
+`src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `pebble` → `mascot` → `layout` → `home` → `portfolio` → `pages` → `print`. I fogli delle tre pagine speciali — `stile.css` (il piano di `/stile/`), `viewer.css` (le tavole vere) ed `email.css` (`/email/`) — sono entry a parte: il plugin li collega, dopo il foglio comune, solo alle pagine che contengono il loro segno (`data-canvas`, `data-viewer`, `data-email`; `PAGE_CSS` in `plugins/site-pages.js`). Le altre pagine scaricano un quarto di CSS in meno.
 
 - **Token** (`tokens.css`): palette carta / inchiostro / minio (`#E5481F`), scala tipografica, spazi, raggi, durate ed easing. È il primo file da aprire per cambiare l’aspetto.
 - **Caratteri**: Archivo Variable (asse `wdth`) per i testi, IBM Plex Mono per etichette e dati, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
-- **Reveal** (`base.css`): `data-reveal` con i tipi `fade`, `up`, `clip`, `line`, `draw`; tutto disattivato con `prefers-reduced-motion`.
+- **Reveal** (`base.css`): `data-reveal` con i tipi `fade`, `up`, `clip`, `line`, `draw`, `words`; tutto disattivato con `prefers-reduced-motion`. Più in basso le rivelazioni partono con l’IntersectionObserver di `motion.js`; nel **primo schermo** (la testata di ogni pagina: `.hero`, `.phead`, `.cs-hero`, `.shero__grid`, `.cnt__intro`, `.nf`) sono invece animazioni CSS che partono al primo disegno, senza aspettare lo script: titolo e testo grande arrivano subito anche su una rete lenta. Lo stesso elenco sta in `FIRST_SCREEN` (`motion.js`). Dopo la tendina d’ingresso (classe `nav-in`) aspettano che la tendina si stia alzando.
+- **Movimento**: durate `--t-1`…`--t-4` = 0,15 · 0,3 · 0,55 · 0,8 s, easing `--ease-out` per gli ingressi. Tendina tra le pagine: esce in 0,34 s (si naviga a 0,36 s), rientra in 0,5 s. Gli inseguimenti (cursore, anteprima, inclinazione dell’hero) usano `damp()` di `utils.js`, che dà la stessa velocità a 60 e a 120 Hz. Niente `will-change` permanenti, tranne dove un elemento si muove di continuo.
 - **Header e footer** (`layout.css`): tutti e due centrati e simmetrici su una griglia `1fr auto 1fr`, con il marchio in mezzo. Nella testata: tre voci · chiocciola e marchio · due voci e invito (sotto i 1100 px: menu · marchio · contatti). Nel piè di pagina, dall’alto: invito e due tasti, fila delle pagine, firma custodita dalle due mascotte, recapiti con le mini immagini, note legali con il credito «Sito di Alberto Pecchini», torna su. Palette scoperta su `footer.site-footer`.
 - **Tasti «sasso»** (`pebble.css`, markup da `pebble()` in `ui.js`): la sagoma irregolare è un’immagine di gpt-image-2 (`public/media/figurine/tasto-*.webp`) stirata sul tasto; sotto c’è lo spessore (la stessa sagoma come maschera, piena di un colore d’ombra, spostata di `--pb-depth`). Al passaggio la faccia si solleva e il tasto si inclina verso il puntatore (`--tx`/`--ty` da `pebble.js`), premendo scende sullo spessore. Tre toni (carta, minio, inchiostro), tre misure, la variante tonda per la sola icona; senza sagoma ritagliata la forma è disegnata in CSS.
 - **Mascotte** (`mascot.css`, markup da `mascot()` in `ui.js`): sopra l’immagine, ai centri segnati in `src/data/mascotte.js`, stanno due occhi del sito (disco bianco, pupilla mossa da `--px`/`--py`, palpebra del colore della pelle) e la zona del naso; `.masc--crop` mostra un ritaglio (la testa della chiocciola in testata, sfumata in basso da una maschera).
@@ -442,7 +446,7 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 ## JavaScript del browser
 
-`src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill.
+`src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill. Il piano di `/stile/` (`canvas.js`), il visualizzatore delle tavole (`viewer.js` con il lettore DWG) e il compositore email (`email.js`) si caricano in pezzi a parte, solo sulle pagine che li contengono (`onDemand` in `main.js`): il JavaScript comune è la metà di prima.
 
 Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, tasti «sasso» che si inclinano e si premono, mascotte con gli occhi che seguono il puntatore (si incrociano sul naso, sbattono le palpebre, si guardano intorno senza puntatore), barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile, visualizzatore delle tavole.
 
@@ -457,8 +461,12 @@ dist/
 ├─ sitemap.xml · robots.txt
 ├─ assets/          JS, CSS e font con hash nel nome (cache lunga)
 ├─ art/<slug>.svg   miniature delle copertine generate
-└─ favicon, og.png, media/…   copiati da public/
+└─ favicon, og.png, media/…   copiati da public/, più le versioni ridotte <nome>-<larghezza>w.webp
 ```
+
+**Immagini responsive** (`plugins/responsive-images.js`): per ogni `<img>` di `/media/` (WebP, JPEG, PNG) scrive in `dist/` le versioni larghe 120, 240, 360, 560, 800 e 1200 px che stanno sotto il 75% dell’originale (la 120 solo per le immagini piccole) e aggiunge `srcset` e `sizes`. Il `sizes` lo dà il template quando sa quanto è grande l’immagine (`figurina()`, `mascot()`, l’avatar dell’hero); altrimenti `auto, 100vw` per le immagini lazy (Chromium sceglie sulla misura vera) e `100vw` per quelle subito visibili. L’anteprima al passaggio negli indici (`data-preview`) prende la versione da 800. In `public/` restano solo gli originali e il dev server serve quelli; il lightbox apre sempre l’originale (o `data-full`). Le versioni si tengono in `node_modules/.cache/ap-varianti/` con l’impronta del file nel nome: una build successiva le ricopia, un’immagine cambiata (le catture rifatte dal bot) si ricalcola da sola. Serve `sharp` (devDependency); senza, le pagine restano com’erano.
+
+**Tavole vere**: con `showSheets` spento nessuna pagina le cita e `dist/media/tavole/` viene tolta dopo la copia: PDF, DWG e SVG restano nel repository ma non sono online.
 
 In console la build riporta il numero di pagine e miniature scritte e, se ce ne sono, i **dati ancora segnaposto** dichiarati in fondo a `src/data/site.js` (`placeholders`). Compilato il dato, togliere la voce dalla lista.
 
@@ -469,7 +477,7 @@ In console la build riporta il numero di pagine e miniature scritte e, se ce ne 
 - [ ] Rileggere privacy e cookie policy (`src/templates/pages/legal.js`) e aggiornare `site.legal.updated`. Se si aggiungono strumenti di analisi o servizi di terze parti, la cookie policy va aggiornata.
 - [ ] Modulo contatti: `site.form.endpoint` punta a `/api/contatti`. Verificare che su Vercel siano impostate le variabili d’ambiente che la funzione si aspetta (`RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO`, `CALLMEBOT_PHONE`, `CALLMEBOT_APIKEY`, `TURNSTILE_SECRET_KEY`) e provare un invio vero in produzione.
 - [ ] Antispam: `site.form.turnstileSiteKey` è vuota, quindi il riquadro Turnstile non compare. Compilarla (chiave pubblica, non è un segreto) se il modulo inizia a ricevere spam.
-- [ ] Sistemare il DNS di albertopecchini.it: il dominio senza www ha ancora un record A verso il vecchio hosting Aruba (62.149.128.40) accanto a quello di Vercel (216.198.79.1). Deve restare solo quello di Vercel, altrimenti chi digita l’indirizzo senza www ottiene a caso il sito o un errore di connessione.
+- [x] DNS di albertopecchini.it: il record A del vecchio hosting Aruba (62.149.128.40) è stato tolto il 28.09.2026; il dominio senza www punta solo a Vercel (216.198.79.1).
 - [ ] Controllare `public/og.png` e il manifest (`public/site.webmanifest`).
 
 ## Pubblicazione

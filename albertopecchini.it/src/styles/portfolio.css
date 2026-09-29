@@ -1108,6 +1108,7 @@
 .cs-metrics li {
   display: grid;
   gap: 0.6rem;
+  container-type: inline-size;
 }
 
 .cs-metrics__v {
@@ -1116,6 +1117,12 @@
   font-stretch: 78%;
   letter-spacing: -0.05em;
   line-height: 0.9;
+}
+
+/* con un valore lungo (una data, «23.447 m³») il corpo non supera il 21% della
+   colonna: il valore sta su una riga e non esce dalla pagina */
+.cs-metrics--fit .cs-metrics__v {
+  font-size: min(clamp(2.5rem, 1.6rem + 4vw, 5.5rem), 21cqi);
 }
 
 .cs-gallery {

@@ -209,11 +209,15 @@ export const figName = (...parts) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
 
-/** La figurina `name`, se è stata ritagliata; altrimenti niente. */
-export function figurina(name, { className, lazy = true } = {}) {
+/**
+ * La figurina `name`, se è stata ritagliata; altrimenti niente.
+ * `sizes`: quanto è larga in pagina (per il srcset aggiunto in build); le figurine
+ * restano sotto i 17rem, di solito sotto i 10.
+ */
+export function figurina(name, { className, lazy = true, sizes } = {}) {
   const f = figurine[name]
   if (!f) return ''
-  return `<img${attrs({ class: cx('fig', className), src: `/media/figurine/${name}.webp`, width: f.w, height: f.h, alt: '', loading: lazy ? 'lazy' : 'eager', decoding: 'async', draggable: 'false' })}>`
+  return `<img${attrs({ class: cx('fig', className), src: `/media/figurine/${name}.webp`, width: f.w, height: f.h, alt: '', loading: lazy ? 'lazy' : 'eager', decoding: 'async', draggable: 'false', sizes: sizes || (lazy ? 'auto, 10rem' : '15rem') })}>`
 }
 
 // ── Tasti «sasso» ────────────────────────────────────────────────────────────
@@ -244,7 +248,7 @@ export function pebble({ href, label, tone = 'carta', size = 'md', shape = 0, ro
   const set = PEBBLES[tone] || PEBBLES.carta
   const name = round ? set.round : set.wide[shape % set.wide.length]
   const has = Boolean(figurine[name])
-  const ico = iconName ? `<span class="pb__icon" aria-hidden="true">${icon(iconName)}</span>` : fig ? `<span class="pb__fig" aria-hidden="true">${figurina(fig, { lazy: true })}</span>` : ''
+  const ico = iconName ? `<span class="pb__icon" aria-hidden="true">${icon(iconName)}</span>` : fig ? `<span class="pb__fig" aria-hidden="true">${figurina(fig, { lazy: true, sizes: 'auto, 2.5em' })}</span>` : ''
   // con `srLabel` il nome accessibile è l'attributo aria-label: niente testo visibile
   const text = srLabel ? '' : `<span class="pb__label">${esc(label)}</span>`
   const inner =
@@ -273,7 +277,7 @@ export function pebble({ href, label, tone = 'carta', size = 'md', shape = 0, ro
 // `crop`: ritaglio in percentuale dell'immagine ({ x, y, w, h }), per mostrare
 // solo la testa quando lo spazio è poco (la testata).
 
-export function mascot(name, { className, crop, lazy = true, decorative = true } = {}) {
+export function mascot(name, { className, crop, lazy = true, decorative = true, sizes } = {}) {
   const m = mascotte[name]
   if (!m) return ''
   const ar = (m.w / m.h).toFixed(4)
@@ -282,7 +286,7 @@ export function mascot(name, { className, crop, lazy = true, decorative = true }
   const nose = m.nose ? `<span class="masc__nose" style="--x:${m.nose.x}%;--y:${m.nose.y}%;--rx:${m.nose.rx}%;--ry:${m.nose.ry}%"></span>` : ''
   const body =
     `<span class="masc__body">` +
-    `<img class="masc__img" src="/media/mascotte/${name}.webp" width="${m.w}" height="${m.h}" alt="${decorative ? '' : esc(m.alt)}" loading="${lazy ? 'lazy' : 'eager'}" decoding="async" draggable="false">` +
+    `<img class="masc__img" src="/media/mascotte/${name}.webp" width="${m.w}" height="${m.h}" alt="${decorative ? '' : esc(m.alt)}" loading="${lazy ? 'lazy' : 'eager'}" sizes="${sizes || (lazy ? 'auto, 15rem' : '15rem')}" decoding="async" draggable="false">` +
     m.eyes.map(eye).join('') +
     nose +
     `</span>`
@@ -473,7 +477,7 @@ export function dataSheet(project, { compact = false } = {}) {
 }
 
 export const stat = ({ value, suffix = '', label, note }, i = 0) => html`
-  <div class="stat" data-reveal="up" style="--d:${i * 90}ms">
+  <div class="stat" data-reveal="up" style="--d:${i * 55}ms">
     <p class="stat__value"><span data-count="${value}">${value}</span>${suffix && `<span class="stat__suffix">${esc(suffix)}</span>`}</p>
     <div class="stat__dim" aria-hidden="true"><span></span></div>
     <p class="stat__label label">${esc(label)}</p>

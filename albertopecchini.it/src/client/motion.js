@@ -1,13 +1,19 @@
 // Micro-interazioni: rivelazione allo scorrimento, numeri animati, parallasse,
 // cursore personalizzato, elementi magnetici, anteprime flottanti e scorrevoli.
 
-import { $, $$, onScroll, clamp, lerp, reducedMotion, finePointer } from './utils.js'
+import { $, $$, onScroll, clamp, damp, reducedMotion, finePointer } from './utils.js'
+
+// Le testate delle pagine si rivelano da sole in CSS (base.css, «Primo schermo»):
+// qui basta segnarle come arrivate. Stesso elenco del foglio di stile.
+const FIRST_SCREEN = '.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf'
 
 // ── Rivelazione allo scorrimento ─────────────────────────────────────────────
 
 export function initReveal() {
-  const items = $$('[data-reveal]')
-  if (!items.length) return
+  const all = $$('[data-reveal]')
+  if (!all.length) return
+  const items = []
+  for (const el of all) el.closest(FIRST_SCREEN) ? el.classList.add('is-in') : items.push(el)
   if (!('IntersectionObserver' in window) || reducedMotion()) {
     items.forEach((el) => el.classList.add('is-in'))
     return
@@ -22,22 +28,32 @@ export function initReveal() {
     },
     { rootMargin: '0px 0px -7% 0px', threshold: 0.06 },
   )
-  // se la pagina entra con la tendina, aspetta che si sia alzata
-  const delay = document.documentElement.classList.contains('is-entering') ? 520 : 60
-  setTimeout(() => items.forEach((el) => io.observe(el)), delay)
+  // se la pagina entra con la tendina, aspetta che si sia alzata; altrimenti un
+  // fotogramma, perché lo stato nascosto sia già disegnato e la transizione parta
+  const observe = () => items.forEach((el) => io.observe(el))
+  if (document.documentElement.classList.contains('is-entering')) setTimeout(observe, 320)
+  else requestAnimationFrame(() => requestAnimationFrame(observe))
 
   // Un riquadro ancora chiuso dal clip-path — o solo traslato e trasparente —
   // risulta "non visibile" al lazy loading nativo: le sue immagini partirebbero
   // solo a rivelazione avvenuta, e un mockup che deve già conoscere l'altezza
   // della pagina per scorrere resterebbe vuoto. Le avviamo poco prima che
   // entrino nello schermo, così all'apertura sono già pronte.
+  // «sizes=auto» vale solo finché l'immagine è lazy: prima si legge la misura vera di
+  // tutte (una sola impaginazione), poi si scrive.
   const near = new IntersectionObserver(
     (entries) => {
+      const imgs = []
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
-        $$('img[loading="lazy"]', entry.target).forEach((img) => (img.loading = 'eager'))
+        imgs.push(...$$('img[loading="lazy"]', entry.target))
         near.unobserve(entry.target)
       }
+      const widths = imgs.map((img) => (img.sizes.startsWith('auto') ? img.offsetWidth : 0))
+      imgs.forEach((img, i) => {
+        if (widths[i]) img.sizes = `${widths[i]}px`
+        img.loading = 'eager'
+      })
     },
     { rootMargin: '900px 0px' },
   )
@@ -52,7 +68,7 @@ export function initCounters() {
   const run = (el) => {
     const target = Number(el.dataset.count)
     if (!Number.isFinite(target) || reducedMotion()) return
-    const duration = 1600
+    const duration = 1100
     const start = performance.now()
     const frame = (now) => {
       const t = clamp((now - start) / duration, 0, 1)
@@ -104,11 +120,14 @@ export function initParallax() {
     let cx = 0
     let cy = 0
     let raf
-    const loop = () => {
-      cx = lerp(cx, tx, 0.08)
-      cy = lerp(cy, ty, 0.08)
+    let then = 0
+    const loop = (now) => {
+      const dt = then ? now - then : 16.667
+      then = now
+      cx = damp(cx, tx, 0.1, dt)
+      cy = damp(cy, ty, 0.1, dt)
       tilt.style.transform = `perspective(1200px) rotateY(${(cx * 2.2).toFixed(2)}deg) rotateX(${(-cy * 2.2).toFixed(2)}deg) translate3d(${(cx * 6).toFixed(1)}px, ${(cy * 6).toFixed(1)}px, 0)`
-      raf = Math.abs(cx - tx) + Math.abs(cy - ty) > 0.001 ? requestAnimationFrame(loop) : null
+      raf = Math.abs(cx - tx) + Math.abs(cy - ty) > 0.001 ? requestAnimationFrame(loop) : ((then = 0), null)
     }
     area.addEventListener('pointermove', (e) => {
       const r = area.getBoundingClientRect()
@@ -135,12 +154,15 @@ export function initCursor() {
   let cx = x
   let cy = y
   let raf
+  let then = 0
 
-  const loop = () => {
-    cx = lerp(cx, x, 0.2)
-    cy = lerp(cy, y, 0.2)
+  const loop = (now) => {
+    const dt = then ? now - then : 16.667
+    then = now
+    cx = damp(cx, x, 0.28, dt)
+    cy = damp(cy, y, 0.28, dt)
     el.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`
-    raf = Math.abs(cx - x) + Math.abs(cy - y) > 0.1 ? requestAnimationFrame(loop) : null
+    raf = Math.abs(cx - x) + Math.abs(cy - y) > 0.1 ? requestAnimationFrame(loop) : ((then = 0), null)
   }
 
   addEventListener(
@@ -186,7 +208,7 @@ export function initMagnetic() {
       el.style.transform = `translate3d(${(dx * strength).toFixed(1)}px, ${(dy * strength).toFixed(1)}px, 0)`
     })
     el.addEventListener('pointerleave', () => {
-      el.style.transition = 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)'
+      el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
       el.style.transform = ''
     })
   })
@@ -206,13 +228,16 @@ export function initHoverPreview() {
   let cx = 0
   let cy = 0
   let raf
+  let then = 0
   let active = null
 
-  const loop = () => {
-    cx = lerp(cx, x, 0.14)
-    cy = lerp(cy, y, 0.14)
+  const loop = (now) => {
+    const dt = then ? now - then : 16.667
+    then = now
+    cx = damp(cx, x, 0.2, dt)
+    cy = damp(cy, y, 0.2, dt)
     box.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`
-    raf = active || Math.abs(cx - x) + Math.abs(cy - y) > 0.2 ? requestAnimationFrame(loop) : null
+    raf = active || Math.abs(cx - x) + Math.abs(cy - y) > 0.2 ? requestAnimationFrame(loop) : ((then = 0), null)
   }
 
   const eligible = (el) => !el.matches('.card') || el.closest('[data-view="list"]')
@@ -251,7 +276,7 @@ export function initScrollPreview() {
     const screen = page?.parentElement
     if (!page || !screen) return
     // pixel al secondo e durata massima: le pagine lunghe (iPhone) li alzano
-    const speed = Number(el.dataset.scrollSpeed) || 260
+    const speed = Number(el.dataset.scrollSpeed) || 340
     const longest = Number(el.dataset.scrollMax) || 9
 
     const start = () => {

@@ -162,10 +162,10 @@ export const easings = [
 ]
 
 export const durations = [
-  { token: '--t-1', label: '0,2 s', s: 0.2 },
-  { token: '--t-2', label: '0,45 s', s: 0.45 },
-  { token: '--t-3', label: '0,8 s', s: 0.8 },
-  { token: '--t-4', label: '1,2 s', s: 1.2 },
+  { token: '--t-1', label: '0,15 s', s: 0.15 },
+  { token: '--t-2', label: '0,3 s', s: 0.3 },
+  { token: '--t-3', label: '0,55 s', s: 0.55 },
+  { token: '--t-4', label: '0,8 s', s: 0.8 },
 ]
 
 export const motionNote = 'Rivelazioni: up, fade, scale, clip, line, draw e parola per parola.'

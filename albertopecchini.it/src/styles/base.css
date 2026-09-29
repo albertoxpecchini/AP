@@ -283,10 +283,6 @@ p {
   flex: none;
 }
 
-.icon--flip {
-  transform: rotate(180deg);
-}
-
 /* ── Tooltip (attributo data-tooltip) ─────────────────────────────────────── */
 
 [data-tooltip] {
@@ -347,7 +343,7 @@ p {
 
 .js [data-reveal='up'] {
   opacity: 0;
-  transform: translate3d(0, 1.75rem, 0);
+  transform: translate3d(0, 1.25rem, 0);
   transition: opacity var(--t-3) var(--ease-out) var(--d), transform var(--t-3) var(--ease-out) var(--d);
 }
 
@@ -373,14 +369,14 @@ p {
 .js [data-reveal='clip'] .media__inner,
 .js [data-reveal='clip'] .cover__inner {
   transform: scale(1.12);
-  transition: transform 1.6s var(--ease-out) var(--d);
+  transition: transform 1.05s var(--ease-out) var(--d);
 }
 
 .js [data-reveal='clip'] .media__caption,
 .js [data-reveal='clip'] .hero__caption,
 .js [data-reveal='clip'] .mark {
   opacity: 0;
-  transition: opacity var(--t-3) ease calc(var(--d) + 0.5s);
+  transition: opacity var(--t-3) ease calc(var(--d) + 0.3s);
 }
 
 /* "line": un filo che si stende da sinistra */
@@ -393,8 +389,8 @@ p {
 
 .js [data-reveal='words'] .w__i {
   transform: translate3d(0, 108%, 0);
-  transition: transform 0.95s var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 32ms + var(--d, 0ms));
+  transition: transform 0.7s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 22ms + var(--d, 0ms));
 }
 
 .js [data-reveal].is-in {
@@ -424,6 +420,85 @@ p {
   opacity: 1;
 }
 
+/* ── Primo schermo ── */
+/* La testata di ogni pagina non aspetta lo script: le sue rivelazioni sono
+   animazioni CSS che partono al primo disegno, così il titolo e il testo grande
+   arrivano subito (anche su una rete lenta) e i tempi non dipendono dal JS.
+   Lo stato di riposo è quello finale: l'animazione parte dallo stato nascosto.
+   Dopo la tendina d’ingresso (.nav-in) aspettano che si stia alzando.
+   L'elenco delle testate va tenuto allineato a FIRST_SCREEN in client/motion.js. */
+
+.js {
+  --enter: 0ms;
+}
+
+.js.nav-in {
+  --enter: 240ms;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) :is([data-reveal='up'], [data-reveal='fade']) {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  animation: reveal-up var(--t-3) var(--ease-out) calc(var(--d) + var(--enter)) both;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='fade'] {
+  animation-name: reveal-fade;
+  animation-timing-function: ease;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='words'] .w__i {
+  transform: none;
+  transition: none;
+  animation: reveal-word 0.7s var(--ease-out) calc(var(--i, 0) * 22ms + var(--d) + var(--enter)) both;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) :is([data-reveal='clip'] [data-clip], [data-reveal='clip'][data-clip]) {
+  clip-path: inset(0 0 0 0);
+  transition: none;
+  animation: reveal-clip var(--t-4) var(--ease-out) calc(var(--d) + var(--enter)) both;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] :is(.media__inner, .cover__inner) {
+  transform: none;
+  transition: none;
+  animation: reveal-zoom 1.05s var(--ease-out) calc(var(--d) + var(--enter)) both;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] :is(.media__caption, .hero__caption, .mark) {
+  transition: none;
+  animation: reveal-fade var(--t-3) ease calc(var(--d) + var(--enter) + 0.3s) both;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] :is(.media__caption, .hero__caption) {
+  opacity: 1;
+}
+
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] .mark {
+  opacity: 0.7;
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translate3d(0, 1.25rem, 0); }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+}
+
+@keyframes reveal-word {
+  from { transform: translate3d(0, 108%, 0); }
+}
+
+@keyframes reveal-clip {
+  from { clip-path: inset(0 0 100% 0); }
+}
+
+@keyframes reveal-zoom {
+  from { transform: scale(1.12); }
+}
+
 .words {
   display: inline;
 }
@@ -438,6 +513,10 @@ p {
 
 .w__i {
   display: inline-block;
+}
+
+/* lo strato serve solo finché la parola aspetta di salire */
+.js [data-reveal='words']:not(.is-in) .w__i {
   will-change: transform;
 }
 
@@ -449,6 +528,7 @@ p {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     transition-delay: 0ms !important;
+    animation-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
 
@@ -459,8 +539,7 @@ p {
   .js [data-reveal] .cover__inner,
   .js [data-reveal] .media__caption,
   .js [data-reveal] .hero__caption,
-  .js [data-reveal] .sig__guides,
-  .js [data-reveal] .foot-sign__meta {
+  .js [data-reveal] .sig__guides {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;

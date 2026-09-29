@@ -46,9 +46,9 @@ function hero() {
       <div class="hero__glow" aria-hidden="true"></div>
       <div class="hero__lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="container hero__wrap">
-        <div class="hero__hello" data-reveal="up" style="--d:60ms">
+        <div class="hero__hello" data-reveal="up" style="--d:30ms">
           <p class="hero__hi">
-            <span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" alt="" decoding="async" fetchpriority="high">${site.availability.open ? '<span class="hero__avatar-dot" aria-hidden="true"></span>' : ''}</span>
+            <span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="2.75rem" alt="" decoding="async" fetchpriority="high">${site.availability.open ? '<span class="hero__avatar-dot" aria-hidden="true"></span>' : ''}</span>
             <span class="hero__hi-text">Ciao, sono</span>
           </p>
           <p class="hero__place label">${esc(site.location.city)} — Italia<span class="hero__coords"> · ${COORDS}</span></p>
@@ -62,7 +62,7 @@ function hero() {
         <div class="rule rule--ticks hero__rule" aria-hidden="true"></div>
 
         <div class="hero__body">
-          <div class="hero__roles-wrap" data-reveal="up" style="--d:250ms">
+          <div class="hero__roles-wrap" data-reveal="up" style="--d:160ms">
             <p class="label hero__roles-label">Discipline</p>
             <ul class="hero__roles" data-hero-roles>
               ${site.roles.map(
@@ -71,7 +71,7 @@ function hero() {
             </ul>
           </div>
 
-          <figure class="hero__visual" data-hero data-reveal="clip" style="--d:150ms">
+          <figure class="hero__visual" data-hero data-reveal="clip" style="--d:100ms">
             <div class="hero__stage">
               <div class="hero__frame" data-tilt data-clip>
                 ${slides.map((s, i) => `<div class="hero__slide${i === 0 ? ' is-active' : ''}" data-hero-slide="${i}"${i ? ' aria-hidden="true"' : ''}>${s.body}</div>`)}
@@ -86,16 +86,16 @@ function hero() {
           </figure>
 
           <div class="hero__pitch">
-            <p class="hero__claim" data-reveal="up" style="--d:300ms">Disegno case, siti e marchi. Scendi a <em class="serif-i">curiosare.</em></p>
-            <p class="hero__lead" data-reveal="up" style="--d:380ms">Diplomato geometra, vivo a ${esc(site.location.city)}. Rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi: con lo stesso metodo e la stessa cura.</p>
-            <div class="hero__actions" data-reveal="up" style="--d:460ms">
+            <p class="hero__claim" data-reveal="up" style="--d:190ms">Disegno case, siti e marchi. Scendi a <em class="serif-i">curiosare.</em></p>
+            <p class="hero__lead" data-reveal="up" style="--d:240ms">Diplomato geometra, vivo a ${esc(site.location.city)}. Rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi: con lo stesso metodo e la stessa cura.</p>
+            <div class="hero__actions" data-reveal="up" style="--d:290ms">
               ${button({ href: '#discipline', label: 'Comincia da qui', iconName: 'arrowDown', size: 'lg', magnetic: true })}
               ${button({ href: cta.href, label: cta.label, variant: 'ghost', size: 'lg' })}
             </div>
           </div>
         </div>
 
-        <nav class="hero__next" aria-label="Cosa trovi scendendo" data-reveal="up" style="--d:560ms">
+        <nav class="hero__next" aria-label="Cosa trovi scendendo" data-reveal="up" style="--d:360ms">
           <p class="hero__next-label label"><span class="scroll-cue__line" aria-hidden="true"></span>Qui sotto</p>
           <ol class="hero__doors">
             ${heroDoors().map(
@@ -137,7 +137,7 @@ function disciplines() {
         <div class="disc">
           ${cards.map(
             (c, i) => html`
-              <a class="disc__card" href="${c.href}" data-reveal="up" style="--d:${i * 110}ms" data-cursor="Vedi">
+              <a class="disc__card" href="${c.href}" data-reveal="up" style="--d:${i * 65}ms" data-cursor="Vedi">
                 <div class="disc__top label"><span>${c.area.letter} — ${esc(c.area.title)}</span>${c.count ? `<span>${String(c.count).padStart(2, '0')} progetti</span>` : ''}</div>
                 ${media(c.image, { ratio: '4/3', reveal: null, caption: null, className: 'disc__media' })}
                 <h2 class="disc__title h3">${esc(c.area.lead)}</h2>
@@ -223,7 +223,7 @@ function services() {
         <ul class="svc__rows">
           ${serviceAreas.map(
             (a, i) => html`
-              <li class="svc__row" data-reveal="up" style="--d:${i * 80}ms">
+              <li class="svc__row" data-reveal="up" style="--d:${i * 50}ms">
                 <a class="svc__link" href="/servizi/#${a.key}">
                   <span class="svc__letter label">${a.letter}</span>
                   <span class="svc__name">${esc(a.title)}</span>
