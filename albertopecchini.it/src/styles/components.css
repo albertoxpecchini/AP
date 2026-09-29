@@ -1537,6 +1537,15 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   font-weight: 500;
 }
 
+/* il ripiego quando il server non consegna: la richiesta già scritta in un'email */
+.form__fallback {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .form__done {
   position: absolute;
   inset: 0;

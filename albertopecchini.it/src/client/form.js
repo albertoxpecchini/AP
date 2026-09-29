@@ -129,6 +129,28 @@ export function initForm() {
   const message = form.elements.messaggio
   message?.addEventListener('input', () => counter && (counter.textContent = `${message.value.length} / ${message.maxLength}`))
 
+  // La richiesta come email già scritta: serve senza endpoint e come ripiego
+  // quando il server non riesce a consegnarla.
+  const mailto = (data) => {
+    const lines = [`Nome: ${data.nome}`, `Email: ${data.email}`]
+    if (data.telefono) lines.push(`Telefono: ${data.telefono}`)
+    lines.push(`Tipo di progetto: ${data.tipo}`)
+    if (data.budget) lines.push(`Budget: ${data.budget}`)
+    lines.push('', data.messaggio)
+    return `mailto:${form.dataset.mail}?subject=${encodeURIComponent(form.dataset.subject + data.tipo)}&body=${encodeURIComponent(lines.join('\n'))}`
+  }
+
+  // Consegna fallita lato server (o rete giù a metà): il testo scritto non va
+  // perso, un clic lo apre nel programma di posta di chi scrive.
+  const fallback = (data, text) => {
+    setState('error', text)
+    const link = document.createElement('a')
+    link.className = 'form__fallback'
+    link.href = mailto(data)
+    link.textContent = 'Invia la richiesta via email, già scritta →'
+    status.append(' ', link)
+  }
+
   const setState = (state, text = '') => {
     form.classList.toggle('is-loading', state === 'loading')
     form.classList.toggle('is-error', state === 'error')
@@ -171,6 +193,11 @@ export function initForm() {
           // Il server spiega cosa non va: meglio il suo messaggio di uno generico.
           const payload = await response.json().catch(() => null)
           turnstile?.reset()
+          // consegna non riuscita (5xx): niente vicolo cieco, il ripiego via email
+          if (response.status >= 500) {
+            fallback(data, 'Il modulo in questo momento non riesce a consegnare la richiesta.')
+            return
+          }
           if (payload?.fields?.length) {
             const first = fields.find((f) => payload.fields.includes(f.name))
             setState('error', payload.error || 'Controlla i campi evidenziati.')
@@ -186,19 +213,15 @@ export function initForm() {
         doneText.textContent = `Grazie ${data.nome.split(' ')[0]}: ho ricevuto la richiesta e ti rispondo entro un giorno lavorativo all’indirizzo ${data.email}.`
       } else {
         await new Promise((resolve) => setTimeout(resolve, 650))
-        const lines = [`Nome: ${data.nome}`, `Email: ${data.email}`]
-        if (data.telefono) lines.push(`Telefono: ${data.telefono}`)
-        lines.push(`Tipo di progetto: ${data.tipo}`)
-        if (data.budget) lines.push(`Budget: ${data.budget}`)
-        lines.push('', data.messaggio)
-        location.href = `mailto:${form.dataset.mail}?subject=${encodeURIComponent(form.dataset.subject + data.tipo)}&body=${encodeURIComponent(lines.join('\n'))}`
+        location.href = mailto(data)
         doneText.textContent = `Si è aperto il tuo programma di posta con il messaggio già compilato: premi «Invia» per spedirlo. Se non si è aperto nulla, scrivimi a ${form.dataset.mail}.`
       }
       setState('idle')
       done.hidden = false
       done.focus()
     } catch (err) {
-      setState('error', navigator.onLine ? `L’invio non è riuscito. Riprova tra poco oppure scrivimi a ${form.dataset.mail}.` : 'Sembra che tu sia offline: controlla la connessione e riprova.')
+      if (navigator.onLine) fallback(data, 'L’invio non è riuscito.')
+      else setState('error', 'Sembra che tu sia offline: controlla la connessione e riprova.')
     }
   })
 
