@@ -328,7 +328,7 @@ export const personLd = () => ({
   description: site.description,
   email: `mailto:${site.contact.email}`,
   address: { '@type': 'PostalAddress', addressLocality: site.location.city, addressRegion: site.location.region, postalCode: site.location.cap, addressCountry: site.location.country },
-  knowsAbout: ['Rilievo topografico', 'Catasto', 'AutoCAD', 'BIM', 'Web design', 'Sviluppo frontend', 'Brand identity', 'Graphic design'],
+  knowsAbout: ['Rilievo topografico', 'Catasto', 'AutoCAD', 'BIM', 'Web design', 'Sviluppo frontend', 'Brand identity', 'Graphic design', 'Assistenza informatica', 'Microsoft Windows', 'Microsoft Office'],
   sameAs: site.social.map((s) => s.url),
 })
 

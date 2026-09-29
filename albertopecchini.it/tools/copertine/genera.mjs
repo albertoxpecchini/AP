@@ -40,7 +40,8 @@ async function genera(slug) {
   for (const f of c.riferimenti) refs.push(await upload(f))
   console.log(`→ ${slug}: ${n} × qualità high, attendo il modello…`)
   const input = {
-    prompt: `${c.soggetto}\n\n${STILE}`,
+    // una voce che non è un blocco di terreno sceglie un linguaggio delle viste (`stile`)
+    prompt: `${c.soggetto}\n\n${c.stile ? STILI[c.stile] : STILE}`,
     ...(refs.length && { input_images: refs }),
     aspect_ratio: '3:2',
     quality: 'high',
@@ -128,7 +129,8 @@ function webp({ w, h, raw }, out, width) {
 
 async function usa(slug, file) {
   if (!copertine[slug]) die(`nessuna copertina per «${slug}»`)
-  const outDir = join(ROOT, 'public/media/progetti', slug)
+  // `cartella`: una copertina che non è di un progetto (l'area Informatica dei servizi)
+  const outDir = join(ROOT, copertine[slug].cartella || join('public/media/progetti', slug))
   await mkdir(outDir, { recursive: true })
   const t = await tela(file)
   webp(t, join(outDir, 'copertina.webp'))

@@ -6,9 +6,11 @@
   border-block: 1px solid var(--line-strong);
 }
 
+/* tante colonne quante sono le aree (quattro con l'informatica) */
 .anchors__inner {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
 }
 
 .anchors__link {
@@ -35,6 +37,27 @@
   .anchors__link:hover {
     color: var(--accent-text);
   }
+}
+
+/* sul telefono quattro voci vanno su due righe */
+@media (max-width: 639px) {
+  .anchors__inner:has(> :nth-child(4)) {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .anchors__inner:has(> :nth-child(4)) .anchors__link:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .anchors__inner:has(> :nth-child(4)) .anchors__link:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+
+.anchors--sm .anchors__link {
+  font-size: clamp(1rem, 0.8rem + 0.9vw, 1.625rem);
 }
 
 .sarea {
@@ -159,9 +182,10 @@
   }
 }
 
-@media (min-width: 900px) {
+/* quattro lavori, due per riga: in quattro colonne il codice («A + C») andrebbe a capo */
+@media (min-width: 760px) {
   .bund__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -180,6 +204,262 @@
   .faq__grid {
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     gap: clamp(2rem, 5vw, 6rem);
+  }
+}
+
+/* ── Informatica (/servizi/informatica/) ───────────────────────────────────── */
+
+.itc {
+  padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.itc__cover {
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.itc__facts {
+  display: grid;
+  column-gap: var(--col-gap);
+  border-top: 1px solid var(--line-strong);
+}
+
+.itc__facts > div {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.itc__facts dd {
+  font-size: var(--fs-h4);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.itc__facts > div:last-child dd {
+  color: var(--accent-text);
+}
+
+@media (min-width: 760px) {
+  .itc__facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .itc__facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .itc__facts > div {
+    border-bottom: 0;
+  }
+}
+
+.itc-group {
+  padding-block: clamp(3.5rem, 2rem + 5vw, 7rem);
+}
+
+.itc-group .h2 {
+  max-width: 12ch;
+}
+
+/* versioni di Windows e Office */
+.itv__grid {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem) var(--col-gap);
+}
+
+.itv__col {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.itv__top {
+  --box: clamp(4.5rem, 3rem + 4vw, 7rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.itv__fig {
+  width: var(--box);
+  height: var(--box);
+  object-fit: contain;
+  object-position: 100% 100%;
+}
+
+.itv__list > div {
+  display: grid;
+  gap: 0.4rem;
+  padding-block: 1.1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.itv__list dt {
+  font-size: var(--fs-h4);
+  font-weight: 540;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.itv__list dd {
+  max-width: 60ch;
+  color: var(--muted);
+}
+
+.itv__note {
+  max-width: 72ch;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .itv__list > div {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: var(--col-gap);
+  }
+}
+
+@media (min-width: 1024px) {
+  .itv__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* il regalo del primo intervento */
+.itg {
+  padding-block: clamp(3.5rem, 2rem + 5vw, 7rem);
+}
+
+.itg__box {
+  display: grid;
+  gap: 1.5rem clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg));
+}
+
+.itg__price {
+  display: flex;
+  align-items: flex-start;
+  font-weight: 500;
+  font-stretch: 70%;
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+  color: var(--accent);
+}
+
+.itg__zero {
+  font-size: clamp(7rem, 4rem + 12vw, 15rem);
+}
+
+.itg__cur {
+  margin-top: 0.3em;
+  font-size: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+}
+
+.itg__body {
+  display: grid;
+  gap: 1rem;
+  max-width: 60ch;
+}
+
+.itg__body .label {
+  color: var(--accent-text);
+}
+
+.itg__note {
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .itg__box {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}
+
+/* come si svolge */
+.its__grid {
+  display: grid;
+  gap: 2rem var(--col-gap);
+}
+
+.its__grid li {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-strong);
+}
+
+.its__n {
+  font-size: clamp(2.5rem, 1.8rem + 3vw, 4.5rem);
+  font-weight: 500;
+  font-stretch: 70%;
+  letter-spacing: -0.05em;
+  line-height: 0.85;
+  color: var(--accent);
+}
+
+.its__grid p {
+  color: var(--muted);
+}
+
+@media (min-width: 700px) {
+  .its__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .its__grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* invito finale */
+.itk__grid {
+  display: grid;
+  gap: 2rem;
+  align-items: end;
+}
+
+.itk__title {
+  max-width: 11ch;
+  font-size: var(--fs-display);
+  font-weight: 540;
+  font-stretch: 88%;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.itk__side {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 34rem;
+}
+
+.itk__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .itk__grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 6vw, 6rem);
   }
 }
 
@@ -1142,6 +1422,11 @@
     position: sticky;
     top: calc(var(--header-h) + 1.5rem);
   }
+}
+
+/* /contatti/?tipo=…#modulo arriva al modulo senza finire sotto la testata */
+.cnt__formwrap {
+  scroll-margin-top: calc(var(--header-h) + 1.5rem);
 }
 
 /* Telefono: l'iPhone con il numero sul tastierino, accanto al testo */

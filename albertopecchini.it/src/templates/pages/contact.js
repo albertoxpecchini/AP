@@ -99,7 +99,7 @@ export function contattiPage() {
             </dl>
           </div>
 
-          <div class="cnt__formwrap" data-reveal="up">
+          <div class="cnt__formwrap" id="modulo" data-reveal="up">
             <form class="form" data-form novalidate action="mailto:${site.contact.email}" method="post" enctype="text/plain" data-endpoint="${esc(site.form.endpoint)}" data-subject="${esc(site.form.subject)}" data-mail="${esc(site.contact.email)}">
               <div class="form__head label"><span>Modulo di contatto</span><span>MOD. 01</span></div>
               <p class="form__note">I campi con <span aria-hidden="true">*</span><span class="sr-only">asterisco</span> sono obbligatori.</p>

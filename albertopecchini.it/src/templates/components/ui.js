@@ -398,7 +398,7 @@ const statusBar = html`
 
 /** Il credito della cornice, obbligatorio con la licenza CC BY-SA. */
 export const iphoneCredit = ({ className } = {}) =>
-  `<p class="${cx('iphone-credit label', className)} target="_blank" rel="noopener noreferrer"></p>`
+  `<p class="${cx('iphone-credit label', className)}"></p>`
 
 /**
  * iPhone 18 Pro con `screen` sullo schermo, sotto la barra di stato e l'isola.

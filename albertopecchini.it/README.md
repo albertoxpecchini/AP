@@ -93,7 +93,8 @@ albertopecchini.it/
 │  ├─ data/                CONTENUTI: l’unica cosa da toccare per aggiornare il sito
 │  │  ├─ site.js           identità, contatti, dati legali, social, navigazione, CTA, numeri, segnaposto
 │  │  ├─ projects.js       portfolio: categorie, aree, progetti e i due interruttori di pubblicazione
-│  │  ├─ services.js       tre aree di servizi, pacchetti, FAQ
+│  │  ├─ services.js       quattro aree di servizi (tecnico, digitale, grafica, informatica), pacchetti, FAQ
+│  │  ├─ informatica.js    la pagina /servizi/informatica/: gruppi, versioni di Windows e Office, regalo, passaggi, regole, FAQ
 │  │  ├─ method.js         le sette fasi del metodo
 │  │  ├─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
 │  │  ├─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
@@ -109,7 +110,7 @@ albertopecchini.it/
 │  │  │  ├─ ui.js          icone, monogramma, bottoni, tasti «sasso» (pebble), mascotte, intestazioni di sezione, media, mockup, schede dati
 │  │  │  ├─ project.js     card, riga d’indice, copertina e anteprima di un progetto
 │  │  │  └─ viewer.js      visualizzatore delle tavole (case study e pagina Tavole)
-│  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), contact, legal (privacy, cookie, 404), stile (sistema visivo), tavole (visualizzatore)
+│  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), informatica (assistenza informatica), contact, legal (privacy, cookie, 404), stile (sistema visivo), tavole (visualizzatore)
 │  ├─ art/                 generatori SVG delle tavole segnaposto
 │  │  ├─ index.js          registro: renderArt({ art, variant, tone, … })
 │  │  ├─ kit.js            primitive di disegno (squadratura, quote, tratteggi, testi)
@@ -156,7 +157,8 @@ albertopecchini.it/
 | `/portfolio/` | Indice completo con filtri (categoria, anno, settore, tecnologia, tipologia) |
 | `/portfolio/tecnico/` · `/portfolio/web/` | Le aree pubblicate (Grafica è nascosta, vedi [Progetti](#progetti)) |
 | `/portfolio/<slug>/` | Case study in nove sezioni, uno per ogni progetto in `projects.js` |
-| `/servizi/` | Servizi per area, con ciò che viene consegnato; pacchetti e FAQ |
+| `/servizi/` | Servizi per area (A tecnico, B digitale, C grafica, D informatica), con ciò che viene consegnato; pacchetti e FAQ |
+| `/servizi/informatica/` | L’assistenza informatica sul serio: i servizi dell’area D in quattro gruppi, le versioni di Windows (XP → 11, LTSC, ARM64, Server) e di Office (Click-to-Run, installazione personalizzata, MSI, Mac), l’installazione di Windows o Office in regalo al primo intervento sopra i 50 € (il lavoro, non la licenza), come si svolge un intervento, regole, FAQ e invito con telefono, WhatsApp e modulo (`/contatti/?tipo=Assistenza%20informatica#modulo` preseleziona la voce). Dati in `src/data/informatica.js`, servizi in `src/data/services.js` (campo `group`) |
 | `/metodo/` | Le sette fasi del lavoro |
 | `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
@@ -184,6 +186,7 @@ Le rotte sono definite in `src/templates/routes.js`: ogni voce ha percorso, `tit
 | pubblicare (o rinascondere) i progetti dimostrativi | `src/data/projects.js → showSamples` |
 | rimettere online un’area del portfolio | `src/data/projects.js → allAreas` (togliere `hidden`) |
 | modificare i servizi, i pacchetti, le FAQ | `src/data/services.js` |
+| modificare versioni, regalo, passaggi e FAQ dell’assistenza informatica | `src/data/informatica.js` |
 | modificare le sette fasi del metodo | `src/data/method.js` |
 | modificare biografia, fotografie, timeline, valori, curriculum | `src/data/studio.js` |
 | cambiare title e description di una pagina | `src/templates/routes.js` |
@@ -392,6 +395,7 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | Immagini | Dove stanno | Fonte |
 | --- | --- | --- |
 | Copertine e gallerie dei progetti non web (strada, bar-caffetteria, cantiere, tettoie, museo) | `public/media/progetti/<slug>/copertina.webp`, `vista-NN*.webp` | Generate con **openai/gpt-image-2** (OpenAI) su [Replicate](https://replicate.com/openai/gpt-image-2), con le tavole originali o le fotografie del museo come riferimento — [`tools/copertine`](tools/copertine/README.md) |
+| Illustrazione dell’assistenza informatica | `public/media/servizi/informatica/copertina.webp` | Generata con **openai/gpt-image-2** su Replicate — [`tools/copertine`](tools/copertine/README.md) (voce `informatica`) |
 | Figurine, sagome dei tasti (`tasto-*.webp`), mini immagini del piè di pagina (`chrome-*.webp`) | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
 | Mascotte: chiocciola gigante africana e tartaruga di terra | `public/media/mascotte/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/mascotte`](tools/mascotte/README.md); gli occhi mobili sono disegnati dal codice del sito |
 | Ingredienti e annunci di «Better Call Pekko» (/assistenza/) | `public/media/assistenza/` | Gli ingredienti (ritagli di Alberto in completi sgargianti, foto stock finte, oggetti, avatar, tre sfondi) sono generati con **openai/gpt-image-2** su Replicate, il volto dalla fototessera data come riferimento; gli annunci `ad-*` sono composti a strati in HTML da [`tools/assistenza`](tools/assistenza/README.md) (testo, starburst e nastri del sito) e fotografati con il browser headless; le GIF montano i fotogrammi con ffmpeg |

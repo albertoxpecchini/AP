@@ -1,4 +1,4 @@
-// Servizi, organizzati in tre macroaree. Ogni servizio ha una descrizione breve
+// Servizi, organizzati in quattro macroaree. Ogni servizio ha una descrizione breve
 // e ciò che viene consegnato (`output`), così il cliente sa cosa riceve.
 //
 // `footer`: le voci richiamate nel footer di ogni pagina. È una scelta esplicita,
@@ -68,9 +68,43 @@ export const serviceAreas = [
       { title: 'Materiale aziendale', text: 'Biglietti da visita, carta intestata, buste, insegne, targhe, modelli Word e PowerPoint, cartigli per tavole tecniche.', output: 'File di stampa · modelli Office' },
     ],
   },
+  {
+    key: 'informatica',
+    letter: 'D',
+    title: 'Informatica',
+    lead: 'Computer che si accendono, stampano e ritrovano i file.',
+    footer: ['Pulizia da virus', 'Windows', 'Backup e recupero dati'],
+    intro:
+      'Assistenza informatica per privati, famiglie e piccoli uffici. Prima di toccare il sistema faccio una copia dei tuoi dati; alla fine ti dico cosa ho trovato e cosa ho cambiato.',
+    art: { src: '/media/servizi/informatica/copertina.webp', width: 1920, height: 1280, alt: 'Illustrazione in assonometria di un piccolo studio in ordine: una persona alla scrivania con monitor e portatile, accanto il computer fisso aperto e il suo pannello laterale in minio appoggiato alla gamba del tavolo; sul mobile basso la stampante, il router, il disco esterno e i raccoglitori' },
+    portfolio: null,
+    // Al posto del portfolio, la pagina dell'area: versioni di Windows e Office,
+    // come si svolge un intervento, domande frequenti (src/data/informatica.js).
+    page: { href: '/servizi/informatica/', label: 'Assistenza informatica nel dettaglio' },
+    // `group` raggruppa i servizi nella pagina dell'area (gruppi in src/data/informatica.js).
+    services: [
+      { group: 'sicurezza', title: 'Pulizia da virus', text: 'Virus, malware, pubblicità che si aprono da sole, estensioni del browser mai installate, programmi che partono all’avvio. Li tolgo, controllo che non tornino e lascio una protezione configurata, senza abbonamenti che non servono.', output: 'Computer pulito · elenco di cosa è stato rimosso' },
+      { group: 'sicurezza', title: 'Aggiornamento hardware', text: 'Un SSD al posto del disco meccanico, più memoria RAM, pulizia interna dalla polvere e pasta termica nuova: un computer di qualche anno torna veloce e silenzioso.', output: 'Computer più veloce · pezzi sostituiti restituiti' },
+      { group: 'sicurezza', title: 'Posta e account', text: 'Email configurata su computer e telefono, accessi persi da recuperare, verifica in due passaggi, un gestore di password al posto del foglietto sotto la tastiera.', output: 'Accessi in ordine · codici di recupero consegnati' },
+      { group: 'file', title: 'File doppioni', text: 'La stessa foto salvata quattro volte, «Copia di copia di». Confronto i file per contenuto, non per nome, e cancello solo quello che approvi tu.', output: 'Spazio liberato · elenco dei doppioni' },
+      { group: 'file', title: 'Riordino cartelle', text: 'Desktop pieno, Download che traboccano, foto sparse fra computer, chiavette e telefono. Una struttura di cartelle semplice, con nomi coerenti, che resta in ordine anche dopo.', output: 'Archivio ordinato · schema delle cartelle' },
+      { group: 'file', title: 'Backup e recupero dati', text: 'Copie automatiche su un disco esterno o nel cloud, prima che servano. E quando è tardi, recupero dei file cancellati da dischi, chiavette e schede SD, finché il supporto lo permette.', output: 'Backup configurato · file recuperati' },
+      { group: 'file', title: 'Impaginazione documenti', text: 'Tesi, relazioni, curriculum, regolamenti, menù: stili, indice automatico, numeri di pagina, intestazioni, immagini che restano al loro posto. Stesso testo, forma ordinata.', output: 'Documento Word e PDF · modello riutilizzabile' },
+      { group: 'file', title: 'Conversione di formati', text: 'DOC, DOCX, ODT, Pages, PDF, immagini, audio e video. PDF da rendere modificabili, scansioni da trasformare in testo ricercabile, file vecchi che nessun programma apre più.', output: 'File nel formato che ti serve' },
+      { group: 'periferiche', title: 'Stampanti e scanner', text: 'La stampante che non stampa, la coda bloccata, lo scanner che non vede il computer, la stampante Wi-Fi che sparisce dalla rete. Installazione, driver e collegamento a tutti i dispositivi di casa o dell’ufficio.', output: 'Pagina di prova · scansione verificata' },
+      { group: 'periferiche', title: 'Audio e periferiche', text: 'Casse mute, microfono che gracchia, cuffie Bluetooth che non si collegano, webcam che non viene riconosciuta. Capisco se è un’impostazione, un driver o il cavo, e lo sistemo.', output: 'Audio, microfono e webcam provati' },
+      { group: 'periferiche', title: 'Driver', text: 'Scheda video, audio, rete, chipset: i driver giusti, presi dal produttore e non dai programmi che promettono di aggiornarli tutti. Se un aggiornamento rompe qualcosa, si torna alla versione che funzionava.', output: 'Driver aggiornati · punto di ripristino' },
+      { group: 'periferiche', title: 'Rete e Wi-Fi', text: 'Router, ripetitori, stanze dove il segnale non arriva, stampanti e dischi condivisi in rete, la password del Wi-Fi che nessuno ricorda più.', output: 'Rete funzionante · credenziali annotate per te' },
+      { group: 'sistemi', title: 'Windows', text: 'Installazione pulita, aggiornamento e riparazione di Windows 11 e 10, delle edizioni LTSC, ARM64 e Server, e delle versioni precedenti fino a XP per i computer e i programmi che devono restare com’erano.', output: 'Sistema installato e aggiornato · dati riportati' },
+      { group: 'sistemi', title: 'Microsoft Office', text: 'Installazione, riparazione e configurazione di Microsoft 365 e di Office dal 2010 al 2024, anche su Mac. Solo i programmi che usi, Outlook collegato alla tua posta.', output: 'Office attivato con la tua licenza · posta configurata' },
+      { group: 'sistemi', title: 'Ripristino del sistema', text: 'Il computer torna com’era il primo giorno senza perdere foto, documenti e posta: copia dei dati, ripristino, programmi e stampante reinstallati.', output: 'Sistema ripristinato · copia dei dati' },
+      { group: 'sistemi', title: 'Cambio di sistema operativo', text: 'Da Windows 10 a 11, da Windows a Linux, su un disco nuovo. Prima verifico che programmi e periferiche funzionino sul nuovo sistema, poi sposto dati, impostazioni e posta.', output: 'Nuovo sistema · dati e programmi trasferiti' },
+      { group: 'sistemi', title: 'Computer nuovo', text: 'Configurazione, via i programmi di prova superflui, trasferimento di file, posta, preferiti e stampante dal computer vecchio, che poi viene cancellato in modo sicuro.', output: 'Computer pronto all’uso · dati trasferiti' },
+    ],
+  },
 ]
 
-// Pacchetti trasversali: il motivo per cui i tre mestieri stanno nello stesso studio.
+// Pacchetti trasversali: il motivo per cui i quattro mestieri stanno nello stesso studio.
 export const bundles = [
   {
     code: 'A + C',
@@ -89,6 +123,12 @@ export const bundles = [
     title: 'Il progetto, online',
     text: 'Una pagina riservata per il committente con tavole, modello 3D navigabile, stato della pratica e avanzamento del cantiere. Niente più allegati persi nelle email.',
     parts: ['Modello 3D', 'Tavole', 'Area riservata', 'Aggiornamenti'],
+  },
+  {
+    code: 'B + D',
+    title: 'Il sito e i computer dell’ufficio',
+    text: 'Chi ha fatto il sito configura anche la posta sul dominio in tutti i computer e i telefoni, la stampante di rete e i backup. Quando qualcosa non va, non si rimbalza fra due tecnici.',
+    parts: ['Sito web', 'Posta sul dominio', 'Rete e stampanti', 'Backup'],
   },
 ]
 

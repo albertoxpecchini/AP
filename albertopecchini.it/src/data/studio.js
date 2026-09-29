@@ -153,6 +153,7 @@ export const profile = {
     { group: 'Area tecnica', items: ['AutoCAD 2D/3D', 'cadwork', 'Archicad', 'Topografia e rilievo strumentale', 'Estimo', 'Disegno tecnico', 'Pratiche edilizie e catastali', 'QGIS', 'Excel avanzato'] },
     { group: 'Sviluppo web', items: ['HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'Astro', 'Tailwind CSS', 'GSAP', 'Accessibilità e performance', 'SEO tecnica', 'Git', 'Vite', 'Vercel'] },
     { group: 'Design', items: ['UI/UX', 'Figma', 'Design system', 'Identità visiva', 'Impaginazione', 'Motion', 'Illustrator · InDesign · Photoshop', 'Fotografia di prodotto'] },
+    { group: 'Informatica', items: ['Windows da XP a 11 · LTSC · ARM64 · Server', 'Microsoft 365 e Office (Click-to-Run, ODT, MSI)', 'Office per Mac', 'Linux', 'Rimozione malware', 'Driver e periferiche', 'Backup e recupero dati', 'Reti domestiche', 'Aggiornamento hardware', 'Impaginazione e conversione di documenti'] },
   ],
   languages: [
     { name: 'Italiano', level: 'Madrelingua' },

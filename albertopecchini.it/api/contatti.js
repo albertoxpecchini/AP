@@ -36,6 +36,7 @@ const FORMS = {
       'Sito web o landing page',
       'Logo e identità visiva',
       'Grafica e materiale stampato',
+      'Assistenza informatica',
       'Un progetto che unisce più ambiti',
       'Altro',
     ],

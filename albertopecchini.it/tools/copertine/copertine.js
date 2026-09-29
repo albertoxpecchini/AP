@@ -60,6 +60,21 @@ The roof is a standing-seam metal sheet painted vermilion, laid only on the back
 Under the canopy a small parked car and a garden table with chairs; a gravel driveway, a lawn in sage green, a low hedge, two small trees.`,
   },
 
+  // Non è un progetto: l'illustrazione dell'area D dei servizi (assistenza
+  // informatica), in /servizi/ e nella sua pagina. Niente terreno da tagliare:
+  // `stile` usa il linguaggio `blocco` delle viste, `cartella` la manda fuori
+  // dalle cartelle dei progetti.
+  informatica: {
+    riferimenti: [],
+    stile: 'blocco',
+    cartella: 'public/media/servizi/informatica',
+    alt: 'Illustrazione in assonometria di un piccolo studio in ordine: una persona alla scrivania con monitor e portatile, accanto il computer fisso aperto e il suo pannello laterale in minio appoggiato alla gamba del tavolo; sul mobile basso la stampante, il router, il disco esterno e i raccoglitori',
+    soggetto: `An isometric cut-away of a small, tidy home office: a square floor slab with two walls meeting at the back corner, like an architectural model cut out of a building; the cut edges of the floor and of the walls show their layers in section.
+On a light timber desk against the back wall: a desktop computer tower with its side panel removed, showing the motherboard, the memory sticks and the fans inside; the removed side panel, painted vermilion, leans against the desk leg. Next to it a monitor and an open laptop, both showing only abstract shapes and a progress bar, a keyboard, a mouse and an open screwdriver set.
+On a low shelf along the side wall: a compact printer with a sheet coming out, a wireless router with two antennas and tiny status lights, a portable external hard drive, and a row of neat file folders. A desk chair, a small potted plant, cables tidied with ties along the wall.
+The vermilion side panel of the computer is the only vermilion element. Everything tidy, calm and readable, like a well-kept workshop.`,
+  },
+
   'museo-mestieri-del-fiume': {
     riferimenti: ['public/media/progetti/museo-mestieri-del-fiume/01-full.webp', 'public/media/progetti/museo-mestieri-del-fiume/02-full.webp'],
     alt: 'Illustrazione in assonometria del museo sul Mincio: gli edifici rurali rossi intorno al prato, il pontile di legno con la barca da pesca, il canneto sull’altra sponda e le biciclette della classe all’ingresso',

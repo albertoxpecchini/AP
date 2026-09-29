@@ -63,6 +63,11 @@ il bordo dell'originale. Poi bilancia i colori perché la carta sia esattamente
 
 In `src/data/projects.js` la copertina si dichiara con `drawnCover(slug, alt)`.
 
+Una voce può non essere un progetto: `informatica` è l'illustrazione dell'area D dei
+servizi (un piccolo studio in assonometria). Ha `stile: 'blocco'`, cioè il linguaggio
+delle viste al posto del blocco di terreno, e `cartella`, dove `usa` scrive
+`copertina.webp` (qui `public/media/servizi/informatica/`).
+
 ## Un progetto nuovo
 
 1. Aggiungere la voce in `copertine.js`: `riferimenti` sono le tavole più leggibili

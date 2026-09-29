@@ -8,7 +8,7 @@ import { bio, photos, facts, timeline, approach, values, tools, profile } from '
 import { button, textLink, media, tagList, icon, splitWords, breadcrumb, sectionHead, monogram, figurina, figName } from '../components/ui.js'
 import { signature } from './home.js'
 
-const head = ({ crumbs, index, label, title, accent, lead, meta }) => html`
+export const head = ({ crumbs, index, label, title, accent, lead, meta }) => html`
   <header class="phead">
     <div class="container">
       ${breadcrumb(crumbs)}
@@ -31,8 +31,8 @@ export function serviziPage() {
       label: 'Servizi',
       title: 'Cosa posso fare, e cosa ricevi.',
       accent: ['ricevi.'],
-      lead: 'Tre macroaree, ventuno servizi. Per ognuno trovi una descrizione breve e l’elenco di ciò che ti viene consegnato: così confronti i preventivi sulle stesse voci.',
-      meta: `${String(total).padStart(2, '0')} servizi · 3 aree`,
+      lead: 'Quattro macroaree, dal rilievo al computer che non parte. Per ogni servizio trovi una descrizione breve e l’elenco di ciò che ti viene consegnato: così confronti i preventivi sulle stesse voci.',
+      meta: `${String(total).padStart(2, '0')} servizi · ${serviceAreas.length} aree`,
     })}
 
     <nav class="anchors" aria-label="Aree di servizio">
@@ -43,7 +43,7 @@ export function serviziPage() {
 
     ${serviceAreas.map(
       (a, ai) => html`
-        <section class="sarea${ai === 1 ? ' sarea--ink' : ''}" id="${a.key}"${ai === 1 ? ' data-theme="ink"' : ''} aria-labelledby="sarea-${a.key}">
+        <section class="sarea${ai % 2 ? ' sarea--ink' : ''}" id="${a.key}"${ai % 2 ? ' data-theme="ink"' : ''} aria-labelledby="sarea-${a.key}">
           <div class="container sarea__grid">
             <div class="sarea__side">
               <div class="sarea__sticky">
@@ -52,7 +52,7 @@ export function serviziPage() {
                 <p class="sarea__lead serif-i">${esc(a.lead)}</p>
                 <p class="sarea__intro">${esc(a.intro)}</p>
                 ${media(a.art, { ratio: '4/3', caption: null, className: 'sarea__art' })}
-                ${a.portfolio ? textLink({ href: a.portfolio, label: `Progetti: ${a.title.toLowerCase()}` }) : ''}
+                ${a.portfolio ? textLink({ href: a.portfolio, label: `Progetti: ${a.title.toLowerCase()}` }) : a.page ? textLink(a.page) : ''}
               </div>
             </div>
             <ol class="sarea__list">
@@ -75,7 +75,7 @@ export function serviziPage() {
 
     <section class="section bund">
       <div class="container">
-        ${sectionHead({ index: 'A+B+C', label: 'Lavori trasversali', title: 'Quando le aree si sommano', lead: 'Il motivo per cui tre mestieri stanno nello stesso studio: certi problemi si risolvono meglio senza passare il lavoro di mano.' })}
+        ${sectionHead({ index: serviceAreas.map((a) => a.letter).join('+'), label: 'Lavori trasversali', title: 'Quando le aree si sommano', lead: 'Il motivo per cui questi mestieri stanno nello stesso studio: certi problemi si risolvono meglio senza passare il lavoro di mano.' })}
         <ul class="bund__grid">
           ${bundles.map(
             (b, i) => html`

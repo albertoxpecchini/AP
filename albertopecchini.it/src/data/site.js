@@ -26,10 +26,10 @@ export const site = {
     { key: 'grafica', label: 'Graphic Designer', note: 'Brand · Editoria' },
   ],
   claim: 'Progetto spazi, strumenti e identità digitali.',
-  // Riga sotto il nome nel footer: i tre ambiti, in breve.
-  tagline: 'Disegno tecnico · Web · Grafica',
+  // Riga sotto il nome nel footer: gli ambiti, in breve.
+  tagline: 'Disegno tecnico · Web · Grafica · Informatica',
   description:
-    'Alberto Pecchini, diplomato geometra, web designer e graphic designer in provincia di Mantova. Rilievi, CAD e modellazione 3D, siti web su misura e identità visive: un solo interlocutore, dallo stato di fatto alla messa online.',
+    'Alberto Pecchini, diplomato geometra, web designer e graphic designer in provincia di Mantova. Rilievi, CAD e modellazione 3D, siti web su misura, identità visive e assistenza informatica: un solo interlocutore, dallo stato di fatto alla messa online.',
   activeSince: 2023,
   edition: 'Portfolio 2026 — Ed. 01',
 
@@ -99,6 +99,7 @@ export const site = {
       'Sito web o landing page',
       'Logo e identità visiva',
       'Grafica e materiale stampato',
+      'Assistenza informatica',
       'Un progetto che unisce più ambiti',
       'Altro',
     ],

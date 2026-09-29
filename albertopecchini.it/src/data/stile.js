@@ -114,7 +114,7 @@ export const scale = [
   { token: '--fs-display', meta: '115 px · 44 → 128', sample: 'Tre discipline', style: 'display' },
   { token: '--fs-h1', meta: '84 px · 38 → 88', sample: 'Lavori scelti', style: 'h1' },
   { token: '--fs-h2', meta: '58 px · 30 → 60', sample: 'Parliamo del tuo prossimo progetto.', accent: 'prossimo', style: 'h2' },
-  { token: '--fs-h3', meta: '32 px · 22 → 32', sample: 'Tre aree, un interlocutore', style: 'h3' },
+  { token: '--fs-h3', meta: '32 px · 22 → 32', sample: 'Quattro aree, un interlocutore', style: 'h3' },
   { token: '--fs-h4', meta: '22 px · 18 → 22', sample: 'Mobile progettato a parte, non ridotto', style: 'h4' },
   { token: '--fs-lead', meta: '24 px · 18 → 24', sample: 'Rilevo un edificio al millimetro, scrivo l’interfaccia che lo racconta, disegno il marchio di chi lo abita.', style: 'lead' },
   { token: '--fs-body', meta: '17 px · interlinea 1,6', sample: 'Struttura prima dell’estetica, contenuti veri prima dei layout, prestazioni misurate. Scrivo il codice a mano: niente temi, niente page builder.', style: 'body' },

@@ -13,7 +13,7 @@ nove figurine in una griglia 3 × 3. Lo script poi le ritaglia una per una.
 
 | File | Cosa è |
 | --- | --- |
-| `fogli.js` | lo stile comune e i fogli (tecnico, digitale, grafica, metodo, computer, chrome, tasti), nove figurine ciascuno, nell'ordine della griglia; un foglio può avere `stile` e `intro` propri e alzare la misura dei ritagli con `max` |
+| `fogli.js` | lo stile comune e i fogli (tecnico, digitale, grafica, informatica, informatica2, metodo, computer, chrome, tasti), nove figurine ciascuno, nell'ordine della griglia; un foglio può avere `stile` e `intro` propri e alzare la misura dei ritagli con `max` |
 | `figurine.mjs` | lo script: genera un foglio, lo ritaglia, scarica un foglio già pagato |
 | `lavoro/` | i fogli PNG con il JSON dell'input (esclusi da Git) |
 | `../../src/data/figurine.js` | generato dal ritaglio: nomi e misure delle figurine pronte |

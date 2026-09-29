@@ -98,6 +98,11 @@ export function initForm() {
   // arrivati dopo pochi istanti, perché nessuno compila un modulo così in fretta.
   let openedAt = Date.now()
 
+  // Dalle pagine dei servizi si arriva con ?tipo=<voce>: se la voce esiste nel
+  // menu, è già scelta (es. /contatti/?tipo=Assistenza%20informatica#modulo).
+  const tipo = new URLSearchParams(location.search).get('tipo')
+  if (tipo && form.elements.tipo && [...form.elements.tipo.options].some((o) => o.value === tipo)) form.elements.tipo.value = tipo
+
   const validate = (field) => {
     const rule = RULES[field.name]
     if (!rule) return true

@@ -16,6 +16,8 @@ import { tavolePage, sheetCount, hasSheets } from './pages/tavole.js'
 import { emailPage } from './pages/email.js'
 import { assistenzaPage, assistenzaContattiPage, assistenzaNotFoundPage } from './pages/assistenza.js'
 import { assistenza, BCP } from '../data/assistenza.js'
+import { informaticaPage, informaticaLd } from './pages/informatica.js'
+import { informatica } from '../data/informatica.js'
 
 const websiteLd = () => ({
   '@context': 'https://schema.org',
@@ -107,10 +109,20 @@ export const routes = [
   {
     path: '/servizi/',
     priority: 0.9,
-    title: 'Servizi — tecnico, digitale, grafica',
-    description: 'Progettazione, rilievi, CAD, catasto, pratiche, 3D, BIM e rendering; siti web, UI/UX e frontend; logo, branding e stampati. Per ogni servizio, cosa viene consegnato.',
+    title: 'Servizi — tecnico, digitale, grafica, informatica',
+    description: 'Progettazione, rilievi, CAD, catasto, pratiche, 3D, BIM e rendering; siti web, UI/UX e frontend; logo, branding e stampati; assistenza informatica. Per ogni servizio, cosa viene consegnato.',
     render: serviziPage,
     jsonld: () => [crumbs({ label: 'Servizi', href: '/servizi/' }), serviceLd()],
+  },
+  {
+    // L'area D dei servizi da vicino: la versione seria di «Better Call Pekko».
+    path: informatica.path,
+    priority: 0.8,
+    title: informatica.title,
+    description: informatica.description,
+    render: informaticaPage,
+    hideCta: true, // la pagina chiude già con il suo invito (telefono, WhatsApp, modulo)
+    jsonld: () => [crumbs({ label: 'Servizi', href: '/servizi/' }, { label: 'Informatica', href: informatica.path }), ...informaticaLd()],
   },
   {
     path: '/studio/',

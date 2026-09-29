@@ -219,7 +219,7 @@ function services() {
   return html`
     <section class="section svc" data-section="Servizi">
       <div class="container">
-        ${sectionHead({ index: '04', label: 'Servizi', title: 'Tre aree, un interlocutore', meta: `${serviceAreas.reduce((n, a) => n + a.services.length, 0)} servizi`, link: { href: '/servizi/', label: 'Tutti i servizi' } })}
+        ${sectionHead({ index: '04', label: 'Servizi', title: 'Quattro aree, un interlocutore', meta: `${serviceAreas.reduce((n, a) => n + a.services.length, 0)} servizi`, link: { href: '/servizi/', label: 'Tutti i servizi' } })}
         <ul class="svc__rows">
           ${serviceAreas.map(
             (a, i) => html`

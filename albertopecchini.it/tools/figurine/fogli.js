@@ -97,6 +97,45 @@ export const fogli = {
     ],
   },
 
+  // ── Informatica ─────────────────────────────────────────────────────────────
+  // L'area D dei servizi (assistenza informatica): diciassette servizi e il
+  // lavoro trasversale B + D, in due fogli. Niente marchi (il modello disegna
+  // volentieri i loghi di Windows e Office): sistemi e programmi si riconoscono
+  // da quello che fanno, una barra di avanzamento, una pagina, un foglio a griglia.
+  informatica: {
+    titolo: 'Assistenza informatica, prima parte: virus, file, periferiche, Windows e Office',
+    figurine: [
+      { nome: 'informatica-pulizia-da-virus', soggetto: 'an open laptop with a small stylised beetle-shaped computer bug being lifted off its screen with a pair of tweezers, and a shield outline beside it, the bug vermilion' },
+      { nome: 'informatica-file-doppioni', soggetto: 'two identical small photo prints and two identical document sheets side by side, with a magnifying glass over them and a vermilion paper clip on one of the copies' },
+      { nome: 'informatica-riordino-cartelle', soggetto: 'a neat row of manila file folders standing upright in a wooden desk organiser, each with a coloured tab, one tab vermilion, and one sheet being slid into its folder' },
+      { nome: 'informatica-stampanti-e-scanner', soggetto: 'a compact home printer-scanner with its scanner lid slightly open and a printed sheet coming out of the front, the sheet with a vermilion stripe' },
+      { nome: 'informatica-audio-e-periferiche', soggetto: 'a pair of small desktop speakers, over-ear headphones and a small clip-on webcam, the headphone ear cushions vermilion' },
+      { nome: 'informatica-driver', soggetto: 'a computer graphics card seen in isometric view, with its cooling fan and gold contacts, and a small floating gear joined to it by a dotted line, the gear vermilion' },
+      { nome: 'informatica-windows', soggetto: 'an open laptop whose screen shows only an abstract installation screen with a long progress bar almost full, and a USB flash drive plugged into its side, the progress bar vermilion' },
+      { nome: 'informatica-microsoft-office', soggetto: 'three sheets fanned out like cards — a text document with lines, a spreadsheet with a grid and a small bar chart, a presentation slide with a simple shape — next to a closed envelope, one bar of the chart vermilion' },
+      { nome: 'informatica-ripristino-del-sistema', soggetto: 'a desktop computer tower with a large circular undo arrow wrapped around it, the arrow vermilion' },
+    ],
+  },
+
+  // Il 29.09.2026 il modello ha disegnato comunque una mela sul coperchio del
+  // portatile nuovo: tolta a mano dal foglio (riquadro 1574,928 → 1614,978
+  // interpolato riga per riga) e ritagliato il file «…-senza-marchio.png».
+  // Se si rigenera, controllare di nuovo i coperchi.
+  informatica2: {
+    titolo: 'Assistenza informatica, seconda parte: sistemi, documenti, dati, rete, hardware e il lavoro B + D',
+    figurine: [
+      { nome: 'informatica-cambio-di-sistema-operativo', soggetto: 'an open laptop with two small floating screen windows above it, an old one with square blocky shapes and a new one with rounded shapes, joined by a curved vermilion arrow' },
+      { nome: 'informatica-impaginazione-documenti', soggetto: 'an open bound report lying flat, showing a neat two-page spread with heading bars, text lines, a small picture block and page numbers as tiny dots, with a vermilion bookmark ribbon' },
+      { nome: 'informatica-conversione-di-formati', soggetto: 'two document sheets with different shapes (one with a folded corner, one with a rounded tab) connected by two curved arrows forming a circle, one arrow vermilion' },
+      { nome: 'informatica-backup-e-recupero-dati', soggetto: 'a portable external hard drive connected by a cable to an open laptop, with a small cloud shape floating above and an upward arrow, the hard drive vermilion' },
+      { nome: 'informatica-rete-e-wi-fi', soggetto: 'a home wireless router with two antennas and small status lights, three curved signal arcs rising above it, and a small plug-in range extender beside it, the signal arcs vermilion' },
+      { nome: 'informatica-computer-nuovo', soggetto: 'a new laptop half out of its open cardboard box tied with a vermilion ribbon, and a smaller old laptop beside it joined by a dashed transfer arrow' },
+      { nome: 'informatica-aggiornamento-hardware', soggetto: 'an open desktop computer case seen from the side, with a memory stick and a small solid-state drive being inserted and a screwdriver beside it, the solid-state drive vermilion' },
+      { nome: 'informatica-posta-e-account', soggetto: 'a smartphone showing a row of six blank code boxes on its screen, an envelope and a small padlock with its key, the key vermilion' },
+      { nome: 'lavori-b-d', soggetto: 'a small office desk seen from the corner with an open laptop showing a simple website layout, a smartphone, a compact printer and a wireless router, all joined by thin dashed lines, the website header vermilion' },
+    ],
+  },
+
   // ── Testata e piè di pagina ─────────────────────────────────────────────────
   // Le mini immagini dei recapiti e delle voci del footer: stesse regole delle
   // altre figurine (bordo adesivo compreso), così stanno bene sul fondo scuro.
