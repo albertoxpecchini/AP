@@ -4,13 +4,14 @@
 // la copia vecchia dopo un aggiornamento.
 
 export const catture = {
-  'ap-desktop-tall.webp': { w: 1200, h: 2833, v: '42614241' },
+  'ap-desktop-tall.webp': { w: 1200, h: 2833, v: '904d7498' },
   'ap-desktop.webp': { w: 1200, h: 750, v: '2c2b6634' },
-  'ap-iphone-01.webp': { w: 804, h: 4678, v: 'ff34393d' },
-  'ap-iphone-02.webp': { w: 804, h: 4678, v: '8d1a29f6' },
-  'ap-iphone-03.webp': { w: 804, h: 4678, v: '239512d3' },
-  'ap-iphone-04.webp': { w: 804, h: 4678, v: '53281121' },
-  'ap-iphone-05.webp': { w: 804, h: 4672, v: '67980666' },
+  'ap-iphone-01.webp': { w: 804, h: 4026, v: '63cd32bc' },
+  'ap-iphone-02.webp': { w: 804, h: 4026, v: '77976c66' },
+  'ap-iphone-03.webp': { w: 804, h: 4026, v: 'db334445' },
+  'ap-iphone-04.webp': { w: 804, h: 4026, v: '201f4fae' },
+  'ap-iphone-05.webp': { w: 804, h: 4026, v: 'c772409f' },
+  'ap-iphone-06.webp': { w: 804, h: 4018, v: 'ce6c4cb4' },
   'ap-mobile-tall.webp': { w: 600, h: 4000, v: 'acac781d' },
   'ap-mobile.webp': { w: 600, h: 1298, v: '0c7f7651' },
   'ap-tablet.webp': { w: 720, h: 1036, v: 'a3170a91' },
