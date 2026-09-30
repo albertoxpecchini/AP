@@ -4,7 +4,7 @@
 
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
-import { button, breadcrumb, monogram, splitWords, figurina } from '../components/ui.js'
+import { button, breadcrumb, monogram, splitWords, figurina, puppet } from '../components/ui.js'
 import { crediti } from '../../data/crediti.js'
 
 const updated = () => new Date(site.legal.updated).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -120,6 +120,31 @@ export function creditiPage() {
 }
 
 // ── 404 ──────────────────────────────────────────────────────────────────────
+// La pagina che manca l'ha presa la gazza ladra (il burattino del piè di
+// pagina): la tiene nel becco, un foglio con l'indirizzo cercato (lo scrive
+// src/client/puppet.js), e se le vai vicino scappa lungo la quota «punto non
+// rilevato», guardandoti. Toccata fa l'occhiolino e riscappa.
+
+// Il foglio: una tavola in piccolo, con il bordo adesivo come i pezzi del
+// burattino. In alto, dietro alla chiave, il disegno (il punto non rilevato);
+// in basso il cartiglio con il numero della tavola e l'indirizzo cercato.
+const missingPage = html`
+  <span class="pup__carry nf__page" data-carry>
+    <svg viewBox="0 0 100 128" aria-hidden="true">
+      <path class="nf__page-edge" d="M6 6H80L94 20V122H6Z"/>
+      <path class="nf__page-sheet" d="M6 6H80L94 20V122H6Z"/>
+      <path class="nf__page-fold" d="M80 6V20H94"/>
+      <path class="nf__page-lines" d="M14 18H48M14 24H40M14 30H44"/>
+      <circle class="nf__page-c" cx="58" cy="54" r="16"/>
+      <path class="nf__page-rule" d="M58 32V76M36 54H80"/>
+      <circle class="nf__page-dot" cx="58" cy="54" r="2.8"/>
+      <path class="nf__page-rule" d="M12 84H88V116H12ZM12 97H88"/>
+      <text class="nf__page-tav" x="16" y="93.5">TAV. 404</text>
+      <text class="nf__page-path" x="16" y="106" data-path>questa pagina</text>
+      <text class="nf__page-nr" x="16" y="112.5">PUNTO NON RILEVATO</text>
+    </svg>
+  </span>
+`
 
 export function notFoundPage() {
   return html`
@@ -128,15 +153,18 @@ export function notFoundPage() {
       <div class="container nf__wrap">
         <p class="label nf__top"><span>Errore 404</span><span>N 404°00′00″ · E —</span><span>Tav. non in elenco</span></p>
         <div class="nf__figure" aria-hidden="true">
-          <span class="nf__num">4</span>
-          <span class="nf__target">
-            <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" class="nf__c"/><circle cx="100" cy="100" r="58" class="nf__c nf__c--dash"/><circle cx="100" cy="100" r="7" class="nf__dot"/><path d="M100 0v72M100 128v72M0 100h72M128 100h72" class="nf__c"/></svg>
-          </span>
-          <span class="nf__num">4</span>
-          <span class="nf__dim"><i></i><b>punto non rilevato</b><i></i></span>
+          <div class="nf__digits">
+            <span class="nf__num">4</span>
+            <span class="nf__target">
+              <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" class="nf__c"/><circle cx="100" cy="100" r="58" class="nf__c nf__c--dash"/><circle cx="100" cy="100" r="7" class="nf__dot"/><path d="M100 0v72M100 128v72M0 100h72M128 100h72" class="nf__c"/></svg>
+            </span>
+            <span class="nf__num">4</span>
+            <span class="nf__dim"><i></i><b>punto non rilevato</b><i></i></span>
+          </div>
+          <div class="nf__gazza" data-flee>${puppet('gazza', { className: 'nf__pup', inside: { testa: missingPage } })}</div>
         </div>
-        <h1 class="nf__title" data-reveal="words">${splitWords('Questo punto non è in mappa.', { accent: ['mappa.'] })}</h1>
-        <p class="lead nf__text">La pagina che cerchi è stata spostata, rinominata o non è mai stata rilevata. Nessun problema: si riparte da un caposaldo noto.</p>
+        <h1 class="nf__title" data-reveal="words">${splitWords('Questa pagina se l’è presa la gazza.', { accent: ['gazza.'] })}</h1>
+        <p class="lead nf__text">Ce l’ha nel becco e non la molla: prova a riprendergliela. Oppure riparti da un caposaldo noto, perché la pagina che cerchi è stata spostata, rinominata o non è mai esistita.</p>
         <div class="nf__actions">
           ${button({ href: '/', label: 'Torna alla home', variant: 'light', magnetic: true })}
           ${button({ href: '/portfolio/', label: 'Apri il portfolio', variant: 'ghost' })}

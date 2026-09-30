@@ -12,10 +12,10 @@ export const mascotte = {
     nose: { x: 74, y: 41, rx: 10, ry: 11 },
   },
   tartaruga: {
-    w: 1193,
-    h: 966,
+    w: 1200,
+    h: 675,
     alt: 'La tartaruga di terra, mascotte del sito',
-    eyes: [{ x: 11.94, y: 32.71, rx: 3.1, ry: 5.54, skin: '#c1985b' }, { x: 28.25, y: 28, rx: 4.15, ry: 5.8, skin: '#be9257' }],
-    nose: { x: 20, y: 36, rx: 6.5, ry: 8 },
+    eyes: [{ x: 4.97, y: 26.34, rx: 2.35, ry: 4.71, skin: '#ac7e58' }, { x: 14.72, y: 27.32, rx: 2.61, ry: 4.64, skin: '#a26e4d' }],
+    nose: { x: 8, y: 34, rx: 4.5, ry: 6 },
   },
 }

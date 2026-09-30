@@ -1860,7 +1860,14 @@
 }
 
 .cmap__map {
+  position: relative;
   padding: 8px;
+}
+
+/* l'airone del Mincio: accanto alla carta, dal lato di Rivalta, guarda la sede
+   (puppet() con `gaze`); sul telefono la carta resta libera */
+.cmap__heron {
+  display: none;
 }
 
 @media (min-width: 1024px) {
@@ -1868,6 +1875,15 @@
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     gap: clamp(2rem, 5vw, 6rem);
     align-items: center;
+  }
+
+  .cmap__heron {
+    --pup-w: clamp(8.5rem, 10vw, 12.5rem);
+    position: absolute;
+    left: calc(var(--pup-w) * -0.5);
+    bottom: 2.6rem;
+    z-index: 2;
+    display: block;
   }
 }
 
@@ -2049,13 +2065,132 @@
   color: var(--accent);
 }
 
+/* la fascia del 404: le cifre a sinistra, la gazza che ci cammina sopra lungo
+   tutta la larghezza, con i piedi sulla quota «punto non rilevato» */
 .nf__figure {
+  position: relative;
+  justify-self: stretch;
+}
+
+.nf__digits {
   position: relative;
   display: flex;
   align-items: center;
   gap: clamp(0.25rem, 1.5vw, 1.5rem);
+  width: fit-content;
   padding-bottom: 2.25rem;
   line-height: 0.8;
+}
+
+/* la quota prosegue a destra, tratteggiata: è il terreno su cui la gazza saltella */
+.nf__digits::after {
+  content: '';
+  position: absolute;
+  left: calc(100% + 0.75rem);
+  bottom: calc(var(--fs-label) / 2);
+  width: 100vw;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.nf__gazza {
+  --gz-w: clamp(7.5rem, 2rem + 24vw, 28rem);
+  position: absolute;
+  right: 3%;
+  bottom: 0.15rem;
+  z-index: 2;
+  width: var(--gz-w);
+}
+
+/* con lo script la muove puppet.js, da sinistra */
+.nf__gazza.is-free {
+  right: auto;
+  left: 0;
+}
+
+.nf__pup {
+  --pup-w: 100%;
+}
+
+/* il foglio nel becco: il becco lo stringe sul bordo alto, a un terzo della
+   larghezza, e da lì pende (le misure sono in % della testa della gazza) */
+.nf__page {
+  left: -15%;
+  top: 49%;
+  width: 80%;
+  transform-origin: 35% 3%;
+}
+
+.nf__page svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.nf__page-edge {
+  fill: #f3f1ec;
+  stroke: #f3f1ec;
+  stroke-width: 9;
+  stroke-linejoin: round;
+}
+
+.nf__page-sheet {
+  fill: #f3f1ec;
+  stroke: #10110f;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.nf__page-fold {
+  fill: #dedad1;
+  stroke: #10110f;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.nf__page text {
+  font-family: var(--font-mono);
+  fill: #10110f;
+}
+
+.nf__page-tav {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  fill: #e5481f !important;
+}
+
+.nf__page-path {
+  font-size: 6.2px;
+}
+
+.nf__page-nr {
+  font-size: 4.4px;
+  letter-spacing: 0.08em;
+  fill: #5a5b55 !important;
+}
+
+.nf__page-rule {
+  fill: none;
+  stroke: #10110f;
+  stroke-width: 0.8;
+}
+
+.nf__page-lines {
+  stroke: #a5a59c;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.nf__page-c {
+  fill: none;
+  stroke: #e5481f;
+  stroke-width: 1.1;
+  stroke-dasharray: 3 3;
+}
+
+.nf__page-dot {
+  fill: #e5481f;
 }
 
 .nf__num {

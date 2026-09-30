@@ -4,14 +4,15 @@
 //
 // Testata e piè di pagina sono i due custodi del sito: composizioni centrate e
 // simmetriche, con il marchio in mezzo, i tasti «sasso» (pebble) disegnati
-// dall'IA e resi premibili dal codice, e le due mascotte — la chiocciola
-// gigante africana e la tartaruga di terra — che seguono il puntatore con gli
-// occhi (mascot(), src/client/mascot.js).
+// dall'IA e resi premibili dal codice, e i burattini — la chiocciola gigante
+// africana (in testata arriva senza guscio, che poi le cade addosso), la
+// tartaruga di terra e gli altri animali — che seguono il puntatore con gli
+// occhi (puppet(), src/client/puppet.js).
 
 import { html, esc, jsonLd, cx } from './html.js'
 import { site, nav, cta, closing } from '../data/site.js'
 import { serviceAreas } from '../data/services.js'
-import { logo, monogram, signature, splitWords, icon, pebble, mascot, figurina } from './components/ui.js'
+import { logo, monogram, signature, splitWords, icon, pebble, puppet, figurina } from './components/ui.js'
 
 const abs = (path) => site.url + path
 
@@ -97,10 +98,6 @@ const isCurrent = (route, href) => (href === '/' ? route.path === '/' : route.pa
 
 const NAV_SPLIT = 3
 
-// Ritaglio della chiocciola per la testata: la testa con gli occhi sui
-// peduncoli (percentuali dell'immagine in public/media/mascotte/lumaca.webp).
-const HEAD_CROP = { x: 62, y: 0, w: 38, h: 54 }
-
 function navItem(route, item, i) {
   const current = isCurrent(route, item.href)
   const link = pebble({ href: item.href, label: item.label, tone: 'carta', size: 'sm', shape: i, current, className: 'site-nav__link' })
@@ -127,7 +124,7 @@ function header(route) {
         <nav class="site-nav" aria-label="Navigazione principale">
           <ul class="site-nav__list site-nav__list--l">${nav.slice(0, NAV_SPLIT).map((it, i) => navItem(route, it, i))}</ul>
           <div class="site-header__brand">
-            ${mascot('lumaca', { className: 'site-header__masc', crop: HEAD_CROP, lazy: false, sizes: '8.2rem' })}
+            ${puppet('lumaca', { className: 'site-header__masc', skip: ['stazione'], lazy: false, sizes: '4.5rem' })}
             ${logo()}
           </div>
           <ul class="site-nav__list site-nav__list--r">
@@ -235,11 +232,16 @@ function footer({ route, compact = false }) {
         </nav>
 
         <div class="foot-sign" data-reveal="draw">
-          ${mascot('lumaca', { className: 'foot-sign__guard foot-sign__guard--l' })}
-          <a class="foot-sign__mark" href="/" aria-label="${esc(site.monogram)} — ${esc(site.name)}, pagina iniziale">
-            <span class="foot-sign__float" data-parallax="0.04">${signature()}</span>
-          </a>
-          ${mascot('tartaruga', { className: 'foot-sign__guard foot-sign__guard--r' })}
+          ${puppet('airone', { className: 'foot-sign__guard foot-sign__pup foot-sign__pup--airone' })}
+          ${puppet('lumaca', { className: 'foot-sign__guard foot-sign__guard--l' })}
+          <div class="foot-sign__center">
+            ${puppet('vespa', { className: 'foot-sign__guard foot-sign__pup foot-sign__pup--vespa' })}
+            <a class="foot-sign__mark" href="/" aria-label="${esc(site.monogram)} — ${esc(site.name)}, pagina iniziale">
+              <span class="foot-sign__float" data-parallax="0.04">${signature()}</span>
+            </a>
+          </div>
+          ${puppet('tartaruga', { className: 'foot-sign__guard foot-sign__guard--r' })}
+          ${puppet('gazza', { className: 'foot-sign__guard foot-sign__pup foot-sign__pup--gazza' })}
           <p class="foot-sign__name">${esc(site.name)}</p>
           <p class="foot-sign__tag">${esc(site.title)} · ${esc(site.tagline)}</p>
         </div>

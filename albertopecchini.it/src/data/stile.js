@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 //  SISTEMA VISIVO — contenuti della pagina /stile/: le tavole del piano
 //  (posizione e misura), palette, ruoli semantici, caratteri, scala, spazi,
-//  raggi, elementi grafici, movimento.
+//  raggi, elementi grafici, movimento, mascotte e burattini.
 //
 //  Qui i valori sono DESCRITTI; a definirli è src/styles/tokens.css. Se lì
 //  cambia un colore o una misura, va aggiornata anche la voce corrispondente.
@@ -17,6 +17,7 @@ export const boards = [
   { key: 'tipografia', index: '02', title: 'Tipografia', short: 'Tipografia', x: 3040, y: 0, w: 1440, h: 1880 },
   { key: 'forma', index: '03', title: 'Forma e movimento', short: 'Forma', x: 4560, y: 0, w: 1440, h: 1440 },
   { key: 'componenti', index: '04', title: 'Componenti', short: 'Componenti', x: 6080, y: 0, w: 1440, h: 2080 },
+  { key: 'mascotte', index: '05', title: 'Mascotte e burattini', short: 'Mascotte', x: 7600, y: 0, w: 1440, h: 2180 },
 ]
 
 // ── 01 · Colore ──────────────────────────────────────────────────────────────
@@ -169,3 +170,49 @@ export const durations = [
 ]
 
 export const motionNote = 'Rivelazioni: up, fade, scale, clip, line, draw e parola per parola.'
+
+// ── 05 · Mascotte e burattini ────────────────────────────────────────────────
+// Gli animali del sito, vivi sulla tavola (puppet() in ui.js): nome, larghezza
+// sulla tavola in px, carattere.
+
+export const zoo = [
+  { key: 'lumaca', name: 'La chiocciola gigante africana', w: 250, trait: 'Toccata, ritira i peduncoli come una chiocciola vera e li riallunga piano.' },
+  { key: 'tartaruga', name: 'La tartaruga di terra', w: 250, trait: 'Mastica, sbadiglia, si addormenta con l’elmetto sugli occhi; spaventata rientra nel guscio e fa capolino; sollevata scalcia; vicino al becco, morde.' },
+  { key: 'airone', name: 'L’airone elegante', w: 132, trait: 'Lento e composto, il collo smorzato; toccato fa l’inchino.' },
+  { key: 'gazza', name: 'La gazza furbissima', w: 250, trait: 'Testa a scatti; se ti avvicini alla chiave la nasconde, poi l’occhiolino.' },
+  { key: 'vespa', name: 'La vespa cattiva ma precisa', w: 200, trait: 'Si libra e punta il pungiglione dove sei; vicina si arrabbia, toccata punge.' },
+]
+
+// Il sesto animale non sta nel piè di pagina ma in home, e il suo numero è
+// riempire d'inchiostro il cognome: sulla tavola ha una fascia sua, con una
+// scena che funziona come quella vera (src/client/ink.js).
+export const aragosta = {
+  name: 'L’aragosta di fiume',
+  trait: 'Il gambero rosso del Mincio. Dorme sopra «Disponibile per nuovi incarichi»; se stai fermo si sveglia di colpo, prende l’annaffiatoio azzurro e versa inchiostro nella prima I. Il cognome è un recipiente solo: il liquido corre da una lettera all’altra, ondeggia quando sposti il piano e gocciola sul righello.',
+  facts: [
+    { value: '2,2 s', label: 'fermi, e si sveglia' },
+    { value: '< 3 s', label: 'per riempirlo' },
+    { value: '5 s', label: 'pieno, poi perde' },
+    { value: '½', label: 'mai sotto la metà' },
+  ],
+  hint: 'Resta fermo due secondi, o toccala.',
+}
+
+// L'animale smontato nella seconda fascia, e quanto si riducono i suoi pezzi.
+export const exploded = { key: 'gazza', scale: 0.46 }
+
+export const puppetRules = [
+  { name: 'Occhi', text: 'Il modello li disegna bianchi e tondi; sopra ci sono quelli del sito: pupilla al 46%, palpebra del colore della pelle, ognuno per conto suo.' },
+  { name: 'Bordo adesivo', text: 'Carta #F3F1EC intorno alla sagoma, come le figurine: sul fondo inchiostro del piè di pagina gli animali restano staccati.' },
+  { name: 'Un solo minio', text: 'Un dettaglio per animale: l’apice del guscio, l’elmetto, il papillon, il cartellino della chiave, la punta del pungiglione. L’aragosta fa eccezione: il rosso è lei.' },
+  { name: 'Fermacampioni', text: 'Dischi dorati sui perni: lo script li trova da solo, il pezzo ci gira intorno e torna a riposo su una molla.' },
+  { name: 'Movimento ridotto', text: 'Con prefers-reduced-motion restano gli sguardi: niente battiti di palpebre, salti né ritiri animati.' },
+]
+
+export const puppetPlaces = [
+  { where: 'Testata', what: 'La testa della chiocciola accanto al marchio, con gli occhi che seguono il puntatore.' },
+  { where: 'Home', what: 'L’aragosta dorme sopra la disponibilità e, se stai fermo, riempie d’inchiostro il cognome.' },
+  { where: 'Piè di pagina', what: 'I cinque burattini intorno alla firma; la vespa si libra sopra.' },
+  { where: '404', what: 'La gazza tiene nel becco la pagina che manca, e scappa lungo la quota.' },
+  { where: 'Contatti', what: 'L’airone del Mincio accanto alla carta, che guarda la sede.' },
+]

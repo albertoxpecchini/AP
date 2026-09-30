@@ -22,7 +22,7 @@ const field = ({ id, label, opt, placeholder, hint, list, type = 'text', autocom
 const chip = (label, attrs = '', className = '') => `<button class="em-chip ${className}" type="button" ${attrs}>${esc(label)}</button>`
 
 const STEPS = [
-  { key: 'mittente', title: 'Mittente', text: 'Scuola, personale o aziendale: cambia indirizzo, firma e presentazione.', action: { label: 'Cambia account', attr: 'data-em-go="#mittente"' } },
+  { key: 'mittente', title: 'Mittente', text: 'Scuola, personale o società: cambia indirizzo, firma e presentazione.', action: { label: 'Cambia account', attr: 'data-em-go="#mittente"' } },
   { key: 'destinatari', title: 'Destinatari', text: 'Un indirizzo in «A» per chi deve rispondere; in «Cc» chi deve sapere; in «Ccn» i gruppi.', action: { label: 'Apri la rubrica', attr: 'data-em-go="#rubrica"' } },
   { key: 'oggetto', title: 'Oggetto', text: 'Tra 30 e 60 caratteri, con l’informazione chiave all’inizio. Mai «Info» o «Richiesta».', action: { label: 'Proponi con l’IA', attr: 'data-em-ai="oggetto"' } },
   { key: 'saluto', title: 'Saluto', text: 'Segue il tono e il primo destinatario: «Gentile Prof. Lanzoni,» o «Buongiorno,». Se manca, l’output lo aggiunge da solo, come fa il generatore.', action: { label: 'Inserisci saluto', attr: 'data-em-snippet="saluto"' } },
@@ -130,7 +130,7 @@ export function emailPage() {
                   <span class="em-sender__kind label">${esc(s.kindLabel)}</span>
                   <span class="em-sender__label">${esc(s.label)}</span>
                   <span class="em-sender__mail">${esc(s.email)}</span>
-                  <span class="em-sender__provider label">${esc(s.provider)} · firma ${esc(s.footer?.id || '—')}${s.logo ? ' · con logo' : ''}</span>
+                  <span class="em-sender__provider label">${esc(s.provider)} · firma ${esc(s.footer?.id || '—')}${s.logo ? ' · con logo' : ''} · stile ${esc(s.styleLabel)}</span>
                   <span class="em-sender__check" aria-hidden="true">${icon('check')}</span>
                 </label>
               `,

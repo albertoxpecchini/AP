@@ -1,6 +1,6 @@
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
-import { button, media, icon, splitWords, breadcrumb, figurina, iphone, iphoneCredit } from '../components/ui.js'
+import { button, media, icon, splitWords, breadcrumb, figurina, iphone, iphoneCredit, puppet } from '../components/ui.js'
 import { COORDS } from '../layout.js'
 
 const field = ({ id, label, type = 'text', required = false, autocomplete, hint, inputmode, pattern, placeholder }) => html`
@@ -180,7 +180,9 @@ export function contattiPage() {
           <p class="label cmap__coords">${COORDS}</p>
           ${button({ href: osm, label: 'Apri in OpenStreetMap', variant: 'ghost', iconName: 'arrowUpRight', external: true })}
         </div>
-        <div class="cmap__map">${media({ art: 'areamap', base: '/media/mappa/area-operativa.webp', alt: 'Carta illustrata dell’area operativa: il lago di Garda, il Mincio, i laghi di Mantova e il Po, con Mantova al centro e raggi di 10, 25 e 50 chilometri' }, { ratio: '4/3', marks: true, caption: 'FIG. 01 — Area operativa · proiezione equirettangolare · scala grafica in carta' })}</div>
+        <div class="cmap__map">${media({ art: 'areamap', base: '/media/mappa/area-operativa.webp', sede: { name: site.location.city, lat: site.location.lat, lon: site.location.lon, coords: COORDS }, alt: `Carta illustrata dell’area operativa: il lago di Garda, il Mincio, i laghi di Mantova e il Po, con la sede a ${site.location.city} e raggi di 10, 25 e 50 chilometri` }, { ratio: '4/3', marks: true, caption: 'FIG. 01 — Area operativa · proiezione equirettangolare · scala grafica in carta' })}
+          ${puppet('airone', { className: 'cmap__heron', gaze: '.cmap .a-sede' })}
+        </div>
       </div>
     </section>
   `

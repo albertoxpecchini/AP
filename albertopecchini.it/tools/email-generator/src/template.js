@@ -10,6 +10,7 @@
 // posizionamento assoluto, niente JavaScript.
 import { escapeHtml } from './util.js'
 import { renderFooterHtml } from './footer-html.js'
+import { isFineSettembre, blockStyles } from './markdown.js'
 
 // GIF trasparente di 1px: Outlook comprime le celle prive di contenuto, e un
 // `&nbsp;` imporrebbe l'altezza di una riga di testo.
@@ -31,9 +32,102 @@ function rulerHtml(theme) {
 }
 
 /**
+ * Impianto di «Fine settembre» (stili.js): pagina bianca, nessuna colonna
+ * centrata e nessun riquadro. Il testo parte da sinistra, largo al massimo
+ * 640px; l'oggetto apre l'email come H1, le etichette (casella e data,
+ * allegati, collegamenti) sono H6, e un filetto nero separa le parti.
+ * Il carattere incorporato non c'è: `fontCss` viene ignorato.
+ */
+function renderFineSettembre({ subject, preheader, eyebrow, title, subtitle, bodyHtml, footer, footerLogo = null, attachments = [], links = [], theme, dateLabel = '' }) {
+  const c = theme.color
+  const st = blockStyles(theme)
+  const width = theme.layout.width
+  const gutter = theme.layout.gutter
+  const rule = `<div style="height:0;line-height:0;font-size:0;border-top:1px solid ${c.ink};margin:0 0 ${theme.space.s5}px;">&nbsp;</div>`
+
+  const parts = []
+  const meta = [eyebrow, dateLabel].filter(Boolean).map(escapeHtml).join(' · ')
+  if (meta) parts.push(`<h6 style="${st.h6}margin:0 0 12px;">${meta}</h6>`)
+  const heading = title || subject
+  if (heading) parts.push(`<h1 class="fs-h1" style="${st.h1}">${escapeHtml(heading)}</h1>`)
+  if (subtitle) parts.push(`<p style="${st.subtitle}">${escapeHtml(subtitle)}</p>`)
+  if (parts.length) parts.push(rule)
+
+  parts.push(bodyHtml)
+
+  // Allegati e collegamenti: un'etichetta H6 e un elenco, niente riquadro.
+  if (attachments.length) {
+    parts.push(
+      `<h6 style="${st.h6}margin:${theme.space.s6}px 0 6px;">${attachments.length === 1 ? 'Allegato' : 'Allegati'}</h6>`,
+      `<ul style="${st.ul}">${attachments.map((file) => `<li style="${st.li}">${escapeHtml(file.name)} <span style="color:${c.graphite};">— ${escapeHtml(String(file.type).toUpperCase())}</span></li>`).join('')}</ul>`,
+    )
+  }
+  if (links.length) {
+    parts.push(
+      `<h6 style="${st.h6}margin:${theme.space.s6}px 0 6px;">Collegamenti</h6>`,
+      `<ul style="${st.ul}">${links.map((link) => `<li style="${st.li}"><a href="${escapeHtml(link)}" style="${st.link}word-break:break-all;">${escapeHtml(link)}</a></li>`).join('')}</ul>`,
+    )
+  }
+
+  const footerHtml = renderFooterHtml(footer, theme, footerLogo)
+  if (footerHtml) parts.push(`<div style="margin:${theme.space.s7}px 0 0;">${footerHtml}</div>`)
+
+  const preheaderHtml = preheader
+    ? `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${c.paper};opacity:0;">${escapeHtml(preheader)}&#8203;${'&#847;&zwnj;&nbsp;&#8199;&shy;'.repeat(40)}</div>`
+    : ''
+
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="it" xml:lang="it">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <meta name="color-scheme" content="light" />
+  <meta name="supported-color-schemes" content="light" />
+  <title>${escapeHtml(subject)}</title>
+  <!--[if mso]>
+  <xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
+  <![endif]-->
+  <style type="text/css">
+    body { margin:0 !important; padding:0 !important; width:100% !important; background:${c.paper}; }
+    table { border-collapse:collapse !important; }
+    img { border:0; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+    @media only screen and (max-width: ${width + gutter * 2 - 1}px) {
+      .fs-pad { padding:28px 20px !important; }
+      .fs-h1 { font-size:${Math.round(theme.size.h1 * 0.8)}px !important; }
+    }
+    /* Tema scuro dei client: la pagina resta bianca, il testo nero */
+    @media (prefers-color-scheme: dark) {
+      .fs-body { background:${c.paper} !important; }
+    }
+  </style>
+</head>
+<body class="fs-body" style="margin:0;padding:0;background:${c.paper};">
+  ${preheaderHtml}
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${c.paper};">
+    <tr>
+      <td class="fs-pad" align="left" style="padding:${theme.space.s6 + 8}px ${gutter}px;text-align:left;">
+        <!--[if mso]><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${width}" align="left"><tr><td><![endif]-->
+        <div style="max-width:${width}px;text-align:left;font-family:${theme.font.sans};color:${c.ink};">
+          ${parts.join('\n          ')}
+        </div>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+}
+
+/**
  * Compone l'HTML completo dell'email.
  */
-export function renderEmailHtml({
+export function renderEmailHtml(options) {
+  return isFineSettembre(options.theme) ? renderFineSettembre(options) : renderMetaSettembre(options)
+}
+
+/** Impianto di «Metà settembre»: colonna da 600px centrata, firma nel riquadro scuro. */
+function renderMetaSettembre({
   subject,
   preheader,
   eyebrow,

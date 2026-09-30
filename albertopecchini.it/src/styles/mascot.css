@@ -121,3 +121,219 @@
     animation: none;
   }
 }
+
+/* ── Burattini ─────────────────────────────────────────────────────────────
+   L'airone, la gazza e la vespa: burattini di carta a pezzi (tools/mascotte,
+   markup da puppet() in ui.js). Ogni .pup__part è un riquadro con il rapporto
+   del suo pezzo (--ar), messo in percentuale del genitore, che gira intorno al
+   perno (--o) di --rest a riposo; src/client/puppet.js scrive la rotazione in
+   corso. I pezzi dietro al genitore hanno z-index negativo: restano sotto la
+   sua immagine perché ogni pezzo isola il proprio impilamento. Gli occhi sono
+   quelli delle mascotte (.masc__eye). */
+
+.pup {
+  position: relative;
+  display: block;
+  width: var(--pup-w, 100%);
+  aspect-ratio: var(--ar);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pup__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.pup__part {
+  position: absolute;
+  display: block;
+  isolation: isolate;
+  aspect-ratio: var(--ar);
+  transform-origin: var(--o);
+  transform: rotate(var(--rest, 0deg));
+}
+
+.pup__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: auto;
+  -webkit-user-drag: none;
+}
+
+/* i pezzi da tirare non fanno scorrere la pagina sotto il dito */
+.pup__part[data-drag] > .pup__img {
+  touch-action: none;
+}
+
+.pup__pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* ciò che un burattino tiene (il foglio della gazza nella 404): è dentro il
+   pezzo che lo porta e gira con lui, dietro alla sua immagine; puppet.js lo fa
+   pendere dal punto di presa (transform-origin, lo decide chi lo usa) */
+.pup__carry {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  pointer-events: auto;
+}
+
+.pup.is-grab .pup__img {
+  cursor: grab;
+}
+
+.pup.is-poke .pup__img {
+  cursor: pointer;
+}
+
+.pup.is-grabbing,
+.pup.is-grabbing .pup__img {
+  cursor: grabbing;
+}
+
+.pup.is-idle .masc__pupil {
+  transition-duration: 0.4s;
+}
+
+/* la gazza sospettosa e la vespa arrabbiata: palpebre a metà */
+.pup.is-sly .masc__lid {
+  transform: translateY(-58%);
+  transition-duration: 0.18s;
+}
+
+.pup--vespa .masc__lid {
+  transform: translateY(-101%) rotate(var(--tilt, 0deg));
+}
+
+.pup--vespa .masc__eye[data-eye='0'] { --tilt: 14deg; }
+.pup--vespa .masc__eye[data-eye='1'] { --tilt: -14deg; }
+
+.pup--vespa.is-angry .masc__lid {
+  transform: translateY(-62%) rotate(var(--tilt));
+  transition-duration: 0.15s;
+}
+
+.pup .masc__eye.is-blink .masc__lid {
+  transform: translateY(0) rotate(var(--tilt, 0deg));
+}
+
+/* le ali della vespa frullano intorno alla radice (sull'immagine, così la rotazione del pezzo resta libera) */
+.pup--vespa .pup__part--ala > .pup__img,
+.pup--vespa .pup__part--ala2 > .pup__img {
+  transform-origin: var(--o);
+  animation: pup-buzz 0.07s linear infinite alternate;
+}
+
+.pup--vespa .pup__part--ala2 > .pup__img {
+  animation-delay: -0.035s;
+}
+
+.pup--vespa.is-angry .pup__part--ala > .pup__img,
+.pup--vespa.is-angry .pup__part--ala2 > .pup__img {
+  animation-duration: 0.04s;
+}
+
+@keyframes pup-buzz {
+  from { transform: rotate(-9deg) scaleY(0.9); }
+  to { transform: rotate(7deg) scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pup--vespa .pup__part--ala > .pup__img,
+  .pup--vespa .pup__part--ala2 > .pup__img {
+    animation: none;
+  }
+}
+
+/* ── La tartaruga ──────────────────────────────────────────────────────────
+   Di profilo, a otto pezzi (src/data/burattini.js). Le zampe lontane sono le
+   stesse immagini di quelle vicine, in ombra. La bocca è un buio dietro alla
+   testa che si apre con la mascella (--open, da puppet.js). Da ferma sonnecchia
+   (palpebre a metà, «z» che salgono dalla testa), spaventata strabuzza gli
+   occhi (pupille piccole). */
+
+.pup--tartaruga .pup__part--anteriore2 > .pup__img,
+.pup--tartaruga .pup__part--posteriore2 > .pup__img {
+  filter: brightness(0.66) saturate(0.85);
+}
+
+.pup__mouth {
+  position: absolute;
+  z-index: -2;
+  display: block;
+  background: #2a1810;
+  border-radius: 0 0 55% 55% / 0 0 100% 100%;
+  transform-origin: 0 0;
+  transform: rotate(var(--tilt, 0deg)) scaleY(var(--open, 0));
+}
+
+.pup--tartaruga .masc__lid {
+  transition-duration: 0.16s;
+}
+
+/* dorme: palpebre a metà, lente */
+.pup--tartaruga.is-asleep .masc__lid {
+  transform: translateY(-38%);
+  transition: transform 1.1s ease-in-out;
+}
+
+.pup--tartaruga.is-asleep .masc__eye.is-blink .masc__lid {
+  transform: translateY(0);
+}
+
+/* spaventata: pupille piccole */
+.pup--tartaruga .masc__pupil {
+  transition: transform 0.1s ease-out, width 0.18s ease, height 0.18s ease;
+}
+
+.pup--tartaruga.is-startled .masc__pupil {
+  width: 30%;
+  height: 30%;
+}
+
+/* le «z» del sonno salgono dalla testa, una dietro l'altra */
+.pup--tartaruga .pup__part--testa::before,
+.pup--tartaruga .pup__part--testa::after {
+  content: 'z';
+  position: absolute;
+  left: 58%;
+  top: -4%;
+  z-index: 2;
+  font-family: var(--font-serif, 'Instrument Serif', serif);
+  font-style: italic;
+  font-size: calc(var(--pup-w, 12rem) * 0.1);
+  line-height: 1;
+  color: var(--fg, #f1f0ec);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pup--tartaruga.is-asleep .pup__part--testa::before,
+.pup--tartaruga.is-asleep .pup__part--testa::after {
+  animation: pup-zzz 2.6s ease-out infinite;
+}
+
+.pup--tartaruga.is-asleep .pup__part--testa::after {
+  animation-delay: -1.3s;
+  left: 66%;
+}
+
+@keyframes pup-zzz {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  15% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(40%, -140%) scale(1.25) rotate(12deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pup--tartaruga.is-asleep .pup__part--testa::before,
+  .pup--tartaruga.is-asleep .pup__part--testa::after {
+    animation: none;
+  }
+}

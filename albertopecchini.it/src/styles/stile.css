@@ -1,4 +1,4 @@
-/* Pagina /stile/: il piano navigabile (zoom e spostamento) e le cinque tavole
+/* Pagina /stile/: il piano navigabile (zoom e spostamento) e le sei tavole
    del sistema visivo. Le tavole hanno misure FISSE in px, come fogli su un
    tavolo da disegno: non seguono la finestra, è la finestra che le inquadra.
    Perciò qui non ci sono clamp() né unità di viewport: tutto è in px o rem. */
@@ -319,6 +319,18 @@ body.page--stile {
   color: var(--fg);
 }
 
+/* il credito: la pagina non ha piè di pagina, sta in fondo al pannello */
+.canvas__credit {
+  padding: 10px 18px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 0.625rem;
+  color: var(--muted);
+}
+
+.canvas__credit a {
+  color: var(--fg);
+}
+
 .canvas__tools {
   position: absolute;
   right: 16px;
@@ -417,9 +429,17 @@ body.page--stile {
     display: none;
   }
 
+  .canvas__credit {
+    padding: 7px 14px 8px;
+  }
+
+  .canvas__edition {
+    display: none;
+  }
+
   .canvas__tools {
     right: 8px;
-    bottom: 112px;
+    bottom: 127px;
   }
 
   .canvas__tool {
@@ -1944,4 +1964,189 @@ body.page--stile {
 .bd-foot .cta {
   padding-block: 18px;
   font-size: 38px;
+}
+
+/* ── 05 · Mascotte e burattini ───────────────────────────────────────────── */
+/* Gli animali sono i burattini veri (mascot.css): si muovono e si toccano
+   anche sulla tavola. La larghezza di ciascuno arriva come --pup-w. */
+
+.bd-zoo {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 27px;
+  align-items: start;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.bd-animal {
+  display: grid;
+  gap: 18px;
+}
+
+.bd-animal__stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 290px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--line-strong);
+}
+
+.bd-animal__name {
+  margin-bottom: 4px;
+  font-size: 17px;
+}
+
+/* L'aragosta della home, con la sua scena: etichetta, cognome e righello come
+   nell'hero, a 160 px di corpo; lo stesso inchiostro della home (client/ink.js).
+   A destra resta posto per l'aragosta, che sta sopra l'etichetta e ne sporge. */
+.bd-ink {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 27px;
+  align-items: end;
+  padding-top: 24px;
+}
+
+.bd-ink__text {
+  display: grid;
+  gap: 10px;
+  align-content: end;
+  max-width: 400px;
+  padding-bottom: 12px;
+}
+
+.bd-ink__facts {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  gap: 22px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.bd-ink__facts dt {
+  font-size: 26px;
+  font-weight: 560;
+  font-stretch: 94%;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.bd-ink__facts dd {
+  margin-top: 6px;
+  max-width: 12ch;
+}
+
+.bd-ink__hint {
+  margin-top: 8px;
+  color: var(--accent-text);
+}
+
+.bd-ink__scene {
+  position: relative;
+  display: grid;
+  justify-items: end;
+  padding: 132px 150px 18px 0;
+}
+
+.bd-ink__bed {
+  color: var(--fg);
+}
+
+.bd-ink__name {
+  margin-top: 30px;
+  font-size: 160px;
+  font-weight: 600;
+  font-stretch: 86%;
+  letter-spacing: -0.055em;
+  line-height: 0.8;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--fg);
+}
+
+.bd-ink__name > span {
+  display: inline-block;
+  padding-block: 0.04em 0.02em;
+}
+
+.bd-ink__rule {
+  justify-self: stretch;
+  margin-top: 16px;
+  margin-right: -150px;
+}
+
+.bd-parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 40px;
+  padding-top: 32px;
+}
+
+.bd-part {
+  display: grid;
+  gap: 12px;
+  min-width: 128px;
+}
+
+.bd-part__img {
+  position: relative;
+  width: var(--w);
+}
+
+.bd-part__img img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-user-drag: none;
+}
+
+/* il perno: un crocino minio sul fermacampioni */
+.bd-part__pin {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  translate: -50% -50%;
+  background:
+    linear-gradient(var(--c-minio), var(--c-minio)) 50% 0 / 1.5px 100% no-repeat,
+    linear-gradient(var(--c-minio), var(--c-minio)) 0 50% / 100% 1.5px no-repeat;
+}
+
+.bd-part__pin::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1.5px solid var(--c-minio);
+  border-radius: 50%;
+}
+
+.bd-part .bd-cap b {
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.bd-prules {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 27px;
+  padding-top: 24px;
+}
+
+.bd-prule .bd-name {
+  margin-bottom: 6px;
+}
+
+.bd-places {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 27px;
+  padding-top: 24px;
+}
+
+.bd-place .label {
+  margin-bottom: 8px;
+  color: var(--accent-text);
 }

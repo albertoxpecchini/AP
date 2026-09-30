@@ -1074,7 +1074,8 @@ const allProjects = [
       { value: '1', label: 'File per aggiungere un progetto' },
     ],
     web: {
-      url: 'https://albertopecchini.it',
+      // con il www: l'apice rimanda lì, e i link al sito vanno sempre al www
+      url: 'https://www.albertopecchini.it',
       domain: 'albertopecchini.it',
       // Nome mostrato al posto del dominio (carosello, anteprime scorrevoli).
       name: 'Alberto Pecchini',

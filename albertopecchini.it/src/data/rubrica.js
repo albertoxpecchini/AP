@@ -16,9 +16,10 @@ import { loadEmailTheme } from '../../tools/email-generator/src/theme.js'
 import { iconDataUri } from '../../tools/email-generator/src/assets.js'
 import { BUTTON_VARIANTS } from '../../tools/email-generator/src/markdown.js'
 import { GENERATOR_VERSION } from '../../tools/email-generator/src/paths.js'
+import { STILI, resolveStyle } from '../../tools/email-generator/src/stili.js'
 
 // ── Account mittente ─────────────────────────────────────────────────────────
-// Ordine e voce di ogni account: scuola, personale, aziendale.
+// Ordine e voce di ogni account: scuola, personale, società.
 
 const KINDS = {
   gmail: {
@@ -42,19 +43,21 @@ const KINDS = {
     intro: 'Sono Alberto Pecchini.',
     tips: [
       'Tono libero, ma oggetto chiaro: chi legge decide in due secondi se aprire.',
-      'Da qui partono le email a privati e conoscenti; per un preventivo o un cliente usa l’account aziendale.',
+      'Da qui partono le email a privati e conoscenti.',
     ],
   },
+  // Proton è la casella ordinaria della società (firma Primo Pecchini); la PEC
+  // cascinafontana@pec.it è un profilo a parte e qui non compare.
   proton: {
     order: 2,
-    kind: 'aziendale',
-    kindLabel: 'Aziendale',
+    kind: 'societa',
+    kindLabel: 'Società',
     webmail: 'proton',
-    intro: 'Sono Alberto Pecchini, diplomato geometra: mi occupo di rilievi, disegno CAD e 3D, siti web e identità visive.',
+    intro: 'Sono Primo Pecchini, della Società Agricola Cascina Fontana S.S.',
     tips: [
-      'Presentati come «diplomato geometra», mai come «geometra»: è un titolo riservato agli iscritti all’albo.',
-      'Niente partita IVA in firma: prestazione occasionale.',
-      'Cifre, tempi e scadenze sempre scritti: un preventivo senza importo è una chiacchiera.',
+      'Ragione sociale sempre per esteso: Società Agricola Cascina Fontana S.S.',
+      'Questa è la casella ordinaria: per le comunicazioni che devono avere valore legale si usa la PEC cascinafontana@pec.it.',
+      'Lo stile di Primo è breve: «Bonjour Mme …», «ns», congedo «Cdt». Si ritocca la punteggiatura, non il tono.',
     ],
   },
 }
@@ -70,6 +73,8 @@ export const senders = loadSenderProfiles()
       provider: p.provider,
       email: p.email,
       footerId: p.footerId,
+      style: resolveStyle(p.style),
+      styleLabel: STILI[resolveStyle(p.style)].label,
       name: footer?.name || 'Alberto Pecchini',
       footer,
       logo: resolveFooterLogo(footer),
@@ -174,9 +179,9 @@ export const contacts = [
   },
   {
     id: 'me-proton',
-    name: 'Alberto Pecchini — aziendale',
+    name: 'Cascina Fontana — società',
     email: 'pecchini@protonmail.com',
-    role: 'Il mio indirizzo di lavoro',
+    role: 'La casella della società (firma Primo Pecchini)',
     group: 'me',
   },
 ]

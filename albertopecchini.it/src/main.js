@@ -10,6 +10,7 @@ import { initForm } from './client/form.js'
 import { initDialer } from './client/phone.js'
 import { initPebbles } from './client/pebble.js'
 import { initMascots } from './client/mascot.js'
+import { initPuppets } from './client/puppet.js'
 
 // I moduli delle pagine speciali si caricano in pezzi a parte, solo dove servono,
 // così le altre pagine non ne pagano il peso: il piano di /stile/, il visualizzatore
@@ -30,6 +31,8 @@ const onDemand = (selector, name, load) =>
 const initCanvas = onDemand('[data-canvas]', 'initCanvas', () => import('./client/canvas.js'))
 const initViewer = onDemand('[data-viewer]', 'initViewer', () => import('./client/viewer.js'))
 const initEmail = onDemand('[data-email]', 'initEmail', () => import('./client/email.js'))
+// l'inchiostro di PECCHINI e l'aragosta che lo versa: solo nella home
+const initInk = onDemand('[data-ink]', 'initInk', () => import('./client/ink.js'))
 
 const modules = [
   initTransitions,
@@ -52,9 +55,11 @@ const modules = [
   initDialer,
   initPebbles,
   initMascots,
+  initPuppets,
   initCanvas,
   initViewer,
   initEmail,
+  initInk,
   initParallax,
   initMagnetic,
   initCursor,

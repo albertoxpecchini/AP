@@ -10,15 +10,23 @@
       "email": "pzkko@yahoo.com",
       "use": "personale",
       "footerId": "yahoo",
-      "aliases": ["yahoo", "personale", "privato", "pzkko@yahoo.com", "pzkko"]
+      "style": "fine-settembre",
+      "aliases": [
+        "yahoo",
+        "personale",
+        "privato",
+        "pzkko@yahoo.com",
+        "pzkko"
+      ]
     },
     {
       "key": "proton",
-      "label": "Lavoro / Azienda",
+      "label": "Cascina Fontana",
       "provider": "Proton Mail",
       "email": "pecchini@protonmail.com",
-      "use": "lavoro",
+      "use": "societa",
       "footerId": "proton",
+      "style": "fine-settembre",
       "aliases": [
         "proton",
         "protonmail",
@@ -27,7 +35,11 @@
         "professionale",
         "studio",
         "pecchini@protonmail.com",
-        "pecchini"
+        "pecchini",
+        "societa",
+        "cascina",
+        "cascina fontana",
+        "cascinafontana"
       ]
     },
     {
@@ -37,6 +49,7 @@
       "email": "398893@studenti.unimore.it",
       "use": "universita",
       "footerId": "gmail",
+      "style": "fine-settembre",
       "aliases": [
         "gmail",
         "google",
@@ -48,6 +61,23 @@
         "398893@studenti.unimore.it",
         "398893",
         "223824"
+      ]
+    },
+    {
+      "key": "pec",
+      "label": "PEC Cascina Fontana",
+      "provider": "Aruba PEC",
+      "email": "cascinafontana@pec.it",
+      "use": "pec",
+      "footerId": "pec",
+      "style": "fine-settembre",
+      "aliases": [
+        "pec",
+        "certificata",
+        "posta certificata",
+        "pec cascina",
+        "pec cascina fontana",
+        "cascinafontana@pec.it"
       ]
     }
   ]

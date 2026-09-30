@@ -164,7 +164,7 @@ export const routes = [
     path: '/stile/',
     priority: 0.4,
     title: 'Stile — il sistema visivo del sito',
-    description: 'Colore, tipografia, forma, movimento e componenti del sito di Alberto Pecchini in cinque tavole su un piano navigabile: ingrandisci e spostati come su un tavolo da disegno.',
+    description: 'Colore, tipografia, forma, movimento, componenti e mascotte del sito di Alberto Pecchini in sei tavole su un piano navigabile: ingrandisci e spostati come su un tavolo da disegno.',
     render: stilePage,
     pageClass: 'page--stile',
     noFooter: true, // la pagina è il piano a tutto schermo: niente chiusura sotto

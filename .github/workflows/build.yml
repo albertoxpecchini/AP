@@ -1,0 +1,73 @@
+# Controllo della build. A ogni push (e nelle pull request) costruisce i due siti
+# che escono da questo repository, albertopecchini.it e bettercallpekko.it
+# (SITE=bcp), e controlla le pagine generate con albertopecchini.it/tools/controllo/:
+# credito col www, link e immagini interni, titoli, dati mancanti nei template,
+# sitemap. Se qualcosa non va, il commit prende la ❌ e GitHub manda un'email.
+#
+# Vercel intanto pubblica per conto suo: questo controllo non blocca niente,
+# avvisa. I commit del bot delle catture (catture.yml) non lo avviano: le spinte
+# fatte con il GITHUB_TOKEN non fanno partire altri workflow.
+
+name: Build
+
+on:
+  push:
+    paths:
+      - albertopecchini.it/**
+      - .github/workflows/build.yml
+  pull_request:
+    paths:
+      - albertopecchini.it/**
+      - .github/workflows/build.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: albertopecchini.it
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: albertopecchini.it/package-lock.json
+
+      - name: Dipendenze
+        run: npm ci --no-audit --no-fund
+
+      # le versioni ridotte delle immagini (plugins/responsive-images.js): si rifanno
+      # solo quelle degli originali cambiati
+      - name: Immagini ridotte
+        uses: actions/cache@v4
+        with:
+          path: albertopecchini.it/node_modules/.cache/ap-varianti
+          key: varianti-${{ hashFiles('albertopecchini.it/public/media/**') }}
+          restore-keys: varianti-
+
+      - name: Build di albertopecchini.it
+        run: npm run build
+
+      - name: Controllo di albertopecchini.it
+        run: node tools/controllo/controllo.mjs dist
+
+      - name: Build di bettercallpekko.it
+        env:
+          SITE: bcp
+        run: npx vite build --outDir dist-bcp
+
+      - name: Controllo di bettercallpekko.it
+        env:
+          SITE: bcp
+        run: node tools/controllo/controllo.mjs dist-bcp

@@ -3,7 +3,7 @@
   "version": 1,
   "footers": {
     "yahoo": {
-      "current": "v1",
+      "current": "v3",
       "versions": [
         {
           "id": "v1",
@@ -42,11 +42,87 @@
             }
           ],
           "notes": []
+        },
+        {
+          "id": "v2",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v1",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Alberto Pecchini",
+          "logo": {
+            "file": "src/assets/email/ap-logo.png",
+            "alt": "AP — Alberto Pecchini",
+            "width": 48,
+            "placement": "side",
+            "frame": false
+          },
+          "name": "Alberto Pecchini",
+          "role": "",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pzkko@yahoo.com",
+              "href": "mailto:pzkko@yahoo.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 351 0355506",
+              "href": "tel:+393510355506"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v2",
+          "address": "",
+          "links": [
+            {
+              "label": "www.albertopecchini.it",
+              "url": "https://www.albertopecchini.it"
+            }
+          ],
+          "social": [],
+          "notes": [],
+          "heading": "Alberto Pecchini",
+          "logo": {
+            "file": "src/assets/email/ap-logo-completo.png",
+            "alt": "Alberto Pecchini — Diplomato geometra — www.albertopecchini.it",
+            "width": 360,
+            "placement": "identity",
+            "frame": false,
+            "href": "https://www.albertopecchini.it"
+          },
+          "name": "Alberto Pecchini",
+          "role": "Diplomato geometra",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pzkko@yahoo.com",
+              "href": "mailto:pzkko@yahoo.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 351 0355506",
+              "href": "tel:+393510355506"
+            }
+          ]
         }
       ]
     },
     "proton": {
-      "current": "v1",
+      "current": "v9",
       "versions": [
         {
           "id": "v1",
@@ -90,11 +166,298 @@
             }
           ],
           "notes": []
+        },
+        {
+          "id": "v2",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v1",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pecchini@protonmail.com",
+              "href": "mailto:pecchini@protonmail.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v2",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "CF e P.IVA 02196490201",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "PEC",
+              "value": "cascinafontana@pec.it",
+              "href": "mailto:cascinafontana@pec.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ]
+        },
+        {
+          "id": "v4",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v3",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "CF e P.IVA 02196490201",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pecchini@protonmail.com",
+              "href": "mailto:pecchini@protonmail.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ]
+        },
+        {
+          "id": "v5",
+          "createdAt": "2026-09-30",
+          "source": "add_version",
+          "replaces": null,
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "CF e P.IVA 02196490201",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pecchini@protonmail.com",
+              "href": "mailto:pecchini@protonmail.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo.png",
+            "alt": "Cascina Fontana — vespa su un alveare",
+            "width": 56,
+            "placement": "side",
+            "frame": false
+          }
+        },
+        {
+          "id": "v6",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v5",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pecchini@protonmail.com",
+              "href": "mailto:pecchini@protonmail.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            },
+            {
+              "type": "text",
+              "label": "CF e P.IVA",
+              "value": "02196490201"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo-primo.png",
+            "alt": "Primo Pecchini — Società Agricola Cascina Fontana S.S.",
+            "width": 360,
+            "placement": "identity",
+            "frame": false
+          }
+        },
+        {
+          "id": "v7",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v6",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email",
+              "value": "pecchini@protonmail.com",
+              "href": "mailto:pecchini@protonmail.com"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            },
+            {
+              "type": "text",
+              "label": "CF e P.IVA",
+              "value": "02196490201"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo-proton.png",
+            "alt": "Primo Pecchini — Cascina Fontana S.S.",
+            "width": 360,
+            "placement": "identity",
+            "frame": false
+          }
+        },
+        {
+          "id": "v8",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v7",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "",
+          "contacts": [
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo-proton.png",
+            "alt": "Primo Pecchini — Cascina Fontana S.S.",
+            "width": 360,
+            "placement": "identity",
+            "frame": false
+          }
+        },
+        {
+          "id": "v9",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v8",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "",
+          "contacts": [
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo-proton-zampillo.png",
+            "alt": "Primo Pecchini — Cascina Fontana S.S.",
+            "width": 360,
+            "placement": "identity",
+            "frame": false
+          }
         }
       ]
     },
     "gmail": {
-      "current": "v4",
+      "current": "v6",
       "versions": [
         {
           "id": "v1",
@@ -198,6 +561,337 @@
           "notes": [
             "Anno accademico 2026/2027 — percorso comune, PDS0-2026"
           ]
+        },
+        {
+          "id": "v5",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v4",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [
+            "Anno accademico 2026/2027"
+          ],
+          "heading": "Alberto Pecchini",
+          "logo": {
+            "file": "src/assets/email/unimore-logo.png",
+            "alt": "Università degli Studi di Modena e Reggio Emilia",
+            "width": 168,
+            "padding": 14
+          },
+          "name": "Alberto Pecchini",
+          "role": "Studente al 1° anno — Matricola: 223824",
+          "org": "Costruzioni e gestione del territorio (L-P01) · Dipartimento di Ingegneria \"Enzo Ferrari\" · Università degli Studi di Modena e Reggio Emilia",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email di ateneo",
+              "value": "398893@studenti.unimore.it",
+              "href": "mailto:398893@studenti.unimore.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 351 0355506",
+              "href": "tel:+393510355506"
+            }
+          ]
+        },
+        {
+          "id": "v6",
+          "createdAt": "2026-09-30",
+          "source": "add_version",
+          "replaces": null,
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [
+            "Anno accademico 2026/2027"
+          ],
+          "heading": "Alberto Pecchini",
+          "logo": {
+            "file": "src/assets/email/unimore-logo-trasparente.png",
+            "alt": "Università degli Studi di Modena e Reggio Emilia",
+            "width": 168,
+            "padding": 14
+          },
+          "name": "Alberto Pecchini",
+          "role": "Studente al 1° anno — Matricola: 223824",
+          "org": "Costruzioni e gestione del territorio (L-P01) · Dipartimento di Ingegneria \"Enzo Ferrari\" · Università degli Studi di Modena e Reggio Emilia",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "Email di ateneo",
+              "value": "398893@studenti.unimore.it",
+              "href": "mailto:398893@studenti.unimore.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 351 0355506",
+              "href": "tel:+393510355506"
+            }
+          ]
+        }
+      ]
+    },
+    "pec": {
+      "current": "v6",
+      "versions": [
+        {
+          "id": "v1",
+          "createdAt": "2026-09-30",
+          "source": "seed",
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "CF e P.IVA 02196490201 · Codice destinatario SUBM70N",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "PEC",
+              "value": "cascinafontana@pec.it",
+              "href": "mailto:cascinafontana@pec.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 68 10 52",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 039 7473",
+              "href": "tel:+393420397473"
+            }
+          ],
+          "address": "Rodigo (MN)",
+          "links": [
+            {
+              "label": "cascinafontana.xyz",
+              "url": "https://www.cascinafontana.xyz"
+            }
+          ],
+          "social": [],
+          "notes": [
+            "Messaggio inviato da casella di posta elettronica certificata.",
+            "AVVISO DI RISERVATEZZA — Questo messaggio di posta elettronica e gli allegati contengono informazioni per uso esclusivo del destinatario. Questa e-mail è confidenziale e la sua riservatezza è tutelata dal Codice in materia di protezione dei dati personali (Decreto legislativo n. 196 del 30/6/2003). Se ne siete stati erroneamente i destinatari, con la presente avvertiamo che trattenere, leggere, copiare e/o distribuire quanto ricevuto a persone diverse dal destinatario può essere soggetto a restrizioni legali o sanzioni. Siete quindi pregati darne immediatamente comunicazione al mittente e di provvedere alla sua cancellazione."
+          ]
+        },
+        {
+          "id": "v2",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v1",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "CF e P.IVA 02196490201",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "PEC",
+              "value": "cascinafontana@pec.it",
+              "href": "mailto:cascinafontana@pec.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "createdAt": "2026-09-30",
+          "source": "add_version",
+          "replaces": null,
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "CF e P.IVA 02196490201",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "PEC",
+              "value": "cascinafontana@pec.it",
+              "href": "mailto:cascinafontana@pec.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo.png",
+            "alt": "Cascina Fontana — vespa su un alveare",
+            "width": 56,
+            "placement": "side",
+            "frame": false
+          }
+        },
+        {
+          "id": "v4",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v3",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "PEC",
+              "value": "cascinafontana@pec.it",
+              "href": "mailto:cascinafontana@pec.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            },
+            {
+              "type": "text",
+              "label": "CF e P.IVA",
+              "value": "02196490201"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo-primo.png",
+            "alt": "Primo Pecchini — Società Agricola Cascina Fontana S.S.",
+            "width": 360,
+            "placement": "identity",
+            "frame": false
+          }
+        },
+        {
+          "id": "v5",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v4",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "PEC",
+              "value": "cascinafontana@pec.it",
+              "href": "mailto:cascinafontana@pec.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            },
+            {
+              "type": "text",
+              "label": "CF e P.IVA",
+              "value": "02196490201"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo-pec.png",
+            "alt": "Primo Pecchini — Società Agricola Cascina Fontana S.S.",
+            "width": 360,
+            "placement": "identity",
+            "frame": false
+          }
+        },
+        {
+          "id": "v6",
+          "createdAt": "2026-09-30",
+          "source": "replace",
+          "replaces": "v5",
+          "address": "",
+          "links": [],
+          "social": [],
+          "notes": [],
+          "heading": "Primo Pecchini",
+          "name": "Primo Pecchini",
+          "role": "Società Agricola Cascina Fontana S.S.",
+          "org": "",
+          "contacts": [
+            {
+              "type": "email",
+              "label": "PEC",
+              "value": "cascinafontana@pec.it",
+              "href": "mailto:cascinafontana@pec.it"
+            },
+            {
+              "type": "phone",
+              "label": "Telefono",
+              "value": "+39 0376 681052",
+              "href": "tel:+390376681052"
+            },
+            {
+              "type": "phone",
+              "label": "Cellulare",
+              "value": "+39 342 0397473",
+              "href": "tel:+393420397473"
+            },
+            {
+              "type": "text",
+              "label": "CF e P.IVA",
+              "value": "02196490201"
+            }
+          ],
+          "logo": {
+            "file": "src/assets/email/cascina-logo-pec-zampillo.png",
+            "alt": "Primo Pecchini — Società Agricola Cascina Fontana S.S.",
+            "width": 360,
+            "placement": "identity",
+            "frame": false
+          }
         }
       ]
     }

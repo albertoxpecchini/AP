@@ -45,21 +45,21 @@ function hero() {
     <section class="hero" data-section="Intro" aria-labelledby="hero-title">
       <div class="hero__glow" aria-hidden="true"></div>
       <div class="hero__lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="container hero__wrap">
+      <div class="container hero__wrap" data-ink>
         <div class="hero__hello" data-reveal="up" style="--d:30ms">
           <p class="hero__hi">
             <span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="2.75rem" alt="" decoding="async" fetchpriority="high">${site.availability.open ? '<span class="hero__avatar-dot" aria-hidden="true"></span>' : ''}</span>
             <span class="hero__hi-text">Ciao, sono</span>
           </p>
           <p class="hero__place label">${esc(site.location.city)} — Italia<span class="hero__coords"> · ${COORDS}</span></p>
-          <p class="hero__avail label"><span class="dot${site.availability.open ? ' dot--live' : ''}" aria-hidden="true"></span>${esc(site.availability.label)}</p>
+          <p class="hero__avail label" data-ink-bed><span class="dot${site.availability.open ? ' dot--live' : ''}" aria-hidden="true"></span>${esc(site.availability.label)}</p>
         </div>
 
         <h1 class="hero__title" id="hero-title">
-          <span class="hero__name" aria-hidden="true"><span class="hero__word"><span>Alberto</span></span> <span class="hero__word hero__word--2"><span>Pecchini</span></span></span>
+          <span class="hero__name" aria-hidden="true"><span class="hero__word"><span>Alberto</span></span> <span class="hero__word hero__word--2"><span data-ink-word>Pecchini</span></span></span>
           <span class="sr-only">${esc(site.name)} — ${site.roles.map((r) => esc(r.label)).join(', ')} a ${esc(site.location.city)}</span>
         </h1>
-        <div class="rule rule--ticks hero__rule" aria-hidden="true"></div>
+        <div class="rule rule--ticks hero__rule" data-ink-rule aria-hidden="true"></div>
 
         <div class="hero__body">
           <div class="hero__roles-wrap" data-reveal="up" style="--d:160ms">

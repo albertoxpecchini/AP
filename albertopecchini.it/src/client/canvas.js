@@ -1,7 +1,7 @@
 // Piano navigabile della pagina /stile/: zoom e spostamento come in un
 // programma di disegno. Trascina per muoverti (o rotella), Ctrl + rotella e
 // pizzico per ingrandire, doppio clic su una tavola per inquadrarla, tasti
-// 1–5 per saltare alle tavole, F per vederle tutte, 0 per la scala reale.
+// 1–6 per saltare alle tavole, F per vederle tutte, 0 per la scala reale.
 // Le animazioni di una tavola ripartono ogni volta che viene inquadrata.
 //
 // Prestazioni: a ogni fotogramma si scrivono solo trasformazioni di elementi
@@ -482,6 +482,8 @@ export function initCanvas() {
 
   viewport.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 && e.button !== 1) return
+    // un burattino della tavola 05 ha già preso il puntatore (si tira un pezzo, non il piano)
+    if (e.defaultPrevented) return
     if (e.target.closest('input, textarea, select')) return
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
     viewport.setPointerCapture(e.pointerId)

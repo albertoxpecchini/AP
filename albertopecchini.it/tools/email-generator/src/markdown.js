@@ -33,7 +33,14 @@ function renderButton(variant, lines, theme, st, iconOf) {
   if (!url) return label ? `<p style="${st.p}">${renderInline(label, st)}</p>` : ''
 
   const c = theme.color
-  const look = BUTTON_VARIANTS[variant] ?? { background: c.ink, color: c.paper, icon: '' }
+  // In «Fine settembre» ogni pulsante è nero e squadrato, anche WhatsApp (che
+  // tiene il suo glifo bianco).
+  const fine = isFineSettembre(theme)
+  const brand = BUTTON_VARIANTS[variant]
+  const look = fine
+    ? { background: c.ink, color: c.paper, icon: brand?.icon ?? '' }
+    : brand ?? { background: c.ink, color: c.paper, icon: '' }
+  const radius = fine ? '0' : '999px'
   const icon = iconOf(look.icon)
   const href = escapeHtml(url)
   const sp = theme.space
@@ -44,16 +51,60 @@ function renderButton(variant, lines, theme, st, iconOf) {
 
   return [
     `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:${sp.s2}px 0 ${sp.s3}px;border-collapse:separate;">`,
-    `<tr><td align="center" bgcolor="${look.background}" style="background:${look.background};border-radius:999px;">`,
-    `<a href="${href}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 28px 14px ${icon ? 22 : 28}px;font-family:${theme.font.sans};font-size:17px;line-height:24px;font-weight:600;color:${look.color};text-decoration:none;border-radius:999px;">`,
+    `<tr><td align="center" bgcolor="${look.background}" style="background:${look.background};border-radius:${radius};">`,
+    `<a href="${href}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 28px 14px ${icon ? 22 : 28}px;font-family:${theme.font.sans};font-size:${fine ? theme.size.body : 17}px;line-height:24px;font-weight:${fine ? 700 : 600};color:${look.color};text-decoration:none;border-radius:${radius};">`,
     `${iconHtml}<span style="color:${look.color};vertical-align:middle;">${escapeHtml(label)}</span></a>`,
     `</td></tr></table>`,
     `<p style="${st.small}">Link diretto: <a href="${href}" style="${st.link}word-break:break-all;">${href}</a></p>`,
   ].join('')
 }
 
+/** Lo stile «Fine settembre» (stili.js): bianco e nero, niente riquadri? */
+export const isFineSettembre = (theme) => theme?.style === 'fine-settembre'
+
+/**
+ * Stili inline di «Fine settembre». Nessun fondo e nessun bordo che chiuda un
+ * blocco: la citazione ha solo un filo a sinistra, il codice solo il carattere
+ * monospaziato, le tabelle filetti orizzontali. Sei livelli di titolo distinti,
+ * H6 è l'etichetta maiuscola che fa anche da intestazione dei gruppi.
+ */
+function fineStyles(theme) {
+  const c = theme.color
+  const s = theme.size
+  const sans = theme.font.sans
+  const mono = theme.font.mono
+  const head = (size, lh, margin, extra = '') =>
+    `margin:${margin};font-family:${sans};font-size:${size}px;line-height:${lh};font-weight:700;color:${c.ink};text-align:left;${extra}`
+
+  return {
+    h1: head(s.h1, 1.1, '0 0 16px', 'letter-spacing:-0.02em;'),
+    h2: head(s.h2, 1.15, '32px 0 12px', 'letter-spacing:-0.015em;'),
+    h3: head(s.h3, 1.25, '24px 0 8px', 'letter-spacing:-0.01em;'),
+    h4: head(s.h4, 1.3, '20px 0 6px'),
+    h5: head(s.h5, 1.35, '16px 0 4px'),
+    h6: head(s.h6, 1.4, '16px 0 6px', `letter-spacing:${theme.tracking.label};text-transform:uppercase;color:${c.graphite};`),
+    subtitle: `margin:0 0 24px;font-family:${sans};font-size:${s.lead}px;line-height:1.45;font-weight:400;color:${c.graphite};text-align:left;`,
+    p: `margin:0 0 16px;font-family:${sans};font-size:${s.body}px;line-height:${theme.leading.body};color:${c.ink};text-align:left;`,
+    small: `margin:0 0 16px;font-family:${sans};font-size:${s.small}px;line-height:1.5;color:${c.graphite};text-align:left;`,
+    link: `color:${c.ink};text-decoration:underline;`,
+    quote: `margin:0 0 16px;padding:0 0 0 16px;border-left:2px solid ${c.ink};font-family:${sans};font-style:italic;font-size:${s.h4}px;line-height:1.5;color:${c.ink};text-align:left;`,
+    ul: `margin:0 0 16px;padding:0 0 0 24px;font-family:${sans};font-size:${s.body}px;line-height:${theme.leading.body};color:${c.ink};text-align:left;`,
+    li: 'margin:0 0 6px;',
+    code: `font-family:${mono};font-size:${s.small}px;color:${c.ink};`,
+    pre: 'margin:0 0 16px;padding:0;',
+    preCode: `font-family:${mono};font-size:${s.small}px;line-height:1.55;color:${c.ink};white-space:pre;`,
+    table: `width:100%;margin:0 0 24px;border-collapse:collapse;font-family:${sans};font-size:${s.small + 1}px;`,
+    th: `padding:8px 16px 8px 0;border-bottom:2px solid ${c.ink};text-align:left;font-family:${sans};font-size:${s.h6}px;font-weight:700;letter-spacing:${theme.tracking.label};text-transform:uppercase;color:${c.ink};`,
+    td: `padding:8px 16px 8px 0;border-bottom:1px solid ${c.line};color:${c.ink};vertical-align:top;text-align:left;`,
+    badge: `font-family:${sans};font-size:${s.h6}px;font-weight:700;letter-spacing:${theme.tracking.label};text-transform:uppercase;color:${c.ink};`,
+    note: `margin:0 0 16px;font-family:${sans};font-size:${s.body}px;line-height:${theme.leading.body};color:${c.ink};text-align:left;`,
+    hr: `margin:32px 0;border:0;border-top:1px solid ${c.ink};height:1px;`,
+  }
+}
+
 /** Stili inline dei blocchi, derivati dal tema. */
 function styles(theme) {
+  if (isFineSettembre(theme)) return fineStyles(theme)
   const c = theme.color
   const s = theme.size
   const sp = theme.space
@@ -198,7 +249,10 @@ export function renderMarkdown(markdown, theme, { icon } = {}) {
         i += 1
       }
       i += 1
-      out.push(`<div style="${st.note}">${renderInline(buffer.join(' ').trim(), st)}</div>`)
+      const note = renderInline(buffer.join(' ').trim(), st)
+      // Senza riquadro, la nota è un'etichetta H6 sopra il suo paragrafo.
+      if (isFineSettembre(theme)) out.push(`<h6 style="${st.h6}">Nota</h6>`, `<p style="${st.note}">${note}</p>`)
+      else out.push(`<div style="${st.note}">${note}</div>`)
       continue
     }
 
@@ -236,7 +290,10 @@ export function renderMarkdown(markdown, theme, { icon } = {}) {
     if (heading) {
       const level = heading[1].length
       const content = renderInline(heading[2].trim(), st)
-      if (level === 1) out.push(`<h1 style="${st.h1}">${content}</h1>`)
+      // «Fine settembre» ha sei livelli distinti; «Metà settembre» ne ha tre,
+      // e dal quarto in giù resta com'era (H3).
+      if (isFineSettembre(theme)) out.push(`<h${level} style="${st[`h${level}`]}">${content}</h${level}>`)
+      else if (level === 1) out.push(`<h1 style="${st.h1}">${content}</h1>`)
       else if (level === 2) out.push(`<h2 style="${st.h2}">${content}</h2>`)
       else out.push(`<h3 style="${st.h3}">${content}</h3>`)
       i += 1

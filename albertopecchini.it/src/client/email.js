@@ -20,6 +20,7 @@ import { validate } from '../../tools/email-generator/src/validate.js'
 import { buildReport } from '../../tools/email-generator/src/report.js'
 import { fontFaceCss } from '../../tools/email-generator/src/font-css.js'
 import { formatDateIt, todayIso, slugify } from '../../tools/email-generator/src/util.js'
+import { themeFor } from '../../tools/email-generator/src/stili.js'
 import archivoUrl from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url'
 
 const API = '/api/email-ai'
@@ -358,6 +359,8 @@ export function initEmail() {
 
   function build() {
     const sender = currentSender()
+    // Lo stile della casella, come in generate.js (stili.js).
+    const theme = themeFor(sender.style, data.theme)
     const to = parseRecipients(state.to)
     const cc = parseRecipients(state.cc)
     const bcc = parseRecipients(state.bcc)
@@ -371,7 +374,7 @@ export function initEmail() {
 
     const footer = state.signature ? sender.footer : null
     const composed = composeBody({ rawBody: state.body, tone: state.tone, to: toList, senderName: footer?.name ?? '' })
-    const bodyHtml = renderMarkdown(composed.markdown, data.theme, { icon: iconOf })
+    const bodyHtml = renderMarkdown(composed.markdown, theme, { icon: iconOf })
     const preheader = buildPreheader(composed.markdown)
     const links = lines(state.links)
     // Come in generate.js: nell'email compare il nome del file, non il percorso.
@@ -389,11 +392,11 @@ export function initEmail() {
       footerLogo: footer ? sender.logo : null,
       attachments,
       links,
-      theme: data.theme,
+      theme,
       dateLabel: formatDateIt(date),
     }
     const liteHtml = renderEmailHtml({ ...common, fontCss: '' })
-    const html = font.css ? renderEmailHtml({ ...common, fontCss: font.css }) : liteHtml
+    const html = font.css && theme.font.embed !== false ? renderEmailHtml({ ...common, fontCss: font.css }) : liteHtml
 
     // Testo semplice, come in generate.js.
     const textParts = [markdownToText(composed.markdown)]
@@ -411,7 +414,7 @@ export function initEmail() {
     const profile = { key: sender.key, email: sender.email, label: sender.label, provider: sender.provider, footerId: sender.footerId }
     const validation = validate({ input, profile, footer, bodyMarkdown: composed.markdown, html, attachments: [], sources: [] })
 
-    return { sender, to, cc, bcc, toList, ccList, bccList, subject, date, slug, id, footer, composed, preheader, links, attachments, html, liteHtml, text, input, profile, validation }
+    return { sender, theme, to, cc, bcc, toList, ccList, bccList, subject, date, slug, id, footer, composed, preheader, links, attachments, html, liteHtml, text, input, profile, validation }
   }
 
   function reportOf(b) {
@@ -420,11 +423,11 @@ export function initEmail() {
       words: markdownToText(b.composed.markdown).split(/\s+/).filter(Boolean).length,
       htmlBytes: bytesOf(b.html),
       liteBytes: bytesOf(b.liteHtml),
-      fontEmbedded: Boolean(font.css),
-      fontBytes: font.bytes,
-      fontBase64Bytes: font.base64Bytes,
+      fontEmbedded: Boolean(font.css) && b.theme.font.embed !== false,
+      fontBytes: b.theme.font.embed !== false ? font.bytes : 0,
+      fontBase64Bytes: b.theme.font.embed !== false ? font.base64Bytes : 0,
       footerVersion: b.footer?.id ?? '—',
-      themeSource: data.theme.source,
+      themeSource: b.theme.source,
       inputFile: `emails/in/${b.id}.md (compositore online /email/)`,
     }
     const outputs = { html: 'email.html', lite: 'email-lite.html', text: 'email.txt', preview: null, report: 'report.md', attachments: null }

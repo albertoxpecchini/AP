@@ -5,6 +5,7 @@ import { renderArt, isSheet } from '../../art/index.js'
 import { site } from '../../data/site.js'
 import { figurine } from '../../data/figurine.js'
 import { mascotte } from '../../data/mascotte.js'
+import { burattino } from '../../data/burattini.js'
 
 // ── Icone (inline, 1em) ──────────────────────────────────────────────────────
 
@@ -292,6 +293,77 @@ export function mascot(name, { className, crop, lazy = true, decorative = true, 
     `</span>`
   const style = crop ? `--ar:${ar};--cx:${crop.x};--cy:${crop.y};--cw:${crop.w};--ch:${crop.h}` : `--ar:${ar}`
   return `<span${attrs({ class: cx('masc', `masc--${name}`, crop && 'masc--crop', className), style, 'data-mascot': name, 'aria-hidden': decorative ? 'true' : null, role: decorative ? null : 'img', 'aria-label': decorative ? null : m.alt })}>${body}</span>`
+}
+
+// ── Burattini ────────────────────────────────────────────────────────────────
+// La chiocciola, la tartaruga, l'airone, la gazza e la vespa (tools/mascotte,
+// «burattini»): burattini di carta a pezzi uniti da fermacampioni, montati come
+// nel file src/data/burattini.js. Ogni pezzo è un riquadro che contiene i suoi figli
+// (dietro con z negativo, davanti con z positivo) e gira intorno al proprio
+// perno; src/client/puppet.js li muove: occhi che seguono il puntatore, pezzi
+// da tirare, e il carattere di ciascun animale.
+//
+// `inside`: HTML in più dentro un pezzo, per nome ({ testa: '…' }): gira con
+// lui. La 404 ci mette il foglio che la gazza tiene nel becco.
+// `gaze`: selettore di ciò che il burattino guarda quando il puntatore non c'è
+// (l'airone accanto alla carta guarda la sede), al posto dello sguardo che vaga.
+// `skip`: pezzi da lasciare fuori, per nome (in testata la chiocciola non ha
+// la stazione totale); `lazy` e `sizes` come in mascot(), perché in testata le
+// immagini servono subito.
+// Dal montaggio: `img` (un pezzo che riusa l'immagine di un altro), `mouth`
+// (il buio della bocca dietro alla testa, che puppet.js apre con --open) e
+// `scena` (regole per lo script, in data-scene: il corpo che si solleva…).
+
+const DEG = Math.PI / 180
+// trasformazioni affini [a, b, c, d, e, f]: x' = a·x + c·y + e, y' = b·x + d·y + f
+const mul = ([a, b, c, d, e, f], [A, B, C, D, E, F]) => [a * A + c * B, b * A + d * B, a * C + c * D, b * C + d * D, a * E + c * F + e, b * E + d * F + f]
+const move = (x, y) => [1, 0, 0, 1, x, y]
+const turn = (deg) => [Math.cos(deg * DEG), Math.sin(deg * DEG), -Math.sin(deg * DEG), Math.cos(deg * DEG), 0, 0]
+
+export function puppet(name, { className, inside = {}, gaze, skip = [], lazy = true, sizes } = {}) {
+  const b = burattino(name)
+  if (!b) return ''
+  const parti = b.parti.filter((p) => !skip.includes(p.id))
+  const kids = (id) => parti.filter((p) => p.parent === id).sort((p, q) => p.z - q.z)
+  const root = parti.find((p) => !p.parent)
+
+  // il riquadro del burattino a riposo, nelle coordinate del corpo
+  const box = [Infinity, Infinity, -Infinity, -Infinity]
+  const walk = (p, m) => {
+    for (const [u, v] of [[0, 0], [p.w, 0], [0, p.h], [p.w, p.h]]) {
+      const [x, y] = [m[0] * u + m[2] * v + m[4], m[1] * u + m[3] * v + m[5]]
+      box[0] = Math.min(box[0], x), (box[1] = Math.min(box[1], y)), (box[2] = Math.max(box[2], x)), (box[3] = Math.max(box[3], y))
+    }
+    for (const c of kids(p.id)) walk(c, mul(m, mul(move(...c.at), mul(turn(c.rest), move(-c.pin[0], -c.pin[1])))))
+  }
+  walk(root, move(0, 0))
+  const [fw, fh] = [box[2] - box[0], box[3] - box[1]]
+
+  const pct = (v, total) => Number(((v / total) * 100).toFixed(3))
+  const eye = (p) => (e, i) =>
+    `<span class="masc__eye" style="--x:${pct(e.x, p.w)}%;--y:${pct(e.y, p.h)}%;--rx:${pct(e.rx, p.w)}%;--ry:${pct(e.ry, p.h)}%;--skin:${e.skin}" data-eye="${i}"><span class="masc__pupil"></span><span class="masc__lid"></span></span>`
+  const part = (p, parent) => {
+    const [x, y, w] = parent ? [pct(p.at[0] - p.pin[0], parent.w), pct(p.at[1] - p.pin[1], parent.h), pct(p.w, parent.w)] : [pct(-box[0], fw), pct(-box[1], fh), pct(p.w, fw)]
+    const style = `left:${x}%;top:${y}%;width:${w}%;--ar:${p.w}/${p.h};--o:${pct(p.pin[0], p.w)}% ${pct(p.pin[1], p.h)}%${p.rest ? `;--rest:${p.rest}deg` : ''}${p.z ? `;z-index:${p.z}` : ''}`
+    return (
+      `<span class="pup__part pup__part--${p.id}" data-part="${p.id}"${p.drag ? ' data-drag' : ''} style="${style}">` +
+      `<img class="pup__img" src="/media/mascotte/${name}/${p.img || p.id}.webp" width="${p.w}" height="${p.h}" alt="" loading="${lazy ? 'lazy' : 'eager'}" sizes="${sizes || (lazy ? 'auto, 8rem' : '8rem')}" decoding="async" draggable="false">` +
+      `<span class="pup__pin" style="left:${pct(p.pin[0], p.w)}%;top:${pct(p.pin[1], p.h)}%"></span>` +
+      (p.mouth ? `<span class="pup__mouth" style="left:${pct(p.mouth[0], p.w)}%;top:${pct(p.mouth[1], p.h)}%;width:${pct(p.mouth[2], p.w)}%;height:${pct(p.mouth[3], p.h)}%;--tilt:${p.mouth[4] || 0}deg"></span>` : '') +
+      p.eyes.map(eye(p)).join('') +
+      (inside[p.id] || '') +
+      kids(p.id).map((c) => part(c, p)).join('') +
+      `</span>`
+    )
+  }
+
+  // le regole per lo script: escursione, sguardo (direzione della punta nel pezzo), molla
+  const rig = Object.fromEntries(
+    parti
+      .filter((p) => p.parent)
+      .map((p) => [p.id, { min: p.min ?? 0, max: p.max ?? 0, rest: p.rest, look: p.look || 0, dir: p.tip ? Math.round(Math.atan2(p.tip[1] - p.pin[1], p.tip[0] - p.pin[0]) / DEG) : 0, drag: Boolean(p.drag), k: p.k || 90, damp: p.damp || 0.32, ...(p.hide && { hide: p.hide }) }]),
+  )
+  return `<span${attrs({ class: cx('pup', `pup--${name}`, className), style: `--ar:${fw.toFixed(0)}/${fh.toFixed(0)}`, 'data-puppet': name, 'data-rig': JSON.stringify(rig), 'data-scene': b.scena ? JSON.stringify(b.scena) : null, 'data-gaze': gaze || null, 'aria-hidden': 'true' })}><span class="pup__stage">${part(root)}</span></span>`
 }
 
 /**

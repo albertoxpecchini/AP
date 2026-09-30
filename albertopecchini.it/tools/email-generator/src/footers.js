@@ -227,7 +227,12 @@ export function writeFootersMarkdown(data = loadFooters()) {
 
 /**
  * Logo della firma → data URI.
- * `footer.logo` è { file, alt, width }: `file` è relativo alla radice del sito.
+ * `footer.logo` è { file, alt, width, placement?, frame? }: `file` è relativo
+ * alla radice del sito; `placement: 'side'` mette il logo accanto al nome,
+ * `placement: 'identity'` lo mette AL POSTO di nome, ruolo e contesto (un logo
+ * che li contiene già scritti: nel testo semplice restano), `frame: false`
+ * toglie il riquadro chiaro (per i marchi nati su fondo scuro) e `href` rende
+ * il logo un link (il link uguale fra quelli della firma non si ripete).
  * Un file assente non è un errore: la firma esce semplicemente senza logo.
  */
 export function resolveFooterLogo(footer) {
@@ -248,6 +253,9 @@ export function resolveFooterLogo(footer) {
     alt: logo.alt ?? '',
     width: Number(logo.width) || 180,
     padding: Number(logo.padding) || 12,
+    placement: ['side', 'identity'].includes(logo.placement) ? logo.placement : 'top',
+    frame: logo.frame !== false,
+    href: /^https:\/\//.test(logo.href ?? '') ? logo.href : null,
     bytes: base64.length,
   }
 }

@@ -145,16 +145,20 @@
   font-size: clamp(1.75rem, 1.2rem + 1.7vw, 2.75rem);
   letter-spacing: -0.02em;
   line-height: 1;
+  white-space: nowrap;
 }
 
+/* anche sul telefono: ci dorme sopra l'aragosta (client/ink.js); stretta, va a capo */
 .hero__avail {
-  display: none;
+  max-width: 9.75rem;
   color: var(--fg);
+  text-align: right;
 }
 
 @media (min-width: 600px) {
   .hero__avail {
-    display: block;
+    max-width: none;
+    text-align: left;
   }
 }
 
@@ -212,6 +216,136 @@
 
 @keyframes rise {
   from { transform: translate3d(0, 104%, 0); }
+}
+
+/* L'inchiostro di PECCHINI e l'aragosta che lo versa (client/ink.js). Il nome
+   resta testo HTML; sopra, un SVG ridisegna il contorno con lo stesso carattere
+   e ci mette dentro il liquido. Finché lo script non l'ha misurato si vede il
+   contorno dell'HTML, poi il suo sparisce e resta quello dell'SVG. */
+.ink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.is-inked > .ink {
+  opacity: 1;
+}
+
+.is-inked [data-ink-word] {
+  -webkit-text-stroke-color: transparent;
+}
+
+.ink__outline {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.5px;
+}
+
+/* il pelo del liquido: un filo chiaro e, appena sotto, il riflesso */
+.ink__crest {
+  fill: none;
+  stroke: rgb(128 148 205 / 0.6);
+  stroke-width: 1px;
+  stroke-linejoin: round;
+}
+
+.ink__shine {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.13);
+  stroke-width: 2.4px;
+  stroke-linejoin: round;
+}
+
+.ink__jet-shine {
+  fill: none;
+  stroke: rgb(178 196 240 / 0.5);
+  stroke-linecap: round;
+}
+
+[data-ink='dorme'] .ink__part {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* il respiro nel sonno: il guscio si gonfia appena, poggiato sull'etichetta */
+.ink__crayfish {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-ink='dorme'] .ink__crayfish {
+    animation: ink-breathe 3.8s ease-in-out infinite;
+  }
+}
+
+@keyframes ink-breathe {
+  50% { transform: scale(1.012, 1.035); }
+}
+
+.ink__zzz text,
+.ink__bang {
+  font-family: var(--font-serif);
+  font-style: italic;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ink__zzz text {
+  font-size: calc(17px + var(--i) * 5px);
+  fill: var(--muted);
+}
+
+[data-ink='dorme'] .ink__zzz text {
+  animation: ink-z 3.3s ease-in infinite;
+  animation-delay: calc(var(--i) * 1.1s);
+}
+
+@keyframes ink-z {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  18% { opacity: 0.85; }
+  100% { opacity: 0; transform: translate(30px, -52px) scale(1.2); }
+}
+
+.ink__bang {
+  fill: var(--accent);
+}
+
+.ink__bang.is-on {
+  animation: ink-bang 0.95s var(--ease-out);
+}
+
+@keyframes ink-bang {
+  0% { opacity: 0; transform: translateY(8px) scale(0.3); }
+  18% { opacity: 1; transform: translateY(0) scale(1.2); }
+  32% { transform: scale(1); }
+  72% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ink='dorme'] .ink__zzz text {
+    animation: none;
+    opacity: 0.7;
+    transform: translate(calc(var(--i) * 12px), calc(var(--i) * -16px));
+  }
+}
+
+@media print {
+  .ink {
+    display: none;
+  }
+
+  .is-inked [data-ink-word] {
+    -webkit-text-stroke-color: var(--fg);
+  }
 }
 
 .hero__rule {

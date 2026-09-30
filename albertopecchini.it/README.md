@@ -70,10 +70,12 @@ albertopecchini.it/
 │  ├─ scontorna.mjs        toglie il fondo a una foto (bria/remove-background) e ne rifinisce i capelli
 │  ├─ copertine/           copertine e gallerie illustrate dei progetti non web, gpt-image-2 su Replicate (vedi il suo README)
 │  ├─ figurine/            figurine scontornate: nove per immagine, gpt-image-2 su Replicate; anche le sagome dei tasti e le mini immagini del piè di pagina (vedi il suo README)
-│  ├─ mascotte/            la chiocciola e la tartaruga, gpt-image-2 su Replicate; occhi trovati dallo script (vedi il suo README)
+│  ├─ mascotte/            la chiocciola e la tartaruga, e i burattini a pezzi (chiocciola, tartaruga, airone, gazza, vespa), gpt-image-2 su Replicate; occhi e perni trovati dallo script (vedi il suo README)
+│  ├─ aragosta/            l’aragosta di fiume della home (intera, poi in pezzi di burattino), gpt-image-2 su Replicate (vedi il suo README)
 │  ├─ cartina/             fondo illustrato della carta dell’area operativa (/contatti/), gpt-image-2 su Replicate
 │  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
+│  ├─ nota/                le «note» di fine stagione (interventi, riepilogo, totale) in PDF A4 coi caratteri del sito (vedi il suo README)
 │  └─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza (vedi il suo README)
 ├─ emails/                 input, output e allegati delle email generate
 ├─ config/                 account mittente e tema email derivato dal CSS
@@ -83,7 +85,8 @@ albertopecchini.it/
 │  ├─ og.png               immagine per le anteprime social (1200×630)
 │  └─ media/
 │     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine; tasto-*.webp sono le sagome dei tasti, chrome-*.webp le mini immagini del piè di pagina
-│     ├─ mascotte/         lumaca.webp e tartaruga.webp, le mascotte, generate da tools/mascotte
+│     ├─ mascotte/         lumaca.webp e tartaruga.webp, le mascotte, e lumaca/ tartaruga/ airone/ gazza/ vespa/, i pezzi dei burattini, generati da tools/mascotte
+│     ├─ aragosta/         i pezzi dell’aragosta di fiume della home (corpo, coda, chele, antenne, annaffiatoio), da tools/aragosta
 │     ├─ assistenza/       ritagli, sfondi, foto stock, avatar e annunci (ad-*.jpg|gif) di «Better Call Pekko», da tools/assistenza
 │     ├─ mockup/           cornici dei dispositivi dal file Figma (MacBook, iPad, iPhone) e l’iPhone 18 Pro vettoriale
 │     ├─ progetti/         una cartella per progetto: fotografie NN.webp (griglia) e NN-full.webp (lightbox), copertina.webp e vista-NN.webp illustrate
@@ -102,14 +105,17 @@ albertopecchini.it/
 │  │  ├─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
 │  │  ├─ figurine.js       generato da tools/figurine: nomi e misure delle figurine ritagliate
 │  │  ├─ mascotte.js       generato da tools/mascotte: misure, occhi e naso delle mascotte
+│  │  ├─ burattini-pezzi.js  generato da tools/mascotte: misure, perni e occhi dei pezzi dei burattini
+│  │  ├─ aragosta.js       a mano: montaggio e pose dell’aragosta della home (aragosta-pezzi.js è generato da tools/aragosta)
+│  │  ├─ burattini.js      a mano: il montaggio dei burattini (dove si attacca ogni pezzo, quanto gira, cosa segue)
 │  │  ├─ assistenza.js     contenuti (in inglese) delle pagine «Better Call Pekko» (/assistenza/, /contatti/assistenza/)
 │  │  ├─ assistenza-media.js  generato da tools/assistenza: misure delle immagini di public/media/assistenza/
 │  ├─ templates/
 │  │  ├─ routes.js         tabella delle rotte (percorso, title, description, dati strutturati) + sitemap, robots, miniature
-│  │  ├─ layout.js         <html> completo: head, header e footer (centrati, tasti «sasso», mascotte), JSON-LD, firma
+│  │  ├─ layout.js         <html> completo: head, header e footer (centrati, tasti «sasso», mascotte e burattini), JSON-LD, firma
 │  │  ├─ html.js           tag `html`, `esc`, `attrs`, `cx`, `pad`, `jsonLd`
 │  │  ├─ components/
-│  │  │  ├─ ui.js          icone, monogramma, bottoni, tasti «sasso» (pebble), mascotte, intestazioni di sezione, media, mockup, schede dati
+│  │  │  ├─ ui.js          icone, monogramma, bottoni, tasti «sasso» (pebble), mascotte, burattini (puppet), intestazioni di sezione, media, mockup, schede dati
 │  │  │  ├─ project.js     card, riga d’indice, copertina e anteprima di un progetto
 │  │  │  └─ viewer.js      visualizzatore delle tavole (case study e pagina Tavole)
 │  │  └─ pages/            una funzione per pagina: home, portfolio, case-study, info (servizi, metodo, studio, profilo), informatica (assistenza informatica), contact, legal (privacy, cookie, 404), stile (sistema visivo), tavole (visualizzatore)
@@ -121,8 +127,10 @@ albertopecchini.it/
 │  │  ├─ chrome.js         header, sottomenu, menu mobile, avanzamento, transizioni
 │  │  ├─ pebble.js         tasti «sasso»: inclinazione verso il puntatore, stato premuto
 │  │  ├─ mascot.js         mascotte: occhi che seguono il puntatore, si incrociano sul naso, sbattono, si guardano intorno
+│  │  ├─ puppet.js         burattini: pezzi su molle da tirare col puntatore, occhi indipendenti, il carattere di airone, gazza e vespa
 │  │  ├─ motion.js         reveal, contatori, parallasse, cursore, elementi magnetici, anteprime
 │  │  ├─ sections.js       hero, carosello dei siti, timeline del metodo, indice laterale
+│  │  ├─ ink.js            l’aragosta della home e l’inchiostro di PECCHINI: burattino, simulazione del liquido, gocce (solo in home)
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
@@ -390,7 +398,18 @@ Servizi, fasi del metodo (in `/metodo/` e in home), lavori trasversali, strument
 
 ### Mascotte
 
-La **chiocciola gigante africana** e la **tartaruga di terra**, gli animali di Alberto, custodiscono il sito: la testa della chiocciola accanto al marchio nella testata, tutte e due ai lati della firma nel piè di pagina. Sono due immagini di gpt-image-2 (`public/media/mascotte/`) fatte da [`tools/mascotte`](tools/mascotte/README.md), che trova gli occhi da solo e scrive `src/data/mascotte.js`; il naso si segna a mano. `mascot(nome, { crop })` in `ui.js` mette sopra l’immagine gli occhi del sito e `src/client/mascot.js` li muove: ogni pupilla segue il puntatore per conto suo, sul naso gli occhi si incrociano e la mascotte vibra, ogni tanto sbattono le palpebre e senza puntatore (telefono, mouse fermo) si guardano intorno.
+La **chiocciola gigante africana** e la **tartaruga di terra**, gli animali di Alberto, custodiscono il sito: la testa della chiocciola accanto al marchio nella testata, tutte e due — come burattini a pezzi — ai lati della firma nel piè di pagina; la tartaruga è stata rifatta da zero il 1º ottobre 2026, di profilo e con l’elmetto, e intera compare solo in «Better Call Pekko». Sono due immagini di gpt-image-2 (`public/media/mascotte/`) fatte da [`tools/mascotte`](tools/mascotte/README.md), che trova gli occhi da solo e scrive `src/data/mascotte.js`; il naso si segna a mano. `mascot(nome, { crop })` in `ui.js` mette sopra l’immagine gli occhi del sito e `src/client/mascot.js` li muove: ogni pupilla segue il puntatore per conto suo, sul naso gli occhi si incrociano e la mascotte vibra, ogni tanto sbattono le palpebre e senza puntatore (telefono, mouse fermo) si guardano intorno.
+
+Accanto a loro, nel piè di pagina, tre **burattini di carta**: l’**airone** elegante (a sinistra), la **gazza** furbissima (a destra) e la **vespa** cattiva ma precisa, che si libra sopra la firma; sul telefono stanno in una fila sopra la firma. Ogni animale è fatto di pezzi separati (corpo, testa, collo, ali, zampe, coda, addome, antenne) uniti da fermacampioni: `tools/mascotte/burattini.mjs` fa disegnare a gpt-image-2 l’animale intero e poi lo stesso smontato, separa i pezzi e trova i perni (i fermacampioni dorati) e gli occhi (`src/data/burattini-pezzi.js`); il montaggio si scrive a mano in `src/data/burattini.js`. `puppet(nome)` in `ui.js` annida i pezzi (dietro o davanti al genitore) e `src/client/puppet.js` li muove su molle: collo, testa e pungiglione si voltano verso il puntatore, zampe, ali, code e antenne si tirano col mouse o col dito e ricadono oscillando, gli occhi seguono il puntatore ciascuno per conto suo (e senza puntatore vagano ognuno per sé). Il carattere: l’airone, toccato, fa l’inchino; la gazza muove la testa a scatti, gira il becco con la chiave se ti avvicini e, toccata, fa l’occhiolino; la vespa punta il pungiglione dove sei, si arrabbia se ti avvicini e, toccata, punge.
+
+### L’aragosta e l’inchiostro (home)
+
+Nella prima schermata della home un’**aragosta di fiume** rossa (il gambero rosso del Mincio) dorme sopra «Disponibile per nuovi incarichi», col suo annaffiatoio azzurro accanto. Quando il visitatore sta fermo per poco più di due secondi (niente puntatore, scroll, tasti o tocchi) si sveglia di colpo — salto, colpo di coda, «!» — e versa inchiostro nella prima I di PECCHINI: in meno di tre secondi il cognome è pieno. PECCHINI è un recipiente unico: l’inchiostro corre sul fondo da una lettera all’altra e sale in tutte insieme. Dopo cinque secondi pieno comincia a perdere, goccia a goccia dal fondo delle lettere sul righello, e l’aragosta torna a versare, all’infinito; una volta riempito non scende mai sotto la metà. Se l’hero esce dallo schermo si riaddormenta (e il cognome perde fino a metà), un tocco la sveglia subito; con «riduci movimento» dorme e basta.
+
+- **Il liquido** è simulato davvero (`Liquid` in `src/client/ink.js`): acqua bassa su una griglia di colonne, 1 px = 1 mm e g = 9,8 m/s², flussi conservativi, così fa onde, sciaborda quando si scorre la pagina (l’accelerazione dello scroll lo spinge di lato) e quando il puntatore ci passa sopra, e si calma da solo. Tutto è in un SVG sopra l’hero: il contorno del cognome è un `<text>` con lo stesso carattere e le stesse misure dell’HTML, che nel frattempo nasconde il proprio (`.is-inked`), e il liquido è ritagliato dalla stessa parola. Il ciclo si ferma quando l’hero non si vede.
+- **L’aragosta** è un burattino di carta come quelli del piè di pagina, ma con un montaggio suo: pezzi e pose in `src/data/aragosta.js`, immagini in `public/media/aragosta/`, fatte da [`tools/aragosta`](tools/aragosta/README.md). Occhi, palpebre, il getto (una parabola dal beccuccio all’apertura della I) e le gocce li disegna il codice.
+- **Anche in /stile/**: la tavola «Mascotte e burattini» ha una fascia per l’aragosta con una scena sua (etichetta, PECCHINI a 160 px, righello) che funziona come quella della home: `ink.js` monta una scena per ogni `[data-ink]` e riporta le misure a 1:1 anche quando il piano è ingrandito; spostare il piano fa sciabordare l’inchiostro.
+- **Markup**: `data-ink` sull’`hero__wrap`, `data-ink-word` sul cognome, `data-ink-bed` sull’etichetta della disponibilità (per questo ora si vede anche sul telefono), `data-ink-rule` sul righello dove cadono le gocce. Il modulo si carica solo in home (`onDemand` in `main.js`). In locale `window.__ink` dice stato e livello e con `__ink.go('versa')` salta a uno stato.
 
 ## Fonti delle immagini
 
@@ -402,6 +421,8 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | Illustrazione dell’assistenza informatica | `public/media/servizi/informatica/copertina.webp` | Generata con **openai/gpt-image-2** su Replicate — [`tools/copertine`](tools/copertine/README.md) (voce `informatica`) |
 | Figurine, sagome dei tasti (`tasto-*.webp`), mini immagini del piè di pagina (`chrome-*.webp`) | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
 | Mascotte: chiocciola gigante africana e tartaruga di terra | `public/media/mascotte/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/mascotte`](tools/mascotte/README.md); gli occhi mobili sono disegnati dal codice del sito |
+| Burattini: airone, gazza, vespa | `public/media/mascotte/{airone,gazza,vespa}/` | Generati con **openai/gpt-image-2** su Replicate (l’animale intero con le due mascotte come riferimento di stile, poi i pezzi con l’intero come riferimento) — [`tools/mascotte`](tools/mascotte/README.md); montaggio, occhi e movimenti sono del codice del sito |
+| Aragosta di fiume della home (con l’annaffiatoio) | `public/media/aragosta/` | Generata con **openai/gpt-image-2** su Replicate (intera con la chiocciola come riferimento di stile, poi i pezzi con l’intera come riferimento) — [`tools/aragosta`](tools/aragosta/README.md); montaggio, occhi, getto, inchiostro e gocce sono del codice del sito |
 | Ingredienti e annunci di «Better Call Pekko» (/assistenza/) | `public/media/assistenza/` | Gli ingredienti (ritagli di Alberto in completi sgargianti e da web designer, balli per le silhouette, foto stock finte, icone lucide «Web 2.0», oggetti, avatar, quattro sfondi) sono generati con **openai/gpt-image-2** su Replicate, il volto dalla fototessera data come riferimento; gli annunci `ad-*` sono composti a strati in HTML da [`tools/assistenza`](tools/assistenza/README.md) (testo, starburst e nastri del sito) e fotografati con il browser headless; i banner `ad-web-*` e i bottoni `btn-*` (88×31) sono disegnati in vettoriale nel canvas di **Claude Design** e resi da `tools/assistenza/design.mjs`; le GIF montano i fotogrammi con ffmpeg; `shot-bcp.webp` è una cattura della pagina stessa |
 | Fondo della carta dell’area operativa (/contatti/) | `public/media/mappa/area-operativa.webp` | Generato con **openai/gpt-image-2** su Replicate dal riferimento di lago e fiumi di `areamap({ solo: 'acque' })`; reticolo, raggi, città, nomi e scala restano vettoriali, da `areamap({ base })` in `src/art/misc.js` — `tools/cartina/cartina.mjs` |
 | Ritratto e avatar | `public/media/studio/fototessera*.webp` | Fototessera di Alberto Pecchini, scontornata con bria/remove-background su Replicate (volto non ritoccato) |
@@ -438,18 +459,19 @@ Scelte fatte apposta, da non cambiare senza motivo:
 - **Caratteri**: Archivo Variable (asse `wdth`) per i testi, IBM Plex Mono per etichette e dati, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
 - **Reveal** (`base.css`): `data-reveal` con i tipi `fade`, `up`, `clip`, `line`, `draw`, `words`; tutto disattivato con `prefers-reduced-motion`. Più in basso le rivelazioni partono con l’IntersectionObserver di `motion.js`; nel **primo schermo** (la testata di ogni pagina: `.hero`, `.phead`, `.cs-hero`, `.shero__grid`, `.cnt__intro`, `.nf`) sono invece animazioni CSS che partono al primo disegno, senza aspettare lo script: titolo e testo grande arrivano subito anche su una rete lenta. Lo stesso elenco sta in `FIRST_SCREEN` (`motion.js`). Dopo la tendina d’ingresso (classe `nav-in`) aspettano che la tendina si stia alzando.
 - **Movimento**: durate `--t-1`…`--t-4` = 0,15 · 0,3 · 0,55 · 0,8 s, easing `--ease-out` per gli ingressi. Tendina tra le pagine: esce in 0,34 s (si naviga a 0,36 s), rientra in 0,5 s. Gli inseguimenti (cursore, anteprima, inclinazione dell’hero) usano `damp()` di `utils.js`, che dà la stessa velocità a 60 e a 120 Hz. Niente `will-change` permanenti, tranne dove un elemento si muove di continuo.
-- **Header e footer** (`layout.css`): tutti e due centrati e simmetrici su una griglia `1fr auto 1fr`, con il marchio in mezzo. Nella testata: tre voci · chiocciola e marchio · due voci e invito (sotto i 1100 px: menu · marchio · contatti). Nel piè di pagina, dall’alto: invito e due tasti, fila delle pagine, firma custodita dalle due mascotte, recapiti con le mini immagini, note legali con il credito «Sito di Alberto Pecchini», torna su. Palette scoperta su `footer.site-footer`.
+- **Header e footer** (`layout.css`): tutti e due centrati e simmetrici su una griglia `1fr auto 1fr`, con il marchio in mezzo. Nella testata: tre voci · chiocciola e marchio · due voci e invito (sotto i 1100 px: menu · marchio · contatti). Nel piè di pagina, dall’alto: invito e due tasti, fila delle pagine, firma custodita dalle due mascotte e dai tre burattini, recapiti con le mini immagini, note legali con il credito «Sito di Alberto Pecchini», torna su. Palette scoperta su `footer.site-footer`.
 - **Tasti «sasso»** (`pebble.css`, markup da `pebble()` in `ui.js`): la sagoma irregolare è un’immagine di gpt-image-2 (`public/media/figurine/tasto-*.webp`) stirata sul tasto; sotto c’è lo spessore (la stessa sagoma come maschera, piena di un colore d’ombra, spostata di `--pb-depth`). Al passaggio la faccia si solleva e il tasto si inclina verso il puntatore (`--tx`/`--ty` da `pebble.js`), premendo scende sullo spessore. Tre toni (carta, minio, inchiostro), tre misure, la variante tonda per la sola icona; senza sagoma ritagliata la forma è disegnata in CSS.
 - **Mascotte** (`mascot.css`, markup da `mascot()` in `ui.js`): sopra l’immagine, ai centri segnati in `src/data/mascotte.js`, stanno due occhi del sito (disco bianco, pupilla mossa da `--px`/`--py`, palpebra del colore della pelle) e la zona del naso; `.masc--crop` mostra un ritaglio (la testa della chiocciola in testata, sfumata in basso da una maschera).
+- **Burattini** (`mascot.css`, markup da `puppet()` in `ui.js`): ogni `.pup__part` è il riquadro di un pezzo, messo in percentuale del genitore e girato intorno al perno (`--o`); i pezzi dietro al genitore hanno `z-index` negativo e restano sotto la sua immagine perché ogni pezzo isola il proprio impilamento. Gli occhi sono quelli delle mascotte; la vespa ha le palpebre inclinate e le ali che frullano.
 - **Stile** (`stile.css`): il piano navigabile della pagina `/stile/` e le sue tavole, a misure fisse in px (sono fogli inquadrati dalla finestra, non layout fluidi).
 - **Visualizzatore** (`viewer.css`): le tavole vere, nel case study, nella pagina `/portfolio/tavole/` e a schermo intero.
 - **Stampa** (`print.css`): la pagina `/studio/profilo/` è pensata per essere stampata come curriculum.
 
 ## JavaScript del browser
 
-`src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill. Il piano di `/stile/` (`canvas.js`), il visualizzatore delle tavole (`viewer.js` con il lettore DWG) e il compositore email (`email.js`) si caricano in pezzi a parte, solo sulle pagine che li contengono (`onDemand` in `main.js`): il JavaScript comune è la metà di prima.
+`src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill. Il piano di `/stile/` (`canvas.js`), il visualizzatore delle tavole (`viewer.js` con il lettore DWG) il compositore email (`email.js`) e l’aragosta con l’inchiostro della home (`ink.js`) si caricano in pezzi a parte, solo sulle pagine che li contengono (`onDemand` in `main.js`): il JavaScript comune è la metà di prima.
 
-Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, tasti «sasso» che si inclinano e si premono, mascotte con gli occhi che seguono il puntatore (si incrociano sul naso, sbattono le palpebre, si guardano intorno senza puntatore), barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile, visualizzatore delle tavole.
+Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, tasti «sasso» che si inclinano e si premono, mascotte con gli occhi che seguono il puntatore (si incrociano sul naso, sbattono le palpebre, si guardano intorno senza puntatore), burattini a pezzi da tirare col mouse o col dito, barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile, visualizzatore delle tavole.
 
 ## Build
 

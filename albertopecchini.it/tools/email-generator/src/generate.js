@@ -10,6 +10,7 @@ import { paths, GENERATOR_VERSION } from './paths.js'
 import { parseInputFile } from './parse-input.js'
 import { resolveSender } from './senders.js'
 import { loadEmailTheme } from './theme.js'
+import { themeFor } from './stili.js'
 import { buildEmbeddedFontCss } from './fonts.js'
 import { readSource, checkAttachments } from './sources.js'
 import { getFooter, learnFooter, renderFooterText, resolveFooterLogo } from './footers.js'
@@ -44,12 +45,13 @@ export function generateEmail(inputFile, options = {}) {
 
   const input = parseInputFile(absoluteInput)
   const baseDir = path.dirname(absoluteInput)
-  const theme = loadEmailTheme()
-
   // ── Mittente ───────────────────────────────────────────────────────────────
   const senderResult = resolveSender(input.meta.fromProfile)
   const profile = senderResult.ok ? senderResult.profile : null
   const senderError = senderResult.ok ? null : senderResult.reason
+
+  // Lo stile è quello della casella (`style` in sender-profiles.json, vedi stili.js).
+  const theme = themeFor(profile?.style, loadEmailTheme())
 
   // ── Fonti e allegati ───────────────────────────────────────────────────────
   const sources = input.filesToRead.map((entry) => readSource(entry, baseDir))
@@ -107,7 +109,7 @@ export function generateEmail(inputFile, options = {}) {
   }
 
   // Variante completa, con carattere incorporato.
-  const font = buildEmbeddedFontCss({ embed: true })
+  const font = buildEmbeddedFontCss({ embed: theme.font.embed !== false })
   const html = renderEmailHtml({ ...common, fontCss: font.css })
 
   // Variante leggera: stessa email senza il font, per Gmail (soglia di ritaglio).

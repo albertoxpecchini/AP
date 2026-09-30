@@ -39,7 +39,9 @@ const CENTER = { lat: 45.1564, lon: 10.7914 }
 const KM_LAT = 111.2
 const KM_LON = 111.32 * Math.cos((CENTER.lat * Math.PI) / 180)
 
+// [nome, lat, lon, 'l' capoluogo | 's' paese, 'w' = nome a sinistra del punto]
 const CITIES = [
+  ['Mantova', 45.1564, 10.7914, 'l'],
   ['Verona', 45.4384, 10.9916, 'l'],
   ['Brescia', 45.5416, 10.2118, 'l'],
   ['Cremona', 45.1332, 10.0227, 'l'],
@@ -53,7 +55,7 @@ const CITIES = [
   ['Castiglione d/S', 45.3906, 10.4894, 's'],
   ['Asola', 45.2206, 10.4131, 's'],
   ['Ostiglia', 45.0706, 11.1339, 's'],
-  ['Goito', 45.2535, 10.663, 's'],
+  ['Goito', 45.2535, 10.663, 's', 'w'],
   ['Viadana', 44.927, 10.52, 's'],
 ]
 
@@ -71,7 +73,10 @@ const GARDA = [[45.44, 10.69], [45.47, 10.72], [45.505, 10.725], [45.55, 10.715]
 // reticolo, raggi, città, scritte e scala grafica, che così restano esatti.
 // `solo: 'acque'`: solo lago e fiumi, senza scritte: è il riferimento che
 // tools/cartina manda al modello perché ridisegni la geografia al posto giusto.
-export function areamap({ w = 1200, h = 900, tone = 'paper', label, base, solo } = {}) {
+// `sede`: { name, lat, lon, coords }, il punto da cui partono i raggi d'azione.
+// Non è il centro della carta: la proiezione resta centrata su Mantova (CENTER)
+// perché la carta illustrata di `base` è disegnata così.
+export function areamap({ w = 1200, h = 900, tone = 'paper', label, base, solo, sede } = {}) {
   const scale = w / 165 // px per km
   const X = (lon) => w / 2 + (lon - CENTER.lon) * KM_LON * scale
   const Y = (lat) => h / 2 - (lat - CENTER.lat) * KM_LAT * scale
@@ -100,29 +105,39 @@ export function areamap({ w = 1200, h = 900, tone = 'paper', label, base, solo }
   out += text(X(10.63), Y(45.56), 'GARDA', { c: 'a-tm', size: 10, anchor: 'middle', spacing: '.2em' })
   out += text(X(11.22), Y(45.035), 'PO', { c: 'a-tm', size: 10, spacing: '.2em' }) + text(X(10.745), Y(45.3), 'MINCIO', { c: 'a-tm', size: 10, spacing: '.2em', rotate: -80 })
 
-  // raggi d'azione
-  for (const km of [10, 25, 50]) {
-    out += circle(w / 2, h / 2, km * scale, km === 25 ? 'a-sa a-dash' : 'a-s2 a-dash')
-    out += rect(w / 2 - 22, h / 2 - km * scale - 8, 44, 15, 'a-bg') + text(w / 2, h / 2 - km * scale + 4, `${km} km`, { c: km === 25 ? 'a-ta' : 'a-tm', size: 10.5, anchor: 'middle' })
+  // raggi d'azione intorno alla sede, con la misura a est (in alto il 50 km
+  // cadrebbe sul lago di Garda)
+  const [sx, sy] = sede ? P([sede.lat, sede.lon]) : [w / 2, h / 2]
+  if (sede) {
+    for (const km of [10, 25, 50]) {
+      out += circle(sx, sy, km * scale, km === 25 ? 'a-sa a-dash' : 'a-s2 a-dash')
+      out += rect(sx + km * scale - 22, sy - 8, 44, 15, 'a-bg') + text(sx + km * scale, sy + 4, `${km} km`, { c: km === 25 ? 'a-ta' : 'a-tm', size: 10.5, anchor: 'middle' })
+    }
   }
 
   // città
-  for (const [name, lat, lon, size] of CITIES) {
+  for (const [name, lat, lon, size, side] of CITIES) {
     const [x, y] = P([lat, lon])
     if (x < 30 || x > w - 60 || y < 30 || y > h - 20) continue
     out += size === 'l' ? rect(x - 4, y - 4, 8, 8, 'a-fill') : circle(x, y, 3, 'a-bg a-s')
-    out += text(x + 10, y + 4, size === 'l' ? name.toUpperCase() : name, { c: size === 'l' ? 'a-t' : 'a-tm', size: size === 'l' ? 11.5 : 10.5, spacing: size === 'l' ? '.08em' : undefined })
+    out += text(side === 'w' ? x - 10 : x + 10, y + 4, size === 'l' ? name.toUpperCase() : name, { c: size === 'l' ? 'a-t' : 'a-tm', size: size === 'l' ? 11.5 : 10.5, spacing: size === 'l' ? '.08em' : undefined, anchor: side === 'w' ? 'end' : 'start' })
   }
 
-  // Mantova
-  out += cross(w / 2, h / 2, 26, 'a-sa') + circle(w / 2, h / 2, 7, 'a-acc') + circle(w / 2, h / 2, 14, 'a-sa')
-  out += rect(w / 2 + 24, h / 2 + 12, 232, 42, 'a-bg a-sa') + text(w / 2 + 36, h / 2 + 30, 'MANTOVA — SEDE', { c: 'a-ta', size: 12, weight: 500, spacing: '.08em' }) + text(w / 2 + 36, h / 2 + 46, '45°09′23″N  10°47′29″E', { size: 10.5 })
+  // la sede: il cartiglio sta in basso a sinistra del punto, dove la carta è libera
+  if (sede) {
+    const tag = `${sede.name.toUpperCase()} — SEDE`
+    const bw = Math.max(232, Math.round(tag.length * 8.2) + 30)
+    // .a-sede: la guarda l'airone accanto alla carta (/contatti/)
+    out += `<g class="a-sede">${cross(sx, sy, 26, 'a-sa') + circle(sx, sy, 7, 'a-acc') + circle(sx, sy, 14, 'a-sa')}</g>`
+    out += rect(sx - 24 - bw, sy + 24, bw, 42, 'a-bg a-sa') + text(sx - 12 - bw, sy + 42, tag, { c: 'a-ta', size: 12, weight: 500, spacing: '.08em' }) + text(sx - 12 - bw, sy + 58, sede.coords, { size: 10.5 })
+  }
 
-  // scala
-  out += rect(40, h - 58, 25 * scale + 40, 38, 'a-bg') + line(56, h - 34, 56 + 25 * scale, h - 34, 'a-sb') + line(56, h - 40, 56, h - 28, 'a-s') + line(56 + 25 * scale, h - 40, 56 + 25 * scale, h - 28, 'a-s')
-  out += text(56, h - 44, '0', { c: 'a-tm', size: 10 }) + text(56 + 25 * scale, h - 44, '25 km', { c: 'a-tm', size: 10, anchor: 'end' })
+  // scala, in basso a destra (a sinistra, in /contatti/, sta l'airone)
+  const s0 = w - 56 - 25 * scale
+  out += rect(s0 - 16, h - 58, 25 * scale + 40, 38, 'a-bg') + line(s0, h - 34, s0 + 25 * scale, h - 34, 'a-sb') + line(s0, h - 40, s0, h - 28, 'a-s') + line(s0 + 25 * scale, h - 40, s0 + 25 * scale, h - 28, 'a-s')
+  out += text(s0, h - 44, '0', { c: 'a-tm', size: 10 }) + text(s0 + 25 * scale, h - 44, '25 km', { c: 'a-tm', size: 10, anchor: 'end' })
   out += poly([[w - 60, 78], [w - 50, 46], [w - 40, 78], [w - 50, 70]], 'a-fill') + text(w - 50, 38, 'N', { size: 12, anchor: 'middle', weight: 500 })
   if (base) out += '</g>'
 
-  return svg({ w, h, tone, label: label || 'Carta dell’area operativa: Mantova con raggi di 10, 25 e 50 chilometri', body: out })
+  return svg({ w, h, tone, label: label || (sede ? `Carta dell’area operativa: la sede a ${sede.name} con raggi di 10, 25 e 50 chilometri` : 'Carta dell’area operativa'), body: out })
 }

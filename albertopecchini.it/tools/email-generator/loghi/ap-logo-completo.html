@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8">
+<!-- Logo completo di Alberto Pecchini per la firma email (yahoo). Si rende con
+     Edge: msedge --headless=new --allow-file-access-from-files --force-device-scale-factor=2
+     --default-background-color=00000000 --window-size=1400,450 --screenshot=… questo file,
+     poi si rifila il trasparente; in src/assets/email/ va la copia larga 720 px. -->
+<style>
+@font-face{font-family:'Archivo Variable';font-weight:100 900;font-stretch:62% 125%;src:url('../../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2') format('woff2-variations')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;src:url('../../../node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-weight:400;src:url('../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2')}
+html,body{margin:0;background:transparent}
+.l{display:inline-flex;align-items:center;gap:40px;padding:40px;color:#10110f}
+.l img{display:block;width:250px;height:250px;border-radius:0}
+/* il nome: .logo__name del sito (Archivo 640) portato in maiuscolo; i titoli del sito stringono la larghezza al 94% */
+.nome{font-family:'Archivo Variable',Archivo,sans-serif;font-weight:640;font-stretch:94%;font-size:76px;line-height:.94;letter-spacing:.005em;text-transform:uppercase;white-space:nowrap}
+/* il sottotitolo: .serif-i del sito (Instrument Serif corsivo, -0.01em) */
+.sotto{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;font-size:66px;line-height:1;letter-spacing:-0.01em;margin:10px 0 0 2px}
+/* il sito: le etichette del sito sono IBM Plex Mono */
+.web{font-family:'IBM Plex Mono',monospace;font-size:31px;letter-spacing:.02em;margin:22px 0 0 3px;padding-top:18px;border-top:3px solid #10110f}
+.web b{font-weight:400;color:#e5481f}
+</style>
+<div class="l"><img src="../../../public/icon-512.png" alt=""><div><div class="nome">Alberto Pecchini</div><div class="sotto">Diplomato geometra</div><div class="web">www.albertopecchini<b>.</b>it</div></div></div>

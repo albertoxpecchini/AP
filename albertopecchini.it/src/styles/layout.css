@@ -85,7 +85,7 @@
   justify-self: end;
 }
 
-/* il marchio: la chiocciola (solo la testa) accanto al monogramma e al nome */
+/* il marchio: la chiocciola (il burattino) accanto al monogramma e al nome */
 .site-header__brand {
   display: flex;
   align-items: center;
@@ -94,12 +94,46 @@
 }
 
 .site-header__masc {
-  --masc-w: 3.1rem;
+  --pup-w: 3.4rem;
+  --drop: calc(0.5s + var(--enter, 0ms));
   flex: none;
-  /* la testa sbuca un filo sotto la linea del nome e il collo sfuma nella barra */
-  margin-bottom: -0.4rem;
-  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 97%);
-  mask-image: linear-gradient(to bottom, #000 58%, transparent 97%);
+}
+
+/* arriva solo corpo e occhi: mezzo secondo dopo che la pagina si vede (--enter,
+   la tendina d'ingresso) il guscio le cade addosso dall'alto, lei si schiaccia
+   un poco e il guscio rimbalza; all'atterraggio (fine di pup-drop) puppet.js la
+   tratta come toccata, quindi ritira gli occhi e il guscio traballa */
+.site-header__masc .pup__part--guscio {
+  animation:
+    pup-drop 0.36s cubic-bezier(0.55, 0, 1, 0.45) var(--drop) both,
+    pup-bounce 0.34s ease-out calc(var(--drop) + 0.36s);
+}
+
+.site-header__masc .pup__part--corpo {
+  transform-origin: 50% 100%;
+  animation: pup-squash 0.3s ease-out calc(var(--drop) + 0.36s);
+}
+
+@keyframes pup-drop {
+  from { translate: 0 -190%; }
+  to { translate: 0 0; }
+}
+
+@keyframes pup-bounce {
+  0%, 100% { translate: 0 0; }
+  40% { translate: 0 -7%; }
+}
+
+@keyframes pup-squash {
+  0%, 100% { scale: 1; }
+  30% { scale: 1.04 0.92; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header__masc .pup__part--guscio,
+  .site-header__masc .pup__part--corpo {
+    animation: none;
+  }
 }
 
 .logo {
@@ -192,6 +226,11 @@
   .menu-toggle:not(.menu-toggle--close),
   .site-header__mail {
     display: none;
+  }
+
+  /* la barra è più alta: la chiocciola intera ci sta più grande */
+  .site-header__masc {
+    --pup-w: 4.4rem;
   }
 
   .site-header__inner {
@@ -594,9 +633,15 @@ footer.site-footer {
 
 /* ── 3 · Il marchio custodito ── */
 
+/* Sul telefono due file: sopra i tre burattini (airone · vespa · gazza), sotto
+   la firma tra la chiocciola e la tartaruga. Da 60rem una fila sola: l'airone e
+   la gazza alle ali, la vespa che si libra sopra la firma. */
 .foot-sign {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    'air ves gaz'
+    'lum sig tar';
   align-items: end;
   justify-items: center;
   column-gap: clamp(0.75rem, 3vw, 3.5rem);
@@ -605,21 +650,99 @@ footer.site-footer {
 }
 
 .foot-sign__guard {
-  --masc-w: clamp(5.5rem, 24vw, 15rem);
+  --pup-w: clamp(5.5rem, 24vw, 15rem);
 }
 
 .foot-sign__guard--l {
+  grid-area: lum;
   justify-self: end;
 }
 
+/* la tartaruga è di profilo, lunga: le si dà più larghezza della chiocciola */
 .foot-sign__guard--r {
+  grid-area: tar;
   justify-self: start;
+  --pup-w: clamp(7rem, 31vw, 19rem);
+}
+
+.foot-sign__center {
+  display: contents;
 }
 
 .foot-sign__mark {
+  grid-area: sig;
   display: block;
   width: clamp(6rem, 22vw, 14rem);
   color: var(--fg);
+}
+
+.foot-sign__pup {
+  margin-bottom: clamp(1rem, 5vw, 2.5rem);
+}
+
+.foot-sign__pup--airone {
+  grid-area: air;
+  --pup-w: clamp(5rem, 22vw, 8rem);
+}
+
+.foot-sign__pup--vespa {
+  grid-area: ves;
+  align-self: center;
+  --pup-w: clamp(5.5rem, 27vw, 9.5rem);
+}
+
+.foot-sign__pup--gazza {
+  grid-area: gaz;
+  --pup-w: clamp(5.25rem, 27vw, 11rem);
+}
+
+@media (min-width: 60rem) {
+  .foot-sign {
+    grid-template-columns: repeat(5, auto);
+    grid-template-areas: 'air lum sig tar gaz';
+    justify-content: center;
+    column-gap: clamp(0.5rem, 2vw, 2.5rem);
+    max-width: none;
+  }
+
+  .foot-sign__pup {
+    margin-bottom: 0;
+  }
+
+  .foot-sign__guard {
+    --pup-w: clamp(10rem, 16vw, 14rem);
+  }
+
+  .foot-sign__guard--r {
+    --pup-w: clamp(13rem, 21vw, 19rem);
+  }
+
+  .foot-sign__center {
+    grid-area: sig;
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+  }
+
+  .foot-sign__mark {
+    grid-area: auto;
+    width: clamp(9rem, 14vw, 13rem);
+  }
+
+  .foot-sign__pup--airone {
+    --pup-w: clamp(7.5rem, 11vw, 11.5rem);
+  }
+
+  .foot-sign__pup--vespa {
+    grid-area: auto;
+    justify-self: end;
+    margin-right: -2rem;
+    --pup-w: clamp(7rem, 9vw, 8.5rem);
+  }
+
+  .foot-sign__pup--gazza {
+    --pup-w: clamp(9rem, 13vw, 13rem);
+  }
 }
 
 .foot-sign__float {
@@ -715,6 +838,18 @@ footer.site-footer {
 
 .js [data-reveal='draw'] .foot-sign__guard--r {
   transition-delay: 0.45s;
+}
+
+.js [data-reveal='draw'] .foot-sign__pup--airone {
+  transition-delay: 0.2s;
+}
+
+.js [data-reveal='draw'] .foot-sign__pup--gazza {
+  transition-delay: 0.6s;
+}
+
+.js [data-reveal='draw'] .foot-sign__pup--vespa {
+  transition-delay: 0.75s;
 }
 
 .js [data-reveal='draw'].is-in .foot-sign__guard,

@@ -1,6 +1,6 @@
 // Pagina /stile/: il sistema visivo del sito su un piano navigabile, come in
-// un programma di disegno — cinque tavole a 1440 px (home, colore, tipografia,
-// forma e movimento, componenti). Le tavole usano gli stessi componenti e gli
+// un programma di disegno — sei tavole a 1440 px (home, colore, tipografia,
+// forma e movimento, componenti, mascotte e burattini). Le tavole usano gli stessi componenti e gli
 // stessi token del sito; zoom e spostamento stanno in src/client/canvas.js.
 // I contenuti (palette, scala, spazi…) vengono da src/data/stile.js.
 
@@ -8,7 +8,8 @@ import { html, esc, cx, pad } from '../html.js'
 import { site, nav, cta, stats, closing } from '../../data/site.js'
 import { projects, byArea, allAreas } from '../../data/projects.js'
 import * as S from '../../data/stile.js'
-import { logo, button, textLink, tagList, picture, icon } from '../components/ui.js'
+import { logo, button, textLink, tagList, picture, icon, puppet } from '../components/ui.js'
+import { burattino } from '../../data/burattini.js'
 import { COORDS } from '../layout.js'
 
 const em = (word) => `<em class="serif-i">${esc(word)}</em>`
@@ -379,9 +380,81 @@ function componentiBoard(b) {
   )
 }
 
+// ── 05 · Mascotte e burattini ────────────────────────────────────────────────
+// Gli animali vivi (si muovono e si toccano anche qui), l'aragosta della home con
+// la sua scena (lo stesso inchiostro della home, src/client/ink.js), un animale
+// smontato con i perni segnati, le regole comuni e dove stanno nel sito.
+
+function mascotteBoard(b) {
+  const x = S.exploded
+  const A = S.aragosta
+  const pezzi = burattino(x.key).parti
+  const pct = (v, total) => ((v / total) * 100).toFixed(2)
+  return board(
+    b,
+    html`
+      <div class="bd">
+        ${head(b, 'Chiocciola · Tartaruga · Airone · Gazza · Vespa · Aragosta', 'gpt-image-2 · pezzi su molle')}
+        ${intro(`Sei animali, ${em('a pezzi')}.`, 'Custodiscono il sito. Li disegna gpt-image-2 in uno stile solo e smontati come burattini di carta, con i fermacampioni ai giunti; il codice li rimonta e li muove: occhi che seguono il puntatore, pezzi da tirare, un carattere per ciascuno.')}
+        <div class="bd-zoo">
+          ${S.zoo.map(
+            (a, i) => html`
+              <figure class="bd-animal" data-bd="up" style="--d:${i * 90}ms">
+                <div class="bd-animal__stage" style="--pup-w:${a.w}px">${puppet(a.key, { className: 'bd-animal__pup' })}</div>
+                <figcaption>
+                  <p class="bd-name bd-animal__name">${esc(a.name)}</p>
+                  <p class="bd-note">${esc(a.trait)}</p>
+                </figcaption>
+              </figure>
+            `,
+          )}
+        </div>
+        ${sub('Il sesto animale · in home, sopra la disponibilità', 'src/data/aragosta.js · src/client/ink.js', { top: true, muted: true })}
+        <div class="bd-ink">
+          <div class="bd-ink__text" data-bd="up">
+            <p class="bd-name bd-animal__name">${esc(A.name)}</p>
+            <p class="bd-note">${esc(A.trait)}</p>
+            <dl class="bd-ink__facts">
+              ${A.facts.map((f) => `<div><dt>${esc(f.value)}</dt><dd class="bd-cap">${esc(f.label)}</dd></div>`)}
+            </dl>
+            <p class="bd-cap bd-ink__hint">${esc(A.hint)}</p>
+          </div>
+          <div class="bd-ink__scene" data-ink data-bd="fade" style="--d:120ms">
+            <p class="bd-ink__bed label" data-ink-bed><span class="dot dot--live" aria-hidden="true"></span>${esc(site.availability.label)}</p>
+            <p class="bd-ink__name" aria-hidden="true"><span data-ink-word>${esc(site.lastName)}</span></p>
+            <div class="rule rule--ticks bd-ink__rule" data-ink-rule aria-hidden="true"></div>
+          </div>
+        </div>
+        ${sub(`Pezzi e perni · ${esc(S.zoo.find((a) => a.key === x.key).name.toLowerCase())}, smontata`, 'src/data/burattini.js', { top: true, muted: true })}
+        <div class="bd-parts">
+          ${pezzi.map(
+            (p, i) => html`
+              <figure class="bd-part" data-bd="up" style="--d:${i * 60}ms;--w:${Math.round(p.w * x.scale)}px">
+                <div class="bd-part__img">
+                  <img src="/media/mascotte/${x.key}/${p.img || p.id}.webp" width="${p.w}" height="${p.h}" alt="" loading="lazy" decoding="async" draggable="false">
+                  ${p.parent ? `<span class="bd-part__pin" style="left:${pct(p.pin[0], p.w)}%;top:${pct(p.pin[1], p.h)}%" aria-hidden="true"></span>` : ''}
+                </div>
+                <figcaption class="bd-cap"><b>${esc(p.id)}</b><br>${p.parent ? `perno ${p.pin.map(Math.round).join(', ')} · su ${esc(p.parent)}` : 'il corpo, senza perno'}</figcaption>
+              </figure>
+            `,
+          )}
+        </div>
+        ${sub('Regole comuni', 'tools/mascotte · src/client/puppet.js', { top: true, muted: true })}
+        <div class="bd-prules">
+          ${S.puppetRules.map((r) => `<div class="bd-prule"><p class="bd-name">${esc(r.name)}</p><p class="bd-note">${esc(r.text)}</p></div>`)}
+        </div>
+        ${sub('Dove stanno', 'Testata · home · piè di pagina · 404 · contatti', { top: true, muted: true })}
+        <div class="bd-places">
+          ${S.puppetPlaces.map((p) => `<div class="bd-place"><p class="label">${esc(p.where)}</p><p class="bd-note">${esc(p.what)}</p></div>`)}
+        </div>
+      </div>
+    `,
+  )
+}
+
 // ── Pagina ───────────────────────────────────────────────────────────────────
 
-const renderers = { home: heroBoard, colore: coloreBoard, tipografia: tipografiaBoard, forma: formaBoard, componenti: componentiBoard }
+const renderers = { home: heroBoard, colore: coloreBoard, tipografia: tipografiaBoard, forma: formaBoard, componenti: componentiBoard, mascotte: mascotteBoard }
 
 const minus = '<svg class="icon" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" aria-hidden="true" focusable="false"><path d="M5 12h14"/></svg>'
 
@@ -399,14 +472,15 @@ export function stilePage() {
       <div class="canvas__panel">
         <div class="canvas__head">
           <h1 class="canvas__title">Stile</h1>
-          <p class="canvas__lead">Il sistema visivo del sito in cinque tavole: la home a 1440 px, colore, tipografia, forma e movimento, componenti.</p>
+          <p class="canvas__lead">Il sistema visivo del sito in sei tavole: la home a 1440 px, colore, tipografia, forma e movimento, componenti, mascotte e burattini.</p>
         </div>
         <nav class="canvas__layers" aria-label="Tavole">
           <ul>
             ${S.boards.map((b) => `<li><button class="canvas__layer" type="button" data-canvas-go="${b.key}"><span class="label">${b.index}</span><span>${esc(b.short)}</span><span class="label">${b.w} × ${b.h}</span></button></li>`)}
           </ul>
         </nav>
-        <p class="canvas__keys label"><kbd>1</kbd>–<kbd>5</kbd> tavole · <kbd>F</kbd> tutte · <kbd>0</kbd> scala 1:1 · <kbd>+</kbd> <kbd>−</kbd> zoom<br>trascina o rotella per spostarti · <kbd>Ctrl</kbd> + rotella per ingrandire</p>
+        <p class="canvas__keys label"><kbd>1</kbd>–<kbd>6</kbd> tavole · <kbd>F</kbd> tutte · <kbd>0</kbd> scala 1:1 · <kbd>+</kbd> <kbd>−</kbd> zoom<br>trascina o rotella per spostarti · <kbd>Ctrl</kbd> + rotella per ingrandire</p>
+        <p class="canvas__credit label"><a class="uline" href="${esc(site.url)}" rel="author">Sito di ${esc(site.name)}</a><span class="canvas__edition"> · ${esc(site.edition)}</span></p>
       </div>
       <div class="canvas__tools" role="group" aria-label="Zoom">
         <button class="canvas__tool" type="button" data-canvas-zoom-out aria-label="Riduci">${minus}</button>

@@ -16,7 +16,8 @@ L'email non viene mai stampata a schermo.
 - [Firme](#firme)
 - [Come si invia l'email](#come-si-invia-lemail)
 - [Cosa viene generato](#cosa-viene-generato)
-- [Stile e carattere](#stile-e-carattere)
+- [Stili](#stili)
+- [Stile e carattere di «Metà settembre»](#stile-e-carattere-di-metà-settembre)
 - [Validazione](#validazione)
 - [Architettura](#architettura)
 
@@ -126,8 +127,9 @@ Il campo `from_profile` è obbligatorio e accetta molte forme:
 | Profilo | Indirizzo | Si può scrivere |
 | --- | --- | --- |
 | `yahoo` | pzkko@yahoo.com | `yahoo`, `personale`, `privato`, l'indirizzo |
-| `proton` | pecchini@protonmail.com | `proton`, `lavoro`, `azienda`, l'indirizzo |
+| `proton` | pecchini@protonmail.com — casella della società (Cascina Fontana) | `proton`, `cascina`, `società`, l'indirizzo |
 | `gmail` | 398893@studenti.unimore.it | `gmail`, `università`, `unimore`, l'indirizzo |
+| `pec` | cascinafontana@pec.it — PEC della società | `pec`, `certificata`, `pec cascina`, l'indirizzo |
 
 Accenti e maiuscole non contano: `Università` e `universita` sono equivalenti.
 Se il valore non è riconoscibile la generazione si ferma con
@@ -167,6 +169,26 @@ indietro basta riportare `current` all'id precedente. Il report dice sempre cosa
 
 Con `footer_profile` si può usare la firma di un profilo diverso dal mittente.
 
+### Loghi delle firme
+
+Il logo di una firma è `logo: { file, alt, width, placement, frame }` nella
+versione: un PNG in `src/assets/email/` (niente SVG: la posta non lo mostra),
+incorporato come data URI. `placement: "side"` lo mette accanto al nome,
+`placement: "identity"` al posto di nome, ruolo e contesto (un logo che li ha
+già scritti; nel testo semplice e nel congedo restano), `frame: false` toglie
+il riquadro chiaro di «Metà settembre».
+
+| File | Firme | Origine |
+| --- | --- | --- |
+| `ap-logo-completo.png` | `yahoo` | icona AP + «ALBERTO PECCHINI» (Archivo 640, come `.logo__name` del sito) + «Diplomato geometra» (Instrument Serif corsivo, `.serif-i`) + www.albertopecchini.it (IBM Plex Mono), mostrato a 360 px e cliccabile; sorgente in `tools/email-generator/loghi/` |
+| `ap-logo.png` | (versioni archiviate) | l'icona del sito (`public/icon-512.png`) a 96 px |
+| `unimore-logo-trasparente.png` | `gmail` | `unimore-logo.svg` su fondo trasparente |
+| `cascina-logo-proton-zampillo.png`, `cascina-logo-pec-zampillo.png` | `proton`, `pec` | come le due righe sotto, con lo zampillo d'acqua disegnato al centro della fontana (vettoriale, `--zampillo` di `marchio.mjs`) |
+| `cascina-logo-proton.png` | (archiviata) `proton` | calabrone gigante giapponese (Vespa mandarinia japonica) sulla fontana + «Cascina Fontana S.S.» + «Primo Pecchini», senza «Società Agricola»; 30.09.2026, originali in `Documents/cascinafontana/logo/mandarinia/` |
+| `cascina-logo-pec.png` | (archiviata) `pec` | come sopra, con «SOCIETÀ AGRICOLA» |
+| `cascina-logo-primo.png` | (versioni archiviate) | logo Cascina Fontana (vespa sulla fontana della cascina, bordeaux `#6D1427`) + nome completo + «Primo Pecchini», mostrato a 360 px; vespa da openai/gpt-image-2, fontana misurata dalla foto, 30.09.2026; originali e procedura in `Documents/cascinafontana/logo/` |
+| `cascina-logo.png` | (versioni archiviate) | prima idea, vespa su un alveare, sostituita |
+
 ## Come si invia l'email
 
 Il composer di Yahoo, Proton e Gmail non accetta il codice HTML incollato: lo
@@ -196,7 +218,27 @@ In `emails/out/<data>_<nome>/`:
 
 Ogni generazione lascia una riga in `emails/logs/generations.log`.
 
-## Stile e carattere
+## Stili
+
+Lo stile dell'email ha versioni con un nome, come le firme, in `src/stili.js`.
+Si sceglie per casella con `style` in `config/sender-profiles.json`; dove manca
+vale quello corrente. Le versioni vecchie restano e si rigenerano identiche.
+
+| Stile | Dal | Com'è |
+| --- | --- | --- |
+| `fine-settembre` «Fine settembre» — **corrente, su tutte e quattro le caselle** | 30.09.2026 | bianco e nero, Helvetica, tutto allineato a sinistra e largo al massimo 640px, nessun riquadro |
+| `meta-settembre` «Metà settembre» | 18.09.2026 | carta e inchiostro del sito, colonna da 600px centrata, firma nel riquadro scuro, Archivo incorporato |
+
+In «Fine settembre» la gerarchia la fanno i titoli: l'oggetto apre l'email come
+H1, nel corpo `#`…`######` danno sei livelli distinti, le etichette (casella e
+data, allegati, collegamenti, «Nota», i recapiti della firma) sono H6 in
+maiuscolo spaziato. Niente fondi né cornici: la citazione ha solo un filo a
+sinistra, il codice solo il carattere monospaziato, le tabelle filetti
+orizzontali, i pulsanti sono neri e squadrati. La firma sta sul bianco, sotto un
+filetto nero: nome H3, ruolo H5, recapiti in colonna. Il carattere non viene
+incorporato, quindi `email.html` ed `email-lite.html` coincidono.
+
+## Stile e carattere di «Metà settembre»
 
 Il tema dell'email è **derivato dal CSS del sito**: `tools/email-generator/src/theme.js`
 legge `src/styles/tokens.css` ed estrae colori, scala tipografica, spazi e raggi.
@@ -253,6 +295,7 @@ Un modulo per responsabilità, in `tools/email-generator/src/`:
 | `senders.js` | normalizzazione dell'account mittente |
 | `sources.js` | lettura delle fonti, verifica degli allegati |
 | `theme.js` | derivazione del tema dal CSS del sito |
+| `stili.js` | versioni dello stile e tema di ciascuna (modulo puro) |
 | `fonts.js` | incorporamento del carattere |
 | `footers.js` | archivio firme versionato, logo della firma in data URI |
 | `footer-html.js` | resa del footer in HTML e testo (modulo puro) |

@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist-bcp
 *.local
 
 # Email generate: gli output si rigenerano dal file di input, che invece si tiene.
@@ -30,6 +31,7 @@ tools/figurine/lavoro/
 tools/mascotte/lavoro/
 tools/cartina/lavoro/
 tools/assistenza/lavoro/
+tools/aragosta/lavoro/
 
 # Catture dei siti: l'ultima impronta di ogni sito. In CI sta nella cache delle Actions.
 tools/catture/stato.json
