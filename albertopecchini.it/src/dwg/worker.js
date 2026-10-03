@@ -1,8 +1,12 @@
-// Worker del visualizzatore DWG: scarica il file, lo legge e costruisce la
-// scena fuori dal thread della pagina; se qui c'è OffscreenCanvas, disegna
-// anche le porzioni richieste e rimanda solo l'immagine (ImageBitmap).
+// Worker del visualizzatore: scarica il file, lo legge e prepara il disegno
+// fuori dal thread della pagina.
 //
 // Messaggi in ingresso:
+//   { id, type: 'gpu', kind: 'dwg' | 'svg', url, darken, focus, maxScale, maxPx }
+//        → { id, gpu } i dati pronti per la scheda grafica (src/gpu/format.js):
+//        il DWG letto e impacchettato da src/gpu/pack-dwg.js, la tavola da PDF
+//        (SVG) da src/gpu/pack-svg.js. È la strada normale.
+//   La strada di riserva, senza WebGL, disegna su canvas 2D:
 //   { id, type: 'load', url, darken, keep }   → { id, info, scene? } (la scena
 //        viene trasferita alla pagina solo se `keep` è falso, cioè quando il
 //        worker non può disegnare)
@@ -13,6 +17,8 @@
 import { parseDwg } from './dwg.js'
 import { buildScene } from './scene.js'
 import { drawScene } from './render.js'
+import { packDwg, transferOf } from '../gpu/pack-dwg.js'
+import { packSvg } from '../gpu/pack-svg.js'
 
 const scenes = new Map()
 const canDraw = typeof OffscreenCanvas !== 'undefined'
@@ -30,20 +36,46 @@ async function load(url, darken, say) {
   return { scene, info: { version: dwg.version, layers: dwg.layers.size, blocks: dwg.blocks.size, entities: scene.stats.entities, stats: scene.stats } }
 }
 
+/** La scena di un DWG: letta una volta sola per indirizzo. */
+function sceneOf(url, darken, say) {
+  const key = keyOf(url, darken)
+  let p = scenes.get(key)
+  if (!p) {
+    p = load(url, darken, say)
+    scenes.set(key, p)
+    p.catch(() => scenes.delete(key))
+  }
+  return p
+}
+
 self.onmessage = async (ev) => {
   const { id, type } = ev.data
   const say = (progress) => self.postMessage({ id, progress })
   try {
+    if (type === 'gpu') {
+      const { kind, url, darken, focus, maxScale, maxPx } = ev.data
+      const t0 = performance.now()
+      let gpu
+      if (kind === 'svg') {
+        say('scarico')
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const text = await res.text()
+        say('preparo')
+        gpu = packSvg(text, { maxPx })
+      } else {
+        const { scene } = await sceneOf(url, darken, say)
+        gpu = packDwg(scene, { focus, maxScale })
+        // senza OffscreenCanvas non si possono fare le lettere: meglio il canvas 2D della pagina
+        if (!gpu.texts) throw new Error('testi non disponibili nel worker')
+      }
+      gpu.ms = Math.round(performance.now() - t0)
+      self.postMessage({ id, gpu }, transferOf(gpu))
+      return
+    }
     if (type === 'load') {
       const { url, darken, keep } = ev.data
-      const key = keyOf(url, darken)
-      let p = scenes.get(key)
-      if (!p) {
-        p = load(url, darken, say)
-        scenes.set(key, p)
-        p.catch(() => scenes.delete(key))
-      }
-      const { scene, info } = await p
+      const { scene, info } = await sceneOf(url, darken, say)
       if (keep && canDraw) {
         self.postMessage({ id, info })
         return

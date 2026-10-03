@@ -7,7 +7,7 @@
 
 import { ACI } from './geom.js'
 
-const CAP = 0.72 // altezza delle maiuscole rispetto al corpo del carattere (Arial ≈ 0,716)
+export const CAP = 0.72 // altezza delle maiuscole rispetto al corpo del carattere (Arial ≈ 0,716)
 
 const rgba = (rgb, a = 1) => (a >= 1 ? `rgb(${rgb[0]},${rgb[1]},${rgb[2]})` : `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a.toFixed(3)})`)
 
@@ -170,13 +170,13 @@ function measureWidth(text, family, bold, italic) {
 }
 
 /** Larghezza nel mondo di un testo alto `h` (altezza delle maiuscole). */
-const worldWidth = (text, h, wf, family, bold, italic) => (measureWidth(text, family, bold, italic) * h * wf) / CAP
+export const worldWidth = (text, h, wf, family, bold, italic) => (measureWidth(text, family, bold, italic) * h * wf) / CAP
 
 /**
  * Impaginazione di un MTEXT: righe di run con posizione, calcolata una volta.
  * Ogni riga: { runs: [{text, x, h, wf, family, bold, italic, rgb, underline}], width, height, baseline }
  */
-function layoutMtext(t) {
+export function layoutMtext(t) {
   if (t.layout) return t.layout
   const lines = []
   const maxW = t.rectWidth > 0 ? t.rectWidth : Infinity
@@ -287,7 +287,8 @@ function drawText(ctx, t, base, scale, paper) {
     ctx.fillStyle = rgba(t.rgb, t.alpha)
     ctx.save()
     ctx.translate(dx * scale, -dy * scale)
-    if (t.oblique) ctx.transform(1, 0, Math.tan(t.oblique), 1, 0, 0)
+    // inclinazione in avanti: la y del canvas scende, quindi il segno è meno
+    if (t.oblique) ctx.transform(1, 0, -Math.tan(t.oblique), 1, 0, 0)
     ctx.scale(wf, 1)
     ctx.fillText(t.text, 0, 0)
     ctx.restore()

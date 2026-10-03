@@ -88,7 +88,7 @@ export function contattiPage() {
             </div>
             <p class="lead" data-reveal="up">Due righe bastano: cosa ti serve, dove, entro quando. ${esc(site.contact.reply)}</p>
 
-            <p class="cnt__avail label" data-reveal="up"><span class="dot${site.availability.open ? ' dot--live' : ''}"></span>${esc(site.availability.label)} — da ${esc(site.availability.from)}</p>
+            <p class="cnt__avail label" data-reveal="up"><span class="dot${site.availability.open ? ' dot--live' : ''}"></span>${esc(site.availability.label)}${site.availability.from ? ` — da ${esc(site.availability.from)}` : ''}</p>
 
             <dl class="cnt__list" data-reveal="up">
               <div><dt class="label">Email</dt><dd><a class="cnt__big" href="mailto:${site.contact.email}">${esc(site.contact.email)}</a></dd></div>

@@ -8,6 +8,8 @@
 
 .em {
   padding-block: calc(var(--header-h) + var(--sp-6)) var(--sp-8);
+  /* il sito è tutto minuscolo, ma qui si scrivono email vere: maiuscole come vanno */
+  text-transform: none;
 }
 
 .em__head {

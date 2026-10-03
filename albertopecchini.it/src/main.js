@@ -33,6 +33,8 @@ const initViewer = onDemand('[data-viewer]', 'initViewer', () => import('./clien
 const initEmail = onDemand('[data-email]', 'initEmail', () => import('./client/email.js'))
 // l'inchiostro di PECCHINI e l'aragosta che lo versa: solo nella home
 const initInk = onDemand('[data-ink]', 'initInk', () => import('./client/ink.js'))
+// le icone gelatina degli strumenti: solo in /studio/
+const initJelly = onDemand('[data-jelly]', 'initJelly', () => import('./client/jelly.js'))
 
 const modules = [
   initTransitions,
@@ -60,6 +62,7 @@ const modules = [
   initViewer,
   initEmail,
   initInk,
+  initJelly,
   initParallax,
   initMagnetic,
   initCursor,

@@ -306,7 +306,6 @@ body.page--stile {
   border-top: 1px solid var(--line);
   font-size: 0.625rem;
   line-height: 1.9;
-  text-transform: none;
   letter-spacing: 0.03em;
 }
 
@@ -315,7 +314,6 @@ body.page--stile {
   border: 1px solid var(--line-strong);
   border-radius: var(--r-1);
   font: inherit;
-  text-transform: uppercase;
   color: var(--fg);
 }
 
@@ -352,10 +350,8 @@ body.page--stile {
   padding: 0 12px;
   border-left: 1px solid var(--line);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--fg);
   transition: background-color var(--t-1) ease;
 }
@@ -659,7 +655,7 @@ body.page--stile {
 
 .bd-cap {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   line-height: 1.5;
   color: var(--muted);
@@ -742,7 +738,7 @@ body.page--stile {
 
 .bd-nav__n {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   color: var(--muted);
 }
@@ -773,19 +769,18 @@ body.page--stile {
 }
 
 .bd-hero__name {
-  font-size: 172px;
+  font-size: 235px;
   font-weight: 600;
   font-stretch: 86%;
   letter-spacing: -0.055em;
   line-height: 0.8;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .bd-hero__word {
   display: inline-block;
   overflow: hidden;
-  padding: 0.04em 0 0.02em;
+  padding: 0.04em 0 0.19em;
   vertical-align: top;
 }
 
@@ -1067,7 +1062,7 @@ body.page--stile {
 
 .bd-swatch__hex {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.08em;
 }
 
@@ -1120,7 +1115,7 @@ body.page--stile {
   padding: 9px 0;
   border-bottom: 1px solid var(--line);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .bd-theme__row span:last-child {
@@ -1269,11 +1264,9 @@ body.page--stile {
 
 .bd-type__alpha--mono {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
-  letter-spacing: 0.08em;
   line-height: 1.6;
-  text-transform: uppercase;
 }
 
 .bd-type__note {
@@ -1315,7 +1308,7 @@ body.page--stile {
 
 .bd-scale__token {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .bd-scale__s {
@@ -1407,7 +1400,7 @@ body.page--stile {
   min-height: 34px;
   border-bottom: 1px solid var(--line);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .bd-sp span:nth-child(2) {
@@ -1684,7 +1677,7 @@ body.page--stile {
   border: 1px solid var(--line);
   border-radius: var(--r-1);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
 }
 
@@ -2062,14 +2055,13 @@ body.page--stile {
   font-stretch: 86%;
   letter-spacing: -0.055em;
   line-height: 0.8;
-  text-transform: uppercase;
   color: transparent;
   -webkit-text-stroke: 1.5px var(--fg);
 }
 
 .bd-ink__name > span {
   display: inline-block;
-  padding-block: 0.04em 0.02em;
+  padding-block: 0.04em 0.19em;
 }
 
 .bd-ink__rule {

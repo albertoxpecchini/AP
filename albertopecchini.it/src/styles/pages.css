@@ -518,7 +518,7 @@
 
 .dial__labels {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   fill: var(--muted);
   display: none;
 }
@@ -1270,7 +1270,7 @@
 
 .sleg__where {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--fg);
 }
@@ -1993,7 +1993,6 @@
   font-size: var(--fs-label);
   font-weight: 500;
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   background: var(--bg-2);
 }
 
@@ -2154,9 +2153,8 @@
 }
 
 .nf__page-tav {
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 500;
-  letter-spacing: 0.08em;
   fill: #e5481f !important;
 }
 
@@ -2165,8 +2163,7 @@
 }
 
 .nf__page-nr {
-  font-size: 4.4px;
-  letter-spacing: 0.08em;
+  font-size: 4.8px;
   fill: #5a5b55 !important;
 }
 
@@ -2236,7 +2233,6 @@
   font-size: var(--fs-label);
   letter-spacing: var(--track-label);
   line-height: 1;
-  text-transform: uppercase;
   color: var(--muted);
 }
 
@@ -2425,5 +2421,173 @@
     right: 0;
     bottom: clamp(2rem, 5vw, 5rem);
     object-position: 100% 100%;
+  }
+}
+
+/* ── Studio: con cosa gira questo sito (icone gelatina) ───────────────────── */
+/* Piastrelle sfalsate che si accavallano (--rot, --dy dal template), con il
+   bordo carta degli adesivi e una lucentezza da caramella gommosa. Il transform
+   di .jelly lo scrive jelly.js finché la molla si muove; senza script resta
+   quello di riposo. Il nome è un fumetto sopra la piastrella. */
+
+.stack {
+  margin-top: clamp(4.5rem, 3rem + 6vw, 8rem);
+  text-align: center;
+}
+
+/* i fumetti nascosti (e le piastrelle tirate verso il bordo) non devono allargare
+   la pagina: sul telefono la farebbero rimpicciolire. In verticale restano liberi. */
+.stools {
+  overflow-x: clip;
+}
+
+.stack__head {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.stack__eyebrow {
+  color: var(--accent);
+}
+
+.stack__title {
+  margin-top: 0.75rem;
+  text-wrap: balance;
+}
+
+.stack__note {
+  margin-top: 1rem;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.stack__row {
+  --size: clamp(3.4rem, 2.9rem + 1.6vw, 4.4rem);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 0.9rem;
+  margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) auto 0;
+  padding: 0.5rem 0 0;
+  list-style: none;
+}
+
+.stack__item {
+  position: relative;
+  margin-inline: calc(var(--size) * -0.07);
+}
+
+.stack__item:hover,
+.stack__item:focus-within,
+.stack__item.is-active {
+  z-index: 3;
+}
+
+.jelly {
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 30%;
+  transform: translateY(var(--dy, 0)) rotate(var(--rot, 0));
+  transform-origin: 50% 100%;
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.jelly:active {
+  cursor: grabbing;
+}
+
+.jelly:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 5px;
+}
+
+.jelly__body {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--c-paper);
+  border-radius: inherit;
+  color: var(--fg);
+  background:
+    radial-gradient(90% 55% at 32% 8%, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0) 60%),
+    radial-gradient(80% 60% at 70% 110%, rgb(0 0 0 / 0.22), rgb(0 0 0 / 0) 70%),
+    var(--bg);
+  box-shadow:
+    inset 0 -0.3rem 0.6rem rgb(0 0 0 / 0.16),
+    inset 0 0.2rem 0.3rem rgb(255 255 255 / 0.3),
+    0 0.7rem 1.1rem -0.45rem rgb(0 0 0 / 0.75);
+}
+
+.jelly__glyph {
+  width: 50%;
+  height: 50%;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.12));
+}
+
+.jelly__tip {
+  position: absolute;
+  bottom: calc(100% + 0.85rem);
+  left: 50%;
+  z-index: 4;
+  width: max-content;
+  max-width: min(15rem, calc(100vw - 2rem));
+  padding: 0.55rem 0.8rem 0.6rem;
+  border-radius: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--c-ink);
+  background: var(--c-paper);
+  box-shadow: 0 0.6rem 1.4rem -0.6rem rgb(0 0 0 / 0.7);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(calc(-50% + var(--tip-x, 0px)), 0.4rem) scale(0.92);
+  transform-origin: 50% 100%;
+  transition:
+    opacity 0.18s var(--ease-out),
+    transform 0.28s var(--ease-out),
+    visibility 0s 0.18s;
+}
+
+/* la punta del fumetto resta sopra la piastrella anche se il fumetto si sposta */
+.jelly__tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: calc(50% - var(--tip-x, 0px));
+  border: 0.4rem solid transparent;
+  border-top-color: var(--c-paper);
+  transform: translateX(-50%);
+}
+
+.jelly__tip b {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-weight: 600;
+  color: var(--c-minio-deep);
+}
+
+.jelly:hover + .jelly__tip,
+.jelly:focus-visible + .jelly__tip,
+.stack__item.is-tip .jelly__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(calc(-50% + var(--tip-x, 0px)), 0) scale(1);
+  transition:
+    opacity 0.18s var(--ease-out),
+    transform 0.28s var(--ease-out),
+    visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jelly__tip {
+    transition: none;
   }
 }

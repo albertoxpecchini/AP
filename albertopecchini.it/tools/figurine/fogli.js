@@ -184,3 +184,55 @@ fogli.tasti = {
     { nome: 'tasto-inchiostro-tondo', soggetto: 'an almost round, slightly irregular pebble shape (about 1:1), near-black ink fill (#10110f), off-white outline' },
   ],
 }
+
+// ── Hero della home ─────────────────────────────────────────────────────────
+// Gli adesivi grandi accanto al terminale dell'hero: uno per ogni comando
+// (tutto, casa, sito, marchio, pc) più qualche comprimario. Stile proprio:
+// stessa palette e stessa assonometria delle altre figurine, ma tratto grosso,
+// forme tozze e molto minio, perché si vedono in grande e devono saltare fuori
+// dal fondo scuro del terminale. Ritagli più grandi (`max`). Le voci con
+// `scarta` sono nel foglio ma non nel sito: il ritaglio le salta.
+
+export const STILE_HERO = `A sheet of nine separate bold sticker illustrations, arranged in a precise 3 × 3 grid on a fully transparent background, for the home page of a young Italian surveyor who is also a web designer and a graphic designer.
+Each sticker is ONE chunky object or tiny still life, centred in its own cell, drawn at the same scale as the others and filling about 72% of its cell. Leave wide empty space between cells: nothing touches, nothing overlaps, nothing crosses into another cell. Do not draw the grid.
+Identical style for all nine: isometric three-quarter view from above, chunky toy-like proportions with slightly rounded corners, bold uniform near-black ink outlines (#10110f, about 6 px), flat matte colour fills with exactly one darker flat tone on the sides in shadow (cel shading), crisp and graphic like a die-cut vinyl sticker of a design studio. Palette: paper white (#f3f1ec), warm greys (#dedad1, #5a5b55), near-black (#10110f), light wood, and a strong red-lead vermilion (#e5481f) as the dominant colour of every object, with a few small leaf-green details (#2f9e5b).
+Every sticker has a thick clean off-white die-cut border (#f3f1ec), about 14 px wide, all around its outer silhouette.
+No cast shadows on the ground, no background, no frames, no text, no letters, no numbers, no brand logos, no emblems, no watermark. Screens and papers show only abstract lines and shapes, never readable characters.`
+
+fogli.hero = {
+  titolo: 'Gli adesivi dell’hero della home: un attrezzo per tutto, la casa, il sito, il marchio, il computer',
+  stile: STILE_HERO,
+  intro: 'The nine stickers, row by row, left to right:',
+  max: 640,
+  figurine: [
+    { nome: 'hero-tutto', soggetto: 'a chunky pocket multi-tool (like a pocket knife, fanned open) with a plain vermilion handle with no emblem and no cross on it; instead of blades, its fold-out tools are: a small steel set square, a short wooden pencil, a drawing compass, a flat steel ruler with tick marks, and a white mouse-cursor arrow on a steel arm' },
+    { nome: 'hero-casa', soggetto: 'a chunky little house like an architectural model, white walls and a vermilion pitched roof lifted a little above the walls so the rooms inside show as a floor plan, with a leaf-green retractable tape measure pulled out along the base of the front wall' },
+    { nome: 'hero-sito', soggetto: 'a chunky open laptop whose screen shows a simple website layout (a header bar, an image block, text lines and one big vermilion button), with a large white mouse-cursor arrow clicking the button and a small browser window with a leaf-green dot floating above the screen' },
+    { nome: 'hero-marchio', soggetto: 'a chunky abstract geometric logo mark as a solid 3D object, a vermilion circle interlocked with a vermilion triangle (not a letter), standing on a fanned stack of colour swatch cards, with a drawing compass leaning on it' },
+    { nome: 'hero-pc', soggetto: 'a chunky desktop computer tower with its side panel open showing tidy components, a vermilion screwdriver and a small wrench leaning on it, and a small leaf-green check mark badge on the corner of its monitor' },
+    { nome: 'hero-cassetta', scarta: true, soggetto: 'a chunky open vermilion toolbox with a handle, neatly holding a set square, a pencil, a drawing compass, a colour swatch fan, a screwdriver and a white mouse-cursor arrow sticking out of it' },
+    { nome: 'hero-preventivo', scarta: true, soggetto: 'a clipboard holding a quote sheet with four lines of abstract text, each line ending in a leaf-green tick, with a vermilion pen lying across the corner' },
+    { nome: 'hero-email', soggetto: 'a vermilion mailbox on a short wooden post with its flag up and a white envelope sticking out of its open door' },
+    { nome: 'hero-online', soggetto: 'a small vermilion signal lamp on a stand (like a stage or traffic beacon) with a round leaf-green light glowing on top and three short green rays around it' },
+  ],
+}
+
+// ── Piè di pagina, seconda tornata ──────────────────────────────────────────
+// Le mini immagini che mancavano ai tasti delle note legali: cookie e stile.
+// Stesso stile del foglio `chrome`. Il foglio ne disegna più versioni per
+// soggetto; nel sito va la migliore, le altre restano nel foglio con `scarta`.
+
+fogli.chrome2 = {
+  titolo: 'Le mini immagini dei tasti «cookie» e «stile» del piè di pagina, in più versioni',
+  figurine: [
+    { nome: 'chrome-cookie', soggetto: 'a single round chocolate-chip biscuit with one bite taken out of its edge and two crumbs beside it, one of the chips vermilion' },
+    { nome: 'chrome-cookie-2', scarta: true, soggetto: 'a small glass jar of round biscuits with a lid, the lid knob vermilion' },
+    { nome: 'chrome-cookie-3', scarta: true, soggetto: 'a round biscuit broken into two halves lying on a small folded paper napkin, a vermilion check mark tag tied to the napkin' },
+    { nome: 'chrome-cookie-4', scarta: true, soggetto: 'a short stack of three round biscuits, the top one with a vermilion sugar-glazed centre' },
+    { nome: 'chrome-stile', soggetto: 'a fan of colour swatch cards held together by a pin at one end, cards in paper white, warm grey, sage green and near-black, the top card vermilion' },
+    { nome: 'chrome-stile-2', scarta: true, soggetto: 'a small wooden painter\'s palette with round blobs of paint in paper white, warm grey, sage green and near-black, one blob vermilion, and a thin brush resting across it' },
+    { nome: 'chrome-stile-3', scarta: true, soggetto: 'a flat steel ruler with tick marks, a sharpened pencil and a small open tin of watercolour pans lying together, one pan vermilion' },
+    { nome: 'chrome-stile-4', scarta: true, soggetto: 'three square colour chips standing in a row like little tiles — paper white, sage green, near-black — with a fourth vermilion chip leaning on them' },
+    { nome: 'chrome-stile-5', scarta: true, soggetto: 'a drawing compass standing open over a small sheet with a circle and a square drawn on it, the circle filled vermilion' },
+  ],
+}

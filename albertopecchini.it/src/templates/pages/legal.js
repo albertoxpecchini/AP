@@ -139,9 +139,9 @@ const missingPage = html`
       <path class="nf__page-rule" d="M58 32V76M36 54H80"/>
       <circle class="nf__page-dot" cx="58" cy="54" r="2.8"/>
       <path class="nf__page-rule" d="M12 84H88V116H12ZM12 97H88"/>
-      <text class="nf__page-tav" x="16" y="93.5">TAV. 404</text>
+      <text class="nf__page-tav" x="16" y="93.5">Tav. 404</text>
       <text class="nf__page-path" x="16" y="106" data-path>questa pagina</text>
-      <text class="nf__page-nr" x="16" y="112.5">PUNTO NON RILEVATO</text>
+      <text class="nf__page-nr" x="16" y="112.5">punto non rilevato</text>
     </svg>
   </span>
 `

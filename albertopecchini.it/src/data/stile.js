@@ -95,10 +95,10 @@ export const typefaces = [
   },
   {
     key: 'mono',
-    name: 'IBM Plex Mono',
-    axis: '400 · 500',
-    alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 · — / 45°14′N',
-    note: 'Etichette, bottoni, coordinate, cartigli: maiuscolo, spaziatura 0,07–0,08em.',
+    name: 'Cascadia Code',
+    axis: 'wght 200–700',
+    alphabet: 'abcdefghijklmnopqrstuvwxyz 0123456789 · — / 45°14′N',
+    note: 'Etichette, bottoni, coordinate, cartigli e il terminale della home: il carattere dei terminali, a 14 px, tutto minuscolo come il resto del sito.',
   },
 ]
 

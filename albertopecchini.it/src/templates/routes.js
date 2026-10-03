@@ -283,7 +283,7 @@ export const placeholderReport = () => [...placeholders, ...tempoLiberoTodo()]
 // Le copertine generate vengono esportate anche come file SVG autonomi, usati
 // dalle anteprime al passaggio del puntatore (caricate solo quando servono).
 
-const STANDALONE_FONTS = `:root{--font-sans:system-ui,-apple-system,'Segoe UI',sans-serif;--font-mono:ui-monospace,'SF Mono','Cascadia Mono',Consolas,monospace;--font-serif:Georgia,'Times New Roman',serif}`
+const STANDALONE_FONTS = `:root{--font-sans:system-ui,-apple-system,'Segoe UI',sans-serif;--font-mono:'Cascadia Code',ui-monospace,'Cascadia Mono',Consolas,monospace;--font-serif:Georgia,'Times New Roman',serif}`
 
 export function artFiles(css) {
   return projects

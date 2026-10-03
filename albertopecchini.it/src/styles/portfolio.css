@@ -1194,6 +1194,11 @@
   }
 }
 
+/* la finestra delle tavole ha lo spessore di minio sotto: la nota gli lascia posto */
+.cs-sec--sheets .viewer + .cs-gallery__hint {
+  margin-top: 1.75rem;
+}
+
 /* Icona + un solo <span> di testo: se il testo va a capo, l'icona resta sulla
    prima riga e i link (i crediti delle illustrazioni) scorrono nella frase
    invece di diventare colonne a sé. */
@@ -1201,7 +1206,6 @@
   display: flex;
   align-items: flex-start;
   gap: 0.6rem;
-  text-transform: none;
   letter-spacing: 0.02em;
   font-size: 0.75rem;
   line-height: 1.6;

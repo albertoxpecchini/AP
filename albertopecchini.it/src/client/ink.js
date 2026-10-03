@@ -200,7 +200,12 @@ function mount(wrap, n) {
   const still = reducedMotion()
   const parts = rigParts()
   const poses = aragosta.pose
-  const letters = word.textContent.trim().toUpperCase()
+  // le lettere come appaiono: maiuscole o minuscole le decide il CSS (dal 2.10.2026 il sito è tutto minuscolo)
+  const raw = word.textContent.trim()
+  const tt = getComputedStyle(word).textTransform
+  const letters = tt === 'uppercase' ? raw.toUpperCase() : tt === 'lowercase' ? raw.toLowerCase() : raw
+  // la posizione di una lettera, maiuscola o minuscola che sia
+  const find = (ch, last = false) => letters.toLowerCase()[last ? 'lastIndexOf' : 'indexOf'](ch.toLowerCase())
 
   // ── SVG ──
   const root = svg('svg', { class: 'ink', 'aria-hidden': 'true', focusable: 'false' })
@@ -290,8 +295,11 @@ function mount(wrap, n) {
     }
     const ctx = document.createElement('canvas').getContext('2d')
     ctx.font = `${cs.fontWeight} ${fs}px ${cs.fontFamily}`
-    const cap = ctx.measureText('H').actualBoundingBoxAscent || fs * 0.7
-    const over = ctx.measureText('C').actualBoundingBoxDescent || fs * 0.012
+    // il recipiente va dalla cima della lettera più alta (le aste di h e P, i puntini
+    // delle i) al fondo della lettera più bassa: la coda della p minuscola, o le pance
+    // tonde appena sotto la linea di base
+    const cap = ctx.measureText(letters).actualBoundingBoxAscent || fs * 0.7
+    const over = ctx.measureText(letters).actualBoundingBoxDescent || fs * 0.012
     const B = bed.getBoundingClientRect()
     const rule = wrap.querySelector('[data-ink-rule]')?.getBoundingClientRect()
     // il bordo destro oltre cui l'aragosta non va: nell'hero quello visibile (l'hero
@@ -300,10 +308,13 @@ function mount(wrap, n) {
     const edge = hero ? Math.min(document.documentElement.clientWidth, hero.getBoundingClientRect().right) : W.right
     const em = fs
     const bottom = base + Math.max(over, 0.01 * em)
-    // dove stanno le aste nelle lettere di Archivo (in em dall'inizio della lettera):
-    // la prima I riceve il getto; perdono l'asta della P, il fondo della seconda C,
-    // l'asta destra della H e l'ultima I
-    const x = (i, off) => (i < 0 ? null : xs[i] + off * em)
+    // dove stanno le aste nelle lettere di Archivo (in em dall'inizio della lettera,
+    // misurate sul carattere a larghezza 86%): la prima i riceve il getto; perdono
+    // l'asta della p, il fondo della seconda c, l'asta destra della h e l'ultima i;
+    // ogni goccia nasce dal fondo della sua lettera (la coda della p scende sotto la base)
+    const STEM = { P: 0.13, C: 0.33, H: 0.514, I: 0.13, p: 0.114, c: 0.25, h: 0.402, i: 0.114 }
+    const x = (i) => (i < 0 ? null : xs[i] + (STEM[letters[i]] ?? 0.13) * em)
+    const foot = (i) => base + Math.max(0, ctx.measureText(letters[i] || '').actualBoundingBoxDescent || 0)
     const sw = S.width / z
     const leak = (px, py) => (px === null ? null : { x: px, y: py, acc: 0, max: 1 })
     const g = {
@@ -317,12 +328,12 @@ function mount(wrap, n) {
       top: base - cap,
       bottom,
       xs,
-      pour: x(letters.indexOf('I'), 0.13) ?? xs[0] + sw * 0.7,
+      pour: x(find('I')) ?? xs[0] + sw * 0.7,
       leaks: [
-        leak(x(letters.indexOf('P'), 0.13), base - 0.5),
-        leak(x(letters.lastIndexOf('C'), 0.33), bottom - 1),
-        leak(x(letters.indexOf('H'), 0.514), base - 0.5),
-        leak(x(letters.lastIndexOf('I'), 0.13), base - 0.5),
+        leak(x(find('P')), foot(find('P')) - 0.5),
+        leak(x(find('C', true)), foot(find('C', true)) - 0.5),
+        leak(x(find('H')), foot(find('H')) - 0.5),
+        leak(x(find('I', true)), foot(find('I', true)) - 0.5),
       ].filter(Boolean),
       bedTop: ly(B.top),
       rule: rule ? ly(rule.top) : base + 0.2 * em,

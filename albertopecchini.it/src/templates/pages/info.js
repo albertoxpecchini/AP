@@ -6,6 +6,7 @@ import { serviceAreas, bundles, faq } from '../../data/services.js'
 import { methodIntro, steps, principles } from '../../data/method.js'
 import { bio, photos, facts, timeline, approach, values, tools, profile } from '../../data/studio.js'
 import { saga, faqPersonali } from '../../data/tempo-libero.js'
+import { stack } from '../../data/stack.js'
 import { button, textLink, media, tagList, icon, splitWords, breadcrumb, sectionHead, monogram, figurina, figName, deviceMockup } from '../components/ui.js'
 import { signature } from './home.js'
 
@@ -293,11 +294,40 @@ export function studioPage() {
         <div class="stools__grid">
           ${tools.map((g) => `<div data-reveal="up">${figurina(figName('strumenti', g.group), { className: 'stools__fig' })}<h3 class="label">${esc(g.group)}</h3><ul>${g.items.map((it) => `<li>${esc(it)}</li>`).join('')}</ul></div>`)}
         </div>
+        ${stackRow()}
       </div>
     </section>
 
     ${tempoLibero()}
     ${domandePersonali()}
+  `
+}
+
+// ── /studio/: con cosa gira questo sito ─────────────────────────────────────
+// Le icone degli strumenti (src/data/stack.js) in una fila di piastrelle
+// sfalsate che si accavallano. Senza script sono ferme e il nome compare al
+// passaggio o col fuoco; jelly.js le fa diventare gelatina (molle su
+// schiacciamento, piega e spostamento) e mostra il nome anche al tocco.
+
+const TILT = [-7, 4, -3, 6, -5, 2, -6, 5, -2, 7, -4, 3, -6, 4, -3, 6, -5, 2, -4]
+const LIFT = [2, -3, 3, -1, 4, -4, 1, -2, 3, -3, 2, -1, 4, -2, 1, -4, 3, -2, 1]
+
+function stackRow() {
+  const glyph = (t) =>
+    Array.isArray(t.glyph) ? t.glyph.map(([c, d]) => `<path fill="${c}" d="${d}"/>`).join('') : `<path fill="currentColor" d="${t.glyph}"/>`
+  return html`
+    <div class="stack">
+      <div class="stack__head" data-reveal="up">
+        <p class="label stack__eyebrow">Questo sito</p>
+        <h3 class="stack__title h3">Con cosa gira, dal codice alla pubblicazione</h3>
+        <p class="stack__note">Gli strumenti che lo fanno funzionare davvero, uno per uno. Passa sopra un’icona, o toccala, per sapere cosa fa.</p>
+      </div>
+      <ul class="stack__row" data-jelly>
+        ${stack.map(
+          (t, i) => `<li class="stack__item"><span class="jelly" tabindex="0" role="img" aria-label="${esc(t.name)}: ${esc(t.does)}" style="--bg:${t.bg};--fg:${t.fg || 'currentColor'};--rot:${TILT[i % TILT.length]}deg;--dy:${LIFT[i % LIFT.length]}px"><span class="jelly__body"><svg class="jelly__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${glyph(t)}</svg></span></span><span class="jelly__tip" aria-hidden="true"><b>${esc(t.name)}</b>${esc(t.does)}</span></li>`,
+        )}
+      </ul>
+    </div>
   `
 }
 

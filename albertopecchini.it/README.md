@@ -76,7 +76,7 @@ albertopecchini.it/
 │  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
 │  ├─ nota/                le «note» di fine stagione (interventi, riepilogo, totale) in PDF A4 coi caratteri del sito (vedi il suo README)
-│  └─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza (vedi il suo README)
+│  └─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza e pulizia dei PDF (vedi il suo README)
 ├─ emails/                 input, output e allegati delle email generate
 ├─ config/                 account mittente e tema email derivato dal CSS
 ├─ profiles/               archivio firme versionato
@@ -101,6 +101,7 @@ albertopecchini.it/
 │  │  ├─ informatica.js    la pagina /servizi/informatica/: gruppi, versioni di Windows e Office, regalo, passaggi, regole, FAQ
 │  │  ├─ method.js         le sette fasi del metodo
 │  │  ├─ studio.js         biografia, fotografie, fatti, timeline, approccio, valori, strumenti, curriculum
+│  │  ├─ stack.js          /studio/: gli strumenti con cui gira il sito (nome, cosa fa, colori, tracciato del marchio da Simple Icons)
 │  │  ├─ tempo-libero.js   /studio/: Better Call Saul e bettercallpekko.it con la legenda dei riferimenti, domande personali (risposte vuote = non pubblicate)
 │  │  ├─ stile.js          sistema visivo: tavole, palette, ruoli, caratteri, scala, spazi, raggi, movimento
 │  │  ├─ figurine.js       generato da tools/figurine: nomi e misure delle figurine ritagliate
@@ -130,14 +131,16 @@ albertopecchini.it/
 │  │  ├─ puppet.js         burattini: pezzi su molle da tirare col puntatore, occhi indipendenti, il carattere di airone, gazza e vespa
 │  │  ├─ motion.js         reveal, contatori, parallasse, cursore, elementi magnetici, anteprime
 │  │  ├─ sections.js       hero, carosello dei siti, timeline del metodo, indice laterale
-│  │  ├─ ink.js            l’aragosta della home e l’inchiostro di PECCHINI: burattino, simulazione del liquido, gocce (solo in home)
+│  │  ├─ jelly.js          /studio/: le icone «gelatina» degli strumenti, su molle (gonfia, piega, schiaccia, rimbalza), nome al tocco
+│  │  ├─ ink.js            l’aragosta della home e l’inchiostro del cognome: burattino, simulazione del liquido, gocce (solo in home)
 │  │  ├─ filters.js        filtri del portfolio (stato nell’URL)
 │  │  ├─ widgets.js        lightbox, confronto prima/dopo, copia negli appunti
 │  │  ├─ form.js           validazione e invio del modulo contatti
 │  │  ├─ phone.js          tastierino dell’iPhone nella pagina Contatti: ricompone il numero quando entra nello schermo
 │  │  ├─ canvas.js         piano della pagina Stile: zoom, spostamento, tavole inquadrate e animate, griglia in WebGL
-│  │  ├─ viewer.js         visualizzatore delle tavole: zoom vettoriale, spostamento, gesti, tastiera, schermo intero
-│  │  ├─ dwg-sheet.js      una tavola letta dal DWG dentro il visualizzatore: worker, canvas base e di dettaglio
+│  │  ├─ viewer.js         visualizzatore delle tavole: zoom, spostamento, gesti, tastiera, schermo intero, barra di scala, coordinate, mappa
+│  │  ├─ gl-sheet.js       il foglio disegnato dalla scheda grafica (WebGL 2): shader, buffer, un fotogramma in quattro chiamate
+│  │  ├─ dwg-sheet.js      la strada di riserva senza WebGL: il DWG su canvas 2D, worker, canvas base e di dettaglio
 │  │  └─ utils.js          selettori, scroll, focus trap, reduced motion
 │  ├─ dwg/                 lettore di file DWG scritto da zero, gira nel browser (vedi «Tavole vere»)
 │  │  ├─ bits.js           lettore di bit: i tipi della specifica (B, BS, BD, DD, MC, MS, H, TU…)
@@ -149,8 +152,14 @@ albertopecchini.it/
 │  │  ├─ geom.js           trasformazioni, archi e bulge, NURBS, ellissi, motivi di tratteggio, palette ACI
 │  │  ├─ mtext.js          interprete dei codici di formato dei testi multilinea
 │  │  ├─ scene.js          dal modello alla scena: tracciati per stile, riempimenti, tratteggi, testi
-│  │  ├─ render.js         disegno della scena su canvas 2D, impaginazione dei testi
-│  │  └─ worker.js         scarica, legge e disegna fuori dal thread della pagina
+│  │  ├─ render.js         disegno della scena su canvas 2D (strada di riserva), impaginazione dei testi
+│  │  └─ worker.js         scarica, legge e prepara il disegno fuori dal thread della pagina
+│  ├─ gpu/                 dal disegno ai dati per la scheda grafica (vedi «Tavole vere»), nel worker
+│  │  ├─ format.js         il formato dei tre elenchi: tratti, triangoli, lettere
+│  │  ├─ tess.js           riempimenti qualunque → triangoli; segmenti ritagliati da un contorno
+│  │  ├─ sdf.js            atlante delle lettere come campo di distanze
+│  │  ├─ pack-dwg.js       dalla scena del DWG: archi veri, tratteggi ritagliati, testi lettera per lettera
+│  │  └─ pack-svg.js       dalle tavole da PDF (SVG di pdftocairo): tracciati, ritagli, lettere, ordine di disegno
 │  ├─ styles/              token → base → componenti → tasti (pebble) → mascotte (mascot) → layout → pagine → stampa; a parte stile, viewer, email
 │  ├─ main.js              entry JavaScript: avvia i moduli client (piano, visualizzatore ed email a richiesta)
 │  └─ style.css            entry CSS: importa src/styles/* nell’ordine giusto (tranne i fogli delle pagine speciali)
@@ -163,17 +172,17 @@ albertopecchini.it/
 
 | Percorso | Pagina |
 | --- | --- |
-| `/` | Home: hero con i tre ruoli, progetti in evidenza, servizi, studio, numeri |
+| `/` | Home: hero con l’invito, il terminale dei mestieri e i siti online, progetti in evidenza, servizi, studio, numeri |
 | `/portfolio/` | Indice completo con filtri (categoria, anno, settore, tecnologia, tipologia) |
 | `/portfolio/tecnico/` · `/portfolio/web/` | Le aree pubblicate (Grafica è nascosta, vedi [Progetti](#progetti)) |
 | `/portfolio/<slug>/` | Case study in nove sezioni, uno per ogni progetto in `projects.js` |
 | `/servizi/` | Servizi per area (A tecnico, B digitale, C grafica, D informatica), con ciò che viene consegnato; pacchetti e FAQ |
 | `/servizi/informatica/` | L’assistenza informatica sul serio: i servizi dell’area D in quattro gruppi, le versioni di Windows (XP → 11, LTSC, ARM64, Server) e di Office (Click-to-Run, installazione personalizzata, MSI, Mac), l’installazione di Windows o Office in regalo al primo intervento sopra i 50 € (il lavoro, non la licenza), come si svolge un intervento, regole, FAQ e invito con telefono, WhatsApp e modulo (`/contatti/?tipo=Assistenza%20informatica#modulo` preseleziona la voce). Dati in `src/data/informatica.js`, servizi in `src/data/services.js` (campo `group`) |
 | `/metodo/` | Le sette fasi del lavoro |
-| `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti; in fondo «Tempo libero» (Better Call Saul, bettercallpekko.it e la legenda dei suoi riferimenti, spiegati con parole nostre: niente battute della serie citate alla lettera) e le domande personali (serie TV, natura e animali, veicoli, vacanze, amici). Testi in `src/data/tempo-libero.js`, compilati da Alberto nel documento «Studio — tempo libero e FAQ personali»: una risposta vuota non compare, le righe della legenda con `ok: false` aspettano la sua conferma, e finché ne mancano la build le elenca tra i segnaposto |
+| `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti; sotto gli strumenti «Con cosa gira» questo sito: diciannove icone sfalsate che si accavallano e fanno da gelatina al passaggio e al tocco, col nome e cosa fa in un fumetto (`src/data/stack.js`, `src/client/jelly.js`, caricato solo qui); in fondo «Tempo libero» (Better Call Saul, bettercallpekko.it e la legenda dei suoi riferimenti, spiegati con parole nostre: niente battute della serie citate alla lettera) e le domande personali (serie TV, natura e animali, veicoli, vacanze, amici). Testi in `src/data/tempo-libero.js`, compilati da Alberto nel documento «Studio — tempo libero e FAQ personali»: una risposta vuota non compare, le righe della legenda con `ok: false` aspettano la sua conferma, e finché ne mancano la build le elenca tra i segnaposto |
 | `/studio/profilo/` | Curriculum sintetico, stampabile |
 | `/contatti/` | Modulo di contatto, recapiti, telefono (un iPhone con il numero sul tastierino), area operativa |
-| `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. **Oggi spenta**: esiste solo con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |
+| `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. Esiste con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
 | `/privacy/` · `/cookie/` | Note legali |
 | `/crediti/` | Crediti e fonti delle immagini (testi in `src/data/crediti.js`), linkata nel footer |
@@ -220,7 +229,7 @@ Campi principali:
 - `web`: per i progetti web, gli screenshot dei mockup e il dominio (`url`).
 - `iphone`: per un progetto web, la pagina intera su iPhone 18 Pro (`{ lead, pages }`, `pages` = strisce della stessa cattura una sotto l’altra). Nel case study ha una sezione **iPhone** tutta sua, dopo la galleria; la pagina scorre al passaggio. Vedi [iPhone 18 Pro](#iphone-18-pro).
 - `photos`: fotografie del progetto a gruppi (`{ lead, groups: [{ title, items }] }`). Nel case study hanno una sezione **Fotografie** tutta loro, subito dopo la galleria o le tavole, in colonne con le proporzioni vere; si aprono nel lightbox.
-- `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Si vedono solo con `showSheets = true`: allora nel case study la galleria diventa la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
+- `sheets`: le tavole vere (DWG, PDF, relazioni) da sfogliare nel visualizzatore. Si vedono solo con `showSheets = true`: allora nel case study, prima della galleria, c'è la sezione **Tavole** e il progetto compare in `/portfolio/tavole/`. Vedi [Tavole vere](#tavole-vere).
 - Il carosello della home mostra tutti i progetti web (area `web` con `web` compilato): su desktop è una griglia ferma, su telefono e tablet scorre col dito. `featured: true` li mette in testa.
 - `sample: true` lo contrassegna come **dimostrativo**: mostra come si presenta un lavoro di quel tipo, ma oggi non viene pubblicato (vedi sotto).
 
@@ -273,7 +282,11 @@ Ogni voce di `images` può essere una **tavola generata**, un disegno vettoriale
 { art: 'floorplan', variant: 'rustico', code: 'AP-25-011', alt: '…', caption: 'TAV. 02 — …' }
 ```
 
-Tavole disponibili: `floorplan`, `elevation`, `section`, `pointcloud`, `ortho`, `cadastral`, `urban`, `sitelayout`, `canopy`, `bim`, `render`, `workspace`, `portrait`, `areamap`, `webpage`, `brandmark`, `restyle`, `stationery`, `poster`, `social`, `brochure`, `packaging`, `signage`, `icons`, `slides`, `titleblock`. Opzioni comuni: `variant`, `tone` (`paper` | `ink` | `tint`), `bare` (senza squadratura), `code`.
+Tavole disponibili: `floorplan`, `elevation`, `section`, `pointcloud`, `ortho`, `cadastral`, `urban`, `sitelayout`, `canopy`, `bim`, `render`, `workspace`, `portrait`, `areamap`, `webpage`, `brandmark`, `restyle`, `stationery`, `poster`, `social`, `brochure`, `packaging`, `signage`, `icons`, `slides`, `titleblock`, `identity`, `sitespec`. Opzioni comuni: `variant`, `tone` (`paper` | `ink` | `tint`), `bare` (senza squadratura), `code`.
+
+`identity` (`src/art/identity.js`) non è un segnaposto: è l’identità di questo sito con la costruzione quotata, e sta nella scheda «Grafica» della home. Quattro `variant`: `fogli` (tre fogli: marchio, icona, logotipo), `tavola` (il monogramma su un foglio da geometra), `notte` (il monogramma su fondo inchiostro, con i punti notevoli), `sistema` (marchio, colori, caratteri, logotipo, icona, spazi). Le misure sono copiate da `MARK` in `ui.js`, da `public/favicon.svg`, da `.logo` in `layout.css` e da `tokens.css`: se cambiano là, vanno aggiornate anche nella tavola.
+
+`sitespec` (`src/art/sitespec.js`) fa lo stesso per il sito: il primo schermo della home ridisegnato in vettoriale e quotato, nella scheda «Digitale» della home. Quattro `variant`: `schermi` (desktop, tablet e telefono nella stessa scala), `rilievo` (il primo schermo a 1440 px su un foglio da geometra), `scala` (le formule `clamp()` dei caratteri come grafico), `sistema` (pagina, caratteri, margini, movimento, altezze delle sezioni). I numeri di `HOME` e `SECTIONS` vengono da un rilievo della pagina nel browser, con la data scritta nella tavola: quando l’hero o la testata cambiano, vanno rimisurati.
 
 Le copertine generate vengono esportate anche come file `dist/art/<slug>.svg`, usati dalle anteprime al passaggio del puntatore.
 
@@ -295,15 +308,14 @@ ffmpeg -i originale.jpg -map_metadata -1 -vf "scale=1600:-1:flags=lanczos" -c:v 
 
 ### Tavole vere
 
-**Oggi non si mostrano.** Dal 26 settembre 2026 il sito non fa vedere i documenti dei
-progetti — tavole, PDF, pagine della relazione — ma solo illustrazioni: copertina e
-galleria di ogni progetto non web vengono da [`tools/copertine`](tools/copertine/README.md)
-(richiesta di Alberto: «mai mostrare i documenti»). I dati e il visualizzatore restano:
-`showSheets` in `src/data/projects.js` è l'interruttore. Spento, i progetti escono
-senza `sheets`, il case study mostra la galleria di `images`, la pagina
-`/portfolio/tavole/` non viene generata e la voce «Tavole» sparisce dal menù. Acceso,
-torna tutto com'era. I file in `public/media/tavole/` restano anche perché fanno da
-riferimento alle illustrazioni.
+**Si mostrano**, dal 2 ottobre 2026 (richiesta di Alberto: «mostra nei progetti il
+visualizzatore DWG e PDF»): nel case study la sezione **Tavole** con il visualizzatore,
+subito prima della galleria delle illustrazioni, più la pagina `/portfolio/tavole/` e
+la sua voce nel menù. `showSheets` in `src/data/projects.js` è l'interruttore: dal 26
+settembre al 2 ottobre era spento («mai mostrare i documenti»). Spento, i progetti
+escono senza `sheets`, il case study ha solo la galleria di `images` (le illustrazioni
+di [`tools/copertine`](tools/copertine/README.md)), la pagina `/portfolio/tavole/` non
+viene generata e la voce «Tavole» sparisce dal menù.
 
 I disegni dei lavori tecnici non sono tavole generate: sono i file veri. Ogni tavola
 sta in `public/media/tavole/<slug>/` con la miniatura `NN.webp` (1200 px),
@@ -319,22 +331,51 @@ zero (nessuna libreria, nessuna conversione) che apre i file di AutoCAD 2010–2
 decodifica bit per bit entità e tabelle (linee, polilinee, archi, cerchi, ellissi,
 spline, testi e testi multilinea, quote, tratteggi pieni e a motivo, blocchi anche
 annidati, layer, tipi di linea, spessori, colori veri e trasparenze, ordine di
-disegno) e disegna tutto su canvas. Una tavola è un riquadro dello spazio modello:
+disegno). Una tavola è un riquadro dello spazio modello:
 `sheet(slug, 'NN', { dwg: 'file.dwg', box: [x0, y0, x1, y1], darken })`, con il
 riquadro in unità del disegno (`h` si ricava da solo). `darken` scurisce i colori
 chiari pensati per lo sfondo nero di AutoCAD; `paper` (A3, A4…) dà la larghezza del
 foglio, da cui gli spessori di linea in millimetri. Lo stesso DWG serve più tavole:
 viene scaricato e letto una volta sola, in un worker, e ogni foglio ne mostra il suo
-riquadro. Su schermo il foglio ha una base a 2048 px e, ingrandendo, si ridisegna la
-parte visibile alla scala dello schermo, quindi resta nitido a qualunque zoom.
+riquadro.
 
-Il visualizzatore (`src/templates/components/viewer.js` e `src/client/viewer.js`)
-muove il foglio con `transform` durante i gesti e, a vista ferma, gli dà la misura vera
-perché il browser ridisegni l’SVG o il DWG nitido a quella scala. Trascinare sposta,
-Ctrl + rotella o due dita ingrandiscono, il doppio clic avvicina, le frecce cambiano
-tavola, F adatta; c’è lo schermo intero. Nei case study la rotella e il dito scorrono
-la pagina finché la tavola non è ingrandita. Senza JavaScript l’elenco apre il file
-stesso (il DWG o l’SVG).
+**Le disegna la scheda grafica.** Tutte le tavole vettoriali — i DWG e quelle da PDF —
+passano da un motore WebGL 2 scritto apposta (`src/gpu/` nel worker,
+`src/client/gl-sheet.js` nella pagina), senza librerie. Il worker prepara tre elenchi
+già pronti per i buffer della scheda: i **tratti** (un rettangolo per segmento o per
+pezzo d'arco: lo shader calcola per ogni pixel la distanza dalla linea, quindi bordi
+sfumati esatti, estremità tonde, tratteggi, e archi veri, non spezzate), i
+**triangoli** dei riempimenti (scomposti a fasce da `tess.js`, con buchi e contorni
+intrecciati; li sfuma il multicampionamento, 8× o 4×) e le **lettere** (un atlante di
+campi di distanze fatto con i caratteri del sistema: nitide a qualunque ingrandimento).
+Le tavole da PDF sono gli SVG di `pdftocairo` letti da `pack-svg.js`; l'ordine dei
+tracciati fa da profondità, così un bianco copre le linee venute prima. Ogni
+fotogramma ridisegna tutta la tavola alla risoluzione dello schermo in quattro
+chiamate: sul computer di sviluppo (RTX 3060 Ti) circa 3 ms, anche a 5120 px di
+larghezza, cioè non perde un fotogramma a 165 Hz e la tavola resta nitida **mentre**
+si ingrandisce. Prima ogni zoom lasciava l'immagine sfocata per 650–800 ms, il tempo
+di ridisegnarla. Le linee più sottili di un pixel restano larghe un pixel e si
+schiariscono in proporzione, senza scendere sotto il 72%: le tavole da PDF, che nel
+browser erano quasi invisibili da lontano, si leggono come sulla carta.
+
+Senza WebGL 2, o se un file non si lascia preparare (un SVG con dentro altro, un
+browser senza `OffscreenCanvas` nei worker), c'è la strada di prima: il foglio si
+muove con `transform` e, a vista ferma, prende la misura vera e il browser ridisegna
+l'SVG (o `dwg-sheet.js` il DWG su canvas 2D: base a 2048 px più la parte visibile alla
+scala dello schermo). Le pagine a immagine (la relazione) sono sempre `<img>`.
+
+Il visualizzatore (`src/templates/components/viewer.js` e `src/client/viewer.js`) è una
+finestra di programma, parente del terminale della home: barra del titolo con il nome
+del file e la spia «gpu» (al passaggio dice quanti tratti e triangoli sta disegnando),
+strumenti in una pillola, e sul piano la **barra di scala** (metri veri se la tavola
+ha `scale`, o `unit: 'm'` per un riquadro DWG; altrimenti millimetri di foglio), le
+**coordinate** del disegno sotto il puntatore per i DWG e, da ingrandito, la **mappa**
+della tavola con il riquadro di ciò che si vede, da trascinare. Trascinare sposta (e
+lasciato in corsa il foglio scivola ancora un po'), Ctrl + rotella o due dita
+ingrandiscono, il doppio clic avvicina, le frecce cambiano tavola, F adatta; c’è lo
+schermo intero. Nei case study la rotella e il dito scorrono la pagina finché la
+tavola non è ingrandita. Senza JavaScript l’elenco apre il file stesso (il DWG o
+l’SVG).
 
 Come si preparano le tavole da PDF, e cosa si controlla prima di pubblicare qualunque
 tavola (indirizzi, nomi, volti), è spiegato in
@@ -394,7 +435,7 @@ La pagina intera di `iphone.pages` (`public/media/web/ap-iphone-01.webp`, `-02`�
 
 ### Figurine
 
-Servizi, fasi del metodo (in `/metodo/` e in home), lavori trasversali, strumenti dello studio, le parti sul web (sezioni 02 e 03 della home, `/portfolio/web/`, case study dei siti), contatti e 404 hanno una piccola illustrazione scontornata: `figurina(nome)` in `ui.js`, file in `public/media/figurine/`, misure in `src/data/figurine.js` (generato). Nascono da [`tools/figurine`](tools/figurine/README.md): un’immagine di gpt-image-2 con nove figurine, ritagliate in automatico. Un nome senza file non disegna nulla. Dallo stesso strumento vengono le **sagome dei tasti** (`tasto-*.webp`, foglio `tasti`, senza bordo adesivo e con ritagli fino a 960 px) e le **mini immagini del piè di pagina** (`chrome-*.webp`: busta, telefono, mappa, calendario, macchina fotografica, scatola del codice, cartello «torna su», lucchetto, quadro).
+Servizi, fasi del metodo (in `/metodo/` e in home), lavori trasversali, strumenti dello studio, le parti sul web (sezioni 02 e 03 della home, `/portfolio/web/`, case study dei siti), contatti e 404 hanno una piccola illustrazione scontornata: `figurina(nome)` in `ui.js`, file in `public/media/figurine/`, misure in `src/data/figurine.js` (generato). Nascono da [`tools/figurine`](tools/figurine/README.md): un’immagine di gpt-image-2 con nove figurine, ritagliate in automatico. Un nome senza file non disegna nulla. Dallo stesso strumento vengono le **sagome dei tasti** (`tasto-*.webp`, foglio `tasti`, senza bordo adesivo e con ritagli fino a 960 px) e le **mini immagini del piè di pagina** (`chrome-*.webp`: busta, telefono, mappa, calendario, macchina fotografica, scatola del codice, cartello «torna su», lucchetto, quadro; foglio `chrome2`: biscotto dei cookie, ventaglio di campioni dello stile).
 
 ### Mascotte
 
@@ -402,13 +443,23 @@ La **chiocciola gigante africana** e la **tartaruga di terra**, gli animali di A
 
 Accanto a loro, nel piè di pagina, tre **burattini di carta**: l’**airone** elegante (a sinistra), la **gazza** furbissima (a destra) e la **vespa** cattiva ma precisa, che si libra sopra la firma; sul telefono stanno in una fila sopra la firma. Ogni animale è fatto di pezzi separati (corpo, testa, collo, ali, zampe, coda, addome, antenne) uniti da fermacampioni: `tools/mascotte/burattini.mjs` fa disegnare a gpt-image-2 l’animale intero e poi lo stesso smontato, separa i pezzi e trova i perni (i fermacampioni dorati) e gli occhi (`src/data/burattini-pezzi.js`); il montaggio si scrive a mano in `src/data/burattini.js`. `puppet(nome)` in `ui.js` annida i pezzi (dietro o davanti al genitore) e `src/client/puppet.js` li muove su molle: collo, testa e pungiglione si voltano verso il puntatore, zampe, ali, code e antenne si tirano col mouse o col dito e ricadono oscillando, gli occhi seguono il puntatore ciascuno per conto suo (e senza puntatore vagano ognuno per sé). Il carattere: l’airone, toccato, fa l’inchino; la gazza muove la testa a scatti, gira il becco con la chiave se ti avvicini e, toccata, fa l’occhiolino; la vespa punta il pungiglione dove sei, si arrabbia se ti avvicini e, toccata, punge.
 
+### L’hero sotto il nome (home)
+
+Sotto il nome e il righello, su carta a puntini, l’hero parla al cliente (rifatto il 2 ottobre 2026; markup in `hero()` e `heroTerminal()` di `src/templates/pages/home.js`, stili in `home.css`, script `initHero` in `sections.js`):
+
+- **L’invito**, a sinistra: la riga di commento `// casa · sito · marchio`, il luogo comune «Servono tre professionisti.» sbarrato col pennarello minio (un elemento `<s>`, una riga per colpo) e timbrato «Falso», la risposta «Ne basta uno.», il tasto «Parliamo del progetto», il tasto che copia l’indirizzo email (anche premendo **C** finché l’hero è in vista; se gli appunti non sono disponibili apre il programma di posta) e tre garanzie prese da Servizi e Metodo.
+- **Il terminale**, a destra: `alberto.sh` con cinque comandi (`heroCommands()`: tutto, casa, sito, marchio, pc), quattro righe di fatti ciascuno e il rimando alla pagina dove continuare. I comandi girano da soli ogni 6,5 s (la barra sotto la voce attiva dice quanto manca), si fermano col puntatore sopra, col fuoco dentro e fuori schermo, e smettono quando il visitatore ne sceglie uno; il comando si scrive un carattere alla volta, poi escono le righe. Ogni comando ha il suo **adesivo** (`hero-*.webp`, foglio `hero` di [`tools/figurine`](tools/figurine/README.md)) appoggiato sull’angolo. Senza script resta il primo comando; con «riduci movimento» non gira e non si scrive.
+- **I siti online**, in fondo: una card per ogni sito pubblicato (`heroSites()`), con la cattura vera, il dominio e lo stato; si aprono in una nuova scheda, tranne questo sito, che rimanda alla sua scheda («Sei qui»).
+
+`tools/catture` prima di fotografare la home clicca `[data-hero-go="0"]`: il primo comando deve restare quello.
+
 ### L’aragosta e l’inchiostro (home)
 
-Nella prima schermata della home un’**aragosta di fiume** rossa (il gambero rosso del Mincio) dorme sopra «Disponibile per nuovi incarichi», col suo annaffiatoio azzurro accanto. Quando il visitatore sta fermo per poco più di due secondi (niente puntatore, scroll, tasti o tocchi) si sveglia di colpo — salto, colpo di coda, «!» — e versa inchiostro nella prima I di PECCHINI: in meno di tre secondi il cognome è pieno. PECCHINI è un recipiente unico: l’inchiostro corre sul fondo da una lettera all’altra e sale in tutte insieme. Dopo cinque secondi pieno comincia a perdere, goccia a goccia dal fondo delle lettere sul righello, e l’aragosta torna a versare, all’infinito; una volta riempito non scende mai sotto la metà. Se l’hero esce dallo schermo si riaddormenta (e il cognome perde fino a metà), un tocco la sveglia subito; con «riduci movimento» dorme e basta.
+Nella prima schermata della home un’**aragosta di fiume** rossa (il gambero rosso del Mincio) dorme sopra «Disponibile per nuovi incarichi», col suo annaffiatoio azzurro accanto. Quando il visitatore sta fermo per poco più di due secondi (niente puntatore, scroll, tasti o tocchi) si sveglia di colpo — salto, colpo di coda, «!» — e versa inchiostro nella prima i di «Pecchini»: in meno di tre secondi il cognome è pieno. Il cognome è un recipiente unico: l’inchiostro corre sul fondo da una lettera all’altra e sale in tutte insieme. Dopo cinque secondi pieno comincia a perdere, goccia a goccia dal fondo delle lettere sul righello, e l’aragosta torna a versare, all’infinito; una volta riempito non scende mai sotto la metà. Se l’hero esce dallo schermo si riaddormenta (e il cognome perde fino a metà), un tocco la sveglia subito; con «riduci movimento» dorme e basta.
 
 - **Il liquido** è simulato davvero (`Liquid` in `src/client/ink.js`): acqua bassa su una griglia di colonne, 1 px = 1 mm e g = 9,8 m/s², flussi conservativi, così fa onde, sciaborda quando si scorre la pagina (l’accelerazione dello scroll lo spinge di lato) e quando il puntatore ci passa sopra, e si calma da solo. Tutto è in un SVG sopra l’hero: il contorno del cognome è un `<text>` con lo stesso carattere e le stesse misure dell’HTML, che nel frattempo nasconde il proprio (`.is-inked`), e il liquido è ritagliato dalla stessa parola. Il ciclo si ferma quando l’hero non si vede.
 - **L’aragosta** è un burattino di carta come quelli del piè di pagina, ma con un montaggio suo: pezzi e pose in `src/data/aragosta.js`, immagini in `public/media/aragosta/`, fatte da [`tools/aragosta`](tools/aragosta/README.md). Occhi, palpebre, il getto (una parabola dal beccuccio all’apertura della I) e le gocce li disegna il codice.
-- **Anche in /stile/**: la tavola «Mascotte e burattini» ha una fascia per l’aragosta con una scena sua (etichetta, PECCHINI a 160 px, righello) che funziona come quella della home: `ink.js` monta una scena per ogni `[data-ink]` e riporta le misure a 1:1 anche quando il piano è ingrandito; spostare il piano fa sciabordare l’inchiostro.
+- **Anche in /stile/**: la tavola «Mascotte e burattini» ha una fascia per l’aragosta con una scena sua (etichetta, «Pecchini» a 160 px, righello) che funziona come quella della home: `ink.js` monta una scena per ogni `[data-ink]` e riporta le misure a 1:1 anche quando il piano è ingrandito; spostare il piano fa sciabordare l’inchiostro.
 - **Markup**: `data-ink` sull’`hero__wrap`, `data-ink-word` sul cognome, `data-ink-bed` sull’etichetta della disponibilità (per questo ora si vede anche sul telefono), `data-ink-rule` sul righello dove cadono le gocce. Il modulo si carica solo in home (`onDemand` in `main.js`). In locale `window.__ink` dice stato e livello e con `__ink.go('versa')` salta a uno stato.
 
 ## Fonti delle immagini
@@ -419,7 +470,7 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | --- | --- | --- |
 | Copertine e gallerie dei progetti non web (strada, bar-caffetteria, cantiere, tettoie, museo) | `public/media/progetti/<slug>/copertina.webp`, `vista-NN*.webp` | Generate con **openai/gpt-image-2** (OpenAI) su [Replicate](https://replicate.com/openai/gpt-image-2), con le tavole originali o le fotografie del museo come riferimento — [`tools/copertine`](tools/copertine/README.md) |
 | Illustrazione dell’assistenza informatica | `public/media/servizi/informatica/copertina.webp` | Generata con **openai/gpt-image-2** su Replicate — [`tools/copertine`](tools/copertine/README.md) (voce `informatica`) |
-| Figurine, sagome dei tasti (`tasto-*.webp`), mini immagini del piè di pagina (`chrome-*.webp`) | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
+| Figurine, adesivi dell’hero della home (`hero-*.webp`), sagome dei tasti (`tasto-*.webp`), mini immagini del piè di pagina (`chrome-*.webp`) | `public/media/figurine/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/figurine`](tools/figurine/README.md) |
 | Mascotte: chiocciola gigante africana e tartaruga di terra | `public/media/mascotte/` | Generate con **openai/gpt-image-2** su Replicate — [`tools/mascotte`](tools/mascotte/README.md); gli occhi mobili sono disegnati dal codice del sito |
 | Burattini: airone, gazza, vespa | `public/media/mascotte/{airone,gazza,vespa}/` | Generati con **openai/gpt-image-2** su Replicate (l’animale intero con le due mascotte come riferimento di stile, poi i pezzi con l’intero come riferimento) — [`tools/mascotte`](tools/mascotte/README.md); montaggio, occhi e movimenti sono del codice del sito |
 | Aragosta di fiume della home (con l’annaffiatoio) | `public/media/aragosta/` | Generata con **openai/gpt-image-2** su Replicate (intera con la chiocciola come riferimento di stile, poi i pezzi con l’intera come riferimento) — [`tools/aragosta`](tools/aragosta/README.md); montaggio, occhi, getto, inchiostro e gocce sono del codice del sito |
@@ -428,13 +479,14 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | Ritratto e avatar | `public/media/studio/fototessera*.webp` | Fototessera di Alberto Pecchini, scontornata con bria/remove-background su Replicate (volto non ritoccato) |
 | Figura scontornata di /studio/ | `public/media/studio/curioso-*.webp` | Fotografia di Alberto Pecchini, scontornata con l’IA su Replicate |
 | Fotografie del museo | `public/media/progetti/museo-mestieri-del-fiume/` | Scattate durante l’uscita del 15.11.2025; le due fotografie d’epoca (60, 61) riprendono materiale esposto nel museo |
-| Tavole (oggi non pubblicate, riferimento delle illustrazioni) | `public/media/tavole/` | Elaborati originali di Alberto Pecchini (AutoCAD LT), I.T.T. «Carlo d’Arco» |
+| Tavole (nel visualizzatore; riferimento delle illustrazioni) | `public/media/tavole/` | Elaborati originali di Alberto Pecchini (AutoCAD LT), I.T.T. «Carlo d’Arco» |
 | Disegni dei progetti dimostrativi, piante e marchi di esempio | `src/art/` → `/art/<slug>.svg` | Disegnati dal codice del sito |
+| Icone degli strumenti di /studio/ | `src/data/stack.js` (SVG in linea) | Tracciati di [Simple Icons](https://simpleicons.org) (CC0; VS Code e OpenAI dalla versione 10, poi tolti dalla raccolta); Figma a colori ridisegnato a mano. I marchi restano dei titolari |
 | Screenshot dei siti | `public/media/web/` | Catture dei siti di Alberto Pecchini |
 | MacBook, iPad, iPhone | `public/media/mockup/` | File della Figma Community [Device Mockups (iMac, Macbook, iPad, iPhone)](https://www.figma.com/community/file/1172125330560103197/device-mockups-imac-macbook-ipad-iphone), licenza CC BY 4.0 |
 | iPhone 18 Pro (case study di questo sito, /contatti/) | `public/media/mockup/iphone-18-pro.svg` | [IPhone 18 Pro Vector.svg](https://commons.wikimedia.org/wiki/File:IPhone_18_Pro_Vector.svg) di Rafael Fernandez, Wikimedia Commons, licenza CC BY-SA 4.0; il credito compare sotto ogni telefono (`iphoneCredit()`) |
 | Icone, monogramma, firma, favicon, `og.png` | `public/`, `ui.js` | Disegnati per il sito |
-| Caratteri | `@fontsource/*` | Archivo, IBM Plex Mono, Instrument Serif — SIL Open Font License |
+| Caratteri | `@fontsource/*` | Archivo, Cascadia Code, Instrument Serif — SIL Open Font License |
 
 ## Modulo contatti
 
@@ -456,8 +508,9 @@ Scelte fatte apposta, da non cambiare senza motivo:
 `src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `pebble` → `mascot` → `layout` → `home` → `portfolio` → `pages` → `print`. I fogli delle tre pagine speciali — `stile.css` (il piano di `/stile/`), `viewer.css` (le tavole vere) ed `email.css` (`/email/`) — sono entry a parte: il plugin li collega, dopo il foglio comune, solo alle pagine che contengono il loro segno (`data-canvas`, `data-viewer`, `data-email`; `PAGE_CSS` in `plugins/site-pages.js`). Le altre pagine scaricano un quarto di CSS in meno.
 
 - **Token** (`tokens.css`): palette carta / inchiostro / minio (`#E5481F`), scala tipografica, spazi, raggi, durate ed easing. È il primo file da aprire per cambiare l’aspetto.
-- **Caratteri**: Archivo Variable (asse `wdth`) per i testi, IBM Plex Mono per etichette e dati, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
+- **Caratteri**: Archivo Variable (asse `wdth`) per i testi, Cascadia Code (`--font-mono`, variabile sul peso 200–700, `@fontsource-variable/cascadia-code`; dal 2 ottobre 2026 al posto di IBM Plex Mono) per etichette, tasti, dati e il terminale della home, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
 - **Reveal** (`base.css`): `data-reveal` con i tipi `fade`, `up`, `clip`, `line`, `draw`, `words`; tutto disattivato con `prefers-reduced-motion`. Più in basso le rivelazioni partono con l’IntersectionObserver di `motion.js`; nel **primo schermo** (la testata di ogni pagina: `.hero`, `.phead`, `.cs-hero`, `.shero__grid`, `.cnt__intro`, `.nf`) sono invece animazioni CSS che partono al primo disegno, senza aspettare lo script: titolo e testo grande arrivano subito anche su una rete lenta. Lo stesso elenco sta in `FIRST_SCREEN` (`motion.js`). Dopo la tendina d’ingresso (classe `nav-in`) aspettano che la tendina si stia alzando.
+- **Tutto minuscolo** (dal 2 ottobre 2026): `body { text-transform: lowercase }` in `base.css`, iniziali e sigle comprese. Nell’HTML il testo resta scritto normale (titoli della scheda, motori di ricerca e lettori di schermo lo leggono come si scrive); quello che il visitatore scrive nei campi resta com’è, i segnaposto sono minuscoli. Non si usa mai `text-transform: none`, che riporterebbe le maiuscole. Etichette e tasti in Cascadia Code a 14 px (`--fs-label` 0,875rem, `--track-label` 0, peso 400). Il nome in testata è «alberto pecchini» a tutta larghezza, con il posto sotto per la coda della p: `ink.js` legge le lettere come appaiono (anche il `text-transform` calcolato), prende le aste dalla tabella `STEM` (in em, misurate sul carattere a larghezza 86%) e fa nascere ogni goccia dal fondo della sua lettera. Fanno eccezione le pagine di Better Call Pekko (fuori dal foglio comune) e il compositore email (`.em`, dove si scrivono email vere).
 - **Movimento**: durate `--t-1`…`--t-4` = 0,15 · 0,3 · 0,55 · 0,8 s, easing `--ease-out` per gli ingressi. Tendina tra le pagine: esce in 0,34 s (si naviga a 0,36 s), rientra in 0,5 s. Gli inseguimenti (cursore, anteprima, inclinazione dell’hero) usano `damp()` di `utils.js`, che dà la stessa velocità a 60 e a 120 Hz. Niente `will-change` permanenti, tranne dove un elemento si muove di continuo.
 - **Header e footer** (`layout.css`): tutti e due centrati e simmetrici su una griglia `1fr auto 1fr`, con il marchio in mezzo. Nella testata: tre voci · chiocciola e marchio · due voci e invito (sotto i 1100 px: menu · marchio · contatti). Nel piè di pagina, dall’alto: invito e due tasti, fila delle pagine, firma custodita dalle due mascotte e dai tre burattini, recapiti con le mini immagini, note legali con il credito «Sito di Alberto Pecchini», torna su. Palette scoperta su `footer.site-footer`.
 - **Tasti «sasso»** (`pebble.css`, markup da `pebble()` in `ui.js`): la sagoma irregolare è un’immagine di gpt-image-2 (`public/media/figurine/tasto-*.webp`) stirata sul tasto; sotto c’è lo spessore (la stessa sagoma come maschera, piena di un colore d’ombra, spostata di `--pb-depth`). Al passaggio la faccia si solleva e il tasto si inclina verso il puntatore (`--tx`/`--ty` da `pebble.js`), premendo scende sullo spessore. Tre toni (carta, minio, inchiostro), tre misure, la variante tonda per la sola icona; senza sagoma ritagliata la forma è disegnata in CSS.
@@ -469,7 +522,7 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 ## JavaScript del browser
 
-`src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill. Il piano di `/stile/` (`canvas.js`), il visualizzatore delle tavole (`viewer.js` con il lettore DWG) il compositore email (`email.js`) e l’aragosta con l’inchiostro della home (`ink.js`) si caricano in pezzi a parte, solo sulle pagine che li contengono (`onDemand` in `main.js`): il JavaScript comune è la metà di prima.
+`src/main.js` avvia in sequenza i moduli di `src/client/`; ognuno cerca i propri elementi e, se non li trova, non fa nulla. Un modulo che fallisce non ferma gli altri (l’errore finisce in console con il prefisso `[site]`). Non ci sono dipendenze: niente librerie di animazione, niente polyfill. Il piano di `/stile/` (`canvas.js`), il visualizzatore delle tavole (`viewer.js` con il motore grafico; il lettore DWG sta nel suo worker), il compositore email (`email.js`) e l’aragosta con l’inchiostro della home (`ink.js`) si caricano in pezzi a parte, solo sulle pagine che li contengono (`onDemand` in `main.js`): il JavaScript comune è la metà di prima.
 
 Quel che fa: header che si nasconde scendendo, menu mobile con focus trap, tasti «sasso» che si inclinano e si premono, mascotte con gli occhi che seguono il puntatore (si incrociano sul naso, sbattono le palpebre, si guardano intorno senza puntatore), burattini a pezzi da tirare col mouse o col dito, barra di avanzamento, transizioni tra pagine, reveal allo scorrimento, contatori, parallasse, cursore personalizzato (solo con puntatore fine), elementi magnetici, anteprime flottanti e scorrevoli, filtri del portfolio con stato nell’URL, lightbox, confronto prima/dopo, copia negli appunti, modulo contatti, piano con zoom e spostamento della pagina Stile, visualizzatore delle tavole.
 
@@ -489,7 +542,7 @@ dist/
 
 **Immagini responsive** (`plugins/responsive-images.js`): per ogni `<img>` di `/media/` (WebP, JPEG, PNG) scrive in `dist/` le versioni larghe 120, 240, 360, 560, 800 e 1200 px che stanno sotto il 75% dell’originale (la 120 solo per le immagini piccole) e aggiunge `srcset` e `sizes`. Il `sizes` lo dà il template quando sa quanto è grande l’immagine (`figurina()`, `mascot()`, l’avatar dell’hero); altrimenti `auto, 100vw` per le immagini lazy (Chromium sceglie sulla misura vera) e `100vw` per quelle subito visibili. L’anteprima al passaggio negli indici (`data-preview`) prende la versione da 800. In `public/` restano solo gli originali e il dev server serve quelli; il lightbox apre sempre l’originale (o `data-full`). Le versioni si tengono in `node_modules/.cache/ap-varianti/` con l’impronta del file nel nome: una build successiva le ricopia, un’immagine cambiata (le catture rifatte dal bot) si ricalcola da sola. Serve `sharp` (devDependency); senza, le pagine restano com’erano.
 
-**Tavole vere**: con `showSheets` spento nessuna pagina le cita e `dist/media/tavole/` viene tolta dopo la copia: PDF, DWG e SVG restano nel repository ma non sono online.
+**Tavole vere**: sono online solo se una pagina le mostra. Con `showSheets` spento nessuna pagina le cita e `dist/media/tavole/` viene tolta dopo la copia: PDF, DWG e SVG restano nel repository ma non sul sito.
 
 In console la build riporta il numero di pagine e miniature scritte e, se ce ne sono, i **dati ancora segnaposto** dichiarati in fondo a `src/data/site.js` (`placeholders`). Compilato il dato, togliere la voce dalla lista.
 

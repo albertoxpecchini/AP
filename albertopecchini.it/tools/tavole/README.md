@@ -31,8 +31,8 @@ sheet(BAR, '01', { dwg: 'bar-caffetteria.dwg', box: [2296.2, 2014.13, 2338.22, 2
 squadratura). Le tavole del bar-caffetteria sono le squadrature A3 in scala 1:100
 (42 × 29,7 unità); quelle della strada sono i riquadri delle fasi del progetto.
 Il browser legge il file con `src/dwg/` (lettore scritto da zero, senza librerie,
-formati AutoCAD 2010–2018) e disegna il riquadro su canvas, come in AutoCAD con lo
-**sfondo bianco**: il colore 7 diventa nero, gli altri colori restano quelli del file
+formati AutoCAD 2010–2018) e la scheda grafica disegna il riquadro (`src/gpu/`,
+WebGL 2; senza, un canvas 2D), come in AutoCAD con lo **sfondo bianco**: il colore 7 diventa nero, gli altri colori restano quelli del file
 (anche i colori veri e le trasparenze), le maschere dei testi prendono il colore dello
 sfondo, i layer spenti, congelati o «non stampabili» non si vedono, l’ordine di
 disegno (porta in primo/secondo piano) è rispettato. Con `darken: true` i tratti
@@ -57,12 +57,31 @@ python svgopt.py lavoro/tavola.raw.svg ../../public/media/tavole/<slug>/NN.svg 3
 trasformazione restano esatte), porta i colori in esadecimale e toglie gli attributi
 con il valore predefinito: i file scendono di circa un terzo.
 
+Sul sito l'SVG non è un'immagine: `src/gpu/pack-svg.js` lo legge e lo passa alla
+scheda grafica come i DWG. Capisce quello che esce da `pdftocairo` (tracciati con
+riempimento e contorno, una matrice, ritagli rettangolari, lettere come sagome
+richiamate con `<use>`); se in un file nuovo c'è altro (immagini, sfumature, testo
+vero) la tavola torna da sola a essere disegnata dal browser, come `<img>`.
+
 ## Riservatezza
 
 Prima di pubblicare una tavola si guarda cosa c’è scritto sopra:
 
-- **Indirizzi**: dal PDF dell’inquadramento del cantiere è stato tolto il nome della
-  strada (redazione con PyMuPDF, rimuovendo i tratti del testo).
+- **Indirizzi**: dall’inquadramento del cantiere è stato tolto il nome della strada,
+  da tutti e quattro i file della tavola (PDF, SVG, le due miniature). Nel PDF non
+  basta togliere i tratti che si vedono: per ogni testo scritto con un carattere SHX
+  AutoCAD aggiunge un **commento nascosto** («AutoCAD SHX Text») con il testo in
+  chiaro, e lì il nome restava, numero civico compreso. Li toglie
+  `pulisci-pdf.mjs`, che svuota anche il layer indicato e riscrive il file da capo:
+
+  ```bash
+  node tools/tavole/pulisci-pdf.mjs originale.pdf ../../public/media/tavole/<slug>/NN.pdf --livello VAR_STRA
+  ```
+
+  Poi l'SVG si rifà dal PDF pulito (o gli si tolgono gli stessi tracciati) e le
+  miniature dall'SVG. Per controllare un PDF: cercare `/Annots` e `/Contents` nel
+  file, e ingrandire la tavola nel visualizzatore fino a leggere le scritte piccole
+  (le linee sottili lì si vedono bene, nella miniatura no).
 - **Persone**: nella relazione sul museo i nomi dei compagni sono coperti e le
   fotografie in cui si riconoscono sono sfocate, nel PDF e nelle pagine; il PDF
   pubblicato ha i metadati ripuliti.

@@ -39,7 +39,8 @@
 
   /* Tipografia */
   --font-sans: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+  /* Cascadia Code per etichette, tasti, dati e terminale (dal 2.10.2026, prima IBM Plex Mono) */
+  --font-mono: 'Cascadia Code Variable', 'Cascadia Code', 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
   --font-serif: 'Instrument Serif', 'Iowan Old Style', 'Times New Roman', serif;
 
   --fs-mega: clamp(3.25rem, 1.2rem + 10.4vw, 12.5rem);
@@ -51,12 +52,12 @@
   --fs-lead: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
   --fs-body: 1.0625rem;
   --fs-small: 0.9375rem;
-  --fs-label: 0.6875rem;
+  --fs-label: 0.875rem;
 
   --lh-tight: 0.94;
   --lh-snug: 1.12;
   --lh-body: 1.6;
-  --track-label: 0.08em;
+  --track-label: 0;
   --track-display: -0.035em;
 
   /* Spazi (base 4px) */

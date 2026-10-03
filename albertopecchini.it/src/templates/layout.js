@@ -206,9 +206,9 @@ function footer({ route, compact = false }) {
   const availability = `${site.availability.label}${site.availability.from ? ` — da ${site.availability.from}` : ''}`
   const notes = [
     { label: 'Privacy', href: '/privacy/', fig: 'chrome-privacy' },
-    { label: 'Cookie', href: '/cookie/' },
+    { label: 'Cookie', href: '/cookie/', fig: 'chrome-cookie' },
     { label: 'Crediti immagini', href: '/crediti/', fig: 'chrome-crediti' },
-    { label: 'Stile', href: '/stile/' },
+    { label: 'Stile', href: '/stile/', fig: 'chrome-stile' },
   ]
 
   return html`

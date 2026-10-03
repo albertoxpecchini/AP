@@ -1,5 +1,6 @@
 // Visualizzatore delle tavole: l'elenco dei disegni, un piano con zoom e
-// spostamento, la riga dati della tavola e il PDF da scaricare.
+// spostamento (barra di scala, coordinate, mappa della tavola), la riga dati
+// della tavola e il PDF da scaricare.
 //
 // Lo stesso componente sta nei case study (le tavole di un progetto, dentro la
 // pagina) e in /portfolio/tavole/ (tutte le tavole, a tutto schermo).
@@ -18,6 +19,14 @@ const MAX_DWG = 40000 // il DWG si ridisegna nitido a qualunque scala
 const isVector = (s) => s.src.endsWith('.svg') || !!s.dwg
 
 const fromLabel = { DWG: 'DWG originale', PDF: 'da PDF', Excel: 'da Excel', Word: 'da Word' }
+// nell'elenco, il tipo di file che si apre: il DWG vero o il PDF
+const fromTag = { DWG: 'dwg', PDF: 'pdf', Excel: 'pdf', Word: 'pdf' }
+
+const base = (path) => path.slice(path.lastIndexOf('/') + 1)
+/** Il nome con cui si scarica il PDF: «06.pdf» da solo non dice niente. */
+const pdfName = (s) => (s.pdf ? (/^\d+\.pdf$/.test(base(s.pdf)) ? `${s.id}.pdf` : base(s.pdf)) : null)
+/** Il file che la tavola mostra, per la barra del titolo: il DWG vero o il PDF. */
+const fileOf = (s) => (s.dwg ? base(s.dwg) : pdfName(s) || base(s.src))
 
 /** Riga dati di una tavola: numero, scala, formato, file d'origine. */
 const metaOf = (s, total) => [`Tav. ${s.n} / ${pad(total)}`, s.scale && `Scala ${s.scale}`, s.paper, fromLabel[s.from] || s.from].filter(Boolean)
@@ -37,17 +46,22 @@ const item = (s, p, total) => html`
       'data-dwg': s.dwg,
       'data-box': s.box && s.box.join(','),
       'data-darken': s.darken ? '1' : null,
-      'data-paper': s.dwg ? s.paper : null,
+      'data-paper': s.paper,
+      'data-scale': s.scale,
+      'data-unit': s.unit,
+      'data-mini': s.mini,
       'data-title': s.title,
       'data-alt': s.alt,
       'data-note': s.note,
       'data-meta': metaOf(s, total).join('|'),
       'data-pdf': s.pdf,
+      'data-pdf-name': pdfName(s),
+      'data-file': fileOf(s),
       'data-project': p.title,
       'data-href': projectHref(p),
     })}>
       <span class="viewer__mini" style="--ratio:${s.width}/${s.height}"><img src="${s.mini}" width="320" height="${Math.round((320 * s.height) / s.width)}" alt="" loading="lazy" decoding="async"></span>
-      <span class="viewer__item-n label">${esc(s.n)}</span>
+      <span class="viewer__item-n label">${esc(s.n)}<span class="viewer__item-from">${esc(fromTag[s.from] || s.from)}</span></span>
       <span class="viewer__item-title">${esc(s.title)}</span>
     </a>
   </li>
@@ -67,12 +81,26 @@ export function sheetViewer(groups, { page = false, label = 'Tavole', lead } = {
 
   return html`
     <section class="${cx('viewer', page && 'viewer--page')}" data-viewer${page ? ' data-viewer-page' : ''} aria-label="${esc(page ? 'Visualizzatore delle tavole' : `Tavole di ${firstProject.title}`)}">
+      <div class="viewer__bar" aria-hidden="true">
+        <span class="viewer__lights"><i></i><i></i><i></i></span>
+        <span class="viewer__file" data-viewer-file>${esc(fileOf(first))}</span>
+        <span class="viewer__chips">
+          <span class="viewer__chip viewer__chip--gpu" data-viewer-engine hidden>gpu</span>
+          <span class="viewer__chip" data-viewer-count>${pad(1)} / ${pad(total(groups[0]))}</span>
+        </span>
+      </div>
+
       <div class="viewer__stage" data-viewer-stage tabindex="0" role="region" aria-roledescription="visualizzatore" aria-label="Tavola: trascina per spostarti, Ctrl e rotella o due dita per ingrandire, frecce per cambiare tavola">
         <div class="viewer__sheet" data-viewer-sheet style="--ratio:${first.width}/${first.height}">
           <img class="viewer__img viewer__img--thumb" src="${first.thumb}" width="${first.width}" height="${first.height}" alt="${esc(first.alt)}" decoding="async" data-viewer-thumb>
         </div>
         <p class="viewer__status label" data-viewer-status aria-live="polite" hidden></p>
         <p class="viewer__hint label" data-viewer-hint aria-hidden="true">Ctrl + rotella per ingrandire</p>
+        <div class="viewer__map" data-viewer-map aria-hidden="true"><img src="${first.mini}" alt="" decoding="async"><span></span></div>
+        <div class="viewer__hud label" aria-hidden="true">
+          <span class="viewer__scale" data-viewer-scale><i></i><b></b><small hidden>sul foglio</small></span>
+          <span class="viewer__xy" data-viewer-xy hidden></span>
+        </div>
       </div>
 
       <div class="viewer__panel">
@@ -100,7 +128,7 @@ export function sheetViewer(groups, { page = false, label = 'Tavole', lead } = {
         <p class="viewer__title" data-viewer-title>${page ? `<span class="viewer__project" data-viewer-project>${esc(firstProject.title)}</span>` : ''}<span data-viewer-name>${esc(first.title)}</span></p>
         <p class="viewer__note" data-viewer-note>${esc(first.note)}</p>
         <p class="viewer__links">
-          <a class="viewer__link" href="${first.pdf || first.src}" data-viewer-pdf${first.pdf ? ' download' : ''}${first.pdf ? '' : ' hidden'}>${icon('download')}<span>Scarica il PDF</span></a>
+          <a class="viewer__link" href="${first.pdf || first.src}" data-viewer-pdf${first.pdf ? ` download="${esc(pdfName(first))}"` : ' hidden'}>${icon('download')}<span>Scarica il PDF</span></a>
           ${page
             ? `<a class="viewer__link" href="${projectHref(firstProject)}" data-viewer-case>${icon('arrowUpRight')}<span>Scheda del progetto</span></a>`
             : `<a class="viewer__link" href="/portfolio/tavole/#${first.id}" data-viewer-all>${icon('arrowUpRight')}<span>Tutte le tavole</span></a>`}
@@ -111,9 +139,11 @@ export function sheetViewer(groups, { page = false, label = 'Tavole', lead } = {
         <button class="viewer__tool" type="button" data-viewer-prev aria-label="Tavola precedente">${icon('arrowLeft')}</button>
         <span class="viewer__tool viewer__count label" data-viewer-count aria-hidden="true">${pad(1)} / ${pad(total(groups[0]))}</span>
         <button class="viewer__tool" type="button" data-viewer-next aria-label="Tavola successiva">${icon('arrow')}</button>
+        <span class="viewer__sep" aria-hidden="true"></span>
         <button class="viewer__tool" type="button" data-viewer-out aria-label="Riduci">${minus}</button>
         <button class="viewer__tool viewer__zoom" type="button" data-viewer-zoom aria-label="Adatta la tavola allo schermo">100%</button>
         <button class="viewer__tool" type="button" data-viewer-in aria-label="Ingrandisci">${icon('plus')}</button>
+        <span class="viewer__sep" aria-hidden="true"></span>
         <button class="viewer__tool" type="button" data-viewer-full aria-label="Schermo intero" aria-pressed="false">${icon('expand')}</button>
       </div>
     </section>

@@ -19,13 +19,14 @@ const SECTIONS = [
   ['dati', 'Dati progetto'],
 ]
 
-// Le sezioni di un progetto: con le tavole vere la galleria diventa «Tavole» (il
-// visualizzatore, solo con `showSheets` acceso in projects.js); con le fotografie o
-// con la pagina intera su iPhone si aggiunge una sezione subito dopo.
+// Le sezioni di un progetto: con le tavole vere, prima della galleria c'è «Tavole»
+// (il visualizzatore dei DWG e dei PDF, solo con `showSheets` acceso in
+// projects.js); con le fotografie o con la pagina intera su iPhone si aggiunge una
+// sezione subito dopo la galleria.
 const sectionsOf = (p) =>
   SECTIONS.flatMap(([id, label]) =>
     id === 'galleria'
-      ? [[id, p.sheets ? 'Tavole' : label], ...(p.photos ? [['fotografie', 'Fotografie']] : []), ...(p.iphone ? [['iphone', 'iPhone']] : [])]
+      ? [...(p.sheets ? [['tavole', 'Tavole']] : []), [id, label], ...(p.photos ? [['fotografie', 'Fotografie']] : []), ...(p.iphone ? [['iphone', 'iPhone']] : [])]
       : [[id, label]],
   )
 
@@ -168,24 +169,25 @@ export function caseStudyPage(p) {
       )}
       ${p.sheets
         ? section(
-            'galleria',
+            'tavole',
             html`
               ${sheetViewer([{ project: p, sheets: p.sheets }])}
-              <p class="label cs-gallery__hint">${icon('expand')}<span>Trascina per spostarti · Ctrl + rotella o due dita per ingrandire · frecce per cambiare tavola · doppio clic per avvicinarti</span></p>
+              <p class="label cs-gallery__hint">${icon('expand')}<span>I disegni veri, non immagini: i DWG e i PDF letti e disegnati dalla scheda grafica · trascina per spostarti · Ctrl + rotella o due dita per ingrandire · frecce per cambiare tavola · doppio clic per avvicinarti</span></p>
             `,
             'cs-sec--wide cs-sec--sheets',
           )
-        : section(
-            'galleria',
-            html`
-              ${p.compare ? compare(p.compare) : ''}
-              <div class="cs-gallery cs-gallery--${p.area}">
-                ${p.images.map((im, i) => media(im, { zoom: true, group: p.slug, index: i, marks: p.area === 'tecnico', ratio: isWeb ? (i === 0 ? '16/10' : i === 1 ? '3/4' : '9/16') : undefined }))}
-              </div>
-              <p class="label cs-gallery__hint">${icon('expand')}<span>${p.images.some((im) => im.ai) ? 'Illustrazioni generate con l’intelligenza artificiale (<a href="/crediti/">crediti</a>) · ' : ''}Seleziona un’immagine per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</span></p>
-            `,
-            'cs-sec--wide',
-          )}
+        : ''}
+      ${section(
+        'galleria',
+        html`
+          ${p.compare ? compare(p.compare) : ''}
+          <div class="cs-gallery cs-gallery--${p.area}">
+            ${p.images.map((im, i) => media(im, { zoom: true, group: p.slug, index: i, marks: p.area === 'tecnico', ratio: isWeb ? (i === 0 ? '16/10' : i === 1 ? '3/4' : '9/16') : undefined }))}
+          </div>
+          <p class="label cs-gallery__hint">${icon('expand')}<span>${p.images.some((im) => im.ai) ? 'Illustrazioni generate con l’intelligenza artificiale (<a href="/crediti/">crediti</a>) · ' : ''}Seleziona un’immagine per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</span></p>
+        `,
+        'cs-sec--wide',
+      )}
       ${p.photos ? section('fotografie', photoSection(p), 'cs-sec--wide cs-sec--photos') : ''}
       ${p.iphone ? section('iphone', iphoneSection(p), 'cs-sec--iphone') : ''}
       ${section(

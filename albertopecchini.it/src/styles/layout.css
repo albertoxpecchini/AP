@@ -164,9 +164,8 @@
 
 .logo__role {
   font-family: var(--font-mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
   color: var(--h-muted, var(--muted));
   white-space: nowrap;
 }
@@ -755,9 +754,8 @@ footer.site-footer {
   margin-top: 1.5rem;
   font-size: 0.9375rem;
   font-weight: 620;
-  letter-spacing: 0.14em;
+  letter-spacing: -0.01em;
   line-height: 1.2;
-  text-transform: uppercase;
 }
 
 .foot-sign__tag {

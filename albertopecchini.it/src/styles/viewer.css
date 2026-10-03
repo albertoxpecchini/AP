@@ -1,23 +1,112 @@
 /* Visualizzatore delle tavole (src/templates/components/viewer.js,
    src/client/viewer.js). Tre assetti dello stesso componente:
-     · nel case study: riquadro con piano, riga dati e elenco delle tavole
+     · nel case study: una finestra con barra del titolo, piano, riga dati ed elenco
      · .viewer--page: la pagina /portfolio/tavole/, a tutta finestra sotto l'header
      · .is-full: schermo intero, sopra tutto il resto
-   Il piano ha lo stesso linguaggio della pagina Stile: carta 3 con la griglia di
-   punti, pannelli carta traslucidi, strumenti in monospace da 44 px. */
+   È una finestra di programma, parente del terminale della home: barra del
+   titolo a inchiostro con le tre luci e il nome del file, angoli tondi, lo
+   spessore di minio sotto. Sul piano (carta 3 con la griglia di punti) stanno
+   il foglio, gli strumenti a pillola, la barra di scala e la mappa. */
 
 .viewer {
   --viewer-stage-h: clamp(17rem, 72vw, 44rem);
+  --viewer-glass: rgb(243 241 236 / 0.92);
   display: grid;
   grid-template-areas:
+    'bar'
     'stage'
     'tools'
     'info'
     'panel';
   grid-template-columns: minmax(0, 1fr);
-  border: 1px solid var(--line);
+  overflow: hidden;
+  overflow: clip;
+  border-radius: var(--r-3);
   background: var(--c-paper);
   color: var(--c-ink);
+  box-shadow:
+    0 0 0 1.5px var(--c-ink),
+    0 0.45rem 0 1.5px var(--c-minio),
+    0 2.2rem 2.6rem -1.6rem rgb(16 17 15 / 0.5);
+}
+
+/* ── Barra del titolo ──────────────────────────────────────────────────── */
+
+.viewer__bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.9rem;
+  background: var(--c-ink);
+  color: #e9e6df;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: 1.3;
+}
+
+.viewer__lights {
+  display: flex;
+  flex: none;
+  gap: 0.4rem;
+}
+
+.viewer__lights i {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--c-minio);
+}
+
+.viewer__lights i:nth-child(2) {
+  background: var(--c-paper);
+}
+
+.viewer__lights i:nth-child(3) {
+  background: #2f9e5b;
+}
+
+.viewer__file {
+  min-width: 0;
+  overflow: hidden;
+  color: #a5a59c;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer__chips {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.viewer__chip {
+  padding: 0.05rem 0.5rem;
+  border: 1px solid rgb(243 241 236 / 0.4);
+  border-radius: var(--r-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* disegna la scheda grafica: una spia di minio */
+.viewer__chip--gpu {
+  border-color: var(--c-minio);
+  background: var(--c-minio);
+  color: var(--c-ink);
+  font-weight: 600;
+  cursor: help;
+}
+
+.viewer__chip[hidden] {
+  display: none;
+}
+
+.no-js .viewer__chips {
+  display: none;
 }
 
 /* ── Piano ─────────────────────────────────────────────────────────────── */
@@ -57,6 +146,23 @@
   touch-action: none;
 }
 
+/* mentre il file si apre: un filo di minio che scorre in cima al piano */
+.viewer.is-loading .viewer__stage::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--c-minio) 35%, var(--c-minio) 65%, transparent) no-repeat;
+  background-size: 45% 100%;
+  animation: viewer-load 1.05s var(--ease-in-out) infinite;
+}
+
+@keyframes viewer-load {
+  from { background-position: -80% 0; }
+  to { background-position: 180% 0; }
+}
+
 /* Foglio: prima dello script è centrato nel piano; dopo lo posiziona
    viewer.js con left/top a 0, transform e misura in px. */
 .viewer__sheet {
@@ -66,8 +172,10 @@
   aspect-ratio: var(--ratio);
   background: #fff;
   box-shadow:
-    0 0 0 1px rgb(16 17 15 / 0.08),
-    0 30px 60px -36px rgb(16 17 15 / 0.5);
+    0 0 0 1px rgb(16 17 15 / 0.1),
+    0 2px 3px rgb(16 17 15 / 0.08),
+    0 16px 32px -18px rgb(16 17 15 / 0.4),
+    0 44px 80px -44px rgb(16 17 15 / 0.45);
 }
 
 .viewer.is-ready .viewer__sheet {
@@ -103,8 +211,30 @@
 .viewer__img--full.is-in {
   opacity: 1;
 }
-/* Tavole DWG: la base copre tutto il foglio, il dettaglio solo la parte
-   visibile (misure in % del foglio, così seguono lo zoom senza ridisegnare) */
+
+/* Il canvas della scheda grafica (src/client/gl-sheet.js): grande quanto il
+   piano, sopra il foglio. Disegna la griglia di punti e la tavola; del foglio
+   vero restano sotto il bianco e l'ombra. */
+.viewer__gl {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.viewer.is-gl .viewer__stage {
+  background-image: none;
+}
+
+.viewer.is-gl-live .viewer__img--thumb {
+  visibility: hidden;
+}
+
+/* Senza scheda grafica, le tavole DWG su canvas 2D: la base copre tutto il
+   foglio, il dettaglio solo la parte visibile (misure in % del foglio, così
+   seguono lo zoom senza ridisegnare) */
 .viewer__dwg {
   position: absolute;
   inset: 0;
@@ -115,42 +245,68 @@
   opacity: 0;
   transition: opacity var(--t-2) ease;
 }
+
 .viewer__dwg.is-in,
 .viewer__dwg--detail {
   opacity: 1;
 }
+
 .viewer__dwg--detail {
   inset: auto;
   transition: none;
 }
+
 .viewer__dwg[hidden] {
   display: none;
 }
+
+/* ── Sul piano: avvisi, barra di scala, mappa ──────────────────────────── */
 
 .viewer__status,
 .viewer__hint {
   position: absolute;
   z-index: 2;
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  background: rgb(243 241 236 / 0.92);
-  color: var(--c-ink);
+  border-radius: var(--r-full);
+  background: var(--c-ink);
+  color: var(--c-paper);
+  box-shadow: 0 1rem 1.6rem -1rem rgb(16 17 15 / 0.6);
   pointer-events: none;
 }
 
 .viewer__status {
   top: 12px;
   left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.8rem 0.35rem 0.6rem;
+}
+
+.viewer__status[hidden] {
+  display: none;
+}
+
+.viewer__status::before {
+  content: '';
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid rgb(243 241 236 / 0.3);
+  border-top-color: var(--c-minio-bright);
+  border-radius: 50%;
+  animation: viewer-spin 0.7s linear infinite;
+}
+
+@keyframes viewer-spin {
+  to { rotate: 1turn; }
 }
 
 .viewer__hint {
   top: 50%;
   left: 50%;
   translate: -50% -50%;
-  padding: 10px 14px;
-  font-size: 0.75rem;
-  text-transform: none;
-  letter-spacing: 0.03em;
+  padding: 0.55rem 1rem;
+  white-space: nowrap;
   opacity: 0;
   transition: opacity var(--t-2) ease;
 }
@@ -159,8 +315,127 @@
   opacity: 1;
 }
 
-/* ── Strumenti: una riga sotto il piano; da tablet in su, sopra il piano in
-      basso a destra ───────────────────────────────────────────────────── */
+.viewer__hud {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: calc(100% - 24px);
+  pointer-events: none;
+}
+
+.viewer__scale,
+.viewer__xy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--viewer-glass);
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+}
+
+/* la barra di scala: una graffa lunga quanto la misura scritta accanto */
+.viewer__scale i {
+  display: block;
+  height: 0.5rem;
+  min-width: 1.5rem;
+  border: 1.5px solid var(--c-ink);
+  border-top: 0;
+}
+
+.viewer__scale b {
+  font-weight: 500;
+}
+
+.viewer__scale small {
+  font-size: inherit;
+  color: var(--c-graphite);
+}
+
+.viewer__xy {
+  color: var(--c-graphite);
+  white-space: pre;
+}
+
+.viewer__scale small[hidden],
+.viewer__xy[hidden] {
+  display: none;
+}
+
+/* la mappa: compare quando la tavola è ingrandita; il riquadro è ciò che si vede */
+.viewer__map {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 9.5rem;
+  aspect-ratio: var(--ratio, 4 / 3);
+  overflow: hidden;
+  border: 1.5px solid var(--c-ink);
+  border-radius: var(--r-2);
+  background: #fff;
+  box-shadow:
+    0 0.25rem 0 rgb(16 17 15 / 0.22),
+    0 1.2rem 1.6rem -1rem rgb(16 17 15 / 0.55);
+  cursor: crosshair;
+  touch-action: none;
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.94;
+  transform-origin: top right;
+  transition:
+    opacity var(--t-2) ease,
+    scale var(--t-2) var(--ease-out),
+    visibility 0s linear var(--t-2);
+}
+
+.viewer__map--tall {
+  width: 6.75rem;
+}
+
+.viewer.is-zoomed .viewer__map {
+  opacity: 1;
+  visibility: visible;
+  scale: 1;
+  transition-delay: 0s;
+}
+
+.viewer__map img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.viewer__map span {
+  position: absolute;
+  border: 1.5px solid var(--c-minio);
+  background: rgb(229 72 31 / 0.14);
+  /* il resto della tavola, fuori dal riquadro, si vela */
+  box-shadow: 0 0 0 100vmax rgb(243 241 236 / 0.6);
+  pointer-events: none;
+}
+
+@media (max-width: 599px) {
+  .viewer__map {
+    display: none;
+  }
+}
+
+/* ── Strumenti: una riga sotto il piano; da tablet in su una pillola in
+      rilievo sopra il piano, in basso a destra ───────────────────────── */
 
 .viewer__tools {
   grid-area: tools;
@@ -174,27 +449,7 @@
   flex: 1;
 }
 
-@media (min-width: 900px) {
-  .viewer__tools {
-    grid-area: stage;
-    align-self: end;
-    justify-self: end;
-    margin: 10px;
-    border: 1px solid var(--line);
-    background: rgb(243 241 236 / 0.94);
-    box-shadow: 0 24px 48px -32px rgb(16 17 15 / 0.45);
-    backdrop-filter: blur(14px) saturate(1.2);
-    -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  }
-
-  .viewer__tools > * {
-    flex: none;
-  }
-}
-
-.no-js .viewer__tools,
-.no-js .viewer__hint,
-.no-js .viewer__status {
+.viewer__sep {
   display: none;
 }
 
@@ -206,11 +461,10 @@
   padding: 0 10px;
   border-left: 1px solid var(--line);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--fs-label);
   font-weight: 500;
-  letter-spacing: 0.06em;
   color: var(--c-ink);
-  transition: background-color var(--t-1) ease;
+  transition: background-color var(--t-1) ease, color var(--t-1) ease;
 }
 
 .viewer__tool:first-child {
@@ -218,16 +472,16 @@
 }
 
 .viewer__tool .icon {
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 
 .viewer__zoom {
-  min-width: 60px;
+  min-width: 64px;
   font-variant-numeric: tabular-nums;
 }
 
 .viewer__count {
-  min-width: 64px;
+  min-width: 72px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: var(--c-graphite);
@@ -235,11 +489,80 @@
 
 @media (hover: hover) {
   button.viewer__tool:hover {
-    background: var(--c-paper-2);
+    background: var(--c-paper-3);
   }
 }
 
-/* sul telefono il numero della tavola sta già nella riga dati */
+button.viewer__tool:active {
+  background: var(--c-ink);
+  color: var(--c-paper);
+}
+
+button.viewer__tool:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.viewer__tool[aria-pressed='true'] {
+  background: var(--c-ink);
+  color: var(--c-paper);
+}
+
+@media (min-width: 900px) {
+  .viewer__tools {
+    grid-area: stage;
+    align-self: end;
+    justify-self: end;
+    align-items: center;
+    gap: 2px;
+    margin: 12px 12px 14px;
+    padding: 3px;
+    border: 1.5px solid var(--c-ink);
+    border-radius: var(--r-full);
+    /* lo spessore del tasto «sasso», sotto la pillola */
+    box-shadow:
+      0 0.25rem 0 #6b665d,
+      0 1.4rem 1.8rem -1rem rgb(16 17 15 / 0.55);
+  }
+
+  .viewer__tools > * {
+    flex: none;
+  }
+
+  .viewer__tool {
+    min-width: 38px;
+    height: 38px;
+    border-left: 0;
+    border-radius: var(--r-full);
+  }
+
+  .viewer__count {
+    min-width: 0;
+    padding-inline: 4px;
+  }
+
+  .viewer__sep {
+    display: block;
+    width: 1px;
+    height: 1.25rem;
+    margin-inline: 3px;
+    background: var(--line-strong);
+  }
+
+  button.viewer__tool:focus-visible {
+    outline-offset: 1px;
+  }
+}
+
+.no-js .viewer__tools,
+.no-js .viewer__hint,
+.no-js .viewer__status,
+.no-js .viewer__hud,
+.no-js .viewer__map {
+  display: none;
+}
+
+/* sul telefono il numero della tavola sta già nella barra del titolo */
 @media (max-width: 599px) {
   .viewer__count {
     display: none;
@@ -311,9 +634,7 @@
   gap: 0.45rem;
   min-height: 44px;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.9375rem;
   color: var(--c-ink);
   text-decoration: underline;
   text-decoration-color: var(--line-strong);
@@ -356,8 +677,8 @@
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-rows: auto auto;
   align-items: center;
-  gap: 4px 8px;
-  width: 11.5rem;
+  gap: 4px 10px;
+  width: 13rem;
   height: 100%;
   padding: 10px 12px;
   border-right: 1px solid var(--line);
@@ -369,29 +690,42 @@
   grid-row: 1 / -1;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-2);
   background: var(--c-paper-3);
+  transition: background-color var(--t-1) ease;
 }
 
 .viewer__mini img {
   display: block;
-  max-width: 48px;
-  max-height: 48px;
+  max-width: 50px;
+  max-height: 50px;
   width: auto;
   height: auto;
   background: #fff;
-  box-shadow: 0 0 0 1px rgb(16 17 15 / 0.1);
+  box-shadow: 0 0 0 1px rgb(16 17 15 / 0.12);
 }
 
 .viewer__item-n {
   align-self: end;
-  font-size: 0.625rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.2;
+}
+
+/* il tipo di file: dwg o pdf */
+.viewer__item-from {
+  padding: 0 0.45rem 0.05rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-full);
+  color: var(--c-graphite);
 }
 
 .viewer__item-title {
   align-self: start;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -404,6 +738,11 @@
 
 .viewer__item[aria-current] .viewer__item-n {
   color: var(--c-minio-bright);
+}
+
+.viewer__item[aria-current] .viewer__item-from {
+  border-color: rgb(243 241 236 / 0.4);
+  color: #cfccc4;
 }
 
 .viewer__item[aria-current] .viewer__mini {
@@ -427,9 +766,10 @@
   .viewer {
     --viewer-stage-h: clamp(26rem, 70vh, 46rem);
     grid-template-areas:
+      'bar bar'
       'stage panel'
       'info panel';
-    grid-template-columns: minmax(0, 1fr) 17.5rem;
+    grid-template-columns: minmax(0, 1fr) 18.5rem;
   }
 
   .viewer__panel {
@@ -475,17 +815,24 @@ body.page--tavole {
   inset: var(--header-h) 0 0;
   z-index: 1;
   grid-template-areas:
+    'bar'
     'stage'
     'tools'
     'info'
     'panel';
-  grid-template-rows: minmax(0, 1fr) auto auto auto;
-  border: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.viewer--page {
+  border-top: 1.5px solid var(--c-ink);
 }
 
 .viewer.is-full {
   inset: 0;
   z-index: var(--z-lightbox);
+  border-top: 0;
 }
 
 .viewer--page .viewer__stage,
@@ -541,7 +888,7 @@ body.page--tavole {
 
   .viewer--page .viewer__item,
   .viewer.is-full .viewer__item {
-    width: 10.5rem;
+    width: 12rem;
     padding-block: 8px;
   }
 
@@ -567,17 +914,19 @@ body.page--tavole {
   .viewer--page,
   .viewer.is-full {
     grid-template-areas:
+      'panel bar'
       'panel stage'
       'panel info';
     grid-template-columns: 20rem minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
   }
 
   .viewer.is-full:not(.viewer--page) {
     grid-template-areas:
+      'bar bar'
       'stage panel'
       'info panel';
-    grid-template-columns: minmax(0, 1fr) 17.5rem;
+    grid-template-columns: minmax(0, 1fr) 18.5rem;
   }
 
   .viewer--page .viewer__panel {
@@ -680,9 +1029,18 @@ body.page--tavole {
   height: 60vh;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .viewer.is-loading .viewer__stage::after,
+  .viewer__status::before {
+    animation: none;
+  }
+}
+
 @media print {
   .viewer__tools,
-  .viewer__panel {
+  .viewer__panel,
+  .viewer__hud,
+  .viewer__map {
     display: none;
   }
 }

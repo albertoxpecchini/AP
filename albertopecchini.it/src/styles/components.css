@@ -20,11 +20,9 @@
   background: var(--btn-bg);
   color: var(--btn-fg);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: 0.07em;
   line-height: 1.2;
-  text-transform: uppercase;
   cursor: pointer;
   transition: color var(--t-2) var(--ease-out), border-color var(--t-2) var(--ease-out);
 }
@@ -53,7 +51,7 @@
   min-height: 2.75rem;
   padding: 0.35rem 0.75rem 0.35rem 1rem;
   gap: 0.75rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
 }
 
 .btn--lg {
@@ -110,10 +108,8 @@
   gap: 0.6rem;
   padding-block: 0.35rem;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
   color: var(--fg);
   cursor: pointer;
 }
@@ -169,10 +165,8 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   border: 1px solid var(--line);
   border-radius: var(--r-1);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
+  font-size: 0.875rem;
   line-height: 1.2;
-  text-transform: uppercase;
   color: var(--fg);
 }
 
@@ -195,11 +189,9 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   border: 1px solid var(--line-strong);
   border-radius: var(--r-full);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
   line-height: 1.2;
-  text-transform: uppercase;
   white-space: nowrap;
   transition: background-color var(--t-1) ease, color var(--t-1) ease, border-color var(--t-1) ease;
 }
@@ -796,7 +788,6 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   letter-spacing: 0.02em;
   line-height: 1.5;
   text-align: center;
-  text-transform: none;
   color: var(--muted);
 }
 
@@ -845,7 +836,7 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   height: 1.5rem;
   margin-left: 0.5rem;
   font-family: var(--font-mono);
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1;
   color: var(--accent-text);
   vertical-align: middle;
@@ -857,7 +848,6 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   padding-top: 1rem;
   border-top: 1px solid var(--line);
   max-width: 60rem;
-  text-transform: none;
   letter-spacing: 0.02em;
   font-size: 0.75rem;
   line-height: 1.5;
@@ -1206,10 +1196,8 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   display: grid;
   place-items: center;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--c-ink);
   opacity: 0;
   transition: opacity var(--t-1) ease;
@@ -1342,7 +1330,6 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
 
 .field__opt {
   color: var(--muted);
-  text-transform: none;
   letter-spacing: 0.02em;
 }
 

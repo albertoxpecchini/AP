@@ -11,6 +11,8 @@ import { elevation, section } from './building.js'
 import { pointcloud, ortho, cadastral, urban, sitelayout } from './survey.js'
 import { canopy, bim, render, workspace } from './axon.js'
 import { brandmark, restyle, stationery, poster, social, brochure, packaging, signage, icons, slides, titleblock } from './brand.js'
+import { identity } from './identity.js'
+import { sitespec } from './sitespec.js'
 import { webpage } from './web.js'
 import { portrait, areamap } from './misc.js'
 
@@ -38,6 +40,8 @@ const REGISTRY = {
   icons,
   slides,
   titleblock,
+  identity,
+  sitespec,
   webpage,
   portrait,
   areamap,

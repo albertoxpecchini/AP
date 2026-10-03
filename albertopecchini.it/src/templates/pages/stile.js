@@ -160,8 +160,8 @@ function tipografiaBoard(b) {
     b,
     html`
       <div class="bd">
-        ${head(b, 'Archivo · Instrument Serif · IBM Plex Mono', 'Ospitati in locale, nessuna richiesta a terzi')}
-        ${intro(`Un grottesco che si ${em('stringe')}, un corsivo per l’accento.`, 'Archivo è variabile su peso e larghezza: i titoli stanno a 560 e al 94%, il nome in copertina all’86%. Il corsivo graziato entra una parola per titolo. Il mono misura: etichette, bottoni, dati.')}
+        ${head(b, 'Archivo · Instrument Serif · Cascadia Code', 'Ospitati in locale, nessuna richiesta a terzi')}
+        ${intro(`Un grottesco che si ${em('stringe')}, un corsivo per l’accento.`, 'Archivo è variabile su peso e larghezza: i titoli stanno a 560 e al 94%, il nome in copertina all’86%. Il corsivo graziato entra una parola per titolo. Il carattere dei terminali misura: etichette, bottoni, dati. Tutto minuscolo.')}
         <div class="bd-types">
           ${S.typefaces.map(
             (t) => html`
@@ -280,7 +280,7 @@ function componentiBoard(b) {
     html`
       <div class="bd">
         ${head(b, 'Riposo · passaggio · attivo', 'Bersagli ≥ 44 px')}
-        ${intro(`Pochi pezzi, ${em('sempre')} gli stessi.`, 'Bottoni in mono maiuscolo che al passaggio si riempiono di minio da sinistra; link sottolineati che si ritirano; chip a pillola per i filtri, tag squadrati per le etichette.')}
+        ${intro(`Pochi pezzi, ${em('sempre')} gli stessi.`, 'Bottoni in mono, mai tutto maiuscolo, che al passaggio si riempiono di minio da sinistra; link sottolineati che si ritirano; chip a pillola per i filtri, tag squadrati per le etichette.')}
         <div class="bd-comp">
           <div class="bd-col">
             <section>

@@ -1,14 +1,23 @@
 // Visualizzatore delle tavole (src/templates/components/viewer.js): si sfoglia
-// un disegno vettoriale come in un programma CAD. Trascina per spostarti,
-// Ctrl + rotella o due dita per ingrandire, doppio clic per avvicinarti,
-// frecce per cambiare tavola (o per spostarti, quando la tavola è ingrandita),
-// + e − per lo zoom, F o 0 per adattarla allo schermo.
+// un disegno vettoriale come in un programma CAD. Trascina per spostarti (e
+// lascia andare: il foglio scivola ancora un po'), Ctrl + rotella o due dita
+// per ingrandire, doppio clic per avvicinarti, frecce per cambiare tavola (o
+// per spostarti, quando la tavola è ingrandita), + e − per lo zoom, F o 0 per
+// adattarla allo schermo.
 //
-// Il foglio è un <img> dentro .viewer__sheet; per le tavole DWG sono due canvas
-// disegnati da src/client/dwg-sheet.js leggendo il file DWG. Durante i gesti si muove solo con
-// transform, che la GPU applica senza ridisegnare; quando la vista si ferma il
-// foglio prende la misura vera (width/height) e il browser ridisegna l'SVG
-// nitido a quella scala. Prima che l'SVG arrivi si vede la miniatura WebP.
+// CHI DISEGNA. Le tavole vettoriali (i DWG e quelle da PDF) le disegna la
+// scheda grafica: un canvas WebGL grande quanto il piano (src/client/gl-sheet.js)
+// ridisegna la tavola a ogni fotogramma alla risoluzione dello schermo, quindi
+// resta nitida anche mentre si ingrandisce. Sotto c'è sempre il foglio vero,
+// .viewer__sheet, con la miniatura WebP: si vede finché il file non è pronto.
+// Senza WebGL 2 (o se un file non si lascia preparare) si torna alla strada di
+// prima: il foglio si muove con transform e, a vista ferma, prende la misura
+// vera e il browser ridisegna l'SVG (o src/client/dwg-sheet.js il DWG su
+// canvas 2D). Le pagine a immagine restano sempre <img>.
+//
+// SUL PIANO: la barra di scala (metri veri se la tavola ha una scala), le
+// coordinate del disegno sotto il puntatore per i DWG, e da ingrandito una
+// mappa della tavola con il riquadro di ciò che si vede (trascinabile).
 //
 // Nei case study la rotella scorre la pagina finché la tavola non è ingrandita
 // e sul telefono un dito scorre la pagina: servono due dita. A tutto schermo, e
@@ -16,10 +25,23 @@
 
 import { $, $$, clamp, reducedMotion, lockPage, trapFocus, announce } from './utils.js'
 import { createDwgLayer } from './dwg-sheet.js'
+import { createGlStage } from './gl-sheet.js'
 
 const SETTLE_MS = 180 // quanto dopo l'ultimo movimento la vista si considera ferma
 const BASE = 1000 // larghezza del foglio a zoom 1, in px CSS
 const DOUBLE_TAP_MS = 320
+const GLIDE_MS = 80 // quanto prosegue il foglio lasciato in corsa (per la velocità che aveva)
+const PAPER_MM = { A4: 297, A3: 420, A2: 594, A1: 841, A0: 1189 } // lato lungo
+const PROGRESS = { scarico: 'Scarico il file…', leggo: 'Leggo il DWG…', preparo: 'Preparo il disegno…' }
+
+const number = (v, digits = 2) => v.toLocaleString('it-IT', { minimumFractionDigits: digits, maximumFractionDigits: digits })
+const plain = (v) => Number(v.toPrecision(3)).toLocaleString('it-IT')
+
+/** Una lunghezza tonda per la barra di scala: «5 m», «50 cm», «2 mm». */
+function lengthLabel(v, unit) {
+  if (unit === 'mm') return v >= 1000 ? `${plain(v / 1000)} m` : v >= 10 ? `${plain(v / 10)} cm` : `${plain(v)} mm`
+  return v >= 1 ? `${plain(v)} m` : v >= 0.01 ? `${plain(v * 100)} cm` : `${plain(v * 1000)} mm`
+}
 
 export function initViewer() {
   $$('[data-viewer]').forEach(setup)
@@ -45,13 +67,38 @@ function setup(root) {
     pdf: $('[data-viewer-pdf]', root),
     caseLink: $('[data-viewer-case]', root),
     allLink: $('[data-viewer-all]', root),
-    count: $('[data-viewer-count]', root),
+    counts: $$('[data-viewer-count]', root),
+    file: $('[data-viewer-file]', root),
     zoom: $('[data-viewer-zoom]', root),
     full: $('[data-viewer-full]', root),
+    scaleBar: $('[data-viewer-scale] i', root),
+    scaleLabel: $('[data-viewer-scale] b', root),
+    scaleNote: $('[data-viewer-scale] small', root),
+    xy: $('[data-viewer-xy]', root),
+    engine: $('[data-viewer-engine]', root),
+    map: $('[data-viewer-map]', root),
+    mapImg: $('[data-viewer-map] img', root),
+    mapFrame: $('[data-viewer-map] span', root),
   }
 
   // Le tavole, con la posizione dentro il proprio progetto (per il contatore)
-  const sheets = items.map((a) => ({ a, ...a.dataset, w: Number(a.dataset.w), h: Number(a.dataset.h), max: Number(a.dataset.max) }))
+  const sheets = items.map((a) => {
+    const d = a.dataset
+    const w = Number(d.w)
+    const h = Number(d.h)
+    const long = PAPER_MM[(d.paper || 'A3').toUpperCase()] || PAPER_MM.A3
+    return {
+      a,
+      ...d,
+      w,
+      h,
+      max: Number(d.max),
+      boxN: d.box ? d.box.split(',').map(Number) : null,
+      vector: !!d.dwg || /\.svg$/i.test(d.src),
+      paperW: w >= h ? long : long / Math.SQRT2, // larghezza del foglio, in mm
+      den: d.scale ? Number(d.scale.split(':')[1]) || 0 : 0,
+    }
+  })
   const groups = new Map()
   sheets.forEach((s) => {
     const g = groups.get(s.project) || []
@@ -63,11 +110,33 @@ function setup(root) {
     s.pos = g.indexOf(s) + 1
     s.total = g.length
   })
+  // Lo stesso DWG serve più tavole: la zona che le contiene tutte e la più stretta
+  const dwgs = new Map()
+  sheets.forEach((s) => {
+    if (!s.boxN) return
+    const g = dwgs.get(s.dwg) || { box: [Infinity, Infinity, -Infinity, -Infinity], minW: Infinity }
+    g.box = [Math.min(g.box[0], s.boxN[0]), Math.min(g.box[1], s.boxN[1]), Math.max(g.box[2], s.boxN[2]), Math.max(g.box[3], s.boxN[3])]
+    g.minW = Math.min(g.minW, s.boxN[2] - s.boxN[0])
+    dwgs.set(s.dwg, g)
+  })
+
+  // La scheda grafica, se c'è: il suo canvas sta sopra il foglio
+  const gl = createGlStage(stage)
+  if (gl) {
+    sheetEl.after(gl.canvas)
+    root.classList.add('is-gl')
+  }
+  /** Ciò che serve alla scheda grafica per disegnare una tavola. */
+  const glSheet = (s) => {
+    if (!s.dwg) return { kind: 'svg', url: s.src, paperMm: s.paperW, maxPx: s.max * 2 }
+    const g = dwgs.get(s.dwg)
+    return { kind: 'dwg', url: s.dwg, darken: s.darken === '1', box: s.boxN, paperMm: s.paperW, focus: g.box, maxScale: (s.max * 2) / g.minW }
+  }
 
   // ── Stato ─────────────────────────────────────────────────────────────────
   // `view` è ciò che si vede, `target` dove si sta andando (coincidono durante
-  // trascinamento, rotella e pizzico). `zc` è lo zoom a cui il foglio è stato
-  // ridisegnato: il transform applica solo il rapporto view.z / zc.
+  // trascinamento e pizzico). `zc` è lo zoom a cui il foglio è stato misurato:
+  // il transform applica solo il rapporto view.z / zc.
 
   let cur = -1
   let base = { w: BASE, h: BASE }
@@ -80,7 +149,7 @@ function setup(root) {
   const view = { x: 0, y: 0, z: 1 }
   const target = { x: 0, y: 0, z: 1 }
   let raf = null
-  let dwg = null // la tavola DWG corrente, se il foglio viene da un DWG
+  let dwg = null // la tavola DWG disegnata su canvas 2D (strada di riserva)
   let pending = null
   let lastT = 0
   let settleTimer = 0
@@ -120,7 +189,10 @@ function setup(root) {
     apply()
   }
 
-  // a vista ferma la tavola DWG ridisegna la parte visibile alla scala vera
+  // la scheda grafica ridisegna la tavola dov'è adesso
+  const paint = () => gl?.draw({ x: view.x, y: view.y, w: base.w * view.z, h: base.h * view.z, zr: view.z / fitZ })
+
+  // a vista ferma la tavola DWG su canvas 2D ridisegna la parte visibile alla scala vera
   const renderDwg = () => dwg?.render({ x: view.x, y: view.y, w: base.w * zc, h: base.h * zc, sw, sh })
 
   const settle = () => {
@@ -130,10 +202,48 @@ function setup(root) {
     renderDwg()
   }
 
+  // Barra di scala: una lunghezza tonda larga un centinaio di pixel. Metri veri
+  // se la tavola dichiara la scala (o se il DWG è in metri), altrimenti
+  // millimetri del foglio stampato.
+  let hudZ = 0
+  const hud = () => {
+    const s = sheets[cur]
+    if (!s) return
+    const w = base.w * view.z
+    const h = base.h * view.z
+    if (el.scaleBar && view.z !== hudZ) {
+      hudZ = view.z
+      let per = s.paperW / w
+      let unit = 'mm'
+      if (s.den) {
+        per = (s.paperW * s.den) / 1000 / w
+        unit = 'm'
+      } else if (s.boxN && s.unit === 'm') {
+        per = (s.boxN[2] - s.boxN[0]) / w
+        unit = 'm'
+      }
+      const raw = per * 120
+      const pow = 10 ** Math.floor(Math.log10(raw))
+      const nice = (raw / pow >= 5 ? 5 : raw / pow >= 2 ? 2 : 1) * pow
+      el.scaleBar.style.width = `${(nice / per).toFixed(1)}px`
+      el.scaleLabel.textContent = lengthLabel(nice, unit)
+      if (el.scaleNote) el.scaleNote.hidden = unit !== 'mm'
+    }
+    if (el.mapFrame && wasZoomed) {
+      const x0 = clamp(-view.x / w, 0, 1)
+      const y0 = clamp(-view.y / h, 0, 1)
+      const x1 = clamp((sw - view.x) / w, 0, 1)
+      const y1 = clamp((sh - view.y) / h, 0, 1)
+      el.mapFrame.style.cssText = `left:${(x0 * 100).toFixed(2)}%;top:${(y0 * 100).toFixed(2)}%;width:${((x1 - x0) * 100).toFixed(2)}%;height:${((y1 - y0) * 100).toFixed(2)}%`
+    }
+  }
+
   let applied = ''
   let lastPct = -1
   let wasZoomed = null
   function apply() {
+    const z = zoomed()
+    if (z !== wasZoomed) root.classList.toggle('is-zoomed', (wasZoomed = z))
     const transform = `translate3d(${view.x.toFixed(2)}px, ${view.y.toFixed(2)}px, 0) scale(${(view.z / zc).toFixed(5)})`
     if (transform !== applied) {
       sheetEl.style.transform = applied = transform
@@ -141,12 +251,12 @@ function setup(root) {
       moving = true
       clearTimeout(settleTimer)
       settleTimer = setTimeout(settle, SETTLE_MS)
+      paint()
+      hud()
     }
     const pct = Math.round((view.z / fitZ) * 100)
     if (pct !== lastPct && el.zoom) el.zoom.textContent = `${pct}%`
     lastPct = pct
-    const z = zoomed()
-    if (z !== wasZoomed) root.classList.toggle('is-zoomed', (wasZoomed = z))
   }
 
   const schedule = () => {
@@ -210,6 +320,7 @@ function setup(root) {
     fitZ = fit().z
     minZ = fitZ * 0.6
     maxZ = Math.max(fitZ * 2, (cur >= 0 ? sheets[cur].max : 16000) / base.w)
+    if (gl?.resize(sw, sh)) paint()
     return wasFit
   }
 
@@ -228,19 +339,29 @@ function setup(root) {
     if (!status) return
     if (!text) {
       status.hidden = true
+      root.classList.remove('is-loading')
       return
     }
     statusTimer = setTimeout(() => {
       status.textContent = text
       status.hidden = false
+      root.classList.add('is-loading')
     }, delay)
   }
 
-  const loadFull = (s) => {
-    const mine = ++token
-    $$('.viewer__img--full', sheetEl).forEach((img) => img.remove())
-    dwg?.destroy()
-    dwg = null
+  /** Chi sta disegnando la tavola: «gpu» con i numeri del file, o niente. */
+  const setEngine = (live) => {
+    root.classList.toggle('is-gl-live', live)
+    if (!el.engine) return
+    el.engine.hidden = !live
+    const info = live && gl.info
+    if (!info) return
+    const n = (v) => v.toLocaleString('it-IT')
+    el.engine.title = `Disegnata dalla scheda grafica (WebGL 2): ${n(info.segCount)} tratti, ${n(info.triCount / 3)} triangoli${info.glyphCount ? `, ${n(info.glyphCount)} lettere` : ''}${info.samples ? ` · antialias ${info.samples}×` : ''}${info.ms ? ` · pronta in ${n(info.ms)} ms` : ''}`
+  }
+
+  // La strada di riserva: il DWG su canvas 2D, l'SVG e le pagine raster in un <img>
+  const loadPlain = (s, mine) => {
     if (s.dwg) {
       // la tavola si legge dal DWG: il worker lo decodifica, i canvas la disegnano
       const layer = createDwgLayer(sheetEl, s, { onStatus: (t) => mine === token && setStatus(t) })
@@ -268,6 +389,32 @@ function setup(root) {
       img.onload = done
       img.onerror = failed
     }
+  }
+
+  const loadFull = (s) => {
+    const mine = ++token
+    $$('.viewer__img--full', sheetEl).forEach((img) => img.remove())
+    dwg?.destroy()
+    dwg = null
+    setEngine(false)
+    if (!gl || !s.vector) {
+      gl?.hide()
+      loadPlain(s, mine)
+      return
+    }
+    setStatus(s.dwg ? 'Apro il DWG…' : 'Apro il disegno…', 250)
+    gl.show(glSheet(s), (p) => mine === token && setStatus(PROGRESS[p] || ''))
+      .then((shown) => {
+        if (!shown || mine !== token) return
+        setStatus('')
+        setEngine(true)
+      })
+      .catch((error) => {
+        console.warn('[tavole] questa tavola non passa dalla scheda grafica:', error)
+        if (mine !== token) return
+        gl.hide()
+        loadPlain(s, mine)
+      })
   }
 
   // l'elenco scorre fino alla tavola corrente senza muovere la pagina; nella
@@ -308,14 +455,26 @@ function setup(root) {
     if (el.note) el.note.textContent = s.note
     if (el.pdf) {
       el.pdf.hidden = !s.pdf
-      if (s.pdf) el.pdf.href = s.pdf
+      if (s.pdf) {
+        el.pdf.href = s.pdf
+        el.pdf.setAttribute('download', s.pdfName || '')
+      }
     }
+    if (el.file) el.file.textContent = s.file
     if (el.caseLink) el.caseLink.href = s.href
     if (el.allLink) el.allLink.href = `/portfolio/tavole/#${s.a.id}`
-    if (el.count) el.count.textContent = `${String(s.pos).padStart(2, '0')} / ${String(s.total).padStart(2, '0')}`
+    for (const c of el.counts) c.textContent = `${String(s.pos).padStart(2, '0')} / ${String(s.total).padStart(2, '0')}`
+    if (el.map) {
+      el.map.style.setProperty('--ratio', `${s.w} / ${s.h}`)
+      el.map.classList.toggle('viewer__map--tall', s.h > s.w)
+      if (el.mapImg) el.mapImg.src = s.mini || s.thumb
+    }
+    if (el.xy) el.xy.hidden = true
+    hudZ = 0
 
     measure()
     reset()
+    hud()
     reveal(s.a)
     if (page) history.replaceState(null, '', `#${s.a.id}`)
     if (say) announce(`Tavola ${s.n}: ${s.title}`)
@@ -343,7 +502,9 @@ function setup(root) {
       if (pinch) {
         origin()
         const dy = clamp(e.deltaY * unit, -60, 60)
-        zoomAt(Math.exp(-dy * 0.0045), e.clientX - sx, e.clientY - sy)
+        // la rotella va a scatti: lo zoom li raccorda; il pizzico sul trackpad è già continuo
+        const notch = e.deltaMode !== 0 || Math.abs(e.deltaY) >= 40
+        zoomAt(Math.exp(-dy * 0.0045), e.clientX - sx, e.clientY - sy, notch)
         return
       }
       let dx = e.deltaX * unit
@@ -366,6 +527,33 @@ function setup(root) {
   let lastType = 'mouse'
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y)
 
+  // Coordinate del disegno sotto il puntatore (solo DWG, solo col mouse)
+  let hover = null
+  let hoverRaf = 0
+  const coords = () => {
+    hoverRaf = 0
+    const s = sheets[cur]
+    if (!el.xy || !hover || !s || !s.boxN) {
+      if (el.xy) el.xy.hidden = true
+      return
+    }
+    origin()
+    const fx = (hover.x - sx - view.x) / (base.w * view.z)
+    const fy = (hover.y - sy - view.y) / (base.h * view.z)
+    if (fx < 0 || fx > 1 || fy < 0 || fy > 1) {
+      el.xy.hidden = true
+      return
+    }
+    const [x0, y0, x1, y1] = s.boxN
+    el.xy.textContent = `x ${number(x0 + fx * (x1 - x0))}  y ${number(y1 - fy * (y1 - y0))}`
+    el.xy.hidden = false
+  }
+  const setHover = (e) => {
+    hover = e && e.pointerType === 'mouse' ? { x: e.clientX, y: e.clientY } : null
+    hoverRaf ||= requestAnimationFrame(coords)
+  }
+  stage.addEventListener('pointerleave', () => setHover(null))
+
   stage.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 && e.button !== 1) return
     measure()
@@ -373,8 +561,10 @@ function setup(root) {
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType })
     stage.setPointerCapture?.(e.pointerId)
     if (pointers.size === 1) {
-      drag = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now(), moved: false, type: e.pointerType }
+      drag = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now(), moved: false, type: e.pointerType, trail: [] }
       pinch = null
+      // un tocco ferma il foglio che sta ancora scivolando
+      if (raf) go({ x: view.x, y: view.y, z: view.z }, { animate: false })
     } else if (pointers.size === 2) {
       const [a, b] = [...pointers.values()]
       pinch = { d: dist(a, b), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }
@@ -384,6 +574,7 @@ function setup(root) {
   })
 
   stage.addEventListener('pointermove', (e) => {
+    setHover(e)
     if (!pointers.has(e.pointerId)) return
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType })
     if (pinch && pointers.size >= 2) {
@@ -409,6 +600,9 @@ function setup(root) {
     go({ x: target.x + dx, y: target.y + dy }, { animate: false })
     drag.x = e.clientX
     drag.y = e.clientY
+    drag.panned = true
+    drag.trail.push({ t: performance.now(), x: e.clientX, y: e.clientY })
+    if (drag.trail.length > 6) drag.trail.shift()
   })
 
   const release = (e) => {
@@ -421,7 +615,7 @@ function setup(root) {
       root.classList.remove('is-dragging')
     } else if (pointers.size === 1) {
       const [p] = pointers.values()
-      drag = { x: p.x, y: p.y, x0: p.x, y0: p.y, t0: performance.now(), moved: true, type: p.type }
+      drag = { x: p.x, y: p.y, x0: p.x, y0: p.y, t0: performance.now(), moved: true, type: p.type, trail: [] }
       pinch = null
     }
     if (!d || e.type === 'pointercancel') return
@@ -431,6 +625,18 @@ function setup(root) {
     if (d.type === 'touch' && d.moved && !zoomed() && Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) {
       step(dx < 0 ? 1 : -1)
       return
+    }
+    // lasciato in corsa, il foglio prosegue un poco e rallenta
+    if (d.panned && !still && d.trail.length > 1) {
+      const now = performance.now()
+      const a = d.trail.find((p) => now - p.t < 90) || d.trail.at(-1)
+      const b = d.trail.at(-1)
+      const dt = b.t - a.t
+      if (dt > 8 && now - b.t < 60) {
+        const vx = (b.x - a.x) / dt
+        const vy = (b.y - a.y) / dt
+        if (Math.hypot(vx, vy) > 0.25) go({ x: target.x + vx * GLIDE_MS, y: target.y + vy * GLIDE_MS })
+      }
     }
     // doppio tocco (il doppio clic del mouse ha il suo evento)
     if (d.type === 'touch' && !d.moved) {
@@ -452,6 +658,38 @@ function setup(root) {
     measure()
     closer(e.clientX - sx, e.clientY - sy)
   })
+
+  // ── Mappa: premere o trascinare porta lì il centro della vista ────────────
+
+  if (el.map) {
+    let held = false
+    const jump = (e) => {
+      const r = el.map.getBoundingClientRect()
+      const fx = clamp((e.clientX - r.left) / r.width, 0, 1)
+      const fy = clamp((e.clientY - r.top) / r.height, 0, 1)
+      go({ x: sw / 2 - fx * base.w * target.z, y: sh / 2 - fy * base.h * target.z }, { animate: false })
+    }
+    el.map.addEventListener('pointerdown', (e) => {
+      e.stopPropagation()
+      if (e.button !== 0) return
+      held = true
+      el.map.setPointerCapture?.(e.pointerId)
+      measure()
+      jump(e)
+    })
+    el.map.addEventListener('pointermove', (e) => {
+      e.stopPropagation()
+      if (held) jump(e)
+    })
+    const drop = (e) => {
+      e.stopPropagation()
+      held = false
+    }
+    el.map.addEventListener('pointerup', drop)
+    el.map.addEventListener('pointercancel', drop)
+    el.map.addEventListener('dblclick', (e) => e.stopPropagation())
+    el.map.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true })
+  }
 
   // ── Tastiera ──────────────────────────────────────────────────────────────
 
@@ -587,6 +825,8 @@ function setup(root) {
     const wasFit = measure()
     if (wasFit) reset()
     else go(target, { animate: false })
+    hudZ = 0
+    hud()
   }
   if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(stage)
   else addEventListener('resize', onResize)

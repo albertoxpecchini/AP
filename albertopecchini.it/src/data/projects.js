@@ -58,12 +58,12 @@ const strisce = (prefisso, alt) =>
     .map((f, i) => shot(f, 0, 0, i ? '' : alt))
 
 // ── Tavole vere ──────────────────────────────────────────────────────────────
-// NON SI MOSTRANO: dal 26.09.2026 il sito non fa vedere i documenti dei progetti
-// (tavole, PDF, pagine della relazione), solo le illustrazioni: copertina e
-// galleria nascono da tools/copertine (richiesta di Alberto: «mai mostrare i
-// documenti»). I dati restano qui: con `showSheets = true` tornano la sezione
-// «Tavole» dei case study, la pagina /portfolio/tavole/ e la sua voce nel menù.
-export const showSheets = false
+// SI MOSTRANO, dal 2.10.2026 (richiesta di Alberto: «mostra nei progetti il
+// visualizzatore DWG e PDF»): la sezione «Tavole» dei case study, la pagina
+// /portfolio/tavole/ e la sua voce nel menù. Dal 26.09 al 2.10 erano spente
+// («mai mostrare i documenti»): con `showSheets = false` spariscono di nuovo e
+// restano solo le illustrazioni (copertina e galleria da tools/copertine).
+export const showSheets = true
 
 // Ogni tavola di `sheets` sta in /public/media/tavole/<slug>/: <n>.svg è il
 // disegno vettoriale che il visualizzatore ingrandisce, <n>.webp la miniatura
@@ -78,13 +78,17 @@ export const showSheets = false
 // non serve l'SVG e `h` si ricava dalle proporzioni del riquadro. `darken`
 // scurisce i colori chiari pensati per lo sfondo nero di AutoCAD; `paper` dà
 // la larghezza del foglio, da cui gli spessori di linea in millimetri.
-const sheet = (slug, n, { title, alt, note, w = 1200, h, scale = null, paper = 'A3', from = 'DWG', full = null, pdf, dwg = null, box = null, darken = false }) => ({
+// La barra di scala del visualizzatore misura in metri veri se c'è `scale` (dal
+// formato del foglio) o, per un riquadro DWG senza scala, se `unit: 'm'` dice che
+// il disegno è in metri; altrimenti in millimetri di foglio.
+const sheet = (slug, n, { title, alt, note, w = 1200, h, scale = null, unit = null, paper = 'A3', from = 'DWG', full = null, pdf, dwg = null, box = null, darken = false }) => ({
   id: `${slug}-${n}`,
   n,
   title,
   alt,
   note,
   scale,
+  unit,
   paper,
   from,
   dwg: dwg ? `/media/tavole/${slug}/${dwg}` : null,
@@ -123,7 +127,7 @@ const TETTOIE = 'tettoie-legno-lamellare'
 const STRADA = 'progetto-stradale'
 // le prime cinque tavole sono riquadri del DWG; i colori del file sono pensati
 // per lo sfondo scuro di AutoCAD e sul bianco si scuriscono
-const stradaDwg = (box) => ({ dwg: 'progetto-stradale.dwg', box, darken: true })
+const stradaDwg = (box) => ({ dwg: 'progetto-stradale.dwg', box, darken: true, unit: 'm' })
 const stradaSheets = [
   sheet(STRADA, '01', {
     title: 'Studio del tracciato',
@@ -1289,7 +1293,7 @@ const allProjects = [
     brand: 'tavolato',
     typefaces: [
       { name: 'Archivo Expanded', role: 'Titoli e logotipo', sample: 'TAVOLATO', style: 'font-stretch:122%;font-weight:700;text-transform:uppercase' },
-      { name: 'IBM Plex Mono', role: 'Dati e didascalie', sample: 'GL24h · 20 × 36', style: 'font-family:var(--font-mono)' },
+      { name: 'IBM Plex Mono', role: 'Dati e didascalie', sample: 'GL24h · 20 × 36', style: "font-family:'IBM Plex Mono',monospace" },
     ],
     cover: img('brandmark', { brand: 'tavolato' }, 'Marchio Tavolato su fondo verde resina'),
     images: [
@@ -1334,7 +1338,7 @@ const allProjects = [
     brand: 'cortebassa',
     typefaces: [
       { name: 'Instrument Serif', role: 'Logotipo e nomi prodotto', sample: 'Miele di tiglio', style: 'font-family:var(--font-serif)' },
-      { name: 'IBM Plex Mono', role: 'Dati di legge e lotti', sample: '250 g · LOTTO 04', style: 'font-family:var(--font-mono)' },
+      { name: 'IBM Plex Mono', role: 'Dati di legge e lotti', sample: '250 g · LOTTO 04', style: "font-family:'IBM Plex Mono',monospace" },
     ],
     cover: img('packaging', { brand: 'cortebassa' }, 'Tre prodotti Corte Bassa con le nuove etichette'),
     images: [
@@ -1468,7 +1472,7 @@ const allProjects = [
     brand: 'anello',
     typefaces: [
       { name: 'Archivo SemiCondensed', role: 'Segnaletica', sample: 'Lago di Mezzo 2,4 km', style: 'font-stretch:88%;font-weight:700' },
-      { name: 'IBM Plex Mono', role: 'Distanze e codici', sample: 'AL-14 · 45.1601 N', style: 'font-family:var(--font-mono)' },
+      { name: 'IBM Plex Mono', role: 'Distanze e codici', sample: 'AL-14 · 45.1601 N', style: "font-family:'IBM Plex Mono',monospace" },
     ],
     cover: img('icons', { brand: 'anello' }, 'Set di dodici pittogrammi per il percorso Anello dei Laghi'),
     images: [

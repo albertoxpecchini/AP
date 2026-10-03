@@ -4,23 +4,9 @@ import { projects, byArea, bySlug, areas } from '../../data/projects.js'
 import { serviceAreas } from '../../data/services.js'
 import { steps } from '../../data/method.js'
 import { bio, photos, facts } from '../../data/studio.js'
-import { button, textLink, sectionHead, media, picture, deviceMockup, stat, icon, splitWords, figurina, figName } from '../components/ui.js'
+import { button, textLink, sectionHead, media, picture, stat, icon, splitWords, figurina, figName } from '../components/ui.js'
 import { siteCard, indexRow } from '../components/project.js'
 import { COORDS } from '../layout.js'
-
-// Le tre figure dell'hero: una per disciplina, sincronizzate con l'elenco dei ruoli.
-const heroSlides = () => {
-  const web = bySlug('rivaltasulmincio-it')
-  return [
-    { key: 'tecnico', caption: 'FIG. 01 — Pianta piano terra · scala 1:100', body: picture({ art: 'floorplan', variant: 'casa', code: 'AP-26-004', alt: 'Pianta architettonica quotata di un’abitazione' }, { lazy: false }) },
-    {
-      key: 'web',
-      caption: `FIG. 02 — ${web.web.domain} · 2026`,
-      body: `<div class="hero__web" data-theme="ink">${deviceMockup('laptop', { domain: web.web.domain, screen: web.web.desktop, lazy: false })}</div>`,
-    },
-    { key: 'grafica', caption: 'FIG. 03 — Costruzione geometrica di un marchio', body: picture({ art: 'brandmark', brand: 'tavolato', construction: true, alt: 'Costruzione geometrica di un marchio su griglia' }, { lazy: false }) },
-  ]
-}
 
 // I siti mostrati nel carosello: prima quelli in evidenza, poi gli altri.
 const webSites = () => [...byArea('web')].filter((p) => p.web).sort((a, b) => Number(b.featured) - Number(a.featured))
@@ -28,19 +14,91 @@ const webSites = () => [...byArea('web')].filter((p) => p.web).sort((a, b) => Nu
 const NUMBERS = ['Zero', 'Un', 'Due', 'Tre', 'Quattro', 'Cinque', 'Sei', 'Sette', 'Otto', 'Nove', 'Dieci']
 const sitesPhrase = (n) => (n === 1 ? 'Un sito' : `${NUMBERS[n] || n} siti`)
 
-// «Qui sotto»: quattro domande che rimandano alle sezioni della pagina.
-const heroDoors = () => {
-  const n = webSites().length
+// Il terminale dell'hero: un comando per ogni cosa che un cliente può chiedere.
+// Ogni comando ha il suo adesivo (foglio «hero» in tools/figurine), quattro
+// righe di fatti — gli stessi delle pagine Servizi e Metodo — e il rimando alla
+// pagina dove continuare. Il primo, «tutto», è quello che si vede senza script.
+const heroCommands = () => {
+  const online = webSites().filter((p) => p.web.url).length
   return [
-    { href: '#siti', n: '02', text: `${sitesPhrase(n)}, tutti da aprire` },
-    { href: '#web', n: '03', text: 'Si può progettare un sito in scala?' },
-    { href: '#metodo', n: '06', text: 'Cosa succede dopo il primo incontro?' },
-    { href: '#studio', n: '07', text: 'Chi c’è dietro?' },
+    {
+      key: 'tutto',
+      rows: [['casa', 'rilievo, CAD, 3D'], ['sito', 'scritto a mano'], ['marchio', 'disegnato su griglia'], ['computer', 'virus, backup, Wi-Fi']],
+      link: { href: '/servizi/', label: 'tutti i servizi' },
+    },
+    {
+      key: 'casa',
+      rows: [['rilievo', 'al millimetro'], ['disegni', 'DWG e PDF in scala'], ['modello 3D', 'viste e assonometrie'], ['sorgenti', 'sempre consegnati']],
+      link: { href: '/portfolio/tecnico/', label: 'i progetti tecnici' },
+    },
+    {
+      key: 'sito',
+      rows: [['online adesso', sitesPhrase(online).toLowerCase()], ['codice', 'scritto a mano'], ['telefono', 'progettato a parte'], ['dominio', 'intestato a te']],
+      link: { href: '#siti', label: 'apri i siti' },
+    },
+    {
+      key: 'marchio',
+      rows: [['logo', 'disegnato su griglia'], ['versioni', 'positivo e negativo'], ['file', 'vettoriali'], ['stampa', 'PDF per la tipografia']],
+      link: { href: '/servizi/#grafica', label: 'i servizi grafici' },
+    },
+    {
+      key: 'pc',
+      rows: [['virus', 'tolti, e non tornano'], ['dati', 'copiati prima di tutto'], ['Windows', 'installato e aggiornato'], ['stampante', 'che stampa']],
+      link: { href: '/servizi/informatica/', label: 'l’assistenza informatica' },
+    },
   ]
 }
 
+// I siti online, in piccolo: la prova che si può aprire subito. Questo sito non
+// rimanda a sé stesso ma alla sua scheda.
+const heroSites = () =>
+  webSites()
+    .filter((p) => p.web.url)
+    .map((p) => {
+      const here = p.web.url === site.url
+      return { p, here, href: here ? `/portfolio/${p.slug}/` : p.web.url }
+    })
+
+function heroTerminal() {
+  const commands = heroCommands()
+  const total = String(commands.length).padStart(2, '0')
+  return html`
+    <div class="hero__stage" data-hero data-reveal="up" style="--d:230ms">
+      <div class="hero__stage-in" data-tilt>
+        <div class="term">
+          <div class="term__bar">
+            <span class="term__lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="term__file">alberto.sh</span>
+            <span class="term__count" aria-hidden="true"><span data-hero-n>01</span>/${total}</span>
+          </div>
+          <div class="term__tabs" role="group" aria-label="Cosa ti serve?">
+            ${commands.map((c, i) => `<button class="term__tab${i === 0 ? ' is-active' : ''}" type="button" data-hero-go="${i}" aria-pressed="${i === 0}">${esc(c.key)}</button>`)}
+          </div>
+          <div class="term__screen">
+            ${commands.map(
+              (c, i) => html`
+                <div class="term__panel${i === 0 ? ' is-active' : ''}" data-hero-panel="${i}">
+                  <p class="term__cmd"><span class="term__prompt" aria-hidden="true">$</span><span data-hero-cmd="alberto --${esc(c.key)}">alberto --${esc(c.key)}</span></p>
+                  <ul class="term__rows">
+                    ${c.rows.map(([k, v], n) => `<li style="--i:${n}"><span class="term__ok" aria-hidden="true">✓</span><span class="term__k">${esc(k)}</span><span class="term__dots" aria-hidden="true"></span><span class="term__v">${esc(v)}</span></li>`)}
+                  </ul>
+                  <p class="term__out" style="--i:${c.rows.length}"><span aria-hidden="true">→ </span><a href="${c.link.href}">${esc(c.link.label)}</a><span class="term__cursor" aria-hidden="true"></span></p>
+                </div>
+              `,
+            )}
+          </div>
+        </div>
+        <div class="hero__stickers" aria-hidden="true">
+          ${commands.map((c, i) => figurina(`hero-${c.key}`, { className: `hero__sticker${i === 0 ? ' is-active' : ''}`, lazy: i > 0, sizes: '(min-width: 900px) 17rem, 36vw' }).replace('<img', `<img data-hero-sticker="${i}"`))}
+        </div>
+      </div>
+    </div>
+  `
+}
+
 function hero() {
-  const slides = heroSlides()
+  const sites = heroSites()
+  const tilts = [-1.3, 0.9, -0.7, 1.2]
   return html`
     <section class="hero" data-section="Intro" aria-labelledby="hero-title">
       <div class="hero__glow" aria-hidden="true"></div>
@@ -62,55 +120,53 @@ function hero() {
         <div class="rule rule--ticks hero__rule" data-ink-rule aria-hidden="true"></div>
 
         <div class="hero__body">
-          <div class="hero__roles-wrap" data-reveal="up" style="--d:160ms">
-            <p class="label hero__roles-label">Discipline</p>
-            <ul class="hero__roles" data-hero-roles>
-              ${site.roles.map(
-                (r, i) => `<li><button class="hero__role${i === 0 ? ' is-active' : ''}" type="button" data-hero-go="${i}" aria-pressed="${i === 0}"><span class="label">0${i + 1}</span><span class="hero__role-name">${esc(r.label)}</span><span class="hero__role-note label">${esc(r.note)}</span></button></li>`,
-              )}
+          <div class="hero__pitch">
+            <p class="hero__kicker" data-reveal="up" style="--d:120ms"><span class="hero__slashes" aria-hidden="true">//</span><span class="hero__pill">casa · sito · marchio</span><span>un solo referente</span></p>
+            <p class="hero__myth" data-reveal="up" style="--d:160ms">
+              <s><span class="hero__strike">“Servono tre</span> <span class="hero__strike hero__strike--2">professionisti.”</span></s>
+              <strong class="hero__stamp">Falso</strong>
+            </p>
+            <p class="hero__claim" data-reveal="up" style="--d:200ms">Ne basta <em class="serif-i">uno.</em></p>
+            <p class="hero__lead" data-reveal="up" style="--d:240ms">Diplomato geometra a ${esc(site.location.city)}: rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi. Con lo stesso metodo e la stessa cura.</p>
+            <div class="hero__actions" data-reveal="up" style="--d:280ms">
+              ${button({ href: cta.href, label: cta.label, size: 'lg', magnetic: true })}
+              <button class="hero__copy" type="button" data-hero-copy="${esc(site.contact.email)}">
+                <span class="hero__copy-ask"><span class="hero__copy-fine">Premi <kbd>C</kbd> per copiare la mia email</span><span class="hero__copy-touch">Tocca per copiare la mia email</span></span>
+                <span class="hero__copy-done" aria-hidden="true"><span class="hero__copy-tick">✓</span> Copiata: ${esc(site.contact.email)}</span>
+                ${figurina('hero-email', { className: 'hero__copy-fig', lazy: false, sizes: '3rem' })}
+              </button>
+            </div>
+            <ul class="hero__trust label" data-reveal="up" style="--d:320ms">
+              <li>Primo colloquio gratuito</li>
+              <li>Preventivo scritto</li>
+              <li>${esc(site.contact.reply.replace(/\.$/, ''))}</li>
             </ul>
           </div>
 
-          <figure class="hero__visual" data-hero data-reveal="clip" style="--d:100ms">
-            <div class="hero__stage">
-              <div class="hero__frame" data-tilt data-clip>
-                ${slides.map((s, i) => `<div class="hero__slide${i === 0 ? ' is-active' : ''}" data-hero-slide="${i}"${i ? ' aria-hidden="true"' : ''}>${s.body}</div>`)}
-              </div>
-              <span class="mark mark--tl" aria-hidden="true"></span><span class="mark mark--tr" aria-hidden="true"></span><span class="mark mark--bl" aria-hidden="true"></span><span class="mark mark--br" aria-hidden="true"></span>
-            </div>
-            <figcaption class="hero__caption label">
-              <span data-hero-caption>${esc(slides[0].caption)}</span>
-              <span class="hero__ticks" aria-hidden="true">${slides.map((_, i) => `<i${i === 0 ? ' class="is-active"' : ''}></i>`)}</span>
-            </figcaption>
-            <template data-hero-captions>${esc(JSON.stringify(slides.map((s) => s.caption)))}</template>
-          </figure>
+          ${heroTerminal()}
 
-          <div class="hero__pitch">
-            <p class="hero__claim" data-reveal="up" style="--d:190ms">Disegno case, siti e marchi. Scendi a <em class="serif-i">curiosare.</em></p>
-            <p class="hero__lead" data-reveal="up" style="--d:240ms">Diplomato geometra, vivo a ${esc(site.location.city)}. Rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi: con lo stesso metodo e la stessa cura.</p>
-            <div class="hero__actions" data-reveal="up" style="--d:290ms">
-              ${button({ href: '#discipline', label: 'Comincia da qui', iconName: 'arrowDown', size: 'lg', magnetic: true })}
-              ${button({ href: cta.href, label: cta.label, variant: 'ghost', size: 'lg' })}
-            </div>
+          <div class="hero__live" data-reveal="up" style="--d:380ms">
+            <p class="hero__live-label label">${figurina('hero-online', { className: 'hero__live-fig', sizes: '2rem' }) || '<span class="dot dot--live" aria-hidden="true"></span>'}<span>Online adesso</span><span class="hero__live-note">${sitesPhrase(sites.length)} veri: aprili</span></p>
+            <ul class="hero__sites">
+              ${sites.map(
+                ({ p, here, href }, i) => html`
+                  <li>
+                    <a class="hsite" href="${href}"${here ? '' : ' target="_blank" rel="noopener"'} style="--r:${tilts[i % tilts.length]}deg">
+                      <span class="hsite__shot">${picture({ ...p.web.desktop, alt: '' }, { sizes: '(min-width: 1100px) 6rem, (min-width: 768px) 23vw, 45vw' })}</span>
+                      <span class="hsite__text">
+                        <span class="hsite__name">${esc(p.title)}</span>
+                        <span class="hsite__domain">${esc(p.web.domain)}</span>
+                      </span>
+                      <span class="hsite__badge${here ? ' hsite__badge--here' : ''}">${here ? 'Sei qui' : 'Online'}</span>
+                      <span class="hsite__arrow" aria-hidden="true">${icon(here ? 'arrow' : 'arrowUpRight')}</span>
+                      ${here ? '' : '<span class="sr-only"> (si apre in una nuova scheda)</span>'}
+                    </a>
+                  </li>
+                `,
+              )}
+            </ul>
           </div>
         </div>
-
-        <nav class="hero__next" aria-label="Cosa trovi scendendo" data-reveal="up" style="--d:360ms">
-          <p class="hero__next-label label"><span class="scroll-cue__line" aria-hidden="true"></span>Qui sotto</p>
-          <ol class="hero__doors">
-            ${heroDoors().map(
-              (d) => html`
-                <li>
-                  <a class="hero__door" href="${d.href}">
-                    <span class="label hero__door-n">${d.n}</span>
-                    <span class="hero__door-text">${esc(d.text)}</span>
-                    <span class="hero__door-icon" aria-hidden="true">${icon('arrowDown')}</span>
-                  </a>
-                </li>
-              `,
-            )}
-          </ol>
-        </nav>
       </div>
     </section>
   `
@@ -120,10 +176,14 @@ function disciplines() {
   const cards = [
     // niente disegni tecnici in vista: l'area si presenta con l'illustrazione di un suo progetto
     { area: serviceAreas[0], count: byArea('tecnico').length, href: '/portfolio/tecnico/', image: { ...bySlug('layout-cantiere').cover, alt: 'Illustrazione in assonometria di un cantiere con l’autogru in minio' } },
-    { area: serviceAreas[1], count: byArea('web').length, href: '/portfolio/web/', image: { art: 'webpage', site: 'edilcorte', device: 'desktop', tall: false, alt: 'Pagina principale di un sito web' } },
+    // Il sito in vetrina è questo: il primo schermo della home, quotato (src/art/sitespec.js);
+    // `variant`: schermi · rilievo · scala · sistema.
+    { area: serviceAreas[1], count: byArea('web').length, href: '/portfolio/web/', image: { art: 'sitespec', variant: 'schermi', alt: 'Il primo schermo della home di Alberto Pecchini a tre larghezze, desktop, tablet e telefono, con le misure' } },
     // La grafica resta una delle tre discipline anche senza progetti pubblicati:
     // finché l'area è nascosta la scheda rimanda ai servizi invece che al portfolio.
-    { area: serviceAreas[2], count: byArea('grafica').length, href: areas.grafica ? '/portfolio/grafica/' : '/servizi/#grafica', image: { art: 'poster', brand: 'argini', alt: 'Serie di manifesti' } },
+    // L'immagine è l'identità di questo sito, quotata (src/art/identity.js);
+    // `variant`: fogli · tavola · notte · sistema.
+    { area: serviceAreas[2], count: byArea('grafica').length, href: areas.grafica ? '/portfolio/grafica/' : '/servizi/#grafica', image: { art: 'identity', variant: 'fogli', alt: 'Tre tavole di costruzione dell’identità di Alberto Pecchini: marchio, icona e logotipo' } },
   ]
   return html`
     <section class="section intro" id="discipline" data-section="Discipline">
@@ -215,6 +275,13 @@ function webTeaser() {
   `
 }
 
+// Le voci in vetrina nella home: cinque per area, di lunghezza simile, così
+// le righe pesano uguale. L'elenco completo sta in /servizi/.
+const HOME_ITEMS = {
+  informatica: ['Pulizia da virus', 'Backup e recupero dati', 'Stampanti e scanner', 'Windows', 'Rete e Wi-Fi'],
+}
+const homeItems = (a) => HOME_ITEMS[a.key] || a.services.slice(0, 5).map((s) => s.title)
+
 function services() {
   return html`
     <section class="section svc" data-section="Servizi">
@@ -227,7 +294,7 @@ function services() {
                 <a class="svc__link" href="/servizi/#${a.key}">
                   <span class="svc__letter label">${a.letter}</span>
                   <span class="svc__name">${esc(a.title)}</span>
-                  <span class="svc__items">${a.services.map((s) => `<span>${esc(s.title)}</span>`).join('')}</span>
+                  <span class="svc__items">${homeItems(a).map((t) => `<span>${esc(t)}</span>`).join('')}</span>
                   <span class="svc__arrow" aria-hidden="true">${icon('arrowUpRight')}</span>
                 </a>
               </li>

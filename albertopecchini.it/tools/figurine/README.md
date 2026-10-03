@@ -8,12 +8,16 @@ pagina contatti e la 404. Hanno lo stesso stile delle copertine
 sulla carta non si vede, sul fondo scuro le fa sembrare adesivi.
 
 Ogni **foglio** è una sola immagine di **openai/gpt-image-2** su Replicate:
-2048 × 2048, qualità high (sempre: è una scelta di Alberto), fondo trasparente,
-nove figurine in una griglia 3 × 3. Lo script poi le ritaglia una per una.
+2048 × 2048, qualità high (sempre: è una scelta di Alberto), nove figurine in una
+griglia 3 × 3. Lo script poi le ritaglia una per una. Dal 30 settembre 2026 il
+modello non accetta più il fondo trasparente: il foglio si chiede su un fondo
+magenta pieno, che il ritaglio toglie con la chiave cromatica dei burattini
+(`tools/mascotte/immagine.mjs`). Nei prompt resta scritto «a fully transparent
+background»: lo script lo sostituisce da solo.
 
 | File | Cosa è |
 | --- | --- |
-| `fogli.js` | lo stile comune e i fogli (tecnico, digitale, grafica, informatica, informatica2, metodo, computer, chrome, tasti), nove figurine ciascuno, nell'ordine della griglia; un foglio può avere `stile` e `intro` propri e alzare la misura dei ritagli con `max` |
+| `fogli.js` | lo stile comune e i fogli (tecnico, digitale, grafica, informatica, informatica2, metodo, computer, chrome, chrome2, tasti, hero), nove figurine ciascuno, nell'ordine della griglia; un foglio può avere `stile` e `intro` propri e alzare la misura dei ritagli con `max`; una voce con `scarta: true` resta nel foglio ma non viene ritagliata |
 | `figurine.mjs` | lo script: genera un foglio, lo ritaglia, scarica un foglio già pagato |
 | `lavoro/` | i fogli PNG con il JSON dell'input (esclusi da Git) |
 | `../../src/data/figurine.js` | generato dal ritaglio: nomi e misure delle figurine pronte |
@@ -33,8 +37,9 @@ node tools/figurine/figurine.mjs recupera tecnico <id>   # se l'attesa si interr
 Il ritaglio separa le figurine dalla trasparenza: raggruppa i pixel pieni in
 blocchi connessi e assegna ogni blocco alla cella della griglia in cui cade il suo
 baricentro, così un pezzo staccato (un raggio, una graffetta) resta con la sua
-figurina e le briciole si scartano. Se il modello restituisce un fondo pieno
-invece che trasparente, prima lo toglie riempiendo dai bordi. Per provarlo senza
+figurina e le briciole si scartano. Il fondo magenta sparisce con la chiave
+cromatica; un fondo pieno di un altro colore si toglie riempiendo dai bordi; i
+vecchi fogli già trasparenti si ritagliano come prima. Per provarlo senza
 toccare il sito: `FIGURINE_PROVA=<cartella> node tools/figurine/figurine.mjs ritaglia …`.
 
 ## Nel sito
@@ -51,8 +56,9 @@ dati con `figName()`:
 | metodo (`/metodo/`, home) | `metodo-<key>`: `metodo-ascolto` |
 | strumenti (`/studio/`) | `strumenti-<gruppo>`: `strumenti-rilievo-e-disegno` |
 | contatti, 404 | `contatti`, `404` |
-| piè di pagina (recapiti, social, torna su, note legali) | `chrome-email`, `chrome-telefono`, `chrome-sede`, `chrome-orari`, `chrome-instagram`, `chrome-github`, `chrome-su`, `chrome-privacy`, `chrome-crediti` |
+| piè di pagina (recapiti, social, torna su, note legali) | `chrome-email`, `chrome-telefono`, `chrome-sede`, `chrome-orari`, `chrome-instagram`, `chrome-github`, `chrome-su`, `chrome-privacy`, `chrome-cookie`, `chrome-crediti`, `chrome-stile` (le ultime due dal foglio `chrome2`, scelte fra più versioni) |
 | tasti «sasso» di testata e piè di pagina (`pebble()` in ui.js, sagome vuote senza bordo adesivo, ritagli fino a 960 px) | `tasto-carta-1…4`, `tasto-carta-tondo`, `tasto-minio-1…2`, `tasto-inchiostro-1`, `tasto-inchiostro-tondo` |
+| home, hero (foglio `hero`: tratto grosso e molto minio, ritagli fino a 640 px) | gli adesivi del terminale, uno per comando: `hero-tutto`, `hero-casa`, `hero-sito`, `hero-marchio`, `hero-pc`; `hero-email` sul tasto che copia l'indirizzo, `hero-online` accanto a «Online adesso» |
 | home, sezione 03 «Web design e sviluppo» | `computer-postazione` accanto al titolo; `computer-mobile`, `computer-tastiera`, `computer-dominio` sui tre punti |
 | home, sezione 02 «Siti web» | `computer-siti` |
 | `/portfolio/web/` | `computer-codice` nella testata (`pageHead({ fig })`) |

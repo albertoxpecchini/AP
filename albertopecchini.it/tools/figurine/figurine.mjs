@@ -2,7 +2,7 @@
 // Figurine del sito con openai/gpt-image-2 su Replicate: un'immagine, nove figurine.
 //
 //   node tools/figurine/figurine.mjs genera <foglio|tutti>
-//       disegna il foglio (2048 × 2048, qualità high, fondo trasparente) in tools/figurine/lavoro/<foglio>/
+//       disegna il foglio (2048 × 2048, qualità high, fondo magenta che il ritaglio toglie) in tools/figurine/lavoro/<foglio>/
 //   node tools/figurine/figurine.mjs ritaglia <foglio> <file.png>
 //       ritaglia le nove figurine in public/media/figurine/<nome>.webp e aggiorna src/data/figurine.js
 //   node tools/figurine/figurine.mjs recupera <foglio> <id-predizione>
@@ -16,6 +16,7 @@ import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { execFileSync } from 'node:child_process'
 import { ROOT, die, predict, prediction, salva } from '../replicate.mjs'
+import { chiave, fondoMagenta } from '../mascotte/immagine.mjs'
 import { STILE, fogli } from './fogli.js'
 
 const LAVORO = join(ROOT, 'tools/figurine/lavoro')
@@ -26,6 +27,13 @@ const MANIFEST = PROVA ? join(resolve(PROVA), 'figurine.js') : join(ROOT, 'src/d
 const GRID = 3
 const MAX = 440 // lato lungo massimo: basta per 220 px CSS su schermi 2x (la più grande, la 404, arriva a 240); un foglio può alzarlo con `max`
 
+// Dal 30.09.2026 il modello rifiuta `background: 'transparent'`: i fogli si
+// chiedono su un fondo magenta pieno, che il ritaglio toglie con la chiave
+// cromatica dei burattini (tools/mascotte/immagine.mjs).
+const TRASPARENTE = 'a fully transparent background'
+const FONDO = 'a perfectly flat, uniform, solid pure magenta background (#FF00FF, a chroma-key backdrop: no texture, no gradient, no vignette, no shadow falls on it)'
+const SENZA_MAGENTA = 'Never use magenta, pink or purple anywhere on the objects or on their borders.'
+
 const foglio = (nome) => fogli[nome] || die(`nessun foglio «${nome}». Disponibili: ${Object.keys(fogli).join(', ')}`)
 
 async function genera(nome) {
@@ -33,12 +41,12 @@ async function genera(nome) {
   const elenco = f.figurine.map((x, i) => `${i + 1}. ${x.soggetto}.`).join('\n')
   const input = {
     // un foglio può avere uno stile e un'introduzione propri (i tasti)
-    prompt: `${f.stile || STILE}\n\n${f.intro || 'The nine figurine, row by row, left to right:'}\n${elenco}`,
+    prompt: `${(f.stile || STILE).replace(TRASPARENTE, FONDO)}\n${SENZA_MAGENTA}\n\n${f.intro || 'The nine figurine, row by row, left to right:'}\n${elenco}`,
     aspect_ratio: '2048x2048',
     quality: 'high',
     number_of_images: 1,
     output_format: 'png',
-    background: 'transparent',
+    background: 'opaque',
   }
   console.log(`→ ${nome}: ${f.titolo} — qualità high, 2048 × 2048, attendo il modello…`)
   const p = await predict(input, `node tools/figurine/figurine.mjs recupera ${nome}`)
@@ -92,7 +100,9 @@ async function ritaglia(nome, file) {
   const probe = execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', src]).toString().trim()
   const [w, h] = probe.split(',').map(Number)
   const px = execFileSync('ffmpeg', ['-loglevel', 'error', '-i', src, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 1 << 28 })
-  console.log(`→ ${nome}: ${w} × ${h}, ${scontorna(px, w, h)}`)
+  const magenta = fondoMagenta({ w, h, px })
+  if (magenta) chiave({ w, h, px })
+  console.log(`→ ${nome}: ${w} × ${h}, ${magenta ? 'fondo magenta tolto con la chiave cromatica' : scontorna(px, w, h)}`)
 
   // maschera a blocchi e componenti connesse (8 vicini)
   const [bw, bh] = [Math.ceil(w / B), Math.ceil(h / B)]
@@ -125,6 +135,7 @@ async function ritaglia(nome, file) {
   await mkdir(OUT, { recursive: true })
   const misure = {}
   for (const [cell, fig] of f.figurine.entries()) {
+    if (fig.scarta) continue // disegnata nel foglio ma non usata nel sito
     const mine = comps.filter((c) => c.cell === cell)
     if (!mine.length) {
       console.warn(`  ! ${fig.nome}: cella ${cell + 1} vuota, salto`)

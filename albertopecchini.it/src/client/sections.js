@@ -1,75 +1,132 @@
 // Comportamenti legati a sezioni specifiche: hero, carosello dei siti,
 // timeline del metodo, indice laterale dei case study.
 
-import { $, $$, onScroll, clamp, reducedMotion } from './utils.js'
+import { $, $$, onScroll, clamp, reducedMotion, announce } from './utils.js'
 
-// ── Hero: tre figure sincronizzate con l'elenco dei ruoli ────────────────────
+// ── Hero: il terminale, un comando per mestiere, e l'email da copiare ────────
 
 export function initHero() {
-  const visual = $('[data-hero]')
-  if (!visual) return
-  const hero = visual.closest('.hero')
-  const slides = $$('[data-hero-slide]', visual)
-  const ticks = $$('.hero__ticks i', visual)
-  const roles = $$('[data-hero-go]')
-  const caption = $('[data-hero-caption]', visual)
-  const captions = JSON.parse($('[data-hero-captions]', visual)?.content.textContent || '[]')
-  const TIME = 5200
+  const stage = $('[data-hero]')
+  if (!stage) return
+  const hero = stage.closest('.hero')
+  const tabs = $$('[data-hero-go]', stage)
+  const panels = $$('[data-hero-panel]', stage)
+  const stickers = $$('[data-hero-sticker]', stage)
+  const count = $('[data-hero-n]', stage)
+  const TIME = 6500
+  const STEP = 34 // ms per carattere del comando
   let index = 0
   let timer
-  let paused = false
+  let typing
+  let left = TIME
+  let since = 0
+  // i comandi girano da soli finché il visitatore non ne sceglie uno
+  let auto = !reducedMotion()
+  const holds = new Set()
 
   hero.style.setProperty('--hero-time', `${TIME}ms`)
+  hero.classList.toggle('is-auto', auto)
+
+  // il comando si scrive un carattere alla volta; le righe escono dopo (--t0, in home.css)
+  const type = (panel) => {
+    const cmd = $('[data-hero-cmd]', panel)
+    const text = cmd.dataset.heroCmd
+    clearInterval(typing)
+    if (reducedMotion()) {
+      cmd.textContent = text
+      panel.style.setProperty('--t0', '0ms')
+      return
+    }
+    panel.style.setProperty('--t0', `${text.length * STEP + 120}ms`)
+    let n = 0
+    cmd.textContent = ''
+    typing = setInterval(() => {
+      cmd.textContent = text.slice(0, ++n)
+      if (n >= text.length) clearInterval(typing)
+    }, STEP)
+  }
 
   const go = (next) => {
-    index = (next + slides.length) % slides.length
-    slides.forEach((s, i) => {
-      s.classList.toggle('is-active', i === index)
-      s.toggleAttribute('aria-hidden', i !== index)
-    })
-    ticks.forEach((t, i) => {
+    index = (next + panels.length) % panels.length
+    panels.forEach((p, i) => p.classList.toggle('is-active', i === index))
+    tabs.forEach((t, i) => {
       t.classList.remove('is-active')
       if (i === index) {
-        void t.offsetWidth // riavvia l'animazione della tacca
+        void t.offsetWidth // riavvia la barra del tempo
         t.classList.add('is-active')
       }
+      t.setAttribute('aria-pressed', String(i === index))
     })
-    roles.forEach((r, i) => {
-      r.classList.toggle('is-active', i === index)
-      r.setAttribute('aria-pressed', String(i === index))
-    })
-    if (caption && captions[index]) caption.textContent = captions[index]
+    stickers.forEach((s, i) => s.classList.toggle('is-active', i === index))
+    if (count) count.textContent = String(index + 1).padStart(2, '0')
+    type(panels[index])
   }
 
-  const schedule = () => {
+  // il tempo che resta al comando in corso si ferma e riparte insieme alla sua barra
+  const run = () => {
     clearTimeout(timer)
-    if (paused || reducedMotion() || document.hidden) return
+    if (!auto || holds.size) return
+    since = performance.now()
     timer = setTimeout(() => {
+      left = TIME
       go(index + 1)
-      schedule()
-    }, TIME)
+      run()
+    }, left)
+  }
+  const hold = (why, on) => {
+    if (on === holds.has(why)) return
+    if (on && !holds.size && since) left = Math.max(600, left - (performance.now() - since))
+    on ? holds.add(why) : holds.delete(why)
+    hero.classList.toggle('is-paused', holds.size > 0)
+    run()
   }
 
-  const setPaused = (value) => {
-    paused = value
-    hero.classList.toggle('is-paused', value)
-    schedule()
-  }
-
-  roles.forEach((r) =>
-    r.addEventListener('click', () => {
-      go(Number(r.dataset.heroGo))
-      schedule()
+  tabs.forEach((t) =>
+    t.addEventListener('click', () => {
+      auto = false
+      hero.classList.remove('is-auto')
+      clearTimeout(timer)
+      go(Number(t.dataset.heroGo))
     }),
   )
-  visual.addEventListener('pointerenter', () => setPaused(true))
-  visual.addEventListener('pointerleave', () => setPaused(false))
-  document.addEventListener('visibilitychange', schedule)
+  stage.addEventListener('pointerenter', () => hold('pointer', true))
+  stage.addEventListener('pointerleave', () => hold('pointer', false))
+  stage.addEventListener('focusin', () => hold('focus', true))
+  stage.addEventListener('focusout', () => hold('focus', false))
+  document.addEventListener('visibilitychange', () => hold('hidden', document.hidden))
   // fuori dallo schermo non gira
-  new IntersectionObserver(([entry]) => setPaused(!entry.isIntersecting), { threshold: 0.2 }).observe(visual)
+  new IntersectionObserver(([entry]) => hold('away', !entry.isIntersecting), { threshold: 0.2 }).observe(stage)
+  run()
 
-  if (reducedMotion()) ticks.forEach((t) => t.classList.remove('is-active'))
-  schedule()
+  // «Premi C per copiare la mia email»: il tasto, e la lettera finché l'hero è in vista
+  const copy = $('[data-hero-copy]', hero)
+  if (!copy) return
+  const email = copy.dataset.heroCopy
+  let inView = true
+  let back
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(email)
+    } catch {
+      // appunti negati: si apre il programma di posta, che l'indirizzo lo porta con sé
+      location.href = `mailto:${email}`
+      return
+    }
+    copy.classList.remove('is-done')
+    void copy.offsetWidth // la cassetta delle lettere risalta a ogni copia
+    copy.classList.add('is-done')
+    announce(`Indirizzo ${email} copiato negli appunti`)
+    clearTimeout(back)
+    back = setTimeout(() => copy.classList.remove('is-done'), 2600)
+  }
+  copy.addEventListener('click', copyEmail)
+  new IntersectionObserver(([entry]) => (inView = entry.isIntersecting)).observe(hero)
+  addEventListener('keydown', (e) => {
+    if (e.key?.toLowerCase() !== 'c' || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return
+    if (!inView || document.body.classList.contains('is-locked')) return
+    if (e.target.closest?.('input, textarea, select, [contenteditable]')) return
+    copyEmail()
+  })
 }
 
 // ── Carosello dei siti ───────────────────────────────────────────────────────

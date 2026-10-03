@@ -1,7 +1,9 @@
-// Una tavola letta direttamente dal DWG, dentro il visualizzatore
-// (src/client/viewer.js). Il file viene scaricato e decodificato una volta
-// sola per indirizzo, in un worker (src/dwg/worker.js); ogni tavola è un
-// riquadro del disegno (`box`, in unità del DWG) portato sul foglio.
+// Una tavola letta direttamente dal DWG e disegnata su canvas 2D, dentro il
+// visualizzatore (src/client/viewer.js): è la strada di riserva, per i browser
+// senza WebGL 2 (di norma disegna la scheda grafica, src/client/gl-sheet.js).
+// Il file viene scaricato e decodificato una volta sola per indirizzo, in un
+// worker (src/dwg/worker.js); ogni tavola è un riquadro del disegno (`box`, in
+// unità del DWG) portato sul foglio.
 //
 // Due canvas dentro il foglio: la «base» è l'intera tavola a una risoluzione
 // fissa, il «dettaglio» copre la parte visibile quando si ingrandisce oltre.
@@ -44,7 +46,8 @@ function getWorker() {
   return worker
 }
 
-function ask(message, transfer = [], onProgress) {
+/** Una richiesta al worker; i messaggi di avanzamento arrivano a `onProgress`. */
+export function ask(message, transfer = [], onProgress) {
   const id = ++seq
   return new Promise((resolve, reject) => {
     pending.set(id, { resolve, reject, onProgress })
