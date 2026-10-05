@@ -14,6 +14,7 @@ import { privacyPage, cookiePage, creditiPage, notFoundPage } from './pages/lega
 import { stilePage } from './pages/stile.js'
 import { tavolePage, sheetCount, hasSheets } from './pages/tavole.js'
 import { emailPage } from './pages/email.js'
+import { wrapped5btPage } from './pages/wrapped5bt.js'
 import { assistenzaPage, assistenzaContattiPage, assistenzaNotFoundPage } from './pages/assistenza.js'
 import { assistenza, BCP } from '../data/assistenza.js'
 import { informaticaPage, informaticaLd } from './pages/informatica.js'
@@ -180,6 +181,19 @@ export const routes = [
     render: emailPage,
     pageClass: 'page--email',
     noindex: true,
+    noFooter: true,
+    hideCta: true,
+  },
+  {
+    // Tela del Wrapped 5BT: pagina volutamente vuota, pronta a ricevere in seguito
+    // le slide verticali e i dati del Wrapped della chat di classe.
+    path: '/wrapped5BT/',
+    title: 'Wrapped 5BT',
+    description: 'Tela del Wrapped 5BT — archivio visivo pronto per le slide e i dati.',
+    render: wrapped5btPage,
+    pageClass: 'page--wrapped5bt',
+    noindex: true,
+    sitemap: false,
     noFooter: true,
     hideCta: true,
   },
