@@ -24,6 +24,7 @@ const PAGE_CSS = [
   { entry: 'src/styles/stile.css', marker: 'data-canvas' },
   { entry: 'src/styles/viewer.css', marker: 'data-viewer' },
   { entry: 'src/styles/email.css', marker: 'data-email' },
+  { entry: 'src/styles/wrapped5bt.css', marker: 'data-wrapped' },
 ]
 
 /** Aggiunge in fondo a <head> i fogli delle pagine speciali che la pagina usa. */
