@@ -18,21 +18,30 @@ export function initWrapped() {
   if (!totale) return
 
   let corrente = -1
+  // destinazione dello scorrimento in corso: due tap o due frecce ravvicinati
+  // devono avanzare di due slide, anche se lo scroll morbido non è ancora arrivato
+  let puntata = null
 
   const indice = () => clamp(Math.round(scorrimento.scrollTop / scorrimento.clientHeight), 0, totale - 1)
 
   const aggiorna = () => {
     const i = indice()
+    if (i === puntata) puntata = null
     if (i === corrente) return
+    const primaVolta = corrente === -1
     corrente = i
     slides.forEach((slide, j) => slide.classList.toggle('is-attiva', j === i))
     if (barra) barra.style.setProperty('--avanzamento', String((i + 1) / totale))
     if (contatore) contatore.textContent = `${String(i + 1).padStart(2, '0')}/${String(totale).padStart(2, '0')}`
-    announce(`Slide ${i + 1} di ${totale}`)
+    // la prima sincronizzazione non è un cambio: niente annuncio a chi apre la pagina
+    if (!primaVolta) announce(`Slide ${i + 1} di ${totale}`)
   }
+
+  const base = () => puntata ?? corrente
 
   const vai = (i) => {
     const dove = clamp(i, 0, totale - 1)
+    puntata = dove
     scorrimento.scrollTo({ top: dove * scorrimento.clientHeight, behavior: reducedMotion() ? 'auto' : 'smooth' })
   }
 
@@ -54,11 +63,11 @@ export function initWrapped() {
   scorrimento.addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return
     const mosse = {
-      ArrowDown: corrente + 1,
-      PageDown: corrente + 1,
-      ' ': e.shiftKey ? corrente - 1 : corrente + 1,
-      ArrowUp: corrente - 1,
-      PageUp: corrente - 1,
+      ArrowDown: base() + 1,
+      PageDown: base() + 1,
+      ' ': e.shiftKey ? base() - 1 : base() + 1,
+      ArrowUp: base() - 1,
+      PageUp: base() - 1,
       Home: 0,
       End: totale - 1,
     }
@@ -67,8 +76,16 @@ export function initWrapped() {
     vai(mosse[e.key])
   })
 
-  prima?.addEventListener('click', () => vai(corrente - 1))
-  dopo?.addEventListener('click', () => vai(corrente + 1))
+  // il click lascerebbe il focus sul pulsante e la tastiera perderebbe il deck:
+  // si riporta subito sullo scorrimento
+  prima?.addEventListener('click', () => {
+    scorrimento.focus({ preventScroll: true })
+    vai(base() - 1)
+  })
+  dopo?.addEventListener('click', () => {
+    scorrimento.focus({ preventScroll: true })
+    vai(base() + 1)
+  })
 
   // sul telefono un tocco secco avanza (metà alta: indietro), come nelle storie;
   // col puntatore fine restano rotella, tasti e frecce
@@ -83,7 +100,7 @@ export function initWrapped() {
     if (Math.hypot(e.clientX - inizio.x, e.clientY - inizio.y) > 8) return
     if (e.target.closest('a, button')) return
     const quota = (e.clientY - stage.getBoundingClientRect().top) / stage.clientHeight
-    vai(quota < 0.35 ? corrente - 1 : corrente + 1)
+    vai(quota < 0.35 ? base() - 1 : base() + 1)
   })
 
   stage.classList.add('is-pronto')

@@ -25,6 +25,7 @@ export const wrapped = {
   //  copertina  { occhiello, titolo, sottotitolo }
   //  numero     { occhiello, valore, unita?, didascalia, secondari: [{ etichetta, valore }], nota? }
   //  classifica { occhiello, titolo, voci: [{ nome, valore, dettaglio? }], unita?, nota? }
+  //             (valore è un NUMERO, mai una stringa formattata: scala le barre)
   //  timeline   { occhiello, titolo, tappe: [{ data, testo }], nota? }
   //  citazione  { occhiello, testo, autore, data, nota? }
   //  confronto  { occhiello, titolo, lati: [{ etichetta, valore, dettaglio? }], nota? }

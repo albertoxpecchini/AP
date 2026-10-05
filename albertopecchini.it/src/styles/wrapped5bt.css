@@ -106,7 +106,8 @@
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: rgb(16 17 15 / 0.12);
+  /* grigio di mezzo: la traccia si deve vedere sia sulle slide carta che ink */
+  background: rgb(138 138 130 / 0.4);
   pointer-events: none;
 }
 
@@ -122,6 +123,11 @@
   position: absolute;
   left: 4cqi;
   bottom: 3cqi;
+  padding: 0.3em 0.55em;
+  border-radius: var(--r-1);
+  /* sfondo proprio, come i comandi: resta leggibile anche sulle slide ink */
+  background: var(--bg);
+  border: 1px solid var(--line);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   color: var(--muted);
@@ -268,11 +274,18 @@
   font-size: 3.8cqi;
 }
 
+/* nel markup la barra sta tra nome e valore: senza posizioni esplicite
+   l'auto-placement spingerebbe il valore in una riga propria */
 .wslide__voce-nome {
+  grid-row: 1;
+  grid-column: 1;
   font-weight: 560;
 }
 
 .wslide__voce-valore {
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
   font-family: var(--font-mono);
 }
 
@@ -361,6 +374,14 @@
   gap: 4cqi;
 }
 
+/* nel markup l'etichetta (dt) precede il valore (dd), come vuole il <dl>;
+   l'ordine visivo — numero sopra, etichetta sotto — lo fa la colonna inversa */
+.wslide__griglia > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.8cqi;
+}
+
 .wslide__griglia dd {
   font-size: 7cqi;
   font-weight: 560;
@@ -369,7 +390,6 @@
 }
 
 .wslide__griglia dt {
-  margin-top: 0.8cqi;
   font-size: 3.2cqi;
   color: var(--muted);
 }

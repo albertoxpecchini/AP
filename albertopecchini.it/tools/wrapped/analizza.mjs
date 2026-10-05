@@ -14,6 +14,11 @@
 // Il primo export passato è la fonte preferita quando lo stesso messaggio compare
 // in più export. Gli input e gli output stanno in tools/wrapped/lavoro/, che è
 // fuori dal repository: le chat non si committano mai.
+//
+// Formati capiti: iOS «[g/m/aa, hh:mm:ss] Nome: testo» e Android
+// «g/m/aa, hh:mm - Nome: testo», in italiano e in inglese, anche a 12 ore
+// (AM/PM); l'ordine giorno/mese viene dedotto per file. Un export che non
+// produce nessuna riga ferma lo script: meglio un errore che un buco muto.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
@@ -22,6 +27,13 @@ import { fileURLToPath } from 'node:url'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
 const LAVORO = join(QUI, 'lavoro')
+
+// Gli export seminano caratteri invisibili (LRM, isolatori bidirezionali):
+// si tolgono ovunque, tranne che nelle menzioni, che usano proprio gli isolatori.
+// Il marcatore U+200E, però, prima di sparire fa da testimone: WhatsApp lo mette
+// davanti alle righe che non ha scritto una persona (eventi di sistema, segnaposto
+// dei media), ed è il segnale strutturale su cui si basa la classificazione.
+const INVISIBILI = /[‎‏‪‫‬⁦⁧⁨⁩﻿]/g
 
 // ---------------------------------------------------------------------------
 // Riga di comando
@@ -43,10 +55,6 @@ if (!percorsi.length) {
   console.error('uso: node tools/wrapped/analizza.mjs <export.zip|_chat.txt> [altro export…] [--alias alias.json] [--out dati.json]')
   process.exit(1)
 }
-
-// Gli export seminano caratteri invisibili (LRM, isolatori bidirezionali):
-// si tolgono ovunque, tranne che nelle menzioni, che usano proprio gli isolatori.
-const INVISIBILI = /[‎‏‪‫‬⁦⁧⁨⁩﻿]/g
 
 // ---------------------------------------------------------------------------
 // Alias: ogni persona può comparire con più nomi (numeri diversi, rubriche
@@ -98,32 +106,55 @@ function leggiExport(percorso) {
 }
 
 // ---------------------------------------------------------------------------
-// Parsing. Una riga di messaggio è «[g/m/aa, hh:mm:ss] Mittente: testo»;
-// le righe che non combaciano sono continuazioni del messaggio precedente.
-// Gli export seminano caratteri invisibili (LRM e simili): si tolgono, ma le
-// menzioni @⁨…⁩ si estraggono prima, perché usano proprio quegli isolatori.
+// Parsing. Formati di riga:
+//   iOS      «[g/m/aa, hh:mm:ss] Mittente: testo»  (eventuale AM/PM; eventi di
+//            sistema attribuiti al nome del gruppo come mittente)
+//   Android  «g/m/aa, hh:mm - Mittente: testo»     (eventi di sistema senza
+//            mittente: «g/m/aa, hh:mm - Marco ha aggiunto Luca»)
+// Le righe che non combaciano sono continuazioni del messaggio precedente.
 // ---------------------------------------------------------------------------
 
-const RIGA = /^‎?\[(\d{1,2})\/(\d{1,2})\/(\d{2,4}), (\d{1,2}):(\d{2}):(\d{2})\] ([^:]+): ?([\s\S]*)$/
+const RIGA_IOS = /^[‎‏]?\[(\d{1,2})\/(\d{1,2})\/(\d{2,4}), (\d{1,2}):(\d{2})(?::(\d{2}))?[  ]?([AP]M)?\] ([^:]+): ?([\s\S]*)$/
+const RIGA_ANDROID = /^[‎‏]?(\d{1,2})\/(\d{1,2})\/(\d{2,4}), (\d{1,2}):(\d{2})(?::(\d{2}))?[  ]?([AP]M)? - ([^:]+): ?([\s\S]*)$/
+const RIGA_ANDROID_SISTEMA = /^[‎‏]?(\d{1,2})\/(\d{1,2})\/(\d{2,4}), (\d{1,2}):(\d{2})(?::(\d{2}))?[  ]?([AP]M)? - ([\s\S]*)$/
 const MENZIONE = /@⁨([^⁩]+)⁩/g
 
-// Segnaposto dei media e righe speciali, nei due formati (inglese e italiano).
-const TIPI_MEDIA = [
-  ['foto', /(^|\s)(image omitted|immagine omessa)$/],
-  ['video', /(^|\s)(video omitted|video omesso)$/],
-  ['vocale', /(^|\s)(audio omitted|audio omesso)$/],
-  ['sticker', /(^|\s)(sticker omitted|sticker non incluso)$/],
-  ['gif', /(^|\s)(GIF omitted|GIF non inclusa)$/i],
-  ['videonota', /(^|\s)(video note omitted|nota video omessa)$/],
-  ['documento', /(document omitted|documento omesso)$/],
-  ['contatto', /(Contact card omitted|Scheda contatto omessa)$/],
-  ['posizione', /^(location:|posizione:|Location:|Posizione:)/i],
-  ['effimero', /(visualizzazione singola|view once)/i],
-]
+// Segnaposto dei media, nei due formati. Con il marcatore di sistema basta che
+// la riga finisca col segnaposto (i documenti hanno davanti il nome del file);
+// senza marcatore il corpo deve ESSERE il segnaposto, così «guarda, image
+// omitted» scritto da una persona resta un messaggio di testo.
+const MEDIA = [
+  ['foto', 'image omitted|immagine omessa'],
+  ['video', 'video omitted|video omesso'],
+  ['vocale', 'audio omitted|audio omesso'],
+  ['sticker', 'sticker omitted|sticker non incluso'],
+  ['gif', 'GIF omitted|GIF non inclusa'],
+  ['videonota', 'video note omitted|nota video omessa'],
+  ['documento', 'document omitted|documento omesso'],
+  ['contatto', 'Contact card omitted|Scheda contatto omessa'],
+  ['effimero', 'view once media omitted|media a visualizzazione singola omesso'],
+].map(([tipo, alternativa]) => [
+  tipo,
+  new RegExp(`(^|\\s)(${alternativa})$`, 'i'),
+  new RegExp(`^(${alternativa})$`, 'i'),
+])
+const POSIZIONE = /^(location:|posizione:)/i
 const SONDAGGIO = /^(POLL:|SONDAGGIO:)/
 const ELIMINATO = /^(This message was deleted\.?|Questo messaggio è stato eliminato\.?|You deleted this message\.?|Hai eliminato questo messaggio\.?|This message was deleted by admin .*|Questo messaggio è stato eliminato dall'admin .*)$/
 const MODIFICATO = /\s*<(This message was edited|Questo messaggio è stato modificato)>\s*$/
-const SISTEMA = /(end-to-end encrypted|crittografat|created this group|created group|ha creato (il gruppo|questo gruppo)|\badded\b|ha aggiunto|\bremoved\b|ha rimosso|\bleft$|è uscit|ha abbandonato|joined using|è entrat|changed the subject|ha cambiato l'oggetto|changed this group's (icon|settings)|ha (cambiato|eliminato) l'(icona|immagine)|pinned a message|ha fissato un messaggio|unpinned|changed their phone number|ha cambiato (il )?numero|changed to|added you|ti ha aggiunto|is now an admin|è ora un admin|changed the group description|ha cambiato la descrizione|ha modificato le impostazioni|deleted this group's icon|turned (on|off) disappearing|ha (attivato|disattivato) i messaggi effimeri|security code changed|codice di sicurezza)/
+
+// Eventi di sistema. Con il marcatore U+200E (o la forma Android senza mittente)
+// basta riconoscere il verbo; SENZA marcatore valgono solo le forme a riga
+// intera e a bassa ambiguità, perché «il nuovo album è uscito» scritto da una
+// persona è un messaggio, non un'uscita dal gruppo.
+const SISTEMA_VERBI = /(end-to-end encrypted|crittografat|created this group|created group|ha creato (il gruppo|questo gruppo)|\badded\b|ha aggiunto|hai aggiunto|\bremoved\b|ha rimosso|hai rimosso|\bleft$|è uscit|sei uscit|you left|ha abbandonato|joined using|è entrat|changed the subject|ha cambiato l'oggetto|hai cambiato l'oggetto|changed this group's (icon|settings)|ha (cambiato|eliminato) l'(icona|immagine)|hai (cambiato|eliminato) l'(icona|immagine)|pinned a message|ha fissato un messaggio|hai fissato un messaggio|unpinned|changed their phone number|ha cambiato (il )?numero|changed to|added you|ti ha aggiunto|is now an admin|è ora un admin|you're now an admin|changed the group description|ha cambiato la descrizione|ha modificato le impostazioni|deleted this group's icon|turned (on|off) disappearing|ha (attivato|disattivato) i messaggi effimeri|hai (attivato|disattivato) i messaggi effimeri|security code|codice di sicurezza)/i
+const SISTEMA_RIGHE = [
+  /^Messages and calls are end-to-end encrypted\./,
+  /^I messaggi e le chiamate sono crittografat/,
+  /^Group creator created this group$/,
+  // le virgolette tipografiche le mette l'export, non chi scrive in chat
+  /^.{1,60} (changed the subject|ha cambiato l'oggetto) .*[“”].*$/,
+]
 
 const NOME_GRUPPO = [
   /changed the subject (?:from .+ )?to [“"](.+)[”"]/,
@@ -132,55 +163,108 @@ const NOME_GRUPPO = [
 const AGGIUNTA = [/^(.+?) added (.+)$/, /^(.+?) ha aggiunto (.+)$/]
 const RIMOZIONE = [/^(.+?) removed (.+)$/, /^(.+?) ha rimosso (.+)$/]
 const USCITA = [/^(.+?) left$/, /^(.+?) è uscit[oa]$/, /^(.+?) ha abbandonato il gruppo$/]
+// Forme in seconda persona («Hai aggiunto Marco», «You removed Luca»): chi
+// agisce è chi ha esportato, che qui non ha un nome; si conta solo chi subisce.
+const AGGIUNTA_TU = /^(?:Hai aggiunto|You added) (.+)$/
+const RIMOZIONE_TU = /^(?:Hai rimosso|You removed) (.+)$/
 
-function classifica(testo) {
+function classifica(testo, segnato) {
   if (ELIMINATO.test(testo)) return 'eliminato'
   if (SONDAGGIO.test(testo)) return 'sondaggio'
-  for (const [tipo, re] of TIPI_MEDIA) if (re.test(testo)) return tipo
-  if (SISTEMA.test(testo)) return 'sistema'
+  for (const [tipo, conPrefisso, esatto] of MEDIA) {
+    if (segnato ? conPrefisso.test(testo) : esatto.test(testo)) return tipo
+  }
+  if (segnato && POSIZIONE.test(testo)) return 'posizione'
+  if (segnato && SISTEMA_VERBI.test(testo)) return 'sistema'
+  if (!segnato && SISTEMA_RIGHE.some((re) => re.test(testo))) return 'sistema'
   return 'testo'
 }
 
 function analizzaFonte(grezzo, fonte) {
-  const messaggi = []
+  const righe = grezzo.replace(/^﻿/, '').split('\n')
+
+  // primo giro: raccoglie le teste di riga senza comporre le date, perché
+  // l'ordine giorno/mese dipende dalla localizzazione dell'export e si può
+  // dedurre solo guardando tutto il file (un campo sopra il 12 scioglie il dubbio)
+  const grezzi = []
   let corrente = null
-  for (const rigaGrezza of grezzo.split('\n')) {
-    const m = RIGA.exec(rigaGrezza)
+  let formato = null // 'ios' o 'android': si blocca al primo match, così una
+  // continuazione che somiglia a una riga dell'altro formato non spezza nulla
+  for (const riga of righe) {
+    let m = null
+    let mittente, corpo, sistemaSenzaMittente = false
+    if (formato !== 'android' && (m = RIGA_IOS.exec(riga))) {
+      formato = 'ios'
+      mittente = m[8]
+      corpo = m[9]
+    } else if (formato !== 'ios' && (m = RIGA_ANDROID.exec(riga))) {
+      formato = 'android'
+      mittente = m[8]
+      corpo = m[9]
+    } else if (formato !== 'ios' && (m = RIGA_ANDROID_SISTEMA.exec(riga)) && (m[8] || '').trim()) {
+      // riga Android senza «Mittente:»: è un evento di sistema
+      formato = 'android'
+      mittente = null
+      corpo = m[8]
+      sistemaSenzaMittente = true
+    } else {
+      m = null
+    }
     if (!m) {
-      // continuazione del messaggio precedente
-      if (corrente) corrente.grezzo += '\n' + rigaGrezza
+      if (corrente) corrente.corpo += '\n' + riga
       continue
     }
-    if (corrente) chiudi(corrente, messaggi)
-    const [, g, mese, a, h, min, s, mittente, corpo] = m
-    const anno = a.length === 2 ? '20' + a : a
+    if (corrente) grezzi.push(corrente)
     corrente = {
-      ts: `${anno}-${mese.padStart(2, '0')}-${g.padStart(2, '0')}T${h.padStart(2, '0')}:${min}:${s}`,
-      mittenteVisto: mittente.replace(INVISIBILI, '').trim(),
-      grezzo: corpo,
+      n1: Number(m[1]),
+      n2: Number(m[2]),
+      anno: m[3].length === 2 ? '20' + m[3] : m[3],
+      ore: Number(m[4]),
+      minuti: m[5],
+      secondi: m[6] || '00',
+      meridiano: m[7] || null,
+      mittenteVisto: mittente ? mittente.replace(INVISIBILI, '').trim() : null,
+      corpo,
+      segnatoRiga: /^[‎‏]/.test(riga),
+      sistemaSenzaMittente,
       fonte,
     }
   }
-  if (corrente) chiudi(corrente, messaggi)
-  return messaggi
-}
+  if (corrente) grezzi.push(corrente)
+  analizzaFonte.ultimoFormato = formato
 
-function chiudi(msg, messaggi) {
-  const menzioni = []
-  for (const m of msg.grezzo.matchAll(MENZIONE)) menzioni.push(nomeCanonico(m[1]))
-  let testo = msg.grezzo.replace(INVISIBILI, '').replace(/\n+$/, '')
-  const modificato = MODIFICATO.test(testo)
-  if (modificato) testo = testo.replace(MODIFICATO, '')
-  const tipo = classifica(testo.trim())
-  messaggi.push({
-    ts: msg.ts,
-    mittente: nomeCanonico(msg.mittenteVisto),
-    tipo,
-    testo,
-    menzioni,
-    modificato,
-    fonte: msg.fonte,
-  })
+  // l'ordine delle date: se un primo campo supera 12 è giorno/mese (Italia),
+  // se lo supera un secondo campo è mese/giorno (localizzazioni USA);
+  // senza prove si assume giorno/mese
+  const giornoPrima = grezzi.some((r) => r.n1 > 12) || !grezzi.some((r) => r.n2 > 12)
+
+  const messaggi = []
+  for (const r of grezzi) {
+    let ore = r.ore
+    if (r.meridiano === 'PM' && ore < 12) ore += 12
+    if (r.meridiano === 'AM' && ore === 12) ore = 0
+    const giorno = giornoPrima ? r.n1 : r.n2
+    const mese = giornoPrima ? r.n2 : r.n1
+    const ts = `${r.anno}-${String(mese).padStart(2, '0')}-${String(giorno).padStart(2, '0')}T${String(ore).padStart(2, '0')}:${r.minuti}:${r.secondi}`
+
+    const menzioni = []
+    for (const m of r.corpo.matchAll(MENZIONE)) menzioni.push(nomeCanonico(m[1]))
+    const segnato = r.segnatoRiga || r.sistemaSenzaMittente || /^[‎‏]/.test(r.corpo)
+    let testo = r.corpo.replace(INVISIBILI, '').replace(/\n+$/, '')
+    const modificato = MODIFICATO.test(testo)
+    if (modificato) testo = testo.replace(MODIFICATO, '')
+    const tipo = r.sistemaSenzaMittente ? 'sistema' : classifica(testo.trim(), segnato)
+    messaggi.push({
+      ts,
+      mittente: r.mittenteVisto ? nomeCanonico(r.mittenteVisto) : '(sistema)',
+      tipo,
+      testo,
+      menzioni,
+      modificato,
+      fonte,
+    })
+  }
+  return messaggi
 }
 
 // ---------------------------------------------------------------------------
@@ -191,8 +275,14 @@ function chiudi(msg, messaggi) {
 
 const fonti = percorsi.map((p, i) => {
   const grezzi = analizzaFonte(leggiExport(p), i)
-  return { percorso: p, nome: basename(p), indice: i, messaggi: grezzi }
+  if (!grezzi.length) {
+    console.error(`analizza: da ${p} non è uscita nessuna riga: formato non riconosciuto o file vuoto. Mi fermo per non far sparire un periodo in silenzio.`)
+    process.exit(1)
+  }
+  return { percorso: p, nome: basename(p), indice: i, messaggi: grezzi, formato: analizzaFonte.ultimoFormato }
 })
+
+const formatiMisti = new Set(fonti.map((f) => f.formato)).size > 1
 
 const visti = new Map()
 for (const fonte of fonti) {
@@ -229,7 +319,7 @@ for (const msg of tutti) {
   msg.mese = msg.ts.slice(0, 7)
   msg.anno = msg.ts.slice(0, 4)
   msg.ora = Number(msg.ts.slice(11, 13))
-  msg.giornoSettimana = new Date(msg.ts + 'Z').getUTCDay()
+  msg.giornoSettimana = new Date(msg.data + 'T00:00:00Z').getUTCDay()
 }
 
 let REGEX_EMOJI
@@ -326,8 +416,10 @@ const personaDi = (nome) => {
 }
 
 const chiaveSettimana = (ts) => {
-  // settimana ISO: giovedì della settimana → anno e numero
-  const d = new Date(ts + 'Z')
+  // settimana ISO: giovedì della settimana → anno e numero. Si lavora sulla
+  // sola data, a mezzanotte UTC: con l'orario dentro, la divisione per 86400000
+  // porterebbe un resto e Math.ceil salterebbe di una settimana.
+  const d = new Date(ts.slice(0, 10) + 'T00:00:00Z')
   const giovedi = new Date(d)
   giovedi.setUTCDate(d.getUTCDate() + 3 - ((d.getUTCDay() + 6) % 7))
   const inizioAnno = new Date(Date.UTC(giovedi.getUTCFullYear(), 0, 1))
@@ -361,6 +453,10 @@ for (const msg of tutti) {
       const m = re.exec(testo)
       if (m) conta(uscite, nomeCanonico(m[1]))
     }
+    let m = AGGIUNTA_TU.exec(testo)
+    if (m) conta(aggiunteSubite, nomeCanonico(m[1]))
+    m = RIMOZIONE_TU.exec(testo)
+    if (m) conta(rimozioniSubite, nomeCanonico(m[1]))
     continue
   }
 
@@ -426,6 +522,11 @@ for (const msg of tutti) {
   const normalizzato = testo.toLowerCase().trim()
   if (normalizzato.length >= 3 && normalizzato.length <= 60) conta(messaggiIdentici, normalizzato)
   if (listaParole.length >= 2 && listaParole.length <= 6 && normalizzato.length <= 40) conta(frasi, normalizzato)
+}
+
+if (!totaleContenuto) {
+  console.error('analizza: gli export non contengono nessun messaggio di contenuto (solo righe di sistema?). Niente da analizzare.')
+  process.exit(1)
 }
 
 // ---------------------------------------------------------------------------
@@ -508,11 +609,7 @@ const strisce = (() => {
   let inizio = null
   let prima = null
   for (const giorno of giorniOrdinati) {
-    if (prima && new Date(giorno) - new Date(prima) === 86400000) {
-      // continua
-    } else {
-      inizio = giorno
-    }
+    if (!(prima && new Date(giorno) - new Date(prima) === 86400000)) inizio = giorno
     const durata = Math.round((new Date(giorno) - new Date(inizio)) / 86400000) + 1
     if (durata > migliore.giorni) migliore = { giorni: durata, dal: inizio, al: giorno }
     prima = giorno
@@ -617,6 +714,10 @@ const copertura = {
     'Reaction e «rispondi a» non sono negli export di WhatsApp: le coppie sono stimate per adiacenza temporale.',
     'Di foto, video, vocali e sticker si vede solo il segnaposto: i conteggi sì, i contenuti no.',
     'I messaggi eliminati prima dell’export non esistono più: quelli contati sono solo gli «eliminati» rimasti visibili.',
+    'Una riga di sistema senza il marcatore invisibile dell’export (raro) può restare contata come testo: meglio quello che inventare eventi da frasi normali.',
+    ...(formatiMisti
+      ? ['Gli export mescolano formato iOS e Android: Android non esporta i secondi, quindi la deduplica tra le fonti non li può confrontare e qualche doppione può sopravvivere nei periodi coperti da entrambe.']
+      : []),
   ],
 }
 
@@ -663,9 +764,12 @@ const dati = {
     perGiornoSettimana: SETTIMANA.map((nome, i) => ({ giorno: nome, messaggi: perGiornoSettimana[i] })),
     oraPiuAttiva: migliorOra(perOra),
     giornoSettimanaPiuAttivo: SETTIMANA[perGiornoSettimana.indexOf(Math.max(...perGiornoSettimana))],
-    mesePiuAttivo: (() => { const [mese, n] = inOrdine(perMese, 1)[0]; return { mese, messaggi: n } })(),
+    mesePiuAttivo: (() => {
+      const [mese, n] = inOrdine(perMese, 1)[0] || [null, 0]
+      return { mese, messaggi: n }
+    })(),
     meseMenoAttivo: (() => {
-      const [mese, n] = [...perMese.entries()].sort((a, b) => a[1] - b[1])[0]
+      const [mese, n] = [...perMese.entries()].sort((a, b) => a[1] - b[1])[0] || [null, 0]
       return { mese, messaggi: n, avvertenza: 'confronta con copertura.mesiQuasiVuoti: può essere un buco tecnico' }
     })(),
   },

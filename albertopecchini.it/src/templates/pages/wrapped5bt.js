@@ -62,7 +62,10 @@ const palco = (slides) => html`
 const numero = (v) => (typeof v === 'number' ? v.toLocaleString('it-IT') : String(v ?? ''))
 
 function renderSlide(slide, i, totale) {
-  const dentro = TIPI[slide.tipo]
+  // un refuso nel tipo deve fermare la build, non produrre una slide vuota
+  if (!Object.hasOwn(TIPI, slide.tipo)) {
+    throw new Error(`wrapped: slide ${i + 1} di tipo sconosciuto «${slide.tipo}» (vedi i tipi in src/data/wrapped.js)`)
+  }
   return html`
     <section
       class="${cx('wslide', `wslide--${slide.tipo}`)}"
@@ -71,7 +74,7 @@ function renderSlide(slide, i, totale) {
       aria-label="Slide ${i + 1} di ${totale}"
     >
       ${slide.occhiello && html`<p class="wslide__occhiello">${esc(slide.occhiello)}</p>`}
-      ${dentro ? dentro(slide) : ''}
+      ${TIPI[slide.tipo](slide)}
       ${slide.nota && html`<p class="wslide__nota">${esc(slide.nota)}</p>`}
     </section>
   `
@@ -95,13 +98,20 @@ const TIPI = {
   `,
 
   classifica: (s) => {
-    const massimo = Math.max(...s.voci.map((v) => Number(v.valore) || 0), 1)
+    // le barre si scalano sui numeri: una stringa formattata («1.234») verrebbe
+    // letta come 1,234 e sballerebbe la scala in silenzio, quindi si rifiuta
+    for (const v of s.voci) {
+      if (typeof v.valore !== 'number' || !Number.isFinite(v.valore)) {
+        throw new Error(`wrapped: nella classifica «${s.titolo}» il valore di «${v.nome}» non è un numero (${JSON.stringify(v.valore)})`)
+      }
+    }
+    const massimo = Math.max(...s.voci.map((v) => v.valore), 1)
     return html`
       <h2 class="wslide__titolo">${esc(s.titolo)}</h2>
       <ol class="wslide__classifica">
         ${s.voci.map(
           (v) => html`
-            <li class="wslide__voce" style="--q: ${((Number(v.valore) || 0) / massimo).toFixed(3)}">
+            <li class="wslide__voce" style="--q: ${(v.valore / massimo).toFixed(3)}">
               <span class="wslide__voce-nome">${esc(v.nome)}</span>
               <span class="wslide__voce-barra" aria-hidden="true"></span>
               <span class="wslide__voce-valore">${esc(numero(v.valore))}${s.unita && ` ${esc(s.unita)}`}</span>
@@ -147,7 +157,7 @@ const TIPI = {
   griglia: (s) => html`
     <h2 class="wslide__titolo">${esc(s.titolo)}</h2>
     <dl class="wslide__griglia">
-      ${s.celle.map((c) => html`<div><dd>${esc(numero(c.valore))}</dd><dt>${esc(c.etichetta)}</dt></div>`)}
+      ${s.celle.map((c) => html`<div><dt>${esc(c.etichetta)}</dt><dd>${esc(numero(c.valore))}</dd></div>`)}
     </dl>
   `,
 
