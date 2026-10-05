@@ -36,6 +36,10 @@ tools/aragosta/lavoro/
 # Catture dei siti: l'ultima impronta di ogni sito. In CI sta nella cache delle Actions.
 tools/catture/stato.json
 
+# Wrapped: gli export della chat, gli alias con i nomi veri e i dati calcolati
+# restano fuori dal repository; si tengono solo lo script e l'esempio.
+tools/wrapped/lavoro/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

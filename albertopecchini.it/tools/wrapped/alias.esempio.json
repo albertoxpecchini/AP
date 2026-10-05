@@ -1,0 +1,7 @@
+{
+  "$commento": "Copia questo file in tools/wrapped/lavoro/alias.json e compilalo con i nomi veri: lavoro/ resta fuori dal repository. Ogni voce di «persone» mappa il nome canonico sull'elenco di come quella persona compare nei vari export (numeri diversi, rubriche diverse, nomi con emoji). Il confronto ignora maiuscole e caratteri invisibili.",
+  "persone": {
+    "Mario": ["mario rossi", "~ m.rossi", "+39 333 000 0000"],
+    "Luigi": ["luigi 🟢", "luigi bianchi"]
+  }
+}
