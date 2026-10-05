@@ -76,7 +76,8 @@ albertopecchini.it/
 │  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
 │  ├─ nota/                le «note» di fine stagione (interventi, riepilogo, totale) in PDF A4 coi caratteri del sito (vedi il suo README)
-│  └─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza e pulizia dei PDF (vedi il suo README)
+│  ├─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza e pulizia dei PDF (vedi il suo README)
+│  └─ wrapped/             l’analizzatore della chat dietro /wrapped5BT/: unisce gli export di WhatsApp e calcola le metriche delle slide (vedi il suo README)
 ├─ emails/                 input, output e allegati delle email generate
 ├─ config/                 account mittente e tema email derivato dal CSS
 ├─ profiles/               archivio firme versionato
@@ -184,7 +185,7 @@ albertopecchini.it/
 | `/contatti/` | Modulo di contatto, recapiti, telefono (un iPhone con il numero sul tastierino), area operativa |
 | `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. Esiste con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |
 | `/stile/` | Il sistema visivo in cinque tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti) su un piano con zoom e spostamento, come in un programma di disegno |
-| `/wrapped5BT/` | Tela verticale vuota per il futuro Wrapped 5BT: struttura 9:16 pronta per accogliere le 35 slide e i dati della chat, volutamente esclusa da menu, sitemap e indicizzazione |
+| `/wrapped5BT/` | Il Wrapped 5BT: frame 9:16 con le slide verticali a scatto, contenuti da `src/data/wrapped.js` e numeri da [`tools/wrapped`](tools/wrapped/README.md); finché le slide non ci sono mostra la tela in attesa. Fuori da menu, sitemap e indicizzazione |
 | `/privacy/` · `/cookie/` | Note legali |
 | `/crediti/` | Crediti e fonti delle immagini (testi in `src/data/crediti.js`), linkata nel footer |
 | `/assistenza/` | «Better Call Pekko»: l’assistenza informatica come il sito americano del 2008 di un «computer guy at law», tutto in inglese — 960 px fissi, colonna blu coi tasti gialli, video di consulenza, annunci di aziende che non esistono, profilo «About Pekko» in stile MySpace, listino 2009, forum phpBB, telefonini e provider del 2009, pagamenti e donazioni PayPal, e-card, coupon, commenti in stile SMS, webcam coi filtri brutti, colonne pubblicitarie ai lati dello schermo, pop-up d’ingresso; Alberto qui si chiama **Pekko** e il nome vero resta solo nel credito del footer. Pagina **autonoma** (`standalone` in `routes.js`): niente guscio del sito, stile e script in linea in `src/templates/pages/assistenza.js`; contenuti in `src/data/assistenza.js`, immagini da [`tools/assistenza`](tools/assistenza/README.md). Ogni banner porta a `/contatti/assistenza/`, tranne quelli della sezione **«Pekko makes websites»** (dal 29.09.2026), che portano ai siti veri: Pekko Explorer 6 (un browser del 2008 con una scheda per sito e la cattura vera da scorrere), gli annunci dei siti, l’infografica del metodo, servizi web, FAQ, «other stuff» (disegno, 3D, grafica), webring e bottoni 88×31; nella colonna destra «DID U KNOW???» con fatti veri; codice Konami (o cinque clic sulla tartaruga) per il segreto |
@@ -508,7 +509,7 @@ Scelte fatte apposta, da non cambiare senza motivo:
 
 `src/style.css` importa i fogli in quest’ordine: `fonts` → `tokens` → `base` → `art` → `components` → `pebble` → `mascot` → `layout` → `home` → `portfolio` → `pages` → `print`. I fogli delle pagine speciali — `stile.css` (il piano di `/stile/`), `viewer.css` (le tavole vere), `email.css` (`/email/`) e `wrapped5bt.css` (`/wrapped5BT/`) — sono entry a parte: il plugin li collega, dopo il foglio comune, solo alle pagine che contengono il loro segno (`data-canvas`, `data-viewer`, `data-email`, `data-wrapped`; `PAGE_CSS` in `plugins/site-pages.js`). Le altre pagine scaricano un quarto di CSS in meno.
 
-`/wrapped5BT/` è una tela vuota 9:16, volutamente priva di contenuto editoriale: serve come contenitore per le future 35 slide del Wrapped 5BT e resta `noindex` e fuori dalla sitemap.
+`/wrapped5BT/` è il frame 9:16 del Wrapped 5BT: le slide arrivano da `src/data/wrapped.js` (i numeri, a monte, da [`tools/wrapped`](tools/wrapped/README.md)), lo scorrimento a scatto è nativo e `src/client/wrapped.js` aggiunge avanzamento, contatore, tastiera e tocco. Dentro al frame le misure sono in `cqi`, così il testo scala col riquadro. Resta `noindex` e fuori dalla sitemap; finché `slides` è vuoto si vede la tela in attesa con le guide.
 
 - **Token** (`tokens.css`): palette carta / inchiostro / minio (`#E5481F`), scala tipografica, spazi, raggi, durate ed easing. È il primo file da aprire per cambiare l’aspetto.
 - **Caratteri**: Archivo Variable (asse `wdth`) per i testi, Cascadia Code (`--font-mono`, variabile sul peso 200–700, `@fontsource-variable/cascadia-code`; dal 2 ottobre 2026 al posto di IBM Plex Mono) per etichette, tasti, dati e il terminale della home, Instrument Serif per gli accenti in corsivo. Ospitati localmente via `@fontsource`, nessuna richiesta a Google Fonts.
