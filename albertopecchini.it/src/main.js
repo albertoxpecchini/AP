@@ -35,6 +35,8 @@ const initEmail = onDemand('[data-email]', 'initEmail', () => import('./client/e
 const initInk = onDemand('[data-ink]', 'initInk', () => import('./client/ink.js'))
 // le icone gelatina degli strumenti: solo in /studio/
 const initJelly = onDemand('[data-jelly]', 'initJelly', () => import('./client/jelly.js'))
+// le slide del Wrapped 5BT: solo in /wrapped5BT/
+const initWrapped = onDemand('[data-wrapped]', 'initWrapped', () => import('./client/wrapped.js'))
 
 const modules = [
   initTransitions,
@@ -63,6 +65,7 @@ const modules = [
   initEmail,
   initInk,
   initJelly,
+  initWrapped,
   initParallax,
   initMagnetic,
   initCursor,

@@ -29,8 +29,9 @@ const BCP = process.env.SITE === 'bcp'
 
 // Pagine senza il credito per scelta: il compositore email è uno strumento
 // privato (noindex, raggiungibile solo col link che porta la chiave), non una
-// pagina del sito.
-const SENZA_CREDITO = new Set(['/email/'])
+// pagina del sito; il visualizzatore delle tavole occupa tutta la finestra
+// senza piè di pagina, e il credito sta su ogni altra pagina del sito.
+const SENZA_CREDITO = new Set(['/email/', '/portfolio/tavole/'])
 
 if (!existsSync(OUT)) {
   console.error(`controllo: la cartella ${relative(process.cwd(), OUT) || OUT} non esiste (manca la build?)`)
