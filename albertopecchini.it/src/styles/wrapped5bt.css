@@ -1,61 +1,447 @@
-/* Tela del Wrapped 5BT: struttura vuota pronta per le future slide 9:16. */
+/* Wrapped 5BT: il frame 9:16 con le slide verticali a scatto.
+   Finché non ci sono slide il frame resta la tela vuota con le guide
+   (modificatore --vuota). Le misure dentro le slide usano i cqi del frame,
+   così il testo scala con il riquadro, non con la finestra. */
 
 .page--wrapped5bt {
   overflow-x: clip;
 }
 
 .wrapped5bt {
-  min-height: calc(100svh - var(--header-h));
+  /* spazio davvero disponibile per il frame: viewport meno header (che galleggia
+     sopra la pagina), padding verticali e riga del credito */
+  --wrapped-spazio: calc(100svh - var(--header-h) - var(--sp-4) - var(--sp-6) - 2.5rem);
+  min-height: 100svh;
   display: grid;
   place-items: center;
-  padding: var(--sp-6) var(--gutter) var(--sp-8);
+  align-content: center;
+  row-gap: var(--sp-4);
+  padding: calc(var(--header-h) + var(--sp-4)) var(--gutter) var(--sp-6);
   background:
     linear-gradient(to right, transparent calc(50% - 0.5px), var(--line) calc(50% - 0.5px), var(--line) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
     var(--bg);
 }
 
 .wrapped5bt__frame {
-  width: min(100%, 480px);
+  width: min(100%, 480px, calc(var(--wrapped-spazio) * 9 / 16));
   aspect-ratio: 9 / 16;
   border: 1px solid var(--line-strong);
   background: var(--c-paper);
   box-shadow: 0 18px 48px rgb(16 17 15 / 0.08);
   position: relative;
   overflow: hidden;
+  container-type: size;
 }
 
-.wrapped5bt__frame::before,
-.wrapped5bt__frame::after {
+/* Le guide a croce restano solo sulla tela vuota. */
+.wrapped5bt__frame--vuota::before,
+.wrapped5bt__frame--vuota::after {
   content: '';
   position: absolute;
   pointer-events: none;
   opacity: 0.7;
 }
 
-.wrapped5bt__frame::before {
+.wrapped5bt__frame--vuota::before {
   inset: 50% 0 auto;
   border-top: 1px dashed var(--line);
 }
 
-.wrapped5bt__frame::after {
+.wrapped5bt__frame--vuota::after {
   inset: 0 auto 0 50%;
   border-left: 1px dashed var(--line);
 }
 
+.wrapped5bt__attesa {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  row-gap: var(--sp-2);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--muted);
+}
+
+.wrapped5bt__attesa-nome {
+  color: var(--fg);
+  letter-spacing: 0.08em;
+}
+
+.wrapped5bt__attesa-stato::before,
+.wrapped5bt__attesa-stato::after {
+  content: ' · ';
+}
+
+.wrapped5bt__credito {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── Scorrimento e cornice dei comandi ──────────────────────────────────── */
+
+.wrapped5bt__scorrimento {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+
+.wrapped5bt__scorrimento::-webkit-scrollbar {
+  display: none;
+}
+
+.wrapped5bt__scorrimento:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.wrapped5bt__progresso {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  /* grigio di mezzo: la traccia si deve vedere sia sulle slide carta che ink */
+  background: rgb(138 138 130 / 0.4);
+  pointer-events: none;
+}
+
+.wrapped5bt__progresso-barra {
+  display: block;
+  height: 100%;
+  width: calc(var(--avanzamento, 0) * 100%);
+  background: var(--c-minio);
+  transition: width var(--t-2) var(--ease-out);
+}
+
+.wrapped5bt__contatore {
+  position: absolute;
+  left: 4cqi;
+  bottom: 3cqi;
+  padding: 0.3em 0.55em;
+  border-radius: var(--r-1);
+  /* sfondo proprio, come i comandi: resta leggibile anche sulle slide ink */
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.wrapped5bt__comandi {
+  position: absolute;
+  right: 4cqi;
+  bottom: 3cqi;
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.wrapped5bt__comando {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-1);
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.wrapped5bt__comando:hover {
+  background: var(--bg-2);
+}
+
+.wrapped5bt__comando:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* contatore e comandi stanno sopra le slide, che hanno il loro tema */
+.no-js .wrapped5bt__comandi,
+.no-js .wrapped5bt__contatore,
+.no-js .wrapped5bt__progresso {
+  display: none;
+}
+
+/* ── Le slide ───────────────────────────────────────────────────────────── */
+
+.wslide {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 3cqi;
+  padding: 10cqi 7cqi 14cqi;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.wslide__occhiello {
+  font-family: var(--font-mono);
+  font-size: 3.4cqi;
+  letter-spacing: 0.08em;
+  color: var(--accent-text);
+}
+
+.wslide__nota {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 2.9cqi;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.wslide__display {
+  font-size: 13cqi;
+  font-weight: 560;
+  font-stretch: 94%;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track-display);
+}
+
+.wslide__sotto {
+  font-size: 4.4cqi;
+  line-height: var(--lh-snug);
+  color: var(--muted);
+}
+
+.wslide__titolo {
+  font-size: 7.5cqi;
+  font-weight: 560;
+  font-stretch: 94%;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--track-display);
+}
+
+.wslide__valore {
+  font-size: 22cqi;
+  font-weight: 560;
+  font-stretch: 94%;
+  line-height: 0.9;
+  letter-spacing: var(--track-display);
+}
+
+.wslide__unita {
+  font-size: 6cqi;
+  margin-left: 1.5cqi;
+  color: var(--muted);
+}
+
+.wslide__didascalia {
+  font-size: 4.4cqi;
+  line-height: var(--lh-snug);
+}
+
+.wslide__secondari {
+  display: grid;
+  gap: 2cqi 4cqi;
+  margin-top: 2cqi;
+}
+
+.wslide__secondari div {
+  display: flex;
+  justify-content: space-between;
+  gap: 3cqi;
+  border-top: 1px solid var(--line);
+  padding-top: 2cqi;
+  font-size: 3.6cqi;
+}
+
+.wslide__secondari dd {
+  font-family: var(--font-mono);
+}
+
+.wslide__classifica {
+  list-style: none;
+  display: grid;
+  row-gap: 3cqi;
+}
+
+.wslide__voce {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 1cqi;
+  font-size: 3.8cqi;
+}
+
+/* nel markup la barra sta tra nome e valore: senza posizioni esplicite
+   l'auto-placement spingerebbe il valore in una riga propria */
+.wslide__voce-nome {
+  grid-row: 1;
+  grid-column: 1;
+  font-weight: 560;
+}
+
+.wslide__voce-valore {
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
+  font-family: var(--font-mono);
+}
+
+.wslide__voce-barra {
+  grid-column: 1 / -1;
+  height: 2.2cqi;
+  background: var(--bg-2);
+  position: relative;
+}
+
+.wslide__voce-barra::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--q, 0) * 100%);
+  background: var(--accent);
+}
+
+.wslide__voce-dettaglio {
+  grid-column: 1 / -1;
+  font-size: 3cqi;
+  color: var(--muted);
+}
+
+.wslide__timeline {
+  list-style: none;
+  display: grid;
+  row-gap: 3cqi;
+  font-size: 3.8cqi;
+  line-height: var(--lh-snug);
+}
+
+.wslide__timeline li {
+  display: grid;
+  row-gap: 0.5cqi;
+  border-left: 2px solid var(--accent);
+  padding-left: 3.5cqi;
+}
+
+.wslide__data {
+  font-family: var(--font-mono);
+  font-size: 3cqi;
+  color: var(--muted);
+}
+
+.wslide__citazione p {
+  font-family: var(--font-serif);
+  font-size: 7.5cqi;
+  line-height: 1.2;
+}
+
+.wslide__citazione footer {
+  margin-top: 4cqi;
+  display: grid;
+  row-gap: 0.5cqi;
+  font-size: 3.8cqi;
+}
+
+.wslide__confronto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30cqi, 1fr));
+  gap: 5cqi;
+}
+
+.wslide__lato-valore {
+  font-size: 11cqi;
+  font-weight: 560;
+  font-stretch: 94%;
+  line-height: 1;
+  letter-spacing: var(--track-display);
+}
+
+.wslide__lato-etichetta {
+  margin-top: 1.5cqi;
+  font-size: 3.8cqi;
+}
+
+.wslide__lato-dettaglio {
+  font-size: 3cqi;
+  color: var(--muted);
+}
+
+.wslide__griglia {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4cqi;
+}
+
+/* nel markup l'etichetta (dt) precede il valore (dd), come vuole il <dl>;
+   l'ordine visivo — numero sopra, etichetta sotto — lo fa la colonna inversa */
+.wslide__griglia > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.8cqi;
+}
+
+.wslide__griglia dd {
+  font-size: 7cqi;
+  font-weight: 560;
+  font-stretch: 94%;
+  line-height: 1.1;
+}
+
+.wslide__griglia dt {
+  font-size: 3.2cqi;
+  color: var(--muted);
+}
+
+.wslide__paragrafo {
+  font-size: 4.4cqi;
+  line-height: var(--lh-body);
+}
+
+.wslide__firma {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 5.5cqi;
+}
+
+/* Entrata morbida dei contenuti quando la slide diventa quella corrente.
+   Si attiva solo con is-pronto, messo da src/client/wrapped.js: se il modulo
+   non parte, le slide restano semplicemente tutte visibili. */
+.is-pronto .wslide > * {
+  opacity: 0;
+  translate: 0 2.5cqi;
+  transition: opacity var(--t-3) var(--ease-out), translate var(--t-3) var(--ease-out);
+}
+
+.is-pronto .wslide.is-attiva > * {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* ── Telefono ───────────────────────────────────────────────────────────── */
+
 @media (max-width: 767px) {
   .wrapped5bt {
-    min-height: calc(100svh - var(--header-h));
-    padding: var(--sp-4) var(--sp-3) var(--sp-6);
+    --wrapped-spazio: calc(100svh - var(--header-h) - var(--sp-2) - var(--sp-4) - 2.5rem);
+    padding: calc(var(--header-h) + var(--sp-2)) var(--sp-3) var(--sp-4);
   }
 
   .wrapped5bt__frame {
-    width: min(100%, 420px);
+    width: min(100%, 420px, calc(var(--wrapped-spazio) * 9 / 16));
     box-shadow: 0 12px 32px rgb(16 17 15 / 0.07);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wrapped5bt__frame {
+  .wrapped5bt__frame,
+  .wrapped5bt__scorrimento {
     scroll-behavior: auto;
+  }
+
+  .is-pronto .wslide > * {
+    opacity: 1;
+    translate: none;
+    transition: none;
   }
 }
