@@ -6,8 +6,11 @@ import { wrapped } from '../../data/wrapped.js'
  *
  * I contenuti vengono da src/data/wrapped.js (e, a monte, dai numeri di
  * tools/wrapped): finché le slide non ci sono, il frame resta la tela vuota
- * con le guide. Lo scorrimento è nativo (scroll-snap); src/client/wrapped.js
- * aggiunge avanzamento, contatore, tastiera e tocco.
+ * con le guide. Ogni slide è una pila di blocchi (numero grande, barre,
+ * tabella, fumetto…) più, se serve, la chiusa «In breve» e il pannello
+ * «Come si calcola» con le definizioni. Lo scorrimento è nativo
+ * (scroll-snap); src/client/wrapped.js aggiunge avanzamento, contatore,
+ * tastiera e tocco.
  */
 export function wrapped5btPage() {
   const slides = wrapped.stato === 'pronto' ? wrapped.slides : []
@@ -59,63 +62,101 @@ const palco = (slides) => html`
 
 /* ── Le slide ───────────────────────────────────────────────────────────── */
 
-const numero = (v) => (typeof v === 'number' ? v.toLocaleString('it-IT') : String(v ?? ''))
+// l'italiano di Intl non raggruppa le migliaia sotto 10.000 («1391»): il deck
+// e la chat scrivono «1.391», quindi il separatore si chiede sempre
+const cifre = new Intl.NumberFormat('it-IT', { useGrouping: 'always', maximumFractionDigits: 3 })
+const numero = (v) => (typeof v === 'number' ? cifre.format(v) : String(v ?? ''))
+
+/* Testo dei dati con un solo segno di stile: **così** diventa grassetto. */
+const fmt = (s) => esc(numero(s)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
 
 function renderSlide(slide, i, totale) {
-  // un refuso nel tipo deve fermare la build, non produrre una slide vuota
-  if (!Object.hasOwn(TIPI, slide.tipo)) {
-    throw new Error(`wrapped: slide ${i + 1} di tipo sconosciuto «${slide.tipo}» (vedi i tipi in src/data/wrapped.js)`)
-  }
+  const dove = `wrapped: slide ${i + 1}${slide.titolo ? ` «${slide.titolo}»` : ''}`
+  if (!Array.isArray(slide.blocchi)) throw new Error(`${dove}: manca l'elenco dei blocchi`)
   return html`
     <section
-      class="${cx('wslide', `wslide--${slide.tipo}`)}"
+      class="${cx('wslide', slide.metodo && 'wslide--metodo')}"
       data-wslide
       data-theme="${slide.tema || 'paper'}"
       aria-label="Slide ${i + 1} di ${totale}"
     >
       ${slide.occhiello && html`<p class="wslide__occhiello">${esc(slide.occhiello)}</p>`}
-      ${TIPI[slide.tipo](slide)}
-      ${slide.nota && html`<p class="wslide__nota">${esc(slide.nota)}</p>`}
+      ${slide.titolo && html`<h2 class="wslide__titolo">${esc(slide.titolo)}</h2>`}
+      ${slide.sotto && html`<p class="wslide__sotto">${fmt(slide.sotto)}</p>`}
+      ${slide.blocchi.map((b, j) => renderBlocco(b, `${dove}, blocco ${j + 1}`))}
+      ${slide.chiusa && html`<p class="wslide__chiusa"><span>In breve</span> ${fmt(slide.chiusa)}</p>`}
+      ${slide.metodo && metodo(slide.metodo)}
     </section>
   `
 }
 
-const TIPI = {
-  copertina: (s) => html`
-    <h1 class="wslide__display">${esc(s.titolo)}</h1>
-    ${s.sottotitolo && html`<p class="wslide__sotto">${esc(s.sottotitolo)}</p>`}
-  `,
+function renderBlocco(b, dove) {
+  // un refuso nel tipo deve fermare la build, non produrre un blocco vuoto
+  if (!Object.hasOwn(BLOCCHI, b.tipo)) {
+    throw new Error(`${dove}: tipo di blocco sconosciuto «${b.tipo}» (vedi i tipi in src/data/wrapped.js)`)
+  }
+  return BLOCCHI[b.tipo](b, dove)
+}
 
-  numero: (s) => html`
-    <p class="wslide__valore">${esc(numero(s.valore))}${s.unita && html`<span class="wslide__unita">${esc(s.unita)}</span>`}</p>
-    ${s.didascalia && html`<p class="wslide__didascalia">${esc(s.didascalia)}</p>`}
-    ${s.secondari && s.secondari.length > 0 &&
-    html`<dl class="wslide__secondari">
-      ${s.secondari.map(
-        (v) => html`<div><dt>${esc(v.etichetta)}</dt><dd>${esc(numero(v.valore))}</dd></div>`,
-      )}
-    </dl>`}
-  `,
-
-  classifica: (s) => {
-    // le barre si scalano sui numeri: una stringa formattata («1.234») verrebbe
-    // letta come 1,234 e sballerebbe la scala in silenzio, quindi si rifiuta
-    for (const v of s.voci) {
-      if (typeof v.valore !== 'number' || !Number.isFinite(v.valore)) {
-        throw new Error(`wrapped: nella classifica «${s.titolo}» il valore di «${v.nome}» non è un numero (${JSON.stringify(v.valore)})`)
-      }
+/* Le barre e le colonne si scalano sui numeri: una stringa formattata
+   («1.234») verrebbe letta come 1,234 e sballerebbe la scala in silenzio. */
+function soloNumeri(valori, dove) {
+  for (const v of valori) {
+    if (typeof v !== 'number' || !Number.isFinite(v)) {
+      throw new Error(`${dove}: valore non numerico (${JSON.stringify(v)})`)
     }
-    const massimo = Math.max(...s.voci.map((v) => v.valore), 1)
+  }
+  return Math.max(...valori, 1e-9)
+}
+
+/* Il pannello delle definizioni: <details> nativo, funziona anche senza JS. */
+const metodo = (testo) => html`
+  <details class="wslide__metodo">
+    <summary><span class="wslide__metodo-apri">Come si calcola</span><span class="wslide__metodo-chiudi">Chiudi</span></summary>
+    <div class="wslide__metodo-testo">
+      <p class="wslide__metodo-titolo">Come si calcola</p>
+      ${[].concat(testo).map((p) => html`<p>${fmt(p)}</p>`)}
+    </div>
+  </details>
+`
+
+const BLOCCHI = {
+  // { righe: [stringhe], accento?: indice della riga in colore }
+  display: (b) => html`
+    <p class="wb-display">
+      ${b.righe.map((r, i) => html`<span class="${cx(i === b.accento && 'is-accento')}">${esc(r)}</span>`)}
+    </p>
+  `,
+
+  // { valore, unita?, testo?, piccolo? } — il numero protagonista della slide
+  numero: (b) => html`
+    <div class="wb-numero">
+      <p class="${cx('wb-numero__valore', b.piccolo && 'wb-numero__valore--piccolo')}">${esc(numero(b.valore))}${b.unita && html`<span class="wb-numero__unita">${esc(b.unita)}</span>`}</p>
+      ${b.testo && html`<p class="wb-numero__testo">${fmt(b.testo)}</p>`}
+    </div>
+  `,
+
+  // { celle: [{ valore, etichetta }], colonne?: 2|3 }
+  cifre: (b) => html`
+    <dl class="wb-cifre" style="--colonne: ${b.colonne || 2}">
+      ${b.celle.map((c) => html`<div><dt>${fmt(c.etichetta)}</dt><dd>${esc(numero(c.valore))}</dd></div>`)}
+    </dl>
+  `,
+
+  // { titolo?, voci: [{ nome, valore: numero, mostra?, testo?, evidenza? }] }
+  // `mostra` sostituisce il valore stampato («11.126 · 21,50%»), la barra resta sul numero
+  barre: (b, dove) => {
+    const massimo = soloNumeri(b.voci.map((v) => v.valore), dove)
     return html`
-      <h2 class="wslide__titolo">${esc(s.titolo)}</h2>
-      <ol class="wslide__classifica">
-        ${s.voci.map(
+      ${b.titolo && html`<p class="wb-etichetta">${esc(b.titolo)}</p>`}
+      <ol class="wb-barre">
+        ${b.voci.map(
           (v) => html`
-            <li class="wslide__voce" style="--q: ${(v.valore / massimo).toFixed(3)}">
-              <span class="wslide__voce-nome">${esc(v.nome)}</span>
-              <span class="wslide__voce-barra" aria-hidden="true"></span>
-              <span class="wslide__voce-valore">${esc(numero(v.valore))}${s.unita && ` ${esc(s.unita)}`}</span>
-              ${v.dettaglio && html`<span class="wslide__voce-dettaglio">${esc(v.dettaglio)}</span>`}
+            <li class="${cx('wb-barra', v.evidenza && 'is-evidenza')}" style="--q: ${(v.valore / massimo).toFixed(3)}">
+              <span class="wb-barra__nome">${fmt(v.nome)}</span>
+              <span class="wb-barra__valore">${esc(v.mostra ?? numero(v.valore))}</span>
+              <span class="wb-barra__traccia" aria-hidden="true"></span>
+              ${v.testo && html`<span class="wb-barra__testo">${fmt(v.testo)}</span>`}
             </li>
           `,
         )}
@@ -123,52 +164,109 @@ const TIPI = {
     `
   },
 
-  timeline: (s) => html`
-    <h2 class="wslide__titolo">${esc(s.titolo)}</h2>
-    <ol class="wslide__timeline">
-      ${s.tappe.map(
-        (t) => html`<li><span class="wslide__data">${esc(t.data)}</span><span>${esc(t.testo)}</span></li>`,
+  // { titolo?, valori: [numeri relativi], descrizione, evidenza?: [indici], bassi?: [indici],
+  //   asse: [{ i, testo }], etichette?: [{ i, testo }] } — istogramma verticale
+  colonne: (b, dove) => {
+    const massimo = soloNumeri(b.valori, dove)
+    const n = b.valori.length
+    const posizione = (i) => `${(((i + 0.5) / n) * 100).toFixed(2)}%`
+    return html`
+      ${b.titolo && html`<p class="wb-etichetta">${esc(b.titolo)}</p>`}
+      <figure class="wb-colonne" style="--n: ${n}">
+        <div class="wb-colonne__area" role="img" aria-label="${esc(b.descrizione)}">
+          ${b.valori.map(
+            (v, i) => html`<span
+              class="${cx('wb-colonna', b.evidenza?.includes(i) && 'is-evidenza', b.bassi?.includes(i) && 'is-basso')}"
+              style="--q: ${(v / massimo).toFixed(3)}"
+            ></span>`,
+          )}
+          ${(b.etichette || []).map(
+            (e) => html`<span class="wb-colonne__etichetta" style="--x: ${posizione(e.i)}; --q: ${(b.valori[e.i] / massimo).toFixed(3)}">${esc(e.testo)}</span>`,
+          )}
+        </div>
+        <div class="wb-colonne__asse" aria-hidden="true">
+          ${b.asse.map((a) => html`<span style="--x: ${posizione(a.i)}">${esc(a.testo)}</span>`)}
+        </div>
+      </figure>
+    `
+  },
+
+  // { titolo?, voci: [{ chiave, valore?, testo? }], colonne?: 1|2 } — righe chiave/valore
+  righe: (b) => html`
+    ${b.titolo && html`<p class="wb-etichetta">${esc(b.titolo)}</p>`}
+    <dl class="wb-righe" style="--colonne: ${b.colonne || 1}">
+      ${b.voci.map(
+        (v) => html`
+          <div>
+            <dt>${fmt(v.chiave)}</dt>
+            ${v.valore !== undefined && html`<dd>${esc(numero(v.valore))}</dd>`}
+            ${v.testo && html`<dd class="wb-righe__testo">${fmt(v.testo)}</dd>`}
+          </div>
+        `,
       )}
-    </ol>
+    </dl>
   `,
 
-  citazione: (s) => html`
-    <blockquote class="wslide__citazione">
-      <p>«${esc(s.testo)}»</p>
-      <footer><span>${esc(s.autore)}</span>${s.data && html`<span class="wslide__data">${esc(s.data)}</span>`}</footer>
-    </blockquote>
-  `,
-
-  confronto: (s) => html`
-    <h2 class="wslide__titolo">${esc(s.titolo)}</h2>
-    <div class="wslide__confronto">
-      ${s.lati.map(
-        (l) => html`
-          <div class="wslide__lato">
-            <p class="wslide__lato-valore">${esc(numero(l.valore))}</p>
-            <p class="wslide__lato-etichetta">${esc(l.etichetta)}</p>
-            ${l.dettaglio && html`<p class="wslide__lato-dettaglio">${esc(l.dettaglio)}</p>`}
+  // { voci: [{ titolo, valore?, testo }], colonne?: 1|2 }
+  schede: (b) => html`
+    <div class="wb-schede" style="--colonne: ${b.colonne || 1}">
+      ${b.voci.map(
+        (v) => html`
+          <div class="${cx('wb-scheda', v.evidenza && 'is-evidenza')}">
+            <p class="wb-scheda__titolo">${fmt(v.titolo)}</p>
+            ${v.valore !== undefined && html`<p class="wb-scheda__valore">${esc(numero(v.valore))}</p>`}
+            ${v.testo && html`<p class="wb-scheda__testo">${fmt(v.testo)}</p>`}
           </div>
         `,
       )}
     </div>
   `,
 
-  griglia: (s) => html`
-    <h2 class="wslide__titolo">${esc(s.titolo)}</h2>
-    <dl class="wslide__griglia">
-      ${s.celle.map((c) => html`<div><dt>${esc(c.etichetta)}</dt><dd>${esc(numero(c.valore))}</dd></div>`)}
-    </dl>
+  // { colonne: [intestazioni], righe: [[celle]], destra?: [indici di colonna], evidenzia?: [indici di riga] }
+  tabella: (b) => html`
+    <div class="wb-tabella">
+      <table>
+        <thead>
+          <tr>${b.colonne.map((c, j) => html`<th class="${cx(b.destra?.includes(j) && 'is-destra')}" scope="col">${esc(c)}</th>`)}</tr>
+        </thead>
+        <tbody>
+          ${b.righe.map(
+            (r, i) => html`<tr class="${cx(b.evidenzia?.includes(i) && 'is-evidenza')}">
+              ${r.map((c, j) => html`<td class="${cx(b.destra?.includes(j) && 'is-destra')}">${fmt(c)}</td>`)}
+            </tr>`,
+          )}
+        </tbody>
+      </table>
+    </div>
   `,
 
-  testo: (s) => html`
-    <h2 class="wslide__titolo">${esc(s.titolo)}</h2>
-    ${s.paragrafi.map((p) => html`<p class="wslide__paragrafo">${esc(p)}</p>`)}
+  // { etichetta?, autore, testo, data, mio? } — un messaggio citato, come in chat
+  fumetto: (b) => html`
+    <figure class="${cx('wb-fumetto', b.mio && 'wb-fumetto--mio')}">
+      ${b.etichetta && html`<figcaption class="wb-etichetta">${esc(b.etichetta)}</figcaption>`}
+      <blockquote>
+        <p class="wb-fumetto__autore">${esc(b.autore)}</p>
+        <p class="wb-fumetto__testo">${esc(b.testo)}</p>
+        <p class="wb-fumetto__data">${esc(b.data)}</p>
+      </blockquote>
+    </figure>
   `,
 
-  finale: (s) => html`
-    <p class="wslide__display">${esc(s.titolo)}</p>
-    ${s.sottotitolo && html`<p class="wslide__sotto">${esc(s.sottotitolo)}</p>`}
-    ${s.firma && html`<p class="wslide__firma">${esc(s.firma)}</p>`}
+  // { titolo?, voci: [{ testo, evidenza? }] }
+  chip: (b) => html`
+    ${b.titolo && html`<p class="wb-etichetta">${esc(b.titolo)}</p>`}
+    <ul class="wb-chip">
+      ${b.voci.map((v) => html`<li class="${cx(v.evidenza && 'is-evidenza')}">${fmt(v.testo)}</li>`)}
+    </ul>
   `,
+
+  // { voci: [{ n, testo }] } — elenco numerato di frasi
+  elenco: (b) => html`
+    <ol class="wb-elenco">
+      ${b.voci.map((v) => html`<li><span class="wb-elenco__n">${esc(v.n)}</span><p>${fmt(v.testo)}</p></li>`)}
+    </ol>
+  `,
+
+  // { testo }
+  paragrafo: (b) => html`<p class="wb-paragrafo">${fmt(b.testo)}</p>`,
 }

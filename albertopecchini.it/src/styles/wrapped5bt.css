@@ -173,36 +173,51 @@
 
 /* ── Le slide ───────────────────────────────────────────────────────────── */
 
+/* Misure in cqi del frame: 1cqi = 1% della larghezza. Il frame è alto 177,8cqi;
+   tolti i margini restano circa 150cqi per i contenuti di una slide. I testi
+   piccoli (sotto i 3cqi) non scendono sotto i 10px, anche sui telefoni stretti. */
 .wslide {
+  position: relative;
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   row-gap: 3cqi;
-  padding: 10cqi 7cqi 14cqi;
+  padding: 11cqi 6.5cqi 15cqi;
   background: var(--bg);
   color: var(--fg);
+  font-size: 3.6cqi;
+  line-height: var(--lh-snug);
 }
 
-.wslide__occhiello {
+.wslide b {
+  font-weight: 640;
+}
+
+.wslide__occhiello,
+.wb-etichetta {
   font-family: var(--font-mono);
-  font-size: 3.4cqi;
+  font-size: max(10px, 2.8cqi);
   letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--accent-text);
 }
 
-.wslide__nota {
-  margin-top: auto;
-  font-family: var(--font-mono);
-  font-size: 2.9cqi;
-  line-height: 1.45;
+/* l'occhiello lascia spazio al pulsante «Come si calcola» in alto a destra */
+.wslide--metodo .wslide__occhiello {
+  padding-right: 30cqi;
+}
+
+.wb-etichetta {
+  margin-bottom: -1.5cqi;
   color: var(--muted);
 }
 
-.wslide__display {
-  font-size: 13cqi;
+.wslide__titolo {
+  margin-top: -1.5cqi;
+  font-size: 7cqi;
   font-weight: 560;
   font-stretch: 94%;
   line-height: var(--lh-tight);
@@ -210,199 +225,480 @@
 }
 
 .wslide__sotto {
-  font-size: 4.4cqi;
-  line-height: var(--lh-snug);
+  margin-top: -1.5cqi;
+  font-size: 3.4cqi;
   color: var(--muted);
 }
 
-.wslide__titolo {
-  font-size: 7.5cqi;
-  font-weight: 560;
-  font-stretch: 94%;
-  line-height: var(--lh-snug);
-  letter-spacing: var(--track-display);
-}
-
-.wslide__valore {
-  font-size: 22cqi;
-  font-weight: 560;
-  font-stretch: 94%;
-  line-height: 0.9;
-  letter-spacing: var(--track-display);
-}
-
-.wslide__unita {
-  font-size: 6cqi;
-  margin-left: 1.5cqi;
-  color: var(--muted);
-}
-
-.wslide__didascalia {
-  font-size: 4.4cqi;
-  line-height: var(--lh-snug);
-}
-
-.wslide__secondari {
-  display: grid;
-  gap: 2cqi 4cqi;
-  margin-top: 2cqi;
-}
-
-.wslide__secondari div {
-  display: flex;
-  justify-content: space-between;
-  gap: 3cqi;
-  border-top: 1px solid var(--line);
-  padding-top: 2cqi;
-  font-size: 3.6cqi;
-}
-
-.wslide__secondari dd {
-  font-family: var(--font-mono);
-}
-
-.wslide__classifica {
-  list-style: none;
-  display: grid;
-  row-gap: 3cqi;
-}
-
-.wslide__voce {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  row-gap: 1cqi;
-  font-size: 3.8cqi;
-}
-
-/* nel markup la barra sta tra nome e valore: senza posizioni esplicite
-   l'auto-placement spingerebbe il valore in una riga propria */
-.wslide__voce-nome {
-  grid-row: 1;
-  grid-column: 1;
-  font-weight: 560;
-}
-
-.wslide__voce-valore {
-  grid-row: 1;
-  grid-column: 2;
-  justify-self: end;
-  font-family: var(--font-mono);
-}
-
-.wslide__voce-barra {
-  grid-column: 1 / -1;
-  height: 2.2cqi;
-  background: var(--bg-2);
-  position: relative;
-}
-
-.wslide__voce-barra::after {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: calc(var(--q, 0) * 100%);
-  background: var(--accent);
-}
-
-.wslide__voce-dettaglio {
-  grid-column: 1 / -1;
-  font-size: 3cqi;
-  color: var(--muted);
-}
-
-.wslide__timeline {
-  list-style: none;
-  display: grid;
-  row-gap: 3cqi;
-  font-size: 3.8cqi;
-  line-height: var(--lh-snug);
-}
-
-.wslide__timeline li {
-  display: grid;
-  row-gap: 0.5cqi;
+.wslide__chiusa {
   border-left: 2px solid var(--accent);
-  padding-left: 3.5cqi;
+  padding-left: 3cqi;
+  font-size: 3.5cqi;
+  line-height: 1.4;
 }
 
-.wslide__data {
+.wslide__chiusa span {
+  display: block;
+  margin-bottom: 0.6cqi;
   font-family: var(--font-mono);
-  font-size: 3cqi;
-  color: var(--muted);
+  font-size: max(10px, 2.6cqi);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
 }
 
-.wslide__citazione p {
-  font-family: var(--font-serif);
-  font-size: 7.5cqi;
-  line-height: 1.2;
+/* ── Il pannello «Come si calcola» ── */
+
+/* Il <details> copre tutta la slide ma, chiuso, lascia passare i clic:
+   resta cliccabile solo il pulsante in alto a destra. */
+.wslide__metodo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
 }
 
-.wslide__citazione footer {
-  margin-top: 4cqi;
+.wslide__metodo summary {
+  position: absolute;
+  top: 4cqi;
+  right: 5cqi;
+  z-index: 1;
+  pointer-events: auto;
+  list-style: none;
+  padding: 0.9cqi 2.2cqi;
+  border: 1px solid var(--line-strong);
+  border-radius: 99px;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: max(10px, 2.6cqi);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.wslide__metodo summary::-webkit-details-marker {
+  display: none;
+}
+
+.wslide__metodo summary:hover {
+  background: var(--bg-2);
+}
+
+.wslide__metodo summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.wslide__metodo-chiudi,
+.wslide__metodo[open] .wslide__metodo-apri {
+  display: none;
+}
+
+.wslide__metodo[open] .wslide__metodo-chiudi {
+  display: inline;
+}
+
+.wslide__metodo[open] {
+  pointer-events: auto;
+}
+
+/* posizionato sul <details>: il suo contenuto sta in uno slot senza altezza
+   propria, quindi height: 100% non coprirebbe tutta la slide */
+.wslide__metodo-testo {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: grid;
-  row-gap: 0.5cqi;
-  font-size: 3.8cqi;
+  align-content: start;
+  row-gap: 2.6cqi;
+  padding: 13cqi 7cqi 16cqi;
+  background: var(--bg);
+  font-size: 3.4cqi;
+  line-height: 1.5;
 }
 
-.wslide__confronto {
+.wslide__metodo-titolo {
+  font-family: var(--font-mono);
+  font-size: max(10px, 2.8cqi);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+/* ── I blocchi ── */
+
+.wb-display {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(30cqi, 1fr));
-  gap: 5cqi;
-}
-
-.wslide__lato-valore {
-  font-size: 11cqi;
+  font-size: 11.5cqi;
   font-weight: 560;
   font-stretch: 94%;
-  line-height: 1;
+  line-height: 1.02;
   letter-spacing: var(--track-display);
 }
 
-.wslide__lato-etichetta {
-  margin-top: 1.5cqi;
-  font-size: 3.8cqi;
+.wb-display .is-accento {
+  color: var(--accent-text);
 }
 
-.wslide__lato-dettaglio {
-  font-size: 3cqi;
+.wb-numero {
+  display: grid;
+  row-gap: 1.5cqi;
+}
+
+.wb-numero__valore {
+  font-size: 19cqi;
+  font-weight: 560;
+  font-stretch: 94%;
+  line-height: 0.95;
+  letter-spacing: var(--track-display);
+  overflow-wrap: anywhere;
+}
+
+.wb-numero__valore--piccolo {
+  font-size: 12cqi;
+}
+
+.wb-numero__unita {
+  font-size: 5cqi;
+  margin-left: 1.5cqi;
+  letter-spacing: 0;
   color: var(--muted);
 }
 
-.wslide__griglia {
+.wb-numero__testo {
+  font-size: 3.8cqi;
+}
+
+.wb-cifre {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4cqi;
+  grid-template-columns: repeat(var(--colonne), 1fr);
+  gap: 3cqi 3.5cqi;
 }
 
 /* nel markup l'etichetta (dt) precede il valore (dd), come vuole il <dl>;
    l'ordine visivo — numero sopra, etichetta sotto — lo fa la colonna inversa */
-.wslide__griglia > div {
+.wb-cifre > div {
   display: flex;
   flex-direction: column-reverse;
-  gap: 0.8cqi;
+  justify-content: flex-end;
+  gap: 0.6cqi;
+  border-top: 1px solid var(--line);
+  padding-top: 1.8cqi;
 }
 
-.wslide__griglia dd {
-  font-size: 7cqi;
+.wb-cifre dd {
+  font-size: 6.2cqi;
   font-weight: 560;
   font-stretch: 94%;
-  line-height: 1.1;
+  line-height: 1.05;
+  letter-spacing: var(--track-display);
 }
 
-.wslide__griglia dt {
-  font-size: 3.2cqi;
+.wb-cifre dt {
+  font-size: 3cqi;
   color: var(--muted);
 }
 
-.wslide__paragrafo {
-  font-size: 4.4cqi;
-  line-height: var(--lh-body);
+.wb-barre {
+  list-style: none;
+  display: grid;
+  row-gap: 1.8cqi;
 }
 
-.wslide__firma {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 5.5cqi;
+.wb-barra {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 2cqi;
+  row-gap: 0.7cqi;
+  font-size: 3.4cqi;
+}
+
+.wb-barra__valore {
+  font-family: var(--font-mono);
+  font-size: 3cqi;
+  align-self: end;
+}
+
+.wb-barra__traccia {
+  grid-column: 1 / -1;
+  height: 1.5cqi;
+  background: var(--bg-2);
+  position: relative;
+}
+
+.wb-barra__traccia::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: max(0.6cqi, calc(var(--q, 0) * 100%));
+  background: var(--muted);
+}
+
+.wb-barra.is-evidenza .wb-barra__nome {
+  font-weight: 640;
+}
+
+.wb-barra.is-evidenza .wb-barra__traccia::after {
+  background: var(--accent);
+}
+
+.wb-barra__testo {
+  grid-column: 1 / -1;
+  font-size: max(10px, 2.9cqi);
+  color: var(--muted);
+}
+
+.wb-colonne {
+  display: grid;
+  row-gap: 1.2cqi;
+}
+
+.wb-colonne__area {
+  position: relative;
+  height: 36cqi;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  align-items: end;
+  column-gap: max(1px, calc(12cqi / var(--n)));
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.wb-colonna {
+  height: max(0.5cqi, calc(var(--q) * 100%));
+  background: var(--muted);
+  opacity: 0.55;
+}
+
+.wb-colonna.is-evidenza {
+  background: var(--accent);
+  opacity: 1;
+}
+
+.wb-colonna.is-basso {
+  height: 0.9cqi;
+  background: var(--fg);
+  opacity: 1;
+}
+
+.wb-colonne__etichetta {
+  position: absolute;
+  left: clamp(4cqi, var(--x), calc(100% - 4cqi));
+  bottom: calc(var(--q) * 100% + 0.8cqi);
+  translate: -50% 0;
+  font-family: var(--font-mono);
+  font-size: max(10px, 2.5cqi);
+  white-space: nowrap;
+}
+
+.wb-colonne__asse {
+  position: relative;
+  height: 3.5cqi;
+  font-family: var(--font-mono);
+  font-size: max(10px, 2.5cqi);
+  color: var(--muted);
+}
+
+.wb-colonne__asse span {
+  position: absolute;
+  left: clamp(3cqi, var(--x), calc(100% - 3cqi));
+  translate: -50% 0;
+  white-space: nowrap;
+}
+
+.wb-righe {
+  display: grid;
+  grid-template-columns: repeat(var(--colonne), 1fr);
+  column-gap: 4cqi;
+  border-bottom: 1px solid var(--line);
+}
+
+.wb-righe > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 3cqi;
+  border-top: 1px solid var(--line);
+  padding: 1.4cqi 0;
+  font-size: 3.4cqi;
+}
+
+.wb-righe dd {
+  font-family: var(--font-mono);
+  font-size: 3.1cqi;
+  text-align: right;
+}
+
+.wb-righe .wb-righe__testo {
+  grid-column: 1 / -1;
+  font-family: inherit;
+  font-size: max(10px, 2.9cqi);
+  text-align: left;
+  color: var(--muted);
+}
+
+.wb-schede {
+  display: grid;
+  grid-template-columns: repeat(var(--colonne), 1fr);
+  gap: 2cqi;
+}
+
+.wb-scheda {
+  display: grid;
+  align-content: start;
+  row-gap: 0.6cqi;
+  padding: 2.2cqi 2.8cqi;
+  background: var(--bg-2);
+  border-radius: var(--r-1);
+}
+
+.wb-scheda.is-evidenza {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.wb-scheda__titolo {
+  font-family: var(--font-mono);
+  font-size: max(10px, 2.5cqi);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.wb-scheda__valore {
+  font-size: 6cqi;
+  font-weight: 560;
+  font-stretch: 94%;
+  line-height: 1.05;
+  letter-spacing: var(--track-display);
+}
+
+.wb-scheda__testo {
+  font-size: 3.2cqi;
+  line-height: 1.35;
+}
+
+.wb-tabella table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: max(10px, 2.9cqi);
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-tabella th {
+  padding: 0 1cqi 1.2cqi 0;
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: max(10px, 2.3cqi);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: bottom;
+  color: var(--muted);
+}
+
+.wb-tabella td {
+  padding: 1.3cqi 1cqi 1.3cqi 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.wb-tabella .is-destra {
+  text-align: right;
+}
+
+.wb-tabella th:last-child,
+.wb-tabella td:last-child {
+  padding-right: 0;
+}
+
+.wb-tabella tr.is-evidenza td {
+  background: var(--bg-2);
+  font-weight: 640;
+}
+
+.wb-fumetto {
+  display: grid;
+  row-gap: 2.5cqi;
+  justify-items: start;
+}
+
+.wb-fumetto blockquote {
+  max-width: 88%;
+  display: grid;
+  row-gap: 0.5cqi;
+  padding: 2.2cqi 3.2cqi 1.6cqi;
+  background: var(--bg-2);
+  border-radius: 0.6cqi 3.5cqi 3.5cqi 3.5cqi;
+}
+
+.wb-fumetto--mio {
+  justify-items: end;
+}
+
+.wb-fumetto--mio blockquote {
+  border-radius: 3.5cqi 0.6cqi 3.5cqi 3.5cqi;
+}
+
+.wb-fumetto__autore {
+  font-size: max(10px, 2.9cqi);
+  font-weight: 640;
+  color: var(--accent-text);
+}
+
+.wb-fumetto__testo {
+  font-size: 4.6cqi;
+  line-height: 1.3;
+  /* la citazione resta com'è stata scritta, maiuscole comprese */
+  text-transform: none;
+}
+
+.wb-fumetto__data {
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-size: max(10px, 2.4cqi);
+  color: var(--muted);
+}
+
+.wb-chip {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5cqi;
+}
+
+.wb-chip li {
+  padding: 0.9cqi 2.4cqi;
+  border: 1px solid var(--line-strong);
+  border-radius: 99px;
+  font-size: 3.2cqi;
+}
+
+.wb-chip li.is-evidenza {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.wb-elenco {
+  list-style: none;
+  display: grid;
+  row-gap: 2.4cqi;
+}
+
+.wb-elenco li {
+  display: grid;
+  grid-template-columns: 6cqi 1fr;
+  column-gap: 2cqi;
+  font-size: 3.4cqi;
+  line-height: 1.38;
+}
+
+.wb-elenco__n {
+  font-family: var(--font-mono);
+  font-size: 3.4cqi;
+  color: var(--accent-text);
+}
+
+.wb-paragrafo {
+  font-size: 3.6cqi;
+  line-height: 1.45;
 }
 
 /* Entrata morbida dei contenuti quando la slide diventa quella corrente.

@@ -185,11 +185,10 @@ export const routes = [
     hideCta: true,
   },
   {
-    // Tela del Wrapped 5BT: pagina volutamente vuota, pronta a ricevere in seguito
-    // le slide verticali e i dati del Wrapped della chat di classe.
+    // Il Wrapped 5BT: le slide verticali con i dati della chat di classe.
     path: '/wrapped5BT/',
     title: 'Wrapped 5BT',
-    description: 'Tela del Wrapped 5BT — archivio visivo pronto per le slide e i dati.',
+    description: 'Wrapped 5BT — quasi quattro anni della chat di classe, dal 2022 al 2026, raccontati con i numeri.',
     render: wrapped5btPage,
     pageClass: 'page--wrapped5bt',
     noindex: true,

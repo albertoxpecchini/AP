@@ -2,7 +2,7 @@
 
 Lo strumento dietro la pagina `/wrapped5BT/`: legge gli export di WhatsApp
 («Esporta chat», senza media), li unisce e tira fuori i numeri veri da cui
-nasceranno le 35 slide. Niente rete, niente dipendenze: un solo script Node.
+nascono le slide. Niente rete, niente dipendenze: un solo script Node.
 
 ## Come si usa
 
