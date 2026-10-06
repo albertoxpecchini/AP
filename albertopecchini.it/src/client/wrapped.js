@@ -31,6 +31,10 @@ export function initWrapped() {
     const primaVolta = corrente === -1
     corrente = i
     slides.forEach((slide, j) => slide.classList.toggle('is-attiva', j === i))
+    // il pannello «Come si calcola» lasciato aperto non deve aspettarti al ritorno
+    $$('.wslide__metodo[open]', scorrimento).forEach((d) => {
+      if (!slides[i].contains(d)) d.open = false
+    })
     if (barra) barra.style.setProperty('--avanzamento', String((i + 1) / totale))
     if (contatore) contatore.textContent = `${String(i + 1).padStart(2, '0')}/${String(totale).padStart(2, '0')}`
     // la prima sincronizzazione non è un cambio: niente annuncio a chi apre la pagina
@@ -62,6 +66,15 @@ export function initWrapped() {
 
   scorrimento.addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return
+    // il focus può essere sul pannello o sullo scorrimento: si chiude quello aperto
+    const aperto = $('.wslide__metodo[open]', scorrimento)
+    if (e.key === 'Escape' && aperto) {
+      aperto.open = false
+      aperto.querySelector('summary')?.focus()
+      return
+    }
+    // spazio e invio su un pulsante o sul «Come si calcola» restano loro
+    if (e.key === ' ' && e.target.closest('a, button, summary')) return
     const mosse = {
       ArrowDown: base() + 1,
       PageDown: base() + 1,
@@ -98,7 +111,7 @@ export function initWrapped() {
     tocco = null
     if (!inizio || finePointer()) return
     if (Math.hypot(e.clientX - inizio.x, e.clientY - inizio.y) > 8) return
-    if (e.target.closest('a, button')) return
+    if (e.target.closest('a, button, summary, .wslide__metodo[open]')) return
     const quota = (e.clientY - stage.getBoundingClientRect().top) / stage.clientHeight
     vai(quota < 0.35 ? base() - 1 : base() + 1)
   })
