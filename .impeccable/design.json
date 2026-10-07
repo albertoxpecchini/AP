@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T00:00:00+02:00",
+  "title": "Design System: pzkko.it",
+  "scope": "Solo pzkko.it (albertopecchini.it/pzkko/). albertopecchini.it e bettercallpekko.it hanno la propria identità nel codice e non la condividono con questa.",
+  "source": {
+    "tokens": "albertopecchini.it/pzkko/index.html, :root e @media (prefers-color-scheme:dark)",
+    "components": "albertopecchini.it/pzkko/index.html (CSS e script in linea), 404.html generata da tools/pzkko/genera-404.mjs"
+  },
+  "extensions": {
+    "colorMeta": {
+      "link": { "role": "primary", "displayName": "Blu link (chiaro)", "canonical": "#0066cc", "cssVar": "--link", "tonalRamp": ["oklch(20% 0.09 255)", "oklch(30% 0.12 255)", "oklch(40% 0.14 255)", "oklch(50% 0.15 255)", "oklch(60% 0.15 255)", "oklch(72% 0.12 255)", "oklch(84% 0.08 255)", "oklch(95% 0.03 255)"] },
+      "link-dark": { "role": "primary", "displayName": "Blu link (scuro)", "canonical": "#2997ff", "cssVar": "--link", "tonalRamp": ["oklch(20% 0.09 255)", "oklch(30% 0.12 255)", "oklch(40% 0.14 255)", "oklch(50% 0.15 255)", "oklch(60% 0.15 255)", "oklch(72% 0.12 255)", "oklch(84% 0.08 255)", "oklch(95% 0.03 255)"] },
+      "bg": { "role": "neutral", "displayName": "Fondo (chiaro)", "canonical": "#fff", "cssVar": "--bg", "tonalRamp": ["oklch(15% 0 0)", "oklch(27% 0 0)", "oklch(39% 0 0)", "oklch(51% 0 0)", "oklch(63% 0 0)", "oklch(75% 0 0)", "oklch(87% 0 0)", "oklch(100% 0 0)"] },
+      "bg-dark": { "role": "neutral", "displayName": "Fondo (scuro)", "canonical": "#000", "cssVar": "--bg" },
+      "tile": { "role": "neutral", "displayName": "Scheda (chiaro)", "canonical": "#f5f5f7", "cssVar": "--tile", "tonalRamp": ["oklch(15% 0.004 285)", "oklch(27% 0.004 285)", "oklch(39% 0.004 285)", "oklch(51% 0.004 285)", "oklch(63% 0.004 285)", "oklch(75% 0.004 285)", "oklch(87% 0.004 285)", "oklch(97% 0.002 285)"] },
+      "tile-dark": { "role": "neutral", "displayName": "Scheda (scuro)", "canonical": "#1d1d1f", "cssVar": "--tile" },
+      "fg": { "role": "neutral", "displayName": "Testo (chiaro)", "canonical": "#1d1d1f", "cssVar": "--fg", "tonalRamp": ["oklch(15% 0.004 285)", "oklch(24% 0.004 285)", "oklch(36% 0.004 285)", "oklch(48% 0.004 285)", "oklch(60% 0.004 285)", "oklch(72% 0.004 285)", "oklch(84% 0.004 285)", "oklch(96% 0.002 285)"] },
+      "fg-dark": { "role": "neutral", "displayName": "Testo (scuro)", "canonical": "#f5f5f7", "cssVar": "--fg" },
+      "fg2": { "role": "neutral", "displayName": "Testo secondario (chiaro)", "canonical": "#6e6e73", "cssVar": "--fg2", "tonalRamp": ["oklch(15% 0.004 285)", "oklch(27% 0.004 285)", "oklch(39% 0.004 285)", "oklch(52% 0.004 285)", "oklch(63% 0.004 285)", "oklch(75% 0.004 285)", "oklch(87% 0.004 285)", "oklch(96% 0.002 285)"] },
+      "fg2-dark": { "role": "neutral", "displayName": "Testo secondario (scuro)", "canonical": "#a1a1a6", "cssVar": "--fg2" },
+      "hair": { "role": "neutral", "displayName": "Filo (chiaro)", "canonical": "rgba(0,0,0,.1)", "cssVar": "--hair" },
+      "hair-dark": { "role": "neutral", "displayName": "Filo (scuro)", "canonical": "rgba(255,255,255,.14)", "cssVar": "--hair" },
+      "nav": { "role": "neutral", "displayName": "Vetro della nav (chiaro)", "canonical": "rgba(255,255,255,.72)", "cssVar": "--nav" },
+      "nav-dark": { "role": "neutral", "displayName": "Vetro della nav (scuro)", "canonical": "rgba(0,0,0,.62)", "cssVar": "--nav" },
+      "tray": { "role": "neutral", "displayName": "Vetro del dock (chiaro)", "canonical": "rgba(255,255,255,.55)", "cssVar": "--tray" },
+      "tray-dark": { "role": "neutral", "displayName": "Vetro del dock (scuro)", "canonical": "rgba(255,255,255,.08)", "cssVar": "--tray" },
+      "tray-edge": { "role": "neutral", "displayName": "Bordo del dock (chiaro)", "canonical": "rgba(255,255,255,.75)", "cssVar": "--tray-edge" },
+      "tray-edge-dark": { "role": "neutral", "displayName": "Bordo del dock (scuro)", "canonical": "rgba(255,255,255,.16)", "cssVar": "--tray-edge" },
+      "tray-in": { "role": "neutral", "displayName": "Luce interna del dock (chiaro)", "canonical": "rgba(255,255,255,.6)", "cssVar": "--tray-in" },
+      "tray-in-dark": { "role": "neutral", "displayName": "Luce interna del dock (scuro)", "canonical": "rgba(255,255,255,.1)", "cssVar": "--tray-in" },
+      "tip": { "role": "neutral", "displayName": "Etichetta (chiaro)", "canonical": "rgba(255,255,255,.94)", "cssVar": "--tip" },
+      "tip-dark": { "role": "neutral", "displayName": "Etichetta (scuro)", "canonical": "rgba(44,44,46,.96)", "cssVar": "--tip" },
+      "slot": { "role": "neutral", "displayName": "Slot vuoto (chiaro)", "canonical": "rgba(0,0,0,.06)", "cssVar": "--slot" },
+      "slot-dark": { "role": "neutral", "displayName": "Slot vuoto (scuro)", "canonical": "rgba(255,255,255,.07)", "cssVar": "--slot" },
+      "slot-edge": { "role": "neutral", "displayName": "Bordo dello slot (chiaro)", "canonical": "rgba(0,0,0,.08)", "cssVar": "--slot-edge" },
+      "slot-edge-dark": { "role": "neutral", "displayName": "Bordo dello slot (scuro)", "canonical": "rgba(255,255,255,.1)", "cssVar": "--slot-edge" },
+      "f1": { "role": "tertiary", "displayName": "Alone blu del campo (chiaro)", "canonical": "rgba(10,132,255,.17)", "cssVar": "--f1", "tonalRamp": ["oklch(20% 0.1 258)", "oklch(31% 0.14 258)", "oklch(42% 0.17 258)", "oklch(53% 0.19 258)", "oklch(63% 0.19 258)", "oklch(74% 0.14 258)", "oklch(85% 0.08 258)", "oklch(95% 0.03 258)"] },
+      "f1-dark": { "role": "tertiary", "displayName": "Alone blu del campo (scuro)", "canonical": "rgba(10,132,255,.42)", "cssVar": "--f1" },
+      "f2": { "role": "tertiary", "displayName": "Alone rosa del campo (chiaro)", "canonical": "rgba(255,45,85,.13)", "cssVar": "--f2", "tonalRamp": ["oklch(20% 0.09 15)", "oklch(31% 0.14 15)", "oklch(42% 0.18 15)", "oklch(53% 0.21 15)", "oklch(63% 0.22 15)", "oklch(74% 0.16 15)", "oklch(85% 0.09 15)", "oklch(95% 0.03 15)"] },
+      "f2-dark": { "role": "tertiary", "displayName": "Alone rosa del campo (scuro)", "canonical": "rgba(255,45,85,.32)", "cssVar": "--f2" },
+      "f3": { "role": "tertiary", "displayName": "Alone arancio del campo (chiaro)", "canonical": "rgba(255,159,10,.16)", "cssVar": "--f3", "tonalRamp": ["oklch(20% 0.06 70)", "oklch(31% 0.09 70)", "oklch(42% 0.12 70)", "oklch(53% 0.15 70)", "oklch(64% 0.17 70)", "oklch(76% 0.16 70)", "oklch(87% 0.1 70)", "oklch(96% 0.03 70)"] },
+      "f3-dark": { "role": "tertiary", "displayName": "Alone arancio del campo (scuro)", "canonical": "rgba(255,159,10,.28)", "cssVar": "--f3" },
+      "gh-a": { "role": "neutral", "displayName": "Icona GitHub, alto (chiaro)", "canonical": "#3d4450", "cssVar": "--gh-a" },
+      "gh-b": { "role": "neutral", "displayName": "Icona GitHub, basso (chiaro)", "canonical": "#1b1f24", "cssVar": "--gh-b" },
+      "gh-a-dark": { "role": "neutral", "displayName": "Icona GitHub, alto (scuro)", "canonical": "#5a6270", "cssVar": "--gh-a" },
+      "gh-b-dark": { "role": "neutral", "displayName": "Icona GitHub, basso (scuro)", "canonical": "#24292f", "cssVar": "--gh-b" },
+      "gm-a": { "role": "neutral", "displayName": "Icona games, alto (chiaro)", "canonical": "#48484a", "cssVar": "--gm-a" },
+      "gm-b": { "role": "neutral", "displayName": "Icona games, basso (chiaro)", "canonical": "#1c1c1e", "cssVar": "--gm-b" },
+      "gm-a-dark": { "role": "neutral", "displayName": "Icona games, alto (scuro)", "canonical": "#6e6e73", "cssVar": "--gm-a" },
+      "gm-b-dark": { "role": "neutral", "displayName": "Icona games, basso (scuro)", "canonical": "#2c2c2e", "cssVar": "--gm-b" },
+      "github-graphite": { "role": "secondary", "displayName": "Grafite GitHub", "canonical": "#24292f", "note": "Fissato in .tile.gh, identico nei due temi; la sola scheda a fondo pieno.", "tonalRamp": ["oklch(15% 0.012 255)", "oklch(26% 0.014 255)", "oklch(37% 0.014 255)", "oklch(48% 0.014 255)", "oklch(60% 0.012 255)", "oklch(72% 0.01 255)", "oklch(84% 0.008 255)", "oklch(95% 0.004 255)"] },
+      "github-graphite-text": { "role": "secondary", "displayName": "Testo su grafite", "canonical": "#f5f5f7" },
+      "github-graphite-muted": { "role": "secondary", "displayName": "Secondario su grafite", "canonical": "#a1a1a6" },
+      "github-graphite-link": { "role": "secondary", "displayName": "Blu su grafite", "canonical": "#2997ff" },
+      "glyph": { "role": "neutral", "displayName": "Glifo dell'icona", "canonical": "#fff" },
+      "selection": { "role": "primary", "displayName": "Selezione del testo", "canonical": "rgba(0,113,227,.28)" }
+    },
+    "brandColors": {
+      "note": "Dichiarati in linea sull'elemento (--ia/--ib), non in :root: vivono solo dentro le icone squircle e negli aloni --glow delle schede.",
+      "instagram": { "face": "radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285aeb 90%)", "glow": "rgba(214,36,159,.34)" },
+      "github": { "face": "linear-gradient(180deg,var(--gh-a),var(--gh-b))", "glow": "rgba(255,255,255,.09)" },
+      "whatsapp": { "ia": "#60d66a", "ib": "#20b038", "glow": "rgba(37,211,102,.26)" },
+      "email": { "ia": "#1fb6ff", "ib": "#0a6cff", "glow": "rgba(10,108,255,.24)" },
+      "paypal": { "ia": "#009cde", "ib": "#003087", "glow": "rgba(0,112,224,.24)" },
+      "tools": { "ia": "#9a9aa0", "ib": "#636366" },
+      "games": { "face": "linear-gradient(180deg,var(--gm-a),var(--gm-b))" },
+      "empty": { "glow": "rgba(120,120,128,.14)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Solo il nome «pzkko» nell'hero (.hero h1), misurato su due assi. Nella 404 scende a clamp(2.25rem,6vw,4rem)/1.05, -.03em (.p404 h1)." },
+      "headline": { "displayName": "Headline", "purpose": "Titoli di sezione social, tools, games (.sec h2), 28px sotto." },
+      "title": { "displayName": "Title", "purpose": "Nome del servizio nella scheda (.tx strong) e titolo degli stati vuoti (.empty h3)." },
+      "lede": { "displayName": "Lede", "purpose": "La riga sotto il nome (.lede), colore --fg2, max-width 68ch, text-wrap balance." },
+      "body": { "displayName": "Body", "purpose": "Corpo di tutto: body, .hd (tabular-nums), .nt (32ch), .go, descrizioni degli stati vuoti (40ch)." },
+      "brand": { "displayName": "Brand", "purpose": "«pzkko» nella striscia di navigazione (.brand)." },
+      "list": { "displayName": "List", "purpose": "Elenco dei siti nella scheda GitHub (.sites), tabular-nums." },
+      "tooltip": { "displayName": "Tooltip", "purpose": "Etichetta sopra l'icona del dock col puntatore (.lbl)." },
+      "label": { "displayName": "Label", "purpose": "Voci della nav, piè di pagina, nomi dei giochi sotto gli slot." },
+      "label-dock-mobile": { "displayName": "Label dock mobile", "purpose": "Etichette sotto le icone del dock sotto i 640px (.lbl in @media (max-width:640px))." }
+    },
+    "shadows": [
+      { "name": "dock", "value": "0 30px 60px -30px rgba(0,0,0,.35), inset 0 1px 0 var(--tray-in)", "dark": "0 30px 60px -30px rgba(0,0,0,.9), inset 0 1px 0 var(--tray-in)", "cssVar": "--shadow", "purpose": "Il vassoio di vetro si solleva dalla pagina: ombra lunga spinta in basso più luce sul filo superiore." },
+      { "name": "dock-icon", "value": "drop-shadow(0 5px 10px rgba(0,0,0,.18))", "mobile": "drop-shadow(0 5px 10px rgba(0,0,0,.16))", "purpose": "Ombra dell'icona nel dock (.dk; a telefono sulla .face). È filter, non box-shadow, per seguire la superellisse." },
+      { "name": "tile-icon", "value": "drop-shadow(0 8px 16px rgba(0,0,0,.16))", "purpose": "Ombra dell'icona da 60px nella scheda (.app), un po' più alta perché il fondo è chiaro e fermo." },
+      { "name": "tooltip", "value": "0 2px 10px rgba(0,0,0,.14), 0 0 0 1px var(--hair)", "purpose": "Etichetta a comparsa del dock (.lbl): ombra breve più anello da 1px." },
+      { "name": "nav-hairline", "value": "0 1px 0 var(--hair)", "purpose": "Filo sotto la nav, solo in .nav.scrolled quando il contenuto scorre sotto." },
+      { "name": "slot-inset", "value": "inset 0 0 0 1px var(--slot-edge)", "purpose": "Bordo interno delle caselle vuote (.folder i, .slots i)." }
+    ],
+    "glass": [
+      { "name": "nav", "value": "blur(20px) saturate(1.8)", "background": "var(--nav)", "fallback": "background var(--bg), nessun filtro con prefers-reduced-transparency: reduce" },
+      { "name": "dock", "value": "blur(30px) saturate(1.6)", "background": "var(--tray)", "border": "1px solid var(--tray-edge)", "fallback": "background var(--tile), nessun filtro con prefers-reduced-transparency: reduce" }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(.23,1,.32,1)", "cssVar": "--eo", "purpose": "Curva di uscita di tutto il sistema: ingressi, pressione, chevron, scheda, filo della nav." },
+      { "name": "rise", "value": ".7s var(--eo) both; from { opacity:0; transform:translateY(12px) }", "purpose": "Ingresso di .hero h1 e .lede (la lede con 70ms di ritardo). Solo con prefers-reduced-motion: no-preference." },
+      { "name": "materialize", "value": ".8s var(--eo) 140ms both; from { opacity:0; transform:translateY(16px) scale(.96); filter:blur(10px) }", "purpose": "Ingresso del dock. Solo con prefers-reduced-motion: no-preference." },
+      { "name": "fade", "value": ".6s ease both; from { opacity:0 }", "purpose": "Ingresso della nav." },
+      { "name": "press", "value": "transform .1s var(--eo); scale(.92)", "purpose": ".dk:active .face e .tile:active .app .face." },
+      { "name": "tile-press", "value": "transform .16s var(--eo); scale(.985)", "purpose": "a.tile:active." },
+      { "name": "chevron", "value": "transform .2s var(--eo); translateX(2px)", "purpose": "Il chevron di .go al passaggio sulla scheda, con sottolineatura a offset 3px." },
+      { "name": "tooltip", "value": "opacity .12s ease, transform .12s var(--eo)", "purpose": ".lbl da translate(-50%,4px) a translate(-50%,0)." },
+      { "name": "nav-hairline", "value": "box-shadow .3s var(--eo)", "purpose": "Comparsa del filo sotto la nav." },
+      { "name": "nav-link", "value": "opacity .15s ease; .82 → 1", "purpose": "Voci della nav al passaggio." },
+      { "name": "dock-spring", "value": "molla criticamente smorzata: damping 1.0, response 0.32s (OMEGA = 2π/0.32); bersaglio = 1 + (MAG-1)·exp(-(d²)/(SPREAD²)), MAG 1.5, SPREAD 1.25 larghezze d'icona; dt ≤ 1/30s; larghezza di riposo = items[0].getBoundingClientRect().width (ripiego 64), rimisurata su resize quando le molle sono ferme", "purpose": "Ingrandimento delle icone del dock sotto il puntatore, interrompibile in ogni istante. Attiva solo con (hover:hover) and (pointer:fine) and (min-width:641px) e senza prefers-reduced-motion: reduce; gli eventi touch sono ignorati." },
+      { "name": "scroll", "value": "scroll-behavior: smooth solo con prefers-reduced-motion: no-preference", "purpose": "Nessuna rivelazione allo scorrimento, nessun parallasse." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "max-width: 640px", "purpose": "Dock a griglia 3+3+1 con etichette e icone clamp(48px,14vw,56px), colonna singola, wrap 16px, sezioni 64px." },
+      { "name": "tablet", "value": "max-width: 1023px", "purpose": "Bento: whatsapp ed e-mail a 3 colonne, paypal a riga intera." },
+      { "name": "pointer-fine", "value": "(hover: hover) and (pointer: fine)", "purpose": "Etichette a comparsa del dock." },
+      { "name": "dock-physics", "value": "(hover: hover) and (pointer: fine) and (min-width: 641px)", "purpose": "Fisica delle molle nel dock (script)." },
+      { "name": "container", "value": "max-width: 1024px", "purpose": ".wrap." }
+    ],
+    "sizes": [
+      { "name": "--sz", "value": "clamp(44px,min(4.6vw,7.5svh),64px)", "mobile": "clamp(48px,14vw,56px) sulla .face", "purpose": "Lato dell'icona nel dock: segue la finestra su entrambi gli assi, fra 44 e 64px." },
+      { "name": "hero", "value": "min-height calc(100svh - 48px); padding 24px 16px calc(28px + env(safe-area-inset-bottom)); 12px sopra a telefono", "purpose": "Primo schermo: .intro (flex 1) centra nome e riga, .dockwrap chiude in basso, nel flusso." },
+      { "name": "intro", "value": "clamp(12px,3svh,32px) 0 clamp(16px,4svh,40px)", "mobile": "clamp(8px,2svh,24px) 0 clamp(12px,3svh,32px)", "purpose": "Respiri verticali di .intro, a due assi." },
+      { "name": "nav", "value": "48px" },
+      { "name": "tile-icon", "value": "60px" },
+      { "name": "folder", "value": "128px", "mobile": "112px" },
+      { "name": "slot", "value": "60px", "mobile": "56px" }
+    ],
+    "fluid": { "rule": "La regola dei due assi: nel primo schermo ogni misura fluida è clamp(min, min(vw, svh), max)", "display": "clamp(2.75rem,min(9vw,13svh),6rem)", "lede": "clamp(1rem,min(1.5vw,2.6svh),1.3125rem)", "sz": "clamp(44px,min(4.6vw,7.5svh),64px)" },
+    "shapes": [
+      { "name": "squircle", "value": "clip-path: url(#sq)", "purpose": "Superellisse vera in objectBoundingBox, definita in fondo alla pagina; su .face, .folder, .folder i, .slots i. Il contenitore .dk porta anche border-radius: 22% per ombra e fuoco." },
+      { "name": "glyph", "value": "54% del lato, fill #fff", "purpose": "Il glifo dentro l'icona; 50–60% per correzione ottica, dichiarato in linea." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Navigazione",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Striscia traslucida sticky da 48px: marchio a sinistra, tre voci a destra; il filo sotto compare solo quando il contenuto scorre sotto.",
+      "html": "<header class=\"ds-nav ds-nav-scrolled\"><div class=\"ds-nav-wrap\"><a class=\"ds-brand\" href=\"#\">pzkko</a><nav class=\"ds-nav-links\"><a href=\"#\">social</a><a href=\"#\">tools</a><a href=\"#\">games</a></nav></div></header>",
+      "css": ".ds-nav{position:relative;height:48px;background:var(--nav,rgba(255,255,255,.72));-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);transition:box-shadow .3s cubic-bezier(.23,1,.32,1);color:var(--fg,#1d1d1f);font:400 17px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em}.ds-nav-scrolled{box-shadow:0 1px 0 var(--hair,rgba(0,0,0,.1))}.ds-nav-wrap{height:100%;max-width:1024px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between}.ds-nav a{color:inherit;text-decoration:none}.ds-brand{font:600 17px/1 -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI Variable Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.02em}.ds-nav-links{display:flex;gap:28px}.ds-nav-links a{font-size:12px;letter-spacing:-.01em;opacity:.82;transition:opacity .15s ease}.ds-nav-links a:hover{opacity:1}.ds-nav a:focus-visible{outline:2px solid var(--link,#0066cc);outline-offset:3px;border-radius:10px}"
+    },
+    {
+      "name": "Dock",
+      "kind": "nav",
+      "refersTo": "dock-tray",
+      "description": "Il componente firma: vassoio di vetro in fondo all'hero a tutto schermo (nel flusso, scorre via con il primo schermo), icone squircle da --sz = clamp(44px,min(4.6vw,7.5svh),64px), separatore e etichetta a comparsa. La fisica delle molle (damping 1, response .32s, MAG 1.5, SPREAD 1.25; larghezza di riposo letta dal layout e rimisurata su resize) vive nello script della pagina.",
+      "html": "<nav class=\"ds-dock\" aria-label=\"collegamenti rapidi\"><a class=\"ds-dk\" href=\"#\" style=\"--ia:#60d66a;--ib:#20b038\"><span class=\"ds-face\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z\"/></svg></span><span class=\"ds-lbl\">whatsapp</span></a><a class=\"ds-dk\" href=\"#\" style=\"--ia:#1fb6ff;--ib:#0a6cff\"><span class=\"ds-face\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" style=\"width:58%;height:58%\"><path d=\"M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z\"/></svg></span><span class=\"ds-lbl\">e-mail</span></a><span class=\"ds-sep\" role=\"separator\" aria-orientation=\"vertical\"></span><a class=\"ds-dk\" href=\"#\" style=\"--ia:#9a9aa0;--ib:#636366\"><span class=\"ds-face\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" style=\"width:50%;height:50%\"><path d=\"M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z\"/></svg></span><span class=\"ds-lbl\">tools</span></a></nav>",
+      "css": ".ds-dock{--sz:clamp(44px,min(4.6vw,7.5svh),64px);position:relative;display:inline-flex;align-items:flex-end;gap:8px;height:calc(var(--sz) + 20px);padding:10px;margin-top:40px;border-radius:28px;background:var(--tray,rgba(255,255,255,.55));border:1px solid var(--tray-edge,rgba(255,255,255,.75));box-shadow:var(--shadow,0 30px 60px -30px rgba(0,0,0,.35)),inset 0 1px 0 var(--tray-in,rgba(255,255,255,.6));-webkit-backdrop-filter:blur(30px) saturate(1.6);backdrop-filter:blur(30px) saturate(1.6);font:400 13px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em}.ds-dk{position:relative;display:block;width:var(--sz);height:var(--sz);flex:none;filter:drop-shadow(0 5px 10px rgba(0,0,0,.18));border-radius:22%;text-decoration:none;color:var(--fg,#1d1d1f);transition:width .32s cubic-bezier(.23,1,.32,1),height .32s cubic-bezier(.23,1,.32,1)}.ds-dk:hover{width:calc(var(--sz) * 1.5);height:calc(var(--sz) * 1.5)}.ds-dk:focus-visible{outline:2px solid var(--link,#0066cc);outline-offset:4px}.ds-sep{width:1px;height:calc(var(--sz) * .78);margin:0 6px;align-self:center;background:var(--hair,rgba(0,0,0,.1));flex:none}.ds-face{display:grid;place-items:center;width:100%;height:100%;border-radius:22%;background:linear-gradient(180deg,var(--ia),var(--ib));transition:transform .1s cubic-bezier(.23,1,.32,1)}.ds-face svg{display:block;width:54%;height:54%;fill:#fff}.ds-dk:active .ds-face{transform:scale(.92)}.ds-lbl{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);padding:5px 10px;border-radius:9px;background:var(--tip,rgba(255,255,255,.94));color:var(--fg,#1d1d1f);white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.14),0 0 0 1px var(--hair,rgba(0,0,0,.1));opacity:0;pointer-events:none;transition:opacity .12s ease,transform .12s cubic-bezier(.23,1,.32,1)}.ds-dk:hover .ds-lbl,.ds-dk:focus-visible .ds-lbl{opacity:1;transform:translate(-50%,0)}"
+    },
+    {
+      "name": "Scheda bento",
+      "kind": "card",
+      "refersTo": "tile",
+      "description": "Scheda neutra a raggio 28px con alone --glow del colore del servizio, icona squircle da 60px, nome, handle, nota e riga d'azione in blu link.",
+      "html": "<a class=\"ds-tile\" href=\"#\" style=\"--glow:rgba(37,211,102,.26);--ia:#60d66a;--ib:#20b038\"><span class=\"ds-app\"><span class=\"ds-face\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z\"/></svg></span></span><span class=\"ds-tx\"><strong>whatsapp</strong><span class=\"ds-hd\">+39 351 0355506</span><span class=\"ds-nt\">scrivimi, rispondo appena posso.</span></span><span class=\"ds-go\">scrivimi su whatsapp<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 6l6 6-6 6\"/></svg></span></a>",
+      "css": ".ds-tile{position:relative;display:flex;flex-direction:column;width:320px;min-height:230px;padding:28px;border-radius:28px;background:var(--tile,#f5f5f7);color:var(--fg,#1d1d1f);overflow:hidden;text-decoration:none;font:400 17px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;transition:transform .16s cubic-bezier(.23,1,.32,1)}.ds-tile::before{content:'';position:absolute;inset:0;background:radial-gradient(58% 60% at 16% 10%,var(--glow),transparent 72%);pointer-events:none}.ds-tile>*{position:relative}.ds-tile:active{transform:scale(.985)}.ds-tile:focus-visible{outline:2px solid var(--link,#0066cc);outline-offset:3px}.ds-app{display:block;width:60px;height:60px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.16))}.ds-face{display:grid;place-items:center;width:100%;height:100%;border-radius:22%;background:linear-gradient(180deg,var(--ia),var(--ib));transition:transform .1s cubic-bezier(.23,1,.32,1)}.ds-face svg{display:block;width:54%;height:54%;fill:#fff}.ds-tile:active .ds-face{transform:scale(.92)}.ds-tx{margin-top:auto;padding-top:28px}.ds-tx strong{display:block;font:600 24px/1.2 -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI Variable Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.02em}.ds-hd{display:block;color:var(--fg2,#6e6e73);margin-top:4px;font-variant-numeric:tabular-nums}.ds-nt{display:block;margin-top:12px;max-width:32ch}.ds-go{display:inline-flex;align-items:center;gap:2px;margin-top:18px;color:var(--link,#0066cc);font-size:17px}.ds-go svg{display:block;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s cubic-bezier(.23,1,.32,1)}.ds-tile:hover .ds-go{text-decoration:underline;text-underline-offset:3px}.ds-tile:hover .ds-go svg{transform:translateX(2px)}"
+    },
+    {
+      "name": "Scheda GitHub (grafite)",
+      "kind": "card",
+      "refersTo": "tile-github",
+      "description": "L'unica scheda a fondo pieno, grafite #24292f identica nei due temi: si guadagna il colore elencando i tre siti che ospita.",
+      "html": "<a class=\"ds-tile-gh\" href=\"#\" style=\"--glow:rgba(255,255,255,.09)\"><span class=\"ds-app\"><span class=\"ds-face\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12\"/></svg></span></span><ul class=\"ds-sites\"><li>albertopecchini.it</li><li>bettercallpekko.it</li><li>pzkko.it</li></ul><span class=\"ds-tx\"><strong>github</strong><span class=\"ds-hd\">albertoxpecchini</span><span class=\"ds-nt\">il codice dei miei siti, compreso questo.</span></span><span class=\"ds-go\">apri github<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 6l6 6-6 6\"/></svg></span></a>",
+      "css": ".ds-tile-gh{position:relative;display:flex;flex-direction:column;width:400px;min-height:280px;padding:28px;border-radius:28px;background:#24292f;color:#f5f5f7;overflow:hidden;text-decoration:none;font:400 17px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;transition:transform .16s cubic-bezier(.23,1,.32,1)}.ds-tile-gh::before{content:'';position:absolute;inset:0;background:radial-gradient(58% 60% at 16% 10%,var(--glow),transparent 72%);pointer-events:none}.ds-tile-gh>*{position:relative}.ds-tile-gh:active{transform:scale(.985)}.ds-tile-gh:focus-visible{outline:2px solid #2997ff;outline-offset:3px}.ds-tile-gh .ds-app{display:block;width:60px;height:60px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.16))}.ds-tile-gh .ds-face{display:grid;place-items:center;width:100%;height:100%;border-radius:22%;background:linear-gradient(180deg,var(--gh-a,#3d4450),var(--gh-b,#1b1f24))}.ds-tile-gh .ds-face svg{display:block;width:54%;height:54%;fill:#fff}.ds-sites{list-style:none;margin:24px 0 0;padding:0;font-size:15px;color:#a1a1a6;font-variant-numeric:tabular-nums}.ds-sites li{padding:8px 0;border-top:1px solid rgba(255,255,255,.12)}.ds-tile-gh .ds-tx{margin-top:auto;padding-top:28px}.ds-tile-gh .ds-tx strong{display:block;font:600 24px/1.2 -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI Variable Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.02em}.ds-tile-gh .ds-hd{display:block;color:#a1a1a6;margin-top:4px;font-variant-numeric:tabular-nums}.ds-tile-gh .ds-nt{display:block;margin-top:12px;max-width:32ch}.ds-tile-gh .ds-go{display:inline-flex;align-items:center;gap:2px;margin-top:18px;color:#2997ff;font-size:17px}.ds-tile-gh .ds-go svg{display:block;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s cubic-bezier(.23,1,.32,1)}.ds-tile-gh:hover .ds-go{text-decoration:underline;text-underline-offset:3px}.ds-tile-gh:hover .ds-go svg{transform:translateX(2px)}"
+    },
+    {
+      "name": "Stato vuoto: cartella (tools)",
+      "kind": "card",
+      "refersTo": "empty-folder",
+      "description": "Scheda a due colonne con testo e una cartella squircle da 128px fatta di nove caselle vuote: la forma di quello che arriverà.",
+      "html": "<div class=\"ds-empty\" style=\"--glow:rgba(120,120,128,.14)\"><div><h3>ancora niente qui.</h3><p>piccoli strumenti gratuiti da usare nel browser, uno alla volta.</p></div><div class=\"ds-folder\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>",
+      "css": ".ds-empty{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:32px 48px;width:560px;padding:28px;border-radius:28px;background:var(--tile,#f5f5f7);color:var(--fg,#1d1d1f);overflow:hidden;font:400 17px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em}.ds-empty::before{content:'';position:absolute;inset:0;background:radial-gradient(58% 60% at 16% 10%,var(--glow),transparent 72%);pointer-events:none}.ds-empty>*{position:relative}.ds-empty h3{margin:0;font:600 24px/1.2 -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI Variable Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.02em}.ds-empty p{color:var(--fg2,#6e6e73);margin:10px 0 0;max-width:40ch}.ds-folder{width:128px;height:128px;border-radius:22%;background:var(--slot,rgba(0,0,0,.06));display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px;justify-self:end}.ds-folder i{display:block;border-radius:22%;background:var(--slot,rgba(0,0,0,.06));box-shadow:inset 0 0 0 1px var(--slot-edge,rgba(0,0,0,.08))}"
+    },
+    {
+      "name": "Stato vuoto: caselle (games)",
+      "kind": "custom",
+      "refersTo": "empty-slot",
+      "description": "Cinque caselle squircle da 60px con il nome del gioco sotto a 12px; ogni gioco, quando esiste, prende il posto della sua casella.",
+      "html": "<div class=\"ds-slots\" aria-label=\"giochi in programma\"><span><i aria-hidden=\"true\"></i>blackjack</span><span><i aria-hidden=\"true\"></i>roulette</span><span><i aria-hidden=\"true\"></i>mine</span><span><i aria-hidden=\"true\"></i>dado</span><span><i aria-hidden=\"true\"></i>moneta</span></div>",
+      "css": ".ds-slots{display:flex;gap:24px;padding-top:8px;font:400 12px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em}.ds-slots span{display:flex;flex-direction:column;align-items:center;gap:9px;flex:0 0 76px;color:var(--fg2,#6e6e73)}.ds-slots i{display:block;width:60px;height:60px;border-radius:22%;background:var(--slot,rgba(0,0,0,.06));box-shadow:inset 0 0 0 1px var(--slot-edge,rgba(0,0,0,.08))}"
+    },
+    {
+      "name": "Piè di pagina",
+      "kind": "custom",
+      "refersTo": "footer",
+      "description": "Bordo alto da 1px, 12px in --fg2, credito a sinistra con link esatto a https://www.albertopecchini.it e il dominio a destra.",
+      "html": "<footer class=\"ds-foot\"><div class=\"ds-foot-wrap\"><a href=\"https://www.albertopecchini.it\" rel=\"author\">sito di alberto pecchini</a><span>pzkko.it</span></div></footer>",
+      "css": ".ds-foot{border-top:1px solid var(--hair,rgba(0,0,0,.1));padding:22px 0 max(22px,env(safe-area-inset-bottom));font:400 12px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;color:var(--fg2,#6e6e73)}.ds-foot-wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;max-width:1024px;margin:0 auto;padding:0 22px}.ds-foot a{color:inherit;text-decoration:none;transition:color .15s ease}.ds-foot a:hover{color:var(--fg,#1d1d1f)}.ds-foot a:focus-visible{outline:2px solid var(--link,#0066cc);outline-offset:3px;border-radius:10px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La scrivania di pzkko",
+    "overview": "pzkko.it è una scrivania, non un elenco. I cinque social e le due zone (tools, games) vivono come icone di app in un dock di vetro posato in fondo al primo schermo: l'hero occupa tutta la finestra, con il solo nome e una riga al centro e il dock sul bordo inferiore, e scorre via con il resto («se scorro giù via la barra, non mi serve», 2026-10-07). Sotto, schede bento spiegano ogni social. La grammatica è quella del web di Apple, presa per intero e non citata: carattere di sistema, display stretto, 17 px di corpo, materiali traslucidi con sfocatura, superellissi vere, molle criticamente smorzate che si possono interrompere in ogni istante.\n\nIl primo schermo si adatta a qualunque finestra su entrambi gli assi: nome, riga, icone e respiri verticali sono clamp() con un min(vw, svh) in mezzo, così la scrivania intera sta sempre in vista senza scorrere, da un telefono stretto a una finestra bassa e larga. La densità è bassa e la gerarchia è data dalla dimensione e dal peso di un unico carattere (sempre 600 per i titoli, 400 per il resto), mai dal colore: tutta la pagina è neutra (bianco e #f5f5f7 in chiaro, nero e #1d1d1f in scuro) e il colore di marca compare solo dentro le icone squircle e come alone tenue nelle schede. Il sito segue il tema del sistema con color-scheme: light dark, è tutto in minuscolo e parla in prima persona.\n\nRifiuti confermati dal percorso di progetto: la colonna link-in-bio di tasti uguali; l'hero su mesh gradient con tre card; gli oggetti skeuomorfici letterali (la prima versione con iPhone e portafoglio MagSafe, bocciata il 2026-10-07); il dock fissato alla finestra che segue lo scorrimento (provato e tolto lo stesso giorno); le rivelazioni allo scorrimento e qualunque movimento decorativo che giri da solo.",
+    "keyCharacteristics": [
+      "Un dock in fondo al primo schermo (.dockwrap / .dock) come azione primaria: sette icone, separatore, vetro con backdrop-filter: blur(30px) saturate(1.6); scorre via con l'hero.",
+      "Primo schermo «adattatore automatico»: --sz: clamp(44px, min(4.6vw, 7.5svh), 64px) e le stesse curve a due assi per nome, riga e respiri.",
+      "Una sola famiglia tipografica, quella di sistema, in due tagli (--fd display, --ft testo); tutto minuscolo.",
+      "Neutri puri più un solo accento, il blu link (--link); il colore di marca vive solo nelle icone e negli aloni --glow.",
+      "Superellisse vera (clipPath #sq) per ogni icona e per gli stati vuoti; raggio 28 px per schede e dock.",
+      "Un solo momento di movimento autoriale (ingresso dell'hero e del dock), poi solo movimento in risposta al puntatore o al dito.",
+      "Ripieghi dichiarati per prefers-reduced-motion e prefers-reduced-transparency."
+    ],
+    "rules": [
+      { "name": "La regola del blu unico", "body": "L'unico accento della pagina è --link. Non esistono altri colori di interfaccia: niente verde di conferma, niente rosso di errore, niente bottoni pieni colorati. Se serve attenzione, si usa peso o dimensione, non tinta.", "section": "colors" },
+      { "name": "La regola del colore dentro l'icona", "body": "Il colore di marca di un servizio vive in due posti soltanto: la superficie della sua icona squircle e l'alone --glow della sua scheda. Mai nel testo, mai nel bordo, mai nel fondo di una scheda.", "section": "colors" },
+      { "name": "La regola della grafite che si guadagna", "body": "La sola scheda a fondo pieno è quella di GitHub (#24292f), e lo è perché porta contenuto in più: l'elenco dei tre siti che ospita. Una scheda non si colora per decorazione; si colora quando ha qualcosa da dire che le altre non hanno.", "section": "colors" },
+      { "name": "La regola del sistema", "body": "Non si aggiungono webfont. Il carattere è quello del dispositivo, nei due tagli --fd e --ft; se una piattaforma non ha il taglio display, la catena di ripiego lo risolve da sola.", "section": "typography" },
+      { "name": "La regola del minuscolo", "body": "Tutto il testo visibile è minuscolo nel sorgente, nomi propri compresi («alberto pecchini», «instagram»). Non si usa text-transform, né in un verso né nell'altro. Titolo e meta della pagina conservano le maiuscole.", "section": "typography" },
+      { "name": "La regola dei due assi", "body": "Nel primo schermo nessuna misura dipende dalla sola larghezza: ogni dimensione fluida è clamp(min, min(vw, svh), max), perché la scrivania deve stare intera in vista anche in una finestra bassa. Dal secondo schermo in giù basta vw.", "section": "layout" },
+      { "name": "La regola del vetro che poggia", "body": "Hanno ombra solo le cose che stanno sopra la pagina: il dock, le icone, l'etichetta. Le schede non hanno ombra né bordo, mai: si staccano dal fondo solo per tono. Non si aggiunge un'ombra a una scheda per farla «risaltare».", "section": "elevation" },
+      { "name": "La regola della linea sola", "body": "L'unica linea del sistema è --hair a 1 px: sotto la nav quando si scorre, come separatore nel dock, sopra il piè di pagina, tra le righe dell'elenco GitHub. Non esistono bordi di scheda, divisori di sezione o cornici.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do tenere il dock in fondo all'hero a tutto schermo, nel flusso, dopo .intro: la scrivania è il primo schermo e scorre via con esso.",
+      "Do misurare ogni cosa del primo schermo su due assi, clamp(min, min(Xvw, Ysvh), max), come --sz, il nome e la riga, così hero e dock stanno interi in qualunque finestra.",
+      "Do tagliare ogni nuova icona con clip-path: url(#sq) e colorarla con --ia/--ib dichiarati in linea; il glifo resta bianco al 54% del lato.",
+      "Do dare a ogni nuova scheda il fondo --tile, raggio 28 px, padding 28 px e un alone --glow del colore del servizio a bassa alpha (.14–.34).",
+      "Do usare --fd 600 per titoli e nomi, --ft 400 per tutto il resto, e la spaziatura negativa prevista per il corpo (da -.01em a -.035em).",
+      "Do prevedere il ripiego per prefers-reduced-transparency (fondo opaco --bg o --tile) e per prefers-reduced-motion (nessun ingresso, nessuna fisica) in ogni nuovo vetro o movimento.",
+      "Do aggiungere un nuovo strumento o gioco al posto della sua casella negli stati vuoti e come nuova icona nel dock, rispettando le righe da tre a telefono.",
+      "Do scrivere tutto il testo visibile in minuscolo nel sorgente e firmare il piè di pagina con il link esatto a https://www.albertopecchini.it."
+    ],
+    "donts": [
+      "Don't fissare il dock alla finestra (position: fixed) né riservargli spazio nel piè di pagina: provato e tolto il 2026-10-07.",
+      "Don't introdurre un secondo colore d'interfaccia oltre --link, né un colore di marca fuori dall'icona e dal suo --glow.",
+      "Don't dare ombre o bordi alle schede: si staccano dal fondo solo per tono (--tile su --bg).",
+      "Don't aggiungere webfont, text-transform o maiuscole nel testo visibile.",
+      "Don't usare 100vh per l'hero: il sistema usa 100svh ed env(safe-area-inset-bottom).",
+      "Don't animare allo scorrimento, né far girare movimenti da soli: dopo l'ingresso si muove solo ciò che risponde al puntatore o al dito.",
+      "Don't usare oggetti skeuomorfici letterali (telefoni, portafogli, scrivanie disegnate) né la colonna di tasti uguali del link-in-bio.",
+      "Don't colorare a fondo pieno una scheda che non porta contenuto in più: la grafite di GitHub è un'eccezione guadagnata, non un modello.",
+      "Don't riempire tools e games con contenuto finto: lo stato vuoto è la forma dell'oggetto futuro, non una promessa illustrata."
+    ]
+  }
+}

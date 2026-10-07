@@ -3,10 +3,42 @@
 Il sito di **pzkko.it**: file statici, niente build. Sta nel repository del sito
 serio ma è un progetto Vercel a parte.
 
-- `index.html` — la pagina (per ora vuota, col credito in fondo)
+- `index.html` — la home: i social come icone in un dock, poi le sezioni social,
+  tools e games (le ultime due per ora vuote). CSS e JS in linea, nessun file esterno.
 - `404.html` — pagina non trovata
+- `favicon.svg`, `apple-touch-icon.png` — la «p» di pzkko su superellisse grafite
+- `og.png` — anteprima per i link condivisi (1200 × 630)
 - `robots.txt`, `sitemap.xml`
 - `vercel.json` — intestazioni di sicurezza, URL puliti
+
+## Com'è fatta la home
+
+Linguaggio di Apple tradotto per il web (carattere di sistema, materiali
+traslucidi, molle interrompibili), in chiaro e in scuro col tema del sistema.
+
+- **Hero a tutto schermo** (`100svh`) che si adatta a qualsiasi finestra: nome,
+  riga e icone del dock sono misurati in `vw`/`svh` con `clamp()`, così il primo
+  schermo entra sempre, alto o basso che sia; il dock si rimisura al resize.
+- **Dock in fondo al primo schermo** (si vede subito all'apertura, poi scorre via
+  col resto): cinque icone dei social (Instagram, GitHub, WhatsApp, e-mail,
+  PayPal), un separatore, poi tools e games (grafite: le cose «mie»). Col
+  puntatore le icone si ingrandiscono con molle criticamente smorzate (response
+  0,32 s) e mostrano l'etichetta; sul telefono è una griglia a righe da tre app
+  al massimo (3+3+1) con l'etichetta sotto. Le icone sono superellissi vere
+  (`clip-path` con il tracciato in fondo alla pagina), i glifi vengono da Simple
+  Icons (CC0) e Material Icons (Apache 2.0).
+- **Sezioni**: social in griglia bento (3+3 / 2+2+2 colonne: la scheda GitHub
+  elenca i tre siti che ospita); tools e games con uno stato vuoto che ha già la
+  forma di quello che arriverà (una cartella, una riga di posti vuoti coi nomi
+  dei giochi in programma).
+- **404**: stessa pagina, stesso dock. Non si modifica a mano: la genera
+  `tools/pzkko/genera-404.mjs` da `index.html` (`node tools/pzkko/genera-404.mjs`
+  dalla cartella `albertopecchini.it`), da rilanciare dopo ogni modifica alla home.
+- Movimento solo in risposta: ingresso una volta, poi niente che giri da solo;
+  `prefers-reduced-motion` e `prefers-reduced-transparency` rispettati.
+
+Quando arriva il primo strumento o gioco, gli si fa una pagina in questa
+cartella (es. `tools/nome/index.html`) e il riquadro vuoto diventa un'icona vera.
 
 ## Vercel
 

@@ -1,0 +1,6 @@
+# Impeccable e Playwright alla radice del repository: catture di verifica e cache
+# restano fuori; il brief in .impeccable/surfaces/ e PRODUCT.md invece si tengono.
+.impeccable/review/
+.impeccable/hook.cache.json
+.impeccable/config.local.json
+.playwright-mcp/
