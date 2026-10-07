@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "onion": "node tools/onion/pubblica.mjs",
     "email": "node tools/email-generator/cli.js",
     "email:new": "node tools/email-generator/cli.js new",
     "email:list": "node tools/email-generator/cli.js list",
