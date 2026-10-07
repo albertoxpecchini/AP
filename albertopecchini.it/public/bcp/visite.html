@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Site Stats (real) — Better Call Pekko</title>
+<!--
+  Statistiche vere del contavisite di Better Call Pekko, lette da /api/bcp/ ogni
+  20 secondi (una GET non conta come visita). Pagina statica di public/bcp/:
+  online su https://www.bettercallpekko.it/visite/ , fuori dalla sitemap e noindex.
+  Stile della pagina madre (2008 di proposito): fondo giallo, riquadri .wid,
+  titoli Impact bordati di rosso, contatore nero a cifre verdi.
+-->
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:#eae41f;color:#000;font:12px/1.4 Verdana,Arial,sans-serif;padding:14px 12px 24px}
+.wrap{max-width:960px;margin:0 auto}
+h1{margin:0 0 10px;font:28px/1 Impact,'Arial Black',sans-serif;color:#fff;-webkit-text-stroke:1.4px #e21212;paint-order:stroke fill;text-transform:uppercase;text-shadow:1px 1px 0 #8a0000,2px 2px 0 #7a0000,3px 3px 0 #6a0000;letter-spacing:.02em;text-wrap:balance}
+h1 small{display:block;margin-top:4px;font:bold 11px/1.3 Verdana,sans-serif;color:#000;-webkit-text-stroke:0;text-shadow:none;text-transform:none;letter-spacing:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:0 0 10px}
+.wid{border:2px solid #000;background:#f4f4f4;padding:10px;min-width:0}
+.wid h4{margin:0 0 6px;font:bold 12px/1 'Arial Black',Arial,sans-serif;color:#0d2560;text-transform:uppercase}
+.counter{display:inline-block;padding:5px 8px;background:#000;color:#3f3;font:bold 26px/1 'Courier New',Courier,monospace;letter-spacing:.15em;border:3px inset #666;font-variant-numeric:tabular-nums}
+.counter.sm{font-size:18px}
+.big{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
+.big .note{font-size:11px;color:#333}
+.delta{display:inline-block;background:#e21212;color:#fff;font:bold 11px/1 Verdana,sans-serif;padding:3px 6px;border:1px solid #000;animation:blink 1s steps(2,end) 6}
+@keyframes blink{50%{opacity:.25}}
+table{border-collapse:collapse;width:100%;font:11px/1.4 Verdana,sans-serif}
+td,th{padding:3px 4px;border-bottom:1px solid #ccc;text-align:left;vertical-align:middle}
+th{background:#0d2560;color:#fff;font-weight:bold}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:10px;background:#e21212;border:1px solid #000;min-width:2px}
+.bar.d{background:#0000cc}
+.chart{display:flex;align-items:flex-end;justify-content:flex-start;gap:4px;height:120px;padding:6px 2px 0;border-bottom:2px solid #000}
+.chart div{flex:1;min-width:0;max-width:72px;background:#e21212;border:1px solid #000;border-bottom:0;position:relative}
+.chart div.today{background:#0000cc}
+.chart div b{position:absolute;left:0;right:0;bottom:100%;text-align:center;font:bold 10px/1.4 Verdana,sans-serif;color:#000}
+.days{display:flex;gap:4px;font:9px/1.6 Verdana,sans-serif;color:#333}
+.days span{flex:1;min-width:0;max-width:72px;text-align:center;overflow:hidden;white-space:nowrap}
+.st{margin:0 0 10px;font:bold 11px/1.4 Verdana,sans-serif}
+.st.err{color:#e21212}
+.muted{color:#444;font-size:11px}
+a{color:#0000cc}
+.foot{margin:14px 0 0;padding:10px;background:#e21212;color:#fff;text-align:center;font:11px/1.6 Verdana,sans-serif;border:2px solid #000}
+.foot a{color:#ffe600}
+@media (prefers-reduced-motion:reduce){.delta{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Site Stats (real)<small>Better Call Pekko · the hit counter, the people online and where they come from. Reading this page does not count as a visit. Refreshes every 20 s.</small></h1>
+
+  <p class="st" id="st">loading the counter… (dial-up noises)</p>
+
+  <div class="grid">
+    <div class="wid"><h4>Visitors since 2006*</h4><div class="big"><span class="counter" id="visits">-------</span><span class="delta" id="delta" hidden>+1</span></div><p class="muted">*counting started in 2026, dont tell anyone</p></div>
+    <div class="wid"><h4>Online now</h4><div class="big"><span class="counter" id="online">-</span><span class="note">opened the site in the last 5 min</span></div></div>
+    <div class="wid"><h4>Today</h4><div class="big"><span class="counter" id="today">-</span><span class="note">since midnight, Rivalta time</span></div></div>
+  </div>
+
+  <div class="grid">
+    <div class="wid"><h4>Where they come from</h4><table id="refs"><tr><th>site</th><th class="n">visits</th><th style="width:40%"></th></tr></table><p class="muted" id="refsNote"><b>direct</b> = typed the address, bookmark, or an app (WhatsApp, Telegram…) that hides the referrer.</p></div>
+    <div class="wid"><h4>Last 14 days</h4><div class="chart" id="chart"></div><div class="days" id="days"></div></div>
+  </div>
+
+  <div class="foot"><a href="/">« back 2 the site</a> · <a href="/api/bcp/" rel="nofollow">raw JSON</a> · <span id="upd">not updated yet</span><br><a href="https://www.albertopecchini.it" rel="author">Site by Alberto Pecchini</a> · Rivalta sul Mincio (MN), Italy</div>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var pad7 = function (n) { return ('0000000' + n).slice(-7); };
+  var prima = null, timer = null;
+
+  function stato(t, err) { var s = $('st'); s.textContent = t; s.className = 'st' + (err ? ' err' : ''); }
+
+  function rendi(j) {
+    $('visits').textContent = pad7(j.visits);
+    $('online').textContent = j.online;
+    var ok = j.today !== undefined;
+    $('today').textContent = ok ? j.today : '?';
+    if (prima && j.visits > prima.visits) { var d = $('delta'); d.textContent = '+' + (j.visits - prima.visits) + ' new!!!'; d.hidden = false; }
+    // provenienze
+    var refs = Object.keys(j.refs || {}).map(function (k) { return [k, j.refs[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+    var tot = refs.reduce(function (s, r) { return s + r[1]; }, 0);
+    var t = $('refs');
+    while (t.rows.length > 1) t.deleteRow(1);
+    if (!refs.length) { var r0 = t.insertRow(); var c0 = r0.insertCell(); c0.colSpan = 3; c0.textContent = ok ? 'nobody yet. the counting by site started on 10/07/2026.' : 'not available yet (old version of the API, wait 4 the deploy)'; }
+    refs.forEach(function (r) {
+      var row = t.insertRow();
+      row.insertCell().textContent = r[0];
+      var n = row.insertCell(); n.className = 'n'; n.textContent = r[1] + ' (' + Math.round(100 * r[1] / tot) + '%)';
+      var b = document.createElement('div'); b.className = 'bar' + (r[0] === 'direct' ? ' d' : ''); b.style.width = Math.max(2, Math.round(100 * r[1] / refs[0][1])) + '%';
+      row.insertCell().appendChild(b);
+    });
+    // giorni
+    var giorni = Object.keys(j.days || {}).sort().slice(-14);
+    var max = Math.max.apply(null, giorni.map(function (d) { return j.days[d]; }).concat([1]));
+    var c = $('chart'), dd = $('days'); c.textContent = ''; dd.textContent = '';
+    var oggi = giorni.length ? giorni[giorni.length - 1] : '';
+    giorni.forEach(function (d) {
+      var bar = document.createElement('div'); bar.style.height = Math.max(2, Math.round(100 * j.days[d] / max)) + '%'; if (d === oggi && j.today === j.days[d]) bar.className = 'today';
+      var b = document.createElement('b'); b.textContent = j.days[d]; bar.appendChild(b); c.appendChild(bar);
+      var s = document.createElement('span'); s.textContent = d.slice(5).replace('-', '/'); dd.appendChild(s);
+    });
+    if (!giorni.length) { var e = document.createElement('div'); e.style.height = '2px'; e.style.flex = '1'; c.appendChild(e); }
+    prima = j;
+    var now = new Date();
+    $('upd').textContent = 'updated ' + now.toLocaleTimeString();
+    stato(ok ? 'live. ' + j.online + ' online now, ' + j.today + ' today, ' + j.visits + ' total.' : 'live, but the API online is still the old one: total and online are real, the rest arrives with the deploy.');
+  }
+
+  function leggi() {
+    if (document.hidden) return;
+    fetch('/api/bcp/', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j.visits === undefined) throw new Error(j.error || 'weird answer'); rendi(j); })
+      .catch(function (e) { stato('the database is on vacation (' + e.message + '). retrying in 20 s.', true); });
+  }
+
+  leggi();
+  timer = setInterval(leggi, 20000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) leggi(); });
+})();
+</script>
+</body>
+</html>

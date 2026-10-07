@@ -1,6 +1,7 @@
-// «Better Call Pekko» — il database vero della parodia: contavisite, persone
-// online, like, condivisioni, sondaggio, record del gioco, forum, guestbook,
-// shoutbox ed e-card. Una funzione sola, un documento JSON solo.
+// «Better Call Pekko» — il database vero della parodia: contavisite (totale,
+// per giorno e per sito di provenienza), persone online, like, condivisioni,
+// sondaggio, record del gioco, forum, guestbook, shoutbox ed e-card. Una
+// funzione sola, un documento JSON solo.
 //
 // Dove sta: un file privato su Vercel Blob (`bcp/db.json`), letto sempre
 // dall'origine (useCache: false) e riscritto con `ifMatch` sull'ETag, così due
@@ -19,9 +20,19 @@ export const config = { runtime: 'nodejs' }
 // BCP_BLOB_PATH solo per le prove in locale contro lo store vero, su un documento a parte
 const PATH = process.env.BCP_BLOB_PATH || 'bcp/db.json'
 const MAX_BODY = 8 * 1024
-const CAP = { threads: 60, replies: 40, guestbook: 150, shout: 60, scores: 10, online: 80 }
+const CAP = { threads: 60, replies: 40, guestbook: 150, shout: 60, scores: 10, online: 80, giorni: 90, ref: 40 }
 const ONLINE_MS = 5 * 60 * 1000
 const AVATARS = 9
+
+// Il giorno «di oggi» secondo l'orologio di casa (Europe/Rome), non quello UTC del server
+const oggi = (now = Date.now()) => new Date(now).toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' })
+const NOSTRO = /(^|\.)bettercallpekko\.it$/
+/** Il sito di provenienza: solo il nome host, minuscolo, senza www.; vuoto se manca, non è un host o è questo sito. */
+function provenienza(v) {
+  const h = typeof v === 'string' ? v.trim().toLowerCase().replace(/^www\./, '').slice(0, 60) : ''
+  if (!h || !/^[a-z0-9.-]+\.[a-z0-9-]+$/.test(h) || NOSTRO.test(h)) return ''
+  return h
+}
 
 // ── Il database iniziale: src/data/bcp-seed.js (lo stampa anche il template) ──
 
@@ -107,6 +118,9 @@ function pubblico(db, now = Date.now()) {
   return {
     visits: db.visits,
     online: Math.max(1, db.online.filter((t) => now - t < ONLINE_MS).length),
+    today: (db.giorni || {})[oggi(now)] || 0,
+    days: Object.fromEntries(Object.entries(db.giorni || {}).sort().slice(-30)),
+    refs: db.ref || {},
     likes: db.likes,
     shares: db.shares,
     ecards: db.ecards,
@@ -173,12 +187,27 @@ const SCRITTURE = new Set(['post', 'reply', 'gb', 'shout'])
 function azione(body, ip) {
   const a = body.a
   switch (a) {
-    case 'hit':
+    case 'hit': {
+      const da = provenienza(body.ref)
       return (db) => {
         const now = Date.now()
-        if (body.nuovo) db.visits++
+        if (body.nuovo) {
+          db.visits++
+          // la stessa visita anche per giorno (gli ultimi CAP.giorni) e per sito di
+          // provenienza ('direct' = nessuno, 'other' = oltre i CAP.ref siti distinti)
+          const g = { ...(db.giorni || {}) }
+          const d = oggi(now)
+          g[d] = (g[d] || 0) + 1
+          db.giorni = Object.fromEntries(Object.entries(g).sort().slice(-CAP.giorni))
+          const r = db.ref || {}
+          let k = da || 'direct'
+          if (!(k in r) && Object.keys(r).length >= CAP.ref) k = 'other'
+          r[k] = (r[k] || 0) + 1
+          db.ref = r
+        }
         db.online = [...db.online.filter((t) => now - t < ONLINE_MS), now].slice(-CAP.online)
       }
+    }
     case 'like': {
       const k = chiave(body.k)
       if (!k) return { error: 'bad like' }
@@ -312,7 +341,9 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const { db } = await store.read()
-      // qualche secondo di cache sulla rete di Vercel: tante visite, poche letture
+      // qualche secondo di cache sulla rete di Vercel: tante visite, poche letture.
+      // Leggibile anche da altre origini (il cruscotto delle visite): sono dati pubblici
+      res.setHeader('Access-Control-Allow-Origin', '*')
       return json(res, 200, { ok: true, ...pubblico(db) }, 'public, max-age=0, s-maxage=8, stale-while-revalidate=30')
     }
     if (req.method !== 'POST') {

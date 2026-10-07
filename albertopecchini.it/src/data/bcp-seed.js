@@ -10,6 +10,8 @@ const at = (s) => Date.parse(s)
 export const seed = () => ({
   v: 1,
   visits: 0,
+  giorni: {}, // visite per giorno (AAAA-MM-GG, ora di Roma)
+  ref: {}, // visite per sito di provenienza ('direct' = nessuno)
   online: [],
   likes: {},
   shares: {},

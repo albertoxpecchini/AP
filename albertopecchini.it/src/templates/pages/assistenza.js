@@ -1887,7 +1887,10 @@ const JS = `
   // ── Il giro vero: una visita (nuova solo la prima volta nella scheda), poi un aggiornamento ogni 30 s
   var nuovoVisitatore = false;
   try { nuovoVisitatore = sessionStorage.getItem('bcp-seen') !== '1'; sessionStorage.setItem('bcp-seen', '1'); } catch (e) {}
-  call({ a: 'hit', nuovo: nuovoVisitatore });
+  // da dove arriva (solo il nome del sito, e solo se non è questo): così si vede se chi ci sponsorizza porta gente
+  var provenienza = '';
+  try { var rh = document.referrer ? new URL(document.referrer).hostname : ''; if (rh && rh !== location.hostname) provenienza = rh; } catch (e) {}
+  call({ a: 'hit', nuovo: nuovoVisitatore, ref: provenienza });
   setInterval(function () { if (!document.hidden && !offline) call(); }, 30000);
 
   // ── Modulo dei contatti: stesse regole di /contatti/, messaggi in inglese
