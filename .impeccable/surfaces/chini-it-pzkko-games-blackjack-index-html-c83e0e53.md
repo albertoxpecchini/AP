@@ -37,4 +37,16 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Documentazione
 
+Registrata l'8.10 in DESIGN.md (frontmatter: gettoni della sala, dei tasti del bordo, delle targhette, dell'HUD e della carta; prosa: «La sala e il feltro» nei colori, «Sala (giochi)» nel layout, «La sala» nei componenti, luce, ombre e vetri della sala, forme, movimento, do e don't) e in .impeccable/design.json (colorMeta, typographyMeta, shadows, glass, motion, breakpoints, sizes, shapes, quattro componenti della sala, narrativa). Il resto dei due file non è stato toccato.
+
+Stato finale della scena, come spedita:
+- la consolle delle mosse (4 tasti tondi da 64 px, bordo 2 px bianco su nero .55, «carta» primario su --btn) e delle puntate (5 fiche da 52 px, poi punta/azzera o ripeti, e salto da 56 px) è appesa sotto il proprio cerchio di puntata (arco a raggio 828 della pianta), davanti al proprio posto, sul bordo imbottito; in verticale è tenuta dentro lo schermo con un clamp sulla x. Il contratto diceva 66 px: la build ha chiuso a 64, ed è quello che DESIGN.md registra.
+- telecamera del telefono: mondo alto 1000 × 1400 con scala max(W/w, H/h) (copre lo schermo e sborda ai lati) e --pan che, quando ci si siede, scorre a metà strada verso la propria sedia (.6s); i posti 1 e 5 restano in parte fuori quadro quando non sono i propri.
+- maniche per ogni corpo: braccia2/sup1–5 (gomito in basso, perno in basso a sinistra, −0,35 rad di correzione), avambraccio e mani dal foglio braccia o, per il corpo 4, dal foglio scuro braccia2/*4; ai posti laterali la mano esterna resta vicina alla spalla (8 invece di 54 unità), con le mani di riposo sul bordo 34 unità sotto il bordo del posto.
+- il croupier porta ogni carta dal sabot al posto sull'orologio del server (parte 1100 ms prima dello scoprimento); la carta si gira all'arrivo; le proprie carte si piegano sotto il dito e tornano con una molla.
+- ogni raster è generato con openai/gpt-image-2 su Replicate (7–8.10.2026, prompt in tools/blackjack/fogli.js, pipeline immagini.mjs), accreditato nel piè di pagina e in tools/blackjack/README.md e design-prompts.md; i pezzi con i perni in games/blackjack/art/pezzi.json.
+
+Aperto, non canonizzato: la scritta ad arco sul feltro non è stata spostata (vedi «Unresolved»); i vetri della sala (vassoio, pillola di stato, tasti del bordo) non dichiarano il ripiego prefers-reduced-transparency che il sistema chiede a ogni vetro (la pagina del pomeriggio lo aveva sul vassoio); --ok #30d158 / --no #ff6961 (punto di presenza e segno delle vincite nelle schede sotto la sala), già nella pagina del pomeriggio, restano fuori dai gettoni perché contraddicono la regola del blu unico.
+
+Nota del 7.10 sera, superata:
 La scena del 7.10 sera sostituisce la pagina a riquadro recensita nel pomeriggio: le immagini (tools/blackjack/lavoro/, non nel repository) sono generate da gpt-image-2 su Replicate con i prompt in tools/blackjack/fogli.js; i pezzi in pzkko/games/blackjack/art/ con pezzi.json. I gettoni del feltro, delle carte e delle fiche registrati in DESIGN.md nel pomeriggio restano validi per i colori; le misure delle carte sul piano (96×134 in pianta) e i tasti tondi da 66 px sul bordo sono nuovi.
