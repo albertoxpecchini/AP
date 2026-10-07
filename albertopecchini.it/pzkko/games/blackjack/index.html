@@ -104,15 +104,19 @@ main{flex:1}
 .tot-feltro.pari{background:rgba(255,255,255,.25)}
 
 /* ── sul bordo imbottito, davanti a me: i tasti delle mosse e le fiche ─── */
-.console{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;z-index:2}
-.console .fila{display:flex;align-items:center;gap:8px}
-.tasto{width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(0,0,0,.55);color:#fff;font:600 14px/1.1 var(--ft);letter-spacing:-.01em;cursor:pointer;display:grid;place-items:center;text-align:center;padding:4px;transition:transform .12s var(--eo),background .15s,opacity .2s;box-shadow:0 4px 10px rgba(0,0,0,.45),inset 0 0 0 3px rgba(0,0,0,.25);pointer-events:auto;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.console{position:absolute;transform:translate(-50%,0);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:2}
+.console .fila{display:flex;align-items:center;gap:6px}
+.console .griglia{display:grid;grid-template-columns:repeat(2,64px);gap:6px}
+.console .chips3{display:grid;grid-template-columns:repeat(3,52px);gap:6px;justify-items:center}
+.console .chips3 :nth-child(4){grid-column:1/3;justify-self:end}
+.tasto{width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(0,0,0,.55);color:#fff;font:600 14px/1.1 var(--ft);letter-spacing:-.01em;cursor:pointer;display:grid;place-items:center;text-align:center;padding:4px;transition:transform .12s var(--eo),background .15s,opacity .2s;box-shadow:0 4px 10px rgba(0,0,0,.45),inset 0 0 0 3px rgba(0,0,0,.25);pointer-events:auto;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .tasto.p{background:var(--btn);border-color:#fff}
 .tasto:disabled{opacity:.35;cursor:default}
 .tasto:not(:disabled):active{transform:scale(.93)}
 .tasto .k{display:block;font-size:11px;font-weight:400;opacity:.75}
+.tasto.s{width:56px;height:56px;font-size:13px}
 @media (hover:hover){.tasto:not(:disabled):not(.p):hover{background:rgba(255,255,255,.2)}}
-.fiche-tocco{width:60px;height:60px;border:0;border-radius:50%;background:center/100% 100% no-repeat;cursor:pointer;transition:transform .12s var(--eo),opacity .2s;filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));pointer-events:auto}
+.fiche-tocco{width:52px;height:52px;border:0;border-radius:50%;background:center/100% 100% no-repeat;cursor:pointer;transition:transform .12s var(--eo),opacity .2s;filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));pointer-events:auto}
 .fiche-tocco:disabled{opacity:.3;cursor:default}
 .fiche-tocco:not(:disabled):active{transform:scale(.92)}
 .fiche-tocco.css{background:#2c2c2e;border:3px dashed rgba(255,255,255,.85);color:#fff;font:700 15px/1 var(--ft)}
@@ -572,7 +576,8 @@ main{flex:1}
       const b = P['puntata' + i]
       const bordo = { x: b.x + (p.x - b.x) * 0.62, y: b.y + (p.y - b.y) * 0.62 }
       // la consolle: sulla fascia fra il cerchio della puntata e il bordo imbottito, davanti al proprio posto
-      const q = arco(852, ANG[i])
+      // appesa sotto il mio cerchio, davanti al mio posto, sulla fascia e sul bordo imbottito
+      const q = arco(828, ANG[i])
       const consolle = proiettaPianta(q.x, q.y)
       scena.posti[i] = { i, p: { x: p.x + cuscino, y: p.y }, prof, s, sedia, gruppo, bordo, consolle, corpo: null, braccia: null, F: null, chi: null, gesto: null }
     }
@@ -597,7 +602,7 @@ main{flex:1}
     if (!d) return
     const spalle = d.perni && d.perni.length >= 2 ? [d.perni[0], d.perni[1]] : [[d.w * 0.05, d.h * 0.92], [d.w * 0.95, d.h * 0.92]]
     const base = [d.w / 2, d.h]
-    const ox = Q.p.x - (base[0] - corpo._p[0]) * s, oy = Q.p.y - 24 * Q.prof - (base[1] - corpo._p[1]) * s
+    const ox = Q.p.x - (base[0] - corpo._p[0]) * s, oy = Q.p.y + 12 * Q.prof - (base[1] - corpo._p[1]) * s
     corpo.setAttribute('transform', `translate(${ox},${oy})`)
     const spalla = (k) => ({ x: ox + (spalle[k][0] - corpo._p[0]) * s, y: oy + (spalle[k][1] - corpo._p[1]) * s })
     const S = Math.abs(spalle[1][0] - spalle[0][0]) * s || 160
@@ -612,8 +617,10 @@ main{flex:1}
     const sin = braccio(Q.gruppo, 'braccia', { sup, inf, mani }, { ...mis, piega: 1 })
     const des = braccio(Q.gruppo, 'braccia', { sup, inf, mani }, { ...mis, piega: -1 })
     sin.base = spalla(0); des.base = spalla(1)
-    sin.riposo = { x: sin.base.x - 54 * Q.prof, y: Q.bordo.y + 34 }
-    des.riposo = { x: des.base.x + 54 * Q.prof, y: Q.bordo.y + 34 }
+    // ai posti di lato la mano esterna resta sul bordo, vicino alla spalla, non nel vuoto
+    const fuoriS = posto === 0 ? 8 : 54, fuoriD = posto === 4 ? 8 : 54
+    sin.riposo = { x: sin.base.x - fuoriS * Q.prof, y: Q.bordo.y + 34 }
+    des.riposo = { x: des.base.x + fuoriD * Q.prof, y: Q.bordo.y + 34 }
     salta(sin, sin.riposo.x, sin.riposo.y); salta(des, des.riposo.x, des.riposo.y)
     posaMano(sin, 'piatta'); posaMano(des, 'piatta')
     Q.corpo = corpo; Q.braccia = { sin, des }; Q.F = figura(corpoG, [sin, des]); Q.chi = id
@@ -748,7 +755,7 @@ main{flex:1}
     if (!scena.console) { scena.console = document.createElement('div'); scena.console.className = 'console'; el.targhe.appendChild(scena.console); scena.console.dataset.firma = '' }
     const con = scena.console
     // la consolle resta dentro la parte di mondo che si vede (in verticale il mondo sborda ai lati)
-    const mezzo = el.sala.clientWidth / K / 2 - 150
+    const mezzo = el.sala.clientWidth / K / 2 - 100
     con.style.left = clamp(Q.consolle.x, mondo.w / 2 - pan - mezzo, mondo.w / 2 - pan + mezzo) + 'px'; con.style.top = Q.consolle.y + 'px'
     const p = ilMio()
     const m = mioTurno() ? p.mani[st.turno.mano] : null
@@ -761,14 +768,14 @@ main{flex:1}
     let h = ''
     if (m) {
       const mosse = [['carta', 'c', true, 'p'], ['stai', 's', true, ''], ['raddoppia', 'r', puoR, ''], ['dividi', 'd', puoD, '']]
-      h += `<div class="fila">${mosse.map(([n, k, ok, cls]) => `<button class="tasto ${cls}" type="button" data-mossa="${n}" ${ok ? '' : 'disabled'}>${n}<span class="k">${k}</span></button>`).join('')}</div>`
+      h += `<div class="griglia">${mosse.map(([n, k, ok, cls]) => `<button class="tasto ${cls}" type="button" data-mossa="${n}" ${ok ? '' : 'disabled'}>${n}<span class="k">${k}</span></button>`).join('')}</div>`
     } else if (puntando && !p.puntata) {
       const max = Math.min(st.config.max, p.pzk)
-      h += `<div class="fila">${FICHE.map((v) => `<button class="fiche-tocco${ficheArt ? '' : ' css'}" type="button" data-fiche="${v}" ${scelta + v > max ? 'disabled' : ''} ${ficheArt ? `style="background-image:url(${ART}fiche/f${v}.webp)"` : ''} aria-label="fiche da ${v}">${ficheArt ? '' : v}</button>`).join('')}</div>`
+      h += `<div class="chips3">${FICHE.map((v) => `<button class="fiche-tocco${ficheArt ? '' : ' css'}" type="button" data-fiche="${v}" ${scelta + v > max ? 'disabled' : ''} ${ficheArt ? `style="background-image:url(${ART}fiche/f${v}.webp)"` : ''} aria-label="fiche da ${v}">${ficheArt ? '' : v}</button>`).join('')}</div>`
       h += '<div class="fila">'
-      if (scelta) h += `<button class="tasto p" type="button" data-punta="${scelta}">punta<span class="k n">${fmt(scelta)}</span></button><button class="tasto" type="button" data-azzera>azzera</button>`
-      else if (p.ultima && p.ultima <= p.pzk && p.ultima <= st.config.max) h += `<button class="tasto" type="button" data-punta="${p.ultima}">ripeti<span class="k n">${fmt(p.ultima)}</span></button>`
-      if (!p.salta && st.fase === 'puntate') h += `<button class="tasto" type="button" data-azione="salta">salto</button>`
+      if (scelta) h += `<button class="tasto s p" type="button" data-punta="${scelta}">punta<span class="k n">${fmt(scelta)}</span></button><button class="tasto s" type="button" data-azzera>azzera</button>`
+      else if (p.ultima && p.ultima <= p.pzk && p.ultima <= st.config.max) h += `<button class="tasto s" type="button" data-punta="${p.ultima}">ripeti<span class="k n">${fmt(p.ultima)}</span></button>`
+      if (!p.salta && st.fase === 'puntate') h += `<button class="tasto s" type="button" data-azione="salta">salto</button>`
       h += '</div>'
     } else if (puntando && p.puntata) h += `<div class="fila"><button class="tasto" type="button" data-punta="0">ritira</button></div>`
     con.innerHTML = h
