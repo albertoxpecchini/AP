@@ -36,9 +36,15 @@ const withPageCss = (html, href) => {
 // SITE=bcp costruisce il sito di bettercallpekko.it (progetto Vercel a parte, stesso
 // repository): solo le rotte di `bcpRoutes`, niente sitemap/robots generati (stanno
 // in public/bcp/), e di public/ solo ciò che quelle pagine usano.
-const BCP = process.env.SITE === 'bcp'
-// media/web: le catture dei siti veri (rifatte ogni ora dal bot) per la sezione Websites.
-const BCP_PUBLIC = ['media/assistenza', 'media/web', 'media/mascotte/lumaca.webp', 'media/mascotte/tartaruga.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png']
+// SITE=pzk fa lo stesso per pzkko.it (pagina autonoma: di public/ solo public/pzk/).
+// EXTERNAL: i siti col loro dominio, la cartella dei file da mettere alla radice e
+// le parti di public/ da copiare.
+const EXTERNAL = {
+  // media/web: le catture dei siti veri (rifatte ogni ora dal bot) per la sezione Websites.
+  bcp: { label: 'bettercallpekko.it', dir: 'bcp', public: ['media/assistenza', 'media/web', 'media/mascotte/lumaca.webp', 'media/mascotte/tartaruga.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'] },
+  pzk: { label: 'pzkko.it', dir: 'pzk', public: [] },
+}[process.env.SITE]
+const BCP = Boolean(EXTERNAL)
 
 export default function sitePages() {
   let config
@@ -155,8 +161,8 @@ export default function sitePages() {
       let thumbs = []
       if (BCP) {
         const pub = path.resolve(config.root, 'public')
-        for (const f of BCP_PUBLIC) await fs.cp(path.join(pub, f), path.join(outDir, f), { recursive: true })
-        for (const f of await fs.readdir(path.join(pub, 'bcp'))) await fs.copyFile(path.join(pub, 'bcp', f), path.join(outDir, f))
+        for (const f of EXTERNAL.public) await fs.cp(path.join(pub, f), path.join(outDir, f), { recursive: true })
+        for (const f of await fs.readdir(path.join(pub, EXTERNAL.dir))) await fs.copyFile(path.join(pub, EXTERNAL.dir, f), path.join(outDir, f))
       } else {
         thumbs = artFiles(await artCss())
         for (const file of thumbs) await write(file.path, file.body)
@@ -166,7 +172,7 @@ export default function sitePages() {
       // il manifest di Vite non serve online
       await fs.rm(path.join(outDir, '.vite'), { recursive: true, force: true })
 
-      config.logger.info(`\n  site-pages · ${count} pagine · ${thumbs.length} miniature · ${BCP ? 'bettercallpekko.it (SITE=bcp)' : 'sitemap.xml · robots.txt'}`)
+      config.logger.info(`\n  site-pages · ${count} pagine · ${thumbs.length} miniature · ${BCP ? `${EXTERNAL.label} (SITE=${process.env.SITE})` : 'sitemap.xml · robots.txt'}`)
       if (variants) config.logger.info(`  site-pages · immagini ridotte: ${variants.made} nuove, ${variants.cached} dalla cache`)
       const todo = BCP ? [] : placeholderReport()
       if (todo.length) {

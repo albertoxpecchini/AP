@@ -18,6 +18,8 @@ import { wrapped5btPage } from './pages/wrapped5bt.js'
 import { assistenzaPage, assistenzaContattiPage, assistenzaNotFoundPage } from './pages/assistenza.js'
 import { assistenza, BCP } from '../data/assistenza.js'
 import { informaticaPage, informaticaLd } from './pages/informatica.js'
+import { pzkkoPage, pzkkoNotFoundPage } from './pages/pzkko.js'
+import { pzkko, PZK } from '../data/pzkko.js'
 import { informatica } from '../data/informatica.js'
 import { tempoLiberoTodo } from '../data/tempo-libero.js'
 
@@ -247,8 +249,16 @@ export const bcpRoutes = [
   { path: '/404/', file: '404.html', is404: true, noindex: true, title: '404 — Better Call Pekko', description: 'Page not found. Better call Pekko.', render: assistenzaNotFoundPage, standalone: true },
 ]
 
+// ── pzkko.it ─────────────────────────────────────────────────────────────────
+// Secondo dominio esterno, stesso schema di bettercallpekko.it: progetto Vercel a
+// parte con SITE=pzk, solo queste pagine; robots.txt e sitemap.xml in public/pzk/.
+export const pzkRoutes = [
+  { path: '/', priority: 1, title: pzkko.titolo, description: pzkko.descrizione, render: pzkkoPage, standalone: true },
+  { path: '/404/', file: '404.html', is404: true, noindex: true, title: '404 — pzkko', description: 'Pagina non trovata.', render: pzkkoNotFoundPage, standalone: true },
+]
+
 /** Le rotte del sito che si sta costruendo o servendo. */
-export const activeRoutes = BCP ? bcpRoutes : routes
+export const activeRoutes = BCP ? bcpRoutes : PZK ? pzkRoutes : routes
 
 const normalize = (pathname) => {
   let p = pathname.replace(/index\.html$/, '')
