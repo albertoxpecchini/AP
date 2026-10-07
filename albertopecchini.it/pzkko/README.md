@@ -4,7 +4,12 @@ Il sito di **pzkko.it**: file statici, niente build. Sta nel repository del sito
 serio ma è un progetto Vercel a parte.
 
 - `index.html` — la home: i social come icone in un dock, poi le sezioni social,
-  tools e games (le ultime due per ora vuote). CSS e JS in linea, nessun file esterno.
+  tools (vuota) e games (il primo c'è). CSS e JS in linea, nessun file esterno.
+- `games/blackjack/` — il tavolo di blackjack (una stanza, il banco è un bot,
+  cinque posti,  al posto dei soldi, +18) e la sua pagina del banco in
+  `admin/`; la funzione sta in `../api/blackjack.js`, le regole in
+  `../src/blackjack/motore.js`, tutto spiegato in `../tools/blackjack/README.md`.
+  La grafica vera (tavolo e carte, da Claude Design) andrà in `art/`.
 - `404.html` — pagina non trovata
 - `favicon.svg`, `apple-touch-icon.png` — la «p» di pzkko su superellisse grafite
 - `og.png` — anteprima per i link condivisi (1200 × 630)
@@ -37,8 +42,9 @@ traslucidi, molle interrompibili), in chiaro e in scuro col tema del sistema.
 - Movimento solo in risposta: ingresso una volta, poi niente che giri da solo;
   `prefers-reduced-motion` e `prefers-reduced-transparency` rispettati.
 
-Quando arriva il primo strumento o gioco, gli si fa una pagina in questa
-cartella (es. `tools/nome/index.html`) e il riquadro vuoto diventa un'icona vera.
+Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
+`tools/nome/index.html`) e il suo riquadro vuoto nella home diventa un'icona
+vera, come è successo con `games/blackjack/`.
 
 ## Vercel
 

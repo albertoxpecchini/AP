@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-10-07T00:57:56.378Z",
         "reason": "Claude: falso positivo, il rilevatore legge 1.3vw dentro font-size:clamp() come line-height 1.30; i valori veri sono 1.47 corpo, 1.38 sottotitolo, 1-1.2 titoli per scelta"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "albertopecchini.it/pzkko/games/blackjack/index.html"
+        ],
+        "createdAt": "2026-10-07T17:01:34.703Z",
+        "reason": "Claude: i posti e il vassoio dei comandi sono zone del tavolo di feltro (la forma del gioco: un oggetto solo), non schede dentro schede"
       }
     ]
   }

@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>blackjack, il tavolo di pzkko</title>
+<meta name="description" content="Un tavolo di blackjack da browser: il banco è un bot, fino a cinque amici seduti insieme, in tempo reale, con i $pzk al posto dei soldi. Solo per maggiorenni, senza denaro reale.">
+<link rel="canonical" href="https://www.pzkko.it/games/blackjack/">
+<meta name="author" content="Alberto Pecchini">
+<link rel="author" href="https://www.albertopecchini.it">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="pzkko">
+<meta property="og:title" content="blackjack, il tavolo di pzkko">
+<meta property="og:description" content="Il banco è un bot, fino a cinque amici al tavolo, in tempo reale, con i $pzk al posto dei soldi. Solo per maggiorenni.">
+<meta property="og:url" content="https://www.pzkko.it/games/blackjack/">
+<meta property="og:image" content="https://www.pzkko.it/og.png">
+<meta property="og:locale" content="it_IT">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"blackjack, il tavolo di pzkko","url":"https://www.pzkko.it/games/blackjack/","inLanguage":"it","isPartOf":{"@type":"WebSite","name":"pzkko","url":"https://www.pzkko.it/"},"author":{"@type":"Person","name":"Alberto Pecchini","alternateName":"pzkko","url":"https://www.albertopecchini.it"}}</script>
+<style>
+/* ── tokens: quelli della home di pzkko.it, più il feltro del tavolo ───────── */
+:root{
+  --bg:#fff; --tile:#f5f5f7; --fg:#1d1d1f; --fg2:#6e6e73; --link:#0066cc;
+  --hair:rgba(0,0,0,.1); --nav:rgba(255,255,255,.72); --tip:rgba(255,255,255,.94);
+  --ok:#248a3d; --no:#d70015; --btn:#0066cc;
+  --fd:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ft:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --eo:cubic-bezier(.23,1,.32,1);
+  /* il tavolo: un colore solo, uguale col tema chiaro e scuro */
+  --felt1:#1b6847; --felt2:#0c3a29; --felt-rim:#092b1f;
+  --felt-fg:#fff; --felt-fg2:rgba(255,255,255,.78); --felt-line:rgba(255,255,255,.16);
+  --glass:rgba(255,255,255,.1); --glass-edge:rgba(255,255,255,.18);
+  --blue:#1a6fe0; --card:#fff; --ink:#1d1d1f; --red:#ff3b30; --chip:#2c2c2e;
+  --cw:46px; --dw:56px;   /* larghezza delle carte: ai posti, al banco */
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#000; --tile:#1d1d1f; --fg:#f5f5f7; --fg2:#a1a1a6; --link:#2997ff;
+    --hair:rgba(255,255,255,.14); --nav:rgba(0,0,0,.62); --tip:rgba(44,44,46,.96);
+    --ok:#30d158; --no:#ff6961; --btn:#1a6fe0;
+  }
+}
+@media (min-width:900px){:root{--cw:84px;--dw:100px}}
+
+/* ── base ───────────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-color:var(--fg2) transparent}
+body{margin:0;min-height:100svh;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font:400 17px/1.47 var(--ft);letter-spacing:-.01em;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(0,113,227,.28)}
+:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:10px}
+.tavolo :focus-visible{outline-color:#fff}
+h1,h2,h3,p,ul{margin:0}
+svg{display:block}
+button{font:inherit;color:inherit;letter-spacing:inherit}
+input{font:inherit}
+.n{font-variant-numeric:tabular-nums}
+.wrap{width:100%;max-width:1024px;margin:0 auto;padding:0 22px}
+main{flex:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── nav ───────────────────────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:10;height:48px;background:var(--nav);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}
+.nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font:600 17px/1 var(--fd);letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.brand span{font-weight:400;color:var(--fg2)}
+.saldo{font-size:13px;color:var(--fg2);display:flex;align-items:center;gap:6px;min-height:28px}
+.saldo b{font-weight:600;color:var(--fg)}
+@media (prefers-reduced-transparency:reduce){.nav{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* ── il tavolo: un oggetto solo che riempie il primo schermo ───────────────── */
+.gioco{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:8px 0 0}
+@media (min-width:1100px){.gioco{grid-template-columns:minmax(0,1fr) 300px;align-items:start}}
+.tavolo{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:12px;min-height:calc(100svh - 48px - 16px);padding:16px 14px 14px;border-radius:28px;color:var(--felt-fg);
+  background:radial-gradient(120% 90% at 50% 38%,var(--felt1) 0%,var(--felt2) 72%,var(--felt-rim) 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -30px rgba(0,0,0,.55);overflow:clip}
+@media (min-width:900px){.tavolo{min-height:640px;padding:22px 24px 20px}}
+@media (min-width:1100px){.tavolo{min-height:min(max(640px,calc(100svh - 72px)),720px)}}
+/* quando arriva il tavolo disegnato in Claude Design: il feltro è l'immagine, la scritta sta nell'immagine */
+.tavolo.art{background:url(art/tavolo.svg) center/cover no-repeat}
+@media (max-width:640px){.tavolo.art{background-image:url(art/tavolo-verticale.svg)}}
+.tavolo.art .scritta{visibility:hidden}
+
+.sabot{position:absolute;top:14px;right:16px;font-size:12px;color:var(--felt-fg2);display:flex;align-items:center;gap:6px}
+.sabot i{display:block;width:14px;height:18px;border-radius:3px;background:var(--card);box-shadow:-3px 0 0 -1px rgba(255,255,255,.7),-6px 0 0 -2px rgba(255,255,255,.45)}
+
+.banco{display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:4px;min-height:calc(var(--dw) * 1.4 + 52px)}
+.banco .chi{font-size:12px;color:var(--felt-fg2)}
+.banco .carte{--cw:var(--dw)}
+
+.scritta{text-align:center;font-size:12px;letter-spacing:.02em;color:var(--felt-fg2);padding:4px 0;margin:auto 0}
+.posti{margin-top:auto}
+.scritta b{font-weight:600;color:var(--felt-fg)}
+
+/* ── i posti: cinque in fila; sul telefono tre più due ─────────────────── */
+.posti{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;align-items:start}
+.posto{grid-column:span 2;position:relative;container-type:inline-size;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:calc(var(--cw) * 1.4 + 74px);padding:8px 6px 10px;border-radius:18px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--felt-line);transition:box-shadow .2s var(--eo),background .2s}
+.posto:nth-child(4){grid-column:2/4}
+.posto:nth-child(5){grid-column:4/6}
+@media (min-width:900px){.posti{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.posto,.posto:nth-child(4),.posto:nth-child(5){grid-column:auto}.posto{padding:12px 10px 12px;border-radius:22px}}
+.posto.mio{box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}
+.posto.turno{background:rgba(255,255,255,.17)}
+.posto.turno.mio{box-shadow:inset 0 0 0 2px #fff,0 0 0 4px rgba(255,255,255,.18)}
+.posto.off .nome{color:var(--felt-fg2)}
+.posto .chi{display:flex;flex-direction:column;align-items:center;line-height:1.2;max-width:100%}
+.nome{font:600 13px/1.2 var(--ft);letter-spacing:-.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.posto .pzk{font-size:11px;color:var(--felt-fg2)}
+.posto.libero{justify-content:center;background:transparent;box-shadow:inset 0 0 0 1px var(--felt-line)}
+.posto.libero span{font-size:12px;color:var(--felt-fg2)}
+.sit{height:44px;padding:0 14px;border:0;border-radius:999px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-edge);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:transform .12s var(--eo),background .15s}
+.sit:active{transform:scale(.96)}
+@media (hover:hover){.sit:hover{background:rgba(255,255,255,.18)}}
+.mani{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.mano{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;border-radius:12px;padding:2px 0}
+.mano.attiva .tot{box-shadow:0 0 0 2px #fff}
+.attesa-mano{font-size:12px;color:var(--felt-fg2);padding-top:6px}
+
+/* ── carte: bianche, indice negli angoli, seme al centro ────────────────── */
+.carte{display:flex;justify-content:center;min-height:calc(var(--cw) * 1.4)}
+.carta{position:relative;flex:none;width:var(--cw);height:calc(var(--cw) * 1.4);border-radius:calc(var(--cw) * .09);background:var(--card);color:var(--ink);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 3px 8px -2px rgba(0,0,0,.5),0 0 0 .5px rgba(0,0,0,.25);overflow:hidden}
+.carta.r{color:var(--red)}
+.carta+.carta{margin-left:calc(var(--cw) * -.64)}
+/* le carte si stringono col posto (container query) e si sovrappongono di più quando sono tante */
+.posto .carte{--cw:clamp(40px,46cqw,64px)}
+@media (min-width:900px){.posto .carte{--cw:clamp(52px,54cqw,84px)}.carte:has(> :nth-child(3)) .carta+.carta{margin-left:calc(var(--cw) * -.62)}.carte:has(> :nth-child(3)) .carta .ix{font-size:calc(var(--cw) * .26)}.carte:has(> :nth-child(4)) .carta+.carta{margin-left:calc(var(--cw) * -.7)}.carte:has(> :nth-child(4)) .carta .ix{font-size:calc(var(--cw) * .23);left:calc(var(--cw) * .05)}.carte:has(> :nth-child(4)) .carta .ix.b{left:auto;right:calc(var(--cw) * .05)}.carte:has(> :nth-child(5)) .carta+.carta{margin-left:calc(var(--cw) * -.76)}}
+.carte:has(> :nth-child(5)) .carta+.carta{margin-left:calc(var(--cw) * -.74)}
+.carte:has(> :nth-child(7)) .carta+.carta{margin-left:calc(var(--cw) * -.8)}
+.carta .ix{position:absolute;top:calc(var(--cw) * .07);left:calc(var(--cw) * .09);display:flex;flex-direction:column;align-items:center;gap:1px;font:700 calc(var(--cw) * .3)/1 var(--fd);letter-spacing:-.04em}
+.carta .ix svg{width:calc(var(--cw) * .2);height:calc(var(--cw) * .2);fill:currentColor}
+.carta .ix.b{top:auto;left:auto;bottom:calc(var(--cw) * .07);right:calc(var(--cw) * .09);transform:rotate(180deg)}
+.carta .pip{position:absolute;inset:0;display:grid;place-items:center}
+.carta .pip svg{width:calc(var(--cw) * .42);height:calc(var(--cw) * .42);fill:currentColor}
+.carta.img{background:var(--card) center/cover no-repeat}
+.carta.img>*{display:none}
+.carta.in{animation:dealt .55s var(--eo) both;animation-timing-function:linear(0,.186 9.1%,.465 18.2%,.682 27.3%,.821 36.4%,.903 45.5%,.949 54.5%,.973 63.6%,.986 72.7%,.993 81.8%,.997 90.9%,1)}
+@keyframes dealt{from{opacity:0;transform:translate(var(--dx,calc(var(--cw) * 1.2)),var(--dy,calc(var(--cw) * -1.4))) rotate(6deg)}}
+@media (prefers-reduced-motion:reduce){.carta.in{animation:none}}
+
+.tot{font:600 12px/1 var(--ft);padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.32);color:#fff;letter-spacing:0}
+.tot.bj{background:#fff;color:var(--ink)}
+.tot.sballa{background:var(--red)}
+.tot.vince{background:#fff;color:var(--ink)}
+.tot.pari{background:rgba(255,255,255,.22)}
+.tot.perde{background:rgba(0,0,0,.32);color:var(--felt-fg2)}
+.fiche{display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 5px;border-radius:999px;background:var(--chip);color:#fff;font:600 11px/1 var(--ft);letter-spacing:0;box-shadow:0 0 0 2px var(--chip),0 0 0 3.5px rgba(255,255,255,.75) inset,0 3px 6px -1px rgba(0,0,0,.6);border:2px dashed rgba(255,255,255,.85)}
+.fiche.img{background:center/contain no-repeat;border:0;box-shadow:none;color:transparent}
+
+/* ── il vassoio dei comandi: vetro, come il dock della home ────────────── */
+.tray{position:relative;margin-top:4px;padding:14px 14px 12px;border-radius:22px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-edge),inset 0 1px 0 rgba(255,255,255,.12);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);display:flex;flex-direction:column;gap:10px}
+@media (prefers-reduced-transparency:reduce){.tray{background:rgba(0,0,0,.35);-webkit-backdrop-filter:none;backdrop-filter:none}}
+.timer{position:absolute;top:0;left:18px;right:18px;height:2px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;opacity:0;transition:opacity .2s}
+.timer.on{opacity:1}
+.timer i{display:block;height:100%;background:#fff;transform-origin:left center;transform:scaleX(1)}
+.riga{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:22px;font-size:15px}
+.riga .conto{font-size:13px;color:var(--felt-fg2);flex:none}
+.riga b{font-weight:600}
+.riga .grande{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.grande .pos{color:#fff}
+.grande .neg{color:#ff8a80}
+.grande .zero{color:var(--felt-fg2)}
+.tasti{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+@media (max-width:480px){.tasti.mosse{display:grid;grid-template-columns:1fr 1fr}.tasti.mosse .b{padding:0 10px}}
+.b{height:44px;padding:0 18px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:#fff;font:600 15px/1 var(--ft);letter-spacing:-.01em;cursor:pointer;transition:transform .12s var(--eo),background .15s,opacity .15s;white-space:nowrap}
+.b.p{background:var(--blue);box-shadow:none}
+.b.t{background:transparent;box-shadow:none;color:var(--felt-fg2);padding:0 10px}
+.b:disabled{opacity:.4;cursor:default}
+.b:not(:disabled):active{transform:scale(.96)}
+@media (hover:hover){.b:not(:disabled):not(.p):hover{background:rgba(255,255,255,.22)}.b.t:not(:disabled):hover{background:transparent;color:#fff}.b.p:not(:disabled):hover{filter:brightness(1.08)}}
+.b .k{display:none;margin-left:8px;font-size:11px;font-weight:400;opacity:.7}
+@media (hover:hover) and (pointer:fine){.b .k{display:inline}}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.ch{width:44px;height:44px;padding:0;border:2px dashed rgba(255,255,255,.85);border-radius:50%;background:var(--chip);box-shadow:0 0 0 2px var(--chip),0 3px 6px -1px rgba(0,0,0,.6);color:#fff;font:600 13px/1 var(--ft);cursor:pointer;transition:transform .12s var(--eo),opacity .15s}
+.ch:disabled{opacity:.35;cursor:default}
+.ch:not(:disabled):active{transform:scale(.92)}
+.campo{display:flex;gap:8px;flex-wrap:wrap}
+.campo input{flex:1 1 160px;min-width:0;height:44px;padding:0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);color:#fff;font-size:16px;letter-spacing:-.01em;text-transform:none}
+.campo input::placeholder{color:var(--felt-fg2)}
+.campo input:focus{outline:2px solid #fff;outline-offset:2px}
+.toast{font-size:13px;color:#fff;background:rgba(0,0,0,.4);padding:8px 12px;border-radius:12px;display:none}
+.toast.on{display:block}
+
+/* ── accanto e sotto: chi c'è, cosa succede, le ultime mani, le regole ─── */
+.lato{display:flex;flex-direction:column;gap:16px}
+.scheda{padding:22px 22px 20px;border-radius:28px;background:var(--tile)}
+.scheda h2{font:600 20px/1.2 var(--fd);letter-spacing:-.02em;margin-bottom:12px}
+.lista{list-style:none;padding:0;font-size:15px}
+.lista li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--hair)}
+.lista li:first-child{border-top:0}
+.lista .chi{display:flex;align-items:center;gap:8px;min-width:0}
+.lista .chi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lista .io{color:var(--fg2);font-size:13px}
+.punto{width:8px;height:8px;border-radius:50%;background:var(--hair);flex:none}
+.punto.on{background:var(--ok)}
+.lista .val{color:var(--fg2);flex:none}
+.eventi{list-style:none;padding:0;font-size:14px;color:var(--fg2);display:flex;flex-direction:column;gap:6px}
+.eventi li{display:flex;gap:10px}
+.eventi time{flex:none;font-size:12px;padding-top:2px}
+.eventi li:first-child{color:var(--fg)}
+.vuoto{color:var(--fg2);font-size:15px}
+.sotto{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:16px 0 0}
+.mani-tab{width:100%;border-collapse:collapse;font-size:14px}
+.mani-tab td{padding:7px 0;border-top:1px solid var(--hair);vertical-align:top}
+.mani-tab tr:first-child td{border-top:0}
+.mani-tab td:first-child{color:var(--fg2);width:4.5em}
+.mani-tab .pos{color:var(--ok)}
+.mani-tab .neg{color:var(--no)}
+.regole{list-style:none;padding:0;font-size:15px;color:var(--fg2);display:flex;flex-direction:column;gap:6px}
+.regole li{padding-left:14px;position:relative}
+.regole li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--fg2)}
+.nota{font-size:14px;color:var(--fg2)}
+.nota b{color:var(--fg);font-weight:600}
+
+/* ── piè di pagina ───────────────────────────────────────────────────────── */
+.foot{border-top:1px solid var(--hair);margin-top:48px;padding:22px 0 max(22px,env(safe-area-inset-bottom));font-size:12px;color:var(--fg2)}
+.foot .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px 16px;flex-wrap:wrap}
+@media (hover:hover){.foot a:hover{color:var(--fg)}}
+
+/* ── velo: il messaggio per i maggiorenni, una volta sola ─────────────────── */
+.velo{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:16px;background:var(--nav);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6)}
+.velo.on{display:grid}
+.box{width:100%;max-width:440px;padding:28px;border-radius:28px;background:var(--tile);box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+.box h2{font:600 28px/1.1 var(--fd);letter-spacing:-.02em}
+.box p{margin-top:12px;color:var(--fg2)}
+.box .tasti{margin-top:22px}
+.box .b{background:var(--btn);color:#fff;box-shadow:none}
+.box .b.t{background:transparent;color:var(--fg2);padding:0}
+.box .b.t:hover{color:var(--fg)}
+
+@media (prefers-reduced-motion:no-preference){
+  .tavolo{animation:materialize .7s var(--eo) both}
+  .lato,.sotto{animation:rise .6s var(--eo) both;animation-delay:80ms}
+}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+@keyframes materialize{from{opacity:0;transform:translateY(14px) scale(.985)}}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .tavolo{padding:14px 10px 10px;border-radius:24px;gap:10px}
+  .posti{gap:6px}
+  .posto{padding:8px 4px 8px;border-radius:16px}
+  /* se una divisione allunga i posti oltre lo schermo, i comandi restano in vista (overflow:clip sul tavolo non blocca lo sticky) */
+  .tray{position:sticky;bottom:8px;z-index:2;padding:12px 12px 10px;border-radius:20px}
+  .scheda{padding:20px 18px 18px;border-radius:24px}
+  .sotto{padding-top:16px}
+  .foot{margin-top:32px}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/">pzkko <span>blackjack</span></a>
+    <div class="saldo n" id="saldo" aria-live="polite"></div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap gioco">
+    <section class="tavolo" id="tavolo" aria-label="il tavolo">
+      <div class="sabot n" id="sabot" aria-hidden="true"><i></i><span></span></div>
+      <div class="banco" id="banco">
+        <span class="chi">banco</span>
+        <div class="carte" id="banco-carte"></div>
+        <span class="tot" id="banco-tot" hidden></span>
+      </div>
+      <p class="scritta"><b>blackjack</b> paga 3 a 2 · il banco sta a 17 · <b>pzkko</b></p>
+      <div class="posti" id="posti" aria-label="i posti"></div>
+      <div class="tray" id="tray">
+        <div class="timer" id="timer"><i></i></div>
+        <div class="riga" id="riga"><span>carico il tavolo…</span></div>
+        <div class="tasti" id="tasti"></div>
+        <p class="toast n" id="toast" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <aside class="lato">
+      <section class="scheda" aria-labelledby="h-chi">
+        <h2 id="h-chi">al tavolo</h2>
+        <ul class="lista n" id="chi"></ul>
+      </section>
+      <section class="scheda" aria-labelledby="h-ev">
+        <h2 id="h-ev">cosa succede</h2>
+        <ul class="eventi n" id="eventi"></ul>
+      </section>
+    </aside>
+  </div>
+
+  <div class="wrap sotto">
+    <section class="scheda" aria-labelledby="h-st">
+      <h2 id="h-st">ultime mani</h2>
+      <div id="storico"></div>
+    </section>
+    <section class="scheda" aria-labelledby="h-re">
+      <h2 id="h-re">le regole del tavolo</h2>
+      <ul class="regole">
+        <li>sabot da sei mazzi, rimescolato quando resta un quarto delle carte.</li>
+        <li>il banco prende una carta scoperta e pesca le altre dopo di te; si ferma a 17, anche morbido. niente assicurazione.</li>
+        <li>blackjack paga 3 a 2; le altre vincite alla pari; in parità riprendi la puntata.</li>
+        <li>raddoppi su qualsiasi coppia di carte iniziale: una carta sola, poi stai. dividi una coppia una volta; gli assi divisi ricevono una carta sola.</li>
+        <li>venti secondi per puntare e venti per ogni decisione: chi non risponde sta; due volte di seguito e si alza dal tavolo.</li>
+        <li>cinque posti; gli altri guardano e si siedono appena si libera un posto.</li>
+      </ul>
+      <p class="nota" style="margin-top:14px"><b>solo per maggiorenni.</b> nessun denaro reale: i $pzk sono gettoni senza alcun valore, non si comprano e non si incassano. li distribuisce pzkko, a sua discrezione.</p>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a href="https://www.albertopecchini.it" rel="author">sito di alberto pecchini</a>
+    <a href="/#games">tutti i giochi</a>
+    <span>pzkko.it</span>
+  </div>
+</footer>
+
+<div class="velo" id="velo" role="dialog" aria-modal="true" aria-labelledby="velo-h">
+  <div class="box">
+    <h2 id="velo-h">solo per maggiorenni.</h2>
+    <p>questo tavolo di blackjack è riservato a chi ha almeno 18 anni.</p>
+    <p>qui non si gioca con soldi veri: i $pzk sono gettoni senza alcun valore, non si comprano, non si vendono e non si incassano. li distribuisce pzkko agli amici al tavolo, a sua discrezione.</p>
+    <div class="tasti">
+      <button class="b" id="velo-ok" type="button">ho più di 18 anni, entro</button>
+      <a class="b t" href="/">torno alla home</a>
+    </div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="s-c" d="M12 21.2s-7.4-4.6-9.5-9.2C.9 8.6 3.1 5 6.6 5c2.3 0 3.9 1.3 5.4 3 1.5-1.7 3.1-3 5.4-3 3.5 0 5.7 3.6 4.1 7-2.1 4.6-9.5 9.2-9.5 9.2z"/>
+    <path id="s-q" d="M12 2.2l7.4 9.8-7.4 9.8-7.4-9.8z"/>
+    <path id="s-f" d="M12 2.6a3.7 3.7 0 0 0-3.3 5.4 3.7 3.7 0 1 0 1.6 6.9c.5-.1 1-.4 1.3-.7l-1.4 6.6h3.6L12.4 14.2c.3.3.8.6 1.3.7a3.7 3.7 0 1 0 1.6-6.9A3.7 3.7 0 0 0 12 2.6z"/>
+    <path id="s-p" d="M12 2.4C9.1 7.1 4.2 9.6 4.2 14a4 4 0 0 0 6.5 3.1L9.9 21.4h4.2l-.8-4.3A4 4 0 0 0 19.8 14c0-4.4-4.9-6.9-7.8-11.6z"/>
+  </defs>
+</svg>
+
+<script>
+(() => {
+  'use strict'
+  // ── impostazioni ───────────────────────────────────────────────────────────
+  const API = '/api/blackjack/'
+  // quando arriva la grafica disegnata in Claude Design (cartella art/), basta accendere queste
+  const ART = { tavolo: false, carte: false, fiche: false }
+  const SEMI = { c: 'cuori', q: 'quadri', f: 'fiori', p: 'picche' }
+  const ROSSI = { c: 1, q: 1 }
+  const FICHE = [5, 10, 25, 50, 100]
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)')
+
+  const $ = (id) => document.getElementById(id)
+  const el = { saldo: $('saldo'), tavolo: $('tavolo'), sabot: $('sabot'), bancoCarte: $('banco-carte'), bancoTot: $('banco-tot'), posti: $('posti'), riga: $('riga'), tasti: $('tasti'), timer: $('timer'), toast: $('toast'), chi: $('chi'), eventi: $('eventi'), storico: $('storico'), velo: $('velo') }
+  const fmt = (n) => Math.trunc(Number(n) || 0).toLocaleString('it-IT')
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+  const ora = (t) => new Date(t).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+
+  // ── memoria locale: la maggiore età, il proprio codice ─────────────────────
+  const mem = {
+    get(k) { try { return localStorage.getItem(k) } catch { return null } },
+    set(k, v) { try { localStorage.setItem(k, v) } catch {} },
+    del(k) { try { localStorage.removeItem(k) } catch {} },
+  }
+  let io = null
+  try { io = JSON.parse(mem.get('bj-io') || 'null') } catch {}
+  if (io && !/^[a-z0-9]{24}$/.test(io.tok || '')) io = null
+
+  // ── stato e orologio del server ────────────────────────────────────────────
+  let st = null // l'ultima vista pubblica
+  let offset = 0 // orologio del server − orologio di qui
+  let sincronizzato = false
+  let scelta = 0 // la puntata che sto componendo con le fiche
+  let codiceMode = false
+  let pollTimer = 0
+  let chiuso = null
+  const now = () => Date.now() + offset
+  if (ART.tavolo) el.tavolo.classList.add('art')
+
+  async function chiama(body) {
+    const t0 = Date.now()
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    const j = await r.json().catch(() => ({ ok: false, error: 'risposta non valida' }))
+    if (typeof j.now === 'number') {
+      const rtt = Date.now() - t0
+      // l'orologio del server, al netto del viaggio: si tiene la stima col viaggio più corto
+      const stima = j.now + rtt / 2 - Date.now()
+      if (!sincronizzato || rtt < 400) { offset = sincronizzato ? offset * 0.5 + stima * 0.5 : stima; sincronizzato = true }
+    }
+    return j
+  }
+
+  async function azione(body, { silenzioso } = {}) {
+    try {
+      const j = await chiama({ ...body, ...(io ? { tok: io.tok } : {}) })
+      if (j.io) { io = { ...io, ...j.io, tok: j.io.tok || io.tok }; mem.set('bj-io', JSON.stringify(io)) }
+      if (j.fase) prendi(j)
+      if (!j.ok) { if (!silenzioso) toast(j.error || 'qualcosa non va'); if (j.chiuso) chiuso = j.error }
+      return j
+    } catch {
+      if (!silenzioso) toast('non riesco a parlare col tavolo: controlla la rete')
+      return { ok: false }
+    }
+  }
+
+  async function poll() {
+    clearTimeout(pollTimer)
+    try {
+      const r = await fetch(API, { headers: { accept: 'application/json' }, cache: 'no-store' })
+      const j = await r.json()
+      if (j.ok) { chiuso = null; prendi(j) } else if (j.chiuso) { chiuso = j.error; render() }
+    } catch {}
+    const attivo = st && st.fase !== 'attesa' && st.fase !== 'puntate'
+    let fra = document.hidden ? 4000 : !st || st.fase === 'attesa' ? 3000 : st.fase === 'puntate' ? 1200 : 800
+    if (st && st.fine !== null) fra = Math.max(250, Math.min(fra, st.fine - now() + 180))
+    if (attivo) fra = Math.min(fra, 800)
+    pollTimer = setTimeout(poll, fra)
+  }
+
+  function prendi(j) {
+    const prima = st
+    st = j
+    if (io) {
+      const me = st.giocatori.find((g) => g.id === io.id)
+      if (me) { io.pzk = me.pzk; io.posto = me.posto; mem.set('bj-io', JSON.stringify(io)) }
+    }
+    // appena tocca a me: titolo e un colpetto, se il telefono lo fa
+    const mioTurno = mioPosto() !== null && st.fase === 'turno' && st.turno && st.turno.posto === mioPosto()
+    const primaTurno = prima && mioPosto() !== null && prima.fase === 'turno' && prima.turno && prima.turno.posto === mioPosto()
+    if (mioTurno && !primaTurno) { try { navigator.vibrate && navigator.vibrate(40) } catch {} }
+    document.title = mioTurno ? 'tocca a te · blackjack' : 'blackjack, il tavolo di pzkko'
+    render()
+  }
+
+  // ── chi sono al tavolo ─────────────────────────────────────────────────────
+  const mioPosto = () => (io && st ? st.posti.findIndex((p) => p && p.id === io.id) : -1) >= 0 ? st.posti.findIndex((p) => p && p.id === io.id) : null
+  const seduto = () => mioPosto() !== null
+  const ilMio = () => (seduto() ? st.posti[mioPosto()] : null)
+  const libero = () => (st ? st.posti.findIndex((p) => !p) : -1)
+
+  // ── carte ──────────────────────────────────────────────────────────────────
+  const rango = (c) => c.slice(0, -1)
+  const seme = (c) => c.slice(-1)
+  const valore = (carte) => {
+    let tot = 0, assi = 0
+    for (const { c } of carte) { const r = rango(c); if (r === 'A') { assi++; tot += 11 } else if (r === 'J' || r === 'Q' || r === 'K' || r === '10') tot += 10; else tot += Number(r) }
+    while (tot > 21 && assi) { tot -= 10; assi-- }
+    return tot
+  }
+  const valCarta = (c) => valore([{ c }])
+  const viste = (carte) => carte.filter((c) => c.t <= now())
+  const nomeCarta = (c) => `${({ A: 'asso', J: 'fante', Q: 'donna', K: 're' })[rango(c)] || rango(c)} di ${SEMI[seme(c)]}`
+
+  function htmlCarta(c, nuova) {
+    const r = rango(c.c), s = seme(c.c)
+    const cls = `carta${ROSSI[s] ? ' r' : ''}${nuova ? ' in' : ''}${ART.carte ? ' img' : ''}`
+    const stile = ART.carte ? ` style="background-image:url(art/carte/${c.c}.svg)"` : ''
+    const ix = `<span class="ix">${r}<svg viewBox="0 0 24 24"><use href="#s-${s}"/></svg></span>`
+    return `<span class="${cls}"${stile} role="img" aria-label="${nomeCarta(c.c)}" data-c="${c.c}">${ix}<span class="pip"><svg viewBox="0 0 24 24"><use href="#s-${s}"/></svg></span>${ix.replace('class="ix"', 'class="ix b"')}</span>`
+  }
+
+  /** Aggiorna un contenitore di carte senza ridisegnare quelle già in tavola (così l'ingresso si anima una volta sola). */
+  function mettiCarte(cont, carte) {
+    const v = viste(carte)
+    let da = cont.querySelectorAll('.carta').length
+    if (da > v.length) {
+      cont.innerHTML = ''
+      da = 0
+    }
+    for (let i = da; i < v.length; i++) {
+      cont.insertAdjacentHTML('beforeend', htmlCarta(v[i], animaCarte))
+      if (animaCarte && !reduce.matches) {
+        // la carta parte dal sabot, in alto a destra, e si posa con la molla
+        const c = cont.lastElementChild
+        const a = el.sabot.getBoundingClientRect()
+        const b = c.getBoundingClientRect()
+        c.style.setProperty('--dx', `${Math.round(a.left - b.left)}px`)
+        c.style.setProperty('--dy', `${Math.round(a.top - b.top)}px`)
+      }
+    }
+    return v
+  }
+
+  // ── il tavolo ──────────────────────────────────────────────────────────────
+  function badgeMano(m, carteViste, inEsito) {
+    if (inEsito && m.esito) {
+      if (m.esito === 'bj') return `<span class="tot bj n">blackjack +${fmt(m.delta)}</span>`
+      if (m.esito === 'vince') return `<span class="tot vince n">+${fmt(m.delta)}</span>`
+      if (m.esito === 'pari') return `<span class="tot pari n">pari</span>`
+      return `<span class="tot perde n">${m.stato === 'sballata' ? 'sballa ' : ''}−${fmt(-m.delta)}</span>`
+    }
+    if (!carteViste.length) return ''
+    const t = valore(carteViste)
+    if (m.stato === 'bj' && carteViste.length === 2) return '<span class="tot bj">blackjack</span>'
+    if (t > 21) return `<span class="tot sballa n">sballa ${t}</span>`
+    return `<span class="tot n">${t}${m.stato === 'raddoppiata' && carteViste.length === m.carte.length ? ' · raddoppio' : ''}</span>`
+  }
+
+  const firmaPosto = (p, i) => {
+    if (!p) return `L${io ? 1 : 0}${seduto() ? 1 : 0}`
+    return JSON.stringify([p.id, p.nome, p.pzk, p.online, p.puntata, p.salta, p.via, st.fase, st.turno && st.turno.posto === i ? st.turno.mano : -1, p.mani.map((m) => [viste(m.carte).length, m.stato, m.esito, m.puntata, m.delta])])
+  }
+
+  function renderPosti() {
+    const inEsito = st.fase === 'esito'
+    st.posti.forEach((p, i) => {
+      let box = el.posti.children[i]
+      if (!box) { box = document.createElement('div'); el.posti.appendChild(box) }
+      const firma = firmaPosto(p, i)
+      if (box.dataset.firma === firma) {
+        if (p) p.mani.forEach((m, j) => { const c = box.querySelector(`[data-mano="${j}"] .carte`); if (c) mettiCarte(c, m.carte) })
+        return
+      }
+      box.dataset.firma = firma
+      if (!p) {
+        box.className = 'posto libero'
+        const puo = io && !seduto()
+        box.innerHTML = puo ? `<button class="sit" type="button" data-siedi="${i}">posto libero</button>` : '<span>libero</span>'
+        return
+      }
+      const mio = io && p.id === io.id
+      const turno = st.fase === 'turno' && st.turno && st.turno.posto === i
+      box.className = `posto${mio ? ' mio' : ''}${turno ? ' turno' : ''}${p.online ? '' : ' off'}`
+      let dentro = ''
+      if (p.mani.length) {
+        dentro = p.mani.map((m, j) => {
+          const attiva = turno && st.turno.mano === j
+          return `<div class="mano${attiva ? ' attiva' : ''}" data-mano="${j}"><div class="carte"></div><span class="badge"></span><div class="sotto-mano"><span class="fiche n${ART.fiche ? ' img' : ''}"${ART.fiche ? ` style="background-image:url(art/fiche-${m.puntata}.svg)"` : ''}>${fmt(m.puntata)}</span></div></div>`
+        }).join('')
+      } else if (p.puntata) dentro = `<div class="attesa-mano"><span class="fiche n${ART.fiche ? ' img' : ''}"${ART.fiche ? ` style="background-image:url(art/fiche-${p.puntata}.svg)"` : ''}>${fmt(p.puntata)}</span></div>`
+      else dentro = `<div class="attesa-mano">${p.salta ? 'salta la mano' : st.fase === 'attesa' || st.fase === 'puntate' ? 'ci pensa…' : 'guarda'}</div>`
+      box.innerHTML = `<div class="chi"><span class="nome">${esc(p.nome)}${mio ? ' (tu)' : ''}</span><span class="pzk n">${fmt(p.pzk)} $pzk</span></div><div class="mani">${dentro}</div>`
+      p.mani.forEach((m, j) => {
+        const mano = box.querySelector(`[data-mano="${j}"]`)
+        const v = mettiCarte(mano.querySelector('.carte'), m.carte)
+        mano.querySelector('.badge').outerHTML = badgeMano(m, v, inEsito)
+      })
+    })
+    while (el.posti.children.length > st.posti.length) el.posti.lastChild.remove()
+  }
+
+  function renderBanco() {
+    const v = mettiCarte(el.bancoCarte, st.banco.carte)
+    el.bancoTot.hidden = !v.length
+    if (v.length) {
+      const t = valore(v)
+      const tutte = v.length === st.banco.carte.length
+      const bj = tutte && st.banco.carte.length === 2 && t === 21 && (st.fase === 'esito' || st.fase === 'banco')
+      el.bancoTot.className = `tot n${t > 21 ? ' sballa' : bj ? ' bj' : ''}`
+      el.bancoTot.textContent = t > 21 ? `sballa ${t}` : bj ? 'blackjack' : String(t)
+    }
+    el.sabot.querySelector('span').textContent = `${st.sabot.carte} carte`
+  }
+
+  // ── il vassoio: i comandi della fase ───────────────────────────────────────
+  const tasto = (testo, attr = '', cls = '', tastoK = '') => `<button class="b ${cls}" type="button" ${attr}>${testo}${tastoK ? `<span class="k">${tastoK}</span>` : ''}</button>`
+  const chipsHtml = () => {
+    const p = ilMio()
+    const max = Math.min(st.config.max, p ? p.pzk : 0)
+    return `<div class="chips" aria-label="fiche">${FICHE.map((f) => `<button class="ch n" type="button" data-fiche="${f}" ${scelta + f > max ? 'disabled' : ''}>${f}</button>`).join('')}</div>`
+  }
+
+  function renderTray() {
+    let riga = '', tasti = ''
+    const resta = st.fine !== null ? Math.max(0, Math.ceil((st.fine - now()) / 1000)) : null
+    const conto = resta !== null ? `<span class="conto n">${resta} s</span>` : ''
+    if (chiuso) {
+      riga = `<span>il tavolo è chiuso</span>`
+      tasti = `<span class="toast on">${esc(chiuso)}</span>`
+    } else if (!io) {
+      riga = `<span>${codiceMode ? 'hai già giocato? entra col tuo codice' : 'come ti chiami?'}</span>`
+      tasti = codiceMode
+        ? `<form class="campo" id="f-codice"><input name="tok" placeholder="il codice che ti ha dato pzkko" autocomplete="off" spellcheck="false" maxlength="24" required inputmode="text"><button class="b p" type="submit">entra</button><button class="b t" type="button" data-codice="0">ho un nome nuovo</button></form>`
+        : `<form class="campo" id="f-nome"><input name="nome" placeholder="il tuo nome" autocomplete="nickname" maxlength="14" required><button class="b p" type="submit">entra al tavolo</button><button class="b t" type="button" data-codice="1">ho un codice</button></form>`
+    } else if (!seduto()) {
+      const l = libero()
+      riga = `<span>ciao <b>${esc(io.nome)}</b>, ${l >= 0 ? 'c’è un posto per te' : 'il tavolo è pieno: si libera un posto e ti siedi'}</span>`
+      tasti = l >= 0 ? tasto('siediti', 'data-azione="siedi"', 'p') : ''
+      tasti += tasto('esci', 'data-azione="esci"', 't')
+    } else {
+      const p = ilMio()
+      const mioTurno = st.fase === 'turno' && st.turno && st.turno.posto === mioPosto()
+      if (st.fase === 'attesa' || st.fase === 'puntate') {
+        if (p.pzk < st.config.min && !p.puntata) {
+          riga = `<span>non hai $pzk: chiedili a pzkko</span>`
+          tasti = tasto('alzati', 'data-azione="alzati"', 't')
+        } else if (p.puntata) {
+          riga = `<span>hai puntato <b class="n">${fmt(p.puntata)} $pzk</b>${st.fase === 'puntate' ? ', si parte tra poco' : ''}</span>${conto}`
+          tasti = tasto('cambia', 'data-azione="cambia"') + tasto('ritira', 'data-punta="0"', 't')
+        } else {
+          riga = `<span>${st.fase === 'attesa' ? 'punta per aprire il tavolo' : p.salta ? 'salti questa mano' : 'puntate aperte'}${scelta ? `: <b class="n">${fmt(scelta)} $pzk</b>` : ''}</span>${conto}`
+          tasti = chipsHtml()
+          tasti += tasto(scelta ? `punta ${fmt(scelta)}` : 'punta', `data-punta="${scelta}" ${scelta ? '' : 'disabled'}`, 'p')
+          if (scelta) tasti += tasto('azzera', 'data-azzera', 't')
+          else if (p.ultima && p.ultima <= p.pzk && p.ultima <= st.config.max) tasti += tasto(`ripeti ${fmt(p.ultima)}`, `data-punta="${p.ultima}"`)
+          if (!p.salta && st.fase === 'puntate') tasti += tasto('salto', 'data-azione="salta"', 't')
+          tasti += tasto('alzati', 'data-azione="alzati"', 't')
+        }
+      } else if (st.fase === 'distribuzione') {
+        riga = `<span>${p.mani.length ? 'si distribuisce' : 'guardi questa mano'}</span>`
+      } else if (st.fase === 'turno') {
+        const chiTocca = st.posti[st.turno.posto]
+        if (mioTurno) {
+          const m = p.mani[st.turno.mano]
+          const due = m.carte.length === 2
+          const raddoppia = due && p.pzk >= m.puntata
+          const dividi = due && p.mani.length === 1 && p.pzk >= m.puntata && valCarta(m.carte[0].c) === valCarta(m.carte[1].c)
+          riga = `<span><b>tocca a te</b>${p.mani.length > 1 ? ` · mano ${st.turno.mano + 1}` : ''} · hai ${valore(viste(m.carte))}</span>${conto}`
+          tasti = tasto('carta', 'data-mossa="carta"', 'p', 'c') + tasto('stai', 'data-mossa="stai"', '', 's') + tasto('raddoppia', `data-mossa="raddoppia" ${raddoppia ? '' : 'disabled'}`, '', 'r') + tasto('dividi', `data-mossa="dividi" ${dividi ? '' : 'disabled'}`, '', 'd')
+        } else {
+          riga = `<span>tocca a <b>${esc(chiTocca ? chiTocca.nome : '?')}</b></span>${conto}`
+        }
+      } else if (st.fase === 'banco') {
+        riga = `<span>il banco gioca</span>`
+      } else if (st.fase === 'esito') {
+        const mie = p.mani
+        const netto = mie.reduce((s, m) => s + (m.delta || 0), 0)
+        const testo = !mie.length ? 'mano finita' : mie.some((m) => m.esito === 'bj') ? `blackjack! <b class="pos n">+${fmt(netto)} $pzk</b>` : netto > 0 ? `hai vinto <b class="pos n">${fmt(netto)} $pzk</b>` : netto < 0 ? `hai perso <b class="neg n">${fmt(-netto)} $pzk</b>` : '<b class="zero">pari</b>: riprendi la puntata'
+        riga = `<span class="grande">${testo}</span>`
+        tasti = `<span class="conto n">prossima tra ${resta} s</span>` + (p.via ? '<span class="conto">ti alzi a fine mano</span>' : tasto('mi alzo a fine mano', 'data-azione="alzati"', 't'))
+      }
+      if (!tasti && st.fase !== 'attesa' && st.fase !== 'puntate' && !p.via) tasti = tasto('mi alzo a fine mano', 'data-azione="alzati"', 't')
+    }
+    const firma = riga + '|' + tasti
+    if (el.tray.dataset.firma !== firma) {
+      const attivo = document.activeElement
+      const nomeCampo = attivo && attivo.name
+      const valoreCampo = attivo && attivo.value
+      el.tray.dataset.firma = firma
+      el.riga.innerHTML = riga
+      el.tasti.innerHTML = tasti
+      el.tasti.classList.toggle('mosse', tasti.includes('data-mossa='))
+      if (nomeCampo) { const c = el.tasti.querySelector(`[name="${nomeCampo}"]`); if (c) { c.value = valoreCampo; c.focus() } }
+    }
+    // il filo del tempo: solo quando c'è una decisione da prendere
+    const mostra = st.fine !== null && (st.fase === 'puntate' || st.fase === 'turno') && !chiuso
+    el.timer.classList.toggle('on', mostra)
+    if (mostra) {
+      const durata = st.fase === 'puntate' ? st.config.tPuntate : st.config.tDecisione
+      el.timer.firstElementChild.style.transform = `scaleX(${Math.max(0, Math.min(1, (st.fine - now()) / durata))})`
+    }
+  }
+  el.tray = $('tray')
+
+  // ── accanto e sotto ────────────────────────────────────────────────────────
+  function renderLato() {
+    const g = st.giocatori
+    el.chi.innerHTML = g.length
+      ? g.map((x) => `<li><span class="chi"><i class="punto${x.online ? ' on' : ''}" title="${x.online ? 'in linea' : 'via'}"></i><span>${esc(x.nome)}</span>${io && x.id === io.id ? '<span class="io">tu</span>' : ''}${x.posto !== null ? `<span class="io">posto ${x.posto + 1}</span>` : ''}</span><span class="val">${fmt(x.pzk)} $pzk</span></li>`).join('')
+      : '<li class="vuoto">ancora nessuno: sei il primo.</li>'
+    el.eventi.innerHTML = st.eventi.length
+      ? st.eventi.slice().reverse().slice(0, 9).map((e) => `<li><time datetime="${new Date(e.t).toISOString()}">${ora(e.t)}</time><span>${esc(e.testo)}</span></li>`).join('')
+      : '<li class="vuoto">il tavolo aspetta la prima puntata.</li>'
+    el.storico.innerHTML = st.storico.length
+      ? `<table class="mani-tab n"><tbody>${st.storico.map((m) => `<tr><td>mano ${m.mano}</td><td>banco ${m.banco === 'sballa' ? 'sballa' : m.banco === 'bj' ? 'blackjack' : m.banco}: ${m.righe.map((r) => `${esc(r.nome)} <span class="${r.delta > 0 ? 'pos' : r.delta < 0 ? 'neg' : ''}">${r.delta > 0 ? '+' : ''}${r.delta === 0 ? 'pari' : fmt(r.delta)}</span>`).join(', ')}</td></tr>`).join('')}</tbody></table>`
+      : '<p class="vuoto">nessuna mano ancora.</p>'
+  }
+
+  function render() {
+    if (!st) { if (chiuso) { el.riga.innerHTML = '<span>il tavolo è chiuso</span>'; el.tasti.innerHTML = `<span class="toast on">${esc(chiuso)}</span>` } return }
+    el.saldo.innerHTML = io ? `<span>${esc(io.nome)}</span><b class="n">${fmt(io.pzk)} $pzk</b>` : ''
+    renderBanco()
+    renderPosti()
+    renderTray()
+    renderLato()
+    programmaCarte()
+    animaCarte = true
+  }
+
+  // le carte compaiono al loro orario: si ridisegna quando scade la prossima
+  let carteTimer = 0
+  let animaCarte = false // alla prima resa le carte già in tavola non volano
+  function programmaCarte() {
+    clearTimeout(carteTimer)
+    const t = now()
+    let prossima = Infinity
+    const guarda = (c) => { if (c.t > t && c.t < prossima) prossima = c.t }
+    st.banco.carte.forEach(guarda)
+    for (const p of st.posti) if (p) for (const m of p.mani) m.carte.forEach(guarda)
+    if (prossima < Infinity) carteTimer = setTimeout(render, Math.max(16, prossima - t + 20))
+  }
+
+  // il filo del tempo e il conto alla rovescia scorrono fra un giro e l'altro
+  let ultimoConto = -1
+  function battito() {
+    if (st && st.fine !== null && !document.hidden) {
+      const resta = Math.max(0, Math.ceil((st.fine - now()) / 1000))
+      if (resta !== ultimoConto) { ultimoConto = resta; renderTray() }
+      else if (el.timer.classList.contains('on')) {
+        const durata = st.fase === 'puntate' ? st.config.tPuntate : st.config.tDecisione
+        el.timer.firstElementChild.style.transform = `scaleX(${Math.max(0, Math.min(1, (st.fine - now()) / durata))})`
+      }
+    }
+    requestAnimationFrame(battito)
+  }
+
+  // ── gesti ──────────────────────────────────────────────────────────────────
+  let toastTimer = 0
+  function toast(msg) {
+    el.toast.textContent = msg
+    el.toast.classList.add('on')
+    clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => el.toast.classList.remove('on'), 3200)
+  }
+
+  el.tavolo.addEventListener('click', async (e) => {
+    const b = e.target.closest('button')
+    if (!b || b.disabled) return
+    if (b.dataset.siedi !== undefined) return azione({ a: 'siedi', posto: Number(b.dataset.siedi) })
+    if (b.dataset.codice !== undefined) { codiceMode = b.dataset.codice === '1'; el.tray.dataset.firma = ''; renderTray(); el.tasti.querySelector('input').focus(); return }
+    if (b.dataset.fiche) { scelta += Number(b.dataset.fiche); el.tray.dataset.firma = ''; renderTray(); return }
+    if (b.dataset.azzera !== undefined) { scelta = 0; el.tray.dataset.firma = ''; renderTray(); return }
+    if (b.dataset.punta !== undefined) {
+      const n = Number(b.dataset.punta)
+      const j = await azione({ a: 'punta', importo: n })
+      if (j.ok) scelta = 0
+      return
+    }
+    if (b.dataset.mossa) return azione({ a: 'gioca', mossa: b.dataset.mossa })
+    if (b.dataset.azione === 'cambia') { const p = ilMio(); scelta = 0; await azione({ a: 'punta', importo: 0 }); scelta = 0; el.tray.dataset.firma = ''; renderTray(); return }
+    if (b.dataset.azione === 'siedi') return azione({ a: 'siedi' })
+    if (b.dataset.azione === 'salta') return azione({ a: 'salta' })
+    if (b.dataset.azione === 'alzati') { const j = await azione({ a: 'alzati' }); if (j.ok && j.dopo) toast('ti alzi a fine mano'); return }
+    if (b.dataset.azione === 'esci') { io = null; mem.del('bj-io'); el.tray.dataset.firma = ''; render(); return }
+  })
+
+  el.tavolo.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const f = e.target
+    if (f.id === 'f-nome') {
+      const nome = f.nome.value.trim()
+      if (!nome) return
+      f.querySelector('button').disabled = true
+      const j = await azione({ a: 'entra', nome })
+      if (j.ok) { if (libero() >= 0) await azione({ a: 'siedi' }, { silenzioso: true }); else toast('tavolo pieno: ti siedi appena si libera un posto') }
+      else f.querySelector('button').disabled = false
+    } else if (f.id === 'f-codice') {
+      const tok = f.tok.value.trim().toLowerCase()
+      if (!/^[a-z0-9]{24}$/.test(tok)) return toast('il codice ha 24 lettere e cifre')
+      const j = await chiama({ a: 'entra', tok })
+      if (j.ok && j.io) { io = { ...j.io, tok }; mem.set('bj-io', JSON.stringify(io)); codiceMode = false; prendi(j); if (libero() >= 0) azione({ a: 'siedi' }, { silenzioso: true }) }
+      else toast(j.error || 'codice non valido')
+    }
+  })
+
+  // tasti rapidi col puntatore: c carta, s stai, r raddoppia, d dividi
+  addEventListener('keydown', (e) => {
+    if (e.target.matches('input,textarea') || e.metaKey || e.ctrlKey || e.altKey) return
+    const k = { c: 'carta', s: 'stai', r: 'raddoppia', d: 'dividi' }[e.key.toLowerCase()]
+    if (!k) return
+    const b = el.tasti.querySelector(`[data-mossa="${k}"]`)
+    if (b && !b.disabled) { e.preventDefault(); b.click() }
+  })
+
+  // ── maggiore età ───────────────────────────────────────────────────────────
+  if (mem.get('bj-18') !== '1') { el.velo.classList.add('on'); document.body.style.overflow = 'hidden'; setTimeout(() => $('velo-ok').focus(), 50) }
+  $('velo-ok').addEventListener('click', () => { mem.set('bj-18', '1'); el.velo.classList.remove('on'); document.body.style.overflow = ''; const i = el.tasti.querySelector('input'); if (i) i.focus() })
+
+  // ── via ────────────────────────────────────────────────────────────────────
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll() })
+  ;(async () => {
+    // prima l'orologio (e il rientro col codice salvato), poi il tavolo
+    if (io) {
+      const j = await chiama({ a: 'entra', tok: io.tok }).catch(() => null)
+      if (j && j.ok) { io = { ...j.io, tok: io.tok }; mem.set('bj-io', JSON.stringify(io)); prendi(j) }
+      else if (j && !j.ok && !j.chiuso) { io = null; mem.del('bj-io') }
+    } else await chiama({ a: 'ping' }).catch(() => null)
+    poll()
+    requestAnimationFrame(battito)
+    setInterval(() => { if (io && !document.hidden) azione({ a: 'ping' }, { silenzioso: true }) }, 25000)
+  })()
+})()
+</script>
+</body>
+</html>

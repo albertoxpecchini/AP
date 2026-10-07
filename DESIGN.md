@@ -48,6 +48,25 @@ colors:
   gh-b-dark: "#24292f"
   gm-a-dark: "#6e6e73"
   gm-b-dark: "#2c2c2e"
+  btn: "#0066cc"
+  btn-dark: "#1a6fe0"
+  blue-felt: "#1a6fe0"
+  felt1: "#1b6847"
+  felt2: "#0c3a29"
+  felt-rim: "#092b1f"
+  felt-fg: "#fff"
+  felt-fg2: "rgba(255,255,255,.78)"
+  felt-line: "rgba(255,255,255,.16)"
+  glass: "rgba(255,255,255,.1)"
+  glass-edge: "rgba(255,255,255,.18)"
+  glass-btn: "rgba(255,255,255,.14)"
+  badge-bg: "rgba(0,0,0,.32)"
+  card: "#fff"
+  ink: "#1d1d1f"
+  red: "#ff3b30"
+  chip: "#2c2c2e"
+  campo: "#fff"
+  campo-dark: "#2c2c2e"
 typography:
   display:
     fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
@@ -105,6 +124,34 @@ typography:
     fontSize: "11px"
     fontWeight: 400
     letterSpacing: "-.01em"
+  button:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    fontSize: "15px"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-.01em"
+  seat-name:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    fontSize: "13px"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-.01em"
+  badge:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    fontSize: "12px"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "0"
+  card-index:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    fontSize: "calc(var(--cw) * .3)"
+    fontWeight: 700
+    lineHeight: 1
+    letterSpacing: "-.04em"
+  felt-caption:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    fontSize: "12px"
+    fontWeight: 400
 rounded:
   tip: "9px"
   focus: "10px"
@@ -112,6 +159,15 @@ rounded:
   tile-mobile: "24px"
   tile: "28px"
   dock: "28px"
+  input: "12px"
+  seat-mobile: "16px"
+  seat: "18px"
+  seat-desktop: "22px"
+  tray-felt-mobile: "20px"
+  tray-felt: "22px"
+  card: "calc(var(--cw) * .09)"
+  pill: "999px"
+  disc: "50%"
 spacing:
   dock-gap: "8px"
   dock-pad: "10px"
@@ -132,6 +188,18 @@ spacing:
   icon-mobile: "clamp(48px, 14vw, 56px)"
   icon-tile: "60px"
   nav-height: "48px"
+  cw: "46px"
+  cw-desktop: "84px"
+  dw: "56px"
+  dw-desktop: "100px"
+  control: "44px"
+  card-overlap: "calc(var(--cw) * -.64)"
+  seat-gap: "8px"
+  seat-gap-desktop: "12px"
+  table-pad-mobile: "14px 10px 10px"
+  table-pad: "16px 14px 14px"
+  table-pad-desktop: "22px 24px 20px"
+  tray-felt-pad: "14px 14px 12px"
 components:
   nav:
     backgroundColor: "{colors.nav}"
@@ -205,6 +273,108 @@ components:
     textColor: "{colors.fg2}"
     typography: "{typography.label}"
     padding: "22px 0 max(22px, env(safe-area-inset-bottom))"
+  felt-table:
+    backgroundColor: "{colors.felt1}"
+    textColor: "{colors.felt-fg}"
+    rounded: "{rounded.tile}"
+    padding: "{spacing.table-pad}"
+    height: "calc(100svh - 48px - 16px)"
+  felt-table-desktop:
+    backgroundColor: "{colors.felt1}"
+    textColor: "{colors.felt-fg}"
+    rounded: "{rounded.tile}"
+    padding: "{spacing.table-pad-desktop}"
+    height: "640px"
+  seat:
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.felt-fg}"
+    typography: "{typography.seat-name}"
+    rounded: "{rounded.seat}"
+    padding: "8px 6px 10px"
+  seat-free:
+    textColor: "{colors.felt-fg2}"
+    typography: "{typography.felt-caption}"
+    rounded: "{rounded.seat}"
+  card:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    typography: "{typography.card-index}"
+    rounded: "{rounded.card}"
+    width: "{spacing.cw}"
+    height: "calc(var(--cw) * 1.4)"
+  card-red:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.red}"
+    typography: "{typography.card-index}"
+    rounded: "{rounded.card}"
+  chip:
+    backgroundColor: "{colors.chip}"
+    textColor: "{colors.glyph}"
+    rounded: "{rounded.disc}"
+    size: "44px"
+  chip-bet:
+    backgroundColor: "{colors.chip}"
+    textColor: "{colors.glyph}"
+    rounded: "{rounded.pill}"
+    padding: "0 5px"
+    height: "32px"
+  total-badge:
+    backgroundColor: "{colors.badge-bg}"
+    textColor: "{colors.glyph}"
+    typography: "{typography.badge}"
+    rounded: "{rounded.pill}"
+    padding: "5px 9px"
+  tray-felt:
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.felt-fg}"
+    rounded: "{rounded.tray-felt}"
+    padding: "{spacing.tray-felt-pad}"
+  button-primary:
+    backgroundColor: "{colors.blue-felt}"
+    textColor: "{colors.glyph}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "0 18px"
+    height: "{spacing.control}"
+  button-primary-page:
+    backgroundColor: "{colors.btn}"
+    textColor: "{colors.glyph}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "0 18px"
+    height: "{spacing.control}"
+  button-glass:
+    backgroundColor: "{colors.glass-btn}"
+    textColor: "{colors.glyph}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "0 18px"
+    height: "{spacing.control}"
+  button-text:
+    textColor: "{colors.felt-fg2}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "0 10px"
+    height: "{spacing.control}"
+  button-page:
+    backgroundColor: "{colors.campo}"
+    textColor: "{colors.fg}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "0 16px"
+    height: "{spacing.control}"
+  input-felt:
+    backgroundColor: "{colors.glass-btn}"
+    textColor: "{colors.glyph}"
+    rounded: "{rounded.pill}"
+    padding: "0 14px"
+    height: "{spacing.control}"
+  input-page:
+    backgroundColor: "{colors.campo}"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.input}"
+    padding: "0 14px"
+    height: "{spacing.control}"
 ---
 
 # Design System: pzkko.it
@@ -258,12 +428,27 @@ Una tavolozza di neutri Apple in due temi, con il blu link come unico accento e 
 ### Colori di marca (solo dentro le icone)
 Le superfici delle icone sono sfumature verticali `linear-gradient(180deg, var(--ia), var(--ib))` con i colori dichiarati in linea sull'elemento: WhatsApp `#60d66a → #20b038`, e-mail `#1fb6ff → #0a6cff`, PayPal `#009cde → #003087`, tools `#9a9aa0 → #636366`; Instagram ha il suo gradiente radiale di marca (`#fdf497`, `#fd5949`, `#d6249f`, `#285aeb`). Il glifo è sempre bianco (`#fff`). Ogni scheda porta un alone `--glow` dello stesso colore di marca a bassa alpha (per esempio `rgba(214,36,159,.34)` per Instagram, `rgba(37,211,102,.26)` per WhatsApp, `rgba(120,120,128,.14)` per gli stati vuoti), disegnato come `radial-gradient` nell'angolo in alto a sinistra della scheda.
 
+### Feltro e tavolo (solo nelle pagine dei giochi, da `games/blackjack/`)
+Il primo gioco (blackjack, 2026-10-07) porta nel sistema un secondo campo di colore, confinato alla pagina del gioco: il feltro del tavolo. È l'unica superficie a colore pieno oltre alla grafite di GitHub e, come quella, se lo guadagna perché è l'oggetto stesso (il tavolo), non una scheda decorata. I token stanno in `:root` di `games/blackjack/index.html` e non cambiano col tema.
+- **Feltro** (`--felt1` `#1b6847` al centro, `--felt2` `#0c3a29` al 72%, `--felt-rim` `#092b1f` al bordo): un solo `radial-gradient(120% 90% at 50% 38%, …)` su `.tavolo`, identico in chiaro e in scuro. Nel contratto era `#1e6f4e → #0d3d2b`; la build ha chiuso un po' più scuro per tenere bianche e fiche leggibili. Quando arriverà il tavolo disegnato (`.tavolo.art`) il feltro diventa l'immagine e questi token restano il ripiego.
+- **Testo sul feltro** (`--felt-fg` `#fff`, `--felt-fg2` `rgba(255,255,255,.78)`): sul feltro il testo è bianco o bianco velato, mai `--fg2` grigio. Il contratto diceva .62; la build è a .78 per il contrasto delle didascalie a 12 px (nomi dei posti, «banco», sabot, scritta).
+- **Filo sul feltro** (`--felt-line` `rgba(255,255,255,.16)`): l'anello interno dei posti e del posto libero; è il `--hair` del feltro.
+- **Vetro sul feltro** (`--glass` `rgba(255,255,255,.1)`, bordo `--glass-edge` `rgba(255,255,255,.18)`): il materiale dei posti, del vassoio dei comandi e del tasto «siediti»; i tasti di vetro e il campo del nome salgono a `rgba(255,255,255,.14)` (`--glass-btn`), .22 al passaggio.
+- **Blu sul feltro** (`--blue` `#1a6fe0`, bianco sopra a 4.78:1): il tasto primario nel vassoio (`.b.p`), uguale nei due temi perché il feltro non cambia. È lo stesso valore di `--btn` scuro.
+- **Blu dei tasti pieni** (`--btn`, chiaro `#0066cc` = `--link`, scuro `#1a6fe0`): il tasto primario sulle superfici neutre (il velo dei maggiorenni, la pagina del banco). In scuro non è `--link` (`#2997ff`) perché il bianco sopra scende a 3.0:1; `#1a6fe0` tiene 4.78:1. Il tasto pieno è l'unico punto in cui l'accento diventa un fondo: resta un solo blu, e resta nei giochi.
+- **Carta** (`--card` `#fff`, inchiostro `--ink` `#1d1d1f`, rosso `--red` `#ff3b30`): la carta è bianca sempre, anche in scuro; i semi rossi (cuori, quadri) usano `--red`, i neri `--ink`. Il rosso è materiale del mazzo, non un colore d'interfaccia: non esce dalla carta.
+- **Fiche** (`--chip` `#2c2c2e`): il disco grafite delle fiche, con anello tratteggiato bianco .85 e cifra bianca; `--chip` è anche l'anello esterno da 2 px.
+- **Campo** (`--campo`, chiaro `#fff`, scuro `#2c2c2e`): il fondo dei campi e dei tasti secondari sulle superfici neutre (pagina del banco), con anello interno `--hair`.
+- **Badge** (`--badge-bg` `rgba(0,0,0,.32)`): il fondo del totale della mano sul feltro.
+
 ### Named Rules
 **La regola del blu unico.** L'unico accento della pagina è `--link`. Non esistono altri colori di interfaccia: niente verde di conferma, niente rosso di errore, niente bottoni pieni colorati. Se serve attenzione, si usa peso o dimensione, non tinta.
 
 **La regola del colore dentro l'icona.** Il colore di marca di un servizio vive in due posti soltanto: la superficie della sua icona squircle e l'alone `--glow` della sua scheda. Mai nel testo, mai nel bordo, mai nel fondo di una scheda.
 
 **La regola della grafite che si guadagna.** La sola scheda a fondo pieno è quella di GitHub (`#24292f`), e lo è perché porta contenuto in più: l'elenco dei tre siti che ospita. Una scheda non si colora per decorazione; si colora quando ha qualcosa da dire che le altre non hanno.
+
+**La regola del feltro.** Il feltro è il solo campo di colore dei giochi ed è uguale in chiaro e in scuro: sopra ci stanno bianco, bianco velato (`--felt-fg2`), vetro bianco a bassa alpha e il blu del tasto primario; niente grigi di pagina, niente `--tile`. Fuori dal tavolo la pagina torna neutra come la home.
 
 ## Typography
 
@@ -283,6 +468,11 @@ Le superfici delle icone sono sfumature verticali `linear-gradient(180deg, var(-
 - **List** (400, 15 px): l'elenco dei siti nella scheda GitHub (`.sites`), numeri tabulari.
 - **Tooltip** (400, 13 px, `-.01em`): l'etichetta sopra l'icona del dock col puntatore.
 - **Label** (400, 12 px, `-.01em`): voci della nav, piè di pagina, nomi dei giochi sotto gli slot. Nel dock mobile le etichette sotto le icone scendono a 11 px.
+- **Button** (600, 15 px, interlinea 1, `-.01em`): i tasti dei giochi (`.b`), pillole da 44 px; la scorciatoia da tastiera accanto (`.k`) è 11 px a peso 400, opacità .7, solo con puntatore fine.
+- **Seat name** (600, 13 px, interlinea 1.2, `-.01em`): il nome al posto (`.nome`), con ellissi; sotto, il saldo a 11 px `--felt-fg2`.
+- **Badge** (600, 12 px, interlinea 1, spaziatura 0): il totale della mano (`.tot`) e l'esito; la cifra della fiche è 11 px (al posto) e 13 px (nel vassoio), sempre tabulare.
+- **Card index** (700, `calc(var(--cw) * .3)`, interlinea 1, `-.04em`, `--fd`): il rango negli angoli della carta, l'unico 700 del sistema perché è stampa sulla carta, non testo d'interfaccia; sarà sostituito dalle carte disegnate.
+- **Felt caption** (400, 12 px, `--felt-fg2`): «banco», il sabot, «posto libero», la scritta del tavolo (`.scritta`, con `.02em` e i due nomi in 600 bianco).
 
 ### Named Rules
 **La regola del sistema.** Non si aggiungono webfont. Il carattere è quello del dispositivo, nei due tagli `--fd` e `--ft`; se una piattaforma non ha il taglio display, la catena di ripiego lo risolve da sola.
@@ -305,6 +495,8 @@ La pagina è una colonna centrata di larghezza massima 1024 px (`.wrap`, `max-wi
 
 **Soglie.** `max-width: 1023px` (bento a due per riga), `max-width: 640px` (telefono: dock a griglia, colonna singola), `(hover: hover) and (pointer: fine)` per le etichette a comparsa, `(hover: hover) and (pointer: fine) and (min-width: 641px)` per la fisica del dock nello script.
 
+**Tavolo (giochi).** La pagina del gioco riusa `.wrap` (1024 px, 22/16 px) e la nav da 48 px, poi un solo oggetto riempie il primo schermo: `.tavolo`, `min-height: calc(100svh - 48px - 16px)` (640 px da 900 px in su, `min(max(640px, 100svh - 72px), 720px)` da 1100), colonna flex con il banco in alto, la scritta a metà (`margin: auto 0`), i posti spinti in fondo (`margin-top: auto`) e il vassoio dei comandi come ultima riga. I posti sono una griglia a 6 colonne con cinque posti da 2 (tre più due, i due centrati su `2/4` e `4/6`) sotto i 900 px, cinque in fila da 900 in su; ogni posto è un contenitore (`container-type: inline-size`) e la larghezza delle carte si misura su di lui: `--cw: clamp(40px, 46cqw, 64px)`, `clamp(52px, 54cqw, 84px)` da 900. Il banco ha carte più grandi (`--dw`, 56 → 100 px). Da 1100 px la griglia `.gioco` aggiunge una colonna laterale di 300 px (al tavolo, cosa succede); sotto, `.sotto` è `repeat(auto-fit, minmax(280px, 1fr))` per ultime mani e regole. Soglie proprie del gioco: 480 px (le quattro mosse in griglia 2×2), 900 px (tavolo da scrivania), 1100 px (colonna laterale). Sotto i 640 px il vassoio è `position: sticky; bottom: 8px` dentro il tavolo, così i comandi restano in vista se una divisione allunga i posti: è l'unico elemento appiccicoso del sito e lo è solo dentro il suo oggetto, non alla finestra.
+
 ### Named Rules
 **La regola dei due assi.** Nel primo schermo nessuna misura dipende dalla sola larghezza: ogni dimensione fluida è `clamp(min, min(vw, svh), max)`, perché la scrivania deve stare intera in vista anche in una finestra bassa. Dal secondo schermo in giù basta `vw`.
 
@@ -319,10 +511,17 @@ Il sistema è ibrido: le superfici appoggiate (schede, stati vuoti, piè di pagi
 - **Etichetta** (`0 2px 10px rgba(0,0,0,.14), 0 0 0 1px var(--hair)`): ombra breve più anello da 1 px, il fumetto di macOS.
 - **Filo della nav** (`.nav.scrolled`: `0 1px 0 var(--hair)`): non un'ombra ma una linea di 1 px, che compare solo quando il contenuto scorre sotto (IntersectionObserver sulla `.sentinel`).
 - **Slot vuoti** (`inset 0 0 0 1px var(--slot-edge)`): un bordo interno appena visibile, la forma di un'icona che non c'è ancora.
+- **Tavolo** (`.tavolo`: `inset 0 0 0 1px rgba(255,255,255,.08), inset 0 1px 0 rgba(255,255,255,.14), 0 30px 60px -30px rgba(0,0,0,.55)`): il feltro è un oggetto sopra la pagina come il dock, con la stessa ombra lunga (più scura) e la stessa luce sul filo in alto; è l'eccezione guadagnata alla regola del vetro che poggia, perché è il tavolo e non una scheda.
+- **Carta** (`.carta`: `0 1px 0 rgba(255,255,255,.4) inset, 0 3px 8px -2px rgba(0,0,0,.5), 0 0 0 .5px rgba(0,0,0,.25)`): una carta posata sul feltro, ombra breve e un filo di mezzo pixel per staccare il bianco dal bianco della carta sotto.
+- **Fiche** (`.ch` / `.fiche`: `0 0 0 2px var(--chip), 0 3px 6px -1px rgba(0,0,0,.6)`, più `inset 0 0 0 3.5px rgba(255,255,255,.75)` sulla fiche puntata): il disco grafite con l'anello esterno e l'ombra corta.
+- **Posto** (`inset 0 0 0 1px var(--felt-line)`; mio `inset 0 0 0 2px rgba(255,255,255,.9)`; mio e di turno `inset 0 0 0 2px #fff, 0 0 0 4px rgba(255,255,255,.18)`): anelli, non ombre: il posto è un'area del feltro, non un oggetto.
+- **Velo dei maggiorenni** (`.box`: `0 30px 60px -30px rgba(0,0,0,.45)`): la finestra di dialogo sopra la pagina, stessa ombra lunga del dock.
 
 ### Vetro
 - **Nav**: `backdrop-filter: blur(20px) saturate(1.8)` su `--nav`.
 - **Dock**: `backdrop-filter: blur(30px) saturate(1.6)` su `--tray`, bordo 1 px `--tray-edge`.
+- **Vassoio sul feltro** (giochi): `backdrop-filter: blur(24px) saturate(1.4)` su `--glass`, anello `--glass-edge` più luce `inset 0 1px 0 rgba(255,255,255,.12)`; con trasparenza ridotta diventa `rgba(0,0,0,.35)` opaco.
+- **Velo** (giochi): `blur(24px) saturate(1.6)` su `--nav` a tutto schermo, sotto la finestra `.box`.
 - Con `prefers-reduced-transparency: reduce` la nav diventa `--bg` opaco e il dock `--tile` opaco, senza sfocatura.
 
 ### Named Rules
@@ -333,6 +532,8 @@ Il sistema è ibrido: le superfici appoggiate (schede, stati vuoti, piè di pagi
 ## Shapes
 
 Due famiglie di forme, entrambe continue e senza spigoli. Le **superfici** (schede, stati vuoti, dock) hanno raggio 28 px (`.tile`, `.dock`), che scende a 24 px per le schede sotto i 640 px; l'etichetta a comparsa ha raggio 9 px e l'anello di fuoco 10 px. Le **icone** sono superellissi vere: ogni `.face`, la cartella `.folder` e le caselle `.slots i` sono tagliate con `clip-path: url(#sq)`, un `clipPath` in `objectBoundingBox` definito in fondo alla pagina (il contenitore `.dk` porta anche `border-radius: 22%` per l'ombra e il fuoco). Il glifo dentro l'icona occupa il 54% del lato (50–60% per i glifi che hanno bisogno di correzione ottica, dichiarato in linea). Non esistono cerchi, pillole, né rettangoli ad angolo vivo; l'unica eccezione geometrica è il separatore verticale di 1 px nel dock.
+
+Nelle pagine dei giochi il tavolo porta tre forme in più, tutte sue: la **pillola** (`999px`) per tasti, campo del nome, badge del totale e fiche puntata, come nel contratto; il **disco** (`50%`) per le fiche da puntare (44 px, anello tratteggiato) e per il punto di presenza (8 px); la **carta** in proporzione 1:1.4 con raggio al 9% della larghezza (`calc(var(--cw) * .09)`), le carte di una mano sovrapposte del 64% (`margin-left: calc(var(--cw) * -.64)`, fino all'80% con sette carte). I posti hanno raggio 18 px (16 a telefono, 22 da scrivania) e il vassoio 22 px (20 a telefono): dentro il tavolo da 28 px i raggi scendono, mai salgono. Queste forme restano sul feltro e nelle pagine dei giochi: la home resta senza cerchi e senza pillole.
 
 ## Components
 
@@ -376,10 +577,28 @@ La forma di quello che arriverà, senza contenuto finto.
 - **Forma:** bordo alto 1 px `--hair`, padding `22px 0 max(22px, env(safe-area-inset-bottom))`.
 - **Testo:** 12 px `--fg2`, due estremi (`space-between`): a sinistra il credito «sito di alberto pecchini» con link esatto a `https://www.albertopecchini.it` e `rel="author"`, a destra «pzkko.it». Al passaggio il link passa a `--fg`.
 
+### Tavolo da gioco (`.tavolo`, pagine dei giochi)
+Il secondo componente firma, dal 2026-10-07: un oggetto solo che riempie il primo schermo, con i comandi nello stesso vetro del dock.
+- **Forma e fondo:** raggio 28 px (24 a telefono), feltro radiale `--felt1 → --felt2 → --felt-rim`, ombra lunga e luce sul filo, `overflow: clip`, `isolation: isolate`; con `ART.tavolo` il fondo diventa `art/tavolo.svg` (verticale sotto i 640 px) e la scritta sparisce.
+- **Banco:** in alto al centro, didascalia «banco» a 12 px `--felt-fg2`, carte da `--dw`, badge del totale; il sabot in alto a destra (12 px, tre carte accatastate in CSS).
+- **Scritta:** una riga a 12 px `.02em` `--felt-fg2` a metà tavolo, nomi in 600 bianco.
+- **Posto (`.posto`):** vetro `--glass` con anello `--felt-line`, raggio 18 px, padding `8px 6px 10px` (12/10 da scrivania), `min-height: calc(var(--cw) * 1.4 + 74px)`; nome 600 13 px, saldo 11 px, carte, badge, fiche. Stati: `.mio` anello bianco da 2 px; `.turno` fondo `rgba(255,255,255,.17)`; `.mio.turno` anello bianco più alone da 4 px; `.off` nome velato; `.libero` trasparente con il tasto «siediti» (`.sit`, pillola 44 px di vetro, 600 13 px). Transizioni `.2s var(--eo)`.
+- **Carta (`.carta`):** `--cw` × 1.4, `--card` bianco, raggio 9%, indice rango + seme in alto a sinistra e ruotato in basso a destra (`.ix`, 700, 30% di `--cw`), seme al centro al 42% (`.pip`), semi come `<use>` di quattro path SVG (`#s-c` cuori, `#s-q` quadri, `#s-f` fiori, `#s-p` picche), rossi in `--red`. Con `ART.carte` (`.carta.img`) la carta è l'immagine `art/carte/<rango><seme>.svg` e i figli si nascondono. Sovrapposizione 64%, più stretta con 3, 4, 5, 7 carte via `:has()`; con quattro o più l'indice scende al 23% e si sposta al bordo.
+- **Fiche:** da puntare (`.ch`): disco 44 px `--chip`, bordo tratteggiato 2 px bianco .85, anello esterno 2 px, 600 13 px, pressione `scale(.92)`, disabilitata al 35%; puntata (`.fiche`): pillola alta 32 px, stesso materiale, 600 11 px, numeri tabulari. Con `ART.fiche` diventa `art/fiche-<valore>.svg`.
+- **Badge del totale (`.tot`):** pillola 600 12 px su `--badge-bg`; `.bj` e `.vince` bianco con inchiostro, `.sballa` `--red`, `.pari` `rgba(255,255,255,.22)`, `.perde` velato; la mano attiva porta un anello bianco da 2 px.
+- **Vassoio (`.tray`):** ultima riga del tavolo: `--glass` con `blur(24px) saturate(1.4)`, raggio 22 px, padding `14px 14px 12px`, colonna con `.riga` (15 px; il conto a 13 px `--felt-fg2`; `.grande` 600 20 px `-.02em`, positivo bianco, negativo `#ff8a80`, zero velato), `.tasti` (riga di tasti, gap 8 px) e `.toast` (13 px su `rgba(0,0,0,.4)`, raggio 12 px). Il **timer** è un filo da 2 px sul bordo alto del vassoio (`left/right: 18px`, pista `rgba(255,255,255,.18)`, riempimento bianco che si svuota con `scaleX`, `transform-origin: left`), visibile solo in `.on`.
+- **Tasti (`.b`):** pillola 44 px, 600 15 px, padding `0 18px`, pressione `scale(.96)` in `.12s var(--eo)`, disabilitato al 40%. Primario `.p` su `--blue` (passaggio `brightness(1.08)`); vetro (predefinito) `--glass-btn` con anello .14 (passaggio .22); testo `.t` trasparente in `--felt-fg2` (passaggio bianco). Sotto i 480 px le quattro mosse stanno in griglia 2×2. Le scorciatoie `.k` compaiono solo con puntatore fine.
+- **Campo del nome (`.campo input`):** pillola 44 px di vetro `--glass-btn` con anello .18, 16 px (niente zoom su iPhone), segnaposto `--felt-fg2`, fuoco anello bianco; sul feltro tutti gli anelli di fuoco sono bianchi (`.tavolo :focus-visible`).
+- **Velo dei maggiorenni (`.velo` / `.box`):** schermo intero su `--nav` sfocato, finestra `--tile` da 440 px, raggio 28 px, padding 28 px, titolo 600 28 px `-.02em`, testo `--fg2`, tasto pieno `--btn` bianco e link di testo `--fg2`; si mostra una volta sola (`bj-18` in memoria) e blocca lo scorrimento del `body`.
+- **Schede accanto e sotto (`.scheda`):** `--tile`, raggio 28 px (24 a telefono) ma padding `22px 22px 20px` e titolo 600 20 px: più fitte delle schede bento della home. Elenchi con filo `--hair` fra le righe, punto di presenza da 8 px, eventi 14 px `--fg2` con l'ora a 12 px e la prima riga in `--fg`.
+- **Pagina del banco (`admin/`):** stessa nav e stesso piè di pagina; griglia `repeat(auto-fit, minmax(340px, 1fr))` di `.scheda`; campi `--campo` a raggio 12 px con anello `--hair`, 44 px, 16 px; tasti pillola `--campo` con anello `--hair`, primario `--btn` bianco, piccoli `.s` da 34 px; tabella 15 px con righe `--hair`.
+- **Home:** il gioco prende il posto della sua casella negli stati vuoti: `.slots a` con `.app .face` in grafite `--gm-a → --gm-b`, glifo di picche (`#i-sp`) al 50%, nome in `--fg`, pressione `scale(.92)`.
+
 ### Movimento
 - **Ingresso (una volta sola, solo con `prefers-reduced-motion: no-preference`):** `h1` e `.lede` entrano con `rise` (`.7s var(--eo)`, da `opacity: 0; translateY(12px)`), la lede con 70 ms di ritardo; il dock con `materialize` (`.8s`, ritardo 140 ms, da `translateY(16px) scale(.96) blur(10px)`); la nav con `fade` (`.6s ease`).
 - **Risposta:** fisica del dock (sopra), pressione `.1s`, chevron `.2s`, scheda `.16s`, opacità delle voci nav `.15s`, filo della nav `.3s`; tutte con `--eo: cubic-bezier(.23,1,.32,1)` salvo le dissolvenze.
 - **Niente allo scorrimento:** nessuna rivelazione, nessun parallasse, nessun elemento che segue la finestra; l'unico effetto legato allo scroll è il filo sotto la nav. `scroll-behavior: smooth` solo senza riduzione del movimento.
+- **Giochi:** il tavolo entra con `materialize` (`.7s var(--eo)`, da `translateY(14px) scale(.985)`) e le schede con `rise` (`.6s`, 80 ms); ogni carta nuova arriva dal sabot con `dealt` (`.55s`, da `translate(--dx, --dy) rotate(6deg)`, curva `linear()` a dodici punti che imita la molla smorzata, con `--dx`/`--dy` impostati dallo script), una per volta sull'orologio del server; il timer si svuota con `transform: scaleX` guidato dallo script; pressioni `.12s`, posti e vassoio `.2s`. Con `prefers-reduced-motion: reduce` niente ingresso e niente carta che vola. Niente che giri da solo fuori dalla mano in corso.
 
 ## Do's and Don'ts
 
@@ -392,6 +611,8 @@ La forma di quello che arriverà, senza contenuto finto.
 - **Do** prevedere il ripiego per `prefers-reduced-transparency` (fondo opaco `--bg` o `--tile`) e per `prefers-reduced-motion` (nessun ingresso, nessuna fisica) in ogni nuovo vetro o movimento.
 - **Do** aggiungere un nuovo strumento o gioco al posto della sua casella negli stati vuoti e come nuova icona nel dock, rispettando le righe da tre a telefono.
 - **Do** scrivere tutto il testo visibile in minuscolo nel sorgente e firmare il piè di pagina con il link esatto a `https://www.albertopecchini.it`.
+- **Do** nei giochi tenere il tavolo come un oggetto solo che riempie il primo schermo (`min-height: calc(100svh - 48px - 16px)`, raggio 28 px, feltro `--felt1 → --felt2 → --felt-rim` uguale nei due temi) con i comandi in un vassoio di vetro `--glass` dentro il tavolo; sul feltro testo bianco o `--felt-fg2`, tasto primario `--blue`, anelli di fuoco bianchi.
+- **Do** disegnare carte e fiche in CSS con i token `--card`/`--ink`/`--red`/`--chip` e lasciare le classi `.img` e i percorsi `art/…` pronti per le immagini di Claude Design: l'arte si accende con un flag (`ART`), senza cambiare il layout.
 
 ### Don't:
 - **Don't** fissare il dock alla finestra (`position: fixed`) né riservargli spazio nel piè di pagina: provato e tolto il 2026-10-07.

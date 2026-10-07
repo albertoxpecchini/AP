@@ -5,7 +5,8 @@
   "scope": "Solo pzkko.it (albertopecchini.it/pzkko/). albertopecchini.it e bettercallpekko.it hanno la propria identità nel codice e non la condividono con questa.",
   "source": {
     "tokens": "albertopecchini.it/pzkko/index.html, :root e @media (prefers-color-scheme:dark)",
-    "components": "albertopecchini.it/pzkko/index.html (CSS e script in linea), 404.html generata da tools/pzkko/genera-404.mjs"
+    "components": "albertopecchini.it/pzkko/index.html (CSS e script in linea), 404.html generata da tools/pzkko/genera-404.mjs",
+    "games": "albertopecchini.it/pzkko/games/blackjack/index.html e admin/index.html (CSS e script in linea): i token del feltro, delle carte, delle fiche e del vassoio sul feltro, aggiunti il 2026-10-07"
   },
   "extensions": {
     "colorMeta": {
@@ -54,7 +55,26 @@
       "github-graphite-muted": { "role": "secondary", "displayName": "Secondario su grafite", "canonical": "#a1a1a6" },
       "github-graphite-link": { "role": "secondary", "displayName": "Blu su grafite", "canonical": "#2997ff" },
       "glyph": { "role": "neutral", "displayName": "Glifo dell'icona", "canonical": "#fff" },
-      "selection": { "role": "primary", "displayName": "Selezione del testo", "canonical": "rgba(0,113,227,.28)" }
+      "selection": { "role": "primary", "displayName": "Selezione del testo", "canonical": "rgba(0,113,227,.28)" },
+      "btn": { "role": "primary", "displayName": "Blu dei tasti pieni (chiaro)", "canonical": "#0066cc", "cssVar": "--btn", "note": "Tasto primario sulle superfici neutre (velo dei maggiorenni, pagina del banco). Bianco sopra 5.6:1. Solo nei giochi." },
+      "btn-dark": { "role": "primary", "displayName": "Blu dei tasti pieni (scuro)", "canonical": "#1a6fe0", "cssVar": "--btn", "note": "Non --link scuro (#2997ff, bianco sopra 3.0:1): #1a6fe0 tiene 4.78:1." },
+      "blue-felt": { "role": "primary", "displayName": "Blu sul feltro", "canonical": "#1a6fe0", "cssVar": "--blue", "note": "Tasto primario nel vassoio del tavolo (.b.p), uguale nei due temi perché il feltro non cambia.", "tonalRamp": ["oklch(20% 0.09 258)", "oklch(30% 0.13 258)", "oklch(40% 0.17 258)", "oklch(50% 0.19 258)", "oklch(60% 0.17 258)", "oklch(72% 0.12 258)", "oklch(84% 0.07 258)", "oklch(95% 0.03 258)"] },
+      "felt1": { "role": "secondary", "displayName": "Feltro, centro", "canonical": "#1b6847", "cssVar": "--felt1", "note": "Solo nelle pagine dei giochi; identico in chiaro e scuro. Centro del radial-gradient di .tavolo.", "tonalRamp": ["oklch(15% 0.04 160)", "oklch(25% 0.06 160)", "oklch(35% 0.08 160)", "oklch(45% 0.09 160)", "oklch(55% 0.1 160)", "oklch(68% 0.09 160)", "oklch(82% 0.06 160)", "oklch(95% 0.02 160)"] },
+      "felt2": { "role": "secondary", "displayName": "Feltro, al 72%", "canonical": "#0c3a29", "cssVar": "--felt2" },
+      "felt-rim": { "role": "secondary", "displayName": "Feltro, bordo", "canonical": "#092b1f", "cssVar": "--felt-rim" },
+      "felt-fg": { "role": "secondary", "displayName": "Testo sul feltro", "canonical": "#fff", "cssVar": "--felt-fg" },
+      "felt-fg2": { "role": "secondary", "displayName": "Testo velato sul feltro", "canonical": "rgba(255,255,255,.78)", "cssVar": "--felt-fg2", "note": "Mai --fg2 grigio sul feltro. Il contratto diceva .62; la build è a .78 per le didascalie a 12px." },
+      "felt-line": { "role": "secondary", "displayName": "Filo sul feltro", "canonical": "rgba(255,255,255,.16)", "cssVar": "--felt-line" },
+      "glass": { "role": "secondary", "displayName": "Vetro sul feltro", "canonical": "rgba(255,255,255,.1)", "cssVar": "--glass", "note": "Posti, vassoio dei comandi, tasto siediti." },
+      "glass-edge": { "role": "secondary", "displayName": "Bordo del vetro sul feltro", "canonical": "rgba(255,255,255,.18)", "cssVar": "--glass-edge" },
+      "glass-btn": { "role": "secondary", "displayName": "Vetro dei tasti sul feltro", "canonical": "rgba(255,255,255,.14)", "note": "Letterale in .b e .campo input; .22 al passaggio." },
+      "badge-bg": { "role": "secondary", "displayName": "Fondo del badge del totale", "canonical": "rgba(0,0,0,.32)", "note": "Letterale in .tot." },
+      "card": { "role": "secondary", "displayName": "Carta", "canonical": "#fff", "cssVar": "--card", "note": "Bianca anche in tema scuro." },
+      "ink": { "role": "secondary", "displayName": "Inchiostro della carta", "canonical": "#1d1d1f", "cssVar": "--ink" },
+      "red": { "role": "secondary", "displayName": "Rosso dei semi", "canonical": "#ff3b30", "cssVar": "--red", "note": "Materiale del mazzo (cuori, quadri) e badge sballato: non esce dalla carta e dal tavolo.", "tonalRamp": ["oklch(20% 0.08 27)", "oklch(31% 0.12 27)", "oklch(42% 0.17 27)", "oklch(53% 0.21 27)", "oklch(63% 0.22 27)", "oklch(74% 0.15 27)", "oklch(85% 0.08 27)", "oklch(95% 0.03 27)"] },
+      "chip": { "role": "secondary", "displayName": "Fiche", "canonical": "#2c2c2e", "cssVar": "--chip", "note": "Disco grafite con anello tratteggiato bianco .85." },
+      "campo": { "role": "neutral", "displayName": "Campo (chiaro)", "canonical": "#fff", "cssVar": "--campo", "note": "Campi e tasti secondari della pagina del banco, con anello --hair." },
+      "campo-dark": { "role": "neutral", "displayName": "Campo (scuro)", "canonical": "#2c2c2e", "cssVar": "--campo" }
     },
     "brandColors": {
       "note": "Dichiarati in linea sull'elemento (--ia/--ib), non in :root: vivono solo dentro le icone squircle e negli aloni --glow delle schede.",
@@ -77,7 +97,12 @@
       "list": { "displayName": "List", "purpose": "Elenco dei siti nella scheda GitHub (.sites), tabular-nums." },
       "tooltip": { "displayName": "Tooltip", "purpose": "Etichetta sopra l'icona del dock col puntatore (.lbl)." },
       "label": { "displayName": "Label", "purpose": "Voci della nav, piè di pagina, nomi dei giochi sotto gli slot." },
-      "label-dock-mobile": { "displayName": "Label dock mobile", "purpose": "Etichette sotto le icone del dock sotto i 640px (.lbl in @media (max-width:640px))." }
+      "label-dock-mobile": { "displayName": "Label dock mobile", "purpose": "Etichette sotto le icone del dock sotto i 640px (.lbl in @media (max-width:640px))." },
+      "button": { "displayName": "Button", "purpose": "I tasti dei giochi (.b), pillole da 44px; la scorciatoia .k a 11px 400 opacità .7 solo con puntatore fine." },
+      "seat-name": { "displayName": "Seat name", "purpose": "Il nome al posto (.nome), con ellissi; il saldo sotto a 11px --felt-fg2." },
+      "badge": { "displayName": "Badge", "purpose": "Totale ed esito della mano (.tot); la cifra della fiche a 11px (posto) e 13px (vassoio), tabulare." },
+      "card-index": { "displayName": "Card index", "purpose": "Il rango negli angoli della carta (.ix): l'unico 700 del sistema, stampa sulla carta e non testo d'interfaccia; sostituito dalle carte disegnate." },
+      "felt-caption": { "displayName": "Felt caption", "purpose": "banco, sabot, posto libero, la scritta del tavolo (.scritta, con .02em)." }
     },
     "shadows": [
       { "name": "dock", "value": "0 30px 60px -30px rgba(0,0,0,.35), inset 0 1px 0 var(--tray-in)", "dark": "0 30px 60px -30px rgba(0,0,0,.9), inset 0 1px 0 var(--tray-in)", "cssVar": "--shadow", "purpose": "Il vassoio di vetro si solleva dalla pagina: ombra lunga spinta in basso più luce sul filo superiore." },
@@ -85,11 +110,18 @@
       { "name": "tile-icon", "value": "drop-shadow(0 8px 16px rgba(0,0,0,.16))", "purpose": "Ombra dell'icona da 60px nella scheda (.app), un po' più alta perché il fondo è chiaro e fermo." },
       { "name": "tooltip", "value": "0 2px 10px rgba(0,0,0,.14), 0 0 0 1px var(--hair)", "purpose": "Etichetta a comparsa del dock (.lbl): ombra breve più anello da 1px." },
       { "name": "nav-hairline", "value": "0 1px 0 var(--hair)", "purpose": "Filo sotto la nav, solo in .nav.scrolled quando il contenuto scorre sotto." },
-      { "name": "slot-inset", "value": "inset 0 0 0 1px var(--slot-edge)", "purpose": "Bordo interno delle caselle vuote (.folder i, .slots i)." }
+      { "name": "slot-inset", "value": "inset 0 0 0 1px var(--slot-edge)", "purpose": "Bordo interno delle caselle vuote (.folder i, .slots i)." },
+      { "name": "felt-table", "value": "inset 0 0 0 1px rgba(255,255,255,.08), inset 0 1px 0 rgba(255,255,255,.14), 0 30px 60px -30px rgba(0,0,0,.55)", "purpose": "Il tavolo (.tavolo) come oggetto sopra la pagina: ombra lunga del dock, più scura, e luce sul filo in alto. Eccezione guadagnata alla regola del vetro che poggia." },
+      { "name": "card", "value": "0 1px 0 rgba(255,255,255,.4) inset, 0 3px 8px -2px rgba(0,0,0,.5), 0 0 0 .5px rgba(0,0,0,.25)", "purpose": "La carta posata sul feltro (.carta): ombra breve e filo di mezzo pixel fra carta e carta." },
+      { "name": "chip", "value": "0 0 0 2px var(--chip), 0 3px 6px -1px rgba(0,0,0,.6)", "bet": "0 0 0 2px var(--chip), 0 0 0 3.5px rgba(255,255,255,.75) inset, 0 3px 6px -1px rgba(0,0,0,.6)", "purpose": "Fiche da puntare (.ch) e fiche puntata (.fiche)." },
+      { "name": "seat-ring", "value": "inset 0 0 0 1px var(--felt-line)", "mine": "inset 0 0 0 2px rgba(255,255,255,.9)", "mineTurn": "inset 0 0 0 2px #fff, 0 0 0 4px rgba(255,255,255,.18)", "purpose": "Anelli del posto (.posto, .mio, .mio.turno): aree del feltro, non oggetti." },
+      { "name": "gate-box", "value": "0 30px 60px -30px rgba(0,0,0,.45)", "purpose": "La finestra del velo dei maggiorenni (.box)." }
     ],
     "glass": [
       { "name": "nav", "value": "blur(20px) saturate(1.8)", "background": "var(--nav)", "fallback": "background var(--bg), nessun filtro con prefers-reduced-transparency: reduce" },
-      { "name": "dock", "value": "blur(30px) saturate(1.6)", "background": "var(--tray)", "border": "1px solid var(--tray-edge)", "fallback": "background var(--tile), nessun filtro con prefers-reduced-transparency: reduce" }
+      { "name": "dock", "value": "blur(30px) saturate(1.6)", "background": "var(--tray)", "border": "1px solid var(--tray-edge)", "fallback": "background var(--tile), nessun filtro con prefers-reduced-transparency: reduce" },
+      { "name": "tray-felt", "value": "blur(24px) saturate(1.4)", "background": "var(--glass)", "border": "inset 0 0 0 1px var(--glass-edge), inset 0 1px 0 rgba(255,255,255,.12)", "fallback": "background rgba(0,0,0,.35), nessun filtro con prefers-reduced-transparency: reduce", "scope": "giochi" },
+      { "name": "velo", "value": "blur(24px) saturate(1.6)", "background": "var(--nav)", "scope": "giochi: il velo dei maggiorenni a tutto schermo" }
     ],
     "motion": [
       { "name": "ease-out", "value": "cubic-bezier(.23,1,.32,1)", "cssVar": "--eo", "purpose": "Curva di uscita di tutto il sistema: ingressi, pressione, chevron, scheda, filo della nav." },
@@ -103,14 +135,24 @@
       { "name": "nav-hairline", "value": "box-shadow .3s var(--eo)", "purpose": "Comparsa del filo sotto la nav." },
       { "name": "nav-link", "value": "opacity .15s ease; .82 → 1", "purpose": "Voci della nav al passaggio." },
       { "name": "dock-spring", "value": "molla criticamente smorzata: damping 1.0, response 0.32s (OMEGA = 2π/0.32); bersaglio = 1 + (MAG-1)·exp(-(d²)/(SPREAD²)), MAG 1.5, SPREAD 1.25 larghezze d'icona; dt ≤ 1/30s; larghezza di riposo = items[0].getBoundingClientRect().width (ripiego 64), rimisurata su resize quando le molle sono ferme", "purpose": "Ingrandimento delle icone del dock sotto il puntatore, interrompibile in ogni istante. Attiva solo con (hover:hover) and (pointer:fine) and (min-width:641px) e senza prefers-reduced-motion: reduce; gli eventi touch sono ignorati." },
-      { "name": "scroll", "value": "scroll-behavior: smooth solo con prefers-reduced-motion: no-preference", "purpose": "Nessuna rivelazione allo scorrimento, nessun parallasse." }
+      { "name": "scroll", "value": "scroll-behavior: smooth solo con prefers-reduced-motion: no-preference", "purpose": "Nessuna rivelazione allo scorrimento, nessun parallasse." },
+      { "name": "table-materialize", "value": ".7s var(--eo) both; from { opacity:0; transform:translateY(14px) scale(.985) }", "purpose": "Ingresso del tavolo (.tavolo). Solo con prefers-reduced-motion: no-preference." },
+      { "name": "cards-rise", "value": ".6s var(--eo) 80ms both; from { opacity:0; transform:translateY(10px) }", "purpose": "Ingresso delle schede accanto e sotto il tavolo (.lato, .sotto)." },
+      { "name": "dealt", "value": ".55s both; from { opacity:0; transform:translate(var(--dx,calc(var(--cw) * 1.2)),var(--dy,calc(var(--cw) * -1.4))) rotate(6deg) }; timing linear(0,.186 9.1%,.465 18.2%,.682 27.3%,.821 36.4%,.903 45.5%,.949 54.5%,.973 63.6%,.986 72.7%,.993 81.8%,.997 90.9%,1)", "purpose": "Ogni carta nuova (.carta.in) arriva dal sabot, una per volta sull'orologio del server; --dx/--dy dallo script. Nessuna animazione con prefers-reduced-motion: reduce." },
+      { "name": "press-control", "value": "transform .12s var(--eo); scale(.96)", "purpose": ".b e .sit alla pressione; le fiche .ch scendono a scale(.92)." },
+      { "name": "seat-state", "value": "box-shadow .2s var(--eo), background .2s", "purpose": "Cambio di stato del posto (.mio, .turno)." },
+      { "name": "timer", "value": "transform: scaleX guidato dallo script, transform-origin left; opacity .2s per comparire", "purpose": "Il filo da 2px sul bordo alto del vassoio che si svuota da sinistra a destra." }
     ],
     "breakpoints": [
       { "name": "phone", "value": "max-width: 640px", "purpose": "Dock a griglia 3+3+1 con etichette e icone clamp(48px,14vw,56px), colonna singola, wrap 16px, sezioni 64px." },
       { "name": "tablet", "value": "max-width: 1023px", "purpose": "Bento: whatsapp ed e-mail a 3 colonne, paypal a riga intera." },
       { "name": "pointer-fine", "value": "(hover: hover) and (pointer: fine)", "purpose": "Etichette a comparsa del dock." },
       { "name": "dock-physics", "value": "(hover: hover) and (pointer: fine) and (min-width: 641px)", "purpose": "Fisica delle molle nel dock (script)." },
-      { "name": "container", "value": "max-width: 1024px", "purpose": ".wrap." }
+      { "name": "container", "value": "max-width: 1024px", "purpose": ".wrap." },
+      { "name": "moves-grid", "value": "max-width: 480px", "purpose": "Giochi: le quattro mosse (.tasti.mosse) in griglia 2×2." },
+      { "name": "table-desktop", "value": "min-width: 900px", "purpose": "Giochi: cinque posti in fila, --cw 84px, --dw 100px, tavolo 640px." },
+      { "name": "aside", "value": "min-width: 1100px", "purpose": "Giochi: colonna laterale da 300px (al tavolo, cosa succede)." },
+      { "name": "seat-container", "value": "container-type: inline-size su .posto", "purpose": "Le carte si misurano sul posto: --cw clamp(40px,46cqw,64px), clamp(52px,54cqw,84px) da 900px." }
     ],
     "sizes": [
       { "name": "--sz", "value": "clamp(44px,min(4.6vw,7.5svh),64px)", "mobile": "clamp(48px,14vw,56px) sulla .face", "purpose": "Lato dell'icona nel dock: segue la finestra su entrambi gli assi, fra 44 e 64px." },
@@ -119,12 +161,21 @@
       { "name": "nav", "value": "48px" },
       { "name": "tile-icon", "value": "60px" },
       { "name": "folder", "value": "128px", "mobile": "112px" },
-      { "name": "slot", "value": "60px", "mobile": "56px" }
+      { "name": "slot", "value": "60px", "mobile": "56px" },
+      { "name": "--cw", "value": "46px", "desktop": "84px", "purpose": "Larghezza della carta ai posti (altezza × 1.4); dentro il posto clamp su cqw." },
+      { "name": "--dw", "value": "56px", "desktop": "100px", "purpose": "Larghezza della carta al banco." },
+      { "name": "table", "value": "min-height calc(100svh - 48px - 16px); padding 16px 14px 14px", "desktop": "min-height 640px (min(max(640px,100svh - 72px),720px) da 1100px); padding 22px 24px 20px", "mobile": "padding 14px 10px 10px", "purpose": "Il tavolo riempie il primo schermo sotto la nav." },
+      { "name": "control", "value": "44px", "purpose": "Altezza di tasti, campo del nome e lato delle fiche da puntare." },
+      { "name": "chip-bet", "value": "32px", "purpose": "Altezza della fiche puntata (.fiche)." },
+      { "name": "timer", "value": "2px", "purpose": "Il filo del tempo sul bordo alto del vassoio." }
     ],
     "fluid": { "rule": "La regola dei due assi: nel primo schermo ogni misura fluida è clamp(min, min(vw, svh), max)", "display": "clamp(2.75rem,min(9vw,13svh),6rem)", "lede": "clamp(1rem,min(1.5vw,2.6svh),1.3125rem)", "sz": "clamp(44px,min(4.6vw,7.5svh),64px)" },
     "shapes": [
       { "name": "squircle", "value": "clip-path: url(#sq)", "purpose": "Superellisse vera in objectBoundingBox, definita in fondo alla pagina; su .face, .folder, .folder i, .slots i. Il contenitore .dk porta anche border-radius: 22% per ombra e fuoco." },
-      { "name": "glyph", "value": "54% del lato, fill #fff", "purpose": "Il glifo dentro l'icona; 50–60% per correzione ottica, dichiarato in linea." }
+      { "name": "glyph", "value": "54% del lato, fill #fff", "purpose": "Il glifo dentro l'icona; 50–60% per correzione ottica, dichiarato in linea." },
+      { "name": "pill", "value": "border-radius: 999px", "purpose": "Giochi: tasti, campo del nome, badge del totale, fiche puntata." },
+      { "name": "disc", "value": "border-radius: 50%", "purpose": "Giochi: fiche da puntare (44px, bordo tratteggiato) e punto di presenza (8px)." },
+      { "name": "card", "value": "border-radius: calc(var(--cw) * .09); proporzione 1:1.4; sovrapposizione margin-left calc(var(--cw) * -.64) (fino a -.8 con sette carte)", "purpose": "La carta da gioco." }
     ]
   },
   "components": [
@@ -183,6 +234,30 @@
       "description": "Bordo alto da 1px, 12px in --fg2, credito a sinistra con link esatto a https://www.albertopecchini.it e il dominio a destra.",
       "html": "<footer class=\"ds-foot\"><div class=\"ds-foot-wrap\"><a href=\"https://www.albertopecchini.it\" rel=\"author\">sito di alberto pecchini</a><span>pzkko.it</span></div></footer>",
       "css": ".ds-foot{border-top:1px solid var(--hair,rgba(0,0,0,.1));padding:22px 0 max(22px,env(safe-area-inset-bottom));font:400 12px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;color:var(--fg2,#6e6e73)}.ds-foot-wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;max-width:1024px;margin:0 auto;padding:0 22px}.ds-foot a{color:inherit;text-decoration:none;transition:color .15s ease}.ds-foot a:hover{color:var(--fg,#1d1d1f)}.ds-foot a:focus-visible{outline:2px solid var(--link,#0066cc);outline-offset:3px;border-radius:10px}"
+    },
+    {
+      "name": "Tavolo da gioco",
+      "kind": "custom",
+      "refersTo": "felt-table",
+      "description": "Il secondo componente firma (giochi): feltro radiale uguale nei due temi, banco in alto, posti di vetro in basso, vassoio dei comandi con timer a filo. Le carte sono CSS fino alle immagini di Claude Design.",
+      "html": "<section class='ds-tavolo' aria-label='il tavolo'><svg width='0' height='0' style='position:absolute' aria-hidden='true'><defs><path id='ds-s-c' d='M12 21.2s-7.4-4.6-9.5-9.2C.9 8.6 3.1 5 6.6 5c2.3 0 3.9 1.3 5.4 3 1.5-1.7 3.1-3 5.4-3 3.5 0 5.7 3.6 4.1 7-2.1 4.6-9.5 9.2-9.5 9.2z'/><path id='ds-s-p' d='M12 2.4C9.1 7.1 4.2 9.6 4.2 14a4 4 0 0 0 6.5 3.1L9.9 21.4h4.2l-.8-4.3A4 4 0 0 0 19.8 14c0-4.4-4.9-6.9-7.8-11.6z'/></defs></svg><div class='ds-banco'><span class='ds-chi'>banco</span><div class='ds-carte' style='--cw:56px'><div class='ds-carta'><span class='ds-ix'>K<svg viewBox='0 0 24 24'><use href='#ds-s-p'/></svg></span><span class='ds-pip'><svg viewBox='0 0 24 24'><use href='#ds-s-p'/></svg></span><span class='ds-ix ds-b'>K<svg viewBox='0 0 24 24'><use href='#ds-s-p'/></svg></span></div></div><span class='ds-tot'>10</span></div><p class='ds-scritta'><b>blackjack</b> paga 3 a 2 · il banco sta a 17 · <b>pzkko</b></p><div class='ds-posti'><div class='ds-posto ds-mio'><span class='ds-nome'>alberto (tu)</span><span class='ds-pzk'>1200 $pzk</span><div class='ds-carte'><div class='ds-carta'><span class='ds-ix'>3<svg viewBox='0 0 24 24'><use href='#ds-s-p'/></svg></span><span class='ds-pip'><svg viewBox='0 0 24 24'><use href='#ds-s-p'/></svg></span></div><div class='ds-carta ds-r'><span class='ds-ix'>K<svg viewBox='0 0 24 24'><use href='#ds-s-c'/></svg></span><span class='ds-pip'><svg viewBox='0 0 24 24'><use href='#ds-s-c'/></svg></span></div></div><span class='ds-tot'>13</span><span class='ds-fiche'>50</span></div><div class='ds-posto ds-libero'><span>posto libero</span><button class='ds-sit' type='button'>siediti</button></div></div><div class='ds-tray'><div class='ds-timer'><i style='transform:scaleX(.6)'></i></div><div class='ds-riga'><span><b>tocca a te</b> · hai 13</span><span class='ds-conto'>19 s</span></div><div class='ds-tasti'><button class='ds-btn ds-p' type='button'>carta<span class='ds-k'>c</span></button><button class='ds-btn' type='button'>stai<span class='ds-k'>s</span></button><button class='ds-btn' type='button'>raddoppia<span class='ds-k'>r</span></button><button class='ds-btn' type='button' disabled>dividi<span class='ds-k'>d</span></button></div></div></section>",
+      "css": ".ds-tavolo{--cw:46px;--eo:cubic-bezier(.23,1,.32,1);position:relative;isolation:isolate;display:flex;flex-direction:column;gap:12px;width:520px;min-height:460px;padding:16px 14px 14px;border-radius:28px;color:#fff;background:radial-gradient(120% 90% at 50% 38%,#1b6847 0%,#0c3a29 72%,#092b1f 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -30px rgba(0,0,0,.55);overflow:clip;font:400 17px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;font-variant-numeric:tabular-nums}.ds-tavolo svg{display:block}.ds-tavolo *:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:10px}.ds-banco{display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:4px}.ds-chi{font-size:12px;color:rgba(255,255,255,.78)}.ds-scritta{margin:auto 0;text-align:center;font-size:12px;letter-spacing:.02em;color:rgba(255,255,255,.78);padding:4px 0}.ds-scritta b{font-weight:600;color:#fff}.ds-posti{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:auto}.ds-posto{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:calc(var(--cw) * 1.4 + 74px);padding:8px 6px 10px;border-radius:18px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);transition:box-shadow .2s var(--eo),background .2s}.ds-posto.ds-mio{box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}.ds-posto.ds-libero{justify-content:center;background:transparent}.ds-posto.ds-libero span{font-size:12px;color:rgba(255,255,255,.78)}.ds-nome{font:600 13px/1.2 inherit;font-weight:600;font-size:13px;line-height:1.2}.ds-pzk{font-size:11px;color:rgba(255,255,255,.78)}.ds-sit{height:44px;padding:0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);color:#fff;font:600 13px/1 inherit;font-size:13px;font-weight:600;cursor:pointer;transition:transform .12s var(--eo),background .15s}.ds-sit:hover{background:rgba(255,255,255,.18)}.ds-sit:active{transform:scale(.96)}.ds-carte{display:flex;justify-content:center;min-height:calc(var(--cw) * 1.4)}.ds-carta{position:relative;flex:none;width:var(--cw);height:calc(var(--cw) * 1.4);border-radius:calc(var(--cw) * .09);background:#fff;color:#1d1d1f;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 3px 8px -2px rgba(0,0,0,.5),0 0 0 .5px rgba(0,0,0,.25);overflow:hidden}.ds-carta.ds-r{color:#ff3b30}.ds-carta+.ds-carta{margin-left:calc(var(--cw) * -.64)}.ds-ix{position:absolute;top:calc(var(--cw) * .07);left:calc(var(--cw) * .09);display:flex;flex-direction:column;align-items:center;gap:1px;font-weight:700;font-size:calc(var(--cw) * .3);line-height:1;letter-spacing:-.04em;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI Variable Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif}.ds-ix svg{width:calc(var(--cw) * .2);height:calc(var(--cw) * .2);fill:currentColor}.ds-ix.ds-b{top:auto;left:auto;bottom:calc(var(--cw) * .07);right:calc(var(--cw) * .09);transform:rotate(180deg)}.ds-pip{position:absolute;inset:0;display:grid;place-items:center}.ds-pip svg{width:calc(var(--cw) * .42);height:calc(var(--cw) * .42);fill:currentColor}.ds-tot{font-weight:600;font-size:12px;line-height:1;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.32);color:#fff;letter-spacing:0}.ds-fiche{display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 5px;border-radius:999px;background:#2c2c2e;color:#fff;font-weight:600;font-size:11px;line-height:1;letter-spacing:0;box-shadow:0 0 0 2px #2c2c2e,0 0 0 3.5px rgba(255,255,255,.75) inset,0 3px 6px -1px rgba(0,0,0,.6);border:2px dashed rgba(255,255,255,.85)}.ds-tray{position:relative;margin-top:4px;padding:14px 14px 12px;border-radius:22px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),inset 0 1px 0 rgba(255,255,255,.12);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);display:flex;flex-direction:column;gap:10px}.ds-timer{position:absolute;top:0;left:18px;right:18px;height:2px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden}.ds-timer i{display:block;height:100%;background:#fff;transform-origin:left center}.ds-riga{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:22px;font-size:15px}.ds-riga b{font-weight:600}.ds-conto{font-size:13px;color:rgba(255,255,255,.78)}.ds-tasti{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.ds-btn{height:44px;padding:0 18px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:#fff;font-weight:600;font-size:15px;line-height:1;letter-spacing:-.01em;cursor:pointer;transition:transform .12s var(--eo),background .15s,opacity .15s;white-space:nowrap}.ds-btn.ds-p{background:#1a6fe0;box-shadow:none}.ds-btn:disabled{opacity:.4;cursor:default}.ds-btn:not(:disabled):not(.ds-p):hover{background:rgba(255,255,255,.22)}.ds-btn.ds-p:not(:disabled):hover{filter:brightness(1.08)}.ds-btn:not(:disabled):active{transform:scale(.96)}.ds-k{margin-left:8px;font-size:11px;font-weight:400;opacity:.7}"
+    },
+    {
+      "name": "Fiche da puntare",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Il disco grafite da 44px con anello tratteggiato bianco e la cifra tabulare; cinque tagli nel vassoio, poi «punta» primario.",
+      "html": "<div class='ds-chips'><button class='ds-ch' type='button'>5</button><button class='ds-ch' type='button'>10</button><button class='ds-ch' type='button'>25</button><button class='ds-ch' type='button'>50</button><button class='ds-ch' type='button' disabled>100</button><button class='ds-punta' type='button'>punta 25</button></div>",
+      "css": ".ds-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:16px;border-radius:22px;background:radial-gradient(120% 90% at 50% 38%,#1b6847 0%,#0c3a29 72%,#092b1f 100%);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}.ds-ch{width:44px;height:44px;padding:0;border:2px dashed rgba(255,255,255,.85);border-radius:50%;background:#2c2c2e;box-shadow:0 0 0 2px #2c2c2e,0 3px 6px -1px rgba(0,0,0,.6);color:#fff;font-weight:600;font-size:13px;line-height:1;cursor:pointer;transition:transform .12s cubic-bezier(.23,1,.32,1),opacity .15s}.ds-ch:disabled{opacity:.35;cursor:default}.ds-ch:not(:disabled):active{transform:scale(.92)}.ds-ch:focus-visible{outline:2px solid #fff;outline-offset:3px}.ds-punta{margin-left:4px;height:44px;padding:0 18px;border:0;border-radius:999px;background:#1a6fe0;color:#fff;font-weight:600;font-size:15px;line-height:1;letter-spacing:-.01em;cursor:pointer;transition:transform .12s cubic-bezier(.23,1,.32,1)}.ds-punta:hover{filter:brightness(1.08)}.ds-punta:active{transform:scale(.96)}.ds-punta:focus-visible{outline:2px solid #fff;outline-offset:3px}"
+    },
+    {
+      "name": "Tasto pieno sulle superfici neutre",
+      "kind": "button",
+      "refersTo": "button-primary-page",
+      "description": "Il tasto primario fuori dal feltro (velo dei maggiorenni, pagina del banco): --btn, cioè --link in chiaro e #1a6fe0 in scuro perché il bianco su #2997ff non regge 4.5:1. Accanto, il tasto secondario --campo con anello --hair.",
+      "html": "<div class='ds-tasti-pagina'><button class='ds-btn-page ds-p' type='button'>ho più di 18 anni, entro</button><button class='ds-btn-page' type='button'>registra un amico</button></div>",
+      "css": ".ds-tasti-pagina{display:flex;gap:8px;flex-wrap:wrap;padding:22px;border-radius:28px;background:var(--tile,#f5f5f7);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif}.ds-btn-page{height:44px;padding:0 16px;border:0;border-radius:999px;background:var(--campo,#fff);box-shadow:inset 0 0 0 1px var(--hair,rgba(0,0,0,.1));color:var(--fg,#1d1d1f);font-weight:600;font-size:15px;line-height:1;letter-spacing:-.01em;cursor:pointer;transition:transform .12s cubic-bezier(.23,1,.32,1)}.ds-btn-page.ds-p{background:var(--btn,#0066cc);color:#fff;box-shadow:none}.ds-btn-page:active{transform:scale(.96)}.ds-btn-page:disabled{opacity:.4;cursor:default}.ds-btn-page:focus-visible{outline:2px solid var(--link,#0066cc);outline-offset:3px}"
     }
   ],
   "narrative": {
@@ -205,7 +280,8 @@
       { "name": "La regola del minuscolo", "body": "Tutto il testo visibile è minuscolo nel sorgente, nomi propri compresi («alberto pecchini», «instagram»). Non si usa text-transform, né in un verso né nell'altro. Titolo e meta della pagina conservano le maiuscole.", "section": "typography" },
       { "name": "La regola dei due assi", "body": "Nel primo schermo nessuna misura dipende dalla sola larghezza: ogni dimensione fluida è clamp(min, min(vw, svh), max), perché la scrivania deve stare intera in vista anche in una finestra bassa. Dal secondo schermo in giù basta vw.", "section": "layout" },
       { "name": "La regola del vetro che poggia", "body": "Hanno ombra solo le cose che stanno sopra la pagina: il dock, le icone, l'etichetta. Le schede non hanno ombra né bordo, mai: si staccano dal fondo solo per tono. Non si aggiunge un'ombra a una scheda per farla «risaltare».", "section": "elevation" },
-      { "name": "La regola della linea sola", "body": "L'unica linea del sistema è --hair a 1 px: sotto la nav quando si scorre, come separatore nel dock, sopra il piè di pagina, tra le righe dell'elenco GitHub. Non esistono bordi di scheda, divisori di sezione o cornici.", "section": "elevation" }
+      { "name": "La regola della linea sola", "body": "L'unica linea del sistema è --hair a 1 px: sotto la nav quando si scorre, come separatore nel dock, sopra il piè di pagina, tra le righe dell'elenco GitHub. Non esistono bordi di scheda, divisori di sezione o cornici.", "section": "elevation" },
+      { "name": "La regola del feltro", "body": "Il feltro è il solo campo di colore dei giochi ed è uguale in chiaro e in scuro: sopra ci stanno bianco, bianco velato (--felt-fg2), vetro bianco a bassa alpha e il blu del tasto primario; niente grigi di pagina, niente --tile. Fuori dal tavolo la pagina torna neutra come la home.", "section": "colors" }
     ],
     "dos": [
       "Do tenere il dock in fondo all'hero a tutto schermo, nel flusso, dopo .intro: la scrivania è il primo schermo e scorre via con esso.",
@@ -215,7 +291,9 @@
       "Do usare --fd 600 per titoli e nomi, --ft 400 per tutto il resto, e la spaziatura negativa prevista per il corpo (da -.01em a -.035em).",
       "Do prevedere il ripiego per prefers-reduced-transparency (fondo opaco --bg o --tile) e per prefers-reduced-motion (nessun ingresso, nessuna fisica) in ogni nuovo vetro o movimento.",
       "Do aggiungere un nuovo strumento o gioco al posto della sua casella negli stati vuoti e come nuova icona nel dock, rispettando le righe da tre a telefono.",
-      "Do scrivere tutto il testo visibile in minuscolo nel sorgente e firmare il piè di pagina con il link esatto a https://www.albertopecchini.it."
+      "Do scrivere tutto il testo visibile in minuscolo nel sorgente e firmare il piè di pagina con il link esatto a https://www.albertopecchini.it.",
+      "Do nei giochi tenere il tavolo come un oggetto solo che riempie il primo schermo (min-height: calc(100svh - 48px - 16px), raggio 28 px, feltro --felt1 → --felt2 → --felt-rim uguale nei due temi) con i comandi in un vassoio di vetro --glass dentro il tavolo; sul feltro testo bianco o --felt-fg2, tasto primario --blue, anelli di fuoco bianchi.",
+      "Do disegnare carte e fiche in CSS con i token --card/--ink/--red/--chip e lasciare le classi .img e i percorsi art/… pronti per le immagini di Claude Design: l'arte si accende con un flag (ART), senza cambiare il layout."
     ],
     "donts": [
       "Don't fissare il dock alla finestra (position: fixed) né riservargli spazio nel piè di pagina: provato e tolto il 2026-10-07.",
