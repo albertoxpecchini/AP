@@ -135,21 +135,24 @@ Niente codici, niente sabot.
 Ogni risposta porta la vista pubblica aggiornata e, se c'è il `tok`, `io`.
 Limiti: 5 ingressi al minuto per IP, 90 mosse al minuto.
 
-## La grafica (Claude Design)
+## La grafica (gpt-image-2 su Replicate)
 
-Oggi il tavolo è feltro in CSS e le carte sono disegnate in CSS (indice negli
-angoli, seme al centro, semi in SVG). Il tavolo e il mazzo veri, firmati
-pzkko, si disegnano in Claude Design (vedi `design-prompts.md`) e si mettono in
-`pzkko/games/blackjack/art/`:
+Il tavolo è una scena: il feltro fotografato in pianta e inclinato in
+prospettiva CSS, il croupier dietro al bordo lontano, cinque sedie con le
+persone sedute, il sabot, la rastrelliera, gli scarti; carte, fiche e segni
+stanno sul piano. Tutte le immagini le ha disegnate openai/gpt-image-2 su
+Replicate (`fogli.js` ha i prompt, `immagini.mjs` genera, scontorna e taglia
+i pezzi in `pzkko/games/blackjack/art/`, con `art/pezzi.json` per misure e
+perni). Le figure sono burattini a pezzi: la pagina monta spalla → gomito →
+polso con la cinematica inversa e muove le mani con molle criticamente
+smorzate; il croupier prende ogni carta dal sabot e la posa al suo orario
+(quello del server, a velocità umana), i giocatori fanno i segnali veri del
+blackjack (carta: l'indice batte sul feltro; stai: la mano ondeggia; raddoppia:
+posa una fiche e alza un dito; dividi: due dita), e le proprie carte si piegano
+sotto il dito. I tasti stanno sul bordo imbottito davanti al proprio posto.
+Tutto il resto in `design-prompts.md`.
 
-- `tavolo.svg` (1600×1000, orizzontale) e `tavolo-verticale.svg` (900×1400):
-  il feltro con la scritta; la pagina lo mette come sfondo del tavolo
-  (`object-fit: cover`) e nasconde la propria scritta;
-- `carte/<rango><seme>.svg`, 52 file: ranghi `A 2 3 4 5 6 7 8 9 10 J Q K`, semi
-  `c q f p` (cuori, quadri, fiori, picche): `Ac.svg`, `10p.svg`, `Kf.svg`…
-  proporzione 5:7 (es. 250×350), angoli al 9 %; più `retro.svg`;
-- `fiche-5.svg`, `fiche-10.svg`, `fiche-25.svg`, `fiche-50.svg`, `fiche-100.svg`
-  (tonde, es. 200×200).
-
-Poi in `index.html` si accendono i tre interruttori:
-`const ART = { tavolo: true, carte: true, fiche: true }`. Niente altro cambia.
+```bash
+node tools/blackjack/immagini.mjs genera tutti       # otto fogli, ~2 $ in tutto
+node tools/blackjack/immagini.mjs usa croupier tools/blackjack/lavoro/croupier/<file>.png busto,braccio,avambraccio,pinza,aperta
+```

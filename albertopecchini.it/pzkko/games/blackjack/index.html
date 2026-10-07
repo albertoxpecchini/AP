@@ -8,9 +8,8 @@
 <link rel="canonical" href="https://www.pzkko.it/games/blackjack/">
 <meta name="author" content="Alberto Pecchini">
 <link rel="author" href="https://www.albertopecchini.it">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="pzkko">
 <meta property="og:title" content="blackjack, il tavolo di pzkko">
@@ -23,39 +22,23 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"blackjack, il tavolo di pzkko","url":"https://www.pzkko.it/games/blackjack/","inLanguage":"it","isPartOf":{"@type":"WebSite","name":"pzkko","url":"https://www.pzkko.it/"},"author":{"@type":"Person","name":"Alberto Pecchini","alternateName":"pzkko","url":"https://www.albertopecchini.it"}}</script>
 <style>
-/* ── tokens: quelli della home di pzkko.it, più il feltro del tavolo ───────── */
+/* ── tokens: quelli della home di pzkko.it; la sala da gioco è scura sempre ── */
 :root{
-  --bg:#fff; --tile:#f5f5f7; --fg:#1d1d1f; --fg2:#6e6e73; --link:#0066cc;
-  --hair:rgba(0,0,0,.1); --nav:rgba(255,255,255,.72); --tip:rgba(255,255,255,.94);
-  --ok:#248a3d; --no:#d70015; --btn:#0066cc;
+  --bg:#000; --tile:#1d1d1f; --fg:#f5f5f7; --fg2:#a1a1a6; --link:#2997ff; --btn:#1a6fe0;
+  --hair:rgba(255,255,255,.14); --nav:rgba(0,0,0,.62); --ok:#30d158; --no:#ff6961;
   --fd:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --ft:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --eo:cubic-bezier(.23,1,.32,1);
-  /* il tavolo: un colore solo, uguale col tema chiaro e scuro */
-  --felt1:#1b6847; --felt2:#0c3a29; --felt-rim:#092b1f;
-  --felt-fg:#fff; --felt-fg2:rgba(255,255,255,.78); --felt-line:rgba(255,255,255,.16);
-  --glass:rgba(255,255,255,.1); --glass-edge:rgba(255,255,255,.18);
-  --blue:#1a6fe0; --card:#fff; --ink:#1d1d1f; --red:#ff3b30; --chip:#2c2c2e;
-  --cw:46px; --dw:56px;   /* larghezza delle carte: ai posti, al banco */
-  color-scheme:light dark;
+  --felt-fg:#fff; --felt-fg2:rgba(255,255,255,.78); --glass:rgba(255,255,255,.1); --glass-edge:rgba(255,255,255,.18);
+  --red:#ff3b30; --ink:#1d1d1f;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    --bg:#000; --tile:#1d1d1f; --fg:#f5f5f7; --fg2:#a1a1a6; --link:#2997ff;
-    --hair:rgba(255,255,255,.14); --nav:rgba(0,0,0,.62); --tip:rgba(44,44,46,.96);
-    --ok:#30d158; --no:#ff6961; --btn:#1a6fe0;
-  }
-}
-@media (min-width:900px){:root{--cw:84px;--dw:100px}}
-
-/* ── base ───────────────────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box}
 html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-color:var(--fg2) transparent}
 body{margin:0;min-height:100svh;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font:400 17px/1.47 var(--ft);letter-spacing:-.01em;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
 a{color:inherit;text-decoration:none}
 ::selection{background:rgba(0,113,227,.28)}
-:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:10px}
-.tavolo :focus-visible{outline-color:#fff}
+:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:10px}
 h1,h2,h3,p,ul{margin:0}
 svg{display:block}
 button{font:inherit;color:inherit;letter-spacing:inherit}
@@ -63,7 +46,6 @@ input{font:inherit}
 .n{font-variant-numeric:tabular-nums}
 .wrap{width:100%;max-width:1024px;margin:0 auto;padding:0 22px}
 main{flex:1}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ── nav ───────────────────────────────────────────────────────────────── */
 .nav{position:sticky;top:0;z-index:10;height:48px;background:var(--nav);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}
@@ -74,126 +56,111 @@ main{flex:1}
 .saldo b{font-weight:600;color:var(--fg)}
 @media (prefers-reduced-transparency:reduce){.nav{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
 
-/* ── il tavolo: un oggetto solo che riempie il primo schermo ───────────────── */
-.gioco{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:8px 0 0}
-@media (min-width:1100px){.gioco{grid-template-columns:minmax(0,1fr) 300px;align-items:start}}
-.tavolo{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:12px;min-height:calc(100svh - 48px - 16px);padding:16px 14px 14px;border-radius:28px;color:var(--felt-fg);
-  background:radial-gradient(120% 90% at 50% 38%,var(--felt1) 0%,var(--felt2) 72%,var(--felt-rim) 100%);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -30px rgba(0,0,0,.55);overflow:clip}
-@media (min-width:900px){.tavolo{min-height:640px;padding:22px 24px 20px}}
-@media (min-width:1100px){.tavolo{min-height:min(max(640px,calc(100svh - 72px)),720px)}}
-/* quando arriva il tavolo disegnato in Claude Design: il feltro è l'immagine, la scritta sta nell'immagine */
-.tavolo.art{background:url(art/tavolo.svg) center/cover no-repeat}
-@media (max-width:640px){.tavolo.art{background-image:url(art/tavolo-verticale.svg)}}
-.tavolo.art .scritta{visibility:hidden}
+/* ── la sala: un palcoscenico a misura di finestra, il mondo dentro in scala ── */
+.sala{position:relative;height:calc(100svh - 48px);min-height:420px;overflow:clip;background:radial-gradient(120% 80% at 50% 10%,#17221d 0%,#070a09 60%,#000 100%);isolation:isolate}
+.mondo{position:absolute;left:50%;top:50%;width:var(--mw);height:var(--mh);transform:translate(-50%,-50%) scale(var(--k));transform-origin:50% 50%}
+.mondo>*{position:absolute;inset:0}
+.strato{pointer-events:none}
+.strato svg{width:100%;height:100%;overflow:visible}
 
-.sabot{position:absolute;top:14px;right:16px;font-size:12px;color:var(--felt-fg2);display:flex;align-items:center;gap:6px}
-.sabot i{display:block;width:14px;height:18px;border-radius:3px;background:var(--card);box-shadow:-3px 0 0 -1px rgba(255,255,255,.7),-6px 0 0 -2px rgba(255,255,255,.45)}
+/* il piano del tavolo: la foto in pianta, inclinata in prospettiva */
+.vista3d{perspective:var(--persp);perspective-origin:50% var(--porig)}
+.piano{position:absolute;left:50%;top:var(--ptop);width:var(--pw);height:var(--ph);margin-left:calc(var(--pw) / -2);transform-origin:50% 100%;transform:rotateX(var(--tilt));transform-style:preserve-3d}
+.piano .feltro{position:absolute;inset:0;background:url(art/tavolo/tavolo.webp) center/100% 100% no-repeat}
+.piano.cssfelt .feltro{background:radial-gradient(120% 90% at 50% 38%,#1b6847 0%,#0c3a29 72%,#092b1f 100%);border-radius:28px 28px 50% 50%/28px 28px 100% 100%;box-shadow:inset 0 0 0 36px #2b1d16,inset 0 0 0 38px rgba(255,255,255,.12)}
+.piano .segni{position:absolute;inset:0;overflow:visible}
+.piano .punto{position:absolute;width:0;height:0}
+#oggetti-piano>*{transform-origin:0 0}
 
-.banco{display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:4px;min-height:calc(var(--dw) * 1.4 + 52px)}
-.banco .chi{font-size:12px;color:var(--felt-fg2)}
-.banco .carte{--cw:var(--dw)}
+/* le carte sul feltro: 96 × 134 in pianta, foto della carta, angolo che si piega */
+.carta{position:absolute;width:96px;height:134px;margin:-67px 0 0 -48px;border-radius:9px;transform-style:preserve-3d;filter:drop-shadow(0 3px 2px rgba(0,0,0,.45))}
+.carta .faccia,.carta .retro{position:absolute;inset:0;border-radius:9px;background:#fff center/100% 100% no-repeat;backface-visibility:hidden}
+.carta .retro{transform:rotateY(180deg);background-image:url(art/carte/retro.webp)}
+.carta .faccia{background-image:var(--img)}
+.carta .faccia.css{display:grid;place-items:center;color:var(--ink);font:700 44px/1 var(--fd);letter-spacing:-.04em;background:#fff}
+.carta .faccia.css.r{color:var(--red)}
+.carta .faccia.css i{position:absolute;top:6px;left:8px;font-size:22px;font-style:normal}
+.carta .faccia.css b{position:absolute;bottom:6px;right:8px;font-size:22px;transform:rotate(180deg)}
+.carta.girata{animation:gira .32s var(--eo) both}
+@keyframes gira{from{transform:rotateY(180deg) translateZ(6px)}to{transform:rotateY(0) translateZ(0)}}
+/* l'angolo in basso a destra che si alza quando lo tocchi: faccia e retro dell'angolo */
+.carta .angolo{position:absolute;inset:0;transform-origin:100% 100%;transform:rotate3d(1,-1,0,calc(var(--piega,0) * -1deg));transform-style:preserve-3d;clip-path:polygon(100% 55%,100% 100%,45% 100%);will-change:transform;pointer-events:none}
+.carta.mia{cursor:grab;pointer-events:auto}
+.carta.mia:active{cursor:grabbing}
 
-.scritta{text-align:center;font-size:12px;letter-spacing:.02em;color:var(--felt-fg2);padding:4px 0;margin:auto 0}
-.posti{margin-top:auto}
-.scritta b{font-weight:600;color:var(--felt-fg)}
+/* fiche puntate sul cerchio, totali vicino alle carte */
+.pila{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;pointer-events:none}
+.pila i{position:absolute;inset:0;border-radius:50%;background:center/100% 100% no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+.pila i.css{background:#2c2c2e;border:3px dashed rgba(255,255,255,.85)}
+.pila span{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);font:600 13px/1 var(--ft);color:#fff;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.tot-feltro{position:absolute;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font:600 15px/1 var(--ft);white-space:nowrap;pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.tot-feltro.bj{background:#fff;color:var(--ink)}
+.tot-feltro.sballa{background:var(--red)}
+.tot-feltro.vince{background:#fff;color:var(--ink)}
+.tot-feltro.perde{color:var(--felt-fg2)}
+.tot-feltro.pari{background:rgba(255,255,255,.25)}
 
-/* ── i posti: cinque in fila; sul telefono tre più due ─────────────────── */
-.posti{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;align-items:start}
-.posto{grid-column:span 2;position:relative;container-type:inline-size;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:calc(var(--cw) * 1.4 + 74px);padding:8px 6px 10px;border-radius:18px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--felt-line);transition:box-shadow .2s var(--eo),background .2s}
-.posto:nth-child(4){grid-column:2/4}
-.posto:nth-child(5){grid-column:4/6}
-@media (min-width:900px){.posti{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.posto,.posto:nth-child(4),.posto:nth-child(5){grid-column:auto}.posto{padding:12px 10px 12px;border-radius:22px}}
-.posto.mio{box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}
-.posto.turno{background:rgba(255,255,255,.17)}
-.posto.turno.mio{box-shadow:inset 0 0 0 2px #fff,0 0 0 4px rgba(255,255,255,.18)}
-.posto.off .nome{color:var(--felt-fg2)}
-.posto .chi{display:flex;flex-direction:column;align-items:center;line-height:1.2;max-width:100%}
-.nome{font:600 13px/1.2 var(--ft);letter-spacing:-.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.posto .pzk{font-size:11px;color:var(--felt-fg2)}
-.posto.libero{justify-content:center;background:transparent;box-shadow:inset 0 0 0 1px var(--felt-line)}
-.posto.libero span{font-size:12px;color:var(--felt-fg2)}
-.sit{height:44px;padding:0 14px;border:0;border-radius:999px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-edge);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:transform .12s var(--eo),background .15s}
-.sit:active{transform:scale(.96)}
-@media (hover:hover){.sit:hover{background:rgba(255,255,255,.18)}}
-.mani{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
-.mano{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;border-radius:12px;padding:2px 0}
-.mano.attiva .tot{box-shadow:0 0 0 2px #fff}
-.attesa-mano{font-size:12px;color:var(--felt-fg2);padding-top:6px}
+/* ── sul bordo imbottito, davanti a me: i tasti delle mosse e le fiche ─── */
+.console{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;z-index:2}
+.console .fila{display:flex;align-items:center;gap:8px}
+.tasto{width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(0,0,0,.55);color:#fff;font:600 14px/1.1 var(--ft);letter-spacing:-.01em;cursor:pointer;display:grid;place-items:center;text-align:center;padding:4px;transition:transform .12s var(--eo),background .15s,opacity .2s;box-shadow:0 4px 10px rgba(0,0,0,.45),inset 0 0 0 3px rgba(0,0,0,.25);pointer-events:auto;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tasto.p{background:var(--btn);border-color:#fff}
+.tasto:disabled{opacity:.35;cursor:default}
+.tasto:not(:disabled):active{transform:scale(.93)}
+.tasto .k{display:block;font-size:11px;font-weight:400;opacity:.75}
+@media (hover:hover){.tasto:not(:disabled):not(.p):hover{background:rgba(255,255,255,.2)}}
+.fiche-tocco{width:60px;height:60px;border:0;border-radius:50%;background:center/100% 100% no-repeat;cursor:pointer;transition:transform .12s var(--eo),opacity .2s;filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));pointer-events:auto}
+.fiche-tocco:disabled{opacity:.3;cursor:default}
+.fiche-tocco:not(:disabled):active{transform:scale(.92)}
+.fiche-tocco.css{background:#2c2c2e;border:3px dashed rgba(255,255,255,.85);color:#fff;font:700 15px/1 var(--ft)}
 
-/* ── carte: bianche, indice negli angoli, seme al centro ────────────────── */
-.carte{display:flex;justify-content:center;min-height:calc(var(--cw) * 1.4)}
-.carta{position:relative;flex:none;width:var(--cw);height:calc(var(--cw) * 1.4);border-radius:calc(var(--cw) * .09);background:var(--card);color:var(--ink);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 3px 8px -2px rgba(0,0,0,.5),0 0 0 .5px rgba(0,0,0,.25);overflow:hidden}
-.carta.r{color:var(--red)}
-.carta+.carta{margin-left:calc(var(--cw) * -.64)}
-/* le carte si stringono col posto (container query) e si sovrappongono di più quando sono tante */
-.posto .carte{--cw:clamp(40px,46cqw,64px)}
-@media (min-width:900px){.posto .carte{--cw:clamp(52px,54cqw,84px)}.carte:has(> :nth-child(3)) .carta+.carta{margin-left:calc(var(--cw) * -.62)}.carte:has(> :nth-child(3)) .carta .ix{font-size:calc(var(--cw) * .26)}.carte:has(> :nth-child(4)) .carta+.carta{margin-left:calc(var(--cw) * -.7)}.carte:has(> :nth-child(4)) .carta .ix{font-size:calc(var(--cw) * .23);left:calc(var(--cw) * .05)}.carte:has(> :nth-child(4)) .carta .ix.b{left:auto;right:calc(var(--cw) * .05)}.carte:has(> :nth-child(5)) .carta+.carta{margin-left:calc(var(--cw) * -.76)}}
-.carte:has(> :nth-child(5)) .carta+.carta{margin-left:calc(var(--cw) * -.74)}
-.carte:has(> :nth-child(7)) .carta+.carta{margin-left:calc(var(--cw) * -.8)}
-.carta .ix{position:absolute;top:calc(var(--cw) * .07);left:calc(var(--cw) * .09);display:flex;flex-direction:column;align-items:center;gap:1px;font:700 calc(var(--cw) * .3)/1 var(--fd);letter-spacing:-.04em}
-.carta .ix svg{width:calc(var(--cw) * .2);height:calc(var(--cw) * .2);fill:currentColor}
-.carta .ix.b{top:auto;left:auto;bottom:calc(var(--cw) * .07);right:calc(var(--cw) * .09);transform:rotate(180deg)}
-.carta .pip{position:absolute;inset:0;display:grid;place-items:center}
-.carta .pip svg{width:calc(var(--cw) * .42);height:calc(var(--cw) * .42);fill:currentColor}
-.carta.img{background:var(--card) center/cover no-repeat}
-.carta.img>*{display:none}
-.carta.in{animation:dealt .55s var(--eo) both;animation-timing-function:linear(0,.186 9.1%,.465 18.2%,.682 27.3%,.821 36.4%,.903 45.5%,.949 54.5%,.973 63.6%,.986 72.7%,.993 81.8%,.997 90.9%,1)}
-@keyframes dealt{from{opacity:0;transform:translate(var(--dx,calc(var(--cw) * 1.2)),var(--dy,calc(var(--cw) * -1.4))) rotate(6deg)}}
-@media (prefers-reduced-motion:reduce){.carta.in{animation:none}}
+/* targhette sotto le sedie */
+.targa{position:absolute;transform:translate(-50%,0);padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:600 15px/1.2 var(--ft);text-align:center;white-space:nowrap;pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.targa small{display:block;font-weight:400;font-size:12px;color:var(--felt-fg2)}
+.targa.mia{box-shadow:0 0 0 2px #fff}
+.targa.turno{background:#fff;color:var(--ink)}
+.targa.turno small{color:#6e6e73}
+.targa.vuota{background:transparent;box-shadow:none;padding:0}
+.targa .libera{height:40px;padding:0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);color:#fff;font:600 14px/1 var(--ft);cursor:pointer;pointer-events:auto;transition:transform .12s var(--eo)}
+.targa .libera:active{transform:scale(.95)}
 
-.tot{font:600 12px/1 var(--ft);padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.32);color:#fff;letter-spacing:0}
-.tot.bj{background:#fff;color:var(--ink)}
-.tot.sballa{background:var(--red)}
-.tot.vince{background:#fff;color:var(--ink)}
-.tot.pari{background:rgba(255,255,255,.22)}
-.tot.perde{background:rgba(0,0,0,.32);color:var(--felt-fg2)}
-.fiche{display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 5px;border-radius:999px;background:var(--chip);color:#fff;font:600 11px/1 var(--ft);letter-spacing:0;box-shadow:0 0 0 2px var(--chip),0 0 0 3.5px rgba(255,255,255,.75) inset,0 3px 6px -1px rgba(0,0,0,.6);border:2px dashed rgba(255,255,255,.85)}
-.fiche.img{background:center/contain no-repeat;border:0;box-shadow:none;color:transparent}
-
-/* ── il vassoio dei comandi: vetro, come il dock della home ────────────── */
-.tray{position:relative;margin-top:4px;padding:14px 14px 12px;border-radius:22px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-edge),inset 0 1px 0 rgba(255,255,255,.12);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);display:flex;flex-direction:column;gap:10px}
-@media (prefers-reduced-transparency:reduce){.tray{background:rgba(0,0,0,.35);-webkit-backdrop-filter:none;backdrop-filter:none}}
-.timer{position:absolute;top:0;left:18px;right:18px;height:2px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;opacity:0;transition:opacity .2s}
-.timer.on{opacity:1}
-.timer i{display:block;height:100%;background:#fff;transform-origin:left center;transform:scaleX(1)}
-.riga{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:22px;font-size:15px}
-.riga .conto{font-size:13px;color:var(--felt-fg2);flex:none}
+/* ── il quadro di comando: una riga sopra al tavolo, il vassoio quando serve ── */
+.hud{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 16px;pointer-events:none}
+.hud>*{pointer-events:auto}
+.riga{position:relative;display:flex;align-items:center;gap:12px;min-height:36px;padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px var(--glass-edge);font-size:15px;max-width:min(70vw,520px)}
 .riga b{font-weight:600}
-.riga .grande{font-size:20px;font-weight:600;letter-spacing:-.02em}
-.grande .pos{color:#fff}
-.grande .neg{color:#ff8a80}
-.grande .zero{color:var(--felt-fg2)}
+.riga .conto{font-size:13px;color:var(--felt-fg2);flex:none}
+.riga .grande{font-size:17px;font-weight:600}
+.riga .pos{color:#fff}.riga .neg{color:#ff8a80}.riga .zero{color:var(--felt-fg2)}
+.timer{position:absolute;left:16px;right:16px;bottom:-6px;height:2px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;opacity:0;transition:opacity .2s}
+.timer.on{opacity:1}
+.timer i{display:block;height:100%;background:#fff;transform-origin:left center}
+.eventi-hud{font-size:13px;color:var(--felt-fg2);padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.4);max-width:min(40vw,380px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tray{position:absolute;left:50%;bottom:max(14px,env(safe-area-inset-bottom));z-index:3;transform:translateX(-50%);max-width:min(92%,560px);padding:10px;border-radius:22px;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);box-shadow:inset 0 0 0 1px var(--glass-edge);display:flex;flex-direction:column;gap:10px}
+.tray[hidden]{display:none}
+.tray.leggero{background:rgba(0,0,0,.35);padding:4px}
 .tasti{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-@media (max-width:480px){.tasti.mosse{display:grid;grid-template-columns:1fr 1fr}.tasti.mosse .b{padding:0 10px}}
 .b{height:44px;padding:0 18px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:#fff;font:600 15px/1 var(--ft);letter-spacing:-.01em;cursor:pointer;transition:transform .12s var(--eo),background .15s,opacity .15s;white-space:nowrap}
-.b.p{background:var(--blue);box-shadow:none}
-.b.t{background:transparent;box-shadow:none;color:var(--felt-fg2);padding:0 10px}
+.b.p{background:var(--btn);box-shadow:none}
+.b.t{background:transparent;box-shadow:none;color:var(--felt-fg2);padding:0 12px}
 .b:disabled{opacity:.4;cursor:default}
 .b:not(:disabled):active{transform:scale(.96)}
-@media (hover:hover){.b:not(:disabled):not(.p):hover{background:rgba(255,255,255,.22)}.b.t:not(:disabled):hover{background:transparent;color:#fff}.b.p:not(:disabled):hover{filter:brightness(1.08)}}
-.b .k{display:none;margin-left:8px;font-size:11px;font-weight:400;opacity:.7}
-@media (hover:hover) and (pointer:fine){.b .k{display:inline}}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.ch{width:44px;height:44px;padding:0;border:2px dashed rgba(255,255,255,.85);border-radius:50%;background:var(--chip);box-shadow:0 0 0 2px var(--chip),0 3px 6px -1px rgba(0,0,0,.6);color:#fff;font:600 13px/1 var(--ft);cursor:pointer;transition:transform .12s var(--eo),opacity .15s}
-.ch:disabled{opacity:.35;cursor:default}
-.ch:not(:disabled):active{transform:scale(.92)}
+@media (hover:hover){.b:not(:disabled):not(.p):hover{background:rgba(255,255,255,.22)}.b.t:not(:disabled):hover{background:transparent;color:#fff}}
 .campo{display:flex;gap:8px;flex-wrap:wrap}
 .campo input{flex:1 1 160px;min-width:0;height:44px;padding:0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);color:#fff;font-size:16px;letter-spacing:-.01em;text-transform:none}
 .campo input::placeholder{color:var(--felt-fg2)}
 .campo input:focus{outline:2px solid #fff;outline-offset:2px}
-.toast{font-size:13px;color:#fff;background:rgba(0,0,0,.4);padding:8px 12px;border-radius:12px;display:none}
+.toast{position:absolute;left:50%;top:64px;z-index:4;transform:translateX(-50%);font-size:14px;color:#fff;background:rgba(0,0,0,.6);padding:9px 14px;border-radius:12px;display:none;max-width:90%;box-shadow:inset 0 0 0 1px var(--glass-edge)}
 .toast.on{display:block}
 
-/* ── accanto e sotto: chi c'è, cosa succede, le ultime mani, le regole ─── */
-.lato{display:flex;flex-direction:column;gap:16px}
+/* ── sotto la sala: chi c'è, le ultime mani e le regole ─────────────────── */
+.sotto{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:24px 0 0}
 .scheda{padding:22px 22px 20px;border-radius:28px;background:var(--tile)}
 .scheda h2{font:600 20px/1.2 var(--fd);letter-spacing:-.02em;margin-bottom:12px}
 .lista{list-style:none;padding:0;font-size:15px}
 .lista li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--hair)}
 .lista li:first-child{border-top:0}
 .lista .chi{display:flex;align-items:center;gap:8px;min-width:0}
-.lista .chi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lista .io{color:var(--fg2);font-size:13px}
 .punto{width:8px;height:8px;border-radius:50%;background:var(--hair);flex:none}
 .punto.on{background:var(--ok)}
@@ -203,26 +170,22 @@ main{flex:1}
 .eventi time{flex:none;font-size:12px;padding-top:2px}
 .eventi li:first-child{color:var(--fg)}
 .vuoto{color:var(--fg2);font-size:15px}
-.sotto{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:16px 0 0}
 .mani-tab{width:100%;border-collapse:collapse;font-size:14px}
 .mani-tab td{padding:7px 0;border-top:1px solid var(--hair);vertical-align:top}
 .mani-tab tr:first-child td{border-top:0}
 .mani-tab td:first-child{color:var(--fg2);width:4.5em}
-.mani-tab .pos{color:var(--ok)}
-.mani-tab .neg{color:var(--no)}
+.mani-tab .pos{color:var(--ok)}.mani-tab .neg{color:var(--no)}
 .regole{list-style:none;padding:0;font-size:15px;color:var(--fg2);display:flex;flex-direction:column;gap:6px}
 .regole li{padding-left:14px;position:relative}
 .regole li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--fg2)}
 .nota{font-size:14px;color:var(--fg2)}
 .nota b{color:var(--fg);font-weight:600}
-
-/* ── piè di pagina ───────────────────────────────────────────────────────── */
 .foot{border-top:1px solid var(--hair);margin-top:48px;padding:22px 0 max(22px,env(safe-area-inset-bottom));font-size:12px;color:var(--fg2)}
 .foot .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px 16px;flex-wrap:wrap}
 @media (hover:hover){.foot a:hover{color:var(--fg)}}
 
 /* ── velo: il messaggio per i maggiorenni, una volta sola ─────────────────── */
-.velo{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:16px;background:var(--nav);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6)}
+.velo{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:16px;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6)}
 .velo.on{display:grid}
 .box{width:100%;max-width:440px;padding:28px;border-radius:28px;background:var(--tile);box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
 .box h2{font:600 28px/1.1 var(--fd);letter-spacing:-.02em}
@@ -230,26 +193,15 @@ main{flex:1}
 .box .tasti{margin-top:22px}
 .box .b{background:var(--btn);color:#fff;box-shadow:none}
 .box .b.t{background:transparent;color:var(--fg2);padding:0}
-.box .b.t:hover{color:var(--fg)}
-
-@media (prefers-reduced-motion:no-preference){
-  .tavolo{animation:materialize .7s var(--eo) both}
-  .lato,.sotto{animation:rise .6s var(--eo) both;animation-delay:80ms}
-}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}}
-@keyframes materialize{from{opacity:0;transform:translateY(14px) scale(.985)}}
 
 @media (max-width:640px){
   .wrap{padding:0 16px}
-  .tavolo{padding:14px 10px 10px;border-radius:24px;gap:10px}
-  .posti{gap:6px}
-  .posto{padding:8px 4px 8px;border-radius:16px}
-  /* se una divisione allunga i posti oltre lo schermo, i comandi restano in vista (overflow:clip sul tavolo non blocca lo sticky) */
-  .tray{position:sticky;bottom:8px;z-index:2;padding:12px 12px 10px;border-radius:20px}
+  .riga{font-size:14px;max-width:62vw}
+  .eventi-hud{display:none}
   .scheda{padding:20px 18px 18px;border-radius:24px}
-  .sotto{padding-top:16px}
   .foot{margin-top:32px}
 }
+@media (prefers-reduced-motion:reduce){.carta.girata{animation:none}}
 </style>
 </head>
 <body>
@@ -261,37 +213,36 @@ main{flex:1}
 </header>
 
 <main>
-  <div class="wrap gioco">
-    <section class="tavolo" id="tavolo" aria-label="il tavolo">
-      <div class="sabot n" id="sabot" aria-hidden="true"><i></i><span></span></div>
-      <div class="banco" id="banco">
-        <span class="chi">banco</span>
-        <div class="carte" id="banco-carte"></div>
-        <span class="tot" id="banco-tot" hidden></span>
+  <section class="sala" id="sala" aria-label="il tavolo">
+    <div class="mondo" id="mondo">
+      <div class="strato"><svg id="dietro" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div class="vista3d">
+        <div class="piano" id="piano">
+          <div class="feltro"></div>
+          <svg class="segni" id="segni" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div id="oggetti-piano"></div>
+        </div>
       </div>
-      <p class="scritta"><b>blackjack</b> paga 3 a 2 · il banco sta a 17 · <b>pzkko</b></p>
-      <div class="posti" id="posti" aria-label="i posti"></div>
-      <div class="tray" id="tray">
-        <div class="timer" id="timer"><i></i></div>
-        <div class="riga" id="riga"><span>carico il tavolo…</span></div>
-        <div class="tasti" id="tasti"></div>
-        <p class="toast n" id="toast" role="status" aria-live="polite"></p>
-      </div>
-    </section>
-
-    <aside class="lato">
-      <section class="scheda" aria-labelledby="h-chi">
-        <h2 id="h-chi">al tavolo</h2>
-        <ul class="lista n" id="chi"></ul>
-      </section>
-      <section class="scheda" aria-labelledby="h-ev">
-        <h2 id="h-ev">cosa succede</h2>
-        <ul class="eventi n" id="eventi"></ul>
-      </section>
-    </aside>
-  </div>
+      <div class="strato"><svg id="davanti" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div id="targhe" class="strato"></div>
+    </div>
+    <div class="hud">
+      <div class="riga" id="riga"><span>carico il tavolo…</span><div class="timer" id="timer"><i></i></div></div>
+      <div class="eventi-hud n" id="eventi-hud" aria-live="polite"></div>
+    </div>
+    <div class="tray" id="tray" hidden><div class="tasti" id="tasti"></div></div>
+    <p class="toast n" id="toast" role="status" aria-live="polite"></p>
+  </section>
 
   <div class="wrap sotto">
+    <section class="scheda" aria-labelledby="h-chi">
+      <h2 id="h-chi">al tavolo</h2>
+      <ul class="lista n" id="chi"></ul>
+    </section>
+    <section class="scheda" aria-labelledby="h-ev">
+      <h2 id="h-ev">cosa succede</h2>
+      <ul class="eventi n" id="eventi"></ul>
+    </section>
     <section class="scheda" aria-labelledby="h-st">
       <h2 id="h-st">ultime mani</h2>
       <div id="storico"></div>
@@ -304,7 +255,7 @@ main{flex:1}
         <li>blackjack paga 3 a 2; le altre vincite alla pari; in parità riprendi la puntata.</li>
         <li>raddoppi su qualsiasi coppia di carte iniziale: una carta sola, poi stai. dividi una coppia una volta; gli assi divisi ricevono una carta sola.</li>
         <li>venti secondi per puntare e venti per ogni decisione: chi non risponde sta; due volte di seguito e si alza dal tavolo.</li>
-        <li>cinque posti; gli altri guardano e si siedono appena si libera un posto.</li>
+        <li>cinque posti; gli altri guardano e si siedono appena si libera un posto. i tasti stanno sul bordo del tavolo davanti a te: c carta, s stai, r raddoppia, d dividi anche da tastiera.</li>
       </ul>
       <p class="nota" style="margin-top:14px"><b>solo per maggiorenni.</b> nessun denaro reale: i $pzk sono gettoni senza alcun valore, non si comprano e non si incassano. li distribuisce pzkko, a sua discrezione.</p>
     </section>
@@ -315,6 +266,7 @@ main{flex:1}
   <div class="wrap">
     <a href="https://www.albertopecchini.it" rel="author">sito di alberto pecchini</a>
     <a href="/#games">tutti i giochi</a>
+    <span>immagini disegnate con gpt-image-2 su replicate</span>
     <span>pzkko.it</span>
   </div>
 </footer>
@@ -331,67 +283,64 @@ main{flex:1}
   </div>
 </div>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <defs>
-    <path id="s-c" d="M12 21.2s-7.4-4.6-9.5-9.2C.9 8.6 3.1 5 6.6 5c2.3 0 3.9 1.3 5.4 3 1.5-1.7 3.1-3 5.4-3 3.5 0 5.7 3.6 4.1 7-2.1 4.6-9.5 9.2-9.5 9.2z"/>
-    <path id="s-q" d="M12 2.2l7.4 9.8-7.4 9.8-7.4-9.8z"/>
-    <path id="s-f" d="M12 2.6a3.7 3.7 0 0 0-3.3 5.4 3.7 3.7 0 1 0 1.6 6.9c.5-.1 1-.4 1.3-.7l-1.4 6.6h3.6L12.4 14.2c.3.3.8.6 1.3.7a3.7 3.7 0 1 0 1.6-6.9A3.7 3.7 0 0 0 12 2.6z"/>
-    <path id="s-p" d="M12 2.4C9.1 7.1 4.2 9.6 4.2 14a4 4 0 0 0 6.5 3.1L9.9 21.4h4.2l-.8-4.3A4 4 0 0 0 19.8 14c0-4.4-4.9-6.9-7.8-11.6z"/>
-  </defs>
-</svg>
-
 <script>
 (() => {
   'use strict'
   // ── impostazioni ───────────────────────────────────────────────────────────
   const API = '/api/blackjack/'
-  // quando arriva la grafica disegnata in Claude Design (cartella art/), basta accendere queste
-  const ART = { tavolo: false, carte: false, fiche: false }
+  const ART = 'art/'
+  const FICHE = [5, 10, 25, 50, 100]
   const SEMI = { c: 'cuori', q: 'quadri', f: 'fiori', p: 'picche' }
   const ROSSI = { c: 1, q: 1 }
-  const FICHE = [5, 10, 25, 50, 100]
   const reduce = matchMedia('(prefers-reduced-motion: reduce)')
-
   const $ = (id) => document.getElementById(id)
-  const el = { saldo: $('saldo'), tavolo: $('tavolo'), sabot: $('sabot'), bancoCarte: $('banco-carte'), bancoTot: $('banco-tot'), posti: $('posti'), riga: $('riga'), tasti: $('tasti'), timer: $('timer'), toast: $('toast'), chi: $('chi'), eventi: $('eventi'), storico: $('storico'), velo: $('velo') }
+  const el = { saldo: $('saldo'), sala: $('sala'), mondo: $('mondo'), dietro: $('dietro'), piano: $('piano'), segni: $('segni'), oggettiPiano: $('oggetti-piano'), davanti: $('davanti'), targhe: $('targhe'), riga: $('riga'), timer: $('timer'), eventiHud: $('eventi-hud'), tray: $('tray'), tasti: $('tasti'), toast: $('toast'), chi: $('chi'), eventi: $('eventi'), storico: $('storico'), velo: $('velo') }
   const fmt = (n) => Math.trunc(Number(n) || 0).toLocaleString('it-IT')
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
   const ora = (t) => new Date(t).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+  const SVG = 'http://www.w3.org/2000/svg'
+  const svgEl = (tag, attrs = {}, parent) => { const e = document.createElementNS(SVG, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (parent) parent.appendChild(e); return e }
+  const FONT = '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif'
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v))
 
-  // ── memoria locale: la maggiore età, il proprio codice ─────────────────────
-  const mem = {
-    get(k) { try { return localStorage.getItem(k) } catch { return null } },
-    set(k, v) { try { localStorage.setItem(k, v) } catch {} },
-    del(k) { try { localStorage.removeItem(k) } catch {} },
+  // ── la pianta del tavolo (1400 × 860) e il mondo (orizzontale o verticale) ──
+  // i cinque posti lungo l'arco (centro 700,−172, raggio 900 il bordo), dal posto 1 a sinistra
+  const ANG = [128, 109, 90, 71, 52].map((a) => (a * Math.PI) / 180)
+  const arco = (r, a) => ({ x: 700 + r * Math.cos(a), y: -172 + r * Math.sin(a) })
+  const PIANTA = {
+    w: 1400, h: 860,
+    puntata: ANG.map((a) => arco(770, a)),
+    carte: ANG.map((a) => arco(640, a)),
+    sedia: ANG.map((a) => arco(1010, a)),
+    banco: { x: 700, y: 230 },
+    sabot: { x: 1120, y: 130 }, bocca: { x: 1030, y: 175 },
+    rastrelliera: { x: 700, y: 92 },
+    scarti: { x: 270, y: 130 },
   }
+  const MONDI = {
+    largo: { w: 1600, h: 1000, pw: 1400, ptop: 150, tilt: 50, persp: 1500, porig: '18%', croupier: { x: 800, y: 250, s: 0.72 }, figura: 1 },
+    alto: { w: 1000, h: 1500, pw: 1380, ptop: 300, tilt: 54, persp: 1400, porig: '14%', croupier: { x: 500, y: 350, s: 0.62 }, figura: 0.8 },
+  }
+  let mondo = MONDI.largo
+  let K = 1 // scala del mondo sullo schermo
+  const sp = () => mondo.pw / PIANTA.w // scala della pianta sul piano
+
+  // ── memoria locale: maggiore età, il proprio codice ───────────────────────
+  const mem = { get(k) { try { return localStorage.getItem(k) } catch { return null } }, set(k, v) { try { localStorage.setItem(k, v) } catch {} }, del(k) { try { localStorage.removeItem(k) } catch {} } }
   let io = null
   try { io = JSON.parse(mem.get('bj-io') || 'null') } catch {}
   if (io && !/^[a-z0-9]{24}$/.test(io.tok || '')) io = null
 
   // ── stato e orologio del server ────────────────────────────────────────────
-  let st = null // l'ultima vista pubblica
-  let offset = 0 // orologio del server − orologio di qui
-  let sincronizzato = false
-  let scelta = 0 // la puntata che sto componendo con le fiche
-  let codiceMode = false
-  let pollTimer = 0
-  let chiuso = null
+  let st = null, prima = null, offset = 0, sincronizzato = false, scelta = 0, codiceMode = false, pollTimer = 0, chiuso = null
   const now = () => Date.now() + offset
-  if (ART.tavolo) el.tavolo.classList.add('art')
-
   async function chiama(body) {
     const t0 = Date.now()
     const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     const j = await r.json().catch(() => ({ ok: false, error: 'risposta non valida' }))
-    if (typeof j.now === 'number') {
-      const rtt = Date.now() - t0
-      // l'orologio del server, al netto del viaggio: si tiene la stima col viaggio più corto
-      const stima = j.now + rtt / 2 - Date.now()
-      if (!sincronizzato || rtt < 400) { offset = sincronizzato ? offset * 0.5 + stima * 0.5 : stima; sincronizzato = true }
-    }
+    if (typeof j.now === 'number') { const rtt = Date.now() - t0; const stima = j.now + rtt / 2 - Date.now(); if (!sincronizzato || rtt < 400) { offset = sincronizzato ? offset * 0.5 + stima * 0.5 : stima; sincronizzato = true } }
     return j
   }
-
   async function azione(body, { silenzioso } = {}) {
     try {
       const j = await chiama({ ...body, ...(io ? { tok: io.tok } : {}) })
@@ -399,358 +348,598 @@ main{flex:1}
       if (j.fase) prendi(j)
       if (!j.ok) { if (!silenzioso) toast(j.error || 'qualcosa non va'); if (j.chiuso) chiuso = j.error }
       return j
-    } catch {
-      if (!silenzioso) toast('non riesco a parlare col tavolo: controlla la rete')
-      return { ok: false }
-    }
+    } catch { if (!silenzioso) toast('non riesco a parlare col tavolo: controlla la rete'); return { ok: false } }
   }
-
   async function poll() {
     clearTimeout(pollTimer)
     try {
       const r = await fetch(API, { headers: { accept: 'application/json' }, cache: 'no-store' })
       const j = await r.json()
-      if (j.ok) { chiuso = null; prendi(j) } else if (j.chiuso) { chiuso = j.error; render() }
+      if (j.ok) { chiuso = null; prendi(j) } else if (j.chiuso) { chiuso = j.error; renderHud() }
     } catch {}
-    const attivo = st && st.fase !== 'attesa' && st.fase !== 'puntate'
     let fra = document.hidden ? 4000 : !st || st.fase === 'attesa' ? 3000 : st.fase === 'puntate' ? 1200 : 800
     if (st && st.fine !== null) fra = Math.max(250, Math.min(fra, st.fine - now() + 180))
-    if (attivo) fra = Math.min(fra, 800)
     pollTimer = setTimeout(poll, fra)
   }
-
-  function prendi(j) {
-    const prima = st
-    st = j
-    if (io) {
-      const me = st.giocatori.find((g) => g.id === io.id)
-      if (me) { io.pzk = me.pzk; io.posto = me.posto; mem.set('bj-io', JSON.stringify(io)) }
-    }
-    // appena tocca a me: titolo e un colpetto, se il telefono lo fa
-    const mioTurno = mioPosto() !== null && st.fase === 'turno' && st.turno && st.turno.posto === mioPosto()
-    const primaTurno = prima && mioPosto() !== null && prima.fase === 'turno' && prima.turno && prima.turno.posto === mioPosto()
-    if (mioTurno && !primaTurno) { try { navigator.vibrate && navigator.vibrate(40) } catch {} }
-    document.title = mioTurno ? 'tocca a te · blackjack' : 'blackjack, il tavolo di pzkko'
-    render()
-  }
-
-  // ── chi sono al tavolo ─────────────────────────────────────────────────────
-  const mioPosto = () => (io && st ? st.posti.findIndex((p) => p && p.id === io.id) : -1) >= 0 ? st.posti.findIndex((p) => p && p.id === io.id) : null
+  const mioPosto = () => { if (!io || !st) return null; const i = st.posti.findIndex((p) => p && p.id === io.id); return i >= 0 ? i : null }
   const seduto = () => mioPosto() !== null
   const ilMio = () => (seduto() ? st.posti[mioPosto()] : null)
   const libero = () => (st ? st.posti.findIndex((p) => !p) : -1)
+  const mioTurnoDi = (s) => io && s && s.fase === 'turno' && s.turno && s.posti[s.turno.posto] && s.posti[s.turno.posto].id === io.id
+  const mioTurno = () => mioTurnoDi(st)
+
+  function prendi(j) {
+    prima = st
+    st = j
+    if (io) { const me = st.giocatori.find((g) => g.id === io.id); if (me) { io.pzk = me.pzk; io.posto = me.posto; mem.set('bj-io', JSON.stringify(io)) } }
+    if (mioTurno() && !mioTurnoDi(prima)) { try { navigator.vibrate && navigator.vibrate(40) } catch {} }
+    document.title = mioTurno() ? 'tocca a te · blackjack' : 'blackjack, il tavolo di pzkko'
+    osserva()
+    render()
+  }
 
   // ── carte ──────────────────────────────────────────────────────────────────
-  const rango = (c) => c.slice(0, -1)
-  const seme = (c) => c.slice(-1)
-  const valore = (carte) => {
-    let tot = 0, assi = 0
-    for (const { c } of carte) { const r = rango(c); if (r === 'A') { assi++; tot += 11 } else if (r === 'J' || r === 'Q' || r === 'K' || r === '10') tot += 10; else tot += Number(r) }
-    while (tot > 21 && assi) { tot -= 10; assi-- }
-    return tot
-  }
+  const rango = (c) => c.slice(0, -1), seme = (c) => c.slice(-1)
+  const valore = (carte) => { let tot = 0, assi = 0; for (const { c } of carte) { const r = rango(c); if (r === 'A') { assi++; tot += 11 } else if (r === 'J' || r === 'Q' || r === 'K' || r === '10') tot += 10; else tot += Number(r) } while (tot > 21 && assi) { tot -= 10; assi-- } return tot }
   const valCarta = (c) => valore([{ c }])
-  const viste = (carte) => carte.filter((c) => c.t <= now())
   const nomeCarta = (c) => `${({ A: 'asso', J: 'fante', Q: 'donna', K: 're' })[rango(c)] || rango(c)} di ${SEMI[seme(c)]}`
 
-  function htmlCarta(c, nuova) {
-    const r = rango(c.c), s = seme(c.c)
-    const cls = `carta${ROSSI[s] ? ' r' : ''}${nuova ? ' in' : ''}${ART.carte ? ' img' : ''}`
-    const stile = ART.carte ? ` style="background-image:url(art/carte/${c.c}.svg)"` : ''
-    const ix = `<span class="ix">${r}<svg viewBox="0 0 24 24"><use href="#s-${s}"/></svg></span>`
-    return `<span class="${cls}"${stile} role="img" aria-label="${nomeCarta(c.c)}" data-c="${c.c}">${ix}<span class="pip"><svg viewBox="0 0 24 24"><use href="#s-${s}"/></svg></span>${ix.replace('class="ix"', 'class="ix b"')}</span>`
+  // ── i pezzi disegnati (art/pezzi.json): misure e perni ─────────────────────
+  let PZ = {}
+  const pezzoDati = (gruppo, nome) => (PZ[gruppo] && PZ[gruppo][nome]) || null
+  const artUrl = (gruppo, nome) => `${ART}${gruppo}/${nome}.webp`
+  const cardUrl = (c) => `${ART}carte/${c}.webp`
+  let carteArt = false, ficheArt = false
+
+  // ── il mondo: misura e scala ────────────────────────────────────────────────
+  function misura() {
+    const W = el.sala.clientWidth, H = el.sala.clientHeight
+    mondo = W < H * 0.9 ? MONDI.alto : MONDI.largo
+    K = Math.min(W / mondo.w, H / mondo.h)
+    const r = el.mondo.style
+    r.setProperty('--mw', mondo.w + 'px'); r.setProperty('--mh', mondo.h + 'px'); r.setProperty('--k', K)
+    r.setProperty('--pw', mondo.pw + 'px'); r.setProperty('--ph', (mondo.pw * PIANTA.h / PIANTA.w) + 'px'); r.setProperty('--ptop', mondo.ptop + 'px')
+    r.setProperty('--tilt', mondo.tilt + 'deg'); r.setProperty('--persp', mondo.persp + 'px'); r.setProperty('--porig', mondo.porig)
+    for (const s of [el.dietro, el.davanti]) s.setAttribute('viewBox', `0 0 ${mondo.w} ${mondo.h}`)
+    proietta()
+  }
+  // dove cade ogni punto della pianta sullo schermo del mondo: lo misura il browser (niente trigonometria a mano)
+  const punti = {}
+  const P = {}
+  function puntoPiano(nome, x, y) {
+    let d = punti[nome]
+    if (!d) { d = document.createElement('div'); d.className = 'punto'; el.piano.appendChild(d); punti[nome] = d }
+    d.style.left = (x * sp()) + 'px'
+    d.style.top = (y * sp()) + 'px'
+  }
+  function leggiPunto(nome) { const m = el.mondo.getBoundingClientRect(); const r = punti[nome].getBoundingClientRect(); P[nome] = { x: (r.left - m.left) / K, y: (r.top - m.top) / K }; return P[nome] }
+  function proietta() {
+    for (const k of Object.keys(P)) delete P[k]
+    PIANTA.puntata.forEach((p, i) => puntoPiano('puntata' + i, p.x, p.y))
+    PIANTA.carte.forEach((p, i) => puntoPiano('carte' + i, p.x, p.y))
+    PIANTA.sedia.forEach((p, i) => puntoPiano('sedia' + i, p.x, p.y))
+    puntoPiano('banco', PIANTA.banco.x, PIANTA.banco.y)
+    puntoPiano('sabot', PIANTA.sabot.x, PIANTA.sabot.y)
+    puntoPiano('bocca', PIANTA.bocca.x, PIANTA.bocca.y)
+    puntoPiano('rastrelliera', PIANTA.rastrelliera.x, PIANTA.rastrelliera.y)
+    puntoPiano('scarti', PIANTA.scarti.x, PIANTA.scarti.y)
+    puntoPiano('bordo', 700, 60)
+    for (const k of Object.keys(punti)) if (!k.startsWith('tmp:')) leggiPunto(k)
+    disegnaScena()
+  }
+  function proiettaPianta(px, py) {
+    const nome = `tmp:${Math.round(px)}:${Math.round(py)}`
+    if (!P[nome]) { puntoPiano(nome, px, py); leggiPunto(nome) }
+    return P[nome]
   }
 
-  /** Aggiorna un contenitore di carte senza ridisegnare quelle già in tavola (così l'ingresso si anima una volta sola). */
-  function mettiCarte(cont, carte) {
-    const v = viste(carte)
-    let da = cont.querySelectorAll('.carta').length
-    if (da > v.length) {
-      cont.innerHTML = ''
-      da = 0
+  // ── la scena fissa: segni sul feltro, oggetti, sedie, croupier ────────────
+  function segniFeltro() {
+    const s = el.segni
+    s.setAttribute('viewBox', `0 0 ${PIANTA.w} ${PIANTA.h}`)
+    s.innerHTML = `<defs><path id="arco-s" d="M 400 320 A 560 560 0 0 0 1000 320" fill="none"/></defs>
+      <text font-size="26" font-weight="600" fill="rgba(255,255,255,.5)" letter-spacing="1" font-family="${FONT}"><textPath href="#arco-s" startOffset="50%" text-anchor="middle">blackjack paga 3 a 2 · il banco sta a 17</textPath></text>
+      <text x="700" y="404" text-anchor="middle" font-size="40" font-weight="700" fill="rgba(255,255,255,.8)" letter-spacing="-1" font-family="${FONT}">pzkko</text>
+      <rect x="652" y="163" width="96" height="134" rx="9" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
+      ${PIANTA.puntata.map((p) => `<circle cx="${p.x}" cy="${p.y}" r="46" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3"/>`).join('')}
+      ${PIANTA.puntata.map((p, i) => `<text x="${p.x}" y="${p.y + 68}" text-anchor="middle" font-size="14" font-weight="600" fill="rgba(255,255,255,.4)" font-family="${FONT}">${i + 1}</text>`).join('')}`
+  }
+
+  // un'immagine di un pezzo, con l'origine nel suo perno (il fermacampioni): torna il gruppo
+  function pezzo(parent, gruppo, nome, { s = 1, perno = 0 } = {}) {
+    const d = pezzoDati(gruppo, nome)
+    const g = svgEl('g', {}, parent)
+    if (!d) { g.dataset.manca = `${gruppo}/${nome}`; return g }
+    const [px, py] = (d.perni && d.perni[perno]) || [0, d.h / 2]
+    const inner = svgEl('g', { transform: `scale(${s}) translate(${-px},${-py})` }, g)
+    svgEl('image', { href: artUrl(gruppo, nome), width: d.w, height: d.h, preserveAspectRatio: 'none' }, inner)
+    g._d = d; g._s = s; g._p = [px, py]
+    return g
+  }
+  // la lunghezza utile di un pezzo di braccio: dal perno alla punta (meno la linguetta)
+  const lunghezza = (gruppo, nome) => { const d = pezzoDati(gruppo, nome); if (!d) return 100; const [px] = (d.perni && d.perni[0]) || [0, 0]; return Math.max(40, d.w - px - 14) }
+
+  // ── figure con braccia: cinematica inversa a due segmenti + molle ─────────
+  // una molla criticamente smorzata per asse: segue il bersaglio senza oltrepassarlo
+  function molla(risposta = 0.26) { const w = (2 * Math.PI) / risposta; return { x: 0, v: 0, t: 0, w, step(dt) { const a = -this.w * this.w * (this.x - this.t) - 2 * this.w * this.v; this.v += a * dt; this.x += this.v * dt } } }
+
+  // un braccio: ogni pezzo scalato alla lunghezza voluta (L1 braccio, L2 avambraccio, Lm mano), dalla spalla
+  function braccio(parent, gruppo, nomi, { L1, L2, Lm, piega = 1 }) {
+    const g = svgEl('g', {}, parent)
+    const sup = pezzo(g, gruppo, nomi.sup, { s: L1 / lunghezza(gruppo, nomi.sup) })
+    const inf = pezzo(g, gruppo, nomi.inf, { s: L2 / lunghezza(gruppo, nomi.inf) })
+    const mani = {}
+    for (const [k, n] of Object.entries(nomi.mani)) { mani[k] = pezzo(g, gruppo, n, { s: Lm / lunghezza(gruppo, n) }); mani[k].style.display = 'none' }
+    const A = { g, sup, inf, mani, L1, L2, piega, mano: Object.keys(mani)[0], mx: molla(), my: molla(), base: { x: 0, y: 0 }, spalla: { x: 0, y: 0 }, rot: 0, riposo: { x: 0, y: 0 }, polso: { x: 0, y: 0 }, angolo: 0 }
+    A.mani[A.mano].style.display = ''
+    return A
+  }
+  function posaMano(A, nome) { if (A.mano === nome || !A.mani[nome]) return; A.mani[A.mano].style.display = 'none'; A.mano = nome; A.mani[nome].style.display = '' }
+  function bersaglio(A, x, y) { A.mx.t = x; A.my.t = y }
+  function salta(A, x, y) { A.mx.t = A.mx.x = x; A.my.t = A.my.x = y; A.mx.v = A.my.v = 0 }
+  function disegnaBraccio(A) {
+    const S = A.spalla
+    let dx = A.mx.x - S.x, dy = A.my.x - S.y
+    let d = Math.hypot(dx, dy)
+    const max = A.L1 + A.L2 - 2, min = Math.abs(A.L1 - A.L2) + 2
+    if (d > max) { dx *= max / d; dy *= max / d; d = max }
+    if (d < min) { const a = Math.atan2(dy, dx); dx = min * Math.cos(a); dy = min * Math.sin(a); d = min }
+    const a0 = Math.atan2(dy, dx)
+    const c = Math.max(-1, Math.min(1, (d * d + A.L1 * A.L1 - A.L2 * A.L2) / (2 * d * A.L1)))
+    const a1 = a0 - A.piega * Math.acos(c)
+    const E = { x: S.x + A.L1 * Math.cos(a1), y: S.y + A.L1 * Math.sin(a1) }
+    const a2 = Math.atan2(S.y + dy - E.y, S.x + dx - E.x)
+    const deg = (r) => (r * 180) / Math.PI
+    A.sup.setAttribute('transform', `translate(${S.x},${S.y}) rotate(${deg(a1)})`)
+    A.inf.setAttribute('transform', `translate(${E.x},${E.y}) rotate(${deg(a2)})`)
+    const W = { x: S.x + dx, y: S.y + dy }
+    const am = a2 + A.rot
+    for (const m of Object.values(A.mani)) m.setAttribute('transform', `translate(${W.x},${W.y}) rotate(${deg(am)})`)
+    A.polso = W; A.angolo = am
+  }
+  // una figura si sporge verso dove lavora la mano: il busto trasla un po', le spalle seguono
+  function figura(corpoG, braccia) { return { corpoG, braccia, lx: molla(0.5), ly: molla(0.5) } }
+  function aggiornaFigura(F, dt) {
+    let tx = 0, ty = 0
+    for (const A of F.braccia) {
+      const dx = A.mx.t - A.base.x, dy = A.my.t - A.base.y
+      const d = Math.hypot(dx, dy), max = A.L1 + A.L2
+      if (d > max * 0.78) { const k = Math.min(60, (d - max * 0.78) * 0.9); tx += (dx / d) * k; ty += (dy / d) * k }
     }
-    for (let i = da; i < v.length; i++) {
-      cont.insertAdjacentHTML('beforeend', htmlCarta(v[i], animaCarte))
-      if (animaCarte && !reduce.matches) {
-        // la carta parte dal sabot, in alto a destra, e si posa con la molla
-        const c = cont.lastElementChild
-        const a = el.sabot.getBoundingClientRect()
-        const b = c.getBoundingClientRect()
-        c.style.setProperty('--dx', `${Math.round(a.left - b.left)}px`)
-        c.style.setProperty('--dy', `${Math.round(a.top - b.top)}px`)
-      }
+    F.lx.t = tx; F.ly.t = ty; F.lx.step(dt); F.ly.step(dt)
+    F.corpoG.setAttribute('transform', `translate(${F.lx.x},${F.ly.x})`)
+    for (const A of F.braccia) { A.spalla = { x: A.base.x + F.lx.x, y: A.base.y + F.ly.x }; A.mx.step(dt); A.my.step(dt); disegnaBraccio(A) }
+  }
+
+  // ── le figure: il croupier e i cinque giocatori ─────────────────────────────
+  const scena = { croupier: null, posti: [], cartaInMano: null, costruita: false, console: null }
+  function disegnaScena() {
+    const dietro = el.dietro, davanti = el.davanti
+    dietro.innerHTML = ''; davanti.innerHTML = ''; el.targhe.innerHTML = ''
+    scena.posti = []; scena.console = null
+    // il croupier: busto dietro al bordo lontano (la vita sparisce dietro al tavolo), le braccia davanti
+    const C = mondo.croupier
+    const corpoG = svgEl('g', {}, dietro)
+    const corpo = pezzo(corpoG, 'croupier', 'busto', { s: C.s * mondo.figura })
+    const bd = corpo._d, sc = corpo._s || 1
+    const spalle = bd && bd.perni && bd.perni.length >= 2 ? [bd.perni[0], bd.perni[1]] : bd ? [[bd.w * 0.08, bd.h * 0.45], [bd.w * 0.92, bd.h * 0.45]] : [[0, 0], [1, 0]]
+    const cs = [(spalle[0][0] + spalle[1][0]) / 2, (spalle[0][1] + spalle[1][1]) / 2]
+    if (bd) corpo.setAttribute('transform', `translate(${C.x - (cs[0] - corpo._p[0]) * sc},${C.y - (cs[1] - corpo._p[1]) * sc})`)
+    const spalla = (i) => ({ x: C.x + (spalle[i][0] - cs[0]) * sc, y: C.y + (spalle[i][1] - cs[1]) * sc })
+    const S = Math.abs(spalle[1][0] - spalle[0][0]) * sc || 200
+    const maniC = { aperta: 'aperta', pinza: 'pinza' }
+    const destro = braccio(davanti, 'croupier', { sup: 'braccio', inf: 'avambraccio', mani: maniC }, { L1: S * 0.82, L2: S * 0.8, Lm: S * 0.42, piega: -1 })
+    const sinistro = braccio(davanti, 'croupier', { sup: 'braccio', inf: 'avambraccio', mani: maniC }, { L1: S * 0.82, L2: S * 0.8, Lm: S * 0.42, piega: 1 })
+    destro.base = spalla(0); sinistro.base = spalla(1)
+    destro.riposo = { x: C.x - S * 0.78, y: P.bordo.y + 70 }
+    sinistro.riposo = { x: C.x + S * 0.78, y: P.bordo.y + 70 }
+    salta(destro, destro.riposo.x, destro.riposo.y); salta(sinistro, sinistro.riposo.x, sinistro.riposo.y)
+    scena.croupier = { corpo, destro, sinistro, F: figura(corpoG, [destro, sinistro]), stato: 'riposo', coda: [], corrente: null, ultimo: 0 }
+    // oggetti con altezza, sul bordo lontano (la base del pezzo sul punto)
+    const ogg = (nome, p, s, dx = 0, dy = 0) => { const g = pezzo(davanti, 'oggetti', nome, { s: s * mondo.figura }); const d = g._d; if (d) g.setAttribute('transform', `translate(${p.x + dx - (d.w / 2 - g._p[0]) * g._s},${p.y + dy - (d.h - g._p[1]) * g._s})`); return g }
+    ogg('rastrelliera', P.rastrelliera, 0.36, 0, 34)
+    ogg('sabot', P.sabot, 0.3, 0, 40)
+    ogg('scarti', P.scarti, 0.26, 0, 34)
+    // le sedie e i giocatori, dal più lontano al più vicino
+    for (const i of [0, 4, 1, 3, 2]) {
+      const p = P['sedia' + i]
+      const prof = 0.8 + 0.2 * ((p.y - P.sedia0.y) / Math.max(1, P.sedia2.y - P.sedia0.y))
+      const s = 0.42 * prof * mondo.figura
+      const sedia = pezzo(davanti, 'oggetti', 'sedia', { s })
+      if (sedia._d) sedia.setAttribute('transform', `translate(${p.x - (sedia._d.w / 2 - sedia._p[0]) * s},${p.y + 60 * prof - (sedia._d.h - sedia._p[1]) * s})`)
+      const gruppo = svgEl('g', { style: 'display:none' }, davanti)
+      // il bordo davanti al posto: fra il cerchio della puntata e la sedia
+      const b = P['puntata' + i]
+      const bordo = { x: clamp(b.x + (p.x - b.x) * 0.42 + (i === 0 ? 70 : i === 4 ? -70 : 0), mondo.w * 0.18, mondo.w * 0.82), y: b.y + (p.y - b.y) * 0.42 }
+      scena.posti[i] = { i, p, prof, s, sedia, gruppo, bordo, corpo: null, braccia: null, F: null, chi: null, gesto: null }
     }
-    return v
+    for (let i = 0; i < 5; i++) { const t = document.createElement('div'); t.className = 'targa'; t.style.left = P['sedia' + i].x + 'px'; t.style.top = (P['sedia' + i].y + 70 * scena.posti[i].prof) + 'px'; el.targhe.appendChild(t); scena.posti[i].targa = t }
+    // la carta portata in mano dal croupier, sopra a tutto
+    const cm = svgEl('g', { style: 'display:none' }, davanti)
+    svgEl('image', { href: `${ART}carte/retro.webp`, x: -30, y: -42, width: 60, height: 84, preserveAspectRatio: 'none' }, cm)
+    scena.cartaInMano = cm
+    scena.costruita = true
+    renderPosti(true)
   }
 
-  // ── il tavolo ──────────────────────────────────────────────────────────────
-  function badgeMano(m, carteViste, inEsito) {
-    if (inEsito && m.esito) {
-      if (m.esito === 'bj') return `<span class="tot bj n">blackjack +${fmt(m.delta)}</span>`
-      if (m.esito === 'vince') return `<span class="tot vince n">+${fmt(m.delta)}</span>`
-      if (m.esito === 'pari') return `<span class="tot pari n">pari</span>`
-      return `<span class="tot perde n">${m.stato === 'sballata' ? 'sballa ' : ''}−${fmt(-m.delta)}</span>`
+  // un giocatore seduto: corpo (uno dei cinque) + due braccia; la destra fa i gesti
+  function siediFigura(posto, id) {
+    const Q = scena.posti[posto]
+    if (!Q) return
+    const nomi = Object.keys(PZ.giocatori || {})
+    if (!nomi.length) return
+    const quale = nomi[[...id].reduce((s, ch) => s + ch.charCodeAt(0), 0) % nomi.length]
+    Q.gruppo.innerHTML = ''
+    const corpoG = svgEl('g', {}, Q.gruppo)
+    const s = Q.s * 1.1
+    const corpo = pezzo(corpoG, 'giocatori', quale, { s })
+    const d = corpo._d
+    if (!d) return
+    const spalle = d.perni && d.perni.length >= 2 ? [d.perni[0], d.perni[1]] : [[d.w * 0.05, d.h * 0.92], [d.w * 0.95, d.h * 0.92]]
+    const base = [d.w / 2, d.h]
+    const ox = Q.p.x - (base[0] - corpo._p[0]) * s, oy = Q.p.y + 40 * Q.prof - (base[1] - corpo._p[1]) * s
+    corpo.setAttribute('transform', `translate(${ox},${oy})`)
+    const spalla = (k) => ({ x: ox + (spalle[k][0] - corpo._p[0]) * s, y: oy + (spalle[k][1] - corpo._p[1]) * s })
+    const S = Math.abs(spalle[1][0] - spalle[0][0]) * s || 160
+    const mani = { piatta: 'piatta', indice: 'indice', due: 'due', pinza: 'pinza', pugno: 'pugno' }
+    const mis = { L1: S * 0.54, L2: S * 0.52, Lm: S * 0.32 }
+    const sin = braccio(Q.gruppo, 'braccia', { sup: 'braccio', inf: 'avambraccio', mani }, { ...mis, piega: 1 })
+    const des = braccio(Q.gruppo, 'braccia', { sup: 'braccio', inf: 'avambraccio', mani }, { ...mis, piega: -1 })
+    sin.base = spalla(0); des.base = spalla(1)
+    sin.riposo = { x: Q.bordo.x - 150 * Q.prof, y: Q.bordo.y + 16 }
+    des.riposo = { x: Q.bordo.x + 150 * Q.prof, y: Q.bordo.y + 16 }
+    salta(sin, sin.riposo.x, sin.riposo.y); salta(des, des.riposo.x, des.riposo.y)
+    Q.corpo = corpo; Q.braccia = { sin, des }; Q.F = figura(corpoG, [sin, des]); Q.chi = id
+    Q.gruppo.style.display = ''
+  }
+  function alzaFigura(posto) { const Q = scena.posti[posto]; if (!Q) return; Q.gruppo.style.display = 'none'; Q.gruppo.innerHTML = ''; Q.corpo = null; Q.braccia = null; Q.F = null; Q.chi = null; Q.gesto = null }
+
+  // ── i gesti dei giocatori: i segnali veri del blackjack ───────────────────
+  // carta: l'indice batte due volte sul feltro · stai: la mano piatta ondeggia sopra le carte
+  // raddoppia: posa una fiche e alza un dito · dividi: due dita sulle carte, poi le allarga
+  function gesto(posto, nome) {
+    const Q = scena.posti[posto]
+    if (!Q || !Q.braccia || reduce.matches) return
+    const A = Q.braccia.des
+    const c = P['carte' + posto], b = P['puntata' + posto]
+    const k = Q.prof
+    const seq = []
+    if (nome === 'carta') seq.push([0, 'indice'], [0, c.x + 30 * k, c.y + 64 * k], [260, c.x + 30 * k, c.y + 50 * k], [420, c.x + 30 * k, c.y + 64 * k], [580, c.x + 30 * k, c.y + 50 * k], [740, c.x + 30 * k, c.y + 64 * k], [1150, A.riposo.x, A.riposo.y])
+    else if (nome === 'stai') seq.push([0, 'piatta'], [0, c.x - 26 * k, c.y + 10 * k], [300, c.x + 46 * k, c.y + 10 * k], [600, c.x - 26 * k, c.y + 10 * k], [900, c.x + 46 * k, c.y + 10 * k], [1300, A.riposo.x, A.riposo.y])
+    else if (nome === 'raddoppia') seq.push([0, 'pinza'], [0, b.x + 64 * k, b.y], [540, b.x + 64 * k, b.y], [560, 'indice'], [740, c.x + 40 * k, c.y + 28 * k], [1400, A.riposo.x, A.riposo.y])
+    else if (nome === 'dividi') seq.push([0, 'due'], [0, c.x, c.y + 18 * k], [540, c.x + 60 * k, c.y + 18 * k], [1100, A.riposo.x, A.riposo.y])
+    else if (nome === 'punta') seq.push([0, 'pinza'], [0, b.x, b.y], [460, b.x, b.y], [480, 'piatta'], [950, A.riposo.x, A.riposo.y])
+    else return
+    const t0 = now()
+    Q.gesto = { t0, seq, i: 0, A, fine: t0 + seq[seq.length - 1][0] + 700 }
+  }
+  function aggiornaGesto(Q, t) {
+    const G = Q.gesto
+    if (!G) return
+    while (G.i < G.seq.length && t - G.t0 >= G.seq[G.i][0]) {
+      const passo = G.seq[G.i]
+      if (typeof passo[1] === 'string') posaMano(G.A, passo[1])
+      else bersaglio(G.A, passo[1], passo[2])
+      G.i++
     }
-    if (!carteViste.length) return ''
-    const t = valore(carteViste)
-    if (m.stato === 'bj' && carteViste.length === 2) return '<span class="tot bj">blackjack</span>'
-    if (t > 21) return `<span class="tot sballa n">sballa ${t}</span>`
-    return `<span class="tot n">${t}${m.stato === 'raddoppiata' && carteViste.length === m.carte.length ? ' · raddoppio' : ''}</span>`
+    if (t > G.fine) { Q.gesto = null; posaMano(G.A, 'piatta'); bersaglio(G.A, G.A.riposo.x, G.A.riposo.y) }
   }
 
-  const firmaPosto = (p, i) => {
-    if (!p) return `L${io ? 1 : 0}${seduto() ? 1 : 0}`
-    return JSON.stringify([p.id, p.nome, p.pzk, p.online, p.puntata, p.salta, p.via, st.fase, st.turno && st.turno.posto === i ? st.turno.mano : -1, p.mani.map((m) => [viste(m.carte).length, m.stato, m.esito, m.puntata, m.delta])])
+  // ── il croupier distribuisce: dal sabot al posto, a velocità umana ────────
+  // ogni carta ha un orario di comparsa t (del server); la mano parte prima, la posa a t
+  const mostrate = new Map()
+  const chiaveCarta = (dove, j, k, c) => `${dove}:${j}:${k}:${c}`
+  function programmaConsegne() {
+    if (!st || !scena.croupier) return
+    const C = scena.croupier
+    const t = now()
+    const tutte = []
+    st.banco.carte.forEach((c, k) => tutte.push({ key: chiaveCarta('b', 0, k, c.c), c: c.c, t: c.t, dove: 'banco', posto: -1, mano: 0, k }))
+    st.posti.forEach((p, i) => { if (p) p.mani.forEach((m, j) => m.carte.forEach((c, k) => tutte.push({ key: chiaveCarta(i, j, k, c.c), c: c.c, t: c.t, dove: 'posto', posto: i, mano: j, k }))) })
+    for (const x of tutte) {
+      if (mostrate.has(x.key) || C.coda.some((y) => y.key === x.key) || (C.corrente && C.corrente.key === x.key)) continue
+      // una carta già in tavola da un pezzo (ricarica a metà mano, scheda rimasta in secondo piano) si posa subito;
+      // una carta nuova la porta il croupier con la consegna intera (900 ms), con movimento ridotto subito
+      if (reduce.matches || x.t < t - 1800) { posaCarta(x); continue }
+      C.coda.push({ ...x, tShow: Math.max(x.t, t + 900) })
+    }
+    C.coda.sort((a, b) => a.tShow - b.tShow)
+  }
+  function puntoCarta(x) {
+    if (x.dove === 'banco') return { px: PIANTA.banco.x + x.k * 30, py: PIANTA.banco.y, rot: x.k % 2 ? 2 : -2 }
+    const p = PIANTA.carte[x.posto]
+    const nm = (st.posti[x.posto] && st.posti[x.posto].mani.length) || 1
+    const off = nm > 1 ? (x.mano === 0 ? -58 : 58) : 0
+    return { px: p.x + off + x.k * 28, py: p.y - x.k * 10, rot: ((x.k * 7) % 11) - 5 }
+  }
+  function aggiornaCroupier(t) {
+    const C = scena.croupier
+    if (!C) return
+    const D = C.destro
+    if (!C.corrente && C.coda.length && (t >= C.coda[0].tShow - 1100 || reduce.matches)) { C.corrente = C.coda.shift(); C.corrente.fase = 'vado' }
+    const X = C.corrente
+    if (!X) { if (C.stato !== 'riposo' && t > C.ultimo + 900) { C.stato = 'riposo'; posaMano(D, 'aperta'); bersaglio(D, D.riposo.x, D.riposo.y) } return }
+    if (reduce.matches) { if (t >= X.tShow) { posaCarta(X); C.corrente = null } return }
+    const bocca = P.bocca
+    const q = puntoCarta(X)
+    const dest = proiettaPianta(q.px, q.py)
+    if (X.fase === 'vado') { C.stato = 'lavoro'; posaMano(D, 'aperta'); bersaglio(D, bocca.x + 30, bocca.y + 6); if (t >= X.tShow - 640) { X.fase = 'prendo'; posaMano(D, 'pinza'); scena.cartaInMano.style.display = '' } }
+    if (X.fase === 'prendo') { bersaglio(D, bocca.x - 34, bocca.y + 30); if (t >= X.tShow - 500) X.fase = 'porto' }
+    if (X.fase === 'porto') { bersaglio(D, dest.x + 12, dest.y - 6); if (t >= X.tShow) { posaCarta(X); scena.cartaInMano.style.display = 'none'; posaMano(D, 'aperta'); X.fase = 'torno'; C.ultimo = t; if (C.coda.length && C.coda[0].tShow - t < 1500) { C.corrente = null; return } bersaglio(D, D.riposo.x, D.riposo.y) } }
+    if (X.fase === 'torno' && t > C.ultimo + 250) C.corrente = null
   }
 
-  function renderPosti() {
-    const inEsito = st.fase === 'esito'
+  // ── le carte sul feltro ───────────────────────────────────────────────────
+  const carteDom = new Map()
+  function htmlCarta(c) {
+    const r = rango(c), s = seme(c)
+    const d = document.createElement('div')
+    d.className = 'carta'
+    const faccia = carteArt ? `<div class="faccia" style="--img:url(${cardUrl(c)})"></div>` : `<div class="faccia css${ROSSI[s] ? ' r' : ''}"><i>${r}</i>${r}<b>${r}</b></div>`
+    d.innerHTML = `${faccia}<div class="retro"></div><div class="angolo">${faccia}<div class="retro"></div></div>`
+    d.setAttribute('role', 'img'); d.setAttribute('aria-label', nomeCarta(c))
+    return d
+  }
+  function posaCarta(x) {
+    if (mostrate.has(x.key)) return
+    mostrate.set(x.key, now())
+    const q = puntoCarta(x)
+    const d = htmlCarta(x.c)
+    d.style.left = (q.px * sp()) + 'px'; d.style.top = (q.py * sp()) + 'px'
+    d.style.transform = `scale(${sp()}) rotate(${q.rot}deg)`
+    d.style.zIndex = 10 + x.k
+    if (!reduce.matches) d.classList.add('girata')
+    if (x.dove === 'posto' && x.posto === mioPosto()) { d.classList.add('mia'); piegaAlTocco(d) }
+    el.oggettiPiano.appendChild(d)
+    carteDom.set(x.key, d)
+    aggiornaTotali()
+    renderHud()
+    renderConsole()
+  }
+  // la carta che si piega sotto il dito: l'angolo si alza quanto trascini, poi torna giù con una molla
+  function piegaAlTocco(d) {
+    let attivo = false, y0 = 0, p = 0, v = 0, raf = 0
+    const spring = () => { const dt = 1 / 60; const w = (2 * Math.PI) / 0.22; v += (-w * w * p - 2 * w * v) * dt; p += v * dt; d.style.setProperty('--piega', p.toFixed(2)); if (Math.abs(p) > 0.2 || Math.abs(v) > 1) raf = requestAnimationFrame(spring); else { p = 0; d.style.setProperty('--piega', '0') } }
+    d.addEventListener('pointerdown', (e) => { attivo = true; y0 = e.clientY; cancelAnimationFrame(raf); d.setPointerCapture(e.pointerId); p = Math.max(p, 14); d.style.setProperty('--piega', p); e.preventDefault() })
+    d.addEventListener('pointermove', (e) => { if (!attivo) return; p = Math.max(8, Math.min(78, 14 + ((y0 - e.clientY) * 0.9) / K)); d.style.setProperty('--piega', p.toFixed(2)) })
+    const fine = () => { if (!attivo) return; attivo = false; v = -140; raf = requestAnimationFrame(spring) }
+    d.addEventListener('pointerup', fine); d.addEventListener('pointercancel', fine)
+  }
+  function sgombra() {
+    const vive = new Set()
+    if (st) { st.banco.carte.forEach((c, k) => vive.add(chiaveCarta('b', 0, k, c.c))); st.posti.forEach((p, i) => { if (p) p.mani.forEach((m, j) => m.carte.forEach((c, k) => vive.add(chiaveCarta(i, j, k, c.c)))) }) }
+    for (const [key, d] of carteDom) if (!vive.has(key)) { d.remove(); carteDom.delete(key); mostrate.delete(key) }
+    if (scena.croupier) { scena.croupier.coda = scena.croupier.coda.filter((x) => vive.has(x.key)); if (scena.croupier.corrente && !vive.has(scena.croupier.corrente.key)) { scena.croupier.corrente = null; scena.cartaInMano.style.display = 'none' } }
+  }
+
+  // ── la consolle sul bordo davanti a me: mosse e fiche ──────────────────────
+  function renderConsole() {
+    if (!st || !scena.costruita) return
+    const i = mioPosto()
+    if (i === null) { if (scena.console) { scena.console.remove(); scena.console = null } return }
+    const Q = scena.posti[i]
+    if (!scena.console) { scena.console = document.createElement('div'); scena.console.className = 'console'; el.targhe.appendChild(scena.console); scena.console.dataset.firma = '' }
+    const con = scena.console
+    con.style.left = Q.bordo.x + 'px'; con.style.top = Q.bordo.y + 'px'
+    const p = ilMio()
+    const m = mioTurno() ? p.mani[st.turno.mano] : null
+    const due = m && m.carte.length === 2
+    const puoR = due && p.pzk >= m.puntata, puoD = due && p.mani.length === 1 && p.pzk >= m.puntata && valCarta(m.carte[0].c) === valCarta(m.carte[1].c)
+    const puntando = st.fase === 'attesa' || st.fase === 'puntate'
+    const firma = JSON.stringify([i, Boolean(m), puoR, puoD, puntando, p.puntata, p.salta, scelta, p.pzk, p.ultima, st.config.max, st.fase, mondo.w])
+    if (con.dataset.firma === firma) return
+    con.dataset.firma = firma
+    let h = ''
+    if (m) {
+      const mosse = [['carta', 'c', true, 'p'], ['stai', 's', true, ''], ['raddoppia', 'r', puoR, ''], ['dividi', 'd', puoD, '']]
+      h += `<div class="fila">${mosse.map(([n, k, ok, cls]) => `<button class="tasto ${cls}" type="button" data-mossa="${n}" ${ok ? '' : 'disabled'}>${n}<span class="k">${k}</span></button>`).join('')}</div>`
+    } else if (puntando && !p.puntata) {
+      const max = Math.min(st.config.max, p.pzk)
+      h += `<div class="fila">${FICHE.map((v) => `<button class="fiche-tocco${ficheArt ? '' : ' css'}" type="button" data-fiche="${v}" ${scelta + v > max ? 'disabled' : ''} ${ficheArt ? `style="background-image:url(${ART}fiche/f${v}.webp)"` : ''} aria-label="fiche da ${v}">${ficheArt ? '' : v}</button>`).join('')}</div>`
+      h += '<div class="fila">'
+      if (scelta) h += `<button class="tasto p" type="button" data-punta="${scelta}">punta<span class="k n">${fmt(scelta)}</span></button><button class="tasto" type="button" data-azzera>azzera</button>`
+      else if (p.ultima && p.ultima <= p.pzk && p.ultima <= st.config.max) h += `<button class="tasto" type="button" data-punta="${p.ultima}">ripeti<span class="k n">${fmt(p.ultima)}</span></button>`
+      if (!p.salta && st.fase === 'puntate') h += `<button class="tasto" type="button" data-azione="salta">salto</button>`
+      h += '</div>'
+    } else if (puntando && p.puntata) h += `<div class="fila"><button class="tasto" type="button" data-punta="0">ritira</button></div>`
+    con.innerHTML = h
+  }
+
+  // ── fiche puntate e totali sul feltro ─────────────────────────────────────
+  const feltroDom = { pile: new Map(), totali: new Map() }
+  const posiz = (px, py) => `left:${px * sp()}px;top:${py * sp()}px;transform:scale(${sp()})`
+  const scomponi = (n) => { const out = []; for (const v of [...FICHE].reverse()) while (n >= v && out.length < 12) { out.push(v); n -= v } return out }
+  function renderPile() {
+    if (!st) return
+    for (let i = 0; i < 5; i++) {
+      const p = st.posti[i], b = PIANTA.puntata[i]
+      const quanto = !p ? 0 : p.mani.length ? p.mani.reduce((s, m) => s + m.puntata, 0) : p.puntata || (i === mioPosto() ? scelta : 0)
+      let d = feltroDom.pile.get(i)
+      if (!quanto) { if (d) { d.remove(); feltroDom.pile.delete(i) } continue }
+      if (!d) { d = document.createElement('div'); d.className = 'pila'; el.oggettiPiano.appendChild(d); feltroDom.pile.set(i, d); d.dataset.q = '' }
+      const q = `${quanto}:${mondo.w}`
+      if (d.dataset.q !== q) { d.dataset.q = q; d.innerHTML = scomponi(quanto).slice(0, 6).map((v, k) => `<i class="${ficheArt ? '' : 'css'}" style="transform:translateY(${-k * 4}px);${ficheArt ? `background-image:url(${ART}fiche/f${v}.webp)` : ''}"></i>`).join('') + `<span class="n">${fmt(quanto)}</span>`; d.style.cssText = posiz(b.x, b.y) }
+    }
+  }
+  function aggiornaTotali() {
+    if (!st) return
+    const vivi = new Set()
+    const metti = (key, px, py, testo, cls) => { vivi.add(key); let d = feltroDom.totali.get(key); if (!d) { d = document.createElement('div'); el.oggettiPiano.appendChild(d); feltroDom.totali.set(key, d) } const f = testo + cls + mondo.w; if (d.dataset.t !== f) { d.dataset.t = f; d.className = `tot-feltro n ${cls}`; d.textContent = testo; d.style.cssText = posiz(px, py) + ' translate(-50%,-50%)' } }
+    const bancoViste = st.banco.carte.filter((c, k) => mostrate.has(chiaveCarta('b', 0, k, c.c)))
+    if (bancoViste.length) { const t = valore(bancoViste); const bj = bancoViste.length === st.banco.carte.length && st.banco.carte.length === 2 && t === 21 && (st.fase === 'esito' || st.fase === 'banco'); metti('banco', PIANTA.banco.x + 40, PIANTA.banco.y + 96, t > 21 ? `sballa ${t}` : bj ? 'blackjack' : String(t), t > 21 ? 'sballa' : bj ? 'bj' : '') }
+    st.posti.forEach((p, i) => { if (!p) return; p.mani.forEach((m, j) => {
+      const v = m.carte.filter((c, k) => mostrate.has(chiaveCarta(i, j, k, c.c)))
+      if (!v.length) return
+      const q = puntoCarta({ dove: 'posto', posto: i, mano: j, k: 0 })
+      const t = valore(v)
+      let testo = String(t), cls = ''
+      if (st.fase === 'esito' && m.esito) { if (m.esito === 'bj') { testo = `blackjack +${fmt(m.delta)}`; cls = 'bj' } else if (m.esito === 'vince') { testo = `+${fmt(m.delta)}`; cls = 'vince' } else if (m.esito === 'pari') { testo = 'pari'; cls = 'pari' } else { testo = `${m.stato === 'sballata' ? 'sballa ' : ''}−${fmt(-m.delta)}`; cls = 'perde' } }
+      else if (m.stato === 'bj' && v.length === 2) { testo = 'blackjack'; cls = 'bj' }
+      else if (t > 21) { testo = `sballa ${t}`; cls = 'sballa' }
+      else if (m.stato === 'raddoppiata' && v.length === m.carte.length) testo = `${t} · raddoppio`
+      metti(`${i}:${j}`, q.px + 30, q.py + 92, testo, cls)
+    }) })
+    for (const [key, d] of feltroDom.totali) if (!vivi.has(key)) { d.remove(); feltroDom.totali.delete(key) }
+  }
+
+  // ── posti, targhette, figure ───────────────────────────────────────────────
+  function renderPosti(forza) {
+    if (!st || !scena.costruita) return
     st.posti.forEach((p, i) => {
-      let box = el.posti.children[i]
-      if (!box) { box = document.createElement('div'); el.posti.appendChild(box) }
-      const firma = firmaPosto(p, i)
-      if (box.dataset.firma === firma) {
-        if (p) p.mani.forEach((m, j) => { const c = box.querySelector(`[data-mano="${j}"] .carte`); if (c) mettiCarte(c, m.carte) })
-        return
-      }
-      box.dataset.firma = firma
+      const Q = scena.posti[i]
+      if (!Q) return
+      const T = Q.targa
       if (!p) {
-        box.className = 'posto libero'
-        const puo = io && !seduto()
-        box.innerHTML = puo ? `<button class="sit" type="button" data-siedi="${i}">posto libero</button>` : '<span>libero</span>'
+        if (Q.chi) alzaFigura(i)
+        const h = io && !seduto() ? `<button class="libera" type="button" data-siedi="${i}">posto libero</button>` : ''
+        if (T.dataset.h !== h) { T.dataset.h = h; T.className = 'targa vuota'; T.style.display = h ? '' : 'none'; T.innerHTML = h }
         return
       }
+      if (Q.chi !== p.id || forza) siediFigura(i, p.id)
       const mio = io && p.id === io.id
       const turno = st.fase === 'turno' && st.turno && st.turno.posto === i
-      box.className = `posto${mio ? ' mio' : ''}${turno ? ' turno' : ''}${p.online ? '' : ' off'}`
-      let dentro = ''
-      if (p.mani.length) {
-        dentro = p.mani.map((m, j) => {
-          const attiva = turno && st.turno.mano === j
-          return `<div class="mano${attiva ? ' attiva' : ''}" data-mano="${j}"><div class="carte"></div><span class="badge"></span><div class="sotto-mano"><span class="fiche n${ART.fiche ? ' img' : ''}"${ART.fiche ? ` style="background-image:url(art/fiche-${m.puntata}.svg)"` : ''}>${fmt(m.puntata)}</span></div></div>`
-        }).join('')
-      } else if (p.puntata) dentro = `<div class="attesa-mano"><span class="fiche n${ART.fiche ? ' img' : ''}"${ART.fiche ? ` style="background-image:url(art/fiche-${p.puntata}.svg)"` : ''}>${fmt(p.puntata)}</span></div>`
-      else dentro = `<div class="attesa-mano">${p.salta ? 'salta la mano' : st.fase === 'attesa' || st.fase === 'puntate' ? 'ci pensa…' : 'guarda'}</div>`
-      box.innerHTML = `<div class="chi"><span class="nome">${esc(p.nome)}${mio ? ' (tu)' : ''}</span><span class="pzk n">${fmt(p.pzk)} $pzk</span></div><div class="mani">${dentro}</div>`
-      p.mani.forEach((m, j) => {
-        const mano = box.querySelector(`[data-mano="${j}"]`)
-        const v = mettiCarte(mano.querySelector('.carte'), m.carte)
-        mano.querySelector('.badge').outerHTML = badgeMano(m, v, inEsito)
-      })
+      const h = `${esc(p.nome)}${mio ? ' (tu)' : ''}<small class="n">${fmt(p.pzk)} $pzk${p.online ? '' : ' · via'}</small>`
+      const cls = `targa${mio ? ' mia' : ''}${turno ? ' turno' : ''}`
+      if (T.dataset.h !== h + cls) { T.dataset.h = h + cls; T.className = cls; T.style.display = ''; T.innerHTML = h }
     })
-    while (el.posti.children.length > st.posti.length) el.posti.lastChild.remove()
+  }
+  // i gesti degli altri: dalle differenze fra lo stato di prima e quello di adesso
+  function osserva() {
+    if (!prima || !st) return
+    st.posti.forEach((p, i) => {
+      const q = prima.posti[i]
+      if (!p || !q || p.id !== q.id) return
+      if (p.mani.length === 2 && q.mani.length === 1) return gesto(i, 'dividi')
+      p.mani.forEach((m, j) => {
+        const mq = q.mani[j]
+        if (!mq) return
+        if (m.stato === 'raddoppiata' && mq.stato !== 'raddoppiata') gesto(i, 'raddoppia')
+        else if (m.carte.length > mq.carte.length && mq.carte.length >= 2 && prima.fase === 'turno') gesto(i, 'carta')
+        else if (m.stato === 'stai' && mq.stato === 'gioca' && m.carte.length === mq.carte.length) gesto(i, 'stai')
+      })
+      if (p.puntata > 0 && q.puntata !== p.puntata && (st.fase === 'puntate' || st.fase === 'attesa')) gesto(i, 'punta')
+    })
   }
 
-  function renderBanco() {
-    const v = mettiCarte(el.bancoCarte, st.banco.carte)
-    el.bancoTot.hidden = !v.length
-    if (v.length) {
-      const t = valore(v)
-      const tutte = v.length === st.banco.carte.length
-      const bj = tutte && st.banco.carte.length === 2 && t === 21 && (st.fase === 'esito' || st.fase === 'banco')
-      el.bancoTot.className = `tot n${t > 21 ? ' sballa' : bj ? ' bj' : ''}`
-      el.bancoTot.textContent = t > 21 ? `sballa ${t}` : bj ? 'blackjack' : String(t)
-    }
-    el.sabot.querySelector('span').textContent = `${st.sabot.carte} carte`
-  }
-
-  // ── il vassoio: i comandi della fase ───────────────────────────────────────
-  const tasto = (testo, attr = '', cls = '', tastoK = '') => `<button class="b ${cls}" type="button" ${attr}>${testo}${tastoK ? `<span class="k">${tastoK}</span>` : ''}</button>`
-  const chipsHtml = () => {
-    const p = ilMio()
-    const max = Math.min(st.config.max, p ? p.pzk : 0)
-    return `<div class="chips" aria-label="fiche">${FICHE.map((f) => `<button class="ch n" type="button" data-fiche="${f}" ${scelta + f > max ? 'disabled' : ''}>${f}</button>`).join('')}</div>`
-  }
-
-  function renderTray() {
-    let riga = '', tasti = ''
-    const resta = st.fine !== null ? Math.max(0, Math.ceil((st.fine - now()) / 1000)) : null
+  // ── il quadro di comando ────────────────────────────────────────────────────
+  const tasto = (testo, attr = '', cls = '') => `<button class="b ${cls}" type="button" ${attr}>${testo}</button>`
+  function renderHud() {
+    let riga = '', tray = '', leggero = false
+    const resta = st && st.fine !== null ? Math.max(0, Math.ceil((st.fine - now()) / 1000)) : null
     const conto = resta !== null ? `<span class="conto n">${resta} s</span>` : ''
-    if (chiuso) {
-      riga = `<span>il tavolo è chiuso</span>`
-      tasti = `<span class="toast on">${esc(chiuso)}</span>`
-    } else if (!io) {
-      riga = `<span>${codiceMode ? 'hai già giocato? entra col tuo codice' : 'come ti chiami?'}</span>`
-      tasti = codiceMode
-        ? `<form class="campo" id="f-codice"><input name="tok" placeholder="il codice che ti ha dato pzkko" autocomplete="off" spellcheck="false" maxlength="24" required inputmode="text"><button class="b p" type="submit">entra</button><button class="b t" type="button" data-codice="0">ho un nome nuovo</button></form>`
+    if (chiuso) riga = `<span>il tavolo è chiuso: ${esc(chiuso)}</span>`
+    else if (!st) riga = '<span>carico il tavolo…</span>'
+    else if (!io) {
+      riga = `<span>${codiceMode ? 'entra col tuo codice' : 'come ti chiami?'}</span>`
+      tray = codiceMode
+        ? `<form class="campo" id="f-codice"><input name="tok" placeholder="il codice che ti ha dato pzkko" autocomplete="off" spellcheck="false" maxlength="24" required><button class="b p" type="submit">entra</button><button class="b t" type="button" data-codice="0">ho un nome nuovo</button></form>`
         : `<form class="campo" id="f-nome"><input name="nome" placeholder="il tuo nome" autocomplete="nickname" maxlength="14" required><button class="b p" type="submit">entra al tavolo</button><button class="b t" type="button" data-codice="1">ho un codice</button></form>`
     } else if (!seduto()) {
       const l = libero()
-      riga = `<span>ciao <b>${esc(io.nome)}</b>, ${l >= 0 ? 'c’è un posto per te' : 'il tavolo è pieno: si libera un posto e ti siedi'}</span>`
-      tasti = l >= 0 ? tasto('siediti', 'data-azione="siedi"', 'p') : ''
-      tasti += tasto('esci', 'data-azione="esci"', 't')
+      riga = `<span>ciao <b>${esc(io.nome)}</b>: ${l >= 0 ? 'tocca una sedia libera' : 'tavolo pieno, aspetta un posto'}</span>`
+      tray = (l >= 0 ? tasto('siediti', 'data-azione="siedi"', 'p') : '') + tasto('esci', 'data-azione="esci"', 't')
     } else {
       const p = ilMio()
-      const mioTurno = st.fase === 'turno' && st.turno && st.turno.posto === mioPosto()
+      leggero = true
       if (st.fase === 'attesa' || st.fase === 'puntate') {
-        if (p.pzk < st.config.min && !p.puntata) {
-          riga = `<span>non hai $pzk: chiedili a pzkko</span>`
-          tasti = tasto('alzati', 'data-azione="alzati"', 't')
-        } else if (p.puntata) {
-          riga = `<span>hai puntato <b class="n">${fmt(p.puntata)} $pzk</b>${st.fase === 'puntate' ? ', si parte tra poco' : ''}</span>${conto}`
-          tasti = tasto('cambia', 'data-azione="cambia"') + tasto('ritira', 'data-punta="0"', 't')
-        } else {
-          riga = `<span>${st.fase === 'attesa' ? 'punta per aprire il tavolo' : p.salta ? 'salti questa mano' : 'puntate aperte'}${scelta ? `: <b class="n">${fmt(scelta)} $pzk</b>` : ''}</span>${conto}`
-          tasti = chipsHtml()
-          tasti += tasto(scelta ? `punta ${fmt(scelta)}` : 'punta', `data-punta="${scelta}" ${scelta ? '' : 'disabled'}`, 'p')
-          if (scelta) tasti += tasto('azzera', 'data-azzera', 't')
-          else if (p.ultima && p.ultima <= p.pzk && p.ultima <= st.config.max) tasti += tasto(`ripeti ${fmt(p.ultima)}`, `data-punta="${p.ultima}"`)
-          if (!p.salta && st.fase === 'puntate') tasti += tasto('salto', 'data-azione="salta"', 't')
-          tasti += tasto('alzati', 'data-azione="alzati"', 't')
-        }
-      } else if (st.fase === 'distribuzione') {
-        riga = `<span>${p.mani.length ? 'si distribuisce' : 'guardi questa mano'}</span>`
-      } else if (st.fase === 'turno') {
-        const chiTocca = st.posti[st.turno.posto]
-        if (mioTurno) {
-          const m = p.mani[st.turno.mano]
-          const due = m.carte.length === 2
-          const raddoppia = due && p.pzk >= m.puntata
-          const dividi = due && p.mani.length === 1 && p.pzk >= m.puntata && valCarta(m.carte[0].c) === valCarta(m.carte[1].c)
-          riga = `<span><b>tocca a te</b>${p.mani.length > 1 ? ` · mano ${st.turno.mano + 1}` : ''} · hai ${valore(viste(m.carte))}</span>${conto}`
-          tasti = tasto('carta', 'data-mossa="carta"', 'p', 'c') + tasto('stai', 'data-mossa="stai"', '', 's') + tasto('raddoppia', `data-mossa="raddoppia" ${raddoppia ? '' : 'disabled'}`, '', 'r') + tasto('dividi', `data-mossa="dividi" ${dividi ? '' : 'disabled'}`, '', 'd')
-        } else {
-          riga = `<span>tocca a <b>${esc(chiTocca ? chiTocca.nome : '?')}</b></span>${conto}`
-        }
-      } else if (st.fase === 'banco') {
-        riga = `<span>il banco gioca</span>`
-      } else if (st.fase === 'esito') {
-        const mie = p.mani
-        const netto = mie.reduce((s, m) => s + (m.delta || 0), 0)
-        const testo = !mie.length ? 'mano finita' : mie.some((m) => m.esito === 'bj') ? `blackjack! <b class="pos n">+${fmt(netto)} $pzk</b>` : netto > 0 ? `hai vinto <b class="pos n">${fmt(netto)} $pzk</b>` : netto < 0 ? `hai perso <b class="neg n">${fmt(-netto)} $pzk</b>` : '<b class="zero">pari</b>: riprendi la puntata'
-        riga = `<span class="grande">${testo}</span>`
-        tasti = `<span class="conto n">prossima tra ${resta} s</span>` + (p.via ? '<span class="conto">ti alzi a fine mano</span>' : tasto('mi alzo a fine mano', 'data-azione="alzati"', 't'))
+        if (p.pzk < st.config.min && !p.puntata) riga = `<span>non hai $pzk: chiedili a pzkko</span>`
+        else if (p.puntata) riga = `<span>hai puntato <b class="n">${fmt(p.puntata)} $pzk</b>${st.fase === 'puntate' ? ', si parte tra poco' : ''}</span>${conto}`
+        else riga = `<span>${st.fase === 'attesa' ? 'tocca le fiche e punta per aprire il tavolo' : p.salta ? 'salti questa mano' : 'puntate aperte'}${scelta ? `: <b class="n">${fmt(scelta)} $pzk</b>` : ''}</span>${conto}`
+        tray = tasto('alzati', 'data-azione="alzati"', 't')
+      } else if (st.fase === 'distribuzione') riga = `<span>${p.mani.length ? 'il croupier distribuisce' : 'guardi questa mano'}</span>`
+      else if (st.fase === 'turno') {
+        const chi = st.posti[st.turno.posto]
+        if (mioTurno()) { const m = p.mani[st.turno.mano]; riga = `<span><b>tocca a te</b>${p.mani.length > 1 ? ` · mano ${st.turno.mano + 1}` : ''} · hai ${valore(m.carte.filter((c, k) => mostrate.has(chiaveCarta(mioPosto(), st.turno.mano, k, c.c))))}</span>${conto}` }
+        else riga = `<span>tocca a <b>${esc(chi ? chi.nome : '?')}</b></span>${conto}`
+        tray = p.via ? '' : tasto('mi alzo a fine mano', 'data-azione="alzati"', 't')
+      } else if (st.fase === 'banco') { riga = '<span>il banco gioca</span>'; tray = p.via ? '' : tasto('mi alzo a fine mano', 'data-azione="alzati"', 't') }
+      else if (st.fase === 'esito') {
+        const mie = p.mani, netto = mie.reduce((s, m) => s + (m.delta || 0), 0)
+        const testo = !mie.length ? 'mano finita' : mie.some((m) => m.esito === 'bj') ? `blackjack! <b class="pos n">+${fmt(netto)} $pzk</b>` : netto > 0 ? `hai vinto <b class="pos n">${fmt(netto)} $pzk</b>` : netto < 0 ? `hai perso <b class="neg n">${fmt(-netto)} $pzk</b>` : '<b class="zero">pari</b>'
+        riga = `<span class="grande">${testo}</span><span class="conto n">prossima tra ${resta} s</span>`
+        tray = p.via ? '' : tasto('mi alzo a fine mano', 'data-azione="alzati"', 't')
       }
-      if (!tasti && st.fase !== 'attesa' && st.fase !== 'puntate' && !p.via) tasti = tasto('mi alzo a fine mano', 'data-azione="alzati"', 't')
     }
-    const firma = riga + '|' + tasti
-    if (el.tray.dataset.firma !== firma) {
-      const attivo = document.activeElement
-      const nomeCampo = attivo && attivo.name
-      const valoreCampo = attivo && attivo.value
-      el.tray.dataset.firma = firma
-      el.riga.innerHTML = riga
-      el.tasti.innerHTML = tasti
-      el.tasti.classList.toggle('mosse', tasti.includes('data-mossa='))
+    const firma = riga + '|' + tray
+    if (el.riga.dataset.firma !== firma) {
+      const attivo = document.activeElement, nomeCampo = attivo && attivo.name, valoreCampo = attivo && attivo.value
+      el.riga.dataset.firma = firma
+      el.riga.innerHTML = riga + '<div class="timer" id="timer"><i></i></div>'
+      el.timer = $('timer')
+      el.tasti.innerHTML = tray
+      el.tray.hidden = !tray
+      el.tray.classList.toggle('leggero', leggero)
       if (nomeCampo) { const c = el.tasti.querySelector(`[name="${nomeCampo}"]`); if (c) { c.value = valoreCampo; c.focus() } }
     }
-    // il filo del tempo: solo quando c'è una decisione da prendere
-    const mostra = st.fine !== null && (st.fase === 'puntate' || st.fase === 'turno') && !chiuso
+    const mostra = st && st.fine !== null && (st.fase === 'puntate' || st.fase === 'turno') && !chiuso
     el.timer.classList.toggle('on', mostra)
-    if (mostra) {
-      const durata = st.fase === 'puntate' ? st.config.tPuntate : st.config.tDecisione
-      el.timer.firstElementChild.style.transform = `scaleX(${Math.max(0, Math.min(1, (st.fine - now()) / durata))})`
-    }
+    if (mostra) { const durata = st.fase === 'puntate' ? st.config.tPuntate : st.config.tDecisione; el.timer.firstElementChild.style.transform = `scaleX(${Math.max(0, Math.min(1, (st.fine - now()) / durata))})` }
+    el.eventiHud.textContent = st && st.eventi.length ? st.eventi[st.eventi.length - 1].testo : ''
   }
-  el.tray = $('tray')
-
-  // ── accanto e sotto ────────────────────────────────────────────────────────
   function renderLato() {
     const g = st.giocatori
-    el.chi.innerHTML = g.length
-      ? g.map((x) => `<li><span class="chi"><i class="punto${x.online ? ' on' : ''}" title="${x.online ? 'in linea' : 'via'}"></i><span>${esc(x.nome)}</span>${io && x.id === io.id ? '<span class="io">tu</span>' : ''}${x.posto !== null ? `<span class="io">posto ${x.posto + 1}</span>` : ''}</span><span class="val">${fmt(x.pzk)} $pzk</span></li>`).join('')
-      : '<li class="vuoto">ancora nessuno: sei il primo.</li>'
-    el.eventi.innerHTML = st.eventi.length
-      ? st.eventi.slice().reverse().slice(0, 9).map((e) => `<li><time datetime="${new Date(e.t).toISOString()}">${ora(e.t)}</time><span>${esc(e.testo)}</span></li>`).join('')
-      : '<li class="vuoto">il tavolo aspetta la prima puntata.</li>'
-    el.storico.innerHTML = st.storico.length
-      ? `<table class="mani-tab n"><tbody>${st.storico.map((m) => `<tr><td>mano ${m.mano}</td><td>banco ${m.banco === 'sballa' ? 'sballa' : m.banco === 'bj' ? 'blackjack' : m.banco}: ${m.righe.map((r) => `${esc(r.nome)} <span class="${r.delta > 0 ? 'pos' : r.delta < 0 ? 'neg' : ''}">${r.delta > 0 ? '+' : ''}${r.delta === 0 ? 'pari' : fmt(r.delta)}</span>`).join(', ')}</td></tr>`).join('')}</tbody></table>`
-      : '<p class="vuoto">nessuna mano ancora.</p>'
+    el.chi.innerHTML = g.length ? g.map((x) => `<li><span class="chi"><i class="punto${x.online ? ' on' : ''}"></i><span>${esc(x.nome)}</span>${io && x.id === io.id ? '<span class="io">tu</span>' : ''}${x.posto !== null ? `<span class="io">posto ${x.posto + 1}</span>` : ''}</span><span class="val">${fmt(x.pzk)} $pzk</span></li>`).join('') : '<li class="vuoto">ancora nessuno: sei il primo.</li>'
+    el.eventi.innerHTML = st.eventi.length ? st.eventi.slice().reverse().slice(0, 9).map((e) => `<li><time datetime="${new Date(e.t).toISOString()}">${ora(e.t)}</time><span>${esc(e.testo)}</span></li>`).join('') : '<li class="vuoto">il tavolo aspetta la prima puntata.</li>'
+    el.storico.innerHTML = st.storico.length ? `<table class="mani-tab n"><tbody>${st.storico.map((m) => `<tr><td>mano ${m.mano}</td><td>banco ${m.banco === 'sballa' ? 'sballa' : m.banco === 'bj' ? 'blackjack' : m.banco}: ${m.righe.map((r) => `${esc(r.nome)} <span class="${r.delta > 0 ? 'pos' : r.delta < 0 ? 'neg' : ''}">${r.delta > 0 ? '+' : ''}${r.delta === 0 ? 'pari' : fmt(r.delta)}</span>`).join(', ')}</td></tr>`).join('')}</tbody></table>` : '<p class="vuoto">nessuna mano ancora.</p>'
   }
-
   function render() {
-    if (!st) { if (chiuso) { el.riga.innerHTML = '<span>il tavolo è chiuso</span>'; el.tasti.innerHTML = `<span class="toast on">${esc(chiuso)}</span>` } return }
+    if (!st) { renderHud(); return }
     el.saldo.innerHTML = io ? `<span>${esc(io.nome)}</span><b class="n">${fmt(io.pzk)} $pzk</b>` : ''
-    renderBanco()
+    sgombra()
+    programmaConsegne()
     renderPosti()
-    renderTray()
+    renderConsole()
+    renderPile()
+    aggiornaTotali()
+    renderHud()
     renderLato()
-    programmaCarte()
-    animaCarte = true
   }
 
-  // le carte compaiono al loro orario: si ridisegna quando scade la prossima
-  let carteTimer = 0
-  let animaCarte = false // alla prima resa le carte già in tavola non volano
-  function programmaCarte() {
-    clearTimeout(carteTimer)
+  // ── il battito: molle delle braccia, croupier, gesti, conto alla rovescia ─
+  let ultimo = performance.now(), ultimoConto = -1
+  function battito(nowP) {
+    const dt = Math.min((nowP - ultimo) / 1000, 1 / 30); ultimo = nowP
     const t = now()
-    let prossima = Infinity
-    const guarda = (c) => { if (c.t > t && c.t < prossima) prossima = c.t }
-    st.banco.carte.forEach(guarda)
-    for (const p of st.posti) if (p) for (const m of p.mani) m.carte.forEach(guarda)
-    if (prossima < Infinity) carteTimer = setTimeout(render, Math.max(16, prossima - t + 20))
-  }
-
-  // il filo del tempo e il conto alla rovescia scorrono fra un giro e l'altro
-  let ultimoConto = -1
-  function battito() {
-    if (st && st.fine !== null && !document.hidden) {
-      const resta = Math.max(0, Math.ceil((st.fine - now()) / 1000))
-      if (resta !== ultimoConto) { ultimoConto = resta; renderTray() }
-      else if (el.timer.classList.contains('on')) {
-        const durata = st.fase === 'puntate' ? st.config.tPuntate : st.config.tDecisione
-        el.timer.firstElementChild.style.transform = `scaleX(${Math.max(0, Math.min(1, (st.fine - now()) / durata))})`
-      }
+    if (scena.costruita && !document.hidden) {
+      aggiornaCroupier(t)
+      const C = scena.croupier
+      aggiornaFigura(C.F, dt)
+      if (C.corrente && scena.cartaInMano.style.display !== 'none') { const W = C.destro.polso, a = C.destro.angolo; scena.cartaInMano.setAttribute('transform', `translate(${W.x + 40 * Math.cos(a)},${W.y + 40 * Math.sin(a)}) rotate(${(a * 180) / Math.PI + 90}) scale(${0.7 * mondo.figura},${0.7 * mondo.figura * 0.72})`) }
+      for (const Q of scena.posti) { if (!Q || !Q.F) continue; aggiornaGesto(Q, t); aggiornaFigura(Q.F, dt) }
     }
+    if (st && st.fine !== null && !document.hidden) { const resta = Math.max(0, Math.ceil((st.fine - now()) / 1000)); if (resta !== ultimoConto) { ultimoConto = resta; renderHud() } else if (el.timer.classList.contains('on')) { const durata = st.fase === 'puntate' ? st.config.tPuntate : st.config.tDecisione; el.timer.firstElementChild.style.transform = `scaleX(${Math.max(0, Math.min(1, (st.fine - now()) / durata))})` } }
     requestAnimationFrame(battito)
   }
 
-  // ── gesti ──────────────────────────────────────────────────────────────────
+  // ── gesti dell'utente ──────────────────────────────────────────────────────
   let toastTimer = 0
-  function toast(msg) {
-    el.toast.textContent = msg
-    el.toast.classList.add('on')
-    clearTimeout(toastTimer)
-    toastTimer = setTimeout(() => el.toast.classList.remove('on'), 3200)
-  }
-
-  el.tavolo.addEventListener('click', async (e) => {
+  function toast(msg) { el.toast.textContent = msg; el.toast.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.toast.classList.remove('on'), 3200) }
+  function miaMossa(mossa) { if (mioPosto() !== null) gesto(mioPosto(), mossa); return azione({ a: 'gioca', mossa }) }
+  el.sala.addEventListener('click', async (e) => {
     const b = e.target.closest('button')
     if (!b || b.disabled) return
     if (b.dataset.siedi !== undefined) return azione({ a: 'siedi', posto: Number(b.dataset.siedi) })
-    if (b.dataset.codice !== undefined) { codiceMode = b.dataset.codice === '1'; el.tray.dataset.firma = ''; renderTray(); el.tasti.querySelector('input').focus(); return }
-    if (b.dataset.fiche) { scelta += Number(b.dataset.fiche); el.tray.dataset.firma = ''; renderTray(); return }
-    if (b.dataset.azzera !== undefined) { scelta = 0; el.tray.dataset.firma = ''; renderTray(); return }
-    if (b.dataset.punta !== undefined) {
-      const n = Number(b.dataset.punta)
-      const j = await azione({ a: 'punta', importo: n })
-      if (j.ok) scelta = 0
-      return
-    }
-    if (b.dataset.mossa) return azione({ a: 'gioca', mossa: b.dataset.mossa })
-    if (b.dataset.azione === 'cambia') { const p = ilMio(); scelta = 0; await azione({ a: 'punta', importo: 0 }); scelta = 0; el.tray.dataset.firma = ''; renderTray(); return }
+    if (b.dataset.codice !== undefined) { codiceMode = b.dataset.codice === '1'; el.riga.dataset.firma = ''; renderHud(); const i = el.tasti.querySelector('input'); if (i) i.focus(); return }
+    if (b.dataset.fiche) { scelta += Number(b.dataset.fiche); renderConsole(); renderPile(); renderHud(); return }
+    if (b.dataset.azzera !== undefined) { scelta = 0; renderConsole(); renderPile(); renderHud(); return }
+    if (b.dataset.punta !== undefined) { const n = Number(b.dataset.punta); if (n > 0 && mioPosto() !== null) gesto(mioPosto(), 'punta'); const j = await azione({ a: 'punta', importo: n }); if (j.ok) { scelta = 0; renderConsole(); renderPile() } return }
+    if (b.dataset.mossa) return miaMossa(b.dataset.mossa)
     if (b.dataset.azione === 'siedi') return azione({ a: 'siedi' })
     if (b.dataset.azione === 'salta') return azione({ a: 'salta' })
     if (b.dataset.azione === 'alzati') { const j = await azione({ a: 'alzati' }); if (j.ok && j.dopo) toast('ti alzi a fine mano'); return }
-    if (b.dataset.azione === 'esci') { io = null; mem.del('bj-io'); el.tray.dataset.firma = ''; render(); return }
+    if (b.dataset.azione === 'esci') { io = null; mem.del('bj-io'); el.riga.dataset.firma = ''; render(); return }
   })
-
-  el.tavolo.addEventListener('submit', async (e) => {
+  el.sala.addEventListener('submit', async (e) => {
     e.preventDefault()
     const f = e.target
-    if (f.id === 'f-nome') {
-      const nome = f.nome.value.trim()
-      if (!nome) return
-      f.querySelector('button').disabled = true
-      const j = await azione({ a: 'entra', nome })
-      if (j.ok) { if (libero() >= 0) await azione({ a: 'siedi' }, { silenzioso: true }); else toast('tavolo pieno: ti siedi appena si libera un posto') }
-      else f.querySelector('button').disabled = false
-    } else if (f.id === 'f-codice') {
-      const tok = f.tok.value.trim().toLowerCase()
-      if (!/^[a-z0-9]{24}$/.test(tok)) return toast('il codice ha 24 lettere e cifre')
-      const j = await chiama({ a: 'entra', tok })
-      if (j.ok && j.io) { io = { ...j.io, tok }; mem.set('bj-io', JSON.stringify(io)); codiceMode = false; prendi(j); if (libero() >= 0) azione({ a: 'siedi' }, { silenzioso: true }) }
-      else toast(j.error || 'codice non valido')
-    }
+    if (f.id === 'f-nome') { const nome = f.nome.value.trim(); if (!nome) return; f.querySelector('button').disabled = true; const j = await azione({ a: 'entra', nome }); if (j.ok) { if (libero() >= 0) await azione({ a: 'siedi' }, { silenzioso: true }); else toast('tavolo pieno: ti siedi appena si libera un posto') } else f.querySelector('button').disabled = false }
+    else if (f.id === 'f-codice') { const tok = f.tok.value.trim().toLowerCase(); if (!/^[a-z0-9]{24}$/.test(tok)) return toast('il codice ha 24 lettere e cifre'); const j = await chiama({ a: 'entra', tok }); if (j.ok && j.io) { io = { ...j.io, tok }; mem.set('bj-io', JSON.stringify(io)); codiceMode = false; prendi(j); if (libero() >= 0) azione({ a: 'siedi' }, { silenzioso: true }) } else toast(j.error || 'codice non valido') }
   })
-
-  // tasti rapidi col puntatore: c carta, s stai, r raddoppia, d dividi
   addEventListener('keydown', (e) => {
     if (e.target.matches('input,textarea') || e.metaKey || e.ctrlKey || e.altKey) return
     const k = { c: 'carta', s: 'stai', r: 'raddoppia', d: 'dividi' }[e.key.toLowerCase()]
     if (!k) return
-    const b = el.tasti.querySelector(`[data-mossa="${k}"]`)
+    const b = el.sala.querySelector(`[data-mossa="${k}"]`)
     if (b && !b.disabled) { e.preventDefault(); b.click() }
   })
 
@@ -760,13 +949,17 @@ main{flex:1}
 
   // ── via ────────────────────────────────────────────────────────────────────
   document.addEventListener('visibilitychange', () => { if (!document.hidden) poll() })
+  let resizeTimer = 0
+  addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { carteDom.forEach((d) => d.remove()); carteDom.clear(); mostrate.clear(); for (const d of feltroDom.totali.values()) d.remove(); feltroDom.totali.clear(); for (const d of feltroDom.pile.values()) d.remove(); feltroDom.pile.clear(); misura(); render() }, 120) })
   ;(async () => {
-    // prima l'orologio (e il rientro col codice salvato), poi il tavolo
-    if (io) {
-      const j = await chiama({ a: 'entra', tok: io.tok }).catch(() => null)
-      if (j && j.ok) { io = { ...j.io, tok: io.tok }; mem.set('bj-io', JSON.stringify(io)); prendi(j) }
-      else if (j && !j.ok && !j.chiuso) { io = null; mem.del('bj-io') }
-    } else await chiama({ a: 'ping' }).catch(() => null)
+    try { PZ = await (await fetch(`${ART}pezzi.json`, { cache: 'no-store' })).json() } catch { PZ = {} }
+    carteArt = Boolean(PZ.carte && Object.keys(PZ.carte).length >= 52)
+    ficheArt = Boolean(PZ.fiche && PZ.fiche.f5)
+    if (!pezzoDati('tavolo', 'tavolo')) el.piano.classList.add('cssfelt')
+    segniFeltro()
+    misura()
+    if (io) { const j = await chiama({ a: 'entra', tok: io.tok }).catch(() => null); if (j && j.ok) { io = { ...j.io, tok: io.tok }; mem.set('bj-io', JSON.stringify(io)); prendi(j) } else if (j && !j.ok && !j.chiuso) { io = null; mem.del('bj-io') } }
+    else await chiama({ a: 'ping' }).catch(() => null)
     poll()
     requestAnimationFrame(battito)
     setInterval(() => { if (io && !document.hidden) azione({ a: 'ping' }, { silenzioso: true }) }, 25000)

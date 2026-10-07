@@ -43,10 +43,10 @@ export const CONFIG = {
   tFretta: 3000, // quando tutti i seduti hanno deciso, le puntate chiudono entro tanto
   tDecisione: 20000, // tempo per ogni decisione
   tEsito: 7000, // pausa a fine mano, con i risultati in vista
-  tCarta: 650, // intervallo fra due carte distribuite
-  tPrima: 800, // attesa prima della prima carta
+  tCarta: 1000, // intervallo fra due carte distribuite (il croupier le porta a mano, a velocità umana)
+  tPrima: 1400, // attesa prima della prima carta
   tPesca: 250, // una carta chiesta arriva dopo tanto
-  tBanco: 900, // intervallo fra le carte del banco
+  tBanco: 1100, // intervallo fra le carte del banco
   tCoda: 1500, // pausa dopo l'ultima carta del banco
   assenza: 90000, // senza segni di vita per tanto ci si alza dal tavolo
   online: 60000, // «in linea» = visto da meno di tanto
