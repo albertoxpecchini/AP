@@ -36,13 +36,11 @@ const withPageCss = (html, href) => {
 // SITE=bcp costruisce il sito di bettercallpekko.it (progetto Vercel a parte, stesso
 // repository): solo le rotte di `bcpRoutes`, niente sitemap/robots generati (stanno
 // in public/bcp/), e di public/ solo ciò che quelle pagine usano.
-// SITE=pzk fa lo stesso per pzkko.it (pagina autonoma: di public/ solo public/pzk/).
 // EXTERNAL: i siti col loro dominio, la cartella dei file da mettere alla radice e
 // le parti di public/ da copiare.
 const EXTERNAL = {
   // media/web: le catture dei siti veri (rifatte ogni ora dal bot) per la sezione Websites.
   bcp: { label: 'bettercallpekko.it', dir: 'bcp', public: ['media/assistenza', 'media/web', 'media/mascotte/lumaca.webp', 'media/mascotte/tartaruga.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'] },
-  pzk: { label: 'pzkko.it', dir: 'pzk', public: [] },
 }[process.env.SITE]
 const BCP = Boolean(EXTERNAL)
 
