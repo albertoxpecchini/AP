@@ -219,7 +219,12 @@ function azione(body, now) {
 
 export default async function handler(req, res) {
   const store = await backend()
-  if (!store) return json(res, 503, { ok: false, chiuso: true, error: 'il tavolo è chiuso: manca l’archivio (Redis)' })
+  if (!store) {
+    // solo i nomi delle variabili che sembrano un archivio, mai i valori: per capire
+    // dal telefono cosa manca sul progetto (Upstash mette KV_REST_API_URL e TOKEN)
+    const viste = Object.keys(process.env).filter((k) => /REDIS|KV_|UPSTASH/i.test(k)).sort()
+    return json(res, 503, { ok: false, chiuso: true, error: 'il tavolo è chiuso: manca l’archivio (Redis)', variabili: viste, admin: Boolean(process.env.BJ_ADMIN_KEY) })
+  }
   const now = Date.now()
 
   try {
