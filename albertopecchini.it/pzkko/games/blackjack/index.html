@@ -15,7 +15,9 @@
 <meta property="og:title" content="blackjack, il tavolo di pzkko">
 <meta property="og:description" content="Il banco è un bot, fino a cinque amici al tavolo, in tempo reale, con i $pzk al posto dei soldi. Solo per maggiorenni.">
 <meta property="og:url" content="https://www.pzkko.it/games/blackjack/">
-<meta property="og:image" content="https://www.pzkko.it/og.png">
+<meta property="og:image" content="https://www.pzkko.it/games/blackjack/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:locale" content="it_IT">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -58,7 +60,7 @@ main{flex:1}
 
 /* ── la sala: un palcoscenico a misura di finestra, il mondo dentro in scala ── */
 .sala{position:relative;height:calc(100svh - 48px);min-height:420px;overflow:clip;background:radial-gradient(120% 80% at 50% 10%,#17221d 0%,#070a09 60%,#000 100%);isolation:isolate}
-.mondo{position:absolute;left:50%;top:50%;width:var(--mw);height:var(--mh);transform:translate(-50%,-50%) scale(var(--k));transform-origin:50% 50%}
+.mondo{position:absolute;left:50%;top:50%;width:var(--mw);height:var(--mh);transform:translate(calc(-50% + var(--pan,0px) * var(--k)),-50%) scale(var(--k));transform-origin:50% 50%;transition:transform .6s var(--eo)}
 .mondo>*{position:absolute;inset:0}
 .strato{pointer-events:none}
 .strato svg{width:100%;height:100%;overflow:visible}
@@ -68,6 +70,7 @@ main{flex:1}
 .piano{position:absolute;left:50%;top:var(--ptop);width:var(--pw);height:var(--ph);margin-left:calc(var(--pw) / -2);transform-origin:50% 100%;transform:rotateX(var(--tilt));transform-style:preserve-3d}
 .piano .feltro{position:absolute;inset:0;background:url(art/tavolo/tavolo.webp) center/100% 100% no-repeat}
 .piano.cssfelt .feltro{background:radial-gradient(120% 90% at 50% 38%,#1b6847 0%,#0c3a29 72%,#092b1f 100%);border-radius:28px 28px 50% 50%/28px 28px 100% 100%;box-shadow:inset 0 0 0 36px #2b1d16,inset 0 0 0 38px rgba(255,255,255,.12)}
+.piano .luce{position:absolute;inset:0;pointer-events:none;background:radial-gradient(58% 52% at 50% 32%,rgba(255,250,220,.16),transparent 72%),radial-gradient(100% 100% at 50% 50%,transparent 58%,rgba(0,0,0,.38) 100%)}
 .piano .segni{position:absolute;inset:0;overflow:visible}
 .piano .punto{position:absolute;width:0;height:0}
 #oggetti-piano>*{transform-origin:0 0}
@@ -128,9 +131,9 @@ main{flex:1}
 .hud{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 16px;pointer-events:none}
 .hud>*{pointer-events:auto}
 .riga{position:relative;display:flex;align-items:center;gap:12px;min-height:36px;padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px var(--glass-edge);font-size:15px;max-width:min(70vw,520px)}
-.riga b{font-weight:600}
+.riga b{font-weight:600;white-space:nowrap}
 .riga .conto{font-size:13px;color:var(--felt-fg2);flex:none}
-.riga .grande{font-size:17px;font-weight:600}
+.riga .grande{font-size:17px;font-weight:600;white-space:nowrap}
 .riga .pos{color:#fff}.riga .neg{color:#ff8a80}.riga .zero{color:var(--felt-fg2)}
 .timer{position:absolute;left:16px;right:16px;bottom:-6px;height:2px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;opacity:0;transition:opacity .2s}
 .timer.on{opacity:1}
@@ -196,7 +199,7 @@ main{flex:1}
 
 @media (max-width:640px){
   .wrap{padding:0 16px}
-  .riga{font-size:14px;max-width:62vw}
+  .riga{font-size:14px;max-width:calc(100vw - 32px)}
   .eventi-hud{display:none}
   .scheda{padding:20px 18px 18px;border-radius:24px}
   .foot{margin-top:32px}
@@ -219,6 +222,7 @@ main{flex:1}
       <div class="vista3d">
         <div class="piano" id="piano">
           <div class="feltro"></div>
+          <div class="luce"></div>
           <svg class="segni" id="segni" xmlns="http://www.w3.org/2000/svg"></svg>
           <div id="oggetti-piano"></div>
         </div>
@@ -319,7 +323,7 @@ main{flex:1}
   }
   const MONDI = {
     largo: { w: 1600, h: 1000, pw: 1400, ptop: 150, tilt: 50, persp: 1500, porig: '18%', croupier: { x: 800, y: 250, s: 0.72 }, figura: 1 },
-    alto: { w: 1000, h: 1500, pw: 1380, ptop: 300, tilt: 54, persp: 1400, porig: '14%', croupier: { x: 500, y: 350, s: 0.62 }, figura: 0.8 },
+    alto: { w: 1000, h: 1400, pw: 1380, ptop: 190, tilt: 50, persp: 1400, porig: '14%', croupier: { x: 500, y: 236, s: 0.66 }, figura: 0.84, copri: true },
   }
   let mondo = MONDI.largo
   let K = 1 // scala del mondo sullo schermo
@@ -393,15 +397,18 @@ main{flex:1}
 
   // ── il mondo: misura e scala ────────────────────────────────────────────────
   function misura() {
+    el.mondo.style.transition = 'none'
     const W = el.sala.clientWidth, H = el.sala.clientHeight
     mondo = W < H * 0.9 ? MONDI.alto : MONDI.largo
-    K = Math.min(W / mondo.w, H / mondo.h)
+    K = mondo.copri ? Math.max(W / mondo.w, H / mondo.h) : Math.min(W / mondo.w, H / mondo.h)
     const r = el.mondo.style
     r.setProperty('--mw', mondo.w + 'px'); r.setProperty('--mh', mondo.h + 'px'); r.setProperty('--k', K)
     r.setProperty('--pw', mondo.pw + 'px'); r.setProperty('--ph', (mondo.pw * PIANTA.h / PIANTA.w) + 'px'); r.setProperty('--ptop', mondo.ptop + 'px')
     r.setProperty('--tilt', mondo.tilt + 'deg'); r.setProperty('--persp', mondo.persp + 'px'); r.setProperty('--porig', mondo.porig)
     for (const s of [el.dietro, el.davanti]) s.setAttribute('viewBox', `0 0 ${mondo.w} ${mondo.h}`)
+    void el.mondo.offsetWidth
     proietta()
+    requestAnimationFrame(() => { el.mondo.style.transition = '' })
   }
   // dove cade ogni punto della pianta sullo schermo del mondo: lo misura il browser (niente trigonometria a mano)
   const punti = {}
@@ -437,9 +444,8 @@ main{flex:1}
   function segniFeltro() {
     const s = el.segni
     s.setAttribute('viewBox', `0 0 ${PIANTA.w} ${PIANTA.h}`)
-    s.innerHTML = `<defs><path id="arco-s" d="M 400 320 A 560 560 0 0 0 1000 320" fill="none"/></defs>
-      <text font-size="26" font-weight="600" fill="rgba(255,255,255,.5)" letter-spacing="1" font-family="${FONT}"><textPath href="#arco-s" startOffset="50%" text-anchor="middle">blackjack paga 3 a 2 · il banco sta a 17</textPath></text>
-      <text x="700" y="404" text-anchor="middle" font-size="40" font-weight="700" fill="rgba(255,255,255,.8)" letter-spacing="-1" font-family="${FONT}">pzkko</text>
+    s.innerHTML = `<defs><path id="arco-s" d="M 366 262 A 520 520 0 0 0 1034 262" fill="none"/></defs>
+      <text font-size="27" font-weight="600" fill="rgba(255,255,255,.55)" letter-spacing="1" font-family="${FONT}"><textPath href="#arco-s" startOffset="50%" text-anchor="middle">blackjack paga 3 a 2 · <tspan font-weight="700" fill="rgba(255,255,255,.85)" letter-spacing="-1">pzkko</tspan> · il banco sta a 17</textPath></text>
       <rect x="652" y="163" width="96" height="134" rx="9" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
       ${PIANTA.puntata.map((p) => `<circle cx="${p.x}" cy="${p.y}" r="46" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3"/>`).join('')}
       ${PIANTA.puntata.map((p, i) => `<text x="${p.x}" y="${p.y + 68}" text-anchor="middle" font-size="14" font-weight="600" fill="rgba(255,255,255,.4)" font-family="${FONT}">${i + 1}</text>`).join('')}`
@@ -458,22 +464,30 @@ main{flex:1}
   }
   // la lunghezza utile di un pezzo di braccio: dal perno alla punta (meno la linguetta)
   const lunghezza = (gruppo, nome) => { const d = pezzoDati(gruppo, nome); if (!d) return 100; const [px] = (d.perni && d.perni[0]) || [0, 0]; return Math.max(40, d.w - px - 14) }
+  // le maniche dei giocatori (braccia2/sup*) sono disegnate col gomito in basso: il perno sta in basso a sinistra e la spalla sopra
+  const pieceAngolo = (gruppo, nome) => (gruppo === 'braccia2' && /^sup/.test(nome) ? -0.35 : 0)
 
   // ── figure con braccia: cinematica inversa a due segmenti + molle ─────────
   // una molla criticamente smorzata per asse: segue il bersaglio senza oltrepassarlo
   function molla(risposta = 0.26) { const w = (2 * Math.PI) / risposta; return { x: 0, v: 0, t: 0, w, step(dt) { const a = -this.w * this.w * (this.x - this.t) - 2 * this.w * this.v; this.v += a * dt; this.x += this.v * dt } } }
 
   // un braccio: ogni pezzo scalato alla lunghezza voluta (L1 braccio, L2 avambraccio, Lm mano), dalla spalla
+  // un pezzo può venire da un altro foglio: nomi.sup = 'braccio' oppure ['braccia2', 'sup1']
+  const ref = (gruppo, n) => (Array.isArray(n) ? n : [gruppo, n])
   function braccio(parent, gruppo, nomi, { L1, L2, Lm, piega = 1 }) {
     const g = svgEl('g', {}, parent)
-    const sup = pezzo(g, gruppo, nomi.sup, { s: L1 / lunghezza(gruppo, nomi.sup) })
-    const inf = pezzo(g, gruppo, nomi.inf, { s: L2 / lunghezza(gruppo, nomi.inf) })
+    const ombra = svgEl('ellipse', { rx: Lm * 0.5, ry: Lm * 0.22, fill: 'rgba(0,0,0,.3)', filter: 'url(#sfoca)' }, g)
+    const [gs, ns] = ref(gruppo, nomi.sup), [gi, ni] = ref(gruppo, nomi.inf)
+    const sup = pezzo(g, gs, ns, { s: L1 / lunghezza(gs, ns) })
+    sup._rot = pieceAngolo(gs, ns)
+    const inf = pezzo(g, gi, ni, { s: L2 / lunghezza(gi, ni) })
     const mani = {}
-    for (const [k, n] of Object.entries(nomi.mani)) { mani[k] = pezzo(g, gruppo, n, { s: Lm / lunghezza(gruppo, n) }); mani[k].style.display = 'none' }
-    const A = { g, sup, inf, mani, L1, L2, piega, mano: Object.keys(mani)[0], mx: molla(), my: molla(), base: { x: 0, y: 0 }, spalla: { x: 0, y: 0 }, rot: 0, riposo: { x: 0, y: 0 }, polso: { x: 0, y: 0 }, angolo: 0 }
+    for (const [k, n] of Object.entries(nomi.mani)) { const [gm, nm] = ref(gruppo, n); mani[k] = pezzo(g, gm, nm, { s: Lm / lunghezza(gm, nm) }); mani[k].style.display = 'none' }
+    const A = { g, ombra, sup, inf, mani, L1, L2, piega, mano: Object.keys(mani)[0], mx: molla(), my: molla(), base: { x: 0, y: 0 }, spalla: { x: 0, y: 0 }, rot: 0, riposo: { x: 0, y: 0 }, polso: { x: 0, y: 0 }, angolo: 0 }
     A.mani[A.mano].style.display = ''
     return A
   }
+  const Lmano = (A) => A.ombra.rx.baseVal.value * 2
   function posaMano(A, nome) { if (A.mano === nome || !A.mani[nome]) return; A.mani[A.mano].style.display = 'none'; A.mano = nome; A.mani[nome].style.display = '' }
   function bersaglio(A, x, y) { A.mx.t = x; A.my.t = y }
   function salta(A, x, y) { A.mx.t = A.mx.x = x; A.my.t = A.my.x = y; A.mx.v = A.my.v = 0 }
@@ -490,11 +504,12 @@ main{flex:1}
     const E = { x: S.x + A.L1 * Math.cos(a1), y: S.y + A.L1 * Math.sin(a1) }
     const a2 = Math.atan2(S.y + dy - E.y, S.x + dx - E.x)
     const deg = (r) => (r * 180) / Math.PI
-    A.sup.setAttribute('transform', `translate(${S.x},${S.y}) rotate(${deg(a1)})`)
+    A.sup.setAttribute('transform', `translate(${S.x},${S.y}) rotate(${deg(a1 + (A.sup._rot || 0))})`)
     A.inf.setAttribute('transform', `translate(${E.x},${E.y}) rotate(${deg(a2)})`)
     const W = { x: S.x + dx, y: S.y + dy }
     const am = a2 + A.rot
     for (const m of Object.values(A.mani)) m.setAttribute('transform', `translate(${W.x},${W.y}) rotate(${deg(am)})`)
+    A.ombra.setAttribute('transform', `translate(${W.x + 8 + Lmano(A) * 0.55 * Math.cos(am)},${W.y + 12 + Lmano(A) * 0.55 * Math.sin(am)}) rotate(${deg(am)})`)
     A.polso = W; A.angolo = am
   }
   // una figura si sporge verso dove lavora la mano: il busto trasla un po', le spalle seguono
@@ -517,6 +532,9 @@ main{flex:1}
     const dietro = el.dietro, davanti = el.davanti
     dietro.innerHTML = ''; davanti.innerHTML = ''; el.targhe.innerHTML = ''
     scena.posti = []; scena.console = null
+    const defs = svgEl('defs', {}, davanti)
+    const filtro = svgEl('filter', { id: 'sfoca', x: '-50%', y: '-50%', width: '200%', height: '200%' }, defs)
+    svgEl('feGaussianBlur', { stdDeviation: 6 }, filtro)
     // il croupier: busto dietro al bordo lontano (la vita sparisce dietro al tavolo), le braccia davanti
     const C = mondo.croupier
     const corpoG = svgEl('g', {}, dietro)
@@ -531,8 +549,8 @@ main{flex:1}
     const destro = braccio(davanti, 'croupier', { sup: 'braccio', inf: 'avambraccio', mani: maniC }, { L1: S * 0.82, L2: S * 0.8, Lm: S * 0.42, piega: -1 })
     const sinistro = braccio(davanti, 'croupier', { sup: 'braccio', inf: 'avambraccio', mani: maniC }, { L1: S * 0.82, L2: S * 0.8, Lm: S * 0.42, piega: 1 })
     destro.base = spalla(0); sinistro.base = spalla(1)
-    destro.riposo = { x: C.x - S * 0.78, y: P.bordo.y + 70 }
-    sinistro.riposo = { x: C.x + S * 0.78, y: P.bordo.y + 70 }
+    destro.riposo = { x: C.x - S * 0.98, y: P.bordo.y + 56 }
+    sinistro.riposo = { x: C.x + S * 0.98, y: P.bordo.y + 56 }
     salta(destro, destro.riposo.x, destro.riposo.y); salta(sinistro, sinistro.riposo.x, sinistro.riposo.y)
     scena.croupier = { corpo, destro, sinistro, F: figura(corpoG, [destro, sinistro]), stato: 'riposo', coda: [], corrente: null, ultimo: 0 }
     // oggetti con altezza, sul bordo lontano (la base del pezzo sul punto)
@@ -546,29 +564,31 @@ main{flex:1}
       const prof = 0.8 + 0.2 * ((p.y - P.sedia0.y) / Math.max(1, P.sedia2.y - P.sedia0.y))
       const s = 0.42 * prof * mondo.figura
       const sedia = pezzo(davanti, 'oggetti', 'sedia', { s })
-      if (sedia._d) sedia.setAttribute('transform', `translate(${p.x - (sedia._d.w / 2 - sedia._p[0]) * s},${p.y + 60 * prof - (sedia._d.h - sedia._p[1]) * s})`)
+      const specchio = i <= 1 // le sedie a sinistra si vedono dall'altro lato
+      if (sedia._d) sedia.setAttribute('transform', `translate(${p.x + (specchio ? 1 : -1) * (sedia._d.w / 2 - sedia._p[0]) * s},${p.y + 60 * prof - (sedia._d.h - sedia._p[1]) * s}) scale(${specchio ? -1 : 1},1)`)
+      const cuscino = (specchio ? 0.2 : -0.2) * (sedia._d ? sedia._d.w : 0) * s // il cuscino sta da un lato nell'immagine di tre quarti
       const gruppo = svgEl('g', { style: 'display:none' }, davanti)
       // il bordo davanti al posto: fra il cerchio della puntata e la sedia
       const b = P['puntata' + i]
-      const bordo = { x: clamp(b.x + (p.x - b.x) * 0.42 + (i === 0 ? 70 : i === 4 ? -70 : 0), mondo.w * 0.18, mondo.w * 0.82), y: b.y + (p.y - b.y) * 0.42 }
-      scena.posti[i] = { i, p, prof, s, sedia, gruppo, bordo, corpo: null, braccia: null, F: null, chi: null, gesto: null }
+      const bordo = { x: b.x + (p.x - b.x) * 0.62, y: b.y + (p.y - b.y) * 0.62 }
+      // la consolle: sulla fascia fra il cerchio della puntata e il bordo imbottito, davanti al proprio posto
+      const q = arco(852, ANG[i])
+      const consolle = proiettaPianta(q.x, q.y)
+      scena.posti[i] = { i, p: { x: p.x + cuscino, y: p.y }, prof, s, sedia, gruppo, bordo, consolle, corpo: null, braccia: null, F: null, chi: null, gesto: null }
     }
     for (let i = 0; i < 5; i++) { const t = document.createElement('div'); t.className = 'targa'; t.style.left = P['sedia' + i].x + 'px'; t.style.top = (P['sedia' + i].y + 70 * scena.posti[i].prof) + 'px'; el.targhe.appendChild(t); scena.posti[i].targa = t }
     // la carta portata in mano dal croupier, sopra a tutto
     const cm = svgEl('g', { style: 'display:none' }, davanti)
-    svgEl('image', { href: `${ART}carte/retro.webp`, x: -30, y: -42, width: 60, height: 84, preserveAspectRatio: 'none' }, cm)
+    svgEl('image', { href: `${ART}carte/retro.webp`, x: -47, y: -66, width: 94, height: 132, preserveAspectRatio: 'none' }, cm)
     scena.cartaInMano = cm
     scena.costruita = true
     renderPosti(true)
   }
 
   // un giocatore seduto: corpo (uno dei cinque) + due braccia; la destra fa i gesti
-  function siediFigura(posto, id) {
+  function siediFigura(posto, id, quale) {
     const Q = scena.posti[posto]
-    if (!Q) return
-    const nomi = Object.keys(PZ.giocatori || {})
-    if (!nomi.length) return
-    const quale = nomi[[...id].reduce((s, ch) => s + ch.charCodeAt(0), 0) % nomi.length]
+    if (!Q || !quale) return
     Q.gruppo.innerHTML = ''
     const corpoG = svgEl('g', {}, Q.gruppo)
     const s = Q.s * 1.1
@@ -577,18 +597,25 @@ main{flex:1}
     if (!d) return
     const spalle = d.perni && d.perni.length >= 2 ? [d.perni[0], d.perni[1]] : [[d.w * 0.05, d.h * 0.92], [d.w * 0.95, d.h * 0.92]]
     const base = [d.w / 2, d.h]
-    const ox = Q.p.x - (base[0] - corpo._p[0]) * s, oy = Q.p.y + 40 * Q.prof - (base[1] - corpo._p[1]) * s
+    const ox = Q.p.x - (base[0] - corpo._p[0]) * s, oy = Q.p.y - 24 * Q.prof - (base[1] - corpo._p[1]) * s
     corpo.setAttribute('transform', `translate(${ox},${oy})`)
     const spalla = (k) => ({ x: ox + (spalle[k][0] - corpo._p[0]) * s, y: oy + (spalle[k][1] - corpo._p[1]) * s })
     const S = Math.abs(spalle[1][0] - spalle[0][0]) * s || 160
-    const mani = { piatta: 'piatta', indice: 'indice', due: 'due', pinza: 'pinza', pugno: 'pugno' }
-    const mis = { L1: S * 0.54, L2: S * 0.52, Lm: S * 0.32 }
-    const sin = braccio(Q.gruppo, 'braccia', { sup: 'braccio', inf: 'avambraccio', mani }, { ...mis, piega: 1 })
-    const des = braccio(Q.gruppo, 'braccia', { sup: 'braccio', inf: 'avambraccio', mani }, { ...mis, piega: -1 })
+    const B2 = PZ.braccia2 || {}
+    const n = Number((quale.match(/\d+/) || [0])[0])
+    const sup = B2['sup' + n] ? ['braccia2', 'sup' + n] : 'braccio'
+    const scura = Boolean(B2['inf' + n])
+    const inf = scura ? ['braccia2', 'inf' + n] : 'avambraccio'
+    const mano = (k) => (scura && B2[k + n] ? ['braccia2', k + n] : k)
+    const mani = { piatta: mano('piatta'), indice: mano('indice'), due: mano('due'), pinza: mano('pinza'), pugno: mano('pugno') }
+    const mis = { L1: S * 0.4, L2: S * 0.4, Lm: S * 0.3 }
+    const sin = braccio(Q.gruppo, 'braccia', { sup, inf, mani }, { ...mis, piega: 1 })
+    const des = braccio(Q.gruppo, 'braccia', { sup, inf, mani }, { ...mis, piega: -1 })
     sin.base = spalla(0); des.base = spalla(1)
-    sin.riposo = { x: Q.bordo.x - 150 * Q.prof, y: Q.bordo.y + 16 }
-    des.riposo = { x: Q.bordo.x + 150 * Q.prof, y: Q.bordo.y + 16 }
+    sin.riposo = { x: sin.base.x - 54 * Q.prof, y: Q.bordo.y + 34 }
+    des.riposo = { x: des.base.x + 54 * Q.prof, y: Q.bordo.y + 34 }
     salta(sin, sin.riposo.x, sin.riposo.y); salta(des, des.riposo.x, des.riposo.y)
+    posaMano(sin, 'piatta'); posaMano(des, 'piatta')
     Q.corpo = corpo; Q.braccia = { sin, des }; Q.F = figura(corpoG, [sin, des]); Q.chi = id
     Q.gruppo.style.display = ''
   }
@@ -720,7 +747,9 @@ main{flex:1}
     const Q = scena.posti[i]
     if (!scena.console) { scena.console = document.createElement('div'); scena.console.className = 'console'; el.targhe.appendChild(scena.console); scena.console.dataset.firma = '' }
     const con = scena.console
-    con.style.left = Q.bordo.x + 'px'; con.style.top = Q.bordo.y + 'px'
+    // la consolle resta dentro la parte di mondo che si vede (in verticale il mondo sborda ai lati)
+    const mezzo = el.sala.clientWidth / K / 2 - 150
+    con.style.left = clamp(Q.consolle.x, mondo.w / 2 - pan - mezzo, mondo.w / 2 - pan + mezzo) + 'px'; con.style.top = Q.consolle.y + 'px'
     const p = ilMio()
     const m = mioTurno() ? p.mani[st.turno.mano] : null
     const due = m && m.carte.length === 2
@@ -758,7 +787,7 @@ main{flex:1}
       if (!quanto) { if (d) { d.remove(); feltroDom.pile.delete(i) } continue }
       if (!d) { d = document.createElement('div'); d.className = 'pila'; el.oggettiPiano.appendChild(d); feltroDom.pile.set(i, d); d.dataset.q = '' }
       const q = `${quanto}:${mondo.w}`
-      if (d.dataset.q !== q) { d.dataset.q = q; d.innerHTML = scomponi(quanto).slice(0, 6).map((v, k) => `<i class="${ficheArt ? '' : 'css'}" style="transform:translateY(${-k * 4}px);${ficheArt ? `background-image:url(${ART}fiche/f${v}.webp)` : ''}"></i>`).join('') + `<span class="n">${fmt(quanto)}</span>`; d.style.cssText = posiz(b.x, b.y) }
+      if (d.dataset.q !== q) { d.dataset.q = q; d.innerHTML = scomponi(quanto).slice(0, 8).map((v, k) => `<i class="${ficheArt ? '' : 'css'}" style="transform:translateY(${-k * 6}px);${ficheArt ? `background-image:url(${ART}fiche/f${v}.webp)` : ''}"></i>`).join('') + `<span class="n">${fmt(quanto)}</span>`; d.style.cssText = posiz(b.x, b.y) }
     }
   }
   function aggiornaTotali() {
@@ -766,7 +795,7 @@ main{flex:1}
     const vivi = new Set()
     const metti = (key, px, py, testo, cls) => { vivi.add(key); let d = feltroDom.totali.get(key); if (!d) { d = document.createElement('div'); el.oggettiPiano.appendChild(d); feltroDom.totali.set(key, d) } const f = testo + cls + mondo.w; if (d.dataset.t !== f) { d.dataset.t = f; d.className = `tot-feltro n ${cls}`; d.textContent = testo; d.style.cssText = posiz(px, py) + ' translate(-50%,-50%)' } }
     const bancoViste = st.banco.carte.filter((c, k) => mostrate.has(chiaveCarta('b', 0, k, c.c)))
-    if (bancoViste.length) { const t = valore(bancoViste); const bj = bancoViste.length === st.banco.carte.length && st.banco.carte.length === 2 && t === 21 && (st.fase === 'esito' || st.fase === 'banco'); metti('banco', PIANTA.banco.x + 40, PIANTA.banco.y + 96, t > 21 ? `sballa ${t}` : bj ? 'blackjack' : String(t), t > 21 ? 'sballa' : bj ? 'bj' : '') }
+    if (bancoViste.length) { const t = valore(bancoViste); const bj = bancoViste.length === st.banco.carte.length && st.banco.carte.length === 2 && t === 21 && (st.fase === 'esito' || st.fase === 'banco'); metti('banco', PIANTA.banco.x - 96, PIANTA.banco.y, t > 21 ? `sballa ${t}` : bj ? 'blackjack' : String(t), t > 21 ? 'sballa' : bj ? 'bj' : '') }
     st.posti.forEach((p, i) => { if (!p) return; p.mani.forEach((m, j) => {
       const v = m.carte.filter((c, k) => mostrate.has(chiaveCarta(i, j, k, c.c)))
       if (!v.length) return
@@ -785,6 +814,16 @@ main{flex:1}
   // ── posti, targhette, figure ───────────────────────────────────────────────
   function renderPosti(forza) {
     if (!st || !scena.costruita) return
+    // una persona diversa per ogni posto: parte dall'id, salta quelle già sedute
+    const nomi = Object.keys(PZ.giocatori || {})
+    const usati = new Set()
+    const corpi = st.posti.map((p) => {
+      if (!p || !nomi.length) return null
+      let k = [...p.id].reduce((s, ch) => s + ch.charCodeAt(0), 0) % nomi.length
+      for (let giri = 0; giri < nomi.length && usati.has(nomi[k]); giri++) k = (k + 1) % nomi.length
+      usati.add(nomi[k])
+      return nomi[k]
+    })
     st.posti.forEach((p, i) => {
       const Q = scena.posti[i]
       if (!Q) return
@@ -795,7 +834,8 @@ main{flex:1}
         if (T.dataset.h !== h) { T.dataset.h = h; T.className = 'targa vuota'; T.style.display = h ? '' : 'none'; T.innerHTML = h }
         return
       }
-      if (Q.chi !== p.id || forza) siediFigura(i, p.id)
+      const quale = corpi[i]
+      if (Q.chi !== p.id || Q.quale !== quale || forza) { siediFigura(i, p.id, quale); Q.quale = quale }
       const mio = io && p.id === io.id
       const turno = st.fase === 'turno' && st.turno && st.turno.posto === i
       const h = `${esc(p.nome)}${mio ? ' (tu)' : ''}<small class="n">${fmt(p.pzk)} $pzk${p.online ? '' : ' · via'}</small>`
@@ -882,8 +922,16 @@ main{flex:1}
     el.eventi.innerHTML = st.eventi.length ? st.eventi.slice().reverse().slice(0, 9).map((e) => `<li><time datetime="${new Date(e.t).toISOString()}">${ora(e.t)}</time><span>${esc(e.testo)}</span></li>`).join('') : '<li class="vuoto">il tavolo aspetta la prima puntata.</li>'
     el.storico.innerHTML = st.storico.length ? `<table class="mani-tab n"><tbody>${st.storico.map((m) => `<tr><td>mano ${m.mano}</td><td>banco ${m.banco === 'sballa' ? 'sballa' : m.banco === 'bj' ? 'blackjack' : m.banco}: ${m.righe.map((r) => `${esc(r.nome)} <span class="${r.delta > 0 ? 'pos' : r.delta < 0 ? 'neg' : ''}">${r.delta > 0 ? '+' : ''}${r.delta === 0 ? 'pari' : fmt(r.delta)}</span>`).join(', ')}</td></tr>`).join('')}</tbody></table>` : '<p class="vuoto">nessuna mano ancora.</p>'
   }
+  let pan = 0
+  function panoramica() {
+    const i = mioPosto()
+    // in verticale il mondo è più largo dello schermo: scorre a metà strada fra il banco e la mia sedia
+    const nuovo = mondo.copri && i !== null && P['sedia' + i] ? Math.round(-(P['sedia' + i].x - mondo.w / 2) * 0.52) : 0
+    if (nuovo !== pan) { pan = nuovo; el.mondo.style.setProperty('--pan', pan + 'px') }
+  }
   function render() {
     if (!st) { renderHud(); return }
+    panoramica()
     el.saldo.innerHTML = io ? `<span>${esc(io.nome)}</span><b class="n">${fmt(io.pzk)} $pzk</b>` : ''
     sgombra()
     programmaConsegne()
@@ -904,7 +952,7 @@ main{flex:1}
       aggiornaCroupier(t)
       const C = scena.croupier
       aggiornaFigura(C.F, dt)
-      if (C.corrente && scena.cartaInMano.style.display !== 'none') { const W = C.destro.polso, a = C.destro.angolo; scena.cartaInMano.setAttribute('transform', `translate(${W.x + 40 * Math.cos(a)},${W.y + 40 * Math.sin(a)}) rotate(${(a * 180) / Math.PI + 90}) scale(${0.7 * mondo.figura},${0.7 * mondo.figura * 0.72})`) }
+      if (C.corrente && scena.cartaInMano.style.display !== 'none') { const W = C.destro.polso, a = C.destro.angolo; scena.cartaInMano.setAttribute('transform', `translate(${W.x + 46 * Math.cos(a)},${W.y + 46 * Math.sin(a)}) rotate(${(a * 180) / Math.PI + 90}) scale(${0.62 * mondo.figura})`) }
       for (const Q of scena.posti) { if (!Q || !Q.F) continue; aggiornaGesto(Q, t); aggiornaFigura(Q.F, dt) }
     }
     if (st && st.fine !== null && !document.hidden) { const resta = Math.max(0, Math.ceil((st.fine - now()) / 1000)); if (resta !== ultimoConto) { ultimoConto = resta; renderHud() } else if (el.timer.classList.contains('on')) { const durata = st.fase === 'puntate' ? st.config.tPuntate : st.config.tDecisione; el.timer.firstElementChild.style.transform = `scaleX(${Math.max(0, Math.min(1, (st.fine - now()) / durata))})` } }

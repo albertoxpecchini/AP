@@ -19,6 +19,8 @@ criticamente smorzate, il busto che si sporge verso dove lavora la mano.
 | `tavolo` | il feltro in pianta, senza scritte | il piano in prospettiva CSS; i segni li disegna la pagina |
 | `carte-rosse`, `carte-nere` | le 52 carte e il retro (`art/carte/<rango><seme>.webp`) | sul feltro, l'angolo si piega al tocco |
 | `fiche` | 5, 10, 25, 50, 100 da sopra (f*) e in pila (s*) | la consolle sul bordo e le puntate sui cerchi |
+| `braccia2` | le maniche dei cinque corpi (sup1…sup5) e avambraccio + mani per la pelle scura del corpo 4 | ogni giocatore ha le braccia del suo vestito |
+| `sabot2` | il sabot con la carta verde in bocca (sostituisce quello di `oggetti`) | sul bordo lontano |
 
 Per rifare un foglio: `node tools/blackjack/immagini.mjs genera <foglio>` (un
 foglio 2048² high costa circa 0,25 $ e ci mette 2–3 minuti), poi `usa` con i

@@ -86,6 +86,34 @@ Style: photorealistic, crisp, matte materials. Never use magenta, pink or purple
 
 ${STILE}`,
   },
+  braccia2: {
+    titolo: 'le maniche dei cinque giocatori, più avambraccio e mani per la pelle scura',
+    aspetto: '2048x2048',
+    prompt: `The separate arm pieces of cut-out puppets of five different casino players seen from behind and slightly above (over the shoulder, looking down at a card table), laid out on ${FONDO}.
+${regole(11)}
+Row 1 and row 2, five RIGHT UPPER ARMS from the shoulder to the elbow, horizontal, the shoulder joint (with its pin) at the left end, each wearing the sleeve of a different garment and ending in bare skin at the elbow end:
+1. a plain red cotton t-shirt short sleeve, light skin below it;
+2. a light blue linen shirt sleeve rolled up above the elbow, light skin;
+3. a grey cotton hoodie sleeve pushed up above the elbow, light skin;
+4. a mustard yellow blouse puff sleeve, medium-dark brown skin;
+5. a dark green polo shirt short sleeve, light skin.
+Row 3 and row 4, for the medium-dark brown skin of player 4 only, the same pieces as a standard set, all horizontal with the joint (and its pin) at the LEFT end:
+6. FOREARM: a right forearm, bare skin, from the elbow to the wrist.
+7. HAND FLAT: a right hand seen from above (back of the hand up), flat, palm down, fingers together.
+8. HAND POINTING: the same hand, index finger extended to the right, the other fingers curled.
+9. HAND TWO FINGERS: the same hand, index and middle fingers extended in a V, the others curled.
+10. HAND PINCHING: the same hand, thumb and index pinched as if holding a chip, without the chip.
+11. HAND FIST: the same hand loosely closed into a relaxed fist.
+
+${STILE}`,
+  },
+  sabot2: {
+    dir: 'oggetti',
+    titolo: 'il sabot con la carta verde in bocca',
+    aspetto: '1024x1024',
+    prompt: `A black acrylic blackjack dealing shoe (a wedge-shaped box holding six decks of cards), alone, centred on ${FONDO}, seen from the players' side of the table in a three-quarter view from slightly above (the camera in front of the table looking down at about 35 degrees). Its mouth (the slot where the cards slide out) faces the FRONT-LEFT; the stack of white playing cards is visible inside through the open top; ONE card is half-way out of the mouth showing its BACK: dark green (#0c3a29) with a thin white border and a fine repeated geometric pattern, no text. No text anywhere on the shoe.
+Style: photorealistic, crisp matte black plastic, soft diffuse light from the upper left, no cast shadow on the magenta background, clean crisp edge around the silhouette. Never use magenta, pink or purple on the object.`,
+  },
   'carte-rosse': {
     dir: 'carte',
     titolo: 'le carte rosse (cuori e quadri) e il retro',
