@@ -65,7 +65,7 @@ export const site = {
     note: 'Diplomato geometra — non iscritto all’albo',
     // Titolare del trattamento per privacy e cookie policy
     owner: 'Alberto Pecchini',
-    updated: '2026-09-18',
+    updated: '2026-10-07',
   },
 
   social: [

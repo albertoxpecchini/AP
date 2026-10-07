@@ -25,7 +25,7 @@
 
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
-import { assistenza as A } from '../../data/assistenza.js'
+import { assistenza as A, BCP } from '../../data/assistenza.js'
 import { media } from '../../data/assistenza-media.js'
 import { seed } from '../../data/bcp-seed.js'
 
@@ -117,6 +117,12 @@ function satisfied() {
   return `<div class="sat">${i3('ANOTHER SATISFIED CUSTOMER?', 'w', 22)}<ul class="soc">${soc.map((s) => `<li><a href="${s.href}" title="${esc(s.title)}" style="background:${s.bg}"${s.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${s.t}</a></li>`).join('')}</ul>${i3('TELL YOUR VIRUS-INFECTED FRIENDS!!!!', 'y', 19)}<div style="margin-top:14px">${logo(true)}</div>${i3('BETTERCALLPEKKO.IT', 'y', 12)}<br><span class="aptv">AP tv</span></div>`
 }
 
+// Distintivo di FrogDR (Domain Rating di bettercallpekko.it): solo nella build
+// SITE=bcp, perché misura quel dominio; la copia /assistenza/ del sito serio ne
+// fa a meno. Il codice è quello dato da FrogDR (href e src non vanno cambiati).
+const frogdr = () =>
+  `<p class="fdr"><a href="https://frogdr.com/bettercallpekko.it?utm_source=bettercallpekko.it" target="_blank" rel="noopener" title="Domain Rating of bettercallpekko.it on FrogDR"><img src="https://frogdr.com/bettercallpekko.it/badge-white-tiny.svg" alt="Monitor your Domain Rating with FrogDR" width="224" height="20" loading="lazy" decoding="async"></a></p>`
+
 function foot() {
   return html`
     <footer class="foot">
@@ -127,6 +133,7 @@ function foot() {
       <p>${esc(A.piede.ia)}</p>
       <p>${esc(A.piede.aggiornato)} · ${esc(A.piede.visitatore)}<span class="counter" data-counter>-------</span> · <span data-online>?</span> online now · Copyright © 2006–${new Date().getFullYear()} Pekko. All rights reserved. No rights reversed.</p>
       <p class="credit"><a href="${esc(site.url)}" rel="author">Site by ${esc(site.name)}</a> · ${esc(site.location.city)} (${esc(site.location.province)}), Italy</p>
+      ${BCP && frogdr()}
     </footer>
     <div class="pop" data-eula-pop hidden role="dialog" aria-modal="true" aria-label="Terms of Use">
       <div class="win"><div class="bar"><span>Terms of Use — Better Call Pekko</span><button class="x" type="button" data-eula-close aria-label="Close">✕</button></div><div style="padding:10px"><div class="eula">${EULA}</div><p style="text-align:center;margin:10px 0 0"><button class="xp" type="button" data-eula-close>I Agree</button> <button class="xp" type="button" data-eula-close>I Agree (no choice)</button></p></div></div>
@@ -1197,6 +1204,7 @@ p{margin:0 0 6px}
 .foot a{color:#ffe600}.foot .cause{font:bold 13px/1.3 'Arial Black',Arial,sans-serif;text-transform:uppercase}.foot .cause a{color:#fff}
 .foot .addr{font-weight:bold}
 .foot .credit{margin-top:6px;font-weight:bold}
+.foot .fdr{margin-top:8px}.foot .fdr img{display:inline-block;vertical-align:middle;width:224px;height:20px}
 .pop{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7)}
 .pop[hidden]{display:none}
 .win{width:560px;max-width:96vw;background:#ece9d8;border:1px solid #0831d9;border-radius:8px 8px 0 0;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden;font-family:Tahoma,Verdana,sans-serif}

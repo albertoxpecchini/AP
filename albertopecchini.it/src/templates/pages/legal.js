@@ -41,7 +41,7 @@ export function privacyPage() {
         title: 'Quali dati tratto',
         body: `<ul>
           <li><strong>Dati che mi invii tu.</strong> Nome, email, telefono (facoltativo), tipo di progetto, budget indicativo (facoltativo) e testo del messaggio, quando compili il modulo di contatto o mi scrivi via email.</li>
-          <li><strong>Dati di navigazione.</strong> Il fornitore di hosting registra nei propri log tecnici l’indirizzo IP, la data e l’ora della richiesta, la pagina richiesta e il tipo di browser. Servono al funzionamento e alla sicurezza del servizio e non vengono usati per identificarti.</li>
+          <li><strong>Dati di navigazione.</strong> Il fornitore di hosting registra nei propri log tecnici l’indirizzo IP, la data e l’ora della richiesta, la pagina richiesta e il tipo di browser. Servono al funzionamento e alla sicurezza del servizio e non vengono usati per identificarti. Una richiesta analoga arriva ai server di FrogDR, da cui il piè di pagina carica l’immagine del distintivo con il Domain Rating del sito.</li>
         </ul>
         <p>Il sito non usa strumenti di analisi statistica, pixel pubblicitari né sistemi di profilazione.</p>`,
       },
@@ -101,7 +101,7 @@ export function cookiePage() {
           </tbody>
         </table></div>
         <p>Sono strumenti tecnici strettamente necessari, esenti da consenso ai sensi delle Linee guida del Garante del 10 giugno 2021.</p>` },
-      { title: 'Risorse di terze parti', body: '<p>Caratteri tipografici, script e immagini sono serviti da questo stesso dominio: aprire una pagina non comporta richieste verso Google Fonts, reti pubblicitarie o social network. Non sono presenti mappe o video incorporati.</p>' },
+      { title: 'Risorse di terze parti', body: '<p>Caratteri tipografici, script e immagini sono serviti da questo stesso dominio: aprire una pagina non comporta richieste verso Google Fonts, reti pubblicitarie o social network. Non sono presenti mappe o video incorporati.</p><p>L’unica eccezione è il distintivo <strong>FrogDR</strong> nel piè di pagina, che mostra il Domain Rating del sito: è un’immagine caricata dai server di FrogDR, che per servirla ricevono l’indirizzo IP e i dati tecnici della richiesta, come per qualsiasi immagine. Non è uno script e non viene usato per tracciarti.</p>' },
       { title: 'Collegamenti esterni', body: '<p>I link verso altri siti — i progetti online, OpenStreetMap, i profili social — si aprono in una nuova scheda. Da quel momento valgono le regole sulla privacy del sito di destinazione.</p>' },
       { title: 'Come cancellare i dati locali', body: '<p>Puoi eliminare in ogni momento i dati salvati dal sito dalle impostazioni del browser, alla voce «Cancella dati di navigazione» o «Dati dei siti». Il sito continuerà a funzionare normalmente.</p>' },
       { title: 'Aggiornamenti', body: `<p>Se in futuro dovessi introdurre strumenti di analisi o servizi di terze parti, questa pagina verrà aggiornata e, quando necessario, ti verrà chiesto il consenso. Per domande: <a href="mailto:${site.contact.email}">${esc(site.contact.email)}</a>.</p>` },
