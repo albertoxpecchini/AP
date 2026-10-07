@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "tiny-text",
+        "value": "*",
+        "files": [
+          "public/bcp/visite.html"
+        ],
+        "createdAt": "2026-10-07T01:54:14.064Z",
+        "reason": "Claude: pagina in stile 2008 come la pagina madre Better Call Pekko (assistenza.js usa Verdana 11 px nei riquadri .wid), scelta di progetto documentata nella memoria pagina-stile-bcs"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "public/bcp/visite.html"
+        ],
+        "createdAt": "2026-10-07T01:54:14.200Z",
+        "reason": "Claude: stessi colori della pagina madre Better Call Pekko (pie' di pagina rosso #e21212 con link gialli #ffe600, come .foot in assistenza.js), parodia 2008 voluta"
+      }
+    ]
+  }
+}
