@@ -618,9 +618,14 @@ main{flex:1}
     const des = braccio(Q.gruppo, 'braccia', { sup, inf, mani }, { ...mis, piega: -1 })
     sin.base = spalla(0); des.base = spalla(1)
     // ai posti di lato la mano esterna resta sul bordo, vicino alla spalla, non nel vuoto
-    const fuoriS = posto === 0 ? 8 : 54, fuoriD = posto === 4 ? 8 : 54
-    sin.riposo = { x: sin.base.x - fuoriS * Q.prof, y: Q.bordo.y + 34 }
-    des.riposo = { x: des.base.x + fuoriD * Q.prof, y: Q.bordo.y + 34 }
+    // ai posti di lato la mano esterna si posa sul bordo verso il centro (fuori non c'è tavolo);
+    // al proprio posto le mani stanno larghe, così la consolle sta in mezzo come un quadro tirato a sé
+    const mio = io && id === io.id
+    const largo = mio ? 104 : 54
+    const sx = posto === 0 ? { x: sin.base.x + 22 * Q.prof, y: Q.bordo.y + 6 } : { x: sin.base.x - largo * Q.prof, y: Q.bordo.y + 34 }
+    const dx = posto === 4 ? { x: des.base.x - 22 * Q.prof, y: Q.bordo.y + 6 } : { x: des.base.x + largo * Q.prof, y: Q.bordo.y + 34 }
+    sin.riposo = sx
+    des.riposo = dx
     salta(sin, sin.riposo.x, sin.riposo.y); salta(des, des.riposo.x, des.riposo.y)
     posaMano(sin, 'piatta'); posaMano(des, 'piatta')
     Q.corpo = corpo; Q.braccia = { sin, des }; Q.F = figura(corpoG, [sin, des]); Q.chi = id
