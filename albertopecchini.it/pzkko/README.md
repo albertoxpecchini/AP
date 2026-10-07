@@ -44,9 +44,13 @@ cartella (es. `tools/nome/index.html`) e il riquadro vuoto diventa un'icona vera
 
 Progetto `pzkko` dal repository `albertoxpecchini/AP`:
 
-- Root Directory: `albertopecchini.it/pzkko`
-- Framework Preset: Other (nessun comando di build, output = la cartella)
+- Root Directory: dovrebbe essere `albertopecchini.it/pzkko` con preset Other
+  (nessuna build, output = la cartella). Finché resta `albertopecchini.it` con
+  preset Vite, ci pensa `tools/pzkko/build.mjs` (il `buildCommand` di
+  `albertopecchini.it/vercel.json`): se la build gira per pzkko.it copia questa
+  cartella in `dist/` così com'è, altrimenti lancia la build normale del sito.
 - Domini: `www.pzkko.it` (principale), `pzkko.it` → 308 verso www
+- Ogni push su `main` pubblica da solo.
 
 ## In locale
 
