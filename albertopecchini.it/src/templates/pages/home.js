@@ -106,7 +106,7 @@ function hero() {
       <div class="container hero__wrap" data-ink>
         <div class="hero__hello" data-reveal="up" style="--d:30ms">
           <p class="hero__hi">
-            <span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="2.75rem" alt="" decoding="async" fetchpriority="high">${site.availability.open ? '<span class="hero__avatar-dot" aria-hidden="true"></span>' : ''}</span>
+            <span class="hero__avatar"><span class="hero__avatar-ph"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="2.75rem" alt="" decoding="async" fetchpriority="high"></span>${site.availability.open ? '<span class="hero__avatar-dot" aria-hidden="true"></span>' : ''}</span>
             <span class="hero__hi-text">Ciao, sono</span>
           </p>
           <p class="hero__place label">${esc(site.location.city)} — Italia<span class="hero__coords"> · ${COORDS}</span></p>
