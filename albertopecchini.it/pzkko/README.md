@@ -9,7 +9,12 @@ serio ma è un progetto Vercel a parte.
   cinque posti,  al posto dei soldi, +18) e la sua pagina del banco in
   `admin/`; la funzione sta in `../api/blackjack.js`, le regole in
   `../src/blackjack/motore.js`, tutto spiegato in `../tools/blackjack/README.md`.
-  La grafica vera (tavolo e carte, da Claude Design) andrà in `art/`.
+  La grafica (gpt-image-2 su Replicate) sta in `art/`.
+- `games/roulette/` — la roulette europea da soli contro il banco: la ruota
+  fotografata che gira con la corona disegnata in SVG, la pallina con la sua
+  fisica (`fisica.js`, provata da `../tools/roulette/prova.mjs`), il croupier
+  del blackjack che lancia, ritira e paga. Niente server: i $pzk stanno nel
+  browser. Spiegato in `../tools/roulette/README.md`.
 - `404.html` — pagina non trovata
 - `favicon.svg`, `apple-touch-icon.png` — la «p» di pzkko su superellisse grafite
 - `og.png` — anteprima per i link condivisi (1200 × 630)

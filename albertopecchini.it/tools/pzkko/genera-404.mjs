@@ -12,6 +12,8 @@ import path from 'node:path'
 
 const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../pzkko')
 let html = readFileSync(path.join(dir, 'index.html'), 'utf8')
+// la home può avere fine riga CRLF (Windows): il generatore ragiona in LF
+html = html.replace(/\r\n/g, '\n')
 
 const rep = (from, to) => {
   const found = from instanceof RegExp ? from.test(html) : html.includes(from)

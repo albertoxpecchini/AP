@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>roulette, la ruota di pzkko</title>
+<meta name="description" content="Una roulette europea da browser, da soli contro il banco: la ruota vera che gira, la pallina che rimbalza sui separatori, il croupier che lancia, ritira e paga. Con i $pzk al posto dei soldi, solo per maggiorenni.">
+<link rel="canonical" href="https://www.pzkko.it/games/roulette/">
+<meta name="author" content="Alberto Pecchini">
+<link rel="author" href="https://www.albertopecchini.it">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="pzkko">
+<meta property="og:title" content="roulette, la ruota di pzkko">
+<meta property="og:description" content="Roulette europea da browser, da soli: la ruota gira davvero, la pallina rimbalza, il croupier lancia e paga. Con i $pzk, solo per maggiorenni.">
+<meta property="og:url" content="https://www.pzkko.it/games/roulette/">
+<meta property="og:image" content="https://www.pzkko.it/og.png">
+<meta property="og:locale" content="it_IT">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="image" href="art/ruota/conca.webp">
+<link rel="preload" as="image" href="art/rotore/rotore.webp">
+<link rel="modulepreload" href="gioco.js">
+<link rel="modulepreload" href="fisica.js">
+<link rel="modulepreload" href="scena.js">
+<link rel="modulepreload" href="ruota.js">
+<link rel="modulepreload" href="tavolo.js">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"roulette, la ruota di pzkko","url":"https://www.pzkko.it/games/roulette/","inLanguage":"it","isPartOf":{"@type":"WebSite","name":"pzkko","url":"https://www.pzkko.it/"},"author":{"@type":"Person","name":"Alberto Pecchini","alternateName":"pzkko","url":"https://www.albertopecchini.it"}}</script>
+<style>
+/* ── tokens: quelli della home di pzkko.it; la sala da gioco è scura sempre ── */
+:root{
+  --bg:#000; --tile:#1d1d1f; --fg:#f5f5f7; --fg2:#a1a1a6; --link:#2997ff; --btn:#1a6fe0;
+  --hair:rgba(255,255,255,.14); --nav:rgba(0,0,0,.62); --ok:#30d158; --no:#ff6961;
+  --fd:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ft:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --eo:cubic-bezier(.23,1,.32,1);
+  --felt-fg:#fff; --felt-fg2:rgba(255,255,255,.78); --glass:rgba(255,255,255,.1); --glass-edge:rgba(255,255,255,.18);
+  --rosso:#d7263d; --nero:#1a1a1c; --verde:#1e8f4e;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-color:var(--fg2) transparent}
+body{margin:0;min-height:100svh;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font:400 17px/1.47 var(--ft);letter-spacing:-.01em;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(0,113,227,.28)}
+:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:10px}
+h1,h2,h3,p,ul{margin:0}
+svg{display:block}
+button{font:inherit;color:inherit;letter-spacing:inherit}
+.n{font-variant-numeric:tabular-nums}
+.wrap{width:100%;max-width:1024px;margin:0 auto;padding:0 22px}
+main{flex:1}
+
+/* ── nav ───────────────────────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:10;height:48px;background:var(--nav);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}
+.nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font:600 17px/1 var(--fd);letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.brand span{font-weight:400;color:var(--fg2)}
+.saldo{font-size:13px;color:var(--fg2);display:flex;align-items:center;gap:6px;min-height:28px}
+.saldo b{font-weight:600;color:var(--fg);transition:color .3s}
+.saldo b.su{color:var(--ok)}
+@media (prefers-reduced-transparency:reduce){.nav{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* ── la sala: un palcoscenico a misura di finestra, il mondo dentro in scala ── */
+.sala{position:relative;height:calc(100svh - 48px);min-height:460px;overflow:clip;background:radial-gradient(120% 80% at 50% 10%,#17221d 0%,#070a09 60%,#000 100%);isolation:isolate;user-select:none;-webkit-user-select:none}
+.mondo{position:absolute;left:50%;top:50%;width:var(--mw);height:var(--mh);transform:translate(-50%,-50%) scale(var(--k));transform-origin:50% 50%}
+.mondo>*{position:absolute;inset:0}
+.strato{pointer-events:none}
+.strato svg{width:100%;height:100%;overflow:visible}
+
+/* il piano del tavolo: la foto in pianta, inclinata in prospettiva */
+.vista3d{perspective:var(--persp);perspective-origin:50% var(--porig)}
+.piano{position:absolute;left:calc(50% + var(--pdx,0px));top:var(--ptop);width:var(--pw);height:var(--ph);margin-left:calc(var(--pw) / -2);transform-origin:50% 100%;transform:rotateX(var(--tilt));transform-style:preserve-3d}
+.piano>img.tavolo{position:absolute;left:0;top:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}
+.piano.alto>img.tavolo{width:var(--ph);height:var(--pw);left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
+.piano .luce{position:absolute;inset:0;pointer-events:none;background:radial-gradient(58% 52% at 50% 32%,rgba(255,250,220,.12),transparent 72%),radial-gradient(100% 100% at 50% 50%,transparent 60%,rgba(0,0,0,.35) 100%)}
+.piano .segni{position:absolute;left:0;top:0;overflow:visible;cursor:pointer}
+.piano .segni.chiuso{cursor:default}
+.piano .segni .zona{fill:transparent;stroke:none}
+.piano .segni .zona.caldo{fill:rgba(255,255,255,.14)}
+.piano .punto{position:absolute;width:0;height:0}
+.piano .ogg{position:absolute;transform-origin:0 0;pointer-events:none}
+
+/* la ruota sul piano: la conca fotografata, il rotore che gira con la corona disegnata, l'ombra della pallina */
+.ruota{position:absolute;pointer-events:none}
+.ruota img{position:absolute;display:block;-webkit-user-drag:none}
+.ruota .incasso{position:absolute;border-radius:50%;box-shadow:0 0 0 6px rgba(0,0,0,.35),0 6px 18px 8px rgba(0,0,0,.5)}
+.ruota .rotore{position:absolute;border-radius:50%;will-change:transform}
+.ruota .rotore img,.ruota .rotore svg{position:absolute;left:0;top:0;width:100%;height:100%}
+.ruota .ombra{position:absolute;left:0;top:0;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:radial-gradient(circle,rgba(0,0,0,.55) 0%,rgba(0,0,0,.35) 45%,transparent 72%);will-change:transform}
+
+/* le fiche sul feltro: pile di immagini, l'importo sotto */
+.pila{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;pointer-events:none;will-change:transform}
+.pila i{position:absolute;inset:0;border-radius:50%;background:center/100% 100% no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+.pila span{position:absolute;left:50%;top:100%;transform:translate(-50%,3px);font:600 12px/1 var(--ft);color:#fff;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.7);padding:2px 5px;border-radius:999px;background:rgba(0,0,0,.45)}
+.pila.vinta span{background:#fff;color:#1d1d1f;text-shadow:none}
+.pila.persa{opacity:.9}
+.pila.via{transition:opacity .45s var(--eo),translate .45s var(--eo);opacity:0;translate:var(--giu,0 30px)}
+
+/* ── sul bordo imbottito, davanti a me: fiche da scegliere e comandi ────── */
+.console{position:absolute;left:50%;transform:translate(-50%,-50%) scale(calc(1 / var(--k,1)));display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;z-index:2}
+.console .fila{display:flex;align-items:center;gap:8px}
+.fiche-tocco{width:58px;height:58px;border:0;border-radius:50%;background:center/100% 100% no-repeat;cursor:pointer;transition:transform .18s var(--eo),opacity .2s,filter .2s;filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));pointer-events:auto;position:relative}
+.fiche-tocco::after{content:"";position:absolute;inset:-5px;border-radius:50%;box-shadow:0 0 0 2px #fff;opacity:0;transition:opacity .15s}
+.fiche-tocco.scelta{transform:translateY(-8px)}
+.fiche-tocco.scelta::after{opacity:1}
+.fiche-tocco:disabled{opacity:.3;cursor:default;transform:none}
+.fiche-tocco:not(:disabled):active{transform:scale(.92)}
+.tasto{height:52px;min-width:52px;padding:0 18px;border-radius:999px;border:2px solid rgba(255,255,255,.8);background:rgba(0,0,0,.55);color:#fff;font:600 14px/1.1 var(--ft);letter-spacing:-.01em;cursor:pointer;display:inline-grid;place-items:center;text-align:center;transition:transform .12s var(--eo),background .15s,opacity .2s;box-shadow:0 4px 10px rgba(0,0,0,.45);pointer-events:auto;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tasto.p{background:var(--btn);border-color:#fff;padding:0 26px;font-size:16px}
+.tasto:disabled{opacity:.35;cursor:default}
+.tasto:not(:disabled):active{transform:scale(.95)}
+.tasto .k{display:block;font-size:11px;font-weight:400;opacity:.75}
+@media (hover:hover){.tasto:not(:disabled):not(.p):hover{background:rgba(255,255,255,.2)}}
+@media (max-width:640px){.fiche-tocco{width:48px;height:48px}.tasto{height:46px;padding:0 14px}.tasto.p{padding:0 20px}}
+
+/* ── il quadro di comando: la riga di stato, gli ultimi numeri ─────────── */
+.hud{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 16px;pointer-events:none}
+.hud>*{pointer-events:auto}
+.riga{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-height:36px;padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px var(--glass-edge);font-size:15px;max-width:min(72vw,560px)}
+.riga b{font-weight:600;white-space:nowrap}
+.riga .grande{font-size:17px;font-weight:600}
+.riga .pos{color:#fff}.riga .neg{color:#ff8a80}
+.riga .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font:700 14px/1 var(--fd);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.num.rosso{background:var(--rosso)}.num.nero{background:var(--nero)}.num.verde{background:var(--verde)}
+.ultimi{display:flex;gap:4px;padding:6px 8px;border-radius:999px;background:rgba(0,0,0,.4);box-shadow:inset 0 0 0 1px var(--glass-edge)}
+.ultimi:empty{display:none}
+.ultimi .num{width:24px;height:24px;font-size:12px}
+.ultimi .num:first-child{box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 0 0 2px #fff}
+.toast{position:absolute;left:50%;top:64px;z-index:4;transform:translateX(-50%);font-size:14px;color:#fff;background:rgba(0,0,0,.6);padding:9px 14px;border-radius:12px;display:none;max-width:90%;box-shadow:inset 0 0 0 1px var(--glass-edge)}
+.toast.on{display:block}
+.tray{position:absolute;left:50%;bottom:max(14px,env(safe-area-inset-bottom));z-index:3;transform:translateX(-50%);padding:6px;border-radius:22px;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);box-shadow:inset 0 0 0 1px var(--glass-edge);display:flex;gap:8px}
+.tray[hidden]{display:none}
+.b{height:44px;padding:0 18px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:#fff;font:600 15px/1 var(--ft);letter-spacing:-.01em;cursor:pointer;transition:transform .12s var(--eo),background .15s,opacity .15s;white-space:nowrap}
+.b.p{background:var(--btn);box-shadow:none}
+.b.t{background:transparent;box-shadow:none;color:var(--felt-fg2);padding:0 12px}
+.b:disabled{opacity:.4;cursor:default}
+.b:not(:disabled):active{transform:scale(.96)}
+@media (hover:hover){.b:not(:disabled):not(.p):hover{background:rgba(255,255,255,.22)}}
+
+/* ── sotto la sala: le regole, gli ultimi giri ─────────────────────────── */
+.sotto{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:24px 0 0}
+.scheda{padding:22px 22px 20px;border-radius:28px;background:var(--tile)}
+.scheda h2{font:600 20px/1.2 var(--fd);letter-spacing:-.02em;margin-bottom:12px}
+.regole{list-style:none;padding:0;font-size:15px;color:var(--fg2);display:flex;flex-direction:column;gap:6px}
+.regole li{padding-left:14px;position:relative}
+.regole li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--fg2)}
+.paga{width:100%;border-collapse:collapse;font-size:14px}
+.paga td{padding:6px 0;border-top:1px solid var(--hair);vertical-align:top}
+.paga tr:first-child td{border-top:0}
+.paga td:last-child{text-align:right;color:var(--fg2);white-space:nowrap}
+.giri{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.giri .num{width:30px;height:30px;font-size:13px;display:inline-grid;place-items:center;border-radius:50%;font-family:var(--fd);font-weight:700;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.vuoto{color:var(--fg2);font-size:15px}
+.nota{font-size:14px;color:var(--fg2)}
+.nota b{color:var(--fg);font-weight:600}
+.foot{border-top:1px solid var(--hair);margin-top:48px;padding:22px 0 max(22px,env(safe-area-inset-bottom));font-size:12px;color:var(--fg2)}
+.foot .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px 16px;flex-wrap:wrap}
+@media (hover:hover){.foot a:hover{color:var(--fg)}}
+
+/* ── velo: il messaggio per i maggiorenni, una volta sola ─────────────────── */
+.velo{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:16px;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6)}
+.velo.on{display:grid}
+.box{width:100%;max-width:440px;padding:28px;border-radius:28px;background:var(--tile);box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+.box h2{font:600 28px/1.1 var(--fd);letter-spacing:-.02em}
+.box p{margin-top:12px;color:var(--fg2)}
+.box .tasti{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.box .b{background:var(--btn);color:#fff;box-shadow:none}
+.box .b.t{background:transparent;color:var(--fg2);padding:0}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .riga{font-size:14px;max-width:70vw}
+  .riga .desc{display:none}
+  .ultimi{display:none}
+  .scheda{padding:20px 18px 18px;border-radius:24px}
+  .foot{margin-top:32px}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/">pzkko <span>roulette</span></a>
+    <div class="saldo n" id="saldo" aria-live="polite"></div>
+  </div>
+</header>
+
+<main>
+  <section class="sala" id="sala" aria-label="il tavolo della roulette">
+    <div class="mondo" id="mondo">
+      <div class="strato"><svg id="dietro" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div class="vista3d">
+        <div class="piano" id="piano">
+          <img class="tavolo" src="art/tavolo/tavolo.webp" alt="" width="1153" height="541" decoding="async">
+          <div class="luce"></div>
+          <div class="ruota" id="ruota"></div>
+          <svg class="segni" id="segni" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div id="oggetti-piano"></div>
+        </div>
+      </div>
+      <div class="strato"><svg id="davanti" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div id="targhe" class="strato"></div>
+    </div>
+    <div class="hud">
+      <div class="riga" id="riga"><span>preparo il tavolo…</span></div>
+      <div class="ultimi n" id="ultimi" aria-label="gli ultimi numeri usciti"></div>
+    </div>
+    <div class="tray" id="tray" hidden></div>
+    <p class="toast n" id="toast" role="status" aria-live="polite"></p>
+  </section>
+
+  <div class="wrap sotto">
+    <section class="scheda" aria-labelledby="h-re">
+      <h2 id="h-re">come si gioca</h2>
+      <ul class="regole">
+        <li>roulette europea: trentasette numeri, un solo zero. la ruota gira davvero e la pallina si ferma dove la portano la pista, i deflettori e i separatori: non c'è un'estrazione a parte.</li>
+        <li>scegli una fiche sul bordo del tavolo e tocca il tappeto: un numero, una linea fra due numeri (cavallo), l'incrocio di quattro (carré), il bordo di una fila (terzina) o di due (sestina), le dozzine, le colonne, rosso o nero, pari o dispari, 1-18 o 19-36.</li>
+        <li>«gira» chiude le puntate: il croupier dà la spinta al rotore, lancia la pallina e, quando si ferma, mette il dolly sul numero, ritira le fiche perse e ti spinge le vincite.</li>
+        <li>si punta da 5 a 500 $pzk per casella. lo zero fa perdere tutte le puntate esterne.</li>
+        <li>da tastiera: barra spaziatrice per girare, 1–5 per scegliere la fiche, backspace per togliere l'ultima fiche.</li>
+      </ul>
+    </section>
+    <section class="scheda" aria-labelledby="h-pa">
+      <h2 id="h-pa">quanto paga</h2>
+      <table class="paga n"><tbody>
+        <tr><td>numero pieno</td><td>35 a 1</td></tr>
+        <tr><td>cavallo (due numeri)</td><td>17 a 1</td></tr>
+        <tr><td>terzina, o zero con due numeri</td><td>11 a 1</td></tr>
+        <tr><td>carré, o zero con 1 2 3</td><td>8 a 1</td></tr>
+        <tr><td>sestina</td><td>5 a 1</td></tr>
+        <tr><td>dozzina, colonna</td><td>2 a 1</td></tr>
+        <tr><td>rosso, nero, pari, dispari, 1-18, 19-36</td><td>1 a 1</td></tr>
+      </tbody></table>
+    </section>
+    <section class="scheda" aria-labelledby="h-gi">
+      <h2 id="h-gi">gli ultimi giri</h2>
+      <ul class="giri n" id="giri"></ul>
+      <p class="nota" style="margin-top:14px"><b>solo per maggiorenni.</b> nessun denaro reale: i $pzk sono gettoni senza alcun valore, non si comprano e non si incassano. qui si gioca da soli, con mille $pzk per cominciare; quando finiscono, il tavolo te ne ridà mille.</p>
+      <p style="margin-top:12px"><button class="b t" id="ricomincia" type="button" style="padding:0">ricomincia con 1000 $pzk</button></p>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a href="https://www.albertopecchini.it" rel="author">sito di alberto pecchini</a>
+    <a href="/#games">tutti i giochi</a>
+    <span>immagini disegnate con gpt-image-2 su replicate</span>
+    <span>pzkko.it</span>
+  </div>
+</footer>
+
+<div class="velo" id="velo" role="dialog" aria-modal="true" aria-labelledby="velo-h">
+  <div class="box">
+    <h2 id="velo-h">solo per maggiorenni.</h2>
+    <p>questa roulette è riservata a chi ha almeno 18 anni.</p>
+    <p>qui non si gioca con soldi veri: i $pzk sono gettoni senza alcun valore, non si comprano, non si vendono e non si incassano.</p>
+    <div class="tasti">
+      <button class="b" id="velo-ok" type="button">ho più di 18 anni, entro</button>
+      <a class="b t" href="/">torno alla home</a>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="gioco.js"></script>
+</body>
+</html>
