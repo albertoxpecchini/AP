@@ -606,9 +606,9 @@
     "purpose": "La lamiera incassata nel portale (.muro)."
    },
    {
-    "name": "luce-sodio",
-    "value": "radial-gradient(70% 36% at 50% -4%, rgba(255,176,70,.22), transparent 70%)",
-    "purpose": "Il lampione di notte sopra la parete (.muro::after)."
+    "name": "lampioni",
+    "value": "radial-gradient(46% 24% at 3% 0%, rgba(255,158,40,.95), rgba(255,150,40,.3) 45%, transparent 72%), radial-gradient(44% 22% at 97% 0%, rgba(196,255,232,.85), rgba(170,255,220,.25) 45%, transparent 72%)",
+    "purpose": "I lampioni (sodio e neon) in screen sopra la parete; il velo .buio #0a0d1c in multiply sotto di loro."
    },
    {
     "name": "felt-light",
@@ -654,6 +654,16 @@
    }
   ],
   "motion": [
+   {
+    "name": "sera",
+    "value": "--notte 0→1 in 90 min dal tramonto −40 (smoothstep), insegna al tramonto, lampioni a +12 min; alba a ritroso",
+    "purpose": "L'orologio del tramonto di Mantova (NOAA) nello script; ?ora=HH:MM, ?veloce=N, ?notte=0..1 per le prove."
+   },
+   {
+    "name": "sfarfallio",
+    "value": "0.97 + 0.03·sin(2π·100 t) campionato a 60 fps + cali casuali (60–280 ms) + strobo d'accensione 1,1–1,5 s",
+    "purpose": "I tubi al neon dell'insegna e dei lampioni (--f-insegna, --f-lampioni); fermo con prefers-reduced-motion."
+   },
    {
     "name": "ease-out",
     "value": "cubic-bezier(.22,1,.36,1)",
@@ -753,8 +763,8 @@
    },
    {
     "name": "notte",
-    "value": "(prefers-color-scheme: dark)",
-    "purpose": "Lamiera spenta, luce al sodio, insegna accesa."
+    "value": "(prefers-color-scheme: dark) solo senza script",
+    "purpose": "Con lo script la notte segue il tramonto di Mantova, non il tema."
    },
    {
     "name": "reduced-motion",

@@ -45,6 +45,8 @@
   --ombra-su:0 4px 6px rgba(0,0,0,.28),0 22px 30px -8px rgba(0,0,0,.5);
   --eo:cubic-bezier(.22,1,.36,1);
   --u:calc(100cqw / 1280);
+  /* la sera: 0 = giorno, 1 = notte (lo script li regola sul tramonto di Mantova); --f-* = lo sfarfallio */
+  --notte:0; --insegna:0; --lampioni:0; --f-insegna:1; --f-lampioni:1;
   color-scheme:light dark;
 }
 
@@ -58,20 +60,29 @@ h1,h2,h3,p,ul{margin:0}
 img{display:block;max-width:100%;height:auto}
 
 /* ── la strada: la pietra del portale, la saracinesca, la soglia ────── */
-.strada{--stipite:clamp(10px,3vw,40px);position:relative;background:
+.strada{--stipite:clamp(10px,3vw,40px);position:relative;isolation:isolate;background:
   radial-gradient(120% 60% at 50% 0%,rgba(255,255,255,.06),transparent 60%),
   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .17 0 0 0 0 .16 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
   linear-gradient(var(--pietra),var(--pietra2));padding:0 var(--stipite)}
 
 /* l'insegna sopra la porta: cassonetto bianco, lettere a scatola; l'h1 è la sua scritta */
-.portale{padding:clamp(18px,3.2vw,40px) 0 clamp(14px,2.4vw,30px);display:flex;justify-content:center}
-.portale h1{margin:0;width:min(100%,840px)}
-.insegna{width:100%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+.portale{position:relative;z-index:32;padding:clamp(18px,3.2vw,40px) 0 clamp(14px,2.4vw,30px);display:flex;justify-content:center}
+.portale h1{position:relative;margin:0;width:min(100%,840px)}
+/* l'insegna: di giorno spenta e sporca, al crepuscolo si scurisce col resto, al tramonto i led dietro il pannello si accendono */
+.insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .4 * var(--notte) + .62 * var(--insegna) * var(--f-insegna))) contrast(calc(1 + .06 * var(--insegna))) drop-shadow(0 6px 10px rgba(0,0,0,.5)) drop-shadow(0 0 26px rgba(255,238,196,calc(.55 * var(--insegna) * var(--f-insegna)))) drop-shadow(0 0 70px rgba(255,222,150,calc(.35 * var(--insegna) * var(--f-insegna))))}
+.insegna-luce{position:absolute;inset:-8% -3%;z-index:2;pointer-events:none;mix-blend-mode:screen;filter:blur(8px);background:radial-gradient(58% 66% at 50% 50%,rgba(255,247,222,.9),rgba(255,240,200,.4) 52%,transparent 74%);opacity:calc(var(--insegna) * var(--f-insegna))}
+.insegna-cono{position:absolute;left:-18%;right:-18%;top:96%;height:min(60vh,520px);z-index:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(50% 100% at 50% 0%,rgba(255,236,190,.42),rgba(255,230,180,.12) 50%,transparent 75%);opacity:calc(var(--insegna) * var(--f-insegna))}
 
 /* la saracinesca: la lamiera fotografata si ripete (una doga ogni 114 px della tela a 1600) */
 .muro{position:relative;container-type:inline-size;max-width:1280px;margin:0 auto;isolation:isolate;
   box-shadow:inset 0 10px 14px -8px rgba(0,0,0,.7),inset 0 -8px 10px -8px rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.5)}
-.muro::before{content:"";position:absolute;inset:0;z-index:-1;background:url(/art/muro.webp) 0 0/2200px auto repeat;background-color:#8e8e8a}
+.muro::before{content:"";position:absolute;inset:0;z-index:-1;background:url(/art/muro.webp) 0 0/2200px auto repeat;background-color:#8e8e8a;filter:brightness(calc(1 - .5 * var(--notte))) saturate(calc(1 - .2 * var(--notte)))}
+/* la sera cala su tutto: un velo blu notte in multiply; sopra, la luce dei lampioni (al sodio a sinistra, al neon a destra) in screen */
+.buio{position:absolute;inset:0;z-index:30;pointer-events:none;mix-blend-mode:multiply;background:#0a0d1c;opacity:calc(var(--notte) * .64)}
+.lampioni{position:absolute;inset:0;z-index:31;pointer-events:none;mix-blend-mode:screen;opacity:calc(var(--lampioni) * var(--f-lampioni));background:
+  radial-gradient(46% 24% at 3% 0%,rgba(255,158,40,.95),rgba(255,150,40,.3) 45%,transparent 72%),
+  radial-gradient(44% 22% at 97% 0%,rgba(196,255,232,.85),rgba(170,255,220,.25) 45%,transparent 72%),
+  radial-gradient(70% 34% at 50% 100%,rgba(255,190,110,.16),transparent 70%)}
 .parete{position:relative;height:calc(1700 * var(--u))}
 .gruppo{display:contents}
 
@@ -163,13 +174,9 @@ img{display:block;max-width:100%;height:auto}
   .tagliandi{height:max(46px,17cqw)}
 }
 
-/* ── di notte: la lamiera si spegne, l'insegna si accende ───────────────── */
+/* ── senza script la notte segue il tema del sistema (con lo script segue il tramonto di Mantova) ─ */
 @media (prefers-color-scheme:dark){
-  .muro::before{filter:brightness(.52) saturate(.85)}
-  .muro::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(70% 36% at 50% -4%,rgba(255,176,70,.22),transparent 70%)}
-  .vol,.man{filter:brightness(.86) saturate(.95) drop-shadow(0 2px 3px rgba(0,0,0,.4)) drop-shadow(0 10px 16px rgba(0,0,0,.45))}
-  .tag{opacity:.8}
-  .insegna{filter:brightness(1.1) contrast(1.04) drop-shadow(0 0 28px rgba(255,236,190,.45)) drop-shadow(0 0 70px rgba(255,220,150,.3))}
+  html:not(.js){--notte:1;--insegna:1;--lampioni:1}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -181,7 +188,7 @@ img{display:block;max-width:100%;height:auto}
 <body>
 <div class="strada">
   <header class="portale">
-    <h1><img class="insegna" src="/art/insegna.webp" alt="pzkko" width="1719" height="604" fetchpriority="high"></h1>
+    <h1><img class="insegna" src="/art/insegna.webp" alt="pzkko" width="1719" height="604" fetchpriority="high"><span class="insegna-luce" aria-hidden="true"></span><span class="insegna-cono" aria-hidden="true"></span></h1>
   </header>
 
   <main class="muro">
@@ -362,12 +369,111 @@ img{display:block;max-width:100%;height:auto}
       <img class="it pezzo" src="/art/nastro/puntina.webp" alt="" width="174" height="201" loading="lazy" style="--x:1206;--y:1226;--w:26;--r:0deg;--mx:250;--my:2000;--mw:22;--mr:0deg;z-index:4">
     </div>
   </main>
-
+  <div class="buio" aria-hidden="true"></div>
+  <div class="lampioni" aria-hidden="true"></div>
 </div>
 
 <script>
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)')
+  const root = document.documentElement
+  root.classList.add('js')
+
+  // ── La sera a Mantova ────────────────────────────────────────────────────
+  // Alba e tramonto si calcolano qui (equazione del tramonto, NOAA) per Mantova,
+  // 45,156° N 10,791° E: nessuna chiamata in rete, vale per sempre. Il muro vive
+  // a Mantova: la sera cala all'ora di lì, da qualunque posto si guardi.
+  // Prove: ?ora=18:30 (ora di Mantova di oggi), ?veloce=60 (il tempo corre 60×), ?notte=1.
+  const LAT = 45.1564, LON = 10.7914, RAD = Math.PI / 180, MIN = 60000
+  // Calcolo NOAA (il foglio del Global Monitoring Laboratory), al minuto: per il
+  // giorno UTC dell'istante chiesto, prima stima a mezzogiorno e poi tre giri
+  // all'ora dell'evento. 90,833° = orizzonte con la rifrazione.
+  const evento = (ms, tramonto) => {
+    const giorno0 = Math.floor(ms / 86400000) * 86400000
+    let t = giorno0 + 12 * 3600000
+    for (let i = 0; i < 3; i++) {
+      const T = (t / 86400000 + 2440587.5 - 2451545) / 36525
+      const L0 = (((280.46646 + T * (36000.76983 + T * 0.0003032)) % 360) + 360) % 360
+      const M = 357.52911 + T * (35999.05029 - 0.0001537 * T)
+      const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T)
+      const C = Math.sin(M * RAD) * (1.914602 - T * (0.004817 + 0.000014 * T)) + Math.sin(2 * M * RAD) * (0.019993 - 0.000101 * T) + Math.sin(3 * M * RAD) * 0.000289
+      const om = 125.04 - 1934.136 * T, lam = L0 + C - 0.00569 - 0.00478 * Math.sin(om * RAD)
+      const eps = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60 + 0.00256 * Math.cos(om * RAD)
+      const decl = Math.asin(Math.sin(eps * RAD) * Math.sin(lam * RAD))
+      const y = Math.tan((eps / 2) * RAD) ** 2
+      const eq = (4 / RAD) * (y * Math.sin(2 * L0 * RAD) - 2 * e * Math.sin(M * RAD) + 4 * e * y * Math.sin(M * RAD) * Math.cos(2 * L0 * RAD) - 0.5 * y * y * Math.sin(4 * L0 * RAD) - 1.25 * e * e * Math.sin(2 * M * RAD))
+      const ha = Math.acos(Math.max(-1, Math.min(1, Math.cos(90.833 * RAD) / (Math.cos(LAT * RAD) * Math.cos(decl)) - Math.tan(LAT * RAD) * Math.tan(decl)))) / RAD
+      t = giorno0 + (720 - 4 * LON - eq + (tramonto ? ha * 4 : -ha * 4)) * MIN
+    }
+    return t
+  }
+  const sole = (ms) => ({ alba: evento(ms, false), tramonto: evento(ms, true) })
+  const q = new URLSearchParams(location.search)
+  const veloce = Math.max(1, Number(q.get('veloce')) || 1)
+  const partenza = Date.now()
+  let inizio = partenza
+  if (q.get('ora')) {
+    // l'ora chiesta è quella di Mantova, oggi
+    const [h, m] = q.get('ora').split(':').map(Number)
+    const romaOra = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' }))
+    const scarto = Date.now() - romaOra.getTime()
+    inizio = new Date(romaOra.getFullYear(), romaOra.getMonth(), romaOra.getDate(), h || 0, m || 0).getTime() + scarto
+  }
+  const adesso = () => inizio + (Date.now() - partenza) * veloce
+  const liscia = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x) }
+
+  // le tre grandezze della sera: il buio (0→1 da 40 min prima del tramonto a 50 dopo),
+  // l'insegna (si accende al tramonto preciso) e i lampioni (12 minuti dopo); all'alba tutto a ritroso
+  const fase = (t) => {
+    const { alba, tramonto } = sole(t)
+    if (q.get('notte') !== null) { const v = Math.max(0, Math.min(1, Number(q.get('notte')))); return { notte: v, insegna: v > 0 ? 1 : 0, lampioni: v > 0 ? 1 : 0 } }
+    if (t < alba) return { notte: liscia((alba - t) / (60 * MIN)), insegna: 1, lampioni: t < alba - 10 * MIN ? 1 : 0 }
+    if (t < tramonto - 40 * MIN) return { notte: 0, insegna: 0, lampioni: 0 }
+    return { notte: liscia((t - (tramonto - 40 * MIN)) / (90 * MIN)), insegna: t >= tramonto ? 1 : 0, lampioni: t >= tramonto + 12 * MIN ? 1 : 0 }
+  }
+
+  // ── Lo sfarfallio delle luci al neon ─────────────────────────────────────
+  // La rete a 50 Hz fa pulsare i tubi a 100 Hz: il browser disegna a 60, quindi
+  // il campione cade ogni volta in un punto diverso dell'onda e ne esce il
+  // tremolio tipico; sopra, ogni tanto, il tubo «sputa» (un calo breve e nervoso)
+  // e all'accensione strobeggia qualche istante prima di tenere.
+  const luce = (cali, accensione) => ({ f: 1, acceso: false, calo: 0, caloVal: 1, cali, accensione, t0: 0 })
+  const insegna = luce(1 / 38, 1500), lampioni = luce(1 / 20, 1100)
+  const campiona = (l, t, dt, stato) => {
+    if (stato && !l.acceso) { l.acceso = true; l.t0 = t; l.calo = 0 }
+    if (!stato) { l.acceso = false; return 0 }
+    if (reduce.matches) return 1
+    const da = t - l.t0
+    if (da < l.accensione) {
+      // strobo d'accensione: sempre più probabile che tenga
+      const p = 0.12 + 0.88 * (da / l.accensione) ** 1.6
+      return Math.random() < p ? 0.55 + 0.45 * Math.random() : 0.04
+    }
+    if (l.calo > 0) { l.calo -= dt; return l.caloVal * (0.6 + 0.4 * Math.random()) }
+    if (Math.random() < l.cali * dt / 1000) { l.calo = 60 + 220 * Math.random(); l.caloVal = 0.35 + 0.35 * Math.random() }
+    return 0.97 + 0.03 * Math.sin(2 * Math.PI * 100 * (t / 1000))
+  }
+  let stato = { notte: 0, insegna: 0, lampioni: 0 }, prima = performance.now(), sfarfallioOn = false
+  const sfarfallio = (now) => {
+    const dt = Math.min(now - prima, 100)
+    prima = now
+    root.style.setProperty('--f-insegna', campiona(insegna, now, dt, stato.insegna > 0).toFixed(3))
+    root.style.setProperty('--f-lampioni', campiona(lampioni, now, dt, stato.lampioni > 0).toFixed(3))
+    if (stato.insegna > 0 || stato.lampioni > 0) requestAnimationFrame(sfarfallio)
+    else sfarfallioOn = false
+  }
+  const aggiorna = () => {
+    stato = fase(adesso())
+    root.style.setProperty('--notte', stato.notte.toFixed(3))
+    root.style.setProperty('--insegna', stato.insegna)
+    root.style.setProperty('--lampioni', stato.lampioni)
+    if ((stato.insegna > 0 || stato.lampioni > 0) && !sfarfallioOn) { sfarfallioOn = true; prima = performance.now(); requestAnimationFrame(sfarfallio) }
+  }
+  // all'apertura le luci già accese non strobeggiano: sono accese da un pezzo
+  { const f0 = fase(adesso()); if (f0.insegna) { insegna.acceso = true; insegna.t0 = -1e9 } if (f0.lampioni) { lampioni.acceso = true; lampioni.t0 = -1e9 } }
+  aggiorna()
+  setInterval(aggiorna, veloce > 1 ? 250 : 1000)
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
 
   // I tagliandi sono fette della carta del volantino: ognuno mostra il pezzo di
   // foglio che gli tocca (stessa immagine, spostata), così quando si strappa

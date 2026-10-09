@@ -65,8 +65,19 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   stanno sotto i fogli (`.tag`, in multiply), i manifesti inventati fra i
   fogli (`.man`), le parole sprayate `social`, `games`, `tools` sono le
   intestazioni delle zone e gli anchor.
-- **Di notte** (tema scuro): la lamiera si spegne (`brightness(.52)`), una
-  luce al sodio cade dall'alto, l'insegna si accende.
+- **La sera a Mantova**: la pagina calcola alba e tramonto di Mantova (calcolo
+  NOAA, al minuto, senza rete) e vive a quell'ora da qualunque posto la si
+  guardi. Da 40 minuti prima del tramonto cala un velo blu notte (`.buio`, in
+  multiply) e la lamiera si spegne; al tramonto preciso i led dietro l'insegna si
+  accendono (strobo d'accensione, poi la luce tiene); 12 minuti dopo si accendono
+  i lampioni, al sodio a sinistra e al neon a destra (`.lampioni`, in screen);
+  la notte è piena 50 minuti dopo il tramonto e all'alba tutto si spegne a
+  ritroso. Le luci al neon sfarfallano: la rete a 50 Hz fa pulsare i tubi a
+  100 Hz e il browser, campionando a 60, ne restituisce il tremolio; in più
+  ogni tanto un tubo «sputa» (`--f-insegna`, `--f-lampioni`). Con
+  `prefers-reduced-motion` niente sfarfallio né strobo. Senza script la notte
+  segue il tema del sistema. Prove: `?ora=18:30` (ora di Mantova di oggi),
+  `?veloce=60` (il tempo corre 60 volte più in fretta), `?notte=1`.
 - **404**: generata dalla home da `tools/pzkko/genera-404.mjs`
   (`node tools/pzkko/genera-404.mjs` dalla cartella `albertopecchini.it`), da
   rilanciare dopo ogni modifica a `index.html`.
