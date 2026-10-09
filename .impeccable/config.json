@@ -38,6 +38,42 @@
         ],
         "createdAt": "2026-10-07T21:21:08.790Z",
         "reason": "Claude: la sala è un palcoscenico di gioco a misura di finestra (mondo in scala dentro overflow:clip); HUD, vassoio e toast stanno dentro apposta, niente popover da far uscire"
+      },
+      {
+        "rule": "radial-halo",
+        "value": "*",
+        "files": [
+          "albertopecchini.it/pzkko/index.html"
+        ],
+        "createdAt": "2026-10-09T14:35:40.114Z",
+        "reason": "le sfumature radiali sono le luci della strada chieste da Alberto il 2026-10-09 (insegna accesa, lampioni al sodio e al neon, fari delle auto): sorgenti di luce in screen, non aloni decorativi"
+      },
+      {
+        "rule": "buried-raster",
+        "value": "*",
+        "files": [
+          "albertopecchini.it/pzkko/index.html"
+        ],
+        "createdAt": "2026-10-09T14:48:37.584Z",
+        "reason": "le immagini a opacità 0 sono le luci spente di giorno (insegna coi tubi, lampioni accesi) e la goccia fra una caduta e l'altra: lo script le accende al tramonto di Mantova, richiesta di Alberto del 2026-10-09"
+      },
+      {
+        "rule": "buried-raster",
+        "value": "*",
+        "files": [
+          "albertopecchini.it/pzkko/404.html"
+        ],
+        "createdAt": "2026-10-09T14:48:37.624Z",
+        "reason": "404 generata dalla home (tools/pzkko/genera-404.mjs): stesse luci spente di giorno"
+      },
+      {
+        "rule": "radial-halo",
+        "value": "*",
+        "files": [
+          "albertopecchini.it/pzkko/404.html"
+        ],
+        "createdAt": "2026-10-09T14:48:37.688Z",
+        "reason": "404 generata dalla home: le sfumature radiali sono le luci di strada (insegna, lampioni, fari) chieste da Alberto il 2026-10-09"
       }
     ]
   }

@@ -36,6 +36,8 @@
   --u:calc(100cqw / 1280);
   /* la sera: 0 = giorno, 1 = notte (lo script li regola sul tramonto di Mantova); --f-* = lo sfarfallio */
   --notte:0; --insegna:0; --lampioni:0; --f-insegna:1; --f-lampioni:1;
+  /* le auto che passano: posizione e forza dei fari (0..1 della larghezza), colore, fanali rossi, neon sotto la scocca */
+  --auto-x:.5; --auto-l:0; --auto-c:255,226,170; --freno:0; --freno-x:1.1; --neon-auto:0;
   color-scheme:light dark;
 }
 
@@ -49,7 +51,7 @@ h1,h2,h3,p,ul{margin:0}
 img{display:block;max-width:100%;height:auto}
 
 /* ── la strada: la pietra del portale, la saracinesca, la soglia ────── */
-.strada{--stipite:clamp(10px,3vw,40px);position:relative;isolation:isolate;background:
+.strada{--stipite:clamp(10px,3vw,40px);position:relative;isolation:isolate;overflow:clip;background:
   radial-gradient(120% 60% at 50% 0%,rgba(255,255,255,.06),transparent 60%),
   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .17 0 0 0 0 .16 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
   linear-gradient(var(--pietra),var(--pietra2));padding:0 var(--stipite)}
@@ -58,8 +60,10 @@ img{display:block;max-width:100%;height:auto}
 .portale{position:relative;z-index:32;padding:clamp(18px,3.2vw,40px) 0 clamp(14px,2.4vw,30px);display:flex;justify-content:center}
 .portale h1{position:relative;margin:0;width:min(100%,840px)}
 /* l'insegna: di giorno spenta e sporca, al crepuscolo si scurisce col resto, al tramonto i led dietro il pannello si accendono */
-.insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .4 * var(--notte) + .62 * var(--insegna) * var(--f-insegna))) contrast(calc(1 + .06 * var(--insegna))) drop-shadow(0 6px 10px rgba(0,0,0,.5)) drop-shadow(0 0 26px rgba(255,238,196,calc(.55 * var(--insegna) * var(--f-insegna)))) drop-shadow(0 0 70px rgba(255,222,150,calc(.35 * var(--insegna) * var(--f-insegna))))}
-.insegna-luce{position:absolute;inset:-8% -3%;z-index:2;pointer-events:none;mix-blend-mode:screen;filter:blur(8px);background:radial-gradient(58% 66% at 50% 50%,rgba(255,247,222,.9),rgba(255,240,200,.4) 52%,transparent 74%);opacity:calc(var(--insegna) * var(--f-insegna))}
+.insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .55 * var(--notte))) drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+/* di notte: la stessa insegna fotografata accesa, i tubi al neon visibili dentro le lettere; sfarfalla con --f-insegna */
+.insegna.notte{position:absolute;inset:0;z-index:2;opacity:calc(var(--insegna) * var(--f-insegna));filter:drop-shadow(0 0 18px rgba(255,236,190,.55)) drop-shadow(0 0 60px rgba(255,222,150,.35))}
+.insegna-luce{position:absolute;inset:-8% -3%;z-index:3;pointer-events:none;mix-blend-mode:screen;filter:blur(10px);background:radial-gradient(52% 60% at 50% 50%,rgba(255,244,214,.55),rgba(255,236,196,.2) 55%,transparent 74%);opacity:calc(var(--insegna) * var(--f-insegna))}
 .insegna-cono{position:absolute;left:-18%;right:-18%;top:96%;height:min(60vh,520px);z-index:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(50% 100% at 50% 0%,rgba(255,236,190,.42),rgba(255,230,180,.12) 50%,transparent 75%);opacity:calc(var(--insegna) * var(--f-insegna))}
 
 /* la saracinesca: la lamiera fotografata si ripete (una doga ogni 114 px della tela a 1600) */
@@ -68,10 +72,45 @@ img{display:block;max-width:100%;height:auto}
 .muro::before{content:"";position:absolute;inset:0;z-index:-1;background:url(/art/muro.webp) 0 0/2200px auto repeat;background-color:#8e8e8a;filter:brightness(calc(1 - .5 * var(--notte))) saturate(calc(1 - .2 * var(--notte)))}
 /* la sera cala su tutto: un velo blu notte in multiply; sopra, la luce dei lampioni (al sodio a sinistra, al neon a destra) in screen */
 .buio{position:absolute;inset:0;z-index:30;pointer-events:none;mix-blend-mode:multiply;background:#0a0d1c;opacity:calc(var(--notte) * .64)}
+/* la luce dei due lampioni veri appesi ai lati dell'insegna: un cono stretto e caldo dalla testa della lampada, un alone largo sul muro */
 .lampioni{position:absolute;inset:0;z-index:31;pointer-events:none;mix-blend-mode:screen;opacity:calc(var(--lampioni) * var(--f-lampioni));background:
-  radial-gradient(46% 24% at 3% 0%,rgba(255,158,40,.95),rgba(255,150,40,.3) 45%,transparent 72%),
-  radial-gradient(44% 22% at 97% 0%,rgba(196,255,232,.85),rgba(170,255,220,.25) 45%,transparent 72%),
-  radial-gradient(70% 34% at 50% 100%,rgba(255,190,110,.16),transparent 70%)}
+  radial-gradient(9% 7% at var(--sodio-x) var(--lampada-y),rgba(255,190,90,1),rgba(255,160,40,.5) 50%,transparent 100%),
+  radial-gradient(26% 46% at var(--sodio-x) calc(var(--lampada-y) + 160px),rgba(255,158,40,.55),rgba(255,150,40,.18) 50%,transparent 75%),
+  radial-gradient(11% 5% at var(--neon-x) var(--neon-y),rgba(220,255,240,1),rgba(196,255,232,.5) 50%,transparent 100%),
+  radial-gradient(26% 46% at var(--neon-x) calc(var(--neon-y) + 160px),rgba(196,255,232,.5),rgba(170,255,220,.16) 50%,transparent 75%),
+  radial-gradient(70% 34% at 50% 100%,rgba(255,190,110,.12),transparent 70%)}
+.strada{--sodio-x:calc(50% - 505px);--neon-x:calc(50% + 555px);--lampada-y:78px;--neon-y:36px}
+/* i fari delle auto che passano in strada (screen sul muro e sui fogli), poi i fanali rossi dal lato in cui se ne vanno */
+.fari,.freni,.neonauto{position:fixed;inset:0;z-index:33;pointer-events:none;mix-blend-mode:screen}
+.fari{opacity:var(--auto-l);background:radial-gradient(34% 62% at calc(var(--auto-x) * 100%) 68%,rgba(var(--auto-c),.95),rgba(var(--auto-c),.38) 36%,transparent 68%)}
+.freni{opacity:var(--freno);background:radial-gradient(28% 52% at calc(var(--freno-x) * 100%) 70%,rgba(255,36,24,.95),rgba(255,30,20,.35) 40%,transparent 70%)}
+.neonauto{opacity:var(--neon-auto);background:radial-gradient(44% 14% at calc(var(--auto-x) * 100%) 100%,rgba(40,220,255,.85),rgba(40,200,255,.3) 50%,transparent 75%)}
+/* le cose attaccate alla pietra intorno all'insegna: lampioni, condizionatori, cavi, intonaco, umidità, scritte degli altri */
+.fuori{position:absolute;pointer-events:none;z-index:0}
+.fuori img{display:block;width:100%;height:auto}
+.fuori.lampada{z-index:3}
+.fuori.lampada img.acceso{position:absolute;inset:0;opacity:calc(var(--lampioni) * var(--f-lampioni))}
+.lampione{left:calc(50% - 640px);top:14px;width:190px}
+.neon{left:calc(50% + 440px);top:0;width:210px}
+.umidita{left:calc(50% + 520px);top:120px;width:110px;opacity:.85}
+.cavi-sx{left:2%;top:-8px;width:min(34%,400px)}
+.cavi-dx{right:1%;top:-14px;width:min(30%,360px)}
+.intonaco{left:max(-30px,calc(50% - 790px));top:48%;width:150px}
+.crepa{left:calc(50% - 700px);top:2%;width:120px;opacity:.9}
+.scritta-tvb{left:max(6px,calc(50% - 760px));top:6%;width:150px;opacity:.9}
+.scritta-acc{left:calc(50% + 455px);top:62%;width:110px;opacity:.9}
+.scritta-topo{left:calc(50% - 560px);top:70%;width:100px}
+.gomma-fuori{left:calc(50% - 470px);top:86%;width:34px}
+/* la condensa dei condizionatori: la goccia cade dal tubo sulla lamiera, uno spruzzo, e il rivolo resta */
+.goccia,.spruzzo{position:absolute;left:0;top:0;z-index:34;pointer-events:none;opacity:0;will-change:transform}
+.goccia{width:9px}
+.spruzzo{width:26px}
+/* le formiche: piccole, in giro per il muro */
+.formica{position:absolute;left:0;top:0;width:11px;z-index:6;pointer-events:none;will-change:transform}
+/* i riflessi sulla lamiera: la stessa foto, a contrasto alto, in screen, dove battono lampioni e fari */
+.muro::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;background:url(/art/muro.webp) 0 0/2200px auto repeat;filter:grayscale(1) contrast(3.2) brightness(1.25);opacity:calc(.28 * var(--lampioni) * var(--f-lampioni) + .75 * var(--auto-l));
+  -webkit-mask-image:radial-gradient(42% 70% at calc(50% - 480px) 0%,#000,transparent 72%),radial-gradient(42% 70% at calc(50% + 480px) 0%,#000,transparent 72%),radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%);
+  mask-image:radial-gradient(42% 70% at calc(50% - 480px) 0%,#000,transparent 72%),radial-gradient(42% 70% at calc(50% + 480px) 0%,#000,transparent 72%),radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%)}
 .parete{position:relative;height:calc(1700 * var(--u))}
 .gruppo{display:contents}
 
@@ -154,6 +193,12 @@ img{display:block;max-width:100%;height:auto}
 /* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
 @media (max-width:899px){
   :root{--u:calc(min(100cqw, 600px) / 390)}
+  .strada{--sodio-x:40px;--neon-x:calc(100% - 36px);--lampada-y:22px;--neon-y:8px}
+  .fuori{display:none}
+  .fuori.lampada{display:block;width:72px;top:-6px}
+  .lampione{left:-6px}
+  .neon{left:auto;right:-6px}
+  .muro::after{-webkit-mask-image:radial-gradient(60% 50% at 0% 0%,#000,transparent 72%),radial-gradient(60% 50% at 100% 0%,#000,transparent 72%),radial-gradient(50% 80% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%);mask-image:radial-gradient(60% 50% at 0% 0%,#000,transparent 72%),radial-gradient(60% 50% at 100% 0%,#000,transparent 72%),radial-gradient(50% 80% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%)}
   .parete{height:calc(2900 * var(--u));max-width:600px;margin:0 auto}
   .it{--px:var(--mx,var(--x));--py:var(--my,var(--y));--pw:var(--mw,var(--w));--pr:var(--mr,var(--r,0deg))}
   .spray{font-size:calc(40 * var(--u))}
@@ -181,7 +226,18 @@ img{display:block;max-width:100%;height:auto}
 <body>
 <div class="strada">
   <header class="portale">
-    <h1><img class="insegna" src="/art/insegna.webp" alt="pzkko" width="1719" height="604" fetchpriority="high"><span class="insegna-luce" aria-hidden="true"></span><span class="insegna-cono" aria-hidden="true"></span></h1>
+    <img class="fuori cavi-sx" src="/art/strada1/cavi.webp" alt="" width="444" height="138" loading="lazy">
+    <img class="fuori cavi-dx" src="/art/strada1/cavi.webp" alt="" width="444" height="138" loading="lazy">
+    <img class="fuori crepa" src="/art/bestiole/crepa.webp" alt="" width="348" height="580" loading="lazy">
+    <img class="fuori scritta-tvb" src="/art/strada2/tvb.webp" alt="" width="441" height="402" loading="lazy">
+    <img class="fuori intonaco" src="/art/strada1/intonaco.webp" alt="" width="408" height="468" loading="lazy">
+    <img class="fuori scritta-topo" src="/art/strada2/topo.webp" alt="" width="459" height="354" loading="lazy">
+    <img class="fuori gomma-fuori" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy">
+    <span class="fuori lampada lampione" aria-hidden="true"><img class="spento" src="/art/strada1/lampione-spento.webp" alt="" width="375" height="426" loading="lazy"><img class="acceso" src="/art/strada1/lampione-acceso.webp" alt="" width="396" height="432" loading="lazy"></span>
+    <span class="fuori lampada neon" aria-hidden="true"><img class="spento" src="/art/strada1/neon-spento.webp" alt="" width="435" height="129" loading="lazy"><img class="acceso" src="/art/strada1/neon-acceso.webp" alt="" width="444" height="132" loading="lazy"></span>
+    <img class="fuori umidita" src="/art/strada1/umidita.webp" alt="" width="294" height="516" loading="lazy">
+    <img class="fuori scritta-acc" src="/art/strada2/acc.webp" alt="" width="429" height="465" loading="lazy">
+    <h1><img class="insegna" src="/art/insegna.webp" alt="pzkko" width="1719" height="604" fetchpriority="high"><img class="insegna notte" src="/art/insegna-notte.webp" alt="" aria-hidden="true" width="1733" height="626"><span class="insegna-luce" aria-hidden="true"></span><span class="insegna-cono" aria-hidden="true"></span></h1>
   </header>
 
   <main class="muro">
@@ -209,6 +265,16 @@ img{display:block;max-width:100%;height:auto}
   </main>
   <div class="buio" aria-hidden="true"></div>
   <div class="lampioni" aria-hidden="true"></div>
+  <div class="fari" aria-hidden="true"></div>
+  <div class="freni" aria-hidden="true"></div>
+  <div class="neonauto" aria-hidden="true"></div>
+  <img class="goccia" src="/art/bestiole/goccia-cade.webp" alt="" width="108" height="520" loading="lazy" id="goccia">
+  <img class="spruzzo" src="/art/bestiole/spruzzo.webp" alt="" width="416" height="296" loading="lazy" id="spruzzo">
+  <img class="formica" src="/art/bestiole/formica.webp" alt="" width="276" height="356" loading="lazy">
+  <img class="formica" src="/art/bestiole/formica.webp" alt="" width="276" height="356" loading="lazy">
+  <img class="formica" src="/art/bestiole/formica-lato.webp" alt="" width="496" height="184" loading="lazy">
+  <img class="formica" src="/art/bestiole/formica.webp" alt="" width="276" height="356" loading="lazy">
+  <img class="formica" src="/art/bestiole/formica-lato.webp" alt="" width="496" height="184" loading="lazy">
 </div>
 
 <script>
@@ -291,15 +357,94 @@ img{display:block;max-width:100%;height:auto}
     if (Math.random() < l.cali * dt / 1000) { l.calo = 60 + 220 * Math.random(); l.caloVal = 0.35 + 0.35 * Math.random() }
     return 0.97 + 0.03 * Math.sin(2 * Math.PI * 100 * (t / 1000))
   }
+  // ── Le auto che passano in strada ────────────────────────────────────────
+  // Di notte, quando i lampioni sono accesi, ogni 20–90 secondi (mai più di tre
+  // al minuto) passa un'auto: i fari (alogeni caldi, led freddi, xeno) spazzano
+  // il muro e i fogli da un lato all'altro, poi dal lato in cui se ne va restano
+  // i fanali rossi che sfumano, con una frenata ogni tanto; una su sette ha il
+  // neon sotto la scocca. ?auto=1 ne fa passare una subito.
+  const FARI = [['255,226,170', 1], ['214,230,255', 1], ['236,240,255', 1], ['255,214,150', 1], ['214,230,255', 1], ['255,226,170', 1]]
+  let auto = null, prossimaAuto = q.get('auto') ? 0 : performance.now() + 8000 + Math.random() * 40000
+  const set = (k, v) => root.style.setProperty(k, v)
+  const passaAuto = (now) => {
+    const [c] = FARI[Math.floor(Math.random() * FARI.length)]
+    auto = { t0: now, durata: 1400 + Math.random() * 1400, verso: Math.random() < 0.5 ? 1 : -1, neon: Math.random() < 1 / 7, frena: Math.random() < 0.4 }
+    set('--auto-c', c)
+  }
+  const animaAuto = (now) => {
+    if (!auto) { if (now > prossimaAuto && !reduce.matches) passaAuto(now); return }
+    const u = (now - auto.t0) / auto.durata
+    if (u < 1) {
+      const x = auto.verso > 0 ? -0.25 + 1.5 * u : 1.25 - 1.5 * u
+      const l = Math.min(1, u / 0.22) * Math.min(1, (1 - u) / 0.28)
+      set('--auto-x', x.toFixed(4)); set('--auto-l', (0.9 * l).toFixed(3)); set('--neon-auto', auto.neon ? (0.8 * l).toFixed(3) : 0)
+      return
+    }
+    set('--auto-l', 0); set('--neon-auto', 0)
+    const v = (now - auto.t0 - auto.durata) / 1700
+    if (v < 1) {
+      const frenata = auto.frena && v > 0.15 && v < 0.5 ? 0.35 : 0
+      set('--freno-x', auto.verso > 0 ? 1.04 : -0.04); set('--freno', ((1 - v) * 0.8 + frenata).toFixed(3))
+    } else { set('--freno', 0); auto = null; prossimaAuto = now + 20000 + Math.random() * 70000 }
+  }
+
   let stato = { notte: 0, insegna: 0, lampioni: 0 }, prima = performance.now(), sfarfallioOn = false
   const sfarfallio = (now) => {
     const dt = Math.min(now - prima, 100)
     prima = now
     root.style.setProperty('--f-insegna', campiona(insegna, now, dt, stato.insegna > 0).toFixed(3))
     root.style.setProperty('--f-lampioni', campiona(lampioni, now, dt, stato.lampioni > 0).toFixed(3))
+    if (stato.lampioni > 0) animaAuto(now)
+    else if (auto) { auto = null; set('--auto-l', 0); set('--freno', 0); set('--neon-auto', 0) }
     if (stato.insegna > 0 || stato.lampioni > 0) requestAnimationFrame(sfarfallio)
     else sfarfallioOn = false
   }
+
+  // ── La condensa dei condizionatori sul tetto ─────────────────────────────
+  // I condizionatori stanno sopra il palazzo, fuori vista: ogni 3–9 secondi
+  // una goccia cade dall'alto sulla lamiera, dove batte uno spruzzo; il rivolo
+  // sotto è stampato sul muro.
+  const strada = document.querySelector('.strada'), muro = document.querySelector('.muro')
+  const rivolo = document.querySelector('.it.pezzo[src*="rivolo"]'), goccia = document.getElementById('goccia'), spruzzo = document.getElementById('spruzzo')
+  const cade = () => {
+    if (document.hidden || reduce.matches || !rivolo) return setTimeout(cade, 4000)
+    const rs = strada.getBoundingClientRect(), rr = rivolo.getBoundingClientRect(), rm = muro.getBoundingClientRect()
+    const x = rr.left + rr.width * 0.5 - rs.left - 4, y0 = -40, y1 = rm.top - rs.top + 4
+    const durata = 420 + (y1 - y0) * 1.1
+    goccia.animate([{ transform: `translate(${x}px, ${y0}px)`, opacity: 1 }, { transform: `translate(${x}px, ${y1}px)`, opacity: 1 }], { duration: durata, easing: 'cubic-bezier(.55,0,1,.6)' }).onfinish = () => {
+      spruzzo.animate([{ transform: `translate(${x - 13}px, ${y1 - 10}px) scale(.4)`, opacity: .9 }, { transform: `translate(${x - 13}px, ${y1 - 12}px) scale(1)`, opacity: 0 }], { duration: 260, easing: 'ease-out' })
+    }
+    setTimeout(cade, 3000 + Math.random() * 6000)
+  }
+  setTimeout(cade, 2500)
+
+  // ── Le formiche ──────────────────────────────────────────────────────────
+  // Cinque formiche piccole lungo il bordo basso della lamiera: camminano, si
+  // fermano, cambiano verso. Si muovono solo con la pagina in vista.
+  const formiche = [...document.querySelectorAll('.formica')].map((el, i) => ({ el, x: 0, y: 0, dir: Math.random() < 0.5 ? 1 : -1, v: 12 + Math.random() * 18, pausa: 0, nata: false, lato: el.src.includes('lato') }))
+  let tFormiche = performance.now()
+  const camminano = (now) => {
+    const dt = Math.min((now - tFormiche) / 1000, 0.1)
+    tFormiche = now
+    if (!document.hidden && !reduce.matches) {
+      const rs = strada.getBoundingClientRect(), rm = muro.getBoundingClientRect()
+      const x0 = rm.left - rs.left + 12, x1 = rm.right - rs.left - 12, yb = rm.bottom - rs.top - 16
+      for (const fo of formiche) {
+        if (!fo.nata) { fo.x = x0 + Math.random() * (x1 - x0); fo.y = yb - Math.random() * 40; fo.nata = true }
+        if (fo.pausa > 0) { fo.pausa -= dt; continue }
+        if (Math.random() < 0.004) { fo.pausa = 0.5 + Math.random() * 2; continue }
+        if (Math.random() < 0.003) fo.dir = -fo.dir
+        fo.x += fo.dir * fo.v * dt
+        fo.y += (Math.random() - 0.5) * 6 * dt
+        if (fo.x < x0) { fo.x = x0; fo.dir = 1 } else if (fo.x > x1) { fo.x = x1; fo.dir = -1 }
+        if (fo.y < yb - 60) fo.y = yb - 60; else if (fo.y > yb) fo.y = yb
+        const giro = fo.lato ? (fo.dir > 0 ? 'scaleX(1)' : 'scaleX(-1)') : `rotate(${fo.dir > 0 ? 90 : -90}deg)`
+        fo.el.style.transform = `translate(${fo.x.toFixed(1)}px, ${fo.y.toFixed(1)}px) ${giro}`
+      }
+    }
+    setTimeout(() => requestAnimationFrame(camminano), 80)
+  }
+  requestAnimationFrame(camminano)
   const aggiorna = () => {
     stato = fase(adesso())
     root.style.setProperty('--notte', stato.notte.toFixed(3))

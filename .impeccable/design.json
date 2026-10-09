@@ -576,6 +576,11 @@
   },
   "shadows": [
    {
+    "name": "riflessi-lamiera",
+    "value": ".muro::after: la foto della lamiera, grayscale contrast(3.2) brightness(1.25), screen, opacità .28·lampioni + .75·fari, mask-image radiali sotto i lampioni e sotto --auto-x",
+    "purpose": "La lamiera riflette le luci: doghe che brillano dove battono lampioni e fari."
+   },
+   {
     "name": "foglio",
     "value": "filter: drop-shadow(0 2px 3px rgba(0,0,0,.28)) drop-shadow(0 10px 16px rgba(0,0,0,.3))",
     "purpose": "Il volantino attaccato al muro (.vol); di notte .4/.45."
@@ -654,6 +659,21 @@
    }
   ],
   "motion": [
+   {
+    "name": "auto",
+    "value": "ogni 20–90 s di notte: fari da −0.25 a 1.25 della larghezza in 1,4–2,8 s (alogeni, led, xeno), poi fanali rossi 1,7 s con frenata al 40 %; una su sette col neon",
+    "purpose": "Le auto che passano in strada (--auto-x, --auto-l, --auto-c, --freno, --neon-auto); ?auto=1 per la prova; ferme con prefers-reduced-motion."
+   },
+   {
+    "name": "goccia",
+    "value": "caduta con cubic-bezier(.55,0,1,.6) dal bordo alto della pagina alla lamiera, spruzzo 260 ms; ogni 3–9 s",
+    "purpose": "La condensa dei condizionatori sul tetto, fuori vista (Web Animations)."
+   },
+   {
+    "name": "formiche",
+    "value": "12–30 px/s lungo il bordo basso, pause e inversioni casuali, 12 aggiornamenti al secondo",
+    "purpose": "Le cinque formiche (.formica)."
+   },
    {
     "name": "sera",
     "value": "--notte 0→1 in 90 min dal tramonto −40 (smoothstep), insegna al tramonto, lampioni a +12 min; alba a ritroso",
@@ -789,6 +809,14 @@
   ]
  },
  "components": [
+  {
+   "name": "Lampione",
+   "kind": "custom",
+   "refersTo": "insegna",
+   "description": "La lanterna al sodio (o il tubo al neon) appesa alla pietra accanto all’insegna: due foto sovrapposte, spenta e accesa; l’accesa segue --lampioni e lo sfarfallio --f-lampioni.",
+   "html": "<span class=\"ds-lampada\"><img src=\"/art/strada1/lampione-spento.webp\" alt=\"\"><img class=\"ds-acceso\" src=\"/art/strada1/lampione-acceso.webp\" alt=\"\"></span>",
+   "css": ".ds-lampada{position:relative;display:block;width:190px;background:#2e2c29}.ds-lampada img{display:block;width:100%;height:auto}.ds-lampada .ds-acceso{position:absolute;inset:0;opacity:var(--lampioni,1)}"
+  },
   {
    "name": "Volantino",
    "kind": "card",

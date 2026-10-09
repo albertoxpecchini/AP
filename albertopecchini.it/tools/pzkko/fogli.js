@@ -168,6 +168,77 @@ scritte: {
 The paint is only spray paint: semi-transparent overspray, drips running downward, grainy edges. No wall, no texture, no shadow: only the paint on the magenta. ${NIENTE_MAGENTA}`,
   },
 
+  strada1: {
+    scala: 0.75,
+    titolo: 'la strada: lampioni (sodio e neon, spenti e accesi), condizionatori, cavi, intonaco, umidità, gomme',
+    aspetto: '2048x2048',
+    griglia: [3, 3],
+    pezzi: ['lampione-spento', 'lampione-acceso', 'neon-spento', 'neon-acceso', 'condizionatori', 'cavi', 'intonaco', 'umidita', 'gomme'],
+    prompt: `${griglia('Nine separate objects from an old Italian city street,', 3, 3)}
+Each object fills most of its cell. Seen from the front and slightly from below, as from the pavement:
+1. a wall-mounted street lamp: a short black cast-iron arm fixed to the wall with a bracket plate at its LEFT end, pointing right, holding a classic lantern head with a high-pressure sodium lamp, switched OFF in daylight (clear glass, dull bulb);
+2. the same kind of wall-mounted sodium street lamp at night, switched ON: the lamp burns a vivid orange-amber inside the lantern, the glass glows, a soft warm halo around the head;
+3. a wall-mounted fluorescent tube fixture: a single white tube under a grey sheet-metal hood with a bracket, horizontal, switched OFF;
+4. the same fluorescent fixture at night, switched ON: the tube glows a cold greenish-white, with a soft halo;
+5. two old outdoor air-conditioner condenser units mounted one above the other on rusty brackets, with a thin white condensate drain pipe hanging down from the lower one, a drop of water at its end;
+6. a sagging bundle of black electrical and telephone cables with a grey plastic junction box and a few cable ties, running horizontally as fixed along a city wall;
+7. a patch of peeling, cracking dark grey paint flaking off a plaster wall, the pale plaster showing underneath, with curling flakes, as an isolated irregular patch;
+8. a damp dark stain with dried water streaks running down, as under a leaking pipe, with white mineral deposits at its edges, as an isolated patch;
+9. three flattened old chewing gums stuck on a wall, grey-white and dirty, drawn large.
+Photorealistic, sharp. ${NIENTE_MAGENTA}`,
+  },
+
+  strada2: {
+    scala: 0.75,
+    titolo: 'scritte sul muro che non c’entrano con pzkko',
+    aspetto: '2048x2048',
+    griglia: [3, 3],
+    pezzi: ['tiamo', 'no', 'ciaomamma', 'acc', 'topo', 'pizza', 'zio', 'qui', 'tvb'],
+    prompt: `Nine separate pieces of street graffiti laid out in a 3 × 3 grid (three columns, three rows) on ${FONDO}, as if drawn on an invisible wall, each complete, none touching another, generous magenta space between them, nothing cropped. They are the scribbles of many different hands, nothing to do with each other:
+1. "ti amo giulia" in quick black marker handwriting with a small heart;
+2. "NO" huge in red spray paint, dripping;
+3. "ciao mamma" in white paint-marker handwriting;
+4. "ACC 19" in silver spray, blocky;
+5. a black stencil of a rat (street-art stencil, crisp edges, slight overspray);
+6. "w la pizza" in blue marker, with an exclamation mark;
+7. "zio" as a quick black spray tag with an underline;
+8. an orange spray arrow pointing down with the word "qui" next to it;
+9. "tvb 4ever" in thick black marker, schoolbook handwriting.
+The paint is only spray paint and marker ink: overspray, drips, grainy edges. No wall, no texture, no shadow. ${NIENTE_MAGENTA}`,
+  },
+
+  bestiole: {
+    scala: 1,
+    traslucido: true,
+    tinta: [236, 242, 255],
+    titolo: 'formiche, gocce di condensa, spruzzo, rivolo, gomme, crepa',
+    aspetto: '2048x2048',
+    griglia: [3, 3],
+    pezzi: ['formiche', 'formica', 'formica-lato', 'goccia', 'goccia-cade', 'spruzzo', 'rivolo', 'gomme2', 'crepa'],
+    prompt: `${griglia('Nine small things from a city wall,', 3, 3)}
+Each thing is drawn LARGE and fills most of its cell, photographed straight on:
+1. three tiny black garden ants walking in a line, seen from directly above;
+2. a single black ant seen from directly above, legs spread, walking;
+3. a single black ant seen from the side, walking to the right;
+4. a single clear water drop hanging, teardrop shaped, transparent with a bright highlight and a dark edge;
+5. a single clear water drop falling, slightly elongated, transparent with a highlight;
+6. a tiny splash of water on a flat surface: a small crown of clear droplets, seen from slightly above;
+7. a thin wet streak of water running down, vertical, transparent and darker where wet, as on a wall;
+8. two flattened old chewing gums stuck on a wall, grey-white and dirty;
+9. a thin dark crack in plaster, branching, as an isolated line drawing of a real crack.
+Photorealistic, sharp. The water is transparent: the magenta shows through it. ${NIENTE_MAGENTA}`,
+  },
+
+  'insegna-notte': {
+    scala: 0.9,
+    intero: 'insegna-notte',
+    riferimento: 'pzkko/art/insegna.webp',
+    titolo: 'l’insegna di notte: i tubi al neon dentro le lettere',
+    aspetto: '2048x1152',
+    prompt: `Recreate the attached sign EXACTLY (same sign box, same framing, same position and size in the frame, same dirt, water stains, rust and the small snail sticker, same five channel letters p z k k o in the same typeface and the same places), centred on ${FONDO} and filling 94% of the image width, but photographed at NIGHT with the sign switched ON:
+the white panel is NOT lit (it is a dull grey-white in the dark); the five letters glow from INSIDE: their acrylic faces are translucent and through each face you clearly see the bright neon tube bent to follow the outline of that letter (a glowing warm-white tube running inside the letter a little inside its edge, with a small gap and the dark electrode holders where the tube starts and ends); the face glows softly around the tube, brighter near it; a little light spills from the letters onto the panel around them and onto the metal letter sides. Nothing else is lit. No shadow on the magenta. Photorealistic, sharp. ${NIENTE_MAGENTA}`,
+  },
+
   insegna: {
     scala: 0.9,
     titolo: 'l’insegna «pzkko»: cassonetto bianco retroilluminato con le lettere a scatola',

@@ -78,6 +78,23 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   `prefers-reduced-motion` niente sfarfallio né strobo. Senza script la notte
   segue il tema del sistema. Prove: `?ora=18:30` (ora di Mantova di oggi),
   `?veloce=60` (il tempo corre 60 volte più in fretta), `?notte=1`.
+- **La strada** (9.10 sera): i lampioni sono veri (`art/strada1/`: una lanterna
+  al sodio a sinistra e un tubo al neon a destra dell'insegna, fotografati
+  spenti e accesi, con il cono di luce dalla testa della lampada); l'insegna
+  di notte è una seconda fotografia (`art/insegna-notte.webp`, generata dalla
+  prima) con i tubi al neon visibili dentro le lettere; intorno, sulla pietra,
+  cavi, la condensa dei condizionatori sul tetto, fuori vista (la goccia cade
+  dall'alto ogni 3–9 s sulla lamiera e lascia il rivolo), intonaco che si sfoglia, umidità, una crepa, gomme
+  schiacciate, un topo a stencil e le scritte degli altri (`art/strada2/`:
+  «ti amo giulia», «NO», «ciao mamma», «ACC 19», «w la pizza», «zio», «qui»,
+  «tvb 4ever»); cinque formiche (`art/bestiole/`) camminano lungo il bordo
+  basso della lamiera. Di notte **passano le auto**: ogni 20–90 secondi (mai
+  più di tre al minuto) i fari (alogeni caldi, led freddi, xeno) spazzano il
+  muro e i fogli, poi dal lato in cui l'auto se ne va restano i fanali rossi,
+  con una frenata ogni tanto; una su sette ha il neon sotto la scocca. La
+  lamiera riflette le luci: `.muro::after` è la stessa foto a contrasto alto,
+  in screen, mascherata dove battono lampioni e fari. `?auto=1` fa passare
+  un'auto subito. Con `prefers-reduced-motion` niente auto, gocce né formiche.
 - **404**: generata dalla home da `tools/pzkko/genera-404.mjs`
   (`node tools/pzkko/genera-404.mjs` dalla cartella `albertopecchini.it`), da
   rilanciare dopo ogni modifica a `index.html`.

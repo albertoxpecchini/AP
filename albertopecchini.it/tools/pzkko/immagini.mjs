@@ -19,7 +19,7 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { ROOT, die, predict, prediction, salva } from '../replicate.mjs'
+import { ROOT, die, predict, prediction, salva, upload } from '../replicate.mjs'
 import { chiave, fondo, fondoMagenta, leggi, rifila, scriviWebp } from '../mascotte/immagine.mjs'
 import { FOGLI } from './fogli.js'
 
@@ -37,6 +37,7 @@ const foglio = (nome) => FOGLI[nome] || die(`nessun foglio «${nome}»: ${Object
 async function genera(nome) {
   const f = foglio(nome)
   const input = { prompt: f.prompt, aspect_ratio: f.aspetto, quality: 'high', number_of_images: 1, output_format: 'png', background: 'opaque' }
+  if (f.riferimento) input.input_images = [await upload(f.riferimento)] // il foglio parte da un'immagine già nel sito (es. l'insegna di giorno)
   console.log(`→ ${nome}: ${f.titolo} — qualità high, ${f.aspetto}, attendo il modello…`)
   const p = await predict(input, `node tools/pzkko/immagini.mjs recupera ${nome}`)
   await salva(p, join(LAVORO, nome), { foglio: nome })
@@ -130,7 +131,7 @@ function estrai(img, { label, gw }, mie, pad = 6) {
  * smescolato, così lo scotch resta trasparente e non rosa. Per i pezzi opachi
  * con bordi morbidi (i graffiti) va meglio chiave() di tools/mascotte.
  */
-function chiaveK(img, bordo = BORDO) {
+function chiaveK(img, bordo = BORDO, tinta = TINTA_SCOTCH) {
   const { px } = img
   const { m: mk, rgb: K } = fondo(img)
   for (let i = 0; i < px.length; i += 4) {
@@ -144,7 +145,7 @@ function chiaveK(img, bordo = BORDO) {
     // Si tiene solo la luminosità e si dà la tinta di un nastro ingiallito.
     if (k < 0.9 || Math.min(px[i], px[i + 2]) - px[i + 1] > 12) {
       const lum = (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 200
-      for (let c = 0; c < 3; c++) px[i + c] = Math.min(255, Math.round(TINTA_SCOTCH[c] * lum))
+      for (let c = 0; c < 3; c++) px[i + c] = Math.min(255, Math.round(tinta[c] * lum))
     }
     px[i + 3] = Math.round(px[i + 3] * k)
   }
@@ -191,7 +192,7 @@ async function usaGriglia(nome, file) {
   const f = foglio(nome)
   const [cols, rows] = f.griglia
   const img = leggi(file)
-  if (fondoMagenta(img)) { (f.traslucido ? chiaveK : chiave)(img, BORDO); console.log(`  fondo magenta tolto con la chiave cromatica${f.traslucido ? ' per pezzi traslucidi' : ''}`) }
+  if (fondoMagenta(img)) { f.traslucido ? chiaveK(img, BORDO, f.tinta) : chiave(img, BORDO); console.log(`  fondo magenta tolto con la chiave cromatica${f.traslucido ? ' per pezzi traslucidi' : ''}`) }
   else console.warn('  ! il foglio non è su fondo magenta: ritaglio quello che è trasparente')
   const trovati = componenti(img)
   const { comps, gw, gh } = trovati
