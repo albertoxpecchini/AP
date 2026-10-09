@@ -1,19 +1,18 @@
 // Rigenera pzkko/404.html da pzkko/index.html, così la pagina non trovata ha lo
-// stesso CSS, lo stesso dock fisso e lo stesso script della home senza copiarli a
-// mano. Da rilanciare dopo ogni modifica a index.html:
+// stesso muro, la stessa insegna, lo stesso CSS e lo stesso script della home
+// senza copiarli a mano. Da rilanciare dopo ogni modifica a index.html:
 //
 //   node tools/pzkko/genera-404.mjs
 //
-// Cambiano solo <title>, i meta (noindex, niente canonical/og), i link del menu
-// e del dock (assoluti verso la home) e il contenuto di <main>.
+// Cambiano <title> e meta (noindex, niente canonical/og) e il contenuto della
+// parete: al posto dei volantini restano i resti strappati di uno, e un foglio
+// bianco che dice che la pagina non c'è, col link alla home.
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../pzkko')
-let html = readFileSync(path.join(dir, 'index.html'), 'utf8')
-// la home può avere fine riga CRLF (Windows): il generatore ragiona in LF
-html = html.replace(/\r\n/g, '\n')
+let html = readFileSync(path.join(dir, 'index.html'), 'utf8').replace(/\r\n/g, '\n')
 
 const rep = (from, to) => {
   const found = from instanceof RegExp ? from.test(html) : html.includes(from)
@@ -21,42 +20,46 @@ const rep = (from, to) => {
   html = html.replace(from, to)
 }
 
-// testata del documento
 rep('<title>pzkko, i social di Alberto Pecchini</title>', '<title>Pagina non trovata, pzkko</title>')
 rep(/<meta name="description" content="[^"]*">/, '<meta name="description" content="L\'indirizzo non esiste o è cambiato. Torna alla home di pzkko.it.">')
 rep('<link rel="canonical" href="https://www.pzkko.it/">', '<meta name="robots" content="noindex">')
 html = html.replace(/<meta property="og:[^"]*" content="[^"]*">\n/g, '').replace(/<meta name="twitter:card" content="[^"]*">\n/, '')
 html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\n/, '')
 
-// link verso la home: dal 404 le ancore non bastano
-html = html.replace(/href="#(social|tools|games)"/g, 'href="/#$1"')
+// la parete: pochi pezzi, e il foglio del messaggio
+const parete = html.match(/<div class="parete">[\s\S]*?\n    <\/div>\n  <\/main>/)
+if (!parete) throw new Error('parete non trovata')
+rep(parete[0], `<div class="parete p404">
+      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" style="--x:30;--y:40;--w:300;--r:-3deg;--mx:-10;--my:20;--mw:230;--mr:-6deg">
+      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" style="--x:960;--y:420;--w:260;--r:-6deg;--mx:180;--my:520;--mw:200;--mr:-5deg">
+      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" style="--x:60;--y:420;--w:230;--r:0deg;--mx:200;--my:40;--mw:170;--mr:-5deg">
+      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" style="--x:1170;--y:60;--w:95;--r:6deg;--mx:300;--my:300;--mw:70;--mr:8deg">
+      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" style="--x:760;--y:560;--w:130;--r:0deg;--mx:40;--my:600;--mw:110;--mr:0deg">
+      <!-- quel che resta del volantino strappato -->
+      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" style="--x:300;--y:70;--w:220;--r:-6deg;--mx:30;--my:290;--mw:150;--mr:-8deg">
+      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" style="--x:860;--y:90;--w:200;--r:8deg;--mx:230;--my:330;--mw:140;--mr:10deg">
+      <img class="it pezzo" src="/art/nastro/scotch-storto.webp" alt="" width="435" height="417" style="--x:470;--y:420;--w:150;--r:0deg;--mx:270;--my:0;--mw:110;--mr:0deg">
+      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" style="--x:840;--y:470;--w:110;--r:20deg;--mx:300;--my:460;--mw:80;--mr:20deg">
 
-// contenuto: lo stesso hero a tutto schermo col dock, col messaggio al posto del nome
-const main = html.match(/<main>[\s\S]*?<\/main>/)
-if (!main) throw new Error('main non trovato')
-const dock = main[0].match(/ *<div class="dockwrap">[\s\S]*?\n    <\/div>\n/)
-if (!dock) throw new Error('dock non trovato dentro l\'hero')
-rep(main[0], `<main class="p404">
-  <section class="hero">
-    <div class="field" aria-hidden="true"></div>
-    <div class="intro">
-      <h1>questa pagina non c'è.</h1>
-      <p class="lede">l'indirizzo non esiste o è cambiato. i social, gli strumenti e i giochi stanno tutti nella home.</p>
-      <a class="go" href="/">torna a pzkko.it<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+      <article class="vol it c-bianco" style="--x:470;--y:60;--w:340;--r:-2deg;--mx:40;--my:30;--mw:300;--mr:-2deg">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2 class="titolo">questa pagina non c'è.</h2>
+          <p>l'indirizzo non esiste o è cambiato: qualcuno ha strappato il volantino. i social, i giochi e gli strumenti stanno tutti nella home.</p>
+          <p class="mano vai" style="margin-top:auto"><a href="/">torna a pzkko.it</a></p>
+        </div>
+      </article>
     </div>
-
-${dock[0].trimEnd()}
-  </section>
-</main>`)
+  </main>`)
 
 // stile in più solo per questa pagina
-rep('</style>\n</head>', `/* 404: titolo più piccolo del nome, link sotto la riga */
-.p404 h1{font-size:clamp(2.25rem,6vw,4rem);line-height:1.05;letter-spacing:-.03em;text-wrap:balance}
-.p404 .go{margin-top:28px;font-size:19px}
-.p404 .go svg{width:18px;height:18px}
+rep('</style>\n</head>', `/* 404: un muro corto */
+.parete.p404{height:calc(640 * var(--u))}
+@media (max-width:899px){.parete.p404{height:calc(720 * var(--u))}}
+.p404 .vol .titolo{font-size:max(26px,15cqw)}
 </style>
 </head>`)
 
-html = html.replace('<!-- il dock: in fondo al primo schermo, poi scorre via col resto -->', '<!-- il dock, come nella home: questo file è generato da tools/pzkko/genera-404.mjs -->')
+html = html.replace('<!-- quello che c\'era già sul muro: graffiti, resti, manifesti di altri -->', '')
 writeFileSync(path.join(dir, '404.html'), html)
 console.log('scritto', path.join(dir, '404.html'), html.length, 'byte')

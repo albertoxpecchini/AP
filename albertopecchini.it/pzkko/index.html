@@ -4,424 +4,441 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>pzkko, i social di Alberto Pecchini</title>
-<meta name="description" content="I social di Alberto Pecchini (pzkko) in un posto solo: Instagram, GitHub, WhatsApp, e-mail e PayPal. E due giochi da browser senza soldi veri: blackjack e roulette.">
+<meta name="description" content="I social di Alberto Pecchini (pzkko) attaccati a un muro: Instagram, GitHub, WhatsApp, e-mail e PayPal. E due giochi da browser senza soldi veri: blackjack e roulette.">
 <link rel="canonical" href="https://www.pzkko.it/">
 <meta name="author" content="Alberto Pecchini">
 <link rel="author" href="https://www.albertopecchini.it">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#2b2a28">
 <meta name="color-scheme" content="light dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="pzkko">
 <meta property="og:title" content="pzkko, i social di Alberto Pecchini">
-<meta property="og:description" content="Instagram, GitHub, WhatsApp, e-mail e PayPal in un posto solo. In arrivo strumenti e giochi da browser.">
+<meta property="og:description" content="Instagram, GitHub, WhatsApp, e-mail e PayPal, attaccati a un muro. E due giochi da browser: blackjack e roulette.">
 <meta property="og:url" content="https://www.pzkko.it/">
-<meta property="og:image" content="https://www.pzkko.it/og.png">
+<meta property="og:image" content="https://www.pzkko.it/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="it_IT">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/art/insegna.webp" as="image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"pzkko","url":"https://www.pzkko.it/","inLanguage":"it","author":{"@type":"Person","name":"Alberto Pecchini","alternateName":"pzkko","url":"https://www.albertopecchini.it","sameAs":["https://www.instagram.com/albertoxpecchini/","https://github.com/albertoxpecchini"]}}</script>
 <style>
-/* ── tokens: la grammatica web di Apple, in chiaro e in scuro ───────────── */
+/* I caratteri dei volantini: Anton e Archivo Black (OFL), Special Elite e Permanent Marker (Apache 2.0), da Google Fonts, serviti da qui. */
+@font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Archivo Black";src:url(/fonts/archivo-black.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-weight:400;font-display:swap}
+
 :root{
-  --bg:#fff; --tile:#f5f5f7; --fg:#1d1d1f; --fg2:#6e6e73; --link:#0066cc;
-  --hair:rgba(0,0,0,.1); --nav:rgba(255,255,255,.72);
-  --tray:rgba(255,255,255,.55); --tray-edge:rgba(255,255,255,.75); --tray-in:rgba(255,255,255,.6);
-  --tip:rgba(255,255,255,.94); --slot:rgba(0,0,0,.06); --slot-edge:rgba(0,0,0,.08);
-  --shadow:0 30px 60px -30px rgba(0,0,0,.35);
-  --f1:rgba(10,132,255,.17); --f2:rgba(255,45,85,.13); --f3:rgba(255,159,10,.16);
-  --gh-a:#3d4450; --gh-b:#1b1f24; --gm-a:#48484a; --gm-b:#1c1c1e;
-  --fd:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --ft:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --eo:cubic-bezier(.23,1,.32,1);
-  /* icona del dock: segue la finestra (larghezza e altezza), fra 44 e 64 px */
-  --sz:clamp(44px,min(4.6vw,7.5svh),64px);
+  --pietra:#2e2c29; --pietra2:#1f1e1c; --asfalto:#3a3937;
+  --inchiostro:#161616; --inchiostro2:#3a3632;
+  --marker:#111; --marker-rosso:#a50d25; --marker-blu:#1446a0;
+  --fa:"Anton",Impact,"Arial Narrow Bold",sans-serif;
+  --fb:"Archivo Black","Arial Black",sans-serif;
+  --ft:"Special Elite","Courier New",monospace;
+  --fm:"Permanent Marker","Comic Sans MS",cursive;
+  --ombra:0 2px 3px rgba(0,0,0,.25),0 10px 18px -6px rgba(0,0,0,.45);
+  --ombra-su:0 4px 6px rgba(0,0,0,.28),0 22px 30px -8px rgba(0,0,0,.5);
+  --eo:cubic-bezier(.22,1,.36,1);
+  --u:calc(100cqw / 1280);
   color-scheme:light dark;
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    --bg:#000; --tile:#1d1d1f; --fg:#f5f5f7; --fg2:#a1a1a6; --link:#2997ff;
-    --hair:rgba(255,255,255,.14); --nav:rgba(0,0,0,.62);
-    --tray:rgba(255,255,255,.08); --tray-edge:rgba(255,255,255,.16); --tray-in:rgba(255,255,255,.1);
-    --tip:rgba(44,44,46,.96); --slot:rgba(255,255,255,.07); --slot-edge:rgba(255,255,255,.1);
-    --shadow:0 30px 60px -30px rgba(0,0,0,.9);
-    --f1:rgba(10,132,255,.42); --f2:rgba(255,45,85,.32); --f3:rgba(255,159,10,.28);
-    --gh-a:#5a6270; --gh-b:#24292f; --gm-a:#6e6e73; --gm-b:#2c2c2e;
-  }
-}
 
-/* ── base ───────────────────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box}
-html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-color:var(--fg2) transparent}
-@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-body{margin:0;min-height:100svh;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font:400 17px/1.47 var(--ft);letter-spacing:-.01em;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-a{color:inherit;text-decoration:none}
-::selection{background:rgba(0,113,227,.28)}
-:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:10px}
-h1,h2,h3,p{margin:0}
-svg{display:block}
-.wrap{width:100%;max-width:1024px;margin:0 auto;padding:0 22px}
-main{flex:1}
+html{background:var(--pietra);-webkit-text-size-adjust:100%;scrollbar-color:#8a8784 var(--pietra2)}
+body{margin:0;min-height:100svh;color:var(--inchiostro);font:400 16px/1.4 var(--ft);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+a{color:inherit}
+::selection{background:#ffd400;color:#111}
+:focus-visible{outline:3px solid #ffd400;outline-offset:3px}
+h1,h2,h3,p,ul{margin:0}
+img{display:block;max-width:100%;height:auto}
 
-/* ── nav: una striscia traslucida sotto cui scorre il contenuto ─────────── */
-.nav{position:sticky;top:0;z-index:10;height:48px;background:var(--nav);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);transition:box-shadow .3s var(--eo)}
-.nav.scrolled{box-shadow:0 1px 0 var(--hair)}
-.nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
-.brand{font:600 17px/1 var(--fd);letter-spacing:-.02em}
-.nav nav{display:flex;gap:28px}
-.nav nav a{font-size:12px;letter-spacing:-.01em;opacity:.82;transition:opacity .15s ease}
-@media (hover:hover){.nav nav a:hover{opacity:1}}
-@media (prefers-reduced-transparency:reduce){.nav{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
+/* ── la strada: la pietra del portale, la saracinesca, il marciapiede ────── */
+.strada{--stipite:clamp(10px,3vw,40px);position:relative;background:
+  radial-gradient(120% 60% at 50% 0%,rgba(255,255,255,.06),transparent 60%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .17 0 0 0 0 .16 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
+  linear-gradient(var(--pietra),var(--pietra2));padding:0 var(--stipite)}
 
-/* ── hero a tutto schermo: nome, una riga, il dock in fondo ──────────────────────────────────────── */
-/* a tutto schermo: il nome al centro, il dock in fondo come sulla scrivania;
-   100svh (non vh) perché su iPhone la barra dell'indirizzo non faccia saltare nulla */
-.hero{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;text-align:center;min-height:calc(100svh - 48px);padding:24px 16px calc(28px + env(safe-area-inset-bottom))}
-.intro{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(12px,3svh,32px) 0 clamp(16px,4svh,40px)}
-.field{position:absolute;inset:0;z-index:-1;pointer-events:none;background:
-  radial-gradient(52% 58% at 34% 74%,var(--f1),transparent 70%),
-  radial-gradient(48% 54% at 68% 70%,var(--f2),transparent 70%),
-  radial-gradient(44% 40% at 50% 100%,var(--f3),transparent 70%)}
-.hero h1{font:600 clamp(2.75rem,min(9vw,13svh),6rem)/1 var(--fd);letter-spacing:-.035em}
-.lede{font-size:clamp(1rem,min(1.5vw,2.6svh),1.3125rem);line-height:1.38;color:var(--fg2);max-width:68ch;margin:16px auto 0;text-wrap:balance}
+/* l'insegna sopra la porta: cassonetto bianco, lettere a scatola; l'h1 è la sua scritta */
+.portale{padding:clamp(18px,3.2vw,40px) 0 clamp(14px,2.4vw,30px);display:flex;justify-content:center}
+.portale h1{margin:0;width:min(100%,840px)}
+.insegna{width:100%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
 
-.dockwrap{display:flex;justify-content:center;width:100%}
-.dock{position:relative;display:flex;align-items:flex-end;gap:8px;height:calc(var(--sz) + 20px);padding:10px;border-radius:28px;background:var(--tray);border:1px solid var(--tray-edge);box-shadow:var(--shadow),inset 0 1px 0 var(--tray-in);-webkit-backdrop-filter:blur(30px) saturate(1.6);backdrop-filter:blur(30px) saturate(1.6)}
-@media (prefers-reduced-transparency:reduce){.dock{background:var(--tile);-webkit-backdrop-filter:none;backdrop-filter:none}}
-.dk{position:relative;display:block;width:var(--sz);height:var(--sz);flex:none;filter:drop-shadow(0 5px 10px rgba(0,0,0,.18));border-radius:22%}
-.dk:focus-visible{outline-offset:4px}
-.sep{width:1px;height:calc(var(--sz) * .78);margin:0 6px;align-self:center;background:var(--hair);flex:none}
+/* la saracinesca: la lamiera fotografata si ripete (una doga ogni 114 px della tela a 1600) */
+.muro{position:relative;container-type:inline-size;max-width:1280px;margin:0 auto;isolation:isolate;
+  box-shadow:inset 0 10px 14px -8px rgba(0,0,0,.7),inset 0 -8px 10px -8px rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.5)}
+.muro::before{content:"";position:absolute;inset:0;z-index:-1;background:url(/art/muro.webp) 0 0/2200px auto repeat;background-color:#8e8e8a}
+.parete{position:relative;height:calc(1700 * var(--u))}
+.gruppo{display:contents}
 
-/* l'icona: superellisse vera (clipPath in fondo alla pagina), glifo bianco */
-.face{display:grid;place-items:center;width:100%;height:100%;clip-path:url(#sq);background:linear-gradient(180deg,var(--ia),var(--ib));transition:transform .1s var(--eo)}
-.face svg{width:54%;height:54%;fill:#fff}
-.ig .face{background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285aeb 90%)}
-.gh .face{--ia:var(--gh-a);--ib:var(--gh-b)}
-.gm .face{--ia:var(--gm-a);--ib:var(--gm-b)}
-.dk:active .face,.tile:active .app .face{transform:scale(.92)}
+/* ogni cosa sul muro è posizionata in 1280esimi (e in 390esimi sul telefono) */
+.it{position:absolute;left:calc(var(--px) * var(--u));top:calc(var(--py) * var(--u));width:calc(var(--pw) * var(--u));--px:var(--x);--py:var(--y);--pw:var(--w);--pr:var(--r,0deg);transform:rotate(var(--pr))}
+.tag{z-index:0;pointer-events:none;mix-blend-mode:multiply;opacity:.92}
+.tag.chiaro{mix-blend-mode:normal;opacity:.95}
+.man{z-index:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)) drop-shadow(0 8px 14px rgba(0,0,0,.28))}
+.pezzo{z-index:1;pointer-events:none}
 
-/* etichetta: a scomparsa sopra l'icona col puntatore, fissa sotto sul telefono */
-.lbl{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);padding:5px 10px;border-radius:9px;background:var(--tip);color:var(--fg);font-size:13px;letter-spacing:-.01em;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.14),0 0 0 1px var(--hair);opacity:0;pointer-events:none;transition:opacity .12s ease,transform .12s var(--eo)}
-.dk:focus-visible .lbl{opacity:1;transform:translate(-50%,0)}
-@media (hover:hover) and (pointer:fine){.dk:hover .lbl{opacity:1;transform:translate(-50%,0)}}
+/* ── le parole sprayate che danno il nome alle zone: graffiti veri (art/scritte/), sotto i fogli ── */
+.spray{z-index:0;margin:0;scroll-margin-top:24px}
+.spray img{mix-blend-mode:multiply;opacity:.95}
+.spray.bianco img{mix-blend-mode:normal}
 
-/* ── sezioni ─────────────────────────────────────────────────────────────── */
-.sec{padding:88px 0 0;scroll-margin-top:72px}
-.sec:last-of-type{padding-bottom:96px}
-.sec h2{font:600 clamp(2rem,4vw,2.5rem)/1.1 var(--fd);letter-spacing:-.02em;margin-bottom:28px}
+/* ── i volantini: carta fotografata, testo vero sopra ───────────────────── */
+.vol{z-index:3;container-type:inline-size;isolation:isolate;aspect-ratio:var(--ar);display:flex;flex-direction:column;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28)) drop-shadow(0 10px 16px rgba(0,0,0,.3));
+  transition:transform .32s var(--eo),filter .32s var(--eo)}
+.vol.sotto{z-index:2}
+.foglio{position:absolute;inset:0;background:var(--carta) center/100% 100% no-repeat;transform:scaleX(var(--flip,1))}
+.testo{position:relative;flex:1;display:flex;flex-direction:column;gap:2.2cqw;padding:var(--pad)}
+.vol:has(.tagliandi) .testo{padding-bottom:var(--giu)}
+.arte{width:var(--aw,62%);margin:0 auto;mix-blend-mode:multiply;flex:none;align-self:var(--aa,center)}
+.vol h3,.vol .titolo{font:400 max(26px,18cqw)/.95 var(--fa);letter-spacing:.005em;color:var(--titolo,var(--inchiostro));text-wrap:balance}
+.vol h3 a,.vol .titolo a{text-decoration:none}
+.vol h3 a::after{content:"";position:absolute;inset:0;z-index:1}
+.vol p{font:400 max(12px,5.4cqw)/1.28 var(--ft);color:var(--testo,var(--inchiostro))}
+.vol .forte{font-family:var(--fb);font-size:max(12px,5cqw);letter-spacing:-.01em}
+.vol .mano{font:400 max(14px,7.2cqw)/1.05 var(--fm);color:var(--marker-c,var(--marker));transform:rotate(-2deg);align-self:flex-start}
+.vol .mano.vai{align-self:flex-end;transform:rotate(-4deg)}
+.vol .freccia{display:inline-block;width:1.5em;height:.75em;vertical-align:-.1em;margin-left:.15em;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.vol .siti .freccia{width:1.1em;height:.55em;margin:0 .35em 0 0;stroke-width:3.5;color:var(--marker-rosso)}
+.vol .mano a{text-decoration:none}
+.vol .adesivo{position:absolute;right:-6%;bottom:-4%;width:34%;z-index:2;transform:rotate(-12deg);pointer-events:none}
+.vol .handle{font:400 max(13px,6cqw)/1.1 var(--fm);color:var(--marker-c,var(--marker));margin-top:auto;overflow-wrap:anywhere;padding-bottom:2cqw}
+.vol .siti{list-style:none;padding:0;font:400 max(12px,5.2cqw)/1.3 var(--ft)}
+.vol .siti li{display:flex;align-items:center}
+.vol .piu18{position:absolute;left:6%;top:5%;z-index:1;font:400 max(12px,6cqw)/1 var(--fb);color:#fff;background:var(--marker-rosso);padding:.35em .4em;border-radius:50%;transform:rotate(12deg)}
 
-.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
-.tile{position:relative;display:flex;flex-direction:column;padding:28px;border-radius:28px;background:var(--tile);overflow:hidden;min-height:230px;transition:transform .16s var(--eo)}
-.tile::before{content:"";position:absolute;inset:0;background:radial-gradient(58% 60% at 16% 10%,var(--glow),transparent 72%);pointer-events:none}
-.tile>*{position:relative}
-.tile.ig,.tile.gh{grid-column:span 3;min-height:280px}
-.tile.wa,.tile.em,.tile.pp{grid-column:span 2}
-/* la scheda grande di github elenca i siti che ospita; instagram resta neutra col suo alone */
-.tile.gh{background:#24292f;color:#f5f5f7}
-.tile.gh .hd{color:#a1a1a6}
-.tile.gh .go{color:#2997ff}
-.sites{list-style:none;margin:24px 0 0;padding:0;font-size:15px;color:#a1a1a6;font-variant-numeric:tabular-nums}
-.sites li{padding:8px 0;border-top:1px solid rgba(255,255,255,.12)}
-a.tile:active{transform:scale(.985)}
-.app{width:60px;height:60px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.16))}
-.tx{margin-top:auto;padding-top:28px}
-.tx strong{display:block;font:600 24px/1.2 var(--fd);letter-spacing:-.02em}
-.hd{display:block;color:var(--fg2);margin-top:4px;font-variant-numeric:tabular-nums}
-.nt{display:block;margin-top:12px;max-width:32ch}
-.go{display:inline-flex;align-items:center;gap:2px;margin-top:18px;color:var(--link);font-size:17px}
-.go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s var(--eo)}
-@media (hover:hover){a.tile:hover .go{text-decoration:underline;text-underline-offset:3px}a.tile:hover .go svg{transform:translateX(2px)}}
-
-/* stati vuoti: la forma di quello che arriverà */
-.empty{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:32px 48px;min-height:0}
-.empty h3{font:600 24px/1.2 var(--fd);letter-spacing:-.02em}
-.empty p{color:var(--fg2);margin-top:10px;max-width:40ch}
-.folder{width:128px;height:128px;clip-path:url(#sq);background:var(--slot);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px;justify-self:end}
-.folder i{display:block;clip-path:url(#sq);background:var(--slot);box-shadow:inset 0 0 0 1px var(--slot-edge)}
-.games{grid-template-columns:1fr}
-.slots{display:flex;gap:24px;padding-top:8px}
-.slots>*{display:flex;flex-direction:column;align-items:center;gap:9px;flex:0 0 76px;font-size:12px;color:var(--fg2)}
-.slots a{color:var(--fg)}
-.slots .app{--ia:var(--gm-a);--ib:var(--gm-b)}
-.slots a:active .face{transform:scale(.92)}
-.slots i{display:block;width:60px;height:60px;clip-path:url(#sq);background:var(--slot);box-shadow:inset 0 0 0 1px var(--slot-edge)}
-
-/* ── piè di pagina ───────────────────────────────────────────────────────── */
-.foot{border-top:1px solid var(--hair);padding:22px 0 max(22px,env(safe-area-inset-bottom));font-size:12px;color:var(--fg2)}
-.foot .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px 16px;flex-wrap:wrap}
-.foot .badge img{display:block}
-.foot a{color:inherit}
-@media (hover:hover){.foot a:hover{color:var(--fg)}}
-
-/* ── movimento: ingresso una volta sola, poi solo in risposta ────────────── */
-@media (prefers-reduced-motion:no-preference){
-  .hero h1,.lede,.dock{animation:rise .7s var(--eo) both}
-  .lede{animation-delay:70ms}
-  .dock{animation-name:materialize;animation-delay:140ms;animation-duration:.8s}
-  .nav{animation:fade .6s ease both}
+@media (hover:hover){
+  .vol:has(h3 a:hover){transform:rotate(var(--pr)) translateY(calc(-1.6 * var(--u))) scale(1.015);filter:drop-shadow(0 4px 5px rgba(0,0,0,.3)) drop-shadow(0 26px 30px rgba(0,0,0,.36));z-index:5}
+  .vol:has(h3 a:hover) h3{text-decoration:underline;text-decoration-thickness:.08em;text-underline-offset:.1em}
 }
-@keyframes rise{from{opacity:0;transform:translateY(12px)}}
-@keyframes fade{from{opacity:0}}
-@keyframes materialize{from{opacity:0;transform:translateY(16px) scale(.96);filter:blur(10px)}}
+.vol:has(h3 a:active){transform:rotate(var(--pr)) scale(.99)}
+.vol:has(h3 a:focus-visible){outline:3px solid #ffd400;outline-offset:4px;z-index:5}
+.vol h3 a:focus-visible{outline:none}
 
-/* ── schermi stretti: il dock diventa una schermata home con le etichette ── */
-@media (max-width:1023px){
-  .tile.wa,.tile.em{grid-column:span 3}
-  .tile.pp{grid-column:span 6}
+/* i tagliandi da strappare: fette della stessa carta, col contatto scritto di traverso.
+   Il foglio con i tagliandi scrive fra i bordi veri della carta e i tagliandi vanno da bordo a bordo. */
+.vol:has(.tagliandi) .testo{padding-left:var(--el);padding-right:var(--er)}
+.vol:has(.tagliandi) .testo>*:not(.tagliandi){margin-left:5cqw;margin-right:5cqw}
+.tagliandi{position:relative;z-index:2;display:flex;margin:auto 0 0;height:max(44px,17cqw);padding:0}
+.tagliandi button{appearance:none;flex:1 1 0;min-width:0;margin:0;padding:0;border:0;border-top:1px dashed rgba(0,0,0,.45);border-left:1px dashed rgba(0,0,0,.4);background:var(--carta) var(--bgpos) / var(--bgsize) no-repeat;cursor:pointer;position:relative;color:var(--marker-c,var(--marker));font:400 max(9px,3.6cqw)/1 var(--fm);
+  writing-mode:vertical-rl;text-align:center;transform-origin:50% 0;transition:transform .55s cubic-bezier(.55,0,1,.45),opacity .5s ease}
+.tagliandi button:first-child{border-left:0}
+.tagliandi button span{display:block;transform:rotate(180deg);padding:8px 0;white-space:nowrap;overflow:hidden;max-height:100%}
+.tagliandi button.via{visibility:hidden;pointer-events:none}
+.tagliandi button.cade{transform:translateY(60%) rotate(14deg);opacity:0}
+.tagliandi button:focus-visible{outline:3px solid #ffd400;outline-offset:-3px}
+@media (hover:hover){.tagliandi button:hover{transform:translateY(2px) rotate(-1.5deg)}}
+.copiato{position:absolute;left:50%;bottom:14%;z-index:3;transform:translateX(-50%) rotate(-6deg);font:400 max(16px,9cqw)/1 var(--fm);color:var(--marker-rosso);background:rgba(255,255,255,.85);padding:.2em .4em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.copiato.si{opacity:1}
+
+/* le carte: ogni volantino sa che foglio ha sotto, la sua proporzione, dove sono i bordi veri del foglio
+   (dentro il ritaglio c'è anche il nastro) e il margine in cui scrivere */
+.c-bianco{--carta:url(/art/carta/bianco.webp);--ar:560/732;--el:10%;--er:11.1%;--pad:16.1cqw 16.1cqw 12.9cqw 15.0cqw;--giu:8.9cqw}
+.c-giallo{--carta:url(/art/carta/giallo.webp);--ar:556/672;--el:2.3%;--er:5%;--pad:14.9cqw 11.0cqw 11.7cqw 8.3cqw;--giu:7.7cqw}
+.c-kraft{--carta:url(/art/carta/kraft.webp);--ar:504/656;--el:2.2%;--er:3.4%;--pad:7.8cqw 8.4cqw 7.4cqw 7.2cqw;--giu:3.4cqw}
+.c-giornale{--carta:url(/art/carta/giornale.webp);--ar:600/524;--el:4.7%;--er:3.5%;--pad:8.4cqw 7.5cqw 7.5cqw 9.7cqw;--giu:3.5cqw}
+.c-arancio{--carta:url(/art/carta/arancio.webp);--ar:520/636;--el:10.6%;--er:7.9%;--pad:14.4cqw 12.9cqw 13.7cqw 15.6cqw;--giu:9.7cqw}
+.c-verde{--carta:url(/art/carta/verde.webp);--ar:596/556;--el:11.6%;--er:10.1%;--pad:14.3cqw 15.1cqw 11.6cqw 16.6cqw;--giu:8.6cqw}
+.c-crema{--carta:url(/art/carta/crema.webp);--ar:588/648;--el:10.9%;--er:8.2%;--pad:14.5cqw 13.2cqw 12.2cqw 15.9cqw;--giu:8.2cqw}
+.c-lucido{--carta:url(/art/carta/lucido.webp);--ar:516/600;--el:1.9%;--er:7.6%;--pad:8.7cqw 12.6cqw 10.6cqw 7.9cqw;--giu:6.6cqw}
+.c-azzurro{--carta:url(/art/carta/azzurro.webp);--ar:652/576;--el:7.5%;--er:5.2%;--pad:12.7cqw 11.2cqw 7.5cqw 12.5cqw;--giu:3.5cqw}
+.flip{--flip:-1}
+
+/* ── il marciapiede: il credito, in fondo a tutto ───────────────────────── */
+.marciapiede{max-width:1280px;margin:0 auto;padding:22px 4px max(22px,env(safe-area-inset-bottom));display:flex;justify-content:flex-end;align-items:center;gap:12px 20px;flex-wrap:wrap;color:#cfcbc4;font:400 14px/1.4 var(--ft)}
+.marciapiede a{color:#f1eee8;text-decoration-thickness:1px;text-underline-offset:3px}
+.marciapiede .badge{display:block;opacity:.85}
+.marciapiede .badge:hover{opacity:1}
+
+/* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
+@media (max-width:899px){
+  :root{--u:calc(min(100cqw, 600px) / 390)}
+  .parete{height:calc(2900 * var(--u));max-width:600px;margin:0 auto}
+  .it{--px:var(--mx,var(--x));--py:var(--my,var(--y));--pw:var(--mw,var(--w));--pr:var(--mr,var(--r,0deg))}
+  .spray{font-size:calc(40 * var(--u))}
+  .vol h3{font-size:max(22px,16cqw)}
+  .vol p{font-size:max(12px,5.6cqw)}
+  .vol .handle{font-size:max(12px,6cqw)}
+  .tagliandi{height:max(46px,17cqw)}
 }
-@media (max-width:640px){
-  .wrap{padding:0 16px}
-  .nav nav{gap:20px}
-  .hero{padding-top:12px}
-  .intro{padding:clamp(8px,2svh,24px) 0 clamp(12px,3svh,32px)}
-  /* dock a righe da tre app al massimo (3+3+1), icone da 56 px */
-  .dock{flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:10px 14px;height:auto;width:100%;max-width:360px;padding:14px 10px 10px;border-radius:28px}
-  .dk{display:flex;flex-direction:column;align-items:center;gap:5px;flex:0 0 calc(33.333% - 10px);max-width:96px;width:auto !important;height:auto !important;filter:none}
-  .face{width:clamp(48px,14vw,56px);height:clamp(48px,14vw,56px);filter:drop-shadow(0 5px 10px rgba(0,0,0,.16))}
-  .sep{display:none}
-  .lbl{position:static;transform:none;opacity:1;padding:0 2px;background:none;box-shadow:none;font-size:11px;letter-spacing:-.01em;color:var(--fg);transition:none;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-  .sec{padding-top:64px}
-  .bento{gap:12px}
-  .tile.ig,.tile.gh,.tile.wa,.tile.em,.tile.pp{grid-column:span 6;min-height:0}
-  .tile{padding:24px;border-radius:24px}
-  .tx{padding-top:40px}
-  .empty{grid-template-columns:1fr;gap:28px}
-  .folder{justify-self:start;width:112px;height:112px;padding:14px;gap:7px}
-  .slots{flex-wrap:wrap;justify-content:flex-start;gap:14px 8px}
-  .slots>*{flex:0 0 calc(33.333% - 6px)}
-  .slots i{width:56px;height:56px}
+
+/* ── di notte: la lamiera si spegne, l'insegna si accende ───────────────── */
+@media (prefers-color-scheme:dark){
+  .muro::before{filter:brightness(.52) saturate(.85)}
+  .muro::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(70% 36% at 50% -4%,rgba(255,176,70,.22),transparent 70%)}
+  .vol,.man{filter:brightness(.86) saturate(.95) drop-shadow(0 2px 3px rgba(0,0,0,.4)) drop-shadow(0 10px 16px rgba(0,0,0,.45))}
+  .tag{opacity:.8}
+  .insegna{filter:brightness(1.1) contrast(1.04) drop-shadow(0 0 28px rgba(255,236,190,.45)) drop-shadow(0 0 70px rgba(255,220,150,.3))}
+  .marciapiede{color:#b9b5ae}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .vol,.tagliandi button,.copiato{transition:none}
+  .tagliandi button.cade{transform:none;opacity:0}
 }
 </style>
 </head>
 <body>
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="/">pzkko</a>
-    <nav aria-label="sezioni">
-      <a href="#social">social</a>
-      <a href="#tools">tools</a>
-      <a href="#games">games</a>
-    </nav>
-  </div>
-</header>
-<div class="sentinel" aria-hidden="true"></div>
+<div class="strada">
+  <header class="portale">
+    <h1><img class="insegna" src="/art/insegna.webp" alt="pzkko" width="1719" height="604" fetchpriority="high"></h1>
+  </header>
 
-<main>
-  <section class="hero">
-    <div class="field" aria-hidden="true"></div>
-    <div class="intro">
-      <h1>pzkko</h1>
-      <p class="lede">sono alberto pecchini: i miei social, e presto strumenti e giochi da browser.</p>
-    </div>
+  <main class="muro">
+    <div class="parete">
 
-    <!-- il dock: in fondo al primo schermo, poi scorre via col resto -->
-    <div class="dockwrap">
-      <nav class="dock" aria-label="collegamenti rapidi">
-        <a class="dk ig" href="https://www.instagram.com/albertoxpecchini/" rel="me noopener" target="_blank">
-          <span class="face"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg></span>
-          <span class="lbl">instagram</span>
-        </a>
-        <a class="dk gh" href="https://github.com/albertoxpecchini" rel="me noopener" target="_blank">
-          <span class="face"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></span>
-          <span class="lbl">github</span>
-        </a>
-        <a class="dk wa" href="https://wa.me/393510355506" rel="noopener" target="_blank" style="--ia:#60d66a;--ib:#20b038">
-          <span class="face"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></span>
-          <span class="lbl">whatsapp</span>
-        </a>
-        <a class="dk em" href="mailto:pzkko@yahoo.com" style="--ia:#1fb6ff;--ib:#0a6cff">
-          <span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:58%;height:58%"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
-          <span class="lbl">e-mail</span>
-        </a>
-        <a class="dk pp" href="https://www.paypal.biz/albertoxpecchini" rel="noopener" target="_blank" style="--ia:#009cde;--ib:#003087">
-          <span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:50%;height:50%"><path d="M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z"/></svg></span>
-          <span class="lbl">paypal</span>
-        </a>
-        <span class="sep" role="separator" aria-orientation="vertical"></span>
-        <a class="dk tl" href="#tools" style="--ia:#9a9aa0;--ib:#636366">
-          <span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:50%;height:50%"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg></span>
-          <span class="lbl">tools</span>
-        </a>
-        <a class="dk gm" href="#games">
-          <span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:60%;height:60%"><path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.27 1.8-.75L9 16h6l2.25 2.25c.48.48 1.13.75 1.8.75 1.56 0 2.75-1.37 2.53-2.91zM11 11H9v2H8v-2H6v-1h2V8h1v2h2v1zm4-1c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg></span>
-          <span class="lbl">games</span>
-        </a>
-      </nav>
-    </div>
-  </section>
+      <!-- quello che c'era già sul muro: graffiti, resti, manifesti di altri -->
+      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:8;--y:420;--w:300;--r:-3deg;--mx:-10;--my:360;--mw:230;--mr:-6deg">
+      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:900;--y:330;--w:250;--r:-6deg;--mx:170;--my:1330;--mw:200;--mr:-5deg">
+      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:1175;--y:380;--w:95;--r:6deg;--mx:300;--my:1365;--mw:70;--mr:8deg">
+      <img class="it tag" src="/art/tag/tag-verde.webp" alt="" width="498" height="360" loading="lazy" style="--x:290;--y:790;--w:330;--r:2deg;--mx:140;--my:1690;--mw:240;--mr:3deg">
+      <img class="it tag chiaro" src="/art/tag/ciao-bianco.webp" alt="" width="441" height="372" loading="lazy" style="--x:1040;--y:760;--w:250;--r:-8deg;--mx:190;--my:2390;--mw:180;--mr:-7deg">
+      <img class="it tag" src="/art/tag/tag-arancio.webp" alt="" width="483" height="390" loading="lazy" style="--x:40;--y:1265;--w:320;--r:3deg;--mx:-6;--my:2660;--mw:230;--mr:4deg">
+      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" loading="lazy" style="--x:930;--y:1340;--w:230;--r:0deg;--mx:110;--my:2760;--mw:170;--mr:-5deg">
+      <img class="it tag chiaro" src="/art/tag/tag-azzurro.webp" alt="" width="450" height="360" loading="lazy" style="--x:640;--y:1385;--w:300;--r:-4deg;--mx:220;--my:2000;--mw:170;--mr:-6deg">
+      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" loading="lazy" style="--x:1150;--y:1545;--w:120;--r:0deg;--mx:270;--my:2690;--mw:110;--mr:0deg">
+      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" loading="lazy" style="--x:640;--y:1570;--w:200;--r:-4deg;--mx:20;--my:2560;--mw:120;--mr:-8deg">
+      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" loading="lazy" style="--x:990;--y:1565;--w:170;--r:6deg;--mx:250;--my:1100;--mw:120;--mr:10deg">
 
-  <section class="sec" id="social">
-    <div class="wrap">
-      <h2>social</h2>
-      <div class="bento">
-        <a class="tile ig" style="--glow:rgba(214,36,159,.34)" href="https://www.instagram.com/albertoxpecchini/" rel="me noopener" target="_blank">
-          <span class="app"><span class="face"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ig"/></svg></span></span>
-          <span class="tx"><strong>instagram</strong><span class="hd">@albertoxpecchini</span><span class="nt">foto, storie e quello che sto facendo.</span></span>
-          <span class="go">apri instagram<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-        </a>
-        <a class="tile gh" style="--glow:rgba(255,255,255,.09)" href="https://github.com/albertoxpecchini" rel="me noopener" target="_blank">
-          <span class="app"><span class="face"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gh"/></svg></span></span>
-          <ul class="sites"><li>albertopecchini.it</li><li>bettercallpekko.it</li><li>pzkko.it</li></ul>
-          <span class="tx"><strong>github</strong><span class="hd">albertoxpecchini</span><span class="nt">il codice dei miei siti, compreso questo.</span></span>
-          <span class="go">apri github<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-        </a>
-        <a class="tile wa" style="--glow:rgba(37,211,102,.26);--ia:#60d66a;--ib:#20b038" href="https://wa.me/393510355506" rel="noopener" target="_blank">
-          <span class="app"><span class="face"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg></span></span>
-          <span class="tx"><strong>whatsapp</strong><span class="hd">+39 351 0355506</span><span class="nt">scrivimi, rispondo appena posso.</span></span>
-          <span class="go">scrivimi su whatsapp<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-        </a>
-        <a class="tile em" style="--glow:rgba(10,108,255,.24);--ia:#1fb6ff;--ib:#0a6cff" href="mailto:pzkko@yahoo.com">
-          <span class="app"><span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:58%;height:58%"><use href="#i-em"/></svg></span></span>
-          <span class="tx"><strong>e-mail</strong><span class="hd">pzkko@yahoo.com</span><span class="nt">per le cose lunghe, o serie.</span></span>
-          <span class="go">mandami una mail<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-        </a>
-        <a class="tile pp" style="--glow:rgba(0,112,224,.24);--ia:#009cde;--ib:#003087" href="https://www.paypal.biz/albertoxpecchini" rel="noopener" target="_blank">
-          <span class="app"><span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:50%;height:50%"><use href="#i-pp"/></svg></span></span>
-          <span class="tx"><strong>paypal</strong><span class="hd">albertoxpecchini</span><span class="nt">se ti va di offrirmi un caffè.</span></span>
-          <span class="go">apri paypal<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-        </a>
-      </div>
-    </div>
-  </section>
+      <img class="it man" src="/art/manifesti1/concerto.webp" alt="" width="555" height="762" loading="lazy" style="--x:330;--y:-26;--w:250;--r:4deg;--mx:240;--my:-8;--mw:150;--mr:6deg">
+      <img class="it man" src="/art/manifesti2/punk.webp" alt="" width="549" height="729" loading="lazy" style="--x:355;--y:445;--w:230;--r:-5deg;--mx:205;--my:1120;--mw:170;--mr:4deg">
+      <img class="it man" src="/art/manifesti1/sagra.webp" alt="" width="561" height="687" loading="lazy" style="--x:430;--y:905;--w:235;--r:-3deg;--mx:245;--my:1760;--mw:140;--mr:-4deg">
+      <img class="it man" src="/art/manifesti1/roulette.webp" alt="" width="555" height="759" loading="lazy" style="--x:1062;--y:790;--w:215;--r:3deg;--mx:245;--my:2230;--mw:140;--mr:3deg">
+      <img class="it man" src="/art/manifesti1/teatro.webp" alt="" width="657" height="672" loading="lazy" style="--x:690;--y:1215;--w:250;--r:2deg;--mx:0;--my:2230;--mw:125;--mr:-4deg">
+      <img class="it man" src="/art/manifesti2/gatto.webp" alt="" width="546" height="729" loading="lazy" style="--x:400;--y:1330;--w:225;--r:5deg;--mx:20;--my:2440;--mw:150;--mr:3deg">
+      <img class="it man" src="/art/manifesti2/dadi.webp" alt="" width="549" height="729" loading="lazy" style="--x:1050;--y:1250;--w:200;--r:-3deg;--mx:225;--my:2450;--mw:150;--mr:-3deg">
+      <img class="it man" src="/art/manifesti2/moneta.webp" alt="" width="609" height="585" loading="lazy" style="--x:95;--y:1445;--w:210;--r:-2deg;--mx:150;--my:2680;--mw:150;--mr:-2deg">
 
-  <section class="sec" id="tools">
-    <div class="wrap">
-      <h2>tools</h2>
-      <div class="tile empty" style="--glow:rgba(120,120,128,.14)">
-        <div>
-          <h3>ancora niente qui.</h3>
-          <p>piccoli strumenti gratuiti da usare nel browser, uno alla volta.</p>
+      <!-- chi sono -->
+      <article class="vol it c-bianco" style="--x:30;--y:40;--w:300;--r:-2deg;--mx:10;--my:20;--mw:250;--mr:-2deg">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <p class="forte">pzkko è il mio nome in rete.</p>
+          <p>sono alberto pecchini, faccio siti. qui ci sono i miei social, due giochi da browser e, piano piano, qualche strumento.</p>
+          <p class="mano" style="margin-top:auto;max-width:72%">strappa un tagliando: copia il contatto <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
         </div>
-        <div class="folder" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      </div>
-    </div>
-  </section>
+        <img class="adesivo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441">
+      </article>
 
-  <section class="sec" id="games">
-    <div class="wrap">
-      <h2>games</h2>
-      <div class="tile empty games" style="--glow:rgba(120,120,128,.14)">
-        <div>
-          <h3>due ci sono: blackjack e roulette.</h3>
-          <p>da browser, senza soldi veri: al blackjack il banco è un bot e al tavolo ci stanno cinque amici; alla roulette giochi da solo, con la ruota che gira davvero. gli altri tre arrivano uno alla volta.</p>
-        </div>
-        <div class="slots" aria-label="giochi">
-          <a href="/games/blackjack/"><span class="app"><span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:50%;height:50%"><use href="#i-sp"/></svg></span></span>blackjack</a>
-          <a href="/games/roulette/"><span class="app"><span class="face"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:54%;height:54%"><use href="#i-rl"/></svg></span></span>roulette</a>
-          <span><i aria-hidden="true"></i>mine</span>
-          <span><i aria-hidden="true"></i>dado</span>
-          <span><i aria-hidden="true"></i>moneta</span>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
+      <section class="gruppo" aria-labelledby="social">
+        <h2 class="it spray" id="social" style="--x:640;--y:470;--w:240;--r:-3deg;--mx:20;--my:340;--mw:150;--mr:-5deg"><img src="/art/scritte/social.webp" alt="social" width="486" height="375" loading="lazy"></h2>
 
-<footer class="foot">
-  <div class="wrap">
-    <a href="https://www.albertopecchini.it" rel="author">sito di alberto pecchini</a>
+        <article class="vol it c-arancio" style="--x:345;--y:70;--w:280;--r:-4deg;--mx:12;--my:410;--mw:190;--mr:-3deg;--titolo:#173f48;--marker-c:#173f48">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte1/macchina.webp" alt="" width="435" height="636" style="--aw:58%">
+            <h3><a href="https://www.instagram.com/albertoxpecchini/" rel="me noopener" target="_blank">instagram</a></h3>
+            <p>foto, storie e quello che sto facendo.</p>
+            <p class="handle">@albertoxpecchini</p>
+            <div class="tagliandi" data-copia="@albertoxpecchini" data-nome="il profilo instagram">
+              <button type="button"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button><button type="button" class="via"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button>
+            </div>
+          </div>
+        </article>
+
+        <article class="vol it c-bianco flip sotto" style="--x:640;--y:30;--w:290;--r:2deg;--mx:195;--my:395;--mw:190;--mr:2deg">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte1/gatto.webp" alt="" width="420" height="606" style="--aw:52%">
+            <h3><a href="https://github.com/albertoxpecchini" rel="me noopener" target="_blank">github</a></h3>
+            <p>il codice dei miei siti, compreso questo:</p>
+            <ul class="siti"><li><svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg>albertopecchini.it</li><li><svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg>bettercallpekko.it</li><li><svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg>pzkko.it</li></ul>
+            <div class="tagliandi" data-copia="github.com/albertoxpecchini" data-nome="l'indirizzo github">
+              <button type="button"><span>albertoxpecchini</span></button><button type="button" class="via"><span>albertoxpecchini</span></button><button type="button"><span>albertoxpecchini</span></button><button type="button"><span>albertoxpecchini</span></button><button type="button"><span>albertoxpecchini</span></button><button type="button" class="via"><span>albertoxpecchini</span></button>
+            </div>
+          </div>
+        </article>
+
+        <article class="vol it c-verde" style="--x:955;--y:60;--w:300;--r:-2deg;--mx:8;--my:750;--mw:195;--mr:-2deg;--marker-c:#0b5d2b">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte1/cornetta.webp" alt="" width="465" height="618" style="--aw:40%">
+            <h3><a href="https://wa.me/393510355506" rel="noopener" target="_blank">whatsapp</a></h3>
+            <p>scrivimi, rispondo appena posso.</p>
+            <p class="handle">+39 351 0355506</p>
+            <div class="tagliandi" data-copia="+39 351 0355506" data-nome="il numero">
+              <button type="button"><span>351 0355506</span></button><button type="button"><span>351 0355506</span></button><button type="button"><span>351 0355506</span></button><button type="button" class="via"><span>351 0355506</span></button><button type="button"><span>351 0355506</span></button><button type="button"><span>351 0355506</span></button>
+            </div>
+          </div>
+        </article>
+
+        <article class="vol it c-crema" style="--x:60;--y:480;--w:290;--r:2.5deg;--mx:200;--my:800;--mw:185;--mr:3deg;--marker-c:#1446a0">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte1/piccione.webp" alt="" width="432" height="627" style="--aw:50%">
+            <h3><a href="mailto:pzkko@yahoo.com">e-mail</a></h3>
+            <p>per le cose lunghe, o serie.</p>
+            <p class="handle">pzkko@yahoo.com</p>
+            <div class="tagliandi" data-copia="pzkko@yahoo.com" data-nome="l'indirizzo e-mail">
+              <button type="button" class="via"><span>pzkko@yahoo.com</span></button><button type="button"><span>pzkko@yahoo.com</span></button><button type="button"><span>pzkko@yahoo.com</span></button><button type="button"><span>pzkko@yahoo.com</span></button><button type="button" class="via"><span>pzkko@yahoo.com</span></button><button type="button"><span>pzkko@yahoo.com</span></button>
+            </div>
+          </div>
+        </article>
+
+        <article class="vol it c-giallo" style="--x:560;--y:560;--w:270;--r:-2deg;--mx:15;--my:1045;--mw:185;--mr:-2deg;--marker-c:#1446a0">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte1/caffe.webp" alt="" width="441" height="633" style="--aw:44%">
+            <h3><a href="https://www.paypal.biz/albertoxpecchini" rel="noopener" target="_blank">un caffè?</a></h3>
+            <p>se ti va di offrirmene uno: paypal.</p>
+            <p class="handle">paypal.biz/<wbr>albertoxpecchini</p>
+            <div class="tagliandi" data-copia="https://www.paypal.biz/albertoxpecchini" data-nome="il link paypal">
+              <button type="button"><span>albertoxpecchini</span></button><button type="button"><span>albertoxpecchini</span></button><button type="button" class="via"><span>albertoxpecchini</span></button><button type="button" class="via"><span>albertoxpecchini</span></button><button type="button"><span>albertoxpecchini</span></button><button type="button"><span>albertoxpecchini</span></button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="gruppo" aria-labelledby="games">
+        <h2 class="it spray bianco" id="games" style="--x:860;--y:905;--w:220;--r:3deg;--mx:20;--my:1340;--mw:150;--mr:-4deg"><img src="/art/scritte/games.webp" alt="games" width="471" height="324" loading="lazy"></h2>
+
+        <article class="vol it c-kraft" style="--x:790;--y:560;--w:280;--r:1.5deg;--mx:10;--my:1420;--mw:195;--mr:2deg;--marker-c:#161616">
+          <div class="foglio" aria-hidden="true"></div>
+          <span class="piu18" aria-label="per maggiorenni">+18</span>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/carte.webp" alt="" width="438" height="609" style="--aw:50%">
+            <h3><a href="/games/blackjack/">blackjack</a></h3>
+            <p>il banco è un bot, cinque posti, $pzk al posto dei soldi.</p>
+            <p class="mano vai">gioca <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
+          </div>
+        </article>
+
+        <article class="vol it c-lucido" style="--x:1035;--y:500;--w:245;--r:-1deg;--mx:200;--my:1400;--mw:185;--mr:-2deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/ruota.webp" alt="" width="423" height="606" style="--aw:54%">
+            <h3><a href="/games/roulette/">roulette</a></h3>
+            <p>da soli contro il banco: la ruota gira davvero.</p>
+            <p class="mano vai">gioca <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
+          </div>
+        </article>
+
+        <article class="vol it c-azzurro" style="--x:660;--y:985;--w:225;--r:3deg;--mx:10;--my:2040;--mw:180;--mr:3deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/bomba.webp" alt="" width="435" height="609" style="--aw:40%">
+            <h3>mine</h3>
+            <p class="mano">in arrivo</p>
+          </div>
+        </article>
+
+        <article class="vol it c-giornale flip" style="--x:870;--y:990;--w:230;--r:-2deg;--mx:200;--my:2050;--mw:180;--mr:-3deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/dadi.webp" alt="" width="432" height="624" style="--aw:40%">
+            <h3>dado</h3>
+            <p class="mano">in arrivo</p>
+          </div>
+        </article>
+
+        <article class="vol it c-verde flip" style="--x:1060;--y:1000;--w:220;--r:4deg;--mx:100;--my:2240;--mw:180;--mr:4deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/moneta.webp" alt="" width="423" height="624" style="--aw:40%">
+            <h3>moneta</h3>
+            <p class="mano">in arrivo</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="gruppo" aria-labelledby="tools">
+        <h2 class="it spray" id="tools" style="--x:430;--y:1200;--w:210;--r:-4deg;--mx:245;--my:1665;--mw:140;--mr:5deg"><img src="/art/scritte/tools.webp" alt="tools" width="474" height="405" loading="lazy"></h2>
+
+        <article class="vol it c-giornale" style="--x:40;--y:930;--w:360;--r:-1.5deg;--mx:10;--my:1740;--mw:250;--mr:-1deg">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/chiavi.webp" alt="" width="435" height="627" style="--aw:30%;--aa:flex-end">
+            <h3>cercasi strumenti</h3>
+            <p>ancora niente qui: piccoli strumenti gratuiti da usare nel browser, uno alla volta.</p>
+          </div>
+        </article>
+      </section>
+
+      <img class="it pezzo" src="/art/nastro/scotch-storto.webp" alt="" width="435" height="417" loading="lazy" style="--x:1000;--y:760;--w:110;--r:-50deg;--mx:160;--my:1660;--mw:80;--mr:-40deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy" style="--x:600;--y:925;--w:120;--r:4deg;--mx:40;--my:2030;--mw:90;--mr:6deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:40;--y:1318;--w:120;--r:-8deg;--mx:250;--my:2515;--mw:90;--mr:-10deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" loading="lazy" style="--x:430;--y:1130;--w:70;--r:30deg;--mx:300;--my:2360;--mw:50;--mr:30deg;z-index:2">
+      <img class="it pezzo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441" loading="lazy" style="--x:820;--y:1560;--w:90;--r:-10deg;--mx:300;--my:2630;--mw:70;--mr:-12deg;z-index:3">
+      <img class="it pezzo" src="/art/nastro/puntina.webp" alt="" width="174" height="201" loading="lazy" style="--x:1206;--y:1226;--w:26;--r:0deg;--mx:250;--my:2000;--mw:22;--mr:0deg;z-index:4">
+    </div>
+  </main>
+
+  <footer class="marciapiede">
     <a class="badge" href="https://frogdr.com/pzkko.it?utm_source=pzkko.it" target="_blank" rel="noopener"><img src="https://frogdr.com/pzkko.it/badge-white-tiny.svg" alt="Monitor your Domain Rating with FrogDR" width="224" height="20" loading="lazy"></a>
-    <span>pzkko.it</span>
-  </div>
-</footer>
-
-<!-- superellisse per le icone (clip-path) e i glifi riusati nelle schede -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <defs>
-    <clipPath id="sq" clipPathUnits="objectBoundingBox"><path d="M1.0000,0.5000L0.9998,0.6497L0.9990,0.6975L0.9978,0.7320L0.9961,0.7601L0.9940,0.7839L0.9913,0.8049L0.9881,0.8236L0.9844,0.8405L0.9802,0.8559L0.9755,0.8701L0.9702,0.8832L0.9644,0.8952L0.9580,0.9064L0.9511,0.9168L0.9435,0.9264L0.9353,0.9353L0.9264,0.9435L0.9168,0.9511L0.9064,0.9580L0.8952,0.9644L0.8832,0.9702L0.8701,0.9755L0.8559,0.9802L0.8405,0.9844L0.8236,0.9881L0.8049,0.9913L0.7839,0.9940L0.7601,0.9961L0.7320,0.9978L0.6975,0.9990L0.6497,0.9998L0.5000,1.0000L0.3503,0.9998L0.3025,0.9990L0.2680,0.9978L0.2399,0.9961L0.2161,0.9940L0.1951,0.9913L0.1764,0.9881L0.1595,0.9844L0.1441,0.9802L0.1299,0.9755L0.1168,0.9702L0.1048,0.9644L0.0936,0.9580L0.0832,0.9511L0.0736,0.9435L0.0647,0.9353L0.0565,0.9264L0.0489,0.9168L0.0420,0.9064L0.0356,0.8952L0.0298,0.8832L0.0245,0.8701L0.0198,0.8559L0.0156,0.8405L0.0119,0.8236L0.0087,0.8049L0.0060,0.7839L0.0039,0.7601L0.0022,0.7320L0.0010,0.6975L0.0002,0.6497L0.0000,0.5000L0.0002,0.3503L0.0010,0.3025L0.0022,0.2680L0.0039,0.2399L0.0060,0.2161L0.0087,0.1951L0.0119,0.1764L0.0156,0.1595L0.0198,0.1441L0.0245,0.1299L0.0298,0.1168L0.0356,0.1048L0.0420,0.0936L0.0489,0.0832L0.0565,0.0736L0.0647,0.0647L0.0736,0.0565L0.0832,0.0489L0.0936,0.0420L0.1048,0.0356L0.1168,0.0298L0.1299,0.0245L0.1441,0.0198L0.1595,0.0156L0.1764,0.0119L0.1951,0.0087L0.2161,0.0060L0.2399,0.0039L0.2680,0.0022L0.3025,0.0010L0.3503,0.0002L0.5000,0.0000L0.6497,0.0002L0.6975,0.0010L0.7320,0.0022L0.7601,0.0039L0.7839,0.0060L0.8049,0.0087L0.8236,0.0119L0.8405,0.0156L0.8559,0.0198L0.8701,0.0245L0.8832,0.0298L0.8952,0.0356L0.9064,0.0420L0.9168,0.0489L0.9264,0.0565L0.9353,0.0647L0.9435,0.0736L0.9511,0.0832L0.9580,0.0936L0.9644,0.1048L0.9702,0.1168L0.9755,0.1299L0.9802,0.1441L0.9844,0.1595L0.9881,0.1764L0.9913,0.1951L0.9940,0.2161L0.9961,0.2399L0.9978,0.2680L0.9990,0.3025L0.9998,0.3503Z"/></clipPath>
-    <!-- Simple Icons (CC0) per i marchi, Material Icons (Apache 2.0) per la busta; i marchi restano dei rispettivi titolari -->
-    <path id="i-ig" d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/>
-    <path id="i-gh" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-    <path id="i-wa" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-    <path id="i-em" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
-    <path id="i-rl" fill-rule="evenodd" d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm0 2.2a8.3 8.3 0 1 1 0 16.6 8.3 8.3 0 0 1 0-16.6zm0 2.3a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm0 2.1a3.9 3.9 0 1 1 0 7.8 3.9 3.9 0 0 1 0-7.8zm0 2.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM12 4.2l.9 3.2h-1.8zM19.8 12l-3.2.9v-1.8zM12 19.8l-.9-3.2h1.8zM4.2 12l3.2-.9v1.8zm12.9-6.9-1.7 2.9-1.2-1.3zm1.1 12.1-2.9-1.7 1.3-1.2zM6.9 18.9l1.7-2.9 1.2 1.3zM5.8 6.8l2.9 1.7-1.3 1.2zM17.4 14.2a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z"/>
-    <path id="i-sp" d="M12 2.4C9.1 7.1 4.2 9.6 4.2 14a4 4 0 0 0 6.5 3.1L9.9 21.4h4.2l-.8-4.3A4 4 0 0 0 19.8 14c0-4.4-4.9-6.9-7.8-11.6z"/>
-    <path id="i-pp" d="M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z"/>
-  </defs>
-</svg>
+  </footer>
+</div>
 
 <script>
 (() => {
-  const root = document.documentElement
-  root.classList.add('js')
   const reduce = matchMedia('(prefers-reduced-motion: reduce)')
 
-  // Striscia in alto: il filo sotto compare solo quando il contenuto le scorre sotto.
-  const nav = document.querySelector('.nav')
-  const sentinel = document.querySelector('.sentinel')
-  new IntersectionObserver(([e]) => nav.classList.toggle('scrolled', !e.isIntersecting), { rootMargin: '-1px 0px 0px 0px' }).observe(sentinel)
-
-  // Dock: le icone si ingrandiscono sotto il puntatore con molle smorzate
-  // (damping 1, response 0.32 s), interrompibili in ogni istante. Solo col
-  // puntatore fine: col dito il dock è una schermata home, ferma.
-  const dock = document.querySelector('.dock')
-  const items = [...dock.querySelectorAll('.dk')]
-  const fine = matchMedia('(hover: hover) and (pointer: fine) and (min-width: 641px)')
-  const MAG = 1.5          // scala massima dell'icona sotto il puntatore
-  const SPREAD = 1.25      // quanto si allarga l'onda, in larghezze d'icona
-  const OMEGA = 2 * Math.PI / 0.32
-  const springs = items.map(() => ({ x: 1, v: 0, t: 1 }))
-  let size = 64, px = null, raf = 0, last = 0
-
-  // la misura base dell'icona viene dal layout (è un clamp su vw/svh), non da un numero fisso
-  const measure = () => { size = items[0].getBoundingClientRect().width || 64 }
-  const onResize = () => { if (px !== null || raf) return; for (const el of items) el.style.width = el.style.height = ''; measure() }
-
-  function retarget() {
-    for (let i = 0; i < items.length; i++) {
-      let t = 1
-      if (px !== null) {
-        const r = items[i].getBoundingClientRect()
-        const d = Math.abs(px - (r.left + r.width / 2)) / size
-        t = 1 + (MAG - 1) * Math.exp(-(d * d) / (SPREAD * SPREAD))
-      }
-      springs[i].t = t
+  // I tagliandi sono fette della carta del volantino: ognuno mostra il pezzo di
+  // foglio che gli tocca (stessa immagine, spostata), così quando si strappa
+  // resta il buco col muro dietro.
+  const fette = () => {
+    for (const t of document.querySelectorAll('.tagliandi')) {
+      const vol = t.closest('.vol')
+      const r = vol.getBoundingClientRect()
+      const rt = t.getBoundingClientRect()
+      const btns = [...t.querySelectorAll('button')]
+      const flip = getComputedStyle(vol).getPropertyValue('--flip').trim() === '-1'
+      btns.forEach((b, i) => {
+        const rb = b.getBoundingClientRect()
+        // posizione del tagliando rispetto al foglio, senza la rotazione (rapporti, non pixel)
+        const w = r.width, h = r.height
+        b.style.setProperty('--bgsize', `${(w / rb.width) * 100}% ${(h / rb.height) * 100}%`)
+        const ox = flip ? (r.right - rb.right) : (rb.left - r.left)
+        const px = ox / (w - rb.width) * 100
+        const py = (rb.top - r.top) / (h - rb.height) * 100
+        b.style.setProperty('--bgpos', `${px}% ${py}%`)
+        if (flip) b.style.transform = ''
+      })
+      void rt
     }
-    if (!raf) { last = performance.now(); raf = requestAnimationFrame(step) }
   }
+  // il calcolo usa i rettangoli non ruotati: si misura col volantino dritto
+  const misura = () => {
+    const vols = [...document.querySelectorAll('.vol')]
+    for (const v of vols) v.style.transform = 'none'
+    fette()
+    for (const v of vols) v.style.transform = ''
+  }
+  misura()
+  addEventListener('resize', misura)
+  document.fonts?.ready.then(misura)
 
-  function step(now) {
-    const dt = Math.min((now - last) / 1000, 1 / 30)
-    last = now
-    let moving = false
-    for (let i = 0; i < items.length; i++) {
-      const s = springs[i]
-      // molla criticamente smorzata: ẍ = -ω²(x - t) - 2ω·ẋ
-      s.v += (-OMEGA * OMEGA * (s.x - s.t) - 2 * OMEGA * s.v) * dt
-      s.x += s.v * dt
-      if (Math.abs(s.x - s.t) > 0.0005 || Math.abs(s.v) > 0.0005) moving = true
-      else { s.x = s.t; s.v = 0 }
-      const w = (size * s.x).toFixed(2) + 'px'
-      items[i].style.width = w
-      items[i].style.height = w
+  // strappare un tagliando copia il contatto
+  let nota
+  const copia = async (t, b) => {
+    const testo = t.dataset.copia
+    let ok = false
+    try { await navigator.clipboard.writeText(testo); ok = true } catch {}
+    const vol = t.closest('.vol')
+    nota?.remove()
+    nota = document.createElement('span')
+    nota.className = 'copiato'
+    nota.textContent = ok ? `copiato: ${testo}` : testo
+    vol.appendChild(nota)
+    requestAnimationFrame(() => nota.classList.add('si'))
+    setTimeout(() => nota?.classList.remove('si'), 2600)
+    const fine = () => { b.classList.add('via'); b.classList.remove('cade'); b.setAttribute('aria-disabled', 'true') }
+    if (reduce.matches) fine()
+    else { b.classList.add('cade'); b.addEventListener('transitionend', fine, { once: true }); setTimeout(fine, 700) }
+    const vivi = t.querySelectorAll('button:not(.via)').length
+    if (vivi === 0) setTimeout(() => { for (const x of t.querySelectorAll('button')) { x.classList.remove('via'); x.removeAttribute('aria-disabled') } }, 1800)
+  }
+  for (const t of document.querySelectorAll('.tagliandi')) {
+    t.setAttribute('role', 'group')
+    t.setAttribute('aria-label', `tagliandi da strappare: copiano ${t.dataset.nome}`)
+    for (const b of t.querySelectorAll('button')) {
+      b.setAttribute('aria-label', `strappa un tagliando e copia ${t.dataset.nome}`)
+      b.addEventListener('click', () => { if (!b.classList.contains('via')) copia(t, b) })
     }
-    raf = moving ? requestAnimationFrame(step) : 0
   }
-
-  const onMove = (e) => { if (e.pointerType === 'touch') return; px = e.clientX; retarget() }
-  const onLeave = () => { px = null; retarget() }
-
-  function enable() {
-    measure()
-    dock.addEventListener('pointermove', onMove)
-    dock.addEventListener('pointerleave', onLeave)
-    addEventListener('resize', onResize)
-  }
-  function disable() {
-    dock.removeEventListener('pointermove', onMove)
-    dock.removeEventListener('pointerleave', onLeave)
-    removeEventListener('resize', onResize)
-    if (raf) cancelAnimationFrame(raf)
-    raf = 0; px = null
-    for (const [i, el] of items.entries()) { springs[i].x = springs[i].t = 1; springs[i].v = 0; el.style.width = el.style.height = '' }
-  }
-  const sync = () => (fine.matches && !reduce.matches ? enable() : disable())
-  sync()
-  fine.addEventListener('change', sync)
-  reduce.addEventListener('change', sync)
 })()
 </script>
 </body>

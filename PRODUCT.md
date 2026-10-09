@@ -55,8 +55,9 @@ Alberto, non come una vetrina di link altrui.
   contenuti diventano pagine in `pzkRoutes`. Giochi in programma (nessuno
   fatto): blackjack, roulette, mine, dado, moneta, senza soldi veri.
 - Niente contenuti del portfolio serio: un dominio = un sito intero.
-- Credito in piè di pagina su tutte le pagine (404 compresa) con link esatto a
-  `https://www.albertopecchini.it`, testo visibile col nome, non col dominio.
+- Credito ad Alberto Pecchini: tolto dalla home e dalla 404 su sua richiesta il
+  2026-10-09 (è il suo sito); le pagine dei giochi lo portano ancora, con link
+  esatto a `https://www.albertopecchini.it` e il nome come testo.
 - Prima versione (iPhone + portafoglio MagSafe, commit 6d339dc) bocciata il
   2026-10-07: non riproporre oggetti skeuomorfici letterali.
 

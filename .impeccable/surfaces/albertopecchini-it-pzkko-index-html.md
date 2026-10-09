@@ -1,36 +1,34 @@
 ---
-version: 1
+version: 2
 slug: "albertopecchini-it-pzkko-index-html"
 primary_target: "albertopecchini.it/pzkko/index.html"
-related_targets: ["albertopecchini.it/pzkko/404.html","albertopecchini.it/tools/pzkko/genera-404.mjs"]
+related_targets: ["albertopecchini.it/pzkko/404.html","albertopecchini.it/tools/pzkko/genera-404.mjs","albertopecchini.it/tools/pzkko/fogli.js","albertopecchini.it/tools/pzkko/immagini.mjs"]
 ---
 
-# pzkko.it — home
+# pzkko.it — home («il muro»)
 
-Scope: the whole home of pzkko.it (`albertopecchini.it/pzkko/index.html`) and its 404, static files with no build. Visitor mode: Experience (a personal hub; the work is the page itself).
+Scope: the whole home of pzkko.it (`albertopecchini.it/pzkko/index.html`) and its 404, static files with no build. Visitor mode: Experience (a personal hub; the page itself is the work).
 
-Audience and job: someone who followed a handle (Instagram, GitHub, a friend told them «cerca pzkko»), on a phone, for a few seconds. Job: understand who pzkko is and tap the right social. Later: use a tool or play a game.
+Audience and job: someone who followed a handle (Instagram, GitHub, a friend told them «cerca pzkko»), on a phone, for a few seconds. Job: understand who pzkko is and tap the right social. Later: play a game, use a tool.
 
-Action: open one of five socials (Instagram, GitHub, WhatsApp, e-mail, PayPal). Secondary: discover that tools and games are coming.
+Action: open one of five socials (Instagram, GitHub, WhatsApp, e-mail, PayPal). Secondary: play blackjack or roulette; see that mine, dado, moneta and the tools are coming.
 
-Proof and content: the five real handles; nothing else exists yet. Tools and games are empty and must read as honest empty states, never as fake content.
+Proof and content: the five real handles, the two real games. Tools and the three missing games are honest «in arrivo» flyers, never fake content. The decorative posters on the wall are fiction (a snail concert, a cat called git): wallpaper, not claims.
 
-Constraints: brief-pinned Apple design language (WWDC principles for the web); Italian; lowercase copy; system font; follows the system theme; credit link to https://www.albertopecchini.it in the footer of every page; no skeuomorphic literal objects (the iPhone + MagSafe wallet version was rejected on 2026-10-07).
+Constraints: user-pinned direction of 2026-10-09 (reference photo: the grey roller shutter of a closed «coin» store in Bologna, covered in graffiti and wild-posted flyers; the user's words: «volantini, street, caos, colori»; images generated with gpt-image-2 on Replicate); Italian; lowercase copy; follows the system theme; no credit link in the home and 404 footer (Alberto removed it on 2026-10-09; the games still carry it); the 2026-10-07 Apple-desktop world (dock, bento, system font) is replaced, not polished.
 
-Chosen direction and memorable moment: «la scrivania di pzkko»: the five socials and the two zones live as app icons in a dock at the bottom edge of the full-screen first viewport (visible on open, as the user asked on 2026-10-07: «quando apro devo vedere sempre in basso la barra icone»; it scrolls away with the hero, as the user then asked: «se scorro giù via la barra, non mi serve») that magnifies under the pointer with critically damped springs (macOS on desktop) and becomes a labeled 3+3+1 grid on the phone (rows of at most three apps, the user's request). Under the full-screen hero, Apple-style bento tiles explain each social (github listing the three sites it hosts; the others neutral with a brand glow); tools and games are two empty-state tiles shaped like what they will become (a folder, a row of app slots).
-
-Unresolved: whether tools/games become pages (they do when the first item exists).
+Chosen direction and memorable moment: the page is the shutter. The old shop sign now reads «pzkko»; every link is a paper flyer taped to the metal; the social flyers carry tear-off tabs with the handle, and tearing one off copies the handle; the 404 is the flyer that someone already tore away, only its tape and corners left.
 
 ## Direction contract
 
-THESIS: pzkko.it is a desktop, not a list. Seven app icons in one dock say «this is a person who makes things» before any text is read; the page refuses the link-in-bio column of equal buttons and the hero-over-mesh with three cards.
+THESIS: pzkko.it is a wall, not a list. The grey saracinesca with its graffiti is the ground, and every social, game and tool is a flyer somebody taped to it, overlapping, crooked, in different papers and inks; the page refuses the link-in-bio column, the hero-over-gradient and the row of equal cards.
 
-OWN-WORLD: Apple's web grammar, committed: system font stack, display tight (-0.035em), 17px body; light #fff with #f5f5f7 tiles, dark #000 with #1d1d1f tiles, link blue #0066cc / #2997ff, no other accent; brand color appears only inside squircle icons (true superellipse clip) and as a faint glow in the neutral tiles; the one exception is the github tile, GitHub graphite #24292f, which earns its size by listing the three sites it hosts; glass tray with backdrop blur over a soft wallpaper field; 28px tile radius, 22% squircle icons; springs damping 1.0, response 0.32; press scale .92 on pointer-down; one authored motion moment (hero entrance + dock), no scroll reveals.
+OWN-WORLD: weathered grey sheet-metal (#8e8e8a, mirror-tiled photo) with spray tags and marker scribbles under everything; papers in white, canary yellow, kraft, newsprint, fluorescent orange, pale green, cream and light blue, with torn edges, yellowed tape, staples and pushpins (all photographed cut-outs, never CSS imitations); inks limited to the printer's palette (black toner, riso orange and teal, screen-print red, green, yellow, blue; never purple or pink, the chroma key's colour); type: Anton for the shouted headlines, Archivo Black for the second voice, Special Elite for photocopied body text, Permanent Marker for the handwritten notes and the tabs; shadows are the paper's own (offset, soft, short); in the dark theme the street goes to night: the metal darkens, a sodium-orange cast, the sign box lights up from behind.
 
-STORY: «ah, è alberto»; the icons are familiar, so the visitor taps without reading; scrolling, they learn each handle and that tools and games are on the way; they leave with the feeling of an Apple page made by one person.
+STORY: «ah, è alberto, e si è messo sul muro»; the visitor recognises Instagram and GitHub from the flyers' pictures and words and taps one; scrolling down the wall they find the games, the three «in arrivo» papers and the tools notice; they leave remembering a wall of posters, not a template.
 
-FIRST VIEWPORT: translucent 48px nav (pzkko left; social, tools, games right). Full-screen hero (100svh minus nav) that adapts to any window («adattatore automatico», the user's request): «pzkko» display at clamp(2.75rem, min(9vw, 13svh), 6rem) centred in the space above the dock, one line under it at clamp(1rem, min(1.5vw, 2.6svh), 1.3125rem) (single line at desktop). The dock sits at the bottom edge of the hero and scrolls away with it: five brand squircles sized clamp(44px, min(4.6vw, 7.5svh), 64px), a separator, two graphite icons (tools, games), in a glass tray over the blurred color field. Primary action = the dock icons themselves. On the phone the dock is the same tray as a 3+3+1 grid of clamp(48px, 14vw, 56px) icons with 11px labels (the user's words, 2026-10-07: «da mobile righe da massimo 3 app nella barra»). The 404 carries the same hero and dock, generated from index.html by tools/pzkko/genera-404.mjs.
+FIRST VIEWPORT: a dark stone portal (CSS jambs and lintel) framing the shutter. At the top, spanning the width, the backlit sign box with the channel letters «pzkko» (generated image; the h1 is its text). Directly under it the shutter starts, already covered: the white typewritten intro flyer («sono alberto pecchini…», ~4 of 12 columns, top left), the orange Instagram flyer with the instant camera (3 columns, rotated −3°), the photocopied GitHub flyer with the cat (3 columns, +2°), the green WhatsApp flyer with its tear-off tabs (3 columns), a black tag and the silver throw-up showing between the papers, the top of a decorative concert poster peeking from under the Instagram one. The primary action is each social flyer as a whole (stretched link over the paper; the tabs are buttons above it). On the phone (390 px): the sign full-width, then the intro flyer full-width and the social flyers two per row, overlapping and crooked, each at least 160 px wide and tappable, tabs 44 px tall.
 
-FORM: dock + bento, first on my list of structures (dock/bento, launchpad grid, control-center stack, single column, sidebar). Brief-pinned direction (Apple design); no concept-seed roll, seed key: none (pinned).
+FORM: wild-posted collage on a 12-column grid with explicit placements, negative margins and per-flyer rotations; first on my list (collage grid, single column of posters, horizontal shutter strip, masonry, poster + caption list). User-pinned direction (the photo); no concept-seed roll, seed key: none (pinned).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.

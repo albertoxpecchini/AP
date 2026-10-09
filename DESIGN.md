@@ -1,53 +1,25 @@
 ---
 name: pzkko.it
-description: la scrivania di pzkko, i social di Alberto Pecchini come icone in un dock di vetro, nella grammatica web di Apple
+description: il muro di pzkko, i social di Alberto Pecchini come volantini attaccati a una saracinesca coperta di graffiti
 colors:
-  bg: "#fff"
-  tile: "#f5f5f7"
-  fg: "#1d1d1f"
-  fg2: "#6e6e73"
-  link: "#0066cc"
-  hair: "rgba(0,0,0,.1)"
-  nav: "rgba(255,255,255,.72)"
-  tray: "rgba(255,255,255,.55)"
-  tray-edge: "rgba(255,255,255,.75)"
-  tray-in: "rgba(255,255,255,.6)"
-  tip: "rgba(255,255,255,.94)"
-  slot: "rgba(0,0,0,.06)"
-  slot-edge: "rgba(0,0,0,.08)"
-  f1: "rgba(10,132,255,.17)"
-  f2: "rgba(255,45,85,.13)"
-  f3: "rgba(255,159,10,.16)"
-  gh-a: "#3d4450"
-  gh-b: "#1b1f24"
-  gm-a: "#48484a"
-  gm-b: "#1c1c1e"
-  github-graphite: "#24292f"
-  github-graphite-text: "#f5f5f7"
-  github-graphite-muted: "#a1a1a6"
-  github-graphite-link: "#2997ff"
-  glyph: "#fff"
-  selection: "rgba(0,113,227,.28)"
-  bg-dark: "#000"
-  tile-dark: "#1d1d1f"
-  fg-dark: "#f5f5f7"
-  fg2-dark: "#a1a1a6"
-  link-dark: "#2997ff"
-  hair-dark: "rgba(255,255,255,.14)"
-  nav-dark: "rgba(0,0,0,.62)"
-  tray-dark: "rgba(255,255,255,.08)"
-  tray-edge-dark: "rgba(255,255,255,.16)"
-  tray-in-dark: "rgba(255,255,255,.1)"
-  tip-dark: "rgba(44,44,46,.96)"
-  slot-dark: "rgba(255,255,255,.07)"
-  slot-edge-dark: "rgba(255,255,255,.1)"
-  f1-dark: "rgba(10,132,255,.42)"
-  f2-dark: "rgba(255,45,85,.32)"
-  f3-dark: "rgba(255,159,10,.28)"
-  gh-a-dark: "#5a6270"
-  gh-b-dark: "#24292f"
-  gm-a-dark: "#6e6e73"
-  gm-b-dark: "#2c2c2e"
+  pietra: "#2e2c29"
+  pietra-2: "#1f1e1c"
+  asfalto: "#3a3937"
+  lamiera: "#8e8e8a"
+  inchiostro: "#161616"
+  inchiostro-2: "#3a3632"
+  marker: "#111"
+  marker-rosso: "#a50d25"
+  marker-blu: "#1446a0"
+  marker-teal: "#173f48"
+  marker-verde: "#0b5d2b"
+  giallo-fuoco: "#ffd400"
+  bianco-carta: "#fff"
+  marciapiede-testo: "#cfcbc4"
+  marciapiede-link: "#f1eee8"
+  marciapiede-testo-dark: "#b9b5ae"
+  notte-sodio: "rgba(255,176,70,.22)"
+  ombra: "rgba(0,0,0,.28)"
   btn: "#0066cc"
   btn-dark: "#1a6fe0"
   blue-felt: "#1a6fe0"
@@ -76,62 +48,62 @@ colors:
   campo: "#fff"
   campo-dark: "#2c2c2e"
 typography:
-  display:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "clamp(2.75rem, min(9vw, 13svh), 6rem)"
-    fontWeight: 600
-    lineHeight: 1
-    letterSpacing: "-.035em"
-  headline:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "clamp(2rem, 4vw, 2.5rem)"
-    fontWeight: 600
+  titolo:
+    fontFamily: "Anton, Impact, 'Arial Narrow Bold', sans-serif"
+    fontSize: "max(26px, 18cqw)"
+    fontWeight: 400
+    lineHeight: 0.95
+    letterSpacing: ".005em"
+  titolo-mobile:
+    fontFamily: "Anton, Impact, 'Arial Narrow Bold', sans-serif"
+    fontSize: "max(22px, 16cqw)"
+    fontWeight: 400
+    lineHeight: 0.95
+  forte:
+    fontFamily: "'Archivo Black', 'Arial Black', sans-serif"
+    fontSize: "max(12px, 5cqw)"
+    fontWeight: 400
+    letterSpacing: "-.01em"
+  corpo:
+    fontFamily: "'Special Elite', 'Courier New', monospace"
+    fontSize: "max(12px, 5.4cqw)"
+    fontWeight: 400
+    lineHeight: 1.28
+  mano:
+    fontFamily: "'Permanent Marker', 'Comic Sans MS', cursive"
+    fontSize: "max(14px, 7.2cqw)"
+    fontWeight: 400
+    lineHeight: 1.05
+  handle:
+    fontFamily: "'Permanent Marker', 'Comic Sans MS', cursive"
+    fontSize: "max(13px, 6cqw)"
+    fontWeight: 400
     lineHeight: 1.1
-    letterSpacing: "-.02em"
-  title:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "24px"
-    fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "-.02em"
-  lede:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "clamp(1rem, min(1.5vw, 2.6svh), 1.3125rem)"
+  tagliando:
+    fontFamily: "'Permanent Marker', 'Comic Sans MS', cursive"
+    fontSize: "max(9px, 3.6cqw)"
     fontWeight: 400
-    lineHeight: 1.38
-    letterSpacing: "-.01em"
-  body:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "17px"
-    fontWeight: 400
-    lineHeight: 1.47
-    letterSpacing: "-.01em"
-  brand:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "17px"
-    fontWeight: 600
     lineHeight: 1
-    letterSpacing: "-.02em"
-  list:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "15px"
+  copiato:
+    fontFamily: "'Permanent Marker', 'Comic Sans MS', cursive"
+    fontSize: "max(16px, 9cqw)"
     fontWeight: 400
-    lineHeight: 1.47
-  tooltip:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "13px"
+    lineHeight: 1
+  piu18:
+    fontFamily: "'Archivo Black', 'Arial Black', sans-serif"
+    fontSize: "max(12px, 6cqw)"
     fontWeight: 400
-    letterSpacing: "-.01em"
-  label:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "12px"
+    lineHeight: 1
+  body:
+    fontFamily: "'Special Elite', 'Courier New', monospace"
+    fontSize: "16px"
     fontWeight: 400
-    letterSpacing: "-.01em"
-  label-dock-mobile:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-    fontSize: "11px"
+    lineHeight: 1.4
+  marciapiede:
+    fontFamily: "'Special Elite', 'Courier New', monospace"
+    fontSize: "14px"
     fontWeight: 400
-    letterSpacing: "-.01em"
+    lineHeight: 1.4
   button:
     fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
     fontSize: "15px"
@@ -176,12 +148,8 @@ typography:
     fontWeight: 600
     letterSpacing: "1px"
 rounded:
-  tip: "9px"
-  focus: "10px"
-  icon: "22%"
-  tile-mobile: "24px"
-  tile: "28px"
-  dock: "28px"
+  piu18: "50%"
+  nessuno: "0"
   input: "12px"
   tray-felt: "22px"
   eventi-hud: "14px"
@@ -190,24 +158,18 @@ rounded:
   pill: "999px"
   disc: "50%"
 spacing:
-  dock-gap: "8px"
-  dock-pad: "10px"
-  bento-gap-mobile: "12px"
-  bento-gap: "16px"
-  wrap-mobile: "16px"
-  wrap: "22px"
-  tile-pad-mobile: "24px"
-  tile-pad: "28px"
-  nav-gap: "28px"
-  hero-bottom: "calc(28px + env(safe-area-inset-bottom))"
-  intro: "clamp(12px, 3svh, 32px) 0 clamp(16px, 4svh, 40px)"
-  intro-mobile: "clamp(8px, 2svh, 24px) 0 clamp(12px, 3svh, 32px)"
-  section-mobile: "64px"
-  section: "88px"
-  section-end: "96px"
-  icon: "clamp(44px, min(4.6vw, 7.5svh), 64px)"
-  icon-mobile: "clamp(48px, 14vw, 56px)"
-  icon-tile: "60px"
+  stipite: "clamp(10px, 3vw, 40px)"
+  portale: "clamp(18px, 3.2vw, 40px) 0 clamp(14px, 2.4vw, 30px)"
+  parete: "1280px"
+  parete-unita: "calc(100cqw / 1280)"
+  parete-unita-mobile: "calc(min(100cqw, 600px) / 390)"
+  parete-altezza: "1700 unità"
+  parete-altezza-mobile: "2900 unità"
+  testo-gap: "2.2cqw"
+  testo-lato: "5cqw"
+  tagliandi: "max(44px, 17cqw)"
+  tagliandi-mobile: "max(46px, 17cqw)"
+  marciapiede: "22px 4px max(22px, env(safe-area-inset-bottom))"
   nav-height: "48px"
   control: "44px"
   tasto: "64px"
@@ -222,78 +184,40 @@ spacing:
   targa-pad: "6px 12px"
   sala-min: "420px"
 components:
-  nav:
-    backgroundColor: "{colors.nav}"
-    textColor: "{colors.fg}"
-    typography: "{typography.label}"
-    height: "48px"
-  nav-brand:
-    textColor: "{colors.fg}"
-    typography: "{typography.brand}"
-  dock-tray:
-    backgroundColor: "{colors.tray}"
-    rounded: "{rounded.dock}"
-    padding: "10px"
-    height: "calc(var(--sz) + 20px)"
-  dock-tray-mobile:
-    backgroundColor: "{colors.tray}"
-    rounded: "{rounded.dock}"
-    padding: "14px 10px 10px"
-    width: "min(100%, 360px)"
-  dock-icon:
-    rounded: "{rounded.icon}"
-    size: "{spacing.icon}"
-  dock-icon-mobile:
-    rounded: "{rounded.icon}"
-    size: "{spacing.icon-mobile}"
-  dock-tooltip:
-    backgroundColor: "{colors.tip}"
-    textColor: "{colors.fg}"
-    typography: "{typography.tooltip}"
-    rounded: "{rounded.tip}"
-    padding: "5px 10px"
-  tile:
-    backgroundColor: "{colors.tile}"
-    textColor: "{colors.fg}"
-    rounded: "{rounded.tile}"
-    padding: "28px"
-  tile-mobile:
-    backgroundColor: "{colors.tile}"
-    rounded: "{rounded.tile-mobile}"
-    padding: "24px"
-  tile-github:
-    backgroundColor: "{colors.github-graphite}"
-    textColor: "{colors.github-graphite-text}"
-    rounded: "{rounded.tile}"
-    padding: "28px"
-  tile-title:
-    textColor: "{colors.fg}"
-    typography: "{typography.title}"
-  tile-handle:
-    textColor: "{colors.fg2}"
-    typography: "{typography.body}"
-  tile-go:
-    textColor: "{colors.link}"
-    typography: "{typography.body}"
-  tile-app-icon:
-    rounded: "{rounded.icon}"
-    size: "60px"
-  empty-folder:
-    backgroundColor: "{colors.slot}"
-    rounded: "{rounded.icon}"
-    size: "128px"
-    padding: "16px"
-  empty-slot:
-    backgroundColor: "{colors.slot}"
-    rounded: "{rounded.icon}"
-    size: "60px"
-  empty-slot-label:
-    textColor: "{colors.fg2}"
-    typography: "{typography.label}"
-  footer:
-    textColor: "{colors.fg2}"
-    typography: "{typography.label}"
-    padding: "22px 0 max(22px, env(safe-area-inset-bottom))"
+  volantino:
+    textColor: "{colors.inchiostro}"
+    typography: "{typography.corpo}"
+    rounded: "{rounded.nessuno}"
+  volantino-titolo:
+    textColor: "{colors.inchiostro}"
+    typography: "{typography.titolo}"
+  volantino-mano:
+    textColor: "{colors.marker}"
+    typography: "{typography.mano}"
+  volantino-handle:
+    textColor: "{colors.marker}"
+    typography: "{typography.handle}"
+  tagliando:
+    textColor: "{colors.marker}"
+    typography: "{typography.tagliando}"
+    height: "{spacing.tagliandi}"
+  nota-copiato:
+    backgroundColor: "rgba(255,255,255,.85)"
+    textColor: "{colors.marker-rosso}"
+    typography: "{typography.copiato}"
+    padding: ".2em .4em"
+  piu18:
+    backgroundColor: "{colors.marker-rosso}"
+    textColor: "#fff"
+    typography: "{typography.piu18}"
+    rounded: "{rounded.piu18}"
+    padding: ".35em .4em"
+  insegna:
+    width: "min(100%, 840px)"
+  marciapiede:
+    textColor: "{colors.marciapiede-testo}"
+    typography: "{typography.marciapiede}"
+    padding: "{spacing.marciapiede}"
   sala:
     backgroundColor: "{colors.sala}"
     textColor: "{colors.felt-fg}"
@@ -415,54 +339,45 @@ components:
 
 # Design System: pzkko.it
 
-> **Perimetro.** Questo documento descrive **solo pzkko.it**, la cartella statica `albertopecchini.it/pzkko/` (index.html, 404.html e le icone accanto). Gli altri due siti dello stesso repository, albertopecchini.it (portfolio, `albertopecchini.it/src/`) e bettercallpekko.it (`SITE=bcp`), hanno ciascuno la propria identità già nel codice e **non** la condividono con questa: niente di quanto segue va applicato a loro, e niente di loro va portato qui.
+> **Perimetro.** Questo documento descrive **solo pzkko.it**, la cartella statica `albertopecchini.it/pzkko/` (index.html, 404.html, `art/`, `fonts/` e le icone accanto). Gli altri due siti dello stesso repository, albertopecchini.it (portfolio, `albertopecchini.it/src/`) e bettercallpekko.it (`SITE=bcp`), hanno ciascuno la propria identità già nel codice e **non** la condividono con questa: niente di quanto segue va applicato a loro, e niente di loro va portato qui.
 >
-> Fonte di verità: i token stanno in `:root` e nel blocco `@media (prefers-color-scheme:dark)` di `index.html`; il CSS e lo script sono in linea nelle pagine, non c'è build. La 404 è generata dalla home da `tools/pzkko/genera-404.mjs` e ne eredita tutto, dock compreso.
+> Fonte di verità: i token stanno in `:root` e nel blocco `@media (prefers-color-scheme:dark)` di `index.html`; il CSS e lo script sono in linea nelle pagine, non c'è build. La 404 è generata dalla home da `tools/pzkko/genera-404.mjs` e ne eredita tutto. Le immagini del muro sono in `art/` (prompt in `tools/pzkko/fogli.js`, pipeline `immagini.mjs`); ogni WebP porta dentro il prompt con cui è nato. Le pagine dei giochi (`games/blackjack/`, `games/roulette/`) sono rimaste nella loro sala dal 7–8.10: qui restano documentate così come sono.
 
 ## Overview
 
-**Creative North Star: "La scrivania di pzkko"**
+**Creative North Star: "Il muro di pzkko"**
 
-pzkko.it è una scrivania, non un elenco. I cinque social e le due zone (tools, games) vivono come icone di app in un dock di vetro posato in fondo al primo schermo: l'hero occupa tutta la finestra, con il solo nome e una riga al centro e il dock sul bordo inferiore, e scorre via con il resto («se scorro giù via la barra, non mi serve», 2026-10-07). Sotto, schede bento spiegano ogni social. La grammatica è quella del web di Apple, presa per intero e non citata: carattere di sistema, display stretto, 17 px di corpo, materiali traslucidi con sfocatura, superellissi vere, molle criticamente smorzate che si possono interrompere in ogni istante.
+pzkko.it è un muro, non un elenco. La pagina è la saracinesca grigia di un negozio chiuso (il riferimento del 2026-10-09 è la serranda di un «coin» a Bologna: insegna sopra, graffiti e manifesti sotto): l'insegna del negozio ora dice «pzkko», e ogni social, gioco e strumento è un volantino di carta attaccato alla lamiera col nastro, storto, sovrapposto agli altri, stampato su una carta diversa con un inchiostro diverso. Niente è disegnato dal CSS dove può essere fotografato: la lamiera, i fogli con il loro nastro e le loro graffette, le illustrazioni, i graffiti, i manifesti degli «altri», l'insegna, le parole sprayate sono immagini generate con gpt-image-2 su Replicate, scontornate con una chiave cromatica e composte nella pagina; il CSS scrive sopra i fogli il testo vero, in quattro caratteri da tipografia di quartiere, e posiziona ogni cosa in 1280esimi della parete.
 
-Il primo schermo si adatta a qualunque finestra su entrambi gli assi: nome, riga, icone e respiri verticali sono `clamp()` con un `min(vw, svh)` in mezzo, così la scrivania intera sta sempre in vista senza scorrere, da un telefono stretto a una finestra bassa e larga. La densità è bassa e la gerarchia è data dalla dimensione e dal peso di un unico carattere (sempre 600 per i titoli, 400 per il resto), mai dal colore: tutta la pagina è neutra (bianco e #f5f5f7 in chiaro, nero e #1d1d1f in scuro) e il colore di marca compare solo dentro le icone squircle e come alone tenue nelle schede. Il sito segue il tema del sistema con `color-scheme: light dark`, è tutto in minuscolo e parla in prima persona.
+La densità è alta per scelta («volantini, street, caos, colori»): i fogli si coprono ai bordi, i graffiti stanno sotto, i manifesti inventati peggiorano il disordine, ma ogni volantino che conta resta intero e leggibile, e ogni link copre tutto il suo foglio. Il momento che si ricorda è il tagliando: i volantini dei social finiscono con la fila di tagliandi da strappare, e strapparne uno copia il contatto e lascia il buco sul muro. Il sito segue il tema del sistema: di giorno la strada, di notte la lamiera si spegne, una luce al sodio cade dall'alto e l'insegna si accende da dietro. Tutto il testo è minuscolo e in prima persona.
 
-Rifiuti confermati dal percorso di progetto: la colonna link-in-bio di tasti uguali; l'hero su mesh gradient con tre card; gli oggetti skeuomorfici letterali (la prima versione con iPhone e portafoglio MagSafe, bocciata il 2026-10-07); il dock fissato alla finestra che segue lo scorrimento (provato e tolto lo stesso giorno); le rivelazioni allo scorrimento e qualunque movimento decorativo che giri da solo.
+Rifiuti confermati dal percorso di progetto: la colonna link-in-bio di tasti uguali; l'hero su mesh gradient con tre card; la scrivania Apple con dock e bento (il mondo del 2026-10-07, sostituito e non rifinito); le imitazioni in CSS di materiali fotografabili (bordi strappati in `clip-path`, nastro in gradiente, spray in `text-shadow`: provati per le intestazioni di zona e sostituiti con le parole sprayate vere); le rivelazioni allo scorrimento e qualunque movimento decorativo che giri da solo.
 
 **Key Characteristics:**
-- Un dock in fondo al primo schermo (`.dockwrap` / `.dock`) come azione primaria: sette icone, separatore, vetro con `backdrop-filter: blur(30px) saturate(1.6)`; scorre via con l'hero.
-- Primo schermo «adattatore automatico»: `--sz: clamp(44px, min(4.6vw, 7.5svh), 64px)` e le stesse curve a due assi per nome, riga e respiri.
-- Una sola famiglia tipografica, quella di sistema, in due tagli (`--fd` display, `--ft` testo); tutto minuscolo.
-- Neutri puri più un solo accento, il blu link (`--link`); il colore di marca vive solo nelle icone e negli aloni `--glow`.
-- Superellisse vera (clipPath `#sq`) per ogni icona e per gli stati vuoti; raggio 28 px per schede e dock.
-- Un solo momento di movimento autoriale (ingresso dell'hero e del dock), poi solo movimento in risposta al puntatore o al dito.
-- Ripieghi dichiarati per `prefers-reduced-motion` e `prefers-reduced-transparency`.
+- La lamiera fotografata (`art/muro.webp`) come fondo di tutta la pagina, tagliata sul passo delle doghe e specchiata, così si ripete senza giunte.
+- Ogni link è un volantino (`.vol`): un foglio fotografato con i bordi veri misurati (`.c-bianco`, `.c-giallo`, …), il testo vero in HTML sopra, misurato in `cqw` del foglio, l'illustrazione in `mix-blend-mode: multiply` come inchiostro sulla carta.
+- Quattro caratteri serviti dal sito: Anton (titoli urlati), Archivo Black (seconda voce), Special Elite (corpo fotocopiato), Permanent Marker (note a mano, handle, tagliandi).
+- I tagliandi da strappare (`.tagliandi`): fette della stessa carta, un tocco strappa e copia il contatto.
+- Posizionamento assoluto in unità della parete (`--x`, `--y`, `--w`, `--r` su 1280; `--mx`, `--my`, `--mw`, `--mr` su 390), rotazioni di pochi gradi, ordine di profondità graffiti → manifesti → volantini → nastri sopra.
+- Il colore è quello delle carte e degli inchiostri da stampa, mai dell'interfaccia; l'unico colore «di sistema» è il giallo del fuoco da tastiera.
+- Niente raggi, niente vetro, niente linee: i bordi sono quelli strappati delle foto.
+- Movimento solo in risposta: il foglio si solleva sotto il puntatore, il tagliando cade quando lo si strappa; `prefers-reduced-motion` rispettato.
 
 ## Colors
 
-Una tavolozza di neutri Apple in due temi, con il blu link come unico accento e il colore di marca confinato nelle icone.
+Una tavolozza di materiali: la pietra del portale, la lamiera, le carte dei volantini (fotografate: bianco, giallo canarino, kraft, carta da giornale, arancio fluo, verde pallido, crema, bianco lucido, azzurro) e gli inchiostri da stampa sopra. Il magenta non esiste: è il colore della chiave cromatica con cui si scontornano i pezzi, e non può comparire su nessuno di essi.
 
 ### Primary
-- **Blu link** (`--link`, chiaro `#0066cc`, scuro `#2997ff`): il solo accento della pagina. Colora la riga «apri …» (`.go`) in fondo a ogni scheda, l'anello di fuoco (`:focus-visible`, 2 px, offset 3 px) e la selezione del testo (`::selection`, `rgba(0,113,227,.28)`). Dentro la scheda grafite di GitHub il blu è fissato a `#2997ff` in entrambi i temi, perché quella scheda è scura sempre.
+- **Inchiostro** (`--inchiostro`, `#161616`): il nero del toner e della stampa: titoli (`.vol h3`, `.titolo`), corpo (`.vol p`), elenco dei siti. Sul kraft è anche il colore del pennarello (`--marker-c: #161616`), perché il rosso non legge sulla carta scura.
+- **Pennarello** (`--marker`, `#111`) e i suoi colori di foglio: ogni volantino dichiara in linea `--marker-c` per le note a mano, l'handle e i tagliandi: teal `#173f48` sull'arancio (anche per il titolo «instagram»), verde `#0b5d2b` sul verde, blu `#1446a0` sul crema e sul giallo, rosso `--marker-rosso` `#a50d25` sui fogli bianchi, lucidi, azzurri e di giornale (le note «gioca», «in arrivo», le frecce dell'elenco GitHub, la nota «copiato»). Il rosso è scuro apposta: deve leggere anche sull'azzurro.
+- **Giallo del fuoco** (`#ffd400`): l'anello di `:focus-visible` (3 px, offset 3 px; 4 px sul volantino intero) e la selezione del testo (`::selection`, con inchiostro `#111`). È il solo colore d'interfaccia e sta solo lì.
 
 ### Neutral
-- **Fondo** (`--bg`, `#fff` / `#000`): la carta della pagina e dell'`html`, anche come ripiego opaco della striscia di navigazione quando la trasparenza è ridotta.
-- **Scheda** (`--tile`, `#f5f5f7` / `#1d1d1f`): il grigio delle schede bento e dei due stati vuoti; anche ripiego opaco del dock senza trasparenza.
-- **Testo** (`--fg`, `#1d1d1f` / `#f5f5f7`): titoli, nome nel dock mobile, testo dell'etichetta a comparsa.
-- **Testo secondario** (`--fg2`, `#6e6e73` / `#a1a1a6`): la riga sotto il nome (`.lede`), gli handle (`.hd`), le descrizioni degli stati vuoti, il piè di pagina, le etichette degli slot; anche il colore della barra di scorrimento.
-- **Filo** (`--hair`, `rgba(0,0,0,.1)` / `rgba(255,255,255,.14)`): l'unica linea della pagina: il bordo sotto la nav quando si scorre (`.nav.scrolled`), il separatore del dock (`.sep`), il bordo alto del piè di pagina, l'anello da 1 px intorno all'etichetta.
-- **Vetro della nav** (`--nav`, `rgba(255,255,255,.72)` / `rgba(0,0,0,.62)`): la striscia traslucida in alto, sempre con `blur(20px) saturate(1.8)`.
-- **Vetro del dock** (`--tray`, `rgba(255,255,255,.55)` / `rgba(255,255,255,.08)`) con bordo (`--tray-edge`) e luce interna (`--tray-in`): il materiale del dock. In scuro il vetro è bianco a bassa opacità, non nero: è il dock di macOS in modalità scura.
-- **Etichetta** (`--tip`, `rgba(255,255,255,.94)` / `rgba(44,44,46,.96)`): il fumetto che compare sopra l'icona col puntatore.
-- **Slot** (`--slot`, `rgba(0,0,0,.06)` / `rgba(255,255,255,.07)`) con bordo interno (`--slot-edge`): la forma di ciò che arriverà nei due stati vuoti (cartella e caselle).
-- **Grafite GitHub** (`#24292f`, testo `#f5f5f7`, secondario `#a1a1a6`, righe `rgba(255,255,255,.12)`): la sola scheda colorata, identica nei due temi, fissata in CSS e non in token perché non cambia col tema.
-- **Icone grafite** (`--gh-a`/`--gh-b` per GitHub, `--gm-a`/`--gm-b` per games): sfumature verticali da chiaro a scuro, più luminose in tema scuro perché l'icona resti leggibile sul vetro.
-
-### Campo di colore (sfondo dell'hero)
-- **Tre aloni** (`--f1` blu `rgba(10,132,255,…)`, `--f2` rosa `rgba(255,45,85,…)`, `--f3` arancio `rgba(255,159,10,…)`): tre `radial-gradient` posizionati nella metà bassa dell'hero (`.field`), dietro il dock. In chiaro sono quasi impercettibili (.13–.17 di alpha), in scuro salgono (.28–.42) perché su nero il vetro ha bisogno di qualcosa da sfocare. Sono lo «sfondo della scrivania»: non vanno usati altrove.
-
-### Colori di marca (solo dentro le icone)
-Le superfici delle icone sono sfumature verticali `linear-gradient(180deg, var(--ia), var(--ib))` con i colori dichiarati in linea sull'elemento: WhatsApp `#60d66a → #20b038`, e-mail `#1fb6ff → #0a6cff`, PayPal `#009cde → #003087`, tools `#9a9aa0 → #636366`; Instagram ha il suo gradiente radiale di marca (`#fdf497`, `#fd5949`, `#d6249f`, `#285aeb`). Il glifo è sempre bianco (`#fff`). Ogni scheda porta un alone `--glow` dello stesso colore di marca a bassa alpha (per esempio `rgba(214,36,159,.34)` per Instagram, `rgba(37,211,102,.26)` per WhatsApp, `rgba(120,120,128,.14)` per gli stati vuoti), disegnato come `radial-gradient` nell'angolo in alto a sinistra della scheda.
+- **Pietra** (`--pietra` `#2e2c29` → `--pietra2` `#1f1e1c`): il portale intorno alla saracinesca e il fondo dell'`html`; `.strada` lo porta con una grana SVG (`feTurbulence`) e un riflesso dall'alto. È anche il `theme-color`.
+- **Lamiera** (`#8e8e8a`, il colore medio di `art/muro.webp`): il fondo della parete, in `background-color` sotto la foto, e il colore che prendono i pixel trasparenti dei ritagli perché i bordi sfumati non restino rosa.
+- **Carta**: non è un token ma nove fotografie (`art/carta/*.webp`), ciascuna con la sua proporzione `--ar` e i bordi veri (`--el`, `--er`, `--pad`, `--giu`) misurati sul ritaglio. Il bianco `#fff` resta solo nella nota «copiato» (`rgba(255,255,255,.85)`) e nel badge «+18».
+- **Marciapiede** (`--asfalto` `#3a3937`; testo `#cfcbc4`, link `#f1eee8`; di notte testo `#b9b5ae`): il piè di pagina sotto la saracinesca, con il credito.
+- **Notte** (sodio `rgba(255,176,70,.22)` in un `radial-gradient` dall'alto; lamiera a `brightness(.52) saturate(.85)`; fogli e manifesti a `brightness(.86) saturate(.95)`; graffiti a `.8` di opacità; insegna a `brightness(1.1)` con due aloni `rgba(255,236,190,.45)` / `rgba(255,220,150,.3)`): il tema scuro non cambia i colori, cambia la luce.
 
 ### La sala e il feltro (solo nelle pagine dei giochi, da `games/blackjack/`)
 Il primo gioco (blackjack, 2026-10-07; rifatto a scena fotografica il 7–8.10) porta nel sistema un secondo campo di colore, confinato alla pagina del gioco: la sala buia e il feltro fotografato. La pagina è scura sempre (`color-scheme: dark`, con i token scuri della home fissati in `:root`): sala e feltro non seguono il tema. I token stanno in `:root` di `games/blackjack/index.html`.
@@ -478,32 +393,32 @@ Il primo gioco (blackjack, 2026-10-07; rifatto a scena fotografica il 7–8.10) 
 - **Campo** (`--campo`, chiaro `#fff`, scuro `#2c2c2e`): il fondo dei campi e dei tasti secondari sulle superfici neutre (pagina del banco), con anello interno `--hair`.
 
 ### Named Rules
-**La regola del blu unico.** L'unico accento della pagina è `--link`. Non esistono altri colori di interfaccia: niente verde di conferma, niente rosso di errore, niente bottoni pieni colorati. Se serve attenzione, si usa peso o dimensione, non tinta.
+**La regola della carta fotografata.** Un volantino nuovo nasce da uno dei nove fogli di `art/carta/` (si riusano, anche specchiati con `.flip`): non si disegna una carta in CSS, non si imita un bordo strappato con `clip-path`, non si inventa un nastro con un gradiente. Se serve un materiale che manca, si genera un foglio nuovo con `tools/pzkko/immagini.mjs` e si scontorna.
 
-**La regola del colore dentro l'icona.** Il colore di marca di un servizio vive in due posti soltanto: la superficie della sua icona squircle e l'alone `--glow` della sua scheda. Mai nel testo, mai nel bordo, mai nel fondo di una scheda.
+**La regola del magenta.** Magenta, rosa e viola non esistono nel sistema: sono la chiave cromatica. Nessun inchiostro, nessun pennarello, nessun manifesto li usa, e un'immagine che li contenesse perderebbe quei pixel nel ritaglio.
 
-**La regola della grafite che si guadagna.** La sola scheda a fondo pieno è quella di GitHub (`#24292f`), e lo è perché porta contenuto in più: l'elenco dei tre siti che ospita. Una scheda non si colora per decorazione; si colora quando ha qualcosa da dire che le altre non hanno.
+**La regola dell'inchiostro.** I colori del testo sono inchiostri da stampa o da pennarello sopra una carta, dichiarati per foglio (`--marker-c`, `--titolo`), e si scelgono per leggere su quella carta (≥ 4,5:1 sul corpo). Non esistono colori d'interfaccia: niente blu dei link, niente verde di conferma, niente rosso d'errore. L'unica eccezione è il giallo del fuoco.
 
 **La regola del feltro.** La sala e il feltro sono il solo campo di colore dei giochi e non seguono il tema: sopra ci stanno bianco, bianco velato (`--felt-fg2`), nero velato (`rgba(0,0,0,.4–.6)`) con anello `--glass-edge` e il blu del tasto primario; niente grigi di pagina, niente `--tile`, niente segni colorati sul feltro. Fuori dalla sala la pagina torna neutra come la home.
 
 ## Typography
 
-**Display Font:** il carattere di sistema in taglio display (`--fd`: SF Pro Display su Apple, Segoe UI Variable Display su Windows, poi Roboto, Helvetica, Arial)
-**Body Font:** il carattere di sistema in taglio testo (`--ft`: SF Pro Text, Segoe UI Variable Text, poi Roboto, Helvetica, Arial)
-**Label/Mono Font:** nessuno; le etichette usano `--ft` a 11–13 px. I numeri (telefono, handle) usano `font-variant-numeric: tabular-nums`.
+**Display Font:** Anton (`--fa`; ripiego Impact, Arial Narrow Bold), OFL, servito da `fonts/anton.woff2`
+**Body Font:** Special Elite (`--ft`; ripiego Courier New), Apache 2.0, `fonts/special-elite.woff2`
+**Label/Mono Font:** Permanent Marker (`--fm`; ripiego Comic Sans MS), Apache 2.0, `fonts/permanent-marker.woff2`, per tutto ciò che è scritto a mano; Archivo Black (`--fb`), OFL, `fonts/archivo-black.woff2`, per la seconda voce urlata
 
-**Character:** una sola famiglia, quella che il visitatore ha già sul dispositivo; la gerarchia nasce dalla dimensione, dal peso 600 contro 400 e dalla spaziatura negativa che si stringe salendo di corpo (da -.01em a -.035em). Nel primo schermo le dimensioni seguono la finestra su entrambi gli assi; dal secondo schermo in giù seguono solo la larghezza. Tutto il testo visibile è minuscolo, scritto così nel sorgente e non con `text-transform`. Nessun carattere viene scaricato.
+**Character:** quattro voci di una tipografia di quartiere: il titolo condensato e pesante del manifesto (Anton), il grottesco nero della locandina (Archivo Black), la macchina da scrivere della fotocopia (Special Elite) e il pennarello di chi ha aggiunto il numero a mano (Permanent Marker). Dentro un volantino ogni misura è in `cqw` del volantino stesso (`container-type: inline-size` su `.vol`) con un pavimento in pixel, così il foglio si legge allo stesso modo a 300 px sul desktop e a 190 px sul telefono, e un foglio più stretto non scende mai sotto i 12 px di corpo. Tutto il testo visibile è minuscolo nel sorgente, nomi propri compresi; i caratteri usano `font-display: swap` e i due principali sono precaricati.
 
 ### Hierarchy
-- **Display** (600, `clamp(2.75rem, min(9vw, 13svh), 6rem)`, interlinea 1, `-.035em`): solo il nome «pzkko» nell'hero; il `min(9vw, 13svh)` lo tiene nel primo schermo anche in finestre basse. Nella 404 il titolo scende a `clamp(2.25rem, 6vw, 4rem)`, interlinea 1.05, `-.03em` (`.p404 h1`), perché è una frase e non un marchio.
-- **Headline** (600, `clamp(2rem, 4vw, 2.5rem)`, interlinea 1.1, `-.02em`): i titoli di sezione «social», «tools», «games» (`.sec h2`), con 28 px sotto.
-- **Title** (600, 24 px, interlinea 1.2, `-.02em`): il nome del servizio nella scheda (`.tx strong`) e il titolo degli stati vuoti (`.empty h3`).
-- **Lede** (400, `clamp(1rem, min(1.5vw, 2.6svh), 1.3125rem)`, interlinea 1.38, colore `--fg2`): la riga sotto il nome, `max-width: 68ch`, `text-wrap: balance`, su una riga sola a desktop.
-- **Body** (400, 17 px, interlinea 1.47, `-.01em`): il corpo di tutto, compresi handle (`.hd`), note (`.nt`, max 32ch), riga «apri …» (`.go`) e descrizioni degli stati vuoti (max 40ch).
-- **Brand** (600, 17 px, interlinea 1, `-.02em`): «pzkko» nella striscia di navigazione.
-- **List** (400, 15 px): l'elenco dei siti nella scheda GitHub (`.sites`), numeri tabulari.
-- **Tooltip** (400, 13 px, `-.01em`): l'etichetta sopra l'icona del dock col puntatore.
-- **Label** (400, 12 px, `-.01em`): voci della nav, piè di pagina, nomi dei giochi sotto gli slot. Nel dock mobile le etichette sotto le icone scendono a 11 px.
+- **Titolo** (Anton 400, `max(26px, 18cqw)`, interlinea .95, `.005em`; `max(22px, 16cqw)` sotto i 900 px; `max(26px, 15cqw)` nella 404): il nome del servizio o del gioco (`.vol h3`, `.titolo`), bilanciato con `text-wrap: balance`. Quando il volantino è un link, il titolo è il link e al passaggio si sottolinea (`.08em`, offset `.1em`).
+- **Forte** (Archivo Black 400, `max(12px, 5cqw)`, `-.01em`): la prima riga del volantino di presentazione («pzkko è il mio nome in rete.»).
+- **Corpo** (Special Elite 400, `max(12px, 5.4cqw)`, interlinea 1.28; `max(12px, 5.6cqw)` sotto i 900 px): il testo del volantino; l'elenco dei siti (`.siti`, `max(12px, 5.2cqw)`, interlinea 1.3) con la freccia a pennarello davanti.
+- **Mano** (Permanent Marker 400, `max(14px, 7.2cqw)`, interlinea 1.05, ruotato di −2°): le note a pennarello («strappa un tagliando: copia il contatto», «gioca» con la freccia, «in arrivo»); `.vai` sta a destra, ruotato di −4°.
+- **Handle** (Permanent Marker 400, `max(13px, 6cqw)`, interlinea 1.1, `overflow-wrap: anywhere`; `max(12px, 6cqw)` sotto i 900 px): il contatto scritto a mano in fondo al foglio, spinto giù con `margin-top: auto`.
+- **Tagliando** (Permanent Marker 400, `max(9px, 3.6cqw)`, `writing-mode: vertical-rl` ruotato di 180°): il contatto ripetuto di traverso su ogni tagliando, tagliato se non entra (è decorazione: il nome accessibile del tasto dice cosa copia).
+- **Copiato** (Permanent Marker 400, `max(16px, 9cqw)`, ruotato di −6°): la nota «copiato: …» che compare sul foglio dopo lo strappo.
+- **+18** (Archivo Black 400, `max(12px, 6cqw)`, bianco su `--marker-rosso`, disco ruotato di 12°): il bollo sul volantino del blackjack.
+- **Body / Marciapiede** (Special Elite 400, 16 px / 14 px, interlinea 1.4): il corpo di pagina e il piè di pagina.
 - **Button** (600, 15 px, interlinea 1, `-.01em`): i tasti a pillola dei giochi (`.b`, 44 px) nel vassoio in basso e nel velo.
 - **Tasto del bordo** (600, 14 px, interlinea 1.1, `-.01em`): il nome della mossa dentro il tasto tondo da 64 px (`.tasto`); sotto, la scorciatoia (`.k`, 11 px, 400, opacità .75) o la cifra della puntata; nei tasti piccoli da 56 px (`.tasto.s`) scende a 13 px.
 - **Targa** (600, 15 px, interlinea 1.2): il nome sotto la sedia (`.targa`), con il saldo a 12 px 400 `--felt-fg2` sotto; «(tu)» accanto al proprio nome.
@@ -513,42 +428,42 @@ Il primo gioco (blackjack, 2026-10-07; rifatto a scena fotografica il 7–8.10) 
 - **Carta di ripiego** (700, 44 px, `-.04em`, `--fd`; indici d'angolo 22 px): la faccia CSS (`.faccia.css`), usata solo se l'immagine del mazzo manca; l'unico 700 del sistema resta stampa sulla carta.
 
 ### Named Rules
-**La regola del sistema.** Non si aggiungono webfont. Il carattere è quello del dispositivo, nei due tagli `--fd` e `--ft`; se una piattaforma non ha il taglio display, la catena di ripiego lo risolve da sola.
+**La regola dei quattro caratteri.** Non si aggiunge un quinto carattere e non si usa il carattere di sistema per il testo visibile: ogni voce ha il suo (Anton urla, Archivo Black ribadisce, Special Elite spiega, Permanent Marker annota). I caratteri stanno in `fonts/` e si caricano con `@font-face`, mai da un host esterno.
 
-**La regola del minuscolo.** Tutto il testo visibile è minuscolo nel sorgente, nomi propri compresi («alberto pecchini», «instagram»). Non si usa `text-transform`, né in un verso né nell'altro. Titolo e meta della pagina conservano le maiuscole.
+**La regola del cqw.** Dentro un volantino il testo si misura in `cqw` del volantino con `max(px, cqw)`: la misura segue il foglio, il pavimento in pixel difende la leggibilità. Fuori dai volantini (marciapiede) si usano i pixel.
+
+**La regola del minuscolo.** Tutto il testo visibile è minuscolo nel sorgente, nomi propri compresi («alberto pecchini», «instagram»). Non si usa `text-transform`. Titolo e meta della pagina conservano le maiuscole.
 
 ## Layout
 
-La pagina è una colonna centrata di larghezza massima 1024 px (`.wrap`, `max-width: 1024px`, padding laterale 22 px, 16 px sotto i 640 px). Il `body` è una colonna flex a `min-height: 100svh` con `main` che si allarga, così il piè di pagina sta in fondo anche con poco contenuto.
+La pagina è la strada: `.strada` (pietra) con `padding: 0 var(--stipite)` (`clamp(10px, 3vw, 40px)`: gli stipiti del portale), dentro il portale `.portale` (padding `clamp(18px, 3.2vw, 40px) 0 clamp(14px, 2.4vw, 30px)`) con l'insegna centrata larga `min(100%, 840px)`, poi la saracinesca `.muro` (larghezza massima 1280 px, centrata, `container-type: inline-size`, `isolation: isolate`, ombra interna in alto e in basso e un filo scuro intorno) e sotto il marciapiede.
 
-**Primo schermo.** Una nav sticky alta 48 px e sotto un hero che occupa il resto della finestra: `min-height: calc(100svh - 48px)`, con `svh` e non `vh` perché su iPhone la barra dell'indirizzo non faccia saltare nulla; padding `24px 16px calc(28px + env(safe-area-inset-bottom))` (12 px sopra a telefono). L'hero è una colonna flex: `.intro` (flex 1) centra nome e riga nello spazio disponibile con respiri `clamp(12px, 3svh, 32px) 0 clamp(16px, 4svh, 40px)` (`clamp(8px, 2svh, 24px) 0 clamp(12px, 3svh, 32px)` a telefono), e `.dockwrap`, una riga flex centrata a larghezza piena, chiude l'hero in basso. Il dock fa parte del flusso: scorre via con il primo schermo, non segue la finestra.
+**La parete.** `.parete` è un rettangolo a misure fisse, alto `calc(1700 * var(--u))` con `--u = calc(100cqw / 1280)`: tutto ciò che sta sul muro è `position: absolute` con `left`, `top` e `width` in unità della parete (`--x`, `--y`, `--w`) e una rotazione `--r` di pochi gradi (da −8° a +6°; i nastri sciolti fino a ±50°). L'ordine di profondità è `z-index`: graffiti 0 (`.tag`), manifesti e resti 1 (`.man`, `.pezzo`), volantini 3 (2 per quelli «sotto»), nastri sciolti sopra i fogli 4, il foglio al passaggio 5. Le posizioni sono scritte a mano, per righe: presentazione + tre social in alto, e-mail, paypal e i due giochi in mezzo, strumenti e i tre giochi «in arrivo» sotto, i manifesti inventati e i graffiti negli spazi che restano, con qualche sovrapposizione voluta ai bordi dei fogli e mai sul testo.
 
-**Adattatore automatico.** Tutto ciò che sta nel primo schermo si misura su entrambi gli assi con `clamp(min, min(Xvw, Ysvh), max)`: l'icona del dock `--sz: clamp(44px, min(4.6vw, 7.5svh), 64px)`, il nome, la riga, i respiri di `.intro`. Il risultato è che hero e dock stanno sempre interi nella finestra, qualunque sia il rapporto fra larghezza e altezza. Sotto i 640 px l'icona si misura sulla sola larghezza, `clamp(48px, 14vw, 56px)`.
+**Il volantino cresce.** `.vol` ha `aspect-ratio: var(--ar)` (la proporzione del foglio) ed è una colonna flex con il testo in flusso (`.testo`, padding `--pad` dai bordi veri della carta): se il testo è più lungo della carta il foglio si allunga, perché l'immagine è in `background-size: 100% 100%`. Le posizioni sotto tengono conto delle altezze reali misurate (desktop: i social finiscono a y ≈ 520, la seconda riga parte da 480–560, la terza da 930–1000).
 
-**Dock.** A desktop una riga di icone da `--sz` allineate in basso, gap 8 px, padding 10 px, alto `calc(var(--sz) + 20px)`. Sotto i 640 px diventa una schermata home: `flex-wrap: wrap`, al massimo tre app per riga (`flex: 0 0 calc(33.333% - 10px)`, quindi 3+3+1 con sette icone), icone `clamp(48px, 14vw, 56px)` con etichetta da 11 px sotto, larghezza 100% fino a 360 px, padding `14px 10px 10px`, il separatore sparisce.
+**Telefono (≤ 899 px).** `--u = calc(min(100cqw, 600px) / 390)`, la parete alta `2900` unità e larga al massimo 600 px centrata (su un tablet la lamiera riempie i lati): ogni elemento passa a `--mx`, `--my`, `--mw`, `--mr`. Due volantini per riga (≈ 190 px l'uno), la presentazione a riga piena in cima, i manifesti inventati a fianco o fra le righe, i graffiti dietro. I titoli scendono a `max(22px, 16cqw)`, i tagliandi salgono a `max(46px, 17cqw)`.
 
-**Bento.** Griglia a 6 colonne (`.bento`, gap 16 px). Instagram e GitHub occupano 3 colonne ciascuna con `min-height: 280px`; WhatsApp, e-mail e PayPal 2 colonne ciascuna con `min-height: 230px`. Sotto i 1024 px WhatsApp ed e-mail salgono a 3 colonne e PayPal prende la riga intera; sotto i 640 px tutto a colonna piena, gap 12 px, altezza minima libera. Gli stati vuoti sono una scheda a due colonne (`.empty`, `minmax(0,1fr) auto`, gap `32px 48px`) con testo a sinistra e forma a destra; a telefono diventano una colonna sola (gap 28 px) con la forma allineata a sinistra.
+**Ritmo.** Non c'è un ritmo di sezioni: ci sono righe di fogli con 20–60 unità d'aria o di sovrapposizione, e le tre parole sprayate come intestazioni di zona (`#social`, `#games`, `#tools`, con `scroll-margin-top: 24px`). Il marciapiede ha `22px 4px max(22px, env(safe-area-inset-bottom))`.
 
-**Ritmo verticale.** Le sezioni distano 88 px dal contenuto sopra (`.sec`, 64 px a telefono) e l'ultima aggiunge 96 px sotto; `scroll-margin-top: 72px` per gli anchor della nav. Il piè di pagina ha 22 px sopra e `max(22px, env(safe-area-inset-bottom))` sotto.
-
-**Soglie.** `max-width: 1023px` (bento a due per riga), `max-width: 640px` (telefono: dock a griglia, colonna singola), `(hover: hover) and (pointer: fine)` per le etichette a comparsa, `(hover: hover) and (pointer: fine) and (min-width: 641px)` per la fisica del dock nello script.
+**Soglie.** `max-width: 899px` (parete in 390esimi), i 600 px di larghezza massima della parete stretta, `(hover: hover)` per il sollevamento e il tagliando che si abbassa, `prefers-color-scheme: dark` per la notte, `prefers-reduced-motion: reduce` per togliere transizioni e caduta.
 
 **Sala (giochi).** La pagina del gioco riusa la nav da 48 px; sotto, un solo oggetto a tutta larghezza riempie il primo schermo: `.sala`, alta `calc(100svh - 48px)` (minimo 420 px), con `overflow: clip` e `isolation: isolate`. Dentro, `.mondo` è un palcoscenico a misure fisse scalato alla finestra: un mondo **largo** di 1600 × 1000 quando la finestra è più larga di 0,9 volte la sua altezza, uno **alto** di 1000 × 1400 altrimenti. La scala `--k` è `min(W/w, H/h)` per il largo (tutto il mondo in vista) e `max(W/w, H/h)` per l'alto (il mondo copre lo schermo e sborda ai lati). Il mondo sta centrato con `translate(-50%, -50%) scale(--k)` e in verticale si sposta di `--pan` (`-(x della propria sedia − w/2) · 0,52`): la telecamera del telefono inquadra il banco e, quando ci si siede, scorre a metà strada verso la propria sedia (`.6s var(--eo)`). Il piano è la pianta del tavolo (1400 × 860 unità) posata in prospettiva CSS: `perspective` 1500 px (1400 in alto), `perspective-origin` 50% 18% (14%), `rotateX(50deg)` con origine sul bordo basso, larga 1400 px (1380), a 150 px dall'alto (190). Tutto ciò che sta sul feltro (cerchi, carte, fiche, pile) vive nelle unità della pianta e lo script chiede al browser dove cade (`getBoundingClientRect` di punti sentinella), così figure, sedie e consolle fuori dal piano si allineano senza trigonometria. I cinque posti stanno su un arco (centro 700, −172; raggio 640 per le carte, 770 per il cerchio di puntata, 828 per la consolle, 900 il bordo, 1010 le sedie) agli angoli 128°, 109°, 90°, 71°, 52°; il banco a 700, 230; il sabot a 1120, 130 con la bocca a 1030, 175; la rastrelliera a 700, 92; gli scarti a 270, 130. Le figure scalano con la profondità (`prof` da 0,8 in fondo a 1 davanti) e con il fattore `figura` del mondo (1 largo, 0,84 alto). Sopra la scena, fuori dalla scala del mondo, stanno i livelli a misura di schermo: l'HUD in cima (`padding: 12px 16px`; pillola di stato a sinistra, ultimo evento a destra), il vassoio in fondo (`bottom: max(14px, env(safe-area-inset-bottom))`, largo al massimo `min(92%, 560px)`) solo per le azioni secondarie (nome, siediti, alzati) e il toast a 64 px dall'alto. La consolle delle mosse sta invece nel mondo, appesa sotto il proprio cerchio di puntata sul bordo imbottito, e in verticale è tenuta dentro la parte di mondo visibile (`clamp` sulla x). Sotto la sala, `.wrap .sotto` è `repeat(auto-fit, minmax(280px, 1fr))` con 24 px sopra per le quattro schede (al tavolo, cosa succede, ultime mani, regole). Soglie proprie del gioco: il rapporto `W < H · 0,9` (mondo alto) e 640 px (pillola di stato a 14 px, ultimo evento nascosto, schede a 24 px). Nessun elemento è appiccicoso: HUD e vassoio sono assoluti dentro la sala, che è alta quanto il primo schermo.
 
 ### Named Rules
-**La regola dei due assi.** Nel primo schermo nessuna misura dipende dalla sola larghezza: ogni dimensione fluida è `clamp(min, min(vw, svh), max)`, perché la scrivania deve stare intera in vista anche in una finestra bassa. Dal secondo schermo in giù basta `vw`.
+**La regola della parete.** Sul muro non esiste il flusso: ogni cosa ha le sue coordinate in unità della parete, su due disposizioni (1280 e 390), e le si cambia leggendo i rettangoli reali (`tools` di prova: `getBoundingClientRect` con `transform: none`) prima di spostare un foglio. Un nuovo volantino prende un posto libero, non si aggiunge in coda.
 
 ## Elevation & Depth
 
-Il sistema è ibrido: le superfici appoggiate (schede, stati vuoti, piè di pagina) sono piatte e si distinguono per tono (`--tile` su `--bg`), mentre gli oggetti che fluttuano sopra la pagina (dock, icone, etichetta) hanno ombre morbide e larghe. Il vetro (`backdrop-filter`) è il terzo mezzo: la nav lascia vedere, sfocato e saturato, il contenuto che le scorre sotto; il dock lascia vedere il campo di colore dell'hero. Ogni ombra ha una direzione dall'alto (y positivo) e un alpha basso; non esistono ombre dure, nette o colorate.
+La profondità è quella della carta sul metallo. Ogni volantino e ogni manifesto porta la propria ombra come `filter: drop-shadow` (segue il contorno strappato, non il rettangolo): una corta e una lunga, entrambe verso il basso. Al passaggio il foglio si solleva (`translateY` di 1,6 unità, `scale(1.015)`) e l'ombra si allunga. I graffiti non hanno ombra: sono vernice sulla lamiera (`mix-blend-mode: multiply` per i neri e i colori, `normal` per il cromato e il bianco). La saracinesca è incassata nel portale con due ombre interne. Di notte le ombre si scuriscono e l'insegna emette luce.
 
 ### Shadow Vocabulary
-- **Dock** (`--shadow: 0 30px 60px -30px rgba(0,0,0,.35)`, scuro `rgba(0,0,0,.9)`, più `inset 0 1px 0 var(--tray-in)`): il dock si solleva dalla pagina con un'ombra lunga e spinta in basso e una luce sul filo superiore, come un vassoio di vetro.
-- **Icona del dock** (`filter: drop-shadow(0 5px 10px rgba(0,0,0,.18))`, mobile `.16` sulla `.face`): segue il contorno della superellisse, non il rettangolo; per questo è `filter` e non `box-shadow`.
-- **Icona nella scheda** (`.app`: `filter: drop-shadow(0 8px 16px rgba(0,0,0,.16))`): un po' più alta della sorella nel dock perché sta su un fondo chiaro e fermo.
-- **Etichetta** (`0 2px 10px rgba(0,0,0,.14), 0 0 0 1px var(--hair)`): ombra breve più anello da 1 px, il fumetto di macOS.
-- **Filo della nav** (`.nav.scrolled`: `0 1px 0 var(--hair)`): non un'ombra ma una linea di 1 px, che compare solo quando il contenuto scorre sotto (IntersectionObserver sulla `.sentinel`).
-- **Slot vuoti** (`inset 0 0 0 1px var(--slot-edge)`): un bordo interno appena visibile, la forma di un'icona che non c'è ancora.
+- **Foglio** (`.vol`: `drop-shadow(0 2px 3px rgba(0,0,0,.28)) drop-shadow(0 10px 16px rgba(0,0,0,.3))`; di notte `.4` / `.45`): il volantino attaccato al muro.
+- **Foglio sollevato** (`.vol:has(h3 a:hover)`: `drop-shadow(0 4px 5px rgba(0,0,0,.3)) drop-shadow(0 26px 30px rgba(0,0,0,.36))`): il foglio staccato dal muro sotto il puntatore, in `.32s var(--eo)`.
+- **Manifesto** (`.man`: `drop-shadow(0 2px 3px rgba(0,0,0,.3)) drop-shadow(0 8px 14px rgba(0,0,0,.28))`): i manifesti degli altri, un po' più piatti dei volantini.
+- **Insegna** (`.insegna`: `drop-shadow(0 6px 10px rgba(0,0,0,.5))`; di notte più `drop-shadow(0 0 28px rgba(255,236,190,.45)) drop-shadow(0 0 70px rgba(255,220,150,.3))`): il cassonetto sporge dal portale; di notte è acceso.
+- **Saracinesca** (`.muro`: `inset 0 10px 14px -8px rgba(0,0,0,.7), inset 0 -8px 10px -8px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.5)`): la lamiera incassata fra architrave e soglia.
+- **Luce al sodio** (`.muro::after` di notte: `radial-gradient(70% 36% at 50% -4%, rgba(255,176,70,.22), transparent 70%)`): non un'ombra ma il lampione, sopra tutto, `pointer-events: none`.
 - **Luce sul feltro** (`.piano .luce`: `radial-gradient(58% 52% at 50% 32%, rgba(255,250,220,.16), transparent 72%)` più `radial-gradient(100% 100% at 50% 50%, transparent 58%, rgba(0,0,0,.38) 100%)`): non un'ombra ma la lampada: il centro del piano è caldo e i bordi si spengono nella sala. È il solo chiaroscuro disegnato sul piano.
 - **Carta** (`.carta`: `filter: drop-shadow(0 3px 2px rgba(0,0,0,.45))`): la carta posata sul feltro, ombra corta e netta come sotto una lampada; è `filter` perché la carta ruota e si piega in 3D.
 - **Fiche** (`.pila i`: `drop-shadow(0 2px 2px rgba(0,0,0,.5))`; da toccare, `.fiche-tocco`: `drop-shadow(0 4px 4px rgba(0,0,0,.55))`): le pile sul cerchio hanno l'ombra corta della carta; le fiche sul bordo, più vicine, un po' più alta.
@@ -558,64 +473,55 @@ Il sistema è ibrido: le superfici appoggiate (schede, stati vuoti, piè di pagi
 - **Velo dei maggiorenni** (`.box`: `0 30px 60px -30px rgba(0,0,0,.45)`): la finestra di dialogo sopra la pagina, stessa ombra lunga del dock.
 
 ### Vetro
-- **Nav**: `backdrop-filter: blur(20px) saturate(1.8)` su `--nav`.
-- **Dock**: `backdrop-filter: blur(30px) saturate(1.6)` su `--tray`, bordo 1 px `--tray-edge`.
+Nella home non c'è vetro: niente `backdrop-filter`, niente trasparenze d'interfaccia. L'unica traslucenza è quella fotografata dello scotch (alfa vero nel WebP).
 - **Vetri della sala** (giochi): il vassoio in basso (`.tray`) è nero .55 con `blur(24px) saturate(1.4)`, la pillola di stato (`.riga`) nero .5 con `blur(16px)`, i tasti del bordo (`.tasto`) nero .55 con `blur(8px)`; tutti con anello `--glass-edge`. Nella sala il ripiego per `prefers-reduced-transparency` è dichiarato solo per la nav.
 - **Velo** (giochi): `blur(24px) saturate(1.6)` su nero .6 a tutto schermo, sotto la finestra `.box`.
-- Con `prefers-reduced-transparency: reduce` la nav diventa `--bg` opaco e il dock `--tile` opaco, senza sfocatura.
 
 ### Named Rules
-**La regola del vetro che poggia.** Hanno ombra solo le cose che stanno sopra la pagina: il dock, le icone, l'etichetta. Le schede non hanno ombra né bordo, mai: si staccano dal fondo solo per tono. Non si aggiunge un'ombra a una scheda per farla «risaltare».
-
-**La regola della linea sola.** L'unica linea del sistema è `--hair` a 1 px: sotto la nav quando si scorre, come separatore nel dock, sopra il piè di pagina, tra le righe dell'elenco GitHub. Non esistono bordi di scheda, divisori di sezione o cornici.
+**La regola dell'ombra della carta.** Hanno ombra solo le cose di carta e l'insegna, e l'ombra è sempre `drop-shadow` sul contorno, mai `box-shadow` su un rettangolo. La vernice (graffiti, parole sprayate) non ha ombra. Non si aggiunge ombra per «far risaltare».
 
 ## Shapes
 
-Due famiglie di forme, entrambe continue e senza spigoli. Le **superfici** (schede, stati vuoti, dock) hanno raggio 28 px (`.tile`, `.dock`), che scende a 24 px per le schede sotto i 640 px; l'etichetta a comparsa ha raggio 9 px e l'anello di fuoco 10 px. Le **icone** sono superellissi vere: ogni `.face`, la cartella `.folder` e le caselle `.slots i` sono tagliate con `clip-path: url(#sq)`, un `clipPath` in `objectBoundingBox` definito in fondo alla pagina (il contenitore `.dk` porta anche `border-radius: 22%` per l'ombra e il fuoco). Il glifo dentro l'icona occupa il 54% del lato (50–60% per i glifi che hanno bisogno di correzione ottica, dichiarato in linea). Non esistono cerchi, pillole, né rettangoli ad angolo vivo; l'unica eccezione geometrica è il separatore verticale di 1 px nel dock.
+Nessuna forma geometrica: i bordi della home sono quelli fotografati (fogli strappati, nastro con le estremità frastagliate, adesivo rotondo con l'angolo sollevato, lettere a scatola) e il CSS non applica raggi (`rounded.nessuno`). Le due sole forme disegnate dal CSS sono il bollo «+18» (disco, `border-radius: 50%`, ruotato) e la linea tratteggiata dei tagliandi (`1px dashed rgba(0,0,0,.45)` sopra, `.4` fra un tagliando e l'altro: la perforazione). La freccia a pennarello è un piccolo SVG in linea (`.freccia`, tratto 3 arrotondato, `currentColor`), non un glifo di carattere. Ogni volantino è ruotato di pochi gradi e i fogli sono specchiabili (`.flip`, `scaleX(-1)` sulla sola carta) per riusare lo stesso foglio senza che si noti.
 
 Nelle pagine dei giochi la sala porta forme sue, tutte sul bordo o sul feltro: il **disco** (`50%`) per i tasti delle mosse e delle puntate sul bordo imbottito (64 px; 56 px i piccoli; 52 px le fiche da toccare; 56 px le pile sul cerchio), per i cerchi di puntata disegnati sul feltro (raggio 46 unità, tratto 3) e per il punto di presenza (8 px) nelle schede; la **pillola** (`999px`) per targhette, pillola di stato, totale sul feltro, tasti del vassoio, campo del nome e «siediti»; la **carta** 96 × 134 unità della pianta con raggio 9 px (il 9% della larghezza, lo stesso del mazzo generato a 250 × 350), con l'angolo in basso a destra che si piega (`clip-path: polygon(100% 55%, 100% 100%, 45% 100%)` ruotato su `rotate3d(1,-1,0)`); le carte di una mano avanzano di 28 unità in x e −10 in y con rotazione `((k·7) mod 11) − 5` gradi, le due mani divise a ±58, quelle del banco di 30 in x a ±2°. Il vassoio ha raggio 22 px, l'ultimo evento 14 px, il toast 12 px, le schede sotto 28 px (24 a telefono): dentro la sala i raggi scendono, mai salgono. I pezzi fotografici (busto, braccia, mani, sedie, sabot, rastrelliera, scarti) sono ritagli senza cornice con l'origine nel **perno** d'ottone, il fermacampioni disegnato nell'immagine, le cui coordinate stanno in `art/pezzi.json`. La home resta senza cerchi e senza pillole.
 
 ## Components
 
-### Navigazione (`.nav`)
-Una striscia traslucida sotto cui scorre il contenuto.
-- **Forma:** `position: sticky`, alta 48 px, nessun raggio, nessun bordo a riposo.
-- **Materiale:** `--nav` con `blur(20px) saturate(1.8)`; opaca `--bg` senza trasparenza.
-- **Contenuto:** marchio «pzkko» a sinistra (`.brand`, 600 17 px `--fd`, `-.02em`); a destra tre voci (`social`, `tools`, `games`) a 12 px, gap 28 px (20 px a telefono), `opacity: .82` che sale a 1 al passaggio (`.15s ease`).
-- **Scorrimento:** quando la `.sentinel` esce dalla vista compare `.nav.scrolled` con il filo `0 1px 0 var(--hair)`, transizione `.3s var(--eo)`.
-- **Mobile:** uguale, senza menu a scomparsa: sono tre voci.
+### Portale e insegna (`.strada` / `.portale` / `.insegna`)
+La pietra intorno e il cassonetto sopra la porta.
+- **Pietra:** `.strada` con `--pietra → --pietra2` e la grana SVG `feTurbulence` (`baseFrequency .9`, alfa .55) più un riflesso radiale dall'alto; padding laterale `--stipite`.
+- **Insegna:** `h1 > img.insegna` (`art/insegna.webp`, 1719 × 604, `alt="pzkko"`, `fetchpriority="high"`, precaricata), larga `min(100%, 840px)`, con la sua ombra; di notte si accende. L'`h1` è il testo dell'insegna.
 
-### Dock (`.dockwrap` / `.dock`)
-Il componente firma: le sette app della scrivania in un vassoio di vetro in fondo al primo schermo.
-- **Posizione:** `.dockwrap` è una riga flex centrata (`display: flex; justify-content: center; width: 100%`) in coda all'hero, dopo `.intro`. Non è fissa: scorre via con il primo schermo.
-- **Vassoio:** `--tray`, bordo 1 px `--tray-edge`, raggio 28 px, padding 10 px, gap 8 px, alto `calc(var(--sz) + 20px)`, `--shadow` più luce interna, `blur(30px) saturate(1.6)`; `--tile` opaco senza trasparenza. `aria-label="collegamenti rapidi"`.
-- **Icona (`.dk` / `.face`):** lato `--sz` = `clamp(44px, min(4.6vw, 7.5svh), 64px)`, superellisse `#sq`, sfumatura verticale `--ia → --ib`, glifo bianco al 54%, `drop-shadow(0 5px 10px rgba(0,0,0,.18))`. Ordine fisso: instagram, github, whatsapp, e-mail, paypal, separatore `.sep` (1 px, alto il 78% dell'icona, margine 6 px), tools, games.
-- **Pressione:** `.dk:active .face { transform: scale(.92) }` in `.1s var(--eo)`.
-- **Fuoco:** anello `--link` 2 px con offset 4 px (`.dk:focus-visible`), e l'etichetta compare come al passaggio.
-- **Etichetta (`.lbl`):** sopra l'icona a `calc(100% + 12px)`, `--tip`, raggio 9 px, padding 5 px 10 px, 13 px, ombra breve più anello `--hair`; a riposo `opacity: 0` e `translate(-50%, 4px)`, compare in `.12s` solo con `(hover: hover) and (pointer: fine)` o col fuoco.
-- **Fisica (script in linea):** ogni icona è una molla criticamente smorzata (damping 1.0, response 0.32 s, `OMEGA = 2π / 0.32`) verso una scala bersaglio `1 + (MAG - 1) · exp(-(d²)/(SPREAD²))` con `MAG = 1.5`, `SPREAD = 1.25` larghezze d'icona e `d` la distanza del puntatore dal centro dell'icona; si aggiorna a ogni `pointermove`, torna a 1 su `pointerleave`, `dt` limitato a 1/30 s. La larghezza di riposo si legge dal layout (`items[0].getBoundingClientRect().width`, ripiego 64) e si rimisura su `resize` quando le molle sono ferme, azzerando prima gli stili in linea, così la fisica segue `--sz` a qualunque finestra. Attiva solo con `(hover: hover) and (pointer: fine) and (min-width: 641px)` e senza `prefers-reduced-motion: reduce`; gli eventi `touch` sono ignorati. Quando la condizione cambia lo script rimuove gli stili in linea, l'ascoltatore di `resize` e ferma il frame.
-- **Mobile (≤ 640 px):** vassoio a larghezza piena fino a 360 px, padding `14px 10px 10px`, gap `10px 14px`, icone `clamp(48px, 14vw, 56px)` con etichetta da 11 px sotto (padding `0 2px`, ellissi se stretta), tre per riga (3+3+1), nessun separatore, nessuna fisica.
-- **404:** stesso dock nello stesso hero, generato dalla home.
+### Lamiera (`.muro::before`)
+`url(/art/muro.webp) 0 0 / 2200px auto repeat` su `#8e8e8a`: la foto di una saracinesca (3200 × 1475, una doga ogni 114 px della tela a 1600, tagliata su 13 doghe e specchiata in larghezza), `z-index: -1` dentro `.muro` isolato. Di notte `brightness(.52) saturate(.85)`.
 
-### Schede bento (`.tile`)
-Schede neutre che spiegano un social; una sola è grafite.
-- **Forma:** raggio 28 px (24 px a telefono), `overflow: hidden`, nessun bordo, nessuna ombra.
-- **Fondo:** `--tile`, con alone `--glow` (dichiarato in linea per scheda) come `radial-gradient(58% 60% at 16% 10%, var(--glow), transparent 72%)` nel `::before`.
-- **Padding interno:** 28 px (24 px a telefono); testo spinto in fondo con `margin-top: auto` e 28 px sopra (40 px a telefono).
-- **Contenuto:** icona `.app` da 60 px (stessa superellisse del dock, ombra più alta), nome in Title (`.tx strong`), handle in Body `--fg2` con numeri tabulari (`.hd`), nota a 32ch (`.nt`), riga d'azione `.go` in `--link` con chevron da 16 px (`stroke-width: 2`).
-- **Stati:** al passaggio la riga `.go` si sottolinea (`text-underline-offset: 3px`) e il chevron scorre di 2 px (`.2s var(--eo)`); alla pressione la scheda intera `scale(.985)` (`.16s var(--eo)`) e l'icona `scale(.92)`.
-- **Variante GitHub (`.tile.gh`):** fondo `#24292f`, testo `#f5f5f7`, `.hd` `#a1a1a6`, `.go` `#2997ff`; in più l'elenco `.sites` (15 px, `#a1a1a6`, righe separate da `1px solid rgba(255,255,255,.12)`, padding 8 px) con i tre siti ospitati. È l'unica scheda che non segue il tema.
+### Volantino (`.vol`)
+Il componente firma: un foglio fotografato con il testo vero sopra; se è un link, tutto il foglio è il link.
+- **Carta:** la classe `.c-<foglio>` (`.c-bianco`, `.c-giallo`, `.c-kraft`, `.c-giornale`, `.c-arancio`, `.c-verde`, `.c-crema`, `.c-lucido`, `.c-azzurro`) dichiara `--carta` (l'immagine), `--ar` (la proporzione), `--el`/`--er` (dove sono i bordi veri della carta, in % della larghezza), `--pad` (il margine di scrittura, in cqw) e `--giu` (il bordo basso). `.foglio` è un livello assoluto con `background: var(--carta) center/100% 100%`, specchiato con `.flip`.
+- **Testo (`.testo`):** colonna flex in flusso, `padding: var(--pad)`, gap 2.2cqw: l'illustrazione (`.arte`, larga `--aw` 30–58%, `mix-blend-mode: multiply`, `align-self` `--aa`), il titolo (`h3`), il corpo, la nota a mano o l'handle (`margin-top: auto`), i tagliandi.
+- **Link:** `h3 > a` con `::after` che copre tutto il foglio (`inset: 0`, z 1); i tagliandi stanno sopra (z 2). Al passaggio (`:has(h3 a:hover)`, solo `(hover: hover)`) il foglio si solleva e il titolo si sottolinea; alla pressione `scale(.99)`; col fuoco l'anello giallo da 3 px a 4 px dal foglio e `z-index: 5`.
+- **Varianti:** `.sotto` (z 2, il foglio che sta sotto il vicino), `.flip`, il bollo `.piu18` in alto a sinistra, l'adesivo `.adesivo` (la chiocciola, 34% del foglio, in basso a destra, −12°) sul volantino di presentazione.
+- **Mobile:** stesse classi; cambiano le coordinate e i pavimenti dei caratteri.
 
-### Stati vuoti (`.tile.empty`)
-La forma di quello che arriverà, senza contenuto finto.
-- **Forma e fondo:** una `.tile` con `--glow: rgba(120,120,128,.14)`, griglia testo + forma.
-- **Testo:** titolo in Title (`.empty h3`), descrizione in Body `--fg2` a 40ch con 10 px sopra.
-- **Cartella (tools, `.folder`):** 128 px (112 px a telefono), superellisse `#sq`, fondo `--slot`, dentro una griglia 3×3 di nove superellissi `--slot` con bordo interno `--slot-edge`, gap 8 px, padding 16 px.
-- **Caselle (games, `.slots`):** cinque caselle da 60 px (56 px a telefono) in superellisse `--slot` con bordo `--slot-edge`, gap 24 px, ognuna con il nome del gioco sotto a 12 px `--fg2`; tre per riga a telefono. Quando un gioco esiste prende il posto della sua casella.
+### Tagliandi (`.tagliandi`)
+La fila di tagliandi da strappare in fondo ai cinque volantini dei social.
+- **Forma:** `display: flex`, alta `max(44px, 17cqw)` (`46px` a telefono), `margin-top: auto`, linea tratteggiata sopra; nel foglio con i tagliandi `.testo` scrive fra `--el` e `--er` e i figli rientrano di 5cqw, così i tagliandi vanno da bordo a bordo della carta.
+- **Tagliando (`button`):** `flex: 1 1 0`, senza bordo tranne la perforazione a sinistra, sfondo = la stessa carta spostata (`--bgpos` / `--bgsize`, calcolati dallo script dai rettangoli non ruotati, rifatti al `resize` e quando i caratteri sono pronti), testo di traverso in `--marker-c`, `aria-label="strappa un tagliando e copia <cosa>"`; il gruppo ha `role="group"` e il suo `aria-label`.
+- **Strappo:** al clic `.cade` (`translateY(60%) rotate(14deg)`, opacità 0, `.55s cubic-bezier(.55,0,1,.45)`), poi `.via` (`visibility: hidden`: il buco mostra il muro) e `aria-disabled`; il testo va negli appunti (`navigator.clipboard`), la nota `.copiato` compare sul foglio per 2,6 s (`opacity .25s`). Alcuni tagliandi nascono già strappati (`.via` nel sorgente). Quando sono finiti tutti, dopo 1,8 s il foglio «ristampa» i tagliandi. Con `prefers-reduced-motion: reduce` lo strappo è immediato.
+- **Passaggio:** `(hover: hover)`: il tagliando si abbassa di 2 px e ruota di −1,5°.
 
-### Piè di pagina (`.foot`)
-- **Forma:** bordo alto 1 px `--hair`, padding `22px 0 max(22px, env(safe-area-inset-bottom))`.
-- **Testo:** 12 px `--fg2`, due estremi (`space-between`): a sinistra il credito «sito di alberto pecchini» con link esatto a `https://www.albertopecchini.it` e `rel="author"`, a destra «pzkko.it». Al passaggio il link passa a `--fg`.
+### Parole sprayate (`.spray`)
+Le intestazioni delle tre zone sono tre graffiti veri (`art/scritte/social.webp`, `games.webp`, `tools.webp`: spray nero, bianco, rosso-arancio, generati con lo stesso foglio magenta), dentro `h2.it.spray` con `id` `social`, `games`, `tools` (gli anchor della 404); l'`img` porta `alt` con la parola. Stanno sulla lamiera (z 0, `mix-blend-mode: multiply` per il nero e il rosso, `normal` per il bianco), mai sopra un foglio.
+
+### Manifesti e graffiti degli altri (`.man`, `.tag`, `.pezzo`)
+Il disordine del muro: otto manifesti inventati (`art/manifesti1/`, `art/manifesti2/`: concerto della chiocciola, lezioni di roulette, teatro del browser, sagra del volantino, cercasi gatto, torneo di dadi, il manifesto punk «pzkko», testa o croce), nove graffiti (`art/tag/`), i resti di manifesti strappati, nastri sciolti, graffette, la puntina, l'adesivo (`art/nastro/`). Sono `img` con `alt=""` e `loading="lazy"`, posizionate come i volantini; i graffiti e i resti `pointer-events: none`. Non sono link e non dicono niente di vero: sono finzione dichiarata (README).
+
+### Marciapiede (`.marciapiede`)
+Il piè di pagina sotto la saracinesca: `max-width: 1280px`, il solo badge FrogDR allineato a destra (`flex-end`, `flex-wrap`); il credito ad Alberto Pecchini è stato tolto dalla home e dalla 404 su sua richiesta il 2026-10-09 (resta nei giochi); Special Elite 14 px `#cfcbc4`, link `#f1eee8` sottolineati a 1 px con offset 3 px.
+
+### 404 (`.parete.p404`)
+Lo stesso muro, alto 640 unità (720 a telefono): i resti strappati di un volantino (`resto-bianco`, `resto-giallo`, scotch, graffette), quattro graffiti e un foglio bianco con «questa pagina non c'è.» (`.titolo`, Anton `max(26px, 15cqw)`), il corpo e la nota a pennarello «torna a pzkko.it» con la freccia, link alla home. Generata da `tools/pzkko/genera-404.mjs`.
 
 ### La sala (`.sala` / `.mondo`, pagine dei giochi)
 Il secondo componente firma, dal 2026-10-07 (scena fotografica dal 7–8.10): una stanza vista dal lato dei giocatori, un mondo a misure fisse scalato alla finestra, figure fotografiche a pezzi su perni e i comandi stampati sul bordo davanti al proprio posto.
@@ -638,37 +544,38 @@ Il secondo componente firma, dal 2026-10-07 (scena fotografica dal 7–8.10): un
 - **Schede sotto la sala (`.scheda`):** `--tile`, raggio 28 px (24 a telefono), padding `22px 22px 20px`, titolo 600 20 px: al tavolo (punto di presenza da 8 px, «tu», «posto n»), cosa succede (eventi 14 px `--fg2`, ora a 12 px, la prima riga in `--fg`), ultime mani (tabella 14 px con righe `--hair`), le regole (elenco puntato 15 px `--fg2`) e la nota sui $pzk.
 - **Pagina del banco (`admin/`):** invariata dal pomeriggio: stessa nav e stesso piè di pagina; griglia `repeat(auto-fit, minmax(340px, 1fr))` di `.scheda`; campi `--campo` a raggio 12 px con anello `--hair`, 44 px, 16 px; tasti pillola `--campo` con anello `--hair`, primario `--btn` bianco, piccoli `.s` da 34 px; tabella 15 px con righe `--hair`.
 - **Piè di pagina del gioco:** come la home, più «tutti i giochi» e il credito «immagini disegnate con gpt-image-2 su replicate»: ogni immagine della sala è generata con openai/gpt-image-2 su Replicate (7–8.10.2026; prompt in `tools/blackjack/fogli.js`, pipeline `immagini.mjs`, crediti in `tools/blackjack/README.md` e `design-prompts.md`).
-- **Home:** il gioco prende il posto della sua casella negli stati vuoti: `.slots a` con `.app .face` in grafite `--gm-a → --gm-b`, glifo di picche (`#i-sp`) al 50%, nome in `--fg`, pressione `scale(.92)`.
+- **Home:** il gioco ha il suo volantino sul muro (`games/blackjack/` e `games/roulette/` sono i fogli kraft e lucido della zona «games»).
 
 ### Movimento
-- **Ingresso (una volta sola, solo con `prefers-reduced-motion: no-preference`):** `h1` e `.lede` entrano con `rise` (`.7s var(--eo)`, da `opacity: 0; translateY(12px)`), la lede con 70 ms di ritardo; il dock con `materialize` (`.8s`, ritardo 140 ms, da `translateY(16px) scale(.96) blur(10px)`); la nav con `fade` (`.6s ease`).
-- **Risposta:** fisica del dock (sopra), pressione `.1s`, chevron `.2s`, scheda `.16s`, opacità delle voci nav `.15s`, filo della nav `.3s`; tutte con `--eo: cubic-bezier(.23,1,.32,1)` salvo le dissolvenze.
-- **Niente allo scorrimento:** nessuna rivelazione, nessun parallasse, nessun elemento che segue la finestra; l'unico effetto legato allo scroll è il filo sotto la nav. `scroll-behavior: smooth` solo senza riduzione del movimento.
+- **Nessun ingresso:** la pagina si mostra com'è; non c'è animazione di apertura.
+- **Risposta:** il foglio che si solleva al passaggio (`.32s var(--eo)`, `--eo: cubic-bezier(.22,1,.36,1)`), la pressione `scale(.99)`, il tagliando che si abbassa al passaggio e cade allo strappo (`.55s`), la nota «copiato» (`.25s ease`).
+- **Niente allo scorrimento:** nessuna rivelazione, nessun parallasse, nessun elemento che segue la finestra.
+- **Riduzione del movimento:** `.vol`, i tagliandi e la nota senza transizioni; il tagliando strappato sparisce sul posto.
 - **Giochi:** nella sala niente ingresso: il mondo si misura e si mostra; l'unico movimento della telecamera è il `--pan` in verticale (`.6s var(--eo)`) quando ci si siede. Poi si muove solo ciò che la mano in corso muove: le braccia per cinematica inversa con molle criticamente smorzate (polso 0,26 s, busto 0,5 s, `dt ≤ 1/30 s`, un solo ciclo di `requestAnimationFrame` per la scena); il croupier porta ogni carta dal sabot al posto sull'orologio del server (parte 1100 ms prima dell'orario di scoperta) e la carta si gira all'arrivo (`gira .32s var(--eo)`); i gesti del giocatore seguono la mossa; l'angolo della propria carta torna giù con una molla (0,22 s); il timer si svuota con `scaleX`; pressioni `.12s var(--eo)` (`scale(.93)` sui tasti tondi, `.92` sulle fiche, `.96` sulle pillole). Con `prefers-reduced-motion: reduce` la carta compare all'orario senza viaggio né giro, e nessun gesto. Niente che giri da solo fuori dalla mano in corso.
 - **Roulette (`games/roulette/`, 8.10):** qui una cosa gira da sola, ed è l'oggetto del gioco: il rotore (CSS `rotate` su un livello composto, `will-change: transform`) e la pallina, mossi dalla fisica di `fisica.js` a 480 passi al secondo in centimetri, con la torretta disegnata che gira con lui. Le braccia del croupier non usano più le molle in pianta ma una cinematica inversa in tre dimensioni (spalla, gomito e polso sopra al tavolo, proiettati con la stessa prospettiva CSS rifatta in JS) e il profilo a jerk minimo per le mani (0,3–1,1 s secondo la distanza, un arco di 0–9 cm), il busto che si sporge in 0,35 s e cammina lungo il bordo in 0,55 s. Le fiche spinte scivolano con lo stesso profilo (0,8 s) e sfumano in 0,45 s quando entrano nel saldo; la fiche scelta si alza di 8 px (`.18s var(--eo)`).
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** tenere il dock in fondo all'hero a tutto schermo, nel flusso, dopo `.intro`: la scrivania è il primo schermo e scorre via con esso.
-- **Do** misurare ogni cosa del primo schermo su due assi, `clamp(min, min(Xvw, Ysvh), max)`, come `--sz`, il nome e la riga, così hero e dock stanno interi in qualunque finestra.
-- **Do** tagliare ogni nuova icona con `clip-path: url(#sq)` e colorarla con `--ia`/`--ib` dichiarati in linea; il glifo resta bianco al 54% del lato.
-- **Do** dare a ogni nuova scheda il fondo `--tile`, raggio 28 px, padding 28 px e un alone `--glow` del colore del servizio a bassa alpha (.14–.34).
-- **Do** usare `--fd` 600 per titoli e nomi, `--ft` 400 per tutto il resto, e la spaziatura negativa prevista per il corpo (da `-.01em` a `-.035em`).
-- **Do** prevedere il ripiego per `prefers-reduced-transparency` (fondo opaco `--bg` o `--tile`) e per `prefers-reduced-motion` (nessun ingresso, nessuna fisica) in ogni nuovo vetro o movimento.
-- **Do** aggiungere un nuovo strumento o gioco al posto della sua casella negli stati vuoti e come nuova icona nel dock, rispettando le righe da tre a telefono.
-- **Do** scrivere tutto il testo visibile in minuscolo nel sorgente e firmare il piè di pagina con il link esatto a `https://www.albertopecchini.it`.
+- **Do** fare di ogni nuovo link un volantino: una classe `.c-<foglio>` di `art/carta/`, il testo in `.testo` (titolo Anton, corpo Special Elite, nota o handle Permanent Marker), l'illustrazione come inchiostro in `multiply`, il link che copre il foglio.
+- **Do** dare a ogni volantino le due disposizioni (`--x --y --w --r` su 1280, `--mx --my --mw --mr` su 390) in un posto libero del muro, leggendo i rettangoli reali dei vicini prima di scegliere, e lasciare che i fogli si coprano solo ai bordi, mai sul testo.
+- **Do** generare con `tools/pzkko/immagini.mjs` ogni materiale nuovo (carta, illustrazione, manifesto, graffito, nastro) su fondo magenta e scontornarlo con `usa`; registrare le misure in `art/pezzi.json` e lasciare il prompt dentro il WebP.
+- **Do** scegliere il colore del pennarello per foglio (`--marker-c`) in modo che legga su quella carta (≥ 4,5:1 sul corpo): nero sul kraft, teal sull'arancio, verde sul verde, blu sul crema e sul giallo, `--marker-rosso` sui fogli chiari.
+- **Do** misurare il testo dei volantini in `max(px, cqw)` e tenere i tagliandi ad almeno 44 px di altezza (46 a telefono).
+- **Do** scrivere tutto il testo visibile in minuscolo; il marciapiede della home non porta il credito (tolto da Alberto il 2026-10-09), i giochi sì.
+- **Do** rigenerare la 404 (`node tools/pzkko/genera-404.mjs`) dopo ogni modifica alla home, e l'anteprima `og.jpg` quando il primo schermo cambia.
+- **Do** dire nel README che i manifesti degli altri sono finzione, e tenere i fogli di lavoro fuori dal repository (`tools/pzkko/lavoro/`).
 - **Do** nei giochi tenere la sala come un oggetto solo che riempie il primo schermo (`.sala` alta `calc(100svh - 48px)`, fondo `#17221d → #000`), con un mondo a misure fisse (1600 × 1000 o 1000 × 1400) scalato con `--k` e la pianta del tavolo (1400 × 860) in prospettiva: ogni cosa sul feltro si misura nelle unità della pianta e si proietta chiedendo al browser; sopra la scena solo pillole di nero velato con anello `--glass-edge`, testo bianco o `--felt-fg2`, tasto primario `--btn`, anelli di fuoco bianchi.
 - **Do** nella roulette disegnare sul feltro ciò che deve essere esatto (la corona dei 37 numeri, il tappeto delle puntate) nelle unità della fisica e del piano, e fotografare solo ciò che è materia (conca, rotore, feltro, pallina, dolly): così il numero che esce è la casella in cui la pallina si ferma e un tocco cade nella zona giusta. I colori del tappeto sono `--rosso #d7263d`, `--nero #1a1a1c`, `--verde #1e8f4e` (nei badge dei numeri), stampati sul feltro a .82–.9 di alpha; la consolle sul bordo si scala di `1 / var(--k)` così fiche e tasti restano a misura di dito anche sul telefono.
 - **Do** mettere i comandi della mano sul bordo davanti al proprio posto, come tasti tondi da 64 px (bordo 2 px bianco su nero .55) e fiche da toccare da 52 px, e lasciare al vassoio in basso solo le azioni secondarie; ogni nuovo pezzo fotografico entra con il suo perno in `art/pezzi.json`, generato con gpt-image-2 su Replicate e accreditato nel piè di pagina e in `tools/blackjack/README.md`.
 
 ### Don't:
-- **Don't** fissare il dock alla finestra (`position: fixed`) né riservargli spazio nel piè di pagina: provato e tolto il 2026-10-07.
-- **Don't** introdurre un secondo colore d'interfaccia oltre `--link`, né un colore di marca fuori dall'icona e dal suo `--glow`.
-- **Don't** dare ombre o bordi alle schede: si staccano dal fondo solo per tono (`--tile` su `--bg`).
-- **Don't** aggiungere webfont, `text-transform` o maiuscole nel testo visibile.
-- **Don't** usare `100vh` per l'hero: il sistema usa `100svh` ed `env(safe-area-inset-bottom)`.
-- **Don't** animare allo scorrimento, né far girare movimenti da soli: dopo l'ingresso si muove solo ciò che risponde al puntatore o al dito.
-- **Don't** usare nella home oggetti skeuomorfici letterali (telefoni, portafogli, scrivanie disegnate) né la colonna di tasti uguali del link-in-bio; nella sala dei giochi la scena fotografica è l'oggetto stesso, non un ornamento.
-- **Don't** colorare a fondo pieno una scheda che non porta contenuto in più: la grafite di GitHub è un'eccezione guadagnata, non un modello.
-- **Don't** riempire tools e games con contenuto finto: lo stato vuoto è la forma dell'oggetto futuro, non una promessa illustrata.
+- **Don't** imitare un materiale in CSS: niente bordi strappati in `clip-path`, nastri in gradiente, spray in `text-shadow`, carta in `box-shadow`. Se manca, si fotografa (si genera).
+- **Don't** usare magenta, rosa o viola su nessun pezzo né nel CSS: sono la chiave cromatica.
+- **Don't** introdurre colori d'interfaccia (blu dei link, verdi, rossi di stato), raggi, vetro, linee o griglie: la home non ha componenti di sistema, ha fogli.
+- **Don't** aggiungere un quinto carattere, usare il carattere di sistema nel testo visibile o caricare i caratteri da un host esterno.
+- **Don't** usare glifi Unicode o emoji al posto di un'icona: le frecce sono l'SVG `.freccia` a pennarello.
+- **Don't** tornare alla scrivania Apple (dock, bento, superellissi, `backdrop-filter`): è il mondo sostituito il 2026-10-09, non una variante.
+- **Don't** animare allo scorrimento o far girare movimenti da soli nella home: si muove solo ciò che risponde al puntatore o al dito; nella sala dei giochi la scena fotografica è l'oggetto stesso, non un ornamento.
+- **Don't** riempire tools e i giochi non fatti con contenuto finto: il volantino «in arrivo» e «cercasi strumenti» sono la forma onesta del vuoto.
+- **Don't** mettere testo vero dentro le immagini (a parte l'insegna, il cui `h1` ha il suo `alt`): i contatti e i nomi restano HTML, selezionabili e copiabili.
