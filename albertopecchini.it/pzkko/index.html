@@ -57,7 +57,7 @@ a{color:inherit}
 h1,h2,h3,p,ul{margin:0}
 img{display:block;max-width:100%;height:auto}
 
-/* ── la strada: la pietra del portale, la saracinesca, il marciapiede ────── */
+/* ── la strada: la pietra del portale, la saracinesca, la soglia ────── */
 .strada{--stipite:clamp(10px,3vw,40px);position:relative;background:
   radial-gradient(120% 60% at 50% 0%,rgba(255,255,255,.06),transparent 60%),
   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .17 0 0 0 0 .16 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
@@ -148,11 +148,8 @@ img{display:block;max-width:100%;height:auto}
 .c-azzurro{--carta:url(/art/carta/azzurro.webp);--ar:652/576;--el:7.5%;--er:5.2%;--pad:12.7cqw 11.2cqw 7.5cqw 12.5cqw;--giu:3.5cqw}
 .flip{--flip:-1}
 
-/* ── il marciapiede: il credito, in fondo a tutto ───────────────────────── */
-.marciapiede{max-width:1280px;margin:0 auto;padding:22px 4px max(22px,env(safe-area-inset-bottom));display:flex;justify-content:flex-end;align-items:center;gap:12px 20px;flex-wrap:wrap;color:#cfcbc4;font:400 14px/1.4 var(--ft)}
-.marciapiede a{color:#f1eee8;text-decoration-thickness:1px;text-underline-offset:3px}
-.marciapiede .badge{display:block;opacity:.85}
-.marciapiede .badge:hover{opacity:1}
+/* ── sotto la saracinesca: la soglia di pietra ────────────────────────── */
+.strada{padding-bottom:clamp(28px,4vw,56px)}
 
 /* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
 @media (max-width:899px){
@@ -173,7 +170,6 @@ img{display:block;max-width:100%;height:auto}
   .vol,.man{filter:brightness(.86) saturate(.95) drop-shadow(0 2px 3px rgba(0,0,0,.4)) drop-shadow(0 10px 16px rgba(0,0,0,.45))}
   .tag{opacity:.8}
   .insegna{filter:brightness(1.1) contrast(1.04) drop-shadow(0 0 28px rgba(255,236,190,.45)) drop-shadow(0 0 70px rgba(255,220,150,.3))}
-  .marciapiede{color:#b9b5ae}
 }
 
 @media (prefers-reduced-motion:reduce){

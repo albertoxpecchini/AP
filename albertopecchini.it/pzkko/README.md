@@ -103,7 +103,7 @@ npx serve albertopecchini.it/pzkko
 
 ## Crediti
 
-Il piè di pagina ha solo il badge FrogDR: il credito ad Alberto Pecchini è stato tolto
-su sua richiesta il 9.10.2026 (è il suo sito; i giochi lo portano ancora).
+La home e la 404 non hanno piè di pagina: credito e badge FrogDR sono stati tolti su
+richiesta di Alberto il 9.10.2026 (è il suo sito; i giochi portano ancora il credito).
 Le immagini del muro sono generate con openai/gpt-image-2 su Replicate; i
 caratteri sono di Google Fonts con le licenze dette sopra.

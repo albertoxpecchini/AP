@@ -430,13 +430,13 @@ Il primo gioco (blackjack, 2026-10-07; rifatto a scena fotografica il 7–8.10) 
 ### Named Rules
 **La regola dei quattro caratteri.** Non si aggiunge un quinto carattere e non si usa il carattere di sistema per il testo visibile: ogni voce ha il suo (Anton urla, Archivo Black ribadisce, Special Elite spiega, Permanent Marker annota). I caratteri stanno in `fonts/` e si caricano con `@font-face`, mai da un host esterno.
 
-**La regola del cqw.** Dentro un volantino il testo si misura in `cqw` del volantino con `max(px, cqw)`: la misura segue il foglio, il pavimento in pixel difende la leggibilità. Fuori dai volantini (marciapiede) si usano i pixel.
+**La regola del cqw.** Dentro un volantino il testo si misura in `cqw` del volantino con `max(px, cqw)`: la misura segue il foglio, il pavimento in pixel difende la leggibilità. Fuori dai volantini si usano i pixel.
 
 **La regola del minuscolo.** Tutto il testo visibile è minuscolo nel sorgente, nomi propri compresi («alberto pecchini», «instagram»). Non si usa `text-transform`. Titolo e meta della pagina conservano le maiuscole.
 
 ## Layout
 
-La pagina è la strada: `.strada` (pietra) con `padding: 0 var(--stipite)` (`clamp(10px, 3vw, 40px)`: gli stipiti del portale), dentro il portale `.portale` (padding `clamp(18px, 3.2vw, 40px) 0 clamp(14px, 2.4vw, 30px)`) con l'insegna centrata larga `min(100%, 840px)`, poi la saracinesca `.muro` (larghezza massima 1280 px, centrata, `container-type: inline-size`, `isolation: isolate`, ombra interna in alto e in basso e un filo scuro intorno) e sotto il marciapiede.
+La pagina è la strada: `.strada` (pietra) con `padding: 0 var(--stipite)` (`clamp(10px, 3vw, 40px)`: gli stipiti del portale), dentro il portale `.portale` (padding `clamp(18px, 3.2vw, 40px) 0 clamp(14px, 2.4vw, 30px)`) con l'insegna centrata larga `min(100%, 840px)`, poi la saracinesca `.muro` (larghezza massima 1280 px, centrata, `container-type: inline-size`, `isolation: isolate`, ombra interna in alto e in basso e un filo scuro intorno) e sotto la soglia di pietra.
 
 **La parete.** `.parete` è un rettangolo a misure fisse, alto `calc(1700 * var(--u))` con `--u = calc(100cqw / 1280)`: tutto ciò che sta sul muro è `position: absolute` con `left`, `top` e `width` in unità della parete (`--x`, `--y`, `--w`) e una rotazione `--r` di pochi gradi (da −8° a +6°; i nastri sciolti fino a ±50°). L'ordine di profondità è `z-index`: graffiti 0 (`.tag`), manifesti e resti 1 (`.man`, `.pezzo`), volantini 3 (2 per quelli «sotto»), nastri sciolti sopra i fogli 4, il foglio al passaggio 5. Le posizioni sono scritte a mano, per righe: presentazione + tre social in alto, e-mail, paypal e i due giochi in mezzo, strumenti e i tre giochi «in arrivo» sotto, i manifesti inventati e i graffiti negli spazi che restano, con qualche sovrapposizione voluta ai bordi dei fogli e mai sul testo.
 
@@ -444,7 +444,7 @@ La pagina è la strada: `.strada` (pietra) con `padding: 0 var(--stipite)` (`cla
 
 **Telefono (≤ 899 px).** `--u = calc(min(100cqw, 600px) / 390)`, la parete alta `2900` unità e larga al massimo 600 px centrata (su un tablet la lamiera riempie i lati): ogni elemento passa a `--mx`, `--my`, `--mw`, `--mr`. Due volantini per riga (≈ 190 px l'uno), la presentazione a riga piena in cima, i manifesti inventati a fianco o fra le righe, i graffiti dietro. I titoli scendono a `max(22px, 16cqw)`, i tagliandi salgono a `max(46px, 17cqw)`.
 
-**Ritmo.** Non c'è un ritmo di sezioni: ci sono righe di fogli con 20–60 unità d'aria o di sovrapposizione, e le tre parole sprayate come intestazioni di zona (`#social`, `#games`, `#tools`, con `scroll-margin-top: 24px`). Il marciapiede ha `22px 4px max(22px, env(safe-area-inset-bottom))`.
+**Ritmo.** Non c'è un ritmo di sezioni: ci sono righe di fogli con 20–60 unità d'aria o di sovrapposizione, e le tre parole sprayate come intestazioni di zona (`#social`, `#games`, `#tools`, con `scroll-margin-top: 24px`). Sotto la saracinesca resta la pietra, `padding-bottom: clamp(28px, 4vw, 56px)`.
 
 **Soglie.** `max-width: 899px` (parete in 390esimi), i 600 px di larghezza massima della parete stretta, `(hover: hover)` per il sollevamento e il tagliando che si abbassa, `prefers-color-scheme: dark` per la notte, `prefers-reduced-motion: reduce` per togliere transizioni e caduta.
 
@@ -517,8 +517,8 @@ Le intestazioni delle tre zone sono tre graffiti veri (`art/scritte/social.webp`
 ### Manifesti e graffiti degli altri (`.man`, `.tag`, `.pezzo`)
 Il disordine del muro: otto manifesti inventati (`art/manifesti1/`, `art/manifesti2/`: concerto della chiocciola, lezioni di roulette, teatro del browser, sagra del volantino, cercasi gatto, torneo di dadi, il manifesto punk «pzkko», testa o croce), nove graffiti (`art/tag/`), i resti di manifesti strappati, nastri sciolti, graffette, la puntina, l'adesivo (`art/nastro/`). Sono `img` con `alt=""` e `loading="lazy"`, posizionate come i volantini; i graffiti e i resti `pointer-events: none`. Non sono link e non dicono niente di vero: sono finzione dichiarata (README).
 
-### Marciapiede (`.marciapiede`)
-Il piè di pagina sotto la saracinesca: `max-width: 1280px`, il solo badge FrogDR allineato a destra (`flex-end`, `flex-wrap`); il credito ad Alberto Pecchini è stato tolto dalla home e dalla 404 su sua richiesta il 2026-10-09 (resta nei giochi); Special Elite 14 px `#cfcbc4`, link `#f1eee8` sottolineati a 1 px con offset 3 px.
+### Sotto la saracinesca
+Nessun piè di pagina: la home e la 404 finiscono con la soglia di pietra (`.strada` con `padding-bottom: clamp(28px, 4vw, 56px)`). Credito e badge FrogDR sono stati tolti su richiesta di Alberto il 2026-10-09; i giochi portano ancora il credito.
 
 ### 404 (`.parete.p404`)
 Lo stesso muro, alto 640 unità (720 a telefono): i resti strappati di un volantino (`resto-bianco`, `resto-giallo`, scotch, graffette), quattro graffiti e un foglio bianco con «questa pagina non c'è.» (`.titolo`, Anton `max(26px, 15cqw)`), il corpo e la nota a pennarello «torna a pzkko.it» con la freccia, link alla home. Generata da `tools/pzkko/genera-404.mjs`.
@@ -562,7 +562,7 @@ Il secondo componente firma, dal 2026-10-07 (scena fotografica dal 7–8.10): un
 - **Do** generare con `tools/pzkko/immagini.mjs` ogni materiale nuovo (carta, illustrazione, manifesto, graffito, nastro) su fondo magenta e scontornarlo con `usa`; registrare le misure in `art/pezzi.json` e lasciare il prompt dentro il WebP.
 - **Do** scegliere il colore del pennarello per foglio (`--marker-c`) in modo che legga su quella carta (≥ 4,5:1 sul corpo): nero sul kraft, teal sull'arancio, verde sul verde, blu sul crema e sul giallo, `--marker-rosso` sui fogli chiari.
 - **Do** misurare il testo dei volantini in `max(px, cqw)` e tenere i tagliandi ad almeno 44 px di altezza (46 a telefono).
-- **Do** scrivere tutto il testo visibile in minuscolo; il marciapiede della home non porta il credito (tolto da Alberto il 2026-10-09), i giochi sì.
+- **Do** scrivere tutto il testo visibile in minuscolo; la home non ha piè di pagina (credito e badge tolti da Alberto il 2026-10-09), i giochi portano il credito.
 - **Do** rigenerare la 404 (`node tools/pzkko/genera-404.mjs`) dopo ogni modifica alla home, e l'anteprima `og.jpg` quando il primo schermo cambia.
 - **Do** dire nel README che i manifesti degli altri sono finzione, e tenere i fogli di lavoro fuori dal repository (`tools/pzkko/lavoro/`).
 - **Do** nei giochi tenere la sala come un oggetto solo che riempie il primo schermo (`.sala` alta `calc(100svh - 48px)`, fondo `#17221d → #000`), con un mondo a misure fisse (1600 × 1000 o 1000 × 1400) scalato con `--k` e la pianta del tavolo (1400 × 860) in prospettiva: ogni cosa sul feltro si misura nelle unità della pianta e si proietta chiedendo al browser; sopra la scena solo pillole di nero velato con anello `--glass-edge`, testo bianco o `--felt-fg2`, tasto primario `--btn`, anelli di fuoco bianchi.

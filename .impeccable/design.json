@@ -812,14 +812,6 @@
    "css": ".ds-piu18{display:inline-block;font:400 16px/1 \"Archivo Black\",\"Arial Black\",sans-serif;color:#fff;background:#a50d25;padding:.35em .4em;border-radius:50%;transform:rotate(12deg)}"
   },
   {
-   "name": "Marciapiede",
-   "kind": "nav",
-   "refersTo": "marciapiede",
-   "description": "Il piè di pagina sotto la saracinesca: solo il badge FrogDR, a destra.",
-   "html": "<footer class=\"ds-marciapiede\"><a href=\"#\">badge frogdr</a></footer>",
-   "css": ".ds-marciapiede{display:flex;justify-content:space-between;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:22px 4px;background:#2e2c29;color:#cfcbc4;font:400 14px/1.4 \"Special Elite\",\"Courier New\",monospace}.ds-marciapiede a{color:#f1eee8;text-decoration-thickness:1px;text-underline-offset:3px}.ds-marciapiede a:focus-visible{outline:3px solid #ffd400;outline-offset:3px}"
-  },
-  {
    "name": "Consolle sul bordo",
    "kind": "button",
    "refersTo": "tasto-bordo",
