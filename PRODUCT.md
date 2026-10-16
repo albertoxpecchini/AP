@@ -52,11 +52,12 @@ Alberto, non come una vetrina di link altrui.
   pzkko@yahoo.com, PayPal albertoxpecchini (paypal.biz).
 - Zone «tools» e «games»: per ora **vuote**, vivono come sezioni della home con
   uno stato vuoto curato (scelta del 2026-10-07); quando arrivano i primi
-  contenuti diventano pagine in `pzkRoutes`. Giochi in programma (nessuno
-  fatto): blackjack, roulette, mine, dado, moneta, senza soldi veri.
+  contenuti diventano pagine in `pzkRoutes`. Giochi in programma: mine,
+  dado, moneta, senza soldi veri (blackjack e roulette sono stati fatti e poi
+  tolti il 2026-10-17).
 - Niente contenuti del portfolio serio: un dominio = un sito intero.
 - Credito ad Alberto Pecchini: tolto dalla home e dalla 404 su sua richiesta il
-  2026-10-09 (è il suo sito); le pagine dei giochi lo portano ancora, con link
+  2026-10-09 (è il suo sito); se una pagina futura lo riporta, il link è
   esatto a `https://www.albertopecchini.it` e il nome come testo.
 - Prima versione (iPhone + portafoglio MagSafe, commit 6d339dc) bocciata il
   2026-10-07: non riproporre oggetti skeuomorfici letterali.

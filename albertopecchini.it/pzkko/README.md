@@ -19,14 +19,6 @@ serio ma è un progetto Vercel a parte.
   il prompt con cui è nato; le misure stanno in `pezzi.json`.
 - `fonts/` — Anton e Archivo Black (SIL OFL), Special Elite e Permanent Marker
   (Apache 2.0), da Google Fonts, serviti da qui.
-- `games/blackjack/` — il tavolo di blackjack (una stanza, il banco è un bot,
-  cinque posti, $pzk al posto dei soldi, +18) e la sua pagina del banco in
-  `admin/`; la funzione sta in `../api/blackjack.js`, le regole in
-  `../src/blackjack/motore.js`, tutto spiegato in `../tools/blackjack/README.md`.
-- `games/roulette/` — la roulette europea da soli contro il banco: la ruota
-  fotografata che gira con la corona disegnata in SVG, la pallina con la sua
-  fisica (`fisica.js`), il croupier del blackjack. Niente server: i $pzk stanno
-  nel browser. Spiegato in `../tools/roulette/README.md`.
 - `404.html` — pagina non trovata: lo stesso muro, con i resti del volantino
   strappato e un foglio che rimanda alla home
 - `favicon.png`, `apple-touch-icon.png` — l'adesivo con la chiocciola sulla lamiera

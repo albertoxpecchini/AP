@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // Le immagini del «muro» di pzkko.it con openai/gpt-image-2 su Replicate, sempre
-// in qualità high (vedi tools/pzkko/fogli.js). Stesso metodo del blackjack e
-// della roulette: fogli su fondo magenta, chiave cromatica, pezzi in
+// in qualità high (vedi tools/pzkko/fogli.js). Fogli su fondo magenta, chiave cromatica, pezzi in
 // pzkko/art/<foglio>/<nome>.webp con le misure in pzkko/art/pezzi.json.
 //
 //   node tools/pzkko/immagini.mjs genera <foglio|tutti> [--parallelo=4]

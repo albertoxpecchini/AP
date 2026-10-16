@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /games/blackjack/admin/
 
 Sitemap: https://www.pzkko.it/sitemap.xml

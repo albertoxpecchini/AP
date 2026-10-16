@@ -5,8 +5,7 @@
  "scope": "Solo pzkko.it (albertopecchini.it/pzkko/). albertopecchini.it e bettercallpekko.it hanno la propria identità nel codice e non la condividono con questa.",
  "source": {
   "tokens": "albertopecchini.it/pzkko/index.html, :root e @media (prefers-color-scheme:dark)",
-  "components": "albertopecchini.it/pzkko/index.html (CSS e script in linea), 404.html generata da tools/pzkko/genera-404.mjs; immagini in pzkko/art/ (openai/gpt-image-2 su Replicate, 2026-10-09: tools/pzkko/fogli.js, immagini.mjs, pezzi.json)",
-  "games": "albertopecchini.it/pzkko/games/blackjack/index.html e admin/index.html (CSS e script in linea): la sala (2026-10-07/08, scena fotografica): mondo scalato, piano in prospettiva, tasti del bordo, targhette, HUD, carte e fiche generate; i pezzi e i perni in games/blackjack/art/pezzi.json; immagini da openai/gpt-image-2 su Replicate (tools/blackjack/fogli.js, immagini.mjs, README.md, design-prompts.md)"
+  "components": "albertopecchini.it/pzkko/index.html (CSS e script in linea), 404.html generata da tools/pzkko/genera-404.mjs; immagini in pzkko/art/ (openai/gpt-image-2 su Replicate, 2026-10-09: tools/pzkko/fogli.js, immagini.mjs, pezzi.json)"
  },
  "extensions": {
   "colorMeta": {
@@ -188,7 +187,7 @@
    },
    "bianco-carta": {
     "role": "neutral",
-    "displayName": "Bianco della nota e del bollo",
+    "displayName": "Bianco della nota «copiato»",
     "canonical": "#ffffff",
     "cssVar": null,
     "tonalRamp": [
@@ -281,215 +280,6 @@
      "hsl(0 0% 84%)",
      "hsl(0 0% 95%)"
     ]
-   },
-   "btn": {
-    "role": "primary",
-    "displayName": "Blu dei tasti pieni (chiaro)",
-    "canonical": "#0066cc",
-    "cssVar": "--btn",
-    "note": "Tasto primario sulle superfici neutre (velo dei maggiorenni, pagina del banco). Bianco sopra 5.6:1. Solo nei giochi."
-   },
-   "btn-dark": {
-    "role": "primary",
-    "displayName": "Blu dei tasti pieni (scuro)",
-    "canonical": "#1a6fe0",
-    "cssVar": "--btn",
-    "note": "Non --link scuro (#2997ff, bianco sopra 3.0:1): #1a6fe0 tiene 4.78:1."
-   },
-   "blue-felt": {
-    "role": "primary",
-    "displayName": "Blu sul feltro",
-    "canonical": "#1a6fe0",
-    "cssVar": "--btn",
-    "note": "Nella sala --btn è fissato a #1a6fe0: «carta» e «punta» sul bordo (.tasto.p, bordo bianco pieno), il primario del vassoio (.b.p) e il tasto del velo. Uguale sempre perché la sala è scura sempre.",
-    "tonalRamp": [
-     "oklch(20% 0.09 258)",
-     "oklch(30% 0.13 258)",
-     "oklch(40% 0.17 258)",
-     "oklch(50% 0.19 258)",
-     "oklch(60% 0.17 258)",
-     "oklch(72% 0.12 258)",
-     "oklch(84% 0.07 258)",
-     "oklch(95% 0.03 258)"
-    ]
-   },
-   "felt1": {
-    "role": "secondary",
-    "displayName": "Feltro, centro (ripiego)",
-    "canonical": "#1b6847",
-    "cssVar": "--felt1",
-    "note": "Solo nelle pagine dei giochi. Dal 7.10 sera il feltro è la foto in pianta art/tavolo/tavolo.webp; il radial-gradient felt1 → felt2 → felt-rim resta come ripiego (.piano.cssfelt, con bordo imbottito #2b1d16 da 36px).",
-    "tonalRamp": [
-     "oklch(15% 0.04 160)",
-     "oklch(25% 0.06 160)",
-     "oklch(35% 0.08 160)",
-     "oklch(45% 0.09 160)",
-     "oklch(55% 0.1 160)",
-     "oklch(68% 0.09 160)",
-     "oklch(82% 0.06 160)",
-     "oklch(95% 0.02 160)"
-    ]
-   },
-   "felt2": {
-    "role": "secondary",
-    "displayName": "Feltro, al 72%",
-    "canonical": "#0c3a29",
-    "cssVar": "--felt2"
-   },
-   "felt-rim": {
-    "role": "secondary",
-    "displayName": "Feltro, bordo",
-    "canonical": "#092b1f",
-    "cssVar": "--felt-rim"
-   },
-   "felt-fg": {
-    "role": "secondary",
-    "displayName": "Testo sul feltro",
-    "canonical": "#fff",
-    "cssVar": "--felt-fg"
-   },
-   "felt-fg2": {
-    "role": "secondary",
-    "displayName": "Testo velato sul feltro",
-    "canonical": "rgba(255,255,255,.78)",
-    "cssVar": "--felt-fg2",
-    "note": "Mai --fg2 grigio nella sala: saldo nelle targhette, conto alla rovescia, ultimo evento, segnaposto del campo, tasti di testo."
-   },
-   "glass": {
-    "role": "secondary",
-    "displayName": "Vetro bianco sul feltro",
-    "canonical": "rgba(255,255,255,.1)",
-    "cssVar": "--glass",
-    "note": "Dichiarato in :root ma non più usato come fondo: sopra la foto il vetro è nero velato. Resta per --glass-edge."
-   },
-   "glass-edge": {
-    "role": "secondary",
-    "displayName": "Anello del vetro",
-    "canonical": "rgba(255,255,255,.18)",
-    "cssVar": "--glass-edge",
-    "note": "Anello inset da 1px di pillola di stato, vassoio, toast e totale sul feltro."
-   },
-   "glass-btn": {
-    "role": "secondary",
-    "displayName": "Vetro dei tasti a pillola",
-    "canonical": "rgba(255,255,255,.14)",
-    "note": "Letterale in .b, .campo input e .targa .libera; .22 al passaggio."
-   },
-   "sala": {
-    "role": "secondary",
-    "displayName": "Sala, in alto",
-    "canonical": "#17221d",
-    "note": "Centro del radial-gradient(120% 80% at 50% 10%) di .sala, la stanza intorno al tavolo; poi #070a09 al 60% e #000 al bordo.",
-    "tonalRamp": [
-     "oklch(15% 0.015 165)",
-     "oklch(25% 0.02 165)",
-     "oklch(35% 0.025 165)",
-     "oklch(45% 0.03 165)",
-     "oklch(55% 0.03 165)",
-     "oklch(68% 0.025 165)",
-     "oklch(82% 0.015 165)",
-     "oklch(95% 0.005 165)"
-    ]
-   },
-   "sala-2": {
-    "role": "secondary",
-    "displayName": "Sala, al 60%",
-    "canonical": "#070a09"
-   },
-   "nero-bordo": {
-    "role": "secondary",
-    "displayName": "Nero velato del bordo",
-    "canonical": "rgba(0,0,0,.55)",
-    "note": "Tasti tondi del bordo (.tasto), targhette (.targa), vassoio (.tray); .35 nel vassoio leggero."
-   },
-   "nero-hud": {
-    "role": "secondary",
-    "displayName": "Nero velato dell'HUD",
-    "canonical": "rgba(0,0,0,.5)",
-    "note": "Pillola di stato (.riga); .4 per l'ultimo evento, .6 per toast e velo."
-   },
-   "nero-tot": {
-    "role": "secondary",
-    "displayName": "Nero velato del totale",
-    "canonical": "rgba(0,0,0,.45)",
-    "note": "Totale ed esito accanto alle carte (.tot-feltro)."
-   },
-   "segno": {
-    "role": "secondary",
-    "displayName": "Segni sul feltro",
-    "canonical": "rgba(255,255,255,.5)",
-    "note": "I cinque cerchi di puntata (r 46, tratto 3) in SVG nelle unità della pianta; .22 il riquadro del banco, .4 i numeri dei posti."
-   },
-   "segno-scritta": {
-    "role": "secondary",
-    "displayName": "Scritta ad arco",
-    "canonical": "rgba(255,255,255,.55)",
-    "note": "«blackjack paga 3 a 2 · pzkko · il banco sta a 17» in textPath; «pzkko» a .85 (segno-nome)."
-   },
-   "segno-nome": {
-    "role": "secondary",
-    "displayName": "Nome nella scritta",
-    "canonical": "rgba(255,255,255,.85)"
-   },
-   "lampada": {
-    "role": "secondary",
-    "displayName": "Lampada sul feltro",
-    "canonical": "rgba(255,250,220,.16)",
-    "note": "radial-gradient(58% 52% at 50% 32%) di .piano .luce sopra la foto del feltro."
-   },
-   "vignetta": {
-    "role": "secondary",
-    "displayName": "Vignetta sul feltro",
-    "canonical": "rgba(0,0,0,.38)",
-    "note": "Secondo radial-gradient di .piano .luce, da trasparente al 58% al bordo."
-   },
-   "card": {
-    "role": "secondary",
-    "displayName": "Carta (ripiego)",
-    "canonical": "#fff",
-    "note": "La carta è l'immagine art/carte/<rango><seme>.webp (dorso retro.webp); #fff è il fondo della faccia e del ripiego CSS."
-   },
-   "ink": {
-    "role": "secondary",
-    "displayName": "Inchiostro della carta",
-    "canonical": "#1d1d1f",
-    "cssVar": "--ink"
-   },
-   "red": {
-    "role": "secondary",
-    "displayName": "Rosso dei semi",
-    "canonical": "#ff3b30",
-    "cssVar": "--red",
-    "note": "Materiale del mazzo (cuori, quadri) e badge sballato: non esce dalla carta e dal tavolo.",
-    "tonalRamp": [
-     "oklch(20% 0.08 27)",
-     "oklch(31% 0.12 27)",
-     "oklch(42% 0.17 27)",
-     "oklch(53% 0.21 27)",
-     "oklch(63% 0.22 27)",
-     "oklch(74% 0.15 27)",
-     "oklch(85% 0.08 27)",
-     "oklch(95% 0.03 27)"
-    ]
-   },
-   "chip": {
-    "role": "secondary",
-    "displayName": "Fiche (ripiego)",
-    "canonical": "#2c2c2e",
-    "note": "La fiche è l'immagine art/fiche/f<valore>.webp; il disco grafite con anello tratteggiato bianco .85 resta come ripiego (.pila i.css, .fiche-tocco.css)."
-   },
-   "campo": {
-    "role": "neutral",
-    "displayName": "Campo (chiaro)",
-    "canonical": "#fff",
-    "cssVar": "--campo",
-    "note": "Campi e tasti secondari della pagina del banco, con anello --hair."
-   },
-   "campo-dark": {
-    "role": "neutral",
-    "displayName": "Campo (scuro)",
-    "canonical": "#2c2c2e",
-    "cssVar": "--campo"
    }
   },
   "typographyMeta": {
@@ -511,7 +301,7 @@
    },
    "mano": {
     "displayName": "Nota a pennarello (Permanent Marker)",
-    "purpose": "«gioca», «in arrivo», «strappa un tagliando»; ruotata di −2°."
+    "purpose": "«in arrivo», «strappa un tagliando»; ruotata di −2°."
    },
    "handle": {
     "displayName": "Contatto scritto a mano",
@@ -525,10 +315,6 @@
     "displayName": "Nota «copiato»",
     "purpose": "La conferma a pennarello rosso dopo lo strappo."
    },
-   "piu18": {
-    "displayName": "Bollo +18",
-    "purpose": "Archivo Black bianco su rosso, disco ruotato."
-   },
    "body": {
     "displayName": "Corpo di pagina",
     "purpose": "Special Elite 16 px."
@@ -536,42 +322,6 @@
    "marciapiede": {
     "displayName": "Marciapiede",
     "purpose": "Il piè di pagina, 14 px."
-   },
-   "button": {
-    "displayName": "Button",
-    "purpose": "I tasti a pillola dei giochi (.b, 44px) nel vassoio in basso e nel velo."
-   },
-   "targa": {
-    "displayName": "Targa",
-    "purpose": "Il nome sotto la sedia (.targa); «(tu)» accanto al proprio."
-   },
-   "targa-saldo": {
-    "displayName": "Targa, saldo",
-    "purpose": "Il saldo sotto il nome (.targa small), --felt-fg2."
-   },
-   "tasto": {
-    "displayName": "Tasto del bordo",
-    "purpose": "Il nome della mossa nel tasto tondo da 64px (.tasto); 13px nei piccoli da 56px (.tasto.s)."
-   },
-   "tasto-k": {
-    "displayName": "Tasto, scorciatoia",
-    "purpose": "La scorciatoia o la cifra sotto il nome della mossa (.tasto .k), opacità .75."
-   },
-   "tot-feltro": {
-    "displayName": "Totale sul feltro",
-    "purpose": "La pillola del totale e dell'esito accanto alle carte (.tot-feltro); la cifra sotto la pila è 600 13px con ombra di testo."
-   },
-   "hud": {
-    "displayName": "HUD",
-    "purpose": "La pillola di stato (.riga), 14px a telefono; conto alla rovescia a 13px; ultimo evento 13px (.eventi-hud)."
-   },
-   "hud-grande": {
-    "displayName": "HUD, esito",
-    "purpose": "L'esito della mano nella pillola di stato (.riga .grande): positivo bianco, negativo #ff8a80, zero velato."
-   },
-   "segni": {
-    "displayName": "Scritta sul feltro",
-    "purpose": "textPath ad arco in SVG nelle unità della pianta (27 di corpo, spaziatura 1, bianco .55; «pzkko» 700 a .85); numeri dei posti 600 14 a .4. Stampa sul feltro: segue la prospettiva."
    }
   },
   "shadows": [
@@ -614,48 +364,6 @@
     "name": "lampioni",
     "value": "radial-gradient(46% 24% at 3% 0%, rgba(255,158,40,.95), rgba(255,150,40,.3) 45%, transparent 72%), radial-gradient(44% 22% at 97% 0%, rgba(196,255,232,.85), rgba(170,255,220,.25) 45%, transparent 72%)",
     "purpose": "I lampioni (sodio e neon) in screen sopra la parete; il velo .buio #0a0d1c in multiply sotto di loro."
-   },
-   {
-    "name": "felt-light",
-    "value": "radial-gradient(58% 52% at 50% 32%, rgba(255,250,220,.16), transparent 72%), radial-gradient(100% 100% at 50% 50%, transparent 58%, rgba(0,0,0,.38) 100%)",
-    "purpose": "La lampada e la vignetta su .piano .luce: il solo chiaroscuro disegnato sul piano fotografato."
-   },
-   {
-    "name": "card",
-    "value": "drop-shadow(0 3px 2px rgba(0,0,0,.45))",
-    "purpose": "La carta posata sul feltro (.carta): filter, perché ruota e si piega in 3D."
-   },
-   {
-    "name": "chip",
-    "value": "drop-shadow(0 2px 2px rgba(0,0,0,.5))",
-    "touch": "drop-shadow(0 4px 4px rgba(0,0,0,.55))",
-    "purpose": "Le pile sul cerchio (.pila i) e le fiche da toccare sul bordo (.fiche-tocco)."
-   },
-   {
-    "name": "rail-button",
-    "value": "0 4px 10px rgba(0,0,0,.45), inset 0 0 0 3px rgba(0,0,0,.25)",
-    "purpose": "Il tasto tondo del bordo (.tasto): ombra breve e anello interno scuro dentro il bordo bianco da 2px."
-   },
-   {
-    "name": "tag-ring",
-    "value": "0 0 0 1px rgba(255,255,255,.16)",
-    "mine": "0 0 0 2px #fff",
-    "purpose": "Anello della targhetta (.targa, .targa.mia): etichette sopra la scena, non oggetti."
-   },
-   {
-    "name": "pill-ring",
-    "value": "inset 0 0 0 1px var(--glass-edge)",
-    "purpose": "Pillola di stato, vassoio, toast; il totale sul feltro usa 0 0 0 1px rgba(255,255,255,.18)."
-   },
-   {
-    "name": "hand",
-    "value": "ellisse SVG rgba(0,0,0,.3) con feGaussianBlur stdDeviation 6, rx = metà mano",
-    "purpose": "L'ombra che ogni mano proietta sul feltro: l'unica ombra che segue un movimento."
-   },
-   {
-    "name": "gate-box",
-    "value": "0 30px 60px -30px rgba(0,0,0,.45)",
-    "purpose": "La finestra del velo dei maggiorenni (.box)."
    }
   ],
   "motion": [
@@ -708,56 +416,6 @@
     "name": "tagliando-hover",
     "value": "translateY(2px) rotate(-1.5deg)",
     "purpose": "Il tagliando che si abbassa al passaggio."
-   },
-   {
-    "name": "camera-pan",
-    "value": "transform .6s var(--eo) su .mondo; --pan = -(x della propria sedia - w/2) · 0.52, solo nel mondo alto",
-    "purpose": "La telecamera del telefono scorre verso la propria sedia quando ci si siede. Nessun ingresso della sala: il mondo si misura e si mostra."
-   },
-   {
-    "name": "arm-spring",
-    "value": "molla criticamente smorzata per asse: response 0.26s (w = 2π/0.26), a = -w²(x - t) - 2wv; dt ≤ 1/30s",
-    "purpose": "Il polso di ogni braccio (croupier e giocatori) segue il bersaglio senza oltrepassarlo."
-   },
-   {
-    "name": "torso-spring",
-    "value": "response 0.5s; il busto trasla fino a 60 unità verso la mano quando il bersaglio supera il 78% della portata",
-    "purpose": "La figura si sporge verso dove lavora la mano."
-   },
-   {
-    "name": "two-bone-ik",
-    "value": "cinematica inversa a due segmenti: portata fra |L1 - L2| + 2 e L1 + L2 - 2; piega ±1 sceglie il verso del gomito; pezzi scalati alla lunghezza utile (w - perno - 14)",
-    "purpose": "Braccio, avambraccio e mano come pezzi fotografati su perni d'ottone (art/pezzi.json)."
-   },
-   {
-    "name": "deal",
-    "value": "vado a -1100ms dall'orario di scoperta (mano aperta verso la bocca del sabot), prendo a -640 (pinza, carta in mano), porto a -500 verso il posto, posa all'orario, torno dopo 250ms",
-    "purpose": "Il croupier porta ogni carta dal sabot al posto sull'orologio del server. Con prefers-reduced-motion: reduce la carta compare all'orario, senza viaggio."
-   },
-   {
-    "name": "flip",
-    "value": "gira .32s var(--eo) both; from { transform: rotateY(180deg) translateZ(6px) }",
-    "purpose": "La carta si gira all'arrivo (.carta.girata). Nessuna animazione con prefers-reduced-motion: reduce."
-   },
-   {
-    "name": "bend",
-    "value": "--piega in gradi su .angolo (rotate3d(1,-1,0)); al rilascio molla con response 0.22s e velocità iniziale -140",
-    "purpose": "La propria carta si piega sotto il dito e torna giù."
-   },
-   {
-    "name": "gestures",
-    "value": "carta: indice batte due volte; stai: mano piatta ondeggia; raddoppia: pinza posa la fiche, poi indice; dividi: due dita si allargano; punta: pinza al cerchio; sequenze di 950–1400ms",
-    "purpose": "I segnali veri del blackjack fatti dalla propria figura. Nessun gesto con prefers-reduced-motion: reduce."
-   },
-   {
-    "name": "press-rail",
-    "value": "transform .12s var(--eo); scale(.93)",
-    "purpose": ".tasto alla pressione; .fiche-tocco scale(.92); .b scale(.96); .targa .libera scale(.95)."
-   },
-   {
-    "name": "timer",
-    "value": "transform: scaleX guidato dallo script, transform-origin left; opacity .2s per comparire",
-    "purpose": "Il filo da 2px sotto la pillola di stato che si svuota da sinistra a destra."
    }
   ],
   "breakpoints": [
@@ -790,21 +448,6 @@
     "name": "reduced-motion",
     "value": "(prefers-reduced-motion: reduce)",
     "purpose": "Niente transizioni, strappo immediato."
-   },
-   {
-    "name": "world-portrait",
-    "value": "W < H · 0.9 (misurato su .sala)",
-    "purpose": "Giochi: mondo alto 1000×1400 con scala max(W/w, H/h) e --pan; altrimenti mondo largo 1600×1000 con scala min(W/w, H/h)."
-   },
-   {
-    "name": "phone-game",
-    "value": "max-width: 640px",
-    "purpose": "Giochi: pillola di stato a 14px e larga calc(100vw - 32px), ultimo evento nascosto, schede a 24px, wrap 16px."
-   },
-   {
-    "name": "hover",
-    "value": "(hover: hover)",
-    "purpose": "Giochi: passaggio sui tasti del bordo (bianco .2) e sulle pillole (.22)."
    }
   ]
  },
@@ -837,57 +480,9 @@
    "name": "Nota a pennarello",
    "kind": "chip",
    "refersTo": "volantino-mano",
-   "description": "La nota scritta a mano sul foglio («gioca» con la freccia SVG, «in arrivo», «copiato: …»).",
-   "html": "<p class=\"ds-mano ds-vai\">gioca <svg viewBox=\"0 0 48 24\" aria-hidden=\"true\"><path d=\"M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8\"/></svg></p><span class=\"ds-copiato\">copiato: +39 351 0355506</span>",
+   "description": "La nota scritta a mano sul foglio («torna a pzkko.it» con la freccia SVG nella 404, «in arrivo», «copiato: …»).",
+   "html": "<p class=\"ds-mano ds-vai\">torna a pzkko.it <svg viewBox=\"0 0 48 24\" aria-hidden=\"true\"><path d=\"M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8\"/></svg></p><span class=\"ds-copiato\">copiato: +39 351 0355506</span>",
    "css": ".ds-mano{margin:0;font:400 20px/1.05 \"Permanent Marker\",cursive;color:#a50d25;transform:rotate(-4deg);display:inline-block}.ds-mano svg{display:inline-block;width:1.5em;height:.75em;vertical-align:-.1em;margin-left:.15em;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.ds-copiato{display:inline-block;margin-left:24px;transform:rotate(-6deg);font:400 24px/1 \"Permanent Marker\",cursive;color:#a50d25;background:rgba(255,255,255,.85);padding:.2em .4em;white-space:nowrap}"
-  },
-  {
-   "name": "Bollo +18",
-   "kind": "chip",
-   "refersTo": "piu18",
-   "description": "Il disco rosso con «+18» in Archivo Black sul volantino del blackjack.",
-   "html": "<span class=\"ds-piu18\" aria-label=\"per maggiorenni\">+18</span>",
-   "css": ".ds-piu18{display:inline-block;font:400 16px/1 \"Archivo Black\",\"Arial Black\",sans-serif;color:#fff;background:#a50d25;padding:.35em .4em;border-radius:50%;transform:rotate(12deg)}"
-  },
-  {
-   "name": "Consolle sul bordo",
-   "kind": "button",
-   "refersTo": "tasto-bordo",
-   "description": "I comandi della mano stampati sul bordo imbottito davanti al proprio posto: nel turno quattro tasti tondi da 64px in griglia 2×2 (bordo 2px bianco su nero .55, «carta» primario su --btn); nelle puntate cinque fiche da 52px e i tasti piccoli da 56px. Qui le fiche sono il ripiego CSS; nella pagina sono le immagini generate.",
-   "html": "<div class='ds-bordo'><div class='ds-console'><div class='ds-griglia'><button class='ds-tasto ds-p' type='button'>carta<span class='ds-k'>c</span></button><button class='ds-tasto' type='button'>stai<span class='ds-k'>s</span></button><button class='ds-tasto' type='button'>raddoppia<span class='ds-k'>r</span></button><button class='ds-tasto' type='button' disabled>dividi<span class='ds-k'>d</span></button></div></div><div class='ds-console'><div class='ds-chips3'><button class='ds-fiche' type='button'>5</button><button class='ds-fiche' type='button'>10</button><button class='ds-fiche' type='button'>25</button><button class='ds-fiche' type='button'>50</button><button class='ds-fiche' type='button' disabled>100</button></div><div class='ds-fila'><button class='ds-tasto ds-s ds-p' type='button'>punta<span class='ds-k'>25</span></button><button class='ds-tasto ds-s' type='button'>azzera</button><button class='ds-tasto ds-s' type='button'>salto</button></div></div></div>",
-   "css": ".ds-bordo{display:flex;gap:28px;align-items:flex-start;justify-content:center;padding:24px;border-radius:28px 28px 50% 50%/28px 28px 100% 100%;background:radial-gradient(120% 90% at 50% 38%,#1b6847 0%,#0c3a29 72%,#092b1f 100%);box-shadow:inset 0 0 0 36px #2b1d16,inset 0 0 0 38px rgba(255,255,255,.12);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}.ds-console{display:flex;flex-direction:column;align-items:center;gap:6px}.ds-griglia{display:grid;grid-template-columns:repeat(2,64px);gap:6px}.ds-chips3{display:grid;grid-template-columns:repeat(3,52px);gap:6px;justify-items:center}.ds-chips3 :nth-child(4){grid-column:1/3;justify-self:end}.ds-fila{display:flex;align-items:center;gap:6px}.ds-tasto{width:64px;height:64px;padding:4px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(0,0,0,.55);color:#fff;font-family:inherit;font-weight:600;font-size:14px;line-height:1.1;letter-spacing:-.01em;display:grid;place-items:center;text-align:center;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.45),inset 0 0 0 3px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:transform .12s cubic-bezier(.23,1,.32,1),background .15s,opacity .2s}.ds-tasto.ds-p{background:#1a6fe0;border-color:#fff}.ds-tasto.ds-s{width:56px;height:56px;font-size:13px}.ds-tasto:disabled{opacity:.35;cursor:default}.ds-tasto:not(:disabled):not(.ds-p):hover{background:rgba(255,255,255,.2)}.ds-tasto:not(:disabled):active{transform:scale(.93)}.ds-tasto:focus-visible{outline:2px solid #fff;outline-offset:3px}.ds-k{display:block;font-size:11px;font-weight:400;opacity:.75}.ds-fiche{width:52px;height:52px;padding:0;border-radius:50%;border:3px dashed rgba(255,255,255,.85);background:#2c2c2e;color:#fff;font-family:inherit;font-weight:700;font-size:15px;line-height:1;cursor:pointer;filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));transition:transform .12s cubic-bezier(.23,1,.32,1),opacity .2s}.ds-fiche:disabled{opacity:.3;cursor:default}.ds-fiche:not(:disabled):active{transform:scale(.92)}.ds-fiche:focus-visible{outline:2px solid #fff;outline-offset:3px}"
-  },
-  {
-   "name": "Pillola di stato (HUD)",
-   "kind": "custom",
-   "refersTo": "hud-pill",
-   "description": "La riga di comando in cima alla sala, fuori dalla scala del mondo: a sinistra la pillola di stato (nero .5 sfocato, anello --glass-edge, 15px, nomi e cifre in 600) con il timer da 2px che si svuota sotto il bordo basso; a destra l'ultimo evento (13px velato su nero .4), nascosto a telefono.",
-   "html": "<div class='ds-hud'><div class='ds-riga'><span><b>tocca a te</b> · hai 16</span><span class='ds-conto'>19 s</span><div class='ds-timer ds-on'><i style='transform:scaleX(.62)'></i></div></div><div class='ds-evento'>dan sta a 20</div></div>",
-   "css": ".ds-hud{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 16px 24px;background:radial-gradient(120% 80% at 50% 10%,#17221d 0%,#070a09 60%,#000 100%);color:#fff;font:400 15px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;font-variant-numeric:tabular-nums}.ds-riga{position:relative;display:flex;align-items:center;gap:12px;min-height:36px;padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}.ds-riga b{font-weight:600;white-space:nowrap}.ds-conto{font-size:13px;color:rgba(255,255,255,.78);flex:none}.ds-timer{position:absolute;left:16px;right:16px;bottom:-6px;height:2px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;opacity:0;transition:opacity .2s}.ds-timer.ds-on{opacity:1}.ds-timer i{display:block;height:100%;background:#fff;transform-origin:left center}.ds-evento{font-size:13px;color:rgba(255,255,255,.78);padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px}"
-  },
-  {
-   "name": "Targhetta",
-   "kind": "chip",
-   "refersTo": "targa",
-   "description": "Il nome e il saldo sotto ogni sedia: pillola 600 15px su nero .55 con anello .16; la propria con anello bianco da 2px e «(tu)»; quella di turno bianca con inchiostro; la sedia libera porta solo il tasto «siediti» di vetro bianco .14.",
-   "html": "<div class='ds-targhe'><div class='ds-targa'>ada<small>437 $pzk</small></div><div class='ds-targa ds-mia'>pekko (tu)<small>1175 $pzk</small></div><div class='ds-targa ds-turno'>dan<small>1772 $pzk</small></div><div class='ds-targa ds-vuota'><button class='ds-libera' type='button'>siediti</button></div></div>",
-   "css": ".ds-targhe{display:flex;gap:16px;align-items:flex-start;padding:20px;background:radial-gradient(120% 80% at 50% 10%,#17221d 0%,#070a09 60%,#000 100%);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}.ds-targa{padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-weight:600;font-size:15px;line-height:1.2;text-align:center;white-space:nowrap;box-shadow:0 0 0 1px rgba(255,255,255,.16)}.ds-targa small{display:block;font-weight:400;font-size:12px;color:rgba(255,255,255,.78)}.ds-targa.ds-mia{box-shadow:0 0 0 2px #fff}.ds-targa.ds-turno{background:#fff;color:#1d1d1f}.ds-targa.ds-turno small{color:#6e6e73}.ds-targa.ds-vuota{background:transparent;box-shadow:none;padding:0}.ds-libera{height:40px;padding:0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);color:#fff;font-family:inherit;font-weight:600;font-size:14px;line-height:1;cursor:pointer;transition:transform .12s cubic-bezier(.23,1,.32,1),background .15s}.ds-libera:hover{background:rgba(255,255,255,.22)}.ds-libera:active{transform:scale(.95)}.ds-libera:focus-visible{outline:2px solid #fff;outline-offset:3px}"
-  },
-  {
-   "name": "Carte e totale sul feltro",
-   "kind": "custom",
-   "refersTo": "carta",
-   "description": "Il feltro con la lampada e la vignetta, due carte da 96×134 con raggio 9px (qui il ripiego CSS; nella pagina il mazzo generato), il totale in pillola su nero .45 e la pila di fiche con la cifra sotto.",
-   "html": "<div class='ds-feltro'><div class='ds-luce'></div><div class='ds-mano'><div class='ds-carta' style='transform:rotate(-5deg)'><div class='ds-faccia ds-r'><i>7</i>7<b>7</b></div></div><div class='ds-carta' style='transform:rotate(2deg);margin-left:-68px;margin-top:-10px'><div class='ds-faccia'><i>K</i>K<b>K</b></div></div><span class='ds-tot'>17</span></div><div class='ds-pila'><i></i><i style='transform:translateY(-6px)'></i><span>50</span></div></div>",
-   "css": ".ds-feltro{position:relative;display:flex;align-items:center;gap:48px;padding:40px 48px 48px;border-radius:28px;background:radial-gradient(120% 90% at 50% 38%,#1b6847 0%,#0c3a29 72%,#092b1f 100%);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}.ds-luce{position:absolute;inset:0;pointer-events:none;background:radial-gradient(58% 52% at 50% 32%,rgba(255,250,220,.16),transparent 72%),radial-gradient(100% 100% at 50% 50%,transparent 58%,rgba(0,0,0,.38) 100%)}.ds-mano{position:relative;display:flex;align-items:flex-start}.ds-carta{position:relative;width:96px;height:134px;border-radius:9px;background:#fff;filter:drop-shadow(0 3px 2px rgba(0,0,0,.45))}.ds-faccia{position:absolute;inset:0;border-radius:9px;display:grid;place-items:center;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI Variable Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-weight:700;font-size:44px;line-height:1;letter-spacing:-.04em}.ds-faccia.ds-r{color:#ff3b30}.ds-faccia i{position:absolute;top:6px;left:8px;font-size:22px;font-style:normal}.ds-faccia b{position:absolute;bottom:6px;right:8px;font-size:22px;transform:rotate(180deg)}.ds-tot{position:relative;align-self:flex-end;margin-left:12px;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font-weight:600;font-size:15px;line-height:1;white-space:nowrap;box-shadow:0 0 0 1px rgba(255,255,255,.18)}.ds-pila{position:relative;width:56px;height:56px}.ds-pila i{position:absolute;inset:0;border-radius:50%;background:#2c2c2e;border:3px dashed rgba(255,255,255,.85);filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}.ds-pila span{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);font-weight:600;font-size:13px;line-height:1;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}"
-  },
-  {
-   "name": "Tasto pieno sulle superfici neutre",
-   "kind": "button",
-   "refersTo": "button-primary-page",
-   "description": "Il tasto primario fuori dal feltro (velo dei maggiorenni, pagina del banco): --btn, cioè --link in chiaro e #1a6fe0 in scuro perché il bianco su #2997ff non regge 4.5:1. Accanto, il tasto secondario --campo con anello --hair.",
-   "html": "<div class='ds-tasti-pagina'><button class='ds-btn-page ds-p' type='button'>ho più di 18 anni, entro</button><button class='ds-btn-page' type='button'>registra un amico</button></div>",
-   "css": ".ds-tasti-pagina{display:flex;gap:8px;flex-wrap:wrap;padding:22px;border-radius:28px;background:var(--tile,#f5f5f7);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif}.ds-btn-page{height:44px;padding:0 16px;border:0;border-radius:999px;background:var(--campo,#fff);box-shadow:inset 0 0 0 1px var(--hair,rgba(0,0,0,.1));color:var(--fg,#1d1d1f);font-weight:600;font-size:15px;line-height:1;letter-spacing:-.01em;cursor:pointer;transition:transform .12s cubic-bezier(.23,1,.32,1)}.ds-btn-page.ds-p{background:var(--btn,#0066cc);color:#fff;box-shadow:none}.ds-btn-page:active{transform:scale(.96)}.ds-btn-page:disabled{opacity:.4;cursor:default}.ds-btn-page:focus-visible{outline:2px solid var(--link,#0066cc);outline-offset:3px}"
   }
  ],
  "narrative": {
@@ -917,11 +512,6 @@
    {
     "name": "La regola dell'inchiostro",
     "body": "I colori del testo sono inchiostri da stampa o da pennarello sopra una carta, dichiarati per foglio (`--marker-c`, `--titolo`), e si scelgono per leggere su quella carta (≥ 4,5:1 sul corpo). Non esistono colori d'interfaccia: niente blu dei link, niente verde di conferma, niente rosso d'errore. L'unica eccezione è il giallo del fuoco.",
-    "section": "colors"
-   },
-   {
-    "name": "La regola del feltro",
-    "body": "La sala e il feltro sono il solo campo di colore dei giochi e non seguono il tema: sopra ci stanno bianco, bianco velato (`--felt-fg2`), nero velato (`rgba(0,0,0,.4–.6)`) con anello `--glass-edge` e il blu del tasto primario; niente grigi di pagina, niente `--tile`, niente segni colorati sul feltro. Fuori dalla sala la pagina torna neutra come la home.",
     "section": "colors"
    },
    {
@@ -958,10 +548,7 @@
    "**Do** misurare il testo dei volantini in `max(px, cqw)` e tenere i tagliandi ad almeno 44 px di altezza (46 a telefono).",
    "**Do** scrivere tutto il testo visibile in minuscolo e firmare il marciapiede con il link esatto a `https://www.albertopecchini.it`.",
    "**Do** rigenerare la 404 (`node tools/pzkko/genera-404.mjs`) dopo ogni modifica alla home, e l'anteprima `og.jpg` quando il primo schermo cambia.",
-   "**Do** dire nel README che i manifesti degli altri sono finzione, e tenere i fogli di lavoro fuori dal repository (`tools/pzkko/lavoro/`).",
-   "**Do** nei giochi tenere la sala come un oggetto solo che riempie il primo schermo (`.sala` alta `calc(100svh - 48px)`, fondo `#17221d → #000`), con un mondo a misure fisse (1600 × 1000 o 1000 × 1400) scalato con `--k` e la pianta del tavolo (1400 × 860) in prospettiva: ogni cosa sul feltro si misura nelle unità della pianta e si proietta chiedendo al browser; sopra la scena solo pillole di nero velato con anello `--glass-edge`, testo bianco o `--felt-fg2`, tasto primario `--btn`, anelli di fuoco bianchi.",
-   "**Do** nella roulette disegnare sul feltro ciò che deve essere esatto (la corona dei 37 numeri, il tappeto delle puntate) nelle unità della fisica e del piano, e fotografare solo ciò che è materia (conca, rotore, feltro, pallina, dolly): così il numero che esce è la casella in cui la pallina si ferma e un tocco cade nella zona giusta. I colori del tappeto sono `--rosso #d7263d`, `--nero #1a1a1c`, `--verde #1e8f4e` (nei badge dei numeri), stampati sul feltro a .82–.9 di alpha; la consolle sul bordo si scala di `1 / var(--k)` così fiche e tasti restano a misura di dito anche sul telefono.",
-   "**Do** mettere i comandi della mano sul bordo davanti al proprio posto, come tasti tondi da 64 px (bordo 2 px bianco su nero .55) e fiche da toccare da 52 px, e lasciare al vassoio in basso solo le azioni secondarie; ogni nuovo pezzo fotografico entra con il suo perno in `art/pezzi.json`, generato con gpt-image-2 su Replicate e accreditato nel piè di pagina e in `tools/blackjack/README.md`."
+   "**Do** dire nel README che i manifesti degli altri sono finzione, e tenere i fogli di lavoro fuori dal repository (`tools/pzkko/lavoro/`)."
   ],
   "donts": [
    "**Don't** imitare un materiale in CSS: niente bordi strappati in `clip-path`, nastri in gradiente, spray in `text-shadow`, carta in `box-shadow`. Se manca, si fotografa (si genera).",
@@ -970,7 +557,7 @@
    "**Don't** aggiungere un quinto carattere, usare il carattere di sistema nel testo visibile o caricare i caratteri da un host esterno.",
    "**Don't** usare glifi Unicode o emoji al posto di un'icona: le frecce sono l'SVG `.freccia` a pennarello.",
    "**Don't** tornare alla scrivania Apple (dock, bento, superellissi, `backdrop-filter`): è il mondo sostituito il 2026-10-09, non una variante.",
-   "**Don't** animare allo scorrimento o far girare movimenti da soli nella home: si muove solo ciò che risponde al puntatore o al dito; nella sala dei giochi la scena fotografica è l'oggetto stesso, non un ornamento.",
+   "**Don't** animare allo scorrimento o far girare movimenti da soli nella home: si muove solo ciò che risponde al puntatore o al dito.",
    "**Don't** riempire tools e i giochi non fatti con contenuto finto: il volantino «in arrivo» e «cercasi strumenti» sono la forma onesta del vuoto.",
    "**Don't** mettere testo vero dentro le immagini (a parte l'insegna, il cui `h1` ha il suo `alt`): i contatti e i nomi restano HTML, selezionabili e copiabili."
   ]

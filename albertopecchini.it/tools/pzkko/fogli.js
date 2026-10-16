@@ -9,7 +9,7 @@
 // I prompt sono in inglese perché il modello li segue meglio. Niente magenta,
 // rosa o viola sui pezzi: la chiave li farebbe sparire.
 
-import { FONDO } from '../blackjack/fogli.js'
+const FONDO = 'a perfectly flat, uniform, solid pure magenta background (#FF00FF, a chroma-key backdrop: no texture, no gradient, no vignette, no shadow falls on it)'
 
 export { FONDO }
 
