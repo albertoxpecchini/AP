@@ -15,10 +15,10 @@ export const formati = {
 }
 
 // Le cinque catture della home che usano i mockup (web.desktop … web.mobileTall).
-const casa = (prefisso) =>
+const casa = (prefisso, percorso = '/') =>
   ['desktop', 'desktopTall', 'tablet', 'mobile', 'mobileTall'].map((formato) => ({
     file: `${prefisso}-${formato.replace('Tall', '-tall')}.webp`,
-    percorso: '/',
+    percorso,
     formato,
   }))
 
@@ -81,5 +81,22 @@ export const siti = {
 
   'dario-donelli': {
     catture: casa('dd'),
+  },
+
+  'pzkko-it': {
+    // il muro vive all'ora di Mantova: ?notte=0 lo tiene di giorno, ?notte=1 lo porta a notte piena
+    catture: [
+      ...casa('pzk', '/?notte=0'),
+      { file: 'pzk-notte-desktop.webp', percorso: '/?notte=1', formato: 'desktop' },
+      {
+        file: 'pzk-roulette-tablet.webp',
+        // #roulette apre la finestra appena la pagina è pronta
+        percorso: '/?notte=0#roulette',
+        formato: 'tablet',
+        viewport: [820, 1093],
+        prima: (page) => page.waitForSelector('dialog[open] canvas', { timeout: 20_000 }),
+      },
+      { file: 'pzk-404-mobile.webp', percorso: '/404/?notte=0', formato: 'mobile' },
+    ],
   },
 }

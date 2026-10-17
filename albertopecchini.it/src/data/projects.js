@@ -1160,6 +1160,61 @@ const allProjects = [
     sample: false,
   },
   {
+    // Il dominio col trattino, come albertopecchini-it (vedi Rivalta qui sopra).
+    slug: 'pzkko-it',
+    code: 'AP-26-W05',
+    title: 'pzkko',
+    subtitle: 'Il mio nome in rete, attaccato a un muro',
+    area: 'web',
+    categories: ['web'],
+    types: ['Sito web', 'Direzione artistica', 'Sviluppo frontend', 'Gioco 3D'],
+    client: 'Progetto personale',
+    sector: 'Siti, social e giochi',
+    location: 'Mantova',
+    year: 2026,
+    services: ['Direzione artistica', 'Immagini generate con l’IA', 'Web design', 'Sviluppo frontend', 'Gioco in 3D'],
+    technologies: ['HTML', 'CSS', 'JavaScript', 'SVG', 'three.js', 'Rapier', 'gpt-image-2', 'Vercel'],
+    summary: 'Una saracinesca coperta di volantini, uno per ogni sito e social, con i tagliandi da strappare, la sera all’ora di Mantova e una roulette in 3D. Una pagina sola, senza build.',
+    description:
+      'pzkko è il nome che uso in rete, da «Pekko», il mio soprannome. pzkko.it mette in un posto solo i miei siti e i miei social e, a poco a poco, i giochi e gli strumenti che faccio per divertimento. Non è il sito dello studio: è il posto dove provo quello che lì non starebbe.',
+    goal: 'Dare a chi mi cerca un indirizzo solo per trovare i miei siti e i miei contatti, e a me un muro dove attaccare le idee nuove.',
+    problem:
+      'Una pagina di link somiglia a tutte le altre: una colonna di bottoni. E un sito fatto per gioco rischia di restare un esercizio: questo doveva funzionare davvero, come una pagina di contatti.',
+    strategy:
+      'Ho preso come riferimento la foto di una saracinesca chiusa a Bologna, coperta di graffiti e di manifesti. Ogni sito, social e gioco è un volantino attaccato col nastro, e in mezzo c’è la roba degli altri, come su un muro vero. La lamiera, la carta, i nastri e le illustrazioni sono immagini generate con gpt-image-2; l’insegna e il muro del palazzo sono disegnati in SVG; i testi sui fogli sono HTML vero, che si legge e si seleziona.',
+    development: [
+      { title: 'Volantini', text: 'Ogni foglio è una carta fotografata vuota, coi bordi misurati, e sopra il testo in HTML in unità del foglio, così si legge a ogni larghezza. I volantini dei social finiscono coi tagliandi da strappare: toccarne uno lo stacca e copia il contatto. La disposizione a pile la calcola uno script che misura i fogli in Chromium.' },
+      { title: 'La sera', text: 'La pagina calcola alba e tramonto di Mantova con l’algoritmo della NOAA, senza chiamate in rete, e vive a quell’ora da qualunque posto la si guardi: da quaranta minuti prima del tramonto il muro imbrunisce, poi si accende l’insegna al neon, coi tubi che sfarfallano, e di notte passano i fari delle auto.' },
+      { title: 'Roulette', text: 'Il volantino della roulette apre una finestra con la ruota in 3D, disegnata con three.js, e la pallina mossa da un motore fisico vero, Rapier: si ferma dove si ferma. Si gioca a soldi finti su tutte le 157 puntate della roulette europea; una prova senza browser ha fatto 4.122 giri senza un errore.' },
+    ],
+    result:
+      'pzkko.it è online dal 7 ottobre 2026: una pagina in HTML, CSS e JavaScript scritti a mano, senza build né framework, con una 404 fatta di un volantino strappato. Il codice della roulette si carica solo quando la si apre.',
+    metrics: [
+      { value: '0', label: 'Passaggi di build' },
+      { value: '18', label: 'Volantini sul muro' },
+      { value: '157', label: 'Puntate della roulette' },
+    ],
+    web: {
+      url: 'https://www.pzkko.it',
+      domain: 'pzkko.it',
+      desktop: shot('pzk-desktop.webp', 1200, 750, 'Home page di pzkko.it su desktop'),
+      desktopTall: shot('pzk-desktop-tall.webp', 1200, 2833, 'Home page di pzkko.it, pagina intera'),
+      tablet: shot('pzk-tablet.webp', 720, 1036, 'Home page di pzkko.it su tablet'),
+      mobile: shot('pzk-mobile.webp', 600, 1298, 'Home page di pzkko.it su smartphone'),
+      mobileTall: shot('pzk-mobile-tall.webp', 600, 4000, 'Home page di pzkko.it su smartphone, pagina intera'),
+      palette: ['#7F7569', '#858785', '#161616', '#FBD711', '#A50D25'],
+    },
+    cover: shot('pzk-desktop.webp', 1200, 750, 'Home page di pzkko.it'),
+    // La home è già nei dispositivi in apertura: la galleria mostra la notte, la roulette e la 404.
+    images: [
+      shot('pzk-notte-desktop.webp', 1200, 750, 'La saracinesca di pzkko.it di notte: il muro imbrunito, l’insegna al neon accesa e i volantini dei siti', 'Di notte — desktop 1440 px'),
+      shot('pzk-roulette-tablet.webp', 720, 960, 'La roulette di pzkko.it: la ruota in 3D, le fiches e il tavolo stampato sul foglio', 'Roulette — tablet 820 px'),
+      shot('pzk-404-mobile.webp', 600, 1298, 'La pagina 404 di pzkko.it su smartphone: i resti di un volantino strappato e il foglio che rimanda alla home', '404 — smartphone 390 px'),
+    ],
+    featured: false,
+    sample: false,
+  },
+  {
     slug: 'edilcorte',
     code: 'AP-25-W04',
     title: 'Edilcorte',

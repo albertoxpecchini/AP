@@ -1,5 +1,5 @@
 # Catture dei siti nei progetti web del portfolio (Rivalta, Cascina Fontana, questo
-# sito, Dario Donelli). Ogni ora guarda se uno dei siti online è cambiato; se sì lo
+# sito, Dario Donelli, pzkko.it). Ogni ora guarda se uno dei siti online è cambiato; se sì lo
 # rifotografa e pubblica le nuove immagini in public/media/web/ con un commit.
 # Lo strumento è albertopecchini.it/tools/catture/ (vedi il suo README).
 
@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       siti:
-        description: 'Siti da rifare, separati da spazi (rivalta, cascina, ap, dd). Vuoto = quelli cambiati'
+        description: 'Siti da rifare, separati da spazi (rivalta, cascina, ap, dd, pzk). Vuoto = quelli cambiati'
         required: false
         default: ''
       forza:

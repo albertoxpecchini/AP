@@ -147,7 +147,7 @@ function hero() {
 
           <div class="hero__live" data-reveal="up" style="--d:380ms">
             <p class="hero__live-label label">${figurina('hero-online', { className: 'hero__live-fig', sizes: '2rem' }) || '<span class="dot dot--live" aria-hidden="true"></span>'}<span>Online adesso</span><span class="hero__live-note">${sitesPhrase(sites.length)} veri: aprili</span></p>
-            <ul class="hero__sites">
+            <ul class="hero__sites" style="--n:${sites.length}">
               ${sites.map(
                 ({ p, here, href }, i) => html`
                   <li>

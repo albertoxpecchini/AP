@@ -10,6 +10,7 @@ iPhone, gallerie delle pagine interne, strisce dell’iPhone 18 Pro) stanno in
 | `cascina-fontana` | www.cascinafontana.xyz | `cascina-*` (home + Prodotti, galleria con la lightbox, Contatti) |
 | `albertopecchini-it` | www.albertopecchini.it | `ap-*` (home + `ap-iphone-NN`, pagina intera a strisce) |
 | `dario-donelli` | dariodonelli.vercel.app | `dd-*` (home) |
+| `pzkko-it` | www.pzkko.it | `pzk-*` (home di giorno con `?notte=0`, la stessa di notte con `?notte=1`, la roulette aperta su tablet, la 404 sul telefono) |
 
 L’indirizzo viene da `web.url` in `src/data/projects.js`: quando Donelli passerà al suo
 dominio basta cambiarlo lì.
@@ -44,7 +45,7 @@ web»); l’iPhone è 402×812 a 2x, a strisce di al più 2400 px CSS (4800 px) 
 - **a ogni push** che tocca lo strumento o il workflow: stesso giro (con lo strumento
   cambiato si rifà tutto, ma i file identici non producono commit).
 - **a mano**, da GitHub → Actions → *Catture dei siti* → *Run workflow*: si possono indicare
-  i siti (`rivalta`, `cascina`, `ap`, `dd`) e forzarli anche se non sono cambiati.
+  i siti (`rivalta`, `cascina`, `ap`, `dd`, `pzk`) e forzarli anche se non sono cambiati.
 
 L’ultima impronta di ogni sito non sta nel repository ma nella cache delle Actions
 (`stato.json`): se la cache sparisce, il giro successivo rifotografa tutto e pubblica solo

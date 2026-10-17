@@ -966,6 +966,16 @@
   gap: 0.9rem 0.75rem;
 }
 
+/* con un numero dispari di siti l'ultimo prende tutta la riga, steso: miniatura e nome affiancati */
+.hero__sites > li:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.hero__sites > li:last-child:nth-child(odd) .hsite {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+}
+
 .hsite {
   position: relative;
   display: grid;
@@ -1090,8 +1100,18 @@
     vertical-align: top;
   }
 
+  /* tutti i siti in una riga: --n è quanti sono (home.js) */
   .hero__sites {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
+  }
+
+  .hero__sites > li:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .hero__sites > li:last-child:nth-child(odd) .hsite {
+    grid-template-columns: none;
+    align-items: normal;
   }
 }
 
@@ -1125,36 +1145,19 @@
     padding-block: 1.25rem 1.5rem;
   }
 
-  /* la card si stende: miniatura, nome, stato */
-  .hsite {
-    grid-template-columns: 5.5rem minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.45rem 0.8rem 0.45rem 0.45rem;
-  }
-
+  /* con cinque siti in riga la card resta in piedi (stesa, miniatura-nome-stato,
+     non ci stava): la freccia in basso a destra, accanto al dominio */
   .hsite__text {
-    padding-inline: 0;
-  }
-
-  .hsite__badge {
-    position: static;
-    grid-column: 3;
-    grid-row: 1;
+    padding-right: 1.3rem;
   }
 
   .hsite__arrow {
     position: absolute;
     right: 0.7rem;
-    bottom: 0.45rem;
+    bottom: 0.75rem;
     display: block;
     font-size: 0.95rem;
     transition: color var(--t-2) ease;
-  }
-
-  .hsite__badge {
-    align-self: start;
-    margin-top: 0.3rem;
   }
 }
 
@@ -1649,8 +1652,13 @@
     margin-top: clamp(3rem, 7vw, 8rem);
   }
 
-  .wcard--end,
   .js .wsel.is-scrollable .wsel__foot {
+    display: none;
+  }
+
+  /* «non solo siti» resta solo se chiude la griglia: con un numero dispari di siti
+     occupa il posto vuoto in fondo alla seconda colonna */
+  .wcard--end:nth-child(odd) {
     display: none;
   }
 }
