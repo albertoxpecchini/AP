@@ -27,6 +27,9 @@ serio ma è un progetto Vercel a parte.
   Lyca Mobile, TIM, Starlink, brat, Unimore, Unibo) sono quelli che si trovano
   su un muro di città, disegnati dal modello: non sono pubblicità né
   collaborazioni, e nessuno di loro ha a che fare con questo sito.
+  `auguri.webp` è il meme degli auguri a @~matti (17.10.2026, torta e scritte
+  disegnate tutte da gpt-image-2): si apre entrando nella home fino al
+  18.10.2026 alle 20:30, poi lo script lo toglie; dopo si può cancellare.
 - `games/roulette/` — la roulette, che si apre in una finestra sopra il muro
   (vedi sotto): `roulette.js` e `roulette.css` (la finestra, il tavolo, le
   fiches), `ruota.js` (la forma della ruota e la sua fisica), `regole.js` (le

@@ -215,9 +215,24 @@ img{display:block;max-width:100%;height:auto}
   .vol,.man,.tagliandi button,.copiato{transition:none}
   .tagliandi button.cade{transform:none;opacity:0}
 }
+
+/* ── auguri @~matti: il meme che si apre entrando, fino al 18.10.2026 alle 20:30 ── */
+.auguri{width:min(88vw,520px);padding:0;border:0;background:none;overflow:visible}
+.auguri::backdrop{background:rgba(10,10,10,.7)}
+.auguri img{display:block;width:100%;height:auto;transform:rotate(-2deg);box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.auguri button{position:absolute;top:-14px;right:-14px;z-index:1;width:40px;height:40px;border:3px solid #fff;border-radius:50%;
+  background:#111;color:#fff;font:700 30px/1 Arial,sans-serif;cursor:pointer}
+.auguri[open]{animation:auguri .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes auguri{from{transform:scale(.6) rotate(6deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.auguri[open]{animation:none}}
 </style>
 </head>
 <body>
+<!-- auguri a matti: si apre entrando fino al 18.10.2026 alle 20:30, poi lo script lo toglie da solo -->
+<dialog class="auguri" aria-label="auguri @~matti">
+  <form method="dialog"><button aria-label="chiudi">×</button></form>
+  <img src="/art/auguri.webp" loading="lazy" alt="meme: torta con le candeline, «auguri @~matti, la torta la offri tu»" width="1024" height="1024">
+</dialog>
 <div class="strada">
   <header class="portale">
     <h1><span class="insegna-luce" aria-hidden="true"></span><img class="insegna" src="/art/insegna.svg" alt="pzkko" width="1080" height="450" fetchpriority="high"><img class="insegna notte" src="/art/insegna-notte.svg" alt="" aria-hidden="true" width="1080" height="450"><span class="insegna-cono" aria-hidden="true"></span></h1>
@@ -866,6 +881,15 @@ img{display:block;max-width:100%;height:auto}
       b.addEventListener('click', () => { if (!b.classList.contains('via')) copia(t, b) })
     }
   }
+
+  // ── auguri @~matti: 24 ore e poi sparisce ────────────────────────────────
+  // L'immagine è lazy dentro il dialog chiuso: dopo la scadenza non si scarica nemmeno.
+  const auguri = document.querySelector('.auguri')
+  if (auguri && Date.now() < Date.parse('2026-10-18T20:30:00+02:00')) {
+    const img = auguri.querySelector('img')
+    auguri.showModal()
+    auguri.addEventListener('click', (e) => { if (e.target === auguri || e.target === img) auguri.close() })
+  } else auguri?.remove()
 })()
 </script>
 </body>
