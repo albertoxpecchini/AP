@@ -161,6 +161,9 @@ img{display:block;max-width:100%;height:auto}
 .vol:has(h3 a:active){transform:rotate(var(--pr)) scale(.99)}
 .vol:has(h3 a:focus-visible){outline:3px solid #ffd400;outline-offset:4px}
 .vol h3 a:focus-visible{outline:none}
+/* un manifesto che è un link: l'<a> non ha scatola sua (l'immagine è assoluta), il fuoco si vede sul manifesto */
+.man-link:focus-visible{outline:none}
+.man-link:focus-visible>.man{outline:3px solid #ffd400;outline-offset:3px;z-index:20}
 
 /* i tagliandi da strappare: fette della stessa carta, col contatto scritto di traverso.
    Il foglio con i tagliandi scrive fra i bordi veri della carta e i tagliandi vanno da bordo a bordo. */
@@ -279,7 +282,7 @@ img{display:block;max-width:100%;height:auto}
       <img class="it man" src="/art/manifesti3/lyca-tim.webp" alt="" width="687" height="714" loading="lazy" style="--x:20;--y:537;--w:255;--r:-3deg;--mx:12;--my:379;--mw:170;--mr:-3deg">
       <img class="it man" src="/art/manifesti3/starlink.webp" alt="" width="699" height="735" loading="lazy" style="--x:530;--y:524;--w:250;--r:2.5deg;--mx:208;--my:951;--mw:168;--mr:2.5deg">
       <img class="it man" src="/art/manifesti3/moncler.webp" alt="" width="681" height="732" loading="lazy" style="--x:1027;--y:571;--w:240;--r:3deg;--mx:212;--my:1359;--mw:160;--mr:3deg">
-      <img class="it man" src="/art/manifesti4/brat.webp" alt="" width="666" height="765" loading="lazy" style="--x:292;--y:18;--w:220;--r:4deg;--mx:218;--my:18;--mw:150;--mr:4deg">
+      <a class="man-link" href="https://oakvx.github.io/bratAnimator/" rel="noopener" target="_blank"><img class="it man" src="/art/manifesti4/brat.webp" alt="brat animator" width="666" height="765" loading="lazy" style="--x:292;--y:18;--w:220;--r:4deg;--mx:218;--my:18;--mw:150;--mr:4deg"></a>
       <img class="it man" src="/art/manifesti4/tre-torri.webp" alt="" width="750" height="702" loading="lazy" style="--x:1037;--y:30;--w:235;--r:-5deg;--mx:18;--my:834;--mw:165;--mr:-5deg">
 
       <!-- i miei siti: questi si aprono (tranne quello di donelli, che aspetta il dominio) -->
