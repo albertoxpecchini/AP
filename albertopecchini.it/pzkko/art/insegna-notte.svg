@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="450" viewBox="0 0 1080 450">
+  <!-- L'insegna di notte: solo quello che si accende, da sovrapporre a insegna.svg (stessa tela).
+       Dentro ogni lettera il tubo al neon segue la stessa traccia; la faccia in metacrilato si
+       scalda di luce intorno al tubo, e la luce si allarga sul pannello. -->
+  <defs>
+    <path id="tratto" d="M23 325V128M23 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0M217 128H335L217 252H335M405 50V252M510 128L405 215M448 180L515 252M561 50V252M666 128L561 215M604 180L671 252M737 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <filter id="alone" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="26"/></filter>
+    <filter id="alone2" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="faccia" x="-5%" y="-10%" width="110%" height="120%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="tubo" x="-5%" y="-10%" width="110%" height="120%"><feGaussianBlur stdDeviation="2.2"/></filter>
+    <clipPath id="c-pannello"><rect x="46" y="36" width="988" height="328"/></clipPath>
+  </defs>
+  <g clip-path="url(#c-pannello)">
+    <g transform="translate(220 64.3) scale(.724)">
+      <!-- la luce sul pannello -->
+      <use href="#tratto" xlink:href="#tratto" stroke="#ffbe6a" stroke-width="150" opacity=".38" filter="url(#alone)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#ffd79a" stroke-width="70" opacity=".5" filter="url(#alone2)"/>
+      <!-- la faccia della lettera: calda, più chiara verso il tubo -->
+      <use href="#tratto" xlink:href="#tratto" stroke="#e9b878" stroke-width="41"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#ffe2b0" stroke-width="30" filter="url(#faccia)"/>
+      <!-- il tubo: il vetro e la luce dentro -->
+      <use href="#tratto" xlink:href="#tratto" stroke="#fff3dc" stroke-width="14" filter="url(#tubo)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#fffdf6" stroke-width="6"/>
+    </g>
+  </g>
+</svg>

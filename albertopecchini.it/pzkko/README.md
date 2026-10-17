@@ -4,19 +4,36 @@ Il sito di **pzkko.it**: file statici, niente build. Sta nel repository del sito
 serio ma è un progetto Vercel a parte.
 
 - `index.html` — la home: «il muro», una saracinesca grigia coperta di graffiti
-  e di volantini attaccati col nastro: ogni social, gioco e strumento è un
+  e di volantini attaccati col nastro: ogni sito, social, gioco e strumento è un
   volantino. CSS e JS in linea.
 - `art/` — le immagini del muro, generate con openai/gpt-image-2 su Replicate
   il 9.10.2026 e ritagliate da `../tools/pzkko/immagini.mjs` (prompt in
-  `../tools/pzkko/fogli.js`): `muro.webp` (la lamiera, si ripete), `insegna.webp`
-  (il cassonetto con le lettere «pzkko»), `carta/` (nove fogli vuoti con nastro
+  `../tools/pzkko/fogli.js`): `muro.webp` (la lamiera, si ripete), `intonaco.svg` (il muro del palazzo,
+  disegnato in SVG, si ripete), `insegna.svg` e `insegna-notte.svg` (l'insegna
+  disegnata in SVG, di giorno e i tubi al neon accesi), `carta/` (nove fogli vuoti con nastro
   e graffette: i testi veri li scrive la pagina sopra), `arte/` (le illustrazioni
   stampate sui volantini, solo inchiostro), `tag/` (graffiti), `nastro/` (nastri,
   resti strappati, adesivo, puntina, graffette), `manifesti1/` e `manifesti2/`
   (otto manifesti interi, inventati, che riempiono il muro: il concerto della
   chiocciola, il gatto che risponde al nome di git… sono finzione, non annunci),
-  `scritte/` (le parole sprayate social, games, tools). Ogni WebP porta dentro
-  il prompt con cui è nato; le misure stanno in `pezzi.json`.
+  `scritte/` (le parole sprayate social, games, tools). Il 17.10.2026 sono
+  arrivati `arte3/` (le illustrazioni dei volantini dei siti), `manifesti3/` e
+  `manifesti4/` (la roba degli altri in cima: il meme unimore contro unibo,
+  lyca mobile contro tim, l'avvistamento starlink, moncler, brat, la cartolina
+  di piazza tre torri, le frisk attaccate con lo scotch, il biglietto del
+  parcheggio di milano) e `scritte2/` (siti, brat summer, unimore ≥ unibo).
+  Ogni WebP porta dentro il prompt con cui è nato; le misure stanno in
+  `pezzi.json`. I marchi e i nomi veri su quei manifesti (Moncler, Frisk,
+  Lyca Mobile, TIM, Starlink, brat, Unimore, Unibo) sono quelli che si trovano
+  su un muro di città, disegnati dal modello: non sono pubblicità né
+  collaborazioni, e nessuno di loro ha a che fare con questo sito.
+- `games/roulette/` — la roulette, che si apre in una finestra sopra il muro
+  (vedi sotto): `roulette.js` e `roulette.css` (la finestra, il tavolo, le
+  fiches), `ruota.js` (la forma della ruota e la sua fisica), `regole.js` (le
+  puntate e i pagamenti), `lib/` (three.js r186, MIT, e Rapier 0.21, Apache 2.0,
+  con le licenze). Le immagini ferme sono in `art/fiches/` (le cinque fiches e
+  il segnaposto, viste dall'alto) e `art/roulette/` (il foglio della finestra
+  e il legno della ruota), generate il 17.10.2026 come le altre.
 - `fonts/` — Anton e Archivo Black (SIL OFL), Special Elite e Permanent Marker
   (Apache 2.0), da Google Fonts, serviti da qui.
 - `404.html` — pagina non trovata: lo stesso muro, con i resti del volantino
@@ -31,9 +48,16 @@ serio ma è un progetto Vercel a parte.
 La pagina è la saracinesca (la foto di riferimento: la serranda di un negozio
 chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
 
-- **Il portale**: pietra scura (CSS, con una grana SVG) intorno; sopra la
-  porta l'insegna, un cassonetto retroilluminato con le lettere «pzkko» a
-  scatola (immagine; l'`h1` è il suo testo).
+- **Il muro e l'insegna** (17.10): l'unica foto vera è la lamiera; sopra è
+  tutto SVG. Il muro del palazzo è `art/intonaco.svg` (una piastrella di
+  640 px: rumori `feTurbulence` che si ripetono senza giunte, la grana della
+  sabbia illuminata con `feDiffuseLighting`, chiazze di colore), un'ombra
+  sotto la gronda in CSS. L'insegna è `art/insegna.svg`: telaio d'alluminio,
+  pannello bianco sporco, colature dal bordo alto, ruggine in basso, viti,
+  l'adesivo con la chiocciola, le lettere «pzkko» a scatola (un tratto unico
+  arrotondato con fianchi, bordo, faccia e ombra) e le colature sul muro
+  sotto il cassonetto. L'`h1` è il suo `alt`. Niente lampioni, cavi o
+  scritte intorno.
 - **La lamiera**: `art/muro.webp`, la foto di una saracinesca ritagliata a un
   numero intero di doghe e specchiata in larghezza, così si ripete senza
   giunte (`background-size: 2200px`).
@@ -50,19 +74,34 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   suo pezzo di foglio come sfondo): toccarne uno lo strappa, copia il contatto
   e lascia il buco col muro dietro; una nota a pennarello dice «copiato». Con
   `prefers-reduced-motion` lo strappo è immediato.
+- **I siti in cima** (17.10): la saracinesca si è allungata verso l'alto e le
+  cose nuove stanno sopra. La zona `siti` ha un volantino per sito, che si
+  apre in una scheda nuova: albertopecchini.it, bettercallpekko.it,
+  rivaltasulmincio.it, cascinafontana.xyz e «ti serve un sito?» (la pagina dei
+  contatti di albertopecchini.it); quello dell'ing. Dario Donelli non è un link
+  («presto online»: aspetta il suo dominio). In mezzo, la roba degli altri:
+  manifesti, meme e cose attaccate con lo scotch, che non portano da nessuna
+  parte.
+- **In primo piano**: i fogli nuovi coprono i vecchi, ma il volantino o il
+  manifesto sotto il puntatore viene davanti a tutti (`z-index: 20`); sul
+  telefono basta toccarlo (lo script gli mette `.sopra`).
 - **La disposizione**: ogni cosa sul muro è posizionata in assoluto in
-  1280esimi della parete (`--x`, `--y`, `--w`, `--r`) e, sotto i 900 px, in
-  390esimi (`--mx`, `--my`, `--mw`, `--mr`), due volantini per riga; su un
-  tablet la parete non supera i 600 px e la lamiera riempie i lati. I graffiti
+  1280esimi della parete (`--x`, `--y`, `--w`, `--r`, alta 2258) e, sotto i
+  900 px, in 390esimi (`--mx`, `--my`, `--mw`, `--mr`, alta 3777); su un
+  tablet la parete non supera i 600 px e la lamiera riempie i lati. Dal 17.10
+  la composizione è a pile: cinque colonne da ~250 unità sul desktop e due sul
+  telefono, ogni pezzo sovrapposto di poco a quello sopra, graffiti e nastri
+  ancorati ai fogli vicini; dopo ogni cambio di testo si rimisurano le altezze
+  vere dei fogli (crescono col testo) e si rifanno le pile. I graffiti
   stanno sotto i fogli (`.tag`, in multiply), i manifesti inventati fra i
-  fogli (`.man`), le parole sprayate `social`, `games`, `tools` sono le
-  intestazioni delle zone e gli anchor.
+  fogli (`.man`), le parole sprayate `siti`, `social`, `games`, `tools` sono
+  le intestazioni delle zone e gli anchor.
 - **La sera a Mantova**: la pagina calcola alba e tramonto di Mantova (calcolo
   NOAA, al minuto, senza rete) e vive a quell'ora da qualunque posto la si
   guardi. Da 40 minuti prima del tramonto cala un velo blu notte (`.buio`, in
-  multiply) e la lamiera si spegne; al tramonto preciso i led dietro l'insegna si
-  accendono (strobo d'accensione, poi la luce tiene); 12 minuti dopo si accendono
-  i lampioni, al sodio a sinistra e al neon a destra (`.lampioni`, in screen);
+  multiply) e la lamiera si spegne; al tramonto preciso i tubi al neon dell'insegna si
+  accendono (strobo d'accensione, poi la luce tiene); 12 minuti dopo i lampioni
+  della strada, fuori vista (da lì passano anche le auto);
   la notte è piena 50 minuti dopo il tramonto e all'alba tutto si spegne a
   ritroso. Le luci al neon sfarfallano: la rete a 50 Hz fa pulsare i tubi a
   100 Hz e il browser, campionando a 60, ne restituisce il tremolio; in più
@@ -70,17 +109,16 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   `prefers-reduced-motion` niente sfarfallio né strobo. Senza script la notte
   segue il tema del sistema. Prove: `?ora=18:30` (ora di Mantova di oggi),
   `?veloce=60` (il tempo corre 60 volte più in fretta), `?notte=1`.
-- **La strada** (9.10 sera): i lampioni sono veri (`art/strada1/`: una lanterna
-  al sodio a sinistra e un tubo al neon a destra dell'insegna, fotografati
-  spenti e accesi, con il cono di luce dalla testa della lampada); l'insegna
-  di notte è una seconda fotografia (`art/insegna-notte.webp`, generata dalla
-  prima) con i tubi al neon visibili dentro le lettere; intorno, sulla pietra,
-  cavi, la condensa dei condizionatori sul tetto, fuori vista (la goccia cade
-  dall'alto ogni 3–9 s sulla lamiera e lascia il rivolo), intonaco che si sfoglia, umidità, una crepa, gomme
-  schiacciate, un topo a stencil e le scritte degli altri (`art/strada2/`:
-  «ti amo giulia», «NO», «ciao mamma», «ACC 19», «w la pizza», «zio», «qui»,
-  «tvb 4ever»); cinque formiche (`art/bestiole/`) camminano lungo il bordo
-  basso della lamiera. Di notte **passano le auto**: ogni 20–90 secondi (mai
+- **La strada di notte**: al tramonto si accende `art/insegna-notte.svg`
+  (stessa tela dell'insegna: i tubi al neon lungo la stessa traccia delle
+  lettere, la faccia calda, la luce sul pannello), con un alone e un cono di
+  luce in screen sul muro e sulla saracinesca. La condensa dei condizionatori sul tetto, fuori
+  vista: la goccia cade dall'alto ogni 3–9 s sulla lamiera e lascia il rivolo;
+  sulla lamiera gomme schiacciate e le scritte degli altri (`art/strada2/`:
+  «ti amo giulia», «NO», «ciao mamma», «w la pizza», «zio», «qui»); cinque formiche (`art/bestiole/`) camminano lungo il bordo
+  basso della lamiera. Tre mosche (`art/mosche/`: posata, che si pulisce
+  le zampe, due battiti d'ali) si posano sul muro e sui fogli, si girano, fanno
+  due passi, si puliscono e volano via a zig zag; scappano dal puntatore. Di notte **passano le auto**: ogni 20–90 secondi (mai
   più di tre al minuto) i fari (alogeni caldi, led freddi, xeno) spazzano il
   muro e i fogli, poi dal lato in cui l'auto se ne va restano i fanali rossi,
   con una frenata ogni tanto; una su sette ha il neon sotto la scocca. La
@@ -90,6 +128,64 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
 - **404**: generata dalla home da `tools/pzkko/genera-404.mjs`
   (`node tools/pzkko/genera-404.mjs` dalla cartella `albertopecchini.it`), da
   rilanciare dopo ogni modifica a `index.html`.
+
+## La roulette (games/roulette/)
+
+Il volantino «roulette» apre una finestra (`<dialog>`, 800 × 600 sul computer,
+a tutto schermo sul telefono) che sembra un foglio grande attaccato al muro col
+nastro; `#roulette` nell'indirizzo la apre subito. Il codice si carica solo
+quando la si apre (passando sul volantino si precarica).
+
+- **Il tavolo e le fiches** sono cose ferme: il tavolo è un SVG stampato sul
+  foglio (`multiply`, un filtro di grana e bordo irregolare come la stampa dei
+  volantini), in verticale: lo zero in cima, tre colonne di numeri, a sinistra
+  dozzine e semplici, sotto le colonne «2:1». Tutte le 157 puntate di una
+  roulette europea (pieni, cavalli, terzine, quartine, sestine, colonne,
+  dozzine, semplici; sullo zero le semplici si perdono, niente «la partage»);
+  passando sopra una puntata l'evidenziatore giallo segna i numeri coperti e la
+  voce a pennarello dice quanto paga. Le fiches (1, 5, 25, 100, 500) e il
+  segnaposto di cristallo sono fotografie.
+- **Le animazioni delle fiches**: posata, la fiche vola dal mucchio al tavolo
+  con un arco (si avvicina, l'ombra si allarga) e la pila fa un colpetto;
+  «togli» la riporta indietro; alla fine del giro sul numero uscito cade il
+  segnaposto e il pennarello lo cerchia, le puntate perse scivolano via verso il
+  banco una pila alla volta, la vincita arriva dal banco accanto alla pila e poi
+  tutto vola al saldo, che conta. Niente mani. Con `prefers-reduced-motion` le
+  fiches non volano.
+- **La ruota** è 3D (three.js): la scodella in mogano laccato con la pista
+  sopraelevata, il piano nero coi rombi cromati, il rotore con l'anello dei
+  numeri (ordine europeo, cifre in Anton disegnate su una tela), le caselle, le
+  palette d'ottone, l'intarsio e la torretta. La pallina la muove **Rapier** (un
+  motore fisico vero, in WebAssembly) dentro la stessa forma: rotola sulla pista,
+  rallenta per l'aria e il rotolamento, scende, sbatte sui rombi e sulle palette
+  e si ferma dove si ferma; il numero è quello della casella sotto di lei. Come
+  nelle ruote automatiche, la pallina salta fuori dalla casella da sola e
+  riparte dalla pista. «×3» fa correre la pallina tre volte più in fretta.
+- **Soldi finti**: 1.000 $pzk all'inizio, si possono ricaricare quando
+  finiscono; il saldo e gli ultimi numeri restano nel browser
+  (`localStorage`, `pzkko-roulette`). Niente premi, niente pagamenti.
+- **Le prove**: `node tools/pzkko/roulette/prova.mjs [4122]` (dalla cartella
+  `albertopecchini.it`) fa girare la stessa ruota senza browser, in più thread,
+  e per ogni giro controlla che la pallina non esca mai, che si fermi davvero in
+  una casella e ci resti, che il numero sia quello giusto e che le vincite di
+  puntate a caso tornino col conto fatto in un altro modo; fra un giro e
+  l'altro passano 2–8 secondi come quando si punta. Alla fine la distribuzione
+  dei 37 numeri e quella dei salti da un numero al successivo (chi quadro), i
+  tempi e i giri. Il 17.10.2026 (ultima prova, seme 20261017): 4122 giri,
+  nessun errore, nessun giro da rifare, ~10 s e ~10 giri sulla pista, ferma
+  dopo ~12 s; numeri p = 0,17, salti p = 0,44. Con i giri attaccati uno
+  all'altro e il rotore sempre alla stessa velocità i numeri venivano un po'
+  troppo legati al giro prima (p ≈ 0,01): per questo il rotore parte fra 1,6
+  e 2,6 rad/s e la pallina da un punto della pista che cambia di ±0,3 rad.
+- **Le trappole della fisica** (scritte anche in `ruota.js`): Rapier non lascia
+  girare un corpo oltre 120π rad/s, troppo poco per una pallina da 19 mm che
+  corre a 4 m/s: la simulazione va al rallentatore (`TEMPO`) e fuori si
+  riconverte; con l'attrito sulla pista Rapier non fa rotolare la pallina in
+  tondo senza strisciare, quindi la pista non ha attrito e la frenata la danno
+  rotolamento e aria a mano; `lengthUnit` sotto 1 e la distanza di previsione
+  di serie (2 cm) frenano la pallina e costano dieci volte tanto.
+- `tools/pzkko/roulette/motore.mjs` rifà `lib/three.js` (solo i pezzi che
+  servono, con esbuild) e ricopia Rapier.
 
 Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
 `tools/nome/index.html`) e il suo volantino «in arrivo» diventa un link.
@@ -102,6 +198,16 @@ toglie il magenta con la chiave cromatica, separa i pezzi per cella e li scrive
 qui. Le illustrazioni nascono su un cartoncino crema che `usa` rende
 trasparente; lo scotch resta traslucido; la lamiera si taglia sul passo delle
 doghe.
+
+## La disposizione
+
+Le posizioni non si scrivono a mano in `index.html`: stanno in
+`../tools/pzkko/disposizione.js` come pile per colonna (cinque sul desktop, due
+sul telefono) e pezzi ancorati ad altri, e `../tools/pzkko/disponi.mjs` le
+riscrive nella pagina. `node tools/pzkko/disponi.mjs tutto --foto` (dalla
+cartella `albertopecchini.it`) dispone, misura le altezze vere in Chromium, dispone
+di nuovo e lascia le foto del muro in `tools/pzkko/lavoro/`; poi si rigenera la
+404. Un pezzo nuovo: lo si aggiunge in `index.html` e lo si mette in una pila.
 
 ## Vercel
 

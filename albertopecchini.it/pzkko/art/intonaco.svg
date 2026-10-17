@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
+  <!-- L'intonaco del palazzo sopra la saracinesca, disegnato: tre rumori che si ripetono senza
+       giunte (stitchTiles) fanno il rilievo della calce, una luce radente da sinistra in alto lo
+       accende, un quarto rumore largo dà le chiazze di colore della pittura vecchia. -->
+  <filter id="calce" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <!-- il rilievo: ondulazioni larghe della cazzuola + grana fine della sabbia -->
+    <feTurbulence type="fractalNoise" baseFrequency=".00625" numOctaves="4" seed="7" stitchTiles="stitch" result="onde"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="3" seed="2" stitchTiles="stitch" result="sabbia"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="11" stitchTiles="stitch" result="grumi"/>
+    <feComposite in="sabbia" in2="onde" operator="arithmetic" k2="1" k3=".05" result="r1"/>
+    <feComposite in="grumi" in2="r1" operator="arithmetic" k2=".3" k3="1" result="rilievo"/>
+    <feColorMatrix in="rilievo" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0 0 0 0" result="altezza"/>
+    <feDiffuseLighting in="altezza" surfaceScale="1.25" diffuseConstant="1" lighting-color="#fff" result="luce">
+      <feDistantLight azimuth="235" elevation="58"/>
+    </feDiffuseLighting>
+    <!-- il colore: grigio caldo, con chiazze più chiare e più scure -->
+    <feTurbulence type="fractalNoise" baseFrequency=".0047" numOctaves="4" seed="23" stitchTiles="stitch" result="chiazze"/>
+    <feColorMatrix in="chiazze" type="matrix" values=".14 0 0 0 .385  .13 0 0 0 .352  .12 0 0 0 .312  0 0 0 0 1" result="tinta"/>
+    <feBlend in="luce" in2="tinta" mode="multiply" result="muro"/>
+    <feComposite in="muro" in2="SourceGraphic" operator="arithmetic" k2="1.25" k3="0" k4="0"/>
+  </filter>
+  <rect width="640" height="640" fill="#000" filter="url(#calce)"/>
+</svg>

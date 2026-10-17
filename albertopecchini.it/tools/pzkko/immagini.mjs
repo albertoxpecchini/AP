@@ -12,12 +12,13 @@
 //       scrive con i nomi di fogli.js; un foglio «intero» (l'insegna): chiave
 //       cromatica, rifilatura e scrittura; il foglio «tela» (la lamiera): lo
 //       riduce a --lato px e lo specchia 2 × 2 così si ripete senza giunte
+//       una «foto» (texture a tutto campo, es. il legno della ruota): ridotta a --lato px, niente chiave
 //   node tools/pzkko/immagini.mjs usa tutti
 //       usa l'ultimo PNG di ogni foglio in lavoro/
 
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { ROOT, die, predict, prediction, salva, upload } from '../replicate.mjs'
 import { chiave, fondo, fondoMagenta, leggi, rifila, scriviWebp } from '../mascotte/immagine.mjs'
 import { FOGLI } from './fogli.js'
@@ -142,7 +143,8 @@ function chiaveK(img, bordo = BORDO, tinta = TINTA_SCOTCH) {
     // Nei pixel traslucidi (lo scotch, le ombre) il colore smescolato resta
     // rosa: il modello ha filtrato il magenta attraverso il nastro ingiallito.
     // Si tiene solo la luminosità e si dà la tinta di un nastro ingiallito.
-    if (k < 0.9 || Math.min(px[i], px[i + 2]) - px[i + 1] > 12) {
+    // Anche il nastro quasi opaco che il modello colora di salmone (rosso e blu sopra il verde).
+    if (k < 0.9 || Math.min(px[i], px[i + 2]) - px[i + 1] > 12 || (px[i] > 180 && px[i] - px[i + 1] > 25 && px[i + 2] - px[i + 1] > -25)) {
       const lum = (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 200
       for (let c = 0; c < 3; c++) px[i + c] = Math.min(255, Math.round(tinta[c] * lum))
     }
@@ -205,6 +207,7 @@ async function usaGriglia(nome, file) {
   await mkdir(dir, { recursive: true })
   console.log(`→ ${nome}: ${img.w} × ${img.h}, ${comps.filter((c) => c.cell === -1).length} briciole scartate`)
   for (const [cell, n] of f.pezzi.entries()) {
+    if (!n) continue // un pezzo tolto dal sito: la sua cella resta, il file no
     const mie = comps.filter((c) => c.cell === cell)
     if (!mie.length) { console.warn(`  ! ${n}: cella ${cell + 1} vuota`); continue }
     const piece = estrai(img, trovati, mie)
@@ -219,9 +222,9 @@ async function usaGriglia(nome, file) {
 async function usaIntero(nome, file) {
   const f = foglio(nome)
   const img = leggi(file)
-  if (fondoMagenta(img)) { chiave(img, BORDO); console.log('  fondo magenta tolto con la chiave cromatica') }
+  if (fondoMagenta(img)) { f.traslucido ? chiaveK(img, BORDO, f.tinta) : chiave(img, BORDO); console.log(`  fondo magenta tolto con la chiave cromatica${f.traslucido ? ' per pezzi traslucidi' : ''}`) }
   const piece = rifila(img, 8)
-  await mkdir(OUT, { recursive: true })
+  await mkdir(dirname(join(OUT, `${f.intero}.webp`)), { recursive: true })
   const [w, h] = await scriviWebp(piece, join(OUT, `${f.intero}.webp`), f.scala ?? SCALA, 82)
   const man = await manifest()
   man[nome] = { [f.intero]: { w, h } }
@@ -278,6 +281,19 @@ async function usaTela(nome, file) {
   console.log(`  ✓ ${nome}.webp ${res.width} × ${res.height} (${(res.size / 1024).toFixed(0)} kB), una doga ogni ${passo} px`)
 }
 
+/** Una foto a tutto campo (una texture): solo ridotta a --lato px e scritta in WebP. */
+async function usaFoto(nome, file) {
+  const { default: sharp } = await import('sharp')
+  const f = foglio(nome)
+  const out = join(OUT, `${f.foto}.webp`)
+  await mkdir(dirname(out), { recursive: true })
+  const res = await sharp(file).resize({ width: LATO, kernel: 'lanczos3' }).removeAlpha().webp({ quality: 80, effort: 6 }).toFile(out)
+  const man = await manifest()
+  man[nome] = { [f.foto]: { w: res.width, h: res.height } }
+  await scriviManifest(man)
+  console.log(`  ✓ ${f.foto}.webp ${res.width} × ${res.height} (${(res.size / 1024).toFixed(0)} kB)`)
+}
+
 async function ultimoPng(nome) {
   const dir = join(LAVORO, nome)
   if (!existsSync(dir)) die(`nessun foglio generato in ${dir}`)
@@ -292,6 +308,7 @@ async function usa(nome, file) {
   if (!existsSync(src)) die(`non trovo ${src}`)
   console.log(`→ ${nome} da ${src}`)
   if (f.tela) return usaTela(nome, src)
+  if (f.foto) return usaFoto(nome, src)
   if (f.intero) return usaIntero(nome, src)
   return usaGriglia(nome, src)
 }

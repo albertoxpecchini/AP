@@ -74,7 +74,7 @@ The tape is real: translucent, slightly yellowed, with small air bubbles, sticki
     titolo: 'nastri, graffette, puntine, resti di manifesti strappati, adesivo',
     aspetto: '2048x2048',
     griglia: [3, 3],
-    pezzi: ['scotch', 'scotch-storto', 'carta-gommata', 'nastro-nero', 'resto-bianco', 'resto-giallo', 'adesivo', 'puntina', 'graffette'],
+    pezzi: [null, 'scotch-storto', 'carta-gommata', 'nastro-nero', 'resto-bianco', 'resto-giallo', 'adesivo', 'puntina', 'graffette'], // null = pezzo tolto dal sito
     prompt: `${griglia('Nine small pieces of street-poster hardware,', 3, 3)}
 Each piece is drawn LARGE and fills most of its cell:
 1. a strip of clear adhesive tape, slightly yellowed, horizontal, with torn ends and tiny air bubbles;
@@ -95,7 +95,7 @@ Photorealistic, sharp, soft even daylight. The clear tape is translucent, so the
     titolo: 'le illustrazioni dei volantini dei social (macchina fotografica, gatto, cornetta, piccione, caffè, bomboletta)',
     aspetto: '2048x2048',
     griglia: [3, 2],
-    pezzi: ['macchina', 'gatto', 'cornetta', 'piccione', 'caffe', 'bomboletta'],
+    pezzi: ['macchina', 'gatto', 'cornetta', 'piccione', 'caffe', null], // null = pezzo tolto dal sito
     prompt: `${griglia('Six separate printed illustrations,', 3, 2)}
 They are the pictures printed on six different street flyers, so each has its own print style with visible ink texture, and there is NO text, no letters and no logos anywhere. Each drawn LARGE, filling most of its cell:
 1. a chunky instant camera with a photo sliding out of the slot, risograph style with two inks (fluorescent orange and dark teal), grainy, slightly misregistered;
@@ -170,10 +170,10 @@ The paint is only spray paint: semi-transparent overspray, drips running downwar
 
   strada1: {
     scala: 0.75,
-    titolo: 'la strada: lampioni (sodio e neon, spenti e accesi), condizionatori, cavi, intonaco, umidità, gomme',
+    titolo: 'la strada: dal 17.10 resta solo il pezzo delle gomme (lampioni, cavi, intonaco e umidità tolti con la facciata in SVG)',
     aspetto: '2048x2048',
     griglia: [3, 3],
-    pezzi: ['lampione-spento', 'lampione-acceso', 'neon-spento', 'neon-acceso', 'condizionatori', 'cavi', 'intonaco', 'umidita', 'gomme'],
+    pezzi: [null, null, null, null, null, null, null, null, 'gomme'], // null = pezzo tolto dal sito
     prompt: `${griglia('Nine separate objects from an old Italian city street,', 3, 3)}
 Each object fills most of its cell. Seen from the front and slightly from below, as from the pavement:
 1. a wall-mounted street lamp: a short black cast-iron arm fixed to the wall with a bracket plate at its LEFT end, pointing right, holding a classic lantern head with a high-pressure sodium lamp, switched OFF in daylight (clear glass, dull bulb);
@@ -193,7 +193,7 @@ Photorealistic, sharp. ${NIENTE_MAGENTA}`,
     titolo: 'scritte sul muro che non c’entrano con pzkko',
     aspetto: '2048x2048',
     griglia: [3, 3],
-    pezzi: ['tiamo', 'no', 'ciaomamma', 'acc', 'topo', 'pizza', 'zio', 'qui', 'tvb'],
+    pezzi: ['tiamo', 'no', 'ciaomamma', null, null, 'pizza', 'zio', 'qui', null], // null = pezzo tolto dal sito
     prompt: `Nine separate pieces of street graffiti laid out in a 3 × 3 grid (three columns, three rows) on ${FONDO}, as if drawn on an invisible wall, each complete, none touching another, generous magenta space between them, nothing cropped. They are the scribbles of many different hands, nothing to do with each other:
 1. "ti amo giulia" in quick black marker handwriting with a small heart;
 2. "NO" huge in red spray paint, dripping;
@@ -214,7 +214,7 @@ The paint is only spray paint and marker ink: overspray, drips, grainy edges. No
     titolo: 'formiche, gocce di condensa, spruzzo, rivolo, gomme, crepa',
     aspetto: '2048x2048',
     griglia: [3, 3],
-    pezzi: ['formiche', 'formica', 'formica-lato', 'goccia', 'goccia-cade', 'spruzzo', 'rivolo', 'gomme2', 'crepa'],
+    pezzi: [null, 'formica', 'formica-lato', null, 'goccia-cade', 'spruzzo', 'rivolo', 'gomme2', null], // null = pezzo tolto dal sito
     prompt: `${griglia('Nine small things from a city wall,', 3, 3)}
 Each thing is drawn LARGE and fills most of its cell, photographed straight on:
 1. three tiny black garden ants walking in a line, seen from directly above;
@@ -229,22 +229,123 @@ Each thing is drawn LARGE and fills most of its cell, photographed straight on:
 Photorealistic, sharp. The water is transparent: the magenta shows through it. ${NIENTE_MAGENTA}`,
   },
 
-  'insegna-notte': {
-    scala: 0.9,
-    intero: 'insegna-notte',
-    riferimento: 'pzkko/art/insegna.webp',
-    titolo: 'l’insegna di notte: i tubi al neon dentro le lettere',
-    aspetto: '2048x1152',
-    prompt: `Recreate the attached sign EXACTLY (same sign box, same framing, same position and size in the frame, same dirt, water stains, rust and the small snail sticker, same five channel letters p z k k o in the same typeface and the same places), centred on ${FONDO} and filling 94% of the image width, but photographed at NIGHT with the sign switched ON:
-the white panel is NOT lit (it is a dull grey-white in the dark); the five letters glow from INSIDE: their acrylic faces are translucent and through each face you clearly see the bright neon tube bent to follow the outline of that letter (a glowing warm-white tube running inside the letter a little inside its edge, with a small gap and the dark electrode holders where the tube starts and ends); the face glows softly around the tube, brighter near it; a little light spills from the letters onto the panel around them and onto the metal letter sides. Nothing else is lit. No shadow on the magenta. Photorealistic, sharp. ${NIENTE_MAGENTA}`,
+  // 17.10: la saracinesca si allunga verso l'alto e in cima finiscono le cose nuove:
+  // i volantini dei siti (testo vero, sopra queste illustrazioni) e roba di altri
+  // (meme, pubblicità, cose attaccate con lo scotch), disegnata intera dal modello
+  manifesti3: {
+    scala: 0.75,
+    titolo: 'quattro manifesti di altri: il meme unimore contro unibo, lyca mobile contro tim, l’avvistamento starlink, moncler',
+    aspetto: '2048x2048',
+    griglia: [2, 2],
+    pezzi: ['unimore', 'lyca-tim', 'starlink', 'moncler'],
+    prompt: `${griglia('Four complete street posters,', 2, 2)}
+Each is a different printed poster wheat-pasted or taped on a city wall by a different person: slightly wrinkled paper, a few creases, real print texture. The text on them is in correct Italian, spelled exactly as given, all lowercase unless written otherwise; nothing else is written on them (no small print, no phone numbers, no addresses, no QR codes, no website addresses). Each poster fills most of its cell.
+1. a black-and-white photocopied meme flyer on white copier paper, heavy toner, a dark photocopy edge: the big bold title «unimore vs unibo» across the top, then the classic "virgin vs chad" meme drawn in crude MS-Paint style, two cartoon men side by side: on the left a hunched, skinny, sad man labelled «lo studente unibo», with three short captions pointing at him with arrows: «doppia a 650 €», «2 ore di fila in segreteria», «"la più antica del mondo"»; on the right a tall, broad, square-jawed confident man striding forward, labelled «lo studente unimore», with captions «singola a 350 €», «parcheggio sotto casa», «aceto balsamico della nonna»;
+2. an old-school boxing match poster, letterpress style, printed in red and black on bright yellow paper: two cartoon SIM cards with little arms, legs and red boxing gloves face each other in a boxing ring, the left SIM card plain blue, the right one plain red; the huge words «lyca mobile vs tim» at the top, «l'incontro del secolo» under them, and at the bottom «100 giga contro 7 giga»; no logos;
+3. a "sighting" flyer, black-and-white photocopy on white paper: the heading «avvistamento» in huge heavy black type; under it a grainy halftone night photograph of a perfectly straight line of evenly spaced bright dots crossing a starry sky above the dark silhouette of a farmhouse and poplar trees in the flat countryside; under the photo «una fila di luci sopra rodigo» and then, bold, «non sono ufo: è starlink»; a row of blank tear-off tabs along the bottom edge, one of them torn off;
+4. a glossy luxury fashion advertising poster, a printed photograph: a shiny lacquered red down puffer jacket floating alone in front of snowy alpine peaks and a deep blue sky, shot like a high-end winter campaign; at the bottom the brand wordmark «MONCLER» in thin, widely spaced capitals; the glossy paper is slightly wrinkled from the glue and its top-right corner is torn away.
+${NIENTE_MAGENTA}`,
   },
 
-  insegna: {
-    scala: 0.9,
-    titolo: 'l’insegna «pzkko»: cassonetto bianco retroilluminato con le lettere a scatola',
+  manifesti4: {
+    scala: 0.75,
+    traslucido: true,
+    titolo: 'brat, la cartolina di piazza tre torri, le frisk attaccate con lo scotch, il biglietto del parcheggio di milano',
+    aspetto: '2048x2048',
+    griglia: [2, 2],
+    pezzi: ['brat', 'tre-torri', 'frisk', 'parcheggio'],
+    prompt: `${griglia('Four things stuck on a city wall,', 2, 2)}
+Each fills most of its cell; the text on them is spelled exactly as given and nothing else is written on them:
+1. a square street poster in the style of a famous minimalist pop album cover: flat acid lime-green paper (#8ACE00), completely empty except for the single lowercase word «brat» in a plain narrow Arial-like sans-serif, black, slightly blurred and low-resolution as if stretched, placed a little left of centre and a little above the middle; wheat-pasted: wrinkled, a faint glue shine, the bottom-left corner peeling, two strips of clear tape at the top corners;
+2. a glossy tourist postcard with a thin white border, held by two strips of clear tape at the top corners: a photograph of the three skyscrapers of Milan's CityLife district at sunset (a straight glass tower, a twisted glass tower and a curved glass tower) rising behind a wide paved square; printed on the photo in white script «saluti da milano» and below it in small white capitals «PIAZZA TRE TORRI»;
+3. a small flat rectangular pack of FRISK peppermint breath mints (the slim white pack with dark blue lettering «FRISK»), stuck flat on the wall with two crossing strips of clear adhesive tape over it, the tape wrinkled, slightly yellowed, with air bubbles;
+4. a curled, slightly crumpled thermal-paper ticket from a street parking meter, white paper a bit yellowed with faded black print: «comune di milano» at the top, then «sosta a pagamento», a big «valido fino alle 18:40», «€ 3,00» and a short barcode; a faint brown coffee-cup ring on it; held on the wall by one strip of clear tape across its top.
+Photorealistic, sharp, soft even daylight. The clear tape is translucent, so the magenta shows through it. ${NIENTE_MAGENTA}`,
+  },
+
+  arte3: {
+    scala: 0.75,
+    senzaCarta: true,
+    titolo: 'le illustrazioni dei volantini dei siti (chiocciola, computer, airone, cascina, compasso, megafono)',
+    aspetto: '2048x2048',
+    griglia: [3, 2],
+    pezzi: ['chiocciola', 'computer', 'airone', 'cascina', 'compasso', 'megafono'],
+    prompt: `${griglia('Six separate printed illustrations,', 3, 2)}
+They are the pictures printed on six different street flyers, so each has its own print style with visible ink texture, and there is NO text, no letters, no numbers and no logos anywhere. Each drawn LARGE, filling most of its cell:
+1. a snail whose spiral shell is drawn like a technical drawing, with compass arcs and little ruler ticks, a pencil lying beside it, risograph style with two inks (blue and red-orange), grainy, slightly misregistered;
+2. an old beige desktop computer with a bulky CRT monitor, a sticking plaster stuck across the screen and an old telephone handset ringing beside it with little ring lines, flat screen print in yellow and black;
+3. a grey heron standing in tall reeds at the edge of a slow river, a small church bell tower far behind it, linocut style, black and dark teal, bold cuts;
+4. a dairy cow's head peeking over a big round hay bale, a neat stack of split firewood beside it, flat screen print in terracotta, olive green and black;
+5. a drafting compass and a set square lying across the front elevation drawing of a small two-storey house, black ink only, fine technical-pen lines with hatching;
+6. a megaphone shouting, with a few loud sound lines coming out of it, black-and-white photocopy style with heavy toner.
+${NIENTE_MAGENTA}`,
+  },
+
+  scritte2: {
+    scala: 0.75,
+    titolo: 'le scritte della parte nuova in cima: siti, brat summer, unimore > unibo',
     aspetto: '2048x1152',
-    intero: 'insegna',
-    prompt: `The sign box above the doorway of an old Italian department store, photographed straight on (flat, frontal, no perspective), centred on ${FONDO} and filling 94% of the image width; the box is about 2.4 times wider than it is tall.
-The sign is a slightly dirty white back-lit acrylic panel in a thin dark grey aluminium frame, with grey water stains, a few splashes of dried mud near the bottom edge and some rust streaks. Mounted on the panel, centred, the word «pzkko» in lowercase, set in a fat rounded geometric 1970s typeface, as three-dimensional channel letters: each letter is a box about 8 cm deep with dark grey anodised metal sides and a flat matte white acrylic face, casting a soft shadow down and to the right onto the panel. Exactly the five letters p, z, k, k, o, nothing else written anywhere. A small round white vinyl sticker with a hand-drawn black snail is stuck on the panel just above the right end of the word. Soft overcast daylight. Photorealistic, sharp. No shadow on the magenta. ${NIENTE_MAGENTA}`,
+    griglia: [3, 1],
+    pezzi: ['siti', 'brat-summer', 'unimore'],
+    prompt: `Three separate pieces of graffiti laid out in a row (three columns, one row) on ${FONDO}, as if sprayed and written on an invisible wall by different hands, each complete, none touching another, generous magenta space between them, nothing cropped, each filling most of its column:
+1. the word "siti" in bright yellow spray paint, lowercase, a fat-cap tag with a thick black outline, a haze of overspray and two drips running down;
+2. the words "brat summer" in acid lime-green spray paint, lowercase, quick loose handwriting on two lines, with drips;
+3. the words "unimore > unibo" in thick black marker, lowercase, scrawled handwriting, the ">" sign big and underlined twice.
+The paint is only spray paint and marker ink: semi-transparent overspray, drips running downward, grainy edges. No wall, no texture, no shadow: only the paint on the magenta. ${NIENTE_MAGENTA}`,
+  },
+
+  // 17.10 sera: la roulette nella finestra (games/roulette/): il foglio della finestra,
+  // le fiches e il segnaposto viste dall'alto, il legno della ruota 3D
+  'carta-roulette': {
+    scala: 1,
+    traslucido: true,
+    intero: 'roulette/carta',
+    titolo: 'il foglio grande della finestra della roulette, attaccato col nastro ai quattro angoli',
+    aspetto: '1536x1152',
+    prompt: `A single large blank sheet of thick off-white poster paper, landscape, about 4:3, photographed straight on (flat, frontal, no perspective), centred on ${FONDO} and filling 90% of the image width and 90% of its height.
+The paper is completely blank, nothing printed or written on it: slightly wavy from humidity, one soft diagonal crease, the edges very slightly irregular, a little yellowing near the edges. A strip of yellowed clear adhesive tape is stuck diagonally across each of the four corners, sticking out past the paper onto the magenta, where the magenta shows through it; small air bubbles in the tape.
+Soft even daylight, no shadow falls on the magenta. Photorealistic, sharp. No text, no logos. ${NIENTE_MAGENTA}`,
+  },
+
+  fiches: {
+    scala: 0.3,
+    titolo: 'le fiches della roulette (1, 5, 25, 100, 500) e il segnaposto del numero uscito, viste dall’alto',
+    aspetto: '2048x2048',
+    griglia: [3, 2],
+    pezzi: ['f1', 'f5', 'f25', 'f100', 'f500', 'dolly'],
+    prompt: `${griglia('Six separate objects from a roulette table,', 3, 2)}
+Each is photographed from DIRECTLY ABOVE (flat top view, orthographic), the five chips exactly the same size, perfectly round, each filling most of its cell. They are real heavy clay casino chips with a fine embossed texture and a slightly worn surface, each with six rectangular edge inserts around the rim, a thin inner ring, and its value printed big in the centre in a heavy condensed sans-serif:
+1. a cream-white chip with dark blue edge inserts and a dark blue «1»;
+2. a red chip with white edge inserts and a white «5»;
+3. a dark green chip with white edge inserts and a white «25»;
+4. a black chip with white edge inserts and a white «100»;
+5. a bright yellow chip with black edge inserts and a black «500»;
+6. a roulette win marker (a "dolly"): a small heavy clear crystal piece shaped like a chess pawn with a round white top, seen from directly above, its clear glass catching highlights.
+Soft even daylight; no shadow falls on the magenta. Photorealistic, sharp. Nothing else written anywhere. ${NIENTE_MAGENTA}`,
+  },
+
+  'legno-roulette': {
+    foto: 'roulette/legno',
+    titolo: 'il legno lucidato della ruota 3D (texture con la venatura dritta)',
+    aspetto: '2048x1152',
+    prompt: `A perfectly flat, straight-on photograph of polished dark mahogany wood veneer with a straight, fine grain running exactly horizontally from left to right, filling the whole frame edge to edge with no border: rich reddish-brown wood under a clear glossy lacquer, fine open pores, subtle darker streaks along the grain. Perfectly even soft lighting: no reflections, no vignette, no gradient, the same brightness in every corner. No objects, no text. Photorealistic, sharp.`,
+  },
+
+  // le mosche che si posano sul muro e volano via: posata (ali chiuse) e in volo (ali mosse)
+  mosche: {
+    scala: .2,
+    traslucido: true,
+    tinta: [236, 242, 255],
+    titolo: 'mosche: posata, che si pulisce, in volo',
+    aspetto: '2048x2048',
+    griglia: [2, 2],
+    pezzi: ['mosca', 'mosca-zampe', 'mosca-vola', 'mosca-vola2'],
+    prompt: `${griglia('Four views of a common house fly (Musca domestica),', 2, 2)}
+Each fly is drawn LARGE, filling most of its cell, photographed from DIRECTLY ABOVE (top view, flat, orthographic), head pointing straight UP in every cell:
+1. the fly resting, wings folded back over the abdomen in a narrow V, legs spread;
+2. the same fly resting, rubbing its two front legs together in front of the head;
+3. the fly in flight, wings spread out to the sides and motion-blurred, legs tucked;
+4. the fly in flight, wings in a different beat position, swept forward and motion-blurred, legs tucked.
+Grey thorax with dark stripes, dark red eyes, bristly black legs, the wings clear and transparent with fine dark veins: the magenta shows through the wings. Photorealistic macro photograph, sharp. ${NIENTE_MAGENTA}`,
   },
 }

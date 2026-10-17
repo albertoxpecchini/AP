@@ -45,7 +45,7 @@ rep(parete[0], `<div class="parete p404">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h2 class="titolo">questa pagina non c'è.</h2>
-          <p>l'indirizzo non esiste o è cambiato: qualcuno ha strappato il volantino. i social, i giochi e gli strumenti stanno tutti nella home.</p>
+          <p>l'indirizzo non esiste o è cambiato: qualcuno ha strappato il volantino. i siti, i social, i giochi e gli strumenti stanno tutti nella home.</p>
           <p class="mano vai" style="margin-top:auto"><a href="/">torna a pzkko.it</a></p>
         </div>
       </article>

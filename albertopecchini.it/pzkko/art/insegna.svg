@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="450" viewBox="0 0 1080 450">
+  <!-- L'insegna di pzkko, di giorno, disegnata: un cassonetto d'alluminio scuro con il pannello
+       bianco sporco, le cinque lettere a scatola (faccia in metacrilato, fianchi d'alluminio, ombra
+       sul pannello), le colature della pioggia, la ruggine in basso, l'adesivo con la chiocciola.
+       Le lettere sono un tratto unico arrotondato: la stessa traccia fa il tubo al neon di notte
+       (insegna-notte.svg). -->
+  <defs>
+    <path id="tratto" d="M23 325V128M23 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0M217 128H335L217 252H335M405 50V252M510 128L405 215M448 180L515 252M561 50V252M666 128L561 215M604 180L671 252M737 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <linearGradient id="telaio" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6c6f71"/><stop offset=".04" stop-color="#4b4e50"/>
+      <stop offset=".9" stop-color="#36383a"/><stop offset="1" stop-color="#232425"/>
+    </linearGradient>
+    <linearGradient id="pannello" x1="0" y1="0" x2=".18" y2="1">
+      <stop offset="0" stop-color="#f1f0eb"/><stop offset=".55" stop-color="#e4e2db"/><stop offset="1" stop-color="#d2cfc6"/>
+    </linearGradient>
+    <linearGradient id="faccia" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfbf8"/><stop offset="1" stop-color="#e9e8e3"/>
+    </linearGradient>
+    <!-- la sporcizia: dove l'acqua cola dal bordo alto e dove schizza dal basso -->
+    <linearGradient id="dove-sporco" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <mask id="m-sporco"><rect x="46" y="36" width="988" height="328" fill="url(#dove-sporco)"/></mask>
+    <linearGradient id="dove-ruggine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/><stop offset=".955" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <mask id="m-ruggine"><rect x="30" y="20" width="1020" height="360" fill="url(#dove-ruggine)"/></mask>
+    <linearGradient id="giu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="m-muro"><rect x="34" y="372" width="1012" height="78" fill="url(#giu)"/></mask>
+    <filter id="colature-muro" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".07 .005" numOctaves="3" seed="21" result="a"/>
+      <feColorMatrix in="a" type="matrix" values="0 0 0 0 .16  0 0 0 0 .14  0 0 0 0 .12  -2.2 0 0 0 1.25" result="fili"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".02 .002" numOctaves="2" seed="5" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  4 0 0 0 -1.7" result="colonne"/>
+      <feComposite in="fili" in2="colonne" operator="in"/>
+      <feGaussianBlur stdDeviation="1.4"/>
+    </filter>
+    <clipPath id="c-pannello"><rect x="46" y="36" width="988" height="328"/></clipPath>
+
+    <!-- colature verticali: un rumore molto più fitto in orizzontale che in verticale -->
+    <filter id="colature" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".09 .0042" numOctaves="3" seed="4" result="a"/>
+      <feColorMatrix in="a" type="matrix" values="0 0 0 0 .34  0 0 0 0 .31  0 0 0 0 .26  -2.6 0 0 0 1.45" result="fili"/>
+      <!-- solo sotto alcuni punti del bordo: colonne larghe scelte da un secondo rumore -->
+      <feTurbulence type="fractalNoise" baseFrequency=".014 .0011" numOctaves="2" seed="8" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  5 0 0 0 -2.6" result="colonne"/>
+      <feComposite in="fili" in2="colonne" operator="in"/>
+      <feGaussianBlur stdDeviation=".7"/>
+    </filter>
+    <!-- macchie e polvere su tutto il pannello -->
+    <filter id="polvere" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="5" seed="9"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .39  0 0 0 0 .33  -1.8 0 0 0 .86"/>
+    </filter>
+    <!-- la ruggine: un rumore tagliato a soglia, solo i picchi -->
+    <filter id="ruggine" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="5" seed="15"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .24  0 0 0 0 .11  2.3 0 0 0 -1.22"/>
+      <feComponentTransfer><feFuncA type="discrete" tableValues="0 .55 .85 1"/></feComponentTransfer>
+      <feGaussianBlur stdDeviation=".5"/>
+    </filter>
+    <!-- grana fine su tutto: niente superfici lisce da vettoriale -->
+    <filter id="grana" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .48  0 0 0 0 .44  0 0 0 .55 -.18"/>
+    </filter>
+    <filter id="sfoca8" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="sfoca3" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="sfoca1" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="1"/></filter>
+  </defs>
+
+  <!-- sul muro, sotto il cassonetto: l'acqua che gocciola dal telaio lascia righe scure che sfumano in giù -->
+  <rect x="34" y="372" width="1012" height="78" filter="url(#colature-muro)" mask="url(#m-muro)" opacity=".7"/>
+
+  <!-- l'ombra del cassonetto sul muro: luce dall'alto a sinistra -->
+  <rect x="44" y="40" width="1020" height="364" rx="4" fill="#1d1a17" opacity=".55" filter="url(#sfoca8)"/>
+  <rect x="34" y="26" width="1020" height="362" fill="#1d1a17" opacity=".5" filter="url(#sfoca3)"/>
+
+  <!-- il telaio e il pannello -->
+  <rect x="30" y="20" width="1020" height="360" fill="url(#telaio)"/>
+  <rect x="30.5" y="20.5" width="1019" height="359" fill="none" stroke="#7d8082" stroke-opacity=".5"/>
+  <rect x="46" y="36" width="988" height="328" fill="url(#pannello)"/>
+  <!-- il pannello sta un filo dentro il telaio: ombra sul bordo alto e a sinistra -->
+  <path d="M46 36H1034V44H54V364H46Z" fill="#2a2a29" opacity=".35" filter="url(#sfoca1)"/>
+
+  <g clip-path="url(#c-pannello)">
+    <rect x="46" y="36" width="988" height="328" filter="url(#polvere)" opacity=".24"/>
+    <rect x="46" y="36" width="988" height="328" filter="url(#colature)" mask="url(#m-sporco)" opacity=".5"/>
+
+    <!-- le lettere: ombra portata, fianchi, bordo, faccia -->
+    <g transform="translate(220 64.3) scale(.724)">
+      <use href="#tratto" xlink:href="#tratto" stroke="#2d2a26" stroke-width="46" transform="translate(16 22)" opacity=".38" filter="url(#sfoca8)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#3f4244" stroke-width="46" transform="translate(9 11)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#4a4d50" stroke-width="46" transform="translate(7 8.5)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#55585b" stroke-width="46" transform="translate(5 6)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#5f6265" stroke-width="46" transform="translate(3 3.5)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#6a6d70" stroke-width="46" transform="translate(1.5 1.6)"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#bdbdb8" stroke-width="47"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="url(#faccia)" stroke-width="41"/>
+      <use href="#tratto" xlink:href="#tratto" stroke="#fff" stroke-width="41" stroke-opacity=".5" transform="translate(-1 -1.4)" filter="url(#sfoca1)" opacity=".6"/>
+    </g>
+
+    <rect x="46" y="36" width="988" height="328" filter="url(#colature)" mask="url(#m-sporco)" opacity=".22"/>
+    <rect x="46" y="36" width="988" height="328" filter="url(#grana)" opacity=".5"/>
+  </g>
+
+  <!-- la ruggine che esce dal telaio in basso e cola sul pannello -->
+  <rect x="30" y="20" width="1020" height="360" filter="url(#ruggine)" mask="url(#m-ruggine)"/>
+
+  <!-- quattro viti del telaio -->
+  <g fill="#2a2b2c" stroke="#8a8c8e" stroke-opacity=".6" stroke-width=".8">
+    <circle cx="38" cy="28" r="3.2"/><circle cx="1042" cy="28" r="3.2"/><circle cx="38" cy="372" r="3.2"/><circle cx="1042" cy="372" r="3.2"/>
+  </g>
+
+  <!-- l'adesivo con la chiocciola, un po' consumato -->
+  <g transform="translate(962 82) rotate(-8)">
+    <circle r="29" fill="#1c1a17" opacity=".3" transform="translate(1.5 2.5)" filter="url(#sfoca1)"/>
+    <circle r="29" fill="#f5f4ef"/>
+    <circle r="28.4" fill="none" stroke="#cdcac1" stroke-width="1.2"/>
+    <g fill="none" stroke="#1e1d1b" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-19 11.5C-9 11.5 5 11.5 10 11.5C14.5 11.5 17 8.5 17 4"/>
+      <path d="M15.6 5L12.8-6.5M17.8 5.4L20.6-5.6"/>
+      <path d="M-3 1a2.6 2.6 0 0 1 5.2 0a5.2 5.2 0 0 1-10.4 0a7.8 7.8 0 0 1 15.6 0a10.2 10.2 0 0 1-20.4 0"/>
+    </g>
+    <circle cx="12.6" cy="-7.2" r="1.7" fill="#1e1d1b"/><circle cx="20.8" cy="-6.3" r="1.7" fill="#1e1d1b"/>
+    <circle r="29" filter="url(#grana)" opacity=".4"/>
+  </g>
+</svg>

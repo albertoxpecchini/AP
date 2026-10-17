@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>pzkko, i social di Alberto Pecchini</title>
-<meta name="description" content="I social di Alberto Pecchini (pzkko) attaccati a un muro: Instagram, GitHub, WhatsApp, e-mail e PayPal.">
+<meta name="description" content="I siti e i social di Alberto Pecchini (pzkko) attaccati a un muro: albertopecchini.it, Better Call Pekko, Rivalta sul Mincio, Cascina Fontana, Instagram, GitHub, WhatsApp, e-mail e PayPal.">
 <link rel="canonical" href="https://www.pzkko.it/">
 <meta name="author" content="Alberto Pecchini">
 <link rel="author" href="https://www.albertopecchini.it">
-<meta name="theme-color" content="#2b2a28">
+<meta name="theme-color" content="#665d56">
 <meta name="color-scheme" content="light dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="pzkko">
 <meta property="og:title" content="pzkko, i social di Alberto Pecchini">
-<meta property="og:description" content="Instagram, GitHub, WhatsApp, e-mail e PayPal, attaccati a un muro.">
+<meta property="og:description" content="I miei siti, Instagram, GitHub, WhatsApp, e-mail e PayPal, attaccati a un muro.">
 <meta property="og:url" content="https://www.pzkko.it/">
 <meta property="og:image" content="https://www.pzkko.it/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -24,7 +24,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/art/insegna.webp" as="image">
+<link rel="preload" href="/art/insegna.svg" as="image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"pzkko","url":"https://www.pzkko.it/","inLanguage":"it","author":{"@type":"Person","name":"Alberto Pecchini","alternateName":"pzkko","url":"https://www.albertopecchini.it","sameAs":["https://www.instagram.com/albertoxpecchini/","https://github.com/albertoxpecchini"]}}</script>
 <style>
 /* I caratteri dei volantini: Anton e Archivo Black (OFL), Special Elite e Permanent Marker (Apache 2.0), da Google Fonts, serviti da qui. */
@@ -34,7 +34,7 @@
 @font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-weight:400;font-display:swap}
 
 :root{
-  --pietra:#2e2c29; --pietra2:#1f1e1c; --asfalto:#3a3937;
+  --pietra:#665d56; --pietra2:#58504a; --asfalto:#3a3937;
   --inchiostro:#161616; --inchiostro2:#3a3632;
   --marker:#111; --marker-rosso:#a50d25; --marker-blu:#1446a0;
   --fa:"Anton",Impact,"Arial Narrow Bold",sans-serif;
@@ -61,68 +61,53 @@ a{color:inherit}
 h1,h2,h3,p,ul{margin:0}
 img{display:block;max-width:100%;height:auto}
 
-/* ── la strada: la pietra del portale, la saracinesca, la soglia ────── */
+/* ── la strada: il muro del palazzo, la saracinesca, la soglia ────────── */
 .strada{--stipite:clamp(10px,3vw,40px);position:relative;isolation:isolate;overflow:clip;background:
-  radial-gradient(120% 60% at 50% 0%,rgba(255,255,255,.06),transparent 60%),
-  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .17 0 0 0 0 .16 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
-  linear-gradient(var(--pietra),var(--pietra2));padding:0 var(--stipite)}
+  radial-gradient(90% 520px at 50% 0%,rgba(255,250,240,.07),transparent 70%),
+  linear-gradient(rgba(20,16,12,.32),transparent 90px),
+  url(/art/intonaco.svg) 0 0/640px repeat,
+  var(--pietra);padding:0 var(--stipite)}
 
-/* l'insegna sopra la porta: cassonetto bianco, lettere a scatola; l'h1 è la sua scritta */
-.portale{position:relative;z-index:32;padding:clamp(18px,3.2vw,40px) 0 clamp(14px,2.4vw,30px);display:flex;justify-content:center}
+/* l'insegna sopra la porta: un cassonetto disegnato in SVG (art/insegna.svg) con le lettere a scatola, le colature
+   e la ruggine; l'h1 è il suo testo. Di sera si scurisce col resto, al tramonto si accendono i tubi al neon dentro
+   le lettere (art/insegna-notte.svg, stessa tela, sovrapposta) */
+.portale{position:relative;z-index:32;padding:clamp(18px,3.2vw,40px) 0 0;display:flex;justify-content:center;pointer-events:none}
 .portale h1{position:relative;margin:0;width:min(100%,840px)}
-/* l'insegna: di giorno spenta e sporca, al crepuscolo si scurisce col resto, al tramonto i led dietro il pannello si accendono */
-.insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .55 * var(--notte))) drop-shadow(0 6px 10px rgba(0,0,0,.5))}
-/* di notte: la stessa insegna fotografata accesa, i tubi al neon visibili dentro le lettere; sfarfalla con --f-insegna */
-.insegna.notte{position:absolute;inset:0;z-index:2;opacity:calc(var(--insegna) * var(--f-insegna));filter:drop-shadow(0 0 18px rgba(255,236,190,.55)) drop-shadow(0 0 60px rgba(255,222,150,.35))}
-.insegna-luce{position:absolute;inset:-8% -3%;z-index:3;pointer-events:none;mix-blend-mode:screen;filter:blur(10px);background:radial-gradient(52% 60% at 50% 50%,rgba(255,244,214,.55),rgba(255,236,196,.2) 55%,transparent 74%);opacity:calc(var(--insegna) * var(--f-insegna))}
-.insegna-cono{position:absolute;left:-18%;right:-18%;top:96%;height:min(60vh,520px);z-index:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(50% 100% at 50% 0%,rgba(255,236,190,.42),rgba(255,230,180,.12) 50%,transparent 75%);opacity:calc(var(--insegna) * var(--f-insegna))}
+.insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .55 * var(--notte)))}
+.insegna.notte{position:absolute;inset:0;z-index:2;filter:none;opacity:calc(var(--insegna) * var(--f-insegna))}
+.insegna-luce{position:absolute;inset:-14% -6% 0;z-index:0;pointer-events:none;mix-blend-mode:screen;filter:blur(14px);background:radial-gradient(50% 46% at 50% 44%,rgba(255,214,150,.4),rgba(255,200,130,.12) 60%,transparent 78%);opacity:calc(var(--insegna) * var(--f-insegna))}
+.insegna-cono{position:absolute;left:-18%;right:-18%;top:84%;height:min(60vh,520px);z-index:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(50% 100% at 50% 0%,rgba(255,220,170,.3),rgba(255,214,160,.08) 50%,transparent 75%);opacity:calc(var(--insegna) * var(--f-insegna))}
 
 /* la saracinesca: la lamiera fotografata si ripete (una doga ogni 114 px della tela a 1600) */
 .muro{position:relative;container-type:inline-size;max-width:1280px;margin:0 auto;isolation:isolate;
   box-shadow:inset 0 10px 14px -8px rgba(0,0,0,.7),inset 0 -8px 10px -8px rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.5)}
 .muro::before{content:"";position:absolute;inset:0;z-index:-1;background:url(/art/muro.webp) 0 0/2200px auto repeat;background-color:#8e8e8a;filter:brightness(calc(1 - .5 * var(--notte))) saturate(calc(1 - .2 * var(--notte)))}
-/* la sera cala su tutto: un velo blu notte in multiply; sopra, la luce dei lampioni (al sodio a sinistra, al neon a destra) in screen */
+/* la sera cala su tutto: un velo blu notte in multiply */
 .buio{position:absolute;inset:0;z-index:30;pointer-events:none;mix-blend-mode:multiply;background:#0a0d1c;opacity:calc(var(--notte) * .64)}
-/* la luce dei due lampioni veri appesi ai lati dell'insegna: un cono stretto e caldo dalla testa della lampada, un alone largo sul muro */
-.lampioni{position:absolute;inset:0;z-index:31;pointer-events:none;mix-blend-mode:screen;opacity:calc(var(--lampioni) * var(--f-lampioni));background:
-  radial-gradient(9% 7% at var(--sodio-x) var(--lampada-y),rgba(255,190,90,1),rgba(255,160,40,.5) 50%,transparent 100%),
-  radial-gradient(26% 46% at var(--sodio-x) calc(var(--lampada-y) + 160px),rgba(255,158,40,.55),rgba(255,150,40,.18) 50%,transparent 75%),
-  radial-gradient(11% 5% at var(--neon-x) var(--neon-y),rgba(220,255,240,1),rgba(196,255,232,.5) 50%,transparent 100%),
-  radial-gradient(26% 46% at var(--neon-x) calc(var(--neon-y) + 160px),rgba(196,255,232,.5),rgba(170,255,220,.16) 50%,transparent 75%),
-  radial-gradient(70% 34% at 50% 100%,rgba(255,190,110,.12),transparent 70%)}
-.strada{--sodio-x:calc(50% - 505px);--neon-x:calc(50% + 555px);--lampada-y:78px;--neon-y:36px}
 /* i fari delle auto che passano in strada (screen sul muro e sui fogli), poi i fanali rossi dal lato in cui se ne vanno */
 .fari,.freni,.neonauto{position:fixed;inset:0;z-index:33;pointer-events:none;mix-blend-mode:screen}
 .fari{opacity:var(--auto-l);background:radial-gradient(34% 62% at calc(var(--auto-x) * 100%) 68%,rgba(var(--auto-c),.95),rgba(var(--auto-c),.38) 36%,transparent 68%)}
 .freni{opacity:var(--freno);background:radial-gradient(28% 52% at calc(var(--freno-x) * 100%) 70%,rgba(255,36,24,.95),rgba(255,30,20,.35) 40%,transparent 70%)}
 .neonauto{opacity:var(--neon-auto);background:radial-gradient(44% 14% at calc(var(--auto-x) * 100%) 100%,rgba(40,220,255,.85),rgba(40,200,255,.3) 50%,transparent 75%)}
-/* le cose attaccate alla pietra intorno all'insegna: lampioni, condizionatori, cavi, intonaco, umidità, scritte degli altri */
-.fuori{position:absolute;pointer-events:none;z-index:0}
-.fuori img{display:block;width:100%;height:auto}
-.fuori.lampada{z-index:3}
-.fuori.lampada img.acceso{position:absolute;inset:0;opacity:calc(var(--lampioni) * var(--f-lampioni))}
-.lampione{left:calc(50% - 640px);top:14px;width:190px}
-.neon{left:calc(50% + 440px);top:0;width:210px}
-.umidita{left:calc(50% + 520px);top:120px;width:110px;opacity:.85}
-.cavi-sx{left:2%;top:-8px;width:min(34%,400px)}
-.cavi-dx{right:1%;top:-14px;width:min(30%,360px)}
-.intonaco{left:max(-30px,calc(50% - 790px));top:48%;width:150px}
-.crepa{left:calc(50% - 700px);top:2%;width:120px;opacity:.9}
-.scritta-tvb{left:max(6px,calc(50% - 760px));top:6%;width:150px;opacity:.9}
-.scritta-acc{left:calc(50% + 455px);top:62%;width:110px;opacity:.9}
-.scritta-topo{left:calc(50% - 560px);top:70%;width:100px}
-.gomma-fuori{left:calc(50% - 470px);top:86%;width:34px}
 /* la condensa dei condizionatori: la goccia cade dal tubo sulla lamiera, uno spruzzo, e il rivolo resta */
 .goccia,.spruzzo{position:absolute;left:0;top:0;z-index:34;pointer-events:none;opacity:0;will-change:transform}
 .goccia{width:9px}
 .spruzzo{width:26px}
 /* le formiche: piccole, in giro per il muro */
 .formica{position:absolute;left:0;top:0;width:11px;z-index:6;pointer-events:none;will-change:transform}
-/* i riflessi sulla lamiera: la stessa foto, a contrasto alto, in screen, dove battono lampioni e fari */
-.muro::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;background:url(/art/muro.webp) 0 0/2200px auto repeat;filter:grayscale(1) contrast(3.2) brightness(1.25);opacity:calc(.28 * var(--lampioni) * var(--f-lampioni) + .75 * var(--auto-l));
-  -webkit-mask-image:radial-gradient(42% 70% at calc(50% - 480px) 0%,#000,transparent 72%),radial-gradient(42% 70% at calc(50% + 480px) 0%,#000,transparent 72%),radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%);
-  mask-image:radial-gradient(42% 70% at calc(50% - 480px) 0%,#000,transparent 72%),radial-gradient(42% 70% at calc(50% + 480px) 0%,#000,transparent 72%),radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%)}
-.parete{position:relative;height:calc(1700 * var(--u))}
+/* le mosche: si posano sul muro e sui fogli, si girano, si puliscono le zampe e volano via.
+   Quattro foto della stessa mosca (posata, che si pulisce, due battiti d'ali) impilate col centro del
+   corpo allineato (--ax/--ay, in px della foto); lo script mostra una foto alla volta (data-f) e muove
+   il contenitore, scalato a ~14 px di corpo. L'ombra si allarga quando la mosca si stacca dal muro. */
+.mosca{position:absolute;left:0;top:0;width:0;height:0;z-index:6;pointer-events:none;will-change:transform;filter:drop-shadow(5px 9px 4px rgba(0,0,0,.45))}
+.mosca.vola{filter:drop-shadow(45px 80px 20px rgba(0,0,0,.2))}
+.mosca img{position:absolute;left:calc(-1px * var(--ax));top:calc(-1px * var(--ay));max-width:none;display:none}
+.mosca[data-f="posata"] .m-posata,.mosca[data-f="zampe"] .m-zampe,.mosca[data-f="vola"] .m-vola,.mosca[data-f="vola2"] .m-vola2{display:block}
+/* i riflessi sulla lamiera: la stessa foto, a contrasto alto, in screen, dove battono i fari */
+.muro::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;background:url(/art/muro.webp) 0 0/2200px auto repeat;filter:grayscale(1) contrast(3.2) brightness(1.25);opacity:calc(.75 * var(--auto-l));
+  -webkit-mask-image:radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%);
+  mask-image:radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%)}
+.parete{position:relative;height:calc(2258 * var(--u))}
 .gruppo{display:contents}
 
 /* ogni cosa sul muro è posizionata in 1280esimi (e in 390esimi sul telefono) */
@@ -135,7 +120,7 @@ img{display:block;max-width:100%;height:auto}
 /* ── le parole sprayate che danno il nome alle zone: graffiti veri (art/scritte/), sotto i fogli ── */
 .spray{z-index:0;margin:0;scroll-margin-top:24px}
 .spray img{mix-blend-mode:multiply;opacity:.95}
-.spray.bianco img{mix-blend-mode:normal}
+.spray.bianco img,.spray.chiaro img{mix-blend-mode:normal}
 
 /* ── i volantini: carta fotografata, testo vero sopra ───────────────────── */
 .vol{z-index:3;container-type:inline-size;isolation:isolate;aspect-ratio:var(--ar);display:flex;flex-direction:column;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28)) drop-shadow(0 10px 16px rgba(0,0,0,.3));
@@ -159,13 +144,22 @@ img{display:block;max-width:100%;height:auto}
 .vol .handle{font:400 max(13px,6cqw)/1.1 var(--fm);color:var(--marker-c,var(--marker));margin-top:auto;overflow-wrap:anywhere;padding-bottom:2cqw}
 .vol .siti{list-style:none;padding:0;font:400 max(12px,5.2cqw)/1.3 var(--ft)}
 .vol .siti li{display:flex;align-items:center}
+.vol .piu18{position:absolute;left:6%;top:5%;z-index:1;font:400 max(12px,6cqw)/1 var(--fb);color:#fff;background:var(--marker-rosso);padding:.35em .4em;border-radius:50%;transform:rotate(12deg)}
 
+/* il foglio sotto il puntatore viene in primo piano: i nuovi coprono i vecchi, ma basta passarci sopra
+   (sul telefono toccarlo: lo script gli mette .sopra) per tirare fuori quello di sotto. Vale anche per i
+   manifesti degli altri, che però non portano da nessuna parte */
+.man{transition:transform .32s var(--eo),filter .32s var(--eo)}
+.vol.sopra,.man.sopra,.vol:focus-within{z-index:20}
 @media (hover:hover){
-  .vol:has(h3 a:hover){transform:rotate(var(--pr)) translateY(calc(-1.6 * var(--u))) scale(1.015);filter:drop-shadow(0 4px 5px rgba(0,0,0,.3)) drop-shadow(0 26px 30px rgba(0,0,0,.36));z-index:5}
+  .vol:hover,.man:hover{z-index:20}
+  .vol:hover,.man:hover{transform:rotate(var(--pr)) translateY(calc(-1 * var(--u)))}
+  .man:hover{filter:drop-shadow(0 4px 5px rgba(0,0,0,.3)) drop-shadow(0 18px 22px rgba(0,0,0,.34))}
+  .vol:has(h3 a:hover){transform:rotate(var(--pr)) translateY(calc(-1.6 * var(--u))) scale(1.015);filter:drop-shadow(0 4px 5px rgba(0,0,0,.3)) drop-shadow(0 26px 30px rgba(0,0,0,.36))}
   .vol:has(h3 a:hover) h3{text-decoration:underline;text-decoration-thickness:.08em;text-underline-offset:.1em}
 }
 .vol:has(h3 a:active){transform:rotate(var(--pr)) scale(.99)}
-.vol:has(h3 a:focus-visible){outline:3px solid #ffd400;outline-offset:4px;z-index:5}
+.vol:has(h3 a:focus-visible){outline:3px solid #ffd400;outline-offset:4px}
 .vol h3 a:focus-visible{outline:none}
 
 /* i tagliandi da strappare: fette della stessa carta, col contatto scritto di traverso.
@@ -203,13 +197,7 @@ img{display:block;max-width:100%;height:auto}
 /* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
 @media (max-width:899px){
   :root{--u:calc(min(100cqw, 600px) / 390)}
-  .strada{--sodio-x:40px;--neon-x:calc(100% - 36px);--lampada-y:22px;--neon-y:8px}
-  .fuori{display:none}
-  .fuori.lampada{display:block;width:72px;top:-6px}
-  .lampione{left:-6px}
-  .neon{left:auto;right:-6px}
-  .muro::after{-webkit-mask-image:radial-gradient(60% 50% at 0% 0%,#000,transparent 72%),radial-gradient(60% 50% at 100% 0%,#000,transparent 72%),radial-gradient(50% 80% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%);mask-image:radial-gradient(60% 50% at 0% 0%,#000,transparent 72%),radial-gradient(60% 50% at 100% 0%,#000,transparent 72%),radial-gradient(50% 80% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%)}
-  .parete{height:calc(2900 * var(--u));max-width:600px;margin:0 auto}
+  .parete{height:calc(3777 * var(--u));max-width:600px;margin:0 auto}
   .it{--px:var(--mx,var(--x));--py:var(--my,var(--y));--pw:var(--mw,var(--w));--pr:var(--mr,var(--r,0deg))}
   .spray{font-size:calc(40 * var(--u))}
   .vol h3{font-size:max(22px,16cqw)}
@@ -224,7 +212,7 @@ img{display:block;max-width:100%;height:auto}
 }
 
 @media (prefers-reduced-motion:reduce){
-  .vol,.tagliandi button,.copiato{transition:none}
+  .vol,.man,.tagliandi button,.copiato{transition:none}
   .tagliandi button.cade{transform:none;opacity:0}
 }
 </style>
@@ -232,69 +220,137 @@ img{display:block;max-width:100%;height:auto}
 <body>
 <div class="strada">
   <header class="portale">
-    <img class="fuori cavi-sx" src="/art/strada1/cavi.webp" alt="" width="444" height="138" loading="lazy">
-    <img class="fuori cavi-dx" src="/art/strada1/cavi.webp" alt="" width="444" height="138" loading="lazy">
-    <img class="fuori crepa" src="/art/bestiole/crepa.webp" alt="" width="348" height="580" loading="lazy">
-    <img class="fuori scritta-tvb" src="/art/strada2/tvb.webp" alt="" width="441" height="402" loading="lazy">
-    <img class="fuori intonaco" src="/art/strada1/intonaco.webp" alt="" width="408" height="468" loading="lazy">
-    <img class="fuori scritta-topo" src="/art/strada2/topo.webp" alt="" width="459" height="354" loading="lazy">
-    <img class="fuori gomma-fuori" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy">
-    <span class="fuori lampada lampione" aria-hidden="true"><img class="spento" src="/art/strada1/lampione-spento.webp" alt="" width="375" height="426" loading="lazy"><img class="acceso" src="/art/strada1/lampione-acceso.webp" alt="" width="396" height="432" loading="lazy"></span>
-    <span class="fuori lampada neon" aria-hidden="true"><img class="spento" src="/art/strada1/neon-spento.webp" alt="" width="435" height="129" loading="lazy"><img class="acceso" src="/art/strada1/neon-acceso.webp" alt="" width="444" height="132" loading="lazy"></span>
-    <img class="fuori umidita" src="/art/strada1/umidita.webp" alt="" width="294" height="516" loading="lazy">
-    <img class="fuori scritta-acc" src="/art/strada2/acc.webp" alt="" width="429" height="465" loading="lazy">
-    <h1><img class="insegna" src="/art/insegna.webp" alt="pzkko" width="1719" height="604" fetchpriority="high"><img class="insegna notte" src="/art/insegna-notte.webp" alt="" aria-hidden="true" width="1733" height="626"><span class="insegna-luce" aria-hidden="true"></span><span class="insegna-cono" aria-hidden="true"></span></h1>
+    <h1><span class="insegna-luce" aria-hidden="true"></span><img class="insegna" src="/art/insegna.svg" alt="pzkko" width="1080" height="450" fetchpriority="high"><img class="insegna notte" src="/art/insegna-notte.svg" alt="" aria-hidden="true" width="1080" height="450"><span class="insegna-cono" aria-hidden="true"></span></h1>
   </header>
 
   <main class="muro">
     <div class="parete">
 
       <!-- quello che c'era già sul muro: graffiti, resti, manifesti di altri -->
-      <img class="it tag" src="/art/strada2/tiamo.webp" alt="" width="399" height="360" loading="lazy" style="--x:1010;--y:1175;--w:170;--r:-4deg;--mx:30;--my:1990;--mw:120;--mr:-3deg">
-      <img class="it tag" src="/art/strada2/no.webp" alt="" width="432" height="441" loading="lazy" style="--x:560;--y:1540;--w:140;--r:3deg;--mx:300;--my:2800;--mw:80;--mr:3deg">
-      <img class="it tag chiaro" src="/art/strada2/ciaomamma.webp" alt="" width="429" height="342" loading="lazy" style="--x:650;--y:1112;--w:170;--r:-2deg;--mx:200;--my:1500;--mw:150;--mr:-2deg">
-      <img class="it tag" src="/art/strada2/pizza.webp" alt="" width="414" height="348" loading="lazy" style="--x:660;--y:1230;--w:170;--r:2deg;--mx:40;--my:2420;--mw:130;--mr:2deg">
-      <img class="it tag" src="/art/strada2/zio.webp" alt="" width="450" height="375" loading="lazy" style="--x:1160;--y:1620;--w:110;--r:0deg;--mx:20;--my:2540;--mw:80;--mr:0deg">
-      <img class="it tag" src="/art/strada2/qui.webp" alt="" width="468" height="492" loading="lazy" style="--x:1090;--y:20;--w:130;--r:0deg;--mx:300;--my:330;--mw:80;--mr:0deg">
-      <img class="it pezzo" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy" style="--x:380;--y:1655;--w:48;--r:0deg;--mx:160;--my:2860;--mw:34;--mr:0deg">
-      <img class="it pezzo" src="/art/bestiole/gomme2.webp" alt="" width="408" height="384" loading="lazy" style="--x:1230;--y:1070;--w:30;--r:20deg;--mx:360;--my:1720;--mw:22;--mr:20deg">
+      <img class="it tag" src="/art/strada2/tiamo.webp" alt="" width="399" height="360" loading="lazy" style="--x:948;--y:1628;--w:170;--r:-4deg;--mx:96;--my:2768;--mw:120;--mr:-3deg">
+      <img class="it tag" src="/art/strada2/no.webp" alt="" width="432" height="441" loading="lazy" style="--x:805;--y:1933;--w:120;--r:3deg;--mx:151;--my:3322;--mw:70;--mr:3deg">
+      <img class="it tag chiaro" src="/art/strada2/ciaomamma.webp" alt="" width="429" height="342" loading="lazy" style="--x:482;--y:1867;--w:170;--r:-2deg;--mx:124;--my:2914;--mw:150;--mr:-2deg">
+      <img class="it tag" src="/art/strada2/pizza.webp" alt="" width="414" height="348" loading="lazy" style="--x:660;--y:2063;--w:170;--r:2deg;--mx:146;--my:2875;--mw:130;--mr:2deg">
+      <img class="it tag" src="/art/strada2/zio.webp" alt="" width="450" height="375" loading="lazy" style="--x:273;--y:2015;--w:110;--r:0deg;--mx:6;--my:3549;--mw:80;--mr:0deg">
+      <img class="it tag" src="/art/strada2/qui.webp" alt="" width="468" height="492" loading="lazy" style="--x:1135;--y:494;--w:120;--r:0deg;--mx:140;--my:1411;--mw:80;--mr:0deg">
+      <img class="it pezzo" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy" style="--x:378;--y:2076;--w:48;--r:0deg;--mx:201;--my:3549;--mw:34;--mr:0deg">
+      <img class="it pezzo" src="/art/bestiole/gomme2.webp" alt="" width="408" height="384" loading="lazy" style="--x:1236;--y:347;--w:30;--r:20deg;--mx:371;--my:947;--mw:22;--mr:20deg">
       <img class="it pezzo" src="/art/bestiole/rivolo.webp" alt="" width="88" height="604" loading="lazy" style="--x:1215;--y:0;--w:36;--r:0deg;--mx:352;--my:0;--mw:22;--mr:0deg;opacity:.8">
-      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:8;--y:420;--w:300;--r:-3deg;--mx:-10;--my:360;--mw:230;--mr:-6deg">
-      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:900;--y:330;--w:250;--r:-6deg;--mx:170;--my:1330;--mw:200;--mr:-5deg">
-      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:1175;--y:380;--w:95;--r:6deg;--mx:300;--my:1365;--mw:70;--mr:8deg">
-      <img class="it tag" src="/art/tag/tag-verde.webp" alt="" width="498" height="360" loading="lazy" style="--x:290;--y:790;--w:330;--r:2deg;--mx:140;--my:1690;--mw:240;--mr:3deg">
-      <img class="it tag chiaro" src="/art/tag/ciao-bianco.webp" alt="" width="441" height="372" loading="lazy" style="--x:1040;--y:760;--w:250;--r:-8deg;--mx:190;--my:2390;--mw:180;--mr:-7deg">
-      <img class="it tag" src="/art/tag/tag-arancio.webp" alt="" width="483" height="390" loading="lazy" style="--x:40;--y:1265;--w:320;--r:3deg;--mx:-6;--my:2660;--mw:230;--mr:4deg">
-      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" loading="lazy" style="--x:930;--y:1340;--w:230;--r:0deg;--mx:110;--my:2760;--mw:170;--mr:-5deg">
-      <img class="it tag chiaro" src="/art/tag/tag-azzurro.webp" alt="" width="450" height="360" loading="lazy" style="--x:640;--y:1385;--w:300;--r:-4deg;--mx:220;--my:2000;--mw:170;--mr:-6deg">
-      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" loading="lazy" style="--x:1150;--y:1545;--w:120;--r:0deg;--mx:270;--my:2690;--mw:110;--mr:0deg">
-      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" loading="lazy" style="--x:640;--y:1570;--w:200;--r:-4deg;--mx:20;--my:2560;--mw:120;--mr:-8deg">
-      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" loading="lazy" style="--x:990;--y:1565;--w:170;--r:6deg;--mx:250;--my:1100;--mw:120;--mr:10deg">
+      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:190;--y:1119;--w:300;--r:-3deg;--mx:25;--my:1214;--mw:230;--mr:-6deg">
+      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:646;--y:911;--w:250;--r:-6deg;--mx:122;--my:1973;--mw:200;--mr:-5deg">
+      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:1170;--y:552;--w:95;--r:6deg;--mx:337;--my:2939;--mw:70;--mr:8deg">
+      <img class="it tag" src="/art/tag/tag-verde.webp" alt="" width="498" height="360" loading="lazy" style="--x:427;--y:1195;--w:330;--r:2deg;--mx:62;--my:2086;--mw:240;--mr:3deg">
+      <img class="it tag chiaro" src="/art/tag/ciao-bianco.webp" alt="" width="441" height="372" loading="lazy" style="--x:958;--y:1078;--w:250;--r:-8deg;--mx:116;--my:2625;--mw:180;--mr:-7deg">
+      <img class="it tag" src="/art/tag/tag-arancio.webp" alt="" width="483" height="390" loading="lazy" style="--x:70;--y:1854;--w:320;--r:3deg;--mx:26;--my:3263;--mw:230;--mr:4deg">
+      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" loading="lazy" style="--x:935;--y:1897;--w:230;--r:0deg;--mx:118;--my:3541;--mw:170;--mr:-5deg">
+      <img class="it tag chiaro" src="/art/tag/tag-azzurro.webp" alt="" width="450" height="360" loading="lazy" style="--x:968;--y:1914;--w:300;--r:-4deg;--mx:144;--my:3073;--mw:170;--mr:-6deg">
+      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" loading="lazy" style="--x:27;--y:1892;--w:110;--r:0deg;--mx:171;--my:3462;--mw:110;--mr:0deg">
+      <img class="it tag chiaro" src="/art/scritte2/brat-summer.webp" alt="" width="501" height="594" loading="lazy" style="--x:560;--y:0;--w:130;--r:-6deg;--mx:243;--my:155;--mw:105;--mr:-6deg">
+      <img class="it tag" src="/art/scritte2/unimore.webp" alt="" width="456" height="498" loading="lazy" style="--x:1072;--y:1380;--w:120;--r:-4deg;--mx:238;--my:3641;--mw:95;--mr:-4deg">
+      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" loading="lazy" style="--x:1115;--y:1952;--w:200;--r:-4deg;--mx:31;--my:3429;--mw:120;--mr:-8deg">
+      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" loading="lazy" style="--x:980;--y:2092;--w:170;--r:6deg;--mx:119;--my:1478;--mw:120;--mr:10deg">
 
-      <img class="it man" src="/art/manifesti1/concerto.webp" alt="" width="555" height="762" loading="lazy" style="--x:330;--y:-26;--w:250;--r:4deg;--mx:240;--my:-8;--mw:150;--mr:6deg">
-      <img class="it man" src="/art/manifesti2/punk.webp" alt="" width="549" height="729" loading="lazy" style="--x:355;--y:445;--w:230;--r:-5deg;--mx:205;--my:1120;--mw:170;--mr:4deg">
-      <img class="it man" src="/art/manifesti1/sagra.webp" alt="" width="561" height="687" loading="lazy" style="--x:430;--y:905;--w:235;--r:-3deg;--mx:245;--my:1760;--mw:140;--mr:-4deg">
-      <img class="it man" src="/art/manifesti1/roulette.webp" alt="" width="555" height="759" loading="lazy" style="--x:1062;--y:790;--w:215;--r:3deg;--mx:245;--my:2230;--mw:140;--mr:3deg">
-      <img class="it man" src="/art/manifesti1/teatro.webp" alt="" width="657" height="672" loading="lazy" style="--x:690;--y:1215;--w:250;--r:2deg;--mx:0;--my:2230;--mw:125;--mr:-4deg">
-      <img class="it man" src="/art/manifesti2/gatto.webp" alt="" width="546" height="729" loading="lazy" style="--x:400;--y:1330;--w:225;--r:5deg;--mx:20;--my:2440;--mw:150;--mr:3deg">
-      <img class="it man" src="/art/manifesti2/dadi.webp" alt="" width="549" height="729" loading="lazy" style="--x:1050;--y:1250;--w:200;--r:-3deg;--mx:225;--my:2450;--mw:150;--mr:-3deg">
-      <img class="it man" src="/art/manifesti2/moneta.webp" alt="" width="609" height="585" loading="lazy" style="--x:95;--y:1445;--w:210;--r:-2deg;--mx:150;--my:2680;--mw:150;--mr:-2deg">
+      <img class="it man" src="/art/manifesti1/concerto.webp" alt="" width="555" height="762" loading="lazy" style="--x:277;--y:1183;--w:240;--r:4deg;--mx:26;--my:2118;--mw:150;--mr:5deg">
+      <img class="it man" src="/art/manifesti2/punk.webp" alt="" width="549" height="729" loading="lazy" style="--x:1027;--y:819;--w:230;--r:-5deg;--mx:212;--my:2498;--mw:160;--mr:4deg">
+      <img class="it man" src="/art/manifesti1/sagra.webp" alt="" width="561" height="687" loading="lazy" style="--x:1032;--y:1942;--w:225;--r:-3deg;--mx:21;--my:3553;--mw:150;--mr:-4deg">
+      <img class="it man" src="/art/manifesti1/roulette.webp" alt="" width="555" height="759" loading="lazy" style="--x:782;--y:1328;--w:215;--r:3deg;--mx:26;--my:2772;--mw:150;--mr:3deg">
+      <img class="it man" src="/art/manifesti1/teatro.webp" alt="" width="657" height="672" loading="lazy" style="--x:1017;--y:1701;--w:245;--r:2deg;--mx:16;--my:3276;--mw:150;--mr:-4deg">
+      <img class="it man" src="/art/manifesti2/gatto.webp" alt="" width="546" height="729" loading="lazy" style="--x:777;--y:1807;--w:225;--r:5deg;--mx:208;--my:3441;--mw:150;--mr:3deg">
+      <img class="it man" src="/art/manifesti2/dadi.webp" alt="" width="549" height="729" loading="lazy" style="--x:1042;--y:1114;--w:200;--r:-3deg;--mx:218;--my:3252;--mw:150;--mr:-3deg">
+      <img class="it man" src="/art/manifesti2/moneta.webp" alt="" width="609" height="585" loading="lazy" style="--x:42;--y:1894;--w:210;--r:-2deg;--mx:36;--my:3419;--mw:150;--mr:-2deg">
+
+      <!-- in cima, la parte nuova (17.10): roba degli altri attaccata dopo, sopra a tutto il resto -->
+      <img class="it man" src="/art/manifesti3/unimore.webp" alt="" width="723" height="708" loading="lazy" style="--x:762;--y:14;--w:275;--r:2deg;--mx:202;--my:517;--mw:180;--mr:2deg">
+      <img class="it man" src="/art/manifesti3/lyca-tim.webp" alt="" width="687" height="714" loading="lazy" style="--x:20;--y:537;--w:255;--r:-3deg;--mx:12;--my:379;--mw:170;--mr:-3deg">
+      <img class="it man" src="/art/manifesti3/starlink.webp" alt="" width="699" height="735" loading="lazy" style="--x:530;--y:524;--w:250;--r:2.5deg;--mx:208;--my:951;--mw:168;--mr:2.5deg">
+      <img class="it man" src="/art/manifesti3/moncler.webp" alt="" width="681" height="732" loading="lazy" style="--x:1027;--y:571;--w:240;--r:3deg;--mx:212;--my:1359;--mw:160;--mr:3deg">
+      <img class="it man" src="/art/manifesti4/brat.webp" alt="" width="666" height="765" loading="lazy" style="--x:292;--y:18;--w:220;--r:4deg;--mx:218;--my:18;--mw:150;--mr:4deg">
+      <img class="it man" src="/art/manifesti4/tre-torri.webp" alt="" width="750" height="702" loading="lazy" style="--x:1037;--y:30;--w:235;--r:-5deg;--mx:18;--my:834;--mw:165;--mr:-5deg">
+
+      <!-- i miei siti: questi si aprono (tranne quello di donelli, che aspetta il dominio) -->
+      <section class="gruppo" aria-labelledby="siti">
+        <h2 class="it spray chiaro" id="siti" style="--x:52;--y:0;--w:170;--r:-6deg;--mx:31;--my:0;--mw:120;--mr:-6deg"><img src="/art/scritte2/siti.webp" alt="siti" width="489" height="603" loading="lazy"></h2>
+
+        <article class="vol it c-bianco" style="--x:12;--y:140;--w:285;--r:-2deg;--mx:6;--my:98;--mw:188;--mr:-2deg;--marker-c:#1446a0">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte3/chiocciola.webp" alt="" width="444" height="588" style="--aw:50%">
+            <h3><a href="https://www.albertopecchini.it" rel="me noopener" target="_blank">alberto pecchini</a></h3>
+            <p>il sito serio: i progetti, i siti che faccio e come lavoro.</p>
+            <p class="handle">albertopecchini.it</p>
+          </div>
+        </article>
+
+        <article class="vol it c-giallo" style="--x:262;--y:236;--w:280;--r:2deg;--mx:198;--my:219;--mw:188;--mr:2deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte3/computer.webp" alt="" width="450" height="588" style="--aw:46%">
+            <h3><a href="https://www.bettercallpekko.it" rel="me noopener" target="_blank">better call pekko</a></h3>
+            <p>il computer non va? assistenza vera, raccontata come uno spot americano del 2008.</p>
+            <p class="handle">bettercallpekko.it</p>
+          </div>
+        </article>
+
+        <article class="vol it c-lucido" style="--x:512;--y:130;--w:280;--r:-1.5deg;--mx:198;--my:681;--mw:188;--mr:-1.5deg;--marker-c:#173f48">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte3/airone.webp" alt="" width="441" height="585" style="--aw:46%">
+            <h3><a href="https://www.rivaltasulmincio.it" rel="noopener" target="_blank">rivalta sul mincio</a></h3>
+            <p>l'atlante del mio paese: 184 luoghi, il meteo, il giornale. niente tracciamenti.</p>
+            <p class="handle">rivaltasulmincio.it</p>
+          </div>
+        </article>
+
+        <article class="vol it c-crema" style="--x:762;--y:263;--w:275;--r:-2deg;--mx:6;--my:544;--mw:188;--mr:-2deg;--marker-c:#0b5d2b">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte3/cascina.webp" alt="" width="447" height="591" style="--aw:46%">
+            <h3><a href="https://www.cascinafontana.xyz" rel="noopener" target="_blank">cascina fontana</a></h3>
+            <p>la cascina di famiglia a rodigo: fieno, legna e fiori, su appuntamento.</p>
+            <p class="handle">cascinafontana.xyz</p>
+          </div>
+        </article>
+
+        <article class="vol it c-kraft" style="--x:1017;--y:245;--w:255;--r:2.5deg;--mx:198;--my:1116;--mw:185;--mr:2deg;--marker-c:#161616">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte3/compasso.webp" alt="" width="444" height="591" style="--aw:44%">
+            <h3>ing. dario donelli</h3>
+            <p>lo studio tecnico di rivalta, in bianco e nero come la sua targa.</p>
+            <p class="mano vai">presto online</p>
+          </div>
+        </article>
+
+        <article class="vol it c-arancio flip" style="--x:772;--y:623;--w:260;--r:3deg;--mx:6;--my:976;--mw:185;--mr:3deg;--titolo:#161616;--marker-c:#161616">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte3/megafono.webp" alt="" width="453" height="591" style="--aw:44%">
+            <h3><a href="https://www.albertopecchini.it/contatti/" rel="noopener" target="_blank">ti serve un sito?</a></h3>
+            <p>fatto a mano, leggero, senza cookie. come questi.</p>
+            <p class="mano vai">scrivimi <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
+          </div>
+        </article>
+      </section>
+
+      <!-- attaccati sopra con lo scotch -->
+      <img class="it man" src="/art/manifesti4/frisk.webp" alt="" width="450" height="423" loading="lazy" style="--x:402;--y:215;--w:105;--r:-9deg;--mx:301;--my:195;--mw:76;--mr:-9deg;z-index:4">
+      <img class="it man" src="/art/manifesti4/parcheggio.webp" alt="" width="486" height="713" loading="lazy" style="--x:998;--y:592;--w:88;--r:-7deg;--mx:166;--my:1040;--mw:62;--mr:-8deg;z-index:4">
 
       <!-- chi sono -->
-      <article class="vol it c-bianco" style="--x:30;--y:40;--w:300;--r:-2deg;--mx:10;--my:20;--mw:250;--mr:-2deg">
+      <article class="vol it c-bianco" id="chi-sono" style="--x:16;--y:797;--w:290;--r:-2deg;--mx:6;--my:1248;--mw:200;--mr:-2deg">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <p class="forte">pzkko è il mio nome in rete.</p>
-          <p>sono alberto pecchini, faccio siti. qui ci sono i miei social, due giochi da browser e, piano piano, qualche strumento.</p>
+          <p>sono alberto pecchini, faccio siti. qui ci sono i miei siti, i miei social e, piano piano, qualche gioco e strumento.</p>
           <p class="mano" style="margin-top:auto;max-width:72%">strappa un tagliando: copia il contatto <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
         </div>
         <img class="adesivo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441">
       </article>
 
       <section class="gruppo" aria-labelledby="social">
-        <h2 class="it spray" id="social" style="--x:640;--y:470;--w:240;--r:-3deg;--mx:20;--my:340;--mw:150;--mr:-5deg"><img src="/art/scritte/social.webp" alt="social" width="486" height="375" loading="lazy"></h2>
+        <h2 class="it spray" id="social" style="--x:282;--y:662;--w:230;--r:-3deg;--mx:218;--my:1531;--mw:150;--mr:-5deg"><img src="/art/scritte/social.webp" alt="social" width="486" height="375" loading="lazy"></h2>
 
-        <article class="vol it c-arancio" style="--x:345;--y:70;--w:280;--r:-4deg;--mx:12;--my:410;--mw:190;--mr:-3deg;--titolo:#173f48;--marker-c:#173f48">
+        <article class="vol it c-arancio" style="--x:262;--y:759;--w:280;--r:-4deg;--mx:6;--my:1512;--mw:188;--mr:-3deg;--titolo:#173f48;--marker-c:#173f48">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte1/macchina.webp" alt="" width="435" height="636" style="--aw:58%">
@@ -307,7 +363,7 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-bianco flip sotto" style="--x:640;--y:30;--w:290;--r:2deg;--mx:195;--my:395;--mw:190;--mr:2deg">
+        <article class="vol it c-bianco flip sotto" style="--x:512;--y:782;--w:285;--r:2deg;--mx:198;--my:1607;--mw:188;--mr:2deg">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte1/gatto.webp" alt="" width="420" height="606" style="--aw:52%">
@@ -320,7 +376,7 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-verde" style="--x:955;--y:60;--w:300;--r:-2deg;--mx:8;--my:750;--mw:195;--mr:-2deg;--marker-c:#0b5d2b">
+        <article class="vol it c-verde" style="--x:762;--y:967;--w:290;--r:-2deg;--mx:198;--my:1946;--mw:190;--mr:-2deg;--marker-c:#0b5d2b">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte1/cornetta.webp" alt="" width="465" height="618" style="--aw:40%">
@@ -333,7 +389,7 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-crema" style="--x:60;--y:480;--w:290;--r:2.5deg;--mx:200;--my:800;--mw:185;--mr:3deg;--marker-c:#1446a0">
+        <article class="vol it c-crema" style="--x:12;--y:1156;--w:285;--r:2.5deg;--mx:6;--my:1836;--mw:185;--mr:3deg;--marker-c:#1446a0">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte1/piccione.webp" alt="" width="432" height="627" style="--aw:50%">
@@ -346,7 +402,7 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-giallo" style="--x:560;--y:560;--w:270;--r:-2deg;--mx:15;--my:1045;--mw:185;--mr:-2deg;--marker-c:#1446a0">
+        <article class="vol it c-giallo" style="--x:512;--y:1216;--w:270;--r:-2deg;--mx:198;--my:2202;--mw:185;--mr:-2deg;--marker-c:#1446a0">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte1/caffe.webp" alt="" width="441" height="633" style="--aw:44%">
@@ -361,9 +417,31 @@ img{display:block;max-width:100%;height:auto}
       </section>
 
       <section class="gruppo" aria-labelledby="games">
-        <h2 class="it spray bianco" id="games" style="--x:860;--y:905;--w:220;--r:3deg;--mx:20;--my:1340;--mw:150;--mr:-4deg"><img src="/art/scritte/games.webp" alt="games" width="471" height="324" loading="lazy"></h2>
+        <h2 class="it spray bianco" id="games" style="--x:282;--y:1513;--w:210;--r:3deg;--mx:16;--my:2319;--mw:150;--mr:-4deg"><img src="/art/scritte/games.webp" alt="games" width="471" height="324" loading="lazy"></h2>
 
-        <article class="vol it c-azzurro" style="--x:660;--y:985;--w:225;--r:3deg;--mx:10;--my:1420;--mw:185;--mr:2deg;--marker-c:#a50d25">
+        <!-- il blackjack è chiuso (niente link); la roulette si apre in una finestra sopra il muro (games/roulette/) -->
+        <article class="vol it c-kraft" style="--x:294;--y:1597;--w:270;--r:1.5deg;--mx:6;--my:2382;--mw:192;--mr:2deg;--marker-c:#161616">
+          <div class="foglio" aria-hidden="true"></div>
+          <span class="piu18" aria-label="per maggiorenni">+18</span>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/carte.webp" alt="" width="438" height="609" style="--aw:50%">
+            <h3>blackjack</h3>
+            <p>il banco è un bot, cinque posti, $pzk al posto dei soldi.</p>
+            <p class="mano vai">chiuso, per ora</p>
+          </div>
+        </article>
+
+        <article class="vol it c-lucido" style="--x:552;--y:1601;--w:235;--r:-1deg;--mx:198;--my:2698;--mw:185;--mr:-2deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" src="/art/arte2/ruota.webp" alt="" width="423" height="606" style="--aw:54%">
+            <h3><a href="#roulette" data-gioco="roulette">roulette</a></h3>
+            <p>da soli contro il banco: la ruota gira davvero. soldi finti.</p>
+            <p class="mano vai">gioca <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
+          </div>
+        </article>
+
+        <article class="vol it c-azzurro" style="--x:1027;--y:1499;--w:230;--r:3deg;--mx:6;--my:2620;--mw:180;--mr:3deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte2/bomba.webp" alt="" width="435" height="609" style="--aw:40%">
@@ -372,7 +450,7 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-giornale flip" style="--x:870;--y:990;--w:230;--r:-2deg;--mx:200;--my:1400;--mw:180;--mr:-3deg;--marker-c:#a50d25">
+        <article class="vol it c-giornale flip" style="--x:522;--y:1882;--w:230;--r:-2deg;--mx:198;--my:2940;--mw:180;--mr:-3deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte2/dadi.webp" alt="" width="432" height="624" style="--aw:40%">
@@ -381,7 +459,7 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-verde flip" style="--x:1060;--y:1000;--w:220;--r:4deg;--mx:115;--my:1535;--mw:150;--mr:4deg;--marker-c:#a50d25">
+        <article class="vol it c-verde flip" style="--x:772;--y:1607;--w:220;--r:4deg;--mx:198;--my:3094;--mw:180;--mr:4deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte2/moneta.webp" alt="" width="423" height="624" style="--aw:40%">
@@ -392,9 +470,9 @@ img{display:block;max-width:100%;height:auto}
       </section>
 
       <section class="gruppo" aria-labelledby="tools">
-        <h2 class="it spray" id="tools" style="--x:430;--y:1200;--w:210;--r:-4deg;--mx:245;--my:1665;--mw:140;--mr:5deg"><img src="/art/scritte/tools.webp" alt="tools" width="474" height="405" loading="lazy"></h2>
+        <h2 class="it spray" id="tools" style="--x:302;--y:1943;--w:200;--r:-4deg;--mx:31;--my:2977;--mw:140;--mr:5deg"><img src="/art/scritte/tools.webp" alt="tools" width="474" height="405" loading="lazy"></h2>
 
-        <article class="vol it c-giornale" style="--x:40;--y:930;--w:360;--r:-1.5deg;--mx:10;--my:1740;--mw:250;--mr:-1deg">
+        <article class="vol it c-giornale" style="--x:12;--y:1564;--w:290;--r:-1.5deg;--mx:6;--my:3052;--mw:195;--mr:-1deg">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
             <img class="arte" src="/art/arte2/chiavi.webp" alt="" width="435" height="627" style="--aw:30%;--aa:flex-end">
@@ -404,16 +482,15 @@ img{display:block;max-width:100%;height:auto}
         </article>
       </section>
 
-      <img class="it pezzo" src="/art/nastro/scotch-storto.webp" alt="" width="435" height="417" loading="lazy" style="--x:1000;--y:760;--w:110;--r:-50deg;--mx:160;--my:1660;--mw:80;--mr:-40deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy" style="--x:600;--y:925;--w:120;--r:4deg;--mx:40;--my:2030;--mw:90;--mr:6deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:40;--y:1318;--w:120;--r:-8deg;--mx:250;--my:2515;--mw:90;--mr:-10deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" loading="lazy" style="--x:430;--y:1130;--w:70;--r:30deg;--mx:300;--my:2360;--mw:50;--mr:30deg;z-index:2">
-      <img class="it pezzo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441" loading="lazy" style="--x:820;--y:1560;--w:90;--r:-10deg;--mx:300;--my:2630;--mw:70;--mr:-12deg;z-index:3">
-      <img class="it pezzo" src="/art/nastro/puntina.webp" alt="" width="174" height="201" loading="lazy" style="--x:1206;--y:1226;--w:26;--r:0deg;--mx:250;--my:2000;--mw:22;--mr:0deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/scotch-storto.webp" alt="" width="435" height="417" loading="lazy" style="--x:524;--y:1583;--w:110;--r:-50deg;--mx:123;--my:3040;--mw:80;--mr:-40deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy" style="--x:580;--y:1200;--w:120;--r:4deg;--mx:42;--my:2612;--mw:90;--mr:6deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:192;--y:1870;--w:120;--r:-8deg;--mx:288;--my:2930;--mw:90;--mr:-10deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" loading="lazy" style="--x:481;--y:1200;--w:70;--r:30deg;--mx:139;--my:2128;--mw:50;--mr:30deg;z-index:2">
+      <img class="it pezzo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441" loading="lazy" style="--x:1225;--y:1927;--w:90;--r:-10deg;--mx:129;--my:3531;--mw:70;--mr:-12deg;z-index:3">
+      <img class="it pezzo" src="/art/nastro/puntina.webp" alt="" width="174" height="201" loading="lazy" style="--x:1138;--y:1119;--w:26;--r:0deg;--mx:94;--my:2776;--mw:22;--mr:0deg;z-index:4">
     </div>
   </main>
   <div class="buio" aria-hidden="true"></div>
-  <div class="lampioni" aria-hidden="true"></div>
   <div class="fari" aria-hidden="true"></div>
   <div class="freni" aria-hidden="true"></div>
   <div class="neonauto" aria-hidden="true"></div>
@@ -424,6 +501,9 @@ img{display:block;max-width:100%;height:auto}
   <img class="formica" src="/art/bestiole/formica-lato.webp" alt="" width="496" height="184" loading="lazy">
   <img class="formica" src="/art/bestiole/formica.webp" alt="" width="276" height="356" loading="lazy">
   <img class="formica" src="/art/bestiole/formica-lato.webp" alt="" width="496" height="184" loading="lazy">
+  <span class="mosca" data-f="posata" aria-hidden="true"><img class="m-posata" src="/art/mosche/mosca.webp" alt="" width="158" height="166" style="--ax:80;--ay:72"><img class="m-zampe" src="/art/mosche/mosca-zampe.webp" alt="" width="154" height="182" style="--ax:75;--ay:92"><img class="m-vola" src="/art/mosche/mosca-vola.webp" alt="" width="192" height="135" style="--ax:94;--ay:64"><img class="m-vola2" src="/art/mosche/mosca-vola2.webp" alt="" width="118" height="149" style="--ax:56;--ay:78"></span>
+  <span class="mosca" data-f="posata" aria-hidden="true"><img class="m-posata" src="/art/mosche/mosca.webp" alt="" width="158" height="166" style="--ax:80;--ay:72"><img class="m-zampe" src="/art/mosche/mosca-zampe.webp" alt="" width="154" height="182" style="--ax:75;--ay:92"><img class="m-vola" src="/art/mosche/mosca-vola.webp" alt="" width="192" height="135" style="--ax:94;--ay:64"><img class="m-vola2" src="/art/mosche/mosca-vola2.webp" alt="" width="118" height="149" style="--ax:56;--ay:78"></span>
+  <span class="mosca" data-f="posata" aria-hidden="true"><img class="m-posata" src="/art/mosche/mosca.webp" alt="" width="158" height="166" style="--ax:80;--ay:72"><img class="m-zampe" src="/art/mosche/mosca-zampe.webp" alt="" width="154" height="182" style="--ax:75;--ay:92"><img class="m-vola" src="/art/mosche/mosca-vola.webp" alt="" width="192" height="135" style="--ax:94;--ay:64"><img class="m-vola2" src="/art/mosche/mosca-vola2.webp" alt="" width="118" height="149" style="--ax:56;--ay:78"></span>
 </div>
 
 <script>
@@ -594,6 +674,92 @@ img{display:block;max-width:100%;height:auto}
     setTimeout(() => requestAnimationFrame(camminano), 80)
   }
   requestAnimationFrame(camminano)
+
+  // ── Le mosche ────────────────────────────────────────────────────────────
+  // Tre mosche, come le formiche ma in volo: posate stanno ferme, ogni tanto
+  // si girano, fanno due passi o si puliscono le zampe; poi partono a zig zag
+  // (cubiche con i punti di controllo a caso, più un tremolio di traverso),
+  // passano da un punto o due e si posano altrove, dentro la parte di strada
+  // che si vede. Se il puntatore si avvicina scappano. Con reduced-motion
+  // restano posate dove sono nate.
+  const K = 0.11 // la scala: il corpo nella foto è ~130 px, sul muro ~14
+  const portale = document.querySelector('.portale')
+  const mosche = [...document.querySelectorAll('.mosca')].map((el, n) => ({ el, n, x: 0, y: 0, a: Math.random() * 360, stato: 'nata', t: 0, f: 'posata' }))
+  const caso = (a, b) => a + Math.random() * (b - a)
+  const meta = () => {
+    const rs = strada.getBoundingClientRect(), rp = portale.getBoundingClientRect()
+    const y0 = Math.max(rp.bottom - rs.top - 30, -rs.top + 30), y1 = Math.max(y0 + 40, Math.min(rs.height - 30, innerHeight - rs.top - 30))
+    return { x: caso(24, rs.width - 24), y: caso(y0, y1) }
+  }
+  const mostra = (m) => {
+    m.el.dataset.f = m.f
+    m.el.style.transform = `translate(${m.x.toFixed(1)}px, ${m.y.toFixed(1)}px) rotate(${m.a.toFixed(1)}deg) scale(${(m.stato === 'vola' ? K * 1.12 : K).toFixed(3)})`
+  }
+  const posa = (m) => { m.stato = 'posata'; m.f = 'posata'; m.el.classList.remove('vola'); m.t = caso(1.5, 9) }
+  const parti = (m, via) => {
+    const punti = [{ x: m.x, y: m.y }]
+    if (via) punti.push({ x: m.x + via.x, y: m.y + via.y })
+    const n = Math.random() < 0.5 ? 1 : 2 + Math.floor(Math.random() * 2)
+    for (let i = 0; i < n; i++) punti.push(meta())
+    m.tratti = []
+    for (let i = 1; i < punti.length; i++) {
+      const p0 = punti[i - 1], p3 = punti[i], d = Math.hypot(p3.x - p0.x, p3.y - p0.y)
+      const c = (p) => ({ x: p.x + caso(-0.6, 0.6) * d, y: p.y + caso(-0.6, 0.6) * d })
+      m.tratti.push({ p0, p1: c(p0), p2: c(p3), p3, dur: Math.max(0.3, d / caso(260, 520)) })
+    }
+    m.pulisce = 0; m.gira = 0; m.passi = 0
+    m.stato = 'vola'; m.el.classList.add('vola'); m.i = 0; m.u = 0; m.fase = Math.random() * 9
+  }
+  const bez = (t, a, b, c, d) => { const s = 1 - t; return s * s * s * a + 3 * s * s * t * b + 3 * s * t * t * c + t * t * t * d }
+  let tMosche = performance.now()
+  const volano = (now) => {
+    const dt = Math.min((now - tMosche) / 1000, 0.05)
+    tMosche = now
+    if (!document.hidden) for (const m of mosche) {
+      if (m.stato === 'nata') { Object.assign(m, meta()); posa(m); m.t = caso(0.5, 6); mostra(m); continue }
+      if (reduce.matches) continue
+      if (m.stato === 'posata') {
+        m.t -= dt
+        if (m.pulisce > 0) { m.pulisce -= dt; m.f = m.pulisce > 0 && Math.floor(now / 140) % 2 ? 'zampe' : 'posata'; mostra(m) }
+        if (m.gira) { const passo = Math.sign(m.gira) * Math.min(Math.abs(m.gira), 400 * dt); m.a += passo; m.gira -= passo; mostra(m) }
+        if (m.passi > 0) { const r = (m.a - 90) * Math.PI / 180, v = 22 * dt; m.x += Math.cos(r) * v; m.y += Math.sin(r) * v; m.passi -= v; mostra(m) }
+        if (m.t <= 0) {
+          const r = Math.random()
+          if (r < 0.35) parti(m)
+          else if (r < 0.6) { m.pulisce = caso(0.8, 2.2); m.t = m.pulisce + caso(0.4, 3) }
+          else if (r < 0.8) { m.gira = caso(25, 120) * (Math.random() < 0.5 ? -1 : 1); m.t = caso(0.6, 4) }
+          else { m.passi = caso(3, 12); m.t = caso(0.6, 3) }
+        }
+        continue
+      }
+      // in volo
+      m.u += dt / m.tratti[m.i].dur
+      if (m.u >= 1) {
+        m.i++; m.u = 0
+        if (m.i >= m.tratti.length) { const fine = m.tratti.at(-1).p3; m.x = fine.x; m.y = fine.y; posa(m); m.a += caso(-40, 40); mostra(m); continue }
+      }
+      const t = m.tratti[m.i], u = m.u
+      const x = bez(u, t.p0.x, t.p1.x, t.p2.x, t.p3.x), y = bez(u, t.p0.y, t.p1.y, t.p2.y, t.p3.y)
+      const dx = x - m.x, dy = y - m.y
+      m.fase += dt * 23
+      const tremo = Math.sin(m.fase) * 2.2 + Math.sin(m.fase * 2.7) * 1.3, l = Math.hypot(dx, dy) || 1
+      m.x = x - (dy / l) * tremo; m.y = y + (dx / l) * tremo
+      if (l > 0.2) m.a = Math.atan2(dy, dx) * 180 / Math.PI + 90
+      m.f = (Math.floor(now / 28) + m.n) % 2 ? 'vola' : 'vola2'
+      mostra(m)
+    }
+    requestAnimationFrame(volano)
+  }
+  requestAnimationFrame(volano)
+  // il puntatore che si avvicina le fa scappare
+  addEventListener('pointermove', (e) => {
+    if (reduce.matches) return
+    const rs = strada.getBoundingClientRect(), px = e.clientX - rs.left, py = e.clientY - rs.top
+    for (const m of mosche) {
+      const d = Math.hypot(m.x - px, m.y - py)
+      if (m.stato === 'posata' && d < 70) parti(m, { x: ((m.x - px) / (d || 1)) * 140, y: ((m.y - py) / (d || 1)) * 140 })
+    }
+  }, { passive: true })
   const aggiorna = () => {
     stato = fase(adesso())
     root.style.setProperty('--notte', stato.notte.toFixed(3))
@@ -606,6 +772,36 @@ img{display:block;max-width:100%;height:auto}
   aggiorna()
   setInterval(aggiorna, veloce > 1 ? 250 : 1000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
+
+  // La roulette: una finestra sopra il muro (games/roulette/). Il codice e la
+  // ruota 3D si caricano solo quando la si apre (o quando il puntatore passa
+  // sul volantino); #roulette nell'indirizzo la apre subito.
+  const gioco = document.querySelector('a[data-gioco="roulette"]')
+  const apriRoulette = () => import('/games/roulette/roulette.js').then((m) => m.apri())
+  if (gioco) {
+    gioco.addEventListener('click', (e) => { e.preventDefault(); history.replaceState(null, '', '#roulette'); apriRoulette() })
+    gioco.addEventListener('pointerenter', () => {
+      for (const f of ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js']) {
+        if (document.querySelector(`link[href="/games/roulette/${f}"]`)) continue
+        const l = document.createElement('link')
+        l.rel = 'modulepreload'; l.href = `/games/roulette/${f}`
+        document.head.appendChild(l)
+      }
+    }, { once: true })
+  }
+  if (location.hash === '#roulette') apriRoulette()
+
+  // Sul telefono non c'è il passaggio del puntatore: toccare un foglio o un
+  // manifesto lo porta in primo piano (resta su finché non se ne tocca un altro).
+  let sopra = null
+  document.querySelector('.parete').addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return
+    const el = e.target.closest('.vol, .man')
+    if (!el || el === sopra) return
+    sopra?.classList.remove('sopra')
+    el.classList.add('sopra')
+    sopra = el
+  }, { passive: true })
 
   // I tagliandi sono fette della carta del volantino: ognuno mostra il pezzo di
   // foglio che gli tocca (stessa immagine, spostata), così quando si strappa
