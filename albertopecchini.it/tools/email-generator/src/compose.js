@@ -7,8 +7,8 @@
 // di inventare un nome.
 import { markdownToText } from './markdown.js'
 
-const GREETING_RE = /^(gentile|gentilissim|egregi|spettabile|buongiorno|buonasera|salve|ciao|caro|cara)\b/i
-const CLOSING_RE = /(cordiali saluti|distinti saluti|cordialmente|a presto|ci sentiamo|grazie e (?:a presto|buona)|un saluto|buon lavoro|resto a disposizione|in attesa di)/i
+const GREETING_RE = /^(gentile|gentilissim|egregi|spettabile|buongiorno|buonasera|bonjour|salve|ciao|caro|cara)\b/i
+const CLOSING_RE = /(cordiali saluti|distinti saluti|cordialmente|a presto|ci sentiamo|grazie e (?:a presto|buona)|un saluto|buon lavoro|resto a disposizione|in attesa di|\bcdt\b)/i
 
 const CLOSINGS = {
   formale: 'Cordiali saluti,',

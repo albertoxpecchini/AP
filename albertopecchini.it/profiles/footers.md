@@ -35,7 +35,7 @@ Versione attiva: **v3**
 
 ## Profilo `proton`
 
-Versione attiva: **v9**
+Versione attiva: **v10**
 
 ### v1 (2026-09-18)
 
@@ -106,11 +106,17 @@ Versione attiva: **v9**
 - Ruolo: Società Agricola Cascina Fontana S.S.
 - Cellulare: +39 342 0397473
 
-### v9 (2026-09-30) — attiva
+### v9 (2026-09-30)
 
 - Nome: Primo Pecchini
 - Ruolo: Società Agricola Cascina Fontana S.S.
 - Cellulare: +39 342 0397473
+
+### v10 (2026-10-07) — attiva
+
+- Nome: Primo Pecchini
+- Ruolo: Società Agricola Cascina Fontana S.S.
+- Mob.: +39 342 0397473
 
 ## Profilo `gmail`
 
@@ -167,7 +173,7 @@ Versione attiva: **v6**
 
 ## Profilo `pec`
 
-Versione attiva: **v6**
+Versione attiva: **v7**
 
 ### v1 (2026-09-30)
 
@@ -218,12 +224,21 @@ Versione attiva: **v6**
 - Cellulare: +39 342 0397473
 - CF e P.IVA: 02196490201
 
-### v6 (2026-09-30) — attiva
+### v6 (2026-09-30)
 
 - Nome: Primo Pecchini
 - Ruolo: Società Agricola Cascina Fontana S.S.
 - PEC: cascinafontana@pec.it
 - Telefono: +39 0376 681052
 - Cellulare: +39 342 0397473
+- CF e P.IVA: 02196490201
+
+### v7 (2026-10-07) — attiva
+
+- Nome: Primo Pecchini
+- Ruolo: Società Agricola Cascina Fontana S.S.
+- PEC: cascinafontana@pec.it
+- Telefono: +39 0376 681052
+- Mob.: +39 342 0397473
 - CF e P.IVA: 02196490201
 

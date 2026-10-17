@@ -214,7 +214,7 @@ export function renderFooterText(footer) {
   if (footer.name) lines.push(footer.name)
   if (footer.role) lines.push(footer.role)
   if (footer.org) lines.push(footer.org)
-  for (const contact of footer.contacts ?? []) lines.push(`${contact.label}: ${contact.value}`)
+  for (const contact of footer.contacts ?? []) lines.push(`${contact.label}${contact.label.endsWith('.') ? '' : ':'} ${contact.value}`)
   if (footer.address) lines.push(footer.address)
   for (const link of footer.links ?? []) lines.push(link.url)
   for (const social of footer.social ?? []) lines.push(`${social.label}: ${social.url}`)
