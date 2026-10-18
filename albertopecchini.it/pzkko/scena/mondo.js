@@ -239,7 +239,7 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
 
   // ── il marciapiede bagnato, il cordolo, la strada, il marciapiede di là ──────
   {
-    const las = lastre(1024, 21)
+    const las = lastre(512, 21)
     const X0 = -6, X1 = W + 9, Z0 = Z_FACCIATA, Z1 = 2.3
     const g = new T.PlaneGeometry(X1 - X0, Z1 - Z0)
     h.pozze = specchio(g, 512, 256, 0x4e4e4e, 1, 1)
@@ -251,7 +251,7 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     // la soglia di pietra sotto la saracinesca, il cordolo, la strada, il marciapiede di fronte
     scene.add(ombra(scatola(W + 0.2, 0.03, 0.3, mPietra, W / 2, -0.015, -0.05), false, true))
     scene.add(ombra(scatola(X1 - X0, 0.15, 0.2, mPietra, (X0 + X1) / 2, -0.06, Z1 + 0.1)))
-    const asf = asfalto(512, 33)
+    const asf = asfalto(256, 33)
     const strada = { x0: -30, x1: W + 30, z0: Z1 + 0.2, z1: 16 }
     for (const t of [asf.map, asf.normalMap]) t.repeat.set((strada.x1 - strada.x0) / asf.lato, (strada.z1 - strada.z0) / asf.lato)
     const road = ombra(new T.Mesh(new T.PlaneGeometry(strada.x1 - strada.x0, strada.z1 - strada.z0), new T.MeshStandardMaterial({ map: asf.map, normalMap: asf.normalMap, roughness: 0.55, metalness: 0.05 })), false, true)

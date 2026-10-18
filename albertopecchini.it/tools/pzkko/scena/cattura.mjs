@@ -2,7 +2,7 @@
 // Fotografa i volantini della home (e quello della 404) per la scena 3D: ogni
 // .vol è carta fotografata con sopra il testo vero in HTML, e la scena lo vuole
 // come immagine da stendere su un foglio di poligoni. Apre le pagine in Chromium
-// (desktop 1440, parete 1280, 3 px per unità), isola un volantino alla volta
+// (desktop 1440, parete 1280, 2 px per unità), isola un volantino alla volta
 // (niente ombra, niente rotazione, sfondo trasparente) e lo ritaglia con un
 // margine, così ci sta anche quello che sporge (l'adesivo di «chi sono»).
 //
@@ -24,7 +24,7 @@ const QUI = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(QUI, '../../../pzkko')
 const OUT = join(ROOT, 'art/scena/vol')
 const sharp = createRequire(join(QUI, '../../../package.json'))('sharp')
-const SCALA = 3 // px della tela per px CSS (1 px CSS = 1 unità della parete a 1440)
+const SCALA = 2 // px della tela per px CSS (1 px CSS = 1 unità della parete a 1440): sullo schermo i fogli sono ~200-250 px, con le mipmap bastano
 const MARGINE = 0.08 // del lato del foglio, per lato
 
 const TIPI = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.js': 'text/javascript', '.css': 'text/css' }
@@ -45,7 +45,8 @@ await mkdir(OUT, { recursive: true })
 for (const f of await readdir(OUT)) await rm(join(OUT, f))
 const manifesto = {}
 
-for (const pagina of ['/?ora=12:00', '/404.html?ora=12:00']) {
+// (?muro=1: la pagina senza la scena 3D, che sposterebbe il muro e cambierebbe le misure dei fogli)
+for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1']) {
   const page = await browser.newPage()
   await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: SCALA })
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
@@ -84,11 +85,11 @@ for (const pagina of ['/?ora=12:00', '/404.html?ora=12:00']) {
     const png = await page.screenshot({ clip: info.clip, omitBackground: true, captureBeyondViewport: false })
     const img = sharp(png)
     const meta = await img.metadata()
-    await img.webp({ quality: 88, alphaQuality: 90 }).toFile(join(OUT, `${info.nome}.webp`))
+    await img.webp({ quality: 84, alphaQuality: 88 }).toFile(join(OUT, `${info.nome}.webp`))
     if (info.fascia) {
       const f = info.fascia
       const buco = { create: { width: f.w, height: f.h + 2, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 1 } } }
-      await sharp(png).composite([{ input: await sharp(buco).png().toBuffer(), left: f.x, top: f.y - 1, blend: 'dest-out' }]).webp({ quality: 88, alphaQuality: 90 }).toFile(join(OUT, `${info.nome}-senza.webp`))
+      await sharp(png).composite([{ input: await sharp(buco).png().toBuffer(), left: f.x, top: f.y - 1, blend: 'dest-out' }]).webp({ quality: 84, alphaQuality: 88 }).toFile(join(OUT, `${info.nome}-senza.webp`))
     }
     manifesto[info.nome] = { w: meta.width, h: meta.height, m: Math.round(info.clip.width * MARGINE / (1 + 2 * MARGINE) * SCALA), cw: Math.round(info.cw * 100) / 100, scala: SCALA, tagliandi: info.tagliandi }
     console.log(`${info.nome}: ${meta.width}×${meta.height}${info.tagliandi ? ` (${info.tagliandi.length} tagliandi)` : ''}`)

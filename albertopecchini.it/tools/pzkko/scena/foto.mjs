@@ -31,7 +31,7 @@ const url = `http://127.0.0.1:${server.address().port}${pagina}?ora=${ora}${extr
 const exe = join(process.env.LOCALAPPDATA, 'ms-playwright/chromium-1243/chrome-win64/chrome.exe')
 const browser = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars', '--ignore-gpu-blocklist'] })
 const page = await browser.newPage()
-page.on('console', (m) => { if (m.type() !== 'log' && m.type() !== 'info' && m.type() !== 'debug') console.log(`[browser ${m.type()}]`, m.text()) })
+page.on('console', (m) => { if ((m.type() !== 'log' && m.type() !== 'info' && m.type() !== 'debug') || m.text().startsWith('scena 3D')) console.log(`[browser ${m.type()}]`, m.text()) })
 page.on('pageerror', (e) => console.log('[pageerror]', e.message))
 await page.setViewport({ width: larg, height: alt, deviceScaleFactor: 1 })
 await page.goto(url, { waitUntil: 'networkidle0', timeout: 120000 })

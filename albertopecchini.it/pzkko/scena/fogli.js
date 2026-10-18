@@ -10,7 +10,7 @@ import { profilo, immagine, DOGA } from './materiali.js'
 
 const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
-export async function fogli(scene, M) {
+export async function fogli(scene, M, avanzamento = () => {}) {
   const { K, W, H } = M
   const manifesto = await fetch('/art/scena/vol.json').then((r) => r.json()).catch(() => ({}))
   const parete = document.querySelector('.parete')
@@ -19,7 +19,21 @@ export async function fogli(scene, M) {
   const ordine = elementi.map((el, i) => ({ el, i, z: Number(getComputedStyle(el).zIndex) || 0 })).sort((a, b) => a.z - b.z || a.i - b.i)
   const pezzi = []
   const cache = new Map()
-  const trama = (src) => { if (!cache.has(src)) cache.set(src, immagine(src).catch(() => null)); return cache.get(src) }
+  let chieste = 0, arrivate = 0
+  const trama = (src) => {
+    if (!cache.has(src)) { chieste++; cache.set(src, immagine(src).catch(() => null).then((t) => { arrivate++; avanzamento(arrivate, chieste); return t })) }
+    return cache.get(src)
+  }
+  // tutte le immagini si chiedono subito, insieme (una alla volta ci vorrebbero secondi); sotto si aspettano dalla cache
+  const nomeVol = (el) => slug(el.id || el.querySelector('h3, .titolo')?.textContent || 'foglio')
+  for (const el of elementi) {
+    if (el.classList.contains('vol')) {
+      const d = manifesto[nomeVol(el)]
+      if (!d) continue
+      trama(`/art/scena/vol/${nomeVol(el)}${d.tagliandi ? '-senza' : ''}.webp`)
+      if (d.tagliandi) trama(`/art/scena/vol/${nomeVol(el)}.webp`)
+    } else { const img = el.tagName === 'IMG' ? el : el.querySelector('img'); if (img) trama(img.currentSrc || img.src) }
+  }
 
   // un foglio piegato sulle doghe: la geometria è un piano suddiviso, ogni vertice
   // sale di quanto sporge la lamiera nel punto del mondo in cui finisce

@@ -1,1 +1,1 @@
-three.js r186 (MIT) con gli addon della scena, copiato da tools/pzkko/scena/motore.mjs.
+three.js r186 (MIT) con gli addon della scena (three.js) e l'esportatore glTF a parte (gltf.js), copiati da tools/pzkko/scena/motore.mjs.

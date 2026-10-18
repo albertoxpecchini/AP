@@ -51,7 +51,8 @@ serio ma è un progetto Vercel a parte.
   auto), `fogli.js` (i volantini e i graffiti presi dalla pagina), `luci.js`
   (il sole di Mantova, il cielo, le luci della notte), `materiali.js` (le trame
   disegnate al volo e il profilo delle doghe), `scena.css`, `lib/` (three.js
-  r186 con gli addon, MIT, `tools/pzkko/scena/motore.mjs`).
+  r186 con gli addon, MIT, `tools/pzkko/scena/motore.mjs`; `gltf.js` è
+  l'esportatore glTF a parte, si scarica solo con `?glb=1`).
 - `art/scena/` — quello che serve alla scena: `lamiera.webp` e `lamiera-r.webp`
   (il colore e la rugosità della saracinesca, tirati fuori dalla foto `muro.webp`
   togliendole la luce, `tools/pzkko/scena/mappe.mjs`), `pannello.svg` e
@@ -160,6 +161,19 @@ disegnata dalla scheda grafica con three.js come la scena di un videogioco,
 con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
 900 px e senza WebGL2 resta quello, senza che la pagina se ne accorga.
 
+- **Mentre si carica** il muro di sempre non si vede: il caricatore in fondo a
+  `index.html` mette subito `html.scena-carico` (la pagina invisibile, uno
+  schermo nero con «pzkko» e la barra, `div.scena-attesa`) e chiede insieme il
+  foglio di stile, i sei moduli (`modulepreload`) e, dentro `fogli.js`, tutte le
+  foto dei volantini in una volta; la scena compila gli shader
+  (`renderer.compileAsync`) e disegna tre fotogrammi a vuoto prima di comparire,
+  così non scatta all'inizio. Se qualcosa va storto si toglie lo schermo e
+  resta il muro. Da scaricare in tutto ~2 MB (three.js 627 KB, i volantini 1,3
+  MB fotografati a 2 px per unità); la console dice «scena 3D pronta in N s».
+  Attenzione: gli strumenti che misurano o fotografano la pagina 2D
+  (`disponi.mjs`, `cattura.mjs`) la aprono con `?muro=1`, altrimenti la scena
+  sposta il muro e le misure vengono sbagliate.
+
 - **Com'è fatto il trucco**: la pagina di sempre resta lì, sotto, invisibile
   (`html.scena3d` in `scena.css`): i link dei volantini, i tagliandi, i giochi,
   le mosche, le formiche e la goccia sono ancora i suoi; la scena si disegna in
@@ -213,12 +227,16 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   sulla strada dietro la telecamera, coi fari che spazzano la saracinesca e la
   porta, i fanali rossi, il neon sotto. Si riflette nel vetro e nelle
   pozzanghere. Prove: `?ora=18:30`, `?notte=1`, `?auto=1` come per la pagina.
-- **Il costo**: MSAA 4×, bloom, due specchi (che si rifanno un fotogramma sì e
-  uno no, alternandosi, senza multisample) e due mappe d'ombra (sole 2048,
-  lampada 1024; quella di chi è spento non si rifà). Su una RTX 3060 Ti
-  ~130–160 fotogrammi al secondo a 1440 × 900. Se nei primi due secondi la media
-  supera i 30 ms a fotogramma si scende a risoluzione 1× e specchi più piccoli;
-  `?qualita=bassa` parte già così (senza bloom né palazzi).
+- **Il costo**: MSAA, bloom, due specchi (che si rifanno un fotogramma sì e
+  uno no, alternandosi, senza multisample) e due mappe d'ombra (sole, lampada;
+  quella di chi è spento non si rifà). Tre livelli (`?qualita=alta|media|bassa`):
+  alta = pixel ratio fino a 1,5, MSAA 4×, specchi 768/512, ombra del sole 2048;
+  media = 1×, MSAA 2×, specchi 512/256, ombre 1024; bassa = niente bloom né
+  palazzi, specchi 384/192. Si parte da «alta», ma da «media» se la scheda
+  grafica si presenta come integrata (Intel, Apple, Mali, Adreno) o il
+  processore ha 4 core o meno; e se i primi fotogrammi passano i 28 ms di media
+  si scende di un gradino, poi di un altro. Su una RTX 3060 Ti ~120–160
+  fotogrammi al secondo a 1440 × 900.
 - **Blender**: `?glb=1` scarica la scena così com'è in glTF binario
   (`pzkko.glb`, GLTFExporter), da aprire con File › Import › glTF.
 - **Le prove**: `node tools/pzkko/scena/foto.mjs --ora=22:00 --scroll=0.5`
@@ -228,8 +246,9 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   (ferma un'auto), `--hover=.vol.c-giallo`, `--prova=<js>`, `--pagina=/404.html`
   (da Git Bash con `MSYS_NO_PATHCONV=1`).
 - **Dopo ogni modifica ai testi dei volantini** (e dopo `genera-404.mjs`):
-  `node tools/pzkko/scena/cattura.mjs`, che rifà le foto in `art/scena/vol/`.
-  La 404 ha la sua scena (il suo volantino è fotografato con gli altri).
+  `node tools/pzkko/scena/cattura.mjs`, che rifà le foto in `art/scena/vol/`
+  (2 px per unità, ~1,3 MB in tutto). La 404 ha la sua scena (il suo volantino
+  è fotografato con gli altri).
 
 ## La roulette (games/roulette/)
 

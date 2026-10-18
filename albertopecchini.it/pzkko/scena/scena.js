@@ -7,9 +7,12 @@
 // della pagina; l'inquadratura è calcolata perché la saracinesca 3D stia
 // esattamente dove sta il muro nel DOM: così la pagina di sempre resta sotto,
 // invisibile, e continua a fare tutto (link, tagliandi, giochi, mosche), e qui
-// si disegna soltanto. Prove: ?muro=1 (niente 3D), ?allinea=1 (il DOM in
-// trasparenza sopra la scena), ?qualita=bassa, ?glb=1 (scarica la scena in glTF
-// per Blender), più quelle della pagina (?ora=18:30, ?veloce=60, ?notte=1, ?auto=1).
+// si disegna soltanto. Mentre si scarica e si costruisce, la pagina mostra lo
+// schermo di caricamento (html.scena-carico, messo dal caricatore in index.html):
+// la scena compare solo quando è pronta e già compilata, senza scatti.
+// Prove: ?muro=1 (niente 3D), ?allinea=1 (il DOM in trasparenza sopra la scena),
+// ?qualita=alta|media|bassa, ?glb=1 (scarica la scena in glTF per Blender), più
+// quelle della pagina (?ora=18:30, ?veloce=60, ?notte=1, ?auto=1).
 import * as T from './lib/three.js'
 import { costruisci, prossimoFotogramma } from './mondo.js'
 import { fogli } from './fogli.js'
@@ -17,47 +20,76 @@ import { luci } from './luci.js'
 
 const DISTANZA = 2.6 // la telecamera, dalla saracinesca (metri)
 
-export async function avvia() {
+// La qualità di partenza: dalla scheda grafica, se si lascia riconoscere. Le
+// integrate (Intel, Apple, Mali, Adreno) e gli emulatori partono da «media»;
+// poi, se i primi fotogrammi sono lenti, si scende comunque.
+const qualitaIniziale = (renderer, chiesta) => {
+  if (chiesta) return chiesta
+  const gl = renderer.getContext()
+  const d = gl.getExtension('WEBGL_debug_renderer_info')
+  const nome = d ? String(gl.getParameter(d.UNMASKED_RENDERER_WEBGL)) : ''
+  if (/SwiftShader|llvmpipe|Mesa|Mali|Adreno|PowerVR|Apple GPU|Intel|Iris|UHD|HD Graphics/i.test(nome)) return 'media'
+  if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return 'media'
+  return 'alta'
+}
+
+export async function avvia({ avanzamento = () => {} } = {}) {
   const root = document.documentElement, q = new URLSearchParams(location.search)
   const parete = document.querySelector('.parete'), muro = document.querySelector('.muro'), strada = document.querySelector('.strada'), portale = document.querySelector('.portale')
-  if (!parete || !muro) return
+  if (!parete || !muro) throw new Error('manca la parete')
+  const t0 = performance.now()
   // il foglio di stile della scena (lo carica la pagina insieme a questo modulo) deve esserci prima della tela
   await new Promise((r) => { const l = document.querySelector('link[href="/scena/scena.css"]'); if (!l || l.sheet) return r(); l.addEventListener('load', r, { once: true }); l.addEventListener('error', r, { once: true }) })
   const tela = document.createElement('canvas')
   tela.className = 'scena-tela'
   tela.setAttribute('aria-hidden', 'true')
   const renderer = new T.WebGLRenderer({ canvas: tela, antialias: false, powerPreference: 'high-performance', alpha: false })
-  const qualita = q.get('qualita') || 'alta'
-  renderer.setPixelRatio(Math.min(devicePixelRatio, qualita === 'alta' ? 2 : 1))
+  let qualita = qualitaIniziale(renderer, q.get('qualita'))
+  const DPR = { alta: 1.5, media: 1, bassa: 1 }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, DPR[qualita] ?? 1))
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = T.PCFShadowMap
   renderer.shadowMap.autoUpdate = false
   renderer.toneMapping = T.AgXToneMapping
   renderer.outputColorSpace = T.SRGBColorSpace
+  avanzamento(0.05, 'la scheda grafica')
 
   // ── le misure: la parete in unità (1280 di larghezza), la saracinesca in metri ──
+  // (si misurano sulla pagina com'è prima del 3D: il muro largo 1280 o quel che ci sta)
   const u = muro.offsetWidth / 1280
   const Hp = (parete.offsetHeight / u) * (2.048 / 1280)
   const M = { K: 2.048 / 1280, W: 2.048, H: Math.max(Hp, 3.2), Hp }
+  if (!Number.isFinite(M.H)) throw new Error(`misure: muro ${muro.offsetWidth} px, parete ${parete.offsetHeight} px`)
 
   const scene = new T.Scene()
   const camera = new T.PerspectiveCamera(40, 1, 0.05, 220)
   camera.position.set(M.W / 2, 1.6, DISTANZA)
   scene.add(camera)
 
-  const h = await costruisci(scene, M, { palazzi: qualita !== 'bassa' })
-  const f = await fogli(scene, M)
+  // il posto e i fogli si costruiscono insieme (le immagini dei fogli arrivano in parallelo)
+  const [h, f] = await Promise.all([
+    costruisci(scene, M, { palazzi: qualita !== 'bassa' }).then((x) => { avanzamento(0.35, 'il posto'); return x }),
+    fogli(scene, M, (arrivate, chieste) => avanzamento(0.1 + 0.5 * (arrivate / Math.max(1, chieste)), 'i volantini')),
+  ])
   const l = luci(scene, renderer, h, M)
+  avanzamento(0.7, 'le luci')
 
   // ── il post-processing: anti-alias MSAA, il bagliore dei neon, i colori ──
-  const target = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: qualita === 'bassa' ? 0 : 4 })
+  const target = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: qualita === 'alta' ? 4 : qualita === 'media' ? 2 : 0 })
   const composer = new T.EffectComposer(renderer, target)
   composer.addPass(new T.RenderPass(scene, camera))
   const bloom = new T.UnrealBloomPass(new T.Vector2(1, 1), 0.55, 0.5, 1.0)
-  if (qualita !== 'bassa') composer.addPass(bloom)
+  bloom.enabled = qualita !== 'bassa'
+  composer.addPass(bloom)
   composer.addPass(new T.OutputPass())
-  if (qualita === 'bassa') { h.vetro.getRenderTarget().setSize(384, 384); h.pozze.getRenderTarget().setSize(256, 128) }
+  const SPECCHI = { alta: [768, 512], media: [512, 256], bassa: [384, 192] }
+  const specchi = (liv) => { const [v, p] = SPECCHI[liv]; h.vetro.getRenderTarget().setSize(v, v); h.pozze.getRenderTarget().setSize(p, p / 2) }
+  specchi(qualita)
+  if (qualita !== 'alta') { l.sole.shadow.mapSize.set(1024, 1024); l.sole.shadow.map?.dispose(); l.sole.shadow.map = null }
 
+  // ── il muro del DOM si sposta (scena.css) e la pagina si allunga sopra e sotto ──
+  root.classList.add('scena3d')
+  if (q.get('allinea') !== null) root.classList.add('scena-allinea')
   const misura = () => {
     const w = innerWidth, hh = innerHeight
     renderer.setSize(w, hh, false)
@@ -91,13 +123,8 @@ export async function avvia() {
     camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert()
   }
 
-  // ── il giro ────────────────────────────────────────────────────────────────
-  let prima = performance.now(), fermo = false, tempi = [], regolato = qualita !== 'alta'
-  const giro = (now) => {
-    if (fermo) return
-    requestAnimationFrame(giro)
-    const dt = Math.min((now - prima) / 1000, 0.1)
-    prima = now
+  // ── un fotogramma ──────────────────────────────────────────────────────────
+  const fotogramma = (now, dt) => {
     const stato = l.aggiorna(now, dt)
     f.aggiorna(dt, now)
     inquadra()
@@ -109,31 +136,52 @@ export async function avvia() {
     h.lampada.castShadow = h.lampada.intensity > 0
     composer.render()
     prossimoFotogramma()
-    // se la macchina non ce la fa, dopo due secondi si abbassa la risoluzione
+  }
+
+  // ── gli shader si compilano prima di mostrare la scena, poi tre fotogrammi a vuoto ──
+  // (la prima volta che un materiale si disegna il browser compila il suo programma:
+  // decine di programmi insieme sono i secondi di scatti all'inizio)
+  document.body.appendChild(tela)
+  misura(); inquadra()
+  avanzamento(0.75, 'gli shader')
+  await renderer.compileAsync(scene, camera)
+  avanzamento(0.9, 'le ombre e i riflessi')
+  for (let i = 0; i < 3; i++) { fotogramma(performance.now(), 1 / 60); await new Promise((r) => requestAnimationFrame(r)) }
+  avanzamento(1, 'pronta')
+
+  // ── il giro ────────────────────────────────────────────────────────────────
+  let prima = performance.now(), fermo = false, tempi = [], regolato = qualita === 'bassa'
+  const giro = (now) => {
+    if (fermo) return
+    requestAnimationFrame(giro)
+    const dt = Math.min((now - prima) / 1000, 0.1)
+    prima = now
+    fotogramma(now, dt)
+    // se la macchina non ce la fa, dopo un secondo si scende di un gradino (e poi di un altro)
     if (!regolato) {
       tempi.push(dt)
-      if (tempi.length > 90) {
-        regolato = true
-        const media = tempi.slice(30).reduce((a, b) => a + b, 0) / (tempi.length - 30)
-        if (media > 0.03) { renderer.setPixelRatio(1); misura(); h.vetro.getRenderTarget().setSize(384, 384); h.pozze.getRenderTarget().setSize(256, 128); console.info('scena 3D: qualità ridotta', (media * 1000).toFixed(0), 'ms a fotogramma') }
+      if (tempi.length >= 45) {
+        const media = tempi.slice(15).reduce((a, b) => a + b, 0) / (tempi.length - 15)
+        tempi = []
+        if (media > 0.028) {
+          qualita = qualita === 'alta' ? 'media' : 'bassa'
+          renderer.setPixelRatio(Math.min(devicePixelRatio, DPR[qualita])); specchi(qualita); bloom.enabled = qualita !== 'bassa'; misura()
+          console.info(`scena 3D: ${(media * 1000).toFixed(0)} ms a fotogramma, qualità ${qualita}`)
+          if (qualita === 'bassa') regolato = true
+        } else regolato = true
       }
     }
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo) { fermo = false; prima = performance.now(); requestAnimationFrame(giro) } })
-
-  // ── si parte: la pagina sotto diventa invisibile, la scena davanti ─────────
-  document.body.appendChild(tela)
-  root.classList.add('scena3d')
-  if (q.get('allinea') !== null) root.classList.add('scena-allinea')
-  misura()
-  inquadra()
   requestAnimationFrame(giro)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, M }
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, M, qualita: () => qualita }
   root.dataset.scena = 'pronta'
+  console.info(`scena 3D pronta in ${((performance.now() - t0) / 1000).toFixed(1)} s (qualità ${qualita})`)
 
-  // ?glb=1: la scena così com'è, in glTF binario, da aprire in Blender (File › Import › glTF)
+  // ?glb=1: la scena così com'è, in glTF binario, da aprire in Blender (File › Import › glTF); l'esportatore si scarica solo qui
   if (q.get('glb') !== null) {
-    new T.GLTFExporter().parse(scene, (glb) => {
+    const { GLTFExporter } = await import('./lib/gltf.js')
+    new GLTFExporter().parse(scene, (glb) => {
       const a = document.createElement('a')
       a.href = URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' })); a.download = 'pzkko.glb'; a.click()
     }, (e) => console.warn('glTF non esportato', e), { binary: true, onlyVisible: false })

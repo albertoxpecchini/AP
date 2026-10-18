@@ -114,7 +114,7 @@ export const asfalto = (n = 512, seme = 33) => {
 // Le facciate dei palazzi di fronte: intonaco colorato con le finestre a
 // griglia; di notte alcune si accendono (la mappa emissiva si ridisegna).
 export const facciata = (larg, alt, colore, seme, piani) => {
-  const n = 1024, m = Math.round((n * alt) / larg)
+  const n = 512, m = Math.round((n * alt) / larg)
   const c = tela(n, m), ctx = c.getContext('2d')
   const e = tela(n, m), ctxe = e.getContext('2d')
   ctx.fillStyle = colore; ctx.fillRect(0, 0, n, m)

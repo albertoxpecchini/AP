@@ -112,7 +112,7 @@ async function misura(foto) {
     catch { res.statusCode = 404; res.end() }
   })
   await new Promise((r) => server.listen(0, '127.0.0.1', r))
-  const url = `http://127.0.0.1:${server.address().port}/?ora=12:00`
+  const url = `http://127.0.0.1:${server.address().port}/?ora=12:00&muro=1` // muro=1: senza la scena 3D, che sposta il muro
   const exe = join(process.env.LOCALAPPDATA, 'ms-playwright/chromium-1243/chrome-win64/chrome.exe')
   const browser = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars'] })
   const out = {}
