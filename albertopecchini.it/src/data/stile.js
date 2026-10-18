@@ -177,7 +177,7 @@ export const motionNote = 'Rivelazioni: up, fade, scale, clip, line, draw e paro
 
 export const zoo = [
   { key: 'lumaca', name: 'La chiocciola gigante africana', w: 250, trait: 'Toccata, ritira i peduncoli come una chiocciola vera e li riallunga piano.' },
-  { key: 'tartaruga', name: 'La tartaruga di terra', w: 250, trait: 'Mastica, sbadiglia, si addormenta con l’elmetto sugli occhi; spaventata rientra nel guscio e fa capolino; sollevata scalcia; vicino al becco, morde.' },
+  { key: 'nutria', name: 'La nutria golosa', w: 250, trait: 'Mangia un ciuffo d’erba e, finito, ne strappa un altro dal cespo; se ti avvicini si blocca con gli occhi sbarrati; toccata sulla testa ingoia tutto, sul corpo si scrolla; sollevata scalcia.' },
   { key: 'airone', name: 'L’airone elegante', w: 132, trait: 'Lento e composto, il collo smorzato; toccato fa l’inchino.' },
   { key: 'gazza', name: 'La gazza furbissima', w: 250, trait: 'Testa a scatti; se ti avvicini alla chiave la nasconde, poi l’occhiolino.' },
   { key: 'vespa', name: 'La vespa cattiva ma precisa', w: 200, trait: 'Si libra e punta il pungiglione dove sei; vicina si arrabbia, toccata punge.' },
@@ -204,7 +204,7 @@ export const exploded = { key: 'gazza', scale: 0.46 }
 export const puppetRules = [
   { name: 'Occhi', text: 'Il modello li disegna bianchi e tondi; sopra ci sono quelli del sito: pupilla al 46%, palpebra del colore della pelle, ognuno per conto suo.' },
   { name: 'Bordo adesivo', text: 'Carta #F3F1EC intorno alla sagoma, come le figurine: sul fondo inchiostro del piè di pagina gli animali restano staccati.' },
-  { name: 'Un solo minio', text: 'Un dettaglio per animale: l’apice del guscio, l’elmetto, il papillon, il cartellino della chiave, la punta del pungiglione. L’aragosta fa eccezione: il rosso è lei.' },
+  { name: 'Un solo minio', text: 'Un dettaglio per animale: l’apice del guscio, i denti della nutria, il papillon, il cartellino della chiave, la punta del pungiglione. L’aragosta fa eccezione: il rosso è lei.' },
   { name: 'Fermacampioni', text: 'Dischi dorati sui perni: lo script li trova da solo, il pezzo ci gira intorno e torna a riposo su una molla.' },
   { name: 'Movimento ridotto', text: 'Con prefers-reduced-motion restano gli sguardi: niente battiti di palpebre, salti né ritiri animati.' },
 ]

@@ -89,7 +89,7 @@ const sharebar = (small = false) =>
 const nomeCampo = (id) => `<input class="nm" name="name" id="${id}" maxlength="24" placeholder="ur name" autocomplete="nickname" required>`
 const trappola = '<input class="hp" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">'
 
-const EULA = `<p><b>END USER LICENSE AGREEMENT — IMPORTANT, READ CAREFULLY.</b> By calling, e-mailing, thinking about, or standing near Pekko ("the Computer Guy") you agree to be bound by this Agreement.</p><p><b>1. GRANT OF LICENSE.</b> The Computer Guy grants you a non-exclusive, non-transferable right to have your computer looked at, sighed over, and eventually fixed.</p><p><b>2. RESTRICTIONS.</b> You may not download "free" screensavers, install seventeen toolbars, or click YES on anything that says YOUR PC IS INFECTED in red letters.</p><p><b>3. DUPLICATE FILES.</b> All copies of copies of copies of your holiday photos remain your responsibility until proven otherwise.</p><p><b>4. PRINTERS.</b> The Computer Guy makes no warranty, express or implied, that any printer will ever print again; printers are governed by separate, older laws.</p><p><b>5. WINDOWS VISTA.</b> See section 4.</p><p><b>6. GOVERNING LAW.</b> This Agreement is governed by the laws of Rivalta sul Mincio and the ancient customs of the Mincio river.</p><p><b>7. PUBLIC POSTS.</b> What you write in the forum, guestbook and shoutbox is public. Don't post phone numbers, addresses or other people's data. The tortoise deletes what it doesn't like.</p><p><b>8. ENTIRE AGREEMENT.</b> Any other agreement is a duplicate and will be deleted with your permission. Si parla italiano. It's all good, man.</p>`
+const EULA = `<p><b>END USER LICENSE AGREEMENT — IMPORTANT, READ CAREFULLY.</b> By calling, e-mailing, thinking about, or standing near Pekko ("the Computer Guy") you agree to be bound by this Agreement.</p><p><b>1. GRANT OF LICENSE.</b> The Computer Guy grants you a non-exclusive, non-transferable right to have your computer looked at, sighed over, and eventually fixed.</p><p><b>2. RESTRICTIONS.</b> You may not download "free" screensavers, install seventeen toolbars, or click YES on anything that says YOUR PC IS INFECTED in red letters.</p><p><b>3. DUPLICATE FILES.</b> All copies of copies of copies of your holiday photos remain your responsibility until proven otherwise.</p><p><b>4. PRINTERS.</b> The Computer Guy makes no warranty, express or implied, that any printer will ever print again; printers are governed by separate, older laws.</p><p><b>5. WINDOWS VISTA.</b> See section 4.</p><p><b>6. GOVERNING LAW.</b> This Agreement is governed by the laws of Rivalta sul Mincio and the ancient customs of the Mincio river.</p><p><b>7. PUBLIC POSTS.</b> What you write in the forum, guestbook and shoutbox is public. Don't post phone numbers, addresses or other people's data. The nutria eats what it doesn't like.</p><p><b>8. ENTIRE AGREEMENT.</b> Any other agreement is a duplicate and will be deleted with your permission. Si parla italiano. It's all good, man.</p>`
 
 // ── Pezzi comuni ─────────────────────────────────────────────────────────────
 
@@ -354,13 +354,13 @@ function bottoni88() {
     ['btn-html', `https://validator.w3.org/nu/?doc=${encodeURIComponent(`${A.dominio}/`)}`, 'HTML5, valid-ish (check it yourself)'],
     ['btn-ita', A.contatti, 'Si parla italiano'],
     ['btn-eyes', '', 'Best viewed with eyes'],
-    ['btn-tortoise', 'segreto', 'Secured by a tortoise'],
+    ['btn-nutria', 'segreto', 'Secured by a nutria'],
   ]
   return `<div class="b88">${lista
     .map(([n, href, alt]) => {
       const im = img(n, alt, { w: 88, h: 31 })
       if (!href) return `<span>${im}</span>`
-      if (href === 'segreto') return `<button type="button" data-tortoise title="${esc(alt)}">${im}</button>`
+      if (href === 'segreto') return `<button type="button" data-nutria title="${esc(alt)}">${im}</button>`
       const fuori = href.startsWith('http')
       return `<a href="${esc(href)}" title="${esc(alt)}"${fuori ? ' target="_blank" rel="noopener"' : ''}>${im}</a>`
     })
@@ -1491,7 +1491,7 @@ const JS = `
     if (!sel) { $('[data-poll-msg]', poll).textContent = 'pick one! any one.'; return; }
     LS.set('bcp-voted', sel.value);
     call({ a: 'vote', i: +sel.value }).then(function (j) {
-      if (!j.ok) { LS.del('bcp-voted'); $('[data-poll-msg]', poll).textContent = j.error || 'vote failed. the tortoise ate it'; }
+      if (!j.ok) { LS.del('bcp-voted'); $('[data-poll-msg]', poll).textContent = j.error || 'vote failed. the nutria ate it'; }
       renderPoll();
     });
   });
@@ -1874,7 +1874,7 @@ const JS = `
     a.addEventListener('click', function () { try { var l = JSON.parse(a.getAttribute('data-ring-random')); a.href = l[Math.floor(Math.random() * l.length)]; } catch (e) {} });
   });
 
-  // ── Il segreto: il codice Konami, o cinque colpi alla tartaruga (per chi non ha le frecce)
+  // ── Il segreto: il codice Konami, o cinque colpi alla nutria (per chi non ha le frecce)
   var segreto = $('[data-segreto]');
   var apriSegreto = function () {
     if (!segreto) { window.alert('U FOUND THE SECRET!!! (the good part is on the home page)'); return; }
@@ -1892,8 +1892,8 @@ const JS = `
     if (e.key === 'Escape' && segreto && !segreto.hidden) { segreto.hidden = true; document.body.classList.remove('has-popup'); }
   });
   var colpi = 0;
-  $$('[data-tortoise]').forEach(function (b) {
-    b.addEventListener('click', function () { if (++colpi >= 5) { colpi = 0; b.title = 'Secured by a tortoise'; apriSegreto(); } else b.title = 'the tortoise felt that. ' + (5 - colpi) + ' more…'; });
+  $$('[data-nutria]').forEach(function (b) {
+    b.addEventListener('click', function () { if (++colpi >= 5) { colpi = 0; b.title = 'Secured by a nutria'; apriSegreto(); } else b.title = 'the nutria felt that. ' + (5 - colpi) + ' more…'; });
   });
 
   // ── Il giro vero: una visita (nuova solo la prima volta nella scheda), poi un aggiornamento ogni 30 s

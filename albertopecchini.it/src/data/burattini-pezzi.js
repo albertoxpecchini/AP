@@ -36,17 +36,17 @@ export const pezzi = {
       stazione: { w: 166, h: 322, pin: [62.8, 282], eyes: [] },
     },
   },
-  tartaruga: {
+  nutria: {
     scala: 0.5,
     pezzi: {
-      testa: { w: 266, h: 170, pin: [227.5, 97], eyes: [{ x: 40, y: 69.5, rx: 22.8, ry: 25.8, skin: '#aa8663' }, { x: 134.5, y: 69.5, rx: 25.8, ry: 25.8, skin: '#9f7d60' }] },
-      corpo: { w: 688, h: 420, pin: [557.8, 212], eyes: [] },
-      mascella: { w: 232, h: 104, pin: [194, 42.5], eyes: [] },
-      elmetto: { w: 232, h: 134, pin: [196.3, 96.8], eyes: [] },
-      collo: { w: 250, h: 130, pin: null, eyes: [] },
-      anteriore: { w: 172, h: 272, pin: [62.5, 102], eyes: [] },
-      posteriore: { w: 204, h: 264, pin: [77.3, 147.3], eyes: [] },
-      coda: { w: 182, h: 112, pin: [39, 46.3], eyes: [] },
+      testa: { w: 390, h: 252, pin: [354, 142.5], eyes: [{ x: 101.8, y: 92.8, rx: 15, ry: 15.5, skin: '#684e40' }, { x: 185.8, y: 97, rx: 18.5, ry: 18.8, skin: '#63493c' }] },
+      corpo: { w: 484, h: 484, pin: null, eyes: [] },
+      mascella: { w: 278, h: 136, pin: [238, 46.8], eyes: [] },
+      braccio: { w: 228, h: 206, pin: [166.3, 31], eyes: [] },
+      erba: { w: 184, h: 298, pin: [90.5, 267.3], eyes: [] },
+      zampa: { w: 270, h: 148, pin: [223.5, 36], eyes: [] },
+      cespo: { w: 238, h: 202, pin: null, eyes: [] },
+      coda: { w: 578, h: 220, pin: [35.3, 154.8], eyes: [] },
     },
   },
   vespa: {

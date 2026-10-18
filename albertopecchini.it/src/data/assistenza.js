@@ -159,16 +159,16 @@ export const assistenza = {
       ['Transport', 'pc ambulance (a white van in my imagination), a motorbike (no drivers needed)'],
       ['Motto', 'until proven infected, every computer is innocent'],
     ],
-    piace: ['printers that print', 'the mincio river', 'salami (payment accepted)', 'floppy disks (1.44 mb of hope)', 'impact font, in 3d', 'the sound of a fixed fan', 'my tortoise', 'my giant african snail'],
+    piace: ['printers that print', 'the mincio river', 'salami (payment accepted)', 'floppy disks (1.44 mb of hope)', 'impact font, in 3d', 'the sound of a fixed fan', 'my nutria', 'my giant african snail'],
     nonPiace: ['vista', 'toolbars (all seventeen)', '"free" screensavers', 'the price of a charger with a bite on it', 'ppl who say "it just stopped working"', 'ink cartridges that r "empty"'],
     staff: [
       { nome: 'PEKKO', ruolo: 'ceo, cto, the computer guy', img: 'cut-punta', nota: 'points at things until they work' },
-      { nome: 'THE TORTOISE', ruolo: 'head of security', img: '/media/mascotte/tartaruga.webp', nota: 'slow, steady, never been hacked' },
+      { nome: 'THE NUTRIA', ruolo: 'head of security', img: '/media/mascotte/nutria.webp', nota: 'eats grass, never been hacked' },
       { nome: 'THE SNAIL', ruolo: 'customer relations', img: '/media/mascotte/lumaca.webp', nota: 'leaves a trail, follows up' },
     ],
     album: ['cut-punta', 'cut-pollici', 'cut-telefono', 'cut-laptop', 'cut-braccia', 'cut-cartello', 'cut-boh', 'cut-pistole', 'cut-stampante'],
     albumTitolo: 'PEKKO’S OUTFIT — rate my suit!!!',
-    albumNota: 'click 👍 on the suit u like. real votes, no cheating (the tortoise is watching)',
+    albumNota: 'click 👍 on the suit u like. real votes, no cheating (the nutria is watching)',
     siti: [
       { label: 'rivaltasulmincio.it', href: 'https://www.rivaltasulmincio.it' },
       { label: 'cascinafontana.xyz', href: 'https://www.cascinafontana.xyz' },
@@ -213,7 +213,7 @@ export const assistenza = {
         tab: 'the serious twin',
         ad: 'ad-web-twin',
         alt: 'Same guy. Different font. Pekko fixes computers — Alberto Pecchini: houses, websites & brands',
-        testo: 'pekkos serious twin. same guy, different font: the portfolio of alberto pecchini, in italian. houses, websites, brands and computers. pages generated from data, technical drawings drawn by code, a snail and a tortoise whose eyes follow ur mouse. 0 frameworks, 0 tracking cookies.',
+        testo: 'pekkos serious twin. same guy, different font: the portfolio of alberto pecchini, in italian. houses, websites, brands and computers. pages generated from data, technical drawings drawn by code, a snail and a nutria whose eyes follow ur mouse. 0 frameworks, 0 tracking cookies.',
         numeri: [['0', 'frameworks'], ['0', 'tracking cookies'], ['2', 'pets on the staff']],
       },
       sito('pzkko-it', {
@@ -232,7 +232,7 @@ export const assistenza = {
         tab: 'bettercallpekko.it',
         tech: ['HTML', 'CSS', 'JavaScript', 'Vercel Blob', 'Claude Design', 'GIF (a lot)'],
         testo: 'this one. u r here. built like its 2008 on purpose: 960 px, gifs, impact in 3d. but the visitor counter, the likes, the forum, the guestbook and the shoutbox r real, and the banners r drawn in vector with real fonts b4 becoming gifs. the only website where pekko is allowed 2 blink.',
-        numeri: [['2008', 'on purpose'], ['100%', 'real counters'], ['1', 'tortoise moderator']],
+        numeri: [['2008', 'on purpose'], ['100%', 'real counters'], ['1', 'nutria moderator']],
       },
     ],
     servizi: [
@@ -269,18 +269,18 @@ export const assistenza = {
       'rivaltasulmincio.it knows 184 places. pekko checked where every single one comes from.',
       'cascinafontana.xyz has exactly 221 lines of javascript. pekko counted them. twice.',
       'the map on dario donellis website was drawn in svg, with the right projection 4 mantova.',
-      'on the serious website the snail and the tortoise follow ur mouse with their eyes. try it.',
+      'on the serious website the snail and the nutria follow ur mouse with their eyes. try it.',
       'pzkko.it calculates the sunset in mantova by itself, no internet needed. when the sun goes down there, the neon sign turns on, wherever u r.',
       'this website was last updated on 06/28/2006, the day pekko was born.',
       'every banner on this page was drawn in vector, with real fonts, then baked into a gif. like its 2008.',
       'the photos of pekko in loud suits come from 1 id photo and a lot of ai. the suits r not for sale (yet).',
-      'the tortoise moderates the forum. it has never been hacked.',
+      'the nutria moderates the forum. it has never been hacked. it has eaten 3 spam posts.',
       'pekkos websites have 0 tracking cookies. pekko accepts real cookies (the ones u eat).',
       'there is a secret on this page. ↑ ↑ ↓ ↓ ← → ← → B A',
     ],
     segreto: {
       titolo: 'U FOUND THE SECRET!!!',
-      testo: 'the konami code still works in 2026. pekko is proud of u. the tortoise is not impressed. as a reward: pekko dancing, and the knowledge that u r a person of culture.',
+      testo: 'the konami code still works in 2026. pekko is proud of u. the nutria is not impressed. as a reward: pekko dancing, and the knowledge that u r a person of culture.',
       conta: 'ppl found it so far (4 real)',
     },
     cta: 'UR WEBSITE NEXT?',
@@ -360,13 +360,13 @@ export const assistenza = {
 
   forum: {
     titolo: 'PEKKO’S FORUM',
-    sotto: 'real topics by real ppl · no links · no spam · the tortoise moderates',
+    sotto: 'real topics by real ppl · no links · no spam · the nutria moderates',
     nota: 'posts r public. dont write ur phone number or ur address plz. for real problems use the contact page',
   },
 
   guestbook: {
     titolo: 'Pekko worked for me!!!!',
-    nota: 'ur comment is public and stays here. no links. dont write ur real phone/address. comments r moderated by pekkos tortoise (expect delays)',
+    nota: 'ur comment is public and stays here. no links. dont write ur real phone/address. comments r moderated by pekkos nutria (expect delays, it is eating)',
   },
 
   sondaggio: {

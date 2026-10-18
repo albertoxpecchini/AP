@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  MASCOTTE — la chiocciola gigante africana e la tartaruga di terra, gli
-//  animali di Alberto, che custodiscono il sito dalla testata e dal piè di
-//  pagina. Un'immagine di openai/gpt-image-2 per ciascuna, fondo trasparente;
+//  MASCOTTE — la chiocciola gigante africana e la nutria golosa (dal
+//  18.10.2026 al posto della tartaruga di terra), che custodiscono il sito
+//  dalla testata e dal piè di pagina. Un'immagine di openai/gpt-image-2 per ciascuna, fondo trasparente;
 //  gli occhi restano bianchi e tondi perché il codice ci disegna sopra le pupille
 //  che seguono il puntatore (src/client/mascot.js).
 //
@@ -20,9 +20,12 @@ export const mascotte = {
     soggetto: `A giant African land snail (Achatina fulica): a large, tall conical spiral shell with brown and cream stripes, whose pointed apex tip is vermilion; a plump grey-brown body on a softly textured foot; two long upper tentacles (eye stalks) rising from the head, each ending in one big round white eyeball with a small black pupil; two short lower tentacles; the head raised and turned toward the viewer. The snail is seen from its front-left and faces the viewer's right.`,
     alt: 'La chiocciola gigante africana, mascotte del sito',
   },
-  tartaruga: {
-    titolo: 'La tartaruga di terra',
-    soggetto: `A Mediterranean land tortoise (Testudo hermanni): a high domed shell with a pattern of olive-yellow and dark brown scutes, scaly stubby legs with small claws, a rounded head with two big round white eyes with small black pupils on the front of the face, a small smiling beak; on its head a tiny vermilion construction hard hat (safety helmet), slightly tilted. The tortoise is seen from its front-right and faces the viewer's left.`,
-    alt: 'La tartaruga di terra, mascotte del sito',
+  // La nutria intera è l'«intero» del burattino (tools/mascotte/burattini.js,
+  // che ne ha anche il prompt): qui serve solo per `usa`, che ne fa nutria.webp
+  // per Better Call Pekko.
+  nutria: {
+    titolo: 'La nutria golosa',
+    soggetto: `A nutria (coypu), sitting upright on its haunches in side view facing the viewer's left, munching a bunch of fresh grass held in its hands, two big vermilion-orange incisors, a long rat-like tail, a tuft of grass on the ground in front of it. See the full prompt in burattini.js.`,
+    alt: 'La nutria golosa, mascotte del sito',
   },
 }

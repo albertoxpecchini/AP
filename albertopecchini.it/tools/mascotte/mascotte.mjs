@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Mascotte del sito con openai/gpt-image-2 su Replicate, sempre in qualità high.
 //
-//   node tools/mascotte/mascotte.mjs genera <lumaca|tartaruga|tutte>
+//   node tools/mascotte/mascotte.mjs genera <lumaca|nutria|tutte>
 //       disegna la mascotte (1536 × 1024, fondo trasparente) in tools/mascotte/lavoro/<nome>/
 //   node tools/mascotte/mascotte.mjs usa <nome> <file.png>
 //       pulisce la trasparenza, rifila i margini, trova gli occhi e scrive

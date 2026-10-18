@@ -6,7 +6,7 @@
 // simmetriche, con il marchio in mezzo, i tasti «sasso» (pebble) disegnati
 // dall'IA e resi premibili dal codice, e i burattini — la chiocciola gigante
 // africana (in testata arriva senza guscio, che poi le cade addosso), la
-// tartaruga di terra e gli altri animali — che seguono il puntatore con gli
+// nutria golosa e gli altri animali — che seguono il puntatore con gli
 // occhi (puppet(), src/client/puppet.js).
 
 import { html, esc, jsonLd, cx } from './html.js'
@@ -109,7 +109,7 @@ function navItem(route, item, i) {
       <div class="subnav" id="subnav-${i}">
         <ul class="subnav__list">
           ${item.children.map(
-            (c, k) => `<li><a class="subnav__link" href="${c.href}"${route.path === c.href ? ' aria-current="page"' : ''}><span class="label">${String.fromCharCode(65 + k)}</span><span class="subnav__label">${esc(c.label)}</span><span class="subnav__note">${esc(c.note)}</span></a></li>`,
+            (c, k) => `<li><a class="subnav__link" href="${c.href}"${route.path === c.href ? ' aria-current="page"' : ''}><span class="label">${String(k + 1).padStart(2, '0')}</span><span class="subnav__label">${esc(c.label)}</span><span class="subnav__note">${esc(c.note)}</span></a></li>`,
           )}
         </ul>
       </div>
@@ -144,7 +144,6 @@ function header(route) {
 function mobileMenu(route) {
   return html`
     <div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu di navigazione" data-theme="ink" hidden>
-      <div class="menu__grid" aria-hidden="true"></div>
       <div class="menu__top container--wide">
         ${logo()}
         ${pebble({ label: 'Chiudi', srLabel: 'Chiudi il menu', tone: 'carta', round: true, iconName: 'close', className: 'menu-toggle menu-toggle--close', attrs: { 'data-menu-close': true } })}
@@ -240,7 +239,7 @@ function footer({ route, compact = false }) {
               <span class="foot-sign__float" data-parallax="0.04">${signature()}</span>
             </a>
           </div>
-          ${puppet('tartaruga', { className: 'foot-sign__guard foot-sign__guard--r' })}
+          ${puppet('nutria', { className: 'foot-sign__guard foot-sign__guard--r' })}
           ${puppet('gazza', { className: 'foot-sign__guard foot-sign__pup foot-sign__pup--gazza' })}
           <p class="foot-sign__name">${esc(site.name)}</p>
           <p class="foot-sign__tag">${esc(site.title)} · ${esc(site.tagline)}</p>

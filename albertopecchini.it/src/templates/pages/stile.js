@@ -13,7 +13,6 @@ import { burattino } from '../../data/burattini.js'
 import { COORDS } from '../layout.js'
 
 const em = (word) => `<em class="serif-i">${esc(word)}</em>`
-const marks = '<span class="mark mark--tl" aria-hidden="true"></span><span class="mark mark--tr" aria-hidden="true"></span><span class="mark mark--bl" aria-hidden="true"></span><span class="mark mark--br" aria-hidden="true"></span>'
 
 /** Titolo con le parole d'accento in corsivo graziato (come il footer). */
 const accented = (text, accent = []) =>
@@ -53,7 +52,6 @@ function heroBoard(b) {
     b,
     html`
       <div class="bd-hero">
-        <div class="bd-hero__lines" aria-hidden="true"><i style="--x:0"></i><i style="--x:25%"></i><i style="--x:70%"></i><i style="--x:100%"></i></div>
         <header class="bd-hero__bar">
           ${logo()}
           <nav class="bd-nav" aria-label="Navigazione principale (esempio)">
@@ -67,7 +65,6 @@ function heroBoard(b) {
           <div class="bd-hero__meta label" data-bd="fade"><span>${esc(site.edition)}</span><span>${esc(site.location.city)} — Italia</span><span>${COORDS}</span></div>
           <p class="bd-hero__name" aria-hidden="true"><span class="bd-hero__word"><span>${esc(site.firstName)}</span></span> <span class="bd-hero__word bd-hero__word--2"><span>${esc(site.lastName)}</span></span></p>
           <p class="sr-only">${esc(site.name)}</p>
-          <div class="rule rule--ticks bd-hero__rule" data-bd="line" style="--d:200ms" aria-hidden="true"></div>
           <div class="bd-hero__body">
             <div class="bd-hero__roles" data-bd="up" style="--d:250ms">
               <p class="label">Discipline</p>
@@ -78,7 +75,6 @@ function heroBoard(b) {
             <figure class="bd-hero__figure" data-bd="clip" style="--d:150ms">
               <div class="bd-hero__stage">
                 <div class="bd-hero__frame" data-clip>${picture({ art: 'floorplan', variant: 'casa', code: 'AP-26-004', alt: 'Pianta architettonica quotata di un’abitazione, scala 1:100' }, { lazy: false })}</div>
-                ${marks}
               </div>
               <figcaption class="bd-hero__caption label"><span>Fig. 01 — Pianta piano terra · scala 1:100</span><span class="bd-hero__ticks" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></figcaption>
             </figure>
@@ -230,11 +226,9 @@ function formaBoard(b) {
             </div>
           </div>
         </div>
-        ${sub('Elementi grafici ricorrenti', '.rule · .rule--ticks · .mark · .dot--live', { top: true, muted: true })}
+        ${sub('Elementi grafici ricorrenti', '.rule · .dot--live', { top: true, muted: true })}
         <div class="bd-els">
           <div><div class="bd-el__box"><div class="bd-el__rule" aria-hidden="true"></div></div><p class="bd-el__name">Filo</p><p class="bd-note bd-el__note">1 px, si stende da sinistra all’ingresso.</p></div>
-          <div><div class="bd-el__box"><div class="rule rule--ticks bd-el__ticks" aria-hidden="true"></div></div><p class="bd-el__name">Righello</p><p class="bd-note bd-el__note">Tacche ogni 8 px, più lunghe ogni 40.</p></div>
-          <div><div class="bd-el__box"><div class="bd-el__marks">${marks}</div></div><p class="bd-el__name">Crocini di registro</p><p class="bd-note bd-el__note">Agli angoli di immagini e tavole, al 70%.</p></div>
           <div><div class="bd-el__box label"><span class="dot dot--live" aria-hidden="true"></span>Disponibile</div><p class="bd-el__name">Punto attivo</p><p class="bd-note bd-el__note">Pulsa ogni 2,4 s. Unico uso del verde.</p></div>
         </div>
         ${sub('Movimento', 'Rispetta prefers-reduced-motion · senza JS tutto è visibile', { top: true, muted: true })}
@@ -394,7 +388,7 @@ function mascotteBoard(b) {
     b,
     html`
       <div class="bd">
-        ${head(b, 'Chiocciola · Tartaruga · Airone · Gazza · Vespa · Aragosta', 'gpt-image-2 · pezzi su molle')}
+        ${head(b, 'Chiocciola · Nutria · Airone · Gazza · Vespa · Aragosta', 'gpt-image-2 · pezzi su molle')}
         ${intro(`Sei animali, ${em('a pezzi')}.`, 'Custodiscono il sito. Li disegna gpt-image-2 in uno stile solo e smontati come burattini di carta, con i fermacampioni ai giunti; il codice li rimonta e li muove: occhi che seguono il puntatore, pezzi da tirare, un carattere per ciascuno.')}
         <div class="bd-zoo">
           ${S.zoo.map(
@@ -422,7 +416,6 @@ function mascotteBoard(b) {
           <div class="bd-ink__scene" data-ink data-bd="fade" style="--d:120ms">
             <p class="bd-ink__bed label" data-ink-bed><span class="dot dot--live" aria-hidden="true"></span>${esc(site.availability.label)}</p>
             <p class="bd-ink__name" aria-hidden="true"><span data-ink-word>${esc(site.lastName)}</span></p>
-            <div class="rule rule--ticks bd-ink__rule" data-ink-rule aria-hidden="true"></div>
           </div>
         </div>
         ${sub(`Pezzi e perni · ${esc(S.zoo.find((a) => a.key === x.key).name.toLowerCase())}, smontata`, 'src/data/burattini.js', { top: true, muted: true })}

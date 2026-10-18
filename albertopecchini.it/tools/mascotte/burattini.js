@@ -1,12 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  BURATTINI — gli animali del piè di pagina: la chiocciola e la tartaruga,
+//  BURATTINI — gli animali del piè di pagina: la chiocciola e la nutria,
 //  l'airone, la gazza e la vespa. Non sono un'immagine sola ma burattini di
 //  carta: pezzi separati (corpo, testa, ali, zampe…) uniti da fermacampioni, che
 //  il sito rimonta e muove col puntatore.
 //
 //  Due passaggi per animale, tutti e due con openai/gpt-image-2 in qualità high:
-//  1. «intero»: l'animale completo, con la chiocciola e la tartaruga come
-//     riferimento di stile, così la famiglia resta una;
+//  1. «intero»: l'animale completo, con la chiocciola come riferimento di
+//     stile (fino al 18.10.2026 anche la tartaruga), così la famiglia resta una;
 //  2. «pezzi»: lo stesso animale smontato nei pezzi elencati qui sotto, con
 //     l'intero come riferimento (stesso disegno, stessa scala).
 //
@@ -27,7 +27,7 @@ Clean off-white die-cut border (#f3f1ec), about 12 px wide, all around the outer
 Never use magenta or pink anywhere on the character or on its border.
 No cast shadow, no ground, no scenery, no text, no letters, no logos, no watermark.`
 
-export const INTERO = `A single cute mascot character, centred and large, on ${FONDO}, for the website of a young Italian surveyor (geometra) who is also a web designer and a graphic designer. It joins two existing mascots of the same site, a giant African land snail and a Mediterranean tortoise: the attached images are STYLE REFERENCES ONLY — match their drawing style, outline weight, colouring, eye design and sticker border exactly, but do NOT draw a snail or a tortoise.`
+export const INTERO = `A single cute mascot character, centred and large, on ${FONDO}, for the website of a young Italian surveyor (geometra) who is also a web designer and a graphic designer. It joins the other mascots of the same site: the attached image, a giant African land snail, is a STYLE REFERENCE ONLY — match its drawing style, outline weight, colouring, eye design and sticker border exactly, but do NOT draw a snail and do NOT copy its backpack, camera or tools.`
 
 export const PEZZI = `The attached image is a cartoon mascot. Redraw this exact character — same design, colours, proportions, line style and eye design — disassembled into the separate flat pieces of a cut-out paper puppet (a paper marionette whose pieces are joined by brass split pins), laid out on ${FONDO}.
 Rules for the pieces:
@@ -40,9 +40,9 @@ Rules for the pieces:
 The pieces:`
 
 export const burattini = {
-  // La chiocciola e la tartaruga c'erano già (mascotte.mjs): il loro «intero» è
-  // la mascotte stessa, quindi basta il secondo passaggio, i pezzi, con
-  // public/media/mascotte/<nome>.webp come riferimento. Così restano identiche.
+  // La chiocciola c'era già (mascotte.mjs): il suo «intero» è la mascotte
+  // stessa, quindi basta il secondo passaggio, i pezzi, con
+  // public/media/mascotte/lumaca.webp come riferimento. Così resta identica.
   lumaca: {
     titolo: 'La chiocciola gigante africana',
     intero: 'public/media/mascotte/lumaca.webp',
@@ -55,40 +55,37 @@ export const burattini = {
     ],
     alt: 'La chiocciola gigante africana, burattino del sito',
   },
-  // Rifatta da zero il 1°.10.2026 (prima era la mascotte del 26.09 smontata in
-  // tre pezzi, con la testa che rimpiccioliva in un buco del guscio). Ora è
-  // pensata subito come burattino: di profilo, collo lungo che scorre sotto il
-  // guscio, zampe che ci rientrano, la mascella per sbadigli e morsi, l'elmetto a
-  // parte, che salta quando si spaventa e le scivola sugli occhi quando dorme.
-  // Per riferimento di stile solo la chiocciola: la vecchia tartaruga no.
-  tartaruga: {
-    titolo: 'La tartaruga di terra',
+  // La nutria (18.10.2026), al posto della tartaruga: pensata subito come
+  // burattino, di profilo, seduta sulle zampe di dietro a mangiare un ciuffo
+  // d'erba. Le braccia portano il ciuffo alla bocca, la mascella mastica, il
+  // ciuffo si consuma (scala) e quando è finito il braccio scende a strapparne
+  // un altro dal cespo che sta a terra davanti a lei. Il braccio lontano riusa
+  // l'immagine di quello vicino. Per riferimento di stile solo la chiocciola.
+  nutria: {
+    titolo: 'La nutria golosa',
     riferimenti: ['public/media/mascotte/lumaca.webp'],
     premessa: `A single cute mascot character, centred and large, on ${FONDO}, for the website of a young Italian surveyor (geometra) who is also a web designer and a graphic designer. It joins the other mascots of the same site: the attached image, a giant African land snail, is a STYLE REFERENCE ONLY — match its drawing style, outline weight, colouring, eye design and sticker border exactly, but do NOT draw a snail and do NOT copy its backpack, camera or tools.`,
-    soggetto: `A Hermann's tortoise (Testudo hermanni), the land tortoise of the gardens along the Mincio: slow, wise, a little sleepy and very greedy. Strict SIDE VIEW (profile) of the whole animal, standing calmly on its four legs and facing the viewer's LEFT:
-- a high, rounded, domed carapace with the typical Hermann pattern: warm olive-yellow scutes, each with a bold black blotch and fine concentric growth lines, a slightly flared rim along the bottom edge, and the pale yellow edge of the plastron just visible under it;
-- a long, wrinkled, grey-brown scaly neck stretched forward and slightly up from under the front of the shell;
-- a rounded head with a small hooked beak and a clearly drawn mouth line with a small friendly closed-mouth smile: the lower jaw is clearly separate from the upper beak;
-- four thick, stumpy, elephant-like legs covered in grey-brown and ochre scales, with short blunt claws: two front legs and two hind legs, the far legs just visible behind the near ones;
-- a short pointed tail at the back.
-On its head it wears a small vermilion construction hard hat (safety helmet), tipped slightly back so the brim stays well above the eyes: its only vermilion detail. No backpack, no bag, no tools, no clothes.
-The head is turned three-quarters toward the viewer so both big round eyes are visible above the beak; the rest of the body stays in profile.`,
-    // le zampe lontane riusano le immagini di quelle vicine (più scure in CSS):
+    soggetto: `A nutria (coypu, Myocastor coypus), the big plump river rodent of the banks of the Mincio near Mantua: round, chubby, placid and very greedy, always eating. Strict SIDE VIEW (profile) of the whole animal, sitting upright on its haunches like a beaver and facing the viewer's LEFT:
+- a plump, round, slightly hunched body covered in dense fur, dark chocolate brown on the back and a warmer lighter brown on the belly, drawn as flat colour with just a few short ink strokes suggesting fur;
+- a broad, blunt, rounded head with a short muzzle, small rounded dark ears, a pale off-white patch around the muzzle and chin, long white whiskers, a small dark nose, and a clearly drawn mouth line: the lower jaw is clearly separate from the upper lip; under the upper lip stick out two big, square, vermilion-orange front incisors, its only vermilion detail;
+- two short front arms raised to the mouth, their small dark five-fingered hands gripping a loose bunch of fresh green grass blades (some blades bent over, a few pale thin roots dangling from the bottom) that it is munching;
+- one big webbed hind foot with long toes, flat on the ground under the body;
+- a long, round, tapering, rat-like tail with a scaly texture and a few sparse hairs, lying on the ground behind it in a gentle curve;
+- on the ground in front of its foot, a small low tuft of grass: green blades fanning up from a small clod of dark earth, where it picks its grass.
+No clothes, no hat, no bag, no tools. The head is turned three-quarters toward the viewer so both big round eyes are visible above the muzzle; the rest of the body stays in profile.`,
+    // il braccio lontano riusa l'immagine di quello vicino (più scuro in CSS):
     // meno pezzi nel foglio, pezzi più grandi
     pezzi: [
-      'BODY: the domed carapace with all its scutes and the plastron edge under it, WITHOUT head, WITHOUT neck, WITHOUT legs and WITHOUT tail. Where the neck and the legs came out from under the shell, the shell simply ends in its clean, closed lower rim: no holes, no openings, no stumps.',
-      'NECK: the long wrinkled grey-brown neck alone, straight and fully stretched out, WITHOUT the head; the pin tab is at its back (shoulder) end, the end that slides in under the front of the shell; the other end is a clean rounded end, where the head is pinned.',
-      'HEAD: the head with both big round eyes and the hooked upper beak, WITHOUT the lower jaw and WITHOUT the hard hat: the bottom edge of the head is the upper edge of the mouth, and the top of the head is a complete rounded outline where the hat sits. The pin tab is at the back of the head, where it joins the neck.',
-      'LOWER JAW: the lower jaw alone, the lower half of the beak and the chin, the same colour as the head; the pin tab is at its back end, the hinge under the head.',
-      'HARD HAT: the small vermilion hard hat alone; the pin tab is at the back end of its brim.',
-      'FRONT LEG: one thick scaly front leg with its short blunt claws, pointing straight down; the pin tab is at the top (shoulder) end, which slides in under the shell.',
-      'HIND LEG: one stumpy elephant-like hind leg with its claws, pointing straight down; the pin tab is at the top (hip) end, which slides in under the shell.',
-      'TAIL: the short pointed tail; the pin tab is at its base.',
+      'BODY: the plump furry body sitting upright, with the haunch and the belly, WITHOUT head, WITHOUT the front arms, WITHOUT the hind foot and WITHOUT the tail: where they came out, the body simply ends in its clean closed outline, no holes, no stumps.',
+      'HEAD: the head with both big round eyes, the small rounded ears, the blunt muzzle with its pale patch, the white whiskers, the nose and the two big vermilion upper incisors sticking out under the upper lip, WITHOUT the lower jaw: the bottom edge of the head is the upper lip. The pin tab is at the back of the head, at the neck.',
+      'LOWER JAW: the lower jaw and chin alone, with the pale chin fur, the same colours as the head; the pin tab is at its back end, the hinge under the head.',
+      'FRONT ARM: one short brown front arm with its small dark five-fingered hand, the fingers curled closed as if gripping a handle, WITHOUT any grass; the pin tab is at the top (shoulder) end.',
+      'GRASS BUNCH: the loose bunch of fresh green grass blades that the hand holds, some blades bent over, a few pale thin roots dangling from the bottom, drawn alone; the pin tab is at the bottom of the bunch, where the hand grips it.',
+      'HIND FOOT: the big webbed hind foot with its long toes and the ankle; the pin tab is at the top (hip) end, which slides under the body.',
+      'TAIL: the long round tapering rat-like tail with its scaly texture, in a gentle curve; the pin tab is at its base (root).',
+      'GRASS TUFT: the small low tuft of grass with its clod of dark earth, drawn alone, with no pin (it does not move).',
     ],
-    // del collo si tiene la parte davanti (500 px del foglio, 250 nel WebP): il
-    // resto starebbe dentro il guscio e uscirebbe da dietro quando la testa rientra
-    ritaglia: { collo: { w: 500 } },
-    alt: 'La tartaruga di terra, burattino del sito',
+    alt: 'La nutria golosa, burattino del sito',
   },
   airone: {
     titolo: "L'airone elegante",

@@ -1,4 +1,4 @@
-// Burattini: la chiocciola, la tartaruga, l'airone, la gazza e la vespa del piè
+// Burattini: la chiocciola, la nutria, l'airone, la gazza e la vespa del piè
 // di pagina (puppet() in ui.js, montaggio in src/data/burattini.js).
 //
 // Ogni pezzo gira intorno al proprio perno su una molla: torna al suo angolo di
@@ -8,9 +8,9 @@
 // senza puntatore vagano, ognuno dove vuole. I pezzi con `hide` sanno anche
 // ritirarsi (spostamento, scala e rotazione su una molla a parte: dentro di
 // scatto, fuori piano). Poi il carattere: la chiocciola ritira i peduncoli se li
-// tocchi, la tartaruga si chiude nel guscio e poi fa capolino, l'airone fa
-// l'inchino, la gazza nasconde la chiave e fa l'occhiolino, la vespa prende la
-// mira col pungiglione e, se la tocchi, punge.
+// tocchi, la nutria mangia l'erba e ne strappa dell'altra dal cespo, l'airone
+// fa l'inchino, la gazza nasconde la chiave e fa l'occhiolino, la vespa prende
+// la mira col pungiglione e, se la tocchi, punge.
 //
 // Nella 404 la gazza ha in più un foglio nel becco ([data-carry], da puppet()
 // con `inside`), che pende come un pendolo, e scappa: sta in un contenitore
@@ -171,7 +171,7 @@ export function initPuppets() {
       else P.poke(P, hit, performance.now(), pointer)
     })
 
-    // battito di palpebre, ogni tanto doppio (la tartaruga li fa lenti)
+    // battito di palpebre, ogni tanto doppio (`blink` nella scena li allunga)
     const ms = P.scene.blink || 130
     const blink = () => {
       if (P.visible && !document.hidden && !still && !P.sleepy) {
@@ -229,7 +229,7 @@ export function initPuppets() {
     addEventListener('pointercancel', end)
   }
 
-  // ── sollevare il corpo (la tartaruga) ──────────────────────────────────────
+  // ── sollevare il corpo (la nutria) ─────────────────────────────────────────
   // Col mouse il corpo si prende e si solleva: segue il puntatore (poco di
   // lato, mai sotto il suolo) e, lasciato, ricade e rimbalza appena (in step).
   // Un clic senza trascinare è un tocco.
@@ -377,7 +377,7 @@ export function initPuppets() {
       P.gaze.x = box.x + (still ? 0 : rand(-0.5, 0.5) * innerWidth)
       P.gaze.y = box.y + (still ? 0.2 : rand(-0.4, 0.3)) * innerHeight
     }
-    // il carattere può fissare un punto (la tartaruga che dorme guarda in basso)
+    // il carattere può fissare un punto (la nutria guarda il cespo che strappa)
     const target = on ? pointer : P.stare || P.gaze
     P.root.classList.toggle('is-idle', !on)
 
@@ -585,8 +585,8 @@ const BEHAVE = {
     for (const p of [a, b]) p.hg = p.until > now ? p.depth : 0
   },
 
-  // la tartaruga: vedi TARTARUGA più sotto
-  tartaruga: (P, s) => TARTARUGA.behave(P, s),
+  // la nutria: vedi NUTRIA più sotto
+  nutria: (P, s) => NUTRIA.behave(P, s),
 
   // l'airone: lento e composto; la zampa alzata ondeggia appena, il collo respira
   airone(P, { now, t, still }) {
@@ -647,7 +647,7 @@ const POKE = {
     if (!hit && guscio) guscio.v += 90
   },
 
-  tartaruga: (P, part, now, pointer) => TARTARUGA.poke(P, part, now, pointer),
+  nutria: (P, part, now) => NUTRIA.poke(P, part, now),
 
   // un inchino
   airone(P, part, now) {
@@ -678,205 +678,193 @@ const POKE = {
   },
 }
 
-// ── La tartaruga ──────────────────────────────────────────────────────────────
-// Lenta e golosa. Da sveglia ogni tanto mastica; senza nessuno intorno per un
-// po' sbadiglia e si addormenta: il collo si affloscia, l'elmetto le scivola
-// sugli occhi, le «z» salgono; un movimento la sveglia di soprassalto.
-// Spaventata (un colpo sul guscio o sul collo, una caduta) rientra tutta —
-// testa, zampe, coda — resta dentro un po', poi fa capolino con gli occhi
-// soli e infine esce. Il puntatore davanti al becco le fa prendere la mira a
-// bocca socchiusa; un tocco sulla testa e azzanna, con un affondo del collo.
-// Una zampa toccata si ritira da sola, la coda toccata scodinzola, l'elmetto
-// toccato salta. Presa per il guscio (col mouse) scalcia in aria; a terra, se
-// il volo era alto, si spaventa.
+// ── La nutria ─────────────────────────────────────────────────────────────────
+// Golosa e placida: seduta sulle zampe di dietro mangia un ciuffo d'erba che
+// tiene con le mani. Mastica a riprese e il ciuffo si consuma (si riduce
+// intorno alla mano); finito, il braccio scende al cespo che ha davanti, ne
+// strappa un altro e lo riporta alla bocca. Se ti avvicini si blocca un attimo
+// con gli occhi sbarrati, poi riprende a mangiare guardandoti. Ogni tanto
+// annusa l'aria o batte il piede; se resti via a lungo e l'erba è quasi finita
+// si strofina il muso con le mani. Un tocco sulla testa e ingoia il ciuffo in
+// un boccone solo; sul corpo si scrolla come uscita dal fiume; sulla coda la
+// frusta; sul piede lo batte; sul cespo va a strapparne un altro; sull'erba la
+// stringe a sé socchiudendo gli occhi. Presa per il corpo (col mouse) agita
+// braccia, piede e coda; a terra, se il volo era alto, si scrolla.
 
-const SLEEP_AFTER = [16000, 28000] // ms senza puntatore prima di addormentarsi
-const YAWN = 1600
-const SNAP = 420
+const EAT = [9000, 15000] // ms per finire un ciuffo
+const GULP = 700
+const SHAKE = 650
+const GROOM_AFTER = [20000, 34000] // ms senza puntatore prima di strofinarsi il muso
 
-const TARTARUGA = {
-  behave(P, { now, t, on, target, still }) {
-    const { collo, testa, mascella, elmetto, anteriore, anteriore2, posteriore, posteriore2, coda } = P.byId
-    const legs = [anteriore, anteriore2, posteriore, posteriore2]
-    const T = (P.tt ??= { mouth: $('.pup__mouth', P.root), hat: { h: 0, v: 0 }, sleepAt: 0, asleep: false, yawned: false, chew: null, next: 0, open: '' })
+const NUTRIA = {
+  behave(P, { now, t, dt, on, target, box, still }) {
+    const { testa, mascella, braccio, braccio2, erba, zampa, coda, cespo } = P.byId
+    const N = (P.nn ??= { mouth: $('.pup__mouth', P.root), phase: 'eat', t0: now, eaten: 0, rate: 1 / rand(...EAT), chew: null, next: 0, open: '', near: false, groomAt: 0 })
     const U = P.until
     const L = P.lift
-    const hidden = U.hide > now
-    const peeking = !hidden && U.peek > now
     const lifted = L.held || L.air
     const bell = (until, dur) => (until > now ? Math.sin((1 - (until - now) / dur) * Math.PI) : 0)
 
-    // ── la caduta: all'atterraggio tutto sobbalza; da alto, spavento
+    // ── la caduta: all'atterraggio tutto sobbalza; da alto, si scrolla
     if (L.thud && now - L.thud < 80) {
       const hit = L.hit || 0
       L.thud = 0
-      for (const [i, p] of legs.entries()) p.v += (i % 2 ? 1 : -1) * (160 + hit * 50)
-      collo.v -= 90 + hit * 40
-      testa.v += 80 + hit * 30
-      coda.v += 200
-      T.hat.v += 4 + hit * 2
-      if (hit > 2.4) startle(P, now)
+      testa.v += 120 + hit * 40
+      coda.v -= 200 + hit * 40
+      zampa.v += 160
+      braccio.v -= 120
+      if (hit > 2.4) (U.shake = now + SHAKE), (U.freeze = now + 1200)
     }
 
-    // ── sonno e risveglio
-    if (still) T.sleepAt = Infinity
-    else if (on || lifted || hidden) {
-      if (T.asleep) {
-        T.asleep = false
-        T.hat.v += 6
-        U.startle = now + 900
-        U.stretch = now + 700
+    // ── il puntatore vicino: si blocca un attimo, occhi sbarrati, poi mangia guardandoti
+    const near = on && !lifted && Math.hypot(target.x - box.x, target.y - box.y) < box.w * 0.75
+    if (near && !N.near && !still) U.freeze = Math.max(U.freeze || 0, now + 900)
+    N.near = near
+    const frozen = U.freeze > now
+    P.root.classList.toggle('is-alert', frozen && !lifted)
+    P.root.classList.toggle('is-sly', U.hold > now)
+
+    // ── strofinarsi il muso: solo senza nessuno intorno, con l'erba quasi finita
+    if (still || on || lifted) N.groomAt = 0
+    else {
+      if (!N.groomAt) N.groomAt = now + rand(...GROOM_AFTER)
+      if (now > N.groomAt && N.phase === 'eat' && N.eaten > 0.7 && !(U.groom > now)) {
+        U.groom = now + 1600
+        shut(P.eyes, 1400)
+        N.groomAt = now + rand(...GROOM_AFTER)
       }
-      T.sleepAt = 0
-      T.yawned = false
-    } else {
-      if (!T.sleepAt) T.sleepAt = now + rand(...SLEEP_AFTER)
-      if (now > T.sleepAt && !T.asleep && !T.yawned && !(U.snap > now)) {
-        T.yawned = true
-        U.yawn = now + YAWN
-        shut(P.eyes, YAWN * 0.7)
-      }
-      if (T.yawned && U.yawn < now && !T.asleep) T.asleep = true
     }
-    P.sleepy = T.asleep
-    P.root.classList.toggle('is-asleep', T.asleep)
-    P.root.classList.toggle('is-startled', U.startle > now)
+    const groom = bell(U.groom, 1600)
 
-    // ── il ritiro: dentro, capolino, fuori; l'affondo del morso; lo stiramento
-    const snap = bell(U.snap, SNAP)
-    const stretch = bell(U.stretch, 700)
-    let depth = hidden ? 1 : peeking ? 0.5 : T.asleep ? 0.18 : 0
-    if (snap) {
-      depth = -0.28 * Math.min(1, snap * 1.6)
-      collo.hk = 900
-    } else if (stretch) depth = -0.12 * stretch
-    else if (lifted) depth = -0.08
-    collo.hg = depth
-    for (const p of legs) p.hg = hidden ? 1 : peeking ? 0.55 : p.until > now ? 1 : 0
-    coda.hg = hidden ? 1 : peeking ? 0.5 : 0
-
-    // dentro non si guarda in giro (la testa uscirebbe dalla corazza); al
-    // capolino appena
-    if (hidden) collo.goal = testa.goal = 0
-    else if (peeking) collo.goal = clamp(collo.goal, -8, 8)
-
-    // ── la bocca: mira, morso, sbadiglio, masticata
+    // ── il pasto: mangia → scende al cespo → strappa → risale
+    const gulp = bell(U.gulp, GULP)
     let jaw = 0
-    if (snap) jaw = -36 * snap
-    else if (U.yawn > now) jaw = -34 * bell(U.yawn, YAWN)
-    else if (!hidden && !peeking && !T.asleep && !still) {
-      if (on && !lifted) {
-        const c = center(testa.img)
-        const dx = target.x - c.x
-        const dy = target.y - c.y
-        // davanti al becco, alla sua altezza: bocca socchiusa
-        if (dx < c.w * 0.15 && dx > -c.w * 1.1 && Math.abs(dy) < c.h * 0.8) jaw = -9
+    let arm = 0
+    if (still) {
+      N.phase = 'eat'
+      N.eaten = 0
+    } else if (lifted) {
+      N.chew = null
+      arm = Math.sin(t * 5) * 18 + 10
+    } else
+      switch (N.phase) {
+        case 'eat':
+          if (gulp) {
+            jaw = -30 * gulp
+            if (gulp > 0.95) N.eaten = 1
+          } else if (!(U.swallow > now) && !frozen && !groom && braccio.a > -15) {
+            if (N.chew && N.chew.until > now) {
+              jaw = (-12 * (1 - Math.cos(((now - N.chew.t0) / 1000) * N.chew.f * 2 * Math.PI))) / 2
+              N.eaten += N.rate * dt * 1000 * 1.6 // si consuma solo masticando (~5/8 del tempo)
+            } else if (now > N.next) {
+              N.next = now + rand(500, 1400)
+              N.chew = { t0: now, until: now + rand(1200, 2400), f: rand(3.6, 5) }
+            }
+          }
+          if (N.eaten >= 1 && !(U.gulp > now) && !(U.swallow > now)) {
+            N.phase = 'reach'
+            N.t0 = now
+            N.chew = null
+          }
+          break
+        case 'reach':
+          arm = -68
+          if (braccio.a < -50 && now - N.t0 > 350) {
+            N.phase = 'grab'
+            N.t0 = now
+            if (cespo) cespo.v += 220
+          }
+          break
+        case 'grab':
+          arm = -68
+          N.eaten = clamp(1 - (now - N.t0) / 220, 0, 1)
+          if (now - N.t0 > 380) (N.phase = 'lift'), (N.t0 = now)
+          break
+        case 'lift':
+          if (braccio.a > -8 || now - N.t0 > 2500) {
+            N.phase = 'eat'
+            N.rate = 1 / rand(...EAT)
+            N.next = now + 150
+          }
+          break
       }
-      if (!jaw) {
-        if (T.chew && T.chew.until > now) jaw = -11 * (1 - Math.cos(((now - T.chew.t0) / 1000) * T.chew.f * 2 * Math.PI)) / 2
-        else if (now > T.next) {
-          T.next = now + rand(6000, 14000)
-          T.chew = { t0: now, until: now + rand(1400, 2600), f: rand(3.5, 5) }
-        }
-      }
-    }
+    const reaching = N.phase === 'reach' || N.phase === 'grab'
+    erba.h = clamp(N.eaten, 0, 1)
+    // stringere il ciuffo a sé (tocco sull'erba), strofinarsi il muso
+    if (U.hold > now) arm += 10 * bell(U.hold, 900)
+    if (groom) arm += (6 + Math.sin(t * 17) * 7) * groom
+    braccio.pose = arm
+    if (braccio2) braccio2.pose = arm
     mascella.pose = jaw
-    const open = clamp(-mascella.a / 38, 0, 1).toFixed(3)
-    if (open !== T.open && T.mouth) T.mouth.style.setProperty('--open', (T.open = open))
+    const open = clamp(-mascella.a / 30, 0, 1).toFixed(3)
+    if (open !== N.open && N.mouth) N.mouth.style.setProperty('--open', (N.open = open))
 
-    // ── la posa: respiro, sonno, morso, sbadiglio
-    collo.pose = still ? 0 : Math.sin(t * 0.55) * 1.6
-    testa.pose = snap * 6 + bell(U.yawn, YAWN) * 8 - jaw * 0.12
-    if (T.asleep) {
-      collo.pose -= 14
-      const c = center(testa.img)
-      P.stare = { x: c.x - c.w * 0.3, y: c.y + c.h * 1.2 }
+    // ── la testa: segue il boccone, scende col braccio, annusa, si scrolla
+    const sniff = bell(U.sniff, 900)
+    const shake = bell(U.shake, SHAKE)
+    testa.pose = (still ? 0 : Math.sin(t * 0.7) * 1.2) - jaw * 0.15 + (reaching ? -14 : 0) + bell(U.swallow, 600) * 10 + sniff * (9 + Math.sin(t * 50) * 2) + shake * Math.sin(t * 70) * 6 - groom * 6
+    // lo sguardo al cespo quando lo raggiunge (o quando glielo tocchi)
+    if (cespo && (reaching || U.glance > now)) {
+      const c = center(cespo.img)
+      P.stare = { x: c.x, y: c.y }
     } else P.stare = null
+    P.off.r = shake * Math.sin(t * 70) * 3.5
 
-    // ── le zampe e la coda: ondeggiano appena; in aria scalciano
-    if (still) for (const p of legs) p.pose = 0
-    else if (lifted) {
-      const sway = clamp(L.vx * 0.05, -28, 28)
-      anteriore.pose = Math.sin(t * 5) * 14 + sway
-      anteriore2.pose = Math.sin(t * 5 + Math.PI) * 14 + sway
-      posteriore.pose = Math.sin(t * 5 + Math.PI / 2) * 12 + sway
-      posteriore2.pose = Math.sin(t * 5 - Math.PI / 2) * 12 + sway
-    } else if (L.walking) {
-      // torna al suo posto a passo di tartaruga
-      anteriore.pose = Math.sin(t * 6) * 10
-      anteriore2.pose = -anteriore.pose
-      posteriore.pose = -Math.sin(t * 6 + 1.2) * 9
-      posteriore2.pose = -posteriore.pose
-    } else {
-      anteriore.pose = Math.sin(t * 0.9) * 2.5
-      anteriore2.pose = -anteriore.pose
-      posteriore.pose = -Math.sin(t * 0.9 + 0.5) * 2.5
-      posteriore2.pose = -posteriore.pose
+    // ── ogni tanto, da sola: annusa l'aria o batte il piede
+    if (!still && !lifted && !on && N.phase === 'eat' && now > (U.idle || 0)) {
+      U.idle = now + rand(7000, 15000)
+      if (Math.random() < 0.6) U.sniff = now + 900
+      else U.scratch = now + 800
     }
-    coda.pose = still ? 0 : U.wag > now ? Math.sin(t * 14) * 18 : lifted ? Math.sin(t * 8) * 12 : Math.sin(t * 0.7) * 4
 
-    // ── l'elmetto: una molla sua (hide manuale): salta con uno scatto e ricade
-    // rimbalzando; nel sonno scivola piano sugli occhi e al risveglio risale
-    const H = T.hat
-    const want = T.asleep ? -0.42 : 0
-    const slow = T.asleep || (H.h < -0.02 && !H.v)
-    const k = slow ? 14 : 260
-    const c = 2 * Math.sqrt(k) * (slow || still ? 1 : 0.32)
-    const dt = Math.min(0.05, (now - (T.then || now)) / 1000)
-    T.then = now
-    H.v += (k * (want - H.h) - c * H.v) * dt
-    H.h = clamp(H.h + H.v * dt, -0.7, 1.2)
-    elmetto.h = still ? want : H.h
+    // ── piede e coda; in aria scalcia, a terra fuori posto torna a saltelli
+    if (still) zampa.pose = coda.pose = 0
+    else if (lifted) {
+      const sway = clamp(L.vx * 0.05, -25, 25)
+      zampa.pose = Math.sin(t * 6) * 18 + sway
+      coda.pose = Math.sin(t * 7) * 16 - sway
+    } else {
+      zampa.pose = U.scratch > now ? Math.sin(t * 20) * 9 : L.walking ? Math.sin(t * 9) * 12 : Math.sin(t * 0.8) * 1.5
+      coda.pose = U.wag > now ? Math.sin(t * 12) * 14 : Math.sin(t * 0.6) * 3 + shake * Math.sin(t * 70) * 8
+    }
+    P.off.y = L.walking && !still ? -Math.abs(Math.sin(t * 9)) * box.h * 0.03 : 0
   },
 
   poke(P, part, now) {
-    const T = P.tt
+    const N = P.nn
     const U = P.until
-    const woke = T?.asleep
-    if (woke) {
-      T.asleep = false
-      T.sleepAt = 0
-      T.hat.v += 6
-      U.startle = now + 900
-    }
-    // già dentro o al capolino: torna dentro
-    if (U.hide > now || U.peek > now) return startle(P, now, true)
     switch (part.id) {
       case 'coda':
-        U.wag = now + 1300
+        U.wag = now + 1200
         return
-      case 'elmetto':
-        // salta e si inclina all'indietro (grab() l'aveva spinto in avanti, sugli occhi)
-        part.v = 280
-        T.hat.v += 8
+      case 'zampa':
+        U.scratch = now + 800
         return
-      case 'anteriore':
-      case 'anteriore2':
-      case 'posteriore':
-      case 'posteriore2':
-        part.until = now + rand(900, 1500)
+      case 'cespo':
+        // se il ciuffo in mano è a metà va a strapparne un altro; se no lo guarda
+        part.v += 240
+        if (N.phase === 'eat' && N.eaten > 0.45 && !(U.gulp > now)) N.eaten = 1
+        else U.glance = now + 900
+        return
+      case 'erba':
+      case 'braccio':
+      case 'braccio2':
+        U.hold = now + 900
         return
       case 'testa':
       case 'mascella':
-        if (woke) return startle(P, now)
-        if (!(U.snap > now)) {
-          U.snap = now + SNAP
-          T.hat.v += 3
-        }
+        // un boccone solo: ingoia tutto il ciuffo
+        if (N.phase === 'eat' && N.eaten < 1 && !(U.gulp > now)) {
+          U.gulp = now + GULP
+          U.swallow = now + GULP + 600
+          shut(P.eyes, 320)
+        } else U.sniff = now + 900
         return
       default:
-        // il guscio, il collo
-        part.v = 0
-        startle(P, now)
+        // il corpo: si scrolla come uscita dal fiume
+        U.shake = now + SHAKE
+        P.byId.testa.v += 180
+        P.byId.coda.v -= 260
     }
   },
-}
-
-function startle(P, now, again = false) {
-  const U = P.until
-  if (!again && U.hide > now) return
-  U.hide = now + rand(1400, 2000)
-  U.peek = U.hide + rand(1100, 1600)
-  U.startle = now + 900
-  if (P.tt) P.tt.hat.v += 7
 }

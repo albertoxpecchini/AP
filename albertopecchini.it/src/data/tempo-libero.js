@@ -81,7 +81,7 @@ export const faqPersonali = {
     {
       nome: 'Natura e animali',
       voci: [
-        { q: 'Chi sono la chiocciola e la tartaruga?', a: '' },
+        { q: 'Chi sono la chiocciola e la nutria?', a: '' },
         { q: 'Dove vai quando vuoi stare all’aperto?', a: '' },
         { q: 'Cosa fai all’aria aperta?', a: '' },
         { q: 'La stagione che preferisci?', a: '' },

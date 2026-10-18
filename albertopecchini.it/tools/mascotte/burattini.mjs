@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Burattini del piè di pagina (chiocciola, tartaruga, airone, gazza, vespa) con
+// Burattini del piè di pagina (chiocciola, nutria, airone, gazza, vespa) con
 // openai/gpt-image-2 su Replicate, sempre in qualità high.
 //
 //   node tools/mascotte/burattini.mjs intero <nome|tutti> [--candidati=2]
-//       l'animale completo (1536 × 1024, fondo magenta), con la chiocciola e la
-//       tartaruga come riferimento di stile (o i `riferimenti` dell'animale), in
+//       l'animale completo (1536 × 1024, fondo magenta), con la chiocciola come
+//       riferimento di stile (o i `riferimenti` dell'animale), in
 //       tools/mascotte/lavoro/<nome>/intero/; con --candidati il modello ne
 //       disegna più d'uno, e si sceglie
 //   node tools/mascotte/burattini.mjs pezzi <nome> [intero.png] [--candidati=2]
@@ -24,7 +24,7 @@ import { ROOT, die, predict, prediction, salva, upload } from '../replicate.mjs'
 import { INTERO, PEZZI, STILE, burattini } from './burattini.js'
 
 const LAVORO = join(ROOT, 'tools/mascotte/lavoro')
-const RIFERIMENTI = ['public/media/mascotte/lumaca.webp', 'public/media/mascotte/tartaruga.webp']
+const RIFERIMENTI = ['public/media/mascotte/lumaca.webp']
 
 // quante immagini per predizione (--candidati=2): se ne sceglie una
 const CANDIDATI = Math.max(1, Math.min(4, Number(process.argv.find((x) => x.startsWith('--candidati='))?.split('=')[1]) || 1))

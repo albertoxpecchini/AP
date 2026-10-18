@@ -150,7 +150,7 @@ node tools/assistenza/design.mjs ad-web-header btn-bcp # solo queste uscite
 | `Metro` | `ad-web-metro` | 486 × 280 | la schermata Start di Windows 8 con cosa c’è in un sito di Pekko |
 | `Dance` | `ad-web-dance` (GIF, 4) | 160 × 600 | silhouette che ballano: «3 KB of javascript. dance like nobody’s downloading» |
 | `Cantiere` | `ad-web-cantiere` (GIF, 2) | 300 × 100 | «NO WEBSITE? PEKKO IS ALREADY DIGGING.», lampeggiante |
-| `Bottoni` | `btn-*` (PNG; GIF `btn-bcp` e `btn-pzkko`, il neon che sfarfalla) | 88 × 31 | i bottoni dei siti veri, 0 cookies, hand coded, si parla italiano, secured by a tortoise… |
+| `Bottoni` | `btn-*` (PNG; GIF `btn-bcp` e `btn-pzkko`, il neon che sfarfalla) | 88 × 31 | i bottoni dei siti veri, 0 cookies, hand coded, si parla italiano, secured by a nutria… |
 
 Gli ingredienti nuovi (fogli di `spot.js`): `ritagli-c` (Pekko web designer a mezzo busto:
 `web-*`), `ritagli-d` (figura intera: surf, balli per le silhouette, cantiere, freccia del

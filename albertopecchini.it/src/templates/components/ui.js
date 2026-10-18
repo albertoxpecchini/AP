@@ -268,7 +268,7 @@ export function pebble({ href, label, tone = 'carta', size = 'md', shape = 0, ro
 }
 
 // ── Mascotte ─────────────────────────────────────────────────────────────────
-// La chiocciola gigante africana e la tartaruga di terra (tools/mascotte),
+// La chiocciola gigante africana e la nutria golosa (tools/mascotte),
 // custodi di testata e piè di pagina. L'immagine ha gli occhi bianchi; sopra ci
 // stanno due occhi del sito, con la pupilla che segue il puntatore e la
 // palpebra che sbatte (src/client/mascot.js). Il «naso» è la zona in cui il
@@ -296,7 +296,7 @@ export function mascot(name, { className, crop, lazy = true, decorative = true, 
 }
 
 // ── Burattini ────────────────────────────────────────────────────────────────
-// La chiocciola, la tartaruga, l'airone, la gazza e la vespa (tools/mascotte,
+// La chiocciola, la nutria, l'airone, la gazza e la vespa (tools/mascotte,
 // «burattini»): burattini di carta a pezzi uniti da fermacampioni, montati come
 // nel file src/data/burattini.js. Ogni pezzo è un riquadro che contiene i suoi figli
 // (dietro con z negativo, davanti con z positivo) e gira intorno al proprio

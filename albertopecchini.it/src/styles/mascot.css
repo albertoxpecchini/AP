@@ -1,5 +1,5 @@
 /* ── Mascotte ──────────────────────────────────────────────────────────────
-   La chiocciola e la tartaruga (tools/mascotte). Sull'immagine, che ha gli
+   La chiocciola e la nutria (tools/mascotte). Sull'immagine, che ha gli
    occhi bianchi, stanno due occhi del sito: un disco bianco con la pupilla che
    segue il puntatore (--px/--py da src/client/mascot.js) e la palpebra del
    colore della pelle che scende per sbattere. Centri e semiassi arrivano in
@@ -123,7 +123,7 @@
 }
 
 /* ── Burattini ─────────────────────────────────────────────────────────────
-   L'airone, la gazza e la vespa: burattini di carta a pezzi (tools/mascotte,
+   La chiocciola, la nutria, l'airone, la gazza e la vespa: burattini di carta a pezzi (tools/mascotte,
    markup da puppet() in ui.js). Ogni .pup__part è un riquadro con il rapporto
    del suo pezzo (--ar), messo in percentuale del genitore, che gira intorno al
    perno (--o) di --rest a riposo; src/client/puppet.js scrive la rotazione in
@@ -252,15 +252,14 @@
   }
 }
 
-/* ── La tartaruga ──────────────────────────────────────────────────────────
-   Di profilo, a otto pezzi (src/data/burattini.js). Le zampe lontane sono le
-   stesse immagini di quelle vicine, in ombra. La bocca è un buio dietro alla
-   testa che si apre con la mascella (--open, da puppet.js). Da ferma sonnecchia
-   (palpebre a metà, «z» che salgono dalla testa), spaventata strabuzza gli
-   occhi (pupille piccole). */
+/* ── La nutria ─────────────────────────────────────────────────────────────
+   Di profilo, seduta, a otto pezzi (src/data/burattini.js). Il braccio lontano
+   è la stessa immagine di quello vicino, in ombra. La bocca è un buio dietro
+   alla testa che si apre con la mascella (--open, da puppet.js). Se ti avvicini
+   si blocca con gli occhi sbarrati (pupille piccole); se le tocchi l'erba la
+   stringe a sé socchiudendo gli occhi (is-sly, qui sopra). */
 
-.pup--tartaruga .pup__part--anteriore2 > .pup__img,
-.pup--tartaruga .pup__part--posteriore2 > .pup__img {
+.pup--nutria .pup__part--braccio2 > .pup__img {
   filter: brightness(0.66) saturate(0.85);
 }
 
@@ -274,66 +273,16 @@
   transform: rotate(var(--tilt, 0deg)) scaleY(var(--open, 0));
 }
 
-.pup--tartaruga .masc__lid {
+.pup--nutria .masc__lid {
   transition-duration: 0.16s;
 }
 
-/* dorme: palpebre a metà, lente */
-.pup--tartaruga.is-asleep .masc__lid {
-  transform: translateY(-38%);
-  transition: transform 1.1s ease-in-out;
-}
-
-.pup--tartaruga.is-asleep .masc__eye.is-blink .masc__lid {
-  transform: translateY(0);
-}
-
-/* spaventata: pupille piccole */
-.pup--tartaruga .masc__pupil {
+/* all'erta: pupille piccole */
+.pup--nutria .masc__pupil {
   transition: transform 0.1s ease-out, width 0.18s ease, height 0.18s ease;
 }
 
-.pup--tartaruga.is-startled .masc__pupil {
-  width: 30%;
-  height: 30%;
-}
-
-/* le «z» del sonno salgono dalla testa, una dietro l'altra */
-.pup--tartaruga .pup__part--testa::before,
-.pup--tartaruga .pup__part--testa::after {
-  content: 'z';
-  position: absolute;
-  left: 58%;
-  top: -4%;
-  z-index: 2;
-  font-family: var(--font-serif, 'Instrument Serif', serif);
-  font-style: italic;
-  font-size: calc(var(--pup-w, 12rem) * 0.1);
-  line-height: 1;
-  color: var(--fg, #f1f0ec);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.pup--tartaruga.is-asleep .pup__part--testa::before,
-.pup--tartaruga.is-asleep .pup__part--testa::after {
-  animation: pup-zzz 2.6s ease-out infinite;
-}
-
-.pup--tartaruga.is-asleep .pup__part--testa::after {
-  animation-delay: -1.3s;
-  left: 66%;
-}
-
-@keyframes pup-zzz {
-  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
-  15% { opacity: 0.9; }
-  100% { opacity: 0; transform: translate(40%, -140%) scale(1.25) rotate(12deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pup--tartaruga.is-asleep .pup__part--testa::before,
-  .pup--tartaruga.is-asleep .pup__part--testa::after {
-    animation: none;
-  }
+.pup--nutria.is-alert .masc__pupil {
+  width: 32%;
+  height: 32%;
 }

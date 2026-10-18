@@ -40,7 +40,7 @@ const withPageCss = (html, href) => {
 // le parti di public/ da copiare.
 const EXTERNAL = {
   // media/web: le catture dei siti veri (rifatte ogni ora dal bot) per la sezione Websites.
-  bcp: { label: 'bettercallpekko.it', dir: 'bcp', public: ['media/assistenza', 'media/web', 'media/mascotte/lumaca.webp', 'media/mascotte/tartaruga.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'] },
+  bcp: { label: 'bettercallpekko.it', dir: 'bcp', public: ['media/assistenza', 'media/web', 'media/mascotte/lumaca.webp', 'media/mascotte/nutria.webp', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'] },
 }[process.env.SITE]
 const BCP = Boolean(EXTERNAL)
 

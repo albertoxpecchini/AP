@@ -129,7 +129,7 @@ export async function usa(nome, file, nomi) {
     if (pezzo === '-') continue
     let piece = estrai(img, trovati, c)
     // `ritaglia` in burattini.js: si tiene solo un riquadro del pezzo (il collo
-    // della tartaruga, che il modello disegna lungo: la parte dentro il guscio
+    // della vecchia tartaruga, che il modello disegnava lungo: la parte dentro il guscio
     // non serve e uscirebbe da dietro quando la testa rientra)
     const taglio = b.ritaglia?.[pezzo]
     if (taglio) {

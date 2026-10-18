@@ -633,7 +633,7 @@ footer.site-footer {
 /* ── 3 · Il marchio custodito ── */
 
 /* Sul telefono due file: sopra i tre burattini (airone · vespa · gazza), sotto
-   la firma tra la chiocciola e la tartaruga. Da 60rem una fila sola: l'airone e
+   la firma tra la chiocciola e la nutria. Da 60rem una fila sola: l'airone e
    la gazza alle ali, la vespa che si libra sopra la firma. */
 .foot-sign {
   display: grid;
@@ -657,11 +657,11 @@ footer.site-footer {
   justify-self: end;
 }
 
-/* la tartaruga è di profilo, lunga: le si dà più larghezza della chiocciola */
+/* la nutria è di profilo, con la coda dietro: le si dà più larghezza della chiocciola */
 .foot-sign__guard--r {
   grid-area: tar;
   justify-self: start;
-  --pup-w: clamp(7rem, 31vw, 19rem);
+  --pup-w: clamp(5.5rem, 30vw, 17rem);
 }
 
 .foot-sign__center {
@@ -713,7 +713,7 @@ footer.site-footer {
   }
 
   .foot-sign__guard--r {
-    --pup-w: clamp(13rem, 21vw, 19rem);
+    --pup-w: clamp(12rem, 19vw, 17rem);
   }
 
   .foot-sign__center {
