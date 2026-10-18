@@ -37,6 +37,14 @@ serio ma è un progetto Vercel a parte.
   con le licenze). Le immagini ferme sono in `art/fiches/` (le cinque fiches e
   il segnaposto, viste dall'alto) e `art/roulette/` (il foglio della finestra
   e il legno della ruota), generate il 17.10.2026 come le altre.
+- `games/blackjack/` — il blackjack, nella stessa finestra (vedi sotto):
+  `blackjack.js` e `blackjack.css` (la finestra, il tavolo, le fiches, la
+  partita), `regole.js` (il sabot, i punti, i tre regolamenti, le laterali),
+  `scena.js` (le carte 3D, il sabot e la vaschetta in three.js, lo stesso
+  `../roulette/lib/three.js`), `carte.js` (le facce e il dorso disegnati in un
+  canvas). Le figure delle carte sono in `art/blackjack/` (le dodici mezze
+  figure, gpt-image-2 il 17.10.2026, `tools/pzkko/blackjack/figure.mjs`).
+- `games/pzk.js` — i $pzk, gli stessi per tutti i giochi.
 - `fonts/` — Anton e Archivo Black (SIL OFL), Special Elite e Permanent Marker
   (Apache 2.0), da Google Fonts, serviti da qui.
 - `404.html` — pagina non trovata: lo stesso muro, con i resti del volantino
@@ -164,9 +172,9 @@ quando la si apre (passando sul volantino si precarica).
   e si ferma dove si ferma; il numero è quello della casella sotto di lei. Come
   nelle ruote automatiche, la pallina salta fuori dalla casella da sola e
   riparte dalla pista. «×3» fa correre la pallina tre volte più in fretta.
-- **Soldi finti**: 1.000 $pzk all'inizio, si possono ricaricare quando
-  finiscono; il saldo e gli ultimi numeri restano nel browser
-  (`localStorage`, `pzkko-roulette`). Niente premi, niente pagamenti.
+- **Soldi finti**: i $pzk di `games/pzk.js`, gli stessi del blackjack (vedi
+  sotto); gli ultimi numeri restano nel browser (`localStorage`,
+  `pzkko-roulette`). Niente premi, niente pagamenti.
 - **Le prove**: `node tools/pzkko/roulette/prova.mjs [4122]` (dalla cartella
   `albertopecchini.it`) fa girare la stessa ruota senza browser, in più thread,
   e per ogni giro controlla che la pallina non esca mai, che si fermi davvero in
@@ -189,6 +197,92 @@ quando la si apre (passando sul volantino si precarica).
   di serie (2 cm) frenano la pallina e costano dieci volte tanto.
 - `tools/pzkko/roulette/motore.mjs` rifà `lib/three.js` (solo i pezzi che
   servono, con esbuild) e ricopia Rapier.
+
+## Il blackjack (games/blackjack/)
+
+Il volantino «blackjack» apre la stessa finestra della roulette (`#blackjack`
+nell'indirizzo la apre subito): il foglio col nastro, il tavolo stampato sopra,
+le fiches fotografate, e le carte vere in 3D.
+
+- **Il tavolo** è un SVG stampato sul foglio come quello della roulette: la
+  cassetta del banco in cima, le scritte ad arco («blackjack paga 3 a 2», la
+  regola del banco, la fascia dell'assicurazione che paga 2 a 1, le regole del
+  tavolo), tre caselle su un arco in basso con i cerchi delle laterali, i limiti
+  (5–1.000, laterali 1–100). Si gioca su una, due o tre caselle; la casella 1 è
+  quella a destra, la prima alla sinistra del banco: le carte si danno e si
+  giocano da destra a sinistra, come al tavolo.
+- **Le carte** sono 3D (three.js): carte da casinò a indice grande, 63 × 88,
+  con gli angoli tondi, lo spessore e una curva appena accennata; la vernice è
+  lucida (clearcoat) e riflette una stanza buia con le lampade di lato, così le
+  carte ferme restano nitide e quelle che girano mandano un lampo. La
+  telecamera guarda dall'alto e il piano delle carte coincide col foglio (un
+  px = un'unità), le ombre cadono sulla carta. Le facce sono disegnate in un
+  canvas (`carte.js`): valori in Anton, i semi disegnati a mano, le figure a
+  due teste con la mezza figura di gpt-image-2 e la stessa girata di 180°; il
+  dorso è rosso pzkko con una trama fine. Le carte escono dal **sabot**
+  (acrilico fumé: dentro il mazzo coricato che si accorcia, la carta di taglio
+  gialla, il dorso della prossima carta nella bocca), volano e si girano in
+  aria, la carta del raddoppio va di traverso, la carta coperta del banco sta
+  sotto la scoperta e il banco la **sbircia** alzandone il bordo; a fine mano
+  il banco raccoglie da destra a sinistra e tutto finisce nella **vaschetta
+  degli scarti**, che cresce. Quando esce la carta di taglio è l'ultima mano:
+  alla successiva si mescola, gli scarti tornano nel sabot e si bruciano le
+  prime carte.
+- **Le regole** sono quelle vere, a scelta («regole di»):
+  - *las vegas* — il gioco a sei mazzi della Strip: carta coperta e
+    sbirciata col 10 o l'asso, il banco sta su tutti i 17, blackjack 3 a 2,
+    raddoppio su due carte anche dopo la divisione, divisione fino a quattro
+    mani (anche 10 e figura), assi divisi una carta sola e niente ridivisione
+    degli assi, resa tardiva, assicurazione e «alla pari», una carta bruciata;
+  - *atlantic city* — come il New Jersey: otto mazzi, al più tre mani divise
+    (N.J.A.C. 13:69F-2.11 per i tavoli da sette posti), resa tardiva;
+  - *venezia* — il regolamento del Casinò di Venezia (comune.venezia.it): sei
+    mazzi, il banco si dà la seconda carta solo alla fine (niente carta
+    coperta: se fa blackjack prende anche raddoppi e divisioni), raddoppio solo
+    con 9, 10 e 11 (anche dopo la divisione), divisione solo di carte uguali
+    fino a tre volte, obbligo di chiedere carta fino a 11, cinque carte
+    bruciate, il banco finisce il colpo anche se tutti hanno sballato, da soli si
+    punta su almeno due caselle, niente resa né laterali, alla pari pagata
+    subito.
+  Con las vegas e atlantic city ci sono le due **laterali** più diffuse:
+  *perfect pairs* (coppia 6, colore 12, perfetta 25 a 1) e *21+3* sulle due
+  carte e la scoperta del banco (colore 5, scala 10, tris 30, scala colore 40,
+  tris uguale 100 a 1), pagate subito dopo la distribuzione. Il blackjack paga
+  3 a 2 anche sulle puntate dispari: i conti vanno a mezzi $pzk.
+- **Le mosse**: carta, stai, raddoppia, dividi, abbandona (dove c'è la resa),
+  e all'asso del banco assicura o alla pari; da tastiera C S R D A, e S/N per
+  l'assicurazione. Il cartellino accanto alla mano dice i punti (7/17 quando
+  l'asso può valere 11), giallo quando tocca a lei; i timbri dicono come è
+  andata. «×3» fa dare le carte tre volte più in fretta.
+- **Le prove**: `node tools/pzkko/blackjack/prova.mjs [4122000]` (dalla
+  cartella `albertopecchini.it`) gioca le mani di ogni regolamento con la
+  strategia di base e poi a caso (anche con mosse vietate, che il tavolo deve
+  rifiutare) e per ogni mano controlla il sabot (52 × mazzi carte, ognuna una
+  volta, le bruciate, la carta di taglio), il banco (tira fino a 16, sta sui
+  17, non tira se non serve, a venezia sì), che ogni $pzk puntato lasci il
+  tavolo una volta sola, i pagamenti contro un calcolo dei punti fatto in un
+  altro modo, i limiti di divisioni, assi e raddoppi, e le frequenze delle
+  laterali contro le probabilità esatte del sabot. Il 17.10.2026, 4.122.000
+  giri per regolamento: nessun errore; vantaggio del banco con la strategia di
+  base 0,36% ± 0,08 (las vegas), 0,34% ± 0,08 (atlantic city), 0,65% ± 0,07
+  (venezia); perfect pairs 6,11% (6 mazzi) e 4,10% (8 mazzi), 21+3 4,62% e
+  3,70%, come le probabilità esatte.
+
+## I $pzk (games/pzk.js)
+
+Un portafoglio solo per tutti i giochi: 1.000 $pzk all'inizio, altri 1.000
+quando sono finiti (meno di 1 libero e niente sui tavoli). Ogni gioco sposta i
+$pzk dal saldo al suo tavolo quando punta e li regola a fine giro; nel browser
+(`localStorage`, `pzkko-pzk`) si salva il saldo più quello che c'è sui tavoli,
+così se la pagina si chiude a metà giro le puntate tornano. Il saldo della
+roulette di prima (`pzkko-roulette`) passa qui da solo la prima volta. Le fiches
+(1, 5, 25, 100, 500) sono le stesse foto in tutti i giochi.
+
+**Il regalo di Instagram**: sotto il saldo, in tutti e due i giochi, c'è
+«seguimi su instagram: +1000 $pzk». Il link apre il profilo
+(instagram.com/albertoxpecchini) e, quando si torna sulla pagina (o dopo 8
+secondi), arrivano 1.000 $pzk, una volta sola per browser (`pzkko-pzk-ig`); poi
+il link sparisce. Un sito non può sapere chi segue chi, quindi ci si fida.
 
 Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
 `tools/nome/index.html`) e il suo volantino «in arrivo» diventa un link.
@@ -240,5 +334,7 @@ giochi senza la barra finale.
 
 La home e la 404 non hanno piè di pagina: credito e badge FrogDR sono stati tolti su
 richiesta di Alberto il 9.10.2026 (è il suo sito; i giochi portano ancora il credito).
-Le immagini del muro sono generate con openai/gpt-image-2 su Replicate; i
-caratteri sono di Google Fonts con le licenze dette sopra.
+Le immagini del muro sono generate con openai/gpt-image-2 su Replicate, come le
+figure delle carte del blackjack (`art/blackjack/`, il prompt nel `.json`
+accanto a ogni figura); i caratteri sono di Google Fonts con le licenze dette
+sopra.

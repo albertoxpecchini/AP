@@ -1,24 +1,26 @@
 // La roulette di pzkko.it, in una finestra sopra il muro. Il tavolo, le fiches e
 // il foglio sono cose ferme (SVG e fotografie); la ruota è 3D (three.js) e la
 // pallina la muove la fisica (Rapier, vedi ruota.js): rotola, rallenta, cade,
-// sbatte sui rombi e sulle palette e si ferma dove si ferma. Soldi finti ($pzk).
+// sbatte sui rombi e sulle palette e si ferma dove si ferma. Soldi finti ($pzk,
+// gli stessi del blackjack e degli altri giochi: ../pzk.js).
 //
 // index.html la apre con import('/games/roulette/roulette.js').then((m) => m.apri()).
 
 import { NUMERI, N, DELTA, R_PALLINA, STATORE, ROTORE, PALETTA, ROMBI, colore, verticiRombo } from './ruota.js'
-import { PUNTATE, PUNTATE_PER_ID, FICHES, SALDO_INIZIALE, esito, inFiches } from './regole.js'
+import { PUNTATE, PUNTATE_PER_ID, FICHES, esito, inFiches } from './regole.js'
+import * as pzk from '../pzk.js'
 
 const QUI = new URL('.', import.meta.url).href
 const ART = '/art/'
 const CHIAVE = 'pzkko-roulette'
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
-const fmt = (n) => n.toLocaleString('it-IT')
+const fmt = pzk.fmt
 const attendi = (ms) => new Promise((r) => setTimeout(r, ms))
 const svgEl = (tag, attr = {}) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k, v] of Object.entries(attr)) e.setAttribute(k, v); return e }
 
 // ── lo stato del gioco ───────────────────────────────────────────────────────
+const GIOCO = 'roulette'
 const stato = {
-  saldo: SALDO_INIZIALE,
   storia: [],
   giocate: new Map(), // id → importo sul tavolo
   mosse: [], // le fiches posate, in ordine (per «togli»)
@@ -30,11 +32,11 @@ const stato = {
 function carica() {
   try {
     const s = JSON.parse(localStorage.getItem(CHIAVE) || 'null')
-    if (s && Number.isFinite(s.saldo) && s.saldo >= 0) stato.saldo = Math.floor(s.saldo)
     if (s && Array.isArray(s.storia)) stato.storia = s.storia.filter((n) => Number.isInteger(n) && n >= 0 && n <= 36).slice(0, 12)
   } catch {}
 }
-function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ saldo: stato.saldo + puntato(), storia: stato.storia })) } catch {} }
+// qui solo gli ultimi numeri: i $pzk li tiene ../pzk.js (le fiches sul tavolo comprese)
+function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ storia: stato.storia })) } catch {} }
 const puntato = () => [...stato.giocate.values()].reduce((a, b) => a + b, 0)
 
 // ── la finestra ──────────────────────────────────────────────────────────────
@@ -47,6 +49,7 @@ export async function apri() {
     dlg.showModal()
     disegnaTavolo()
     ridisegnaPile(false)
+    aggiornaBanco()
   }
   if (!motore) motore = avviaMotore().catch((e) => { console.error(e); el.carica.textContent = 'la ruota non si è caricata: riprova più tardi' })
   else riprendi()
@@ -98,6 +101,8 @@ async function costruisci() {
     saldo: q('.rl-saldo b'), puntato: q('.rl-saldo .puntato'), scegli: q('.rl-scegli'), togli: q('.rl-togli'), rifai: q('.rl-rifai'), veloce: q('.rl-veloce'),
     gira: q('.rl-gira'), campo: q('.rl-campo'), svg: q('.rl-campo svg'), fiches: q('.rl-fiches'), storia: q('.rl-storia'),
   }
+  // chi mi segue su instagram riceve 1.000 $pzk (una volta, ../pzk.js)
+  q('.rl-saldo').appendChild(pzk.linkInstagram({ fatto: () => { voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`); contaSaldo(pzk.saldo() - pzk.PREMIO_IG, pzk.saldo(), RIDOTTO.matches ? 0 : 900) } }))
   // le fiches da scegliere
   for (const v of FICHES) {
     const b = document.createElement('button')
@@ -120,7 +125,8 @@ async function costruisci() {
   new ResizeObserver(() => ridimensiona?.()).observe(el.ruota)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) ultimo = performance.now() })
   pronta = true
-  voce(stato.saldo > 0 ? 'scegli una fiche e punta' : 'hai finito i $pzk')
+  voce(!pzk.aSecco() ? 'scegli una fiche e punta' : 'hai finito i $pzk')
+  pzk.ascolta(() => { if (!contando) aggiornaBanco() }) // il saldo cambia anche giocando a blackjack
   aggiornaBanco()
   aggiornaStoria()
 }
@@ -136,7 +142,7 @@ function chiudi() {
 function voce(t) { if (el.voce) el.voce.textContent = t }
 
 function aggiornaBanco() {
-  el.saldo.textContent = `$pzk ${fmt(stato.saldo)}`
+  el.saldo.textContent = `$pzk ${fmt(pzk.saldo())}`
   const p = puntato()
   el.puntato.textContent = p ? `sul tavolo: ${fmt(p)}` : ''
   const punta = stato.fase === 'punta'
@@ -148,7 +154,7 @@ function aggiornaBanco() {
   el.togli.disabled = !punta || !stato.mosse.length
   el.rifai.disabled = !punta || !stato.ultime || stato.giocate.size > 0
   el.gira.disabled = !punta || !motore || !ruota
-  if (punta && stato.saldo === 0 && !stato.giocate.size) {
+  if (punta && pzk.aSecco() && !stato.giocate.size) {
     el.gira.textContent = 'ricarica'
     el.gira.disabled = false
   } else el.gira.textContent = 'gira'
@@ -353,9 +359,8 @@ function colpetto(p) {
 async function posa(id, evento) {
   if (stato.fase !== 'punta') { voce('rien ne va plus: aspetta la pallina'); return }
   const v = stato.fiche
-  if (stato.saldo < v) { voce(stato.saldo ? `non ti bastano: hai ${fmt(stato.saldo)} $pzk` : 'hai finito i $pzk'); scuoti(el.saldo); return }
+  if (!pzk.punta(GIOCO, v)) { voce(pzk.saldo() >= 1 ? `non ti bastano: hai ${fmt(pzk.saldo())} $pzk` : 'hai finito i $pzk'); scuoti(el.saldo); return }
   if (stato.vinto != null) togliSegno()
-  stato.saldo -= v
   stato.giocate.set(id, (stato.giocate.get(id) ?? 0) + v)
   stato.mosse.push({ id, v })
   const p = pila(id)
@@ -386,7 +391,7 @@ function togli() {
   if (!p.fiches.length) { p.el.remove(); pile.delete(id) }
   const resto = stato.giocate.get(id) - v
   if (resto > 0) stato.giocate.set(id, resto); else stato.giocate.delete(id)
-  stato.saldo += v
+  pzk.ritira(GIOCO, v)
   aggiornaBanco()
   salva()
   if (da) vola(v, da, centro(el.scegli.querySelector(`[data-v="${v}"] img`)), { durata: 300, alto: 24 })
@@ -395,7 +400,7 @@ function togli() {
 async function rifai() {
   if (stato.fase !== 'punta' || !stato.ultime || stato.giocate.size) return
   const tot = [...stato.ultime.values()].reduce((a, b) => a + b, 0)
-  if (tot > stato.saldo) { voce(`per rifare servono ${fmt(tot)} $pzk`); scuoti(el.saldo); return }
+  if (tot > pzk.saldo()) { voce(`per rifare servono ${fmt(tot)} $pzk`); scuoti(el.saldo); return }
   const prima = stato.fiche
   for (const [id, imp] of stato.ultime) for (const v of inFiches(imp)) { stato.fiche = v; posa(id); await attendi(RIDOTTO.matches ? 0 : 70) }
   stato.fiche = prima
@@ -443,10 +448,10 @@ function togliSegno(tutto = true) {
 // ── il giro ──────────────────────────────────────────────────────────────────
 async function gira() {
   if (stato.fase !== 'punta') return
-  if (stato.saldo === 0 && !stato.giocate.size) {
-    stato.saldo = SALDO_INIZIALE
-    salva(); aggiornaBanco()
-    voce(`altri ${fmt(SALDO_INIZIALE)} $pzk finti: punta`)
+  if (pzk.aSecco() && !stato.giocate.size) {
+    pzk.ricarica()
+    aggiornaBanco()
+    voce(`altri ${fmt(pzk.INIZIALE)} $pzk finti: punta`)
     return
   }
   if (!ruota) return
@@ -538,11 +543,11 @@ async function fermata(n) {
       }
       k++
     }
-    contaSaldo(stato.saldo, stato.saldo + conto.torna, RIDOTTO.matches ? 0 : 900)
+    contaSaldo(pzk.saldo(), pzk.saldo() + conto.torna, RIDOTTO.matches ? 0 : 900)
     await Promise.all(ritorni)
     for (const id of conto.vinte) { const p = pile.get(id); p?.vincita?.el.remove(); p?.el.remove(); pile.delete(id) }
   }
-  stato.saldo += conto.torna
+  pzk.regola(GIOCO, conto.puntato, conto.torna)
   if (giocate.size) stato.ultime = giocate
   stato.giocate = new Map()
   stato.mosse = []
@@ -552,16 +557,19 @@ async function fermata(n) {
   salva()
   stato.fase = 'punta'
   aggiornaBanco()
-  if (stato.saldo === 0) voce(`${n} ${col}. hai finito i $pzk: ricarica`)
+  if (pzk.aSecco()) voce(`${n} ${col}. hai finito i $pzk: ricarica`)
 }
 
+let contando = false
 function contaSaldo(da, a, durata) {
   if (!durata) { el.saldo.textContent = `$pzk ${fmt(a)}`; return }
+  contando = true
   const t0 = performance.now()
   const passo = (t) => {
     const u = Math.min(1, (t - t0) / durata), e = 1 - (1 - u) ** 3
-    el.saldo.textContent = `$pzk ${fmt(Math.round(da + (a - da) * e))}`
+    el.saldo.textContent = `$pzk ${fmt(Math.round((da + (a - da) * e) * 2) / 2)}`
     if (u < 1) requestAnimationFrame(passo)
+    else contando = false
   }
   requestAnimationFrame(passo)
 }

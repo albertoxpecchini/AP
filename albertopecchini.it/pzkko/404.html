@@ -150,6 +150,9 @@ img{display:block;max-width:100%;height:auto}
 .vol:has(h3 a:active){transform:rotate(var(--pr)) scale(.99)}
 .vol:has(h3 a:focus-visible){outline:3px solid #ffd400;outline-offset:4px}
 .vol h3 a:focus-visible{outline:none}
+/* un manifesto che è un link: l'<a> non ha scatola sua (l'immagine è assoluta), il fuoco si vede sul manifesto */
+.man-link:focus-visible{outline:none}
+.man-link:focus-visible>.man{outline:3px solid #ffd400;outline-offset:3px;z-index:20}
 
 /* i tagliandi da strappare: fette della stessa carta, col contatto scritto di traverso.
    Il foglio con i tagliandi scrive fra i bordi veri della carta e i tagliandi vanno da bordo a bordo. */
@@ -204,6 +207,16 @@ img{display:block;max-width:100%;height:auto}
   .vol,.man,.tagliandi button,.copiato{transition:none}
   .tagliandi button.cade{transform:none;opacity:0}
 }
+
+/* ── auguri @~matti: il meme che si apre entrando, fino al 18.10.2026 alle 20:30 ── */
+.auguri{width:min(88vw,520px);padding:0;border:0;background:none;overflow:visible}
+.auguri::backdrop{background:rgba(10,10,10,.7)}
+.auguri img{display:block;width:100%;height:auto;transform:rotate(-2deg);box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.auguri button{position:absolute;top:-14px;right:-14px;z-index:1;width:40px;height:40px;border:3px solid #fff;border-radius:50%;
+  background:#111;color:#fff;font-family:var(--fb);font-size:26px;line-height:1;cursor:pointer}
+.auguri[open]{animation:auguri .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes auguri{from{transform:scale(.6) rotate(6deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.auguri[open]{animation:none}}
 /* 404: un muro corto */
 .parete.p404{height:calc(640 * var(--u))}
 @media (max-width:899px){.parete.p404{height:calc(720 * var(--u))}}
@@ -211,6 +224,11 @@ img{display:block;max-width:100%;height:auto}
 </style>
 </head>
 <body>
+<!-- auguri a matti: si apre entrando fino al 18.10.2026 alle 20:30, poi lo script lo toglie da solo -->
+<dialog class="auguri" aria-label="auguri @~matti">
+  <form method="dialog"><button aria-label="chiudi">×</button></form>
+  <img src="/art/auguri.webp" loading="lazy" alt="meme: torta con le candeline, «auguri @~matti, la torta la offri tu»" width="1024" height="1024">
+</dialog>
 <div class="strada">
   <header class="portale">
     <h1><span class="insegna-luce" aria-hidden="true"></span><img class="insegna" src="/art/insegna.svg" alt="pzkko" width="1080" height="450" fetchpriority="high"><img class="insegna notte" src="/art/insegna-notte.svg" alt="" aria-hidden="true" width="1080" height="450"><span class="insegna-cono" aria-hidden="true"></span></h1>
@@ -522,23 +540,29 @@ img{display:block;max-width:100%;height:auto}
   setInterval(aggiorna, veloce > 1 ? 250 : 1000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
 
-  // La roulette: una finestra sopra il muro (games/roulette/). Il codice e la
-  // ruota 3D si caricano solo quando la si apre (o quando il puntatore passa
-  // sul volantino); #roulette nell'indirizzo la apre subito.
-  const gioco = document.querySelector('a[data-gioco="roulette"]')
-  const apriRoulette = () => import('/games/roulette/roulette.js').then((m) => m.apri())
-  if (gioco) {
-    gioco.addEventListener('click', (e) => { e.preventDefault(); history.replaceState(null, '', '#roulette'); apriRoulette() })
+  // I giochi: la roulette e il blackjack, ognuno in una finestra sopra il muro
+  // (games/<gioco>/). Il codice e il 3D si caricano solo quando si apre (o quando
+  // il puntatore passa sul volantino); #roulette o #blackjack nell'indirizzo li apre subito.
+  const GIOCHI = {
+    roulette: ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js'].map((f) => `/games/roulette/${f}`),
+    blackjack: ['blackjack.js', 'regole.js', 'scena.js', 'carte.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/blackjack/`).pathname),
+  }
+  const apriGioco = (nome) => import(`/games/${nome}/${nome}.js`).then((m) => m.apri())
+  for (const gioco of document.querySelectorAll('a[data-gioco]')) {
+    const nome = gioco.dataset.gioco
+    if (!GIOCHI[nome]) continue
+    gioco.addEventListener('click', (e) => { e.preventDefault(); history.replaceState(null, '', `#${nome}`); apriGioco(nome) })
     gioco.addEventListener('pointerenter', () => {
-      for (const f of ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js']) {
-        if (document.querySelector(`link[href="/games/roulette/${f}"]`)) continue
+      for (const f of GIOCHI[nome]) {
+        if (document.querySelector(`link[href="${f}"]`)) continue
         const l = document.createElement('link')
-        l.rel = 'modulepreload'; l.href = `/games/roulette/${f}`
+        l.rel = 'modulepreload'; l.href = f
         document.head.appendChild(l)
       }
     }, { once: true })
   }
-  if (location.hash === '#roulette') apriRoulette()
+  const nel = location.hash.slice(1)
+  if (GIOCHI[nel]) apriGioco(nel)
 
   // Sul telefono non c'è il passaggio del puntatore: toccare un foglio o un
   // manifesto lo porta in primo piano (resta su finché non se ne tocca un altro).
@@ -615,6 +639,15 @@ img{display:block;max-width:100%;height:auto}
       b.addEventListener('click', () => { if (!b.classList.contains('via')) copia(t, b) })
     }
   }
+
+  // ── auguri @~matti: 24 ore e poi sparisce ────────────────────────────────
+  // L'immagine è lazy dentro il dialog chiuso: dopo la scadenza non si scarica nemmeno.
+  const auguri = document.querySelector('.auguri')
+  if (auguri && Date.now() < Date.parse('2026-10-18T20:30:00+02:00')) {
+    const img = auguri.querySelector('img')
+    auguri.showModal()
+    auguri.addEventListener('click', (e) => { if (e.target === auguri || e.target === img) auguri.close() })
+  } else auguri?.remove()
 })()
 </script>
 </body>

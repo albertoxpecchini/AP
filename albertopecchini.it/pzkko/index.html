@@ -437,20 +437,21 @@ img{display:block;max-width:100%;height:auto}
       <section class="gruppo" aria-labelledby="games">
         <h2 class="it spray bianco" id="games" style="--x:282;--y:1513;--w:210;--r:3deg;--mx:16;--my:2319;--mw:150;--mr:-4deg"><img src="/art/scritte/games.webp" alt="games" width="471" height="324" loading="lazy"></h2>
 
-        <!-- il blackjack è chiuso (niente link); la roulette si apre in una finestra sopra il muro (games/roulette/) -->
+        <!-- il blackjack e la roulette si aprono in una finestra sopra il muro (games/blackjack/, games/roulette/), coi $pzk in comune (games/pzk.js) -->
         <article class="vol it c-kraft" style="--x:294;--y:1597;--w:270;--r:1.5deg;--mx:6;--my:2382;--mw:192;--mr:2deg;--marker-c:#161616">
           <div class="foglio" aria-hidden="true"></div>
           <span class="piu18" aria-label="per maggiorenni">+18</span>
           <div class="testo">
             <img class="arte" src="/art/arte2/carte.webp" alt="" width="438" height="609" style="--aw:50%">
-            <h3>blackjack</h3>
-            <p>il banco è un bot, cinque posti, $pzk al posto dei soldi.</p>
-            <p class="mano vai">chiuso, per ora</p>
+            <h3><a href="#blackjack" data-gioco="blackjack">blackjack</a></h3>
+            <p>le regole vere di las vegas, atlantic city e venezia. carte in 3D, soldi finti.</p>
+            <p class="mano vai">gioca <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
           </div>
         </article>
 
         <article class="vol it c-lucido" style="--x:552;--y:1601;--w:235;--r:-1deg;--mx:198;--my:2698;--mw:185;--mr:-2deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
+          <span class="piu18" aria-label="per maggiorenni">+18</span>
           <div class="testo">
             <img class="arte" src="/art/arte2/ruota.webp" alt="" width="423" height="606" style="--aw:54%">
             <h3><a href="#roulette" data-gioco="roulette">roulette</a></h3>
@@ -791,23 +792,29 @@ img{display:block;max-width:100%;height:auto}
   setInterval(aggiorna, veloce > 1 ? 250 : 1000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
 
-  // La roulette: una finestra sopra il muro (games/roulette/). Il codice e la
-  // ruota 3D si caricano solo quando la si apre (o quando il puntatore passa
-  // sul volantino); #roulette nell'indirizzo la apre subito.
-  const gioco = document.querySelector('a[data-gioco="roulette"]')
-  const apriRoulette = () => import('/games/roulette/roulette.js').then((m) => m.apri())
-  if (gioco) {
-    gioco.addEventListener('click', (e) => { e.preventDefault(); history.replaceState(null, '', '#roulette'); apriRoulette() })
+  // I giochi: la roulette e il blackjack, ognuno in una finestra sopra il muro
+  // (games/<gioco>/). Il codice e il 3D si caricano solo quando si apre (o quando
+  // il puntatore passa sul volantino); #roulette o #blackjack nell'indirizzo li apre subito.
+  const GIOCHI = {
+    roulette: ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js'].map((f) => `/games/roulette/${f}`),
+    blackjack: ['blackjack.js', 'regole.js', 'scena.js', 'carte.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/blackjack/`).pathname),
+  }
+  const apriGioco = (nome) => import(`/games/${nome}/${nome}.js`).then((m) => m.apri())
+  for (const gioco of document.querySelectorAll('a[data-gioco]')) {
+    const nome = gioco.dataset.gioco
+    if (!GIOCHI[nome]) continue
+    gioco.addEventListener('click', (e) => { e.preventDefault(); history.replaceState(null, '', `#${nome}`); apriGioco(nome) })
     gioco.addEventListener('pointerenter', () => {
-      for (const f of ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js']) {
-        if (document.querySelector(`link[href="/games/roulette/${f}"]`)) continue
+      for (const f of GIOCHI[nome]) {
+        if (document.querySelector(`link[href="${f}"]`)) continue
         const l = document.createElement('link')
-        l.rel = 'modulepreload'; l.href = `/games/roulette/${f}`
+        l.rel = 'modulepreload'; l.href = f
         document.head.appendChild(l)
       }
     }, { once: true })
   }
-  if (location.hash === '#roulette') apriRoulette()
+  const nel = location.hash.slice(1)
+  if (GIOCHI[nel]) apriGioco(nel)
 
   // Sul telefono non c'è il passaggio del puntatore: toccare un foglio o un
   // manifesto lo porta in primo piano (resta su finché non se ne tocca un altro).

@@ -1,0 +1,116 @@
+/* La finestra del blackjack di pzkko.it: lo stesso foglio col nastro della
+   roulette (art/roulette/carta.webp), 800 × 600 sul computer, a tutto schermo sul
+   telefono. Dentro: il tavolo stampato sul foglio (SVG in multiply), le fiches
+   fotografate, le carte 3D (canvas trasparente sopra il foglio), i cartellini
+   dei punti e i timbri. Caratteri e colori quelli del muro. */
+
+.bj{position:fixed;inset:0;margin:auto;width:800px;height:600px;max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#161616;
+  font:400 14px/1.3 "Special Elite","Courier New",monospace;--rosso:#b3121f;--nero:#161616;--evid:#ffd400;--marker:"Permanent Marker","Comic Sans MS",cursive;--fa:"Anton",Impact,sans-serif}
+.bj::backdrop{background:rgba(12,10,8,.62);backdrop-filter:blur(2px)}
+.bj[open]{animation:bj-attacca .32s cubic-bezier(.22,1,.36,1)}
+.bj.chiude{animation:bj-stacca .22s ease-in forwards}
+@keyframes bj-attacca{from{opacity:0;transform:translateY(18px) rotate(1.2deg) scale(.97)}}
+@keyframes bj-stacca{to{opacity:0;transform:translateY(10px) rotate(-.8deg) scale(.98)}}
+.bj::before{content:"";position:absolute;left:-9.04%;right:-8.66%;top:-12.6%;bottom:-12.49%;z-index:-1;background:url(/art/roulette/carta.webp) 0 0/100% 100% no-repeat;transform:scaleX(-1);filter:drop-shadow(0 4px 6px rgba(0,0,0,.35)) drop-shadow(0 24px 30px rgba(0,0,0,.4));pointer-events:none}
+.bj *{box-sizing:border-box}
+.bj button,.bj select{font:inherit;color:inherit}
+.bj :focus-visible{outline:3px solid var(--evid);outline-offset:2px}
+.bj [hidden]{display:none !important}
+
+.bj-dentro{position:absolute;inset:0;display:grid;grid-template-rows:52px 1fr 84px;padding:10px 18px 8px 14px}
+
+.bj-testa{display:flex;align-items:center;gap:16px;min-width:0;padding-left:8px}
+.bj-testa h2{margin:0;font:400 44px/1 var(--fa);letter-spacing:.005em;flex:none}
+.bj-voce{margin:0;flex:1;min-width:0;font:400 18px/1.1 var(--marker);color:var(--rosso);transform:rotate(-1.2deg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bj-regole{flex:none;display:flex;align-items:baseline;gap:4px;font-size:12px;color:#5a544c}
+.bj-regole select{appearance:none;-webkit-appearance:none;padding:1px 2px;border:0;border-bottom:2px solid currentColor;border-radius:0;background:none;cursor:pointer;font:400 16px/1.1 var(--marker);color:#1446a0}
+.bj-regole select:disabled{opacity:.45;cursor:not-allowed}
+.bj-chiudi{flex:none;width:44px;height:44px;padding:6px;border:0;border-radius:50%;background:none;cursor:pointer;color:#161616;transform:rotate(-6deg);transition:transform .2s cubic-bezier(.22,1,.36,1)}
+.bj-chiudi svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4.2;stroke-linecap:round}
+@media (hover:hover){.bj-chiudi:hover{transform:rotate(-6deg) scale(1.12)}}
+
+/* il campo: il tavolo stampato, le fiches, le carte 3D, i segni */
+.bj-campo{position:relative;min-height:0}
+.bj-tavolo{position:absolute;inset:0;width:100%;height:100%;overflow:visible;mix-blend-mode:multiply}
+.bj-tavolo text{pointer-events:none;user-select:none}
+.bj-tavolo .bj-grande{font-family:var(--fa);letter-spacing:.02em}
+.bj-tavolo .bj-piccola{font-family:"Special Elite","Courier New",monospace}
+.bj-zona{fill:transparent;cursor:pointer}
+.bj-zona:focus{outline:none}
+.bj-zona:focus-visible{stroke:var(--evid);stroke-width:3}
+@media (hover:hover){.bj:not(.chiuso) .bj-zona:hover{fill:rgba(255,212,0,.35)}}
+.bj.chiuso .bj-zona{cursor:default}
+.bj-fiches,.bj-segni{position:absolute;inset:0;pointer-events:none}
+.bj-3d{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.bj-pila{position:absolute;left:0;top:0;width:0;height:0;--f:28px}
+.bj-fiche{position:absolute;left:calc(var(--f) / -2);top:calc(var(--f) / -2);width:var(--f);height:var(--f);max-width:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 2px 3px rgba(0,0,0,.2));will-change:transform}
+.bj-volo{position:fixed;left:0;top:0;--f:28px;width:var(--f);height:var(--f);margin:calc(var(--f) / -2) 0 0 calc(var(--f) / -2);z-index:5;pointer-events:none;will-change:transform}
+.bj-carica{position:absolute;inset:0;display:grid;place-items:center;margin:0;font:400 20px/1.2 var(--marker);color:#3a3632;text-align:center;transform:rotate(-2deg);pointer-events:none}
+
+/* i punti di una mano: un cartellino nero; giallo evidenziatore quando tocca a lei, rosso se sballa */
+.bj-punti{position:absolute;left:0;top:0;padding:3px 6px 2px;font:400 15px/1 var(--fa);color:#fff;background:var(--nero);border-radius:3px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.bj-punti.attiva{background:var(--evid);color:var(--nero);box-shadow:0 0 0 2px var(--nero),0 3px 0 rgba(0,0,0,.25)}
+.bj-punti.sballa{background:var(--rosso)}
+/* i timbri: blackjack, sballa, vince, pari */
+.bj-timbro{position:absolute;z-index:2;padding:.08em .35em .12em;font:400 22px/1 var(--fa);color:#fff;background:var(--nero);white-space:nowrap;transform:translate(-50%,-50%) rotate(-4deg);box-shadow:0 3px 0 rgba(0,0,0,.25);animation:bj-timbro .45s cubic-bezier(.2,1.6,.4,1) both}
+.bj-timbro.oro{background:var(--evid);color:var(--nero)}
+.bj-timbro.rosso{background:var(--rosso)}
+.bj-timbro.grigio{background:#5a544c}
+.bj-timbro.via{animation:bj-via .3s ease-in forwards}
+@keyframes bj-timbro{from{opacity:0;transform:translate(-50%,-50%) rotate(-4deg) scale(1.8)}}
+@keyframes bj-via{to{opacity:0;transform:translate(-50%,-70%) rotate(-4deg) scale(.9)}}
+
+/* sotto: il saldo, le fiches da scegliere o le mosse, i tasti */
+.bj-banco{display:flex;align-items:center;gap:12px;padding:0 4px 0 10px;min-width:0}
+.bj-saldo{flex:none;margin:0;line-height:1;min-width:112px}
+.bj-saldo small{display:block;font:400 12px/1 var(--marker);color:#3a3632}
+.bj-saldo b{display:block;font:400 26px/1.05 var(--fa);font-weight:400}
+.bj-saldo .puntato{display:block;margin-top:3px;font-size:11px;color:#5a544c}
+.bj-saldo .pzk-ig{display:inline-block;margin-top:4px;padding-bottom:1px;border-bottom:2px solid currentColor;font:400 12px/1.15 var(--marker);color:#1446a0;text-decoration:none;white-space:nowrap}
+.bj-saldo .pzk-ig[hidden]{display:none}
+.bj-saldo .pzk-ig b{display:inline;font:inherit;color:var(--rosso)}
+@media (hover:hover){.bj-saldo .pzk-ig:hover{color:var(--rosso)}}
+.bj-scegli{display:flex;gap:2px;flex:none}
+.bj-scegli button{position:relative;width:42px;height:46px;padding:0;border:0;background:none;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1)}
+.bj-scegli img{width:38px;height:38px;max-width:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 3px 4px rgba(0,0,0,.18))}
+.bj-scegli button[aria-pressed="true"]{transform:translateY(-7px)}
+.bj-scegli button[aria-pressed="true"] img{filter:drop-shadow(0 2px 1px rgba(0,0,0,.3)) drop-shadow(0 9px 8px rgba(0,0,0,.28))}
+.bj-scegli button:disabled{opacity:.35;cursor:not-allowed}
+.bj-azioni,.bj-chiede{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;flex:1;min-width:0}
+.bj-azioni button,.bj-chiede button,.bj-dai{flex:none;padding:.16em .42em .2em;border:0;background:var(--nero);color:#fff !important;font:400 21px/1 var(--fa) !important;cursor:pointer;transform:rotate(-2deg);box-shadow:0 3px 0 rgba(0,0,0,.25);transition:transform .15s cubic-bezier(.22,1,.36,1),background .15s}
+.bj-azioni button:nth-child(2n){transform:rotate(1.5deg)}
+.bj-azioni button:disabled,.bj-chiede button:disabled,.bj-dai:disabled{background:#8a847c;cursor:not-allowed;opacity:.6}
+@media (hover:hover){.bj-azioni button:not(:disabled):hover,.bj-chiede button:not(:disabled):hover,.bj-dai:not(:disabled):hover{transform:rotate(-2deg) translateY(-2px)}}
+.bj-azioni button:not(:disabled):active,.bj-chiede button:not(:disabled):active,.bj-dai:not(:disabled):active{transform:rotate(-2deg) translateY(1px)}
+.bj-chiede button[data-si="0"]{background:none;color:var(--nero) !important;box-shadow:none;border-bottom:3px solid currentColor}
+.bj-dai{font-size:26px !important}
+.bj-tasti{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;justify-content:flex-end;flex:1;min-width:0}
+.bj-piccolo{padding:2px 4px;border:0;border-bottom:2px solid currentColor;background:none;cursor:pointer;font:400 15px/1.1 var(--marker) !important;color:#1446a0 !important}
+.bj-piccolo:disabled{opacity:.35;cursor:not-allowed}
+.bj-piccolo[aria-pressed="true"]{color:var(--rosso) !important}
+
+@media (prefers-reduced-motion:reduce){
+  .bj[open],.bj.chiude,.bj-timbro,.bj-timbro.via{animation:none}
+}
+
+/* il telefono e le finestre basse: il foglio a tutto schermo, il tavolo sopra, i tasti sotto */
+@media (max-width:820px),(max-height:640px){
+  .bj{width:100vw;height:100svh;max-height:100svh}
+  .bj::before{inset:0;background:url(/art/roulette/carta.webp) 50% 50%/240% 220% no-repeat;filter:none}
+  .bj-dentro{overflow-y:auto;overscroll-behavior:contain;grid-template-rows:auto 1fr auto;padding:6px 12px calc(10px + env(safe-area-inset-bottom));row-gap:6px}
+  /* il tavolo non si allunga oltre il necessario: in mezzo resterebbe solo foglio vuoto */
+  .bj-campo{align-self:start;height:clamp(420px,114vw,560px)}
+  .bj-banco{align-self:end}
+  .bj-testa{flex-wrap:wrap;gap:2px 10px;padding-left:2px}
+  .bj-testa h2{font-size:32px}
+  .bj-voce{order:3;flex:1 1 100%;font-size:16px;white-space:normal;min-height:2.2em}
+  .bj-regole{margin-left:auto}
+  .bj-banco{flex-wrap:wrap;gap:8px 10px;padding:0}
+  .bj-saldo{min-width:0}
+  .bj-scegli button{width:40px}
+  .bj-scegli img{width:36px;height:36px}
+  .bj-azioni,.bj-chiede{flex:1 1 100%;justify-content:center}
+  .bj-azioni button,.bj-chiede button{font-size:21px !important}
+  .bj-tasti{flex:1 1 100%;justify-content:flex-end;gap:6px 16px}
+  .bj-dai{font-size:24px !important}
+}
