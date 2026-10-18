@@ -23,11 +23,15 @@ export default function apiDev() {
         // Chiave di accesso di /email/: in locale la mette il server, così la
         // pagina non la chiede. Solo per richieste da questo computer e dalla
         // pagina stessa: un sito aperto in un'altra scheda (Sec-Fetch-Site
-        // cross-site) resta senza chiave e riceve 401.
+        // cross-site) resta senza chiave e riceve 401. Nemmeno chi arriva da un
+        // tunnel (npm run online, porte inoltrate di VS Code): il tunnel si collega
+        // da questo computer e riscrive Host e Origin in localhost, ma lascia
+        // le intestazioni X-Forwarded-*.
         const loopback = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress)
+        const inoltrata = ['x-forwarded-for', 'x-forwarded-host', 'x-real-ip', 'forwarded'].some((h) => h in req.headers)
         const site = req.headers['sec-fetch-site']
         const sameOrigin = site ? site === 'same-origin' : !req.headers.origin
-        if (loopback && sameOrigin && process.env.EMAIL_TOOL_KEY) req.headers['x-email-key'] = process.env.EMAIL_TOOL_KEY
+        if (loopback && !inoltrata && sameOrigin && process.env.EMAIL_TOOL_KEY) req.headers['x-email-key'] = process.env.EMAIL_TOOL_KEY
         try {
           const mod = await server.ssrLoadModule(file)
           await mod.default(req, res)

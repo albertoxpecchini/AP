@@ -17,6 +17,24 @@
         }
       },
       "presentation": { "reveal": "silent", "panel": "dedicated" }
+    },
+    {
+      "label": "online",
+      "detail": "i tre dev server (albertopecchini.it, bettercallpekko.it, pzkko.it) con gli indirizzi pubblici fissi — Ctrl+Alt+O",
+      "type": "shell",
+      "command": "npm run online",
+      "options": { "cwd": "${workspaceFolder}/albertopecchini.it" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "online",
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^online:",
+          "endsPattern": "^\\s*pronti\\s*$"
+        }
+      },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false, "clear": true }
     }
   ]
 }

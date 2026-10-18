@@ -8,6 +8,7 @@
     "dev": "vite",
     "dev:bcp": "node tools/dev.mjs bcp",
     "dev:pzkko": "node tools/dev.mjs pzkko",
+    "online": "node tools/online.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "onion": "node tools/onion/pubblica.mjs",
