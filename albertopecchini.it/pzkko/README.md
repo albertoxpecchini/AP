@@ -227,8 +227,14 @@ Progetto `pzkko` dal repository `albertoxpecchini/AP`:
 ## In locale
 
 ```bash
-npx serve albertopecchini.it/pzkko
+cd albertopecchini.it
+npm run dev:pzkko   # http://localhost:5182, si ricarica a ogni modifica
 ```
+
+Il server (`tools/dev.mjs`) serve la cartella così com’è e fa come Vercel con
+`vercel.json`: `/x` → `/x/`, `404.html` per le pagine che non ci sono, le stesse
+intestazioni. Niente Vite: riscriverebbe `new URL('.', import.meta.url)` dei
+giochi senza la barra finale.
 
 ## Crediti
 

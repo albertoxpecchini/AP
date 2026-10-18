@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:bcp": "node tools/dev.mjs bcp",
+    "dev:pzkko": "node tools/dev.mjs pzkko",
     "build": "vite build",
     "preview": "vite preview",
     "onion": "node tools/onion/pubblica.mjs",

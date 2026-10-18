@@ -34,6 +34,8 @@ Richiede **Node 20.19 o superiore** (in produzione gira su Node 24) e npm.
 ```bash
 npm install
 npm run dev       # sviluppo su http://localhost:5173 (se la porta è occupata Vite ne sceglie un’altra)
+npm run dev:bcp   # bettercallpekko.it su http://localhost:5181 (SITE=bcp, visite e like in memoria)
+npm run dev:pzkko # pzkko.it su http://localhost:5182 (la cartella pzkko/ così com’è)
 npm run build     # genera dist/: pagine, sitemap.xml, robots.txt, 404.html, miniature
 npm run preview   # serve dist/ in locale, come farebbe l’hosting
 ```
@@ -571,7 +573,7 @@ Domini di produzione: `www.albertopecchini.it` e `albertopecchini.it` (che riman
 
 **bettercallpekko.it** è il dominio delle sole pagine «Better Call Pekko» (`/assistenza/` e `/contatti/assistenza/`): un **secondo progetto Vercel** collegato allo stesso repository, con Root Directory `albertopecchini.it` e la variabile d’ambiente `SITE=bcp`. Con quella variabile la build produce solo la parodia alla radice (`/`), i contatti in `/contact/`, una `404.html` sua, `robots.txt` e `sitemap.xml` presi da `public/bcp/` e, di `public/`, soltanto `media/assistenza/`, `media/web/` (le catture dei siti veri, per la sezione «Pekko makes websites»), le due mascotte e le icone (`plugins/site-pages.js`, `bcpRoutes` in `routes.js`; i percorsi li sceglie `src/data/assistenza.js`). Le funzioni di `api/` ci sono anche lì: nel nuovo progetto vanno copiate le variabili del modulo di contatto (`RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM`, `CALLMEBOT_PHONE`, `CALLMEBOT_APIKEY`, ed eventualmente `TURNSTILE_SECRET_KEY`, aggiungendo il dominio al widget su Cloudflare). Le due pagine restano raggiungibili anche sul sito serio, con canonical sul dominio e fuori dalla sitemap (`sitemap: false`). Nel piè di pagina delle tre pagine (home, contatti, 404) c’è il **distintivo di FrogDR** col Domain Rating del dominio, con il codice dato da FrogDR (link e immagine da `frogdr.com`): compare solo nella build `SITE=bcp`, non nella copia `/assistenza/` del sito serio (`frogdr()` in `src/templates/pages/assistenza.js`).
 
-Per attivarlo: su Vercel «Add New Project» dallo stesso repository `albertoxpecchini/AP`, Root Directory `albertopecchini.it`, framework Vite, variabile `SITE=bcp` (Production e Preview), poi Settings → Domains con `bettercallpekko.it` e `www.bettercallpekko.it` (www che rimanda all’apice); nel DNS di Aruba i record che Vercel indica (A sull’apice, CNAME su www). In locale: `SITE=bcp npm run build && npm run preview`.
+Per attivarlo: su Vercel «Add New Project» dallo stesso repository `albertoxpecchini/AP`, Root Directory `albertopecchini.it`, framework Vite, variabile `SITE=bcp` (Production e Preview), poi Settings → Domains con `bettercallpekko.it` e `www.bettercallpekko.it` (www che rimanda all’apice); nel DNS di Aruba i record che Vercel indica (A sull’apice, CNAME su www). In locale: `npm run dev:bcp` (sviluppo su :5181, col database in memoria: mai nel Blob vero) oppure `SITE=bcp npm run build && npm run preview`.
 
 `vercel.json` imposta URL puliti con barra finale (come i percorsi generati), cache di un anno sugli asset con hash, cache di trenta giorni su `media/` e `art/`, e le intestazioni `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`. `404.html` viene servita in automatico.
 

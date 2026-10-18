@@ -15,6 +15,8 @@ export default defineConfig({
   // host: true = in ascolto su tutte le interfacce: Vite stampa sempre sia
   // l'indirizzo Local sia quello Network (per provare il sito dal telefono in
   // rete locale). Vale per `npm run dev` e per `npm run preview`.
-  server: { port: 5173, strictPort: false, host: true },
-  preview: { host: true },
+  // allowedHosts: senza, Vite rifiuta le richieste che arrivano dagli indirizzi
+  // inoltrati di VS Code (pannello Porte, *.devtunnels.ms) con «Blocked request».
+  server: { port: 5173, strictPort: false, host: true, allowedHosts: ['.devtunnels.ms'] },
+  preview: { host: true, allowedHosts: ['.devtunnels.ms'] },
 })
