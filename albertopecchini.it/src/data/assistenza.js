@@ -55,7 +55,7 @@ export const assistenza = {
   nome: 'Better Call Pekko',
   titolo: 'In Computer Trouble? Better Call Pekko! — I’m the computer guy (and I make websites). Computer repair & web design in Rivalta sul Mincio (Mantova, Italy)',
   descrizione:
-    'pekko fixes computers: virus removal, duplicate files, printers that wont print, drivers, windows and office installs, phones, wi-fi. and he makes real websites, hand-coded: rivaltasulmincio.it, cascinafontana.xyz, ing. dario donelli. rivalta sul mincio (mantova), house calls and remote help. si parla italiano.',
+    'pekko fixes computers: virus removal, duplicate files, printers that wont print, drivers, windows and office installs, phones, wi-fi. and he makes real websites, hand-coded: rivaltasulmincio.it, cascinafontana.xyz, ing. dario donelli, pzkko.it. rivalta sul mincio (mantova), house calls and remote help. si parla italiano.',
   titoloContatti: 'Contact Pekko — free consultation, si parla italiano',
   descrizioneContatti: 'phone, whatsapp, e-mail or the form: tell pekko what ur computer did and get an answer within 1 business day. rivalta sul mincio (mantova, italy), house calls and remote help.',
 
@@ -173,6 +173,7 @@ export const assistenza = {
       { label: 'rivaltasulmincio.it', href: 'https://www.rivaltasulmincio.it' },
       { label: 'cascinafontana.xyz', href: 'https://www.cascinafontana.xyz' },
       { label: 'ing. dario donelli', href: PRJ['dario-donelli'].web.url },
+      { label: 'pzkko.it', href: PRJ['pzkko-it'].web.url },
       { label: 'the serious website', href: site.url },
     ],
   },
@@ -215,6 +216,13 @@ export const assistenza = {
         testo: 'pekkos serious twin. same guy, different font: the portfolio of alberto pecchini, in italian. houses, websites, brands and computers. pages generated from data, technical drawings drawn by code, a snail and a tortoise whose eyes follow ur mouse. 0 frameworks, 0 tracking cookies.',
         numeri: [['0', 'frameworks'], ['0', 'tracking cookies'], ['2', 'pets on the staff']],
       },
+      sito('pzkko-it', {
+        tab: 'pzkko.it',
+        ad: 'ad-web-pzkko',
+        alt: 'pzkko: all my sites & socials on 1 wall. Pekko points at a yellow flyer with tear-off tabs on a rolling shutter: tear 1 off!!! 3D roulette inside! pzkko.it',
+        testo: 'pekkos name on the internet, glued 2 a wall. a rolling shutter covered in flyers, 1 4 every site and social, with tear-off tabs that copy the contact. at sunset in mantova the wall gets dark and the neon sign turns on, and 1 flyer opens a 3d roulette with real physics: the ball stops where it stops (fake money only). no build, no frameworks, just files.',
+        numeri: [['1', 'wall'], ['157', 'roulette bets'], ['0', 'build steps']],
+      }),
       {
         slug: 'bettercallpekko',
         nome: 'Better Call Pekko',
@@ -262,6 +270,7 @@ export const assistenza = {
       'cascinafontana.xyz has exactly 221 lines of javascript. pekko counted them. twice.',
       'the map on dario donellis website was drawn in svg, with the right projection 4 mantova.',
       'on the serious website the snail and the tortoise follow ur mouse with their eyes. try it.',
+      'pzkko.it calculates the sunset in mantova by itself, no internet needed. when the sun goes down there, the neon sign turns on, wherever u r.',
       'this website was last updated on 06/28/2006, the day pekko was born.',
       'every banner on this page was drawn in vector, with real fonts, then baked into a gif. like its 2008.',
       'the photos of pekko in loud suits come from 1 id photo and a lot of ai. the suits r not for sale (yet).',

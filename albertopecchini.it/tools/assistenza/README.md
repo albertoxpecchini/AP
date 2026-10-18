@@ -119,8 +119,8 @@ per fotogramma.
 
 - `design/project/` è la copia locale del canvas (`canvas.json` + un `.dc.html` per
   artboard, in markup letterale: niente `{{…}}`, così il browser headless lo legge com'è).
-- `design/assets.json` dice da quale file di `public/` viene ogni immagine caricata nel
-  canvas (`/_blob/<id>`).
+- `design/assets.json` dice da quale file viene ogni immagine caricata nel canvas
+  (`/_blob/<id>`): di norma da `public/`, per il banner di pzkko.it da `pzkko/art/`.
 - `design.mjs` apre ogni artboard con puppeteer-core (quello di `tools/catture`), aspetta i
   font, e per ogni elemento con `data-out="<nome>"` scrive `public/media/assistenza/<nome>`:
   JPEG a densità 2× per i fissi, PNG per i bottoni, GIF a 1× per quelli con
@@ -138,18 +138,19 @@ node tools/assistenza/design.mjs ad-web-header btn-bcp # solo queste uscite
 
 | Artboard | Uscita | Misura | Cosa è |
 | --- | --- | --- | --- |
-| `Main` | `ad-web-header` (GIF, 4) | 960 × 200 | «pekko web design 2.0 BETA — WEBSITES THAT DON’T SUCK!!!», Pekko che indica il finto browser dove girano i quattro siti veri |
+| `Main` | `ad-web-header` (GIF, 5) | 960 × 200 | «pekko web design 2.0 BETA — WEBSITES THAT DON’T SUCK!!!», Pekko che indica il finto browser dove girano i cinque siti veri (pzkko.it dal 18.10.2026) |
 | `Top468` | `ad-web-468` (GIF, 3) | 468 × 60 | «NEED A WEBSITE? / PEKKO MAKES THEM TOO!!! / 4 REAL», in testata accanto al milionesimo visitatore |
 | `Tile` | `ad-web-tile` (GIF, 2) | 158 × 155 | «PEKKO MAKES WEBSITES!!!» nella colonna blu |
 | `Rivalta` | `ad-web-rivalta` | 300 × 250 | «184 PLACES. 1 VILLAGE. 0 TRACKERS.», mappa vera, spilli lucidi, «NOW IN BETA!» |
 | `Cascina` | `ad-web-cascina` | 300 × 250 | «Hay! This website has 0 cookies», kraft e polaroid del 2012 |
 | `Donelli` | `ad-web-donelli` | 300 × 250 | «Serious engineer. Serious website.», targa in bianco e nero, post-it di Pekko |
 | `Twin` | `ad-web-twin` | 300 × 250 | «SAME GUY. Different font.»: Pekko contro Alberto, il sito serio |
+| `Pzkko` | `ad-web-pzkko` | 300 × 250 | la saracinesca di pzkko.it di notte: insegna al neon, volantino giallo «all my sites & socials» coi tagliandi «pzkko.it» (uno strappato), il graffito «pzk★», Pekko che indica, «TEAR 1 OFF!!!» e «3D ROULETTE INSIDE!»; immagini prese da `pzkko/art/` |
 | `Infografica` | `ad-web-howto` | 960 × 300 | «how pekko makes a website»: le 7 fasi vere del metodo, flat 2013 |
 | `Metro` | `ad-web-metro` | 486 × 280 | la schermata Start di Windows 8 con cosa c’è in un sito di Pekko |
 | `Dance` | `ad-web-dance` (GIF, 4) | 160 × 600 | silhouette che ballano: «3 KB of javascript. dance like nobody’s downloading» |
 | `Cantiere` | `ad-web-cantiere` (GIF, 2) | 300 × 100 | «NO WEBSITE? PEKKO IS ALREADY DIGGING.», lampeggiante |
-| `Bottoni` | `btn-*` (PNG; `btn-bcp` GIF) | 88 × 31 | i bottoni dei siti veri, 0 cookies, hand coded, si parla italiano, secured by a tortoise… |
+| `Bottoni` | `btn-*` (PNG; GIF `btn-bcp` e `btn-pzkko`, il neon che sfarfalla) | 88 × 31 | i bottoni dei siti veri, 0 cookies, hand coded, si parla italiano, secured by a tortoise… |
 
 Gli ingredienti nuovi (fogli di `spot.js`): `ritagli-c` (Pekko web designer a mezzo busto:
 `web-*`), `ritagli-d` (figura intera: surf, balli per le silhouette, cantiere, freccia del

@@ -255,7 +255,7 @@ function mid() {
       <div class="midlike">${like('page', 'Like Better Call Pekko')} · <a href="#donate">share it »</a></div>
       <div class="latest">
         <p class="ab3">NEW!!! pekko also makes websites. just launched:</p>
-        <div class="lts">${W.siti.slice(0, 3).map((s, i) => `<a href="#explorer" data-pex-open="${i}"><span class="bar"><i></i><i></i><i></i></span><img src="${s.anteprima.src}" width="186" height="116" alt="${esc(`The home page of ${s.dominio}`)}" loading="lazy" decoding="async"><b>${esc(s.tab)}</b></a>`)}</div>
+        <div class="lts">${W.siti.map((s, i) => [s, i]).filter(([s]) => s.anteprima && s.slug !== 'albertopecchini-it').map(([s, i]) => `<a href="#explorer" data-pex-open="${i}"><span class="bar"><i></i><i></i><i></i></span><img src="${s.anteprima.src}" width="186" height="116" alt="${esc(`The home page of ${s.dominio}`)}" loading="lazy" decoding="async"><b>${esc(s.tab)}</b></a>`)}</div>
       </div>
       <p class="special">${i3(A.slogan, 'r', 20)}</p>
     </div>
@@ -346,6 +346,7 @@ function bottoni88() {
     ['btn-cascina', S[1].url, 'cascinafontana.xyz'],
     ['btn-donelli', S[2].url, 'Ing. Dario Donelli'],
     ['btn-ap', site.url, 'Alberto Pecchini, the serious website'],
+    ['btn-pzkko', S.find((s) => s.slug === 'pzkko-it').url, 'pzkko.it, the wall'],
     ['btn-bcp', `${A.dominio}/`, 'Better Call Pekko!!!'],
     ['btn-hand', '#websites', 'Hand coded'],
     ['btn-cookie', '#websites', '0 cookies, 0 trackers'],
@@ -369,10 +370,11 @@ function bottoni88() {
 function websites() {
   const S = W.siti
   const [serio] = S.filter((s) => s.slug === 'albertopecchini-it')
+  const [muro] = S.filter((s) => s.slug === 'pzkko-it')
   return html`
     <section class="sec" id="websites">
       <h2>${i3(W.titolo, 'b', 34)}<small>${esc(W.sotto)}</small></h2>
-      <a class="ad full" href="#explorer">${img('ad-web-header', 'Pekko web design 2.0 (beta): websites that don’t suck!!! Pekko points at his real websites: rivaltasulmincio.it, cascinafontana.xyz, Ing. Dario Donelli, albertopecchini.it', { w: 960, h: 200 })}</a>
+      <a class="ad full" href="#explorer">${img('ad-web-header', 'Pekko web design 2.0 (beta): websites that don’t suck!!! Pekko points at his real websites: rivaltasulmincio.it, cascinafontana.xyz, Ing. Dario Donelli, albertopecchini.it, pzkko.it', { w: 960, h: 200 })}</a>
       <div class="in">
         <p class="lead">${esc(W.intro)}</p>
         <div class="cols">
@@ -380,6 +382,8 @@ function websites() {
           <div class="c300">
             ${ad(serio.ad, serio.alt, { w: 300, h: 250, href: serio.url, ext: true, title: 'The serious website (opens in a new window)' })}
             <p class="note" style="text-align:center">same guy, different font · <a href="${esc(site.url)}" target="_blank" rel="noopener">the serious website »</a></p>
+            ${ad(muro.ad, muro.alt, { w: 300, h: 250, href: muro.url, ext: true, title: `${muro.dominio} (opens in a new window)` })}
+            <p class="note" style="text-align:center">same guy, on a wall · <a href="${esc(muro.url)}" target="_blank" rel="noopener">pzkko.it »</a></p>
             ${ad('ad-web-cantiere', 'No website? Pekko is already digging. Free consultation', { w: 300, h: 100, href: ctaWeb })}
             <div style="margin-top:8px">${webring()}</div>
             <div class="wid" style="margin-top:8px"><h4>Want one?</h4>free consultation, written quote item by item, 1 person from start 2 finish. <a href="${ctaWeb}">tell pekko about ur site »</a></div>
@@ -1256,12 +1260,12 @@ p{margin:0 0 6px}
 .mid .midlike{position:absolute;left:20px;top:612px;width:600px;text-align:center;font:11px Verdana,sans-serif}
 .mid .latest{position:absolute;left:20px;top:650px;width:600px}
 .mid .latest .ab3{margin:0 0 6px;text-align:center;font-size:14px}
-.lts{display:flex;justify-content:space-between}
-.lts a{display:block;width:192px;padding:3px;border:1px solid #23466f;border-radius:5px 5px 2px 2px;background:#eef1f5;box-shadow:2px 2px 0 rgba(0,0,0,.3);text-decoration:none;text-align:center}
+.lts{display:flex;gap:8px}
+.lts a{display:block;flex:1;min-width:0;padding:3px;border:1px solid #23466f;border-radius:5px 5px 2px 2px;background:#eef1f5;box-shadow:2px 2px 0 rgba(0,0,0,.3);text-decoration:none;text-align:center}
 .lts a:hover{outline:2px solid #e21212}
 .lts .bar{display:flex;justify-content:flex-end;gap:2px;height:10px;margin:-3px -3px 3px;padding:2px 3px;border-radius:5px 5px 0 0;background:linear-gradient(#7fa3cc,#23466f)}
 .lts .bar i{width:8px;height:6px;border-radius:1px;background:#cfe0f5}.lts .bar i:last-child{background:#e2553a}
-.lts img{width:186px;height:116px;object-fit:cover;object-position:top;border:1px solid #9fb3cc}
+.lts img{display:block;width:100%;height:auto;aspect-ratio:186/116;object-fit:cover;object-position:top;border:1px solid #9fb3cc}
 .lts b{display:block;margin-top:3px;font:bold 11px Tahoma,Verdana,sans-serif;color:#0a35d6}
 .mid .special{bottom:10px}
 .lk{display:inline-flex;align-items:center;gap:4px;font:11px 'Lucida Grande',Tahoma,Verdana,sans-serif;color:#333}
