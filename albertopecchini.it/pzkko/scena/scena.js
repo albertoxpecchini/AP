@@ -65,7 +65,7 @@ export async function avvia() {
     bloom.setSize(w, hh)
     // lo spazio in più da scorrere, sopra (l'insegna) e sotto (il marciapiede)
     const px = muro.offsetWidth / M.W // pixel per metro sul piano della saracinesca
-    portale.style.height = `${Math.round(1.05 * px)}px`
+    portale.style.height = `${Math.round(1.3 * px)}px`
     portale.style.padding = '0'
     strada.style.paddingBottom = `${Math.round(1.35 * px)}px`
   }

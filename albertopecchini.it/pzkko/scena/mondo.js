@@ -55,12 +55,13 @@ const scatola = (w, h, d, mat, x, y, z) => { const m = new T.Mesh(new T.BoxGeome
 
 // le lettere dell'insegna: la stessa traccia di art/insegna.svg (un tratto unico arrotondato)
 const TRATTO = 'M23 325V128M23 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0M217 128H335L217 252H335M405 50V252M510 128L405 215M448 180L515 252M561 50V252M666 128L561 215M604 180L671 252M737 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0'
-const lettere = (x0, ytop, s, raggio, z) => {
+// cx, cy: il centro del testo «pzkko» nel mondo; s: metri per unità svg (la traccia, scalata di 0,724, è larga 640 e alta 199 unità)
+const lettere = (cx, cy, s, raggio, z) => {
   // x0, ytop: dove sta l'angolo in alto a sinistra del cassonetto (svg 30,20); s: metri per unità svg
   const dati = new T.SVGLoader().parse(`<svg xmlns="http://www.w3.org/2000/svg"><path d="${TRATTO}"/></svg>`)
   const pezzi = []
   for (const sub of dati.paths[0].subPaths) {
-    const punti = sub.getPoints(10).map((p) => new T.Vector3(x0 + (220 + 0.724 * p.x - 30) * s, ytop - (64.3 + 0.724 * p.y - 20) * s, z))
+    const punti = sub.getPoints(10).map((p) => new T.Vector3(cx + (0.724 * p.x - 320) * s, cy - (0.724 * p.y - 135.5) * s, z))
     for (let i = 1; i < punti.length; i++) if (punti[i].distanceTo(punti[i - 1]) > 1e-5) pezzi.push(tubo(punti[i - 1], punti[i], raggio))
     for (const p of punti) { const g = new T.SphereGeometry(raggio, 12, 10); g.translate(p.x, p.y, p.z); pezzi.push(g) }
   }
@@ -124,7 +125,8 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
   }
 
   // ── la facciata: intonaco col buco della saracinesca e quello della porta ────
-  const PORTA = { x0: W + 0.16, x1: W + 1.04, h: 2.32 }
+  // la porta subito a destra della guida: il fronte del negozio va da -0,1 a x1 + 0,1 e sta al centro dello schermo (scena.css)
+  const PORTA = { x0: W + 0.12, x1: W + 0.87, h: 2.32 }
   {
     const f = new T.Shape()
     f.moveTo(-5, -0.3); f.lineTo(W + 7, -0.3); f.lineTo(W + 7, 8); f.lineTo(-5, 8); f.closePath()
@@ -189,8 +191,9 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
 
   // ── l'insegna: il cassonetto, il pannello, le lettere tubolari e il neon dentro ──
   {
-    const LARG = 1.30, ALT = 1.30 * 360 / 1020, PROF = 0.14
-    const s = LARG / 1020, x0 = W / 2 - LARG / 2, y0 = H + 0.42, ytop = y0 + ALT, z0 = Z_FACCIATA
+    // il cassonetto copre tutto il fronte (saracinesca e porta), appena sopra l'architrave; le lettere al centro, alte 34 cm
+    const x0 = -0.1, LARG = PORTA.x1 + 0.1 - x0, ALT = 0.5, PROF = 0.16
+    const s = 0.34 / 199, y0 = H + 0.1, z0 = Z_FACCIATA, cxl = x0 + LARG / 2, cyl = y0 + ALT / 2
     const cass = new T.Group()
     // il telaio: quattro profili, il fondo e la faccia dietro il pannello
     for (const [w, hh, x, y] of [[LARG, 0.03, 0, ALT / 2 - 0.015], [LARG, 0.03, 0, -ALT / 2 + 0.015], [0.03, ALT, -LARG / 2 + 0.015, 0], [0.03, ALT, LARG / 2 - 0.015, 0]]) cass.add(ombra(scatola(w, hh, PROF, mAlluminio, x, y, PROF / 2)))
@@ -205,29 +208,30 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     // le lettere: tubi bianchi di metacrilato, che di notte si scaldano di luce; davanti il filo del neon
     const zl = z0 + PROF - 0.012 + 0.03
     h.lettere = new T.MeshPhysicalMaterial({ color: 0xf4f2ec, roughness: 0.3, clearcoat: 0.5, clearcoatRoughness: 0.3, emissive: 0xffb45c, emissiveIntensity: 0 })
-    const lett = ombra(new T.Mesh(lettere(x0, ytop, s, 0.03, zl), h.lettere)); scene.add(lett)
+    const lett = ombra(new T.Mesh(lettere(cxl, cyl, s, 0.032, zl), h.lettere)); scene.add(lett)
     h.neon = new T.MeshBasicMaterial({ color: 0xfff1d8, transparent: true, opacity: 0 })
-    const neon = new T.Mesh(lettere(x0, ytop, s, 0.008, zl + 0.03), h.neon); scene.add(neon)
+    const neon = new T.Mesh(lettere(cxl, cyl, s, 0.008, zl + 0.032), h.neon); scene.add(neon)
     // la luce che l'insegna manda sul muro e sulla saracinesca: tre lampade davanti al pannello
-    h.luciInsegna = [0.25, 0.5, 0.75].map((f) => { const l = new T.PointLight(0xffb45c, 0, 4, 2); l.position.set(x0 + LARG * f, y0 + ALT / 2 - 0.05, z0 + PROF + 0.45); scene.add(l); return l })
+    h.luciInsegna = [-0.4, -0.13, 0.13, 0.4].map((f) => { const l = new T.PointLight(0xffb45c, 0, 4, 2); l.position.set(cxl + 1.1 * f, cyl - 0.05, z0 + PROF + 0.45); scene.add(l); return l })
     // le colature della pioggia sul muro, sotto il cassonetto
     const col = await immagine(ART + 'colature.svg').catch(() => null)
-    if (col) { const m = new T.Mesh(new T.PlaneGeometry(LARG + 0.02, 0.1), new T.MeshStandardMaterial({ map: col, transparent: true, roughness: 0.95, depthWrite: false })); m.position.set(W / 2, y0 - 0.05, Z_FACCIATA + 0.002); scene.add(m) }
+    if (col) { const m = new T.Mesh(new T.PlaneGeometry(LARG + 0.02, 0.1), new T.MeshStandardMaterial({ map: col, transparent: true, roughness: 0.95, depthWrite: false })); m.position.set(cxl, y0 - 0.05, Z_FACCIATA + 0.002); scene.add(m) }
     h.insegna = { x0, y0, LARG, ALT }
   }
 
   // ── la lampada a muro: il braccio, il corpo, la lampadina, il fascio ─────────
   {
-    const x = (PORTA.x0 + PORTA.x1) / 2 + 0.1, y = 3.6
-    const braccio = new T.Mesh(tubo(new T.Vector3(x, y, Z_FACCIATA), new T.Vector3(x, y, Z_FACCIATA + 0.55), 0.016), mFerro); scene.add(ombra(braccio))
-    const tirante = new T.Mesh(tubo(new T.Vector3(x, y + 0.35, Z_FACCIATA), new T.Vector3(x, y + 0.02, Z_FACCIATA + 0.5), 0.008), mFerro); scene.add(ombra(tirante))
-    scene.add(ombra(scatola(0.12, 0.4, 0.03, mFerro, x, y + 0.15, Z_FACCIATA + 0.015)))
+    // sopra l'insegna, con un braccio lungo un metro: il fascio scende sulla saracinesca senza battere sul cassonetto
+    const x = (PORTA.x0 + PORTA.x1) / 2, y = H + 1.15, SB = 1.0
+    const braccio = new T.Mesh(tubo(new T.Vector3(x, y, Z_FACCIATA), new T.Vector3(x, y, Z_FACCIATA + SB), 0.016), mFerro); scene.add(ombra(braccio))
+    const tirante = new T.Mesh(tubo(new T.Vector3(x, y + 0.45, Z_FACCIATA), new T.Vector3(x, y + 0.02, Z_FACCIATA + SB - 0.05), 0.008), mFerro); scene.add(ombra(tirante))
+    scene.add(ombra(scatola(0.12, 0.5, 0.03, mFerro, x, y + 0.2, Z_FACCIATA + 0.015)))
     const corpo = new T.Mesh(new T.CylinderGeometry(0.16, 0.08, 0.22, 20, 1, true), new T.MeshStandardMaterial({ color: 0x2a2c2e, roughness: 0.5, metalness: 0.7, side: T.DoubleSide }))
-    corpo.position.set(x, y - 0.1, Z_FACCIATA + 0.55); scene.add(ombra(corpo, true, false))
+    corpo.position.set(x, y - 0.1, Z_FACCIATA + SB); scene.add(ombra(corpo, true, false))
     h.lampadina = new T.Mesh(new T.SphereGeometry(0.035, 16, 12), new T.MeshStandardMaterial({ color: 0x222222, emissive: 0xffe4c0, emissiveIntensity: 0 }))
-    h.lampadina.position.set(x, y - 0.2, Z_FACCIATA + 0.55); scene.add(h.lampadina)
-    const spot = new T.SpotLight(0xffe4c0, 0, 16, 0.95, 0.5, 2)
-    spot.position.set(x, y - 0.22, Z_FACCIATA + 0.55)
+    h.lampadina.position.set(x, y - 0.2, Z_FACCIATA + SB); scene.add(h.lampadina)
+    const spot = new T.SpotLight(0xffe4c0, 0, 16, 0.75, 0.5, 2)
+    spot.position.set(x, y - 0.22, Z_FACCIATA + SB)
     spot.target.position.set(W / 2 + 0.3, 1.0, 0.3); scene.add(spot.target)
     spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024); spot.shadow.bias = -0.0005; spot.shadow.normalBias = 0.02; spot.shadow.camera.near = 0.3; spot.shadow.camera.far = 16
     scene.add(spot); h.lampada = spot

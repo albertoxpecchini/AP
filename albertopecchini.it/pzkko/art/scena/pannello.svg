@@ -1,17 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="988" height="328" viewBox="0 0 988 328">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="328" viewBox="0 0 2400 328">
   <!-- Il pannello dell'insegna per la scena 3D: solo la lastra bianca sporca di art/insegna.svg
        (polvere, colature, ruggine in basso, l'adesivo con la chiocciola), senza telaio né lettere
-       né ombre: il telaio e le lettere lì sono poligoni, e la luce la mette la scena. -->
+       né ombre: il telaio e le lettere lì sono poligoni, e la luce la mette la scena. Largo quanto
+       il fronte del negozio (saracinesca e porta), 2400 × 328. -->
   <defs>
     <linearGradient id="dove-sporco" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#fff" stop-opacity=".35"/>
       <stop offset=".7" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff"/>
     </linearGradient>
-    <mask id="m-sporco"><rect width="988" height="328" fill="url(#dove-sporco)"/></mask>
+    <mask id="m-sporco"><rect width="2400" height="328" fill="url(#dove-sporco)"/></mask>
     <linearGradient id="dove-ruggine" x1="0" y1="0" x2="0" y2="1">
       <stop offset=".84" stop-color="#fff" stop-opacity="0"/><stop offset=".95" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff"/>
     </linearGradient>
-    <mask id="m-ruggine"><rect width="988" height="328" fill="url(#dove-ruggine)"/></mask>
+    <mask id="m-ruggine"><rect width="2400" height="328" fill="url(#dove-ruggine)"/></mask>
     <filter id="colature" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
       <feTurbulence type="fractalNoise" baseFrequency=".09 .0042" numOctaves="3" seed="4" result="a"/>
       <feColorMatrix in="a" type="matrix" values="0 0 0 0 .34  0 0 0 0 .31  0 0 0 0 .26  -2.6 0 0 0 1.45" result="fili"/>
@@ -36,13 +37,13 @@
     </filter>
     <filter id="sfoca1" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="1"/></filter>
   </defs>
-  <rect width="988" height="328" fill="#ebe9e2"/>
-  <rect width="988" height="328" filter="url(#polvere)" opacity=".24"/>
-  <rect width="988" height="328" filter="url(#colature)" mask="url(#m-sporco)" opacity=".6"/>
-  <rect width="988" height="328" filter="url(#grana)" opacity=".5"/>
-  <rect width="988" height="328" filter="url(#ruggine)" mask="url(#m-ruggine)"/>
-  <!-- l'adesivo con la chiocciola, un po' consumato -->
-  <g transform="translate(916 46) rotate(-8)">
+  <rect width="2400" height="328" fill="#ebe9e2"/>
+  <rect width="2400" height="328" filter="url(#polvere)" opacity=".24"/>
+  <rect width="2400" height="328" filter="url(#colature)" mask="url(#m-sporco)" opacity=".6"/>
+  <rect width="2400" height="328" filter="url(#grana)" opacity=".5"/>
+  <rect width="2400" height="328" filter="url(#ruggine)" mask="url(#m-ruggine)"/>
+  <!-- l'adesivo con la chiocciola, un po' consumato, in fondo a destra -->
+  <g transform="translate(2320 50) rotate(-8)">
     <circle r="29" fill="#1c1a17" opacity=".3" transform="translate(1.5 2.5)" filter="url(#sfoca1)"/>
     <circle r="29" fill="#f5f4ef"/>
     <circle r="28.4" fill="none" stroke="#cdcac1" stroke-width="1.2"/>

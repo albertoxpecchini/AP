@@ -176,16 +176,19 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   sua luce, con la rugosità dove c'è sporco e ruggine), le guide, la barra con
   la serratura, la facciata d'intonaco col buco e le spalle, lo zoccolo di
   pietra, il pluviale, il citofono, la targa del civico, le finestre del piano
-  di sopra. L'insegna è il cassonetto d'alluminio col pannello sporco
-  (`pannello.svg`) e le lettere «pzkko» come tubi di metacrilato lungo la stessa
-  traccia di `insegna.svg`, col filo del neon davanti. A destra la porta a vetri
+  di sopra. L'insegna è il cassonetto d'alluminio largo quanto il fronte del
+  negozio, appena sopra l'architrave, col pannello sporco (`pannello.svg`) e le
+  lettere «pzkko» (alte 34 cm, al centro) come tubi di metacrilato lungo la
+  stessa traccia di `insegna.svg`, col filo del neon davanti. A destra la porta a vetri
   del negozio: il vetro è uno specchio vero della strada (Reflector), dentro il
   buio con bancone, scaffali, il cartello «chiuso» appeso e la spia dell'allarme
   che lampeggia. Davanti il marciapiede di lastre bagnate (le pozzanghere sono un
   secondo specchio), il cordolo, l'asfalto, e di là dalla strada cinque palazzi
   con le finestre che la sera si accendono, e due lampioni. In `scena.css` il
-  muro è un po' più stretto e spostato a sinistra (`66vw`), così la porta e la
-  lampada entrano nell'inquadratura anche a 1440 px.
+  muro è un po' più stretto (`64vw`) e messo in modo che al centro dello schermo
+  stia tutto il fronte del negozio, saracinesca e porta: così la porta e la
+  lampada (sopra l'insegna) entrano nell'inquadratura anche a 1440 px e
+  l'insegna ha le lettere al centro.
 - **I fogli** (`fogli.js`): ogni elemento `.it` della parete diventa un foglio
   di poligoni nel suo posto esatto (le stesse `--x --y --w --r`), suddiviso con
   lo stesso passo delle doghe e piegato sulla loro bombatura; i graffiti stanno

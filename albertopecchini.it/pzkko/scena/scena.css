@@ -6,8 +6,9 @@
 html.scena3d{background:#101214}
 html.scena3d .scena-tela{display:block;position:fixed;inset:0;width:100%;height:100%;z-index:0}
 html.scena3d .strada{position:relative;z-index:1;background:none}
-/* la saracinesca un po' più stretta e spostata a sinistra, così a destra ci stanno la porta a vetri e la lampada */
-html.scena3d .muro{box-shadow:none;max-width:min(1280px,66vw);margin-left:max(var(--stipite),6vw)}
+/* la saracinesca un po' più stretta, e messa in modo che al centro dello schermo ci sia tutto il fronte del negozio
+   (saracinesca + porta a vetri, largo 1,212 volte la saracinesca), con l'insegna sopra */
+html.scena3d .muro{box-shadow:none;max-width:min(1280px,64vw);margin-left:max(0px,calc((100% - min(1280px,64vw)) / 2 - .212 * min(1280px,64vw)))}
 html.scena3d .muro::before,html.scena3d .muro::after,html.scena3d .buio,html.scena3d .fari,html.scena3d .freni,html.scena3d .neonauto{display:none}
 html.scena3d .portale{visibility:hidden}
 html.scena3d .it{visibility:hidden}
