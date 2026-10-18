@@ -87,10 +87,18 @@ export async function fogli(scene, M, avanzamento = () => {}) {
     const gruppo = new T.Group()
     gruppo.position.set(cx, cy, 0); gruppo.rotation.z = theta
     const lucido = cl.contains('c-lucido')
-    const mat = lucido
+    // i graffiti scuri sono vernice che tinge il metallo: si moltiplicano con quello che c'è sotto (come il multiply
+    // della pagina), prendendo la luce dalla lamiera, così l'inchiostro resta nero e leggibile; quelli chiari
+    // (.chiaro, .bianco: argento, bianco) coprono, e sono materia illuminata come la carta
+    const chiaro = cl.contains('chiaro') || cl.contains('bianco')
+    let mat
+    if (tipo === 'graffito' && !chiaro) {
+      mat = new T.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.03, blending: T.MultiplyBlending, premultipliedAlpha: true, depthWrite: false })
+      mat.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n gl_FragColor = vec4( mix( vec3( 1.0 ), diffuseColor.rgb, diffuseColor.a ), 1.0 );') }
+    } else mat = lucido
       ? new T.MeshPhysicalMaterial({ map: tex, transparent: true, alphaTest: 0.03, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 })
-      : new T.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.7 : 0.88, metalness: 0 })
-    const mesh = new T.Mesh(piano(pw * K, ph * K, cx, cy, theta, tipo === 'graffito' ? 0.0006 + n * 0.00005 : strato, 0, 0, tipo !== 'graffito'), mat)
+      : new T.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : 0.88, metalness: 0 })
+    const mesh = new T.Mesh(piano(pw * K, ph * K, cx, cy, theta, tipo === 'graffito' ? 0.0008 + n * 0.00005 : strato, 0, 0, tipo !== 'graffito'), mat)
     if (tipo === 'graffito') { mat.polygonOffset = true; mat.polygonOffsetFactor = -2; mat.polygonOffsetUnits = -2 }
     mesh.castShadow = tipo === 'vol' || tipo === 'man'; mesh.receiveShadow = true
     mesh.renderOrder = n
@@ -137,6 +145,8 @@ export async function fogli(scene, M, avanzamento = () => {}) {
     pezzi.push(pezzo)
   }
 
+  // c'è qualcosa che si muove (un foglio che si alza, un tagliando che cade)? serve alle ombre, che se no non si rifanno
+  const inMoto = () => pezzi.some((p) => p.meta > 0 || p.alza > 0.0005 || p.tagliandi.some((t) => t.stato === 'cade'))
   const aggiorna = (dt, now) => {
     for (const p of pezzi) {
       // una molla verso l'alzata chiesta
@@ -158,5 +168,5 @@ export async function fogli(scene, M, avanzamento = () => {}) {
       }
     }
   }
-  return { pezzi, aggiorna }
+  return { pezzi, aggiorna, inMoto }
 }

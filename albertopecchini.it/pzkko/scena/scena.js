@@ -14,11 +14,32 @@
 // ?qualita=alta|media|bassa, ?glb=1 (scarica la scena in glTF per Blender), più
 // quelle della pagina (?ora=18:30, ?veloce=60, ?notte=1, ?auto=1).
 import * as T from './lib/three.js'
-import { costruisci, prossimoFotogramma } from './mondo.js'
+import { costruisci, prossimoFotogramma, specchiSubito } from './mondo.js'
 import { fogli } from './fogli.js'
 import { luci } from './luci.js'
 
 const DISTANZA = 2.6 // la telecamera, dalla saracinesca (metri)
+
+// Il filtro «da videogioco»: grana che si muove, un filo di aberrazione cromatica
+// ai bordi, vignetta, righe sottili e un colore un po' sporco, sopra l'immagine
+// già a colori finiti (dopo l'OutputPass). ?filtro=0 lo toglie.
+const FILTRO = {
+  uniforms: { tDiffuse: { value: null }, tempo: { value: 0 }, risoluzione: { value: new T.Vector2(1, 1) }, grana: { value: 0.055 }, aberrazione: { value: 0.008 }, vignetta: { value: 0.36 }, righe: { value: 0.045 } },
+  vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }`,
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float tempo, grana, aberrazione, vignetta, righe; uniform vec2 risoluzione; varying vec2 vUv;
+    float caso( vec2 p ) { return fract( sin( dot( p, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 ); }
+    void main() {
+      vec2 d = vUv - 0.5; float r2 = dot( d, d );
+      vec2 sposta = d * r2 * aberrazione;
+      vec3 c = vec3( texture2D( tDiffuse, vUv + sposta ).r, texture2D( tDiffuse, vUv ).g, texture2D( tDiffuse, vUv - sposta ).b );
+      float g = caso( floor( vUv * risoluzione / 1.5 ) + fract( tempo * 0.37 ) * 97.0 ) - 0.5;
+      c += g * grana * ( 0.6 + 0.4 * ( 1.0 - c.g ) );
+      c *= 1.0 - righe * ( 0.5 + 0.5 * sin( vUv.y * risoluzione.y * 1.4 ) );
+      c *= 1.0 - vignetta * smoothstep( 0.12, 0.65, r2 );
+      c = mix( c, c * vec3( 0.97, 1.0, 0.92 ), 0.55 );
+      gl_FragColor = vec4( c, 1.0 );
+    }`,
+}
 
 // La qualità di partenza: dalla scheda grafica, se si lascia riconoscere. Le
 // integrate (Intel, Apple, Mali, Adreno) e gli emulatori partono da «media»;
@@ -45,11 +66,11 @@ export async function avvia({ avanzamento = () => {} } = {}) {
   tela.setAttribute('aria-hidden', 'true')
   const renderer = new T.WebGLRenderer({ canvas: tela, antialias: false, powerPreference: 'high-performance', alpha: false })
   let qualita = qualitaIniziale(renderer, q.get('qualita'))
-  const DPR = { alta: 1.5, media: 1, bassa: 1 }
+  // la risoluzione interna: meno pixel = più fotogrammi; la grana del filtro nasconde la morbidezza
+  const DPR = { alta: 1.25, media: 0.9, bassa: 0.75 }
   renderer.setPixelRatio(Math.min(devicePixelRatio, DPR[qualita] ?? 1))
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = T.PCFShadowMap
-  renderer.shadowMap.autoUpdate = false
   renderer.toneMapping = T.AgXToneMapping
   renderer.outputColorSpace = T.SRGBColorSpace
   avanzamento(0.05, 'la scheda grafica')
@@ -82,10 +103,17 @@ export async function avvia({ avanzamento = () => {} } = {}) {
   bloom.enabled = qualita !== 'bassa'
   composer.addPass(bloom)
   composer.addPass(new T.OutputPass())
+  const filtro = new T.ShaderPass(FILTRO)
+  filtro.enabled = q.get('filtro') !== '0'
+  composer.addPass(filtro)
   const SPECCHI = { alta: [768, 512], media: [512, 256], bassa: [384, 192] }
   const specchi = (liv) => { const [v, p] = SPECCHI[liv]; h.vetro.getRenderTarget().setSize(v, v); h.pozze.getRenderTarget().setSize(p, p / 2) }
   specchi(qualita)
   if (qualita !== 'alta') { l.sole.shadow.mapSize.set(1024, 1024); l.sole.shadow.map?.dispose(); l.sole.shadow.map = null }
+  // le mappe d'ombra si rifanno solo quando si dice (sotto, in fotogramma): le luci restano sempre «con ombra», così i
+  // materiali si compilano una volta sola e non si accendono/spengono programmi a ogni tramonto
+  l.sole.shadow.autoUpdate = false
+  h.lampada.shadow.autoUpdate = false
 
   // ── il muro del DOM si sposta (scena.css) e la pagina si allunga sopra e sotto ──
   root.classList.add('scena3d')
@@ -95,6 +123,7 @@ export async function avvia({ avanzamento = () => {} } = {}) {
     renderer.setSize(w, hh, false)
     composer.setSize(w, hh)
     bloom.setSize(w, hh)
+    filtro.uniforms.risoluzione.value.set(w * renderer.getPixelRatio(), hh * renderer.getPixelRatio())
     // lo spazio in più da scorrere, sopra (l'insegna) e sotto (il marciapiede)
     const px = muro.offsetWidth / M.W // pixel per metro sul piano della saracinesca
     portale.style.height = `${Math.round(1.3 * px)}px`
@@ -124,16 +153,23 @@ export async function avvia({ avanzamento = () => {} } = {}) {
   }
 
   // ── un fotogramma ──────────────────────────────────────────────────────────
+  let n = 0
   const fotogramma = (now, dt) => {
     const stato = l.aggiorna(now, dt)
     f.aggiorna(dt, now)
     inquadra()
-    renderer.shadowMap.needsUpdate = true
+    // le ombre si rifanno solo quando qualcosa si muove (un foglio che si alza, un tagliando, l'auto) e comunque
+    // ogni 24 fotogrammi per il sole che gira; gli specchi a ogni fotogramma solo mentre passa l'auto
+    n++
+    const mosso = n < 4 || n % 24 === 0 || stato.auto || f.inMoto()
+    // di notte la lampada decide le ombre, di giorno il sole: la mappa di chi è spento non si rifà
+    // (nei primi fotogrammi tutte e due, così le mappe esistono: un sampler d'ombra senza mappa è un errore GL)
+    l.sole.shadow.needsUpdate = n < 4 || (mosso && stato.giorno > 0.02 && stato.notte < 0.98)
+    h.lampada.shadow.needsUpdate = n < 4 || (mosso && h.lampada.intensity > 0)
+    specchiSubito(stato.auto)
+    filtro.uniforms.tempo.value = now / 1000
     // il bagliore: di giorno solo le cose davvero accecanti, di notte i neon e le lampade
     bloom.threshold = 1.5 + 2 * (1 - stato.buio); bloom.strength = 0.12 + 0.25 * stato.buio
-    // di notte la lampada decide le ombre, di giorno il sole: la mappa di chi è spento non si rifà
-    l.sole.castShadow = stato.giorno > 0.02 && stato.notte < 0.98
-    h.lampada.castShadow = h.lampada.intensity > 0
     composer.render()
     prossimoFotogramma()
   }
@@ -174,7 +210,7 @@ export async function avvia({ avanzamento = () => {} } = {}) {
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo) { fermo = false; prima = performance.now(); requestAnimationFrame(giro) } })
   requestAnimationFrame(giro)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, M, qualita: () => qualita }
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, filtro, h, f, l, M, qualita: () => qualita }
   root.dataset.scena = 'pronta'
   console.info(`scena 3D pronta in ${((performance.now() - t0) / 1000).toFixed(1)} s (qualità ${qualita})`)
 

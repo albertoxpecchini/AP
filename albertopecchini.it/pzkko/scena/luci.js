@@ -151,13 +151,17 @@ export function luci(scene, renderer, h, M) {
 
     // ── l'auto che passa: la pagina dice dov'è (--auto-x, 0..1 della larghezza) e quanto fanno luce i fari ──
     const c = s.autoL > 0 || s.freno > 0
-    h.auto.visible = c
+    let inMoto = false
     if (c) {
       const x = s.autoL > 0 ? s.autoX : s.frenoX
       if (autoX0 !== null && x !== autoX0) verso = x > autoX0 ? 1 : -1
       autoX0 = x
-      // la pozza dei fari sta ~3,7 m avanti all'auto: l'auto passa da x = -6 a 4, la luce spazza la saracinesca e la porta
-      h.auto.position.set(-6 + x * 10, -0.13, h.strada.z0 + 1.9)
+      // l'auto passa da x = -10 a 12 (la pozza dei fari sta ~3,7 m avanti): così esce dallo specchio della porta
+      // prima di sparire, invece di svanire lì davanti; i fanali della frenata (--freno-x oltre 1) la portano più in là
+      const xw = -10 + x * 22
+      h.auto.position.set(xw, -0.13, h.strada.z0 + 1.9)
+      inMoto = Math.abs(xw - W / 2) < 13
+      h.auto.visible = inMoto
       h.auto.rotation.y = verso > 0 ? 0 : Math.PI
       if (s.autoC) { const [r, g, b] = s.autoC.split(',').map(Number); if (Number.isFinite(r)) { h.autoFari.emissive.setRGB(r / 255, g / 255, b / 255); for (const l of h.autoLuci) l.color.setRGB(r / 255, g / 255, b / 255) } }
       for (const l of h.autoLuci) l.intensity = 110 * s.autoL
@@ -165,8 +169,8 @@ export function luci(scene, renderer, h, M) {
       h.autoFanali.emissiveIntensity = (s.autoL > 0 ? 1.2 : 0) + 4 * s.freno
       h.autoFreno.intensity = 1.5 * s.freno
       h.autoNeon.intensity = 2 * s.neonAuto
-    } else autoX0 = null
-    return { buio, giorno, notte: s.notte, el: elEff }
+    } else { autoX0 = null; h.auto.visible = false }
+    return { buio, giorno, notte: s.notte, el: elEff, auto: inMoto }
   }
   return { aggiorna, sole: sunLight, adesso }
 }

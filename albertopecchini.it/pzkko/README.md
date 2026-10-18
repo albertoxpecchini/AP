@@ -190,10 +190,11 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   sua luce, con la rugosità dove c'è sporco e ruggine), le guide, la barra con
   la serratura, la facciata d'intonaco col buco e le spalle, lo zoccolo di
   pietra, il pluviale, il citofono, la targa del civico, le finestre del piano
-  di sopra. L'insegna è il cassonetto d'alluminio largo quanto il fronte del
-  negozio, appena sopra l'architrave, col pannello sporco (`pannello.svg`) e le
-  lettere «pzkko» (alte 34 cm, al centro) come tubi di metacrilato lungo la
-  stessa traccia di `insegna.svg`, col filo del neon davanti. A destra la porta a vetri
+  di sopra. L'insegna è il cassonetto d'alluminio (1,5 m: più stretto della
+  saracinesca e centrato su di lei), appena sopra l'architrave, col pannello
+  sporco (`pannello.svg`) e le lettere «pzkko» (alte 28 cm) come tubi di
+  metacrilato lungo la stessa traccia di `insegna.svg`, col filo del neon
+  davanti. A destra la porta a vetri
   del negozio: il vetro è uno specchio vero della strada (Reflector), dentro il
   buio con bancone, scaffali, il cartello «chiuso» appeso e la spia dell'allarme
   che lampeggia. Davanti il marciapiede di lastre bagnate (le pozzanghere sono un
@@ -201,12 +202,14 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   con le finestre che la sera si accendono, e due lampioni. In `scena.css` il
   muro è un po' più stretto (`64vw`) e messo in modo che al centro dello schermo
   stia tutto il fronte del negozio, saracinesca e porta: così la porta e la
-  lampada (sopra l'insegna) entrano nell'inquadratura anche a 1440 px e
-  l'insegna ha le lettere al centro.
+  lampada (sopra, su un braccio da un metro) entrano nell'inquadratura anche a
+  1440 px.
 - **I fogli** (`fogli.js`): ogni elemento `.it` della parete diventa un foglio
   di poligoni nel suo posto esatto (le stesse `--x --y --w --r`), suddiviso con
   lo stesso passo delle doghe e piegato sulla loro bombatura; i graffiti stanno
-  attaccati al metallo, la carta un filo sopra, uno strato per foglio
+  attaccati al metallo (quelli scuri sono vernice che si moltiplica col metallo,
+  come il `multiply` della pagina: l'inchiostro resta nero e si legge; quelli
+  chiari, `.chiaro` e `.bianco`, coprono), la carta un filo sopra, uno strato per foglio
   nell'ordine di sovrapposizione della pagina (z-index e ordine nel DOM). I
   volantini usano le foto fatte da `cattura.mjs` (testo in HTML sopra la carta,
   fotografati in Chromium a 3 px per unità, con un margine per l'adesivo che
@@ -224,19 +227,27 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   lettere e il filo del neon (emissivi, col bagliore), tre lampade davanti al
   pannello, la lampada a muro sopra la porta (un faro con le ombre), i lampioni
   di là, le finestre dei palazzi; e **l'auto che passa è un'auto**: una berlina
-  sulla strada dietro la telecamera, coi fari che spazzano la saracinesca e la
+  sulla strada dietro la telecamera (da x = −10 a 12 m, così esce dallo specchio
+  della porta prima di sparire), coi fari che spazzano la saracinesca e la
   porta, i fanali rossi, il neon sotto. Si riflette nel vetro e nelle
   pozzanghere. Prove: `?ora=18:30`, `?notte=1`, `?auto=1` come per la pagina.
 - **Il costo**: MSAA, bloom, due specchi (che si rifanno un fotogramma sì e
   uno no, alternandosi, senza multisample) e due mappe d'ombra (sole, lampada;
   quella di chi è spento non si rifà). Tre livelli (`?qualita=alta|media|bassa`):
-  alta = pixel ratio fino a 1,5, MSAA 4×, specchi 768/512, ombra del sole 2048;
-  media = 1×, MSAA 2×, specchi 512/256, ombre 1024; bassa = niente bloom né
-  palazzi, specchi 384/192. Si parte da «alta», ma da «media» se la scheda
+  alta = risoluzione interna fino a 1,25×, MSAA 4×, specchi 768/512, ombra del
+  sole 2048; media = 0,9×, MSAA 2×, specchi 512/256, ombre 1024; bassa = 0,75×,
+  niente bloom né palazzi, specchi 384/192. Le mappe d'ombra si rifanno solo
+  quando qualcosa si muove (un foglio che si alza, un tagliando che cade,
+  l'auto) e ogni 24 fotogrammi per il sole che gira; gli specchi a ogni
+  fotogramma solo mentre passa l'auto (se no il riflesso andava a scatti). Si parte da «alta», ma da «media» se la scheda
   grafica si presenta come integrata (Intel, Apple, Mali, Adreno) o il
   processore ha 4 core o meno; e se i primi fotogrammi passano i 28 ms di media
   si scende di un gradino, poi di un altro. Su una RTX 3060 Ti ~120–160
   fotogrammi al secondo a 1440 × 900.
+- **Il filtro** (l'ultimo passaggio, dopo i colori finiti; `?filtro=0` lo
+  toglie): grana che si muove, un filo di aberrazione cromatica ai bordi,
+  vignetta, righe sottili e un colore un po' sporco, da videogioco horror a
+  basso costo (il riferimento era Buckshot Roulette).
 - **Blender**: `?glb=1` scarica la scena così com'è in glTF binario
   (`pzkko.glb`, GLTFExporter), da aprire con File › Import › glTF.
 - **Le prove**: `node tools/pzkko/scena/foto.mjs --ora=22:00 --scroll=0.5`

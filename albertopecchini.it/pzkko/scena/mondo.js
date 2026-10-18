@@ -36,11 +36,13 @@ const specchio = (geo, larg, alt, colore, opacita, turno) => {
   r.material.transparent = opacita < 1
   // uno specchio non si disegna dentro un altro specchio (costerebbe un giro di scena in più)
   const prima = r.onBeforeRender
-  r.onBeforeRender = (...a) => { if (dentroSpecchio || (fotogramma & 1) !== turno) return; dentroSpecchio = true; try { prima.apply(r, a) } finally { dentroSpecchio = false } }
+  r.onBeforeRender = (...a) => { if (dentroSpecchio || (!subito && (fotogramma & 1) !== turno)) return; dentroSpecchio = true; try { prima.apply(r, a) } finally { dentroSpecchio = false } }
   return r
 }
-let dentroSpecchio = false, fotogramma = 0
+let dentroSpecchio = false, fotogramma = 0, subito = false
 export const prossimoFotogramma = () => { fotogramma++ }
+// mentre passa un'auto gli specchi si rifanno a ogni fotogramma, se no il riflesso va a scatti
+export const specchiSubito = (si) => { subito = si }
 
 // un cilindro da a a b (un tubo), con le sfere ai capi se si chiede
 const tubo = (a, b, r, seg = 12) => {
@@ -191,9 +193,9 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
 
   // ── l'insegna: il cassonetto, il pannello, le lettere tubolari e il neon dentro ──
   {
-    // il cassonetto copre tutto il fronte (saracinesca e porta), appena sopra l'architrave; le lettere al centro, alte 34 cm
-    const x0 = -0.1, LARG = PORTA.x1 + 0.1 - x0, ALT = 0.5, PROF = 0.16
-    const s = 0.34 / 199, y0 = H + 0.1, z0 = Z_FACCIATA, cxl = x0 + LARG / 2, cyl = y0 + ALT / 2
+    // il cassonetto è più stretto della saracinesca (1,5 m su 2,05) e centrato su di lei, appena sopra l'architrave; le lettere al centro, alte 28 cm
+    const LARG = 1.5, ALT = 0.42, PROF = 0.14, x0 = W / 2 - LARG / 2
+    const s = 0.28 / 199, y0 = H + 0.1, z0 = Z_FACCIATA, cxl = W / 2, cyl = y0 + ALT / 2
     const cass = new T.Group()
     // il telaio: quattro profili, il fondo e la faccia dietro il pannello
     for (const [w, hh, x, y] of [[LARG, 0.03, 0, ALT / 2 - 0.015], [LARG, 0.03, 0, -ALT / 2 + 0.015], [0.03, ALT, -LARG / 2 + 0.015, 0], [0.03, ALT, LARG / 2 - 0.015, 0]]) cass.add(ombra(scatola(w, hh, PROF, mAlluminio, x, y, PROF / 2)))
@@ -201,6 +203,8 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     cass.add(ombra(scatola(LARG - 0.06, 0.02, PROF, mAlluminio, 0, ALT / 2 - 0.04, PROF / 2)))
     cass.add(ombra(scatola(LARG - 0.06, 0.02, PROF, mAlluminio, 0, -ALT / 2 + 0.04, PROF / 2)))
     const pannelloT = await immagine(ART + 'pannello.svg').catch(() => null)
+    // il pannello disegnato è lungo (2400 × 328): se ne usa la parte destra, con l'adesivo
+    if (pannelloT) { pannelloT.repeat.set(0.56, 1); pannelloT.offset.set(0.44, 0) }
     h.pannello = new T.MeshPhysicalMaterial({ map: pannelloT, color: 0xffffff, roughness: 0.38, clearcoat: 0.25, clearcoatRoughness: 0.4, emissive: 0xffc07a, emissiveMap: pannelloT, emissiveIntensity: 0 })
     const pann = ombra(new T.Mesh(new T.PlaneGeometry(LARG - 0.06, ALT - 0.06), h.pannello), false, true)
     pann.position.z = PROF - 0.012; cass.add(pann)
@@ -212,7 +216,7 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     h.neon = new T.MeshBasicMaterial({ color: 0xfff1d8, transparent: true, opacity: 0 })
     const neon = new T.Mesh(lettere(cxl, cyl, s, 0.008, zl + 0.032), h.neon); scene.add(neon)
     // la luce che l'insegna manda sul muro e sulla saracinesca: tre lampade davanti al pannello
-    h.luciInsegna = [-0.4, -0.13, 0.13, 0.4].map((f) => { const l = new T.PointLight(0xffb45c, 0, 4, 2); l.position.set(cxl + 1.1 * f, cyl - 0.05, z0 + PROF + 0.45); scene.add(l); return l })
+    h.luciInsegna = [-0.4, -0.13, 0.13, 0.4].map((f) => { const l = new T.PointLight(0xffb45c, 0, 4, 2); l.position.set(cxl + 0.9 * f, cyl - 0.05, z0 + PROF + 0.45); scene.add(l); return l })
     // le colature della pioggia sul muro, sotto il cassonetto
     const col = await immagine(ART + 'colature.svg').catch(() => null)
     if (col) { const m = new T.Mesh(new T.PlaneGeometry(LARG + 0.02, 0.1), new T.MeshStandardMaterial({ map: col, transparent: true, roughness: 0.95, depthWrite: false })); m.position.set(cxl, y0 - 0.05, Z_FACCIATA + 0.002); scene.add(m) }
@@ -222,7 +226,7 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
   // ── la lampada a muro: il braccio, il corpo, la lampadina, il fascio ─────────
   {
     // sopra l'insegna, con un braccio lungo un metro: il fascio scende sulla saracinesca senza battere sul cassonetto
-    const x = (PORTA.x0 + PORTA.x1) / 2, y = H + 1.15, SB = 1.0
+    const x = (PORTA.x0 + PORTA.x1) / 2, y = H + 0.75, SB = 1.0
     const braccio = new T.Mesh(tubo(new T.Vector3(x, y, Z_FACCIATA), new T.Vector3(x, y, Z_FACCIATA + SB), 0.016), mFerro); scene.add(ombra(braccio))
     const tirante = new T.Mesh(tubo(new T.Vector3(x, y + 0.45, Z_FACCIATA), new T.Vector3(x, y + 0.02, Z_FACCIATA + SB - 0.05), 0.008), mFerro); scene.add(ombra(tirante))
     scene.add(ombra(scatola(0.12, 0.5, 0.03, mFerro, x, y + 0.2, Z_FACCIATA + 0.015)))

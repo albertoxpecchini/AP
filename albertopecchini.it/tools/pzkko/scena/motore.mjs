@@ -30,7 +30,7 @@ export const NOMI = [
   'CanvasTexture', 'Texture', 'TextureLoader', 'SRGBColorSpace', 'NoColorSpace',
   'RepeatWrapping', 'MirroredRepeatWrapping', 'ClampToEdgeWrapping', 'LinearFilter', 'LinearMipmapLinearFilter',
   'AgXToneMapping', 'ACESFilmicToneMapping', 'NoToneMapping', 'PCFShadowMap', 'PMREMGenerator', 'DoubleSide', 'FrontSide', 'BackSide',
-  'HalfFloatType', 'Fog',
+  'HalfFloatType', 'Fog', 'NormalBlending', 'MultiplyBlending',
 ]
 const comune = { bundle: true, format: 'esm', minify: true, target: 'es2020', legalComments: 'none' }
 await mkdir(LIB, { recursive: true })
@@ -40,6 +40,7 @@ export { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 export { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 export { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 export { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
+export { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 export { Reflector } from 'three/addons/objects/Reflector.js'
 export { Sky } from 'three/addons/objects/Sky.js'
 export { SVGLoader } from 'three/addons/loaders/SVGLoader.js'
