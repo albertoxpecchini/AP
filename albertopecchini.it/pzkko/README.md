@@ -45,6 +45,18 @@ serio ma è un progetto Vercel a parte.
   canvas). Le figure delle carte sono in `art/blackjack/` (le dodici mezze
   figure, gpt-image-2 il 17.10.2026, `tools/pzkko/blackjack/figure.mjs`).
 - `games/pzk.js` — i $pzk, gli stessi per tutti i giochi.
+- `scena/` — la scena 3D della home (vedi sotto): `scena.js` (la telecamera,
+  l'inquadratura allineata al DOM, il giro), `mondo.js` (il posto: facciata,
+  saracinesca, insegna, porta a vetri, marciapiede, strada, palazzi, lampada,
+  auto), `fogli.js` (i volantini e i graffiti presi dalla pagina), `luci.js`
+  (il sole di Mantova, il cielo, le luci della notte), `materiali.js` (le trame
+  disegnate al volo e il profilo delle doghe), `scena.css`, `lib/` (three.js
+  r186 con gli addon, MIT, `tools/pzkko/scena/motore.mjs`).
+- `art/scena/` — quello che serve alla scena: `lamiera.webp` e `lamiera-r.webp`
+  (il colore e la rugosità della saracinesca, tirati fuori dalla foto `muro.webp`
+  togliendole la luce, `tools/pzkko/scena/mappe.mjs`), `pannello.svg` e
+  `colature.svg` (il pannello dell'insegna e le colature, da `insegna.svg`),
+  `vol/` e `vol.json` (le foto dei volantini, `tools/pzkko/scena/cattura.mjs`).
 - `fonts/` — Anton e Archivo Black (SIL OFL), Special Elite e Permanent Marker
   (Apache 2.0), da Google Fonts, serviti da qui.
 - `404.html` — pagina non trovata: lo stesso muro, con i resti del volantino
@@ -139,6 +151,82 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
 - **404**: generata dalla home da `tools/pzkko/genera-404.mjs`
   (`node tools/pzkko/genera-404.mjs` dalla cartella `albertopecchini.it`), da
   rilanciare dopo ogni modifica a `index.html`.
+
+## La scena 3D (scena/)
+
+Dal 18.10.2026, sui computer con WebGL2 (finestra da 900 px in su), la home
+non è più una pagina ma un posto: la stessa saracinesca coi suoi volantini,
+disegnata dalla scheda grafica con three.js come la scena di un videogioco,
+con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
+900 px e senza WebGL2 resta quello, senza che la pagina se ne accorga.
+
+- **Com'è fatto il trucco**: la pagina di sempre resta lì, sotto, invisibile
+  (`html.scena3d` in `scena.css`): i link dei volantini, i tagliandi, i giochi,
+  le mosche, le formiche e la goccia sono ancora i suoi; la scena si disegna in
+  una tela fissa dietro e **l'inquadratura è calcolata perché la saracinesca 3D
+  stia esattamente dove sta il muro nel DOM** (proiezione decentrata: la
+  telecamera sta un po' a destra e più in basso del centro, come una persona sul
+  marciapiede con un obiettivo decentrabile, ma il piano della parete finisce
+  pixel per pixel sui pixel della pagina). La telecamera è fissa davanti alla
+  vetrina e sale e scende con lo scorrimento. `?allinea=1` mostra il DOM in
+  trasparenza sopra la scena per controllare che combacino.
+- **Il posto** (`mondo.js`, tutto in metri: 1 unità della parete = 1,6 mm, la
+  saracinesca è larga 2,05 m): le doghe sono poligoni (bombate, col canale al
+  giunto e qualche ammaccatura; la vernice è la foto della lamiera senza la
+  sua luce, con la rugosità dove c'è sporco e ruggine), le guide, la barra con
+  la serratura, la facciata d'intonaco col buco e le spalle, lo zoccolo di
+  pietra, il pluviale, il citofono, la targa del civico, le finestre del piano
+  di sopra. L'insegna è il cassonetto d'alluminio col pannello sporco
+  (`pannello.svg`) e le lettere «pzkko» come tubi di metacrilato lungo la stessa
+  traccia di `insegna.svg`, col filo del neon davanti. A destra la porta a vetri
+  del negozio: il vetro è uno specchio vero della strada (Reflector), dentro il
+  buio con bancone, scaffali, il cartello «chiuso» appeso e la spia dell'allarme
+  che lampeggia. Davanti il marciapiede di lastre bagnate (le pozzanghere sono un
+  secondo specchio), il cordolo, l'asfalto, e di là dalla strada cinque palazzi
+  con le finestre che la sera si accendono, e due lampioni. In `scena.css` il
+  muro è un po' più stretto e spostato a sinistra (`66vw`), così la porta e la
+  lampada entrano nell'inquadratura anche a 1440 px.
+- **I fogli** (`fogli.js`): ogni elemento `.it` della parete diventa un foglio
+  di poligoni nel suo posto esatto (le stesse `--x --y --w --r`), suddiviso con
+  lo stesso passo delle doghe e piegato sulla loro bombatura; i graffiti stanno
+  attaccati al metallo, la carta un filo sopra, uno strato per foglio
+  nell'ordine di sovrapposizione della pagina (z-index e ordine nel DOM). I
+  volantini usano le foto fatte da `cattura.mjs` (testo in HTML sopra la carta,
+  fotografati in Chromium a 3 px per unità, con un margine per l'adesivo che
+  sporge); quelli coi tagliandi hanno la fascia tolta e **ogni tagliando è un
+  foglietto suo**, che cade quando la pagina gli mette `.cade` e sparisce con
+  `.via`. Il foglio sotto il puntatore (o col fuoco) si alza di 2 cm con una
+  molla. La carta lucida (`c-lucido`) ha la vernice (clearcoat).
+- **Le luci** (`luci.js`): il sole è dove sta davvero sopra Mantova a quest'ora
+  (lo stesso calcolo NOAA della pagina, più altezza e azimut; la facciata guarda
+  a sud-sud-ovest, 200°), con le ombre; il cielo (addon `Sky`) fa da sfondo, da
+  luce d'ambiente e da riflesso (PMREM, rifatto quando il sole si sposta). Di
+  notte la scena legge ogni fotogramma le variabili CSS della pagina
+  (`--notte`, `--insegna` con lo sfarfallio, `--lampioni`, `--auto-x`,
+  `--auto-l`, `--auto-c`, `--freno`, `--neon-auto`) e accende i poligoni: le
+  lettere e il filo del neon (emissivi, col bagliore), tre lampade davanti al
+  pannello, la lampada a muro sopra la porta (un faro con le ombre), i lampioni
+  di là, le finestre dei palazzi; e **l'auto che passa è un'auto**: una berlina
+  sulla strada dietro la telecamera, coi fari che spazzano la saracinesca e la
+  porta, i fanali rossi, il neon sotto. Si riflette nel vetro e nelle
+  pozzanghere. Prove: `?ora=18:30`, `?notte=1`, `?auto=1` come per la pagina.
+- **Il costo**: MSAA 4×, bloom, due specchi (che si rifanno un fotogramma sì e
+  uno no, alternandosi, senza multisample) e due mappe d'ombra (sole 2048,
+  lampada 1024; quella di chi è spento non si rifà). Su una RTX 3060 Ti
+  ~130–160 fotogrammi al secondo a 1440 × 900. Se nei primi due secondi la media
+  supera i 30 ms a fotogramma si scende a risoluzione 1× e specchi più piccoli;
+  `?qualita=bassa` parte già così (senza bloom né palazzi).
+- **Blender**: `?glb=1` scarica la scena così com'è in glTF binario
+  (`pzkko.glb`, GLTFExporter), da aprire con File › Import › glTF.
+- **Le prove**: `node tools/pzkko/scena/foto.mjs --ora=22:00 --scroll=0.5`
+  (dalla cartella `albertopecchini.it`) fotografa la scena in Chromium headless
+  (che usa la scheda grafica vera) in `tools/pzkko/lavoro/scena-*.png` e dice i
+  fotogrammi al secondo; `--larg`, `--alt`, `--q=notte=1`, `--vars=--auto-l:0.9;--auto-x:0.5`
+  (ferma un'auto), `--hover=.vol.c-giallo`, `--prova=<js>`, `--pagina=/404.html`
+  (da Git Bash con `MSYS_NO_PATHCONV=1`).
+- **Dopo ogni modifica ai testi dei volantini** (e dopo `genera-404.mjs`):
+  `node tools/pzkko/scena/cattura.mjs`, che rifà le foto in `art/scena/vol/`.
+  La 404 ha la sua scena (il suo volantino è fotografato con gli altri).
 
 ## La roulette (games/roulette/)
 

@@ -1,0 +1,1 @@
+three.js r186 (MIT) con gli addon della scena, copiato da tools/pzkko/scena/motore.mjs.

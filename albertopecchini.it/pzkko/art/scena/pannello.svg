@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="988" height="328" viewBox="0 0 988 328">
+  <!-- Il pannello dell'insegna per la scena 3D: solo la lastra bianca sporca di art/insegna.svg
+       (polvere, colature, ruggine in basso, l'adesivo con la chiocciola), senza telaio né lettere
+       né ombre: il telaio e le lettere lì sono poligoni, e la luce la mette la scena. -->
+  <defs>
+    <linearGradient id="dove-sporco" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <mask id="m-sporco"><rect width="988" height="328" fill="url(#dove-sporco)"/></mask>
+    <linearGradient id="dove-ruggine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".84" stop-color="#fff" stop-opacity="0"/><stop offset=".95" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <mask id="m-ruggine"><rect width="988" height="328" fill="url(#dove-ruggine)"/></mask>
+    <filter id="colature" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".09 .0042" numOctaves="3" seed="4" result="a"/>
+      <feColorMatrix in="a" type="matrix" values="0 0 0 0 .34  0 0 0 0 .31  0 0 0 0 .26  -2.6 0 0 0 1.45" result="fili"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".014 .0011" numOctaves="2" seed="8" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  5 0 0 0 -2.6" result="colonne"/>
+      <feComposite in="fili" in2="colonne" operator="in"/>
+      <feGaussianBlur stdDeviation=".7"/>
+    </filter>
+    <filter id="polvere" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="5" seed="9"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .39  0 0 0 0 .33  -1.8 0 0 0 .86"/>
+    </filter>
+    <filter id="ruggine" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="5" seed="15"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .24  0 0 0 0 .11  2.3 0 0 0 -1.22"/>
+      <feComponentTransfer><feFuncA type="discrete" tableValues="0 .55 .85 1"/></feComponentTransfer>
+      <feGaussianBlur stdDeviation=".5"/>
+    </filter>
+    <filter id="grana" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .48  0 0 0 0 .44  0 0 0 .55 -.18"/>
+    </filter>
+    <filter id="sfoca1" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="1"/></filter>
+  </defs>
+  <rect width="988" height="328" fill="#ebe9e2"/>
+  <rect width="988" height="328" filter="url(#polvere)" opacity=".24"/>
+  <rect width="988" height="328" filter="url(#colature)" mask="url(#m-sporco)" opacity=".6"/>
+  <rect width="988" height="328" filter="url(#grana)" opacity=".5"/>
+  <rect width="988" height="328" filter="url(#ruggine)" mask="url(#m-ruggine)"/>
+  <!-- l'adesivo con la chiocciola, un po' consumato -->
+  <g transform="translate(916 46) rotate(-8)">
+    <circle r="29" fill="#1c1a17" opacity=".3" transform="translate(1.5 2.5)" filter="url(#sfoca1)"/>
+    <circle r="29" fill="#f5f4ef"/>
+    <circle r="28.4" fill="none" stroke="#cdcac1" stroke-width="1.2"/>
+    <g fill="none" stroke="#1e1d1b" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-19 11.5C-9 11.5 5 11.5 10 11.5C14.5 11.5 17 8.5 17 4"/>
+      <path d="M15.6 5L12.8-6.5M17.8 5.4L20.6-5.6"/>
+      <path d="M-3 1a2.6 2.6 0 0 1 5.2 0a5.2 5.2 0 0 1-10.4 0a7.8 7.8 0 0 1 15.6 0a10.2 10.2 0 0 1-20.4 0"/>
+    </g>
+    <circle cx="12.6" cy="-7.2" r="1.7" fill="#1e1d1b"/><circle cx="20.8" cy="-6.3" r="1.7" fill="#1e1d1b"/>
+    <circle r="29" filter="url(#grana)" opacity=".4"/>
+  </g>
+</svg>

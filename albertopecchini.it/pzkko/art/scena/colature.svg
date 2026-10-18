@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1012" height="78" viewBox="0 0 1012 78">
+  <!-- Le colature sul muro sotto il cassonetto dell'insegna (da art/insegna.svg), su trasparente:
+       nella scena 3D stanno su un foglio appoggiato all'intonaco. -->
+  <defs>
+    <linearGradient id="giu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="m-muro"><rect width="1012" height="78" fill="url(#giu)"/></mask>
+    <filter id="colature-muro" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".07 .005" numOctaves="3" seed="21" result="a"/>
+      <feColorMatrix in="a" type="matrix" values="0 0 0 0 .16  0 0 0 0 .14  0 0 0 0 .12  -2.2 0 0 0 1.25" result="fili"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".02 .002" numOctaves="2" seed="5" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  4 0 0 0 -1.7" result="colonne"/>
+      <feComposite in="fili" in2="colonne" operator="in"/>
+      <feGaussianBlur stdDeviation="1.4"/>
+    </filter>
+  </defs>
+  <rect width="1012" height="78" filter="url(#colature-muro)" mask="url(#m-muro)" opacity=".7"/>
+</svg>

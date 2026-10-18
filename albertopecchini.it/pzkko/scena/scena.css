@@ -1,0 +1,23 @@
+/* La scena 3D (scena.js) sotto la pagina: quando è pronta (html.scena3d) il muro
+   del DOM diventa invisibile ma resta lì a ricevere i clic (i link dei volantini,
+   i tagliandi, i giochi), e la scena si disegna in una tela fissa sotto tutto.
+   Le mosche, le formiche e la goccia restano quelle della pagina, sopra la tela. */
+.scena-tela{display:none}
+html.scena3d{background:#101214}
+html.scena3d .scena-tela{display:block;position:fixed;inset:0;width:100%;height:100%;z-index:0}
+html.scena3d .strada{position:relative;z-index:1;background:none}
+/* la saracinesca un po' più stretta e spostata a sinistra, così a destra ci stanno la porta a vetri e la lampada */
+html.scena3d .muro{box-shadow:none;max-width:min(1280px,66vw);margin-left:max(var(--stipite),6vw)}
+html.scena3d .muro::before,html.scena3d .muro::after,html.scena3d .buio,html.scena3d .fari,html.scena3d .freni,html.scena3d .neonauto{display:none}
+html.scena3d .portale{visibility:hidden}
+html.scena3d .it{visibility:hidden}
+/* quello che deve restare cliccabile, trasparente: i link dei volantini (coprono tutto il foglio), i manifesti che sono link, i tagliandi */
+html.scena3d .vol h3 a,html.scena3d .vol .titolo a,html.scena3d .vol .mano a{visibility:visible;color:transparent}
+html.scena3d .man-link .it{visibility:visible;opacity:0}
+html.scena3d .tagliandi button{visibility:visible;color:transparent;background:none;border-color:transparent}
+html.scena3d .copiato{visibility:visible}
+html.scena3d .vol h3,html.scena3d .vol:has(h3 a:hover) h3{text-decoration:none}
+html.scena3d .vol h3 a:focus-visible::after{outline:3px solid #ffd400;outline-offset:6px}
+html.scena3d .tagliandi button:focus-visible{outline:3px solid #ffd400}
+/* ?allinea=1: il DOM in trasparenza sopra la scena, per controllare che combacino */
+html.scena-allinea .it,html.scena-allinea .portale{visibility:visible;opacity:.45}

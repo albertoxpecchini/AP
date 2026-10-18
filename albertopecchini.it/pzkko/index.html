@@ -902,5 +902,17 @@ img{display:block;max-width:100%;height:auto}
   } else auguri?.remove()
 })()
 </script>
+<!-- La scena 3D (scena/): sui computer con WebGL2 la saracinesca diventa una strada vera, disegnata dalla
+     scheda grafica con luci, ombre e riflessi; questa pagina resta sotto, invisibile, a fare tutto il resto.
+     ?muro=1 la tiene com'è; sotto i 900 px resta il muro di sempre. -->
+<script>
+(() => {
+  const q = new URLSearchParams(location.search)
+  if (q.get('muro') !== null || innerWidth < 900) return
+  if (!document.createElement('canvas').getContext('webgl2')) return
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/scena/scena.css'; document.head.appendChild(l)
+  import('/scena/scena.js').then((m) => m.avvia()).catch((e) => console.warn('scena 3D non partita', e))
+})()
+</script>
 </body>
 </html>
