@@ -102,7 +102,6 @@ function hero() {
   return html`
     <section class="hero" data-section="Intro" aria-labelledby="hero-title">
       <div class="hero__glow" aria-hidden="true"></div>
-      <div class="hero__lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="container hero__wrap" data-ink>
         <div class="hero__hello" data-reveal="up" style="--d:30ms">
           <p class="hero__hi">
@@ -117,7 +116,6 @@ function hero() {
           <span class="hero__name" aria-hidden="true"><span class="hero__word"><span>Alberto</span></span> <span class="hero__word hero__word--2"><span data-ink-word>Pecchini</span></span></span>
           <span class="sr-only">${esc(site.name)} — ${site.roles.map((r) => esc(r.label)).join(', ')} a ${esc(site.location.city)}</span>
         </h1>
-        <div class="rule rule--ticks hero__rule" data-ink-rule aria-hidden="true"></div>
 
         <div class="hero__body">
           <div class="hero__pitch">
@@ -356,7 +354,7 @@ function studio() {
   return html`
     <section class="section std" id="studio" data-section="Studio">
       <div class="container std__grid">
-        <div class="std__photo">${media(photos.portrait, { ratio: '4/5', marks: true, parallax: true })}</div>
+        <div class="std__photo">${media(photos.portrait, { ratio: '4/5', parallax: true })}</div>
         <div class="std__copy">
           <p class="label" data-reveal="fade"><span class="sec-head__index">07</span>Studio</p>
           <h2 class="h2 std__title" data-reveal="words">${splitWords(bio.headline, { accent: ['codice,', 'sezione.'] })}</h2>

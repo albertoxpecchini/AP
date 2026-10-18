@@ -80,7 +80,7 @@
 }
 
 .sarea__letter {
-  font-size: clamp(5rem, 3rem + 10vw, 14rem);
+  font-size: clamp(4.5rem, 2.5rem + 8vw, 11rem);
   font-weight: 500;
   font-stretch: 70%;
   letter-spacing: -0.06em;
@@ -164,7 +164,7 @@
 }
 
 .bund__code {
-  font-size: clamp(2.5rem, 1.5rem + 3.5vw, 4.5rem);
+  font-size: clamp(2.25rem, 1.4rem + 2.8vw, 3.75rem);
   font-weight: 500;
   font-stretch: 72%;
   letter-spacing: -0.04em;
@@ -359,12 +359,12 @@
 }
 
 .itg__zero {
-  font-size: clamp(7rem, 4rem + 12vw, 15rem);
+  font-size: clamp(6rem, 3.5rem + 9.5vw, 12rem);
 }
 
 .itg__cur {
   margin-top: 0.3em;
-  font-size: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+  font-size: clamp(2.25rem, 1.4rem + 3.2vw, 4.25rem);
 }
 
 .itg__body {
@@ -403,7 +403,7 @@
 }
 
 .its__n {
-  font-size: clamp(2.5rem, 1.8rem + 3vw, 4.5rem);
+  font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.75rem);
   font-weight: 500;
   font-stretch: 70%;
   letter-spacing: -0.05em;
@@ -655,7 +655,7 @@
 }
 
 .mstep__n {
-  font-size: clamp(5rem, 3rem + 12vw, 16rem);
+  font-size: clamp(4.5rem, 2.5rem + 9.5vw, 13rem);
   font-weight: 500;
   font-stretch: 68%;
   letter-spacing: -0.06em;
@@ -760,7 +760,7 @@
   }
 
   .mstep__n {
-    font-size: clamp(5rem, 9vw, 11rem);
+    font-size: clamp(4.5rem, 7.5vw, 9.5rem);
   }
 }
 
@@ -819,7 +819,7 @@
 }
 
 .shero__title {
-  font-size: clamp(2.5rem, 1.4rem + 5vw, 6.5rem);
+  font-size: clamp(2.375rem, 1.2rem + 4vw, 5.5rem);
   font-weight: 540;
   font-stretch: 88%;
   letter-spacing: -0.045em;
@@ -1017,7 +1017,7 @@
 }
 
 .sapp__n {
-  font-size: clamp(3rem, 2rem + 4vw, 6rem);
+  font-size: clamp(2.75rem, 1.75rem + 3.2vw, 5rem);
   font-weight: 500;
   font-stretch: 70%;
   letter-spacing: -0.05em;
@@ -2031,16 +2031,6 @@
   display: grid;
 }
 
-.nf__grid {
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 4rem),
-    repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 4rem);
-  mask-image: radial-gradient(ellipse at 50% 40%, #000 10%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 10%, transparent 75%);
-}
-
 .nf__wrap {
   position: relative;
   display: grid;
@@ -2077,18 +2067,8 @@
   align-items: center;
   gap: clamp(0.25rem, 1.5vw, 1.5rem);
   width: fit-content;
-  padding-bottom: 2.25rem;
+  padding-bottom: 0.75rem;
   line-height: 0.8;
-}
-
-/* la quota prosegue a destra, tratteggiata: è il terreno su cui la gazza saltella */
-.nf__digits::after {
-  content: '';
-  position: absolute;
-  left: calc(100% + 0.75rem);
-  bottom: calc(var(--fs-label) / 2);
-  width: 100vw;
-  border-top: 1px dashed var(--line-strong);
 }
 
 .nf__gazza {
@@ -2191,7 +2171,7 @@
 }
 
 .nf__num {
-  font-size: clamp(7rem, 3rem + 24vw, 26rem);
+  font-size: clamp(6rem, 2.5rem + 19vw, 21rem);
   font-weight: 560;
   font-stretch: 72%;
   letter-spacing: -0.06em;
@@ -2221,43 +2201,6 @@
 @keyframes sweep {
   to { transform: rotate(360deg); }
 }
-
-.nf__dim {
-  position: absolute;
-  inset: auto 0 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 0.75rem;
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  letter-spacing: var(--track-label);
-  line-height: 1;
-  color: var(--muted);
-}
-
-.nf__dim b {
-  font-weight: 400;
-}
-
-.nf__dim i {
-  position: relative;
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.nf__dim i::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  width: 1px;
-  height: 11px;
-  background: var(--fg);
-  transform: rotate(45deg);
-}
-
-.nf__dim i:first-child::before { left: 0; }
-.nf__dim i:last-child::before { right: 0; }
 
 .nf__title {
   font-size: var(--fs-h1);

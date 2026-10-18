@@ -93,7 +93,7 @@ export function contattiPage() {
             <dl class="cnt__list" data-reveal="up">
               <div><dt class="label">Email</dt><dd><a class="cnt__big" href="mailto:${site.contact.email}">${esc(site.contact.email)}</a></dd></div>
               <div><dt class="label">Telefono</dt><dd><a class="cnt__big" href="tel:${site.contact.phone.replace(/\s/g, '')}">${esc(site.contact.phone)}</a></dd></div>
-              <div><dt class="label">Dove sono</dt><dd>${esc(site.location.city)} (${esc(site.location.province)}) · ${esc(site.location.cap)}<br><span class="cnt__muted">Ricevo su appuntamento</span></dd></div>
+              <div><dt class="label">Dove sono</dt><dd>${esc(site.location.city)} (${esc(site.location.province)}) · ${esc(site.location.cap)}<br><span class="cnt__muted">Di persona a Mantova e provincia, da remoto in tutta Italia</span></dd></div>
               <div><dt class="label">Orari</dt><dd>${esc(site.contact.hours)}<br><span class="cnt__muted">Scrivimi o chiamami e fissiamo giorno e ora</span></dd></div>
               <div><dt class="label">Social</dt><dd><ul class="cnt__social">${site.social.map((s) => `<li><a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}${icon('arrowUpRight')}<span class="sr-only"> (nuova scheda)</span></a></li>`)}</ul></dd></div>
             </dl>
@@ -180,7 +180,7 @@ export function contattiPage() {
           <p class="label cmap__coords">${COORDS}</p>
           ${button({ href: osm, label: 'Apri in OpenStreetMap', variant: 'ghost', iconName: 'arrowUpRight', external: true })}
         </div>
-        <div class="cmap__map">${media({ art: 'areamap', base: '/media/mappa/area-operativa.webp', sede: { name: site.location.city, lat: site.location.lat, lon: site.location.lon, coords: COORDS }, alt: `Carta illustrata dell’area operativa: il lago di Garda, il Mincio, i laghi di Mantova e il Po, con la sede a ${site.location.city} e raggi di 10, 25 e 50 chilometri` }, { ratio: '4/3', marks: true, caption: 'FIG. 01 — Area operativa · proiezione equirettangolare · scala grafica in carta' })}
+        <div class="cmap__map">${media({ art: 'areamap', base: '/media/mappa/area-operativa.webp', sede: { name: site.location.city, lat: site.location.lat, lon: site.location.lon, coords: COORDS }, alt: `Carta illustrata dell’area operativa: il lago di Garda, il Mincio, i laghi di Mantova e il Po, con la sede a ${site.location.city} e raggi di 10, 25 e 50 chilometri` }, { ratio: '4/3', caption: 'FIG. 01 — Area operativa · proiezione equirettangolare · scala grafica in carta' })}
           ${puppet('airone', { className: 'cmap__heron', gaze: '.cmap .a-sede' })}
         </div>
       </div>

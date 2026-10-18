@@ -164,7 +164,8 @@ main:focus {
 }
 
 .container--wide {
-  width: min(100% - var(--gutter) * 2, 120rem);
+  width: min(100% - var(--gutter) * 2, 96rem);
+  margin-inline: auto;
 }
 
 .section {
@@ -234,16 +235,6 @@ p {
   background: var(--line-strong);
 }
 
-/* righello: tacche ogni 8px, più lunghe ogni 40 */
-.rule--ticks {
-  position: relative;
-  height: 9px;
-  background:
-    linear-gradient(var(--line-strong), var(--line-strong)) 0 0 / 100% 1px no-repeat,
-    repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 40px) 0 0 / 100% 9px no-repeat,
-    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 8px) 0 0 / 100% 5px no-repeat;
-}
-
 .dot {
   display: inline-block;
   width: 0.5rem;
@@ -275,23 +266,6 @@ p {
   70%, to { transform: scale(3.4); opacity: 0; }
 }
 
-/* crocini di registro agli angoli di un riquadro */
-.mark {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--fg), var(--fg)) center / 100% 1px no-repeat,
-    linear-gradient(var(--fg), var(--fg)) center / 1px 100% no-repeat;
-  opacity: 0.7;
-}
-
-.mark--tl { top: -8px; left: -8px; }
-.mark--tr { top: -8px; right: -8px; }
-.mark--bl { bottom: -8px; left: -8px; }
-.mark--br { bottom: -8px; right: -8px; }
-
 .icon {
   flex: none;
 }
@@ -316,7 +290,7 @@ p {
   background: var(--c-ink);
   color: var(--c-paper);
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--fs-label);
   font-weight: 400;
   line-height: 1;
   white-space: nowrap;
@@ -384,8 +358,7 @@ p {
 }
 
 .js [data-reveal='clip'] .media__caption,
-.js [data-reveal='clip'] .hero__caption,
-.js [data-reveal='clip'] .mark {
+.js [data-reveal='clip'] .hero__caption {
   opacity: 0;
   transition: opacity var(--t-3) ease calc(var(--d) + 0.3s);
 }
@@ -418,12 +391,6 @@ p {
 .js [data-reveal='clip'].is-in .cover__inner,
 .js [data-reveal='words'].is-in .w__i {
   transform: none;
-}
-
-.js [data-reveal='clip'].is-in .media__caption,
-.js [data-reveal='clip'].is-in .hero__caption,
-.js [data-reveal='clip'].is-in .mark {
-  opacity: 0.7;
 }
 
 .js [data-reveal='clip'].is-in .media__caption,
@@ -477,17 +444,13 @@ p {
   animation: reveal-zoom 1.05s var(--ease-out) calc(var(--d) + var(--enter)) both;
 }
 
-.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] :is(.media__caption, .hero__caption, .mark) {
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] :is(.media__caption, .hero__caption) {
   transition: none;
   animation: reveal-fade var(--t-3) ease calc(var(--d) + var(--enter) + 0.3s) both;
 }
 
 .js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] :is(.media__caption, .hero__caption) {
   opacity: 1;
-}
-
-.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='clip'] .mark {
-  opacity: 0.7;
 }
 
 @keyframes reveal-up {

@@ -155,7 +155,6 @@ export function sectionHead({ index, label, title, titleHtml, lead, meta, level 
         <p class="label sec-head__label">${index && `<span class="sec-head__index">${esc(index)}</span>`}<span>${esc(label)}</span></p>
         ${meta && `<p class="label sec-head__meta">${esc(meta)}</p>`}
       </div>
-      <div class="rule rule--ticks" aria-hidden="true"></div>
       <div class="sec-head__body">
         <${H} class="sec-head__title h2" data-reveal="words">${titleHtml || splitWords(title)}</${H}>
         ${(lead || link) && html`<div class="sec-head__side" data-reveal="up">${lead && `<p class="lead">${esc(lead)}</p>`}${link && textLink(link)}</div>`}
@@ -370,7 +369,7 @@ export function puppet(name, { className, inside = {}, gaze, skip = [], lazy = t
  * Riquadro immagine con rapporto fisso, crocini di registro e didascalia opzionale.
  * `zoom` lo rende apribile nel lightbox (gruppo = galleria di appartenenza).
  */
-export function media(image, { ratio, caption, reveal = 'clip', parallax = false, zoom = false, group, index, lazy = true, className, marks = false, fit } = {}) {
+export function media(image, { ratio, caption, reveal = 'clip', parallax = false, zoom = false, group, index, lazy = true, className, fit } = {}) {
   if (!image) return ''
   const r = ratio || ratioOf(image)
   const cap = caption === undefined ? image.caption : caption
@@ -383,10 +382,9 @@ export function media(image, { ratio, caption, reveal = 'clip', parallax = false
     ? `<div class="media__frame media__frame--zoom" data-clip>${inner}<button class="media__open" type="button" data-lightbox="${esc(group || 'gallery')}" data-index="${index ?? 0}" data-caption="${esc(cap || image.alt || '')}" aria-label="Ingrandisci: ${esc(image.alt || cap || 'immagine')}" data-cursor="Apri"><span class="media__zoom" aria-hidden="true">${icon('expand')}</span></button></div>`
     : `<div class="media__frame" data-clip>${inner}</div>`
   return html`
-    <figure class="${cx('media', fit && `media--${fit}`, marks && 'media--marks', className)}" style="--ratio:${r}"${reveal ? ` data-reveal="${reveal}"` : ''}>
+    <figure class="${cx('media', fit && `media--${fit}`, className)}" style="--ratio:${r}"${reveal ? ` data-reveal="${reveal}"` : ''}>
       <div class="media__box">
         ${frame}
-        ${marks && '<span class="mark mark--tl" aria-hidden="true"></span><span class="mark mark--tr" aria-hidden="true"></span><span class="mark mark--bl" aria-hidden="true"></span><span class="mark mark--br" aria-hidden="true"></span>'}
       </div>
       ${cap && `<figcaption class="media__caption label">${esc(cap)}</figcaption>`}
     </figure>
@@ -551,7 +549,6 @@ export function dataSheet(project, { compact = false } = {}) {
 export const stat = ({ value, suffix = '', label, note }, i = 0) => html`
   <div class="stat" data-reveal="up" style="--d:${i * 55}ms">
     <p class="stat__value"><span data-count="${value}">${value}</span>${suffix && `<span class="stat__suffix">${esc(suffix)}</span>`}</p>
-    <div class="stat__dim" aria-hidden="true"><span></span></div>
     <p class="stat__label label">${esc(label)}</p>
     ${note && `<p class="stat__note">${esc(note)}</p>`}
   </div>

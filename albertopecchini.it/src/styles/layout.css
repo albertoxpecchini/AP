@@ -277,7 +277,21 @@
     margin: 0 0.1rem 0.3rem 0;
     font-size: 0.75rem;
     color: var(--h-muted);
-    transition: transform var(--t-2) var(--ease-out), color var(--t-1) ease;
+    opacity: 0;
+    transition: transform var(--t-2) var(--ease-out), color var(--t-1) ease, opacity var(--t-1) ease;
+  }
+
+  /* visibile al passaggio, con la tastiera e sempre dove non c'è il puntatore */
+  .site-nav__item--sub:hover .site-nav__toggle,
+  .site-nav__item--sub:focus-within .site-nav__toggle,
+  .site-nav__toggle[aria-expanded='true'] {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .site-nav__toggle {
+      opacity: 1;
+    }
   }
 
   .site-nav__item--sub:hover .site-nav__toggle,
@@ -362,7 +376,7 @@
   inset: 0;
   z-index: var(--z-menu);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr auto;
   overflow-y: auto;
   overscroll-behavior: contain;
   clip-path: inset(0 0 100% 0);
@@ -371,16 +385,6 @@
 
 .menu.is-open {
   clip-path: inset(0 0 0 0);
-}
-
-.menu__grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 25%) 0 0 / 100% 100%,
-    linear-gradient(transparent, transparent);
-  opacity: 0.6;
 }
 
 .menu__top {
@@ -594,11 +598,10 @@ footer.site-footer {
   align-items: center;
   gap: 0.6rem;
   color: var(--fg);
-  font-size: 0.75rem;
 }
 
 .foot-cta__title {
-  font-size: clamp(2.5rem, 1rem + 5.6vw, 6.25rem);
+  font-size: clamp(2.25rem, 1rem + 4.4vw, 5.25rem);
   font-weight: 540;
   font-stretch: 86%;
   letter-spacing: -0.04em;
@@ -941,7 +944,7 @@ footer.site-footer {
 
 .foot-legal__id,
 .foot-legal__credit {
-  font-size: 0.75rem;
+  max-width: 60ch;
   line-height: 1.6;
   text-wrap: balance;
 }
@@ -974,6 +977,11 @@ footer.site-footer {
   width: 224px;
   max-width: 100%;
   height: 20px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  line-height: 20px;
+  white-space: nowrap;
 }
 
 /* ── 6 · Torna su ── */

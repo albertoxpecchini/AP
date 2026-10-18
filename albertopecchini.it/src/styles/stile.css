@@ -30,9 +30,9 @@ body.page--stile {
 .canvas__bg {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgb(16 17 15 / 0.22) 1px, transparent 1.4px);
-  background-size: 24px 24px;
   pointer-events: none;
+  /* dal 18.10.2026 il piano è liscio: niente punti, né in CSS né dalla GPU */
+  display: none;
 }
 
 .canvas__bg.is-gl {
@@ -479,7 +479,6 @@ body.page--stile {
   transition: clip-path var(--t-4) var(--ease-out) var(--d);
 }
 
-.js .board [data-bd='clip'] .mark,
 .js .board [data-bd='clip'] figcaption {
   opacity: 0;
   transition: opacity var(--t-3) ease calc(var(--d) + 0.3s);
@@ -492,10 +491,6 @@ body.page--stile {
 
 .js .board.is-live [data-bd='clip'] [data-clip] {
   clip-path: inset(0 0 0 0);
-}
-
-.js .board.is-live [data-bd='clip'] .mark {
-  opacity: 0.7;
 }
 
 .js .board.is-live [data-bd='clip'] figcaption {
@@ -680,24 +675,6 @@ body.page--stile {
   overflow: hidden;
 }
 
-.bd-hero__lines {
-  position: absolute;
-  top: 0;
-  right: 50px;
-  bottom: 0;
-  left: 50px;
-  pointer-events: none;
-}
-
-.bd-hero__lines i {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--x);
-  width: 1px;
-  background: var(--line);
-}
-
 .bd-hero__bar {
   position: relative;
   display: flex;
@@ -810,10 +787,6 @@ body.page--stile {
 
 @keyframes bd-rise {
   from { transform: translate3d(0, 104%, 0); }
-}
-
-.bd-hero__rule {
-  margin-top: 16px;
 }
 
 .bd-hero__body {
@@ -1523,36 +1496,13 @@ body.page--stile {
   transform-origin: left;
 }
 
-.bd-el__ticks {
-  width: 100%;
-  transform-origin: left;
-}
-
-.js .board .bd-el__rule,
-.js .board .bd-el__ticks {
+.js .board .bd-el__rule {
   transform: scaleX(0);
   transition: transform var(--t-4) var(--ease-out) 0.3s;
 }
 
-.js .board.is-live .bd-el__rule,
-.js .board.is-live .bd-el__ticks {
+.js .board.is-live .bd-el__rule {
   transform: none;
-}
-
-.bd-el__marks {
-  position: relative;
-  width: 150px;
-  height: 90px;
-  background: var(--c-paper-3);
-}
-
-.js .board .bd-el__marks .mark {
-  opacity: 0;
-  transition: opacity var(--t-3) ease 0.6s;
-}
-
-.js .board.is-live .bd-el__marks .mark {
-  opacity: 0.7;
 }
 
 .bd-el__box .dot {
@@ -2062,12 +2012,6 @@ body.page--stile {
 .bd-ink__name > span {
   display: inline-block;
   padding-block: 0.04em 0.19em;
-}
-
-.bd-ink__rule {
-  justify-self: stretch;
-  margin-top: 16px;
-  margin-right: -150px;
 }
 
 .bd-parts {

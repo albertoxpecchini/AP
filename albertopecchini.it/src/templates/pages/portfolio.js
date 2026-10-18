@@ -25,7 +25,6 @@ function pageHead({ crumbs, index, label, title, accent = [], lead, meta, fig })
         ${breadcrumb(crumbs)}
         <div class="phead__top label" data-reveal="fade"><span><span class="sec-head__index">${index}</span>${esc(label)}</span><span>${esc(meta)}</span></div>
         ${art ? `<div class="phead__row">${h1}${art}</div>` : h1}
-        <div class="rule rule--ticks" aria-hidden="true"></div>
         <p class="phead__lead lead" data-reveal="up">${esc(lead)}</p>
       </div>
     </header>
@@ -50,7 +49,7 @@ export function portfolioPage() {
   return html`
     ${pageHead({
       crumbs: [{ label: 'Home', href: '/' }, { label: 'Portfolio', href: '/portfolio/' }],
-      index: '00',
+      index: '01',
       label: 'Portfolio',
       title: 'Tutto il lavoro, in un indice.',
       accent: ['indice.'],
@@ -159,7 +158,7 @@ export function tecnicoPage() {
               <article class="tsheet"${filterAttrs(p)}${i % 2 ? ' data-flip' : ''}>
                 <div class="tsheet__media">
                   <a href="${projectHref(p)}" data-cursor="Apri" aria-label="${esc(p.title)} — apri il case study" tabindex="-1">
-                    ${media(p.cover, { ratio: '4/3', marks: true, caption: null, lazy: i > 0 })}
+                    ${media(p.cover, { ratio: '4/3', caption: null, lazy: i > 0 })}
                   </a>
                 </div>
                 <div class="tsheet__body">

@@ -87,6 +87,14 @@ function iphoneSection(p) {
   `
 }
 
+// Titolo del progetto successivo: l'ultima parola e la freccia non si separano
+// mai (la freccia da sola su una riga sembrava un errore).
+const nextTitle = (title) => {
+  const words = esc(title).split(' ')
+  const last = words.pop()
+  return `${words.join(' ')}${words.length ? ' ' : ''}<span class="cs-next__end">${last}<span class="cs-next__arrow" aria-hidden="true">${icon('arrow')}</span></span>`
+}
+
 export function caseStudyPage(p) {
   const area = allAreas[p.area]
   const next = nextOf(p.slug)
@@ -107,7 +115,6 @@ export function caseStudyPage(p) {
           </div>
           <h1 class="cs-hero__title" data-reveal="words">${splitWords(p.title)}</h1>
           <p class="cs-hero__sub" data-reveal="up"><span class="serif-i">${esc(p.subtitle)}</span>${sampleMark(p)}</p>
-          <div class="rule rule--ticks" aria-hidden="true"></div>
           <dl class="cs-hero__meta" data-reveal="up">
             <div><dt class="label">Cliente</dt><dd>${esc(p.client)}</dd></div>
             <div><dt class="label">Settore</dt><dd>${esc(p.sector)}</dd></div>
@@ -182,7 +189,7 @@ export function caseStudyPage(p) {
         html`
           ${p.compare ? compare(p.compare) : ''}
           <div class="cs-gallery cs-gallery--${p.area}">
-            ${p.images.map((im, i) => media(im, { zoom: true, group: p.slug, index: i, marks: p.area === 'tecnico', ratio: isWeb ? (i === 0 ? '16/10' : i === 1 ? '3/4' : '9/16') : undefined }))}
+            ${p.images.map((im, i) => media(im, { zoom: true, group: p.slug, index: i, ratio: isWeb ? (i === 0 ? '16/10' : i === 1 ? '3/4' : '9/16') : undefined }))}
           </div>
           <p class="label cs-gallery__hint">${icon('expand')}<span>${p.images.some((im) => im.ai) ? 'Illustrazioni generate con l’intelligenza artificiale (<a href="/crediti/">crediti</a>) · ' : ''}Seleziona un’immagine per aprirla a tutto schermo · frecce per scorrere · Esc per chiudere</span></p>
         `,
@@ -225,7 +232,7 @@ export function caseStudyPage(p) {
     <a class="cs-next" href="${projectHref(next)}" data-theme="ink" data-cursor="Apri" data-preview="${nextPv.src}" data-preview-ratio="${nextPv.ratio}">
       <div class="container cs-next__inner">
         <p class="label"><span>Progetto successivo</span><span>${esc(next.code)}</span></p>
-        <p class="cs-next__title">${esc(next.title)}<span class="cs-next__arrow" aria-hidden="true">${icon('arrow')}</span></p>
+        <p class="cs-next__title">${nextTitle(next.title)}</p>
         <p class="cs-next__sub serif-i">${esc(next.subtitle)}</p>
       </div>
     </a>

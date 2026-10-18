@@ -119,8 +119,6 @@
   height: var(--viewer-stage-h);
   overflow: hidden;
   background-color: var(--c-paper-3);
-  background-image: radial-gradient(rgb(16 17 15 / 0.2) 1px, transparent 1.4px);
-  background-size: 24px 24px;
   outline: none;
   /* un dito scorre la pagina; con la tavola ingrandita la sposta */
   touch-action: pan-y;

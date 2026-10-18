@@ -156,8 +156,8 @@ export function informaticaPage() {
           <p class="lead">${esc(it.cta.text)}</p>
           <div class="itk__actions">
             ${button({ href: contactHref, label: 'Scrivimi' })}
-            ${button({ href: `tel:+${cifre}`, label: `Chiama ${site.contact.phone}`, variant: 'ghost', iconName: 'arrowUpRight' })}
             ${button({ href: whatsappHref, label: 'WhatsApp', variant: 'ghost', iconName: 'arrowUpRight', external: true })}
+            ${button({ href: `tel:+${cifre}`, label: `Chiama ${site.contact.phone}`, variant: 'ghost', iconName: 'arrowUpRight' })}
           </div>
         </div>
       </div>

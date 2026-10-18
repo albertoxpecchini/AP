@@ -93,7 +93,7 @@ const blockHead = (index, label, extra = '') => html`
     <p class="label"><span class="sec-head__index">${index}</span>${esc(label)}</p>
     ${extra}
   </header>
-  <div class="rule rule--ticks" aria-hidden="true"></div>
+  <div class="rule" aria-hidden="true"></div>
 `
 
 export function emailPage() {
@@ -395,7 +395,6 @@ export function emailPage() {
               ([key, label, note]) => html`
                 <div class="em-stat">
                   <p class="em-stat__value" data-em-stat="${key}">0</p>
-                  <div class="stat__dim" aria-hidden="true"><span></span></div>
                   <p class="em-stat__label label">${esc(label)}</p>
                   <p class="em-stat__note">${esc(note)}</p>
                 </div>

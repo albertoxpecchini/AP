@@ -130,15 +130,13 @@ function terminal(x, y, w) {
  */
 function screen(x, y, s, d) {
   const id = nextId('s')
-  const dots = nextId('d')
   const hair = 1 / s
   const line = `stroke="${C.ink}" stroke-opacity=".16" stroke-width="${n(hair)}"`
   const nameStyle = { size: d.fs, family: SANS, weight: 600, stretch: 86, spacing: '-0.055em' }
-  let o = `<defs><clipPath id="${id}"><rect width="${d.W}" height="${d.H}"/></clipPath><pattern id="${dots}" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="${C.ink}" opacity=".16"/></pattern></defs>`
+  let o = `<defs><clipPath id="${id}"><rect width="${d.W}" height="${d.H}"/></clipPath></defs>`
   o += `<g transform="translate(${n(x)} ${n(y)}) scale(${Number(s.toFixed(4))})" clip-path="url(#${id})">`
-  o += Rc(0, 0, d.W, d.H, C.paper) + Rc(0, d.body, d.W, d.H - d.body, `url(#${dots})`)
-  // fili dei margini e bordo della testata
-  o += `<path d="M${d.g} 0V${d.H}M${n(d.W - d.g)} 0V${d.H}M0 ${d.hh}H${d.W}" fill="none" ${line}/>`
+  // carta liscia, come la home dal 18.10.2026 (niente puntini, fili dei margini né righello)
+  o += Rc(0, 0, d.W, d.H, C.paper)
 
   // testata
   if (d.pills) for (const [px, pw, label, minio] of d.pills) o += pebble(px, d.pillY, pw, label, minio)
@@ -156,11 +154,6 @@ function screen(x, y, s, d) {
   // nome: «alberto» pieno, «pecchini» a filo (l'inchiostro lo riempie dopo)
   o += T(d.words[0][0], d.words[0][1], 'alberto', nameStyle)
   o += T(d.words[1][0], d.words[1][1], 'pecchini', nameStyle).replace(`fill="${C.ink}"`, `fill="${C.paper}" stroke="${C.ink}" stroke-width="1.5"`)
-
-  // filo con le tacche: una ogni 8 px, più lunga ogni 40
-  let ticks = ''
-  for (let tx = 0; tx <= d.W - d.g * 2; tx += 8) ticks += `M${n(d.g + tx)} ${d.rule}v${tx % 40 === 0 ? 9 : 5}`
-  o += `<path d="M${d.g} ${d.rule}H${n(d.W - d.g)}${ticks}" fill="none" stroke="${C.ink}" stroke-opacity=".42" stroke-width="1"/>`
 
   // «// casa · sito · marchio  un solo referente»
   const kk = d.kicker

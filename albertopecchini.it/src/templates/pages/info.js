@@ -16,7 +16,6 @@ export const head = ({ crumbs, index, label, title, accent, lead, meta }) => htm
       ${breadcrumb(crumbs)}
       <div class="phead__top label" data-reveal="fade"><span><span class="sec-head__index">${index}</span>${esc(label)}</span><span>${esc(meta)}</span></div>
       <h1 class="phead__title" data-reveal="words">${splitWords(title, { accent })}</h1>
-      <div class="rule rule--ticks" aria-hidden="true"></div>
       <p class="phead__lead lead" data-reveal="up">${esc(lead)}</p>
     </div>
   </header>

@@ -22,7 +22,6 @@
   letter-spacing: -0.045em;
   line-height: 0.92;
   max-width: 15ch;
-  padding-bottom: clamp(1.5rem, 3vw, 3rem);
   text-wrap: balance;
 }
 
@@ -460,7 +459,7 @@
 }
 
 .alinks__name {
-  font-size: clamp(1.75rem, 1.2rem + 3vw, 4.5rem);
+  font-size: clamp(1.625rem, 1.1rem + 2.4vw, 3.75rem);
   font-weight: 540;
   font-stretch: 90%;
   letter-spacing: -0.04em;
@@ -647,7 +646,7 @@
 }
 
 .wproj__title {
-  font-size: clamp(2.25rem, 1.3rem + 3.2vw, 4.75rem);
+  font-size: clamp(2rem, 1.2rem + 2.6vw, 4rem);
   overflow-wrap: anywhere;
 }
 
@@ -768,7 +767,7 @@
 }
 
 .gproj__n {
-  font-size: clamp(4rem, 2rem + 10vw, 13rem);
+  font-size: clamp(3.5rem, 1.75rem + 8vw, 10.5rem);
   font-weight: 500;
   font-stretch: 70%;
   letter-spacing: -0.06em;
@@ -892,7 +891,7 @@
 }
 
 .cs-hero__sub {
-  margin-block: clamp(1rem, 2vw, 2rem) clamp(1.5rem, 3vw, 3rem);
+  margin-block: clamp(1rem, 2vw, 2rem);
   font-size: var(--fs-h3);
   line-height: 1.1;
   color: var(--muted);
@@ -1010,7 +1009,7 @@
 }
 
 .cs-sec__n {
-  font-size: clamp(3.5rem, 2rem + 7vw, 10rem);
+  font-size: clamp(3rem, 1.75rem + 5.5vw, 8rem);
   font-weight: 500;
   font-stretch: 70%;
   letter-spacing: -0.06em;
@@ -1112,7 +1111,7 @@
 }
 
 .cs-metrics__v {
-  font-size: clamp(2.5rem, 1.6rem + 4vw, 5.5rem);
+  font-size: clamp(2.25rem, 1.4rem + 3.2vw, 4.5rem);
   font-weight: 540;
   font-stretch: 78%;
   letter-spacing: -0.05em;
@@ -1371,10 +1370,6 @@
 }
 
 .cs-next__title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 2rem;
   font-size: var(--fs-display);
   font-weight: 560;
   font-stretch: 86%;
@@ -1382,8 +1377,17 @@
   line-height: 0.92;
 }
 
+/* ultima parola + freccia: un blocco che non si spezza */
+.cs-next__end {
+  white-space: nowrap;
+}
+
 .cs-next__arrow {
+  display: inline-block;
+  margin-left: 0.3em;
   font-size: 0.7em;
+  line-height: 0;
+  vertical-align: 0.06em;
   transition: transform var(--t-3) var(--ease-out), color var(--t-2) ease;
 }
 

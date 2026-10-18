@@ -44,6 +44,7 @@ export const timeline = [
   { year: '2026', title: 'Primi siti per clienti', text: 'Online il sito dello studio dell’ing. Dario Donelli; in proprio, l’atlante digitale di Rivalta sul Mincio e il sito di Cascina Fontana, l’azienda agricola di famiglia. React, Vite, TypeScript, JavaScript vanilla.', tag: 'Web' },
   { year: '2026', title: 'Diploma CAT', text: 'Diploma di Costruzioni, Ambiente e Territorio dopo cinque anni di AutoCAD, rilievo strumentale ed estimo.', tag: 'Tecnico' },
   { year: '2026', title: 'Università di Modena e Reggio Emilia', text: 'Immatricolazione al corso di laurea in Costruzioni e gestione del territorio, Dipartimento di Ingegneria «Enzo Ferrari».', tag: 'Formazione' },
+  { year: '2026', title: 'Collaborazione con Gabriele Lucia', text: 'Al Dipartimento di Ingegneria «Enzo Ferrari» di UNIMORE ho conosciuto Gabriele Lucia, che lì studia Ingegneria Informatica: sviluppatore e grafico come me, con lui collaboro su progetti web.', tag: 'Web' },
 ]
 
 export const approach = [

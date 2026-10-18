@@ -36,9 +36,12 @@ npm install
 npm run dev       # sviluppo su http://localhost:5173 (se la porta è occupata Vite ne sceglie un’altra)
 npm run dev:bcp   # bettercallpekko.it su http://localhost:5181 (SITE=bcp, visite e like in memoria)
 npm run dev:pzkko # pzkko.it su http://localhost:5182 (la cartella pzkko/ così com’è)
+npm run online    # i tre insieme, anche da fuori con indirizzi fissi (Ctrl+Alt+O in VS Code)
 npm run build     # genera dist/: pagine, sitemap.xml, robots.txt, 404.html, miniature
 npm run preview   # serve dist/ in locale, come farebbe l’hosting
 ```
+
+`npm run online` (`tools/online.mjs`) accende i server che mancano e ospita il tunnel anonimo «pzkko» di Microsoft dev tunnels, con un indirizzo fisso per porta; la prima volta servono `winget install Microsoft.devtunnel` e `devtunnel user login -g`. Da fuori /email/ non riceve la chiave: il tunnel arriva da localhost ma con le intestazioni `X-Forwarded-*`, e `plugins/api-dev.js` la dà solo senza.
 
 In sviluppo la pagina si ricarica da sola quando cambiano dati, template o tavole. Da VS Code, **F5** avvia il server di sviluppo e apre Edge sul sito (configurazione in `.vscode/` alla radice del repository).
 
@@ -78,6 +81,7 @@ albertopecchini.it/
 │  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
 │  ├─ nota/                le «note» di fine stagione (interventi, riepilogo, totale) in PDF A4 coi caratteri del sito (vedi il suo README)
+│  ├─ og/                  rigenera public/og.png, l’anteprima social, dai testi di site.js (vedi il suo README)
 │  ├─ onion/               l’indirizzo .onion servito da questo PC, senza Vercel: Tor + server statico, `npm run onion` pubblica (vedi il suo README)
 │  ├─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza e pulizia dei PDF (vedi il suo README)
 │  └─ wrapped/             l’analizzatore della chat dietro /wrapped5BT/: unisce gli export di WhatsApp e calcola le metriche delle slide (vedi il suo README)
@@ -86,7 +90,7 @@ albertopecchini.it/
 ├─ profiles/               archivio firme versionato
 ├─ public/                 servito così com’è alla radice del sito
 │  ├─ favicon.svg · favicon-32.png · apple-touch-icon.png · icon-512.png · site.webmanifest
-│  ├─ og.png               immagine per le anteprime social (1200×630)
+│  ├─ og.png               immagine per le anteprime social (1200×630), generata da tools/og
 │  └─ media/
 │     ├─ figurine/         figurine ritagliate (<nome>.webp con trasparenza), generate da tools/figurine; tasto-*.webp sono le sagome dei tasti, chrome-*.webp le mini immagini del piè di pagina
 │     ├─ mascotte/         lumaca.webp e nutria.webp, le mascotte, e lumaca/ nutria/ airone/ gazza/ vespa/, i pezzi dei burattini, generati da tools/mascotte
@@ -450,7 +454,7 @@ Accanto a loro, nel piè di pagina, tre **burattini di carta**: l’**airone** e
 
 ### L’hero sotto il nome (home)
 
-Sotto il nome e il righello, su carta a puntini, l’hero parla al cliente (rifatto il 2 ottobre 2026; markup in `hero()` e `heroTerminal()` di `src/templates/pages/home.js`, stili in `home.css`, script `initHero` in `sections.js`):
+Sotto il nome, su carta liscia (dal 18.10.2026 niente più righello, carta a puntini né assi verticali: gli sfondi di tutto il sito sono piani), l’hero parla al cliente (rifatto il 2 ottobre 2026; markup in `hero()` e `heroTerminal()` di `src/templates/pages/home.js`, stili in `home.css`, script `initHero` in `sections.js`):
 
 - **L’invito**, a sinistra: la riga di commento `// casa · sito · marchio`, il luogo comune «Servono tre professionisti.» sbarrato col pennarello minio (un elemento `<s>`, una riga per colpo) e timbrato «Falso», la risposta «Ne basta uno.», il tasto «Parliamo del progetto», il tasto che copia l’indirizzo email (anche premendo **C** finché l’hero è in vista; se gli appunti non sono disponibili apre il programma di posta) e tre garanzie prese da Servizi e Metodo.
 - **Il terminale**, a destra: `alberto.sh` con cinque comandi (`heroCommands()`: tutto, casa, sito, marchio, pc), quattro righe di fatti ciascuno e il rimando alla pagina dove continuare. I comandi girano da soli ogni 6,5 s (la barra sotto la voce attiva dice quanto manca), si fermano col puntatore sopra, col fuoco dentro e fuori schermo, e smettono quando il visitatore ne sceglie uno; il comando si scrive un carattere alla volta, poi escono le righe. Ogni comando ha il suo **adesivo** (`hero-*.webp`, foglio `hero` di [`tools/figurine`](tools/figurine/README.md)) appoggiato sull’angolo. Senza script resta il primo comando; con «riduci movimento» non gira e non si scrive.
@@ -464,7 +468,7 @@ Nella prima schermata della home un’**aragosta di fiume** rossa (il gambero ro
 
 - **Il liquido** è simulato davvero (`Liquid` in `src/client/ink.js`): acqua bassa su una griglia di colonne, 1 px = 1 mm e g = 9,8 m/s², flussi conservativi, così fa onde, sciaborda quando si scorre la pagina (l’accelerazione dello scroll lo spinge di lato) e quando il puntatore ci passa sopra, e si calma da solo. Tutto è in un SVG sopra l’hero: il contorno del cognome è un `<text>` con lo stesso carattere e le stesse misure dell’HTML, che nel frattempo nasconde il proprio (`.is-inked`), e il liquido è ritagliato dalla stessa parola. Il ciclo si ferma quando l’hero non si vede.
 - **L’aragosta** è un burattino di carta come quelli del piè di pagina, ma con un montaggio suo: pezzi e pose in `src/data/aragosta.js`, immagini in `public/media/aragosta/`, fatte da [`tools/aragosta`](tools/aragosta/README.md). Occhi, palpebre, il getto (una parabola dal beccuccio all’apertura della I) e le gocce li disegna il codice.
-- **Anche in /stile/**: la tavola «Mascotte e burattini» ha una fascia per l’aragosta con una scena sua (etichetta, «Pecchini» a 160 px, righello) che funziona come quella della home: `ink.js` monta una scena per ogni `[data-ink]` e riporta le misure a 1:1 anche quando il piano è ingrandito; spostare il piano fa sciabordare l’inchiostro.
+- **Anche in /stile/**: la tavola «Mascotte e burattini» ha una fascia per l’aragosta con una scena sua (etichetta, «Pecchini» a 160 px) che funziona come quella della home: `ink.js` monta una scena per ogni `[data-ink]` e riporta le misure a 1:1 anche quando il piano è ingrandito; spostare il piano fa sciabordare l’inchiostro.
 - **Markup**: `data-ink` sull’`hero__wrap`, `data-ink-word` sul cognome, `data-ink-bed` sull’etichetta della disponibilità (per questo ora si vede anche sul telefono), `data-ink-rule` sul righello dove cadono le gocce. Il modulo si carica solo in home (`onDemand` in `main.js`). In locale `window.__ink` dice stato e livello e con `__ink.go('versa')` salta a uno stato.
 
 ## Fonti delle immagini
@@ -490,7 +494,8 @@ Le stesse informazioni sono pubblicate nella pagina [`/crediti/`](https://www.al
 | Screenshot dei siti | `public/media/web/` | Catture dei siti di Alberto Pecchini |
 | MacBook, iPad, iPhone | `public/media/mockup/` | File della Figma Community [Device Mockups (iMac, Macbook, iPad, iPhone)](https://www.figma.com/community/file/1172125330560103197/device-mockups-imac-macbook-ipad-iphone), licenza CC BY 4.0 |
 | iPhone 18 Pro (case study di questo sito, /contatti/) | `public/media/mockup/iphone-18-pro.svg` | [IPhone 18 Pro Vector.svg](https://commons.wikimedia.org/wiki/File:IPhone_18_Pro_Vector.svg) di Rafael Fernandez, Wikimedia Commons, licenza CC BY-SA 4.0; il credito compare sotto ogni telefono (`iphoneCredit()`) |
-| Icone, monogramma, firma, favicon, `og.png` | `public/`, `ui.js` | Disegnati per il sito |
+| Icone, monogramma, firma, favicon | `public/`, `ui.js` | Disegnati per il sito |
+| `og.png`, l’anteprima social | `public/og.png` | Composta in HTML coi caratteri del sito e fotografata da Chromium — [`tools/og`](tools/og/README.md); i testi vengono da `src/data/site.js` |
 | Caratteri | `@fontsource/*` | Archivo, Cascadia Code, Instrument Serif — SIL Open Font License |
 
 ## Modulo contatti

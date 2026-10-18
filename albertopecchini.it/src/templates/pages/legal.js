@@ -149,7 +149,6 @@ const missingPage = html`
 export function notFoundPage() {
   return html`
     <section class="nf" data-theme="ink">
-      <div class="nf__grid" aria-hidden="true"></div>
       <div class="container nf__wrap">
         <p class="label nf__top"><span>Errore 404</span><span>N 404°00′00″ · E —</span><span>Tav. non in elenco</span></p>
         <div class="nf__figure" aria-hidden="true">
@@ -159,7 +158,6 @@ export function notFoundPage() {
               <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" class="nf__c"/><circle cx="100" cy="100" r="58" class="nf__c nf__c--dash"/><circle cx="100" cy="100" r="7" class="nf__dot"/><path d="M100 0v72M100 128v72M0 100h72M128 100h72" class="nf__c"/></svg>
             </span>
             <span class="nf__num">4</span>
-            <span class="nf__dim"><i></i><b>punto non rilevato</b><i></i></span>
           </div>
           <div class="nf__gazza" data-flee>${puppet('gazza', { className: 'nf__pup', inside: { testa: missingPage } })}</div>
         </div>

@@ -132,13 +132,13 @@ const stradaSheets = [
   sheet(STRADA, '01', {
     title: 'Studio del tracciato',
     ...stradaDwg([2270, 380, 4130, 1650]),
-    alt: 'Quattro planimetrie sulla stessa carta a curve di livello: due tracciolini con i cerchi del compasso e due poligonali d’asse tra i punti A e B',
-    note: 'Due tracciolini da A a B a pendenza costante del 5,3%, con il compasso aperto a 37,74 m tra una curva di livello e l’altra, e le due poligonali d’asse che ne ricavo: A-1-2-3-4-B di 968 m e A-1-2-B di 892 m.',
+    alt: 'Quattro planimetrie sulla stessa carta a curve di livello: due tracciolini con i cerchi del compasso e due poligonali d’asse tra partenza e arrivo',
+    note: 'Due tracciolini a pendenza costante del 5,3% da un estremo all’altro, con il compasso aperto a 37,74 m tra una curva di livello e l’altra, e le due poligonali d’asse che ne ricavo: una a quattro vertici di 968 m e una a due vertici di 892 m.',
   }),
   sheet(STRADA, '02', {
     title: 'Costruzione dei raccordi',
     ...stradaDwg([4570, 380, 5430, 1000]),
-    alt: 'Poligonale d’asse A-1-2-3-4-B con i cerchi di raggio 80 m costruiti sui vertici',
+    alt: 'Poligonale d’asse a quattro vertici con i cerchi di raggio 80 m costruiti sui vertici',
     note: 'Il tracciato definitivo segue il secondo tracciolino: cinque rettifili, quattro vertici e su ogni vertice il cerchio di raggio 80 m che raccorda i due lati.',
   }),
   sheet(STRADA, '03', {
@@ -151,7 +151,7 @@ const stradaSheets = [
     title: 'Picchettamento',
     ...stradaDwg([6582, 378, 7442, 998]),
     alt: 'Asse stradale con i 28 picchetti numerati e le tracce delle sezioni trasversali',
-    note: '28 picchetti numerati da A a B, dove l’asse incrocia le curve di livello e nei punti notevoli del tracciato, con le tracce delle sezioni trasversali.',
+    note: '28 picchetti numerati dalla partenza all’arrivo, dove l’asse incrocia le curve di livello e nei punti notevoli del tracciato, con le tracce delle sezioni trasversali.',
   }),
   sheet(STRADA, '05', {
     title: 'Planimetria di progetto',
@@ -560,7 +560,7 @@ const allProjects = [
   {
     slug: STRADA,
     code: 'AP-26-T01',
-    title: 'Progetto stradale da A a B',
+    title: 'Una strada tra due punti',
     subtitle: 'Dal tracciolino ai metri cubi di scavo, su una carta a curve di livello',
     area: 'tecnico',
     categories: ['tecnico', 'cad'],
@@ -573,15 +573,15 @@ const allProjects = [
     technologies: ['AutoCAD LT', 'Excel'],
     summary: 'Una strada di 934 m tra due punti di una carta a curve di livello: due tracciolini al 5,3%, quattro curve di raggio 80 m, 28 picchetti, profilo, sezioni e il calcolo dei 23.447 m³ di scavo.',
     description:
-      'Un progetto stradale completo, dal primo tracciato sulla carta al conto della terra da muovere: collegare il punto A, a quota 300 m, con il punto B, a quota 286 m, su una carta con le curve di livello ogni 2 m e un corso d’acqua nel fondovalle.',
+      'Un progetto stradale completo, dal primo tracciato sulla carta al conto della terra da muovere: collegare la partenza, a quota 300 m, con l’arrivo, a quota 286 m, su una carta con le curve di livello ogni 2 m e un corso d’acqua nel fondovalle.',
     goal: 'Tracciare una strada che scenda nel fondovalle e risalga dall’altra parte con pendenze regolari, e arrivare a sapere quanta terra scavare e quanta riportare.',
     problem:
-      'Tra A e B ci sono 31 metri da scendere e 17 da risalire, con il fondovalle a quota 269 e il corso d’acqua da attraversare. La linea più breve è impraticabile: la strada deve seguire il terreno, e ogni scelta in pianta cambia il profilo, le sezioni e i volumi.',
+      'Tra partenza e arrivo ci sono 31 metri da scendere e 17 da risalire, con il fondovalle a quota 269 e il corso d’acqua da attraversare. La linea più breve è impraticabile: la strada deve seguire il terreno, e ogni scelta in pianta cambia il profilo, le sezioni e i volumi.',
     strategy:
       'Ho seguito il metodo in ordine. Prima i tracciolini, spezzate a pendenza costante del 5,3% costruite con il compasso aperto a 37,74 m tra una curva di livello e l’altra; poi le poligonali d’asse che li regolarizzano, le curve, i picchetti, e solo alla fine profilo, sezioni e volumi. Ho confrontato due ipotesi e ho sviluppato la seconda.',
     development: [
-      { title: 'Tracciato', text: 'Due tracciolini da A a B e due poligonali d’asse, A-1-2-3-4-B di 968 m e A-1-2-B di 892 m. Quella definitiva segue il secondo tracciolino con quattro vertici.' },
-      { title: 'Curve', text: 'Quattro curve circolari di raggio 80 m, con deviazioni di 67,1°, 67,6°, 67,0° e 10,3°: 296 m di archi sui 934 m dell’asse, picchettato in 28 punti da A a B.' },
+      { title: 'Tracciato', text: 'Due tracciolini da un estremo all’altro e due poligonali d’asse, una a quattro vertici di 968 m e una a due vertici di 892 m. Quella definitiva segue il secondo tracciolino con quattro vertici.' },
+      { title: 'Curve', text: 'Quattro curve circolari di raggio 80 m, con deviazioni di 67,1°, 67,6°, 67,0° e 10,3°: 296 m di archi sui 934 m dell’asse, picchettato in 28 punti dalla partenza all’arrivo.' },
       { title: 'Profilo', text: 'Altezze esagerate dieci volte e tre livellette: −6,52% per 475,75 m fino al fondovalle, un tratto in piano di 76,16 m e +4,45% per 382,06 m fino a B. Lo scavo più profondo, 5,22 m, è al picchetto 26.' },
       { title: 'Volumi', text: '28 sezioni con piattaforma di 10 m, aree di sterro e riporto misurate in AutoCAD e un foglio Excel che calcola i volumi con le sezioni ragguagliate: 23.447 m³ di scavo e 569 m³ di riporto.' },
     ],

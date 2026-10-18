@@ -280,7 +280,7 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
 .sec-head__body {
   display: grid;
   gap: 1.5rem;
-  padding-top: clamp(1.5rem, 3vw, 3rem);
+  padding-top: clamp(0.75rem, 1.5vw, 1.5rem);
 }
 
 .sec-head__side {
@@ -862,7 +862,7 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
 /* ── Statistiche ──────────────────────────────────────────────────────────── */
 
 .stat__value {
-  font-size: clamp(3.5rem, 2rem + 7vw, 9rem);
+  font-size: clamp(3rem, 1.75rem + 5.5vw, 7.5rem);
   font-weight: 540;
   font-stretch: 78%;
   letter-spacing: -0.05em;
@@ -875,28 +875,8 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   font-stretch: 100%;
 }
 
-.stat__dim {
-  position: relative;
-  height: 1px;
-  margin: 1.25rem 0 0.9rem;
-  background: var(--line-strong);
-}
-
-.stat__dim::before,
-.stat__dim::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  width: 1px;
-  height: 11px;
-  background: var(--fg);
-  transform: rotate(45deg);
-}
-
-.stat__dim::before { left: 0; }
-.stat__dim::after { right: 0; }
-
 .stat__label {
+  margin-top: 1rem;
   color: var(--fg);
 }
 
@@ -1387,6 +1367,12 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   gap: 1rem;
   font-size: 0.8125rem;
   color: var(--muted);
+}
+
+/* il contatore dei caratteri sta su una riga sola, anche sul telefono */
+.field__hint .label {
+  flex: none;
+  white-space: nowrap;
 }
 
 .field__error {

@@ -42,7 +42,8 @@ void main(){
 const gridAlpha = (z) => clamp((z - 0.3) * 2, 0, 1)
 
 function dotGrid(host) {
-  if (!host) return { draw() {}, resize() {} }
+  // piano liscio (dal 18.10.2026 .canvas__bg è display: none): niente da disegnare
+  if (!host || getComputedStyle(host).display === 'none') return { draw() {}, resize() {} }
   const css = {
     draw(x, y, z) {
       const s = GRID * z
