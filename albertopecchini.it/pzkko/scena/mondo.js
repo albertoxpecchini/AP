@@ -7,7 +7,7 @@
 // telefono (0,95 m): il piano di sopra, l'insegna e le luci si mettono rispetto a
 // lei, e le luci accese insieme sono meno (ognuna costa a ogni pixel).
 import * as T from './lib/three.js'
-import { intonaco, lastre, asfalto, facciata, immagine, scritta, profilo, DOGA } from './materiali.js'
+import { facciata, immagine, scritta, profilo, DOGA } from './materiali.js'
 
 export const Z_FACCIATA = 0.10
 const ART = '/art/scena/'
@@ -32,22 +32,27 @@ const SPECCHIO = {
     #include <colorspace_fragment>
     }`,
 }
-// (senza multisample, che costa un giro di scena in più; e ogni specchio si rifà un fotogramma sì e uno no, alternandosi con l'altro)
+// (senza multisample, che costa un giro di scena in più). Ogni specchio è un giro di scena: si rifanno solo quando si
+// dice (specchiModo): «fermi» finché niente si muove (il riflesso di prima è ancora giusto), «alterni» un fotogramma sì
+// e uno no, alternandosi con l'altro, «tutti» a ogni fotogramma
 const specchio = (geo, larg, alt, colore, opacita, turno) => {
   const r = new T.Reflector(geo, { clipBias: 0.002, textureWidth: larg, textureHeight: alt, color: colore, shader: SPECCHIO, multisample: 0 })
   r.material.uniforms.opacita.value = opacita
   r.material.transparent = opacita < 1
   // uno specchio non si disegna dentro un altro specchio (costerebbe un giro di scena in più)
   const prima = r.onBeforeRender
-  r.onBeforeRender = (...a) => { if (dentroSpecchio || (!subito && (fotogramma & 1) !== turno)) return; dentroSpecchio = true; try { prima.apply(r, a) } finally { dentroSpecchio = false } }
+  r.onBeforeRender = (...a) => {
+    if (dentroSpecchio || modo === 'fermi' || (modo === 'alterni' && (fotogramma & 1) !== turno)) return
+    dentroSpecchio = true
+    try { prima.apply(r, a) } finally { dentroSpecchio = false }
+  }
   return r
 }
-let dentroSpecchio = false, fotogramma = 0, subito = false
+let dentroSpecchio = false, fotogramma = 0, modo = 'tutti'
 export const prossimoFotogramma = () => { fotogramma++ }
-// mentre passa un'auto gli specchi si rifanno a ogni fotogramma, se no il riflesso va a scatti
-export const specchiSubito = (si) => { subito = si }
+export const specchiModo = (m) => { modo = m }
 
-// un cilindro da a a b (un tubo), con le sfere ai capi se si chiede
+// un cilindro da a a b (un tubo)
 const tubo = (a, b, r, seg = 12) => {
   const dir = b.clone().sub(a), len = dir.length()
   const g = new T.CylinderGeometry(r, r, len, seg, 1, true)
@@ -61,30 +66,50 @@ const scatola = (w, h, d, mat, x, y, z) => { const m = new T.Mesh(new T.BoxGeome
 // le lettere dell'insegna: la stessa traccia di art/insegna.svg (un tratto unico arrotondato)
 const TRATTO = 'M23 325V128M23 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0M217 128H335L217 252H335M405 50V252M510 128L405 215M448 180L515 252M561 50V252M666 128L561 215M604 180L671 252M737 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0'
 // cx, cy: il centro del testo «pzkko» nel mondo; s: metri per unità svg (la traccia, scalata di 0,724, è larga 640 e alta 199 unità)
-const lettere = (cx, cy, s, raggio, z) => {
-  // x0, ytop: dove sta l'angolo in alto a sinistra del cassonetto (svg 30,20); s: metri per unità svg
+// Pochi poligoni: i tratti dritti sono un tubo solo (non dieci), le curve otto pezzi, il tubo ha `seg` lati, e una sfera
+// (piccola, `seg` spicchi) solo ai capi e dove il tratto gira più di 20°: nei giri dolci i tubi si toccano già
+const lettere = (cx, cy, s, raggio, z, seg) => {
   const dati = new T.SVGLoader().parse(`<svg xmlns="http://www.w3.org/2000/svg"><path d="${TRATTO}"/></svg>`)
-  const pezzi = []
+  const mondo = (p) => new T.Vector3(cx + (0.724 * p.x - 320) * s, cy - (0.724 * p.y - 135.5) * s, z)
+  const pezzi = [], sfera = (p) => { const g = new T.SphereGeometry(raggio, seg, Math.max(4, seg / 2 + 1)); g.translate(p.x, p.y, p.z); pezzi.push(g) }
   for (const sub of dati.paths[0].subPaths) {
-    const punti = sub.getPoints(10).map((p) => new T.Vector3(cx + (0.724 * p.x - 320) * s, cy - (0.724 * p.y - 135.5) * s, z))
-    for (let i = 1; i < punti.length; i++) if (punti[i].distanceTo(punti[i - 1]) > 1e-5) pezzi.push(tubo(punti[i - 1], punti[i], raggio))
-    for (const p of punti) { const g = new T.SphereGeometry(raggio, 12, 10); g.translate(p.x, p.y, p.z); pezzi.push(g) }
+    const punti = []
+    for (const c of sub.curves) for (const p of c.isLineCurve ? [c.v1, c.v2] : c.getPoints(8)) {
+      const v = mondo(p)
+      if (!punti.length || v.distanceTo(punti.at(-1)) > 1e-5) punti.push(v)
+    }
+    for (let i = 1; i < punti.length; i++) pezzi.push(tubo(punti[i - 1], punti[i], raggio, seg))
+    sfera(punti[0]); sfera(punti.at(-1))
+    for (let i = 1; i < punti.length - 1; i++) {
+      const a = punti[i].clone().sub(punti[i - 1]).normalize(), b = punti[i + 1].clone().sub(punti[i]).normalize()
+      if (a.dot(b) < Math.cos(20 * Math.PI / 180)) sfera(punti[i])
+    }
   }
   return T.mergeGeometries(pezzi)
 }
 
-export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) {
+// poche: meno luci (ognuna si calcola per ogni pixel di ogni materiale, anche spenta): una lampada nell'insegna invece
+// di quattro, i lampioni di là senza luce, l'auto con un faro solo e senza il rosso dei freni né il neon sotto
+export async function costruisci(scene, M, { palazzi: conPalazzi = true, poche = false } = {}) {
   const { W, H, telefono } = M
   const h = {} // quello che la scena deve poter muovere o accendere
   const TETTO = Math.max(8, H + 4.4) // il filo alto della facciata
   const ombra = (m, getta = true, riceve = true) => { m.castShadow = getta; m.receiveShadow = riceve; return m }
 
   // ── materiali ──────────────────────────────────────────────────────────────
-  const [lam, lamR] = await Promise.all([immagine(ART + 'lamiera.webp'), immagine(ART + 'lamiera-r.webp')])
+  // le trame: la lamiera (dalla foto) e l'intonaco, le lastre e l'asfalto, disegnati una volta da tools/pzkko/scena/trame.mjs
+  // con le funzioni di materiali.js (calcolarli qui erano due secondi di pagina ferma); tutte insieme, in parallelo
+  const TRAME = ART + 'trame/'
+  const ripete = (src, colore = true) => immagine(src, { ripeti: true }).then((t) => { if (!colore) t.colorSpace = T.NoColorSpace; t.anisotropy = 8; return t })
+  const [lam, lamR, ...tr] = await Promise.all([immagine(ART + 'lamiera.webp'), immagine(ART + 'lamiera-r.webp'),
+    ripete(TRAME + 'intonaco.webp'), ripete(TRAME + 'intonaco-n.webp', false),
+    ripete(TRAME + 'lastre.webp'), ripete(TRAME + 'lastre-n.webp', false), ripete(TRAME + 'lastre-a.webp', false),
+    ripete(TRAME + 'asfalto.webp'), ripete(TRAME + 'asfalto-n.webp', false)])
+  // (lato: i metri di una trama, come in materiali.js)
+  const into = { map: tr[0], normalMap: tr[1], lato: 1 }, las = { map: tr[2], normalMap: tr[3], asciutto: tr[4], lato: 1.2 }, asf = { map: tr[5], normalMap: tr[6], lato: 2 }
   lam.wrapS = T.MirroredRepeatWrapping; lam.wrapT = T.RepeatWrapping; lam.anisotropy = 16
   lamR.wrapS = T.MirroredRepeatWrapping; lamR.wrapT = T.RepeatWrapping; lamR.colorSpace = T.NoColorSpace
   const mLamiera = new T.MeshStandardMaterial({ map: lam, roughnessMap: lamR, roughness: 1, metalness: 0.22, color: 0xe8e9e6 })
-  const into = intonaco(512, 7)
   // il colore (le chiazze della pittura vecchia) si ripete ogni 4 m, il rilievo ogni metro: da lontano non si vede il
   // motivo a quadretti di una piastrella da un metro
   into.map.repeat.set(0.25, 0.25); into.normalMap.repeat.set(1, 1)
@@ -97,12 +122,16 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
   const mGomma = new T.MeshStandardMaterial({ color: 0x111111, roughness: 0.95 })
 
   // ── la saracinesca: doghe bombate, il canale al giunto, qualche ammaccatura ──
+  // Otto righe per doga, fitte al giunto (dove c'è il canale, stretto) e larghe sulla pancia (che è dolce); in larghezza
+  // una colonna ogni ~17 cm (l'ammaccatura è un'onda larga un metro). La bombatura è concava: fra due righe la lamiera
+  // sta sotto la curva vera, e la carta (fogli.js) sopra, che la segue con le sue righe
   {
     const x0 = -0.02, x1 = W + 0.02, y0 = -0.02, y1 = H + 0.3
-    const nx = 40, doghe = Math.ceil((y1 - y0) / DOGA), perDoga = 14, ny = doghe * perDoga
+    const RIGHE = [0, 0.04, 0.1, 0.25, 0.5, 0.75, 0.9, 0.96]
+    const nx = Math.max(6, Math.round((x1 - x0) / 0.17)), doghe = Math.ceil((y1 - y0) / DOGA), perDoga = RIGHE.length, ny = doghe * perDoga
     const pos = [], uv = [], idx = []
     for (let j = 0; j <= ny; j++) {
-      const yd = (j / perDoga) * DOGA // distanza dalla cima (y1 è un giunto)
+      const yd = (Math.floor(j / perDoga) + (RIGHE[j % perDoga] ?? 0)) * DOGA // distanza dalla cima (y1 è un giunto)
       const y = y1 - yd
       for (let i = 0; i <= nx; i++) {
         const x = x0 + ((x1 - x0) * i) / nx
@@ -120,6 +149,8 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2))
     g.setIndex(idx); g.computeVertexNormals()
     h.saracinesca = ombra(new T.Mesh(g, mLamiera), true, true)
+    // dopo i fogli (fogli.js, renderOrder -1 quando sono opachi): dove c'è carta la lamiera non si calcola
+    h.saracinesca.renderOrder = 1
     scene.add(h.saracinesca)
     // le guide ai lati, la barra in basso con la serratura e il gommino
     scene.add(ombra(scatola(0.05, H + 0.3, 0.09, mFerroVerniciato, -0.045, H / 2 + 0.14, 0.03)))
@@ -221,12 +252,12 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     // le lettere: tubi bianchi di metacrilato, che di notte si scaldano di luce; davanti il filo del neon
     const zl = z0 + PROF - 0.012 + 0.03 * k
     h.lettere = new T.MeshPhysicalMaterial({ color: 0xf4f2ec, roughness: 0.3, clearcoat: 0.5, clearcoatRoughness: 0.3, emissive: 0xffb45c, emissiveIntensity: 0 })
-    const lett = ombra(new T.Mesh(lettere(cxl, cyl, s, 0.032 * k, zl), h.lettere)); scene.add(lett)
+    const lett = ombra(new T.Mesh(lettere(cxl, cyl, s, 0.032 * k, zl, 8), h.lettere)); scene.add(lett)
     h.neon = new T.MeshBasicMaterial({ color: 0xfff1d8, transparent: true, opacity: 0 })
-    const neon = new T.Mesh(lettere(cxl, cyl, s, 0.008 * k, zl + 0.032 * k), h.neon); scene.add(neon)
-    // la luce che l'insegna manda sul muro e sulla saracinesca: quattro lampade davanti al pannello (una sul telefono, che
-    // fa la luce di quattro); l'intensità di ognuna la usa luci.js
-    const posti = telefono ? [0] : [-0.4, -0.13, 0.13, 0.4]
+    const neon = new T.Mesh(lettere(cxl, cyl, s, 0.008 * k, zl + 0.032 * k, 5), h.neon); scene.add(neon)
+    // la luce che l'insegna manda sul muro e sulla saracinesca: quattro lampade davanti al pannello (una sul telefono e
+    // con poche luci, che fa la luce di quattro); l'intensità di ognuna la usa luci.js
+    const posti = telefono || poche ? [0] : [-0.4, -0.13, 0.13, 0.4]
     h.luciInsegna = posti.map((f) => { const l = new T.PointLight(0xffb45c, 0, 4, 2); l.position.set(cxl + 0.9 * k * f, cyl - 0.05 * k, z0 + PROF + 0.45 * k); scene.add(l); return l })
     h.luceInsegna = 0.35 * (4 / posti.length) * k * k
     // le colature della pioggia sul muro, sotto il cassonetto
@@ -265,7 +296,6 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
 
   // ── il marciapiede bagnato, il cordolo, la strada, il marciapiede di là ──────
   {
-    const las = lastre(512, 21)
     const X0 = -6, X1 = W + 9, Z0 = Z_FACCIATA, Z1 = 2.3
     const g = new T.PlaneGeometry(X1 - X0, Z1 - Z0)
     h.pozze = specchio(g, 512, 256, 0x4e4e4e, 1, 1)
@@ -277,7 +307,6 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     // la soglia di pietra sotto la saracinesca, il cordolo, la strada, il marciapiede di fronte
     scene.add(ombra(scatola(W + 0.2, 0.03, 0.3, mPietra, W / 2, -0.015, -0.05), false, true))
     scene.add(ombra(scatola(X1 - X0, 0.15, 0.2, mPietra, (X0 + X1) / 2, -0.06, Z1 + 0.1)))
-    const asf = asfalto(256, 33)
     const strada = { x0: -30, x1: W + 30, z0: Z1 + 0.2, z1: 16 }
     for (const t of [asf.map, asf.normalMap]) t.repeat.set((strada.x1 - strada.x0) / asf.lato, (strada.z1 - strada.z0) / asf.lato)
     const road = ombra(new T.Mesh(new T.PlaneGeometry(strada.x1 - strada.x0, strada.z1 - strada.z0), new T.MeshStandardMaterial({ map: asf.map, normalMap: asf.normalMap, roughness: 0.55, metalness: 0.05 })), false, true)
@@ -306,8 +335,8 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
       const testa = new T.Mesh(new T.BoxGeometry(0.55, 0.18, 0.3), mFerro); testa.position.set(lx, 7.4, Z - 0.9); scene.add(ombra(testa))
       const bulbo = new T.Mesh(new T.PlaneGeometry(0.45, 0.22), new T.MeshStandardMaterial({ color: 0x333333, emissive: 0xffd090, emissiveIntensity: 0 }))
       bulbo.rotation.x = -Math.PI / 2; bulbo.position.set(lx, 7.3, Z - 0.9); scene.add(bulbo)
-      // (sul telefono solo la lampadina accesa, senza la luce: è lontana, e una luce in meno conta)
-      const luce = telefono ? null : new T.PointLight(0xffd090, 0, 40, 2)
+      // (sul telefono e con poche luci solo la lampadina accesa, senza la luce: è lontana, e una luce in meno conta)
+      const luce = telefono || poche ? null : new T.PointLight(0xffd090, 0, 40, 2)
       if (luce) { luce.position.set(lx, 7.1, Z - 0.9); scene.add(luce) }
       return { luce, bulbo }
     })
@@ -328,22 +357,27 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     h.autoFari = new T.MeshStandardMaterial({ color: 0x333333, emissive: 0xffe2aa, emissiveIntensity: 0 })
     h.autoFanali = new T.MeshStandardMaterial({ color: 0x3a0a0a, emissive: 0xff2418, emissiveIntensity: 0 })
     for (const z of [0.6, -0.6]) { auto.add(scatola(0.05, 0.16, 0.4, h.autoFari, 2.2, 0.7, z)); auto.add(scatola(0.05, 0.14, 0.4, h.autoFanali, -2.2, 0.72, z)) }
-    h.autoLuci = [0.6, -0.6].map((z) => {
-      // i fari guardano avanti e un po' verso il muro (la strada è stretta): così passando lo spazzano
+    // i fari guardano avanti e un po' verso il muro (la strada è stretta): così passando lo spazzano; con poche luci un
+    // faro solo, al centro, che fa la luce di due
+    h.autoLuci = (poche ? [0] : [0.6, -0.6]).map((z) => {
       const s = new T.SpotLight(0xffe2aa, 0, 30, 0.87, 0.55, 2)
       s.position.set(2.2, 0.7, z); s.target.position.set(8.4, 0.1, z - 10); auto.add(s); auto.add(s.target)
       return s
     })
-    h.autoFreno = new T.PointLight(0xff2418, 0, 6, 2); h.autoFreno.position.set(-2.4, 0.7, 0); auto.add(h.autoFreno)
-    h.autoNeon = telefono ? null : new T.PointLight(0x28dcff, 0, 5, 2)
+    h.luceFari = 110 * (2 / h.autoLuci.length)
+    h.autoFreno = poche ? null : new T.PointLight(0xff2418, 0, 6, 2)
+    if (h.autoFreno) { h.autoFreno.position.set(-2.4, 0.7, 0); auto.add(h.autoFreno) }
+    h.autoNeon = telefono || poche ? null : new T.PointLight(0x28dcff, 0, 5, 2)
     if (h.autoNeon) { h.autoNeon.position.set(0, 0.25, 0); auto.add(h.autoNeon) }
-    // l'auto resta sempre nella scena, con le luci a zero quando non passa: si nasconde solo la carrozzeria. three conta
-    // solo le luci visibili, e il numero delle luci entra nei programmi di tutti i materiali illuminati: nascondere il
-    // gruppo intero voleva dire ricompilarli tutti al primo passaggio (su Windows, secondi di blocco)
+    // l'auto resta sempre nella scena, con le luci a zero quando non passa: si nasconde solo la carrozzeria (le luci
+    // visibili decidono i programmi di tutti i materiali: luci.js le accende e spegne a insiemi, compilati a parte)
     h.autoCorpo = auto.children.filter((o) => o.isMesh)
     for (const o of h.autoCorpo) o.visible = false
     scene.add(auto); h.auto = auto
   }
+
+  // le luci della notte, quelle che di giorno non ci sono (luci.js le accende a insiemi: giorno, sera, notte)
+  h.luciNotte = [...h.luciInsegna, h.lampada, h.lampione, ...h.lampioni.map((l) => l.luce), ...h.autoLuci, h.autoFreno, h.autoNeon].filter(Boolean)
 
   return h
 }

@@ -13,44 +13,24 @@
 // parete è quella del telefono (due colonne, stretta e alta) e la saracinesca è
 // larga 0,95 m invece di 2,05: i volantini restano grandi come quelli veri.
 // Prove: ?muro=1 (niente 3D), ?intro=0 (niente arrivo), ?allinea=1 (il DOM in
-// trasparenza sopra la scena), ?qualita=alta|media|bassa|telefono, ?filtro=0,
+// trasparenza sopra la scena), ?qualita=alta|media|bassa|telefono, ?dpr=1 (la
+// risoluzione interna; con ?qualita= o ?dpr= la scena non si adatta da sola),
 // ?glb=1 (scarica la scena in glTF per Blender), più quelle della pagina
 // (?ora=18:30, ?veloce=60, ?notte=1, ?auto=1).
 import * as T from './lib/three.js'
-import { costruisci, prossimoFotogramma, specchiSubito } from './mondo.js'
+import { costruisci, prossimoFotogramma, specchiModo } from './mondo.js'
 import { fogli } from './fogli.js'
 import { luci } from './luci.js'
 
-// Il filtro «da videogioco»: grana che si muove, un filo di aberrazione cromatica
-// ai bordi, vignetta, righe sottili e un colore un po' sporco, sopra l'immagine
-// già a colori finiti (dopo l'OutputPass). ?filtro=0 lo toglie.
-const FILTRO = {
-  uniforms: { tDiffuse: { value: null }, tempo: { value: 0 }, risoluzione: { value: new T.Vector2(1, 1) }, grana: { value: 0.055 }, aberrazione: { value: 0.008 }, vignetta: { value: 0.36 }, righe: { value: 0.045 } },
-  vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }`,
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float tempo, grana, aberrazione, vignetta, righe; uniform vec2 risoluzione; varying vec2 vUv;
-    float caso( vec2 p ) { return fract( sin( dot( p, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 ); }
-    void main() {
-      vec2 d = vUv - 0.5; float r2 = dot( d, d );
-      vec2 sposta = d * r2 * aberrazione;
-      vec3 c = vec3( texture2D( tDiffuse, vUv + sposta ).r, texture2D( tDiffuse, vUv ).g, texture2D( tDiffuse, vUv - sposta ).b );
-      float g = caso( floor( vUv * risoluzione / 1.5 ) + fract( tempo * 0.37 ) * 97.0 ) - 0.5;
-      c += g * grana * ( 0.6 + 0.4 * ( 1.0 - c.g ) );
-      c *= 1.0 - righe * ( 0.5 + 0.5 * sin( vUv.y * risoluzione.y * 1.4 ) );
-      c *= 1.0 - vignetta * smoothstep( 0.12, 0.65, r2 );
-      c = mix( c, c * vec3( 0.97, 1.0, 0.92 ), 0.55 );
-      gl_FragColor = vec4( c, 1.0 );
-    }`,
-}
-
-// I livelli di qualità. dpr = la risoluzione interna rispetto ai pixel CSS (la
-// grana del filtro nasconde la morbidezza); msaa = l'anti-alias; specchi = la
-// tela del vetro e delle pozzanghere; ombra = la mappa del sole. Il telefono ha
-// il suo: tanti pixel (il testo dei volantini si deve leggere) ma niente MSAA.
+// I livelli di qualità (niente anti-alias in nessuno). dpr = la risoluzione interna rispetto ai pixel CSS, che non
+// scende mai: è lei che decide se le immagini sono nitide, il resto si può togliere; specchi = la tela del vetro e
+// delle pozzanghere; ombra = la mappa del sole; bloom = la risoluzione del bagliore rispetto ai pixel CSS (0 = niente);
+// luci = «tutte» o «poche» (mondo.js).
 const LIVELLI = {
-  alta: { dpr: 1.25, msaa: 4, specchi: [768, 512], ombra: 2048, bloom: true },
-  media: { dpr: 0.9, msaa: 2, specchi: [512, 256], ombra: 1024, bloom: true },
-  bassa: { dpr: 0.75, msaa: 0, specchi: [384, 192], ombra: 1024, bloom: false },
-  telefono: { dpr: 1.5, msaa: 0, specchi: [384, 192], ombra: 1024, bloom: true },
+  alta: { dpr: 1.25, specchi: [768, 512], ombra: 2048, bloom: 1, luci: 'tutte' },
+  media: { dpr: 1, specchi: [512, 256], ombra: 1024, bloom: 0.5, luci: 'poche' },
+  bassa: { dpr: 1, specchi: [256, 128], ombra: 1024, bloom: 0, luci: 'poche', palazzi: false },
+  telefono: { dpr: 1.5, specchi: [384, 192], ombra: 1024, bloom: 1, luci: 'poche' },
 }
 // Dalla scheda grafica, se si lascia riconoscere: le integrate (Intel, Apple,
 // Mali, Adreno) e gli emulatori partono da «media»; poi, se i primi fotogrammi
@@ -66,8 +46,17 @@ const qualitaIniziale = (renderer, chiesta, telefono) => {
   return 'alta'
 }
 
-// l'arrivo: quanto si resta da lontano (almeno, al massimo) e quanto dura il volo
-const ATTESA_MIN = 1800, ATTESA_MAX = 9000, VOLO = 2600
+// l'arrivo: quanto si resta da lontano dopo la schermata di caricamento (almeno, al massimo) e quanto dura il volo;
+// quanto si aspettano le foto al massimo, dietro la schermata, prima di mostrare la scena lo stesso
+const ATTESA_MIN = 900, ATTESA_MAX = 20000, VOLO = 2600, CARICO_MAX = 25000
+// la barra di caricamento (il caricatore in index.html): fin qui i moduli, la costruzione, gli shader; il resto le foto
+const CARICO = { moduli: 0.12, costruita: 0.3, shader: 0.4 }
+const carico = (p) => window.pzkkoCarico?.(p)
+// la telecamera non scende sotto mezzo metro da terra: più giù, in fondo alla pagina, guarderebbe il marciapiede da
+// sotto (il piano si vede da una faccia sola: sotto c'è il cielo). La proiezione è decentrata, la parete resta dov'è
+const ALTEZZA_MIN = 0.5
+// il sole gira di 0,25° al minuto: la sua ombra si rifà quando si è spostato di 0,15°
+const COS_SOLE = Math.cos(0.15 * Math.PI / 180)
 const liscia = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * x * (x * (x * 6 - 15) + 10) }
 
 export async function avvia() {
@@ -75,6 +64,7 @@ export async function avvia() {
   const parete = document.querySelector('.parete'), strada = document.querySelector('.strada'), portale = document.querySelector('.portale')
   if (!parete) throw new Error('manca la parete')
   const t0 = performance.now()
+  carico(CARICO.moduli)
   const sottile = matchMedia('(max-width:899px)')
   const telefono = sottile.matches
   // girare il telefono o allargare la finestra oltre i 900 px cambia la disposizione dei fogli: si ricomincia
@@ -99,7 +89,9 @@ export async function avvia() {
 async function scena({ root, q, parete, strada, portale, t0, telefono, tela, renderer }) {
   const qualita = qualitaIniziale(renderer, q.get('qualita'), telefono)
   const liv = { ...LIVELLI[qualita] }
-  let dpr = Math.min(devicePixelRatio, liv.dpr)
+  // (?qualita= e ?dpr= sono per le prove: con quelli la scena non si adatta da sola)
+  const fissa = q.has('qualita') || q.has('dpr')
+  let dpr = Number(q.get('dpr')) || Math.min(devicePixelRatio, liv.dpr)
   renderer.setPixelRatio(dpr)
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = T.PCFShadowMap
@@ -117,26 +109,26 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   const scene = new T.Scene()
   const camera = new T.PerspectiveCamera(40, 1, 0.05, 220)
   scene.add(camera)
-  const [h, f] = await Promise.all([costruisci(scene, M, { palazzi: qualita !== 'bassa' }), fogli(scene, M)])
+  // (prima i fogli: chiedono le foto, che si scaricano e decodificano per conto loro mentre il posto si costruisce,
+  // due secondi di trame disegnate al volo)
+  const [f, h] = await Promise.all([fogli(scene, M, renderer), costruisci(scene, M, { palazzi: liv.palazzi !== false, poche: liv.luci === 'poche' })])
   const l = luci(scene, renderer, h, M)
   const tCostruita = performance.now()
+  carico(CARICO.costruita)
 
-  // ── il post-processing: anti-alias MSAA, il bagliore dei neon, i colori, il filtro ──
-  const target = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: liv.msaa })
+  // ── il post-processing: il bagliore dei neon, poi i colori (l'OutputPass, l'ultimo, disegna sullo schermo) ──
+  const target = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType })
   const composer = new T.EffectComposer(renderer, target)
   composer.setPixelRatio(dpr)
   composer.addPass(new T.RenderPass(scene, camera))
   const bloom = new T.UnrealBloomPass(new T.Vector2(1, 1), 0.55, 0.5, 1.0)
   composer.addPass(bloom)
-  composer.addPass(new T.OutputPass())
-  const filtro = new T.ShaderPass(FILTRO)
-  filtro.enabled = q.get('filtro') !== '0'
-  composer.addPass(filtro)
+  const uscita = new T.OutputPass()
+  composer.addPass(uscita)
   const specchi = ([v, p]) => { h.vetro.getRenderTarget().setSize(v, v); h.pozze.getRenderTarget().setSize(p, p / 2) }
   specchi(liv.specchi)
   if (liv.ombra !== 2048) l.sole.shadow.mapSize.set(liv.ombra, liv.ombra)
-  // le mappe d'ombra si rifanno solo quando si dice (sotto, in fotogramma): le luci restano sempre «con ombra», così i
-  // materiali si compilano una volta sola e non si accendono/spengono programmi a ogni tramonto
+  // le mappe d'ombra si rifanno solo quando si dice (sotto, in fotogramma)
   l.sole.shadow.autoUpdate = false
   h.lampada.shadow.autoUpdate = false
 
@@ -158,8 +150,8 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
       dim.w = w; dim.h = hh
       renderer.setSize(w, hh, false)
       composer.setSize(w, hh)
-      bloom.setSize(w, hh)
-      filtro.uniforms.risoluzione.value.set(w * dpr, hh * dpr)
+      // (il bagliore a una risoluzione sua, più bassa: è sfocato comunque)
+      bloom.setSize(Math.max(2, w * (liv.bloom || 1)), Math.max(2, hh * (liv.bloom || 1)))
     }
     // lo spazio in più da scorrere, sopra (l'insegna) e sotto (il marciapiede)
     const px = parete.offsetWidth / M.W // pixel per metro sul piano della saracinesca
@@ -179,19 +171,24 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   // che si vede (centro wx, wy e mezza altezza hv) e dove sta la telecamera rispetto al centro (ox, oy). La
   // proiezione è decentrata, come un obiettivo decentrabile: le verticali restano verticali anche guardando in su.
   camera.updateProjectionMatrix = () => {}
+  const ultima = {}
+  // mette la telecamera; dice se si è mossa rispetto al fotogramma prima (gli specchi, che se no non si rifanno)
   const metti = (p) => {
+    let mossa = false
+    for (const k in p) if (ultima[k] !== p[k]) { mossa = true; ultima[k] = p[k] }
     const camX = p.wx + p.ox, camY = p.wy + p.oy, n = camera.near
     const hw = p.hv * dim.w / dim.h
     camera.position.set(camX, camY, p.d)
     camera.projectionMatrix.makePerspective((p.wx - hw - camX) * n / p.d, (p.wx + hw - camX) * n / p.d, (p.wy + p.hv - camY) * n / p.d, (p.wy - p.hv - camY) * n / p.d, n, camera.far)
     camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert()
+    return mossa
   }
   // vicino: la saracinesca 3D dove sta la parete del DOM, pixel per pixel
   const vicino = () => {
     const left = base.x - sx, top = base.y - sy, fpm = base.w / M.W
     const cx = M.W / 2 - (left + base.w / 2 - dim.w / 2) / fpm
     const cy = M.H - (dim.h / 2 - top) / fpm
-    const camX = cx + (telefono ? 0.1 : 0.3), camY = telefono ? cy - 0.2 : 0.75 + 0.55 * cy
+    const camX = cx + (telefono ? 0.1 : 0.3), camY = Math.max(ALTEZZA_MIN, telefono ? cy - 0.2 : 0.75 + 0.55 * cy)
     return { d: DIST, wx: cx, wy: cy, hv: dim.h / (2 * fpm), ox: camX - cx, oy: camY - cy }
   }
   // lontano: dall'altra parte del marciapiede, ad altezza d'occhio, tutto il negozio nell'inquadratura, con lo stesso
@@ -219,7 +216,8 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   const ridotto = matchMedia('(prefers-reduced-motion: reduce)').matches || q.get('intro') === '0'
   let fase = ridotto ? 'fatto' : 'lontano', tVia = 0, prontiFogli = false, salta = false, visibile = false, arrivata = () => {}
   f.pronti.then(() => { prontiFogli = true })
-  // toccare, scorrere o premere un tasto mentre si guarda da lontano fa partire il volo subito
+  // toccare, scorrere o premere un tasto mentre si guarda da lontano accorcia l'attesa (ma si parte lo stesso solo a
+  // fogli pronti: all'arrivo dev'essere tutto a bordo, senza foto che compaiono dopo)
   const fretta = () => { salta = true }
   for (const ev of ['wheel', 'touchstart', 'keydown', 'pointerdown']) addEventListener(ev, fretta, { passive: true, once: true })
   const posa = (now) => {
@@ -228,7 +226,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     if (fase === 'lontano') {
       // (finché la tela non si vede si resta da lontano: il tempo si conta da quando la strada compare)
       const attesa = visibile ? now - tVista : 0
-      if ((attesa > ATTESA_MIN && prontiFogli) || attesa > ATTESA_MAX || (salta && attesa > 700)) { fase = 'avvicina'; tVia = now }
+      if ((prontiFogli && (attesa > ATTESA_MIN || (salta && attesa > 700))) || attesa > ATTESA_MAX) { fase = 'avvicina'; tVia = now }
       else return lontano(now, b.hv / b.d)
     }
     const s = liscia((now - tVia) / VOLO)
@@ -236,48 +234,115 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     return vola(lontano(now, b.hv / b.d), b, s)
   }
 
+  // ── gli shader: ogni insieme di luci (luci.js) vuole i suoi programmi, compilati prima di usarli ──
+  // Un programma che manca al momento di disegnare si compila lì, bloccando (su Windows ~200 ms l'uno: erano secondi di
+  // nero). La chiave di un programma comprende la destinazione (la tela del post-processing, dove three toglie il tone
+  // mapping, o lo schermo), la nebbia e le luci della scena in cui si disegna, e se il materiale è opaco; quindi:
+  // - la scena si compila dentro la sua tela, col cielo già pronto come ambiente (l.aggiorna: entra nei materiali), con
+  //   la carrozzeria dell'auto (nascosta finché non passa) e con la carta sia trasparente sia opaca (fogli.js la fa
+  //   opaca finita la dissolvenza);
+  // - i quadri del bagliore dentro la tela (di giorno è spento e si accenderebbe la sera con uno scatto) e l'OutputPass
+  //   sullo schermo: ognuno con la mesh del suo FullScreenQuad (un triangolo con solo posizione
+  //   e uv: anche gli attributi della geometria entrano nella chiave, con un piano qualunque non combaciava); i campi
+  //   _fsQuad e _mesh sono privati per convenzione, ma three è quella in lib/, ferma. L'OutputPass decide le sue
+  //   define al primo render: gli si danno prima.
+  // Restano ai primi fotogrammi (a tela nascosta) i materiali di profondità delle ombre, che three crea da sé.
+  // L'insieme di partenza si compila a tela nascosta, tutto insieme; quando la sera ne serve un altro si compila in
+  // sottofondo un pezzo per fotogramma (mettere in coda un programma costa ~40 ms sul filo principale, tutti insieme
+  // era un secondo fermo; la scheda poi compila per conto suo, intanto si continua con le luci di prima) e si mette
+  // quando è tutto pronto.
+  uscita._outputColorSpace = renderer.outputColorSpace; uscita._toneMapping = renderer.toneMapping
+  uscita.material.defines = { SRGB_TRANSFER: '', AGX_TONE_MAPPING: '' }; uscita.material.needsUpdate = true
+  const quadri = [
+    ...[bloom.materialHighPassFilter, ...bloom.separableBlurMaterials, bloom.compositeMaterial, bloom.blendMaterial].filter(Boolean).map((m) => [bloom._fsQuad, m, true]),
+    [uscita._fsQuad, uscita.material, false],
+  ]
+  const compilati = new Set()
+  let compilando = null
+  const fotogrammaDopo = () => new Promise((r) => requestAnimationFrame(r))
+  // i pezzi da compilare: ogni oggetto della scena (con l'auto), col suo materiale com'è e, per la carta, anche opaco;
+  // i quadri del post-processing. Ogni pezzo è una chiamata a renderer.compile (mette in coda i programmi: la scheda li
+  // compila per conto suo, e sotto si aspetta che siano pronti) con le luci dell'insieme messe
+  const pezziDaCompilare = function* () {
+    const visti = new Set(), oggetti = []
+    scene.traverse((o) => { if (o.isMesh && o.material && !visti.has(o.material)) { visti.add(o.material); oggetti.push(o) } })
+    const carta = new Set(f.pezzi.filter((p) => p.opaco).map((p) => p.mesh))
+    const dentro = (o, opaco) => () => {
+      const era = o.visible, t = o.material.transparent
+      o.visible = true
+      if (opaco) o.material.transparent = false
+      renderer.setRenderTarget(composer.renderTarget1)
+      renderer.compile(o, camera, scene)
+      o.visible = era; o.material.transparent = t
+    }
+    for (const o of oggetti) {
+      yield dentro(o, false)
+      if (carta.has(o) && o.material.transparent) yield dentro(o, true)
+    }
+    for (const [fq, m, dentroTela] of quadri) yield () => {
+      const prima = fq.material
+      fq.material = m
+      renderer.setRenderTarget(dentroTela ? composer.renderTarget1 : null)
+      renderer.compile(fq._mesh, camera)
+      fq.material = prima
+    }
+  }
+  const compila = async (nome, { subito = false } = {}) => {
+    const prima = l.attuale()
+    for (const pezzo of pezziDaCompilare()) {
+      l.metti(nome)
+      pezzo()
+      renderer.setRenderTarget(null)
+      if (prima) l.metti(prima)
+      if (!subito) await fotogrammaDopo()
+    }
+    // i programmi si aspettano uno per uno (la scheda compila in parallelo, per conto suo)
+    while (!renderer.info.programs.every((p) => p.isReady())) await fotogrammaDopo()
+    compilati.add(nome)
+  }
+  // l'insieme che serve è cambiato: si mette se è compilato, se no si compila (e si mette al fotogramma in cui è pronto)
+  const cambia = (nome) => {
+    if (compilati.has(nome)) return l.metti(nome)
+    if (!compilando) compilando = compila(nome).catch((e) => console.warn('scena 3D: luci non compilate', e)).finally(() => { compilando = null })
+    return false
+  }
+
   // ── un fotogramma ──────────────────────────────────────────────────────────
   let n = 0
+  const ultimoSole = new T.Vector3()
   const fotogramma = (now, dt) => {
     const stato = l.aggiorna(now, dt)
     f.aggiorna(dt, now)
-    metti(posa(now))
-    // le ombre si rifanno solo quando qualcosa si muove (un foglio che si alza o compare, un tagliando, l'auto) e
-    // comunque ogni 24 fotogrammi per il sole che gira (non dipendono dalla telecamera: il volo non le tocca)
+    const acceso = stato.insieme !== l.attuale() && cambia(stato.insieme)
+    const mossa = metti(posa(now))
     n++
-    const mosso = n < 4 || n % 24 === 0 || stato.auto || f.inMoto(now)
-    // di notte la lampada decide le ombre, di giorno il sole: la mappa di chi è spento non si rifà
-    // (nei primi fotogrammi tutte e due, così le mappe esistono: un sampler d'ombra senza mappa è un errore GL)
-    l.sole.shadow.needsUpdate = n < 4 || (mosso && stato.giorno > 0.02 && stato.notte < 0.98)
-    h.lampada.shadow.needsUpdate = n < 4 || (mosso && h.lampada.intensity > 0)
-    // gli specchi a ogni fotogramma quando la telecamera si muove o passa un'auto, se no uno sì e uno no
-    specchiSubito(stato.auto || fase !== 'fatto')
-    filtro.uniforms.tempo.value = now / 1000
+    // le ombre si rifanno solo quando qualcosa si muove (un foglio che si alza o compare, un tagliando, l'auto), quando il
+    // sole si è spostato di 0,15° (ogni ~40 s) e quando una luce si è appena accesa (non dipendono dalla telecamera:
+    // il volo non le tocca). Di chi è spento non si rifanno (nei primi fotogrammi sì, così le mappe esistono: un
+    // sampler d'ombra senza mappa è un errore GL)
+    const mosso = n < 4 || stato.auto || f.inMoto(now)
+    if (l.sole.visible && (mosso || acceso || stato.dir.dot(ultimoSole) < COS_SOLE)) { l.sole.shadow.needsUpdate = true; ultimoSole.copy(stato.dir) }
+    if (h.lampada.visible && (mosso || acceso)) h.lampada.shadow.needsUpdate = true
+    // gli specchi: fermi finché niente si muove (il riflesso di prima è ancora giusto; ogni mezzo secondo comunque, per
+    // la sera che avanza e lo sfarfallio), uno sì e uno no quando la telecamera si muove, tutti e due a ogni fotogramma
+    // nel volo e quando passa un'auto se la scheda ce la fa
+    const vivo = mossa || mosso || acceso || fase !== 'fatto' || n % 32 === 0
+    specchiModo(!vivo ? 'fermi' : qualita === 'alta' && (stato.auto || fase !== 'fatto') ? 'tutti' : 'alterni')
     // il bagliore: solo quando fa buio (di giorno non c'è niente di così acceso, e costa)
-    bloom.enabled = liv.bloom && stato.buio > 0.15
+    bloom.enabled = liv.bloom > 0 && stato.buio > 0.15
     bloom.threshold = 1.5 + 2 * (1 - stato.buio); bloom.strength = 0.12 + 0.25 * stato.buio
     composer.render()
     prossimoFotogramma()
   }
 
-  // ── gli shader si compilano prima di mostrare la scena, poi tre fotogrammi a vuoto (la tela è ancora trasparente) ──
-  // La scena si disegna dentro la tela del post-processing, e lì three toglie il tone mapping: i programmi vanno
-  // compilati con quella tela come destinazione, se no si compilano le varianti per lo schermo e quelle vere al primo
-  // fotogramma, una alla volta e bloccando (su Windows ~200 ms l'una: erano cinque secondi di nero). Prima si prepara
-  // il cielo come ambiente (l.aggiorna), che entra nei programmi dei materiali; insieme si compilano i materiali del
-  // bagliore, che di giorno è spento e si accenderebbe la sera con uno scatto, e il filtro, che va sullo schermo.
+  // ── gli shader dell'insieme di partenza, poi tre fotogrammi a vuoto (la tela è ancora trasparente) ──
   tVista = performance.now()
-  l.aggiorna(tVista, 1 / 60)
+  const s0 = l.aggiorna(tVista, 1 / 60)
+  l.metti(s0.insieme)
   metti(posa(tVista))
-  const quadri = new T.Scene(), quad = new T.PlaneGeometry(2, 2)
-  for (const mat of [bloom.materialHighPassFilter, ...bloom.separableBlurMaterials, bloom.compositeMaterial, bloom.blendMaterial]) if (mat) quadri.add(new T.Mesh(quad, mat))
-  const schermo = new T.Scene(); schermo.add(new T.Mesh(quad, filtro.material))
-  renderer.setRenderTarget(composer.renderTarget1)
-  // (le luci entrano nella chiave di ogni programma, anche dei quadri del post-processing: si compilano con quelle della scena)
-  await Promise.all([renderer.compileAsync(scene, camera), renderer.compileAsync(quadri, camera, scene)])
-  renderer.setRenderTarget(null)
-  await renderer.compileAsync(schermo, camera, scene)
+  await compila(s0.insieme, { subito: true })
   const tCompilata = performance.now()
+  carico(CARICO.shader)
   const prog = () => renderer.info.programs?.length ?? 0
   const dettagli = []
   for (let i = 0; i < 3; i++) {
@@ -286,14 +351,30 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     await new Promise((r) => requestAnimationFrame(r))
   }
   const tPronta = performance.now()
-  console.info(`scena 3D: costruita ${(tCostruita - t0).toFixed(0)} ms, shader ${(tCompilata - tCostruita).toFixed(0)} ms, primi fotogrammi ${dettagli.join(' / ')} (programmi ${prog()})`)
+  console.info(`scena 3D: costruita ${(tCostruita - t0).toFixed(0)} ms, shader ${(tCompilata - tCostruita).toFixed(0)} ms, primi fotogrammi ${dettagli.join(' / ')} (programmi ${prog()}, luci «${s0.insieme}»)`)
 
-  // ── si vede: la tela compare in dissolvenza dal nero (scena.css), la telecamera è da lontano ──
-  tVista = performance.now()
-  visibile = true
-  root.classList.add('scena-vista')
+  // ── dietro la schermata di caricamento: la scena gira già (la tela è trasparente sotto la schermata) e carica le foto
+  // sulla scheda; la barra va con loro. Quando sono tutte a bordo (o dopo CARICO_MAX) la schermata se ne va, la tela
+  // compare in dissolvenza dal nero (scena.css) con la telecamera da lontano, e dopo un attimo parte il volo ──
+  let vista = () => {}
+  const mostra = (now) => {
+    tVista = now
+    vista()
+    visibile = true
+    root.classList.add('scena-vista')
+    carico(1)
+    console.info(`scena 3D: foto a bordo in ${((now - t0) / 1000).toFixed(1)} s${prontiFogli ? '' : ' (non tutte: troppo tempo)'}`)
+  }
   const tempi = window.pzkkoTempi = []
   let prima = performance.now(), fermo = false, misurati = [], gradini = 0
+  // se la macchina non ce la fa (più di 24 ms a fotogramma, sotto i ~40 al secondo) si toglie qualcosa, fino a tre
+  // volte, ma mai la risoluzione (le immagini devono restare nitide): prima gli specchi e il bagliore a metà, poi le
+  // ombre a 512, poi gli specchi ancora a metà e il bagliore spento
+  const degrada = (g, media) => {
+    if (g === 1 || g === 3) { liv.specchi = liv.specchi.map((x) => Math.max(128, x / 2)); specchi(liv.specchi); liv.bloom = g === 3 ? 0 : Math.min(liv.bloom, 0.5); dim.w = 0; misura() }
+    else { liv.ombra = 512; for (const s of [l.sole.shadow, h.lampada.shadow]) { s.mapSize.set(512, 512); s.needsUpdate = true } }
+    console.info(`scena 3D: ${(media * 1000).toFixed(0)} ms a fotogramma, ${['specchi e bagliore a metà', 'ombre a 512', 'specchi a un quarto, niente bagliore'][g - 1]}`)
+  }
   const giro = (now) => {
     if (fermo) return
     requestAnimationFrame(giro)
@@ -301,38 +382,39 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     prima = now
     const p0 = renderer.info.programs?.length ?? 0, a = performance.now()
     fotogramma(now, dt)
-    if (tempi.length < 900) tempi.push(Math.round(dt * 10000) / 10)
+    if (!visibile) {
+      carico(CARICO.shader + (0.97 - CARICO.shader) * f.avanzamento())
+      if (prontiFogli || now - tPronta > CARICO_MAX) mostra(now)
+    }
+    // (i tempi dei fotogrammi, per foto.mjs, da quando la scena si vede)
+    if (visibile && tempi.length < 900) tempi.push(Math.round(dt * 10000) / 10)
     if (q.get('programmi') !== null) {
       const p1 = renderer.info.programs?.length ?? 0, ms = performance.now() - a
       if (p1 > p0 || ms > 30) console.info(`scena 3D, fotogramma ${n} (${fase}): ${ms.toFixed(0)} ms, ${p1 - p0} programmi nuovi ${renderer.info.programs.slice(p0).map((p) => p.name || p.cacheKey.slice(0, 40)).join(' | ')}`)
     }
-    // se la macchina non ce la fa (più di 24 ms a fotogramma, sotto i ~40 al secondo) si abbassa la risoluzione, fino a
-    // tre volte; si misura mentre si guarda da lontano, che è il momento più pesante (tutti i fogli in vista)
-    if (gradini < 3 && n > 12) {
+    // si misura a foto tutte a bordo (prima i fotogrammi in cui salgono sulla scheda sono lenti per conto loro), mentre
+    // si guarda da lontano: il momento più pesante, tutti i fogli in vista
+    if (!fissa && gradini < 3 && prontiFogli && n > 12) {
       misurati.push(dt)
       if (misurati.length >= 40) {
-        // la mediana, non la media: i fotogrammi in cui arriva un'immagine (la carica sulla scheda) non devono contare
+        // la mediana, non la media: un fotogramma lungo ogni tanto non deve contare
         const media = [...misurati].sort((a, b) => a - b)[misurati.length >> 1]
         misurati = []
-        if (media > 0.024) {
-          gradini++
-          dpr = Math.max(0.55, dpr * 0.8)
-          renderer.setPixelRatio(dpr); composer.setPixelRatio(dpr); dim.w = 0; misura()
-          liv.specchi = liv.specchi.map((x) => Math.max(128, x / 2)); specchi(liv.specchi)
-          console.info(`scena 3D: ${(media * 1000).toFixed(0)} ms a fotogramma, risoluzione ${dpr.toFixed(2)}×`)
-        } else gradini = 3
+        if (media > 0.024) degrada(++gradini, media)
+        else gradini = 3
       }
     }
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo) { fermo = false; prima = performance.now(); requestAnimationFrame(giro) } })
   requestAnimationFrame(giro)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, filtro, h, f, l, M, qualita, fase: () => fase, dpr: () => dpr }
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, M, qualita, liv, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale() }
 
   // ── arrivata: la pagina sotto torna a rispondere (lo fa il caricatore in index.html quando questa promessa si chiude) ──
+  if (!visibile) await new Promise((ok) => { vista = ok })
   if (fase !== 'fatto') await new Promise((ok) => { arrivata = ok })
   root.dataset.scena = 'pronta'
   const sec = (x) => ((x - t0) / 1000).toFixed(1)
-  console.info(`scena 3D: costruita in ${sec(tCostruita)} s, vista in ${sec(tPronta)} s, arrivata in ${sec(performance.now())} s (${qualita}, ${dpr.toFixed(2)}×${telefono ? ', telefono' : ''})`)
+  console.info(`scena 3D: costruita in ${sec(tCostruita)} s, pronta in ${sec(tPronta)} s, vista in ${sec(tVista)} s, arrivata in ${sec(performance.now())} s (${qualita}, ${dpr.toFixed(2)}×${telefono ? ', telefono' : ''}, luci «${l.attuale()}»)`)
 
   // ?glb=1: la scena così com'è, in glTF binario, da aprire in Blender (File › Import › glTF); l'esportatore si scarica solo qui
   if (q.get('glb') !== null) {

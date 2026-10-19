@@ -652,10 +652,31 @@ img{display:block;max-width:100%;height:auto}
 </script>
 <!-- La scena 3D (scena/): dove c'è WebGL2 (computer e telefono) la saracinesca diventa una strada vera, disegnata
      dalla scheda grafica con luci, ombre e riflessi; questa pagina resta sotto, invisibile, a fare tutto il resto.
-     Mentre si scarica il muro di sempre non si vede (html.scena-carico: la pagina trasparente su nero); poi la strada
-     compare da lontano e la telecamera si avvicina; quando è arrivata la pagina torna a rispondere. Se il 3D non parte
-     si torna al muro di sempre. ?muro=1 lo tiene com'è. -->
+     Mentre si scarica c'è la schermata di caricamento (.carico): le foto dei volantini, ripetute, scorrono dentro la
+     barra, accese fin dove è arrivato il caricamento; il muro di sempre non si vede (html.scena-carico: la pagina
+     trasparente su nero). Quando tutto è sulla scheda grafica la schermata se ne va, la strada compare da lontano e
+     la telecamera si avvicina; quando è arrivata la pagina torna a rispondere. Se il 3D non parte si torna al muro di
+     sempre. ?muro=1 lo tiene com'è. -->
 <style>
+/* la schermata di caricamento: sopra tutto (anche il velo dei clic), su nero */
+.carico{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:16px;background:#0c0d0f;color:#e9e4d8;transition:opacity .6s ease}
+.carico.via{opacity:0;pointer-events:none}
+.carico-box{width:min(680px,100%);display:grid;gap:14px}
+.carico-riga{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.carico-testo{margin:0;font:400 15px/1.2 var(--ft);letter-spacing:.02em;opacity:.8}
+.carico-num{font:400 30px/1 var(--fa);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.carico-barra{position:relative;height:clamp(92px,18vw,132px);overflow:hidden;border-radius:3px;background:#17181b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+/* due nastri uguali, uno sopra l'altro: sotto spento, sopra acceso, dentro una finestra ferma (.carico-luce) larga fin
+   dove arriva il caricamento (--p, 0..1; un ritaglio sul nastro che scorre il browser a volte non lo disegnava);
+   ogni nastro ha le foto due volte e scorre di metà della sua lunghezza, così ricomincia senza salto */
+.carico-nastro{position:absolute;top:0;bottom:0;left:0;display:flex;align-items:center;gap:14px;padding-left:14px;width:max-content;animation:carico-scorri var(--durata,30s) linear infinite}
+.carico-nastro img{height:80%;width:auto;aspect-ratio:.72;object-fit:contain;transform:rotate(var(--r,0deg));filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
+/* (il grigio su ogni foto, non sul nastro che scorre: lì, a scheda grafica occupata, il browser lo perdeva) */
+.carico-spento img{filter:grayscale(1) brightness(.38)}
+.carico-luce{position:absolute;top:0;bottom:0;left:0;width:calc(var(--p,0) * 100%);overflow:hidden;transition:width .4s var(--eo)}
+.carico-bordo{position:absolute;top:0;bottom:0;left:calc(var(--p,0) * 100%);width:2px;margin-left:-1px;background:#ffd400;box-shadow:0 0 12px 2px rgba(255,212,0,.55);transition:left .4s var(--eo)}
+@keyframes carico-scorri{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.carico-nastro{animation:none}.carico{transition-duration:.2s}}
 html.scena-carico{background:#0c0d0f}
 html.scena-carico .strada{visibility:hidden}
 /* quando la strada compare da lontano la pagina sotto torna visibile (nel 3D di lei si vedono solo mosche, formiche e la
@@ -677,7 +698,46 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   // il foglio di stile e i moduli si scaricano tutti insieme, non uno dopo l'altro
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/scena/scena.css'; document.head.appendChild(l)
   for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
-  const via = () => { root.classList.remove('scena-carico'); scudo.remove() }
+
+  // la schermata di caricamento. Le foto del nastro sono quelle che la scena metterà sui volantini (scena/fogli.js:
+  // lo stesso nome, la stessa cartella per computer o telefono): il browser le scarica una volta sola, e intanto si
+  // vedono. Ripetute finché il nastro è lungo abbastanza, poi tutto due volte per il giro senza salto
+  const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const cartella = matchMedia('(max-width:899px)').matches ? 'vol-m' : 'vol'
+  const foto = [...document.querySelectorAll('.parete .vol')].filter((el) => getComputedStyle(el).display !== 'none')
+    .map((el) => `/art/scena/${cartella}/${slug(el.id || el.querySelector('h3, .titolo')?.textContent || 'foglio')}.webp`)
+  const giro = []
+  while (foto.length && giro.length < 14) giro.push(...foto)
+  const nastro = (classe) => `<div class="carico-nastro ${classe}" style="--durata:${Math.max(16, giro.length * 1.6)}s">${[...giro, ...giro].map((src, i) => `<img src="${src}" alt="" decoding="async" style="--r:${[-2.5, 1.5, -1, 2.5, -1.5, 1][i % 6]}deg">`).join('')}</div>`
+  const carico = document.createElement('div')
+  carico.className = 'carico'
+  carico.setAttribute('role', 'progressbar'); carico.setAttribute('aria-label', 'Caricamento di pzkko'); carico.setAttribute('aria-valuemin', '0'); carico.setAttribute('aria-valuemax', '100')
+  carico.innerHTML = `<div class="carico-box"><div class="carico-riga"><p class="carico-testo">attacco i volantini…</p><span class="carico-num" aria-hidden="true">0%</span></div>
+    <div class="carico-barra" aria-hidden="true">${nastro('carico-spento')}<div class="carico-luce">${nastro('carico-acceso')}</div><div class="carico-bordo"></div></div></div>`
+  document.body.appendChild(carico)
+  const num = carico.querySelector('.carico-num')
+  const togli = () => { carico.classList.add('via'); setTimeout(() => carico.remove(), 700) }
+  // a che punto è: metà le foto scaricate (le conta questa pagina, dal nastro), metà la scena (scena.js dice 0..1:
+  // i moduli, la costruzione, gli shader, le foto sulla scheda). Solo in avanti; quando la scena dice 1 la schermata se ne va
+  const uniche = [...new Set(foto)]
+  let scaricate = 0, scena = 0, fatto = 0
+  const mostra = () => {
+    const p = scena >= 1 ? 1 : Math.max(fatto, 0.03 + 0.97 * (0.5 * (uniche.length ? scaricate / uniche.length : 1) + 0.5 * scena))
+    if (p === fatto && p < 1) return
+    fatto = p
+    carico.style.setProperty('--p', p.toFixed(3))
+    num.textContent = Math.round(p * 100) + '%'
+    carico.setAttribute('aria-valuenow', String(Math.round(p * 100)))
+    if (p >= 1) togli()
+  }
+  for (const src of uniche) {
+    const img = carico.querySelector(`.carico-acceso img[src="${src}"]`)
+    const conta = () => { scaricate++; mostra() }
+    if (img.complete) conta(); else { img.addEventListener('load', conta, { once: true }); img.addEventListener('error', conta, { once: true }) }
+  }
+  window.pzkkoCarico = (p) => { if (fatto < 1) { scena = Math.max(scena, p); mostra() } }
+  mostra()
+  const via = () => { root.classList.remove('scena-carico'); scudo.remove(); if (carico.isConnected) togli() }
   import('/scena/scena.js').then((m) => m.avvia()).then(via).catch((e) => { console.warn('scena 3D non partita, resta il muro', e); via() })
 })()
 </script>

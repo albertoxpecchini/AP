@@ -13,11 +13,26 @@
 // le immagini arrivano dopo, ognuna quando arriva, e il foglio compare in
 // dissolvenza. Così la scena si può già guardare da lontano mentre si scarica,
 // e il programma dei materiali è lo stesso prima e dopo (niente ricompilazioni).
+// Finita la dissolvenza il foglio diventa opaco: la lamiera sotto non si disegna
+// più (i fogli coprono metà saracinesca, e ogni pixel di lamiera costa quanto
+// uno di carta).
 import * as T from './lib/three.js'
 import { profilo, immagine, DOGA } from './materiali.js'
 
 const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 const DISSOLVENZA = 450 // ms
+
+// La nitidezza: i fogli si vedono rimpiccioliti (sul computer ~2,8 pixel di foto per pixel di schermo) e la scheda li
+// legge da un livello di mipmap che li sfoca; si legge mezzo livello più in qua (il terzo argomento di texture2D, il
+// «bias»), così il testo resta netto senza tremolare. Una funzione sola per tutti i fogli: entra nella chiave del programma
+const nitida = (sh) => {
+  sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', '#ifdef USE_MAP\n diffuseColor *= texture2D( map, vMapUv, -0.6 );\n#endif')
+}
+// i graffiti scuri: nitidi, e moltiplicati col metallo (sotto, in fogli)
+const nitidaMoltiplica = (sh) => {
+  nitida(sh)
+  sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n gl_FragColor = vec4( mix( vec3( 1.0 ), diffuseColor.rgb, diffuseColor.a ), 1.0 );')
+}
 
 const vuota = (() => {
   const t = new T.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1)
@@ -26,7 +41,7 @@ const vuota = (() => {
   return t
 })()
 
-export async function fogli(scene, M) {
+export async function fogli(scene, M, renderer) {
   const { K, H, telefono } = M
   const cartella = telefono ? 'vol-m' : 'vol'
   const manifesto = await fetch(`/art/scena/${cartella}.json`).then((r) => r.json()).catch(() => ({}))
@@ -38,10 +53,15 @@ export async function fogli(scene, M) {
   const cache = new Map()
   const attese = []
   const trama = (src) => { if (!cache.has(src)) cache.set(src, immagine(src).catch(() => null)); return cache.get(src) }
-  // quando l'immagine arriva, fatto(trama); tutte le richieste partono subito, insieme. Le immagini arrivate si mettono
-  // sui fogli al massimo tre per fotogramma (aggiorna): caricarne venti nella scheda nello stesso fotogramma lo allunga
+  // quando l'immagine arriva, fatto(trama); tutte le richieste partono subito, insieme. Le immagini arrivate si caricano
+  // nella scheda (initTexture) e si mettono sui fogli a tempo, fino a 4 ms per fotogramma (aggiorna): caricarne
+  // venti nello stesso fotogramma lo allunga. `pronti` si chiude quando sono tutte a bordo della scheda, non solo scaricate
   const coda = []
-  const quando = (src, fatto) => attese.push(trama(src).then((t) => { if (t) coda.push(() => fatto(t)) }))
+  // (caricate: quante sono a bordo, o non sono arrivate e non arriveranno; serve alla barra di caricamento)
+  let caricate = 0
+  const quando = (src, fatto) => attese.push(trama(src).then((t) => { if (t) coda.push(() => { renderer.initTexture(t); fatto(t); caricate++ }); else caricate++ }))
+  let scaricate = false, finito = null
+  const pronti = Promise.all(attese).then(() => { scaricate = true; return new Promise((r) => { finito = r }) })
 
   // un foglio piegato sulle doghe: la geometria è un piano suddiviso, ogni vertice
   // sale di quanto sporge la lamiera nel punto del mondo in cui finisce
@@ -56,8 +76,10 @@ export async function fogli(scene, M) {
     return g
   }
   const piano = (w, h, cx, cy, theta, strato, lx = 0, ly = 0, carta = true) => {
-    // le righe seguono le doghe con lo stesso passo della lamiera (14 per doga), così la carta non ci affonda dentro
-    const g = new T.PlaneGeometry(w, h, Math.max(2, Math.round(w / 0.05)), Math.max(4, Math.ceil(h / (DOGA / 14))))
+    // sei righe per doga (2 cm): la bombatura è concava, quindi la lamiera fra le sue righe sta sotto la curva e la carta,
+    // 0,8 mm sopra, fra le sue resta sopra la lamiera (al peggio 0,3 mm di margine); in larghezza la piega è solo
+    // l'ammaccatura, larga un metro: una colonna ogni 12 cm basta
+    const g = new T.PlaneGeometry(w, h, Math.max(1, Math.round(w / 0.12)), Math.max(3, Math.ceil(h / (DOGA / 6))))
     g.translate(lx, ly, 0)
     return piega(g, cx, cy, theta, strato, carta)
   }
@@ -102,16 +124,20 @@ export async function fogli(scene, M) {
     let mat
     if (tipo === 'graffito' && !chiaro) {
       mat = new T.MeshBasicMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, blending: T.MultiplyBlending, premultipliedAlpha: true, depthWrite: false })
-      mat.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n gl_FragColor = vec4( mix( vec3( 1.0 ), diffuseColor.rgb, diffuseColor.a ), 1.0 );') }
-    } else mat = lucido
-      ? new T.MeshPhysicalMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 })
-      : new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : 0.88, metalness: 0 })
+      mat.onBeforeCompile = nitidaMoltiplica
+    } else {
+      mat = lucido
+        ? new T.MeshPhysicalMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 })
+        : new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : 0.88, metalness: 0 })
+      mat.onBeforeCompile = nitida
+    }
     const mesh = new T.Mesh(piano(pw * K, ph * K, cx, cy, theta, tipo === 'graffito' ? 0.0008 + n * 0.00005 : strato, 0, 0, tipo !== 'graffito'), mat)
     if (tipo === 'graffito') { mat.polygonOffset = true; mat.polygonOffsetFactor = -2; mat.polygonOffsetUnits = -2 }
     mesh.castShadow = tipo === 'vol' || tipo === 'man'; mesh.receiveShadow = true
     mesh.renderOrder = n
     gruppo.add(mesh)
-    const pezzo = { el, gruppo, mesh, tipo, alza: 0, meta: 0, tagliandi: [], arrivo: 0, arrivoT: 0 }
+    // la carta (non i graffiti, che si moltiplicano col metallo) diventa opaca finita la dissolvenza
+    const pezzo = { el, gruppo, mesh, tipo, opaco: tipo !== 'graffito', alza: 0, meta: 0, tagliandi: [], arrivo: 0, arrivoT: 0 }
     quando(src, (t) => { mat.map = t; pezzo.arrivo = performance.now() })
 
     // i tagliandi: fette della foto, ognuna un foglietto suo
@@ -127,6 +153,7 @@ export async function fogli(scene, M) {
         const uv = g.attributes.uv
         for (let k = 0; k < uv.count; k++) uv.setXY(k, (tg.x + uv.getX(k) * tg.w) / dati.w, 1 - (tg.y + (1 - uv.getY(k)) * tg.h) / dati.h)
         const mt = new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.88 })
+        mt.onBeforeCompile = nitida
         const tm = new T.Mesh(g, mt)
         tm.castShadow = true; tm.receiveShadow = true; tm.renderOrder = n + 0.5
         // il perno: il bordo alto del tagliando, da cui si piega quando cade
@@ -156,13 +183,17 @@ export async function fogli(scene, M) {
   }
 
   const comparsa = (t0, now) => (t0 ? Math.min(1, (now - t0) / DISSOLVENZA) : 0)
-  // c'è qualcosa che si muove (un foglio che si alza o compare, un tagliando che cade)? serve alle ombre, che se no non si rifanno
+  // c'è qualcosa che si muove (un foglio che si alza o compare, un tagliando che cade)? serve alle ombre e agli specchi, che se no non si rifanno
   const inMoto = (now) => coda.length > 0 || pezzi.some((p) => p.meta > 0 || p.alza > 0.0005 || (p.arrivo && now - p.arrivo < DISSOLVENZA + 50) || p.tagliandi.some((t) => t.stato === 'cade'))
   const aggiorna = (dt, now) => {
-    for (let i = 0; i < 3 && coda.length; i++) coda.shift()()
+    if (coda.length) { const a = performance.now(); do coda.shift()(); while (coda.length && performance.now() - a < 4) }
+    else if (scaricate && finito) { finito(); finito = null }
     for (const p of pezzi) {
       const fa = comparsa(p.arrivo, now)
       if (p.mesh.material.opacity !== fa) p.mesh.material.opacity = fa
+      // comparso del tutto: opaco (con l'alphaTest il contorno resta), e disegnato prima della lamiera, che sotto di lui
+      // non si calcola più (il test di profondità la scarta prima dell'ombreggiatura)
+      if (fa === 1 && p.opaco && p.mesh.material.transparent) { p.mesh.material.transparent = false; p.mesh.renderOrder = -1 }
       // una molla verso l'alzata chiesta
       const k = 1 - Math.exp(-dt * 14)
       p.alza += (p.meta - p.alza) * k
@@ -183,5 +214,5 @@ export async function fogli(scene, M) {
       }
     }
   }
-  return { pezzi, aggiorna, inMoto, pronti: Promise.all(attese) }
+  return { pezzi, aggiorna, inMoto, pronti, avanzamento: () => (attese.length ? caricate / attese.length : 1) }
 }

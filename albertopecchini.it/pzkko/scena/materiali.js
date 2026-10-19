@@ -1,7 +1,10 @@
-// I materiali della scena 3D: le trame disegnate al volo (intonaco, lastre del
+// I materiali della scena 3D: le trame disegnate (intonaco, lastre del
 // marciapiede, asfalto, le finestre dei palazzi di fronte), i rumori che le
 // fanno, le mappe di normali tirate fuori dalle altezze e il profilo delle doghe
 // della saracinesca, che la lamiera e i fogli attaccati sopra devono seguire.
+// Intonaco, lastre e asfalto non si disegnano più nella pagina (erano due
+// secondi fermi): li disegna una volta tools/pzkko/scena/trame.mjs con queste
+// funzioni, in art/scena/trame/; le facciate sì, costano poco.
 import * as T from './lib/three.js'
 
 // ── il rumore ────────────────────────────────────────────────────────────────
@@ -158,15 +161,19 @@ export const facciata = (larg, alt, colore, seme, piani) => {
 
 // Un'immagine (o un SVG) come trama di colore. Si decodifica prima (img.decode(), fuori dal filo principale): se la
 // decodifica la facesse la scheda grafica al momento di caricarla, il fotogramma in cui arriva durerebbe decine di ms.
+// Poi se ne fa un ImageBitmap già capovolto e senza conversioni di colore: la scheda lo prende così com'è, in un colpo;
+// da un <img> il browser lo capovolgerebbe e riconvertirebbe sul filo principale, decine di ms per ogni volantino.
 export const immagine = async (src, { ripeti = false, flipY = true } = {}) => {
   const img = new Image()
   img.decoding = 'async'
   img.src = src
   try { await img.decode() } catch { if (!img.complete || !img.naturalWidth) throw new Error('immagine non caricata: ' + src) }
-  const t = new T.Texture(img)
+  let bitmap = null
+  try { bitmap = await createImageBitmap(img, { imageOrientation: flipY ? 'flipY' : 'none', premultiplyAlpha: 'none', colorSpaceConversion: 'none' }) } catch {}
+  const t = new T.Texture(bitmap || img)
   t.colorSpace = T.SRGBColorSpace
   t.wrapS = t.wrapT = ripeti ? T.RepeatWrapping : T.ClampToEdgeWrapping
-  t.anisotropy = 8; t.flipY = flipY
+  t.anisotropy = 8; t.flipY = bitmap ? false : flipY
   t.needsUpdate = true
   return t
 }

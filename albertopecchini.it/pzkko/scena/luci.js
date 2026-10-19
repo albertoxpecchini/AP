@@ -3,7 +3,15 @@
 // che fa da ambiente e da riflesso, e di notte tutto quello che la pagina già
 // comanda con le sue variabili CSS (--notte, --insegna, --lampioni, le auto che
 // passano coi fari): la scena le legge ogni fotogramma e accende i poligoni.
+//
+// Le luci vanno a insiemi, perché ogni luce visibile si calcola per ogni pixel
+// di ogni materiale, anche spenta: «giorno» = il sole e il cielo; «sera» = anche
+// le luci della notte (insegna, lampada, lampioni, l'auto); «notte» = senza il
+// sole. Ogni insieme vuole i suoi programmi (il numero delle luci entra in
+// tutti): aggiorna dice quale serve, scena.js lo compila a parte e poi lo mette.
 import * as T from './lib/three.js'
+
+const INSIEMI = { giorno: { sole: true, notte: false }, sera: { sole: true, notte: true }, notte: { sole: false, notte: true } }
 
 const LAT = 45.1564, LON = 10.7914, RAD = Math.PI / 180
 const FACCIATA = 200 * RAD // dove guarda la facciata (azimut da nord): sud-sud-ovest, prende il sole da metà mattina al pomeriggio
@@ -108,6 +116,17 @@ export function luci(scene, renderer, h, M) {
     }
   }
 
+  // ── gli insiemi di luci ─────────────────────────────────────────────────────
+  let insieme = null
+  const metti = (nome) => {
+    if (nome === insieme) return false
+    insieme = nome
+    const i = INSIEMI[nome]
+    sunLight.visible = i.sole
+    for (const l of h.luciNotte) l.visible = i.notte
+    return true
+  }
+
   const colSole = new T.Color(), caldo = new T.Color(0xffb070), bianco = new T.Color(0xfff4e6)
   const colNebbia = new T.Color(), nebbiaGiorno = new T.Color(0x9aa4b0), nebbiaNotte = new T.Color(0x05070c)
   const colCielo = new T.Color(), cieloGiorno = new T.Color(0x9ec5ff), cieloNotte = new T.Color(0x24304f)
@@ -170,19 +189,23 @@ export function luci(scene, renderer, h, M) {
       for (const o of h.autoCorpo) o.visible = inMoto
       h.auto.rotation.y = verso > 0 ? 0 : Math.PI
       if (s.autoC) { const [r, g, b] = s.autoC.split(',').map(Number); if (Number.isFinite(r)) { h.autoFari.emissive.setRGB(r / 255, g / 255, b / 255); for (const l of h.autoLuci) l.color.setRGB(r / 255, g / 255, b / 255) } }
-      for (const l of h.autoLuci) l.intensity = 110 * s.autoL
+      for (const l of h.autoLuci) l.intensity = h.luceFari * s.autoL
       h.autoFari.emissiveIntensity = 5 * s.autoL
       h.autoFanali.emissiveIntensity = (s.autoL > 0 ? 1.2 : 0) + 4 * s.freno
-      h.autoFreno.intensity = 1.5 * s.freno
+      if (h.autoFreno) h.autoFreno.intensity = 1.5 * s.freno
       if (h.autoNeon) h.autoNeon.intensity = 2 * s.neonAuto
     } else if (autoX0 !== null) {
       autoX0 = null
       for (const o of h.autoCorpo) o.visible = false
       for (const l of h.autoLuci) l.intensity = 0
-      h.autoFreno.intensity = 0; if (h.autoNeon) h.autoNeon.intensity = 0
+      if (h.autoFreno) h.autoFreno.intensity = 0
+      if (h.autoNeon) h.autoNeon.intensity = 0
       h.autoFari.emissiveIntensity = 0; h.autoFanali.emissiveIntensity = 0
     }
-    return { buio, giorno, notte: s.notte, el: elEff, auto: inMoto }
+    // l'insieme che serve adesso: le luci della notte quando la pagina ne accende una (o passa un'auto), il sole finché
+    // sta sopra l'orizzonte
+    const serve = s.notte > 0 || s.insegna > 0 || s.lampioni > 0 || c ? (giorno > 0 ? 'sera' : 'notte') : 'giorno'
+    return { buio, giorno, notte: s.notte, el: elEff, dir, auto: inMoto, insieme: serve }
   }
-  return { aggiorna, sole: sunLight, adesso }
+  return { aggiorna, metti, attuale: () => insieme, sole: sunLight, adesso }
 }

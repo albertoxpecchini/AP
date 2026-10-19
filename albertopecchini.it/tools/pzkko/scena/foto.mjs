@@ -11,6 +11,7 @@
 //     --sequenza=N --passo=ms fa N foto una dopo l'altra (scena-<nome>-1.png …) per vedere il volo
 //   Alla fine dice i tempi dei fotogrammi durante l'arrivo (media, 95° percentile, massimo, quanti sopra 33 ms).
 import { createServer } from 'node:http'
+import { existsSync } from 'node:fs'
 import { readFile, mkdir, stat } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { join, extname, dirname } from 'node:path'
@@ -33,15 +34,20 @@ const server = createServer(async (req, res) => {
 })
 await new Promise((r) => server.listen(0, '127.0.0.1', r))
 const url = `http://127.0.0.1:${server.address().port}${pagina}?ora=${ora}${extra ? '&' + extra : ''}`
-const exe = join(process.env.LOCALAPPDATA, 'ms-playwright/chromium-1243/chrome-win64/chrome.exe')
-const browser = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars', '--ignore-gpu-blocklist'] })
+// il browser: --chrome=<exe> o la variabile CHROME; se no il Chromium di Playwright, se no Edge (c'è su ogni Windows)
+const exe = arg('chrome', process.env.CHROME) || [join(process.env.LOCALAPPDATA ?? '', 'ms-playwright/chromium-1243/chrome-win64/chrome.exe'), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find((p) => existsSync(p))
+if (!exe) { console.error('non trovo un browser: --chrome=<percorso di chrome.exe o msedge.exe>'); process.exit(1) }
+// --libero: senza il ritmo dello schermo (vsync), così i fotogrammi al secondo sono quelli veri e non 60 o 30
+const libero = process.argv.includes('--libero') ? ['--disable-gpu-vsync', '--disable-frame-rate-limit'] : []
+const browser = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars', '--ignore-gpu-blocklist', ...libero] })
 const page = await browser.newPage()
 page.on('console', (m) => { if ((m.type() !== 'log' && m.type() !== 'info' && m.type() !== 'debug') || m.text().startsWith('scena 3D')) console.log(`[browser ${m.type()}]`, m.text()) })
 page.on('pageerror', (e) => console.log('[pageerror]', e.message))
 await page.setViewport({ width: larg, height: alt, deviceScaleFactor: dpr })
 // --inietta=<js> : codice eseguito nella pagina prima di tutto il resto (per le prove)
 if (inietta) await page.evaluateOnNewDocument(inietta)
-await page.goto(url, { waitUntil: subito ? 'domcontentloaded' : 'networkidle0', timeout: 120000 })
+// (si aspetta il load, non la rete ferma: il segnale vero è html[data-scena="pronta"], sotto)
+await page.goto(url, { waitUntil: subito ? 'domcontentloaded' : 'load', timeout: 120000 })
 await page.evaluate(() => document.querySelector('.auguri')?.remove())
 const t0 = Date.now()
 await mkdir(LAVORO, { recursive: true })
