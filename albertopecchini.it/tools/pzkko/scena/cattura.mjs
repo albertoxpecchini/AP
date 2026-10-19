@@ -8,6 +8,9 @@
 //
 //   node tools/pzkko/scena/cattura.mjs      (dalla cartella albertopecchini.it)
 //
+// Due volte: col computer (1440 px, art/scena/vol/ e vol.json) e col telefono (390 px, la disposizione a due
+// colonne, art/scena/vol-m/ e vol-m.json), perché sul telefono i volantini hanno il testo un po' più grande.
+//
 // Scrive in pzkko/art/scena/vol/: <nome>.webp (il foglio intero) e, per i fogli
 // coi tagliandi, <nome>-senza.webp (la fascia dei tagliandi tolta: in 3D ogni
 // tagliando è un pezzo a sé che si strappa) e pzkko/art/scena/vol.json con le
@@ -22,7 +25,10 @@ import { fileURLToPath } from 'node:url'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(QUI, '../../../pzkko')
-const OUT = join(ROOT, 'art/scena/vol')
+const VISTE = [
+  { w: 1440, h: 1000, cartella: 'vol', json: 'vol.json' },
+  { w: 390, h: 844, cartella: 'vol-m', json: 'vol-m.json' },
+]
 const sharp = createRequire(join(QUI, '../../../package.json'))('sharp')
 const SCALA = 2 // px della tela per px CSS (1 px CSS = 1 unità della parete a 1440): sullo schermo i fogli sono ~200-250 px, con le mipmap bastano
 const MARGINE = 0.08 // del lato del foglio, per lato
@@ -41,6 +47,8 @@ const base = `http://127.0.0.1:${server.address().port}`
 const exe = join(process.env.LOCALAPPDATA, 'ms-playwright/chromium-1243/chrome-win64/chrome.exe')
 const browser = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars'] })
 
+for (const vista of VISTE) {
+const OUT = join(ROOT, 'art/scena', vista.cartella)
 await mkdir(OUT, { recursive: true })
 for (const f of await readdir(OUT)) await rm(join(OUT, f))
 const manifesto = {}
@@ -48,7 +56,7 @@ const manifesto = {}
 // (?muro=1: la pagina senza la scena 3D, che sposterebbe il muro e cambierebbe le misure dei fogli)
 for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1']) {
   const page = await browser.newPage()
-  await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: SCALA })
+  await page.setViewport({ width: vista.w, height: vista.h, deviceScaleFactor: SCALA })
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
   await page.goto(base + pagina, { waitUntil: 'networkidle0' })
   await page.evaluate(async () => {
@@ -96,7 +104,8 @@ for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1']) {
   }
   await page.close()
 }
+await writeFile(join(ROOT, 'art/scena', vista.json), JSON.stringify(manifesto, null, 1))
+console.log(`scritti ${Object.keys(manifesto).length} volantini in ${OUT} e ${vista.json}`)
+}
 await browser.close()
 server.close()
-await writeFile(join(ROOT, 'art/scena/vol.json'), JSON.stringify(manifesto, null, 1))
-console.log(`scritti ${Object.keys(manifesto).length} volantini in ${OUT} e vol.json`)

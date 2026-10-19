@@ -1,14 +1,22 @@
 /* La scena 3D (scena.js) sotto la pagina: quando è pronta (html.scena3d) il muro
    del DOM diventa invisibile ma resta lì a ricevere i clic (i link dei volantini,
    i tagliandi, i giochi), e la scena si disegna in una tela fissa sotto tutto.
-   Le mosche, le formiche e la goccia restano quelle della pagina, sopra la tela. */
+   Le mosche, le formiche e la goccia restano quelle della pagina, sopra la tela.
+   La tela compare in dissolvenza dal nero (html.scena-vista) quando il primo
+   fotogramma è pronto: la telecamera è ancora da lontano. */
 .scena-tela{display:none}
-html.scena3d{background:#101214}
-html.scena3d .scena-tela{display:block;position:fixed;inset:0;width:100%;height:100%;z-index:0}
+html.scena3d{background:#0c0d0f}
+/* alta quanto la finestra più grande (100lvh): sul telefono la barra del browser che va e viene non la ridimensiona */
+html.scena3d .scena-tela{display:block;position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:0;opacity:0;transition:opacity 1.1s ease}
+html.scena-vista .scena-tela{opacity:1}
 html.scena3d .strada{position:relative;z-index:1;background:none}
-/* la saracinesca un po' più stretta, e messa in modo che al centro dello schermo ci sia tutto il fronte del negozio
-   (saracinesca + porta a vetri, largo 1,212 volte la saracinesca), con l'insegna sopra */
-html.scena3d .muro{box-shadow:none;max-width:min(1280px,64vw);margin-left:max(0px,calc((100% - min(1280px,64vw)) / 2 - .212 * min(1280px,64vw)))}
+/* sul computer la saracinesca è un po' più stretta, e messa in modo che al centro dello schermo ci sia tutto il fronte
+   del negozio (saracinesca + porta a vetri, largo 1,212 volte la saracinesca), con l'insegna sopra; sul telefono resta
+   la parete del telefono, larga quanto lo schermo */
+@media (min-width:900px){
+  html.scena3d .muro{max-width:min(1280px,64vw);margin-left:max(0px,calc((100% - min(1280px,64vw)) / 2 - .212 * min(1280px,64vw)))}
+}
+html.scena3d .muro{box-shadow:none}
 html.scena3d .muro::before,html.scena3d .muro::after,html.scena3d .buio,html.scena3d .fari,html.scena3d .freni,html.scena3d .neonauto{display:none}
 html.scena3d .portale{visibility:hidden}
 html.scena3d .it{visibility:hidden}
@@ -22,3 +30,4 @@ html.scena3d .vol h3 a:focus-visible::after{outline:3px solid #ffd400;outline-of
 html.scena3d .tagliandi button:focus-visible{outline:3px solid #ffd400}
 /* ?allinea=1: il DOM in trasparenza sopra la scena, per controllare che combacino */
 html.scena-allinea .it,html.scena-allinea .portale{visibility:visible;opacity:.45}
+@media (prefers-reduced-motion:reduce){html.scena3d .scena-tela{transition-duration:.3s}}

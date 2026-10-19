@@ -57,7 +57,8 @@ serio ma è un progetto Vercel a parte.
   (il colore e la rugosità della saracinesca, tirati fuori dalla foto `muro.webp`
   togliendole la luce, `tools/pzkko/scena/mappe.mjs`), `pannello.svg` e
   `colature.svg` (il pannello dell'insegna e le colature, da `insegna.svg`),
-  `vol/` e `vol.json` (le foto dei volantini, `tools/pzkko/scena/cattura.mjs`).
+  `vol/` e `vol.json`, `vol-m/` e `vol-m.json` (le foto dei volantini per il
+  computer e per il telefono, `tools/pzkko/scena/cattura.mjs`).
 - `fonts/` — Anton e Archivo Black (SIL OFL), Special Elite e Permanent Marker
   (Apache 2.0), da Google Fonts, serviti da qui.
 - `404.html` — pagina non trovata: lo stesso muro, con i resti del volantino
@@ -155,22 +156,59 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
 
 ## La scena 3D (scena/)
 
-Dal 18.10.2026, sui computer con WebGL2 (finestra da 900 px in su), la home
-non è più una pagina ma un posto: la stessa saracinesca coi suoi volantini,
-disegnata dalla scheda grafica con three.js come la scena di un videogioco,
-con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
-900 px e senza WebGL2 resta quello, senza che la pagina se ne accorga.
+Dal 18.10.2026 (dal 19.10 anche sul telefono), dove c'è WebGL2 la home non è
+più una pagina ma un posto: la stessa saracinesca coi suoi volantini, disegnata
+dalla scheda grafica con three.js come la scena di un videogioco, con luci,
+ombre e riflessi veri. `?muro=1` tiene il muro di sempre; senza WebGL2 resta
+quello, senza che la pagina se ne accorga.
 
-- **Mentre si carica** il muro di sempre non si vede: il caricatore in fondo a
-  `index.html` mette subito `html.scena-carico` (la pagina invisibile, uno
-  schermo nero con «pzkko» e la barra, `div.scena-attesa`) e chiede insieme il
-  foglio di stile, i sei moduli (`modulepreload`) e, dentro `fogli.js`, tutte le
-  foto dei volantini in una volta; la scena compila gli shader
-  (`renderer.compileAsync`) e disegna tre fotogrammi a vuoto prima di comparire,
-  così non scatta all'inizio. Se qualcosa va storto si toglie lo schermo e
-  resta il muro. Da scaricare in tutto ~2 MB (three.js 627 KB, i volantini 1,3
-  MB fotografati a 2 px per unità); la console dice «scena 3D pronta in N s».
-  Attenzione: gli strumenti che misurano o fotografano la pagina 2D
+- **L'arrivo** (al posto della schermata di caricamento): il caricatore in fondo
+  a `index.html` mette subito `html.scena-carico` (la pagina trasparente su nero,
+  il muro di sempre non si vede mai) e chiede insieme il foglio di stile e i sei
+  moduli (`modulepreload`). La scena si costruisce coi fogli vuoti, compila gli
+  shader e disegna tre fotogrammi a tela nascosta; poi la strada compare in
+  dissolvenza dal nero, **vista da lontano**: dall'altra parte del marciapiede,
+  ad altezza d'occhio, tutto il negozio nell'inquadratura (sul telefono la parte
+  alta della saracinesca, con l'insegna), con la telecamera che si avvicina piano
+  e respira. Le foto dei volantini arrivano tutte insieme e ogni foglio compare
+  in dissolvenza quando arriva la sua. Quando sono arrivate tutte (e la strada si
+  è vista almeno 1,8 s; al massimo dopo 9 s, o subito se si tocca, si scorre o
+  si preme un tasto) la telecamera **vola dritta** fino all'inquadratura di
+  sempre in 2,6 s: la distanza cala in scala logaritmica (l'avvicinamento ha
+  sempre la stessa velocità a vista) e il centro si sposta in proporzione alla
+  distanza, come in un volo in linea retta; il punto d'arrivo segue lo
+  scorrimento, quindi si può scorrere anche durante il volo. Arrivata, la pagina
+  sotto torna a rispondere (si toglie `scena-carico`). Con
+  `prefers-reduced-motion` (o `?intro=0`) niente volo: la scena compare già
+  arrivata. Se qualcosa va storto si torna al muro di sempre. La console dice
+  «costruita, shader, primi fotogrammi» e «vista in N s, arrivata in N s».
+  Da scaricare ~2 MB sul computer (three.js 627 KB, 171 compresso; i volantini
+  1,3 MB) e ~1,5 MB sul telefono (i volantini 0,8 MB).
+- **Le trappole della compilazione**: la scena si disegna dentro la tela del
+  post-processing, e lì three toglie il tone mapping; i programmi vanno compilati
+  con quella tela come destinazione (`renderer.setRenderTarget` prima di
+  `compileAsync`) e col cielo già pronto come ambiente (il PMREM entra nei
+  programmi dei materiali), se no al primo fotogramma si compilano le varianti
+  vere, una alla volta e bloccando: su Windows ~200 ms l'una, erano 5 s di nero.
+  Si compilano prima anche i materiali del bagliore (di giorno è spento: si
+  compilerebbero al tramonto, con uno scatto) e il filtro (che va sullo schermo).
+  Il cielo come ambiente si rifà solo quando il sole si sposta di 0,6°; le
+  variabili della pagina si leggono da `html.style`, non con `getComputedStyle`
+  (che a ogni fotogramma ricalcolerebbe lo stile di tutta la pagina), e la
+  posizione della parete si rilegge solo quando la pagina cambia misura (a ogni
+  fotogramma basta lo scorrimento).
+- **Il telefono**: la parete è quella del telefono (due colonne, 390esimi, alta
+  3777), quindi la saracinesca è larga 0,95 m e alta ~9 m (i volantini restano
+  grandi come quelli veri, ~45 cm); l'insegna, la lampada e il piano di sopra si
+  mettono rispetto a lei. Le foto dei volantini sono fatte apposta nella
+  disposizione del telefono (`vol-m/`: lì il testo è un po' più grande). Di notte
+  la luce di un lampione dall'altra parte della strada prende tutta la parete
+  alta. Meno luci accese insieme (ognuna costa a ogni pixel): una lampada
+  nell'insegna invece di quattro, i lampioni di là senza luce, niente neon sotto
+  l'auto. La tela è alta `100lvh`, così la barra del browser che va e viene non
+  la ridimensiona. Girando il telefono (o allargando la finestra oltre i 900 px)
+  la pagina si ricarica, perché cambia la disposizione dei fogli.
+- **Attenzione**: gli strumenti che misurano o fotografano la pagina 2D
   (`disponi.mjs`, `cattura.mjs`) la aprono con `?muro=1`, altrimenti la scena
   sposta il muro e le misure vengono sbagliate.
 
@@ -205,14 +243,15 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   lampada (sopra, su un braccio da un metro) entrano nell'inquadratura anche a
   1440 px.
 - **I fogli** (`fogli.js`): ogni elemento `.it` della parete diventa un foglio
-  di poligoni nel suo posto esatto (le stesse `--x --y --w --r`), suddiviso con
+  di poligoni nel suo posto esatto (le `--px --py --pw --pr` già risolte dal CSS:
+  sul computer le `--x --y --w --r`, sul telefono le `--mx --my --mw --mr`), suddiviso con
   lo stesso passo delle doghe e piegato sulla loro bombatura; i graffiti stanno
   attaccati al metallo (quelli scuri sono vernice che si moltiplica col metallo,
   come il `multiply` della pagina: l'inchiostro resta nero e si legge; quelli
   chiari, `.chiaro` e `.bianco`, coprono), la carta un filo sopra, uno strato per foglio
   nell'ordine di sovrapposizione della pagina (z-index e ordine nel DOM). I
   volantini usano le foto fatte da `cattura.mjs` (testo in HTML sopra la carta,
-  fotografati in Chromium a 3 px per unità, con un margine per l'adesivo che
+  fotografati in Chromium a 2 px per unità, con un margine per l'adesivo che
   sporge); quelli coi tagliandi hanno la fascia tolta e **ogni tagliando è un
   foglietto suo**, che cade quando la pagina gli mette `.cade` e sparisce con
   `.via`. Il foglio sotto il puntatore (o col fuoco) si alza di 2 cm con una
@@ -231,19 +270,23 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
   della porta prima di sparire), coi fari che spazzano la saracinesca e la
   porta, i fanali rossi, il neon sotto. Si riflette nel vetro e nelle
   pozzanghere. Prove: `?ora=18:30`, `?notte=1`, `?auto=1` come per la pagina.
-- **Il costo**: MSAA, bloom, due specchi (che si rifanno un fotogramma sì e
-  uno no, alternandosi, senza multisample) e due mappe d'ombra (sole, lampada;
-  quella di chi è spento non si rifà). Tre livelli (`?qualita=alta|media|bassa`):
-  alta = risoluzione interna fino a 1,25×, MSAA 4×, specchi 768/512, ombra del
-  sole 2048; media = 0,9×, MSAA 2×, specchi 512/256, ombre 1024; bassa = 0,75×,
-  niente bloom né palazzi, specchi 384/192. Le mappe d'ombra si rifanno solo
-  quando qualcosa si muove (un foglio che si alza, un tagliando che cade,
-  l'auto) e ogni 24 fotogrammi per il sole che gira; gli specchi a ogni
-  fotogramma solo mentre passa l'auto (se no il riflesso andava a scatti). Si parte da «alta», ma da «media» se la scheda
-  grafica si presenta come integrata (Intel, Apple, Mali, Adreno) o il
-  processore ha 4 core o meno; e se i primi fotogrammi passano i 28 ms di media
-  si scende di un gradino, poi di un altro. Su una RTX 3060 Ti ~120–160
-  fotogrammi al secondo a 1440 × 900.
+- **Il costo**: MSAA, bloom (solo quando fa buio), due specchi (che si rifanno
+  un fotogramma sì e uno no, alternandosi, senza multisample; a ogni fotogramma
+  durante l'arrivo e mentre passa l'auto) e due mappe d'ombra (sole, lampada;
+  quella di chi è spento non si rifà; si rifanno solo quando qualcosa si muove,
+  un foglio che si alza o compare, un tagliando, l'auto, e ogni 24 fotogrammi per
+  il sole che gira). Quattro livelli (`?qualita=alta|media|bassa|telefono`):
+  alta = risoluzione interna 1,25×, MSAA 4×, specchi 768/512, ombra del sole
+  2048; media = 0,9×, MSAA 2×, specchi 512/256, ombre 1024; bassa = 0,75×, niente
+  bloom né palazzi, specchi 384/192; telefono = 1,5× (il testo dei volantini si
+  deve leggere), niente MSAA, specchi 384/192, ombre 1024/512. Si parte da
+  «alta», da «media» se la scheda grafica si presenta come integrata (Intel,
+  Apple, Mali, Adreno) o il processore ha 4 core o meno, da «telefono» sotto i
+  900 px; poi, mentre si guarda da lontano (il momento più pesante: tutti i fogli
+  in vista), se la mediana dei fotogrammi passa i 24 ms la risoluzione scende
+  del 20%, fino a tre volte (con la media contavano i fotogrammi in cui arrivano
+  le immagini e scendeva anche sulle schede buone). Su una RTX 3060 Ti ~120–165
+  fotogrammi al secondo a 1440 × 900, l'arrivo senza un fotogramma sopra i 33 ms.
 - **Il filtro** (l'ultimo passaggio, dopo i colori finiti; `?filtro=0` lo
   toglie): grana che si muove, un filo di aberrazione cromatica ai bordi,
   vignetta, righe sottili e un colore un po' sporco, da videogioco horror a
@@ -253,12 +296,16 @@ con luci, ombre e riflessi veri. `?muro=1` tiene il muro di sempre; sotto i
 - **Le prove**: `node tools/pzkko/scena/foto.mjs --ora=22:00 --scroll=0.5`
   (dalla cartella `albertopecchini.it`) fotografa la scena in Chromium headless
   (che usa la scheda grafica vera) in `tools/pzkko/lavoro/scena-*.png` e dice i
-  fotogrammi al secondo; `--larg`, `--alt`, `--q=notte=1`, `--vars=--auto-l:0.9;--auto-x:0.5`
-  (ferma un'auto), `--hover=.vol.c-giallo`, `--prova=<js>`, `--pagina=/404.html`
-  (da Git Bash con `MSYS_NO_PATHCONV=1`).
+  fotogrammi al secondo e i tempi dei fotogrammi dell'arrivo; `--larg`, `--alt`,
+  `--dpr` (telefono: `--larg=390 --alt=844 --dpr=3`), `--q=notte=1`,
+  `--vars=--auto-l:0.9;--auto-x:0.5` (ferma un'auto), `--hover=.vol.c-giallo`,
+  `--prova=<js>`, `--pagina=/404.html` (da Git Bash con `MSYS_NO_PATHCONV=1`),
+  `--subito --attesa=1000` (la vista da lontano), `--subito --sequenza=8
+  --passo=500` (il volo, una foto ogni mezzo secondo), `--q=programmi=1` (in
+  console i programmi compilati ai primi fotogrammi: devono essere pochi).
 - **Dopo ogni modifica ai testi dei volantini** (e dopo `genera-404.mjs`):
   `node tools/pzkko/scena/cattura.mjs`, che rifà le foto in `art/scena/vol/`
-  (2 px per unità, ~1,3 MB in tutto). La 404 ha la sua scena (il suo volantino
+  (computer, 2 px per unità, ~1,3 MB) e `art/scena/vol-m/` (telefono, ~0,8 MB). La 404 ha la sua scena (il suo volantino
   è fotografato con gli altri).
 
 ## La roulette (games/roulette/)

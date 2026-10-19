@@ -902,40 +902,35 @@ img{display:block;max-width:100%;height:auto}
   } else auguri?.remove()
 })()
 </script>
-<!-- La scena 3D (scena/): sui computer con WebGL2 la saracinesca diventa una strada vera, disegnata dalla
-     scheda grafica con luci, ombre e riflessi; questa pagina resta sotto, invisibile, a fare tutto il resto.
-     Mentre si scarica e si costruisce, al posto del muro c'è lo schermo di caricamento (html.scena-carico, lo schermo è div.scena-attesa):
-     il muro di sempre non si vede mai, a meno che il 3D non parta. ?muro=1 lo tiene com'è; sotto i 900 px
-     resta il muro di sempre. -->
+<!-- La scena 3D (scena/): dove c'è WebGL2 (computer e telefono) la saracinesca diventa una strada vera, disegnata
+     dalla scheda grafica con luci, ombre e riflessi; questa pagina resta sotto, invisibile, a fare tutto il resto.
+     Mentre si scarica il muro di sempre non si vede (html.scena-carico: la pagina trasparente su nero); poi la strada
+     compare da lontano e la telecamera si avvicina; quando è arrivata la pagina torna a rispondere. Se il 3D non parte
+     si torna al muro di sempre. ?muro=1 lo tiene com'è. -->
 <style>
 html.scena-carico{background:#0c0d0f}
 html.scena-carico .strada{visibility:hidden}
-div.scena-attesa{position:fixed;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0c0d0f;color:#e9e6df;font:400 15px/1.4 var(--ft)}
-html.scena-carico div.scena-attesa{display:flex}
-.scena-attesa b{font:400 44px/1 var(--fa);letter-spacing:.02em;color:#f4f2ec;text-shadow:0 0 18px rgba(255,190,110,.35)}
-.scena-attesa span{position:relative;width:min(60vw,320px);height:3px;background:#2a2c30;overflow:hidden}
-.scena-attesa i{position:absolute;inset:0;width:0;background:#ffb45c;transition:width .25s ease-out}
-.scena-attesa small{color:#8d8a84;font-size:13px}
-@media (prefers-reduced-motion:reduce){.scena-attesa i{transition:none}}
+/* quando la strada compare da lontano la pagina sotto torna visibile (nel 3D di lei si vedono solo mosche, formiche e la
+   goccia, nascoste fino all'arrivo): ricalcolarla e ridisegnarla costa un fotogramma lungo, che lì cade nella dissolvenza
+   dal nero e non si vede. All'arrivo compaiono solo quelle, che sono piccole. I clic durante l'arrivo li ferma un velo
+   trasparente (.scena-scudo), che all'arrivo si toglie: toccare tutta la pagina in quel momento costava uno scatto */
+html.scena-carico.scena-vista .strada{visibility:visible}
+html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,html.scena-carico .spruzzo{visibility:hidden}
+.scena-scudo{position:fixed;inset:0;z-index:60}
 </style>
 <script>
 (() => {
   const q = new URLSearchParams(location.search)
-  if (q.get('muro') !== null || innerWidth < 900) return
+  if (q.get('muro') !== null) return
   if (!document.createElement('canvas').getContext('webgl2')) return
   const root = document.documentElement
   root.classList.add('scena-carico')
-  const box = document.createElement('div')
-  box.className = 'scena-attesa'; box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite')
-  box.innerHTML = '<b>pzkko</b><span><i></i></span><small>si alza la saracinesca…</small>'
-  document.body.appendChild(box)
-  const barra = box.querySelector('i'), riga = box.querySelector('small')
-  const avanzamento = (p, cosa) => { barra.style.width = Math.round(p * 100) + '%'; if (cosa) riga.textContent = p >= 1 ? 'pronta' : 'si alza la saracinesca… ' + cosa }
+  const scudo = document.createElement('div'); scudo.className = 'scena-scudo'; scudo.setAttribute('aria-hidden', 'true'); document.body.appendChild(scudo)
   // il foglio di stile e i moduli si scaricano tutti insieme, non uno dopo l'altro
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/scena/scena.css'; document.head.appendChild(l)
   for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
-  const via = () => { root.classList.remove('scena-carico'); box.remove() }
-  import('/scena/scena.js').then((m) => m.avvia({ avanzamento })).then(via).catch((e) => { console.warn('scena 3D non partita, resta il muro', e); via() })
+  const via = () => { root.classList.remove('scena-carico'); scudo.remove() }
+  import('/scena/scena.js').then((m) => m.avvia()).then(via).catch((e) => { console.warn('scena 3D non partita, resta il muro', e); via() })
 })()
 </script>
 </body>

@@ -156,15 +156,20 @@ export const facciata = (larg, alt, colore, seme, piani) => {
   return { map, emissiveMap, accendi }
 }
 
-// Un'immagine (o un SVG) come trama di colore.
-export const immagine = (src, { ripeti = false, flipY = true } = {}) => new Promise((ok, no) => {
-  new T.TextureLoader().load(src, (t) => {
-    t.colorSpace = T.SRGBColorSpace
-    t.wrapS = t.wrapT = ripeti ? T.RepeatWrapping : T.ClampToEdgeWrapping
-    t.anisotropy = 8; t.flipY = flipY
-    ok(t)
-  }, undefined, no)
-})
+// Un'immagine (o un SVG) come trama di colore. Si decodifica prima (img.decode(), fuori dal filo principale): se la
+// decodifica la facesse la scheda grafica al momento di caricarla, il fotogramma in cui arriva durerebbe decine di ms.
+export const immagine = async (src, { ripeti = false, flipY = true } = {}) => {
+  const img = new Image()
+  img.decoding = 'async'
+  img.src = src
+  try { await img.decode() } catch { if (!img.complete || !img.naturalWidth) throw new Error('immagine non caricata: ' + src) }
+  const t = new T.Texture(img)
+  t.colorSpace = T.SRGBColorSpace
+  t.wrapS = t.wrapT = ripeti ? T.RepeatWrapping : T.ClampToEdgeWrapping
+  t.anisotropy = 8; t.flipY = flipY
+  t.needsUpdate = true
+  return t
+}
 // Un SVG disegnato su una tela della misura voluta (i browser lo rasterizzano
 // alla grandezza chiesta, senza perdere nitidezza).
 export const svgSuTela = (src, larg, alt) => new Promise((ok, no) => {

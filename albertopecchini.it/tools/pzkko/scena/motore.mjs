@@ -27,7 +27,7 @@ export const NOMI = [
   'TorusGeometry', 'CircleGeometry', 'ShapeGeometry', 'Shape', 'Path', 'Vector2', 'Vector3', 'Matrix4', 'Quaternion', 'Euler', 'Color', 'MathUtils',
   'MeshStandardMaterial', 'MeshPhysicalMaterial', 'MeshBasicMaterial', 'ShaderMaterial',
   'DirectionalLight', 'SpotLight', 'PointLight', 'HemisphereLight',
-  'CanvasTexture', 'Texture', 'TextureLoader', 'SRGBColorSpace', 'NoColorSpace',
+  'CanvasTexture', 'Texture', 'TextureLoader', 'DataTexture', 'SRGBColorSpace', 'NoColorSpace',
   'RepeatWrapping', 'MirroredRepeatWrapping', 'ClampToEdgeWrapping', 'LinearFilter', 'LinearMipmapLinearFilter',
   'AgXToneMapping', 'ACESFilmicToneMapping', 'NoToneMapping', 'PCFShadowMap', 'PMREMGenerator', 'DoubleSide', 'FrontSide', 'BackSide',
   'HalfFloatType', 'Fog', 'NormalBlending', 'MultiplyBlending',

@@ -3,6 +3,9 @@
 // riflette la strada, il marciapiede bagnato, la strada, i palazzi di fronte, la
 // lampada a muro, l'auto che passa. Tutto in metri; la saracinesca occupa
 // x ∈ [0, W], y ∈ [0, H] sul piano z = 0 e la facciata sta 10 cm più avanti.
+// Sul telefono (M.telefono) la saracinesca è stretta e alta come la parete del
+// telefono (0,95 m): il piano di sopra, l'insegna e le luci si mettono rispetto a
+// lei, e le luci accese insieme sono meno (ognuna costa a ogni pixel).
 import * as T from './lib/three.js'
 import { intonaco, lastre, asfalto, facciata, immagine, scritta, profilo, DOGA } from './materiali.js'
 
@@ -71,8 +74,9 @@ const lettere = (cx, cy, s, raggio, z) => {
 }
 
 export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) {
-  const { W, H } = M
+  const { W, H, telefono } = M
   const h = {} // quello che la scena deve poter muovere o accendere
+  const TETTO = Math.max(8, H + 4.4) // il filo alto della facciata
   const ombra = (m, getta = true, riceve = true) => { m.castShadow = getta; m.receiveShadow = riceve; return m }
 
   // ── materiali ──────────────────────────────────────────────────────────────
@@ -81,7 +85,9 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
   lamR.wrapS = T.MirroredRepeatWrapping; lamR.wrapT = T.RepeatWrapping; lamR.colorSpace = T.NoColorSpace
   const mLamiera = new T.MeshStandardMaterial({ map: lam, roughnessMap: lamR, roughness: 1, metalness: 0.22, color: 0xe8e9e6 })
   const into = intonaco(512, 7)
-  into.map.repeat.set(1, 1); into.normalMap.repeat.set(1, 1)
+  // il colore (le chiazze della pittura vecchia) si ripete ogni 4 m, il rilievo ogni metro: da lontano non si vede il
+  // motivo a quadretti di una piastrella da un metro
+  into.map.repeat.set(0.25, 0.25); into.normalMap.repeat.set(1, 1)
   const mIntonaco = new T.MeshStandardMaterial({ map: into.map, normalMap: into.normalMap, normalScale: new T.Vector2(0.8, 0.8), roughness: 0.92, metalness: 0, color: 0xd8d2c6 })
   const mIntonacoScuro = mIntonaco.clone(); mIntonacoScuro.color.set(0xb9b2a4)
   const mFerro = new T.MeshStandardMaterial({ color: 0x3b3d3f, roughness: 0.55, metalness: 0.8 })
@@ -131,7 +137,7 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
   const PORTA = { x0: W + 0.12, x1: W + 0.87, h: 2.32 }
   {
     const f = new T.Shape()
-    f.moveTo(-5, -0.3); f.lineTo(W + 7, -0.3); f.lineTo(W + 7, 8); f.lineTo(-5, 8); f.closePath()
+    f.moveTo(-5, -0.3); f.lineTo(W + 7, -0.3); f.lineTo(W + 7, TETTO); f.lineTo(-5, TETTO); f.closePath()
     const buco = new T.Path(); buco.moveTo(-0.07, -0.05); buco.lineTo(W + 0.07, -0.05); buco.lineTo(W + 0.07, H + 0.05); buco.lineTo(-0.07, H + 0.05); buco.closePath()
     const porta = new T.Path(); porta.moveTo(PORTA.x0, -0.05); porta.lineTo(PORTA.x1, -0.05); porta.lineTo(PORTA.x1, PORTA.h); porta.lineTo(PORTA.x0, PORTA.h); porta.closePath()
     f.holes.push(buco, porta)
@@ -146,17 +152,18 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     scene.add(ombra(scatola(PORTA.x0 - W - 0.12, 0.5, 0.025, mPietra, W + 0.1 + (PORTA.x0 - W - 0.12) / 2, 0.25, Z_FACCIATA + 0.0125)))
     scene.add(ombra(scatola(W + 7 - PORTA.x1 - 0.02, 0.5, 0.025, mPietra, PORTA.x1 + 0.02 + (W + 7 - PORTA.x1 - 0.02) / 2, 0.25, Z_FACCIATA + 0.0125)))
     // la gronda in cima, fuori vista quasi sempre, e il piano di sopra: due finestre con le persiane
-    scene.add(ombra(scatola(W + 12, 0.22, 0.5, mPietra, W / 2 + 1, 7.9, Z_FACCIATA + 0.25)))
+    // (tutto rispetto alla cima della saracinesca: il piano di sopra comincia 2 m sopra)
+    scene.add(ombra(scatola(W + 12, 0.22, 0.5, mPietra, W / 2 + 1, H + 4.29, Z_FACCIATA + 0.25)))
     for (const fx of [W / 2 - 0.9, W / 2 + 1.1, W + 3.2]) {
-      scene.add(ombra(scatola(1.2, 1.7, 0.3, new T.MeshStandardMaterial({ color: 0x1a1c20, roughness: 0.3, metalness: 0.2 }), fx, 5.6, Z_FACCIATA - 0.14)))
-      scene.add(ombra(scatola(0.5, 1.75, 0.04, new T.MeshStandardMaterial({ color: 0x4f6b45, roughness: 0.7 }), fx - 0.58, 5.6, Z_FACCIATA + 0.02)))
-      scene.add(ombra(scatola(0.5, 1.75, 0.04, new T.MeshStandardMaterial({ color: 0x4f6b45, roughness: 0.7 }), fx + 0.58, 5.6, Z_FACCIATA + 0.02)))
-      scene.add(ombra(scatola(1.4, 0.06, 0.12, mPietra, fx, 4.72, Z_FACCIATA + 0.06)))
+      scene.add(ombra(scatola(1.2, 1.7, 0.3, new T.MeshStandardMaterial({ color: 0x1a1c20, roughness: 0.3, metalness: 0.2 }), fx, H + 2, Z_FACCIATA - 0.14)))
+      scene.add(ombra(scatola(0.5, 1.75, 0.04, new T.MeshStandardMaterial({ color: 0x4f6b45, roughness: 0.7 }), fx - 0.58, H + 2, Z_FACCIATA + 0.02)))
+      scene.add(ombra(scatola(0.5, 1.75, 0.04, new T.MeshStandardMaterial({ color: 0x4f6b45, roughness: 0.7 }), fx + 0.58, H + 2, Z_FACCIATA + 0.02)))
+      scene.add(ombra(scatola(1.4, 0.06, 0.12, mPietra, fx, H + 1.11, Z_FACCIATA + 0.06)))
     }
     // il pluviale a sinistra, coi collari
-    const plu = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 8.2, 16), mFerroVerniciato)
-    plu.position.set(-0.5, 4.1, Z_FACCIATA + 0.07); scene.add(ombra(plu))
-    for (const y of [0.6, 2.4, 4.4, 6.4]) { const c = new T.Mesh(new T.TorusGeometry(0.052, 0.008, 6, 20), mFerro); c.rotation.x = Math.PI / 2; c.position.set(-0.5, y, Z_FACCIATA + 0.07); scene.add(ombra(c)) }
+    const plu = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, H + 4.6, 16), mFerroVerniciato)
+    plu.position.set(-0.5, (H + 4.6) / 2, Z_FACCIATA + 0.07); scene.add(ombra(plu))
+    for (let y = 0.6; y < H + 4.2; y += 1.9) { const c = new T.Mesh(new T.TorusGeometry(0.052, 0.008, 6, 20), mFerro); c.rotation.x = Math.PI / 2; c.position.set(-0.5, y, Z_FACCIATA + 0.07); scene.add(ombra(c)) }
     // il citofono e la targa del numero civico
     scene.add(ombra(scatola(0.12, 0.2, 0.02, mAlluminio, PORTA.x1 + 0.16, 1.5, Z_FACCIATA + 0.01)))
     h.citofono = new T.Mesh(new T.CircleGeometry(0.012, 16), new T.MeshStandardMaterial({ color: 0x222222, emissive: 0xffa040, emissiveIntensity: 0 }))
@@ -193,34 +200,39 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
 
   // ── l'insegna: il cassonetto, il pannello, le lettere tubolari e il neon dentro ──
   {
-    // il cassonetto è più stretto della saracinesca (1,5 m su 2,05) e centrato su di lei, appena sopra l'architrave; le lettere al centro, alte 28 cm
-    const LARG = 1.5, ALT = 0.42, PROF = 0.14, x0 = W / 2 - LARG / 2
-    const s = 0.28 / 199, y0 = H + 0.1, z0 = Z_FACCIATA, cxl = W / 2, cyl = y0 + ALT / 2
+    // il cassonetto è più stretto della saracinesca (1,5 m su 2,05) e centrato su di lei, appena sopra l'architrave; le
+    // lettere al centro, alte 28 cm. Sul telefono la saracinesca è larga 0,95 m e l'insegna scala con lei (k)
+    const LARG = Math.min(1.5, 0.78 * W), k = LARG / 1.5
+    const ALT = 0.42 * k, PROF = 0.06 + 0.08 * k, sp = 0.03 * Math.max(0.6, k), x0 = W / 2 - LARG / 2
+    const s = (0.28 * k) / 199, y0 = H + 0.1 * k, z0 = Z_FACCIATA, cxl = W / 2, cyl = y0 + ALT / 2
     const cass = new T.Group()
     // il telaio: quattro profili, il fondo e la faccia dietro il pannello
-    for (const [w, hh, x, y] of [[LARG, 0.03, 0, ALT / 2 - 0.015], [LARG, 0.03, 0, -ALT / 2 + 0.015], [0.03, ALT, -LARG / 2 + 0.015, 0], [0.03, ALT, LARG / 2 - 0.015, 0]]) cass.add(ombra(scatola(w, hh, PROF, mAlluminio, x, y, PROF / 2)))
-    cass.add(ombra(scatola(LARG - 0.06, ALT - 0.06, 0.02, mAlluminio, 0, 0, 0.01)))
-    cass.add(ombra(scatola(LARG - 0.06, 0.02, PROF, mAlluminio, 0, ALT / 2 - 0.04, PROF / 2)))
-    cass.add(ombra(scatola(LARG - 0.06, 0.02, PROF, mAlluminio, 0, -ALT / 2 + 0.04, PROF / 2)))
+    for (const [w, hh, x, y] of [[LARG, sp, 0, ALT / 2 - sp / 2], [LARG, sp, 0, -ALT / 2 + sp / 2], [sp, ALT, -LARG / 2 + sp / 2, 0], [sp, ALT, LARG / 2 - sp / 2, 0]]) cass.add(ombra(scatola(w, hh, PROF, mAlluminio, x, y, PROF / 2)))
+    cass.add(ombra(scatola(LARG - 2 * sp, ALT - 2 * sp, 0.02, mAlluminio, 0, 0, 0.01)))
+    cass.add(ombra(scatola(LARG - 2 * sp, 0.02, PROF, mAlluminio, 0, ALT / 2 - sp - 0.01, PROF / 2)))
+    cass.add(ombra(scatola(LARG - 2 * sp, 0.02, PROF, mAlluminio, 0, -ALT / 2 + sp + 0.01, PROF / 2)))
     const pannelloT = await immagine(ART + 'pannello.svg').catch(() => null)
     // il pannello disegnato è lungo (2400 × 328): se ne usa la parte destra, con l'adesivo
     if (pannelloT) { pannelloT.repeat.set(0.56, 1); pannelloT.offset.set(0.44, 0) }
     h.pannello = new T.MeshPhysicalMaterial({ map: pannelloT, color: 0xffffff, roughness: 0.38, clearcoat: 0.25, clearcoatRoughness: 0.4, emissive: 0xffc07a, emissiveMap: pannelloT, emissiveIntensity: 0 })
-    const pann = ombra(new T.Mesh(new T.PlaneGeometry(LARG - 0.06, ALT - 0.06), h.pannello), false, true)
+    const pann = ombra(new T.Mesh(new T.PlaneGeometry(LARG - 2 * sp, ALT - 2 * sp), h.pannello), false, true)
     pann.position.z = PROF - 0.012; cass.add(pann)
     cass.position.set(x0 + LARG / 2, y0 + ALT / 2, z0); scene.add(cass)
     // le lettere: tubi bianchi di metacrilato, che di notte si scaldano di luce; davanti il filo del neon
-    const zl = z0 + PROF - 0.012 + 0.03
+    const zl = z0 + PROF - 0.012 + 0.03 * k
     h.lettere = new T.MeshPhysicalMaterial({ color: 0xf4f2ec, roughness: 0.3, clearcoat: 0.5, clearcoatRoughness: 0.3, emissive: 0xffb45c, emissiveIntensity: 0 })
-    const lett = ombra(new T.Mesh(lettere(cxl, cyl, s, 0.032, zl), h.lettere)); scene.add(lett)
+    const lett = ombra(new T.Mesh(lettere(cxl, cyl, s, 0.032 * k, zl), h.lettere)); scene.add(lett)
     h.neon = new T.MeshBasicMaterial({ color: 0xfff1d8, transparent: true, opacity: 0 })
-    const neon = new T.Mesh(lettere(cxl, cyl, s, 0.008, zl + 0.032), h.neon); scene.add(neon)
-    // la luce che l'insegna manda sul muro e sulla saracinesca: tre lampade davanti al pannello
-    h.luciInsegna = [-0.4, -0.13, 0.13, 0.4].map((f) => { const l = new T.PointLight(0xffb45c, 0, 4, 2); l.position.set(cxl + 0.9 * f, cyl - 0.05, z0 + PROF + 0.45); scene.add(l); return l })
+    const neon = new T.Mesh(lettere(cxl, cyl, s, 0.008 * k, zl + 0.032 * k), h.neon); scene.add(neon)
+    // la luce che l'insegna manda sul muro e sulla saracinesca: quattro lampade davanti al pannello (una sul telefono, che
+    // fa la luce di quattro); l'intensità di ognuna la usa luci.js
+    const posti = telefono ? [0] : [-0.4, -0.13, 0.13, 0.4]
+    h.luciInsegna = posti.map((f) => { const l = new T.PointLight(0xffb45c, 0, 4, 2); l.position.set(cxl + 0.9 * k * f, cyl - 0.05 * k, z0 + PROF + 0.45 * k); scene.add(l); return l })
+    h.luceInsegna = 0.35 * (4 / posti.length) * k * k
     // le colature della pioggia sul muro, sotto il cassonetto
     const col = await immagine(ART + 'colature.svg').catch(() => null)
-    if (col) { const m = new T.Mesh(new T.PlaneGeometry(LARG + 0.02, 0.1), new T.MeshStandardMaterial({ map: col, transparent: true, roughness: 0.95, depthWrite: false })); m.position.set(cxl, y0 - 0.05, Z_FACCIATA + 0.002); scene.add(m) }
-    h.insegna = { x0, y0, LARG, ALT }
+    if (col) { const m = new T.Mesh(new T.PlaneGeometry(LARG + 0.02, 0.1 * k), new T.MeshStandardMaterial({ map: col, transparent: true, roughness: 0.95, depthWrite: false })); m.position.set(cxl, y0 - 0.05 * k, Z_FACCIATA + 0.002); scene.add(m) }
+    h.insegna = { x0, y0, LARG, ALT, top: y0 + ALT }
   }
 
   // ── la lampada a muro: il braccio, il corpo, la lampadina, il fascio ─────────
@@ -236,10 +248,20 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
     h.lampadina.position.set(x, y - 0.2, Z_FACCIATA + SB); scene.add(h.lampadina)
     const spot = new T.SpotLight(0xffe4c0, 0, 16, 0.75, 0.5, 2)
     spot.position.set(x, y - 0.22, Z_FACCIATA + SB)
-    spot.target.position.set(W / 2 + 0.3, 1.0, 0.3); scene.add(spot.target)
-    spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024); spot.shadow.bias = -0.0005; spot.shadow.normalBias = 0.02; spot.shadow.camera.near = 0.3; spot.shadow.camera.far = 16
+    // (sul telefono la saracinesca è alta 9 m: la lampada illumina la parte di sopra, il resto lo fa il lampione di fronte)
+    spot.target.position.set(W / 2 + (telefono ? 0 : 0.3), telefono ? H - 2.2 : 1.0, 0.3); scene.add(spot.target)
+    spot.castShadow = true; spot.shadow.mapSize.set(telefono ? 512 : 1024, telefono ? 512 : 1024); spot.shadow.bias = -0.0005; spot.shadow.normalBias = 0.02; spot.shadow.camera.near = 0.3; spot.shadow.camera.far = 16
     scene.add(spot); h.lampada = spot
   }
+  // sul telefono, di notte: la luce di un lampione dall'altra parte della strada, fuori vista, che prende tutta la
+  // saracinesca alta (senza ombre, costa poco)
+  if (telefono) {
+    const lp = new T.SpotLight(0xffd9a8, 0, 0, 0.62, 0.7, 2)
+    lp.position.set(W / 2 + 1.5, H * 0.55, 9); lp.target.position.set(W / 2, H * 0.45, 0)
+    scene.add(lp, lp.target); h.lampione = lp
+  }
+  // il fronte del negozio (saracinesca e porta), per l'inquadratura da lontano
+  h.fronte = { x0: -0.1, x1: PORTA.x1 + 0.1 }
 
   // ── il marciapiede bagnato, il cordolo, la strada, il marciapiede di là ──────
   {
@@ -284,7 +306,9 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
       const testa = new T.Mesh(new T.BoxGeometry(0.55, 0.18, 0.3), mFerro); testa.position.set(lx, 7.4, Z - 0.9); scene.add(ombra(testa))
       const bulbo = new T.Mesh(new T.PlaneGeometry(0.45, 0.22), new T.MeshStandardMaterial({ color: 0x333333, emissive: 0xffd090, emissiveIntensity: 0 }))
       bulbo.rotation.x = -Math.PI / 2; bulbo.position.set(lx, 7.3, Z - 0.9); scene.add(bulbo)
-      const luce = new T.PointLight(0xffd090, 0, 40, 2); luce.position.set(lx, 7.1, Z - 0.9); scene.add(luce)
+      // (sul telefono solo la lampadina accesa, senza la luce: è lontana, e una luce in meno conta)
+      const luce = telefono ? null : new T.PointLight(0xffd090, 0, 40, 2)
+      if (luce) { luce.position.set(lx, 7.1, Z - 0.9); scene.add(luce) }
       return { luce, bulbo }
     })
   } else h.lampioni = []
@@ -311,8 +335,13 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true } = {}) 
       return s
     })
     h.autoFreno = new T.PointLight(0xff2418, 0, 6, 2); h.autoFreno.position.set(-2.4, 0.7, 0); auto.add(h.autoFreno)
-    h.autoNeon = new T.PointLight(0x28dcff, 0, 5, 2); h.autoNeon.position.set(0, 0.25, 0); auto.add(h.autoNeon)
-    auto.visible = false
+    h.autoNeon = telefono ? null : new T.PointLight(0x28dcff, 0, 5, 2)
+    if (h.autoNeon) { h.autoNeon.position.set(0, 0.25, 0); auto.add(h.autoNeon) }
+    // l'auto resta sempre nella scena, con le luci a zero quando non passa: si nasconde solo la carrozzeria. three conta
+    // solo le luci visibili, e il numero delle luci entra nei programmi di tutti i materiali illuminati: nascondere il
+    // gruppo intero voleva dire ricompilarli tutti al primo passaggio (su Windows, secondi di blocco)
+    h.autoCorpo = auto.children.filter((o) => o.isMesh)
+    for (const o of h.autoCorpo) o.visible = false
     scene.add(auto); h.auto = auto
   }
 

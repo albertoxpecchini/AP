@@ -6,6 +6,10 @@
 //   node tools/pzkko/scena/foto.mjs [--ora=12:00] [--scroll=0|0.5|1] [--larg=1440] [--alt=900] [--q=…] [--nome=x]
 //     dalla cartella albertopecchini.it; le foto vanno in tools/pzkko/lavoro/scena-<nome>.png
 //   ?q= aggiunge parametri all'indirizzo (es. --q=notte=1&auto=1 oppure --q=allinea=1)
+//   --dpr=3 la densità dei pixel (telefono: --larg=390 --alt=844 --dpr=3)
+//   --subito non aspetta l'arrivo: fotografa la scena da lontano --attesa ms dopo che è comparsa; con
+//     --sequenza=N --passo=ms fa N foto una dopo l'altra (scena-<nome>-1.png …) per vedere il volo
+//   Alla fine dice i tempi dei fotogrammi durante l'arrivo (media, 95° percentile, massimo, quanti sopra 33 ms).
 import { createServer } from 'node:http'
 import { readFile, mkdir, stat } from 'node:fs/promises'
 import { createRequire } from 'node:module'
@@ -18,6 +22,7 @@ const LAVORO = join(QUI, '../lavoro')
 const arg = (n, d) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? '').split('=').slice(1).join('=') || d
 const ora = arg('ora', '12:00'), scroll = Number(arg('scroll', '0')), larg = Number(arg('larg', '1440')), alt = Number(arg('alt', '900')), extra = arg('q', ''), attesa = Number(arg('attesa', '2500')), vars = arg('vars', ''), prova = arg('prova', ''), hover = arg('hover', ''), nome = arg('nome', `${ora.replace(':', '')}-${scroll}`)
 const pagina = arg('pagina', '/')
+const inietta = arg('inietta', ''), dpr = Number(arg('dpr', '1')), subito = process.argv.includes('--subito'), sequenza = Number(arg('sequenza', '1')), passo = Number(arg('passo', '400'))
 
 const TIPI = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.json': 'application/json' }
 const puppeteer = createRequire(join(QUI, '../../catture/package.json'))('puppeteer-core')
@@ -33,12 +38,36 @@ const browser = await puppeteer.launch({ executablePath: exe, headless: true, ar
 const page = await browser.newPage()
 page.on('console', (m) => { if ((m.type() !== 'log' && m.type() !== 'info' && m.type() !== 'debug') || m.text().startsWith('scena 3D')) console.log(`[browser ${m.type()}]`, m.text()) })
 page.on('pageerror', (e) => console.log('[pageerror]', e.message))
-await page.setViewport({ width: larg, height: alt, deviceScaleFactor: 1 })
-await page.goto(url, { waitUntil: 'networkidle0', timeout: 120000 })
+await page.setViewport({ width: larg, height: alt, deviceScaleFactor: dpr })
+// --inietta=<js> : codice eseguito nella pagina prima di tutto il resto (per le prove)
+if (inietta) await page.evaluateOnNewDocument(inietta)
+await page.goto(url, { waitUntil: subito ? 'domcontentloaded' : 'networkidle0', timeout: 120000 })
 await page.evaluate(() => document.querySelector('.auguri')?.remove())
 const t0 = Date.now()
+await mkdir(LAVORO, { recursive: true })
+if (subito) {
+  // la scena da lontano (e il volo, con --sequenza): niente scorrimento né variabili, solo foto
+  try { await page.waitForSelector('html.scena-vista', { timeout: 40000 }) } catch { console.log('la scena non compare (html.scena-vista non arriva)') }
+  console.log(`scena comparsa dopo ${((Date.now() - t0) / 1000).toFixed(1)} s`)
+  await new Promise((r) => setTimeout(r, attesa))
+  for (let i = 1; i <= sequenza; i++) {
+    const out = join(LAVORO, sequenza > 1 ? `scena-${nome}-${i}.png` : `scena-${nome}.png`)
+    const t = Date.now()
+    await page.screenshot({ path: out, captureBeyondViewport: false })
+    const fase = await page.evaluate(() => window.pzkkoScena?.fase())
+    console.log('scritta', out, fase)
+    if (i < sequenza) await new Promise((r) => setTimeout(r, Math.max(0, passo - (Date.now() - t))))
+  }
+  await browser.close(); server.close(); process.exit(0)
+}
 try { await page.waitForSelector('html[data-scena="pronta"]', { timeout: 40000 }) } catch { console.log('la scena non è partita (html[data-scena] non arriva)') }
 console.log(`scena pronta in ${((Date.now() - t0) / 1000).toFixed(1)} s`)
+// i fotogrammi dell'arrivo: quanto sono durati
+const tempi = await page.evaluate(() => window.pzkkoTempi || [])
+if (tempi.length > 10) {
+  const ord = [...tempi.slice(3)].sort((a, b) => a - b), media = ord.reduce((a, b) => a + b, 0) / ord.length
+  console.log(`arrivo: ${tempi.length} fotogrammi, media ${media.toFixed(1)} ms, 95° ${ord[Math.floor(ord.length * 0.95)]} ms, massimo ${ord.at(-1)} ms, sopra 33 ms: ${ord.filter((x) => x > 33).length}${tempi.some((x) => x > 33) ? ' (ai fotogrammi ' + tempi.map((x, i) => (x > 33 ? i : -1)).filter((i) => i >= 0).join(', ') + ' dalla comparsa)' : ''}`)
+}
 await page.evaluate((s) => { scrollTo(0, s * (document.documentElement.scrollHeight - innerHeight)) }, scroll)
 // --vars=--auto-l:0.9;--auto-x:0.45 : variabili CSS imposte alla pagina (per fermare un'auto, provare le luci)
 if (vars) await page.evaluate((v) => { for (const kv of v.split(';')) { const [k, val] = kv.split(/:(.*)/); document.documentElement.style.setProperty(k.trim(), val.trim()) } }, vars)

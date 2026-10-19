@@ -1,39 +1,47 @@
 // Quello che sta attaccato alla saracinesca, preso dalla pagina: ogni elemento
 // .it della parete (volantini, manifesti, graffiti, nastri) diventa un foglio di
-// poligoni nel punto esatto in cui sta nel DOM (le stesse --x --y --w --r in
-// 1280esimi), piegato sulle doghe, con la sua immagine sopra. I volantini usano
-// le foto fatte da tools/pzkko/scena/cattura.mjs (art/scena/vol/), i tagliandi
-// sono pezzi a sé che cadono quando la pagina li strappa. Il DOM resta sotto,
-// invisibile, a ricevere i clic: qui si ascoltano solo passaggi, fuoco e strappi.
+// poligoni nel punto esatto in cui sta nel DOM, piegato sulle doghe, con la sua
+// immagine sopra. La posizione è quella che la pagina usa in quel momento
+// (--px --py --pw --pr: le --x --y --w --r in 1280esimi sul computer, le --mx
+// --my --mw --mr in 390esimi sul telefono). I volantini usano le foto fatte da
+// tools/pzkko/scena/cattura.mjs (art/scena/vol/ per il computer, vol-m/ per il
+// telefono), i tagliandi sono pezzi a sé che cadono quando la pagina li strappa.
+// Il DOM resta sotto, invisibile, a ricevere i clic: qui si ascoltano solo
+// passaggi, fuoco e strappi.
+//
+// I fogli si costruiscono subito, con una trama vuota (un pixel trasparente):
+// le immagini arrivano dopo, ognuna quando arriva, e il foglio compare in
+// dissolvenza. Così la scena si può già guardare da lontano mentre si scarica,
+// e il programma dei materiali è lo stesso prima e dopo (niente ricompilazioni).
 import * as T from './lib/three.js'
 import { profilo, immagine, DOGA } from './materiali.js'
 
 const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+const DISSOLVENZA = 450 // ms
 
-export async function fogli(scene, M, avanzamento = () => {}) {
-  const { K, W, H } = M
-  const manifesto = await fetch('/art/scena/vol.json').then((r) => r.json()).catch(() => ({}))
+const vuota = (() => {
+  const t = new T.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1)
+  t.colorSpace = T.SRGBColorSpace
+  t.needsUpdate = true
+  return t
+})()
+
+export async function fogli(scene, M) {
+  const { K, H, telefono } = M
+  const cartella = telefono ? 'vol-m' : 'vol'
+  const manifesto = await fetch(`/art/scena/${cartella}.json`).then((r) => r.json()).catch(() => ({}))
   const parete = document.querySelector('.parete')
   const elementi = [...parete.querySelectorAll('.it')].filter((el) => el.isConnected && getComputedStyle(el).display !== 'none')
   // l'ordine di sovrapposizione della pagina: z-index (auto = 0) e poi l'ordine nel DOM
   const ordine = elementi.map((el, i) => ({ el, i, z: Number(getComputedStyle(el).zIndex) || 0 })).sort((a, b) => a.z - b.z || a.i - b.i)
   const pezzi = []
   const cache = new Map()
-  let chieste = 0, arrivate = 0
-  const trama = (src) => {
-    if (!cache.has(src)) { chieste++; cache.set(src, immagine(src).catch(() => null).then((t) => { arrivate++; avanzamento(arrivate, chieste); return t })) }
-    return cache.get(src)
-  }
-  // tutte le immagini si chiedono subito, insieme (una alla volta ci vorrebbero secondi); sotto si aspettano dalla cache
-  const nomeVol = (el) => slug(el.id || el.querySelector('h3, .titolo')?.textContent || 'foglio')
-  for (const el of elementi) {
-    if (el.classList.contains('vol')) {
-      const d = manifesto[nomeVol(el)]
-      if (!d) continue
-      trama(`/art/scena/vol/${nomeVol(el)}${d.tagliandi ? '-senza' : ''}.webp`)
-      if (d.tagliandi) trama(`/art/scena/vol/${nomeVol(el)}.webp`)
-    } else { const img = el.tagName === 'IMG' ? el : el.querySelector('img'); if (img) trama(img.currentSrc || img.src) }
-  }
+  const attese = []
+  const trama = (src) => { if (!cache.has(src)) cache.set(src, immagine(src).catch(() => null)); return cache.get(src) }
+  // quando l'immagine arriva, fatto(trama); tutte le richieste partono subito, insieme. Le immagini arrivate si mettono
+  // sui fogli al massimo tre per fotogramma (aggiorna): caricarne venti nella scheda nello stesso fotogramma lo allunga
+  const coda = []
+  const quando = (src, fatto) => attese.push(trama(src).then((t) => { if (t) coda.push(() => fatto(t)) }))
 
   // un foglio piegato sulle doghe: la geometria è un piano suddiviso, ogni vertice
   // sale di quanto sporge la lamiera nel punto del mondo in cui finisce
@@ -56,20 +64,24 @@ export async function fogli(scene, M, avanzamento = () => {}) {
 
   for (let n = 0; n < ordine.length; n++) {
     const { el } = ordine[n]
-    const sv = (p, d = 0) => { const v = parseFloat(el.style.getPropertyValue(p)); return Number.isFinite(v) ? v : d }
-    const x = sv('--x'), y = sv('--y'), w = sv('--w', 100), r = sv('--r')
+    // la posizione che la pagina sta usando adesso (computer o telefono), già risolta dal CSS
+    const cs = getComputedStyle(el)
+    const v = (p, d = 0) => { const x = parseFloat(cs.getPropertyValue(p)); return Number.isFinite(x) ? x : d }
+    const x = v('--px'), y = v('--py'), w = v('--pw', 100), r = v('--pr')
     // la carta sta sopra la lamiera (0,8 mm e poi uno strato ogni foglio); la vernice dei graffiti sta attaccata al metallo
     const strato = 0.0008 + n * 0.00025
     const cl = el.classList
     const tipo = cl.contains('vol') ? 'vol' : cl.contains('man') ? 'man' : cl.contains('pezzo') ? 'pezzo' : 'graffito'
-    let src, pw = w, ph, m = 0, dati = null
+    let src, srcPiena = null, pw = w, ph, m = 0, dati = null
     if (tipo === 'vol') {
       const nome = slug(el.id || el.querySelector('h3, .titolo')?.textContent || 'foglio')
       dati = manifesto[nome]
       if (!dati) { console.warn('scena: manca la foto del volantino', nome); continue }
       const f = w / dati.cw / dati.scala // unità per pixel della foto
       pw = dati.w * f; ph = dati.h * f; m = dati.m * f
-      src = `/art/scena/vol/${nome}${dati.tagliandi ? '-senza' : ''}.webp`
+      src = `/art/scena/${cartella}/${nome}${dati.tagliandi ? '-senza' : ''}.webp`
+      // i tagliandi usano la foto intera (nel foglio la loro fascia è tolta)
+      if (dati.tagliandi) srcPiena = `/art/scena/${cartella}/${nome}.webp`
     } else {
       const img = el.tagName === 'IMG' ? el : el.querySelector('img')
       if (!img) continue
@@ -77,10 +89,6 @@ export async function fogli(scene, M, avanzamento = () => {}) {
       const iw = Number(img.getAttribute('width')) || img.naturalWidth || 100, ih = Number(img.getAttribute('height')) || img.naturalHeight || 100
       ph = (w * ih) / iw
     }
-    const tex = await trama(src)
-    if (!tex) continue
-    // i tagliandi usano la foto intera (nel foglio la loro fascia è tolta)
-    const texPiena = tipo === 'vol' && dati?.tagliandi ? await trama(src.replace('-senza', '')) : tex
     // il centro del foglio nel mondo (la rotazione CSS è attorno al centro dell'elemento, la foto ha il margine attorno)
     const cxU = x - m + pw / 2, cyU = y - m + ph / 2
     const cx = cxU * K, cy = H - cyU * K, theta = -r * Math.PI / 180
@@ -93,17 +101,18 @@ export async function fogli(scene, M, avanzamento = () => {}) {
     const chiaro = cl.contains('chiaro') || cl.contains('bianco')
     let mat
     if (tipo === 'graffito' && !chiaro) {
-      mat = new T.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.03, blending: T.MultiplyBlending, premultipliedAlpha: true, depthWrite: false })
+      mat = new T.MeshBasicMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, blending: T.MultiplyBlending, premultipliedAlpha: true, depthWrite: false })
       mat.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n gl_FragColor = vec4( mix( vec3( 1.0 ), diffuseColor.rgb, diffuseColor.a ), 1.0 );') }
     } else mat = lucido
-      ? new T.MeshPhysicalMaterial({ map: tex, transparent: true, alphaTest: 0.03, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 })
-      : new T.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : 0.88, metalness: 0 })
+      ? new T.MeshPhysicalMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 })
+      : new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : 0.88, metalness: 0 })
     const mesh = new T.Mesh(piano(pw * K, ph * K, cx, cy, theta, tipo === 'graffito' ? 0.0008 + n * 0.00005 : strato, 0, 0, tipo !== 'graffito'), mat)
     if (tipo === 'graffito') { mat.polygonOffset = true; mat.polygonOffsetFactor = -2; mat.polygonOffsetUnits = -2 }
     mesh.castShadow = tipo === 'vol' || tipo === 'man'; mesh.receiveShadow = true
     mesh.renderOrder = n
     gruppo.add(mesh)
-    const pezzo = { el, gruppo, mesh, tipo, alza: 0, meta: 0, tagliandi: [] }
+    const pezzo = { el, gruppo, mesh, tipo, alza: 0, meta: 0, tagliandi: [], arrivo: 0, arrivoT: 0 }
+    quando(src, (t) => { mat.map = t; pezzo.arrivo = performance.now() })
 
     // i tagliandi: fette della foto, ognuna un foglietto suo
     if (dati?.tagliandi) {
@@ -117,7 +126,7 @@ export async function fogli(scene, M, avanzamento = () => {}) {
         const g = piano(tw * K, th * K, cx, cy, theta, strato + 0.0002, lx * K, ly * K)
         const uv = g.attributes.uv
         for (let k = 0; k < uv.count; k++) uv.setXY(k, (tg.x + uv.getX(k) * tg.w) / dati.w, 1 - (tg.y + (1 - uv.getY(k)) * tg.h) / dati.h)
-        const mt = new T.MeshStandardMaterial({ map: texPiena, transparent: true, alphaTest: 0.03, roughness: 0.88 })
+        const mt = new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.88 })
         const tm = new T.Mesh(g, mt)
         tm.castShadow = true; tm.receiveShadow = true; tm.renderOrder = n + 0.5
         // il perno: il bordo alto del tagliando, da cui si piega quando cade
@@ -135,6 +144,7 @@ export async function fogli(scene, M, avanzamento = () => {}) {
         new MutationObserver(osserva).observe(b, { attributes: true, attributeFilter: ['class'] })
         osserva()
       })
+      quando(srcPiena, (t) => { for (const tg of pezzo.tagliandi) tg.mat.map = t; pezzo.arrivoT = performance.now() })
     }
     // il passaggio del puntatore e il fuoco alzano il foglio (come in pagina)
     const su = () => { pezzo.meta = 1 }, giu = () => { pezzo.meta = 0 }
@@ -145,10 +155,14 @@ export async function fogli(scene, M, avanzamento = () => {}) {
     pezzi.push(pezzo)
   }
 
-  // c'è qualcosa che si muove (un foglio che si alza, un tagliando che cade)? serve alle ombre, che se no non si rifanno
-  const inMoto = () => pezzi.some((p) => p.meta > 0 || p.alza > 0.0005 || p.tagliandi.some((t) => t.stato === 'cade'))
+  const comparsa = (t0, now) => (t0 ? Math.min(1, (now - t0) / DISSOLVENZA) : 0)
+  // c'è qualcosa che si muove (un foglio che si alza o compare, un tagliando che cade)? serve alle ombre, che se no non si rifanno
+  const inMoto = (now) => coda.length > 0 || pezzi.some((p) => p.meta > 0 || p.alza > 0.0005 || (p.arrivo && now - p.arrivo < DISSOLVENZA + 50) || p.tagliandi.some((t) => t.stato === 'cade'))
   const aggiorna = (dt, now) => {
+    for (let i = 0; i < 3 && coda.length; i++) coda.shift()()
     for (const p of pezzi) {
+      const fa = comparsa(p.arrivo, now)
+      if (p.mesh.material.opacity !== fa) p.mesh.material.opacity = fa
       // una molla verso l'alzata chiesta
       const k = 1 - Math.exp(-dt * 14)
       p.alza += (p.meta - p.alza) * k
@@ -157,16 +171,17 @@ export async function fogli(scene, M, avanzamento = () => {}) {
         p.gruppo.rotation.x = 0.07 * p.alza
         p.gruppo.rotation.y = -0.03 * p.alza
       }
+      const ft = comparsa(p.arrivoT, now)
       for (const t of p.tagliandi) {
-        if (t.stato === 'su') { t.perno.visible = true; t.perno.rotation.x = 0; t.perno.position.z = 0; t.mat.opacity = 1; continue }
+        if (t.stato === 'su') { t.perno.visible = true; t.perno.rotation.x = 0; t.perno.position.z = 0; t.mat.opacity = ft; continue }
         if (t.stato === 'via') { t.perno.visible = false; continue }
         const u = Math.min(1, (now - t.t0) / 700)
         t.perno.visible = true
         t.perno.rotation.x = -u * u * 1.4
         t.perno.position.z = 0.01 * Math.sin(u * Math.PI)
-        t.mat.opacity = 1 - u * u
+        t.mat.opacity = ft * (1 - u * u)
       }
     }
   }
-  return { pezzi, aggiorna, inMoto }
+  return { pezzi, aggiorna, inMoto, pronti: Promise.all(attese) }
 }

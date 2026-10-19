@@ -62,7 +62,8 @@ export function luci(scene, renderer, h, M) {
   const sunLight = new T.DirectionalLight(0xfff2e0, 0)
   sunLight.castShadow = true
   sunLight.shadow.mapSize.set(2048, 2048)
-  Object.assign(sunLight.shadow.camera, { left: -4.5, right: W + 4.5, top: 7, bottom: -1.5, near: 1, far: 80 })
+  // (sul telefono la saracinesca è alta 9 m: la scatola dell'ombra la prende tutta)
+  Object.assign(sunLight.shadow.camera, M.telefono ? { left: -2, right: W + 2, top: H / 2 + 4, bottom: -(H / 2 + 3), near: 1, far: 80 } : { left: -4.5, right: W + 4.5, top: 7, bottom: -1.5, near: 1, far: 80 })
   sunLight.shadow.bias = -0.0004; sunLight.shadow.normalBias = 0.03; sunLight.shadow.radius = 3
   sunLight.target.position.set(W / 2, H / 2, 0)
   scene.add(sunLight, sunLight.target)
@@ -80,10 +81,12 @@ export function luci(scene, renderer, h, M) {
   scene.fog = new T.Fog(0x9aa4b0, 40, 160)
   const pmrem = new T.PMREMGenerator(renderer)
   const cieloScena = new T.Scene(); cieloScena.add(sky)
-  let ambiente = null, ultimoEl = 99, ultimaNotte = -1, ultimoAmbiente = 0
-  const aggiornaAmbiente = (el, notte, t) => {
-    if (ambiente && Math.abs(el - ultimoEl) < 0.6 * RAD && Math.abs(notte - ultimaNotte) < 0.04 && t - ultimoAmbiente < 2000) return
-    ultimoEl = el; ultimaNotte = notte; ultimoAmbiente = t
+  // il cielo come ambiente e riflesso si rifà solo quando il sole si è spostato di 0,6° (ogni due minuti e mezzo) o la
+  // sera è avanzata: rifarlo costa un cubo di sei facce, e farlo ogni due secondi dava uno scatto ogni due secondi
+  let ambiente = null, ultimoEl = 99, ultimaNotte = -1
+  const aggiornaAmbiente = (el, notte) => {
+    if (ambiente && Math.abs(el - ultimoEl) < 0.6 * RAD && Math.abs(notte - ultimaNotte) < 0.04) return
+    ultimoEl = el; ultimaNotte = notte
     cieloScena.add(sky)
     const nuovo = pmrem.fromScene(cieloScena, 0.02)
     scene.add(sky)
@@ -93,13 +96,15 @@ export function luci(scene, renderer, h, M) {
   }
 
   // ── le variabili della pagina ───────────────────────────────────────────────
+  // (la pagina le scrive tutte su html con style.setProperty: si leggono da lì, coi valori di partenza di :root, senza
+  // getComputedStyle, che a ogni fotogramma costringerebbe il browser a ricalcolare lo stile di tutta la pagina)
+  const st = root.style
   const leggi = () => {
-    const cs = getComputedStyle(root)
-    const v = (n, d = 0) => { const x = parseFloat(cs.getPropertyValue(n)); return Number.isFinite(x) ? x : d }
+    const v = (n, d = 0) => { const x = parseFloat(st.getPropertyValue(n)); return Number.isFinite(x) ? x : d }
     return {
       notte: nottePar ?? v('--notte'), insegna: v('--insegna') * v('--f-insegna', 1), lampioni: v('--lampioni') * v('--f-lampioni', 1),
       autoX: v('--auto-x', 0.5), autoL: v('--auto-l'), freno: v('--freno'), frenoX: v('--freno-x', 1.1), neonAuto: v('--neon-auto'),
-      autoC: cs.getPropertyValue('--auto-c').trim(),
+      autoC: st.getPropertyValue('--auto-c').trim() || '255,226,170',
     }
   }
 
@@ -131,17 +136,18 @@ export function luci(scene, renderer, h, M) {
     scene.environmentIntensity = 0.12 * (1 - buio) + 0.06 * buio
     scene.fog.color.copy(colNebbia.copy(nebbiaGiorno).lerp(nebbiaNotte, buio))
     renderer.toneMappingExposure = 0.55 * (1 - buio) + 1.25 * buio
-    aggiornaAmbiente(elEff, s.notte, t)
+    aggiornaAmbiente(elEff, s.notte)
 
     // ── l'insegna ──
     h.lettere.emissiveIntensity = 1.6 * s.insegna
     h.pannello.emissiveIntensity = 0.12 * s.insegna
     h.neon.color.setRGB(3.2 * s.insegna, 2.9 * s.insegna, 2.3 * s.insegna); h.neon.opacity = s.insegna > 0 ? 1 : 0
-    for (const l of h.luciInsegna) l.intensity = 0.35 * s.insegna
+    for (const l of h.luciInsegna) l.intensity = h.luceInsegna * s.insegna
     // ── la lampada a muro, i lampioni, le finestre di fronte, le spie ──
     h.lampada.intensity = 16 * s.lampioni
     h.lampadina.material.emissiveIntensity = 8 * s.lampioni
-    for (const l of h.lampioni) { l.luce.intensity = 30 * s.lampioni; l.bulbo.material.emissiveIntensity = 6 * s.lampioni }
+    if (h.lampione) h.lampione.intensity = 520 * s.lampioni
+    for (const l of h.lampioni) { if (l.luce) l.luce.intensity = 30 * s.lampioni; l.bulbo.material.emissiveIntensity = 6 * s.lampioni }
     if (t - finestreT > 60000 || (buio > 0.3 && finestreQuanto === 0)) { finestreT = t; finestreQuanto = buio > 0.3 ? 0.3 + Math.random() * 0.35 : 0; for (const f of h.facciate) f.accendi(finestreQuanto) }
     for (const f of h.facciate) f.mat.emissiveIntensity = 1.3 * buio
     // il vetro della porta: di giorno riflette poco, di notte (dentro è buio) molto di più
@@ -161,15 +167,21 @@ export function luci(scene, renderer, h, M) {
       const xw = -10 + x * 22
       h.auto.position.set(xw, -0.13, h.strada.z0 + 1.9)
       inMoto = Math.abs(xw - W / 2) < 13
-      h.auto.visible = inMoto
+      for (const o of h.autoCorpo) o.visible = inMoto
       h.auto.rotation.y = verso > 0 ? 0 : Math.PI
       if (s.autoC) { const [r, g, b] = s.autoC.split(',').map(Number); if (Number.isFinite(r)) { h.autoFari.emissive.setRGB(r / 255, g / 255, b / 255); for (const l of h.autoLuci) l.color.setRGB(r / 255, g / 255, b / 255) } }
       for (const l of h.autoLuci) l.intensity = 110 * s.autoL
       h.autoFari.emissiveIntensity = 5 * s.autoL
       h.autoFanali.emissiveIntensity = (s.autoL > 0 ? 1.2 : 0) + 4 * s.freno
       h.autoFreno.intensity = 1.5 * s.freno
-      h.autoNeon.intensity = 2 * s.neonAuto
-    } else { autoX0 = null; h.auto.visible = false }
+      if (h.autoNeon) h.autoNeon.intensity = 2 * s.neonAuto
+    } else if (autoX0 !== null) {
+      autoX0 = null
+      for (const o of h.autoCorpo) o.visible = false
+      for (const l of h.autoLuci) l.intensity = 0
+      h.autoFreno.intensity = 0; if (h.autoNeon) h.autoNeon.intensity = 0
+      h.autoFari.emissiveIntensity = 0; h.autoFanali.emissiveIntensity = 0
+    }
     return { buio, giorno, notte: s.notte, el: elEff, auto: inMoto }
   }
   return { aggiorna, sole: sunLight, adesso }
