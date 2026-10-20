@@ -334,9 +334,13 @@ quello, senza che la pagina se ne accorga.
   della porta prima di sparire), coi fari che spazzano la saracinesca e la
   porta, i fanali rossi, il neon sotto. Si riflette nel vetro e nelle
   pozzanghere. Prove: `?ora=18:30`, `?notte=1`, `?auto=1` come per la pagina.
-- **Il neon** (`neon.js`, 20.10): l'insegna è un neon vero, non più lettere a
-  scatola. Tubi di vetro da 13 mm lungo la traccia di `insegna.svg` («pzkko», alte
-  26 cm) e, a sinistra, **la chiocciola del logo** (la traccia dell'adesivo e di
+- **Il neon** (`neon.js`, 20.10): l'insegna è un neon vero. «pzkko» ha le lettere
+  dell'insegna di prima (`insegna.svg`): **lettere a scatola a canale aperto**, il
+  tratto tondo largo 46 unità disegnato su una tela e i suoi contorni (marching
+  squares) alzati in fianchi d'alluminio da 3,6 cm, l'interno bianco, il profilo
+  chiaro sul bordo, e dentro il canale il tubo; di giorno le lettere grosse e bianche
+  di prima col tubo dentro, di sera il canale si riempie di luce rossa. Tubi di vetro
+  da 13 mm lungo la traccia di `insegna.svg` («pzkko», alte 26 cm) e, a sinistra, **la chiocciola del logo** (la traccia dell'adesivo e di
   `favicon.png`: guscio a spirale, piede, antenne con le perle degli occhi), a 3,6
   cm dal pannello. Come li piega un vetraio: gli spigoli sono curve, le aperture
   chiuse (la pancia della p, la o) restano aperte di un dito, ai due capi di ogni
