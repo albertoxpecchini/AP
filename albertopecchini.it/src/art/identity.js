@@ -7,7 +7,7 @@
 //   · colori     → styles/tokens.css
 // Se cambiano là, vanno cambiate qui. I testi sono già minuscoli, come il sito.
 
-import { svg, n, nextId } from './kit.js'
+import { svg, n, nextId, softShadow } from './kit.js'
 
 const SANS = 'var(--font-sans)'
 const SERIF = 'var(--font-serif)'
@@ -75,13 +75,9 @@ function T(x, y, str, { fill = C.ink, size = 12, family = MONO, weight = 400, an
 const Rc = (x, y, w, h, fill, extra = '') => `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" fill="${fill}"${extra}/>`
 const Ln = (x1, y1, x2, y2, stroke, sw = 1, extra = '') => `<path d="M${n(x1)} ${n(y1)}L${n(x2)} ${n(y2)}" stroke="${stroke}" stroke-width="${sw}" fill="none"${extra}/>`
 const Ci = (cx, cy, r, extra = '') => `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}"${extra}/>`
-const shadow = (x, y, w, h, o = 0.2) => Rc(x + 8, y + 12, w, h, '#000', ` opacity="${o}" filter="url(#SHADOW)"`)
-const shadowDef = (id) => `<filter id="${id}" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur stdDeviation="12"/></filter>`
+const shadow = (x, y, w, h, o = 0.2) => softShadow(x + 8, y + 12, w, h, { sigma: 12, opacity: o })
 
-const out = (w, h, label, body) => {
-  const id = nextId('f')
-  return svg({ w, h, tone: 'bare', bg: false, label, defs: shadowDef(id), body: body.replaceAll('url(#SHADOW)', `url(#${id})`) })
-}
+const out = (w, h, label, body) => svg({ w, h, tone: 'bare', bg: false, label, body })
 
 /**
  * Quota da tavola: linea sottile, tacche a 45° e misura sopra la linea.

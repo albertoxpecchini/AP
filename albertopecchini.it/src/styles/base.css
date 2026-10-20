@@ -172,6 +172,22 @@ main:focus {
   padding-block: var(--section);
 }
 
+/* Le sezioni lontane dallo schermo non si calcolano né si disegnano: senza, ogni
+   fotogramma animato in cima alla home (l'inchiostro, i burattini) rifaceva il
+   lavoro di tutta la pagina, hit-test del puntatore compresi. L'altezza stimata
+   vale finché la sezione non è passata sullo schermo una volta, poi il browser
+   ricorda quella vera. Il contenimento taglia ciò che sborda: qui non sborda
+   niente, e gli elementi fissi (cursore, anteprima, lightbox) stanno fuori. */
+main > .section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 60rem;
+}
+
+footer.site-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 125rem;
+}
+
 /* ── Tipografia ───────────────────────────────────────────────────────────── */
 
 .label {

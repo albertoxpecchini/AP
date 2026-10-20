@@ -11,10 +11,10 @@
 // Il liquido è una simulazione vera, un'onda in acqua bassa su una griglia di
 // colonne (1 px = 1 mm, g = 9,8 m/s²): corre, fa onde, sciaborda quando si
 // scorre la pagina e quando il puntatore ci passa sopra, e si calma da solo.
-// Tutto è disegnato in un SVG sopra l'hero: il contorno della parola è un
-// <text> con lo stesso carattere dell'HTML (che intanto nasconde il suo), e il
-// liquido è ritagliato dalla stessa parola. Se l'aragosta si allontana dallo
-// schermo si riaddormenta; con «riduci movimento» dorme e basta.
+// Il contorno della parola è un <text> SVG con lo stesso carattere dell'HTML
+// (che intanto nasconde il suo); tutto ciò che si muove è disegnato su canvas,
+// e il liquido è ritagliato dalla stessa parola. Se l'aragosta si allontana
+// dallo schermo si riaddormenta; con «riduci movimento» dorme e basta.
 
 import { aragosta } from '../data/aragosta.js'
 import { clamp, reducedMotion } from './utils.js'
@@ -49,7 +49,6 @@ const Rd = (deg) => {
 }
 const Sc = (x, y = x) => [x, 0, 0, y, 0, 0]
 const at = (m, [x, y]) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]]
-const str = (m) => `matrix(${m.map((v) => +v.toFixed(5)).join(' ')})`
 
 // ── Il liquido: acqua bassa su una griglia sfalsata ─────────────────────────
 // h[i] altezza del liquido nella colonna i, u[j] velocità sul bordo tra i-1 e i.
@@ -207,64 +206,55 @@ function mount(wrap, n) {
   // la posizione di una lettera, maiuscola o minuscola che sia
   const find = (ch, last = false) => letters.toLowerCase()[last ? 'lastIndexOf' : 'indexOf'](ch.toLowerCase())
 
-  // ── SVG ──
+  // ── Gli strati ──
+  // Ciò che si muove sta su tre canvas e un fotogramma non tocca il DOM: con
+  // tutto in un SVG, ogni path o trasformazione cambiati costringevano il
+  // browser a rifare layout, hit-test del puntatore, paint e livelli di tutta la
+  // pagina, a ogni fotogramma. Nell'SVG resta ciò che sta fermo: il contorno
+  // della parola e il ritaglio del liquido (un canvas non saprebbe scrivere
+  // Archivo stretto all'86%, e così il ritaglio è lo stesso <text> del contorno).
+  //   pool  il liquido, ritagliato dalla parola, sotto il contorno
+  //   fx    macchie, gocce e il getto fuori dalla lettera, sopra il contorno
+  //   cray  l'aragosta; il respiro nel sonno è un'animazione CSS del canvas
+  // Le z e il «!» sono testo HTML sopra il getto, animati dal CSS.
+  const layer = (cls) => {
+    const c = document.createElement('canvas')
+    c.className = `ink ${cls}`
+    c.setAttribute('aria-hidden', 'true')
+    return { c, ctx: c.getContext('2d'), box: null, k: 1 }
+  }
+  const pool = layer('ink__pool')
   const root = svg('svg', { class: 'ink', 'aria-hidden': 'true', focusable: 'false' })
-  const defs = svg('defs', {}, root)
-  const clip = svg('clipPath', { id: uid('clip') }, defs)
-  const clipText = svg('text', {}, clip)
-  const grad = svg('linearGradient', { id: uid('grad'), gradientUnits: 'userSpaceOnUse', x1: 0, x2: 0, y1: 0, y2: 100 }, defs)
-  for (const [o, c] of [[0, '#283150'], [0.12, '#191d2b'], [0.5, '#12151f'], [1, '#0b0c10']]) svg('stop', { offset: o, 'stop-color': c }, grad)
-
-  const pool = svg('g', { 'clip-path': `url(#${uid('clip')})` }, root)
-  const body = svg('path', { fill: `url(#${uid('grad')})` }, pool)
-  const shine = svg('path', { class: 'ink__shine' }, pool)
-  const crest = svg('path', { class: 'ink__crest' }, pool)
-  const inJet = svg('path', { fill: INK }, pool)
-  const splashG = svg('g', { fill: '#1d2336' }, pool)
+  const cut = svg('clipPath', { id: uid('cut') }, svg('defs', {}, root))
+  const cutText = svg('text', {}, cut)
   const outline = svg('text', { class: 'ink__outline' }, root)
-  const stainsG = svg('g', { class: 'ink__stains', fill: INK }, root)
-  const dropsG = svg('g', { fill: INK }, root)
-  const jet = svg('path', { fill: INK }, root)
-  const jetShine = svg('path', { class: 'ink__jet-shine' }, root)
-  const zzz = svg('g', { class: 'ink__zzz' }, root)
-  for (let i = 0; i < 3; i++) svg('text', { style: `--i:${i}` }, zzz).textContent = 'z'
-  const bang = svg('text', { class: 'ink__bang' }, root)
-  bang.textContent = '!'
+  pool.c.style.clipPath = `url(#${uid('cut')})`
+  const fx = layer('ink__fx')
+  const marks = document.createElement('div')
+  marks.className = 'ink ink__marks'
+  marks.setAttribute('aria-hidden', 'true')
+  marks.innerHTML = '<span class="ink__zzz"><span style="--i:0">z</span><span style="--i:1">z</span><span style="--i:2">z</span></span><span class="ink__bang">!</span>'
+  const [zzz, bang] = marks.children
+  const cray = layer('ink__cray')
+  // dove la si tocca, quando dorme, per svegliarla
+  const hit = document.createElement('span')
+  hit.className = 'ink__hit'
+  hit.setAttribute('aria-hidden', 'true')
 
-  // l'aragosta: un <g> per pezzo, fratelli nell'ordine di disegno; a ciascuno la
-  // sua matrice intera, calcolata lungo la catena dei genitori
-  const crayfish = svg('g', { class: 'ink__crayfish' }, root)
-  const nodes = []
-  let eyesG
-  for (const id of aragosta.ordine) {
-    const presa = id === 'presa'
-    const p = parts[presa ? aragosta.presa.pezzo : id]
-    const g = svg('g', {}, crayfish)
-    if (presa) {
-      const [x, y, width, height] = aragosta.presa.clip
-      svg('rect', { x, y, width, height }, svg('clipPath', { id: uid('presa') }, defs))
-      g.setAttribute('clip-path', `url(#${uid('presa')})`)
-    }
-    nodes.push({ g, part: p.id })
-    svg('image', { href: `/media/aragosta/${p.id}.webp`, width: p.w, height: p.h, class: 'ink__part' }, g)
-    if (id === 'corpo') eyesG = svg('g', {}, g)
+  // l'aragosta: i pezzi nell'ordine di disegno, ciascuno con la sua matrice
+  // intera calcolata lungo la catena dei genitori; `presa` ridisegna la pinza
+  const nodes = aragosta.ordine.map((id) => ({ part: id === 'presa' ? aragosta.presa.pezzo : id, presa: id === 'presa' }))
+  const images = {}
+  for (const id of Object.keys(parts)) {
+    const img = new Image()
+    img.src = `/media/aragosta/${id}.webp`
+    images[id] = { img, bitmap: null, scale: 0 }
   }
 
   // gli occhi: disco bianco, pupilla, palpebra del colore del guscio e la piega dell'occhio chiuso
-  const eyes = parts.corpo.eyes.map((e, i) => {
-    const cp = svg('clipPath', { id: uid(`eye${i}`) }, defs)
-    svg('ellipse', { cx: e.x, cy: e.y, rx: e.rx + 0.6, ry: e.ry + 0.6 }, cp)
-    const g = svg('g', {}, eyesG)
-    svg('ellipse', { cx: e.x, cy: e.y, rx: e.rx, ry: e.ry, fill: '#fff' }, g)
-    const pupil = svg('circle', { cx: e.x, cy: e.y, r: Math.min(e.rx, e.ry) * 0.44, fill: '#10110f' }, g)
-    const lidG = svg('g', { 'clip-path': `url(#${uid(`eye${i}`)})` }, g)
-    const lid = svg('path', { fill: e.skin, stroke: '#10110f', 'stroke-width': 3 }, lidG)
-    const crease = svg('path', { fill: 'none', stroke: '#10110f', 'stroke-width': 3.2, 'stroke-linecap': 'round' }, g)
-    crease.setAttribute('d', `M${e.x - e.rx * 0.62},${e.y + e.ry * 0.05} Q${e.x},${e.y + e.ry * 0.62} ${e.x + e.rx * 0.62},${e.y + e.ry * 0.05}`)
-    return { ...e, pupil, lid, crease, px: 0, py: 0 }
-  })
+  const eyes = parts.corpo.eyes.map((e) => ({ ...e, px: 0, py: 0, ly: 0, r: 0, crease: 0 }))
 
-  wrap.appendChild(root)
+  wrap.append(pool.c, root, fx.c, marks, cray.c, hit)
 
   // ── Misure ──
   let geo = null
@@ -320,6 +310,7 @@ function mount(wrap, n) {
     const g = {
       W: wrap.offsetWidth || W.width,
       H: wrap.offsetHeight || W.height,
+      z, // lo zoom del piano di /stile/: i canvas ne tengono conto per restare nitidi
       fs,
       cs,
       base,
@@ -354,17 +345,99 @@ function mount(wrap, n) {
     root.setAttribute('viewBox', `0 0 ${f1(g.W)} ${f1(g.H)}`)
     root.style.width = `${g.W}px`
     root.style.height = `${g.H}px`
-    for (const t of [clipText, outline]) {
-      t.textContent = letters
-      t.setAttribute('x', f1(g.xs[0]))
-      t.setAttribute('y', f1(g.base))
-      t.style.cssText = `font-family:${g.cs.fontFamily};font-weight:${g.cs.fontWeight};font-size:${g.fs}px;font-stretch:${g.cs.fontStretch};letter-spacing:${g.cs.letterSpacing};font-kerning:${g.cs.fontKerning}`
-    }
     const n = clamp(Math.round(g.width / 4), 60, 200)
     liquid = liquid && old ? liquid.resized(n, g.width, g.depth / old.depth) : new Liquid(n, g.width)
     placeCrayfish()
+    // i canvas: il liquido sulla parola, l'aragosta fin dove può arrivare, e
+    // getto, gocce e macchie su tutto lo spazio fra le due e l'etichetta
+    const pad = 0.06 * g.fs
+    fit(pool, g.x0 - 2, g.top - pad, g.width + 4, g.bottom + 6 - (g.top - pad))
+    const C = place.box
+    const fx0 = Math.min(g.x0, C.x) - 4
+    const fy0 = Math.min(g.top, C.y) - 4
+    fit(fx, fx0, fy0, Math.max(g.x1, C.x + C.w) + 4 - fx0, Math.max(g.rule + pad + 6, g.bottom + 6) - fy0)
+    fit(cray, C.x, C.y, C.w, C.h)
+    const R = place.rest
+    cray.c.style.setProperty('--ox', `${f1(R.x + R.w / 2 - cray.box.x)}px`)
+    cray.c.style.setProperty('--oy', `${f1(R.y + R.h - cray.box.y)}px`)
+    Object.assign(hit.style, { left: `${f1(R.x)}px`, top: `${f1(R.y)}px`, width: `${f1(R.w)}px`, height: `${f1(R.h)}px` })
+    // il contorno e il ritaglio del liquido: lo stesso testo, il secondo nelle coordinate del suo canvas
+    const font = `font-family:${g.cs.fontFamily};font-weight:${g.cs.fontWeight};font-size:${g.fs}px;font-stretch:${g.cs.fontStretch};letter-spacing:${g.cs.letterSpacing};font-kerning:${g.cs.fontKerning}`
+    for (const [t, x, y] of [[outline, g.xs[0], g.base], [cutText, g.xs[0] - pool.box.x, g.base - pool.box.y]]) {
+      t.textContent = letters
+      t.setAttribute('x', f1(x))
+      t.setAttribute('y', f1(y))
+      t.style.cssText = font
+    }
+    // le z e il «!» sono grandi in proporzione all'aragosta
+    zzz.style.setProperty('--s', f1(place.S / 0.22))
+    Object.assign(bang.style, { fontSize: `${f1(150 * place.S)}px`, left: `${f1(-40 * place.S)}px`, top: `calc(${f1(10 * place.S)}px - 0.8em)` })
+    marksAt = ''
+    shrink()
     return true
   }
+
+  // Un canvas sopra il riquadro (x, y, w, h) della scena, con i pixel dello schermo
+  const fit = (L, x, y, w, h) => {
+    const k = Math.min(3, (devicePixelRatio || 1) * geo.z)
+    const pw = Math.max(1, Math.ceil(w * k))
+    const ph = Math.max(1, Math.ceil(h * k))
+    L.k = k
+    L.box = { x, y, w: pw / k, h: ph / k }
+    L.blank = false
+    if (L.c.width !== pw) L.c.width = pw
+    if (L.c.height !== ph) L.c.height = ph
+    Object.assign(L.c.style, { left: `${x}px`, top: `${y}px`, width: `${L.box.w}px`, height: `${L.box.h}px` })
+  }
+  // lo pulisce e lo porta alle coordinate della scena
+  const begin = (L) => {
+    const { ctx, k, box } = L
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.clearRect(0, 0, L.c.width, L.c.height)
+    ctx.setTransform(k, 0, 0, k, -box.x * k, -box.y * k)
+    return ctx
+  }
+
+  // I pezzi rimpiccioliti una volta sola alla misura a cui si disegnano, a metà
+  // per volta (un salto solo perderebbe dettagli): ogni fotogramma poi copia
+  // pixel quasi uno a uno, nitidi come le <image> dell'SVG di prima.
+  const shrink = () => {
+    if (!place) return
+    for (const [id, im] of Object.entries(images)) {
+      const p = parts[id]
+      if (!im.img.complete || !im.img.naturalWidth) continue
+      const s = Math.min(1, place.S * p.scale * cray.k * 1.1)
+      if (im.bitmap && Math.abs(im.scale - s) < 0.01) continue
+      const tw = Math.max(1, Math.round(p.w * s))
+      const th = Math.max(1, Math.round(p.h * s))
+      let src = im.img
+      let [w, h] = [im.img.naturalWidth, im.img.naturalHeight]
+      for (;;) {
+        const last = w / 2 < tw
+        ;[w, h] = last ? [tw, th] : [Math.round(w / 2), Math.round(h / 2)]
+        const c = document.createElement('canvas')
+        c.width = w
+        c.height = h
+        const ctx = c.getContext('2d')
+        ctx.imageSmoothingQuality = 'high'
+        ctx.drawImage(src, 0, 0, w, h)
+        src = c
+        if (last) break
+      }
+      im.bitmap = src
+      im.scale = s
+    }
+  }
+
+  // Fin dove arriva l'aragosta dal perno su cui si inclina, in pixel del corpo,
+  // qualunque angolo prendano i pezzi: al risveglio la coda scatta di 80° e
+  // le antenne di 50°, e il canvas non deve tagliarle.
+  const extent = (() => {
+    const dist = (p, [x, y]) => (p.parent ? dist(parts[p.parent], p.at) + Math.hypot(x - p.pin[0], y - p.pin[1]) * p.scale : Math.hypot(x - aragosta.pivot[0], y - aragosta.pivot[1]))
+    let r = 0
+    for (const p of Object.values(parts)) for (const c of [[0, 0], [p.w, 0], [0, p.h], [p.w, p.h]]) r = Math.max(r, dist(p, c))
+    return r
+  })()
 
   // L'aragosta sta sopra l'etichetta, grande in proporzione al nome; nella posa
   // «versa» il beccuccio cade poco a destra della prima I. Se a destra non c'è
@@ -384,7 +457,19 @@ function mount(wrap, n) {
     S = Math.min(S, (g.right - aim) / Math.max(1, right - tip[0]))
     const X = aim - S * tip[0]
     const Y = g.bedTop + 1 - S * aragosta.ground
-    place = { X, Y, S }
+    // il riquadro del canvas: un quadrato intorno al perno, con il margine del salto
+    const half = S * extent * 1.15 + 6
+    const cx = X + S * aragosta.pivot[0]
+    const cy = Y + S * aragosta.pivot[1]
+    // a riposo: dove sta l'aragosta che dorme (il respiro parte dal suo fondo, il tocco la sveglia)
+    const sleep = chain(parts, rootM(X, Y, S, poses.dorme), poses.dorme)
+    let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity]
+    for (const p of Object.values(parts))
+      for (const c of [[0, 0], [p.w, 0], [0, p.h], [p.w, p.h]]) {
+        const [x, y] = at(sleep[p.id], c)
+        ;[x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)]
+      }
+    place = { X, Y, S, box: { x: cx - half, y: cy - half, w: 2 * half, h: 2 * half }, rest: { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } }
   }
 
   // ── Stato ──
@@ -401,6 +486,9 @@ function mount(wrap, n) {
   let lookX = null
   let lookY = null
   let stream = null // { head, tail, flow, len }
+  let jet = null // il poligono del getto in questo fotogramma (vedi shapeJet)
+  let bangUntil = 0 // fin quando si vede il «!» del risveglio (s, sull'orologio della scena)
+  let marksAt = '' // dove stanno le z e il «!» (la trasformazione scritta)
   const splashes = []
   const drops = []
   const stains = []
@@ -427,32 +515,61 @@ function mount(wrap, n) {
       bang.classList.remove('is-on')
       void bang.getBoundingClientRect()
       bang.classList.add('is-on')
+      bangUntil = clock + 1
     }
     if (s === 'perde') leakTo = geo.depth * rnd(0.56, 0.68)
   }
 
   // ── Disegno ──
+  // il liquido nelle lettere: il corpo sfumato, il riflesso e il pelo chiaro,
+  // il getto che entra dalla I e gli spruzzi (il canvas è ritagliato dalla parola)
   const drawPool = () => {
     const g = geo
     const L = liquid
     const { n, dx, h } = L
-    let d = `M${f1(g.x0)},${f1(g.bottom + 4)}`
-    let line = ''
-    for (let i = 0; i < n; i++) {
-      const x = g.x0 + (i + 0.5) * dx
-      const y = g.bottom - h[i]
-      if (i === 0) d += `L${f1(g.x0)},${f1(y)}`
-      d += `L${f1(x)},${f1(y)}`
-      line += `${i ? 'L' : 'M'}${f1(x)},${f1(y)}`
+    const ctx = begin(pool)
+    const surface = () => {
+      ctx.beginPath()
+      for (let i = 0; i < n; i++) ctx[i ? 'lineTo' : 'moveTo'](g.x0 + (i + 0.5) * dx, g.bottom - h[i])
     }
-    d += `L${f1(g.x1)},${f1(g.bottom - h[n - 1])}L${f1(g.x1)},${f1(g.bottom + 4)}Z`
-    body.setAttribute('d', d)
-    crest.setAttribute('d', line)
-    shine.setAttribute('d', line)
-    shine.setAttribute('transform', `translate(0 ${f1(2.2 * g.k + 0.8)})`)
-    const top = g.bottom - L.mean
-    grad.setAttribute('y1', f1(top - 3))
-    grad.setAttribute('y2', f1(top - 3 + Math.max(24, g.depth)))
+    ctx.beginPath()
+    ctx.moveTo(g.x0, g.bottom + 4)
+    ctx.lineTo(g.x0, g.bottom - h[0])
+    for (let i = 0; i < n; i++) ctx.lineTo(g.x0 + (i + 0.5) * dx, g.bottom - h[i])
+    ctx.lineTo(g.x1, g.bottom - h[n - 1])
+    ctx.lineTo(g.x1, g.bottom + 4)
+    ctx.closePath()
+    const top = g.bottom - L.mean - 3
+    const grad = ctx.createLinearGradient(0, top, 0, top + Math.max(24, g.depth))
+    for (const [o, c] of [[0, '#283150'], [0.12, '#191d2b'], [0.5, '#12151f'], [1, '#0b0c10']]) grad.addColorStop(o, c)
+    ctx.fillStyle = grad
+    ctx.fill()
+    ctx.lineJoin = 'round'
+    // il riflesso, appena sotto il pelo, e il pelo: un filo chiaro
+    ctx.save()
+    ctx.translate(0, 2.2 * g.k + 0.8)
+    surface()
+    ctx.strokeStyle = 'rgb(255 255 255 / 0.13)'
+    ctx.lineWidth = 2.4
+    ctx.stroke()
+    ctx.restore()
+    surface()
+    ctx.strokeStyle = 'rgb(128 148 205 / 0.6)'
+    ctx.lineWidth = 1
+    ctx.stroke()
+    if (jet) {
+      ctx.fillStyle = INK
+      ctx.fill(jet.shape)
+    }
+    if (splashes.length) {
+      ctx.fillStyle = '#1d2336'
+      ctx.beginPath()
+      for (const q of splashes) {
+        ctx.moveTo(q.x + q.r, q.y)
+        ctx.arc(q.x, q.y, q.r, 0, 2 * Math.PI)
+      }
+      ctx.fill()
+    }
   }
 
   // il getto: una parabola dal beccuccio alla cima della I, poi dritto fino al pelo del liquido
@@ -481,14 +598,13 @@ function mount(wrap, n) {
     return { pts, len, E, F }
   }
 
-  const drawJet = (t) => {
+  // il filo del getto in questo fotogramma: il poligono (dentro e fuori dalla
+  // lettera è lo stesso) e il riflesso sopra la cima della I
+  const shapeJet = (t) => {
     const total = stream ? stream.path.len.at(-1) : 0
     const a = stream ? Math.min(stream.tail, total) : 0
     const b = stream ? Math.min(stream.head, total) : 0
-    if (b - a < 0.5) {
-      for (const el of [jet, jetShine, inJet]) setD(el, '')
-      return
-    }
+    if (b - a < 0.5) return null
     const g = geo
     const { pts, len, E } = stream.path
     const w0 = (4.6 * g.k + 1.2) * (0.35 + 0.65 * stream.flow)
@@ -517,24 +633,29 @@ function mount(wrap, n) {
       right.push([cx + ty * w * 0.5, cy - tx * w * 0.5])
       mid.push([cx + ty * w * 0.18, cy - tx * w * 0.18])
     }
-    const poly = (l, r) => `M${l.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}L${r.reverse().map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}Z`
-    // fuori dalla lettera il getto passa sopra il contorno (entra dall'apertura della I);
-    // dentro, lo stesso getto ritagliato dalla lettera
-    const d = poly([...left], [...right])
-    setD(jet, d)
-    setD(inJet, d)
-    jetOut.setAttribute('height', f1(99999 + E[1] + 1.5))
-    const up = mid.filter((p) => p[1] < E[1])
-    setD(jetShine, up.length > 1 ? `M${up.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}` : '')
-    jetShine.setAttribute('stroke-width', f1(Math.max(0.6, w0 * 0.2)))
+    const shape = new Path2D()
+    left.forEach(([x, y], i) => shape[i ? 'lineTo' : 'moveTo'](x, y))
+    for (let i = right.length - 1; i >= 0; i--) shape.lineTo(right[i][0], right[i][1])
+    shape.closePath()
+    return { shape, top: E[1], shine: mid.filter((p) => p[1] < E[1]), shineWidth: Math.max(0.6, w0 * 0.2) }
   }
-  // il getto «fuori» è tagliato all'altezza della cima della I
-  const jetOut = svg('rect', { x: -99999, y: -99999, width: 299999, height: 99999 }, svg('clipPath', { id: uid('jet') }, defs))
-  jet.setAttribute('clip-path', `url(#${uid('jet')})`)
 
-  const drawDrops = () => {
+  // sopra il contorno: le macchie sull'etichetta, le gocce sotto le lettere e
+  // quelle che cadono, il getto fuori dalla lettera (entra dall'apertura della I)
+  const drawFx = () => {
     const g = geo
-    let d = ''
+    const blank = !jet && !drops.length && !stains.length && !g.leaks.some((l) => l.bead)
+    if (blank && fx.blank) return // vuoto ora e vuoto prima: niente da ridisegnare
+    fx.blank = blank
+    const ctx = begin(fx)
+    ctx.fillStyle = INK
+    for (const st of stains) {
+      ctx.globalAlpha = Math.max(0, st.o)
+      ctx.beginPath()
+      ctx.ellipse(st.x, st.y, st.rx, st.ry, 0, 0, 2 * Math.PI)
+      ctx.fill()
+    }
+    ctx.globalAlpha = 1
     for (const l of g.leaks) {
       if (!l.bead) continue
       const r = l.bead
@@ -542,40 +663,51 @@ function mount(wrap, n) {
       const y0 = l.y
       const cy = y0 + r * (0.9 + 1.1 * p)
       const a = r * 0.55
-      d += `M${f1(l.x - a)},${f1(y0)}C${f1(l.x - a)},${f1(y0 + (cy - y0) * 0.5)} ${f1(l.x - r)},${f1(cy - r * 0.7)} ${f1(l.x - r)},${f1(cy)}A${f1(r)},${f1(r)} 0 1 0 ${f1(l.x + r)},${f1(cy)}C${f1(l.x + r)},${f1(cy - r * 0.7)} ${f1(l.x + a)},${f1(y0 + (cy - y0) * 0.5)} ${f1(l.x + a)},${f1(y0)}Z`
+      ctx.beginPath()
+      ctx.moveTo(l.x - a, y0)
+      ctx.bezierCurveTo(l.x - a, y0 + (cy - y0) * 0.5, l.x - r, cy - r * 0.7, l.x - r, cy)
+      ctx.arc(l.x, cy, r, Math.PI, 0, true)
+      ctx.bezierCurveTo(l.x + r, cy - r * 0.7, l.x + a, y0 + (cy - y0) * 0.5, l.x + a, y0)
+      ctx.closePath()
+      ctx.fill()
     }
     for (const q of drops) {
       const ry = q.r * (1 + Math.min(1.6, q.vy / 900))
       const rx = q.r * (1 - Math.min(0.3, q.vy / 3000))
-      d += `M${f1(q.x - rx)},${f1(q.y)}a${f1(rx)},${f1(ry)} 0 1 0 ${f1(2 * rx)},0a${f1(rx)},${f1(ry)} 0 1 0 ${f1(-2 * rx)},0Z`
+      ctx.beginPath()
+      ctx.ellipse(q.x, q.y, rx, ry, 0, 0, 2 * Math.PI)
+      ctx.fill()
     }
-    setD(dropsPath, d)
-    let sp = ''
-    for (const q of splashes) sp += `M${f1(q.x - q.r)},${f1(q.y)}a${f1(q.r)},${f1(q.r)} 0 1 0 ${f1(2 * q.r)},0a${f1(q.r)},${f1(q.r)} 0 1 0 ${f1(-2 * q.r)},0Z`
-    setD(splashPath, sp)
-    for (const st of stains) st.el.setAttribute('opacity', Math.max(0, st.o).toFixed(2))
-  }
-  const dropsPath = svg('path', {}, dropsG)
-  const splashPath = svg('path', {}, splashG)
-  // scrive `d` solo se è cambiato: a riposo il ciclo non tocca il DOM
-  const setD = (el, d) => {
-    if (el._d !== d) el.setAttribute('d', (el._d = d))
+    if (!jet) return
+    // il getto «fuori» è tagliato all'altezza della cima della I
+    ctx.save()
+    ctx.beginPath()
+    ctx.rect(fx.box.x, fx.box.y, fx.box.w, jet.top + 1.5 - fx.box.y)
+    ctx.clip()
+    ctx.fill(jet.shape)
+    ctx.restore()
+    if (jet.shine.length > 1) {
+      ctx.beginPath()
+      jet.shine.forEach(([x, y], i) => ctx[i ? 'lineTo' : 'moveTo'](x, y))
+      ctx.strokeStyle = 'rgb(178 196 240 / 0.5)'
+      ctx.lineWidth = jet.shineWidth
+      ctx.lineCap = 'round'
+      ctx.stroke()
+    }
   }
 
+  // la posa di questo fotogramma: matrici dei pezzi, palpebre e pupille; le z e
+  // il «!» seguono la testa finché si vedono (nel sonno e subito dopo il risveglio)
   const drawCrayfish = () => {
     if (!place) return
     const pose = {}
     for (const k in P) pose[k] = P[k].v
     const M = chain(parts, rootM(place.X, place.Y, place.S, pose), pose)
-    for (const n of nodes) n.g.setAttribute('transform', str(M[n.part]))
-    // palpebre e pupille
     const lid = clamp(Math.max(pose.lid, blink), 0, 1)
     const inv = invert(M.corpo)
     for (const e of eyes) {
-      const ly = e.y - e.ry - 2 + (2 * e.ry + 4) * lid + (lid > 0.98 ? e.ry : 0)
-      const bulge = e.ry * 0.28
-      e.lid.setAttribute('d', `M${f1(e.x - e.rx - 3)},${f1(e.y - e.ry - 3)}H${f1(e.x + e.rx + 3)}V${f1(ly)}Q${f1(e.x)},${f1(ly + bulge * 2)} ${f1(e.x - e.rx - 3)},${f1(ly)}Z`)
-      e.crease.setAttribute('opacity', smooth(0.85, 1, lid).toFixed(2))
+      e.ly = e.y - e.ry - 2 + (2 * e.ry + 4) * lid + (lid > 0.98 ? e.ry : 0)
+      e.crease = smooth(0.85, 1, lid)
       // la pupilla guarda il punto (lookX, lookY), nelle coordinate del corpo
       let tx = 0
       let ty = 0
@@ -590,18 +722,88 @@ function mount(wrap, n) {
       }
       e.px += (tx - e.px) * 0.35
       e.py += (ty - e.py) * 0.35
-      e.pupil.setAttribute('cx', f1(e.x + e.px))
-      e.pupil.setAttribute('cy', f1(e.y + e.py))
-      e.pupil.setAttribute('r', f1(Math.min(e.rx, e.ry) * (0.44 - 0.2 * startle)))
+      e.r = Math.min(e.rx, e.ry) * (0.44 - 0.2 * startle)
     }
-    // le z del sonno e il «!» del risveglio stanno sopra la testa
-    const [hx, hy] = at(M.corpo, [150, -10])
-    zzz.setAttribute('transform', `translate(${f1(hx)} ${f1(hy)}) scale(${f1(place.S / 0.22)})`)
-    bang.setAttribute('x', f1(hx - 40 * place.S))
-    bang.setAttribute('y', f1(hy + 10 * place.S))
-    const size = `${f1(150 * place.S)}px`
-    if (bang.style.fontSize !== size) bang.style.fontSize = size
+    if (state === 'dorme' || clock < bangUntil) {
+      const [hx, hy] = at(M.corpo, [150, -10])
+      const t = `translate(${f1(hx)}px, ${f1(hy)}px)`
+      if (t !== marksAt) marks.style.transform = marksAt = t
+    }
+    paintCrayfish(M)
     return M
+  }
+
+  const paintCrayfish = (M) => {
+    const ctx = begin(cray)
+    const { k, box } = cray
+    for (const node of nodes) {
+      const im = images[node.part]
+      if (!im.bitmap) continue
+      const p = parts[node.part]
+      ctx.setTransform(k, 0, 0, k, -box.x * k, -box.y * k)
+      ctx.transform(...M[node.part])
+      if (node.presa) {
+        const [x, y, w, h] = aragosta.presa.clip
+        ctx.save()
+        ctx.beginPath()
+        ctx.rect(x, y, w, h)
+        ctx.clip()
+      }
+      ctx.drawImage(im.bitmap, 0, 0, p.w, p.h)
+      if (node.presa) ctx.restore()
+      else if (node.part === 'corpo') paintEyes(ctx)
+    }
+  }
+
+  // gli occhi, nelle coordinate del corpo
+  const paintEyes = (ctx) => {
+    for (const e of eyes) {
+      ctx.fillStyle = '#fff'
+      ctx.beginPath()
+      ctx.ellipse(e.x, e.y, e.rx, e.ry, 0, 0, 2 * Math.PI)
+      ctx.fill()
+      ctx.fillStyle = '#10110f'
+      ctx.beginPath()
+      ctx.arc(e.x + e.px, e.y + e.py, e.r, 0, 2 * Math.PI)
+      ctx.fill()
+      // la palpebra, ritagliata dall'occhio
+      const bulge = e.ry * 0.28
+      ctx.save()
+      ctx.beginPath()
+      ctx.ellipse(e.x, e.y, e.rx + 0.6, e.ry + 0.6, 0, 0, 2 * Math.PI)
+      ctx.clip()
+      ctx.beginPath()
+      ctx.moveTo(e.x - e.rx - 3, e.y - e.ry - 3)
+      ctx.lineTo(e.x + e.rx + 3, e.y - e.ry - 3)
+      ctx.lineTo(e.x + e.rx + 3, e.ly)
+      ctx.quadraticCurveTo(e.x, e.ly + bulge * 2, e.x - e.rx - 3, e.ly)
+      ctx.closePath()
+      ctx.fillStyle = e.skin
+      ctx.fill()
+      ctx.strokeStyle = '#10110f'
+      ctx.lineWidth = 3
+      ctx.stroke()
+      ctx.restore()
+      // la piega dell'occhio chiuso
+      if (e.crease > 0) {
+        ctx.globalAlpha = e.crease
+        ctx.beginPath()
+        ctx.moveTo(e.x - e.rx * 0.62, e.y + e.ry * 0.05)
+        ctx.quadraticCurveTo(e.x, e.y + e.ry * 0.62, e.x + e.rx * 0.62, e.y + e.ry * 0.05)
+        ctx.lineWidth = 3.2
+        ctx.lineCap = 'round'
+        ctx.stroke()
+        ctx.lineCap = 'butt'
+        ctx.globalAlpha = 1
+      }
+    }
+  }
+
+  // tutti gli strati insieme (dopo un ridimensionamento, che svuota i canvas)
+  const drawAll = () => {
+    drawPool()
+    drawFx()
+    drawCrayfish()
   }
 
   const invert = (m) => {
@@ -746,16 +948,14 @@ function mount(wrap, n) {
       q.y += q.vy * dt
       if (q.y + q.r >= g.rule) {
         drops.splice(i, 1)
-        const st = { x: q.x + rnd(-1, 1), y: g.rule + 0.5, rx: q.r * rnd(1.6, 2.2), ry: q.r * 0.55, o: 0.85, born: clock }
-        st.el = svg('ellipse', { cx: f1(st.x), cy: f1(st.y), rx: f1(st.rx), ry: f1(st.ry) }, stainsG)
-        stains.push(st)
-        if (stains.length > 40) stains.shift().el.remove()
+        stains.push({ x: q.x + rnd(-1, 1), y: g.rule + 0.5, rx: q.r * rnd(1.6, 2.2), ry: q.r * 0.55, o: 0.85, born: clock })
+        if (stains.length > 40) stains.shift()
         for (let s = 0; s < 3; s++) splashes.push({ x: q.x, y: g.rule - 0.5, vx: rnd(-90, 90) * g.k, vy: -rnd(90, 200) * Math.sqrt(g.k), r: q.r * rnd(0.25, 0.4), free: true })
       }
     }
     for (let i = stains.length - 1; i >= 0; i--) {
       stains[i].o = 0.85 * (1 - (clock - stains[i].born) / 7)
-      if (stains[i].o <= 0) stains.splice(i, 1)[0].el.remove()
+      if (stains[i].o <= 0) stains.splice(i, 1)
     }
     for (let i = splashes.length - 1; i >= 0; i--) {
       const q = splashes[i]
@@ -790,9 +990,9 @@ function mount(wrap, n) {
     else if (state === 'sveglia') lookX = lookY = null
     else (lookX = g.x0 + g.width * (0.5 + 0.4 * Math.sin(clock * 0.5))), (lookY = g.top)
 
+    jet = shapeJet(clock)
     drawPool()
-    drawJet(clock)
-    drawDrops()
+    drawFx()
 
     const settled = Object.keys(P).every((k) => Math.abs(P[k].v - target[k]) < 0.05 && Math.abs(P[k].s) < 0.05)
     const calm = state === 'dorme' && settled && !stream && !drops.length && !splashes.length && !stains.length && L.energy() < 4 && !leaking && Math.abs(v) < 1
@@ -827,7 +1027,7 @@ function mount(wrap, n) {
     { passive: true },
   )
   // svegliarla a mano: un tocco sull'aragosta che dorme
-  crayfish.addEventListener('click', () => {
+  hit.addEventListener('click', () => {
     if (state !== 'dorme' || still) return
     go('sveglia')
     wake()
@@ -854,25 +1054,43 @@ function mount(wrap, n) {
   }
   document.addEventListener('visibilitychange', wake)
 
+  // misure nuove (la scena ridimensionata, o lo zoom del piano di /stile/): i
+  // canvas ripartono vuoti e si ridisegna tutto
   let pending = 0
-  new ResizeObserver(() => {
+  const relayout = () => {
     cancelAnimationFrame(pending)
     pending = requestAnimationFrame(() => {
       if (started && layout()) {
-        drawPool()
-        drawCrayfish()
+        drawAll()
         wake()
       }
     })
-  }).observe(wrap)
+  }
+  new ResizeObserver(relayout).observe(wrap)
+  // Il piano di /stile/ ingrandisce con una trasformazione, che il ResizeObserver
+  // non vede: quando si ferma (perde .is-moving), se lo zoom è cambiato parecchio
+  // i canvas si rifanno alla nuova scala. Durante il movimento li scala il
+  // compositore, come i livelli del piano.
+  const plane = wrap.closest('[data-canvas]')
+  if (plane)
+    new MutationObserver(() => {
+      if (!geo || plane.classList.contains('is-moving')) return
+      const z = wrap.getBoundingClientRect().width / (wrap.offsetWidth || 1)
+      if (Math.abs(z - geo.z) > 0.15 * geo.z) relayout()
+    }).observe(plane, { attributes: true, attributeFilter: ['class'] })
+
+  // i pezzi arrivano dalla rete: quando ci sono si rimpiccioliscono e l'aragosta si ridisegna
+  Promise.all(Object.values(images).map(({ img }) => img.decode().catch(() => {}))).then(() => {
+    shrink()
+    if (started) drawCrayfish()
+  })
 
   // parte dopo i caratteri e dopo che il nome è salito al suo posto
   const ready = Promise.all([document.fonts?.ready, ...word.getAnimations().map((a) => a.finished.catch(() => {}))])
   Promise.race([ready, new Promise((r) => setTimeout(r, 2500))]).then(() => {
     if (!layout()) return
     started = true
-    drawPool()
-    drawCrayfish()
+    drawAll()
     wrap.classList.add('is-inked')
     wrap.dataset.ink = state
     if (still) return

@@ -32,6 +32,16 @@ const center = (el) => {
   return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }
 }
 
+// Le scritture di un fotogramma aspettano che tutti i burattini abbiano letto le
+// loro misure: una lettura dopo una scrittura costringe il browser a rifare stile
+// e layout, e con più burattini (e i loro occhi) succedeva più volte a fotogramma.
+const writes = []
+const put = (el, prop, value) => writes.push(el, prop, value)
+const flush = () => {
+  for (let i = 0; i < writes.length; i += 3) writes[i].style.setProperty(writes[i + 1], writes[i + 2])
+  writes.length = 0
+}
+
 export function initPuppets() {
   const roots = $$('[data-puppet]')
   if (!roots.length) return
@@ -52,8 +62,10 @@ export function initPuppets() {
     for (const P of puppets) {
       if (!P.visible) continue
       any = true
-      step(P, dt, now)
+      measure(P)
     }
+    for (const P of puppets) if (P.visible) step(P, dt, now)
+    flush()
     raf = any ? requestAnimationFrame(frame) : ((then = 0), null)
   }
   const wake = () => {
@@ -341,34 +353,42 @@ export function initPuppets() {
     }
     F.vx = dt ? (F.x - x0) / dt : 0
     const t = `translate(${F.x.toFixed(1)}px, ${F.y.toFixed(1)}px)`
-    if (t !== F.shown) F.wrap.style.transform = F.shown = t
+    if (t !== F.shown) put(F.wrap, 'transform', (F.shown = t))
   }
 
   // ── un fotogramma ──────────────────────────────────────────────────────────
 
-  function step(P, dt, now) {
-    const on = active(now) || Boolean(P.dragging)
-    const t = now / 1000
-
-    // letture, tutte prima delle scritture
+  // le letture di un burattino, tutte prima delle scritture di ogni burattino
+  function measure(P) {
     for (const p of P.parts) {
       const hide = p.cfg?.hide
       p.abs = p.parent ? p.parent.abs + p.rest + p.a + (hide?.r || 0) * p.h : P.off.r
       p.S = (p.parent ? p.parent.S : 1) * (hide ? 1 - (1 - (hide.s ?? 1)) * p.h : 1)
       if (p.cfg) p.pv = center(p.pin)
     }
-    for (const e of P.eyes) e.c = center(e.eye)
-    const box = center(P.root)
+    for (const e of P.eyes) {
+      e.c = center(e.eye)
+      e.rx = e.eye.offsetWidth / 2
+      e.ry = e.eye.offsetHeight / 2
+    }
+    P.box = center(P.root)
     if (P.flee) {
       P.flee.box = P.flee.arena.getBoundingClientRect()
       P.flee.me = P.flee.wrap.getBoundingClientRect()
     }
+    if (P.gaze.el) P.gaze.c = center(P.gaze.el)
+  }
+
+  function step(P, dt, now) {
+    const on = active(now) || Boolean(P.dragging)
+    const t = now / 1000
+    const box = P.box
 
     // dove si guarda: il puntatore, o un punto che cambia ogni tanto
     // (con il movimento ridotto si guarda avanti, un po' in basso, e basta)
     if (!on && P.gaze.el) {
       // un punto fisso (la sede sulla carta), con appena un tremito dello sguardo
-      const c = center(P.gaze.el)
+      const c = P.gaze.c
       if (now > P.gaze.next) P.gaze = { ...P.gaze, next: now + rand(1200, 2600), jx: still ? 0 : rand(-6, 6), jy: still ? 0 : rand(-4, 4) }
       P.gaze.x = c.x + (P.gaze.jx || 0)
       P.gaze.y = c.y + (P.gaze.jy || 0)
@@ -450,7 +470,7 @@ export function initPuppets() {
     const sx = (o.x + o.lx + L.x).toFixed(2)
     const sy = (o.y + o.ly + L.y).toFixed(2)
     const stage = `translate(${sx}px, ${sy}px) rotate(${o.r.toFixed(2)}deg)`
-    if (stage !== P.shown) P.stage.style.transform = P.shown = stage
+    if (stage !== P.shown) put(P.stage, 'transform', (P.shown = stage))
 
     // il foglio in bocca: la gravità lo tiene dritto (compensa l'angolo del
     // pezzo che lo porta) e nei salti resta indietro
@@ -463,7 +483,7 @@ export function initPuppets() {
         C.a += C.v * dt
       }
       const r = `rotate(${C.a.toFixed(2)}deg)`
-      if (r !== C.shown) C.el.style.transform = C.shown = r
+      if (r !== C.shown) put(C.el, 'transform', (C.shown = r))
     }
 
     // scritture
@@ -478,7 +498,7 @@ export function initPuppets() {
         const scale = `scale(${(1 - (1 - (hide.s ?? 1)) * h).toFixed(3)})`
         t = hide.own ? `${t} ${move} ${scale}` : `${move} ${t} ${scale}`
       }
-      if (t !== p.shown) p.el.style.transform = p.shown = t
+      if (t !== p.shown) put(p.el, 'transform', (p.shown = t))
     }
 
     // occhi: ciascuno per sé; senza puntatore ognuno sceglie il suo punto
@@ -496,11 +516,9 @@ export function initPuppets() {
       // nel riferimento della testa, che può essere girata
       const a = -e.part.abs * DEG
       const [lx, ly] = [dx * Math.cos(a) - dy * Math.sin(a), dx * Math.sin(a) + dy * Math.cos(a)]
-      const rx = e.eye.offsetWidth / 2
-      const ry = e.eye.offsetHeight / 2
-      const k = Math.min(1, d / (rx * NEAR))
-      e.pupil.style.setProperty('--px', `${((lx / d) * rx * ROOM * k).toFixed(1)}px`)
-      e.pupil.style.setProperty('--py', `${((ly / d) * ry * ROOM * k).toFixed(1)}px`)
+      const k = Math.min(1, d / (e.rx * NEAR))
+      put(e.pupil, '--px', `${((lx / d) * e.rx * ROOM * k).toFixed(1)}px`)
+      put(e.pupil, '--py', `${((ly / d) * e.ry * ROOM * k).toFixed(1)}px`)
     }
   }
 }
@@ -797,7 +815,7 @@ const NUTRIA = {
     if (braccio2) braccio2.pose = arm
     mascella.pose = jaw
     const open = clamp(-mascella.a / 30, 0, 1).toFixed(3)
-    if (open !== N.open && N.mouth) N.mouth.style.setProperty('--open', (N.open = open))
+    if (open !== N.open && N.mouth) put(N.mouth, '--open', (N.open = open))
 
     // ── la testa: segue il boccone, scende col braccio, annusa, si scrolla
     const sniff = bell(U.sniff, 900)
