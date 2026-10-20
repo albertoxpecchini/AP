@@ -45,23 +45,31 @@ serio ma è un progetto Vercel a parte.
   canvas). Le figure delle carte sono in `art/blackjack/` (le dodici mezze
   figure, gpt-image-2 il 17.10.2026, `tools/pzkko/blackjack/figure.mjs`).
 - `games/pzk.js` — i $pzk, gli stessi per tutti i giochi.
+- `regia/` — la regia, il pannello nascosto per provare il sito (vedi sotto):
+  `regia.js` e `regia.css`.
 - `scena/` — la scena 3D della home (vedi sotto): `scena.js` (la telecamera,
   l'inquadratura allineata al DOM, il giro), `mondo.js` (il posto: facciata,
   saracinesca, insegna, porta a vetri, marciapiede, strada, palazzi, lampada,
-  auto), `fogli.js` (i volantini e i graffiti presi dalla pagina), `luci.js`
-  (il sole di Mantova, il cielo, le luci della notte), `materiali.js` (le trame
-  disegnate e il profilo delle doghe), `scena.css`, `lib/` (three.js
-  r186 con gli addon, MIT, `tools/pzkko/scena/motore.mjs`; `gltf.js` è
-  l'esportatore glTF a parte, si scarica solo con `?glb=1`).
+  auto), `neon.js` (i tubi al neon dell'insegna e la chiocciola del logo),
+  `fogli.js` (i volantini e i graffiti presi dalla pagina, e la superficie su cui
+  camminano le bestie), `acqua.js` (la condensa che scende sulla lamiera e il muro
+  bagnato), `bestie.js` (formiche, mosche, zanzare e blatte), `marciapiede.js`
+  (le lastre e le pozzanghere, disegnate dallo shader), `luci.js` (il sole di
+  Mantova, il cielo, le luci della notte), `materiali.js` (le trame disegnate, il
+  profilo e la griglia delle doghe), `scena.css`, `lib/` (three.js r186 con gli
+  addon, MIT, `tools/pzkko/scena/motore.mjs`; `gltf.js` è l'esportatore glTF a
+  parte, si scarica solo con `?glb=1`).
 - `art/scena/` — quello che serve alla scena: `lamiera.webp` e `lamiera-r.webp`
   (il colore e la rugosità della saracinesca, tirati fuori dalla foto `muro.webp`
   togliendole la luce, `tools/pzkko/scena/mappe.mjs`), `pannello.svg` e
-  `colature.svg` (il pannello dell'insegna e le colature, da `insegna.svg`),
+  `colature.svg` (il pannello dell'insegna, senza l'adesivo: la chiocciola ora è
+  un neon, e le colature, da `insegna.svg`),
   `vol/` e `vol.json`, `vol-m/` e `vol-m.json` (le foto dei volantini per il
   computer e per il telefono, `tools/pzkko/scena/cattura.mjs`), `trame/`
-  (intonaco, lastre del marciapiede e asfalto, colore e normali, 74 KB in
-  tutto: le disegna una volta `tools/pzkko/scena/trame.mjs` con le funzioni di
-  `materiali.js`, che nella pagina costavano due secondi fermi).
+  (intonaco e asfalto, colore e normali, 37 KB in tutto: le disegna una volta
+  `tools/pzkko/scena/trame.mjs` con le funzioni di `materiali.js`, che nella
+  pagina costavano due secondi fermi; le lastre del marciapiede dal 20.10 le
+  disegna lo shader, `marciapiede.js`).
 - `fonts/` — Anton e Archivo Black (SIL OFL), Special Elite e Permanent Marker
   (Apache 2.0), da Google Fonts, serviti da qui.
 - `404.html` — pagina non trovata: lo stesso muro, con i resti del volantino
@@ -248,8 +256,9 @@ quello, senza che la pagina se ne accorga.
   sposta il muro e le misure vengono sbagliate.
 
 - **Com'è fatto il trucco**: la pagina di sempre resta lì, sotto, invisibile
-  (`html.scena3d` in `scena.css`): i link dei volantini, i tagliandi, i giochi,
-  le mosche, le formiche e la goccia sono ancora i suoi; la scena si disegna in
+  (`html.scena3d` in `scena.css`): i link dei volantini, i tagliandi e i giochi
+  sono ancora i suoi (le sue mosche, formiche e la goccia no: nascoste e ferme,
+  nella scena sono 3D); la scena si disegna in
   una tela fissa dietro e **l'inquadratura è calcolata perché la saracinesca 3D
   stia esattamente dove sta il muro nel DOM** (proiezione decentrata: la
   telecamera sta un po' a destra e più in basso del centro, come una persona sul
@@ -270,14 +279,12 @@ quello, senza che la pagina se ne accorga.
   pietra, il pluviale, il citofono, la targa del civico, le finestre del piano
   di sopra. L'insegna è il cassonetto d'alluminio (1,5 m: più stretto della
   saracinesca e centrato su di lei), appena sopra l'architrave, col pannello
-  sporco (`pannello.svg`) e le lettere «pzkko» (alte 28 cm) come tubi di
-  metacrilato lungo la stessa traccia di `insegna.svg`, col filo del neon
-  davanti (i tratti dritti sono un tubo solo, le curve otto pezzi, una sfera
-  solo ai capi e negli angoli: 47 000 triangoli diventati pochi migliaia). A destra la porta a vetri
+  sporco (`pannello.svg`) e davanti l'insegna al neon (vedi sotto, *Il neon*);
+  sopra il cassonetto il trasformatore. A destra la porta a vetri
   del negozio: il vetro è uno specchio vero della strada (Reflector), dentro il
   buio con bancone, scaffali, il cartello «chiuso» appeso e la spia dell'allarme
-  che lampeggia. Davanti il marciapiede di lastre bagnate (le pozzanghere sono un
-  secondo specchio), il cordolo, l'asfalto, e di là dalla strada cinque palazzi
+  che lampeggia. Davanti il marciapiede di lastre bagnate con le pozzanghere (vedi
+  sotto, *Il marciapiede*), il cordolo, l'asfalto, e di là dalla strada cinque palazzi
   con le finestre che la sera si accendono, e due lampioni. In `scena.css` il
   muro è un po' più stretto (`64vw`) e messo in modo che al centro dello schermo
   stia tutto il fronte del negozio, saracinesca e porta: così la porta e la
@@ -291,7 +298,15 @@ quello, senza che la pagina se ne accorga.
   resta sopra la lamiera); i graffiti stanno
   attaccati al metallo (quelli scuri sono vernice che si moltiplica col metallo,
   come il `multiply` della pagina: l'inchiostro resta nero e si legge; quelli
-  chiari, `.chiaro` e `.bianco`, coprono), la carta un filo sopra, uno strato per foglio
+  chiari, `.chiaro` e `.bianco`, coprono). **I graffiti stanno sugli stessi
+  triangoli della lamiera** (le sue righe e colonne dentro il rettangolo del
+  graffito, `lamiera()` in `materiali.js`), un decimo di millimetro sopra, con la
+  foto stesa in coordinate del mondo: fino al 20.10 avevano una griglia loro, e
+  carta e graffiti contavano le doghe da H invece che dal giunto in cima al
+  rotolo (H + 30 cm), sfasati di 0,4 doghe: la lamiera li bucava a strisce, e il
+  `polygonOffset` che li teneva su, nella proiezione obliqua degli specchi, li
+  tirava sopra i manifesti (le pozzanghere sotto la saracinesca). La vernice non
+  si alza col puntatore. La carta un filo sopra, uno strato per foglio
   nell'ordine di sovrapposizione della pagina (z-index e ordine nel DOM); finita
   la dissolvenza la carta diventa opaca e si disegna prima della lamiera, che
   sotto di lei non si calcola più (i fogli coprono metà saracinesca). I
@@ -311,14 +326,91 @@ quello, senza che la pagina se ne accorga.
   luce d'ambiente e da riflesso (PMREM, rifatto quando il sole si sposta). Di
   notte la scena legge ogni fotogramma le variabili CSS della pagina
   (`--notte`, `--insegna` con lo sfarfallio, `--lampioni`, `--auto-x`,
-  `--auto-l`, `--auto-c`, `--freno`, `--neon-auto`) e accende i poligoni: le
-  lettere e il filo del neon (emissivi, col bagliore), tre lampade davanti al
-  pannello, la lampada a muro sopra la porta (un faro con le ombre), i lampioni
+  `--auto-l`, `--auto-c`, `--freno`, `--neon-auto`) e accende i poligoni: i
+  tubi al neon (emissivi, col bagliore), quattro lampade davanti al pannello del
+  colore dei tubi, la lampada a muro sopra la porta (un faro con le ombre), i lampioni
   di là, le finestre dei palazzi; e **l'auto che passa è un'auto**: una berlina
   sulla strada dietro la telecamera (da x = −10 a 12 m, così esce dallo specchio
   della porta prima di sparire), coi fari che spazzano la saracinesca e la
   porta, i fanali rossi, il neon sotto. Si riflette nel vetro e nelle
   pozzanghere. Prove: `?ora=18:30`, `?notte=1`, `?auto=1` come per la pagina.
+- **Il neon** (`neon.js`, 20.10): l'insegna è un neon vero, non più lettere a
+  scatola. Tubi di vetro da 13 mm lungo la traccia di `insegna.svg` («pzkko», alte
+  26 cm) e, a sinistra, **la chiocciola del logo** (la traccia dell'adesivo e di
+  `favicon.png`: guscio a spirale, piede, antenne con le perle degli occhi), a 3,6
+  cm dal pannello. Come li piega un vetraio: gli spigoli sono curve, le aperture
+  chiuse (la pancia della p, la o) restano aperte di un dito, ai due capi di ogni
+  pezzo il tubo gira all'indietro (il gomito verniciato di nero) ed entra nel
+  pannello da un passacavo di gomma; i supporti di plastica ogni ~16 cm, il
+  trasformatore sopra il cassonetto. **Colori veri, quelli dei gas**: «pzkko» è
+  neon, rosso arancio, la chiocciola argon e mercurio in vetro cobalto, blu. Il
+  vetro tinge quello che ha dietro (due passate: una moltiplica il fondo per il
+  colore del vetro, una aggiunge i riflessi), così di giorno i tubi spenti si
+  vedono rossi e blu sul pannello bianco; di sera il gas riempie il tubo (oltre
+  l'1, il bagliore lo allarga), la luce cade sul pannello (i tratti sfocati su
+  una tela, la sua trama emissiva) e sul muro (le quattro lampade dell'insegna,
+  tre rosse e una blu; sul telefono una rossa). **Il tone mapping**: AgX porta al
+  pastello tutto ciò che è molto saturo e molto acceso (il rosso del neon veniva
+  salmone); l'OutputPass (in `scena.js`) per quei pixel mescola una curva che tiene
+  la tinta (il colore diviso per il suo massimo; il cuore più acceso schiarisce verso un
+  bianco caldo, come nelle foto dei neon veri), e non tocca la carta e i muri,
+  che così in alto non arrivano. Lo sfarfallio resta quello della pagina
+  (`--insegna`, `--f-insegna`).
+- **L'acqua** (`acqua.js`): la condensa dello split del primo piano esce dal muro
+  sotto la finestra (il buco col rosone), scende in un tubo grigio fissato con le
+  graffe, entra sotto l'architrave e finisce contro la lamiera a destra
+  dell'insegna. La goccia si gonfia alla bocca (3–9 s), si stacca e scende a
+  scatti come sulla vernice vera: più è grossa più corre, dove la lamiera la
+  trattiene si ferma, quando la raggiunge un'altra si uniscono e ripartono, per
+  strada perde acqua; in fondo resta appesa alla barra e cade sulla soglia:
+  schizzo e cerchio. **Il muro bagnato** è uno shader solo (`bagnato(materiale,
+  tipo)`), in coordinate del mondo, sulla lamiera, sulla carta, sull'intonaco e
+  sulla pietra: il rivolo scuro e lucido lungo la stessa linea storta delle gocce,
+  che si allarga verso il basso e nei giunti delle doghe, col velo d'acqua che
+  scorre (la normale si muove verso il basso); la carta bagnata più scura e satura;
+  sotto il buco del tubo la riga d'umido sull'intonaco; in basso gli schizzi della
+  pioggia (20–40 cm); sull'intonaco l'umidità che sale dal terreno col bordo bianco
+  del salnitro; ai piedi del rivolo la pozza. Il rivolo disegnato della pagina
+  (`bestiole/rivolo.webp`, `data-scena="no"`) resta solo nel muro di sempre.
+- **Le bestie** (`bestie.js`): al posto dei disegni piatti della pagina, in 3D,
+  a grandezza vera o quasi. **Formiche** (13 mm) in fila alle gomme da masticare
+  sulla lamiera: una pista dalla barra in fondo a `strada1/gomme`, una dalla guida
+  di destra a `bestiole/gomme2`; storta, ognuna col suo scarto; si fermano ad
+  antennarsi quando si incrociano, mangiano e tornano con la briciola rosa,
+  rientrano e ripartono; col puntatore vicino si sparpagliano e poi ritrovano la
+  pista. **Mosche** (13 mm) posate sul muro, sui fogli, sull'insegna: ferme, si
+  girano, due passi, si strofinano le zampe davanti; volano a tratti dritti con
+  virate secche (vicino alla meta rallentano, se no ci girano intorno), a volte una
+  insegue l'altra, e si posano dentro la parte di strada che si vede; scappano dal
+  puntatore, dai fari, dal foglio che si alza; di notte dormono. **Zanzare tigre**
+  (nere a righe bianche, le zampe dietro alzate): di giorno in basso, ronzano
+  piano, cercano il puntatore e ogni tanto vengono a ronzare davanti alla
+  telecamera; di sera girano attorno alla lampada e all'insegna. **Blatte
+  americane** (38 mm), solo di notte: escono da sotto la saracinesca, girano sul
+  marciapiede a scatti, salgono sulla lamiera, si infilano sotto i fogli; con i
+  fari o il puntatore corrono a nascondersi. Ogni specie è una mesh a istanze, le
+  ali trasparenti un'altra: zampe (a tripode, la fase legata alla strada fatta: i
+  piedi non scivolano), antenne e ali le muove lo shader. Camminano sulla
+  superficie vera (`superficie(x, y)` di `fogli.js`: una griglia di 1 cm dice il
+  foglio più in alto, con la sua alzata) e si inclinano sulle doghe. Niente mappe
+  d'ombra (si rifarebbero a ogni fotogramma): un'ombra morbida sotto ognuna, che
+  si allarga e sbiadisce quando si stacca. Con `prefers-reduced-motion` stanno
+  ferme. Il puntatore nel mondo: dove il raggio dalla telecamera tocca la
+  saracinesca o il marciapiede (anche il tocco sul telefono).
+- **Il marciapiede** (`marciapiede.js`): le lastre e le pozzanghere le disegna lo
+  shader in coordinate del mondo (niente trame da scaricare, niente piastrella che
+  si ripete, e il dettaglio regge anche da vicino: in fondo alla pagina la
+  telecamera è a mezzo metro da terra). Granito grigio in lastre 60 × 40 sfalsate:
+  ogni lastra col suo tono (qualcuna rifatta più chiara), un filo d'inclinazione,
+  quanto è affondata; la grana a tre misure, che sfuma nel suo grigio quando è più
+  piccola di un pixel (senza anti-alias tremerebbe); fughe nette, sporco verso le
+  fughe, gomme da masticare schiacciate, chiazze lucide di bagnato. Le pozzanghere
+  stanno nelle lastre affondate, lungo le fughe vicine, verso il cordolo e ai piedi
+  del rivolo; la pietra intorno è più scura e lucida. L'acqua è lo specchio della
+  strada (Reflector, con lo shader delle pozze), appena sopra le lastre e disegnato
+  solo dov'è acqua, col bordo netto, increspato dal vento, più forte radente
+  (Fresnel). La pietra non scende mai sotto ruvidezza 0,2: i bordi smussati lucidi
+  facevano scintille, di notte.
 - **Il costo**: due specchi (ognuno un giro di scena, senza multisample) e due
   mappe d'ombra (sole, lampada) che si rifanno **solo quando serve**: gli
   specchi quando la telecamera si muove (uno sì e uno no, alternandosi), nel
@@ -330,11 +422,12 @@ quello, senza che la pagina se ne accorga.
   MSAA né altro: il 19.10.2026 sono stati tolti, insieme al filtro «da
   videogioco» alla Buckshot Roulette). Quattro livelli
   (`?qualita=alta|media|bassa|telefono`; con `?qualita=` o `?dpr=` la scena non
-  si adatta da sola): alta = risoluzione interna 1,25×, specchi 768/512, ombra
-  del sole 2048, tutte le luci; media = 1×, specchi 512/256, ombre 1024,
+  si adatta da sola): alta = risoluzione interna 1,25×, specchi 768 (il vetro)
+  e 1024 × 512 (le pozzanghere, dal 20.10: prima 512 × 256, troppo sfocate), ombra
+  del sole 2048, tutte le luci; media = 1×, specchi 512 e 384 × 192, ombre 1024,
   bagliore a metà risoluzione, poche luci; bassa = come media con specchi
-  256/128, niente bloom né palazzi; telefono = 1,5× (il testo dei volantini si
-  deve leggere), specchi 384/192, ombre 1024/512, poche luci. **La risoluzione
+  256 e 256 × 128, niente bloom né palazzi; telefono = 1,5× (il testo dei volantini si
+  deve leggere), specchi 384 e 384 × 192, ombre 1024/512, poche luci. **La risoluzione
   non scende mai**: è lei che decide se le immagini sono nitide, il resto si
   può togliere. Si parte da «alta», da «media» se la scheda grafica si presenta
   come integrata (Intel, Apple, Mali, Adreno) o il processore ha 4 core o meno,
@@ -348,7 +441,11 @@ quello, senza che la pagina se ne accorga.
   1440 × 900, senza il limite dello schermo (`--libero`): ~120 fotogrammi al
   secondo di giorno, ~90 di notte, il telefono 125–180 (erano 16 di giorno).
   Attenzione alle misure: un'altra pagina 3D aperta sulla stessa scheda (la
-  stessa home in un'altra finestra) le dimezza.
+  stessa home in un'altra finestra) le dimezza, e un'auto che passa (specchi e
+  ombre a ogni fotogramma) le abbassa: ripeterle. Il 20.10, su una RTX 3060 Ti di
+  notte, 207–281 fotogrammi al secondo con neon, acqua e bestie e 124–304 con la
+  versione di prima (`--radice=`, sotto); le bestie costano ~0,1 ms di processore
+  a fotogramma.
 - **Blender**: `?glb=1` scarica la scena così com'è in glTF binario
   (`pzkko.glb`, GLTFExporter), da aprire con File › Import › glTF.
 - **Le prove**: `node tools/pzkko/scena/foto.mjs --ora=22:00 --scroll=0.5`
@@ -365,6 +462,13 @@ quello, senza che la pagina se ne accorga.
   `--subito --attesa=1000` (la vista da lontano), `--subito --sequenza=8
   --passo=500` (il volo, una foto ogni mezzo secondo), `--q=programmi=1` (in
   console i programmi compilati ai primi fotogrammi: devono essere pochi).
+  `--sequenza=N --passo=ms` anche a scena arrivata (le bestie, le gocce),
+  `--ritaglio=x,y,l,a` (ritaglia e ingrandisce due volte: le bestie sono di
+  pochi pixel), `--radice=<cartella>` (un'altra copia di `pzkko/`, per
+  confrontare con la versione di prima: `git archive HEAD pzkko | tar -x -C
+  <cartella>`). In `--prova` c'è `s` = `window.pzkkoScena`: `s.b.dentro` (le
+  bestie: `mosche`, `zanzare`, `blatte`, `formiche`, `decolla`), `s.a` (l'acqua),
+  `s.h.neon`; `--q=blatte=1` fa uscire le blatte anche di giorno.
 - **Dopo ogni modifica ai testi dei volantini** (e dopo `genera-404.mjs`):
   `node tools/pzkko/scena/cattura.mjs`, che rifà le foto in `art/scena/vol/`
   (computer, 2 px per unità, ~1,3 MB) e `art/scena/vol-m/` (telefono, ~0,8 MB). La 404 ha la sua scena (il suo volantino
@@ -498,6 +602,42 @@ le fiches fotografate, e le carte vere in 3D.
   (venezia); perfect pairs 6,11% (6 mazzi) e 4,10% (8 mazzi), 21+3 4,62% e
   3,70%, come le probabilità esatte.
 
+## La regia (regia/)
+
+Un pannello nascosto per provare il sito senza aspettare la sera o un'auto: si apre
+**scrivendo «regia»** sulla tastiera (di nuovo per chiuderlo), con `#regia`
+nell'indirizzo o **toccando cinque volte in fretta** la striscia in cima allo schermo.
+Il codice si scarica solo allora. È un foglio col nastro come le finestre dei giochi,
+ma di lato (sul telefono dal basso, «abbassa» lo riduce alla testata) e senza velo
+scuro: la scena cambia dietro mentre si trascina. Ogni comando è una pista stampata
+con l'inchiostro dei tavoli e **una fiche da trascinare**: lungo il binario (con
+l'evidenziatore fino al valore, le tacche, l'alba e il tramonto segnati in rosso) o
+nelle caselle, dove si posa nella più vicina con un colpetto; anche dalla tastiera
+(frecce, pagina su e giù, inizio e fine). Ogni zona la sua fiche:
+
+- **il tempo** (gialla): l'ora di Mantova, la velocità (ferma, ×1, ×10, ×60, ×600),
+  alba, mezzogiorno, tramonto, sera, mezzanotte, adesso;
+- **la sera** (nera): il buio (auto = col tramonto, o fisso), l'insegna e i lampioni
+  (auto, spenti, accesi), lo sfarfallio;
+- **le auto** (rossa): «passa un'auto» (anche di giorno), ogni quanti secondi, i fari
+  (alogeni, led, xeno), il neon sotto, e un'auto ferma coi fari accesi dove si posa
+  la fiche;
+- **la scena** (verde): esposizione, bagliore, neon, specchi, il muro del DOM in
+  trasparenza (`?allinea`), la qualità (ricarica), rifare l'arrivo, il muro senza 3D,
+  il glTF;
+- **le bestie** e **l'acqua** (blu): ogni specie sì o no, le blatte anche di giorno,
+  la velocità, «spaventale», una zanzara davanti alla telecamera; le gocce più fitte
+  o più rade, una goccia adesso.
+
+In fondo i numeri della scena (fotogrammi al secondo, l'ora, il buio, qualità e
+risoluzione, l'insieme di luci, i programmi) e «rimetti tutto». Niente si salva:
+ricaricando torna tutto com'era, tranne l'ora e la velocità che le ricariche della
+regia si portano nell'indirizzo. Quello che comanda: `window.pzkkoPagina` (in
+`index.html`: l'orologio, che dal 20.10 è uno solo anche per la scena,
+`window.pzkkoOrologio`; la sera forzata; le regole delle auto), `window.pzkkoRegia`
+(i ritocchi che la scena legge a ogni fotogramma, `REGIA` in `scena/materiali.js`) e
+`window.pzkkoScena` (le bestie, la goccia).
+
 ## I $pzk (games/pzk.js)
 
 Un portafoglio solo per tutti i giochi: 1.000 $pzk all'inizio, altri 1.000
@@ -535,6 +675,30 @@ riscrive nella pagina. `node tools/pzkko/disponi.mjs tutto --foto` (dalla
 cartella `albertopecchini.it`) dispone, misura le altezze vere in Chromium, dispone
 di nuovo e lascia le foto del muro in `tools/pzkko/lavoro/`; poi si rigenera la
 404. Un pezzo nuovo: lo si aggiunge in `index.html` e lo si mette in una pila.
+
+**La serranda** (20.10): `../tools/pzkko/serranda.mjs` fa tutto questo da riga di
+comando, per chi ci lavora (Alberto o Claude: c'è anche la skill
+`.claude/skills/serranda` alla radice del repository). Dalla cartella
+`albertopecchini.it`:
+
+```bash
+node tools/pzkko/serranda.mjs                 # stato: parete (unità e metri in 3D), manopole, colonne, spazio libero
+node tools/pzkko/serranda.mjs volantino --titolo="…" --testo="…" [--link=…] [--zona=games] [--carta=giallo] [--arte=arte2/dadi]
+node tools/pzkko/serranda.mjs pezzo --img=manifesti2/x [--tipo=man|tag|pezzo]
+node tools/pzkko/serranda.mjs allunga --sopra=400   # spazio nuovo in cima (o --sotto, --minimo; --telefono, --entrambi)
+node tools/pzkko/serranda.mjs comprimi 10           # pile più fitte del 10% (--scala=0.9 pezzi più stretti, --annulla)
+node tools/pzkko/serranda.mjs rifai                 # disponi, 404, foto dei volantini per il 3D, foto di prova della scena
+```
+
+Il pezzo nuovo va nella colonna più corta (o in `--colonna`, dopo `--dopo`), sul
+computer e sul telefono. Le manopole stanno in una riga di `DESK` e `MOB`
+(`top`, `bottom`, `minimo`, `passo`, `scala`, lette da `disponi.mjs`). La scena 3D
+non vuole niente: la saracinesca è alta quanto la parete del DOM (e la scatola
+dell'ombra del sole cresce con lei). `--prova` dice cosa farebbe senza scrivere.
+Provato il 20.10 con +450 unità in cima, un volantino nuovo e le pile al 92%: poi
+rimesso tutto com'era. `disponi.mjs`, `cattura.mjs`, `foto.mjs` e `trame.mjs`
+trovano il browser con `../tools/pzkko/browser.mjs` (Chromium di Playwright, se
+no Edge); con Edge le altezze dei volantini vengono qualche unità diverse.
 
 ## Vercel
 

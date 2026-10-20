@@ -21,16 +21,19 @@ import * as T from './lib/three.js'
 import { costruisci, prossimoFotogramma, specchiModo } from './mondo.js'
 import { fogli } from './fogli.js'
 import { luci } from './luci.js'
+import { acqua } from './acqua.js'
+import { bestie } from './bestie.js'
+import { REGIA } from './materiali.js'
 
 // I livelli di qualità (niente anti-alias in nessuno). dpr = la risoluzione interna rispetto ai pixel CSS, che non
 // scende mai: è lei che decide se le immagini sono nitide, il resto si può togliere; specchi = la tela del vetro e
 // delle pozzanghere; ombra = la mappa del sole; bloom = la risoluzione del bagliore rispetto ai pixel CSS (0 = niente);
 // luci = «tutte» o «poche» (mondo.js).
 const LIVELLI = {
-  alta: { dpr: 1.25, specchi: [768, 512], ombra: 2048, bloom: 1, luci: 'tutte' },
-  media: { dpr: 1, specchi: [512, 256], ombra: 1024, bloom: 0.5, luci: 'poche' },
-  bassa: { dpr: 1, specchi: [256, 128], ombra: 1024, bloom: 0, luci: 'poche', palazzi: false },
-  telefono: { dpr: 1.5, specchi: [384, 192], ombra: 1024, bloom: 1, luci: 'poche' },
+  alta: { dpr: 1.25, specchi: [768, 1024], ombra: 2048, bloom: 1, luci: 'tutte' },
+  media: { dpr: 1, specchi: [512, 384], ombra: 1024, bloom: 0.5, luci: 'poche' },
+  bassa: { dpr: 1, specchi: [256, 256], ombra: 1024, bloom: 0, luci: 'poche', palazzi: false },
+  telefono: { dpr: 1.5, specchi: [384, 384], ombra: 1024, bloom: 1, luci: 'poche' },
 }
 // Dalla scheda grafica, se si lascia riconoscere: le integrate (Intel, Apple,
 // Mali, Adreno) e gli emulatori partono da «media»; poi, se i primi fotogrammi
@@ -113,6 +116,10 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   // due secondi di trame disegnate al volo)
   const [f, h] = await Promise.all([fogli(scene, M, renderer), costruisci(scene, M, { palazzi: liv.palazzi !== false, poche: liv.luci === 'poche' })])
   const l = luci(scene, renderer, h, M)
+  // la condensa che scende sulla lamiera (il bagnato sui materiali l'hanno già mondo.js e fogli.js)
+  const a = acqua(scene, M, h, f)
+  // le formiche, le mosche, le zanzare e le blatte (al posto dei disegni piatti della pagina)
+  const b = bestie(scene, M, h, f, { ridotto: matchMedia('(prefers-reduced-motion: reduce)').matches })
   const tCostruita = performance.now()
   carico(CARICO.costruita)
 
@@ -124,6 +131,21 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   const bloom = new T.UnrealBloomPass(new T.Vector2(1, 1), 0.55, 0.5, 1.0)
   composer.addPass(bloom)
   const uscita = new T.OutputPass()
+  // AgX porta verso il pastello tutto quello che è molto saturo e molto acceso: il rosso del neon diventava salmone.
+  // Per quei pixel (i tubi, la loro luce, i fanali; la carta e i muri non arrivano così in alto, di giorno nemmeno i
+  // manifesti rossi al sole) si mescola una curva che tiene la tinta: il colore diviso per il suo massimo, alla
+  // Reinhard; il cuore più acceso schiarisce verso un bianco caldo, come nelle foto dei neon veri
+  uscita.material.fragmentShader = uscita.material.fragmentShader
+    .replace('gl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );', 'gl_FragColor.rgb = agxNeon( gl_FragColor.rgb );')
+    .replace('void main() {', `vec3 agxNeon( vec3 c ) {
+      vec3 a = AgXToneMapping( c ), e = max( c * toneMappingExposure, 0.0 );
+      float mx = max( max( e.r, e.g ), e.b ), mn = min( min( e.r, e.g ), e.b );
+      float k = smoothstep( 0.55, 0.85, ( mx - mn ) / max( mx, 1e-5 ) ) * smoothstep( 0.3, 1.2, mx );
+      vec3 t = min( e * ( 1.3 / ( 1.0 + 0.7 * mx ) ), 1.0 );
+      t = mix( t, vec3( 1.0, 0.88, 0.72 ), 0.4 * smoothstep( 5.0, 16.0, mx ) );
+      return mix( a, t, k );
+    }
+    void main() {`)
   composer.addPass(uscita)
   const specchi = ([v, p]) => { h.vetro.getRenderTarget().setSize(v, v); h.pozze.getRenderTarget().setSize(p, p / 2) }
   specchi(liv.specchi)
@@ -307,14 +329,43 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     return false
   }
 
+  // ── il puntatore nel mondo, per le bestie: dove il raggio dalla telecamera tocca la saracinesca (1 cm davanti) o,
+  // più in basso, il marciapiede. Anche il tocco sul telefono (pointerdown); veloce = più di 0,8 px/ms ──
+  let pClient = null, pT = 0, pVeloce = 0
+  const segui = (e) => { if (pClient) pVeloce = Math.hypot(e.clientX - pClient.x, e.clientY - pClient.y) / Math.max(1, e.timeStamp - pT); pClient = { x: e.clientX, y: e.clientY, tocco: e.pointerType !== 'mouse' }; pT = e.timeStamp }
+  addEventListener('pointermove', segui, { passive: true })
+  addEventListener('pointerdown', segui, { passive: true })
+  document.documentElement.addEventListener('pointerleave', () => { pClient = null })
+  const origine = new T.Vector3(), raggio = new T.Vector3()
+  const puntatore = () => {
+    // (un tocco vale qualche secondo, poi il dito non è più lì)
+    if (!pClient || (pClient.tocco && performance.now() - pT > 2500)) return null
+    camera.updateMatrixWorld()
+    origine.setFromMatrixPosition(camera.matrixWorld)
+    raggio.set((pClient.x / dim.w) * 2 - 1, 1 - (pClient.y / dim.h) * 2, 0.5).unproject(camera).sub(origine).normalize()
+    const veloce = pVeloce > 0.8 && performance.now() - pT < 150
+    let t = (0.01 - origine.z) / raggio.z
+    const x = origine.x + raggio.x * t, y = origine.y + raggio.y * t
+    if (y >= 0 || raggio.y >= 0) return { x, y, z: 0.01, suolo: false, veloce }
+    t = -origine.y / raggio.y
+    return { x: origine.x + raggio.x * t, y: 0, z: origine.z + raggio.z * t, suolo: true, veloce }
+  }
+  const bestieCtx = { vista: { x0: 0, x1: 1, y0: 0, y1: 1 }, puntatore: null, buio: 0, fari: 0, telecamera: camera.position, lampada: h.lampadina.position, insegna: h.neon.centri.testo, blatte: q.has('blatte') }
+
   // ── un fotogramma ──────────────────────────────────────────────────────────
   let n = 0
   const ultimoSole = new T.Vector3()
   const fotogramma = (now, dt) => {
     const stato = l.aggiorna(now, dt)
     f.aggiorna(dt, now)
+    a.aggiorna(dt, now); a.luce(stato.buio)
     const acceso = stato.insieme !== l.attuale() && cambia(stato.insieme)
     const mossa = metti(posa(now))
+    // le bestie: il muro che si vede è quello dell'inquadratura di arrivo (da lontano si vedrebbe tutto il negozio)
+    const v = vicino(), asp = dim.w / dim.h
+    Object.assign(bestieCtx.vista, { x0: v.wx - v.hv * asp, x1: v.wx + v.hv * asp, y0: v.wy - v.hv, y1: v.wy + v.hv })
+    bestieCtx.puntatore = puntatore(); bestieCtx.buio = stato.buio; bestieCtx.fari = stato.fari
+    b.aggiorna(dt, now, bestieCtx)
     n++
     // le ombre si rifanno solo quando qualcosa si muove (un foglio che si alza o compare, un tagliando, l'auto), quando il
     // sole si è spostato di 0,15° (ogni ~40 s) e quando una luce si è appena accesa (non dipendono dalla telecamera:
@@ -329,8 +380,10 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     const vivo = mossa || mosso || acceso || fase !== 'fatto' || n % 32 === 0
     specchiModo(!vivo ? 'fermi' : qualita === 'alta' && (stato.auto || fase !== 'fatto') ? 'tutti' : 'alterni')
     // il bagliore: solo quando fa buio (di giorno non c'è niente di così acceso, e costa)
-    bloom.enabled = liv.bloom > 0 && stato.buio > 0.15
-    bloom.threshold = 1.5 + 2 * (1 - stato.buio); bloom.strength = 0.12 + 0.25 * stato.buio
+    bloom.enabled = liv.bloom > 0 && stato.buio > 0.15 && REGIA.bagliore > 0
+    bloom.threshold = 1.5 + 2 * (1 - stato.buio); bloom.strength = (0.12 + 0.25 * stato.buio) * REGIA.bagliore
+    // (la regia può spegnere gli specchi: il vetro e le pozzanghere)
+    h.vetro.visible = h.pozze.visible = REGIA.specchi
     composer.render()
     prossimoFotogramma()
   }
@@ -407,7 +460,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo) { fermo = false; prima = performance.now(); requestAnimationFrame(giro) } })
   requestAnimationFrame(giro)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, M, qualita, liv, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale() }
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, M, qualita, liv, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale() }
 
   // ── arrivata: la pagina sotto torna a rispondere (lo fa il caricatore in index.html quando questa promessa si chiude) ──
   if (!visibile) await new Promise((ok) => { vista = ok })

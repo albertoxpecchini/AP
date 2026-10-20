@@ -1,8 +1,8 @@
-// I materiali della scena 3D: le trame disegnate (intonaco, lastre del
-// marciapiede, asfalto, le finestre dei palazzi di fronte), i rumori che le
+// I materiali della scena 3D: le trame disegnate (intonaco,
+// asfalto, le finestre dei palazzi di fronte), i rumori che le
 // fanno, le mappe di normali tirate fuori dalle altezze e il profilo delle doghe
 // della saracinesca, che la lamiera e i fogli attaccati sopra devono seguire.
-// Intonaco, lastre e asfalto non si disegnano più nella pagina (erano due
+// Intonaco e asfalto non si disegnano più nella pagina (erano due
 // secondi fermi): li disegna una volta tools/pzkko/scena/trame.mjs con queste
 // funzioni, in art/scena/trame/; le facciate sì, costano poco.
 import * as T from './lib/three.js'
@@ -71,32 +71,6 @@ export const intonaco = (n = 512, seme = 7) => {
   }
   ctx.putImageData(img, 0, 0)
   return { map: trama(c), normalMap: normaliDaAltezze(alt, n, 1, 1), lato: 1 }
-}
-
-// Le lastre del marciapiede: due per lato (lastre da 60 cm con la fuga), la
-// pietra con le venature, e la mappa delle pozzanghere (bianco = asciutto).
-export const lastre = (n = 1024, seme = 21) => {
-  const lato = 1.2, alt = new Float32Array(n * n), c = tela(n), ctx = c.getContext('2d'), img = ctx.createImageData(n, n), d = img.data
-  const cr = tela(n), ctxr = cr.getContext('2d'), imgr = ctxr.createImageData(n, n), dr = imgr.data
-  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
-    const u = x / n, v = y / n
-    // la fuga fra le lastre: un canale di 12 mm, con lo spigolo smussato
-    const fx = Math.abs(((u * 2) % 1) - 0.5) * lato / 2, fy = Math.abs(((v * 2) % 1) - 0.5) * lato / 2
-    const bordo = Math.min(fx, fy) // distanza dallo spigolo più vicino, in metri
-    const fuga = bordo < 0.006 ? -0.006 : bordo < 0.02 ? -0.006 * (1 - (bordo - 0.006) / 0.014) ** 2 : 0
-    const grana = strati(u * 48, v * 48, 48, seme, 3, 0.5), vene = strati(u * 6, v * 6, 6, seme + 2, 4, 0.55)
-    alt[y * n + x] = fuga + grana * 0.0012 + (vene - 0.5) * 0.002
-    const l = 0.46 + (vene - 0.5) * 0.22 + (grana - 0.5) * 0.12 + (fuga < 0 ? -0.18 : 0)
-    const i = (y * n + x) * 4
-    d[i] = 255 * Math.min(1, l * 0.98); d[i + 1] = 255 * Math.min(1, l * 0.97); d[i + 2] = 255 * Math.min(1, l * 0.95); d[i + 3] = 255
-    // pozzanghere dove la lastra è bassa: una soglia su un rumore largo
-    const pozza = strati(u * 2.5, v * 2.5, 2.5, seme + 7, 3, 0.5)
-    const bagnato = Math.min(1, Math.max(0, (pozza - 0.555) * 16))
-    const w = 255 * (1 - bagnato)
-    dr[i] = w; dr[i + 1] = w; dr[i + 2] = w; dr[i + 3] = 255
-  }
-  ctx.putImageData(img, 0, 0); ctxr.putImageData(imgr, 0, 0)
-  return { map: trama(c), normalMap: normaliDaAltezze(alt, n, lato, 1), asciutto: trama(cr, false), lato }
 }
 
 // L'asfalto: grana fine e scura, qualche rappezzo.
@@ -185,6 +159,33 @@ export const svgSuTela = (src, larg, alt) => new Promise((ok, no) => {
   img.onerror = no
   img.src = src
 })
+// Un tubo lungo una spezzata (i neon, il tubo della condensa): un anello di `seg` lati per punto, orientato col
+// trasporto parallelo (niente torsioni); senza tappi.
+export const tuboSpezzato = (pts, r, seg) => {
+  const n = pts.length, tan = pts.map((_, i) => pts[Math.min(n - 1, i + 1)].clone().sub(pts[Math.max(0, i - 1)]).normalize())
+  const nrm = Math.abs(tan[0].z) > 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(0, 0, 1)
+  nrm.addScaledVector(tan[0], -nrm.dot(tan[0])).normalize()
+  const q = new T.Quaternion(), bi = new T.Vector3(), d = new T.Vector3()
+  const pos = [], nor = [], idx = []
+  for (let i = 0; i < n; i++) {
+    if (i > 0) { q.setFromUnitVectors(tan[i - 1], tan[i]); nrm.applyQuaternion(q); nrm.addScaledVector(tan[i], -nrm.dot(tan[i])).normalize() }
+    bi.crossVectors(tan[i], nrm)
+    for (let k = 0; k <= seg; k++) {
+      const a = (k / seg) * Math.PI * 2
+      d.copy(nrm).multiplyScalar(Math.cos(a)).addScaledVector(bi, Math.sin(a))
+      pos.push(pts[i].x + r * d.x, pts[i].y + r * d.y, pts[i].z + r * d.z); nor.push(d.x, d.y, d.z)
+    }
+  }
+  for (let i = 0; i < n - 1; i++) for (let k = 0; k < seg; k++) {
+    const a = i * (seg + 1) + k, b = a + seg + 1
+    idx.push(a, b, a + 1, a + 1, b, b + 1)
+  }
+  const g = new T.BufferGeometry()
+  g.setAttribute('position', new T.Float32BufferAttribute(pos, 3))
+  g.setAttribute('normal', new T.Float32BufferAttribute(nor, 3))
+  g.setIndex(idx)
+  return g
+}
 // Testo scritto su una tela trasparente (cartelli, targhe).
 export const scritta = (righe, { larg = 512, alt = 256, font = '700 90px "Archivo Black", sans-serif', colore = '#111', sfondo = null, giro = 0 } = {}) => {
   const c = tela(larg, alt), ctx = c.getContext('2d')
@@ -195,6 +196,17 @@ export const scritta = (righe, { larg = 512, alt = 256, font = '700 90px "Archiv
   righe.forEach((r, i) => ctx.fillText(r, 0, (i - (righe.length - 1) / 2) * lh))
   return trama(c, true, false)
 }
+
+// La regia (../regia/regia.js, il pannello nascosto per provare il sito): i ritocchi alla scena, letti a ogni
+// fotogramma da luci.js, scena.js, bestie.js e acqua.js. Uno solo, su window: la regia lo scrive anche se si apre
+// prima che la scena ci sia
+export const REGIA = (window.pzkkoRegia ??= {
+  esposizione: 1, bagliore: 1, neon: 1, specchi: true,
+  bestie: { formiche: true, mosche: true, zanzare: true, blatte: true }, blatteDiGiorno: false, velocitaBestie: 1, goccia: 1,
+})
+
+// la facciata sta 10 cm più avanti della saracinesca (z = 0)
+export const Z_FACCIATA = 0.10
 
 // ── la saracinesca ───────────────────────────────────────────────────────────
 // Il profilo delle doghe: ogni doga è bombata (5 mm) e al giunto c'è il canale
@@ -208,4 +220,38 @@ export const profilo = (yDaCima, x = 0, carta = false) => {
   const d = Math.min(u, 1 - u)
   const canale = 0.002 * Math.exp(-((d / 0.035) ** 2))
   return bomba - canale + ammacco
+}
+
+// La griglia dei poligoni della lamiera (W × H, in metri) e la sua altezza esatta in ogni punto. Le doghe si contano dalla
+// cima del rotolo, y1, che è un giunto 30 cm sopra il buco: la lamiera, la carta e la vernice attaccate sopra devono
+// contarle dallo stesso punto (contandole da H la carta e i graffiti erano sfasati di 0,4 doghe, e la lamiera li bucava
+// a strisce). Otto righe per doga, fitte al giunto (dove c'è il canale, stretto) e larghe sulla pancia; in larghezza una
+// colonna ogni ~17 cm (l'ammaccatura è un'onda larga un metro). z(x, y) è l'altezza dei triangoli veri, non della curva:
+// i graffiti stanno sugli stessi triangoli, un decimo di millimetro sopra, e la lamiera non li buca mai.
+export const RIGHE = [0, 0.04, 0.1, 0.25, 0.5, 0.75, 0.9, 0.96]
+export const lamiera = (W, H) => {
+  const x0 = -0.02, x1 = W + 0.02, y0 = -0.02, y1 = H + 0.3
+  const nx = Math.max(6, Math.round((x1 - x0) / 0.17)), ny = Math.ceil((y1 - y0) / DOGA) * RIGHE.length
+  const yd = (j) => (Math.floor(j / RIGHE.length) + RIGHE[j % RIGHE.length]) * DOGA // distanza dalla cima
+  const xs = Array.from({ length: nx + 1 }, (_, i) => x0 + ((x1 - x0) * i) / nx)
+  const ys = Array.from({ length: ny + 1 }, (_, j) => y1 - yd(j)) // dall'alto in basso
+  const prof = (x, y, carta = false) => profilo(y1 - y, x, carta)
+  // la riga j sopra il punto (ys[j] ≥ y > ys[j + 1]) e la colonna i a sinistra
+  const riga = (y) => {
+    const f = Math.max(0, (y1 - y) / DOGA), d = Math.floor(f), r = f - d
+    let k = RIGHE.length - 1
+    while (k > 0 && RIGHE[k] > r) k--
+    return Math.min(ny - 1, d * RIGHE.length + k)
+  }
+  const colonna = (x) => Math.min(nx - 1, Math.max(0, Math.floor(((x - x0) / (x1 - x0)) * nx)))
+  // i triangoli come in mondo.js: (a, c, b) e (b, c, d), a in alto a sinistra, la diagonale da b (in alto a destra) a c
+  const z = (x, y) => {
+    const i = colonna(x), j = riga(y)
+    const fx = (x - xs[i]) / (xs[i + 1] - xs[i]), fy = (ys[j] - y) / (ys[j] - ys[j + 1])
+    const za = prof(xs[i], ys[j]), zb = prof(xs[i + 1], ys[j]), zc = prof(xs[i], ys[j + 1])
+    if (fx + fy <= 1) return za + (zb - za) * fx + (zc - za) * fy
+    const zd = prof(xs[i + 1], ys[j + 1])
+    return zd + (zc - zd) * (1 - fx) + (zb - zd) * (1 - fy)
+  }
+  return { x0, x1, y0, y1, nx, ny, xs, ys, yd, prof, z, riga, colonna }
 }

@@ -15,13 +15,14 @@
 // coi tagliandi, <nome>-senza.webp (la fascia dei tagliandi tolta: in 3D ogni
 // tagliando è un pezzo a sé che si strappa) e pzkko/art/scena/vol.json con le
 // misure. Da rilanciare dopo ogni modifica ai testi dei volantini (e dopo
-// genera-404.mjs). Serve puppeteer-core in tools/catture e il Chromium di
-// Playwright, come per disponi.mjs.
+// genera-404.mjs). Serve puppeteer-core in tools/catture e un browser
+// (il Chromium di Playwright o Edge: ../browser.mjs), come per disponi.mjs.
 import { createServer } from 'node:http'
 import { readFile, writeFile, mkdir, stat, readdir, rm } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { join, extname, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import * as browser from '../browser.mjs'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(QUI, '../../../pzkko')
@@ -34,9 +35,7 @@ const SCALA = 2 // px della tela per px CSS (1 px CSS = 1 unità della parete a 
 const MARGINE = 0.08 // del lato del foglio, per lato
 
 const TIPI = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.js': 'text/javascript', '.css': 'text/css' }
-let puppeteer
-try { puppeteer = createRequire(join(QUI, '../../catture/package.json'))('puppeteer-core') }
-catch { throw new Error('manca puppeteer-core: npm i dentro tools/catture') }
+const puppeteer = browser.puppeteer()
 const server = createServer(async (req, res) => {
   let f = join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname))
   try { if ((await stat(f)).isDirectory()) f = join(f, 'index.html'); res.setHeader('Content-Type', TIPI[extname(f)] || 'application/octet-stream'); res.end(await readFile(f)) }
@@ -44,8 +43,7 @@ const server = createServer(async (req, res) => {
 })
 await new Promise((r) => server.listen(0, '127.0.0.1', r))
 const base = `http://127.0.0.1:${server.address().port}`
-const exe = join(process.env.LOCALAPPDATA, 'ms-playwright/chromium-1243/chrome-win64/chrome.exe')
-const browser = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars'] })
+const aperto = await puppeteer.launch({ executablePath: browser.eseguibile(), headless: true, args: ['--no-sandbox', '--hide-scrollbars'] })
 
 for (const vista of VISTE) {
 const OUT = join(ROOT, 'art/scena', vista.cartella)
@@ -55,7 +53,7 @@ const manifesto = {}
 
 // (?muro=1: la pagina senza la scena 3D, che sposterebbe il muro e cambierebbe le misure dei fogli)
 for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1']) {
-  const page = await browser.newPage()
+  const page = await aperto.newPage()
   await page.setViewport({ width: vista.w, height: vista.h, deviceScaleFactor: SCALA })
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
   await page.goto(base + pagina, { waitUntil: 'networkidle0' })
@@ -107,5 +105,5 @@ for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1']) {
 await writeFile(join(ROOT, 'art/scena', vista.json), JSON.stringify(manifesto, null, 1))
 console.log(`scritti ${Object.keys(manifesto).length} volantini in ${OUT} e ${vista.json}`)
 }
-await browser.close()
+await aperto.close()
 server.close()

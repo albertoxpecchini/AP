@@ -253,7 +253,7 @@ img{display:block;max-width:100%;height:auto}
       <img class="it tag" src="/art/strada2/qui.webp" alt="" width="468" height="492" loading="lazy" style="--x:1135;--y:494;--w:120;--r:0deg;--mx:140;--my:1411;--mw:80;--mr:0deg">
       <img class="it pezzo" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy" style="--x:378;--y:2076;--w:48;--r:0deg;--mx:201;--my:3549;--mw:34;--mr:0deg">
       <img class="it pezzo" src="/art/bestiole/gomme2.webp" alt="" width="408" height="384" loading="lazy" style="--x:1236;--y:347;--w:30;--r:20deg;--mx:371;--my:947;--mw:22;--mr:20deg">
-      <img class="it pezzo" src="/art/bestiole/rivolo.webp" alt="" width="88" height="604" loading="lazy" style="--x:1215;--y:0;--w:36;--r:0deg;--mx:352;--my:0;--mw:22;--mr:0deg;opacity:.8">
+      <img class="it pezzo" src="/art/bestiole/rivolo.webp" data-scena="no" alt="" width="88" height="604" loading="lazy" style="--x:1215;--y:0;--w:36;--r:0deg;--mx:352;--my:0;--mw:22;--mr:0deg;opacity:.8">
       <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:190;--y:1119;--w:300;--r:-3deg;--mx:25;--my:1214;--mw:230;--mr:-6deg">
       <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:646;--y:911;--w:250;--r:-6deg;--mx:122;--my:1973;--mw:200;--mr:-5deg">
       <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:1170;--y:552;--w:95;--r:6deg;--mx:337;--my:2939;--mw:70;--mr:8deg">
@@ -571,12 +571,31 @@ img{display:block;max-width:100%;height:auto}
     const scarto = Date.now() - romaOra.getTime()
     inizio = new Date(romaOra.getFullYear(), romaOra.getMonth(), romaOra.getDate(), h || 0, m || 0).getTime() + scarto
   }
-  const adesso = () => inizio + (Date.now() - partenza) * veloce
+  // l'orologio, uno per la pagina e per la scena 3D (luci.js lo legge da window.pzkkoOrologio): la regia (regia/) lo
+  // sposta, lo accelera e lo ferma
+  const orologio = window.pzkkoOrologio = (() => {
+    let base = inizio, da = Date.now(), v = veloce, fermo = false
+    const ora = () => base + (fermo ? 0 : (Date.now() - da) * v)
+    const rifai = () => { base = ora(); da = Date.now() }
+    return {
+      adesso: ora,
+      imposta(ms) { base = ms; da = Date.now() },
+      get veloce() { return v }, set veloce(x) { rifai(); v = x },
+      get fermo() { return fermo }, set fermo(x) { rifai(); fermo = x },
+    }
+  })()
+  const adesso = orologio.adesso
   const liscia = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x) }
 
   // le tre grandezze della sera: il buio (0→1 da 40 min prima del tramonto a 50 dopo),
   // l'insegna (si accende al tramonto preciso) e i lampioni (12 minuti dopo); all'alba tutto a ritroso
+  const forza = { notte: null, insegna: null, lampioni: null }
   const fase = (t) => {
+    const f = fase0(t)
+    for (const k in forza) if (forza[k] !== null) f[k] = forza[k]
+    return f
+  }
+  const fase0 = (t) => {
     const { alba, tramonto } = sole(t)
     if (q.get('notte') !== null) { const v = Math.max(0, Math.min(1, Number(q.get('notte')))); return { notte: v, insegna: v > 0 ? 1 : 0, lampioni: v > 0 ? 1 : 0 } }
     if (t < alba) return { notte: liscia((alba - t) / (60 * MIN)), insegna: 1, lampioni: t < alba - 10 * MIN ? 1 : 0 }
@@ -594,7 +613,7 @@ img{display:block;max-width:100%;height:auto}
   const campiona = (l, t, dt, stato) => {
     if (stato && !l.acceso) { l.acceso = true; l.t0 = t; l.calo = 0 }
     if (!stato) { l.acceso = false; return 0 }
-    if (reduce.matches) return 1
+    if (reduce.matches || !regola.sfarfallio) return 1
     const da = t - l.t0
     if (da < l.accensione) {
       // strobo d'accensione: sempre più probabile che tenga
@@ -613,14 +632,23 @@ img{display:block;max-width:100%;height:auto}
   // neon sotto la scocca. ?auto=1 ne fa passare una subito.
   const FARI = [['255,226,170', 1], ['214,230,255', 1], ['236,240,255', 1], ['255,214,150', 1], ['214,230,255', 1], ['255,226,170', 1]]
   let auto = null, prossimaAuto = q.get('auto') ? 0 : performance.now() + 8000 + Math.random() * 40000
+  // le regole della regia: ogni (secondi, in media), fari (uno di FARI, o null a caso), neon (sì, no, null a caso),
+  // subito (un'auto adesso, anche di giorno), ferma (un'auto ferma coi fari accesi in quel punto, 0..1, o null)
+  const regola = { ogni: 55, fari: null, neon: null, subito: false, ferma: null, sfarfallio: true }
+  const autoForzata = () => regola.subito || regola.ferma !== null
   const set = (k, v) => root.style.setProperty(k, v)
   const passaAuto = (now) => {
-    const [c] = FARI[Math.floor(Math.random() * FARI.length)]
-    auto = { t0: now, durata: 1400 + Math.random() * 1400, verso: Math.random() < 0.5 ? 1 : -1, neon: Math.random() < 1 / 7, frena: Math.random() < 0.4 }
+    const [c] = FARI[regola.fari ?? Math.floor(Math.random() * FARI.length)]
+    auto = { t0: now, durata: 1400 + Math.random() * 1400, verso: Math.random() < 0.5 ? 1 : -1, neon: regola.neon ?? Math.random() < 1 / 7, frena: Math.random() < 0.4 }
     set('--auto-c', c)
   }
   const animaAuto = (now) => {
-    if (!auto) { if (now > prossimaAuto && !reduce.matches) passaAuto(now); return }
+    if (regola.ferma !== null) {
+      // ferma: i fari puntati in quel punto, finché la regia non la lascia andare
+      set('--auto-x', regola.ferma.toFixed(4)); set('--auto-l', 0.9); set('--neon-auto', regola.neon ? 0.8 : 0); set('--freno', 0); auto = null
+      return
+    }
+    if (!auto) { if ((now > prossimaAuto || regola.subito) && !reduce.matches) passaAuto(now); return }
     const u = (now - auto.t0) / auto.durata
     if (u < 1) {
       const x = auto.verso > 0 ? -0.25 + 1.5 * u : 1.25 - 1.5 * u
@@ -633,7 +661,7 @@ img{display:block;max-width:100%;height:auto}
     if (v < 1) {
       const frenata = auto.frena && v > 0.15 && v < 0.5 ? 0.35 : 0
       set('--freno-x', auto.verso > 0 ? 1.04 : -0.04); set('--freno', ((1 - v) * 0.8 + frenata).toFixed(3))
-    } else { set('--freno', 0); auto = null; prossimaAuto = now + 20000 + Math.random() * 70000 }
+    } else { set('--freno', 0); auto = null; regola.subito = false; prossimaAuto = now + 1000 * regola.ogni * (0.4 + 1.2 * Math.random()) }
   }
 
   let stato = { notte: 0, insegna: 0, lampioni: 0 }, prima = performance.now(), sfarfallioOn = false
@@ -642,9 +670,9 @@ img{display:block;max-width:100%;height:auto}
     prima = now
     root.style.setProperty('--f-insegna', campiona(insegna, now, dt, stato.insegna > 0).toFixed(3))
     root.style.setProperty('--f-lampioni', campiona(lampioni, now, dt, stato.lampioni > 0).toFixed(3))
-    if (stato.lampioni > 0) animaAuto(now)
+    if (stato.lampioni > 0 || autoForzata() || auto) animaAuto(now)
     else if (auto) { auto = null; set('--auto-l', 0); set('--freno', 0); set('--neon-auto', 0) }
-    if (stato.insegna > 0 || stato.lampioni > 0) requestAnimationFrame(sfarfallio)
+    if (stato.insegna > 0 || stato.lampioni > 0 || autoForzata() || auto) requestAnimationFrame(sfarfallio)
     else sfarfallioOn = false
   }
 
@@ -653,9 +681,11 @@ img{display:block;max-width:100%;height:auto}
   // una goccia cade dall'alto sulla lamiera, dove batte uno spruzzo; il rivolo
   // sotto è stampato sul muro.
   const strada = document.querySelector('.strada'), muro = document.querySelector('.muro')
+  // con la scena 3D (scena/) la goccia, le formiche e le mosche sono le sue, in 3D: queste stanno ferme e nascoste
+  const in3d = () => root.classList.contains('scena3d')
   const rivolo = document.querySelector('.it.pezzo[src*="rivolo"]'), goccia = document.getElementById('goccia'), spruzzo = document.getElementById('spruzzo')
   const cade = () => {
-    if (document.hidden || reduce.matches || !rivolo) return setTimeout(cade, 4000)
+    if (document.hidden || reduce.matches || !rivolo || in3d()) return setTimeout(cade, 4000)
     const rs = strada.getBoundingClientRect(), rr = rivolo.getBoundingClientRect(), rm = muro.getBoundingClientRect()
     const x = rr.left + rr.width * 0.5 - rs.left - 4, y0 = -40, y1 = rm.top - rs.top + 4
     const durata = 420 + (y1 - y0) * 1.1
@@ -674,7 +704,7 @@ img{display:block;max-width:100%;height:auto}
   const camminano = (now) => {
     const dt = Math.min((now - tFormiche) / 1000, 0.1)
     tFormiche = now
-    if (!document.hidden && !reduce.matches) {
+    if (!document.hidden && !reduce.matches && !in3d()) {
       const rs = strada.getBoundingClientRect(), rm = muro.getBoundingClientRect()
       const x0 = rm.left - rs.left + 12, x1 = rm.right - rs.left - 12, yb = rm.bottom - rs.top - 16
       for (const fo of formiche) {
@@ -734,7 +764,7 @@ img{display:block;max-width:100%;height:auto}
   const volano = (now) => {
     const dt = Math.min((now - tMosche) / 1000, 0.05)
     tMosche = now
-    if (!document.hidden) for (const m of mosche) {
+    if (!document.hidden && !in3d()) for (const m of mosche) {
       if (m.stato === 'nata') { Object.assign(m, meta()); posa(m); m.t = caso(0.5, 6); mostra(m); continue }
       if (reduce.matches) continue
       if (m.stato === 'posata') {
@@ -772,7 +802,7 @@ img{display:block;max-width:100%;height:auto}
   requestAnimationFrame(volano)
   // il puntatore che si avvicina le fa scappare
   addEventListener('pointermove', (e) => {
-    if (reduce.matches) return
+    if (reduce.matches || in3d()) return
     const rs = strada.getBoundingClientRect(), px = e.clientX - rs.left, py = e.clientY - rs.top
     for (const m of mosche) {
       const d = Math.hypot(m.x - px, m.y - py)
@@ -784,12 +814,13 @@ img{display:block;max-width:100%;height:auto}
     root.style.setProperty('--notte', stato.notte.toFixed(3))
     root.style.setProperty('--insegna', stato.insegna)
     root.style.setProperty('--lampioni', stato.lampioni)
-    if ((stato.insegna > 0 || stato.lampioni > 0) && !sfarfallioOn) { sfarfallioOn = true; prima = performance.now(); requestAnimationFrame(sfarfallio) }
+    if ((stato.insegna > 0 || stato.lampioni > 0 || autoForzata()) && !sfarfallioOn) { sfarfallioOn = true; prima = performance.now(); requestAnimationFrame(sfarfallio) }
   }
   // all'apertura le luci già accese non strobeggiano: sono accese da un pezzo
   { const f0 = fase(adesso()); if (f0.insegna) { insegna.acceso = true; insegna.t0 = -1e9 } if (f0.lampioni) { lampioni.acceso = true; lampioni.t0 = -1e9 } }
   aggiorna()
-  setInterval(aggiorna, veloce > 1 ? 250 : 1000)
+  const tic = () => { aggiorna(); setTimeout(tic, orologio.veloce > 1 ? 250 : 1000) }
+  setTimeout(tic, veloce > 1 ? 250 : 1000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
 
   // I giochi: la roulette e il blackjack, ognuno in una finestra sopra il muro
@@ -815,6 +846,31 @@ img{display:block;max-width:100%;height:auto}
   }
   const nel = location.hash.slice(1)
   if (GIOCHI[nel]) apriGioco(nel)
+
+  // ── La regia ─────────────────────────────────────────────────────────────
+  // Un pannello nascosto per provare il sito: l'ora di Mantova e la sua velocità, la sera, le auto, la scena 3D, le
+  // bestie, l'acqua (regia/). Si apre scrivendo «regia» sulla tastiera, con #regia nell'indirizzo o toccando cinque
+  // volte in fretta la striscia in cima allo schermo. Il codice si scarica solo allora.
+  window.pzkkoPagina = {
+    orologio, forza, regola, sole, aggiorna: () => aggiorna(),
+    passaAuto: () => { regola.subito = true; aggiorna() },
+    // un'auto ferma coi fari accesi nel punto x (0..1 della larghezza), o null: se ne va
+    fermaAuto: (x) => { regola.ferma = x; if (x === null) { set('--auto-l', 0); set('--neon-auto', 0) } aggiorna() },
+  }
+  const apriRegia = () => import('/regia/regia.js').then((m) => m.apri()).catch((e) => console.warn('regia non aperta', e))
+  let scritto = ''
+  addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1 || e.target.closest?.('input, textarea')) return
+    scritto = (scritto + e.key.toLowerCase()).slice(-5)
+    if (scritto === 'regia') { scritto = ''; apriRegia() }
+  })
+  let tocchi = []
+  addEventListener('pointerdown', (e) => {
+    if (e.clientY > 70) return
+    tocchi = [...tocchi.filter((t) => e.timeStamp - t < 2500), e.timeStamp]
+    if (tocchi.length >= 5) { tocchi = []; apriRegia() }
+  }, { passive: true })
+  if (nel === 'regia') apriRegia()
 
   // Sul telefono non c'è il passaggio del puntatore: toccare un foglio o un
   // manifesto lo porta in primo piano (resta su finché non se ne tocca un altro).
@@ -931,9 +987,9 @@ img{display:block;max-width:100%;height:auto}
 @media (prefers-reduced-motion:reduce){.carico-nastro{animation:none}.carico{transition-duration:.2s}}
 html.scena-carico{background:#0c0d0f}
 html.scena-carico .strada{visibility:hidden}
-/* quando la strada compare da lontano la pagina sotto torna visibile (nel 3D di lei si vedono solo mosche, formiche e la
-   goccia, nascoste fino all'arrivo): ricalcolarla e ridisegnarla costa un fotogramma lungo, che lì cade nella dissolvenza
-   dal nero e non si vede. All'arrivo compaiono solo quelle, che sono piccole. I clic durante l'arrivo li ferma un velo
+/* quando la strada compare da lontano la pagina sotto torna visibile (nel 3D di lei non si vede niente: la goccia, le
+   mosche e le formiche sono quelle 3D della scena, queste restano nascoste): ricalcolarla e ridisegnarla costa un
+   fotogramma lungo, che lì cade nella dissolvenza dal nero e non si vede. I clic durante l'arrivo li ferma un velo
    trasparente (.scena-scudo), che all'arrivo si toglie: toccare tutta la pagina in quel momento costava uno scatto */
 html.scena-carico.scena-vista .strada{visibility:visible}
 html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,html.scena-carico .spruzzo{visibility:hidden}
@@ -949,7 +1005,7 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   const scudo = document.createElement('div'); scudo.className = 'scena-scudo'; scudo.setAttribute('aria-hidden', 'true'); document.body.appendChild(scudo)
   // il foglio di stile e i moduli si scaricano tutti insieme, non uno dopo l'altro
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/scena/scena.css'; document.head.appendChild(l)
-  for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
+  for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'neon', 'acqua', 'bestie', 'marciapiede', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
 
   // la schermata di caricamento. Le foto del nastro sono quelle che la scena metterà sui volantini (scena/fogli.js:
   // lo stesso nome, la stessa cartella per computer o telefono): il browser le scarica una volta sola, e intanto si

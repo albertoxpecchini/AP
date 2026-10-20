@@ -10,6 +10,7 @@
 // sole. Ogni insieme vuole i suoi programmi (il numero delle luci entra in
 // tutti): aggiorna dice quale serve, scena.js lo compila a parte e poi lo mette.
 import * as T from './lib/three.js'
+import { REGIA } from './materiali.js'
 
 const INSIEMI = { giorno: { sole: true, notte: false }, sera: { sole: true, notte: true }, notte: { sole: false, notte: true } }
 
@@ -61,7 +62,8 @@ export const orologio = () => {
 
 export function luci(scene, renderer, h, M) {
   const { W, H } = M
-  const adesso = orologio()
+  // l'orologio della pagina (index.html), che la regia sposta e accelera; se non c'è, uno uguale
+  const adesso = window.pzkkoOrologio?.adesso ?? orologio()
   const root = document.documentElement
   const q = new URLSearchParams(location.search)
   const nottePar = q.get('notte') !== null ? Math.max(0, Math.min(1, Number(q.get('notte')))) : null
@@ -70,8 +72,10 @@ export function luci(scene, renderer, h, M) {
   const sunLight = new T.DirectionalLight(0xfff2e0, 0)
   sunLight.castShadow = true
   sunLight.shadow.mapSize.set(2048, 2048)
-  // (sul telefono la saracinesca è alta 9 m: la scatola dell'ombra la prende tutta)
-  Object.assign(sunLight.shadow.camera, M.telefono ? { left: -2, right: W + 2, top: H / 2 + 4, bottom: -(H / 2 + 3), near: 1, far: 80 } : { left: -4.5, right: W + 4.5, top: 7, bottom: -1.5, near: 1, far: 80 })
+  // (sul telefono la saracinesca è alta 9 m: la scatola dell'ombra la prende tutta; sul computer cresce con lei, se la
+  // serranda si allunga: serranda.mjs. Per la parete di sempre, alta 3,61 m, è quella di prima: da -1,5 a 7)
+  const piu = Math.max(0, (H - 3.61) / 2)
+  Object.assign(sunLight.shadow.camera, M.telefono ? { left: -2, right: W + 2, top: H / 2 + 4, bottom: -(H / 2 + 3), near: 1, far: 80 } : { left: -4.5, right: W + 4.5, top: 7 + piu, bottom: -1.5 - piu, near: 1, far: 80 })
   sunLight.shadow.bias = -0.0004; sunLight.shadow.normalBias = 0.03; sunLight.shadow.radius = 3
   sunLight.target.position.set(W / 2, H / 2, 0)
   scene.add(sunLight, sunLight.target)
@@ -154,14 +158,15 @@ export function luci(scene, renderer, h, M) {
     cieloLuce.groundColor.copy(colTerra.copy(terraGiorno).lerp(terraNotte, buio))
     scene.environmentIntensity = 0.12 * (1 - buio) + 0.06 * buio
     scene.fog.color.copy(colNebbia.copy(nebbiaGiorno).lerp(nebbiaNotte, buio))
-    renderer.toneMappingExposure = 0.55 * (1 - buio) + 1.25 * buio
+    renderer.toneMappingExposure = (0.55 * (1 - buio) + 1.25 * buio) * REGIA.esposizione
     aggiornaAmbiente(elEff, s.notte)
 
-    // ── l'insegna ──
-    h.lettere.emissiveIntensity = 1.6 * s.insegna
-    h.pannello.emissiveIntensity = 0.12 * s.insegna
-    h.neon.color.setRGB(3.2 * s.insegna, 2.9 * s.insegna, 2.3 * s.insegna); h.neon.opacity = s.insegna > 0 ? 1 : 0
-    for (const l of h.luciInsegna) l.intensity = h.luceInsegna * s.insegna
+    // ── l'insegna: i tubi al neon, la loro luce sul pannello e sul muro ──
+    // (la regia può accenderla di più o di meno)
+    const ins = s.insegna * REGIA.neon
+    h.neon.accendi(ins)
+    h.pannello.emissiveIntensity = 0.5 * ins
+    for (const l of h.luciInsegna) l.intensity = h.luceInsegna * ins
     // ── la lampada a muro, i lampioni, le finestre di fronte, le spie ──
     h.lampada.intensity = 16 * s.lampioni
     h.lampadina.material.emissiveIntensity = 8 * s.lampioni
@@ -205,7 +210,7 @@ export function luci(scene, renderer, h, M) {
     // l'insieme che serve adesso: le luci della notte quando la pagina ne accende una (o passa un'auto), il sole finché
     // sta sopra l'orizzonte
     const serve = s.notte > 0 || s.insegna > 0 || s.lampioni > 0 || c ? (giorno > 0 ? 'sera' : 'notte') : 'giorno'
-    return { buio, giorno, notte: s.notte, el: elEff, dir, auto: inMoto, insieme: serve }
+    return { buio, giorno, notte: s.notte, el: elEff, dir, auto: inMoto, fari: c ? s.autoL : 0, insieme: serve }
   }
   return { aggiorna, metti, attuale: () => insieme, sole: sunLight, adesso }
 }

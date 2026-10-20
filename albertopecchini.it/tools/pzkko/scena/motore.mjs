@@ -24,13 +24,15 @@ const esbuild = req('esbuild')
 export const NOMI = [
   'WebGLRenderer', 'WebGLRenderTarget', 'Scene', 'PerspectiveCamera', 'Group', 'Object3D', 'Mesh',
   'BufferGeometry', 'BufferAttribute', 'Float32BufferAttribute', 'PlaneGeometry', 'BoxGeometry', 'CylinderGeometry', 'SphereGeometry',
-  'TorusGeometry', 'CircleGeometry', 'ShapeGeometry', 'Shape', 'Path', 'Vector2', 'Vector3', 'Matrix4', 'Quaternion', 'Euler', 'Color', 'MathUtils',
+  'TorusGeometry', 'CircleGeometry', 'ShapeGeometry', 'Shape', 'Path', 'Vector2', 'Vector3', 'Vector4', 'Matrix4', 'Quaternion', 'Euler', 'Color', 'MathUtils',
   'MeshStandardMaterial', 'MeshPhysicalMaterial', 'MeshBasicMaterial', 'ShaderMaterial',
   'DirectionalLight', 'SpotLight', 'PointLight', 'HemisphereLight',
   'CanvasTexture', 'Texture', 'TextureLoader', 'DataTexture', 'SRGBColorSpace', 'NoColorSpace',
   'RepeatWrapping', 'MirroredRepeatWrapping', 'ClampToEdgeWrapping', 'LinearFilter', 'LinearMipmapLinearFilter',
   'AgXToneMapping', 'ACESFilmicToneMapping', 'NoToneMapping', 'PCFShadowMap', 'PMREMGenerator', 'DoubleSide', 'FrontSide', 'BackSide',
-  'HalfFloatType', 'Fog', 'NormalBlending', 'MultiplyBlending',
+  'HalfFloatType', 'Fog', 'NormalBlending', 'MultiplyBlending', 'AdditiveBlending',
+  // le bestie (bestie.js) e l'acqua (acqua.js): una mesh a istanze per specie, gli attributi per istanza
+  'InstancedMesh', 'InstancedBufferAttribute', 'DynamicDrawUsage',
 ]
 const comune = { bundle: true, format: 'esm', minify: true, target: 'es2020', legalComments: 'none' }
 await mkdir(LIB, { recursive: true })

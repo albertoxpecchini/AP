@@ -9,16 +9,18 @@
 //   --dpr=3 la densità dei pixel (telefono: --larg=390 --alt=844 --dpr=3)
 //   --subito non aspetta l'arrivo: fotografa la scena da lontano --attesa ms dopo che è comparsa; con
 //     --sequenza=N --passo=ms fa N foto una dopo l'altra (scena-<nome>-1.png …) per vedere il volo
+//   --sequenza=N --passo=ms anche senza --subito (a scena arrivata), --ritaglio=x,y,l,a per guardare da vicino
 //   Alla fine dice i tempi dei fotogrammi durante l'arrivo (media, 95° percentile, massimo, quanti sopra 33 ms).
 import { createServer } from 'node:http'
-import { existsSync } from 'node:fs'
 import { readFile, mkdir, stat } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { join, extname, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import * as browser from '../browser.mjs'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
-const ROOT = join(QUI, '../../../pzkko')
+// --radice=<cartella>: un'altra copia di pzkko/ (per confrontare con la versione di prima, estratta da git)
+const ROOT = (process.argv.find((a) => a.startsWith('--radice=')) ?? '').slice(9) || join(QUI, '../../../pzkko')
 const LAVORO = join(QUI, '../lavoro')
 const arg = (n, d) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? '').split('=').slice(1).join('=') || d
 const ora = arg('ora', '12:00'), scroll = Number(arg('scroll', '0')), larg = Number(arg('larg', '1440')), alt = Number(arg('alt', '900')), extra = arg('q', ''), attesa = Number(arg('attesa', '2500')), vars = arg('vars', ''), prova = arg('prova', ''), hover = arg('hover', ''), nome = arg('nome', `${ora.replace(':', '')}-${scroll}`)
@@ -26,7 +28,7 @@ const pagina = arg('pagina', '/')
 const inietta = arg('inietta', ''), dpr = Number(arg('dpr', '1')), subito = process.argv.includes('--subito'), sequenza = Number(arg('sequenza', '1')), passo = Number(arg('passo', '400'))
 
 const TIPI = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.json': 'application/json' }
-const puppeteer = createRequire(join(QUI, '../../catture/package.json'))('puppeteer-core')
+const puppeteer = browser.puppeteer()
 const server = createServer(async (req, res) => {
   let f = join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname))
   try { if ((await stat(f)).isDirectory()) f = join(f, 'index.html'); res.setHeader('Content-Type', TIPI[extname(f)] || 'application/octet-stream'); res.end(await readFile(f)) }
@@ -34,13 +36,12 @@ const server = createServer(async (req, res) => {
 })
 await new Promise((r) => server.listen(0, '127.0.0.1', r))
 const url = `http://127.0.0.1:${server.address().port}${pagina}?ora=${ora}${extra ? '&' + extra : ''}`
-// il browser: --chrome=<exe> o la variabile CHROME; se no il Chromium di Playwright, se no Edge (c'è su ogni Windows)
-const exe = arg('chrome', process.env.CHROME) || [join(process.env.LOCALAPPDATA ?? '', 'ms-playwright/chromium-1243/chrome-win64/chrome.exe'), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find((p) => existsSync(p))
-if (!exe) { console.error('non trovo un browser: --chrome=<percorso di chrome.exe o msedge.exe>'); process.exit(1) }
+// il browser: --chrome=<exe> o la variabile CHROME; se no il Chromium di Playwright, se no Edge (../browser.mjs)
+const exe = browser.eseguibile()
 // --libero: senza il ritmo dello schermo (vsync), così i fotogrammi al secondo sono quelli veri e non 60 o 30
 const libero = process.argv.includes('--libero') ? ['--disable-gpu-vsync', '--disable-frame-rate-limit'] : []
-const browser = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars', '--ignore-gpu-blocklist', ...libero] })
-const page = await browser.newPage()
+const aperto = await puppeteer.launch({ executablePath: exe, headless: true, args: ['--no-sandbox', '--hide-scrollbars', '--ignore-gpu-blocklist', ...libero] })
+const page = await aperto.newPage()
 page.on('console', (m) => { if ((m.type() !== 'log' && m.type() !== 'info' && m.type() !== 'debug') || m.text().startsWith('scena 3D')) console.log(`[browser ${m.type()}]`, m.text()) })
 page.on('pageerror', (e) => console.log('[pageerror]', e.message))
 await page.setViewport({ width: larg, height: alt, deviceScaleFactor: dpr })
@@ -64,7 +65,7 @@ if (subito) {
     console.log('scritta', out, fase)
     if (i < sequenza) await new Promise((r) => setTimeout(r, Math.max(0, passo - (Date.now() - t))))
   }
-  await browser.close(); server.close(); process.exit(0)
+  await aperto.close(); server.close(); process.exit(0)
 }
 try { await page.waitForSelector('html[data-scena="pronta"]', { timeout: 40000 }) } catch { console.log('la scena non è partita (html[data-scena] non arriva)') }
 console.log(`scena pronta in ${((Date.now() - t0) / 1000).toFixed(1)} s`)
@@ -84,10 +85,24 @@ if (hover) { const el = await page.$(hover); if (el) { await el.scrollIntoView()
 await new Promise((r) => setTimeout(r, attesa))
 await mkdir(LAVORO, { recursive: true })
 const out = join(LAVORO, `scena-${nome}.png`)
-await page.screenshot({ path: out, captureBeyondViewport: false })
+// --sequenza=N --passo=ms anche a scena arrivata (le bestie, le gocce: com'è il movimento), --ritaglio=x,y,l,a ritaglia ogni
+// foto (in pixel dello schermo, già moltiplicati per --dpr) e la ingrandisce due volte
+const ritaglio = arg('ritaglio', '').split(',').map(Number)
+const scatta = async (file) => {
+  if (ritaglio.length !== 4) return page.screenshot({ path: file, captureBeyondViewport: false })
+  const sharp = createRequire(join(QUI, '../../catture/package.json'))('sharp')
+  const [x, y, l, a] = ritaglio
+  await sharp(await page.screenshot({ captureBeyondViewport: false })).extract({ left: x, top: y, width: l, height: a }).resize(l * 2).toFile(file)
+}
+for (let i = 1; i < sequenza; i++) {
+  const t = Date.now()
+  await scatta(join(LAVORO, `scena-${nome}-${i}.png`))
+  await new Promise((r) => setTimeout(r, Math.max(0, passo - (Date.now() - t))))
+}
+await scatta(sequenza > 1 ? join(LAVORO, `scena-${nome}-${sequenza}.png`) : out)
 const fps = await page.evaluate(() => new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { if (++n < 90) requestAnimationFrame(f); else r(1000 / ((performance.now() - t0) / n)) }; requestAnimationFrame(f) }))
 console.log(`${fps.toFixed(0)} fotogrammi al secondo`)
 const info = await page.evaluate(() => ({ scroll: scrollY, altezza: document.documentElement.scrollHeight, muro: document.querySelector('.muro').getBoundingClientRect().toJSON() }))
 console.log('scritta', out, JSON.stringify(info))
-await browser.close()
+await aperto.close()
 server.close()

@@ -17,16 +17,18 @@
 // più (i fogli coprono metà saracinesca, e ogni pixel di lamiera costa quanto
 // uno di carta).
 import * as T from './lib/three.js'
-import { profilo, immagine, DOGA } from './materiali.js'
+import { immagine, lamiera, DOGA } from './materiali.js'
+import { bagnato } from './acqua.js'
 
 const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 const DISSOLVENZA = 450 // ms
 
 // La nitidezza: i fogli si vedono rimpiccioliti (sul computer ~2,8 pixel di foto per pixel di schermo) e la scheda li
 // legge da un livello di mipmap che li sfoca; si legge mezzo livello più in qua (il terzo argomento di texture2D, il
-// «bias»), così il testo resta netto senza tremolare. Una funzione sola per tutti i fogli: entra nella chiave del programma
+// «bias»), così il testo resta netto senza tremolare. Fuori dalla foto niente (i graffiti stanno su un pezzo di lamiera
+// più grande di loro, sotto). Una funzione sola per tutti i fogli: entra nella chiave del programma
 const nitida = (sh) => {
-  sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', '#ifdef USE_MAP\n diffuseColor *= texture2D( map, vMapUv, -0.6 );\n#endif')
+  sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', '#ifdef USE_MAP\n if ( vMapUv.x < 0.0 || vMapUv.x > 1.0 || vMapUv.y < 0.0 || vMapUv.y > 1.0 ) discard;\n diffuseColor *= texture2D( map, vMapUv, -0.6 );\n#endif')
 }
 // i graffiti scuri: nitidi, e moltiplicati col metallo (sotto, in fogli)
 const nitidaMoltiplica = (sh) => {
@@ -63,29 +65,59 @@ export async function fogli(scene, M, renderer) {
   let scaricate = false, finito = null
   const pronti = Promise.all(attese).then(() => { scaricate = true; return new Promise((r) => { finito = r }) })
 
+  // la lamiera sotto: la stessa griglia di mondo.js, con le doghe contate dallo stesso giunto
+  const lam = lamiera(M.W, H)
   // un foglio piegato sulle doghe: la geometria è un piano suddiviso, ogni vertice
   // sale di quanto sporge la lamiera nel punto del mondo in cui finisce
-  const piega = (g, cx, cy, theta, strato, carta = true) => {
+  const piega = (g, cx, cy, theta, strato) => {
     const p = g.attributes.position, c = Math.cos(theta), s = Math.sin(theta)
     for (let i = 0; i < p.count; i++) {
       const lx = p.getX(i), ly = p.getY(i)
       const wx = cx + lx * c - ly * s, wy = cy + lx * s + ly * c
-      p.setZ(i, profilo(H - wy, wx, carta) + strato)
+      p.setZ(i, lam.prof(wx, wy, true) + strato)
     }
     g.computeVertexNormals()
     return g
   }
-  const piano = (w, h, cx, cy, theta, strato, lx = 0, ly = 0, carta = true) => {
+  const piano = (w, h, cx, cy, theta, strato, lx = 0, ly = 0) => {
     // sei righe per doga (2 cm): la bombatura è concava, quindi la lamiera fra le sue righe sta sotto la curva e la carta,
-    // 0,8 mm sopra, fra le sue resta sopra la lamiera (al peggio 0,3 mm di margine); in larghezza la piega è solo
-    // l'ammaccatura, larga un metro: una colonna ogni 12 cm basta
+    // 0,8 mm sopra, fra le sue resta sopra la lamiera (al peggio 0,3 mm di margine; la carta non entra nel canale del
+    // giunto); in larghezza la piega è solo l'ammaccatura, larga un metro: una colonna ogni 12 cm basta
     const g = new T.PlaneGeometry(w, h, Math.max(1, Math.round(w / 0.12)), Math.max(3, Math.ceil(h / (DOGA / 6))))
     g.translate(lx, ly, 0)
-    return piega(g, cx, cy, theta, strato, carta)
+    return piega(g, cx, cy, theta, strato)
+  }
+  // un graffito: vernice sulla lamiera, quindi sugli stessi triangoli (le righe e le colonne della lamiera dentro il
+  // rettangolo che lo contiene, più i bordi), dz sopra; la foto si stende in coordinate del mondo, ruotata, e fuori da
+  // lei non si disegna niente (nitida). Niente polygonOffset: negli specchi, con la loro proiezione obliqua, tirava i
+  // graffiti davanti ai manifesti
+  const vernice = (w, h, cx, cy, theta, dz) => {
+    const c = Math.cos(theta), s = Math.sin(theta)
+    const ang = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => [cx + (a * w * c - b * h * s) / 2, cy + (a * w * s + b * h * c) / 2])
+    const xa = Math.min(...ang.map((p) => p[0])), xb = Math.max(...ang.map((p) => p[0]))
+    const ya = Math.min(...ang.map((p) => p[1])), yb = Math.max(...ang.map((p) => p[1]))
+    const xs = [xa, ...lam.xs.filter((x) => x > xa && x < xb), xb], ys = [yb, ...lam.ys.filter((y) => y < yb && y > ya), ya]
+    const pos = [], uv = [], idx = [], n = xs.length
+    for (const y of ys) for (const x of xs) {
+      const dx = x - cx, dy = y - cy
+      pos.push(dx, dy, lam.z(x, y) + dz)
+      uv.push((dx * c + dy * s) / w + 0.5, (dy * c - dx * s) / h + 0.5)
+    }
+    for (let j = 0; j < ys.length - 1; j++) for (let i = 0; i < n - 1; i++) {
+      const a = j * n + i
+      idx.push(a, a + n, a + 1, a + 1, a + n, a + n + 1)
+    }
+    const g = new T.BufferGeometry()
+    g.setAttribute('position', new T.Float32BufferAttribute(pos, 3))
+    g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2))
+    g.setIndex(idx); g.computeVertexNormals()
+    return g
   }
 
   for (let n = 0; n < ordine.length; n++) {
     const { el } = ordine[n]
+    // (data-scena="no": solo per il muro di sempre; il rivolo disegnato, qui c'è l'acqua vera di acqua.js)
+    if (el.dataset.scena === 'no') continue
     // la posizione che la pagina sta usando adesso (computer o telefono), già risolta dal CSS
     const cs = getComputedStyle(el)
     const v = (p, d = 0) => { const x = parseFloat(cs.getPropertyValue(p)); return Number.isFinite(x) ? x : d }
@@ -130,14 +162,19 @@ export async function fogli(scene, M, renderer) {
         ? new T.MeshPhysicalMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 })
         : new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : 0.88, metalness: 0 })
       mat.onBeforeCompile = nitida
+      // (dove passa il rivolo la carta si bagna: più scura, lucida; acqua.js)
+      bagnato(mat, 2)
     }
-    const mesh = new T.Mesh(piano(pw * K, ph * K, cx, cy, theta, tipo === 'graffito' ? 0.0008 + n * 0.00005 : strato, 0, 0, tipo !== 'graffito'), mat)
-    if (tipo === 'graffito') { mat.polygonOffset = true; mat.polygonOffsetFactor = -2; mat.polygonOffsetUnits = -2 }
+    // (la vernice non ruota col gruppo: sta sulla griglia della lamiera, che è dritta)
+    if (tipo === 'graffito') gruppo.rotation.z = 0
+    const mesh = new T.Mesh(tipo === 'graffito' ? vernice(pw * K, ph * K, cx, cy, theta, 0.0001 + n * 0.00002) : piano(pw * K, ph * K, cx, cy, theta, strato), mat)
     mesh.castShadow = tipo === 'vol' || tipo === 'man'; mesh.receiveShadow = true
     mesh.renderOrder = n
     gruppo.add(mesh)
-    // la carta (non i graffiti, che si moltiplicano col metallo) diventa opaca finita la dissolvenza
-    const pezzo = { el, gruppo, mesh, tipo, opaco: tipo !== 'graffito', alza: 0, meta: 0, tagliandi: [], arrivo: 0, arrivoT: 0 }
+    // la carta (non i graffiti, che si moltiplicano col metallo) diventa opaca finita la dissolvenza; cx, cy, theta, mezza
+    // larghezza e mezza altezza della carta vera (senza il margine della foto) e lo strato servono a superficie, sotto
+    const pezzo = { el, gruppo, mesh, tipo, opaco: tipo !== 'graffito', alza: 0, meta: 0, tagliandi: [], arrivo: 0, arrivoT: 0,
+      cx, cy, theta, hw: ((pw - 2 * m) * K) / 2, hh: ((ph - 2 * m) * K) / 2, strato }
     quando(src, (t) => { mat.map = t; pezzo.arrivo = performance.now() })
 
     // i tagliandi: fette della foto, ognuna un foglietto suo
@@ -154,6 +191,7 @@ export async function fogli(scene, M, renderer) {
         for (let k = 0; k < uv.count; k++) uv.setXY(k, (tg.x + uv.getX(k) * tg.w) / dati.w, 1 - (tg.y + (1 - uv.getY(k)) * tg.h) / dati.h)
         const mt = new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.88 })
         mt.onBeforeCompile = nitida
+        bagnato(mt, 2)
         const tm = new T.Mesh(g, mt)
         tm.castShadow = true; tm.receiveShadow = true; tm.renderOrder = n + 0.5
         // il perno: il bordo alto del tagliando, da cui si piega quando cade
@@ -173,13 +211,39 @@ export async function fogli(scene, M, renderer) {
       })
       quando(srcPiena, (t) => { for (const tg of pezzo.tagliandi) tg.mat.map = t; pezzo.arrivoT = performance.now() })
     }
-    // il passaggio del puntatore e il fuoco alzano il foglio (come in pagina)
-    const su = () => { pezzo.meta = 1 }, giu = () => { pezzo.meta = 0 }
-    const bersaglio = el.closest('.man-link') || el
-    bersaglio.addEventListener('pointerenter', su); bersaglio.addEventListener('pointerleave', giu)
-    bersaglio.addEventListener('focusin', su); bersaglio.addEventListener('focusout', giu)
+    // il passaggio del puntatore e il fuoco alzano il foglio (come in pagina); la vernice resta sul muro
+    if (tipo !== 'graffito') {
+      const su = () => { pezzo.meta = 1 }, giu = () => { pezzo.meta = 0 }
+      const bersaglio = el.closest('.man-link') || el
+      bersaglio.addEventListener('pointerenter', su); bersaglio.addEventListener('pointerleave', giu)
+      bersaglio.addEventListener('focusin', su); bersaglio.addEventListener('focusout', giu)
+    }
     scene.add(gruppo)
     pezzi.push(pezzo)
+  }
+
+  // La superficie, per le bestie e le gocce che ci camminano sopra: in ogni punto della saracinesca, quanto sta in fuori
+  // (z) e cosa c'è (il foglio più in alto, o la lamiera). Una griglia di 1 cm dice il foglio più in alto (i pezzi sono
+  // già nell'ordine di sovrapposizione: l'ultimo che copre una cella vince); la z è quella della carta, più lo strato e
+  // quanto il foglio è alzato in quel momento (la molla del passaggio del puntatore: alzato e un po' inclinato)
+  const CELLA = 0.01, gx = Math.ceil((M.W + 0.04) / CELLA), gy = Math.ceil((H + 0.04) / CELLA)
+  const sopra = new Int16Array(gx * gy).fill(-1)
+  pezzi.forEach((p, k) => {
+    if (p.tipo === 'graffito') return
+    const c = Math.cos(p.theta), s = Math.sin(p.theta), ex = Math.abs(p.hw * c) + Math.abs(p.hh * s), ey = Math.abs(p.hw * s) + Math.abs(p.hh * c)
+    for (let j = Math.max(0, Math.floor((p.cy - ey + 0.02) / CELLA)); j <= Math.min(gy - 1, Math.floor((p.cy + ey + 0.02) / CELLA)); j++) {
+      for (let i = Math.max(0, Math.floor((p.cx - ex + 0.02) / CELLA)); i <= Math.min(gx - 1, Math.floor((p.cx + ex + 0.02) / CELLA)); i++) {
+        const dx = (i + 0.5) * CELLA - 0.02 - p.cx, dy = (j + 0.5) * CELLA - 0.02 - p.cy
+        if (Math.abs(dx * c + dy * s) < p.hw && Math.abs(dy * c - dx * s) < p.hh) sopra[j * gx + i] = k
+      }
+    }
+  })
+  const superficie = (x, y) => {
+    const i = Math.floor((x + 0.02) / CELLA), j = Math.floor((y + 0.02) / CELLA)
+    const k = i >= 0 && i < gx && j >= 0 && j < gy ? sopra[j * gx + i] : -1
+    if (k < 0) return { z: lam.z(x, y), pezzo: null }
+    const p = pezzi[k], g = p.gruppo
+    return { z: lam.prof(x, y, true) + p.strato + g.position.z + (y - p.cy) * g.rotation.x - (x - p.cx) * g.rotation.y, pezzo: p }
   }
 
   const comparsa = (t0, now) => (t0 ? Math.min(1, (now - t0) / DISSOLVENZA) : 0)
@@ -214,5 +278,5 @@ export async function fogli(scene, M, renderer) {
       }
     }
   }
-  return { pezzi, aggiorna, inMoto, pronti, avanzamento: () => (attese.length ? caricate / attese.length : 1) }
+  return { pezzi, aggiorna, inMoto, pronti, avanzamento: () => (attese.length ? caricate / attese.length : 1), lam, superficie }
 }

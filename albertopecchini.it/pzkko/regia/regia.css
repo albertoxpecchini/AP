@@ -1,0 +1,97 @@
+/* La regia di pzkko.it: il pannello nascosto per provare il sito (regia.js). Un foglio attaccato col nastro come
+   le finestre dei giochi, ma di lato (sul telefono dal basso) e senza velo scuro: dietro si deve vedere la scena che
+   cambia. Dentro, piste stampate con l'inchiostro del tavolo e le fiches fotografate da trascinare. */
+
+.rg{position:fixed;inset:3vh 22px auto auto;z-index:80;margin:0;width:440px;height:94vh;max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#161616;
+  font:400 13px/1.3 "Special Elite","Courier New",monospace;--rosso:#b3121f;--nero:#161616;--blu:#1446a0;--evid:rgba(255,212,0,.6);--marker:"Permanent Marker","Comic Sans MS",cursive;--fa:"Anton",Impact,sans-serif}
+.rg[open]{display:block;animation:rg-attacca .32s cubic-bezier(.22,1,.36,1)}
+.rg.chiude{animation:rg-stacca .22s ease-in forwards}
+@keyframes rg-attacca{from{opacity:0;transform:translateX(30px) rotate(1.4deg) scale(.97)}}
+@keyframes rg-stacca{to{opacity:0;transform:translateX(20px) rotate(-.8deg) scale(.98)}}
+/* la carta: il foglio dei giochi, preso nel mezzo (senza il nastro, che qui è a parte) */
+.rg::before{content:"";position:absolute;inset:0;z-index:-1;background:url(/art/roulette/carta.webp) 50% 50%/250% 150% no-repeat;border-radius:2px;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.35)) drop-shadow(0 24px 30px rgba(0,0,0,.42));pointer-events:none}
+.rg *{box-sizing:border-box}
+.rg button{font:inherit;color:inherit}
+.rg :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
+.rg-nastro{position:absolute;z-index:3;width:108px;height:auto;max-width:none;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
+.rg-n1{left:-60px;top:-26px;transform:rotate(-38deg)}
+.rg-n2{right:-60px;top:-24px;transform:rotate(36deg) scaleX(-1)}
+.rg-n3{left:-58px;bottom:-26px;transform:rotate(32deg)}
+.rg-n4{right:-58px;bottom:-28px;transform:rotate(-34deg) scaleX(-1)}
+.rg-defs{position:absolute;width:0;height:0}
+
+.rg-dentro{position:absolute;inset:0;display:flex;flex-direction:column;padding:12px 8px 14px 18px}
+/* la testata: il titolo come quello dei volantini, la voce a pennarello, abbassa e chiudi */
+.rg-testa{flex:none;display:flex;align-items:center;gap:10px;min-width:0;padding:0 8px 4px 4px}
+.rg-testa h2{margin:0;font:400 44px/1 var(--fa);letter-spacing:.005em;flex:none}
+.rg-voce{margin:0;flex:1;min-width:0;font:400 17px/1.1 var(--marker);color:var(--rosso);transform:rotate(-1.5deg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rg-tondo{flex:none;width:38px;height:38px;padding:5px;border:0;border-radius:50%;background:none;cursor:pointer;color:#161616;transform:rotate(-6deg);transition:transform .2s cubic-bezier(.22,1,.36,1)}
+.rg-tondo svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round}
+@media (hover:hover){.rg-tondo:hover{transform:rotate(-6deg) scale(1.12)}}
+.rg.giu .rg-abbassa svg{transform:rotate(180deg)}
+
+.rg-corpo{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 10px 10px 4px;scrollbar-width:thin;scrollbar-color:#8a847c transparent}
+.rg.giu .rg-corpo,.rg.giu .rg-piede{display:none}
+.rg.giu{height:auto}
+
+/* le zone del tavolo: un titolo stampato con la sua fiche */
+.rg-sez{margin:6px 0 14px}
+.rg-sez h3{display:flex;align-items:center;gap:8px;margin:0 0 4px;padding-bottom:3px;border-bottom:2px solid #161616;font:400 24px/1 var(--fa);letter-spacing:.01em}
+.rg-sez h3 img{width:24px;height:24px;max-width:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.rg-sez h3 small{margin-left:auto;font:400 13px/1 var(--marker);color:#5a544c;transform:rotate(-2deg)}
+
+/* una riga: il nome e il valore a sinistra, la pista a destra */
+.rg-riga{display:grid;grid-template-columns:98px 1fr;align-items:center;gap:8px;min-height:44px}
+.rg-nome{line-height:1.05}
+.rg-nome b{display:block;margin-top:1px;font:400 15px/1.05 var(--marker);color:var(--rosso);font-weight:400;white-space:nowrap}
+/* la pista: SVG stampato (multiply, l'inchiostro granuloso dei tavoli), la fiche sopra da trascinare */
+.rg-pista{position:relative;height:40px;cursor:pointer;touch-action:pan-y;outline:none}
+.rg-pista:focus-visible{outline:3px solid #ffd400;outline-offset:2px}
+.rg-pista svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;mix-blend-mode:multiply;pointer-events:none}
+.rg-pista svg text{font-family:var(--fa);user-select:none}
+.rg-fiche{position:absolute;left:0;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;max-width:none;pointer-events:none;will-change:transform,left;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 2px 3px rgba(0,0,0,.22));transition:transform .18s cubic-bezier(.22,1,.36,1),filter .18s}
+.rg-pista.scatta .rg-fiche{transition:left .2s cubic-bezier(.22,1,.36,1),transform .18s cubic-bezier(.22,1,.36,1),filter .18s}
+/* presa: la fiche si alza e fa ombra; posata, fa un colpetto */
+.rg-pista.presa{cursor:grabbing}
+.rg-pista.presa .rg-fiche{transform:translateY(-7px) scale(1.14) rotate(-8deg);filter:drop-shadow(0 3px 2px rgba(0,0,0,.3)) drop-shadow(0 12px 10px rgba(0,0,0,.3))}
+.rg-fiche.posa{animation:rg-colpo .3s cubic-bezier(.2,1.6,.4,1)}
+@keyframes rg-colpo{from{transform:scale(1.18) rotate(-4deg)}}
+@media (hover:hover){.rg-pista:not(.presa):hover .rg-fiche{transform:translateY(-2px)}}
+
+/* i tasti: quello grosso nero storto come «gira» e «distribuisci», quelli piccoli a pennarello */
+.rg-tasti{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:6px 0 4px 106px}
+.rg-gira{flex:none;padding:.16em .5em .2em;border:0;background:#161616;color:#fff !important;font:400 20px/1 var(--fa) !important;cursor:pointer;transform:rotate(-2deg);box-shadow:0 3px 0 rgba(0,0,0,.25);transition:transform .15s cubic-bezier(.22,1,.36,1)}
+.rg-gira:nth-child(2n){transform:rotate(1.5deg);background:var(--rosso)}
+@media (hover:hover){.rg-gira:hover{transform:rotate(-2deg) translateY(-2px)}.rg-gira:nth-child(2n):hover{transform:rotate(1.5deg) translateY(-2px)}}
+.rg-gira:active{transform:rotate(-2deg) translateY(1px)}
+.rg-piccolo{padding:2px 3px;border:0;border-bottom:2px solid currentColor;background:none;cursor:pointer;font:400 14px/1.1 var(--marker) !important;color:var(--blu) !important}
+@media (hover:hover){.rg-piccolo:hover{color:var(--rosso) !important}}
+.rg-nota{margin:2px 0 0 106px;font-size:11px;line-height:1.25;color:#5a544c}
+
+/* in fondo: i numeri della scena, come la storia dei numeri usciti della roulette */
+.rg-piede{flex:none;display:flex;align-items:center;gap:8px;padding:6px 14px 2px 4px;border-top:2px solid #161616}
+.rg-conta{display:flex;flex-wrap:wrap;gap:4px;margin:0;padding:0;list-style:none;flex:1;min-width:0}
+.rg-conta li{flex:none;padding:3px 7px 2px;border-radius:999px;font:400 12px/1 var(--fa);color:#fff;background:var(--nero);letter-spacing:.02em}
+.rg-conta li.rosso{background:var(--rosso)}
+.rg-conta li.verde{background:#0b5d2b}
+
+@media (prefers-reduced-motion:reduce){
+  .rg[open],.rg.chiude,.rg-fiche.posa{animation:none}
+  .rg-fiche,.rg-pista.scatta .rg-fiche{transition:none}
+}
+
+/* il telefono: il foglio dal basso, metà schermo, la scena sopra; «abbassa» lo riduce alla testata */
+@media (max-width:820px){
+  .rg{inset:auto 0 0 0;width:100vw;height:60svh}
+  .rg::before{background-size:300% 160%}
+  .rg-n1{left:-44px;top:-26px;width:96px}
+  .rg-n2{right:-44px;top:-24px;width:96px}
+  .rg-n3,.rg-n4{display:none}
+  .rg-dentro{padding:8px 4px calc(6px + env(safe-area-inset-bottom)) 12px}
+  .rg-testa h2{font-size:34px}
+  .rg-voce{font-size:15px}
+  .rg-riga{grid-template-columns:84px 1fr}
+  .rg-tasti,.rg-nota{margin-left:92px}
+}
