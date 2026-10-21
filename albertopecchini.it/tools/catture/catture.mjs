@@ -218,7 +218,8 @@ async function scattaSito(browser, sito) {
         { name: 'prefers-reduced-motion', value: 'reduce' },
         { name: 'prefers-color-scheme', value: 'light' },
       ])
-      await page.goto(sito.url + cattura.percorso, { waitUntil: 'networkidle2', timeout: 60_000 })
+      // (sito.carica: fin dove aspettare il caricamento; pzkko.it, con la scena 3D in software su GitHub, solo il documento)
+      await page.goto(sito.url + cattura.percorso, { waitUntil: sito.carica || 'networkidle2', timeout: sito.carica ? 180_000 : 60_000 })
       await page.addStyleTag({ content: FERMO + (sito.stile || '') })
       await prepara(page)
       if (sito.prima) await sito.prima(page)

@@ -35,7 +35,8 @@ concurrency:
 jobs:
   catture:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # (40: le catture di pzkko.it, con la scena 3D disegnata in software, sono lente)
+    timeout-minutes: 40
     defaults:
       run:
         working-directory: albertopecchini.it

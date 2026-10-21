@@ -89,10 +89,13 @@ export const siti = {
     // spente e la cattura usciva nera (fino al 21.10, quando il giro di GitHub cadeva di sera).
     // Dal 18.10 la home è una scena 3D, che arriva dopo il caricamento (col movimento ridotto senza il volo): le catture
     // della finestra la aspettano pronta, se no erano il nero del caricamento (21.10). Le pagine intere sono il muro di
-    // sempre (?muro=1): la scena è una tela fissa grande quanto la finestra, a strisce non si fotografa
+    // sempre (?muro=1): la scena è una tela fissa grande quanto la finestra, a strisce non si fotografa.
+    // Su GitHub non c'è scheda video: la scena gira in software (SwiftShader), lenta, e la pagina non arrivava mai a
+    // «rete ferma» entro i 60 s di goto. Si carica fino al documento (carica) e la scena si aspetta fino a 3 minuti
+    carica: 'domcontentloaded',
     prima: async (page) => {
       await page
-        .waitForFunction(() => document.documentElement.dataset.scena === 'pronta' || !document.documentElement.classList.contains('scena-carico'), { timeout: 90_000 })
+        .waitForFunction(() => document.documentElement.dataset.scena === 'pronta' || !document.documentElement.classList.contains('scena-carico'), { timeout: 180_000, polling: 1000 })
         .catch(() => console.log(`! ${page.url()}: la scena 3D non è arrivata`))
       await page.evaluate(() => scrollTo(0, 0))
       await new Promise((r) => setTimeout(r, 2000))
