@@ -4,15 +4,15 @@
 // la copia vecchia dopo un aggiornamento.
 
 export const catture = {
-  'ap-desktop-tall.webp': { w: 1200, h: 2833, v: 'bbfa4bdd' },
+  'ap-desktop-tall.webp': { w: 1200, h: 2833, v: 'fe5b201b' },
   'ap-desktop.webp': { w: 1200, h: 750, v: 'e6b83923' },
-  'ap-iphone-01.webp': { w: 804, h: 4084, v: 'd68f8545' },
+  'ap-iphone-01.webp': { w: 804, h: 4084, v: '0e30b6ce' },
   'ap-iphone-02.webp': { w: 804, h: 4084, v: '7353bb5c' },
   'ap-iphone-03.webp': { w: 804, h: 4084, v: '66da0693' },
   'ap-iphone-04.webp': { w: 804, h: 4084, v: 'b642344e' },
   'ap-iphone-05.webp': { w: 804, h: 4084, v: 'e0e4fa9f' },
   'ap-iphone-06.webp': { w: 804, h: 4080, v: 'b13c3a8b' },
-  'ap-mobile-tall.webp': { w: 600, h: 4000, v: 'feb06ea2' },
+  'ap-mobile-tall.webp': { w: 600, h: 4000, v: '5fe65228' },
   'ap-mobile.webp': { w: 600, h: 1298, v: '6c18accf' },
   'ap-tablet.webp': { w: 720, h: 1036, v: 'c6829e03' },
   'cascina-contatti-mobile.webp': { w: 600, h: 1298, v: '990e9109' },
@@ -29,6 +29,8 @@ export const catture = {
   'dd-mobile.webp': { w: 600, h: 1298, v: '93168203' },
   'dd-tablet.webp': { w: 720, h: 1036, v: '24abfc77' },
   'pzk-404-mobile.webp': { w: 600, h: 1298, v: '83f16411' },
+  'pzk-bologna-m.webp': { w: 540, h: 720, v: 'ae6d59d0' },
+  'pzk-bologna.webp': { w: 1080, h: 1440, v: '4cc7cd1d' },
   'pzk-desktop-tall.webp': { w: 1200, h: 2253, v: 'da66d840' },
   'pzk-desktop.webp': { w: 1200, h: 750, v: '47c50c37' },
   'pzk-mobile-tall.webp': { w: 600, h: 4000, v: 'cfad4638' },
