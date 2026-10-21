@@ -262,9 +262,14 @@ class Barra:
         if s['fatto'] is not None and s['durata']:
             rit = max(0, s['durata'] - s['fatto'])
             voce = f'voce −{rit:.0f} s' if rit < 100 else f'voce −{rit / 60:.0f} min'
+            # più di 3 minuti indietro durante la registrazione: il trascrittore è fermo o non regge
+            allarme = rit > 180 and not s.get('fine')
         else:
-            voce = 'voce …'
-        d.text((X(12), X(50)), voce, font=p.f_testo, fill=INCHIOSTRO)
+            # dopo un minuto di registrazione senza trascrizione il trascrittore non è partito (log\trascrivi.log)
+            allarme = bool(s['durata']) and s['durata'] > 90 and not s.get('fine')
+            voce = 'voce ferma!' if allarme else 'voce …'
+        d.text((X(12), X(50)), voce + (' !' if allarme and not voce.endswith('!') else ''), font=p.f_testo,
+               fill=PENNARELLO if allarme else INCHIOSTRO)
         # Special Elite non ha ✓ né ▸: la spunta si fa a mano
         o = s['ocr']
         if o.get('leggo'):

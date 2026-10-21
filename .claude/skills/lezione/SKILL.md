@@ -11,6 +11,9 @@ librerie in `%LOCALAPPDATA%\Lezioni\venv` (`$py` qui sotto), la lezione in corso
 Lezione di riferimento completa, da imitare: `Documenti\Lezioni\2026-10-21\` (`grezzo.md`,
 `ocr\`, `appunti\appunti.md` e `appunti\figure\_figure_parte*.py`).
 
+Se Alberto ha premuto «Lezione» da solo, controlla subito `log\trascrivi.log`: il 21.10 alle
+14:08 il trascrittore non partiva (bug di `--materia` vuota, corretto) e nessuno se n'è accorto.
+
 **Regola d'oro: registrazione e ascolto non si fermano mai** finché Alberto non dice che è
 finita. I guardiani rilanciano registratore e trascrittore; per riavviare il trascrittore
 si crea `FERMA_TRASCRIZIONE` nella cartella della lezione (mai uccidere il registratore).
@@ -56,7 +59,11 @@ fede sulla voce. Il nome della docente: non fidarti dell'account Teams della tel
    regola + esempio svolto passo passo + il perché detto a voce, rimandi `⏱ h:mm:ss`,
    tabelle riassuntive, «Detto a voce», «Errori da non fare», «Prossima lezione»; grafici
    ridisegnati con matplotlib in `appunti\figure\` (copia e adatta `_figure_parte1.py`).
-   Se la lezione è lunga, dividila fra due aiutanti (prima e dopo la pausa) e poi unisci.
+   Se la lezione è lunga o va fatta tutta a registrazione finita (Alberto ha usato i
+   collegamenti da solo, come il 21.10 pomeriggio), dividila fra tre aiutanti per pezzi di
+   tempo: ognuno legge la lavagna del suo pezzo (`ocr\ocr_pK_NNN.json`, provini `pK_*`,
+   usando le funzioni `prepara.ritaglia`/`prepara.provino`, mai `prepara.py` intero) e scrive
+   `appunti\parte_K.md` (solo sezioni «## »); poi `$py unisci.py <cartella> --titolo "…"`.
 3. `$py impagina.py "<cartella>\appunti\appunti.md"` → HTML e PDF A4. Controlla le pagine
    (PyMuPDF non è nel venv: `uv pip install pymupdf` in un venv di lavoro, o guarda l'HTML),
    poi apri il PDF con `Start-Process`.

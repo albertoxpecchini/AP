@@ -104,6 +104,8 @@ lettura in LaTeX.
   dalla cornice viola; regge al cambio di disposizione, alla chat aperta, allo schermo
   intero) e fa i provini 3×3; **`aspetta.py`** aspetta che ci sia abbastanza da leggere.
 - **`barra.py`** — la barra (tkinter).
+- **`unisci.py`** — per una lezione lunga divisa fra più lettori: unisce `appunti\parte_1.md`,
+  `parte_2.md`… in `appunti.md`, rinumera le sezioni e scrive intestazione e indice.
 - **`impagina.py`** — Markdown con `$…$` → HTML con KaTeX → PDF A4 stampato da Edge, coi
   caratteri di albertopecchini.it (Archivo, Instrument Serif, IBM Plex Mono) e il minio
   come solo accento. `` `⏱ 1:05:04` `` diventa l'etichetta del minuto,
