@@ -14,6 +14,8 @@ import { foto as fotoDi, poi, disegni } from './disegni.js'
 import { CHIUSINO } from './marciapiede.js'
 
 const TERRA = '/art/scena/terra/'
+// il centro del chiusino [x, z], sul telefono e sul computer (sotto, P; lo usa anche portachiavi.js, che sta lì accanto)
+export const TOMBINO = { telefono: [0.5, 0.9], computer: [1.7, 1.3] }
 
 // un numero a caso ma sempre lo stesso (la spazzatura non si sposta a ogni visita)
 let seme = 7
@@ -106,8 +108,8 @@ export async function spazzatura(scene, M) {
   // Il chiusino: in mezzo all'inquadratura, in squadra con le lastre (righe da 40 cm dalla facciata: il telaio ne prende
   // due, coi lati sulle fughe; un lato in x sulla fuga di una riga)
   const P = telefono
-    ? { kola: [0.12, 0.3, 0.6], pechino: [1.0, 0.36, -0.4], lucky: [0.68, 0.3, 2.2], tucson: [1.02, 0.95, 0.35], pzkkonet: [-0.12, 1.0, -0.6], menu: [0.34, 0.28, 1.4], tombino: [0.5, 0.9], area: [0.0, 1.1, 0.22, 1.25] }
-    : { kola: [0.45, 0.42, 0.6], pechino: [2.35, 0.5, -0.4], lucky: [1.12, 0.95, 2.2], tucson: [0.78, 0.8, 0.35], pzkkonet: [2.36, 1.22, -0.25], menu: [0.62, 1.22, 0.9], tombino: [1.7, 1.3], area: [0.3, 2.6, 0.25, 1.45] }
+    ? { kola: [0.12, 0.3, 0.6], pechino: [1.0, 0.36, -0.4], lucky: [0.68, 0.3, 2.2], tucson: [1.02, 0.95, 0.35], pzkkonet: [-0.12, 1.0, -0.6], menu: [0.34, 0.28, 1.4], tombino: TOMBINO.telefono, area: [0.0, 1.1, 0.22, 1.25] }
+    : { kola: [0.45, 0.42, 0.6], pechino: [2.35, 0.5, -0.4], lucky: [1.12, 0.95, 2.2], tucson: [0.78, 0.8, 0.35], pzkkonet: [2.36, 1.22, -0.25], menu: [0.62, 1.22, 0.9], tombino: TOMBINO.computer, area: [0.3, 2.6, 0.25, 1.45] }
   // (le cose sparse a caso, le gomme e i mozziconi, non finiscono sul chiusino)
   const qua = () => { for (;;) { const p = [caso(P.area[0], P.area[1]), caso(P.area[2], P.area[3])]; if (Math.max(Math.abs(p[0] - P.tombino[0]), Math.abs(p[1] - P.tombino[1])) > LATO_CHIUSINO / 2 + 0.04) return p } }
   // (la scatola di pechino ha la stessa faccia sui quattro lati: la trama si ripete quattro volte intorno)

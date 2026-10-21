@@ -112,6 +112,9 @@ void main() {
   if ( uNeve > 0.5 ) a *= 1.0 - smoothstep( 0.35, 1.0, length( vQ ) );
   if ( a < 0.004 ) discard;
   gl_FragColor = vec4( uColore, a );
+  // (col post-processing non fanno niente; sul telefono la scena si disegna dritta sullo schermo: il tono e l'sRGB qui)
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }`
 const particelle = (n, neve) => {
   const seme = new Float32Array(n * 16), angolo = new Float32Array(n * 8), idx = []
@@ -156,7 +159,8 @@ export function meteo(scene, camera, M, h, { quante = 1 } = {}) {
   let prossimoLampo = 0, lampoT = -1, lampi = [], fonte = null, bersaglio = DOPO_PIOGGIA, salta = false, tenuto = false
   const inizio = performance.now()
   const TINTA = { pioggia: new T.Color(0.78, 0.82, 0.88), neve: new T.Color(1, 1, 1) }
-  const fulmine = (now) => { lampoT = now; lampi = [0, 90 + Math.random() * 80, 260 + Math.random() * 200].slice(0, 2 + Math.floor(Math.random() * 2)) }
+  // (e il suo tuono, suono/suono.js: arriva dopo, tanto più tardi quanto è lontano)
+  const fulmine = (now) => { lampoT = now; lampi = [0, 90 + Math.random() * 80, 260 + Math.random() * 200].slice(0, 2 + Math.floor(Math.random() * 2)); window.pzkkoSuono?.evento('lampo') }
 
   // ctx: buio (0..1), lampioni (0..1), la vista (il rettangolo di muro che si vede), dov'è la telecamera
   const aggiorna = (dt, now, ctx) => {

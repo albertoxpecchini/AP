@@ -32,6 +32,8 @@ html.scena3d .copiato{visibility:visible}
 html.scena3d .vol h3,html.scena3d .vol:has(h3 a:hover) h3{text-decoration:none}
 html.scena3d .vol h3 a:focus-visible::after{outline:3px solid #ffd400;outline-offset:6px}
 html.scena3d .tagliandi button:focus-visible{outline:3px solid #ffd400}
+/* il puntatore sopra il portachiavi per terra (scena/portachiavi.js): il suo tasto si preme */
+html.scena-tasto,html.scena-tasto *{cursor:pointer}
 /* ?allinea=1: il DOM in trasparenza sopra la scena, per controllare che combacino */
 html.scena-allinea .it,html.scena-allinea .portale{visibility:visible;opacity:.45}
 @media (prefers-reduced-motion:reduce){html.scena3d .scena-tela{transition-duration:.3s}}

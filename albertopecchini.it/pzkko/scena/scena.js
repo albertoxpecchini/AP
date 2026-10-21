@@ -15,10 +15,10 @@
 // parete è quella del telefono (due colonne, stretta e alta) e la saracinesca è
 // larga 0,95 m invece di 2,05: i volantini restano grandi come quelli veri.
 // Prove: ?muro=1 (niente 3D), ?intro=0 (niente arrivo), ?allinea=1 (il DOM in
-// trasparenza sopra la scena), ?qualita=alta|media|bassa|telefono, ?dpr=1 (la
-// risoluzione interna; con ?qualita= o ?dpr= la scena non si adatta da sola),
-// ?glb=1 (scarica la scena in glTF per Blender), più quelle della pagina
-// (?ora=18:30, ?veloce=60, ?notte=1, ?auto=1).
+// trasparenza sopra la scena), ?qualita=bassa|media|alta|ultra|telefono, ?dpr=1 (la
+// risoluzione interna; con ?qualita= o ?dpr= la scena non si adatta da sola e la
+// scelta della regia non conta), ?glb=1 (scarica la scena in glTF per Blender), più
+// quelle della pagina (?ora=18:30, ?veloce=60, ?notte=1, ?auto=1).
 import * as T from './lib/three.js'
 import { costruisci, prossimoFotogramma, specchiModo } from './mondo.js'
 import { fogli } from './fogli.js'
@@ -26,22 +26,67 @@ import { luci } from './luci.js'
 import { acqua } from './acqua.js'
 import { bestie } from './bestie.js'
 import { spazzatura } from './spazzatura.js'
+import { portachiavi } from './portachiavi.js'
 import { meteo, METEO } from './meteo.js'
 import { REGIA } from './materiali.js'
 
-// I livelli di qualità (niente anti-alias in nessuno). dpr = la risoluzione interna rispetto ai pixel CSS, che non
-// scende mai: è lei che decide se le immagini sono nitide, il resto si può togliere; specchi = la tela del vetro e
-// delle pozzanghere; ombra = la mappa del sole; bloom = la risoluzione del bagliore rispetto ai pixel CSS (0 = niente);
-// luci = «tutte» o «poche» (mondo.js).
+// I livelli di qualità (niente anti-alias in nessuno: in «alta» e «ultra» lo fa la risoluzione in più). Dal 21.10 si
+// cambiano dal vivo dalla regia, senza ricaricare. scala = la risoluzione interna rispetto ai pixel dello schermo
+// (devicePixelRatio), max = il suo tetto in pixel interni per pixel CSS, mp = il tetto in milioni di pixel della tela (un
+// 4K al 150% a 1,5× sarebbero 19 milioni): non scende mai sotto quella dello schermo, fino a 1, perché è lei che decide se
+// le immagini sono nitide; sopra (alta, ultra) la scena si disegna più grande e lo schermo la riduce, e gli spigoli
+// vengono lisci. Prima «alta» era 1,25 al massimo, cioè su uno schermo normale uguale a «media». specchi = la tela del
+// vetro e delle pozzanghere (null = niente specchi); ombra = la mappa del sole (la lampada la metà, da 1024 a 2048);
+// bloom = la risoluzione del bagliore rispetto ai pixel CSS (0 = niente); palazzi = i palazzi di fronte; poche = meno luci
+// (mondo.js: si decide costruendo, quindi vale il livello con cui si apre la pagina).
+// Sulla 3060 Ti la scheda fa tutta la scena in 2–5 ms anche a 2×: il tempo se ne andava altrove (index.html, la regia).
+// Il telefono (sotto i 900 px) dal 21.10 sera ha una scena sola, la minima, e nessuna scelta: alla risoluzione dello
+// schermo (3× su un iPhone), senza anti-alias, senza ombre (ombra 0: la mappa d'ombra non c'è e i materiali non la
+// leggono), senza specchi, senza bagliore e senza post-processing (diretta: si disegna dritto sullo schermo, il tono e
+// l'sRGB li fa ogni materiale; prima erano due passaggi a tutto schermo su tele a mezza precisione). Con l'1,5×, le
+// ombre, gli specchi e il bagliore un iPhone 16 Pro faceva 20 fotogrammi al secondo, un iPhone 14 10
 const LIVELLI = {
-  alta: { dpr: 1.25, specchi: [768, 1024], ombra: 2048, bloom: 1, luci: 'tutte' },
-  media: { dpr: 1, specchi: [512, 384], ombra: 1024, bloom: 0.5, luci: 'poche' },
-  bassa: { dpr: 1, specchi: [256, 256], ombra: 1024, bloom: 0, luci: 'poche', palazzi: false },
-  telefono: { dpr: 1.5, specchi: [384, 384], ombra: 1024, bloom: 1, luci: 'poche' },
+  bassa: { scala: 1, max: 1, mp: 4, specchi: [256, 256], ombra: 1024, bloom: 0, palazzi: false, poche: true },
+  media: { scala: 1, max: 1, mp: 4, specchi: [512, 384], ombra: 1024, bloom: 0.5, poche: true },
+  alta: { scala: 1.5, max: 3, mp: 8.3, specchi: [1024, 1024], ombra: 2048, bloom: 1 },
+  ultra: { scala: 2, max: 4, mp: 16.6, specchi: [1536, 2048], ombra: 4096, bloom: 1 },
+  telefono: { scala: 1, max: 4, mp: 12, specchi: null, ombra: 0, bloom: 0, poche: true, diretta: true },
 }
+// la curva dei colori accesi sopra AgX (vedi uscita, sotto): nell'OutputPass, e sul telefono dentro ogni materiale
+const AGX_NEON = `vec3 agxNeon( vec3 c ) {
+  vec3 a = AgXToneMapping( c ), e = max( c * toneMappingExposure, 0.0 );
+  float mx = max( max( e.r, e.g ), e.b ), mn = min( min( e.r, e.g ), e.b );
+  float k = smoothstep( 0.55, 0.85, ( mx - mn ) / max( mx, 1e-5 ) ) * smoothstep( 0.3, 1.2, mx );
+  vec3 t = min( e * ( 1.3 / ( 1.0 + 0.7 * mx ) ), 1.0 );
+  t = mix( t, vec3( 1.0, 0.88, 0.72 ), 0.4 * smoothstep( 5.0, 16.0, mx ) );
+  return mix( a, t, k );
+}`
+const conNeon = (m) => {
+  if (m.userData.neon) return
+  m.userData.neon = true
+  // (la chiave di prima: una sua, chiesta ogni volta; quella di serie è il testo di onBeforeCompile, presa adesso)
+  const sua = Object.prototype.hasOwnProperty.call(m, 'customProgramCacheKey') ? m.customProgramCacheKey.bind(m) : null
+  const fissa = sua ? '' : m.onBeforeCompile.toString()
+  const prima = Object.prototype.hasOwnProperty.call(m, 'onBeforeCompile') ? m.onBeforeCompile : null
+  m.onBeforeCompile = (sh, r) => {
+    if (prima) prima.call(m, sh, r)
+    if (!sh.fragmentShader.includes('void main() {') || !sh.fragmentShader.includes('#include <tonemapping_fragment>')) return
+    sh.fragmentShader = sh.fragmentShader
+      .replace('void main() {', `#if defined( TONE_MAPPING )\n${AGX_NEON}\n#endif\nvoid main() {`)
+      .replace('#include <tonemapping_fragment>', '#if defined( TONE_MAPPING )\n gl_FragColor.rgb = agxNeon( gl_FragColor.rgb );\n#endif')
+  }
+  m.customProgramCacheKey = () => `${sua ? sua() : fissa}|neon`
+}
+// «auto» che non ce la fa scende di un gradino alla volta (il telefono no: è già il minimo)
+const SCENDE = { ultra: 'alta', alta: 'media', media: 'bassa' }
+// la densità dei pixel interni di un livello, per una tela di w × h pixel CSS
+const densita = (liv, w, h) => { const d = devicePixelRatio || 1; return Math.max(Math.min(d, 1), Math.min(d * liv.scala, liv.max, Math.sqrt((liv.mp * 1e6) / Math.max(1, w * h)))) }
+// la grafica scelta nella regia resta nel browser: { modo: 'auto' | un livello | 'su misura', su: i valori su misura }
+const GRAFICA = 'pzkko-grafica'
+const leggiGrafica = () => { try { return JSON.parse(localStorage.getItem(GRAFICA)) || {} } catch { return {} } }
 // Dalla scheda grafica, se si lascia riconoscere: le integrate (Intel, Apple,
-// Mali, Adreno) e gli emulatori partono da «media»; poi, se i primi fotogrammi
-// sono lenti, si scende comunque.
+// Mali, Adreno) e gli emulatori partono da «media»; poi, in «auto», se i primi
+// fotogrammi sono lenti, si scende comunque.
 const qualitaIniziale = (renderer, chiesta, telefono) => {
   if (chiesta && LIVELLI[chiesta]) return chiesta
   if (telefono) return 'telefono'
@@ -96,13 +141,30 @@ export async function avvia() {
 }
 
 async function scena({ root, q, parete, strada, portale, t0, telefono, tela, renderer }) {
-  const qualita = qualitaIniziale(renderer, q.get('qualita'), telefono)
-  const liv = { ...LIVELLI[qualita] }
-  // (?qualita= e ?dpr= sono per le prove: con quelli la scena non si adatta da sola)
-  const fissa = q.has('qualita') || q.has('dpr')
-  let dpr = Number(q.get('dpr')) || Math.min(devicePixelRatio, liv.dpr)
+  // il livello: ?qualita= (le prove), se no quello scelto nella regia, se no dalla scheda grafica. modo dice chi comanda:
+  // 'auto' (la scena, che scende se non ce la fa), un livello, 'su misura' (i valori della regia sopra un livello)
+  // (sul telefono niente scelte: la scena minima, sempre; ?qualita= per le prove sì)
+  const salvata = q.has('qualita') || telefono ? {} : leggiGrafica()
+  const scelta = q.get('qualita') || (LIVELLI[salvata.modo] ? salvata.modo : null)
+  let livello = qualitaIniziale(renderer, scelta, telefono)
+  const liv = { ...LIVELLI[livello], ...(salvata.modo === 'su misura' ? salvata.su : {}) }
+  let modo = salvata.modo === 'su misura' ? 'su misura' : scelta ? livello : telefono ? 'telefono' : 'auto'
+  // (diretta: senza post-processing, dritto sullo schermo; si decide costruendo)
+  const diretta = !!liv.diretta
+  // (?dpr= è per le prove: la risoluzione interna fissa)
+  const dprFisso = Number(q.get('dpr')) || 0
+  // il tetto della scheda, o di quello che il browser dice di lei: una tela più larga o più alta di LATO pixel non si
+  // disegna (le tele del post-processing sono trame grandi quanto lei: errore GL, e la pagina resta nera). Firefox e
+  // LibreWolf con la protezione dalle impronte (privacy.resistFingerprinting) dicono 2048 di qualunque scheda e un
+  // devicePixelRatio di 2: «alta» chiedeva una tela di 3820 × 2172, nera. Ora la risoluzione si ferma prima, anche sotto 1
+  // se la finestra stessa è più larga; la regia lo dice
+  const gl = renderer.getContext()
+  const LATO = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE), gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS))
+  const voluta = (w, hh) => dprFisso || densita(liv, w, hh)
+  const nelTetto = (d, w, hh) => Math.min(d, LATO / Math.max(1, w), LATO / Math.max(1, hh))
+  let dpr = nelTetto(voluta(innerWidth, innerHeight), innerWidth, innerHeight)
   renderer.setPixelRatio(dpr)
-  renderer.shadowMap.enabled = true
+  renderer.shadowMap.enabled = liv.ombra > 0
   renderer.shadowMap.type = T.PCFShadowMap
   renderer.toneMapping = T.AgXToneMapping
   renderer.outputColorSpace = T.SRGBColorSpace
@@ -122,22 +184,24 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   scene.add(camera)
   // (prima i fogli: chiedono le foto, che si scaricano e decodificano per conto loro mentre il posto si costruisce,
   // due secondi di trame disegnate al volo)
-  // (e insieme la spazzatura per terra col chiusino di pzkkonet, che non dipende dal resto)
-  const [f, h, sp] = await Promise.all([fogli(scene, M, renderer), costruisci(scene, M, { palazzi: liv.palazzi !== false, poche: liv.luci === 'poche' }), spazzatura(scene, M)])
+  // (e insieme la spazzatura per terra col chiusino di pzkkonet e il portachiavi della banca $pzk lì accanto, che non
+  // dipendono dal resto; i palazzi si costruiscono sempre, «bassa» li nasconde)
+  const [f, h, sp, pc] = await Promise.all([fogli(scene, M, renderer), costruisci(scene, M, { poche: !!liv.poche }), spazzatura(scene, M), portachiavi(scene, M)])
   const l = luci(scene, renderer, h, M)
   // la condensa che scende sulla lamiera (il bagnato sui materiali l'hanno già mondo.js e fogli.js)
   const a = acqua(scene, M, h, f)
   // le formiche, le mosche, le zanzare e le blatte (al posto dei disegni piatti della pagina)
   const b = bestie(scene, M, h, f, { ridotto: matchMedia('(prefers-reduced-motion: reduce)').matches })
   // il meteo di Mantova: il cielo, la nebbia, le gocce e i fiocchi, il bagnato (meno gocce dove la scheda è più piccola)
-  const me = meteo(scene, camera, M, h, { quante: qualita === 'alta' ? 1 : 0.55 })
+  const me = meteo(scene, camera, M, h, { quante: livello === 'alta' || livello === 'ultra' ? 1 : livello === 'telefono' ? 0.4 : 0.55 })
   const tCostruita = performance.now()
   carico(CARICO.costruita)
 
   // ── il post-processing: il bagliore dei neon, poi i colori (l'OutputPass, l'ultimo, disegna sullo schermo) ──
   const target = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType })
   const composer = new T.EffectComposer(renderer, target)
-  composer.setPixelRatio(dpr)
+  // (diretta: il composer resta lì, con le sue tele da un pixel, e non si usa)
+  if (!diretta) composer.setPixelRatio(dpr)
   composer.addPass(new T.RenderPass(scene, camera))
   const bloom = new T.UnrealBloomPass(new T.Vector2(1, 1), 0.55, 0.5, 1.0)
   composer.addPass(bloom)
@@ -148,19 +212,32 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   // Reinhard; il cuore più acceso schiarisce verso un bianco caldo, come nelle foto dei neon veri
   uscita.material.fragmentShader = uscita.material.fragmentShader
     .replace('gl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );', 'gl_FragColor.rgb = agxNeon( gl_FragColor.rgb );')
-    .replace('void main() {', `vec3 agxNeon( vec3 c ) {
-      vec3 a = AgXToneMapping( c ), e = max( c * toneMappingExposure, 0.0 );
-      float mx = max( max( e.r, e.g ), e.b ), mn = min( min( e.r, e.g ), e.b );
-      float k = smoothstep( 0.55, 0.85, ( mx - mn ) / max( mx, 1e-5 ) ) * smoothstep( 0.3, 1.2, mx );
-      vec3 t = min( e * ( 1.3 / ( 1.0 + 0.7 * mx ) ), 1.0 );
-      t = mix( t, vec3( 1.0, 0.88, 0.72 ), 0.4 * smoothstep( 5.0, 16.0, mx ) );
-      return mix( a, t, k );
-    }
-    void main() {`)
+    .replace('void main() {', `${AGX_NEON}\nvoid main() {`)
   composer.addPass(uscita)
-  const specchi = ([v, p]) => { h.vetro.getRenderTarget().setSize(v, v); h.pozze.getRenderTarget().setSize(p, p / 2) }
+  // diretta (il telefono): niente OutputPass, il tono lo fa ogni materiale, e senza questa curva i colori accesi sotto il
+  // lampione venivano slavati. Si mette dentro ogni materiale al posto del tono di three, dopo quello che il materiale fa
+  // già (onBeforeCompile); la chiave del programma resta quella di prima più «neon», così materiali diversi non si
+  // scambiano i programmi (come bagnato in acqua.js)
+  if (diretta) scene.traverse((o) => { for (const m of [].concat(o.material ?? [])) conNeon(m) })
+  // (null: niente specchi, fotogramma li nasconde)
+  const specchi = (s) => { const [v, p] = s ? s.map((x) => Math.min(x, LATO)) : [1, 2]; h.vetro.getRenderTarget().setSize(v, v); h.pozze.getRenderTarget().setSize(p, p / 2) }
+  // le mappe d'ombra del sole e della lampada: three ne crea una alla misura di quel momento e poi non la cambia più, quindi
+  // per cambiarla la si butta e si chiede di rifare le ombre (la rifà al prossimo disegno). Fino al 21.10 «ombre a 512»
+  // della scena che si adattava cambiava solo il numero: la mappa restava da 2048
+  const ombre = (n) => {
+    if (!n) return
+    n = Math.min(n, LATO)
+    const lampada = telefono ? Math.min(n, 512) : Math.min(n, Math.max(1024, n / 2))
+    for (const [s, x] of [[l.sole.shadow, n], [h.lampada.shadow, lampada]]) {
+      if (s.mapSize.x === x) continue
+      s.mapSize.set(x, x)
+      if (s.map) { s.map.dispose(); s.map = null }
+      s.needsUpdate = true
+    }
+  }
   specchi(liv.specchi)
-  if (liv.ombra !== 2048) l.sole.shadow.mapSize.set(liv.ombra, liv.ombra)
+  ombre(liv.ombra)
+  for (const p of h.palazzi) p.visible = liv.palazzi !== false
   // le mappe d'ombra si rifanno solo quando si dice (sotto, in fotogramma)
   l.sole.shadow.autoUpdate = false
   h.lampada.shadow.autoUpdate = false
@@ -221,10 +298,15 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     const w = tela.clientWidth || innerWidth, hh = tela.clientHeight || innerHeight
     if (w !== dim.w || hh !== dim.h) {
       dim.w = w; dim.h = hh
+      // (la densità dipende anche dalla misura della finestra: il tetto in milioni di pixel)
+      const d = nelTetto(voluta(w, hh), w, hh)
+      if (d !== dpr) { dpr = d; renderer.setPixelRatio(dpr); if (!diretta) composer.setPixelRatio(dpr) }
       renderer.setSize(w, hh, false)
-      composer.setSize(w, hh)
-      // (il bagliore a una risoluzione sua, più bassa: è sfocato comunque)
-      bloom.setSize(Math.max(2, w * (liv.bloom || 1)), Math.max(2, hh * (liv.bloom || 1)))
+      if (!diretta) {
+        composer.setSize(w, hh)
+        // (il bagliore a una risoluzione sua, più bassa: è sfocato comunque)
+        bloom.setSize(Math.min(LATO, Math.max(2, w * (liv.bloom || 1))), Math.min(LATO, Math.max(2, hh * (liv.bloom || 1))))
+      }
     }
     // lo spazio in più da scorrere, sopra (l'insegna) e sotto (il marciapiede)
     const px = parete.offsetWidth / M.W // pixel per metro sul piano della saracinesca
@@ -238,6 +320,35 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   new ResizeObserver(() => rileggi()).observe(parete)
   new ResizeObserver(() => rileggi()).observe(portale)
   misura()
+
+  // ── la qualità dal vivo (la regia, «auto» che scende): la risoluzione, gli specchi, le ombre, il bagliore, i palazzi;
+  // le luci no (poche o tutte, si decide costruendo) ──
+  const applica = (nuovo) => {
+    Object.assign(liv, nuovo)
+    specchi(liv.specchi); ombre(liv.ombra)
+    for (const p of h.palazzi) p.visible = liv.palazzi !== false
+    dim.w = 0; misura()
+  }
+  // «auto»: se la macchina non ce la fa si scende di un livello (sotto, in giro); adattata dice da dove e perché
+  let adattata = null, gradini = 0, misurati = []
+  const scendi = (media) => {
+    const giu = SCENDE[livello]
+    if (!giu) { gradini = 3; return }
+    adattata = { da: adattata?.da ?? livello, a: giu, ms: Math.round(media * 1000) }
+    livello = giu
+    applica(LIVELLI[giu])
+    console.info(`scena 3D: ${(media * 1000).toFixed(0)} ms a fotogramma, scendo a «${giu}»`)
+  }
+  // la regia: «auto», un livello o «su misura» (i valori dati sopra quelli di adesso); si mette subito e resta nel browser
+  const imposta = (m, su = {}) => {
+    if (m === 'auto') {
+      modo = 'auto'; gradini = 0; misurati = []; adattata = null
+      livello = qualitaIniziale(renderer, null, telefono)
+      applica(LIVELLI[livello])
+    } else if (LIVELLI[m]) { modo = livello = m; adattata = null; applica(LIVELLI[m]) }
+    else { modo = 'su misura'; applica(su) }
+    try { localStorage.setItem(GRAFICA, JSON.stringify(modo === 'su misura' ? { modo, su: { ...liv } } : { modo })) } catch {}
+  }
 
   // ── le inquadrature ────────────────────────────────────────────────────────
   // Un'inquadratura è: la telecamera a distanza d dal piano della saracinesca (z = 0), il rettangolo di quel piano
@@ -379,7 +490,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
       const era = o.visible, t = o.material.transparent
       o.visible = true
       if (opaco) o.material.transparent = false
-      renderer.setRenderTarget(composer.renderTarget1)
+      renderer.setRenderTarget(diretta ? null : composer.renderTarget1)
       renderer.compile(o, camera, scene)
       o.visible = era; o.material.transparent = t
     }
@@ -387,7 +498,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
       yield dentro(o, false)
       if (carta.has(o) && o.material.transparent) yield dentro(o, true)
     }
-    for (const [fq, m, dentroTela] of quadri) yield () => {
+    if (!diretta) for (const [fq, m, dentroTela] of quadri) yield () => {
       const prima = fq.material
       fq.material = m
       renderer.setRenderTarget(dentroTela ? composer.renderTarget1 : null)
@@ -441,8 +552,26 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   }
   const bestieCtx = { vista: { x0: 0, x1: 1, y0: 0, y1: 1 }, puntatore: null, buio: 0, fari: 0, telecamera: camera.position, lampada: h.lampadina.position, insegna: h.lettere.centri.testo, blatte: q.has('blatte') }
 
+  // ── il portachiavi per terra: tocca il raggio del puntatore? Il clic (o il tocco) preme il tasto, e sopra il puntatore
+  // diventa la manina (html.scena-tasto, scena.css: cambia solo entrando e uscendo) ──
+  const da = new T.Vector3(), verso = new T.Vector3()
+  const tocca = (x, y) => {
+    if (!visibile || perso || !dim.w) return false
+    camera.updateMatrixWorld()
+    da.setFromMatrixPosition(camera.matrixWorld)
+    verso.set((x / dim.w) * 2 - 1, 1 - (y / dim.h) * 2, 0.5).unproject(camera).sub(da).normalize()
+    return pc.tocca(da, verso)
+  }
+  let sulTasto = false
+  addEventListener('pointermove', (e) => {
+    const s = e.pointerType === 'mouse' && tocca(e.clientX, e.clientY)
+    if (s !== sulTasto) { sulTasto = s; root.classList.toggle('scena-tasto', s) }
+  }, { passive: true })
+  addEventListener('click', (e) => { if (!e.defaultPrevented && tocca(e.clientX, e.clientY)) { e.preventDefault(); pc.premi() } })
+
   // ── un fotogramma ──────────────────────────────────────────────────────────
-  let n = 0
+  // (fps: i fotogrammi al secondo, contati in giro, sotto, due volte al secondo: il portachiavi e la regia)
+  let n = 0, fps = 0
   const ultimoSole = new T.Vector3()
   const fotogramma = (now, dt) => {
     const stato = l.aggiorna(now, dt)
@@ -472,15 +601,18 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     // la sera che avanza e lo sfarfallio), uno sì e uno no quando la telecamera si muove, tutti e due a ogni fotogramma
     // nel volo e quando passa un'auto se la scheda ce la fa
     const vivo = mossa || mosso || acceso || fase !== 'fatto' || n % 32 === 0
-    specchiModo(!vivo ? 'fermi' : qualita === 'alta' && (stato.auto || fase !== 'fatto') ? 'tutti' : 'alterni')
+    specchiModo(!vivo ? 'fermi' : (liv.specchi?.[0] ?? 0) >= 1024 && (stato.auto || fase !== 'fatto') ? 'tutti' : 'alterni')
     // il bagliore: solo quando fa buio (di giorno non c'è niente di così acceso, e costa); con la nebbia le luci si
     // allargano (l'alone dei lampioni nella nebbia)
     bloom.enabled = liv.bloom > 0 && stato.buio > 0.15 && REGIA.bagliore > 0
     bloom.threshold = (1.5 + 2 * (1 - stato.buio)) * (1 - 0.35 * METEO.nebbia)
     bloom.strength = (0.12 + 0.25 * stato.buio) * (1 + 1.2 * METEO.nebbia) * REGIA.bagliore
     // (la regia può spegnere gli specchi: il vetro e le pozzanghere)
-    h.vetro.visible = h.pozze.visible = REGIA.specchi
-    composer.render()
+    h.vetro.visible = h.pozze.visible = REGIA.specchi && !!liv.specchi
+    // il portachiavi per terra: i fotogrammi al secondo sul display, il tasto che torna su
+    pc.aggiorna(now, fps, stato.buio)
+    if (diretta) renderer.render(scene, camera)
+    else composer.render()
     prossimoFotogramma()
   }
 
@@ -515,20 +647,14 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     console.info(`scena 3D: anteprime a bordo in ${((now - t0) / 1000).toFixed(1)} s${anteprimePronte ? '' : ' (non tutte: troppo tempo)'}`)
   }
   const tempi = window.pzkkoTempi = []
-  let prima = performance.now(), fermo = false, misurati = [], gradini = 0
-  // se la macchina non ce la fa (più di 24 ms a fotogramma, sotto i ~40 al secondo) si toglie qualcosa, fino a tre
-  // volte, ma mai la risoluzione (le immagini devono restare nitide): prima gli specchi e il bagliore a metà, poi le
-  // ombre a 512, poi gli specchi ancora a metà e il bagliore spento
-  const degrada = (g, media) => {
-    if (g === 1 || g === 3) { liv.specchi = liv.specchi.map((x) => Math.max(128, x / 2)); specchi(liv.specchi); liv.bloom = g === 3 ? 0 : Math.min(liv.bloom, 0.5); dim.w = 0; misura() }
-    else { liv.ombra = 512; for (const s of [l.sole.shadow, h.lampada.shadow]) { s.mapSize.set(512, 512); s.needsUpdate = true } }
-    console.info(`scena 3D: ${(media * 1000).toFixed(0)} ms a fotogramma, ${['specchi e bagliore a metà', 'ombre a 512', 'specchi a un quarto, niente bagliore'][g - 1]}`)
-  }
+  let prima = performance.now(), fermo = false, contati = 0, tConta = prima
   const giro = (now) => {
     if (fermo || perso) return
     requestAnimationFrame(giro)
     const dt = Math.min((now - prima) / 1000, 0.1)
     prima = now
+    contati++
+    if (now - tConta >= 500) { fps = (contati * 1000) / (now - tConta); contati = 0; tConta = now }
     const p0 = renderer.info.programs?.length ?? 0, a = performance.now()
     fotogramma(now, dt)
     if (!visibile) {
@@ -554,20 +680,21 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
       const p1 = renderer.info.programs?.length ?? 0, ms = performance.now() - a
       if (p1 > p0 || ms > 30) console.info(`scena 3D, fotogramma ${n} (${fase}): ${ms.toFixed(0)} ms, ${p1 - p0} programmi nuovi ${renderer.info.programs.slice(p0).map((p) => p.name || p.cacheKey.slice(0, 40)).join(' | ')}`)
     }
-    // si misura a foto tutte a bordo (prima i fotogrammi in cui salgono sulla scheda sono lenti per conto loro), mentre
-    // si guarda da lontano: il momento più pesante, tutti i fogli in vista
-    if (!fissa && gradini < 3 && prontiFogli && n > 12) {
+    // «auto»: se la macchina non ce la fa (più di 24 ms a fotogramma, sotto i ~40 al secondo) si scende di un livello, fino
+    // a tre volte. Si misura a foto tutte a bordo (prima i fotogrammi in cui salgono sulla scheda sono lenti per conto
+    // loro), mentre si guarda da lontano: il momento più pesante, tutti i fogli in vista
+    if (modo === 'auto' && !dprFisso && gradini < 3 && prontiFogli && n > 12) {
       misurati.push(dt)
       if (misurati.length >= 40) {
         // la mediana, non la media: un fotogramma lungo ogni tanto non deve contare
         const media = [...misurati].sort((a, b) => a - b)[misurati.length >> 1]
         misurati = []
-        if (media > 0.024) degrada(++gradini, media)
+        if (media > 0.024) { gradini++; scendi(media) }
         else gradini = 3
       }
     }
   }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo && !perso) { fermo = false; prima = performance.now(); requestAnimationFrame(giro) } })
+  document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo && !perso) { fermo = false; prima = tConta = performance.now(); contati = 0; requestAnimationFrame(giro) } })
   requestAnimationFrame(giro)
 
   // ── la scheda grafica perde il contesto (un driver che si pianta, la memoria che finisce, un'altra pagina 3D che se la
@@ -602,7 +729,10 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     setTimeout(() => { ext?.loseContext(); setTimeout(() => ext?.restoreContext(), 1000) }, 3000)
   }
   // (lontano: la scatola dell'inquadratura da lontano, per carico.mjs: la foto del caricamento la ritaglia con questi numeri)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, sp, me, meteo: METEO, M, qualita, liv, vetrina, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale(),
+  // (grafica: quello che la regia mostra e cambia; imposta: «auto», un livello o «su misura»; pc: il portachiavi per terra)
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, sp, pc, me, meteo: METEO, M, liv, vetrina, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale(),
+    get qualita() { return livello }, fps: () => fps, imposta, livelli: LIVELLI,
+    grafica: () => ({ modo, livello, liv: { ...liv }, dpr, voluta: voluta(dim.w || innerWidth, dim.h || innerHeight), lato: LATO, adattata, prova: q.has('qualita') || !!dprFisso, poche: !!h.luciPoche }),
     lontano: { ...scatola(), respiro: RESPIRO, d: (RESPIRO * scatola().bh) / TAN_LONTANO } }
 
   // ── arrivata: la pagina sotto torna a rispondere (lo fa il caricatore in index.html quando questa promessa si chiude) ──
@@ -611,7 +741,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   carico(1)
   root.dataset.scena = 'pronta'
   const sec = (x) => ((x - t0) / 1000).toFixed(1)
-  console.info(`scena 3D: costruita in ${sec(tCostruita)} s, pronta in ${sec(tPronta)} s, vista in ${sec(tVista)} s, arrivata in ${sec(performance.now())} s (${qualita}, ${dpr.toFixed(2)}×${telefono ? ', telefono' : ''}, luci «${l.attuale()}»)`)
+  console.info(`scena 3D: costruita in ${sec(tCostruita)} s, pronta in ${sec(tPronta)} s, vista in ${sec(tVista)} s, arrivata in ${sec(performance.now())} s (${livello}${modo === 'auto' ? ', auto' : modo === 'su misura' ? ', su misura' : ''}, ${dpr.toFixed(2)}×${telefono ? ', telefono' : ''}, luci «${l.attuale()}»)`)
 
   // ?glb=1: la scena così com'è, in glTF binario, da aprire in Blender (File › Import › glTF); l'esportatore si scarica solo qui
   if (q.get('glb') !== null) {

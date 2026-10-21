@@ -1,23 +1,32 @@
-// La regia di pzkko.it: il pannello nascosto per provare il sito, nello stile dei
-// giochi (un foglio col nastro, piste stampate, fiches da trascinare). Comanda
-// l'ora di Mantova e la sua velocità, la sera (il buio, l'insegna, i lampioni, lo
-// sfarfallio), le auto che passano (quando, che fari, il neon sotto, una ferma
-// dove si vuole), la scena 3D (esposizione, bagliore, luce dell'insegna, specchi,
-// qualità), le bestie e la goccia della condensa. Non è modale: la scena dietro
-// cambia mentre si trascina. Niente si salva: ricaricando torna tutto com'era (tranne l'ora e la
-// velocità, che le ricariche della regia si portano dietro nell'indirizzo).
+// La regia di pzkko.it: il pannello per provare e regolare il sito, nello stile dei giochi (un foglio col nastro, le
+// caselle stampate del tavolo, le fiches come pomelli). Dal 21.10 è a schede e leggera:
+// - grafica: la qualità della scena 3D (auto, bassa, media, alta, ultra), cambiata dal vivo senza ricaricare, e i suoi
+//   pezzi uno per uno (risoluzione, ombre, riflessi, bagliore, palazzi: «su misura»), i ritocchi, la vetrina, la luce
+//   del portachiavi per terra. La qualità e la luce restano nel browser (scena.js, portachiavi.js);
+// - ora e sera: l'ora di Mantova e la sua velocità, il buio, l'insegna, i lampioni, lo sfarfallio;
+// - meteo: quello vero o uno scelto, quanto, il bagnato e la neve per terra, un lampo;
+// - strada: le auto (quando, che fari, il neon sotto, una ferma), le bestie, le gocce;
+// - suono: i suoni della strada (suono/, window.pzkkoSuono), acceso, il volume, ognuno da provare;
+// - prove: il muro in trasparenza, rifare l'arrivo, il muro senza 3D, il glTF, i numeri della scheda.
+// In fondo come va la scena (fotogrammi al secondo, qualità, ora, buio, luci, meteo) e «rimetti tutto». Non è modale: la
+// scena dietro cambia mentre si regola. Il resto non si salva: ricaricando torna com'era (tranne l'ora e la velocità,
+// che le ricariche della regia si portano dietro nell'indirizzo).
+// Prima era un foglio lungo di piste in SVG col filtro dell'inchiostro, ridisegnate due volte al secondo, e la qualità
+// ricaricava la pagina: con la pagina che ricalcolava lo stile a ogni fotogramma (index.html, fino al 21.10) la regia
+// aperta portava la scena di sera a 67 fps su una 3060 Ti. Ora caselle e cursori sono HTML, e si tocca solo quello che
+// cambia.
 //
-// index.html la apre scrivendo «regia», con #regia nell'indirizzo o con cinque
-// tocchi in fretta in cima allo schermo: import('/regia/regia.js').then((m) => m.apri()).
-// Quello che comanda: window.pzkkoPagina (l'orologio, la sera, le auto, in index.html),
-// window.pzkkoRegia (i ritocchi che la scena legge a ogni fotogramma, scena/materiali.js)
-// e window.pzkkoScena (le bestie, la goccia, i numeri in fondo).
+// index.html la apre col tasto giallo in alto a destra (.rotella), scrivendo «regia», con #regia nell'indirizzo o con
+// cinque tocchi in fretta in cima allo schermo: import('/regia/regia.js').then((m) => m.apri()).
+// Quello che comanda: window.pzkkoPagina (l'orologio, la sera, le auto, in index.html), window.pzkkoRegia (i ritocchi
+// che la scena legge a ogni fotogramma, scena/materiali.js) e window.pzkkoScena (la grafica, le bestie, la goccia, il
+// meteo, il portachiavi, i numeri in fondo).
 
 const QUI = new URL('.', import.meta.url).href
 const ART = '/art/'
-const svgEl = (tag, attr = {}) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k, v] of Object.entries(attr)) e.setAttribute(k, v); return e }
 const fmt = (v, d = 2) => (Math.round(v * 10 ** d) / 10 ** d).toLocaleString('it-IT')
 const limita = (x, a, b) => Math.min(b, Math.max(a, x))
+const el = (tag, cls, testo) => { const e = document.createElement(tag); if (cls) e.className = cls; if (testo != null) e.textContent = testo; return e }
 
 // i ritocchi della scena: gli stessi valori di partenza di scena/materiali.js (REGIA)
 const PREDEFINITI = {
@@ -38,8 +47,8 @@ const adesso = () => pagina().orologio.adesso()
 const vai = (m) => { const o = pagina().orologio, t = o.adesso(); o.imposta(t + (m - minuto(t)) * 60000); pagina().aggiorna() }
 const sole = () => { const s = pagina().sole(adesso()); return { alba: minuto(s.alba), tramonto: minuto(s.tramonto) } }
 
-// ricarica la pagina con dei parametri (la qualità, il muro senza 3D, l'arrivo), portandosi dietro l'ora e la
-// velocità e la regia aperta
+// ricarica la pagina con dei parametri (l'arrivo, il muro senza 3D, il glTF), portandosi dietro l'ora, la velocità e la
+// regia aperta
 const ricarica = (cambia) => {
   const u = new URL(location.href), o = pagina().orologio
   u.searchParams.set('ora', hhmm(minuto(o.adesso())))
@@ -50,22 +59,27 @@ const ricarica = (cambia) => {
 }
 
 // ── la finestra ──────────────────────────────────────────────────────────────
-let dlg, voceEl, piste = [], conta, giro = null
+let dlg, voceEl, corpo, schede, conta, controlli = [], giro = 0, scheda = 'grafica', conSuono = false
+const SCHEDE = [['grafica', 'grafica'], ['ora', 'ora e sera'], ['meteo', 'meteo'], ['strada', 'strada'], ['suono', 'suono'], ['prove', 'prove']]
+const rotella = () => document.querySelector('.rotella')
 
 export async function apri() {
   if (!dlg) await costruisci()
-  // (scrivere «regia» di nuovo la chiude)
+  // (il tasto giallo, o scrivere «regia» di nuovo: la chiude)
   if (dlg.open) return chiudi()
   dlg.classList.remove('chiude', 'giu')
   dlg.show()
-  // (senza rubare il fuoco alla pagina: si apre, non si entra)
-  document.activeElement?.blur?.()
-  for (const p of piste) p.disegna()
+  rotella()?.setAttribute('aria-expanded', 'true')
+  // (senza rubare il fuoco alla pagina: si apre, non si entra; dal tasto giallo il fuoco resta sul tasto)
+  if (!document.activeElement?.closest?.('.rotella')) document.activeElement?.blur?.()
+  if (!conSuono && window.pzkkoSuono) riempiSuono()
+  rileggi(true)
   avviaConta()
 }
 
 function chiudi() {
   if (!dlg?.open || dlg.classList.contains('chiude')) return
+  rotella()?.setAttribute('aria-expanded', 'false')
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { dlg.close(); return }
   dlg.classList.add('chiude')
   dlg.addEventListener('animationend', () => { dlg.classList.remove('chiude'); dlg.close() }, { once: true })
@@ -80,316 +94,426 @@ async function costruisci() {
     l.onload = ok; l.onerror = ok
     document.head.appendChild(l)
   })
+  try { scheda = localStorage.getItem('pzkko-regia-scheda') || scheda } catch {}
+  if (!SCHEDE.some(([k]) => k === scheda)) scheda = 'grafica'
   dlg = document.createElement('dialog')
   dlg.className = 'rg'
   dlg.setAttribute('aria-labelledby', 'rg-titolo')
   dlg.innerHTML = `
     <img class="rg-nastro rg-n1" src="${ART}nastro/carta-gommata.webp" alt="" width="483" height="183">
     <img class="rg-nastro rg-n2" src="${ART}nastro/carta-gommata.webp" alt="" width="483" height="183">
-    <img class="rg-nastro rg-n3" src="${ART}nastro/carta-gommata.webp" alt="" width="483" height="183">
-    <img class="rg-nastro rg-n4" src="${ART}nastro/carta-gommata.webp" alt="" width="483" height="183">
-    <svg class="rg-defs" aria-hidden="true"><filter id="rg-ink" x="-2%" y="-10%" width="104%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" result="d"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -.55 1.22" result="g"/><feComposite in="d" in2="g" operator="in"/></filter></svg>
     <div class="rg-dentro">
       <header class="rg-testa">
         <h2 id="rg-titolo">regia</h2>
-        <p class="rg-voce" aria-live="polite">trascina le fiches</p>
+        <p class="rg-voce" aria-live="polite">scegli e guarda</p>
         <button class="rg-tondo rg-abbassa" type="button" aria-label="abbassa la regia"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M9 15c4 4 7 7 11 11 4-4 8-8 11-11"/></svg></button>
         <button class="rg-tondo rg-chiudi" type="button" aria-label="chiudi la regia"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M9 10c7 6 14 13 22 21M30 8c-6 8-13 15-21 23"/></svg></button>
       </header>
+      <div class="rg-schede" role="tablist" aria-label="le parti della regia"></div>
       <div class="rg-corpo"></div>
       <footer class="rg-piede"><ul class="rg-conta" aria-label="come va la scena"></ul><button class="rg-piccolo rg-rimetti" type="button">rimetti tutto</button></footer>
     </div>`
   document.body.appendChild(dlg)
   voceEl = dlg.querySelector('.rg-voce')
   conta = dlg.querySelector('.rg-conta')
-  const corpo = dlg.querySelector('.rg-corpo')
+  corpo = dlg.querySelector('.rg-corpo')
+  schede = dlg.querySelector('.rg-schede')
   dlg.querySelector('.rg-chiudi').addEventListener('click', chiudi)
   dlg.querySelector('.rg-abbassa').addEventListener('click', () => dlg.classList.toggle('giu'))
   dlg.querySelector('.rg-rimetti').addEventListener('click', rimetti)
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dlg.open) chiudi() })
-  for (const s of sezioniPagina()) corpo.appendChild(s)
-  // la scena: se c'è già, le sue sezioni; se sta ancora arrivando (la regia aperta durante il caricamento, o dopo una
-  // delle sue ricariche, che riaprono la regia con #regia prima che il 3D ci sia) un segnaposto, sostituito dalle sezioni
-  // vere appena la scena c'è. Prima la regia restava «senza 3D» fino a una ricarica da zero, e «con il 3D» ricaricava
-  // nello stesso punto: un giro senza uscita
-  let attesa = null
-  const mettiScena = () => {
-    const s = scena(), arriva = !s && document.documentElement.classList.contains('scena-carico')
-    if (attesa && arriva) return false
-    const nuove = s ? sezioniScena(s) : arriva ? [sezione('la scena', 25, 'il 3D arriva', [nota('il 3D sta arrivando: i suoi comandi compaiono qui appena la strada si vede.')])] : sezioniSenza()
-    if (attesa) { for (const v of attesa) v.remove() }
-    for (const v of nuove) corpo.appendChild(v)
-    attesa = arriva ? nuove : null
-    if (!arriva && dlg.open) for (const p of piste) p.disegna()
-    return !arriva
+
+  // le schede: una pagina alla volta; frecce, inizio e fine per passare dall'una all'altra
+  for (const [k, t] of SCHEDE) {
+    const b = el('button', 'rg-scheda', t)
+    b.type = 'button'; b.id = `rg-s-${k}`; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', `rg-p-${k}`); b.dataset.k = k
+    b.addEventListener('click', () => mostra(k))
+    b.addEventListener('keydown', (e) => {
+      const i = SCHEDE.findIndex(([x]) => x === k), j = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: SCHEDE.length - 1 }[e.key]
+      if (j === undefined) return
+      e.preventDefault()
+      const n = SCHEDE[(j + SCHEDE.length) % SCHEDE.length][0]
+      mostra(n); schede.querySelector(`[data-k="${n}"]`).focus()
+    })
+    schede.appendChild(b)
+    const p = el('div', 'rg-pagina')
+    p.id = `rg-p-${k}`; p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', b.id); p.tabIndex = -1
+    corpo.appendChild(p)
   }
-  if (!mettiScena()) { const t = setInterval(() => { if (mettiScena()) clearInterval(t) }, 250) }
-  new ResizeObserver(() => { if (dlg.open) for (const p of piste) p.disegna() }).observe(corpo)
-  // quello che cambia da solo (l'ora che passa, la sera che cala): le piste si rileggono due volte al secondo
-  setInterval(() => { if (dlg.open) for (const p of piste) p.rileggi() }, 500)
+  riempi()
+  mostra(scheda)
+  // la scena: se sta ancora arrivando (la regia aperta durante il caricamento, o dopo una delle sue ricariche, che la
+  // riaprono con #regia prima che il 3D ci sia) le sue parti dicono «il 3D arriva» e si rifanno appena la scena c'è
+  if (!scena() && document.documentElement.classList.contains('scena-carico')) {
+    const t = setInterval(() => {
+      if (scena() || !document.documentElement.classList.contains('scena-carico')) { clearInterval(t); riempi(); if (dlg.open) rileggi(true) }
+    }, 250)
+  }
+  // quello che cambia da solo (l'ora che passa, la sera che cala, l'auto che scende): si rilegge due volte al secondo,
+  // solo la scheda aperta, e si tocca solo quello che è cambiato
+  setInterval(() => { if (dlg.open) rileggi() }, 500)
 }
 
-// ── le piste ─────────────────────────────────────────────────────────────────
-// Una pista è una riga: il nome e il valore (a pennarello) a sinistra, a destra il binario stampato e la fiche.
-// tipo «scorre»: un valore continuo fra min e max (log: in scala logaritmica), con le tacche sotto, i segni in rosso
-// (l'alba, il tramonto) e a sinistra, se c'è auto, la casella che vale null («segue da solo»). Tipo «scatti»: le
-// caselle di valori [testo, valore]; la fiche si trascina e si posa nella più vicina. leggi() e scrivi(v) sono il
-// valore vero; dopo: scrive solo quando la fiche si posa (le scelte che ricaricano la pagina)
-function pista(def, fiche) {
-  const riga = document.createElement('div')
-  riga.className = 'rg-riga'
-  riga.innerHTML = `<span class="rg-nome">${def.nome}<b></b></span><div class="rg-pista" tabindex="0" role="slider" aria-label="${def.nome}"><svg aria-hidden="true"></svg><img class="rg-fiche" src="${ART}fiches/f${fiche}.webp" alt="" width="170" height="174" draggable="false"></div>`
-  const p = riga.querySelector('.rg-pista'), svg = p.querySelector('svg'), chip = p.querySelector('.rg-fiche'), val = riga.querySelector('b')
-  const scatti = def.tipo === 'scatti', AUTO = def.auto ? 46 : 0, Y0 = 5, Y1 = 22
-  const W = () => p.clientWidth || 300
-  const x0 = () => (AUTO ? AUTO + 10 : 6), x1 = () => W() - 6
-  const norm = (v) => (def.log ? Math.log(v / def.min) / Math.log(def.max / def.min) : (v - def.min) / (def.max - def.min))
-  const denorm = (k) => (def.log ? def.min * (def.max / def.min) ** k : def.min + k * (def.max - def.min))
-  const indice = (v) => Math.max(0, def.valori.findIndex(([, x]) => x === v))
-  const xDi = (v) => {
-    if (scatti) { const n = def.valori.length; return (indice(v) + 0.5) * (W() / n) }
-    if (v === null) return AUTO / 2
-    return x0() + limita(norm(v), 0, 1) * (x1() - x0())
-  }
-  const vDi = (x) => {
-    if (scatti) return def.valori[limita(Math.floor(x / (W() / def.valori.length)), 0, def.valori.length - 1)][1]
-    if (AUTO && x < AUTO + 5) return null
-    let v = denorm(limita((x - x0()) / (x1() - x0()), 0, 1))
-    if (def.passo) v = Math.round(v / def.passo) * def.passo
-    return v
-  }
-  const testo = (v) => (scatti ? def.valori[indice(v)][0] : v === null ? def.autoTesto?.() ?? 'auto' : def.testo(v))
-  let valore = def.leggi(), presa = false
+function mostra(k) {
+  scheda = k
+  try { localStorage.setItem('pzkko-regia-scheda', k) } catch {}
+  for (const b of schede.children) { const s = b.dataset.k === k; b.setAttribute('aria-selected', String(s)); b.tabIndex = s ? 0 : -1 }
+  for (const p of corpo.children) p.hidden = p.id !== `rg-p-${k}`
+  corpo.scrollTop = 0
+  rileggi(true)
+}
 
-  const disegna = () => {
-    svg.innerHTML = ''
-    const w = W(), stampa = svgEl('g', { filter: 'url(#rg-ink)' }), sopra = svgEl('g')
-    const scritta = (t, x, y, a = {}) => { const e = svgEl('text', { x, y, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#161616', ...a }); e.textContent = t; stampa.appendChild(e) }
-    if (scatti) {
-      // le caselle, come quelle del tavolo; quella scelta evidenziata
-      const n = def.valori.length, cw = w / n
-      def.valori.forEach(([t, v], i) => {
-        if (v === valore) sopra.appendChild(svgEl('rect', { x: i * cw + 2.5, y: Y0 + 1.5, width: cw - 5, height: Y1 - Y0 - 3, fill: 'rgba(255,212,0,.6)' }))
-        stampa.appendChild(svgEl('rect', { x: i * cw + 1, y: Y0, width: cw - 2, height: Y1 - Y0, fill: 'none', stroke: '#161616', 'stroke-width': 1.6 }))
-        scritta(t, (i + 0.5) * cw, 37, v === valore ? { fill: '#b3121f' } : {})
-      })
-    } else {
-      // la casella «auto», il binario con l'evidenziatore fino al valore, le tacche, i segni rossi
-      if (AUTO) {
-        if (valore === null) sopra.appendChild(svgEl('rect', { x: 2.5, y: Y0 + 1.5, width: AUTO - 5, height: Y1 - Y0 - 3, fill: 'rgba(255,212,0,.6)' }))
-        stampa.appendChild(svgEl('rect', { x: 1, y: Y0, width: AUTO - 2, height: Y1 - Y0, fill: 'none', stroke: '#161616', 'stroke-width': 1.6 }))
-        scritta(def.autoNome ?? 'auto', AUTO / 2, 37, valore === null ? { fill: '#b3121f' } : {})
-      }
-      const a = x0() - 4, b = x1() + 4
-      stampa.appendChild(svgEl('rect', { x: a, y: Y0, width: b - a, height: Y1 - Y0, rx: 3, fill: 'none', stroke: '#161616', 'stroke-width': 1.6 }))
-      if (valore !== null) sopra.appendChild(svgEl('rect', { x: a + 1.5, y: Y0 + 1.5, width: Math.max(0, xDi(valore) - a - 1.5), height: Y1 - Y0 - 3, fill: 'rgba(255,212,0,.6)' }))
-      for (const [v, t] of def.tacche?.() ?? []) {
-        const x = xDi(v)
-        stampa.appendChild(svgEl('path', { d: `M${x} ${Y1 - 5}V${Y1}`, stroke: '#161616', 'stroke-width': 1.4 }))
-        if (t) scritta(t, x, 37)
-      }
-      for (const [v, t] of def.segni?.() ?? []) {
-        const x = xDi(v)
-        stampa.appendChild(svgEl('path', { d: `M${x} ${Y0 - 3}V${Y1 + 3}`, stroke: '#b3121f', 'stroke-width': 2, 'stroke-linecap': 'round' }))
-        scritta(t, x, Y0 - 5, { fill: '#b3121f', 'font-size': 9.5 })
-      }
-    }
-    svg.appendChild(sopra); svg.appendChild(stampa)
-    if (!presa) chip.style.left = `${xDi(valore)}px`
-    chip.style.top = `${(Y0 + Y1) / 2}px`
-    const t = testo(valore)
-    val.textContent = t
-    p.setAttribute('aria-valuetext', t)
-  }
-  const metti = (v, annuncia = true) => {
-    if (v === valore) return
-    valore = v
-    if (!def.dopo) def.scrivi(v)
-    disegna()
-    if (annuncia) voce(`${def.nome}: ${testo(v)}`)
-  }
+// le pagine si (ri)fanno tutte insieme: all'inizio e quando arriva la scena. Ogni controllo sa in che pagina sta, così
+// quelli delle schede chiuse non si rileggono
+let inCostruzione = null
+const pag = (k) => corpo.querySelector(`#rg-p-${k}`)
+const metti = (k, figli) => { inCostruzione = pag(k); controlli = controlli.filter((c) => c.pagina !== inCostruzione); inCostruzione.replaceChildren(...figli()); inCostruzione = null }
+function riempi() {
+  const S = scena(), arriva = !S && document.documentElement.classList.contains('scena-carico')
+  metti('grafica', () => (S ? paginaGrafica(S) : arriva ? attesa() : senza3d()))
+  metti('ora', paginaOra)
+  metti('meteo', () => (S ? paginaMeteo(S) : arriva ? attesa() : [nota('il meteo è della scena 3D, e qui il 3D non c\'è.')]))
+  metti('strada', () => paginaStrada(S))
+  riempiSuono()
+  metti('prove', () => paginaProve(S))
+}
+// (i suoni arrivano per conto loro: se la regia si è fatta prima, la loro pagina si rifà quando si apre)
+const riempiSuono = () => { conSuono = !!window.pzkkoSuono; metti('suono', paginaSuono) }
+const attesa = () => [nota('il 3D sta arrivando: le sue regole compaiono qui appena la strada si vede.')]
+const senza3d = () => [nota('qui il 3D non c\'è (niente WebGL2, o ?muro=1): restano l\'ora, la sera, le auto e i suoni, sul muro di sempre.'), tasti([['con il 3D', () => ricarica({ muro: null })]])]
 
-  // trascinare: la fiche si alza e segue il dito (nelle caselle il valore cambia già passando), posata fa un colpetto
-  const muovi = (e) => { const r = p.getBoundingClientRect(), x = limita(e.clientX - r.left, 0, r.width); chip.style.left = `${x}px`; metti(vDi(x)) }
-  p.addEventListener('pointerdown', (e) => {
-    if (e.button > 0) return
-    try { p.setPointerCapture(e.pointerId) } catch {}
-    presa = true
-    p.classList.add('presa'); p.classList.remove('scatta')
-    muovi(e)
-  })
-  p.addEventListener('pointermove', (e) => { if (presa) muovi(e) })
-  const lascia = () => {
-    if (!presa) return
-    presa = false
-    p.classList.remove('presa'); p.classList.add('scatta')
-    disegna()
-    chip.classList.remove('posa'); void chip.offsetWidth; chip.classList.add('posa')
-    if (def.dopo) def.scrivi(valore)
-  }
-  p.addEventListener('pointerup', lascia)
-  p.addEventListener('pointercancel', lascia)
-  // la tastiera: frecce, pagina su e giù, inizio e fine (le scelte che ricaricano: Invio)
-  p.addEventListener('keydown', (e) => {
+// ── i controlli ──────────────────────────────────────────────────────────────
+// ognuno ha leggi() (il valore vero) e mette(v) (lo mostra); rileggi() li confronta con quello che mostrano: due volte al
+// secondo solo i vivi (quelli che cambiano da soli), tutti quando si tocca qualcosa o si apre
+const registra = (c) => { c.pagina = inCostruzione; controlli.push(c); return c }
+function rileggi(tutti = false) {
+  for (const c of controlli) {
+    if (c.pagina?.hidden || (!tutti && !c.vivo)) continue
     let v
-    if (scatti) {
-      const i = indice(valore), n = def.valori.length
-      const j = { ArrowLeft: i - 1, ArrowDown: i - 1, ArrowRight: i + 1, ArrowUp: i + 1, Home: 0, End: n - 1 }[e.key]
-      if (j === undefined) { if (e.key === 'Enter' && def.dopo) def.scrivi(valore); return }
-      v = def.valori[limita(j, 0, n - 1)][1]
-    } else {
-      const k = valore === null ? -0.01 : norm(valore), d = { ArrowLeft: -0.02, ArrowDown: -0.02, ArrowRight: 0.02, ArrowUp: 0.02, PageDown: -0.1, PageUp: 0.1 }[e.key]
-      if (e.key === 'Home') v = AUTO ? null : def.min
-      else if (e.key === 'End') v = def.max
-      else if (d === undefined) return
-      else if (AUTO && k + d < 0) v = null
-      else { v = denorm(limita(k + d, 0, 1)); if (def.passo) v = Math.round(v / def.passo) * def.passo }
-    }
-    e.preventDefault()
-    p.classList.add('scatta')
-    metti(v)
-  })
-  piste.push({ disegna, rileggi: () => { if (presa) return; const v = def.leggi(); if (v !== valore || def.vivo) { valore = v; disegna() } } })
-  return riga
+    try { v = c.leggi() } catch { continue }
+    const k = JSON.stringify(v) ?? 'undefined'
+    if (k !== c.mostrato) { c.mostrato = k; c.mette(v) }
+  }
 }
-
+const riga = (nome, ...dentro) => {
+  const r = el('div', 'rg-riga')
+  const n = el('span', 'rg-nome', nome), b = el('b', 'rg-val')
+  n.appendChild(b)
+  r.append(n, ...dentro)
+  return { r, val: b }
+}
+const uguali = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+// le caselle: una scelta fra pochi valori [testo, valore]; quella scelta evidenziata col giallo. Frecce per spostarsi
+function caselle(nome, valori, leggi, scrivi, { vivo = false } = {}) {
+  const g = el('div', 'rg-caselle')
+  g.setAttribute('role', 'radiogroup'); g.setAttribute('aria-label', nome)
+  const { r, val } = riga(nome, g)
+  const bottoni = valori.map(([t, v]) => {
+    const b = el('button', 'rg-casella', t)
+    b.type = 'button'; b.setAttribute('role', 'radio')
+    b.addEventListener('click', () => { scrivi(v); voce(`${nome}: ${t}`); rileggi(true) })
+    g.appendChild(b)
+    return b
+  })
+  g.addEventListener('keydown', (e) => {
+    const i = bottoni.indexOf(document.activeElement), d = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key]
+    if (i < 0 || !d) return
+    e.preventDefault()
+    const j = (i + d + bottoni.length) % bottoni.length
+    bottoni[j].focus(); bottoni[j].click()
+  })
+  registra({ vivo, leggi, mette: (v) => {
+    const i = valori.findIndex(([, x]) => uguali(x, v))
+    bottoni.forEach((b, j) => { b.setAttribute('aria-checked', String(j === i)); b.tabIndex = j === Math.max(0, i) ? 0 : -1 })
+    val.textContent = i >= 0 ? '' : 'su misura'
+  } })
+  return r
+}
+// i bottoni sì/no, ognuno per conto suo (le bestie)
+function interruttori(nome, voci) {
+  const g = el('div', 'rg-caselle')
+  g.setAttribute('role', 'group'); g.setAttribute('aria-label', nome)
+  const { r } = riga(nome, g)
+  for (const [t, leggi, scrivi] of voci) {
+    const b = el('button', 'rg-casella', t)
+    b.type = 'button'
+    b.addEventListener('click', () => { const v = !leggi(); scrivi(v); voce(`${t}: ${v ? 'sì' : 'no'}`); rileggi(true) })
+    g.appendChild(b)
+    registra({ leggi, mette: (v) => b.setAttribute('aria-pressed', String(!!v)) })
+  }
+  return r
+}
+// il cursore: un valore continuo fra min e max (log: in scala logaritmica), la fiche come pomello, l'evidenziatore fino al
+// valore, le tacche sotto, i segni in rosso (l'alba, il tramonto); con auto, una casella a sinistra che vale null («segue
+// da solo»: il pomello mostra il valore che sta seguendo). La tastiera è quella del cursore del browser
+function cursore(nome, def, fiche = 25) {
+  const { min, max, log, passo } = def
+  const norm = (v) => (log ? Math.log(v / min) / Math.log(max / min) : (v - min) / (max - min))
+  const denorm = (k) => { let v = log ? min * (max / min) ** k : min + k * (max - min); if (passo) v = Math.round(v / passo) * passo; return v }
+  const box = el('div', 'rg-cursore')
+  const auto = def.auto ? el('button', 'rg-casella rg-auto', def.autoNome ?? 'auto') : null
+  const pista = el('div', 'rg-pista')
+  const input = el('input')
+  input.type = 'range'; input.min = 0; input.max = 1000; input.step = 1
+  input.setAttribute('aria-label', nome)
+  pista.style.setProperty('--fiche', `url(${ART}fiches/f${fiche}.webp)`)
+  const sotto = el('div', 'rg-tacche'), segni = el('div', 'rg-segni')
+  sotto.setAttribute('aria-hidden', 'true'); segni.setAttribute('aria-hidden', 'true')
+  for (const [v, t] of def.tacche ?? []) { const s = el('span', null, t); s.style.left = `${limita(norm(v), 0, 1) * 100}%`; sotto.appendChild(s) }
+  pista.append(input, sotto, segni)
+  if (auto) {
+    auto.type = 'button'
+    auto.addEventListener('click', () => {
+      const v = def.leggi() === null ? def.autoValore?.() ?? denorm(Number(input.value) / 1000) : null
+      def.scrivi(v); voce(`${nome}: ${v === null ? def.autoTesto?.() ?? 'auto' : def.testo(v)}`); rileggi(true)
+    })
+    box.appendChild(auto)
+  }
+  box.appendChild(pista)
+  const { r, val } = riga(nome, box)
+  let presa = false
+  input.addEventListener('input', () => { presa = true; const v = denorm(Number(input.value) / 1000); def.scrivi(v); voce(`${nome}: ${def.testo(v)}`); mostraV(v) })
+  input.addEventListener('change', () => { presa = false; rileggi(true) })
+  const mostraV = (v) => {
+    const k = limita(norm(v === null ? def.autoValore?.() ?? min : v), 0, 1)
+    if (!presa) input.value = String(Math.round(k * 1000))
+    pista.style.setProperty('--k', k.toFixed(4))
+    pista.classList.toggle('in-auto', v === null)
+    auto?.setAttribute('aria-pressed', String(v === null))
+    const t = v === null ? def.autoTesto?.() ?? 'auto' : def.testo(v)
+    val.textContent = t
+    input.setAttribute('aria-valuetext', t)
+  }
+  registra({ vivo: def.vivo, leggi: () => (def.leggi() === null && def.autoValore ? { auto: def.autoValore() } : def.leggi()), mette: (x) => {
+    mostraV(x?.auto !== undefined ? null : x)
+    // (i segni rossi cambiano solo col giorno: l'alba e il tramonto)
+    if (def.segni) {
+      const s = def.segni(), k = JSON.stringify(s.map(([x]) => Math.round(x)))
+      if (k !== segni.dataset.k) { segni.dataset.k = k; segni.replaceChildren(...s.map(([x, t]) => { const e = el('span', null, t); e.style.left = `${limita(norm(x), 0, 1) * 100}%`; return e })) }
+    }
+  } })
+  return r
+}
 const tasti = (lista) => {
-  const d = document.createElement('div')
-  d.className = 'rg-tasti'
+  const d = el('div', 'rg-tasti')
   for (const [t, fa, grosso] of lista) {
-    const b = document.createElement('button')
-    b.type = 'button'; b.className = grosso ? 'rg-gira' : 'rg-piccolo'; b.textContent = t
-    b.addEventListener('click', () => { fa(); voce(t) })
+    const b = el('button', grosso ? 'rg-gira' : 'rg-piccolo', t)
+    b.type = 'button'
+    b.addEventListener('click', () => { fa(); voce(t); rileggi(true) })
     d.appendChild(b)
   }
   return d
 }
-const nota = (t) => { const p = document.createElement('p'); p.className = 'rg-nota'; p.textContent = t; return p }
-const sezione = (titolo, fiche, piccola, righe) => {
-  const s = document.createElement('section')
-  s.className = 'rg-sez'
-  s.innerHTML = `<h3><img src="${ART}fiches/f${fiche}.webp" alt="" width="170" height="174">${titolo}<small>${piccola}</small></h3>`
-  for (const r of righe) s.appendChild(r.disegna ? r : r.nome ? pista(r, fiche) : r)
-  return s
-}
+const nota = (t) => el('p', 'rg-nota', t)
+// una nota che si riscrive da sola (la qualità di adesso, i dati del meteo, i numeri della scheda)
+const notaViva = (testo) => { const p = nota(''); registra({ vivo: true, leggi: testo, mette: (t) => { p.textContent = t } }); return p }
+const titolo = (t, fiche) => { const h = el('h3', 'rg-titolo'); h.innerHTML = `<img src="${ART}fiches/f${fiche}.webp" alt="" width="170" height="174">`; h.append(t); return h }
 
 // ── che cosa si comanda ──────────────────────────────────────────────────────
 const si = [['sì', true], ['no', false]]
-// quello della pagina (c'è sempre): il tempo, la sera, le auto
-function sezioniPagina() {
+const RIS = [['1×', 1], ['1,5×', 1.5], ['2×', 2]]
+const OMBRE = [['512', 512], ['1024', 1024], ['2048', 2048], ['4096', 4096]]
+const RIFLESSI = [['spenti', null], ['bassi', [256, 256]], ['medi', [512, 384]], ['alti', [1024, 1024]], ['tanti', [1536, 2048]]]
+const BAGLIORE = [['spento', 0], ['metà', 0.5], ['pieno', 1]]
+
+// la grafica: la qualità (dal vivo), i suoi pezzi su misura, i ritocchi, la vetrina, il portachiavi
+function paginaGrafica(S) {
+  const G = () => S.grafica()
+  // i pezzi su misura: partono dai valori di adesso (la risoluzione su misura arriva fino a 4 pixel interni per pixel CSS)
+  const su = (x) => S.imposta('su misura', x)
+  // il telefono: la scena minima, niente da scegliere (scena.js); i ritocchi che contano anche lì e il portachiavi
+  if (G().modo === 'telefono') return [
+    titolo('la qualità', 25),
+    nota('sul telefono la scena è una sola, la più leggera: alla risoluzione dello schermo, senza anti-alias, ombre, riflessi, bagliore né post-processing. niente da scegliere.'),
+    notaViva(() => { const g = G(), c = S.renderer.domElement; return `adesso: ${fmt(g.dpr)} pixel per pixel, la tela ${c.width} × ${c.height}.` }),
+    titolo('i ritocchi', 5),
+    cursore('esposizione', { min: 0.25, max: 4, log: true, leggi: () => R.esposizione, scrivi: (v) => { R.esposizione = v }, testo: (v) => `x${fmt(v)}`, tacche: [[0.25, '¼'], [1, '1'], [4, '4']] }, 5),
+    cursore('luce dell\'insegna', { min: 0, max: 3, leggi: () => R.neon, scrivi: (v) => { R.neon = v }, testo: (v) => (v < 0.01 ? 'spenta' : `x${fmt(v)}`), tacche: [[0, 'spenta'], [1, '1'], [3, '3']] }, 5),
+    ...portachiavi(S),
+  ]
+  return [
+    titolo('la qualità', 25),
+    caselle('qualità', [['auto', 'auto'], ['bassa', 'bassa'], ['media', 'media'], ['alta', 'alta'], ['ultra', 'ultra'], ['su misura', 'su misura']],
+      () => G().modo, (v) => { if (v === 'su misura') su({}); else S.imposta(v) }),
+    notaViva(() => {
+      const g = G(), c = S.renderer.domElement
+      let t = `adesso: «${g.livello}»${g.modo === 'su misura' ? ' su misura' : ''}, ${fmt(g.dpr)} pixel per pixel, la tela ${c.width} × ${c.height}.`
+      if (g.modo === 'auto') t += g.adattata ? ` auto è scesa da «${g.adattata.da}» a «${g.adattata.a}»: ${g.adattata.ms} ms a fotogramma.` : ' auto sceglie dalla scheda grafica e scende se non ce la fa.'
+      // (il browser che dice limiti piccoli: la tela non può passarli, se no resta nera)
+      if (g.dpr < g.voluta - 0.01) t += ` il browser dice che la scheda arriva a ${g.lato} pixel per lato: la risoluzione si ferma a ${fmt(g.dpr)}× (il livello vorrebbe ${fmt(g.voluta)}×).${g.lato <= 4096 ? ' succede con firefox e librewolf quando la protezione dalle impronte è accesa (privacy.resistFingerprinting): finge una scheda da 2048 pixel e tiene ogni pagina a 60 fotogrammi al secondo. per questo sito la si può togliere (privacy.resistFingerprinting.exemptedDomains in about:config): torna la risoluzione vera, ma i 60 restano finché la protezione è accesa.' : ''}`
+      if (g.prova) t += ' l\'indirizzo ha ?qualita= o ?dpr=: alla prossima apertura comanda lui.'
+      return t
+    }),
+    caselle('risoluzione', RIS, () => G().liv.scala, (v) => su({ scala: v, max: 4, mp: 4 + 6.3 * v })),
+    caselle('ombre', OMBRE, () => G().liv.ombra, (v) => su({ ombra: v })),
+    caselle('riflessi', RIFLESSI, () => G().liv.specchi ?? null, (v) => su({ specchi: v })),
+    caselle('bagliore', BAGLIORE, () => G().liv.bloom, (v) => su({ bloom: v })),
+    caselle('palazzi di fronte', si, () => G().liv.palazzi !== false, (v) => su({ palazzi: v })),
+    nota(`${S.M.telefono ? 'sul telefono «auto» è la qualità del telefono. ' : ''}la scelta resta in questo browser. le luci della notte (adesso ${G().poche ? 'poche' : 'tutte'}) si decidono aprendo la pagina: con «bassa» e «media» poche, dalla volta dopo.`),
+    titolo('i ritocchi', 5),
+    cursore('esposizione', { min: 0.25, max: 4, log: true, leggi: () => R.esposizione, scrivi: (v) => { R.esposizione = v }, testo: (v) => `x${fmt(v)}`, tacche: [[0.25, '¼'], [1, '1'], [4, '4']] }, 5),
+    cursore('forza del bagliore', { min: 0, max: 3, leggi: () => R.bagliore, scrivi: (v) => { R.bagliore = v }, testo: (v) => (v < 0.01 ? 'niente' : `x${fmt(v)}`), tacche: [[0, 'niente'], [1, '1'], [3, '3']] }, 5),
+    cursore('luce dell\'insegna', { min: 0, max: 3, leggi: () => R.neon, scrivi: (v) => { R.neon = v }, testo: (v) => (v < 0.01 ? 'spenta' : `x${fmt(v)}`), tacche: [[0, 'spenta'], [1, '1'], [3, '3']] }, 5),
+    caselle('vetrina col mouse', si, () => R.vetrina !== false, (v) => { R.vetrina = v }),
+    ...portachiavi(S),
+  ]
+}
+const portachiavi = (S) => [
+  titolo('il portachiavi', 500),
+  caselle('luce del display', [['accesa', true], ['spenta', false]], () => S.pc.luce, (v) => { S.pc.luce = v }, { vivo: true }),
+  nota('il token della banca $pzk perso per terra accanto al chiusino, in fondo alla pagina: dice i fotogrammi al secondo. si accende e si spegne anche col suo tasto giallo, toccandolo.'),
+]
+
+// l'ora e la sera (della pagina: ci sono anche senza 3D)
+function paginaOra() {
   const P = pagina()
-  const fuori = []
-  fuori.push(sezione('il tempo', 500, 'a mantova', [
-    { nome: 'ora', tipo: 'scorre', min: 0, max: 1439, passo: 1, vivo: true, leggi: () => minuto(adesso()), scrivi: vai, testo: hhmm,
-      tacche: () => [0, 3, 6, 9, 12, 15, 18, 21, 24].map((h) => [Math.min(1439, h * 60), String(h)]),
-      segni: () => { const s = sole(); return [[s.alba, 'alba'], [s.tramonto, 'tramonto']] } },
-    { nome: 'velocità', tipo: 'scatti', valori: [['ferma', 0], ['x1', 1], ['x10', 10], ['x60', 60], ['x600', 600]],
-      leggi: () => (P.orologio.fermo ? 0 : P.orologio.veloce),
-      scrivi: (v) => { P.orologio.fermo = v === 0; if (v) P.orologio.veloce = v; P.aggiorna() } },
+  const tre = (spenta, accesa) => [['auto', null], [spenta, 0], [accesa, 1]]
+  return [
+    titolo('il tempo', 500),
+    cursore('ora', { min: 0, max: 1439, passo: 1, vivo: true, leggi: () => Math.floor(minuto(adesso())), scrivi: vai, testo: hhmm,
+      tacche: [0, 6, 12, 18, 24].map((h) => [Math.min(1439, h * 60), String(h)]), segni: () => { const s = sole(); return [[s.alba, 'alba'], [s.tramonto, 'tramonto']] } }, 500),
+    caselle('velocità', [['ferma', 0], ['x1', 1], ['x10', 10], ['x60', 60], ['x600', 600]], () => (P.orologio.fermo ? 0 : P.orologio.veloce),
+      (v) => { P.orologio.fermo = v === 0; if (v) P.orologio.veloce = v; P.aggiorna() }),
     tasti([
       ['alba', () => vai(sole().alba - 15)], ['mezzogiorno', () => vai(12 * 60)], ['tramonto', () => vai(sole().tramonto - 5)],
       ['sera', () => vai(sole().tramonto + 55)], ['mezzanotte', () => vai(0)], ['adesso', () => { P.orologio.imposta(Date.now()); P.aggiorna() }],
     ]),
-  ]))
-  const valoreCss = (n) => parseFloat(document.documentElement.style.getPropertyValue(n)) || 0
-  const tre = (spenta, accesa) => [['auto', null], [spenta, 0], [accesa, 1]]
-  fuori.push(sezione('la sera', 100, 'auto = col tramonto', [
-    { nome: 'buio', tipo: 'scorre', auto: true, min: 0, max: 1, vivo: true, leggi: () => P.forza.notte, scrivi: (v) => { P.forza.notte = v; P.aggiorna() },
-      testo: (v) => fmt(v), autoTesto: () => `auto · ${fmt(valoreCss('--notte'))}`, tacche: () => [[0, 'giorno'], [0.5, ''], [1, 'notte']] },
-    { nome: 'insegna', tipo: 'scatti', valori: tre('spenta', 'accesa'), leggi: () => P.forza.insegna, scrivi: (v) => { P.forza.insegna = v; P.aggiorna() } },
-    { nome: 'lampioni', tipo: 'scatti', valori: tre('spenti', 'accesi'), leggi: () => P.forza.lampioni, scrivi: (v) => { P.forza.lampioni = v; P.aggiorna() } },
-    { nome: 'sfarfallio', tipo: 'scatti', valori: si, leggi: () => P.regola.sfarfallio, scrivi: (v) => { P.regola.sfarfallio = v } },
-  ]))
-  fuori.push(sezione('le auto', 5, 'anche di giorno', [
-    tasti([['passa un\'auto', () => P.passaAuto(), true]]),
-    { nome: 'ogni', tipo: 'scorre', min: 5, max: 180, log: true, passo: 1, leggi: () => P.regola.ogni, scrivi: (v) => { P.regola.ogni = v }, testo: (v) => `${v} s`,
-      tacche: () => [[5, '5 s'], [15, '15'], [60, '1 min'], [180, '3 min']] },
-    { nome: 'fari', tipo: 'scatti', valori: [['a caso', null], ['alogeni', 0], ['led', 1], ['xeno', 2]], leggi: () => P.regola.fari, scrivi: (v) => { P.regola.fari = v } },
-    { nome: 'neon sotto', tipo: 'scatti', valori: [['a caso', null], ['sì', true], ['no', false]], leggi: () => P.regola.neon, scrivi: (v) => { P.regola.neon = v } },
-    { nome: 'ferma', tipo: 'scorre', auto: true, autoNome: 'passa', min: -0.2, max: 1.2, leggi: () => P.regola.ferma, scrivi: (v) => P.fermaAuto(v),
-      testo: (v) => `ferma a ${fmt(v)}`, autoTesto: () => 'passa e va', tacche: () => [[0, 'sinistra'], [0.5, 'davanti'], [1, 'destra']] },
-  ]))
-  return fuori
+    titolo('la sera', 100),
+    cursore('buio', { min: 0, max: 1, auto: true, vivo: true, leggi: () => P.forza.notte, scrivi: (v) => { P.forza.notte = v; P.aggiorna() },
+      testo: (v) => fmt(v), autoValore: () => P.luci.notte, autoTesto: () => `auto · ${fmt(P.luci.notte)}`, tacche: [[0, 'giorno'], [1, 'notte']] }, 100),
+    caselle('insegna', tre('spenta', 'accesa'), () => P.forza.insegna, (v) => { P.forza.insegna = v; P.aggiorna() }),
+    caselle('lampioni', tre('spenti', 'accesi'), () => P.forza.lampioni, (v) => { P.forza.lampioni = v; P.aggiorna() }),
+    caselle('sfarfallio', si, () => P.regola.sfarfallio, (v) => { P.regola.sfarfallio = v }),
+    nota('auto = col tramonto di mantova: il buio da 40 minuti prima, l\'insegna al tramonto, i lampioni 12 minuti dopo.'),
+  ]
 }
-// senza la scena 3D (?muro=1, niente WebGL2, o il 3D non è partito)
-const sezioniSenza = () => [sezione('la scena', 25, 'senza 3D', [nota('qui il 3D non c\'è: restano l\'ora, la sera e le auto, sul muro di sempre.'), tasti([['con il 3D', () => ricarica({ muro: null })]])])]
-// quello della scena 3D: la scena, le bestie, il meteo, l'acqua
-function sezioniScena(S) {
-  const fuori = []
-  fuori.push(sezione('la scena', 25, 'il 3D', [
-    { nome: 'esposizione', tipo: 'scorre', min: 0.25, max: 4, log: true, leggi: () => R.esposizione, scrivi: (v) => { R.esposizione = v }, testo: (v) => `x${fmt(v)}`, tacche: () => [[0.25, '¼'], [1, '1'], [4, '4']] },
-    { nome: 'bagliore', tipo: 'scorre', min: 0, max: 3, leggi: () => R.bagliore, scrivi: (v) => { R.bagliore = v }, testo: (v) => `x${fmt(v)}`, tacche: () => [[0, 'niente'], [1, '1'], [3, '3']] },
-    { nome: 'luce insegna', tipo: 'scorre', min: 0, max: 3, leggi: () => R.neon, scrivi: (v) => { R.neon = v }, testo: (v) => `x${fmt(v)}`, tacche: () => [[0, 'spento'], [1, '1'], [3, '3']] },
-    { nome: 'specchi', tipo: 'scatti', valori: si, leggi: () => R.specchi, scrivi: (v) => { R.specchi = v } },
-    { nome: 'vetrina (col mouse)', tipo: 'scatti', valori: si, leggi: () => R.vetrina !== false, scrivi: (v) => { R.vetrina = v } },
-    { nome: 'il muro sotto', tipo: 'scatti', valori: [['no', false], ['in trasparenza', true]], leggi: () => document.documentElement.classList.contains('scena-allinea'),
-      scrivi: (v) => { if (v) window.pzkkoTrattenute?.(); document.documentElement.classList.toggle('scena-allinea', v) } },
-    { nome: 'qualità', tipo: 'scatti', dopo: true, valori: ['alta', 'media', 'bassa', 'telefono'].map((q) => [q, q]), leggi: () => S.qualita,
-      scrivi: (v) => { if (v !== S.qualita) ricarica({ qualita: v }) } },
-    nota('la qualità ricarica la pagina (l\'ora e la velocità restano).'),
-    tasti([['rifai l\'arrivo', () => ricarica({ intro: null })], ['muro senza 3D', () => ricarica({ muro: 1 })], ['scarica il .glb', () => ricarica({ glb: 1 })]]),
-  ]))
-  fuori.push(sezione('le bestie', 1, 'dal vero', [
-    ...['formiche', 'mosche', 'zanzare', 'blatte'].map((n) => ({ nome: n, tipo: 'scatti', valori: si, leggi: () => R.bestie[n], scrivi: (v) => { R.bestie[n] = v } })),
-    { nome: 'blatte di giorno', tipo: 'scatti', valori: [['no', false], ['sì', true]], leggi: () => R.blatteDiGiorno, scrivi: (v) => { R.blatteDiGiorno = v } },
-    { nome: 'velocità', tipo: 'scorre', min: 0, max: 4, leggi: () => R.velocitaBestie, scrivi: (v) => { R.velocitaBestie = v }, testo: (v) => (v < 0.02 ? 'ferme' : `x${fmt(v)}`), tacche: () => [[0, 'ferme'], [1, '1'], [4, '4']] },
-    tasti([['spaventale', () => S.b?.spaventa(), true], ['una zanzara davanti', () => S.b?.visita(), true]]),
-  ]))
-  // il meteo: quello vero di Mantova (/api/meteo, ogni dieci minuti) o uno scelto, quanto è forte; il bagnato e la neve
-  // per terra vanno da soli col meteo (auto) o si fissano
-  const M = S.meteo, d = M.dati
-  fuori.push(sezione('il meteo', 100, 'vero = mantova', [
-    { nome: 'tempo', tipo: 'scatti', valori: [['vero', null], ['sole', 'sole'], ['nuvole', 'nuvoloso'], ['nebbia', 'nebbia'], ['pioggia', 'pioggia'], ['tuoni', 'temporale'], ['neve', 'neve']],
-      leggi: () => R.meteo, scrivi: (v) => { R.meteo = v } },
-    { nome: 'quanto', tipo: 'scorre', min: 0, max: 1, leggi: () => R.intensita, scrivi: (v) => { R.intensita = v }, testo: (v) => fmt(v), tacche: () => [[0, 'poco'], [0.5, ''], [1, 'tanto']] },
-    { nome: 'bagnato', tipo: 'scorre', auto: true, min: 0, max: 1, vivo: true, leggi: () => R.bagnato, scrivi: (v) => { R.bagnato = v },
-      testo: (v) => fmt(v), autoTesto: () => `auto · ${fmt(M.bagnato)}`, tacche: () => [[0, 'asciutto'], [1, 'fradicio']] },
-    { nome: 'neve per terra', tipo: 'scorre', auto: true, min: 0, max: 1, vivo: true, leggi: () => R.manto, scrivi: (v) => { R.manto = v },
-      testo: (v) => fmt(v), autoTesto: () => `auto · ${fmt(M.manto)}`, tacche: () => [[0, 'niente'], [1, 'tutta']] },
-    nota(d ? `a mantova adesso: codice ${d.codice}, nuvole ${d.nuvole}%, ${fmt(d.pioggia, 1)} mm di pioggia (${fmt(d.pioggia12, 1)} nelle ultime 12 ore), visibilità ${d.visibilita >= 1000 ? fmt(d.visibilita / 1000, 1) + ' km' : Math.round(d.visibilita) + ' m'}, vento ${Math.round(d.vento)} km/h, ${fmt(d.temperatura, 1)}°.`
-      : 'i dati veri non ci sono (in locale /api/meteo non risponde): «vero» è il dopo pioggia di sempre.'),
+
+// il meteo: quello vero di Mantova (/api/meteo, ogni dieci minuti) o uno scelto, quanto è forte; il bagnato e la neve per
+// terra vanno da soli col meteo (auto) o si fissano
+function paginaMeteo(S) {
+  const M = S.meteo
+  return [
+    titolo('il meteo', 100),
+    caselle('tempo', [['vero', null], ['sole', 'sole'], ['nuvole', 'nuvoloso'], ['nebbia', 'nebbia'], ['pioggia', 'pioggia'], ['tuoni', 'temporale'], ['neve', 'neve']],
+      () => R.meteo, (v) => { R.meteo = v }),
+    cursore('quanto', { min: 0, max: 1, leggi: () => R.intensita, scrivi: (v) => { R.intensita = v }, testo: (v) => fmt(v), tacche: [[0, 'poco'], [1, 'tanto']] }, 1),
+    cursore('bagnato', { min: 0, max: 1, auto: true, vivo: true, leggi: () => R.bagnato, scrivi: (v) => { R.bagnato = v }, testo: (v) => fmt(v),
+      autoValore: () => M.bagnato, autoTesto: () => `auto · ${fmt(M.bagnato)}`, tacche: [[0, 'asciutto'], [1, 'fradicio']] }, 1),
+    cursore('neve per terra', { min: 0, max: 1, auto: true, vivo: true, leggi: () => R.manto, scrivi: (v) => { R.manto = v }, testo: (v) => fmt(v),
+      autoValore: () => M.manto, autoTesto: () => `auto · ${fmt(M.manto)}`, tacche: [[0, 'niente'], [1, 'tutta']] }, 1),
     tasti([['un lampo', () => S.me?.lampo(), true]]),
-  ]))
-  fuori.push(sezione('l\'acqua', 1, 'la condensa', [
-    { nome: 'gocce', tipo: 'scorre', min: 0.1, max: 5, log: true, leggi: () => R.goccia, scrivi: (v) => { R.goccia = v }, testo: (v) => (v < 1 ? `${fmt(1 / v, 1)} volte più spesso` : `x${fmt(v)} più rade`),
-      tacche: () => [[0.1, 'fitte'], [1, '1'], [5, 'rade']] },
+    notaViva(() => {
+      const d = M.dati
+      return d ? `a mantova adesso: codice ${d.codice}, nuvole ${d.nuvole}%, ${fmt(d.pioggia, 1)} mm di pioggia (${fmt(d.pioggia12, 1)} nelle ultime 12 ore), visibilità ${d.visibilita >= 1000 ? fmt(d.visibilita / 1000, 1) + ' km' : Math.round(d.visibilita) + ' m'}, vento ${Math.round(d.vento)} km/h, ${fmt(d.temperatura, 1)}°. in scena: ${M.testo}.`
+        : `i dati veri non ci sono (in locale /api/meteo non risponde): «vero» è il dopo pioggia di sempre. in scena: ${M.testo}.`
+    }),
+  ]
+}
+
+// la strada: le auto (della pagina), le bestie e le gocce (della scena)
+function paginaStrada(S) {
+  const P = pagina()
+  const fuori = [
+    titolo('le auto', 5),
+    tasti([['passa un\'auto', () => P.passaAuto(), true]]),
+    cursore('ogni', { min: 5, max: 180, log: true, passo: 1, leggi: () => P.regola.ogni, scrivi: (v) => { P.regola.ogni = v }, testo: (v) => `${v} s`,
+      tacche: [[5, '5 s'], [15, '15'], [60, '1 min'], [180, '3 min']] }, 5),
+    caselle('fari', [['a caso', null], ['alogeni', 0], ['led', 1], ['xeno', 2]], () => P.regola.fari, (v) => { P.regola.fari = v }),
+    caselle('neon sotto', [['a caso', null], ['sì', true], ['no', false]], () => P.regola.neon, (v) => { P.regola.neon = v }),
+    cursore('ferma', { min: -0.2, max: 1.2, auto: true, autoNome: 'passa', leggi: () => P.regola.ferma, scrivi: (v) => P.fermaAuto(v),
+      testo: (v) => `ferma a ${fmt(v)}`, autoValore: () => 0.5, autoTesto: () => 'passa e va', tacche: [[0, 'sinistra'], [0.5, 'davanti'], [1, 'destra']] }, 5),
+    nota('di notte, coi lampioni accesi, ne passa una ogni 20–90 secondi; «passa un\'auto» la fa passare anche di giorno.'),
+  ]
+  if (!S) return [...fuori, nota('le bestie e le gocce sono della scena 3D.')]
+  fuori.push(
+    titolo('le bestie', 1),
+    interruttori('quali', ['formiche', 'mosche', 'zanzare', 'blatte'].map((n) => [n, () => R.bestie[n], (v) => { R.bestie[n] = v }])),
+    caselle('blatte di giorno', [['no', false], ['sì', true]], () => R.blatteDiGiorno, (v) => { R.blatteDiGiorno = v }),
+    cursore('velocità', { min: 0, max: 4, leggi: () => R.velocitaBestie, scrivi: (v) => { R.velocitaBestie = v }, testo: (v) => (v < 0.02 ? 'ferme' : `x${fmt(v)}`), tacche: [[0, 'ferme'], [1, '1'], [4, '4']] }, 1),
+    tasti([['spaventale', () => S.b?.spaventa(), true], ['una zanzara davanti', () => S.b?.visita(), true]]),
+    titolo('l\'acqua', 1),
+    cursore('gocce', { min: 0.1, max: 5, log: true, leggi: () => R.goccia, scrivi: (v) => { R.goccia = v }, testo: (v) => (v < 1 ? `${fmt(1 / v, 1)} volte più spesso` : `x${fmt(v)} più rade`),
+      tacche: [[0.1, 'fitte'], [1, '1'], [5, 'rade']] }, 1),
     tasti([['una goccia', () => S.a?.goccia(), true]]),
-  ]))
+  )
   return fuori
 }
 
-// rimette tutto com'era: l'ora vera, la sera col tramonto, le auto a caso, la scena come si era caricata
+// i suoni della strada (suono/): acceso o no (si ricorda, come il nastro in basso a sinistra), il volume, e ogni suono
+// che capita da solo, adesso
+function paginaSuono() {
+  const U = window.pzkkoSuono
+  if (!U) return [titolo('il suono', 25), nota('i suoni della strada non ci sono ancora: partono al primo tocco o tasto sulla pagina.')]
+  const prova = (lista) => tasti(lista.map(([t, n]) => [t, () => U.prova(n)]))
+  return [
+    titolo('il suono', 25),
+    caselle('suono', si, () => U.acceso, (v) => U.accendi(v, true), { vivo: true }),
+    cursore('volume', { min: 0, max: 1, leggi: () => U.volume, scrivi: (v) => { U.volume = v }, testo: (v) => `${Math.round(v * 100)}%`, tacche: [[0, 'zitto'], [1, 'forte']] }, 25),
+    nota('tutto sintetizzato. da provare:'),
+    prova([['le campane', 'campane'], ['mezzogiorno', 'mezzogiorno'], ['un tuono', 'tuono'], ['bussa', 'bussa']]),
+    prova([['passeri', 'passeri'], ['tortora', 'tortora'], ['piccioni', 'piccioni'], ['cornacchia', 'cornacchia'], ['rondoni', 'rondoni'], ['merlo', 'merlo'], ['civetta', 'civetta'], ['allocco', 'allocco']]),
+    prova([['motorino', 'motorino'], ['clacson', 'clacson'], ['tapparella', 'tapparella']]),
+    nota('l\'auto, la pioggia, la zanzara davanti e la goccia si provano dalle loro schede: si sentono da dove sono.'),
+  ]
+}
+
+// le prove: quello che ricarica la pagina, e i numeri della scheda
+function paginaProve(S) {
+  const fuori = [titolo('le prove', 25)]
+  if (!S) return [...fuori, tasti([['con il 3D', () => ricarica({ muro: null })]])]
+  return [
+    ...fuori,
+    caselle('il muro sotto', [['no', false], ['in trasparenza', true]], () => document.documentElement.classList.contains('scena-allinea'),
+      (v) => { if (v) window.pzkkoTrattenute?.(); document.documentElement.classList.toggle('scena-allinea', v) }),
+    tasti([['rifai l\'arrivo', () => ricarica({ intro: null })], ['muro senza 3D', () => ricarica({ muro: 1 })], ['scarica il .glb', () => ricarica({ glb: 1 })]]),
+    nota('questi tre ricaricano la pagina (l\'ora e la velocità restano).'),
+    notaViva(() => {
+      const i = S.renderer.info, gl = S.renderer.getContext(), d = gl.getExtension('WEBGL_debug_renderer_info')
+      const nome = d ? String(gl.getParameter(d.UNMASKED_RENDERER_WEBGL)).replace(/^ANGLE \(|\)$/g, '') : 'non si fa riconoscere'
+      return `la scheda: ${nome}. ${i.programs?.length ?? 0} programmi; nell'ultimo passaggio ${i.render.calls} disegni, ${Math.round(i.render.triangles / 1000)} mila triangoli. luci «${S.insieme()}».`
+    }),
+  ]
+}
+
+// rimette tutto com'era: l'ora vera, la sera col tramonto, le auto a caso, il volume, i ritocchi della scena (la grafica
+// e la luce del portachiavi no: sono scelte che restano)
 function rimetti() {
   const P = pagina()
   P.orologio.fermo = false; P.orologio.veloce = 1; P.orologio.imposta(Date.now())
   for (const k in P.forza) P.forza[k] = null
   Object.assign(P.regola, { ogni: 55, fari: null, neon: null, sfarfallio: true })
   P.fermaAuto(null)
-  const p = structuredClone(PREDEFINITI)
-  Object.assign(R, p)
+  if (window.pzkkoSuono) window.pzkkoSuono.volume = 0.7
+  Object.assign(R, structuredClone(PREDEFINITI))
   document.documentElement.classList.remove('scena-allinea')
   P.aggiorna()
-  for (const x of piste) x.rileggi()
-  voce('tutto com\'era')
+  rileggi(true)
+  voce('tutto com\'era (la grafica resta)')
 }
 
-// ── in fondo: come va la scena (fotogrammi al secondo, qualità, luci, programmi), l'ora, il buio ──
+// ── in fondo: come va la scena (fotogrammi al secondo, qualità, ora, buio, luci, meteo) ──
+// (le voci sono sempre le stesse: si cambia solo il testo, e solo se è cambiato)
 function avviaConta() {
   if (giro) return
-  let n = 0, t0 = performance.now(), fps = 0
+  const voci = Array.from({ length: 6 }, () => conta.appendChild(el('li')))
+  let n = 0, t0 = performance.now()
+  const scrivi = (li, t, c = '') => { if (li.textContent !== t) li.textContent = t; if (li.className !== c) li.className = c; li.hidden = !t }
   const passo = (now) => {
-    if (!dlg.open) { giro = null; return }
+    if (!dlg.open) { giro = 0; conta.replaceChildren(); return }
     giro = requestAnimationFrame(passo)
     n++
     if (now - t0 < 500) return
-    fps = Math.round((n * 1000) / (now - t0)); n = 0; t0 = now
-    const S = scena(), voci = [[`${fps} fps`, fps < 40 ? 'rosso' : 'verde'], [hhmm(minuto(adesso())) + (pagina().orologio.fermo ? ' ferma' : pagina().orologio.veloce > 1 ? ` x${pagina().orologio.veloce}` : '')]]
-    voci.push([`buio ${fmt(parseFloat(document.documentElement.style.getPropertyValue('--notte')) || 0)}`])
-    if (S) {
-      const info = S.renderer.info
-      voci.push([`${S.qualita} ${fmt(S.dpr(), 2)}x`], [`luci ${S.insieme()}`], [`${info.programs?.length ?? 0} programmi`], [S.meteo.testo])
-    } else voci.push(['senza 3D'])
-    conta.innerHTML = voci.map(([t, c]) => `<li${c ? ` class="${c}"` : ''}>${t}</li>`).join('')
+    const S = scena(), P = pagina()
+    // (con la scena: i suoi fotogrammi; senza, quelli del browser)
+    const fps = Math.round(S ? S.fps() : (n * 1000) / (now - t0))
+    n = 0; t0 = now
+    scrivi(voci[0], `${fps} fps`, fps < 40 ? 'rosso' : 'verde')
+    scrivi(voci[1], hhmm(minuto(adesso())) + (P.orologio.fermo ? ' ferma' : P.orologio.veloce > 1 ? ` x${P.orologio.veloce}` : ''))
+    scrivi(voci[2], `buio ${fmt(P.luci.notte)}`)
+    const g = S?.grafica()
+    scrivi(voci[3], g ? `${g.livello} ${fmt(g.dpr)}×` : 'senza 3D')
+    scrivi(voci[4], S ? `luci ${S.insieme()}` : '')
+    scrivi(voci[5], S ? S.meteo.testo : '')
   }
   giro = requestAnimationFrame(passo)
 }

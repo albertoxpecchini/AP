@@ -452,4 +452,19 @@ They are the signs and stickers of the glass door of a small closed shop in Mant
 6. a small white vinyl «SPINGERE» sticker with a black arrow, one corner peeling.
 No door, no glass, no wall, no shadow: only the pieces on the magenta. ${NIENTE_MAGENTA}`,
   },
+
+  // 21.10 notte: il tasto della regia, sempre in alto a destra (index.html, .rotella): un pulsante giallo vero, con la
+  // rotella stampata sul cappuccio, su e premuto
+  tasto: {
+    scala: 0.3,
+    titolo: 'il tasto giallo della regia con la rotella, su e premuto, visto dall’alto',
+    aspetto: '2048x1152',
+    griglia: [2, 1],
+    pezzi: ['tasto', 'tasto-giu'],
+    prompt: `${griglia('Two views of the same real push button,', 2, 1)}
+It is a big chunky industrial push button, the kind on a machine control panel or an arcade cabinet, photographed from DIRECTLY ABOVE (top view, flat, orthographic), perfectly round, each one filling most of its cell, the two exactly the same size:
+1. the button RELEASED: a glossy bright yellow domed plastic cap, raised high, with a crisp curved white highlight near the top-left of the dome and a soft darker yellow towards the bottom-right edge; in the centre of the cap a black gear (a cog wheel with eight square teeth and a round hole in the middle) moulded into the plastic, slightly recessed; the cap sits inside a round black textured plastic bezel ring with a thin chrome inner rim, four tiny screws on the bezel;
+2. the same button PRESSED DOWN: the yellow cap pushed deep into the bezel, so a thin dark gap shows all around it between the cap and the chrome rim, the dome looks lower and flatter, its highlight smaller and dimmer, the yellow a little darker, the same black gear in the centre.
+Soft studio light from the top left, sharp. Photorealistic product photograph. The bezel ring is the outer edge of each piece: nothing outside it, no panel, no shadow falls on the magenta. No text. ${NIENTE_MAGENTA}`,
+  },
 }

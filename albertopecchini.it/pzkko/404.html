@@ -31,7 +31,7 @@
   // il foglio di stile e i moduli della scena si chiedono subito, prima delle immagini della pagina (che sotto non si
   // vedono): chiesti in fondo alla pagina partivano dietro a tutte loro
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/scena/scena.css'; document.head.appendChild(l)
-  for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'lettere', 'acqua', 'bestie', 'marciapiede', 'spazzatura', 'meteo', 'negozio', 'fronte', 'disegni', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
+  for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'lettere', 'acqua', 'bestie', 'marciapiede', 'spazzatura', 'portachiavi', 'meteo', 'negozio', 'fronte', 'disegni', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
   // le illustrazioni dei volantini della pagina (pigre, dentro un .vol) al 3D non servono: lui ha le foto dei volantini
   // fatte da cattura.mjs. Si trattengono mentre la pagina si legge (src → data-tieni), prima che il browser le chieda, e
   // tornano solo se servono (window.pzkkoTrattenute: il 3D non parte, il muro in trasparenza della regia o di ?allinea).
@@ -269,6 +269,40 @@ img{display:block;max-width:100%;height:auto}
 .auguri[open]{animation:auguri .35s cubic-bezier(.2,1.4,.4,1)}
 @keyframes auguri{from{transform:scale(.6) rotate(6deg);opacity:0}}
 @media (prefers-reduced-motion:reduce){.auguri[open]{animation:none}}
+
+/* ── i suoni della strada (suono/): un pezzo di nastro di carta in basso a sinistra, scritto a pennarello. Sta sopra
+   il caricamento (si vede già col pomodoro), sotto la regia; senza Web Audio (o negli strumenti che fotografano la
+   pagina) resta nascosto. Barrato quando è spento; le onde respirano quando suona davvero ── */
+.suono{position:fixed;z-index:75;left:max(10px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:3px;
+  height:42px;padding:0 17px 2px 13px;border:0;background:url(/art/nastro/carta-gommata.webp) center/100% 100% no-repeat;color:#1a1a1a;
+  font:400 17px/1 "Permanent Marker",var(--fb,cursive);transform:rotate(-4deg);filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .2s cubic-bezier(.2,1.4,.4,1)}
+.suono[hidden]{display:none}
+.suono:hover{transform:rotate(-2deg) scale(1.06)}
+.suono:focus-visible{outline:2px dashed #ffd400;outline-offset:3px}
+.suono svg{width:30px;height:24px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.suono .s-muto,.suono[aria-pressed="false"] .s-onde{display:none}
+.suono[aria-pressed="false"] .s-muto{display:inline}
+.suono[aria-pressed="false"] span{text-decoration:line-through 2px}
+.suono.va .s-onde{animation:onde 1.8s ease-in-out infinite}
+@keyframes onde{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.suono,.suono:hover{transition:none}.suono.va .s-onde{animation:none}}
+
+/* ── il tasto della regia: un pulsante giallo vero con la rotella sul cappuccio (art/tasto/, disegnato da gpt-image-2
+   come il resto del muro, su e premuto), sempre in alto a destra, sopra il caricamento e la regia (sotto solo i giochi,
+   che sono modali). Si abbassa quando lo si preme e resta giù finché la regia è aperta. Senza script non c'è ── */
+.rotella{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));width:62px;height:62px;padding:0;border:0;border-radius:50%;
+  background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));
+  transition:transform .18s cubic-bezier(.2,1.4,.4,1)}
+html:not(.js) .rotella{display:none}
+.rotella img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
+.rotella .giu,.rotella:active .su,.rotella[aria-expanded="true"] .su{visibility:hidden}
+.rotella:active .giu,.rotella[aria-expanded="true"] .giu{visibility:visible}
+@media (hover:hover){.rotella:hover{transform:scale(1.05)}}
+.rotella:active{transform:scale(.95)}
+.rotella:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
+@media (max-width:899px){.rotella{width:54px;height:54px}}
+@media (prefers-reduced-motion:reduce){.rotella{transition:none}}
 /* 404: un muro corto */
 .parete.p404{height:calc(640 * var(--u))}
 @media (max-width:899px){.parete.p404{height:calc(720 * var(--u))}}
@@ -324,6 +358,10 @@ img{display:block;max-width:100%;height:auto}
   <span class="mosca" data-f="posata" aria-hidden="true"><img class="m-posata" src="/art/mosche/mosca.webp" alt="" width="158" height="166" style="--ax:80;--ay:72"><img class="m-zampe" src="/art/mosche/mosca-zampe.webp" alt="" width="154" height="182" style="--ax:75;--ay:92"><img class="m-vola" src="/art/mosche/mosca-vola.webp" alt="" width="192" height="135" style="--ax:94;--ay:64"><img class="m-vola2" src="/art/mosche/mosca-vola2.webp" alt="" width="118" height="149" style="--ax:56;--ay:78"></span>
   <span class="mosca" data-f="posata" aria-hidden="true"><img class="m-posata" src="/art/mosche/mosca.webp" alt="" width="158" height="166" style="--ax:80;--ay:72"><img class="m-zampe" src="/art/mosche/mosca-zampe.webp" alt="" width="154" height="182" style="--ax:75;--ay:92"><img class="m-vola" src="/art/mosche/mosca-vola.webp" alt="" width="192" height="135" style="--ax:94;--ay:64"><img class="m-vola2" src="/art/mosche/mosca-vola2.webp" alt="" width="118" height="149" style="--ax:56;--ay:78"></span>
 </div>
+<!-- i suoni della strada (suono/): partono al primo tocco o tasto; questo li spegne e li riaccende -->
+<button class="suono" type="button" aria-pressed="true" aria-label="i suoni della strada" title="i suoni della strada" hidden><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4.5 12.4h6.2l8-6.6.3 20.6-8.1-6.8H4.8z"/><path class="s-onde" d="M24.2 10.6c2.6 3 2.8 7.6.2 10.9M28.6 6.8c4.6 4.9 4.8 13.3.3 18.6"/><path class="s-muto" d="M24.5 11.2l8.6 9.4M33 11.4l-8.4 9"/></svg><span>suono</span></button>
+<!-- il tasto giallo della regia, sempre in alto a destra: la grafica, l'ora, il meteo, la strada, i suoni -->
+<button class="rotella" type="button" aria-label="regia: grafica, ora, meteo, strada e suoni" title="regia" aria-expanded="false"><img class="su" src="/art/tasto/tasto.webp" alt="" width="247" height="250"><img class="giu" src="/art/tasto/tasto-giu.webp" alt="" width="247" height="250" loading="lazy"></button>
 
 <script>
 (() => {
@@ -436,42 +474,70 @@ img{display:block;max-width:100%;height:auto}
   // subito (un'auto adesso, anche di giorno), ferma (un'auto ferma coi fari accesi in quel punto, 0..1, o null)
   const regola = { ogni: 55, fari: null, neon: null, subito: false, ferma: null, sfarfallio: true }
   const autoForzata = () => regola.subito || regola.ferma !== null
-  const set = (k, v) => root.style.setProperty(k, v)
+  // le luci della sera e delle auto: la scena 3D le legge da qui a ogni fotogramma (window.pzkkoPagina.luci, luci.js), il
+  // muro di sempre le vuole come variabili CSS su html (--notte, --f-insegna, --auto-x…). Fino al 21.10 erano solo le
+  // variabili, scritte su html a ogni fotogramma (lo sfarfallio, le auto): ogni scrittura costringeva il browser a
+  // ricalcolare lo stile di tutta la pagina (~4 ms a fotogramma di sera, e con la regia aperta a ridisegnarla: 67 fps su
+  // una 3060 Ti). Con la scena 3D il muro sotto è invisibile e le variabili non si scrivono; senza, solo quando cambiano
+  const luci = { notte: 0, insegna: 0, lampioni: 0, 'f-insegna': 1, 'f-lampioni': 1, 'auto-x': 0.5, 'auto-l': 0, 'auto-c': '255,226,170', freno: 0, 'freno-x': 1.1, 'neon-auto': 0 }
+  const scritte = {}
+  const set = (k, v) => {
+    luci[k] = k === 'auto-c' ? v : Number(v)
+    if (root.classList.contains('scena3d')) return
+    const s = String(v)
+    if (scritte[k] !== s) { scritte[k] = s; root.style.setProperty(`--${k}`, s) }
+  }
+  // la prossima auto si sceglie prima, così i suoni della strada (suono/) la fanno sentire arrivare tre secondi prima dei
+  // fari: window.pzkkoSuono.evento('auto'), una volta per auto (quella che la regia chiede subito, senza anticipo)
+  const nuova = () => ({ durata: 1400 + Math.random() * 1400, verso: Math.random() < 0.5 ? 1 : -1, neon: Math.random() < 1 / 7, frena: Math.random() < 0.4, detta: false })
+  let prossima = nuova()
+  const annuncia = (a, tra) => {
+    if (a.detta) return
+    a.detta = true
+    window.pzkkoSuono?.evento('auto', { durata: a.durata, verso: a.verso, neon: regola.neon ?? a.neon, frena: a.frena, tra })
+  }
   const passaAuto = (now) => {
     const [c] = FARI[regola.fari ?? Math.floor(Math.random() * FARI.length)]
-    auto = { t0: now, durata: 1400 + Math.random() * 1400, verso: Math.random() < 0.5 ? 1 : -1, neon: regola.neon ?? Math.random() < 1 / 7, frena: Math.random() < 0.4 }
-    set('--auto-c', c)
+    if (regola.subito && prossima.detta) prossima = nuova()
+    auto = { t0: now, ...prossima, neon: regola.neon ?? prossima.neon }
+    annuncia(auto, 0)
+    prossima = nuova()
+    set('auto-c', c)
   }
   const animaAuto = (now) => {
     if (regola.ferma !== null) {
       // ferma: i fari puntati in quel punto, finché la regia non la lascia andare
-      set('--auto-x', regola.ferma.toFixed(4)); set('--auto-l', 0.9); set('--neon-auto', regola.neon ? 0.8 : 0); set('--freno', 0); auto = null
+      set('auto-x', regola.ferma.toFixed(4)); set('auto-l', 0.9); set('neon-auto', regola.neon ? 0.8 : 0); set('freno', 0); auto = null
       return
     }
-    if (!auto) { if ((now > prossimaAuto || regola.subito) && !reduce.matches) passaAuto(now); return }
+    if (!auto) {
+      if (!reduce.matches && !regola.subito && now > prossimaAuto - 3000) annuncia(prossima, Math.max(0, prossimaAuto - now))
+      if ((now > prossimaAuto || regola.subito) && !reduce.matches) passaAuto(now)
+      return
+    }
     const u = (now - auto.t0) / auto.durata
     if (u < 1) {
       const x = auto.verso > 0 ? -0.25 + 1.5 * u : 1.25 - 1.5 * u
       const l = Math.min(1, u / 0.22) * Math.min(1, (1 - u) / 0.28)
-      set('--auto-x', x.toFixed(4)); set('--auto-l', (0.9 * l).toFixed(3)); set('--neon-auto', auto.neon ? (0.8 * l).toFixed(3) : 0)
+      set('auto-x', x.toFixed(4)); set('auto-l', (0.9 * l).toFixed(3)); set('neon-auto', auto.neon ? (0.8 * l).toFixed(3) : 0)
       return
     }
-    set('--auto-l', 0); set('--neon-auto', 0)
+    set('auto-l', 0); set('neon-auto', 0)
     const v = (now - auto.t0 - auto.durata) / 1700
     if (v < 1) {
       const frenata = auto.frena && v > 0.15 && v < 0.5 ? 0.35 : 0
-      set('--freno-x', auto.verso > 0 ? 1.04 : -0.04); set('--freno', ((1 - v) * 0.8 + frenata).toFixed(3))
-    } else { set('--freno', 0); auto = null; regola.subito = false; prossimaAuto = now + 1000 * regola.ogni * (0.4 + 1.2 * Math.random()) }
+      set('freno-x', auto.verso > 0 ? 1.04 : -0.04); set('freno', ((1 - v) * 0.8 + frenata).toFixed(3))
+    } else { set('freno', 0); auto = null; regola.subito = false; prossimaAuto = now + 1000 * regola.ogni * (0.4 + 1.2 * Math.random()) }
   }
 
   let stato = { notte: 0, insegna: 0, lampioni: 0 }, prima = performance.now(), sfarfallioOn = false
   const sfarfallio = (now) => {
     const dt = Math.min(now - prima, 100)
     prima = now
-    root.style.setProperty('--f-insegna', campiona(insegna, now, dt, stato.insegna > 0).toFixed(3))
-    root.style.setProperty('--f-lampioni', campiona(lampioni, now, dt, stato.lampioni > 0).toFixed(3))
+    set('f-insegna', campiona(insegna, now, dt, stato.insegna > 0).toFixed(3))
+    set('f-lampioni', campiona(lampioni, now, dt, stato.lampioni > 0).toFixed(3))
     if (stato.lampioni > 0 || autoForzata() || auto) animaAuto(now)
-    else if (auto) { auto = null; set('--auto-l', 0); set('--freno', 0); set('--neon-auto', 0) }
+    else if (auto) { auto = null; set('auto-l', 0); set('freno', 0); set('neon-auto', 0) }
     if (stato.insegna > 0 || stato.lampioni > 0 || autoForzata() || auto) requestAnimationFrame(sfarfallio)
     else sfarfallioOn = false
   }
@@ -491,6 +557,8 @@ img{display:block;max-width:100%;height:auto}
     const durata = 420 + (y1 - y0) * 1.1
     goccia.animate([{ transform: `translate(${x}px, ${y0}px)`, opacity: 1 }, { transform: `translate(${x}px, ${y1}px)`, opacity: 1 }], { duration: durata, easing: 'cubic-bezier(.55,0,1,.6)' }).onfinish = () => {
       spruzzo.animate([{ transform: `translate(${x - 13}px, ${y1 - 10}px) scale(.4)`, opacity: .9 }, { transform: `translate(${x - 13}px, ${y1 - 12}px) scale(1)`, opacity: 0 }], { duration: 260, easing: 'ease-out' })
+      // (il «plic» in cima alla lamiera, suono/suono.js)
+      window.pzkkoSuono?.evento('goccia', { u: (rr.left + rr.width * 0.5 - rm.left) / rm.width, cima: true })
     }
     setTimeout(cade, 3000 + Math.random() * 6000)
   }
@@ -611,9 +679,9 @@ img{display:block;max-width:100%;height:auto}
   }, { passive: true })
   const aggiorna = () => {
     stato = fase(adesso())
-    root.style.setProperty('--notte', stato.notte.toFixed(3))
-    root.style.setProperty('--insegna', stato.insegna)
-    root.style.setProperty('--lampioni', stato.lampioni)
+    set('notte', stato.notte.toFixed(3))
+    set('insegna', stato.insegna)
+    set('lampioni', stato.lampioni)
     if ((stato.insegna > 0 || stato.lampioni > 0 || autoForzata()) && !sfarfallioOn) { sfarfallioOn = true; prima = performance.now(); requestAnimationFrame(sfarfallio) }
   }
   // all'apertura le luci già accese non strobeggiano: sono accese da un pezzo
@@ -648,14 +716,17 @@ img{display:block;max-width:100%;height:auto}
   if (GIOCHI[nel]) apriGioco(nel)
 
   // ── La regia ─────────────────────────────────────────────────────────────
-  // Un pannello nascosto per provare il sito: l'ora di Mantova e la sua velocità, la sera, le auto, la scena 3D, le
-  // bestie, l'acqua (regia/). Si apre scrivendo «regia» sulla tastiera, con #regia nell'indirizzo o toccando cinque
-  // volte in fretta la striscia in cima allo schermo. Il codice si scarica solo allora.
+  // Il pannello per provare e regolare il sito: la grafica della scena 3D, l'ora di Mantova e la sua velocità, la sera,
+  // il meteo, le auto, le bestie, l'acqua, i suoni (regia/). Si apre col tasto giallo in alto a destra (.rotella), e
+  // ancora scrivendo «regia» sulla tastiera, con #regia nell'indirizzo o toccando cinque volte in fretta la striscia in
+  // cima allo schermo. Il codice si scarica solo allora (col puntatore sopra il tasto, già un attimo prima).
   window.pzkkoPagina = {
-    orologio, forza, regola, sole, aggiorna: () => aggiorna(),
+    orologio, forza, regola, sole, luci, aggiorna: () => aggiorna(),
     passaAuto: () => { regola.subito = true; aggiorna() },
     // un'auto ferma coi fari accesi nel punto x (0..1 della larghezza), o null: se ne va
-    fermaAuto: (x) => { regola.ferma = x; if (x === null) { set('--auto-l', 0); set('--neon-auto', 0) } aggiorna() },
+    fermaAuto: (x) => { regola.ferma = x; if (x === null) { set('auto-l', 0); set('neon-auto', 0) } aggiorna() },
+    // (le mosche del muro di sempre, per il loro ronzio: suono/suono.js)
+    mosche,
   }
   const apriRegia = () => import('/regia/regia.js').then((m) => m.apri()).catch((e) => console.warn('regia non aperta', e))
   let scritto = ''
@@ -666,11 +737,74 @@ img{display:block;max-width:100%;height:auto}
   })
   let tocchi = []
   addEventListener('pointerdown', (e) => {
-    if (e.clientY > 70) return
+    if (e.clientY > 70 || e.target.closest?.('.rotella')) return
     tocchi = [...tocchi.filter((t) => e.timeStamp - t < 2500), e.timeStamp]
     if (tocchi.length >= 5) { tocchi = []; apriRegia() }
   }, { passive: true })
+  const rotella = document.querySelector('.rotella')
+  if (rotella) {
+    rotella.addEventListener('click', apriRegia)
+    const prepara = () => {
+      for (const [rel, href, as] of [['modulepreload', '/regia/regia.js'], ['preload', '/regia/regia.css', 'style']]) {
+        if (document.querySelector(`link[href="${href}"]`)) continue
+        const l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l)
+      }
+    }
+    rotella.addEventListener('pointerenter', prepara, { once: true })
+    rotella.addEventListener('focus', prepara, { once: true })
+  }
   if (nel === 'regia') apriRegia()
+
+  // ── I suoni della strada (suono/) ────────────────────────────────────────
+  // Tutto sintetizzato dal vivo, niente file: la città, le campane, gli uccelli, l'insegna che ronza, le auto, il meteo
+  // vero, la goccia, le mosche, il PC del negozio. Il browser lascia partire l'audio solo dopo un gesto: partono al primo
+  // tocco o tasto, sfumando (se chi guarda non li ha spenti: pzkko-suono = no nel browser); il nastro in basso a sinistra
+  // li spegne e li riaccende. Il motore (suono/suono.js) si scarica solo allora, e riceve il contesto già sbloccato qui,
+  // dentro il gesto (Safari lo vuole lì). window.pzkkoSuono: acceso, volume, accendi(sì, ricorda) e prova(nome) per la
+  // regia, evento(nome, dati) per la pagina e la scena, che aspetta in coda finché il motore non c'è. Gli strumenti che
+  // fotografano la pagina (navigator.webdriver) il nastro non lo vedono, se non con ?suono
+  {
+    const AC = window.AudioContext ?? window.webkitAudioContext
+    const tasto = document.querySelector('.suono'), coda = []
+    let vuole = true, ctx = null, motore = null, spegni = 0
+    try { vuole = localStorage.getItem('pzkko-suono') !== 'no' } catch {}
+    const S = window.pzkkoSuono = {
+      acceso: false, volume: 0.7, coda,
+      evento: (nome, dati = {}) => { if (coda.length < 24) coda.push([nome, dati, performance.now()]) },
+      accendi(si = true, ricorda = false) {
+        if (ricorda) { vuole = si; try { localStorage.setItem('pzkko-suono', si ? 'si' : 'no') } catch {} }
+        tasto?.setAttribute('aria-pressed', String(si))
+        if (!si) { S.acceso = false; clearTimeout(spegni); if (ctx) spegni = setTimeout(() => { if (!S.acceso) ctx.suspend() }, 600); return }
+        if (!AC) return
+        S.acceso = true
+        if (!ctx) {
+          ctx = new AC({ latencyHint: 'balanced' })
+          // (sull'iPhone come un suono di sottofondo: rispetta il tasto del silenzioso e non ferma la musica)
+          try { if (navigator.audioSession) navigator.audioSession.type = 'ambient' } catch {}
+          ctx.onstatechange = () => tasto?.classList.toggle('va', ctx.state === 'running' && S.acceso)
+        }
+        clearTimeout(spegni)
+        ctx.resume().catch(() => {})
+        motore ??= import('/suono/suono.js').then((m) => m.accendi(ctx)).catch((e) => console.warn('suoni non partiti', e))
+      },
+      prova: (nome) => { S.accendi(true); S.evento('prova', { nome }) },
+    }
+    if (AC && tasto && (!navigator.webdriver || q.has('suono'))) tasto.hidden = false
+    tasto?.setAttribute('aria-pressed', String(vuole))
+    tasto?.addEventListener('click', () => S.accendi(tasto.getAttribute('aria-pressed') !== 'true', true))
+    // il primo gesto li accende; i gesti dopo lo sbloccano, finché il browser non lo lascia suonare davvero (col dito vale
+    // il tocco che finisce, non quello che comincia)
+    const gesti = ['pointerdown', 'pointerup', 'touchend', 'keydown']
+    const sblocca = (e) => {
+      if (!vuole || e.target?.closest?.('.suono')) return
+      if (!S.acceso) S.accendi(true)
+      ctx?.resume().then(() => { if (ctx.state === 'running') for (const g of gesti) removeEventListener(g, sblocca, true) }, () => {})
+    }
+    for (const g of gesti) addEventListener(g, sblocca, { capture: true, passive: true })
+    document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else if (S.acceso) ctx.resume() })
+    addEventListener('pagehide', () => ctx?.suspend())
+    addEventListener('pageshow', (e) => { if (e.persisted && S.acceso) ctx?.resume() })
+  }
 
   // Sul telefono non c'è il passaggio del puntatore: toccare un foglio o un
   // manifesto lo porta in primo piano (resta su finché non se ne tocca un altro).
@@ -733,6 +867,7 @@ img{display:block;max-width:100%;height:auto}
     vol.appendChild(nota)
     requestAnimationFrame(() => nota.classList.add('si'))
     setTimeout(() => nota?.classList.remove('si'), 2600)
+    window.pzkkoSuono?.evento('strappo')
     const fine = () => { b.classList.add('via'); b.classList.remove('cade'); b.setAttribute('aria-disabled', 'true') }
     if (reduce.matches) fine()
     else { b.classList.add('cade'); b.addEventListener('transitionend', fine, { once: true }); setTimeout(fine, 700) }
@@ -857,7 +992,7 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   // window.pzkkoFotoCarico: la scena tiene il meteo della foto (il dopo pioggia) finché la foto non è sfumata
   const FOTO = null // (la 404: le foto del caricamento sono della home, tools/pzkko/genera-404.mjs)
   const F = FOTO?.[telefono ? 'telefono' : 'computer'], foto = carico.firstElementChild
-  const nn = parseFloat(root.style.getPropertyValue('--notte')) || 0
+  const nn = window.pzkkoPagina?.luci.notte ?? (parseFloat(root.style.getPropertyValue('--notte')) || 0)
   const luce = nn <= 0.001 ? 'giorno' : nn < 0.3 ? 'tramonto' : nn < 0.8 ? 'sera' : 'notte'
   let subito = false
   try { subito = sessionStorage.getItem('pzkko-subito') === '1' } catch {}
@@ -949,7 +1084,7 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
     if (pronta && v >= 1) {
       tMaturo ||= now
       if (ridotto || (!pronti && now - tMaturo > 1500)) sfuma()
-      else if (pronti) { stato = 'scoppio'; tScoppio = now; carico.classList.add('scoppia') }
+      else if (pronti) { stato = 'scoppio'; tScoppio = now; carico.classList.add('scoppia'); window.pzkkoSuono?.evento('scoppio', { tra: 300 }) }
     }
   }
   requestAnimationFrame(passo)

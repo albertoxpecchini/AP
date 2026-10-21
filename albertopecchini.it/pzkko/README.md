@@ -43,6 +43,8 @@ serio ma è un progetto Vercel a parte.
   `auguri.webp` è il meme degli auguri a @~matti (17.10.2026, torta e scritte
   disegnate tutte da gpt-image-2): si apre entrando nella home fino al
   18.10.2026 alle 20:30, poi lo script lo toglie; dopo si può cancellare.
+  `tasto/` (21.10) è il tasto giallo della regia con la rotella, su e premuto
+  (gpt-image-2, foglio «tasto» di `../tools/pzkko/fogli.js`).
 - `games/roulette/` — la roulette, che si apre in una finestra sopra il muro
   (vedi sotto): `roulette.js` e `roulette.css` (la finestra, il tavolo, le
   fiches), `ruota.js` (la forma della ruota e la sua fisica), `regole.js` (le
@@ -60,8 +62,11 @@ serio ma è un progetto Vercel a parte.
 - `games/pzk.js` — i $pzk, gli stessi per tutti i giochi.
 - `api/meteo.mjs` — la funzione Vercel che dà alla scena il meteo di Mantova (da
   Open-Meteo, dieci minuti in cache; vedi «Il meteo» e «Vercel», sotto).
-- `regia/` — la regia, il pannello nascosto per provare il sito (vedi sotto):
-  `regia.js` e `regia.css`.
+- `regia/` — la regia, il pannello per provare e regolare il sito, che si apre col
+  tasto giallo in alto a destra (vedi sotto): `regia.js` e `regia.css`.
+- `suono/` — i suoni della strada, tutti sintetizzati dal vivo (vedi «Il suono»,
+  sotto): `suono.js` (chi ascolta, cosa suona quando e da dove) e `voci.js` (gli
+  strumenti).
 - `scena/` — la scena 3D della home (vedi sotto): `scena.js` (la telecamera,
   l'inquadratura allineata al DOM, il giro), `mondo.js` (il posto: facciata,
   saracinesca, insegna, porta a vetri, marciapiede, strada, palazzi, lampada,
@@ -71,7 +76,9 @@ serio ma è un progetto Vercel a parte.
   camminano le bestie), `acqua.js` (la condensa che scende sulla lamiera e il muro
   bagnato), `bestie.js` (formiche, mosche, zanzare e blatte), `marciapiede.js`
   (le lastre e le pozzanghere, disegnate dallo shader), `spazzatura.js` (la
-  spazzatura della casa per terra e il chiusino di pzkkonet), `prossima.js` (l'altra
+  spazzatura della casa per terra e il chiusino di pzkkonet), `portachiavi.js` (il token
+  della banca $pzk per terra accanto al chiusino, col display che dice i fotogrammi al
+  secondo), `prossima.js` (l'altra
   pagina col 3D, scaricata in cache mentre si guarda questa: vedi «Il caricamento è il
   pomodoro»), `fronte.js` (il fronte
   del negozio: la porta a vetri, il citofono, la targa del 28, il cartello «chiuso», il
@@ -215,7 +222,9 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   la notte è piena 50 minuti dopo il tramonto e all'alba tutto si spegne a
   ritroso. Le luci a scarica sfarfallano: la rete a 50 Hz fa pulsare i tubi a
   100 Hz e il browser, campionando a 60, ne restituisce il tremolio; in più
-  ogni tanto un tubo «sputa» (`--f-insegna`, `--f-lampioni`). Con
+  ogni tanto un tubo «sputa» (`--f-insegna`, `--f-lampioni`; le variabili si
+  scrivono su `html` solo col muro di sempre e solo quando cambiano, e la scena 3D
+  legge gli stessi valori da `window.pzkkoPagina.luci`: vedi «La regia»). Con
   `prefers-reduced-motion` niente sfarfallio né strobo. Senza script la notte
   segue il tema del sistema. Prove: `?ora=18:30` (ora di Mantova di oggi),
   `?veloce=60` (il tempo corre 60 volte più in fretta), `?notte=1`.
@@ -567,9 +576,10 @@ quello, senza che la pagina se ne accorga.
   (lo stesso calcolo NOAA della pagina, più altezza e azimut; la facciata guarda
   a sud-sud-ovest, 200°), con le ombre; il cielo (addon `Sky`) fa da sfondo, da
   luce d'ambiente e da riflesso (PMREM, rifatto quando il sole si sposta). Di
-  notte la scena legge ogni fotogramma le variabili CSS della pagina
-  (`--notte`, `--insegna` con lo sfarfallio, `--lampioni`, `--auto-x`,
-  `--auto-l`, `--auto-c`, `--freno`, `--neon-auto`) e accende i poligoni: le
+  notte la scena legge ogni fotogramma le luci della pagina
+  (`notte`, `insegna` con lo sfarfallio `f-insegna`, `lampioni`, `auto-x`,
+  `auto-l`, `auto-c`, `freno`, `neon-auto`, in `window.pzkkoPagina.luci`: dal 21.10
+  non più dalle variabili CSS su `html`, vedi «La regia») e accende i poligoni: le
   tubi al neon dentro le lettere (emissivi, col bagliore) e la faccia accesa
   intorno a loro, tre lampade bianco caldo davanti al pannello, la lampada a muro sopra la porta (un faro con le ombre), i lampioni
   di là, le finestre dei palazzi; e **l'auto che passa è un'auto**: una berlina
@@ -709,6 +719,29 @@ quello, senza che la pagina se ne accorga.
   la ruggine nella fessura e nelle asole. Le gomme e i mozziconi sparsi non ci
   finiscono sopra; con la neve resta scoperto, come i chiusini veri, scaldati da
   sotto. ~74 000 triangoli sul computer, 51 000 sul telefono.
+- **Il portachiavi della banca $pzk** (21.10, `portachiavi.js`): perso per terra
+  davanti all'angolo del chiusino verso la telecamera (sul telefono, dove in fondo
+  si vede solo il coperchio, sopra il coperchio), il token delle password usa e
+  getta che le banche danno ai clienti: stondato (un profilo estruso con una
+  smussatura da 3,5 mm), grafite, con l'anello e due chiavi (una Yale d'ottone e una
+  di ferro), «banca $pzk» e la fiche gialla da 500 come logo, «fps» in giallo. Il
+  **display a led verdi** dice i fotogrammi al secondo della scena (contati in
+  `scena.js`, ridisegnati due volte al secondo su una tela 608 × 320: tre cifre a
+  sette segmenti in corsivo, i segmenti spenti che si intravedono, il riflesso del
+  vetro), con un alone verde per terra (un velo che si somma, niente luce vera:
+  una luce in più ricompilerebbe tutti i materiali) e il bagliore della scena di
+  sera. Il **tasto giallo** accanto (gomma, con la lampadina stampata) si preme col
+  mouse o col dito: si abbassa di 1,5 mm e torna su con un rimbalzo, e la luce si
+  spegne (le cifre restano, scure, senza bagliore) o si riaccende; sopra il
+  portachiavi il puntatore è la manina (`html.scena-tasto`). Il raggio del
+  puntatore lo cerca con una scatola nel riferimento del portachiavi (niente
+  `Raycaster`, che `lib/three.js` non ha). Com'era la luce resta nel browser
+  (`localStorage` `pzkko-portachiavi`); la regia la comanda anche lei. È **un po'
+  più grande** di quelli veri (9 × 4,6 cm invece di 6,5 × 3) e sta inclinato di 11°
+  verso la strada, appoggiato sulle chiavi: in fondo alla pagina la telecamera è a
+  mezzo metro da terra e un token piatto, da lì, sarebbe una riga; così le cifre
+  (1,5 cm) sullo schermo di un computer sono alte una ventina di pixel. Sul livello
+  1, come la roba per terra.
 - Tutto sempre negli stessi posti (un numero a caso col seme fisso), diversi per
   computer e telefono (`P` in cima a `spazzatura()`: più una cosa è vicina alla
   telecamera, più deve stare in mezzo). Le cose piatte (gomme, mozziconi,
@@ -767,22 +800,67 @@ quello, senza che la pagina se ne accorga.
   al secondo con l'intonaco nuovo e il PC (248 prima: alla pari, dentro il
   ballo del 30% fra un giro e l'altro). **Niente anti-alias** (né
   MSAA né altro: il 19.10.2026 sono stati tolti, insieme al filtro «da
-  videogioco» alla Buckshot Roulette). Quattro livelli
-  (`?qualita=alta|media|bassa|telefono`; con `?qualita=` o `?dpr=` la scena non
-  si adatta da sola): alta = risoluzione interna 1,25×, specchi 768 (il vetro)
-  e 1024 × 512 (le pozzanghere, dal 20.10: prima 512 × 256, troppo sfocate), ombra
-  del sole 2048, tutte le luci; media = 1×, specchi 512 e 384 × 192, ombre 1024,
-  bagliore a metà risoluzione, poche luci; bassa = come media con specchi
-  256 e 256 × 128, niente bloom né palazzi; telefono = 1,5× (il testo dei volantini si
-  deve leggere), specchi 384 e 384 × 192, ombre 1024/512, poche luci. **La risoluzione
-  non scende mai**: è lei che decide se le immagini sono nitide, il resto si
-  può togliere. Si parte da «alta», da «media» se la scheda grafica si presenta
-  come integrata (Intel, Apple, Mali, Adreno) o il processore ha 4 core o meno,
-  da «telefono» sotto i 900 px; poi, a foto tutte a bordo e mentre si guarda da
-  lontano (il momento più pesante: tutti i fogli in vista), se la mediana dei
-  fotogrammi passa i 24 ms si toglie qualcosa, fino a tre volte: prima specchi
-  e bagliore a metà, poi le ombre a 512, poi gli specchi a un quarto e niente
-  bagliore. Triangoli per fotogramma (con ombre e specchi): ~38 000 sul
+  videogioco» alla Buckshot Roulette): in «alta» e «ultra» gli spigoli li liscia la
+  risoluzione in più. **La qualità** (dal 21.10 si cambia dal vivo dalla regia,
+  senza ricaricare, e la scelta resta nel browser, `localStorage` `pzkko-grafica`;
+  `?qualita=bassa|media|alta|ultra|telefono` e `?dpr=` comandano sopra tutto, per
+  le prove). La risoluzione interna è una **scala** di quella dello schermo
+  (`devicePixelRatio`), con un tetto in pixel per pixel CSS e uno in milioni di
+  pixel della tela (`densita` in `scena.js`), e **non scende mai** sotto quella
+  dello schermo fino a 1: è lei che decide se le immagini sono nitide, il resto si
+  può togliere. bassa = 1×, specchi 256 e 256 × 128, ombre 1024, niente bagliore né
+  palazzi, poche luci; media = 1×, specchi 512 e 384 × 192, ombre 1024, bagliore a
+  metà risoluzione, poche luci; **alta** = **1,5×** dello schermo (fino a 3, al
+  massimo 8,3 milioni di pixel: un 4K), specchi 1024 (il vetro) e 1024 × 512 (le
+  pozzanghere), ombra del sole 2048 e della lampada 1024, tutte le luci; **ultra** =
+  2× (fino a 4, al massimo 16,6 milioni), specchi 1536 e 2048 × 1024, ombre 4096 e
+  2048. **Il telefono** (sotto i 900 px; dal 21.10 sera) ha una scena sola, la
+  minima, e niente da scegliere (la regia lì non ha la qualità, e le scelte salvate
+  del computer non contano): **alla risoluzione dello schermo** (3× su un iPhone,
+  al massimo 12 milioni di pixel), senza anti-alias, **senza ombre** (la mappa d'ombra
+  non c'è proprio: `shadowMap.enabled` spento, i materiali non la leggono), **senza
+  specchi** (il vetro della porta e le pozzanghere nascosti, le loro tele da un
+  pixel), **senza bagliore e senza post-processing**: si disegna dritto sullo schermo
+  (`diretta`), e il tono AgX e l'sRGB li fa ogni materiale (alle particelle del meteo
+  sono state aggiunte le due righe che lo fanno); la curva che tiene saturi i colori
+  accesi (`AGX_NEON`, che sul computer sta nell'OutputPass) entra in ogni materiale
+  con `conNeon` (come `bagnato` in `acqua.js`: dopo l'`onBeforeCompile` di prima, con
+  la chiave del programma di prima più «neon»), se no sotto il lampione la carta
+  veniva slavata. Poche luci, la pioggia e la neve al 40%. Prima il telefono era 1,5×
+  con ombre 1024/512, specchi 384 e bagliore, e un iPhone 16 Pro faceva 20 fotogrammi
+  al secondo, un iPhone 14 10. Nella prova del 21.10 (390 × 844 a 3×, la scheda
+  della 3060 Ti): di notte 0,9 ms a fotogramma invece di 5,9, con la pioggia 1,25
+  invece di 7,1, a quattro volte i pixel. Fino al 21.10 «alta» era 1,25 al
+  massimo, cioè su uno schermo normale (devicePixelRatio 1) uguale a «media», e
+  cambiarla ricaricava la pagina con l'arrivo da capo: «il selettore non va in
+  alta». Ora la regia cambia risoluzione, specchi, ombre, bagliore e palazzi al
+  volo (`applica`), anche uno per uno («su misura»); le luci no: poche o tutte si
+  decide costruendo, quindi vale il livello con cui si apre la pagina. Le mappe
+  d'ombra, per cambiare misura, si buttano e si rifanno (`ombre`): three ne crea
+  una alla misura del primo disegno e non la cambia più, e fino al 21.10 «ombre a
+  512» cambiava solo il numero. **Il tetto della scheda** (21.10): la tela non passa
+  mai `MAX_TEXTURE_SIZE` (né `MAX_RENDERBUFFER_SIZE` e `MAX_VIEWPORT_DIMS`) per lato,
+  e nemmeno gli specchi, le ombre e il bagliore: le tele del post-processing sono trame
+  grandi quanto lei, e una più grande non si disegna (errore GL 1281, la pagina nera).
+  Con una scheda vera il tetto è 16384 e non si tocca mai; ma **LibreWolf**, e Firefox
+  con `privacy.resistFingerprinting`, per non farsi riconoscere dicono 2048 di
+  qualunque scheda, un `devicePixelRatio` di 2 e 4 core: «alta» chiedeva una tela di
+  3820 × 2172 ed era nera, come `?dpr=2` e più. Ora la risoluzione si ferma prima
+  (anche sotto 1 se la finestra è più larga di 2048) e la regia lo dice. Quella
+  protezione tiene anche **ogni pagina a 60 fotogrammi al secondo** (provato il 21.10:
+  LibreWolf 158 sulla 3060 Ti, 60 con la protezione e 165 senza); l'eccezione per un
+  sito (`privacy.resistFingerprinting.exemptedDomains`) ridà i limiti veri della
+  scheda, ma i 60 restano. Senza i nomi delle schede e con 4 core «auto» lì sceglie
+  «media». **Auto** (quando non si è scelto niente): si parte
+  da «alta», da «media» se la scheda grafica si presenta come integrata (Intel,
+  Apple, Mali, Adreno) o il processore ha 4 core o meno; poi, a foto tutte a bordo e mentre si guarda da lontano (il momento più
+  pesante: tutti i fogli in vista), se la mediana dei fotogrammi passa i 24 ms si
+  scende di un livello (ultra → alta → media → bassa), fino a tre volte, e la regia
+  dice da dove e perché. Il 21.10 sulla 3060 Ti, a 1903 × 951 senza limite
+  (`--libero`), di notte scorrendo: «alta» (1,5×) 165–260 fotogrammi al secondo, in
+  fondo sul marciapiede ~214; «media» (1×) ~310; «ultra» (2×) 118–229. La scheda
+  fa tutta la scena in 2–5 ms anche a 2×: il tempo se ne andava nella pagina (le
+  variabili CSS, vedi «La regia»). Triangoli per fotogramma (con ombre e specchi): ~38 000 sul
   computer, ~32 000 sul telefono (erano 390 000 e 600 000). Su una Intel UHD 630
   (il portatile, dove Chrome gira sull'integrata anche se c'è una GeForce) a
   1440 × 900, senza il limite dello schermo (`--libero`): ~120 fotogrammi al
@@ -957,49 +1035,86 @@ le fiches fotografate, e le carte vere in 3D.
 
 ## La regia (regia/)
 
-Un pannello nascosto per provare il sito senza aspettare la sera o un'auto: si apre
-**scrivendo «regia»** sulla tastiera (di nuovo per chiuderlo), con `#regia`
-nell'indirizzo o **toccando cinque volte in fretta** la striscia in cima allo schermo.
-Il codice si scarica solo allora. È un foglio col nastro come le finestre dei giochi,
-ma di lato (sul telefono dal basso, «abbassa» lo riduce alla testata) e senza velo
-scuro: la scena cambia dietro mentre si trascina. Ogni comando è una pista stampata
-con l'inchiostro dei tavoli e **una fiche da trascinare**: lungo il binario (con
-l'evidenziatore fino al valore, le tacche, l'alba e il tramonto segnati in rosso) o
-nelle caselle, dove si posa nella più vicina con un colpetto; anche dalla tastiera
-(frecce, pagina su e giù, inizio e fine). Ogni zona la sua fiche:
+Il pannello per provare e regolare il sito senza aspettare la sera o un'auto. Dal
+21.10 si apre col **tasto giallo in alto a destra** (`.rotella` in `index.html`: un
+pulsante giallo vero con la rotella stampata sul cappuccio, disegnato da gpt-image-2
+come il resto del muro, `art/tasto/tasto.webp` e `tasto-giu.webp`, foglio «tasto» in
+`tools/pzkko/fogli.js`; sempre visibile, sopra il caricamento e la regia, sotto solo i
+giochi, che sono modali; si abbassa quando lo si preme e resta giù finché la regia è
+aperta; di nuovo per chiuderla), e ancora **scrivendo «regia»** sulla tastiera, con
+`#regia` nell'indirizzo o **toccando cinque volte in fretta** la striscia in cima allo
+schermo. Il codice si scarica solo allora (col puntatore sopra il tasto, già un attimo
+prima). È un foglio col nastro come le finestre dei giochi, di lato sotto il tasto (sul
+telefono dal basso, «abbassa» lo riduce alla testata) e senza velo scuro: la scena
+cambia dietro mentre si regola. **A schede**, una pagina alla volta (frecce per
+passare dall'una all'altra; l'ultima aperta resta nel browser):
 
-- **il tempo** (gialla): l'ora di Mantova, la velocità (ferma, ×1, ×10, ×60, ×600),
-  alba, mezzogiorno, tramonto, sera, mezzanotte, adesso;
-- **la sera** (nera): il buio (auto = col tramonto, o fisso), l'insegna e i lampioni
-  (auto, spenti, accesi), lo sfarfallio;
-- **le auto** (rossa): «passa un'auto» (anche di giorno), ogni quanti secondi, i fari
-  (alogeni, led, xeno), il neon sotto, e un'auto ferma coi fari accesi dove si posa
-  la fiche;
-- **la scena** (verde): esposizione, bagliore, luce dell'insegna, specchi, il muro del DOM in
-  trasparenza (`?allinea`), la qualità (ricarica), rifare l'arrivo, il muro senza 3D,
-  il glTF;
-- **le bestie** e **l'acqua** (blu): ogni specie sì o no, le blatte anche di giorno,
-  la velocità, «spaventale», una zanzara davanti alla telecamera; le gocce più fitte
-  o più rade, una goccia adesso;
-- **il meteo** (nera): il tempo (vero = Mantova adesso, sole, nuvole, nebbia,
-  pioggia, tuoni, neve), quanto è forte, il bagnato e la neve per terra (auto = col
-  meteo, o fissi), i dati veri di adesso, «un lampo».
+- **grafica**: la qualità della scena 3D (auto, bassa, media, alta, ultra, su misura;
+  vedi «Il costo» nella scena), con la riga che dice com'è adesso (il livello, i pixel
+  per pixel, la tela, se «auto» è scesa e perché); i suoi pezzi uno per uno
+  (risoluzione 1×, 1,5×, 2×; ombre 512–4096; riflessi spenti, bassi, medi, alti,
+  tanti; bagliore spento, a metà, pieno; i palazzi di fronte), che la fanno «su
+  misura»; i ritocchi (esposizione, forza del bagliore, luce dell'insegna), la vetrina
+  col mouse, la luce del portachiavi per terra. Tutto dal vivo, niente ricariche; la
+  qualità e la luce del portachiavi restano nel browser. Sul telefono la scena è una
+  sola, la minima (sopra): la scheda dice com'è, e restano l'esposizione, la luce
+  dell'insegna e il portachiavi;
+- **ora e sera**: l'ora di Mantova (l'alba e il tramonto segnati in rosso), la
+  velocità (ferma, ×1, ×10, ×60, ×600), alba, mezzogiorno, tramonto, sera, mezzanotte,
+  adesso; il buio (auto = col tramonto, o fisso), l'insegna e i lampioni (auto,
+  spenti, accesi), lo sfarfallio;
+- **meteo**: il tempo (vero = Mantova adesso, sole, nuvole, nebbia, pioggia, tuoni,
+  neve), quanto è forte, il bagnato e la neve per terra (auto = col meteo, o fissi),
+  «un lampo», i dati veri di adesso;
+- **strada**: le auto («passa un'auto», anche di giorno, ogni quanti secondi, i fari
+  alogeni, led o xeno, il neon sotto, un'auto ferma coi fari accesi in un punto); le
+  bestie (ogni specie sì o no, le blatte anche di giorno, la velocità, «spaventale»,
+  una zanzara davanti alla telecamera); le gocce più fitte o più rade, una adesso;
+- **suono**: i suoni della strada (`suono/`, sotto): acceso, il volume, e ognuno da
+  provare;
+- **prove**: il muro del DOM in trasparenza (`?allinea`), rifare l'arrivo, il muro
+  senza 3D, il glTF (questi tre ricaricano la pagina), e i numeri della scheda (il
+  suo nome, i programmi, i disegni e i triangoli dell'ultimo passaggio, l'insieme di
+  luci).
 
-In fondo i numeri della scena (fotogrammi al secondo, l'ora, il buio, qualità e
-risoluzione, l'insieme di luci, i programmi, il meteo) e «rimetti tutto». Niente si salva:
-ricaricando torna tutto com'era, tranne l'ora e la velocità che le ricariche della
-regia si portano nell'indirizzo. Quello che comanda: `window.pzkkoPagina` (in
-`index.html`: l'orologio, che dal 20.10 è uno solo anche per la scena,
-`window.pzkkoOrologio`; la sera forzata; le regole delle auto), `window.pzkkoRegia`
-(i ritocchi che la scena legge a ogni fotogramma, `REGIA` in `scena/materiali.js`) e
-`window.pzkkoScena` (le bestie, la goccia, il meteo: `meteo` lo stato, `me.lampo()`).
+Le scelte sono **caselle stampate** come quelle del tavolo, con l'evidenziatore giallo
+su quella scelta, e i valori continui **cursori** col binario stampato, l'evidenziatore
+fino al valore e la fiche come pomello (la casella «auto» a sinistra, dove c'è, fa
+seguire il valore da solo: il pomello mostra quello che segue); tastiera e lettori di
+schermo sono quelli dei controlli del browser. In fondo i numeri della scena
+(fotogrammi al secondo, l'ora, il buio, qualità e risoluzione, l'insieme di luci, il
+meteo) e «rimetti tutto» (l'ora vera, la sera col tramonto, le auto a caso, il volume,
+i ritocchi; la grafica no: è una scelta). Il resto non si salva: ricaricando torna
+com'era, tranne l'ora e la velocità che le ricariche della regia si portano
+nell'indirizzo. Quello che comanda: `window.pzkkoPagina` (in `index.html`: l'orologio,
+che dal 20.10 è uno solo anche per la scena, `window.pzkkoOrologio`; la sera forzata;
+le regole delle auto; le luci, `luci`), `window.pzkkoRegia` (i ritocchi che la scena
+legge a ogni fotogramma, `REGIA` in `scena/materiali.js`) e `window.pzkkoScena` (la
+grafica, `grafica()` e `imposta()`; i fotogrammi al secondo, `fps()`; il portachiavi,
+`pc`; le bestie, la goccia, il meteo: `meteo` lo stato, `me.lampo()`).
+
+**Lenta e pesante, fino al 21.10.** Sulla 3060 Ti di sera la scena faceva 66–127
+fotogrammi al secondo, e con la regia aperta 55: la pagina scriveva le luci della sera
+(lo sfarfallio dei neon, le auto) come variabili CSS su `html` **a ogni fotogramma**, e
+ogni scrittura costringeva il browser a ricalcolare lo stile di tutta la pagina (~4 ms,
+il muro sotto ha migliaia di elementi), e a ridipingere la regia, che era un foglio di
+piste SVG col filtro dell'inchiostro (rumore e spostamento) in `multiply`, rifatte due
+volte al secondo. La scheda grafica intanto finiva la scena in 2–5 ms. Ora la pagina
+tiene le luci in `window.pzkkoPagina.luci`, da dove le legge la scena (`luci.js`), e
+con la scena 3D (`html.scena3d`) le variabili non le scrive più (il muro sotto è
+invisibile); senza, le scrive solo quando cambiano. La regia è HTML piatto (caselle,
+cursori del browser; la carta su un livello suo che non si ridipinge) e tocca solo
+quello che è cambiato, solo nella scheda aperta. Stessa sera, a risoluzione 1,5× invece
+di 1×: ~165 fotogrammi al secondo con e senza regia, 310 a 1×. Il selettore della
+qualità, poi, ricaricava la pagina (sette secondi con l'arrivo) e «alta» su uno schermo
+normale era uguale a «media»: vedi «Il costo».
 
 **Aperta prima della scena** (21.10): la regia aperta durante il caricamento, e quella
-che si riapre da sé dopo ognuna delle sue ricariche (qualità, «rifai l'arrivo»: tornano
+che si riapre da sé dopo ognuna delle sue ricariche («rifai l'arrivo», il glTF: tornano
 con `#regia`, prima che il 3D ci sia), restava «senza 3D» per sempre, e «con il 3D»
 ricaricava nello stesso punto: un giro da cui si usciva solo ricaricando da zero, senza
-`#regia`. Ora, se il 3D sta arrivando (`html.scena-carico`), al posto delle sezioni della
-scena c'è «il 3D arriva», che diventa la scena, le bestie, il meteo e l'acqua appena
+`#regia`. Ora, se il 3D sta arrivando (`html.scena-carico`), al posto delle parti della
+scena c'è «il 3D arriva», che diventa la grafica, il meteo, le bestie e l'acqua appena
 `window.pzkkoScena` c'è; «senza 3D» solo se il 3D non c'è davvero.
 
 **Il contesto perso** (21.10, `scena.js`): se la scheda grafica perde il contesto WebGL
@@ -1010,6 +1125,88 @@ parallelo come all'inizio, rifà il cielo come ambiente (`l.rifai()`), le ombre 
 specchi, e riparte da dov'era; se non torna entro 8 s ricarica, ma senza l'arrivo
 (`sessionStorage` `pzkko-subito`). `?perdi=1` lo prova: perso dopo 3 s, ridato dopo 1
 (ricompilata in 0,1 s, la strada di nuovo intera).
+
+## Il suono (suono/)
+
+Dal 21.10.2026 la strada si sente. Niente file audio: ogni suono è sintetizzato dal vivo col
+Web Audio (`voci.js`: oscillatori e rumori filtrati; le cose fatte di mille pezzi, come la
+pioggia sulla lamiera, i grilli, i tuoni e la carta, calcolate una volta in un tampone; le
+campane in un `OfflineAudioContext`), e si sente quello che c'è nella scena, da dove sta la
+telecamera, all'ora di Mantova. Sono 70 KB di codice (23 compressi), che si scaricano solo
+quando i suoni partono.
+
+- **Come parte**: il browser lascia suonare una pagina solo dopo un gesto. Al primo tocco o
+  tasto (non lo scorrimento) i suoni partono sfumando, in tre secondi; il nastro «suono» in
+  basso a sinistra (carta gommata, a pennarello: barrato quando è spento, le onde respirano
+  quando suona) li spegne e li riaccende, e il browser se lo ricorda (`pzkko-suono` in
+  `localStorage`: chi li ha spenti non li sente più partire da soli). Il contesto audio nasce
+  dentro il gesto (Safari lo vuole lì) e passa a `suono.js`; sull'iPhone è «ambient»: rispetta
+  il tasto del silenzioso e non ferma la musica. Con la pagina nascosta tutto si ferma;
+  mentre si gioca (la roulette e il blackjack, finestre modali) la strada si abbassa.
+  `window.pzkkoSuono`: `acceso`, `volume`, `accendi(sì, ricorda)`, `prova(nome)` per la
+  regia, `evento(nome, dati)` per la pagina e la scena (finché il motore non c'è, gli eventi
+  aspettano in coda: i vecchi si buttano, le auto si suonano da dove sono arrivate).
+- **Chi ascolta**: la telecamera della scena, in metri come lei: ogni suono ha il suo posto e
+  si sente più piano, più spento e più dalla sua parte quanto più è lontano; l'eco della strada
+  (la coda e le riflessioni del palazzo di fronte, a 12 m, che rimbalzano fra le due facciate)
+  se ne prende una parte. Quindi l'arrivo si sente avvicinarsi, l'insegna ronza di più in cima
+  alla pagina e la goccia in fondo. Senza 3D gli stessi posti, con lo scorrimento della parete.
+- **Sempre**: la città lontana (più forte nelle ore di punta, più piano di notte e la
+  domenica; sull'asfalto bagnato sibila), le onde del traffico delle altre strade, il
+  condizionatore lassù, il motorino a due tempi in un'altra via (col Doppler), un clacson, la
+  tapparella di qualcuno al palazzo di fronte (su a strattoni al mattino, giù da sola la sera,
+  col colpo in fondo).
+- **Le campane**, oltre i tetti: le ore dalle 7 alle 22, un colpo alla mezza, a mezzogiorno
+  il concerto di tre campane a slancio e al tramonto l'Ave Maria, nel momento in cui si accende
+  l'insegna. Suonano solo se il tempo passa da sé (la regia che salta di ora non le fa partire).
+  Ogni campana ha i suoi parziali (il ronzio, la terza minore, la quinta, la nominale…), e
+  ognuno sono due toni vicinissimi che battono.
+- **Gli uccelli**, secondo l'ora e la stagione: i passeri (di più all'alba e al tramonto), la
+  tortora dal collare, i piccioni (che a volte volano via battendo le ali), la cornacchia; i
+  rondoni da fine aprile ad agosto, il merlo all'alba e al tramonto in primavera; di notte la
+  civetta e l'allocco (d'autunno di più). Le sere d'estate i grilli, al ritmo della temperatura
+  vera di Mantova (la legge di Dolbear: 7·T − 30 cri al minuto), e nei pomeriggi caldi
+  d'estate le cicale. Con la pioggia, la neve o la nebbia stanno zitti.
+- **L'insegna**: il trasformatore che ronza (50 Hz e le armoniche pari) e il gas che
+  sfrigola, con lo sfarfallio della pagina: a ogni salto di luce una scintilla, e
+  l'accensione al tramonto crepita.
+- **Le auto**: la pagina sceglie la prossima auto prima e la annuncia tre secondi prima dei
+  fari (`evento('auto')` in `index.html`), così si sente arrivare; passa dietro la telecamera
+  col Doppler (il volume, il lato, l'aria e la frequenza sono curve calcolate per tutto il
+  passaggio), sul bagnato sibila, col neon sotto si sentono la cassa e il basso dei tamarri dai
+  finestrini chiusi e la targa che vibra, ogni tanto i freni stridono. Quella ferma della regia
+  tiene il motore al minimo, e lasciata andare riparte.
+- **Il meteo vero**: la pioggia (il velo, le gocce sulla lamiera, quelle nelle pozze, il
+  pluviale che si riempie piano e gorgoglia), il tuono dopo ogni lampo (tanto più tardi quanto
+  è lontano, lo schianto solo se è vicino: `evento('lampo')` in `meteo.js`), il vento a
+  raffiche col fischio nelle fessure e le doghe che sbattono, la nebbia e la neve che ovattano
+  tutto; dopo la pioggia gocciola la gronda.
+- **Le cose piccole**: la goccia della condensa che tocca la soglia (`evento('goccia')` in
+  `acqua.js`); le mosche e le zanzare tigre che ronzano mentre volano, più acute quando
+  scattano (quella che la regia manda davanti alla telecamera ronza all'orecchio, da un lato
+  all'altro); le blatte che zampettano sulla pietra, solo da vicino.
+- **Il negozio**: davanti alla porta (a meno di 7 m, col mouse sul fronte la vetrina ci
+  porta), dietro il vetro, il PC di `negozio.js` (che ora dice la sua fase: `fase(now)`): si
+  spegne e si riaccende (la ventola, il disco che prende i giri), il bip del POST, il floppy,
+  il disco che lavora, qualcuno che va nel Setup con le frecce, le quattro note di legno della
+  scrivania (non è il suono di Ubuntu), la password, il comando battuto, Invio; poi il panico,
+  e da capo.
+- **Le mani**: il foglio che si alza fruscia, il tagliando si strappa, un clic sulla
+  saracinesca nuda (non su un foglio) la bussa, il pomodoro del caricamento fa splat (se i suoni
+  sono già accesi).
+- **Il banco**: tutto passa da un filtro (la nebbia e la neve), da un compressore (i tuoni) e
+  dal volume. I punti usa e getta (un uccello, una goccia) si staccano da soli dopo 30 secondi.
+- **La regia** ha la scheda «suono»: acceso, il volume, e ogni suono che capita da solo da far
+  partire adesso.
+- **Le prove**: `node tools/pzkko/suono/ascolta.mjs strumenti [nome…]` registra ogni strumento
+  da solo in un `OfflineAudioContext` di Chromium; `… strada [giorno|notte|temporale|tramonto|
+  zanzara|negozio]` registra la home vera col 3D, dal vivo (20–30 s l'una). Per ognuno scrive in
+  `tools/pzkko/lavoro/suono/` il WAV, lo spettrogramma (PNG: il tempo in orizzontale, la
+  frequenza in scala logaritmica da 40 Hz a 16 kHz, le righe a 100 Hz, 1 e 10 kHz) e dice i
+  livelli: RMS secondo per secondo e il picco, in dBFS. Il 21.10: il fondo della strada sta a
+  −30 dBFS, gli uccelli e le auto vicine a −20/−10 di picco, l'Ave Maria a −22, un tuono vicino
+  a −7. Il nastro, negli strumenti che fotografano la pagina, non c'è (`navigator.webdriver`);
+  `?suono` lo fa vedere lo stesso.
 
 ## I $pzk (games/pzk.js)
 

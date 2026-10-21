@@ -76,8 +76,16 @@ if (tempi.length > 10) {
   console.log(`arrivo: ${tempi.length} fotogrammi, media ${media.toFixed(1)} ms, 95° ${ord[Math.floor(ord.length * 0.95)]} ms, massimo ${ord.at(-1)} ms, sopra 33 ms: ${ord.filter((x) => x > 33).length}${tempi.some((x) => x > 33) ? ' (ai fotogrammi ' + tempi.map((x, i) => (x > 33 ? i : -1)).filter((i) => i >= 0).join(', ') + ' dalla comparsa)' : ''}`)
 }
 await page.evaluate((s) => { scrollTo(0, s * (document.documentElement.scrollHeight - innerHeight)) }, scroll)
-// --vars=--auto-l:0.9;--auto-x:0.45 : variabili CSS imposte alla pagina (per fermare un'auto, provare le luci)
-if (vars) await page.evaluate((v) => { for (const kv of v.split(';')) { const [k, val] = kv.split(/:(.*)/); document.documentElement.style.setProperty(k.trim(), val.trim()) } }, vars)
+// --vars=--auto-l:0.9;--auto-x:0.45 : le luci della pagina imposte (per fermare un'auto, provare le luci): come variabili
+// CSS per il muro di sempre e in window.pzkkoPagina.luci, da dove le legge la scena 3D (dal 21.10)
+if (vars) await page.evaluate((v) => {
+  for (const kv of v.split(';')) {
+    const [k, val] = kv.split(/:(.*)/).map((x) => x.trim())
+    document.documentElement.style.setProperty(k, val)
+    const luci = window.pzkkoPagina?.luci, n = k.replace(/^--/, '')
+    if (luci && n in luci) luci[n] = n === 'auto-c' ? val : Number(val)
+  }
+}, vars)
 // --prova=<js> : codice eseguito nella pagina prima della foto (per spegnere pezzi e misurare)
 if (prova) await page.evaluate((p) => { const s = window.pzkkoScena; new Function('s', p)(s) }, prova)
 // --hover=<selettore> : il puntatore sopra un elemento (il foglio si alza)

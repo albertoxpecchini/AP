@@ -1,8 +1,9 @@
 // Le luci della scena: il sole dove sta davvero sopra Mantova a quest'ora (lo
 // stesso calcolo NOAA della pagina, qui anche l'altezza e l'azimut), il cielo
 // che fa da ambiente e da riflesso, e di notte tutto quello che la pagina già
-// comanda con le sue variabili CSS (--notte, --insegna, --lampioni, le auto che
-// passano coi fari): la scena le legge ogni fotogramma e accende i poligoni.
+// comanda per il muro di sempre (notte, insegna, lampioni, le auto che passano
+// coi fari, in window.pzkkoPagina.luci): la scena le legge ogni fotogramma e
+// accende i poligoni.
 //
 // Le luci vanno a insiemi, perché ogni luce visibile si calcola per ogni pixel
 // di ogni materiale, anche spenta: «giorno» = il sole e il cielo; «sera» = anche
@@ -114,16 +115,18 @@ export function luci(scene, renderer, h, M) {
     scene.environment = ambiente.texture
   }
 
-  // ── le variabili della pagina ───────────────────────────────────────────────
-  // (la pagina le scrive tutte su html con style.setProperty: si leggono da lì, coi valori di partenza di :root, senza
-  // getComputedStyle, che a ogni fotogramma costringerebbe il browser a ricalcolare lo stile di tutta la pagina)
+  // ── le luci della pagina ────────────────────────────────────────────────────
+  // (la pagina le tiene in window.pzkkoPagina.luci, coi nomi delle variabili CSS del muro di sempre: dal 21.10 con la
+  // scena 3D non le scrive più su html, perché ogni scrittura ricalcolava lo stile di tutta la pagina; senza la pagina,
+  // per le prove, le variabili su html)
   const st = root.style
   const leggi = () => {
-    const v = (n, d = 0) => { const x = parseFloat(st.getPropertyValue(n)); return Number.isFinite(x) ? x : d }
+    const pag = window.pzkkoPagina?.luci
+    const v = (n, d = 0) => { const x = pag ? pag[n] : parseFloat(st.getPropertyValue(`--${n}`)); return Number.isFinite(x) ? x : d }
     return {
-      notte: nottePar ?? v('--notte'), insegna: v('--insegna') * v('--f-insegna', 1), lampioni: v('--lampioni') * v('--f-lampioni', 1),
-      autoX: v('--auto-x', 0.5), autoL: v('--auto-l'), freno: v('--freno'), frenoX: v('--freno-x', 1.1), neonAuto: v('--neon-auto'),
-      autoC: st.getPropertyValue('--auto-c').trim() || '255,226,170',
+      notte: nottePar ?? v('notte'), insegna: v('insegna') * v('f-insegna', 1), lampioni: v('lampioni') * v('f-lampioni', 1),
+      autoX: v('auto-x', 0.5), autoL: v('auto-l'), freno: v('freno'), frenoX: v('freno-x', 1.1), neonAuto: v('neon-auto'),
+      autoC: (pag ? pag['auto-c'] : st.getPropertyValue('--auto-c').trim()) || '255,226,170',
     }
   }
 

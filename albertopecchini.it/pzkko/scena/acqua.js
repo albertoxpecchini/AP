@@ -192,6 +192,8 @@ export function acqua(scene, M, h, f) {
       schizzi.push({ x, y: 0.002, z, vx: Math.cos(a) * v * 0.6, vy: 0.4 + Math.random() * 0.6, vz: Math.abs(Math.sin(a)) * v * 0.6, t: 0, r: 0.0009 + Math.random() * 0.0011 })
     }
     if (cerchi.length < 6) cerchi.push({ x, z, t: 0 })
+    // (il «plic», suono/suono.js)
+    window.pzkkoSuono?.evento('goccia', { x, z })
   }
 
   const aggiorna = (dt, now) => {

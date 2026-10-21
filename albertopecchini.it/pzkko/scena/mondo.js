@@ -77,7 +77,7 @@ const scatola = (w, h, d, mat, x, y, z) => { const m = new T.Mesh(new T.BoxGeome
 // di quattro, i lampioni di là senza luce, l'auto con un faro solo e senza il rosso dei freni né il neon sotto
 export async function costruisci(scene, M, { palazzi: conPalazzi = true, poche = false } = {}) {
   const { W, H, telefono } = M
-  const h = {} // quello che la scena deve poter muovere o accendere
+  const h = { luciPoche: poche } // quello che la scena deve poter muovere o accendere
   const TETTO = Math.max(8, H + 4.4) // il filo alto della facciata
   const ombra = (m, getta = true, riceve = true) => { m.castShadow = getta; m.receiveShadow = riceve; return m }
   // ── i pezzi fermi si uniscono (21.10): ogni mesh è una chiamata di disegno in ogni passaggio (lo schermo, le due
@@ -332,7 +332,8 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true, poche =
   }
 
   // ── i palazzi di fronte, i lampioni della strada ─────────────────────────────
-  h.facciate = []
+  // (h.palazzi: i palazzi, che «bassa» nasconde: scena.js)
+  h.facciate = []; h.palazzi = []
   if (conPalazzi) {
     const Z = 16.9
     let x = -22
@@ -342,7 +343,7 @@ export async function costruisci(scene, M, { palazzi: conPalazzi = true, poche =
       const mF = new T.MeshStandardMaterial({ map: f.map, emissiveMap: f.emissiveMap, emissive: 0xffffff, emissiveIntensity: 0, roughness: 0.9 })
       const mL = new T.MeshStandardMaterial({ color: colore, roughness: 0.9 })
       const b = new T.Mesh(new T.BoxGeometry(larg, alt, 10), [mL, mL, mL, mL, mF, mL])
-      b.position.set(x + larg / 2, alt / 2 - 0.13, Z + 5); ombra(b, true, true); scene.add(b)
+      b.position.set(x + larg / 2, alt / 2 - 0.13, Z + 5); ombra(b, true, true); scene.add(b); h.palazzi.push(b)
       h.facciate.push({ ...f, mat: mF })
       x += larg + 0.02
     })

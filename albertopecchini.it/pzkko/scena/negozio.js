@@ -168,10 +168,15 @@ export function negozio(scene, { bancone, porta }) {
   // ── a ogni fotogramma: la fase dall'orologio, la tela ridisegnata al più a 10 Hz e solo se la porta si vede ──
   const t0 = performance.now() - 6000 // (si parte dalla scrivania: entrando si vede Ubuntu che va, poi si pianta)
   let fase = null, ultimo = -1e9, animata = true
-  const aggiorna = (now, vista) => {
-    if (vista && (vista.x1 < porta.x0 - 0.3 || vista.x0 > porta.x1 + 0.3)) return
+  // la fase all'istante now e da quanti ms c'è (anche per i suoni del PC, suono/suono.js)
+  const faseA = (now) => {
     let t = (now - t0) % TOTALE, nome = 'nero'
     for (const [n, d] of FASI) { if (t < d) { nome = n; break } t -= d }
+    return { nome, t }
+  }
+  const aggiorna = (now, vista) => {
+    if (vista && (vista.x1 < porta.x0 - 0.3 || vista.x0 > porta.x1 + 0.3)) return
+    const { nome, t } = faseA(now)
     if (nome !== fase || (animata && now - ultimo > 100)) {
       animata = schermate[nome](t)
       tex.needsUpdate = true; ultimo = now
@@ -182,5 +187,5 @@ export function negozio(scene, { bancone, porta }) {
     const disco = (nome === 'post' && t > 2300) || nome === 'grub' || nome === 'plymouth' || (nome === 'desktop' && t < 3000)
     ledDisco.emissiveIntensity = disco && Math.sin(now * 0.021) * Math.sin(now * 0.0073) > -0.2 ? 2.5 : 0
   }
-  return { aggiorna, schermo: c }
+  return { aggiorna, schermo: c, fase: faseA, dove: { x: tx, y: y + 0.2, z } }
 }
