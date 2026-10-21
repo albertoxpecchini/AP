@@ -1203,6 +1203,19 @@ const allProjects = [
       caption: 'Bologna, via Rizzoli · 22.09.2024, 12:28 · iPhone 16 Pro, Live Photo',
       link: { href: 'https://www.pzkko.it/storia/', label: 'La storia intera su pzkko.it' },
     },
+    // La zona «tools» del muro: gli strumenti che faccio per me e regalo. Lo zip e la sua pagina sono su pzkko.it
+    // (pzkko/tools/lezioni/), il codice in tools/lezioni/ di questo repository.
+    tools: {
+      lead: 'Sul muro c’è anche la zona tools: gli strumenti che faccio per me e che regalo, da scaricare.',
+      items: [
+        {
+          name: 'pzk$meeting',
+          text: 'Registra la lezione su Teams, trascrive la voce con Whisper in sincrono con la lavagna, legge le formule e a fine lezione fa gli appunti impaginati in PDF. Gratis, per Windows.',
+          download: { href: 'https://www.pzkko.it/tools/lezioni/lezioni.zip', name: 'pzk$meeting.zip', label: 'Scarica pzk$meeting.zip', meta: 'zip · 0,9 MB · Windows' },
+          page: { href: 'https://www.pzkko.it/tools/lezioni/', label: 'La pagina su pzkko.it' },
+        },
+      ],
+    },
     result:
       'pzkko.it è online dal 7 ottobre 2026: una pagina in HTML, CSS e JavaScript scritti a mano, senza build né framework, con una 404 fatta di un volantino strappato. Il codice della roulette si carica solo quando la si apre.',
     metrics: [

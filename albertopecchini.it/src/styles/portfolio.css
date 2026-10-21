@@ -1096,6 +1096,16 @@
   max-width: 56ch;
 }
 
+/* gli strumenti da scaricare (la sezione «Tools»): lo zip, quanto pesa, la pagina */
+.cs-tool__links {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.85rem;
+}
+
 .cs-metrics {
   display: grid;
   gap: 2rem var(--col-gap);

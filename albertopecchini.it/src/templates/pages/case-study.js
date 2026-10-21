@@ -2,7 +2,7 @@ import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
 import { allAreas, nextOf } from '../../data/projects.js'
 import { BRANDS } from '../../art/brand.js'
-import { button, media, deviceStage, iphoneSite, iphoneCredit, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark, figurina } from '../components/ui.js'
+import { button, textLink, media, deviceStage, iphoneSite, iphoneCredit, dataSheet, tagList, icon, splitWords, breadcrumb, sampleMark, figurina } from '../components/ui.js'
 import { projectHref, previewOf } from '../components/project.js'
 import { compare, swatches, specimens } from './portfolio.js'
 import { sheetViewer } from '../components/viewer.js'
@@ -23,14 +23,17 @@ const SECTIONS = [
 // (il visualizzatore dei DWG e dei PDF, solo con `showSheets` acceso in
 // projects.js); con le fotografie o con la pagina intera su iPhone si aggiunge una
 // sezione subito dopo la galleria; con un fun fact (da dove è nato il progetto),
-// una sezione subito dopo la strategia.
+// una sezione subito dopo la strategia; con degli strumenti da scaricare (la zona
+// «tools» di pzkko.it), una sezione subito dopo lo sviluppo.
 const sectionsOf = (p) =>
   SECTIONS.flatMap(([id, label]) =>
     id === 'galleria'
       ? [...(p.sheets ? [['tavole', 'Tavole']] : []), [id, label], ...(p.photos ? [['fotografie', 'Fotografie']] : []), ...(p.iphone ? [['iphone', 'iPhone']] : [])]
       : id === 'strategia' && p.funFact
         ? [[id, label], ['funfact', 'Fun fact']]
-        : [[id, label]],
+        : id === 'sviluppo' && p.tools
+          ? [[id, label], ['tools', 'Tools']]
+          : [[id, label]],
   )
 
 // Le figurine delle sezioni dei progetti web (tools/figurine, foglio «computer»).
@@ -113,6 +116,30 @@ function funFactSection(p) {
   `
 }
 
+/** Gli strumenti del progetto (la zona «tools» di pzkko.it): cosa fanno, lo zip da scaricare, la loro pagina. */
+function toolsSection(p) {
+  const t = p.tools
+  return html`
+    ${t.lead ? `<p class="cs-lead" data-reveal="up">${esc(t.lead)}</p>` : ''}
+    <ol class="cs-steps">
+      ${t.items.map(
+        (s, i) => html`
+          <li class="cs-step" data-reveal="up" style="--d:${i * 45}ms">
+            <span class="cs-step__n label">${String(i + 1).padStart(2, '0')}</span>
+            <h3 class="cs-step__title h4">${esc(s.name)}</h3>
+            <p>${esc(s.text)}</p>
+            <div class="cs-tool__links">
+              ${button({ href: s.download.href, label: s.download.label, variant: 'ghost', iconName: 'download', attrs: { download: s.download.name } })}
+              ${s.download.meta ? `<span class="label">${esc(s.download.meta)}</span>` : ''}
+              ${s.page ? textLink({ href: s.page.href, label: s.page.label, iconName: 'arrowUpRight', external: true }) : ''}
+            </div>
+          </li>
+        `,
+      )}
+    </ol>
+  `
+}
+
 // Titolo del progetto successivo: l'ultima parola e la freccia non si separano
 // mai (la freccia da sola su una riga sembrava un errore).
 const nextTitle = (title) => {
@@ -190,6 +217,7 @@ export function caseStudyPage(p) {
           </ol>
         `,
       )}
+      ${p.tools ? section('tools', toolsSection(p)) : ''}
       ${section(
         'risultato',
         html`
