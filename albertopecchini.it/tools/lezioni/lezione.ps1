@@ -38,6 +38,12 @@ if (-not $Cartella -and (Test-Path $corrente)) {
     $m = Join-Path $c 'meta.json'
     if ((Test-Path $m) -and -not (Test-Path (Join-Path $c 'FINE')) -and ((Get-Date) - (Get-Item $m).LastWriteTime).TotalSeconds -lt 15) {
         Write-Host "Sta gia' registrando in $c" -ForegroundColor Green
+        # la barra chiusa col doppio clic si riapre premendo di nuovo "Lezione"
+        $barra = Get-CimInstance Win32_Process -Filter "Name='python.exe' OR Name='pythonw.exe'" | Where-Object { $_.CommandLine -like '*barra.py*' }
+        if (-not $barra) {
+            Start-Process $pyw -WorkingDirectory $t -ArgumentList 'barra.py', "`"$c`""
+            Write-Host 'Riapro la barra.'
+        }
         Start-Sleep 3
         exit 0
     }
@@ -63,7 +69,9 @@ function Guardiano($nome, $comando) {
     Start-Process powershell -WindowStyle Hidden -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', "Set-Location '$t'; $giro"
 }
 Guardiano 'registra' "'$py' registra.py '$Cartella' --schermo '$Schermo'"
-Guardiano 'trascrivi' "'$py' trascrivi.py '$Cartella' --lingua '$Lingua' --materia '$Materia'"
+# --materia solo se c'e': PowerShell 5.1 butta via gli argomenti vuoti e trascrivi.py non partirebbe
+$materia = if ($Materia) { " --materia '$Materia'" } else { '' }
+Guardiano 'trascrivi' "'$py' trascrivi.py '$Cartella' --lingua '$Lingua'$materia"
 if ($env:ANTHROPIC_API_KEY -and (Test-Path (Join-Path $t 'ocr_claude.py'))) {
     Guardiano 'ocr' "'$py' ocr_claude.py '$Cartella'"
     $ocr = 'lettura della lavagna con Claude: accesa'
