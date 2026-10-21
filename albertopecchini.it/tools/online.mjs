@@ -39,7 +39,9 @@ const dt = (...args) => spawnSync(devtunnel, args, { encoding: 'utf8' })
 console.log('online: tre dev server e il tunnel «%s»\n', TUNNEL)
 
 // 1. login (una volta per computer) e tunnel con le tre porte
-if (!/Logged in/i.test(dt('user', 'show').stdout)) {
+// («Not logged in» contiene anche lui «logged in»: prima passava per un accesso, e il tunnel si chiedeva da anonimo)
+const utente = dt('user', 'show').stdout
+if (/not logged in/i.test(utente) || !/logged in/i.test(utente)) {
   console.log('devtunnel: accedi con GitHub nel browser che si apre…')
   if (spawnSync(devtunnel, ['user', 'login', '-g'], { stdio: 'inherit' }).status !== 0) process.exit(1)
 }
