@@ -75,6 +75,11 @@ const pzkko = (port) => {
       pagine.add(res)
       return req.on('close', () => pagine.delete(res))
     }
+    // le funzioni di pzkko/api (come su Vercel: /api/meteo → pzkko/api/meteo.mjs)
+    const funzione = /^\/api\/([a-z0-9-]+)\/?$/.exec(pathname)?.[1]
+    if (funzione && esiste(path.join(root, 'api', funzione + '.mjs'))) {
+      return import(`./../pzkko/api/${funzione}.mjs?${Date.now()}`).then((m) => m.default(req, res)).catch((e) => { console.error(e); res.writeHead(500).end() })
+    }
     let nome = pathname
     try { nome = decodeURIComponent(pathname) } catch {}
     const file = path.join(root, nome)

@@ -1187,6 +1187,22 @@ const allProjects = [
       { title: 'La sera', text: 'La pagina calcola alba e tramonto di Mantova con l’algoritmo della NOAA, senza chiamate in rete, e vive a quell’ora da qualunque posto la si guardi: da quaranta minuti prima del tramonto il muro imbrunisce, poi si accende l’insegna al neon, coi tubi che sfarfallano, e di notte passano i fari delle auto.' },
       { title: 'Roulette', text: 'Il volantino della roulette apre una finestra con la ruota in 3D, disegnata con three.js, e la pallina mossa da un motore fisico vero, Rapier: si ferma dove si ferma. Si gioca a soldi finti su tutte le 157 puntate della roulette europea; una prova senza browser ha fatto 4.122 giri senza un errore.' },
     ],
+    // La foto vera da cui è nato il muro, con la sua Live Photo (tools/pzkko/storia/storia.mjs); la storia intera,
+    // coi meme bolognesi, è su pzkko.it/storia/.
+    funFact: {
+      lead: 'Il muro di pzkko.it esiste davvero: l’ho fotografato a Bologna, in via Rizzoli, a un centinaio di metri dalle Due Torri, domenica 22 settembre 2024 alle 12:28. Era la prima volta in vita mia a Bologna, in gita con Veronica, e l’iPhone 16 Pro era uscito due giorni prima: fotografavo tutto per provarlo.',
+      text: 'Un ingresso della Coin chiuso da una saracinesca: lamiera grigia, graffiti, più di venti volantini e sopra l’insegna con le lettere a scatola. Da lì vengono le lettere tonde di «pzkko», l’adesivo tondo sull’insegna (sul puntino della i c’era un cono gelato, sulla mia c’è la chiocciola) e i manifesti degli altri in mezzo ai miei volantini. Ci ho pensato per due anni; a ottobre 2026 è diventato il sito.',
+      photo: {
+        src: '/media/web/pzk-bologna.webp',
+        small: '/media/web/pzk-bologna-m.webp',
+        live: '/media/web/pzk-bologna.mp4',
+        w: 1080,
+        h: 1440,
+        alt: 'La saracinesca di un ingresso della Coin in via Rizzoli a Bologna: lamiera grigia coperta di graffiti e di volantini, sopra l’insegna «coin» con le lettere a scatola.',
+      },
+      caption: 'Bologna, via Rizzoli · 22.09.2024, 12:28 · iPhone 16 Pro, Live Photo',
+      link: { href: 'https://www.pzkko.it/storia/', label: 'La storia intera su pzkko.it' },
+    },
     result:
       'pzkko.it è online dal 7 ottobre 2026: una pagina in HTML, CSS e JavaScript scritti a mano, senza build né framework, con una 404 fatta di un volantino strappato. Il codice della roulette si carica solo quando la si apre.',
     metrics: [

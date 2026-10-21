@@ -11,6 +11,7 @@
 // tutti): aggiorna dice quale serve, scena.js lo compila a parte e poi lo mette.
 import * as T from './lib/three.js'
 import { REGIA } from './materiali.js'
+import { METEO } from './meteo.js'
 
 const INSIEMI = { giorno: { sole: true, notte: false }, sera: { sole: true, notte: true }, notte: { sole: false, notte: true } }
 
@@ -90,18 +91,24 @@ export function luci(scene, renderer, h, M) {
   const riga = 'gl_FragColor = vec4( texColor, 1.0 );'
   if (sky.material.fragmentShader.includes(riga)) sky.material.fragmentShader = sky.material.fragmentShader.replace(riga, 'gl_FragColor = vec4( min( texColor, vec3( 3.0 ) ), 1.0 );')
   scene.add(sky)
+  // il cielo coperto (meteo.js): una cupola grigia davanti al cielo, trasparente quanto sono le nuvole e la nebbia (dentro
+  // i 90 m: la scena sta tutta dentro, e il cubo dell'ambiente la vede)
+  const coperto = new T.Mesh(new T.SphereGeometry(90, 32, 16), new T.MeshBasicMaterial({ color: 0x9da2a8, side: T.BackSide, transparent: true, opacity: 0, depthWrite: false, fog: false }))
+  coperto.renderOrder = -1
+  scene.add(coperto)
   scene.fog = new T.Fog(0x9aa4b0, 40, 160)
   const pmrem = new T.PMREMGenerator(renderer)
   const cieloScena = new T.Scene(); cieloScena.add(sky)
-  // il cielo come ambiente e riflesso si rifà solo quando il sole si è spostato di 0,6° (ogni due minuti e mezzo) o la
-  // sera è avanzata: rifarlo costa un cubo di sei facce, e farlo ogni due secondi dava uno scatto ogni due secondi
-  let ambiente = null, ultimoEl = 99, ultimaNotte = -1
-  const aggiornaAmbiente = (el, notte) => {
-    if (ambiente && Math.abs(el - ultimoEl) < 0.6 * RAD && Math.abs(notte - ultimaNotte) < 0.04) return
-    ultimoEl = el; ultimaNotte = notte
-    cieloScena.add(sky)
+  // il cielo come ambiente e riflesso si rifà solo quando il sole si è spostato di 0,6° (ogni due minuti e mezzo), la
+  // sera è avanzata o il cielo si è coperto o scoperto: rifarlo costa un cubo di sei facce, e farlo ogni due secondi dava
+  // uno scatto ogni due secondi
+  let ambiente = null, ultimoEl = 99, ultimaNotte = -1, ultimoCoperto = -1
+  const aggiornaAmbiente = (el, notte, cop) => {
+    if (ambiente && Math.abs(el - ultimoEl) < 0.6 * RAD && Math.abs(notte - ultimaNotte) < 0.04 && Math.abs(cop - ultimoCoperto) < 0.1) return
+    ultimoEl = el; ultimaNotte = notte; ultimoCoperto = cop
+    cieloScena.add(sky, coperto)
     const nuovo = pmrem.fromScene(cieloScena, 0.02)
-    scene.add(sky)
+    scene.add(sky, coperto)
     if (ambiente) ambiente.dispose()
     ambiente = nuovo
     scene.environment = ambiente.texture
@@ -135,6 +142,8 @@ export function luci(scene, renderer, h, M) {
   const colNebbia = new T.Color(), nebbiaGiorno = new T.Color(0x9aa4b0), nebbiaNotte = new T.Color(0x05070c)
   const colCielo = new T.Color(), cieloGiorno = new T.Color(0x9ec5ff), cieloNotte = new T.Color(0x24304f)
   const colTerra = new T.Color(), terraGiorno = new T.Color(0x8a7a68), terraNotte = new T.Color(0x2a2016)
+  // il meteo: il grigio del cielo coperto e della nebbia, di giorno e di notte (la notte di città, coi lampioni, è arancio)
+  const grigioGiorno = new T.Color(0xa7acb1), grigioNotte = new T.Color(0x1d1b1a), nebbiaFitta = new T.Color(0xb9bdc0), colCoperto = new T.Color(), colNotteNebbia = new T.Color(), lampo = new T.Color(0xdfe6ff)
   let autoX0 = null, verso = 1, finestreT = -1e9, finestreQuanto = 0
 
   const aggiorna = (t, dt) => {
@@ -146,32 +155,44 @@ export function luci(scene, renderer, h, M) {
     const dir = direzione(elEff, az)
     const giorno = Math.max(0, Math.min(1, Math.sin(elEff) * 6)) // 0 sotto l'orizzonte, 1 da ~10° in su
     sunLight.position.copy(dir).multiplyScalar(40).add(sunLight.target.position)
-    sunLight.intensity = 3.4 * giorno * (1 - s.notte) ** 1.5
+    // (le nuvole spengono il sole diretto: niente più ombre nette, la luce la fa il cielo)
+    const m = METEO, cop = Math.min(1, m.nuvole + 0.6 * m.nebbia)
+    sunLight.intensity = 3.4 * giorno * (1 - s.notte) ** 1.5 * (1 - 0.96 * m.nuvole ** 1.3) * (1 - 0.7 * m.nebbia)
     colSole.copy(caldo).lerp(bianco, Math.max(0, Math.min(1, elEff / (25 * RAD))))
     sunLight.color.copy(colSole)
     u.sunPosition.value.copy(dir)
+    u.turbidity.value = 4 + 14 * m.nuvole; u.rayleigh.value = 1.6 * (1 - 0.7 * m.nuvole); u.mieCoefficient.value = 0.004 + 0.02 * m.nuvole
     // il buio: la sera della pagina (--notte, 90 minuti attorno al tramonto) e il crepuscolo vero (da 6° sopra a 6° sotto l'orizzonte)
     const crepuscolo = Math.max(0, Math.min(1, 1 - (el + 6 * RAD) / (12 * RAD)))
     const buio = Math.max(s.notte, crepuscolo)
-    cieloLuce.intensity = 0.2 * (1 - buio) + 0.1 * buio
-    cieloLuce.color.copy(colCielo.copy(cieloGiorno).lerp(cieloNotte, buio))
+    // col cielo coperto la luce del cielo cresce e si fa grigia (e il lampo la accende tutta per un attimo)
+    // (dal 21.10 il posto è più chiaro: la luce del cielo, l'ambiente e l'esposizione di un terzo in più, giorno e notte)
+    cieloLuce.intensity = (0.28 * (1 - buio) + 0.14 * buio) * (1 + 4 * cop * (1 - 0.9 * buio)) + 7 * m.lampo
+    cieloLuce.color.copy(colCielo.copy(cieloGiorno).lerp(cieloNotte, buio)).lerp(colCoperto.copy(grigioGiorno).lerp(grigioNotte, buio), cop * 0.8).lerp(lampo, Math.min(1, m.lampo))
     cieloLuce.groundColor.copy(colTerra.copy(terraGiorno).lerp(terraNotte, buio))
-    scene.environmentIntensity = 0.12 * (1 - buio) + 0.06 * buio
-    scene.fog.color.copy(colNebbia.copy(nebbiaGiorno).lerp(nebbiaNotte, buio))
-    renderer.toneMappingExposure = (0.55 * (1 - buio) + 1.25 * buio) * REGIA.esposizione
-    aggiornaAmbiente(elEff, s.notte)
+    scene.environmentIntensity = (0.17 * (1 - buio) + 0.08 * buio) * (1 + 2 * cop * (1 - 0.9 * buio))
+    coperto.material.opacity = Math.min(0.97, 0.85 * m.nuvole + 0.5 * m.nebbia)
+    coperto.material.color.copy(grigioGiorno).lerp(grigioNotte, buio).lerp(lampo, Math.min(1, m.lampo * 1.5))
+    coperto.visible = coperto.material.opacity > 0.01
+    // la nebbia: lontana col sereno, a pochi metri con la nebbia vera (il muro è a 2,6 m: con la nebbia fitta ci si
+    // vede attraverso, velato), un po' più vicina con la pioggia e la neve
+    const fitta = Math.max(m.nebbia, 0.45 * Math.max(m.pioggia, m.neve))
+    scene.fog.far = 6 + 154 * (1 - fitta) ** 3
+    scene.fog.near = scene.fog.far * 0.25 * (1 - m.nebbia)
+    scene.fog.color.copy(colNebbia.copy(nebbiaGiorno).lerp(nebbiaFitta, fitta)).lerp(colNotteNebbia.copy(nebbiaNotte).lerp(grigioNotte, fitta), buio)
+    renderer.toneMappingExposure = (0.78 * (1 - buio) + 1.5 * buio) * (1 + 0.3 * cop * (1 - buio)) * REGIA.esposizione
+    aggiornaAmbiente(elEff, s.notte, cop)
 
-    // ── l'insegna: i tubi al neon, la loro luce sul pannello e sul muro ──
+    // ── l'insegna: le lettere accese e la loro luce sul muro ──
     // (la regia può accenderla di più o di meno)
     const ins = s.insegna * REGIA.neon
-    h.neon.accendi(ins)
-    h.pannello.emissiveIntensity = 0.5 * ins
+    h.lettere.accendi(ins)
     for (const l of h.luciInsegna) l.intensity = h.luceInsegna * ins
     // ── la lampada a muro, i lampioni, le finestre di fronte, le spie ──
-    h.lampada.intensity = 16 * s.lampioni
+    h.lampada.intensity = 20 * s.lampioni
     h.lampadina.material.emissiveIntensity = 8 * s.lampioni
-    if (h.lampione) h.lampione.intensity = 520 * s.lampioni
-    for (const l of h.lampioni) { if (l.luce) l.luce.intensity = 30 * s.lampioni; l.bulbo.material.emissiveIntensity = 6 * s.lampioni }
+    if (h.lampione) h.lampione.intensity = 650 * s.lampioni
+    for (const l of h.lampioni) { if (l.luce) l.luce.intensity = 38 * s.lampioni; l.bulbo.material.emissiveIntensity = 6 * s.lampioni }
     if (t - finestreT > 60000 || (buio > 0.3 && finestreQuanto === 0)) { finestreT = t; finestreQuanto = buio > 0.3 ? 0.3 + Math.random() * 0.35 : 0; for (const f of h.facciate) f.accendi(finestreQuanto) }
     for (const f of h.facciate) f.mat.emissiveIntensity = 1.3 * buio
     // il vetro della porta: di giorno riflette poco, di notte (dentro è buio) molto di più
@@ -210,7 +231,9 @@ export function luci(scene, renderer, h, M) {
     // l'insieme che serve adesso: le luci della notte quando la pagina ne accende una (o passa un'auto), il sole finché
     // sta sopra l'orizzonte
     const serve = s.notte > 0 || s.insegna > 0 || s.lampioni > 0 || c ? (giorno > 0 ? 'sera' : 'notte') : 'giorno'
-    return { buio, giorno, notte: s.notte, el: elEff, dir, auto: inMoto, fari: c ? s.autoL : 0, insieme: serve }
+    return { buio, giorno, notte: s.notte, el: elEff, dir, auto: inMoto, fari: c ? s.autoL : 0, lampioni: s.lampioni, insieme: serve }
   }
-  return { aggiorna, metti, attuale: () => insieme, sole: sunLight, adesso }
+  // rifai: il cielo come ambiente si rifà al prossimo aggiorna (scena.js, quando la scheda grafica ridà il contesto: la tela
+  // del PMREM è rinata vuota)
+  return { aggiorna, metti, attuale: () => insieme, sole: sunLight, adesso, rifai: () => { ultimoEl = 99 } }
 }

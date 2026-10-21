@@ -14,8 +14,12 @@
 //   (acqua.js). Un campo solo dice dove c'è acqua: la pietra intorno è più
 //   scura e lucida, l'acqua è lo specchio della strada (Reflector), più forte
 //   radente (Fresnel), increspato dal vento.
+import * as T from './lib/three.js'
 import { BAGNO } from './acqua.js'
 import { Z_FACCIATA } from './materiali.js'
+
+// il telaio del chiusino per le lastre (spazzatura.js lo mette: x e z del centro, mezzo lato)
+export const CHIUSINO = { value: new T.Vector4(0, 0, 0, 0) }
 
 export const LASTRE_GLSL = `
 float mH( vec2 p ) { p = fract( p * vec2( 233.34, 851.73 ) ); p += dot( p, p + 23.45 ); return fract( p.x * p.y ); }
@@ -25,30 +29,38 @@ float mN( vec2 p ) {
 }
 float mF( vec2 p ) { return 0.5 * mN( p ) + 0.25 * mN( p * 2.03 + 17.0 ) + 0.125 * mN( p * 4.01 + 31.0 ) + 0.125 * mN( p * 8.1 + 7.0 ); }
 // la lastra in cui cade p (x lungo il muro, y = z del mondo): xy il punto dentro la lastra (m), z la distanza dal bordo,
-// w il suo numero a caso; id le sue coordinate di lastra
+// w il suo numero a caso; id le sue coordinate di lastra. Le lastre intorno al chiusino (spazzatura.js: mChiusino, il
+// centro e mezzo lato del telaio quadrato, 0 se non c'è) sono tagliate su di lui: la fuga gli gira intorno
+uniform vec4 mChiusino;
 vec4 mLastra( vec2 p, out vec2 id ) {
   float z = p.y - ${Z_FACCIATA.toFixed(3)}, riga = floor( z / 0.4 ), x = p.x + mod( riga, 2.0 ) * 0.3, col = floor( x / 0.6 );
   id = vec2( col, riga );
   vec2 l = vec2( x - col * 0.6, z - riga * 0.4 );
-  return vec4( l, min( min( l.x, 0.6 - l.x ), min( l.y, 0.4 - l.y ) ), mH( id ) );
+  float bordo = min( min( l.x, 0.6 - l.x ), min( l.y, 0.4 - l.y ) );
+  vec2 dq = abs( p - mChiusino.xy ) - mChiusino.z;
+  if ( mChiusino.z > 0.0 ) bordo = min( bordo, max( max( dq.x, dq.y ), 0.0 ) );
+  return vec4( l, bordo, mH( id ) );
 }
-// dove c'è acqua: più di M_SOGLIA. Il terreno a chiazze, le lastre affondate (una su cinque, più o meno), le fughe che
-// tengono l'acqua vicino alle pozze, la pendenza verso il cordolo, la pozza della condensa (acqua.js)
-uniform vec3 mPozza;
+// dove c'è acqua: mAcqua > 0. Il terreno a chiazze, le lastre affondate (una su cinque, più o meno), le fughe che
+// tengono l'acqua vicino alle pozze, la pendenza verso il cordolo; quanta acqua c'è lo dice il meteo (mMeteo.x, il
+// bagnato: asciutto, niente pozze; piove, pozze larghe). La pozza della condensa (acqua.js) c'è sempre
+uniform vec3 mPozza; uniform vec4 mMeteo;
 float mCampo( vec2 p ) {
   vec2 id; vec4 L = mLastra( p, id );
   float c = mF( p * 1.3 + 4.0 ) + 0.06 * mF( p * 11.0 ) + 0.2 * smoothstep( 0.8, 1.0, mH( id + 3.7 ) ) + 0.3 * smoothstep( 1.65, 2.28, p.y );
-  c += 0.05 * ( 1.0 - smoothstep( 0.0, 0.008, L.z ) );
-  float dp = length( ( p - mPozza.xy ) * vec2( 1.0, 1.5 ) ) / max( mPozza.z, 0.01 );
-  return max( c, 0.9 - 0.3 * dp + 0.06 * mF( p * 9.0 ) );
+  return c + 0.05 * ( 1.0 - smoothstep( 0.0, 0.008, L.z ) );
 }
-const float M_SOGLIA = 0.69;
+float mGoccia( vec2 p ) {
+  float dp = length( ( p - mPozza.xy ) * vec2( 1.0, 1.5 ) ) / max( mPozza.z, 0.01 );
+  return 0.9 - 0.3 * dp + 0.06 * mF( p * 9.0 );
+}
+float mAcqua( vec2 p ) { return max( mCampo( p ) - ( 1.22 - 0.57 * mMeteo.x ), mGoccia( p ) - 0.69 ); }
 `
 
 // il materiale delle lastre: un MeshStandardMaterial a cui lo shader dà colore, ruvidezza e rilievo
 export const lastre = (m) => {
   m.onBeforeCompile = (sh) => {
-    sh.uniforms.mPozza = BAGNO.pozza
+    sh.uniforms.mPozza = BAGNO.pozza; sh.uniforms.mMeteo = BAGNO.meteo; sh.uniforms.mChiusino = CHIUSINO
     sh.vertexShader = 'varying vec3 vMondo;\n' + sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n vMondo = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;')
     sh.fragmentShader = 'varying vec3 vMondo;\n' + LASTRE_GLSL + sh.fragmentShader
       .replace('#include <color_fragment>', `#include <color_fragment>
@@ -78,13 +90,24 @@ export const lastre = (m) => {
       // la fuga: 6 mm di sabbia scura, netta a ogni distanza
       float mFw = fwidth( mL.z ) + 1e-5, mFuga = 1.0 - smoothstep( 0.003 - mFw, 0.003 + mFw, mL.z );
       mC = mix( mC, vec3( 0.075, 0.07, 0.065 ), mFuga );
-      // bagnato: tutto un po' (ha piovuto), a chiazze lucide, molto vicino alle pozze
-      float mAcqua = mCampo( mP ), mUmido = smoothstep( M_SOGLIA - 0.12, M_SOGLIA, mAcqua ), mVelo = smoothstep( 0.5, 0.62, mF( mP * 2.3 + 5.0 ) );
-      mC *= 0.76 * ( 1.0 - 0.18 * mVelo ) * ( 1.0 - 0.42 * mUmido );
+      // bagnato quanto dice il meteo: tutto un po', a chiazze lucide, molto vicino alle pozze
+      float mBagno = mMeteo.x, mUmido = smoothstep( -0.12, 0.0, mAcqua( mP ) ), mVelo = smoothstep( 0.5, 0.62, mF( mP * 2.3 + 5.0 ) ) * mBagno;
+      mC *= mix( 0.97, 0.76, mBagno ) * ( 1.0 - 0.18 * mVelo ) * ( 1.0 - 0.42 * mUmido );
+      // la neve per terra, solo quando c'è (sono tredici rumori a pixel: senza, il marciapiede andava a tre quarti): prima
+      // a chiazze (nelle fughe e dove le lastre sono basse resta di più), poi tutta; non un foglio bianco ma più e meno
+      // spessa, qualche chiazza pestata e grigia, le fughe che si indovinano finché è poca
+      float mNeve = 0.0;
+      if ( mMeteo.y > 0.002 ) {
+        mNeve = smoothstep( 0.0, 0.3, mMeteo.y * 1.4 - 0.45 + 0.5 * mF( mP * 2.6 + 9.0 ) + 0.15 * mFuga );
+        vec3 mBianco = vec3( 0.88, 0.9, 0.94 ) * ( 0.94 + 0.06 * mN( mP * 300.0 ) ) * ( 0.9 + 0.1 * mF( mP * 1.7 + 3.0 ) );
+        mBianco *= ( 1.0 - 0.3 * smoothstep( 0.55, 0.85, mF( mP * 0.9 + 21.0 ) ) ) * ( 1.0 - 0.14 * mFuga * ( 1.0 - smoothstep( 0.6, 1.0, mMeteo.y ) ) );
+        mC = mix( mC, mBianco, mNeve );
+      }
       diffuseColor.rgb = mC;`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
       // (mai sotto 0,2: una pietra lucidissima sui bordi smussati fa scintille, di notte; l'acqua vera è lo specchio)
-      roughnessFactor = mix( mix( mix( 0.5, 0.26, mVelo ), 0.92, mFuga ), 0.2, mUmido );`)
+      roughnessFactor = mix( mix( mix( mix( 0.62, 0.5, mBagno ), 0.26, mVelo ), 0.92, mFuga ), 0.2, mUmido * mBagno + mUmido * 0.3 );
+      roughnessFactor = mix( roughnessFactor, 0.85, mNeve );`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
       // (la telecamera non è ruotata: x e z del mondo sono x e z della vista) ogni lastra un po' storta, il bordo smussato,
       // la grana
@@ -92,7 +115,7 @@ export const lastre = (m) => {
       vec2 mB = vec2( mL.x < 0.3 ? 1.0 : -1.0, mL.y < 0.2 ? 1.0 : -1.0 ) * ( abs( mL.x - 0.3 ) > abs( mL.y - 0.2 ) * 1.5 ? vec2( 1.0, 0.0 ) : vec2( 0.0, 1.0 ) );
       mT += mB * 0.25 * ( 1.0 - smoothstep( 0.0, 0.01, mL.z ) ) * mMedia * ( 1.0 - mUmido );
       mT += ( vec2( mN( mP * 700.0 ), mN( mP * 700.0 + 5.0 ) ) - 0.5 ) * 0.12 * mFine;
-      normal = normalize( normal + vec3( mT.x, 0.0, mT.y ) );`)
+      normal = normalize( normal + vec3( mT.x, 0.0, mT.y ) * ( 1.0 - mNeve ) );`)
   }
   m.customProgramCacheKey = () => 'lastre'
   return m
@@ -102,7 +125,7 @@ export const lastre = (m) => {
 // mosso dal vento e più forte radente; sotto, la pietra bagnata si vede poco
 export const SPECCHIO_POZZE = {
   name: 'pozze',
-  uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, opacita: { value: 1 }, mPozza: BAGNO.pozza, mTempo: BAGNO.tempo },
+  uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, opacita: { value: 1 }, mPozza: BAGNO.pozza, mTempo: BAGNO.tempo, mMeteo: BAGNO.meteo, mChiusino: CHIUSINO },
   vertexShader: `uniform mat4 textureMatrix; varying vec4 vUv; varying vec3 vMondo;
     #include <common>
     #include <logdepthbuf_pars_vertex>
@@ -114,17 +137,27 @@ export const SPECCHIO_POZZE = {
     #include <logdepthbuf_pars_fragment>
     void main() {
     #include <logdepthbuf_fragment>
-      float c = mCampo( vMondo.xz ), w = fwidth( c ) * 1.2 + 0.0015, acqua = smoothstep( M_SOGLIA - w, M_SOGLIA + w, c );
+      // (sotto la neve l'acqua non si vede)
+      float c = mAcqua( vMondo.xz ), w = fwidth( c ) * 1.2 + 0.0015, acqua = smoothstep( -w, w, c ) * ( 1.0 - smoothstep( 0.25, 0.7, mMeteo.y ) );
       if ( acqua < 0.004 ) discard;
       // il vento increspa l'acqua: il riflesso trema un poco (più al largo che sul bordo)
       vec2 p = vMondo.xz * 14.0;
       vec2 n = vec2( mN( p + vec2( mTempo * 0.45, 0.0 ) ), mN( p * 1.3 + vec2( 3.0, mTempo * 0.33 ) ) ) - 0.5;
-      vec4 uv = vUv; uv.xy += n * 0.014 * smoothstep( M_SOGLIA, M_SOGLIA + 0.06, c ) * uv.w;
+      // la pioggia nelle pozze: in ogni cella di 9 cm, se piove abbastanza, un cerchio che si allarga e sparisce
+      vec2 cr = vMondo.xz / 0.09, ci = floor( cr ), cf = fract( cr ) - 0.5;
+      float hc = mH( ci + 13.0 ), anello = 0.0;
+      if ( hc < mMeteo.z * 0.9 ) {
+        vec2 c0 = ( vec2( mH( ci + 1.7 ), mH( ci + 4.1 ) ) - 0.5 ) * 0.2;
+        float t = fract( mTempo * ( 0.9 + hc ) + mH( ci + 9.3 ) ), dd = length( cf - c0 );
+        anello = exp( -pow( ( dd - t * 0.3 ) / 0.03, 2.0 ) ) * ( 1.0 - t );
+        n += ( cf - c0 ) / max( dd, 1e-3 ) * anello * 0.8;
+      }
+      vec4 uv = vUv; uv.xy += n * 0.014 * smoothstep( 0.0, 0.06, c ) * uv.w;
       vec3 rif = texture2DProj( tDiffuse, uv ).rgb * color;
       // Fresnel (dell'acqua, un po' più forte del vero) e l'acqua torbida scura dove non riflette
       vec3 v = normalize( cameraPosition - vMondo );
       float f = 0.04 + 0.96 * pow( 1.0 - clamp( v.y, 0.0, 1.0 ), 5.0 ), r = 0.38 + 0.62 * f;
-      gl_FragColor = vec4( rif * r + vec3( 0.012, 0.011, 0.009 ) * ( 1.0 - r ), acqua * opacita * 0.9 );
+      gl_FragColor = vec4( rif * r + vec3( 0.012, 0.011, 0.009 ) * ( 1.0 - r ) + anello * 0.06, acqua * opacita * 0.9 );
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
     }`,

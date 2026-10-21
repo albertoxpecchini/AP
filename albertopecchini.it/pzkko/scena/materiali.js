@@ -55,7 +55,10 @@ export const normaliDaAltezze = (alt, n, latoMetri, forza = 1) => {
 }
 
 // L'intonaco: calce con le onde larghe della cazzuola, la grana della sabbia, i
-// grumi, e il colore a chiazze della pittura vecchia. Un metro per tela.
+// grumi, e il colore a chiazze della pittura vecchia. Un metro per tela. Nell'alfa
+// (dal 21.10) le crepe: righe sottili che vanno a zig zag e si ramificano, scritte
+// come trasparenza (1 = niente crepa); intonacoVivo (sotto) le legge e le fa vedere
+// solo a zone, così non si vede che si ripetono ogni metro.
 export const intonaco = (n = 512, seme = 7) => {
   const alt = new Float32Array(n * n), c = tela(n), ctx = c.getContext('2d'), img = ctx.createImageData(n, n), d = img.data
   for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
@@ -70,7 +73,90 @@ export const intonaco = (n = 512, seme = 7) => {
     d[i] = 255 * Math.min(1, l * 1.0); d[i + 1] = 255 * Math.min(1, l * 0.94); d[i + 2] = 255 * Math.min(1, l * 0.85); d[i + 3] = 255
   }
   ctx.putImageData(img, 0, 0)
+  // le crepe: sei passeggiate a caso (col seme), che deviano a ogni passo e ogni tanto si biforcano, dal tratto che si
+  // assottiglia; stanno dentro la tela (non attraversano il bordo: la tela si ripete e la crepa non deve saltare). Si
+  // tolgono dall'alfa (destination-out), mai del tutto: con l'alfa a zero il colore sotto andrebbe perso
+  ctx.globalCompositeOperation = 'destination-out'
+  ctx.lineCap = 'round'
+  let k = 0
+  const caso = () => hash(k++, seme, 977)
+  const crepa = (x, y, dir, passi, larg) => {
+    for (let p = 0; p < passi; p++) {
+      dir += (caso() - 0.5) * 0.9
+      const nx = x + Math.cos(dir) * (3 + caso() * 5), ny = y + Math.sin(dir) * (3 + caso() * 5)
+      if (nx < 12 || ny < 12 || nx > n - 12 || ny > n - 12) return
+      const w = larg * (1 - p / passi) + 0.5
+      ctx.strokeStyle = `rgba(0,0,0,${(0.85 * Math.min(1, w)).toFixed(2)})`; ctx.lineWidth = Math.max(0.6, w)
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke()
+      x = nx; y = ny
+      if (p > 4 && caso() < 0.06 && larg > 0.9) crepa(x, y, dir + (caso() < 0.5 ? 1 : -1) * (0.7 + caso() * 0.8), Math.round(passi * 0.4), larg * 0.6)
+    }
+  }
+  for (let c = 0; c < 6; c++) crepa(40 + caso() * (n - 80), 40 + caso() * (n - 80), caso() * Math.PI * 2, 30 + Math.round(caso() * 60), 1.1 + caso() * 0.6)
+  ctx.globalCompositeOperation = 'source-over'
   return { map: trama(c), normalMap: normaliDaAltezze(alt, n, 1, 1), lato: 1 }
+}
+
+// L'intonaco vero (21.10), nello shader della facciata, in coordinate del mondo (x lungo la facciata, y da terra):
+// - la stessa trama letta anche a una scala di 9 m (una lettura in più) rompe la ripetizione ogni 4 m del colore, e fa
+//   le chiazze larghe dello sporco, più ruvide;
+// - le crepe dell'alfa della trama, solo nelle zone che dice un rumore largo (così non si vede che tornano ogni metro);
+// - le colature della pioggia: righe verticali sottili, su tutta la facciata appena, più scure sotto i davanzali delle
+//   finestre e sotto il cassonetto dell'insegna (davanzali: x del centro, y, mezza larghezza);
+// - la pittura che si scrosta a chiazze dal bordo netto (col filo d'ombra del bordo), sotto il cemento grigio;
+// - l'intonaco caduto (buchi: x, y del centro, mezzi assi): dentro i mattoni coi giunti di malta, l'ombra dell'orlo.
+// Tutto rumore di valori (quattro hash per lettura) su una decina di letture: la facciata è un terzo dello schermo, e
+// il bagnato di acqua.js fa lo stesso. Va messo prima di bagnato(m, 1), che lo incatena. I colori scritti qui sono
+// lineari (diffuseColor lo è: l'intonaco chiaro sta a ~0,23): il cemento e i mattoni devono stare sotto.
+export const intonacoVivo = (m, { davanzali = [], buchi = [] } = {}) => {
+  const f = (x) => Number(x).toFixed(3)
+  const DAV = davanzali.map(([x, y, hw]) => `iSotto = max( iSotto, ( 1.0 - smoothstep( 0.0, 0.9, ${f(y)} - iP.y ) ) * step( iP.y, ${f(y)} ) * ( 1.0 - smoothstep( ${f(hw - 0.1)}, ${f(hw + 0.15)}, abs( iP.x - ${f(x)} ) ) ) );`).join('\n')
+  const BUCHI = buchi.map(([x, y, rx, ry]) => `{ float d = length( ( iP - vec2( ${f(x)}, ${f(y)} ) ) / vec2( ${f(rx)}, ${f(ry)} ) ) + 0.45 * ( iN( iP * 6.0 + 1.0 ) - 0.5 ) + 0.2 * ( iN( iP * 20.0 ) - 0.5 ); iBuco = max( iBuco, 1.0 - smoothstep( 0.97, 1.0, d ) ); iBordo = max( iBordo, smoothstep( 0.72, 1.0, d ) ); iAlone = max( iAlone, 1.0 - smoothstep( 1.0, 1.35, d ) ); }`).join('\n')
+  m.onBeforeCompile = (sh) => {
+    sh.vertexShader = 'varying vec3 vMuroPos;\n' + sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n vMuroPos = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;')
+    sh.fragmentShader = `varying vec3 vMuroPos;
+float iH( vec2 p ) { p = fract( p * vec2( 311.7, 173.3 ) ); p += dot( p, p + 19.19 ); return fract( p.x * p.y ); }
+float iN( vec2 p ) {
+  vec2 i = floor( p ), f = fract( p ); f = f * f * ( 3.0 - 2.0 * f );
+  return mix( mix( iH( i ), iH( i + vec2( 1.0, 0.0 ) ), f.x ), mix( iH( i + vec2( 0.0, 1.0 ) ), iH( i + vec2( 1.0, 1.0 ) ), f.x ), f.y );
+}
+` + sh.fragmentShader
+      .replace('#include <map_fragment>', `
+  vec4 iS = texture2D( map, vMapUv );
+  diffuseColor.rgb *= iS.rgb;
+  vec2 iP = vMuroPos.xy;
+  float iMac = dot( texture2D( map, iP * 0.11 + vec2( 0.37, 0.71 ) ).rgb, vec3( 0.333 ) );
+  float iN1 = iN( iP * 0.45 + 2.0 ), iN2 = iN( iP * 1.7 + 9.0 );
+  float iSporco = smoothstep( 0.45, 0.9, 0.5 * iN1 + 0.3 * iN2 + 0.4 * ( 0.55 - iMac ) );
+  diffuseColor.rgb *= ( 0.8 + 0.45 * iMac ) * ( 1.0 - 0.16 * iSporco );
+  float iCrepa = ( 1.0 - iS.a ) * smoothstep( 0.42, 0.6, iN( iP * 0.8 + 5.0 ) );
+  diffuseColor.rgb *= 1.0 - 0.55 * iCrepa;
+  float iRighe = iN( vec2( iP.x * 9.0, iP.y * 0.35 ) ) * iN( vec2( iP.x * 23.0 + 5.0, iP.y * 0.9 ) );
+  float iSotto = 0.0;
+  ${DAV}
+  diffuseColor.rgb *= 1.0 - ( 0.1 + 0.3 * iSotto ) * smoothstep( 0.22, 0.6, iRighe );
+  float iSf = 0.6 * iN( iP * 9.0 + 7.0 ) + 0.4 * iN( iP * 23.0 + 3.0 );
+  float iZona = smoothstep( 0.5, 0.75, iN( iP * 0.6 + 11.0 ) );
+  float iScrost = smoothstep( 0.66, 0.675, iSf ) * iZona;
+  float iOrlo = ( smoothstep( 0.645, 0.66, iSf ) - smoothstep( 0.66, 0.675, iSf ) ) * iZona;
+  vec3 iCemento = vec3( 0.13, 0.12, 0.105 ) * ( 0.75 + 0.5 * iN( iP * 40.0 ) );
+  diffuseColor.rgb = mix( diffuseColor.rgb, iCemento, iScrost ) * ( 1.0 - 0.3 * iOrlo );
+  float iBuco = 0.0, iBordo = 0.0, iAlone = 0.0;
+  ${BUCHI}
+  diffuseColor.rgb *= 1.0 - 0.25 * iAlone * ( 1.0 - iBuco );
+  if ( iBuco > 0.0 ) {
+    float riga = floor( iP.y / 0.065 ), fy = fract( iP.y / 0.065 );
+    float xx = iP.x + mod( riga, 2.0 ) * 0.125, col = floor( xx / 0.25 ), fx = fract( xx / 0.25 );
+    float malta = max( 1.0 - smoothstep( 0.12, 0.16, fy ), 1.0 - smoothstep( 0.035, 0.05, fx ) );
+    vec3 mattone = vec3( 0.24, 0.095, 0.055 ) * ( 0.6 + 0.8 * iH( vec2( col, riga ) ) ) * ( 0.8 + 0.4 * iN( iP * 45.0 ) );
+    vec3 dentro = mix( mattone, vec3( 0.15, 0.14, 0.12 ) * ( 0.7 + 0.5 * iN( iP * 25.0 ) ), malta );
+    dentro *= 1.0 - 0.6 * iBordo;
+    diffuseColor.rgb = mix( diffuseColor.rgb, dentro, iBuco );
+  }`)
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n roughnessFactor = min( 1.0, roughnessFactor + 0.12 * iSporco + 0.2 * iScrost + 0.1 * iBuco );')
+  }
+  m.customProgramCacheKey = () => `intonacoVivo:${DAV.length}:${BUCHI.length}`
+  return m
 }
 
 // L'asfalto: grana fine e scura, qualche rappezzo.
@@ -201,8 +287,11 @@ export const scritta = (righe, { larg = 512, alt = 256, font = '700 90px "Archiv
 // fotogramma da luci.js, scena.js, bestie.js e acqua.js. Uno solo, su window: la regia lo scrive anche se si apre
 // prima che la scena ci sia
 export const REGIA = (window.pzkkoRegia ??= {
-  esposizione: 1, bagliore: 1, neon: 1, specchi: true,
+  esposizione: 1, bagliore: 1, neon: 1, specchi: true, vetrina: true,
   bestie: { formiche: true, mosche: true, zanzare: true, blatte: true }, blatteDiGiorno: false, velocitaBestie: 1, goccia: 1,
+  // il meteo (meteo.js): null = quello vero di Mantova, o uno scelto (sole, nuvoloso, nebbia, pioggia, temporale, neve)
+  // con la sua intensità; il bagnato e la neve per terra (null = col meteo)
+  meteo: null, intensita: 0.6, bagnato: null, manto: null,
 })
 
 // la facciata sta 10 cm più avanti della saracinesca (z = 0)

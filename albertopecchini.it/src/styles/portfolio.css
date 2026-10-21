@@ -1267,6 +1267,141 @@
   }
 }
 
+/* il fun fact: la foto vera a sinistra, il racconto accanto */
+.cs-fun {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.cs-fun__photo {
+  justify-self: center;
+  width: min(100%, 21rem);
+}
+
+.cs-fun__copy {
+  display: grid;
+  gap: 1.25rem;
+  align-content: center;
+}
+
+.cs-fun__copy > p:not(.label) {
+  max-width: 62ch;
+}
+
+@media (min-width: 768px) {
+  .cs-fun {
+    grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: center;
+  }
+
+  .cs-fun__photo {
+    width: 100%;
+  }
+}
+
+/* la Live Photo, come sull'iPhone: la foto ferma, e al passaggio (o tenendo premuto, o col tasto LIVE) i tre
+   secondi di video intorno allo scatto; finito, torna la foto (src/client/live.js) */
+.live__frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-1);
+  background: var(--line);
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.live__frame img,
+.live__frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.live__frame video {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.6s var(--ease-out);
+}
+
+.live.is-playing video {
+  opacity: 1;
+}
+
+.live.is-playing img,
+.live.is-playing video {
+  transform: scale(1.025);
+}
+
+.live__badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem 0.3rem 0.4rem;
+  border: 0;
+  border-radius: 99px;
+  background: rgb(245 245 245 / 0.8);
+  backdrop-filter: blur(8px);
+  color: #1c1c1e;
+  font: 600 0.7rem/1 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.live__badge svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+.live__badge .live__dot {
+  fill: currentColor;
+  stroke: none;
+}
+
+.live.is-playing .live__badge svg {
+  animation: live-gira 2.5s linear infinite;
+}
+
+@keyframes live-gira {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.cs-fun__photo .media__caption {
+  margin-top: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live__frame img,
+  .live__frame video {
+    transition: none;
+  }
+
+  .live.is-playing img,
+  .live.is-playing video {
+    transform: none;
+  }
+
+  .live.is-playing .live__badge svg {
+    animation: none;
+  }
+}
+
 .cs-data {
   display: grid;
   gap: 0;

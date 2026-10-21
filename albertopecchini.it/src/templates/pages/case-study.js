@@ -22,12 +22,15 @@ const SECTIONS = [
 // Le sezioni di un progetto: con le tavole vere, prima della galleria c'è «Tavole»
 // (il visualizzatore dei DWG e dei PDF, solo con `showSheets` acceso in
 // projects.js); con le fotografie o con la pagina intera su iPhone si aggiunge una
-// sezione subito dopo la galleria.
+// sezione subito dopo la galleria; con un fun fact (da dove è nato il progetto),
+// una sezione subito dopo la strategia.
 const sectionsOf = (p) =>
   SECTIONS.flatMap(([id, label]) =>
     id === 'galleria'
       ? [...(p.sheets ? [['tavole', 'Tavole']] : []), [id, label], ...(p.photos ? [['fotografie', 'Fotografie']] : []), ...(p.iphone ? [['iphone', 'iPhone']] : [])]
-      : [[id, label]],
+      : id === 'strategia' && p.funFact
+        ? [[id, label], ['funfact', 'Fun fact']]
+        : [[id, label]],
   )
 
 // Le figurine delle sezioni dei progetti web (tools/figurine, foglio «computer»).
@@ -82,6 +85,29 @@ function iphoneSection(p) {
       <div class="cs-iphone__copy">
         <p class="cs-lead" data-reveal="up">${esc(p.iphone.lead)}</p>
         <p class="label cs-gallery__hint cs-iphone__hint" data-reveal="up">${icon('arrowDown')} Passa sopra lo schermo o raggiungilo con Tab: la pagina scorre fino in fondo · sul telefono tocca per avviare, ritocca per tornare in cima</p>
+      </div>
+    </div>
+  `
+}
+
+/** Il fun fact: la foto vera da cui è nato il progetto, che è una Live Photo (src/client/live.js), e il racconto. */
+function funFactSection(p) {
+  const f = p.funFact
+  return html`
+    <div class="cs-fun">
+      <figure class="cs-fun__photo live" data-live data-reveal="up">
+        <div class="live__frame">
+          <img src="${f.photo.src}"${f.photo.small ? ` srcset="${f.photo.small} 540w, ${f.photo.src} ${f.photo.w}w" sizes="(min-width: 768px) 21rem, 90vw"` : ''} width="${f.photo.w}" height="${f.photo.h}" alt="${esc(f.photo.alt)}" loading="lazy" decoding="async">
+          <video src="${f.photo.live}" muted playsinline disablepictureinpicture preload="none" aria-hidden="true" tabindex="-1"></video>
+          <button class="live__badge" type="button" aria-label="Guarda la Live Photo"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="live__dot" cx="10" cy="10" r="2.6"/><circle cx="10" cy="10" r="5.2"/><circle cx="10" cy="10" r="8.2" stroke-dasharray="1.6 1.6"/></svg>LIVE</button>
+        </div>
+        <figcaption class="media__caption label">${esc(f.caption)}</figcaption>
+      </figure>
+      <div class="cs-fun__copy">
+        <p class="cs-lead" data-reveal="up">${esc(f.lead)}</p>
+        <p data-reveal="up">${esc(f.text)}</p>
+        <p class="label cs-gallery__hint" data-reveal="up">Passa sopra la foto o tienila premuta: parte la Live Photo, i tre secondi intorno allo scatto</p>
+        ${f.link ? `<div data-reveal="up">${button({ href: f.link.href, label: f.link.label, variant: 'ghost', iconName: 'arrowUpRight', external: true })}</div>` : ''}
       </div>
     </div>
   `
@@ -155,6 +181,7 @@ export function caseStudyPage(p) {
           ${p.typefaces ? `<div class="cs-block" data-reveal="up"><p class="label">Tipografia</p>${specimens(p.typefaces)}</div>` : ''}
         `,
       )}
+      ${p.funFact ? section('funfact', funFactSection(p), 'cs-sec--tint', 'tint') : ''}
       ${section(
         'sviluppo',
         html`

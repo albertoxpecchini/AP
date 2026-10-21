@@ -25,24 +25,31 @@
 //       [--dopo=chiave] [--larg=230] [--mlarg=150]
 //       un manifesto (o un graffito, un resto di nastro) già in art/, nelle pile
 //   node tools/pzkko/serranda.mjs rifai [--senza-foto]
-//       disponi.mjs tutto, genera-404.mjs, scena/cattura.mjs e le foto della scena 3D in tools/pzkko/lavoro/
-//       (computer in cima, a metà e in fondo; telefono a un terzo), da guardare prima di pubblicare
+//       disponi.mjs tutto, genera-404.mjs, genera-storia.mjs e disponi.mjs tutto --pagina=storia, scena/cattura.mjs,
+//       scena/carico.mjs (le foto del caricamento, della home e della storia) e le foto della scena 3D in
+//       tools/pzkko/lavoro/ (computer in cima, a metà e in fondo; telefono a un terzo; la storia in cima), da guardare
+//       prima di pubblicare
 //
 //   --prova (con volantino, pezzo, allunga, comprimi): dice cosa farebbe e non scrive niente
+//   --pagina=storia (con stato, allunga, comprimi): il muro della storia (pzkko/storia/, le sue pile in
+//       storia/disposizione.js); i suoi fogli si scrivono a mano lì, volantino e pezzo sono solo per la home
 //
 // Dalla cartella albertopecchini.it. Servono `npm ci` lì (sharp) e in tools/catture (puppeteer-core), e un browser
 // (Chromium di Playwright o Edge: browser.mjs).
-import { readFile, writeFile } from 'node:fs/promises'
+import { readFile, writeFile, unlink } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { calcola } from './disponi.mjs'
+import { calcola, PAGINE } from './disponi.mjs'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
 const SITO = join(QUI, '../..')
-const PAGINA = join(SITO, 'pzkko/index.html'), DISP = join(QUI, 'disposizione.js')
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith(`--${n}=`)); return a ? a.slice(n.length + 3) : d }
+// la pagina col muro: la home, o con --pagina=storia la storia (disponi.mjs, PAGINE)
+const pagina = arg('pagina', 'home')
+if (!PAGINE[pagina]) { console.error(`serranda: --pagina=${Object.keys(PAGINE).join('|')}`); process.exit(1) }
+const PAGINA = PAGINE[pagina].file, DISP = PAGINE[pagina].disp
 const ha = (n) => process.argv.includes(`--${n}`)
 const prova = ha('prova')
 const [cmd = 'stato', primo] = process.argv.slice(2).filter((a) => !a.startsWith('--'))
@@ -100,13 +107,13 @@ const giro = () => { const g = 1.5 + Math.random() * 2.5; return Math.round((Mat
 
 // ── i comandi ────────────────────────────────────────────────────────────────
 async function stato() {
-  const { d, m, html } = await calcola()
+  const { d, m, html } = await calcola(pagina)
   const testo = await readFile(DISP, 'utf8')
   for (const [vista, r, nome] of [['desk', d, 'computer (1280 unità di larghezza)'], ['mob', m, 'telefono (390 unità)']]) {
     const scritta = vista === 'desk' ? html.match(/\.parete\{position:relative;height:calc\((\d+) \* var/)?.[1] : html.match(/\.parete\{height:calc\((\d+) \* var\(--u\)\);max-width:600px/)?.[1]
     const { attuali } = manopole(testo, vista)
     console.log(`\n${nome}`)
-    console.log(`  parete: ${scritta} unità in index.html, ${r.parete} dalle pile → saracinesca 3D alta ${(r.parete * METRI[vista]).toFixed(2)} m`)
+    console.log(`  parete: ${scritta} unità in ${pagina === 'home' ? 'index.html' : 'storia/index.html'}, ${r.parete} dalle pile → saracinesca 3D alta ${(r.parete * METRI[vista]).toFixed(2)} m`)
     console.log(`  manopole: ${Object.entries(attuali).map(([k, v]) => `${k} ${v}`).join(', ')}`)
     r.spec.cols.forEach((c, i) => console.log(`  colonna ${i} (x ${c.x}): ${String(c.items.length).padStart(2)} pezzi, finisce a ${r.fondi[i]}, libere in fondo ${r.parete - r.fondi[i]} unità${i === piuCorta(r.fondi) ? '  ← la più corta' : ''}`))
   }
@@ -152,7 +159,11 @@ const misure = async (img) => {
   return { w: m.width, h: m.height }
 }
 
+// (volantino e pezzo sanno dove si scrive nella home; i fogli della storia si scrivono a mano)
+const soloHome = (cmd) => { if (pagina !== 'home') throw new Error(`${cmd}: solo per la home; i fogli della storia si scrivono in pzkko/storia/index.html e tools/pzkko/storia/disposizione.js`) }
+
 async function volantino() {
+  soloHome('volantino')
   const titolo = arg('titolo')
   if (!titolo) throw new Error('volantino: --titolo="…"')
   let html = await readFile(PAGINA, 'utf8'), testo = await readFile(DISP, 'utf8')
@@ -164,7 +175,7 @@ async function volantino() {
   if (!CARTE.includes(carta)) throw new Error(`carta: una di ${CARTE.join(', ')}`)
   const larg = Number(arg('larg', 260)), mlarg = Number(arg('mlarg', 185)), r = giro(), marker = arg('marker', '#a50d25')
   const righe = []
-  if (arg('arte')) { const { w, h } = await misure(arg('arte')); righe.push(`<img class="arte" src="/art/${arg('arte')}.webp" alt="" width="${w}" height="${h}" style="--aw:${arg('aw', 44)}%">`) }
+  if (arg('arte')) { const { w, h } = await misure(arg('arte')); righe.push(`<img class="arte" loading="lazy" src="/art/${arg('arte')}.webp" alt="" width="${w}" height="${h}" style="--aw:${arg('aw', 44)}%">`) }
   righe.push(arg('link') ? `<h3><a href="${esc(arg('link'))}" rel="noopener" target="_blank">${esc(titolo)}</a></h3>` : `<h3>${esc(titolo)}</h3>`)
   if (arg('testo')) righe.push(`<p>${esc(arg('testo'))}</p>`)
   if (arg('handle')) righe.push(`<p class="handle">${esc(arg('handle'))}</p>`)
@@ -197,6 +208,7 @@ ${rientro}</article>
 }
 
 async function pezzo() {
+  soloHome('pezzo')
   const img = arg('img'), tipo = arg('tipo', 'man')
   if (!img) throw new Error('pezzo: --img=manifesti2/x (sotto art/, senza .webp)')
   let html = await readFile(PAGINA, 'utf8'), testo = await readFile(DISP, 'utf8')
@@ -217,7 +229,7 @@ async function pezzo() {
 
 // la riga nelle pile del computer e del telefono: nella colonna chiesta o nella più corta, dopo `dopo` o in fondo
 async function nellePile(testo, rigaD, rigaM) {
-  const { d, m } = await calcola()
+  const { d, m } = await calcola(pagina)
   const cd = arg('colonna') !== undefined ? Number(arg('colonna')) : piuCorta(d.fondi)
   const cm = arg('mcolonna') !== undefined ? Number(arg('mcolonna')) : piuCorta(m.fondi)
   const dopo = arg('dopo') ?? null
@@ -229,7 +241,27 @@ async function nellePile(testo, rigaD, rigaM) {
 
 const scrivi = async (testo) => { if (prova) console.log('(--prova: niente scritto)'); else await writeFile(DISP, testo) }
 
+// Un rifai alla volta: due insieme (il 21.10, da due sessioni) si riscrivono a vicenda index.html, le foto dei
+// volantini e quelle del caricamento, e le foto di uno vengono metà con la parete di prima e metà con quella nuova.
+// Il lucchetto è il pid di chi lavora; se quel processo non c'è più (fermato a metà) il lucchetto non vale.
+const LUCCHETTO = join(QUI, 'lavoro/rifai.lucchetto')
+async function chiudi() {
+  for (;;) {
+    try { await writeFile(LUCCHETTO, String(process.pid), { flag: 'wx' }); return } catch (e) { if (e.code !== 'EEXIST') throw e }
+    const pid = Number(await readFile(LUCCHETTO, 'utf8').catch(() => 0))
+    let vivo = false
+    try { process.kill(pid, 0); vivo = pid > 0 } catch {}
+    if (vivo) throw new Error(`c'è già un rifai in corso (processo ${pid}): aspetta che finisca (se sei sicuro che non c'è, cancella ${LUCCHETTO})`)
+    await unlink(LUCCHETTO).catch(() => {})
+  }
+}
+
 async function rifai() {
+  await chiudi()
+  try { await rifaiTutto() } finally { await unlink(LUCCHETTO).catch(() => {}) }
+}
+
+async function rifaiTutto() {
   const passo = (titolo, args) => {
     console.log(`\n── ${titolo}`)
     const r = spawnSync(process.execPath, args, { cwd: SITO, stdio: 'inherit' })
@@ -237,12 +269,17 @@ async function rifai() {
   }
   passo('la disposizione, misurata nel browser', ['tools/pzkko/disponi.mjs', 'tutto', '--foto'])
   passo('la 404', ['tools/pzkko/genera-404.mjs'])
+  // la storia: rifatta dalla home (il suo CSS e il suo script cambiano con lei), poi le sue pile, misurate
+  passo('la storia', ['tools/pzkko/genera-storia.mjs'])
+  passo('la disposizione della storia', ['tools/pzkko/disponi.mjs', 'tutto', '--foto', '--pagina=storia'])
   passo('le foto dei volantini per la scena 3D', ['tools/pzkko/scena/cattura.mjs'])
+  // (la foto del caricamento è la strada da lontano: con la parete più alta o più bassa non coinciderebbe più)
+  passo('le foto del caricamento', ['tools/pzkko/scena/carico.mjs'])
   if (!ha('senza-foto')) {
-    for (const [nome, a] of [['serranda-cima', ['--scroll=0']], ['serranda-meta', ['--scroll=0.5']], ['serranda-fondo', ['--scroll=1']], ['serranda-telefono', ['--larg=390', '--alt=844', '--dpr=2', '--scroll=0.3']]]) {
+    for (const [nome, a] of [['serranda-cima', ['--scroll=0']], ['serranda-meta', ['--scroll=0.5']], ['serranda-fondo', ['--scroll=1']], ['serranda-telefono', ['--larg=390', '--alt=844', '--dpr=2', '--scroll=0.3']], ['serranda-storia', ['--pagina=/storia/', '--scroll=0']]]) {
       passo(`la scena 3D: ${nome}`, ['tools/pzkko/scena/foto.mjs', '--ora=12:00', `--nome=${nome}`, ...a])
     }
-    console.log('\nguarda tools/pzkko/lavoro/scena-serranda-*.png (e muro-desk.png, muro-mob.png per la pagina senza 3D)')
+    console.log('\nguarda tools/pzkko/lavoro/scena-serranda-*.png (e muro-desk.png, muro-mob.png, storia-desk.png e storia-mob.png per le pagine senza 3D)')
   }
 }
 

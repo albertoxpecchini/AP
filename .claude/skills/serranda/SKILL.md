@@ -21,7 +21,7 @@ node tools/pzkko/serranda.mjs volantino --titolo="…" --testo="…" [--link=URL
 node tools/pzkko/serranda.mjs pezzo --img=manifesti2/x [--tipo=man|tag|pezzo] [--colonna=N] [--dopo=chiave]
 node tools/pzkko/serranda.mjs allunga --sopra=400        # spazio nuovo in cima (tutto scende); --sotto, --minimo; --telefono / --entrambi
 node tools/pzkko/serranda.mjs comprimi 10                # le pile si sovrappongono del 10% in più; --scala=0.9; --annulla
-node tools/pzkko/serranda.mjs rifai                      # disponi + 404 + foto dei volantini + foto 3D di prova
+node tools/pzkko/serranda.mjs rifai                      # disponi + 404 + foto dei volantini + foto del caricamento + foto 3D di prova
 ```
 
 `--prova` su volantino, pezzo, allunga e comprimi mostra cosa farebbe senza scrivere.
@@ -37,7 +37,9 @@ node tools/pzkko/serranda.mjs rifai                      # disponi + 404 + foto 
    `comprimi P` (pile più fitte), poi di nuovo `stato`.
 4. `rifai`: serve un browser (Chromium di Playwright o Edge, `tools/pzkko/browser.mjs`) e
    `npm ci` in `albertopecchini.it/` e in `tools/catture/`. Misura le altezze vere,
-   rigenera `404.html`, rifà le foto in `pzkko/art/scena/vol*`, fotografa la scena.
+   rigenera `404.html`, rifà le foto in `pzkko/art/scena/vol*` e le foto del caricamento
+   (`pzkko/art/scena/carico/`, la strada da lontano: dipendono dall'altezza della parete),
+   fotografa la scena.
 5. Guarda le foto con Read: `tools/pzkko/lavoro/scena-serranda-{cima,meta,fondo,telefono}.png`
    (3D) e `muro-desk.png`, `muro-mob.png` (la pagina senza 3D). Controlla che niente
    copra i link dei volantini veri, che il pezzo nuovo si veda e si legga nella scena 3D
@@ -52,4 +54,11 @@ node tools/pzkko/serranda.mjs rifai                      # disponi + 404 + foto 
 - Le manopole (top, bottom, minimo, passo, scala) stanno in una riga di `DESK` e `MOB`
   in `disposizione.js`, scritta da `serranda.mjs`: si possono cambiare anche a mano.
 - La 404 non ha i pezzi nuovi (ha il suo muro corto), ma va rigenerata (lo fa `rifai`).
+- La storia (`pzkko/storia/`, pzkko.it/storia/) è la home con un altro muro: stesso CSS,
+  stesso script, stessa scena 3D, rifatta dalla home da `tools/pzkko/genera-storia.mjs`
+  (lo fa `rifai`, con le sue pile, le sue foto dei fogli e del caricamento). Le sue pile
+  stanno in `tools/pzkko/storia/disposizione.js`; `stato`, `allunga` e `comprimi` ci
+  lavorano con `--pagina=storia`. I suoi fogli si scrivono a mano in `storia/index.html`,
+  dentro `<div class="parete storia">` e con un id `storia-…` (non con `volantino` o `pezzo`).
+  Dopo `rifai` guarda anche `scena-serranda-storia.png`, `storia-desk.png` e `storia-mob.png`.
 - Non fare commit né push se Alberto non lo chiede: ogni push su `main` va online.

@@ -1,7 +1,7 @@
 {
  "alberto-pecchini": {
   "w": 410,
-  "h": 608,
+  "h": 592,
   "m": 28,
   "cw": 176.72,
   "scala": 2,
@@ -9,7 +9,7 @@
  },
  "better-call-pekko": {
   "w": 410,
-  "h": 640,
+  "h": 638,
   "m": 28,
   "cw": 176.72,
   "scala": 2,
@@ -17,7 +17,7 @@
  },
  "rivalta-sul-mincio": {
   "w": 410,
-  "h": 584,
+  "h": 582,
   "m": 28,
   "cw": 176.72,
   "scala": 2,
@@ -25,7 +25,7 @@
  },
  "cascina-fontana": {
   "w": 410,
-  "h": 622,
+  "h": 598,
   "m": 28,
   "cw": 176.72,
   "scala": 2,
@@ -41,11 +41,64 @@
  },
  "ti-serve-un-sito": {
   "w": 404,
-  "h": 576,
+  "h": 546,
   "m": 28,
   "cw": 173.91,
   "scala": 2,
   "tagliandi": null
+ },
+ "da-dove-viene-questo-muro": {
+  "w": 404,
+  "h": 712,
+  "m": 28,
+  "cw": 173.91,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "vendo-il-ciao": {
+  "w": 410,
+  "h": 752,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": [
+   {
+    "x": 64,
+    "y": 601,
+    "w": 45,
+    "h": 92
+   },
+   {
+    "x": 108,
+    "y": 601,
+    "w": 47,
+    "h": 92
+   },
+   {
+    "x": 155,
+    "y": 601,
+    "w": 47,
+    "h": 92
+   },
+   {
+    "x": 202,
+    "y": 601,
+    "w": 47,
+    "h": 92
+   },
+   {
+    "x": 249,
+    "y": 601,
+    "w": 47,
+    "h": 92
+   },
+   {
+    "x": 296,
+    "y": 601,
+    "w": 47,
+    "h": 92
+   }
+  ]
  },
  "chi-sono": {
   "w": 436,
@@ -192,7 +245,7 @@
  },
  "e-mail": {
   "w": 404,
-  "h": 608,
+  "h": 610,
   "m": 28,
   "cw": 173.91,
   "scala": 2,
@@ -237,7 +290,7 @@
  },
  "un-caffe": {
   "w": 404,
-  "h": 634,
+  "h": 636,
   "m": 28,
   "cw": 173.91,
   "scala": 2,
@@ -280,6 +333,51 @@
    }
   ]
  },
+ "tiktok": {
+  "w": 410,
+  "h": 616,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": [
+   {
+    "x": 35,
+    "y": 473,
+    "w": 52,
+    "h": 92
+   },
+   {
+    "x": 87,
+    "y": 473,
+    "w": 54,
+    "h": 92
+   },
+   {
+    "x": 140,
+    "y": 473,
+    "w": 54,
+    "h": 92
+   },
+   {
+    "x": 194,
+    "y": 473,
+    "w": 54,
+    "h": 92
+   },
+   {
+    "x": 248,
+    "y": 473,
+    "w": 54,
+    "h": 92
+   },
+   {
+    "x": 301,
+    "y": 473,
+    "w": 54,
+    "h": 92
+   }
+  ]
+ },
  "blackjack": {
   "w": 418,
   "h": 554,
@@ -298,7 +396,7 @@
  },
  "mine": {
   "w": 392,
-  "h": 364,
+  "h": 354,
   "m": 27,
   "cw": 169.2,
   "scala": 2,
@@ -306,7 +404,7 @@
  },
  "dado": {
   "w": 394,
-  "h": 366,
+  "h": 370,
   "m": 27,
   "cw": 169.2,
   "scala": 2,
@@ -322,7 +420,7 @@
  },
  "cercasi-strumenti": {
   "w": 424,
-  "h": 500,
+  "h": 498,
   "m": 29,
   "cw": 183.31,
   "scala": 2,
@@ -333,6 +431,224 @@
   "h": 844,
   "m": 45,
   "cw": 282.02,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-torna": {
+  "w": 326,
+  "h": 378,
+  "m": 23,
+  "cw": 141,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-muro": {
+  "w": 436,
+  "h": 842,
+  "m": 30,
+  "cw": 188,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-scatto-1": {
+  "w": 410,
+  "h": 674,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": null,
+  "live": {
+   "x": 45,
+   "y": 45,
+   "w": 321,
+   "h": 428
+  }
+ },
+ "storia-com-e-andata": {
+  "w": 350,
+  "h": 222,
+  "m": 24,
+  "cw": 150.41,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-bologna": {
+  "w": 404,
+  "h": 602,
+  "m": 28,
+  "cw": 173.91,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-iphone": {
+  "w": 404,
+  "h": 522,
+  "m": 28,
+  "cw": 173.91,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-scatto-2": {
+  "w": 392,
+  "h": 568,
+  "m": 27,
+  "cw": 169.2,
+  "scala": 2,
+  "tagliandi": null,
+  "live": {
+   "x": 43,
+   "y": 43,
+   "w": 307,
+   "h": 410
+  }
+ },
+ "storia-scatto-3": {
+  "w": 392,
+  "h": 568,
+  "m": 27,
+  "cw": 169.2,
+  "scala": 2,
+  "tagliandi": null,
+  "live": {
+   "x": 43,
+   "y": 43,
+   "w": 307,
+   "h": 410
+  }
+ },
+ "storia-saracinesca": {
+  "w": 410,
+  "h": 854,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-due-anni-dopo": {
+  "w": 410,
+  "h": 616,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-cosa-e-finito": {
+  "w": 394,
+  "h": 260,
+  "m": 27,
+  "cw": 169.2,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-insegna": {
+  "w": 410,
+  "h": 776,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-adesivo": {
+  "w": 410,
+  "h": 586,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-roba-degli-altri": {
+  "w": 410,
+  "h": 780,
+  "m": 28,
+  "cw": 176.72,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-scontrino": {
+  "w": 392,
+  "h": 1058,
+  "m": 27,
+  "cw": 169.2,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-lo-sapevi": {
+  "w": 414,
+  "h": 890,
+  "m": 29,
+  "cw": 178.61,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-ragu": {
+  "w": 404,
+  "h": 802,
+  "m": 28,
+  "cw": 173.91,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-bologna-2-0": {
+  "w": 396,
+  "h": 608,
+  "m": 27,
+  "cw": 171.08,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-meme-spaghetti": {
+  "w": 396,
+  "h": 374,
+  "m": 27,
+  "cw": 171.08,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-meme-nonna": {
+  "w": 382,
+  "h": 380,
+  "m": 26,
+  "cw": 164.5,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-meme-ragu": {
+  "w": 382,
+  "h": 382,
+  "m": 26,
+  "cw": 164.5,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-meme-torri": {
+  "w": 382,
+  "h": 382,
+  "m": 26,
+  "cw": 164.5,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-meme-mortadella": {
+  "w": 382,
+  "h": 380,
+  "m": 26,
+  "cw": 164.5,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-meme-iphone": {
+  "w": 382,
+  "h": 382,
+  "m": 26,
+  "cw": 164.5,
+  "scala": 2,
+  "tagliandi": null
+ },
+ "storia-fine": {
+  "w": 410,
+  "h": 662,
+  "m": 28,
+  "cw": 176.72,
   "scala": 2,
   "tagliandi": null
  }

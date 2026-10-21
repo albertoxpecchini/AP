@@ -1,0 +1,8 @@
+{
+  "fonte": "meme/nonna.webp (gpt-image-2) con le scritte della pagina della storia, fotografato dal browser",
+  "strumento": "tools/pzkko/storia/storia.mjs muro",
+  "scritte": [
+    "quando a bologna ordini",
+    "gli spaghetti alla bolognese"
+  ]
+}

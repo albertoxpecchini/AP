@@ -1,9 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2400" height="328" viewBox="0 0 2400 328">
   <!-- Il pannello dell'insegna per la scena 3D: solo la lastra bianca sporca di art/insegna.svg
-       (polvere, colature, ruggine in basso), senza telaio né lettere né ombre: il telaio e i tubi
-       al neon lì sono poligoni, e la luce la mette la scena; la chiocciola del logo è un tubo al
-       neon anche lei (scena/neon.js). Largo quanto il fronte del negozio (saracinesca e porta),
-       2400 × 328. -->
+       (polvere, colature, ruggine in basso), senza telaio né lettere né ombre: il telaio e le
+       lettere a scatola lì sono poligoni (scena/lettere.js), e la luce la mette la scena. Largo
+       quanto il fronte del negozio (saracinesca e porta), 2400 × 328. -->
   <defs>
     <linearGradient id="dove-sporco" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#fff" stop-opacity=".35"/>

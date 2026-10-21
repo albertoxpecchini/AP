@@ -21,14 +21,15 @@ import { tuboSpezzato, tela, DOGA, Z_FACCIATA, REGIA } from './materiali.js'
 // le uniform in comune: il tempo (il velo che scorre), il rivolo (x del tubo, y in cima, y in fondo, y del giunto in
 // cima al rotolo: la fase delle doghe), la pozza ai suoi piedi (x, z, raggio) e il tubo sulla facciata (x, y del buco,
 // y dell'architrave: lungo il tubo la condensa cola e l'intonaco è umido)
-export const BAGNO = { tempo: { value: 0 }, rivolo: { value: new T.Vector4(1, 3, 0.07, 3.3) }, pozza: { value: new T.Vector3(1, 0.15, 0.2) }, tubo: { value: new T.Vector3(1, 4, 3) } }
+// meteo (meteo.js): x quanto è bagnato, y la neve per terra, z la pioggia che cade, w la neve che cade
+export const BAGNO = { tempo: { value: 0 }, rivolo: { value: new T.Vector4(1, 3, 0.07, 3.3) }, pozza: { value: new T.Vector3(1, 0.15, 0.2) }, tubo: { value: new T.Vector3(1, 4, 3) }, meteo: { value: new T.Vector4(0.85, 0, 0, 0) } }
 
 // la linea del rivolo: l'acqua non scende dritta, la portano di qua e di là le ammaccature e lo sporco. La stessa
 // funzione in GLSL (bCentro) e qui (centro), così le gocce stanno sul bagnato
 const centro = (x0, y) => x0 + 0.01 * Math.sin(y * 5.3 + 1.7) + 0.006 * Math.sin(y * 13.1 + 0.4) + 0.003 * Math.sin(y * 37)
 
 const GLSL = `
-uniform float bTempo; uniform vec4 bRivolo; uniform vec3 bPozza, bTubo;
+uniform float bTempo; uniform vec4 bRivolo, bMeteo; uniform vec3 bPozza, bTubo;
 varying vec3 vBagnoPos;
 float bHash( vec2 p ) { p = fract( p * vec2( 123.34, 456.21 ) ); p += dot( p, p + 45.32 ); return fract( p.x * p.y ); }
 float bRumore( vec2 p ) {
@@ -52,14 +53,17 @@ void bagno( vec3 p, out float w, out float v, out float s, out vec2 n ) {
     float onda = ( p.y + bTempo * 0.11 ) * 70.0 + bRumore( vec2( p.x * 300.0, p.y * 20.0 ) ) * 5.0;
     n = vec2( ( bRumore( vec2( p.x * 500.0, ( p.y + bTempo * 0.14 ) * 90.0 ) ) - 0.5 ) * 0.7, sin( onda ) * 0.45 ) * v;
   }
-  // in basso, gli schizzi della pioggia: umido per 20-40 cm, non lucido
+  // in basso, gli schizzi della pioggia: umido per 20-40 cm, non lucido (quanto è bagnato lo dice il meteo)
   float fondo = 1.0 - smoothstep( 0.1 + 0.12 * bRumore( vec2( p.x * 6.0, 2.0 ) ), 0.26 + 0.16 * bRumore( vec2( p.x * 2.3, 7.0 ) ), p.y );
-  w = max( w, 0.65 * fondo * ( 0.7 + 0.3 * bRumore( p.xy * 30.0 ) ) );
+  w = max( w, 0.65 * fondo * ( 0.7 + 0.3 * bRumore( p.xy * 30.0 ) ) * ( 0.2 + 0.8 * bMeteo.x ) );
 #if BAGNO_TIPO == 1
-  // l'umidità che sale dal terreno nell'intonaco, fino a 0,7-1,1 m, col bordo bianco del salnitro
-  float hR = 0.78 + 0.22 * bRumore( vec2( p.x * 1.3, 3.0 ) ) + 0.05 * bRumore( vec2( p.x * 11.0, 5.0 ) );
+  // l'umidità che sale dal terreno nell'intonaco, fino a 0,7-1,1 m, col bordo bianco del salnitro. Il salnitro (21.10) è
+  // a chiazze, sfrangiato e granuloso, più forte dove il muro è più umido: era una riga bianca ondulata continua, finta
+  float hR = 0.78 + 0.22 * bRumore( vec2( p.x * 1.3, 3.0 ) ) + 0.07 * bRumore( vec2( p.x * 4.1, 8.0 ) ) + 0.03 * bRumore( vec2( p.x * 11.0, 5.0 ) );
   w = max( w, 0.5 * ( 1.0 - smoothstep( hR - 0.12, hR, p.y ) ) * ( 0.75 + 0.25 * bRumore( p.xy * 14.0 ) ) );
-  s = smoothstep( hR - 0.07, hR - 0.015, p.y ) * ( 1.0 - smoothstep( hR - 0.005, hR + 0.025, p.y ) ) * ( 0.5 + 0.5 * bRumore( p.xy * 40.0 ) );
+  float sY = p.y + 0.04 * ( bRumore( p.xy * vec2( 9.0, 4.0 ) ) - 0.5 );
+  s = smoothstep( hR - 0.14, hR - 0.03, sY ) * ( 1.0 - smoothstep( hR - 0.02, hR + 0.05, sY ) )
+    * smoothstep( 0.35, 0.8, bRumore( vec2( p.x * 2.3, 9.0 ) ) ) * smoothstep( 0.25, 0.85, bRumore( p.xy * vec2( 70.0, 45.0 ) ) );
   // sotto il buco del tubo la condensa cola lungo il tubo: una riga d'umido, larga in cima, con lo sporco che si porta dietro
   if ( p.y < bTubo.y && p.y > bTubo.z - 0.02 && p.z > 0.09 ) {
     float k = ( bTubo.y - p.y ) / max( bTubo.y - bTubo.z, 0.1 );
@@ -80,7 +84,7 @@ void bagno( vec3 p, out float w, out float v, out float s, out vec2 n ) {
 // tipo: 0 lamiera, 1 intonaco, 2 carta (e la vernice chiara), 4 pietra (il 3 erano le lastre: ora marciapiede.js)
 const COLORE = {
   0: 'diffuseColor.rgb *= 1.0 - 0.62 * bW;',
-  1: 'diffuseColor.rgb *= 1.0 - 0.5 * bW; diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.86, 0.85, 0.8 ), 0.5 * bS );',
+  1: 'diffuseColor.rgb *= 1.0 - 0.5 * bW; diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.74, 0.72, 0.66 ), 0.32 * bS );',
   2: 'diffuseColor.rgb = pow( max( diffuseColor.rgb, 0.0 ), vec3( 1.0 + 0.8 * bW ) ) * ( 1.0 - 0.4 * bW );',
   4: 'diffuseColor.rgb *= 1.0 - 0.5 * bW;',
 }
@@ -90,12 +94,13 @@ export const bagnato = (m, tipo) => {
   const prima = Object.prototype.hasOwnProperty.call(m, 'onBeforeCompile') ? m.onBeforeCompile : null
   m.onBeforeCompile = (sh, r) => {
     if (prima) prima(sh, r)
-    sh.uniforms.bTempo = BAGNO.tempo; sh.uniforms.bRivolo = BAGNO.rivolo; sh.uniforms.bPozza = BAGNO.pozza; sh.uniforms.bTubo = BAGNO.tubo
+    sh.uniforms.bTempo = BAGNO.tempo; sh.uniforms.bRivolo = BAGNO.rivolo; sh.uniforms.bPozza = BAGNO.pozza; sh.uniforms.bTubo = BAGNO.tubo; sh.uniforms.bMeteo = BAGNO.meteo
     sh.vertexShader = 'varying vec3 vBagnoPos;\n' + sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n vBagnoPos = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;')
     sh.fragmentShader = `#define BAGNO_TIPO ${tipo}\n${GLSL}\n` + sh.fragmentShader
       .replace('#include <color_fragment>', `#include <color_fragment>\n float bW, bV, bS; vec2 bN; bagno( vBagnoPos, bW, bV, bS, bN );\n ${COLORE[tipo]}`)
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n roughnessFactor = mix( roughnessFactor, 0.05, bV ) * ( 1.0 - 0.25 * bW );')
-      .replace('#include <normal_fragment_maps>', tipo === 4 ? '#include <normal_fragment_maps>' : '#include <normal_fragment_maps>\n normal = normalize( normal + vec3( bN, 0.0 ) );')
+      // (la pietra: dove guarda in su, con la neve si imbianca; la telecamera non è ruotata, la y della vista è quella del mondo)
+      .replace('#include <normal_fragment_maps>', tipo === 4 ? '#include <normal_fragment_maps>\n float bNv = bMeteo.y * smoothstep( 0.55, 0.85, normal.y ) * ( 0.75 + 0.25 * bRumore( vBagnoPos.xz * 40.0 ) );\n diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.9, 0.92, 0.95 ), smoothstep( 0.15, 0.5, bNv ) );\n roughnessFactor = mix( roughnessFactor, 0.85, smoothstep( 0.15, 0.5, bNv ) );' : '#include <normal_fragment_maps>\n normal = normalize( normal + vec3( bN, 0.0 ) );')
   }
   const chiave = `bagno${tipo}:${prima ? prima.toString() : ''}`
   m.customProgramCacheKey = () => chiave

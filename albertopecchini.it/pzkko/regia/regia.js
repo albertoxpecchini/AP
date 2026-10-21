@@ -2,9 +2,9 @@
 // giochi (un foglio col nastro, piste stampate, fiches da trascinare). Comanda
 // l'ora di Mantova e la sua velocità, la sera (il buio, l'insegna, i lampioni, lo
 // sfarfallio), le auto che passano (quando, che fari, il neon sotto, una ferma
-// dove si vuole), la scena 3D (esposizione, bagliore, neon, specchi, qualità), le
-// bestie e la goccia della condensa. Non è modale: la scena dietro cambia mentre
-// si trascina. Niente si salva: ricaricando torna tutto com'era (tranne l'ora e la
+// dove si vuole), la scena 3D (esposizione, bagliore, luce dell'insegna, specchi,
+// qualità), le bestie e la goccia della condensa. Non è modale: la scena dietro
+// cambia mentre si trascina. Niente si salva: ricaricando torna tutto com'era (tranne l'ora e la
 // velocità, che le ricariche della regia si portano dietro nell'indirizzo).
 //
 // index.html la apre scrivendo «regia», con #regia nell'indirizzo o con cinque
@@ -21,8 +21,9 @@ const limita = (x, a, b) => Math.min(b, Math.max(a, x))
 
 // i ritocchi della scena: gli stessi valori di partenza di scena/materiali.js (REGIA)
 const PREDEFINITI = {
-  esposizione: 1, bagliore: 1, neon: 1, specchi: true,
+  esposizione: 1, bagliore: 1, neon: 1, specchi: true, vetrina: true,
   bestie: { formiche: true, mosche: true, zanzare: true, blatte: true }, blatteDiGiorno: false, velocitaBestie: 1, goccia: 1,
+  meteo: null, intensita: 0.6, bagnato: null, manto: null,
 }
 const R = (window.pzkkoRegia ??= structuredClone(PREDEFINITI))
 const pagina = () => window.pzkkoPagina
@@ -106,7 +107,23 @@ async function costruisci() {
   dlg.querySelector('.rg-abbassa').addEventListener('click', () => dlg.classList.toggle('giu'))
   dlg.querySelector('.rg-rimetti').addEventListener('click', rimetti)
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dlg.open) chiudi() })
-  for (const s of sezioni()) corpo.appendChild(s)
+  for (const s of sezioniPagina()) corpo.appendChild(s)
+  // la scena: se c'è già, le sue sezioni; se sta ancora arrivando (la regia aperta durante il caricamento, o dopo una
+  // delle sue ricariche, che riaprono la regia con #regia prima che il 3D ci sia) un segnaposto, sostituito dalle sezioni
+  // vere appena la scena c'è. Prima la regia restava «senza 3D» fino a una ricarica da zero, e «con il 3D» ricaricava
+  // nello stesso punto: un giro senza uscita
+  let attesa = null
+  const mettiScena = () => {
+    const s = scena(), arriva = !s && document.documentElement.classList.contains('scena-carico')
+    if (attesa && arriva) return false
+    const nuove = s ? sezioniScena(s) : arriva ? [sezione('la scena', 25, 'il 3D arriva', [nota('il 3D sta arrivando: i suoi comandi compaiono qui appena la strada si vede.')])] : sezioniSenza()
+    if (attesa) { for (const v of attesa) v.remove() }
+    for (const v of nuove) corpo.appendChild(v)
+    attesa = arriva ? nuove : null
+    if (!arriva && dlg.open) for (const p of piste) p.disegna()
+    return !arriva
+  }
+  if (!mettiScena()) { const t = setInterval(() => { if (mettiScena()) clearInterval(t) }, 250) }
   new ResizeObserver(() => { if (dlg.open) for (const p of piste) p.disegna() }).observe(corpo)
   // quello che cambia da solo (l'ora che passa, la sera che cala): le piste si rileggono due volte al secondo
   setInterval(() => { if (dlg.open) for (const p of piste) p.rileggi() }, 500)
@@ -257,8 +274,10 @@ const sezione = (titolo, fiche, piccola, righe) => {
 }
 
 // ── che cosa si comanda ──────────────────────────────────────────────────────
-function sezioni() {
-  const P = pagina(), si = [['sì', true], ['no', false]]
+const si = [['sì', true], ['no', false]]
+// quello della pagina (c'è sempre): il tempo, la sera, le auto
+function sezioniPagina() {
+  const P = pagina()
   const fuori = []
   fuori.push(sezione('il tempo', 500, 'a mantova', [
     { nome: 'ora', tipo: 'scorre', min: 0, max: 1439, passo: 1, vivo: true, leggi: () => minuto(adesso()), scrivi: vai, testo: hhmm,
@@ -290,18 +309,21 @@ function sezioni() {
     { nome: 'ferma', tipo: 'scorre', auto: true, autoNome: 'passa', min: -0.2, max: 1.2, leggi: () => P.regola.ferma, scrivi: (v) => P.fermaAuto(v),
       testo: (v) => `ferma a ${fmt(v)}`, autoTesto: () => 'passa e va', tacche: () => [[0, 'sinistra'], [0.5, 'davanti'], [1, 'destra']] },
   ]))
-  if (!scena()) {
-    fuori.push(sezione('la scena', 25, 'senza 3D', [nota('qui il 3D non c\'è (o non è ancora partito): restano l\'ora, la sera e le auto, sul muro di sempre.'), tasti([['con il 3D', () => ricarica({ muro: null })]])]))
-    return fuori
-  }
-  const S = scena()
+  return fuori
+}
+// senza la scena 3D (?muro=1, niente WebGL2, o il 3D non è partito)
+const sezioniSenza = () => [sezione('la scena', 25, 'senza 3D', [nota('qui il 3D non c\'è: restano l\'ora, la sera e le auto, sul muro di sempre.'), tasti([['con il 3D', () => ricarica({ muro: null })]])])]
+// quello della scena 3D: la scena, le bestie, il meteo, l'acqua
+function sezioniScena(S) {
+  const fuori = []
   fuori.push(sezione('la scena', 25, 'il 3D', [
     { nome: 'esposizione', tipo: 'scorre', min: 0.25, max: 4, log: true, leggi: () => R.esposizione, scrivi: (v) => { R.esposizione = v }, testo: (v) => `x${fmt(v)}`, tacche: () => [[0.25, '¼'], [1, '1'], [4, '4']] },
     { nome: 'bagliore', tipo: 'scorre', min: 0, max: 3, leggi: () => R.bagliore, scrivi: (v) => { R.bagliore = v }, testo: (v) => `x${fmt(v)}`, tacche: () => [[0, 'niente'], [1, '1'], [3, '3']] },
-    { nome: 'neon', tipo: 'scorre', min: 0, max: 3, leggi: () => R.neon, scrivi: (v) => { R.neon = v }, testo: (v) => `x${fmt(v)}`, tacche: () => [[0, 'spento'], [1, '1'], [3, '3']] },
+    { nome: 'luce insegna', tipo: 'scorre', min: 0, max: 3, leggi: () => R.neon, scrivi: (v) => { R.neon = v }, testo: (v) => `x${fmt(v)}`, tacche: () => [[0, 'spento'], [1, '1'], [3, '3']] },
     { nome: 'specchi', tipo: 'scatti', valori: si, leggi: () => R.specchi, scrivi: (v) => { R.specchi = v } },
+    { nome: 'vetrina (col mouse)', tipo: 'scatti', valori: si, leggi: () => R.vetrina !== false, scrivi: (v) => { R.vetrina = v } },
     { nome: 'il muro sotto', tipo: 'scatti', valori: [['no', false], ['in trasparenza', true]], leggi: () => document.documentElement.classList.contains('scena-allinea'),
-      scrivi: (v) => document.documentElement.classList.toggle('scena-allinea', v) },
+      scrivi: (v) => { if (v) window.pzkkoTrattenute?.(); document.documentElement.classList.toggle('scena-allinea', v) } },
     { nome: 'qualità', tipo: 'scatti', dopo: true, valori: ['alta', 'media', 'bassa', 'telefono'].map((q) => [q, q]), leggi: () => S.qualita,
       scrivi: (v) => { if (v !== S.qualita) ricarica({ qualita: v }) } },
     nota('la qualità ricarica la pagina (l\'ora e la velocità restano).'),
@@ -312,6 +334,21 @@ function sezioni() {
     { nome: 'blatte di giorno', tipo: 'scatti', valori: [['no', false], ['sì', true]], leggi: () => R.blatteDiGiorno, scrivi: (v) => { R.blatteDiGiorno = v } },
     { nome: 'velocità', tipo: 'scorre', min: 0, max: 4, leggi: () => R.velocitaBestie, scrivi: (v) => { R.velocitaBestie = v }, testo: (v) => (v < 0.02 ? 'ferme' : `x${fmt(v)}`), tacche: () => [[0, 'ferme'], [1, '1'], [4, '4']] },
     tasti([['spaventale', () => S.b?.spaventa(), true], ['una zanzara davanti', () => S.b?.visita(), true]]),
+  ]))
+  // il meteo: quello vero di Mantova (/api/meteo, ogni dieci minuti) o uno scelto, quanto è forte; il bagnato e la neve
+  // per terra vanno da soli col meteo (auto) o si fissano
+  const M = S.meteo, d = M.dati
+  fuori.push(sezione('il meteo', 100, 'vero = mantova', [
+    { nome: 'tempo', tipo: 'scatti', valori: [['vero', null], ['sole', 'sole'], ['nuvole', 'nuvoloso'], ['nebbia', 'nebbia'], ['pioggia', 'pioggia'], ['tuoni', 'temporale'], ['neve', 'neve']],
+      leggi: () => R.meteo, scrivi: (v) => { R.meteo = v } },
+    { nome: 'quanto', tipo: 'scorre', min: 0, max: 1, leggi: () => R.intensita, scrivi: (v) => { R.intensita = v }, testo: (v) => fmt(v), tacche: () => [[0, 'poco'], [0.5, ''], [1, 'tanto']] },
+    { nome: 'bagnato', tipo: 'scorre', auto: true, min: 0, max: 1, vivo: true, leggi: () => R.bagnato, scrivi: (v) => { R.bagnato = v },
+      testo: (v) => fmt(v), autoTesto: () => `auto · ${fmt(M.bagnato)}`, tacche: () => [[0, 'asciutto'], [1, 'fradicio']] },
+    { nome: 'neve per terra', tipo: 'scorre', auto: true, min: 0, max: 1, vivo: true, leggi: () => R.manto, scrivi: (v) => { R.manto = v },
+      testo: (v) => fmt(v), autoTesto: () => `auto · ${fmt(M.manto)}`, tacche: () => [[0, 'niente'], [1, 'tutta']] },
+    nota(d ? `a mantova adesso: codice ${d.codice}, nuvole ${d.nuvole}%, ${fmt(d.pioggia, 1)} mm di pioggia (${fmt(d.pioggia12, 1)} nelle ultime 12 ore), visibilità ${d.visibilita >= 1000 ? fmt(d.visibilita / 1000, 1) + ' km' : Math.round(d.visibilita) + ' m'}, vento ${Math.round(d.vento)} km/h, ${fmt(d.temperatura, 1)}°.`
+      : 'i dati veri non ci sono (in locale /api/meteo non risponde): «vero» è il dopo pioggia di sempre.'),
+    tasti([['un lampo', () => S.me?.lampo(), true]]),
   ]))
   fuori.push(sezione('l\'acqua', 1, 'la condensa', [
     { nome: 'gocce', tipo: 'scorre', min: 0.1, max: 5, log: true, leggi: () => R.goccia, scrivi: (v) => { R.goccia = v }, testo: (v) => (v < 1 ? `${fmt(1 / v, 1)} volte più spesso` : `x${fmt(v)} più rade`),
@@ -350,7 +387,7 @@ function avviaConta() {
     voci.push([`buio ${fmt(parseFloat(document.documentElement.style.getPropertyValue('--notte')) || 0)}`])
     if (S) {
       const info = S.renderer.info
-      voci.push([`${S.qualita} ${fmt(S.dpr(), 2)}x`], [`luci ${S.insieme()}`], [`${info.programs?.length ?? 0} programmi`])
+      voci.push([`${S.qualita} ${fmt(S.dpr(), 2)}x`], [`luci ${S.insieme()}`], [`${info.programs?.length ?? 0} programmi`], [S.meteo.testo])
     } else voci.push(['senza 3D'])
     conta.innerHTML = voci.map(([t, c]) => `<li${c ? ` class="${c}"` : ''}>${t}</li>`).join('')
   }

@@ -3,9 +3,11 @@
 // insegna, porta a vetri, marciapiede bagnato, i palazzi di fronte, il sole di
 // Mantova a quest'ora e di notte l'insegna, la lampada e le auto che passano.
 //
-// L'arrivo: mentre i volantini si scaricano la strada si vede da lontano, con la
-// telecamera ad altezza d'occhio che si avvicina piano; quando tutto è pronto la
-// telecamera vola dritta fino all'inquadratura di sempre. Da lì è fissa davanti
+// L'arrivo è il caricamento: appena le anteprime sono a bordo (le foto dei
+// volantini e le trame per terra in piccolo, pochi KB) la strada si vede da
+// lontano, già tutta, leggerissima; poi la telecamera si avvicina quanto è
+// arrivata la risoluzione piena, e quando è arrivata all'inquadratura di sempre è
+// tutto nitido. Da lì è fissa davanti
 // alla vetrina e sale e scende con lo scorrimento della pagina; l'inquadratura è
 // calcolata perché la saracinesca 3D stia esattamente dove sta la parete nel DOM:
 // così la pagina di sempre resta sotto, invisibile, e continua a fare tutto
@@ -23,6 +25,8 @@ import { fogli } from './fogli.js'
 import { luci } from './luci.js'
 import { acqua } from './acqua.js'
 import { bestie } from './bestie.js'
+import { spazzatura } from './spazzatura.js'
+import { meteo, METEO } from './meteo.js'
 import { REGIA } from './materiali.js'
 
 // I livelli di qualità (niente anti-alias in nessuno). dpr = la risoluzione interna rispetto ai pixel CSS, che non
@@ -49,11 +53,13 @@ const qualitaIniziale = (renderer, chiesta, telefono) => {
   return 'alta'
 }
 
-// l'arrivo: quanto si resta da lontano dopo la schermata di caricamento (almeno, al massimo) e quanto dura il volo;
-// quanto si aspettano le foto al massimo, dietro la schermata, prima di mostrare la scena lo stesso
-const ATTESA_MIN = 900, ATTESA_MAX = 20000, VOLO = 2600, CARICO_MAX = 25000
-// la barra di caricamento (il caricatore in index.html): fin qui i moduli, la costruzione, gli shader; il resto le foto
-const CARICO = { moduli: 0.12, costruita: 0.3, shader: 0.4 }
+// l'arrivo: quanto si resta fermi da lontano appena la strada compare, quanto dura il volo almeno (anche con tutto già
+// in cache), dopo quanto si arriva comunque se la risoluzione piena non è ancora tutta a bordo; quanto si aspettano le
+// anteprime al massimo, dietro l'anteprima della pagina, prima di mostrare la scena lo stesso
+const ATTESA_MIN = 500, ATTESA_MAX = 20000, VOLO = 2600, CARICO_MAX = 25000, FOTO_PIENA = 1500
+// a che punto è (il caricatore in index.html): fin qui i moduli, la costruzione, gli shader, le anteprime; il resto è
+// la risoluzione piena, mentre la telecamera si avvicina
+const CARICO = { moduli: 0.1, costruita: 0.25, shader: 0.35, anteprime: 0.45 }
 const carico = (p) => window.pzkkoCarico?.(p)
 // la telecamera non scende sotto mezzo metro da terra: più giù, in fondo alla pagina, guarderebbe il marciapiede da
 // sotto (il piano si vede da una faccia sola: sotto c'è il cielo). La proiezione è decentrata, la parete resta dov'è
@@ -107,19 +113,24 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   const Hp = (parete.offsetHeight / u) * K
   const M = { K, W, H: Math.max(Hp, telefono ? 2 : 3.2), Hp, telefono }
   if (!Number.isFinite(M.H)) throw new Error(`misure: parete ${parete.offsetWidth} × ${parete.offsetHeight} px`)
-  const DIST = telefono ? 1.6 : 2.6 // la telecamera, dalla saracinesca, quando è arrivata
+  // la telecamera, dalla saracinesca, quando è arrivata (sul computer dal 21.10 è più indietro, 3,1 m invece di 2,6, e la
+  // parete del DOM è più stretta, scena.css: si vede più strada; col mouse sul fronte del negozio si avvicina, sotto)
+  const DIST = telefono ? 1.6 : 3.1
 
   const scene = new T.Scene()
   const camera = new T.PerspectiveCamera(40, 1, 0.05, 220)
   scene.add(camera)
   // (prima i fogli: chiedono le foto, che si scaricano e decodificano per conto loro mentre il posto si costruisce,
   // due secondi di trame disegnate al volo)
-  const [f, h] = await Promise.all([fogli(scene, M, renderer), costruisci(scene, M, { palazzi: liv.palazzi !== false, poche: liv.luci === 'poche' })])
+  // (e insieme la spazzatura per terra col chiusino di pzkkonet, che non dipende dal resto)
+  const [f, h, sp] = await Promise.all([fogli(scene, M, renderer), costruisci(scene, M, { palazzi: liv.palazzi !== false, poche: liv.luci === 'poche' }), spazzatura(scene, M)])
   const l = luci(scene, renderer, h, M)
   // la condensa che scende sulla lamiera (il bagnato sui materiali l'hanno già mondo.js e fogli.js)
   const a = acqua(scene, M, h, f)
   // le formiche, le mosche, le zanzare e le blatte (al posto dei disegni piatti della pagina)
   const b = bestie(scene, M, h, f, { ridotto: matchMedia('(prefers-reduced-motion: reduce)').matches })
+  // il meteo di Mantova: il cielo, la nebbia, le gocce e i fiocchi, il bagnato (meno gocce dove la scheda è più piccola)
+  const me = meteo(scene, camera, M, h, { quante: qualita === 'alta' ? 1 : 0.55 })
   const tCostruita = performance.now()
   carico(CARICO.costruita)
 
@@ -165,7 +176,47 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   // basta lo scorrimento (getBoundingClientRect a ogni fotogramma costringerebbe il browser a rifare l'impaginazione)
   const base = { x: 0, y: 0, w: 1 }
   let sx = scrollX, sy = scrollY
-  const rileggi = () => { const r = parete.getBoundingClientRect(); sx = scrollX; sy = scrollY; base.x = r.left + sx; base.y = r.top + sy; base.w = r.width }
+  // (la parete si legge senza la scala della vetrina, sotto: il rettangolo è quello di base)
+  const rileggi = () => {
+    if (vetrina.messa) parete.style.transform = 'none'
+    const r = parete.getBoundingClientRect(); sx = scrollX; sy = scrollY; base.x = r.left + sx; base.y = r.top + sy; base.w = r.width
+    if (vetrina.messa) parete.style.transform = `scale(${vetrina.z.toFixed(4)})`
+  }
+  // ── la vetrina: col mouse sul fronte del negozio (saracinesca, insegna, porta) la telecamera si avvicina di ZOOM volte
+  // (un carrello, non uno zoom: l'angolo di campo resta quello e la porta e il marciapiede girano come camminando),
+  // tenendo fermo quello che sta sotto il puntatore, come una lente: quello che c'è intorno si allarga attorno a lui. La
+  // parete del DOM si scala dello stesso fattore attorno allo stesso punto (transform su .parete), così i link e i
+  // tagliandi restano pixel per pixel sotto i volantini. Solo col mouse, a scena arrivata (col tocco non c'è «sopra»,
+  // e sul telefono la parete è già vicina). La regia può spegnerla (REGIA.vetrina) ──
+  const ZOOM = 1.25
+  const vetrina = { z: 1, v: 0, ox: 0, oy: 0, dentro: false, messa: false }
+  const aggiornaVetrina = (dt) => {
+    const p = pClient
+    let dentro = false
+    if (p && !p.tocco && fase === 'fatto' && !telefono && REGIA.vetrina !== false) {
+      // il punto sotto il puntatore sul piano della saracinesca, con la parete com'è adesso (il piano è lineare sullo
+      // schermo: niente raggi); un po' d'isteresi sul bordo
+      const z = vetrina.z, fpm = (base.w * z) / M.W
+      const x = (p.x - (base.x - sx + (1 - z) * vetrina.ox)) / fpm, y = M.H - (p.y - (base.y - sy + (1 - z) * vetrina.oy)) / fpm
+      const m = vetrina.dentro ? 0.15 : 0
+      dentro = x > h.fronte.x0 - 0.15 - m && x < h.fronte.x1 + 0.15 + m && y > -0.1 - m && y < h.insegna.top + 0.3 + m
+      if (dentro) {
+        // il centro della lente: il puntatore, in pixel della parete non scalata (lì sta l'origine della transform);
+        // insegue in fretta, e da ferma (z = 1) si mette lì subito
+        const tx = p.x - (base.x - sx), ty = p.y - (base.y - sy)
+        const k = z < 1.001 ? 1 : 1 - Math.exp(-dt / 0.06)
+        vetrina.ox += (tx - vetrina.ox) * k; vetrina.oy += (ty - vetrina.oy) * k
+      }
+    }
+    vetrina.dentro = dentro
+    // una molla smorzata (critica) verso 1 o ZOOM: parte e arriva piano, in ~0,7 s
+    const meta = dentro ? ZOOM : 1
+    vetrina.v += (30 * (meta - vetrina.z) - 11 * vetrina.v) * dt
+    vetrina.z += vetrina.v * dt
+    if (Math.abs(vetrina.z - meta) < 0.0005 && Math.abs(vetrina.v) < 0.002) { vetrina.z = meta; vetrina.v = 0 }
+    if (vetrina.z > 1.0005) { parete.style.transformOrigin = `${vetrina.ox.toFixed(1)}px ${vetrina.oy.toFixed(1)}px`; parete.style.transform = `scale(${vetrina.z.toFixed(4)})`; vetrina.messa = true }
+    else if (vetrina.messa) { parete.style.transform = ''; parete.style.transformOrigin = ''; vetrina.messa = false }
+  }
   const misura = () => {
     const w = tela.clientWidth || innerWidth, hh = tela.clientHeight || innerHeight
     if (w !== dim.w || hh !== dim.h) {
@@ -205,55 +256,85 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert()
     return mossa
   }
-  // vicino: la saracinesca 3D dove sta la parete del DOM, pixel per pixel
+  // vicino: la saracinesca 3D dove sta la parete del DOM, pixel per pixel (la parete com'è sullo schermo: scalata di z
+  // attorno a (ox, oy) dalla vetrina, e la telecamera a DIST / z: un carrello, l'angolo di campo non cambia)
   const vicino = () => {
-    const left = base.x - sx, top = base.y - sy, fpm = base.w / M.W
-    const cx = M.W / 2 - (left + base.w / 2 - dim.w / 2) / fpm
+    const z = vetrina.z, w = base.w * z, fpm = w / M.W
+    const left = base.x - sx + (1 - z) * vetrina.ox, top = base.y - sy + (1 - z) * vetrina.oy
+    const cx = M.W / 2 - (left + w / 2 - dim.w / 2) / fpm
     const cy = M.H - (dim.h / 2 - top) / fpm
     const camX = cx + (telefono ? 0.1 : 0.3), camY = Math.max(ALTEZZA_MIN, telefono ? cy - 0.2 : 0.75 + 0.55 * cy)
-    return { d: DIST, wx: cx, wy: cy, hv: dim.h / (2 * fpm), ox: camX - cx, oy: camY - cy }
+    return { d: DIST / z, wx: cx, wy: cy, hv: dim.h / (2 * fpm), ox: camX - cx, oy: camY - cy }
   }
-  // lontano: dall'altra parte del marciapiede, ad altezza d'occhio, tutto il negozio nell'inquadratura, con lo stesso
-  // angolo di campo di quando si arriva; si avvicina piano e respira. Sul telefono la saracinesca è alta 9 m e da
-  // lontano sembrerebbe una fessura: si inquadra la parte alta (l'insegna e i primi fogli), con la telecamera già lassù
+  // lontano: dall'altra parte del marciapiede, ad altezza d'occhio, tutto il negozio nell'inquadratura; si avvicina piano
+  // e respira. Sul telefono la saracinesca è alta 12 m e da lontano sembrerebbe una fessura: si inquadra la parte alta
+  // (l'insegna e i primi fogli), con la telecamera già lassù.
+  // Dal 21.10 la telecamera da lontano sta in un punto fisso, che non dipende dalla forma della finestra: la finestra
+  // decide solo quanto del piano della saracinesca si vede intorno al negozio (il rettangolo che lo contiene, allargato
+  // di RESPIRO). Così la foto del caricamento (index.html, fatta da tools/pzkko/scena/carico.mjs una volta per tutte,
+  // larga quanto la finestra più larga) è un ritaglio esatto del primo fotogramma su qualunque schermo: dove finisce la
+  // foto comincia la scena, pixel per pixel. Prima la distanza seguiva l'angolo di campo dell'arrivo, che cambia con la
+  // forma della finestra. Finché la tela non si vede, e per FOTO ms dopo (la foto che sfuma sopra), la telecamera sta
+  // ferma lì; poi respira. ?finestra=<metri> (per carico.mjs) dà l'altezza del rettangolo invece della finestra
   let tVista = 0
-  const lontano = (now, tan) => {
+  const RESPIRO = 1.22, TAN_LONTANO = telefono ? 0.64 : 0.38, FOTO = 300
+  const finestra = Number(q.get('finestra')) || 0, fotoCarico = q.get('carico') === 'foto'
+  const scatola = () => {
     const bx0 = telefono ? -0.55 : -0.7, bx1 = telefono ? M.W + 0.55 : h.fronte.x1 + 0.7
     const by0 = telefono ? M.H - 2.4 : -0.45, by1 = h.insegna.top + (telefono ? 0.7 : 0.6)
-    const hvBox = Math.max((by1 - by0) / 2, (bx1 - bx0) / 2 / (dim.w / dim.h))
-    const tt = Math.max(0, now - tVista) / 1000
-    const d = (hvBox / tan) * (1 + 0.22 * Math.exp(-tt / 4))
-    const wy = (by0 + by1) / 2
+    return { wx: (bx0 + bx1) / 2, wy: (by0 + by1) / 2, bw: (bx1 - bx0) / 2, bh: (by1 - by0) / 2 }
+  }
+  const lontano = (now) => {
+    const { wx, wy, bw, bh } = scatola()
+    const hv0 = finestra ? finestra / 2 : RESPIRO * Math.max(bh, bw / (dim.w / dim.h)), D = (RESPIRO * bh) / TAN_LONTANO
+    const tt = visibile && !fotoCarico ? Math.max(0, now - tVista - FOTO) / 1000 : 0
+    const k = (1 + 0.22 * Math.exp(-tt / 4)) / RESPIRO
     const camY = (telefono ? wy - 0.4 : 1.65) + 0.03 * Math.sin(tt * 0.9)
-    return { d, wx: (bx0 + bx1) / 2, wy, hv: d * tan, ox: 0.05 * Math.sin(tt * 0.55), oy: camY - wy }
+    return { d: D * k, wx, wy, hv: hv0 * k, ox: 0.05 * Math.sin(tt * 0.55), oy: camY - wy }
   }
   // il volo: la telecamera va dritta (il centro si sposta in proporzione alla distanza, come in un volo in linea
-  // retta) e la distanza cala in scala logaritmica, così l'avvicinamento ha sempre la stessa velocità a vista
+  // retta) e la distanza cala in scala logaritmica, così l'avvicinamento ha sempre la stessa velocità a vista; l'angolo di
+  // campo va da quello di lontano a quello dell'arrivo con la stessa legge (da lontano dipende dalla finestra, sopra)
   const vola = (a, b, s) => {
     const d = Math.exp(Math.log(a.d) + (Math.log(b.d) - Math.log(a.d)) * s)
     const k = Math.abs(a.d - b.d) < 1e-6 ? 1 - s : (d - b.d) / (a.d - b.d)
-    const mix = (x, y) => y + (x - y) * k
-    return { d, wx: mix(a.wx, b.wx), wy: mix(a.wy, b.wy), hv: d * (b.hv / b.d), ox: mix(a.ox, b.ox), oy: mix(a.oy, b.oy) }
+    const mix = (x, y) => y + (x - y) * k, tanB = b.hv / b.d
+    return { d, wx: mix(a.wx, b.wx), wy: mix(a.wy, b.wy), hv: d * tanB * (a.hv / a.d / tanB) ** k, ox: mix(a.ox, b.ox), oy: mix(a.oy, b.oy) }
   }
-  const ridotto = matchMedia('(prefers-reduced-motion: reduce)').matches || q.get('intro') === '0'
-  let fase = ridotto ? 'fatto' : 'lontano', tVia = 0, prontiFogli = false, salta = false, visibile = false, arrivata = () => {}
+  // (pzkko-subito: la ricarica dopo un contesto perso che non è tornato, sotto; una volta sola)
+  let subito = false
+  try { subito = sessionStorage.getItem('pzkko-subito') === '1'; sessionStorage.removeItem('pzkko-subito') } catch {}
+  const ridotto = matchMedia('(prefers-reduced-motion: reduce)').matches || q.get('intro') === '0' || subito
+  // c'è la foto del caricamento sopra la tela (index.html): il meteo resta quello della foto finché non sfuma
+  const conFoto = !ridotto && !!window.pzkkoFotoCarico
+  let fase = ridotto ? 'fatto' : 'lontano', tVia = 0, prontiFogli = false, anteprimePronte = false, salta = false, visibile = false, arrivata = () => {}
   f.pronti.then(() => { prontiFogli = true })
-  // toccare, scorrere o premere un tasto mentre si guarda da lontano accorcia l'attesa (ma si parte lo stesso solo a
-  // fogli pronti: all'arrivo dev'essere tutto a bordo, senza foto che compaiono dopo)
+  let tAnteprime = 0
+  f.anteprime.then(() => { anteprimePronte = true; tAnteprime = performance.now(); sp.vere() })
+  // toccare, scorrere o premere un tasto mentre si guarda da lontano fa partire subito (ma la telecamera arriva solo
+  // quando è arrivato tutto: all'arrivo dev'essere tutto nitido, senza foto che cambiano dopo)
   const fretta = () => { salta = true }
   for (const ev of ['wheel', 'touchstart', 'keydown', 'pointerdown']) addEventListener(ev, fretta, { passive: true, once: true })
+  // quanta risoluzione piena è a bordo (0..1): le foto vere dei volantini e le trame vere per terra
+  const pieno = () => 0.8 * f.avanzamento() + 0.2 * sp.avanzamento()
+  // l'avvicinamento: s insegue la meta, che è quanto è a bordo ma non più di quanto il volo abbia già fatto (VOLO), e
+  // non torna mai indietro; la telecamera va con liscia(s): parte e arriva piano, si ferma piano se aspetta una foto
+  let sVolo = 0, ultimaPosa = 0
   const posa = (now) => {
     const b = vicino()
     if (fase === 'fatto') return b
+    const dt = Math.min(0.1, Math.max(0, (now - (ultimaPosa || now)) / 1000)); ultimaPosa = now
     if (fase === 'lontano') {
-      // (finché la tela non si vede si resta da lontano: il tempo si conta da quando la strada compare)
+      // (finché la tela non si vede si resta da lontano: il tempo si conta da quando la strada compare; mai mentre la foto
+      // del caricamento sfuma sopra, nemmeno con la fretta; per carico.mjs, ?carico=foto, mai)
       const attesa = visibile ? now - tVista : 0
-      if ((prontiFogli && (attesa > ATTESA_MIN || (salta && attesa > 700))) || attesa > ATTESA_MAX) { fase = 'avvicina'; tVia = now }
-      else return lontano(now, b.hv / b.d)
+      if (visibile && !fotoCarico && (attesa > ATTESA_MIN || (salta && attesa > FOTO))) { fase = 'avvicina'; tVia = now }
+      else return lontano(now)
     }
-    const s = liscia((now - tVia) / VOLO)
-    if (s >= 1) { fase = 'fatto'; arrivata(); return b }
-    return vola(lontano(now, b.hv / b.d), b, s)
+    const meta = Math.min(now - tVia > ATTESA_MAX ? 1 : pieno(), (now - tVia) / VOLO)
+    sVolo = Math.min(1, Math.max(sVolo, sVolo + (meta - sVolo) * (1 - Math.exp(-dt / 0.25))))
+    if (meta >= 1 && sVolo > 0.99) { fase = 'fatto'; arrivata(); return b }
+    return vola(lontano(now), b, liscia(sVolo))
   }
 
   // ── gli shader: ogni insieme di luci (luci.js) vuole i suoi programmi, compilati prima di usarli ──
@@ -280,8 +361,13 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     [uscita._fsQuad, uscita.material, false],
   ]
   const compilati = new Set()
-  let compilando = null
+  // (epoca: quante volte la scheda grafica ha ridato il contesto, sotto; una compilazione partita prima non vale più)
+  let compilando = null, epoca = 0
   const fotogrammaDopo = () => new Promise((r) => requestAnimationFrame(r))
+  // (cedere senza aspettare un fotogramma: il browser, se è ora, disegna il pomodoro del caricamento e poi si riprende
+  // subito; scheduler.yield dove c'è, se no un messaggio a sé stessi, che non ha i 4 ms minimi di setTimeout)
+  const canale = new MessageChannel()
+  const cedi = () => (globalThis.scheduler?.yield ? globalThis.scheduler.yield() : new Promise((r) => { canale.port1.onmessage = () => r(); canale.port2.postMessage(0) }))
   // i pezzi da compilare: ogni oggetto della scena (con l'auto), col suo materiale com'è e, per la carta, anche opaco;
   // i quadri del post-processing. Ogni pezzo è una chiamata a renderer.compile (mette in coda i programmi: la scheda li
   // compila per conto suo, e sotto si aspetta che siano pronti) con le luci dell'insieme messe
@@ -310,17 +396,20 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     }
   }
   const compila = async (nome, { subito = false } = {}) => {
-    const prima = l.attuale()
+    const prima = l.attuale(), e = epoca
     for (const pezzo of pezziDaCompilare()) {
+      if (e !== epoca || renderer.getContext().isContextLost()) return
       l.metti(nome)
       pezzo()
       renderer.setRenderTarget(null)
       if (prima) l.metti(prima)
-      if (!subito) await fotogrammaDopo()
+      // (subito: tutto di fila, ma cedendo fra un pezzo e l'altro: tutto insieme era un secondo e più di pagina ferma, col
+      // pomodoro del caricamento immobile)
+      await (subito ? cedi() : fotogrammaDopo())
     }
     // i programmi si aspettano uno per uno (la scheda compila in parallelo, per conto suo)
-    while (!renderer.info.programs.every((p) => p.isReady())) await fotogrammaDopo()
-    compilati.add(nome)
+    while (e === epoca && !renderer.info.programs.every((p) => p.isReady())) await fotogrammaDopo()
+    if (e === epoca) compilati.add(nome)
   }
   // l'insieme che serve è cambiato: si mette se è compilato, se no si compila (e si mette al fotogramma in cui è pronto)
   const cambia = (nome) => {
@@ -350,7 +439,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     t = -origine.y / raggio.y
     return { x: origine.x + raggio.x * t, y: 0, z: origine.z + raggio.z * t, suolo: true, veloce }
   }
-  const bestieCtx = { vista: { x0: 0, x1: 1, y0: 0, y1: 1 }, puntatore: null, buio: 0, fari: 0, telecamera: camera.position, lampada: h.lampadina.position, insegna: h.neon.centri.testo, blatte: q.has('blatte') }
+  const bestieCtx = { vista: { x0: 0, x1: 1, y0: 0, y1: 1 }, puntatore: null, buio: 0, fari: 0, telecamera: camera.position, lampada: h.lampadina.position, insegna: h.lettere.centri.testo, blatte: q.has('blatte') }
 
   // ── un fotogramma ──────────────────────────────────────────────────────────
   let n = 0
@@ -360,12 +449,17 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     f.aggiorna(dt, now)
     a.aggiorna(dt, now); a.luce(stato.buio)
     const acceso = stato.insieme !== l.attuale() && cambia(stato.insieme)
+    aggiornaVetrina(dt)
     const mossa = metti(posa(now))
     // le bestie: il muro che si vede è quello dell'inquadratura di arrivo (da lontano si vedrebbe tutto il negozio)
     const v = vicino(), asp = dim.w / dim.h
     Object.assign(bestieCtx.vista, { x0: v.wx - v.hv * asp, x1: v.wx + v.hv * asp, y0: v.wy - v.hv, y1: v.wy + v.hv })
     bestieCtx.puntatore = puntatore(); bestieCtx.buio = stato.buio; bestieCtx.fari = stato.fari
     b.aggiorna(dt, now, bestieCtx)
+    h.negozio?.aggiorna(now, bestieCtx.vista)
+    sp.aggiorna()
+    // (il meteo resta quello della foto del caricamento finché la foto non è sfumata: poi va verso quello vero, piano)
+    me.aggiorna(dt, now, { buio: stato.buio, lampioni: stato.lampioni, vista: bestieCtx.vista, tieni: fotoCarico || (conFoto && (!visibile || now - tVista < FOTO)) })
     n++
     // le ombre si rifanno solo quando qualcosa si muove (un foglio che si alza o compare, un tagliando, l'auto), quando il
     // sole si è spostato di 0,15° (ogni ~40 s) e quando una luce si è appena accesa (non dipendono dalla telecamera:
@@ -379,9 +473,11 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     // nel volo e quando passa un'auto se la scheda ce la fa
     const vivo = mossa || mosso || acceso || fase !== 'fatto' || n % 32 === 0
     specchiModo(!vivo ? 'fermi' : qualita === 'alta' && (stato.auto || fase !== 'fatto') ? 'tutti' : 'alterni')
-    // il bagliore: solo quando fa buio (di giorno non c'è niente di così acceso, e costa)
+    // il bagliore: solo quando fa buio (di giorno non c'è niente di così acceso, e costa); con la nebbia le luci si
+    // allargano (l'alone dei lampioni nella nebbia)
     bloom.enabled = liv.bloom > 0 && stato.buio > 0.15 && REGIA.bagliore > 0
-    bloom.threshold = 1.5 + 2 * (1 - stato.buio); bloom.strength = (0.12 + 0.25 * stato.buio) * REGIA.bagliore
+    bloom.threshold = (1.5 + 2 * (1 - stato.buio)) * (1 - 0.35 * METEO.nebbia)
+    bloom.strength = (0.12 + 0.25 * stato.buio) * (1 + 1.2 * METEO.nebbia) * REGIA.bagliore
     // (la regia può spegnere gli specchi: il vetro e le pozzanghere)
     h.vetro.visible = h.pozze.visible = REGIA.specchi
     composer.render()
@@ -406,17 +502,17 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   const tPronta = performance.now()
   console.info(`scena 3D: costruita ${(tCostruita - t0).toFixed(0)} ms, shader ${(tCompilata - tCostruita).toFixed(0)} ms, primi fotogrammi ${dettagli.join(' / ')} (programmi ${prog()}, luci «${s0.insieme}»)`)
 
-  // ── dietro la schermata di caricamento: la scena gira già (la tela è trasparente sotto la schermata) e carica le foto
-  // sulla scheda; la barra va con loro. Quando sono tutte a bordo (o dopo CARICO_MAX) la schermata se ne va, la tela
-  // compare in dissolvenza dal nero (scena.css) con la telecamera da lontano, e dopo un attimo parte il volo ──
-  let vista = () => {}
+  // ── dietro l'anteprima della pagina: la scena gira già (la tela è trasparente) e carica le anteprime sulla scheda.
+  // Quando sono tutte a bordo (o dopo CARICO_MAX) la tela compare in dissolvenza (scena.css) con la telecamera da
+  // lontano, e dopo un attimo l'avvicinamento, che va con la risoluzione piena ──
+  let vista = () => {}, chiesta = false
   const mostra = (now) => {
     tVista = now
     vista()
     visibile = true
     root.classList.add('scena-vista')
-    carico(1)
-    console.info(`scena 3D: foto a bordo in ${((now - t0) / 1000).toFixed(1)} s${prontiFogli ? '' : ' (non tutte: troppo tempo)'}`)
+    carico(CARICO.anteprime)
+    console.info(`scena 3D: anteprime a bordo in ${((now - t0) / 1000).toFixed(1)} s${anteprimePronte ? '' : ' (non tutte: troppo tempo)'}`)
   }
   const tempi = window.pzkkoTempi = []
   let prima = performance.now(), fermo = false, misurati = [], gradini = 0
@@ -429,16 +525,29 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     console.info(`scena 3D: ${(media * 1000).toFixed(0)} ms a fotogramma, ${['specchi e bagliore a metà', 'ombre a 512', 'specchi a un quarto, niente bagliore'][g - 1]}`)
   }
   const giro = (now) => {
-    if (fermo) return
+    if (fermo || perso) return
     requestAnimationFrame(giro)
     const dt = Math.min((now - prima) / 1000, 0.1)
     prima = now
     const p0 = renderer.info.programs?.length ?? 0, a = performance.now()
     fotogramma(now, dt)
     if (!visibile) {
-      carico(CARICO.shader + (0.97 - CARICO.shader) * f.avanzamento())
-      if (prontiFogli || now - tPronta > CARICO_MAX) mostra(now)
-    }
+      carico(CARICO.shader + (CARICO.anteprime - CARICO.shader) * f.anteprima())
+      // (per la foto del caricamento, ?carico=foto, la tela si fa vedere solo con tutto a piena risoluzione. Sotto la foto
+      // del caricamento solo coi fogli già comparsi del tutto (la dissolvenza dei fogli che arrivano, che dal nero non si
+      // vedeva, sotto la foto li farebbe sparire e ricomparire) e, se arriva entro FOTO_PIENA ms dalle anteprime, con la
+      // risoluzione piena: la foto è nitida, le anteprime da 128 px sul telefono no. Intanto la foto è lì, ferma e identica)
+      // Pronta, non si mostra da sola: lo dice al caricamento (window.pzkkoScoppia, index.html), che finisce di far maturare
+      // il pomodoro, lo fa scoppiare sulla telecamera e risponde quando la macchia copre lo schermo: lì sotto la tela
+      // compare di colpo. Intanto si continua a disegnare da lontano, a tela nascosta
+      const piene = f.avanzamento() >= 1 && sp.avanzamento() >= 1
+      if (!chiesta && ((fotoCarico ? prontiFogli && piene && !f.inMoto(now) : (anteprimePronte && !(conFoto && (f.inMoto(now) || (!piene && now - tAnteprime < FOTO_PIENA))))) || now - tPronta > CARICO_MAX)) {
+        chiesta = true
+        carico(CARICO.anteprime)
+        const vai = () => mostra(performance.now())
+        Promise.resolve(window.pzkkoScoppia?.()).then(vai, vai)
+      }
+    } else if (fase !== 'fatto') carico(CARICO.anteprime + (0.99 - CARICO.anteprime) * pieno())
     // (i tempi dei fotogrammi, per foto.mjs, da quando la scena si vede)
     if (visibile && tempi.length < 900) tempi.push(Math.round(dt * 10000) / 10)
     if (q.get('programmi') !== null) {
@@ -458,13 +567,48 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
       }
     }
   }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo) { fermo = false; prima = performance.now(); requestAnimationFrame(giro) } })
+  document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo && !perso) { fermo = false; prima = performance.now(); requestAnimationFrame(giro) } })
   requestAnimationFrame(giro)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, M, qualita, liv, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale() }
+
+  // ── la scheda grafica perde il contesto (un driver che si pianta, la memoria che finisce, un'altra pagina 3D che se la
+  // prende): three lo tiene (preventDefault) e, quando il browser lo ridà, rifà da sé trame, geometrie e tele. Qui il resto:
+  // ci si ferma (disegnare o compilare su un contesto perso non serve e può lanciare errori), e al ritorno si ricompila
+  // tutto in parallelo come all'inizio (lasciati a three, i ~130 programmi si compilerebbero uno per uno al primo
+  // fotogramma, secondi fermi), si rifanno il cielo come ambiente, le ombre e gli specchi, e si riparte da dove si era.
+  // Prima la tela restava nera e bisognava ricaricare da zero. Se il contesto non torna entro 8 s si ricarica, ma senza
+  // l'arrivo (sessionStorage pzkko-subito), e la pagina torna dov'era. ?perdi=1 lo prova: perso dopo 3 s, ridato dopo 1
+  let perso = false, attesaRitorno = 0
+  tela.addEventListener('webglcontextlost', () => {
+    perso = true
+    console.warn('scena 3D: la scheda grafica ha perso il contesto, aspetto che torni')
+    clearTimeout(attesaRitorno)
+    attesaRitorno = setTimeout(() => { try { sessionStorage.setItem('pzkko-subito', '1') } catch {} location.reload() }, 8000)
+  })
+  tela.addEventListener('webglcontextrestored', async () => {
+    clearTimeout(attesaRitorno)
+    const t = performance.now()
+    epoca++; compilati.clear(); compilando = null
+    l.rifai(); n = 0; dim.w = 0; misura()
+    const ins = l.aggiorna(performance.now(), 1 / 60).insieme
+    l.metti(ins)
+    await compila(ins, { subito: true })
+    l.sole.shadow.needsUpdate = true; h.lampada.shadow.needsUpdate = true
+    perso = false
+    if (!fermo) { prima = performance.now(); requestAnimationFrame(giro) }
+    console.info(`scena 3D: contesto ridato, ricompilata in ${((performance.now() - t) / 1000).toFixed(1)} s`)
+  })
+  if (q.get('perdi') !== null) {
+    const ext = renderer.getContext().getExtension('WEBGL_lose_context')
+    setTimeout(() => { ext?.loseContext(); setTimeout(() => ext?.restoreContext(), 1000) }, 3000)
+  }
+  // (lontano: la scatola dell'inquadratura da lontano, per carico.mjs: la foto del caricamento la ritaglia con questi numeri)
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, sp, me, meteo: METEO, M, qualita, liv, vetrina, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale(),
+    lontano: { ...scatola(), respiro: RESPIRO, d: (RESPIRO * scatola().bh) / TAN_LONTANO } }
 
   // ── arrivata: la pagina sotto torna a rispondere (lo fa il caricatore in index.html quando questa promessa si chiude) ──
   if (!visibile) await new Promise((ok) => { vista = ok })
   if (fase !== 'fatto') await new Promise((ok) => { arrivata = ok })
+  carico(1)
   root.dataset.scena = 'pronta'
   const sec = (x) => ((x - t0) / 1000).toFixed(1)
   console.info(`scena 3D: costruita in ${sec(tCostruita)} s, pronta in ${sec(tPronta)} s, vista in ${sec(tVista)} s, arrivata in ${sec(performance.now())} s (${qualita}, ${dpr.toFixed(2)}×${telefono ? ', telefono' : ''}, luci «${l.attuale()}»)`)

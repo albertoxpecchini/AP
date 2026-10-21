@@ -15,6 +15,15 @@ export function leggi(file) {
   return { w, h, px }
 }
 
+/** Come leggi, ma se ffmpeg non c'è (non è su tutti i PC) legge con sharp, che sta fra le dipendenze del sito. */
+export async function leggiA(file) {
+  try { return leggi(file) } catch (e) { if (e.code !== 'ENOENT') throw e }
+  const { default: sharp } = await import('sharp')
+  const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  for (let i = 3; i < data.length; i += 4) data[i] = alfa(data[i])
+  return { w: info.width, h: info.height, px: data }
+}
+
 /**
  * Chiave cromatica per i fogli su fondo magenta pieno: il fondo diventa
  * trasparente. «Quanto magenta» è min(R, B) − G: ~225 sul fondo (il modello non

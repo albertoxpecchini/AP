@@ -24,7 +24,7 @@ const esbuild = req('esbuild')
 export const NOMI = [
   'WebGLRenderer', 'WebGLRenderTarget', 'Scene', 'PerspectiveCamera', 'Group', 'Object3D', 'Mesh',
   'BufferGeometry', 'BufferAttribute', 'Float32BufferAttribute', 'PlaneGeometry', 'BoxGeometry', 'CylinderGeometry', 'SphereGeometry',
-  'TorusGeometry', 'CircleGeometry', 'ShapeGeometry', 'Shape', 'Path', 'Vector2', 'Vector3', 'Vector4', 'Matrix4', 'Quaternion', 'Euler', 'Color', 'MathUtils',
+  'TorusGeometry', 'CircleGeometry', 'ShapeGeometry', 'ExtrudeGeometry', 'Shape', 'Path', 'Vector2', 'Vector3', 'Vector4', 'Matrix4', 'Quaternion', 'Euler', 'Color', 'MathUtils',
   'MeshStandardMaterial', 'MeshPhysicalMaterial', 'MeshBasicMaterial', 'ShaderMaterial',
   'DirectionalLight', 'SpotLight', 'PointLight', 'HemisphereLight',
   'CanvasTexture', 'Texture', 'TextureLoader', 'DataTexture', 'SRGBColorSpace', 'NoColorSpace',

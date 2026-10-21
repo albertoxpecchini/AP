@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix albertopecchini.it run dev",
+    "dev:pzkko": "npm --prefix albertopecchini.it run dev:pzkko",
+    "dev:bcp": "npm --prefix albertopecchini.it run dev:bcp",
     "build": "npm --prefix albertopecchini.it run build",
     "preview": "npm --prefix albertopecchini.it run preview",
     "email": "npm --prefix albertopecchini.it run email --",

@@ -27,7 +27,7 @@ const ora = arg('ora', '12:00'), scroll = Number(arg('scroll', '0')), larg = Num
 const pagina = arg('pagina', '/')
 const inietta = arg('inietta', ''), dpr = Number(arg('dpr', '1')), subito = process.argv.includes('--subito'), sequenza = Number(arg('sequenza', '1')), passo = Number(arg('passo', '400'))
 
-const TIPI = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.json': 'application/json' }
+const TIPI = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.mp4': 'video/mp4', '.css': 'text/css', '.json': 'application/json' }
 const puppeteer = browser.puppeteer()
 const server = createServer(async (req, res) => {
   let f = join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname))

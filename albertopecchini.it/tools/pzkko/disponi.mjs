@@ -2,6 +2,8 @@
 // Compone il muro di pzkko.it: legge le pile di disposizione.js, le altezze vere
 // dei pezzi (i volantini crescono col testo) e riscrive --x --y --w --r --mx --my
 // --mw --mr di ogni elemento .it di pzkko/index.html, più l'altezza della parete.
+// Con --pagina=storia lo stesso per il muro della storia: le pile di storia/disposizione.js
+// in pzkko/storia/index.html (le foto in lavoro/storia-desk.png e storia-mob.png).
 //
 //   node tools/pzkko/disponi.mjs misura [--foto]
 //       apre la home nel browser (desktop 1440 e telefono 390), misura ogni pezzo
@@ -24,14 +26,18 @@ import * as browser from './browser.mjs'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(QUI, '../../pzkko')
-const FILE = join(ROOT, 'index.html')
 const LAVORO = join(QUI, 'lavoro')
-const RETT = join(LAVORO, 'rettangoli.json')
+// le pagine col muro a pile: il file, le sue pile, l'indirizzo, le misure e il nome delle foto
+export const PAGINE = {
+  home: { file: join(ROOT, 'index.html'), disp: join(QUI, 'disposizione.js'), url: '/', rett: join(LAVORO, 'rettangoli.json'), foto: 'muro' },
+  storia: { file: join(ROOT, 'storia/index.html'), disp: join(QUI, 'storia/disposizione.js'), url: '/storia/', rett: join(LAVORO, 'rettangoli-storia.json'), foto: 'storia' },
+}
+const quale = (nome) => { if (!PAGINE[nome]) throw new Error(`pagina «${nome}»: ${Object.keys(PAGINE).join(' o ')}`); return PAGINE[nome] }
 
 // ── gli elementi .it di index.html e la loro chiave ──────────────────────────
 export function elementi(html) {
   const out = []
-  for (const m of html.matchAll(/<(img|article|h2)\b[^>]*\bclass="[^"]*\bit\b[^"]*"[^>]*>/g)) {
+  for (const m of html.matchAll(/<(img|article|h2|figure|section)\b[^>]*\bclass="[^"]*\bit\b[^"]*"[^>]*>/g)) {
     const t = m[0]
     const id = t.match(/\bid="([^"]+)"/)
     let k
@@ -49,12 +55,13 @@ export function elementi(html) {
 // allunga verso l'alto e tutto scende), bottom = spazio in fondo, minimo = l'altezza minima della parete, passo = quanto
 // ogni pezzo spinge in giù il successivo rispetto alla sua altezza (1 = com'era; 0,85 = si sovrappongono di un 15% in
 // più e ci sta altra roba), scala = la larghezza dei pezzi (0,9 = più stretti, centrati nel posto di prima)
-export async function calcola() {
+export async function calcola(pagina = 'home') {
+  const P = quale(pagina)
   let rett = {}
-  try { rett = JSON.parse(await readFile(RETT, 'utf8')) } catch {}
-  const html = await readFile(FILE, 'utf8')
+  try { rett = JSON.parse(await readFile(P.rett, 'utf8')) } catch {}
+  const html = await readFile(P.file, 'utf8')
   // (?t: la disposizione appena cambiata da serranda.mjs, non quella già importata)
-  const { DESK, MOB } = await import(pathToFileURL(join(QUI, 'disposizione.js')).href + '?t=' + Date.now())
+  const { DESK, MOB } = await import(pathToFileURL(P.disp).href + '?t=' + Date.now())
   const elems = elementi(html)
   const perK = Object.fromEntries(elems.map((e) => [e.k, e]))
   const altezza = (vista, k, w) => {
@@ -69,7 +76,7 @@ export async function calcola() {
     for (const col of spec.cols) {
       let y = spec.top ?? 0, fondo = y
       for (const it of col.items) {
-        if (!perK[it.k]) throw new Error(`${vista}: in index.html non c'è ${it.k}`)
+        if (!perK[it.k]) throw new Error(`${vista}: in ${P.file} non c'è ${it.k}`)
         y += it.gap ?? spec.gap
         const w = Math.round(it.w * scala), h = altezza(vista, it.k, w)
         pos[it.k] = { x: Math.round(col.x + (it.dx ?? 0) * scala + (it.w - w) / 2), y: Math.round(y), w, r: it.r ?? 0, h }
@@ -90,8 +97,8 @@ export async function calcola() {
   return { html, elems, d: disponi('desk', DESK), m: disponi('mob', MOB) }
 }
 
-export async function applica() {
-  let { html, elems, d, m } = await calcola()
+export async function applica(pagina = 'home') {
+  let { html, elems, d, m } = await calcola(pagina)
   const senza = elems.filter((e) => !d.pos[e.k] || !m.pos[e.k]).map((e) => e.k)
   if (senza.length) console.warn(`! senza posto (restano dove sono): ${senza.join(', ')}`)
   for (const e of [...elems].reverse()) {
@@ -106,14 +113,15 @@ export async function applica() {
   }
   html = html.replace(/\.parete\{position:relative;height:calc\(\d+ \* var\(--u\)\)\}/, `.parete{position:relative;height:calc(${d.parete} * var(--u))}`)
   html = html.replace(/\.parete\{height:calc\(\d+ \* var\(--u\)\);max-width:600px/, `.parete{height:calc(${m.parete} * var(--u));max-width:600px`)
-  await writeFile(FILE, html)
+  await writeFile(quale(pagina).file, html)
   console.log(`desktop: le colonne finiscono a ${d.fondi.join(', ')} → parete ${d.parete}`)
   console.log(`telefono: le colonne finiscono a ${m.fondi.join(', ')} → parete ${m.parete}`)
 }
 
 // ── misura ───────────────────────────────────────────────────────────────────
 const TIPI = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' }
-export async function misura(foto) {
+export async function misura(foto, pagina = 'home') {
+  const P = quale(pagina)
   const puppeteer = browser.puppeteer()
   const server = createServer(async (req, res) => {
     let f = join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname))
@@ -121,7 +129,7 @@ export async function misura(foto) {
     catch { res.statusCode = 404; res.end() }
   })
   await new Promise((r) => server.listen(0, '127.0.0.1', r))
-  const url = `http://127.0.0.1:${server.address().port}/?ora=12:00&muro=1` // muro=1: senza la scena 3D, che sposta il muro
+  const url = `http://127.0.0.1:${server.address().port}${P.url}?ora=12:00&muro=1` // muro=1: senza la scena 3D, che sposta il muro
   const aperto = await puppeteer.launch({ executablePath: browser.eseguibile(), headless: true, args: ['--no-sandbox', '--hide-scrollbars'] })
   const out = {}
   await mkdir(LAVORO, { recursive: true })
@@ -147,21 +155,22 @@ export async function misura(foto) {
         return { k: chiave(el), x: Math.round((r.left - pr.left) / u), y: Math.round((r.top - pr.top) / u), w: Math.round(r.width / u), h: Math.round(r.height / u) }
       })
     })
-    if (foto) await page.screenshot({ path: join(LAVORO, `muro-${vista}.png`), fullPage: true })
+    if (foto) await page.screenshot({ path: join(LAVORO, `${P.foto}-${vista}.png`), fullPage: true })
     await page.close()
   }
   await aperto.close()
   server.close()
-  await writeFile(RETT, JSON.stringify(out, null, 1))
-  console.log(`misurati ${out.desk.length} pezzi → ${RETT}${foto ? ' (e le foto in lavoro/)' : ''}`)
+  await writeFile(P.rett, JSON.stringify(out, null, 1))
+  console.log(`misurati ${out.desk.length} pezzi → ${P.rett}${foto ? ' (e le foto in lavoro/)' : ''}`)
 }
 
 // lanciato da riga di comando (non importato da serranda.mjs)
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [cmd] = process.argv.slice(2)
   const foto = process.argv.includes('--foto')
-  if (cmd === 'misura') await misura(foto)
-  else if (cmd === 'applica') await applica()
-  else if (cmd === 'tutto') { await applica(); await misura(false); await applica(); await misura(foto) }
-  else { console.error('uso: disponi.mjs misura [--foto] · applica · tutto [--foto]'); process.exit(1) }
+  const pagina = (process.argv.find((a) => a.startsWith('--pagina=')) ?? '--pagina=home').slice(9)
+  if (cmd === 'misura') await misura(foto, pagina)
+  else if (cmd === 'applica') await applica(pagina)
+  else if (cmd === 'tutto') { await applica(pagina); await misura(false, pagina); await applica(pagina); await misura(foto, pagina) }
+  else { console.error('uso: disponi.mjs misura [--foto] · applica · tutto [--foto], con --pagina=home|storia'); process.exit(1) }
 }

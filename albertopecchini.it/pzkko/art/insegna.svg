@@ -1,11 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="450" viewBox="0 0 1080 450">
   <!-- L'insegna di pzkko, di giorno, disegnata: un cassonetto d'alluminio scuro con il pannello
-       bianco sporco, le cinque lettere a scatola (faccia in metacrilato, fianchi d'alluminio, ombra
-       sul pannello), le colature della pioggia, la ruggine in basso, l'adesivo con la chiocciola.
-       Le lettere sono un tratto unico arrotondato: la stessa traccia fa il tubo al neon di notte
+       bianco sporco, le cinque lettere a scatola (faccia in metacrilato bianco, bordino e fianchi
+       grigi, ombra sul pannello), le colature della pioggia, la ruggine in basso.
+       Le lettere sono quelle della «coin» vera di via Rizzoli (art/storia/), le stesse della scena 3D:
+       le misure e come sono fatte in scena/lettere.js. Dentro, il tubo al neon: di notte si accende
        (insegna-notte.svg). -->
   <defs>
-    <path id="tratto" d="M23 325V128M23 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0M217 128H335L217 252H335M405 50V252M510 128L405 215M448 180L515 252M561 50V252M666 128L561 215M604 180L671 252M737 190a62 62 0 1 0 124 0a62 62 0 1 0-124 0" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- «pzkko», in unità della x (alta 100): la riga della x a 0, la base a 100 -->
+    <g id="parola" fill-rule="evenodd">
+      <path d="M0 50A51 51 0 1 1 29.5 96.25V152H0ZM29.5 50A21.5 21.5 0 1 0 72.5 50A21.5 21.5 0 1 0 29.5 50Z"/>
+      <path transform="translate(108 0)" d="M0 0H86V29L42 71H86V100H0V71L44 29H0Z"/>
+      <path transform="translate(203 0)" d="M0-58H30V16L46 0H88L38 50L88 100H45L30 85V100H0Z"/>
+      <path transform="translate(298 0)" d="M0-58H30V16L46 0H88L38 50L88 100H45L30 85V100H0Z"/>
+      <path transform="translate(391 0)" d="M0 50A51 51 0 1 0 102 50A51 51 0 1 0 0 50ZM29.5 50A21.5 21.5 0 1 1 72.5 50A21.5 21.5 0 1 1 29.5 50Z"/>
+    </g>
+    <!-- i tubi al neon dentro le lettere, a metà del tratto -->
+    <g id="tubi" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14.75 134V50A36.25 36.25 0 1 1 27.7 77.8"/>
+      <path transform="translate(108 0)" d="M18 14.5H80.2L5.8 85.5H68"/>
+      <path transform="translate(203 0)" d="M15 84V-40M54 16L25 50L54 84"/>
+      <path transform="translate(298 0)" d="M15 84V-40M54 16L25 50L54 84"/>
+      <path transform="translate(391 0)" d="M30.2 79.7A36.25 36.25 0 1 1 47.8 86.1"/>
+    </g>
 
     <linearGradient id="telaio" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#6c6f71"/><stop offset=".04" stop-color="#4b4e50"/>
@@ -91,17 +107,21 @@
     <rect x="46" y="36" width="988" height="328" filter="url(#polvere)" opacity=".24"/>
     <rect x="46" y="36" width="988" height="328" filter="url(#colature)" mask="url(#m-sporco)" opacity=".5"/>
 
-    <!-- le lettere: ombra portata, fianchi, bordo, faccia -->
-    <g transform="translate(220 64.3) scale(.724)">
-      <use href="#tratto" xlink:href="#tratto" stroke="#2d2a26" stroke-width="46" transform="translate(16 22)" opacity=".38" filter="url(#sfoca8)"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="#3f4244" stroke-width="46" transform="translate(9 11)"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="#4a4d50" stroke-width="46" transform="translate(7 8.5)"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="#55585b" stroke-width="46" transform="translate(5 6)"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="#5f6265" stroke-width="46" transform="translate(3 3.5)"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="#6a6d70" stroke-width="46" transform="translate(1.5 1.6)"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="#bdbdb8" stroke-width="47"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="url(#faccia)" stroke-width="41"/>
-      <use href="#tratto" xlink:href="#tratto" stroke="#fff" stroke-width="41" stroke-opacity=".5" transform="translate(-1 -1.4)" filter="url(#sfoca1)" opacity=".6"/>
+    <!-- le lettere, al centro del pannello: ombra portata, la barra dietro, i fianchi (visti un po' da
+         sotto, verso destra), il bordino, la faccia -->
+    <g transform="translate(268.85 148.3) scale(1.1)">
+      <use href="#parola" xlink:href="#parola" fill="#2d2a26" transform="translate(13 18)" opacity=".38" filter="url(#sfoca8)"/>
+      <rect x="20" y="34" width="453" height="8" fill="#6a665f"/>
+      <use href="#parola" xlink:href="#parola" fill="#55514b" transform="translate(7 9.5)"/>
+      <use href="#parola" xlink:href="#parola" fill="#5f5b55" transform="translate(5.6 7.6)"/>
+      <use href="#parola" xlink:href="#parola" fill="#69655e" transform="translate(4.2 5.7)"/>
+      <use href="#parola" xlink:href="#parola" fill="#736f68" transform="translate(2.8 3.8)"/>
+      <use href="#parola" xlink:href="#parola" fill="#7d7972" transform="translate(1.4 1.9)"/>
+      <use href="#parola" xlink:href="#parola" fill="url(#faccia)" stroke="#4f4b45" stroke-width="2.2"/>
+      <!-- il tubo spento si intravede dietro la faccia traslucida (un po' più in basso a destra: sta più indietro) -->
+      <use href="#tubi" xlink:href="#tubi" stroke="#b9b4ab" stroke-width="10" opacity=".22" transform="translate(1.4 1.9)" filter="url(#sfoca1)"/>
+      <use href="#tubi" xlink:href="#tubi" stroke="#fff" stroke-width="5" opacity=".3" filter="url(#sfoca1)"/>
+      <use href="#parola" xlink:href="#parola" fill="#fff" opacity=".35" transform="translate(-.8 -1)" filter="url(#sfoca1)"/>
     </g>
 
     <rect x="46" y="36" width="988" height="328" filter="url(#colature)" mask="url(#m-sporco)" opacity=".22"/>
@@ -114,19 +134,5 @@
   <!-- quattro viti del telaio -->
   <g fill="#2a2b2c" stroke="#8a8c8e" stroke-opacity=".6" stroke-width=".8">
     <circle cx="38" cy="28" r="3.2"/><circle cx="1042" cy="28" r="3.2"/><circle cx="38" cy="372" r="3.2"/><circle cx="1042" cy="372" r="3.2"/>
-  </g>
-
-  <!-- l'adesivo con la chiocciola, un po' consumato -->
-  <g transform="translate(962 82) rotate(-8)">
-    <circle r="29" fill="#1c1a17" opacity=".3" transform="translate(1.5 2.5)" filter="url(#sfoca1)"/>
-    <circle r="29" fill="#f5f4ef"/>
-    <circle r="28.4" fill="none" stroke="#cdcac1" stroke-width="1.2"/>
-    <g fill="none" stroke="#1e1d1b" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M-19 11.5C-9 11.5 5 11.5 10 11.5C14.5 11.5 17 8.5 17 4"/>
-      <path d="M15.6 5L12.8-6.5M17.8 5.4L20.6-5.6"/>
-      <path d="M-3 1a2.6 2.6 0 0 1 5.2 0a5.2 5.2 0 0 1-10.4 0a7.8 7.8 0 0 1 15.6 0a10.2 10.2 0 0 1-20.4 0"/>
-    </g>
-    <circle cx="12.6" cy="-7.2" r="1.7" fill="#1e1d1b"/><circle cx="20.8" cy="-6.3" r="1.7" fill="#1e1d1b"/>
-    <circle r="29" filter="url(#grana)" opacity=".4"/>
   </g>
 </svg>

@@ -227,12 +227,12 @@ export function bestie(scene, M, h, f, { ridotto = false } = {}) {
   const ins = h.insegna
   const PORTA = { x0: W + 0.1, x1: W + 0.9, y1: 2.36 }
   // dove si può stare sul muro in (x, y): quanto sporge la superficie (z) e che cos'è; null dove non si sta (la porta,
-  // le spalle del buco). Dentro la saracinesca la superficie dei fogli (fogli.js), sotto la barra, sopra l'insegna e
-  // la facciata
+  // le spalle del buco). Dentro la saracinesca la superficie dei fogli (fogli.js), sotto la barra, sopra l'insegna (il
+  // pannello o la faccia di una lettera) e la facciata
   const muro = (x, y) => {
     if (x > 0.006 && x < W - 0.006 && y > 0.072 && y < H - 0.005) return f.superficie(x, y)
     if (x > 0 && x < W && y >= 0.003 && y <= 0.072) return { z: 0.0245, pezzo: null }
-    if (x > ins.x0 + 0.03 && x < ins.x0 + ins.LARG - 0.03 && y > ins.y0 + 0.03 && y < ins.top - 0.03) return { z: ins.zPannello, pezzo: null, insegna: true }
+    if (x > ins.x0 + 0.03 && x < ins.x0 + ins.LARG - 0.03 && y > ins.y0 + 0.03 && y < ins.top - 0.03) return { z: h.lettere.sopra(x, y) ?? ins.zPannello, pezzo: null, insegna: true }
     if (x > PORTA.x0 && x < PORTA.x1 && y < PORTA.y1) return null
     if (x < -0.1 || x > W + 0.1 || y > H + 0.08) {
       if (x > ins.x0 - 0.02 && x < ins.x0 + ins.LARG + 0.02 && y > ins.y0 - 0.02 && y < ins.top + 0.02) return null
@@ -402,8 +402,9 @@ export function bestie(scene, M, h, f, { ridotto = false } = {}) {
         if (m.pulisce > 0) m.pulisce = Math.max(0, m.pulisce - dt)
         if (m.gira) { const p = Math.sign(m.gira) * Math.min(Math.abs(m.gira), 5 * dt); m.a += p; m.gira -= p; mosso = Math.abs(p) * 0.004 }
         if (m.passi > 0) {
+          // (si ferma anche sul bordo di un gradino alto, come il fianco di una lettera dell'insegna)
           const v = 0.035 * dt, nx = m.x + Math.cos(m.a) * v, ny = m.y + Math.sin(m.a) * v, s = muro(nx, ny)
-          if (s) { m.x = nx; m.y = ny; m.z = s.z; m.passi -= v; mosso = v } else m.passi = 0
+          if (s && Math.abs(s.z - m.z) < 0.02) { m.x = nx; m.y = ny; m.z = s.z; m.passi -= v; mosso = v } else m.passi = 0
         }
         const s = muro(m.x, m.y)
         if (s) m.z = s.z

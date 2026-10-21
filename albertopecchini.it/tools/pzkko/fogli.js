@@ -294,6 +294,49 @@ ${NIENTE_MAGENTA}`,
 The paint is only spray paint and marker ink: semi-transparent overspray, drips running downward, grainy edges. No wall, no texture, no shadow: only the paint on the magenta. ${NIENTE_MAGENTA}`,
   },
 
+  // 21.10: altra roba degli altri (red bull, estathé, eastpak, il cartello della frutta) e il libretto del landini
+  manifesti5: {
+    scala: 0.75,
+    traslucido: true,
+    titolo: 'red bull che mette le ali alla chiocciola, il brick di estathé con lo scotch, l’eastpak scarabocchiato, il cartello di fragole, mirtilli e lamponi',
+    aspetto: '2048x2048',
+    griglia: [2, 2],
+    pezzi: ['redbull', 'estathe', 'eastpak', 'frutti'],
+    prompt: `${griglia('Four things stuck on a city wall,', 2, 2)}
+Each is put up by a different person and fills most of its cell; the text on them is spelled exactly as given, nothing else is written on them (no small print, no phone numbers, no addresses, no QR codes, no website addresses):
+1. a portrait street poster in the style of the classic hand-drawn Red Bull TV cartoons: plain off-white paper, simple wobbly black ink outlines, almost no colour. A cartoon snail has just drunk a can of Red Bull: it flies off upward with two small white feathered wings, and its empty spiral shell is left behind on the ground next to the empty can. The can is drawn in colour: the real slim silver-and-blue Red Bull can with the blue-and-silver checkered pattern and the two red charging bulls in front of a yellow sun. At the bottom, in the same hand-drawn style, the slogan «red bull ti mette le ali». The paper is wheat-pasted: wrinkled, a faint glue shine, the bottom-right corner torn away;
+2. a small empty carton brick of Estathé lemon iced tea (the classic Italian 200 ml drink box: yellow carton, the «estathé» wordmark, a slice of lemon and a glass of tea on it), slightly crushed, its thin plastic straw bent and still stuck in the hole, stuck flat on the wall with two crossing strips of clear adhesive tape over it, the tape wrinkled, slightly yellowed, with air bubbles;
+3. a glossy printed advertising poster, a photograph: a worn black Eastpak backpack (the classic Padded Pak'r shape, the small rectangular red «EASTPAK» label patch on the front pocket) hanging from a hook against a grey concrete wall, covered in years of school marker scribbles in white and silver ink: names, hearts, «5ªB», «4ever», «maturità 2025», a little snail drawing, a few pin badges; across the top in bold white condensed capitals «BUILT TO RESIST»; the paper is wrinkled from the glue, the top-left corner peeling;
+4. a farm-stand sign hand-lettered on a piece of torn brown cardboard box: «fragole» in thick crimson-red marker, «mirtilli» in dark blue, «lamponi» in deep red, each word on its own line, wobbly big letters, with small childlike drawings of a strawberry, a few blueberries and a raspberry; under them «raccolti oggi» and «€ 3 la vaschetta» in black marker; the cardboard is creased and a bit wet at the bottom, fixed on the wall with two strips of brown packing tape at the top.
+Photorealistic, sharp, soft even daylight. The clear tape is translucent, so the magenta shows through it. ${NIENTE_MAGENTA}`,
+  },
+
+  landini: {
+    scala: 0.6,
+    traslucido: true,
+    titolo: 'il libretto d’istruzioni del landini L 25 testacalda (1957): la copertina e la pagina dell’avviamento',
+    aspetto: '2048x2048',
+    griglia: [2, 1],
+    pezzi: ['copertina', 'avviamento'],
+    prompt: `Two separate pieces of paper laid out side by side (two columns, one row) on ${FONDO}, photographed straight on (flat, orthographic, no perspective), each complete and whole, upright, filling most of its half, generous empty magenta space between them, nothing cropped by the edge.
+They come from the same old Italian tractor instruction booklet printed in 1957, now stuck on a city wall: portrait A5 pages, thin paper yellowed and foxed with age, brown spots, dog-eared corners, letterpress printing in black and one red, a slightly uneven ink. The text is in correct Italian, spelled exactly as given, nothing else is written on them:
+1. the front cover, on slightly thicker card: at the top the big bold red word «LANDINI», under it «trattrice L 25» and «motore a testa calda», in the middle a black line drawing (an old engraving) of the tractor seen from the side: a 1950s Italian single-cylinder hot-bulb tractor with a long horizontal engine block, the bulb head at the front, a big flywheel on the left side, a tall vertical exhaust pipe, a small seat on a spring, big ribbed rear wheels and small front wheels; at the bottom «ISTRUZIONI PER L'USO E LA MANUTENZIONE», «Fabbrica Macchine Agricole Giovanni Landini · Fabbrico (Reggio Emilia)» and «1957»; a coffee-cup ring and two rusty staples along the left edge; a strip of clear adhesive tape across the top edge holds it on the wall;
+2. an inner page of the same booklet: the heading «AVVIAMENTO DEL MOTORE» in bold red capitals, two small black technical drawings (a mechanic heating the bulb head of the engine with a petrol blowtorch, and the steering wheel taken off and fitted onto the hub of the flywheel to swing-start the engine), and four numbered steps in a black serif typeface: «1. scaldare la testa con la lampada per 8–10 minuti», «2. togliere il volante e innestarlo sul mozzo del volano», «3. far oscillare il volano avanti e indietro finché il motore parte», «4. rimettere il volante sullo sterzo»; the page number «12» at the bottom; a greasy thumbprint; two strips of clear adhesive tape at the top corners.
+Photorealistic, sharp, soft even daylight. The clear tape is translucent, so the magenta shows through it. ${NIENTE_MAGENTA}`,
+  },
+
+  arte4: {
+    scala: 0.75,
+    senzaCarta: true,
+    titolo: 'l’illustrazione del volantino di tiktok (il telefono con la chiocciola che balla)',
+    aspetto: '1152x1536',
+    griglia: [1, 1],
+    pezzi: ['telefono'],
+    prompt: `A single printed illustration, centred on ${FONDO}, photographed straight on, filling most of the image, nothing cropped.
+It is the picture printed on a street flyer, on a small card of cream paper with visible ink texture, and there is NO text, no letters, no numbers and no logos anywhere: a smartphone held upright in a hand, its screen showing a vertical video of a cartoon snail dancing on its tail with little motion lines, three music notes floating out of the phone. Risograph style with two inks, cyan and red, overprinted and deliberately misregistered so every outline has a cyan ghost on one side and a red ghost on the other, grainy.
+${NIENTE_MAGENTA}`,
+  },
+
   // 17.10 sera: la roulette nella finestra (games/roulette/): il foglio della finestra,
   // le fiches e il segnaposto viste dall'alto, il legno della ruota 3D
   'carta-roulette': {
@@ -347,5 +390,66 @@ Each fly is drawn LARGE, filling most of its cell, photographed from DIRECTLY AB
 3. the fly in flight, wings spread out to the sides and motion-blurred, legs tucked;
 4. the fly in flight, wings in a different beat position, swept forward and motion-blurred, legs tucked.
 Grey thorax with dark stripes, dark red eyes, bristly black legs, the wings clear and transparent with fine dark veins: the magenta shows through the wings. Photorealistic macro photograph, sharp. ${NIENTE_MAGENTA}`,
+  },
+
+  // ── per la scena 3D (21.10): quello che c'è sulla facciata intorno alla saracinesca e sulla porta a vetri. La scena li
+  // attacca all'intonaco, al pluviale, al telaio e al vetro (scena/fronte.js), coi nomi di qui e le misure di pezzi.json
+  facciata: {
+    scala: 0.75,
+    titolo: 'i graffiti sull\'intonaco della facciata: il pezzo, lo stencil del divieto, le tag, il gesso, la pittura del comune',
+    aspetto: '2048x2048',
+    griglia: [3, 3],
+    pezzi: ['pezzo-pzk', 'divieto', 'tag-mnt', 'tag-46100', 'tag-pekko', 'gesso', 'tag-gimbo', 'tag-2026', 'buff'],
+    prompt: `${griglia('Nine separate pieces of paint,', 3, 3)}
+They are what was sprayed, written and drawn over the years on the plastered wall of an old building in Mantova, around a closed shop, each one exactly as it looks on the wall but without the wall:
+1. a big graffiti throw-up: fat rounded bubble letters «PZK» filled with silver chrome spray paint, a thick black outline, a thin white highlight, drips running down from the bottom, a haze of overspray;
+2. an official stencil in black spray paint: «DIVIETO DI AFFISSIONE» in condensed capital stencil letters (with the stencil bridges), on two lines, uneven paint, faint overspray, two drips, old and faded;
+3. a quick black spray tag «mnt» with a long underline;
+4. «46100» (the postcode of Mantova) in black spray, fast and slanted, with one drip;
+5. a red paint-marker tag «pekko» with a little star;
+6. a white chalk drawing of a snail with «pzkko» written in chalk under it, a child's drawing, powdery and smudged;
+7. a fat green marker tag «gimbo» with a halo of ink;
+8. a hasty blue spray tag «pzk 2026»;
+9. a patch of «buff»: an irregular rectangle of beige-grey wall paint rolled by the city over an old graffiti, the roller texture visible and the ghost of a black tag faintly showing through it.
+The paint is only spray paint, marker ink, chalk and wall paint: semi-transparent overspray, drips running downward, grainy edges. No wall, no texture, no shadow: only the paint on the magenta. ${NIENTE_MAGENTA}`,
+  },
+
+  adesivi: {
+    scala: 0.5,
+    titolo: 'gli adesivi attaccati al pluviale, al telaio della porta e al muro',
+    aspetto: '2048x2048',
+    griglia: [3, 3],
+    pezzi: ['hello', 'unimore', 'teschio', 'nutria', 'mn', 'concerto', 'strappato', 'pzkkonet', 'occhio'],
+    prompt: `${griglia('Nine separate street stickers,', 3, 3)}
+They are the stickers («slaps») stuck over the years on the drainpipe, the door frame and the walls of a street in Mantova: all weathered, faded by the sun, scratched, some corners peeling, each one different:
+1. a red «HELLO my name is» label with «pekko» written in black marker;
+2. a small yellow rectangular sticker «unimore ≥ unibo» in bold black letters;
+3. a black square sticker with a white grinning cartoon skull, its top half torn off;
+4. a round sticker with a cartoon nutria (a coypu) happily eating a piece of bread, thick black outlines;
+5. a white oval sticker like a car country code, «MN» in big black letters and «46100 mantova» in small letters;
+6. a torn paper sticker of a concert, «la chiocciola · live · 21.11», with a little drawing of a snail playing a guitar;
+7. what is left of a torn-off sticker: a rough rectangle of white paper fibres and yellowed glue;
+8. a blue rectangular sticker «pzkkonet» with a small snail logo and «la fibra che arriva anche dove non c'è»;
+9. a sticker with one big cartoon eye looking sideways.
+Seen straight on, flat. No wall, no shadow: only the stickers on the magenta. ${NIENTE_MAGENTA}`,
+  },
+
+  porta: {
+    scala: 0.6,
+    titolo: 'il cartello «chiuso», la targa del civico 28 e gli adesivi del vetro della porta',
+    aspetto: '2048x1152',
+    griglia: [3, 2],
+    pezzi: ['chiuso', 'civico', 'orario', 'fumare', 'video', 'spingere'],
+    tagli: [[0.35, 0.61], [0.5]],
+    briciole: 3, // (i due punti e i trattini dell'orario sono piccoli: non sono briciole)
+    prompt: `${griglia('Six signs and stickers,', 3, 2)}
+They are the signs and stickers of the glass door of a small closed shop in Mantova, each one seen straight on:
+1. a hanging shop sign: a landscape rectangle (3:2) of thick white plastic card, slightly yellowed by the sun, two small punched holes in the top corners, the word «CHIUSO» printed across the middle in big bold red condensed capitals and «torniamo presto» in small black print under it; a strip of clear tape on one corner, faint fingerprints;
+2. a square house-number plate of enamelled steel, slightly domed: deep blue enamel, a thin white border line inset from the edge and the number «28» in big white classic Italian street-sign numerals; the enamel chipped around the two screw holes (top and bottom, with rusty slotted screws) and at the corners, showing black iron and rust, a thin rust streak below the lower screw;
+3. an opening-hours sticker for the glass made only of cut white vinyl letters (no background panel): «ORARIO» on top, then «lun – ven  9:00 – 12:30  15:30 – 19:30», «sabato  9:00 – 12:30», «domenica chiuso», in a clean sans-serif, a couple of letters partly peeled off;
+4. a round red-and-white «VIETATO FUMARE» sticker with the crossed-out cigarette, faded by the sun;
+5. a small rectangular yellow-and-black «AREA VIDEOSORVEGLIATA» sticker with a camera pictogram and small print, scratched;
+6. a small white vinyl «SPINGERE» sticker with a black arrow, one corner peeling.
+No door, no glass, no wall, no shadow: only the pieces on the magenta. ${NIENTE_MAGENTA}`,
   },
 }

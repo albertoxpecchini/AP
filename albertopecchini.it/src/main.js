@@ -37,6 +37,8 @@ const initInk = onDemand('[data-ink]', 'initInk', () => import('./client/ink.js'
 const initJelly = onDemand('[data-jelly]', 'initJelly', () => import('./client/jelly.js'))
 // le slide del Wrapped 5BT: solo in /wrapped5BT/
 const initWrapped = onDemand('[data-wrapped]', 'initWrapped', () => import('./client/wrapped.js'))
+// le Live Photo: solo dove ce n'è una (il fun fact di pzkko)
+const initLive = onDemand('[data-live]', 'initLive', () => import('./client/live.js'))
 
 const modules = [
   initTransitions,
@@ -66,6 +68,7 @@ const modules = [
   initInk,
   initJelly,
   initWrapped,
+  initLive,
   initParallax,
   initMagnetic,
   initCursor,

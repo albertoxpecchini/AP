@@ -20,7 +20,7 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { ROOT, die, predict, prediction, salva, upload } from '../replicate.mjs'
-import { chiave, fondo, fondoMagenta, leggi, rifila, scriviWebp } from '../mascotte/immagine.mjs'
+import { chiave, fondo, fondoMagenta, leggiA, rifila, scriviWebp } from '../mascotte/immagine.mjs'
 import { FOGLI } from './fogli.js'
 
 const LAVORO = join(ROOT, 'tools/pzkko/lavoro')
@@ -192,14 +192,17 @@ async function scriviManifest(man) {
 async function usaGriglia(nome, file) {
   const f = foglio(nome)
   const [cols, rows] = f.griglia
-  const img = leggi(file)
+  const img = await leggiA(file)
   if (fondoMagenta(img)) { f.traslucido ? chiaveK(img, BORDO, f.tinta) : chiave(img, BORDO); console.log(`  fondo magenta tolto con la chiave cromatica${f.traslucido ? ' per pezzi traslucidi' : ''}`) }
   else console.warn('  ! il foglio non è su fondo magenta: ritaglio quello che è trasparente')
   const trovati = componenti(img)
   const { comps, gw, gh } = trovati
-  // ogni componente va alla cella in cui cade il suo baricentro; le briciole si scartano
+  // ogni componente va alla cella in cui cade il suo baricentro; le briciole si scartano. tagli: dove finiscono le
+  // colonne e le righe (frazioni), se il modello non le ha fatte uguali (nel foglio della porta l'orario sborda a sinistra)
+  const [tx, ty] = f.tagli ?? [[], []]
+  const dove = (v, n, t) => (t.length ? t.filter((k) => v >= k).length : Math.min(n - 1, (v * n) | 0))
   for (const c of comps) {
-    c.cell = c.n < MIN ? -1 : Math.min(rows - 1, ((c.sy / c.n / gh) * rows) | 0) * cols + Math.min(cols - 1, ((c.sx / c.n / gw) * cols) | 0)
+    c.cell = c.n < (f.briciole ?? MIN) ? -1 : dove(c.sy / c.n / gh, rows, ty) * cols + dove(c.sx / c.n / gw, cols, tx)
   }
   const man = await manifest()
   man[nome] = {}
@@ -221,7 +224,7 @@ async function usaGriglia(nome, file) {
 
 async function usaIntero(nome, file) {
   const f = foglio(nome)
-  const img = leggi(file)
+  const img = await leggiA(file)
   if (fondoMagenta(img)) { f.traslucido ? chiaveK(img, BORDO, f.tinta) : chiave(img, BORDO); console.log(`  fondo magenta tolto con la chiave cromatica${f.traslucido ? ' per pezzi traslucidi' : ''}`) }
   const piece = rifila(img, 8)
   await mkdir(dirname(join(OUT, `${f.intero}.webp`)), { recursive: true })

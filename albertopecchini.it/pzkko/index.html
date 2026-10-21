@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>pzkko, i social di Alberto Pecchini</title>
-<meta name="description" content="I siti e i social di Alberto Pecchini (pzkko) attaccati a un muro: albertopecchini.it, Better Call Pekko, Rivalta sul Mincio, Cascina Fontana, Instagram, GitHub, WhatsApp, e-mail e PayPal.">
+<meta name="description" content="I siti e i social di Alberto Pecchini (pzkko) attaccati a un muro: albertopecchini.it, Better Call Pekko, Rivalta sul Mincio, Cascina Fontana, Instagram, TikTok, GitHub, WhatsApp, e-mail e PayPal.">
 <link rel="canonical" href="https://www.pzkko.it/">
 <meta name="author" content="Alberto Pecchini">
 <link rel="author" href="https://www.albertopecchini.it">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="pzkko">
 <meta property="og:title" content="pzkko, i social di Alberto Pecchini">
-<meta property="og:description" content="I miei siti, Instagram, GitHub, WhatsApp, e-mail e PayPal, attaccati a un muro.">
+<meta property="og:description" content="I miei siti, Instagram, TikTok, GitHub, WhatsApp, e-mail e PayPal, attaccati a un muro.">
 <meta property="og:url" content="https://www.pzkko.it/">
 <meta property="og:image" content="https://www.pzkko.it/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -25,13 +25,55 @@
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/art/insegna.svg" as="image">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"pzkko","url":"https://www.pzkko.it/","inLanguage":"it","author":{"@type":"Person","name":"Alberto Pecchini","alternateName":"pzkko","url":"https://www.albertopecchini.it","sameAs":["https://www.instagram.com/albertoxpecchini/","https://github.com/albertoxpecchini"]}}</script>
+<!-- La scena 3D (in fondo alla pagina): se partirà (WebGL2, niente ?muro), la pagina si nasconde subito sotto
+     l'anteprima della strada, senza far vedere il muro per un attimo -->
+<script>
+(() => {
+  const q = new URLSearchParams(location.search)
+  if (q.get('muro') !== null) return
+  let gl = null
+  try { gl = document.createElement('canvas').getContext('webgl2') } catch {}
+  if (!gl) return
+  gl.getExtension('WEBGL_lose_context')?.loseContext()
+  document.documentElement.classList.add('scena-carico')
+  // il pomodoro del caricamento (in fondo alla pagina): matura sotto gli occhi mentre la scena si prepara, si chiede per primo
+  const pm = document.createElement('link'); pm.rel = 'preload'; pm.as = 'image'; pm.href = '/art/scena/pomodoro/matura.webp'; pm.fetchPriority = 'high'; document.head.appendChild(pm)
+  // il foglio di stile e i moduli della scena si chiedono subito, prima delle immagini della pagina (che sotto non si
+  // vedono): chiesti in fondo alla pagina partivano dietro a tutte loro
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/scena/scena.css'; document.head.appendChild(l)
+  for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'lettere', 'acqua', 'bestie', 'marciapiede', 'spazzatura', 'meteo', 'negozio', 'fronte', 'disegni', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
+  // le illustrazioni dei volantini della pagina (pigre, dentro un .vol) al 3D non servono: lui ha le foto dei volantini
+  // fatte da cattura.mjs. Si trattengono mentre la pagina si legge (src → data-tieni), prima che il browser le chieda, e
+  // tornano solo se servono (window.pzkkoTrattenute: il 3D non parte, il muro in trasparenza della regia o di ?allinea).
+  // (per questo sono pigre tutte, anche le prime in alto: una non pigra il browser la chiede prima di qualunque script)
+  window.pzkkoTrattenute = () => { for (const i of document.querySelectorAll('img[data-tieni]')) { i.src = i.dataset.tieni; i.removeAttribute('data-tieni') } }
+  if (q.has('allinea')) return
+  const trattieni = new MutationObserver((cambi) => {
+    for (const c of cambi) for (const n of c.addedNodes) for (const i of n.tagName === 'IMG' ? [n] : n.querySelectorAll?.('img') ?? []) {
+      if (i.loading === 'lazy' && i.getAttribute('src') && i.closest('.it')?.classList.contains('vol')) { i.dataset.tieni = i.getAttribute('src'); i.removeAttribute('src') }
+    }
+  })
+  trattieni.observe(document.documentElement, { childList: true, subtree: true })
+  document.addEventListener('DOMContentLoaded', () => trattieni.disconnect(), { once: true })
+})()
+</script>
+<style>html.scena-carico{background:#0c0d0f}html.scena-carico .strada{visibility:hidden}</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"pzkko","url":"https://www.pzkko.it/","inLanguage":"it","author":{"@type":"Person","name":"Alberto Pecchini","alternateName":"pzkko","url":"https://www.albertopecchini.it","sameAs":["https://www.instagram.com/albertoxpecchini/","https://www.tiktok.com/@albertoxpecchini","https://github.com/albertoxpecchini"]}}</script>
 <style>
-/* I caratteri dei volantini: Anton e Archivo Black (OFL), Special Elite e Permanent Marker (Apache 2.0), da Google Fonts, serviti da qui. */
+/* I caratteri dei volantini: Anton e Archivo Black (OFL), Special Elite e Permanent Marker (Apache 2.0), da Google Fonts, serviti da qui.
+   Dal 21.10 anche quelli delle altre tipografie (le classi t-* e m-sale, sotto): Abril Fatface, Shrikhand, Bungee, Black Ops One,
+   Rubik Mono One, Alfa Slab One (OFL) e Rock Salt (Apache 2.0); il browser li scarica solo se un volantino li usa. */
 @font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Archivo Black";src:url(/fonts/archivo-black.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Abril Fatface";src:url(/fonts/abril-fatface.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Shrikhand";src:url(/fonts/shrikhand.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Bungee";src:url(/fonts/bungee.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Black Ops One";src:url(/fonts/black-ops-one.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rubik Mono One";src:url(/fonts/rubik-mono-one.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Alfa Slab One";src:url(/fonts/alfa-slab-one.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rock Salt";src:url(/fonts/rock-salt.woff2) format("woff2");font-weight:400;font-display:swap}
 
 :root{
   --pietra:#665d56; --pietra2:#58504a; --asfalto:#3a3937;
@@ -107,7 +149,7 @@ img{display:block;max-width:100%;height:auto}
 .muro::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;background:url(/art/muro.webp) 0 0/2200px auto repeat;filter:grayscale(1) contrast(3.2) brightness(1.25);opacity:calc(.75 * var(--auto-l));
   -webkit-mask-image:radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%);
   mask-image:radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%)}
-.parete{position:relative;height:calc(2258 * var(--u))}
+.parete{position:relative;height:calc(2989 * var(--u))}
 .gruppo{display:contents}
 
 /* ogni cosa sul muro è posizionata in 1280esimi (e in 390esimi sul telefono) */
@@ -130,7 +172,7 @@ img{display:block;max-width:100%;height:auto}
 .testo{position:relative;flex:1;display:flex;flex-direction:column;gap:2.2cqw;padding:var(--pad)}
 .vol:has(.tagliandi) .testo{padding-bottom:var(--giu)}
 .arte{width:var(--aw,62%);margin:0 auto;mix-blend-mode:multiply;flex:none;align-self:var(--aa,center)}
-.vol h3,.vol .titolo{font:400 max(26px,18cqw)/.95 var(--fa);letter-spacing:.005em;color:var(--titolo,var(--inchiostro));text-wrap:balance}
+.vol h3,.vol .titolo{font:400 max(calc(26px * var(--ts,1)),calc(18cqw * var(--ts,1)))/.95 var(--fa);letter-spacing:.005em;color:var(--titolo,var(--inchiostro));text-wrap:balance}
 .vol h3 a,.vol .titolo a{text-decoration:none}
 .vol h3 a::after{content:"";position:absolute;inset:0;z-index:1}
 .vol p{font:400 max(12px,5.4cqw)/1.28 var(--ft);color:var(--testo,var(--inchiostro))}
@@ -145,6 +187,16 @@ img{display:block;max-width:100%;height:auto}
 .vol .siti{list-style:none;padding:0;font:400 max(12px,5.2cqw)/1.3 var(--ft)}
 .vol .siti li{display:flex;align-items:center}
 .vol .piu18{position:absolute;left:6%;top:5%;z-index:1;font:400 max(12px,6cqw)/1 var(--fb);color:#fff;background:var(--marker-rosso);padding:.35em .4em;border-radius:50%;transform:rotate(12deg)}
+/* le altre tipografie: il titolo in un altro carattere (--fa) e alla sua misura (--ts: Anton è stretto, questi no);
+   m-sale scrive le note a mano col pennarello che gratta (Rock Salt, largo e alto: più piccolo) */
+.t-didone{--fa:"Abril Fatface",Didot,"Bodoni MT",serif;--ts:.8}
+.t-tondo{--fa:"Shrikhand","Cooper Black",serif;--ts:.72;--titolo:#7a2a12}
+.t-insegna{--fa:"Bungee","Arial Black",sans-serif;--ts:.62}
+.t-stencil{--fa:"Black Ops One",Impact,sans-serif;--ts:.78}
+.t-mono{--fa:"Rubik Mono One","Arial Black",sans-serif;--ts:.62}
+.t-slab{--fa:"Alfa Slab One",Rockwell,serif;--ts:.74}
+.t-didone h3,.t-tondo h3,.t-insegna h3,.t-stencil h3,.t-mono h3,.t-slab h3{line-height:1.02}
+.m-sale .mano{font:400 max(11px,4.8cqw)/1.5 "Rock Salt","Comic Sans MS",cursive}
 
 /* il foglio sotto il puntatore viene in primo piano: i nuovi coprono i vecchi, ma basta passarci sopra
    (sul telefono toccarlo: lo script gli mette .sopra) per tirare fuori quello di sotto. Vale anche per i
@@ -200,10 +252,10 @@ img{display:block;max-width:100%;height:auto}
 /* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
 @media (max-width:899px){
   :root{--u:calc(min(100cqw, 600px) / 390)}
-  .parete{height:calc(3777 * var(--u));max-width:600px;margin:0 auto}
+  .parete{height:calc(5228 * var(--u));max-width:600px;margin:0 auto}
   .it{--px:var(--mx,var(--x));--py:var(--my,var(--y));--pw:var(--mw,var(--w));--pr:var(--mr,var(--r,0deg))}
   .spray{font-size:calc(40 * var(--u))}
-  .vol h3{font-size:max(22px,16cqw)}
+  .vol h3{font-size:max(calc(22px * var(--ts,1)),calc(16cqw * var(--ts,1)))}
   .vol p{font-size:max(12px,5.6cqw)}
   .vol .handle{font-size:max(12px,6cqw)}
   .tagliandi{height:max(46px,17cqw)}
@@ -245,104 +297,117 @@ img{display:block;max-width:100%;height:auto}
     <div class="parete">
 
       <!-- quello che c'era già sul muro: graffiti, resti, manifesti di altri -->
-      <img class="it tag" src="/art/strada2/tiamo.webp" alt="" width="399" height="360" loading="lazy" style="--x:948;--y:1628;--w:170;--r:-4deg;--mx:96;--my:2768;--mw:120;--mr:-3deg">
-      <img class="it tag" src="/art/strada2/no.webp" alt="" width="432" height="441" loading="lazy" style="--x:805;--y:1933;--w:120;--r:3deg;--mx:151;--my:3322;--mw:70;--mr:3deg">
-      <img class="it tag chiaro" src="/art/strada2/ciaomamma.webp" alt="" width="429" height="342" loading="lazy" style="--x:482;--y:1867;--w:170;--r:-2deg;--mx:124;--my:2914;--mw:150;--mr:-2deg">
-      <img class="it tag" src="/art/strada2/pizza.webp" alt="" width="414" height="348" loading="lazy" style="--x:660;--y:2063;--w:170;--r:2deg;--mx:146;--my:2875;--mw:130;--mr:2deg">
-      <img class="it tag" src="/art/strada2/zio.webp" alt="" width="450" height="375" loading="lazy" style="--x:273;--y:2015;--w:110;--r:0deg;--mx:6;--my:3549;--mw:80;--mr:0deg">
-      <img class="it tag" src="/art/strada2/qui.webp" alt="" width="468" height="492" loading="lazy" style="--x:1135;--y:494;--w:120;--r:0deg;--mx:140;--my:1411;--mw:80;--mr:0deg">
-      <img class="it pezzo" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy" style="--x:378;--y:2076;--w:48;--r:0deg;--mx:201;--my:3549;--mw:34;--mr:0deg">
-      <img class="it pezzo" src="/art/bestiole/gomme2.webp" alt="" width="408" height="384" loading="lazy" style="--x:1236;--y:347;--w:30;--r:20deg;--mx:371;--my:947;--mw:22;--mr:20deg">
+      <img class="it tag" src="/art/strada2/tiamo.webp" alt="" width="399" height="360" loading="lazy" style="--x:948;--y:1413;--w:170;--r:-4deg;--mx:96;--my:3020;--mw:120;--mr:-3deg">
+      <img class="it tag" src="/art/strada2/no.webp" alt="" width="432" height="441" loading="lazy" style="--x:805;--y:1718;--w:120;--r:3deg;--mx:151;--my:3502;--mw:70;--mr:3deg">
+      <img class="it tag chiaro" src="/art/strada2/ciaomamma.webp" alt="" width="429" height="342" loading="lazy" style="--x:482;--y:1730;--w:170;--r:-2deg;--mx:124;--my:2622;--mw:150;--mr:-2deg">
+      <img class="it tag" src="/art/strada2/pizza.webp" alt="" width="414" height="348" loading="lazy" style="--x:660;--y:1896;--w:170;--r:2deg;--mx:146;--my:3111;--mw:130;--mr:2deg">
+      <img class="it tag" src="/art/strada2/zio.webp" alt="" width="450" height="375" loading="lazy" style="--x:848;--y:2051;--w:110;--r:0deg;--mx:6;--my:3714;--mw:80;--mr:0deg">
+      <img class="it tag" src="/art/strada2/qui.webp" alt="" width="468" height="492" loading="lazy" style="--x:1135;--y:438;--w:120;--r:0deg;--mx:140;--my:1262;--mw:80;--mr:0deg">
+      <img class="it pezzo" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy" style="--x:762;--y:2092;--w:48;--r:0deg;--mx:201;--my:3714;--mw:34;--mr:0deg">
+      <img class="it pezzo" src="/art/bestiole/gomme2.webp" alt="" width="408" height="384" loading="lazy" style="--x:1236;--y:325;--w:30;--r:20deg;--mx:371;--my:869;--mw:22;--mr:20deg">
       <img class="it pezzo" src="/art/bestiole/rivolo.webp" data-scena="no" alt="" width="88" height="604" loading="lazy" style="--x:1215;--y:0;--w:36;--r:0deg;--mx:352;--my:0;--mw:22;--mr:0deg;opacity:.8">
-      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:190;--y:1119;--w:300;--r:-3deg;--mx:25;--my:1214;--mw:230;--mr:-6deg">
-      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:646;--y:911;--w:250;--r:-6deg;--mx:122;--my:1973;--mw:200;--mr:-5deg">
-      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:1170;--y:552;--w:95;--r:6deg;--mx:337;--my:2939;--mw:70;--mr:8deg">
-      <img class="it tag" src="/art/tag/tag-verde.webp" alt="" width="498" height="360" loading="lazy" style="--x:427;--y:1195;--w:330;--r:2deg;--mx:62;--my:2086;--mw:240;--mr:3deg">
-      <img class="it tag chiaro" src="/art/tag/ciao-bianco.webp" alt="" width="441" height="372" loading="lazy" style="--x:958;--y:1078;--w:250;--r:-8deg;--mx:116;--my:2625;--mw:180;--mr:-7deg">
-      <img class="it tag" src="/art/tag/tag-arancio.webp" alt="" width="483" height="390" loading="lazy" style="--x:70;--y:1854;--w:320;--r:3deg;--mx:26;--my:3263;--mw:230;--mr:4deg">
-      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" loading="lazy" style="--x:935;--y:1897;--w:230;--r:0deg;--mx:118;--my:3541;--mw:170;--mr:-5deg">
-      <img class="it tag chiaro" src="/art/tag/tag-azzurro.webp" alt="" width="450" height="360" loading="lazy" style="--x:968;--y:1914;--w:300;--r:-4deg;--mx:144;--my:3073;--mw:170;--mr:-6deg">
-      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" loading="lazy" style="--x:27;--y:1892;--w:110;--r:0deg;--mx:171;--my:3462;--mw:110;--mr:0deg">
-      <img class="it tag chiaro" src="/art/scritte2/brat-summer.webp" alt="" width="501" height="594" loading="lazy" style="--x:560;--y:0;--w:130;--r:-6deg;--mx:243;--my:155;--mw:105;--mr:-6deg">
-      <img class="it tag" src="/art/scritte2/unimore.webp" alt="" width="456" height="498" loading="lazy" style="--x:1072;--y:1380;--w:120;--r:-4deg;--mx:238;--my:3641;--mw:95;--mr:-4deg">
-      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" loading="lazy" style="--x:1115;--y:1952;--w:200;--r:-4deg;--mx:31;--my:3429;--mw:120;--mr:-8deg">
-      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" loading="lazy" style="--x:980;--y:2092;--w:170;--r:6deg;--mx:119;--my:1478;--mw:120;--mr:10deg">
+      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:190;--y:1019;--w:300;--r:-3deg;--mx:25;--my:1074;--mw:230;--mr:-6deg">
+      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:646;--y:763;--w:250;--r:-6deg;--mx:122;--my:1760;--mw:200;--mr:-5deg">
+      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:1170;--y:530;--w:95;--r:6deg;--mx:337;--my:2647;--mw:70;--mr:8deg">
+      <img class="it tag" src="/art/tag/tag-verde.webp" alt="" width="498" height="360" loading="lazy" style="--x:427;--y:1128;--w:330;--r:2deg;--mx:62;--my:2414;--mw:240;--mr:3deg">
+      <img class="it tag chiaro" src="/art/tag/ciao-bianco.webp" alt="" width="441" height="372" loading="lazy" style="--x:958;--y:996;--w:250;--r:-8deg;--mx:116;--my:2354;--mw:180;--mr:-7deg">
+      <img class="it tag" src="/art/tag/tag-arancio.webp" alt="" width="483" height="390" loading="lazy" style="--x:70;--y:1993;--w:260;--r:3deg;--mx:26;--my:3467;--mw:230;--mr:4deg">
+      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" loading="lazy" style="--x:935;--y:1661;--w:230;--r:0deg;--mx:118;--my:3172;--mw:170;--mr:-5deg">
+      <img class="it tag chiaro" src="/art/tag/tag-azzurro.webp" alt="" width="450" height="360" loading="lazy" style="--x:968;--y:1734;--w:300;--r:-4deg;--mx:144;--my:2757;--mw:170;--mr:-6deg">
+      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" loading="lazy" style="--x:27;--y:2096;--w:110;--r:0deg;--mx:171;--my:3627;--mw:110;--mr:0deg">
+      <img class="it tag chiaro" src="/art/scritte2/brat-summer.webp" alt="" width="501" height="594" loading="lazy" style="--x:560;--y:0;--w:130;--r:-6deg;--mx:243;--my:138;--mw:105;--mr:-6deg">
+      <img class="it tag" src="/art/scritte2/unimore.webp" alt="" width="456" height="498" loading="lazy" style="--x:1072;--y:1241;--w:120;--r:-4deg;--mx:238;--my:3272;--mw:95;--mr:-4deg">
+      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" loading="lazy" style="--x:1115;--y:1772;--w:200;--r:-4deg;--mx:31;--my:3609;--mw:120;--mr:-8deg">
+      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" loading="lazy" style="--x:980;--y:1856;--w:170;--r:6deg;--mx:119;--my:1583;--mw:120;--mr:10deg">
 
-      <img class="it man" src="/art/manifesti1/concerto.webp" alt="" width="555" height="762" loading="lazy" style="--x:277;--y:1183;--w:240;--r:4deg;--mx:26;--my:2118;--mw:150;--mr:5deg">
-      <img class="it man" src="/art/manifesti2/punk.webp" alt="" width="549" height="729" loading="lazy" style="--x:1027;--y:819;--w:230;--r:-5deg;--mx:212;--my:2498;--mw:160;--mr:4deg">
-      <img class="it man" src="/art/manifesti1/sagra.webp" alt="" width="561" height="687" loading="lazy" style="--x:1032;--y:1942;--w:225;--r:-3deg;--mx:21;--my:3553;--mw:150;--mr:-4deg">
-      <img class="it man" src="/art/manifesti1/roulette.webp" alt="" width="555" height="759" loading="lazy" style="--x:782;--y:1328;--w:215;--r:3deg;--mx:26;--my:2772;--mw:150;--mr:3deg">
-      <img class="it man" src="/art/manifesti1/teatro.webp" alt="" width="657" height="672" loading="lazy" style="--x:1017;--y:1701;--w:245;--r:2deg;--mx:16;--my:3276;--mw:150;--mr:-4deg">
-      <img class="it man" src="/art/manifesti2/gatto.webp" alt="" width="546" height="729" loading="lazy" style="--x:777;--y:1807;--w:225;--r:5deg;--mx:208;--my:3441;--mw:150;--mr:3deg">
-      <img class="it man" src="/art/manifesti2/dadi.webp" alt="" width="549" height="729" loading="lazy" style="--x:1042;--y:1114;--w:200;--r:-3deg;--mx:218;--my:3252;--mw:150;--mr:-3deg">
-      <img class="it man" src="/art/manifesti2/moneta.webp" alt="" width="609" height="585" loading="lazy" style="--x:42;--y:1894;--w:210;--r:-2deg;--mx:36;--my:3419;--mw:150;--mr:-2deg">
+      <img class="it man" src="/art/manifesti1/concerto.webp" alt="" width="555" height="762" loading="lazy" style="--x:277;--y:1378;--w:240;--r:4deg;--mx:26;--my:2417;--mw:150;--mr:5deg">
+      <img class="it man" src="/art/manifesti2/punk.webp" alt="" width="549" height="729" loading="lazy" style="--x:1027;--y:737;--w:230;--r:-5deg;--mx:212;--my:2227;--mw:160;--mr:4deg">
+      <img class="it man" src="/art/manifesti1/sagra.webp" alt="" width="561" height="687" loading="lazy" style="--x:1032;--y:1737;--w:225;--r:-3deg;--mx:21;--my:3704;--mw:150;--mr:-4deg">
+      <img class="it man" src="/art/manifesti1/roulette.webp" alt="" width="555" height="759" loading="lazy" style="--x:782;--y:1142;--w:215;--r:3deg;--mx:26;--my:3008;--mw:150;--mr:3deg">
+      <img class="it man" src="/art/manifesti1/teatro.webp" alt="" width="657" height="672" loading="lazy" style="--x:1017;--y:1521;--w:245;--r:2deg;--mx:16;--my:3456;--mw:150;--mr:-4deg">
+      <img class="it man" src="/art/manifesti2/gatto.webp" alt="" width="546" height="729" loading="lazy" style="--x:777;--y:1571;--w:225;--r:5deg;--mx:208;--my:3072;--mw:150;--mr:3deg">
+      <img class="it man" src="/art/manifesti2/dadi.webp" alt="" width="549" height="729" loading="lazy" style="--x:1042;--y:1002;--w:200;--r:-3deg;--mx:218;--my:2903;--mw:150;--mr:-3deg">
+      <img class="it man" src="/art/manifesti2/moneta.webp" alt="" width="609" height="585" loading="lazy" style="--x:1032;--y:1976;--w:210;--r:-2deg;--mx:36;--my:3584;--mw:150;--mr:-2deg">
 
       <!-- in cima, la parte nuova (17.10): roba degli altri attaccata dopo, sopra a tutto il resto -->
-      <img class="it man" src="/art/manifesti3/unimore.webp" alt="" width="723" height="708" loading="lazy" style="--x:762;--y:14;--w:275;--r:2deg;--mx:202;--my:517;--mw:180;--mr:2deg">
-      <img class="it man" src="/art/manifesti3/lyca-tim.webp" alt="" width="687" height="714" loading="lazy" style="--x:20;--y:537;--w:255;--r:-3deg;--mx:12;--my:379;--mw:170;--mr:-3deg">
-      <img class="it man" src="/art/manifesti3/starlink.webp" alt="" width="699" height="735" loading="lazy" style="--x:530;--y:524;--w:250;--r:2.5deg;--mx:208;--my:951;--mw:168;--mr:2.5deg">
-      <img class="it man" src="/art/manifesti3/moncler.webp" alt="" width="681" height="732" loading="lazy" style="--x:1027;--y:571;--w:240;--r:3deg;--mx:212;--my:1359;--mw:160;--mr:3deg">
+      <img class="it man" src="/art/manifesti3/unimore.webp" alt="" width="723" height="708" loading="lazy" style="--x:762;--y:14;--w:275;--r:2deg;--mx:202;--my:456;--mw:180;--mr:2deg">
+      <img class="it man" src="/art/manifesti3/lyca-tim.webp" alt="" width="687" height="714" loading="lazy" style="--x:20;--y:463;--w:255;--r:-3deg;--mx:12;--my:328;--mw:170;--mr:-3deg">
+      <img class="it man" src="/art/manifesti3/starlink.webp" alt="" width="699" height="735" loading="lazy" style="--x:530;--y:483;--w:250;--r:2.5deg;--mx:208;--my:845;--mw:168;--mr:2.5deg">
+      <img class="it man" src="/art/manifesti3/moncler.webp" alt="" width="681" height="732" loading="lazy" style="--x:1027;--y:515;--w:240;--r:3deg;--mx:212;--my:1210;--mw:160;--mr:3deg">
       <a class="man-link" href="https://oakvx.github.io/bratAnimator/" rel="noopener" target="_blank"><img class="it man" src="/art/manifesti4/brat.webp" alt="brat animator" width="666" height="765" loading="lazy" style="--x:292;--y:18;--w:220;--r:4deg;--mx:218;--my:18;--mw:150;--mr:4deg"></a>
-      <img class="it man" src="/art/manifesti4/tre-torri.webp" alt="" width="750" height="702" loading="lazy" style="--x:1037;--y:30;--w:235;--r:-5deg;--mx:18;--my:834;--mw:165;--mr:-5deg">
+      <img class="it man" src="/art/manifesti4/tre-torri.webp" alt="" width="750" height="702" loading="lazy" style="--x:1037;--y:30;--w:235;--r:-5deg;--mx:18;--my:723;--mw:165;--mr:-5deg">
 
+      <!-- da bologna (storia/): tre meme stampati e attaccati, portano alla storia del muro -->
+      <a class="man-link" href="/storia/"><img class="it man" src="/art/storia/muro/mortadella.webp" alt="meme: «bologna la dotta, la rossa… e la grassa», pekko culla una mortadella" width="600" height="600" loading="lazy" style="--x:282;--y:2200;--w:220;--r:3deg;--mx:218;--my:3242;--mw:150;--mr:3deg"></a>
+      <a class="man-link" href="/storia/"><img class="it man" src="/art/storia/muro/iphone.webp" alt="meme: «iphone nuovo da due giorni, la modella: una saracinesca»" width="600" height="600" loading="lazy" style="--x:527;--y:1896;--w:230;--r:-2deg;--mx:208;--my:3367;--mw:160;--mr:-2deg"></a>
+      <a class="man-link" href="/storia/"><img class="it man" src="/art/storia/muro/nonna.webp" alt="meme: «quando a bologna ordini gli spaghetti alla bolognese», la nonna col mattarello" width="600" height="600" loading="lazy" style="--x:782;--y:1831;--w:220;--r:2deg;--mx:218;--my:3501;--mw:150;--mr:2deg"></a>
+
+      <img class="it man" src="/art/manifesti5/redbull.webp" alt="" width="540" height="693" loading="lazy" style="--x:512;--y:2088;--w:225;--r:4deg;--mx:6;--my:3857;--mw:150;--mr:4deg">
+      <img class="it man" src="/art/manifesti5/eastpak.webp" alt="" width="540" height="765" loading="lazy" style="--x:512;--y:2333;--w:215;--r:2deg;--mx:198;--my:3945;--mw:150;--mr:2deg">
+      <img class="it man" src="/art/landini/copertina.webp" alt="" width="583" height="943" loading="lazy" style="--x:762;--y:2014;--w:200;--r:3deg;--mx:6;--my:4018;--mw:140;--mr:3deg">
+      <img class="it man" src="/art/landini/avviamento.webp" alt="" width="547" height="946" loading="lazy" style="--x:1012;--y:2143;--w:185;--r:2deg;--mx:198;--my:4124;--mw:130;--mr:2deg">
+      <img class="it man" src="/art/amici/landini.webp" alt="" width="653" height="820" loading="lazy" style="--x:762;--y:2290;--w:165;--r:3.5deg;--mx:6;--my:4209;--mw:130;--mr:3.5deg">
+      <img class="it man" src="/art/manifesti5/frutti.webp" alt="" width="657" height="795" loading="lazy" style="--x:1012;--y:2416;--w:205;--r:2deg;--mx:6;--my:4364;--mw:150;--mr:2deg">
+      <img class="it man" src="/art/amici/negozio.webp" alt="" width="479" height="820" loading="lazy" style="--x:12;--y:2460;--w:115;--r:-3deg;--mx:198;--my:4314;--mw:100;--mr:-3deg">
+      <img class="it man" src="/art/amici/ypsilon.webp" alt="" width="316" height="820" loading="lazy" style="--x:262;--y:2383;--w:85;--r:-4deg;--mx:198;--my:4456;--mw:70;--mr:-4deg">
       <!-- i miei siti: questi si aprono (tranne quello di donelli, che aspetta il dominio) -->
       <section class="gruppo" aria-labelledby="siti">
         <h2 class="it spray chiaro" id="siti" style="--x:52;--y:0;--w:170;--r:-6deg;--mx:31;--my:0;--mw:120;--mr:-6deg"><img src="/art/scritte2/siti.webp" alt="siti" width="489" height="603" loading="lazy"></h2>
 
-        <article class="vol it c-bianco" style="--x:12;--y:140;--w:285;--r:-2deg;--mx:6;--my:98;--mw:188;--mr:-2deg;--marker-c:#1446a0">
+        <article class="vol it c-bianco t-didone" style="--x:12;--y:119;--w:285;--r:-2deg;--mx:6;--my:83;--mw:188;--mr:-2deg;--marker-c:#1446a0">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte3/chiocciola.webp" alt="" width="444" height="588" style="--aw:50%">
+            <img class="arte" loading="lazy" src="/art/arte3/chiocciola.webp" alt="" width="444" height="588" style="--aw:50%">
             <h3><a href="https://www.albertopecchini.it" rel="me noopener" target="_blank">alberto pecchini</a></h3>
             <p>il sito serio: i progetti, i siti che faccio e come lavoro.</p>
             <p class="handle">albertopecchini.it</p>
           </div>
         </article>
 
-        <article class="vol it c-giallo" style="--x:262;--y:236;--w:280;--r:2deg;--mx:198;--my:219;--mw:188;--mr:2deg;--marker-c:#a50d25">
+        <article class="vol it c-giallo" style="--x:262;--y:211;--w:280;--r:2deg;--mx:198;--my:189;--mw:188;--mr:2deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte3/computer.webp" alt="" width="450" height="588" style="--aw:46%">
+            <img class="arte" loading="lazy" src="/art/arte3/computer.webp" alt="" width="450" height="588" style="--aw:46%">
             <h3><a href="https://www.bettercallpekko.it" rel="me noopener" target="_blank">better call pekko</a></h3>
             <p>il computer non va? assistenza vera, raccontata come uno spot americano del 2008.</p>
             <p class="handle">bettercallpekko.it</p>
           </div>
         </article>
 
-        <article class="vol it c-lucido" style="--x:512;--y:130;--w:280;--r:-1.5deg;--mx:198;--my:681;--mw:188;--mr:-1.5deg;--marker-c:#173f48">
+        <article class="vol it c-lucido" style="--x:512;--y:130;--w:280;--r:-1.5deg;--mx:198;--my:603;--mw:188;--mr:-1.5deg;--marker-c:#173f48">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte3/airone.webp" alt="" width="441" height="585" style="--aw:46%">
+            <img class="arte" loading="lazy" src="/art/arte3/airone.webp" alt="" width="441" height="585" style="--aw:46%">
             <h3><a href="https://www.rivaltasulmincio.it" rel="noopener" target="_blank">rivalta sul mincio</a></h3>
             <p>l'atlante del mio paese: 184 luoghi, il meteo, il giornale. niente tracciamenti.</p>
             <p class="handle">rivaltasulmincio.it</p>
           </div>
         </article>
 
-        <article class="vol it c-crema" style="--x:762;--y:263;--w:275;--r:-2deg;--mx:6;--my:544;--mw:188;--mr:-2deg;--marker-c:#0b5d2b">
+        <article class="vol it c-crema t-tondo" style="--x:762;--y:236;--w:275;--r:-2deg;--mx:6;--my:475;--mw:188;--mr:-2deg;--marker-c:#0b5d2b">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte3/cascina.webp" alt="" width="447" height="591" style="--aw:46%">
+            <img class="arte" loading="lazy" src="/art/arte3/cascina.webp" alt="" width="447" height="591" style="--aw:46%">
             <h3><a href="https://www.cascinafontana.xyz" rel="noopener" target="_blank">cascina fontana</a></h3>
             <p>la cascina di famiglia a rodigo: fieno, legna e fiori, su appuntamento.</p>
             <p class="handle">cascinafontana.xyz</p>
           </div>
         </article>
 
-        <article class="vol it c-kraft" style="--x:1017;--y:245;--w:255;--r:2.5deg;--mx:198;--my:1116;--mw:185;--mr:2deg;--marker-c:#161616">
+        <article class="vol it c-kraft" style="--x:1017;--y:223;--w:255;--r:2.5deg;--mx:198;--my:992;--mw:185;--mr:2deg;--marker-c:#161616">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte3/compasso.webp" alt="" width="444" height="591" style="--aw:44%">
+            <img class="arte" loading="lazy" src="/art/arte3/compasso.webp" alt="" width="444" height="591" style="--aw:44%">
             <h3>ing. dario donelli</h3>
             <p>lo studio tecnico di rivalta, in bianco e nero come la sua targa.</p>
             <p class="mano vai">presto online</p>
           </div>
         </article>
 
-        <article class="vol it c-arancio flip" style="--x:772;--y:623;--w:260;--r:3deg;--mx:6;--my:976;--mw:185;--mr:3deg;--titolo:#161616;--marker-c:#161616">
+        <article class="vol it c-arancio flip t-insegna m-sale" style="--x:772;--y:538;--w:260;--r:3deg;--mx:6;--my:850;--mw:185;--mr:3deg;--titolo:#161616;--marker-c:#161616">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte3/megafono.webp" alt="" width="453" height="591" style="--aw:44%">
+            <img class="arte" loading="lazy" src="/art/arte3/megafono.webp" alt="" width="453" height="591" style="--aw:44%">
             <h3><a href="https://www.albertopecchini.it/contatti/" rel="noopener" target="_blank">ti serve un sito?</a></h3>
             <p>fatto a mano, leggero, senza cookie. come questi.</p>
             <p class="mano vai">scrivimi <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
@@ -350,12 +415,41 @@ img{display:block;max-width:100%;height:auto}
         </article>
       </section>
 
+      <!-- il fun fact: la saracinesca vera di bologna (storia/) -->
+      <article class="vol it c-giornale" style="--x:22;--y:1023;--w:260;--r:-3deg;--mx:12;--my:1315;--mw:185;--mr:-3deg;--marker-c:#1446a0">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <img class="arte" loading="lazy" src="/art/storia/foto-1-m.webp" alt="" width="540" height="720" style="--aw:40%">
+          <h3><a href="/storia/">da dove viene questo muro?</a></h3>
+          <p>fun fact: esiste davvero. l'ho fotografato a bologna nel 2024, con un iphone nuovo di due giorni.</p>
+          <p class="mano vai">leggi la storia</p>
+        </div>
+      </article>
+
+      <!-- l'annuncio della ciao: la foto vera (il CR2 della canon, tools/pzkko/amici.mjs ciao), il numero di whatsapp nei tagliandi -->
+      <article class="vol it c-bianco t-slab m-sale" style="--x:12;--y:2042;--w:275;--r:2.5deg;--mx:198;--my:3624;--mw:188;--mr:2.5deg;--marker-c:#1446a0">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <img class="arte" loading="lazy" src="/art/annunci/ciao.webp" alt="la piaggio ciao grigia sull'erba, al tramonto" width="720" height="787" style="--aw:80%">
+          <h3><a href="https://wa.me/393510355506?text=ciao%2C%20vendi%20ancora%20il%20ciao%3F" rel="noopener" target="_blank">vendo il ciao</a></h3>
+          <p>piaggio ciao px, grigio. la foto è vera: è proprio lui.</p>
+          <p class="mano">chiedimi tutto</p>
+          <div class="tagliandi" data-copia="+39 351 0355506" data-nome="il numero">
+            <button type="button"><span>351 0355506</span></button><button type="button" class="via"><span>351 0355506</span></button><button type="button"><span>351 0355506</span></button><button type="button"><span>351 0355506</span></button><button type="button"><span>351 0355506</span></button><button type="button" class="via"><span>351 0355506</span></button>
+          </div>
+        </div>
+      </article>
+
       <!-- attaccati sopra con lo scotch -->
-      <img class="it man" src="/art/manifesti4/frisk.webp" alt="" width="450" height="423" loading="lazy" style="--x:402;--y:215;--w:105;--r:-9deg;--mx:301;--my:195;--mw:76;--mr:-9deg;z-index:4">
-      <img class="it man" src="/art/manifesti4/parcheggio.webp" alt="" width="486" height="713" loading="lazy" style="--x:998;--y:592;--w:88;--r:-7deg;--mx:166;--my:1040;--mw:62;--mr:-8deg;z-index:4">
+      <img class="it man" src="/art/manifesti4/frisk.webp" alt="" width="450" height="423" loading="lazy" style="--x:402;--y:190;--w:105;--r:-9deg;--mx:301;--my:165;--mw:76;--mr:-9deg;z-index:4">
+      <img class="it man" src="/art/manifesti4/parcheggio.webp" alt="" width="486" height="713" loading="lazy" style="--x:998;--y:536;--w:88;--r:-7deg;--mx:166;--my:934;--mw:62;--mr:-8deg;z-index:4">
+      <img class="it man" src="/art/manifesti5/estathe.webp" alt="" width="585" height="594" loading="lazy" style="--x:946;--y:2552;--w:105;--r:8deg;--mx:114;--my:3953;--mw:80;--mr:8deg;z-index:4">
+      <!-- gli adesivi con le foto vere (tools/pzkko/amici.mjs), sopra i manifesti degli altri -->
+      <img class="it man" src="/art/amici/jager.webp" alt="" width="820" height="789" loading="lazy" style="--x:1096;--y:865;--w:165;--r:-6deg;--mx:257;--my:2312;--mw:120;--mr:-6deg;z-index:4">
+      <img class="it man" src="/art/amici/keglevich.webp" alt="" width="768" height="820" loading="lazy" style="--x:812;--y:2466;--w:165;--r:-4deg;--mx:26;--my:4515;--mw:125;--mr:-4deg;z-index:4">
 
       <!-- chi sono -->
-      <article class="vol it c-bianco" id="chi-sono" style="--x:16;--y:797;--w:290;--r:-2deg;--mx:6;--my:1248;--mw:200;--mr:-2deg">
+      <article class="vol it c-bianco" id="chi-sono" style="--x:16;--y:697;--w:290;--r:-2deg;--mx:6;--my:1079;--mw:200;--mr:-2deg">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <p class="forte">pzkko è il mio nome in rete.</p>
@@ -366,12 +460,12 @@ img{display:block;max-width:100%;height:auto}
       </article>
 
       <section class="gruppo" aria-labelledby="social">
-        <h2 class="it spray" id="social" style="--x:282;--y:662;--w:230;--r:-3deg;--mx:218;--my:1531;--mw:150;--mr:-5deg"><img src="/art/scritte/social.webp" alt="social" width="486" height="375" loading="lazy"></h2>
+        <h2 class="it spray" id="social" style="--x:282;--y:594;--w:230;--r:-3deg;--mx:218;--my:1365;--mw:150;--mr:-5deg"><img src="/art/scritte/social.webp" alt="social" width="486" height="375" loading="lazy"></h2>
 
-        <article class="vol it c-arancio" style="--x:262;--y:759;--w:280;--r:-4deg;--mx:6;--my:1512;--mw:188;--mr:-3deg;--titolo:#173f48;--marker-c:#173f48">
+        <article class="vol it c-arancio" style="--x:262;--y:673;--w:280;--r:-4deg;--mx:6;--my:1617;--mw:188;--mr:-3deg;--titolo:#173f48;--marker-c:#173f48">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte1/macchina.webp" alt="" width="435" height="636" style="--aw:58%">
+            <img class="arte" loading="lazy" src="/art/arte1/macchina.webp" alt="" width="435" height="636" style="--aw:58%">
             <h3><a href="https://www.instagram.com/albertoxpecchini/" rel="me noopener" target="_blank">instagram</a></h3>
             <p>foto, storie e quello che sto facendo.</p>
             <p class="handle">@albertoxpecchini</p>
@@ -381,10 +475,10 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-bianco flip sotto" style="--x:512;--y:782;--w:285;--r:2deg;--mx:198;--my:1607;--mw:188;--mr:2deg">
+        <article class="vol it c-bianco flip sotto" style="--x:512;--y:715;--w:285;--r:2deg;--mx:198;--my:1429;--mw:188;--mr:2deg">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte1/gatto.webp" alt="" width="420" height="606" style="--aw:52%">
+            <img class="arte" loading="lazy" src="/art/arte1/gatto.webp" alt="" width="420" height="606" style="--aw:52%">
             <h3><a href="https://github.com/albertoxpecchini" rel="me noopener" target="_blank">github</a></h3>
             <p>il codice dei miei siti, compreso questo:</p>
             <ul class="siti"><li><svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg>albertopecchini.it</li><li><svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg>bettercallpekko.it</li><li><svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg>pzkko.it</li></ul>
@@ -394,10 +488,10 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-verde" style="--x:762;--y:967;--w:290;--r:-2deg;--mx:198;--my:1946;--mw:190;--mr:-2deg;--marker-c:#0b5d2b">
+        <article class="vol it c-verde" style="--x:762;--y:819;--w:290;--r:-2deg;--mx:198;--my:1733;--mw:190;--mr:-2deg;--marker-c:#0b5d2b">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte1/cornetta.webp" alt="" width="465" height="618" style="--aw:40%">
+            <img class="arte" loading="lazy" src="/art/arte1/cornetta.webp" alt="" width="465" height="618" style="--aw:40%">
             <h3><a href="https://wa.me/393510355506" rel="noopener" target="_blank">whatsapp</a></h3>
             <p>scrivimi, rispondo appena posso.</p>
             <p class="handle">+39 351 0355506</p>
@@ -407,10 +501,10 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-crema" style="--x:12;--y:1156;--w:285;--r:2.5deg;--mx:6;--my:1836;--mw:185;--mr:3deg;--marker-c:#1446a0">
+        <article class="vol it c-crema" style="--x:12;--y:1401;--w:285;--r:2.5deg;--mx:6;--my:2164;--mw:185;--mr:3deg;--marker-c:#1446a0">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte1/piccione.webp" alt="" width="432" height="627" style="--aw:50%">
+            <img class="arte" loading="lazy" src="/art/arte1/piccione.webp" alt="" width="432" height="627" style="--aw:50%">
             <h3><a href="mailto:pzkko@yahoo.com">e-mail</a></h3>
             <p>per le cose lunghe, o serie.</p>
             <p class="handle">pzkko@yahoo.com</p>
@@ -420,10 +514,10 @@ img{display:block;max-width:100%;height:auto}
           </div>
         </article>
 
-        <article class="vol it c-giallo" style="--x:512;--y:1216;--w:270;--r:-2deg;--mx:198;--my:2202;--mw:185;--mr:-2deg;--marker-c:#1446a0">
+        <article class="vol it c-giallo" style="--x:512;--y:1103;--w:270;--r:-2deg;--mx:198;--my:1962;--mw:185;--mr:-2deg;--marker-c:#1446a0">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte1/caffe.webp" alt="" width="441" height="633" style="--aw:44%">
+            <img class="arte" loading="lazy" src="/art/arte1/caffe.webp" alt="" width="441" height="633" style="--aw:44%">
             <h3><a href="https://www.paypal.biz/albertoxpecchini" rel="noopener" target="_blank">un caffè?</a></h3>
             <p>se ti va di offrirmene uno: paypal.</p>
             <p class="handle">paypal.biz/<wbr>albertoxpecchini</p>
@@ -432,56 +526,69 @@ img{display:block;max-width:100%;height:auto}
             </div>
           </div>
         </article>
+
+        <article class="vol it c-lucido t-mono" style="--x:262;--y:1058;--w:275;--r:-2.5deg;--mx:6;--my:1908;--mw:188;--mr:-2.5deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <img class="arte" loading="lazy" src="/art/arte4/telefono.webp" alt="" width="672" height="1011" style="--aw:46%">
+            <h3><a href="https://www.tiktok.com/@albertoxpecchini" rel="me noopener" target="_blank">tiktok</a></h3>
+            <p>video corti, in verticale, quando capita.</p>
+            <p class="handle">@albertoxpecchini</p>
+            <div class="tagliandi" data-copia="@albertoxpecchini" data-nome="il profilo tiktok">
+              <button type="button"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button><button type="button" class="via"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button><button type="button"><span>@albertoxpecchini</span></button>
+            </div>
+          </div>
+        </article>
       </section>
 
       <section class="gruppo" aria-labelledby="games">
-        <h2 class="it spray bianco" id="games" style="--x:282;--y:1513;--w:210;--r:3deg;--mx:16;--my:2319;--mw:150;--mr:-4deg"><img src="/art/scritte/games.webp" alt="games" width="471" height="324" loading="lazy"></h2>
+        <h2 class="it spray bianco" id="games" style="--x:282;--y:1675;--w:210;--r:3deg;--mx:16;--my:2597;--mw:150;--mr:-4deg"><img src="/art/scritte/games.webp" alt="games" width="471" height="324" loading="lazy"></h2>
 
         <!-- il blackjack e la roulette si aprono in una finestra sopra il muro (games/blackjack/, games/roulette/), coi $pzk in comune (games/pzk.js) -->
-        <article class="vol it c-kraft" style="--x:294;--y:1597;--w:270;--r:1.5deg;--mx:6;--my:2382;--mw:192;--mr:2deg;--marker-c:#161616">
+        <article class="vol it c-kraft" style="--x:294;--y:1745;--w:270;--r:1.5deg;--mx:6;--my:2650;--mw:192;--mr:2deg;--marker-c:#161616">
           <div class="foglio" aria-hidden="true"></div>
           <span class="piu18" aria-label="per maggiorenni">+18</span>
           <div class="testo">
-            <img class="arte" src="/art/arte2/carte.webp" alt="" width="438" height="609" style="--aw:50%">
+            <img class="arte" loading="lazy" src="/art/arte2/carte.webp" alt="" width="438" height="609" style="--aw:50%">
             <h3><a href="#blackjack" data-gioco="blackjack">blackjack</a></h3>
             <p>le regole vere di las vegas, atlantic city e venezia. carte in 3D, soldi finti.</p>
             <p class="mano vai">gioca <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
           </div>
         </article>
 
-        <article class="vol it c-lucido" style="--x:552;--y:1601;--w:235;--r:-1deg;--mx:198;--my:2698;--mw:185;--mr:-2deg;--marker-c:#a50d25">
+        <article class="vol it c-lucido" style="--x:552;--y:1449;--w:235;--r:-1deg;--mx:198;--my:2406;--mw:185;--mr:-2deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <span class="piu18" aria-label="per maggiorenni">+18</span>
           <div class="testo">
-            <img class="arte" src="/art/arte2/ruota.webp" alt="" width="423" height="606" style="--aw:54%">
+            <img class="arte" loading="lazy" src="/art/arte2/ruota.webp" alt="" width="423" height="606" style="--aw:54%">
             <h3><a href="#roulette" data-gioco="roulette">roulette</a></h3>
             <p>da soli contro il banco: la ruota gira davvero. soldi finti.</p>
             <p class="mano vai">gioca <svg class="freccia" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
           </div>
         </article>
 
-        <article class="vol it c-azzurro" style="--x:1027;--y:1499;--w:230;--r:3deg;--mx:6;--my:2620;--mw:180;--mr:3deg;--marker-c:#a50d25">
+        <article class="vol it c-azzurro t-stencil" style="--x:1027;--y:1347;--w:230;--r:3deg;--mx:6;--my:2876;--mw:180;--mr:3deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte2/bomba.webp" alt="" width="435" height="609" style="--aw:40%">
+            <img class="arte" loading="lazy" src="/art/arte2/bomba.webp" alt="" width="435" height="609" style="--aw:40%">
             <h3>mine</h3>
             <p class="mano">in arrivo</p>
           </div>
         </article>
 
-        <article class="vol it c-giornale flip" style="--x:522;--y:1882;--w:230;--r:-2deg;--mx:198;--my:2940;--mw:180;--mr:-3deg;--marker-c:#a50d25">
+        <article class="vol it c-giornale flip m-sale" style="--x:522;--y:1715;--w:230;--r:-2deg;--mx:198;--my:2623;--mw:180;--mr:-3deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte2/dadi.webp" alt="" width="432" height="624" style="--aw:40%">
+            <img class="arte" loading="lazy" src="/art/arte2/dadi.webp" alt="" width="432" height="624" style="--aw:40%">
             <h3>dado</h3>
             <p class="mano">in arrivo</p>
           </div>
         </article>
 
-        <article class="vol it c-verde flip" style="--x:772;--y:1607;--w:220;--r:4deg;--mx:198;--my:3094;--mw:180;--mr:4deg;--marker-c:#a50d25">
+        <article class="vol it c-verde flip" style="--x:772;--y:1392;--w:220;--r:4deg;--mx:198;--my:2762;--mw:180;--mr:4deg;--marker-c:#a50d25">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte2/moneta.webp" alt="" width="423" height="624" style="--aw:40%">
+            <img class="arte" loading="lazy" src="/art/arte2/moneta.webp" alt="" width="423" height="624" style="--aw:40%">
             <h3>moneta</h3>
             <p class="mano">in arrivo</p>
           </div>
@@ -489,24 +596,24 @@ img{display:block;max-width:100%;height:auto}
       </section>
 
       <section class="gruppo" aria-labelledby="tools">
-        <h2 class="it spray" id="tools" style="--x:302;--y:1943;--w:200;--r:-4deg;--mx:31;--my:2977;--mw:140;--mr:5deg"><img src="/art/scritte/tools.webp" alt="tools" width="474" height="405" loading="lazy"></h2>
+        <h2 class="it spray" id="tools" style="--x:302;--y:2056;--w:200;--r:-4deg;--mx:31;--my:3193;--mw:140;--mr:5deg"><img src="/art/scritte/tools.webp" alt="tools" width="474" height="405" loading="lazy"></h2>
 
-        <article class="vol it c-giornale" style="--x:12;--y:1564;--w:290;--r:-1.5deg;--mx:6;--my:3052;--mw:195;--mr:-1deg">
+        <article class="vol it c-giornale" style="--x:12;--y:1768;--w:290;--r:-1.5deg;--mx:6;--my:3256;--mw:195;--mr:-1deg">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <img class="arte" src="/art/arte2/chiavi.webp" alt="" width="435" height="627" style="--aw:30%;--aa:flex-end">
+            <img class="arte" loading="lazy" src="/art/arte2/chiavi.webp" alt="" width="435" height="627" style="--aw:30%;--aa:flex-end">
             <h3>cercasi strumenti</h3>
             <p>ancora niente qui: piccoli strumenti gratuiti da usare nel browser, uno alla volta.</p>
           </div>
         </article>
       </section>
 
-      <img class="it pezzo" src="/art/nastro/scotch-storto.webp" alt="" width="435" height="417" loading="lazy" style="--x:524;--y:1583;--w:110;--r:-50deg;--mx:123;--my:3040;--mw:80;--mr:-40deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy" style="--x:580;--y:1200;--w:120;--r:4deg;--mx:42;--my:2612;--mw:90;--mr:6deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:192;--y:1870;--w:120;--r:-8deg;--mx:288;--my:2930;--mw:90;--mr:-10deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" loading="lazy" style="--x:481;--y:1200;--w:70;--r:30deg;--mx:139;--my:2128;--mw:50;--mr:30deg;z-index:2">
-      <img class="it pezzo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441" loading="lazy" style="--x:1225;--y:1927;--w:90;--r:-10deg;--mx:129;--my:3531;--mw:70;--mr:-12deg;z-index:3">
-      <img class="it pezzo" src="/art/nastro/puntina.webp" alt="" width="174" height="201" loading="lazy" style="--x:1138;--y:1119;--w:26;--r:0deg;--mx:94;--my:2776;--mw:22;--mr:0deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/scotch-storto.webp" alt="" width="435" height="417" loading="lazy" style="--x:524;--y:1430;--w:110;--r:-50deg;--mx:123;--my:3244;--mw:80;--mr:-40deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy" style="--x:580;--y:1087;--w:120;--r:4deg;--mx:42;--my:2868;--mw:90;--mr:6deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:192;--y:2074;--w:120;--r:-8deg;--mx:288;--my:2613;--mw:90;--mr:-10deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" loading="lazy" style="--x:481;--y:1395;--w:70;--r:30deg;--mx:139;--my:2427;--mw:50;--mr:30deg;z-index:2">
+      <img class="it pezzo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441" loading="lazy" style="--x:1225;--y:1747;--w:90;--r:-10deg;--mx:129;--my:3682;--mw:70;--mr:-12deg;z-index:3">
+      <img class="it pezzo" src="/art/nastro/puntina.webp" alt="" width="174" height="201" loading="lazy" style="--x:1138;--y:1007;--w:26;--r:0deg;--mx:94;--my:3012;--mw:22;--mr:0deg;z-index:4">
     </div>
   </main>
   <div class="buio" aria-hidden="true"></div>
@@ -960,37 +1067,60 @@ img{display:block;max-width:100%;height:auto}
 </script>
 <!-- La scena 3D (scena/): dove c'è WebGL2 (computer e telefono) la saracinesca diventa una strada vera, disegnata
      dalla scheda grafica con luci, ombre e riflessi; questa pagina resta sotto, invisibile, a fare tutto il resto.
-     Mentre si scarica c'è la schermata di caricamento (.carico): le foto dei volantini, ripetute, scorrono dentro la
-     barra, accese fin dove è arrivato il caricamento; il muro di sempre non si vede (html.scena-carico: la pagina
-     trasparente su nero). Quando tutto è sulla scheda grafica la schermata se ne va, la strada compare da lontano e
-     la telecamera si avvicina; quando è arrivata la pagina torna a rispondere. Se il 3D non parte si torna al muro di
-     sempre. ?muro=1 lo tiene com'è. -->
+     Il caricamento (dal 21.10 sera): subito il pomodoro che matura mentre la scena si prepara, col contatore sotto
+     (davanti al nero e a un filo giallo, chi non lo sapeva ricaricava credendola rotta), e appena arriva, dietro, la
+     strada da lontano sfocata (.carico-foto). Quando la scena è pronta il pomodoro si gonfia, scoppia e macchia la telecamera;
+     sotto la macchia la tela compare di colpo e la foto sfocata sfuma nella strada nitida, poi la macchia cola via e la
+     telecamera si avvicina quanto arriva la risoluzione piena (il filo giallo, in basso). Il muro di sempre non si vede
+     (html.scena-carico: la pagina trasparente su nero); quando la telecamera è arrivata la pagina torna a rispondere e si
+     prepara l'altra pagina col 3D (scena/prossima.js). Se il 3D non parte si torna al muro di sempre. ?muro=1 lo tiene
+     com'è. -->
 <style>
-/* la schermata di caricamento: sopra tutto (anche il velo dei clic), su nero */
-.carico{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:16px;background:#0c0d0f;color:#e9e4d8;transition:opacity .6s ease}
-.carico.via{opacity:0;pointer-events:none}
-.carico-box{width:min(680px,100%);display:grid;gap:14px}
-.carico-riga{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
-.carico-testo{margin:0;font:400 15px/1.2 var(--ft);letter-spacing:.02em;opacity:.8}
-.carico-num{font:400 30px/1 var(--fa);letter-spacing:.02em;font-variant-numeric:tabular-nums}
-.carico-barra{position:relative;height:clamp(92px,18vw,132px);overflow:hidden;border-radius:3px;background:#17181b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
-/* due nastri uguali, uno sopra l'altro: sotto spento, sopra acceso, dentro una finestra ferma (.carico-luce) larga fin
-   dove arriva il caricamento (--p, 0..1; un ritaglio sul nastro che scorre il browser a volte non lo disegnava);
-   ogni nastro ha le foto due volte e scorre di metà della sua lunghezza, così ricomincia senza salto */
-.carico-nastro{position:absolute;top:0;bottom:0;left:0;display:flex;align-items:center;gap:14px;padding-left:14px;width:max-content;animation:carico-scorri var(--durata,30s) linear infinite}
-.carico-nastro img{height:80%;width:auto;aspect-ratio:.72;object-fit:contain;transform:rotate(var(--r,0deg));filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
-/* (il grigio su ogni foto, non sul nastro che scorre: lì, a scheda grafica occupata, il browser lo perdeva) */
-.carico-spento img{filter:grayscale(1) brightness(.38)}
-.carico-luce{position:absolute;top:0;bottom:0;left:0;width:calc(var(--p,0) * 100%);overflow:hidden;transition:width .4s var(--eo)}
-.carico-bordo{position:absolute;top:0;bottom:0;left:calc(var(--p,0) * 100%);width:2px;margin-left:-1px;background:#ffd400;box-shadow:0 0 12px 2px rgba(255,212,0,.55);transition:left .4s var(--eo)}
-@keyframes carico-scorri{to{transform:translateX(-50%)}}
-@media (prefers-reduced-motion:reduce){.carico-nastro{animation:none}.carico{transition-duration:.2s}}
+/* il caricamento: sopra tutto (anche il velo dei clic), ma non prende i clic (ci pensa lo scudo). La foto sfocata è grande
+   quanto la tela (in alto, 100lvh), con la strada alla misura della tela al primo fotogramma (lo script); sfuma dal nero
+   appena è arrivata. Il pomodoro e il contatore ci sono da subito (il primo fotogramma è dentro la pagina, PRIMO nello
+   script, finché non arriva matura.webp). Il pomodoro: due strati coi fotogrammi di matura.webp, il secondo in
+   dissolvenza sul primo (fra un fotogramma e l'altro matura), e cresce con --s; respira (.pomo, un'animazione CSS: va
+   avanti anche quando lo script è fermo, mentre la scena si costruisce e compila gli shader); lo scoppio (.pomo-scoppio) è
+   una fila di quattro fotogrammi, grandi --k volte quelli di matura, che vola verso la telecamera (--sb); le sue immagini
+   e quella della macchia si chiedono dopo (.armato), per non rubare la banda alla scena. La macchia sulla lente (.colpito)
+   copre lo schermo, poi (.cola) scivola giù e sfuma, piano all'inizio e poi in fretta. Quando la tela si vede
+   (html.scena-vista) compare di colpo sotto la macchia e la foto sfocata sfuma sopra di lei: la messa a fuoco. Resta il
+   filo (.dopo), che va con l'avvicinamento (--p, 0..1, mosso a ogni fotogramma dallo script) fino all'arrivo */
+.carico{position:fixed;inset:0;z-index:70;pointer-events:none;transition:opacity .6s ease}
+.carico.via{opacity:0}
+.carico-foto{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;background:#0c0d0f center no-repeat;opacity:0;transition:opacity .7s ease}
+html.con-foto .carico-foto{opacity:1}
+html.scena-vista .carico-foto{opacity:0;transition:opacity .9s ease .1s}
+html.scena-carico.scena-vista .scena-tela{transition:none}
+.pomo{--t:min(30vmin,200px);position:fixed;left:50%;top:44%;width:var(--t);height:var(--t);margin:calc(var(--t) / -2) 0 0 calc(var(--t) / -2);transition:opacity .5s ease;animation:respira 1.7s ease-in-out infinite}
+@keyframes respira{50%{transform:scale(1.04) rotate(-2deg)}}
+.pomo-frutto,.pomo-frutto i{position:absolute;inset:0}
+.pomo-frutto{transform:scale(var(--s,.55));background:0 0/100% 100% no-repeat}
+.pomo-frutto i{background:url(/art/scena/pomodoro/matura.webp) 0 0/800% 100% no-repeat}
+.pomo-scoppio{position:absolute;left:50%;top:50%;width:calc(var(--t) * var(--k,2));height:calc(var(--t) * var(--k,2));background:0 0/400% 100% no-repeat;transform:translate(-50%,-50%) scale(var(--sb,1));visibility:hidden}
+.carico-conto{position:fixed;left:0;right:0;top:calc(44% + min(30vmin,200px) / 2 + 10px);text-align:center;color:#f4efe4;text-shadow:0 1px 8px rgba(0,0,0,.7);transition:opacity .5s ease}
+.carico-conto b{display:block;font:400 clamp(30px,6vmin,46px)/1 "Anton",Impact,sans-serif;font-variant-numeric:tabular-nums}
+.carico-conto span{display:block;margin-top:6px;font:400 clamp(13px,2.3vmin,17px)/1.2 "Special Elite",monospace;opacity:.85}
+.carico.scoppia .carico-conto,.carico.fuori .pomo{opacity:0;transition-duration:.2s}
+.carico.scoppia .pomo{animation:none}
+.carico-macchia{--m:max(112vw,112vh);position:fixed;left:50%;top:50%;width:var(--m);height:var(--m);margin:calc(var(--m) / -2) 0 0 calc(var(--m) / -2);background:center/contain no-repeat;visibility:hidden}
+.carico.armato .pomo-scoppio{background-image:url(/art/scena/pomodoro/scoppio.webp)}
+.carico.armato .carico-macchia{background-image:url(/art/scena/pomodoro/macchia.webp)}
+.carico.colpito .carico-macchia{visibility:visible;animation:colpo .16s cubic-bezier(.2,.8,.4,1)}
+.carico.cola .carico-macchia{opacity:0;transform:translateY(8vh) scaleY(1.04);transition:opacity 1.1s cubic-bezier(.6,0,.9,.5),transform 1.1s cubic-bezier(.5,0,.9,.6)}
+.carico.finito .pomo,.carico.finito .carico-macchia{display:none}
+@keyframes colpo{from{transform:scale(1.15)}}
+.carico-filo{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.07);opacity:0;transition:opacity .4s}
+.carico.dopo .carico-filo{opacity:1}
+.carico-filo::after{content:"";position:absolute;inset:0;background:#ffd400;box-shadow:0 0 8px rgba(255,212,0,.55);transform-origin:0 50%;transform:scaleX(var(--p,0))}
+@media (prefers-reduced-motion:reduce){.carico,.carico-foto,.pomo,.carico-conto{transition-duration:.3s}.pomo{animation:none}}
 html.scena-carico{background:#0c0d0f}
 html.scena-carico .strada{visibility:hidden}
 /* quando la strada compare da lontano la pagina sotto torna visibile (nel 3D di lei non si vede niente: la goccia, le
    mosche e le formiche sono quelle 3D della scena, queste restano nascoste): ricalcolarla e ridisegnarla costa un
-   fotogramma lungo, che lì cade nella dissolvenza dal nero e non si vede. I clic durante l'arrivo li ferma un velo
-   trasparente (.scena-scudo), che all'arrivo si toglie: toccare tutta la pagina in quel momento costava uno scatto */
+   fotogramma lungo, che lì cade sotto la macchia e non si vede. I clic durante l'arrivo li ferma un velo trasparente
+   (.scena-scudo), che all'arrivo si toglie: toccare tutta la pagina in quel momento costava uno scatto */
 html.scena-carico.scena-vista .strada{visibility:visible}
 html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,html.scena-carico .spruzzo{visibility:hidden}
 .scena-scudo{position:fixed;inset:0;z-index:60}
@@ -1003,50 +1133,151 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   const root = document.documentElement
   root.classList.add('scena-carico')
   const scudo = document.createElement('div'); scudo.className = 'scena-scudo'; scudo.setAttribute('aria-hidden', 'true'); document.body.appendChild(scudo)
-  // il foglio di stile e i moduli si scaricano tutti insieme, non uno dopo l'altro
-  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/scena/scena.css'; document.head.appendChild(l)
-  for (const m of ['scena', 'mondo', 'fogli', 'luci', 'materiali', 'neon', 'acqua', 'bestie', 'marciapiede', 'lib/three']) { const p = document.createElement('link'); p.rel = 'modulepreload'; p.href = '/scena/' + m + '.js'; document.head.appendChild(p) }
 
-  // la schermata di caricamento. Le foto del nastro sono quelle che la scena metterà sui volantini (scena/fogli.js:
-  // lo stesso nome, la stessa cartella per computer o telefono): il browser le scarica una volta sola, e intanto si
-  // vedono. Ripetute finché il nastro è lungo abbastanza, poi tutto due volte per il giro senza salto
+  // Le anteprime dei volantini e delle altre cose fotografate (vol-lo/), della roba per terra (terra/lo/), del fronte del negozio (fronte/lo/) e degli
+  // atlanti della facciata (muro/lo/) si chiedono già qui, mentre si scaricano i moduli: la scena le vuole per farsi vedere
+  const telefono = matchMedia('(max-width:899px)').matches
   const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  const cartella = matchMedia('(max-width:899px)').matches ? 'vol-m' : 'vol'
-  const foto = [...document.querySelectorAll('.parete .vol')].filter((el) => getComputedStyle(el).display !== 'none')
+  const cartella = telefono ? 'vol-m-lo' : 'vol-lo'
+  const piccole = [...document.querySelectorAll('.parete .vol, .parete .it.foto')].filter((el) => getComputedStyle(el).display !== 'none')
     .map((el) => `/art/scena/${cartella}/${slug(el.id || el.querySelector('h3, .titolo')?.textContent || 'foglio')}.webp`)
-  const giro = []
-  while (foto.length && giro.length < 14) giro.push(...foto)
-  const nastro = (classe) => `<div class="carico-nastro ${classe}" style="--durata:${Math.max(16, giro.length * 1.6)}s">${[...giro, ...giro].map((src, i) => `<img src="${src}" alt="" decoding="async" style="--r:${[-2.5, 1.5, -1, 2.5, -1.5, 1][i % 6]}deg">`).join('')}</div>`
+    .concat(['kola', 'pechino', 'lucky', 'tucson', 'pzkkonet', 'menu', 'chiusino', 'chiusino-normali', 'chiusino-lucido'].map((n) => `/art/scena/terra/lo/${n}.webp`))
+    .concat(['alluminio', 'zoccolo', 'citofono', 'citofono-normali', 'citofono-lucido', 'lucchetto', 'lucchetto-fondo'].map((n) => `/art/scena/fronte/lo/${n}.webp`))
+    .concat(['graffiti', 'adesivi'].map((n) => `/art/scena/muro/lo/${n}.webp`))
+  for (const src of new Set(piccole)) { const i = new Image(); i.decoding = 'async'; i.src = src }
   const carico = document.createElement('div')
   carico.className = 'carico'
   carico.setAttribute('role', 'progressbar'); carico.setAttribute('aria-label', 'Caricamento di pzkko'); carico.setAttribute('aria-valuemin', '0'); carico.setAttribute('aria-valuemax', '100')
-  carico.innerHTML = `<div class="carico-box"><div class="carico-riga"><p class="carico-testo">attacco i volantini…</p><span class="carico-num" aria-hidden="true">0%</span></div>
-    <div class="carico-barra" aria-hidden="true">${nastro('carico-spento')}<div class="carico-luce">${nastro('carico-acceso')}</div><div class="carico-bordo"></div></div></div>`
+  carico.innerHTML = '<div class="carico-foto" aria-hidden="true"></div><div class="pomo" aria-hidden="true"><div class="pomo-frutto"><i></i><i></i></div><div class="pomo-scoppio"></div></div>'
+    + '<div class="carico-conto" aria-hidden="true"><b>0%</b><span>si sta preparando…</span></div><div class="carico-macchia" aria-hidden="true"></div><div class="carico-filo" aria-hidden="true"></div>'
   document.body.appendChild(carico)
-  const num = carico.querySelector('.carico-num')
   const togli = () => { carico.classList.add('via'); setTimeout(() => carico.remove(), 700) }
-  // a che punto è: metà le foto scaricate (le conta questa pagina, dal nastro), metà la scena (scena.js dice 0..1:
-  // i moduli, la costruzione, gli shader, le foto sulla scheda). Solo in avanti; quando la scena dice 1 la schermata se ne va
-  const uniche = [...new Set(foto)]
-  let scaricate = 0, scena = 0, fatto = 0
-  const mostra = () => {
-    const p = scena >= 1 ? 1 : Math.max(fatto, 0.03 + 0.97 * (0.5 * (uniche.length ? scaricate / uniche.length : 1) + 0.5 * scena))
-    if (p === fatto && p < 1) return
-    fatto = p
-    carico.style.setProperty('--p', p.toFixed(3))
-    num.textContent = Math.round(p * 100) + '%'
-    carico.setAttribute('aria-valuenow', String(Math.round(p * 100)))
-    if (p >= 1) togli()
+  const ridotto = matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // La foto: la strada da lontano com'è al primo fotogramma, sfocata e piccola (pochi KB: deve arrivare nel secondo di
+  // nero). tools/pzkko/scena/carico.mjs scrive FOTO: per computer e telefono la scatola del negozio bw × bh, in metri, il
+  // rettangolo della foto hm × am·hm, le forme di finestra che copre e la foto di ogni luce. Da lontano la telecamera sta in
+  // un punto fisso (scena.js, lontano) e la finestra decide solo quanto se ne vede: metà altezza 1,22·max(bh, bw/forma) sul
+  // piano della saracinesca. Quindi la foto, centrata, alta hm per quei metri, cade dove cadrà la tela, e la messa a fuoco
+  // sotto la macchia non sposta niente. La luce dalla sera della pagina (--notte). Senza l'arrivo (movimento ridotto,
+  // ?intro=0, la ricarica dopo un contesto perso) o in una finestra di forma che la foto non copre, niente foto: il nero.
+  // window.pzkkoFotoCarico: la scena tiene il meteo della foto (il dopo pioggia) finché la foto non è sfumata
+  const FOTO = {"computer":{"v":{"giorno":"/art/scena/carico/computer-giorno.webp?v=5475484f","tramonto":"/art/scena/carico/computer-tramonto.webp?v=a86d2b3e","sera":"/art/scena/carico/computer-sera.webp?v=25551352","notte":"/art/scena/carico/computer-notte.webp?v=bd5d5a3b"},"bw":2.209,"bh":3.1766,"hm":7.751,"am":2.1,"forme":[0.7,2.1]},"telefono":{"v":{"giorno":"/art/scena/carico/telefono-giorno.webp?v=2a440d4f","tramonto":"/art/scena/carico/telefono-tramonto.webp?v=793fa0ff","sera":"/art/scena/carico/telefono-sera.webp?v=8cb19a17","notte":"/art/scena/carico/telefono-notte.webp?v=bd60b397"},"bw":1.025,"bh":1.6784,"hm":5.9548,"am":0.5502,"forme":[0.42,0.8]}}
+  const F = FOTO?.[telefono ? 'telefono' : 'computer'], foto = carico.firstElementChild
+  const nn = parseFloat(root.style.getPropertyValue('--notte')) || 0
+  const luce = nn <= 0.001 ? 'giorno' : nn < 0.3 ? 'tramonto' : nn < 0.8 ? 'sera' : 'notte'
+  let subito = false
+  try { subito = sessionStorage.getItem('pzkko-subito') === '1' } catch {}
+  const misura = () => {
+    const w = foto.clientWidth, hh = foto.clientHeight, a = w / hh
+    if (!F || !(a >= F.forme[0] && a <= F.forme[1])) return false
+    const s = hh / (2 * 1.22 * Math.max(F.bh, F.bw / a)) // pixel per metro sul piano della saracinesca
+    foto.style.backgroundSize = `${(F.am * F.hm * s).toFixed(2)}px ${(F.hm * s).toFixed(2)}px`
+    return true
   }
-  for (const src of uniche) {
-    const img = carico.querySelector(`.carico-acceso img[src="${src}"]`)
-    const conta = () => { scaricate++; mostra() }
-    if (img.complete) conta(); else { img.addEventListener('load', conta, { once: true }); img.addEventListener('error', conta, { once: true }) }
+  // (il pomodoro e il contatore ci sono già; la foto sfocata sfuma dal nero appena è arrivata)
+  if (F?.v[luce] && !(ridotto || q.get('intro') === '0' || subito) && misura()) {
+    window.pzkkoFotoCarico = true
+    const src = F.v[luce], img = new Image()
+    img.decoding = 'async'; img.fetchPriority = 'high'; img.src = src
+    img.decode().then(() => {
+      if (root.classList.contains('scena-vista') || !carico.isConnected) return
+      foto.style.backgroundImage = `url("${src}")`
+      root.classList.add('con-foto')
+    }, () => {})
+    addEventListener('resize', misura)
   }
-  window.pzkkoCarico = (p) => { if (fatto < 1) { scena = Math.max(scena, p); mostra() } }
-  mostra()
-  const via = () => { root.classList.remove('scena-carico'); scudo.remove(); if (carico.isConnected) togli() }
-  import('/scena/scena.js').then((m) => m.avvia()).then(via).catch((e) => { console.warn('scena 3D non partita, resta il muro', e); via() })
+
+  // Il pomodoro (le immagini: tools/pzkko/scena/pomodoro.mjs). matura.webp la chiede già la testa della pagina, per
+  // prima; finché non c'è si vede PRIMO, il suo primo fotogramma, piccolo, dentro la pagina. Scoppio e macchia quando la
+  // scena ha i suoi moduli (pzkkoCarico ≥ 0,25) o dopo 2,5 s: chiesti subito rubavano la banda alla scena (col movimento
+  // ridotto mai: il pomodoro non scoppia, sfuma). SCOPPIO: quante volte un fotogramma dello scoppio è più grande di uno di
+  // matura. Tutti e due li scrive pomodoro.mjs usa
+  const PRIMO = 'data:image/webp;base64,UklGRg4JAABXRUJQVlA4WAoAAAAQAAAAbwAAbwAAQUxQSEECAAARf6CgbRs2NAB9exERlZ7FJL+edEPStm3H4zzBWLXx1rbtva0c/QPJuhyta7u/YLjtBLvatt1kzO97Nt+ru95F9H8C6L9np8FLli6bOqQzWKdVJ65+Z2ZOXj+1rgvQossuq94YgdLp6HfWTO4MQEx8xAZrRgCIT2z0ZndrEz+z4Zs9bH1g4zcDdqrZ4j6fjYNsda4F0W7nZdDcfba839hy1xZnmvrA1s/7zBQyYF8zTQjnjUQYMsvEW4y9BoSDwWl65Qw6Xq8JpUxroovCGToXGHacTjNOmYZwcDioVsjAOWpvkLaptSCVKQkHidNUIgydrRLHmq/SiLVXpRUrqiBcLA7IljN4uuwAWrasHK2f7A3afFkTWljWgnZe1ooWlbWjvfR5dXLQkgEv4aJx0Gsiw6d7LcTL8Ar9NBG8TK/C307kpwn9NMvxMrwW4qV7TcQLegkXLRnw6tSB9tLvRW1oUZK2oJXJGtHCsjdo82VxtH6yQrRMWQgtXSYcrJd+GbVhlZFiA9Y2lXKsfioRrEwV4SAlAyrUglRGygmk+WohpEy1Tu04N/1q9BZnG2kW4mTrdGpHeenXobcoYdKOoGTpUStG1GegEmMsGRRtCDf9JiiBMI+MijZ7NwNm6KK9sWS4U6utqN8UhVxLvcj8PTv7yKL4bCMasEHLHXPJTLJb7JhKziLbxY6Z5Cyyf8QxkdxIiNu/6N2cSZjLn+jUjCBUUfrUlSUvbfATcKdVx5+6zMnrO6b5CX3S0jVrlg3x0X9PAFZQOCCmBgAAsCEAnQEqcABwAD6dQpxJJaOioS+xWzCwE4lkbNZEz2ACWJxP25v5R44am4C56D0u7wd6AHly+xN+5fpAZrm/K3SaqveXedL0V8+r1b7Av62dZ39qvYm/adtmoDy1Vdvox6XjdrtbMVZwWf1MYH1qsMJHuP0mxOIt+Lvhb6NnbnicGojHN2xyP2gm83ev2X4p2TtKmp8L9CeZY1x4/LKxfBwUHoKJyjH9538OZLpgmXTBKrmQEjBcor9zOdORAz2RVGM+wGV+hBTNy5wsOE9PZ9FnMpr9ORJV4puyeW4xaV+uTmUU43ndQLye6zLz8XbMFXZlmp8jq83atayowc1cITXQ31pzH1vSO9V8i6XTmv3CUEPkTQAA/v02aRf/LAHr4xJaPKdKVBLhjLwBeikz/KIdgfmH0uO7nvOdh5e9ZXqCU6WlJH5Vv/BHTIH61FjxrQS+bo1W4qss+kaQ3XEuAUc4ug3/73mp/4gGsJ4Q8HxlO+MjydWhb5nVakDmAzxe9FO4J9HN8sXe52n/D4+wwsuNG+dh06bvNUApH3kAOhr/fyL3nRi3rnHCvA8JfbUN71MsWVqSfRweI1NzPY2ztLG1kWXZ7cVT5H17TzVMVofQEIKBAXF/4bsbhPZT3UMzm4J2rqhcG2iGQJTqt3+gPgvtsLv+1lqb/KQ1CUTR0Ygg0oILf1tF6V3fA0jql+ceA11hw+o78/+9F6Ozpm+OaSs41cUPYQRfoFILSjQ4RtYIlJ0EqY3bho2D/lvJQjD5Kj/SR6PY3cJX6tlxmiyBTJpRSbqWnxyzbUNtHlQ6svBmlv6j4coZG4w3wIHjzfHKQx35RB9gopPQOer6ZF2sYBX/wOZg/N/zxtX3MebdAMS0vxkX98Jkmy9TjuT1eP0bYAJiFYgJqM5oSYA1mTyv6CUWc/sFiOX/f6p7huQPWsJuJWh6iQ9OAwqoEbRQrqJGtuSOErvNQtoYwARyj8HuNWMjQvYgP/n/ElpAKoo1WJ4qJAOw7rNHPy0NnhoofjlAmfexq2pAwIdPdJ3rRyOwQ2d/4tpmByBpMqubWVYsWEmXA9uPvO9DRkBK/SqbXIY77qbw5F6SPuK259XLu58xnXz6HT/e4DOWnC0zCr+rgusWyGq7lcS9CJsI0jASrPxo7kgbiqvjtmyL4YrkgpGUmZ7YS0g+qXiFhNo3iPmq+BgG9NEzOOWtBib3/yVZNPEIOu2duOEx04ULlKkXQVGW5d+5ldTKpM39+jMewjkU6TWQydG95bbqI2ujSrrt/wIWaN9Z8min/eJHSYP6zfekCs1u74//2IaMpkDjZZm7qJYj8a1jyHj8BiUNpT7ssrQek1G+Pa2ejO4rwB/mLKn0KCYEUKyaLAHkEpbhmXfIN+NwcOpnJLTXZRtSY9KbeTDlIWyPu7OWaQFaxrKvQ5PBIQISotpsFR7wgrHxSN0iPepNZ72N3xElnfc+fvJJRR8TJOKzF15yC3x3e16rjxkInQMhRC/jgpYMpeg01tyCGcGTTFK9giQ0L+EIJjusqRi79eut6+xoTwvTio+cATaaRV6OVnyMquF435q5X8wbaY8ixRZFEH98E4Lte5o4hqd/ASGI9hSO3cisBVYUEKxJIP0OngOQFajIYtbUBEFzB+8c8b6WX+il+B3MVzgeI52m3C/PJbznNfytLEovkZR14aI22iy9+srQOf7ZQTAfTR5Ar0ad4SmuMWMpNjvavCSoPS8elgq6StZ2Uolx5Z8ZP8wGpzjeCzWzf9lS0yyYk3jXyIjE7aTHdbbcGraD/YAWSyyQcP5KloOuhQN82x65QsniwtfYJNMpXEvNC5N8O8axXywkUAaTU65GEvxRKcdq0bZfn5Dv7eO/rjB5/T71UF2mPjJ60XZqSC/Ft88igcqa8YpslGGddrD2dmPi8S0kOPYhlhslptHa02qFvJBcoScu2mdpG6m/t43gVq0C72Lnc+CyjUqy875MaZq6AdYdhTFEfpxg3xtBhDhwFW6Q7yraO3geD52TSXmrrsJ9s4f/o2VYQKafYdZbHQvAWr2nbhe6pM2HjRjDyEqyDe8WDYk4Vn0SDuB9O4fDSeBhdOoYXb/QmPILJ2MOi39sqqSOv6WO1OaN++pZsHEpp3WkdNogf5vOFwxJrAqVSYwli0kNJ5/g+ywF/H3NNTFPawLuaOH0n8DP7Loe1sNJPQyH28P93awai8pibKfgqXpEWIL4UTYAMdfWM+iNZQ0M8Vo/tcQNDsm05b+54jeCKh73HFez2yAAAA=='
+  const SCOPPIO = 2.048
+  const prendi = (f) => { const i = new Image(); i.decoding = 'async'; i.src = '/art/scena/pomodoro/' + f; return i.decode().then(() => true, () => false) }
+  let armato = null, pronti = false
+  const arma = () => { if (ridotto) return; armato ??= Promise.all([prendi('scoppio.webp'), prendi('macchia.webp')]).then((ok) => { pronti = ok.every(Boolean); carico.classList.add('armato') }) }
+  setTimeout(arma, 2500)
+  const pomo = carico.querySelector('.pomo'), frutto = pomo.firstElementChild, [ia, ib] = frutto.children, bum = pomo.lastElementChild
+  const conto = carico.querySelector('.carico-conto b')
+  pomo.style.setProperty('--k', String(SCOPPIO))
+  frutto.style.backgroundImage = `url("${PRIMO}")`
+  prendi('matura.webp').then((ok) => { if (ok) frutto.style.backgroundImage = 'none' })
+  const fotogramma = (el, i, n) => { el.style.backgroundPosition = `${(i / (n - 1)) * 100}% 0` }
+
+  // A che punto è: la scena lo dice (scena.js, 0..1: i moduli, la costruzione, gli shader, le anteprime fino a VISTA, poi
+  // la risoluzione piena mentre la telecamera si avvicina). Fino a VISTA matura il pomodoro: ci va dietro morbido e quando
+  // non arriva niente va avanti piano da solo (fino a un 15% in più, mai oltre il 97%, mai indietro); quando la scena è
+  // pronta (window.pzkkoScoppia) finisce di maturare, mai più in fretta di 0,8 s dal verde al rosso, e scoppia. Poi il filo,
+  // con le stesse regole, fino all'arrivo
+  const VISTA = 0.45
+  let fatto = 0, mostrato = 0, v = 0, prima = performance.now(), cambiato = prima
+  let stato = 'matura', pronta = null, tMaturo = 0, tScoppio = 0
+  const scopri = () => { pronta?.(); pronta = null; stato = 'fatto' }
+  // senza le immagini dello scoppio (non arrivate 1,5 s dopo che il pomodoro è maturo) o col movimento ridotto: il
+  // pomodoro sfuma e basta
+  const sfuma = () => { carico.classList.add('scoppia', 'fuori', 'dopo'); scopri() }
+  // lo scoppio (ms dal via): si gonfia tremando (0–300), scoppia in quattro fotogrammi volando verso la telecamera
+  // (300–580, ~14 al secondo), poi la macchia sulla lente: lì sotto si mostra la scena, e dopo 420 ms la macchia cola via
+  const scoppia = (t) => {
+    if (t < 300) {
+      const x = t / 300, s = 1 + 0.3 * (1 + 2.7 * (x - 1) ** 3 + 1.7 * (x - 1) ** 2), w = 0.05 * x * Math.sin(t / 22)
+      frutto.style.transform = `scale(${(s * (1 + w)).toFixed(4)},${(s * (1 - w)).toFixed(4)})`
+    } else if (t < 580) {
+      const x = (t - 300) / 280
+      frutto.style.visibility = 'hidden'; bum.style.visibility = 'visible'
+      fotogramma(bum, Math.min(3, Math.floor(x * 4)), 4)
+      bum.style.setProperty('--sb', (1.3 + 2.2 * x * x).toFixed(4))
+    } else {
+      bum.style.visibility = 'hidden'
+      carico.classList.add('colpito', 'dopo')
+      scopri()
+      setTimeout(() => carico.classList.add('cola'), 420)
+      setTimeout(() => carico.classList.add('finito'), 1700)
+    }
+  }
+  const passo = (now) => {
+    if (!carico.isConnected) return
+    requestAnimationFrame(passo)
+    const dt = Math.min(0.1, Math.max(0, (now - prima) / 1000)); prima = now
+    const da = 0.15 * (1 - Math.exp(-(now - cambiato) / 3500))
+    const meta = fatto >= 1 ? 1 : Math.min(0.97, fatto + da)
+    mostrato = Math.max(mostrato, mostrato + (meta - mostrato) * (1 - Math.exp(-dt / 0.2)))
+    carico.style.setProperty('--p', mostrato.toFixed(4))
+    if (stato === 'scoppio') return scoppia(now - tScoppio)
+    if (stato !== 'matura') return
+    const mv = pronta ? 1 : Math.min(0.97, fatto / VISTA + da)
+    v = Math.max(v, Math.min(mv, v + (pronta ? dt * 1.25 : Math.min(dt * 1.25, (mv - v) * (1 - Math.exp(-dt / 0.3))))))
+    const f = v * 7, i = Math.min(6, Math.floor(f))
+    fotogramma(ia, i, 8); fotogramma(ib, i + 1, 8); ib.style.opacity = (f - i).toFixed(3)
+    frutto.style.setProperty('--s', ridotto ? '0.85' : (0.55 + 0.45 * v).toFixed(4))
+    conto.textContent = `${Math.round(v * 100)}%`
+    if (pronta && v >= 1) {
+      tMaturo ||= now
+      if (ridotto || (!pronti && now - tMaturo > 1500)) sfuma()
+      else if (pronti) { stato = 'scoppio'; tScoppio = now; carico.classList.add('scoppia') }
+    }
+  }
+  requestAnimationFrame(passo)
+  window.pzkkoCarico = (p) => {
+    if (p > fatto) { fatto = Math.min(1, p); cambiato = performance.now(); carico.setAttribute('aria-valuenow', String(Math.round(fatto * 100))) }
+    if (p >= 0.25) arma()
+  }
+  // (per le foto di carico.mjs, ?carico=foto, niente pomodoro: la scena si fa vedere appena è pronta)
+  if (q.get('carico') !== 'foto') window.pzkkoScoppia = () => new Promise((ok) => { pronta = ok })
+
+  // arrivati: la pagina sotto torna a rispondere e, appena il browser è libero, si prepara l'altra pagina col 3D (la
+  // storia dalla home; la home dalla storia e dalla 404): chi ci va dopo qualche secondo la trova già scaricata
+  const via = (ok) => {
+    root.classList.remove('scena-carico'); scudo.remove(); fatto = 1
+    if (carico.isConnected) setTimeout(togli, 250)
+    if (!ok || q.get('carico') === 'foto') return
+    const altra = location.pathname.startsWith('/storia') || document.querySelector('.p404') ? '/' : '/storia/'
+    const libero = window.requestIdleCallback ?? ((f) => setTimeout(f, 1500))
+    libero(() => import('/scena/prossima.js').then((m) => m.prepara(altra, luce)).catch((e) => console.warn('altra pagina non preparata', e)), { timeout: 4000 })
+  }
+  import('/scena/scena.js').then((m) => m.avvia()).then(() => via(true)).catch((e) => { console.warn('scena 3D non partita, resta il muro', e); window.pzkkoTrattenute?.(); root.classList.remove('con-foto'); via(false) })
 })()
 </script>
 </body>

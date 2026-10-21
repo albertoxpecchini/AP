@@ -61,5 +61,8 @@ rep('</style>\n</head>', `/* 404: un muro corto */
 </head>`)
 
 html = html.replace('<!-- quello che c\'era già sul muro: graffiti, resti, manifesti di altri -->', '')
+// le foto del caricamento sono la strada della home da lontano, col suo muro alto: sotto il muro corto della 404 non
+// coinciderebbero. Qui niente foto: il nero e la tela che sfuma
+rep(/  const FOTO = .*\n/, '  const FOTO = null // (la 404: le foto del caricamento sono della home, tools/pzkko/genera-404.mjs)\n')
 writeFileSync(path.join(dir, '404.html'), html)
 console.log('scritto', path.join(dir, '404.html'), html.length, 'byte')

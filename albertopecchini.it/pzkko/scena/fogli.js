@@ -3,16 +3,20 @@
 // poligoni nel punto esatto in cui sta nel DOM, piegato sulle doghe, con la sua
 // immagine sopra. La posizione è quella che la pagina usa in quel momento
 // (--px --py --pw --pr: le --x --y --w --r in 1280esimi sul computer, le --mx
-// --my --mw --mr in 390esimi sul telefono). I volantini usano le foto fatte da
-// tools/pzkko/scena/cattura.mjs (art/scena/vol/ per il computer, vol-m/ per il
-// telefono), i tagliandi sono pezzi a sé che cadono quando la pagina li strappa.
+// --my --mw --mr in 390esimi sul telefono). I volantini (e le altre cose fatte in
+// HTML, .foto) usano le foto fatte da tools/pzkko/scena/cattura.mjs (art/scena/vol/
+// per il computer, vol-m/ per il telefono), i tagliandi sono pezzi a sé che cadono
+// quando la pagina li strappa, le Live Photo della storia un video sopra la foto.
 // Il DOM resta sotto, invisibile, a ricevere i clic: qui si ascoltano solo
 // passaggi, fuoco e strappi.
 //
 // I fogli si costruiscono subito, con una trama vuota (un pixel trasparente):
-// le immagini arrivano dopo, ognuna quando arriva, e il foglio compare in
-// dissolvenza. Così la scena si può già guardare da lontano mentre si scarica,
-// e il programma dei materiali è lo stesso prima e dopo (niente ricompilazioni).
+// le immagini arrivano dopo, in due giri. Prima le anteprime (vol-lo/, 128 px,
+// pochi KB: tools/pzkko/scena/anteprime.mjs), ognuna quando arriva, e il foglio
+// compare in dissolvenza: la strada si vede subito da lontano, già tutta. Poi le
+// foto vere, che prendono il posto delle anteprime mentre la telecamera si
+// avvicina (scena.js va con loro). Il programma dei materiali è lo stesso prima e
+// dopo (niente ricompilazioni).
 // Finita la dissolvenza il foglio diventa opaco: la lamiera sotto non si disegna
 // più (i fogli coprono metà saracinesca, e ogni pixel di lamiera costa quanto
 // uno di carta).
@@ -20,7 +24,8 @@ import * as T from './lib/three.js'
 import { immagine, lamiera, DOGA } from './materiali.js'
 import { bagnato } from './acqua.js'
 
-const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+// (il nome della foto di un volantino: anche prossima.js, per scaricare quelle dell'altra pagina)
+export const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 const DISSOLVENZA = 450 // ms
 
 // La nitidezza: i fogli si vedono rimpiccioliti (sul computer ~2,8 pixel di foto per pixel di schermo) e la scheda li
@@ -45,7 +50,7 @@ const vuota = (() => {
 
 export async function fogli(scene, M, renderer) {
   const { K, H, telefono } = M
-  const cartella = telefono ? 'vol-m' : 'vol'
+  const cartella = telefono ? 'vol-m' : 'vol', cartellaLo = cartella + '-lo'
   const manifesto = await fetch(`/art/scena/${cartella}.json`).then((r) => r.json()).catch(() => ({}))
   const parete = document.querySelector('.parete')
   const elementi = [...parete.querySelectorAll('.it')].filter((el) => el.isConnected && getComputedStyle(el).display !== 'none')
@@ -53,17 +58,22 @@ export async function fogli(scene, M, renderer) {
   const ordine = elementi.map((el, i) => ({ el, i, z: Number(getComputedStyle(el).zIndex) || 0 })).sort((a, b) => a.z - b.z || a.i - b.i)
   const pezzi = []
   const cache = new Map()
-  const attese = []
   const trama = (src) => { if (!cache.has(src)) cache.set(src, immagine(src).catch(() => null)); return cache.get(src) }
-  // quando l'immagine arriva, fatto(trama); tutte le richieste partono subito, insieme. Le immagini arrivate si caricano
-  // nella scheda (initTexture) e si mettono sui fogli a tempo, fino a 4 ms per fotogramma (aggiorna): caricarne
-  // venti nello stesso fotogramma lo allunga. `pronti` si chiude quando sono tutte a bordo della scheda, non solo scaricate
+  // quando l'immagine arriva, fatto(trama); tutte le richieste partono subito, insieme (le anteprime prima, nell'ordine).
+  // Le immagini arrivate si caricano nella scheda (initTexture) e si mettono sui fogli a tempo, fino a 4 ms per
+  // fotogramma (aggiorna): caricarne venti nello stesso fotogramma lo allunga. Per giro: quante sono a bordo (o non
+  // sono arrivate e non arriveranno), e la promessa che si chiude quando ci sono tutte (anteprime, pronti, in fondo)
   const coda = []
-  // (caricate: quante sono a bordo, o non sono arrivate e non arriveranno; serve alla barra di caricamento)
-  let caricate = 0
-  const quando = (src, fatto) => attese.push(trama(src).then((t) => { if (t) coda.push(() => { renderer.initTexture(t); fatto(t); caricate++ }); else caricate++ }))
-  let scaricate = false, finito = null
-  const pronti = Promise.all(attese).then(() => { scaricate = true; return new Promise((r) => { finito = r }) })
+  const giri = { lo: { n: 0, a: 0, ok: null }, piene: { n: 0, a: 0, ok: null } }
+  // (le vere si chiedono solo quando le anteprime sono a bordo: chieste insieme gli rubavano la banda, e la strada
+  // ci metteva di più a farsi vedere)
+  const dopo = []
+  const quando = (src, fatto, giro = 'piene') => {
+    const g = giri[giro]
+    g.n++
+    const chiedi = () => trama(src).then((t) => { if (t) coda.push(() => { renderer.initTexture(t); fatto(t); g.a++ }); else g.a++ })
+    if (giro === 'piene') dopo.push(chiedi); else chiedi()
+  }
 
   // la lamiera sotto: la stessa griglia di mondo.js, con le doghe contate dallo stesso giunto
   const lam = lamiera(M.W, H)
@@ -126,8 +136,11 @@ export async function fogli(scene, M, renderer) {
     const strato = 0.0008 + n * 0.00025
     const cl = el.classList
     const tipo = cl.contains('vol') ? 'vol' : cl.contains('man') ? 'man' : cl.contains('pezzo') ? 'pezzo' : 'graffito'
+    // fotografati da cattura.mjs: i volantini e le altre cose fatte in HTML (.foto: le scritte sprayate della storia);
+    // il resto sono le immagini della pagina
+    const foto = tipo === 'vol' || cl.contains('foto')
     let src, srcPiena = null, pw = w, ph, m = 0, dati = null
-    if (tipo === 'vol') {
+    if (foto) {
       const nome = slug(el.id || el.querySelector('h3, .titolo')?.textContent || 'foglio')
       dati = manifesto[nome]
       if (!dati) { console.warn('scena: manca la foto del volantino', nome); continue }
@@ -148,7 +161,8 @@ export async function fogli(scene, M, renderer) {
     const cx = cxU * K, cy = H - cyU * K, theta = -r * Math.PI / 180
     const gruppo = new T.Group()
     gruppo.position.set(cx, cy, 0); gruppo.rotation.z = theta
-    const lucido = cl.contains('c-lucido')
+    // (la carta lucida, e le foto stampate della storia)
+    const lucido = cl.contains('c-lucido') || cl.contains('stampa')
     // i graffiti scuri sono vernice che tinge il metallo: si moltiplicano con quello che c'è sotto (come il multiply
     // della pagina), prendendo la luce dalla lamiera, così l'inchiostro resta nero e leggibile; quelli chiari
     // (.chiaro, .bianco: argento, bianco) coprono, e sono materia illuminata come la carta
@@ -173,9 +187,34 @@ export async function fogli(scene, M, renderer) {
     gruppo.add(mesh)
     // la carta (non i graffiti, che si moltiplicano col metallo) diventa opaca finita la dissolvenza; cx, cy, theta, mezza
     // larghezza e mezza altezza della carta vera (senza il margine della foto) e lo strato servono a superficie, sotto
-    const pezzo = { el, gruppo, mesh, tipo, opaco: tipo !== 'graffito', alza: 0, meta: 0, tagliandi: [], arrivo: 0, arrivoT: 0,
+    const pezzo = { el, gruppo, mesh, tipo, opaco: tipo !== 'graffito', alza: 0, meta: 0, tagliandi: [], live: null, arrivo: 0, arrivoT: 0,
       cx, cy, theta, hw: ((pw - 2 * m) * K) / 2, hh: ((ph - 2 * m) * K) / 2, strato }
-    quando(src, (t) => { mat.map = t; pezzo.arrivo = performance.now() })
+    // l'anteprima (se c'è: solo i volantini, le altre immagini sono quelle della pagina, già scaricate) e poi la vera;
+    // se la vera arriva prima, l'anteprima non la sostituisce
+    let vera = false
+    if (foto) quando(src.replace(`/${cartella}/`, `/${cartellaLo}/`), (t) => { if (vera) return; mat.map = t; if (!pezzo.arrivo) pezzo.arrivo = performance.now() }, 'lo')
+    // (l'anteprima, sostituita, si toglie dalla scheda)
+    const sostituisci = (vecchia, t) => { if (vecchia && vecchia !== vuota && vecchia !== t) vecchia.dispose() }
+    quando(src, (t) => { vera = true; sostituisci(mat.map, t); mat.map = t; if (!pezzo.arrivo) pezzo.arrivo = performance.now() }, foto ? 'piene' : 'lo')
+
+    // la Live Photo (le stampe della storia): il video della pagina, steso sopra la foto dove cattura.mjs l'ha misurata.
+    // Si vede quando la pagina lo fa partire (.va sulla stampa: il passaggio, il dito, il tasto LIVE) e sfuma come lì;
+    // finito, torna la foto. Una trama normale col video dentro, ricaricata a ogni fotogramma mentre va: lo stesso
+    // materiale dei tagliandi, quindi lo stesso programma
+    const video = dati?.live && el.querySelector('video')
+    if (video) {
+      const f = w / dati.cw / dati.scala, lv = dati.live
+      const lx = (lv.x + lv.w / 2) * f - pw / 2, ly = -((lv.y + lv.h / 2) * f - ph / 2)
+      const t = new T.Texture(video)
+      t.colorSpace = T.SRGBColorSpace; t.generateMipmaps = false; t.minFilter = T.LinearFilter
+      const mv = new T.MeshStandardMaterial({ map: t, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.88 })
+      mv.onBeforeCompile = nitida
+      bagnato(mv, 2)
+      const vm = new T.Mesh(piano(lv.w * f * K, lv.h * f * K, cx, cy, theta, strato + 0.0002, lx * K, ly * K), mv)
+      vm.receiveShadow = true; vm.renderOrder = n + 0.5; vm.visible = false
+      gruppo.add(vm)
+      pezzo.live = { el, video, t, mesh: vm, mat: mv, v: 0 }
+    }
 
     // i tagliandi: fette della foto, ognuna un foglietto suo
     if (dati?.tagliandi) {
@@ -209,7 +248,9 @@ export async function fogli(scene, M, renderer) {
         new MutationObserver(osserva).observe(b, { attributes: true, attributeFilter: ['class'] })
         osserva()
       })
-      quando(srcPiena, (t) => { for (const tg of pezzo.tagliandi) tg.mat.map = t; pezzo.arrivoT = performance.now() })
+      let veraT = false
+      quando(srcPiena.replace(`/${cartella}/`, `/${cartellaLo}/`), (t) => { if (veraT) return; for (const tg of pezzo.tagliandi) tg.mat.map = t; if (!pezzo.arrivoT) pezzo.arrivoT = performance.now() }, 'lo')
+      quando(srcPiena, (t) => { veraT = true; sostituisci(pezzo.tagliandi[0]?.mat.map, t); for (const tg of pezzo.tagliandi) tg.mat.map = t; if (!pezzo.arrivoT) pezzo.arrivoT = performance.now() })
     }
     // il passaggio del puntatore e il fuoco alzano il foglio (come in pagina); la vernice resta sul muro
     if (tipo !== 'graffito') {
@@ -251,7 +292,7 @@ export async function fogli(scene, M, renderer) {
   const inMoto = (now) => coda.length > 0 || pezzi.some((p) => p.meta > 0 || p.alza > 0.0005 || (p.arrivo && now - p.arrivo < DISSOLVENZA + 50) || p.tagliandi.some((t) => t.stato === 'cade'))
   const aggiorna = (dt, now) => {
     if (coda.length) { const a = performance.now(); do coda.shift()(); while (coda.length && performance.now() - a < 4) }
-    else if (scaricate && finito) { finito(); finito = null }
+    for (const g of Object.values(giri)) if (g.ok && g.a >= g.n) { g.ok(); g.ok = null; if (g === giri.lo) for (const c of dopo.splice(0)) c() }
     for (const p of pezzi) {
       const fa = comparsa(p.arrivo, now)
       if (p.mesh.material.opacity !== fa) p.mesh.material.opacity = fa
@@ -266,6 +307,16 @@ export async function fogli(scene, M, renderer) {
         p.gruppo.rotation.x = 0.07 * p.alza
         p.gruppo.rotation.y = -0.03 * p.alza
       }
+      // la Live Photo: entra e esce in ~0,35 s come nella pagina, e la trama si ricarica solo mentre il video va
+      const lv = p.live
+      if (lv) {
+        const va = lv.el.classList.contains('va') && lv.video.readyState >= 2
+        lv.v += ((va ? 1 : 0) - lv.v) * (1 - Math.exp(-dt / 0.12))
+        if (!va && lv.v < 0.01) lv.v = 0
+        lv.mat.opacity = Math.min(fa, lv.v)
+        lv.mesh.visible = lv.mat.opacity > 0
+        if (lv.mesh.visible && !lv.video.paused) lv.t.needsUpdate = true
+      }
       const ft = comparsa(p.arrivoT, now)
       for (const t of p.tagliandi) {
         if (t.stato === 'su') { t.perno.visible = true; t.perno.rotation.x = 0; t.perno.position.z = 0; t.mat.opacity = ft; continue }
@@ -278,5 +329,8 @@ export async function fogli(scene, M, renderer) {
       }
     }
   }
-  return { pezzi, aggiorna, inMoto, pronti, avanzamento: () => (attese.length ? caricate / attese.length : 1), lam, superficie }
+  // (le promesse dopo i fogli: prima `giri` non sa ancora quante immagini aspettare)
+  const anteprime = new Promise((r) => { giri.lo.ok = r }), pronti = new Promise((r) => { giri.piene.ok = r })
+  // avanzamento: quanta della risoluzione piena è a bordo (0..1); anteprima: quanto delle anteprime
+  return { pezzi, aggiorna, inMoto, pronti, anteprime, avanzamento: () => (giri.piene.n ? giri.piene.a / giri.piene.n : 1), anteprima: () => (giri.lo.n ? giri.lo.a / giri.lo.n : 1), lam, superficie }
 }
