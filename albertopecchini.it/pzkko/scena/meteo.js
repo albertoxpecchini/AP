@@ -145,7 +145,8 @@ export function meteo(scene, camera, M, h, { quante = 1 } = {}) {
   camera.layers.enable(1)
 
   // i dati: all'arrivo e ogni dieci minuti
-  const chiedi = () => fetch('/api/meteo', { headers: { accept: 'application/json' } })
+  // (con la barra in fondo: senza, su Vercel, trailingSlash di vercel.json risponde prima con un 308)
+  const chiedi = () => fetch('/api/meteo/', { headers: { accept: 'application/json' } })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => { if (d && d.codice !== undefined) METEO.dati = d })
     .catch(() => {})
