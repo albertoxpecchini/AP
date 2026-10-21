@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>lezioni: registra la lezione e fa gli appunti · pzkko</title>
-<meta name="description" content="Lezioni, lo strumento gratuito di Alberto Pecchini per Windows: registra la lezione su Teams, trascrive la voce con Whisper in sincrono con la lavagna, legge le formule e fa gli appunti in PDF.">
+<title>pzk$meeting: registra la lezione e fa gli appunti · pzkko</title>
+<meta name="description" content="pzk$meeting, lo strumento gratuito di Alberto Pecchini per Windows: registra la lezione su Teams, trascrive la voce con Whisper in sincrono con la lavagna, legge le formule e fa gli appunti in PDF.">
 <link rel="canonical" href="https://www.pzkko.it/tools/lezioni/">
 <meta name="author" content="Alberto Pecchini">
 <link rel="author" href="https://www.albertopecchini.it">
 <meta name="theme-color" content="#665d56">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="pzkko">
-<meta property="og:title" content="lezioni: registra la lezione e fa gli appunti">
+<meta property="og:title" content="pzk$meeting: registra la lezione e fa gli appunti">
 <meta property="og:description" content="Registra la lezione su Teams, la trascrive in sincrono con la lavagna, legge le formule e fa gli appunti in PDF. Gratis, per Windows.">
 <meta property="og:url" content="https://www.pzkko.it/tools/lezioni/">
 <meta property="og:image" content="https://www.pzkko.it/tools/lezioni/og.jpg">
@@ -23,7 +23,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Lezioni","url":"https://www.pzkko.it/tools/lezioni/","downloadUrl":"https://www.pzkko.it/tools/lezioni/lezioni.zip","operatingSystem":"Windows 10, Windows 11","applicationCategory":"EducationalApplication","inLanguage":"it","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Alberto Pecchini","url":"https://www.albertopecchini.it"},"description":"Registra la lezione su Teams, trascrive la voce con Whisper in sincrono con la lavagna, legge le formule e fa gli appunti in PDF."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"pzk$meeting","url":"https://www.pzkko.it/tools/lezioni/","downloadUrl":"https://www.pzkko.it/tools/lezioni/lezioni.zip","operatingSystem":"Windows 10, Windows 11","applicationCategory":"EducationalApplication","inLanguage":"it","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Alberto Pecchini","url":"https://www.albertopecchini.it"},"description":"Registra la lezione su Teams, trascrive la voce con Whisper in sincrono con la lavagna, legge le formule e fa gli appunti in PDF."}</script>
 <style>
 /* Lezioni su pzkko.it: i fogli attaccati alla saracinesca, come sul muro. Caratteri del muro: Anton e Archivo Black (OFL),
    Special Elite e Permanent Marker (Apache 2.0); carte, nastri e lamiera da art/. Niente script. */
@@ -169,7 +169,7 @@ img{display:block;max-width:100%;height:auto}
       <article class="vol c-bianco grande" style="--r:-1deg;--marker-c:#1446a0">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
-          <h1>lezioni</h1>
+          <h1>pzk$meeting</h1>
           <p class="forte">registra la lezione su teams, la trascrive parola per parola in sincrono con la lavagna, legge le formule e alla fine ti dà gli appunti impaginati in pdf.</p>
           <p>l'ho fatto per le mie lezioni su teams: quello che la prof dice e quello che scrive alla lavagna, insieme, al secondo.</p>
           <p class="mano">gratis, per windows</p>
@@ -195,7 +195,7 @@ img{display:block;max-width:100%;height:auto}
         <article class="vol c-arancio scarica" style="--r:2.5deg;--marker-c:#161616">
           <div class="foglio" aria-hidden="true"></div>
           <div class="testo">
-            <h2><a href="/tools/lezioni/lezioni.zip" download>scarica lezioni.zip</a></h2>
+            <h2><a href="/tools/lezioni/lezioni.zip" download="pzk$meeting.zip">scarica pzk$meeting.zip</a></h2>
             <p class="dati">versione <!--versione-->2026.10.21<!--/versione--> · <!--peso-->904 KB<!--/peso--> · windows 10 e 11</p>
             <ol>
               <li>estrai lo zip dove vuoi;</li>
@@ -221,7 +221,7 @@ img{display:block;max-width:100%;height:auto}
         <div class="testo">
           <h2>come si usa</h2>
           <ol>
-            <li>scarica <code>lezioni.zip</code> ed estrailo dove vuoi, per esempio in documenti.</li>
+            <li>scarica <code>pzk$meeting.zip</code> ed estrailo dove vuoi, per esempio in documenti.</li>
             <li>tasto destro su <code>installa.ps1</code> → esegui con powershell. la prima volta scarica python, le librerie e il modello di whisper: con la scheda video sono circa 5 gb, ci vuole un po'.</li>
             <li>prima della lezione apri teams, l'app o nel browser, sullo schermo da registrare.</li>
             <li>sul desktop premi «lezione»: partono registrazione, trascrizione e la barra.</li>
@@ -307,7 +307,7 @@ img{display:block;max-width:100%;height:auto}
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h2>crediti</h2>
-          <p>lezioni è di alberto pecchini. dentro ci sono faster-whisper e i modelli whisper (mit), katex (mit), pyaudiowpatch, mss, pillow, numpy, matplotlib e markdown-it-py. i caratteri: archivo, instrument serif, ibm plex mono e anton (ofl), special elite e permanent marker (apache 2.0).</p>
+          <p>pzk$meeting è di alberto pecchini. dentro ci sono faster-whisper e i modelli whisper (mit), katex (mit), pyaudiowpatch, mss, pillow, numpy, matplotlib e markdown-it-py. i caratteri: archivo, instrument serif, ibm plex mono e anton (ofl), special elite e permanent marker (apache 2.0).</p>
           <p class="mano vai">il codice è nello zip</p>
         </div>
       </article>

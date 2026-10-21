@@ -196,7 +196,11 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   strumenti» è diventato «lezioni», il link alla pagina dello strumento
   (`tools/lezioni/`, vedi «Gli strumenti», sotto). Sopra c'è la stampa vera degli
   appunti di esempio (`art/lezioni/volantino.webp`), in multiply come
-  l'inchiostro delle illustrazioni. La chiave nelle pile è `vol:lezioni`.
+  l'inchiostro delle illustrazioni. Dal 22.10 il suo nome è **pzk$meeting** (la
+  registrazione delle videolezioni): il titolo del foglio, della pagina e il file
+  scaricato (`download="pzk$meeting.zip"`; sul server resta `lezioni.zip`, e
+  l'indirizzo resta `tools/lezioni/`). Il titolo è al 76% (`--ts:.76`): in Anton
+  «pzk$meeting» usciva dal foglio. La chiave nelle pile è `vol:pzk$meeting`.
 - **I tagliandi**: i volantini dei social finiscono con una fila di tagliandi
   da strappare, fette della stessa carta (lo script dà a ogni tagliando il
   suo pezzo di foglio come sfondo): toccarne uno lo strappa, copia il contatto
@@ -1256,7 +1260,7 @@ niente script. I fogli si allungano col testo (la carta si stira un po'):
 `.testo` è alto almeno quanto la carta (`calc(100cqw / (var(--ar)))`), di più
 se serve. Il volantino nella zona `tools` del muro porta lì.
 
-- **lezioni** (`tools/lezioni/`, 21.10.2026): lo strumento di Alberto per
+- **pzk$meeting** (`tools/lezioni/`, 21.10.2026; fino al 22.10 si chiamava lezioni): lo strumento di Alberto per
   registrare le lezioni su Teams, trascriverle con Whisper in sincrono con la
   lavagna, leggerne le formule e farne gli appunti in PDF. È un programma per
   Windows, non una cosa da browser: la pagina lo spiega e dà

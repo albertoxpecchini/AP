@@ -116,8 +116,9 @@ export async function carico({ log = console.log, pagine = Object.keys(PAGINE) }
     }
     const file = join(ROOT, P.file)
     let html = await readFile(file, 'utf8')
-    if (!/  const FOTO = .*\n/.test(html)) throw new Error(`in ${P.file} manca la riga «  const FOTO = …»`)
-    html = html.replace(/  const FOTO = .*\n/, () => `  const FOTO = ${JSON.stringify(FOTO)}\n`)
+    // (\r?: con core.autocrlf, su Windows, la pagina ha i ritorni a capo CRLF e il punto non scavalca il \r)
+    if (!/  const FOTO = .*\r?\n/.test(html)) throw new Error(`in ${P.file} manca la riga «  const FOTO = …»`)
+    html = html.replace(/  const FOTO = .*?(\r?\n)/, (_, acapo) => `  const FOTO = ${JSON.stringify(FOTO)}${acapo}`)
     await writeFile(file, html)
     log(`FOTO scritte in pzkko/${P.file}`)
     for (const f of await readdir(OUT)) if (sua(f) && !scritti.has(f)) { await rm(join(OUT, f)); log(`tolta ${f}, non serve più`) }
