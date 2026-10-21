@@ -10,7 +10,7 @@ iPhone, gallerie delle pagine interne, strisce dell’iPhone 18 Pro) stanno in
 | `cascina-fontana` | www.cascinafontana.xyz | `cascina-*` (home + Prodotti, galleria con la lightbox, Contatti) |
 | `albertopecchini-it` | www.albertopecchini.it | `ap-*` (home + `ap-iphone-NN`, pagina intera a strisce) |
 | `dario-donelli` | dariodonelli.vercel.app | `dd-*` (home) |
-| `pzkko-it` | www.pzkko.it | `pzk-*` (home di giorno con `?notte=0`, la stessa di notte con `?notte=1`, la roulette aperta su tablet, la 404 sul telefono) |
+| `pzkko-it` | www.pzkko.it | `pzk-*` (home di giorno con `?ora=12:00&notte=0`, la stessa di notte con `?ora=22:00&notte=1`, la roulette aperta su tablet, la 404 sul telefono; la finestra è la scena 3D, aspettata finché è pronta, le pagine intere il muro senza 3D, `?muro=1`) |
 
 L’indirizzo viene da `web.url` in `src/data/projects.js`: quando Donelli passerà al suo
 dominio basta cambiarlo lì.
@@ -55,6 +55,12 @@ il piano Hobby Vercel pubblica solo i commit del titolare del progetto.
 Un giro senza cambiamenti dura pochi secondi ma GitHub lo conta come un minuto: circa 720
 minuti al mese dei 2.000 gratuiti per i repository privati. Per spenderne meno basta
 diradare il `cron` (per esempio `17 */2 * * *`, ogni due ore).
+
+**pzkko.it e la scena 3D** (22.10): le catture della finestra si fanno senza
+`captureBeyondViewport` (che puppeteer accende da sé e che ridimensiona la vista per lo
+scatto: la tela WebGL usciva nera) e a un’ora fissa (`?ora=12:00`): la scena mette il sole
+dove sta davvero, e col solo `?notte=0` il giro della sera fotografava una notte con le
+luci spente, nera. Prima le catture di pzkko fallivano o venivano nere da giorni.
 
 Se un sito è irraggiungibile, il giro lo salta con un avviso e riprova all’ora dopo. Se una
 cattura fallisce, le altre si pubblicano lo stesso e il workflow finisce in errore (GitHub

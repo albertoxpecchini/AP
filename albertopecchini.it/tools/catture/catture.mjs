@@ -195,9 +195,11 @@ async function fotografa(page, cattura, formato, larghezza) {
     }
     return out
   }
+  // (la finestra così com'è: con captureBeyondViewport, che puppeteer accende da sé, Chrome ridimensiona la vista per lo
+  // scatto e una tela WebGL, la scena 3D di pzkko.it, esce nera)
   const png = formato.alta
     ? await page.screenshot({ clip: { x: 0, y: 0, width: larghezza, height: Math.min(formato.alta, altezza) }, captureBeyondViewport: true })
-    : await page.screenshot()
+    : await page.screenshot({ captureBeyondViewport: false })
   return [{ nome: cattura.file, webp: await webp(png, formato) }]
 }
 
