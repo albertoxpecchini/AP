@@ -50,7 +50,7 @@ const LIVELLI = {
   media: { scala: 1, max: 1, mp: 4, specchi: [512, 384], ombra: 1024, bloom: 0.5, poche: true },
   alta: { scala: 1.5, max: 3, mp: 8.3, specchi: [1024, 1024], ombra: 2048, bloom: 1 },
   ultra: { scala: 2, max: 4, mp: 16.6, specchi: [1536, 2048], ombra: 4096, bloom: 1 },
-  telefono: { scala: 1, max: 4, mp: 12, specchi: null, ombra: 0, bloom: 0, poche: true, diretta: true },
+  telefono: { scala: 1, max: 4, mp: 12, specchi: null, ombra: 0, bloom: 0, poche: true, diretta: true, moto: 2 / 3 },
 }
 // la curva dei colori accesi sopra AgX (vedi uscita, sotto): nell'OutputPass, e sul telefono dentro ogni materiale
 const AGX_NEON = `vec3 agxNeon( vec3 c ) {
@@ -294,12 +294,14 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     if (vetrina.z > 1.0005) { parete.style.transformOrigin = `${vetrina.ox.toFixed(1)}px ${vetrina.oy.toFixed(1)}px`; parete.style.transform = `scale(${vetrina.z.toFixed(4)})`; vetrina.messa = true }
     else if (vetrina.messa) { parete.style.transform = ''; parete.style.transformOrigin = ''; vetrina.messa = false }
   }
+  // (inMoto: il telefono che scorre, sotto, in moto; tMossa: l'ultimo fotogramma in cui la telecamera si è mossa)
+  let tMossa = -1e9, inMoto = false
   const misura = () => {
     const w = tela.clientWidth || innerWidth, hh = tela.clientHeight || innerHeight
     if (w !== dim.w || hh !== dim.h) {
       dim.w = w; dim.h = hh
       // (la densità dipende anche dalla misura della finestra: il tetto in milioni di pixel)
-      const d = nelTetto(voluta(w, hh), w, hh)
+      const d = nelTetto(voluta(w, hh) * (inMoto ? liv.moto : 1), w, hh)
       if (d !== dpr) { dpr = d; renderer.setPixelRatio(dpr); if (!diretta) composer.setPixelRatio(dpr) }
       renderer.setSize(w, hh, false)
       if (!diretta) {
@@ -310,9 +312,12 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     }
     // lo spazio in più da scorrere, sopra (l'insegna) e sotto (il marciapiede)
     const px = parete.offsetWidth / M.W // pixel per metro sul piano della saracinesca
-    portale.style.height = `${Math.round((telefono ? h.insegna.top - M.H + 0.35 : 1.3) * px)}px`
-    portale.style.padding = '0'
-    strada.style.paddingBottom = `${Math.round((telefono ? 0.9 : 1.35) * px)}px`
+    // (solo se cambia: su iPhone la barra di Safari che si nasconde scorrendo manda un ridimensionamento dopo l'altro, e
+    // ogni scrittura, anche uguale, ricalcolava l'impaginazione di tutta la pagina)
+    const alta = `${Math.round((telefono ? h.insegna.top - M.H + 0.35 : 1.3) * px)}px`, sotto = `${Math.round((telefono ? 0.9 : 1.35) * px)}px`
+    if (portale.style.height !== alta) portale.style.height = alta
+    if (portale.style.padding !== '0px') portale.style.padding = '0'
+    if (strada.style.paddingBottom !== sotto) strada.style.paddingBottom = sotto
     rileggi()
   }
   addEventListener('resize', misura)
@@ -320,6 +325,21 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   new ResizeObserver(() => rileggi()).observe(parete)
   new ResizeObserver(() => rileggi()).observe(portale)
   misura()
+
+  // ── il telefono che scorre (liv.moto): la risoluzione scende di un terzo (3× → 2× su un iPhone) finché la telecamera si
+  // muove, e torna piena un quarto di secondo dopo che si è fermata. Da fermo a 3× l'iPhone ci stava nei 16 ms; scorrendo
+  // Safari compone anche la pagina che si muove, la scheda sforava e i fotogrammi scendevano da 60 a 30 e a 20 (21.10).
+  // Cambiare la misura della tela costa poco, una volta all'inizio e una alla fine dello scorrimento ──
+  const moto = (now, mossa) => {
+    if (!liv.moto) return
+    if (mossa) tMossa = now
+    const m = now - tMossa < 250
+    if (m === inMoto) return
+    inMoto = m
+    const d = nelTetto(voluta(dim.w, dim.h) * (m ? liv.moto : 1), dim.w, dim.h)
+    // (diretta: niente composer da ridimensionare; setPixelRatio rifà la tela alla misura di adesso)
+    if (d !== dpr) { dpr = d; renderer.setPixelRatio(dpr); if (!diretta) composer.setPixelRatio(dpr) }
+  }
 
   // ── la qualità dal vivo (la regia, «auto» che scende): la risoluzione, gli specchi, le ombre, il bagliore, i palazzi;
   // le luci no (poche o tutte, si decide costruendo) ──
@@ -580,6 +600,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     const acceso = stato.insieme !== l.attuale() && cambia(stato.insieme)
     aggiornaVetrina(dt)
     const mossa = metti(posa(now))
+    moto(now, mossa)
     // le bestie: il muro che si vede è quello dell'inquadratura di arrivo (da lontano si vedrebbe tutto il negozio)
     const v = vicino(), asp = dim.w / dim.h
     Object.assign(bestieCtx.vista, { x0: v.wx - v.hv * asp, x1: v.wx + v.hv * asp, y0: v.wy - v.hv, y1: v.wy + v.hv })

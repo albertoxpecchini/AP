@@ -32,6 +32,10 @@ html.scena3d .copiato{visibility:visible}
 html.scena3d .vol h3,html.scena3d .vol:has(h3 a:hover) h3{text-decoration:none}
 html.scena3d .vol h3 a:focus-visible::after{outline:3px solid #ffd400;outline-offset:6px}
 html.scena3d .tagliandi button:focus-visible{outline:3px solid #ffd400}
+/* i fogli coi link dentro (i volantini, i manifesti che portano da qualche parte) restano in parte dipinti, trasparenti,
+   e con le loro ombre sfocate e le fusioni il browser li ricalcolava scorrendo: sotto la scena non servono (21.10, per il
+   telefono, che scorrendo era già al limite) */
+html.scena3d .parete .it,html.scena3d .parete .it *{filter:none !important;mix-blend-mode:normal !important}
 /* il puntatore sopra il portachiavi per terra (scena/portachiavi.js): il suo tasto si preme */
 html.scena-tasto,html.scena-tasto *{cursor:pointer}
 /* ?allinea=1: il DOM in trasparenza sopra la scena, per controllare che combacino */

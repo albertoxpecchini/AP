@@ -837,7 +837,16 @@ quello, senza che la pagina se ne accorga.
   accesi (`AGX_NEON`, che sul computer sta nell'OutputPass) entra in ogni materiale
   con `conNeon` (come `bagnato` in `acqua.js`: dopo l'`onBeforeCompile` di prima, con
   la chiave del programma di prima più «neon»), se no sotto il lampione la carta
-  veniva slavata. Poche luci, la pioggia e la neve al 40%. Prima il telefono era 1,5×
+  veniva slavata. Poche luci, la pioggia e la neve al 40%. **Scorrendo** (21.10 sera)
+  la risoluzione scende di un terzo (`moto`: 3× → 2× su un iPhone) e torna piena un
+  quarto di secondo dopo che la telecamera si è fermata: da fermo un iPhone faceva 60
+  fotogrammi al secondo, scorrendo 22–30, perché Safari compone anche la pagina che si
+  muove e la scheda, già al limite a 3×, sforava i 16 ms (e il ritmo dello schermo
+  dimezza: 60, 30, 20). Nella prova la scheda lavora 0,9 ms invece di 1,6 a
+  fotogramma mentre si scorre. Sotto la scena, i fogli coi link dentro non hanno più
+  ombre sfocate né fusioni (`scena.css`): con un link visibile il browser le
+  calcolava lo stesso, scorrendo; e `misura` scrive le misure della pagina solo se
+  cambiano (la barra di Safari che si nasconde manda un ridimensionamento dopo l'altro). Prima il telefono era 1,5×
   con ombre 1024/512, specchi 384 e bagliore, e un iPhone 16 Pro faceva 20 fotogrammi
   al secondo, un iPhone 14 10. Nella prova del 21.10 (390 × 844 a 3×, la scheda
   della 3060 Ti): di notte 0,9 ms a fotogramma invece di 5,9, con la pioggia 1,25
