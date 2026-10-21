@@ -45,6 +45,9 @@ serio ma è un progetto Vercel a parte.
   18.10.2026 alle 20:30, poi lo script lo toglie; dopo si può cancellare.
   `tasto/` (21.10) è il tasto giallo della regia con la rotella, su e premuto
   (gpt-image-2, foglio «tasto» di `../tools/pzkko/fogli.js`).
+  `lezioni/` (21.10) sono le immagini della pagina dello strumento lezioni e del
+  suo volantino: non disegnate da un modello, fatte dal tool su una lezione
+  inventata (vedi «Gli strumenti»).
 - `games/roulette/` — la roulette, che si apre in una finestra sopra il muro
   (vedi sotto): `roulette.js` e `roulette.css` (la finestra, il tavolo, le
   fiches), `ruota.js` (la forma della ruota e la sua fisica), `regole.js` (le
@@ -60,6 +63,9 @@ serio ma è un progetto Vercel a parte.
   canvas). Le figure delle carte sono in `art/blackjack/` (le dodici mezze
   figure, gpt-image-2 il 17.10.2026, `tools/pzkko/blackjack/figure.mjs`).
 - `games/pzk.js` — i $pzk, gli stessi per tutti i giochi.
+- `tools/lezioni/` — la pagina dello strumento lezioni (`index.html`), lo zip da
+  scaricare (`lezioni.zip`, lo fa `../tools/lezioni/pacchetto.py`) e
+  l'anteprima per i social (`og.jpg`). Vedi «Gli strumenti», sotto.
 - `api/meteo.mjs` — la funzione Vercel che dà alla scena il meteo di Mantova (da
   Open-Meteo, dieci minuti in cache; vedi «Il meteo» e «Vercel», sotto).
 - `regia/` — la regia, il pannello per provare e regolare il sito, che si apre col
@@ -186,6 +192,11 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   «instagram», coi tagliandi di @albertoxpecchini; «vendo il ciao» è un annuncio
   vero, con la foto della ciao stampata sopra, il link a whatsapp col messaggio
   già scritto e i tagliandi col numero.
+- **Il primo strumento** (21.10): nella zona `tools` il foglio «cercasi
+  strumenti» è diventato «lezioni», il link alla pagina dello strumento
+  (`tools/lezioni/`, vedi «Gli strumenti», sotto). Sopra c'è la stampa vera degli
+  appunti di esempio (`art/lezioni/volantino.webp`), in multiply come
+  l'inchiostro delle illustrazioni. La chiave nelle pile è `vol:lezioni`.
 - **I tagliandi**: i volantini dei social finiscono con una fila di tagliandi
   da strappare, fette della stessa carta (lo script dà a ogni tagliando il
   suo pezzo di foglio come sfondo): toccarne uno lo strappa, copia il contatto
@@ -1226,6 +1237,30 @@ il link sparisce. Un sito non può sapere chi segue chi, quindi ci si fida.
 
 Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
 `tools/nome/index.html`) e il suo volantino «in arrivo» diventa un link.
+
+## Gli strumenti (tools/)
+
+Uno strumento è una pagina statica in `tools/<nome>/`, fuori dalla scena 3D: in
+testa l'insegna (torna al muro), sotto un pezzo di saracinesca con i fogli
+attaccati in colonne. Stesse carte, nastri e caratteri del muro, CSS in linea,
+niente script. I fogli si allungano col testo (la carta si stira un po'):
+`.testo` è alto almeno quanto la carta (`calc(100cqw / (var(--ar)))`), di più
+se serve. Il volantino nella zona `tools` del muro porta lì.
+
+- **lezioni** (`tools/lezioni/`, 21.10.2026): lo strumento di Alberto per
+  registrare le lezioni su Teams, trascriverle con Whisper in sincrono con la
+  lavagna, leggerne le formule e farne gli appunti in PDF. È un programma per
+  Windows, non una cosa da browser: la pagina lo spiega e dà
+  `tools/lezioni/lezioni.zip`. Il codice vive in `../tools/lezioni/` (col suo
+  README); lo zip lo fa `python ../tools/lezioni/pacchetto.py`, che scrive anche
+  versione e peso nella pagina (fra `<!--versione-->` e `<!--peso-->`): va
+  rilanciato dopo ogni modifica al tool, prima del commit. Le immagini
+  (`art/lezioni/`: `appunti.webp` la pagina di appunti, `volantino.webp` il suo
+  pezzo sul foglio del muro, `barra.webp` e `barra-chiusa.webp` la barra) e
+  `tools/lezioni/og.jpg` vengono da una lezione **inventata**: la barra
+  disegnata dal suo codice senza finestra su una cartella finta, gli appunti di
+  esempio impaginati da `impagina.py`. Niente della lezione vera (voci, nomi,
+  lavagna) va sulla pagina.
 
 ## La storia (storia/)
 

@@ -40,6 +40,10 @@ tools/catture/stato.json
 # restano fuori dal repository; si tengono solo lo script e l'esempio.
 tools/wrapped/lavoro/
 
+# Lezioni: le lezioni registrate stanno in Documenti\Lezioni e il Python in
+# %LOCALAPPDATA%\Lezioni, fuori dal repository; qui solo lo strumento.
+tools/lezioni/__pycache__/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

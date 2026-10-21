@@ -1,0 +1,4 @@
+# Solo con una GPU NVIDIA: cuBLAS e cuDNN per ctranslate2 4.8 (CUDA 12, cuDNN 9).
+# Circa 1,5 GB; senza, Whisper gira sulla CPU con il modello small.
+nvidia-cublas-cu12>=12.4,<13
+nvidia-cudnn-cu12>=9,<10

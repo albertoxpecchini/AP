@@ -1,0 +1,3 @@
+# Solo per la lettura automatica della lavagna e gli appunti con Claude (ANTHROPIC_API_KEY):
+# l'SDK ufficiale di Anthropic, provato con la 1.17.0. Lo installa installa.ps1.
+anthropic>=1.17,<2

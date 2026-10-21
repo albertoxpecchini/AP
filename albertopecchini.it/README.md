@@ -80,6 +80,7 @@ albertopecchini.it/
 │  ├─ cartina/             fondo illustrato della carta dell’area operativa (/contatti/), gpt-image-2 su Replicate
 │  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
+│  ├─ lezioni/             le lezioni su Teams registrate, trascritte con Whisper in sincrono con la lavagna e messe in appunti PDF; si scarica da pzkko.it/tools/lezioni (vedi il suo README)
 │  ├─ nota/                le «note» di fine stagione (interventi, riepilogo, totale) in PDF A4 coi caratteri del sito (vedi il suo README)
 │  ├─ og/                  rigenera public/og.png, l’anteprima social, dai testi di site.js (vedi il suo README)
 │  ├─ onion/               l’indirizzo .onion servito da questo PC, senza Vercel: Tor + server statico, `npm run onion` pubblica (vedi il suo README)

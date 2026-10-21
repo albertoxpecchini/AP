@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>lezioni: registra la lezione e fa gli appunti · pzkko</title>
+<meta name="description" content="Lezioni, lo strumento gratuito di Alberto Pecchini per Windows: registra la lezione su Teams, trascrive la voce con Whisper in sincrono con la lavagna, legge le formule e fa gli appunti in PDF.">
+<link rel="canonical" href="https://www.pzkko.it/tools/lezioni/">
+<meta name="author" content="Alberto Pecchini">
+<link rel="author" href="https://www.albertopecchini.it">
+<meta name="theme-color" content="#665d56">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="pzkko">
+<meta property="og:title" content="lezioni: registra la lezione e fa gli appunti">
+<meta property="og:description" content="Registra la lezione su Teams, la trascrive in sincrono con la lavagna, legge le formule e fa gli appunti in PDF. Gratis, per Windows.">
+<meta property="og:url" content="https://www.pzkko.it/tools/lezioni/">
+<meta property="og:image" content="https://www.pzkko.it/tools/lezioni/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="it_IT">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Lezioni","url":"https://www.pzkko.it/tools/lezioni/","downloadUrl":"https://www.pzkko.it/tools/lezioni/lezioni.zip","operatingSystem":"Windows 10, Windows 11","applicationCategory":"EducationalApplication","inLanguage":"it","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Alberto Pecchini","url":"https://www.albertopecchini.it"},"description":"Registra la lezione su Teams, trascrive la voce con Whisper in sincrono con la lavagna, legge le formule e fa gli appunti in PDF."}</script>
+<style>
+/* Lezioni su pzkko.it: i fogli attaccati alla saracinesca, come sul muro. Caratteri del muro: Anton e Archivo Black (OFL),
+   Special Elite e Permanent Marker (Apache 2.0); carte, nastri e lamiera da art/. Niente script. */
+@font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Archivo Black";src:url(/fonts/archivo-black.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Bungee";src:url(/fonts/bungee.woff2) format("woff2");font-weight:400;font-display:swap}
+
+:root{
+  --pietra:#665d56; --pietra2:#58504a;
+  --inchiostro:#161616; --inchiostro2:#3a3632;
+  --marker:#111; --marker-rosso:#a50d25; --marker-blu:#1446a0;
+  --fa:"Anton",Impact,"Arial Narrow Bold",sans-serif;
+  --fb:"Archivo Black","Arial Black",sans-serif;
+  --ft:"Special Elite","Courier New",monospace;
+  --fm:"Permanent Marker","Comic Sans MS",cursive;
+  --eo:cubic-bezier(.22,1,.36,1);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--pietra);-webkit-text-size-adjust:100%;scrollbar-color:#8a8784 var(--pietra2)}
+body{margin:0;min-height:100svh;color:var(--inchiostro);font:400 16px/1.4 var(--ft);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+::selection{background:#ffd400;color:#111}
+:focus-visible{outline:3px solid #ffd400;outline-offset:3px}
+h1,h2,h3,p,ul,ol,figure,pre{margin:0}
+img{display:block;max-width:100%;height:auto}
+
+/* il muro del palazzo e, sopra, la saracinesca */
+.strada{--stipite:clamp(10px,3vw,40px);position:relative;isolation:isolate;overflow:clip;padding:0 var(--stipite) clamp(28px,4vw,56px);
+  background:linear-gradient(rgba(20,16,12,.32),transparent 90px),url(/art/intonaco.svg) 0 0/640px repeat,var(--pietra)}
+.portale{display:flex;justify-content:center;padding:clamp(14px,2.6vw,30px) 0 0}
+.portale a{display:block;width:min(100%,560px)}
+.muro{position:relative;max-width:1180px;margin:0 auto;padding:clamp(18px,3vw,44px) clamp(14px,2.6vw,40px) clamp(30px,4vw,60px);isolation:isolate;
+  box-shadow:inset 0 10px 14px -8px rgba(0,0,0,.7),inset 0 -8px 10px -8px rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.5)}
+.muro::before{content:"";position:absolute;inset:0;z-index:-1;background:url(/art/muro.webp) 0 0/2200px auto repeat;background-color:#8e8e8a}
+
+/* la parola sprayata e la testa: il foglio grande e quello per scaricare */
+.spray{width:min(46vw,190px);margin:0 0 -18px 4%;transform:rotate(-4deg);mix-blend-mode:multiply;opacity:.95}
+.testa{display:flex;flex-wrap:wrap;gap:clamp(18px,3vw,44px);align-items:flex-start;margin-bottom:clamp(16px,2.4vw,34px)}
+.testa .sinistra{flex:1 1 440px;max-width:560px;display:flex;flex-direction:column;gap:clamp(22px,3vw,40px)}
+.testa .sinistra .c-crema{width:84%;margin-left:8%}
+.testa .lato{flex:1 1 360px;max-width:520px;display:flex;flex-direction:column;gap:clamp(18px,2.6vw,36px)}
+
+/* i fogli: carta fotografata, testo vero sopra. La proporzione della carta è un minimo: se il testo è
+   più lungo il foglio si allunga (la carta si stira un po', come una locandina più alta) */
+.fogli{columns:3 330px;column-gap:clamp(18px,2.4vw,34px)}
+.vol{position:relative;container-type:inline-size;isolation:isolate;display:flex;flex-direction:column;
+  margin:0 0 clamp(22px,3vw,40px);break-inside:avoid;transform:rotate(var(--r,0deg));
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.28)) drop-shadow(0 10px 16px rgba(0,0,0,.3));transition:transform .32s var(--eo)}
+.testa .vol{margin:0}
+@media (hover:hover){.vol:hover{transform:rotate(var(--r,0deg)) translateY(-3px)}}
+.foglio{position:absolute;inset:0;z-index:-1;background:var(--carta) center/100% 100% no-repeat;transform:scaleX(var(--flip,1))}
+/* almeno alto come la carta (100cqw = la larghezza del foglio), di più se il testo non ci sta */
+.testo{position:relative;flex:1;display:flex;flex-direction:column;gap:3.2cqw;padding:var(--pad);min-height:calc(100cqw / (var(--ar)))}
+.testo::after{content:"";flex:none;height:4cqw}  /* un respiro sopra il bordo strappato quando il foglio si allunga */
+.vol h1{font:400 max(56px,21cqw)/.88 var(--fa);letter-spacing:.005em}
+.vol h2{font:400 max(26px,12cqw)/.95 var(--fa);letter-spacing:.005em;color:var(--titolo,var(--inchiostro));text-wrap:balance}
+.vol p,.vol li{font:400 max(14px,4.5cqw)/1.36 var(--ft);color:var(--inchiostro)}
+.vol ul,.vol ol{padding-left:1.2em;display:flex;flex-direction:column;gap:2cqw}
+.vol ul{list-style:"– "}
+.vol li::marker{font-family:var(--fm);color:var(--marker-c,var(--marker))}
+.vol .forte{font:400 max(15px,4.1cqw)/1.25 var(--fb);letter-spacing:-.01em}
+.vol .mano{font:400 max(16px,6.6cqw)/1.05 var(--fm);color:var(--marker-c,var(--marker));transform:rotate(-2deg);align-self:flex-start}
+.vol .mano.vai{align-self:flex-end;transform:rotate(-4deg)}
+.vol code,.vol kbd{font:inherit;background:rgba(255,212,0,.45);padding:0 .2em;border-radius:2px}
+.freccia{display:inline-block;width:1.5em;height:.75em;vertical-align:-.1em;margin-left:.15em;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.freccia.giu{transform:rotate(90deg);width:1em;height:.8em;margin-left:.3em}
+
+/* il foglio per scaricare: tutto il foglio è il link */
+.scarica h2{font:400 max(22px,9.4cqw)/1.02 "Bungee","Arial Black",sans-serif}
+.scarica h2 a{text-decoration:none}
+.scarica h2 a::after{content:"";position:absolute;inset:0;z-index:1}
+@media (hover:hover){.scarica:has(h2 a:hover){transform:rotate(var(--r,0deg)) translateY(-4px) scale(1.015)}
+  .scarica:has(h2 a:hover) h2{text-decoration:underline;text-decoration-thickness:.08em;text-underline-offset:.1em}}
+.scarica:has(h2 a:focus-visible){outline:3px solid #ffd400;outline-offset:4px}
+.scarica h2 a:focus-visible{outline:none}
+.scarica .dati{font:400 max(12px,4.2cqw)/1.3 var(--ft)}
+.scarica ol li{font-size:max(13px,4.1cqw)}
+
+/* le stampe attaccate col nastro: gli appunti e la barra */
+.stampa{position:relative;margin:0 5% clamp(30px,4vw,48px);break-inside:avoid;transform:rotate(var(--r,0deg));
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)) drop-shadow(0 12px 18px rgba(0,0,0,.32))}
+.stampa>img:first-child{background:#fff}
+.stampa .nastro{position:absolute;width:34%;pointer-events:none}
+.stampa figcaption{position:absolute;left:4%;bottom:-.2em;transform:translateY(100%) rotate(-2deg);font:400 clamp(15px,1.7vw,19px)/1.05 var(--fm);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.barra{display:flex;align-items:flex-start;gap:7%;justify-content:center;margin:1cqw 0}
+.barra figure{display:flex;flex-direction:column;align-items:center;gap:1cqw}
+.barra figcaption{font:400 max(13px,4.6cqw)/1 var(--fm);color:var(--marker-c,var(--marker));transform:rotate(-3deg)}
+.barra .aperta{flex:0 1 287px}
+.barra .chiusa{flex:none;width:25px}
+
+/* il grezzo: com'è il file, a macchina */
+.grezzo{font:400 max(12px,3.7cqw)/1.45 var(--ft);white-space:pre-wrap;overflow-wrap:anywhere;background:rgba(255,255,255,.55);padding:2.4cqw 3cqw;border-left:3px solid var(--marker-rosso)}
+
+/* la firma in fondo */
+.firma{max-width:1180px;margin:clamp(18px,2.6vw,30px) auto 0;display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:space-between;align-items:center;
+  font:400 15px/1.3 var(--ft);color:#efe9e1;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.firma a{text-decoration-thickness:.06em;text-underline-offset:.15em}
+.torna{display:inline-flex;align-items:center;height:42px;padding:0 18px 2px 14px;background:url(/art/nastro/carta-gommata.webp) center/100% 100% no-repeat;
+  color:#1a1a1a;font:400 17px/1 var(--fm);text-decoration:none;text-shadow:none;transform:rotate(-3deg);filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+@media (hover:hover){.torna:hover{transform:rotate(-1deg) scale(1.05)}}
+
+/* le carte: proporzione, margine in cui scrivere (gli stessi della home) */
+.c-bianco{--carta:url(/art/carta/bianco.webp);--ar:560/732;--pad:16.1cqw 16.1cqw 12.9cqw 15.0cqw}
+.c-giallo{--carta:url(/art/carta/giallo.webp);--ar:556/672;--pad:14.9cqw 11.0cqw 11.7cqw 8.3cqw}
+.c-kraft{--carta:url(/art/carta/kraft.webp);--ar:504/656;--pad:7.8cqw 8.4cqw 7.4cqw 7.2cqw}
+.c-giornale{--carta:url(/art/carta/giornale.webp);--ar:600/524;--pad:8.4cqw 7.5cqw 7.5cqw 9.7cqw}
+.c-arancio{--carta:url(/art/carta/arancio.webp);--ar:520/636;--pad:14.4cqw 12.9cqw 13.7cqw 15.6cqw}
+.c-verde{--carta:url(/art/carta/verde.webp);--ar:596/556;--pad:14.3cqw 15.1cqw 11.6cqw 16.6cqw}
+.c-crema{--carta:url(/art/carta/crema.webp);--ar:588/648;--pad:14.5cqw 13.2cqw 12.2cqw 15.9cqw}
+.c-lucido{--carta:url(/art/carta/lucido.webp);--ar:516/600;--pad:8.7cqw 12.6cqw 10.6cqw 7.9cqw}
+.c-azzurro{--carta:url(/art/carta/azzurro.webp);--ar:652/576;--pad:12.7cqw 11.2cqw 7.5cqw 12.5cqw}
+.flip{--flip:-1}
+
+@media (max-width:720px){
+  /* sul telefono una colonna sola: prima il foglio grande, poi quello per scaricare, poi il resto */
+  /* senza wrap: in una colonna che va a capo Chromium misura l'altezza dei fogli prima di allargarli (e con
+     container-type la larghezza in quel momento è zero: una parola per riga, fogli altissimi) */
+  .testa{flex-direction:column;flex-wrap:nowrap;align-items:stretch}
+  .testa .sinistra,.testa .lato{display:contents}
+  .testa .grande{order:1}
+  .testa .scarica{order:2;margin:0 4%}
+  .testa .sinistra .c-crema{order:3;width:auto;margin:0}
+  .testa .stampa{order:4;margin-bottom:clamp(30px,8vw,48px)}
+  .vol p,.vol li{font-size:max(14px,4.7cqw)}
+}
+@media (prefers-reduced-motion:reduce){.vol,.torna{transition:none}}
+</style>
+</head>
+<body>
+<div class="strada">
+  <header class="portale">
+    <a href="/"><img src="/art/insegna.svg" alt="pzkko: torna al muro" width="1080" height="450"></a>
+  </header>
+
+  <main class="muro">
+    <img class="spray" src="/art/scritte/tools.webp" alt="tools" width="474" height="405">
+
+    <div class="testa">
+      <div class="sinistra">
+      <article class="vol c-bianco grande" style="--r:-1deg;--marker-c:#1446a0">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h1>lezioni</h1>
+          <p class="forte">registra la lezione su teams, la trascrive parola per parola in sincrono con la lavagna, legge le formule e alla fine ti dà gli appunti impaginati in pdf.</p>
+          <p>l'ho fatto per le mie lezioni su teams: quello che la prof dice e quello che scrive alla lavagna, insieme, al secondo.</p>
+          <p class="mano">gratis, per windows</p>
+        </div>
+      </article>
+
+        <article class="vol c-crema" style="--r:1.5deg;--marker-c:#a50d25">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <h2>cosa fa</h2>
+            <ul>
+              <li>registra l'audio del pc e lo schermo dove c'è teams, sullo stesso orologio. quando la lavagna cambia, salva una foto.</li>
+              <li>trascrive la voce con whisper large-v3 sulla scheda video, parola per parola, di solito fra quindici e quaranta secondi dietro la diretta.</li>
+              <li>mette tutto in un file grezzo: cosa ha detto, minuto per minuto, accanto a cosa c'era scritto.</li>
+              <li>legge le formule della lavagna e le riscrive in latex.</li>
+              <li>a fine lezione fa gli appunti per argomento, con i grafici ridisegnati, e li impagina in pdf.</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+
+      <div class="lato">
+        <article class="vol c-arancio scarica" style="--r:2.5deg;--marker-c:#161616">
+          <div class="foglio" aria-hidden="true"></div>
+          <div class="testo">
+            <h2><a href="/tools/lezioni/lezioni.zip" download>scarica lezioni.zip</a></h2>
+            <p class="dati">versione <!--versione-->2026.10.21<!--/versione--> · <!--peso-->902 KB<!--/peso--> · windows 10 e 11</p>
+            <ol>
+              <li>estrai lo zip dove vuoi;</li>
+              <li>tasto destro su <code>installa.ps1</code> → esegui con powershell;</li>
+              <li>prima della lezione premi «lezione» sul desktop.</li>
+            </ol>
+            <p class="mano vai">tutto qui sotto <svg class="freccia giu" viewBox="0 0 48 24" aria-hidden="true"><path d="M3 13c10-2 22-2 34-1M28 5c4 3 7 5 10 7-3 2-7 5-10 8"/></svg></p>
+          </div>
+        </article>
+
+        <figure class="stampa" style="--r:1.5deg">
+          <img src="/art/lezioni/appunti.webp" alt="una pagina di appunti di esempio: il titolo «Limiti di funzione», una formula su una forma indeterminata, un riquadro «detto a voce», la tabella dei limiti notevoli e il grafico di sen x fratto x" width="960" height="1185" loading="lazy">
+          <img class="nastro" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy" style="left:-6%;top:-3%;transform:rotate(-32deg)">
+          <img class="nastro" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy" style="right:-7%;top:-2%;transform:rotate(28deg)">
+          <figcaption>così vengono gli appunti (questi sono un esempio)</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="fogli">
+      <article class="vol c-giallo" style="--r:1deg;--marker-c:#a50d25">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>come si usa</h2>
+          <ol>
+            <li>scarica <code>lezioni.zip</code> ed estrailo dove vuoi, per esempio in documenti.</li>
+            <li>tasto destro su <code>installa.ps1</code> → esegui con powershell. la prima volta scarica python, le librerie e il modello di whisper: con la scheda video sono circa 5 gb, ci vuole un po'.</li>
+            <li>prima della lezione apri teams, l'app o nel browser, sullo schermo da registrare.</li>
+            <li>sul desktop premi «lezione»: partono registrazione, trascrizione e la barra.</li>
+            <li>alla fine premi «fine lezione». trovi tutto in <code>documenti\lezioni</code>, una cartella per giorno.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="vol c-kraft" style="--r:-2deg;--marker-c:#161616">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>la barra</h2>
+          <div class="barra">
+            <figure class="aperta"><img src="/art/lezioni/barra.webp" alt="la barra aperta: rec 52:18 col pallino rosso, il livello dell'audio, la miniatura della lavagna con 214 scatti, voce meno 14 secondi, ocr meno 1 minuto con 2 in coda, e l'ultima frase sentita a pennarello" width="287" height="138" loading="lazy"><figcaption>aperta</figcaption></figure>
+            <figure class="chiusa"><img src="/art/lezioni/barra-chiusa.webp" alt="la barra chiusa: resta solo la linguetta con scritto lezione" width="25" height="138" loading="lazy"><figcaption>chiusa</figcaption></figure>
+          </div>
+          <p>un foglio attaccato con lo scotch a un pezzo di saracinesca, sempre in primo piano sul bordo dello schermo. ti dice se registra, quanto sente forte, l'ultima foto della lavagna, quanto sono indietro voce e formule e l'ultima frase sentita.</p>
+          <p class="mano vai">tira la linguetta e rientra</p>
+        </div>
+      </article>
+
+      <article class="vol c-giornale" style="--r:1.5deg;--marker-c:#a50d25">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>il grezzo</h2>
+          <p>il file che si riempie durante la lezione: voce e lavagna sulla stessa riga del tempo.</p>
+          <pre class="grezzo">**[12:04]** 🗣 adesso raccogliamo il termine di grado più alto, sopra e sotto
+**[12:10]** 🖼 t_000730.jpg
+&gt; $$\lim_{x\to+\infty}\frac{x^3+x}{2x^3-1}=\frac12$$</pre>
+          <p class="mano">gli appunti nascono da qui</p>
+        </div>
+      </article>
+
+      <article class="vol c-verde flip" style="--r:-1deg;--marker-c:#0b5d2b">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>le formule</h2>
+          <p>whisper sente, ma le formule alla lavagna qualcuno le deve leggere. due modi:</p>
+          <ul>
+            <li>con <strong>claude code</strong>: la skill «lezione» legge la lavagna ogni due minuti e a fine lezione scrive gli appunti. va col tuo abbonamento.</li>
+            <li>da solo, con una chiave api di anthropic: «lezione» avvia la lettura automatica e «fine lezione» scrive gli appunti. a pagamento, qualche euro a lezione.</li>
+          </ul>
+          <p>senza nessuno dei due hai comunque la registrazione, la trascrizione e le foto della lavagna.</p>
+        </div>
+      </article>
+
+      <article class="vol c-azzurro" style="--r:2deg;--marker-c:#a50d25">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>cosa serve</h2>
+          <ul>
+            <li>windows 10 o 11.</li>
+            <li>una scheda video nvidia, consigliata: con una rtx 3060 ti trascrive sei-dieci volte più in fretta di quanto si parla. senza va sulla cpu col modello small, meno preciso.</li>
+            <li>circa 5 gb liberi, edge per il pdf.</li>
+            <li>l'audio deve uscire dal pc: registra quello che senti, quindi niente muto su teams.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="vol c-lucido" style="--r:-1.5deg;--marker-c:#a50d25">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>i limiti, onesti</h2>
+          <ul>
+            <li>whisper storpia i termini («è alla x» per <i>e</i> alla x): negli appunti la lavagna vale più della voce.</li>
+            <li>se la telecamera taglia un pezzo di lavagna, viene ricostruito da quello che si sente, ed è segnato.</li>
+            <li>se teams cade, la registrazione va avanti: i buchi restano silenzio, i tempi non si spostano.</li>
+            <li>l'ho provato su windows 10 con una rtx 3060 ti. su altri pc dimmi come va.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="vol c-bianco" style="--r:1deg;--marker-c:#a50d25">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>privacy</h2>
+          <p>audio, foto e appunti restano sul tuo pc, in <code>documenti\lezioni</code>. esce solo quello che mandi a claude, se lo usi: le foto della lavagna e il testo.</p>
+          <p class="forte">registra solo le lezioni che hai il diritto di registrare, e tienile per te.</p>
+        </div>
+      </article>
+
+      <article class="vol c-giornale flip" style="--r:-1deg;--marker-c:#1446a0">
+        <div class="foglio" aria-hidden="true"></div>
+        <div class="testo">
+          <h2>crediti</h2>
+          <p>lezioni è di alberto pecchini. dentro ci sono faster-whisper e i modelli whisper (mit), katex (mit), pyaudiowpatch, mss, pillow, numpy, matplotlib e markdown-it-py. i caratteri: archivo, instrument serif, ibm plex mono e anton (ofl), special elite e permanent marker (apache 2.0).</p>
+          <p class="mano vai">il codice è nello zip</p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="firma">
+    <a class="torna" href="/">← torna al muro</a>
+    <p>strumento di <a href="https://www.albertopecchini.it" rel="me noopener" target="_blank">Alberto Pecchini</a></p>
+  </footer>
+</div>
+</body>
+</html>
