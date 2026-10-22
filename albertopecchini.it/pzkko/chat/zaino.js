@@ -7,6 +7,7 @@
 // come copia, si salva un po' dopo ogni cambio e subito quando la pagina si nasconde. Vince chi ha il `t` più recente.
 
 import * as pzk from '../games/pzk.js'
+import { PER_ID } from './testi.js'
 
 const API = '/api/wallet'
 const CHIAVE_SESSIONE = 'pzkko-chat-sessione'
@@ -82,7 +83,7 @@ export const mestiere = () => Z.mestiere
 
 /** Aggiunge punti esperienza (la mortadella li raddoppia). → il livello nuovo se è salito, se no 0 */
 export function daiXp(n) {
-  if (effetto('mortadella')) n *= 2
+  n *= 1 + bonus('xp')
   const prima = livello()
   Z.xp = Math.round(Z.xp + n)
   Z.stat.xp = (Z.stat.xp ?? 0) + n
@@ -90,8 +91,19 @@ export function daiXp(n) {
   const dopo = livello()
   return dopo > prima ? dopo : 0
 }
-/** Il moltiplicatore delle paghe: 2 % per livello sopra il primo, +10 % con la lattina. */
-export const moltiplicatore = () => Math.round((1 + 0.02 * (livello() - 1) + (effetto('lattina') ? 0.1 : 0)) * 100) / 100
+/** Il moltiplicatore delle paghe: 2 % per livello sopra il primo, più i bonus «paga» (la lattina, la pzk-kola, il neon…). */
+export const moltiplicatore = () => Math.round((1 + 0.02 * (livello() - 1) + bonus('paga')) * 100) / 100
+
+/** La somma di un bonus (paga, xp, attese, vendita, morte, sfide): quelli dei consumabili ancora in effetto e delle cose da tenere
+ *  che ci sono nello zaino (oggetti.js). Una frazione: 0.1 = +10 %, -0.5 = metà. */
+export function bonus(k) {
+  let s = 0
+  for (const id of Object.keys(Z.effetti)) if (effetto(id)) s += PER_ID[id]?.bonus?.[k] ?? 0
+  for (const id of Object.keys(Z.oggetti)) if (Z.oggetti[id] > 0 && PER_ID[id]?.tipo === 'tieni') s += PER_ID[id].bonus?.[k] ?? 0
+  return s
+}
+/** I bonus di adesso, tutti insieme: { paga: 0.2, xp: 0.5, … } (solo quelli diversi da zero). */
+export const bonusTutti = () => Object.fromEntries(['paga', 'xp', 'attese', 'vendita', 'morte', 'sfide'].map((k) => [k, bonus(k)]).filter(([, v]) => v))
 
 // ── gli oggetti ──
 export const ha = (id) => (Z.oggetti[id] ?? 0) > 0
@@ -113,7 +125,7 @@ export function svuota() { Z.oggetti = {}; scrivi() }
 export const manca = (cmd) => Math.max(0, (Z.attese[cmd] ?? 0) - Date.now())
 /** Segna l'attesa (il caffè la dimezza). */
 export function aspetta(cmd, ms) {
-  if (effetto('caffe')) ms = Math.round(ms / 2)
+  ms = Math.round(ms * Math.max(0.25, 1 + bonus('attese')))
   Z.attese[cmd] = Date.now() + ms
   for (const k of Object.keys(Z.attese)) if (Z.attese[k] < Date.now()) delete Z.attese[k]
   scrivi()

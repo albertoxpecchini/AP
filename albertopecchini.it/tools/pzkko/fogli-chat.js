@@ -71,6 +71,28 @@ const TESTI = {
     mina: 'a black round naval mine with spikes and a lit fuse', gemma: 'a green emerald gem', testa: 'a gold coin showing a snail head in profile (heads)',
     croce: 'a gold coin showing a big plus-shaped cross symbol (tails)', dadi: 'two red dice showing five and three', quiz: 'a big yellow question mark on a blue speech bubble',
   }],
+  'chat-cibo': [5, 2, '2048x1152', 'lo shop: il cibo e le bevande', 'Ten food and drink items, each one alone, NO text, NO logos and NO letters on any packaging (plain colour-blocked packaging only):', {
+    'pzk-kola': 'a dark brown cola can with a bold white wavy stripe and a little green snail silhouette on it, condensation drops', estathe: 'a yellow-orange tetra-pak iced tea carton with a straw and a peach drawn on it',
+    'frutti-bosco': 'a small cardboard punnet overflowing with blueberries, strawberries and raspberries', zucca: 'a big orange Mantuan pumpkin with a green curly stalk and a slice cut out',
+    tortelli: 'a white plate of square stuffed pasta (tortelli di zucca) with melted butter, sage leaves and a sprinkle of cheese', grissini: 'a pack of thin pizza-flavoured breadsticks: a red and yellow bag with a few breadsticks sticking out of the top and a tomato drawn on it',
+    ramen: 'an instant ramen box: a red and yellow cardboard take-away carton with a wire handle, chopsticks sticking out, a little steam, a dragon drawn on it', sbrisolona: 'a rustic crumbly almond cake (sbrisolona), broken in pieces on a wooden board',
+    mostarda: 'a small glass jar of Mantuan mostarda: candied fruit pieces in golden syrup, a checked cloth lid tied with string', pomodoro: 'a single ripe red tomato with a green stalk, shiny',
+  }],
+  'chat-roba': [5, 2, '2048x1152', 'lo shop: le cose citate da Alberto', 'Ten objects, each one alone, NO text and NO logos anywhere:', {
+    eastpak: 'a black nylon school backpack with a wide front pocket and a rubber patch (no logo)', 'ciao-px': 'a vintage Italian moped (Piaggio Ciao style) in light blue, with a step-through frame, small wheels and a pedal crank, seen from the side',
+    landini: 'a 1950s Italian crawler-less wheeled farm tractor in a dark red/orange paint with a big round hot-bulb front nose (Landini L25 style), seen from the side', stampante: 'a modern white and black inkjet printer with a paper tray and a sheet coming out',
+    'iphone-duo': 'a futuristic smartphone seen from the front with TWO camera lenses side by side and a glowing gold screen, premium look', stufa: 'a black cast-iron wood-burning stove with a glass door showing fire and a stove pipe on top',
+    bonsai: 'a small bonsai tree in a shallow ceramic pot with a twisted trunk and a round green canopy', 'penne-bic': 'three cheap ballpoint pens (clear body, blue cap) taped with transparent scotch tape to a sheet of paper and tied to it by a string',
+    tucson: 'a modern dark grey compact SUV seen from the side, sleek (Hyundai Tucson style), no badges', 'manuale-landini': 'an old 1957 tractor instruction manual: a worn cream paperback booklet with a drawing of a tractor on the cover and a coffee stain',
+  }],
+  'chat-pzk': [4, 3, '2048x1152', 'lo shop: le cose di pzk', 'Twelve objects of the fictional «pzk» brand universe, each one alone, NO text and NO readable letters anywhere:', {
+    luckypzkko: 'a crushed empty cigarette-style cardboard pack in red and white with a snail silhouette on it, flattened and dirty, as litter', gomma: 'a pink chewed gum blob stuck to a bit of pavement, with a stretched string',
+    tombino: 'a round cast-iron manhole cover with a relief pattern of concentric rings and a small snail in the centre', lucchettone: 'a huge heavy brass padlock with a thick shackle, locked, shiny',
+    citofono: 'a street door intercom panel: a brushed metal plate with one button and a small speaker grille and a tiny brass number plate (use the digits «28» only)', pzkkonet: 'a small round metal sticker with a wifi signal symbol (three arcs and a dot) and a snail silhouette inside',
+    portachiavi: 'a rounded pocket keyring gadget in black plastic with a metal ring and a single big button with a small green glowing display', petizione: 'a clipboard with a sheet of paper (lines only, no words) and a ballpoint pen hanging from it on a string, taped with scotch',
+    neon: 'a neon sign shaped like a glowing blue snail with a swirl shell, lit up, with a little black wiring box', portafoglio: 'a used brown leather wallet, open, with two tiny glowing green screens set in metal frames inside and a few worn stitches, post-apocalyptic style',
+    pager: 'a black 1990s pager with a green LCD screen and a belt clip', peluche: 'a plush toy of the snail mascot: a soft green snail with a brown spiral shell and black sunglasses',
+  }],
   'chat-mestieri': [4, 3, '2048x1152', 'i mestieri: la chiocciola vestita da', `All twelve are the SAME character, ${LUMACA}, dressed for a job (the sunglasses always on):`, {
     rider: 'a food delivery rider: a cycling helmet and a big square delivery backpack', cameriere: 'a waiter at a village festival: a white apron, holding a tray with two plates of ravioli',
     barista: 'a barista: a black apron, holding a steaming espresso cup', bidello: 'a school janitor: a blue work coat and a huge ring of keys',

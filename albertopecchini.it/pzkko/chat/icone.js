@@ -20,6 +20,12 @@ export const FOGLI_CHAT = {
   'chat-slot': ['ciliegia', 'limone', 'sette', 'campana', 'diamante', 'chiocciola-oro', 'bar', 'trifoglio', 'anguria', 'uva', 'stella', 'dado'],
   // i giochi
   'chat-giochi': ['carte', 'roulette', 'mina', 'gemma', 'testa', 'croce', 'dadi', 'quiz'],
+  // lo shop (23.10), pezzi citati da Alberto nelle chat: il cibo e le bevande…
+  'chat-cibo': ['pzk-kola', 'estathe', 'frutti-bosco', 'zucca', 'tortelli', 'grissini', 'ramen', 'sbrisolona', 'mostarda', 'pomodoro'],
+  // …le cose (i volantini, gli annunci, gli scontrini)…
+  'chat-roba': ['eastpak', 'ciao-px', 'landini', 'stampante', 'iphone-duo', 'stufa', 'bonsai', 'penne-bic', 'tucson', 'manuale-landini'],
+  // …e le cose di pzk (la spazzatura del brand, la porta, il neon, il wallet)
+  'chat-pzk': ['luckypzkko', 'gomma', 'tombino', 'lucchettone', 'citofono', 'pzkkonet', 'portachiavi', 'petizione', 'neon', 'portafoglio', 'pager', 'peluche'],
   // i mestieri
   'chat-mestieri': ['rider', 'cameriere', 'barista', 'bidello', 'salumiere', 'tatuatore', 'streamer', 'sviluppatore', 'prof', 'influencer', 'avvocato', 'sindaco'],
 }

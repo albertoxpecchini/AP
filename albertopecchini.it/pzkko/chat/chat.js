@@ -343,7 +343,7 @@ export async function muori(ctx, motivo) {
     scheda({ colore: 'ambra', av: 'bot-occhiolino', t: ':cornetto: il cornetto ha fatto il suo', d: `${motivo}\nSaresti morto, ma il cornetto rosso si è crepato al posto tuo: i $pzk sono salvi. Ne hai ancora ${zaino.quanti('cornetto')}.` })
     return
   }
-  const persi = mezzi(Math.min(MORTE.max, pzk.saldo() * MORTE.quota))
+  const persi = mezzi(Math.min(MORTE.max, pzk.saldo() * MORTE.quota * Math.max(0, 1 + zaino.bonus('morte')))) // il bonsai e il lucchettone ne fanno perdere meno
   if (persi > 0) spendi(persi)
   scheda({ colore: 'rosso', av: 'bot-morto', t: ':teschio: sei morto', d: `${motivo}\nHai perso ${pzkHtml(persi)} (il ${MORTE.quota * 100} % dei $pzk liberi${persi >= MORTE.max ? ', il massimo' : ''}). Gli EUR€ nel wallet non si toccano.`, pie: 'un :cornetto: dal negozio ti avrebbe salvato' })
 }

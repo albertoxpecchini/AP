@@ -126,6 +126,8 @@ export const REPERTI = [
   { id: 'tesoro', nome: 'IL TESORO DEI GONZAGA', peso: 1, vale: 1800, raro: true, leggendario: true },
 ]
 
+import { REPARTO_VECCHI, BONUS_VECCHI, NUOVI } from './oggetti.js'
+
 // ── i mestieri: livello minimo, paga a turno (prima del moltiplicatore), il minigioco preferito ──
 export const MESTIERI = [
   { id: 'rider', nome: 'rider', liv: 1, paga: 120, frase: 'consegni pizze in bici col freddo', gioco: 'strada' },
@@ -143,7 +145,7 @@ export const MESTIERI = [
 ]
 
 // ── il negozio: prezzo in $pzk, cosa fa ──
-export const NEGOZIO = [
+const VECCHI = [
   { id: 'canna', nome: 'canna da pesca', prezzo: 350, cosa: 'per pescare nel Mincio (pesca). Ogni tanto si rompe.', tipo: 'attrezzo' },
   { id: 'esca', nome: 'esca viva', prezzo: 60, cosa: 'la prossima pescata pesca due volte. Si consuma.', tipo: 'usa' },
   { id: 'fionda', nome: 'fionda', prezzo: 300, cosa: 'per cacciare (caccia). Prende le bestie piccole.', tipo: 'attrezzo' },
@@ -158,6 +160,11 @@ export const NEGOZIO = [
   { id: 'cassa-comune', nome: 'cassa comune', prezzo: 400, cosa: 'dentro: $pzk, un oggetto, o niente (apri).', tipo: 'cassa' },
   { id: 'cassa-rara', nome: 'cassa rara', prezzo: 1200, cosa: 'dentro: più $pzk, attrezzi, qualcosa di raro (apri).', tipo: 'cassa' },
   { id: 'cassa-gonzaga', nome: 'cassa dei Gonzaga', prezzo: 4000, cosa: 'dentro: il tesoro di una dinastia. O una delusione da 4.000 $pzk (apri).', tipo: 'cassa' },
+]
+/** Tutto quello che si compra: i vecchi (reparto e bonus da oggetti.js; gli attrezzi si hanno una volta sola) e le cose nuove dello shop. */
+export const NEGOZIO = [
+  ...VECCHI.map((x) => ({ ...x, reparto: REPARTO_VECCHI[x.id] ?? 'fortuna', ...(BONUS_VECCHI[x.id] && { bonus: BONUS_VECCHI[x.id] }), ...(x.tipo === 'attrezzo' && { unico: true }) })),
+  ...NUOVI,
 ]
 export const PER_ID = Object.fromEntries([...NEGOZIO, ...PESCI, ...ANIMALI, ...REPERTI].map((x) => [x.id, x]))
 /** Il nome di un oggetto, come si scrive nello zaino. */
