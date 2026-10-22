@@ -175,19 +175,22 @@ img{display:block;max-width:100%;height:auto}
 .testo{position:relative;flex:1;display:flex;flex-direction:column;gap:2.2cqw;padding:var(--pad)}
 .vol:has(.tagliandi) .testo{padding-bottom:var(--giu)}
 .arte{width:var(--aw,62%);margin:0 auto;mix-blend-mode:multiply;flex:none;align-self:var(--aa,center)}
-.vol h3,.vol .titolo{font:400 max(calc(26px * var(--ts,1)),calc(18cqw * var(--ts,1)))/.95 var(--fa);letter-spacing:.005em;color:var(--titolo,var(--inchiostro));text-wrap:balance}
+/* Nessuna scritta esce dal suo riquadro: il riquadro comanda, non la scritta. Le parole lunghe (link, nomi) vanno a capo
+   (overflow-wrap); un titolo o un testo che non ci sta si rimpicciolisce (--fit, lo mette lo script «adatta» più sotto) */
+.vol .testo{min-width:0;overflow-wrap:anywhere}
+.vol h3,.vol .titolo{font:400 calc(max(calc(26px * var(--ts,1)),calc(18cqw * var(--ts,1))) * var(--fit,1))/.95 var(--fa);letter-spacing:.005em;color:var(--titolo,var(--inchiostro));text-wrap:balance}
 .vol h3 a,.vol .titolo a{text-decoration:none}
 .vol h3 a::after{content:"";position:absolute;inset:0;z-index:1}
-.vol p{font:400 max(12px,5.4cqw)/1.28 var(--ft);color:var(--testo,var(--inchiostro))}
-.vol .forte{font-family:var(--fb);font-size:max(12px,5cqw);letter-spacing:-.01em}
-.vol .mano{font:400 max(14px,7.2cqw)/1.05 var(--fm);color:var(--marker-c,var(--marker));transform:rotate(-2deg);align-self:flex-start}
+.vol p{font:400 calc(max(12px,5.4cqw) * var(--fit,1))/1.28 var(--ft);color:var(--testo,var(--inchiostro))}
+.vol .forte{font-family:var(--fb);font-size:calc(max(12px,5cqw) * var(--fit,1));letter-spacing:-.01em}
+.vol .mano{font:400 calc(max(14px,7.2cqw) * var(--fit,1))/1.05 var(--fm);color:var(--marker-c,var(--marker));transform:rotate(-2deg);align-self:flex-start}
 .vol .mano.vai{align-self:flex-end;transform:rotate(-4deg)}
 .vol .freccia{display:inline-block;width:1.5em;height:.75em;vertical-align:-.1em;margin-left:.15em;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .vol .siti .freccia{width:1.1em;height:.55em;margin:0 .35em 0 0;stroke-width:3.5;color:var(--marker-rosso)}
 .vol .mano a{text-decoration:none}
 .vol .adesivo{position:absolute;right:-6%;bottom:-4%;width:34%;z-index:2;transform:rotate(-12deg);pointer-events:none}
-.vol .handle{font:400 max(13px,6cqw)/1.1 var(--fm);color:var(--marker-c,var(--marker));margin-top:auto;overflow-wrap:anywhere;padding-bottom:2cqw}
-.vol .siti{list-style:none;padding:0;font:400 max(12px,5.2cqw)/1.3 var(--ft)}
+.vol .handle{font:400 calc(max(13px,6cqw) * var(--fit,1))/1.1 var(--fm);color:var(--marker-c,var(--marker));margin-top:auto;overflow-wrap:anywhere;padding-bottom:2cqw}
+.vol .siti{list-style:none;padding:0;font:400 calc(max(12px,5.2cqw) * var(--fit,1))/1.3 var(--ft)}
 .vol .siti li{display:flex;align-items:center}
 .vol .piu18{position:absolute;left:6%;top:5%;z-index:1;font:400 max(12px,6cqw)/1 var(--fb);color:#fff;background:var(--marker-rosso);padding:.35em .4em;border-radius:50%;transform:rotate(12deg)}
 /* le altre tipografie: il titolo in un altro carattere (--fa) e alla sua misura (--ts: Anton è stretto, questi no);
@@ -360,7 +363,7 @@ html:not(.js) .rotella{display:none}
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),inset 0 0 0 4px rgba(0,0,0,.08),0 3px 4px rgba(0,0,0,.5),0 10px 14px rgba(0,0,0,.3);transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
 .wallet-tasto::before{content:"";position:absolute;inset:3px;border:1.5px dashed rgba(236,220,190,.45);border-radius:7px;pointer-events:none}
 .wallet-tasto canvas{display:block;width:100%;height:100%;border-radius:4px;background:#050806;box-shadow:inset 0 0 6px rgba(0,0,0,.9),0 0 0 2px #1a1a1a}
-.wallet-tasto .wt-eti{position:absolute;right:9px;top:9px;font:400 7px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#46ff7d;opacity:.75;text-shadow:0 0 4px #46ff7d;pointer-events:none}
+.wallet-tasto .wt-eti{position:absolute;right:9px;top:9px;font:400 7px/1 "Fake Receipt",monospace;letter-spacing:.06em;color:#46ff7d;opacity:.75;text-shadow:0 0 4px #46ff7d;pointer-events:none}
 .wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 22px/1 "Anton",Impact,sans-serif;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
 .wallet-tasto .wt-piu.va{animation:wt-piu 1.6s ease-out forwards}
 @keyframes wt-piu{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
@@ -1321,10 +1324,24 @@ html:not(.js) .chat-tasto{display:none}
       void rt
     }
   }
+  // Nessuna scritta esce dal suo riquadro: se un titolo è più largo del foglio (pzk$meeting) o il testo è più alto, il
+  // volantino si rimpicciolisce (--fit, sui font di .vol) a passi del 4 % finché ci sta, fino alla metà. Si rifà quando la
+  // finestra cambia e quando arrivano i font
+  const adatta = () => {
+    for (const v of document.querySelectorAll('.vol')) {
+      v.style.setProperty('--fit', '1')
+      const testo = v.querySelector('.testo') ?? v
+      const righe = [...testo.querySelectorAll('h3, .titolo, p, .mano, .handle, .forte, li, .pet-testa, .pet-sotto')]
+      const sborda = () => testo.scrollHeight > testo.clientHeight + 1 || righe.some((e) => e.scrollWidth > e.clientWidth + 1)
+      let fit = 1
+      while (fit > 0.5 && sborda()) { fit -= 0.04; v.style.setProperty('--fit', fit.toFixed(2)) }
+    }
+  }
   // il calcolo usa i rettangoli non ruotati: si misura col volantino dritto
   const misura = () => {
     const vols = [...document.querySelectorAll('.vol')]
     for (const v of vols) v.style.transform = 'none'
+    adatta()
     fette()
     for (const v of vols) v.style.transform = ''
   }

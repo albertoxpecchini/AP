@@ -5,7 +5,7 @@
    esce la «carta» coi moduli (entra, converti, invia, altro), come una tessera che si sfila dalla tasca. */
 
 .wallet{position:fixed;inset:0;margin:auto;width:min(94vw,760px);max-width:none;max-height:none;height:auto;padding:0;border:0;background:none;overflow:visible;
-  color:#e9e4d8;font:400 14px/1.35 "Special Elite","Courier New",monospace;--led:#46ff7d;--ambra:#ffb02e;--lcd:#9fb48a;--mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",Menlo,monospace;--fa:"Anton",Impact,sans-serif;--marker:"Permanent Marker","Comic Sans MS",cursive}
+  color:#e9e4d8;font:400 14px/1.35 "Fake Receipt",monospace;--led:#46ff7d;--ambra:#ffb02e;--lcd:#9fb48a;--mono:"Fake Receipt",monospace;--fa:"Fake Receipt",monospace;--marker:"Fake Receipt",monospace}
 .wallet::backdrop{background:rgba(12,10,8,.55);backdrop-filter:blur(2px)}
 .wallet[open]{animation:w-apre .34s cubic-bezier(.22,1,.36,1)}
 .wallet.chiude{animation:w-chiude .2s ease-in forwards}
@@ -38,27 +38,31 @@
 /* la borsa: il grafico e sopra i numeri */
 .w-borsa .w-grafico{inset:0}
 .w-borsa .w-tasso{position:absolute;left:4%;top:4%;font:400 3cqw/1 var(--mono);color:var(--led);text-shadow:0 0 .8cqw rgba(70,255,125,.8)}
-.w-borsa .w-tasso small{font-size:1.3cqw;opacity:.8;margin-left:.4cqw}
+.w-borsa .w-tasso{max-width:56%}
+.w-borsa .w-tasso small{display:block;font-size:1.2cqw;opacity:.8;margin-top:.2cqw}
 .w-borsa .w-tasso .w-inv{display:block;margin-top:.5cqw;font-size:1.25cqw;opacity:.75}
-.w-borsa .w-var{position:absolute;right:4%;top:4.5%;font:400 1.6cqw/1.2 var(--mono);text-align:right;color:var(--led);text-shadow:0 0 .6cqw currentColor}
-.w-borsa .w-var.giu{color:#ff5b4a}
-.w-borsa .w-var.su{color:var(--led)}
-.w-borsa .w-info{position:absolute;left:4%;bottom:5%;right:4%;display:flex;justify-content:space-between;gap:1cqw;font:400 1.2cqw/1.25 var(--mono);color:var(--led);opacity:.85;text-shadow:0 0 .5cqw var(--led);white-space:nowrap}
-.w-borsa .w-periodo{position:absolute;right:4%;top:19%;font:400 1.25cqw/1 var(--mono);color:var(--led);opacity:.7;text-transform:uppercase;letter-spacing:.1em}
+/* la variazione del periodo: un'etichetta piena, verde se sale e rossa se scende, come sui siti delle crypto */
+.w-borsa .w-var{position:absolute;right:4%;top:5%;padding:.35cqw .7cqw .4cqw;border-radius:.4cqw;font:400 1.35cqw/1.1 var(--mono);text-align:right;color:#041008;background:#9aa89c;white-space:nowrap}
+.w-borsa .w-var.giu{background:#ff5b4a}
+.w-borsa .w-var.su{background:var(--led)}
+.w-borsa .w-periodo{position:absolute;right:4%;top:18%;font:400 1.05cqw/1 var(--mono);color:#dcebdc;opacity:.65;white-space:nowrap}
+/* sotto il grafico: minimo e massimo del periodo (perché si muove non si dice) */
+.w-borsa .w-info{position:absolute;left:3%;bottom:4%;right:3%;display:flex;justify-content:space-between;gap:1cqw;font:400 1.15cqw/1.2 var(--mono);color:#b9c9b9;white-space:nowrap;overflow:hidden}
+.w-borsa .w-info b{font-weight:400;color:var(--led)}
 
 /* la targhetta sotto gli schermi: l'indirizzo inciso nell'acciaio */
-.w-targa{display:grid;place-items:center;font:400 1.3cqw/1 var(--mono);letter-spacing:.09em;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.35);text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.w-targa{display:grid;place-items:center;font:400 1.2cqw/1 var(--mono);letter-spacing:.04em;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.35);text-transform:uppercase;white-space:nowrap;overflow:hidden}
 
 /* i quattro tasti gialli (già nella foto: qui solo la parte che si preme) e le scritte incise sotto */
 .w-tasto{width:4.6%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transform:translate(-50%,-50%);transition:box-shadow .15s}
-.w-tasto::after{content:attr(data-eti);position:absolute;left:50%;top:118%;transform:translateX(-50%);font:400 1.15cqw/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.3);white-space:nowrap;pointer-events:none}
+.w-tasto::after{content:attr(data-eti);position:absolute;left:50%;top:118%;transform:translateX(-50%);font:400 1.05cqw/1 var(--mono);letter-spacing:.02em;text-transform:uppercase;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.3);white-space:nowrap;pointer-events:none}
 .w-tasto:active,.w-tasto[aria-pressed="true"]{box-shadow:inset 0 0 0 .35cqw rgba(0,0,0,.35),inset 0 .25cqw .4cqw rgba(0,0,0,.45)}
 .w-tasto[aria-pressed="true"]::after{color:#ffd400;text-shadow:0 0 .8cqw rgba(255,212,0,.9)}
 @media (hover:hover){.w-tasto:hover{box-shadow:0 0 1cqw .2cqw rgba(255,212,0,.35)}}
 /* la manopola: gira per cambiare il periodo del grafico (la tacca è l'unica cosa disegnata) */
 .w-manopola{width:4.9%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transform:translate(-50%,-50%)}
 .w-manopola i{position:absolute;left:50%;top:50%;width:.45cqw;height:1.6cqw;margin-left:-.225cqw;background:#ffd400;border-radius:.2cqw;transform-origin:50% 0;transform:rotate(var(--giro,0deg)) translateY(-1.95cqw);box-shadow:0 0 .5cqw rgba(255,212,0,.8);transition:transform .25s cubic-bezier(.2,1.4,.4,1)}
-.w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:116%;transform:translateX(-50%);font:400 1.15cqw/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.3);white-space:nowrap}
+.w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:116%;transform:translateX(-50%);font:400 1.05cqw/1 var(--mono);letter-spacing:.02em;text-transform:uppercase;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.3);white-space:nowrap}
 
 /* il cavo usb-c (art/wallet-cavo/, una foto di gpt-image-2 come il portafoglio): la porta guarda verso chi guarda, quindi
    la spina è infilata giù, perpendicolare allo sguardo, e si vede solo il suo fondo (la foto è la spina vista dall'alto col

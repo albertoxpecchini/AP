@@ -52,12 +52,17 @@ function display(c, testo, { colore = '#46ff7d', spento = '#0a2614', fondo = '#0
   const g = c.getContext('2d')
   g.globalCompositeOperation = 'source-over'; g.shadowBlur = 0
   g.fillStyle = fondo; g.fillRect(0, 0, W, H)
-  const h = H * alt, w = h * 0.52, t = h * 0.12, passo = w + t * 2.2, y = H * su - h / 2 + h * 0.08, Wd = W * (1 - destra)
+  const Wd = W * (1 - destra)
   const cifre = testo.replace(/[^0-9.\-]/g, '')
   const soloCifre = cifre.replace(/\./g, '')
   const n = posti ?? Math.max(soloCifre.length, 1)
-  // dove stanno: da destra; il punto decimale ruba poco spazio
-  const larg = n * passo + (cifre.includes('.') ? t * 1.6 : 0) + h * 0.1
+  // le misure dalle cifre: riempiono l'altezza `alt`; se il numero è lungo (un botto di cifre) si stringono finché ci
+  // stanno tutte nella larghezza, mai tagliate
+  const misure = (h) => { const w = h * 0.52, t = h * 0.12, passo = w + t * 2.2; return { h, w, t, passo, larg: n * passo + (cifre.includes('.') ? t * 1.6 : 0) + h * 0.1 } }
+  let M = misure(H * alt)
+  if (M.larg > Wd * 0.96) M = misure((H * alt * Wd * 0.96) / M.larg)
+  const { h, w, t, passo, larg } = M
+  const y = H * su - h / 2 + h * 0.08
   let x = Math.max(t, (Wd - larg) / 2)
   x = Math.min(x, Wd - larg)
   const pos = []
@@ -90,20 +95,22 @@ function disegnaBatteria(c, { pct, carica }) {
   if (c.width !== W || c.height !== H) { c.width = W; c.height = H }
   const g = c.getContext('2d')
   g.fillStyle = '#9fb48a'; g.fillRect(0, 0, W, H)
-  // il bordo della pila, il polo, le tacche dentro
-  const bw = W * 0.5, bh = H * 0.34, bx = W * 0.08, by = H * 0.4, r = Math.max(1, H * 0.02)
+  // due righe con aria: sopra la pila (a sinistra) e il numero (a destra), sotto la saetta e «in carica» quando si carica
+  const bw = W * 0.42, bh = H * 0.28, bx = W * 0.09, by = carica ? H * 0.2 : H * 0.36, r = Math.max(1, H * 0.02)
   g.lineWidth = Math.max(1, H * 0.035); g.strokeStyle = '#1c2616'; g.fillStyle = '#1c2616'
   g.beginPath(); g.roundRect(bx, by, bw, bh, r); g.stroke()
-  g.fillRect(bx + bw + g.lineWidth, by + bh * 0.28, W * 0.035, bh * 0.44)
-  const tacche = 5, piene = Math.round((pct / 100) * tacche), gap = bw * 0.025, tw = (bw - gap * (tacche + 1) - g.lineWidth) / tacche
+  g.fillRect(bx + bw + g.lineWidth, by + bh * 0.28, W * 0.03, bh * 0.44)
+  const tacche = 5, piene = Math.round((pct / 100) * tacche), gap = bw * 0.03, tw = (bw - gap * (tacche + 1) - g.lineWidth) / tacche
   for (let i = 0; i < tacche; i++) if (i < piene) g.fillRect(bx + g.lineWidth / 2 + gap + i * (tw + gap), by + g.lineWidth / 2 + gap, tw, bh - g.lineWidth - gap * 2)
-  // il numero
-  g.font = `${Math.round(H * 0.3)}px ui-monospace, Consolas, monospace`; g.textAlign = 'right'; g.textBaseline = 'middle'
-  g.fillText(`${pct}%`, W * 0.96, by + bh / 2)
-  // la saetta, in carica
+  // il numero, a destra, sulla riga della pila
+  g.font = `${Math.round(H * 0.27)}px "Fake Receipt", ui-monospace, Consolas, monospace`; g.textAlign = 'right'; g.textBaseline = 'middle'
+  g.fillText(`${pct}%`, W * 0.93, by + bh / 2)
+  // in carica: la saetta (disegnata, niente emoji) e la scritta, sulla riga sotto
   if (carica) {
-    g.font = `${Math.round(H * 0.22)}px ui-monospace, Consolas, monospace`; g.textAlign = 'left'
-    g.fillText('⚡ in carica', bx, H * 0.86)
+    const sy = H * 0.74, sh = H * 0.24, sx = bx + sh * 0.1
+    g.beginPath(); g.moveTo(sx + sh * 0.5, sy - sh / 2); g.lineTo(sx + sh * 0.05, sy + sh * 0.08); g.lineTo(sx + sh * 0.42, sy + sh * 0.08); g.lineTo(sx + sh * 0.28, sy + sh / 2); g.lineTo(sx + sh * 0.75, sy - sh * 0.1); g.lineTo(sx + sh * 0.4, sy - sh * 0.1); g.closePath(); g.fill()
+    g.font = `${Math.round(H * 0.2)}px "Fake Receipt", ui-monospace, Consolas, monospace`; g.textAlign = 'left'
+    g.fillText('in carica', sx + sh * 1.05, sy)
   }
   // il vetro ha una grana (lcd)
   g.fillStyle = 'rgba(0,0,0,.05)'
@@ -111,43 +118,55 @@ function disegnaBatteria(c, { pct, carica }) {
 }
 
 // ── il grafico della borsa ──
-function disegnaGrafico(c, punti, { nata } = {}) {
+function disegnaGrafico(c, punti, { da = '24h' } = {}) {
   const dpr = Math.min(2, devicePixelRatio || 1), W = Math.max(2, Math.round(c.clientWidth * dpr)), H = Math.max(2, Math.round(c.clientHeight * dpr))
   if (c.width !== W || c.height !== H) { c.width = W; c.height = H }
   const g = c.getContext('2d')
   g.fillStyle = '#020604'; g.fillRect(0, 0, W, H)
-  // la griglia (terminale)
-  g.strokeStyle = 'rgba(70,255,125,.12)'; g.lineWidth = 1
-  for (let i = 1; i < 6; i++) { g.beginPath(); g.moveTo(0, (H * i) / 6); g.lineTo(W, (H * i) / 6); g.stroke() }
-  for (let i = 1; i < 8; i++) { g.beginPath(); g.moveTo((W * i) / 8, 0); g.lineTo((W * i) / 8, H); g.stroke() }
+  const MONO = '"Fake Receipt", ui-monospace, Consolas, monospace'
   if (!punti || punti.length < 2) {
-    g.fillStyle = 'rgba(70,255,125,.7)'; g.font = `${Math.round(H * 0.07)}px ui-monospace, Consolas, monospace`; g.textAlign = 'center'
+    g.fillStyle = 'rgba(70,255,125,.7)'; g.font = `${Math.round(H * 0.07)}px ${MONO}`; g.textAlign = 'center'
     g.fillText(punti === undefined ? 'mi collego alla borsa…' : punti?.length === 1 ? 'la borsa è appena nata: 1 $pzk = 1 €' : 'borsa chiusa', W / 2, H * 0.62)
     return
   }
+  // come i grafici delle crypto: verde se nel periodo è salito, rosso se è sceso; i prezzi a destra, le ore sotto
   const t0 = punti[0][0], t1 = punti[punti.length - 1][0]
+  const su = punti[punti.length - 1][1] >= punti[0][1]
+  const C = su ? [70, 255, 125] : [255, 91, 74], col = `rgb(${C})`, cola = (a) => `rgba(${C},${a})`
   let lo = Infinity, hi = -Infinity
   for (const [, v] of punti) { if (v < lo) lo = v; if (v > hi) hi = v }
-  const m = (hi - lo) * 0.18 || hi * 0.02 || 0.02
+  const m = (hi - lo) * 0.12 || hi * 0.02 || 0.02
   lo -= m; hi += m
-  const top = H * 0.3, bot = H * 0.84
-  const X = (t) => (t1 > t0 ? ((t - t0) / (t1 - t0)) * (W * 0.96) + W * 0.02 : W / 2), Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top)
-  // l'area sotto, poi la linea, poi il punto che pulsa
+  const left = W * 0.03, right = W * 0.85, top = H * 0.36, bot = H * 0.74
+  const X = (t) => (t1 > t0 ? ((t - t0) / (t1 - t0)) * (right - left) + left : (left + right) / 2), Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top)
+  // la griglia e i prezzi a destra (tre livelli)
+  g.font = `${Math.round(H * 0.048)}px ${MONO}`; g.textAlign = 'left'; g.textBaseline = 'middle'
+  for (let k = 0; k <= 2; k++) {
+    const v = lo + ((hi - lo) * (2 - k)) / 2, y = Y(v)
+    g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 1; g.setLineDash([3, 4]); g.beginPath(); g.moveTo(left, y); g.lineTo(right, y); g.stroke(); g.setLineDash([])
+    g.fillStyle = 'rgba(220,235,220,.75)'; g.fillText(v.toFixed(4), right + W * 0.012, y)
+  }
+  // le ore (o i giorni) sotto
+  const o = { timeZone: 'Europe/Rome' }
+  const fmtT = (t) => { const d = new Date(t); return da === '24h' ? d.toLocaleTimeString('it-IT', { ...o, hour: '2-digit', minute: '2-digit' }) : da === '7g' ? d.toLocaleDateString('it-IT', { ...o, weekday: 'short', day: 'numeric' }) : d.toLocaleDateString('it-IT', { ...o, day: 'numeric', month: 'short' }) }
+  g.fillStyle = 'rgba(220,235,220,.7)'
+  for (let k = 0; k <= 3; k++) { const t = t0 + ((t1 - t0) * k) / 3; g.textAlign = k === 0 ? 'left' : k === 3 ? 'right' : 'center'; g.fillText(fmtT(t), X(t), H * 0.81) }
+  // l'area sotto, la linea, il punto
   g.beginPath(); g.moveTo(X(t0), bot)
   for (const [t, v] of punti) g.lineTo(X(t), Y(v))
   g.lineTo(X(t1), bot); g.closePath()
-  const grad = g.createLinearGradient(0, top, 0, bot); grad.addColorStop(0, 'rgba(70,255,125,.28)'); grad.addColorStop(1, 'rgba(70,255,125,0)')
+  const grad = g.createLinearGradient(0, top, 0, bot); grad.addColorStop(0, cola(0.32)); grad.addColorStop(1, cola(0))
   g.fillStyle = grad; g.fill()
   g.beginPath()
-  for (const [i, [t, v]] of punti.entries()) i ? g.lineTo(X(t), Y(v)) : g.moveTo(X(t), Y(v))
-  g.strokeStyle = '#46ff7d'; g.lineWidth = Math.max(1.2, H * 0.012); g.lineJoin = 'round'; g.shadowColor = '#46ff7d'; g.shadowBlur = H * 0.03
+  for (const [k, [t, v]] of punti.entries()) k ? g.lineTo(X(t), Y(v)) : g.moveTo(X(t), Y(v))
+  g.strokeStyle = col; g.lineWidth = Math.max(1.4, H * 0.013); g.lineJoin = 'round'; g.shadowColor = col; g.shadowBlur = H * 0.03
   g.stroke(); g.shadowBlur = 0
   const [tu, vu] = punti[punti.length - 1]
-  g.fillStyle = '#c8ffd9'; g.beginPath(); g.arc(X(tu), Y(vu), Math.max(2, H * 0.014), 0, Math.PI * 2); g.fill()
-  // il minimo e il massimo del periodo
-  g.fillStyle = 'rgba(70,255,125,.7)'; g.font = `${Math.round(H * 0.05)}px ui-monospace, Consolas, monospace`; g.textAlign = 'left'
-  g.fillText(`max ${(hi - m).toFixed(4)}`, W * 0.025, top + H * 0.05)
-  g.fillText(`min ${(lo + m).toFixed(4)}`, W * 0.025, bot - H * 0.02)
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(X(tu), Y(vu), Math.max(2, H * 0.014), 0, Math.PI * 2); g.fill()
+  // l'ultimo prezzo su un'etichetta colorata, a destra, all'altezza della linea
+  const et = vu.toFixed(4), ew = g.measureText(et).width + W * 0.02, eh = H * 0.075, ey = Math.min(bot - eh / 2, Math.max(top + eh / 2, Y(vu)))
+  g.fillStyle = col; g.beginPath(); g.roundRect(right + W * 0.006, ey - eh / 2, ew, eh, 3); g.fill()
+  g.fillStyle = '#041008'; g.textAlign = 'left'; g.fillText(et, right + W * 0.016, ey)
   // le righe di scansione del tubo
   g.fillStyle = 'rgba(0,0,0,.18)'
   for (let y = 0; y < H; y += 3) g.fillRect(0, y, W, 1)
@@ -251,13 +270,16 @@ function disegnaBorsa() {
   const d = borsaDati
   if (!d) { disegnaGrafico(S.grafico, undefined); S.tasso.textContent = '…'; return }
   if (!d.ok) { disegnaGrafico(S.grafico, null); S.tasso.innerHTML = d?.offline ? 'chiusa' : '…'; S.var.textContent = ''; S.info.textContent = d?.offline ? 'la borsa apre quando il server ha il suo archivio' : ''; return }
-  disegnaGrafico(S.grafico, d.punti, { nata: d.nata })
-  S.tasso.innerHTML = `${d.tasso.toFixed(4)}<small>€ / $pzk</small><span class="w-inv">1 € = ${d.inverso.toFixed(3)} $pzk</span>`
+  disegnaGrafico(S.grafico, d.punti, { da: d.da })
+  S.tasso.innerHTML = `${d.tasso.toFixed(4)}<small>€ per $pzk</small><span class="w-inv">1 € = ${d.inverso.toFixed(3)} $pzk</span>`
+  const nomi = { '24h': 'in 24 ore', '7g': 'in 7 giorni', '30g': 'in 30 giorni', tutto: 'da sempre' }
   const v = { '24h': d.var24, '7g': d.var7g, '30g': d.var30g, tutto: d.nata ? d.tasso / 1 - 1 : null }[d.da]
-  if (v === null || v === undefined) { S.var.textContent = 'appena nata'; S.var.className = 'w-var' } else { S.var.textContent = `${v >= 0 ? '▲' : '▼'} ${(v * 100).toFixed(2)} %`; S.var.className = `w-var ${v >= 0 ? 'su' : 'giu'}` }
-  const f = d.fattori ?? {}
-  const meteo = f.codice === 0 || f.codice === 1 ? '☀' : f.codice >= 95 ? '⛈' : (f.codice >= 51 && f.codice <= 67) || (f.codice >= 80 && f.codice <= 82) ? '☂' : (f.codice >= 71 && f.codice <= 77) || f.codice === 85 || f.codice === 86 ? '❄' : f.codice >= 45 && f.codice <= 48 ? '≋' : '☁'
-  S.info.innerHTML = `<span>cap ${fmt(d.cap?.pzk ?? 0)} $pzk · ${d.cap?.conti ?? 0} conti</span><span>${meteo} ${f.temperatura != null ? Math.round(f.temperatura) + '°' : ''} ${f.giorno ? '☼' : '☾'} ${f.commit ? 'git ✓' : f.commit === false ? 'git ✗' : ''} ${d.umore?.ecc ? '· giorno pazzo' : ''}</span>`
+  if (v === null || v === undefined) { S.var.textContent = 'appena nata'; S.var.className = 'w-var' } else { S.var.textContent = `${v >= 0 ? '▲' : '▼'} ${Math.abs(v * 100).toFixed(2).replace('.', ',')} %`; S.var.className = `w-var ${v >= 0 ? 'su' : 'giu'}` }
+  S.periodo.textContent = nomi[d.da]
+  // il minimo e il massimo del periodo (perché sale o scende non si dice: la borsa è un mistero, come quelle vere)
+  let lo = Infinity, hi = -Infinity
+  for (const [, x] of d.punti ?? []) { if (x < lo) lo = x; if (x > hi) hi = x }
+  S.info.innerHTML = d.punti?.length ? `<span>min <b>${lo.toFixed(4)}</b></span><span>max <b>${hi.toFixed(4)}</b></span><span>cap <b>${fmt(d.cap?.pzk ?? 0)}</b> · ${d.cap?.conti ?? 0} conti</span>` : ''
 }
 
 // ── la carta coi moduli ──
