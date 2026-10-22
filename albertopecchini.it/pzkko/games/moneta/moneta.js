@@ -113,6 +113,8 @@ async function costruisci() {
   }
   // chi mi segue su instagram riceve 1.000 $pzk (una volta, ../pzk.js)
   q('.mo-saldo').appendChild(pzk.linkInstagram({ fatto: () => { voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`); contaSaldo(pzk.saldo() - pzk.PREMIO_IG, pzk.saldo(), RIDOTTO.matches ? 0 : 900) } }))
+  // col conto, gli EUR€ parcheggiati nel wallet: si giocano solo convertiti in $pzk (../pzk.js, wallet/)
+  q('.mo-saldo').appendChild(pzk.rigaEuro())
   for (const v of pzk.FICHES) {
     const b = document.createElement('button')
     b.type = 'button'
@@ -280,7 +282,7 @@ function pila(l) {
   p.el.style.transform = `translate(${c.x}px, ${c.y}px)`
   return p
 }
-const ALTO = 2.6 // px fra una fiche e quella sopra
+const ALTO = 3.4 // px fra una fiche e quella sopra
 function immagineFiche(v, i) {
   const img = document.createElement('img')
   img.className = 'mo-fiche'
@@ -420,9 +422,9 @@ function togliSegno() { if (T) T.segno.innerHTML = ''; stato.uscita = null }
 function lancia() {
   if (stato.fase !== 'punta') return
   if (pzk.aSecco() && !puntato()) {
-    pzk.ricarica()
+    const dati = pzk.ricarica()
     aggiornaBanco()
-    voce(`altri ${fmt(pzk.INIZIALE)} $pzk finti: punta`)
+    voce(dati ? `altri ${fmt(pzk.INIZIALE)} $pzk finti: punta` : pzk.perche())
     return
   }
   if (!lancio) return
@@ -544,8 +546,8 @@ async function lascia() {
     voli.push(vola(p.fiches[j] ?? 1, da, dove, { durata: 480, alto: 34, dopo: j * 22, svanisce: true, scala: 0.8 }))
   })
   contaSaldo(pzk.saldo(), pzk.saldo() + imp, RIDOTTO.matches ? 0 : 900)
-  await Promise.all(voli)
   pzk.regola(GIOCO, imp, imp)
+  await Promise.all(voli)
   fine()
 }
 

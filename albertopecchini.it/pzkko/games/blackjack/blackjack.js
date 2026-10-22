@@ -120,6 +120,8 @@ async function costruisci() {
   }
   // chi mi segue su instagram riceve 1.000 $pzk (una volta, ../pzk.js)
   q('.bj-saldo').appendChild(pzk.linkInstagram({ fatto: () => { voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`); contaSaldo(pzk.saldo() - pzk.PREMIO_IG, pzk.saldo()); aggiornaBanco() } }))
+  // col conto, gli EUR€ parcheggiati nel wallet: si giocano solo convertiti in $pzk (../pzk.js, wallet/)
+  q('.bj-saldo').appendChild(pzk.rigaEuro())
   for (const v of pzk.FICHES) {
     const b = document.createElement('button')
     b.type = 'button'
@@ -558,7 +560,7 @@ const chiedi = () => new Promise((ok) => { attesa = ok })
 
 async function distribuisci() {
   if (stato.fase !== 'punta' || !scena) return
-  if (pzk.aSecco()) { pzk.ricarica(); aggiornaBanco(); voce(`altri ${fmt(pzk.INIZIALE)} $pzk finti: punta`); return }
+  if (pzk.aSecco()) { const dati = pzk.ricarica(); aggiornaBanco(); voce(dati ? `altri ${fmt(pzk.INIZIALE)} $pzk finti: punta` : pzk.perche()); return }
   const pu = stato.puntate.map((p, casella) => ({ casella, puntata: p.base, pp: p.pp, t3: p.t3 }))
   const giocate = pu.filter((p) => p.puntata > 0)
   if (!giocate.length) { voce('punta prima in un cerchio'); return }

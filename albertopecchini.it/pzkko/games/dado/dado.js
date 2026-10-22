@@ -122,12 +122,15 @@ async function costruisci() {
   }
   // chi mi segue su instagram riceve 1.000 $pzk (una volta, ../pzk.js)
   q('.dd-saldo').appendChild(pzk.linkInstagram({ fatto: () => { voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`); contaSaldo(pzk.saldo() - pzk.PREMIO_IG, pzk.saldo()) } }))
+  // col conto, gli EUR€ parcheggiati nel wallet: si giocano solo convertiti in $pzk (../pzk.js, wallet/)
+  q('.dd-saldo').appendChild(pzk.rigaEuro())
   for (const v of pzk.FICHES) {
     const b = document.createElement('button')
     b.type = 'button'
     b.dataset.v = v
     b.setAttribute('aria-label', `fiche da ${v}`)
     b.innerHTML = `<img src="${ART}fiches/f${v}.webp" alt="" width="170" height="174">`
+    if (v === stato.fiche) b.autofocus = true
     b.addEventListener('click', () => { stato.fiche = v; aggiornaBanco() })
     el.scegli.appendChild(b)
   }
@@ -285,10 +288,11 @@ function disegnaTavolo() {
   const testo = (t, x, y, size, a = {}) => { const e = svgEl('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: INK, 'font-size': size.toFixed(1), ...a }); e.textContent = t; stampa.appendChild(e); return e }
   // righe di testo una sotto l'altra, centrate nella casella e rimpicciolite finché ci stanno (em: larghezza media di un carattere)
   const righe = (b, linee, { su = 0.5, alto = 0.86 } = {}) => {
-    const tot = linee.reduce((a, l) => a + l.s * 1.12, 0)
-    const k = Math.min(1, (b.h * alto) / tot, ...linee.map((l) => (b.w * 0.88) / (l.t.length * l.s * (l.em ?? 0.5))))
-    let y = b.y + b.h * su - (tot * k) / 2
-    for (const l of linee) { const s = l.s * k; testo(l.t, b.x + b.w / 2, y + s * 0.56, s, { class: l.cl ?? 'dd-grande', fill: l.f ?? INK }); y += s * 1.12 }
+    const misure = linee.map((l) => Math.min(l.s, (b.w * 0.88) / (l.t.length * (l.em ?? 0.5))))
+    const k = Math.min(1, (b.h * alto) / misure.reduce((a, s) => a + s * 1.12, 0))
+    const tot = misure.reduce((a, s) => a + s * k * 1.12, 0)
+    let y = b.y + b.h * su - tot / 2
+    linee.forEach((l, i) => { const s = misure[i] * k; testo(l.t, b.x + b.w / 2, y + s * 0.56, s, { class: l.cl ?? 'dd-grande', fill: l.f ?? INK }); y += s * 1.12 })
   }
   const pagaTesto = (n) => `${fmt(n)} a 1`
   for (const p of PUNTATE[stato.regole]) {
@@ -300,7 +304,8 @@ function disegnaTavolo() {
       case 'piccolo': case 'grande': case 'pari': case 'dispari': {
         const cinese = { piccolo: '小', grande: '大', pari: '雙', dispari: '單' }[p.tipo]
         const sotto = p.tipo === 'piccolo' ? 'da 4 a 10' : p.tipo === 'grande' ? 'da 11 a 17' : ''
-        if (!stretto) righe(b, [{ t: cinese, s: 34, f: ROSSO, cl: 'dd-cinese', em: 1 }, { t: p.tipo, s: 21 }, ...(sotto ? [{ t: sotto, s: 12, cl: 'dd-piccola', em: 0.6 }] : []), { t: '1 a 1', s: 12, cl: 'dd-piccola', em: 0.6, f: ROSSO }, { t: 'perde con le triple', s: 9, cl: 'dd-piccola', em: 0.6 }], { su: p.tipo.length > 6 ? 0.42 : 0.4, alto: 0.62 })
+        const triple = b.w > 90 ? [{ t: 'perde con le triple', s: 10, cl: 'dd-piccola', em: 0.6 }] : [{ t: 'perde con', s: 10, cl: 'dd-piccola', em: 0.6 }, { t: 'le triple', s: 10, cl: 'dd-piccola', em: 0.6 }]
+        if (!stretto) righe(b, [{ t: cinese, s: 30, f: ROSSO, cl: 'dd-cinese', em: 1 }, { t: p.tipo, s: 22 }, ...(sotto ? [{ t: sotto, s: 12, cl: 'dd-piccola', em: 0.6 }] : []), { t: '1 a 1', s: 12, cl: 'dd-piccola', em: 0.6, f: ROSSO }, ...triple], { su: 0.4, alto: 0.72 })
         else righe(b, [{ t: `${cinese} ${p.tipo}`, s: 17, em: 0.62 }, { t: sotto || '1 a 1', s: 10, cl: 'dd-piccola', em: 0.6, f: sotto ? INK : ROSSO }], { su: 0.36, alto: 0.6 })
         break
       }
@@ -549,9 +554,9 @@ function scuotiSaldo() {
 function scuoti() {
   if (stato.fase !== 'punta') return
   if (pzk.aSecco() && !stato.giocate.size) {
-    pzk.ricarica()
+    const dati = pzk.ricarica()
     aggiornaBanco()
-    voce(`altri ${fmt(pzk.INIZIALE)} $pzk finti: punta`)
+    voce(dati ? `altri ${fmt(pzk.INIZIALE)} $pzk finti: punta` : pzk.perche())
     return
   }
   if (!campana) return
@@ -754,21 +759,23 @@ function costruisciScena() {
 
   // i punti che devono stare dentro l'inquadratura: il bordo della base, in alto e in basso, e il pomolo
   const bordo = []
-  for (let k = 0; k < 24; k++) { const a = (k / 24) * Math.PI * 2; bordo.push(new THREE.Vector3(0.094 * Math.cos(a), -0.012, 0.094 * Math.sin(a)), new THREE.Vector3(0.094 * Math.cos(a), -0.034, 0.094 * Math.sin(a))) }
+  for (let k = 0; k < 24; k++) { const a = (k / 24) * Math.PI * 2; bordo.push(new THREE.Vector3(0.094 * Math.cos(a), -0.012, 0.094 * Math.sin(a)), new THREE.Vector3(0.092 * Math.cos(a), -0.032, 0.092 * Math.sin(a))) }
   bordo.push(new THREE.Vector3(0, CIMA + 0.016, 0))
   ridimensiona = () => {
     const w = el.campana.clientWidth, h = el.campana.clientHeight
     if (!w || !h) return
     renderer.setSize(w, h, false)
     camera.aspect = w / h
-    // la campana guardata da davanti e dall'alto (56°): la distanza più corta a cui ci sta tutta
-    const el0 = (56 * Math.PI) / 180, mira = new THREE.Vector3(0, 0.012, 0.006)
+    // la campana guardata da davanti e dall'alto (60°: così tutto il vetro sta davanti alla base, e trasmette il
+    // legno e il panno; dove dietro non c'è niente three.js trasmetterebbe del bianco, una calotta di latte),
+    // alla distanza più corta a cui ci sta tutta
+    const el0 = (60 * Math.PI) / 180, mira = new THREE.Vector3(0, 0.01, 0.004)
     const prova = (d) => {
       camera.position.set(0, mira.y + Math.sin(el0) * d, mira.z + Math.cos(el0) * d)
       camera.lookAt(mira)
       camera.updateProjectionMatrix()
       camera.updateMatrixWorld()
-      return bordo.every((p) => { const q = p.clone().project(camera); return Math.abs(q.x) < 0.95 && Math.abs(q.y) < 0.93 })
+      return bordo.every((p) => { const q = p.clone().project(camera); return Math.abs(q.x) < 0.97 && Math.abs(q.y) < 0.96 })
     }
     let a = 0.1, b = 1.5
     for (let i = 0; i < 24; i++) { const m = (a + b) / 2; if (prova(m)) b = m; else a = m }
@@ -798,7 +805,7 @@ function costruisciScena() {
   const ebano = new THREE.MeshPhysicalMaterial({ color: 0x17120f, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.08, side: THREE.DoubleSide })
   const ottone = new THREE.MeshStandardMaterial({ color: 0xd8b56a, metalness: 1, roughness: 0.22, side: THREE.DoubleSide })
   const panno = new THREE.MeshStandardMaterial({ map: texPanno(), roughness: 0.95 })
-  const vetroMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.04, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.03, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.6 })
+  const vetroMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 1, thickness: 0.0016, ior: 1.5, roughness: 0.03, metalness: 0, specularIntensity: 1, envMapIntensity: 1.6 })
   const giro = (prof, mat, seg = 96) => new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), seg), mat)
 
   // la base, ferma: un cilindro basso di mogano laccato col pozzetto in cui sta il piatto

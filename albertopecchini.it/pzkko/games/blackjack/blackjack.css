@@ -68,6 +68,9 @@
 .bj-saldo .puntato{display:block;margin-top:3px;font-size:11px;color:#5a544c}
 .bj-saldo .pzk-ig{display:inline-block;margin-top:4px;padding-bottom:1px;border-bottom:2px solid currentColor;font:400 12px/1.15 var(--marker);color:#1446a0;text-decoration:none;white-space:nowrap}
 .bj-saldo .pzk-ig[hidden]{display:none}
+.bj-saldo .pzk-eur{display:block;margin-top:3px;font:400 12px/1.15 var(--marker);color:#0b5d2b;text-decoration:none;white-space:nowrap}
+.bj-saldo .pzk-eur[hidden]{display:none}
+.bj-saldo .pzk-eur b{font:inherit;color:#0b5d2b;border-bottom:2px solid currentColor}
 .bj-saldo .pzk-ig b{display:inline;font:inherit;color:var(--rosso)}
 @media (hover:hover){.bj-saldo .pzk-ig:hover{color:var(--rosso)}}
 .bj-scegli{display:flex;gap:2px;flex:none}

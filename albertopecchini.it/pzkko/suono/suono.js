@@ -486,7 +486,7 @@ export function accendi(c) {
 
   // ── le cose della scena che si toccano (tocchi.js): ognuna col suo strumento, dal suo posto nel mondo ──
   const STRUMENTI = { citofono: 'citofono', vetro: 'vetro', telaio: 'telaio', maniglione: 'maniglione', lucchetto: 'lucchetto', portachiavi: 'portachiavi', lattina: 'lattina',
-    'carta-bagnata': 'cartaBagnata', pacchetto: 'pacchetto', cartone: 'cartone', grissini: 'grissini', pozza: 'pozza', pietra: 'pietra', neve: 'neve', chiusino: 'chiusino', muro: 'muro' }
+    'carta-bagnata': 'cartaBagnata', banconota: 'cartaBagnata', pacchetto: 'pacchetto', cartone: 'cartone', grissini: 'grissini', pozza: 'pozza', pietra: 'pietra', neve: 'neve', chiusino: 'chiusino', muro: 'muro' }
   const tocco = (d) => { const fa = V[STRUMENTI[d.cosa]]; if (fa) fa(da(d.x, d.y, d.z, { ref: 2.4, eco: 0.14, vita: 4 }), c.currentTime + 0.004) }
   // il campanello: il pulsante scatta sul citofono, e dentro il negozio, dietro il vetro (che si mangia gli acuti), il
   // campanello trilla finché il dito tiene, nella stanza vuota che rimbomba. A volte, poco dopo, il citofono si apre:
@@ -551,7 +551,7 @@ export function accendi(c) {
   P.evento = senti
 
   // ── il giro: una trentina di volte al secondo le cose che si muovono, una volta al secondo l'ora ──
-  // (la roulette e il blackjack sono finestre modali: mentre si gioca la strada si sente più piano)
+  // (i giochi, dalla roulette alla moneta, sono finestre modali: mentre si gioca la strada si sente più piano)
   let modale = () => false
   try { document.querySelector(':modal'); modale = () => !!document.querySelector('dialog:modal') } catch { modale = () => !!document.querySelector('dialog[open]:not(.rg)') }
   let ultimo = performance.now(), lento = 0, avvio = true

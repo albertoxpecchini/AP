@@ -1,7 +1,8 @@
 // Le cose della strada che si toccano (22.10): il pulsante del citofono (il campanello suona dentro il negozio finché lo
 // si tiene premuto), la piastra del citofono, il vetro della porta (lo si bussa), i profili d'alluminio, il maniglione
 // (la porta è chiusa a chiave: sbatte sulla serratura), il lucchettone, il portachiavi della banca $pzk, il muro, e per
-// terra la lattina (dondola), il pacchetto di sigarette, la scatola del ramen, i volantini bagnati, i grissini, il
+// terra la lattina (dondola), il pacchetto di sigarette, la scatola del ramen, i volantini bagnati, i grissini, le
+// banconote della banca $pzk (si raccolgono: banconote.js), il
 // chiusino, le pozzanghere (gli anelli si allargano dal dito, marciapiede.js) e la pietra.
 // Il raggio dalla telecamera passa per il puntatore e vince la cosa più vicina. Col mouse si suona alla pressione, col
 // dito al tocco (il clic: un dito che scorre la pagina non suona niente). Sopra i fogli e i link della pagina comanda il
@@ -140,6 +141,7 @@ export function tocchi({ camera, dim, h, sp, pc, M, visibile }) {
     const { x, y, z } = qua.punto
     if (qua.cosa === 'campanello') { premi(); if (!tieni) setTimeout(rilascia, 900); return }
     if (qua.cosa === 'portachiavi') pc.premi()
+    if (qua.cosa === 'banconota') qua.c?.prendi?.()
     if (qua.cosa === 'pozza') onda(x, z, 1)
     if (qua.cosa === 'lucchetto' && lucchetto) scuoti(lucchetto, 0.6)
     if (qua.c) scuoti(qua.c, qua.c.rotola ? 1 : 0.35)

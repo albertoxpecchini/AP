@@ -117,6 +117,8 @@ async function costruisci() {
   }
   // chi mi segue su instagram riceve 1.000 $pzk (una volta, ../pzk.js)
   q('.mn-saldo').appendChild(pzk.linkInstagram({ fatto: () => { voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`); contaSaldo(pzk.saldo() - pzk.PREMIO_IG, pzk.saldo()); aggiornaBanco() } }))
+  // col conto, gli EUR€ parcheggiati nel wallet: si giocano solo convertiti in $pzk (../pzk.js, wallet/)
+  q('.mn-saldo').appendChild(pzk.rigaEuro())
   // c'è un posto solo: toccare una fiche la punta
   for (const v of pzk.FICHES) {
     const b = document.createElement('button')
@@ -298,7 +300,8 @@ function disegnaTavolo() {
   zone.addEventListener('keydown', tastiZone)
   zone.addEventListener('pointerover', (e) => { const i = e.target.dataset?.i; if (i != null) solleva(Number(i), true) })
   zone.addEventListener('pointerout', (e) => { const i = e.target.dataset?.i; if (i != null) solleva(Number(i), false) })
-  zone.addEventListener('focusin', (e) => { const i = e.target.dataset?.i; if (i != null) { attiva = Number(i); solleva(attiva, true) } })
+  // col fuoco della tastiera la casella si alza come sotto il puntatore (dopo un clic no: sembrerebbe scelta)
+  zone.addEventListener('focusin', (e) => { const i = e.target.dataset?.i; if (i != null) { attiva = Number(i); if (e.target.matches(':focus-visible')) solleva(attiva, true) } })
   zone.addEventListener('focusout', (e) => { const i = e.target.dataset?.i; if (i != null) solleva(Number(i), false) })
   disegnaBruciature()
   disegnaScala()
@@ -347,7 +350,7 @@ function disegnaScala() {
     for (let j = 0; j < N && da + j <= n; j++) {
       const kk = da + j, x = sc.x + j * cw + cw / 2
       if (kk === k) evid(sc.x + j * cw + 2, y0, cw - 4, sc.h - 14)
-      if (kk === k + 1 && stato.fase === 'gioco') g.appendChild(svgEl('path', { d: `M${x - cw * 0.32} ${y0 + sc.h - 12}c${cw * 0.2} -2 ${cw * 0.44} -2 ${cw * 0.64} 0`, fill: 'none', stroke: rosso, 'stroke-width': 2.2, 'stroke-linecap': 'round' }))
+      if (kk === k + 1 && stato.fase === 'gioco') g.appendChild(svgEl('path', { d: `M${x - cw * 0.32} ${y0 + sc.h - 6}c${cw * 0.2} -2 ${cw * 0.44} -2 ${cw * 0.64} 0`, fill: 'none', stroke: rosso, 'stroke-width': 2.2, 'stroke-linecap': 'round' }))
       testo(parola(kk, 'gemma', 'gemme'), x, y0 + 9, { class: 'mn-piccola', 'font-size': 9.5, 'text-anchor': 'middle' })
       testo(scriviMolt(centesimi(m, kk)), x, y0 + 26, { class: 'mn-grande', 'font-size': 15, 'text-anchor': 'middle' })
       if (pu) testo(fmt(vincita(pu, m, kk)), x, y0 + 42, { class: 'mn-piccola', 'font-size': 10, 'text-anchor': 'middle', fill: '#5a544c' })
@@ -419,7 +422,7 @@ function ridisegna() {
   scena?.misura(G.w, G.h, G.lato, G.caselle)
   for (const [k, p] of pile) mettiPila(k, p)
   Object.assign(el.sotto.style, { left: `${G.sotto.x}px`, top: `${G.sotto.y}px`, width: `${G.sotto.w}px` })
-  for (const t of el.segni.children) t.remove()
+  for (const t of [...el.segni.children]) t.remove()
 }
 
 // ── le fiches ────────────────────────────────────────────────────────────────
@@ -544,7 +547,7 @@ function scuoti(e) {
 async function gioca() {
   if (stato.fase === 'gioco') return incassa()
   if (stato.fase !== 'punta' || !scena) return
-  if (pzk.aSecco() && !stato.puntata) { pzk.ricarica(); aggiornaBanco(); voce(`altri ${fmt(pzk.INIZIALE)} $pzk finti: punta`); return }
+  if (pzk.aSecco() && !stato.puntata) { const dati = pzk.ricarica(); aggiornaBanco(); voce(dati ? `altri ${fmt(pzk.INIZIALE)} $pzk finti: punta` : pzk.perche()); return }
   if (!stato.puntata) { voce('prima punta: tocca una fiche'); scuoti(el.scegli); return }
   let P
   try { P = Partita.nuova({ puntata: stato.puntata, m: stato.m, semeGiocatore: stato.seme, giro: stato.giro + 1 }) } catch (e) { voce(e.message); return }

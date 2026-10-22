@@ -73,7 +73,36 @@ serio ma è un progetto Vercel a parte.
   `../roulette/lib/three.js`), `carte.js` (le facce e il dorso disegnati in un
   canvas). Le figure delle carte sono in `art/blackjack/` (le dodici mezze
   figure, gpt-image-2 il 17.10.2026, `tools/pzkko/blackjack/figure.mjs`).
-- `games/pzk.js` — i $pzk, gli stessi per tutti i giochi.
+- `games/mine/` — le mine, nella stessa finestra (vedi sotto): `mine.js` e
+  `mine.css` (la finestra, il campo stampato, le fiches, il giro), `regole.js`
+  (i moltiplicatori, le mine decise dal seme, la partita), `scena.js` (le
+  tessere 3D, le gemme, la bomba e lo scoppio, con `../roulette/lib/three.js`),
+  `tessere.js` (il dorso e le facce disegnati in un canvas; la mina stampata è
+  `art/arte2/bomba.webp`, l'illustrazione del volantino).
+- `games/dado/` — il dado, cioè il sic bo, nella stessa finestra (vedi sotto):
+  `dado.js` e `dado.css` (la finestra, il tavolo, le fiches, il colpo e la
+  campana 3D, con `../roulette/lib/three.js`), `campana.js` (la forma della
+  campana e dei dadi e la loro fisica, con `../roulette/lib/rapier.mjs`),
+  `regole.js` (le puntate e le due tabelle dei pagamenti). Niente immagini
+  nuove: i dadi, il panno e il vetro si disegnano nella pagina, il legno della
+  base è quello della roulette.
+- `games/moneta/` — testa o croce, nella stessa finestra (vedi sotto):
+  `moneta.js` e `moneta.css` (la finestra, il tavolo, le fiches, lascia o
+  raddoppia), `lancio.js` (la moneta, il piatto e la loro fisica, con
+  `../roulette/lib/rapier.mjs`), `scena.js` (il piatto e la moneta in 3D, la
+  telecamera e la lente, con `../roulette/lib/three.js`). Le facce della moneta
+  sono in `art/moneta/` (gpt-image-2 il 22.10.2026, `tools/pzkko/moneta/facce.mjs`).
+- `games/pzk.js` — i $pzk, gli stessi per tutti i giochi e per il wallet: la sessione (1.000, non si
+  salvano) o il conto (vedi «Il wallet e la borsa», sotto).
+- `wallet/` — il wallet dei $pzk (22.10 notte), il portafoglio di pelle alla Fallout in alto a sinistra:
+  `wallet.js` (gli schermi, la batteria, la borsa, la carta coi moduli) e `wallet.css`; la foto del
+  portafoglio in `art/wallet/portafoglio.webp`, le banconote in `art/banconote/` (fogli «wallet» e
+  «banconote» di `../tools/pzkko/fogli.js`, gpt-image-2). `../tools/pzkko/wallet.mjs` elenca e cancella
+  i conti con la chiave di amministrazione.
+- `api/wallet.mjs` — la funzione Vercel dei conti del wallet (nome, PIN, saldo, EUR€, indirizzi, invii,
+  banconote trovate: su Vercel Blob), `api/borsa.mjs` la borsa (il cambio PZK/EUR€ e la sua serie);
+  `api/_archivio.mjs`, `api/_borsa.mjs`, `api/_conti.mjs` i pezzi comuni (col trattino basso: non sono
+  funzioni).
 - `tools/lezioni/` — la pagina dello strumento lezioni (`index.html`), lo zip da
   scaricare (`lezioni.zip`, lo fa `../tools/lezioni/pacchetto.py`) e
   l'anteprima per i social (`og.jpg`). Vedi «Gli strumenti», sotto.
@@ -101,7 +130,7 @@ serio ma è un progetto Vercel a parte.
   (le lastre e le pozzanghere, disegnate dallo shader), `spazzatura.js` (la
   spazzatura della casa per terra e il chiusino di pzkkonet), `portachiavi.js` (il token
   della banca $pzk per terra accanto al chiusino, col display che dice i fotogrammi al
-  secondo), `tocchi.js` (le cose che si toccano: il citofono, la porta, la roba per terra, le
+  secondo), `banconote.js` (i $pzk persi per terra, che si raccolgono), `tocchi.js` (le cose che si toccano: il citofono, la porta, la roba per terra, le
   pozzanghere), `penne.js` (le bic della petizione appese allo spago), `prossima.js` (l'altra
   pagina col 3D, scaricata in cache mentre si guarda questa: vedi «Il caricamento è il
   pomodoro»), `fronte.js` (il fronte
@@ -1134,6 +1163,233 @@ le fiches fotografate, e le carte vere in 3D.
   (venezia); perfect pairs 6,11% (6 mazzi) e 4,10% (8 mazzi), 21+3 4,62% e
   3,70%, come le probabilità esatte.
 
+## Le mine (games/mine/)
+
+Il volantino «mine» (22.10.2026) apre la stessa finestra degli altri giochi
+(`#mine` nell'indirizzo la apre subito): il foglio col nastro, il campo stampato
+sopra, le fiches fotografate, e venticinque tessere vere in 3D. Il titolo è nello
+stencil del volantino (Black Ops One).
+
+- **Il gioco** è quello delle mine dei casinò online: cinque per cinque caselle,
+  si sceglie quante mine (da 1 a 24, «con [3] mine» in alto; la scelta resta nel
+  browser), si punta (1–1.000: c'è un posto solo, quindi toccare una fiche la
+  punta; anche il cerchio «puntata» posa l'ultima fiche) e si gioca; ogni casella
+  senza mina è una gemma e alza il moltiplicatore, si incassa quando si vuole,
+  una mina si prende tutto. Dopo l'ultima gemma, o arrivati al massimo, si
+  incassa da sé. «a caso» scopre una casella qualunque; da tastiera le frecce
+  nel campo, Invio, A (a caso) e I (incassa). «rifai» ripunta l'ultima puntata,
+  «×3» fa girare tutto tre volte più in fretta.
+- **I moltiplicatori** (`regole.js`): dopo k gemme con m mine, l'inverso della
+  probabilità di arrivarci, C(25, k) / C(25 − m, k), meno l'1% che tiene il
+  banco, troncato ai centesimi: quello stampato è quello pagato (con 3 mine
+  ×1,12 alla prima gemma, ×2.277 a tutte e 22; con una mina ×1,03 e, alla fine,
+  ×24,75 come con 24 mine alla prima). Si paga a mezzi $pzk per difetto, al più
+  1.000.000 $pzk a giro. **La scala** stampata a destra (sotto, sul telefono)
+  dice quanto paga ogni gemma e quanto si vince con la puntata di adesso;
+  l'evidenziatore sulla riga raggiunta, la freccia rossa sulla prossima.
+- **Le mine sono decise prima del primo tocco**, come nei casinò «provably
+  fair»: il seme del banco (32 byte a caso, nuovi a ogni giro), il seme del
+  giocatore (8 byte, nel browser, `pzkko-mine`) e il numero del giro passano da
+  HMAC-SHA256 (chiave il seme del banco, messaggio «giocatore:giro:cursore»);
+  ogni 4 byte fanno un numero fra 0 e 1, e 24 numeri pescano le caselle una alla
+  volta fra quelle rimaste: le prime m sono le mine. Durante il giro, in piccolo
+  sotto la colonna, c'è l'impronta (SHA-256) del seme del banco; a fine giro il
+  seme: toccandola si copiano seme, impronta, mine e il modo di rifare il conto.
+  SHA-256 e HMAC sono scritti in `regole.js` (quaranta righe) invece di
+  `crypto.subtle`, che il browser dà solo in https o su localhost: così le mine
+  si giocano anche dal telefono sulla rete di casa. Le mine stanno in un campo
+  privato della partita e escono solo a giro finito.
+- **Le tessere** (`scena.js`, `tessere.js`) sono 3D come le carte del blackjack:
+  la stessa telecamera dall'alto, il foglio sul piano y = 0, un'unità = un px.
+  Spesse, con lo smusso e gli angoli tondi, laccate: il dorso rosso pzkko con la
+  trama delle carte e un rombo, la faccia color avorio con la cornice stampata.
+  Sotto il puntatore (o col fuoco della tastiera) la tessera si alza un poco.
+  Toccata si gira come una carta; se è una gemma, ne salta fuori uno smeraldo
+  sfaccettato (un brillante a otto lati, vernice e iridescenza, che prende le
+  lampadine della stanza riflessa) che gira e ci si posa. Se è una mina esce la
+  bomba nera laccata, col collare di ferro e la miccia di corda accesa (la
+  scintilla come quella del volantino), trema e **scoppia**: il lampo (la stanza
+  si illumina), il fumo che sale, i pezzi della tessera che volano, rimbalzano
+  e restano sul foglio o sulle altre tessere, le tessere vicine che saltano e
+  ricadono un po' spostate e storte, il foglio che sobbalza, il timbro «boom». Sul
+  foglio resta **la bruciatura** (SVG sotto le tessere, una macchia sfrangiata
+  diversa ogni volta e la polvere intorno), che si vede fra le tessere anche nei
+  giri dopo; restano le ultime quattro. A fine giro le altre caselle si girano a
+  onda, a partire dall'ultima toccata, più scure: le gemme stampate e le mine con
+  la bomba del volantino (`art/arte2/bomba.webp`, la stessa illustrazione).
+  Al giro dopo le gemme spariscono, le tessere tornano coperte e dritte e quella
+  scoppiata ricade dall'alto con un rimbalzo. Con `prefers-reduced-motion`
+  niente voli né scoppio: le tessere si girano e basta.
+- **I $pzk** sono quelli di tutti i giochi; le perdite volano alla cassetta del
+  banco, le vincite arrivano da lì accanto alla puntata e poi al saldo. Gli
+  ultimi giri sono in fondo alla colonna (il moltiplicatore incassato, o «boom»).
+- **Le prove**: `node tools/pzkko/mine/prova.mjs [200000]` (dalla cartella
+  `albertopecchini.it`) controlla i moltiplicatori e le vincite contro i
+  binomiali esatti in BigInt, SHA-256 e HMAC contro node:crypto, le mine contro
+  lo stesso conto fatto con node:crypto e una pesca diversa, che ogni casella sia
+  mina quanto le altre (chi quadro, anche sulle coppie), e poi gioca: gemme e
+  mina giuste per le mine svelate, le mosse vietate rifiutate (la stessa casella,
+  incassare senza gemme, giocare a giro finito), il conto (la puntata lascia il
+  tavolo una volta, torna la vincita giusta) e il ritorno al giocatore. Il
+  22.10.2026, un milione di giri (77 s): nessun errore; caselle chi quadro 7,0 su
+  24 gradi, coppie 312 su 299; ritorno con le strategie che restano sotto il
+  massimo 97,95% misurato, 98,90% atteso (z = −0,62). Chi si spinge fin dove il
+  massimo taglia la vincita ci perde di più (84,8% atteso, con le strategie a
+  caso della prova).
+
+## Il dado (games/dado/)
+
+Il volantino «dado» apre il **sic bo** (tre dadi, «grande e piccolo», il gioco di
+dadi dei casinò di Macao) nella stessa finestra degli altri giochi: `#dado`
+nell'indirizzo lo apre subito. Il foglio col nastro è quello della roulette,
+capovolto; il codice si carica solo quando si apre.
+
+- **La campana** è 3D (three.js) in alto a sinistra: una base bassa di mogano
+  laccato (il legno della roulette), dentro il piatto nero col panno verde, il
+  collare d'ottone, la campana di vetro col pomolo e i tre dadi d'avorio, lucidi,
+  a spigoli tondi, coi punti incavati: neri, l'uno e il quattro rossi e l'uno
+  grande, come i dadi cinesi. «scuoti» fa vibrare il piatto: su e giù (8,5–10,5
+  Hz, 7–9 mm), un po' di lato e inclinato avanti e indietro attorno a un asse che
+  gira, per 1,6–2,2 s, poi si spegne piano. I dadi li muove **Rapier** (lo stesso
+  della roulette): saltano fino a 5 cm, sbattono sul vetro e fra loro e si
+  fermano dove si fermano; esce la faccia in alto. Se un dado resta storto
+  (appoggiato al vetro o a un altro dado) il colpo non vale e la campana si
+  riscuote, come al tavolo. Fra un colpo e l'altro i dadi restano dove sono, e
+  alla volta dopo la campana riparte da lì; aprendo la finestra mostrano l'ultimo
+  colpo. A dadi fermi la scena non si ridisegna.
+- **Il tavolo** è un SVG stampato sul foglio (`multiply`, il filtro di grana
+  degli altri), come i tavoli di Macao: in alto piccolo e grande (小, 大) ai lati,
+  pari e dispari (雙, 單) dove ci sono, le coppie, le triple e la qualsiasi
+  tripla in mezzo; sotto i quattordici totali, le quindici combinazioni e i sei
+  numeri; i dadi disegnati col pennino, l'uno e il quattro in rosso. Sul telefono
+  lo stesso tavolo va a capo in righe più corte. Passando su una casella
+  l'evidenziatore la segna e la voce a pennarello dice quanto paga; dopo il colpo
+  **il tavolo si illumina** dove vince (come quelli veri), le fiches perse
+  scivolano al banco, la vincita arriva accanto alla pila e poi tutto vola al
+  saldo. Accanto alla campana gli ultimi colpi, le tre facce e il totale.
+- **Le regole** sono quelle vere, a scelta («regole di»), coi pagamenti come li
+  riporta wizardofodds.com/games/sic-bo:
+  - *macao* — piccolo (4–10) e grande (11–17) 1 a 1, pari e dispari 1 a 1 (ci
+    sono solo lì), tutti e quattro perdono con le triple; totale 4 e 17 a 50, 5
+    e 16 a 18, 6 e 15 a 14, 7 e 14 a 12, 8 e 13 a 8, da 9 a 12 a 6; coppia (almeno
+    due di quel numero, anche nella tripla) 8 a 1; tripla di un numero 150 a 1,
+    qualsiasi tripla 24 a 1; combinazione di due numeri 5 a 1; numero singolo 1,
+    2 o 3 a 1 se esce su uno, due o tre dadi;
+  - *atlantic city* — come il New Jersey: niente pari e dispari, totale 4 e 17 a
+    60, 5 e 16 a 30, 6 e 15 a 17, coppia 10 a 1, tripla 180 a 1, qualsiasi
+    tripla 30 a 1; il resto come a macao.
+  Il vantaggio del banco va dal 2,78% di piccolo, grande, pari e dispari al
+  47,22% del totale 5 a macao (vedi le prove).
+- **Soldi finti**: i $pzk di `games/pzk.js`, gli stessi degli altri giochi; le
+  regole scelte e gli ultimi colpi restano nel browser (`localStorage`,
+  `pzkko-dado`). «togli», «rifai», «×3» (la campana tre volte più in fretta) come
+  alla roulette.
+- **Le prove**: `node tools/pzkko/dado/prova.mjs [41220]` (dalla cartella
+  `albertopecchini.it`). Prima le 216 uscite: per ogni puntata, con tutte e due le
+  tabelle, quanto rendono le regole contro un conto fatto al contrario (le
+  puntate vincenti ricavate dai dadi), e il vantaggio del banco esatto contro
+  quello di wizardofodds. Poi la stessa campana del gioco si scuote N volte di
+  fila in più thread (i dadi ripartono da dove si erano fermati) e per ogni colpo
+  si controlla che i dadi restino dentro il vetro (nel riferimento della campana,
+  che si muove), che si fermino dritti sul panno con quelle facce in alto e mezzo
+  secondo dopo siano ancora lì, e le vincite di puntate a caso; alla fine le facce
+  di ogni dado, i totali (chi quadro) e le facce da un colpo al successivo (i dadi
+  non devono ricordarsi da dove sono partiti). Il 22.10.2026 (seme 4122,
+  41.220 colpi, ~6 minuti in 18 thread): nessun errore; un colpo dura 2,3 s
+  (mediana; fino a 9,6 quando si riscuote), l'1,63% si riscuote (un dado
+  storto); il vetro entra nei dadi al più 2,4 mm mentre si scuote; facce p =
+  0,31, 0,37 e 0,51 per dado, 0,95 tutte insieme; totali p = 0,63; da un colpo
+  al successivo p = 0,50, stessa faccia il 16,90% (16,67% atteso). Col seme
+  2026: facce p = 0,43, passaggi p = 0,39, stessa faccia il 16,78%.
+- **Le trappole della fisica** (scritte anche in `campana.js`): il vetro comincia
+  un centimetro sotto il panno, perché sul bordo aperto della superficie i dadi
+  che correvano contro la parete ci passavano attraverso (fino a 7 mm dentro);
+  la campana ha la parete dritta in basso e la cupola sopra, perché nella mezza
+  sfera un dado su dieci restava appoggiato storto; la vibrazione si spegne in
+  0,7 s, perché le ultime scosse piccole fanno ricadere dritti i dadi in bilico,
+  e il panno ha poco attrito (0,4), perché un dado caduto contro la parete ci
+  restava appoggiato di sbieco (insieme i colpi da rifare scendono dal 3,5
+  all'1,6%). Una partenza più secca e più forte toglieva l'ultimo filo di
+  memoria fra un colpo e l'altro ma faceva uscire un po' meno il quattro (p =
+  0,014) e legava i colpi in un altro modo: scartata. Contatti più rigidi
+  (`contact_natural_frequency` 60) facevano entrare il vetro nei dadi di quasi 7
+  mm. La telecamera guarda la campana da 60° perché tutto il vetro stia davanti
+  alla base: dove dietro non c'è niente three.js trasmette del bianco (la tela è
+  trasparente) e la cupola sembrava di latte.
+
+## La moneta (games/moneta/)
+
+Il volantino «moneta» apre **testa o croce** nella stessa finestra degli altri
+giochi: `#moneta` nell'indirizzo lo apre subito. Il foglio col nastro è quello
+della roulette, capovolto; il codice si carica solo quando si apre (passando sul
+volantino si precarica).
+
+- **La moneta** è d'ottone, 32 mm e 2,6 mm di spessore, in 3D (three.js): sulla
+  testa un profilo all'antica inventato con la corona d'alloro, «PZKKO» e
+  «MMXXVI»; sulla croce una croce gigliata coi quattro punti e un giro di
+  perline; il bordo zigrinato. Le facce le ha disegnate gpt-image-2 come mappe
+  delle altezze (`tools/pzkko/moneta/facce.mjs`, il prompt è lì e nei `.json`);
+  da lì, una volta e non nel browser, il colore (l'ottone bruno nei fondi e
+  chiaro sulle creste), le normali, il lucido e il ricalco a matita del tavolo,
+  in `art/moneta/`; il bordo rialzato lo rifà il codice, tondo. Il primo foglio
+  era una moneta illuminata invece di una mappa, e attorno alla croce la scritta
+  girava in «CORSET»: rifatto, con la croce senza scritte.
+- **Il lancio**: la moneta sta nel piatto, un vassoio di legno laccato da 25 cm
+  (il legno della roulette) appoggiato sul foglio. «lancia»: sale dal fondo, a
+  metà salita il pollice la gira sottosopra o no (a caso, vedi sotto), poi la
+  tira su a 1,7–2,2 m/s facendola girare 6–11 volte al secondo attorno a un asse
+  orizzontale qualunque, con un filo di rotazione su se stessa; sale 20–30 cm
+  sopra il foglio, ricade vicino al centro, rimbalza (di solito quattro volte),
+  rotola, ondeggia e si ferma, in poco più di un secondo. La muove **Rapier**,
+  come la pallina della roulette, ed esce la faccia che resta in su. Se si ferma
+  appoggiata al bordo il lancio non vale e si rilancia da lì (meno di uno su
+  cento). Fra un lancio e l'altro la moneta resta dov'è.
+- **La telecamera** guarda il piatto di sbieco e sale dietro alla moneta che vola
+  (la gru: la metà della sua altezza); quando si ferma le va sopra e si gira, così
+  la faccia uscita si legge dritta, e la tela sfuma in tondo nel foglio come una
+  lente (`--lente`, una maschera CSS animata). Il timbro dice testa o croce. A
+  moneta ferma la scena non si ridisegna.
+- **Il tavolo** è un SVG stampato sul foglio come gli altri: due caselle, testa e
+  croce, con la faccia ricalcata a matita, il nome, «paga 1 a 1» e il cerchio dove
+  si punta (anche su tutte e due). Dopo il lancio il pennarello cerchia la faccia
+  uscita, le fiches perse scivolano al banco, la vincita arriva accanto alla pila
+  e le due pile diventano una. Sotto, le ultime uscite, quanti lanci in tutto con
+  la percentuale di testa e croce, e quante volte di fila è uscita l'ultima.
+- **Lascia o raddoppia?** Dopo una vincita tutto resta sul tavolo: «lascia»
+  incassa, «raddoppia» rilancia tutto (toccando l'altra casella la puntata ci si
+  sposta, prima). Si raddoppia quante volte si vuole, e perdendo si perde tutto.
+  «rifai» rimette le puntate da cui era partita la serie.
+- **Soldi finti**: i $pzk di `games/pzk.js`, gli stessi degli altri giochi; le
+  uscite restano nel browser (`localStorage`, `pzkko-moneta`). Testa e croce
+  pagano 1 a 1 e la moneta è giusta: il banco non ha vantaggio. «togli», «rifai»,
+  «×3» (la moneta tre volte più in fretta) come alla roulette.
+- **Le prove**: `node tools/pzkko/moneta/prova.mjs [20000]` (dalla cartella
+  `albertopecchini.it`) lancia la stessa moneta del gioco N volte di fila in più
+  thread, ogni lancio da dove si è fermato il precedente, e controlla che non esca
+  mai dal piatto né passi sotto il fondo, che quando si dice ferma sia piatta e
+  mezzo secondo dopo sia ancora lì con la stessa faccia; alla fine testa contro
+  croce, quante volte esce la faccia che era in su prima del lancio e quante
+  volte la stessa del lancio prima (chi quadro), altezze, giri, rimbalzi e tempi.
+  Il 22.10.2026 (seme 4122): 20.000 lanci in 162 s, nessun errore, 173 rifatti
+  (appoggiata al bordo, 0,86%); testa 49,81%, croce 50,19% (p = 0,60); la faccia
+  che era in su prima del lancio 50,28% (p = 0,43), la stessa del lancio prima
+  50,28% (p = 0,44); sale a 19–29 cm, 2,4–10,4 giri (mediana 5,3), 1–7 rimbalzi,
+  ferma dopo 0,7–5 s (mediana 1,1).
+- **Le trappole della fisica** (scritte anche in `lancio.js`): la fisica da sola
+  non è giusta. Partendo con in su la faccia del lancio prima, usciva l'opposta il
+  52,2% delle volte (10.000 lanci, p < 0,001: chi puntava sempre sull'altra
+  vinceva); le monete vere hanno una preferenza simile, per la stessa faccia, del
+  50,8% (Bartoš e altri, 2023, 350.757 lanci). Il mezzo giro a caso del pollice la
+  pareggia: con la partenza metà e metà e una moneta uguale dalle due parti, testa
+  e croce escono metà e metà per simmetria, qualunque sia la preferenza (che la
+  prova misura ancora: la faccia in su quando il pollice la lascia esce il 47,3%
+  delle volte). Le tolleranze di Rapier restano quelle di serie, in metri, come
+  nella roulette: in centimetri (`lengthUnit` 0,01) la moneta che ondeggia
+  affondava nel legno di 1–2 mm in un fotogramma su dieci, così in meno di tre su
+  cento e per un attimo (negli urti di spigolo anche 5 mm, per un passo). Il
+  cilindro arrotondato di Rapier va meglio di un poliedro a 48 lati, che entrava
+  di 8 mm; passi più corti (1/1200 s) non servono.
+
 ## La regia (regia/)
 
 Il pannello per provare e regolare il sito senza aspettare la sera o un'auto. Dal
@@ -1243,7 +1499,7 @@ quando i suoni partono.
   `localStorage`: chi li ha spenti non li sente più partire da soli). Il contesto audio nasce
   dentro il gesto (Safari lo vuole lì) e passa a `suono.js`; sull'iPhone è «ambient»: rispetta
   il tasto del silenzioso e non ferma la musica. Con la pagina nascosta tutto si ferma;
-  mentre si gioca (la roulette e il blackjack, finestre modali) la strada si abbassa.
+  mentre si gioca (i giochi sono finestre modali) la strada si abbassa.
   `window.pzkkoSuono`: `acceso`, `volume`, `accendi(sì, ricorda)`, `prova(nome)` per la
   regia, `evento(nome, dati)` per la pagina e la scena (finché il motore non c'è, gli eventi
   aspettano in coda: i vecchi si buttano, le auto si suonano da dove sono arrivate).
@@ -1329,19 +1585,96 @@ quando i suoni partono.
 
 ## I $pzk (games/pzk.js)
 
-Un portafoglio solo per tutti i giochi: 1.000 $pzk all'inizio, altri 1.000
-quando sono finiti (meno di 1 libero e niente sui tavoli). Ogni gioco sposta i
-$pzk dal saldo al suo tavolo quando punta e li regola a fine giro; nel browser
-(`localStorage`, `pzkko-pzk`) si salva il saldo più quello che c'è sui tavoli,
-così se la pagina si chiude a metà giro le puntate tornano. Il saldo della
-roulette di prima (`pzkko-roulette`) passa qui da solo la prima volta. Le fiches
-(1, 5, 25, 100, 500) sono le stesse foto in tutti i giochi.
+Un portafoglio solo per tutti i giochi e per il wallet. Dal 22.10 notte due modi:
 
-**Il regalo di Instagram**: sotto il saldo, in tutti e due i giochi, c'è
-«seguimi su instagram: +1000 $pzk». Il link apre il profilo
-(instagram.com/albertoxpecchini) e, quando si torna sulla pagina (o dopo 8
-secondi), arrivano 1.000 $pzk, una volta sola per browser (`pzkko-pzk-ig`); poi
-il link sparisce. Un sito non può sapere chi segue chi, quindi ci si fida.
+- **la sessione**: chi non entra ha 1.000 $pzk che durano la sessione del browser
+  (`sessionStorage`, `pzkko-pzk-sessione`) e non cambiano mai; a secco (meno di 1 libero e
+  niente sui tavoli) il gioco ne dà altri 1.000. Niente EUR€, niente borsa.
+- **il conto**: chi entra nel wallet ha i suoi $pzk salvati sul server (`api/wallet.mjs`) e
+  soggetti alla borsa. I giochi girano nel browser, quindi il saldo lo manda il browser (`salva`,
+  un secondo dopo ogni cambio e subito quando la pagina si nasconde); il token e l'ultimo stato
+  stanno in `localStorage` (`pzkko-wallet`) e la pagina riparte con quelli mentre chiede al server.
+  A secco: se ci sono EUR€ si apre il wallet per convertirli, se no il **sussidio**, 1.000 $pzk una
+  volta al giorno (`perche()` dice al gioco cosa dire).
+
+Ogni gioco sposta i $pzk dal saldo al suo tavolo quando punta e li regola a fine giro; si salva il
+saldo più quello che c'è sui tavoli, così se la pagina si chiude a metà giro le puntate tornano. Le
+fiches (1, 5, 25, 100, 500) sono le stesse foto in tutti i giochi. Sotto il saldo di ogni gioco, col
+conto, la riga `rigaEuro()`: «hai anche EUR€ 12,50 nel wallet: convertili in $pzk» apre il cambio.
+
+**Il regalo di Instagram**: «seguimi su instagram: +1000 $pzk», nei giochi e nel wallet. Il link apre
+il profilo (instagram.com/albertoxpecchini) e, quando si torna sulla pagina (o dopo 8 secondi),
+arrivano 1.000 $pzk, una volta sola: per browser nella sessione (`pzkko-pzk-ig`), per conto col
+conto (lo segna il server). Un sito non può sapere chi segue chi, quindi ci si fida.
+
+## Il wallet e la borsa (wallet/, api/wallet.mjs, api/borsa.mjs)
+
+**Il wallet** (22.10 notte) è il tasto in alto a sinistra, un portafoglio chiuso di pelle col led
+verde che dice i $pzk (le stesse cifre a sette segmenti del portachiavi per terra). Si apre su un
+portafoglio di pelle usato, aperto, customizzato come un Pip-Boy di Fallout (la foto
+`art/wallet/portafoglio.webp`: la pelle, la piastra d'acciaio rivettata, il nastro adesivo, i tasti
+gialli, la manopola, la porta usb-c sul fianco sinistro; gli schermi nella foto sono spenti, li
+accende `wallet.js` in percentuale sulla foto, `POS`). A sinistra il **saldo in $pzk** a led verdi
+(sotto, quanto vale in €), gli **EUR€** a led ambra, la **batteria** su un lcd (100 % alle 7 di
+mattina, 2 % alle 7 di sera, poi in carica fino alle 7 col cavo usb-c infilato nella porta, ora di
+Mantova, `window.pzkkoOrologio`) e la targhetta incisa con l'**indirizzo**. A destra **la borsa**: il
+grafico del cambio PZK/EUR€ (la manopola gira il periodo: 24 ore, 7 giorni, 30 giorni, da sempre),
+il cambio e il suo inverso, la variazione del periodo, la capitalizzazione (i $pzk di tutti i
+conti, quanti conti) e i fattori del momento (il meteo, la temperatura, giorno o notte, se c'è
+stato un commit). I quattro tasti gialli sfilano dalla tasca **la carta** coi moduli: **conto**
+(entra o crea il conto: un nome e un PIN di quattro cifre, niente di più; il conto nuovo parte con
+1.000 $pzk; dentro, le ultime mosse, sincronizza, esci), **cambio** (il fader orizzontale come
+quelli di regia: $pzk → EUR€ o EUR€ → $pzk, quanto dai e quanto ricevi al cambio dell'ultima
+sincronizzazione), **invia** (a un indirizzo, dopo 48 ore dalla nascita del conto), **altro**
+(l'indirizzo, il PIN, il regalo di instagram). La voce è una striscia di nastro dymo sulla pelle.
+`#wallet` lo apre; i giochi lo aprono con `pzk.apriWallet('converti')` (evento `pzkko-wallet`). Gli
+strumenti che fotografano la pagina non vedono il tasto (`navigator.webdriver`), `?wallet` sì.
+
+**Gli EUR€** sono l'«euroshit», l'euro finto del wallet (il nome viene dall'album *Euroshit* di
+Yung Pips, il rapper torinese: un euro che vale quello che vale). Per finta non varia mai: si muove
+solo il $pzk. Non si prelevano, non si depositano, non si giocano: servono a parcheggiare i $pzk
+quando si pensa che scendano e a riprenderli quando conviene, sempre al cambio del momento. Quando
+un gioco trova un conto a secco con EUR€ dentro, apre il cambio.
+
+**Il cambio** (`api/_borsa.mjs`, `pzkko/borsa.json` su Blob) è una serie vera, un punto ogni dieci
+minuti (dieci minuti per l'ultima settimana, un'ora fino a tre mesi, poi un giorno), nata a
+1 $pzk = 1 € la notte del 22.10.2026. Ogni passo è un caso deterministico (dall'ora del punto: il
+passato non si riscrive) più una deriva: l'**umore del giorno** (a caso fra −5 % e +5 % al giorno;
+con probabilità 4 % un giorno è un'eccezione, come le crypto: ±10–30 % e il doppio del nervosismo)
+e i **fattori del mondo**, misurati quando si aggiunge un punto: un **commit** di Alberto nelle
+ultime 24 ore (GitHub, `albertoxpecchini/AP`) +3 % al giorno, nessuno −2 %; il **meteo** di Mantova
+(Open-Meteo) sole +2 %, pioggia o temporale −2 %, neve −1 %; la **temperatura** sopra i 26° −1,5 %,
+sotto gli 8° +1,5 %; il **giorno** +1,2 %, la **notte** −1,2 %. Le conversioni usano il cambio di
+quando il wallet si è sincronizzato (il browser manda `t`, il server ricalcola `tassoA(t)`), purché
+non sia passata più di mezz'ora: dopo, il wallet si sincronizza da sé (il cambio è quello nuovo).
+`/api/borsa?da=24h|7g|30g|tutto` dà il cambio, le variazioni, i fattori, la serie e la
+capitalizzazione (un minuto di cache sulla rete di Vercel); `node tools/pzkko/wallet.mjs borsa` la
+legge da riga di comando.
+
+**I conti** (`api/wallet.mjs`, `pzkko/wallet.json` su Blob): nome (2–20 lettere, unico senza
+accenti né maiuscole), PIN (scrypt con sale), indirizzo «pzk» più sei cifre (a caso ma uniche; si
+cambia **una volta sola** con sei cifre proprie: agli studenti unimore si consiglia il numero della
+loro e-mail), i $pzk, gli EUR€, le ultime 40 mosse. **pzk398893 è di Alberto**: il nome «pzkko» (e
+alberto, admin, banca…) si crea solo con la chiave di amministrazione (`PZKKO_ADMIN_KEY`, o la
+stessa `FIRME_ADMIN_KEY`: il repository è pubblico, un PIN nel codice non sarebbe un segreto; la
+carta chiede la chiave quando il nome è quello, oppure `node tools/pzkko/wallet.mjs crea pzkko
+<pin>`). L'accesso dà un token firmato (HMAC con `WALLET_SECRET`, o derivato dal token del Blob) che
+vale 180 giorni. Il saldo che manda il browser si accetta se ha senso (non più di 20.000 + 1.200
+$pzk al secondo dall'ultimo salvataggio: nessun gioco paga più di 35 a 1 su una fiche da 500); se
+no si risponde col saldo salvato e il browser si allinea. **Gli invii** fra conti (in $pzk, almeno
+1) si aprono 48 ore dopo la creazione del conto, così creare conti nuovi per regalarsi i loro 1.000
+non è una strada; al massimo 3 conti al giorno per IP, 8 tentativi di accesso in dieci minuti per
+nome. **Le banconote per terra** (`trova`) una volta al giorno ciascuna (il giorno di Mantova), il
+**sussidio** una volta al giorno a chi è a secco. Moderazione: `node tools/pzkko/wallet.mjs` elenca
+i conti, `via <nome>` ne cancella uno (con la chiave in `.env.local`; `--locale` parla col server
+di prova); oppure il JSON dalla pagina dello store.
+
+**Le banconote perse per terra** (`scena/banconote.js`, `art/banconote/`): quattro banconote della
+banca $pzk, da 500, 100, 25 e 10 (la chiocciola in smoking incisa come su una banconota vera,
+«non ha corso legale · soldi finti»), cadute sul marciapiede davanti al negozio, stropicciate come
+i volantini bagnati. Si raccolgono toccandole (`tocchi.js`, `banconota`): la banconota si alza verso
+la telecamera e svanisce, i suoi $pzk entrano nel saldo (il led del tasto li conta, «+500 $pzk» vola
+via dal tasto) e domani sono di nuovo lì. 635 $pzk al giorno a chi passa a raccoglierli.
 
 Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
 `tools/nome/index.html`) e il suo volantino «in arrivo» diventa un link.
@@ -1573,6 +1906,14 @@ Progetto `pzkko` dal repository `albertoxpecchini/AP`:
   elenca le firme e `node tools/pzkko/firme.mjs via <id>` ne cancella una; oppure si modifica
   `pzkko/firme.json` dalla pagina dello store. Se il progetto passa alla Root Directory
   `albertopecchini.it/pzkko`, lì serve un `package.json` con `@vercel/blob`.
+- `/api/wallet` e `/api/borsa` (22.10 notte): il wallet dei $pzk e la borsa. `api/wallet.mjs` e `api/borsa.mjs` qui
+  dentro, riesportate da `albertopecchini.it/api/wallet.js` e `borsa.js`. I conti in `pzkko/wallet.json` e la serie
+  del cambio in `pzkko/borsa.json` sullo stesso **Vercel Blob** della petizione: senza store collegato rispondono
+  «offline» e la home va avanti coi 1.000 $pzk della sessione (il wallet lo dice). Variabili nel progetto:
+  `PZKKO_ADMIN_KEY` (o `FIRME_ADMIN_KEY`) per creare il conto «pzkko» di Alberto e moderare; a piacere
+  `WALLET_SECRET` (la firma dei token: senza, deriva dal token del Blob, e cambiando store i token scadono),
+  `GITHUB_TOKEN` (le chiamate a GitHub senza token sono 60 l'ora per IP: dagli IP di Vercel possono finire, e allora il
+  fattore commit non conta). In locale (`npm run dev:pzkko`) tutto sta in memoria.
 - Domini: `www.pzkko.it` (principale), `pzkko.it` → 308 verso www
 - Ogni push su `main` pubblica da solo.
 

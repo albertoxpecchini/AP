@@ -103,6 +103,8 @@ async function costruisci() {
   }
   // chi mi segue su instagram riceve 1.000 $pzk (una volta, ../pzk.js)
   q('.rl-saldo').appendChild(pzk.linkInstagram({ fatto: () => { voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`); contaSaldo(pzk.saldo() - pzk.PREMIO_IG, pzk.saldo(), RIDOTTO.matches ? 0 : 900) } }))
+  // col conto, gli EUR€ parcheggiati nel wallet: si giocano solo convertiti in $pzk (../pzk.js, wallet/)
+  q('.rl-saldo').appendChild(pzk.rigaEuro())
   // le fiches da scegliere
   for (const v of FICHES) {
     const b = document.createElement('button')
@@ -449,9 +451,9 @@ function togliSegno(tutto = true) {
 async function gira() {
   if (stato.fase !== 'punta') return
   if (pzk.aSecco() && !stato.giocate.size) {
-    pzk.ricarica()
+    const dati = pzk.ricarica()
     aggiornaBanco()
-    voce(`altri ${fmt(pzk.INIZIALE)} $pzk finti: punta`)
+    voce(dati ? `altri ${fmt(pzk.INIZIALE)} $pzk finti: punta` : pzk.perche())
     return
   }
   if (!ruota) return

@@ -533,4 +533,35 @@ It is a big chunky industrial push button, the kind on a machine control panel o
 2. the same button PRESSED DOWN: the yellow cap pushed deep into the bezel, so a thin dark gap shows all around it between the cap and the chrome rim, the dome looks lower and flatter, its highlight smaller and dimmer, the yellow a little darker, the same black gear in the centre.
 Soft studio light from the top left, sharp. Photorealistic product photograph. The bezel ring is the outer edge of each piece: nothing outside it, no panel, no shadow falls on the magenta. No text. ${NIENTE_MAGENTA}`,
   },
+
+  // 23.10 notte: il wallet dei $pzk (pzkko/wallet/), in alto a sinistra: un portafoglio di pelle usato, aperto, con sopra
+  // la piastra d'acciaio rivettata alla fallout, gli schermi (vuoti: li accende la pagina), la porta usb-c sul lato
+  // sinistro. Scala 0.5: nella pagina è largo al massimo 640 px
+  wallet: {
+    scala: 0.65,
+    titolo: 'il portafoglio di pelle del wallet $pzk, aperto, con la piastra d’acciaio e gli schermi spenti',
+    aspetto: '2048x1152',
+    griglia: [1, 1],
+    pezzi: ['portafoglio'],
+    prompt: `${griglia('One piece: a single open bifold wallet,', 1, 1)}
+It is a well-used men's bifold wallet of dark brown full-grain leather, lying OPEN and flat, photographed from DIRECTLY ABOVE (top view, orthographic, no perspective), landscape, filling the cell: the two leather flaps side by side with the fold running vertically down the middle, rounded corners, cream saddle stitching along the edges, the leather scuffed, creased and darkened by years in a back pocket, a worn patch where coins sat.
+It has been customised by a tinkerer in the style of a Fallout Pip-Boy: on the LEFT flap, a brushed gunmetal steel plate riveted to the leather with eight small hex rivets, and recessed into the plate three switched-off display windows of dark smoky glass with a thin black plastic bezel each: one wide rectangular window across the upper half of the plate (about 1.8:1), and two smaller rectangular windows side by side under it; a tiny embossed metal label plate under them reading nothing (blank). On the RIGHT flap another riveted steel plate with ONE large switched-off dark glass window in the upper two thirds (about 1.6:1), and under it a horizontal row of four small round yellow rubber buttons in black bezels and a small knurled black knob. Along the LEFT outer edge of the wallet, half way down, a small oval USB-C port set in the leather in a little steel ferrule. A strip of grey duct tape across one corner, a couple of scratches on the steel, a brass snap stud. The card slots and the bill pocket of the wallet show at the bottom edge of each flap, a folded corner of a yellowish banknote peeking out of the right pocket.
+All displays are OFF: plain dark glass, nothing drawn on them, no text, no icons anywhere. Soft diffuse studio light from the top left, photorealistic, sharp. The outline of the wallet is the edge of the piece: nothing outside it, no table, no shadow falls on the magenta. ${NIENTE_MAGENTA}`,
+  },
+
+  // 23.10 notte: i $pzk persi per terra (pzkko/scena/banconote.js), quattro banconote della banca $pzk
+  banconote: {
+    scala: 0.5,
+    titolo: 'le quattro banconote della banca $pzk (500, 100, 25, 10) perse per terra',
+    aspetto: '2048x1152',
+    griglia: [2, 2],
+    pezzi: ['b500', 'b100', 'b25', 'b10'],
+    prompt: `${griglia('Four banknotes,', 2, 2)}
+They are the four paper banknotes of an invented play currency, the «$pzk» of the «banca $pzk», all the same size (landscape, 2:1), each one complete and perfectly flat, photographed straight from above, the same engraved design in four colours, as finely engraved and detailed as real euro notes: intaglio guilloché borders and rosettes, a portrait in an oval frame of a garden SNAIL seen in profile with its spiral shell and two antennae, drawn like an engraved statesman, the big denomination numeral in the top left and bottom right corners and in words, «$pzk» in large letters at the top, «BANCA $PZK» and «pzkko.it» in small capitals, a security thread, a watermark area, a serial number in red, tiny microprint along the edge reading «non ha corso legale · soldi finti».
+1. top left: 500 $pzk, golden yellow and ochre, the word «cinquecento»;
+2. top right: 100 $pzk, charcoal grey and black on light paper, the word «cento»;
+3. bottom left: 25 $pzk, green, the word «venticinque»;
+4. bottom right: 10 $pzk, orange-red, the word «dieci».
+The paper is slightly worn and creased, a little dirty at the edges, as notes that have been lost on a sidewalk, but each lies flat and whole. Photorealistic, sharp. Nothing outside the rectangles of the notes, no shadow falls on the magenta. ${NIENTE_MAGENTA}`,
+  },
 }

@@ -1,0 +1,132 @@
+/* Il wallet dei $pzk (22.10 notte): il portafoglio di pelle usato, customizzato alla Fallout, che si apre dal tasto in
+   alto a sinistra (index.html, .wallet-tasto). La pelle, la piastra d'acciaio rivettata, gli schermi spenti, i quattro
+   tasti gialli, la manopola e la porta usb-c sono nella foto (art/wallet/portafoglio.webp, gpt-image-2); gli schermi li
+   accende la pagina (tele e testo, posizionati in percentuale sulla foto: le misure in wallet.js). Sotto il portafoglio
+   esce la «carta» coi moduli (entra, converti, invia, altro), come una tessera che si sfila dalla tasca. */
+
+.wallet{position:fixed;inset:0;margin:auto;width:min(94vw,760px);max-width:none;max-height:none;height:auto;padding:0;border:0;background:none;overflow:visible;
+  color:#e9e4d8;font:400 14px/1.35 "Special Elite","Courier New",monospace;--led:#46ff7d;--ambra:#ffb02e;--lcd:#9fb48a;--mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",Menlo,monospace;--fa:"Anton",Impact,sans-serif;--marker:"Permanent Marker","Comic Sans MS",cursive}
+.wallet::backdrop{background:rgba(12,10,8,.55);backdrop-filter:blur(2px)}
+.wallet[open]{animation:w-apre .34s cubic-bezier(.22,1,.36,1)}
+.wallet.chiude{animation:w-chiude .2s ease-in forwards}
+@keyframes w-apre{from{opacity:0;transform:translateY(-16px) rotate(-1deg) scale(.97)}}
+@keyframes w-chiude{to{opacity:0;transform:translateY(-8px) scale(.98)}}
+.wallet *{box-sizing:border-box}
+.wallet button,.wallet input{font:inherit;color:inherit}
+.wallet :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
+
+/* ── il portafoglio ── */
+.w-corpo{position:relative;width:100%;aspect-ratio:1214/559;container-type:inline-size;background:url(/art/wallet/portafoglio.webp) center/100% 100% no-repeat;
+  filter:drop-shadow(0 6px 8px rgba(0,0,0,.45)) drop-shadow(0 28px 36px rgba(0,0,0,.45))}
+.w-corpo>*{position:absolute}
+.w-chiudi{right:-1.2%;top:-7%;width:5.2cqw;height:5.2cqw;padding:0;border:0;border-radius:50%;background:#161616;color:#fff;font:400 3.6cqw/1 var(--fa);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.5)}
+@media (hover:hover){.w-chiudi:hover{transform:scale(1.08)}}
+
+/* gli schermi: vetro scuro, un riflesso in diagonale, la luce dentro */
+.w-schermo{overflow:hidden;border-radius:.6cqw;background:#050806;box-shadow:inset 0 0 1.2cqw rgba(0,0,0,.9)}
+.w-schermo::after{content:"";position:absolute;inset:0;background:linear-gradient(118deg,rgba(255,255,255,.1),rgba(255,255,255,.03) 38%,rgba(255,255,255,0) 40%,rgba(255,255,255,.02));pointer-events:none}
+.w-schermo canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.w-schermo .w-eti{position:absolute;left:4%;top:5%;font:400 1.35cqw/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--led));opacity:.8;text-shadow:0 0 .6cqw var(--c,var(--led))}
+.w-schermo .w-sotto{position:absolute;right:4%;bottom:7%;font:400 1.2cqw/1.2 var(--mono);color:var(--c,var(--led));opacity:.85;text-shadow:0 0 .5cqw var(--c,var(--led));text-align:right;white-space:nowrap}
+.w-eur{--c:var(--ambra)}
+.w-batt{--c:#1c2616;background:var(--lcd)}
+.w-batt .w-eti{opacity:.95;text-shadow:none;color:#1c2616}
+.w-batt::after{background:linear-gradient(118deg,rgba(255,255,255,.22),rgba(255,255,255,.06) 38%,rgba(255,255,255,0) 40%,rgba(255,255,255,.04))}
+.wallet.spento .w-schermo{background:#0d100e}
+.wallet.spento .w-schermo .w-eti,.wallet.spento .w-schermo .w-sotto{opacity:.35;text-shadow:none}
+
+/* la borsa: il grafico e sopra i numeri */
+.w-borsa .w-grafico{inset:0}
+.w-borsa .w-tasso{position:absolute;left:4%;top:4%;font:400 3cqw/1 var(--mono);color:var(--led);text-shadow:0 0 .8cqw rgba(70,255,125,.8)}
+.w-borsa .w-tasso small{font-size:1.3cqw;opacity:.8;margin-left:.4cqw}
+.w-borsa .w-tasso .w-inv{display:block;margin-top:.5cqw;font-size:1.25cqw;opacity:.75}
+.w-borsa .w-var{position:absolute;right:4%;top:4.5%;font:400 1.6cqw/1.2 var(--mono);text-align:right;color:var(--led);text-shadow:0 0 .6cqw currentColor}
+.w-borsa .w-var.giu{color:#ff5b4a}
+.w-borsa .w-var.su{color:var(--led)}
+.w-borsa .w-info{position:absolute;left:4%;bottom:5%;right:4%;display:flex;justify-content:space-between;gap:1cqw;font:400 1.2cqw/1.25 var(--mono);color:var(--led);opacity:.85;text-shadow:0 0 .5cqw var(--led);white-space:nowrap}
+.w-borsa .w-periodo{position:absolute;right:4%;top:19%;font:400 1.25cqw/1 var(--mono);color:var(--led);opacity:.7;text-transform:uppercase;letter-spacing:.1em}
+
+/* la targhetta sotto gli schermi: l'indirizzo inciso nell'acciaio */
+.w-targa{display:grid;place-items:center;font:400 1.3cqw/1 var(--mono);letter-spacing:.09em;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.35);text-transform:uppercase;white-space:nowrap;overflow:hidden}
+
+/* i quattro tasti gialli (già nella foto: qui solo la parte che si preme) e le scritte incise sotto */
+.w-tasto{width:4.6%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transform:translate(-50%,-50%);transition:box-shadow .15s}
+.w-tasto::after{content:attr(data-eti);position:absolute;left:50%;top:118%;transform:translateX(-50%);font:400 1.15cqw/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.3);white-space:nowrap;pointer-events:none}
+.w-tasto:active,.w-tasto[aria-pressed="true"]{box-shadow:inset 0 0 0 .35cqw rgba(0,0,0,.35),inset 0 .25cqw .4cqw rgba(0,0,0,.45)}
+.w-tasto[aria-pressed="true"]::after{color:#ffd400;text-shadow:0 0 .8cqw rgba(255,212,0,.9)}
+@media (hover:hover){.w-tasto:hover{box-shadow:0 0 1cqw .2cqw rgba(255,212,0,.35)}}
+/* la manopola: gira per cambiare il periodo del grafico (la tacca è l'unica cosa disegnata) */
+.w-manopola{width:4.9%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transform:translate(-50%,-50%)}
+.w-manopola i{position:absolute;left:50%;top:50%;width:.45cqw;height:1.6cqw;margin-left:-.225cqw;background:#ffd400;border-radius:.2cqw;transform-origin:50% 0;transform:rotate(var(--giro,0deg)) translateY(-1.95cqw);box-shadow:0 0 .5cqw rgba(255,212,0,.8);transition:transform .25s cubic-bezier(.2,1.4,.4,1)}
+.w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:116%;transform:translateX(-50%);font:400 1.15cqw/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#2a2d30;text-shadow:0 .08cqw 0 rgba(255,255,255,.3);white-space:nowrap}
+
+/* il cavo usb-c: entra nella porta sul fianco sinistro quando è in carica */
+.w-cavo{left:-12.5%;top:47%;width:19%;height:22%;pointer-events:none;opacity:0;transition:opacity .4s}
+.w-cavo svg{width:100%;height:100%;overflow:visible}
+.wallet.carica .w-cavo{opacity:1}
+
+/* la voce: una striscia di nastro dymo nero sulla pelle, sotto la piastra di sinistra */
+.w-voce{left:3.4%;top:86.5%;max-width:43%;margin:0;padding:.5cqw 1cqw .6cqw;background:#141414;color:#f1efe8;font:400 1.45cqw/1.15 var(--fa);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transform:rotate(-.6deg);box-shadow:0 .2cqw .3cqw rgba(0,0,0,.4);opacity:0;transition:opacity .25s}
+.w-voce.si{opacity:1}
+.w-voce.male{background:#8a1a1a}
+
+/* ── la carta che si sfila dalla tasca: i moduli ── */
+.w-carta{position:relative;z-index:-1;width:min(100%,560px);margin:-3.2% auto 0;padding:34px 24px 20px;border-radius:12px;color:#161616;
+  background:linear-gradient(160deg,#f6f1e4,#e9e1cf 60%,#ddd3bd);box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 0 0 1px rgba(0,0,0,.08);transform:translateY(-40px);opacity:0;visibility:hidden;transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .25s,visibility 0s .32s}
+.w-carta.si{transform:none;opacity:1;visibility:visible;transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .25s}
+.w-carta::before{content:"";position:absolute;left:24px;right:24px;top:14px;height:3px;background:repeating-linear-gradient(90deg,#1446a0 0 10px,transparent 10px 16px);opacity:.5}
+.w-carta h3{margin:0 0 10px;font:400 26px/1 var(--fa);letter-spacing:.01em}
+.w-carta h3 small{font:400 13px/1 var(--marker);color:#a50d25;margin-left:10px;vertical-align:middle}
+.w-carta p{margin:6px 0}
+.w-carta .w-nota{font-size:12.5px;color:#4a4540}
+.w-carta label{display:block;margin:10px 0 2px;font:400 13px/1.2 var(--marker);color:#1446a0}
+.w-carta input{width:100%;padding:8px 10px;border:2px solid #161616;border-radius:6px;background:#fffdf7;font:400 17px/1.2 var(--mono);color:#161616}
+.w-carta input[inputmode="numeric"]{letter-spacing:.3em}
+.w-carta .w-riga{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.w-carta .w-riga>*{flex:1 1 140px}
+.w-carta .w-azioni{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.w-carta .w-b{flex:none;padding:8px 16px 9px;border:0;border-radius:4px;background:#161616;color:#fff;font:400 15px/1 var(--fa);letter-spacing:.04em;cursor:pointer;transform:rotate(-.6deg);box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.w-carta .w-b.giallo{background:#ffd400;color:#111}
+.w-carta .w-b.rosso{background:#a50d25}
+.w-carta .w-b.piatto{background:none;color:#161616;box-shadow:none;text-decoration:underline;padding-left:4px;padding-right:4px}
+.w-carta .w-b:disabled{opacity:.45;cursor:default}
+@media (hover:hover){.w-carta .w-b:not(:disabled):hover{transform:rotate(-.6deg) scale(1.04)}}
+.w-carta .w-sch{display:flex;gap:4px;margin:0 0 10px}
+.w-carta .w-sch button{padding:6px 12px;border:2px solid #161616;border-bottom:0;border-radius:6px 6px 0 0;background:none;font:400 14px/1 var(--fa);cursor:pointer;opacity:.55}
+.w-carta .w-sch button[aria-selected="true"]{opacity:1;background:#161616;color:#fff}
+.w-carta .w-esito{margin-top:10px;font:400 15px/1.25 var(--marker);color:#0b5d2b;min-height:1.3em}
+.w-carta .w-esito.male{color:#a50d25}
+.w-carta .w-mosse{margin:10px 0 0;padding:0;list-style:none;font-size:12.5px;max-height:150px;overflow:auto;border-top:1px dashed rgba(0,0,0,.25)}
+.w-carta .w-mosse li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed rgba(0,0,0,.15)}
+.w-carta .w-mosse b{font-weight:400;font-family:var(--mono)}
+.w-carta .w-mosse .piu{color:#0b5d2b}
+.w-carta .w-mosse .meno{color:#a50d25}
+.w-carta .pzk-ig{display:inline-block;padding-bottom:1px;border-bottom:2px solid currentColor;font:400 14px/1.2 var(--marker);color:#1446a0;text-decoration:none}
+.w-carta .pzk-ig[hidden]{display:none}
+.w-carta .pzk-ig b{color:#a50d25;font-weight:400}
+
+/* il cursore della conversione: un fader orizzontale come quelli della regia */
+.w-fader{position:relative;height:54px;margin:14px 0 4px;border-radius:8px;background:linear-gradient(#2a2a2a,#161616);box-shadow:inset 0 2px 6px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.15)}
+.w-fader::before{content:"";position:absolute;left:18px;right:18px;top:50%;height:4px;margin-top:-2px;background:#000;border-radius:2px;box-shadow:0 1px 0 rgba(255,255,255,.1)}
+.w-fader .w-tacche{position:absolute;left:18px;right:18px;top:6px;height:8px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 1px,transparent 1px 10%);pointer-events:none}
+.w-fader input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0 8px;appearance:none;-webkit-appearance:none;background:none;cursor:ew-resize;touch-action:none}
+.w-fader input::-webkit-slider-runnable-track{height:100%;background:none}
+.w-fader input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:30px;height:46px;margin-top:4px;border-radius:4px;background:linear-gradient(90deg,#3a3a3a,#6b6b6b 48%,#f2f2f2 49% 51%,#6b6b6b 52%,#2e2e2e);box-shadow:0 3px 6px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.15)}
+.w-fader input::-moz-range-track{height:100%;background:none}
+.w-fader input::-moz-range-thumb{width:30px;height:46px;border:0;border-radius:4px;background:linear-gradient(90deg,#3a3a3a,#6b6b6b 48%,#f2f2f2 49% 51%,#6b6b6b 52%,#2e2e2e);box-shadow:0 3px 6px rgba(0,0,0,.6)}
+.w-fader .w-led-f{position:absolute;right:10px;bottom:4px;font:400 11px/1 var(--mono);color:var(--led);text-shadow:0 0 6px var(--led);pointer-events:none}
+.w-conv{display:flex;justify-content:space-between;gap:10px;font:400 15px/1.3 var(--mono)}
+.w-conv b{font-weight:400;font-size:20px}
+.w-verso{display:flex;gap:6px;align-items:center;margin-top:8px}
+.w-verso button{padding:6px 10px;border:2px solid #161616;border-radius:20px;background:none;font:400 13px/1 var(--fa);cursor:pointer;opacity:.5}
+.w-verso button[aria-pressed="true"]{opacity:1;background:#161616;color:#fff}
+
+/* ── il telefono: il portafoglio a tutta larghezza, la carta sotto con le scritte normali ── */
+@media (max-width:899px){
+  .wallet{width:100vw;max-height:100dvh;overflow:auto;padding:max(10px,env(safe-area-inset-top)) 0 20px;scrollbar-width:none}
+  .w-corpo{width:96vw;margin:0 auto}
+  .w-chiudi{top:-3%;right:0;width:9cqw;height:9cqw;font-size:6cqw}
+  .w-carta{width:92vw;padding:30px 16px 16px}
+  .w-voce{font-size:1.8cqw}
+}
+@media (prefers-reduced-motion:reduce){.wallet[open],.wallet.chiude,.w-carta,.w-manopola i{animation:none;transition:none}}

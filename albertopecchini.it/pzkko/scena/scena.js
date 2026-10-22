@@ -27,6 +27,7 @@ import { acqua } from './acqua.js'
 import { bestie } from './bestie.js'
 import { spazzatura } from './spazzatura.js'
 import { portachiavi } from './portachiavi.js'
+import { banconote } from './banconote.js'
 import { penne } from './penne.js'
 import { tocchi } from './tocchi.js'
 import { meteo, METEO } from './meteo.js'
@@ -189,6 +190,9 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   // (e insieme la spazzatura per terra col chiusino di pzkkonet e il portachiavi della banca $pzk lì accanto, che non
   // dipendono dal resto; i palazzi si costruiscono sempre, «bassa» li nasconde)
   const [f, h, sp, pc] = await Promise.all([fogli(scene, M, renderer), costruisci(scene, M, { poche: !!liv.poche }), spazzatura(scene, M), portachiavi(scene, M)])
+  // i $pzk persi per terra (22.10 notte, banconote.js): si raccolgono come la roba per terra (tocchi.js)
+  const bn = banconote(scene, M, camera)
+  sp.tocchi.push(...bn.tocchi)
   const l = luci(scene, renderer, h, M)
   // la condensa che scende sulla lamiera (il bagnato sui materiali l'hanno già mondo.js e fogli.js)
   const a = acqua(scene, M, h, f)
@@ -606,7 +610,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     sp.aggiorna()
     // le penne della petizione che dondolano, la lattina che rotola, il pulsante del citofono (le ombre li vogliono)
     const dondola = pn.aggiorna(dt, now, { vento: Math.hypot(METEO.vento?.x ?? 0, METEO.vento?.y ?? 0), puntatore: bestieCtx.puntatore })
-    const toccato = tc.aggiorna(dt)
+    const toccato = tc.aggiorna(dt) | bn.aggiorna(now)
     // (il meteo resta quello della foto del caricamento finché la foto non è sfumata: poi va verso quello vero, piano)
     me.aggiorna(dt, now, { buio: stato.buio, lampioni: stato.lampioni, vista: bestieCtx.vista, tieni: fotoCarico || (conFoto && (!visibile || now - tVista < FOTO)) })
     n++
@@ -751,7 +755,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   }
   // (lontano: la scatola dell'inquadratura da lontano, per carico.mjs: la foto del caricamento la ritaglia con questi numeri)
   // (grafica: quello che la regia mostra e cambia; imposta: «auto», un livello o «su misura»; pc: il portachiavi per terra)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, sp, pc, pn, tc, me, meteo: METEO, M, liv, vetrina, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale(),
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, sp, pc, pn, bn, tc, me, meteo: METEO, M, liv, vetrina, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale(),
     get qualita() { return livello }, fps: () => fps, imposta, livelli: LIVELLI,
     grafica: () => ({ modo, livello, liv: { ...liv }, dpr, voluta: voluta(dim.w || innerWidth, dim.h || innerHeight), lato: LATO, adattata, prova: q.has('qualita') || !!dprFisso, poche: !!h.luciPoche }),
     lontano: { ...scatola(), respiro: RESPIRO, d: (RESPIRO * scatola().bh) / TAN_LONTANO } }
