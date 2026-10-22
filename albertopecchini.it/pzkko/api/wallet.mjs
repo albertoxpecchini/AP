@@ -35,7 +35,11 @@ const RISERVATI = { pzkko: '398893' } // nome → indirizzo, solo con la chiave
 const NOMI_PROTETTI = new Set(['pzkko', 'alberto', 'albertopecchini', 'pecchini', 'admin', 'banca', 'bancapzk', 'root'])
 const mezzi = (n) => Math.round(n * 2) / 2
 const cent = (n) => Math.round(n * 100) / 100
-const chiaveAdmin = () => process.env.PZKKO_ADMIN_KEY || process.env.FIRME_ADMIN_KEY || process.env.WALLET_ADMIN_KEY || null
+// la chiave ripulita da quello che s'incolla per sbaglio su Vercel: spazi, a capo, virgolette, «PZKKO_ADMIN_KEY=»
+const pulisciChiave = (s) => (typeof s === 'string' ? s.trim().replace(/^[A-Z_]*ADMIN_KEY\s*=\s*/, '').replace(/^(["'])(.*)\1$/, '$2').trim() : '')
+const chiaveAdmin = () => pulisciChiave(process.env.PZKKO_ADMIN_KEY || process.env.FIRME_ADMIN_KEY || process.env.WALLET_ADMIN_KEY) || null
+const chiaveGiusta = (key) => { const k = chiaveAdmin(); return Boolean(k) && pulisciChiave(key) === k }
+const erroreChiave = (msg) => (chiaveAdmin() ? msg : `${msg} (e nel progetto manca PZKKO_ADMIN_KEY)`)
 
 // ── il PIN e il token ──
 const sale = () => randomBytes(12).toString('base64url')
@@ -117,8 +121,7 @@ export default async function handler(req, res) {
 
     // ── la moderazione ──
     if (a === 'lista' || a === 'via') {
-      const k = chiaveAdmin()
-      if (!k || body.key !== k) return json(res, 403, { ok: false, errore: 'no' })
+      if (!chiaveGiusta(body.key)) return json(res, 403, { ok: false, errore: erroreChiave('no') })
       if (a === 'lista') { const { db } = await store.read(); return json(res, 200, { ok: true, ...offerta(db), conti: db.conti.map((c) => ({ ...vista(c, now), id: c.id, pin: !!c.pin })) }) }
       const r = await aggiorna(store, (db) => { const i = db.conti.findIndex((c) => c.k === chiaveNome(pulisci(body.nome))); if (i < 0) return { errore: 'non c’è' }; db.conti.splice(i, 1) })
       return json(res, r.errore ? 404 : 200, { ok: !r.errore, errore: r.errore })
@@ -129,7 +132,7 @@ export default async function handler(req, res) {
       const nome = pulisci(body.nome), e = validaNome(nome) || validaPin(body.pin)
       if (e) return json(res, 400, { ok: false, errore: e })
       const k = chiaveNome(nome)
-      if (NOMI_PROTETTI.has(k) && body.key !== chiaveAdmin()) return json(res, 403, { ok: false, errore: 'questo nome è di Alberto' })
+      if (NOMI_PROTETTI.has(k) && !chiaveGiusta(body.key)) return json(res, 403, { ok: false, errore: erroreChiave('questo nome è di Alberto') })
       if (limiti.crea.troppe(ip, now)) return json(res, 429, { ok: false, errore: 'troppi conti da qui: uno basta' })
       const r = await aggiorna(store, (db) => {
         if (db.conti.length >= CAP) return { errore: 'la banca è piena' }
@@ -231,7 +234,7 @@ export default async function handler(req, res) {
       if (!nuovo) return json(res, 400, { ok: false, errore: 'sei cifre' })
       return manda(await azione((c, db) => {
         if (c.indCambiato) return { errore: 'l’indirizzo si cambia una volta sola, e l’hai già fatto' }
-        if (Object.values(RISERVATI).includes(nuovo) && body.key !== chiaveAdmin()) return { errore: 'questo è di Alberto' }
+        if (Object.values(RISERVATI).includes(nuovo) && !chiaveGiusta(body.key)) return { errore: 'questo è di Alberto' }
         if (db.conti.some((x) => x.ind === nuovo)) return { errore: 'questo indirizzo è già di qualcuno' }
         mossa(c, { t: now, tipo: 'indirizzo', da: 'pzk' + c.ind, a: 'pzk' + nuovo })
         c.ind = nuovo; c.indCambiato = true
