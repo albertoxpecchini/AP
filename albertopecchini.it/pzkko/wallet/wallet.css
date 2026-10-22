@@ -51,7 +51,7 @@
 .w-borsa .w-info b{font-weight:400;color:var(--led)}
 
 /* la targhetta sotto gli schermi: l'indirizzo inciso nell'acciaio */
-.w-targa{display:grid;place-items:center;font:400 1.35cqw/1 var(--mono);letter-spacing:.06em;color:#15171a;text-shadow:0 .08cqw 0 rgba(255,255,255,.45);text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.w-targa{display:grid;place-items:center;padding:0 1.6cqw;font:400 1.05cqw/1 var(--mono);letter-spacing:.03em;color:#15171a;text-shadow:0 .08cqw 0 rgba(255,255,255,.45);text-transform:uppercase;white-space:nowrap;overflow:hidden}
 
 /* i quattro tasti gialli (già nella foto: qui solo la parte che si preme) e le scritte incise sotto */
 .w-tasto{width:4.6%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transform:translate(-50%,-50%);transition:box-shadow .15s}
