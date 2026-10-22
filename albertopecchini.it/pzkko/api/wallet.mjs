@@ -41,7 +41,13 @@ const chiaveAdmin = () => process.env.PZKKO_ADMIN_KEY || process.env.FIRME_ADMIN
 const sale = () => randomBytes(12).toString('base64url')
 const hashPin = (pin, s) => scryptSync(String(pin), s, 32, { N: 16384 }).toString('base64url')
 const pinGiusto = (c, pin) => { if (!c.pin) return false; const a = Buffer.from(hashPin(pin, c.pin.s)), b = Buffer.from(c.pin.h); return a.length === b.length && timingSafeEqual(a, b) }
-const segreto = () => process.env.WALLET_SECRET || process.env.PZKKO_SECRET || (process.env.BLOB_READ_WRITE_TOKEN ? createHmac('sha256', 'pzkko-wallet').update(process.env.BLOB_READ_WRITE_TOKEN).digest('base64url') : 'pzkko-in-locale')
+// il segreto dei token: WALLET_SECRET, o derivato dal token di Blob o dalla chiave di amministrazione (con lo store
+// collegato via OIDC il token non c'è più, e il ripiego fisso è pubblico: va bene solo in locale)
+const segreto = () => {
+  if (process.env.WALLET_SECRET || process.env.PZKKO_SECRET) return process.env.WALLET_SECRET || process.env.PZKKO_SECRET
+  const base = process.env.BLOB_READ_WRITE_TOKEN || chiaveAdmin()
+  return base ? createHmac('sha256', 'pzkko-wallet').update(base).digest('base64url') : 'pzkko-in-locale'
+}
 const firma = (s) => createHmac('sha256', segreto()).update(s).digest('base64url').slice(0, 27)
 const token = (id, now) => { const exp = now + VALE_TOKEN; return `${id}.${exp.toString(36)}.${firma(`${id}.${exp.toString(36)}`)}` }
 const leggiToken = (t, now) => {

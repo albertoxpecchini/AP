@@ -16,6 +16,8 @@
 // Sta qui (.mjs) perché vada online anche quando il progetto pzkko avrà la Root Directory in albertopecchini.it/pzkko;
 // finché la radice è albertopecchini.it, la pubblica albertopecchini.it/api/firme.js, che la riesporta.
 
+import { blobOpzioni } from './_archivio.mjs'
+
 const PATH = process.env.FIRME_BLOB_PATH || 'pzkko/firme.json'
 const MAX_BODY = 2 * 1024
 const CAP = 5000 // firme in tutto: oltre, il foglio è pieno
@@ -36,21 +38,22 @@ const memoria = (globalThis.__pzkkoFirme ??= { db: null, etag: 0 })
 const vuoto = () => ({ firme: [] })
 
 async function backend() {
-  if (process.env.BLOB_READ_WRITE_TOKEN && process.env.FIRME_STORE !== 'memory') {
+  const opz = blobOpzioni() // il token di una volta, o l'id dello store con OIDC (vedi _archivio.mjs)
+  if (opz && process.env.FIRME_STORE !== 'memory') {
     const blob = await import('@vercel/blob')
     return {
       async read() {
         // prima l'ETag vero (head), poi il contenuto: se qualcuno scrive nel mezzo, il nostro ifMatch fallisce e si
         // riprova (vedi api/bcp.js)
-        const meta = await blob.head(PATH).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e })
+        const meta = await blob.head(PATH, opz).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e })
         if (!meta) return { db: vuoto(), etag: null }
-        const r = await blob.get(PATH, { access: 'private', useCache: false })
+        const r = await blob.get(PATH, { ...opz, access: 'private', useCache: false })
         if (!r || !r.stream) return { db: vuoto(), etag: null }
         return { db: await new Response(r.stream).json(), etag: meta.etag }
       },
       async write(db, etag) {
         try {
-          await blob.put(PATH, JSON.stringify(db), { access: 'private', addRandomSuffix: false, allowOverwrite: Boolean(etag), contentType: 'application/json', ...(etag && { ifMatch: etag }) })
+          await blob.put(PATH, JSON.stringify(db), { ...opz, access: 'private', addRandomSuffix: false, allowOverwrite: Boolean(etag), contentType: 'application/json', ...(etag && { ifMatch: etag }) })
           return true
         } catch (e) {
           if (e instanceof blob.BlobPreconditionFailedError || /already exists|precondition/i.test(e.message)) return false

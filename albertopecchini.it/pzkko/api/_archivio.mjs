@@ -1,28 +1,38 @@
 // L'archivio delle funzioni di pzkko.it che devono ricordare qualcosa (il wallet dei $pzk e la borsa, api/wallet.mjs e
 // api/borsa.mjs; la petizione, api/firme.mjs, ha il suo uguale): un file JSON privato su Vercel Blob per ognuna, letto
 // sempre dall'origine e riscritto con `ifMatch` sull'ETag, così due scritture nello stesso istante non si cancellano (chi
-// perde rilegge e riprova). Il token (BLOB_READ_WRITE_TOKEN) lo mette Vercel collegando uno store Blob al progetto pzkko.
-// Senza token, online, l'archivio non c'è (null: la funzione risponde «offline»); in locale (il server di npm run
+// perde rilegge e riprova). Le credenziali le mette Vercel collegando uno store Blob al progetto pzkko: una volta il
+// token (BLOB_READ_WRITE_TOKEN), adesso l'id dello store (BLOB_STORE_ID, o col prefisso scelto nel collegamento, come
+// BLOB_READ_WRITE_TOKEN_STORE_ID) e il token OIDC della funzione, che @vercel/blob prende da sé.
+// Senza credenziali, online, l'archivio non c'è (null: la funzione risponde «offline»); in locale (il server di npm run
 // dev:pzkko, o PZKKO_STORE=memory) tutto sta in memoria finché il server non si ferma.
 // (Comincia per _ : Vercel non ne fa una funzione.)
 
 const memorie = (globalThis.__pzkkoArchivi ??= new Map())
 
+/** Le opzioni di Blob per arrivare allo store (col token di una volta, nessuna), o null se lo store non è collegato. */
+export function blobOpzioni() {
+  if (process.env.BLOB_READ_WRITE_TOKEN) return {}
+  const storeId = process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN_STORE_ID
+  return storeId ? { storeId } : null
+}
+
 /** L'archivio del file `path` (es. pzkko/wallet.json): { read() → { db, etag }, write(db, etag) → bool }, o null. */
 export async function archivio(path, vuoto) {
-  if (process.env.BLOB_READ_WRITE_TOKEN && process.env.PZKKO_STORE !== 'memory') {
+  const opz = blobOpzioni()
+  if (opz && process.env.PZKKO_STORE !== 'memory') {
     const blob = await import('@vercel/blob')
     return {
       async read() {
-        const meta = await blob.head(path).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e })
+        const meta = await blob.head(path, opz).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e })
         if (!meta) return { db: vuoto(), etag: null }
-        const r = await blob.get(path, { access: 'private', useCache: false })
+        const r = await blob.get(path, { ...opz, access: 'private', useCache: false })
         if (!r || !r.stream) return { db: vuoto(), etag: null }
         return { db: await new Response(r.stream).json(), etag: meta.etag }
       },
       async write(db, etag) {
         try {
-          await blob.put(path, JSON.stringify(db), { access: 'private', addRandomSuffix: false, allowOverwrite: Boolean(etag), contentType: 'application/json', ...(etag && { ifMatch: etag }) })
+          await blob.put(path, JSON.stringify(db), { ...opz, access: 'private', addRandomSuffix: false, allowOverwrite: Boolean(etag), contentType: 'application/json', ...(etag && { ifMatch: etag }) })
           return true
         } catch (e) {
           if (e instanceof blob.BlobPreconditionFailedError || /already exists|precondition/i.test(e.message)) return false
