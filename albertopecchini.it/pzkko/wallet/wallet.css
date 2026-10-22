@@ -62,10 +62,10 @@
 
 /* il cavo usb-c (art/wallet-cavo/, una foto di gpt-image-2 come il portafoglio): la porta guarda verso chi guarda, quindi
    la spina è infilata giù, perpendicolare allo sguardo, e si vede solo il suo fondo (la foto è la spina vista dall'alto col
-   cavo che corre a sinistra: ruotata di −90° attorno al suo fondo, così il cavo scende e va fuori dal portafoglio, sfumando).
+   cavo che corre a sinistra: ruotata di −90° attorno al suo fondo, così il cavo scende fino al bordo in basso del portafoglio e lì si taglia).
    La porta sta al 5,1 % da sinistra e al 56 % dall'alto della foto; il fondo della spina è l'11 % destro dell'immagine */
 .w-cavo{left:-31.9%;top:48.3%;width:37%;height:auto;pointer-events:none;opacity:0;transition:opacity .4s;transform:rotate(-90deg);transform-origin:right center;
-  filter:drop-shadow(-.35cqw .2cqw .4cqw rgba(0,0,0,.5));-webkit-mask-image:linear-gradient(90deg,transparent,#000 18%);mask-image:linear-gradient(90deg,transparent,#000 18%)}
+  filter:drop-shadow(-.35cqw .2cqw .4cqw rgba(0,0,0,.5));clip-path:inset(0 0 0 43.2%)} /* tagliato dove il portafoglio finisce: il cavo arriva al bordo in basso e lì sparisce sotto */
 .wallet.carica .w-cavo{opacity:1}
 
 /* la voce: una striscia di nastro dymo nero sulla pelle, sotto la piastra di sinistra */
