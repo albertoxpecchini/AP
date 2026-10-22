@@ -1,0 +1,79 @@
+/* La petizione da vicino (petizione.js): il foglio staccato dal muro, grande, sopra un velo; le righe che scorrono, la riga
+   in cui si scrive, le penne appese allo spago. Il foglio ha le stesse classi di quello del muro (.vol .c-bianco
+   .petizione, in index.html): stessa carta, stessi caratteri, stesse misure in cqw, quindi la stessa proporzione */
+.pv{position:fixed;inset:0;z-index:90;outline:none}
+.pv-velo{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,rgba(14,13,12,.48),rgba(6,6,8,.72));touch-action:none}
+/* (il foglio: le regole del muro che lo muoverebbero, il passaggio del puntatore e la transizione, qui non valgono;
+   lo muove solo il volo) */
+.pv .pv-foglio.vol,.pv .pv-foglio.vol:hover{position:absolute;margin:0;z-index:1;transform:none;transform-origin:50% 50%;transition:none;will-change:transform;
+  filter:brightness(var(--sera,1)) drop-shadow(0 6px 10px rgba(0,0,0,.4)) drop-shadow(0 26px 44px rgba(0,0,0,.42))}
+.pv-foglio h3{cursor:default}
+/* quante firme: contate a pennarello nell'angolo in alto, da qualcuno che passava */
+.pv .pv-conta{position:absolute;right:13%;top:6.5%;z-index:2;margin:0;transform:rotate(7deg);font:400 max(13px,4.6cqw)/1 "Permanent Marker","Comic Sans MS",cursive;color:#a50d25;pointer-events:none}
+
+/* le righe: scorrono (le ultime 60 firme), senza barra (il dito e la rotella bastano); le righe stampate stanno sul
+   contenuto, così scorrono con lui */
+.pv .pv-righe{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:none;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.pv .pv-righe::-webkit-scrollbar{display:none}
+.pv .pv-righe::before{display:none}
+.pv-dentro{position:relative;min-height:100%;background:
+  linear-gradient(90deg,transparent calc(8% - var(--fl)),#2b2825 0 calc(8% + var(--fl)),transparent 0),
+  linear-gradient(90deg,transparent calc(48% - var(--fl)),#2b2825 0 calc(48% + var(--fl)),transparent 0),
+  linear-gradient(90deg,transparent calc(67% - var(--fl)),#2b2825 0 calc(67% + var(--fl)),transparent 0),
+  linear-gradient(90deg,transparent calc(80% - var(--fl)),#2b2825 0 calc(80% + var(--fl)),transparent 0),
+  repeating-linear-gradient(to bottom,transparent 0 calc(var(--rh) - 2 * var(--fl)),rgba(43,40,37,.45) 0 var(--rh))}
+.pv-tela{position:absolute;left:0;top:0;width:100%;mix-blend-mode:multiply;pointer-events:none}
+
+/* la riga nuova: il numero stampato, il nome da scrivere (nella calligrafia della biro, del suo colore), la data e
+   l'ora a matita chiara; l'evidenziatore leggero dice dove si scrive */
+.pv-riga{position:absolute;left:0;right:0;height:var(--rh);display:grid;grid-template-columns:8fr 40fr 19fr 13fr 20fr;align-items:center;margin:0;
+  background:linear-gradient(90deg,transparent 8%,rgba(255,226,60,.2) 8.5%,rgba(255,226,60,.16) 99%,transparent);transition:opacity .3s}
+.pv-riga.via{opacity:0;pointer-events:none}
+.pv-riga[hidden]{display:none}
+.pv-n{font:400 calc(var(--rh) * .4)/1 "Special Elite","Courier New",monospace;color:rgba(38,36,34,.72);padding-left:17%;align-self:end;padding-bottom:calc(var(--rh) * .28)}
+.pv-c-nome{display:block;min-width:0;height:100%}
+.pv-nome{display:block;width:100%;height:100%;margin:0;padding:0 0 0 6%;border:0;border-radius:0;background:none;outline:none;box-shadow:none;
+  font:500 calc(var(--rh) * .78)/1 "Caveat","Comic Sans MS",cursive;color:#1d3a9c;caret-color:#1d3a9c}
+.pv-nome::placeholder{color:rgba(60,56,52,.36);opacity:1}
+.pv-nome:disabled{color:transparent}
+.pv-c-data,.pv-c-ora{font:500 calc(var(--rh) * .56)/1 "Caveat","Comic Sans MS",cursive;color:rgba(60,56,52,.3);padding-left:8%;white-space:nowrap;overflow:hidden}
+.pv-trappola{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.pv-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* firma: il «firma anche tu» del foglio diventa il pulsante (stesso posto, stessa scrittura a pennarello) */
+.pv-azioni{display:flex;gap:1em;align-items:baseline}
+.pv-azioni button{appearance:none;margin:0;padding:.05em .1em;border:0;background:none;font:inherit;color:inherit;cursor:pointer;text-decoration:underline transparent .08em;text-underline-offset:.12em;transition:text-decoration-color .2s,transform .2s}
+.pv-azioni button:hover{text-decoration-color:currentColor}
+.pv-azioni button:active{transform:scale(.96)}
+.pv-azioni button:disabled{opacity:.35;cursor:default;text-decoration-color:transparent}
+.pv-azioni button:focus-visible{outline:2px dashed #ffd400;outline-offset:3px}
+.pv-azioni button[hidden]{display:none}
+.pv-altro{font-size:.62em!important;opacity:.8}
+
+/* lo spago (petizione.js lo ridisegna a ogni fotogramma), lo scotch sopra, le penne (si muovono con transform) */
+.pv-spaghi{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
+.pv-spago{fill:none;stroke:#efe9da;stroke-width:max(1.2px,.38cqw);stroke-linecap:round;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.pv-foglio>.pet-scotch{z-index:3;bottom:4.6%}
+.pv-penne{position:absolute;inset:0;z-index:4;pointer-events:none}
+.pv-penna{position:absolute;left:0;top:0;padding:0;margin:0;border:0;background:none;transform-origin:50% 0;pointer-events:auto;cursor:pointer;will-change:transform;-webkit-tap-highlight-color:transparent}
+.pv-penna img{position:absolute;inset:0;width:100%;height:100%;max-width:none;pointer-events:none;filter:drop-shadow(.3cqw .7cqw .5cqw rgba(0,0,0,.32))}
+.pv-penna .pv-aperta{visibility:hidden}
+.pv-penna[aria-checked="true"] img{filter:drop-shadow(0 0 .5cqw rgba(255,212,0,.95)) drop-shadow(.3cqw .7cqw .5cqw rgba(0,0,0,.32))}
+.pv-penna:focus-visible{outline:2px dashed #ffd400;outline-offset:2px}
+.pv-tappo{position:absolute;left:0;top:0;z-index:5;pointer-events:none;visibility:hidden;max-width:none;transform-origin:50% 50%;filter:drop-shadow(.3cqw .6cqw .4cqw rgba(0,0,0,.3))}
+
+/* la nota a pennarello: grazie, gli errori, la petizione in pausa */
+.pv .pv-nota{position:absolute;left:6%;bottom:-3%;z-index:6;max-width:88%;margin:0;padding:.2em .5em .25em;transform:rotate(-2.5deg);background:rgba(255,253,246,.94);box-shadow:0 2px 8px rgba(0,0,0,.25);
+  font:400 max(14px,5cqw)/1.15 "Permanent Marker","Comic Sans MS",cursive;color:#a50d25;opacity:0;pointer-events:none;transition:opacity .25s}
+.pv .pv-nota.si{opacity:1}
+.pv .pv-nota.ok{color:#0b5d2b}
+
+/* chiudere: il tondo nero col bordo bianco, come quello degli auguri */
+.pv-chiudi{position:fixed;z-index:3;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));width:44px;height:44px;padding:0;border:3px solid #fff;border-radius:50%;
+  background:#111;color:#fff;font:400 28px/1 "Archivo Black","Arial Black",sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);transition:transform .2s cubic-bezier(.2,1.4,.4,1)}
+.pv-chiudi:hover{transform:scale(1.08) rotate(90deg)}
+.pv-chiudi:focus-visible{outline:3px solid #ffd400;outline-offset:3px}
+
+@media (prefers-reduced-motion:reduce){
+  .pv-riga,.pv-nota,.pv-chiudi,.pv-azioni button{transition:none}
+}

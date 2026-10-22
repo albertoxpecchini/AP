@@ -405,10 +405,7 @@ export function strumenti(c) {
     colpo(out, t, { a: a * 0.5, rate: caso(1.6, 2.6), fine: 0.12 })
     soffio(out, t, { a, att: 0.0005, tau: 0.004, filtri: [filtro('bandpass', caso(1500, 3200), 3)] })
   }
-  const bussa = (out, t, { a = 0.45 } = {}) => {
-    colpo(out, t, { a, rate: caso(0.92, 1.08) })
-    for (let i = 0, u = t + 0.05; i < 5; i++, u += caso(0.03, 0.07)) doga(out, u, a * 0.3 * (1 - i / 5))
-  }
+  // (la saracinesca bussata col dito sta più sotto, fra le cose che si toccano: bussa)
   const sbatte = (out, t, { a = 0.2, n = Math.round(caso(4, 14)) } = {}) => {
     let u = t
     for (let i = 0; i < n; i++) {
@@ -419,8 +416,8 @@ export function strumenti(c) {
   }
 
   // ── la carta: un tampone di crepitio (rumore a scatti) per il foglio che si alza e il tagliando strappato ──
-  let carta = null
-  const crepita = () => (carta ??= tampone(1.5, 1, (d) => {
+  let crepitio = null
+  const crepita = () => (crepitio ??= tampone(1.5, 1, (d) => {
     let e = 0
     for (let i = 0; i < d.length; i++) { if (Math.random() < 500 / sr) e = caso(0.3, 1); e *= 0.995; d[i] = (Math.random() * 2 - 1) * e }
   }))
@@ -595,8 +592,318 @@ export function strumenti(c) {
     for (const [u, f, k] of [[0, 659.3, 1], [0.16, 987.8, 0.9], [0.32, 830.6, 0.9], [0.5, 1318.5, 0.6]]) tono(out, t + u, 1.2, fisso(f), { a: a * k, att: 0.004, cala: 0.22, armoniche: [[1, 1], [3.9, 0.12], [9.2, 0.04]] })
   }
 
+  // ── le cose che si toccano (22.10) ────────────────────────────────────────
+  // I corpi percossi: i modi di un corpo (frequenza, ampiezza, costante di tempo), ognuno due toni vicinissimi che
+  // battono, più il colpo (un rumore che si spegne subito: più lungo, più sordo), calcolati una volta in un tampone; tre
+  // varianti un filo diverse, suonate a caso: due colpi di fila non sono mai uguali
+  const CORPI = {
+    // la saracinesca: il rombo grave del telo di doghe (corto: le doghe sono lente nelle guide), poi la lamiera
+    saracinesca: { modi: [[52, 1, 0.22], [74, 0.8, 0.2], [109, 0.7, 0.16], [158, 0.55, 0.13], [231, 0.5, 0.11], [325, 0.42, 0.09], [452, 0.38, 0.075], [618, 0.3, 0.06], [847, 0.26, 0.05], [1163, 0.2, 0.038], [1590, 0.15, 0.028], [2210, 0.1, 0.02], [3080, 0.07, 0.013], [4300, 0.05, 0.009]], colpo: 0.5, tc: 0.002, sec: 1.1 },
+    // la lastra della porta, che si flette (i modi bassi) e canta un attimo (gli acuti)
+    vetro: { modi: [[96, 0.7, 0.075], [148, 0.65, 0.065], [229, 0.55, 0.055], [347, 0.45, 0.045], [523, 0.35, 0.035], [786, 0.26, 0.028], [1170, 0.2, 0.022], [1730, 0.15, 0.018], [2640, 0.14, 0.014], [3960, 0.11, 0.01], [5870, 0.07, 0.007]], colpo: 0.35, tc: 0.0008, sec: 0.5 },
+    alluminio: { modi: [[410, 0.6, 0.05], [690, 0.55, 0.04], [1050, 0.5, 0.035], [1540, 0.4, 0.03], [2280, 0.3, 0.02], [3310, 0.2, 0.014], [4720, 0.12, 0.009]], colpo: 0.4, tc: 0.0008, sec: 0.4 },
+    // il tubo d'acciaio del maniglione: canta a lungo
+    acciaio: { modi: [[310, 0.3, 0.06], [1180, 0.5, 0.35], [2650, 0.45, 0.28], [4370, 0.3, 0.2], [6290, 0.18, 0.12], [8410, 0.1, 0.08]], colpo: 0.3, tc: 0.0006, sec: 1.5 },
+    // la lattina schiacciata: alluminio sottile, smorzato dalle pieghe
+    lattina: { modi: [[480, 0.5, 0.03], [1220, 0.6, 0.05], [2130, 0.55, 0.04], [3320, 0.45, 0.03], [4870, 0.3, 0.02], [6740, 0.2, 0.012]], colpo: 0.5, tc: 0.0007, sec: 0.4 },
+    ghisa: { modi: [[176, 0.8, 0.35], [404, 0.65, 0.3], [741, 0.5, 0.25], [1215, 0.38, 0.18], [1850, 0.25, 0.12], [2700, 0.15, 0.08]], colpo: 0.6, tc: 0.003, sec: 1.6 },
+    ottone: { modi: [[920, 0.35, 0.05], [2080, 0.6, 0.18], [3540, 0.5, 0.14], [5260, 0.35, 0.1], [7400, 0.2, 0.06]], colpo: 0.4, tc: 0.0006, sec: 0.9 },
+    legno: { modi: [[190, 0.6, 0.04], [310, 0.55, 0.035], [520, 0.45, 0.03], [780, 0.35, 0.022], [1180, 0.25, 0.015], [1750, 0.15, 0.01]], colpo: 0.6, tc: 0.002, sec: 0.35 },
+    // la lamiera smaltata del cartello stradale: sottile e larga, i modi bassi lunghi
+    smalto: { modi: [[88, 0.7, 0.4], [131, 0.6, 0.35], [197, 0.5, 0.3], [296, 0.45, 0.25], [520, 0.35, 0.2], [910, 0.3, 0.15], [1480, 0.25, 0.12], [2390, 0.18, 0.09], [3610, 0.12, 0.06]], colpo: 0.35, tc: 0.001, sec: 1.8 },
+    pietra: { modi: [[920, 0.5, 0.012], [1580, 0.45, 0.01], [2650, 0.35, 0.007], [4100, 0.2, 0.005]], colpo: 0.8, tc: 0.0025, sec: 0.15 },
+    plastica: { modi: [[1850, 0.5, 0.012], [3100, 0.45, 0.01], [4800, 0.3, 0.007]], colpo: 0.6, tc: 0.0006, sec: 0.12 },
+    cartone: { modi: [[240, 0.6, 0.03], [380, 0.5, 0.025], [610, 0.35, 0.018], [950, 0.2, 0.012]], colpo: 0.7, tc: 0.003, sec: 0.25 },
+    intonaco: { modi: [[130, 0.6, 0.03], [260, 0.45, 0.02], [520, 0.3, 0.012]], colpo: 0.9, tc: 0.004, sec: 0.2 },
+  }
+  const varianti = new Map()
+  const corpo = (nome) => {
+    let v = varianti.get(nome)
+    if (!v) varianti.set(nome, (v = []))
+    if (v.length < 3) {
+      const C = CORPI[nome]
+      v.push(picco(tampone(C.sec, 1, (d) => {
+        for (const [f, am, tau] of C.modi) {
+          const f1 = f * caso(0.97, 1.03), f2 = f1 * caso(1.003, 1.012), T = tau * sr * caso(0.85, 1.15), p1 = Math.random() * TAU, p2 = Math.random() * TAU, w1 = (TAU * f1) / sr, w2 = (TAU * f2) / sr
+          for (let i = 0, L = Math.min(d.length, T * 7); i < L; i++) d[i] += am * Math.exp(-i / T) * (0.6 * Math.sin(w1 * i + p1) + 0.4 * Math.sin(w2 * i + p2))
+        }
+        const tc = C.tc * sr
+        let lp = 0
+        for (let i = 0, L = Math.min(d.length, tc * 8); i < L; i++) { lp += 0.5 * (Math.random() * 2 - 1 - lp); d[i] += lp * C.colpo * Math.exp(-i / tc) }
+      }), 0.9))
+    }
+    return scegli(v)
+  }
+  // un corpo in out all'istante t: quanto forte, più acuto o più grave (rate), tagliato dopo fine secondi, coi suoi filtri
+  const batti = (out, t, nome, { a = 0.4, rate = 1, fine = 0, filtri = [] } = {}) => {
+    const s = c.createBufferSource(), g = guadagno(a)
+    s.buffer = corpo(nome); s.playbackRate.value = rate
+    fila(s, ...filtri, g, out); s.start(t)
+    if (fine) { g.gain.setValueAtTime(a, t + fine * 0.7); g.gain.linearRampToValueAtTime(0, t + fine); s.stop(t + fine + 0.01) }
+    return s
+  }
+
+  // la saracinesca bussata, rifatta: il colpo delle nocche (il tonfo morbido della mano, lo schiocco), il rombo del telo
+  // di doghe e la lamiera, poi le doghe che ballano nelle guide e si urtano, sempre più fitte e più piano (come una cosa
+  // che rimbalza). alto, da 0 (in fondo) a 1 (in cima): in basso, dove la barra è chiusa col lucchettone, è più secca e
+  // balla meno; a metà rimbomba di più; in alto balla di più
+  const bussa = (out, t, { a = 0.5, alto = 0.5 } = {}) => {
+    const basso = 1 - Math.min(1, alto * 2.5)
+    soffio(out, t, { a: a * 0.5, att: 0.002, tau: 0.012, tipo: 'rosa', filtri: [filtro('lowpass', 700)] })
+    soffio(out, t, { a: a * 0.3, att: 0.0004, tau: 0.0012, filtri: [filtro('bandpass', 2600, 0.9)] })
+    batti(out, t + 0.001, 'saracinesca', { a: a * (0.9 - 0.25 * basso), rate: caso(0.94, 1.06) * (1 + 0.25 * basso), fine: 0.9 - 0.45 * basso, filtri: [filtro('lowshelf', 160, 0.7, 5 * (1 - basso) * Math.sin(Math.PI * Math.min(1, alto)))] })
+    const n = Math.round(caso(7, 13) * (1 - 0.55 * basso) * (0.8 + 0.4 * alto))
+    let u = t + caso(0.018, 0.03), passo = caso(0.03, 0.05), forza = a * 0.32
+    for (let i = 0; i < n; i++) {
+      doga(out, u, forza * caso(0.5, 1))
+      u += passo * caso(0.7, 1.25); passo *= 0.86; forza *= 0.8
+    }
+  }
+
+  // il campanello del negozio: dentro, dietro la porta, il campanello elettrico che trilla finché il dito tiene (il
+  // martelletto batte la campana venticinque volte al secondo, l'elettrocalamita ronza sotto). Il tampone si ripete
+  // senza giunta (ogni colpo che sfora la fine ricomincia dall'inizio); il pulsante scatta giù e su (in out, il citofono)
+  let trillo = null
+  const campanella = () => (trillo ??= picco(tampone(1.2, 1, (d) => {
+    const n = d.length, f0 = caso(1150, 1350), P = [[1, 1, 0.32], [2.76, 0.5, 0.18], [5.4, 0.25, 0.09], [8.93, 0.12, 0.05]]
+    for (let s0 = 0; s0 < n; s0 += Math.round(sr / caso(23.5, 26.5))) {
+      const forza = caso(0.7, 1)
+      for (const [r, am, tau] of P) { const w = (TAU * f0 * r) / sr, T = tau * sr; for (let i = 0; i < T * 3; i++) d[(s0 + i) % n] += forza * am * Math.exp(-i / T) * Math.sin(w * i) }
+    }
+  }), 0.8))
+  const campanello = (out, dentro, t) => {
+    clic(out, t, 0.22)
+    const s = fonte(campanella(), t + 0.03), g = guadagno(0), z = c.createOscillator(), gz = guadagno(0)
+    fila(s, g, dentro)
+    g.gain.setValueAtTime(0, t + 0.03); g.gain.linearRampToValueAtTime(0.55, t + 0.07)
+    z.type = 'sawtooth'; z.frequency.value = 100
+    fila(z, filtro('bandpass', 700, 1.5), gz, dentro)
+    gz.gain.setValueAtTime(0, t + 0.03); gz.gain.linearRampToValueAtTime(0.035, t + 0.07)
+    z.start(t + 0.03)
+    return {
+      lascia: (u) => {
+        g.gain.cancelScheduledValues(u); g.gain.setValueAtTime(g.gain.value, u); g.gain.setTargetAtTime(0, u, 0.12)
+        gz.gain.cancelScheduledValues(u); gz.gain.setValueAtTime(gz.gain.value, u); gz.gain.setTargetAtTime(0, u, 0.02)
+        s.stop(u + 1.4); z.stop(u + 0.3)
+        clic(out, u, 0.14)
+      },
+    }
+  }
+  // il citofono che si apre e nessuno parla: lo scatto, il fruscio della linea (la banda del telefono), il ronzio della
+  // rete, lo scatto che chiude
+  const risponde = (out, t, { d = caso(1.2, 2.4) } = {}) => {
+    clic(out, t, 0.16)
+    const s = fonte(R.rosa, t, { fine: t + d + 0.1 }), g = guadagno(0), o = c.createOscillator(), go = guadagno(0)
+    fila(s, filtro('highpass', 320), filtro('lowpass', 3200), filtro('peaking', 1200, 1, 5), g, out)
+    for (const [gg, v] of [[g, 0.05], [go, 0.007]]) { gg.gain.setValueAtTime(0, t); gg.gain.linearRampToValueAtTime(v, t + 0.02); gg.gain.setValueAtTime(v, t + d - 0.05); gg.gain.linearRampToValueAtTime(0, t + d) }
+    o.frequency.value = 50; fila(o, go, out); o.start(t); o.stop(t + d + 0.05)
+    clic(out, t + d, 0.18)
+    return d
+  }
+  // la piastra del citofono: alluminio, un colpetto
+  const citofono = (out, t, { a = 0.35 } = {}) => {
+    batti(out, t, 'alluminio', { a, rate: caso(1.3, 1.6), fine: 0.2 })
+    soffio(out, t, { a: a * 0.3, att: 0.0004, tau: 0.0012, filtri: [filtro('bandpass', 3000, 1)] })
+  }
+  // bussare sul vetro della porta: il tonfo del vetro che si flette, lo schiocco delle nocche, il vetro che canta un
+  // attimo, e a volte la porta che balla nel telaio (è chiusa a chiave)
+  const vetro = (out, t, { a = 0.45 } = {}) => {
+    soffio(out, t, { a: a * 0.35, att: 0.001, tau: 0.008, tipo: 'rosa', filtri: [filtro('lowpass', 900)] })
+    soffio(out, t, { a: a * 0.4, att: 0.0003, tau: 0.0009, filtri: [filtro('bandpass', 3800, 0.8)] })
+    batti(out, t, 'vetro', { a, rate: caso(0.9, 1.12) })
+    if (Math.random() < 0.35) batti(out, t + caso(0.02, 0.04), 'alluminio', { a: a * 0.15, rate: caso(1.3, 1.6), fine: 0.08 })
+  }
+  // i profili d'alluminio della porta: vuoti, un «tonc» metallico
+  const telaio = (out, t, { a = 0.42 } = {}) => {
+    soffio(out, t, { a: a * 0.3, att: 0.0005, tau: 0.002, filtri: [filtro('bandpass', 2400, 1)] })
+    batti(out, t, 'alluminio', { a, rate: caso(0.92, 1.1) })
+  }
+  // il maniglione: la porta è chiusa a chiave, la si tira e sbatte sulla serratura (avanti, e indietro più piano), il
+  // vetro trema nel telaio, il tubo d'acciaio canta
+  const maniglione = (out, t, { a = 0.5 } = {}) => {
+    batti(out, t, 'acciaio', { a: a * 0.35, rate: caso(0.95, 1.05) })
+    const sbatti = (u, k) => {
+      soffio(out, u, { a: a * 0.5 * k, att: 0.0005, tau: 0.003, filtri: [filtro('bandpass', 1300, 1.2)] })
+      batti(out, u, 'alluminio', { a: a * 0.4 * k, rate: caso(0.7, 0.85), fine: 0.25 })
+      batti(out, u, 'vetro', { a: a * 0.2 * k, rate: caso(1.1, 1.3), fine: 0.2 })
+    }
+    sbatti(t + 0.04, 1); sbatti(t + caso(0.13, 0.18), 0.55)
+  }
+  // il lucchettone d'ottone coricato per terra: il colpo dell'ottone, il ferro che lo tiene, due sobbalzi
+  const lucchetto = (out, t, { a = 0.45 } = {}) => {
+    batti(out, t, 'ottone', { a, rate: caso(0.92, 1.08) })
+    batti(out, t + caso(0.02, 0.05), 'acciaio', { a: a * 0.35, rate: caso(0.6, 0.75), fine: 0.4 })
+    for (let i = 0, u = t + 0.07; i < 3; i++, u += caso(0.03, 0.06)) batti(out, u, 'ottone', { a: a * 0.15 * (1 - i * 0.3), rate: caso(1.2, 1.5), fine: 0.05 })
+  }
+  // il tasto di gomma del portachiavi, e le chiavi che tintinnano sull'anello
+  const portachiavi = (out, t, { a = 0.35 } = {}) => {
+    tono(out, t, 0.04, fisso(caso(300, 380)), { a: a * 0.4, att: 0.001, cala: 0.008 })
+    soffio(out, t, { a: a * 0.3, att: 0.0005, tau: 0.002, filtri: [filtro('bandpass', 2000, 1.5)] })
+    for (let i = 0, u = t + 0.02; i < 4; i++, u += caso(0.025, 0.07)) batti(out, u, 'ottone', { a: a * caso(0.08, 0.18), rate: caso(1.4, 2), fine: 0.12 })
+  }
+  // la lattina schiacciata: il colpo dell'alluminio sottile, poi rotola un filo sulla pietra (lo sfrigolio) e ballonzola
+  const lattina = (out, t, { a = 0.4 } = {}) => {
+    soffio(out, t, { a: a * 0.4, att: 0.0003, tau: 0.001, filtri: [filtro('highpass', 2500)] })
+    batti(out, t, 'lattina', { a, rate: caso(0.9, 1.1) })
+    const d = caso(0.35, 0.6), s = fonte(R.bianco, t + 0.04, { fine: t + 0.04 + d }), g = guadagno(0)
+    fila(s, filtro('bandpass', caso(2600, 3600), 1.2), g, out)
+    g.gain.setValueAtTime(0, t + 0.04); g.gain.linearRampToValueAtTime(a * 0.08, t + 0.08); g.gain.setTargetAtTime(0, t + 0.1, d * 0.35)
+    for (let i = 0, u = t + caso(0.08, 0.14); i < 3; i++, u += caso(0.06, 0.12)) batti(out, u, 'lattina', { a: a * 0.3 * (1 - i * 0.28), rate: caso(1.05, 1.3), fine: 0.06 })
+  }
+  // la carta bagnata incollata alle lastre: un risucchio molle, l'acqua che schiocca sotto, una goccia
+  const cartaBagnata = (out, t, { a = 0.35 } = {}) => {
+    soffio(out, t, { a: a * 0.5, att: 0.008, tau: 0.04, tipo: 'rosa', filtri: [filtro('bandpass', 700, 0.8)] })
+    soffio(out, t + 0.02, { a: a * 0.25, att: 0.003, tau: 0.02, filtri: [filtro('bandpass', 1800, 1.5)] })
+    goccia(out, t + caso(0.05, 0.12), { f: caso(600, 900), a: a * 0.3 })
+  }
+  // il pacchetto di sigarette: il cartoncino, il cellophane che crocchia
+  const pacchetto = (out, t, { a = 0.35 } = {}) => {
+    batti(out, t, 'cartone', { a: a * 0.5, rate: caso(1.3, 1.6) })
+    const d = caso(0.18, 0.28), s = fonte(crepita(), t, { fine: t + d + 0.02, rate: caso(1.3, 1.7) }), g = guadagno(0)
+    fila(s, filtro('highpass', 3200), g, out)
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a * 0.9, t + 0.01); g.gain.setTargetAtTime(0, t + 0.02, d * 0.4)
+  }
+  // la scatola del ramen: il cartone vuoto, un fruscio, il manico di ferro che tintinna
+  const cartone = (out, t, { a = 0.4 } = {}) => {
+    batti(out, t, 'cartone', { a, rate: caso(0.9, 1.1) })
+    fruscio(out, t + 0.01, { a: a * 0.25 })
+    batti(out, t + caso(0.01, 0.03), 'acciaio', { a: a * 0.08, rate: caso(1.8, 2.3), fine: 0.25 })
+  }
+  // i grissini: il film del pacchetto che crocchia (più secco del cellophane) e dentro i grissini che si urtano; ogni
+  // tanto uno si rompe
+  const grissini = (out, t, { a = 0.3 } = {}) => {
+    const d = caso(0.2, 0.32), s = fonte(crepita(), t, { fine: t + d + 0.02, rate: caso(1.6, 2.1) }), g = guadagno(0)
+    fila(s, filtro('highpass', 2200), filtro('peaking', 5000, 1, 4), g, out)
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + 0.008); g.gain.setTargetAtTime(0, t + 0.02, d * 0.35)
+    for (let i = 0, u = t + 0.01; i < 4; i++, u += caso(0.02, 0.07)) {
+      soffio(out, u, { a: a * caso(0.25, 0.5), att: 0.0003, tau: 0.0015, filtri: [filtro('bandpass', caso(1500, 3500), 3)] })
+      tono(out, u, 0.03, fisso(caso(900, 1400)), { a: a * 0.1, att: 0.0005, cala: 0.006 })
+    }
+    if (Math.random() < 0.2) { const u = t + caso(0.06, 0.15); soffio(out, u, { a: a * 0.9, att: 0.0005, tau: 0.004, filtri: [filtro('bandpass', 2200, 1.2)] }); soffio(out, u + 0.006, { a: a * 0.5, att: 0.0005, tau: 0.01, filtri: [filtro('highpass', 3000)] }) }
+  }
+  // la pozzanghera: lo schiaffo dell'acqua, la bolla che fischia salendo (il «plop»), gli schizzi che ricadono
+  const pozza = (out, t, { a = 0.45 } = {}) => {
+    soffio(out, t, { a: a * 0.5, att: 0.001, tau: 0.012, tipo: 'rosa', filtri: [filtro('lowpass', 1100)] })
+    soffio(out, t, { a: a * 0.35, att: 0.002, tau: 0.03, filtri: [filtro('bandpass', 3500, 0.7)] })
+    const o = c.createOscillator(), g = guadagno(0), f = caso(380, 520), u = t + 0.012
+    o.frequency.setValueAtTime(f, u); o.frequency.exponentialRampToValueAtTime(f * caso(2, 2.6), u + 0.05)
+    g.gain.setValueAtTime(0, u); g.gain.linearRampToValueAtTime(a * 0.45, u + 0.004); g.gain.setTargetAtTime(0, u + 0.01, 0.025)
+    fila(o, g, out); o.start(u); o.stop(u + 0.15)
+    for (let i = 0, n = Math.round(caso(3, 6)); i < n; i++) goccia(out, t + caso(0.06, 0.35), { f: caso(900, 2200), a: a * caso(0.08, 0.2) })
+  }
+  // la pietra del marciapiede: un colpo sordo e un filo di sabbia; la neve che si schiaccia
+  const pietra = (out, t, { a = 0.35 } = {}) => {
+    batti(out, t, 'pietra', { a, rate: caso(0.9, 1.1) })
+    soffio(out, t + 0.004, { a: a * 0.15, att: 0.004, tau: 0.03, filtri: [filtro('bandpass', 5000, 1)] })
+  }
+  const neve = (out, t, { a = 0.3 } = {}) => {
+    const d = caso(0.15, 0.25), s = fonte(crepita(), t, { fine: t + d + 0.02, rate: caso(0.5, 0.7) }), g = guadagno(0)
+    fila(s, filtro('lowpass', 2500), filtro('highpass', 300), g, out)
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + 0.03); g.gain.setTargetAtTime(0, t + 0.04, d * 0.4)
+  }
+  // il chiusino di ghisa, un po' lento nel telaio: il colpo pesante, e il coperchio che dondola e ricade (ton… tonc)
+  const chiusino = (out, t, { a = 0.5 } = {}) => {
+    soffio(out, t, { a: a * 0.4, att: 0.002, tau: 0.02, tipo: 'rosa', filtri: [filtro('lowpass', 500)] })
+    batti(out, t, 'ghisa', { a, rate: caso(0.95, 1.05) })
+    batti(out, t + caso(0.13, 0.2), 'ghisa', { a: a * 0.45, rate: caso(1.02, 1.1), fine: 0.6 })
+  }
+  // il muro del palazzo: l'intonaco, sordo
+  const muro = (out, t, { a = 0.4 } = {}) => {
+    batti(out, t, 'intonaco', { a, rate: caso(0.9, 1.1) })
+    soffio(out, t + 0.003, { a: a * 0.1, att: 0.004, tau: 0.02, filtri: [filtro('bandpass', 4500, 1)] })
+  }
+  // toccare un foglio attaccato alla saracinesca: la carta che schiocca contro la lamiera (il tonfo della lamiera dietro,
+  // appena, lo schiocco della carta) e un fruscio. Le cose che non sono carta (data-suono in index.html): la carta lucida
+  // dei poster, il cartoncino, lo scontrino termico che crocchia, l'asse di legno delle zucche, il cartello di lamiera
+  // smaltata appeso al fil di ferro; la petizione, con le penne che ballano
+  const carta = (out, t, { tipo = '', a = 0.4 } = {}) => {
+    if (tipo === 'legno') return legno(out, t, { a })
+    if (tipo === 'cartello') return cartello(out, t, { a })
+    const lucida = tipo === 'lucida', spessa = tipo === 'cartoncino', termica = tipo === 'scontrino'
+    soffio(out, t, { a: a * (spessa ? 0.5 : 0.35), att: 0.0015, tau: spessa ? 0.012 : 0.008, tipo: 'rosa', filtri: [filtro('lowpass', spessa ? 600 : 900)] })
+    soffio(out, t, { a: a * (lucida ? 0.5 : 0.4), att: 0.0006, tau: lucida ? 0.004 : 0.003, filtri: [filtro('bandpass', lucida ? 4200 : termica ? 5200 : 2800, 0.9)] })
+    batti(out, t + 0.001, 'saracinesca', { a: a * 0.08, rate: caso(1.4, 1.8), fine: 0.12 })
+    const d = termica ? caso(0.12, 0.2) : caso(0.07, 0.12), s = fonte(crepita(), t + 0.004, { fine: t + d + 0.03, rate: termica ? caso(1.6, 2) : caso(0.9, 1.2) }), g = guadagno(0)
+    fila(s, filtro('bandpass', termica ? 5000 : lucida ? 3600 : 2600, 0.8), g, out)
+    g.gain.setValueAtTime(0, t + 0.004); g.gain.linearRampToValueAtTime(a * (termica ? 0.5 : 0.25), t + 0.012); g.gain.linearRampToValueAtTime(0, t + d)
+    if (tipo === 'petizione') penne(out, t + 0.03, { n: 3, a: a * 0.6 })
+  }
+  // l'asse delle zucche: un «toc» di legno, e l'asse attaccata col nastro che ballonzola contro la lamiera
+  const legno = (out, t, { a = 0.45 } = {}) => {
+    soffio(out, t, { a: a * 0.4, att: 0.0008, tau: 0.004, tipo: 'rosa', filtri: [filtro('bandpass', 900, 0.8)] })
+    batti(out, t, 'legno', { a, rate: caso(0.92, 1.08) })
+    batti(out, t + caso(0.03, 0.05), 'legno', { a: a * 0.25, rate: caso(1.1, 1.25), fine: 0.08 })
+  }
+  // il cartello di rivalta, lamiera smaltata appesa al fil di ferro: il «tang» che ondeggia (la lamiera sottile si
+  // piega avanti e indietro: il suono va su e giù), il fil di ferro che sfrega, il cartello che ricade sulla saracinesca
+  const cartello = (out, t, { a = 0.45 } = {}) => {
+    const s = c.createBufferSource(), l = c.createOscillator(), lg = guadagno(0.03), g = guadagno(a)
+    s.buffer = corpo('smalto'); s.playbackRate.value = caso(0.95, 1.05)
+    l.frequency.value = caso(4, 7); fila(l, lg, s.playbackRate)
+    lg.gain.setValueAtTime(0.03, t); lg.gain.linearRampToValueAtTime(0, t + 1.6)
+    fila(s, g, out); s.start(t); l.start(t); l.stop(t + 1.9)
+    soffio(out, t, { a: a * 0.35, att: 0.0005, tau: 0.002, filtri: [filtro('bandpass', 3000, 1)] })
+    const d = caso(0.25, 0.4), f = fonte(R.bianco, t + 0.02, { fine: t + 0.02 + d }), gf = guadagno(0)
+    fila(f, filtro('bandpass', 4200, 4), gf, out)
+    gf.gain.setValueAtTime(0, t + 0.02); gf.gain.linearRampToValueAtTime(a * 0.06, t + 0.05); gf.gain.linearRampToValueAtTime(0, t + 0.02 + d)
+    const u = t + caso(0.25, 0.4)
+    batti(out, u, 'saracinesca', { a: a * 0.3, rate: caso(1.3, 1.6), fine: 0.3 })
+    batti(out, u, 'smalto', { a: a * 0.3, rate: caso(1.1, 1.2), fine: 0.4 })
+  }
+  // le bic che dondolano e si urtano, o battono sulla lamiera: tic di plastica
+  const penne = (out, t, { n = Math.round(caso(1, 3)), a = 0.3 } = {}) => {
+    for (let i = 0, u = t; i < n; i++, u += caso(0.05, 0.14)) {
+      batti(out, u, 'plastica', { a: a * caso(0.5, 1), rate: caso(0.85, 1.25) })
+      if (Math.random() < 0.4) batti(out, u + 0.002, 'saracinesca', { a: a * 0.05, rate: caso(2, 2.6), fine: 0.06 })
+    }
+  }
+  // la biro che scrive sul foglio attaccato alla saracinesca: lo sfrigolio della sfera sulla carta (rumore acuto, mosso
+  // dai tratti: le lettere, la penna che si alza fra una parola e l'altra), sotto il tamburo cupo della carta che batte
+  // sulla lamiera. La firma: più veloce, a occhielli, senza pause
+  const penna = (out, t, { durata = 1, n = 6, tipo = 'scrive' } = {}) => {
+    const N = Math.max(16, Math.ceil(durata * 120)), firma = tipo === 'firma', forma = new Float32Array(N)
+    let fase = 0, pausa = 0
+    const f = firma ? caso(9, 12) : caso(5, 7.5)
+    for (let i = 0; i < N; i++) {
+      const u = i / (N - 1)
+      fase += ((f * durata) / N) * TAU
+      if (!firma && pausa <= 0 && Math.random() < (n / N) * 0.6) pausa = Math.round(N * caso(0.03, 0.06))
+      const su = pausa-- > 0 ? 0.05 : 1
+      forma[i] = su * (0.35 + 0.65 * Math.abs(Math.sin(fase))) * Math.min(1, u * 12, (1 - u) * 14)
+    }
+    const s = fonte(R.rosa, t, { fine: t + durata + 0.05 }), g = guadagno(0), s2 = fonte(R.marrone, t, { fine: t + durata + 0.05 }), g2 = guadagno(0)
+    fila(s, filtro('highpass', 1500), filtro('peaking', 3600, 1.2, 6), g, out)
+    fila(s2, filtro('bandpass', 420, 2), g2, out)
+    g.gain.setValueCurveAtTime(forma.map((v) => v * 0.16), t, durata)
+    g2.gain.setValueCurveAtTime(forma.map((v) => v * 0.09), t, durata)
+  }
+  // il cappuccio della bic: «pop» quando salta via (e da qualche parte ricade), «clic» quando torna
+  const tappo = (out, t, { chiude = false, a = 0.3 } = {}) => {
+    if (chiude) { batti(out, t, 'plastica', { a, rate: 1.3 }); batti(out, t + 0.018, 'plastica', { a: a * 0.6, rate: 1.6 }); return }
+    tono(out, t, 0.05, curva([[0, 900], [1, 480]], 6), { a: a * 0.6, att: 0.002, cala: 0.012 })
+    soffio(out, t, { a: a * 0.4, att: 0.0005, tau: 0.003, filtri: [filtro('bandpass', 2400, 1)] })
+    batti(out, t + caso(0.25, 0.4), 'plastica', { a: a * 0.4, rate: caso(0.9, 1.1) })
+  }
+  // il foglio della petizione che si stacca dal muro (lo scotch che cede, l'aria) e torna (giù: il fruscio al contrario);
+  // attacca: il palmo che lo ripreme sullo scotch, due volte
+  const foglio = (out, t, { a = 0.6, giu = false } = {}) => {
+    const d = 0.32, s = fonte(R.rosa, t, { fine: t + d + 0.05 }), bp = filtro('bandpass', giu ? 2400 : 600, 0.9), g = guadagno(0)
+    bp.frequency.setValueAtTime(giu ? 2400 : 600, t); bp.frequency.exponentialRampToValueAtTime(giu ? 500 : 2600, t + d)
+    fila(s, bp, g, out)
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a * 0.16, t + d * 0.4); g.gain.linearRampToValueAtTime(0, t + d)
+    if (!giu) { const sc = fonte(crepita(), t, { fine: t + 0.12, rate: 1.4 }), gs = guadagno(0); fila(sc, filtro('highpass', 2500), gs, out); gs.gain.setValueAtTime(a * 0.3, t); gs.gain.setTargetAtTime(0, t, 0.03) }
+  }
+  const attacca = (out, t, { a = 0.45 } = {}) => {
+    for (const [u, k] of [[0, 1], [0.11, 0.7]]) {
+      soffio(out, t + u, { a: a * 0.4 * k, att: 0.002, tau: 0.012, tipo: 'rosa', filtri: [filtro('lowpass', 500)] })
+      batti(out, t + u, 'saracinesca', { a: a * 0.1 * k, rate: caso(1.2, 1.5), fine: 0.15 })
+    }
+  }
+
   return {
-    R, fonte, filtro, guadagno, fila, soffio, tono, eco, tampone,
+    R, fonte, filtro, guadagno, fila, soffio, tono, eco, tampone, corpo, batti,
+    campanello, risponde, citofono, vetro, telaio, maniglione, lucchetto, portachiavi, lattina, cartaBagnata, pacchetto, cartone, grissini,
+    pozza, pietra, neve, chiusino, muro, carta, legno, cartello, penne, penna, tappo, foglio, attacca,
     goccia, gronda, passeri, tortora, piccioni, ali, cornacchia, rondoni, merlo, civetta, allocco, grilli, cicale,
     campana, rintocco, tuono, lamiera, pozze, colpo, bussa, sbatte, fruscio, strappo, splat,
     motorino, clacson, tapparella, auto, stridio, minimo, ronzio, scintilla, split, ventola, bip, floppy, clic, giri, tasto, accesso,

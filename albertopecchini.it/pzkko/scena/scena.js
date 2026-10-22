@@ -27,6 +27,8 @@ import { acqua } from './acqua.js'
 import { bestie } from './bestie.js'
 import { spazzatura } from './spazzatura.js'
 import { portachiavi } from './portachiavi.js'
+import { penne } from './penne.js'
+import { tocchi } from './tocchi.js'
 import { meteo, METEO } from './meteo.js'
 import { REGIA } from './materiali.js'
 
@@ -192,6 +194,8 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   const a = acqua(scene, M, h, f)
   // le formiche, le mosche, le zanzare e le blatte (al posto dei disegni piatti della pagina)
   const b = bestie(scene, M, h, f, { ridotto: matchMedia('(prefers-reduced-motion: reduce)').matches })
+  // le tre bic della petizione, appese allo spago sotto il suo foglio (22.10)
+  const pn = penne(scene, M, f)
   // il meteo di Mantova: il cielo, la nebbia, le gocce e i fiocchi, il bagnato (meno gocce dove la scheda è più piccola)
   const me = meteo(scene, camera, M, h, { quante: livello === 'alta' || livello === 'ultra' ? 1 : livello === 'telefono' ? 0.4 : 0.55 })
   const tCostruita = performance.now()
@@ -572,22 +576,14 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   }
   const bestieCtx = { vista: { x0: 0, x1: 1, y0: 0, y1: 1 }, puntatore: null, buio: 0, fari: 0, telecamera: camera.position, lampada: h.lampadina.position, insegna: h.lettere.centri.testo, blatte: q.has('blatte') }
 
-  // ── il portachiavi per terra: tocca il raggio del puntatore? Il clic (o il tocco) preme il tasto, e sopra il puntatore
-  // diventa la manina (html.scena-tasto, scena.css: cambia solo entrando e uscendo) ──
-  const da = new T.Vector3(), verso = new T.Vector3()
-  const tocca = (x, y) => {
-    if (!visibile || perso || !dim.w) return false
-    camera.updateMatrixWorld()
-    da.setFromMatrixPosition(camera.matrixWorld)
-    verso.set((x / dim.w) * 2 - 1, 1 - (y / dim.h) * 2, 0.5).unproject(camera).sub(da).normalize()
-    return pc.tocca(da, verso)
-  }
-  let sulTasto = false
-  addEventListener('pointermove', (e) => {
-    const s = e.pointerType === 'mouse' && tocca(e.clientX, e.clientY)
-    if (s !== sulTasto) { sulTasto = s; root.classList.toggle('scena-tasto', s) }
-  }, { passive: true })
-  addEventListener('click', (e) => { if (!e.defaultPrevented && tocca(e.clientX, e.clientY)) { e.preventDefault(); pc.premi() } })
+  // ── le cose che si toccano (tocchi.js, dal 22.10): il citofono, la porta, il lucchettone, il portachiavi della banca
+  // $pzk, la roba per terra, le pozzanghere. Il raggio del puntatore sceglie la più vicina; sopra, il puntatore diventa
+  // la manina (html.scena-tasto, scena.css: cambia solo entrando e uscendo) ──
+  const tc = tocchi({ camera, dim, h, sp, pc, M, visibile: () => visibile && !perso && dim.w > 0 })
+  // mentre la petizione è aperta (petizione.js) la scena si riposa: il foglio grande vola sopra un'immagine ferma, e la
+  // scheda grafica non lavora per niente. Si risveglia quando il foglio è tornato al suo posto
+  let riposo = false
+  document.addEventListener('pzkko-petizione', (ev) => { const fase = ev.detail?.fase; if (fase === 'aperta') riposo = true; else if (fase === 'chiusa' || fase === 'apre') riposo = false })
 
   // ── un fotogramma ──────────────────────────────────────────────────────────
   // (fps: i fotogrammi al secondo, contati in giro, sotto, due volte al secondo: il portachiavi e la regia)
@@ -608,6 +604,9 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     b.aggiorna(dt, now, bestieCtx)
     h.negozio?.aggiorna(now, bestieCtx.vista)
     sp.aggiorna()
+    // le penne della petizione che dondolano, la lattina che rotola, il pulsante del citofono (le ombre li vogliono)
+    const dondola = pn.aggiorna(dt, now, { vento: Math.hypot(METEO.vento?.x ?? 0, METEO.vento?.y ?? 0), puntatore: bestieCtx.puntatore })
+    const toccato = tc.aggiorna(dt)
     // (il meteo resta quello della foto del caricamento finché la foto non è sfumata: poi va verso quello vero, piano)
     me.aggiorna(dt, now, { buio: stato.buio, lampioni: stato.lampioni, vista: bestieCtx.vista, tieni: fotoCarico || (conFoto && (!visibile || now - tVista < FOTO)) })
     n++
@@ -615,7 +614,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     // sole si è spostato di 0,15° (ogni ~40 s) e quando una luce si è appena accesa (non dipendono dalla telecamera:
     // il volo non le tocca). Di chi è spento non si rifanno (nei primi fotogrammi sì, così le mappe esistono: un
     // sampler d'ombra senza mappa è un errore GL)
-    const mosso = n < 4 || stato.auto || f.inMoto(now)
+    const mosso = n < 4 || stato.auto || f.inMoto(now) || dondola || toccato
     if (l.sole.visible && (mosso || acceso || stato.dir.dot(ultimoSole) < COS_SOLE)) { l.sole.shadow.needsUpdate = true; ultimoSole.copy(stato.dir) }
     if (h.lampada.visible && (mosso || acceso)) h.lampada.shadow.needsUpdate = true
     // gli specchi: fermi finché niente si muove (il riflesso di prima è ancora giusto; ogni mezzo secondo comunque, per
@@ -672,6 +671,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   const giro = (now) => {
     if (fermo || perso) return
     requestAnimationFrame(giro)
+    if (riposo) { prima = now; return }
     const dt = Math.min((now - prima) / 1000, 0.1)
     prima = now
     contati++
@@ -751,7 +751,7 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
   }
   // (lontano: la scatola dell'inquadratura da lontano, per carico.mjs: la foto del caricamento la ritaglia con questi numeri)
   // (grafica: quello che la regia mostra e cambia; imposta: «auto», un livello o «su misura»; pc: il portachiavi per terra)
-  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, sp, pc, me, meteo: METEO, M, liv, vetrina, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale(),
+  window.pzkkoScena = { scene, camera, renderer, composer, bloom, h, f, l, a, b, sp, pc, pn, tc, me, meteo: METEO, M, liv, vetrina, fase: () => fase, dpr: () => dpr, insieme: () => l.attuale(),
     get qualita() { return livello }, fps: () => fps, imposta, livelli: LIVELLI,
     grafica: () => ({ modo, livello, liv: { ...liv }, dpr, voluta: voluta(dim.w || innerWidth, dim.h || innerHeight), lato: LATO, adattata, prova: q.has('qualita') || !!dprFisso, poche: !!h.luciPoche }),
     lontano: { ...scatola(), respiro: RESPIRO, d: (RESPIRO * scatola().bh) / TAN_LONTANO } }

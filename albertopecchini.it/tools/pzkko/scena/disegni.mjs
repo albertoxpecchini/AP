@@ -51,6 +51,18 @@ const DISEGNI = {
     aspect_ratio: '1024x1536',
     usa: { file: 'scena/terra/pzkkonet.webp', larg: 512, alt: 725, qualita: 76 },
   },
+  // 22.10: il pacchetto dei grissini alla pizza, aperto per terra coi grissini che escono (scena/spazzatura.js)
+  grissini: {
+    prompt: `The front face of a long flat plastic flow-wrap packet of Italian breadsticks, laid flat and seen from straight above, filling the image: glossy printed film with crimped serrated seals at the left and right ends; a deep tomato-red background with a wavy band of white and basil green; the brand «grissin pzk» in bold cream-white rounded letters with a small cartoon snail holding a breadstick, the flavour «gusto pizza» in big yellow script on a red ribbon, small text «pomodoro e origano · 125 g»; a long clear window in the middle through which you see golden breadsticks lying side by side, dusted with red tomato powder and green oregano flakes. A little crumpled, the film creased, a few crumbs. ${FLAT}`,
+    aspect_ratio: '2048x1152',
+    usa: { file: 'scena/terra/grissini.webp', larg: 1024, alt: 576, qualita: 80 },
+  },
+  // la trama dei grissini che escono dal pacchetto: un pezzo dritto di un grissino della sua finestra (niente da
+  // disegnare: si ritaglia da «grissini»; nella scena si ripete lungo il bastoncino)
+  grissino: {
+    da: 'grissini',
+    usa: { file: 'scena/terra/grissino.webp', ritaglio: [400, 729, 420, 22], larg: 512, alt: 32, qualita: 82 },
+  },
   menu: {
     prompt: `A printed take-away menu flyer of a Chinese restaurant: a red header «pechino · ristorante cinese» with a small golden dragon, a short list of dishes with prices in Italian (ravioli al vapore 4,50 €, spaghetti di soia 5,00 €, pollo alle mandorle 6,50 €, involtini primavera 3,00 €), «consegna a domicilio · mantova · 0376 000 000» at the bottom. Cheap off-white paper, red and gold ink, a little torn, dirty and wet. ${FLAT}`,
     aspect_ratio: '1024x1536',
@@ -120,6 +132,7 @@ const ultimo = async (nome) => {
 
 async function genera(nome) {
   const d = DISEGNI[nome]
+  if (!d.prompt) return console.log(`· ${nome}: niente da disegnare, si ritaglia da «${d.da}» (usa ${nome})`)
   const input = { prompt: d.prompt, aspect_ratio: d.aspect_ratio, quality: 'high', number_of_images: 1, output_format: 'png', background: d.background || 'opaque' }
   if (d.ingresso) {
     // (la mappa pulita da «usa», se c'è: la rifinita; se no l'ultimo disegno così com'è, es. la faccia del lucchetto)
@@ -134,9 +147,10 @@ async function genera(nome) {
 
 async function usa(nome) {
   const { default: sharp } = await import('sharp')
-  const d = DISEGNI[nome].usa, file = await ultimo(nome)
-  if (!file) die(`nessun PNG per ${nome}: prima «genera ${nome}»`)
+  const d = DISEGNI[nome].usa, da = DISEGNI[nome].da ?? nome, file = await ultimo(da)
+  if (!file) die(`nessun PNG per ${da}: prima «genera ${da}»`)
   let img = sharp(file)
+  if (d.ritaglio) { const [left, top, width, height] = d.ritaglio; img = sharp(await img.extract({ left, top, width, height }).toBuffer()) }
   img = d.alt ? img.resize(d.larg, d.alt, { fit: 'cover' }) : img.resize(d.larg)
   if (d.grigio) img = img.grayscale()
   // la mappa delle altezze: il modello la disegna come un rilievo illuminato (i rilievi più chiari del piano, con un

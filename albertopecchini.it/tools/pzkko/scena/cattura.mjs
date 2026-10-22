@@ -67,7 +67,8 @@ for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1', '/stor
     // la pagina spoglia: solo il volantino scelto, senza ombre né rotazione, su trasparente
     const s = document.createElement('style')
     s.textContent = `html,body,.strada,.muro{background:none!important}.muro{box-shadow:none!important}.muro::before,.muro::after,.buio,.fari,.freni,.neonauto,.portale,.goccia,.spruzzo,.formica,.mosca{display:none!important}
-      .it{visibility:hidden}.it.scatto{visibility:visible;filter:none!important;transform:none!important;z-index:99!important}.it.scatto *{transition:none!important}`
+      .it{visibility:hidden}.it.scatto{visibility:visible;filter:none!important;transform:none!important;z-index:99!important}.it.scatto *{transition:none!important}
+      .pet-penne,.pet-firme{display:none!important}`
     document.head.appendChild(s)
   })
   const vols = await page.$$('.parete .vol, .parete .it.foto')
@@ -82,13 +83,15 @@ for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1', '/stor
       const clip = { x: r.left + scrollX - m, y: r.top + scrollY - m, width: r.width + 2 * m, height: r.height + 2 * m }
       const chiave = el.id || (el.querySelector('h3, .titolo')?.textContent ?? 'foglio')
       const nome = chiave.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      const tag = el.querySelector('.tagliandi'), live = el.querySelector('.live-foto')
+      const tag = el.querySelector('.tagliandi'), live = el.querySelector('.live-foto'), righe = el.querySelector('.pet-righe')
       const rel = (b) => ({ x: Math.round((b.left + scrollX - clip.x) * SCALA), y: Math.round((b.top + scrollY - clip.y) * SCALA), w: Math.round(b.width * SCALA), h: Math.round(b.height * SCALA) })
       return {
         nome, clip, cw: r.width,
         fascia: tag ? rel(tag.getBoundingClientRect()) : null,
         tagliandi: tag ? [...tag.querySelectorAll('button')].map((b) => rel(b.getBoundingClientRect())) : null,
         live: live ? rel(live.getBoundingClientRect()) : null,
+        // la petizione: dove stanno le righe delle firme (la scena ci scrive sopra quelle vere) e quante sono
+        firme: righe ? { ...rel(righe.getBoundingClientRect()), righe: Number(getComputedStyle(righe).getPropertyValue('--righe')) || 10 } : null,
       }
     }, SCALA, MARGINE)
     if (manifesto[info.nome]) throw new Error(`due fogli si chiamano «${info.nome}» (${pagina}): la scena non saprebbe quale foto usare`)
@@ -101,8 +104,8 @@ for (const pagina of ['/?ora=12:00&muro=1', '/404.html?ora=12:00&muro=1', '/stor
       const buco = { create: { width: f.w, height: f.h + 2, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 1 } } }
       await sharp(png).composite([{ input: await sharp(buco).png().toBuffer(), left: f.x, top: f.y - 1, blend: 'dest-out' }]).webp({ quality: 84, alphaQuality: 88 }).toFile(join(OUT, `${info.nome}-senza.webp`))
     }
-    manifesto[info.nome] = { w: meta.width, h: meta.height, m: Math.round(info.clip.width * MARGINE / (1 + 2 * MARGINE) * SCALA), cw: Math.round(info.cw * 100) / 100, scala: SCALA, tagliandi: info.tagliandi, ...(info.live ? { live: info.live } : {}) }
-    console.log(`${info.nome}: ${meta.width}×${meta.height}${info.tagliandi ? ` (${info.tagliandi.length} tagliandi)` : ''}${info.live ? ' (live photo)' : ''}`)
+    manifesto[info.nome] = { w: meta.width, h: meta.height, m: Math.round(info.clip.width * MARGINE / (1 + 2 * MARGINE) * SCALA), cw: Math.round(info.cw * 100) / 100, scala: SCALA, tagliandi: info.tagliandi, ...(info.live ? { live: info.live } : {}), ...(info.firme ? { firme: info.firme } : {}) }
+    console.log(`${info.nome}: ${meta.width}×${meta.height}${info.tagliandi ? ` (${info.tagliandi.length} tagliandi)` : ''}${info.live ? ' (live photo)' : ''}${info.firme ? ` (petizione: ${info.firme.righe} righe)` : ''}`)
   }
   await page.close()
 }

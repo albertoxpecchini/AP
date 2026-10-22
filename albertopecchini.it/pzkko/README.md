@@ -27,13 +27,24 @@ serio ma è un progetto Vercel a parte.
   fragole, mirtilli e lamponi), `landini/` (la copertina e la pagina
   dell'avviamento del libretto d'istruzioni del landini L 25 testacalda, 1957,
   disegnati dal modello: non è la scansione di un libretto vero) e `arte4/`
-  (l'illustrazione del volantino di tiktok).
+  (l'illustrazione del volantino di tiktok). Il 22.10, al posto dei tre meme della
+  storia, `manifesti6/` (il cartello delle zucche mantovane dipinto su un'asse, il
+  cartello stradale di Rivalta sul Mincio rubato e appeso col fil di ferro, il
+  promemoria del dentista con l'appuntamento vero, l'offerta della Epson EcoTank
+  ET-2825), `manifesti7/` (la pubblicità dell'iPhone Duo «da 3625 $», che non esiste,
+  lo scontrino di Tecnomat delle due stufe a legna da 1.803,10 €, il corso di potatura
+  dei bonsai, la gita in pullman «verona e l'arena tour»), `manifesti8/` (tre
+  manifesti inventati: «MODENA e l'assalto al supermercato», il film; la protesta
+  francese contro il carovita; «GEN. VANNACCI AL POTERE?», solo scritte e un berretto:
+  niente facce né simboli di partito) e `penne/` (le tre bic cristal della petizione
+  legate allo spago, più la nera e la rossa senza cappuccio e i cappucci a parte, che
+  fa `../tools/pzkko/penne.mjs` dalla punta della blu; le misure in `penne.json`).
   Ogni WebP porta dentro il prompt con cui è nato; le misure stanno in
   `pezzi.json`. I marchi e i nomi veri su quei manifesti (Moncler, Frisk,
   Lyca Mobile, TIM, Starlink, brat, Unimore, Unibo, Red Bull, Estathé, Eastpak,
-  Landini) sono quelli che si trovano su un muro di città, disegnati dal
-  modello: non sono pubblicità né collaborazioni, e nessuno di loro ha a che
-  fare con questo sito.
+  Landini, Epson, Apple, Tecnomat) sono quelli che si trovano su un muro di città,
+  disegnati dal modello: non sono pubblicità né collaborazioni, e nessuno di loro ha
+  a che fare con questo sito.
   **Le foto vere** (21.10): `amici/` sono gli adesivi con le foto di Alberto e
   degli amici (la persona scontornata da bria/remove-background, col bordo
   bianco dell'adesivo fustellato; quello sul landini all'aratura è una foto di
@@ -68,6 +79,12 @@ serio ma è un progetto Vercel a parte.
   l'anteprima per i social (`og.jpg`). Vedi «Gli strumenti», sotto.
 - `api/meteo.mjs` — la funzione Vercel che dà alla scena il meteo di Mantova (da
   Open-Meteo, dieci minuti in cache; vedi «Il meteo» e «Vercel», sotto).
+- `api/firme.mjs` — la funzione Vercel della petizione (22.10): le firme vere, su Vercel
+  Blob (vedi «Vercel», sotto).
+- `petizione/` — la petizione «pzkko.it è un bel sito?» (vedi «Com'è fatta la home»):
+  `firme.js` (le firme dal server e come si disegnano a mano, per il muro, la scena 3D e
+  il foglio da vicino), `petizione.js` e `petizione.css` (il foglio che si avvicina, le
+  penne, la scrittura).
 - `regia/` — la regia, il pannello per provare e regolare il sito, che si apre col
   tasto giallo in alto a destra (vedi sotto): `regia.js` e `regia.css`.
 - `suono/` — i suoni della strada, tutti sintetizzati dal vivo (vedi «Il suono»,
@@ -84,7 +101,8 @@ serio ma è un progetto Vercel a parte.
   (le lastre e le pozzanghere, disegnate dallo shader), `spazzatura.js` (la
   spazzatura della casa per terra e il chiusino di pzkkonet), `portachiavi.js` (il token
   della banca $pzk per terra accanto al chiusino, col display che dice i fotogrammi al
-  secondo), `prossima.js` (l'altra
+  secondo), `tocchi.js` (le cose che si toccano: il citofono, la porta, la roba per terra, le
+  pozzanghere), `penne.js` (le bic della petizione appese allo spago), `prossima.js` (l'altra
   pagina col 3D, scaricata in cache mentre si guarda questa: vedi «Il caricamento è il
   pomodoro»), `fronte.js` (il fronte
   del negozio: la porta a vetri, il citofono, la targa del 28, il cartello «chiuso», il
@@ -201,6 +219,31 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   scaricato (`download="pzk$meeting.zip"`; sul server resta `lezioni.zip`, e
   l'indirizzo resta `tools/lezioni/`). Il titolo è al 76% (`--ts:.76`): in Anton
   «pzk$meeting» usciva dal foglio. La chiave nelle pile è `vol:pzk$meeting`.
+- **La petizione** (22.10, `#petizione`, nella quinta colonna sul computer e nella
+  seconda sul telefono): un foglio a4 stampato, «petizione popolare · pzkko.it è un bel
+  sito?», con la tabella (n., nome e cognome, data, ora, firma) e sotto tre bic cristal
+  (blu senza cappuccio, nera, rossa) legate allo spago e attaccate al foglio con lo
+  scotch, che dondolano al passaggio del puntatore. **Le firme sono vere**: le salva
+  `api/firme.mjs` (vedi «Vercel») e le vede chiunque apra la pagina. Sul foglio del muro
+  le ultime dieci, scritte a mano da `petizione/firme.js` su una tela (`.pet-firme`, in
+  multiply come l'inchiostro): ognuna con la sua calligrafia (Caveat, Reenie Beanie,
+  Nothing You Could Do, Homemade Apple), un po' storta, la data e l'ora di Mantova e uno
+  scarabocchio per firma, tutti decisi dall'id della firma (uguali per tutti); il colore
+  è quello della bic scelta. Toccando il foglio (o una penna) **si stacca dal muro e si
+  avvicina** (`petizione/petizione.js` e `.css`): il foglio grande è già della sua misura
+  finale e parte rimpicciolito e storto sopra quello del muro (FLIP: solo transform e
+  opacity, composti dalla scheda grafica), così resta nitido e non scatta; la scena 3D
+  sotto, a volo finito, si riposa (non disegna) fino al ritorno. Sul foglio da vicino
+  scorrono le ultime 60 firme, la riga nuova è evidenziata: si sceglie la penna, si
+  scrive il nome e la penna **va a scrivere davvero**: lo spago si allenta e si tende, il
+  cappuccio della nera e della rossa salta via, la punta segue la scrittura (il nome, la
+  data, l'ora, lo scarabocchio, ognuno col suo tempo e il suo suono), poi la penna torna a
+  dondolare, «grazie! hai firmato alle…» a pennarello e il foglio torna al muro con la
+  firma nuova in fondo. Il browser ricorda chi ha firmato (`pzkko-firma`): la sua riga è
+  ripassata con l'evidenziatore, e c'è «firma per un'altra persona». Senza server
+  (`offline`) il foglio si vede ma non si firma. `pzkko.it/#petizione` lo apre da solo.
+  Gli strumenti che fotografano la pagina non caricano il modulo (`?petizione` sì): la
+  foto del foglio per la scena è vuota e le firme le scrive la scena dal vivo.
 - **I tagliandi**: i volantini dei social finiscono con una fila di tagliandi
   da strappare, fette della stessa carta (lo script dà a ogni tagliando il
   suo pezzo di foglio come sfondo): toccarne uno lo strappa, copia il contatto
@@ -218,8 +261,8 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   manifesto sotto il puntatore viene davanti a tutti (`z-index: 20`); sul
   telefono basta toccarlo (lo script gli mette `.sopra`).
 - **La disposizione**: ogni cosa sul muro è posizionata in assoluto in
-  1280esimi della parete (`--x`, `--y`, `--w`, `--r`, alta 2989 dal 21.10) e, sotto i
-  900 px, in 390esimi (`--mx`, `--my`, `--mw`, `--mr`, alta 5228); su un
+  1280esimi della parete (`--x`, `--y`, `--w`, `--r`, alta 3191 dal 22.10, era 2989) e, sotto i
+  900 px, in 390esimi (`--mx`, `--my`, `--mw`, `--mr`, alta 5486, era 5228); su un
   tablet la parete non supera i 600 px e la lamiera riempie i lati. Dal 17.10
   la composizione è a pile: cinque colonne da ~250 unità sul desktop e due sul
   telefono, ogni pezzo sovrapposto di poco a quello sopra, graffiti e nastri
@@ -412,7 +455,7 @@ quello, senza che la pagina se ne accorga.
   posizione della parete si rilegge solo quando la pagina cambia misura (a ogni
   fotogramma basta lo scorrimento).
 - **Il telefono**: la parete è quella del telefono (due colonne, 390esimi, alta
-  5228), quindi la saracinesca è larga 0,95 m e alta ~12,7 m (i volantini restano
+  5486 dal 22.10), quindi la saracinesca è larga 0,95 m e alta ~13,4 m (i volantini restano
   grandi come quelli veri, ~45 cm); l'insegna, la lampada e il piano di sopra si
   mettono rispetto a lei. Le foto dei volantini sono fatte apposta nella
   disposizione del telefono (`vol-m/`: lì il testo è un po' più grande). Di notte
@@ -715,8 +758,42 @@ quello, senza che la pagina se ne accorga.
   volantini bagnati** incollati alle lastre (la **Hyundai Tucson** di pzkko motors,
   **pzkkonet** «la fibra che arriva anche dove non c'è», il menu del ristorante
   **pechino**), sedici **gomme da masticare** appiccicate (vecchie e nere, qualcuna
-  fresca rosa o menta). Se un'immagine non arriva resta il colore pieno: la scena
-  parte lo stesso.
+  fresca rosa o menta) e, dal 22.10, **i grissini alla pizza**: il pacchetto di
+  «grissin pzk · gusto pizza» schiacciato e aperto da un lato, sei grissini che escono a
+  ventaglio, due per terra (uno rotto in tre pezzi) e le briciole (la faccia del
+  pacchetto è `terra/grissini`, la trama dei grissini `terra/grissino`, ritagliata da
+  `disegni.mjs usa grissino` dalla finestra del pacchetto). Se un'immagine non arriva
+  resta il colore pieno: la scena parte lo stesso.
+- **Le cose che si toccano** (22.10, `tocchi.js`): il raggio dalla telecamera passa per
+  il puntatore e vince la cosa più vicina; col mouse si suona alla pressione, col dito al
+  tocco (il clic: un dito che scorre non suona niente), e sopra le cose il puntatore è
+  la manina. **Il citofono**: il pulsante d'ottone è un disco vero sopra quello disegnato
+  (la stessa immagine), si abbassa di 2 mm e il campanello trilla dentro il negozio
+  finché lo si tiene (fino a 4 s); a volte poi il citofono si apre, fruscia e si richiude
+  senza che nessuno parli. **La porta**: il vetro si bussa, i profili d'alluminio
+  suonano vuoti, il maniglione la fa sbattere sulla serratura (è chiusa a chiave). Il
+  **lucchettone** (ottone contro ferro, dondola), il **portachiavi** (il tasto e le chiavi
+  che tintinnano), il **muro**. Per terra **la lattina** (rotola avanti e indietro sulla
+  pancia e scivola un filo), il pacchetto di sigarette, la scatola del ramen, i volantini
+  bagnati, i grissini (sobbalzano), il **chiusino** (ghisa che dondola nel telaio), **le
+  pozzanghere** (dove c'è acqua: il campo delle pozze di `marciapiede.js` rifatto in
+  JavaScript, `acquaQui`; tre anelli si allargano dal dito nello specchio delle pozze,
+  `ONDE`, quattro tocchi alla volta; sul telefono, senza specchi, solo il suono), la
+  pietra, la neve. Sopra i fogli e i link comanda la pagina (i volantini, i tagliandi,
+  la saracinesca nuda); l'evento che tocca una cosa porta `pzkkoTocco`, e suono.js non
+  bussa anche la saracinesca che c'è dietro. `window.pzkkoScena.tc.trova(x, y)` dice cosa
+  c'è sotto un punto della finestra.
+- **Le penne della petizione** (22.10, `penne.js`): le tre bic sono modelli (il fusto
+  esagonale trasparente col tubetto dentro, il tappino, la punta con la sfera d'ottone, il
+  cappuccio con la clip), appese allo spago sotto il foglio della petizione con le misure
+  del CSS della pagina; mesh a istanze, una per materiale: tre penne in cinque chiamate di
+  disegno. Ognuna è un pendolo smorzato: il vento vero le fa dondolare (e staccare un filo
+  dalla lamiera), il puntatore che ci passa sopra le spinge, il foglio che si alza le
+  scuote; si appoggiano alle doghe (`superficie` di `fogli.js`). Mentre si muovono le
+  ombre si rifanno. Il foglio della petizione, nella scena, ha sopra la sua foto le firme
+  vere (`fogli.js`, la stessa `disegna` della pagina, dove `cattura.mjs` ha misurato la
+  tabella: `firme` in `vol.json`); mentre il foglio si è avvicinato per firmare, qui
+  spariscono foglio e penne (evento `pzkko-petizione`), e la scena si riposa.
 - **Il chiusino di pzkkonet**: telaio quadrato di **80 cm** col coperchio tondo,
   **in squadra col marciapiede** (nessuna rotazione: prende due righe di lastre,
   coi lati sulle fughe) e **in mezzo all'inquadratura** in fondo alla pagina (sul
@@ -1215,13 +1292,31 @@ quando i suoni partono.
   il disco che lavora, qualcuno che va nel Setup con le frecce, le quattro note di legno della
   scrivania (non è il suono di Ubuntu), la password, il comando battuto, Invio; poi il panico,
   e da capo.
-- **Le mani**: il foglio che si alza fruscia, il tagliando si strappa, un clic sulla
-  saracinesca nuda (non su un foglio) la bussa, il pomodoro del caricamento fa splat (se i suoni
-  sono già accesi).
+- **Le mani**: il foglio che si alza fruscia, il tagliando si strappa, il pomodoro del
+  caricamento fa splat (se i suoni sono già accesi). Dal 22.10 (col mouse alla pressione, col
+  dito al tocco): **un foglio toccato** schiocca contro la lamiera col suo materiale
+  (`data-suono` in `index.html`: la carta, la carta lucida dei poster, il cartoncino del
+  dentista, lo scontrino termico che crocchia, l'asse di legno delle zucche, il cartello di
+  lamiera smaltata che ondeggia sul fil di ferro e ricade sulla saracinesca); **la saracinesca
+  nuda**, rifatta: il tonfo delle nocche, il rombo grave del telo di doghe, la lamiera, le doghe
+  che ballano nelle guide sempre più fitte e più piano, più secca in basso (la barra chiusa col
+  lucchettone), più rimbombante a metà, più ballerina in alto. **Le cose della scena**
+  (`tocchi.js`, evento `tocco`), ognuna col suo strumento e dal suo posto nel mondo: il
+  campanello (il pulsante che scatta, il campanello elettrico dietro il vetro che trilla finché
+  si tiene premuto, il citofono che a volte si apre e fruscia), il vetro, l'alluminio, il
+  maniglione, il lucchettone, il portachiavi, la lattina, la carta bagnata, il pacchetto, il
+  cartone, i grissini, la pozzanghera (lo schiaffo, il «plop» della bolla, gli schizzi), la
+  pietra, la neve, il chiusino, il muro. Sono **corpi percossi** (`corpo` e `batti` in
+  `voci.js`): i modi di vibrazione di ogni materiale calcolati una volta in un tampone, tre
+  varianti un filo diverse, così due colpi di fila non sono mai uguali. **La petizione**: il
+  foglio che si stacca e torna, le penne che si urtano, il cappuccio che salta via e torna con
+  un clic, **la biro che scrive** (lo sfrigolio della sfera mosso dai tratti, il tamburo della
+  carta sulla lamiera; la firma più veloce, a occhielli).
 - **Il banco**: tutto passa da un filtro (la nebbia e la neve), da un compressore (i tuoni) e
   dal volume. I punti usa e getta (un uccello, una goccia) si staccano da soli dopo 30 secondi.
 - **La regia** ha la scheda «suono»: acceso, il volume, e ogni suono che capita da solo da far
-  partire adesso.
+  partire adesso (dal 22.10 anche le cose che si toccano: campanello, vetro, maniglione, lattina,
+  pozza, chiusino, cartello, l'asse delle zucche, la carta, la biro).
 - **Le prove**: `node tools/pzkko/suono/ascolta.mjs strumenti [nome…]` registra ogni strumento
   da solo in un `OfflineAudioContext` di Chromium; `… strada [giorno|notte|temporale|tramonto|
   zanzara|negozio]` registra la home vera col 3D, dal vivo (20–30 s l'una). Per ognuno scrive in
@@ -1353,12 +1448,10 @@ della Cucina alla Camera di Commercio di Bologna il 17.10.1982 e rivista nel 202
   piccole).
 - **Sul muro** la porta il volantino «da dove viene questo muro?», subito sotto
   «chi sono» (colonna 0, sul computer e sul telefono), con la prima foto stampata
-  sopra. Tre meme stampati (`art/storia/muro/`: la mortadella, il fotografo di
-  saracinesche, la nonna) stanno in fondo fra la roba degli altri e portano anche
-  loro alla storia: sono le stampe della pagina della storia, scritte comprese,
-  fotografate dal browser con `storia.mjs muro`. Con loro e «testa o croce»
-  spostato in fondo alla quinta colonna le pile del computer finiscono tutte fra
-  2314 e 2410 unità (parete 2450, prima 2258).
+  sopra. Fino al 22.10 c'erano anche tre meme stampati (`art/storia/muro/`: la
+  mortadella, il fotografo di saracinesche, la nonna, le stampe della pagina della
+  storia fotografate con `storia.mjs muro`): tolti su richiesta di Alberto per fare
+  posto alla roba nuova (le immagini restano in `art/storia/muro/`).
 
 ## Le immagini
 
@@ -1443,6 +1536,9 @@ accorciare la saracinesca; a coprirsi di più sono i manifesti finti, i titoli d
 volantini veri si leggono tutti. `disponi.mjs`, `cattura.mjs`, `foto.mjs` e `trame.mjs`
 trovano il browser con `../tools/pzkko/browser.mjs` (Chromium di Playwright, se
 no Edge); con Edge le altezze dei volantini vengono qualche unità diverse.
+Il 22.10 la roba nuova (i manifesti 6, 7 e 8, la petizione) ha preso il posto dei tre meme della
+storia e lo spazio libero in fondo alle colonne, e la parete è cresciuta da sé (la colonna più
+lunga più `bottom`): 3191 unità sul computer (5,1 m di saracinesca 3D), 5486 sul telefono.
 
 ## Vercel
 
@@ -1458,6 +1554,25 @@ Progetto `pzkko` dal repository `albertoxpecchini/AP`:
   `albertopecchini.it` la pubblica `albertopecchini.it/api/meteo.js`, che la
   riesporta (e c'è anche su albertopecchini.it: male non fa). In locale la serve
   `npm run dev:pzkko`.
+- `/api/firme` (22.10): la petizione. `api/firme.mjs` qui dentro, pubblicata come il meteo da
+  `albertopecchini.it/api/firme.js` finché la radice è lì. Le firme stanno in un JSON privato su
+  **Vercel Blob** (`pzkko/firme.json`), letto dall'origine e riscritto con `ifMatch` sull'ETag
+  (due firme insieme non si cancellano: chi perde riprova), come il database di Better Call
+  Pekko (`api/bcp.js`). **Va collegato uno store Blob al progetto pzkko** (Vercel › pzkko ›
+  Storage › Connect, lo store privato di bcp o uno nuovo): Vercel aggiunge
+  `BLOB_READ_WRITE_TOKEN` e al deploy dopo la petizione si accende; senza, risponde «offline» e
+  il foglio si vede ma non si firma. Protezioni: campo trappola, 2,5 s minimi da quando il
+  foglio si è avvicinato, al massimo 2 firme in 10 minuti e 6 al giorno per IP (in memoria,
+  l'IP non si salva), lo stesso nome una volta al giorno, 120 firme l'ora in tutto, nomi di
+  2–32 lettere senza link, numeri di telefono, emoji né parolacce (anche camuffate: «c4zz0»,
+  «p u t t a n a»; non i cognomi veri come Negri o Negro), 5000 firme al massimo; a chi guarda
+  vanno le ultime 300 (venti secondi di cache sulla rete di Vercel, cinque minuti di riuso mentre si
+  rinfresca: le letture del Blob sul piano gratuito sono contate; chi firma vede subito la sua firma,
+  gli altri entro una ventina di secondi). **Moderazione**: con
+  `FIRME_ADMIN_KEY` nel progetto (e la stessa in `.env.local`), `node tools/pzkko/firme.mjs`
+  elenca le firme e `node tools/pzkko/firme.mjs via <id>` ne cancella una; oppure si modifica
+  `pzkko/firme.json` dalla pagina dello store. Se il progetto passa alla Root Directory
+  `albertopecchini.it/pzkko`, lì serve un `package.json` con `@vercel/blob`.
 - Domini: `www.pzkko.it` (principale), `pzkko.it` → 308 verso www
 - Ogni push su `main` pubblica da solo.
 
@@ -1471,7 +1586,8 @@ npm run dev:pzkko   # http://localhost:5182, si ricarica a ogni modifica
 Il server (`tools/dev.mjs`) serve la cartella così com’è e fa come Vercel con
 `vercel.json`: `/x` → `/x/`, `404.html` per le pagine che non ci sono, le stesse
 intestazioni. Niente Vite: riscriverebbe `new URL('.', import.meta.url)` dei
-giochi senza la barra finale.
+giochi senza la barra finale. Le firme della petizione, in locale, stanno in memoria finché
+il server resta acceso (`node tools/pzkko/firme.mjs --locale` le elenca).
 
 ## Crediti
 
@@ -1480,5 +1596,7 @@ richiesta di Alberto il 9.10.2026 (è il suo sito; i giochi portano ancora il cr
 Le immagini del muro sono generate con openai/gpt-image-2 su Replicate, come le
 figure delle carte del blackjack (`art/blackjack/`, il prompt nel `.json`
 accanto a ogni figura); i caratteri sono di Google Fonts con le licenze dette
-sopra. Le foto degli adesivi sono di Alberto e dei suoi amici; quella sul landini
+sopra, e quelli delle firme della petizione (22.10, `fonts/`, solo il sottoinsieme latino,
+16–51 KB, scaricati solo quando servono) Caveat, Reenie Beanie e Nothing You Could Do (SIL
+OFL) e Homemade Apple (Apache 2.0). Le foto degli adesivi sono di Alberto e dei suoi amici; quella sul landini
 è di simo4gantos8 (il credito è stampato sull'adesivo).

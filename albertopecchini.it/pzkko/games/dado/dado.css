@@ -1,0 +1,121 @@
+/* La finestra del dado (il sic bo) di pzkko.it: lo stesso foglio col nastro
+   della roulette e del blackjack (art/roulette/carta.webp), 800 × 600 sul
+   computer, a tutto schermo sul telefono. Dentro: la campana 3D (canvas), il
+   tavolo stampato sul foglio (SVG in multiply), le fiches fotografate. Caratteri
+   e colori quelli del muro. */
+
+.dd{position:fixed;inset:0;margin:auto;width:800px;height:600px;max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#161616;
+  font:400 14px/1.3 "Special Elite","Courier New",monospace;--rosso:#b3121f;--nero:#161616;--evid:rgba(255,212,0,.55);--marker:"Permanent Marker","Comic Sans MS",cursive;--fa:"Anton",Impact,sans-serif}
+.dd::backdrop{background:rgba(12,10,8,.62);backdrop-filter:blur(2px)}
+.dd[open]{animation:dd-attacca .32s cubic-bezier(.22,1,.36,1)}
+.dd.chiude{animation:dd-stacca .22s ease-in forwards}
+@keyframes dd-attacca{from{opacity:0;transform:translateY(18px) rotate(-.9deg) scale(.97)}}
+@keyframes dd-stacca{to{opacity:0;transform:translateY(10px) rotate(.6deg) scale(.98)}}
+/* il foglio con il nastro agli angoli, capovolto rispetto a quello della roulette: l'immagine sborda dal riquadro, il riquadro è la carta */
+.dd::before{content:"";position:absolute;left:-8.66%;right:-9.04%;top:-12.49%;bottom:-12.6%;z-index:-1;background:url(/art/roulette/carta.webp) 0 0/100% 100% no-repeat;transform:scaleY(-1);filter:drop-shadow(0 -4px 6px rgba(0,0,0,.35)) drop-shadow(0 -24px 30px rgba(0,0,0,.4));pointer-events:none}
+.dd *{box-sizing:border-box}
+.dd button,.dd select{font:inherit;color:inherit}
+.dd :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
+
+.dd-dentro{position:absolute;inset:0;display:grid;grid-template-columns:330px 1fr;grid-template-rows:52px 232px 1fr;column-gap:16px;row-gap:6px;padding:10px 18px 12px 14px}
+
+/* la testata: il titolo come quello dei volantini, la voce a pennarello, le regole, la chiusura */
+.dd-testa{grid-column:1/3;display:flex;align-items:center;gap:16px;min-width:0;padding-left:8px}
+.dd-testa h2{margin:0;font:400 44px/1 var(--fa);letter-spacing:.005em;flex:none}
+.dd-voce{margin:0;flex:1;min-width:0;font:400 18px/1.1 var(--marker);color:var(--rosso);transform:rotate(-1.3deg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-regole{flex:none;display:flex;align-items:baseline;gap:4px;font-size:12px;color:#5a544c}
+.dd-regole select{appearance:none;-webkit-appearance:none;padding:1px 2px;border:0;border-bottom:2px solid currentColor;border-radius:0;background:none;cursor:pointer;font:400 16px/1.1 var(--marker);color:#1446a0}
+.dd-regole select:disabled{opacity:.45;cursor:not-allowed}
+.dd-chiudi{flex:none;width:44px;height:44px;padding:6px;border:0;border-radius:50%;background:none;cursor:pointer;color:#161616;transform:rotate(-6deg);transition:transform .2s cubic-bezier(.22,1,.36,1)}
+.dd-chiudi svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4.2;stroke-linecap:round}
+@media (hover:hover){.dd-chiudi:hover{transform:rotate(-6deg) scale(1.12)}}
+
+/* la campana */
+.dd-campana{position:relative;grid-row:2;grid-column:1;min-height:0}
+.dd-campana canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.dd-carica{position:absolute;inset:0;display:grid;place-items:center;margin:0;font:400 20px/1.2 var(--marker);color:#3a3632;text-align:center;transform:rotate(-2deg)}
+.dd-annuncio{position:absolute;left:50%;bottom:2%;z-index:2;margin:0;padding:.08em .35em .12em;font:400 30px/1 var(--fa);color:#fff;background:var(--nero);transform:translateX(-50%) rotate(-3deg);white-space:nowrap;pointer-events:none;opacity:0;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.dd-annuncio.tripla{background:var(--rosso)}
+.dd-annuncio.si{animation:dd-timbro .5s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes dd-timbro{from{opacity:0;transform:translateX(-50%) rotate(-3deg) scale(1.8)}to{opacity:1;transform:translateX(-50%) rotate(-3deg) scale(1)}}
+
+/* accanto alla campana: il saldo, le fiches da scegliere, i tasti, gli ultimi colpi */
+.dd-banco{grid-row:2;grid-column:2;display:flex;flex-direction:column;justify-content:center;gap:12px;min-width:0}
+.dd-riga{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dd-saldo{flex:none;margin:0;line-height:1;min-width:112px}
+.dd-saldo small{display:block;font:400 12px/1 var(--marker);color:#3a3632}
+.dd-saldo b{display:block;font:400 26px/1.05 var(--fa);font-weight:400}
+.dd-saldo .puntato{display:block;margin-top:3px;font-size:11px;color:#5a544c}
+.dd-saldo .pzk-ig{display:inline-block;margin-top:4px;padding-bottom:1px;border-bottom:2px solid currentColor;font:400 12px/1.15 var(--marker);color:#1446a0;text-decoration:none;white-space:nowrap}
+.dd-saldo .pzk-ig[hidden]{display:none}
+.dd-saldo .pzk-ig b{display:inline;font:inherit;color:var(--rosso)}
+@media (hover:hover){.dd-saldo .pzk-ig:hover{color:var(--rosso)}}
+.dd-scegli{display:flex;gap:2px;flex:none}
+.dd-scegli button{position:relative;width:42px;height:46px;padding:0;border:0;background:none;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1)}
+.dd-scegli img{width:38px;height:38px;max-width:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 3px 4px rgba(0,0,0,.18))}
+.dd-scegli button[aria-pressed="true"]{transform:translateY(-7px)}
+.dd-scegli button[aria-pressed="true"] img{filter:drop-shadow(0 2px 1px rgba(0,0,0,.3)) drop-shadow(0 9px 8px rgba(0,0,0,.28))}
+.dd-scegli button:disabled{opacity:.35;cursor:not-allowed}
+.dd-tasti{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:flex-end}
+.dd-scuoti{flex:none;padding:.18em .55em .22em;border:0;background:#161616;color:#fff !important;font:400 26px/1 var(--fa) !important;cursor:pointer;transform:rotate(-2deg);box-shadow:0 3px 0 rgba(0,0,0,.25);transition:transform .15s cubic-bezier(.22,1,.36,1),background .15s}
+@media (hover:hover){.dd-scuoti:not(:disabled):hover{transform:rotate(-2deg) translateY(-2px)}}
+.dd-scuoti:not(:disabled):active{transform:rotate(-2deg) translateY(1px)}
+.dd-scuoti:disabled{background:#8a847c;cursor:not-allowed}
+.dd-piccolo{padding:2px 4px;border:0;border-bottom:2px solid currentColor;background:none;cursor:pointer;font:400 15px/1.1 var(--marker) !important;color:#1446a0 !important}
+.dd-piccolo:disabled{opacity:.35;cursor:not-allowed}
+.dd-piccolo[aria-pressed="true"]{color:var(--rosso) !important}
+.dd-sotto{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px}
+/* gli ultimi colpi: le tre facce in fila e il totale (×3 per le triple) */
+.dd-storia{display:flex;gap:9px;margin:0;padding:0;list-style:none;overflow:hidden;flex:1;min-width:0}
+.dd-storia li{flex:none;display:flex;flex-direction:column;align-items:center;gap:1px}
+.dd-storia li b{font:400 13px/1 var(--fa);font-weight:400}
+.dd-storia li.piccolo b{color:#1446a0}
+.dd-storia li.tripla b{color:var(--rosso)}
+.dd-storia li:first-child .dd-mini{outline:2px solid #161616;outline-offset:2px;border-radius:2px}
+.dd-mini{width:46px;height:14px;display:block}
+.dd-nota{margin:0;font-size:10.5px;line-height:1.2;color:#5a544c;text-align:right;max-width:130px;flex:none}
+
+/* il tavolo: SVG stampato sul foglio, fiches sopra */
+.dd-tavolo{position:relative;grid-row:3;grid-column:1/3;min-height:0;display:flex;flex-direction:column}
+.dd-campo{position:relative;flex:1;min-height:0}
+.dd-campo svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;mix-blend-mode:multiply}
+.dd-campo svg text{pointer-events:none;user-select:none}
+.dd-campo svg .dd-grande{font-family:var(--fa)}
+.dd-campo svg .dd-piccola{font-family:"Special Elite","Courier New",monospace}
+.dd-campo svg .dd-cinese{font-family:"Noto Serif SC","Songti SC","SimSun","Microsoft YaHei",serif;font-weight:700}
+.dd-zona{fill:transparent;cursor:pointer}
+.dd-zona:focus{outline:none}
+.dd-zona:focus-visible{stroke:#ffd400;stroke-width:3}
+.dd.chiuso .dd-zona{cursor:not-allowed}
+.dd-evid rect{fill:var(--evid)}
+.dd-fiches{position:absolute;inset:0;pointer-events:none}
+.dd-pila{position:absolute;left:0;top:0;width:0;height:0;--f:28px}
+.dd-fiche{position:absolute;left:calc(var(--f) / -2);top:calc(var(--f) / -2);width:var(--f);height:var(--f);max-width:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 2px 3px rgba(0,0,0,.2));will-change:transform}
+.dd-volo{position:fixed;left:0;top:0;--f:28px;width:var(--f);height:var(--f);margin:calc(var(--f) / -2) 0 0 calc(var(--f) / -2);z-index:5;pointer-events:none;will-change:transform;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+
+@media (prefers-reduced-motion:reduce){
+  .dd[open],.dd.chiude{animation:none}
+  .dd-annuncio.si{animation:none;opacity:1}
+}
+
+/* il telefono e le finestre basse: il foglio a tutto schermo, la campana sopra, il banco, il tavolo sotto */
+@media (max-width:820px),(max-height:640px){
+  .dd{width:100vw;height:100svh;max-height:100svh}
+  .dd::before{inset:0;background:url(/art/roulette/carta.webp) 50% 50%/240% 220% no-repeat;transform:none;filter:none}
+  .dd-dentro{overflow-y:auto;overscroll-behavior:contain;grid-template-columns:1fr;grid-template-rows:auto minmax(210px,34svh) auto auto;padding:6px 12px calc(10px + env(safe-area-inset-bottom));row-gap:8px}
+  .dd-testa{grid-column:1;flex-wrap:wrap;gap:2px 10px;padding-left:2px}
+  .dd-testa h2{font-size:32px}
+  .dd-voce{order:3;flex:1 1 100%;font-size:16px;white-space:normal;min-height:2.2em}
+  .dd-regole{margin-left:auto}
+  .dd-campana{grid-row:2;grid-column:1}
+  .dd-banco{grid-row:3;grid-column:1;gap:8px}
+  .dd-riga{gap:6px 10px}
+  .dd-saldo{min-width:0}
+  .dd-scegli button{width:40px}
+  .dd-scegli img{width:36px;height:36px}
+  .dd-tasti{gap:6px 16px}
+  .dd-scuoti{font-size:24px !important}
+  .dd-annuncio{font-size:24px}
+  .dd-tavolo{grid-row:4;grid-column:1}
+  .dd-campo{flex:none;height:clamp(440px,128vw,560px)}
+}

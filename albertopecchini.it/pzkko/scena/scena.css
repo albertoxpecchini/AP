@@ -28,6 +28,8 @@ html.scena3d .it{visibility:hidden}
 html.scena3d .vol a{visibility:visible;color:transparent}
 html.scena3d .man-link .it{visibility:visible;opacity:0}
 html.scena3d .tagliandi button{visibility:visible;color:transparent;background:none;border-color:transparent}
+/* le bic della petizione (22.10): nella scena sono modelli (penne.js), qui restano dove pendono, da toccare */
+html.scena3d .penna img{visibility:visible;opacity:0}
 html.scena3d .copiato{visibility:visible}
 html.scena3d .vol h3,html.scena3d .vol:has(h3 a:hover) h3{text-decoration:none}
 html.scena3d .vol h3 a:focus-visible::after{outline:3px solid #ffd400;outline-offset:6px}
@@ -36,7 +38,8 @@ html.scena3d .tagliandi button:focus-visible{outline:3px solid #ffd400}
    e con le loro ombre sfocate e le fusioni il browser li ricalcolava scorrendo: sotto la scena non servono (21.10, per il
    telefono, che scorrendo era già al limite) */
 html.scena3d .parete .it,html.scena3d .parete .it *{filter:none !important;mix-blend-mode:normal !important}
-/* il puntatore sopra il portachiavi per terra (scena/portachiavi.js): il suo tasto si preme */
+/* il puntatore sopra le cose della strada che si toccano (scena/tocchi.js: il citofono, la porta, il portachiavi, la
+   roba per terra, le pozzanghere): la manina */
 html.scena-tasto,html.scena-tasto *{cursor:pointer}
 /* ?allinea=1: il DOM in trasparenza sopra la scena, per controllare che combacino */
 html.scena-allinea .it,html.scena-allinea .portale{visibility:visible;opacity:.45}

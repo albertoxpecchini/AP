@@ -20,6 +20,34 @@ import { Z_FACCIATA } from './materiali.js'
 
 // il telaio del chiusino per le lastre (spazzatura.js lo mette: x e z del centro, mezzo lato)
 export const CHIUSINO = { value: new T.Vector4(0, 0, 0, 0) }
+// i tocchi nelle pozzanghere (tocchi.js): x, z, quando (il tempo di BAGNO), quanto forte; quattro alla volta
+export const ONDE = { value: Array.from({ length: 4 }, () => new T.Vector4(0, 0, -99, 0)) }
+let onda = 0
+export const tocca = (x, z, forza = 1) => { ONDE.value[onda].set(x, z, BAGNO.tempo.value, forza); onda = (onda + 1) % 4 }
+
+// Il campo dell'acqua di LASTRE_GLSL, rifatto qui uguale (mH, mN, mF, mLastra, mCampo, mGoccia, mAcqua): tocchi.js deve
+// sapere se il dito è finito in una pozzanghera. La scheda conta a 32 bit e qui a 64: sul bordo di una pozza si può
+// sbagliare di un millimetro
+const fr = (v) => v - Math.floor(v)
+const mH = (x, y) => { let a = fr(x * 233.34), b = fr(y * 851.73); const d = a * (a + 23.45) + b * (b + 23.45); a += d; b += d; return fr(a * b) }
+const mN = (x, y) => {
+  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy, ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy)
+  const a = mH(ix, iy), b = mH(ix + 1, iy), c = mH(ix, iy + 1), d = mH(ix + 1, iy + 1)
+  return (a + (b - a) * ux) + ((c + (d - c) * ux) - (a + (b - a) * ux)) * uy
+}
+const mF = (x, y) => 0.5 * mN(x, y) + 0.25 * mN(x * 2.03 + 17, y * 2.03 + 17) + 0.125 * mN(x * 4.01 + 31, y * 4.01 + 31) + 0.125 * mN(x * 8.1 + 7, y * 8.1 + 7)
+const passo = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
+export function acquaQui(x, y) {
+  const z = y - Z_FACCIATA, riga = Math.floor(z / 0.4), xx = x + (((riga % 2) + 2) % 2) * 0.3, col = Math.floor(xx / 0.6)
+  const lx = xx - col * 0.6, ly = z - riga * 0.4, C = CHIUSINO.value
+  let bordo = Math.min(lx, 0.6 - lx, ly, 0.4 - ly)
+  if (C.z > 0) bordo = Math.min(bordo, Math.max(Math.abs(x - C.x) - C.z, Math.abs(y - C.y) - C.z, 0))
+  const campo = mF(x * 1.3 + 4, y * 1.3 + 4) + 0.06 * mF(x * 11, y * 11) + 0.2 * passo(0.8, 1, mH(col + 3.7, riga + 3.7)) + 0.3 * passo(1.65, 2.28, y) + 0.05 * (1 - passo(0, 0.008, bordo))
+  const P = BAGNO.pozza.value, M = BAGNO.meteo.value
+  const goccia = 0.9 - 0.3 * (Math.hypot(x - P.x, (y - P.y) * 1.5) / Math.max(P.z, 0.01)) + 0.06 * mF(x * 9, y * 9)
+  // (sotto la neve l'acqua non si vede)
+  return M.y > 0.25 ? -1 : Math.max(campo - (1.22 - 0.57 * M.x), goccia - 0.69)
+}
 
 export const LASTRE_GLSL = `
 float mH( vec2 p ) { p = fract( p * vec2( 233.34, 851.73 ) ); p += dot( p, p + 23.45 ); return fract( p.x * p.y ); }
@@ -125,14 +153,14 @@ export const lastre = (m) => {
 // mosso dal vento e più forte radente; sotto, la pietra bagnata si vede poco
 export const SPECCHIO_POZZE = {
   name: 'pozze',
-  uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, opacita: { value: 1 }, mPozza: BAGNO.pozza, mTempo: BAGNO.tempo, mMeteo: BAGNO.meteo, mChiusino: CHIUSINO },
+  uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, opacita: { value: 1 }, mPozza: BAGNO.pozza, mTempo: BAGNO.tempo, mMeteo: BAGNO.meteo, mChiusino: CHIUSINO, mOnde: ONDE },
   vertexShader: `uniform mat4 textureMatrix; varying vec4 vUv; varying vec3 vMondo;
     #include <common>
     #include <logdepthbuf_pars_vertex>
     void main() { vUv = textureMatrix * vec4( position, 1.0 ); vMondo = ( modelMatrix * vec4( position, 1.0 ) ).xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
     #include <logdepthbuf_vertex>
     }`,
-  fragmentShader: `uniform vec3 color; uniform sampler2D tDiffuse; uniform float opacita, mTempo; varying vec4 vUv; varying vec3 vMondo;
+  fragmentShader: `uniform vec3 color; uniform sampler2D tDiffuse; uniform float opacita, mTempo; uniform vec4 mOnde[ 4 ]; varying vec4 vUv; varying vec3 vMondo;
     ${LASTRE_GLSL}
     #include <logdepthbuf_pars_fragment>
     void main() {
@@ -151,6 +179,20 @@ export const SPECCHIO_POZZE = {
         float t = fract( mTempo * ( 0.9 + hc ) + mH( ci + 9.3 ) ), dd = length( cf - c0 );
         anello = exp( -pow( ( dd - t * 0.3 ) / 0.03, 2.0 ) ) * ( 1.0 - t );
         n += ( cf - c0 ) / max( dd, 1e-3 ) * anello * 0.8;
+      }
+      // i tocchi (tocchi.js): tre anelli che si allargano dal dito, uno dietro l'altro, e in due secondi si spengono
+      for ( int i = 0; i < 4; i++ ) {
+        vec4 o = mOnde[ i ];
+        float eta = mTempo - o.z;
+        if ( eta < 0.0 || eta > 2.2 ) continue;
+        vec2 dv = vMondo.xz - o.xy; float dd = length( dv );
+        for ( int k = 0; k < 3; k++ ) {
+          float r = ( eta - float( k ) * 0.17 ) * 0.24;
+          if ( r <= 0.0 ) continue;
+          float a = exp( -pow( ( dd - r ) / ( 0.01 + r * 0.06 ), 2.0 ) ) * pow( 1.0 - eta / 2.2, 1.5 ) * o.w * ( 1.0 - float( k ) * 0.3 );
+          n += dv / max( dd, 1e-3 ) * a * 1.4;
+          anello += a * 0.9;
+        }
       }
       vec4 uv = vUv; uv.xy += n * 0.014 * smoothstep( 0.0, 0.06, c ) * uv.w;
       vec3 rif = texture2DProj( tDiffuse, uv ).rgb * color;

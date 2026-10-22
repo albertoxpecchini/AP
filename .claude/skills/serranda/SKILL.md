@@ -61,4 +61,9 @@ node tools/pzkko/serranda.mjs rifai                      # disponi + 404 + foto 
   lavorano con `--pagina=storia`. I suoi fogli si scrivono a mano in `storia/index.html`,
   dentro `<div class="parete storia">` e con un id `storia-…` (non con `volantino` o `pezzo`).
   Dopo `rifai` guarda anche `scena-serranda-storia.png`, `storia-desk.png` e `storia-mob.png`.
+- La petizione (`#petizione`, dal 22.10) ha le tre bic appese allo spago sotto il foglio:
+  sporgono ~180 unità sul computer e ~130 sul telefono. Nella pila, subito sotto, va un
+  graffito o un manifesto degli altri, mai un volantino vero (le penne coprirebbero il link).
+  La sua foto per la scena è vuota (le firme le scrive la scena dal vivo): `cattura.mjs`
+  nasconde penne e firme e annota dov'è la tabella.
 - Non fare commit né push se Alberto non lo chiede: ogni push su `main` va online.

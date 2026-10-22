@@ -208,7 +208,7 @@ export async function portachiavi(scene, M) {
   }
   // il raggio del puntatore (origine e direzione, nel mondo) tocca il portachiavi? Tutto il portachiavi fa da tasto: la
   // scatola che lo contiene, nel suo riferimento (inclinato e girato), col metodo delle lastre; niente Raycaster
-  const inv = new T.Matrix4(), lo = new T.Vector3(), ld = new T.Vector3()
+  const inv = new T.Matrix4(), lo = new T.Vector3(), ld = new T.Vector3(), pw = new T.Vector3()
   const SCATOLA = [[-(L0 / 2 + BS), L0 / 2 + BS], [-0.001, SP + mm(3)], [-(W0 / 2 + BS), W0 / 2 + BS]]
   const tocca = (origine, direzione) => {
     token.updateWorldMatrix(true, false)
@@ -223,7 +223,8 @@ export async function portachiavi(scene, M) {
       t0 = Math.max(t0, ta); t1 = Math.min(t1, tb)
       if (t0 > t1) return false
     }
-    return true
+    // (la distanza dalla telecamera, nel mondo: tocchi.js sceglie la cosa più vicina fra quelle toccate)
+    return pw.copy(lo).addScaledVector(ld, t0).applyMatrix4(token.matrixWorld).distanceTo(origine)
   }
   let ultimo = 0
   return {

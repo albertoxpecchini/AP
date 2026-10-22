@@ -337,6 +337,72 @@ It is the picture printed on a street flyer, on a small card of cream paper with
 ${NIENTE_MAGENTA}`,
   },
 
+  // 22.10: altra roba degli altri al posto dei meme della storia: le zucche, il cartello di rivalta rubato, il promemoria
+  // del dentista (l'appuntamento è vero), l'offerta della stampante, l'iphone che non esiste, lo scontrino delle stufe,
+  // il corso dei bonsai, la gita a verona; e tre manifesti inventati (modena, la francia, vannacci)
+  manifesti6: {
+    scala: 0.75,
+    traslucido: true,
+    titolo: 'il cartello delle zucche, il cartello stradale di rivalta sul mincio, il promemoria del dentista, l’offerta della epson',
+    aspetto: '2048x2048',
+    griglia: [2, 2],
+    pezzi: ['zucche', 'rivalta', 'dentista', 'epson'],
+    prompt: `${griglia('Four things stuck on a city wall,', 2, 2)}
+Each is put up by a different person and fills most of its cell; the text on them is spelled exactly as given, with the same capital and small letters, and nothing else is written on them (no small print, no phone numbers, no addresses, no QR codes, no website addresses):
+1. a farm-stand sign painted by hand on an old weathered wooden board (two grey-brown planks side by side, rough grain, chipped edges): the big word «zucche» in thick bright orange house paint with wobbly brush strokes and one drip, under it «mantovane» in black paint, then «delica · violina» and «€ 1,50 al kg» in black marker, and along the bottom simple painted pumpkins: a squat round grey-green Mantua pumpkin, a bright orange round one and a long beige violin-shaped butternut; a rusty nail head in each corner; two strips of silver duct tape at the top hold it on the wall;
+2. a real Italian road sign for the entrance of a village, stolen and hung on the wall with a twisted piece of wire through two holes at the top: a rectangular white enamelled sheet-steel sign with rounded corners and a thin black border line set a little inside the edge, the place name «RIVALTA SUL MINCIO» in black capitals in the Italian road-sign typeface, on two lines, and under it, much smaller, «Comune di Rodigo»; a few dents and scratches with rust showing through, faint dirt streaks, a small round football sticker half peeled off one corner;
+3. a small dentist's appointment reminder card, the size of a business card, white card with a pale sky-blue printed band at the top: a simple outline drawing of a tooth and «STUDIO DENTISTICO», under it «Dott. D.F. MART», then «prossimo appuntamento» and two printed fields with dotted lines, «GIORNO» and «ORE», filled in by hand with a blue ballpoint pen: «24-11-26» after GIORNO and «12,30» after ORE; one strip of clear tape across the top holds it on the wall;
+4. a glossy electronics-shop offer flyer: a big red starburst with «OFFERTA» in bold white capitals, a clean product photo of a compact Epson EcoTank inkjet all-in-one printer with its refillable ink tank window on the front (the ink inside looks dark, no colours), the text «Epson EcoTank ET-2825», under it «stampa · copia · scansiona · wi-fi», the old price «€ 229,90» struck through with a red line and the new price «€ 169,90» in huge red numbers; the paper is wrinkled from the glue and the bottom-right corner is peeling.
+Photorealistic, sharp, soft even daylight. The clear tape is translucent, so the magenta shows through it. ${NIENTE_MAGENTA}`,
+  },
+
+  manifesti7: {
+    scala: 0.75,
+    traslucido: true,
+    titolo: 'la pubblicità dell’iphone duo, lo scontrino di tecnomat delle due stufe a legna, il corso di potatura dei bonsai, la gita a verona',
+    aspetto: '2048x2048',
+    griglia: [2, 2],
+    pezzi: ['iphone', 'scontrino', 'bonsai', 'verona'],
+    prompt: `${griglia('Four things stuck on a city wall,', 2, 2)}
+Each is put up by a different person and fills most of its cell; the text on them is spelled exactly as given, with the same capital and small letters, and nothing else is written on them (no small print, no phone numbers, no addresses, no QR codes, no website addresses):
+1. a glossy smartphone advertising poster in the minimalist style of a premium tech campaign, a printed photograph: plain white background, a fictional new phone made of two thin glass smartphones joined side by side by a polished steel hinge like a book, half open and floating, both screens lit with the same abstract wallpaper of deep blue and warm orange waves, a soft shadow under it; at the top the headline «iPhone Duo» in a thin black sans-serif, under it «nuovo.» smaller, and at the bottom «da 3625 $»; no logo anywhere; the glossy paper is slightly wrinkled from the glue and its top-left corner peels;
+2. a long, narrow, curled thermal-paper till receipt from a DIY superstore, a bit yellowed, the black print slightly faded, held on the wall by one strip of clear tape across its top, all in a plain monospaced receipt font with left-aligned labels and right-aligned prices: at the top «TECNOMAT» in bold capitals, then «DOCUMENTO COMMERCIALE» and «di vendita o prestazione», a dashed line, the item line «STUFA A LEGNA 9 KW» with «2 x 901,55» under it and «1.803,10» on the right, another dashed line, «TOTALE COMPLESSIVO» with «1.803,10» on the right in bold, «di cui IVA» with «325,15», «PAGAMENTO ELETTRONICO» with «1.803,10», then «18-10-2026 10:42» and a barcode at the bottom;
+3. a photocopied community flyer on pale green paper, black toner: a black ink drawing of a small juniper bonsai in a shallow rectangular pot with a pair of bonsai pruning scissors beside it, the title «corso di potatura bonsai» in big bold lowercase letters at the top, under the drawing «per principianti», «4 giovedì sera» and «porta il tuo bonsai»; along the bottom edge a row of tear-off tabs, each with «bonsai» written sideways, two of them torn off;
+4. a bus-trip flyer from a village pensioners' club, printed in colour on cheap glossy paper: a sunny photo of the Roman amphitheatre Arena di Verona under a blue sky, a small cut-out photo of a white coach bus in one corner, the big title «verona e l'arena tour» in bold yellow letters with a red outline, under it «gita in pullman», «domenica 15 novembre», «partenza ore 7:00 · pranzo incluso · € 45» and «posti limitati!»; a strip of brown packing tape at the top.
+Photorealistic, sharp, soft even daylight. The clear tape is translucent, so the magenta shows through it. ${NIENTE_MAGENTA}`,
+  },
+
+  manifesti8: {
+    scala: 1,
+    titolo: 'modena e l’assalto al supermercato (il film che non c’è), le proteste in francia per il carovita, gen. vannacci al potere?',
+    aspetto: '2048x1152',
+    griglia: [3, 1],
+    pezzi: ['modena', 'francia', 'vannacci'],
+    prompt: `Three complete street posters laid out side by side (three columns, one row) on ${FONDO}, photographed straight on (flat, orthographic, no perspective), each complete and whole, upright, filling most of its column, generous empty magenta space between them, nothing cropped by the edge.
+Each is a different printed poster wheat-pasted on a city wall by a different person: slightly wrinkled paper, a few creases, real print texture. The text on them is spelled exactly as given and nothing else is written on them (no small print, no credits block, no phone numbers, no addresses, no QR codes, no website addresses):
+1. a dramatic Hollywood action-movie poster with orange-and-teal colour grading: a crowd of ordinary people in winter coats charging at night toward the glowing entrance of an Italian supermarket, pushing shopping carts like battering rams, discount price tags flying through the air, and in the foreground a paper shopping bag bursting with boxes of tortellini and a wheel of parmesan; the title «MODENA» in huge metallic capitals, under it «e l'assalto al supermercato», and at the bottom «prossimamente al cinema»;
+2. a French protest poster screen-printed in red and black on cream paper, in the style of the May 1968 posters: a raised fist holding a baguette like a torch, behind it a big price tag; the slogans in French «LA VIE EST TROP CHÈRE !» at the top and «tous dans la rue · samedi 14h» at the bottom;
+3. a black-and-white photocopied political street poster, heavy toner, creased paper: a simple bold drawing of a general's peaked military cap with gold braid on the visor (the only colour on the poster is that little gold) and a huge question mark beside it; the text in big heavy capitals «GEN. VANNACCI» and «AL POTERE?»; nothing else (no party symbols, no faces, no people).
+${NIENTE_MAGENTA}`,
+  },
+
+  // le penne della petizione «pzkko.it è un bel sito?» (index.html): legate allo spago, per il muro di sempre e per la
+  // finestra in cui si firma (nella scena 3D sono modelli, scena/petizione.js)
+  penne: {
+    scala: 0.6,
+    traslucido: true,
+    titolo: 'le tre bic cristal della petizione, legate allo spago (la blu senza cappuccio, la nera, la rossa)',
+    aspetto: '2048x1152',
+    griglia: [3, 1],
+    pezzi: ['blu', 'nera', 'rossa'],
+    prompt: `Three ballpoint pens laid out side by side (three columns, one row) on ${FONDO}, photographed straight on (flat, orthographic, no perspective), each complete and whole, perfectly vertical, filling the height of its column, generous empty magenta space between them, nothing cropped by the edge.
+They are the classic cheap BIC Cristal pens, shown full length from the side: a clear transparent hexagonal plastic barrel through which the thin ink tube is visible all the way down, the small coloured end plug at the TOP end and the writing end at the BOTTOM. Each hangs from a piece of thin white cotton string: the string is tied around the barrel just under the end plug with a small knot, wrapped there with one turn of clear sticky tape, and from the knot it goes straight up and is cut off a little above the pen (only that short end of string is shown):
+1. a blue BIC Cristal, blue ink tube and blue end plug, WITHOUT its cap: the conical clear tip and the brass point are visible at the bottom, a little blue ink on the point;
+2. a black BIC Cristal, black ink tube and black end plug, with its black cap and clip on the writing end;
+3. a red BIC Cristal, red ink tube and red end plug, with its red cap and clip on the writing end.
+Photorealistic, sharp, soft even daylight, a subtle highlight along the plastic edges. The clear plastic and the clear tape are translucent, so the magenta shows through them. ${NIENTE_MAGENTA}`,
+  },
+
   // 17.10 sera: la roulette nella finestra (games/roulette/): il foglio della finestra,
   // le fiches e il segnaposto viste dall'alto, il legno della ruota 3D
   'carta-roulette': {

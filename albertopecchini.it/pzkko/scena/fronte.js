@@ -18,7 +18,7 @@ import { foto, poi } from './disegni.js'
 const FRONTE = '/art/scena/fronte/', MURO = '/art/scena/muro/'
 const GRADI = Math.PI / 180
 // il citofono: la piastra (12 × 18 cm) e, dentro la sua immagine, la finestrella del nome (u, v da sotto)
-const CITOFONO = { larg: 0.12, alt: 0.18, prof: 0.022, nome: { u0: 0.195, u1: 0.805, v0: 0.411, v1: 0.523 } }
+const CITOFONO = { larg: 0.12, alt: 0.18, prof: 0.022, nome: { u0: 0.195, u1: 0.805, v0: 0.411, v1: 0.523 }, bottone: { u: 0.5, v: 0.232, r: 0.146 } }
 
 export async function fronte(scene, M, h, { PORTA, zp }) {
   const { W } = M
@@ -180,7 +180,24 @@ export async function fronte(scene, M, h, { PORTA, zp }) {
     nome.position.set(xc + ((n.u0 + n.u1) / 2 - 0.5) * CITOFONO.larg, yc + ((n.v0 + n.v1) / 2 - 0.5) * CITOFONO.alt, zc + CITOFONO.prof / 2 + 0.0004)
     scene.add(nome)
     h.citofono = nome
+    // il pulsante d'ottone (22.10): un disco vero sopra quello disegnato, con la stessa immagine, che si abbassa di 2 mm
+    // quando lo si preme (tocchi.js, che fa suonare il campanello dentro il negozio)
+    const b = CITOFONO.bottone, rb = b.r * CITOFONO.larg, faccia = new T.CircleGeometry(rb, 40), uvb = faccia.attributes.uv
+    for (let i = 0; i < uvb.count; i++) uvb.setXY(i, b.u + (uvb.getX(i) - 0.5) * 2 * b.r, b.v + (uvb.getY(i) - 0.5) * ((2 * rb) / CITOFONO.alt))
+    const mBottone = new T.MeshStandardMaterial({ map: cit.t, color: colore(cit, 0xa8854f), normalMap: citN.t, roughnessMap: citL.t, metalnessMap: citL.t, roughness: citL.t ? 1 : 0.35, metalness: citL.t ? 1 : 0.9 })
+    poi(cit, mBottone, 'map'); poi(citN, mBottone, 'normalMap'); poi(citL, mBottone, 'roughnessMap', 'metalnessMap')
+    const bordo = new T.Mesh(new T.CylinderGeometry(rb, rb * 1.03, 0.004, 40, 1, true), mOttone)
+    bordo.rotation.x = Math.PI / 2; bordo.position.z = -0.002
+    const bottone = new T.Group()
+    bottone.add(new T.Mesh(faccia, mBottone), bordo)
+    const zb = zc + CITOFONO.prof / 2 + 0.0026
+    bottone.position.set(xc + (b.u - 0.5) * CITOFONO.larg, yc + (b.v - 0.5) * CITOFONO.alt, zb)
+    scene.add(ombra(bottone, false, true))
+    h.citofonoTocchi = { bottone, zb, x: bottone.position.x, y: bottone.position.y, r: rb, piastra: { x: xc, y: yc, z: zc + CITOFONO.prof / 2, larg: CITOFONO.larg, alt: CITOFONO.alt } }
   }
+  // dove si tocca la porta (tocchi.js): il vetro (meno il traverso), l'anta coi suoi profili, il maniglione
+  h.portaTocchi = { vetro: { x0: A0 + MONT, x1: A1 - MONT, y0: ZOC + 0.03, y1: ph - T0 - MONT, z: zp }, traverso: [0.965, 1.035],
+    anta: { x0: x0, x1: x1, y0: 0, y1: ph, z: fronteAnta }, maniglia: { x: xm, y0: 0.78, y1: 1.27, z: fronteAnta + 0.06, r: 0.0125 } }
 
   // ── il lucchettone: un lucchetto d'ottone da 12 cm che tiene chiusa la saracinesca. Il ferro passa nell'occhiello
   // saldato davanti alla barra in fondo e nella cambretta murata nella soglia, e il corpo, che non ci sta appeso (gli
@@ -212,6 +229,8 @@ export async function fronte(scene, M, h, { PORTA, zp }) {
     lucchetto.rotation.x = giro
     lucchetto.position.set(xl, yo - cima * Math.cos(giro), zo - cima * Math.sin(giro))
     scene.add(lucchetto)
+    // (tocchi.js: toccato, suona l'ottone contro il ferro, e dondola un filo sul ferro che lo tiene)
+    h.lucchettone = { o: lucchetto, giro }
     // l'occhiello: una piastra d'acciaio saldata davanti alla barra, di taglio, col buco; la cambretta: un tondino a U
     // murato nella soglia, accanto
     const s = new T.Shape()

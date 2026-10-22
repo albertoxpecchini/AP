@@ -23,6 +23,38 @@
 import * as T from './lib/three.js'
 import { immagine, lamiera, DOGA } from './materiali.js'
 import { bagnato } from './acqua.js'
+import { ascolta, disegna, caratteri, firme } from '../petizione/firme.js'
+
+// La petizione (22.10, index.html #petizione): sopra la foto del foglio, che cattura.mjs fa vuota, le firme vere
+// (api/firme.mjs), disegnate da petizione/firme.js come nella pagina, nella tabella dove cattura.mjs l'ha misurata
+// (dati.firme, in px della foto); una tela una volta e mezza la foto, ridisegnata quando arrivano firme nuove
+const petizione = (t, dati) => {
+  const img = t.image, Q = 1.5, w = Math.round(img.width * Q), h = Math.round(img.height * Q), r = dati.firme
+  // la foto, copiata una volta e dritta (arriva capovolta per la scheda): la trama si toglie, le firme nuove arrivano dopo
+  const foto = document.createElement('canvas')
+  foto.width = img.width; foto.height = img.height
+  const fc = foto.getContext('2d')
+  if (t.flipY === false) { fc.translate(0, img.height); fc.scale(1, -1) }
+  fc.drawImage(img, 0, 0)
+  const tela = document.createElement('canvas')
+  tela.width = w; tela.height = h
+  const ctx = tela.getContext('2d')
+  const ct = new T.CanvasTexture(tela)
+  ct.colorSpace = T.SRGBColorSpace; ct.anisotropy = 8
+  const ridisegna = (s) => {
+    ctx.clearRect(0, 0, w, h)
+    ctx.drawImage(foto, 0, 0, w, h)
+    const ultime = s.firme.slice(-r.righe)
+    ctx.save()
+    ctx.globalCompositeOperation = 'multiply'
+    disegna(ctx, ultime, { x: r.x * Q, y: r.y * Q, w: r.w * Q, h: r.h * Q, righe: r.righe, primo: s.totale - ultime.length + 1 })
+    ctx.restore()
+    ct.needsUpdate = true
+  }
+  ridisegna(firme())
+  caratteri().then(() => ascolta(ridisegna))
+  return ct
+}
 
 // (il nome della foto di un volantino: anche prossima.js, per scaricare quelle dell'altra pagina)
 export const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
@@ -161,8 +193,10 @@ export async function fogli(scene, M, renderer) {
     const cx = cxU * K, cy = H - cyU * K, theta = -r * Math.PI / 180
     const gruppo = new T.Group()
     gruppo.position.set(cx, cy, 0); gruppo.rotation.z = theta
-    // (la carta lucida, e le foto stampate della storia)
-    const lucido = cl.contains('c-lucido') || cl.contains('stampa')
+    // (la carta lucida, le foto stampate della storia e i poster lucidi degli altri; il cartello di rivalta è di lamiera
+    // smaltata: lucido anche lui, un filo di metallo)
+    const suono = el.dataset.suono
+    const lucido = cl.contains('c-lucido') || cl.contains('stampa') || suono === 'lucida' || suono === 'cartello'
     // i graffiti scuri sono vernice che tinge il metallo: si moltiplicano con quello che c'è sotto (come il multiply
     // della pagina), prendendo la luce dalla lamiera, così l'inchiostro resta nero e leggibile; quelli chiari
     // (.chiaro, .bianco: argento, bianco) coprono, e sono materia illuminata come la carta
@@ -173,8 +207,8 @@ export async function fogli(scene, M, renderer) {
       mat.onBeforeCompile = nitidaMoltiplica
     } else {
       mat = lucido
-        ? new T.MeshPhysicalMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 })
-        : new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : 0.88, metalness: 0 })
+        ? new T.MeshPhysicalMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: suono === 'cartello' ? 0.26 : 0.32, metalness: suono === 'cartello' ? 0.12 : 0, clearcoat: suono === 'cartello' ? 0.85 : 0.6, clearcoatRoughness: suono === 'cartello' ? 0.12 : 0.25 })
+        : new T.MeshStandardMaterial({ map: vuota, transparent: true, opacity: 0, alphaTest: 0.03, roughness: tipo === 'pezzo' ? 0.35 : tipo === 'graffito' ? 0.85 : suono === 'legno' ? 0.93 : 0.88, metalness: 0 })
       mat.onBeforeCompile = nitida
       // (dove passa il rivolo la carta si bagna: più scura, lucida; acqua.js)
       bagnato(mat, 2)
@@ -195,7 +229,15 @@ export async function fogli(scene, M, renderer) {
     if (foto) quando(src.replace(`/${cartella}/`, `/${cartellaLo}/`), (t) => { if (vera) return; mat.map = t; if (!pezzo.arrivo) pezzo.arrivo = performance.now() }, 'lo')
     // (l'anteprima, sostituita, si toglie dalla scheda)
     const sostituisci = (vecchia, t) => { if (vecchia && vecchia !== vuota && vecchia !== t) vecchia.dispose() }
-    quando(src, (t) => { vera = true; sostituisci(mat.map, t); mat.map = t; if (!pezzo.arrivo) pezzo.arrivo = performance.now() }, foto ? 'piene' : 'lo')
+    // (la petizione: la foto vera diventa la tela con le firme sopra, e la foto si toglie dalla scheda)
+    const firmato = foto && el.id === 'petizione' && dati?.firme
+    quando(src, (t) => { vera = true; const tt = firmato ? petizione(t, dati) : t; sostituisci(mat.map, tt); mat.map = tt; if (tt !== t) t.dispose(); if (!pezzo.arrivo) pezzo.arrivo = performance.now() }, foto ? 'piene' : 'lo')
+    // mentre il foglio si è avvicinato per firmare (petizione.js) qui non c'è: torna quando torna lui
+    if (el.id === 'petizione') document.addEventListener('pzkko-petizione', (ev) => {
+      const fase = ev.detail?.fase
+      if (fase === 'apre') gruppo.visible = false
+      else if (fase === 'chiusa') gruppo.visible = true
+    })
 
     // la Live Photo (le stampe della storia): il video della pagina, steso sopra la foto dove cattura.mjs l'ha misurata.
     // Si vede quando la pagina lo fa partire (.va sulla stampa: il passaggio, il dito, il tasto LIVE) e sfuma come lì;

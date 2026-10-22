@@ -108,12 +108,16 @@ export async function spazzatura(scene, M) {
   // Il chiusino: in mezzo all'inquadratura, in squadra con le lastre (righe da 40 cm dalla facciata: il telaio ne prende
   // due, coi lati sulle fughe; un lato in x sulla fuga di una riga)
   const P = telefono
-    ? { kola: [0.12, 0.3, 0.6], pechino: [1.0, 0.36, -0.4], lucky: [0.68, 0.3, 2.2], tucson: [1.02, 0.95, 0.35], pzkkonet: [-0.12, 1.0, -0.6], menu: [0.34, 0.28, 1.4], tombino: TOMBINO.telefono, area: [0.0, 1.1, 0.22, 1.25] }
-    : { kola: [0.45, 0.42, 0.6], pechino: [2.35, 0.5, -0.4], lucky: [1.12, 0.95, 2.2], tucson: [0.78, 0.8, 0.35], pzkkonet: [2.36, 1.22, -0.25], menu: [0.62, 1.22, 0.9], tombino: TOMBINO.computer, area: [0.3, 2.6, 0.25, 1.45] }
+    ? { kola: [0.12, 0.3, 0.6], pechino: [1.0, 0.36, -0.4], lucky: [0.68, 0.3, 2.2], tucson: [1.02, 0.95, 0.35], pzkkonet: [-0.12, 1.0, -0.6], menu: [0.34, 0.28, 1.4], grissini: [1.0, 0.62, 0.9], tombino: TOMBINO.telefono, area: [0.0, 1.1, 0.22, 1.25] }
+    : { kola: [0.45, 0.42, 0.6], pechino: [2.35, 0.5, -0.4], lucky: [1.12, 0.95, 2.2], tucson: [0.78, 0.8, 0.35], pzkkonet: [2.36, 1.22, -0.25], menu: [0.62, 1.22, 0.9], grissini: [1.32, 0.6, 0.42], tombino: TOMBINO.computer, area: [0.3, 2.6, 0.25, 1.45] }
+  // le cose da toccare (tocchi.js): cosa sono (il suono, suono/suono.js), l'oggetto; rotola: dondola sulla pancia
+  const tocchi = []
   // (le cose sparse a caso, le gomme e i mozziconi, non finiscono sul chiusino)
   const qua = () => { for (;;) { const p = [caso(P.area[0], P.area[1]), caso(P.area[2], P.area[3])]; if (Math.max(Math.abs(p[0] - P.tombino[0]), Math.abs(p[1] - P.tombino[1])) > LATO_CHIUSINO / 2 + 0.04) return p } }
   // (la scatola di pechino ha la stessa faccia sui quattro lati: la trama si ripete quattro volte intorno)
-  const [kola, pechino, lucky, tucson, pzkkonet, menu] = await Promise.all([foto('kola'), foto('pechino', (t) => { t.wrapS = T.RepeatWrapping; t.repeat.x = 4 }), foto('lucky'), foto('tucson'), foto('pzkkonet'), foto('menu')])
+  // (il grissino: la striscia della trama corre lungo il bastoncino, cioè lungo la v del cilindro: girata di 90°)
+  const [kola, pechino, lucky, tucson, pzkkonet, menu, grissini, grissino] = await Promise.all([foto('kola'), foto('pechino', (t) => { t.wrapS = T.RepeatWrapping; t.repeat.x = 4 }), foto('lucky'), foto('tucson'), foto('pzkkonet'), foto('menu'),
+    foto('grissini'), foto('grissino', (t) => { t.wrapS = t.wrapT = T.MirroredRepeatWrapping; t.center.set(0.5, 0.5); t.rotation = Math.PI / 2 })])
 
   // la lattina di pzk-kola: rossa, schiacciata in mezzo e piegata, coricata; l'etichetta le gira intorno
   {
@@ -128,9 +132,12 @@ export async function spazzatura(scene, M) {
     const etichetta = new T.MeshStandardMaterial({ map: kola.t, color: kola.t ? 0xffffff : 0xc4121b, metalness: 0.75, roughness: 0.3 })
     poi(kola, etichetta, 'map')
     const lattina = new T.Mesh(g, [etichetta, alluminio, alluminio])
+    // (prima gira sul suo asse, poi si corica: così tocchi.js la fa rotolare sulla pancia con rotation.y)
+    lattina.rotation.order = 'ZYX'
     lattina.rotation.z = Math.PI / 2 - 0.08
     const o = new T.Group(); o.add(lattina); lattina.position.y = 0.022
     metti(o, P.kola[0], P.kola[1], P.kola[2])
+    tocchi.push({ cosa: 'lattina', o, rotola: true })
   }
   // la scatola di pechino: un tronco di piramide di cartone, rovesciata, i lembi aperti, il manico di ferro, i noodles
   {
@@ -162,6 +169,7 @@ export async function spazzatura(scene, M) {
     }
     o.add(new T.Mesh(unisci(fili.map((pts) => [tuboSpezzato(pts, 0.0018, 5), new T.Matrix4(), 0xe8c56a])), mNoodle))
     metti(o, P.pechino[0], P.pechino[1], P.pechino[2])
+    tocchi.push({ cosa: 'cartone', o })
   }
   // il pacchetto di luckypzkko, accartocciato (la faccia davanti su ogni lato); i mozziconi qua e là
   {
@@ -172,6 +180,7 @@ export async function spazzatura(scene, M) {
     pacchetto.rotation.x = -Math.PI / 2 + 0.05; pacchetto.position.y = 0.012
     const o = new T.Group(); o.add(pacchetto)
     metti(o, P.lucky[0], P.lucky[1], P.lucky[2])
+    tocchi.push({ cosa: 'pacchetto', o })
     // (ognuno: il filtro, la carta, la cenere; montati e poi uniti tutti in una geometria)
     const parti = [], filtro = new T.CylinderGeometry(0.0039, 0.0039, 0.021, 10), cenere = new T.CylinderGeometry(0.0036, 0.0038, 0.003, 10)
     for (let i = 0; i < 9; i++) {
@@ -191,6 +200,49 @@ export async function spazzatura(scene, M) {
   for (const [mappa, dove, lucido] of [[tucson, P.tucson, 0.32], [pzkkonet, P.pzkkonet, 0.45], [menu, P.menu, 0.5]]) {
     const o = volantino(mappa, lucido)
     metti(o, dove[0], dove[1], dove[2]); piatto(o)
+    // (incollati dalla pioggia: non si muovono, fanno solo il rumore della carta bagnata)
+    tocchi.push({ cosa: 'carta-bagnata', o: o.children[0], margine: 0.004 })
+  }
+  // i grissini alla pizza (22.10): il pacchetto di «grissin pzk» aperto da un lato, coi grissini che escono, due per terra
+  // (uno rotto in tre pezzi) e le briciole. Il pacchetto è un cuscino schiacciato di film lucido (la faccia disegnata da
+  // gpt-image-2, disegni.mjs «grissini»), i grissini cilindri con la trama ritagliata dalla finestra del pacchetto
+  {
+    const o = new T.Group(), LG = 0.27, LW = 0.112, LH = 0.026
+    const g = accartoccia(new T.BoxGeometry(LG, LW, LH, 14, 6, 2), 0.006, 6)
+    // (le facce: +x, −x, +y, −y, +z, −z; coricato, la +z guarda in su)
+    const busta = new T.MeshStandardMaterial({ map: grissini.t, color: grissini.t ? 0xffffff : 0xc4161a, roughness: 0.3, metalness: 0.05 })
+    const fianco = new T.MeshStandardMaterial({ color: 0xa8141a, roughness: 0.34, metalness: 0.05 })
+    poi(grissini, busta, 'map')
+    const pacco = new T.Mesh(g, [fianco, fianco, fianco, fianco, busta, fianco])
+    pacco.rotation.x = -Math.PI / 2; pacco.position.y = LH / 2 - 0.004
+    o.add(pacco)
+    const pasta = new T.MeshStandardMaterial({ map: grissino.t, color: grissino.t ? 0xffffff : 0xd59a52, roughness: 0.72 })
+    poi(grissino, pasta, 'map')
+    const bastoncino = (l) => new T.CylinderGeometry(0.0044, 0.0047, l, 9, 1)
+    const fuori = []
+    // quelli che escono dalla parte aperta (a +x), a ventaglio
+    for (let i = 0; i < 6; i++) {
+      const l = caso(0.2, 0.25), m = new T.Mesh(bastoncino(l)), a = caso(-0.12, 0.14), z = (i - 2.5) * 0.013 + caso(-0.004, 0.004)
+      m.rotation.set(0, a, Math.PI / 2); m.position.set(LG / 2 - l / 2 + caso(0.03, 0.09), 0.0055 + (i % 2) * 0.004, z)
+      m.updateMatrix(); fuori.push([m.geometry, m.matrix.clone(), 0xffffff])
+    }
+    // due per terra: uno intero, uno rotto in tre pezzi
+    const per = (l, x, z, a) => { const m = new T.Mesh(bastoncino(l)); m.rotation.set(0, a, Math.PI / 2); m.position.set(x, 0.0046, z); m.updateMatrix(); fuori.push([m.geometry, m.matrix.clone(), 0xffffff]) }
+    per(0.23, LG / 2 + 0.07, 0.07, 0.5)
+    per(0.09, LG / 2 + 0.03, -0.085, -0.3); per(0.07, LG / 2 + 0.13, -0.1, 0.8); per(0.05, LG / 2 + 0.2, -0.06, -1.2)
+    const gg = unisci(fuori)
+    // (unisci butta le uv: le si rimette, una copia per pezzo, come le avevano i cilindri)
+    const uv = []
+    for (const [g0] of fuori) uv.push(...(g0.index ? g0.toNonIndexed() : g0).attributes.uv.array)
+    gg.setAttribute('uv', new T.Float32BufferAttribute(uv, 2))
+    o.add(new T.Mesh(gg, pasta))
+    // le briciole
+    const bri = []
+    for (let i = 0; i < 26; i++) { const m = new T.Mesh(new T.BoxGeometry(1, 1, 1)); const s = caso(0.002, 0.005); m.scale.set(s, s * 0.6, s * caso(0.6, 1)); m.position.set(LG / 2 + caso(-0.02, 0.22), s * 0.3, caso(-0.11, 0.1)); m.rotation.y = caso(0, 3); m.updateMatrix(); bri.push([m.geometry, m.matrix.clone(), i % 4 ? 0xd9a35c : 0xb4532f]) }
+    const briciole = new T.Mesh(unisci(bri), new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.8 }))
+    briciole.castShadow = false; o.add(briciole)
+    metti(o, P.grissini[0], P.grissini[1], P.grissini[2])
+    tocchi.push({ cosa: 'grissini', o })
   }
   // le gomme da masticare appiccicate: vecchie (nere, grigie) e qualcuna fresca (rosa, menta)
   {
@@ -216,7 +268,8 @@ export async function spazzatura(scene, M) {
     metti(o, P.tombino[0], P.tombino[1]); piatto(o)
     o.traverse((m) => { m.castShadow = false })
     CHIUSINO.value.set(P.tombino[0], P.tombino[1], LATO_CHIUSINO / 2, 0)
+    tocchi.push({ cosa: 'chiusino', o: o.children[0], margine: 0.002 })
   }
   // aggiorna, avanzamento, vere: di tutte le immagini disegnate, anche quelle del fronte del negozio (disegni.js)
-  return { tutte, ...disegni }
+  return { tutte, tocchi, ...disegni }
 }

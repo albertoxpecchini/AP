@@ -1,0 +1,120 @@
+/* La finestra delle mine di pzkko.it: lo stesso foglio col nastro della roulette
+   e del blackjack (art/roulette/carta.webp), 800 × 600 sul computer, a tutto
+   schermo sul telefono. Dentro: il campo stampato sul foglio (SVG in multiply),
+   le fiches fotografate, le tessere 3D (canvas trasparente sopra il foglio), i
+   timbri. Caratteri e colori quelli del muro; il titolo nello stencil del
+   volantino (Black Ops One). */
+
+.mn{position:fixed;inset:0;margin:auto;width:800px;height:600px;max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#161616;
+  font:400 14px/1.3 "Special Elite","Courier New",monospace;--rosso:#b3121f;--nero:#161616;--evid:#ffd400;--marker:"Permanent Marker","Comic Sans MS",cursive;--fa:"Anton",Impact,sans-serif;--stencil:"Black Ops One",Impact,sans-serif}
+.mn::backdrop{background:rgba(12,10,8,.62);backdrop-filter:blur(2px)}
+.mn[open]{animation:mn-attacca .32s cubic-bezier(.22,1,.36,1)}
+.mn.chiude{animation:mn-stacca .22s ease-in forwards}
+@keyframes mn-attacca{from{opacity:0;transform:translateY(18px) rotate(-1deg) scale(.97)}}
+@keyframes mn-stacca{to{opacity:0;transform:translateY(10px) rotate(.8deg) scale(.98)}}
+.mn::before{content:"";position:absolute;left:-8.66%;right:-9.04%;top:-12.6%;bottom:-12.49%;z-index:-1;background:url(/art/roulette/carta.webp) 0 0/100% 100% no-repeat;transform:scaleY(-1);filter:drop-shadow(0 -4px 6px rgba(0,0,0,.35)) drop-shadow(0 -24px 30px rgba(0,0,0,.4));pointer-events:none}
+.mn *{box-sizing:border-box}
+.mn button,.mn select{font:inherit;color:inherit}
+.mn :focus-visible{outline:3px solid var(--evid);outline-offset:2px}
+.mn [hidden]{display:none !important}
+
+.mn-dentro{position:absolute;inset:0;display:grid;grid-template-rows:52px 1fr 84px;padding:10px 18px 8px 14px}
+
+.mn-testa{display:flex;align-items:center;gap:16px;min-width:0;padding-left:8px}
+.mn-testa h2{margin:0;font:400 40px/1 var(--stencil);letter-spacing:.01em;flex:none}
+.mn-voce{margin:0;flex:1;min-width:0;font:400 18px/1.1 var(--marker);color:var(--rosso);transform:rotate(-1.2deg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mn-quante{flex:none;display:flex;align-items:baseline;gap:4px;font-size:12px;color:#5a544c}
+.mn-quante select{appearance:none;-webkit-appearance:none;padding:1px 4px;border:0;border-bottom:2px solid currentColor;border-radius:0;background:none;cursor:pointer;font:400 18px/1.1 var(--marker);color:#1446a0;text-align:center}
+.mn-quante select:disabled{opacity:.45;cursor:not-allowed}
+.mn-chiudi{flex:none;width:44px;height:44px;padding:6px;border:0;border-radius:50%;background:none;cursor:pointer;color:#161616;transform:rotate(-6deg);transition:transform .2s cubic-bezier(.22,1,.36,1)}
+.mn-chiudi svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4.2;stroke-linecap:round}
+@media (hover:hover){.mn-chiudi:hover{transform:rotate(-6deg) scale(1.12)}}
+
+/* il campo: il foglio stampato, le fiches, le tessere 3D, i segni */
+.mn-campo{position:relative;min-height:0}
+.mn-tavolo{position:absolute;inset:0;width:100%;height:100%;overflow:visible;mix-blend-mode:multiply}
+.mn-tavolo text{pointer-events:none;user-select:none}
+.mn-tavolo .mn-grande{font-family:var(--fa);letter-spacing:.02em}
+.mn-tavolo .mn-piccola{font-family:"Special Elite","Courier New",monospace}
+.mn-zona{fill:transparent;cursor:pointer}
+.mn-zona:focus{outline:none}
+.mn-zona:focus-visible{stroke:var(--evid);stroke-width:3.5}
+.mn.chiuso .mn-zona:not(.mn-zona-puntata){cursor:default}
+@media (hover:hover){.mn:not(.chiuso) .mn-zona-puntata:hover,.mn.chiuso .mn-zona-puntata:hover{fill:rgba(255,212,0,.3)}}
+.mn-bruciata.nuova{animation:mn-brucia .5s ease-out both}
+@keyframes mn-brucia{from{opacity:0}}
+.mn-fiches,.mn-segni{position:absolute;inset:0;pointer-events:none}
+.mn-3d{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.mn-pila{position:absolute;left:0;top:0;width:0;height:0;--f:28px}
+.mn-fiche{position:absolute;left:calc(var(--f) / -2);top:calc(var(--f) / -2);width:var(--f);height:var(--f);max-width:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 2px 3px rgba(0,0,0,.2));will-change:transform}
+.mn-volo{position:fixed;left:0;top:0;--f:28px;width:var(--f);height:var(--f);margin:calc(var(--f) / -2) 0 0 calc(var(--f) / -2);z-index:5;pointer-events:none;will-change:transform}
+.mn-carica{position:absolute;inset:0;display:grid;place-items:center;margin:0;font:400 20px/1.2 var(--marker);color:#3a3632;text-align:center;transform:rotate(-2deg);pointer-events:none}
+
+/* i timbri: boom, la vincita */
+.mn-timbro{position:absolute;z-index:2;padding:.08em .35em .12em;font:400 24px/1 var(--fa);color:#fff;background:var(--nero);white-space:nowrap;transform:translate(-50%,-50%) rotate(-5deg);box-shadow:0 3px 0 rgba(0,0,0,.25);animation:mn-timbro .45s cubic-bezier(.2,1.6,.4,1) both;pointer-events:none}
+.mn-timbro.oro{background:var(--evid);color:var(--nero)}
+.mn-timbro.rosso{background:var(--rosso);font-family:var(--stencil);animation-delay:.12s}
+.mn-timbro.via{animation:mn-via .3s ease-in forwards}
+@keyframes mn-timbro{from{opacity:0;transform:translate(-50%,-50%) rotate(-5deg) scale(1.8)}}
+@keyframes mn-via{to{opacity:0;transform:translate(-50%,-70%) rotate(-5deg) scale(.9)}}
+
+/* sotto la colonna: gli ultimi giri e la stampa piccola della prova */
+.mn-sotto{position:absolute;display:flex;flex-direction:column;gap:5px;min-width:0}
+.mn-storia{display:flex;gap:4px;margin:0;padding:0;list-style:none;overflow:hidden;min-height:20px}
+.mn-storia li{flex:none;padding:3px 5px 2px;border-radius:3px;font:400 12px/1 var(--fa);color:var(--nero);background:var(--evid)}
+.mn-storia li.mina{background:var(--rosso);color:#fff;font-family:var(--stencil);font-size:11px}
+.mn-storia li:first-child{outline:2px solid #161616;outline-offset:1px}
+.mn-prova{align-self:flex-start;max-width:100%;padding:0;border:0;background:none;cursor:pointer;font-size:10.5px !important;line-height:1.2;color:#5a544c !important;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (hover:hover){.mn-prova:hover{color:#1446a0 !important;text-decoration:underline}}
+
+/* sotto: il saldo, le fiches da puntare, i tasti */
+.mn-banco{display:flex;align-items:center;gap:12px;padding:0 4px 0 10px;min-width:0}
+.mn-saldo{flex:none;margin:0;line-height:1;min-width:112px}
+.mn-saldo small{display:block;font:400 12px/1 var(--marker);color:#3a3632}
+.mn-saldo b{display:block;font:400 26px/1.05 var(--fa);font-weight:400}
+.mn-saldo .puntato{display:block;margin-top:3px;font-size:11px;color:#5a544c}
+.mn-saldo .pzk-ig{display:inline-block;margin-top:4px;padding-bottom:1px;border-bottom:2px solid currentColor;font:400 12px/1.15 var(--marker);color:#1446a0;text-decoration:none;white-space:nowrap}
+.mn-saldo .pzk-ig[hidden]{display:none}
+.mn-saldo .pzk-ig b{display:inline;font:inherit;color:var(--rosso)}
+@media (hover:hover){.mn-saldo .pzk-ig:hover{color:var(--rosso)}}
+.mn-scegli{display:flex;gap:2px;flex:none}
+.mn-scegli button{position:relative;width:42px;height:46px;padding:0;border:0;background:none;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1)}
+.mn-scegli img{width:38px;height:38px;max-width:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 3px 4px rgba(0,0,0,.18))}
+@media (hover:hover){.mn-scegli button:not(:disabled):hover{transform:translateY(-5px)}}
+.mn-scegli button:not(:disabled):active{transform:translateY(-1px) scale(.96)}
+.mn-scegli button:disabled{opacity:.35;cursor:not-allowed}
+.mn-tasti{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;justify-content:flex-end;flex:1;min-width:0}
+.mn-piccolo{padding:2px 4px;border:0;border-bottom:2px solid currentColor;background:none;cursor:pointer;font:400 15px/1.1 var(--marker) !important;color:#1446a0 !important}
+.mn-piccolo:disabled{opacity:.35;cursor:not-allowed}
+.mn-piccolo[aria-pressed="true"]{color:var(--rosso) !important}
+.mn-gioca{flex:none;padding:.16em .45em .2em;border:0;background:var(--nero);color:#fff !important;font:400 26px/1 var(--fa) !important;cursor:pointer;transform:rotate(-2deg);box-shadow:0 3px 0 rgba(0,0,0,.25);transition:transform .15s cubic-bezier(.22,1,.36,1),background .15s;white-space:nowrap}
+.mn-gioca.incassa:not(:disabled){background:var(--evid);color:var(--nero) !important;box-shadow:0 0 0 2px var(--nero),0 3px 0 2px rgba(0,0,0,.25)}
+.mn-gioca:disabled{background:#8a847c;cursor:not-allowed;opacity:.6}
+@media (hover:hover){.mn-gioca:not(:disabled):hover{transform:rotate(-2deg) translateY(-2px)}}
+.mn-gioca:not(:disabled):active{transform:rotate(-2deg) translateY(1px)}
+
+@media (prefers-reduced-motion:reduce){
+  .mn[open],.mn.chiude,.mn-timbro,.mn-timbro.via,.mn-bruciata.nuova{animation:none}
+}
+
+/* il telefono e le finestre basse: il foglio a tutto schermo, il campo sopra, i tasti sotto */
+@media (max-width:820px),(max-height:640px){
+  .mn{width:100vw;height:100svh;max-height:100svh}
+  .mn::before{inset:0;background:url(/art/roulette/carta.webp) 50% 50%/240% 220% no-repeat;filter:none}
+  .mn-dentro{overflow-y:auto;overscroll-behavior:contain;grid-template-rows:auto 1fr auto;padding:6px 12px calc(10px + env(safe-area-inset-bottom));row-gap:6px}
+  .mn-banco{align-self:end}
+  .mn-testa{flex-wrap:wrap;gap:2px 10px;padding-left:2px}
+  .mn-testa h2{font-size:30px}
+  .mn-voce{order:3;flex:1 1 100%;font-size:16px;white-space:normal;min-height:2.2em}
+  .mn-quante{margin-left:auto}
+  .mn-banco{flex-wrap:wrap;gap:8px 10px;padding:0}
+  .mn-saldo{min-width:0}
+  .mn-scegli button{width:40px}
+  .mn-scegli img{width:36px;height:36px}
+  .mn-tasti{flex:1 1 100%;justify-content:flex-end;gap:6px 16px}
+  .mn-gioca{font-size:24px !important}
+}
+/* sul telefono in piedi il campo è alto quanto serve: le caselle larghe come lo schermo, sotto la colonna */
+@media (max-width:820px){
+  .mn-campo{align-self:start;height:calc(100vw + 136px);max-height:720px}
+}

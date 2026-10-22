@@ -20,8 +20,12 @@
 // - La goccia della condensa, quando tocca la soglia; le mosche e la zanzara tigre che ronzano (quella che viene davanti
 //   alla telecamera, all'orecchio), le blatte che zampettano sulla pietra (da vicino); dentro il negozio, dietro il vetro,
 //   il PC che si accende (bip, floppy, disco), qualcuno che va nel Setup e poi scrive il comando che lo pianta, e da capo.
-// - Le mani: il foglio che si alza fruscia, il tagliando si strappa, la saracinesca nuda si bussa (un clic sul muro),
-//   il pomodoro del caricamento fa splat.
+// - Le mani: il foglio che si alza fruscia, il tagliando si strappa, il pomodoro del caricamento fa splat; dal 22.10 un
+//   foglio toccato schiocca col suo materiale (la carta, la carta lucida, il cartoncino, lo scontrino, l'asse di legno,
+//   il cartello di lamiera), la saracinesca nuda si bussa (più secca in basso, più ballerina in alto), le cose della
+//   scena (scena/tocchi.js) suonano col loro strumento e dal loro posto: il campanello che trilla dentro il negozio
+//   finché lo si tiene, il vetro, il maniglione, il lucchettone, la lattina, la carta bagnata, i grissini, le
+//   pozzanghere, il chiusino; e la petizione: il foglio che si stacca e torna, le penne, il cappuccio, la biro che scrive.
 // Il browser lascia partire l'audio solo dopo un gesto: lo accende index.html (il nastro «suono» in basso a sinistra,
 // window.pzkkoSuono) e passa qui il contesto già sbloccato. Gli eventi della pagina e della scena (la goccia, l'auto, il
 // lampo, lo strappo, lo scoppio) arrivano con window.pzkkoSuono.evento; quelli arrivati prima del motore aspettano in coda.
@@ -461,12 +465,47 @@ export function accendi(c) {
     tFruscio = performance.now()
     V.fruscio(qui(), c.currentTime + 0.005)
   }, { passive: true })
-  // un clic sulla saracinesca nuda (non su un foglio): la si bussa
-  document.addEventListener('click', (e) => {
-    if (!P.acceso || !e.target.closest?.('.parete') || e.target.closest('.vol, .man, a, button, .tagliandi')) return
+  // toccare (22.10): col mouse alla pressione, col dito al tocco (il clic: chi scorre la pagina col dito non suona
+  // niente). Un foglio schiocca contro la lamiera, col suo materiale (data-suono in index.html: la carta lucida, il
+  // cartoncino, lo scontrino, l'asse di legno delle zucche, il cartello di lamiera); la saracinesca nuda si bussa, più
+  // secca in basso (la barra chiusa col lucchettone) e più ballerina in alto. Le cose della scena 3D le tocca tocchi.js,
+  // che lo scrive sull'evento (pzkkoTocco): la saracinesca che c'è dietro sullo schermo non si bussa anche lei
+  let dito = 'mouse'
+  const mano = (e) => {
+    const el = e.target
+    if (!P.acceso || e.pzkkoTocco || !el?.closest?.('.parete') || el.closest('.tagliandi, .penna, #petizione')) return
     px = e.clientX / innerWidth
-    V.bussa(qui(0.8), c.currentTime + 0.005)
-  })
+    const foglio = el.closest('.vol, .man')
+    if (foglio) return V.carta(qui(0.9), c.currentTime + 0.003, { tipo: foglio.dataset.suono || (foglio.classList.contains('c-lucido') ? 'lucida' : '') })
+    if (el.closest('a, button')) return
+    const r = el.closest('.parete').getBoundingClientRect(), m = (limita((r.bottom - e.clientY) / Math.max(1, r.height)) * altezza())
+    V.bussa(qui(0.85), c.currentTime + 0.003, { alto: limita(m / 3) })
+  }
+  document.addEventListener('pointerdown', (e) => { dito = e.pointerType; if (e.pointerType === 'mouse' && e.button === 0) mano(e) }, { passive: true })
+  document.addEventListener('click', (e) => { if (dito !== 'mouse') mano(e) })
+
+  // ── le cose della scena che si toccano (tocchi.js): ognuna col suo strumento, dal suo posto nel mondo ──
+  const STRUMENTI = { citofono: 'citofono', vetro: 'vetro', telaio: 'telaio', maniglione: 'maniglione', lucchetto: 'lucchetto', portachiavi: 'portachiavi', lattina: 'lattina',
+    'carta-bagnata': 'cartaBagnata', pacchetto: 'pacchetto', cartone: 'cartone', grissini: 'grissini', pozza: 'pozza', pietra: 'pietra', neve: 'neve', chiusino: 'chiusino', muro: 'muro' }
+  const tocco = (d) => { const fa = V[STRUMENTI[d.cosa]]; if (fa) fa(da(d.x, d.y, d.z, { ref: 2.4, eco: 0.14, vita: 4 }), c.currentTime + 0.004) }
+  // il campanello: il pulsante scatta sul citofono, e dentro il negozio, dietro il vetro (che si mangia gli acuti), il
+  // campanello trilla finché il dito tiene, nella stanza vuota che rimbomba. A volte, poco dopo, il citofono si apre:
+  // fruscia, nessuno parla, si chiude
+  let squilla = null
+  const campanello = (d) => {
+    const t = c.currentTime + 0.004
+    if (d.premuto) {
+      if (squilla) return
+      const v = S()?.h?.portaTocchi?.vetro
+      const fuori = da(d.x, d.y, d.z, { ref: 2.4, eco: 0.1, vita: 8 }), dentro = da(v ? (v.x0 + v.x1) / 2 : d.x - 0.5, 1.7, -1.4, { ref: 2.4, eco: 0.5, vetro: true, vita: 8 })
+      squilla = { s: V.campanello(fuori, dentro, t), t, d }
+    } else if (squilla) {
+      const q = squilla
+      squilla = null
+      q.s.lascia(Math.max(t, q.t + 0.25))
+      if (Math.random() < 0.35) setTimeout(() => V.risponde(da(q.d.x, q.d.y, q.d.z, { ref: 2.4, eco: 0.1, vita: 6 }), c.currentTime + 0.01), caso(1400, 2600))
+    }
+  }
 
   // ── gli eventi della pagina e della scena; le prove della regia ──
   const centro = guadagno(1)
@@ -476,7 +515,14 @@ export function accendi(c) {
     campane: () => ore(Math.floor(mantova(pagina()?.orologio?.adesso?.() ?? Date.now()).ora)),
     mezzogiorno: () => concerto(Math.max(c.currentTime + 0.3, campaneFino), 30),
     tuono: () => lampo({ vicino: caso(0.6, 1) }),
-    bussa: () => V.bussa(qui(0.8), c.currentTime + 0.01),
+    bussa: () => V.bussa(qui(0.85), c.currentTime + 0.01, { alto: Math.random() }),
+    // (le cose che si toccano: dalla regia si sentono come in mano)
+    campanello: () => { const d = { x: W + 1, y: 1.4, z: 0.05 }; campanello({ ...d, premuto: true }); setTimeout(() => campanello({ ...d, premuto: false }), 1300) },
+    ...Object.fromEntries(Object.entries(STRUMENTI).map(([k, v]) => [k, () => V[v](qui(0.9), c.currentTime + 0.01)])),
+    cartello: () => V.cartello(qui(0.9), c.currentTime + 0.01),
+    legno: () => V.legno(qui(0.9), c.currentTime + 0.01),
+    carta: () => V.carta(qui(0.9), c.currentTime + 0.01, { tipo: scegli(['', 'lucida', 'cartoncino', 'scontrino']) }),
+    penna: () => V.penna(qui(0.9), c.currentTime + 0.01, { durata: 1.6, n: 12 }),
   }
   const senti = (nome, d = {}) => {
     if (nome === 'auto') auto(d)
@@ -484,6 +530,15 @@ export function accendi(c) {
     else if (nome === 'lampo') lampo(d)
     else if (nome === 'strappo') V.strappo(qui(), c.currentTime + 0.005)
     else if (nome === 'scoppio') V.splat(centro, c.currentTime + Math.max(0, (d.tra ?? 0) / 1000))
+    else if (nome === 'tocco') tocco(d)
+    else if (nome === 'campanello') campanello(d)
+    // la petizione (petizione.js, scena/penne.js): la biro che scrive, le penne che si urtano, il cappuccio, il foglio
+    // che si stacca dal muro e torna, il palmo che lo riattacca
+    else if (nome === 'penna') V.penna(qui(0.9), c.currentTime + 0.005, d)
+    else if (nome === 'penne') V.penne(qui(0.7), c.currentTime + 0.005, d)
+    else if (nome === 'tappo') V.tappo(qui(), c.currentTime + 0.005, d)
+    else if (nome === 'foglio') V.foglio(qui(), c.currentTime + 0.005, d)
+    else if (nome === 'attacca') V.attacca(qui(), c.currentTime + 0.005, d)
     else if (nome === 'prova') prove[d.nome]?.()
   }
   // (quelli arrivati prima del motore: i vecchi si buttano, le auto si suonano da dove sono arrivate)
