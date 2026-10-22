@@ -69,6 +69,7 @@
 @font-face{font-family:"Archivo Black";src:url(/fonts/archivo-black.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Fake Receipt";src:url(/fonts/fake-receipt.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Abril Fatface";src:url(/fonts/abril-fatface.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Shrikhand";src:url(/fonts/shrikhand.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Bungee";src:url(/fonts/bungee.woff2) format("woff2");font-weight:400;font-display:swap}
@@ -377,8 +378,8 @@ html:not(.js) .wallet-tasto{display:none}
 .chat-tasto{position:fixed;z-index:85;top:calc(max(12px,env(safe-area-inset-top)) + 62px);left:max(12px,env(safe-area-inset-left));width:112px;height:61px;padding:0;border:0;background:none;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
 .chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
-.chat-tasto .ct-lcd{position:absolute;left:14.5%;top:27%;width:55%;height:47%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px;padding:0 5px;border-radius:2px;background:#a9bc96;color:#1c2616;font:400 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;text-align:left;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden;white-space:nowrap}
-.chat-tasto .ct-lcd b{font:400 11px/1 "Rubik Mono One",ui-monospace,monospace}
+.chat-tasto .ct-lcd{position:absolute;left:14.5%;top:27%;width:55%;height:47%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px;padding:0 5px;border-radius:2px;background:#a9bc96;color:#1c2616;font:400 8.5px/1 "Fake Receipt",ui-monospace,Consolas,monospace;letter-spacing:.04em;text-align:left;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden;white-space:nowrap}
+.chat-tasto .ct-lcd b{font:400 12px/1 "Fake Receipt",ui-monospace,monospace}
 .chat-tasto .ct-lcd .ct-n{display:none}
 .chat-tasto.msg .ct-lcd .ct-n{display:inline;animation:ct-lamp 1.2s steps(2) infinite}
 .chat-tasto .ct-led{position:absolute;left:83%;top:23%;width:6px;height:6px;border-radius:50%;background:#2a1a10;box-shadow:inset 0 0 2px #000}
@@ -389,7 +390,7 @@ html:not(.js) .chat-tasto{display:none}
 @media (hover:hover){.chat-tasto:hover{transform:scale(1.04)}}
 .chat-tasto:active{transform:scale(.96)}
 .chat-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.chat-tasto{top:calc(max(12px,env(safe-area-inset-top)) + 54px);width:96px;height:52px}.chat-tasto .ct-lcd{font-size:7px}.chat-tasto .ct-lcd b{font-size:9.5px}}
+@media (max-width:899px){.chat-tasto{top:calc(max(12px,env(safe-area-inset-top)) + 54px);width:96px;height:52px}.chat-tasto .ct-lcd{font-size:7px}.chat-tasto .ct-lcd b{font-size:10.5px}}
 @media (prefers-reduced-motion:reduce){.chat-tasto{transition:none}.chat-tasto.msg .ct-lcd .ct-n,.chat-tasto.msg .ct-led{animation:none}}
 </style>
 </head>
