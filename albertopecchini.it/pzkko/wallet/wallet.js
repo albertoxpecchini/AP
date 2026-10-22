@@ -193,7 +193,7 @@ function costruisci() {
       <div class="w-schermo w-borsa" style="${pos(POS.borsa)}"><canvas class="w-grafico"></canvas><div class="w-tasso"></div><div class="w-var"></div><div class="w-periodo"></div><div class="w-info"></div></div>
       ${tasti.map((t, i) => `<button class="w-tasto" type="button" data-s="${t}" data-eti="${t}" aria-pressed="false" style="left:${POS.tasti[i][0]}%;top:${POS.tasti[i][1]}%" aria-label="${t}"></button>`).join('')}
       <button class="w-manopola" type="button" data-eti="periodo" aria-label="il periodo del grafico" style="left:${POS.manopola[0]}%;top:${POS.manopola[1]}%"><i></i></button>
-      <div class="w-cavo" aria-hidden="true"><svg viewBox="0 0 190 120" fill="none"><path d="M-40 118 C 20 118, 40 60, 110 60" stroke="#111" stroke-width="9" stroke-linecap="round"/><path d="M-40 118 C 20 118, 40 60, 110 60" stroke="#2c2c2c" stroke-width="5" stroke-linecap="round"/><rect x="108" y="49" width="46" height="22" rx="6" fill="#1b1b1b" stroke="#0a0a0a" stroke-width="2"/><rect x="150" y="53" width="30" height="14" rx="7" fill="#b9bcbf" stroke="#6d7073" stroke-width="1.5"/><circle cx="118" cy="60" r="3" fill="#46ff7d"><animate attributeName="opacity" values="1;.2;1" dur="1.6s" repeatCount="indefinite"/></circle></svg></div>
+      <img class="w-cavo" src="/art/wallet-cavo/cavo.webp" alt="" width="971" height="184" loading="lazy" aria-hidden="true">
       <p class="w-voce" role="status" aria-live="polite"></p>
     </div>
     <div class="w-carta"></div>`

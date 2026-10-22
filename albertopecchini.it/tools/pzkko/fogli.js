@@ -567,6 +567,16 @@ They are the four paper banknotes of an invented play currency, the «$pzk» of 
 The paper is slightly worn and creased, a little dirty at the edges, as notes that have been lost on a sidewalk, but each lies flat and whole. Photorealistic, sharp. Nothing outside the rectangles of the notes, no shadow falls on the magenta. ${NIENTE_MAGENTA}`,
   },
 
+  'wallet-cavo': {
+    scala: 0.5,
+    titolo: 'il cavo usb-c del wallet, in carica: entra nella porta sul fianco sinistro',
+    aspetto: '2048x1152',
+    griglia: [1, 1],
+    pezzi: ['cavo'],
+    prompt: `${griglia('One piece: a single USB-C charging cable,', 1, 1)}
+It is photographed from DIRECTLY ABOVE (flat top view, orthographic), landscape, filling the cell from left to right: a black braided nylon USB-C cable, about as thick as a pencil, coming in from the LEFT edge of the cell in one gentle S-shaped curve and ending on the RIGHT with its plug. The plug is a matte dark grey anodised aluminium housing (rounded rectangle, with a short black rubber strain relief where the cable enters it) and, at its very right end, the small metal USB-C tip, pointing exactly to the right, horizontal. The cable is slightly worn, a scuff on the housing. Photorealistic, sharp, soft diffuse studio light from the top left (the same light as the leather wallet it will plug into), no shadow on the magenta. Nothing else: no port, no wallet, no table. ${NIENTE_MAGENTA}`,
+  },
+
   // ── la chat col bot (pzkko/chat/): le icone al posto delle emoji e il cercapersone del tasto. I pezzi stanno in
   // pzkko/chat/icone.js, i prompt in fogli-chat.js ──
   ...fogliChat({ griglia, NIENTE_MAGENTA }),
