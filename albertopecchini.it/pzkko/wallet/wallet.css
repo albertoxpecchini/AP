@@ -62,10 +62,13 @@
 
 /* il cavo usb-c (art/wallet-cavo/, una foto di gpt-image-2 come il portafoglio): la porta guarda verso chi guarda, quindi
    la spina è infilata giù, perpendicolare allo sguardo, e si vede solo il suo fondo (la foto è la spina vista dall'alto col
-   cavo che corre a sinistra: ruotata di −90° attorno al suo fondo, così il cavo scende fino al bordo in basso del portafoglio e lì si taglia).
+   cavo che corre a sinistra: ruotata di −90° attorno al suo fondo, così il cavo scende fino al bordo in basso del portafoglio, e da lì il filo continua fino in fondo allo schermo).
    La porta sta al 5,1 % da sinistra e al 56 % dall'alto della foto; il fondo della spina è l'11 % destro dell'immagine */
 .w-cavo{left:-31.9%;top:48.3%;width:37%;height:auto;pointer-events:none;opacity:0;transition:opacity .4s;transform:rotate(-90deg);transform-origin:right center;
-  filter:drop-shadow(-.35cqw .2cqw .4cqw rgba(0,0,0,.5));clip-path:inset(0 0 0 43.2%)} /* tagliato dove il portafoglio finisce: il cavo arriva al bordo in basso e lì sparisce sotto */
+  filter:drop-shadow(-.35cqw .2cqw .4cqw rgba(0,0,0,.5));clip-path:inset(0 0 0 43.2%)} /* tagliato al bordo in basso del portafoglio: da lì continua il filo */
+/* il filo: da sotto il bordo del portafoglio fino in fondo allo schermo, un pezzo di cavo dritto ripetuto (filo.webp), dietro la carta dei moduli */
+.w-cavo-filo{left:3.66cqw;top:100%;width:2.88cqw;height:120vh;z-index:-2;pointer-events:none;opacity:0;transition:opacity .4s;background:url(/art/wallet-cavo/filo.webp) center top/100% auto repeat-y;filter:drop-shadow(.2cqw .3cqw .4cqw rgba(0,0,0,.5))}
+.wallet.carica .w-cavo-filo{opacity:1}
 .wallet.carica .w-cavo{opacity:1}
 
 /* la voce: una striscia di nastro dymo nero sulla pelle, sotto la piastra di sinistra */

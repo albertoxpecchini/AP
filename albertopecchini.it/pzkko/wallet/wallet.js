@@ -193,7 +193,7 @@ function costruisci() {
       <div class="w-schermo w-borsa" style="${pos(POS.borsa)}"><canvas class="w-grafico"></canvas><div class="w-tasso"></div><div class="w-var"></div><div class="w-periodo"></div><div class="w-info"></div></div>
       ${tasti.map((t, i) => `<button class="w-tasto" type="button" data-s="${t}" data-eti="${t}" aria-pressed="false" style="left:${POS.tasti[i][0]}%;top:${POS.tasti[i][1]}%" aria-label="${t}"></button>`).join('')}
       <button class="w-manopola" type="button" data-eti="periodo" aria-label="il periodo del grafico" style="left:${POS.manopola[0]}%;top:${POS.manopola[1]}%"><i></i></button>
-      <img class="w-cavo" src="/art/wallet-cavo/cavo.webp" alt="" width="771" height="60" loading="lazy" aria-hidden="true">
+      <img class="w-cavo" src="/art/wallet-cavo/cavo.webp" alt="" width="771" height="60" loading="lazy" aria-hidden="true"><div class="w-cavo-filo" aria-hidden="true"></div>
       <p class="w-voce" role="status" aria-live="polite"></p>
     </div>
     <div class="w-carta"></div>`
