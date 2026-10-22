@@ -14,6 +14,7 @@ import * as zaino from './zaino.js'
 import { conIcone, icona } from './icone.js'
 import { COMANDI, PER_NOME, CATEGORIE } from './comandi/index.js'
 import { eventoCasuale, salutoIniziale } from './comandi/eventi.js'
+import { NEGOZIO as NEGOZIO_OGGETTI } from './testi.js'
 
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const mezzi = (n) => Math.round(n * 2) / 2
@@ -22,7 +23,7 @@ export const pzkHtml = (n) => `<span class="pzk">${pzk.fmt(n)} $pzk</span>`
 export const eurHtml = (n) => `<span class="eur">EUR€ ${pzk.fmtEur(n)}</span>`
 
 let tasto = null, dlg = null, lista = null, input = null, sugg = null, saldoEl = null, giuEl = null, rapidiEl = null
-let nuovi = 0, ultimoGiorno = '', incollata = true
+let nuovi = 0, ultimoGiorno = '', incollata = true, rapidiFrecce = () => {}
 let aspettaTesto = null // { risolvi, nascosto } quando un minigioco aspetta che si scriva qualcosa
 const storia = [] // i comandi scritti, per le frecce
 let iStoria = -1
@@ -56,7 +57,11 @@ function costruisci() {
       <div class="c-testa">${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
       <div class="c-lista" role="log" aria-live="polite"></div>
       <button class="c-giu" type="button" aria-label="vai agli ultimi messaggi" hidden><span>↓</span><b class="c-nuovi"></b></button>
-      <div class="c-rapidi" role="toolbar" aria-label="le ultime scelte"></div>
+      <div class="c-rapidi-box">
+        <button class="c-fr sx" type="button" aria-label="scorri i tasti a sinistra" hidden>‹</button>
+        <div class="c-rapidi" role="toolbar" aria-label="le ultime scelte"></div>
+        <button class="c-fr dx" type="button" aria-label="scorri i tasti a destra" hidden>›</button>
+      </div>
       <form class="c-riga" autocomplete="off">
         <ul class="c-sugg" role="listbox" hidden></ul>
         <span class="c-prompt" aria-hidden="true">›</span>
@@ -78,6 +83,16 @@ function costruisci() {
   lista.addEventListener('click', clicLista)
   lista.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.cmd')) { e.preventDefault(); clicLista(e) } })
   rapidiEl.addEventListener('click', clicRapidi)
+  // le freccette: la fila scorre a passi, e ogni freccia c'è solo se da quel lato c'è altro
+  const frecce = () => {
+    const sx = dlg.querySelector('.c-fr.sx'), dx = dlg.querySelector('.c-fr.dx')
+    sx.hidden = rapidiEl.scrollLeft < 8
+    dx.hidden = rapidiEl.scrollLeft + rapidiEl.clientWidth > rapidiEl.scrollWidth - 8
+  }
+  rapidiFrecce = () => requestAnimationFrame(frecce)
+  for (const f of dlg.querySelectorAll('.c-fr')) f.addEventListener('click', () => rapidiEl.scrollBy({ left: (f.classList.contains('sx') ? -1 : 1) * rapidiEl.clientWidth * 0.7, behavior: RIDOTTO.matches ? 'instant' : 'smooth' }))
+  rapidiEl.addEventListener('scroll', frecce, { passive: true })
+  new ResizeObserver(frecce).observe(rapidiEl)
   disegnaRapidi()
   zaino.ascolta(disegnaRapidi)
   dlg.querySelector('.c-chiudi').addEventListener('click', chiudi)
@@ -348,7 +363,12 @@ export async function esegui(riga, { muto = false } = {}) {
   if (!nome) return
   if (!muto) utente(riga.replace(/^\/+/, ''), { rifai: true })
   const c = PER_NOME.get(nome)
-  if (!c) { scheda({ colore: 'rosso', av: 'bot-pensa', t: 'eh?', d: `«${nome}» non lo conosco. Scrivi <code>aiuto</code> per l'elenco dei comandi.` }); return }
+  if (!c) {
+    // non è un comando, ma magari è una cosa del negozio o dello zaino: si propone cosa farne
+    const x = NEGOZIO_OGGETTI.find((o) => o.id === nome || o.nome.toLowerCase() === nome)
+    if (x) { scheda({ colore: 'ambra', av: 'bot-pensa', t: `:${x.id}: «${nome}» non è un comando`, d: `ma <b>${x.nome}</b> è nel negozio (${pzkHtml(x.prezzo)}). Cosa ne vuoi fare?`, azioni: [[`compra ${x.id}`, 'compra', 'oro'], [`usa ${x.id}`, 'usa'], [`info ${x.id}`, 'info']] }); return }
+    scheda({ colore: 'rosso', av: 'bot-pensa', t: 'eh?', d: `«${nome}» non lo conosco. Scrivi <code>aiuto</code> per l'elenco dei comandi.` }); return
+  }
   const chiave = c.nomi[0]
   if (!muto) zaino.ricorda(riga)
   if (c.attesa) {
@@ -387,6 +407,7 @@ function disegnaRapidi() {
     const attesa = c?.attesa ? zaino.manca(c.nomi[0]) : 0
     return `<span class="c-r${attesa ? ' attesa' : ''}"><button type="button" class="c-r-b" data-cmd="${esc(r)}" title="${attesa ? `fra ${durata(attesa)}` : 'rifallo'}">${c?.icona ? icona(c.icona) : ''}<span>${esc(r)}</span></button>${fatti.length ? `<button type="button" class="c-r-x" data-via="${esc(r)}" aria-label="togli ${esc(r)}">×</button>` : ''}</span>`
   }).join('')
+  rapidiFrecce()
 }
 function clicRapidi(e) {
   const via = e.target.closest('[data-via]')

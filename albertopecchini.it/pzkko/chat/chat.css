@@ -143,9 +143,17 @@
 .c-sugg li .emo{height:1.2em}
 
 /* ── i tasti rapidi: le ultime scelte, una fila che scorre di lato sopra la riga dove si scrive ── */
-.c-rapidi{display:flex;align-items:center;gap:6px;padding:7px 10px 3px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;border-top:1px solid rgba(70,255,125,.18);background:rgba(0,0,0,.3);mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent)}
+.c-rapidi-box{position:relative;border-top:1px solid rgba(70,255,125,.18);background:rgba(0,0,0,.3)}
+.c-rapidi{display:flex;align-items:center;gap:6px;padding:7px 10px 3px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
 .c-rapidi::-webkit-scrollbar{display:none}
 .c-rapidi:empty{display:none}
+/* le freccette di lato: un tasto tondo che sfuma sopra la fila */
+.c-fr{position:absolute;top:0;bottom:0;z-index:2;width:34px;padding:0 0 3px;border:0;color:var(--led);font:400 26px/1 var(--fa);cursor:pointer;text-shadow:0 0 6px rgba(70,255,125,.7)}
+.c-fr[hidden]{display:none}
+.c-fr.sx{left:0;background:linear-gradient(90deg,#0b100c 40%,transparent);text-align:left;padding-left:9px}
+.c-fr.dx{right:0;background:linear-gradient(270deg,#0b100c 40%,transparent);text-align:right;padding-right:9px}
+@media (hover:hover){.c-fr:hover{color:#fff}}
+.c-fr:active{transform:scale(.9)}
 .c-r{flex:none;display:inline-flex;align-items:stretch;border-radius:999px;background:#1c241d;box-shadow:inset 0 0 0 1px rgba(70,255,125,.28);animation:c-msg .22s ease-out}
 .c-r-b{display:inline-flex;align-items:center;gap:5px;max-width:200px;padding:5px 8px 5px 11px;border:0;border-radius:999px 0 0 999px;background:none;color:#cfe8cc;font:400 13.5px/1 var(--mono);cursor:pointer;white-space:nowrap}
 .c-r-b span{overflow:hidden;text-overflow:ellipsis}
@@ -193,6 +201,22 @@
 .c-scheda{user-select:text;transition:transform .15s,box-shadow .15s}
 @media (hover:hover){.c-scheda:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.07)}}
 .c-msg.tu .c-bolla{cursor:text;user-select:text}
+
+/* la vetrina del negozio: una riga per pezzo, col tasto per comprare lì */
+.c-vetrina{margin:6px 0 2px}
+.c-v-sez{margin:10px 0 2px;font:400 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--c,var(--ambra));opacity:.85}
+.c-v-sez:first-child{margin-top:2px}
+.c-v-riga{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px dashed rgba(255,255,255,.09)}
+.c-v-sez+.c-v-riga{border-top:0}
+.c-v-ico .emo{height:40px;width:40px;object-fit:contain;margin:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+.c-v-txt{min-width:0;font-size:15px;line-height:1.2}
+.c-v-txt small{display:block;margin-top:2px;font:400 11.5px/1.25 var(--mono);color:#9aa795}
+.c-v-prezzo{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:13px}
+.c-v-b{padding:4px 10px 5px;font-size:12px}
+.c-v-b.manca{background:#2b2e29;color:#8b9385;box-shadow:0 3px 0 #000,0 4px 5px rgba(0,0,0,.4)}
+.c-v-ce{font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--led);opacity:.7}
+.c-v-riga.ce{opacity:.65}
+@media (max-width:480px){.c-v-riga{grid-template-columns:36px 1fr auto;gap:8px}.c-v-ico .emo{height:34px;width:34px}}
 
 /* il bot scrive… */
 .c-scrive{display:inline-flex;gap:3px;padding:8px 10px}

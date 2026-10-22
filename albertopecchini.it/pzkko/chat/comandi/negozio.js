@@ -3,8 +3,19 @@ import * as zaino from '../zaino.js'
 import { NEGOZIO, PER_ID, PESCI, ANIMALI, REPERTI, nomeDi } from '../testi.js'
 
 const VENDIBILI = [...PESCI, ...ANIMALI, ...REPERTI]
-const pezzo = (s) => { s = (s ?? '').toLowerCase(); return NEGOZIO.find((x) => x.id === s || x.nome.toLowerCase() === s || x.nome.toLowerCase().startsWith(s)) ?? VENDIBILI.find((x) => x.id === s || nomeDi(x.id).toLowerCase().startsWith(s)) }
-const riga = (x, ctx) => `:${x.id}: <b>${x.nome}</b> · ${ctx.pzkHtml(x.prezzo)}\n<small>${x.cosa}</small>`
+const pezzo = (s) => { s = (s ?? '').trim().toLowerCase(); if (!s) return undefined; return NEGOZIO.find((x) => x.id === s || x.nome.toLowerCase() === s || x.nome.toLowerCase().startsWith(s)) ?? VENDIBILI.find((x) => x.id === s || nomeDi(x.id).toLowerCase().startsWith(s)) }
+const SEZIONI = [['attrezzo', 'attrezzi'], ['usa', 'da usare'], ['tieni', 'da tenere'], ['cassa', 'casse']]
+/** La vetrina: ogni pezzo in una riga con icona, descrizione, prezzo e il tasto per comprarlo lì (grigio se non ti bastano i $pzk o se l'attrezzo ce l'hai già). */
+function vetrina(ctx) {
+  const saldo = ctx.pzk.saldo()
+  const riga = (x) => {
+    const ho = zaino.quanti(x.id), ce = x.tipo === 'attrezzo' && ho > 0, manca = x.prezzo - saldo
+    const tasto = ce ? '<span class="c-v-ce">ce l’hai</span>' : `<button type="button" class="c-b c-v-b${manca > 0 ? ' manca' : ''}" data-cmd="compra ${x.id}" ${manca > 0 ? `title="ti mancano ${ctx.fmt(manca)} $pzk"` : ''}>compra</button>`
+    return `<div class="c-v-riga${ce ? ' ce' : ''}"><div class="c-v-ico">:${x.id}:</div><div class="c-v-txt"><b>${x.nome}</b>${!ce && ho ? ` <small>(ne hai ${ho})</small>` : ''}<small>${x.cosa}</small></div><div class="c-v-prezzo">${ctx.pzkHtml(x.prezzo)}${tasto}</div></div>`
+  }
+  return SEZIONI.map(([tipo, nome]) => { const l = NEGOZIO.filter((x) => x.tipo === tipo); return l.length ? `<div class="c-v-sez">${nome}</div>${l.map(riga).join('')}` : '' }).join('')
+}
+const mostraVetrina = (ctx, t = ':sacco: il negozio dietro la saracinesca') => ctx.dì({ colore: 'ambra', t, html: `<div class="c-vetrina">${vetrina(ctx)}</div>`, pie: `hai ${ctx.fmt(ctx.pzk.saldo())} $pzk · tocca «compra» su un pezzo, o scrivi <code>compra canna 2</code> per più d’uno` })
 
 // le casse: cosa può uscire (peso, cosa)
 const CASSE = {
@@ -26,13 +37,12 @@ export const NEGOZIO_COMANDI = [
   },
   {
     nomi: ['negozio', 'shop', 'store'], cat: 'negozio', icona: 'sacco', breve: 'cosa si compra, e a quanto', uso: 'negozio', senzaEventi: true,
-    async fai(ctx) {
-      ctx.dì({ colore: 'ambra', t: ':sacco: il negozio dietro la saracinesca', html: `<ul>${NEGOZIO.map((x) => `<li>${riga(x, ctx)}</li>`).join('')}</ul>`, pie: 'si compra con «compra &lt;cosa&gt; [quanti]», es. «compra canna»' })
-    },
+    async fai(ctx) { mostraVetrina(ctx) },
   },
   {
     nomi: ['compra', 'buy'], cat: 'negozio', icona: 'pzk', breve: 'compra dal negozio: compra canna', uso: 'compra <cosa> [quanti]', senzaEventi: true,
     async fai(ctx) {
+      if (!ctx.args.length) { mostraVetrina(ctx, ':sacco: cosa vuoi comprare?'); return false }
       const x = NEGOZIO.find((n) => n.id === pezzo(ctx.args.join(' ').replace(/\s+\d+$/, ''))?.id)
       const n = Math.max(1, Math.min(50, parseInt(ctx.args.at(-1)) || 1))
       if (!x) return ctx.dì({ colore: 'rosso', d: `non lo vendo. Guarda il <code>negozio</code>.` })

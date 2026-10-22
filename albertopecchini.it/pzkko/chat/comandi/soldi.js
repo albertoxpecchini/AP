@@ -1,4 +1,4 @@
-// I soldi: aiuto, saldo, profilo, attese, i premi giornalieri, l'elemosina, la classifica, dai.
+// I soldi: aiuto, saldo, profilo, attese, i premi giornalieri, l'elemosina, la classifica, manda.
 import * as zaino from '../zaino.js'
 import { PERSONAGGI, nomeDi } from '../testi.js'
 
@@ -89,11 +89,11 @@ export const SOLDI = [
     },
   },
   {
-    nomi: ['dai', 'invia', 'give', 'pay'], cat: 'soldi', icona: 'pzk', breve: 'manda $pzk a un conto: dai pzk123456 50', uso: 'dai <pzk123456> <quanti>', senzaEventi: true,
+    nomi: ['manda', 'invia', 'dai', 'give', 'pay'], cat: 'soldi', icona: 'pzk', breve: 'manda $pzk a un conto: manda pzk123456 50', uso: 'manda <pzk123456> <quanti>', senzaEventi: true,
     async fai(ctx) {
       if (!ctx.pzk.conto()) return ctx.dì({ colore: 'ambra', d: 'per inviare serve un conto: entra nel wallet.', pie: 'apro il wallet' }) && ctx.apriWallet('entra')
       const ind = ctx.args[0], n = ctx.importo(ctx.args[1])
-      if (!ind || !Number.isFinite(n)) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>dai pzk123456 50</code>.' })
+      if (!ind || !Number.isFinite(n)) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>manda pzk123456 50</code>.' })
       await ctx.pensa(300)
       const r = await ctx.pzk.invia(ind, n)
       if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: r.errore ?? 'non è andata.' })

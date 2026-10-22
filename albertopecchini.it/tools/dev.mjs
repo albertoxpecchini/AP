@@ -48,7 +48,17 @@ const pzkko = (port) => {
   const SCRIPT = `<script>new EventSource('${RICARICA}').onmessage = () => location.reload()</script>`
   const pagine = new Set()
   let attesa
+  // Su Windows fs.watch segnala anche i semplici accessi in lettura: la pagina che si ricarica rilegge i suoi file, il
+  // server li prende per modifiche e la ricarica ancora, ogni due secondi, all'infinito. Si ricarica solo se un file è
+  // cambiato davvero: data di modifica e dimensione, a confronto con quelle viste l'ultima volta.
+  const firma = (f) => { try { const s = fs.statSync(f); return s.isFile() ? `${s.mtimeMs}:${s.size}` : null } catch { return 'sparito' } }
+  const visti = new Map()
+  for (const dir of [root, prove]) if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir, { recursive: true })) { const p = path.join(dir, f), v = firma(p); if (v) visti.set(p, v) }
   for (const dir of [root, prove]) if (fs.existsSync(dir)) fs.watch(dir, { recursive: true }, (_, file) => {
+    if (!file) return
+    const p = path.join(dir, String(file)), v = firma(p)
+    if (v === null || visti.get(p) === v) return // una cartella, o un file solo letto
+    visti.set(p, v)
     clearTimeout(attesa)
     attesa = setTimeout(() => {
       for (const res of pagine) res.write('data: ricarica\n\n')
@@ -110,7 +120,7 @@ const pzkko = (port) => {
   })
 }
 
-const SITI = { bcp: () => bcp(5181), pzkko: () => pzkko(5182) }
+const SITI = { bcp: () => bcp(5181), pzkko: () => pzkko(Number(process.env.PZKKO_PORT) || 5182) }
 const sito = SITI[process.argv[2]]
 if (!sito) {
   console.error(`uso: node tools/dev.mjs ${Object.keys(SITI).join('|')}`)

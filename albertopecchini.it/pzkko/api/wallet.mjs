@@ -28,6 +28,7 @@ import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypt
 import { archivio, aggiorna, corpo, giornoDi, ipDi, json, limite } from './_archivio.mjs'
 import { borsa, tassoA, attuale } from './_borsa.mjs'
 import { PATH, vuoto, offerta } from './_conti.mjs'
+import { PATH_GIOCATORI, vuotoG, aggiornaGiocatore } from './_giocatori.mjs'
 
 export const INIZIALE = 1000, PREMIO_IG = 1000, SUSSIDIO = 1000
 export const BANCONOTE = { b500: 500, b100: 100, b25: 25, b10: 10 }
@@ -57,6 +58,7 @@ const segreto = () => {
 }
 const firma = (s) => createHmac('sha256', segreto()).update(s).digest('base64url').slice(0, 27)
 const token = (id, now) => { const exp = now + VALE_TOKEN; return `${id}.${exp.toString(36)}.${firma(`${id}.${exp.toString(36)}`)}` }
+export const idDaToken = (t, now = Date.now()) => leggiToken(t, now)
 const leggiToken = (t, now) => {
   if (typeof t !== 'string') return null
   const [id, exp, sig] = t.split('.')
@@ -101,7 +103,7 @@ function accogli(c, pzk, now) {
 }
 
 // lo zaino della chat: la forma che accetta (numeri finiti, oggetti piccoli, al più MAX_ZAINO byte)
-const PATH_CHAT = process.env.CHAT_BLOB_PATH || 'pzkko/chat.json', MAX_ZAINO = 8 * 1024
+const PATH_CHAT = process.env.CHAT_BLOB_PATH || 'pzkko/chat.json', MAX_ZAINO = 12 * 1024
 const vuotoChat = () => ({ zaini: {} })
 const zainoValido = (z) => {
   if (!z || typeof z !== 'object' || z.v !== 1 || !Number.isFinite(z.xp) || z.xp < 0) return false
@@ -186,6 +188,14 @@ export default async function handler(req, res) {
       if (body.zaino === undefined) { const { db } = await chat.read(); return json(res, 200, { ok: true, zaino: db.zaini[id] ?? null }) }
       if (!zainoValido(body.zaino)) return json(res, 400, { ok: false, errore: 'zaino strano' })
       const r = await aggiorna(chat, (db) => { const mio = db.zaini[id]; if (mio && mio.t > (body.zaino.t ?? 0)) return { invariato: true, zaino: mio }; db.zaini[id] = body.zaino; return { zaino: body.zaino } })
+      // la riga pubblica del giocatore nel database (api/_giocatori.mjs): se non va, lo zaino è salvo lo stesso
+      if (!r.invariato) {
+        try {
+          const dbG = await archivio(PATH_GIOCATORI, vuotoG)
+          const conto = dbG && (await store.read()).db.conti.find((x) => x.id === id)
+          if (conto) await aggiorna(dbG, (g) => { aggiornaGiocatore(g, conto, r.zaino, now) })
+        } catch (e) { console.warn('giocatori:', e.message) }
+      }
       return json(res, 200, { ok: true, zaino: r.zaino })
     }
 
