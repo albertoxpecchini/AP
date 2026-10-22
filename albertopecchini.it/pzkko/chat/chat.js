@@ -32,6 +32,7 @@ let salutato = false
 export function prepara(b) {
   tasto = b
   aggiornaTasto()
+  import('./tomodachi.js').then((m) => m.avvia(b)).catch((e) => console.warn('tomodachi non partito', e)) // la chiocciolina sullo schermo lcd
   zaino.ascolta(aggiornaTasto)
   pzk.osserva(() => { aggiornaTasto(); aggiornaSaldo() })
   setInterval(aggiornaTasto, 30_000)
