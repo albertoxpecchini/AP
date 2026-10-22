@@ -13,7 +13,7 @@ import * as pzk from '../games/pzk.js'
 
 const IMM = { w: 1214, h: 559 } // la foto del portafoglio: le misure degli schermi sono in percentuale di lei
 const POS = {
-  saldo: [15.6, 20.9, 25.4, 23.2], eur: [16.3, 50.3, 11.2, 12.1], batt: [30.2, 50.2, 10.0, 12.2], targa: [21.4, 67.5, 12.7, 5.3], borsa: [59.6, 18.6, 29.4, 40.4],
+  saldo: [15.6, 20.9, 25.4, 23.2], eur: [16.3, 50.3, 11.2, 12.1], batt: [30.2, 50.2, 10.0, 12.2], targa: [21.4, 66.1, 12.7, 5.2], borsa: [59.6, 18.6, 29.4, 40.4],
   tasti: [[62.73, 67.9], [67.92, 67.75], [73.19, 67.75], [78.38, 67.75]], manopola: [84.3, 69.5],
 }
 const PERIODI = [['24h', '24 ore'], ['7g', '7 giorni'], ['30g', '30 giorni'], ['tutto', 'da sempre']]
