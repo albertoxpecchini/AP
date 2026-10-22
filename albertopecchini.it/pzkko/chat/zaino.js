@@ -13,7 +13,7 @@ const CHIAVE_SESSIONE = 'pzkko-chat-sessione'
 const CHIAVE_CONTO = 'pzkko-chat'
 export const MAX_BYTE = 8 * 1024
 
-export const vuoto = () => ({ v: 1, t: 0, xp: 0, mestiere: null, turni: 0, oggetti: {}, attese: {}, effetti: {}, serie: {}, stat: {} })
+export const vuoto = () => ({ v: 1, t: 0, xp: 0, mestiere: null, turni: 0, oggetti: {}, attese: {}, effetti: {}, serie: {}, stat: {}, rapidi: [] })
 const leggiJSON = (dep, k) => { try { return JSON.parse(dep.getItem(k) || 'null') } catch { return null } }
 const scriviJSON = (dep, k, v) => { try { v === null ? dep.removeItem(k) : dep.setItem(k, JSON.stringify(v)) } catch {} }
 const valido = (z) => z && typeof z === 'object' && z.v === 1 && Number.isFinite(z.xp)
@@ -138,6 +138,17 @@ export function segnaSerie(id, n) { Z.serie[id] = { ultimo: Date.now(), n }; scr
 // ── le statistiche ──
 export const stat = (k) => Z.stat[k] ?? 0
 export function conta(k, n = 1) { Z.stat[k] = (Z.stat[k] ?? 0) + n; scrivi() }
+
+// ── i tasti rapidi: le ultime scelte, la più recente per prima (le righe scritte, come «roulette 50 rosso») ──
+export const MAX_RAPIDI = 8
+export const rapidi = () => Z.rapidi ?? []
+export function ricorda(riga) {
+  riga = riga.trim().replace(/^\/+/, '').replace(/^pzk\s+/i, '').replace(/\s+/g, ' ')
+  if (!riga) return
+  Z.rapidi = [riga, ...(Z.rapidi ?? []).filter((r) => r !== riga)].slice(0, MAX_RAPIDI)
+  scrivi()
+}
+export function scorda(riga) { Z.rapidi = (Z.rapidi ?? []).filter((r) => r !== riga); scrivi() }
 
 /** Tutto da capo (per le prove: «reset»). */
 export function azzera() { Z = vuoto(); scrivi() }

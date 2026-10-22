@@ -142,6 +142,58 @@
 .c-sugg li.scelta,.c-sugg li:hover{background:rgba(70,255,125,.12)}
 .c-sugg li .emo{height:1.2em}
 
+/* ── i tasti rapidi: le ultime scelte, una fila che scorre di lato sopra la riga dove si scrive ── */
+.c-rapidi{display:flex;align-items:center;gap:6px;padding:7px 10px 3px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;border-top:1px solid rgba(70,255,125,.18);background:rgba(0,0,0,.3);mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent)}
+.c-rapidi::-webkit-scrollbar{display:none}
+.c-rapidi:empty{display:none}
+.c-r{flex:none;display:inline-flex;align-items:stretch;border-radius:999px;background:#1c241d;box-shadow:inset 0 0 0 1px rgba(70,255,125,.28);animation:c-msg .22s ease-out}
+.c-r-b{display:inline-flex;align-items:center;gap:5px;max-width:200px;padding:5px 8px 5px 11px;border:0;border-radius:999px 0 0 999px;background:none;color:#cfe8cc;font:400 13.5px/1 var(--mono);cursor:pointer;white-space:nowrap}
+.c-r-b span{overflow:hidden;text-overflow:ellipsis}
+.c-r-b .emo{height:1.3em;margin:0}
+.c-r-x{width:22px;padding:0 7px 1px 0;border:0;border-radius:0 999px 999px 0;background:none;color:#5f6b5c;font:400 15px/1 var(--mono);cursor:pointer;opacity:0;transition:opacity .15s}
+.c-r:hover .c-r-x,.c-r:focus-within .c-r-x{opacity:1}
+@media (hover:none){.c-r-x{opacity:.6}}
+@media (hover:hover){.c-r:hover{background:#26342a;box-shadow:inset 0 0 0 1px var(--led)}.c-r-x:hover{color:var(--rosso)}}
+.c-r:active{transform:scale(.95)}
+.c-r.attesa .c-r-b{color:#7c8a78}
+.c-r-eti{flex:none;font:400 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--led);opacity:.6}
+.c-rapidi.iniziali .c-r{background:transparent;box-shadow:inset 0 0 0 1px rgba(70,255,125,.18);border-style:dashed}
+
+/* tasto «vai agli ultimi messaggi» con i nuovi */
+.c-giu{position:absolute;right:14px;bottom:112px;z-index:5;display:flex;align-items:center;gap:6px;height:32px;padding:0 11px;border:0;border-radius:16px;background:var(--led);color:#062a12;font:400 15px/1 var(--fa);cursor:pointer;box-shadow:0 3px 0 #0c7a33,0 6px 12px rgba(0,0,0,.5);animation:c-msg .2s ease-out}
+.c-giu[hidden]{display:none}
+.c-giu .c-nuovi:not(:empty)::after{content:" nuovi"}
+.c-giu .c-nuovi{font:400 13px/1 var(--mono)}
+.c-giu .c-nuovi{color:#062a12}
+
+/* orari, giorni, ripeti */
+.c-ora{align-self:flex-end;flex:none;font:400 9.5px/1 var(--mono);letter-spacing:.04em;color:#6c7a68;margin-bottom:3px}
+.c-msg.tu .c-ora{order:0}
+.c-msg.tu .c-bolla{order:1}
+.c-msg.tu .c-rip{order:2}
+.c-giorno{align-self:center;margin:4px auto 12px;padding:3px 12px;border-radius:999px;background:rgba(70,255,125,.08);font:400 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--led);opacity:.75;width:max-content}
+.c-rip{flex:none;align-self:center;width:24px;height:24px;margin-left:-2px;padding:0 0 2px;border:0;border-radius:50%;background:rgba(255,255,255,.06);color:#9aa795;font:400 15px/1 var(--mono);cursor:pointer;opacity:0;transition:opacity .15s,transform .3s}
+.c-msg.tu:hover .c-rip,.c-rip:focus-visible{opacity:1}
+@media (hover:none){.c-rip{opacity:.55}}
+.c-rip:hover{color:var(--led);transform:rotate(180deg)}
+
+/* i comandi dentro il testo si toccano; i tasti di seguito sotto la scheda */
+.chat code.cmd{cursor:pointer;box-shadow:inset 0 -2px 0 rgba(70,255,125,.45);transition:background .15s,transform .1s}
+.chat code.cmd:hover{background:rgba(70,255,125,.28);color:#fff}
+.chat code.cmd:active{transform:translateY(1px)}
+.c-azioni{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.1)}
+.c-az{display:inline-flex;align-items:center;gap:5px;padding:5px 11px 5px 9px;border:0;border-radius:999px;background:rgba(70,255,125,.1);color:var(--led);font:400 13px/1 var(--mono);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(70,255,125,.35);transition:background .15s,transform .1s}
+.c-az .emo{height:1.25em;margin:0}
+.c-az:hover{background:var(--led);color:#062a12}
+.c-az:active{transform:scale(.95)}
+.c-az.oro{color:#ffd400;background:rgba(255,212,0,.1);box-shadow:inset 0 0 0 1px rgba(255,212,0,.4)}
+.c-az.oro:hover{background:#ffd400;color:#161200}
+
+/* le schede si sollevano appena quando le sfiori; la selezione si copia */
+.c-scheda{user-select:text;transition:transform .15s,box-shadow .15s}
+@media (hover:hover){.c-scheda:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.07)}}
+.c-msg.tu .c-bolla{cursor:text;user-select:text}
+
 /* il bot scrive… */
 .c-scrive{display:inline-flex;gap:3px;padding:8px 10px}
 .c-scrive i{width:6px;height:6px;border-radius:50%;background:var(--led);opacity:.4;animation:c-scrive 1s infinite}

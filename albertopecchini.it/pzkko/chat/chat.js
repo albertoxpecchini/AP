@@ -21,7 +21,8 @@ export const fmt = pzk.fmt
 export const pzkHtml = (n) => `<span class="pzk">${pzk.fmt(n)} $pzk</span>`
 export const eurHtml = (n) => `<span class="eur">EUR€ ${pzk.fmtEur(n)}</span>`
 
-let tasto = null, dlg = null, lista = null, input = null, sugg = null, saldoEl = null
+let tasto = null, dlg = null, lista = null, input = null, sugg = null, saldoEl = null, giuEl = null, rapidiEl = null
+let nuovi = 0, ultimoGiorno = '', incollata = true
 let aspettaTesto = null // { risolvi, nascosto } quando un minigioco aspetta che si scriva qualcosa
 const storia = [] // i comandi scritti, per le frecce
 let iStoria = -1
@@ -54,6 +55,8 @@ function costruisci() {
     <div class="c-schermo">
       <div class="c-testa">${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
       <div class="c-lista" role="log" aria-live="polite"></div>
+      <button class="c-giu" type="button" aria-label="vai agli ultimi messaggi" hidden><span>↓</span><b class="c-nuovi"></b></button>
+      <div class="c-rapidi" role="toolbar" aria-label="le ultime scelte"></div>
       <form class="c-riga" autocomplete="off">
         <ul class="c-sugg" role="listbox" hidden></ul>
         <span class="c-prompt" aria-hidden="true">›</span>
@@ -67,6 +70,16 @@ function costruisci() {
   input = dlg.querySelector('input')
   sugg = dlg.querySelector('.c-sugg')
   saldoEl = dlg.querySelector('.c-saldo')
+  giuEl = dlg.querySelector('.c-giu')
+  rapidiEl = dlg.querySelector('.c-rapidi')
+  lista.addEventListener('scroll', () => { incollata = visteAlFondo(); if (incollata) azzeraNuovi(); else giuEl.hidden = false }, { passive: true })
+  lista.addEventListener('load', () => { if (incollata) vaiGiu() }, true) // un'icona che arriva allunga la lista: si resta in fondo
+  giuEl.addEventListener('click', () => { azzeraNuovi(); vaiGiu(true) })
+  lista.addEventListener('click', clicLista)
+  lista.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.cmd')) { e.preventDefault(); clicLista(e) } })
+  rapidiEl.addEventListener('click', clicRapidi)
+  disegnaRapidi()
+  zaino.ascolta(disegnaRapidi)
   dlg.querySelector('.c-chiudi').addEventListener('click', chiudi)
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); chiudi() })
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
@@ -100,18 +113,44 @@ export function chiudi() {
 }
 
 // ── i messaggi ──
-function aggiungi(el) {
+const visteAlFondo = () => lista.scrollHeight - lista.scrollTop - lista.clientHeight < 60
+function vaiGiu(liscio = false) { incollata = true; lista.scrollTo({ top: lista.scrollHeight, behavior: liscio && !RIDOTTO.matches ? 'smooth' : 'instant' }) }
+function azzeraNuovi() { nuovi = 0; giuEl.hidden = true; giuEl.querySelector('.c-nuovi').textContent = '' }
+/** Dopo un cambio: se si stava guardando in fondo si resta in fondo, se no si segna «n nuovi» sul tasto ↓.
+ *  `incollata`: la lista segue il fondo finché chi legge non scorre in su (così anche le icone che arrivano dopo non la staccano). */
+function scorri(nuovoMsg = false, mio = false) {
+  if (mio || incollata) { vaiGiu(); return }
+  if (nuovoMsg) { nuovi++; giuEl.querySelector('.c-nuovi').textContent = nuovi }
+  giuEl.hidden = false
+}
+const ora = (d = new Date()) => d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+/** Il separatore del giorno («oggi», «ieri», «lun 12 ott») quando cambia. */
+function separatore() {
+  const g = new Date().toDateString()
+  if (g === ultimoGiorno) return
+  const prima = ultimoGiorno
+  ultimoGiorno = g
+  const s = document.createElement('div')
+  s.className = 'c-giorno'
+  s.textContent = prima ? new Date().toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) : 'oggi'
+  lista.appendChild(s)
+}
+function aggiungi(el, mio = false) {
+  separatore()
   lista.appendChild(el)
   while (lista.children.length > 160) lista.firstElementChild.remove()
-  lista.scrollTop = lista.scrollHeight
+  scorri(true, mio)
+  lista.dataset.letto = '1'
   return el
 }
-export function utente(testo) {
+export function utente(testo, { rifai = false } = {}) {
   const m = document.createElement('div')
   m.className = 'c-msg tu'
-  m.innerHTML = `<div class="c-bolla"></div>`
-  m.firstElementChild.textContent = testo
-  return aggiungi(m)
+  m.innerHTML = `<time class="c-ora">${ora()}</time><div class="c-bolla"></div>${rifai ? '<button class="c-rip" type="button" title="rifallo" aria-label="rifai questo comando">↻</button>' : ''}`
+  m.querySelector('.c-bolla').textContent = testo
+  const rip = m.querySelector('.c-rip')
+  if (rip) rip.dataset.cmd = testo
+  return aggiungi(m, true)
 }
 export function sistema(testo) {
   const m = document.createElement('div')
@@ -120,24 +159,38 @@ export function sistema(testo) {
   return aggiungi(m)
 }
 /** Il contenuto di una scheda: { t: titolo, d: testo (con :icone: e <b>), html, campi: [[nome, valore, largo?]], img, pie, colore, av } */
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+/** I <code>comando</code> dentro il testo diventano tasti: si clicca e il comando parte (se ha parti da riempire, <…> o […], si scrive nella riga). */
+function cliccabili(html) {
+  return html.replace(/<code>([^<]{1,60})<\/code>/g, (m, t) => {
+    const vero = t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+    const primo = vero.trim().replace(/^\/+/, '').replace(/^pzk\s+/i, '').split(/\s+/)[0]?.toLowerCase()
+    if (!primo || !PER_NOME.has(primo)) return m
+    return `<code class="cmd" role="button" tabindex="0" data-cmd="${esc(vero)}" title="${/[<[]/.test(vero) ? 'scrivilo nella riga' : 'toccalo per farlo'}">${t}</code>`
+  })
+}
+/** Il contenuto di una scheda: { t, d, html, campi, img, pie, colore, av, azioni: [[comando, etichetta, stile?]] (tasti di seguito) } */
 function riempi(s, e) {
   s.className = `c-scheda ${e.colore ?? 'verde'}`
-  s.innerHTML = `${e.t ? `<h4>${conIcone(e.t)}</h4>` : ''}${e.d ? `<p class="c-testo">${conIcone(e.d)}</p>` : ''}${e.html ? conIcone(e.html) : ''}` +
-    `${e.campi?.length ? `<dl class="c-campi">${e.campi.map(([n, v, largo]) => `<div${largo ? ' class="largo"' : ''}><dt>${conIcone(n)}</dt><dd>${conIcone(v)}</dd></div>`).join('')}</dl>` : ''}` +
-    `${e.img ? `<img class="c-img" src="${e.img}" alt="">` : ''}${e.pie ? `<div class="c-pie">${conIcone(e.pie)}</div>` : ''}`
+  const campi = e.campi?.length ? `<dl class="c-campi">${e.campi.map(([n, v, largo]) => `<div${largo ? ' class="largo"' : ''}><dt>${conIcone(n)}</dt><dd>${conIcone(v)}</dd></div>`).join('')}</dl>` : ''
+  const azioni = e.azioni?.length ? `<div class="c-azioni">${e.azioni.map(([cmd, eti, stile]) => `<button type="button" class="c-az ${stile ?? ''}" data-cmd="${esc(cmd)}">${conIcone(eti ?? cmd)}</button>`).join('')}</div>` : ''
+  s.innerHTML = cliccabili(`${e.t ? `<h4>${conIcone(e.t)}</h4>` : ''}${e.d ? `<p class="c-testo">${conIcone(e.d)}</p>` : ''}${e.html ? conIcone(e.html) : ''}${campi}` +
+    `${e.img ? `<img class="c-img" src="${esc(e.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}${e.pie ? `<div class="c-pie">${conIcone(e.pie)}</div>` : ''}`) + azioni
 }
 export function scheda(e) {
   const m = document.createElement('div')
   m.className = 'c-msg'
-  m.innerHTML = `<div class="c-av">${icona(e.av ?? 'bot')}</div><div class="c-scheda"></div>`
-  riempi(m.lastElementChild, e)
+  m.innerHTML = `<div class="c-av">${icona(e.av ?? 'bot')}</div><div class="c-scheda"></div><time class="c-ora">${ora()}</time>`
+  riempi(m.querySelector('.c-scheda'), e)
   aggiungi(m)
-  return m.lastElementChild
+  m.querySelector('.c-img')?.addEventListener('load', () => scorri(), { once: true })
+  return m.querySelector('.c-scheda')
 }
 export function aggiorna(s, e) {
   if (e.av) s.parentElement.firstElementChild.innerHTML = icona(e.av)
   riempi(s, e)
-  lista.scrollTop = lista.scrollHeight
+  s.parentElement.querySelector('.c-ora')?.replaceChildren(ora())
+  scorri()
   return s
 }
 /** La barra del tempo in fondo alla scheda; → ferma() */
@@ -163,7 +216,7 @@ export function scegli(s, bottoni, ms = 0, { griglia = null, onPremuto = null } 
     riga.appendChild(el)
   }
   s.appendChild(riga)
-  lista.scrollTop = lista.scrollHeight
+  scorri()
   return new Promise((risolvi) => {
     let timer = 0
     const fine = (id, premuto) => {
@@ -293,10 +346,11 @@ function invia() {
 export async function esegui(riga, { muto = false } = {}) {
   const { nome, args, testo } = analizza(riga)
   if (!nome) return
-  if (!muto) utente(riga.replace(/^\/+/, ''))
+  if (!muto) utente(riga.replace(/^\/+/, ''), { rifai: true })
   const c = PER_NOME.get(nome)
   if (!c) { scheda({ colore: 'rosso', av: 'bot-pensa', t: 'eh?', d: `«${nome}» non lo conosco. Scrivi <code>aiuto</code> per l'elenco dei comandi.` }); return }
   const chiave = c.nomi[0]
+  if (!muto) zaino.ricorda(riga)
   if (c.attesa) {
     const m = zaino.manca(chiave)
     if (m > 0) { const s = scheda({ colore: 'ambra', av: 'bot-pensa', t: ':clessidra: calma', d: `«${chiave}» lo puoi rifare fra <b>${durata(m)}</b>.${zaino.effetto('caffe') ? '' : ' Un :caffe: dal negozio dimezza le attese.'}` }); tempo(s, Math.min(m, 60_000)); return }
@@ -314,9 +368,41 @@ export async function esegui(riga, { muto = false } = {}) {
     scheda({ colore: 'rosso', av: 'bot-arrabbiato', t: 'qualcosa si è rotto', d: `${e.message ?? e}` })
   } finally {
     inCorso.delete(chiave)
+    disegnaRapidi()
     aggiornaSaldo()
     aggiornaTasto()
   }
+}
+
+// ── i tasti rapidi: le ultime scelte, sempre sotto il pollice ──
+const RAPIDI_INIZIALI = ['giornaliero', 'lavora', 'pesca', 'saldo', 'aiuto']
+/** Un tasto per ognuna delle ultime scelte (la più recente a sinistra); se non ce ne sono ancora, i comandi per cominciare. */
+function disegnaRapidi() {
+  if (!rapidiEl) return
+  const fatti = zaino.rapidi()
+  const righe = fatti.length ? fatti : RAPIDI_INIZIALI
+  rapidiEl.classList.toggle('iniziali', !fatti.length)
+  rapidiEl.innerHTML = (fatti.length ? '' : '<span class="c-r-eti">per cominciare</span>') + righe.map((r) => {
+    const c = PER_NOME.get(analizza(r).nome)
+    const attesa = c?.attesa ? zaino.manca(c.nomi[0]) : 0
+    return `<span class="c-r${attesa ? ' attesa' : ''}"><button type="button" class="c-r-b" data-cmd="${esc(r)}" title="${attesa ? `fra ${durata(attesa)}` : 'rifallo'}">${c?.icona ? icona(c.icona) : ''}<span>${esc(r)}</span></button>${fatti.length ? `<button type="button" class="c-r-x" data-via="${esc(r)}" aria-label="togli ${esc(r)}">×</button>` : ''}</span>`
+  }).join('')
+}
+function clicRapidi(e) {
+  const via = e.target.closest('[data-via]')
+  if (via) { zaino.scorda(via.dataset.via); return }
+  const b = e.target.closest('[data-cmd]')
+  if (b && !aspettaTesto) esegui(b.dataset.cmd)
+  else if (b) { input.value = b.dataset.cmd; input.focus() }
+}
+/** Un comando toccato dentro la lista: un <code> di un messaggio, un tasto di seguito, il ↻ dei messaggi tuoi. */
+function clicLista(e) {
+  const b = e.target.closest('[data-cmd]')
+  if (!b || b.disabled) return
+  const cmd = b.dataset.cmd
+  if (aspettaTesto) { input.focus(); return }
+  if (b.classList.contains('cmd') && /[<[]/.test(cmd)) { input.value = cmd.replace(/\s*[<[].*$/, ' '); input.focus(); return } // ha parti da riempire
+  esegui(cmd)
 }
 
 // ── i suggerimenti e le frecce ──
