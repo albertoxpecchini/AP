@@ -226,7 +226,12 @@ function costruisci() {
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); chiudi() })
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
   for (const t of S.tasti) t.addEventListener('click', () => mostra(S.sezione === t.dataset.s ? null : t.dataset.s))
-  S.manopola.addEventListener('click', () => { periodo = (periodo + 1) % PERIODI.length; S.manopola.style.setProperty('--giro', `${-60 + periodo * 60}deg`); borsa(true) })
+  // la manopola è un selettore a scatti: un periodo ogni quarto di giro, sempre in senso orario (gli scatti si sommano, così
+  // dall'ultimo periodo al primo la tacca va avanti invece di tornare indietro di mezzo giro); parte già sul periodo giusto
+  const giro = () => S.manopola.style.setProperty('--giro', `${-45 + scatti * (360 / PERIODI.length)}deg`)
+  let scatti = periodo
+  giro()
+  S.manopola.addEventListener('click', () => { periodo = (periodo + 1) % PERIODI.length; scatti++; giro(); borsa(true) })
   pzk.osserva(aggiorna)
   addEventListener('resize', () => { if (dlg.open) { aggiorna(); disegnaBorsa() } })
   setInterval(() => { if (dlg.open) aggiornaBatteria() }, 30000)
