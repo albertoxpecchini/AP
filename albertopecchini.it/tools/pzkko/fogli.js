@@ -569,12 +569,12 @@ The paper is slightly worn and creased, a little dirty at the edges, as notes th
 
   'wallet-cavo': {
     scala: 0.5,
-    titolo: 'il cavo usb-c del wallet, in carica: entra nella porta sul fianco sinistro',
+    titolo: 'il cavo usb-c del wallet, in carica: la spina infilata nella porta vista dall’alto',
     aspetto: '2048x1152',
     griglia: [1, 1],
     pezzi: ['cavo'],
-    prompt: `${griglia('One piece: a single USB-C charging cable,', 1, 1)}
-It is photographed from DIRECTLY ABOVE (flat top view, orthographic), landscape, filling the cell from left to right: a black braided nylon USB-C cable, about as thick as a pencil, coming in from the LEFT edge of the cell in one gentle S-shaped curve and ending on the RIGHT with its plug. The plug is a matte dark grey anodised aluminium housing (rounded rectangle, with a short black rubber strain relief where the cable enters it) and, at its very right end, the small metal USB-C tip, pointing exactly to the right, horizontal. The cable is slightly worn, a scuff on the housing. Photorealistic, sharp, soft diffuse studio light from the top left (the same light as the leather wallet it will plug into), no shadow on the magenta. Nothing else: no port, no wallet, no table. ${NIENTE_MAGENTA}`,
+    prompt: `${griglia('One piece: a single USB-C charging cable plugged into a port,', 1, 1)}
+The photograph is taken from DIRECTLY ABOVE (top view, orthographic). The port is in an INVISIBLE flat surface facing the camera, so the plug is inserted straight DOWN, away from the camera, and only the BACK END of the plug is visible: the top of its matte dark grey anodised aluminium housing, a small rounded rectangle seen end-on, with the black rubber strain relief in its middle where the cable comes out. The cable, black braided nylon, about as thick as a pencil, rises out of the plug straight towards the camera for a short stretch (foreshortened, slightly out of focus at its nearest point) and then bends over to the LEFT and runs away across the frame to the LEFT edge of the cell, lying flat and in focus. The plug end sits in the RIGHT third of the cell, in the vertical middle; the cable fills the rest towards the left. Photorealistic, soft diffuse studio light from the top left, no shadow on the magenta. Nothing else: no port drawn, no surface, no table. ${NIENTE_MAGENTA}`,
   },
 
   // ── la chat col bot (pzkko/chat/): le icone al posto delle emoji e il cercapersone del tasto. I pezzi stanno in
