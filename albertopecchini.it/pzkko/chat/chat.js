@@ -330,7 +330,7 @@ function ctxDi(args, testo) {
   return {
     args, testo, zaino, pzk, dì: scheda, scheda, aggiorna, scegli, scrivi, tempo, dormi, pensa, sistema, utente,
     paga, spendi, punta, regola, nome, importo, caso, rnd, tra, durata, fmt, pzkHtml, eurHtml, icona, conIcone,
-    esegui, apriWallet: (sez) => pzk.apriWallet(sez), comandi: COMANDI, perNome: PER_NOME, categorie: CATEGORIE,
+    esegui, apriWallet: (sez) => pzk.apriWallet(sez), apriApp: (app, opz) => import('../telefono/telefono.js').then((t) => t.apri(app, opz)), comandi: COMANDI, perNome: PER_NOME, categorie: CATEGORIE,
     muori: (motivo) => muori(ctxDi(args, testo), motivo), saleDiLivello: (l) => l && scheda({ colore: 'oro', av: 'bot-ride', t: ':livello: livello ' + l + '!', d: `sei salito di livello: adesso le paghe valgono ×${zaino.moltiplicatore().toLocaleString('it-IT')}.` }),
   }
 }

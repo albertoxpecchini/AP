@@ -75,7 +75,7 @@
 .c-scheda .c-campi dd{margin:1px 0 0;font-size:15px}
 .c-scheda .c-pie{margin-top:6px;font:400 10.5px/1.3 var(--mono);color:#8b9385;letter-spacing:.03em}
 .c-scheda .c-pie .emo{height:1.2em}
-.c-scheda .c-img{display:block;max-width:100%;max-height:180px;margin:6px 0 2px;border-radius:4px}
+.c-scheda .c-img{display:block;width:100%;max-height:210px;object-fit:cover;margin:6px 0 2px;border-radius:4px}
 .c-scheda .c-grande{display:flex;gap:12px;align-items:center}
 .c-scheda table{border-collapse:collapse;margin:6px 0 2px;font-size:13.5px}
 .c-scheda td,.c-scheda th{padding:2px 8px 2px 0;text-align:left;vertical-align:top;font-weight:400}
@@ -213,12 +213,36 @@
 .c-v-txt{min-width:0;font-size:15px;line-height:1.2}
 .c-v-txt small{display:block;margin-top:2px;font:400 11.5px/1.25 var(--mono);color:#9aa795}
 .c-v-txt .c-v-bonus{display:inline-block;margin-top:4px;padding:1px 6px 2px;border-radius:3px;background:rgba(70,255,125,.12);color:var(--led);font:400 10.5px/1.3 var(--mono);letter-spacing:.03em}
+.c-v-vecchio{font:400 11px/1 var(--mono);color:#7c8a78}
+.c-v-sconto{padding:1px 5px 2px;border-radius:3px;background:var(--rosso);color:#fff;font:400 10.5px/1.2 var(--mono)}
 .c-v-prezzo{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:13px}
 .c-v-b{padding:4px 10px 5px;font-size:12px}
 .c-v-b.manca{background:#2b2e29;color:#8b9385;box-shadow:0 3px 0 #000,0 4px 5px rgba(0,0,0,.4)}
 .c-v-ce{font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--led);opacity:.7}
 .c-v-riga.ce{opacity:.65}
 @media (max-width:480px){.c-v-riga{grid-template-columns:36px 1fr auto;gap:8px}.c-v-ico .emo{height:34px;width:34px}}
+
+/* sfide e side quest: una riga per sfida, con la barra di quanto manca */
+.c-sfide{margin:6px 0 2px}
+.c-sfida{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px dashed rgba(255,255,255,.09)}
+.c-sfida:first-child{border-top:0}
+.c-sf-ico .emo{height:34px;width:34px;object-fit:contain;margin:0}
+.c-sf-txt{min-width:0;font-size:15px;line-height:1.2}
+.c-sf-txt small{display:block;margin-top:2px;font:400 11px/1.2 var(--mono);color:#9aa795;text-transform:uppercase;letter-spacing:.05em}
+.c-sf-premio{text-align:right;font-size:13px}
+.c-sf-premio small{display:block;font:400 10.5px/1.2 var(--mono);color:#9aa795}
+.c-barra{height:5px;margin-top:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+.c-barra i{display:block;height:100%;background:var(--ambra);box-shadow:0 0 6px var(--ambra);transition:width .4s}
+.c-sfida.pronta .c-barra i{background:var(--led);box-shadow:0 0 6px var(--led)}
+.c-sfida.fatta{opacity:.55}.c-sfida.fatta .c-sf-txt b{text-decoration:line-through}
+.c-sfida.fatta .c-barra i{background:#6b7067;box-shadow:none}
+.c-sfida.bloccata{opacity:.6}
+.c-notizie{list-style:none;padding:0;margin:6px 0 2px}
+.c-notizie li{padding:4px 0;border-top:1px dashed rgba(255,255,255,.08);font-size:14px}
+.c-notizie li:first-child{border-top:0}
+tr.cliccabile,li.cliccabile{cursor:pointer}
+@media (hover:hover){tr.cliccabile:hover td,li.cliccabile:hover{background:rgba(70,255,125,.1)}}
+.c-az.spento{opacity:.5;background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:#9aa795}
 
 /* il bot scrive… */
 .c-scrive{display:inline-flex;gap:3px;padding:8px 10px}

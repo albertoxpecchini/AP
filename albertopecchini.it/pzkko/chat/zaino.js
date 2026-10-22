@@ -109,7 +109,11 @@ export const bonusTutti = () => Object.fromEntries(['paga', 'xp', 'attese', 'ven
 export const ha = (id) => (Z.oggetti[id] ?? 0) > 0
 export const quanti = (id) => Z.oggetti[id] ?? 0
 export const oggetti = () => Object.entries(Z.oggetti).filter(([, n]) => n > 0)
-export function aggiungi(id, n = 1) { Z.oggetti[id] = (Z.oggetti[id] ?? 0) + n; scrivi() }
+export function aggiungi(id, n = 1) {
+  Z.oggetti[id] = (Z.oggetti[id] ?? 0) + n
+  if (['carpa-oro', 'drago', 'tesoro'].includes(id)) Z.rari = [...new Set([...(Z.rari ?? []), id])] // i leggendari fanno notizia (api/_giocatori.mjs)
+  scrivi()
+}
 /** → false se non ce n'erano abbastanza */
 export function togli(id, n = 1) {
   if ((Z.oggetti[id] ?? 0) < n) return false
@@ -141,7 +145,17 @@ export function attiva(id, ms) { Z.effetti[id] = Math.max(Z.effetti[id] ?? 0, Da
 // ── il mestiere ──
 export function assumi(id) { Z.mestiere = id; Z.turni = 0; scrivi() }
 export function licenzia() { Z.mestiere = null; Z.turni = 0; scrivi() }
-export function turno() { Z.turni = (Z.turni ?? 0) + 1; scrivi() }
+export function turno() { Z.turni = (Z.turni ?? 0) + 1; Z.stat.turniLavoro = (Z.stat.turniLavoro ?? 0) + 1; scrivi() }
+
+// ── le sfide giornaliere, le missioni e il quiz: lo stato sta qui, la logica in sfide.js, missioni.js, quiz.js ──
+export const sfideStato = () => Z.sfide ?? null
+export function salvaSfide(s) { Z.sfide = s; scrivi() }
+export const missioniStato = () => Z.quest ?? { attive: {}, fatte: {} }
+export function salvaMissioni(q) { Z.quest = q; scrivi() }
+export const quizStato = () => Z.quiz ?? { g: '', pagati: 0, serie: 0, migliore: 0 }
+export function salvaQuiz(q) { Z.quiz = q; scrivi() }
+/** Segna un oggetto leggendario preso (il database ne fa una notizia). */
+export function nota(id) { Z.rari = [...new Set([...(Z.rari ?? []), id])]; scrivi() }
 
 // ── le serie dei premi (giornaliero, settimanale, mensile): { ultimo: ts, n: giorni di fila } ──
 export const serie = (id) => Z.serie[id] ?? { ultimo: 0, n: 0 }

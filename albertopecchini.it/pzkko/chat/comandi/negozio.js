@@ -2,29 +2,32 @@
 import * as zaino from '../zaino.js'
 import { NEGOZIO, PER_ID, PESCI, ANIMALI, REPERTI, nomeDi } from '../testi.js'
 import { REPARTI, testoBonus } from '../oggetti.js'
+import * as mercato from '../mercato.js'
 
 const VENDIBILI = [...PESCI, ...ANIMALI, ...REPERTI]
 const pezzo = (s) => { s = (s ?? '').trim().toLowerCase(); if (!s) return undefined; return NEGOZIO.find((x) => x.id === s || x.nome.toLowerCase() === s || x.nome.toLowerCase().startsWith(s)) ?? VENDIBILI.find((x) => x.id === s || nomeDi(x.id).toLowerCase().startsWith(s)) }
 /** Il reparto scritto come si scrive («cibo», «roba», «pzk», «att»…). */
-const reparto = (s) => { s = (s ?? '').toLowerCase().trim(); return s ? REPARTI.find(([id, nome]) => id.startsWith(s) || nome.startsWith(s)) : null }
+const OFFERTE = ['offerte', 'offerte del giorno', 'regalo']
+const reparto = (s) => { s = (s ?? '').toLowerCase().trim(); return s ? [OFFERTE, ...REPARTI].find(([id, nome]) => id.startsWith(s) || nome.startsWith(s)) : null }
 /** Un reparto in righe: ogni pezzo con icona, descrizione, bonus, prezzo e il tasto per comprarlo lì (grigio se non ti bastano i $pzk, «ce l'hai» se è una cosa unica). */
 function vetrina(ctx, rep) {
   const saldo = ctx.pzk.saldo()
   const riga = (x) => {
-    const ho = zaino.quanti(x.id), ce = x.unico && ho > 0, manca = x.prezzo - saldo, bonus = testoBonus(x.bonus)
+    const ho = zaino.quanti(x.id), ce = x.unico && ho > 0, prezzo = mercato.prezzoDi(x), manca = prezzo - saldo, bonus = testoBonus(x.bonus), sconto = mercato.scontoDi(x.id)
     const tasto = ce ? '<span class="c-v-ce">ce l’hai</span>' : `<button type="button" class="c-b c-v-b${manca > 0 ? ' manca' : ''}" data-cmd="compra ${x.id}" ${manca > 0 ? `title="ti mancano ${ctx.fmt(manca)} $pzk"` : ''}>compra</button>`
-    return `<div class="c-v-riga${ce ? ' ce' : ''}"><div class="c-v-ico">:${x.id}:</div><div class="c-v-txt"><b>${x.nome}</b>${!ce && ho ? ` <small>(ne hai ${ho})</small>` : ''}<small>${x.cosa}</small>${bonus ? `<span class="c-v-bonus">${bonus}</span>` : ''}</div><div class="c-v-prezzo">${ctx.pzkHtml(x.prezzo)}${tasto}</div></div>`
+    return `<div class="c-v-riga${ce ? ' ce' : ''}"><div class="c-v-ico">:${x.id}:</div><div class="c-v-txt"><b>${x.nome}</b>${!ce && ho ? ` <small>(ne hai ${ho})</small>` : ''}<small>${x.cosa}</small>${bonus ? `<span class="c-v-bonus">${bonus}</span>` : ''}</div><div class="c-v-prezzo">${sconto ? `<s class="c-v-vecchio">${ctx.fmt(x.prezzo)}</s><span class="c-v-sconto">−${Math.round(sconto * 100)} %</span>` : ''}${ctx.pzkHtml(prezzo)}${tasto}</div></div>`
   }
-  return NEGOZIO.filter((x) => x.reparto === rep).map(riga).join('')
+  const pezzi = rep === 'offerte' ? mercato.offerte().map((o) => PER_ID[o.id]) : NEGOZIO.filter((x) => x.reparto === rep)
+  return pezzi.map(riga).join('')
 }
 /** Senza reparto: l'ingresso (un tasto per reparto). Con un reparto: la sua vetrina. */
 function mostraVetrina(ctx, rep, t) {
   if (!rep) {
     return ctx.dì({ colore: 'ambra', t: t ?? ':sacco: il negozio dietro la saracinesca', d: `${NEGOZIO.length} pezzi in ${REPARTI.length} reparti. Scegli dove entrare, o scrivi <code>compra canna</code> se sai già cosa vuoi.`,
-      azioni: REPARTI.map(([id, nome, ico]) => [`negozio ${id}`, `:${ico}: ${nome}`, id === 'cibo' ? 'oro' : '']), pie: `hai ${ctx.fmt(ctx.pzk.saldo())} $pzk · lo <code>shop</code> sul telefono ha tutto in un posto solo` })
+      azioni: [['negozio offerte', ':regalo: offerte del giorno', 'oro'], ...REPARTI.map(([id, nome, ico]) => [`negozio ${id}`, `:${ico}: ${nome}`])], pie: `hai ${ctx.fmt(ctx.pzk.saldo())} $pzk · lo <code>shop</code> sul telefono ha tutto in un posto solo` })
   }
   const [id, nome, ico] = rep
-  ctx.dì({ colore: 'ambra', t: `:${ico}: ${nome}`, html: `<div class="c-vetrina">${vetrina(ctx, id)}</div>`, azioni: REPARTI.filter(([r]) => r !== id).map(([r, n, i]) => [`negozio ${r}`, `:${i}: ${n}`]),
+  ctx.dì({ colore: 'ambra', t: `:${ico}: ${nome}`, html: `<div class="c-vetrina">${vetrina(ctx, id)}</div>`, azioni: [...(id === 'offerte' ? [] : [['negozio offerte', ':regalo: offerte', 'oro']]), ...REPARTI.filter(([r]) => r !== id).map(([r, n, i]) => [`negozio ${r}`, `:${i}: ${n}`])],
     pie: `hai ${ctx.fmt(ctx.pzk.saldo())} $pzk · tocca «compra» su un pezzo, o scrivi <code>compra canna 2</code> per più d’uno` })
 }
 
@@ -62,12 +65,12 @@ export const NEGOZIO_COMANDI = [
       const n0 = Math.max(1, Math.min(50, parseInt(ctx.args.at(-1)) || 1))
       if (!x) return ctx.dì({ colore: 'rosso', d: `non lo vendo. Guarda il <code>negozio</code>.` })
       if (x.unico && zaino.ha(x.id)) return ctx.dì({ colore: 'ambra', d: `:${x.id}: ${x.nome}: ce l’hai già.` })
-      const n = x.unico ? 1 : n0
-      const tot = x.prezzo * n
-      if (!ctx.spendi(tot)) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: `costa ${ctx.pzkHtml(tot)} e hai ${ctx.pzkHtml(ctx.pzk.saldo())}. Lavora.` })
-      zaino.aggiungi(x.id, n)
-      zaino.conta('comprati', tot)
-      ctx.dì({ t: `:${x.id}: comprat${n > 1 ? 'i' : 'o'}`, d: `<b>${x.nome}</b>${n > 1 ? ` × ${n}` : ''} per ${ctx.pzkHtml(tot)}. ${x.cosa}`, pie: x.tipo === 'usa' || x.tipo === 'cassa' ? `«${x.tipo === 'cassa' ? 'apri' : 'usa'} ${x.id}» quando vuoi` : '' })
+      const r = mercato.compra(x.id, n0)
+      if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: `${r.errore}. Lavora.` })
+      const { n, tot, sconto } = r
+      ctx.dì({ t: `:${x.id}: comprat${n > 1 ? 'i' : 'o'}`, d: `<b>${x.nome}</b>${n > 1 ? ` × ${n}` : ''} per ${ctx.pzkHtml(tot)}${sconto ? ` (offerta del giorno −${Math.round(sconto * 100)} %)` : ''}. ${x.cosa}`,
+        azioni: x.tipo === 'usa' ? [[`usa ${x.id}`, 'usalo subito', 'oro']] : x.tipo === 'cassa' ? [[`apri ${x.id}`, 'aprila', 'oro']] : [],
+        pie: x.tipo === 'usa' || x.tipo === 'cassa' ? '' : undefined })
     },
   },
   {

@@ -30,18 +30,6 @@ const esitoHtml = (ctx, netto) => (netto > 0 ? `<b>+${ctx.fmt(netto)}</b> $pzk` 
 
 export const GIOCHI = [
   {
-    nomi: ['quiz', 'trivia'], cat: 'giochi', icona: 'quiz', breve: 'una domanda, quattro risposte, 12 secondi: 30, 60 o 120 $pzk', uso: 'quiz [facile|medio|difficile]', attesa: 30,
-    async fai(ctx) {
-      const diff = { facile: 1, medio: 2, media: 2, difficile: 3 }[ctx.args[0]?.toLowerCase()] ?? null
-      const r = await MINIGIOCHI.quiz(ctx, diff)
-      const premio = [0, 30, 60, 120][r.diff]
-      if (!r.ok) return ctx.scheda({ colore: 'grigio', av: 'bot-triste', d: r.nota })
-      const n = ctx.paga(premio)
-      ctx.scheda({ colore: 'oro', av: 'bot-ride', t: ':quiz: giusto', d: `${ctx.pzkHtml(n)}.` })
-      ctx.saleDiLivello(zaino.daiXp(4 * r.diff))
-    },
-  },
-  {
     nomi: ['veloce', 'fast', 'riflessi'], cat: 'giochi', icona: 'fulmine', breve: 'una parola compare all’improvviso: riscrivila, paga in base al tempo', uso: 'veloce', attesa: 30,
     async fai(ctx) {
       const r = await MINIGIOCHI.veloce(ctx)

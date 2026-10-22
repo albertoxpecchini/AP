@@ -77,17 +77,7 @@ export const SOLDI = [
       ctx.saleDiLivello(zaino.daiXp(4))
     },
   },
-  {
-    nomi: ['classifica', 'lb', 'ricchi', 'top'], cat: 'soldi', icona: 'trofeo', breve: 'i conti più ricchi', uso: 'classifica', senzaEventi: true,
-    async fai(ctx) {
-      await ctx.pensa(400)
-      let d = null
-      try { d = await (await fetch('/api/wallet?classifica=1')).json() } catch {}
-      if (!d?.ok || !d.classifica) return ctx.dì({ colore: 'grigio', d: 'la classifica adesso non c’è (il server non risponde).' })
-      if (!d.classifica.length) return ctx.dì({ colore: 'grigio', d: 'nessun conto ancora: apri il wallet e fanne uno.' })
-      ctx.dì({ colore: 'oro', t: ':trofeo: i più ricchi', html: `<table><tr><th>#</th><th>nome</th><th>$pzk</th></tr>${d.classifica.map((c, i) => `<tr><td>${i + 1}</td><td>${c.nome}</td><td class="pzk">${ctx.fmt(c.pzk)}</td></tr>`).join('')}</table>`, pie: 'i $pzk liberi dei conti (gli EUR€ non contano)' })
-    },
-  },
+  // la classifica è in giocatori.js (usa il database dei giocatori)
   {
     nomi: ['manda', 'invia', 'dai', 'give', 'pay'], cat: 'soldi', icona: 'pzk', breve: 'manda $pzk a un conto: manda pzk123456 50', uso: 'manda <pzk123456> <quanti>', senzaEventi: true,
     async fai(ctx) {
