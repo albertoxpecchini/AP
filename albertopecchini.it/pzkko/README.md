@@ -1679,6 +1679,52 @@ via dal tasto) e domani sono di nuovo lì. 635 $pzk al giorno a chi passa a racc
 Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
 `tools/nome/index.html`) e il suo volantino «in arrivo» diventa un link.
 
+## La chat col bot (chat/, api/wallet.mjs azione «zaino»)
+
+Sotto il wallet c'è un **cercapersone** nero con lo schermo lcd (`.chat-tasto`, `art/chat-cercapersone/`): il led rosso e
+«1 msg» si accendono quando c'è il premio giornaliero da riscuotere. Si apre un palmare a fosfori verdi dove si parla
+con **pzk**, il bot: la chiocciola della banca $pzk (quella delle banconote) con gli occhiali da sole, in otto umori
+(`art/chat-bot/`). Si scrive un comando e basta (`pesca`; anche `pzk pesca` e `/pesca`), lui risponde con una scheda
+(barra colorata, titolo, testo, campi, piè, pulsanti) e, quando serve, aspetta una risposta: pulsanti, o una parola
+scritta nella riga in fondo, con la barra del tempo. Niente emoji di sistema: solo le nostre icone (`chat/icone.js`, le
+cartelle `art/chat-*`, i fogli in `tools/pzkko/fogli-chat.js`), `:canna:` nel testo diventa l'immagine.
+
+**I comandi** (`aiuto` li elenca, `aiuto pesca` spiega un comando; le frecce in su ripetono gli ultimi):
+
+- *soldi*: `saldo`, `profilo` (xp, livello, mestiere, statistiche), `attese`, `giornaliero` / `settimanale` / `mensile`
+  (premio con la serie: ogni volta di fila vale di più), `elemosina` (un personaggio di Mantova ti dà 0–150 $pzk, un
+  oggetto o una risposta acida), `classifica` (i dieci conti più ricchi, GET `/api/wallet?classifica=1`), `dai`
+  (= `pzk.invia`).
+- *attività*: `cerca` (tre posti a caso, qualcuno uccide), `crimine` (più rischio, più paga), `altobasso`, `posta`
+  (col telefono: piattaforma + meme → like → $pzk), `scava` (pala), `pesca` (canna; il pesce raro si prende cliccando
+  il pesce giusto in 3,5 s), `caccia` (fionda per le bestie piccole, fucile per cinghiale, cervo e drago; quelle
+  pericolose caricano: si schiva dall'altra parte in 3 s, se no si muore).
+- *lavoro*: `lavora lista`, `lavora come <mestiere>` (dodici mestieri, dal rider al sindaco, ognuno con un livello
+  minimo), `lavora` (un turno ogni 20 minuti: un minigioco, riuscito = paga intera, sbagliato = un decimo; la paga cresce
+  del 5 % a turno fino a +50 %), `lavora licenziati`. I minigiochi (`chat/minigiochi.js`): riscrivi la frase (sta su una
+  tela, non si incolla), anagramma, memoria, colori, icona, rigore, al contrario, conti, l'ordinazione, la consegna, quiz.
+- *giochi*: `quiz` (12 s, 30/60/120), `veloce` (la parola compare all'improvviso, paga a tempo), `slot`, `dadi` (tu
+  contro il bot), `moneta`, e i tavoli veri con le loro regole (`games/*/regole.js`): `roulette 50 rosso`,
+  `blackjack 25` (carta / stai / raddoppia), `mine 50 3` (griglia di pulsanti e «incassa»), `dado 50 piccolo` (sic bo,
+  tabella di Macao). Le puntate passano dai tavoli `chat-<gioco>` di `games/pzk.js`.
+- *negozio*: `zaino`, `negozio`, `compra`, `vendi` (pesci, bestie e reperti; `vendi tutto`), `usa` (caffè: attese
+  dimezzate 10 min; lattina: +10 % paghe 30 min; mortadella: xp doppi 20 min), `info`, `apri` (tre casse), `gratta`.
+
+**La morte** (cerca, crimine, caccia andati male): si perde il 20 % dei $pzk liberi (al più 5.000), mai gli EUR€; il
+**cornetto rosso** del negozio si consuma al posto tuo. **Gli eventi casuali** (7 % dopo un comando): una banconota
+vola dalla finestra (scrivi la parola in 5 s), un quiz lampo, testa o croce gratis, una nutria che ruba dallo zaino.
+Il **livello** sale con gli xp (`1 + √(xp / 60)`) e dà un moltiplicatore sulle paghe (+2 % a livello).
+
+**Lo zaino** (`chat/zaino.js`: xp, mestiere, oggetti, attese, effetti, serie, statistiche) segue i soldi: nella sessione
+sta in `sessionStorage` e sparisce con la scheda; col conto sta sul server (azione `zaino` di `api/wallet.mjs`, un file
+a parte su Blob, `pzkko/chat.json`, al più 8 KB, forma controllata) e in `localStorage` come copia, salvato un secondo
+e mezzo dopo ogni cambio e subito quando la pagina si nasconde; vince chi ha il `t` più recente.
+
+Il modulo (`chat/chat.js` + `chat.css`) si carica da solo appena la pagina è tranquilla e al clic; `#chat` apre la chat,
+l'evento `pzkko-chat` (con `detail.comando`) la apre scrivendo un comando. Gli strumenti che fotografano la pagina non
+vedono il tasto (`navigator.webdriver`), `?chat` lo fa vedere. **In locale**: `npm run dev:pzkko` e poi
+`http://localhost:5182/prova/chat/`, la pagina di prova con la sola chat (`tools/pzkko/prove/chat.html`, non va online).
+
 ## Gli strumenti (tools/)
 
 Uno strumento è una pagina statica in `tools/<nome>/`, fuori dalla scena 3D: in

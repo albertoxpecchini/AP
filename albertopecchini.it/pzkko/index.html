@@ -370,6 +370,27 @@ html:not(.js) .wallet-tasto{display:none}
 .wallet-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
 @media (max-width:899px){.wallet-tasto{width:96px;height:46px;padding:5px 7px 5px 8px}.wallet-tasto .wt-eti{font-size:6.5px;right:8px;top:8px}}
 @media (prefers-reduced-motion:reduce){.wallet-tasto{transition:none}.wallet-tasto .wt-piu.va{animation-duration:.01s}}
+
+/* ── il tasto della chat col bot (chat/), sotto il wallet: un cercapersone nero con lo
+   schermo lcd verde; chat/chat.js lo accende (il led e «1 msg» quando il bot ha qualcosa da dire). Negli strumenti che
+   fotografano la pagina non c'è (navigator.webdriver), ?chat lo fa vedere lo stesso. Senza script non c'è ── */
+.chat-tasto{position:fixed;z-index:85;top:calc(max(12px,env(safe-area-inset-top)) + 62px);left:max(12px,env(safe-area-inset-left));width:112px;height:61px;padding:0;border:0;background:none;cursor:pointer;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
+.chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
+.chat-tasto .ct-lcd{position:absolute;left:14.5%;top:27%;width:55%;height:47%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px;padding:0 5px;border-radius:2px;background:#a9bc96;color:#1c2616;font:400 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;text-align:left;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden;white-space:nowrap}
+.chat-tasto .ct-lcd b{font:400 11px/1 "Rubik Mono One",ui-monospace,monospace}
+.chat-tasto .ct-lcd .ct-n{display:none}
+.chat-tasto.msg .ct-lcd .ct-n{display:inline;animation:ct-lamp 1.2s steps(2) infinite}
+.chat-tasto .ct-led{position:absolute;left:83%;top:23%;width:6px;height:6px;border-radius:50%;background:#2a1a10;box-shadow:inset 0 0 2px #000}
+.chat-tasto.msg .ct-led{background:#ff3b2e;box-shadow:0 0 6px #ff3b2e,0 0 12px rgba(255,59,46,.6);animation:ct-lamp 1.2s steps(2) infinite}
+@keyframes ct-lamp{50%{opacity:.25}}
+.chat-tasto[hidden]{display:none}
+html:not(.js) .chat-tasto{display:none}
+@media (hover:hover){.chat-tasto:hover{transform:scale(1.04)}}
+.chat-tasto:active{transform:scale(.96)}
+.chat-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
+@media (max-width:899px){.chat-tasto{top:calc(max(12px,env(safe-area-inset-top)) + 54px);width:96px;height:52px}.chat-tasto .ct-lcd{font-size:7px}.chat-tasto .ct-lcd b{font-size:9.5px}}
+@media (prefers-reduced-motion:reduce){.chat-tasto{transition:none}.chat-tasto.msg .ct-lcd .ct-n,.chat-tasto.msg .ct-led{animation:none}}
 </style>
 </head>
 <body>
@@ -777,6 +798,8 @@ html:not(.js) .wallet-tasto{display:none}
 <button class="rotella" type="button" aria-label="regia: grafica, ora, meteo, strada e suoni" title="regia" aria-expanded="false"><img class="su" src="/art/tasto/tasto.webp" alt="" width="247" height="250"><img class="giu" src="/art/tasto/tasto-giu.webp" alt="" width="247" height="250" loading="lazy"></button>
 <!-- il wallet dei $pzk (wallet/), sempre in alto a sinistra: il portafoglio chiuso col led del saldo -->
 <button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" title="wallet $pzk" hidden><canvas class="wt-led" width="190" height="80" aria-hidden="true"></canvas><span class="wt-eti" aria-hidden="true">$pzk</span></button>
+<!-- la chat col bot dei $pzk (chat/), sotto il wallet: il cercapersone con lo schermo lcd -->
+<button class="chat-tasto" type="button" aria-label="chat: parla col bot dei $pzk" title="chat col bot" hidden><img src="/art/chat-cercapersone/cercapersone.webp" alt="" width="670" height="366"><span class="ct-lcd" aria-hidden="true"><b>pzk</b><span><span class="ct-n">1 msg</span></span></span><span class="ct-led" aria-hidden="true"></span></button>
 
 <script>
 (() => {
@@ -1189,6 +1212,24 @@ html:not(.js) .wallet-tasto{display:none}
       document.addEventListener('pzkko-wallet', (e) => apri(e.detail?.sezione))
       ;(window.requestIdleCallback ?? setTimeout)(() => carica().catch(() => {}), { timeout: 3500 })
       if (nel === 'wallet') apri()
+    }
+  }
+
+  // ── La chat col bot dei $pzk (chat/): il cercapersone sotto il wallet. Il modulo arriva da solo
+  // appena la pagina è tranquilla (così il cercapersone sa se c'è un premio da riscuotere) e subito al clic; #chat la apre,
+  // l'evento pzkko-chat pure (con detail.comando si scrive un comando). Gli strumenti che fotografano non la vedono ──
+  {
+    const tasto = document.querySelector('.chat-tasto')
+    if (tasto && (!navigator.webdriver || q.has('chat'))) {
+      tasto.hidden = false
+      let modulo = null
+      const carica = () => (modulo ??= Promise.all([import('/chat/chat.js'), new Promise((ok) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/chat/chat.css'; l.onload = l.onerror = ok; document.head.appendChild(l) })])
+        .then(([m]) => { m.prepara(tasto); return m }).catch((e) => { modulo = null; console.warn('chat non caricata', e); throw e }))
+      const apri = (comando) => carica().then((m) => m.apri(comando)).catch(() => {})
+      tasto.addEventListener('click', () => apri())
+      document.addEventListener('pzkko-chat', (e) => apri(e.detail?.comando))
+      ;(window.requestIdleCallback ?? setTimeout)(() => carica().catch(() => {}), { timeout: 4000 })
+      if (nel === 'chat') apri()
     }
   }
 

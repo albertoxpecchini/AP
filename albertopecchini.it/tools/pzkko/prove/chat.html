@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="it" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>prova: la chat col bot dei $pzk</title>
+<!-- La pagina di prova della chat (npm run dev:pzkko → http://localhost:5182/prova/chat/): solo i due tasti in alto a
+     sinistra (il wallet vero e il cercapersone della chat) su un muro vuoto, coi file veri di pzkko/chat/. Il css del
+     tasto qui sotto è quello da copiare in pzkko/index.html sotto .wallet-tasto, come il loader in fondo. -->
+<style>
+@font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rubik Mono One";src:url(/fonts/rubik-mono-one.woff2) format("woff2");font-weight:400;font-display:swap}
+html,body{margin:0;min-height:100%;background:#8e8e8a url(/art/muro.webp) center/900px repeat;color:#111;font:16px/1.4 "Special Elite",monospace}
+body::after{content:"";position:fixed;inset:0;background:rgba(20,16,12,.35);pointer-events:none}
+.nota{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:1;padding:8px 14px;background:#ffd400;color:#111;font:400 14px/1.2 "Permanent Marker",cursive;transform:translateX(-50%) rotate(-1deg);box-shadow:0 3px 6px rgba(0,0,0,.4)}
+
+/* ── il tasto del wallet, com'è in index.html ── */
+.wallet-tasto{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:grid;grid-template-columns:1fr;align-items:center;width:112px;height:52px;padding:6px 8px 6px 9px;border:0;border-radius:9px 11px 10px 9px;
+  background:radial-gradient(120% 90% at 20% 10%,rgba(255,255,255,.12),transparent 50%),linear-gradient(165deg,#5a3d2a,#3d2819 55%,#2b1b11);color:#e9e4d8;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),inset 0 0 0 4px rgba(0,0,0,.08),0 3px 4px rgba(0,0,0,.5),0 10px 14px rgba(0,0,0,.3);transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
+.wallet-tasto::before{content:"";position:absolute;inset:3px;border:1.5px dashed rgba(236,220,190,.45);border-radius:7px;pointer-events:none}
+.wallet-tasto canvas{display:block;width:100%;height:100%;border-radius:4px;background:#050806;box-shadow:inset 0 0 6px rgba(0,0,0,.9),0 0 0 2px #1a1a1a}
+.wallet-tasto .wt-eti{position:absolute;right:9px;top:9px;font:400 7px/1 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#46ff7d;opacity:.75;text-shadow:0 0 4px #46ff7d;pointer-events:none}
+.wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 22px/1 "Anton",Impact,sans-serif;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
+.wallet-tasto .wt-piu.va{animation:wt-piu 1.6s ease-out forwards}
+@keyframes wt-piu{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
+.wallet-tasto[hidden]{display:none}
+@media (hover:hover){.wallet-tasto:hover{transform:scale(1.04)}}
+.wallet-tasto:active{transform:scale(.96)}
+.wallet-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
+@media (max-width:899px){.wallet-tasto{width:96px;height:46px;padding:5px 7px 5px 8px}.wallet-tasto .wt-eti{font-size:6.5px;right:8px;top:8px}}
+
+/* ── DA COPIARE IN index.html ── il tasto della chat col bot (chat/), sotto il wallet: un cercapersone nero con lo
+   schermo lcd verde; chat/chat.js lo accende (il led e «1 msg» quando il bot ha qualcosa da dire). Negli strumenti che
+   fotografano la pagina non c'è (navigator.webdriver), ?chat lo fa vedere lo stesso. Senza script non c'è ── */
+.chat-tasto{position:fixed;z-index:85;top:calc(max(12px,env(safe-area-inset-top)) + 62px);left:max(12px,env(safe-area-inset-left));width:112px;height:61px;padding:0;border:0;background:none;cursor:pointer;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
+.chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
+.chat-tasto .ct-lcd{position:absolute;left:14.5%;top:27%;width:55%;height:47%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px;padding:0 5px;border-radius:2px;background:#a9bc96;color:#1c2616;font:400 8px/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;text-align:left;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden;white-space:nowrap}
+.chat-tasto .ct-lcd b{font:400 11px/1 "Rubik Mono One",ui-monospace,monospace}
+.chat-tasto .ct-lcd .ct-n{display:none}
+.chat-tasto.msg .ct-lcd .ct-n{display:inline;animation:ct-lamp 1.2s steps(2) infinite}
+.chat-tasto .ct-led{position:absolute;left:83%;top:23%;width:6px;height:6px;border-radius:50%;background:#2a1a10;box-shadow:inset 0 0 2px #000}
+.chat-tasto.msg .ct-led{background:#ff3b2e;box-shadow:0 0 6px #ff3b2e,0 0 12px rgba(255,59,46,.6);animation:ct-lamp 1.2s steps(2) infinite}
+@keyframes ct-lamp{50%{opacity:.25}}
+.chat-tasto[hidden]{display:none}
+html:not(.js) .chat-tasto{display:none}
+@media (hover:hover){.chat-tasto:hover{transform:scale(1.04)}}
+.chat-tasto:active{transform:scale(.96)}
+.chat-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
+@media (max-width:899px){.chat-tasto{top:calc(max(12px,env(safe-area-inset-top)) + 54px);width:96px;height:52px}.chat-tasto .ct-lcd{font-size:7px}.chat-tasto .ct-lcd b{font-size:9.5px}}
+@media (prefers-reduced-motion:reduce){.chat-tasto{transition:none}.chat-tasto.msg .ct-lcd .ct-n,.chat-tasto.msg .ct-led{animation:none}}
+</style>
+</head>
+<body>
+<button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" title="wallet $pzk" hidden><canvas class="wt-led" width="190" height="80" aria-hidden="true"></canvas><span class="wt-eti" aria-hidden="true">$pzk</span></button>
+<!-- DA COPIARE IN index.html: il cercapersone della chat col bot (chat/), sotto il wallet -->
+<button class="chat-tasto" type="button" aria-label="chat: parla col bot dei $pzk" title="chat col bot" hidden><img src="/art/chat-cercapersone/cercapersone.webp" alt="" width="670" height="366"><span class="ct-lcd" aria-hidden="true"><b>pzk</b><span><span class="ct-n">1 msg</span></span></span><span class="ct-led" aria-hidden="true"></span></button>
+<p class="nota">pagina di prova: solo la chat, senza il muro. Non va online.</p>
+
+<script type="module">
+const q = new URLSearchParams(location.search)
+const nel = location.hash.slice(1)
+// il wallet, come in index.html
+{
+  const tasto = document.querySelector('.wallet-tasto')
+  tasto.hidden = false
+  let modulo = null
+  const carica = () => (modulo ??= Promise.all([import('/wallet/wallet.js'), new Promise((ok) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/wallet/wallet.css'; l.onload = l.onerror = ok; document.head.appendChild(l) })])
+    .then(([m]) => { m.prepara(tasto); return m }).catch((e) => { modulo = null; console.warn('wallet non caricato', e); throw e }))
+  const apri = (sezione) => carica().then((m) => m.apri(sezione)).catch(() => {})
+  tasto.addEventListener('click', () => apri())
+  document.addEventListener('pzkko-wallet', (e) => apri(e.detail?.sezione))
+  ;(window.requestIdleCallback ?? setTimeout)(() => carica().catch(() => {}), { timeout: 3500 })
+  if (nel === 'wallet') apri()
+}
+// ── DA COPIARE IN index.html ── la chat col bot (chat/): il cercapersone sotto il wallet. Il modulo arriva da solo
+// appena la pagina è tranquilla (così il cercapersone sa se c'è un premio da riscuotere) e subito al clic; #chat la apre,
+// l'evento pzkko-chat pure (con detail.comando si scrive un comando). Gli strumenti che fotografano non la vedono ──
+{
+  const tasto = document.querySelector('.chat-tasto')
+  if (tasto && (!navigator.webdriver || q.has('chat'))) {
+    tasto.hidden = false
+    let modulo = null
+    const carica = () => (modulo ??= Promise.all([import('/chat/chat.js'), new Promise((ok) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/chat/chat.css'; l.onload = l.onerror = ok; document.head.appendChild(l) })])
+      .then(([m]) => { m.prepara(tasto); return m }).catch((e) => { modulo = null; console.warn('chat non caricata', e); throw e }))
+    const apri = (comando) => carica().then((m) => m.apri(comando)).catch(() => {})
+    tasto.addEventListener('click', () => apri())
+    document.addEventListener('pzkko-chat', (e) => apri(e.detail?.comando))
+    ;(window.requestIdleCallback ?? setTimeout)(() => carica().catch(() => {}), { timeout: 4000 })
+    if (nel === 'chat') apri()
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+// Lo zaino di chi parla col bot (chat.js): i punti esperienza e il livello, il mestiere, gli oggetti, le attese dei
+// comandi, gli effetti in corso (il caffè, la lattina…), la serie dei premi giornalieri e le statistiche. I $pzk NON
+// stanno qui: sono quelli di games/pzk.js, gli stessi dei giochi e del wallet.
+//
+// Come il saldo: nella SESSIONE (chi non è entrato nel wallet) lo zaino sta in sessionStorage e sparisce con la scheda;
+// col CONTO sta sul server (api/wallet.mjs, azione «zaino», un file a parte su Blob: pzkko/chat.json) e in localStorage
+// come copia, si salva un po' dopo ogni cambio e subito quando la pagina si nasconde. Vince chi ha il `t` più recente.
+
+import * as pzk from '../games/pzk.js'
+
+const API = '/api/wallet'
+const CHIAVE_SESSIONE = 'pzkko-chat-sessione'
+const CHIAVE_CONTO = 'pzkko-chat'
+export const MAX_BYTE = 8 * 1024
+
+export const vuoto = () => ({ v: 1, t: 0, xp: 0, mestiere: null, turni: 0, oggetti: {}, attese: {}, effetti: {}, serie: {}, stat: {} })
+const leggiJSON = (dep, k) => { try { return JSON.parse(dep.getItem(k) || 'null') } catch { return null } }
+const scriviJSON = (dep, k, v) => { try { v === null ? dep.removeItem(k) : dep.setItem(k, JSON.stringify(v)) } catch {} }
+const valido = (z) => z && typeof z === 'object' && z.v === 1 && Number.isFinite(z.xp)
+
+/** Il livello dai punti: 1 all'inizio, 2 a 60 xp, 3 a 240, 5 a 960, 10 a 4.860. */
+export const livelloDi = (xp) => 1 + Math.floor(Math.sqrt(Math.max(0, xp) / 60))
+/** Gli xp che servono per il livello l. */
+export const xpPer = (l) => 60 * (l - 1) ** 2
+
+let Z = carica()
+let chi = pzk.conto()?.ind ?? null // per chi è lo zaino in memoria
+const ascolti = new Set()
+let attesa = 0, sporco = false, inCorso = null
+
+function carica() {
+  const c = pzk.conto()
+  if (c) { const z = leggiJSON(localStorage, CHIAVE_CONTO); return z && z.ind === c.ind && valido(z.zaino) ? z.zaino : vuoto() }
+  const z = leggiJSON(sessionStorage, CHIAVE_SESSIONE)
+  return valido(z) ? z : vuoto()
+}
+function scrivi() {
+  Z.t = Date.now()
+  const c = pzk.conto()
+  if (c) { scriviJSON(localStorage, CHIAVE_CONTO, { ind: c.ind, zaino: Z }); salvaPoi() } else scriviJSON(sessionStorage, CHIAVE_SESSIONE, Z)
+  for (const f of ascolti) f(Z)
+}
+function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 1500) }
+async function salva(keepalive = false) {
+  const t = pzk.token()
+  if (!t || !sporco) return
+  sporco = false
+  try {
+    inCorso = fetch(API, { method: 'POST', keepalive, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t, zaino: Z }) })
+    const d = await (await inCorso).json().catch(() => null)
+    if (d?.zaino && valido(d.zaino) && d.zaino.t > Z.t) { Z = d.zaino; scriviJSON(localStorage, CHIAVE_CONTO, { ind: pzk.conto()?.ind, zaino: Z }); for (const f of ascolti) f(Z) }
+  } catch {} finally { inCorso = null }
+}
+/** Col conto: chiede al server lo zaino salvato; se è più recente di quello di qui, vince. */
+export async function sincronizza() {
+  const t = pzk.token()
+  if (!t) return
+  try {
+    const d = await (await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t }) })).json()
+    if (d?.zaino && valido(d.zaino) && d.zaino.t > Z.t) { Z = d.zaino; scriviJSON(localStorage, CHIAVE_CONTO, { ind: pzk.conto()?.ind, zaino: Z }); for (const f of ascolti) f(Z) }
+    else if (d?.ok && !d.zaino && Z.t) salvaPoi()
+  } catch {}
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(attesa); salva(true) } })
+addEventListener('pagehide', () => { clearTimeout(attesa); salva(true) })
+// si entra o si esce dal wallet: lo zaino cambia padrone
+pzk.osserva(() => {
+  const c = pzk.conto()?.ind ?? null
+  if (c === chi) return
+  chi = c
+  Z = carica()
+  for (const f of ascolti) f(Z)
+  if (c) sincronizza()
+})
+
+/** Lo zaino com'è (da non modificare a mano: usa le funzioni qui sotto). */
+export const stato = () => Z
+export const ascolta = (fn) => { ascolti.add(fn); return () => ascolti.delete(fn) }
+export const xp = () => Z.xp
+export const livello = () => livelloDi(Z.xp)
+export const mestiere = () => Z.mestiere
+
+/** Aggiunge punti esperienza (la mortadella li raddoppia). → il livello nuovo se è salito, se no 0 */
+export function daiXp(n) {
+  if (effetto('mortadella')) n *= 2
+  const prima = livello()
+  Z.xp = Math.round(Z.xp + n)
+  Z.stat.xp = (Z.stat.xp ?? 0) + n
+  scrivi()
+  const dopo = livello()
+  return dopo > prima ? dopo : 0
+}
+/** Il moltiplicatore delle paghe: 2 % per livello sopra il primo, +10 % con la lattina. */
+export const moltiplicatore = () => Math.round((1 + 0.02 * (livello() - 1) + (effetto('lattina') ? 0.1 : 0)) * 100) / 100
+
+// ── gli oggetti ──
+export const ha = (id) => (Z.oggetti[id] ?? 0) > 0
+export const quanti = (id) => Z.oggetti[id] ?? 0
+export const oggetti = () => Object.entries(Z.oggetti).filter(([, n]) => n > 0)
+export function aggiungi(id, n = 1) { Z.oggetti[id] = (Z.oggetti[id] ?? 0) + n; scrivi() }
+/** → false se non ce n'erano abbastanza */
+export function togli(id, n = 1) {
+  if ((Z.oggetti[id] ?? 0) < n) return false
+  Z.oggetti[id] -= n
+  if (Z.oggetti[id] <= 0) delete Z.oggetti[id]
+  scrivi()
+  return true
+}
+export function svuota() { Z.oggetti = {}; scrivi() }
+
+// ── le attese (i cooldown) ──
+/** Quanti ms mancano prima di poter rifare il comando (0 se si può). */
+export const manca = (cmd) => Math.max(0, (Z.attese[cmd] ?? 0) - Date.now())
+/** Segna l'attesa (il caffè la dimezza). */
+export function aspetta(cmd, ms) {
+  if (effetto('caffe')) ms = Math.round(ms / 2)
+  Z.attese[cmd] = Date.now() + ms
+  for (const k of Object.keys(Z.attese)) if (Z.attese[k] < Date.now()) delete Z.attese[k]
+  scrivi()
+}
+export const attese = () => Object.entries(Z.attese).filter(([, t]) => t > Date.now()).sort((a, b) => a[1] - b[1])
+export function azzeraAttese() { Z.attese = {}; scrivi() }
+
+// ── gli effetti (una cosa usata che dura un po') ──
+export const effetto = (id) => (Z.effetti[id] ?? 0) > Date.now()
+export const effetti = () => Object.entries(Z.effetti).filter(([, t]) => t > Date.now())
+export function attiva(id, ms) { Z.effetti[id] = Math.max(Z.effetti[id] ?? 0, Date.now()) + ms; scrivi() }
+
+// ── il mestiere ──
+export function assumi(id) { Z.mestiere = id; Z.turni = 0; scrivi() }
+export function licenzia() { Z.mestiere = null; Z.turni = 0; scrivi() }
+export function turno() { Z.turni = (Z.turni ?? 0) + 1; scrivi() }
+
+// ── le serie dei premi (giornaliero, settimanale, mensile): { ultimo: ts, n: giorni di fila } ──
+export const serie = (id) => Z.serie[id] ?? { ultimo: 0, n: 0 }
+export function segnaSerie(id, n) { Z.serie[id] = { ultimo: Date.now(), n }; scrivi() }
+
+// ── le statistiche ──
+export const stat = (k) => Z.stat[k] ?? 0
+export function conta(k, n = 1) { Z.stat[k] = (Z.stat[k] ?? 0) + n; scrivi() }
+
+/** Tutto da capo (per le prove: «reset»). */
+export function azzera() { Z = vuoto(); scrivi() }
+
+/** Lo zaino pesa troppo per il server? (non dovrebbe mai) */
+export const pesante = () => JSON.stringify(Z).length > MAX_BYTE
+
+if (pzk.token()) setTimeout(sincronizza, 600)

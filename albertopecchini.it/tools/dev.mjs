@@ -31,6 +31,9 @@ const bcp = async (port) => {
 // (cleanUrls, trailingSlash, 404.html, intestazioni) e ricarica la pagina quando cambia un file.
 const pzkko = (port) => {
   const root = path.join(ROOT, 'pzkko')
+  // le pagine di prova di tools/pzkko/prove/<nome>.html, su /prova/<nome>/: un pezzo del sito da solo (la chat col bot),
+  // con i file veri di pzkko/ (/chat/, /games/pzk.js, /art/, /fonts/, /api/); online non ci sono
+  const prove = path.join(ROOT, 'tools/pzkko/prove')
   const { headers } = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'))
   const intestazioni = Object.fromEntries(headers.filter((h) => h.source === '/(.*)').flatMap((h) => h.headers.map((x) => [x.key, x.value])))
   const TIPI = {
@@ -45,7 +48,7 @@ const pzkko = (port) => {
   const SCRIPT = `<script>new EventSource('${RICARICA}').onmessage = () => location.reload()</script>`
   const pagine = new Set()
   let attesa
-  fs.watch(root, { recursive: true }, (_, file) => {
+  for (const dir of [root, prove]) if (fs.existsSync(dir)) fs.watch(dir, { recursive: true }, (_, file) => {
     clearTimeout(attesa)
     attesa = setTimeout(() => {
       for (const res of pagine) res.write('data: ricarica\n\n')
@@ -80,6 +83,8 @@ const pzkko = (port) => {
     if (funzione && esiste(path.join(root, 'api', funzione + '.mjs'))) {
       return import(`./../pzkko/api/${funzione}.mjs?${Date.now()}`).then((m) => m.default(req, res)).catch((e) => { console.error(e); res.writeHead(500).end() })
     }
+    const prova = /^\/prova\/([a-z0-9-]+)\/$/.exec(pathname)?.[1]
+    if (prova && esiste(path.join(prove, prova + '.html'))) return invia(res, 200, path.join(prove, prova + '.html'))
     let nome = pathname
     try { nome = decodeURIComponent(pathname) } catch {}
     const file = path.join(root, nome)

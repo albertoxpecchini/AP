@@ -18,6 +18,9 @@
 // chi è a secco) sono qui. Il PIN si salva con scrypt e un sale; l'accesso dà un token firmato (HMAC) che il browser
 // tiene in localStorage per 180 giorni.
 //
+// La chat col bot (pzkko/chat/): { a: 'zaino', token } legge lo zaino di chi parla col bot (xp, oggetti, attese…) e
+// { a: 'zaino', token, zaino } lo salva (al più 8 KB, forma controllata), in un file a parte, pzkko/chat.json
+// ({ zaini: { [id]: zaino } }), così wallet.json non si gonfia. GET ?classifica=1 dà i dieci conti più ricchi (nome e $pzk).
 // Moderazione: con la chiave, { a: 'lista', key } elenca i conti e { a: 'via', key, nome } ne cancella uno.
 // Sta qui (.mjs) perché vada online anche quando il progetto pzkko avrà la Root Directory in albertopecchini.it/pzkko;
 // finché la radice è albertopecchini.it, la pubblica albertopecchini.it/api/wallet.js, che la riesporta.
@@ -97,6 +100,14 @@ function accogli(c, pzk, now) {
   return null
 }
 
+// lo zaino della chat: la forma che accetta (numeri finiti, oggetti piccoli, al più MAX_ZAINO byte)
+const PATH_CHAT = process.env.CHAT_BLOB_PATH || 'pzkko/chat.json', MAX_ZAINO = 8 * 1024
+const vuotoChat = () => ({ zaini: {} })
+const zainoValido = (z) => {
+  if (!z || typeof z !== 'object' || z.v !== 1 || !Number.isFinite(z.xp) || z.xp < 0) return false
+  for (const k of ['oggetti', 'attese', 'effetti', 'serie', 'stat']) if (z[k] && (typeof z[k] !== 'object' || Array.isArray(z[k]) || Object.keys(z[k]).length > 120)) return false
+  return JSON.stringify(z).length <= MAX_ZAINO
+}
 const limiti = { crea: limite('wallet-crea', 3, GIORNO), entra: limite('wallet-entra', 8, 10 * MINUTO), tutte: limite('wallet-tutte', 300, 10 * MINUTO) }
 
 export default async function handler(req, res) {
@@ -105,8 +116,10 @@ export default async function handler(req, res) {
   const now = Date.now()
   try {
     if (req.method === 'GET' || req.method === 'HEAD') {
-      const ind = indirizzoDi(new URL(req.url, 'http://x').searchParams.get('ind'))
+      const url = new URL(req.url, 'http://x')
+      const ind = indirizzoDi(url.searchParams.get('ind'))
       const { db } = await store.read()
+      if (url.searchParams.has('classifica')) return json(res, 200, { ok: true, classifica: [...db.conti].sort((a, b) => b.pzk - a.pzk).slice(0, 10).map((c) => ({ nome: c.nome, pzk: c.pzk })) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
       if (ind) { const c = db.conti.find((x) => x.ind === ind); return c ? json(res, 200, { ok: true, conto: { nome: c.nome, ind: 'pzk' + c.ind, creato: c.creato } }, 'public, s-maxage=20') : json(res, 404, { ok: false, errore: 'nessun conto con questo indirizzo' }) }
       return json(res, 200, { ok: true, ...offerta(db) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
     }
@@ -115,7 +128,7 @@ export default async function handler(req, res) {
     if (limiti.tutte.troppe(ip, now)) return json(res, 429, { ok: false, errore: 'con calma' })
     limiti.tutte.segna(ip, now)
     let body
-    try { body = await corpo(req) } catch { return json(res, 400, { ok: false, errore: 'richiesta sbagliata' }) }
+    try { body = await corpo(req, 12 * 1024) } catch { return json(res, 400, { ok: false, errore: 'richiesta sbagliata' }) }
     if (!body || typeof body !== 'object') return json(res, 400, { ok: false, errore: 'richiesta sbagliata' })
     const a = body.a
 
@@ -166,6 +179,15 @@ export default async function handler(req, res) {
     const b = await borsa(now)
     const tasso = b ? attuale(b) : 1
     const risposta = (c, extra = {}) => ({ ok: true, conto: vista(c, now), tasso, t: now, ...extra })
+
+    if (a === 'zaino') {
+      const chat = await archivio(PATH_CHAT, vuotoChat)
+      if (!chat) return json(res, 503, { ok: false, offline: true, errore: 'lo zaino è in pausa' })
+      if (body.zaino === undefined) { const { db } = await chat.read(); return json(res, 200, { ok: true, zaino: db.zaini[id] ?? null }) }
+      if (!zainoValido(body.zaino)) return json(res, 400, { ok: false, errore: 'zaino strano' })
+      const r = await aggiorna(chat, (db) => { const mio = db.zaini[id]; if (mio && mio.t > (body.zaino.t ?? 0)) return { invariato: true, zaino: mio }; db.zaini[id] = body.zaino; return { zaino: body.zaino } })
+      return json(res, 200, { ok: true, zaino: r.zaino })
+    }
 
     if (a === 'stato' || a === 'salva') {
       const r = await aggiorna(store, (db) => {

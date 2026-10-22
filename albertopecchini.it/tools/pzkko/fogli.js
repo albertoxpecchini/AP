@@ -9,6 +9,8 @@
 // I prompt sono in inglese perché il modello li segue meglio. Niente magenta,
 // rosa o viola sui pezzi: la chiave li farebbe sparire.
 
+import { fogliChat } from './fogli-chat.js'
+
 const FONDO = 'a perfectly flat, uniform, solid pure magenta background (#FF00FF, a chroma-key backdrop: no texture, no gradient, no vignette, no shadow falls on it)'
 
 export { FONDO }
@@ -564,4 +566,8 @@ They are the four paper banknotes of an invented play currency, the «$pzk» of 
 4. bottom right: 10 $pzk, orange-red, the word «dieci».
 The paper is slightly worn and creased, a little dirty at the edges, as notes that have been lost on a sidewalk, but each lies flat and whole. Photorealistic, sharp. Nothing outside the rectangles of the notes, no shadow falls on the magenta. ${NIENTE_MAGENTA}`,
   },
+
+  // ── la chat col bot (pzkko/chat/): le icone al posto delle emoji e il cercapersone del tasto. I pezzi stanno in
+  // pzkko/chat/icone.js, i prompt in fogli-chat.js ──
+  ...fogliChat({ griglia, NIENTE_MAGENTA }),
 }

@@ -1,0 +1,160 @@
+/* La chat col bot dei $pzk (22.10): si apre dal cercapersone sotto il wallet (index.html, .chat-tasto). Un palmare nero
+   di plastica dura, con lo schermo a fosfori verdi come il Pip-Boy del wallet: dentro i messaggi, il bot risponde con
+   «schede» (barra colorata a sinistra, titolo, testo, campi, piè, pulsanti) e in fondo la riga dove si scrive il
+   comando, coi suggerimenti. Le icone sono le nostre (art/chat-*, chat/icone.js), mai emoji di sistema. */
+
+.chat{position:fixed;inset:0;margin:auto;width:min(94vw,680px);height:min(86dvh,760px);max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;
+  color:#dfe6d6;font:400 15px/1.4 "Special Elite","Courier New",monospace;--led:#46ff7d;--ambra:#ffb02e;--rosso:#ff5b4a;--blu:#5fb5ff;--lcd:#9fb48a;--vetro:#0b100c;--plastica:#1d201c;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",Menlo,monospace;--fa:"Anton",Impact,sans-serif;--marker:"Permanent Marker","Comic Sans MS",cursive}
+.chat::backdrop{background:rgba(12,10,8,.55);backdrop-filter:blur(2px)}
+.chat[open]{animation:c-apre .3s cubic-bezier(.22,1,.36,1)}
+.chat.chiude{animation:c-chiude .18s ease-in forwards}
+@keyframes c-apre{from{opacity:0;transform:translateY(14px) scale(.97)}}
+@keyframes c-chiude{to{opacity:0;transform:translateY(8px) scale(.98)}}
+.chat *{box-sizing:border-box}
+.chat button,.chat input{font:inherit;color:inherit}
+.chat :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
+.chat b{font-weight:400;color:#fff}
+.chat .pzk{font-family:var(--mono);color:var(--led);text-shadow:0 0 6px rgba(70,255,125,.6);white-space:nowrap}
+.chat .eur{font-family:var(--mono);color:var(--ambra);text-shadow:0 0 6px rgba(255,176,46,.5);white-space:nowrap}
+.chat .meno{color:var(--rosso)}
+.chat code{font:400 .95em/1 var(--mono);padding:1px 5px;border-radius:3px;background:rgba(70,255,125,.1);color:var(--led)}
+
+/* le icone nostre, alte come la riga */
+.chat .emo{display:inline-block;height:1.35em;width:auto;vertical-align:-.3em;margin:0 .08em;image-rendering:auto}
+.chat .emo.grande{height:3.2em;vertical-align:middle}
+.chat .emo.manca{width:1.35em;border-radius:50%;background:#333;color:#999;text-align:center;line-height:1.35em;font-size:.8em}
+
+/* ── il palmare ── */
+.c-corpo{position:relative;display:flex;flex-direction:column;width:100%;height:100%;border-radius:22px;padding:14px 14px 12px;
+  background:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.07),transparent 50%),linear-gradient(170deg,#2a2d28,#1a1c19 60%,#121410);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 0 0 5px rgba(0,0,0,.35),0 8px 10px rgba(0,0,0,.5),0 30px 40px rgba(0,0,0,.5)}
+.c-corpo::before{content:"";position:absolute;left:50%;top:5px;width:48px;height:4px;margin-left:-24px;border-radius:2px;background:#0a0a0a;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.c-chiudi{position:absolute;right:-10px;top:-10px;z-index:2;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:#161616;color:#fff;font:400 22px/1 var(--fa);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.5)}
+@media (hover:hover){.c-chiudi:hover{transform:scale(1.08)}}
+
+/* lo schermo: vetro scuro, fosfori verdi, righe di scansione */
+.c-schermo{position:relative;flex:1;display:flex;flex-direction:column;min-height:0;border-radius:10px;background:var(--vetro);box-shadow:inset 0 0 18px rgba(0,0,0,.95),0 0 0 2px #090a08,0 0 0 3px rgba(255,255,255,.05);overflow:hidden}
+.c-schermo::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px),linear-gradient(118deg,rgba(255,255,255,.06),rgba(255,255,255,.015) 38%,transparent 40%)}
+
+/* la barra in alto: l'avatar del bot, il nome, il led */
+.c-testa{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid rgba(70,255,125,.18);background:rgba(70,255,125,.05)}
+.c-testa .emo{height:40px;filter:drop-shadow(0 0 4px rgba(70,255,125,.3))}
+.c-testa .c-nome{font:400 22px/1 var(--fa);letter-spacing:.03em;color:#fff}
+.c-testa .c-nome small{display:block;margin-top:3px;font:400 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--led);opacity:.8}
+.c-testa .c-nome small::before{content:"";display:inline-block;width:6px;height:6px;margin:0 6px 1px 0;border-radius:50%;background:var(--led);box-shadow:0 0 6px var(--led);animation:c-led 2.4s ease-in-out infinite}
+@keyframes c-led{50%{opacity:.35}}
+.c-testa .c-saldo{margin-left:auto;text-align:right;font:400 11px/1.3 var(--mono);color:var(--led);opacity:.9;text-shadow:0 0 6px rgba(70,255,125,.6)}
+.c-testa .c-saldo b{display:block;font-size:17px;color:var(--led)}
+.c-testa .c-saldo .eur{display:block;font-size:11px}
+
+/* i messaggi */
+.c-lista{flex:1;min-height:0;overflow:auto;padding:12px 12px 6px;scroll-behavior:smooth;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(70,255,125,.3) transparent}
+.c-msg{display:flex;gap:8px;margin:0 0 10px;animation:c-msg .22s ease-out}
+@keyframes c-msg{from{opacity:0;transform:translateY(6px)}}
+.c-msg.tu{justify-content:flex-end}
+.c-msg.tu .c-bolla{max-width:80%;padding:6px 12px 7px;border-radius:10px 10px 2px 10px;background:#f1ead6;color:#161616;font:400 15px/1.3 var(--marker);box-shadow:0 2px 3px rgba(0,0,0,.5);transform:rotate(.4deg);word-break:break-word}
+.c-msg.tu .c-bolla::before{content:"› ";color:#a50d25}
+.c-msg .c-av{flex:none;width:34px;height:34px;margin-top:2px}
+.c-msg .c-av .emo{height:34px;width:34px;object-fit:contain;margin:0}
+.c-msg.sistema{justify-content:center;font:400 11px/1.3 var(--mono);letter-spacing:.06em;color:var(--led);opacity:.6;text-transform:uppercase}
+
+/* la scheda del bot */
+.c-scheda{position:relative;max-width:min(100%,520px);padding:8px 12px 9px 14px;border-radius:4px 8px 8px 4px;background:#141a15;border-left:4px solid var(--c,var(--led));box-shadow:0 2px 4px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.04);word-break:break-word}
+.c-scheda.verde{--c:var(--led)}.c-scheda.ambra{--c:var(--ambra)}.c-scheda.rosso{--c:var(--rosso)}.c-scheda.blu{--c:var(--blu)}.c-scheda.grigio{--c:#6b7067}.c-scheda.oro{--c:#ffd400}
+.c-scheda h4{margin:0 0 4px;font:400 19px/1.1 var(--fa);letter-spacing:.02em;color:#fff}
+.c-scheda h4 .emo{height:1.25em;vertical-align:-.25em}
+.c-scheda p{margin:0 0 4px}
+.c-scheda p:last-child{margin-bottom:0}
+.c-scheda .c-testo{white-space:pre-line}
+.c-scheda .c-campi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px 12px;margin:8px 0 2px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.12)}
+.c-scheda .c-campi>div.largo{grid-column:1/-1}
+.c-scheda .c-campi dt{margin:0;font:400 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--led));opacity:.85}
+.c-scheda .c-campi dd{margin:1px 0 0;font-size:14px}
+.c-scheda .c-pie{margin-top:6px;font:400 10.5px/1.3 var(--mono);color:#8b9385;letter-spacing:.03em}
+.c-scheda .c-pie .emo{height:1.2em}
+.c-scheda .c-img{display:block;max-width:100%;max-height:180px;margin:6px 0 2px;border-radius:4px}
+.c-scheda .c-grande{display:flex;gap:12px;align-items:center}
+.c-scheda table{border-collapse:collapse;margin:6px 0 2px;font-size:13.5px}
+.c-scheda td,.c-scheda th{padding:2px 8px 2px 0;text-align:left;vertical-align:top;font-weight:400}
+.c-scheda th{font:400 10px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--led));opacity:.85}
+.c-scheda tr+tr td{border-top:1px dashed rgba(255,255,255,.08)}
+.c-scheda ul{margin:4px 0;padding-left:18px}
+.c-scheda li{margin:2px 0}
+
+/* la barra del tempo, nei minigiochi */
+.c-tempo{position:relative;height:5px;margin:8px 0 4px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.c-tempo i{position:absolute;inset:0;transform-origin:left;background:var(--c,var(--led));box-shadow:0 0 6px var(--c,var(--led));animation:c-tempo var(--ms,10s) linear forwards}
+@keyframes c-tempo{to{transform:scaleX(0)}}
+.c-tempo.ferma i{animation-play-state:paused}
+
+/* i pulsanti sotto la scheda: tasti di gomma gialli/neri come quelli del wallet */
+.c-bottoni{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.c-b{flex:none;min-width:36px;padding:6px 12px 7px;border:0;border-radius:5px;background:#ffd400;color:#111;font:400 14px/1 var(--fa);letter-spacing:.04em;cursor:pointer;box-shadow:0 3px 0 #8a7000,0 4px 5px rgba(0,0,0,.4);transform:rotate(-.4deg);transition:transform .08s,box-shadow .08s}
+.c-b.nero{background:#2b2e29;color:#fff;box-shadow:0 3px 0 #000,0 4px 5px rgba(0,0,0,.4)}
+.c-b.rosso{background:#a50d25;color:#fff;box-shadow:0 3px 0 #4a0410,0 4px 5px rgba(0,0,0,.4)}
+.c-b.verde{background:var(--led);color:#062a12;box-shadow:0 3px 0 #0c7a33,0 4px 5px rgba(0,0,0,.4)}
+.c-b.quadro{width:40px;height:40px;padding:0;font-size:16px}
+.c-b .emo{height:1.3em;vertical-align:-.3em;margin:0}
+.c-b:active,.c-b.premuto{transform:translateY(3px) rotate(-.4deg);box-shadow:0 0 0 #000,0 1px 2px rgba(0,0,0,.4)}
+.c-b:disabled{opacity:.45;cursor:default;box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.c-b.giusto{background:var(--led);color:#062a12}
+.c-b.sbagliato{background:#4a0410;color:#ffb0a8}
+@media (hover:hover){.c-b:not(:disabled):hover{transform:scale(1.05) rotate(-.4deg)}}
+/* griglie di pulsanti (le mine 5×5, il gratta e vinci 3×3) */
+.c-griglia{display:grid;gap:5px;margin-top:8px;width:max-content;max-width:100%}
+.c-griglia .c-b{width:42px;height:42px;padding:0;transform:none;font-size:15px}
+.c-griglia .c-b .emo{height:1.6em;vertical-align:middle}
+.c-griglia .c-b:active,.c-griglia .c-b.premuto{transform:translateY(3px)}
+.c-griglia.g5{grid-template-columns:repeat(5,42px)}
+.c-griglia.g3{grid-template-columns:repeat(3,52px)}
+.c-griglia.g3 .c-b{width:52px;height:52px}
+.c-griglia .c-b.aperta{background:#1d241e;color:var(--led);box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+.c-griglia .c-b.bum{background:#7a1010;color:#fff}
+/* la parola da riscrivere: su tela, così non si copia */
+.c-parola{display:block;margin:6px 0 2px;height:44px;max-width:100%;border-radius:4px;background:#0a0d0a}
+.c-nascosto{user-select:none;-webkit-user-select:none;pointer-events:none}
+/* i rulli della slot */
+.c-rulli{display:flex;gap:8px;margin:8px 0 4px}
+.c-rulli div{width:62px;height:62px;display:grid;place-items:center;border-radius:6px;background:#f1ead6;box-shadow:inset 0 0 0 3px #161616,0 3px 4px rgba(0,0,0,.5)}
+.c-rulli div .emo{height:44px;margin:0}
+.c-rulli.gira div .emo{animation:c-rullo .12s linear infinite}
+@keyframes c-rullo{from{transform:translateY(-14px);opacity:.3}to{transform:translateY(14px);opacity:1}}
+/* le carte del blackjack */
+.c-carte{display:flex;gap:4px;flex-wrap:wrap;margin:3px 0}
+.c-carta{display:inline-grid;place-items:center;width:34px;height:46px;border-radius:4px;background:#f6f1e4;color:#111;font:400 16px/1 var(--fa);box-shadow:0 1px 2px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.15)}
+.c-carta.rossa{color:#c0182a}
+.c-carta.coperta{background:repeating-linear-gradient(45deg,#1446a0 0 4px,#0d2f6e 4px 8px)}
+.c-carta small{font-size:12px;margin-top:-3px}
+
+/* dove si scrive */
+.c-riga{position:relative;display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid rgba(70,255,125,.18);background:rgba(0,0,0,.35)}
+.c-riga .c-prompt{font:400 20px/1 var(--mono);color:var(--led);text-shadow:0 0 6px var(--led)}
+.c-riga input{flex:1;min-width:0;padding:6px 8px;border:0;border-radius:4px;background:rgba(70,255,125,.06);color:#eaf5e4;font:400 16px/1.2 var(--mono);caret-color:var(--led)}
+.c-riga input::placeholder{color:#5f6b5c}
+.c-riga .c-invia{flex:none;padding:7px 12px 8px}
+.c-sugg{position:absolute;left:10px;right:10px;bottom:100%;margin:0 0 4px;padding:4px 0;list-style:none;border-radius:6px;background:#161c17;box-shadow:0 -4px 14px rgba(0,0,0,.6),inset 0 0 0 1px rgba(70,255,125,.25);max-height:220px;overflow:auto;z-index:4}
+.c-sugg[hidden]{display:none}
+.c-sugg li{display:flex;gap:10px;align-items:baseline;padding:5px 12px;cursor:pointer;font-size:14px}
+.c-sugg li b{font-family:var(--mono);color:var(--led)}
+.c-sugg li span{color:#8b9385;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-sugg li.scelta,.c-sugg li:hover{background:rgba(70,255,125,.12)}
+.c-sugg li .emo{height:1.2em}
+
+/* il bot scrive… */
+.c-scrive{display:inline-flex;gap:3px;padding:8px 10px}
+.c-scrive i{width:6px;height:6px;border-radius:50%;background:var(--led);opacity:.4;animation:c-scrive 1s infinite}
+.c-scrive i:nth-child(2){animation-delay:.2s}.c-scrive i:nth-child(3){animation-delay:.4s}
+@keyframes c-scrive{30%{opacity:1;transform:translateY(-3px)}}
+
+/* il telefono: tutto schermo */
+@media (max-width:899px){
+  .chat{width:100vw;height:100dvh;max-height:100dvh}
+  .c-corpo{border-radius:0;padding:max(8px,env(safe-area-inset-top)) 6px max(6px,env(safe-area-inset-bottom))}
+  .c-corpo::before{display:none}
+  .c-chiudi{right:8px;top:calc(max(8px,env(safe-area-inset-top)) + 6px)}
+  .c-testa{padding-right:52px}
+  .c-testa .c-saldo{display:none}
+  .c-riga input{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){.chat[open],.chat.chiude,.c-msg,.c-rulli.gira div .emo{animation:none}}
