@@ -86,10 +86,9 @@ export class Moneta {
     const w = (this.world = new RAPIER.World({ x: 0, y: -FISICA.g, z: 0 }))
     w.timestep = FISICA.dt
     w.integrationParameters.numSolverIterations = 8
-    w.integrationParameters.lengthUnit = 0.01 // le tolleranze del motore in centimetri: la moneta è alta 2,6 mm
-    // i contatti si preparano a 4 mm (con lengthUnit piccolo quelli di serie sono a 0,02 mm: la moneta che cade a 2 m/s
-    // fa 3,5 mm per passo, e senza contatti preparati entrava nel fondo di 2 mm prima di rimbalzare)
-    //w.integrationParameters.normalizedPredictionDistance = 0.4
+    // (le tolleranze del motore restano quelle di serie, in metri, come nella roulette: provate in centimetri o in
+    // millimetri, la moneta che ondeggia sul fondo ci affondava di 1–2 mm in un fotogramma su dieci invece di uno su
+    // sessanta, e costava di più)
 
     // il piatto: il fondo è un blocco (contatti puliti per la moneta che ci ondeggia sopra), la parete una superficie di rivoluzione
     const fisso = w.createRigidBody(RAPIER.RigidBodyDesc.fixed())
@@ -120,7 +119,6 @@ export class Moneta {
   metti(faccia, x = 0, z = 0, giro = this.rnd() * TAU) {
     const b = this.corpo
     b.setBodyType(this.R.RigidBodyType.Dynamic, true)
-    b.enableCcd(true) // (cambiando tipo il corpo perde la CCD: senza, la moneta che cade entra nel fondo di qualche mm prima di rimbalzare)
     b.setTranslation({ x, y: FONDO.y + MONETA.h / 2, z }, true)
     // la croce in su: mezzo giro attorno a x; e un giro qualunque attorno a y
     const qy = { x: 0, y: Math.sin(giro / 2), z: 0, w: Math.cos(giro / 2) }
@@ -142,21 +140,27 @@ export class Moneta {
   }
 
   /**
-   * Un lancio nuovo. La moneta sale dal fondo (stato 'presa', `presa` secondi), poi il pollice la tira su
-   * facendola girare; con `presa: 0` parte subito (le prove).
+   * Un lancio nuovo. La moneta sale dal fondo (stato 'presa', `presa` secondi) e a metà salita il pollice la gira
+   * sottosopra, o no, a caso; poi la tira su facendola girare. Con `presa: 0` parte subito (le prove).
+   *
+   * Quel mezzo giro a caso è quello che rende giusta la moneta: la fisica da sola non lo è del tutto (nelle prove,
+   * 10.000 lanci, usciva la faccia opposta a quella in su alla partenza il 52% delle volte; le monete vere hanno
+   * una preferenza simile, per la stessa faccia, del 51%). Con la faccia di partenza metà e metà, e una moneta
+   * uguale dalle due parti, testa e croce escono metà e metà qualunque sia quella preferenza, e un lancio non dice
+   * niente del successivo.
    */
   lancia({ presa = FISICA.lancio.presa } = {}) {
     const L = FISICA.lancio, rnd = this.rnd
     const p = this.corpo.translation()
-    // l'asse del giro: orizzontale, in una direzione qualunque; il verso del giro a caso
-    const a = rnd() * TAU, verso = rnd() < 0.5 ? -1 : 1
+    // l'asse del giro: orizzontale, in una direzione qualunque; il verso del giro a caso; il mezzo giro del pollice
+    const a = rnd() * TAU, verso = rnd() < 0.5 ? -1 : 1, gira = rnd() < 0.5
     const w = casuale(...L.giri, rnd) * TAU * verso
     const su = casuale(...L.su, rnd)
     // dove cade: vicino al centro (il tempo di volo fino al fondo)
     const y0 = FONDO.y + L.alto, tv = (su + Math.sqrt(su * su + 2 * FISICA.g * (y0 - FONDO.y - MONETA.r * 0.5))) / FISICA.g
     const ma = rnd() * TAU, mr = L.mira * Math.sqrt(rnd())
     this.colpo = {
-      da: { x: p.x, y: p.y, z: p.z }, q0: this.corpo.rotation(),
+      da: { x: p.x, y: p.y, z: p.z }, q0: this.corpo.rotation(), asse: a, gira,
       a: { x: p.x * 0.6, y: y0, z: p.z * 0.6 },
       v: { x: (mr * Math.cos(ma) - p.x * 0.6) / tv, y: su, z: (mr * Math.sin(ma) - p.z * 0.6) / tv },
       w: { x: w * Math.cos(a), y: casuale(-1, 1, rnd) * L.trottola, z: w * Math.sin(a) },
@@ -177,14 +181,21 @@ export class Moneta {
   via() {
     const b = this.corpo, C = this.colpo
     b.setBodyType(this.R.RigidBodyType.Dynamic, true)
-    b.enableCcd(true) // (cambiando tipo il corpo perde la CCD: senza, la moneta che cade entra nel fondo di qualche mm prima di rimbalzare)
     b.setTranslation(C.a, true)
+    b.setRotation(this.giro(1), true)
+    this.partenza = this.faccia() // (per le prove: la faccia in su quando il pollice la lascia)
     // l'asse del giro è orizzontale nel mondo: la velocità angolare si dà nel mondo
     b.setLinvel(C.v, true)
     b.setAngvel(C.w, true)
     this.vPrima = { ...C.v }
     this.stato = 'vola'
     this.t = 0
+  }
+
+  /** L'orientamento durante la presa: `k` (0…1) del mezzo giro del pollice attorno all'asse del lancio, se si gira. */
+  giro(k) {
+    const C = this.colpo, t = C.gira ? (Math.PI * k) / 2 : 0
+    return molt({ x: Math.cos(C.asse) * Math.sin(t), y: 0, z: Math.sin(C.asse) * Math.sin(t), w: Math.cos(t) }, C.q0)
   }
 
   /** Un passo fisso (FISICA.dt). Restituisce 'testa' o 'croce' quando la moneta si ferma, 'nonvale' se il lancio non vale. */
@@ -194,11 +205,13 @@ export class Moneta {
     this.t += dt
 
     if (this.stato === 'presa') {
-      // sale dritta dal fondo all'altezza del lancio, ancora piatta
+      // sale dritta dal fondo all'altezza del lancio, e dalla metà della salita si gira sottosopra (se si gira)
       const P = this.presa, C = this.colpo
       P.t += dt
       const u = Math.min(1, P.t / P.durata), e = u * u * (3 - 2 * u)
       b.setNextKinematicTranslation({ x: C.da.x + (C.a.x - C.da.x) * e, y: C.da.y + (C.a.y - C.da.y) * e, z: C.da.z + (C.a.z - C.da.z) * e })
+      const g = Math.min(1, Math.max(0, (u - 0.35) / 0.65))
+      b.setNextKinematicRotation(this.giro(g * g * (3 - 2 * g)))
       this.world.step()
       if (u >= 1) this.via()
       return null

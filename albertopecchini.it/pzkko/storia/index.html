@@ -1114,12 +1114,15 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
   setTimeout(tic, veloce > 1 ? 250 : 1000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
 
-  // I giochi: la roulette e il blackjack, ognuno in una finestra sopra il muro
+  // I giochi: la roulette, il blackjack, testa o croce, le mine e il dado, ognuno in una finestra sopra il muro
   // (games/<gioco>/). Il codice e il 3D si caricano solo quando si apre (o quando
-  // il puntatore passa sul volantino); #roulette o #blackjack nell'indirizzo li apre subito.
+  // il puntatore passa sul volantino); #roulette, #blackjack, #moneta, #mine o #dado nell'indirizzo li apre subito.
   const GIOCHI = {
     roulette: ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js'].map((f) => `/games/roulette/${f}`),
     blackjack: ['blackjack.js', 'regole.js', 'scena.js', 'carte.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/blackjack/`).pathname),
+    moneta: ['moneta.js', 'lancio.js', 'scena.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/moneta/`).pathname),
+    mine: ['mine.js', 'regole.js', 'scena.js', 'tessere.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/mine/`).pathname),
+    dado: ['dado.js', 'regole.js', 'campana.js', '../pzk.js', '../roulette/lib/three.js', '../roulette/lib/rapier.mjs'].map((f) => new URL(f, `${location.origin}/games/dado/`).pathname),
   }
   const apriGioco = (nome) => import(`/games/${nome}/${nome}.js`).then((m) => m.apri())
   for (const gioco of document.querySelectorAll('a[data-gioco]')) {
@@ -1485,7 +1488,7 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   // sotto la macchia non sposta niente. La luce dalla sera della pagina (--notte). Senza l'arrivo (movimento ridotto,
   // ?intro=0, la ricarica dopo un contesto perso) o in una finestra di forma che la foto non copre, niente foto: il nero.
   // window.pzkkoFotoCarico: la scena tiene il meteo della foto (il dopo pioggia) finché la foto non è sfumata
-  const FOTO = {"computer":{"v":{"giorno":"/art/scena/carico/storia-computer-giorno.webp?v=5c82c0c7","tramonto":"/art/scena/carico/storia-computer-tramonto.webp?v=674e9fe8","sera":"/art/scena/carico/storia-computer-sera.webp?v=0fe83eea","notte":"/art/scena/carico/storia-computer-notte.webp?v=d19287d7"},"bw":2.209,"bh":2.3854,"hm":7.6999,"am":1.5874,"forme":[0.7,2.1]},"telefono":{"v":{"giorno":"/art/scena/carico/storia-telefono-giorno.webp?v=ca8eaaf5","tramonto":"/art/scena/carico/storia-telefono-tramonto.webp?v=cf8ab1d3","sera":"/art/scena/carico/storia-telefono-sera.webp?v=05f2656a","notte":"/art/scena/carico/storia-telefono-notte.webp?v=b6174878"},"bw":1.025,"bh":1.6784,"hm":5.9548,"am":0.5502,"forme":[0.42,0.8]}}
+  const FOTO = {"computer":{"v":{"giorno":"/art/scena/carico/storia-computer-giorno.webp?v=9ec48c11","tramonto":"/art/scena/carico/storia-computer-tramonto.webp?v=a21a81ab","sera":"/art/scena/carico/storia-computer-sera.webp?v=94d48e92","notte":"/art/scena/carico/storia-computer-notte.webp?v=db7cdc8c"},"bw":2.209,"bh":2.3854,"hm":7.6999,"am":1.5874,"forme":[0.7,2.1]},"telefono":{"v":{"giorno":"/art/scena/carico/storia-telefono-giorno.webp?v=17b73d30","tramonto":"/art/scena/carico/storia-telefono-tramonto.webp?v=b839a515","sera":"/art/scena/carico/storia-telefono-sera.webp?v=27d8b3ea","notte":"/art/scena/carico/storia-telefono-notte.webp?v=a2336f1e"},"bw":1.025,"bh":1.6784,"hm":5.9548,"am":0.5502,"forme":[0.42,0.8]}}
   const F = FOTO?.[telefono ? 'telefono' : 'computer'], foto = carico.firstElementChild
   const nn = window.pzkkoPagina?.luci.notte ?? (parseFloat(root.style.getPropertyValue('--notte')) || 0)
   const luce = nn <= 0.001 ? 'giorno' : nn < 0.3 ? 'tramonto' : nn < 0.8 ? 'sera' : 'notte'

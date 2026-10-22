@@ -24,11 +24,14 @@ export const FISICA = {
   dt: 1 / 480, // passo fisso (8 per fotogramma a 60 Hz)
   g: 9.81,
   massa: 0.0096, // un dado di cellulosa da 20 mm (~1,2 g/cm³)
+  // con più attrito sul panno un dado che cade contro la parete ci resta appoggiato di sbieco (un colpo da rifare)
   attrito: { panno: 0.4, vetro: 0.06, dadi: 0.3 },
   rimbalzo: { panno: 0.3, vetro: 0.5, dadi: 0.45 },
   // la scossa: il piatto vibra in su e giù (f Hz, ampiezza a m), di lato un po' meno, e si inclina avanti e indietro
-  // (inclina rad) attorno a un asse che gira; sale in `salita` s e si spegne in `discesa` s
-  scossa: { f: [8.5, 10.5], a: [0.008, 0.01], lato: 0.45, inclina: 0.08, durata: [1.6, 2.2], salita: 0.04, discesa: 0.7 },
+  // (inclina rad) attorno a un asse che gira; sale in `salita` s e si spegne in `discesa` s: piano, perché le ultime
+  // scosse piccole fanno ricadere dritti i dadi in bilico. Più forte e più secca toglieva l'ultimo filo di memoria
+  // fra un colpo e l'altro, ma faceva uscire meno il quattro (le prove, tools/pzkko/dado/prova.mjs)
+  scossa: { f: [8.5, 10.5], a: [0.007, 0.009], lato: 0.45, inclina: 0.08, durata: [1.6, 2.2], salita: 0.12, discesa: 0.7 },
   ferma: { v: 0.004, w: 0.2, t: 0.35 }, // fermi: velocità (m/s, rad/s) e per quanto (s)
   dritto: Math.cos((4 * Math.PI) / 180), // la faccia in alto deve guardare in su entro 4°
   attesa: 8, // s dopo la scossa: se i dadi non si fermano, il colpo non vale
@@ -103,6 +106,7 @@ export class Campana {
     w.timestep = FISICA.dt
     w.integrationParameters.numSolverIterations = 8
     w.integrationParameters.lengthUnit = 0.1 // gli oggetti sono di qualche centimetro: le tolleranze di Rapier in proporzione
+    // (contatti più rigidi, contact_natural_frequency 60, facevano entrare il vetro nei dadi di quasi 7 mm)
     const flag = RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES
 
     // il piatto e la cupola: un corpo solo, cinematico, che la macchina scuote

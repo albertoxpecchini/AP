@@ -77,8 +77,9 @@ export const DESK = {
       // la petizione: sotto le sue penne (appese allo spago, sporgono ~115 unità) un graffito, non un volantino vero
       { k: '#petizione', w: 260, dx: 0, gap: -12, r: -1 },
       { k: 'scritte2/unimore', w: 120, dx: 60, gap: 0, r: -4 },
-      { k: V('mine'), w: 230, dx: 15, gap: -12, r: 3 },
+      // il graffito è basso e le penne arrivano oltre: prima un manifesto, poi le mine (dal 22.10 un link)
       { k: 'manifesti1/teatro', w: 245, dx: 5, gap: -10, r: 2 },
+      { k: V('mine'), w: 230, dx: 15, gap: -12, r: 3 },
       { k: 'manifesti1/sagra', w: 225, dx: 20, gap: -10, r: -3 },
       { k: 'manifesti2/moneta', w: 210, dx: 20, gap: -10, r: -2 },
       { k: 'landini/avviamento', w: 185, gap: -15, r: 2 },

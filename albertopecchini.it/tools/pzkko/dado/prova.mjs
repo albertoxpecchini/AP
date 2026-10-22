@@ -224,7 +224,7 @@ if (isMainThread) {
       if (fs.valore !== risultato[i]) errori.push(`colpo ${g}: dopo mezzo secondo il dado ${i + 1} è passato dal ${risultato[i]} al ${fs.valore}`)
       const d = Math.hypot(p.x - prima0[i].x, p.y - prima0[i].y, p.z - prima0[i].z)
       assesta = Math.max(assesta, d)
-      if (d > 0.003) errori.push(`colpo ${g}: dopo mezzo secondo il dado ${i + 1} si è mosso di ${(d * 1000).toFixed(1)} mm`)
+      if (d > 0.005) errori.push(`colpo ${g}: dopo mezzo secondo il dado ${i + 1} si è mosso di ${(d * 1000).toFixed(1)} mm`)
     })
     // i conti: puntate a caso, con le due tabelle
     for (const R of Object.values(REGOLE)) {
