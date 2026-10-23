@@ -123,7 +123,9 @@
 .w-pagina .w-esito{min-height:1.3em;margin-top:.6em;font-size:.95em;color:var(--led)}
 .w-pagina .w-esito.male{color:#ff6b5b;text-shadow:0 0 .4em rgba(255,91,74,.5)}
 .w-pagina .w-mosse{margin:.6em 0 0;padding:0;list-style:none;font-size:.82em;border-top:1px dashed rgba(70,255,125,.3)}
-.w-pagina .w-mosse li{display:flex;justify-content:space-between;gap:.8em;padding:.3em 0;border-bottom:1px dashed rgba(70,255,125,.15)}
+.w-pagina .w-mosse li{display:flex;justify-content:space-between;align-items:baseline;gap:.8em;padding:.3em 0;border-bottom:1px dashed rgba(70,255,125,.15)}
+/* la cifra non va mai a capo: se la descrizione è lunga va a capo lei, e la cifra resta sulla sua prima riga */
+.w-pagina .w-mosse b{flex:none;white-space:nowrap}
 .w-pagina .w-mosse .piu{color:var(--led)}
 .w-pagina .w-mosse .meno{color:#ff6b5b}
 .w-pagina .pzk-ig{display:inline-block;color:var(--ambra);border-bottom:1.5px solid currentColor;text-decoration:none;font-size:.95em}
