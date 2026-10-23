@@ -408,7 +408,7 @@ function carta(sezione, soloDati = false) {
       const chiave = el('div'); chiave.hidden = true; const [wk, ik] = campo('chiave di amministrazione', { type: 'password', autocomplete: 'off' }, 'questo nome è di Alberto: serve la chiave del progetto'); chiave.appendChild(wk); iK = ik; form.appendChild(chiave)
       iN.addEventListener('input', () => { chiave.hidden = !(modo === 'crea' && /^\s*(pzkko|alberto|albertopecchini|pecchini|admin|banca|bancapzk|root)\s*$/i.test(iN.value)) })
       const az = el('div', 'w-azioni')
-      const b = bott(modo === 'entra' ? 'entra' : 'crea il conto', 'giallo', () => attesa(b, async () => {
+      const b = bott(modo === 'entra' ? 'entra' : 'crea', 'giallo', () => attesa(b, async () => {
         const r = modo === 'entra' ? await pzk.entra(iN.value, iP.value) : await pzk.crea(iN.value, iP.value, iK?.value || undefined)
         if (!r.ok) return di(false, r.offline ? 'il wallet è in pausa: il server non ha ancora il suo archivio. per ora valgono i 1.000 della sessione' : r.errore)
         voce(r.nuovo ? `benvenuto, ${r.conto.nome}: ${r.conto.ind}` : `ciao ${r.conto.nome}`)

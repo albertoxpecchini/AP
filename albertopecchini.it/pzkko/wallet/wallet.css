@@ -189,3 +189,4 @@
 .w-pagina[data-sezione="cambio"] .w-fader{margin:.5em 0 .35em}
 .w-pagina .w-intro:has(+ .w-esito:not(:empty)){display:none} /* un errore prende il posto del paragrafo in cima */
 .w-pagina .w-intro + .w-esito{margin:.3em 0}
+.w-pagina label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* le etichette su una riga sola: partono tutte dalla stessa linea */
