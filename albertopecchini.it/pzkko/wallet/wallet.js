@@ -331,7 +331,7 @@ async function borsa(forza = false) {
   S.periodo.textContent = PERIODI[periodo][1]
   if (!forza && borsaDati?.da === da && Date.now() - borsaDati.quando < 60000) return disegnaBorsa()
   try {
-    const r = await fetch(`/api/borsa?da=${da}`)
+    const r = await fetch(`/api/borsa/?da=${da}`)
     const d = await r.json()
     borsaDati = { ...d, da, quando: Date.now() }
   } catch { borsaDati = { ok: false, da, quando: Date.now() } }

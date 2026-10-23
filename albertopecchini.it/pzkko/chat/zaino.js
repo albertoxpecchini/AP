@@ -9,7 +9,7 @@
 import * as pzk from '../games/pzk.js'
 import { PER_ID } from './testi.js'
 
-const API = '/api/wallet'
+const API = '/api/wallet/' // con la barra finale (trailingSlash): senza, il redirect 308 del POST fa chiedere conferma al browser
 const CHIAVE_SESSIONE = 'pzkko-chat-sessione'
 const CHIAVE_CONTO = 'pzkko-chat'
 export const MAX_BYTE = 8 * 1024

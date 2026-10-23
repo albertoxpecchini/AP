@@ -1776,7 +1776,13 @@ cercapersone) la vive il server, alla prima richiesta del giorno, dopo aver acco
 percentuale dei $pzk senza passare dal controllo dei salti, ricorda le ultime 14 giornate in `c.lumaca` e ne fa una mossa
 `{ tipo: 'lumaca', n, verso, pct, g, ev }`. Il browser manda `lg`, il giorno della lumachina che il suo saldo contiene già:
 se una risposta s'è persa, le giornate che non ha visto si aggiungono al saldo che manda (né perse né raddoppiate); se
-un'azione dice di no nello stesso momento in cui la lumachina ha vissuto, la giornata si salva lo stesso. Moderazione: `node tools/pzkko/wallet.mjs` elenca
+un'azione dice di no nello stesso momento in cui la lumachina ha vissuto, la giornata si salva lo stesso.
+**Il conto della banca** (pzkko, pzk398893, di Alberto) **non ha limiti** (23.10: «il mio account non ha limiti»):
+niente attesa di 48 ore per gli invii e niente controllo dei salti del saldo (`illimitato` in `api/wallet.mjs`); i
+soldi restano soldi, non manda più di quello che ha. **Le chiamate alle API vanno con la barra finale**
+(`/api/wallet/`, `/api/giocatori/`, `/api/borsa/?…`, `/api/meteo/`): il sito ha `trailingSlash`, e senza barra ogni
+POST passava da un redirect 308 che alcuni browser fanno confermare a ogni salvataggio («inviare nuovamente i dati del
+modulo?»). Moderazione: `node tools/pzkko/wallet.mjs` elenca
 i conti, `via <nome>` ne cancella uno (con la chiave in `.env.local`; `--locale` parla col server
 di prova); oppure il JSON dalla pagina dello store.
 

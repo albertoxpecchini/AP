@@ -175,7 +175,7 @@ export function banner(bottone, { batteria }) {
   // ── i dati: la borsa delle 24 ore (la stessa di /api/borsa che usa il wallet), ogni due minuti finché la pagina si vede ──
   let borsa = null
   const prendiBorsa = async () => {
-    try { const d = await (await fetch('/api/borsa?da=24h')).json(); borsa = d.ok ? d : { chiusa: true } } catch { borsa ??= { chiusa: true } }
+    try { const d = await (await fetch('/api/borsa/?da=24h')).json(); borsa = d.ok ? d : { chiusa: true } } catch { borsa ??= { chiusa: true } }
   }
   prendiBorsa()
   setInterval(() => { if (!document.hidden) prendiBorsa() }, 120000)

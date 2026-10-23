@@ -92,11 +92,15 @@ const validaPin = (p) => (/^\d{4}$/.test(String(p ?? '')) ? null : 'il PIN è di
 const nuovoIndirizzo = (db) => { for (;;) { const i = String(100000 + Math.floor(Math.random() * 900000)); if (!Object.values(RISERVATI).includes(i) && !db.conti.some((c) => c.ind === i)) return i } }
 const indirizzoDi = (s) => { const m = /^(?:pzk)?\s*(\d{6})$/i.exec(pulisci(s)); return m ? m[1] : null }
 
+// il conto di Alberto (pzkko, pzk398893: la banca) non ha limiti (23.10, Alberto: «il mio account non ha limiti»): niente
+// attesa di 48 ore per gli invii, niente controllo dei salti del saldo. I soldi restano soldi: non manda più di quello che ha
+const illimitato = (c) => c?.k === 'pzkko'
+
 // ── il conto come lo vede il suo padrone (mai il PIN), e il resto della risposta ──
 const oggi = () => giornoDi()
 const vista = (c, now) => ({
   nome: c.nome, ind: 'pzk' + c.ind, indCambiato: !!c.indCambiato, creato: c.creato, pzk: c.pzk, eur: c.eur, ig: !!c.ig,
-  trovati: c.trovati?.g === oggi() ? c.trovati.q : [], sussidio: c.sussidio === oggi(), invii: c.creato + ATTESA_INVII <= now, inviiDa: c.creato + ATTESA_INVII,
+  trovati: c.trovati?.g === oggi() ? c.trovati.q : [], sussidio: c.sussidio === oggi(), invii: illimitato(c) || c.creato + ATTESA_INVII <= now, inviiDa: illimitato(c) ? c.creato : c.creato + ATTESA_INVII,
   mosse: (c.mosse ?? []).slice(-12), lumaca: c.lumaca ? { g: c.lumaca.g, ultime: c.lumaca.ultime } : null,
 })
 const mossa = (c, m) => { (c.mosse ??= []).push(m); if (c.mosse.length > 40) c.mosse.splice(0, c.mosse.length - 40) }
@@ -125,7 +129,7 @@ function accogli(c, pzk, now, lg) {
   if (lg !== undefined) for (const v of c.lumaca?.ultime ?? []) if (lg === null || v.g > lg) pzk = Math.max(0, pzk + v.n)
   pzk = mezzi(pzk)
   const secondi = Math.max(0, (now - (c.salvato ?? c.creato)) / 1000)
-  if (pzk - c.pzk > 20000 + 1200 * secondi) return 'il saldo non torna: ricarico quello salvato'
+  if (!illimitato(c) && pzk - c.pzk > 20000 + 1200 * secondi) return 'il saldo non torna: ricarico quello salvato'
   c.pzk = pzk; c.salvato = now
   return null
 }
@@ -296,7 +300,7 @@ export default async function handler(req, res) {
       if (!ind) return json(res, 400, { ok: false, errore: 'l’indirizzo è pzk più sei cifre' })
       if (!Number.isFinite(quanto) || quanto < 1) return json(res, 400, { ok: false, errore: 'almeno 1 $pzk' })
       return manda(await azione((c, db) => {
-        if (c.creato + ATTESA_INVII > now) return { errore: `gli invii si aprono 48 ore dopo la creazione del conto: ${new Date(c.creato + ATTESA_INVII).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}` }
+        if (!illimitato(c) && c.creato + ATTESA_INVII > now) return { errore: `gli invii si aprono 48 ore dopo la creazione del conto: ${new Date(c.creato + ATTESA_INVII).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}` }
         const d = db.conti.find((x) => x.ind === ind)
         if (!d) return { errore: 'nessun conto con questo indirizzo' }
         if (d.id === c.id) return { errore: 'sei tu' }

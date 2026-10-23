@@ -47,8 +47,8 @@ async function aggiornaMondo() {
   // il meteo vero solo se chi guarda l'ha scelto in regia (window.pzkkoScelte.meteo, dal 23.10: di partenza sempre sole)
   const vero = !window.pzkkoScelte || window.pzkkoScelte.meteo === 'vero'
   if (!vero) meteo = null
-  else if (now - meteoT > 10 * 60_000) { meteoT = now; try { meteo = await (await fetch('/api/meteo')).json() } catch {} }
-  if (now - borsaT > 5 * 60_000) { borsaT = now; try { const d = await (await fetch('/api/borsa?da=24h')).json(); if (d.ok) borsa = d } catch {} }
+  else if (now - meteoT > 10 * 60_000) { meteoT = now; try { meteo = await (await fetch('/api/meteo/')).json() } catch {} }
+  if (now - borsaT > 5 * 60_000) { borsaT = now; try { const d = await (await fetch('/api/borsa/?da=24h')).json(); if (d.ok) borsa = d } catch {} }
 }
 const piove = () => meteo && (meteo.pioggia > 0 || (meteo.codice >= 51 && meteo.codice <= 67) || (meteo.codice >= 80 && meteo.codice <= 82) || meteo.codice >= 95)
 const nevica = () => meteo && (meteo.neve > 0 || (meteo.codice >= 71 && meteo.codice <= 77) || meteo.codice === 85 || meteo.codice === 86)

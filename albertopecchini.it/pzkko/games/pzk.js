@@ -16,7 +16,7 @@
 // più quello che c'è sui tavoli: se la pagina si chiude a metà giro, alla volta dopo le puntate tornano nel saldo.
 // I conti vanno a mezzi $pzk (il blackjack paga 3 a 2: 5 → 7,5); gli EUR€ a centesimi.
 
-const API = '/api/wallet'
+const API = '/api/wallet/' // con la barra finale: il sito ha trailingSlash, e senza ogni POST passava da un redirect 308 che alcuni browser fanno confermare (« reinviare i dati del modulo? »)
 const CHIAVE_SESSIONE = 'pzkko-pzk-sessione'
 const CHIAVE_CONTO = 'pzkko-wallet'
 const CHIAVE_TROVATE = 'pzkko-pzk-trovate'

@@ -6,7 +6,7 @@
 
 import * as pzk from '../games/pzk.js'
 
-const API = '/api/giocatori'
+const API = '/api/giocatori/' // con la barra finale (trailingSlash): niente redirect
 const cache = new Map()
 
 async function leggi(q, ttl = 30_000) {
