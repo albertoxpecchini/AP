@@ -92,6 +92,14 @@ serio ma è un progetto Vercel a parte.
   `../roulette/lib/rapier.mjs`), `scena.js` (il piatto e la moneta in 3D, la
   telecamera e la lente, con `../roulette/lib/three.js`). Le facce della moneta
   sono in `art/moneta/` (gpt-image-2 il 22.10.2026, `tools/pzkko/moneta/facce.mjs`).
+- `games/virtual/` — «virtual», le scommesse sul campionato di calcio inventato (23.10), nella
+  stessa finestra (vedi sotto): `virtual.js` e `virtual.css` (la finestra, le quote stampate, la
+  schedina, le fiches, i pagamenti), `partita.js` (il calendario a cicli di cinque minuti, le
+  quote dalla forza vera, il risultato a caso, il meteo, la cronaca minuto per minuto, tutto dal
+  seme dell'orario), `squadre.js` (le quaranta squadre di A e B coi nomi storpiati, i colori, gli
+  stemmi disegnati in SVG, i cognomi inventati), `schermo.js` (lo schermino a pixel: il campo, gli
+  omini, i tifosi, la telecamera, il meteo, le scene degli eventi). L'illustrazione del volantino è
+  `art/virtual/pallone.svg`, disegnata a mano. Le prove: `../tools/pzkko/virtual/prova.mjs`.
 - `games/pzk.js` — i $pzk, gli stessi per tutti i giochi e per il wallet: la sessione (1.000, non si
   salvano) o il conto (vedi «Il wallet e la borsa», sotto).
 - `wallet/` — il wallet dei $pzk (22.10 notte), il portafoglio di pelle alla Fallout in alto a sinistra:
@@ -1462,6 +1470,89 @@ volantino si precarica).
   cilindro arrotondato di Rapier va meglio di un poliedro a 48 lati, che entrava
   di 8 mm; passi più corti (1/1200 s) non servono.
 
+## Virtual (games/virtual/)
+
+Il volantino «virtual» (23.10.2026) apre **le scommesse sul calcio inventato** nella stessa finestra
+degli altri giochi: `#virtual` nell'indirizzo lo apre subito. Un campionato infinito, una partita
+sola alla volta, uguale per chiunque sia sul sito in quel momento; si gioca coi $pzk di
+`games/pzk.js` (niente soldi veri, mai).
+
+- **Il calendario** (`partita.js`): il tempo è a **cicli di cinque minuti** allineati all'orologio.
+  Nei primi quattro minuti le scommesse sono aperte (12:55:00 → 12:58:59), l'ultimo minuto la
+  partita è in diretta (90' più il recupero compressi in 60 secondi), allo scoccare del ciclo dopo è
+  finita, si paga e si apre la successiva. L'indice della partita è `Math.floor(Date.now() /
+  300000)`; da lì, con un generatore seminato (mulberry32), escono squadre, quote, meteo,
+  formazioni e tutta la cronaca. Così due persone vedono la **stessa partita** nello stesso
+  momento (provato con due schede: stesso punteggio allo stesso secondo), chi arriva a metà la
+  vede dal punto giusto e ricaricare non cambia niente. Il conto alla rovescia sta sul tabellone
+  («si chiude tra 2:41», «IN DIRETTA · finisce tra 34s») e sullo schermino («FISCHIO TRA 3:26»).
+- **Le squadre** (`squadre.js`): le venti di Serie A e le venti di Serie B 2026/27 coi nomi
+  storpiati ma riconoscibili (Juvenclub, Inder, Milano Rossonera, Napule, Atalanto, Fiorentoina,
+  Mantua, Verona Scaligera, Stabia Vespe…), la sigla, la città, i colori di casa e di trasferta
+  (gli ospiti giocano in seconda maglia se la prima somiglia a quella di casa, e il portiere è di
+  un colore che non c'è), uno **stemma originale in SVG** (la forma, il colore sociale e lo
+  «spirito»: una zebra, un biscione, un giglio, un lupo, un ciuccio, una vespa; mai il logo vero) e
+  una **forza da 1 a 100** presa dalla realtà. I cognomi dei giocatori sono sillabe italiane a
+  caso. Gli accoppiamenti: A contro A (52%), B contro B (34%), un incrocio A–B il 14% delle volte.
+- **Le quote seguono la realtà, i risultati no.** Le quote si calcolano come farebbe un
+  bookmaker: gol attesi dalla differenza di forza (più 4 punti di fattore campo e un filo di rumore
+  dal seme), probabilità di 1 X 2 e dei totali da due Poisson, margine del 6,5%, centesimi, mai
+  sotto 1,05 (1 X 2 sommano al 106,5% in probabilità implicita, over e under della stessa soglia
+  pure). Inder–Vicentini dà 1,07 · 11,05 · 26,85; Juvenclub–Milano 2,29 · 3,66 · 2,82. Il
+  **risultato** invece esce da un altro seme con una **Poisson di media fissa 1,35 a squadra**,
+  uguale per tutte: non legge niente delle squadre. La sfavorita vince quanto la favorita; è la
+  battuta del gioco, scritta nelle regole («le quote copiano la Serie A vera, i risultati no»).
+  Una partita su 120 finisce **a tavolino** (3–0, per nebbia, blackout dei riflettori, invasione di
+  nutrie, gli ospiti che sbagliano stadio…): paga come tale.
+- **Le puntate**: 1 X 2 e over/under con soglie 1,5 · 2,5 · 3,5 · 4,5, anche insieme, con le fiches
+  degli altri giochi; vincita = puntata × quota. La schedina dice cosa si è giocato, la quota, la
+  possibile vincita e l'esito; le scommesse restano nel browser (`localStorage`, `pzkko-virtual`) e
+  si pagano al fischio finale anche a finestra chiusa (riaprendo si trova l'esito), i $pzk puntati
+  stanno sul tavolo di `pzk.js` fino al pagamento e tornano sul tavolo dopo una ricarica. A partita
+  iniziata le quote si spengono. «togli» e «rifai» come negli altri giochi.
+- **Lo schermino** (`schermo.js`): un solo canvas di 192 × 120 pixel grossi per un fattore intero
+  (`image-rendering: pixelated`: netti a ogni misura, anche sul telefono), dentro una cornice di
+  plastica da tamagotchi. Il campo da calcio a cinque in erba con le righe e le porte, cinque omini
+  per parte con le maglie della loro squadra (strisce, metà, fascia, croce), gli spalti coi tifosi
+  pixel nei colori delle due squadre (che entrano durante le scommesse, saltano al gol, fanno
+  l'onda), le bandiere al vento, le panchine con le riserve. Tutto è funzione del tempo: niente
+  stato che si accumula. **La telecamera** segue la palla con inerzia e zooma sulle azioni (campo
+  largo, mezzo campo, primo piano sui cartellini), per i rigori l'inquadratura da dietro la porta,
+  il gol ha il replay al rallentatore. **Gli eventi**: fischio d'inizio, gol (il tiro, la rete che
+  si gonfia, GOL!, l'esultanza, il replay), tiro fuori, palo e parata, rimessa, fallo, giallo e
+  rosso (l'arbitro alza il cartellino, l'espulso esce e la squadra resta in quattro), rigore (gol,
+  parato o fuori), infortunio (a terra, la barella gialla, entra la riserva), intervallo, fischio
+  finale, la sospensione. **Il meteo** della città di casa è deciso dal seme ma coerente col clima
+  e la stagione (cinque climi, pesi mese per mese: a ottobre a Bergamo nebbia o pioggia, a Palermo
+  sereno, d'inverno al nord può nevicare): sereno, nuvole (le ombre che passano), pioggia (gocce,
+  pozzanghere, scivolate), nebbia (si vede poco), neve (il prato bianco, la palla arancione),
+  vento (le bandiere e le foglie). **La luce** segue l'ora vera: di sera la luce bassa, di notte i
+  riflettori accesi e il buio intorno. Il meteo non tocca il risultato. Un fotogramma costa 0,2–2 ms
+  anche a 6× (il telefono a 3×). Il ciclo si ferma con la finestra chiusa o la scheda nascosta e
+  riprende al secondo giusto; con `prefers-reduced-motion` la telecamera sta ferma e larga e si
+  disegna due volte al secondo.
+- **Durante le scommesse** lo schermino non è vuoto: le squadre si scaldano nelle due metà, i
+  tifosi entrano, il meteo c'è già, e a rotazione i cartelli della presentazione (stemmi, forza,
+  le ultime cinque «uscite», inventate; la città e il meteo; «le quote copiano la Serie A vera, i
+  risultati no»).
+- **Il tabellone** sotto lo schermino: gli stemmi SVG, i nomi, città · serie · forza, il
+  punteggio che salta al gol, il minuto, i cartellini, il conto alla rovescia; sotto, una riga col
+  meteo e le ultime cinque. «come si gioca» apre le regole in un foglietto.
+- **I suoni** (`suono/voci.js`, `suono/suono.js`): il fischietto, il boato del gol, l'«uuuh» del
+  palo, la fiche posata, la vincita a 8 bit; passano dal motore della strada, quindi spenti se chi
+  guarda ha spento il suono. Nella regia, scheda «suono», si provano.
+- **Le prove**: `node tools/pzkko/virtual/prova.mjs [partite, 2000]` (dalla cartella
+  `albertopecchini.it`) costruisce N partite di fila e controlla il determinismo, le quote (la
+  favorita quotata più bassa, 1 X 2 al 106,5%, over/under complementari, mai sotto 1,05), che i
+  risultati **non** dipendano dalla forza, la cronaca (i gol della cronaca sono quelli del
+  risultato, gli eventi in ordine e a distanza, mai a cavallo dell'intervallo, il rosso lascia in
+  quattro, il tavolino 3–0) e le puntate contro un conto fatto al contrario. Il 23.10.2026, 5.000
+  partite: nessun errore; correlazione fra differenza di forza e quota dell'1 −0,77 (le quote
+  seguono la forza), fra differenza di forza e differenza di gol +0,01 e fra quota dell'1 e «la
+  casa vince» −0,00 (i risultati no); con una favorita netta (≥ 15 punti) vince la favorita il
+  38,8%, pareggio 25,5%, la sfavorita 35,7%, nelle partite equilibrate 38,1 / 24,6 / 37,2 (chi
+  quadro p = 0,54); gol a squadra media 1,364 e varianza 1,374 (Poisson); tavolini 0,5%.
+
 ## La regia (regia/)
 
 Il pannello per provare e regolare il sito senza aspettare la sera o un'auto. Si apre
@@ -1507,7 +1598,7 @@ passare dall'una all'altra; l'ultima aperta resta nel browser):
   bestie (ogni specie sì o no, le blatte anche di giorno, la velocità, «spaventale»,
   una zanzara davanti alla telecamera); le gocce più fitte o più rade, una adesso;
 - **suono**: i suoni della strada (`suono/`, sotto): acceso, il volume, e ognuno da
-  provare;
+  provare (dal 23.10 anche il fischietto, il boato e l'«uuuh» di virtual);
 - **prove**: il muro del DOM in trasparenza (`?allinea`), rifare l'arrivo, il glTF
   (questi due ricaricano la pagina; il muro senza 3D, dal 23.10, è l'interruttore in cima a
   «grafica»), e i numeri della scheda (il
