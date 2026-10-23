@@ -177,3 +177,15 @@
 .w-pagina form .w-b{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:calc(2.435em + 3px);margin-bottom:0;padding-top:0;padding-bottom:0} /* alto come i campi (2,24 em della pagina + 3 px di bordo): combacia sopra e sotto */
 .w-pagina .w-esito:empty{min-height:0;margin:0}
 .w-pagina input:not([type=range]){box-sizing:border-box;height:calc(2em + 3px)} /* 0,4 em sopra e sotto + 1,2 em di riga + 3 px di bordo: la stessa altezza del tasto */
+/* la pagina del conto: le ultime mosse in un riquadro che prende lo spazio rimasto e scorre da solo (la pagina no) */
+.w-pagina[data-sezione="conto"]:not([hidden]):has(.w-mosse){display:flex;flex-direction:column;overflow:hidden}
+.w-pagina .w-mosse{flex:1 1 auto;min-height:2.6em;overflow:hidden auto;margin-top:.6em;padding:.15em .55em;border:1.5px solid rgba(70,255,125,.3);border-radius:.25em;scrollbar-width:thin;scrollbar-color:rgba(70,255,125,.45) transparent}
+.w-pagina .w-mosse li:last-child{border-bottom:0}
+/* la pagina del cambio: «dai / ricevi» a sinistra e i tasti a destra sulla stessa riga, centrati fra loro */
+.w-pagina[data-sezione="cambio"]:not([hidden]){display:grid;grid-template-columns:1fr auto;column-gap:1.2em;align-content:start}
+.w-pagina[data-sezione="cambio"]>*{grid-column:1 / -1}
+.w-pagina[data-sezione="cambio"]>.w-conv{grid-column:1;align-self:center}
+.w-pagina[data-sezione="cambio"]>.w-azioni{grid-column:2;align-self:center;margin-top:0}
+.w-pagina[data-sezione="cambio"] .w-fader{margin:.5em 0 .35em}
+.w-pagina .w-intro:has(+ .w-esito:not(:empty)){display:none} /* un errore prende il posto del paragrafo in cima */
+.w-pagina .w-intro + .w-esito{margin:.3em 0}

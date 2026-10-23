@@ -386,12 +386,20 @@ function carta(sezione, soloDati = false) {
 
   if (sezione === 'conto' && !c) {
     K.innerHTML = `<h3>il conto <small>no sbatti: un nome e quattro cifre</small></h3>
-      <p class="w-nota">senza conto giochi coi <b>1.000 $pzk della sessione</b>, che non si salvano. col conto restano tuoi, hanno un indirizzo e vivono nella borsa. si parte con 1.000 $pzk.</p>`
+      <p class="w-nota w-intro"></p>`
+    // il paragrafo in cima cambia con la linguetta, e un errore prende il suo posto: così la pagina resta alta uguale e
+    // sta tutta nello schermo
+    const intro = q(K, '.w-intro')
+    intro.after(esito)
     const sch = el('div', 'w-sch'); const bE = el('button', '', 'entra'), bC = el('button', '', 'crea il conto'); bE.type = bC.type = 'button'; sch.append(bE, bC); K.appendChild(sch)
     const form = el('form'); form.addEventListener('submit', (e) => e.preventDefault()); K.appendChild(form)
     let modo = 'entra'
     const disegna = () => {
       bE.setAttribute('aria-selected', String(modo === 'entra')); bC.setAttribute('aria-selected', String(modo === 'crea'))
+      intro.innerHTML = modo === 'entra'
+        ? 'senza conto giochi coi <b>1.000 $pzk della sessione</b>, che non si salvano. col conto restano tuoi, hanno un indirizzo e vivono nella borsa. si parte con 1.000 $pzk.'
+        : 'il PIN non si recupera: scegline uno che ricordi (studenti unimore: le ultime quattro cifre del numero dell’e-mail vanno benissimo).'
+      di(true, '')
       form.innerHTML = ''
       const [wn, iN] = campo('nome', { type: 'text', autocomplete: 'username', maxLength: 20, placeholder: 'il tuo nome' })
       const [wp, iP] = pin()
@@ -407,8 +415,8 @@ function carta(sezione, soloDati = false) {
         mostra('conto'); borsa(true)
       }))
       form.addEventListener('submit', () => b.click(), { once: false })
-      az.append(b); if (modo === 'crea') az.appendChild(el('p', 'w-nota', 'il PIN non si recupera: scegline uno che ricordi (per gli studenti unimore: le ultime quattro cifre del numero dell’e-mail vanno benissimo).'))
-      form.append(az, esito)
+      az.append(b)
+      form.append(az)
       iN.focus()
     }
     bE.addEventListener('click', () => { modo = 'entra'; disegna() }); bC.addEventListener('click', () => { modo = 'crea'; disegna() })
@@ -417,9 +425,8 @@ function carta(sezione, soloDati = false) {
   }
   if (sezione === 'conto') {
     K.innerHTML = `<h3>${c.nome} <small>${c.ind}</small></h3>
-      <p>hai <b data-vivo="pzk"></b> e <b data-vivo="eur"></b>. conto nato il ${new Date(c.creato).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}.
-      <span data-vivo="invii"></span></p>
-      <p class="w-nota">il saldo si salva da solo mentre giochi; il cambio è quello di quando il wallet si è sincronizzato (<span data-vivo="sync"></span>) e dopo mezz’ora si sincronizza di nuovo da sé.</p>`
+      <p>hai <b data-vivo="pzk"></b> e <b data-vivo="eur"></b>.</p>
+      <p class="w-nota">nato il ${new Date(c.creato).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'short', year: 'numeric' })} · <span data-vivo="invii"></span> · cambio delle <span data-vivo="sync"></span></p>`
     const az = el('div', 'w-azioni')
     const bS = bott('sincronizza', '', () => attesa(bS, async () => { const r = await pzk.sincronizza(); di(r.ok, r.ok ? `sincronizzato: 1 $pzk = ${pzk.tasso().toFixed(4)} €` : r.errore); borsa(true) }))
     const bU = bott('esci', 'piatto', () => attesa(bU, async () => { await pzk.esci(); voce('sei uscito: valgono i 1.000 della sessione'); mostra('conto') }))
@@ -433,7 +440,7 @@ function carta(sezione, soloDati = false) {
   if (sezione === 'cambio') {
     if (!c) { K.innerHTML = '<h3>il cambio</h3><p>gli EUR€ (l’euro finto del wallet: non si prelevano, non si depositano, non si giocano) ci sono solo col conto. i 1.000 della sessione sono 1.000 e basta.</p>'; const b = bott('entra o crea il conto', 'giallo', () => mostra('conto')); K.appendChild(b); return }
     K.innerHTML = `<h3>il cambio <small>1 $pzk = <span data-vivo="tasso"></span> €</small></h3>
-      <p class="w-nota">parcheggi i $pzk in EUR€ quando pensi che scendano e li riprendi quando ti conviene. gli EUR€ non si giocano: per giocarli vanno riconvertiti in $pzk, al cambio del momento. il cambio è quello della sincronizzazione (<span data-vivo="sync"></span>); gli spiccioli vanno a mezzi $pzk e a centesimi.</p>`
+      <p class="w-nota">parcheggia i $pzk in EUR€ quando pensi che scendano; per giocarli vanno riconvertiti. cambio delle <span data-vivo="sync"></span>.</p>`
     const verso = el('div', 'w-verso'); const bA = el('button', '', '$pzk → EUR€'), bB = el('button', '', 'EUR€ → $pzk'); bA.type = bB.type = 'button'; verso.append(bA, bB); K.appendChild(verso)
     const fader = el('div', 'w-fader', '<div class="w-tacche"></div><input type="range" min="0" max="1000" step="1" value="0" aria-label="quanto convertire"><span class="w-led-f"></span>'); K.appendChild(fader)
     const conv = el('div', 'w-conv'); K.appendChild(conv)
@@ -488,28 +495,37 @@ function carta(sezione, soloDati = false) {
   if (sezione === 'altro') {
     if (!c) { K.innerHTML = '<h3>altro</h3><p>l’indirizzo, il PIN e il regalo di instagram stanno nel conto.</p>'; K.appendChild(bott('entra o crea il conto', 'giallo', () => mostra('conto'))); const ig = pzk.linkInstagram({ fatto: () => voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`) }); K.appendChild(el('p', '', '')).appendChild(ig); return }
     K.innerHTML = `<h3>altro <small>${c.ind}</small></h3>`
+    // tre linguette, una sezione alla volta (nello schermo non ci stanno tutte insieme)
+    const sch = el('div', 'w-sch'), parti = []
+    const linguetta = (nome, box) => { const b = el('button', '', nome); b.type = 'button'; b.addEventListener('click', () => scegli(parti.indexOf(box))); sch.appendChild(b); parti.push(box) }
+    const scegli = (n) => { parti.forEach((p, i) => { p.hidden = i !== n; sch.children[i].setAttribute('aria-selected', String(i === n)) }); di(true, '') }
+    K.appendChild(sch)
     // l'indirizzo: una volta sola
     const ind = el('div')
     if (!c.indCambiato) {
-      ind.innerHTML = '<p>il tuo indirizzo è a caso: puoi cambiarlo <b>una volta sola</b> con sei cifre tue. se sei studente unimore, il numero della tua e-mail (quello prima di @studenti.unimore.it) è perfetto.</p>'
+      ind.innerHTML = '<p class="w-nota">l’indirizzo è a caso: puoi cambiarlo <b>una volta sola</b> con sei cifre tue (studenti unimore: il numero dell’e-mail).</p>'
       const [wn, iN] = campo('sei cifre', { type: 'text', inputMode: 'numeric', autocomplete: 'off', maxLength: 6, pattern: '\\d{6}', placeholder: '123456' })
       const az = el('div', 'w-azioni')
       const b = bott('cambia indirizzo', '', () => attesa(b, async () => { if (!confirm(`pzk${iN.value}: sicuro? non si cambia più.`)) return; const r = await pzk.cambiaIndirizzo(iN.value); di(r.ok, r.ok ? `fatto: ora sei ${pzk.conto().ind}` : r.errore); if (r.ok) carta('altro') }))
       az.append(b); ind.append(wn, az)
     } else ind.innerHTML = `<p class="w-nota">l’indirizzo ${c.ind} l’hai scelto tu: non si cambia più.</p>`
     K.appendChild(ind)
+    linguetta('indirizzo', ind)
     // il PIN
-    const pinBox = el('div'); pinBox.innerHTML = '<label style="margin-top:16px">cambia il PIN</label>'
+    const pinBox = el('div')
     const [w1, i1] = pin('PIN di adesso'), [w2, i2] = pin('PIN nuovo')
     const riga = el('div', 'w-riga'); riga.append(w1, w2); pinBox.appendChild(riga)
     const az2 = el('div', 'w-azioni'); const bP = bott('cambia PIN', '', () => attesa(bP, async () => { const r = await pzk.cambiaPin(i1.value, i2.value); di(r.ok, r.ok ? 'PIN cambiato' : r.errore); if (r.ok) i1.value = i2.value = '' })); az2.append(bP); pinBox.appendChild(az2)
     K.appendChild(pinBox)
+    linguetta('PIN', pinBox)
     // instagram
-    const igp = el('p'); igp.style.marginTop = '16px'
+    const igp = el('p')
     igp.appendChild(pzk.linkInstagram({ fatto: () => voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`) }))
-    if (c.ig) igp.appendChild(el('span', 'w-nota', 'il regalo di instagram l’hai già avuto: grazie.'))
+    if (c.ig) igp.appendChild(el('span', 'w-nota', ' il regalo di instagram l’hai già avuto: grazie.'))
     K.appendChild(igp)
+    linguetta('instagram', igp)
     K.appendChild(esito)
+    scegli(0)
   }
 }
 // i pezzi della carta che seguono il conto
@@ -520,7 +536,7 @@ function vivo(e, c) {
   else if (k === 'eur') e.textContent = `${fmtEur(c.eur)} EUR€`
   else if (k === 'tasso') e.textContent = pzk.tasso().toFixed(4)
   else if (k === 'sync') e.textContent = new Date(pzk.sincronizzato()).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
-  else if (k === 'invii') e.textContent = c.invii ? 'puoi mandare $pzk agli altri conti.' : `gli invii si aprono il ${new Date(c.inviiDa).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} (48 ore dalla nascita del conto).`
+  else if (k === 'invii') e.textContent = c.invii ? 'puoi mandare $pzk agli altri conti' : `invii dal ${new Date(c.inviiDa).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
   else if (k === 'mosse') {
     const NOMI = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio' }
     e.innerHTML = [...(c.mosse ?? [])].reverse().map((m) => {
