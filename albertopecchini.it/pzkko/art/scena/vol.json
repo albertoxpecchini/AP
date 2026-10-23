@@ -666,5 +666,13 @@
   "cw": 255,
   "scala": 2,
   "tagliandi": null
+ },
+ "virtual": {
+  "w": 532,
+  "h": 638,
+  "m": 37,
+  "cw": 230,
+  "scala": 2,
+  "tagliandi": null
  }
 }

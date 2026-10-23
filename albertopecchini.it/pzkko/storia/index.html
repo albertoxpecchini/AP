@@ -1219,15 +1219,16 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
   setTimeout(tic, veloce > 1 ? 250 : 1000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
 
-  // I giochi: la roulette, il blackjack, testa o croce, le mine e il dado, ognuno in una finestra sopra il muro
-  // (games/<gioco>/). Il codice e il 3D si caricano solo quando si apre (o quando
-  // il puntatore passa sul volantino); #roulette, #blackjack, #moneta, #mine o #dado nell'indirizzo li apre subito.
+  // I giochi: la roulette, il blackjack, testa o croce, le mine, il dado e virtual, ognuno in una finestra sopra il muro
+  // (games/<gioco>/). Il codice e il 3D si caricano solo quando si apre (o quando il puntatore passa sul volantino);
+  // #roulette, #blackjack, #moneta, #mine, #dado o #virtual nell'indirizzo li apre subito.
   const GIOCHI = {
     roulette: ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js'].map((f) => `/games/roulette/${f}`),
     blackjack: ['blackjack.js', 'regole.js', 'scena.js', 'carte.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/blackjack/`).pathname),
     moneta: ['moneta.js', 'lancio.js', 'scena.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/moneta/`).pathname),
     mine: ['mine.js', 'regole.js', 'scena.js', 'tessere.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/mine/`).pathname),
     dado: ['dado.js', 'regole.js', 'campana.js', '../pzk.js', '../roulette/lib/three.js', '../roulette/lib/rapier.mjs'].map((f) => new URL(f, `${location.origin}/games/dado/`).pathname),
+    virtual: ['virtual.js', 'partita.js', 'squadre.js', 'schermo.js', '../pzk.js'].map((f) => new URL(f, `${location.origin}/games/virtual/`).pathname),
   }
   const apriGioco = (nome) => import(`/games/${nome}/${nome}.js`).then((m) => m.apri())
   for (const gioco of document.querySelectorAll('a[data-gioco]')) {

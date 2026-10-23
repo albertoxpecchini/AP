@@ -156,7 +156,7 @@ img{display:block;max-width:100%;height:auto}
 .muro::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;background:url(/art/muro.webp) 0 0/2200px auto repeat;filter:grayscale(1) contrast(3.2) brightness(1.25);opacity:calc(.75 * var(--auto-l));
   -webkit-mask-image:radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%);
   mask-image:radial-gradient(34% 100% at calc(var(--auto-x) * 100%) 50%,#000,transparent 70%)}
-.parete{position:relative;height:calc(3252 * var(--u))}
+.parete{position:relative;height:calc(3320 * var(--u))}
 .gruppo{display:contents}
 
 /* ogni cosa sul muro è posizionata in 1280esimi (e in 390esimi sul telefono) */
@@ -295,7 +295,7 @@ img{display:block;max-width:100%;height:auto}
 /* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
 @media (max-width:899px){
   :root{--u:calc(min(100cqw, 600px) / 390)}
-  .parete{height:calc(5654 * var(--u));max-width:600px;margin:0 auto}
+  .parete{height:calc(5684 * var(--u));max-width:600px;margin:0 auto}
   .it{--px:var(--mx,var(--x));--py:var(--my,var(--y));--pw:var(--mw,var(--w));--pr:var(--mr,var(--r,0deg))}
   .spray{font-size:calc(40 * var(--u))}
   .vol h3{font-size:max(calc(22px * var(--ts,1)),calc(16cqw * var(--ts,1)))}
@@ -831,15 +831,16 @@ html:not(.js) .chat-tasto{display:none}
   setTimeout(tic, veloce > 1 ? 250 : 1000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna() })
 
-  // I giochi: la roulette, il blackjack, testa o croce, le mine e il dado, ognuno in una finestra sopra il muro
-  // (games/<gioco>/). Il codice e il 3D si caricano solo quando si apre (o quando
-  // il puntatore passa sul volantino); #roulette, #blackjack, #moneta, #mine o #dado nell'indirizzo li apre subito.
+  // I giochi: la roulette, il blackjack, testa o croce, le mine, il dado e virtual, ognuno in una finestra sopra il muro
+  // (games/<gioco>/). Il codice e il 3D si caricano solo quando si apre (o quando il puntatore passa sul volantino);
+  // #roulette, #blackjack, #moneta, #mine, #dado o #virtual nell'indirizzo li apre subito.
   const GIOCHI = {
     roulette: ['roulette.js', 'ruota.js', 'regole.js', 'lib/three.js'].map((f) => `/games/roulette/${f}`),
     blackjack: ['blackjack.js', 'regole.js', 'scena.js', 'carte.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/blackjack/`).pathname),
     moneta: ['moneta.js', 'lancio.js', 'scena.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/moneta/`).pathname),
     mine: ['mine.js', 'regole.js', 'scena.js', 'tessere.js', '../pzk.js', '../roulette/lib/three.js'].map((f) => new URL(f, `${location.origin}/games/mine/`).pathname),
     dado: ['dado.js', 'regole.js', 'campana.js', '../pzk.js', '../roulette/lib/three.js', '../roulette/lib/rapier.mjs'].map((f) => new URL(f, `${location.origin}/games/dado/`).pathname),
+    virtual: ['virtual.js', 'partita.js', 'squadre.js', 'schermo.js', '../pzk.js'].map((f) => new URL(f, `${location.origin}/games/virtual/`).pathname),
   }
   const apriGioco = (nome) => import(`/games/${nome}/${nome}.js`).then((m) => m.apri())
   for (const gioco of document.querySelectorAll('a[data-gioco]')) {

@@ -84,6 +84,7 @@ export const DESK = {
       { k: 'manifesti2/moneta', w: 210, dx: 20, gap: -10, r: -2 },
       { k: 'landini/avviamento', w: 185, gap: -15, r: 2 },
       { k: 'manifesti5/frutti', w: 205, gap: -15, r: 2 },
+      { k: V('virtual'), w: 230, dx: 10, gap: -15, r: -3 },
     ] },
   ],
   rel: [
@@ -163,6 +164,7 @@ export const MOB = {
       { k: 'manifesti8/modena', w: 145, dx: 25, gap: 24, r: -1.5 },
       { k: 'manifesti7/iphone', w: 140, dx: 10, gap: 12, r: 2 },
       { k: 'manifesti8/francia', w: 140, dx: 30, gap: -12, r: 2 },
+      { k: V('virtual'), w: 180, gap: -12, r: -3 },
     ] },
     { x: 198, items: [
       { k: 'manifesti4/brat', w: 150, dx: 20, gap: 18, r: 4 },

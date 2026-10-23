@@ -1,4 +1,4 @@
-// I $pzk di pzkko.it: soldi finti, gli stessi per tutti i giochi (roulette, blackjack, mine, dado, moneta e quelli che
+// I $pzk di pzkko.it: soldi finti, gli stessi per tutti i giochi (roulette, blackjack, mine, dado, moneta, virtual e quelli che
 // verranno) e per il wallet in alto a sinistra (wallet/wallet.js). Non valgono niente e non si comprano.
 //
 // Due modi di stare al mondo (dal 22.10 notte):
