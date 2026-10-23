@@ -1,5 +1,9 @@
 // La regia di pzkko.it: il pannello per provare e regolare il sito, nello stile dei giochi (un foglio col nastro, le
 // caselle stampate del tavolo, le fiches come pomelli). Dal 21.10 è a schede e leggera:
+// - in cima a grafica (dal 23.10) «come parte»: le scelte di chi guarda, che restano nel browser (index.html,
+//   window.pzkkoScelte e pzkkoPagina.scegli): il 3D spento o acceso (pzkko-3d: ricarica la pagina), l'ora sempre a
+//   mezzogiorno o quella vera con la sera e la notte (pzkko-ora), il meteo sempre sole o quello vero (pzkko-meteo). Di
+//   partenza: 2D, giorno, sole;
 // - grafica: la qualità della scena 3D (auto, bassa, media, alta, ultra), cambiata dal vivo senza ricaricare, e i suoi
 //   pezzi uno per uno (risoluzione, ombre, riflessi, bagliore, palazzi: «su misura»), i ritocchi, la vetrina, la luce
 //   del portachiavi per terra. La qualità e la luce restano nel browser (scena.js, portachiavi.js);
@@ -7,10 +11,11 @@
 // - meteo: quello vero o uno scelto, quanto, il bagnato e la neve per terra, un lampo;
 // - strada: le auto (quando, che fari, il neon sotto, una ferma), le bestie, le gocce;
 // - suono: i suoni della strada (suono/, window.pzkkoSuono), acceso, il volume, ognuno da provare;
-// - prove: il muro in trasparenza, rifare l'arrivo, il muro senza 3D, il glTF, i numeri della scheda.
+// - prove: il muro in trasparenza, rifare l'arrivo, il glTF, i numeri della scheda (il muro senza 3D, fino al 23.10 qui,
+//   è l'interruttore del 3D in cima a grafica).
 // In fondo come va la scena (fotogrammi al secondo, qualità, ora, buio, luci, meteo) e «rimetti tutto». Non è modale: la
 // scena dietro cambia mentre si regola. Il resto non si salva: ricaricando torna com'era (tranne l'ora e la velocità,
-// che le ricariche della regia si portano dietro nell'indirizzo).
+// che le ricariche della regia si portano dietro nell'indirizzo se la regia le ha cambiate).
 // Prima era un foglio lungo di piste in SVG col filtro dell'inchiostro, ridisegnate due volte al secondo, e la qualità
 // ricaricava la pagina: con la pagina che ricalcolava lo stile a ogni fotogramma (index.html, fino al 21.10) la regia
 // aperta portava la scena di sera a 67 fps su una 3060 Ti. Ora caselle e cursori sono HTML, e si tocca solo quello che
@@ -34,7 +39,9 @@ const PREDEFINITI = {
   bestie: { formiche: true, mosche: true, zanzare: true, blatte: true }, blatteDiGiorno: false, velocitaBestie: 1, goccia: 1,
   meteo: null, intensita: 0.6, bagnato: null, manto: null,
 }
-const R = (window.pzkkoRegia ??= structuredClone(PREDEFINITI))
+// il meteo di partenza: il sole, o quello vero se lo si è scelto (window.pzkkoScelte.tempo, nella testa di index.html)
+const tempo = () => (window.pzkkoScelte ? window.pzkkoScelte.tempo : null)
+const R = (window.pzkkoRegia ??= { ...structuredClone(PREDEFINITI), meteo: tempo() })
 const pagina = () => window.pzkkoPagina
 const scena = () => window.pzkkoScena
 
@@ -47,15 +54,20 @@ const adesso = () => pagina().orologio.adesso()
 const vai = (m) => { const o = pagina().orologio, t = o.adesso(); o.imposta(t + (m - minuto(t)) * 60000); pagina().aggiorna() }
 const sole = () => { const s = pagina().sole(adesso()); return { alba: minuto(s.alba), tramonto: minuto(s.tramonto) } }
 
-// ricarica la pagina con dei parametri (l'arrivo, il muro senza 3D, il glTF), portandosi dietro l'ora, la velocità e la
-// regia aperta
+// ricarica la pagina con dei parametri (l'arrivo, il 3D acceso o spento, il glTF), portandosi dietro la regia aperta e,
+// se la regia li ha cambiati, l'ora e la velocità (se no la pagina riparte da sé: a mezzogiorno, o all'ora vera)
 const ricarica = (cambia) => {
-  const u = new URL(location.href), o = pagina().orologio
-  u.searchParams.set('ora', hhmm(minuto(o.adesso())))
-  if (o.veloce > 1 && !o.fermo) u.searchParams.set('veloce', o.veloce); else u.searchParams.delete('veloce')
+  const u = new URL(location.href), P = pagina(), o = P.orologio
+  const corre = o.veloce > 1 && !o.fermo
+  if (corre || Math.abs(o.adesso() - (P.partenza?.() ?? Date.now())) > 2 * 60000) u.searchParams.set('ora', hhmm(minuto(o.adesso())))
+  else u.searchParams.delete('ora')
+  if (corre) u.searchParams.set('veloce', o.veloce); else u.searchParams.delete('veloce')
   for (const [k, v] of Object.entries(cambia)) { if (v === null) u.searchParams.delete(k); else u.searchParams.set(k, v) }
   u.hash = 'regia'
-  location.href = u.toString()
+  // (l'indirizzo nuovo al posto di quello di adesso, e si ricarica: assegnato a location.href, se cambiava solo il
+  // #regia, o niente, il browser non ricaricava)
+  history.replaceState(history.state, '', u.toString())
+  location.reload()
 }
 
 // ── la finestra ──────────────────────────────────────────────────────────────
@@ -170,9 +182,9 @@ const pag = (k) => corpo.querySelector(`#rg-p-${k}`)
 const metti = (k, figli) => { inCostruzione = pag(k); controlli = controlli.filter((c) => c.pagina !== inCostruzione); inCostruzione.replaceChildren(...figli()); inCostruzione = null }
 function riempi() {
   const S = scena(), arriva = !S && document.documentElement.classList.contains('scena-carico')
-  metti('grafica', () => (S ? paginaGrafica(S) : arriva ? attesa() : senza3d()))
+  metti('grafica', () => [...comeParte(), ...(S ? paginaGrafica(S) : arriva ? attesa() : senza3d())])
   metti('ora', paginaOra)
-  metti('meteo', () => (S ? paginaMeteo(S) : arriva ? attesa() : [nota('il meteo è della scena 3D, e qui il 3D non c\'è.')]))
+  metti('meteo', () => (S ? paginaMeteo(S) : arriva ? attesa() : [titolo('il meteo', 100), nota('il meteo si vede solo nella scena 3D, che qui è spenta (si accende in cima alla scheda «grafica»): sul muro di sempre non piove mai.')]))
   metti('strada', () => paginaStrada(S))
   riempiSuono()
   metti('prove', () => paginaProve(S))
@@ -180,7 +192,28 @@ function riempi() {
 // (i suoni arrivano per conto loro: se la regia si è fatta prima, la loro pagina si rifà quando si apre)
 const riempiSuono = () => { conSuono = !!window.pzkkoSuono; metti('suono', paginaSuono) }
 const attesa = () => [nota('il 3D sta arrivando: le sue regole compaiono qui appena la strada si vede.')]
-const senza3d = () => [nota('qui il 3D non c\'è (niente WebGL2, o ?muro=1): restano l\'ora, la sera, le auto e i suoni, sul muro di sempre.'), tasti([['con il 3D', () => ricarica({ muro: null })]])]
+const senza3d = () => [nota(pagina().scelte?.scena
+  ? 'il 3D è acceso ma qui non è partito (niente WebGL2, o un errore: lo dice la console). resta il muro di sempre, con l\'ora, la sera, le auto e i suoni.'
+  : 'il 3D è spento: questo è il muro di sempre, con l\'ora, la sera, le auto e i suoni. la qualità e i ritocchi della scena compaiono qui quando lo si accende.')]
+
+// ── come parte la pagina: le scelte di chi guarda, che restano nel browser (dal 23.10) ──
+// di partenza la pagina è il muro di sempre, in 2D, a mezzogiorno col sole; il 3D (pzkko-3d), l'ora vera con la sera e
+// la notte (pzkko-ora) e il meteo vero (pzkko-meteo) si accendono qui, apposta. pzkkoPagina.scegli (index.html) le
+// ricorda e mette subito l'ora e il meteo; il 3D si accende e si spegne ricaricando la pagina (senza ?scena e ?muro)
+const comeParte = () => {
+  const P = pagina(), C = () => P.scelte ?? {}
+  return [
+    titolo('come parte', 25),
+    caselle('3D', [['spento', false], ['acceso', true]], () => !!C().scena, (v) => {
+      const prima = !!C().scena
+      P.scegli?.('scena', v)
+      if (v !== prima) ricarica({ muro: null, scena: null })
+    }),
+    caselle('ora', [['sempre giorno', 'giorno'], ['vera (con la notte)', 'vera']], () => C().ora ?? 'vera', (v) => P.scegli?.('ora', v)),
+    caselle('meteo', [['sempre sole', 'sole'], ['vero', 'vero']], () => C().meteo ?? 'vero', (v) => P.scegli?.('meteo', v)),
+    nota('restano in questo browser. il 3D si accende e si spegne ricaricando la pagina; l\'ora e il meteo cambiano subito (il meteo si vede solo nel 3D).'),
+  ]
+}
 
 // ── i controlli ──────────────────────────────────────────────────────────────
 // ognuno ha leggi() (il valore vero) e mette(v) (lo mostra); rileggi() li confronta con quello che mostrano: due volte al
@@ -370,6 +403,7 @@ function paginaOra() {
   const tre = (spenta, accesa) => [['auto', null], [spenta, 0], [accesa, 1]]
   return [
     titolo('il tempo', 500),
+    notaViva(() => (P.scelte?.ora === 'vera' ? 'si parte all\'ora vera di mantova, con la sera e la notte' : 'si parte sempre a mezzogiorno, fermi') + ': si sceglie in cima alla scheda «grafica». qui si prova, e ricaricando torna com\'era.'),
     cursore('ora', { min: 0, max: 1439, passo: 1, vivo: true, leggi: () => Math.floor(minuto(adesso())), scrivi: vai, testo: hhmm,
       tacche: [0, 6, 12, 18, 24].map((h) => [Math.min(1439, h * 60), String(h)]), segni: () => { const s = sole(); return [[s.alba, 'alba'], [s.tramonto, 'tramonto']] } }, 500),
     caselle('velocità', [['ferma', 0], ['x1', 1], ['x10', 10], ['x60', 60], ['x600', 600]], () => (P.orologio.fermo ? 0 : P.orologio.veloce),
@@ -394,6 +428,7 @@ function paginaMeteo(S) {
   const M = S.meteo
   return [
     titolo('il meteo', 100),
+    notaViva(() => (pagina().scelte?.meteo === 'vero' ? 'si parte col meteo vero di mantova' : 'si parte sempre col sole') + ': si sceglie in cima alla scheda «grafica». qui si prova, e ricaricando torna com\'era.'),
     caselle('tempo', [['vero', null], ['sole', 'sole'], ['nuvole', 'nuvoloso'], ['nebbia', 'nebbia'], ['pioggia', 'pioggia'], ['tuoni', 'temporale'], ['neve', 'neve']],
       () => R.meteo, (v) => { R.meteo = v }),
     cursore('quanto', { min: 0, max: 1, leggi: () => R.intensita, scrivi: (v) => { R.intensita = v }, testo: (v) => fmt(v), tacche: [[0, 'poco'], [1, 'tanto']] }, 1),
@@ -405,6 +440,7 @@ function paginaMeteo(S) {
     notaViva(() => {
       const d = M.dati
       return d ? `a mantova adesso: codice ${d.codice}, nuvole ${d.nuvole}%, ${fmt(d.pioggia, 1)} mm di pioggia (${fmt(d.pioggia12, 1)} nelle ultime 12 ore), visibilità ${d.visibilita >= 1000 ? fmt(d.visibilita / 1000, 1) + ' km' : Math.round(d.visibilita) + ' m'}, vento ${Math.round(d.vento)} km/h, ${fmt(d.temperatura, 1)}°. in scena: ${M.testo}.`
+        : R.meteo || new URLSearchParams(location.search).has('meteo') ? `i dati veri di mantova si chiedono solo col tempo «vero». in scena: ${M.testo}.`
         : `i dati veri non ci sono (in locale /api/meteo non risponde): «vero» è il dopo pioggia di sempre. in scena: ${M.testo}.`
     }),
   ]
@@ -461,13 +497,13 @@ function paginaSuono() {
 // le prove: quello che ricarica la pagina, e i numeri della scheda
 function paginaProve(S) {
   const fuori = [titolo('le prove', 25)]
-  if (!S) return [...fuori, tasti([['con il 3D', () => ricarica({ muro: null })]])]
+  if (!S) return [...fuori, nota('le prove sono della scena 3D: si accende in cima alla scheda «grafica» (o con ?scena=1 nell\'indirizzo).')]
   return [
     ...fuori,
     caselle('il muro sotto', [['no', false], ['in trasparenza', true]], () => document.documentElement.classList.contains('scena-allinea'),
       (v) => { if (v) window.pzkkoTrattenute?.(); document.documentElement.classList.toggle('scena-allinea', v) }),
-    tasti([['rifai l\'arrivo', () => ricarica({ intro: null })], ['muro senza 3D', () => ricarica({ muro: 1 })], ['scarica il .glb', () => ricarica({ glb: 1 })]]),
-    nota('questi tre ricaricano la pagina (l\'ora e la velocità restano).'),
+    tasti([['rifai l\'arrivo', () => ricarica({ intro: null })], ['scarica il .glb', () => ricarica({ glb: 1 })]]),
+    nota('questi due ricaricano la pagina (l\'ora e la velocità restano, se le hai cambiate). il muro senza 3D: l\'interruttore in cima alla scheda «grafica».'),
     notaViva(() => {
       const i = S.renderer.info, gl = S.renderer.getContext(), d = gl.getExtension('WEBGL_debug_renderer_info')
       const nome = d ? String(gl.getParameter(d.UNMASKED_RENDERER_WEBGL)).replace(/^ANGLE \(|\)$/g, '') : 'non si fa riconoscere'
@@ -476,20 +512,22 @@ function paginaProve(S) {
   ]
 }
 
-// rimette tutto com'era: l'ora vera, la sera col tramonto, le auto a caso, il volume, i ritocchi della scena (la grafica
-// e la luce del portachiavi no: sono scelte che restano)
+// rimette tutto com'era: l'ora di partenza (mezzogiorno, o quella vera se la si è scelta), la sera col tramonto, le auto
+// a caso, il volume, i ritocchi della scena e il meteo di partenza (la grafica, la luce del portachiavi e le scelte di
+// «come parte» no: sono scelte che restano)
 function rimetti() {
   const P = pagina()
-  P.orologio.fermo = false; P.orologio.veloce = 1; P.orologio.imposta(Date.now())
   for (const k in P.forza) P.forza[k] = null
+  if (P.rimettiOra) P.rimettiOra()
+  else { P.orologio.fermo = false; P.orologio.veloce = 1; P.orologio.imposta(Date.now()) }
   Object.assign(P.regola, { ogni: 55, fari: null, neon: null, sfarfallio: true })
   P.fermaAuto(null)
   if (window.pzkkoSuono) window.pzkkoSuono.volume = 0.7
-  Object.assign(R, structuredClone(PREDEFINITI))
+  Object.assign(R, structuredClone(PREDEFINITI), { meteo: tempo() })
   document.documentElement.classList.remove('scena-allinea')
   P.aggiorna()
   rileggi(true)
-  voce('tutto com\'era (la grafica resta)')
+  voce('tutto com\'era (la grafica e «come parte» restano)')
 }
 
 // ── in fondo: come va la scena (fotogrammi al secondo, qualità, ora, buio, luci, meteo) ──

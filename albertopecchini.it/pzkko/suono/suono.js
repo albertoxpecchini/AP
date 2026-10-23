@@ -1,5 +1,6 @@
 // I suoni della strada di pzkko.it. Tutto sintetizzato dal vivo (voci.js), niente file: si sente quello che c'è nella
-// scena, da dove sta la telecamera, all'ora di Mantova.
+// scena, da dove sta la telecamera, all'ora di Mantova. Dal 23.10, se nella regia non si è scelta l'ora vera, è sempre
+// mezzogiorno (l'orologio della pagina sta fermo: il giorno, gli uccelli, niente campane), e senza il meteo vero c'è il sole.
 // - Sempre: la città lontana (più forte nelle ore di punta, più piano la domenica e di notte; quando l'asfalto è bagnato
 //   sibila), il condizionatore lassù, le onde del traffico delle altre strade, il motorino che passa in un'altra via, un
 //   clacson, la tapparella di qualcuno al palazzo di fronte (su al mattino, giù la sera).
@@ -85,12 +86,17 @@ export function accendi(c) {
   }
   rileggi()
   addEventListener('resize', rileggi)
+  // (lo scorrimento e la finestra si tengono qui quando cambiano: letti nel giro, a pagina con un'animazione in corso,
+  // costringevano il browser a rifare lo stile trenta volte al secondo)
+  const fin = { y: scrollY, w: innerWidth, h: innerHeight }
+  addEventListener('scroll', () => { fin.y = scrollY }, { passive: true })
+  addEventListener('resize', () => { fin.y = scrollY; fin.w = innerWidth; fin.h = innerHeight })
   const altezza = () => S()?.M?.H ?? base.h / (base.w / W)
   const ascolta = () => {
     const cam = S()?.camera
     if (cam) { L.x = cam.position.x; L.y = cam.position.y; L.z = cam.position.z; return }
     const h = altezza()
-    L.x = W / 2; L.y = limita(h - (scrollY + innerHeight / 2 - base.y) / (base.w / W), 0.4, h + 0.6); L.z = 2.6
+    L.x = W / 2; L.y = limita(h - (fin.y + fin.h / 2 - base.y) / (base.w / W), 0.4, h + 0.6); L.z = 2.6
   }
   const posti = () => {
     const s = S(), ins = s?.h?.insegna, h = altezza()
@@ -102,9 +108,10 @@ export function accendi(c) {
     }
   }
   let dove = posti()
+  // (senza 3D niente pioggia; dal 23.10, se non si è scelto il meteo vero, è il sole: l'asfalto asciutto come nella scena)
   const meteo = () => {
     const m = S()?.meteo
-    return m ? { pioggia: m.pioggia, neve: m.neve, nebbia: m.nebbia, bagnato: m.bagnato, vento: Math.hypot(m.vento.x, m.vento.y), dati: m.dati } : { pioggia: 0, neve: 0, nebbia: 0, bagnato: 0.4, vento: 0.3, dati: null }
+    return m ? { pioggia: m.pioggia, neve: m.neve, nebbia: m.nebbia, bagnato: m.bagnato, vento: Math.hypot(m.vento.x, m.vento.y), dati: m.dati } : { pioggia: 0, neve: 0, nebbia: 0, bagnato: window.pzkkoScelte?.meteo === 'vero' ? 0.4 : 0.15, vento: 0.3, dati: null }
   }
 
   // ── i punti da cui vengono i suoni: la distanza (il volume, e l'aria che si mangia gli acuti), il lato, l'eco ──
@@ -452,7 +459,7 @@ export function accendi(c) {
       let r = mosche2d[i]
       if (!r) { if (!si) return; r = mosche2d[i] = ronza(false) }
       vola(r, si, t)
-      if (si) { r.v.g.gain.setTargetAtTime(0.12, t, 0.05); r.v.p.pan.setTargetAtTime(limita((m.x / innerWidth) * 2 - 1, -0.9, 0.9), t, 0.05) }
+      if (si) { r.v.g.gain.setTargetAtTime(0.12, t, 0.05); r.v.p.pan.setTargetAtTime(limita((m.x / fin.w) * 2 - 1, -0.9, 0.9), t, 0.05) }
     })
   }
 
@@ -552,13 +559,16 @@ export function accendi(c) {
 
   // ── il giro: una trentina di volte al secondo le cose che si muovono, una volta al secondo l'ora ──
   // (i giochi, dalla roulette alla moneta, sono finestre modali: mentre si gioca la strada si sente più piano)
+  // Gira con un timer e non coi fotogrammi (dal 23.10): non disegna niente, e un requestAnimationFrame sempre acceso
+  // teneva la pagina a ridisegnarsi a ogni giro dello schermo anche ferma, dal primo tocco in poi. A pagina nascosta il
+  // contesto audio è sospeso e il giro si ferma alla prima riga che lo guarda
   let modale = () => false
   try { document.querySelector(':modal'); modale = () => !!document.querySelector('dialog:modal') } catch { modale = () => !!document.querySelector('dialog[open]:not(.rg)') }
   let ultimo = performance.now(), lento = 0, avvio = true
   setTimeout(() => { avvio = false }, 5000)
-  const giro = (now) => {
-    requestAnimationFrame(giro)
-    if (now - ultimo < 33) return
+  const giro = (now = performance.now()) => {
+    setTimeout(giro, 33)
+    if (now - ultimo < 32) return
     const dt = Math.min(0.2, (now - ultimo) / 1000), t = c.currentTime
     ultimo = now
     uscita.gain.setTargetAtTime(P.acceso ? P.volume * (modale() ? 0.4 : 1) : 0, t, P.acceso ? (avvio ? 1.3 : 0.25) : 0.1)
@@ -576,7 +586,7 @@ export function accendi(c) {
     fermaAuto()
     if (now - lento > 1000) { lento = now; orario() }
   }
-  requestAnimationFrame(giro)
+  setTimeout(giro, 33)
   // (l'uscita, per le prove: tools/pzkko/suono/ascolta.mjs ci registra la strada)
   P.uscita = uscita
   return { senti }

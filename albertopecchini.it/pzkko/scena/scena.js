@@ -14,7 +14,9 @@
 // (link, tagliandi, giochi, mosche), e qui si disegna soltanto. Sul telefono la
 // parete è quella del telefono (due colonne, stretta e alta) e la saracinesca è
 // larga 0,95 m invece di 2,05: i volantini restano grandi come quelli veri.
-// Prove: ?muro=1 (niente 3D), ?intro=0 (niente arrivo), ?allinea=1 (il DOM in
+// Dal 23.10 la scena parte solo se la si sceglie (la regia, scheda «grafica»: pzkko-3d = si nel browser) o con
+// ?scena=1: di partenza la home è il muro di sempre, in 2D (lo decide la testa di index.html, window.pzkkoScelte).
+// Prove: ?scena=1 (il 3D), ?muro=1 (niente 3D), ?intro=0 (niente arrivo), ?allinea=1 (il DOM in
 // trasparenza sopra la scena), ?qualita=bassa|media|alta|ultra|telefono, ?dpr=1 (la
 // risoluzione interna; con ?qualita= o ?dpr= la scena non si adatta da sola e la
 // scelta della regia non conta), ?glb=1 (scarica la scena in glTF per Blender), più

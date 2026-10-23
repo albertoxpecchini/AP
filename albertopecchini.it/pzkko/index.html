@@ -25,12 +25,26 @@
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/art/insegna.svg" as="image">
-<!-- La scena 3D (in fondo alla pagina): se partirà (WebGL2, niente ?muro), la pagina si nasconde subito sotto
-     l'anteprima della strada, senza far vedere il muro per un attimo -->
+<!-- Le scelte di chi guarda (window.pzkkoScelte), che la regia tiene nel browser. Dal 23.10 la pagina parte sempre col
+     muro di sempre, in 2D, a mezzogiorno col sole, sul computer e sul telefono: il 3D, l'ora vera con la sera e la notte
+     e il meteo vero di Mantova si accendono apposta, in cima alla scheda «grafica» della regia.
+     La scena 3D (in fondo alla pagina): se partirà (scelta, WebGL2, niente ?muro), la pagina si nasconde subito sotto
+     l'anteprima della strada, senza far vedere il muro per un attimo; se no non si chiede niente di suo -->
 <script>
 (() => {
   const q = new URLSearchParams(location.search)
-  if (q.get('muro') !== null) return
+  // pzkko-3d = si: il 3D (?scena=1 lo accende e ?muro=1 lo spegne, per le prove: ?muro comanda); pzkko-ora = vera: l'ora
+  // di Mantova, con la sera e la notte (se no sempre mezzogiorno, index.html più sotto); pzkko-meteo = vero: il meteo di
+  // Mantova nella scena (se no sempre sole). tempo = il meteo con cui parte la scena (window.pzkkoRegia.meteo, meteo.js):
+  // 'sole', o null = quello vero, anche quando ?meteo= ne chiede uno per le prove
+  const leggi = (k) => { try { return localStorage.getItem(k) } catch { return null } }
+  const S = window.pzkkoScelte = {
+    scena: q.get('muro') !== null ? false : q.has('scena') ? q.get('scena') !== '0' : leggi('pzkko-3d') === 'si',
+    ora: leggi('pzkko-ora') === 'vera' ? 'vera' : 'giorno',
+    meteo: leggi('pzkko-meteo') === 'vero' ? 'vero' : 'sole',
+    get tempo() { return this.meteo === 'vero' || q.has('meteo') ? null : 'sole' },
+  }
+  if (!S.scena) return
   let gl = null
   try { gl = document.createElement('canvas').getContext('webgl2') } catch {}
   if (!gl) return
@@ -115,7 +129,8 @@ img{display:block;max-width:100%;height:auto}
 
 /* l'insegna sopra la porta: un cassonetto disegnato in SVG (art/insegna.svg) con le lettere a scatola, le colature
    e la ruggine; l'h1 è il suo testo. Di sera si scurisce col resto, al tramonto si accendono i tubi al neon dentro
-   le lettere (art/insegna-notte.svg, stessa tela, sovrapposta) */
+   le lettere (art/insegna-notte.svg, stessa tela, sovrapposta; dal 23.10 si scarica solo quando si accende: data-src,
+   lo script) */
 .portale{position:relative;z-index:32;padding:clamp(18px,3.2vw,40px) 0 0;display:flex;justify-content:center;pointer-events:none}
 .portale h1{position:relative;margin:0;width:min(100%,840px)}
 .insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .55 * var(--notte)))}
@@ -300,10 +315,8 @@ img{display:block;max-width:100%;height:auto}
   .tagliandi{height:max(46px,17cqw)}
 }
 
-/* ── senza script la notte segue il tema del sistema (con lo script segue il tramonto di Mantova) ─ */
-@media (prefers-color-scheme:dark){
-  html:not(.js){--notte:1;--insegna:1;--lampioni:1}
-}
+/* (senza script è sempre giorno: fino al 23.10 la notte seguiva il tema scuro del sistema; dal 23.10 la pagina parte
+   sempre di giorno, e la sera di Mantova si sceglie nella regia, che senza script non c'è) */
 
 @media (prefers-reduced-motion:reduce){
   .vol,.man,.tagliandi button,.copiato{transition:none}
@@ -414,7 +427,7 @@ html:not(.js) .chat-tasto{display:none}
 </dialog>
 <div class="strada">
   <header class="portale">
-    <h1><span class="insegna-luce" aria-hidden="true"></span><img class="insegna" src="/art/insegna.svg" alt="pzkko" width="1080" height="450" fetchpriority="high"><img class="insegna notte" src="/art/insegna-notte.svg" alt="" aria-hidden="true" width="1080" height="450"><span class="insegna-cono" aria-hidden="true"></span></h1>
+    <h1><span class="insegna-luce" aria-hidden="true"></span><img class="insegna" src="/art/insegna.svg" alt="pzkko" width="1080" height="450" fetchpriority="high"><img class="insegna notte" data-src="/art/insegna-notte.svg" alt="" aria-hidden="true" width="1080" height="450"><span class="insegna-cono" aria-hidden="true"></span></h1>
   </header>
 
   <main class="muro">
@@ -825,6 +838,10 @@ html:not(.js) .chat-tasto{display:none}
   // 45,156° N 10,791° E: nessuna chiamata in rete, vale per sempre. Il muro vive
   // a Mantova: la sera cala all'ora di lì, da qualunque posto si guardi.
   // Prove: ?ora=18:30 (ora di Mantova di oggi), ?veloce=60 (il tempo corre 60×), ?notte=1.
+  // Dal 23.10 di partenza è sempre giorno: l'orologio sta fermo a mezzogiorno di Mantova (niente buio, insegna, lampioni
+  // né auto coi fari, e nella scena 3D il sole di mezzogiorno). L'ora vera, con la sera e la notte, la sceglie chi guarda
+  // nella regia (window.pzkkoScelte.ora = 'vera', pzkko-ora nel browser); le prove (?ora, ?veloce, ?notte) la vogliono vera
+  // come prima.
   const LAT = 45.1564, LON = 10.7914, RAD = Math.PI / 180, MIN = 60000
   // Calcolo NOAA (il foglio del Global Monitoring Laboratory), al minuto: per il
   // giorno UTC dell'istante chiesto, prima stima a mezzogiorno e poi tre giri
@@ -851,23 +868,34 @@ html:not(.js) .chat-tasto{display:none}
   const sole = (ms) => ({ alba: evento(ms, false), tramonto: evento(ms, true) })
   const q = new URLSearchParams(location.search)
   const veloce = Math.max(1, Number(q.get('veloce')) || 1)
-  const partenza = Date.now()
-  let inizio = partenza
+  // l'ora h:m di Mantova, oggi
+  const aMantova = (h, m) => {
+    const romaOra = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' }))
+    const scarto = Date.now() - romaOra.getTime()
+    return new Date(romaOra.getFullYear(), romaOra.getMonth(), romaOra.getDate(), h || 0, m || 0).getTime() + scarto
+  }
+  const scelte = (window.pzkkoScelte ??= { scena: false, ora: 'giorno', meteo: 'sole', tempo: 'sole' })
+  const prova = !!q.get('ora') || q.has('veloce') || q.get('notte') !== null
+  // sempre giorno: la scelta di partenza (le prove comandano solo all'apertura: scelto dalla regia, vale la scelta)
+  let giorno = !prova && scelte.ora !== 'vera'
+  let inizio = giorno ? aMantova(12, 0) : Date.now()
   if (q.get('ora')) {
     // l'ora chiesta è quella di Mantova, oggi
     const [h, m] = q.get('ora').split(':').map(Number)
-    const romaOra = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' }))
-    const scarto = Date.now() - romaOra.getTime()
-    inizio = new Date(romaOra.getFullYear(), romaOra.getMonth(), romaOra.getDate(), h || 0, m || 0).getTime() + scarto
+    inizio = aMantova(h, m)
   }
   // l'orologio, uno per la pagina e per la scena 3D (luci.js lo legge da window.pzkkoOrologio): la regia (regia/) lo
-  // sposta, lo accelera e lo ferma
+  // sposta, lo accelera e lo ferma; sempre giorno, sta fermo a mezzogiorno
+  // perGioco(): l'ora per i meccanismi del gioco, che non sono la luce (le batterie del wallet e del cercapersone, in
+  // carica dalle 19 alle 7 col cavo): quella vera quando l'orologio è fermo al mezzogiorno di Mantova (sempre giorno, la
+  // partenza), quella della regia appena qualcuno lo sposta o lo fa andare (per provare la carica senza aspettare la sera)
   const orologio = window.pzkkoOrologio = (() => {
-    let base = inizio, da = Date.now(), v = veloce, fermo = false
+    let base = inizio, da = Date.now(), v = veloce, fermo = giorno
     const ora = () => base + (fermo ? 0 : (Date.now() - da) * v)
     const rifai = () => { base = ora(); da = Date.now() }
     return {
       adesso: ora,
+      perGioco: () => (fermo && Math.abs(ora() - aMantova(12, 0)) < MIN ? Date.now() : ora()),
       imposta(ms) { base = ms; da = Date.now() },
       get veloce() { return v }, set veloce(x) { rifai(); v = x },
       get fermo() { return fermo }, set fermo(x) { rifai(); fermo = x },
@@ -1006,10 +1034,14 @@ html:not(.js) .chat-tasto{display:none}
     const rs = strada.getBoundingClientRect(), rr = rivolo.getBoundingClientRect(), rm = muro.getBoundingClientRect()
     const x = rr.left + rr.width * 0.5 - rs.left - 4, y0 = -40, y1 = rm.top - rs.top + 4
     const durata = 420 + (y1 - y0) * 1.1
-    goccia.animate([{ transform: `translate(${x}px, ${y0}px)`, opacity: 1 }, { transform: `translate(${x}px, ${y1}px)`, opacity: 1 }], { duration: durata, easing: 'cubic-bezier(.55,0,1,.6)' }).onfinish = () => {
+    // (il «plic» in cima alla lamiera, suono/suono.js)
+    const plic = () => window.pzkkoSuono?.evento('goccia', { u: (rr.left + rr.width * 0.5 - rm.left) / rm.width, cima: true })
+    // con la cima della lamiera fuori dallo schermo (si è scesi) la goccia non si vede: niente animazione, solo il plic,
+    // allo stesso momento
+    if (rm.top + 30 < 0) setTimeout(plic, durata)
+    else goccia.animate([{ transform: `translate(${x}px, ${y0}px)`, opacity: 1 }, { transform: `translate(${x}px, ${y1}px)`, opacity: 1 }], { duration: durata, easing: 'cubic-bezier(.55,0,1,.6)' }).onfinish = () => {
       spruzzo.animate([{ transform: `translate(${x - 13}px, ${y1 - 10}px) scale(.4)`, opacity: .9 }, { transform: `translate(${x - 13}px, ${y1 - 12}px) scale(1)`, opacity: 0 }], { duration: 260, easing: 'ease-out' })
-      // (il «plic» in cima alla lamiera, suono/suono.js)
-      window.pzkkoSuono?.evento('goccia', { u: (rr.left + rr.width * 0.5 - rm.left) / rm.width, cima: true })
+      plic()
     }
     setTimeout(cade, 3000 + Math.random() * 6000)
   }
@@ -1017,17 +1049,22 @@ html:not(.js) .chat-tasto{display:none}
 
   // ── Le formiche ──────────────────────────────────────────────────────────
   // Cinque formiche piccole lungo il bordo basso della lamiera: camminano, si
-  // fermano, cambiano verso. Si muovono solo con la pagina in vista.
+  // fermano, cambiano verso. Si muovono solo con la pagina in vista, e solo se il
+  // fondo della lamiera è nello schermo (o quasi): lontane, stanno ferme e non
+  // chiedono fotogrammi, e si guarda di nuovo fra 0,3 s.
   const formiche = [...document.querySelectorAll('.formica')].map((el, i) => ({ el, x: 0, y: 0, dir: Math.random() < 0.5 ? 1 : -1, v: 12 + Math.random() * 18, pausa: 0, nata: false, lato: el.src.includes('lato') }))
   let tFormiche = performance.now()
   const camminano = (now) => {
     const dt = Math.min((now - tFormiche) / 1000, 0.1)
     tFormiche = now
+    let lontane = true
     if (!document.hidden && !reduce.matches && !in3d()) {
       const rs = strada.getBoundingClientRect(), rm = muro.getBoundingClientRect()
       const x0 = rm.left - rs.left + 12, x1 = rm.right - rs.left - 12, yb = rm.bottom - rs.top - 16
+      lontane = rm.bottom < -150 || rm.bottom - 150 > innerHeight
       for (const fo of formiche) {
         if (!fo.nata) { fo.x = x0 + Math.random() * (x1 - x0); fo.y = yb - Math.random() * 40; fo.nata = true }
+        else if (lontane) continue
         if (fo.pausa > 0) { fo.pausa -= dt; continue }
         if (Math.random() < 0.004) { fo.pausa = 0.5 + Math.random() * 2; continue }
         if (Math.random() < 0.003) fo.dir = -fo.dir
@@ -1039,7 +1076,8 @@ html:not(.js) .chat-tasto{display:none}
         fo.el.style.transform = `translate(${fo.x.toFixed(1)}px, ${fo.y.toFixed(1)}px) ${giro}`
       }
     }
-    setTimeout(() => requestAnimationFrame(camminano), 80)
+    if (lontane) setTimeout(() => camminano(performance.now()), 300)
+    else setTimeout(() => requestAnimationFrame(camminano), 80)
   }
   requestAnimationFrame(camminano)
 
@@ -1080,6 +1118,20 @@ html:not(.js) .chat-tasto{display:none}
   }
   const bez = (t, a, b, c, d) => { const s = 1 - t; return s * s * s * a + 3 * s * s * t * b + 3 * s * t * t * c + t * t * t * d }
   let tMosche = performance.now()
+  // Quando sono tutte posate e ferme (o c'è il 3D, che ha le sue) il giro dorme: niente fotogrammi fino alla prossima
+  // mossa (la più vicina delle attese m.t), o finché il puntatore non ne fa scappare una. Svegliandosi, il tempo dormito si
+  // toglie alle attese, come se il giro fosse andato avanti (fino al 23.10 girava sempre: un fotogramma a ogni giro dello
+  // schermo anche a mosche ferme, e a ogni fotogramma lo stile della pagina e le animazioni del cercapersone da rifare)
+  let dorme = false, dormeDa = 0, attesa = 0, sveglia = 0
+  const svegliaMosche = () => {
+    if (!dorme) return
+    dorme = false; clearTimeout(sveglia)
+    const via = Math.min((performance.now() - dormeDa) / 1000, attesa)
+    for (const m of mosche) if (m.stato === 'posata') m.t -= via
+    tMosche = performance.now()
+    requestAnimationFrame(volano)
+  }
+  reduce.addEventListener?.('change', svegliaMosche)
   const volano = (now) => {
     const dt = Math.min((now - tMosche) / 1000, 0.05)
     tMosche = now
@@ -1116,6 +1168,14 @@ html:not(.js) .chat-tasto{display:none}
       m.f = (Math.floor(now / 28) + m.n) % 2 ? 'vola' : 'vola2'
       mostra(m)
     }
+    if (!document.hidden && (in3d() || mosche.every((m) => m.stato === 'posata' && !(m.pulisce > 0) && !m.gira && !(m.passi > 0)))) {
+      // (col 3D si riguarda ogni secondo; col movimento ridotto restano posate e le attese non corrono, come prima: si dorme
+      // finché la preferenza non cambia)
+      attesa = in3d() ? Infinity : reduce.matches ? 0 : Math.max(0, Math.min(...mosche.map((m) => m.t)))
+      dorme = true; dormeDa = now
+      sveglia = in3d() ? setTimeout(svegliaMosche, 1000) : reduce.matches ? 0 : setTimeout(svegliaMosche, Math.min(attesa * 1000, 1e9))
+      return
+    }
     requestAnimationFrame(volano)
   }
   requestAnimationFrame(volano)
@@ -1125,14 +1185,17 @@ html:not(.js) .chat-tasto{display:none}
     const rs = strada.getBoundingClientRect(), px = e.clientX - rs.left, py = e.clientY - rs.top
     for (const m of mosche) {
       const d = Math.hypot(m.x - px, m.y - py)
-      if (m.stato === 'posata' && d < 70) parti(m, { x: ((m.x - px) / (d || 1)) * 140, y: ((m.y - py) / (d || 1)) * 140 })
+      if (m.stato === 'posata' && d < 70) { parti(m, { x: ((m.x - px) / (d || 1)) * 140, y: ((m.y - py) / (d || 1)) * 140 }); svegliaMosche() }
     }
   }, { passive: true })
+  // (l'insegna accesa del muro di sempre si chiede la prima volta che serve: di giorno, cioè di partenza, mai)
+  const insegnaNotte = document.querySelector('img.insegna.notte[data-src]')
   const aggiorna = () => {
     stato = fase(adesso())
     set('notte', stato.notte.toFixed(3))
     set('insegna', stato.insegna)
     set('lampioni', stato.lampioni)
+    if (stato.insegna > 0 && insegnaNotte && !insegnaNotte.src && !root.classList.contains('scena-carico') && !root.classList.contains('scena3d')) insegnaNotte.src = insegnaNotte.dataset.src
     if ((stato.insegna > 0 || stato.lampioni > 0 || autoForzata()) && !sfarfallioOn) { sfarfallioOn = true; prima = performance.now(); requestAnimationFrame(sfarfallio) }
   }
   // all'apertura le luci già accese non strobeggiano: sono accese da un pezzo
@@ -1181,6 +1244,19 @@ html:not(.js) .chat-tasto{display:none}
     fermaAuto: (x) => { regola.ferma = x; if (x === null) { set('auto-l', 0); set('neon-auto', 0) } aggiorna() },
     // (le mosche del muro di sempre, per il loro ronzio: suono/suono.js)
     mosche,
+    // le scelte di chi guarda (window.pzkkoScelte, nella testa della pagina): scegli le cambia, le ricorda nel browser e
+    // mette subito l'ora e il meteo (il 3D lo accende e lo spegne la regia, ricaricando). partenza = l'ora da cui la pagina
+    // riparte da sé (mezzogiorno, o adesso); rimettiOra ci torna
+    scelte,
+    partenza: () => (giorno ? aMantova(12, 0) : Date.now()),
+    rimettiOra: () => { orologio.fermo = giorno; orologio.veloce = 1; orologio.imposta(giorno ? aMantova(12, 0) : Date.now()); aggiorna() },
+    scegli(k, v) {
+      scelte[k] = v
+      const [chiave, valore] = { scena: ['pzkko-3d', v ? 'si' : 'no'], ora: ['pzkko-ora', v], meteo: ['pzkko-meteo', v] }[k]
+      try { localStorage.setItem(chiave, valore) } catch {}
+      if (k === 'ora') { giorno = v !== 'vera'; for (const x in forza) forza[x] = null; window.pzkkoPagina.rimettiOra() }
+      if (k === 'meteo' && window.pzkkoRegia) window.pzkkoRegia.meteo = scelte.tempo
+    },
   }
   const apriRegia = () => import('/regia/regia.js').then((m) => m.apri()).catch((e) => console.warn('regia non aperta', e))
   let scritto = ''
@@ -1276,7 +1352,14 @@ html:not(.js) .chat-tasto{display:none}
         }
         clearTimeout(spegni)
         ctx.resume().catch(() => {})
-        motore ??= import('/suono/suono.js').then((m) => m.accendi(ctx)).catch((e) => console.warn('suoni non partiti', e))
+        // (il motore calcola i suoi rumori e l'eco tutti insieme: sul telefono mezzo secondo fermo, e il primo gesto di solito
+        // è il dito che comincia a scorrere o che tocca un volantino. Quindi parte dopo il gesto, quando la pagina non scorre
+        // da 0,3 s e il browser è libero: i suoni sfumano dentro lo stesso, e gli eventi aspettano in coda)
+        motore ??= import('/suono/suono.js').then((m) => new Promise((ok) => {
+          let t = 0
+          const ferma = () => { clearTimeout(t); t = setTimeout(() => { removeEventListener('scroll', ferma); (window.requestIdleCallback ?? setTimeout)(ok, { timeout: 800 }) }, 300) }
+          addEventListener('scroll', ferma, { passive: true }); ferma()
+        }).then(() => m.accendi(ctx))).catch((e) => console.warn('suoni non partiti', e))
       },
       prova: (nome) => { S.accendi(true); S.evento('prova', { nome }) },
     }
@@ -1312,51 +1395,105 @@ html:not(.js) .chat-tasto{display:none}
   // I tagliandi sono fette della carta del volantino: ognuno mostra il pezzo di
   // foglio che gli tocca (stessa immagine, spostata), così quando si strappa
   // resta il buco col muro dietro.
+  // (prima si leggono tutte le misure e poi si scrive: scrivendo un tagliando e leggendo il dopo, il browser rifaceva lo
+  // stile a ogni tagliando)
   const fette = () => {
+    const tagli = []
     for (const t of document.querySelectorAll('.tagliandi')) {
       const vol = t.closest('.vol')
       const r = vol.getBoundingClientRect()
-      const rt = t.getBoundingClientRect()
-      const btns = [...t.querySelectorAll('button')]
       const flip = getComputedStyle(vol).getPropertyValue('--flip').trim() === '-1'
-      btns.forEach((b, i) => {
-        const rb = b.getBoundingClientRect()
-        // posizione del tagliando rispetto al foglio, senza la rotazione (rapporti, non pixel)
-        const w = r.width, h = r.height
-        b.style.setProperty('--bgsize', `${(w / rb.width) * 100}% ${(h / rb.height) * 100}%`)
-        const ox = flip ? (r.right - rb.right) : (rb.left - r.left)
-        const px = ox / (w - rb.width) * 100
-        const py = (rb.top - r.top) / (h - rb.height) * 100
-        b.style.setProperty('--bgpos', `${px}% ${py}%`)
-        if (flip) b.style.transform = ''
-      })
-      void rt
+      for (const b of t.querySelectorAll('button')) tagli.push([b, r, b.getBoundingClientRect(), flip])
+    }
+    for (const [b, r, rb, flip] of tagli) {
+      // posizione del tagliando rispetto al foglio, senza la rotazione (rapporti, non pixel)
+      const w = r.width, h = r.height
+      b.style.setProperty('--bgsize', `${(w / rb.width) * 100}% ${(h / rb.height) * 100}%`)
+      const ox = flip ? (r.right - rb.right) : (rb.left - r.left)
+      const px = ox / (w - rb.width) * 100
+      const py = (rb.top - r.top) / (h - rb.height) * 100
+      b.style.setProperty('--bgpos', `${px}% ${py}%`)
+      if (flip) b.style.transform = ''
     }
   }
   // Nessuna scritta esce dal suo riquadro: se un titolo è più largo del foglio (pzk$meeting) o il testo è più alto, il
   // volantino si rimpicciolisce (--fit, sui font di .vol) a passi del 4 % finché ci sta, fino alla metà. Si rifà quando la
-  // finestra cambia e quando arrivano i font
+  // finestra cambia e quando arrivano i font. Tutti i volantini insieme, a passi: si scrive il --fit di quelli che sbordano
+  // e poi si legge una volta sola (ogni volantino sta per conto suo, quindi è lo stesso conto; uno alla volta, ogni passo
+  // rifaceva l'impaginazione della pagina: ~240 volte all'apertura, 0,16 s fermi sul telefono prima del primo disegno)
   const adatta = () => {
-    for (const v of document.querySelectorAll('.vol')) {
+    let fogli = [...document.querySelectorAll('.vol')].map((v) => {
       v.style.setProperty('--fit', '1')
       const testo = v.querySelector('.testo') ?? v
-      const righe = [...testo.querySelectorAll('h3, .titolo, p, .mano, .handle, .forte, li, .pet-testa, .pet-sotto')]
-      const sborda = () => testo.scrollHeight > testo.clientHeight + 1 || righe.some((e) => e.scrollWidth > e.clientWidth + 1)
-      let fit = 1
-      while (fit > 0.5 && sborda()) { fit -= 0.04; v.style.setProperty('--fit', fit.toFixed(2)) }
-    }
+      return { v, testo, righe: [...testo.querySelectorAll('h3, .titolo, p, .mano, .handle, .forte, li, .pet-testa, .pet-sotto')], fit: 1 }
+    })
+    const sborda = ({ testo, righe }) => testo.scrollHeight > testo.clientHeight + 1 || righe.some((e) => e.scrollWidth > e.clientWidth + 1)
+    while ((fogli = fogli.filter((f) => f.fit > 0.5 && sborda(f))).length) for (const f of fogli) { f.fit -= 0.04; f.v.style.setProperty('--fit', f.fit.toFixed(2)) }
   }
-  // il calcolo usa i rettangoli non ruotati: si misura col volantino dritto
+  // il calcolo usa i rettangoli non ruotati: si misura col volantino dritto. Intanto la sua transizione (il foglio che si
+  // solleva) sta spenta, e torna solo a volantino di nuovo storto: se no a ogni misura (all'apertura due volte) tutti i
+  // volantini partivano a girarsi dal dritto al loro posto, 0,32 s di fotogrammi
   const misura = () => {
     const vols = [...document.querySelectorAll('.vol')]
-    for (const v of vols) v.style.transform = 'none'
+    for (const v of vols) { v.style.transition = 'none'; v.style.transform = 'none' }
     adatta()
     fette()
     for (const v of vols) v.style.transform = ''
+    void vols[0]?.offsetWidth
+    for (const v of vols) v.style.transition = ''
   }
   misura()
-  addEventListener('resize', misura)
+  // (solo se cambia la larghezza: l'altezza non sposta niente, e sul telefono la barra dell'indirizzo che va e viene
+  // mentre si scorre la cambia di continuo)
+  let misurata = [innerWidth, devicePixelRatio]
+  addEventListener('resize', () => {
+    if (innerWidth === misurata[0] && devicePixelRatio === misurata[1]) return
+    misurata = [innerWidth, devicePixelRatio]
+    misura()
+  })
   document.fonts?.ready.then(misura)
+
+  // ── Le immagini lontane ──────────────────────────────────────────────────
+  // Le immagini pigre (loading=lazy) che il browser non ha ancora chiesto le guarda un suo IntersectionObserver, e finché
+  // un'animazione è in corso (la banda e lo sfarfallio del tubo catodico del cercapersone non si fermano mai) un
+  // osservatore con qualcosa da guardare fa lavorare il filo della pagina a ogni fotogramma: stile, disegno, consegna al
+  // compositor, a pagina ferma (sul telefono un quinto del processore). Quindi le pigre ancora lontane (più di 1250 px
+  // dallo schermo, la soglia di Chrome col 4G; 2500 con la rete più lenta) si tengono da parte senza src (la scatola resta
+  // della sua misura, per width e height) e si rimettono quando lo scorrimento, la finestra che cambia o la stampa le
+  // portano a quella distanza: si scaricano quando si scaricavano prima, e a pagina ferma il filo della pagina dorme. Si
+  // guarda al primo fotogramma, dopo le formiche (che lì vanno al loro posto, in fondo); prima si misurano tutte e poi si
+  // tolgono e rimettono (una alla volta, ogni misura rifaceva l'impaginazione). Col 3D (che ha le sue) e negli
+  // strumenti che fotografano la pagina (navigator.webdriver: aspettano le pigre rendendole subito) niente
+  {
+    const SOGLIA = /2g|3g/.test(navigator.connection?.effectiveType ?? '') ? 2500 : 1250
+    // di ognuna dove sta nella pagina (su e giù, scorrimento compreso): si misura quando la si mette da parte e di nuovo
+    // solo se la finestra cambia; scorrendo bastano due confronti (misurarle tutte a ogni fotogramma, ruotate come sono,
+    // costava 2 ms a fotogramma sul telefono)
+    let lontane = [], guardo = 0, rimisura = false
+    const dove = (i) => { const r = i.getBoundingClientRect(); return { i, su: r.top + scrollY, giu: r.bottom + scrollY } }
+    const vicina = (x) => x.giu > scrollY - SOGLIA && x.su < scrollY + innerHeight + SOGLIA
+    const rimetti = ({ i }) => { i.loading = 'eager'; i.src = i.dataset.poi; i.removeAttribute('data-poi') }
+    const guarda = () => {
+      guardo = 0
+      if (rimisura) { rimisura = false; lontane = lontane.map(({ i }) => dove(i)) }
+      const ora = lontane.filter(vicina)
+      if (ora.length) { lontane = lontane.filter((x) => !ora.includes(x)); for (const x of ora) rimetti(x) }
+      if (!lontane.length) { removeEventListener('scroll', presto); removeEventListener('resize', cambia) }
+    }
+    const presto = () => { guardo ||= requestAnimationFrame(guarda) }
+    const cambia = () => { rimisura = true; presto() }
+    if (!navigator.webdriver && !root.classList.contains('scena-carico')) requestAnimationFrame(() => {
+      // (tutte quelle non ancora chieste, anche le vicine, che tornano subito senza pigrizia: lasciate al browser, quelle al
+      // confine della sua soglia potevano restare a guardare)
+      lontane = [...document.querySelectorAll('img[loading=lazy]')].filter((i) => !i.currentSrc && i.getAttribute('src')).map(dove)
+      for (const { i } of lontane) { i.dataset.poi = i.getAttribute('src'); i.removeAttribute('src') }
+      guarda()
+      if (!lontane.length) return
+      addEventListener('scroll', presto, { passive: true })
+      addEventListener('resize', cambia)
+      addEventListener('beforeprint', () => { for (const x of lontane) rimetti(x); lontane = []; guarda() })
+    })
+  }
 
   // strappare un tagliando copia il contatto
   let nota
@@ -1418,7 +1555,8 @@ html:not(.js) .chat-tasto{display:none}
   } else auguri?.remove()
 })()
 </script>
-<!-- La scena 3D (scena/): dove c'è WebGL2 (computer e telefono) la saracinesca diventa una strada vera, disegnata
+<!-- La scena 3D (scena/): quando la si sceglie (dal 23.10 è spenta: la si accende nella regia, o ?scena=1) e c'è WebGL2
+     (computer e telefono) la saracinesca diventa una strada vera, disegnata
      dalla scheda grafica con luci, ombre e riflessi; questa pagina resta sotto, invisibile, a fare tutto il resto.
      Il caricamento (dal 21.10 sera): subito il pomodoro che matura mentre la scena si prepara, col contatore sotto
      (davanti al nero e a un filo giallo, chi non lo sapeva ricaricava credendola rotta), e appena arriva, dietro, la
@@ -1481,10 +1619,10 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
 <script>
 (() => {
   const q = new URLSearchParams(location.search)
-  if (q.get('muro') !== null) return
-  if (!document.createElement('canvas').getContext('webgl2')) return
   const root = document.documentElement
-  root.classList.add('scena-carico')
+  // (l'ha deciso la testa della pagina: il 3D scelto nella regia o con ?scena=1, WebGL2, niente ?muro; se no niente
+  // pomodoro, niente anteprime, niente moduli: il muro di sempre resta leggero)
+  if (!root.classList.contains('scena-carico')) return
   const scudo = document.createElement('div'); scudo.className = 'scena-scudo'; scudo.setAttribute('aria-hidden', 'true'); document.body.appendChild(scudo)
 
   // Le anteprime dei volantini e delle altre cose fotografate (vol-lo/), della roba per terra (terra/lo/), del fronte del negozio (fronte/lo/) e degli
@@ -1515,7 +1653,7 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   // sotto la macchia non sposta niente. La luce dalla sera della pagina (--notte). Senza l'arrivo (movimento ridotto,
   // ?intro=0, la ricarica dopo un contesto perso) o in una finestra di forma che la foto non copre, niente foto: il nero.
   // window.pzkkoFotoCarico: la scena tiene il meteo della foto (il dopo pioggia) finché la foto non è sfumata
-  const FOTO = {"computer":{"v":{"giorno":"/art/scena/carico/computer-giorno.webp?v=68ed0ee8","tramonto":"/art/scena/carico/computer-tramonto.webp?v=724c0471","sera":"/art/scena/carico/computer-sera.webp?v=0b9e869e","notte":"/art/scena/carico/computer-notte.webp?v=73a28b9a"},"bw":2.209,"bh":3.3866,"hm":8.2633,"am":2.1,"forme":[0.7,2.1]},"telefono":{"v":{"giorno":"/art/scena/carico/telefono-giorno.webp?v=1415fd66","tramonto":"/art/scena/carico/telefono-tramonto.webp?v=cd9bf0f9","sera":"/art/scena/carico/telefono-sera.webp?v=2ed822a8","notte":"/art/scena/carico/telefono-notte.webp?v=66969958"},"bw":1.025,"bh":1.6784,"hm":5.9548,"am":0.5502,"forme":[0.42,0.8]}}
+  const FOTO = {"computer":{"v":{"giorno":"/art/scena/carico/computer-giorno.webp?v=f617532a","tramonto":"/art/scena/carico/computer-tramonto.webp?v=9bd9c1d9","sera":"/art/scena/carico/computer-sera.webp?v=63d5223e","notte":"/art/scena/carico/computer-notte.webp?v=6c446355"},"bw":2.209,"bh":3.3866,"hm":8.2633,"am":2.1,"forme":[0.7,2.1]},"telefono":{"v":{"giorno":"/art/scena/carico/telefono-giorno.webp?v=7effbff9","tramonto":"/art/scena/carico/telefono-tramonto.webp?v=609093c6","sera":"/art/scena/carico/telefono-sera.webp?v=45489d8f","notte":"/art/scena/carico/telefono-notte.webp?v=8718db6d"},"bw":1.025,"bh":1.6784,"hm":5.9548,"am":0.5502,"forme":[0.42,0.8]}}
   const F = FOTO?.[telefono ? 'telefono' : 'computer'], foto = carico.firstElementChild
   const nn = window.pzkkoPagina?.luci.notte ?? (parseFloat(root.style.getPropertyValue('--notte')) || 0)
   const luce = nn <= 0.001 ? 'giorno' : nn < 0.3 ? 'tramonto' : nn < 0.8 ? 'sera' : 'notte'
@@ -1633,5 +1771,7 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   import('/scena/scena.js').then((m) => m.avvia()).then(() => via(true)).catch((e) => { console.warn('scena 3D non partita, resta il muro', e); window.pzkkoTrattenute?.(); root.classList.remove('con-foto'); via(false) })
 })()
 </script>
+<!-- lo scontrino delle novità (benvenuto/): una volta per versione, a pagina caricata; ?novita lo fa rivedere -->
+<script type="module" src="/benvenuto/benvenuto.js"></script>
 </body>
 </html>

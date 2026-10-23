@@ -204,6 +204,29 @@ serio ma è un progetto Vercel a parte.
 La pagina è la saracinesca (la foto di riferimento: la serranda di un negozio
 chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
 
+- **Come parte** (23.10, «per adesso avvialo sia da telefono che da pc in 2d con
+  sempre luce sparata»): la home parte **sempre in 2D**, il muro di sempre, sul computer
+  e sul telefono, anche dove c'è WebGL2, **a mezzogiorno col sole**: niente buio, niente
+  insegna accesa, niente lampioni né auto coi fari, niente pioggia, neve, nebbia o nuvole.
+  Il resto è una scelta di chi guarda, in cima alla scheda «grafica» della regia («come
+  parte», vedi «La regia»), ricordata nel browser: **il 3D** (`localStorage` `pzkko-3d` =
+  `si`; si accende e si spegne ricaricando la pagina), **l'ora vera** di Mantova con la sera
+  e la notte (`pzkko-ora` = `vera`; se no `giorno`) e **il meteo vero** nella scena
+  (`pzkko-meteo` = `vero`; se no `sole`); l'ora e il meteo cambiano subito. Lo decide uno
+  script nella testa di `index.html` (`window.pzkkoScelte`: `scena`, `ora`, `meteo`, e
+  `tempo`, il meteo con cui parte la scena); `window.pzkkoPagina.scegli(k, v)` le cambia.
+  La luce non è il gioco: le batterie del wallet e del cercapersone (in carica dalle 19 alle 7,
+  col cavo che s'infila) seguono l'ora vera anche quando la pagina sta ferma a mezzogiorno
+  (`window.pzkkoOrologio.perGioco()`: l'ora vera se l'orologio è fermo a mezzogiorno, quella
+  della regia se lo si sposta per provare); il tomodachi chiede il meteo vero solo con
+  «meteo vero» scelto in regia.
+  Per le prove `?scena=1` accende il 3D e `?muro=1` lo spegne (comanda lui); `?ora=`,
+  `?veloce=` e `?notte=` vogliono l'ora vera come prima, `?meteo=` il suo tempo. Quando il
+  3D non è scelto la pagina non chiede niente della scena (né moduli, né pomodoro, né
+  anteprime, né `/api/meteo`) e non trattiene le illustrazioni dei volantini: provato il
+  23.10 sul server di prova, la home di partenza fa 93 richieste e 5,5 MB sul computer
+  (1300 × 860) e 67 e 3,9 MB sul telefono (390 × 844 a 3×), le stesse del vecchio
+  `?muro=1`; col 3D che partiva da solo erano 411 richieste e 17,3 MB, 393 e 15,2 MB.
 - **Il muro e l'insegna** (17.10): l'unica foto vera è la lamiera; sopra è
   tutto SVG. Il muro del palazzo è `art/intonaco.svg` (una piastrella di
   640 px: rumori `feTurbulence` che si ripetono senza giunte, la grana della
@@ -301,7 +324,9 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   fogli (`.man`), le parole sprayate `siti`, `social`, `games`, `tools` sono
   le intestazioni delle zone e gli anchor.
 - **La sera a Mantova**: la pagina calcola alba e tramonto di Mantova (calcolo
-  NOAA, al minuto, senza rete) e vive a quell'ora da qualunque posto la si
+  NOAA, al minuto, senza rete) e, con l'ora vera scelta nella regia (dal 23.10; di
+  partenza l'orologio sta fermo a mezzogiorno di Mantova, `window.pzkkoOrologio.fermo`),
+  vive a quell'ora da qualunque posto la si
   guardi. Da 40 minuti prima del tramonto cala un velo blu notte (`.buio`, in
   multiply) e la lamiera si spegne; al tramonto preciso i neon dentro le lettere si
   accendono (strobo d'accensione, poi la luce tiene); 12 minuti dopo i lampioni
@@ -312,13 +337,14 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   ogni tanto un tubo «sputa» (`--f-insegna`, `--f-lampioni`; le variabili si
   scrivono su `html` solo col muro di sempre e solo quando cambiano, e la scena 3D
   legge gli stessi valori da `window.pzkkoPagina.luci`: vedi «La regia»). Con
-  `prefers-reduced-motion` niente sfarfallio né strobo. Senza script la notte
-  segue il tema del sistema. Prove: `?ora=18:30` (ora di Mantova di oggi),
-  `?veloce=60` (il tempo corre 60 volte più in fretta), `?notte=1`.
-- **La strada di notte**: al tramonto si accende `art/insegna-notte.svg`
+  `prefers-reduced-motion` niente sfarfallio né strobo. Senza script è sempre
+  giorno (fino al 23.10 la notte seguiva il tema scuro del sistema). Prove: `?ora=18:30` (ora di Mantova di oggi),
+  `?veloce=60` (il tempo corre 60 volte più in fretta), `?notte=1`: con loro l'orologio
+  corre come prima, anche senza l'ora vera scelta.
+- **La strada di notte** (con l'ora vera): al tramonto si accende `art/insegna-notte.svg`
   (stessa tela dell'insegna: dentro ogni lettera il tubo al neon bianco
   caldo, la faccia che si scalda intorno a lui, gli elettrodi ai capi, la luce
-  sul pannello), con un alone e un cono di
+  sul pannello; dal 23.10 si scarica solo la prima volta che si accende, `data-src`), con un alone e un cono di
   luce in screen sul muro e sulla saracinesca. La condensa dei condizionatori sul tetto, fuori
   vista: la goccia cade dall'alto ogni 3–9 s sulla lamiera e lascia il rivolo;
   sulla lamiera gomme schiacciate e le scritte degli altri (`art/strada2/`:
@@ -332,6 +358,34 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
   lamiera riflette le luci: `.muro::after` è la stessa foto a contrasto alto,
   in screen, mascherata dove battono lampioni e fari. `?auto=1` fa passare
   un'auto subito. Con `prefers-reduced-motion` niente auto, gocce né formiche.
+- **Ferma quando è ferma** (23.10, «fai tutto velocissimo e super ottimizzato»): a pagina
+  ferma il filo della pagina dorme, e niente cambia d'aspetto (foto al pixel prima e dopo,
+  computer e telefono: identiche). Le mosche, quando sono tutte posate e ferme, non chiedono
+  fotogrammi fino alla prossima mossa (o al puntatore che le fa scappare); le formiche, col
+  fondo della lamiera lontano dallo schermo, stanno ferme e si riguarda ogni 0,3 s; la goccia,
+  con la cima della lamiera fuori dallo schermo, non si anima (resta il plic); il pannello a led
+  del wallet (`wallet/banner.js`) disegna solo quando cambia qualcosa; il giro dei suoni
+  (`suono/suono.js`) va con un timer a 30 al secondo e non coi fotogrammi, e il motore parte
+  dopo il primo gesto quando la pagina non scorre da 0,3 s (calcolare i rumori è mezzo secondo
+  fermo sul telefono). **Le immagini lontane**: un IntersectionObserver con qualcosa da
+  guardare, finché gira un'animazione (il tubo catodico del cercapersone non si ferma mai), fa
+  lavorare la pagina a ogni fotogramma; quello del browser per le immagini `loading=lazy`
+  guardava tutte quelle non ancora chieste. Quindi lo script le tiene da parte senza `src`
+  (`data-poi`; la scatola resta della sua misura) e le rimette quando lo scorrimento le porta a
+  1250 px dallo schermo (2500 con la rete lenta: le soglie di Chrome), senza pigrizia; le altre
+  subito. Si scaricano quando si scaricavano prima. Negli strumenti che fotografano la pagina
+  (`navigator.webdriver`) e col 3D niente. **La misura dei volantini** (`adatta`, `fette`) legge
+  tutto e poi scrive tutto (una alla volta erano ~240 impaginazioni all'apertura, 0,16 s fermi
+  sul telefono), tiene spenta la transizione dei fogli mentre li raddrizza (prima tutti si
+  giravano al loro posto in 0,32 s all'apertura, e le fette dei tagliandi a volte si misuravano a
+  metà giro) e si rifà solo se cambia la larghezza, non per la barra del telefono che va e viene.
+  Misure (23.10, Chromium senza finestra, prima/dopo sulla stessa pagina): a riposo con le
+  mosche posate il filo della pagina lavora 16 ms al secondo invece di 100 sul computer, 44
+  invece di 320–415 sul telefono (390 × 844, processore 4 volte più lento), ~9 fotogrammi al
+  secondo invece di 66; dopo un tocco, coi suoni accesi, 25 invece di 97 e 101 invece di 464;
+  sul telefono il primo disegno a 184 ms invece di 312 e il compito più lungo all'apertura 96 ms
+  invece di 154; scorrendo col dito il fotogramma più lungo della pagina 125–144 ms invece di
+  470–500.
 - **404**: generata dalla home da `tools/pzkko/genera-404.mjs`
   (`node tools/pzkko/genera-404.mjs` dalla cartella `albertopecchini.it`), da
   rilanciare dopo ogni modifica a `index.html`. Lo stesso per la storia:
@@ -344,10 +398,19 @@ più una pagina ma un posto: la stessa saracinesca coi suoi volantini, disegnata
 dalla scheda grafica con three.js come la scena di un videogioco, con luci,
 ombre e riflessi veri. `?muro=1` tiene il muro di sempre; senza WebGL2 resta
 quello, senza che la pagina se ne accorga.
+**Dal 23.10 il 3D è una scelta**: di partenza la home è il muro di sempre (vedi «Come
+parte» nella home), e la scena parte solo se la si accende nella regia («come parte», in
+cima alla scheda «grafica»: `pzkko-3d` = `si` nel browser, la pagina si ricarica) o con
+`?scena=1`. Acceso, parte **a mezzogiorno col sole** (l'orologio della pagina fermo, il
+meteo `sole`: luci «giorno», `REGIA.meteo` = `window.pzkkoScelte.tempo`), e con l'ora vera
+e il meteo vero scelti fa come prima: la sera, la notte, le auto, la pioggia di Mantova.
+Gli strumenti che fotografano o registrano la scena (`foto.mjs`, `carico.mjs`,
+`suono/ascolta.mjs strada`) la aprono con `?scena=1`.
 
 - **Il caricamento è il pomodoro** (21.10 sera; dal 20.10 era «l'arrivo», senza schermata:
   davanti al nero e a un filo giallo di 2 px chi non lo sapeva ricaricava, credendo il sito
-  rotto). Uno script nella testa di `index.html`, se il 3D partirà (WebGL2, niente `?muro`),
+  rotto). Uno script nella testa di `index.html`, se il 3D partirà (scelto o `?scena=1`, WebGL2,
+  niente `?muro`; se no non chiede niente e lo script del caricamento, in fondo, non parte),
   mette subito `html.scena-carico` (la pagina trasparente su nero: il muro non si vede
   nemmeno per un attimo) e chiede **per primi** il foglio di stile e i moduli della scena
   (`modulepreload`: chiesti in fondo alla pagina partivano dietro a tutte le sue immagini) e
@@ -371,7 +434,8 @@ quello, senza che la pagina se ne accorga.
      `tools/pzkko/scena/carico.mjs` in `art/scena/carico/` (la scena fotografata da
      lontano, poi ridotta e sfocata), per computer (forme da 0,7 a 2,1) e telefono (da 0,42
      a 0,8), quattro luci (giorno alle 13, tramonto 25 min prima del tramonto, sera 8 min
-     dopo, notte alle 22:30: la pagina sceglie da `--notte`), e scrive i numeri in `FOTO`,
+     dopo, notte alle 22:30: la pagina sceglie da `--notte`; di partenza, a mezzogiorno, il
+     giorno), col sole (dal 23.10: il tempo con cui nasce la scena; prima il dopo pioggia), e scrive i numeri in `FOTO`,
      in fondo a `index.html`; la storia ha le sue (`storia-*`), la 404 niente (`FOTO =
      null`: il nero). Fuori da quelle forme, col movimento ridotto o `?intro=0`, niente
      foto. **Da rifare quando la strada da lontano cambia** (la parete, l'insegna, la
@@ -390,8 +454,10 @@ quello, senza che la pagina se ne accorga.
      la telecamera**: la macchia copre lo schermo e lì sotto la tela compare di colpo, mentre
      la foto sfocata sfuma nella strada nitida (la messa a fuoco, 0,9 s). Dopo 0,4 s la
      macchia cola giù e sfuma in 1,1 s, piano all'inizio e poi in fretta. Per 0,3 s la
-     telecamera non si muove nemmeno se si scorre, e il meteo resta quello della foto (il
-     dopo pioggia, `tieni` in `meteo.js`): poi va verso quello vero sfumando, senza salti.
+     telecamera non si muove nemmeno se si scorre, e il meteo resta quello della foto (dal
+     23.10 il sole, `tieni` in `meteo.js`): col sole di partenza non cambia niente, col meteo
+     vero poi va verso quello di Mantova sfumando, senza salti. (Fino al 23.10 la scena nasceva
+     col dopo pioggia anche col sole scelto, e le pozze si asciugavano sotto gli occhi.)
      Col movimento ridotto niente scoppio: il pomodoro matura e sfuma. Se le immagini dello
      scoppio non sono arrivate 1,5 s dopo che il pomodoro è maturo, sfuma lo stesso;
   4. **lo zoom che finisce la risoluzione**: dopo mezzo secondo (sotto la macchia che cola)
@@ -659,7 +725,8 @@ quello, senza che la pagina se ne accorga.
   `nitida`), così il testo è netto senza tremolare.
 - **Le luci** (`luci.js`; dal 21.10 il posto è più chiaro: la luce del cielo,
   l'ambiente e l'esposizione di un terzo in più, di giorno e di notte, e la
-  lampada e i lampioni un po' più forti): il sole è dove sta davvero sopra Mantova a quest'ora
+  lampada e i lampioni un po' più forti): il sole è dove sta davvero sopra Mantova all'ora
+  dell'orologio della pagina (di partenza mezzogiorno, fermo: dal 23.10; con l'ora vera, a quest'ora)
   (lo stesso calcolo NOAA della pagina, più altezza e azimut; la facciata guarda
   a sud-sud-ovest, 200°), con le ombre; il cielo (addon `Sky`) fa da sfondo, da
   luce d'ambiente e da riflesso (PMREM, rifatto quando il sole si sposta). Di
@@ -871,8 +938,10 @@ quello, senza che la pagina se ne accorga.
   livelli dalla telecamera, e `mondo.js` le spegne il livello 1 mentre uno specchio
   disegna (prima le pozze ridisegnavano anche il chiusino, e le gocce della
   pioggia).
-- **Il meteo** (`meteo.js`, `api/meteo.mjs`): quello vero di Mantova, chiesto a
-  `/api/meteo` all'arrivo e ogni dieci minuti (la funzione lo prende da Open-Meteo,
+- **Il meteo** (`meteo.js`, `api/meteo.mjs`): dal 23.10 di partenza è **sempre sole**
+  (`REGIA.meteo` = `'sole'`) e i dati non si chiedono nemmeno; scelto il meteo vero nella
+  regia (`pzkko-meteo` = `vero`, o il tempo «vero» della scheda meteo), è quello di Mantova, chiesto a
+  `/api/meteo` da quel momento e ogni dieci minuti (la funzione lo prende da Open-Meteo,
   gratuito e senza chiave, e lo tiene dieci minuti nella cache di Vercel: Open-Meteo
   riceve una richiesta ogni dieci minuti, non una per visita). Dal codice WMO: sole,
   nuvoloso, nebbia, pioggia, temporale, neve; poi le nuvole (%), la pioggia
@@ -1406,7 +1475,16 @@ telefono dal basso, «abbassa» lo riduce alla testata) e senza velo scuro: la s
 cambia dietro mentre si regola. **A schede**, una pagina alla volta (frecce per
 passare dall'una all'altra; l'ultima aperta resta nel browser):
 
-- **grafica**: la qualità della scena 3D (auto, bassa, media, alta, ultra, su misura;
+- **grafica**, e in cima (dal 23.10) **come parte**: le scelte di chi guarda, che restano
+  nel browser, tre righe di caselle: **3D** spento / acceso (`pzkko-3d`; la pagina si
+  ricarica, al posto di «muro senza 3D» e «con il 3D» che c'erano nelle prove), **ora**
+  sempre giorno / vera (con la notte) (`pzkko-ora`) e **meteo** sempre sole / vero
+  (`pzkko-meteo`), questi due subito, senza ricaricare. Di partenza: spento, sempre giorno,
+  sempre sole (vedi «Come parte» nella home). Misurate il 23.10: sul computer i nomi a x 840
+  e le caselle a 952 come tutti gli altri controlli della scheda, sul telefono 14 e 104,
+  ogni gruppo centrato sulla sua riga, tutte le caselle su una riga sola. Le schede «ora e
+  sera» e «meteo» dicono in cima come si parte e che lì si prova soltanto. Poi
+  la qualità della scena 3D (auto, bassa, media, alta, ultra, su misura;
   vedi «Il costo» nella scena), con la riga che dice com'è adesso (il livello, i pixel
   per pixel, la tela, se «auto» è scesa e perché); i suoi pezzi uno per uno
   (risoluzione 1×, 1,5×, 2×; ombre 512–4096; riflessi spenti, bassi, medi, alti,
@@ -1429,8 +1507,9 @@ passare dall'una all'altra; l'ultima aperta resta nel browser):
   una zanzara davanti alla telecamera); le gocce più fitte o più rade, una adesso;
 - **suono**: i suoni della strada (`suono/`, sotto): acceso, il volume, e ognuno da
   provare;
-- **prove**: il muro del DOM in trasparenza (`?allinea`), rifare l'arrivo, il muro
-  senza 3D, il glTF (questi tre ricaricano la pagina), e i numeri della scheda (il
+- **prove**: il muro del DOM in trasparenza (`?allinea`), rifare l'arrivo, il glTF
+  (questi due ricaricano la pagina; il muro senza 3D, dal 23.10, è l'interruttore in cima a
+  «grafica»), e i numeri della scheda (il
   suo nome, i programmi, i disegni e i triangoli dell'ultimo passaggio, l'insieme di
   luci).
 
@@ -1440,12 +1519,17 @@ fino al valore e la fiche come pomello (la casella «auto» a sinistra, dove c'�
 seguire il valore da solo: il pomello mostra quello che segue); tastiera e lettori di
 schermo sono quelli dei controlli del browser. In fondo i numeri della scena
 (fotogrammi al secondo, l'ora, il buio, qualità e risoluzione, l'insieme di luci, il
-meteo) e «rimetti tutto» (l'ora vera, la sera col tramonto, le auto a caso, il volume,
-i ritocchi; la grafica no: è una scelta). Il resto non si salva: ricaricando torna
+meteo) e «rimetti tutto» (l'ora di partenza, mezzogiorno o quella vera, la sera col
+tramonto, le auto a caso, il volume, i ritocchi, il meteo di partenza; la grafica e «come
+parte» no: sono scelte). Il resto non si salva: ricaricando torna
 com'era, tranne l'ora e la velocità che le ricariche della regia si portano
-nell'indirizzo. Quello che comanda: `window.pzkkoPagina` (in `index.html`: l'orologio,
+nell'indirizzo, se la regia le ha cambiate (dal 23.10: prima sempre, e così `?ora=` restava
+attaccato all'indirizzo). Le ricariche mettono l'indirizzo nuovo con `history.replaceState`
+e ricaricano: assegnato a `location.href`, se cambiava solo `#regia` il browser non
+ricaricava. Quello che comanda: `window.pzkkoPagina` (in `index.html`: l'orologio,
 che dal 20.10 è uno solo anche per la scena, `window.pzkkoOrologio`; la sera forzata;
-le regole delle auto; le luci, `luci`), `window.pzkkoRegia` (i ritocchi che la scena
+le regole delle auto; le luci, `luci`; le scelte di «come parte», `scelte`, `scegli`,
+`partenza` e `rimettiOra`), `window.pzkkoRegia` (i ritocchi che la scena
 legge a ogni fotogramma, `REGIA` in `scena/materiali.js`) e `window.pzkkoScena` (la
 grafica, `grafica()` e `imposta()`; i fotogrammi al secondo, `fps()`; il portachiavi,
 `pc`; le bestie, la goccia, il meteo: `meteo` lo stato, `me.lampo()`).
@@ -1472,7 +1556,8 @@ con `#regia`, prima che il 3D ci sia), restava «senza 3D» per sempre, e «con 
 ricaricava nello stesso punto: un giro da cui si usciva solo ricaricando da zero, senza
 `#regia`. Ora, se il 3D sta arrivando (`html.scena-carico`), al posto delle parti della
 scena c'è «il 3D arriva», che diventa la grafica, il meteo, le bestie e l'acqua appena
-`window.pzkkoScena` c'è; «senza 3D» solo se il 3D non c'è davvero.
+`window.pzkkoScena` c'è; «senza 3D» solo se il 3D non c'è davvero (dal 23.10 dice se è
+spento, o acceso ma non partito: niente WebGL2, o un errore).
 
 **Il contesto perso** (21.10, `scena.js`): se la scheda grafica perde il contesto WebGL
 (un driver che si pianta, la memoria che finisce, un'altra pagina 3D), la tela restava
@@ -1490,7 +1575,10 @@ Web Audio (`voci.js`: oscillatori e rumori filtrati; le cose fatte di mille pezz
 pioggia sulla lamiera, i grilli, i tuoni e la carta, calcolate una volta in un tampone; le
 campane in un `OfflineAudioContext`), e si sente quello che c'è nella scena, da dove sta la
 telecamera, all'ora di Mantova. Sono 70 KB di codice (23 compressi), che si scaricano solo
-quando i suoni partono.
+quando i suoni partono. Dal 23.10 seguono le scelte di «come parte» (la regia): di partenza
+è mezzogiorno, fermo (il giorno, gli uccelli, il traffico di mezzogiorno; niente campane,
+che suonano solo se il tempo passa da sé), e c'è il sole (l'asfalto asciutto: senza 3D il
+bagnato è 0,15, col meteo vero 0,4 come prima; nel 3D quello della scena).
 
 - **Come parte**: il browser lascia suonare una pagina solo dopo un gesto. Al primo tocco o
   tasto (non lo scorrimento) i suoni partono sfumando, in tre secondi; il nastro «suono» in
@@ -1682,7 +1770,12 @@ no si risponde col saldo salvato e il browser si allinea. **Gli invii** fra cont
 1) si aprono 48 ore dopo la creazione del conto, così creare conti nuovi per regalarsi i loro 1.000
 non è una strada; al massimo 3 conti al giorno per IP, 8 tentativi di accesso in dieci minuti per
 nome. **Le banconote per terra** (`trova`) una volta al giorno ciascuna (il giorno di Mantova), il
-**sussidio** una volta al giorno a chi è a secco. Moderazione: `node tools/pzkko/wallet.mjs` elenca
+**sussidio** una volta al giorno a chi è a secco. **La lumachina** (23.10 sera, `chat/lumaca.mjs`, vedi il
+cercapersone) la vive il server, alla prima richiesta del giorno, dopo aver accolto il saldo del browser: sposta la sua
+percentuale dei $pzk senza passare dal controllo dei salti, ricorda le ultime 14 giornate in `c.lumaca` e ne fa una mossa
+`{ tipo: 'lumaca', n, verso, pct, g, ev }`. Il browser manda `lg`, il giorno della lumachina che il suo saldo contiene già:
+se una risposta s'è persa, le giornate che non ha visto si aggiungono al saldo che manda (né perse né raddoppiate); se
+un'azione dice di no nello stesso momento in cui la lumachina ha vissuto, la giornata si salva lo stesso. Moderazione: `node tools/pzkko/wallet.mjs` elenca
 i conti, `via <nome>` ne cancella uno (con la chiave in `.env.local`; `--locale` parla col server
 di prova); oppure il JSON dalla pagina dello store.
 
@@ -1703,13 +1796,26 @@ lcd vive il tomodachi (`chat/tomodachi.js`, la chiocciolina a pixel); il led ros
 riscuotere e **sfarfalla come la spia del disco di un PC** quando il sistema lavora (`chat/led.js`: ogni richiesta al
 server, il bot che pensa e scrive, le app che si caricano). Al clic **il cercapersone si ingrandisce** e diventa lo stesso
 cercapersone in alta qualità (`art/chat-pager-grande/pager-grande.webp`, gpt-image-2, foglio `chat-pager-grande`): il tasto
-è la stessa foto rimpicciolita con l'lcd nelle stesse quote, così l'ingrandimento è puro e non si vede il cambio; la prima
-volta lo schermo si accende con «pzk os». Alla chiusura il contrario. Niente tasti con la «×»: si chiude toccando fuori,
-con Esc, o premendo «home» quando sei già nella home.
+è la stessa foto rimpicciolita con l'lcd nelle stesse quote, così l'ingrandimento è puro e non si vede il cambio. Poi
+(23.10 sera) **la porta**: sullo schermo resta il tomodachi, a tutto schermo, e compare il tasto **ACCEDI**; premuto, la
+chiocciolina si sposta e a destra «pzk os» scrive quattro **baggianate** a caso (`BAGGIANATE` in telefono.js: «sveglio i
+criceti nella ruota del server», «soffio nella cartuccia»…) mentre la barra si riempie, e si entra. Niente tasti con la
+«×»: si chiude col **tasto rosso CHIUDI**, toccando fuori o con Esc dalla home: lo schermo **si spegne come un tubo
+catodico** (si schiaccia in una riga bianca, poi in un punto, sul vetro nero), ricompare il tomodachi che **saluta**
+(«CIAO» e il cuore, `tomodachi.saluta`) e dopo un paio di secondi il cercapersone si rimpicciolisce da solo nel tasto; un
+secondo «chiudi» mentre saluta chiude subito. Il **tasto verde INDIETRO** torna indietro di una mossa (la pagina interna
+dell'app, poi l'app di prima, poi la home) e si può premere a raffica; nella home non fa niente. La freccia in alto
+nelle app fa lo stesso. Tutto il cercapersone, come il wallet, è scritto solo in Fake Receipt. Lo schermo è un **tubo
+catodico che sfarfalla** (`games/crt.js`, come gli schermi del wallet) già sulla porta, e lo è anche lo schermino del
+cercapersone piccolo: i tre tubi (tasto, doppione che vola, schermo grande) sono «insieme», agganciati all'orologio della
+pagina, così allo zoom la banda e lo sfarfallio non saltano. Se è in carica (dalle 19 alle 7), all'apertura **il cavo
+usb-c s'inserisce**: sale da sotto la finestra inclinato, trova la porta raddrizzandosi, spinge e scatta dentro
+(`inserisciCavo` in telefono.js; la scatola `.t-cavo-scatola` taglia la punta quando entra). È l'unica animazione che
+Alberto ha voluto oltre allo zoom: niente altro deve muoversi da solo.
 
 **Il cercapersone grande** (`telefono/telefono.js` + `telefono.css`; il nome è rimasto dalla prima versione, che era un
 telefono) è orizzontale come quello piccolo. Le quote sono misurate sul disegno (1341 × 774): lo schermo va da 8,35 % a
-74,65 % in larghezza e da 24,68 % a 80,88 % in altezza; i due tasti grigi sono veri (sopra: home, sotto: indietro), il led
+74,65 % in larghezza e da 24,68 % a 80,88 % in altezza; i due tasti sono veri (sopra, rosso: chiudi; sotto, verde: indietro), il led
 è a 84,6 % / 25,6 %. Nello schermo, un palco di 760 punti ridimensionato allo schermo vero: barra di stato lcd (pzkkonet,
 ora, batteria come quella del wallet), la home (ora, saldo, sfide, l'ultima notizia dei giocatori) e le **app**, una per
 modulo in `telefono/app/`, caricate al primo uso e poi tenute montate; le icone sono adesivi disegnati (foglio `chat-app`).
@@ -1720,6 +1826,25 @@ Sul cellulare lo schermo prende tutta la finestra e i tasti diventano una barra 
   con lo scontrino. **Sfide**: le tre sfide di oggi. **Quiz**: i quiz retributivi. **Quest**: le side quest. **Giocatori**:
   il database (classifiche col podio, notizie, cerca, il tuo profilo coi rivali, i numeri della banca). **Zaino**: quello
   che hai, coi bonus in corso. **Foto**: le foto vere dei quiz. **Banca**: apre il wallet.
+
+**La salute della lumachina** (23.10 sera; `chat/lumaca.mjs` il motore, `chat/lumaca-dati.mjs` le 300 giornate,
+`chat/lumaca-avvisi.js` le notifiche, la scheda in `telefono/app/giocatori.js`): in Giocatori > **io** c'è la lumachina
+del cercapersone con la sua salute. È indipendente e non ci si può fare niente: ogni giorno di Mantova, da mezzanotte a
+mezzanotte, si sveglia con una salute (0–100 %, un decimale; per il 70 % dipende da ieri, quindi una lumachina malata
+resta malata qualche giorno) e decide lei la giornata: nera con probabilità 0,088 + 0,5 × (1 − salute), buona con
+0,112 + 0,5 × salute, neutra il 30 % (il punto e due in più alle buone compensa le nere, che nei dati tolgono in media un
+filo più di quanto diano le buone). Ogni giornata è un evento (100 negativi, 100 positivi, 100 neutri: medicine che
+spendono i tuoi soldi, visioni che fanno guadagnare o perdere, affari, disastri…) credibile con la salute di quel giorno,
+con la sua percentuale (coi decimali) dei $pzk liberi del conto. Più rare, a qualunque salute, 3 **catastrofi** e 3
+**miracoli** (0,5 % dei giorni per lato), a coppie rovesciate (−50 % e +100 %): nel lungo periodo non svuotano né gonfiano
+i conti (simulazione: dopo un anno il conto mediano resta dov'era). La giornata la decide un dado deterministico (la
+nascita del conto e il giorno): è la stessa sul server e nel browser e non si rigioca. **Il server la applica** ai conti
+(`api/wallet.mjs`, alla prima richiesta del giorno: entra, stato, salva, ogni azione, la nascita del conto), vive anche i
+giorni in cui non c'eri (al più 30), ne fa una mossa del wallet («la lumachina −2,35 %») e, per catastrofi e miracoli, una
+notizia della banca. Se ha combinato qualcosa che non hai visto, il riquadro «dalla banca» della home diventa
+**urgente** e porta a «io», l'app Giocatori e la scheda «io» hanno il pallino (il led lampeggia), e in cima a «io» c'è
+l'avviso con le giornate, il racconto e i $pzk, finché non premi «ho capito». Senza conto la lumachina c'è lo stesso (una
+per browser) ma non tocca i 1.000 della sessione: dice cosa avrebbe fatto. Gli EUR€ non li tocca mai.
 
 **La chat** (`chat/chat.js` + `chat.css`): si scrive un comando e basta (`pesca`; anche `pzk pesca` e `/pesca`). Il bot,
 **pzk** (la chiocciola della banca con gli occhiali da sole, otto umori in `art/chat-bot/`), risponde con una scheda che
@@ -1829,7 +1954,8 @@ della Cucina alla Camera di Commercio di Bologna il 17.10.1982 e rivista nel 202
   saracinesca coi fogli a pile (cinque colonne sul computer, due sul telefono),
   la sera di Mantova, le auto, le mosche, la regia, e dove c'è WebGL2 la stessa
   scena 3D con l'arrivo dalla strada, le foto del caricamento, il meteo, le
-  bestie, la vetrina. Prima era una griglia che scorreva, senza scena 3D né sera
+  bestie, la vetrina (dal 23.10, come la home, parte in 2D a mezzogiorno col sole, e
+  il resto si sceglie nella regia: le scelte sono le stesse, nello stesso browser). Prima era una griglia che scorreva, senza scena 3D né sera
   (la versione di prima non era in Git). Le pile stanno in
   `../tools/pzkko/storia/disposizione.js` (le chiavi sono gli id `#storia-…`) e
   le scrive `disponi.mjs --pagina=storia`, come per la home; il passo è 1 e i

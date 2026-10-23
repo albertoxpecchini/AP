@@ -186,7 +186,7 @@ const STRADA = {
   giorno: { q: 'ora=08:20', sec: 25 },
   notte: { q: 'ora=22:40', sec: 25, prima: 'window.pzkkoPagina.regola.ogni = 7' },
   temporale: { q: 'ora=16:00&meteo=temporale', sec: 25 },
-  tramonto: { q: '', sec: 30, prima: 'const P = window.pzkkoPagina; P.orologio.imposta(P.sole(Date.now()).tramonto - 15000)' },
+  tramonto: { q: '', sec: 30, prima: 'const P = window.pzkkoPagina; P.orologio.fermo = false; P.orologio.imposta(P.sole(Date.now()).tramonto - 15000)' },
   zanzara: { q: 'ora=11:00', sec: 10, prima: 'setTimeout(() => window.pzkkoScena.b.visita(), 500); setTimeout(() => window.pzkkoScena.b.visita(), 4500)' },
   negozio: { q: 'ora=21:30', sec: 30, mouse: true },
 }
@@ -197,7 +197,8 @@ if (modo === 'strada') {
     page.on('pageerror', (e) => console.log(`[${nome} pageerror]`, e.message))
     page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warn') console.log(`[${nome} ${m.type()}]`, m.text()) })
     await page.setViewport({ width: 1440, height: 900 })
-    await page.goto(`${base}/?suono&intro=0${s.q ? '&' + s.q : ''}`, { waitUntil: 'load', timeout: 120000 })
+    // (scena=1: dal 23.10 la home parte in 2D, il 3D si sceglie)
+    await page.goto(`${base}/?suono&intro=0&scena=1${s.q ? '&' + s.q : ''}`, { waitUntil: 'load', timeout: 120000 })
     await page.waitForFunction(() => document.documentElement.dataset.scena === 'pronta' || !document.documentElement.classList.contains('scena-carico'), { timeout: 120000 })
     // (il gesto: un tasto, poi il motore)
     await page.keyboard.press('x')

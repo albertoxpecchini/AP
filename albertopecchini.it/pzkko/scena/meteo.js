@@ -16,6 +16,10 @@
 // Open-Meteo tace) resta il dopo pioggia di sempre. La regia (regia/) può
 // scegliere il tempo e quanto è forte, ?meteo=pioggia|neve|nebbia|nuvoloso|sole|temporale
 // lo fissa per le prove.
+// Dal 23.10 si parte col sole (REGIA.meteo = 'sole', materiali.js): quello vero di Mantova lo si sceglie nella regia
+// (pzkko-meteo = vero nel browser), e solo allora si chiedono i dati. La scena nasce già col sole, il tempo delle foto
+// del caricamento (carico.mjs): così col sole non cambia niente quando la foto sfuma, e col meteo vero si va da lì verso
+// quello di Mantova (prima nasceva col dopo pioggia, e col sole le pozze si asciugavano sotto gli occhi).
 //
 // Le gocce e i fiocchi sono una mesh ciascuno, mosse tutte dallo shader (nessun
 // calcolo a fotogramma): ognuna ha il suo posto in una scatola che segue
@@ -25,8 +29,9 @@ import * as T from './lib/three.js'
 import { REGIA } from './materiali.js'
 import { BAGNO } from './acqua.js'
 
-// lo stato di adesso, ammorbidito (letto da luci.js e scena.js); bersaglio = dove va
-export const METEO = { tipo: 'sole', nuvole: 0.25, pioggia: 0, neve: 0, nebbia: 0, bagnato: 0.85, manto: 0, lampo: 0, vento: new T.Vector2(), dati: null, testo: '' }
+// lo stato di adesso, ammorbidito (letto da luci.js e scena.js); bersaglio = dove va. Si parte dal sole (scelto('sole'),
+// sotto): il tempo delle foto del caricamento
+export const METEO = { tipo: 'sole', nuvole: 0.05, pioggia: 0, neve: 0, nebbia: 0, bagnato: 0.15, manto: 0, lampo: 0, vento: new T.Vector2(0.6, 0.2), dati: null, testo: '' }
 const TIPI = ['sole', 'nuvoloso', 'nebbia', 'pioggia', 'temporale', 'neve']
 const limita = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x))
 
@@ -147,16 +152,16 @@ export function meteo(scene, camera, M, h, { quante = 1 } = {}) {
   // la telecamera vede anche il livello 1 (le gocce e i fiocchi), gli specchi e le ombre no
   camera.layers.enable(1)
 
-  // i dati: all'arrivo e ogni dieci minuti
+  // i dati: col meteo vero (non scelto, sotto), dalla prima volta e poi ogni dieci minuti; col sole di sempre niente
   // (con la barra in fondo: senza, su Vercel, trailingSlash di vercel.json risponde prima con un 308)
   const chiedi = () => fetch('/api/meteo/', { headers: { accept: 'application/json' } })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => { if (d && d.codice !== undefined) METEO.dati = d })
     .catch(() => {})
-  chiedi()
-  setInterval(chiedi, 10 * 60 * 1000)
+  let chiesti = false
+  const servono = () => { if (chiesti) return; chiesti = true; chiedi(); setInterval(chiedi, 10 * 60 * 1000) }
 
-  let prossimoLampo = 0, lampoT = -1, lampi = [], fonte = null, bersaglio = DOPO_PIOGGIA, salta = false, tenuto = false
+  let prossimoLampo = 0, lampoT = -1, lampi = [], fonte = null, bersaglio = scelto('sole', 0), salta = false, tenuto = false
   const inizio = performance.now()
   const TINTA = { pioggia: new T.Color(0.78, 0.82, 0.88), neve: new T.Color(1, 1, 1) }
   // (e il suo tuono, suono/suono.js: arriva dopo, tanto più tardi quanto è lontano)
@@ -167,6 +172,7 @@ export function meteo(scene, camera, M, h, { quante = 1 } = {}) {
     // il bersaglio: la regia, poi ?meteo=, poi i dati, se no il dopo pioggia
     // (si rifà solo quando cambia da dove viene: i dati nuovi, un altro tempo o un'altra intensità dalla regia)
     const forzato = REGIA.meteo ?? (TIPI.includes(q.get('meteo')) ? q.get('meteo') : null)
+    if (!forzato) servono()
     const ora = forzato ? `${forzato}:${REGIA.intensita}` : METEO.dati ?? DOPO_PIOGGIA
     // (ctx.tieni: c'è sopra la foto del caricamento, fatta col dopo pioggia: si resta lì, così quando sfuma la scena sotto è
     // identica; poi si va verso il tempo vero sfumando, senza il salto dei primi secondi)
@@ -184,7 +190,7 @@ export function meteo(scene, camera, M, h, { quante = 1 } = {}) {
     METEO.manto += ((REGIA.manto ?? b.manto) - METEO.manto) * kl
     METEO.vento.lerp(b.vento, k)
     const d = METEO.dati
-    METEO.testo = forzato ? `${NOMI[b.tipo]} (scelto)` : d ? `${NOMI[b.tipo]}, ${Math.round(d.temperatura)}° a mantova` : 'dopo la pioggia (senza dati)'
+    METEO.testo = forzato ? `${NOMI[b.tipo]} (${forzato === 'sole' && REGIA.meteo === window.pzkkoScelte?.tempo ? 'sempre' : 'scelto'})` : d ? `${NOMI[b.tipo]}, ${Math.round(d.temperatura)}° a mantova` : 'dopo la pioggia (senza dati)'
 
     // i lampi del temporale: ogni 4-14 secondi, due o tre colpi
     if (b.temporale && now > prossimoLampo) { fulmine(now); prossimoLampo = now + 4000 + Math.random() * 10000 }

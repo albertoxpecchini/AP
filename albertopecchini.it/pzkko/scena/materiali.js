@@ -290,8 +290,9 @@ export const REGIA = (window.pzkkoRegia ??= {
   esposizione: 1, bagliore: 1, neon: 1, specchi: true, vetrina: true,
   bestie: { formiche: true, mosche: true, zanzare: true, blatte: true }, blatteDiGiorno: false, velocitaBestie: 1, goccia: 1,
   // il meteo (meteo.js): null = quello vero di Mantova, o uno scelto (sole, nuvoloso, nebbia, pioggia, temporale, neve)
-  // con la sua intensità; il bagnato e la neve per terra (null = col meteo)
-  meteo: null, intensita: 0.6, bagnato: null, manto: null,
+  // con la sua intensità; il bagnato e la neve per terra (null = col meteo). Dal 23.10 si parte col sole, se nella regia
+  // non si è scelto il meteo vero (window.pzkkoScelte.tempo, nella testa di index.html; ?meteo= per le prove)
+  meteo: window.pzkkoScelte ? window.pzkkoScelte.tempo : null, intensita: 0.6, bagnato: null, manto: null,
 })
 
 // la facciata sta 10 cm più avanti della saracinesca (z = 0)

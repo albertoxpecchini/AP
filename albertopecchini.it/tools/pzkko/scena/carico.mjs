@@ -12,7 +12,7 @@
 // al centro. Quattro luci (giorno, tramonto, sera, notte: la pagina sceglie da --notte), per computer e telefono; la foto
 // si scatta alta `altezza` e si riduce a `sfocata` px con la sfocatura `sigma` (in pixel della ridotta: abbastanza
 // perché, ingrandita 7–8 volte sullo schermo, resti morbida). WebP senza perdita: quello normale, ingrandito così, era
-// tutto a quadretti. Col meteo di partenza della scena (il dopo pioggia), che la scena
+// tutto a quadretti. Col meteo di partenza della scena (dal 23.10 il sole; prima il dopo pioggia), che la scena
 // tiene finché la foto non è sfumata.
 //
 //   node tools/pzkko/scena/carico.mjs [--pagina=home|storia]     (dalla cartella albertopecchini.it)
@@ -92,7 +92,8 @@ export async function carico({ log = console.log, pagine = Object.keys(PAGINE) }
           const pw = Math.round(alt * am), dpr = disp === 'telefono' ? Math.ceil(pw / 880) : 1
           await pagina.setViewport({ width: Math.round(pw / dpr), height: Math.round(alt / dpr), deviceScaleFactor: dpr, isMobile: disp === 'telefono', hasTouch: disp === 'telefono' })
           await pagina.evaluateOnNewDocument((css) => document.addEventListener('DOMContentLoaded', () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s) }), STILE)
-          const q = new URLSearchParams({ ora, carico: 'foto', qualita: D.qualita, dpr: String(dpr), ...(hm ? { finestra: hm.toFixed(4) } : {}) })
+          // (scena=1: dal 23.10 la home parte in 2D, il 3D si sceglie)
+          const q = new URLSearchParams({ scena: '1', ora, carico: 'foto', qualita: D.qualita, dpr: String(dpr), ...(hm ? { finestra: hm.toFixed(4) } : {}) })
           await pagina.goto(`${base}${P.percorso.slice(1)}?${q}`, { waitUntil: 'domcontentloaded', timeout: 120000 })
           await pagina.waitForSelector('html.scena-vista', { timeout: 90000 })
           await new Promise((r) => setTimeout(r, 600))

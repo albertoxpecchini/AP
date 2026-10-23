@@ -119,7 +119,7 @@ export function banner(bottone, { batteria }) {
   // le misure: il pannello è alto dieci led e largo quanti ne entrano; i led spenti e i colori si preparano una volta, e
   // di nuovo solo quando il pannello cambia grandezza (leggere le misure a ogni fotogramma costringerebbe la pagina a
   // ricalcolare l'impaginazione)
-  new ResizeObserver(() => { rimisura = true }).observe(tela)
+  new ResizeObserver(() => { rimisura = true; sveglia() }).observe(tela)
   const misura = () => {
     if (!rimisura) return W > 0
     rimisura = false
@@ -239,6 +239,7 @@ export function banner(bottone, { batteria }) {
   pzk.ascolta((s) => {
     etichetta(s)
     fermo = false
+    sveglia()
     if (RIDOTTO.matches || Math.abs(s - (flash?.a ?? mostrato)) < 0.25) { if (!flash) mostrato = s; return }
     const ora = performance.now()
     flash = { da: flash ? adesso(ora) : mostrato, a: s, t0: ora }
@@ -275,27 +276,34 @@ export function banner(bottone, { batteria }) {
     nastro = importo(mostrato).concat(vuoto([], 2)); vuoto(nastro, 5); scrivi(nastro, '◆', 'a', true); vuoto(nastro, 6)
     prossima = 1; pos = 0; acc = 0; ultimo = -1 // il saldo è già lì: si parte dalla voce dopo
     pagina = 1; cambioPagina = 0; pagine = null
+    sveglia()
   }
-  const smetti = () => { if (scorre) { scorre = false; fermo = false } }
+  const smetti = () => { if (scorre) { scorre = false; fermo = false; sveglia() } }
   bottone.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') parti() })
   bottone.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'touch') smetti() })
   bottone.addEventListener('focus', () => { if (bottone.matches(':focus-visible')) parti() })
   bottone.addEventListener('blur', smetti)
 
-  // ── il motore: requestAnimationFrame (si ferma da solo quando la pagina non si vede), un disegno a ogni scatto ──
-  let nastro = [], pos = 0, acc = 0, prima = 0, ultimo = -1
+  // ── il motore: requestAnimationFrame (si ferma da solo quando la pagina non si vede), un disegno a ogni scatto. Gira
+  // solo finché c'è qualcosa da muovere (il nastro, il lampo del saldo); col saldo fermo dorme e non chiede fotogrammi, e
+  // lo svegliano il saldo che cambia, il cursore, il fuoco e la tela che cambia misura (fino al 23.10 girava sempre, anche
+  // per non disegnare niente) ──
+  let nastro = [], pos = 0, acc = 0, prima = 0, ultimo = -1, va = false
+  function sveglia() { if (!va) { va = true; prima = 0; requestAnimationFrame(passo) } } // da fuori, dopo un sonno
+  const ancora = () => { va = true; requestAnimationFrame(passo) } // da dentro: il fotogramma dopo
   const riempi = () => {
     if (pos > 4000) { nastro = nastro.slice(pos); pos = 0 }
     while (nastro.length < pos + vis + 2) aggiungi(nastro)
   }
-  const passo = (ora) => {
-    requestAnimationFrame(passo)
+  function passo(ora) {
+    va = false
     const dt = Math.min(200, prima ? ora - prima : 0)
     prima = ora
-    if (!misura()) return
-    if (flash && disegnaFlash(ora)) { ultimo = -1; return }
+    if (!misura()) return // (la tela senza misura: la sveglia il ResizeObserver)
+    if (flash && disegnaFlash(ora)) { ultimo = -1; return ancora() }
     if (!scorre) { if (!fermo) { disegna(importo(mostrato)); fermo = true } return } // il saldo, fermo: si ridisegna solo quando cambia
     fermo = false
+    ancora()
     if (RIDOTTO.matches) { disegnaPagina(ora); ultimo = -1; return }
     pagine = null
     acc += (dt * VEL) / 1000
@@ -306,8 +314,8 @@ export function banner(bottone, { batteria }) {
     disegna(nastro, pos)
     ultimo = pos
   }
-  requestAnimationFrame(passo)
-  addEventListener('resize', () => { rimisura = true }) // anche il devicePixelRatio (lo zoom) cambia la tela
+  sveglia()
+  addEventListener('resize', () => { rimisura = true; sveglia() }) // anche il devicePixelRatio (lo zoom) cambia la tela
 
   // la banconota raccolta per terra: il suo valore vola via dal tasto (e il saldo che cambia lo dice anche il pannello)
   const piu = document.createElement('span')

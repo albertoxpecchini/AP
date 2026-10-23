@@ -35,7 +35,8 @@ const server = createServer(async (req, res) => {
   catch { res.statusCode = 404; res.end() }
 })
 await new Promise((r) => server.listen(0, '127.0.0.1', r))
-const url = `http://127.0.0.1:${server.address().port}${pagina}?ora=${ora}${extra ? '&' + extra : ''}`
+// (scena=1: dal 23.10 la home parte in 2D, il 3D si sceglie)
+const url = `http://127.0.0.1:${server.address().port}${pagina}?scena=1&ora=${ora}${extra ? '&' + extra : ''}`
 // il browser: --chrome=<exe> o la variabile CHROME; se no il Chromium di Playwright, se no Edge (../browser.mjs)
 const exe = browser.eseguibile()
 // --libero: senza il ritmo dello schermo (vsync), così i fotogrammi al secondo sono quelli veri e non 60 o 30
