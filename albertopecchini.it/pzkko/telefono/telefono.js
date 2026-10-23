@@ -32,6 +32,7 @@ import * as tomodachi from '../chat/tomodachi.js'
 import { icona } from '../chat/icone.js'
 import * as led from '../chat/led.js'
 import { tubo, allinea } from '../games/crt.js'
+import { tieni, ricordo, ricorda } from './ricordi.js'
 
 const CREPE = '/art/chat-pager-crepe/crepe.webp', CREPE_PICCOLA = '/art/chat-pager-crepe/crepe-piccola.webp' // il vetro rotto del cercapersone scassato (la piccola è quella del tasto, chat.js)
 
@@ -52,6 +53,8 @@ export const APP = [
   { id: 'missioni', nome: 'quest', icona: 'app-quest', carica: () => import('./app/missioni.js'), badge: () => import('../chat/missioni.js').then((m) => m.pronte()) },
   { id: 'giocatori', nome: 'giocatori', icona: 'app-giocatori', carica: () => import('./app/giocatori.js'), badge: () => import('../chat/lumaca-avvisi.js').then((m) => m.daVedere().length) }, // la lumachina ha combinato qualcosa
   { id: 'zaino', nome: 'zaino', icona: 'app-zaino', carica: () => import('./app/zaino.js') },
+  // la miniera (23.10): il pallino quando la memoria è piena (la postazione non mina più finché non incassi)
+  { id: 'miniera', nome: 'miniera', icona: 'app-miniera', carica: () => import('./app/miniera.js'), badge: () => import('../chat/miniera.js').then((m) => (m.piena?.() ? 1 : 0)).catch(() => 0) },
   { id: 'foto', nome: 'foto', icona: 'app-foto', carica: () => import('./app/foto.js') },
   // virtual (23.10 sera): le scommesse sul calcio inventato, la stessa partita e la stessa schedina del gioco grande; il
   // pallino: le vincite non ancora viste, o le scommesse aperte sulla partita che sta per chiudere (meno di un minuto)
@@ -149,6 +152,7 @@ function costruisci() {
   palco = dlg.querySelector('.t-palco')
   vista = dlg.querySelector('.t-vista')
   homeEl = dlg.querySelector('.t-home')
+  tieni(homeEl, 'home') // la home si ridisegna a ogni cambio dello zaino: resta dov'è (telefono/ricordi.js)
   tostoEl = dlg.querySelector('.t-toast')
   statoEl = dlg.querySelector('.t-stato')
   ledEl = dlg.querySelector('.t-led')
@@ -227,7 +231,7 @@ async function disegnaHome() {
     <div class="t-h-sx">
       <div class="t-w-ora"><b>${ora()}</b><span>${d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</span></div>
       <div class="t-widget">
-        <button class="t-w t-w-saldo" type="button" data-app="banca"><small>saldo</small><b class="pzk">${pzk.fmt(pzk.saldo())} $pzk</b>${e >= 0.01 ? `<span class="eur">EUR€ ${pzk.fmtEur(e)}</span>` : ''}<div class="t-xp"><i style="width:${pct}%"></i></div><small>livello ${liv} · ${xp - da}/${a - da} xp</small></button>
+        <button class="t-w t-w-saldo" type="button" data-app="banca"><small>saldo</small><b class="pzk" title="${pzk.fmt(pzk.saldo())} $pzk">${pzk.fmtCorto(pzk.saldo())} $pzk</b>${e >= 0.01 ? `<span class="eur">EUR€ ${pzk.fmtEur(e)}</span>` : ''}<div class="t-xp"><i style="width:${pct}%"></i></div><small>livello ${liv} · ${xp - da}/${a - da} xp</small></button>
         <button class="t-w t-w-sfide" type="button" data-app="sfide"><small>sfide di oggi</small><b>${o.sfide.filter((x) => x.riscossa).length}/3</b><div class="t-pips">${o.sfide.map((x) => `<i class="${x.riscossa ? 'fatta' : x.pronta ? 'pronta' : ''}"></i>`).join('')}</div><small>${o.sfide.some((x) => x.pronta) ? 'da riscuotere!' : o.tutte ? 'tutte fatte' : 'da fare'}</small></button>
       </div>
       <button class="t-w t-w-notizie" type="button" data-app="giocatori" data-tab="notizie"><small>dalla banca</small><div class="t-notizia">…</div></button>
@@ -463,7 +467,10 @@ async function accedi() {
   try { await carica(mio) } finally { led.finisci() }
   if (mio !== giro || !dlg.open) return // chiuso durante il caricamento
   dentro = true
-  const a = attesa
+  // l'app chiesta da chi ha aperto vince; se nessuno ne chiede una, si torna a quella che era aperta l'ultima volta
+  // (Alberto, 23.10: «memorizza sempre le azioni»; da scassato solo la chat)
+  const ultima = ricordo('cercapersone', { app: null }).app
+  const a = attesa ?? (ultima && APP.some((x) => x.id === ultima) && (!zaino.pagerRotto() || ultima === 'chat') ? { app: ultima, opz: {} } : null)
   attesa = null
   if (a?.app) await vai(a.app, a.opz)
   else home()
@@ -565,6 +572,7 @@ export function home({ subito = false } = {}) {
   if (!dlg) return
   const prima = corrente
   corrente = null
+  if (dentro) ricorda('cercapersone', { app: null }) // solo se ci torni tu: all'apertura la home si prepara sotto la porta
   storia.length = 0
   for (const { host, ist } of montate.values()) { if (!host.hidden) ist?.nascondi?.(); host.hidden = true; host.classList.remove('entra') }
   homeEl.hidden = false
@@ -619,6 +627,7 @@ export async function vai(id, opz = {}) {
   for (const [k, x] of montate) if (k !== id && !x.host.hidden) { x.ist?.nascondi?.(); x.host.hidden = true }
   homeEl.hidden = true
   corrente = id
+  ricorda('cercapersone', { app: id }) // riaprendo il cercapersone si torna qui
   schermo.dataset.in = id
   m.host.hidden = false
   m.host.classList.remove('entra')

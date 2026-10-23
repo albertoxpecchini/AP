@@ -6,6 +6,7 @@ import * as zaino from '../../chat/zaino.js'
 import * as sfide from '../../chat/sfide.js'
 import { icona } from '../../chat/icone.js'
 import { fmt } from '../../games/pzk.js'
+import { tieni } from '../ricordi.js'
 
 // dove si fa ogni sfida: [app, comando per la chat]
 const DOVE = { pesca: ['chat', 'pesca'], caccia: ['chat', 'caccia'], scava: ['chat', 'scava'], comandi: ['chat', 'aiuto'], guadagna: ['chat', 'lavora'], vinci: ['chat', 'slot 20'], compra: ['negozio'], quiz: ['quiz'], lavora: ['chat', 'lavora'], missione: ['missioni'] }
@@ -64,6 +65,7 @@ function clic(e) {
 
 export function monta(h, c) {
   host = h; ctx = c
+  tieni(host, 'sfide') // riscuotendo la lista resta dov'è (telefono/ricordi.js)
   host.addEventListener('click', clic)
   zaino.ascolta(() => { if (!host.hidden) disegna() })
   disegna()

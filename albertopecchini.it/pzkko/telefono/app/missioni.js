@@ -7,6 +7,7 @@ import * as missioni from '../../chat/missioni.js'
 import { PER_ID as OGGETTI, nomeDi } from '../../chat/testi.js'
 import { icona } from '../../chat/icone.js'
 import { fmt } from '../../games/pzk.js'
+import { tieni, ricordo, ricorda } from '../ricordi.js'
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const STATI = { pronta: ['da fare', 'verde'], 'in corso': ['in corso', 'ambra'], fatta: ['finita', 'grigio'], bloccata: ['bloccata', 'rosso'] }
@@ -16,6 +17,7 @@ const premio = (p) => `<span class="pzk">+${fmt(p.pzk)} $pzk</span> · +${p.xp} 
 
 function elenco() {
   aperta = null
+  ricorda('missioni', { aperta })
   const el = missioni.elenco()
   host.innerHTML = `${ctx.testata('Quest')}
     <div class="t-corpo-app t-mi">
@@ -35,6 +37,7 @@ function elenco() {
 
 function pagina(id, esito = null) {
   aperta = id
+  ricorda('missioni', { aperta }) // la storia aperta si ricorda: riaprendo l'app (o la pagina) si torna lì
   const v = missioni.vista(id)
   const m = v.m
   const avviso = esito ? [esito.speso ? `hai pagato ${esito.speso} $pzk` : '', esito.perso ? `hai perso ${esito.perso} $pzk` : '', esito.consumato ? `hai usato ${nomeDi(esito.consumato)}` : '', esito.caso === 'ko' ? 'non è andata bene…' : esito.caso === 'ok' ? 'è andata!' : ''].filter(Boolean) : []
@@ -86,9 +89,13 @@ function clic(e) {
 
 export function monta(h, c) {
   host = h; ctx = c
+  tieni(host, 'missioni')
   host.addEventListener('click', clic)
   host.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click() } })
   host.addEventListener('click', (e) => { if (e.target.closest('.t-indietro') && aperta) { e.stopPropagation(); clearInterval(scrittura); elenco() } }, true)
-  elenco()
+  // si torna alla storia che era aperta, se è ancora in corso (telefono/ricordi.js); se no l'elenco
+  const prima = ricordo('missioni', { aperta: null }).aperta
+  if (prima && missioni.elenco().some((m) => m.id === prima && m.stato === 'in corso')) pagina(prima)
+  else elenco()
   return { mostra: () => (aperta ? pagina(aperta) : elenco()), nascondi: () => clearInterval(scrittura) }
 }

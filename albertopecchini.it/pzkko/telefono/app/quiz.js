@@ -8,6 +8,7 @@ import * as zaino from '../../chat/zaino.js'
 import * as quiz from '../../chat/quiz.js'
 import { icona } from '../../chat/icone.js'
 import { fmt } from '../../games/pzk.js'
+import { tieni } from '../ricordi.js'
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const NOMI = ['', 'facile', 'media', 'difficile']
@@ -132,6 +133,7 @@ function clic(e) {
 
 export function monta(h, c) {
   host = h; ctx = c
+  tieni(host, 'quiz') // gli argomenti e il riepilogo restano dove li lasci (telefono/ricordi.js)
   host.addEventListener('click', clic)
   // la freccia indietro durante una partita torna all'ingresso (e la partita si perde), dall'ingresso alla home
   host.addEventListener('click', (e) => { if (e.target.closest('.t-indietro') && P) { e.stopPropagation(); clearInterval(timer); ingresso() } }, true)

@@ -13,6 +13,7 @@
 import * as pzk from '../games/pzk.js'
 import { banner } from './banner.js'
 import { tubo } from '../games/crt.js'
+import { tieni, riporta, ricordo, ricorda } from '../telefono/ricordi.js'
 
 const IMM = { w: 1214, h: 559 } // la foto del portafoglio: le misure degli schermi sono in percentuale di lei
 const POS = {
@@ -257,7 +258,8 @@ function mosca(tasca) {
 
 // ── il portafoglio aperto ──
 let dlg = null, S = null // S: gli elementi e lo stato
-let borsaDati = null, periodo = 0, borsaTimer = 0
+let borsaDati = null, borsaTimer = 0
+let periodo = Math.min(PERIODI.length - 1, Math.max(0, ricordo('wallet-borsa', { periodo: 0 }).periodo | 0)) // il periodo del pomello si ricorda (telefono/ricordi.js)
 function costruisci() {
   dlg = el('dialog', 'wallet')
   dlg.setAttribute('aria-label', 'wallet $pzk')
@@ -285,6 +287,8 @@ function costruisci() {
     grafico: q(dlg, '.w-grafico'), tasso: q(dlg, '.w-tasso'), var: q(dlg, '.w-var'), periodo: q(dlg, '.w-periodo'), info: q(dlg, '.w-info'), carta: q(dlg, '.w-pagina'), borsaEl: q(dlg, '.w-borsa'), voce: q(dlg, '.w-voce'), manopola: q(dlg, '.w-manopola'),
     tasti: [...dlg.querySelectorAll('.w-tasto')], sezione: null,
   }
+  // ogni pagina ricorda il suo punto, anche quello della lista delle mosse (telefono/ricordi.js; Alberto, 23.10: niente salti in cima)
+  tieni(S.carta, 'wallet', { vista: () => S.carta.dataset.sezione ?? '' })
   // niente tasto per chiudere: si tocca fuori dal portafoglio (o Esc)
   // l'anello giallo del fuoco serve a chi usa la tastiera: dopo un clic col mouse si spegne, al primo tasto premuto torna
   dlg.addEventListener('pointerdown', () => dlg.classList.add('mouse'))
@@ -297,7 +301,7 @@ function costruisci() {
   const giro = () => S.manopola.style.setProperty('--giro', `${-45 + scatti * (360 / PERIODI.length)}deg`)
   let scatti = periodo
   giro()
-  S.manopola.addEventListener('click', () => { periodo = (periodo + 1) % PERIODI.length; scatti++; giro(); borsa(true) })
+  S.manopola.addEventListener('click', () => { periodo = (periodo + 1) % PERIODI.length; ricorda('wallet-borsa', { periodo }); scatti++; giro(); borsa(true) })
   pzk.osserva(aggiorna)
   addEventListener('resize', () => { if (dlg.open) { aggiorna(); disegnaBorsa() } })
   setInterval(() => { if (dlg.open) aggiornaBatteria() }, 30000)
@@ -358,12 +362,13 @@ function disegnaBorsa() {
 // il portafoglio: si lavora solo dagli schermini. (La funzione si chiama ancora carta(): era la carta che si sfilava.)
 function mostra(sezione) {
   S.sezione = sezione
+  ricorda('wallet', { sezione }) // riaprendo il wallet (anche dopo il ricaricamento) si torna su questa pagina
   for (const t of S.tasti) t.setAttribute('aria-pressed', String(t.dataset.s === sezione))
   S.borsaEl.classList.toggle('in-pagina', !!sezione)
   if (!sezione) { S.carta.hidden = true; disegnaBorsa(); return }
   carta(sezione)
   S.carta.hidden = false
-  S.carta.scrollTop = 0
+  riporta(S.carta) // la pagina torna dove l'avevi lasciata (la prima volta dall'alto)
 }
 function carta(sezione, soloDati = false) {
   const c = pzk.conto(), K = S.carta
@@ -553,6 +558,7 @@ export function apri(sezione = null) {
   clearInterval(borsaTimer); borsaTimer = setInterval(() => { if (dlg.open) borsa(true) }, 60000)
   if (sezione) mostra(sezione === 'converti' ? 'cambio' : sezione === 'entra' ? 'conto' : sezione)
   else if (!pzk.conto() && !sessionStorage.getItem('pzkko-wallet-visto')) { mostra('conto'); try { sessionStorage.setItem('pzkko-wallet-visto', '1') } catch {} }
+  else if (!S.sezione) { const r = ricordo('wallet', { sezione: null }).sezione; if (r) mostra(r) } // la pagina aperta l'ultima volta
   if (sezione === 'converti' && pzk.conto()?.eur >= 0.01) voce(`hai ${fmtEur(pzk.euro())} EUR€: convertili per giocare`)
 }
 export function chiudi() {

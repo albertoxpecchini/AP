@@ -14,6 +14,7 @@ import { stemmaSVG } from '../../games/virtual/squadre.js'
 import { Schermo } from '../../games/virtual/schermo.js'
 import * as SC from '../../games/virtual/schedina.js'
 import { icona } from '../../chat/icone.js'
+import { tieni } from '../ricordi.js'
 
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const fmt = pzk.fmt, fmtQuota = SC.fmtQuota
@@ -51,7 +52,7 @@ function disegna() {
           <div class="t-vi-ou">${ordine.filter((p) => p.id.length > 1).map(quota).join('')}</div>
         </div>
         <div class="t-vi-banco">
-          <div class="t-vi-saldo"><small>hai</small><b class="pzk">${fmt(pzk.saldo())} $pzk</b><small class="t-vi-sul"></small></div>
+          <div class="t-vi-saldo"><small>hai</small><b class="pzk">${pzk.fmtCorto(pzk.saldo())} $pzk</b><small class="t-vi-sul"></small></div>
           <div class="t-vi-fiches" role="group" aria-label="scegli la fiche">${pzk.FICHES.map((v) => `<button type="button" data-f="${v}" aria-pressed="${v === SC.S.fiche}" ${aperte ? '' : 'disabled'} aria-label="fiche da ${v}"><img src="/art/fiches/f${v}.webp" alt="" width="170" height="174"></button>`).join('')}</div>
           <button class="c-b nero t-vi-togli" type="button" data-togli ${aperte ? '' : 'disabled'}>togli</button>
         </div>
@@ -80,7 +81,7 @@ function pile() {
 }
 function banco() {
   if (!el.saldo) return
-  el.saldo.textContent = `${fmt(pzk.saldo())} $pzk`
+  el.saldo.textContent = `${pzk.fmtCorto(pzk.saldo())} $pzk` // (il riquadro è stretto: i numeri corti, games/pzk.js)
   const sul = SC.sulTavolo(corrente.indice)
   el.sul.textContent = sul ? `sulla partita: ${fmt(sul)}` : ''
   for (const b of host.querySelectorAll('[data-f]')) b.setAttribute('aria-pressed', String(Number(b.dataset.f) === SC.S.fiche))
@@ -202,6 +203,7 @@ export function monta(h, c) {
   new ResizeObserver(() => { if (!host.hidden) misura() }).observe(host)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) sveglia() })
   disegna()
+  tieni(host, 'virtual') // la schedina resta dov'era quando si ridisegna (telefono/ricordi.js)
   return {
     mostra: () => { aperta = true; aggiorna(); SC.viste(); sveglia() }, // (prima si pagano le partite finite, poi gli esiti sono «visti»: il pallino si spegne)
     nascondi: () => { aperta = false; cancelAnimationFrame(raf); raf = 0 },

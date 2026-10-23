@@ -126,6 +126,17 @@ export function inFiches(importo) {
 /** I $pzk come si scrivono: 1.250 o 7,5. Gli EUR€: 1.250,00. */
 export const fmt = (n) => n.toLocaleString('it-IT', { maximumFractionDigits: 1 })
 export const fmtEur = (n) => n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+/** I numeri corti per i riquadri stretti (Alberto, 23.10: «13.332,5» non ci stava): 999, 1,0K, 13,3K, 1,0M, 1,0B, 1,0T.
+ *  Un decimale sempre; se arrotondando si arriva a mille si passa all'unità dopo (999.960 → 1,0M, non 1.000,0K). */
+export function fmtCorto(n) {
+  const a = Math.abs(Number(n) || 0), meno = n < 0 ? '−' : ''
+  if (a < 1000) return meno + fmt(a)
+  const U = [['K', 1e3], ['M', 1e6], ['B', 1e9], ['T', 1e12]]
+  let i = U.findLastIndex(([, v]) => a >= v)
+  let x = Math.round((a / U[i][1]) * 10) / 10
+  if (x >= 1000 && i < U.length - 1) { i++; x = Math.round((a / U[i][1]) * 10) / 10 }
+  return meno + x.toLocaleString('it-IT', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + U[i][0]
+}
 
 // ── il conto ─────────────────────────────────────────────────────────────────
 /** Il conto, come lo vede il wallet ({ nome, ind, pzk, eur, ig, trovati, invii, mosse… }), o null (la sessione). */

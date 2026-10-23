@@ -1949,6 +1949,19 @@ Sul cellulare lo schermo prende tutta la finestra e i tasti diventano una barra 
   davanti alla porta col fischietto, sul verde): da rigenerare con gpt-image-2 come le altre, `node tools/pzkko/immagini.mjs
   genera chat-app2` (il prompt è nel foglio `chat-app2` di `tools/pzkko/fogli-chat.js`). **Banca**: apre il wallet.
 
+**La miniera** (23.10; app `telefono/app/miniera.js`, regole `chat/miniera.js`, catalogo `chat/miniera-dati.mjs`, disegni
+`chat/miniera-pixel.js`): si minano $pzk col PC, ma prima bisogna comprare i pezzi e farsi la postazione. Dodici posti
+(tavolo, sedia, case, processore, schede video, ram, ventole, led, memoria, schermi, tastiera, mouse), 75 pezzi su cinque
+livelli e otto PC pronti, dal «muletto» da 808 $pzk (16 $pzk/ora) alla «centrale» da 366.080 (1.476 $pzk/ora). Tutto si
+incastra: il case sta sul tavolo se è abbastanza largo, le schede lunghe solo nei case che le tengono, gli schermi quanti ne
+porta il tavolo; il calore delle schede contro le ventole fa la temperatura, e sopra gli 80 °C il PC rallenta; la sedia, il
+tavolo, la ram, la memoria, i led, gli schermi, la tastiera e il mouse moltiplicano (la sedia fino a +30 %). Produce anche a
+pagina chiusa, fino a quante ore tiene la memoria (al più 12: un incasso non supera i 18.000 $pzk, sotto il controllo dei
+salti del server); il pallino sull'icona quando la memoria è piena. I disegni sono pixel art piatta disegnata in codice
+(come il tomodachi), su una griglia fissa, perché ogni pezzo si combini con tutti gli altri al pixel; le tele si scalano per
+multipli interi dei pixel veri. Lo stato sta nello zaino (`Z.miniera`). **I numeri corti** (`fmtCorto` in games/pzk.js:
+999, 1,0K, 13,3K, 1,0M, 1,0B, 1,0T) nei riquadri stretti: il saldo della home, i numeri dei Giocatori, classifiche e podi.
+
 **La salute della lumachina** (23.10 sera; `chat/lumaca.mjs` il motore, `chat/lumaca-dati.mjs` le 300 giornate,
 `chat/lumaca-avvisi.js` le notifiche, la scheda in `telefono/app/giocatori.js`): in Giocatori > **io** c'è la lumachina
 del cercapersone con la sua salute. È indipendente e non ci si può fare niente: ogni giorno di Mantova, da mezzanotte a
