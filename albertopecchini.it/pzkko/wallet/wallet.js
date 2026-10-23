@@ -194,6 +194,29 @@ export function prepara(bottone) {
   document.addEventListener('pzkko-banconota', (e) => { piu.textContent = `+${fmt(e.detail.valore)} $pzk`; piu.classList.remove('va'); void piu.offsetWidth; piu.classList.add('va') })
 }
 
+// ── il pomello del periodo (23.10): disegnato visto perfettamente dall'alto, fedele a quello della foto (plastica nera, il
+// bordo zigrinato, il cappello liscio), perché quello della foto è un po' di traverso e girandolo girava anche il fianco.
+// Due strati: «gira» (la zigrinatura e la tacca gialla, ruota col periodo) e il riflesso della luce, che resta fermo.
+function pomello() {
+  const righe = Array.from({ length: 56 }, (_, i) => { const a = (i / 56) * Math.PI * 2, c = Math.cos(a), s = Math.sin(a); return `<line x1="${(50 + 40.5 * c).toFixed(2)}" y1="${(50 + 40.5 * s).toFixed(2)}" x2="${(50 + 48.6 * c).toFixed(2)}" y2="${(50 + 48.6 * s).toFixed(2)}"/>` }).join('')
+  return `<svg class="w-pomo" viewBox="0 0 100 100" aria-hidden="true">
+    <defs>
+      <radialGradient id="w-pomo-cap" cx="42%" cy="36%" r="70%"><stop offset="0" stop-color="#3b3b3d"/><stop offset=".45" stop-color="#1a1a1b"/><stop offset="1" stop-color="#080808"/></radialGradient>
+      <radialGradient id="w-pomo-luce" cx="34%" cy="26%" r="42%"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="49.5" fill="#070707"/>
+    <g class="gira">
+      <g stroke="#3a3a3c" stroke-width="2.3" stroke-linecap="round">${righe}</g>
+      <circle cx="50" cy="50" r="39.5" fill="url(#w-pomo-cap)" stroke="#000" stroke-width="1.6"/>
+      <circle cx="50" cy="50" r="37.6" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+      <rect x="47.6" y="13" width="4.8" height="25" rx="2.4" fill="#ffd400"/>
+      <rect x="47.6" y="13" width="4.8" height="25" rx="2.4" fill="none" stroke="#ffd400" stroke-opacity=".35" stroke-width="3"/>
+    </g>
+    <circle cx="50" cy="50" r="39" fill="url(#w-pomo-luce)"/>
+    <path d="M18 30 A38 38 0 0 1 44 12.5" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.4" stroke-linecap="round"/>
+  </svg>`
+}
+
 // ── il portafoglio aperto ──
 let dlg = null, S = null // S: gli elementi e lo stato
 let borsaDati = null, periodo = 0, borsaTimer = 0
@@ -210,7 +233,7 @@ function costruisci() {
       <div class="w-targa" style="${pos(POS.targa)}"></div>
       <div class="w-schermo w-borsa" style="${pos(POS.borsa)}"><canvas class="w-grafico"></canvas><div class="w-tasso"></div><div class="w-var"></div><div class="w-periodo"></div><div class="w-info"></div></div>
       ${tasti.map((t, i) => `<button class="w-tasto" type="button" data-s="${t}" data-eti="${t}" aria-pressed="false" style="left:${POS.tasti[i][0]}%;top:${POS.tasti[i][1]}%" aria-label="${t}"></button>`).join('')}
-      <button class="w-manopola" type="button" data-eti="periodo" aria-label="il periodo del grafico" style="left:${POS.manopola[0]}%;top:${POS.manopola[1]}%"><i></i></button>
+      <button class="w-manopola" type="button" data-eti="periodo" aria-label="il periodo del grafico" style="left:${POS.manopola[0]}%;top:${POS.manopola[1]}%">${pomello()}</button>
       <img class="w-cavo" src="/art/wallet-cavo/cavo.webp" alt="" width="771" height="60" loading="lazy" aria-hidden="true"><div class="w-cavo-filo" aria-hidden="true"></div>
       <p class="w-voce" role="status" aria-live="polite"></p>
     </div>
@@ -222,6 +245,9 @@ function costruisci() {
     tasti: [...dlg.querySelectorAll('.w-tasto')], sezione: null,
   }
   // niente tasto per chiudere: si tocca fuori dal portafoglio (o Esc)
+  // l'anello giallo del fuoco serve a chi usa la tastiera: dopo un clic col mouse si spegne, al primo tasto premuto torna
+  dlg.addEventListener('pointerdown', () => dlg.classList.add('mouse'))
+  dlg.addEventListener('keydown', () => dlg.classList.remove('mouse'))
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); chiudi() })
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
   for (const t of S.tasti) t.addEventListener('click', () => mostra(S.sezione === t.dataset.s ? null : t.dataset.s))

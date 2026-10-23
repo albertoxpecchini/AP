@@ -17,6 +17,7 @@
 .wallet *{box-sizing:border-box}
 .wallet button,.wallet input{font:inherit;color:inherit}
 .wallet :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
+.wallet.mouse :focus-visible{outline:none}
 
 /* ── il portafoglio ── */
 .w-corpo{position:relative;flex:none;width:min(96vw,1600px,calc(86dvh*1214/559));margin:auto 0;aspect-ratio:1214/559;container-type:inline-size;background:url(/art/wallet/portafoglio.webp) center/100% 100% no-repeat;
@@ -63,13 +64,12 @@
 @media (hover:hover){.w-tasto:hover{box-shadow:0 0 1cqw .2cqw rgba(255,212,0,.35)}}
 /* la manopola: gira per cambiare il periodo del grafico (la tacca è l'unica cosa disegnata) */
 .w-manopola{width:4.9%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transform:translate(-50%,-50%)}
-/* il pomello gira davvero: è il pezzo di foto del pomello (centro 84,27 % / 69,50 %, largo 4,7 % della foto), ritagliato
-   tondo e ruotato intero con la sua zigrinatura; la tacca gialla è stampata sul bordo. L'ombra sotto resta nella foto, ferma */
-.w-manopola i{position:absolute;left:50%;top:50%;width:4.6cqw;height:4.6cqw;margin:-2.3cqw 0 0 -2.3cqw;border-radius:50%;
-  background:url(/art/wallet/portafoglio.webp) no-repeat;background-size:100cqw calc(100cqw * 559 / 1214);background-position:calc(-84.267cqw + 2.3cqw) calc(-69.499cqw * 559 / 1214 + 2.3cqw);
-  transform:rotate(var(--giro,0deg));transition:transform .32s cubic-bezier(.2,1.3,.4,1)}
-.w-manopola i::after{content:"";position:absolute;left:50%;top:6%;width:.4cqw;height:1.25cqw;margin-left:-.2cqw;border-radius:.2cqw;background:#ffd400;box-shadow:0 0 .45cqw rgba(255,212,0,.75),inset 0 -.1cqw 0 rgba(0,0,0,.25)}
-.w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:97.5%;transform:translateX(-50%);font:400 .98cqw/1 var(--mono);letter-spacing:0;text-transform:uppercase;color:#0e1012;text-shadow:0 .1cqw 0 rgba(255,255,255,.5);white-space:nowrap}
+/* il pomello: un SVG visto dall'alto (wallet.js, pomello()), centrato sul pomello della foto (84,27 % / 69,50 %) e largo
+   quanto tutta la sua impronta (5,3 % della foto, fianco compreso), così quello fotografato di traverso sparisce sotto.
+   Gira solo lo strato «gira»: -45° per le 24 ore, poi un quarto di giro a scatto, sempre in senso orario */
+.w-pomo{position:absolute;left:50%;top:50%;width:5.3cqw;height:5.3cqw;margin:-2.65cqw 0 0 -2.65cqw;overflow:visible;filter:drop-shadow(0 .35cqw .3cqw rgba(0,0,0,.65))}
+.w-pomo .gira{transform-box:view-box;transform-origin:50% 50%;transform:rotate(var(--giro,0deg));transition:transform .32s cubic-bezier(.2,1.3,.4,1)}
+.w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:111%;transform:translateX(-50%);font:400 .98cqw/1 var(--mono);letter-spacing:0;text-transform:uppercase;color:#0e1012;text-shadow:0 .1cqw 0 rgba(255,255,255,.5);white-space:nowrap}
 
 /* il cavo usb-c (art/wallet-cavo/, una foto di gpt-image-2 come il portafoglio): la porta guarda verso chi guarda, quindi
    la spina è infilata giù, perpendicolare allo sguardo, e si vede solo il suo fondo (la foto è la spina vista dall'alto col
@@ -149,4 +149,4 @@
   .w-carta{width:92vw;padding:30px 16px 16px}
   .w-voce{font-size:1.8cqw}
 }
-@media (prefers-reduced-motion:reduce){.wallet[open],.wallet.chiude,.w-carta,.w-manopola i{animation:none;transition:none}}
+@media (prefers-reduced-motion:reduce){.wallet[open],.wallet.chiude,.w-carta,.w-pomo .gira{animation:none;transition:none}}
