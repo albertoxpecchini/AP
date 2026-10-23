@@ -1779,7 +1779,13 @@ se una risposta s'è persa, le giornate che non ha visto si aggiungono al saldo 
 un'azione dice di no nello stesso momento in cui la lumachina ha vissuto, la giornata si salva lo stesso.
 **Il conto della banca** (pzkko, pzk398893, di Alberto) **non ha limiti** (23.10: «il mio account non ha limiti»):
 niente attesa di 48 ore per gli invii e niente controllo dei salti del saldo (`illimitato` in `api/wallet.mjs`); i
-soldi restano soldi, non manda più di quello che ha. **Le chiamate alle API vanno con la barra finale**
+soldi restano soldi, non manda più di quello che ha. **I soldi che arrivano da fuori** (un invio ricevuto, un'operazione
+della banca) hanno un numero (`c.es`, `c.esterni`): il browser manda `es`, l'ultimo che conosce, e il server aggiunge
+quelli dopo al saldo che riceve, così un browser aperto col saldo di prima non li cancella (né li duplica a chi manda).
+**Le operazioni della banca** (`OPERAZIONI` in `api/wallet.mjs`): passaggi che chiede Alberto, fatti dal server una volta
+sola alla prima richiesta di ogni istanza (segnati in `db.operazioni`; quelle non andate si ritentano); `GET
+/api/wallet/?operazioni=1` dice com'è andata. La prima: 5.000 $pzk da pzk398893 a pzk113089 (23.10).
+**Le chiamate alle API vanno con la barra finale**
 (`/api/wallet/`, `/api/giocatori/`, `/api/borsa/?…`, `/api/meteo/`): il sito ha `trailingSlash`, e senza barra ogni
 POST passava da un redirect 308 che alcuni browser fanno confermare a ogni salvataggio («inviare nuovamente i dati del
 modulo?»). Moderazione: `node tools/pzkko/wallet.mjs` elenca

@@ -102,6 +102,7 @@ const vista = (c, now) => ({
   nome: c.nome, ind: 'pzk' + c.ind, indCambiato: !!c.indCambiato, creato: c.creato, pzk: c.pzk, eur: c.eur, ig: !!c.ig,
   trovati: c.trovati?.g === oggi() ? c.trovati.q : [], sussidio: c.sussidio === oggi(), invii: illimitato(c) || c.creato + ATTESA_INVII <= now, inviiDa: illimitato(c) ? c.creato : c.creato + ATTESA_INVII,
   mosse: (c.mosse ?? []).slice(-12), lumaca: c.lumaca ? { g: c.lumaca.g, ultime: c.lumaca.ultime } : null,
+  es: c.es ?? 0, esterni: (c.esterni ?? []).slice(-30),
 })
 const mossa = (c, m) => { (c.mosse ??= []).push(m); if (c.mosse.length > 40) c.mosse.splice(0, c.mosse.length - 40) }
 
@@ -123,10 +124,17 @@ async function notizieLumaca(c, lu, now) {
 // `lg`: il giorno della lumachina che il saldo del browser contiene già (null: nessuno); le giornate vissute dopo, che il
 // browser non ha visto, si aggiungono (undefined: un browser di prima della lumachina, niente da aggiungere)
 const lgDi = (x) => (x === null || (typeof x === 'string' && /^\d{4}-\d\d-\d\d$/.test(x)) ? x : undefined)
-function accogli(c, pzk, now, lg) {
+// I SOLDI CHE ARRIVANO DA FUORI (23.10): un invio ricevuto da un altro conto, un'operazione della banca. Il saldo lo dice il
+// browser, e un browser aperto col saldo di prima li cancellerebbe (o, per chi manda, li duplicherebbe). Ognuno ha un
+// numero (c.es, il contatore, e c.esterni, gli ultimi 30 { s, n }); il browser manda `es`, l'ultimo che conosce, e quelli
+// dopo si aggiungono al saldo che manda (undefined: un browser di prima, niente da aggiungere)
+const esDi = (x) => (Number.isInteger(x) && x >= 0 ? x : undefined)
+const esterno = (c, n) => { c.es = (c.es ?? 0) + 1; (c.esterni ??= []).push({ s: c.es, n }); if (c.esterni.length > 30) c.esterni.splice(0, c.esterni.length - 30) }
+function accogli(c, pzk, now, lg, es) {
   if (pzk === undefined || pzk === null) return null
   if (typeof pzk !== 'number' || !Number.isFinite(pzk) || pzk < 0 || pzk > 1e8) return 'saldo strano'
   if (lg !== undefined) for (const v of c.lumaca?.ultime ?? []) if (lg === null || v.g > lg) pzk = Math.max(0, pzk + v.n)
+  if (es !== undefined) for (const v of c.esterni ?? []) if (v.s > es) pzk = Math.max(0, pzk + v.n)
   pzk = mezzi(pzk)
   const secondi = Math.max(0, (now - (c.salvato ?? c.creato)) / 1000)
   if (!illimitato(c) && pzk - c.pzk > 20000 + 1200 * secondi) return 'il saldo non torna: ricarico quello salvato'
@@ -144,8 +152,40 @@ const zainoValido = (z) => {
 }
 const limiti = { crea: limite('wallet-crea', 3, GIORNO), entra: limite('wallet-entra', 8, 10 * MINUTO), tutte: limite('wallet-tutte', 300, 10 * MINUTO) }
 
+// LE OPERAZIONI DELLA BANCA: passaggi che Alberto chiede e che fa il server, una volta sola ciascuno (segnati in
+// db.operazioni[id], col risultato: quelle non andate si ritentano), alla prima richiesta di ogni istanza della funzione. Per chi manda e per chi riceve sono soldi da
+// fuori (esterno), con la mossa sul conto. GET ?operazioni=1 dice com'è andata.
+export const OPERAZIONI = [
+  // 23.10.2026, Alberto: «fai da solo un passaggio da wallet 398893 a 113089 di 5000 pzk»
+  { id: '2026-10-23-398893-113089-5000', da: '398893', a: '113089', n: 5000 },
+]
+let operazioniViste = false
+async function operazioni(store, now) {
+  if (operazioniViste) return
+  const { db } = await store.read()
+  if (OPERAZIONI.every((o) => db.operazioni?.[o.id]?.ok)) { operazioniViste = true; return }
+  await aggiorna(store, (db) => {
+    let fatto = false
+    for (const o of OPERAZIONI) {
+      if (db.operazioni?.[o.id]?.ok) continue // fatta; una che non è andata (un conto che manca, i soldi che non bastano) si ritenta
+      const c = db.conti.find((x) => x.ind === o.da), d = db.conti.find((x) => x.ind === o.a), n = mezzi(o.n)
+      const esito = !c ? 'manca il conto pzk' + o.da : !d ? 'manca il conto pzk' + o.a : c.pzk < n ? `pzk${o.da} ha ${c.pzk} $pzk, non ${n}` : null
+      if (!esito) {
+        c.pzk = mezzi(c.pzk - n); d.pzk = mezzi(d.pzk + n); esterno(c, -n); esterno(d, n)
+        mossa(c, { t: now, tipo: 'inviato', n, a: 'pzk' + d.ind, nome: d.nome })
+        mossa(d, { t: now, tipo: 'ricevuto', n, da: 'pzk' + c.ind, nome: c.nome })
+      }
+      ;(db.operazioni ??= {})[o.id] = { t: now, ok: !esito, ...(esito && { errore: esito }) }
+      fatto = true
+    }
+    return fatto ? {} : { invariato: true }
+  })
+  operazioniViste = true
+}
+
 export default async function handler(req, res) {
   const store = await archivio(PATH, vuoto)
+  if (store) await operazioni(store, Date.now()).catch((e) => console.warn('operazioni:', e.message))
   if (!store) return json(res, 503, { ok: false, offline: true, errore: 'il wallet è in pausa: per ora valgono i 1.000 $pzk della sessione' }, 'public, s-maxage=30')
   const now = Date.now()
   try {
@@ -153,6 +193,7 @@ export default async function handler(req, res) {
       const url = new URL(req.url, 'http://x')
       const ind = indirizzoDi(url.searchParams.get('ind'))
       const { db } = await store.read()
+      if (url.searchParams.has('operazioni')) return json(res, 200, { ok: true, operazioni: OPERAZIONI.map((o) => ({ id: o.id, da: 'pzk' + o.da, a: 'pzk' + o.a, n: o.n, ...(db.operazioni?.[o.id] ?? { fatta: false }) })) })
       if (url.searchParams.has('classifica')) return json(res, 200, { ok: true, classifica: [...db.conti].sort((a, b) => b.pzk - a.pzk).slice(0, 10).map((c) => ({ nome: c.nome, pzk: c.pzk })) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
       if (ind) { const c = db.conti.find((x) => x.ind === ind); return c ? json(res, 200, { ok: true, conto: { nome: c.nome, ind: 'pzk' + c.ind, creato: c.creato } }, 'public, s-maxage=20') : json(res, 404, { ok: false, errore: 'nessun conto con questo indirizzo' }) }
       return json(res, 200, { ok: true, ...offerta(db) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
@@ -244,7 +285,7 @@ export default async function handler(req, res) {
       const r = await aggiorna(store, (db) => {
         const c = db.conti.find((x) => x.id === id)
         if (!c) return { errore: 'conto sparito', esci: true }
-        const prima = c.pzk, avviso = accogli(c, body.pzk, now, lgDi(body.lg)), lu = vive(c, now)
+        const prima = c.pzk, avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es)), lu = vive(c, now)
         if (c.pzk === prima && !lu) return { invariato: true, c, avviso }
         return { c, avviso, lu }
       })
@@ -259,7 +300,7 @@ export default async function handler(req, res) {
     const azione = (fai) => aggiorna(store, (db) => {
       const c = db.conti.find((x) => x.id === id)
       if (!c) return { errore: 'conto sparito', esci: true }
-      const avviso = accogli(c, body.pzk, now, lgDi(body.lg))
+      const avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es))
       if (avviso) return { errore: avviso, c }
       const lu = vive(c, now)
       const esito = fai(c, db) ?? {}
@@ -305,7 +346,7 @@ export default async function handler(req, res) {
         if (!d) return { errore: 'nessun conto con questo indirizzo' }
         if (d.id === c.id) return { errore: 'sei tu' }
         if (quanto > c.pzk) return { errore: `non ti bastano: hai ${c.pzk} $pzk` }
-        c.pzk = mezzi(c.pzk - quanto); d.pzk = mezzi(d.pzk + quanto)
+        c.pzk = mezzi(c.pzk - quanto); d.pzk = mezzi(d.pzk + quanto); esterno(d, quanto)
         mossa(c, { t: now, tipo: 'inviato', n: quanto, a: 'pzk' + d.ind, nome: d.nome })
         mossa(d, { t: now, tipo: 'ricevuto', n: quanto, da: 'pzk' + c.ind, nome: c.nome })
         return { fatto: { a: 'pzk' + d.ind, nome: d.nome, n: quanto } }

@@ -142,7 +142,7 @@ async function chiama(body, { keepalive = false } = {}) {
   try {
     // lg: il giorno della lumachina che il saldo di qui contiene già (api/wallet.mjs: se una risposta s'è persa, il server
     // aggiunge le giornate che il browser non ha visto)
-    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(W && { token: W.token, lg: W.conto.lumaca?.g ?? null }), ...body }), keepalive })
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(W && { token: W.token, lg: W.conto.lumaca?.g ?? null, ...(Number.isInteger(W.conto.es) && { es: W.conto.es }) }), ...body }), keepalive })
     const d = await r.json().catch(() => ({ ok: false, errore: 'il server non risponde' }))
     online = !d.offline
     if (d.esci && W) { esci(false) }
@@ -153,7 +153,10 @@ async function chiama(body, { keepalive = false } = {}) {
 // si è giocato (tienipzk), resta il saldo di qui più quello che la lumachina ha appena spostato sul server (d.lumaca.delta)
 function accogli(d, { tienipzk = false } = {}) {
   if (!d?.conto || !W) return
-  const pzkLocale = W.conto.pzk, lumaca = Number(d.lumaca?.delta) || 0
+  // es: i soldi arrivati da fuori (un invio ricevuto, un'operazione della banca) che il saldo di qui non contiene ancora
+  const pzkLocale = W.conto.pzk, esPrima = W.conto.es
+  const fuori = Number.isInteger(esPrima) ? (d.conto.esterni ?? []).filter((v) => v.s > esPrima).reduce((a, v) => a + v.n, 0) : 0
+  const lumaca = (Number(d.lumaca?.delta) || 0) + fuori
   W.conto = d.conto
   if (Number.isFinite(d.tasso)) W.tasso = d.tasso
   if (Number.isFinite(d.t)) W.t = d.t
