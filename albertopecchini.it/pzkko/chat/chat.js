@@ -46,6 +46,8 @@ export function prepara(b) {
   aggiornaTasto()
   import('./tomodachi.js').then((m) => m.avvia(b)).catch((e) => console.warn('tomodachi non partito', e)) // la chiocciolina sullo schermo lcd
     .then(() => b.querySelector('.ct-lcd')?.append(crepe))
+    // e sopra il tubo catodico, lo stesso dello schermo grande e allo stesso ritmo (games/crt.js, «insieme»): l'ingrandimento resta puro
+    .then(() => import('../games/crt.js')).then((c) => c.tubo(b.querySelector('.ct-lcd'), { insieme: true })).catch(() => {})
   zaino.ascolta(aggiornaTasto)
   pzk.osserva(() => { aggiornaTasto(); aggiornaSaldo() })
   setInterval(aggiornaTasto, 30_000)
@@ -64,7 +66,7 @@ export function monta(host) {
   dlg = document.createElement('div')
   dlg.className = 'chat-app'
   dlg.innerHTML = `<div class="c-schermo">
-      <div class="c-testa"><button class="c-indietro" type="button" aria-label="torna alla home del telefono">‹</button>${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
+      <div class="c-testa"><button class="c-indietro" type="button" aria-label="indietro">‹</button>${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
       <div class="c-lista" role="log" aria-live="polite"></div>
       <button class="c-giu" type="button" aria-label="vai agli ultimi messaggi" hidden><span>↓</span><b class="c-nuovi"></b></button>
       <div class="c-rapidi-box">
@@ -104,7 +106,7 @@ export function monta(host) {
   new ResizeObserver(frecce).observe(rapidiEl)
   disegnaRapidi()
   zaino.ascolta(disegnaRapidi)
-  dlg.querySelector('.c-indietro').addEventListener('click', () => import('../telefono/telefono.js').then((t) => t.home()))
+  dlg.querySelector('.c-indietro').addEventListener('click', () => import('../telefono/telefono.js').then((t) => t.indietro({ daFreccia: true }))) // come il tasto verde: una mossa indietro
   dlg.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); invia() })
   input.addEventListener('input', suggerisci)
   input.addEventListener('keydown', tasti)

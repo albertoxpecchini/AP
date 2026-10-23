@@ -130,6 +130,7 @@ It is a classic black plastic pager seen from DIRECTLY IN FRONT (flat, orthograp
   }
   // il cercapersone GRANDE (23.10): quello che esce ingrandendo il tasto, lo stesso disegno in alta qualità, con lo schermo
   // lcd più grande dove stanno le app (telefono/telefono.js). Lo schermo è magenta pieno come il fondo: la chiave lo buca.
+  // Dopo `immagini.mjs usa chat-pager-grande <png>` va lanciato `node tools/pzkko/tasti-pager.mjs`: i tasti grigi diventano rosso (sopra) e verde (sotto), e rifà pager-piccolo.webp.
   out['chat-pager-grande'] = {
     scala: 0.75, titolo: 'il cercapersone grande: il dispositivo con le app', aspetto: '2048x1152', griglia: [1, 1], pezzi: ['pager-grande'],
     prompt: `${griglia('One piece: a single 1990s pager (beeper),', 1, 1)}

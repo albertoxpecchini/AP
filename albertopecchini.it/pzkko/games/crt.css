@@ -1,0 +1,79 @@
+/* Il tubo catodico degli schermi a fosfori (crt.js, tubo(el)): il vetro è l'ultimo figlio dello schermo, assoluto e
+   largo quanto lui, e non cambia niente della sua scatola. Gli strati, dal basso:
+   ::before        le righe di scansione (passo e spessore in pixel veri del display: crt.js, passi());
+   .crt-maschera   la maschera dei fosfori: righine verticali rosso / verde / blu, moltiplicate sul contenuto (il nero resta nero);
+   .crt-banda      la banda chiara che scorre lenta dall'alto in basso (il ronzio della rete, come sui televisori veri);
+   .crt-buio       lo sfarfallio: un velo nero la cui opacità salta a passi irregolari, con ogni tanto un colpo;
+   ::after         il vetro bombato: il bagliore dei fosfori, la vignetta con gli angoli scuri, l'ombra del bordo, il riflesso.
+   Il vetro NON fa da contesto d'impilamento (niente z-index, opacity, transform, filter, contain su di lui): gli strati
+   hanno ciascuno il loro z-index e stanno nel contesto dello schermo, così la maschera si moltiplica davvero sul
+   contenuto, e il vetro non diventa il contenitore di niente (nel wallet, sul telefono, la pagina dei tasti è fixed dentro
+   lo schermo del grafico e deve uscirne). Si muovono SOLO lo sfarfallio e la banda, con opacity e transform (animazioni
+   composite, sul compositor: il thread della pagina resta fermo); niente accensioni, dissolvenze o transition, perché
+   Alberto non vuole movimenti che non ha chiesto.
+
+   Il filtro SVG sul contenuto (i canali rosso e blu spostati di 0,7 px, l'aberrazione cromatica, più un alone sfocato in
+   screen, il bloom) è stato provato e scartato il 23.10. Misure sul wallet aperto, 1300 × 860, Chromium headless con la
+   GPU, 5 s a riposo: senza tubo il compositor lavora 7 ms al secondo; col vetro 172 ms/s (165 fotogrammi al secondo, cioè
+   circa 1 ms a fotogramma, il thread della pagina a 3,7 ms/s come senza); col filtro su tutto il contenuto 208 ms/s
+   (+21 %), solo sulle tele 207 ms/s (+17 %): lo sfarfallio, girando sopra, obbliga a rifare il filtro a ogni fotogramma.
+   I fotogrammi restano 165 (p95 6,2 ms), ma in cambio di quel costo il filtro sfoca le scritte piccole (le quote del
+   grafico, i numeri sulle etichette) e taglia i bagliori dove finisce la sua regione: a grandezza vera si vede quasi solo
+   lo sfocato. L'aberrazione resta quella della maschera dei fosfori, il bagliore quello nel vetro. */
+
+.crt-vetro{position:absolute;inset:0;display:block;margin:0;padding:0;border-radius:inherit;overflow:hidden;pointer-events:none;
+  --crt-fosforo:70 255 125;
+  /* qualcuno nasconde tutti i figli dello schermo tranne uno (il wallet: .w-borsa.in-pagina>:not(.w-pagina)): il vetro
+     resta visibile se lo è lo schermo, e sparisce con lui */
+  visibility:inherit !important}
+/* gli strati: ognuno col suo z-index (40 come il vecchio ::after del cercapersone, o quello chiesto a tubo()); in :where
+   perché le regole dei singoli strati qui sotto vincano senza gare di specificità */
+:where(.crt-vetro)::before,:where(.crt-vetro)::after,:where(.crt-vetro>i){content:"";position:absolute;inset:0;z-index:var(--crt-z,40);display:block;border-radius:inherit;pointer-events:none}
+
+/* le righe di scansione: una riga scura ogni tre pixel del display */
+.crt-vetro::before{background:repeating-linear-gradient(180deg,rgb(0 0 0/.3) 0 var(--crt-filo,1px),transparent 0 var(--crt-passo,3px))}
+
+/* la maschera dei fosfori (la griglia di un trinitron): tre righine verticali per passo, moltiplicate, così toccano
+   solo quello che è acceso e ai bordi delle cifre lasciano un filo di rosso e di blu */
+.crt-maschera{background:linear-gradient(90deg,#ff7070 0 33.34%,#70ff70 0 66.67%,#7070ff 0) 0 0/var(--crt-passo,3px) 100%;mix-blend-mode:multiply;opacity:.3}
+
+/* la banda del ronzio: alta poco più di un terzo dello schermo, scende in 9 s e riparte da sopra */
+.crt-banda{inset:0 0 auto;height:38%;border-radius:0;
+  background:linear-gradient(180deg,transparent,rgb(var(--crt-fosforo)/.035) 28%,rgb(255 255 255/.06) 50%,rgb(var(--crt-fosforo)/.035) 72%,transparent);
+  transform:translateY(-100%);animation:crt-scorre 9s linear var(--crt-fase-banda,0s) infinite}
+@keyframes crt-scorre{from{transform:translateY(-100%)}to{transform:translateY(264%)}}
+
+/* lo sfarfallio: un velo nero che toglie dal 3 al 14 % della luce a passi irregolari (mai un'onda regolare: ogni passo
+   dura da 50 a 300 ms), e una volta per giro un colpo doppio (−20 %, poi −16 %, in un quarto di secondo). Solo cali di
+   luce, niente lampi chiari; i salti normali restano sotto il 10 % (la soglia di un «lampo») e i colpi sono al massimo due
+   in un secondo: sotto il limite dei lampi pericolosi (tre al secondo) */
+.crt-buio{background:#000;opacity:.06;animation:crt-sfarfalla 5.3s steps(1,end) var(--crt-fase,0s) infinite}
+@keyframes crt-sfarfalla{
+  0%{opacity:.06}4%{opacity:.03}9%{opacity:.09}13%{opacity:.05}19%{opacity:.1}21%{opacity:.05}24%{opacity:.14}25.5%{opacity:.06}
+  31%{opacity:.03}36%{opacity:.09}41%{opacity:.05}47%{opacity:.07}50%{opacity:.03}55%{opacity:.1}58%{opacity:.06}
+  62%{opacity:.2}63.5%{opacity:.07}65%{opacity:.16}66.5%{opacity:.05}
+  71%{opacity:.09}76%{opacity:.03}80%{opacity:.07}85%{opacity:.05}89%{opacity:.12}91%{opacity:.06}95%{opacity:.03}98%{opacity:.09}}
+
+/* il vetro bombato. Gli sfondi, dall'alto: il riflesso in diagonale (lo stesso che gli schermi del wallet avevano già),
+   la luce della finestra sul vetro curvo in alto a sinistra, la vignetta (scura negli angoli, dove il vetro curva di
+   più), il bagliore dei fosfori che rimbalza nel vetro. L'ombra interna è il bordo bombato: va col lato corto dello
+   schermo (crt.js la misura) */
+.crt-vetro::after{
+  background:
+    linear-gradient(118deg,rgb(255 255 255/.085),rgb(255 255 255/.022) 38%,transparent 40%,rgb(255 255 255/.014)),
+    radial-gradient(55% 40% at 24% 12%,rgb(255 255 255/.06),transparent 70%),
+    radial-gradient(farthest-corner at 50% 50%,transparent 62%,rgb(0 0 0/.22) 84%,rgb(0 0 0/.56)),
+    radial-gradient(75% 70% at 50% 46%,rgb(var(--crt-fosforo)/.07),transparent 75%);
+  /* leggera: nel grafico del wallet l'etichetta rossa del prezzo sta a 4 px dal bordo destro, e deve leggersi */
+  box-shadow:inset 0 0 calc(var(--crt-lato,100px)*.07) calc(var(--crt-lato,100px)*.008) rgb(0 0 0/.62),inset 0 0 0 1px rgb(0 0 0/.5)}
+
+/* il riflesso e le righe che gli schermi avevano già col loro ::after (.w-schermo::after nel wallet, .t-schermo::after
+   nel cercapersone) si spengono: il vetro li rifà, e due righe di scansione con passi diversi una sopra l'altra fanno il
+   moiré. Doppia classe per vincere comunque, qualunque foglio arrivi dopo */
+.crt.crt::after{display:none}
+
+/* chi chiede meno movimento: niente sfarfallio e niente banda; restano le righe, i fosfori e il vetro */
+@media (prefers-reduced-motion:reduce){
+  .crt-banda{display:none}
+  .crt-buio{animation:none;opacity:.06}
+}

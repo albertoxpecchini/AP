@@ -12,6 +12,7 @@
 // scorrono tutti i dati del wallet: lo accende prepara(), con banner.js.
 import * as pzk from '../games/pzk.js'
 import { banner } from './banner.js'
+import { tubo } from '../games/crt.js'
 
 const IMM = { w: 1214, h: 559 } // la foto del portafoglio: le misure degli schermi sono in percentuale di lei
 const POS = {
@@ -82,7 +83,8 @@ function display(c, testo, { colore = '#46ff7d', spento = '#0a2614', fondo = '#0
 
 // ── la batteria: dalle 7 alle 19 si scarica da 100 % a 2 %, poi si carica fino alle 7 ──
 const oraMantova = () => {
-  const ms = window.pzkkoOrologio?.adesso?.() ?? Date.now()
+  // l'ora del gioco: quella vera anche quando la pagina sta ferma a mezzogiorno per la luce (window.pzkkoOrologio.perGioco)
+  const o = window.pzkkoOrologio, ms = o?.perGioco?.() ?? o?.adesso?.() ?? Date.now()
   const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Rome', hour: 'numeric', minute: 'numeric', hour12: false }).formatToParts(new Date(ms))
   return Number(p.find((x) => x.type === 'hour').value) % 24 + Number(p.find((x) => x.type === 'minute').value) / 60
 }
@@ -274,6 +276,10 @@ function costruisci() {
       <p class="w-voce" role="status" aria-live="polite"></p>
     </div>`
   document.body.appendChild(dlg)
+  // gli schermi a fosfori sono tubi catodici veri (../games/crt.js: sfarfallano, righe, fosfori, vetro bombato); la
+  // batteria no, è un lcd. z 3: gli strati del vetro stanno sopra la pagina dei tasti nello schermo del grafico (z 2) e
+  // sotto quella grande che sul telefono esce dallo schermo (z 5, wallet.css)
+  for (const s of dlg.querySelectorAll('.w-saldo, .w-eur, .w-borsa')) tubo(s, { z: 3, fosforo: s.classList.contains('w-eur') ? 'ambra' : 'verde' })
   S = {
     corpo: q(dlg, '.w-corpo'), saldo: q(dlg, '.w-saldo canvas'), sotto: q(dlg, '.w-saldo .w-sotto'), eur: q(dlg, '.w-eur canvas'), batt: q(dlg, '.w-batt canvas'), targa: q(dlg, '.w-targa'),
     grafico: q(dlg, '.w-grafico'), tasso: q(dlg, '.w-tasso'), var: q(dlg, '.w-var'), periodo: q(dlg, '.w-periodo'), info: q(dlg, '.w-info'), carta: q(dlg, '.w-pagina'), borsaEl: q(dlg, '.w-borsa'), voce: q(dlg, '.w-voce'), manopola: q(dlg, '.w-manopola'),

@@ -10,6 +10,11 @@
 //   la chat aperta (parla con te), il mouse sul tasto (ti guarda), il clic (cuore), la pagina nascosta (si ferma),
 //   da quanto non ci vedevamo (dopo un giorno ti aspettava), i compleanni e le feste (18.10 Matti, 31.10, 25.12, 1.1)
 // Tutto disegnato a pixel (niente immagini, niente emoji), in verde lcd. avvia(tasto) lo accende.
+// Il cercapersone grande (telefono/) ne mostra una copia viva e la comanda con due modalità forzate:
+//   attendi(true/false): finché è vera la chiocciolina aspetta a sinistra (colonne 3–14), girata verso destra, con la
+//   freccina che indica il tasto ACCEDI in basso a destra; sbatte gli occhi ogni tanto. Vince su tutto tranne il saluto.
+//   saluta(ms = 2600): per ms ti saluta, ferma al centro (colonne 8–21): l'antenna davanti fa ciao su e giù, «CIAO» in
+//   alto e il cuoricino che batte. Vince su tutto, anche sull'attesa e su «parla»; poi torna il cervello normale.
 
 import * as pzk from '../games/pzk.js'
 import * as zaino from './zaino.js'
@@ -24,6 +29,7 @@ let stato = 'fermo', da = 0, fino = 0, verso = 1, x = 9 // x: la colonna del pie
 let meteo = null, meteoT = 0, borsa = null, borsaT = 0
 let saldoPrima = null, evento = null, eventoFino = 0, mortiPrima = -1
 let sopra = false, cuori = [], gocce = []
+let attesa = false, salutoFino = 0, salutoT = 0 // le modalità forzate dal cercapersone grande (attendi, saluta)
 let mem = leggiMem()
 
 function leggiMem() { try { return JSON.parse(localStorage.getItem(CHIAVE) || '{}') } catch { return {} } }
@@ -38,7 +44,10 @@ const oraMantova = () => {
 }
 async function aggiornaMondo() {
   const now = Date.now()
-  if (now - meteoT > 10 * 60_000) { meteoT = now; try { meteo = await (await fetch('/api/meteo')).json() } catch {} }
+  // il meteo vero solo se chi guarda l'ha scelto in regia (window.pzkkoScelte.meteo, dal 23.10: di partenza sempre sole)
+  const vero = !window.pzkkoScelte || window.pzkkoScelte.meteo === 'vero'
+  if (!vero) meteo = null
+  else if (now - meteoT > 10 * 60_000) { meteoT = now; try { meteo = await (await fetch('/api/meteo')).json() } catch {} }
   if (now - borsaT > 5 * 60_000) { borsaT = now; try { const d = await (await fetch('/api/borsa?da=24h')).json(); if (d.ok) borsa = d } catch {} }
 }
 const piove = () => meteo && (meteo.pioggia > 0 || (meteo.codice >= 51 && meteo.codice <= 67) || (meteo.codice >= 80 && meteo.codice <= 82) || meteo.codice >= 95)
@@ -61,6 +70,10 @@ function decidi() {
   mortiPrima = morti
   if (mem.visto && t - mem.visto > 24 * 3600_000 && !mem.salutato) { evento = 'aspettavo'; eventoFino = t + 12_000; mem.salutato = true }
   mem.visto = t; scriviMem()
+  // le modalità forzate dal cercapersone grande: il saluto prima di tutto, poi l'attesa del tasto ACCEDI (gli eventi
+  // qui sopra si contano lo stesso, e se sono ancora freschi si vedono dopo)
+  if (t < salutoFino) return ['saluta', salutoFino - t]
+  if (attesa) return ['attende', 2000]
   if (evento && t < eventoFino) return [evento, 2000]
   evento = null
   // chi comanda, in ordine
@@ -88,39 +101,61 @@ function decidi() {
 }
 
 // ── i pixel ──
-const P = (gx, gy, on = true) => { if (gx < 0 || gy < 0 || gx >= COL || gy >= RIG) return; g.fillStyle = on ? SCURO : CHIARO; g.fillRect(Math.round(gx * cw), Math.round(gy * ch), Math.ceil(cw), Math.ceil(ch)) }
+// un pixel: acceso (scuro) o spento; spento vuol dire cancellato e ridisegnato chiaro, così la spirale del guscio, la luna a
+// falce e gli occhi grandi si vedono davvero (prima il chiaro, trasparente all'8 %, finiva sopra lo scuro e non spegneva
+// niente). Le celle vanno da un arrotondamento al successivo: si toccano senza sovrapporsi.
+const P = (gx, gy, on = true) => {
+  if (gx < 0 || gy < 0 || gx >= COL || gy >= RIG) return
+  const x0 = Math.round(gx * cw), y0 = Math.round(gy * ch), w = Math.round((gx + 1) * cw) - x0, h = Math.round((gy + 1) * ch) - y0
+  if (!on) g.clearRect(x0, y0, w, h)
+  g.fillStyle = on ? SCURO : CHIARO
+  g.fillRect(x0, y0, w, h)
+}
 let cw = 1, ch = 1
 const riga = (x0, y0, n) => { for (let i = 0; i < n; i++) P(x0 + i, y0) }
 const colonna = (x0, y0, n) => { for (let i = 0; i < n; i++) P(x0, y0 + i) }
 const cerchio = (cx, cy, r, on = true) => { for (let yy = -r; yy <= r; yy++) for (let xx = -r; xx <= r; xx++) if (xx * xx + yy * yy <= r * r + r * 0.5) P(cx + xx, cy + yy, on) }
-// lettere 3 × 5 per le poche scritte (Z, !, $, ?)
-const GLIFI = { z: ['111', '001', '010', '100', '111'], '!': ['010', '010', '010', '000', '010'], $: ['010', '111', '110', '011', '111'], '?': ['111', '001', '011', '000', '010'], '♥': ['101', '111', '111', '010', '000'] }
+// lettere 3 × 5 per le poche scritte (Z, !, $, ?, e CIAO del saluto)
+const GLIFI = {
+  z: ['111', '001', '010', '100', '111'], '!': ['010', '010', '010', '000', '010'], $: ['010', '111', '110', '011', '111'], '?': ['111', '001', '011', '000', '010'], '♥': ['101', '111', '111', '010', '000'],
+  C: ['011', '100', '100', '100', '011'], I: ['111', '010', '010', '010', '111'], A: ['010', '101', '111', '101', '101'], O: ['010', '101', '101', '101', '010'],
+  cuore: ['01010', '11111', '11111', '01110', '00100'], // il cuore grande (5 × 5) del saluto, che batte col ♥
+}
 const glifo = (ch_, x0, y0) => { const G = GLIFI[ch_]; if (!G) return; G.forEach((r, yy) => [...r].forEach((b, xx) => { if (b === '1') P(x0 + xx, y0 + yy) })) }
+const scrivi = (s, x0, y0) => [...s].forEach((l, i) => glifo(l, x0 + i * 4, y0)) // lettere 3 × 5 con una colonna di spazio
+/** La freccina che indica a destra: la punta in (x0 + 4, y0). */
+const freccina = (x0, y0) => { riga(x0, y0, 5); P(x0 + 3, y0 - 1); P(x0 + 2, y0 - 2); P(x0 + 3, y0 + 1); P(x0 + 2, y0 + 2) }
 
-/** La chiocciola: `px` è la colonna del piede davanti, `py` la riga del suolo; guarda verso `v` (1 destra). */
-function lumaca(px, py, v, { passo = 0, occhi = 'aperti', occhiali = false, lacrima = false, salto = 0, giro = false, ali = false, stella = false } = {}) {
+/** La chiocciola: `px` è la colonna del piede davanti, `py` la riga del suolo; `v` 1 la disegna con la testa a sinistra,
+ *  -1 specchiata (testa a destra). Con `ciao` (0 o 1, il fotogramma) l'antenna davanti fa ciao. */
+function lumaca(px, py, v, { passo = 0, occhi = 'aperti', occhiali = false, lacrima = false, salto = 0, giro = false, ali = false, stella = false, ciao = null } = {}) {
   const X = (dx) => (v > 0 ? px + dx : px - dx)
+  const R = (dx, yy, n) => riga(v > 0 ? px + dx : px - dx - n + 1, yy, n) // la riga da dx a dx + n - 1, specchiata anche lei
   const y = py - salto
   if (giro) { // stecchita: sulla schiena, guscio sotto, occhi a x
-    riga(X(0), y - 1, 9); cerchio(X(4), y - 3, 2); P(X(4), y - 3, false)
+    R(0, y - 1, 9); cerchio(X(4), y - 3, 2); P(X(4), y - 3, false)
     P(X(9), y - 2); P(X(10), y - 3); P(X(9), y - 4); P(X(11), y - 4); P(X(10), y - 5); P(X(11), y - 2)
     return
   }
   // il corpo: due righe, con l'onda del passo
-  riga(X(0), y - 1, 10); riga(X(1 + passo), y - 2, 8)
+  R(0, y - 1, 10); R(1 + passo, y - 2, 8)
   P(X(0), y - 2); P(X(-1), y - 1) // la testa sporge
   // il guscio: un cerchio con la spirale
   cerchio(X(6), y - 4, 3); P(X(6), y - 4, false); P(X(7), y - 5, false)
-  if (stella) { P(X(6), y - 9); riga(X(5), y - 8, 3); P(X(6), y - 7) }
+  if (stella) { P(X(6), y - 9); R(5, y - 8, 3); P(X(6), y - 7) }
   if (ali) { for (let i = 0; i < 3; i++) { P(X(8 + i), y - 7 - i); P(X(9 + i), y - 7 - i) } }
-  // le antenne con gli occhi
-  colonna(X(-1), y - 5, 3); colonna(X(1), y - 5, 3)
-  if (occhi === 'chiusi') { riga(X(-2), y - 6, 2); riga(X(1), y - 6, 2) }
+  // le antenne con gli occhi (col saluto quella davanti la disegna il ciao, qui sotto)
+  const davanti = ciao === null
+  colonna(X(1), y - 5, 3); if (davanti) colonna(X(-1), y - 5, 3)
+  if (occhi === 'chiusi') { if (davanti) R(-2, y - 6, 2); R(1, y - 6, 2) }
   else if (occhi === 'x') { P(X(-2), y - 7); P(X(0), y - 5); P(X(-2), y - 5); P(X(0), y - 7); P(X(1), y - 7); P(X(2), y - 6) }
   else if (occhi === 'grandi') { cerchio(X(-1), y - 6, 1); cerchio(X(1), y - 6, 1); P(X(-1), y - 6, false); P(X(1), y - 6, false) }
-  else { P(X(-2), y - 6); P(X(-1), y - 6); P(X(1), y - 6); P(X(2), y - 6); if (occhi === 'su') { P(X(-1), y - 7); P(X(1), y - 7) } }
-  if (occhiali) { riga(X(-3), y - 6, 7); riga(X(-2), y - 5, 2); riga(X(1), y - 5, 2) }
+  else { if (davanti) { P(X(-2), y - 6); P(X(-1), y - 6) } P(X(1), y - 6); P(X(2), y - 6); if (occhi === 'su') { if (davanti) P(X(-1), y - 7); P(X(1), y - 7) } }
+  if (occhiali) { R(-3, y - 6, 7); R(-2, y - 5, 2); R(1, y - 5, 2) }
   if (lacrima) { P(X(-2), y - 4); P(X(-2), y - 3) }
+  // il ciao: l'antenna davanti si allunga dritta in su (1), poi si piega in avanti (0), e così via a ogni passo
+  if (ciao === 1) { colonna(X(-1), y - 7, 5); P(X(-1), y - 8); P(X(-2), y - 8) }
+  else if (ciao === 0) { colonna(X(-1), y - 4, 2); P(X(-2), y - 5); P(X(-3), y - 6); P(X(-3), y - 7); P(X(-4), y - 7) }
 }
 
 function disegna() {
@@ -131,11 +166,12 @@ function disegna() {
   g.clearRect(0, 0, W, H)
   // la griglia dei pixel spenti, come un lcd vero
   for (let yy = 0; yy < RIG; yy++) for (let xx = 0; xx < COL; xx++) P(xx, yy, false)
-  const t = Date.now(), fase = tick % 2, ora = oraMantova(), suolo = 14
+  const t = Date.now(), fase = tick % 2, ora = oraMantova()
   const S = stato
-  // il cielo: sole o luna in alto a destra, nuvole, pioggia, neve
-  const cieloX = verso > 0 ? 27 : 3
-  if (S !== 'tv' && S !== 'borsa') {
+  const suolo = S === 'saluta' ? 15 : 14 // nel saluto sta giù, appoggiata al terreno, per lasciare il posto a «CIAO»
+  // il cielo: sole o luna in alto a destra, nuvole, pioggia, neve (nell'attesa sempre a destra: la chiocciolina è a sinistra)
+  const cieloX = verso > 0 || S === 'attende' ? 27 : 3
+  if (S !== 'tv' && S !== 'borsa' && S !== 'saluta') {
     if (ora.h >= 20 || ora.h < 6) { cerchio(cieloX, 3, 2); cerchio(cieloX + 1, 2, 2, false); P(cieloX - 5, 2); P(cieloX - 7, 5); P(cieloX - 3, 7) } // la luna a falce e tre stelle
     else if (sereno() || !meteo) { cerchio(cieloX, 3, 1); P(cieloX, 0); P(cieloX, 6); P(cieloX - 3, 3); P(cieloX + 3, 3) }
     else { riga(cieloX - 3, 3, 6); riga(cieloX - 2, 2, 4); riga(cieloX - 4, 4, 8) }
@@ -147,8 +183,11 @@ function disegna() {
   // dove sta: passeggia avanti e indietro
   if (S === 'passeggia' || S === 'corre' || S === 'ginnastica') { x += verso * (S === 'corre' ? 2 : 1); if (x > 20) verso = -1; if (x < 6) verso = 1 }
   const opz = { passo: fase }
-  let salto = 0, extra = null
+  let salto = 0, extra = null, qx = null, qv = null // qx, qv: dove sta e da che parte guarda, se lo stato lo impone
+  const f1 = RIDOTTO.matches ? 1 : fase // con meno animazioni l'attesa e il saluto restano sul fotogramma che si capisce
   switch (S) {
+    case 'attende': qx = 12; qv = -1; opz.passo = 0; opz.occhi = !RIDOTTO.matches && tick % 7 === 0 ? 'chiusi' : 'aperti'; extra = () => freccina(15 + f1, 12); break
+    case 'saluta': qx = 17; qv = -1; opz.passo = 0; opz.ciao = f1; extra = () => { scrivi('CIAO', 5, 1); if (f1) glifo('cuore', 22, 1); else glifo('♥', 23, 2) }; break
     case 'dorme': opz.occhi = 'chiusi'; opz.passo = 0; extra = () => { glifo('z', x + 10 + (tick % 3), 4 - (tick % 3)); if (tick % 2) glifo('z', x + 13, 1) }; break
     case 'fermo': opz.occhi = tick % 9 === 0 ? 'chiusi' : 'aperti'; opz.passo = 0; break
     case 'guarda': opz.occhi = 'grandi'; opz.passo = 0; break
@@ -178,19 +217,36 @@ function disegna() {
     case 'fuochi': salto = fase ? 2 : 0; opz.occhi = 'su'; extra = () => { for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + tick; P(Math.round(24 + Math.cos(a) * (2 + (tick % 3))), Math.round(5 + Math.sin(a) * (2 + (tick % 3)))) } }; break
   }
   if (zaino.livello() >= 10) opz.stella = true
-  lumaca(Math.round(x), suolo, verso, { ...opz, salto })
+  lumaca(qx ?? Math.round(x), suolo, qv ?? verso, { ...opz, salto })
   extra?.()
   // il terreno
   for (let xx = 0; xx < COL; xx += 2) P(xx + (tick % 2), 15)
   // la busta in alto a destra quando c'è il premio da riscuotere (il led rosso del tasto lampeggia lo stesso)
-  if (tasto.classList.contains('msg') && tick % 2 && S !== 'chiama' && S !== 'tv' && S !== 'borsa') { riga(25, 0, 6); riga(25, 3, 6); colonna(25, 0, 4); colonna(30, 0, 4); P(27, 1); P(28, 1) }
+  if (tasto.classList.contains('msg') && tick % 2 && S !== 'chiama' && S !== 'tv' && S !== 'borsa' && S !== 'saluta') { riga(25, 0, 6); riga(25, 3, 6); colonna(25, 0, 4); colonna(30, 0, 4); P(27, 1); P(28, 1) }
 }
 
-function passo() {
-  if (RIDOTTO.matches && tick > 1) return
+/** Un passo del cervello e un disegno; `forza` disegna anche con meno animazioni (per attendi e saluta). */
+function passo(forza = false) {
+  if (RIDOTTO.matches && tick > 1 && !forza) return
   const t = Date.now()
   if (t >= fino) { const [s, d] = decidi(); if (s !== stato) { stato = s; da = t } fino = t + d; cuori = [] }
   disegna()
+}
+
+/** L'attesa del tasto ACCEDI del cercapersone grande: con true la chiocciolina aspetta a sinistra e indica il tasto in basso a
+ *  destra, finché non arriva false (allora torna il cervello normale). Il saluto, se c'è, passa davanti. */
+export function attendi(si) {
+  attesa = !!si; fino = 0
+  if (g) passo(true)
+}
+
+/** Il saluto: per `ms` la chiocciolina ti saluta con l'antenna, «CIAO» e il cuoricino, davanti a tutto il resto; poi torna
+ *  normale. Ridisegna subito. */
+export function saluta(ms = 2600) {
+  salutoFino = Date.now() + ms; fino = 0
+  if (g) passo(true)
+  clearTimeout(salutoT)
+  if (RIDOTTO.matches) salutoT = setTimeout(() => { fino = 0; if (g) passo(true) }, ms + 50) // con meno animazioni nessuno ridisegnerebbe la fine
 }
 
 /** Accende il tomodachi sullo schermo lcd del tasto. */

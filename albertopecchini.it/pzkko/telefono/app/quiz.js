@@ -1,7 +1,8 @@
 // L'app Quiz (23.10): i quiz retributivi (chat/quiz.js) a tutto schermo. L'ingresso dice quante risposte pagate restano oggi,
-// il record di serie e gli argomenti; la partita è una domanda alla volta, col cerchio dei 15 secondi, la foto quando c'è
-// (con il credito), quattro risposte grandi; ogni risposta giusta mostra quanto ha pagato, la serie cresce; alla fine il
-// riepilogo. Le domande, i premi e il tetto giornaliero sono quelli della chat.
+// il record di serie e gli argomenti; la partita è una domanda alla volta, col cerchio dei 15 secondi, a sinistra la foto
+// intera quando c'è (con il credito) o se no la domanda scritta grande, a destra le quattro risposte una sotto l'altra; ogni
+// risposta giusta mostra quanto ha pagato, la serie cresce; alla fine il riepilogo. Le domande, i premi e il tetto
+// giornaliero sono quelli della chat.
 
 import * as zaino from '../../chat/zaino.js'
 import * as quiz from '../../chat/quiz.js'
@@ -31,19 +32,37 @@ function ingresso() {
     </div>`
 }
 
+// la domanda scritta grande, nella colonna di sinistra quando non c'è la foto (le più lunghe, oltre 80 caratteri, un po' più piccole)
+const grande = (t) => `<h3 class="t-qz-domanda${t.length > 80 ? ' lunga' : ''}">${esc(t)}</h3>`
+
 function domanda() {
   const d = P.domande[P.i]
   bloccata = false
+  // con la foto: la domanda in testa, la foto intera a sinistra e le risposte a destra; senza: la domanda grande a sinistra
   host.innerHTML = `${ctx.testata(`Quiz · ${P.i + 1}/${P.domande.length}`, `<span class="t-qz-serie${P.serie > 1 ? ' su' : ''}">${icona('fuoco')}${P.serie}</span>`)}
-    <div class="t-corpo-app t-qz t-qz-gioco">
+    <div class="t-corpo-app t-qz t-qz-gioco ${d.img ? 'con-foto' : 'senza-foto'}">
       <div class="t-qz-punti">${P.domande.map((_, i) => `<i class="${i < P.i ? (P.esiti[i] ? 'si' : 'no') : i === P.i ? 'ora' : ''}"></i>`).join('')}</div>
-      <div class="t-qz-tempo"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><circle class="v" cx="22" cy="22" r="19" style="animation-duration:${quiz.TEMPO}s"/></svg><b data-sec>${quiz.TEMPO}</b></div>
-      <span class="t-qz-diff d${d.diff}">${NOMI[d.diff]} · ${quiz.PAGA[d.diff]} $pzk</span>
-      <h3 class="t-qz-q">${esc(d.q)}</h3>
-      ${d.img ? `<figure class="t-qz-foto"><img src="${esc(d.img)}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(d.credito ?? '')}</figcaption></figure>` : ''}
-      <div class="t-qz-risp">${d.risposte.map((t, i) => `<button type="button" data-r="${i}"><span>${'ABCD'[i]}</span>${esc(t)}</button>`).join('')}</div>
+      <div class="t-qz-testa">
+        <div class="t-qz-tempo"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><circle class="v" cx="22" cy="22" r="19" style="animation-duration:${quiz.TEMPO}s"/></svg><b data-sec>${quiz.TEMPO}</b></div>
+        <span class="t-qz-diff d${d.diff}">${NOMI[d.diff]} · ${quiz.PAGA[d.diff]} $pzk</span>
+        ${d.img ? `<h3 class="t-qz-q">${esc(d.q)}</h3>` : ''}
+      </div>
+      <div class="t-qz-campo">
+        ${d.img ? `<figure class="t-qz-foto"><img src="${esc(d.img)}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(d.credito ?? '')}</figcaption></figure>` : grande(d.q)}
+        <div class="t-qz-risp">${d.risposte.map((t, i) => `<button type="button" data-r="${i}"><span>${'ABCD'[i]}</span>${esc(t)}</button>`).join('')}</div>
+      </div>
       <div class="t-qz-esito" hidden></div>
     </div>`
+  // il rapporto vero della foto, per il css: la foto è larga quanto il rapporto le concede nell'altezza del campo, intera.
+  // Se non si carica, al suo posto va la domanda grande (e si tira a indovinare)
+  const img = host.querySelector('.t-qz-foto img')
+  if (img) {
+    const fig = img.parentElement
+    const rapporto = () => { if (img.naturalWidth) fig.style.setProperty('--ar', (img.naturalWidth / img.naturalHeight).toFixed(4)) }
+    img.addEventListener('load', rapporto)
+    img.addEventListener('error', () => { fig.outerHTML = grande('la foto non si carica: tira a indovinare') })
+    if (img.complete) rapporto()
+  }
   inizio = performance.now()
   clearInterval(timer)
   timer = setInterval(() => {
@@ -67,10 +86,15 @@ function rispondi(i) {
     else if (Number(b.dataset.r) === i) b.classList.add('sbagliata')
   }
   host.querySelector('.t-qz-tempo')?.classList.add('ferma')
+  // l'esito prende il posto della testa (in orizzontale; in verticale va sotto le risposte): foto e risposte restano dove sono.
+  // La nota delle foto («era il Palazzo Ducale.») ripete la risposta giusta, già scritta o già scelta: lì non serve
+  host.querySelector('.t-qz-gioco')?.classList.add('risposto')
+  const nota = r.nota && r.nota !== `era ${d.risposte[r.indiceGiusto]}.` ? r.nota : ''
   const es = host.querySelector('.t-qz-esito')
   es.hidden = false
   es.className = `t-qz-esito ${r.giusta ? 'si' : 'no'}`
-  es.innerHTML = `${icona(r.giusta ? 'bot-ride' : 'bot-triste')}<div><b>${r.giusta ? (r.pagato ? `+${fmt(r.premio)} $pzk` : 'giusto!') : i === null ? 'tempo scaduto' : 'sbagliato'}</b><small>${r.giusta ? `+${r.xp} xp${r.serie > 1 ? ` · serie di ${r.serie}` : ''}` : `era: ${esc(d.risposte[r.indiceGiusto])}`}</small>${r.nota ? `<p>${esc(r.nota)}</p>` : ''}</div><button class="c-b" type="button" data-avanti>${P.finita ? 'risultato' : 'avanti'}</button>`
+  es.innerHTML = `${icona(r.giusta ? 'bot-ride' : 'bot-triste')}<div><b>${r.giusta ? (r.pagato ? `+${fmt(r.premio)} $pzk` : 'giusto!') : i === null ? 'tempo scaduto' : 'sbagliato'}</b><small>${r.giusta ? `+${r.xp} xp${r.serie > 1 ? ` · serie di ${r.serie}` : ''}` : `era: ${esc(d.risposte[r.indiceGiusto])}`}</small>${nota ? `<p>${esc(nota)}</p>` : ''}</div><button class="c-b" type="button" data-avanti>${P.finita ? 'risultato' : 'avanti'}</button>`
+  es.scrollIntoView({ block: 'nearest' }) // di colpo, senza scivolare (niente transizioni); se l'esito si vede già non fa niente
   if (r.livello) ctx.toast(`sei salito al <b>livello ${r.livello}</b>!`, { icona: 'livello' })
   P.ultimo = r
 }

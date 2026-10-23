@@ -2,10 +2,10 @@
    di plastica dura, con lo schermo a fosfori verdi come il Pip-Boy del wallet: dentro i messaggi, il bot risponde con
    «schede» (barra colorata a sinistra, titolo, testo, campi, piè, pulsanti) e in fondo la riga dove si scrive il
    comando, coi suggerimenti. Il testo e i numeri sono in Fake Receipt (fonts/, CC0), il carattere a matrice di punti
-   degli scontrini; i titoli in Anton, quello che scrivi tu in Permanent Marker. Le icone sono le nostre (art/chat-*, chat/icone.js), mai emoji di sistema. */
+   degli scontrini, e da 23.10 è l'unico carattere (anche i titoli e quello che scrivi tu: Alberto lo vuole sempre). Le icone sono le nostre (art/chat-*, chat/icone.js), mai emoji di sistema. */
 
 .chat{color:#dfe6d6;font:400 16px/1.4 "Fake Receipt","Courier New",monospace;--led:#46ff7d;--ambra:#ffb02e;--rosso:#ff5b4a;--blu:#5fb5ff;--lcd:#9fb48a;--vetro:#0b100c;--plastica:#1d201c;
-  --mono:"Fake Receipt",ui-monospace,Consolas,monospace;--fa:"Anton",Impact,sans-serif;--marker:"Permanent Marker","Comic Sans MS",cursive}
+  --mono:"Fake Receipt",ui-monospace,Consolas,monospace;--fa:"Fake Receipt",ui-monospace,monospace;--marker:"Fake Receipt",ui-monospace,monospace}
 .chat *{box-sizing:border-box}
 .chat button{font:inherit}
 .chat input{font:inherit;color:inherit}

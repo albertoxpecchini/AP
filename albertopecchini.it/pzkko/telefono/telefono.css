@@ -6,7 +6,8 @@
    barra di stato a cristalli liquidi, piastrelle come adesivi col bordo nero, pannelli di plastica scura coi fosfori verdi,
    tasti di gomma gialli. Le variabili (--led, --ambra…) e la tipografia vengono dalla classe .chat sullo schermo. */
 
-.tel{--w:min(96vw,1240px,calc(90dvh*1341/774));position:fixed;inset:0;margin:auto;width:var(--w);height:calc(var(--w)*774/1341);max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#e9efe6}
+.tel{--w:min(96vw,1240px,calc(90dvh*1341/774));position:fixed;inset:0;margin:auto;width:var(--w);height:calc(var(--w)*774/1341);max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#e9efe6;
+  font-family:"Fake Receipt",ui-monospace,monospace;--mono:"Fake Receipt",ui-monospace,monospace;--fa:"Fake Receipt",ui-monospace,monospace;--marker:"Fake Receipt",ui-monospace,monospace} /* un carattere solo, sempre (Alberto, 23.10) */
 .tel::backdrop{background:radial-gradient(70% 60% at 50% 45%,rgba(70,255,125,.08),transparent 70%),rgba(10,9,8,.68);backdrop-filter:blur(3px);transition:opacity .5s}
 .tel[open]{animation:t-apre .4s cubic-bezier(.2,1.1,.3,1)}
 .tel.chiude{animation:t-chiude .2s ease-in forwards}
@@ -17,8 +18,14 @@
 .tel :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
 
 /* il cercapersone: la foto, e sopra lo schermo, il led e i due tasti nelle quote del disegno */
-.t-corpo{position:relative;width:100%;height:100%;container-type:inline-size;transition:opacity .32s ease-out}
+/* niente transizione sull'opacità: allo scambio col doppione il cercapersone vero deve comparire DI COLPO (con una
+   transizione ripartiva da 0 e per 340 ms si vedeva «ricaricarsi»: la doppia animazione notata da Alberto il 23.10) */
+.t-corpo{position:relative;width:100%;height:100%;container-type:inline-size}
 .t-corpo:focus{outline:none}
+/* il vetro spento dietro lo schermo: nella foto il buco dello schermo è trasparente, e quando lo schermo si spegne (si
+   schiaccia in una riga) dietro deve esserci il nero del tubo, non il muro. Stesse quote e stessi angoli di .t-schermo */
+.t-corpo::before{content:"";position:absolute;left:8.352%;top:24.677%;width:66.294%;height:56.202%;border-radius:.9% / 1.9%;background:#030504;box-shadow:inset 0 0 18px #000}
+.tel.pieno .t-corpo::before{inset:0;width:auto;height:auto;border-radius:0}
 .t-cornice{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;user-select:none;filter:drop-shadow(0 28px 40px rgba(0,0,0,.6))}
 .t-schermo{position:absolute;left:8.352%;top:24.677%;width:66.294%;height:56.202%;overflow:hidden;border-radius:.9% / 1.9%;background:#050806;isolation:isolate;box-shadow:inset 0 0 18px rgba(0,0,0,.9)}
 .t-schermo::after{content:"";position:absolute;inset:0;z-index:40;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.09) 0 1px,transparent 1px 3px),linear-gradient(115deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 36%,transparent 38%)}
@@ -26,18 +33,21 @@
 .t-led{position:absolute;left:84.638%;top:25.581%;width:2.685%;height:4.91%;border-radius:50%;pointer-events:none}
 .t-led.on{background:radial-gradient(circle at 40% 35%,#ffb3a8,#ff3b2e 45%,rgba(255,59,46,0) 72%);box-shadow:0 0 14px 4px rgba(255,59,46,.55);animation:t-led 1.2s steps(2) infinite}
 @keyframes t-led{50%{opacity:.2}}
-.t-tasto{position:absolute;left:81.506%;width:8.7%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transition:background .08s,transform .08s}
-.t-tasto.su{top:38.501%}.t-tasto.giu{top:62.274%}
+/* i tasti: le gomme misurate sulla foto il 23.10 sera (tools/pzkko/tasti-pager.mjs, cerchio ai minimi quadrati su 720 raggi:
+   centri 1151,9 / 356,7 e 1152,0 / 541,6 px, raggi 58,9 e 59,4 px su 1341 × 774) */
+.t-tasto{position:absolute;left:81.490%;width:8.821%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transition:background .08s,transform .08s}
+.t-tasto.su{top:38.440%}.t-tasto.giu{top:62.328%}
 @media (hover:hover){.t-tasto:hover{background:radial-gradient(circle,rgba(255,255,255,.1),transparent 70%)}}
 .t-tasto:active{transform:scale(.94);background:radial-gradient(circle,rgba(0,0,0,.35),rgba(0,0,0,.15) 60%,transparent 72%)}
 /* le scritte sotto i tasti: bianche, stampate sulla plastica come la serigrafia dei cercapersone veri, grandi in
    proporzione al cercapersone (cqw: la larghezza di .t-corpo) e staccate dai graffi da un'ombra scura. Il posto è misurato
    sulla foto: sotto il tasto di sopra la plastica libera va da 430 a 469 px (su 774: l'anello scuro e il bordino lucido
    finiscono a 428, l'anello del tasto di sotto comincia a 470), il centro è a 449,5; per il tasto di sotto alla stessa
-   distanza, 634. Tutte e due cadono al 130 % dell'altezza del tasto, centrate: mai sul tasto né sul suo bordo */
-.t-tasto::after{position:absolute;left:50%;top:130%;translate:-50% -50%;font:400 clamp(12px,1.25cqw,18px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#f3f1ea;white-space:nowrap;
+   distanza, 634. Tutte e due cadono al 128,4 % dell'altezza del tasto (152 px sotto il bordo alto, su un tasto di 118,3), centrate: mai sul tasto né sul suo bordo. Dal 23.10 sera il
+   tasto di sopra è rosso e dice CHIUDI, quello di sotto è verde e dice INDIETRO (i colori sono nella foto) */
+.t-tasto::after{position:absolute;left:50%;top:128.4%;translate:-50% -50%;font:400 clamp(12px,1.25cqw,18px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#f3f1ea;white-space:nowrap;
   text-shadow:0 1px 0 #000,0 0 2px #000,0 0 6px rgba(0,0,0,.9)}
-.t-tasto.su::after{content:"home"}.t-tasto.giu::after{content:"indietro"}
+.t-tasto.su::after{content:"chiudi"}.t-tasto.giu::after{content:"indietro"}
 
 /* la barra di stato: una riga di cristalli liquidi */
 .t-stato{position:absolute;inset:0 0 auto 0;z-index:20;height:26px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border-bottom:1px solid rgba(70,255,125,.22);background:linear-gradient(180deg,rgba(70,255,125,.1),rgba(70,255,125,.03));font:400 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--led);text-shadow:0 0 6px rgba(70,255,125,.6);pointer-events:none}
@@ -163,25 +173,52 @@
 .chat-app .c-riga input{font-size:16px}
 .chat-app .c-lista{padding-top:8px}
 
-/* la transizione: il doppione del cercapersone piccolo, e lo schermo che si accende */
+/* la transizione: il doppione del cercapersone piccolo che vola fino al posto di quello grande (e alla chiusura torna) */
 .tel.zoom{animation:none}
 .tel.zoom-nascosto .t-corpo{opacity:0}
 .tel.zoom::backdrop{opacity:0}
 .tel.zoom.zoom-sfondo::backdrop{opacity:1}
 .t-doppio{position:fixed;z-index:50;pointer-events:none;transition:opacity .3s;filter:drop-shadow(0 18px 30px rgba(0,0,0,.55))}
 .t-doppio img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
-.t-doppio-lcd{position:absolute;overflow:hidden;border-radius:2px;background:#a9bc96;box-shadow:inset 0 0 4px rgba(0,0,0,.6)}
+/* l'lcd del doppione ha gli stessi angoli dello schermo vero (.t-schermo, .9 % / 1.9 %): allo scambio non cambia niente */
+.t-doppio-lcd{position:absolute;overflow:hidden;border-radius:.9% / 1.9%;background:#a9bc96;box-shadow:inset 0 0 4px rgba(0,0,0,.6)}
 .t-doppio-lcd canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .t-doppio.via{opacity:0}
-.t-boot{position:fixed;z-index:51;overflow:hidden;background:#a9bc96;pointer-events:none;opacity:0;transition:opacity .25s}
-.t-boot.su{opacity:1}.t-boot.via{opacity:0}
-.t-boot canvas{position:absolute;left:4%;top:8%;width:46%;height:auto;aspect-ratio:2/1;image-rendering:pixelated}
-.t-boot::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(28,38,22,.07) 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,rgba(28,38,22,.07) 0 1px,transparent 1px 4px),radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.18))}
-.t-boot-txt{position:absolute;right:6%;top:50%;translate:0 -50%;display:grid;justify-items:start;gap:8px;color:#1c2616;font:400 13px/1 var(--mono,monospace);letter-spacing:.18em;text-transform:uppercase}
-.t-boot-txt b{font:400 clamp(28px,6vw,72px)/1 var(--fa,Anton,Impact,sans-serif);letter-spacing:.04em;text-transform:none}
-.t-boot-txt i{display:block;width:100%;min-width:140px;height:14px;margin-top:4px;padding:2px;border:2px solid #1c2616}
-.t-boot-txt em{display:block;width:0;height:100%;background:#1c2616;animation:t-carica .85s steps(10) forwards}
-@keyframes t-carica{to{width:100%}}
+
+/* la porta (23.10 sera): l'lcd verde del tomodachi a tutto schermo, identico a quello del doppione, col tasto ACCEDI in basso a
+   destra (la chiocciolina intanto sta a sinistra e lo guarda: tomodachi.attendi). Premuto, la chiocciolina si sposta in alto a
+   sinistra e a destra compaiono «pzk os», il registro con le baggianate e la barra; poi la porta sfuma e sotto c'è pzk os.
+   Alla chiusura torna, con la chiocciolina che saluta. Sta sopra il tubo catodico: l'lcd non è un tubo. */
+.t-porta{position:absolute;inset:0;z-index:45;overflow:hidden;background:#a9bc96;color:#1c2616;font:400 16px/1.2 "Fake Receipt",ui-monospace,monospace;transition:opacity .3s}
+.t-porta[hidden]{display:none}
+.t-porta.via{opacity:0}
+.t-porta-lcd canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;
+  transition:left .5s cubic-bezier(.6,0,.25,1),top .5s cubic-bezier(.6,0,.25,1),width .5s cubic-bezier(.6,0,.25,1),height .5s cubic-bezier(.6,0,.25,1)}
+/* nel caricamento la chiocciolina e la scritta stanno sulla stessa riga: tutte e due centrate a metà altezza, a 4,5 % dai bordi */
+.t-porta[data-fase="carica"] .t-porta-lcd canvas{left:4.5%;top:27.5%;width:45%;height:45%}
+/* ACCEDI: scritto a cristalli liquidi, con il cursore che lampeggia; compare a scatti come i segmenti di un lcd */
+.tel .t-accedi{position:absolute;right:4%;bottom:9%;display:flex;align-items:center;gap:.45em;padding:.5em .75em .5em 1em;border:max(2px,.2cqw) solid currentColor;border-radius:0;background:none;color:#1c2616;
+  font:400 clamp(16px,2.1cqw,30px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;visibility:hidden}
+.tel .t-accedi::after{content:"";width:.55em;height:.95em;background:currentColor;animation:t-cursore 1.06s linear infinite}
+@keyframes t-cursore{0%,49%{opacity:1}50%,100%{opacity:0}}
+.t-porta.pronta[data-fase="attesa"] .t-accedi{visibility:visible;animation:t-segmenti .3s steps(3)}
+@keyframes t-segmenti{from{opacity:0}}
+@media (hover:hover){.tel .t-accedi:hover{background:#1c2616;color:#a9bc96}}
+.tel .t-accedi:active{background:#1c2616;color:#a9bc96;translate:0 1px}
+.tel .t-accedi:focus-visible{outline:max(2px,.2cqw) dashed #1c2616;outline-offset:.3em}
+/* il caricamento: «pzk os», le ultime tre baggianate (le vecchie sbiadite), la barra a scatti */
+.t-porta-txt{position:absolute;left:53.5%;right:4.5%;top:13%;bottom:13%;display:flex;flex-direction:column;gap:.6em;visibility:hidden;opacity:0;transition:opacity .25s .3s}
+.t-porta[data-fase="carica"] .t-porta-txt{visibility:visible;opacity:1}
+.tel .t-porta-txt b{color:#1c2616;text-shadow:none;font:400 clamp(26px,4.6cqw,66px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.02em}
+.t-frasi{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:.4em;margin:0;padding:0;list-style:none;font-size:clamp(12px,1.3cqw,19px);line-height:1.2;letter-spacing:.02em}
+.t-frasi li::before{content:"> "}
+.t-frasi li.ok::after{content:"\a0…\a0ok"} /* spazi che non vanno a capo: «… ok» resta attaccato all'ultima parola */
+.t-frasi li.fine.ok::after{content:""}
+.t-frasi li:not(:last-child){opacity:.5}
+.t-barra{display:block;flex:none;height:clamp(12px,1.5cqw,20px);padding:2px;border:max(2px,.18cqw) solid currentColor}
+.t-barra em{display:block;width:0;height:100%;background:currentColor;transition:width .2s steps(3)}
+/* lo spegnimento (telefono.js, spegni): lo schermo si schiaccia in una riga e poi in un punto; questo strato lo sbianca */
+.t-bianco{position:absolute;inset:0;z-index:60;background:#f2fff4;opacity:0;pointer-events:none}
 
 /* sul cellulare: lo schermo prende tutta la finestra, i tasti diventano una barra in basso */
 .tel.pieno{width:100vw;height:100dvh}
@@ -193,9 +230,19 @@
 .tel.pieno .t-home{padding-top:calc(36px + env(safe-area-inset-top,0px));padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
 .tel.pieno .t-toast{top:calc(30px + env(safe-area-inset-top,0px))}
 .tel.pieno .t-nav{position:absolute;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(2,1fr);height:calc(48px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);border-top:2px solid #000;background:#151816}
-.tel.pieno .t-nav button{border:0;background:none;color:var(--led);font:400 26px/1 var(--fa);cursor:pointer}
-.tel.pieno .t-nav button .emo{height:30px;width:30px;object-fit:contain}
-.tel.pieno .t-nav button:active{background:rgba(70,255,125,.12)}
+.tel.pieno .t-nav{gap:8px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.tel.pieno .t-nav button{border:2px solid #000;border-radius:7px;color:#fff;font:400 15px/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;box-shadow:0 3px 0 #000;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+.tel.pieno .t-nav [data-t="indietro"]{background:#3d824f} /* i colori delle gomme della foto */
+.tel.pieno .t-nav [data-t="chiudi"]{background:#c74337}
+.tel.pieno .t-nav button:active{translate:0 2px;box-shadow:0 1px 0 #000}
+/* sul cellulare la porta lascia libera la barra (si può chiudere anche da lì); in verticale la chiocciolina sta in alto */
+.tel.pieno .t-porta{bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+@media (max-aspect-ratio:1/1){
+  .tel.pieno .t-porta-lcd canvas{top:20%;height:auto}
+  .tel.pieno .t-porta[data-fase="carica"] .t-porta-lcd canvas{left:6%;top:5%;width:88%;height:auto}
+  .tel.pieno .t-porta-txt{left:6%;right:6%;top:calc(5% + 50cqw);bottom:auto;height:auto} /* subito sotto la chiocciolina: alta 88cqw / 2,04 ≈ 43cqw, più lo stacco */
+  .tel.pieno .t-accedi{right:50%;translate:50% 0;bottom:16%}
+}
 
 /* in verticale (il cellulare tenuto dritto): la home in colonna, le app con più spazio sotto */
 @container palco (max-aspect-ratio: 1/1){
@@ -396,13 +443,25 @@
 .t-qz-serie{display:inline-flex;align-items:center;gap:3px;font:400 18px/1 var(--fa);color:#76856f}
 .t-qz-serie .emo{height:22px;width:22px;margin:0;filter:grayscale(1);opacity:.5}
 .t-qz-serie.su{color:var(--ambra)}.t-qz-serie.su .emo{filter:none;opacity:1}
-.t-qz-gioco{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-content:start}
-.t-qz-punti{grid-column:1 / -1;display:flex;gap:4px}
+/* la partita (23.10, Alberto: «in quiz le immagini a sinistra intere e poi a destra le scelte multiple»). Sopra i pallini e
+   la testa: il cerchio dei secondi, la difficoltà e, con la foto, la domanda. Sotto il campo a due colonne: a sinistra la foto
+   INTERA (mai ritagliata), a destra le quattro risposte una sotto l'altra, alte quanto la foto, così la prima comincia a filo
+   col bordo alto della foto e l'ultima finisce a filo con quello basso; il credito della foto corre sotto, largo quanto il
+   campo. Senza foto la colonna di sinistra è la domanda scritta grande: le risposte restano nello stesso posto e con la
+   stessa forma in tutte le domande (in «di tutto un po'» foto e domande scritte si alternano, e i tasti non saltano). Dopo la
+   risposta l'esito prende il posto della testa, nella stessa riga: niente si sposta, la foto non rimpicciolisce, e sul palco
+   760 × 372 tutto sta nello schermo senza scorrere. Le quote: il corpo dell'app è alto 302 punti (372 − 26 di barra − 44 di
+   testata); tolti 8 + 10 di margini, 6 di pallini, 56 di testa e due spazi da 6, al campo restano 210, e alla foto 194 (sotto
+   ci sono i 12 del credito e 4 di spazio). In verticale (il cellulare dritto) si va in colonna e si scorre: vedi sotto. */
+.t-qz-gioco{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(56px,auto) minmax(0,1fr);grid-template-areas:"punti" "testa" "campo";gap:6px;padding:8px 14px 10px}
+.t-qz-punti{grid-area:punti;display:flex;gap:4px}
 .t-qz-punti i{flex:1;height:6px;background:rgba(255,255,255,.12)}
 .t-qz-punti i.ora{background:var(--blu);box-shadow:0 0 6px var(--blu)}
 .t-qz-punti i.si{background:var(--led)}.t-qz-punti i.no{background:var(--rosso)}
 .t-qz-punti.grandi{justify-content:center;margin:8px 0}.t-qz-punti.grandi i{flex:none;width:22px;height:10px}
-.t-qz-tempo{position:relative;grid-row:span 2;width:52px;height:52px}
+.t-qz-testa{grid-area:testa;display:grid;grid-template-columns:auto minmax(0,1fr);align-content:center;gap:5px 12px}
+.risposto .t-qz-testa{visibility:hidden}
+.t-qz-tempo{position:relative;grid-row:1 / 3;width:52px;height:52px}
 .t-qz-tempo svg{width:100%;height:100%;transform:rotate(-90deg)}
 .t-qz-tempo circle{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4}
 .t-qz-tempo circle.v{stroke:var(--blu);stroke-dasharray:119.4;stroke-dashoffset:0;animation:t-tempo linear forwards;stroke-linecap:round}
@@ -411,30 +470,72 @@
 .t-qz-tempo b{position:absolute;inset:0;display:grid;place-items:center;font:400 18px/1 var(--fa);color:#fff}
 .t-qz-diff{align-self:end;font:400 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blu)}
 .t-qz-diff.d1{color:var(--led)}.t-qz-diff.d3{color:var(--rosso)}
-.t-qz-q{margin:0;font:400 18px/1.25 var(--mono);color:#fff}
-.t-qz-foto{grid-column:1 / -1;margin:4px 0 0}
-.t-qz-foto img{display:block;width:100%;max-height:170px;object-fit:cover;border:2px solid #000;border-radius:6px}
-.t-qz-foto figcaption{margin-top:3px;font:400 9.5px/1.2 var(--mono);color:#76856f}
-.t-qz-risp{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-.t-qz-risp button{display:flex;align-items:center;gap:9px;min-height:46px;padding:7px 10px;border:2px solid #000;border-radius:8px;background:#1d2534;color:#fff;font:400 14.5px/1.2 var(--mono);text-align:left;cursor:pointer;box-shadow:0 3px 0 #000;transition:background .15s}
+.senza-foto .t-qz-diff{grid-row:1 / 3;align-self:center}
+.t-qz-q{align-self:start;margin:0;font:400 18px/1.25 var(--mono);color:#fff}
+/* il campo è un contenitore (cqw, cqh = la sua larghezza e la sua altezza): la foto è larga quanto il suo rapporto (--ar,
+   messo da quiz.js appena l'immagine arriva; prima 3:2) le concede nell'altezza del campo meno il credito (12 + 4 di spazio)
+   e i 2 + 2 del bordo, e mai più del 55 % del campo; l'altezza segue da sola il rapporto, quindi niente bande e niente tagli.
+   Quando è l'altezza a comandare (quasi sempre: le foto sono orizzontali e il campo è basso e largo) la foto è alta
+   esattamente quanto la colonna delle risposte; quando comanda il 55 % (una panoramica) sta centrata in verticale su di loro */
+.t-qz-campo{grid-area:campo;container-type:size;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) 12px;grid-template-areas:"sx risp" "cap cap";gap:4px 12px}
+.senza-foto .t-qz-campo{grid-template-rows:minmax(0,1fr);grid-template-areas:"sx risp"}
+.t-qz-foto{display:contents;--ar:1.5}
+.t-qz-foto img{grid-area:sx;align-self:center;display:block;width:min(55cqw,calc((100cqh - 16px - 4px) * var(--ar) + 4px));height:auto;aspect-ratio:auto var(--ar);object-fit:contain;border:2px solid #000;border-radius:6px;background:#000}
+.t-qz-foto figcaption{grid-area:cap;min-width:0;font:400 9.5px/12px var(--mono);color:#76856f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* senza foto: la domanda grande, nello stesso riquadro blu dell'ingresso, centrata in verticale; il 42 % del campo è la
+   larghezza di una foto 3:2 piena (194 × 1,5 = 291 su 732), così le risposte cominciano più o meno dove cominciano con la foto */
+.t-qz-domanda{grid-area:sx;width:42cqw;display:grid;align-items:center;margin:0;padding:10px 14px;border:2px solid #000;border-radius:8px;background:#101826;box-shadow:inset 0 0 0 1px rgba(95,181,255,.3),0 3px 0 #000;font:400 20px/1.25 var(--fa);color:#fff;overflow-wrap:break-word}
+.t-qz-domanda.lunga{font-size:17px}
+/* le risposte: quattro righe uguali che si dividono l'altezza della foto (194 − 3 × 6 di spazio = 44 l'una: due righe di
+   testo da 14 px ci stanno, e la risposta più lunga, 43 caratteri × 0,676 em di Fake Receipt = 407 px, va su due righe) */
+.t-qz-risp{grid-area:risp;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(4,minmax(min-content,1fr));gap:6px}
+.t-qz-risp button{display:flex;align-items:center;gap:9px;min-width:0;padding:3px 10px;border:2px solid #000;border-radius:8px;background:#1d2534;color:#fff;font:400 14px/1.15 var(--mono);text-align:left;cursor:pointer;box-shadow:0 3px 0 #000;transition:background .15s}
 .t-qz-risp button span{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:4px;background:rgba(255,255,255,.12);font:400 13px/1 var(--fa)}
 @media (hover:hover){.t-qz-risp button:not(:disabled):hover{background:#283550}}
 .t-qz-risp button:active{transform:translateY(2px);box-shadow:0 1px 0 #000}
 .t-qz-risp button.giusta{background:#1e6b3a;box-shadow:0 3px 0 #000,0 0 14px rgba(70,255,125,.4)}
 .t-qz-risp button.sbagliata{background:#7a1f1a}
 .t-qz-risp button:disabled{cursor:default}
-.t-qz-esito{grid-column:1 / -1;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-top:8px;padding:9px 12px;border:2px solid #000;border-radius:8px;animation:c-msg .2s ease-out}
+/* l'esito sta nella riga della testa (56 punti): una riga col verdetto e il premio o la risposta giusta, sotto il «lo
+   sapevi?» in piccolo (la nota più lunga, 101 caratteri a 10,5 px, fa 717 px: due righe nei ~550 che restano fra la faccina
+   e «avanti») */
+.t-qz-esito{grid-area:testa;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:3px 10px;border:2px solid #000;border-radius:8px;animation:c-msg .2s ease-out}
 .t-qz-esito.si{background:rgba(70,255,125,.12)}.t-qz-esito.no{background:rgba(255,91,74,.12)}
-.t-qz-esito .emo{height:44px;width:44px;margin:0}
-.t-qz-esito b{display:block;font:400 19px/1.1 var(--fa);color:#fff}
+.t-qz-esito .emo{height:40px;width:40px;margin:0}
+.t-qz-esito>div{min-width:0;line-height:1} /* senza, la prima riga prende l'interlinea del corpo e l'esito con la nota fa 58,5 */
+.t-qz-esito b{margin-right:8px;font:400 18px/1 var(--fa);color:#fff}
 .t-qz-esito small{font:400 12px/1.2 var(--mono);color:#cfdccb}
-.t-qz-esito p{margin:4px 0 0;font:400 12px/1.3 var(--mono);color:#9fb29a}
+.t-qz-esito p{margin:3px 0 0;font:400 10.5px/1.1 var(--mono);color:#9fb29a}
 .t-qz-esito[hidden]{display:none}
 .t-qz-fine{text-align:center}
 .t-qz-fine h3{margin:4px 0;font:400 34px/1 var(--fa);color:#fff}
 .t-qz-fine p{margin:0 0 6px;color:#c8d4e6}
 .t-qz-fine .t-qz-dati{margin:10px 0}
-@container palco (max-aspect-ratio: 1/1){.t-qz-risp{grid-template-columns:1fr}}
+/* in verticale (il cellulare dritto) una colonna sola che scorre: la testa, la foto intera larga quanto lo schermo o la domanda
+   grande, le risposte una sotto l'altra coi tasti alti 46 per il pollice, e l'esito sotto le risposte, vicino al pollice, senza
+   coprire la testa; quando c'è la nota (solo nelle domande scritte, che non hanno la foto e hanno posto) il suo «avanti» va
+   su una riga sua, largo quanto l'esito, e la nota ha tutta la riga invece di 170 px e cinque righe. La foto è alta al
+   massimo il 34 % del palco: su un telefono da 844 il corpo dell'app è alto 726 (844 − 26 di barra − 44 di testata − 48 dei
+   tasti in basso) e tutto il resto, col caso peggiore (quattro risposte su due righe, 53 l'una, e l'esito di una risposta
+   sbagliata, 78), fa 435: alla foto restano 291, e il 34 % di 844 è 287. Così anche una foto verticale e l'esito stanno nello
+   schermo senza scorrere; sui telefoni più bassi si scorre */
+@container palco (max-aspect-ratio: 1/1){
+  .t-qz-gioco{grid-template-rows:none;grid-template-areas:"punti" "testa" "campo" "esito";align-content:start;padding-bottom:16px}
+  .t-qz-campo,.senza-foto .t-qz-campo{container-type:normal;grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"sx" "cap" "risp";gap:4px}
+  .senza-foto .t-qz-campo{grid-template-areas:"sx" "risp";gap:10px}
+  .t-qz-foto img{justify-self:center;width:min(100%,calc((34cqh - 4px) * var(--ar) + 4px))}
+  .t-qz-foto figcaption{white-space:normal}
+  .t-qz-domanda{width:auto}
+  .t-qz-risp{grid-template-rows:none;gap:8px;margin-top:6px}
+  .t-qz-risp button{min-height:46px;padding:7px 10px;font-size:14.5px;line-height:1.2}
+  .t-qz-esito{grid-area:esito;gap:8px 10px;padding:9px 12px}
+  .t-qz-esito .emo{height:44px;width:44px}
+  .t-qz-esito b{display:block;margin:0 0 3px;font-size:19px}
+  .t-qz-esito p{margin-top:4px;font-size:12px;line-height:1.3}
+  .t-qz-esito:has(p){grid-template-columns:auto minmax(0,1fr)}
+  .t-qz-esito:has(p) .c-b{grid-column:1 / -1;padding:9px 12px 10px}
+  .risposto .t-qz-testa{visibility:visible}
+}
 
 /* ───────── Quest ───────── */
 .t-mi-intro{margin:0 0 10px;font:400 13px/1.4 var(--mono);color:#9fb29a}
@@ -485,7 +586,7 @@
 .t-mi-fine{grid-column:1 / -1;margin-top:10px;transform:none}
 
 /* ───────── Giocatori ───────── */
-.t-gi-tab{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.t-gi-tab{flex:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06)}
 .t-gi-tab button{display:flex;align-items:center;justify-content:center;gap:5px;height:30px;border:2px solid #000;border-radius:6px;background:#1a1f1b;color:#cfdccb;font:400 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .t-gi-tab button .emo{height:20px;width:20px;margin:0}
 .t-gi-tab button.on{background:#6a3fb5;color:#fff;box-shadow:0 0 12px rgba(155,107,255,.4)}
@@ -585,22 +686,13 @@
 .t-sf-oggi small,.t-sf-oggi b{display:block}
 .t-sf-oggi b{margin:2px 0 4px}
 @container palco (min-aspect-ratio: 3/2){
-  .t-qz-foto img{max-height:118px}
-  .t-qz-risp button{min-height:40px;padding:5px 9px}
   .t-qz-q{font-size:16.5px}
 }
 
 /* la transizione senza cuciture: durante lo zoom il cercapersone vero appare e sparisce di colpo (sotto c'è il doppione,
-   identico), il doppione ha la stessa ombra; l'accensione parte dall'lcd identico a quello del doppione */
+   identico), il doppione ha la stessa ombra; la porta è identica all'lcd del doppione */
 .tel.zoom .t-corpo{transition:none}
 .t-doppio{filter:drop-shadow(0 28px 40px rgba(0,0,0,.6))}
-.t-boot{opacity:1;transition:opacity .3s}
-.t-boot canvas{left:0;top:0;width:100%;height:100%;aspect-ratio:auto;transition:left .55s cubic-bezier(.6,0,.25,1),top .55s cubic-bezier(.6,0,.25,1),width .55s cubic-bezier(.6,0,.25,1),height .55s cubic-bezier(.6,0,.25,1)}
-.t-boot.su canvas{left:3%;top:12%;width:50%;height:50%}
-.t-boot .t-boot-txt{opacity:0;transition:opacity .3s .45s}
-.t-boot.su .t-boot-txt{opacity:1}
-.t-boot .t-boot-txt em{animation:none}
-.t-boot.su .t-boot-txt em{animation:t-carica .8s .5s steps(10) forwards}
 .tel.fermo{animation:none}
 
 /* il led che lavora (chat/led.js): sfarfalla forte sopra il lampeggio lento delle notifiche */
@@ -615,3 +707,76 @@
 .tel.scassato .t-crepe,.t-doppio .t-crepe{display:block}
 .t-doppio .t-crepe{opacity:var(--crepe-grande,1)}.t-doppio .t-crepe.piccola{opacity:calc(1 - var(--crepe-grande,1));filter:drop-shadow(0 0 .5px rgba(0,0,0,.9))} /* telefono.js, crepeNelDoppione */
 .tel.scassato .t-ico:not([data-app="chat"]){opacity:.35;filter:grayscale(1)}
+
+/* ───────── La lumachina (Giocatori > io, 23.10 sera; chat/lumaca.mjs) ─────────
+   L'avviso urgente (rosso, finché non premi «ho capito»), poi la scheda: la faccia, la salute col decimale e la barra
+   (rossa sotto il 35 %, ambra sotto il 65, verde sopra), la giornata di oggi con cosa ha fatto ai $pzk, gli ultimi giorni.
+   Niente animazioni (Alberto: niente transizioni non chieste): l'urgenza la danno il rosso, il pallino e il led. */
+.t-lu .meno,.t-lu-urgente .meno,.t-w-notizie b.meno{color:var(--rosso)}
+.t-lu .piu,.t-lu-urgente .piu,.t-w-notizie b.piu{color:var(--led)}
+.t-lu .zero{color:#9fb29a}
+.t-gi-tab button{position:relative}
+.t-gi-tab .t-badge{right:-6px;top:-9px}
+.t-w-notizie.urgente{box-shadow:inset 0 0 0 2px var(--rosso),0 3px 0 #000}
+.t-w-notizie.urgente small{color:var(--rosso)}
+.t-w-notizie b.meno,.t-w-notizie b.piu{display:inline;margin:0;font:400 13px/1.25 var(--mono);white-space:nowrap}
+/* l'avviso urgente */
+.t-lu-urgente{margin-bottom:12px;padding:10px 12px 11px;border:2px solid #000;border-radius:8px;background:#2a1311;box-shadow:inset 0 0 0 2px var(--rosso),0 3px 0 #000}
+.t-lu-urgente header{display:flex;align-items:center;gap:8px;font:400 15px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--rosso)}
+.t-lu-urgente header .emo{flex:none;height:28px;width:28px;object-fit:contain;margin:0}
+.t-lu-urgente>p{margin:7px 0 8px;font:400 12.5px/1.35 var(--mono);color:#ffd2cc}
+.t-lu-urgente ol{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.t-lu-urgente li{display:grid;grid-template-columns:80px 1fr auto;gap:10px;align-items:baseline;padding:7px 9px;border-radius:6px;background:rgba(0,0,0,.38)}
+.t-lu-urgente .g{white-space:nowrap;font:400 11px/1.25 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#d6aaa3}
+.t-lu-urgente .t{min-width:0;font:400 12px/1.35 var(--mono);color:#ddcdca}
+.t-lu-urgente .t b{display:block;margin-bottom:2px;font:400 13.5px/1.2 var(--mono);color:#fff}
+.t-lu-urgente .n{text-align:right;white-space:nowrap}
+.t-lu-urgente .n b{display:block;font:400 14px/1.15 var(--mono)}
+.t-lu-urgente li.meno .n b{color:var(--rosso)}.t-lu-urgente li.piu .n b{color:var(--led)} /* .chat b è bianco: qui il colore va detto */
+.t-lu-urgente .n small{font:400 11px/1.2 var(--mono);color:#d6aaa3}
+.t-lu-urgente footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;font:400 13px/1.2 var(--mono);color:#ffd2cc}
+.t-lu-urgente footer b{font:inherit}
+/* la scheda */
+.t-lu{--k:var(--led);margin-bottom:12px;padding:12px;border:2px solid #000;border-radius:8px;background:linear-gradient(135deg,rgba(70,255,125,.1),#121813 60%);box-shadow:0 3px 0 #000}
+.t-lu[data-salute="media"]{--k:var(--ambra)}
+.t-lu[data-salute="male"]{--k:var(--rosso);background:linear-gradient(135deg,rgba(255,91,74,.12),#121813 60%)}
+.t-lu-testa{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.t-lu-testa .emo{height:56px;width:56px;object-fit:contain;margin:0}
+.t-lu-testa h3{margin:0;font:400 18px/1 var(--fa);color:#fff;white-space:nowrap}
+.t-lu-testa p{margin:4px 0 0;font:400 12.5px/1.2 var(--mono);color:#9fb29a}
+.t-lu-testa p b{font:inherit;color:var(--k)}
+.t-lu-salute{text-align:right}
+.t-lu-salute b{display:block;font:400 26px/1 var(--mono);color:var(--k);white-space:nowrap}
+.t-lu-salute small{font:400 10px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#9fb29a}
+.t-lu-barra{height:8px;margin:10px 0;background:rgba(255,255,255,.1)}
+.t-lu-barra i{display:block;height:100%;background:var(--k);box-shadow:0 0 6px var(--k)}
+.t-lu-oggi{padding:9px 11px 10px;border-radius:6px;background:rgba(0,0,0,.35)}
+.t-lu-oggi>small{display:block;font:400 10.5px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#9fb29a}
+.t-lu-oggi p{margin:5px 0 7px;font:400 13.5px/1.4 var(--mono);color:#e9efe6}
+.t-lu-eff b{font:400 15px/1.2 var(--mono)}
+.t-lu-eff small{display:block;margin-top:2px;font:400 11px/1.35 var(--mono);color:#9fb29a}
+.t-lu-eff small b{font:inherit}
+.t-lu-dx .t-sh-sez{margin-top:12px}
+.t-lu-storia{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.t-lu-storia li{display:grid;grid-template-columns:80px 42px 1fr auto;gap:8px;align-items:baseline;padding:5px 8px;border-radius:5px;background:rgba(255,255,255,.04);font:400 12px/1.25 var(--mono);color:#cfdccb}
+.t-lu-storia .g{white-space:nowrap;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#9fb29a}
+.t-lu-storia .s.male{color:var(--rosso)}.t-lu-storia .s.media{color:var(--ambra)}.t-lu-storia .s.bene{color:var(--led)}
+.t-lu-storia .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-lu-storia b{font:inherit;white-space:nowrap}
+.t-lu-nota{margin:10px 0 0;font:400 11px/1.4 var(--mono);color:#76856f}
+/* sullo schermo largo del cercapersone: a sinistra oggi, a destra gli ultimi giorni */
+@container palco (min-aspect-ratio: 3/2){
+  .t-lu:not(.sola){display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:start} /* sola: un conto appena nato, niente giorni passati */
+  .t-lu-dx .t-sh-sez{margin-top:0}
+}
+/* sul telefono in verticale: le quattro schede dei Giocatori stanno nella larghezza (in Fake Receipt «classifiche» con
+   l'icona non ci stava e «io», col pallino della lumachina, finiva fuori); l'avviso della lumachina mette data e 
+   sulla prima riga e il racconto sotto, largo quanto il riquadro */
+@container palco (max-aspect-ratio: 1/1){
+  .t-gi-tab button .emo{display:none}
+  .t-gi-tab button{gap:0;padding:0 2px;font-size:11px;letter-spacing:.02em}
+  .t-lu-urgente li{grid-template-columns:1fr auto;row-gap:4px}
+  .t-lu-urgente li .g{grid-column:1;grid-row:1}
+  .t-lu-urgente li .n{grid-column:2;grid-row:1}
+  .t-lu-urgente li .t{grid-column:1 / -1;grid-row:2}
+}
