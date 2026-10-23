@@ -336,8 +336,11 @@ function punta(id) {
   carica()
   // la stessa puntata sulla stessa quota si somma
   const gia = stato.schedina.find((b) => b.indice === corrente.indice && b.id === id && !b.pagata)
-  if (gia) gia.puntata += v
-  else stato.schedina.push({ indice: corrente.indice, id, quota: q, puntata: v, esito: null, pagata: false, casa: P.casa.sigla, ospite: P.ospite.sigla })
+  // le fiches si tengono nell'ordine in cui sono state posate, e l'ora dell'ultima: «togli» toglie proprio quella
+  // ogni fiche come [valore, quando è stata posata]: «togli» toglie l'ultima posata, su qualunque quota sia
+  const ora = Date.now()
+  if (gia) { gia.fiches = [...fichesDi(gia), [v, ora]]; gia.puntata += v }
+  else stato.schedina.push({ indice: corrente.indice, id, quota: q, puntata: v, fiches: [[v, ora]], esito: null, pagata: false, casa: P.casa.sigla, ospite: P.ospite.sigla })
   stato.schedina = stato.schedina.slice(-40)
   salva()
   const b = el.quote.querySelector(`[data-id="${id}"]`)
@@ -349,16 +352,20 @@ function punta(id) {
   voce(`${pu.nome} a ${fmtQuota(q)}: se va, ${fmt(Math.round(v * q * 2) / 2)} $pzk`)
 }
 // «togli»: l'ultima fiche posata su questa partita torna nel saldo
+// le fiches di una puntata nell'ordine in cui sono state posate (le puntate salvate prima non lo sapevano: si ricostruiscono)
+const fichesDi = (b) => (Array.isArray(b.fiches) && b.fiches.length && b.fiches.every((x) => Array.isArray(x)) ? b.fiches : pzk.inFiches(b.puntata).map((v) => [v, 0]))
 function togli() {
   allOra()
   if (corrente.fase !== 'scommesse') return
   carica()
   const mie = diAdesso().filter((b) => !b.pagata)
-  const b = mie[mie.length - 1]
+  // la quota su cui è stata posata l'ultima fiche, e proprio quella fiche
+  const quando = (x) => fichesDi(x).at(-1)?.[1] ?? 0
+  const b = mie.reduce((a, x) => (a && quando(a) > quando(x) ? a : x), null)
   if (!b) return
-  // si toglie l'ultima fiche della sua pila
-  const f = pzk.inFiches(b.puntata)
-  const v = f[f.length - 1]
+  const f = fichesDi(b)
+  const v = f.at(-1)[0]
+  b.fiches = f.slice(0, -1)
   b.puntata -= v
   if (b.puntata <= 0) stato.schedina.splice(stato.schedina.indexOf(b), 1)
   pzk.ritira(GIOCO, v)
