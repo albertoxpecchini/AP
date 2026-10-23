@@ -18,20 +18,21 @@ body::after{content:"";position:fixed;inset:0;background:rgba(20,16,12,.35);poin
 .nota{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:1;padding:8px 14px;background:#ffd400;color:#111;font:400 14px/1.2 "Permanent Marker",cursive;transform:translateX(-50%) rotate(-1deg);box-shadow:0 3px 6px rgba(0,0,0,.4)}
 
 /* ── il tasto del wallet, com'è in index.html ── */
-.wallet-tasto{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:grid;grid-template-columns:1fr;align-items:center;width:112px;height:52px;padding:6px 8px 6px 9px;border:0;border-radius:9px 11px 10px 9px;
-  background:radial-gradient(120% 90% at 20% 10%,rgba(255,255,255,.12),transparent 50%),linear-gradient(165deg,#5a3d2a,#3d2819 55%,#2b1b11);color:#e9e4d8;cursor:pointer;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),inset 0 0 0 4px rgba(0,0,0,.08),0 3px 4px rgba(0,0,0,.5),0 10px 14px rgba(0,0,0,.3);transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
-.wallet-tasto::before{content:"";position:absolute;inset:3px;border:1.5px dashed rgba(236,220,190,.45);border-radius:7px;pointer-events:none}
-.wallet-tasto canvas{display:block;width:100%;height:100%;border-radius:4px;background:#050806;box-shadow:inset 0 0 6px rgba(0,0,0,.9),0 0 0 2px #1a1a1a}
-.wallet-tasto .wt-eti{position:absolute;right:9px;top:9px;font:400 7px/1 "Fake Receipt",monospace;letter-spacing:.06em;color:#46ff7d;opacity:.75;text-shadow:0 0 4px #46ff7d;pointer-events:none}
-.wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 22px/1 "Anton",Impact,sans-serif;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
+.wallet-tasto{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));width:calc(52px * 792 / 214);height:52px;padding:0;border:0;background:none;color:#e9e4d8;cursor:pointer;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
+.wallet-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;pointer-events:none}
+.wallet-tasto canvas,.wallet-tasto::after{position:absolute;left:7.828%;top:29.673%;width:82.197%;height:42.523%}
+.wallet-tasto canvas{display:block;background:#040605}
+/* il vetro sopra i led: un riflesso in diagonale e l'ombra della cornice */
+.wallet-tasto::after{content:"";pointer-events:none;background:linear-gradient(172deg,rgba(255,255,255,.1),rgba(255,255,255,.035) 46%,rgba(255,255,255,0) 48%);box-shadow:inset 0 1px 3px rgba(0,0,0,.85),inset 0 -1px 2px rgba(0,0,0,.5)}
+.wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 20px/1 "Fake Receipt",monospace;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
 .wallet-tasto .wt-piu.va{animation:wt-piu 1.6s ease-out forwards}
 @keyframes wt-piu{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
 .wallet-tasto[hidden]{display:none}
-@media (hover:hover){.wallet-tasto:hover{transform:scale(1.04)}}
-.wallet-tasto:active{transform:scale(.96)}
+@media (hover:hover){.wallet-tasto:hover{transform:scale(1.03)}}
+.wallet-tasto:active{transform:scale(.97)}
 .wallet-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.wallet-tasto{width:96px;height:46px;padding:5px 7px 5px 8px}.wallet-tasto .wt-eti{font-size:6.5px;right:8px;top:8px}}
+@media (max-width:899px){.wallet-tasto{width:calc(46px * 792 / 214);height:46px}}
 
 /* ── DA COPIARE IN index.html ── il tasto della chat col bot (chat/), sotto il wallet: un cercapersone nero con lo
    schermo lcd verde dove vive il tomodachi, una chiocciolina a pixel (chat/tomodachi.js); il led rosso lampeggia quando c'è un premio da riscuotere. Negli strumenti che
@@ -56,7 +57,7 @@ html:not(.js) .chat-tasto{display:none}
 </style>
 </head>
 <body>
-<button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" title="wallet $pzk" hidden><canvas class="wt-led" width="190" height="80" aria-hidden="true"></canvas><span class="wt-eti" aria-hidden="true">$pzk</span></button>
+<button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" hidden><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas></button>
 <!-- DA COPIARE IN index.html: il cercapersone della chat col bot (chat/), sotto il wallet -->
 <button class="chat-tasto" type="button" aria-label="chat: parla col bot dei $pzk" title="chat col bot" hidden><img src="/art/chat-pager-grande/pager-piccolo.webp" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span></button>
 <p class="nota">pagina di prova: solo la chat, senza il muro. Non va online.</p>

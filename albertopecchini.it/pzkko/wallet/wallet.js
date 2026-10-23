@@ -8,8 +8,10 @@
 // entra gioca coi 1.000 $pzk della sessione), il cambio (il fader orizzontale: $pzk ↔ EUR€ al cambio dell'ultima
 // sincronizzazione), gli invii fra conti (48 ore dopo la creazione), e il resto (l'indirizzo, che si cambia una volta
 // sola, il PIN, il regalo di instagram). I soldi li tiene ../games/pzk.js, gli stessi dei giochi.
-// Il tasto in alto a sinistra (index.html, .wallet-tasto) ha il suo led col saldo: lo disegna prepara().
+// Il tasto in alto a sinistra (index.html, .wallet-tasto) è un banner col pannello a led dei $pzk, dove col cursore sopra
+// scorrono tutti i dati del wallet: lo accende prepara(), con banner.js.
 import * as pzk from '../games/pzk.js'
+import { banner } from './banner.js'
 
 const IMM = { w: 1214, h: 559 } // la foto del portafoglio: le misure degli schermi sono in percentuale di lei
 const POS = {
@@ -176,27 +178,8 @@ function disegnaGrafico(c, punti, { da = '24h' } = {}) {
   for (let y = 0; y < H; y += 3) g.fillRect(0, y, W, 1)
 }
 
-// ── il tasto in alto a sinistra ──
-let tasto = null, tastoAnim = 0, mostrato = null
-export function prepara(bottone) {
-  tasto = bottone
-  const c = q(bottone, 'canvas')
-  if (!c) return
-  const piu = el('span', 'wt-piu', ''); bottone.appendChild(piu)
-  const disegna = (v) => { display(c, String(Math.round(v)), { alt: 0.62, destra: 0.2 }); mostrato = v }
-  const verso = (a) => {
-    if (mostrato === null || RIDOTTO.matches || Math.abs(a - mostrato) < 1) { disegna(a); return }
-    const da = mostrato, t0 = performance.now(), durata = 700
-    cancelAnimationFrame(tastoAnim)
-    const passo = (now) => { const e = Math.min(1, (now - t0) / durata), k = 1 - (1 - e) ** 3; disegna(da + (a - da) * k); if (e < 1) tastoAnim = requestAnimationFrame(passo) }
-    tastoAnim = requestAnimationFrame(passo)
-  }
-  pzk.ascolta((s) => verso(s))
-  disegna(pzk.saldo())
-  addEventListener('resize', () => disegna(mostrato ?? pzk.saldo()))
-  // la banconota raccolta per terra: il suo valore vola via dal tasto
-  document.addEventListener('pzkko-banconota', (e) => { piu.textContent = `+${fmt(e.detail.valore)} $pzk`; piu.classList.remove('va'); void piu.offsetWidth; piu.classList.add('va') })
-}
+// ── il tasto in alto a sinistra: il banner col pannello a led dei $pzk e dei dati che scorrono (banner.js) ──
+export function prepara(bottone) { banner(bottone, { batteria }) }
 
 // ── il pomello del periodo (23.10): disegnato visto perfettamente dall'alto, fedele a quello della foto (plastica nera, il
 // bordo zigrinato, il cappello liscio), perché quello della foto è un po' di traverso e girandolo girava anche il fianco.

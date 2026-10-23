@@ -1609,8 +1609,18 @@ conto (lo segna il server). Un sito non può sapere chi segue chi, quindi ci si 
 
 ## Il wallet e la borsa (wallet/, api/wallet.mjs, api/borsa.mjs)
 
-**Il wallet** (22.10 notte) è il tasto in alto a sinistra, un portafoglio chiuso di pelle col led
-verde che dice i $pzk (le stesse cifre a sette segmenti del portachiavi per terra). Si apre (dal 23.10 grande quanto
+**Il wallet** (22.10 notte) è il tasto in alto a sinistra. Dal 23.10 sera è un **banner**, alto come il tasto
+di prima: una striscia di pelle cucita con la piastra d'acciaio rivettata e un pannello a led lungo (la foto
+`art/wallet-banner/banner.webp`, foglio `wallet-banner` di `tools/pzkko/fogli.js`; il vetro misurato sulla foto, da x 62
+a 713 e da y 63,5 a 154,5 su 792 × 214). Il pannello lo accende `wallet/banner.js`: dice **sempre i $pzk** (a destra,
+come un registratore di cassa); **col cursore sopra** (o col fuoco della tastiera) ci scorrono tutti i dati del wallet
+come su un tabellone di borsa (saldo, sul tavolo, EUR€, quanto valgono in euro, PZK/EUR€ con ▲▼ delle 24 ore e
+dell'ultima ora, il grafico delle 24 ore fatto di led, min e max, 1 € in $pzk, capitalizzazione e conti, nome e
+indirizzo, batteria, ultima mossa, ora del cambio; ogni voce si scrive coi dati del momento in cui entra nel nastro);
+**col clic** si apre il wallet. Quando il saldo cambia lampeggia la differenza e il numero corre al valore nuovo. Le
+lettere sono il Fake Receipt messo led per led: il carattere è una matrice di 5 × 8 puntini (passo 93 unità), i centri
+trovati con la trasformata di distanza e agganciati alla griglia; M, W, €, S, $, ° e la punteggiatura rifatti a mano
+sulla stessa griglia (la tabella `LETTERE` in banner.js). Al tocco niente nastro: il dito apre il wallet. Si apre (dal 23.10 grande quanto
 entra nella finestra e nel mezzo, per leggere bene gli schermi; niente «×»: si chiude toccando fuori) su un
 portafoglio di pelle usato, aperto, customizzato come un Pip-Boy di Fallout (la foto
 `art/wallet/portafoglio.webp`: la pelle, la piastra d'acciaio rivettata, il nastro adesivo, i tasti

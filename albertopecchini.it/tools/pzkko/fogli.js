@@ -577,6 +577,21 @@ The paper is slightly worn and creased, a little dirty at the edges, as notes th
 The photograph is taken from DIRECTLY ABOVE (top view, orthographic). The port is in an INVISIBLE flat surface facing the camera, so the plug is inserted straight DOWN, away from the camera, and only the BACK END of the plug is visible: the top of its matte dark grey anodised aluminium housing, a small rounded rectangle seen end-on, with the black rubber strain relief in its middle where the cable comes out. The cable, black braided nylon, about as thick as a pencil, rises out of the plug straight towards the camera for a short stretch (foreshortened, slightly out of focus at its nearest point) and then bends over to the LEFT and runs away across the frame to the LEFT edge of the cell, lying flat and in focus. The plug end sits in the RIGHT third of the cell, in the vertical middle; the cable fills the rest towards the left. Photorealistic, soft diffuse studio light from the top left, no shadow on the magenta. Nothing else: no port drawn, no surface, no table. ${NIENTE_MAGENTA}`,
   },
 
+  // 23.10 sera: il tasto del wallet in alto a sinistra (pzkko/index.html, .wallet-tasto), rifatto come un banner: la
+  // stessa pelle del portafoglio, una piastra d'acciaio e un pannello a led lungo e spento (i led li accende la pagina:
+  // wallet.js, prepara)
+  'wallet-banner': {
+    scala: 0.4,
+    titolo: 'il tasto del wallet: una striscia di pelle cucita con la piastra d’acciaio e il pannello a led spento',
+    aspetto: '2048x1152',
+    griglia: [1, 1],
+    pezzi: ['banner'],
+    prompt: `${griglia('One piece: a single long horizontal leather tag,', 1, 1)}
+It is a long, flat, horizontal rectangular strap tag of dark brown full-grain leather with rounded corners, exactly four times as wide as it is tall, photographed from DIRECTLY ABOVE (top view, orthographic, no perspective), filling the width of the cell: the same well-used leather of an old men's wallet, scuffed, creased and darkened, with cream saddle stitching running all around it close to the edge.
+It has been customised by a tinkerer in the style of a Fallout Pip-Boy: riveted onto the leather, a brushed gunmetal steel plate that covers almost the whole tag (only a NARROW margin of leather shows around it, just wide enough for the stitching), with four small hex rivets in its corners, and recessed into the plate ONE long horizontal display window of dark smoky glass in a thin black plastic bezel: the window is BIG, it fills most of the plate, its height is about 60 % of the total height of the tag and it is about seven times as wide as it is tall, perfectly rectangular and straight, centred. The steel shows only as a thin frame around the window, a little wider at the two ends where the rivets are.
+The display is OFF: plain uniform dark glass, nothing drawn on it, no dots, no text, no icons. A couple of fine scratches on the steel, a small piece of grey duct tape folded over the top right corner of the leather. Soft diffuse studio light from the top left, photorealistic, sharp. The outline of the leather is the edge of the piece: nothing outside it, no table, no shadow falls on the magenta. No text anywhere. ${NIENTE_MAGENTA}`,
+  },
+
   // ── la chat col bot (pzkko/chat/): le icone al posto delle emoji e il cercapersone del tasto. I pezzi stanno in
   // pzkko/chat/icone.js, i prompt in fogli-chat.js ──
   ...fogliChat({ griglia, NIENTE_MAGENTA }),

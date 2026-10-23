@@ -354,25 +354,30 @@ html:not(.js) .rotella{display:none}
 @media (max-width:899px){.rotella{width:54px;height:54px}}
 @media (prefers-reduced-motion:reduce){.rotella{transition:none}}
 
-/* ── il tasto del wallet (22.10 notte), sempre in alto a sinistra: il portafoglio chiuso, un pezzo di pelle col suo led
-   verde che dice i $pzk (lo disegna wallet/wallet.js, che si carica da solo appena la pagina è tranquilla; il
-   portafoglio aperto, wallet.css). Negli strumenti che fotografano la pagina non c'è (navigator.webdriver), ?wallet lo fa
-   vedere lo stesso. Senza script non c'è ── */
-.wallet-tasto{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:grid;grid-template-columns:1fr;align-items:center;width:112px;height:52px;padding:6px 8px 6px 9px;border:0;border-radius:9px 11px 10px 9px;
-  background:radial-gradient(120% 90% at 20% 10%,rgba(255,255,255,.12),transparent 50%),linear-gradient(165deg,#5a3d2a,#3d2819 55%,#2b1b11);color:#e9e4d8;cursor:pointer;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),inset 0 0 0 4px rgba(0,0,0,.08),0 3px 4px rgba(0,0,0,.5),0 10px 14px rgba(0,0,0,.3);transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
-.wallet-tasto::before{content:"";position:absolute;inset:3px;border:1.5px dashed rgba(236,220,190,.45);border-radius:7px;pointer-events:none}
-.wallet-tasto canvas{display:block;width:100%;height:100%;border-radius:4px;background:#050806;box-shadow:inset 0 0 6px rgba(0,0,0,.9),0 0 0 2px #1a1a1a}
-.wallet-tasto .wt-eti{position:absolute;right:9px;top:9px;font:400 7px/1 "Fake Receipt",monospace;letter-spacing:.06em;color:#46ff7d;opacity:.75;text-shadow:0 0 4px #46ff7d;pointer-events:none}
-.wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 22px/1 "Anton",Impact,sans-serif;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
+/* ── il tasto del wallet (22.10 notte; dal 23.10 sera un banner), sempre in alto a sinistra e alto come prima: una
+   striscia di pelle cucita con la piastra d'acciaio e un pannello a led che dice sempre i $pzk; col cursore sopra ci
+   scorrono tutti i dati del wallet, col clic si apre il portafoglio (la foto è art/wallet-banner/banner.webp,
+   gpt-image-2; i led li accende wallet/banner.js, che si carica da solo appena la pagina è tranquilla; il portafoglio
+   aperto, wallet.css). Il pannello sta sul vetro della foto, misurato sui profili di luce (792 × 214): dentro la cornice
+   nera da x 62 a 713 e da y 63,5 a 154,5. Il cercapersone qui sotto (.chat-tasto) parte 10 px sotto il banner (8 sul
+   telefono). Negli strumenti che fotografano la pagina non c'è (navigator.webdriver),
+   ?wallet lo fa vedere lo stesso. Senza script non c'è ── */
+.wallet-tasto{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));width:calc(52px * 792 / 214);height:52px;padding:0;border:0;background:none;color:#e9e4d8;cursor:pointer;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
+.wallet-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;pointer-events:none}
+.wallet-tasto canvas,.wallet-tasto::after{position:absolute;left:7.828%;top:29.673%;width:82.197%;height:42.523%}
+.wallet-tasto canvas{display:block;background:#040605}
+/* il vetro sopra i led: un riflesso in diagonale e l'ombra della cornice */
+.wallet-tasto::after{content:"";pointer-events:none;background:linear-gradient(172deg,rgba(255,255,255,.1),rgba(255,255,255,.035) 46%,rgba(255,255,255,0) 48%);box-shadow:inset 0 1px 3px rgba(0,0,0,.85),inset 0 -1px 2px rgba(0,0,0,.5)}
+.wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 20px/1 "Fake Receipt",monospace;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
 .wallet-tasto .wt-piu.va{animation:wt-piu 1.6s ease-out forwards}
 @keyframes wt-piu{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
 .wallet-tasto[hidden]{display:none}
 html:not(.js) .wallet-tasto{display:none}
-@media (hover:hover){.wallet-tasto:hover{transform:scale(1.04)}}
-.wallet-tasto:active{transform:scale(.96)}
+@media (hover:hover){.wallet-tasto:hover{transform:scale(1.03)}}
+.wallet-tasto:active{transform:scale(.97)}
 .wallet-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.wallet-tasto{width:96px;height:46px;padding:5px 7px 5px 8px}.wallet-tasto .wt-eti{font-size:6.5px;right:8px;top:8px}}
+@media (max-width:899px){.wallet-tasto{width:calc(46px * 792 / 214);height:46px}}
 @media (prefers-reduced-motion:reduce){.wallet-tasto{transition:none}.wallet-tasto .wt-piu.va{animation-duration:.01s}}
 
 /* ── il tasto della chat col bot (chat/), sotto il wallet: un cercapersone nero con lo
@@ -800,8 +805,8 @@ html:not(.js) .chat-tasto{display:none}
 <button class="suono" type="button" aria-pressed="true" aria-label="i suoni della strada" title="i suoni della strada" hidden><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4.5 12.4h6.2l8-6.6.3 20.6-8.1-6.8H4.8z"/><path class="s-onde" d="M24.2 10.6c2.6 3 2.8 7.6.2 10.9M28.6 6.8c4.6 4.9 4.8 13.3.3 18.6"/><path class="s-muto" d="M24.5 11.2l8.6 9.4M33 11.4l-8.4 9"/></svg><span>suono</span></button>
 <!-- il tasto giallo della regia, sempre in alto a destra: la grafica, l'ora, il meteo, la strada, i suoni -->
 <button class="rotella" type="button" aria-label="regia: grafica, ora, meteo, strada e suoni" title="regia" aria-expanded="false"><img class="su" src="/art/tasto/tasto.webp" alt="" width="247" height="250"><img class="giu" src="/art/tasto/tasto-giu.webp" alt="" width="247" height="250" loading="lazy"></button>
-<!-- il wallet dei $pzk (wallet/), sempre in alto a sinistra: il portafoglio chiuso col led del saldo -->
-<button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" title="wallet $pzk" hidden><canvas class="wt-led" width="190" height="80" aria-hidden="true"></canvas><span class="wt-eti" aria-hidden="true">$pzk</span></button>
+<!-- il wallet dei $pzk (wallet/), sempre in alto a sinistra: il banner di pelle col pannello a led dei $pzk (col cursore sopra scorrono i dati) -->
+<button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" hidden><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas></button>
 <!-- la chat col bot dei $pzk (chat/), sotto il wallet: il cercapersone con lo schermo lcd -->
 <button class="chat-tasto" type="button" aria-label="chat: parla col bot dei $pzk" title="chat col bot" hidden><img src="/art/chat-pager-grande/pager-piccolo.webp" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span></button>
 
