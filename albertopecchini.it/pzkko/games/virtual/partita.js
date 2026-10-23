@@ -343,7 +343,7 @@ function cronaca({ golCasa, golOspite, tavolino, rand, formazioni, meteo }) {
       if (!grande(e)) continue
       e.t = T.fine - 1.4
       // i grandi di prima arretrano, a catena, finché stanno a 3,2 s
-      for (let j = sistemati.length - 1, lim = e.t; j >= 0; j--) { const g = sistemati[j]; if (!grande(g)) continue; if (g.t > lim - 3.2) g.t = lim - 3.2; lim = g.t }
+      for (let j = sistemati.length - 1, lim = e.t; j >= 0; j--) { const g = sistemati[j]; if (!grande(g)) continue; if (g.t > lim - 3.2) g.t = lim - 3.2; if (g.t > T.fine1 - 1.6 && g.t < T.via2 + 0.6) g.t = T.fine1 - 1.6; lim = g.t }
     }
     sistemati.push(e)
     ultimo = e.t

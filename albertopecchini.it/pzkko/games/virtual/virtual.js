@@ -318,7 +318,10 @@ function pila(cont, importo) {
   const n = document.createElement('b'); n.textContent = fmt(importo); cont.appendChild(n)
 }
 
+// prima di puntare o togliere si guarda l'orologio vero (col movimento ridotto il ciclo passa solo ogni mezzo secondo)
+function allOra() { const f = fase(); if (f.indice !== corrente.indice || f.fase !== corrente.fase) aggiorna() }
 function punta(id) {
+  allOra()
   if (corrente.fase !== 'scommesse') { voce('la partita è in corso: si punta sulla prossima'); return }
   const v = stato.fiche
   if (pzk.aSecco()) {
@@ -329,6 +332,8 @@ function punta(id) {
   }
   if (!pzk.punta(GIOCO, v)) { voce(pzk.saldo() >= 1 ? `non ti bastano: hai ${fmt(pzk.saldo())} $pzk` : 'hai finito i $pzk'); scuoti(el.saldo); return }
   const q = P.quote[id]
+  // (un'altra scheda può aver appena puntato: si rilegge la schedina del browser prima di scriverla, così non si perde)
+  carica()
   // la stessa puntata sulla stessa quota si somma
   const gia = stato.schedina.find((b) => b.indice === corrente.indice && b.id === id && !b.pagata)
   if (gia) gia.puntata += v
@@ -345,7 +350,9 @@ function punta(id) {
 }
 // «togli»: l'ultima fiche posata su questa partita torna nel saldo
 function togli() {
+  allOra()
   if (corrente.fase !== 'scommesse') return
+  carica()
   const mie = diAdesso().filter((b) => !b.pagata)
   const b = mie[mie.length - 1]
   if (!b) return
