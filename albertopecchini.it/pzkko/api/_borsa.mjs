@@ -12,7 +12,7 @@
 //   la temperatura: sopra i 26° −1,5 %, sotto gli 8° +1,5 %
 //   il giorno +1,2 %, la notte −1,2 %
 // (api/wallet.mjs converte al cambio di quando il wallet si è sincronizzato, se non è passata più di mezz'ora: tassoA)
-import { archivio, aggiorna } from './_archivio.mjs'
+import { archivio, aggiorna, blobOpzioni } from './_archivio.mjs'
 
 export const PATH = process.env.BORSA_BLOB_PATH || 'pzkko/borsa.json'
 export const PASSO = 10 * 60 * 1000
@@ -47,16 +47,37 @@ export const derivaFattori = (f) => {
   if (f.giorno === true) d += 0.012; else if (f.giorno === false) d -= 0.012
   return d
 }
+// ── il nervosismo (23.10): col solo passo a caso dello 0,25 % e la deriva il grafico veniva quasi una retta inclinata
+// (la deriva, coi fattori, vale fino al 6–8 % al giorno, il caso il 3 %). Una crypto vera nelle 24 ore è tutta denti: qui
+// sopra la tendenza c'è un'ONDA, fatta di tre oscillazioni (55 minuti, 2,4 ore, 6,1 ore), di un rumore a ogni punto e di
+// qualche STRAPPO (un punto su 40: ±1–3,5 % che rientra in mezz'ora), il tutto moltiplicato per il REGIME del momento
+// (blocchi di tre ore calmi o agitati, raccordati; nei giorni d'eccezione il doppio). Ogni passo aggiunge la DIFFERENZA
+// dell'onda fra adesso e dieci minuti prima: sul lungo periodo l'onda si annulla, quindi quanto sale o scende il giorno
+// lo decidono sempre la deriva e i fattori, come prima. Tutto nasce dall'ora del punto: il passato non si riscrive.
+const BLOCCO = 3 * ORA
+const ONDE = [[55 * 60 * 1000, 0.0035, 0.7], [2.4 * ORA, 0.0068, 2.1], [6.1 * ORA, 0.011, 4.4]] // [periodo, ampiezza, fase]
+const gauss2 = (t) => { const u = Math.max(1e-9, caso(t, 3)), v = caso(t, 4); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v) }
+export function regime(t) {
+  const b = Math.floor(t / BLOCCO), k = (t - b * BLOCCO) / BLOCCO, liscia = k * k * (3 - 2 * k)
+  const r = (i) => 0.55 + 1.35 * h32(i * 5 + 9) ** 1.5
+  return (r(b) * (1 - liscia) + r(b + 1) * liscia) * (umore(t).ecc ? 2 : 1)
+}
+const strappo = (t) => {
+  let s = 0
+  for (let j = 0; j < 3; j++) { const tj = t - j * PASSO; if (caso(tj, 5) < 0.025) s += (caso(tj, 6) < 0.5 ? -1 : 1) * (0.01 + 0.025 * caso(tj, 7)) * (1 - j / 3) }
+  return s
+}
+export const onda = (t) => regime(t) * (ONDE.reduce((s, [p, a, f]) => s + a * Math.sin((2 * Math.PI * t) / p + f), 0) + 0.0032 * gauss2(t) + strappo(t))
 const passo = (v, t, f) => {
-  const { deriva, ecc } = umore(t)
-  const sigma = (ecc ? 0.075 : 0.03) / Math.sqrt(AL_GIORNO)
-  v *= Math.exp((deriva + derivaFattori(f)) / AL_GIORNO + sigma * gauss(t))
+  const { deriva } = umore(t)
+  const sigma = 0.035 / Math.sqrt(AL_GIORNO) // la tendenza: un passo a caso lento (i giorni d'eccezione li fa il regime)
+  v *= Math.exp((deriva + derivaFattori(f)) / AL_GIORNO + sigma * regime(t) * gauss(t) + onda(t) - onda(t - PASSO))
   return Math.min(MAX, Math.max(MIN, v))
 }
 
-/** Aggiunge i punti mancanti fino a `now`; true se ne ha aggiunti. */
-export function avanza(db, now, f) {
-  if (!db.punti.length) { const t0 = Math.floor(now / PASSO) * PASSO; db.nata = t0; db.punti.push([t0, 1]); return true }
+/** Aggiunge i punti mancanti fino a `now`; true se ne ha aggiunti. `nascita`: da quando parte una borsa nuova (di solito adesso). */
+export function avanza(db, now, f, nascita = now) {
+  if (!db.punti.length) { const t0 = Math.floor(nascita / PASSO) * PASSO; db.nata = t0; db.punti.push([t0, 1]); if (t0 + PASSO > now) return true }
   let [t, v] = db.punti[db.punti.length - 1], n = 0
   while (t + PASSO <= now && n < 30000) { t += PASSO; v = passo(v, t, f); db.punti.push([t, Math.round(v * 1e6) / 1e6]); n++ }
   if (n) compatta(db, now)
@@ -103,7 +124,10 @@ export async function borsa(now = Date.now()) {
     const ultimo = db.punti.length ? db.punti[db.punti.length - 1][0] : -Infinity
     if (ultimo + PASSO > now) return { invariato: true }
     db.fattori = await misura(db.fattori, now)
-    avanza(db, now, db.fattori)
+    // in locale la borsa vive in memoria e rinasce a ogni avvio del server: la si fa nascere tre giorni fa, così il
+    // grafico di prova ha una storia; online la storia è quella vera, salvata
+    const inLocale = process.env.PZKKO_STORE === 'memory' || (!blobOpzioni() && !process.env.VERCEL)
+    avanza(db, now, db.fattori, inLocale ? now - 3 * GIORNO : now)
   })
   return db
 }
@@ -112,7 +136,31 @@ export async function borsa(now = Date.now()) {
 export function pubblico(db, now = Date.now(), da = 7 * GIORNO) {
   const v = attuale(db)
   const varia = (ms) => (db.nata && now - ms >= db.nata ? v / tassoA(db, now - ms) - 1 : null)
-  const serie = db.punti.filter(([t]) => now - t <= da)
+  let serie = db.punti.filter(([t]) => now - t <= da)
   if (!serie.length && db.punti.length) serie.push(db.punti[db.punti.length - 1])
+  if (da <= GIORNO) serie = dettaglio(serie)
   return { tasso: v, inverso: 1 / v, t: now, nata: db.nata, var1h: varia(ORA), var24: varia(GIORNO), var7g: varia(7 * GIORNO), var30g: varia(30 * GIORNO), fattori: db.fattori, deriva: derivaFattori(db.fattori), umore: umore(now), punti: serie }
+}
+
+/** Il grafico delle 24 ore col dettaglio fine delle crypto: fra due punti da dieci minuti, quattro punti intermedi (ogni
+ *  due minuti) su un ponte a caso che parte e arriva esattamente sui due punti veri. Solo da guardare: i cambi delle
+ *  conversioni (tassoA) restano quelli dei punti salvati. Il caso nasce dall'ora del punto, quindi il disegno non cambia
+ *  a ogni richiesta. */
+function dettaglio(serie) {
+  const N = 5, fuori = []
+  for (let i = 0; i < serie.length; i++) {
+    const [t0, v0] = serie[i]
+    fuori.push([t0, v0])
+    const prossimo = serie[i + 1]
+    if (!prossimo || prossimo[0] - t0 !== PASSO) continue
+    const [, v1] = prossimo
+    const s = 0.0018 * regime(t0)
+    const w = [0]
+    for (let k = 1; k <= N; k++) { const u = Math.max(1e-9, h32(Math.floor(t0 / 60000) * 31 + k * 101)), z = h32(Math.floor(t0 / 60000) * 37 + k * 211); w.push(w[k - 1] + Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * z)) }
+    for (let k = 1; k < N; k++) {
+      const a = k / N, ponte = s * (w[k] - a * w[N]) // il ponte: zero ai due capi
+      fuori.push([t0 + (PASSO * k) / N, Math.round(v0 * (v1 / v0) ** a * Math.exp(ponte) * 1e6) / 1e6])
+    }
+  }
+  return fuori
 }
