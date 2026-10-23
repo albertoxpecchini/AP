@@ -33,15 +33,57 @@ const stato = {
   fiche: 5,
   ultime: null, // le puntate dell'ultima partita (per «rifai»)
   regole: false,
+  tolte: [], // i timbri delle fiches ritirate con «togli» (vedi unisci)
 }
-function carica() {
+// le fiches di una puntata nell'ordine in cui sono state posate (le puntate salvate prima non lo sapevano: si ricostruiscono,
+// con timbri uguali in tutte le schede così l'unione non le raddoppia)
+function fichesDi(b) {
+  if (Array.isArray(b.fiches) && b.fiches.length && b.fiches.every((x) => Array.isArray(x))) return b.fiches
+  return pzk.inFiches(b.puntata).map((v, i) => [v, b.indice * 1e-3 + i * 1e-6])
+}
+function leggi() {
   try {
     const s = JSON.parse(localStorage.getItem(CHIAVE) || 'null')
-    if (s && Array.isArray(s.schedina)) stato.schedina = s.schedina.filter((b) => Number.isInteger(b.indice) && PER_PUNTATA.has(b.id) && b.puntata > 0 && b.quota >= 1).slice(-40)
-    if (s && Array.isArray(s.ultime)) stato.ultime = s.ultime
-  } catch {}
+    return {
+      schedina: Array.isArray(s?.schedina) ? s.schedina.filter((b) => Number.isInteger(b.indice) && PER_PUNTATA.has(b.id) && b.puntata > 0 && b.quota >= 1) : [],
+      ultime: Array.isArray(s?.ultime) ? s.ultime : null,
+      tolte: Array.isArray(s?.tolte) ? s.tolte : [],
+    }
+  } catch { return { schedina: [], ultime: null, tolte: [] } }
 }
-function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ schedina: stato.schedina, ultime: stato.ultime })) } catch {} }
+// due schede possono scrivere la schedina nello stesso istante, ognuna partendo dalla sua copia: invece di sovrascrivere
+// si uniscono. Ogni fiche ha un timbro suo ([valore, timbro]); una puntata è l'unione delle fiches viste dalle due parti,
+// meno quelle tolte («tolte» tiene i timbri delle fiches ritirate, così non ricompaiono dalla copia vecchia dell'altra
+// scheda); «pagata» vince su «da pagare»
+function unisci(a, b) {
+  const tolte = [...new Set([...a.tolte, ...b.tolte])].slice(-200)
+  const via = new Set(tolte)
+  const per = new Map()
+  for (const x of [...a.schedina, ...b.schedina]) {
+    const k = `${x.indice}|${x.id}|${x.pagata ? 'p' : 'a'}`
+    const g = per.get(k)
+    if (!g) { per.set(k, { ...x, fiches: fichesDi(x) }); continue }
+    const timbri = new Set(g.fiches.map((f) => f[1]))
+    g.fiches = [...g.fiches, ...fichesDi(x).filter((f) => !timbri.has(f[1]))].sort((m, n) => m[1] - n[1])
+  }
+  // una puntata pagata in una scheda e ancora aperta nell'altra: conta quella pagata
+  for (const [k, x] of per) if (!x.pagata && per.has(k.slice(0, -1) + 'p')) per.delete(k)
+  const schedina = [...per.values()]
+    .map((x) => { const f = x.fiches.filter((c) => !via.has(c[1])); return { ...x, fiches: f, puntata: f.reduce((t, c) => t + c[0], 0) } })
+    .filter((x) => x.puntata > 0)
+    .sort((m, n) => m.indice - n.indice || (m.fiches[0][1] - n.fiches[0][1]))
+    .slice(-40)
+  return { schedina, ultime: b.ultime ?? a.ultime, tolte }
+}
+function carica() {
+  const u = unisci(leggi(), { schedina: stato.schedina, ultime: stato.ultime, tolte: stato.tolte ?? [] })
+  stato.schedina = u.schedina; stato.ultime = u.ultime; stato.tolte = u.tolte
+  return u
+}
+function salva() {
+  const u = carica()
+  try { localStorage.setItem(CHIAVE, JSON.stringify(u)) } catch {}
+}
 const diAdesso = () => stato.schedina.filter((b) => b.indice === corrente.indice)
 const sulTavolo = () => diAdesso().reduce((a, b) => a + b.puntata, 0)
 
@@ -158,7 +200,7 @@ async function costruisci() {
   pzk.ascolta(() => aggiornaBanco()) // il saldo cambia anche giocando agli altri giochi
   document.addEventListener('visibilitychange', () => { if (!document.hidden && dlg.open) { aggiorna(true); sveglia() } })
   // un'altra scheda ha puntato o pagato: la schedina si rilegge
-  addEventListener('storage', (e) => { if (e.key === CHIAVE) { carica(); riconcilia(); if (dlg.open) { quote(); schedina(); aggiornaBanco() } } })
+  addEventListener('storage', (e) => { if (e.key === CHIAVE) { const prima = e.newValue; const u = carica(); if (JSON.stringify(u) !== prima) try { localStorage.setItem(CHIAVE, JSON.stringify(u)) } catch {}; riconcilia(); if (dlg.open) { quote(); schedina(); aggiornaBanco() } } })
   schermo = new Schermo(el.canvas)
   // le puntate ancora aperte tornano sul tavolo di pzk.js (una ricarica le aveva rimesse nel saldo), poi le partite finite
   // mentre la finestra era chiusa si pagano subito
@@ -336,11 +378,10 @@ function punta(id) {
   carica()
   // la stessa puntata sulla stessa quota si somma
   const gia = stato.schedina.find((b) => b.indice === corrente.indice && b.id === id && !b.pagata)
-  // le fiches si tengono nell'ordine in cui sono state posate, e l'ora dell'ultima: «togli» toglie proprio quella
   // ogni fiche come [valore, quando è stata posata]: «togli» toglie l'ultima posata, su qualunque quota sia
-  const ora = Date.now()
-  if (gia) { gia.fiches = [...fichesDi(gia), [v, ora]]; gia.puntata += v }
-  else stato.schedina.push({ indice: corrente.indice, id, quota: q, puntata: v, fiches: [[v, ora]], esito: null, pagata: false, casa: P.casa.sigla, ospite: P.ospite.sigla })
+  const timbro = Date.now() + Math.random() / 2 // (unico anche fra due schede nello stesso millisecondo)
+  if (gia) { gia.fiches = [...fichesDi(gia), [v, timbro]]; gia.puntata += v }
+  else stato.schedina.push({ indice: corrente.indice, id, quota: q, puntata: v, fiches: [[v, timbro]], esito: null, pagata: false, casa: P.casa.sigla, ospite: P.ospite.sigla })
   stato.schedina = stato.schedina.slice(-40)
   salva()
   const b = el.quote.querySelector(`[data-id="${id}"]`)
@@ -352,8 +393,6 @@ function punta(id) {
   voce(`${pu.nome} a ${fmtQuota(q)}: se va, ${fmt(Math.round(v * q * 2) / 2)} $pzk`)
 }
 // «togli»: l'ultima fiche posata su questa partita torna nel saldo
-// le fiches di una puntata nell'ordine in cui sono state posate (le puntate salvate prima non lo sapevano: si ricostruiscono)
-const fichesDi = (b) => (Array.isArray(b.fiches) && b.fiches.length && b.fiches.every((x) => Array.isArray(x)) ? b.fiches : pzk.inFiches(b.puntata).map((v) => [v, 0]))
 function togli() {
   allOra()
   if (corrente.fase !== 'scommesse') return
@@ -364,9 +403,10 @@ function togli() {
   const b = mie.reduce((a, x) => (a && quando(a) > quando(x) ? a : x), null)
   if (!b) return
   const f = fichesDi(b)
-  const v = f.at(-1)[0]
+  const [v, timbro] = f.at(-1)
   b.fiches = f.slice(0, -1)
   b.puntata -= v
+  stato.tolte = [...(stato.tolte ?? []), timbro].slice(-200)
   if (b.puntata <= 0) stato.schedina.splice(stato.schedina.indexOf(b), 1)
   pzk.ritira(GIOCO, v)
   salva()
