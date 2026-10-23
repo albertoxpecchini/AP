@@ -53,6 +53,9 @@ export const APP = [
   { id: 'giocatori', nome: 'giocatori', icona: 'app-giocatori', carica: () => import('./app/giocatori.js'), badge: () => import('../chat/lumaca-avvisi.js').then((m) => m.daVedere().length) }, // la lumachina ha combinato qualcosa
   { id: 'zaino', nome: 'zaino', icona: 'app-zaino', carica: () => import('./app/zaino.js') },
   { id: 'foto', nome: 'foto', icona: 'app-foto', carica: () => import('./app/foto.js') },
+  // virtual (23.10 sera): le scommesse sul calcio inventato, la stessa partita e la stessa schedina del gioco grande; il
+  // pallino: le vincite non ancora viste, o le scommesse aperte sulla partita che sta per chiudere (meno di un minuto)
+  { id: 'virtual', nome: 'virtual', icona: 'app-virtual', carica: () => import('./app/virtual.js'), badge: () => import('../games/virtual/schedina.js').then((m) => { m.avvia(); return m.daVedere().length + m.aperteInChiusura() }) },
   { id: 'banca', nome: 'banca', icona: 'app-banca', azione: () => pzk.apriWallet() },
 ]
 

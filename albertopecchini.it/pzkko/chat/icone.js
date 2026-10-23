@@ -28,6 +28,9 @@ export const FOGLI_CHAT = {
   'chat-pzk': ['luckypzkko', 'gomma', 'tombino', 'lucchettone', 'citofono', 'pzkkonet', 'portachiavi', 'petizione', 'neon', 'portafoglio', 'pager', 'peluche'],
   // le app del cercapersone grande (telefono/): piastrelle adesivo intere, e i tre tasti della barra del cellulare
   'chat-app': ['app-chat', 'app-shop', 'app-sfide', 'app-quiz', 'app-quest', 'app-giocatori', 'app-zaino', 'app-foto', 'app-banca', 'app-home', 'app-indietro', 'app-chiudi'],
+  // la piastrella di virtual (23.10 sera): per ora disegnata a mano in SVG → webp (art/chat-app/app-virtual.webp), da rifare
+  // con gpt-image-2 come le altre (il prompt è nel foglio chat-app2 di tools/pzkko/fogli-chat.js)
+  'chat-app2': ['app-virtual'],
   // i mestieri
   'chat-mestieri': ['rider', 'cameriere', 'barista', 'bidello', 'salumiere', 'tatuatore', 'streamer', 'sviluppatore', 'prof', 'influencer', 'avvocato', 'sindaco'],
 }

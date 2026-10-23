@@ -99,6 +99,11 @@ const TESTI = {
     'app-zaino': 'olive green tile; a green canvas backpack', 'app-foto': 'teal tile; a vintage film camera', 'app-banca': 'dark green tile; a stack of green coins with a snail profile',
     'app-home': 'black tile; the snail shell spiral in bright green (the HOME button)', 'app-indietro': 'black tile; a thick bright green arrow pointing LEFT (the BACK button)', 'app-chiudi': 'black tile; a thick bright red X (the CLOSE button)',
   }],
+  // la piastrella di virtual (23.10 sera): un foglio da una cella sola, nello stesso stile di chat-app. Finché non si genera,
+  // in art/chat-app/app-virtual.webp c'è il disegno fatto a mano in SVG (tools/pzkko/virtual/icona.mjs lo scrive)
+  'chat-app2': [1, 1, '1024x1024', 'la piastrella dell\'app virtual', `One APP ICON for a gritty retro pager operating system, a SQUARE STICKER TILE with slightly rounded corners, a very thick black outline, a flat saturated background colour inside the tile, a slight paper-sticker white edge, and one bold simple symbol in the middle (no letters, no numbers, no text, not glossy, not an iPhone or Android style: hand-made sticker look like the rest of the set). The mascot that may appear is ${LUMACA}:`, {
+    'app-virtual': 'grass green tile; a black-and-white football (soccer ball) in front of a tiny white goal net, with a small yellow referee whistle',
+  }],
   'chat-mestieri': [4, 3, '2048x1152', 'i mestieri: la chiocciola vestita da', `All twelve are the SAME character, ${LUMACA}, dressed for a job (the sunglasses always on):`, {
     rider: 'a food delivery rider: a cycling helmet and a big square delivery backpack', cameriere: 'a waiter at a village festival: a white apron, holding a tray with two plates of ravioli',
     barista: 'a barista: a black apron, holding a steaming espresso cup', bidello: 'a school janitor: a blue work coat and a huge ring of keys',

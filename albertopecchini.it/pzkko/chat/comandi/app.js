@@ -1,4 +1,4 @@
-// I comandi delle app del telefono, giocabili anche dalla chat: telefono, shop, sfide, missioni, quest, quiz.
+// I comandi delle app del telefono, giocabili anche dalla chat: telefono, shop, virtual, sfide, missioni, quest, quiz.
 // (La logica sta in sfide.js, missioni.js, quiz.js, mercato.js; l'interfaccia grande è nelle app di telefono/app/.)
 import * as zaino from '../zaino.js'
 import * as sfide from '../sfide.js'
@@ -76,6 +76,10 @@ export const APP = [
   {
     nomi: ['shop', 'ecommerce'], cat: 'app', icona: 'sacco', breve: 'lo shop del telefono: offerte, carrello, tutto il catalogo', uso: 'shop', senzaEventi: true,
     async fai(ctx) { ctx.apriApp('negozio') },
+  },
+  {
+    nomi: ['virtual', 'scommesse', 'calcio'], cat: 'app', icona: 'app-virtual', breve: 'le scommesse sul campionato inventato: una partita ogni 5 minuti', uso: 'virtual', senzaEventi: true,
+    async fai(ctx) { ctx.apriApp('virtual') },
   },
   {
     nomi: ['sfide', 'sfida', 'daily', 'giornaliere'], cat: 'app', icona: 'fulmine', breve: 'le tre sfide di oggi; «sfide riscuoti» ritira i premi', uso: 'sfide [riscuoti]', senzaEventi: true,
