@@ -14,7 +14,7 @@ import * as pzk from '../games/pzk.js'
 const IMM = { w: 1214, h: 559 } // la foto del portafoglio: le misure degli schermi sono in percentuale di lei
 const POS = {
   saldo: [15.6, 20.9, 25.4, 23.2], eur: [16.3, 50.3, 11.2, 12.1], batt: [30.2, 50.2, 10.0, 12.2], targa: [21.4, 66.1, 12.7, 5.2], borsa: [59.6, 18.6, 29.4, 40.4],
-  tasti: [[62.73, 67.9], [67.92, 67.75], [73.19, 67.75], [78.38, 67.75]], manopola: [84.3, 69.5],
+  tasti: [[62.686, 67.835], [67.927, 67.822], [73.158, 67.766], [78.382, 67.761]], manopola: [84.267, 67.796], // i centri misurati sulla foto (23.10): il pomello sulla riga dei tasti gialli (67,796 %, la media dei loro centri)
 }
 const PERIODI = [['24h', '24 ore'], ['7g', '7 giorni'], ['30g', '30 giorni'], ['tutto', 'da sempre']]
 const fmt = pzk.fmt, fmtEur = pzk.fmtEur
@@ -215,6 +215,55 @@ function pomello() {
     <circle cx="50" cy="50" r="39" fill="url(#w-pomo-luce)"/>
     <path d="M18 30 A38 38 0 0 1 44 12.5" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.4" stroke-linecap="round"/>
   </svg>`
+}
+
+// ── le mosche (23.10): aprendo il portafoglio qualche mosca esce dalle taschine, come dai portafogli vuoti dei fumetti
+// (otto se sei quasi al verde). Escono da sotto il bordo della tasca (la parte ancora dentro è nascosta), ronzano un po'
+// intorno e se ne vanno. Le mosche sono quelle della scena (art/mosche/, gpt-image-2): due pose in volo che si alternano
+// per il battito delle ali, il corpo girato nella direzione del volo. Le tasche sono misurate sulla foto (1214 × 559): la
+// taschina sotto il saldo ha il bordo al 79,6 % (da x 9 % a 43 %), quella delle banconote all'88 % (da 66 % a 91 %).
+const TASCHE = [{ x: [9, 43], y: 79.6 }, { x: [66, 91], y: 88 }]
+function mosche() {
+  if (RIDOTTO.matches) return
+  const n = pzk.saldo() < 100 ? 8 : 3 + Math.floor(Math.random() * 3)
+  for (let i = 0; i < n; i++) setTimeout(() => { if (dlg.open) mosca(TASCHE[i % 2]) }, 380 + i * (160 + Math.random() * 240))
+}
+function mosca(tasca) {
+  const r = S.corpo.getBoundingClientRect()
+  if (!r.width) return
+  const lato = r.width * (0.026 + Math.random() * 0.008)
+  const el = document.createElement('div')
+  el.className = 'w-mosca'
+  el.setAttribute('aria-hidden', 'true')
+  el.style.width = el.style.height = `${lato}px`
+  el.innerHTML = '<img src="/art/mosche/mosca-vola.webp" alt=""><img src="/art/mosche/mosca-vola2.webp" alt="">'
+  dlg.appendChild(el)
+  const bordo = r.top + (r.height * tasca.y) / 100 // il bordo della tasca, sullo schermo
+  let x = r.left + (r.width * (tasca.x[0] + Math.random() * (tasca.x[1] - tasca.x[0]))) / 100
+  let y = bordo + lato * 0.55 // parte da dentro la tasca
+  let vx = (Math.random() - 0.5) * 0.15, vy = -(0.45 + Math.random() * 0.3) // px al millisecondo
+  const verso = Math.random() < 0.5 ? -1 : 1
+  const via = { x: x + verso * innerWidth * (0.5 + Math.random() * 0.5), y: -lato * 3 - Math.random() * innerHeight * 0.4 }
+  const t0 = performance.now(), ronza = 900 + Math.random() * 900
+  let prima = t0
+  const vola = (ora) => {
+    const dt = Math.min(40, ora - prima), vita = ora - t0
+    prima = ora
+    let ax, ay
+    if (vita < 420) { ax = (Math.random() - 0.5) * 0.002; ay = -0.0009 } // esce dalla tasca, verso l'alto
+    else if (vita < 420 + ronza) { ax = (Math.random() - 0.5) * 0.03; ay = (Math.random() - 0.5) * 0.03 - 0.0004 } // ronza intorno
+    else { const dx = via.x - x, dy = via.y - y, d = Math.hypot(dx, dy) || 1; ax = (dx / d) * 0.005 + (Math.random() - 0.5) * 0.012; ay = (dy / d) * 0.005 + (Math.random() - 0.5) * 0.012 } // se ne va
+    vx += ax * dt; vy += ay * dt
+    const v = Math.hypot(vx, vy), max = vita < 420 + ronza ? 0.8 : 1.5
+    if (v > max) { vx *= max / v; vy *= max / v }
+    x += vx * dt; y += vy * dt
+    const sotto = y + lato / 2 - bordo // quanto della mosca è ancora dentro la tasca
+    el.style.clipPath = vita < 1000 && sotto > 0 ? `inset(0 0 ${Math.min(lato, sotto).toFixed(1)}px 0)` : ''
+    el.style.transform = `translate(${(x - lato / 2).toFixed(1)}px, ${(y - lato / 2).toFixed(1)}px) rotate(${((Math.atan2(vy, vx) * 180) / Math.PI + 90).toFixed(1)}deg)`
+    if (!dlg.open || vita > 8000 || x < -150 || x > innerWidth + 150 || y < -150 || y > innerHeight + 150) { el.remove(); return }
+    requestAnimationFrame(vola)
+  }
+  requestAnimationFrame(vola)
 }
 
 // ── il portafoglio aperto ──
@@ -483,7 +532,7 @@ function vivo(e, c) {
 
 export function apri(sezione = null) {
   if (!dlg) costruisci()
-  if (!dlg.open) { dlg.classList.remove('chiude'); dlg.showModal(); S.corpo.focus({ preventScroll: true }) } // il fuoco sul portafoglio, non sul primo tasto (che si accenderebbe di giallo)
+  if (!dlg.open) { dlg.classList.remove('chiude'); dlg.showModal(); S.corpo.focus({ preventScroll: true }); mosche() } // il fuoco sul portafoglio, non sul primo tasto (che si accenderebbe di giallo)
   aggiorna()
   if (!borsaDati) disegnaBorsa()
   borsa()

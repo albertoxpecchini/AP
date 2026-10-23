@@ -69,7 +69,7 @@
    Gira solo lo strato «gira»: -45° per le 24 ore, poi un quarto di giro a scatto, sempre in senso orario */
 .w-pomo{position:absolute;left:50%;top:50%;width:5.3cqw;height:5.3cqw;margin:-2.65cqw 0 0 -2.65cqw;overflow:visible;filter:drop-shadow(0 .35cqw .3cqw rgba(0,0,0,.65))}
 .w-pomo .gira{transform-box:view-box;transform-origin:50% 50%;transform:rotate(var(--giro,0deg));transition:transform .32s cubic-bezier(.2,1.3,.4,1)}
-.w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:111%;transform:translateX(-50%);font:400 .98cqw/1 var(--mono);letter-spacing:0;text-transform:uppercase;color:#0e1012;text-shadow:0 .1cqw 0 rgba(255,255,255,.5);white-space:nowrap}
+.w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:113.84%;transform:translateX(-50%);font:400 .98cqw/1 var(--mono);letter-spacing:0;text-transform:uppercase;color:#0e1012;text-shadow:0 .1cqw 0 rgba(255,255,255,.5);white-space:nowrap}
 
 /* il cavo usb-c (art/wallet-cavo/, una foto di gpt-image-2 come il portafoglio): la porta guarda verso chi guarda, quindi
    la spina è infilata giù, perpendicolare allo sguardo, e si vede solo il suo fondo (la foto è la spina vista dall'alto col
@@ -150,3 +150,10 @@
   .w-voce{font-size:1.8cqw}
 }
 @media (prefers-reduced-motion:reduce){.wallet[open],.wallet.chiude,.w-carta,.w-pomo .gira{animation:none;transition:none}}
+
+/* le mosche che escono dalle taschine (wallet.js, mosche()): due pose in volo che si alternano per il battito delle ali */
+.w-mosca{position:fixed;left:0;top:0;z-index:20;pointer-events:none;will-change:transform;filter:drop-shadow(0 .5vw .35vw rgba(0,0,0,.45))}
+.w-mosca img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.w-mosca img:first-child{animation:w-ali .05s steps(1) infinite}
+.w-mosca img:last-child{animation:w-ali .05s steps(1) infinite reverse}
+@keyframes w-ali{0%{opacity:1}50%{opacity:0}}
