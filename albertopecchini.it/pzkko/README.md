@@ -98,8 +98,11 @@ serio ma è un progetto Vercel a parte.
   quote dalla forza vera, il risultato a caso, il meteo, la cronaca minuto per minuto, tutto dal
   seme dell'orario), `squadre.js` (le quaranta squadre di A e B coi nomi storpiati, i colori, gli
   stemmi disegnati in SVG, i cognomi inventati), `schermo.js` (lo schermino a pixel: il campo, gli
-  omini, i tifosi, la telecamera, il meteo, le scene degli eventi). L'illustrazione del volantino è
-  `art/virtual/pallone.svg`, disegnata a mano. Le prove: `../tools/pzkko/virtual/prova.mjs`.
+  omini, i tifosi, la telecamera, il meteo, le scene degli eventi), `schedina.js` (la schedina in
+  comune fra la finestra e l'app del cercapersone: le puntate nel browser, il tavolo dei $pzk, il
+  pagamento, l'unione fra schede). L'illustrazione del volantino è `art/virtual/pallone.svg`,
+  disegnata a mano. Le prove: `../tools/pzkko/virtual/prova.mjs`; `../tools/pzkko/virtual/icona.mjs`
+  scrive la piastrella dell'app (`art/chat-app2/app-virtual.webp`).
 - `games/pzk.js` — i $pzk, gli stessi per tutti i giochi e per il wallet: la sessione (1.000, non si
   salvano) o il conto (vedi «Il wallet e la borsa», sotto).
 - `wallet/` — il wallet dei $pzk (22.10 notte), il portafoglio di pelle alla Fallout in alto a sinistra:
@@ -1535,9 +1538,14 @@ sola alla volta, uguale per chiunque sia sul sito in quel momento; si gioca coi 
   tifosi entrano, il meteo c'è già, e a rotazione i cartelli della presentazione (stemmi, forza,
   le ultime cinque «uscite», inventate; la città e il meteo; «le quote copiano la Serie A vera, i
   risultati no»).
-- **Il tabellone** sotto lo schermino: gli stemmi SVG, i nomi, città · serie · forza, il
-  punteggio che salta al gol, il minuto, i cartellini, il conto alla rovescia; sotto, una riga col
-  meteo e le ultime cinque. «come si gioca» apre le regole in un foglietto.
+- **Il tabellone** sotto lo schermino: gli stemmi SVG, i nomi, città · forza, il punteggio che
+  salta al gol, il minuto, i cartellini, il conto alla rovescia; sotto, una riga col meteo e le
+  ultime cinque. «come si gioca» apre le regole in un foglietto.
+- **La schedina in comune** (`schedina.js`, 23.10 sera): le puntate, il tavolo dei $pzk, il pagamento
+  e l'unione fra schede stanno in un modulo solo, usato dalla finestra grande e dall'app del
+  cercapersone (`telefono/app/virtual.js`, vedi «Il cercapersone»): una copia per pagina, le due
+  interfacce si avvisano a vicenda (`ascolta`) e con le altre schede via `storage`. Chi apre per
+  primo (`avvia`) rimette sul tavolo le puntate aperte e paga le partite finite nel frattempo.
 - **I suoni** (`suono/voci.js`, `suono/suono.js`): il fischietto, il boato del gol, l'«uuuh» del
   palo, la fiche posata, la vincita a 8 bit; passano dal motore della strada, quindi spenti se chi
   guarda ha spento il suono. Nella regia, scheda «suono», si provano.
@@ -1929,7 +1937,17 @@ Sul cellulare lo schermo prende tutta la finestra e i tasti diventano una barra 
   col conto alla rovescia a mezzanotte), reparti, ricerca, ordine, preferiti, la scheda del prodotto, il carrello, la cassa
   con lo scontrino. **Sfide**: le tre sfide di oggi. **Quiz**: i quiz retributivi. **Quest**: le side quest. **Giocatori**:
   il database (classifiche col podio, notizie, cerca, il tuo profilo coi rivali, i numeri della banca). **Zaino**: quello
-  che hai, coi bonus in corso. **Foto**: le foto vere dei quiz. **Banca**: apre il wallet.
+  che hai, coi bonus in corso. **Foto**: le foto vere dei quiz. **Virtual** (23.10 sera, Alberto: «il gioco dovrebbe essere
+  anche dentro al cercapersone»; `telefono/app/virtual.js`): le scommesse sul calcio inventato, la **stessa partita** del
+  gioco grande sullo stesso schermino a pixel (`games/virtual/partita.js` e `schermo.js`), col tabellone, il conto alla
+  rovescia, le quote 1 X 2 e over/under, le fiches e la schedina; scommesse e pagamenti passano dalla **stessa schedina**
+  della finestra grande (`games/virtual/schedina.js`, `pzkko-virtual`, lo stesso tavolo dei $pzk), quindi quello che si
+  punta qui si vede là e viceversa; «gioco grande» apre la finestra sopra il muro; sullo schermo largo lo schermino sta a
+  sinistra e il banco a destra, sul cellulare tutto in colonna. Il pallino: le vincite non ancora viste, o le scommesse
+  aperte sulla partita che chiude entro un minuto. In chat `virtual` (anche `scommesse`, `calcio`) la apre. La piastrella
+  (`art/chat-app2/app-virtual.webp`) per ora è disegnata a mano in SVG da `tools/pzkko/virtual/icona.mjs` (il pallone
+  davanti alla porta col fischietto, sul verde): da rigenerare con gpt-image-2 come le altre, `node tools/pzkko/immagini.mjs
+  genera chat-app2` (il prompt è nel foglio `chat-app2` di `tools/pzkko/fogli-chat.js`). **Banca**: apre il wallet.
 
 **La salute della lumachina** (23.10 sera; `chat/lumaca.mjs` il motore, `chat/lumaca-dati.mjs` le 300 giornate,
 `chat/lumaca-avvisi.js` le notifiche, la scheda in `telefono/app/giocatori.js`): in Giocatori > **io** c'è la lumachina
@@ -1968,7 +1986,7 @@ scorrerle. Niente emoji di sistema: solo le nostre icone (`chat/icone.js`, `art/
 - *negozio*: `negozio [reparto]` (offerte, cibo, attrezzi, fortuna, roba, pzk: ogni pezzo in una riga col tasto «compra»),
   `compra` (da solo apre la vetrina), `vendi`, `usa`, `info`, `zaino`, `apri`, `gratta`. Un nome di oggetto scritto da
   solo propone compra/usa/info.
-- *app*: `telefono`, `shop`, `sfide [riscuoti]`, `missioni`, `quest <nome> [scelta]`.
+- *app*: `telefono`, `shop`, `virtual`, `sfide [riscuoti]`, `missioni`, `quest <nome> [scelta]`.
 - *giocatori* (il database): `classifica [metrica]`, `cerca <nome>`, `giocatore [nome|pzk123456]`, `notizie`, `rivale`,
   `banca`.
 
