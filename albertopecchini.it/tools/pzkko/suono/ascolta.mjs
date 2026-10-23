@@ -148,6 +148,8 @@ const STRUMENTI = {
     g.gain.setValueCurveAtTime(vol, 0.2, T); p.pan.setValueCurveAtTime(lato, 0.2, T); V.auto(ing, 0.2, T, dop, { bagnato: 0.85, neon: true })`],
   insegna: [5, 'const r = V.ronzio(out); r.ronza.value = 0.06; r.sfrigola.value = 0.01; for (let t = 1.5; t < 3; t += 0.05 + Math.random() * 0.1) V.scintilla(out, t); r.sfrigola.setValueAtTime(0.035, 2); r.sfrigola.setValueAtTime(0.01, 2.3)'],
   split: [4, 'const s = V.split(out); s.g.value = 0.12'],
+  // virtual (games/virtual/): il fischietto, il boato del gol, l'uuuh del palo, la fiche, la vincita
+  virtual: [8, 'V.fischietto(out, 0.2, { colpi: 2 }); V.fiche(out, 1.2); V.boato(out, 1.8); V.uuuh(out, 4.8); V.vinta(out, 6.2)'],
   pc: [9, `const v = V.ventola(out); v.g.setValueAtTime(0, 0); v.g.setTargetAtTime(0.35, 0.2, 0.5); v.disco.setTargetAtTime(0.02, 2.7, 0.4); V.giri(out, 0.2); V.bip(out, 0.55); V.floppy(out, 1.2); for (let u = 2.5; u < 3.3; u += 0.05 + Math.random() * 0.15) V.clic(out, u, 0.12)
     V.accesso(out, 4); for (let i = 0; i < 20; i++) V.tasto(out, 5.5 + i * 0.07, { spazio: i % 6 === 5 }); V.tasto(out, 7.2, { a: 0.2, spazio: true })`],
   mosca: [4, `const o = c.createOscillator(), l = c.createOscillator(), a = c.createGain(), bp = V.filtro('bandpass', 420, 0.9), lg = c.createGain(); o.type = 'sawtooth'; o.frequency.value = 200; l.frequency.value = 7; lg.gain.value = 3; l.connect(lg).connect(o.frequency); o.connect(bp).connect(a).connect(out)

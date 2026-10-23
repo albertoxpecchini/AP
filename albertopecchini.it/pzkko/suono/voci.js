@@ -900,8 +900,38 @@ export function strumenti(c) {
     }
   }
 
+  // ── virtual (games/virtual/): i suoni della partita sullo schermino, piccoli e un po' «a 8 bit» come lo schermo ──
+  // il fischietto dell'arbitro: un tono acuto con la pallina che rotola dentro (tremolo), uno o due colpi
+  const fischietto = (out, t, { a = 0.22, colpi = 1 } = {}) => {
+    for (let i = 0; i < colpi; i++) {
+      const u = t + i * 0.28, d = i === colpi - 1 ? caso(0.3, 0.45) : 0.16
+      tono(out, u, d, curva([[0, 2900], [0.1, 3050], [1, 2980]]), { tipo: 'square', a: a * 0.5, att: 0.006, rel: 0.05, tremolo: [38, 0.9, d], armoniche: [[1, 1], [2, 0.15]] })
+      soffio(out, u, { a: a * 0.4, att: 0.002, tau: d * 0.6, filtri: [filtro('bandpass', 3000, 6)] })
+    }
+  }
+  // il boato dei tifosi al gol: rumore rosa che sale di colpo e scende piano, con un «ooo» di voci sotto
+  const boato = (out, t, { a = 0.5, d = 2.4 } = {}) => {
+    const s = fonte(R.rosa, t, { fine: t + d + 0.1 }), g = guadagno(0), bp = filtro('bandpass', 900, 0.6)
+    fila(s, bp, filtro('highshelf', 3000, 0.7, -6), g, out)
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + 0.12); g.gain.setTargetAtTime(0, t + 0.5, d * 0.35)
+    for (const f of [180, 230, 290]) tono(out, t + 0.03, d * 0.7, curva([[0, f * 0.96], [0.3, f], [1, f * 0.9]]), { tipo: 'sawtooth', a: a * 0.05, att: 0.1, rel: d * 0.3, vibrato: 0.02, vf: 5 })
+  }
+  // l'«uuuh» del palo: le voci che salgono e cadono deluse, più corto del boato
+  const uuuh = (out, t, { a = 0.35 } = {}) => {
+    const s = fonte(R.rosa, t, { fine: t + 1 }), g = guadagno(0)
+    fila(s, filtro('bandpass', 700, 0.8), g, out)
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a * 0.8, t + 0.25); g.gain.linearRampToValueAtTime(0, t + 0.9)
+    for (const f of [200, 250]) tono(out, t, 0.8, curva([[0, f * 0.9], [0.35, f * 1.08], [1, f * 0.8]]), { tipo: 'sawtooth', a: a * 0.05, att: 0.15, rel: 0.4 })
+    batti(out, t, 'alluminio', { a: a * 0.5, rate: caso(1.1, 1.3), fine: 0.3 }) // il palo che vibra
+  }
+  // la fiche posata sul foglio delle quote: un colpetto di plastica
+  const fiche = (out, t, { a = 0.3 } = {}) => { batti(out, t, 'plastica', { a, rate: caso(0.95, 1.1) }); batti(out, t + 0.03, 'plastica', { a: a * 0.4, rate: caso(1.3, 1.5) }) }
+  // la vincita: tre note che salgono, a 8 bit
+  const vinta = (out, t, { a = 0.22 } = {}) => { for (const [i, f] of [523, 659, 784].entries()) tono(out, t + i * 0.09, 0.1, fisso(f), { tipo: 'square', a, att: 0.004, rel: 0.03 }); tono(out, t + 0.3, 0.3, fisso(1046), { tipo: 'square', a, att: 0.004, rel: 0.15 }) }
+
   return {
     R, fonte, filtro, guadagno, fila, soffio, tono, eco, tampone, corpo, batti,
+    fischietto, boato, uuuh, fiche, vinta,
     campanello, risponde, citofono, vetro, telaio, maniglione, lucchetto, portachiavi, lattina, cartaBagnata, pacchetto, cartone, grissini,
     pozza, pietra, neve, chiusino, muro, carta, legno, cartello, penne, penna, tappo, foglio, attacca,
     goccia, gronda, passeri, tortora, piccioni, ali, cornacchia, rondoni, merlo, civetta, allocco, grilli, cicale,

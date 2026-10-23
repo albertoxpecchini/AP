@@ -530,6 +530,10 @@ export function accendi(c) {
     legno: () => V.legno(qui(0.9), c.currentTime + 0.01),
     carta: () => V.carta(qui(0.9), c.currentTime + 0.01, { tipo: scegli(['', 'lucida', 'cartoncino', 'scontrino']) }),
     penna: () => V.penna(qui(0.9), c.currentTime + 0.01, { durata: 1.6, n: 12 }),
+    // virtual: il fischietto, il boato del gol, l'«uuuh» del palo
+    fischietto: () => V.fischietto(centro, c.currentTime + 0.01, { colpi: 2 }),
+    boato: () => V.boato(centro, c.currentTime + 0.01),
+    uuuh: () => V.uuuh(centro, c.currentTime + 0.01),
   }
   const senti = (nome, d = {}) => {
     if (nome === 'auto') auto(d)
@@ -546,6 +550,12 @@ export function accendi(c) {
     else if (nome === 'tappo') V.tappo(qui(), c.currentTime + 0.005, d)
     else if (nome === 'foglio') V.foglio(qui(), c.currentTime + 0.005, d)
     else if (nome === 'attacca') V.attacca(qui(), c.currentTime + 0.005, d)
+    // virtual (games/virtual/virtual.js): la partita sullo schermino. Dal centro, come lo scoppio del pomodoro
+    else if (nome === 'virtual-fischio') V.fischietto(centro, c.currentTime + 0.005, { colpi: d.colpi ?? 1 })
+    else if (nome === 'virtual-gol') { V.fischietto(centro, c.currentTime + 0.005); V.boato(centro, c.currentTime + 0.1) }
+    else if (nome === 'virtual-palo') V.uuuh(centro, c.currentTime + 0.005)
+    else if (nome === 'virtual-fiche') V.fiche(qui(), c.currentTime + 0.005)
+    else if (nome === 'virtual-vinta') V.vinta(centro, c.currentTime + 0.005)
     else if (nome === 'prova') prove[d.nome]?.()
   }
   // (quelli arrivati prima del motore: i vecchi si buttano, le auto si suonano da dove sono arrivate)

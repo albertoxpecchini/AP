@@ -491,6 +491,7 @@ function paginaSuono() {
     prova([['campanello', 'campanello'], ['vetro', 'vetro'], ['maniglione', 'maniglione'], ['lattina', 'lattina'], ['pozza', 'pozza'], ['chiusino', 'chiusino'], ['cartello', 'cartello'], ['asse delle zucche', 'legno'], ['carta', 'carta'], ['la biro', 'penna']]),
     prova([['passeri', 'passeri'], ['tortora', 'tortora'], ['piccioni', 'piccioni'], ['cornacchia', 'cornacchia'], ['rondoni', 'rondoni'], ['merlo', 'merlo'], ['civetta', 'civetta'], ['allocco', 'allocco']]),
     prova([['motorino', 'motorino'], ['clacson', 'clacson'], ['tapparella', 'tapparella']]),
+    prova([['fischietto', 'fischietto'], ['boato del gol', 'boato'], ['uuuh del palo', 'uuuh']]),
     nota('l\'auto, la pioggia, la zanzara davanti e la goccia si provano dalle loro schede: si sentono da dove sono.'),
   ]
 }
