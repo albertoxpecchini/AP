@@ -139,11 +139,16 @@ function disegnaGrafico(c, punti, { da = '24h' } = {}) {
   lo -= m; hi += m
   const left = W * 0.03, right = W * 0.85, top = H * 0.36, bot = H * 0.74
   const X = (t) => (t1 > t0 ? ((t - t0) / (t1 - t0)) * (right - left) + left : (left + right) / 2), Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top)
-  // la griglia e i prezzi a destra (tre livelli)
-  g.font = `${Math.round(H * 0.048)}px ${MONO}`; g.textAlign = 'left'; g.textBaseline = 'middle'
+  // la griglia e i prezzi a destra (tre livelli). L'etichetta dell'ultimo prezzo sta sulla stessa colonna ed è più alta di
+  // una riga: la quota che le cadrebbe sotto non si scrive (la riga tratteggiata sì), così non si accavallano mai
+  const fontH = Math.round(H * 0.048)
+  g.font = `${fontH}px ${MONO}`; g.textAlign = 'left'; g.textBaseline = 'middle'
+  const [tu, vu] = punti[punti.length - 1]
+  const eh = H * 0.075, ey = Math.min(bot - eh / 2, Math.max(top + eh / 2, Y(vu)))
   for (let k = 0; k <= 2; k++) {
     const v = lo + ((hi - lo) * (2 - k)) / 2, y = Y(v)
     g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 1; g.setLineDash([3, 4]); g.beginPath(); g.moveTo(left, y); g.lineTo(right, y); g.stroke(); g.setLineDash([])
+    if (Math.abs(y - ey) < (eh + fontH) / 2 + 2 * dpr) continue // sotto l'etichetta del prezzo: la quota si salta
     g.fillStyle = 'rgba(220,235,220,.75)'; g.fillText(v.toFixed(4), right + W * 0.012, y)
   }
   // le ore (o i giorni) sotto
@@ -161,10 +166,9 @@ function disegnaGrafico(c, punti, { da = '24h' } = {}) {
   for (const [k, [t, v]] of punti.entries()) k ? g.lineTo(X(t), Y(v)) : g.moveTo(X(t), Y(v))
   g.strokeStyle = col; g.lineWidth = Math.max(1.4, H * 0.013); g.lineJoin = 'round'; g.shadowColor = col; g.shadowBlur = H * 0.03
   g.stroke(); g.shadowBlur = 0
-  const [tu, vu] = punti[punti.length - 1]
   g.fillStyle = '#fff'; g.beginPath(); g.arc(X(tu), Y(vu), Math.max(2, H * 0.014), 0, Math.PI * 2); g.fill()
-  // l'ultimo prezzo su un'etichetta colorata, a destra, all'altezza della linea
-  const et = vu.toFixed(4), ew = g.measureText(et).width + W * 0.02, eh = H * 0.075, ey = Math.min(bot - eh / 2, Math.max(top + eh / 2, Y(vu)))
+  // l'ultimo prezzo su un'etichetta colorata, a destra, all'altezza della linea (ey ed eh calcolati sopra, con la griglia)
+  const et = vu.toFixed(4), ew = g.measureText(et).width + W * 0.02
   g.fillStyle = col; g.beginPath(); g.roundRect(right + W * 0.006, ey - eh / 2, ew, eh, 3); g.fill()
   g.fillStyle = '#041008'; g.textAlign = 'left'; g.fillText(et, right + W * 0.016, ey)
   // le righe di scansione del tubo
