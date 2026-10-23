@@ -9,6 +9,7 @@ import { NEGOZIO, PER_ID } from '../../chat/testi.js'
 import { REPARTI, testoBonus } from '../../chat/oggetti.js'
 import * as mercato from '../../chat/mercato.js'
 import { icona } from '../../chat/icone.js'
+import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
 
 const CHIAVE_CARRELLO = 'pzkko-carrello'
 const CHIAVE_PREF = 'pzkko-preferiti'
@@ -21,7 +22,9 @@ const ORDINI = [['top', 'in evidenza'], ['prezzo-su', 'prezzo: dal più basso'],
 const peso = (x) => Object.values(x.bonus ?? {}).reduce((a, n) => a + Math.abs(n), 0)
 
 let host = null, ctx = null
-let S = { v: 'vetrina', rep: 'tutti', q: '', ordine: 'top', solo: false, pid: null, n: 1, scontrino: null }
+// la vista e le scelte si ricordano (telefono/ricordi.js): riaprendo lo shop si ritrova reparto, ordine, ricerca e la scheda aperta
+let S = { ...ricordo('negozio', { v: 'vetrina', rep: 'tutti', q: '', ordine: 'top', solo: false, pid: null, n: 1 }), scontrino: null }
+if (S.v === 'scontrino' || (S.v === 'prodotto' && !PER_ID[S.pid])) S.v = 'vetrina'
 let carrello = leggi(CHIAVE_CARRELLO, {}) // { id: quanti }
 let pref = new Set(leggi(CHIAVE_PREF, []))
 let timer = 0
@@ -110,7 +113,7 @@ function prodotto() {
 function carrelloVista() {
   const righe = nelCarrello(), t = totale(), sal = pzk.saldo(), ris = risparmio()
   return `${testata('Carrello')}
-    <div class="t-corpo-app t-sh">
+    <div class="t-corpo-app t-sh t-sh-vcarrello">
       ${righe.length ? `<div class="t-sh-lista">${righe.map(([id, n]) => { const x = PER_ID[id]; return `<div class="t-sh-linea"><div class="t-sh-img pic" data-act="apri" data-id="${id}">${icona(id)}</div><div class="t-sh-lt"><b>${esc(x.nome)}</b>${prezzoHtml(x)}</div><div class="t-sh-q"><div><button type="button" data-act="meno-c" data-id="${id}" aria-label="uno in meno">−</button><b>${n}</b><button type="button" data-act="piu-c" data-id="${id}" aria-label="uno in più"${x.unico ? ' disabled' : ''}>+</button></div></div><button class="t-sh-x" type="button" data-act="togli" data-id="${id}" aria-label="togli dal carrello">togli</button></div>` }).join('')}</div>
       <div class="t-sh-somma">
         ${ris ? `<div><span>sconti di oggi</span><b class="pzk">−${fmt(ris)} $pzk</b></div>` : ''}
@@ -140,12 +143,23 @@ function scontrinoVista() {
 }
 
 // ── disegno e gesti ──
+// Ridisegnare rifà tutto l'html: quello che scorre (la lista, i caroselli, i reparti) lo rimette dov'era telefono/ricordi.js
+// (23.10, Alberto: aggiungendo al carrello la lista tornava su e bisognava riscendere ogni volta). Ogni vista ha il suo
+// punto: tornando alla vetrina da un prodotto o dal carrello la si ritrova dove la si era lasciata.
 function disegna() {
   clearInterval(timer)
+  ricorda('negozio', { v: S.v === 'scontrino' ? 'vetrina' : S.v, rep: S.rep, q: S.q, ordine: S.ordine, solo: S.solo, pid: S.pid, n: S.n })
   host.innerHTML = S.v === 'prodotto' ? prodotto() : S.v === 'carrello' ? carrelloVista() : S.v === 'scontrino' ? scontrinoVista() : vetrina()
   if (S.v === 'vetrina' && host.querySelector('[data-conto]')) timer = setInterval(() => { const c = host.querySelector('[data-conto]'); if (c && !host.hidden) c.textContent = contoAllaRovescia() }, 1000)
 }
-const vaiVista = (v, extra = {}) => { S = { ...S, v, ...extra }; disegna(); host.querySelector('.t-corpo-app')?.scrollTo({ top: 0 }) }
+/** Cambia vista. Un'altra scheda di prodotto e la cassa partono dall'alto; un altro reparto, ordine o filtro è una lista
+ *  nuova: la vetrina riparte dall'alto (la fila dei reparti resta dov'è). */
+const vaiVista = (v, extra = {}) => {
+  if ('rep' in extra || 'solo' in extra || 'ordine' in extra) dallAlto(host)
+  if (('pid' in extra && extra.pid !== S.pid) || v === 'scontrino') { S = { ...S, v, ...extra }; disegna(); return dallAlto(host) }
+  S = { ...S, v, ...extra }
+  disegna()
+}
 
 function aggiungi(id, n = 1) {
   const x = PER_ID[id]
@@ -199,6 +213,7 @@ function indietro() { if (S.v !== 'vetrina') { vaiVista('vetrina'); return true 
 
 export function monta(h, c) {
   host = h; ctx = c
+  tieni(host, 'negozio')
   disegna()
   host.addEventListener('click', clic)
   host.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click() } })

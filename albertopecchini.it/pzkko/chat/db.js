@@ -26,7 +26,8 @@ export const METRICHE = {
   quiz: ['risposte giuste ai quiz', 'n', 'quiz'], sfide: ['sfide fatte', 'n', 'fulmine'], missioni: ['side quest fatte', 'n', 'chiave-vecchia'], serie: ['serie di giorni', 'n', 'fuoco'], acquisti: ['pezzi comprati', 'n', 'sacco'],
   vecchiaia: ['giorni di vita', 'n', 'clessidra'], eur: ['EUR€', 'eur', 'eur'], persi: ['persi ai giochi', 'pzk', 'no'],
 }
-export const valoreHtml = (metrica, v) => { const t = METRICHE[metrica]?.[1]; const n = Number(v).toLocaleString('it-IT'); return t === 'pzk' ? `<span class="pzk">${n} $pzk</span>` : t === 'eur' ? `<span class="eur">EUR€ ${n}</span>` : n }
+// i valori corti (1,0K, 13,3K, 1,0M…: games/pzk.js fmtCorto) perché nelle classifiche e nei podi stiano nella riga
+export const valoreHtml = (metrica, v) => { const t = METRICHE[metrica]?.[1]; const n = t === 'eur' ? Number(v).toLocaleString('it-IT') : pzk.fmtCorto(Number(v)); return t === 'pzk' ? `<span class="pzk">${n} $pzk</span>` : t === 'eur' ? `<span class="eur">EUR€ ${n}</span>` : n }
 
 export const top = (metrica, n = 10) => leggi(`top=${encodeURIComponent(metrica)}&n=${n}`)
 export const cerca = (testo) => leggi(`cerca=${encodeURIComponent(testo)}`, 15_000)

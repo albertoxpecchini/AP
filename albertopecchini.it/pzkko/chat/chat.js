@@ -88,6 +88,12 @@ export function monta(host) {
   saldoEl = dlg.querySelector('.c-saldo')
   giuEl = dlg.querySelector('.c-giu')
   rapidiEl = dlg.querySelector('.c-rapidi')
+  // la storia: quella di chi c'è; si salva poco dopo ogni cambio e subito quando la pagina si nasconde o si chiude
+  caricaStoria()
+  new MutationObserver(salvaPoi).observe(lista, { childList: true, subtree: true, characterData: true })
+  addEventListener('pagehide', () => salvaStoria())
+  document.addEventListener('visibilitychange', () => { if (document.hidden) salvaStoria() })
+  pzk.osserva(() => { const d = doveStoria(); if (d.k !== storiaDove?.k) { salvaStoria(); caricaStoria(); vaiGiu() } }) // entrando o uscendo dal conto
   lista.addEventListener('scroll', () => { incollata = visteAlFondo(); if (incollata) azzeraNuovi(); else giuEl.hidden = false }, { passive: true })
   lista.addEventListener('load', () => { if (incollata) vaiGiu() }, true) // un'icona che arriva allunga la lista: si resta in fondo
   giuEl.addEventListener('click', () => { azzeraNuovi(); vaiGiu(true) })
@@ -122,7 +128,8 @@ function aggiornaSaldo() {
 }
 /** L'app torna in primo piano: il saluto la prima volta, poi (se c'è) un comando da scrivere. */
 export function mostra(comando = null) {
-  if (!salutato) { salutato = true; salutoIniziale(ctxDi([], '')) }
+  // il saluto una volta al giorno: ricaricando la pagina lo stesso giorno la storia c'è già, e non si ripete
+  if (!salutato) { salutato = true; if (ultimoGiorno !== new Date().toDateString()) salutoIniziale(ctxDi([], '')) }
   aggiornaSaldo()
   if (typeof comando === 'string' && comando.trim()) { input.value = comando; invia() }
   else if (matchMedia('(hover:hover)').matches) requestAnimationFrame(() => input.focus()) // sul telefono vero la tastiera non salta fuori da sola
@@ -149,16 +156,52 @@ function scorri(nuovoMsg = false, mio = false) {
   giuEl.hidden = false
 }
 const ora = (d = new Date()) => d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
-/** Il separatore del giorno («oggi», «ieri», «lun 12 ott») quando cambia. */
+/** Il nome di un giorno (una data di toDateString) visto da oggi: «oggi», «ieri», «lun 12 ott». */
+function nomeGiorno(g) {
+  const ieri = new Date(); ieri.setDate(ieri.getDate() - 1)
+  return g === new Date().toDateString() ? 'oggi' : g === ieri.toDateString() ? 'ieri' : new Date(g).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+/** Il separatore del giorno quando cambia (col giorno scritto dentro: la storia ricaricata domani lo ribattezza). */
 function separatore() {
   const g = new Date().toDateString()
   if (g === ultimoGiorno) return
-  const prima = ultimoGiorno
   ultimoGiorno = g
   const s = document.createElement('div')
   s.className = 'c-giorno'
-  s.textContent = prima ? new Date().toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) : 'oggi'
+  s.dataset.g = g
+  s.textContent = nomeGiorno(g)
   lista.appendChild(s)
+}
+
+// ── la storia (23.10, Alberto: «memorizza sempre le azioni»): i messaggi restano anche ricaricando la pagina ──
+// Si salva l'html degli ultimi messaggi finiti (non quelli in coda, a metà scrittura o «sta scrivendo…»): nella sessione in
+// sessionStorage, come i $pzk e lo zaino; col conto in localStorage, per quel conto (entrando o uscendo la chat cambia
+// storia). Torna fermo quello che si muoveva: i tasti dei minigiochi spenti, niente barre del tempo; i comandi cliccabili
+// e i tasti delle schede restano vivi (li prende clicLista). I separatori si ribattezzano col giorno di adesso.
+const STORIA_MSG = 120, STORIA_BYTE = 400_000
+let storiaDove = null, storiaAttesa = 0
+const doveStoria = () => { const c = pzk.conto(); return c ? { dep: localStorage, k: `pzkko-chat-storia:${c.ind}` } : { dep: sessionStorage, k: 'pzkko-chat-storia' } }
+const finito = (m) => !m.classList.contains('in-attesa') && !m.querySelector('.c-scrive') && !m.querySelector('.c-scheda')?.__finisci
+function salvaStoria(dove = storiaDove) {
+  clearTimeout(storiaAttesa)
+  if (!lista || !dove) return
+  const t = document.createElement('template')
+  t.innerHTML = [...lista.children].filter(finito).slice(-STORIA_MSG).map((m) => m.outerHTML).join('')
+  for (const b of t.content.querySelectorAll('.c-bottoni button, .c-griglia button')) b.disabled = true
+  for (const x of t.content.querySelectorAll('.c-tempo')) x.remove()
+  let html = t.innerHTML
+  while (html.length > STORIA_BYTE && t.content.firstElementChild) { t.content.firstElementChild.remove(); html = t.innerHTML }
+  try { dove.dep.setItem(dove.k, html) } catch {}
+}
+const salvaPoi = () => { clearTimeout(storiaAttesa); storiaAttesa = setTimeout(salvaStoria, 800) }
+/** Rimette nella lista la storia di chi c'è adesso (al montaggio, e quando si entra o si esce dal conto). */
+function caricaStoria() {
+  storiaDove = doveStoria()
+  let html = ''
+  try { html = storiaDove.dep.getItem(storiaDove.k) ?? '' } catch {}
+  lista.innerHTML = html
+  for (const s of lista.querySelectorAll('.c-giorno')) if (s.dataset.g) s.textContent = nomeGiorno(s.dataset.g)
+  ultimoGiorno = [...lista.querySelectorAll('.c-giorno')].pop()?.dataset.g ?? ''
 }
 function aggiungi(el, mio = false) {
   separatore()

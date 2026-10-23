@@ -28,6 +28,9 @@ export const FOGLI_CHAT = {
   'chat-pzk': ['luckypzkko', 'gomma', 'tombino', 'lucchettone', 'citofono', 'pzkkonet', 'portachiavi', 'petizione', 'neon', 'portafoglio', 'pager', 'peluche'],
   // le app del cercapersone grande (telefono/): piastrelle adesivo intere, e i tre tasti della barra del cellulare
   'chat-app': ['app-chat', 'app-shop', 'app-sfide', 'app-quiz', 'app-quest', 'app-giocatori', 'app-zaino', 'app-foto', 'app-banca', 'app-home', 'app-indietro', 'app-chiudi'],
+  // l'app Miniera (23.10): questa NON è di Replicate, è disegnata in codice a pixel come tutta la miniera
+  // (tools/pzkko/miniera-icona.mjs la scrive in art/chat-miniera/; fogli-chat.js non ha un prompt per lei e non la rifà)
+  'chat-miniera': ['app-miniera'],
   // i mestieri
   'chat-mestieri': ['rider', 'cameriere', 'barista', 'bidello', 'salumiere', 'tatuatore', 'streamer', 'sviluppatore', 'prof', 'influencer', 'avvocato', 'sindaco'],
 }

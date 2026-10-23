@@ -7,6 +7,7 @@ import * as zaino from '../../chat/zaino.js'
 import { PER_ID, PESCI, ANIMALI, REPERTI, nomeDi } from '../../chat/testi.js'
 import { testoBonus } from '../../chat/oggetti.js'
 import { icona } from '../../chat/icone.js'
+import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const VENDIBILI = new Set([...PESCI, ...ANIMALI, ...REPERTI].map((x) => x.id))
@@ -14,13 +15,16 @@ const FILTRI = [['tutto', 'tutto'], ['usa', 'da usare'], ['tieni', 'da tenere'],
 const tipoDi = (id) => (VENDIBILI.has(id) ? 'vendi' : PER_ID[id]?.tipo ?? 'tieni')
 const resto = (ms) => { const m = Math.ceil(ms / 60000); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min` }
 
-let host = null, ctx = null, filtro = 'tutto', scelto = null, timer = 0
+let host = null, ctx = null, timer = 0
+// il filtro e la cosa aperta si ricordano (telefono/ricordi.js), anche riaprendo la pagina
+let { filtro, scelto } = ricordo('zaino', { filtro: 'tutto', scelto: null })
 
 function disegna() {
   const ogg = zaino.oggetti().filter(([id]) => filtro === 'tutto' || tipoDi(id) === filtro)
   const eff = zaino.effetti(), bonus = testoBonus(zaino.bonusTutti())
   const x = scelto && PER_ID[scelto], n = scelto ? zaino.quanti(scelto) : 0
   if (scelto && !n) scelto = null
+  ricorda('zaino', { filtro, scelto })
   host.innerHTML = `${ctx.testata('Zaino', `<span class="t-sh-piede" style="margin:0">${zaino.oggetti().reduce((a, [, q]) => a + q, 0)} pezzi</span>`)}
     <div class="t-corpo-app t-za">
       ${bonus || eff.length ? `<div class="t-za-bonus">${eff.map(([id, t]) => `<span class="eff">${icona(id)} ${esc(nomeDi(id))} · ${resto(t - Date.now())}</span>`).join('')}${bonus ? bonus.split(' · ').map((b) => `<span>${b}</span>`).join('') : ''}</div>` : ''}
@@ -47,8 +51,8 @@ function azioni(id, x) {
 
 function clic(e) {
   const f = e.target.closest('[data-filtro]'), p = e.target.closest('[data-id]'), u = e.target.closest('[data-usa]'), c = e.target.closest('[data-chat]')
-  if (f) { filtro = f.dataset.filtro; scelto = null; return disegna() }
-  if (p) { scelto = scelto === p.dataset.id ? null : p.dataset.id; disegna(); host.querySelector('.t-za-dett')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return }
+  if (f) { if (filtro !== f.dataset.filtro) dallAlto(host); filtro = f.dataset.filtro; scelto = null; return disegna() } // un altro filtro: la lista riparte dall'alto
+  if (p) { scelto = scelto === p.dataset.id ? null : p.dataset.id; disegna(); requestAnimationFrame(() => host.querySelector('.t-za-dett')?.scrollIntoView({ block: 'nearest' })); return } // dopo che la lista è tornata dov'era: si sposta solo quanto basta
   if (u) {
     const x = PER_ID[u.dataset.usa]
     if (!zaino.togli(x.id)) return
@@ -62,6 +66,7 @@ function clic(e) {
 
 export function monta(h, c) {
   host = h; ctx = c
+  tieni(host, 'zaino')
   host.addEventListener('click', clic)
   zaino.ascolta(() => { if (!host.hidden) disegna() })
   disegna()

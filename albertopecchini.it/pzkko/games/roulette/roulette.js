@@ -33,10 +33,13 @@ function carica() {
   try {
     const s = JSON.parse(localStorage.getItem(CHIAVE) || 'null')
     if (s && Array.isArray(s.storia)) stato.storia = s.storia.filter((n) => Number.isInteger(n) && n >= 0 && n <= 36).slice(0, 12)
+    // le giocate dell'ultimo giro si ricordano anche ricaricando, per «rifai» (23.10, Alberto: «memorizza sempre le azioni»)
+    const ult = Array.isArray(s?.ultime) ? s.ultime.filter(([id, imp]) => PUNTATE_PER_ID.has(id) && Number.isFinite(imp) && imp > 0) : []
+    if (ult.length) stato.ultime = new Map(ult)
   } catch {}
 }
-// qui solo gli ultimi numeri: i $pzk li tiene ../pzk.js (le fiches sul tavolo comprese)
-function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ storia: stato.storia })) } catch {} }
+// qui gli ultimi numeri e le giocate dell'ultimo giro: i $pzk li tiene ../pzk.js (le fiches sul tavolo comprese)
+function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ storia: stato.storia, ultime: stato.ultime ? [...stato.ultime] : null })) } catch {} }
 const puntato = () => [...stato.giocate.values()].reduce((a, b) => a + b, 0)
 
 // ── la finestra ──────────────────────────────────────────────────────────────

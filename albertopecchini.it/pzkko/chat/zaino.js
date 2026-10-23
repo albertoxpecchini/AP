@@ -160,6 +160,9 @@ export const missioniStato = () => Z.quest ?? { attive: {}, fatte: {} }
 export function salvaMissioni(q) { Z.quest = q; scrivi() }
 export const quizStato = () => Z.quiz ?? { g: '', pagati: 0, serie: 0, migliore: 0 }
 export function salvaQuiz(q) { Z.quiz = q; scrivi() }
+// la miniera di $pzk (miniera.js): i pezzi comprati, quelli montati e da quando matura. Solo id e numeri (pochi byte)
+export const minieraStato = () => Z.miniera ?? { posseduti: {}, montati: {}, dal: 0, acc: 0 }
+export function salvaMiniera(m) { Z.miniera = m; scrivi() }
 /** Segna un oggetto leggendario preso (il database ne fa una notizia). */
 export function nota(id) { Z.rari = [...new Set([...(Z.rari ?? []), id])]; scrivi() }
 
