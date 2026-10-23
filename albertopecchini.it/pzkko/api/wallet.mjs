@@ -134,7 +134,14 @@ function accogli(c, pzk, now, lg, es) {
   if (pzk === undefined || pzk === null) return null
   if (typeof pzk !== 'number' || !Number.isFinite(pzk) || pzk < 0 || pzk > 1e8) return 'saldo strano'
   if (lg !== undefined) for (const v of c.lumaca?.ultime ?? []) if (lg === null || v.g > lg) pzk = Math.max(0, pzk + v.n)
-  if (es !== undefined) for (const v of c.esterni ?? []) if (v.s > es) pzk = Math.max(0, pzk + v.n)
+  if (es !== undefined) {
+    for (const v of c.esterni ?? []) if (v.s > es) pzk = Math.max(0, pzk + v.n)
+  } else if (c.esterni?.length) {
+    // un browser che non dice cosa sa (`es` assente: un codice di prima, o un saldo salvato nel browser prima dei soldi da
+    // fuori) non può riscrivere il saldo di un conto che ne ha: non si sa se li contiene. Si tiene quello del server e il
+    // browser lo riprende (23.10: il browser di Alberto ha rimesso i suoi 7.285 dopo il passaggio di 5.000)
+    return 'aggiorno il saldo dalla banca'
+  }
   pzk = mezzi(pzk)
   const secondi = Math.max(0, (now - (c.salvato ?? c.creato)) / 1000)
   if (!illimitato(c) && pzk - c.pzk > 20000 + 1200 * secondi) return 'il saldo non torna: ricarico quello salvato'
@@ -158,6 +165,9 @@ const limiti = { crea: limite('wallet-crea', 3, GIORNO), entra: limite('wallet-e
 export const OPERAZIONI = [
   // 23.10.2026, Alberto: «fai da solo un passaggio da wallet 398893 a 113089 di 5000 pzk»
   { id: '2026-10-23-398893-113089-5000', da: '398893', a: '113089', n: 5000 },
+  // la correzione: dopo il passaggio il browser di Alberto (col saldo di prima, senza `es`) aveva rimesso 7.285, e i
+  // 5.000 erano diventati 10.000. Si tolgono di nuovo, senza mossa (quella del passaggio c'è già)
+  { id: '2026-10-23-correzione-398893-5000', da: '398893', togli: 5000 },
 ]
 let operazioniViste = false
 async function operazioni(store, now) {
@@ -168,9 +178,10 @@ async function operazioni(store, now) {
     let fatto = false
     for (const o of OPERAZIONI) {
       if (db.operazioni?.[o.id]?.ok) continue // fatta; una che non è andata (un conto che manca, i soldi che non bastano) si ritenta
-      const c = db.conti.find((x) => x.ind === o.da), d = db.conti.find((x) => x.ind === o.a), n = mezzi(o.n)
-      const esito = !c ? 'manca il conto pzk' + o.da : !d ? 'manca il conto pzk' + o.a : c.pzk < n ? `pzk${o.da} ha ${c.pzk} $pzk, non ${n}` : null
-      if (!esito) {
+      const c = db.conti.find((x) => x.ind === o.da), d = db.conti.find((x) => x.ind === o.a), n = mezzi(o.n ?? o.togli)
+      const esito = !c ? 'manca il conto pzk' + o.da : !o.togli && !d ? 'manca il conto pzk' + o.a : c.pzk < n ? `pzk${o.da} ha ${c.pzk} $pzk, non ${n}` : null
+      if (!esito && o.togli) { c.pzk = mezzi(c.pzk - n); esterno(c, -n) } // una correzione: solo da togliere, senza mossa
+      else if (!esito) {
         c.pzk = mezzi(c.pzk - n); d.pzk = mezzi(d.pzk + n); esterno(c, -n); esterno(d, n)
         mossa(c, { t: now, tipo: 'inviato', n, a: 'pzk' + d.ind, nome: d.nome })
         mossa(d, { t: now, tipo: 'ricevuto', n, da: 'pzk' + c.ind, nome: c.nome })
@@ -193,7 +204,7 @@ export default async function handler(req, res) {
       const url = new URL(req.url, 'http://x')
       const ind = indirizzoDi(url.searchParams.get('ind'))
       const { db } = await store.read()
-      if (url.searchParams.has('operazioni')) return json(res, 200, { ok: true, operazioni: OPERAZIONI.map((o) => ({ id: o.id, da: 'pzk' + o.da, a: 'pzk' + o.a, n: o.n, ...(db.operazioni?.[o.id] ?? { fatta: false }) })) })
+      if (url.searchParams.has('operazioni')) return json(res, 200, { ok: true, operazioni: OPERAZIONI.map((o) => ({ id: o.id, da: 'pzk' + o.da, ...(o.a ? { a: 'pzk' + o.a, n: o.n } : { togli: o.togli }), ...(db.operazioni?.[o.id] ?? { fatta: false }) })) })
       if (url.searchParams.has('classifica')) return json(res, 200, { ok: true, classifica: [...db.conti].sort((a, b) => b.pzk - a.pzk).slice(0, 10).map((c) => ({ nome: c.nome, pzk: c.pzk })) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
       if (ind) { const c = db.conti.find((x) => x.ind === ind); return c ? json(res, 200, { ok: true, conto: { nome: c.nome, ind: 'pzk' + c.ind, creato: c.creato } }, 'public, s-maxage=20') : json(res, 404, { ok: false, errore: 'nessun conto con questo indirizzo' }) }
       return json(res, 200, { ok: true, ...offerta(db) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
