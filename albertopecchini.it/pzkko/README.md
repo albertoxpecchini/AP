@@ -1624,7 +1624,11 @@ gira davvero, un quarto di giro a scatto e sempre in senso orario: è il pezzo d
 tacca gialla sul bordo),
 il cambio e il suo inverso, la variazione del periodo, la capitalizzazione (i $pzk di tutti i
 conti, quanti conti) e i fattori del momento (il meteo, la temperatura, giorno o notte, se c'è
-stato un commit). I quattro tasti gialli sfilano dalla tasca **la carta** coi moduli: **conto**
+stato un commit). Aprendo il wallet qualche **mosca** esce dalle taschine (quella sotto il saldo e quella delle
+banconote; otto se sei al verde), ronza e vola via (`mosche()`, le mosche di `art/mosche/`). I quattro tasti gialli
+aprono la loro pagina **dentro lo schermo del grafico**, al posto del grafico, coi fosfori verdi (dal 23.10: prima
+sfilavano una carta sotto il portafoglio); ripremendo lo stesso tasto, o con Esc, torna il grafico. Sul telefono la pagina
+si apre come uno schermo grande nel mezzo. Le pagine sono (la funzione si chiama ancora `carta()`) coi moduli: **conto**
 (entra o crea il conto: un nome e un PIN di quattro cifre, niente di più; il conto nuovo parte con
 1.000 $pzk; dentro, le ultime mosse, sincronizza, esci), **cambio** (il fader orizzontale come
 quelli di regia: $pzk → EUR€ o EUR€ → $pzk, quanto dai e quanto ricevi al cambio dell'ultima

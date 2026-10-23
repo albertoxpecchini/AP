@@ -280,24 +280,23 @@ function costruisci() {
       <div class="w-schermo w-eur" style="${pos(POS.eur)}"><canvas></canvas><span class="w-eti">EUR€</span></div>
       <div class="w-schermo w-batt" style="${pos(POS.batt)}"><canvas></canvas></div>
       <div class="w-targa" style="${pos(POS.targa)}"></div>
-      <div class="w-schermo w-borsa" style="${pos(POS.borsa)}"><canvas class="w-grafico"></canvas><div class="w-tasso"></div><div class="w-var"></div><div class="w-periodo"></div><div class="w-info"></div></div>
+      <div class="w-schermo w-borsa" style="${pos(POS.borsa)}"><canvas class="w-grafico"></canvas><div class="w-tasso"></div><div class="w-var"></div><div class="w-periodo"></div><div class="w-info"></div><div class="w-pagina" hidden></div></div>
       ${tasti.map((t, i) => `<button class="w-tasto" type="button" data-s="${t}" data-eti="${t}" aria-pressed="false" style="left:${POS.tasti[i][0]}%;top:${POS.tasti[i][1]}%" aria-label="${t}"></button>`).join('')}
       <button class="w-manopola" type="button" data-eti="periodo" aria-label="il periodo del grafico" style="left:${POS.manopola[0]}%;top:${POS.manopola[1]}%">${pomello()}</button>
       <img class="w-cavo" src="/art/wallet-cavo/cavo.webp" alt="" width="771" height="60" loading="lazy" aria-hidden="true"><div class="w-cavo-filo" aria-hidden="true"></div>
       <p class="w-voce" role="status" aria-live="polite"></p>
-    </div>
-    <div class="w-carta"></div>`
+    </div>`
   document.body.appendChild(dlg)
   S = {
     corpo: q(dlg, '.w-corpo'), saldo: q(dlg, '.w-saldo canvas'), sotto: q(dlg, '.w-saldo .w-sotto'), eur: q(dlg, '.w-eur canvas'), batt: q(dlg, '.w-batt canvas'), targa: q(dlg, '.w-targa'),
-    grafico: q(dlg, '.w-grafico'), tasso: q(dlg, '.w-tasso'), var: q(dlg, '.w-var'), periodo: q(dlg, '.w-periodo'), info: q(dlg, '.w-info'), carta: q(dlg, '.w-carta'), voce: q(dlg, '.w-voce'), manopola: q(dlg, '.w-manopola'),
+    grafico: q(dlg, '.w-grafico'), tasso: q(dlg, '.w-tasso'), var: q(dlg, '.w-var'), periodo: q(dlg, '.w-periodo'), info: q(dlg, '.w-info'), carta: q(dlg, '.w-pagina'), borsaEl: q(dlg, '.w-borsa'), voce: q(dlg, '.w-voce'), manopola: q(dlg, '.w-manopola'),
     tasti: [...dlg.querySelectorAll('.w-tasto')], sezione: null,
   }
   // niente tasto per chiudere: si tocca fuori dal portafoglio (o Esc)
   // l'anello giallo del fuoco serve a chi usa la tastiera: dopo un clic col mouse si spegne, al primo tasto premuto torna
   dlg.addEventListener('pointerdown', () => dlg.classList.add('mouse'))
   dlg.addEventListener('keydown', () => dlg.classList.remove('mouse'))
-  dlg.addEventListener('cancel', (e) => { e.preventDefault(); chiudi() })
+  dlg.addEventListener('cancel', (e) => { e.preventDefault(); S.sezione ? mostra(null) : chiudi() }) // Esc: prima la pagina, poi il wallet
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
   for (const t of S.tasti) t.addEventListener('click', () => mostra(S.sezione === t.dataset.s ? null : t.dataset.s))
   // la manopola è un selettore a scatti: un periodo ogni quarto di giro, sempre in senso orario (gli scatti si sommano, così
@@ -361,13 +360,17 @@ function disegnaBorsa() {
   S.info.innerHTML = d.punti?.length ? `<span>min <b>${lo.toFixed(4)}</b></span><span>max <b>${hi.toFixed(4)}</b></span><span>cap <b>${fmt(d.cap?.pzk ?? 0)}</b> · ${d.cap?.conti ?? 0} conti</span>` : ''
 }
 
-// ── la carta coi moduli ──
+// ── le pagine dei tasti (23.10): CONTO, CAMBIO, INVIA e ALTRO aprono la loro pagina DENTRO lo schermo del grafico, al
+// posto del grafico; ripremendo lo stesso tasto (o con Esc) la pagina si chiude e torna il grafico. Niente esce più sotto
+// il portafoglio: si lavora solo dagli schermini. (La funzione si chiama ancora carta(): era la carta che si sfilava.)
 function mostra(sezione) {
   S.sezione = sezione
   for (const t of S.tasti) t.setAttribute('aria-pressed', String(t.dataset.s === sezione))
-  if (!sezione) { S.carta.classList.remove('si'); return }
+  S.borsaEl.classList.toggle('in-pagina', !!sezione)
+  if (!sezione) { S.carta.hidden = true; disegnaBorsa(); return }
   carta(sezione)
-  S.carta.classList.add('si')
+  S.carta.hidden = false
+  S.carta.scrollTop = 0
 }
 function carta(sezione, soloDati = false) {
   const c = pzk.conto(), K = S.carta
@@ -377,20 +380,20 @@ function carta(sezione, soloDati = false) {
   const esito = el('p', 'w-esito')
   const di = (ok, testo) => { esito.textContent = testo; esito.classList.toggle('male', !ok) }
   const campo = (lab, attrs, nota) => { const w = el('div'); w.innerHTML = `<label>${lab}</label>`; const i = el('input'); Object.assign(i, attrs); w.appendChild(i); if (nota) w.appendChild(el('p', 'w-nota', nota)); return [w, i] }
-  const pin = (lab = 'PIN (quattro cifre)') => campo(lab, { type: 'password', inputMode: 'numeric', autocomplete: 'off', maxLength: 4, pattern: '\\d{4}', placeholder: '····' })
+  const pin = (lab = 'PIN, 4 cifre') => campo(lab, { type: 'password', inputMode: 'numeric', autocomplete: 'off', maxLength: 4, pattern: '\\d{4}', placeholder: '····' })
   const bott = (testo, cls, fai) => { const b = el('button', `w-b ${cls}`, testo); b.type = 'button'; b.addEventListener('click', fai); return b }
   const attesa = async (b, fai) => { b.disabled = true; try { await fai() } finally { b.disabled = false } }
 
   if (sezione === 'conto' && !c) {
     K.innerHTML = `<h3>il conto <small>no sbatti: un nome e quattro cifre</small></h3>
-      <p class="w-nota">senza conto giochi coi <b>1.000 $pzk della sessione</b>: non si salvano e non cambiano mai. col conto i tuoi $pzk restano, hanno un indirizzo (pzk + sei cifre), si mandano agli amici e vivono nella borsa: puoi parcheggiarli in EUR€ e riprenderli quando il cambio ti conviene. si parte con 1.000 $pzk.</p>`
+      <p class="w-nota">senza conto giochi coi <b>1.000 $pzk della sessione</b>, che non si salvano. col conto restano tuoi, hanno un indirizzo e vivono nella borsa. si parte con 1.000 $pzk.</p>`
     const sch = el('div', 'w-sch'); const bE = el('button', '', 'entra'), bC = el('button', '', 'crea il conto'); bE.type = bC.type = 'button'; sch.append(bE, bC); K.appendChild(sch)
     const form = el('form'); form.addEventListener('submit', (e) => e.preventDefault()); K.appendChild(form)
     let modo = 'entra'
     const disegna = () => {
       bE.setAttribute('aria-selected', String(modo === 'entra')); bC.setAttribute('aria-selected', String(modo === 'crea'))
       form.innerHTML = ''
-      const [wn, iN] = campo('nome (o username)', { type: 'text', autocomplete: 'username', maxLength: 20, placeholder: 'il tuo nome' })
+      const [wn, iN] = campo('nome', { type: 'text', autocomplete: 'username', maxLength: 20, placeholder: 'il tuo nome' })
       const [wp, iP] = pin()
       const riga = el('div', 'w-riga'); riga.append(wn, wp); form.appendChild(riga)
       let iK = null

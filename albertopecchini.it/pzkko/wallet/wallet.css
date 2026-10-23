@@ -87,69 +87,73 @@
 .w-voce.si{opacity:1}
 .w-voce.male{background:#8a1a1a}
 
-/* ── la carta che si sfila dalla tasca: i moduli ── */
-.w-carta{position:relative;z-index:-1;flex:none;width:min(92vw,640px);margin:-1.6% auto 0;padding:34px 24px 20px;border-radius:12px;color:#161616;
-  background:linear-gradient(160deg,#f6f1e4,#e9e1cf 60%,#ddd3bd);box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 0 0 1px rgba(0,0,0,.08);transform:translateY(-40px);opacity:0;visibility:hidden;transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .25s,visibility 0s .32s}
-.w-carta.si{transform:none;opacity:1;visibility:visible;transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .25s}
-/* chiusa, la carta non occupa posto: così il portafoglio è davvero nel mezzo; aperta, sta sotto e il portafoglio sale */
-.w-carta:not(.si){position:absolute;left:50%;top:0;translate:-50% 0}
-.w-carta.si{margin-bottom:auto}
-.wallet:has(.w-carta.si) .w-corpo{margin-bottom:0}
-.w-carta::before{content:"";position:absolute;left:24px;right:24px;top:14px;height:3px;background:repeating-linear-gradient(90deg,#1446a0 0 10px,transparent 10px 16px);opacity:.5}
-.w-carta h3{margin:0 0 10px;font:400 26px/1 var(--fa);letter-spacing:.01em}
-.w-carta h3 small{font:400 13px/1 var(--marker);color:#a50d25;margin-left:10px;vertical-align:middle}
-.w-carta p{margin:6px 0}
-.w-carta .w-nota{font-size:12.5px;color:#4a4540}
-.w-carta label{display:block;margin:10px 0 2px;font:400 13px/1.2 var(--marker);color:#1446a0}
-.w-carta input{width:100%;padding:8px 10px;border:2px solid #161616;border-radius:6px;background:#fffdf7;font:400 17px/1.2 var(--mono);color:#161616}
-.w-carta input[inputmode="numeric"]{letter-spacing:.3em}
-.w-carta .w-riga{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-.w-carta .w-riga>*{flex:1 1 140px}
-.w-carta .w-azioni{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.w-carta .w-b{flex:none;padding:8px 16px 9px;border:0;border-radius:4px;background:#161616;color:#fff;font:400 15px/1 var(--fa);letter-spacing:.04em;cursor:pointer;transform:rotate(-.6deg);box-shadow:0 3px 0 rgba(0,0,0,.25)}
-.w-carta .w-b.giallo{background:#ffd400;color:#111}
-.w-carta .w-b.rosso{background:#a50d25}
-.w-carta .w-b.piatto{background:none;color:#161616;box-shadow:none;text-decoration:underline;padding-left:4px;padding-right:4px}
-.w-carta .w-b:disabled{opacity:.45;cursor:default}
-@media (hover:hover){.w-carta .w-b:not(:disabled):hover{transform:rotate(-.6deg) scale(1.04)}}
-.w-carta .w-sch{display:flex;gap:4px;margin:0 0 10px}
-.w-carta .w-sch button{padding:6px 12px;border:2px solid #161616;border-bottom:0;border-radius:6px 6px 0 0;background:none;font:400 14px/1 var(--fa);cursor:pointer;opacity:.55}
-.w-carta .w-sch button[aria-selected="true"]{opacity:1;background:#161616;color:#fff}
-.w-carta .w-esito{margin-top:10px;font:400 15px/1.25 var(--marker);color:#0b5d2b;min-height:1.3em}
-.w-carta .w-esito.male{color:#a50d25}
-.w-carta .w-mosse{margin:10px 0 0;padding:0;list-style:none;font-size:12.5px;max-height:150px;overflow:auto;border-top:1px dashed rgba(0,0,0,.25)}
-.w-carta .w-mosse li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed rgba(0,0,0,.15)}
-.w-carta .w-mosse b{font-weight:400;font-family:var(--mono)}
-.w-carta .w-mosse .piu{color:#0b5d2b}
-.w-carta .w-mosse .meno{color:#a50d25}
-.w-carta .pzk-ig{display:inline-block;padding-bottom:1px;border-bottom:2px solid currentColor;font:400 14px/1.2 var(--marker);color:#1446a0;text-decoration:none}
-.w-carta .pzk-ig[hidden]{display:none}
-.w-carta .pzk-ig b{color:#a50d25;font-weight:400}
+/* ── le pagine dei tasti, dentro lo schermo del grafico (wallet.js: mostra, carta) ──
+   CONTO, CAMBIO, INVIA e ALTRO aprono la loro pagina al posto del grafico, coi fosfori verdi dello schermo: niente esce più
+   sotto il portafoglio. Le misure sono in em, legate alla grandezza della pagina (che cresce col portafoglio): così si
+   legge a ogni dimensione. Sul telefono lo schermino è troppo piccolo per scrivere: la pagina diventa uno schermo grande
+   in mezzo alla finestra. */
+.w-borsa.in-pagina>:not(.w-pagina){visibility:hidden}
+.w-pagina{position:absolute;inset:0;z-index:2;overflow:hidden auto;overscroll-behavior:contain;padding:.95em 1.2em 1.1em;
+  background:radial-gradient(120% 90% at 30% 0%,rgba(70,255,125,.07),transparent 60%),#050806;color:#c9f5d2;font:400 clamp(12px,1.02cqw,20px)/1.38 var(--mono);
+  text-shadow:0 0 .32em rgba(70,255,125,.35);scrollbar-width:thin;scrollbar-color:rgba(70,255,125,.45) transparent;animation:w-pagina .24s ease-out}
+.w-pagina[hidden]{display:none}
+@keyframes w-pagina{from{opacity:0;filter:brightness(2.4)}}
+.w-pagina h3{margin:0 0 .5em;font:400 1.5em/1.05 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--led);text-shadow:0 0 .4em rgba(70,255,125,.7)}
+.w-pagina h3 small{display:block;margin:.4em 0 0;font-size:.55em;letter-spacing:.08em;color:var(--ambra);text-shadow:0 0 .4em rgba(255,176,46,.5)}
+.w-pagina p{margin:.45em 0}
+.w-pagina b{font-weight:400;color:#fff}
+.w-pagina .w-nota{font-size:.86em;color:#8fc79a}
+.w-pagina label{display:block;margin:.65em 0 .22em;font-size:.76em;letter-spacing:.12em;text-transform:uppercase;color:#7fd193}
+.w-pagina input{width:100%;padding:.4em .55em;border:1.5px solid rgba(70,255,125,.55);border-radius:.25em;background:rgba(70,255,125,.06);color:var(--led);font:400 1.12em/1.2 var(--mono);caret-color:var(--led);outline:0;box-shadow:none}
+.w-pagina input:focus{border-color:var(--led);box-shadow:0 0 .55em rgba(70,255,125,.45)}
+.w-pagina input::placeholder{color:rgba(70,255,125,.3)}
+.w-pagina input[inputmode="numeric"]{letter-spacing:.3em}
+.w-pagina .w-riga{display:flex;gap:.8em;flex-wrap:wrap;align-items:flex-end}
+.w-pagina .w-riga>*{flex:1 1 9em}
+.w-pagina .w-azioni{display:flex;gap:.6em;flex-wrap:wrap;align-items:center;margin-top:.8em}
+.w-pagina .w-b{flex:none;padding:.45em .95em .5em;border:1.5px solid var(--led);border-radius:.25em;background:transparent;color:var(--led);font:400 .92em/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transform:none;box-shadow:none}
+.w-pagina .w-b.giallo{background:var(--led);color:#03140a;text-shadow:none;box-shadow:0 0 .7em rgba(70,255,125,.5)}
+.w-pagina .w-b.rosso{border-color:#ff5b4a;color:#ff5b4a}
+.w-pagina .w-b.piatto{border-color:transparent;text-decoration:underline}
+.w-pagina .w-b:disabled{opacity:.4;cursor:default}
+@media (hover:hover){.w-pagina .w-b:not(:disabled):hover{background:rgba(70,255,125,.18)}.w-pagina .w-b.giallo:not(:disabled):hover{background:#7dffa3}}
+.w-pagina .w-sch{display:flex;gap:.4em;margin:.15em 0 .55em}
+.w-pagina .w-sch button{padding:.38em .8em;border:1.5px solid rgba(70,255,125,.5);border-radius:.25em;background:none;color:#7fd193;font:400 .88em/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.w-pagina .w-sch button[aria-selected="true"]{background:var(--led);color:#03140a;text-shadow:none}
+.w-pagina .w-esito{min-height:1.3em;margin-top:.6em;font-size:.95em;color:var(--led)}
+.w-pagina .w-esito.male{color:#ff6b5b;text-shadow:0 0 .4em rgba(255,91,74,.5)}
+.w-pagina .w-mosse{margin:.6em 0 0;padding:0;list-style:none;font-size:.82em;border-top:1px dashed rgba(70,255,125,.3)}
+.w-pagina .w-mosse li{display:flex;justify-content:space-between;gap:.8em;padding:.3em 0;border-bottom:1px dashed rgba(70,255,125,.15)}
+.w-pagina .w-mosse .piu{color:var(--led)}
+.w-pagina .w-mosse .meno{color:#ff6b5b}
+.w-pagina .pzk-ig{display:inline-block;color:var(--ambra);border-bottom:1.5px solid currentColor;text-decoration:none;font-size:.95em}
+.w-pagina .pzk-ig[hidden]{display:none}
+.w-pagina .pzk-ig b{color:#fff}
 
-/* il cursore della conversione: un fader orizzontale come quelli della regia */
-.w-fader{position:relative;height:54px;margin:14px 0 4px;border-radius:8px;background:linear-gradient(#2a2a2a,#161616);box-shadow:inset 0 2px 6px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.15)}
-.w-fader::before{content:"";position:absolute;left:18px;right:18px;top:50%;height:4px;margin-top:-2px;background:#000;border-radius:2px;box-shadow:0 1px 0 rgba(255,255,255,.1)}
-.w-fader .w-tacche{position:absolute;left:18px;right:18px;top:6px;height:8px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 1px,transparent 1px 10%);pointer-events:none}
-.w-fader input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0 8px;appearance:none;-webkit-appearance:none;background:none;cursor:ew-resize;touch-action:none}
+/* il cursore della conversione: una barra di fosfori con la levetta accesa */
+.w-fader{position:relative;height:2.5em;margin:.7em 0 .3em;border:1.5px solid rgba(70,255,125,.5);border-radius:.3em;background:rgba(70,255,125,.05)}
+.w-fader .w-tacche{position:absolute;left:.6em;right:.6em;top:.25em;height:.45em;background:repeating-linear-gradient(90deg,rgba(70,255,125,.45) 0 1px,transparent 1px 10%);pointer-events:none}
+.w-pagina .w-fader input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0 .35em;border:0;background:none;appearance:none;-webkit-appearance:none;cursor:ew-resize;touch-action:none;box-shadow:none}
 .w-fader input::-webkit-slider-runnable-track{height:100%;background:none}
-.w-fader input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:30px;height:46px;margin-top:4px;border-radius:4px;background:linear-gradient(90deg,#3a3a3a,#6b6b6b 48%,#f2f2f2 49% 51%,#6b6b6b 52%,#2e2e2e);box-shadow:0 3px 6px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.15)}
+.w-fader input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:1.15em;height:2em;margin-top:.12em;border-radius:.2em;background:var(--led);box-shadow:0 0 .7em var(--led)}
 .w-fader input::-moz-range-track{height:100%;background:none}
-.w-fader input::-moz-range-thumb{width:30px;height:46px;border:0;border-radius:4px;background:linear-gradient(90deg,#3a3a3a,#6b6b6b 48%,#f2f2f2 49% 51%,#6b6b6b 52%,#2e2e2e);box-shadow:0 3px 6px rgba(0,0,0,.6)}
-.w-fader .w-led-f{position:absolute;right:10px;bottom:4px;font:400 11px/1 var(--mono);color:var(--led);text-shadow:0 0 6px var(--led);pointer-events:none}
-.w-conv{display:flex;justify-content:space-between;gap:10px;font:400 15px/1.3 var(--mono)}
-.w-conv b{font-weight:400;font-size:20px}
-.w-verso{display:flex;gap:6px;align-items:center;margin-top:8px}
-.w-verso button{padding:6px 10px;border:2px solid #161616;border-radius:20px;background:none;font:400 13px/1 var(--fa);cursor:pointer;opacity:.5}
-.w-verso button[aria-pressed="true"]{opacity:1;background:#161616;color:#fff}
+.w-fader input::-moz-range-thumb{width:1.15em;height:2em;border:0;border-radius:.2em;background:var(--led);box-shadow:0 0 .7em var(--led)}
+.w-fader .w-led-f{position:absolute;right:.5em;bottom:.25em;font-size:.75em;color:var(--led);pointer-events:none}
+.w-conv{display:flex;justify-content:space-between;gap:.8em;font-size:.9em}
+.w-conv b{font-size:1.3em}
+.w-conv small{color:#8fc79a}
+.w-verso{display:flex;gap:.4em;align-items:center;margin-top:.5em}
+.w-verso button{padding:.35em .75em;border:1.5px solid rgba(70,255,125,.5);border-radius:1em;background:none;color:#7fd193;font:400 .85em/1 var(--mono);cursor:pointer}
+.w-verso button[aria-pressed="true"]{background:var(--led);color:#03140a;text-shadow:none}
 
-/* ── il telefono: il portafoglio a tutta larghezza, la carta sotto con le scritte normali ── */
+/* ── il telefono: il portafoglio a tutta larghezza; la pagina dei tasti diventa uno schermo grande nel mezzo, con le scritte normali ── */
 @media (max-width:899px){
   .wallet{padding:max(10px,env(safe-area-inset-top)) 0 20px}
   .w-corpo{width:96vw}
-  .w-carta{width:92vw;padding:30px 16px 16px}
+  .w-pagina{position:fixed;inset:auto 3vw;top:50%;translate:0 -50%;height:min(78dvh,560px);z-index:5;font-size:15px;border-radius:10px;box-shadow:0 0 0 3px #1a1a1a,0 0 0 5px rgba(255,255,255,.08),0 24px 60px rgba(0,0,0,.7)}
   .w-voce{font-size:1.8cqw}
 }
-@media (prefers-reduced-motion:reduce){.wallet[open],.wallet.chiude,.w-carta,.w-pomo .gira{animation:none;transition:none}}
+@media (prefers-reduced-motion:reduce){.wallet[open],.wallet.chiude,.w-pagina,.w-pomo .gira{animation:none;transition:none}}
 
 /* le mosche che escono dalle taschine (wallet.js, mosche()): due pose in volo che si alternano per il battito delle ali */
 .w-mosca{position:fixed;left:0;top:0;z-index:20;pointer-events:none;will-change:transform;filter:drop-shadow(0 .5vw .35vw rgba(0,0,0,.45))}
@@ -157,3 +161,19 @@
 .w-mosca img:first-child{animation:w-ali .05s steps(1) infinite}
 .w-mosca img:last-child{animation:w-ali .05s steps(1) infinite reverse}
 @keyframes w-ali{0%{opacity:1}50%{opacity:0}}
+
+/* le pagine compatte, perché il modulo entri tutto nello schermo senza scorrere: nome, PIN e tasto sulla stessa riga
+   (il tasto allineato in basso ai campi), gli spazi verticali più stretti */
+.w-pagina{padding:.8em 1.2em .8em}
+.w-pagina h3{margin-bottom:.3em}
+.w-pagina h3 small{margin-top:.25em}
+.w-pagina p{margin:.3em 0}
+.w-pagina .w-sch{margin:.3em 0 .35em}
+.w-pagina label{margin-top:.45em}
+.w-pagina form{display:grid;grid-template-columns:1fr .8fr auto;gap:0 .7em;align-items:end}
+.w-pagina form .w-riga,.w-pagina form .w-azioni{display:contents}
+.w-pagina form .w-azioni .w-nota,.w-pagina form .w-esito,.w-pagina form>div:not(.w-riga):not(.w-azioni){grid-column:1 / -1}
+.w-pagina form .w-esito{margin-top:.35em}
+.w-pagina form .w-b{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:calc(2.435em + 3px);margin-bottom:0;padding-top:0;padding-bottom:0} /* alto come i campi (2,24 em della pagina + 3 px di bordo): combacia sopra e sotto */
+.w-pagina .w-esito:empty{min-height:0;margin:0}
+.w-pagina input:not([type=range]){box-sizing:border-box;height:calc(2em + 3px)} /* 0,4 em sopra e sotto + 1,2 em di riga + 3 px di bordo: la stessa altezza del tasto */
