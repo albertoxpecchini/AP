@@ -52,7 +52,36 @@
 .t-batt i.on{background:var(--led);box-shadow:0 0 4px var(--led)}
 .t-batt b{position:absolute;right:calc(100% + 6px);font-weight:400}
 .t-batt.bassa i.on{background:var(--rosso);box-shadow:0 0 4px var(--rosso)}
-.t-batt.carica::before{content:"";position:absolute;left:-12px;top:0;width:7px;height:10px;background:var(--led);clip-path:polygon(60% 0,0 55%,45% 55%,30% 100%,100% 40%,55% 40%)}
+/* in carica la saetta sta fra il «%» e la pila, a 4 px da tutti e due misurati sull'inchiostro (il «%» ha 4 px di aria a
+   destra, le punte della saetta sono sfumate): il numero si sposta 6,5 px a sinistra (23.10, prima la saetta gli finiva
+   sopra); senza carica il numero resta dov'era */
+.t-batt.carica b{right:calc(100% + 12.5px)}
+.t-batt.carica::before{content:"";position:absolute;left:-11px;top:50%;translate:0 -50%;width:7px;height:10px;background:var(--led);clip-path:polygon(60% 0,0 55%,45% 55%,30% 100%,100% 40%,55% 40%)}
+
+/* il cavo usb-c, in carica (dalle 19 alle 7, come il wallet: .tel.carica). La porta è in mezzo al bordo di sotto del
+   cercapersone (nella foto 1341 × 774 l'ultima riga opaca è la 767, il centro del corpo a metà): la spina entra dal basso,
+   perpendicolare. La spina (art/chat-pager-cavo/spina.webp, 132 × 556, gpt-image-2, vista di fianco, tozza perché sotto il
+   cercapersone restano pochi pixel): punta d'argento righe 4–65 (è dentro la porta: tagliata), corpo grigio 66–195 largo
+   124 px, gommino 196–242, cavo largo 39,5 px col centro a 65,25 da 244. La grandezza è quella vera, lo stesso cavo del
+   wallet (Alberto, 23.10: «uguale a wallet per dimensione, il cercapersone è piccolo, max 7 cm»): il cavo del wallet è
+   largo 17,2 px su un portafoglio aperto di ~22 cm largo 1340 px (1440 × 900), cioè 2,8 mm; il corpo del cercapersone
+   (7 cm) è il 95,97 % della foto, quindi 2,8 mm sono il 3,87 % della foto (la spina viene 8,9 mm, il 12 %). Il corpo
+   della spina parte dalla riga 766 della foto (un pixel dentro il bordo, niente fessura). Da dietro il gommino (riga 238) il filo del wallet
+   (filo.webp: 60 px, il cavo è largo 26 e ha il centro a 29) scalato perché il cavo sia largo uguale e sullo stesso asse,
+   fino in fondo allo schermo. --k è un pixel della spina. Sopra la foto, non sotto: l'ombra del cercapersone cade sul
+   muro, non sul cavo.
+   All'apertura, se è in carica, il cavo S'INSERISCE (Alberto, 23.10 sera: l'unica animazione permessa; telefono.js,
+   inserisciCavo): spina e filo stanno in una scatola che comincia al bordo di sotto del cercapersone (riga 766) e taglia
+   tutto quello che sta sopra, così la punta d'argento (righe 4–65 della spina) si vede finché è fuori e sparisce entrando
+   nella porta; il gruppo spina + filo si muove e s'inclina attorno alla cima della punta. Fermo, è identico a prima. */
+.t-cavo-scatola{--k:calc(3.87cqw / 39.5);position:absolute;left:0;right:0;top:calc(766 / 1341 * 100cqw);height:120vh;overflow:hidden;pointer-events:none;opacity:0} /* niente dissolvenza: c'è o non c'è */
+.t-cavo-gruppo{position:absolute;inset:0;transform-origin:50% calc(-62 * var(--k))}
+.t-cavo,.t-cavo-filo{position:absolute;pointer-events:none;user-select:none}
+.t-cavo{left:50%;top:calc(-66 * var(--k));width:calc(132 * var(--k));height:auto;max-width:none;translate:-50% 0;clip-path:inset(calc(4 / 556 * 100%) 0 calc(312 / 556 * 100%) 0)}
+.t-cavo-filo{left:calc(50% - (66 - 65.25) * var(--k) - 29 / 26 * 39.5 * var(--k));top:calc((238 - 66) * var(--k));width:calc(60 / 26 * 39.5 * var(--k));height:120vh;
+  background:url(/art/wallet-cavo/filo.webp) center top/100% auto repeat-y;filter:drop-shadow(.2cqw .3cqw .4cqw rgba(0,0,0,.5))}
+.tel.carica .t-cavo-scatola{opacity:1}
+.tel.pieno .t-cavo-scatola{display:none} /* sul cellulare a tutto schermo il cercapersone non c'è */
 
 /* la home: a sinistra l'ora e i widget, a destra le app */
 .t-vista{position:absolute;inset:0;overflow:hidden;background:#07100a}
@@ -576,3 +605,13 @@
 
 /* il led che lavora (chat/led.js): sfarfalla forte sopra il lampeggio lento delle notifiche */
 .t-led.lavora{background:radial-gradient(circle at 40% 35%,#ffd0c8,#ff3b2e 45%,rgba(255,59,46,0) 72%);box-shadow:0 0 16px 5px rgba(255,59,46,.6);animation:none;opacity:1}
+
+/* il cercapersone scassato (23.10): quando muori ti resta quello col vetro rotto, che fa solo lavorare e ricomprare il
+   nuovo (chat/chat.js, zaino.pagerRotto). Le crepe (art/chat-pager-crepe/crepe.webp, gpt-image-2) stanno sopra le righe
+   del tubo (z 55) e sotto il bianco dello spegnimento (60), nello schermo grande e nel doppione dello zoom (c'è solo da
+   scassato); l'ombra scura le fa leggere sia sull'lcd chiaro della porta sia sullo schermo nero. Le app spente: tutte
+   tranne la chat (vai() le ferma con un avviso). */
+.t-crepe{position:absolute;inset:0;z-index:55;width:100%;height:100%;max-width:none;object-fit:cover;object-position:70% 30%;pointer-events:none;user-select:none;display:none;filter:drop-shadow(0 0 1px rgba(0,0,0,.85))}
+.tel.scassato .t-crepe,.t-doppio .t-crepe{display:block}
+.t-doppio .t-crepe{opacity:var(--crepe-grande,1)}.t-doppio .t-crepe.piccola{opacity:calc(1 - var(--crepe-grande,1));filter:drop-shadow(0 0 .5px rgba(0,0,0,.9))} /* telefono.js, crepeNelDoppione */
+.tel.scassato .t-ico:not([data-app="chat"]){opacity:.35;filter:grayscale(1)}

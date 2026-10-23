@@ -142,6 +142,12 @@ export const effetto = (id) => (Z.effetti[id] ?? 0) > Date.now()
 export const effetti = () => Object.entries(Z.effetti).filter(([, t]) => t > Date.now())
 export function attiva(id, ms) { Z.effetti[id] = Math.max(Z.effetti[id] ?? 0, Date.now()) + ms; scrivi() }
 
+// ── il cercapersone scassato (23.10): quando muori (senza cornetto) il cercapersone si rompe; quello rotto fa solo
+// lavorare e ricomprare il nuovo («compra cercapersone»). Il segno sta nello zaino, quindi col conto vale ovunque ──
+export const pagerRotto = () => !!Z.pagerRotto
+export function rompiPager() { Z.pagerRotto = true; scrivi() }
+export function aggiustaPager() { delete Z.pagerRotto; scrivi() }
+
 // ── il mestiere ──
 export function assumi(id) { Z.mestiere = id; Z.turni = 0; scrivi() }
 export function licenzia() { Z.mestiere = null; Z.turni = 0; scrivi() }

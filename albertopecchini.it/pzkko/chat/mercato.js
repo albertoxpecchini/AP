@@ -42,6 +42,16 @@ export function incassa(n, { sfide = false } = {}) {
 }
 
 /** Compra n pezzi: toglie i $pzk e mette nello zaino. → { ok, x, n, tot, sconto } oppure { ok: false, errore } */
+/** Il cercapersone nuovo al posto di quello scassato (dopo una morte): costa quanto il «cercapersone» del negozio (con
+ *  l'offerta del giorno, se c'è), ma non finisce nello zaino: torna il dispositivo. → { ok, tot } o { ok: false, errore, manca } */
+export function ricompraPager() {
+  const tot = prezzoDi(PER_ID.pager)
+  if (!pzk.punta('chat', tot)) return { ok: false, errore: `costa ${tot} $pzk e ne hai ${pzk.saldo()}`, manca: tot - pzk.saldo(), tot }
+  pzk.regola('chat', tot, 0)
+  zaino.conta('comprati', tot)
+  zaino.aggiustaPager()
+  return { ok: true, tot, sconto: scontoDi('pager') }
+}
 export function compra(id, n = 1) {
   const x = PER_ID[id]
   if (!x?.prezzo) return { ok: false, errore: 'non lo vendo' }

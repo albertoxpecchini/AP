@@ -38,8 +38,8 @@ export const LAVORO = [
       if (!m) return ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: 'disoccupato', d: 'prima un mestiere: <code>lavora lista</code>, poi <code>lavora come rider</code>.' }) && false
       const manca = zaino.manca('turno')
       if (manca > 0) { const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':clessidra: turno finito', d: `il prossimo turno da ${m.nome} fra <b>${ctx.durata(manca)}</b>.` }); ctx.tempo(s, Math.min(manca, 60000)); return false }
-      ctx.dì({ av: 'bot-occhiolino', t: `:${m.id}: turno da ${m.nome}`, d: `${m.frase}. Pronto?` })
-      await ctx.dormi(900)
+      const pronto = ctx.dì({ av: 'bot-occhiolino', t: `:${m.id}: turno da ${m.nome}`, d: `${m.frase}. Pronto?` })
+      await ctx.inVista(pronto, 900)
       const gioco = Math.random() < 0.6 ? m.gioco : ctx.caso(GIOCHI_TUTTI)
       const r = await MINIGIOCHI[gioco](ctx)
       zaino.aspetta('turno', ATTESA_TURNO * 1000)

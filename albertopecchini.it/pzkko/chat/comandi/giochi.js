@@ -51,6 +51,7 @@ export const GIOCHI = [
       const esce = [gira(), gira(), gira()]
       const s = ctx.dì({ colore: 'ambra', t: ':sette: slot', html: `<div class="c-rulli gira"><div>${ctx.icona('sette')}</div><div>${ctx.icona('sette')}</div><div>${ctx.icona('sette')}</div></div>`, pie: `puntati ${ctx.fmt(n)}` })
       const rulli = s.querySelectorAll('.c-rulli div')
+      await ctx.inVista(s) // i rulli si fermano quando si vedono girare, non mentre la scheda si scrive
       for (let i = 0; i < 3; i++) { await ctx.dormi(700); rulli[i].innerHTML = ctx.icona(esce[i]); rulli[i].style.animation = 'none'; rulli[i].querySelector('.emo').style.animation = 'none' }
       s.querySelector('.c-rulli').classList.remove('gira')
       const [a, b, c] = esce
@@ -69,7 +70,7 @@ export const GIOCHI = [
       const n = puntata(ctx, 'dadi', ctx.args[0], 1, 1000)
       if (n === null) return false
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':dadi: dadi', d: 'tiro io, poi tu…' })
-      await ctx.dormi(900)
+      await ctx.inVista(s, 900)
       const io = [d6(), d6()], tu = [d6(), d6()]
       const si = io[0] + io[1], st = tu[0] + tu[1]
       await ctx.dormi(600)
@@ -89,7 +90,7 @@ export const GIOCHI = [
       const n = puntata(ctx, 'moneta', a, 1, 1000)
       if (n === null) return false
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':testa: la moneta gira…' })
-      await ctx.dormi(1100)
+      await ctx.inVista(s, 1100)
       const esce = crypto.getRandomValues(new Uint8Array(1))[0] % 2 ? 'testa' : 'croce'
       const netto = fine(ctx, 'moneta', n, esce === scelta ? n * 2 : 0)
       ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : 'rosso', av: netto > 0 ? 'bot-ride' : 'bot-occhiolino', t: `:${esce}: ${esce}`, d: `avevi detto ${scelta}.`, pie: esitoHtml(ctx, netto) })
@@ -108,7 +109,7 @@ export const GIOCHI = [
       const n = puntata(ctx, 'roulette', imp, 1, 1000)
       if (n === null) return false
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':roulette: rien ne va plus', d: `${ctx.fmt(n)} su <b>${p.nome}</b> (paga ${p.paga} a 1). La pallina gira…` })
-      await ctx.dormi(1600)
+      await ctx.inVista(s, 1600)
       const numero = crypto.getRandomValues(new Uint8Array(1))[0] % 37
       const e = esitoRoulette(new Map([[id, n]]), numero)
       const netto = fine(ctx, 'roulette', e.puntato, e.torna)
@@ -210,7 +211,7 @@ export const GIOCHI = [
       const n = puntata(ctx, 'dado', imp, 1, 1000)
       if (n === null) return false
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':dadi: sic bo', d: `${ctx.fmt(n)} su <b>${p.nome}</b> (paga ${Array.isArray(p.paga) ? p.paga.join('/') : p.paga} a 1). I dadi rotolano…` })
-      await ctx.dormi(1300)
+      await ctx.inVista(s, 1300)
       const dadi = [d6(), d6(), d6()]
       const e = esitoDado(new Map([[id, n]]), dadi, R)
       const netto = fine(ctx, 'dado', e.puntato, e.torna)

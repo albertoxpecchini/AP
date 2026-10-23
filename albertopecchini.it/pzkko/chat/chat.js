@@ -7,14 +7,15 @@
 //
 // prepara(tasto): accende il cercapersone («1 msg» quando c'è un premio pronto). apri(comando): apre la chat e, se c'è,
 // scrive il comando. Un comando riceve un «ctx» con tutto quello che serve per parlare e aspettare risposte: dì(scheda),
-// aggiorna(el, scheda), scegli(el, bottoni, ms), scrivi(ms), tempo(el, ms), dormi(ms), pensa(ms), paga(n), spendi(n)…
+// aggiorna(el, scheda), scegli(el, bottoni, ms), scrivi(ms), tempo(el, ms), dormi(ms), inVista(el, ms), pensa(ms), paga(n), spendi(n)…
 
 import * as pzk from '../games/pzk.js'
 import * as zaino from './zaino.js'
 import { conIcone, icona } from './icone.js'
 import { COMANDI, PER_NOME, CATEGORIE } from './comandi/index.js'
 import { eventoCasuale, salutoIniziale } from './comandi/eventi.js'
-import { NEGOZIO as NEGOZIO_OGGETTI } from './testi.js'
+import { NEGOZIO as NEGOZIO_OGGETTI, PER_ID } from './testi.js'
+import { prezzoDi } from './mercato.js'
 import * as led from './led.js'
 
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
@@ -23,6 +24,9 @@ export const fmt = pzk.fmt
 export const pzkHtml = (n) => `<span class="pzk">${pzk.fmt(n)} $pzk</span>`
 export const eurHtml = (n) => `<span class="eur">EUR€ ${pzk.fmtEur(n)}</span>`
 
+// il vetro rotto del cercapersone scassato, nel tasto piccolo: la versione ridotta col massimo (tools/pzkko/crepe-piccole.mjs),
+// perché ridotta con la media ai 74 px dell'lcd sparirebbe. Lo schermo grande (telefono.js) usa crepe.webp
+const CREPE = '/art/chat-pager-crepe/crepe-piccola.webp'
 let tasto = null, dlg = null, lista = null, input = null, sugg = null, saldoEl = null, giuEl = null, rapidiEl = null
 let nuovi = 0, ultimoGiorno = '', incollata = true, rapidiFrecce = () => {}
 let aspettaTesto = null // { risolvi, nascosto } quando un minigioco aspetta che si scriva qualcosa
@@ -35,8 +39,13 @@ let salutato = false
 export function prepara(b) {
   tasto = b
   led.collega(b.querySelector('.ct-led')) // il led sfarfalla quando il sistema lavora (led.js)
+  // le crepe del cercapersone scassato: l'immagine si carica da subito (nascosta), così quando muori non arriva dopo; nell'lcd
+  // entra dopo la chiocciolina (avvia() riscrive l'lcd) e prima del vetro del tubo catodico, che crt.js mette in fondo
+  const crepe = new Image()
+  Object.assign(crepe, { className: 'ct-crepe', src: CREPE, alt: '', draggable: false })
   aggiornaTasto()
   import('./tomodachi.js').then((m) => m.avvia(b)).catch((e) => console.warn('tomodachi non partito', e)) // la chiocciolina sullo schermo lcd
+    .then(() => b.querySelector('.ct-lcd')?.append(crepe))
   zaino.ascolta(aggiornaTasto)
   pzk.osserva(() => { aggiornaTasto(); aggiornaSaldo() })
   setInterval(aggiornaTasto, 30_000)
@@ -44,7 +53,8 @@ export function prepara(b) {
 /** Il cercapersone dice «1 msg» quando c'è un premio da riscuotere (il giornaliero, o qualcosa in sospeso). */
 function aggiornaTasto() {
   if (!tasto) return
-  tasto.classList.toggle('msg', zaino.manca('giornaliero') === 0)
+  tasto.classList.toggle('msg', zaino.manca('giornaliero') === 0 && !zaino.pagerRotto())
+  tasto.classList.toggle('scassato', zaino.pagerRotto()) // le crepe sul vetro (.ct-crepe): ci sono da morto, fino al nuovo
 }
 
 // ── il pannello: dal 23.10 la chat è un'app del telefono (telefono/telefono.js), si monta dentro il suo schermo ──
@@ -337,6 +347,13 @@ export function scrivi(ms = 0, { segnaposto = 'scrivi qui…' } = {}) {
   })
 }
 export const dormi = (ms) => new Promise((r) => setTimeout(r, RIDOTTO.matches ? Math.min(ms, 150) : ms))
+/** Lascia la scheda sotto gli occhi per ms, contati da quando è scritta tutta (prima ci sono la coda, i puntini e la
+ *  scrittura: un dormi() subito dopo dì() se li mangia, e le svolte del rider sparivano prima di vederle). inVista(s) e basta
+ *  aspetta solo che sia scritta: da lì partono i tempi per rispondere. */
+export async function inVista(s, ms = 0) {
+  await s.__pronta
+  if (ms) await dormi(ms)
+}
 /** Il bot «scrive…» per un po'. */
 export async function pensa(ms = 700) {
   led.colpo(ms)
@@ -405,7 +422,7 @@ export function durata(ms) {
 
 function ctxDi(args, testo) {
   return {
-    args, testo, zaino, pzk, dì: scheda, scheda, aggiorna, scegli, scrivi, tempo, dormi, pensa, sistema, utente,
+    args, testo, zaino, pzk, dì: scheda, scheda, aggiorna, scegli, scrivi, tempo, dormi, inVista, pensa, sistema, utente,
     paga, spendi, punta, regola, nome, importo, caso, rnd, tra, durata, fmt, pzkHtml, eurHtml, icona, conIcone,
     esegui, apriWallet: (sez) => pzk.apriWallet(sez), apriApp: (app, opz) => import('../telefono/telefono.js').then((t) => t.apri(app, opz)), comandi: COMANDI, perNome: PER_NOME, categorie: CATEGORIE,
     muori: (motivo) => muori(ctxDi(args, testo), motivo), saleDiLivello: (l) => l && scheda({ colore: 'oro', av: 'bot-ride', t: ':livello: livello ' + l + '!', d: `sei salito di livello: adesso le paghe valgono ×${zaino.moltiplicatore().toLocaleString('it-IT')}.` }),
@@ -422,7 +439,18 @@ export async function muori(ctx, motivo) {
   }
   const persi = mezzi(Math.min(MORTE.max, pzk.saldo() * MORTE.quota * Math.max(0, 1 + zaino.bonus('morte')))) // il bonsai e il lucchettone ne fanno perdere meno
   if (persi > 0) spendi(persi)
-  scheda({ colore: 'rosso', av: 'bot-morto', t: ':teschio: sei morto', d: `${motivo}\nHai perso ${pzkHtml(persi)} (il ${MORTE.quota * 100} % dei $pzk liberi${persi >= MORTE.max ? ', il massimo' : ''}). Gli EUR€ nel wallet non si toccano.`, pie: 'un :cornetto: dal negozio ti avrebbe salvato' })
+  zaino.rompiPager() // e il cercapersone si rompe: quello scassato fa solo lavorare e ricomprare il nuovo (23.10)
+  if (!lista) return // la chat non è montata (il tasto «muori» della pagina di prova): basta lo stato
+  scheda({ colore: 'rosso', av: 'bot-morto', t: ':teschio: sei morto', d: `${motivo}\nHai perso ${pzkHtml(persi)} (il ${MORTE.quota * 100} % dei $pzk liberi${persi >= MORTE.max ? ', il massimo' : ''}). Gli EUR€ nel wallet non si toccano.\nE il :pager: cercapersone si è <b>scassato</b>: adesso fa solo <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, pie: 'un :cornetto: dal negozio ti avrebbe salvato', azioni: AZIONI_SCASSATO })
+}
+// ── il cercapersone scassato: due cose sole, lavorare e ricomprare il nuovo ──
+const RICOMPRA = /^(cercapersone|pager)$/i
+const prezzoPager = () => prezzoDi(PER_ID.pager)
+const AZIONI_SCASSATO = [['lavora', ':rider: lavora', 'oro'], ['compra cercapersone', ':pager: compra il nuovo']]
+/** Da scassato passano solo «lavora» (con lista, come, licenziati) e «compra cercapersone». */
+const passaDaRotto = (c, testo) => c?.nomi[0] === 'lavora' || (c?.nomi[0] === 'compra' && RICOMPRA.test(testo.trim()))
+function soloScassato() {
+  scheda({ colore: 'rosso', av: 'bot-triste', t: ':pager: cercapersone scassato', d: `col vetro rotto funzionano solo due cose: <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, azioni: AZIONI_SCASSATO })
 }
 
 function invia() {
@@ -441,6 +469,7 @@ export async function esegui(riga, { muto = false } = {}) {
   if (!muto) utente(riga.replace(/^\/+/, ''), { rifai: true })
   const c = PER_NOME.get(nome)
   led.colpo(160)
+  if (zaino.pagerRotto() && !passaDaRotto(c, testo)) return soloScassato()
   if (!c) {
     // non è un comando, ma magari è una cosa del negozio o dello zaino: si propone cosa farne
     const x = NEGOZIO_OGGETTI.find((o) => o.id === nome || o.nome.toLowerCase() === nome)
@@ -477,10 +506,11 @@ const RAPIDI_INIZIALI = ['giornaliero', 'lavora', 'pesca', 'saldo', 'aiuto']
 /** Un tasto per ognuna delle ultime scelte (la più recente a sinistra); se non ce ne sono ancora, i comandi per cominciare. */
 function disegnaRapidi() {
   if (!rapidiEl) return
-  const fatti = zaino.rapidi()
-  const righe = fatti.length ? fatti : RAPIDI_INIZIALI
+  const rotto = zaino.pagerRotto() // da scassato i tasti sono solo i due che funzionano
+  const fatti = rotto ? [] : zaino.rapidi()
+  const righe = rotto ? AZIONI_SCASSATO.map(([r]) => r) : fatti.length ? fatti : RAPIDI_INIZIALI
   rapidiEl.classList.toggle('iniziali', !fatti.length)
-  rapidiEl.innerHTML = (fatti.length ? '' : '<span class="c-r-eti">per cominciare</span>') + righe.map((r) => {
+  rapidiEl.innerHTML = (fatti.length ? '' : `<span class="c-r-eti">${rotto ? 'scassato' : 'per cominciare'}</span>`) + righe.map((r) => {
     const c = PER_NOME.get(analizza(r).nome)
     const attesa = c?.attesa ? zaino.manca(c.nomi[0]) : 0
     return `<span class="c-r${attesa ? ' attesa' : ''}"><button type="button" class="c-r-b" data-cmd="${esc(r)}" title="${attesa ? `fra ${durata(attesa)}` : 'rifallo'}">${c?.icona ? icona(c.icona) : ''}<span>${esc(r)}</span></button>${fatti.length ? `<button type="button" class="c-r-x" data-via="${esc(r)}" aria-label="togli ${esc(r)}">×</button>` : ''}</span>`

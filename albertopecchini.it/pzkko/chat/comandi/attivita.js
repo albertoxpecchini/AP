@@ -90,7 +90,7 @@ export const ATTIVITA = [
     async fai(ctx) {
       if (!serve(ctx, 'pala', 'A mani nude non si scava.')) return false
       const s = ctx.dì({ av: 'bot-pensa', t: ':pala: scavi…', d: ctx.caso(['dietro la saracinesca.', 'nell’aiuola di piazza Virgiliana.', 'sulla riva del Mincio.', 'nel cortile di unimore, di nascosto.', 'sotto il platano del parco.']) })
-      await ctx.dormi(1500)
+      await ctx.inVista(s, 1500)
       const x = estrai(REPERTI)
       zaino.aggiungi(x.id)
       zaino.conta('scavati')
@@ -105,7 +105,7 @@ export const ATTIVITA = [
       if (!serve(ctx, 'canna', 'Senza canna si guarda l’acqua e basta.')) return false
       const esca = zaino.togli('esca')
       const s = ctx.dì({ av: 'bot-pensa', t: ':canna: lanci la lenza…', d: `${ctx.caso(['nel lago di Mezzo.', 'sotto il ponte di San Giorgio.', 'nel Mincio, dove è più scuro.', 'nel Rio, fra le case.', 'dal pontile di Lunetta.'])}${esca ? ' Con :esca: l’esca: due prese.' : ''}` })
-      await ctx.dormi(1800)
+      await ctx.inVista(s, 1800)
       const prese = esca ? [estrai(PESCI), estrai(PESCI)] : [estrai(PESCI)]
       const righe = []
       for (const x of prese) {
@@ -137,7 +137,7 @@ export const ATTIVITA = [
       const arma = fucile ? 'fucile' : 'fionda'
       const lista = fucile ? ANIMALI : ANIMALI.filter((a) => !a.raro && !a.pericoloso)
       const s = ctx.dì({ av: 'bot-pensa', t: `:${arma}: ti apposti…`, d: ctx.caso(['nel canneto del lago Superiore.', 'dietro i platani del Te.', 'sull’argine, controvento.', 'nel parco del Mincio, all’alba.', 'in piazza, fra i piccioni.']) })
-      await ctx.dormi(1800)
+      await ctx.inVista(s, 1800)
       const x = estrai(lista)
       if (x.pericoloso) {
         const DIR = ['sinistra', 'centro', 'destra']

@@ -15,6 +15,9 @@
 @font-face{font-family:"Fake Receipt";src:url(/fonts/fake-receipt.woff2) format("woff2");font-weight:400;font-display:swap}
 html,body{margin:0;min-height:100%;background:#8e8e8a url(/art/muro.webp) center/900px repeat;color:#111;font:16px/1.4 "Special Elite",monospace}
 body::after{content:"";position:fixed;inset:0;background:rgba(20,16,12,.35);pointer-events:none}
+.prova-morte{position:fixed;right:16px;bottom:16px;z-index:1;display:flex;gap:8px}
+.prova-morte button{padding:8px 14px;border:0;background:#ffd400;color:#111;font:400 14px/1.2 "Permanent Marker",cursive;cursor:pointer;transform:rotate(1deg);box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.prova-morte [data-prova="muori"]{background:#c74337;color:#fff;transform:rotate(-1.5deg)}
 .nota{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:1;padding:8px 14px;background:#ffd400;color:#111;font:400 14px/1.2 "Permanent Marker",cursive;transform:translateX(-50%) rotate(-1deg);box-shadow:0 3px 6px rgba(0,0,0,.4)}
 
 /* ── il tasto del wallet, com'è in index.html ── */
@@ -42,6 +45,10 @@ body::after{content:"";position:fixed;inset:0;background:rgba(20,16,12,.35);poin
 .chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
 .chat-tasto .ct-lcd{position:absolute;left:8.352%;top:24.677%;width:66.294%;height:56.202%;display:block;border-radius:1px;background:#a9bc96;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden}
 .chat-tasto .ct-lcd canvas{display:block;width:100%;height:100%;image-rendering:pixelated} /* il tomodachi (chat/tomodachi.js) */
+/* il cercapersone scassato (23.10, dopo una morte): le crepe sul vetro dell'lcd (art/chat-pager-crepe/, chat.js le mette
+   nel tasto da subito, nascoste), sopra la chiocciolina e le righe del tubo; l'ombra scura le fa leggere sull'lcd chiaro */
+.chat-tasto .ct-crepe{position:absolute;inset:0;z-index:55;width:100%;height:100%;object-fit:cover;object-position:70% 30%;pointer-events:none;display:none;filter:drop-shadow(0 0 .5px rgba(0,0,0,.9))}
+.chat-tasto.scassato .ct-crepe{display:block}
 .chat-tasto .ct-led{position:absolute;left:84.638%;top:25.581%;width:2.685%;height:4.91%;min-width:3px;min-height:3px;border-radius:50%;background:transparent}
 .chat-tasto.msg .ct-led{background:#ff3b2e;box-shadow:0 0 6px #ff3b2e,0 0 12px rgba(255,59,46,.6);animation:ct-lamp 1.2s steps(2) infinite}
 @keyframes ct-lamp{50%{opacity:.25}}
@@ -60,6 +67,7 @@ html:not(.js) .chat-tasto{display:none}
 <button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" hidden><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas></button>
 <!-- DA COPIARE IN index.html: il cercapersone della chat col bot (chat/), sotto il wallet -->
 <button class="chat-tasto" type="button" aria-label="chat: parla col bot dei $pzk" title="chat col bot" hidden><img src="/art/chat-pager-grande/pager-piccolo.webp" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span></button>
+<div class="prova-morte" role="group" aria-label="prove del cercapersone scassato"><button type="button" data-prova="muori">muori</button><button type="button" data-prova="ripara">ripara</button></div>
 <p class="nota">pagina di prova: solo la chat, senza il muro. Non va online.</p>
 
 <script type="module">
@@ -95,6 +103,15 @@ const nel = location.hash.slice(1)
     if (nel === 'chat') apri()
   }
 }
+// ── SOLO PROVA ── il cercapersone scassato (23.10): «muori» fa la morte vera di chat.js (il 20 % dei $pzk, e il
+// cercapersone si scassa; con la chat aperta arriva anche la scheda), «ripara» lo rimette nuovo senza pagare
+document.querySelector('.prova-morte').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-prova]')
+  if (!b) return
+  const [chat, zaino] = await Promise.all([import('/chat/chat.js'), import('/chat/zaino.js')])
+  if (b.dataset.prova === 'muori') await chat.muori(null, 'prova: ti sei sporto troppo dal ponte di San Giorgio.')
+  else zaino.aggiustaPager()
+})
 </script>
 </body>
 </html>

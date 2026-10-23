@@ -20,6 +20,8 @@ import * as zaino from '../chat/zaino.js'
 import { icona } from '../chat/icone.js'
 import * as led from '../chat/led.js'
 
+const CREPE = '/art/chat-pager-crepe/crepe.webp', CREPE_PICCOLA = '/art/chat-pager-crepe/crepe-piccola.webp' // il vetro rotto del cercapersone scassato (la piccola è quella del tasto, chat.js)
+
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const PIENO = matchMedia('(max-width:700px),(max-height:520px)') // il cellulare: schermo intero
 // il tasto sotto il wallet è LA STESSA FOTO rimpicciolita (pager-piccolo.webp), con l'lcd nelle stesse quote: così
@@ -63,9 +65,11 @@ function caricaStile() {
   return (cssPronto ??= Promise.all([foglio('/chat/chat.css', 'data-chat-css'), foglio('/telefono/telefono.css', 'data-telefono')]))
 }
 
-// ── la batteria, come quella del wallet: 100 % alle 7, 2 % alle 19, poi in carica fino alle 7 ──
+// ── la batteria, come quella del wallet: 100 % alle 7, 2 % alle 19, poi in carica fino alle 7 (col cavo usb-c sotto) ──
+// L'ora è quella dell'orologio della pagina, come nel wallet: se la regia lo sposta, tutti e due si caricano insieme.
 function oraMantova() {
-  const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Rome', hour: 'numeric', minute: 'numeric', hour12: false }).formatToParts(new Date())
+  const ms = window.pzkkoOrologio?.adesso?.() ?? Date.now()
+  const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Rome', hour: 'numeric', minute: 'numeric', hour12: false }).formatToParts(new Date(ms))
   return (Number(p.find((x) => x.type === 'hour').value) % 24) + Number(p.find((x) => x.type === 'minute').value) / 60
 }
 export function batteria() {
@@ -82,6 +86,7 @@ function costruisci() {
   dlg.setAttribute('aria-label', 'il cercapersone dei $pzk')
   dlg.innerHTML = `<div class="t-corpo" tabindex="-1">
     <img class="t-cornice" src="${PAGER.src}" width="${PAGER.w}" height="${PAGER.h}" alt="" draggable="false">
+    <div class="t-cavo-scatola" aria-hidden="true"><div class="t-cavo-gruppo"><div class="t-cavo-filo"></div><img class="t-cavo" src="/art/chat-pager-cavo/spina.webp" width="132" height="556" alt="" loading="lazy" draggable="false"></div></div>
     <div class="t-schermo chat" data-in="home">
       <div class="t-palco">
         <div class="t-stato" aria-hidden="true">
@@ -108,6 +113,12 @@ function costruisci() {
   statoEl = dlg.querySelector('.t-stato')
   ledEl = dlg.querySelector('.t-led')
   led.collega(ledEl) // sfarfalla quando il sistema lavora (chat/led.js)
+  // le crepe del cercapersone scassato (23.10, dopo una morte: fa solo lavorare e ricomprare il nuovo): sopra le righe del
+  // tubo (z 55), sotto il bianco dello spegnimento; prima del vetro, che resta l'ultimo figlio. L'immagine c'è da subito,
+  // nascosta (.tel.scassato la mostra): quando muori non arriva dopo
+  const crepe = new Image()
+  Object.assign(crepe, { className: 't-crepe', src: CREPE, alt: '', draggable: false })
+  schermo.insertBefore(crepe, schermo.querySelector('.crt-vetro'))
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); corrente ? indietro() : chiudi() }) // Esc: prima indietro, poi si chiude
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
   dlg.addEventListener('click', (e) => {
@@ -120,7 +131,7 @@ function costruisci() {
     else if (v.startsWith('app:')) vai(v.slice(4))
   })
   homeEl.addEventListener('click', (e) => { const b = e.target.closest('[data-app]'); if (b) vai(b.dataset.app, { tab: b.dataset.tab }) })
-  zaino.ascolta(() => { if (dlg.open) { aggiornaLed(); if (!corrente) disegnaHome() } })
+  zaino.ascolta(() => { if (dlg.open) { aggiornaStato(); aggiornaLed(); if (!corrente) disegnaHome() } }) // lo stato: anche scassato o no
   pzk.osserva(() => { if (!corrente && dlg.open) disegnaHome() })
   new ResizeObserver(adatta).observe(dlg)
   PIENO.addEventListener('change', adatta)
@@ -131,6 +142,8 @@ function aggiornaStato() {
   statoEl.querySelector('.t-ora').textContent = ora()
   const bt = statoEl.querySelector('.t-batt')
   bt.classList.toggle('carica', b.carica); bt.classList.toggle('bassa', b.pct <= 15 && !b.carica)
+  dlg.classList.toggle('carica', b.carica) // il cavo usb-c sotto il cercapersone, come quello del wallet
+  dlg.classList.toggle('scassato', zaino.pagerRotto()) // dopo una morte: le crepe, e le app spente tranne la chat
   bt.querySelectorAll('i').forEach((s, i) => s.classList.toggle('on', b.pct > i * 20))
   bt.querySelector('b').textContent = `${b.pct}%`
 }
@@ -215,6 +228,18 @@ function copiaLcd() {
   cv.vivo = setInterval(copia, 120)
   return cv
 }
+/** Le crepe nel doppione che vola: piccolo ha quelle del tasto (crepe-piccola.webp, ridotta col massimo), grande quelle
+ *  dello schermo (crepe.webp), che a 74 px sparirebbero. Il doppione cambia misura a ogni fotogramma: a ogni misura si vede
+ *  la versione giusta (fino a 120 px la piccola, da 400 la grande, in mezzo tutte e due in proporzione), così all'inizio e
+ *  alla fine dello zoom le crepe sono quelle del tasto e dello schermo, senza salti. */
+function crepeNelDoppione(lcd) {
+  lcd.insertAdjacentHTML('beforeend', `<img class="t-crepe piccola" src="${CREPE_PICCOLA}" alt=""><img class="t-crepe" src="${CREPE}" alt="">`)
+  const ro = new ResizeObserver(([e]) => {
+    if (!lcd.isConnected) return ro.disconnect()
+    lcd.style.setProperty('--crepe-grande', Math.min(1, Math.max(0, (e.contentRect.width - 120) / 280)).toFixed(3))
+  })
+  ro.observe(lcd)
+}
 /** Il doppione del cercapersone piccolo: la foto e, nel suo lcd, la chiocciolina. */
 function doppione() {
   const d = document.createElement('div')
@@ -225,6 +250,7 @@ function doppione() {
   d.innerHTML = `<img src="${src}" alt=""><div class="t-doppio-lcd" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%"></div>`
   const cv = copiaLcd()
   d.querySelector('.t-doppio-lcd').appendChild(cv)
+  if (zaino.pagerRotto()) crepeNelDoppione(d.querySelector('.t-doppio-lcd')) // scassato: le stesse crepe del tasto e dello schermo grande, prima del vetro
   d.vivo = cv.vivo
   return d
 }
@@ -363,6 +389,8 @@ export function indietro() {
 export async function vai(id, opz = {}) {
   const a = APP.find((x) => x.id === id)
   if (!a) return
+  // scassato (dopo una morte) si apre solo la chat: lì si lavora e si ricompra il cercapersone nuovo
+  if (zaino.pagerRotto() && id !== 'chat') { toast('è <b>scassato</b>: funziona solo la chat, per <b>lavorare</b> e <b>comprare il nuovo</b>', { icona: 'pager' }); return }
   if (a.azione) { a.azione(); return }
   led.colpo(140)
   if (corrente && corrente !== id && !opz.daIndietro) storia.push(corrente)

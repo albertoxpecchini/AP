@@ -30,6 +30,7 @@ export function suTela(s, testo) {
 /** Chiede di scrivere `atteso` entro ms: → { ok, nota, tempo } */
 async function chiedi(ctx, s, atteso, ms, { segnaposto = 'scrivi qui…' } = {}) {
   const ferma = ctx.tempo(s, ms)
+  await ctx.inVista(s) // il tempo parte quando la domanda si legge tutta, insieme alla barra
   const t0 = performance.now()
   const r = await ctx.scrivi(ms, { segnaposto })
   ferma()
@@ -59,7 +60,7 @@ export const MINIGIOCHI = {
   async memoria(ctx) {
     const cinque = mescola(PAROLE).slice(0, 5).map((x) => x.toLowerCase())
     const s = ctx.dì({ colore: 'blu', t: 'memoria', d: `ricorda queste cinque, nell’ordine: <b>${cinque.join(' · ')}</b>` })
-    await ctx.dormi(4000)
+    await ctx.inVista(s, 4000)
     ctx.aggiorna(s, { colore: 'blu', t: 'memoria', d: 'adesso scrivile tu, nell’ordine, separate da uno spazio. 20 secondi.' })
     const ferma = ctx.tempo(s, 20000)
     const r = await ctx.scrivi(20000, { segnaposto: 'parola parola parola…' })
@@ -73,7 +74,7 @@ export const MINIGIOCHI = {
   async colori(ctx) {
     const parole = mescola(PAROLE).slice(0, 4), colori = mescola(COLORI).slice(0, 4)
     const s = ctx.dì({ colore: 'blu', t: 'i colori', html: `<p>guarda bene, 4 secondi: ${parole.map((p, i) => `<b style="color:${colori[i][1]}">${p}</b>`).join(' · ')}</p>` })
-    await ctx.dormi(4000)
+    await ctx.inVista(s, 4000)
     const k = ctx.rnd(4)
     ctx.aggiorna(s, { colore: 'blu', t: 'i colori', d: `di che colore era <b>${parole[k]}</b>?` })
     const ferma = ctx.tempo(s, 8000)
@@ -85,7 +86,7 @@ export const MINIGIOCHI = {
   async icona(ctx) {
     const cinque = mescola(ICONE_FACILI).slice(0, 5), giusta = cinque[0]
     const s = ctx.dì({ colore: 'blu', t: 'occhio', html: `<p>guarda, 2 secondi: ${ctx.icona(giusta, 'emo grande')}</p>` })
-    await ctx.dormi(2000)
+    await ctx.inVista(s, 2000)
     ctx.aggiorna(s, { colore: 'blu', t: 'occhio', d: 'qual era?' })
     const ferma = ctx.tempo(s, 8000)
     const r = await ctx.scegli(s, mescola(cinque).map((i) => ({ id: i, eti: `:${i}:`, stile: 'nero quadro' })), 8000)
@@ -113,7 +114,7 @@ export const MINIGIOCHI = {
   async veloce(ctx) {
     const p = ctx.caso(PAROLE)
     const s = ctx.dì({ colore: 'blu', av: 'bot-pensa', t: 'pronti…', d: 'appena compare la parola, riscrivila.' })
-    await ctx.dormi(ctx.tra(1200, 4500))
+    await ctx.inVista(s, ctx.tra(1200, 4500))
     ctx.aggiorna(s, { colore: 'ambra', av: 'bot-arrabbiato', t: 'VIA!', d: '' })
     suTela(s, p)
     const r = await chiedi(ctx, s, p, 10000)
@@ -130,7 +131,7 @@ export const MINIGIOCHI = {
   async ordine(ctx) {
     const voci = mescola(FOGLI_CHAT['chat-slot']).slice(0, 4), seq = mescola(voci).slice(0, 3)
     const s = ctx.dì({ colore: 'blu', t: 'l’ordinazione', html: `<p>il cliente vuole, in quest’ordine (3 secondi): ${seq.map((i) => ctx.icona(i, 'emo grande')).join(' ')}</p>` })
-    await ctx.dormi(3000)
+    await ctx.inVista(s, 3000)
     ctx.aggiorna(s, { colore: 'blu', t: 'l’ordinazione', d: 'premi le tre cose nello stesso ordine.' })
     const premute = []
     const ferma = ctx.tempo(s, 10000)
@@ -139,15 +140,22 @@ export const MINIGIOCHI = {
     const ok = r !== null && premute.every((p, i) => p === seq[i])
     return { ok, nota: ok ? 'tutto giusto.' : r === null ? 'tempo scaduto.' : 'ordine sbagliato: il cliente se ne va.' }
   },
-  /** strada: le svolte per arrivare alla consegna */
+  /** strada: le svolte per arrivare alla consegna. Mentre le rifai, sotto compaiono quelle già fatte (1/4, 2/4…). */
   async strada(ctx) {
     const FR = ['sinistra', 'dritto', 'destra'], seq = Array.from({ length: 4 }, () => ctx.caso(FR))
     const s = ctx.dì({ colore: 'blu', t: 'la consegna', d: `la strada, 3 secondi: <b>${seq.join(' → ')}</b>` })
-    await ctx.dormi(3000)
-    ctx.aggiorna(s, { colore: 'blu', t: 'la consegna', d: 'rifai le quattro svolte, in ordine.' })
+    await ctx.inVista(s, 3000)
+    ctx.aggiorna(s, { colore: 'blu', t: 'la consegna', d: 'rifai le quattro svolte, in ordine.', html: '<p class="c-testo" data-fatte>fatte 0/4</p>' })
+    const fatte = s.querySelector('[data-fatte]')
     const premute = []
     const ferma = ctx.tempo(s, 10000)
-    const r = await ctx.scegli(s, FR.map((d) => ({ id: d, eti: d, stile: 'nero' })), 10000, { onPremuto: (id) => { premute.push(id); return premute.length >= 4 ? 'fine' : 'continua' } })
+    const r = await ctx.scegli(s, FR.map((d) => ({ id: d, eti: d, stile: 'nero' })), 10000, {
+      onPremuto: (id) => {
+        premute.push(id)
+        fatte.innerHTML = `fatte ${premute.length}/4: <b>${premute.join(' → ')}</b>`
+        return premute.length >= 4 ? 'fine' : 'continua'
+      },
+    })
     ferma()
     const ok = r !== null && premute.every((p, i) => p === seq[i])
     return { ok, nota: ok ? 'consegnato.' : r === null ? 'tempo scaduto.' : `ti sei perso: era ${seq.join(' → ')}.` }

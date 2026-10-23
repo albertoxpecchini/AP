@@ -13,6 +13,7 @@ const EVENTI = [
     const parola = ctx.caso(['PRENDILA', 'ACCHIAPPA', 'MIA', 'SVELTO', 'AFFERRA'])
     const s = ctx.dì({ colore: 'oro', av: 'bot-occhiolino', t: ':banconota: una banconota vola dalla finestra!', d: `scrivi <b>${parola}</b> prima che se la porti il vento.` })
     const ferma = ctx.tempo(s, 5000)
+    await ctx.inVista(s) // i secondi partono quando l'evento si legge, non quando nasce in coda
     const r = await ctx.scrivi(5000, { segnaposto: parola })
     ferma()
     if (r?.trim().toUpperCase() === parola) { const n = ctx.paga(ctx.tra(80, 400)); ctx.aggiorna(s, { colore: 'oro', av: 'bot-ride', t: ':banconota: presa!', d: `${ctx.pzkHtml(n)} in tasca.` }) }
@@ -45,6 +46,7 @@ const EVENTI = [
     const [id] = ctx.caso(roba)
     const s = ctx.dì({ colore: 'rosso', av: 'bot-arrabbiato', t: ':nutria: una nutria!', d: `ti sta rubando :${id}: dallo zaino. Scrivi <b>SCIÒ</b>!` })
     const ferma = ctx.tempo(s, 4000)
+    await ctx.inVista(s)
     const r = await ctx.scrivi(4000, { segnaposto: 'SCIÒ' })
     ferma()
     if (r && /^sci[oò]!?$/i.test(r.trim())) ctx.aggiorna(s, { av: 'bot-ride', t: ':nutria: scappata', d: 'la nutria molla tutto e si tuffa nel Mincio.' })

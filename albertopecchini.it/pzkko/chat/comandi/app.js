@@ -31,13 +31,14 @@ async function giocaQuiz(ctx, arg) {
   const p = await quiz.nuova(scelto)
   if (!p) return ctx.dì({ colore: 'grigio', av: 'bot-triste', d: scelto === 'giocatori' ? 'ci sono pochi giocatori nel database: servono almeno tre conti con qualche punto.' : 'non ho domande per questo argomento.' })
   const rest = quiz.restanti()
-  ctx.dì({ colore: 'blu', t: `:quiz: quiz · ${argomenti.find(([id]) => id === scelto)?.[1] ?? 'di tutto un po’'}`, d: `${p.domande.length} domande, ${quiz.TEMPO} secondi l’una. ${rest > 0 ? `Ogni risposta giusta paga da ${quiz.PAGA[1]} a ${quiz.PAGA[3]} $pzk (se rispondi in fretta, di più). Oggi ne restano <b>${rest}</b> pagate.` : 'Le risposte pagate di oggi sono finite: è solo un allenamento (punti esperienza).'}` })
-  await ctx.dormi(900)
+  const intro = ctx.dì({ colore: 'blu', t: `:quiz: quiz · ${argomenti.find(([id]) => id === scelto)?.[1] ?? 'di tutto un po’'}`, d: `${p.domande.length} domande, ${quiz.TEMPO} secondi l’una. ${rest > 0 ? `Ogni risposta giusta paga da ${quiz.PAGA[1]} a ${quiz.PAGA[3]} $pzk (se rispondi in fretta, di più). Oggi ne restano <b>${rest}</b> pagate.` : 'Le risposte pagate di oggi sono finite: è solo un allenamento (punti esperienza).'}` })
+  await ctx.inVista(intro, 900)
   const NOMI = ['', 'facile', 'media', 'difficile']
   while (!p.finita) {
     const d = p.domande[p.i]
     const s = ctx.dì({ colore: 'blu', t: `:quiz: ${p.i + 1}/${p.domande.length} · ${NOMI[d.diff]}`, d: esc(d.q), img: d.img, pie: d.credito || undefined })
     const ferma = ctx.tempo(s, quiz.TEMPO * 1000)
+    await ctx.inVista(s) // il bonus di velocità conta da quando la domanda è scritta, come la barra
     const t0 = Date.now()
     const id = await ctx.scegli(s, d.risposte.map((t, i) => ({ id: String(i), eti: esc(t), stile: 'nero' })), quiz.TEMPO * 1000)
     ferma()

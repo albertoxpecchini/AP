@@ -64,6 +64,11 @@ export const NEGOZIO_COMANDI = [
       const x = NEGOZIO.find((n) => n.id === pezzo(ctx.args.join(' ').replace(/\s+\d+$/, ''))?.id)
       const n0 = Math.max(1, Math.min(50, parseInt(ctx.args.at(-1)) || 1))
       if (!x) return ctx.dì({ colore: 'rosso', d: `non lo vendo. Guarda il <code>negozio</code>.` })
+      if (x.id === 'pager' && zaino.pagerRotto()) { // il nuovo al posto di quello scassato (23.10): torna tutto, il soprammobile resta un'altra cosa
+        const r = mercato.ricompraPager()
+        if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', t: ':pager: non bastano', d: `il cercapersone nuovo ${r.errore}: mancano ${ctx.pzkHtml(r.manca)}. Lavora.`, azioni: [['lavora', ':rider: lavora', 'oro']] })
+        return ctx.dì({ colore: 'oro', av: 'bot-ride', t: ':pager: cercapersone nuovo', d: `pagato ${ctx.pzkHtml(r.tot)}${r.sconto ? ` (offerta del giorno −${Math.round(r.sconto * 100)} %)` : ''}. Vetro nuovo, tutto funziona di nuovo.`, azioni: [['aiuto', 'i comandi']] })
+      }
       if (x.unico && zaino.ha(x.id)) return ctx.dì({ colore: 'ambra', d: `:${x.id}: ${x.nome}: ce l’hai già.` })
       const r = mercato.compra(x.id, n0)
       if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: `${r.errore}. Lavora.` })
@@ -132,7 +137,7 @@ export const NEGOZIO_COMANDI = [
       if (!cassa) return ctx.dì({ colore: 'rosso', d: 'quale? <code>apri comune</code>, <code>apri rara</code>, <code>apri gonzaga</code>.' })
       if (!zaino.togli(cassa)) return ctx.dì({ colore: 'grigio', d: `non hai una :${cassa}: ${nomeDi(cassa)}. Nel negozio costa ${ctx.fmt(PER_ID[cassa].prezzo)}.` })
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: `:${cassa}: si apre…`, d: 'il lucchetto cigola.' })
-      await ctx.dormi(1400)
+      await ctx.inVista(s, 1400)
       const r = pesca(CASSE[cassa], ctx)
       zaino.conta('casse')
       if (r.niente) return ctx.aggiorna(s, { colore: 'grigio', av: 'bot-triste', t: `:${cassa}: vuota`, d: `dentro: ${r.niente}` })

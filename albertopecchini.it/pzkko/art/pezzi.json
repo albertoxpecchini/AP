@@ -1310,6 +1310,28 @@
    "h": 178
   }
  },
+ "chat-pager-cavo": {
+  "spina": {
+   "w": 132,
+   "h": 556
+  }
+ },
+ "chat-pager-simboli": {
+  "spegni": {
+   "w": 214,
+   "h": 232
+  },
+  "indietro": {
+   "w": 246,
+   "h": 164
+  }
+ },
+ "chat-pager-crepe": {
+  "crepe": {
+   "w": 1024,
+   "h": 576
+  }
+ },
  "wallet-banner": {
   "banner": {
    "w": 792,

@@ -1773,7 +1773,11 @@ sempre quelli veri). GET `?top=<metrica>`, `?cerca=`, `?ind=pzk123456` (profilo 
 browser); POST `{ token, vicini }` per il proprio profilo e i rivali. Mai il PIN né gli oggetti uno per uno.
 
 **La morte** si perde il 20 % dei $pzk liberi (al più 5.000; il bonsai e il lucchettone ne fanno perdere meno), il
-cornetto si consuma al posto tuo. **Lo zaino** (`chat/zaino.js`) segue i soldi: nella sessione in `sessionStorage`, col
+cornetto si consuma al posto tuo. E il cercapersone si **scassa** (23.10, `zaino.pagerRotto()`): il vetro crepato
+(`art/chat-pager-crepe/`: `crepe.webp` nello schermo grande, `crepe-piccola.webp` nel tasto, ridotta col massimo da
+`tools/pzkko/crepe-piccole.mjs`; nel doppione dello zoom tutte e due, secondo la misura), le app spente tranne la chat, e
+la chat accetta solo `lavora` e `compra cercapersone`, che costa quanto il cercapersone del negozio e lo rimette nuovo
+(`mercato.ricompraPager`). Nella pagina di prova i tasti «muori» e «ripara» (a cercapersone chiuso). **Lo zaino** (`chat/zaino.js`) segue i soldi: nella sessione in `sessionStorage`, col
 conto sul server (`pzkko/chat.json`, al più 12 KB) e in `localStorage`; ci stanno anche i tasti rapidi, le sfide, le
 missioni, il quiz e i leggendari presi.
 
