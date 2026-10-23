@@ -1253,5 +1253,61 @@
    "w": 194,
    "h": 172
   }
+ },
+ "chat-pager-grande": {
+  "pager-grande": {
+   "w": 1341,
+   "h": 774
+  }
+ },
+ "chat-app": {
+  "app-chat": {
+   "w": 190,
+   "h": 184
+  },
+  "app-shop": {
+   "w": 194,
+   "h": 184
+  },
+  "app-sfide": {
+   "w": 186,
+   "h": 186
+  },
+  "app-quiz": {
+   "w": 188,
+   "h": 184
+  },
+  "app-quest": {
+   "w": 188,
+   "h": 180
+  },
+  "app-giocatori": {
+   "w": 192,
+   "h": 180
+  },
+  "app-zaino": {
+   "w": 190,
+   "h": 180
+  },
+  "app-foto": {
+   "w": 190,
+   "h": 180
+  },
+  "app-banca": {
+   "w": 188,
+   "h": 178
+  },
+  "app-home": {
+   "w": 192,
+   "h": 178
+  },
+  "app-indietro": {
+   "w": 192,
+   "h": 180
+  },
+  "app-chiudi": {
+   "w": 188,
+   "h": 178
+  }
  }
 }

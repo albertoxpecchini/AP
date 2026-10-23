@@ -203,8 +203,7 @@ function costruisci() {
   const pos = ([x, y, w, h]) => `left:${x}%;top:${y}%;width:${w}%;height:${h}%`
   const tasti = ['conto', 'cambio', 'invia', 'altro']
   dlg.innerHTML = `
-    <div class="w-corpo">
-      <button class="w-chiudi" type="button" aria-label="chiudi il wallet">×</button>
+    <div class="w-corpo" tabindex="-1">
       <div class="w-schermo w-saldo" style="${pos(POS.saldo)}"><canvas></canvas><span class="w-eti">$pzk</span><span class="w-sotto"></span></div>
       <div class="w-schermo w-eur" style="${pos(POS.eur)}"><canvas></canvas><span class="w-eti">EUR€</span></div>
       <div class="w-schermo w-batt" style="${pos(POS.batt)}"><canvas></canvas></div>
@@ -222,7 +221,7 @@ function costruisci() {
     grafico: q(dlg, '.w-grafico'), tasso: q(dlg, '.w-tasso'), var: q(dlg, '.w-var'), periodo: q(dlg, '.w-periodo'), info: q(dlg, '.w-info'), carta: q(dlg, '.w-carta'), voce: q(dlg, '.w-voce'), manopola: q(dlg, '.w-manopola'),
     tasti: [...dlg.querySelectorAll('.w-tasto')], sezione: null,
   }
-  q(dlg, '.w-chiudi').addEventListener('click', chiudi)
+  // niente tasto per chiudere: si tocca fuori dal portafoglio (o Esc)
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); chiudi() })
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
   for (const t of S.tasti) t.addEventListener('click', () => mostra(S.sezione === t.dataset.s ? null : t.dataset.s))
@@ -458,7 +457,7 @@ function vivo(e, c) {
 
 export function apri(sezione = null) {
   if (!dlg) costruisci()
-  if (!dlg.open) { dlg.classList.remove('chiude'); dlg.showModal() }
+  if (!dlg.open) { dlg.classList.remove('chiude'); dlg.showModal(); S.corpo.focus({ preventScroll: true }) } // il fuoco sul portafoglio, non sul primo tasto (che si accenderebbe di giallo)
   aggiorna()
   if (!borsaDati) disegnaBorsa()
   borsa()

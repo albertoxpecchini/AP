@@ -1610,7 +1610,8 @@ conto (lo segna il server). Un sito non può sapere chi segue chi, quindi ci si 
 ## Il wallet e la borsa (wallet/, api/wallet.mjs, api/borsa.mjs)
 
 **Il wallet** (22.10 notte) è il tasto in alto a sinistra, un portafoglio chiuso di pelle col led
-verde che dice i $pzk (le stesse cifre a sette segmenti del portachiavi per terra). Si apre su un
+verde che dice i $pzk (le stesse cifre a sette segmenti del portachiavi per terra). Si apre (dal 23.10 grande quanto
+entra nella finestra e nel mezzo, per leggere bene gli schermi; niente «×»: si chiude toccando fuori) su un
 portafoglio di pelle usato, aperto, customizzato come un Pip-Boy di Fallout (la foto
 `art/wallet/portafoglio.webp`: la pelle, la piastra d'acciaio rivettata, il nastro adesivo, i tasti
 gialli, la manopola, la porta usb-c sul fianco sinistro; gli schermi nella foto sono spenti, li
@@ -1618,7 +1619,9 @@ accende `wallet.js` in percentuale sulla foto, `POS`). A sinistra il **saldo in 
 (sotto, quanto vale in €), gli **EUR€** a led ambra, la **batteria** su un lcd (100 % alle 7 di
 mattina, 2 % alle 7 di sera, poi in carica fino alle 7 col cavo usb-c infilato nella porta, ora di
 Mantova, `window.pzkkoOrologio`) e la targhetta incisa con l'**indirizzo**. A destra **la borsa**: il
-grafico del cambio PZK/EUR€ (la manopola gira il periodo: 24 ore, 7 giorni, 30 giorni, da sempre),
+grafico del cambio PZK/EUR€ (la manopola gira il periodo: 24 ore, 7 giorni, 30 giorni, da sempre; dal 23.10 il pomello
+gira davvero, un quarto di giro a scatto e sempre in senso orario: è il pezzo di foto del pomello ritagliato tondo, con la
+tacca gialla sul bordo),
 il cambio e il suo inverso, la variazione del periodo, la capitalizzazione (i $pzk di tutti i
 conti, quanti conti) e i fattori del momento (il meteo, la temperatura, giorno o notte, se c'è
 stato un commit). I quattro tasti gialli sfilano dalla tasca **la carta** coi moduli: **conto**
@@ -1679,51 +1682,92 @@ via dal tasto) e domani sono di nuovo lì. 635 $pzk al giorno a chi passa a racc
 Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
 `tools/nome/index.html`) e il suo volantino «in arrivo» diventa un link.
 
-## La chat col bot (chat/, api/wallet.mjs azione «zaino»)
+## Il cercapersone e la chat col bot (chat/, telefono/, api/wallet.mjs azione «zaino», api/giocatori.mjs)
 
-Sotto il wallet c'è un **cercapersone** nero con lo schermo lcd (`.chat-tasto`, `art/chat-cercapersone/`): il led rosso e
-«1 msg» si accendono quando c'è il premio giornaliero da riscuotere. Si apre un palmare a fosfori verdi dove si parla
-con **pzk**, il bot: la chiocciola della banca $pzk (quella delle banconote) con gli occhiali da sole, in otto umori
-(`art/chat-bot/`). Si scrive un comando e basta (`pesca`; anche `pzk pesca` e `/pesca`), lui risponde con una scheda
-(barra colorata, titolo, testo, campi, piè, pulsanti) e, quando serve, aspetta una risposta: pulsanti, o una parola
-scritta nella riga in fondo, con la barra del tempo. Niente emoji di sistema: solo le nostre icone (`chat/icone.js`, le
-cartelle `art/chat-*`, i fogli in `tools/pzkko/fogli-chat.js`), `:canna:` nel testo diventa l'immagine.
+Sotto il wallet c'è un **cercapersone** nero (`.chat-tasto`, `art/chat-pager-grande/pager-piccolo.webp`): sul suo schermo
+lcd vive il tomodachi (`chat/tomodachi.js`, la chiocciolina a pixel); il led rosso lampeggia piano quando c'è qualcosa da
+riscuotere e **sfarfalla come la spia del disco di un PC** quando il sistema lavora (`chat/led.js`: ogni richiesta al
+server, il bot che pensa e scrive, le app che si caricano). Al clic **il cercapersone si ingrandisce** e diventa lo stesso
+cercapersone in alta qualità (`art/chat-pager-grande/pager-grande.webp`, gpt-image-2, foglio `chat-pager-grande`): il tasto
+è la stessa foto rimpicciolita con l'lcd nelle stesse quote, così l'ingrandimento è puro e non si vede il cambio; la prima
+volta lo schermo si accende con «pzk os». Alla chiusura il contrario. Niente tasti con la «×»: si chiude toccando fuori,
+con Esc, o premendo «home» quando sei già nella home.
 
-**I comandi** (`aiuto` li elenca, `aiuto pesca` spiega un comando; le frecce in su ripetono gli ultimi):
+**Il cercapersone grande** (`telefono/telefono.js` + `telefono.css`; il nome è rimasto dalla prima versione, che era un
+telefono) è orizzontale come quello piccolo. Le quote sono misurate sul disegno (1341 × 774): lo schermo va da 8,35 % a
+74,65 % in larghezza e da 24,68 % a 80,88 % in altezza; i due tasti grigi sono veri (sopra: home, sotto: indietro), il led
+è a 84,6 % / 25,6 %. Nello schermo, un palco di 760 punti ridimensionato allo schermo vero: barra di stato lcd (pzkkonet,
+ora, batteria come quella del wallet), la home (ora, saldo, sfide, l'ultima notizia dei giocatori) e le **app**, una per
+modulo in `telefono/app/`, caricate al primo uso e poi tenute montate; le icone sono adesivi disegnati (foglio `chat-app`).
+Sul cellulare lo schermo prende tutta la finestra e i tasti diventano una barra in basso.
 
-- *soldi*: `saldo`, `profilo` (xp, livello, mestiere, statistiche), `attese`, `giornaliero` / `settimanale` / `mensile`
-  (premio con la serie: ogni volta di fila vale di più), `elemosina` (un personaggio di Mantova ti dà 0–150 $pzk, un
-  oggetto o una risposta acida), `classifica` (i dieci conti più ricchi, GET `/api/wallet?classifica=1`), `dai`
-  (= `pzk.invia`).
-- *attività*: `cerca` (tre posti a caso, qualcuno uccide), `crimine` (più rischio, più paga), `altobasso`, `posta`
-  (col telefono: piattaforma + meme → like → $pzk), `scava` (pala), `pesca` (canna; il pesce raro si prende cliccando
-  il pesce giusto in 3,5 s), `caccia` (fionda per le bestie piccole, fucile per cinghiale, cervo e drago; quelle
-  pericolose caricano: si schiva dall'altra parte in 3 s, se no si muore).
-- *lavoro*: `lavora lista`, `lavora come <mestiere>` (dodici mestieri, dal rider al sindaco, ognuno con un livello
-  minimo), `lavora` (un turno ogni 20 minuti: un minigioco, riuscito = paga intera, sbagliato = un decimo; la paga cresce
-  del 5 % a turno fino a +50 %), `lavora licenziati`. I minigiochi (`chat/minigiochi.js`): riscrivi la frase (sta su una
-  tela, non si incolla), anagramma, memoria, colori, icona, rigore, al contrario, conti, l'ordinazione, la consegna, quiz.
-- *giochi*: `quiz` (12 s, 30/60/120), `veloce` (la parola compare all'improvviso, paga a tempo), `slot`, `dadi` (tu
-  contro il bot), `moneta`, e i tavoli veri con le loro regole (`games/*/regole.js`): `roulette 50 rosso`,
-  `blackjack 25` (carta / stai / raddoppia), `mine 50 3` (griglia di pulsanti e «incassa»), `dado 50 piccolo` (sic bo,
-  tabella di Macao). Le puntate passano dai tavoli `chat-<gioco>` di `games/pzk.js`.
-- *negozio*: `zaino`, `negozio`, `compra`, `vendi` (pesci, bestie e reperti; `vendi tutto`), `usa` (caffè: attese
-  dimezzate 10 min; lattina: +10 % paghe 30 min; mortadella: xp doppi 20 min), `info`, `apri` (tre casse), `gratta`.
+- **Chat**: il bot (sotto). **Shop**: un e-commerce: offerte del giorno (tre pezzi a −20/−30/−40 %, uguali per tutti,
+  col conto alla rovescia a mezzanotte), reparti, ricerca, ordine, preferiti, la scheda del prodotto, il carrello, la cassa
+  con lo scontrino. **Sfide**: le tre sfide di oggi. **Quiz**: i quiz retributivi. **Quest**: le side quest. **Giocatori**:
+  il database (classifiche col podio, notizie, cerca, il tuo profilo coi rivali, i numeri della banca). **Zaino**: quello
+  che hai, coi bonus in corso. **Foto**: le foto vere dei quiz. **Banca**: apre il wallet.
 
-**La morte** (cerca, crimine, caccia andati male): si perde il 20 % dei $pzk liberi (al più 5.000), mai gli EUR€; il
-**cornetto rosso** del negozio si consuma al posto tuo. **Gli eventi casuali** (7 % dopo un comando): una banconota
-vola dalla finestra (scrivi la parola in 5 s), un quiz lampo, testa o croce gratis, una nutria che ruba dallo zaino.
-Il **livello** sale con gli xp (`1 + √(xp / 60)`) e dà un moltiplicatore sulle paghe (+2 % a livello).
+**La chat** (`chat/chat.js` + `chat.css`): si scrive un comando e basta (`pesca`; anche `pzk pesca` e `/pesca`). Il bot,
+**pzk** (la chiocciola della banca con gli occhiali da sole, otto umori in `art/chat-bot/`), risponde con una scheda che
+non spunta di colpo: «sta scrivendo…» per 500 ms, poi il testo si scrive da solo in 1000 ms (una coda li mostra uno alla
+volta; i pulsanti e i timer dei minigiochi partono a scrittura finita). Le schede sono interattive: ogni `<code>comando</code>`
+nel testo si tocca, sotto possono esserci tasti di seguito, i propri messaggi hanno il ↻ per rifarli; orari e giorni, il
+tasto ↓ coi nuovi. Sopra la riga, i **tasti rapidi**: le ultime 8 scelte (salvate nello zaino), con le freccette per
+scorrerle. Niente emoji di sistema: solo le nostre icone (`chat/icone.js`, `art/chat-*`, `tools/pzkko/fogli-chat.js`).
 
-**Lo zaino** (`chat/zaino.js`: xp, mestiere, oggetti, attese, effetti, serie, statistiche) segue i soldi: nella sessione
-sta in `sessionStorage` e sparisce con la scheda; col conto sta sul server (azione `zaino` di `api/wallet.mjs`, un file
-a parte su Blob, `pzkko/chat.json`, al più 8 KB, forma controllata) e in `localStorage` come copia, salvato un secondo
-e mezzo dopo ogni cambio e subito quando la pagina si nasconde; vince chi ha il `t` più recente.
+**I comandi** (`aiuto` li elenca e ogni nome si tocca; `aiuto pesca` ne spiega uno):
 
-Il modulo (`chat/chat.js` + `chat.css`) si carica da solo appena la pagina è tranquilla e al clic; `#chat` apre la chat,
-l'evento `pzkko-chat` (con `detail.comando`) la apre scrivendo un comando. Gli strumenti che fotografano la pagina non
-vedono il tasto (`navigator.webdriver`), `?chat` lo fa vedere. **In locale**: `npm run dev:pzkko` e poi
-`http://localhost:5182/prova/chat/`, la pagina di prova con la sola chat (`tools/pzkko/prove/chat.html`, non va online).
+- *soldi*: `saldo`, `profilo`, `attese`, `giornaliero` / `settimanale` / `mensile`, `elemosina`, `manda pzk123456 50`
+  (era `dai`/`invia`, che restano come alias).
+- *attività*: `cerca`, `crimine`, `altobasso`, `posta`, `scava`, `pesca`, `caccia`. *lavoro*: `lavora …` (dodici mestieri).
+- *giochi*: `quiz [argomento]` (una partita intera, sotto), `veloce`, `slot`, `dadi`, `moneta`, `roulette`, `blackjack`,
+  `mine`, `dado`.
+- *negozio*: `negozio [reparto]` (offerte, cibo, attrezzi, fortuna, roba, pzk: ogni pezzo in una riga col tasto «compra»),
+  `compra` (da solo apre la vetrina), `vendi`, `usa`, `info`, `zaino`, `apri`, `gratta`. Un nome di oggetto scritto da
+  solo propone compra/usa/info.
+- *app*: `telefono`, `shop`, `sfide [riscuoti]`, `missioni`, `quest <nome> [scelta]`.
+- *giocatori* (il database): `classifica [metrica]`, `cerca <nome>`, `giocatore [nome|pzk123456]`, `notizie`, `rivale`,
+  `banca`.
+
+**Lo shop** (`chat/testi.js` + `chat/oggetti.js` + `chat/mercato.js`): 46 pezzi in cinque reparti; 32 sono le cose citate da
+Alberto nelle sue chat (il cibo dei volantini e della spazzatura: pzk-kola, tè alla pesca, frutti di bosco, zucca,
+tortelli, grissini alla pizza, ramen Pechino, sbrisolona, mostarda, pomodoro; la roba: Eastpak, Ciao PX, Landini L25,
+Epson ET-2825, iPhone Duo, stufa a legna, bonsai, penne BIC, Tucson, il manuale del Landini; le cose di pzk: luckypzkko,
+gomma, tombino, lucchettone, citofono 28, pzkkonet, portachiavi, petizione, neon, portafoglio, cercapersone, peluche),
+disegnate nei fogli `chat-cibo`, `chat-roba`, `chat-pzk`. Ogni pezzo può avere **bonus** veri (`zaino.bonus(k)`): `paga`,
+`xp`, `attese`, `vendita`, `morte`, `sfide`; i consumabili li danno a tempo, le cose da tenere finché sono nello zaino.
+Gli acquisti della chat e dello shop passano tutti da `mercato.compra`.
+
+**Le sfide giornaliere** (`chat/sfide.js`): ogni giorno tre sfide (facile, media, difficile) fatte con quello che sai fare
+(niente pesca senza canna), misurate sulle statistiche dello zaino; tutte e tre danno il bonus del giorno con una cassa, e
+la serie di giorni di fila lo fa crescere. **I quiz retributivi** (`chat/quiz.js` + `quiz-dati.js`): partite da 8 domande
+su un argomento (Mantova, cucina, cultura, scienza, tech, giochi, pzk, «foto» — che cos'è nella foto —, «giocatori» —
+domande fatte col database —), 15 secondi l'una; ogni risposta giusta paga 20/40/80 $pzk, di più se veloce o in serie;
+pagano le prime 40 giuste del giorno. I fatti di Mantova sono verificati sul web. **Le side quest** (`chat/missioni.js` +
+`missioni-dati.js`): cinque storie a bivi (il civico 28, il pomodoro che scoppia, la petizione, il Landini che non parte,
+il drago del Mincio), con costi, rischi, oggetti che servono, un premio alla fine.
+
+**Le foto vere** (`chat/immagini.js`): 14 foto da Wikimedia Commons (monumenti di Mantova, il cibo, il Landini, il Ciao),
+caricate da lì con autore e licenza scritti sotto; per una foto da **Imgur** basta una voce con `imgur: '<id>'` al posto
+di `url` (Imgur non si può cercare né caricare senza una chiave API, quindi gli id li deve dare Alberto).
+
+**Il database dei giocatori** (`api/_giocatori.mjs`, `api/giocatori.mjs`, `chat/db.js`): un file su Blob,
+`pzkko/giocatori.json`, con la riga pubblica di ogni giocatore (livello, statistiche, mestiere, serie, leggendari presi,
+ultima volta visto), aggiornata a ogni salvataggio dello zaino e unita ai conti del wallet a ogni richiesta (i $pzk sono
+sempre quelli veri). GET `?top=<metrica>`, `?cerca=`, `?ind=pzk123456` (profilo con la posizione in ogni classifica),
+`?stats=1`, `?notizie=1` (salite di livello, leggendari, vincite grosse, mestieri, serie: dati, le parole le mette il
+browser); POST `{ token, vicini }` per il proprio profilo e i rivali. Mai il PIN né gli oggetti uno per uno.
+
+**La morte** si perde il 20 % dei $pzk liberi (al più 5.000; il bonsai e il lucchettone ne fanno perdere meno), il
+cornetto si consuma al posto tuo. **Lo zaino** (`chat/zaino.js`) segue i soldi: nella sessione in `sessionStorage`, col
+conto sul server (`pzkko/chat.json`, al più 12 KB) e in `localStorage`; ci stanno anche i tasti rapidi, le sfide, le
+missioni, il quiz e i leggendari presi.
+
+Il modulo si carica da solo appena la pagina è tranquilla e al clic; `#chat` apre direttamente la chat, l'evento
+`pzkko-chat` (con `detail.comando`) la apre scrivendo un comando. Gli strumenti che fotografano la pagina non vedono il tasto
+(`navigator.webdriver`), `?chat` lo fa vedere. **In locale**: `npm run dev:pzkko` e poi `http://localhost:5182/prova/chat/`
+(`tools/pzkko/prove/chat.html`, non va online); `PZKKO_PORT=5190` per un secondo server. Il server ricarica la pagina solo
+se un file cambia davvero (su Windows `fs.watch` segnala anche le letture).
 
 ## Gli strumenti (tools/)
 

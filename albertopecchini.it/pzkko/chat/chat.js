@@ -15,6 +15,7 @@ import { conIcone, icona } from './icone.js'
 import { COMANDI, PER_NOME, CATEGORIE } from './comandi/index.js'
 import { eventoCasuale, salutoIniziale } from './comandi/eventi.js'
 import { NEGOZIO as NEGOZIO_OGGETTI } from './testi.js'
+import * as led from './led.js'
 
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const mezzi = (n) => Math.round(n * 2) / 2
@@ -33,6 +34,7 @@ let salutato = false
 // ── il tasto ──
 export function prepara(b) {
   tasto = b
+  led.collega(b.querySelector('.ct-led')) // il led sfarfalla quando il sistema lavora (led.js)
   aggiornaTasto()
   import('./tomodachi.js').then((m) => m.avvia(b)).catch((e) => console.warn('tomodachi non partito', e)) // la chiocciolina sullo schermo lcd
   zaino.ascolta(aggiornaTasto)
@@ -45,16 +47,14 @@ function aggiornaTasto() {
   tasto.classList.toggle('msg', zaino.manca('giornaliero') === 0)
 }
 
-// ── il pannello ──
-function costruisci() {
-  if (dlg) return
-  dlg = document.createElement('dialog')
-  dlg.className = 'chat'
-  dlg.setAttribute('aria-label', 'la chat col bot dei $pzk')
-  dlg.innerHTML = `<div class="c-corpo">
-    <button class="c-chiudi" type="button" aria-label="chiudi">×</button>
-    <div class="c-schermo">
-      <div class="c-testa">${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
+// ── il pannello: dal 23.10 la chat è un'app del telefono (telefono/telefono.js), si monta dentro il suo schermo ──
+/** Monta la chat dentro `host` (la fa il telefono una volta sola); poi `mostra()` ogni volta che l'app torna in primo piano. */
+export function monta(host) {
+  if (dlg) return dlg
+  dlg = document.createElement('div')
+  dlg.className = 'chat-app'
+  dlg.innerHTML = `<div class="c-schermo">
+      <div class="c-testa"><button class="c-indietro" type="button" aria-label="torna alla home del telefono">‹</button>${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
       <div class="c-lista" role="log" aria-live="polite"></div>
       <button class="c-giu" type="button" aria-label="vai agli ultimi messaggi" hidden><span>↓</span><b class="c-nuovi"></b></button>
       <div class="c-rapidi-box">
@@ -68,9 +68,8 @@ function costruisci() {
         <input type="text" name="c" placeholder="scrivi un comando: aiuto" aria-label="il comando" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" maxlength="120">
         <button class="c-b c-invia" type="submit">invia</button>
       </form>
-    </div>
-  </div>`
-  document.body.appendChild(dlg)
+    </div>`
+  host.appendChild(dlg)
   lista = dlg.querySelector('.c-lista')
   input = dlg.querySelector('input')
   sugg = dlg.querySelector('.c-sugg')
@@ -95,37 +94,36 @@ function costruisci() {
   new ResizeObserver(frecce).observe(rapidiEl)
   disegnaRapidi()
   zaino.ascolta(disegnaRapidi)
-  dlg.querySelector('.c-chiudi').addEventListener('click', chiudi)
-  dlg.addEventListener('cancel', (e) => { e.preventDefault(); chiudi() })
-  dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
+  dlg.querySelector('.c-indietro').addEventListener('click', () => import('../telefono/telefono.js').then((t) => t.home()))
   dlg.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); invia() })
   input.addEventListener('input', suggerisci)
   input.addEventListener('keydown', tasti)
   input.addEventListener('blur', () => setTimeout(() => { sugg.hidden = true }, 150))
   sugg.addEventListener('mousedown', (e) => { const li = e.target.closest('li'); if (li) { e.preventDefault(); input.value = li.dataset.nome + ' '; sugg.hidden = true; input.focus() } })
   aggiornaSaldo()
+  return dlg
 }
 function aggiornaSaldo() {
   if (!saldoEl) return
   const e = pzk.euro()
   saldoEl.innerHTML = `<b>${pzk.fmt(pzk.saldo())} $pzk</b>${e >= 0.01 ? `<span class="eur">EUR€ ${pzk.fmtEur(e)}</span>` : ''}liv. ${zaino.livello()}`
 }
-export function apri(comando = null) {
-  costruisci()
-  if (!dlg.open) {
-    dlg.classList.remove('chiude')
-    dlg.showModal()
-    if (!salutato) { salutato = true; salutoIniziale(ctxDi([], '')) }
-  }
+/** L'app torna in primo piano: il saluto la prima volta, poi (se c'è) un comando da scrivere. */
+export function mostra(comando = null) {
+  if (!salutato) { salutato = true; salutoIniziale(ctxDi([], '')) }
+  aggiornaSaldo()
   if (typeof comando === 'string' && comando.trim()) { input.value = comando; invia() }
-  else requestAnimationFrame(() => input.focus()) // dopo che il dialog ha preso il fuoco
+  else if (matchMedia('(hover:hover)').matches) requestAnimationFrame(() => input.focus()) // sul telefono vero la tastiera non salta fuori da sola
+  vaiGiu()
 }
-export function chiudi() {
-  if (!dlg?.open) return
-  if (RIDOTTO.matches) return dlg.close()
-  dlg.classList.add('chiude')
-  dlg.addEventListener('animationend', () => { dlg.classList.remove('chiude'); dlg.close() }, { once: true })
+/** Apre il telefono: il cercapersone e l'evento «pzkko-chat» arrivano qui. Col clic si apre la home (lo schermo del
+ *  cercapersone si zooma fino al telefono); con un comando, o con #chat nell'indirizzo, si apre direttamente la chat. */
+export function apri(comando = null) {
+  const conComando = typeof comando === 'string' && comando.trim()
+  const app = conComando || location.hash === '#chat' ? 'chat' : null
+  return import('../telefono/telefono.js').then((t) => t.apri(app, { comando: conComando ? comando : null, da: tasto }))
 }
+export function chiudi() { return import('../telefono/telefono.js').then((t) => t.chiudi()) }
 
 // ── i messaggi ──
 const visteAlFondo = () => lista.scrollHeight - lista.scrollTop - lista.clientHeight < 60
@@ -192,23 +190,100 @@ function riempi(s, e) {
   s.innerHTML = cliccabili(`${e.t ? `<h4>${conIcone(e.t)}</h4>` : ''}${e.d ? `<p class="c-testo">${conIcone(e.d)}</p>` : ''}${e.html ? conIcone(e.html) : ''}${campi}` +
     `${e.img ? `<img class="c-img" src="${esc(e.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}${e.pie ? `<div class="c-pie">${conIcone(e.pie)}</div>` : ''}`) + azioni
 }
+// I messaggi del bot non spuntano di colpo (23.10): prima «sta scrivendo…» per 500 ms, poi il testo si scrive da solo, tutto,
+// in 1000 ms (qualunque sia la lunghezza). La scheda però esiste subito, nascosta (.in-attesa), perché i comandi la usano
+// appena creata (ci aggiungono i bottoni, la barra del tempo, la aggiornano): una CODA la mostra a turno, una alla volta,
+// nell'ordine in cui sono nate. `scheda.__pronta` è la promessa del momento in cui la scrittura è finita: i bottoni
+// (scegli) e il timer dei quiz partono solo allora. Con «riduci animazioni» il messaggio appare subito.
+export const RITARDO_MS = 500, SCRITTURA_MS = 1000
+let coda = Promise.resolve()
+const DA_NASCONDERE = 'img,button,svg,canvas,.c-barra,.c-tempo,.c-azioni,.c-campi,table,ul'
+
 export function scheda(e) {
   const m = document.createElement('div')
   m.className = 'c-msg'
   m.innerHTML = `<div class="c-av">${icona(e.av ?? 'bot')}</div><div class="c-scheda"></div><time class="c-ora">${ora()}</time>`
-  riempi(m.querySelector('.c-scheda'), e)
-  aggiungi(m)
+  const card = m.querySelector('.c-scheda')
+  riempi(card, e)
   m.querySelector('.c-img')?.addEventListener('load', () => scorri(), { once: true })
-  return m.querySelector('.c-scheda')
+  if (RIDOTTO.matches) { aggiungi(m); card.__pronta = Promise.resolve(); return card }
+  m.classList.add('in-attesa')
+  aggiungi(m)
+  card.__avatar = e.av ?? 'bot'
+  card.__pronta = coda = coda.then(() => mostraScrivendo(m, card)).catch((err) => console.warn('scrittura:', err))
+  return card
 }
+
+/** Il momento del messaggio: puntini per 500 ms, poi la scrittura. */
+async function mostraScrivendo(m, card) {
+  if (card.__fatto) return
+  led.inizia() // il bot «ragiona»: il led lavora finché il messaggio non è scritto
+  try { await scriviConPuntini(m, card) } finally { led.finisci() }
+}
+async function scriviConPuntini(m, card) {
+  const ind = document.createElement('div')
+  ind.className = 'c-msg'
+  ind.innerHTML = `<div class="c-av">${icona('bot-pensa')}</div><div class="c-scrive"><i></i><i></i><i></i></div>`
+  lista.insertBefore(ind, m)
+  scorri()
+  await new Promise((r) => { card.__salta = r; setTimeout(r, RITARDO_MS) })
+  ind.remove()
+  if (card.__fatto) return
+  m.classList.remove('in-attesa')
+  await scriviAMano(m, card)
+}
+
+/** Fa comparire il testo di una scheda un pezzetto alla volta, in SCRITTURA_MS in tutto; icone, tasti e barre quando arriva il loro turno. */
+function scriviAMano(m, card) {
+  return new Promise((risolvi) => {
+    const nodi = [], blocchi = []
+    let totale = 0
+    const giro = document.createTreeWalker(card, NodeFilter.SHOW_ALL)
+    for (let n = giro.nextNode(); n; n = giro.nextNode()) {
+      if (n.nodeType === 3) { if (n.nodeValue) { nodi.push({ n, s: n.nodeValue, da: totale }); totale += n.nodeValue.length } }
+      else if (n.nodeType === 1 && n.matches(DA_NASCONDERE) && !n.parentElement.closest(DA_NASCONDERE)) blocchi.push({ n, da: totale })
+    }
+    if (!totale) return risolvi()
+    for (const { n } of nodi) n.nodeValue = ''
+    for (const { n } of blocchi) n.classList.add('nasc')
+    const inizio = performance.now()
+    let finito = false
+    const fine = () => {
+      if (finito) return
+      finito = true
+      clearInterval(giroTimer)
+      for (const { n, s } of nodi) n.nodeValue = s
+      for (const { n } of blocchi) n.classList.remove('nasc')
+      card.__fatto = true
+      card.__finisci = null
+      scorri()
+      risolvi()
+    }
+    card.__finisci = fine
+    const passo = () => {
+      const k = Math.min(1, (performance.now() - inizio) / SCRITTURA_MS)
+      const fino = Math.round(totale * k)
+      for (const { n, s, da } of nodi) { const v = s.slice(0, Math.max(0, fino - da)); if (n.nodeValue !== v) n.nodeValue = v }
+      for (const { n, da } of blocchi) if (da < fino || k >= 1) n.classList.remove('nasc')
+      scorri()
+      if (k >= 1) fine()
+    }
+    const giroTimer = setInterval(passo, 30)
+    passo()
+  })
+}
+
 export function aggiorna(s, e) {
+  // un aggiornamento mentre la scheda si sta ancora scrivendo la completa di colpo (e salta la coda)
+  if (s.__finisci) s.__finisci()
+  if (!s.__fatto && s.__salta) { s.__fatto = true; s.__salta(); s.parentElement.classList.remove('in-attesa') }
   if (e.av) s.parentElement.firstElementChild.innerHTML = icona(e.av)
   riempi(s, e)
   s.parentElement.querySelector('.c-ora')?.replaceChildren(ora())
   scorri()
   return s
 }
-/** La barra del tempo in fondo alla scheda; → ferma() */
+/** La barra del tempo in fondo alla scheda (parte quando la scheda è scritta tutta); → ferma() */
 export function tempo(s, ms) {
   const b = document.createElement('div')
   b.className = 'c-tempo'
@@ -217,8 +292,9 @@ export function tempo(s, ms) {
   s.appendChild(b)
   return () => b.classList.add('ferma')
 }
-/** I pulsanti sotto la scheda: → Promise dell'id premuto, o null allo scadere. { griglia: 'g5'|'g3', resta: true tiene i pulsanti attivi (li gestisce chi chiama) } */
-export function scegli(s, bottoni, ms = 0, { griglia = null, onPremuto = null } = {}) {
+/** I pulsanti sotto la scheda (compaiono a scrittura finita): → Promise dell'id premuto, o null allo scadere. { griglia: 'g5'|'g3', resta: true tiene i pulsanti attivi (li gestisce chi chiama) } */
+export async function scegli(s, bottoni, ms = 0, { griglia = null, onPremuto = null } = {}) {
+  await s.__pronta
   const riga = document.createElement('div')
   riga.className = griglia ? `c-griglia ${griglia}` : 'c-bottoni'
   for (const b of bottoni) {
@@ -263,6 +339,7 @@ export function scrivi(ms = 0, { segnaposto = 'scrivi qui…' } = {}) {
 export const dormi = (ms) => new Promise((r) => setTimeout(r, RIDOTTO.matches ? Math.min(ms, 150) : ms))
 /** Il bot «scrive…» per un po'. */
 export async function pensa(ms = 700) {
+  led.colpo(ms)
   const m = document.createElement('div')
   m.className = 'c-msg'
   m.innerHTML = `<div class="c-av">${icona('bot-pensa')}</div><div class="c-scrive"><i></i><i></i><i></i></div>`
@@ -363,6 +440,7 @@ export async function esegui(riga, { muto = false } = {}) {
   if (!nome) return
   if (!muto) utente(riga.replace(/^\/+/, ''), { rifai: true })
   const c = PER_NOME.get(nome)
+  led.colpo(160)
   if (!c) {
     // non è un comando, ma magari è una cosa del negozio o dello zaino: si propone cosa farne
     const x = NEGOZIO_OGGETTI.find((o) => o.id === nome || o.nome.toLowerCase() === nome)

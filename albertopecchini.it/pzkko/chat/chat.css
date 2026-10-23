@@ -4,14 +4,8 @@
    comando, coi suggerimenti. Il testo e i numeri sono in Fake Receipt (fonts/, CC0), il carattere a matrice di punti
    degli scontrini; i titoli in Anton, quello che scrivi tu in Permanent Marker. Le icone sono le nostre (art/chat-*, chat/icone.js), mai emoji di sistema. */
 
-.chat{position:fixed;inset:0;margin:auto;width:min(94vw,680px);height:min(86dvh,760px);max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;
-  color:#dfe6d6;font:400 16px/1.4 "Fake Receipt","Courier New",monospace;--led:#46ff7d;--ambra:#ffb02e;--rosso:#ff5b4a;--blu:#5fb5ff;--lcd:#9fb48a;--vetro:#0b100c;--plastica:#1d201c;
+.chat{color:#dfe6d6;font:400 16px/1.4 "Fake Receipt","Courier New",monospace;--led:#46ff7d;--ambra:#ffb02e;--rosso:#ff5b4a;--blu:#5fb5ff;--lcd:#9fb48a;--vetro:#0b100c;--plastica:#1d201c;
   --mono:"Fake Receipt",ui-monospace,Consolas,monospace;--fa:"Anton",Impact,sans-serif;--marker:"Permanent Marker","Comic Sans MS",cursive}
-.chat::backdrop{background:rgba(12,10,8,.55);backdrop-filter:blur(2px)}
-.chat[open]{animation:c-apre .3s cubic-bezier(.22,1,.36,1)}
-.chat.chiude{animation:c-chiude .18s ease-in forwards}
-@keyframes c-apre{from{opacity:0;transform:translateY(14px) scale(.97)}}
-@keyframes c-chiude{to{opacity:0;transform:translateY(8px) scale(.98)}}
 .chat *{box-sizing:border-box}
 .chat button{font:inherit}
 .chat input{font:inherit;color:inherit}
@@ -26,14 +20,6 @@
 .chat .emo{display:inline-block;height:1.35em;width:auto;vertical-align:-.3em;margin:0 .08em;image-rendering:auto}
 .chat .emo.grande{height:3.2em;vertical-align:middle}
 .chat .emo.manca{width:1.35em;border-radius:50%;background:#333;color:#999;text-align:center;line-height:1.35em;font-size:.8em}
-
-/* ── il palmare ── */
-.c-corpo{position:relative;display:flex;flex-direction:column;width:100%;height:100%;border-radius:22px;padding:14px 14px 12px;
-  background:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.07),transparent 50%),linear-gradient(170deg,#2a2d28,#1a1c19 60%,#121410);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 0 0 5px rgba(0,0,0,.35),0 8px 10px rgba(0,0,0,.5),0 30px 40px rgba(0,0,0,.5)}
-.c-corpo::before{content:"";position:absolute;left:50%;top:5px;width:48px;height:4px;margin-left:-24px;border-radius:2px;background:#0a0a0a;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-.c-chiudi{position:absolute;right:-10px;top:-10px;z-index:2;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:#161616;color:#fff;font:400 22px/1 var(--fa);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.5)}
-@media (hover:hover){.c-chiudi:hover{transform:scale(1.08)}}
 
 /* lo schermo: vetro scuro, fosfori verdi, righe di scansione */
 .c-schermo{position:relative;flex:1;display:flex;flex-direction:column;min-height:0;border-radius:10px;background:var(--vetro);box-shadow:inset 0 0 18px rgba(0,0,0,.95),0 0 0 2px #090a08,0 0 0 3px rgba(255,255,255,.05);overflow:hidden}
@@ -244,20 +230,14 @@ tr.cliccabile,li.cliccabile{cursor:pointer}
 @media (hover:hover){tr.cliccabile:hover td,li.cliccabile:hover{background:rgba(70,255,125,.1)}}
 .c-az.spento{opacity:.5;background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:#9aa795}
 
+/* il messaggio nasce nascosto e si scrive da solo (chat.js: scheda, scriviAMano) */
+.c-msg.in-attesa{display:none}
+.nasc{display:none!important}
+
 /* il bot scrive… */
 .c-scrive{display:inline-flex;gap:3px;padding:8px 10px}
 .c-scrive i{width:6px;height:6px;border-radius:50%;background:var(--led);opacity:.4;animation:c-scrive 1s infinite}
 .c-scrive i:nth-child(2){animation-delay:.2s}.c-scrive i:nth-child(3){animation-delay:.4s}
 @keyframes c-scrive{30%{opacity:1;transform:translateY(-3px)}}
 
-/* il telefono: tutto schermo */
-@media (max-width:899px){
-  .chat{width:100vw;height:100dvh;max-height:100dvh}
-  .c-corpo{border-radius:0;padding:max(8px,env(safe-area-inset-top)) 6px max(6px,env(safe-area-inset-bottom))}
-  .c-corpo::before{display:none}
-  .c-chiudi{right:8px;top:calc(max(8px,env(safe-area-inset-top)) + 6px)}
-  .c-testa{padding-right:52px}
-  .c-testa .c-saldo{display:none}
-  .c-riga input{font-size:16px}
-}
-@media (prefers-reduced-motion:reduce){.chat[open],.chat.chiude,.c-msg,.c-rulli.gira div .emo{animation:none}}
+@media (prefers-reduced-motion:reduce){.c-msg,.c-rulli.gira div .emo{animation:none}}

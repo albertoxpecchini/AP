@@ -26,6 +26,8 @@ export const FOGLI_CHAT = {
   'chat-roba': ['eastpak', 'ciao-px', 'landini', 'stampante', 'iphone-duo', 'stufa', 'bonsai', 'penne-bic', 'tucson', 'manuale-landini'],
   // …e le cose di pzk (la spazzatura del brand, la porta, il neon, il wallet)
   'chat-pzk': ['luckypzkko', 'gomma', 'tombino', 'lucchettone', 'citofono', 'pzkkonet', 'portachiavi', 'petizione', 'neon', 'portafoglio', 'pager', 'peluche'],
+  // le app del cercapersone grande (telefono/): piastrelle adesivo intere, e i tre tasti della barra del cellulare
+  'chat-app': ['app-chat', 'app-shop', 'app-sfide', 'app-quiz', 'app-quest', 'app-giocatori', 'app-zaino', 'app-foto', 'app-banca', 'app-home', 'app-indietro', 'app-chiudi'],
   // i mestieri
   'chat-mestieri': ['rider', 'cameriere', 'barista', 'bidello', 'salumiere', 'tatuatore', 'streamer', 'sviluppatore', 'prof', 'influencer', 'avvocato', 'sindaco'],
 }

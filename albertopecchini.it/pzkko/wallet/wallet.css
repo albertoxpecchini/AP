@@ -4,10 +4,13 @@
    accende la pagina (tele e testo, posizionati in percentuale sulla foto: le misure in wallet.js). Sotto il portafoglio
    esce la «carta» coi moduli (entra, converti, invia, altro), come una tessera che si sfila dalla tasca. */
 
-.wallet{position:fixed;inset:0;margin:auto;width:min(94vw,760px);max-width:none;max-height:none;height:auto;padding:0;border:0;background:none;overflow:visible;
+/* il dialog prende tutta la finestra: il portafoglio sta nel mezzo, grande quanto entra (per leggere bene gli schermi), e
+   quando la carta dei moduli è fuori si scorre per vederla; un clic fuori dal portafoglio lo chiude */
+.wallet{position:fixed;inset:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;padding:2dvh 0;border:0;background:none;overflow:hidden auto;overscroll-behavior:contain;scrollbar-width:none;
   color:#e9e4d8;font:400 14px/1.35 "Fake Receipt",monospace;--led:#46ff7d;--ambra:#ffb02e;--lcd:#9fb48a;--mono:"Fake Receipt",monospace;--fa:"Fake Receipt",monospace;--marker:"Fake Receipt",monospace}
 .wallet::backdrop{background:rgba(12,10,8,.55);backdrop-filter:blur(2px)}
-.wallet[open]{animation:w-apre .34s cubic-bezier(.22,1,.36,1)}
+.wallet[open]{display:flex;flex-direction:column;align-items:center;animation:w-apre .34s cubic-bezier(.22,1,.36,1)}
+.wallet::-webkit-scrollbar{display:none}
 .wallet.chiude{animation:w-chiude .2s ease-in forwards}
 @keyframes w-apre{from{opacity:0;transform:translateY(-16px) rotate(-1deg) scale(.97)}}
 @keyframes w-chiude{to{opacity:0;transform:translateY(-8px) scale(.98)}}
@@ -16,11 +19,10 @@
 .wallet :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
 
 /* ── il portafoglio ── */
-.w-corpo{position:relative;width:100%;aspect-ratio:1214/559;container-type:inline-size;background:url(/art/wallet/portafoglio.webp) center/100% 100% no-repeat;
+.w-corpo{position:relative;flex:none;width:min(96vw,1600px,calc(86dvh*1214/559));margin:auto 0;aspect-ratio:1214/559;container-type:inline-size;background:url(/art/wallet/portafoglio.webp) center/100% 100% no-repeat;
   filter:drop-shadow(0 6px 8px rgba(0,0,0,.45)) drop-shadow(0 28px 36px rgba(0,0,0,.45))}
 .w-corpo>*{position:absolute}
-.w-chiudi{right:-1.2%;top:-7%;width:5.2cqw;height:5.2cqw;padding:0;border:0;border-radius:50%;background:#161616;color:#fff;font:400 3.6cqw/1 var(--fa);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.5)}
-@media (hover:hover){.w-chiudi:hover{transform:scale(1.08)}}
+.w-corpo:focus{outline:none}
 
 /* gli schermi: vetro scuro, un riflesso in diagonale, la luce dentro */
 .w-schermo{overflow:hidden;border-radius:.6cqw;background:#050806;box-shadow:inset 0 0 1.2cqw rgba(0,0,0,.9)}
@@ -61,7 +63,12 @@
 @media (hover:hover){.w-tasto:hover{box-shadow:0 0 1cqw .2cqw rgba(255,212,0,.35)}}
 /* la manopola: gira per cambiare il periodo del grafico (la tacca è l'unica cosa disegnata) */
 .w-manopola{width:4.9%;aspect-ratio:1;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transform:translate(-50%,-50%)}
-.w-manopola i{position:absolute;left:50%;top:50%;width:.45cqw;height:1.6cqw;margin-left:-.225cqw;background:#ffd400;border-radius:.2cqw;transform-origin:50% 0;transform:rotate(var(--giro,0deg)) translateY(-1.95cqw);box-shadow:0 0 .5cqw rgba(255,212,0,.8);transition:transform .25s cubic-bezier(.2,1.4,.4,1)}
+/* il pomello gira davvero: è il pezzo di foto del pomello (centro 84,27 % / 69,50 %, largo 4,7 % della foto), ritagliato
+   tondo e ruotato intero con la sua zigrinatura; la tacca gialla è stampata sul bordo. L'ombra sotto resta nella foto, ferma */
+.w-manopola i{position:absolute;left:50%;top:50%;width:4.6cqw;height:4.6cqw;margin:-2.3cqw 0 0 -2.3cqw;border-radius:50%;
+  background:url(/art/wallet/portafoglio.webp) no-repeat;background-size:100cqw calc(100cqw * 559 / 1214);background-position:calc(-84.267cqw + 2.3cqw) calc(-69.499cqw * 559 / 1214 + 2.3cqw);
+  transform:rotate(var(--giro,0deg));transition:transform .32s cubic-bezier(.2,1.3,.4,1)}
+.w-manopola i::after{content:"";position:absolute;left:50%;top:6%;width:.4cqw;height:1.25cqw;margin-left:-.2cqw;border-radius:.2cqw;background:#ffd400;box-shadow:0 0 .45cqw rgba(255,212,0,.75),inset 0 -.1cqw 0 rgba(0,0,0,.25)}
 .w-manopola::after{content:attr(data-eti);position:absolute;left:50%;top:97.5%;transform:translateX(-50%);font:400 .98cqw/1 var(--mono);letter-spacing:0;text-transform:uppercase;color:#0e1012;text-shadow:0 .1cqw 0 rgba(255,255,255,.5);white-space:nowrap}
 
 /* il cavo usb-c (art/wallet-cavo/, una foto di gpt-image-2 come il portafoglio): la porta guarda verso chi guarda, quindi
@@ -81,9 +88,13 @@
 .w-voce.male{background:#8a1a1a}
 
 /* ── la carta che si sfila dalla tasca: i moduli ── */
-.w-carta{position:relative;z-index:-1;width:min(100%,560px);margin:-3.2% auto 0;padding:34px 24px 20px;border-radius:12px;color:#161616;
+.w-carta{position:relative;z-index:-1;flex:none;width:min(92vw,640px);margin:-1.6% auto 0;padding:34px 24px 20px;border-radius:12px;color:#161616;
   background:linear-gradient(160deg,#f6f1e4,#e9e1cf 60%,#ddd3bd);box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 0 0 1px rgba(0,0,0,.08);transform:translateY(-40px);opacity:0;visibility:hidden;transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .25s,visibility 0s .32s}
 .w-carta.si{transform:none;opacity:1;visibility:visible;transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .25s}
+/* chiusa, la carta non occupa posto: così il portafoglio è davvero nel mezzo; aperta, sta sotto e il portafoglio sale */
+.w-carta:not(.si){position:absolute;left:50%;top:0;translate:-50% 0}
+.w-carta.si{margin-bottom:auto}
+.wallet:has(.w-carta.si) .w-corpo{margin-bottom:0}
 .w-carta::before{content:"";position:absolute;left:24px;right:24px;top:14px;height:3px;background:repeating-linear-gradient(90deg,#1446a0 0 10px,transparent 10px 16px);opacity:.5}
 .w-carta h3{margin:0 0 10px;font:400 26px/1 var(--fa);letter-spacing:.01em}
 .w-carta h3 small{font:400 13px/1 var(--marker);color:#a50d25;margin-left:10px;vertical-align:middle}
@@ -133,9 +144,8 @@
 
 /* ── il telefono: il portafoglio a tutta larghezza, la carta sotto con le scritte normali ── */
 @media (max-width:899px){
-  .wallet{width:100vw;max-height:100dvh;overflow:auto;padding:max(10px,env(safe-area-inset-top)) 0 20px;scrollbar-width:none}
-  .w-corpo{width:96vw;margin:0 auto}
-  .w-chiudi{top:-3%;right:0;width:9cqw;height:9cqw;font-size:6cqw}
+  .wallet{padding:max(10px,env(safe-area-inset-top)) 0 20px}
+  .w-corpo{width:96vw}
   .w-carta{width:92vw;padding:30px 16px 16px}
   .w-voce{font-size:1.8cqw}
 }

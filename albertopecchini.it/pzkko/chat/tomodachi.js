@@ -48,7 +48,7 @@ const festa = ({ g, m }) => (g === 18 && m === 10 ? 'festa' : g === 31 && m === 
 
 /** Il cervello: guarda tutto e sceglie lo stato (con la sua durata). */
 function decidi() {
-  const t = Date.now(), ora = oraMantova(), chatAperta = !!document.querySelector('.chat[open]')
+  const t = Date.now(), ora = oraMantova(), chatAperta = !!document.querySelector('.tel[open]') // il telefono aperto: parla con te
   const saldo = pzk.saldo()
   // gli eventi: cambi di saldo e morti
   if (saldoPrima !== null && saldo !== saldoPrima) {
