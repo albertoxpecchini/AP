@@ -114,8 +114,11 @@ serio ma è un progetto Vercel a parte.
   `firme.js` (le firme dal server e come si disegnano a mano, per il muro, la scena 3D e
   il foglio da vicino), `petizione.js` e `petizione.css` (il foglio che si avvicina, le
   penne, la scrittura).
-- `regia/` — la regia, il pannello per provare e regolare il sito, che si apre col
-  tasto giallo in alto a destra (vedi sotto): `regia.js` e `regia.css`.
+- `regia/` — la regia, il pannello per provare e regolare il sito, che si apre scrivendo
+  «regia», con `#regia` o con cinque tocchi in cima allo schermo (vedi sotto): `regia.js` e
+  `regia.css`.
+- `benvenuto/` — lo scontrino delle novità (23.10, versione 3.0 «lumaca catodica»): una
+  volta per versione entrando nella home, con «come si accende il 3D»; `?novita` lo rifà vedere.
 - `suono/` — i suoni della strada, tutti sintetizzati dal vivo (vedi «Il suono»,
   sotto): `suono.js` (chi ascolta, cosa suona quando e da dove) e `voci.js` (gli
   strumenti).
@@ -1461,16 +1464,14 @@ volantino si precarica).
 
 ## La regia (regia/)
 
-Il pannello per provare e regolare il sito senza aspettare la sera o un'auto. Dal
-21.10 si apre col **tasto giallo in alto a destra** (`.rotella` in `index.html`: un
-pulsante giallo vero con la rotella stampata sul cappuccio, disegnato da gpt-image-2
-come il resto del muro, `art/tasto/tasto.webp` e `tasto-giu.webp`, foglio «tasto» in
-`tools/pzkko/fogli.js`; sempre visibile, sopra il caricamento e la regia, sotto solo i
-giochi, che sono modali; si abbassa quando lo si preme e resta giù finché la regia è
-aperta; di nuovo per chiuderla), e ancora **scrivendo «regia»** sulla tastiera, con
-`#regia` nell'indirizzo o **toccando cinque volte in fretta** la striscia in cima allo
-schermo. Il codice si scarica solo allora (col puntatore sopra il tasto, già un attimo
-prima). È un foglio col nastro come le finestre dei giochi, di lato sotto il tasto (sul
+Il pannello per provare e regolare il sito senza aspettare la sera o un'auto. Si apre
+**scrivendo «regia»** sulla tastiera, con `#regia` nell'indirizzo o **toccando cinque
+volte in fretta** la striscia in cima allo schermo (sul telefono). Dal 21.10 al 23.10 c'era
+anche il tasto giallo in alto a destra (la rotella, `art/tasto/`, foglio «tasto» in
+`tools/pzkko/fogli.js`): il 23.10 Alberto l'ha tolto («togli tasto regia»), e da allora lo
+dice lo scontrino delle novità (`benvenuto/`), con «come si accende il 3D» e il tasto «apri
+la regia adesso», che la apre sulla scheda «grafica» (in cima c'è «come parte»). Il codice
+si scarica solo quando si apre. È un foglio col nastro come le finestre dei giochi, di lato in alto a destra (sul
 telefono dal basso, «abbassa» lo riduce alla testata) e senza velo scuro: la scena
 cambia dietro mentre si regola. **A schede**, una pagina alla volta (frecce per
 passare dall'una all'altra; l'ultima aperta resta nel browser):

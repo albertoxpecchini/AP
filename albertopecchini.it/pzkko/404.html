@@ -340,21 +340,6 @@ img{display:block;max-width:100%;height:auto}
 @keyframes onde{50%{opacity:.35}}
 @media (prefers-reduced-motion:reduce){.suono,.suono:hover{transition:none}.suono.va .s-onde{animation:none}}
 
-/* ── il tasto della regia: un pulsante giallo vero con la rotella sul cappuccio (art/tasto/, disegnato da gpt-image-2
-   come il resto del muro, su e premuto), sempre in alto a destra, sopra il caricamento e la regia (sotto solo i giochi,
-   che sono modali). Si abbassa quando lo si preme e resta giù finché la regia è aperta. Senza script non c'è ── */
-.rotella{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));width:62px;height:62px;padding:0;border:0;border-radius:50%;
-  background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));
-  transition:transform .18s cubic-bezier(.2,1.4,.4,1)}
-html:not(.js) .rotella{display:none}
-.rotella img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
-.rotella .giu,.rotella:active .su,.rotella[aria-expanded="true"] .su{visibility:hidden}
-.rotella:active .giu,.rotella[aria-expanded="true"] .giu{visibility:visible}
-@media (hover:hover){.rotella:hover{transform:scale(1.05)}}
-.rotella:active{transform:scale(.95)}
-.rotella:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.rotella{width:54px;height:54px}}
-@media (prefers-reduced-motion:reduce){.rotella{transition:none}}
 
 /* ── il tasto del wallet (22.10 notte; dal 23.10 sera un banner), sempre in alto a sinistra e alto come prima: una
    striscia di pelle cucita con la piastra d'acciaio e un pannello a led che dice sempre i $pzk; col cursore sopra ci
@@ -463,8 +448,6 @@ html:not(.js) .chat-tasto{display:none}
 </div>
 <!-- i suoni della strada (suono/): partono al primo tocco o tasto; questo li spegne e li riaccende -->
 <button class="suono" type="button" aria-pressed="true" aria-label="i suoni della strada" title="i suoni della strada" hidden><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4.5 12.4h6.2l8-6.6.3 20.6-8.1-6.8H4.8z"/><path class="s-onde" d="M24.2 10.6c2.6 3 2.8 7.6.2 10.9M28.6 6.8c4.6 4.9 4.8 13.3.3 18.6"/><path class="s-muto" d="M24.5 11.2l8.6 9.4M33 11.4l-8.4 9"/></svg><span>suono</span></button>
-<!-- il tasto giallo della regia, sempre in alto a destra: la grafica, l'ora, il meteo, la strada, i suoni -->
-<button class="rotella" type="button" aria-label="regia: grafica, ora, meteo, strada e suoni" title="regia" aria-expanded="false"><img class="su" src="/art/tasto/tasto.webp" alt="" width="247" height="250"><img class="giu" src="/art/tasto/tasto-giu.webp" alt="" width="247" height="250" loading="lazy"></button>
 <!-- il wallet dei $pzk (wallet/), sempre in alto a sinistra: il banner di pelle col pannello a led dei $pzk (col cursore sopra scorrono i dati) -->
 <button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" hidden><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas></button>
 <!-- la chat col bot dei $pzk (chat/), sotto il wallet: il cercapersone con lo schermo lcd -->
@@ -877,9 +860,10 @@ html:not(.js) .chat-tasto{display:none}
 
   // ── La regia ─────────────────────────────────────────────────────────────
   // Il pannello per provare e regolare il sito: la grafica della scena 3D, l'ora di Mantova e la sua velocità, la sera,
-  // il meteo, le auto, le bestie, l'acqua, i suoni (regia/). Si apre col tasto giallo in alto a destra (.rotella), e
-  // ancora scrivendo «regia» sulla tastiera, con #regia nell'indirizzo o toccando cinque volte in fretta la striscia in
-  // cima allo schermo. Il codice si scarica solo allora (col puntatore sopra il tasto, già un attimo prima).
+  // il meteo, le auto, le bestie, l'acqua, i suoni (regia/). Dal 23.10 non c'è più il tasto giallo (Alberto: «togli tasto
+  // regia»): si apre scrivendo «regia» sulla tastiera, con #regia nell'indirizzo o toccando cinque volte in fretta la
+  // striscia in cima allo schermo (sul telefono); lo scontrino delle novità (benvenuto/) lo dice. Il codice si scarica
+  // solo allora.
   window.pzkkoPagina = {
     orologio, forza, regola, sole, luci, aggiorna: () => aggiorna(),
     passaAuto: () => { regola.subito = true; aggiorna() },
@@ -910,22 +894,10 @@ html:not(.js) .chat-tasto{display:none}
   })
   let tocchi = []
   addEventListener('pointerdown', (e) => {
-    if (e.clientY > 70 || e.target.closest?.('.rotella')) return
+    if (e.clientY > 70) return
     tocchi = [...tocchi.filter((t) => e.timeStamp - t < 2500), e.timeStamp]
     if (tocchi.length >= 5) { tocchi = []; apriRegia() }
   }, { passive: true })
-  const rotella = document.querySelector('.rotella')
-  if (rotella) {
-    rotella.addEventListener('click', apriRegia)
-    const prepara = () => {
-      for (const [rel, href, as] of [['modulepreload', '/regia/regia.js'], ['preload', '/regia/regia.css', 'style']]) {
-        if (document.querySelector(`link[href="${href}"]`)) continue
-        const l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l)
-      }
-    }
-    rotella.addEventListener('pointerenter', prepara, { once: true })
-    rotella.addEventListener('focus', prepara, { once: true })
-  }
   if (nel === 'regia') apriRegia()
 
   // ── Il wallet dei $pzk (wallet/): il tasto in alto a sinistra, il portafoglio che si apre, i conti (api/wallet.mjs) e

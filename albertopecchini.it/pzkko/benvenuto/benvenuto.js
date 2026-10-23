@@ -6,15 +6,17 @@
 // (navigator.webdriver), se non con ?novita, che lo fa vedere sempre (anche a chi l'ha già letto).
 //
 // Per una versione nuova: VERSIONE, NOME e le righe di NOVITA (e di C_E_ANCHE, se il sito ha cose nuove per sempre).
+// Dalla 3.0.1 (23.10) c'è anche «come si accende il 3D»: il tasto giallo della regia non c'è più, quindi lo scontrino
+// dice come aprirla, e il suo tasto «apri la regia adesso» la apre sulla scheda «grafica» (in cima c'è «come parte»).
 
-export const VERSIONE = '3.0'
+export const VERSIONE = '3.0.1'
 export const NOME = 'lumaca catodica'
 const CHIAVE = 'pzkko-novita' // l'ultima versione di cui si è letto lo scontrino
 
 // [cosa, prezzo]: le novità di questa versione
 const NOVITA = [
   ['il muro parte in 2D, sempre di giorno e col sole, sul telefono e sul computer', 'nuovo'],
-  ['la strada in 3D, la notte e il meteo veri: li accendi tu in regia (il tasto giallo)', 'nuovo'],
+  ['la strada in 3D, la notte e il meteo veri: li accendi tu in regia (come, qui sotto)', 'nuovo'],
   ['più leggero: 5,5 MB invece di 17, e da fermo il muro lavora 6 volte meno', 'nuovo'],
   ['il cercapersone: il tomodachi ti aspetta, premi ACCEDI e carica', 'nuovo'],
   ['CHIUDI, il tasto rosso: lo schermo si spegne come un vecchio tubo', 'nuovo'],
@@ -36,10 +38,17 @@ const C_E_ANCHE = [
   ['le banconote per terra, il sussidio, il regalo di Instagram', 'incluso'],
   ['il cercapersone: chat col bot, shop, sfide, quiz, quest, giocatori, zaino, foto', 'incluso'],
   ['la petizione: «pzkko.it è un bel sito?», con la penna', 'incluso'],
-  ['la regia: grafica, ora, meteo, strada, suoni', 'incluso'],
+  ['la regia (scrivi «regia»): grafica, ora, meteo, strada, suoni', 'incluso'],
   ['i suoni della strada, sintetizzati dal vivo', 'incluso'],
   ['la strada in 3D (se la accendi): il negozio, le auto, le bestie, la pioggia', 'incluso'],
   ['la storia vera della saracinesca, e lo strumento per le lezioni', 'incluso'],
+]
+// come si accende il 3D: i passi, uno per riga
+const COME_3D = [
+  'apri la regia: sul computer scrivi «regia» con la tastiera; sul telefono tocca cinque volte in fretta in cima allo schermo (o apri pzkko.it/#regia)',
+  'nella scheda «grafica», in cima: «come parte»',
+  '3D: «acceso». la pagina si ricarica e parte la strada; resta accesa anche le volte dopo, finché non la spegni',
+  'lì accanto, se vuoi, anche l’ora vera (con la notte) e il meteo vero',
 ]
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
@@ -78,6 +87,10 @@ export async function apri() {
     <hr>
     <h3>novità</h3>${righe(NOVITA)}
     <hr>
+    <h3>come si accende il 3D</h3>
+    <ol class="bv-passi">${COME_3D.map((p) => `<li>${esc(p)}</li>`).join('')}</ol>
+    <button class="bv-regia" type="button">apri la regia adesso</button>
+    <hr>
     <h3>c’è anche</h3>${righe(C_E_ANCHE)}
     <hr>
     <div class="bv-tot"><span>totale</span><b>0,00 $pzk</b></div>
@@ -86,10 +99,12 @@ export async function apri() {
     <p class="bv-pie">grazie e arrivederci<br>conservare lo scontrino</p>
   </article>`
   document.body.appendChild(d)
-  // il tasto giallo della regia sta sempre sopra a tutto, in alto a destra: lo scontrino comincia sotto di lui (sul
-  // telefono, dove lo scontrino è largo quasi tutta la finestra, se no gli coprirebbe l'angolo)
-  const tasto = document.querySelector('.rotella')?.getBoundingClientRect()
-  if (tasto?.height) d.style.setProperty('--sopra', `${Math.max(48, Math.ceil(tasto.bottom + 12))}px`)
+  // «apri la regia adesso»: lo scontrino si chiude e la regia si apre sulla scheda «grafica», dove c'è «come parte»
+  d.querySelector('.bv-regia').addEventListener('click', () => {
+    try { localStorage.setItem('pzkko-regia-scheda', 'grafica') } catch {}
+    d.close()
+    import('/regia/regia.js').then((m) => m.apri()).catch((e) => console.warn('regia non aperta', e))
+  })
   // fuori dallo scontrino (il dialog è grande quanto la finestra, lo scontrino sta nel mezzo) si chiude; Esc pure
   d.addEventListener('click', (e) => { if (e.target === d) d.close() })
   d.addEventListener('close', () => { segna(); d.remove() }, { once: true })

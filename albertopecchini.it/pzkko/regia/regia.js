@@ -21,8 +21,9 @@
 // aperta portava la scena di sera a 67 fps su una 3060 Ti. Ora caselle e cursori sono HTML, e si tocca solo quello che
 // cambia.
 //
-// index.html la apre col tasto giallo in alto a destra (.rotella), scrivendo «regia», con #regia nell'indirizzo o con
-// cinque tocchi in fretta in cima allo schermo: import('/regia/regia.js').then((m) => m.apri()).
+// index.html la apre scrivendo «regia», con #regia nell'indirizzo o con cinque tocchi in fretta in cima allo schermo
+// (dal 23.10 il tasto giallo in alto a destra non c'è più); lo scontrino delle novità (benvenuto/) ha «apri la regia
+// adesso»: import('/regia/regia.js').then((m) => m.apri()).
 // Quello che comanda: window.pzkkoPagina (l'orologio, la sera, le auto, in index.html), window.pzkkoRegia (i ritocchi
 // che la scena legge a ogni fotogramma, scena/materiali.js) e window.pzkkoScena (la grafica, le bestie, la goccia, il
 // meteo, il portachiavi, i numeri in fondo).

@@ -4,7 +4,10 @@
    Dal 21.10 niente filtri né fusioni sul contenuto: la carta sta su un livello suo (will-change), che non si ridisegna
    quando cambia un numero, e tutto il resto è inchiostro piatto. */
 
-.rg{position:fixed;inset:calc(max(12px,env(safe-area-inset-top)) + 74px) 20px auto auto;z-index:80;margin:0;width:460px;height:calc(100vh - 108px - max(12px,env(safe-area-inset-top)));max-height:860px;max-width:none;padding:0;border:0;background:none;overflow:visible;color:#161616;
+/* in alto a destra: fino al 23.10 stava sotto il tasto giallo (74 px più giù); ora il tasto non c'è e sale a 60 px dal bordo,
+   quanto basta perché il nastro in cima (.rg-n1, .rg-n2: ruotato, sporge 51 px sopra il foglio) resti tutto dentro la
+   finestra: a 60 px comincia a 9 px dal bordo (misurato) */
+.rg{position:fixed;inset:max(60px,calc(env(safe-area-inset-top) + 52px)) 20px auto auto;z-index:80;margin:0;width:460px;height:calc(100vh - 80px - max(0px,env(safe-area-inset-top)));max-height:860px;max-width:none;padding:0;border:0;background:none;overflow:visible;color:#161616;
   font:400 13px/1.3 "Special Elite","Courier New",monospace;--rosso:#b3121f;--nero:#161616;--blu:#1446a0;--evid:rgba(255,212,0,.62);--marker:"Permanent Marker","Comic Sans MS",cursive;--fa:"Anton",Impact,sans-serif}
 .rg[open]{display:block;animation:rg-attacca .3s cubic-bezier(.22,1,.36,1)}
 .rg.chiude{animation:rg-stacca .2s ease-in forwards}
