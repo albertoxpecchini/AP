@@ -31,8 +31,11 @@
 @media (hover:hover){.t-tasto:hover{background:radial-gradient(circle,rgba(255,255,255,.1),transparent 70%)}}
 .t-tasto:active{transform:scale(.94);background:radial-gradient(circle,rgba(0,0,0,.35),rgba(0,0,0,.15) 60%,transparent 72%)}
 /* le scritte sotto i tasti: bianche, stampate sulla plastica come la serigrafia dei cercapersone veri, grandi in
-   proporzione al cercapersone (cqw: la larghezza di .t-corpo) e staccate dai graffi da un'ombra scura */
-.t-tasto::after{position:absolute;left:50%;top:106%;translate:-50% 0;font:400 clamp(12px,1.25cqw,18px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#f3f1ea;white-space:nowrap;
+   proporzione al cercapersone (cqw: la larghezza di .t-corpo) e staccate dai graffi da un'ombra scura. Il posto è misurato
+   sulla foto: sotto il tasto di sopra la plastica libera va da 430 a 469 px (su 774: l'anello scuro e il bordino lucido
+   finiscono a 428, l'anello del tasto di sotto comincia a 470), il centro è a 449,5; per il tasto di sotto alla stessa
+   distanza, 634. Tutte e due cadono al 130 % dell'altezza del tasto, centrate: mai sul tasto né sul suo bordo */
+.t-tasto::after{position:absolute;left:50%;top:130%;translate:-50% -50%;font:400 clamp(12px,1.25cqw,18px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#f3f1ea;white-space:nowrap;
   text-shadow:0 1px 0 #000,0 0 2px #000,0 0 6px rgba(0,0,0,.9)}
 .t-tasto.su::after{content:"home"}.t-tasto.giu::after{content:"indietro"}
 
