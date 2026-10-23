@@ -79,6 +79,12 @@ export function aggiornaGiocatore(db, c, z, now) {
   db.g[c.id] = nuova
 }
 
+/** Una notizia che non viene dalla riga del giocatore (la lumachina: le catastrofi e i miracoli, api/wallet.mjs). */
+export function notizia(db, c, tipo, dato, now) {
+  db.notizie.push({ t: now, ind: c.ind, nome: c.nome, tipo, dato })
+  if (db.notizie.length > MAX_NOTIZIE) db.notizie.splice(0, db.notizie.length - MAX_NOTIZIE)
+}
+
 /** Il titolo che uno si è guadagnato: quello che fa di più. */
 export function titoloDi(r) {
   const s = r.s

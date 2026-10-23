@@ -60,6 +60,10 @@ export function testoNotizia(n) {
     case 'quiz': return { icona: 'quiz', html: `${chi} ha azzeccato <b>${D}</b> domande di fila ai quiz` }
     case 'serie': return { icona: 'fuoco', html: `${chi} è a <b>${D}</b> giorni di fila` }
     case 'nuovo': return { icona: 'bot-ride', html: `${chi} è arrivato in banca` }
+    case 'lumaca': { // le catastrofi e i miracoli della lumachina (api/wallet.mjs): { ev, pct, titolo }
+      const p = Number(D?.pct) || 0, titolo = String(D?.titolo ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+      return { icona: p < 0 ? 'bot-triste' : 'bot-ricco', html: `la lumachina di ${chi}: <b>${titolo}</b> (${p < 0 ? '−' : '+'}${Math.abs(p).toLocaleString('it-IT', { maximumFractionDigits: 2 })} % dei $pzk)` }
+    }
     default: return { icona: 'bot', html: `${chi}: ${n.tipo}` }
   }
 }

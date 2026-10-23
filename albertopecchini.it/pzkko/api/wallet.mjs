@@ -18,6 +18,16 @@
 // chi è a secco) sono qui. Il PIN si salva con scrypt e un sale; l'accesso dà un token firmato (HMAC) che il browser
 // tiene in localStorage per 180 giorni.
 //
+// La lumachina (23.10 sera, chat/lumaca.mjs): ogni giorno di Mantova la chiocciolina del cercapersone si sveglia con una
+// salute e decide da sola la giornata, che sposta una percentuale dei $pzk del conto (medicine, visioni, affari, disastri,
+// miracoli). La vive QUI, sul server, alla prima richiesta del giorno (entra, stato, salva, ogni azione; e alla creazione):
+// così nessun limite sui salti la blocca e nessuno può schivarla non mandando il saldo. Se manchi da qualche giorno li vive
+// tutti (al più 30). Il conto la ricorda in c.lumaca ({ g, ultime }), la vista la passa al browser (la scheda «io» del
+// cercapersone ne fa la notifica), ogni giornata che sposta $pzk è una mossa ('lumaca') e le catastrofi e i miracoli sono
+// notizie della banca. Il browser manda `lg`, il giorno della lumachina che il suo saldo contiene già: se una risposta s'è
+// persa (la pagina chiusa al momento sbagliato), le giornate che non ha visto si aggiungono al saldo che manda, invece di
+// sparire.
+//
 // La chat col bot (pzkko/chat/): { a: 'zaino', token } legge lo zaino di chi parla col bot (xp, oggetti, attese…) e
 // { a: 'zaino', token, zaino } lo salva (al più 8 KB, forma controllata), in un file a parte, pzkko/chat.json
 // ({ zaini: { [id]: zaino } }), così wallet.json non si gonfia. GET ?classifica=1 dà i dieci conti più ricchi (nome e $pzk).
@@ -28,7 +38,8 @@ import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypt
 import { archivio, aggiorna, corpo, giornoDi, ipDi, json, limite } from './_archivio.mjs'
 import { borsa, tassoA, attuale } from './_borsa.mjs'
 import { PATH, vuoto, offerta } from './_conti.mjs'
-import { PATH_GIOCATORI, vuotoG, aggiornaGiocatore } from './_giocatori.mjs'
+import { PATH_GIOCATORI, vuotoG, aggiornaGiocatore, notizia } from './_giocatori.mjs'
+import { vivi, daVivere, evento } from '../chat/lumaca.mjs'
 
 export const INIZIALE = 1000, PREMIO_IG = 1000, SUSSIDIO = 1000
 export const BANCONOTE = { b500: 500, b100: 100, b25: 25, b10: 10 }
@@ -86,15 +97,32 @@ const oggi = () => giornoDi()
 const vista = (c, now) => ({
   nome: c.nome, ind: 'pzk' + c.ind, indCambiato: !!c.indCambiato, creato: c.creato, pzk: c.pzk, eur: c.eur, ig: !!c.ig,
   trovati: c.trovati?.g === oggi() ? c.trovati.q : [], sussidio: c.sussidio === oggi(), invii: c.creato + ATTESA_INVII <= now, inviiDa: c.creato + ATTESA_INVII,
-  mosse: (c.mosse ?? []).slice(-12),
+  mosse: (c.mosse ?? []).slice(-12), lumaca: c.lumaca ? { g: c.lumaca.g, ultime: c.lumaca.ultime } : null,
 })
 const mossa = (c, m) => { (c.mosse ??= []).push(m); if (c.mosse.length > 40) c.mosse.splice(0, c.mosse.length - 40) }
 
+// la lumachina vive i giorni che le mancano fino a oggi (chat/lumaca.mjs): una mossa per ogni giornata che sposta $pzk.
+// → { delta, nuove } o null
+const vive = (c, now) => vivi(c, oggi(), (v) => { if (v.n) mossa(c, { t: now, tipo: 'lumaca', n: Math.abs(v.n), verso: v.n < 0 ? 'meno' : 'piu', pct: v.pct, g: v.g, ev: v.ev }) })
+// le catastrofi e i miracoli appena vissuti diventano notizie della banca (se il database dei giocatori non va, pazienza)
+async function notizieLumaca(c, lu, now) {
+  const gravi = (lu?.nuove ?? []).filter((v) => Math.abs(v.pct) >= 25)
+  if (!gravi.length) return
+  try {
+    const dbG = await archivio(PATH_GIOCATORI, vuotoG)
+    if (dbG) await aggiorna(dbG, (g) => { for (const v of gravi) notizia(g, c, 'lumaca', { ev: v.ev, pct: v.pct, titolo: evento(v.ev)?.titolo ?? '' }, now) })
+  } catch (e) { console.warn('notizie lumaca:', e.message) }
+}
+
 // il saldo che dice il browser: si accetta se ha senso (quello che si può vincere giocando in quel tempo: nessun gioco
 // paga più di 35 a 1 su una fiche da 500, e un giro dura secondi)
-function accogli(c, pzk, now) {
+// `lg`: il giorno della lumachina che il saldo del browser contiene già (null: nessuno); le giornate vissute dopo, che il
+// browser non ha visto, si aggiungono (undefined: un browser di prima della lumachina, niente da aggiungere)
+const lgDi = (x) => (x === null || (typeof x === 'string' && /^\d{4}-\d\d-\d\d$/.test(x)) ? x : undefined)
+function accogli(c, pzk, now, lg) {
   if (pzk === undefined || pzk === null) return null
   if (typeof pzk !== 'number' || !Number.isFinite(pzk) || pzk < 0 || pzk > 1e8) return 'saldo strano'
+  if (lg !== undefined) for (const v of c.lumaca?.ultime ?? []) if (lg === null || v.g > lg) pzk = Math.max(0, pzk + v.n)
   pzk = mezzi(pzk)
   const secondi = Math.max(0, (now - (c.salvato ?? c.creato)) / 1000)
   if (pzk - c.pzk > 20000 + 1200 * secondi) return 'il saldo non torna: ricarico quello salvato'
@@ -156,12 +184,13 @@ export default async function handler(req, res) {
         const c = { id: now.toString(36) + randomBytes(4).toString('base64url'), nome, k, pin: { s, h: hashPin(body.pin, s) }, ind: RISERVATI[k] ?? nuovoIndirizzo(db), indCambiato: false, creato: now, pzk: INIZIALE, eur: 0, ig: false, salvato: now }
         mossa(c, { t: now, tipo: 'nato', n: INIZIALE })
         db.conti.push(c)
-        return { c }
+        return { c, lu: vive(c, now) } // la lumachina nasce col conto e vive già oggi
       })
       if (r.errore) return json(res, 409, { ok: false, errore: r.errore })
       limiti.crea.segna(ip, now)
+      await notizieLumaca(r.c, r.lu, now)
       const b = await borsa(now)
-      return json(res, 200, { ok: true, nuovo: true, token: token(r.c.id, now), conto: vista(r.c, now), tasso: b ? attuale(b) : 1, t: now })
+      return json(res, 200, { ok: true, nuovo: true, token: token(r.c.id, now), conto: vista(r.c, now), tasso: b ? attuale(b) : 1, t: now, ...(r.lu && { lumaca: r.lu }) })
     }
     if (a === 'entra') {
       const nome = pulisci(body.nome), k = chiaveNome(nome)
@@ -169,10 +198,18 @@ export default async function handler(req, res) {
       if (limiti.entra.troppe(ip + '|' + k, now)) return json(res, 429, { ok: false, errore: 'troppi tentativi: riprova fra dieci minuti' })
       limiti.entra.segna(ip + '|' + k, now)
       const { db } = await store.read()
-      const c = db.conti.find((x) => x.k === k)
+      let c = db.conti.find((x) => x.k === k)
       if (!c || !pinGiusto(c, body.pin)) return json(res, 401, { ok: false, errore: 'nome o PIN sbagliati' })
+      let lu = null
+      if (daVivere(c.lumaca?.g, oggi()).length) { // la lumachina ha giorni da vivere: una scrittura, al più una al giorno
+        const id = c.id
+        const r = await aggiorna(store, (d) => { const x = d.conti.find((y) => y.id === id); if (!x) return { invariato: true }; const l = vive(x, now); return l ? { c: x, lu: l } : { invariato: true, c: x } })
+        if (r.c) c = r.c
+        lu = r.lu ?? null
+        await notizieLumaca(c, lu, now)
+      }
       const b = await borsa(now)
-      return json(res, 200, { ok: true, token: token(c.id, now), conto: vista(c, now), tasso: b ? attuale(b) : 1, t: now })
+      return json(res, 200, { ok: true, token: token(c.id, now), conto: vista(c, now), tasso: b ? attuale(b) : 1, t: now, ...(lu && { lumaca: lu }) })
     }
 
     // ── da qui in poi serve il token ──
@@ -203,24 +240,33 @@ export default async function handler(req, res) {
       const r = await aggiorna(store, (db) => {
         const c = db.conti.find((x) => x.id === id)
         if (!c) return { errore: 'conto sparito', esci: true }
-        const prima = c.pzk, avviso = accogli(c, body.pzk, now)
-        if (c.pzk === prima) return { invariato: true, c, avviso }
-        return { c }
+        const prima = c.pzk, avviso = accogli(c, body.pzk, now, lgDi(body.lg)), lu = vive(c, now)
+        if (c.pzk === prima && !lu) return { invariato: true, c, avviso }
+        return { c, avviso, lu }
       })
       if (r.errore) return json(res, 401, { ok: false, errore: r.errore, esci: r.esci })
-      return json(res, 200, risposta(r.c, r.avviso ? { avviso: r.avviso } : {}))
+      await notizieLumaca(r.c, r.lu, now)
+      return json(res, 200, risposta(r.c, { ...(r.avviso && { avviso: r.avviso }), ...(r.lu && { lumaca: r.lu }) }))
     }
 
-    // le altre azioni cambiano il conto: prima il saldo del browser, poi la mossa
+    // le altre azioni cambiano il conto: prima il saldo del browser, poi la lumachina, poi la mossa. Se l'azione dice di no
+    // ma la lumachina ha appena vissuto, si salva lo stesso (il no diventa un «rifiuto»): la giornata non va persa, se no il
+    // browser la vedrebbe e il server no, e la richiesta dopo la vivrebbe due volte
     const azione = (fai) => aggiorna(store, (db) => {
       const c = db.conti.find((x) => x.id === id)
       if (!c) return { errore: 'conto sparito', esci: true }
-      const avviso = accogli(c, body.pzk, now)
+      const avviso = accogli(c, body.pzk, now, lgDi(body.lg))
       if (avviso) return { errore: avviso, c }
+      const lu = vive(c, now)
       const esito = fai(c, db) ?? {}
-      return { c, ...esito }
+      if (esito.errore && lu) return { c, lu, rifiuto: esito.errore }
+      return { c, lu, ...esito }
     })
-    const manda = (r, extra = {}) => (r.errore ? json(res, r.esci ? 401 : 409, { ok: false, errore: r.errore, esci: r.esci, ...(r.c && { conto: vista(r.c, now), tasso, t: now }) }) : json(res, 200, risposta(r.c, extra)))
+    const manda = async (r, extra = {}) => {
+      await notizieLumaca(r.c, r.lu, now)
+      const errore = r.errore ?? r.rifiuto, lumaca = r.lu ? { lumaca: r.lu } : {}
+      return errore ? json(res, r.esci ? 401 : 409, { ok: false, errore, esci: r.esci, ...(r.c && { conto: vista(r.c, now), tasso, t: now }), ...lumaca }) : json(res, 200, risposta(r.c, { ...extra, ...lumaca }))
+    }
 
     if (a === 'converti') {
       const da = body.da === 'eur' ? 'eur' : 'pzk', quanto = Number(body.quanto), t = Number(body.t)

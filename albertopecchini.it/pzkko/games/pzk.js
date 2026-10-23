@@ -140,21 +140,24 @@ export const serverOnline = () => online
 
 async function chiama(body, { keepalive = false } = {}) {
   try {
-    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(W && { token: W.token }), ...body }), keepalive })
+    // lg: il giorno della lumachina che il saldo di qui contiene già (api/wallet.mjs: se una risposta s'è persa, il server
+    // aggiunge le giornate che il browser non ha visto)
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(W && { token: W.token, lg: W.conto.lumaca?.g ?? null }), ...body }), keepalive })
     const d = await r.json().catch(() => ({ ok: false, errore: 'il server non risponde' }))
     online = !d.offline
     if (d.esci && W) { esci(false) }
     return d
   } catch { return { ok: false, errore: 'niente rete: riprova' } }
 }
-// la risposta del server con dentro il conto: diventa lo stato (il saldo libero segue, i tavoli restano)
+// la risposta del server con dentro il conto: diventa lo stato (il saldo libero segue, i tavoli restano). Se intanto qui
+// si è giocato (tienipzk), resta il saldo di qui più quello che la lumachina ha appena spostato sul server (d.lumaca.delta)
 function accogli(d, { tienipzk = false } = {}) {
   if (!d?.conto || !W) return
-  const pzkLocale = W.conto.pzk
+  const pzkLocale = W.conto.pzk, lumaca = Number(d.lumaca?.delta) || 0
   W.conto = d.conto
   if (Number.isFinite(d.tasso)) W.tasso = d.tasso
   if (Number.isFinite(d.t)) W.t = d.t
-  if (tienipzk && !d.avviso) W.conto.pzk = pzkLocale
+  if (tienipzk && !d.avviso) { W.conto.pzk = Math.max(0, mezzi(pzkLocale + lumaca)); if (lumaca) liberi = Math.max(0, mezzi(liberi + lumaca)) }
   else liberi = Math.max(0, mezzi(W.conto.pzk - sulTavoli()))
   scriviJSON(localStorage, CHIAVE_CONTO, W)
   avvisa()
