@@ -17,7 +17,8 @@
 .tel :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
 
 /* il cercapersone: la foto, e sopra lo schermo, il led e i due tasti nelle quote del disegno */
-.t-corpo{position:relative;width:100%;height:100%;transition:opacity .32s ease-out}
+.t-corpo{position:relative;width:100%;height:100%;container-type:inline-size;transition:opacity .32s ease-out}
+.t-corpo:focus{outline:none}
 .t-cornice{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;user-select:none;filter:drop-shadow(0 28px 40px rgba(0,0,0,.6))}
 .t-schermo{position:absolute;left:8.352%;top:24.677%;width:66.294%;height:56.202%;overflow:hidden;border-radius:.9% / 1.9%;background:#050806;isolation:isolate;box-shadow:inset 0 0 18px rgba(0,0,0,.9)}
 .t-schermo::after{content:"";position:absolute;inset:0;z-index:40;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.09) 0 1px,transparent 1px 3px),linear-gradient(115deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 36%,transparent 38%)}
@@ -29,7 +30,10 @@
 .t-tasto.su{top:38.501%}.t-tasto.giu{top:62.274%}
 @media (hover:hover){.t-tasto:hover{background:radial-gradient(circle,rgba(255,255,255,.1),transparent 70%)}}
 .t-tasto:active{transform:scale(.94);background:radial-gradient(circle,rgba(0,0,0,.35),rgba(0,0,0,.15) 60%,transparent 72%)}
-.t-tasto::after{position:absolute;left:50%;top:104%;translate:-50% 0;font:400 11px/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);white-space:nowrap}
+/* le scritte sotto i tasti: bianche, stampate sulla plastica come la serigrafia dei cercapersone veri, grandi in
+   proporzione al cercapersone (cqw: la larghezza di .t-corpo) e staccate dai graffi da un'ombra scura */
+.t-tasto::after{position:absolute;left:50%;top:106%;translate:-50% 0;font:400 clamp(12px,1.25cqw,18px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#f3f1ea;white-space:nowrap;
+  text-shadow:0 1px 0 #000,0 0 2px #000,0 0 6px rgba(0,0,0,.9)}
 .t-tasto.su::after{content:"home"}.t-tasto.giu::after{content:"indietro"}
 
 /* la barra di stato: una riga di cristalli liquidi */

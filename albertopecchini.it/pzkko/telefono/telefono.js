@@ -80,7 +80,7 @@ function costruisci() {
   dlg = document.createElement('dialog')
   dlg.className = 'tel'
   dlg.setAttribute('aria-label', 'il cercapersone dei $pzk')
-  dlg.innerHTML = `<div class="t-corpo">
+  dlg.innerHTML = `<div class="t-corpo" tabindex="-1">
     <img class="t-cornice" src="${PAGER.src}" width="${PAGER.w}" height="${PAGER.h}" alt="" draggable="false">
     <div class="t-schermo chat" data-in="home">
       <div class="t-palco">
@@ -247,11 +247,11 @@ function doveGrande() {
 }
 async function ingrandisci() {
   const r0 = origine?.getBoundingClientRect()
-  if (RIDOTTO.matches || !visibile(r0)) { dlg.showModal(); adatta(); return false } // niente transizione: si apre e basta
+  if (RIDOTTO.matches || !visibile(r0)) { dlg.showModal(); corpo.focus({ preventScroll: true }); adatta(); return false } // niente transizione: si apre e basta
   // «fermo»: l'animazione d'apertura normale del dialog resta spenta finché è aperto (se no, tolto «zoom», ripartirebbe e il
   // cercapersone farebbe un saltello un secondo dopo essersi aperto)
   dlg.classList.add('fermo', 'zoom', 'zoom-nascosto')
-  dlg.showModal()
+  dlg.showModal(); corpo.focus({ preventScroll: true })
   adatta()
   const r1 = doveGrande()
   const d = doppione()
@@ -319,7 +319,7 @@ export async function apri(app = null, opz = {}) {
     if (opz.da) origine = opz.da
     dlg.classList.remove('chiude')
     aggiornaStato()
-    const transizione = opz.da ? ingrandisci() : (dlg.showModal(), adatta(), Promise.resolve(false))
+    const transizione = opz.da ? ingrandisci() : (dlg.showModal(), corpo.focus({ preventScroll: true }), adatta(), Promise.resolve(false))
     if (app) await vai(app, opz)
     else home()
     await transizione
