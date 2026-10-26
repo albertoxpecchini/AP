@@ -10,9 +10,12 @@
 //   wallet, il clic di plastica del wallet e del cercapersone sul muro, il colpetto sul panno dei giochi, un tic morbido
 //   altrove; i cursori ticchettano mentre scorrono. I pezzi di carta della barra frusciano (barra/barra.js, fruscio). I
 //   volantini no: li suona già la strada.
+// - La musica (26.10, musica.js: «voglio le musichette»): sei brani che si alternano, coi suoni accesi, in ogni pagina, al
+//   70% (window.pzkkoSuono.musica, che la regia cambia); le sigle la abbassano un momento, e cambiando pagina riprende
+//   da dov'era (qui sotto, chi la guarda).
 // Nella home (e nella storia e nella 404) c'è il motore della strada: si usa il suo contesto (window.pzkkoSuono.ctx) e si
 // tace se il nastro «suono» è spento. Nelle pagine senza la strada (gadget, oggetti, traguardi, info, le prove) un contesto
-// suo, che nasce al primo clic, e si tace se nel browser i suoni sono stati spenti (pzkko-suono = no).
+// suo, che nasce al primo gesto, e si tace se nel browser i suoni sono stati spenti (pzkko-suono = no).
 
 const AC = window.AudioContext ?? window.webkitAudioContext
 let proprio = null, out = null, outCtx = null, bus = null
@@ -31,7 +34,7 @@ function contesto(gesto = false) {
   }
   if (c.state !== 'running') c.resume().catch(() => {})
   if (outCtx !== c) { out = c.createGain(); out.connect(c.destination); outCtx = c; bus = out }
-  out.gain.value = 0.36 * (P?.volume ?? 0.7)
+  out.gain.value = 0.25 // (fisso: il volume di window.pzkkoSuono è quello della strada, dal 26.10 al 20%)
   return c
 }
 
@@ -111,7 +114,23 @@ export function musichetta(nome, gesto = false) {
   if (sigla?.context === c) { const s = sigla; s.gain.setTargetAtTime(0, c.currentTime, 0.03); setTimeout(() => s.disconnect(), 400) }
   sigla = bus = c.createGain()
   sigla.connect(out)
+  musica?.abbassa(1.4)
   try { m(c, c.currentTime + 0.02) } finally { bus = out }
+}
+
+// ── la musica: suona se si sente (la home col nastro acceso, le altre pagine col loro contesto e i suoni non spenti) e la
+// pagina si vede; il resto lo fa musica.js, che si scarica la prima volta che serve ──
+let musica = null, scarica = null, alto = -1
+const ricordata = () => { try { return JSON.parse(sessionStorage.getItem('pzkko-musica')) ?? {} } catch { return {} } }
+function guardaMusica() {
+  const P = window.pzkkoSuono
+  const c = document.hidden ? null : P ? (P.acceso ? P.ctx : null) : spentoQui() ? null : proprio
+  const v = c?.state === 'running' ? P?.musica ?? 0.7 : 0
+  if (c && musica?.c !== c && v) {
+    scarica ??= import('./musica.js').then((m) => { musica?.ferma(); musica = m.avvia(c, ricordata()); alto = -1 }).catch(() => {}).finally(() => { scarica = null })
+    return
+  }
+  if (musica && v !== alto) { musica.volume(v, v ? 1.2 : 0.15); alto = v }
 }
 
 // ── i suonini dei tasti ──
@@ -170,4 +189,10 @@ if (!window.pzkkoTasti) {
       if (k) musichetta(FINESTRE[k])
     }
   }).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['open'], attributeOldValue: true })
+  // la musica: guardata un paio di volte al secondo. Nelle pagine senza la strada il contesto nasce al primo gesto (non
+  // solo al primo tasto) e dorme a pagina nascosta; andando via, il brano e il punto restano per la pagina dopo
+  setInterval(guardaMusica, 400)
+  for (const g of ['pointerdown', 'keydown']) addEventListener(g, () => { if (!window.pzkkoSuono) contesto(true) }, { capture: true, passive: true })
+  document.addEventListener('visibilitychange', () => { if (proprio) (document.hidden ? proprio.suspend() : proprio.resume()).catch(() => {}) })
+  addEventListener('pagehide', () => { if (musica) try { sessionStorage.setItem('pzkko-musica', JSON.stringify(musica.dove())) } catch {} })
 }

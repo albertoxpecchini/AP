@@ -1619,8 +1619,8 @@ passare dall'una all'altra; l'ultima aperta resta nel browser):
   alogeni, led o xeno, il neon sotto, un'auto ferma coi fari accesi in un punto); le
   bestie (ogni specie sì o no, le blatte anche di giorno, la velocità, «spaventale»,
   una zanzara davanti alla telecamera); le gocce più fitte o più rade, una adesso;
-- **suono**: i suoni della strada (`suono/`, sotto): acceso, il volume, e ognuno da
-  provare (dal 23.10 anche il fischietto, il boato e l'«uuuh» di virtual);
+- **suono**: i suoni della strada (`suono/`, sotto): acceso, il volume della strada e quello
+  della musica, e ognuno da provare (dal 23.10 anche il fischietto, il boato e l'«uuuh» di virtual);
 - **prove**: il muro del DOM in trasparenza (`?allinea`), rifare l'arrivo, il glTF
   (questi due ricaricano la pagina; il muro senza 3D, dal 23.10, è l'interruttore in cima a
   «grafica»), e i numeri della scheda (il
@@ -1699,6 +1699,27 @@ strada), né quello che ha `data-suono-no`. Nella home, nella storia e nella 404
 clic e tace se nel browser i suoni sono spenti (`pzkko-suono = no`). Lo carica la barra (quindi c'è in ogni pagina) e il
 cercapersone.
 
+**La musica** (26.10, `suono/musica.js`; Alberto: «voglio le musichette… diverse, stile ocarina / animal crossing /
+minecraft in 16 bit», la musica al 70% e i suoni ambiente al 20%): sei brani scritti apposta, due per stile, che si
+alternano e si ripetono, sintetizzati nota per nota come il resto, con gli strumenti di una cartuccia del Super Nintendo
+(l'ocarina col vibrato che arriva dopo e lo sbuffo dell'attacco, l'arpa, la marimba, il piano elettrico in FM, il
+contrabbasso pizzicato, il piano, gli archi, i campanelli, il flauto, la batteria a spazzole), la sua eco (il ritardo che
+torna perdendo gli acuti), un riverbero e il filo d'acuti in meno (passa basso a 11 kHz), poi un limitatore. I brani:
+**il Mincio** (valzer in re: ocarina, arpa e archi; al secondo giro rispondono i campanelli) e **la nebbia** (la minore:
+ocarina, campanelli che arpeggiano lassù, archi bassi; poi l'arpa), lo stile ocarina; **piazza Sordello** (fa maggiore
+di mattina, con lo swing: marimba, piano elettrico in levare, contrabbasso che cammina, batteria leggera; al secondo giro
+i campanelli un'ottava sopra) e **il bar di sera** (mi bemolle: flauto, piano elettrico, contrabbasso a due, spazzole; poi
+la marimba), lo stile Animal Crossing; **i campi** (do maggiore, lento) e **la nevicata** (mi minore, la sinistra a crome),
+lo stile Minecraft: il piano che dice poco, gli archi al secondo giro. Ognuno fa due o tre giri (un minuto, un minuto e
+mezzo), poi 7 secondi di strada sola e il prossimo; il primo è a caso. Le note si scrivono come testo («F#5:3 E5 D5:2 |
+…», gli accordi con «+», le pause «-», la batteria «x»), gli arpeggi e gli accordi tenuti da un accordo per battuta; un
+timer le programma 1,5 s avanti. Chi decide quando è `interfaccia.js`: suona coi suoni accesi e la pagina in vista,
+nella home sul contesto della strada (il nastro «suono» la spegne con lei), nelle altre pagine col contesto loro, al primo
+gesto; le sigle la abbassano un momento; andando via la pagina scrive il brano e il punto (`pzkko-musica` in
+`sessionStorage`) e quella dopo riprende da lì. I volumi stanno in `window.pzkkoSuono`: `volume` è la strada (0,2,
+prima 0,7), `musica` la musica (0,7); i tasti e le sigle hanno il loro, fisso. `ascolta.mjs musica [n…]` registra i
+brani interi, `--tracce` dice quanto pesa ogni voce da sola (così si è bilanciato il mix).
+
 Dal 21.10.2026 la strada si sente. Niente file audio: ogni suono è sintetizzato dal vivo col
 Web Audio (`voci.js`: oscillatori e rumori filtrati; le cose fatte di mille pezzi, come la
 pioggia sulla lamiera, i grilli, i tuoni e la carta, calcolate una volta in un tampone; le
@@ -1717,7 +1738,7 @@ bagnato è 0,15, col meteo vero 0,4 come prima; nel 3D quello della scena).
   dentro il gesto (Safari lo vuole lì) e passa a `suono.js`; sull'iPhone è «ambient»: rispetta
   il tasto del silenzioso e non ferma la musica. Con la pagina nascosta tutto si ferma;
   mentre si gioca (i giochi sono finestre modali) la strada si abbassa.
-  `window.pzkkoSuono`: `acceso`, `volume`, `accendi(sì, ricorda)`, `prova(nome)` per la
+  `window.pzkkoSuono`: `acceso`, `volume` (la strada, dal 26.10 al 20%), `musica` (70%), `accendi(sì, ricorda)`, `prova(nome)` per la
   regia, `evento(nome, dati)` per la pagina e la scena (finché il motore non c'è, gli eventi
   aspettano in coda: i vecchi si buttano, le auto si suonano da dove sono arrivate).
 - **Chi ascolta**: la telecamera della scena, in metri come lei: ogni suono ha il suo posto e
@@ -1787,7 +1808,7 @@ bagnato è 0,15, col meteo vero 0,4 come prima; nel 3D quello della scena).
   carta sulla lamiera; la firma più veloce, a occhielli).
 - **Il banco**: tutto passa da un filtro (la nebbia e la neve), da un compressore (i tuoni) e
   dal volume. I punti usa e getta (un uccello, una goccia) si staccano da soli dopo 30 secondi.
-- **La regia** ha la scheda «suono»: acceso, il volume, e ogni suono che capita da solo da far
+- **La regia** ha la scheda «suono»: acceso, il volume della strada e quello della musica, e ogni suono che capita da solo da far
   partire adesso (dal 22.10 anche le cose che si toccano: campanello, vetro, maniglione, lattina,
   pozza, chiusino, cartello, l'asse delle zucche, la carta, la biro).
 - **Le prove**: `node tools/pzkko/suono/ascolta.mjs strumenti [nome…]` registra ogni strumento
