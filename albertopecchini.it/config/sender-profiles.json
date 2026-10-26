@@ -11,6 +11,9 @@
       "use": "personale",
       "footerId": "yahoo",
       "style": "fine-settembre",
+      "privacy": {
+        "holder": "Alberto Pecchini"
+      },
       "aliases": [
         "yahoo",
         "personale",
@@ -27,6 +30,9 @@
       "use": "societa",
       "footerId": "proton",
       "style": "fine-settembre",
+      "privacy": {
+        "holder": "Società Agricola Cascina Fontana S.S."
+      },
       "aliases": [
         "proton",
         "protonmail",
@@ -50,6 +56,9 @@
       "use": "universita",
       "footerId": "gmail",
       "style": "fine-settembre",
+      "privacy": {
+        "holder": "Alberto Pecchini"
+      },
       "aliases": [
         "gmail",
         "google",
@@ -71,6 +80,9 @@
       "use": "pec",
       "footerId": "pec",
       "style": "fine-settembre",
+      "privacy": {
+        "holder": "Società Agricola Cascina Fontana S.S."
+      },
       "aliases": [
         "pec",
         "certificata",

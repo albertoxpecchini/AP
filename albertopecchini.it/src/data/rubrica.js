@@ -12,6 +12,7 @@
 import { loadSenderProfiles } from '../../tools/email-generator/src/senders.js'
 import { getFooter, resolveFooterLogo } from '../../tools/email-generator/src/footers.js'
 import { renderFooterText } from '../../tools/email-generator/src/footer-html.js'
+import { privacyOf } from '../../tools/email-generator/src/informativa.js'
 import { loadEmailTheme } from '../../tools/email-generator/src/theme.js'
 import { iconDataUri } from '../../tools/email-generator/src/assets.js'
 import { BUTTON_VARIANTS } from '../../tools/email-generator/src/markdown.js'
@@ -79,6 +80,7 @@ export const senders = loadSenderProfiles()
       footer,
       logo: resolveFooterLogo(footer),
       signature: footer ? renderFooterText(footer) : p.email,
+      privacy: privacyOf(p),
       ...kind,
       order,
     }
