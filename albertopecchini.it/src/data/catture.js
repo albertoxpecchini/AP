@@ -4,15 +4,15 @@
 // la copia vecchia dopo un aggiornamento.
 
 export const catture = {
-  'ap-desktop-tall.webp': { w: 1200, h: 2833, v: '113a4999' },
+  'ap-desktop-tall.webp': { w: 1200, h: 2833, v: 'd4c6e647' },
   'ap-desktop.webp': { w: 1200, h: 750, v: 'e6b83923' },
-  'ap-iphone-01.webp': { w: 804, h: 4084, v: '2378ec2a' },
+  'ap-iphone-01.webp': { w: 804, h: 4084, v: '13d0bfff' },
   'ap-iphone-02.webp': { w: 804, h: 4084, v: '7353bb5c' },
   'ap-iphone-03.webp': { w: 804, h: 4084, v: '66da0693' },
   'ap-iphone-04.webp': { w: 804, h: 4084, v: 'b642344e' },
   'ap-iphone-05.webp': { w: 804, h: 4084, v: 'e0e4fa9f' },
   'ap-iphone-06.webp': { w: 804, h: 4080, v: 'b13c3a8b' },
-  'ap-mobile-tall.webp': { w: 600, h: 4000, v: 'be7d7e7f' },
+  'ap-mobile-tall.webp': { w: 600, h: 4000, v: '2f7a4f3b' },
   'ap-mobile.webp': { w: 600, h: 1298, v: '6c18accf' },
   'ap-tablet.webp': { w: 720, h: 1036, v: 'c6829e03' },
   'cascina-contatti-mobile.webp': { w: 600, h: 1298, v: '990e9109' },
