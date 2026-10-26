@@ -18,6 +18,7 @@ import { iconDataUri } from './assets.js'
 import { composeBody, buildPreheader } from './compose.js'
 import { renderMarkdown, markdownToText } from './markdown.js'
 import { renderEmailHtml } from './template.js'
+import { privacyOf, renderInformativaText } from './informativa.js'
 import { renderPreviewHtml } from './preview.js'
 import { validate } from './validate.js'
 import { buildReport, buildLogLine } from './report.js'
@@ -102,6 +103,8 @@ export function generateEmail(inputFile, options = {}) {
     bodyHtml,
     footer,
     footerLogo: resolveFooterLogo(footer),
+    // L'informativa segue la casella che scrive, non `footer_profile`.
+    privacy: privacyOf(profile),
     attachments: attachmentList,
     links: input.links,
     theme,
@@ -123,6 +126,8 @@ export function generateEmail(inputFile, options = {}) {
   }
   const footerText = renderFooterText(footer)
   if (footerText) textParts.push('', '—', footerText)
+  const informativaText = renderInformativaText(common.privacy)
+  if (informativaText) textParts.push('', informativaText)
   const emailText = `${textParts.join('\n').replace(/\n{3,}/g, '\n\n').trim()}\n`
 
   // ── Validazione ────────────────────────────────────────────────────────────

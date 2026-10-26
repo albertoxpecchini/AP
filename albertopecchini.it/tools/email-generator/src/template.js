@@ -10,6 +10,7 @@
 // posizionamento assoluto, niente JavaScript.
 import { escapeHtml } from './util.js'
 import { renderFooterHtml } from './footer-html.js'
+import { renderInformativaHtml } from './informativa.js'
 import { isFineSettembre, blockStyles } from './markdown.js'
 
 // GIF trasparente di 1px: Outlook comprime le celle prive di contenuto, e un
@@ -38,7 +39,7 @@ function rulerHtml(theme) {
  * allegati, collegamenti) sono H6, e un filetto nero separa le parti.
  * Il carattere incorporato non c'è: `fontCss` viene ignorato.
  */
-function renderFineSettembre({ subject, preheader, eyebrow, title, subtitle, bodyHtml, footer, footerLogo = null, attachments = [], links = [], theme, dateLabel = '' }) {
+function renderFineSettembre({ subject, preheader, eyebrow, title, subtitle, bodyHtml, footer, footerLogo = null, privacy = null, attachments = [], links = [], theme, dateLabel = '' }) {
   const c = theme.color
   const st = blockStyles(theme)
   const width = theme.layout.width
@@ -71,6 +72,10 @@ function renderFineSettembre({ subject, preheader, eyebrow, title, subtitle, bod
 
   const footerHtml = renderFooterHtml(footer, theme, footerLogo)
   if (footerHtml) parts.push(`<div style="margin:${theme.space.s7}px 0 0;">${footerHtml}</div>`)
+
+  // Informativa privacy e riservatezza della casella, sempre in fondo (informativa.js).
+  const informativaHtml = renderInformativaHtml(theme, privacy)
+  if (informativaHtml) parts.push(`<div style="margin:${theme.space.s6}px 0 0;border-top:1px solid ${c.line};padding:${theme.space.s4}px 0 0;">${informativaHtml}</div>`)
 
   const preheaderHtml = preheader
     ? `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${c.paper};opacity:0;">${escapeHtml(preheader)}&#8203;${'&#847;&zwnj;&nbsp;&#8199;&shy;'.repeat(40)}</div>`
@@ -136,6 +141,7 @@ function renderMetaSettembre({
   bodyHtml,
   footer,
   footerLogo = null,
+  privacy = null,
   attachments = [],
   links = [],
   theme,
@@ -232,6 +238,16 @@ function renderMetaSettembre({
     ? `<tr><td style="padding:${sp.s5}px ${gutter}px ${sp.s6}px;">${footerHtml}</td></tr>`
     : ''
 
+  // Informativa privacy e riservatezza della casella, sempre in fondo (informativa.js).
+  const informativaHtml = renderInformativaHtml(theme, privacy)
+  const informativaBlock = informativaHtml
+    ? `<tr><td class="ap-pad" style="padding:0 ${gutter}px ${sp.s6}px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr><td style="border-top:1px solid ${c.line};padding:${sp.s4}px 0 0;">${informativaHtml}</td></tr>
+        </table>
+      </td></tr>`
+    : ''
+
   // Il preheader è l'anteprima nella lista dei messaggi: presente nel sorgente,
   // invisibile all'apertura.
   const preheaderHtml = preheader
@@ -294,6 +310,7 @@ function renderMetaSettembre({
           ${attachmentBlock}
           ${linkBlock}
           ${footerBlock}
+          ${informativaBlock}
         </table>
       </td>
     </tr>

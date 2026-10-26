@@ -14,6 +14,7 @@
 
 import { $, $$, announce } from './utils.js'
 import { renderEmailHtml } from '../../tools/email-generator/src/template.js'
+import { renderInformativaText } from '../../tools/email-generator/src/informativa.js'
 import { renderMarkdown, markdownToText } from '../../tools/email-generator/src/markdown.js'
 import { composeBody, buildPreheader, buildGreeting, buildClosing, hasGreeting, hasClosing } from '../../tools/email-generator/src/compose.js'
 import { validate } from '../../tools/email-generator/src/validate.js'
@@ -390,6 +391,7 @@ export function initEmail() {
       bodyHtml,
       footer,
       footerLogo: footer ? sender.logo : null,
+      privacy: sender.privacy,
       attachments,
       links,
       theme,
@@ -403,6 +405,7 @@ export function initEmail() {
     if (links.length) textParts.push('', 'Collegamenti:', ...links.map((l) => `- ${l}`))
     if (attachments.length) textParts.push('', 'Allegati:', ...attachments.map((f) => `- ${f.name} (${f.type})`))
     if (footer) textParts.push('', '—', sender.signature)
+    if (sender.privacy) textParts.push('', renderInformativaText(sender.privacy))
     const text = `${textParts.join('\n').replace(/\n{3,}/g, '\n\n').trim()}\n`
 
     const input = {

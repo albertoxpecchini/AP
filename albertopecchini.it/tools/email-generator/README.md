@@ -14,6 +14,7 @@ L'email non viene mai stampata a schermo.
 - [Compilare il file di input](#compilare-il-file-di-input)
 - [Account mittente](#account-mittente)
 - [Firme](#firme)
+- [Informativa in fondo](#informativa-in-fondo)
 - [Come si invia l'email](#come-si-invia-lemail)
 - [Cosa viene generato](#cosa-viene-generato)
 - [Stili](#stili)
@@ -189,6 +190,26 @@ il riquadro chiaro di «Metà settembre».
 | `cascina-logo-primo.png` | (versioni archiviate) | logo Cascina Fontana (vespa sulla fontana della cascina, bordeaux `#6D1427`) + nome completo + «Primo Pecchini», mostrato a 360 px; vespa da openai/gpt-image-2, fontana misurata dalla foto, 30.09.2026; originali e procedura in `Documents/cascinafontana/logo/` |
 | `cascina-logo.png` | (versioni archiviate) | prima idea, vespa su un alveare, sostituita |
 
+## Informativa in fondo
+
+Ogni email, con qualunque stile e anche senza firma, si chiude con
+l'«Informativa Privacy» e l'«Avviso di Riservatezza» della casella che scrive.
+Il titolare è `privacy.holder` in `config/sender-profiles.json`; le richieste
+vanno all'indirizzo della casella stessa (o a `privacy.email`, se indicato):
+
+| Casella | Titolare | Richieste a |
+| --- | --- | --- |
+| `yahoo` | Alberto Pecchini | pzkko@yahoo.com |
+| `gmail` | Alberto Pecchini | 398893@studenti.unimore.it |
+| `proton` | Società Agricola Cascina Fontana S.S. | pecchini@protonmail.com |
+| `pec` | Società Agricola Cascina Fontana S.S. | cascinafontana@pec.it |
+
+L'informativa segue il mittente, non `footer_profile`. Sta sotto la firma, dopo
+un filetto chiaro, nel carattere n. 2 della posta (13px, come
+`<font size="2">`), in grigio e con i titoli in minuscolo; l'indirizzo è
+cliccabile. In `email.txt` compare in fondo, in testo semplice. Il testo è in
+`src/informativa.js`.
+
 ## Come si invia l'email
 
 Il composer di Yahoo, Proton e Gmail non accetta il codice HTML incollato: lo
@@ -299,6 +320,7 @@ Un modulo per responsabilità, in `tools/email-generator/src/`:
 | `fonts.js` | incorporamento del carattere |
 | `footers.js` | archivio firme versionato, logo della firma in data URI |
 | `footer-html.js` | resa del footer in HTML e testo (modulo puro) |
+| `informativa.js` | informativa privacy e avviso di riservatezza in fondo, HTML e testo (modulo puro) |
 | `assets.js` | icone dei pulsanti in data URI |
 | `font-css.js` | regola @font-face del carattere incorporato (modulo puro) |
 | `compose.js` | saluto, chiusura, struttura del corpo |
@@ -312,7 +334,7 @@ Un modulo per responsabilità, in `tools/email-generator/src/`:
 Il JavaScript vive solo nell'anteprima: dentro l'email non ce n'è.
 
 I moduli di resa — `compose.js`, `markdown.js`, `template.js`, `footer-html.js`,
-`font-css.js`, `validate.js`, `report.js`, `util.js` — non toccano il disco: gli
+`informativa.js`, `font-css.js`, `validate.js`, `report.js`, `util.js` — non toccano il disco: gli
 stessi file girano anche nel browser, nel compositore in pagina (`/email/`, vedi
 il README del sito), che produce email identiche a quelle di `npm run email`.
 Lettura di file, firme, tema e immagini restano nei moduli Node (`footers.js`,
