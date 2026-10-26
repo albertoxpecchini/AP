@@ -1700,7 +1700,7 @@ clic e tace se nel browser i suoni sono spenti (`pzkko-suono = no`). Lo carica l
 cercapersone.
 
 **La musica** (26.10, `suono/musica.js`; Alberto: «voglio le musichette… diverse, stile ocarina / animal crossing /
-minecraft in 16 bit», la musica al 70% e i suoni ambiente al 20%): sei brani scritti apposta, due per stile, che si
+minecraft in 16 bit», i suoni ambiente al 20% e la musica al 70%, poi «musica 0.3»): sei brani scritti apposta, due per stile, che si
 alternano e si ripetono, sintetizzati nota per nota come il resto, con gli strumenti di una cartuccia del Super Nintendo
 (l'ocarina col vibrato che arriva dopo e lo sbuffo dell'attacco, l'arpa, la marimba, il piano elettrico in FM, il
 contrabbasso pizzicato, il piano, gli archi, i campanelli, il flauto, la batteria a spazzole), la sua eco (il ritardo che
@@ -1717,7 +1717,7 @@ timer le programma 1,5 s avanti. Chi decide quando è `interfaccia.js`: suona co
 nella home sul contesto della strada (il nastro «suono» la spegne con lei), nelle altre pagine col contesto loro, al primo
 gesto; le sigle la abbassano un momento; andando via la pagina scrive il brano e il punto (`pzkko-musica` in
 `sessionStorage`) e quella dopo riprende da lì. I volumi stanno in `window.pzkkoSuono`: `volume` è la strada (0,2,
-prima 0,7), `musica` la musica (0,7); i tasti e le sigle hanno il loro, fisso. `ascolta.mjs musica [n…]` registra i
+prima 0,7), `musica` la musica (0,3); i tasti e le sigle hanno il loro, fisso. `ascolta.mjs musica [n…]` registra i
 brani interi, `--tracce` dice quanto pesa ogni voce da sola (così si è bilanciato il mix).
 
 Dal 21.10.2026 la strada si sente. Niente file audio: ogni suono è sintetizzato dal vivo col
@@ -1738,7 +1738,7 @@ bagnato è 0,15, col meteo vero 0,4 come prima; nel 3D quello della scena).
   dentro il gesto (Safari lo vuole lì) e passa a `suono.js`; sull'iPhone è «ambient»: rispetta
   il tasto del silenzioso e non ferma la musica. Con la pagina nascosta tutto si ferma;
   mentre si gioca (i giochi sono finestre modali) la strada si abbassa.
-  `window.pzkkoSuono`: `acceso`, `volume` (la strada, dal 26.10 al 20%), `musica` (70%), `accendi(sì, ricorda)`, `prova(nome)` per la
+  `window.pzkkoSuono`: `acceso`, `volume` (la strada, dal 26.10 al 20%), `musica` (30%), `accendi(sì, ricorda)`, `prova(nome)` per la
   regia, `evento(nome, dati)` per la pagina e la scena (finché il motore non c'è, gli eventi
   aspettano in coda: i vecchi si buttano, le auto si suonano da dove sono arrivate).
 - **Chi ascolta**: la telecamera della scena, in metri come lei: ogni suono ha il suo posto e

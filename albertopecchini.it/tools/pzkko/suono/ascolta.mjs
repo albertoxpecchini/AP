@@ -7,7 +7,7 @@
 //   node tools/pzkko/suono/ascolta.mjs strada [scena…]     la home vera, col 3D, registrata dal vivo: giorno, notte,
 //                                                           temporale, tramonto, zanzara, negozio (20–30 s l'una)
 //   node tools/pzkko/suono/ascolta.mjs musica [n…]          i brani della musica (suono/musica.js), interi, al volume
-//                                                           solito (70%), in un OfflineAudioContext; n da 1. Con
+//                                                           solito (30%), in un OfflineAudioContext; n da 1. Con
 //                                                           --tracce niente file: il peso di ogni voce da sola, in dB
 //
 // dalla cartella albertopecchini.it. I livelli sono in dBFS: RMS secondo per secondo e il picco (sopra −1 il suono
@@ -196,7 +196,7 @@ if (modo === 'musica') {
   const rendi = (i, solo) => page.evaluate(async (i, solo, SR) => {
     const { avvia, durata } = await import('/suono/musica.js')
     const sec = durata(i) + 5, c = new OfflineAudioContext(2, Math.ceil(sec * SR), SR), m = avvia(c, { brano: i, vivo: false, solo })
-    m.volume(0.7, 0.001); m.programma(sec)
+    m.volume(0.3, 0.001); m.programma(sec)
     const b = await c.startRendering()
     let q = 0
     for (let k = 0; k < 2; k++) { const d = b.getChannelData(k); for (let j = 0; j < d.length; j++) q += d[j] * d[j] }
@@ -214,7 +214,7 @@ if (modo === 'musica') {
     const b64 = await page.evaluate(async (i, SR) => {
       const { avvia, durata } = await import('/suono/musica.js')
       const sec = durata(i) + 5, c = new OfflineAudioContext(2, Math.ceil(sec * SR), SR), m = avvia(c, { brano: i, vivo: false })
-      m.volume(0.7, 0.001); m.programma(sec)
+      m.volume(0.3, 0.001); m.programma(sec)
       const b = await c.startRendering(), f = new Float32Array(b.length * 2)
       f.set(b.getChannelData(0)); f.set(b.getChannelData(1), b.length)
       let s = ''; const u8 = new Uint8Array(f.buffer)

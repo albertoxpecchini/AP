@@ -11,7 +11,7 @@
 //   altrove; i cursori ticchettano mentre scorrono. I pezzi di carta della barra frusciano (barra/barra.js, fruscio). I
 //   volantini no: li suona già la strada.
 // - La musica (26.10, musica.js: «voglio le musichette»): sei brani che si alternano, coi suoni accesi, in ogni pagina, al
-//   70% (window.pzkkoSuono.musica, che la regia cambia); le sigle la abbassano un momento, e cambiando pagina riprende
+//   30% (window.pzkkoSuono.musica, che la regia cambia); le sigle la abbassano un momento, e cambiando pagina riprende
 //   da dov'era (qui sotto, chi la guarda).
 // Nella home (e nella storia e nella 404) c'è il motore della strada: si usa il suo contesto (window.pzkkoSuono.ctx) e si
 // tace se il nastro «suono» è spento. Nelle pagine senza la strada (gadget, oggetti, traguardi, info, le prove) un contesto
@@ -125,7 +125,7 @@ const ricordata = () => { try { return JSON.parse(sessionStorage.getItem('pzkko-
 function guardaMusica() {
   const P = window.pzkkoSuono
   const c = document.hidden ? null : P ? (P.acceso ? P.ctx : null) : spentoQui() ? null : proprio
-  const v = c?.state === 'running' ? P?.musica ?? 0.7 : 0
+  const v = c?.state === 'running' ? P?.musica ?? 0.3 : 0
   if (c && musica?.c !== c && v) {
     scarica ??= import('./musica.js').then((m) => { musica?.ferma(); musica = m.avvia(c, ricordata()); alto = -1 }).catch(() => {}).finally(() => { scarica = null })
     return

@@ -949,7 +949,7 @@ html.con-barra:not(.scena3d) .portale{padding-top:calc(var(--barra) + clamp(22px
     let vuole = true, ctx = null, motore = null, spegni = 0
     try { vuole = localStorage.getItem('pzkko-suono') !== 'no' } catch {}
     const S = window.pzkkoSuono = {
-      acceso: false, volume: 0.2, musica: 0.7, coda, // (26.10: la strada al 20%, la musica di suono/musica.js al 70%)
+      acceso: false, volume: 0.2, musica: 0.3, coda, // (26.10: la strada al 20%, la musica di suono/musica.js al 30%)
       evento: (nome, dati = {}) => { if (coda.length < 24) coda.push([nome, dati, performance.now()]) },
       accendi(si = true, ricorda = false) {
         if (ricorda) { vuole = si; try { localStorage.setItem('pzkko-suono', si ? 'si' : 'no') } catch {} }
