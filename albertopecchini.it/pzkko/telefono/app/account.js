@@ -144,7 +144,7 @@ async function clic(e) {
   if (fai === 'tutto') { host.querySelector('[data-k="quota"]').value = '1000'; return scriviCambio() }
   await attesa(f, async () => {
     if (fai === 'sincronizza') { const r = await pzk.sincronizza(); di(r.ok, r.ok ? `sincronizzato: 1 $pzk = ${pzk.tasso().toFixed(4)} €` : r.errore) }
-    if (fai === 'esci') { await pzk.esci(); esito = null; ctx.toast('sei uscito: valgono i 1.000 della sessione', { icona: 'lucchetto' }); disegna() }
+    if (fai === 'esci') { await pzk.esci(); esito = null; ctx.toast('sei uscito: per usare il cercapersone serve di nuovo il conto', { icona: 'lucchetto' }); disegna() }
     if (fai === 'converti') {
       const n = quanto()
       if (!(n > 0)) return
