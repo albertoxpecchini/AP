@@ -19,6 +19,8 @@ import { assistenzaPage, assistenzaContattiPage, assistenzaNotFoundPage } from '
 import { assistenza, BCP } from '../data/assistenza.js'
 import { informaticaPage, informaticaLd } from './pages/informatica.js'
 import { informatica } from '../data/informatica.js'
+import { unimore, materiaPath, esercizioPath } from '../data/unimore.js'
+import { unimorePage, materiaPage, esercizioPage } from './pages/unimore.js'
 import { tempoLiberoTodo } from '../data/tempo-libero.js'
 
 const websiteLd = () => ({
@@ -220,6 +222,12 @@ export const routes = [
     standalone: true,
     sitemap: false,
   },
+  // Unimore: materie ed esercizi, ancora senza contenuti → fuori da motori e sitemap.
+  { path: unimore.path, title: unimore.title, description: unimore.description, render: unimorePage, noindex: true, sitemap: false, hideCta: true },
+  ...unimore.materie.flatMap((m) => [
+    { path: materiaPath(m), title: `${m.title} — Unimore`, description: m.lead, render: () => materiaPage(m), noindex: true, sitemap: false, hideCta: true },
+    ...m.esercizi.map((e) => ({ path: esercizioPath(m, e), title: `${e.title} — ${m.title}`, description: m.lead, render: () => esercizioPage(m, e), noindex: true, sitemap: false, hideCta: true })),
+  ]),
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
   { path: '/cookie/', priority: 0.2, title: 'Cookie policy', description: 'Il sito non usa cookie di profilazione: ecco cosa viene salvato nel browser e perché.', render: cookiePage, hideCta: true },
   { path: '/crediti/', priority: 0.2, title: 'Crediti e fonti delle immagini', description: 'Da dove vengono le immagini del sito: disegni e foto originali, illustrazioni generate con gpt-image-2, mockup della Figma Community.', render: creditiPage, hideCta: true },

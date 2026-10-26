@@ -2534,3 +2534,15 @@
     transition: none;
   }
 }
+
+/* Unimore: i listati di codice e le uscite dei programmi */
+.unimore__code {
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  background: var(--bg-2);
+  border-left: 2px solid var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 2;
+}
