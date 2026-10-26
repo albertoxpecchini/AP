@@ -100,6 +100,10 @@ let cssPronto = null
 let orologio = 0
 let dentro = false // passata la porta: si è premuto ACCEDI e il caricamento è finito
 let attesa = null // l'app chiesta da chi ha aperto il cercapersone, che si apre dopo la porta: { app, opz }
+// SENZA CONTO NON SI ENTRA (26.10, Alberto: «non puoi accedere al cercapersone se non ti registri/accedi»): passata la porta, finché
+// non c'è un conto l'unica app è l'Account (vai e home ci rimandano); l'app che si voleva aprire aspetta qui, e quando il conto
+// c'è (ctx.dopoAccesso, chiamato dall'app Account) si apre.
+let daFare = null // { id, opz }
 let giro = 0 // cresce a ogni apertura e chiusura: il caricamento di una porta vecchia non apre niente
 let chiudendo = null, sveglia = null // la chiusura in corso, e come accorciarla (un secondo «chiudi»)
 
@@ -199,7 +203,10 @@ function costruisci() {
   porta.querySelector('.t-accedi').addEventListener('click', accedi)
   homeEl.addEventListener('click', (e) => { const b = e.target.closest('[data-app]'); if (b) vai(b.dataset.app, { tab: b.dataset.tab }) })
   zaino.ascolta(() => { if (dlg.open) { aggiornaStato(); aggiornaLed(); if (!corrente) disegnaHome() } }) // lo stato: anche scassato o no
-  pzk.osserva(() => { if (!corrente && dlg.open) disegnaHome() })
+  pzk.osserva(() => {
+    if (!corrente && dlg.open) disegnaHome()
+    if (dlg.open && dentro && !pzk.conto() && corrente !== 'account') vai('account', { scheda: 'conto' }) // (uscito dal conto, anche da un'altra scheda)
+  })
   new ResizeObserver(adatta).observe(dlg)
   PIENO.addEventListener('change', adatta)
 }
@@ -461,7 +468,7 @@ async function carica(mio) {
   lista.replaceChildren()
   barra.style.width = '0%'
   await dorm(RIDOTTO.matches ? 0 : 420) // la chiocciolina si sposta a sinistra e compare la scritta
-  const frasi = [...mescola(BAGGIANATE).slice(0, 4), 'accesso consentito']
+  const frasi = [...mescola(BAGGIANATE).slice(0, 4), pzk.conto() ? 'accesso consentito' : 'serve il conto: crealo o entra']
   for (let i = 0; i < frasi.length; i++) {
     if (mio !== giro) return
     const li = document.createElement('li')
@@ -490,7 +497,7 @@ async function accedi() {
   const a = attesa ?? (ultima && APP.some((x) => x.id === ultima) && (!zaino.pagerRotto() || ultima === 'chat') ? { app: ultima, opz: {} } : null)
   attesa = null
   if (a?.app) await vai(a.app, a.opz) // (la sigla è quella dell'app)
-  else { musichetta('consentito'); home() }
+  else { if (pzk.conto()) musichetta('consentito'); home() }
   porta.classList.add('via') // la porta sfuma e sotto c'è pzk os
   await dorm(RIDOTTO.matches ? 0 : 320)
   if (mio !== giro) return
@@ -566,6 +573,7 @@ export async function chiudi() {
     else mostraPorta('saluta')
     dentro = false
     attesa = null
+    daFare = null
     tomodachi.saluta?.(2600)
     await aspetta(RIDOTTO.matches ? 1200 : 2300)
     sveglia = null
@@ -588,6 +596,7 @@ export async function chiudi() {
 /** La home. subito: senza l'animazione di ritorno (il tasto indietro: premuto a raffica, ogni volta ripartirebbe). */
 export function home({ subito = false } = {}) {
   if (!dlg) return
+  if (dentro && !pzk.conto()) { vai('account', { scheda: 'conto' }); return } // (senza conto non c'è una home: vedi daFare)
   const prima = corrente
   corrente = null
   if (prima && dentro) musichetta('home')
@@ -616,6 +625,8 @@ export function indietro({ daFreccia = false } = {}) {
   else home({ subito: true })
 }
 export async function vai(id, opz = {}) {
+  let rimandata = false
+  if (dentro && !pzk.conto() && id !== 'account') { daFare = { id, opz }; id = 'account'; opz = { scheda: 'conto' }; rimandata = true }
   const a = APP.find((x) => x.id === id)
   if (!a) return
   // scassato (dopo una morte) si apre solo la chat: lì si lavora e si ricompra il cercapersone nuovo
@@ -647,7 +658,7 @@ export async function vai(id, opz = {}) {
   for (const [k, x] of montate) if (k !== id && !x.host.hidden) { x.ist?.nascondi?.(); x.host.hidden = true }
   homeEl.hidden = true
   corrente = id
-  ricorda('cercapersone', { app: id }) // riaprendo il cercapersone si torna qui
+  if (!rimandata) ricorda('cercapersone', { app: id }) // riaprendo il cercapersone si torna qui
   schermo.dataset.in = id
   m.host.hidden = false
   m.host.classList.remove('entra')
@@ -659,6 +670,8 @@ export async function vai(id, opz = {}) {
 function ctxApp(id) {
   return {
     id, home, vai, esc, icona,
+    /** Il conto c'è (l'app Account l'ha appena creato o aperto): si va dove si voleva andare, o alla home. */
+    dopoAccesso: () => { const d = daFare; daFare = null; if (d) vai(d.id, d.opz); else home() },
     /** La testata di un'app: freccia indietro (come il tasto verde), titolo, e (se serve) altro html a destra. */
     testata: (titolo, destra = '') => `<header class="t-testata"><button class="t-indietro" type="button" data-t="indietro" aria-label="indietro">‹</button><h2>${titolo}</h2><div class="t-az">${destra}</div></header>`,
     toast,

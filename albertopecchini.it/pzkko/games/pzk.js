@@ -35,6 +35,18 @@ const mezzi = (n) => Math.round(n * 2) / 2
 const cent = (n) => Math.round(n * 100) / 100
 const tavoli = new Map() // gioco → $pzk sul suo tavolo, in questa pagina
 const ascolti = new Set(), osservatori = new Set()
+// CHI POSSIEDE I SOLDI (26.10, Alberto: «senza account ho messo dei soldi su virtual e quando ho loggato ho visto ancora i vecchi
+// soldi = bug, rischio duplicazione»): la sessione e ogni conto sono portafogli separati. Quando si entra o si esce, quello che
+// era sui tavoli appartiene al portafoglio di prima: i tavoli si svuotano e i giochi che avevano una puntata aperta finiscono
+// fra gli STANTII; se poi pagano, il pagamento non passa (la puntata non è stata tolta a questo portafoglio). Chi tiene le sue
+// puntate (la schedina di virtual) si sposta insieme: alCambioConto.
+const stantii = new Set()
+const cambiaConto = new Set()
+function altroProprietario() {
+  for (const [g, n] of tavoli) if (n > 0) stantii.add(g)
+  tavoli.clear()
+}
+const avvisaCambioConto = () => { for (const f of cambiaConto) { try { f() } catch (e) { console.error(e) } } }
 const sulTavoli = () => [...tavoli.values()].reduce((a, b) => a + b, 0)
 /** Il giorno di Mantova (AAAA-MM-GG): le banconote per terra tornano ogni giorno. */
 export const oggi = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
@@ -67,18 +79,24 @@ function scrivi() {
 export const saldo = () => liberi
 /** I $pzk che un gioco ha sul tavolo. */
 export const sulTavolo = (gioco) => tavoli.get(gioco) ?? 0
+/** Di chi sono i soldi di adesso: 's' (la sessione) o 'c:nome' (un conto). Chi salva roba legata ai soldi lo usa per tenerla separata. */
+export const proprietario = () => (W ? 'c:' + String(W.conto.nome ?? '').toLowerCase() : 's')
+/** fn() quando si entra in un conto o se ne esce (anche da un'altra scheda): il portafoglio è un altro. Restituisce la funzione per smettere. */
+export function alCambioConto(fn) { cambiaConto.add(fn); return () => cambiaConto.delete(fn) }
 
 /** Dal saldo al tavolo del gioco; false (e niente spostato) se non bastano. */
 export function punta(gioco, n) {
   n = mezzi(n)
   if (!(n > 0) || n > puliti() || inGalera()) return false
   liberi -= n
+  stantii.delete(gioco)
   tavoli.set(gioco, sulTavolo(gioco) + n)
   scrivi()
   return true
 }
 /** Dal tavolo al saldo (la fiche tolta prima del giro). */
 export function ritira(gioco, n) {
+  if (stantii.has(gioco)) return
   n = Math.min(mezzi(n), sulTavolo(gioco))
   if (!(n > 0)) return
   tavoli.set(gioco, sulTavolo(gioco) - n)
@@ -88,6 +106,7 @@ export function ritira(gioco, n) {
 /** Fine di un giro (o di una parte): `giocato` lascia il tavolo, `torna` va nel saldo. `tipo`: 'casa' (di base: un conto
  *  con la cassa di pzk, che incassa il giocato e paga il tornato), 'conio' (soldi nuovi: il tornato nasce dal nulla). */
 export function regola(gioco, giocato, torna, tipo = 'casa') {
+  if (stantii.has(gioco)) { stantii.delete(gioco); return } // la puntata era di un altro portafoglio (vedi altroProprietario): niente da pagare qui
   tavoli.set(gioco, Math.max(0, sulTavolo(gioco) - mezzi(giocato)))
   liberi += mezzi(torna)
   const F = flussi()
@@ -147,7 +166,7 @@ export function osserva(fn) { osservatori.add(fn); return () => osservatori.dele
 addEventListener('storage', (e) => {
   if (e.key !== CHIAVE_CONTO) return
   const w = leggiConto()
-  if (!!w !== !!W || (w && W && w.token !== W.token)) { W = w; liberi = w ? Math.max(0, mezzi(w.conto.pzk - sulTavoli())) : leggiSessione(); avvisa(); return }
+  if (!!w !== !!W || (w && W && w.token !== W.token)) { altroProprietario(); W = w; liberi = w ? Math.max(0, mezzi(w.conto.pzk)) : leggiSessione(); avvisa(); avvisaCambioConto(); return }
   if (w && W) { W = w; liberi = Math.max(0, mezzi(w.conto.pzk - sulTavoli())); avvisa() }
 })
 
@@ -245,19 +264,23 @@ export async function crea(nome, pin, key) {
   return d
 }
 function prendi(d) {
+  altroProprietario() // (quello che era sui tavoli era della sessione: non passa nel conto)
   W = { token: d.token, conto: d.conto, tasso: d.tasso, t: d.t }
-  liberi = Math.max(0, mezzi(d.conto.pzk - sulTavoli()))
+  liberi = Math.max(0, mezzi(d.conto.pzk))
   scriviJSON(localStorage, CHIAVE_CONTO, W)
   avvisa()
+  avvisaCambioConto()
 }
 /** Esci: si torna ai 1.000 della sessione (prima si salva quello che c'è). */
 export async function esci(salvaPrima = true) {
   if (!W) return
   if (salvaPrima) { clearTimeout(attesa); await salva() }
+  altroProprietario() // (le puntate del conto sono nel suo saldo, salvato qui sopra: i tavoli non seguono nella sessione)
   W = null
   scriviJSON(localStorage, CHIAVE_CONTO, null)
   liberi = leggiSessione()
   avvisa()
+  avvisaCambioConto()
 }
 /** Sincronizza col server: il conto com'è lì e il cambio di adesso (prima manda il saldo di qui). → { ok, errore? } */
 export async function sincronizza() {

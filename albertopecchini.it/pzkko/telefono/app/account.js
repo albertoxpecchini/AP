@@ -96,7 +96,7 @@ function altro(c) {
 function disegna() {
   ricorda('account', S)
   const c = pzk.conto()
-  host.innerHTML = `${ctx.testata('Account', `<span class="t-sh-piede" style="margin:0">${c ? esc(c.ind) : 'sessione'}</span>`)}
+  host.innerHTML = `${ctx.testata('Account', `<span class="t-sh-piede" style="margin:0">${c ? esc(c.ind) : 'serve il conto'}</span>`)}
     <nav class="t-gi-tab" role="tablist">${SCHEDE.map(([id, n, i]) => `<button type="button" role="tab" aria-selected="${S.scheda === id}" class="${S.scheda === id ? 'on' : ''}" data-scheda="${id}">${icona(i)}<span>${n}</span></button>`).join('')}</nav>
     <div class="t-corpo-app t-ac">${esito ? `<p class="t-ac-esito${esito[0] ? '' : ' male'}">${esc(esito[1])}</p>` : ''}${{ conto, cambio, invia, altro }[S.scheda](c)}</div>`
   // il link di instagram è un elemento vivo (games/pzk.js): si appende
@@ -119,7 +119,8 @@ async function invio(e) {
       const r = tipo === 'entra' ? await pzk.entra(val('nome'), val('pin')) : await pzk.crea(val('nome'), val('pin'), val('chiave') || undefined)
       if (!r.ok) return di(false, r.offline ? 'il conto è in pausa: il server non ha ancora il suo archivio. per ora valgono i 1.000 della sessione' : r.errore)
       ctx.toast(r.nuovo ? `benvenuto, ${esc(r.conto.nome)}: ${esc(r.conto.ind)}` : `ciao ${esc(r.conto.nome)}`, { icona: 'app-account' })
-      esito = null; S.scheda = 'conto'; return disegna()
+      esito = null; S.scheda = 'conto'; disegna()
+      return ctx.dopoAccesso?.() // (il cercapersone senza conto è chiuso: ora si va dove si voleva andare)
     }
     if (tipo === 'invia') {
       const r = await pzk.invia(val('ind'), Number(val('quanti')))

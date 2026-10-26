@@ -2203,6 +2203,24 @@ lo aggiunge `pixel.mjs` (tutte le piastrelle `APP`, anche le prossime).
   (`agnolini` somiglia a dei tortellini, `risottopilota`, `salame`, `sabbioneta` accanto a `ducale`, `borghetto` è in provincia di Verona).
 - **La wiki** (`wiki/`, 26.10, voce «wiki» della barra): **pzkkopedia**, «l'enciclopedia libera del muro». Lo scheletro VUOTO di una wiki, copia fedele nella grafica e nella struttura della skin Vector 2022 di Wikipedia in italiano (intestazione con menu, logo e ricerca; colonna con il menu principale e l'indice; linguette Voce/Discussione e Leggi/Modifica/Cronologia; piè di pagina), con il tocco di pzkko: Anton per il titolo, la fascia di ruggine col filo giallo sotto la barra, il logo di una chiocciola a puzzle disegnato qui, nessun nome né testo altrui. È una pagina sola, `wiki/index.html`, con l'indirizzo della voce nell'hash (`/wiki/#/Titolo_della_voce`, `#/Speciale:Cerca?q=…`, `#/Titolo?action=edit`); tutta l'interfaccia sta in `wiki.js` (modulo ES) e `wiki.css`. Le voci stanno in `wiki/voci.js` (`VOCI = {}`: titolo → wikitesto, il formato è nel commento di testa) e per ora non ce n'è nessuna: la Pagina principale ha i suoi riquadri con «nessun contenuto ancora», ogni titolo che non esiste mostra «Questa pagina non esiste» col tasto «Crea», le pagine «Speciale:» (Ultime modifiche, Una voce a caso, Pagine speciali, Cerca, Registri…) sono vuote. L'editor ha la barra degli strumenti e un'anteprima che funziona, con un piccolo interprete del wikitesto (grassetto, corsivo, titoli e indice con gli id, link rossi se la voce non esiste, elenchi, categorie); «Salva pagina» per ora dice che la wiki non è ancora aperta alle modifiche, e le utenze sono finte. Niente template, tabelle, immagini né note. Sul telefono la colonna diventa il menu hamburger. Niente dipendenze né CDN; `noindex`, fuori dalla sitemap. L'icona nella barra è provvisoria (`manuale-landini`).
 
+## Il conto per il cercapersone e i portafogli separati (26.10)
+
+«Non puoi accedere al cercapersone se non ti registri/accedi» e «senza account ho messo dei soldi su virtual e quando ho loggato
+ho visto ancora i vecchi soldi: rischio duplicazione» (Alberto).
+
+- **Senza conto il cercapersone si apre solo sull'Account** (`telefono/telefono.js`: `vai` e `home` rimandano all'app Account
+  finché `pzk.conto()` è vuoto; l'app che si voleva aprire aspetta in `daFare` e parte quando l'Account chiama
+  `ctx.dopoAccesso()`, dopo che si è creato o aperto il conto; la porta dice «serve il conto: crealo o entra»). Uscire dal conto,
+  anche da un'altra scheda, riporta lì. I giochi della pagina restano giocabili senza conto, coi 1.000 $pzk della sessione.
+- **La sessione e ogni conto sono portafogli separati** (`games/pzk.js`): `proprietario()` dice di chi sono i soldi ('s' o
+  'c:nome') e `alCambioConto(fn)` avvisa quando cambia (entrare, uscire, un altro conto da un'altra scheda). Quello che era sui tavoli
+  appartiene al portafoglio di prima: i tavoli si svuotano e i giochi che avevano una puntata aperta diventano «stantii», quindi
+  `regola` e `ritira` non pagano più (una mano iniziata coi soldi della sessione e finita dopo il login non porta soldi nel conto).
+- **La schedina di virtual segue il portafoglio** (`games/virtual/schedina.js`): senza conto sta in `sessionStorage`
+  (`pzkko-virtual`, sparisce con la sessione), col conto in `localStorage` (`pzkko-virtual:nome`); entrando o uscendo si cambia
+  schedina e le puntate aperte si rimettono sul tavolo del portafoglio giusto. Le puntate vecchie nella chiave `pzkko-virtual` di
+  `localStorage` (prima di questa regola, di proprietario ignoto) non si leggono più.
+
 ## Gli strumenti (tools/)
 
 Uno strumento è una pagina statica in `tools/<nome>/`, fuori dalla scena 3D: in

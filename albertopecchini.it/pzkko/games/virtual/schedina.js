@@ -8,12 +8,20 @@
 // ogni fiche ha un timbro suo, una puntata è l'unione delle fiches viste dalle due parti meno quelle tolte («tolte» tiene i
 // timbri delle fiches ritirate con «togli», così non ricompaiono dalla copia vecchia dell'altra scheda); «pagata» vince su
 // «da pagare».
+//
+// DI CHI SONO LE PUNTATE (26.10, Alberto: «senza account ho messo dei soldi su virtual e quando ho loggato ho visto ancora i vecchi
+// soldi = bug, rischio duplicazione»): la schedina segue il portafoglio di games/pzk.js. Senza conto sta nella sessione del
+// browser (sessionStorage, pzkko-virtual: sparisce con la sessione come i suoi 1.000 $pzk); con un conto sta nel suo spazio
+// (localStorage, pzkko-virtual:nome). Entrando o uscendo la schedina cambia insieme ai soldi (pzk.alCambioConto): le puntate della
+// sessione non passano mai nel conto, e quelle del conto tornano solo a quel conto.
 
 import * as pzk from '../pzk.js'
 import { PER_PUNTATA, fase, partita, vince, scriviRisultato } from './partita.js'
 
 export const GIOCO = 'virtual'
 export const CHIAVE = 'pzkko-virtual'
+const chiave = () => { const o = pzk.proprietario(); return o === 's' ? CHIAVE : `${CHIAVE}:${o.slice(2)}` }
+const deposito = () => (pzk.proprietario() === 's' ? sessionStorage : localStorage)
 export const fmtQuota = (q) => q.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 /** La vincita di una puntata (a mezzi $pzk). */
 export const vincitaDi = (b) => Math.round(b.puntata * b.quota * 2) / 2
@@ -38,7 +46,7 @@ export function fichesDi(b) {
 }
 function leggi() {
   try {
-    const s = JSON.parse(localStorage.getItem(CHIAVE) || 'null')
+    const s = JSON.parse(deposito().getItem(chiave()) || 'null')
     return {
       schedina: Array.isArray(s?.schedina) ? s.schedina.filter((b) => Number.isInteger(b.indice) && PER_PUNTATA.has(b.id) && b.puntata > 0 && b.quota >= 1) : [],
       ultime: Array.isArray(s?.ultime) ? s.ultime : null,
@@ -75,7 +83,7 @@ export function carica() {
 }
 function salva() {
   const u = carica()
-  try { localStorage.setItem(CHIAVE, JSON.stringify(u)) } catch {}
+  try { deposito().setItem(chiave(), JSON.stringify(u)) } catch {}
   avvisa()
 }
 /** Le puntate della partita `indice`. */
@@ -205,12 +213,20 @@ export function avvia() {
   carica()
   rimettiSulTavolo(aperte())
   pagaScadute()
+  // si è entrati in un conto (o ne si è usciti): è un altro portafoglio, un'altra schedina
+  pzk.alCambioConto(() => {
+    S.schedina = []; S.ultime = null; S.tolte = []
+    carica()
+    rimettiSulTavolo(aperte())
+    pagaScadute()
+    avvisa()
+  })
   // un'altra scheda ha puntato o pagato: la schedina si rilegge
   addEventListener('storage', (e) => {
-    if (e.key !== CHIAVE) return
+    if (e.storageArea !== localStorage || e.key !== chiave()) return
     const prima = e.newValue
     const u = carica()
-    if (JSON.stringify(u) !== prima) try { localStorage.setItem(CHIAVE, JSON.stringify(u)) } catch {}
+    if (JSON.stringify(u) !== prima) try { localStorage.setItem(chiave(), JSON.stringify(u)) } catch {}
     riconcilia()
     avvisa()
   })
