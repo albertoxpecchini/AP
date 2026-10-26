@@ -68,7 +68,25 @@ function schedaMissione(ctx, id, esito = null) {
     azioni: v.scelte.map((s) => [s.ok ? `quest ${id} ${s.i + 1}` : `quest ${id} ${s.i + 1}`, `${s.eti}${s.costo ? ` (${s.costo})` : ''}${s.azzardo ? ` ${s.azzardo} %` : ''}${s.ok ? '' : ` — ${s.motivo}`}`, s.ok ? '' : 'spento']) })
 }
 
+// le app che si installano dalla chat (26.10): ognuna compare nel cercapersone una volta installata
+export const INSTALLABILI = {
+  decifratore: { prezzo: 1500, icona: 'app-decifratore', cosa: 'apre i wallet pzk e le chiavette usb che lo spazzino trova nei cestini, con tre giochini di decodifica. I soldi che escono sono puliti: erano destinati a sparire.' },
+}
 export const APP = [
+  {
+    nomi: ['installa', 'install', 'scarica'], cat: 'app', icona: 'app-decifratore', breve: 'installa un’app nel cercapersone: «installa decifratore»', uso: 'installa <app>', senzaEventi: true,
+    async fai(ctx) {
+      const id = ctx.args[0]?.toLowerCase()
+      const x = INSTALLABILI[id]
+      if (!x) return ctx.dì({ colore: 'blu', t: ':telefono: le app da installare', html: `<table>${Object.entries(INSTALLABILI).map(([k, v]) => `<tr><td>:${v.icona}:</td><td><b>${k}</b>${zaino.installata(k) ? ' ✓' : ''}<br><small>${v.cosa}</small></td><td>${ctx.pzkHtml(v.prezzo)}</td></tr>`).join('')}</table>`, pie: 'scrivi «installa decifratore»' }) && false
+      if (zaino.installata(id)) return ctx.dì({ colore: 'grigio', d: `il ${id} c’è già: è nel cercapersone.` }) && false
+      if (!ctx.spendi(x.prezzo)) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: `costa ${ctx.pzkHtml(x.prezzo)} puliti: ${ctx.pzk.perche() || `ne hai ${ctx.fmt(ctx.pzk.puliti())}`}.` }) && false
+      await ctx.pensa(900)
+      zaino.installa(id)
+      return ctx.dì({ colore: 'verde', av: 'bot-occhiolino', t: `:${x.icona}: ${id} installato`, d: `${x.cosa}
+Lo trovi nel cercapersone, fra le app.`, pie: `-${ctx.fmt(x.prezzo)} $pzk` })
+    },
+  },
   {
     nomi: ['telefono', 'phone', 'app'], cat: 'app', icona: 'telefono', breve: 'apre il telefono con tutte le app', uso: 'telefono', senzaEventi: true,
     async fai(ctx) { ctx.apriApp(null) },

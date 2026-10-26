@@ -1,0 +1,43 @@
+/* Le pagine delle sezioni della barra (26.10: gadget, oggetti, traguardi, info): il muro sotto, scurito, e sopra un foglio
+   di carta attaccato col nastro, come i volantini; i titoli in Anton, il testo a macchina (Special Elite), le note a
+   pennarello. Le icone sono quelle del cercapersone (art/chat-*). */
+@font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-weight:400;font-display:swap}
+:root{--carta:#f4efe2;--inchiostro:#1c1a14;--rosso:#a50d25;--blu:#1446a0;--fa:"Anton",Impact,sans-serif;--marker:"Permanent Marker","Comic Sans MS",cursive;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:#5f5b55 url(/art/muro.webp) center top/900px repeat;color:var(--inchiostro);font:400 16px/1.55 "Special Elite","Courier New",monospace}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:rgba(20,16,12,.45)}
+.foglio{position:relative;width:min(100% - 32px,980px);margin:calc(var(--barra,44px) + 34px) auto 40px;padding:34px clamp(18px,4vw,48px) 40px;background:var(--carta);
+  box-shadow:0 4px 6px rgba(0,0,0,.3),0 22px 40px rgba(0,0,0,.35);transform:rotate(-.25deg)}
+.foglio::before,.foglio::after{content:"";position:absolute;top:-14px;width:120px;height:30px;background:rgba(236,226,190,.82);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.foglio::before{left:-22px;rotate:-28deg}.foglio::after{right:-22px;rotate:26deg}
+.foglio h1{margin:0 0 4px;font:400 clamp(40px,7vw,72px)/.95 var(--fa);letter-spacing:.005em}
+.foglio .voce{margin:0 0 22px;font:400 clamp(17px,2.4vw,22px)/1.2 var(--marker);color:var(--rosso);transform:rotate(-1deg)}
+.foglio h2{margin:34px 0 10px;font:400 28px/1 var(--fa);letter-spacing:.01em}
+.foglio h2 small{margin-left:8px;font:400 14px/1 "Special Elite",monospace;color:#6a6458}
+.foglio p{margin:0 0 12px}
+.foglio a{color:var(--blu)}
+.foglio .emo{width:1.4em;height:1.4em;vertical-align:-.35em;object-fit:contain}
+.griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.scheda{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;padding:12px;border:2px solid var(--inchiostro);background:#fffaf0;box-shadow:3px 3px 0 var(--inchiostro)}
+.scheda>img{width:56px;height:56px;object-fit:contain}
+.scheda b{display:block;font:400 19px/1.1 var(--fa);letter-spacing:.01em}
+.scheda small{display:block;color:#6a6458;font-size:13px;line-height:1.35}
+.scheda .pr{display:inline-block;margin-top:5px;padding:1px 7px;background:var(--inchiostro);color:#ffd400;font-size:12px}
+.scheda.spento{opacity:.55;filter:grayscale(.7)}
+.barretta{height:8px;margin-top:6px;background:#e3dccb;border:1px solid var(--inchiostro)}
+.barretta i{display:block;height:100%;background:var(--rosso)}
+.scheda.fatto .barretta i{background:#2e7d32}
+.cerca{width:100%;max-width:420px;margin:0 0 14px;padding:9px 12px;border:2px solid var(--inchiostro);background:#fffaf0;font:inherit;color:inherit}
+.cerca:focus{outline:3px solid #ffd400;outline-offset:1px}
+.piede{width:min(100% - 32px,980px);margin:0 auto 40px;color:#f1efe8;font-size:13px;text-align:center;text-shadow:0 1px 2px #000}
+.piede a{color:#ffd400}
+@media (max-width:600px){.foglio{transform:none}.foglio::before,.foglio::after{width:80px}}
+a.scheda{color:inherit;text-decoration:none;transition:transform .12s,box-shadow .12s}
+a.scheda:hover,a.scheda:focus-visible{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--inchiostro);outline:none}
+.scheda.tuo{background:#fff6c9}
+.scheda .pr.tuo{margin-left:6px;background:#2e7d32;color:#fff}
+.scheda[hidden],section[hidden]{display:none}
+.riassunto{font-size:17px}.riassunto b{font:400 24px/1 var(--fa)}

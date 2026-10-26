@@ -1,6 +1,7 @@
 // Il saluto quando la chat si apre e gli eventi casuali che capitano ogni tanto dopo un comando (chat.js, esegui).
 import * as zaino from '../zaino.js'
 import { QUIZ } from '../testi.js'
+import { SCELTA } from '../quiz-altre.js'
 
 export function salutoIniziale(ctx) {
   const pronto = zaino.manca('giornaliero') === 0
@@ -51,6 +52,22 @@ const EVENTI = [
     ferma()
     if (r && /^sci[oò]!?$/i.test(r.trim())) ctx.aggiorna(s, { av: 'bot-ride', t: ':nutria: scappata', d: 'la nutria molla tutto e si tuffa nel Mincio.' })
     else { zaino.togli(id); ctx.aggiorna(s, { colore: 'rosso', av: 'bot-triste', t: ':nutria: fregato', d: `la nutria si è portata via :${id}: ${id}.` }) }
+  },
+  // vero o falso lampo (26.10): una delle domande vero/falso di quiz-altre.js, 6 secondi, paga come il quiz lampo
+  async (ctx) => {
+    const vf = SCELTA.filter(([, q, r]) => r.length === 2 && q.startsWith('Vero o falso? '))
+    if (!vf.length) return
+    const [, dom, r, , nota] = ctx.caso(vf)
+    const testo = dom.replace('Vero o falso? ', '')
+    const s = ctx.dì({ colore: 'blu', av: 'bot-pensa', t: ':quiz: vero o falso?', d: testo })
+    const ferma = ctx.tempo(s, 6000)
+    const scelta = await ctx.scegli(s, [{ id: 'vero', eti: 'vero', stile: 'nero' }, { id: 'falso', eti: 'falso', stile: 'nero' }], 6000)
+    ferma()
+    if (scelta === r[0]) { const n = ctx.paga(ctx.tra(60, 200)); ctx.aggiorna(s, { colore: 'oro', av: 'bot-ride', t: ':quiz: giusto!', d: `${testo}
+<b>${r[0]}</b>: ${ctx.pzkHtml(n)}.${nota ? `
+<small>${nota}</small>` : ''}` }) }
+    else ctx.aggiorna(s, { colore: 'grigio', av: 'bot-triste', t: ':quiz: no', d: `era <b>${r[0]}</b>.${nota ? `
+<small>${nota}</small>` : ''}` })
   },
 ]
 export async function eventoCasuale(ctx) {

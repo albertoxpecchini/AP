@@ -105,8 +105,22 @@ serio ma è un progetto Vercel a parte.
   scrive la piastrella dell'app (`art/chat-app2/app-virtual.webp`).
 - `games/pzk.js` — i $pzk, gli stessi per tutti i giochi e per il wallet: la sessione (1.000, non si
   salvano) o il conto (vedi «Il wallet e la borsa», sotto).
-- `wallet/` — il wallet dei $pzk (22.10 notte), il portafoglio di pelle alla Fallout in alto a sinistra:
-  `wallet.js` (gli schermi, la batteria, la borsa, la carta coi moduli) e `wallet.css`; la foto del
+- `barra/` — la barra in alto (26.10, Alberto: «una topbar con sezioni: la storia del sito, i gadget,
+  elenchi di oggetti, achievement, account, info e copyright»): `barra.js` la mette in cima a ogni pagina che lo carica
+  (la home, e quindi la storia e la 404 che si generano da lei, e le pagine nuove), `barra.css` (niente sfondo: dall'alto
+  colano pixel scuri, qualcuno colorato si stacca e cade; le voci sono pezzi di carta strappati col nastro, in fila al
+  centro, ognuno con la sua carta e il suo carattere; i bordi e i pixel vengono da un caso col seme fisso, sempre uguali;
+  `--barra` è l'altezza), `pagina.css` (il foglio
+  col nastro delle pagine nuove). Le voci: **storia**, **gadget** (`gadget/`: il wallet, il cercapersone e le sue 17 app,
+  i giochi, coi link che li aprono), **oggetti** (`oggetti/`: lo shop per reparto, il bottino con quanto spesso esce, le
+  facce con rarità e prezzo, quelli tuoi segnati, la ricerca; dai dati veri di `chat/testi.js` e `chat/oggetti.js`),
+  **traguardi** (`traguardi/`: gli achievement, `chat/traguardi.js`: ventisei, ognuno una funzione che legge lo zaino e
+  dice a che punto sei, quindi valgono anche quelli fatti prima), **account** (nella home apre il cercapersone
+  sull'account; dalle altre pagine porta a `/#account`, che fa lo stesso), **info** (`info/`: cos'è, i soldi finti, chi
+  l'ha fatto, cosa si salva, i crediti, il copyright) e **wiki**, spenta con «presto» finché non c'è. Fuori dalla home, prima di tutte, **← indietro** (carta rossa): porta sempre alla home pulita (`/`), non
+  alla pagina di prima (che poteva essere `/#account`). La home, usato `#account`, lo toglie dall'indirizzo.
+- `wallet/` — il wallet dei $pzk (22.10 notte), il portafoglio di pelle alla Fallout (dal 26.10 il banner è un pezzo del muro):
+  `wallet.js` (gli schermi, la batteria, la borsa; dal 26.10 il conto è nell'app Account del cercapersone) e `wallet.css`; la foto del
   portafoglio in `art/wallet/portafoglio.webp`, le banconote in `art/banconote/` (fogli «wallet» e
   «banconote» di `../tools/pzkko/fogli.js`, gpt-image-2). `../tools/pzkko/wallet.mjs` elenca e cancella
   i conti con la chiave di amministrazione.
@@ -1670,6 +1684,21 @@ specchi, e riparte da dov'era; se non torna entro 8 s ricarica, ma senza l'arriv
 
 ## Il suono (suono/)
 
+**I suoni dell'interfaccia** (26.10, `suono/interfaccia.js`; Alberto: «crea i suoni dove non ci sono: ogni app ha la sua
+musichetta, ogni tasto ha un suonino»), sintetizzati anche loro, chiptune a onde quadre, triangoli e rumore:
+`musichetta(nome)` suona la sigla di ogni app del cercapersone (`telefono.js`, `vai`: aprendola, non tornando
+indietro), l'accensione (ACCEDI), «accesso consentito», lo spegnimento a tubo catodico e il ritorno alla home; il wallet e
+i cinque giochi grandi hanno la loro, che parte da sola quando la finestra si apre (un `MutationObserver` sull'`open`
+dei dialog: `.wallet .rl .bj .mn .dd .mo .vi`). Una sigla nuova sfuma quella di prima. Ogni tasto ha il suonino del suo
+materiale (chi ascolta i clic, in cattura): il bip a 8 bit nel cercapersone (più basso per indietro e chiudi, più alto
+per le schede), lo scatto meccanico dei tasti gialli del wallet, il clic di plastica del wallet e del cercapersone sul
+muro, il colpetto sul panno dei giochi, un tic morbido altrove; i cursori ticchettano. I pezzi di carta della barra
+frusciano, e il loro link parte 120 ms dopo perché il fruscio si senta (`barra/barra.js`). I volantini no (li suona la
+strada), né quello che ha `data-suono-no`. Nella home, nella storia e nella 404 usa il contesto della strada
+(`window.pzkkoSuono.ctx`) e tace se il nastro «suono» è spento; nelle pagine senza la strada fa un contesto suo al primo
+clic e tace se nel browser i suoni sono spenti (`pzkko-suono = no`). Lo carica la barra (quindi c'è in ogni pagina) e il
+cercapersone.
+
 Dal 21.10.2026 la strada si sente. Niente file audio: ogni suono è sintetizzato dal vivo col
 Web Audio (`voci.js`: oscillatori e rumori filtrati; le cose fatte di mille pezzi, come la
 pioggia sulla lamiera, i grilli, i tuoni e la carta, calcolate una volta in un tampone; le
@@ -1771,6 +1800,60 @@ bagnato è 0,15, col meteo vero 0,4 come prima; nel 3D quello della scena).
   a −7. Il nastro, negli strumenti che fotografano la pagina, non c'è (`navigator.webdriver`);
   `?suono` lo fa vedere lo stesso.
 
+## L'economia (api/_economia.mjs, 26.10)
+
+Alberto: «i soldi persi o mangiati da te dai giocatori non spariscono ma vanno nelle casse di pzk; se li genero dal nulla
+sono nuovi». Le regole sono quelle di una moneta vera (e su un punto correggono l'idea di partenza):
+
+- **L'offerta** (i $pzk che esistono) = i conti dei giocatori + la **cassa di pzk** + i **portafogli smarriti**. La
+  capitalizzazione della borsa è l'offerta per il cambio (`api/borsa.mjs`, `cap`).
+- **Il conio**: i soldi che nascono dal nulla (il lavoro, le quest, le sfide, i quiz, i premi giornalieri, la miniera, il
+  sussidio, le banconote per terra, instagram, i miracoli della lumachina) fanno crescere l'offerta. **Più soldi valgono
+  meno**: la capitalizzazione sale, il singolo $pzk scende (l'inflazione). La borsa ne tiene conto: metà della crescita
+  dell'offerta nelle ultime 24 ore (al più ±5 % al giorno) si toglie dalla deriva del cambio (`_borsa.mjs`, `inflazione`).
+- **La cassa di pzk** è il conto «banca pzk» (`pzk000001`, `api/_economia.mjs` BANCA; non è quello di Alberto,
+  pzk398893, e non ci si entra): il croupier, il negoziante, il banco. Le puntate perse, gli acquisti dello shop e delle
+  facce, l'installazione delle app, le commissioni della lavatrice, le multe e le cauzioni vanno lì; le vincite, la roba
+  venduta (pesci, bestie, reperti, la roba degli uffici), le casse e il gratta e vinci, il cambio da EUR€ escono da lì. Se
+  la cassa non basta per pagare, la differenza si conia. I trasferimenti non cambiano l'offerta.
+- **I portafogli smarriti**: i $pzk persi morendo (il 20 %) non vanno alla cassa, cadono per terra; dopo 96 giorni si
+  distruggono (l'offerta cala: deflazione, il cambio sale). Lo spazzino che trova un wallet e lo decifra li rimette in
+  giro: soldi puliti, perché erano destinati a sparire.
+- **Come il server lo sa**: i giochi girano nel browser, quindi è il browser che etichetta ogni movimento
+  (`pzk.regola(gioco, giocato, torna, tipo)`: `'casa'` di base, `'conio'` per il lavoro e i premi; `pzk.perdi(n)` per le
+  morti) e manda i flussi col saldo a lotti numerati (`flussi: { n, casa, persi }`; un lotto già contato, per una risposta
+  persa, non si conta due volte). Quello che la differenza di saldo non spiega è conio; una perdita non spiegata va alla
+  cassa (`api/wallet.mjs`, `contabilizza`).
+
+**I soldi sporchi**: il bottino delle rapine. Si sommano al saldo ma **con pzk non si spendono** (né giochi, né shop, né
+app: `pzk.punta` accetta solo i puliti), non si mandano, non si cambiano in EUR€. Si puliscono da soli dopo 96 giorni o
+nella **lavatrice** (l'app `telefono/app/lavatrice.js`, azione `lava`): fino a 50.000 in 10 minuti, 2.000 $pzk puliti di
+commissione alla cassa, una alla volta. Nella bio (il profilo, l'account, la scheda dell'app giocatori) puliti e sporchi
+si vedono separati.
+
+**La rapina** (`telefono/app/rapina.js`, azione `colpo`): contro la cassa, almeno in due e al più in quattro. Chi organizza
+apre il colpo e ha un codice di quattro lettere; i complici entrano col codice (quindici minuti); chi ha organizzato dà
+il via. Va a segno nel 32 % dei casi in due, 40 % in tre, 48 % in quattro; il bottino è il 3 % della cassa più l'1 % a
+testa (al più 15.000 a testa), sporco, diviso. Se va male: **6 ore di galera** e una multa (il 20 % dei puliti, al più
+5.000) alla cassa. Un colpo al giorno, col conto di almeno 48 ore (così i conti nuovi non servono a rapinare). I colpi
+riusciti e le retate finiscono nelle notizie della banca.
+
+**La galera**: niente lavoro, niente giochi, niente colpi (`pzk.inGalera`); si esce prima pagando la cauzione (3.000
+puliti, azione `cauzione`) nell'app rapina, che in galera diventa la cella.
+
+**I lavori rischiosi** (`chat/testi.js`, MESTIERI con `rischio`, `galera`, `multa`): pagano tanto, ma a ogni turno si può
+essere presi (niente paga, la roba sequestrata, la galera, la multa: `pzk.arresto`). Il bot avvisa prima di ogni turno,
+con la probabilità, e si può lasciar stare; servono il conto. Sono lo **spazzino di uffici** (il videogioco del nastro:
+`chat/minigiochi.js`, `nastro`; 12 cose, un secondo a pezzo, si tiene o si butta trascinando o con le frecce, al più tre
+in tasca, e poi il resto lo si guarda passare; il rischio cresce del 15 % per ogni chiavetta o wallet tenuto), il
+corriere di notte, il biscazziere, il contrabbandiere di tortelli. Ai mestieri onesti si sono aggiunti imbianchino,
+pizzaiolo, meccanico, bagnino del Mincio.
+
+**Il decifratore** (`telefono/app/decifratore.js`, azione `decifra`): si installa dalla chat («installa decifratore»,
+1.500 puliti: `chat/comandi/app.js`) e solo allora compare nel cercapersone. Apre i wallet pzk e le chiavette che lo
+spazzino trova (`testi.js`, UFFICIO) con tre giochini facili (il cifrario di Cesare, il binario, la sequenza, la parola
+allo specchio; due errori perdonati); i $pzk escono dal fondo dei portafogli smarriti, tre al giorno.
+
 ## I $pzk (games/pzk.js)
 
 Un portafoglio solo per tutti i giochi e per il wallet. Dal 22.10 notte due modi:
@@ -1797,7 +1880,16 @@ conto (lo segna il server). Un sito non può sapere chi segue chi, quindi ci si 
 
 ## Il wallet e la borsa (wallet/, api/wallet.mjs, api/borsa.mjs)
 
-**Il wallet** (22.10 notte) è il tasto in alto a sinistra. Dal 23.10 sera è un **banner**, alto come il tasto
+**Il wallet e il cercapersone stanno sulla serranda** (26.10, Alberto: «nella serranda, nulla in sospeso: avvitato,
+incollato, appeso… ma sono come dei volantini»): prima erano sospesi, fissi in alto a sinistra; ora sono pezzi della
+parete (`#wallet-muro` in cima alla prima pila, avvitato con quattro viti, `art/muro/viti.svg`; `#cercapersone-muro` in
+cima alla seconda, appeso a un chiodo per la clip, `art/muro/chiodo.svg`), nelle pile di `tools/pzkko/disposizione.js`
+come gli altri (`disponi.mjs` riconosce anche i `button` `.it`), e scorrono col muro. Restano vivi: nella pagina sono i
+bottoni di sempre; nella scena 3D li disegna una **tela viva** (`scena/fogli.js`, `viva`) che ricopia dieci volte al
+secondo le loro immagini, i canvas accesi e i riquadri colorati, con un filo di luce sua, e il bottone resta sopra,
+trasparente, per i clic (`scena.css`, `.vivo`). Le foto per la scena non servono (`cattura.mjs` non li fotografa).
+
+**Il wallet** (22.10 notte) era il tasto in alto a sinistra. Dal 23.10 sera è un **banner**, alto come il tasto
 di prima: una striscia di pelle cucita con la piastra d'acciaio rivettata e un pannello a led lungo (la foto
 `art/wallet-banner/banner.webp`, foglio `wallet-banner` di `tools/pzkko/fogli.js`; il vetro misurato sulla foto, da x 62
 a 713 e da y 63,5 a 154,5 su 792 × 214). Il pannello lo accende `wallet/banner.js`: dice **sempre i $pzk** (a destra,
@@ -1823,16 +1915,17 @@ tacca gialla sul bordo),
 il cambio e il suo inverso, la variazione del periodo, la capitalizzazione (i $pzk di tutti i
 conti, quanti conti) e i fattori del momento (il meteo, la temperatura, giorno o notte, se c'è
 stato un commit). Aprendo il wallet qualche **mosca** esce dalle taschine (quella sotto il saldo e quella delle
-banconote; otto se sei al verde), ronza e vola via (`mosche()`, le mosche di `art/mosche/`). I quattro tasti gialli
-aprono la loro pagina **dentro lo schermo del grafico**, al posto del grafico, coi fosfori verdi (dal 23.10: prima
-sfilavano una carta sotto il portafoglio); ripremendo lo stesso tasto, o con Esc, torna il grafico. Sul telefono la pagina
-si apre come uno schermo grande nel mezzo. Le pagine sono (la funzione si chiama ancora `carta()`) coi moduli: **conto**
-(entra o crea il conto: un nome e un PIN di quattro cifre, niente di più; il conto nuovo parte con
-1.000 $pzk; dentro, le ultime mosse, sincronizza, esci), **cambio** (il fader orizzontale come
-quelli di regia: $pzk → EUR€ o EUR€ → $pzk, quanto dai e quanto ricevi al cambio dell'ultima
-sincronizzazione), **invia** (a un indirizzo, dopo 48 ore dalla nascita del conto), **altro**
-(l'indirizzo, il PIN, il regalo di instagram). La voce è una striscia di nastro dymo sulla pelle.
-`#wallet` lo apre; i giochi lo aprono con `pzk.apriWallet('converti')` (evento `pzkko-wallet`). Gli
+banconote; otto se sei al verde), ronza e vola via (`mosche()`, le mosche di `art/mosche/`). **Dal 26.10 nel wallet ci sono solo il saldo e la
+borsa** (Alberto: «in portafoglio solo saldo e borsa · l'account lo crei dal cercapersone»): le pagine dei quattro tasti
+gialli (dal 23.10 si aprivano dentro lo schermo del grafico: conto, cambio, invia, altro) sono diventate l'app **Account**
+del cercapersone (`telefono/app/account.js`), e i tasti gialli della foto ci portano, ognuno sulla sua scheda: il wallet
+si chiude e si apre il cercapersone. Lì: **conto** (crea o entra: un nome e un PIN di quattro cifre, niente di più; il
+conto nuovo parte con 1.000 $pzk; dentro, le ultime mosse, sincronizza, esci), **cambio** (il cursore: $pzk → EUR€ o
+EUR€ → $pzk al cambio dell'ultima sincronizzazione), **invia** (a un indirizzo, dopo 48 ore dalla nascita del conto),
+**altro** (l'indirizzo, il PIN, il regalo di instagram). La voce è una striscia di nastro dymo sulla pelle.
+`#wallet` lo apre. `pzk.apriWallet()` apre il wallet (evento `pzkko-wallet`); con una delle pagine di prima
+(`'entra'`, `'converti'`, `'invia'`, `'altro'`: i giochi a secco con EUR€, la chat) apre invece l'app Account sulla
+scheda giusta. Gli
 strumenti che fotografano la pagina non vedono il tasto (`navigator.webdriver`), `?wallet` sì.
 
 **Gli EUR€** sono l'«euroshit», l'euro finto del wallet (il nome viene dall'album *Euroshit* di
@@ -2045,7 +2138,70 @@ Il modulo si carica da solo appena la pagina è tranquilla e al clic; `#chat` ap
 `pzkko-chat` (con `detail.comando`) la apre scrivendo un comando. Gli strumenti che fotografano la pagina non vedono il tasto
 (`navigator.webdriver`), `?chat` lo fa vedere. **In locale**: `npm run dev:pzkko` e poi `http://localhost:5182/prova/chat/`
 (`tools/pzkko/prove/chat.html`, non va online); `PZKKO_PORT=5190` per un secondo server. Il server ricarica la pagina solo
-se un file cambia davvero (su Windows `fs.watch` segnala anche le letture).
+se un file cambia davvero (su Windows `fs.watch` segnala anche le letture). Solo il cercapersone, senza muro né wallet:
+`http://localhost:5182/prova/cercapersone/` (`#profilo`, `#miniera`… lo apre su quell'app).
+
+**Il profilo** (26.10, `telefono/app/profilo.js`, l'app «profilo»): il cartellino (la faccia, il nome, l'indirizzo, il
+titolo, il motto, il livello) e tutti i numeri: i soldi, **i giochi grandi uno per uno** (mani, quante vinte, puntato,
+netto, il colpo migliore), la vita col bot, i progressi, col conto le posizioni in classifica. I giochi grandi si contano da
+soli: `games/pzk.js` a ogni `regola` chiama `zaino.giro` (roulette, blackjack, mine, dado, moneta, virtual: `Z.giochi`, e
+anche `vinti`, `persi` e `giri` come la chat). **Personalizzabile** (scheda «modifica»): la faccia (gli avatar di
+`art/chat-avatar/` più gli adesivi del bot), il colore, la cornice (nastro, oro, neon, pixel, niente) e il motto (60
+lettere), in `Z.profilo`. **Le facce hanno una rarità** (comune 250 $pzk, non comune 600, raro 1.500, epico 4.000,
+leggendario 12.000) e si comprano coi $pzk (toccandone una non tua si apre la vetrina col prezzo): solo cinque comuni
+sono di tutti, le altre 28 su 33 si pagano (`Z.profilo.avs`, quelle comprate); le leggendarie (`bot-ricco` al livello 10,
+la carpa d'oro, il drago, il tesoro) vanno prima sbloccate. Col conto
+`api/_giocatori.mjs` ne mette una copia ripulita nella riga pubblica (`pr`, e i giochi in `gi`): nell'app Giocatori gli
+altri vedono la faccia nelle classifiche, il colore e il motto nella scheda. **Le app veloci** (26.10): **bin·hex** (`telefono/app/conversioni.js`): un numero in decimale, binario, ottale o
+esadecimale e subito nelle altre basi, grande quanto si vuole (BigInt) e con la virgola (frazioni esatte: i periodici
+finiscono coi «…»), il complemento a 2 su 8/16/32/64 bit, e «come si fa» verso la base scelta (le divisioni successive coi
+resti letti dal basso, le moltiplicazioni per la parte frazionaria, la somma delle potenze, i gruppi di bit).
+**calcoli** (`telefono/app/calcolatrice.js`): la scientifica del geometra, in gon (o gradi o radianti): CALCOLO
+(un'espressione col tastierino, la moltiplicazione sottintesa, ANS, gli ultimi risultati), TRIANGOLI (tre dati e il resto,
+con Carnot, il teorema dei seni, la somma degli angoli, Erone, e le due soluzioni del caso ambiguo), COORDINATE (polari →
+cartesiane, distanza e azimut fra due punti col reciproco, l'area con Gauss; azimut dal Nord in senso orario), ANGOLI
+(sessagesimali, sessadecimali, centesimali, radianti). **cucina** (`telefono/app/cucina.js`): le ricette del Mincio alla
+Cooking Mama (tortelli di zucca, risotto alla pilota, sbrisolona, luccio in salsa), ogni passo un minigioco (taglia,
+ordina, mescola girando in tondo, impasta, versa, cuoci), la nonna che commenta, la medaglia dalla media; le prime tre
+ricette del giorno con una medaglia pagano $pzk e xp, l'oro dà il piatto vero (tortelli, sbrisolona) una volta al giorno
+(`Z.cucina`). **codice C** (`telefono/app/compilatore.js`): la copia di mycompiler.io per il C, a sinistra l'editor
+(numeri di riga, colori della sintassi, Tab e rientri, Ctrl+Invio esegue), a destra INPUT (lo stdin) e OUTPUT (l'uscita, gli
+errori in rosso, il codice d'uscita, i tempi), gli errori di GCC segnati sulle righe, sei esempi. Il C è **vero e compilato
+fuori**: GCC 14.2 su Compiler Explorer (`godbolt.org/api`, gratis, senza chiave, CORS aperto), e Wandbox (`gcc-head-c`)
+se il primo non risponde; scelta di Alberto (26.10), la pagina avvisa che il codice esce dal sito. Il carattere del codice
+è Cascadia Code (`fonts/cascadia-code.woff2`, OFL, preso da `@fontsource-variable/cascadia-code`): quello del
+cercapersone ha solo maiuscole. Con più di dodici app la home le mette cinque per riga (`.t-griglia:has(> :nth-child(13))`).
+
+Gli avatar (`art/chat-avatar/`) e le
+piastrelle delle app nuove (`art/chat-app3/`) sono **a pixel**, di `retro-diffusion/rd-plus` su Replicate, una predizione per
+icona, col fondo tolto e ingrandite senza sfumare: `node tools/pzkko/pixel.mjs [nome…]` (i prompt sono lì; serve
+`REPLICATE_API_TOKEN` in `albertopecchini.it/.env.local`; `--rifai` rielabora i PNG già scaricati senza pagare). Il bordo
+bianco di carta delle piastrelle è **nel disegno**, non nel CSS: quelle di gpt-image-2 ce l'hanno di loro, a quelle a pixel
+lo aggiunge `pixel.mjs` (tutte le piastrelle `APP`, anche le prossime).
+
+## Quiz, side quest, traguardi e comandi in più (26.10 sera)
+
+«Altri quiz, altre foto, più modi di rispondere, altre cose in chat, altre side quest, altri traguardi» (Alberto).
+
+- **Quiz** (`chat/quiz.js`, dati in `chat/quiz-dati.js` e `chat/quiz-altre.js`): otto argomenti nuovi (geometra, informatica,
+  storia, geografia, natura, musica, sport, matematica) più domande in coda ai sette vecchi, 262 voci in tutto in
+  `quiz-altre.js`; le chiavi `${arg}:${i}` dei vecchi non cambiano (le nuove vanno dopo). Un nuovo modo di rispondere: le
+  **VERO/FALSO**, scritte nei dati con `['vero','falso']` (o `['falso','vero']`): la prima voce è la giusta, il motore non le
+  mescola e la domanda ha `vf: true` (due tasti grandi nell'app, `.t-qz-risp.vf`). Nelle domande con la foto i finti sbagliati
+  sono, se possibile, della stessa categoria (`cat` in `chat/immagini.js`). Solo fatti controllabili: le domande sull'economia di
+  pzk sono state tolte se non verificate sul codice (96 giorni, 1.000 iniziali).
+- **Side quest**: otto nuove in `chat/missioni-altre.js` (la nutria sindacalista, il ponte che non finisce, la sagra dei tortelli, il
+  cliente fantasma, la rana che canta, la statua di Virgilio, la campana stonata, la consegna impossibile), tutte senza oggetti
+  per cominciare; `missioni-dati.js` le mette dopo le prime cinque (13 in tutto). Controllo: ogni `vai` esiste e ogni nodo si raggiunge.
+- **Traguardi** (`chat/traguardi.js`): 47 (erano 26), per lo più scaglioni più alti degli stessi contatori; quello «tutte le side quest» vale 13.
+- **Chat** (`chat/comandi/svago.js`): barzelletta, palla8, oroscopo (uguale per tutti per tutto il giorno), sorte (testa o croce
+  per ridere: «moneta» coi soldi è un gioco), tira (dado per ridere: «dado» coi soldi è il sic bo). Niente soldi, niente attese.
+  In più un evento a caso, «vero o falso lampo» (`chat/comandi/eventi.js`, 6 secondi, paga come il quiz lampo).
+- **Foto** (`chat/immagini.js`, 26.10): da 14 a 126 foto di Wikimedia Commons (solo CC BY, CC BY-SA, CC0 e pubblico dominio, con autore e
+  licenza stampati sotto la foto). Ogni voce ha anche `cat` (mantova 27, natura 20, tech 24, cibo 16, varie 14, geometra 13, arte 12) per
+  scegliere i finti sbagliati nella stessa categoria. Gli id sono solo di lettere. Da controllare a occhio: alcune `cosa` sono ambigue
+  (`agnolini` somiglia a dei tortellini, `risottopilota`, `salame`, `sabbioneta` accanto a `ducale`, `borghetto` è in provincia di Verona).
+- **La wiki** (`wiki/`, 26.10, voce «wiki» della barra): **pzkkopedia**, «l'enciclopedia libera del muro». Lo scheletro VUOTO di una wiki, copia fedele nella grafica e nella struttura della skin Vector 2022 di Wikipedia in italiano (intestazione con menu, logo e ricerca; colonna con il menu principale e l'indice; linguette Voce/Discussione e Leggi/Modifica/Cronologia; piè di pagina), con il tocco di pzkko: Anton per il titolo, la fascia di ruggine col filo giallo sotto la barra, il logo di una chiocciola a puzzle disegnato qui, nessun nome né testo altrui. È una pagina sola, `wiki/index.html`, con l'indirizzo della voce nell'hash (`/wiki/#/Titolo_della_voce`, `#/Speciale:Cerca?q=…`, `#/Titolo?action=edit`); tutta l'interfaccia sta in `wiki.js` (modulo ES) e `wiki.css`. Le voci stanno in `wiki/voci.js` (`VOCI = {}`: titolo → wikitesto, il formato è nel commento di testa) e per ora non ce n'è nessuna: la Pagina principale ha i suoi riquadri con «nessun contenuto ancora», ogni titolo che non esiste mostra «Questa pagina non esiste» col tasto «Crea», le pagine «Speciale:» (Ultime modifiche, Una voce a caso, Pagine speciali, Cerca, Registri…) sono vuote. L'editor ha la barra degli strumenti e un'anteprima che funziona, con un piccolo interprete del wikitesto (grassetto, corsivo, titoli e indice con gli id, link rossi se la voce non esiste, elenchi, categorie); «Salva pagina» per ora dice che la wiki non è ancora aperta alle modifiche, e le utenze sono finte. Niente template, tabelle, immagini né note. Sul telefono la colonna diventa il menu hamburger. Niente dipendenze né CDN; `noindex`, fuori dalla sitemap. L'icona nella barra è provvisoria (`manuale-landini`).
 
 ## Gli strumenti (tools/)
 

@@ -15,6 +15,7 @@
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/art/insegna.svg" as="image">
+<link rel="stylesheet" href="/barra/barra.css"><!-- la barra in alto con le sezioni (barra/barra.js) -->
 <!-- Le scelte di chi guarda (window.pzkkoScelte), che la regia tiene nel browser. Dal 23.10 la pagina parte sempre col
      muro di sempre, in 2D, a mezzogiorno col sole, sul computer e sul telefono: il 3D, l'ora vera con la sera e la notte
      e il meteo vero di Mantova si accendono apposta, in cima alla scheda «grafica» della regia.
@@ -121,6 +122,8 @@ img{display:block;max-width:100%;height:auto}
    le lettere (art/insegna-notte.svg, stessa tela, sovrapposta; dal 23.10 si scarica solo quando si accende: data-src,
    lo script) */
 .portale{position:relative;z-index:32;padding:clamp(18px,3.2vw,40px) 0 0;display:flex;justify-content:center;pointer-events:none}
+/* con la barra in alto (barra/barra.js, 26.10) l'insegna scende sotto di lei, con un po' d'aria: nella scena 3D l'insegna è in 3D e lo spazio c'è già */
+html.con-barra:not(.scena3d) .portale{padding-top:calc(var(--barra) + clamp(22px,3.4vw,48px))}
 .portale h1{position:relative;margin:0;width:min(100%,840px)}
 .insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .55 * var(--notte)))}
 .insegna.notte{position:absolute;inset:0;z-index:2;filter:none;opacity:calc(var(--insegna) * var(--f-insegna))}
@@ -165,6 +168,7 @@ img{display:block;max-width:100%;height:auto}
 .tag.chiaro{mix-blend-mode:normal;opacity:.95}
 .man{z-index:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)) drop-shadow(0 8px 14px rgba(0,0,0,.28))}
 .pezzo{z-index:1;pointer-events:none}
+.pezzo.vivo{pointer-events:auto} /* il wallet e il cercapersone (26.10): pezzi del muro da toccare */
 
 /* ── le parole sprayate che danno il nome alle zone: graffiti veri (art/scritte/), sotto i fogli ── */
 .spray{z-index:0;margin:0;scroll-margin-top:24px}
@@ -295,7 +299,7 @@ img{display:block;max-width:100%;height:auto}
 /* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
 @media (max-width:899px){
   :root{--u:calc(min(100cqw, 600px) / 390)}
-  .parete{height:calc(5684 * var(--u));max-width:600px;margin:0 auto}
+  .parete{height:calc(5760 * var(--u));max-width:600px;margin:0 auto}
   .it{--px:var(--mx,var(--x));--py:var(--my,var(--y));--pw:var(--mw,var(--w));--pr:var(--mr,var(--r,0deg))}
   .spray{font-size:calc(40 * var(--u))}
   .vol h3{font-size:max(calc(22px * var(--ts,1)),calc(16cqw * var(--ts,1)))}
@@ -346,12 +350,12 @@ img{display:block;max-width:100%;height:auto}
    scorrono tutti i dati del wallet, col clic si apre il portafoglio (la foto è art/wallet-banner/banner.webp,
    gpt-image-2; i led li accende wallet/banner.js, che si carica da solo appena la pagina è tranquilla; il portafoglio
    aperto, wallet.css). Il pannello sta sul vetro della foto, misurato sui profili di luce (792 × 214): dentro la cornice
-   nera da x 62 a 713 e da y 63,5 a 154,5. Il cercapersone qui sotto (.chat-tasto) parte 10 px sotto il banner (8 sul
-   telefono). Negli strumenti che fotografano la pagina non c'è (navigator.webdriver),
-   ?wallet lo fa vedere lo stesso. Senza script non c'è ── */
-.wallet-tasto{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));width:calc(52px * 792 / 214);height:52px;padding:0;border:0;background:none;color:#e9e4d8;cursor:pointer;
+   nera da x 62 a 713 e da y 63,5 a 154,5. Dal 26.10 non sta più sospeso in alto a sinistra: è un pezzo della parete
+   (#wallet-muro, in cima alla prima pila), avvitato alla saracinesca (art/muro/viti.svg), e scorre col muro. Negli
+   strumenti che fotografano la pagina i led restano spenti (navigator.webdriver; ?wallet li accende) ── */
+.wallet-tasto{height:auto;aspect-ratio:792/214;padding:0;border:0;background:none;color:#e9e4d8;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
-.wallet-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;pointer-events:none}
+.wallet-tasto img,.chat-tasto img.attacco{position:absolute;inset:0;width:100%;height:100%;max-width:none;pointer-events:none}
 .wallet-tasto canvas,.wallet-tasto::after{position:absolute;left:7.828%;top:29.673%;width:82.197%;height:42.523%}
 .wallet-tasto canvas{display:block;background:#040605}
 /* il vetro sopra i led: un riflesso in diagonale e l'ombra della cornice */
@@ -359,18 +363,16 @@ img{display:block;max-width:100%;height:auto}
 .wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 20px/1 "Fake Receipt",monospace;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
 .wallet-tasto .wt-piu.va{animation:wt-piu 1.6s ease-out forwards}
 @keyframes wt-piu{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
-.wallet-tasto[hidden]{display:none}
-html:not(.js) .wallet-tasto{display:none}
-@media (hover:hover){.wallet-tasto:hover{transform:scale(1.03)}}
-.wallet-tasto:active{transform:scale(.97)}
+@media (hover:hover){.wallet-tasto:hover{scale:1.03}}
+.wallet-tasto:active{scale:.97}
 .wallet-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.wallet-tasto{width:calc(46px * 792 / 214);height:46px}}
 @media (prefers-reduced-motion:reduce){.wallet-tasto{transition:none}.wallet-tasto .wt-piu.va{animation-duration:.01s}}
 
 /* ── il tasto della chat col bot (chat/), sotto il wallet: un cercapersone nero con lo
-   schermo lcd verde dove vive il tomodachi, una chiocciolina a pixel (chat/tomodachi.js); il led rosso lampeggia quando c'è un premio da riscuotere. Negli strumenti che
-   fotografano la pagina non c'è (navigator.webdriver), ?chat lo fa vedere lo stesso. Senza script non c'è ── */
-.chat-tasto{position:fixed;z-index:85;top:calc(max(12px,env(safe-area-inset-top)) + 62px);left:max(12px,env(safe-area-inset-left));width:112px;height:65px;padding:0;border:0;background:none;cursor:pointer;
+   schermo lcd verde dove vive il tomodachi, una chiocciolina a pixel (chat/tomodachi.js); il led rosso lampeggia quando c'è un premio da riscuotere.
+   Dal 26.10 è un pezzo della parete (#cercapersone-muro, in cima alla seconda pila), appeso al chiodo per la clip
+   (art/muro/chiodo.svg). Negli strumenti che fotografano la pagina resta spento (navigator.webdriver; ?chat lo accende) ── */
+.chat-tasto{height:auto;aspect-ratio:336/194;padding:0;border:0;background:none;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
 .chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
 .chat-tasto .ct-lcd{position:absolute;left:8.352%;top:24.677%;width:66.294%;height:56.202%;display:block;border-radius:1px;background:#a9bc96;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden}
@@ -384,12 +386,9 @@ html:not(.js) .wallet-tasto{display:none}
 @keyframes ct-lamp{50%{opacity:.25}}
 /* il led che lavora (chat/led.js): sfarfalla come la spia del disco di un PC finché il sistema fa qualcosa */
 .chat-tasto .ct-led.lavora{background:#ff4a3a;box-shadow:0 0 5px #ff3b2e,0 0 11px rgba(255,59,46,.65);animation:none;opacity:1}
-.chat-tasto[hidden]{display:none}
-html:not(.js) .chat-tasto{display:none}
-@media (hover:hover){.chat-tasto:hover{transform:scale(1.04)}}
-.chat-tasto:active{transform:scale(.96)}
+@media (hover:hover){.chat-tasto:hover{scale:1.04}}
+.chat-tasto:active{scale:.96}
 .chat-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.chat-tasto{top:calc(max(12px,env(safe-area-inset-top)) + 54px);width:96px;height:56px}}
 @media (prefers-reduced-motion:reduce){.chat-tasto{transition:none}.chat-tasto.msg .ct-led{animation:none}}
 /* 404: un muro corto */
 .parete.p404{height:calc(640 * var(--u))}
@@ -448,10 +447,6 @@ html:not(.js) .chat-tasto{display:none}
 </div>
 <!-- i suoni della strada (suono/): partono al primo tocco o tasto; questo li spegne e li riaccende -->
 <button class="suono" type="button" aria-pressed="true" aria-label="i suoni della strada" title="i suoni della strada" hidden><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4.5 12.4h6.2l8-6.6.3 20.6-8.1-6.8H4.8z"/><path class="s-onde" d="M24.2 10.6c2.6 3 2.8 7.6.2 10.9M28.6 6.8c4.6 4.9 4.8 13.3.3 18.6"/><path class="s-muto" d="M24.5 11.2l8.6 9.4M33 11.4l-8.4 9"/></svg><span>suono</span></button>
-<!-- il wallet dei $pzk (wallet/), sempre in alto a sinistra: il banner di pelle col pannello a led dei $pzk (col cursore sopra scorrono i dati) -->
-<button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" hidden><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas></button>
-<!-- la chat col bot dei $pzk (chat/), sotto il wallet: il cercapersone con lo schermo lcd -->
-<button class="chat-tasto" type="button" aria-label="chat: parla col bot dei $pzk" title="chat col bot" hidden><img src="/art/chat-pager-grande/pager-piccolo.webp" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span></button>
 
 <script>
 (() => {
@@ -935,6 +930,8 @@ html:not(.js) .chat-tasto{display:none}
       document.addEventListener('pzkko-chat', (e) => apri(e.detail?.comando))
       ;(window.requestIdleCallback ?? setTimeout)(() => carica().catch(() => {}), { timeout: 4000 })
       if (nel === 'chat') apri()
+      // la voce «account» della barra, dalle altre pagine; poi via il #account dall'indirizzo, così non si riapre (ricaricando, col tasto indietro)
+      if (nel === 'account') { history.replaceState(null, '', location.pathname + location.search); carica().then(() => import('/games/pzk.js')).then((p) => p.apriWallet('conto')).catch(() => {}) }
     }
   }
 
@@ -962,6 +959,7 @@ html:not(.js) .chat-tasto{display:none}
         S.acceso = true
         if (!ctx) {
           ctx = new AC({ latencyHint: 'balanced' })
+          S.ctx = ctx // (anche per i suoni dell'interfaccia: suono/interfaccia.js)
           // (sull'iPhone come un suono di sottofondo: rispetta il tasto del silenzioso e non ferma la musica)
           try { if (navigator.audioSession) navigator.audioSession.type = 'ambient' } catch {}
           ctx.onstatechange = () => tasto?.classList.toggle('va', ctx.state === 'running' && S.acceso)
@@ -1389,5 +1387,6 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
 </script>
 <!-- lo scontrino delle novità (benvenuto/): una volta per versione, a pagina caricata; ?novita lo fa rivedere -->
 <script type="module" src="/benvenuto/benvenuto.js"></script>
+<script type="module" src="/barra/barra.js"></script>
 </body>
 </html>

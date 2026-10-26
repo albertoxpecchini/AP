@@ -37,7 +37,8 @@ const quale = (nome) => { if (!PAGINE[nome]) throw new Error(`pagina «${nome}»
 // ── gli elementi .it di index.html e la loro chiave ──────────────────────────
 export function elementi(html) {
   const out = []
-  for (const m of html.matchAll(/<(img|article|h2|figure|section)\b[^>]*\bclass="[^"]*\bit\b[^"]*"[^>]*>/g)) {
+  // (button: il wallet e il cercapersone, pezzi vivi del muro dal 26.10)
+  for (const m of html.matchAll(/<(img|article|h2|figure|section|button)\b[^>]*\bclass="[^"]*\bit\b[^"]*"[^>]*>/g)) {
     const t = m[0]
     const id = t.match(/\bid="([^"]+)"/)
     let k

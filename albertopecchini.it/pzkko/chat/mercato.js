@@ -37,7 +37,7 @@ export const prezzoDi = (x) => Math.max(1, Math.round(x.prezzo * (1 - scontoDi(x
 /** Incassa un premio (sfide, quiz, missioni): col moltiplicatore del livello e dei bonus «paga», e dei bonus «sfide» se `sfide`. → quanto è arrivato */
 export function incassa(n, { sfide = false } = {}) {
   const tot = Math.round(n * zaino.moltiplicatore() * (sfide ? 1 + zaino.bonus('sfide') : 1) * 2) / 2
-  if (tot > 0) { pzk.regola('chat', 0, tot); zaino.conta('guadagnati', tot) }
+  if (tot > 0) { pzk.regola('chat', 0, tot, 'conio'); zaino.conta('guadagnati', tot) } // (i premi: soldi nuovi)
   return tot
 }
 

@@ -123,7 +123,9 @@ export function banner(bottone, { batteria }) {
   const misura = () => {
     if (!rimisura) return W > 0
     rimisura = false
-    const dpr = Math.min(2, devicePixelRatio || 1)
+    // almeno 320 px di tela (26.10): sul muro, nella scena 3D, il pezzo nella pagina è piccolo (la parete è stretta) e coi led
+    // sotto i 2 px i puntini non si disegnavano; e la tela la ricopia la scena (scena/fogli.js, viva), che la vuole nitida
+    const dpr = Math.max(Math.min(2, devicePixelRatio || 1), 320 / Math.max(1, tela.clientWidth))
     const w = Math.round(tela.clientWidth * dpr), h = Math.round(tela.clientHeight * dpr)
     if (!w || !h) return false
     ultimo = -1; cambioPagina = 0; fermo = false

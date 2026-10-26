@@ -13,14 +13,17 @@ export const DESK = {
   top: 0, bottom: 40, minimo: 2000, passo: 1, scala: 1,
   cols: [
     { x: 12, items: [
-      { k: '#storia-torna', w: 190, dx: 30, gap: 10, r: -3 },
+      // il wallet e il cercapersone (26.10): in cima, come nella home
+      { k: '#wallet-muro', w: 245, dx: 8, gap: 0, r: -2 },
+      { k: '#storia-torna', w: 190, dx: 30, gap: 6, r: -3 },
       { k: '#storia-muro', w: 300, gap: -22, r: -1.5 },
       { k: '#storia-com-e-andata', w: 240, dx: 25, gap: 0, r: -4 },
       { k: '#storia-bologna', w: 275, gap: -4, r: -2 },
       { k: '#storia-saracinesca', w: 280, gap: -24, r: -1.5 },
     ] },
     { x: 262, items: [
-      { k: '#storia-scatto-1', w: 320, dx: 5, gap: 30, r: 1.5 },
+      { k: '#cercapersone-muro', w: 185, dx: 35, gap: 6, r: 3 },
+      { k: '#storia-scatto-1', w: 320, dx: 5, gap: 14, r: 1.5 },
       { k: '#storia-iphone', w: 270, gap: -6, r: 2 },
       { k: '#storia-scatto-3', w: 245, dx: 8, gap: -22, r: 2 },
       { k: '#storia-lo-sapevi', w: 285, gap: -6, r: -1 },
@@ -80,7 +83,8 @@ export const MOB = {
   top: 0, bottom: 40, minimo: 0, passo: 1, scala: 1,
   cols: [
     { x: 6, items: [
-      { k: '#storia-torna', w: 150, dx: 20, gap: 8, r: -3 },
+      { k: '#wallet-muro', w: 182, dx: 2, gap: 0, r: -2 },
+      { k: '#storia-torna', w: 150, dx: 20, gap: 6, r: -3 },
       { k: '#storia-muro', w: 200, gap: -16, r: -2 },
       { k: '#storia-scatto-1', w: 188, gap: -16, r: 1.5 },
       { k: '#storia-com-e-andata', w: 160, dx: 15, gap: 0, r: -4 },
@@ -95,7 +99,8 @@ export const MOB = {
       { k: '#storia-fine', w: 188, gap: -4, r: 1 },
     ] },
     { x: 198, items: [
-      { k: 'manifesti3/unimore', w: 170, dx: 10, gap: 18, r: 2 },
+      { k: '#cercapersone-muro', w: 150, dx: 20, gap: 4, r: 3 },
+      { k: 'manifesti3/unimore', w: 170, dx: 10, gap: 12, r: 2 },
       { k: '#storia-iphone', w: 185, gap: -14, r: 2 },
       { k: '#storia-scatto-2', w: 180, dx: 4, gap: -18, r: -1 },
       { k: '#storia-scatto-3', w: 180, dx: 4, gap: -4, r: 2 },

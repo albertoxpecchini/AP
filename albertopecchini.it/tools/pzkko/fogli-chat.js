@@ -6,9 +6,9 @@
 import { FOGLI_CHAT } from '../../pzkko/chat/icone.js'
 
 const STICKER = `They are drawn as flat cartoon STICKERS in ONE consistent style, like the custom emoji set of a Discord bot: bold black outlines of even thickness, simple chunky shapes, bright saturated flat colours with at most one darker flat shade tone per colour, no gradients, no texture, no text or letters anywhere, no background and no drop shadow, each sticker big and centred in its cell, readable even when shrunk to 32 pixels. Slightly hand-drawn, like marker-pen stickers on a wall.`
-const LUMACA = `the mascot of the «banca $pzk»: a cute cartoon garden SNAIL with a brown spiral shell (a lighter spiral line on it), a soft green body, two eye stalks with big round eyes, wearing black wayfarer SUNGLASSES across the eye stalks`
+export const LUMACA = `the mascot of the «banca $pzk»: a cute cartoon garden SNAIL with a brown spiral shell (a lighter spiral line on it), a soft green body, two eye stalks with big round eyes, wearing black wayfarer SUNGLASSES across the eye stalks`
 
-const TESTI = {
+export const TESTI = {
   'chat-bot': [4, 2, '2048x1152', 'il bot della chat: la chiocciola con gli occhiali da sole in otto umori',
     `All eight are the SAME character, ${LUMACA}, seen from the side with the head on the left, in eight different moods (the sunglasses stay on in every one):`, {
       bot: 'calm and friendly, a small confident smile',

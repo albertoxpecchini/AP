@@ -32,6 +32,10 @@
 // { a: 'zaino', token, zaino } lo salva (al più 8 KB, forma controllata), in un file a parte, pzkko/chat.json
 // ({ zaini: { [id]: zaino } }), così wallet.json non si gonfia. GET ?classifica=1 dà i dieci conti più ricchi (nome e $pzk).
 // Moderazione: con la chiave, { a: 'lista', key } elenca i conti e { a: 'via', key, nome } ne cancella uno.
+// L'ECONOMIA (26.10, _economia.mjs): ogni salvataggio dice dove sono andati i soldi (`flussi`: alla cassa di pzk o persi
+// per terra; il resto è conio), la lumachina, il sussidio, le banconote e instagram coniano, il cambio passa dalla cassa;
+// i soldi sporchi (il bottino delle rapine) non si mandano né si cambiano; le azioni nuove: colpo (la rapina alla cassa,
+// almeno in due), lava (la lavatrice), decifra (i wallet trovati dallo spazzino), arresto e cauzione (la galera).
 // Sta qui (.mjs) perché vada online anche quando il progetto pzkko avrà la Root Directory in albertopecchini.it/pzkko;
 // finché la radice è albertopecchini.it, la pubblica albertopecchini.it/api/wallet.js, che la riesporta.
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
@@ -40,6 +44,7 @@ import { borsa, tassoA, attuale } from './_borsa.mjs'
 import { PATH, vuoto, offerta } from './_conti.mjs'
 import { PATH_GIOCATORI, vuotoG, aggiornaGiocatore, notizia } from './_giocatori.mjs'
 import { vivi, daVivere, evento } from '../chat/lumaca.mjs'
+import { cassa, eBanca, conia, allaCassa, perdi, distruggi, ritrova, smarriti, sporchi, puliti, sporca, matura, LAVA, CAUZIONE, PULIZIA } from './_economia.mjs'
 
 export const INIZIALE = 1000, PREMIO_IG = 1000, SUSSIDIO = 1000
 export const BANCONOTE = { b500: 500, b100: 100, b25: 25, b10: 10 }
@@ -98,17 +103,25 @@ const illimitato = (c) => c?.k === 'pzkko'
 
 // ── il conto come lo vede il suo padrone (mai il PIN), e il resto della risposta ──
 const oggi = () => giornoDi()
+const ora = (t) => new Date(t).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
 const vista = (c, now) => ({
   nome: c.nome, ind: 'pzk' + c.ind, indCambiato: !!c.indCambiato, creato: c.creato, pzk: c.pzk, eur: c.eur, ig: !!c.ig,
   trovati: c.trovati?.g === oggi() ? c.trovati.q : [], sussidio: c.sussidio === oggi(), invii: illimitato(c) || c.creato + ATTESA_INVII <= now, inviiDa: illimitato(c) ? c.creato : c.creato + ATTESA_INVII,
   mosse: (c.mosse ?? []).slice(-12), lumaca: c.lumaca ? { g: c.lumaca.g, ultime: c.lumaca.ultime } : null,
   es: c.es ?? 0, esterni: (c.esterni ?? []).slice(-30),
+  // l'economia: i soldi sporchi e quando si puliscono, il lavaggio, la galera, l'ultimo lotto di flussi contato, l'ultimo colpo
+  sporchi: sporchi(c), puliti: puliti(c), pulizia: c.sporchi?.length ? c.sporchi[0].t + PULIZIA : null, lavaggio: c.lavaggio ?? null,
+  galera: c.galera > now ? c.galera : null, fn: c.fn ?? 0, colpo: c.ultimoColpo ?? 0, decifrati: c.decifrati?.g === oggi() ? c.decifrati.n : 0,
 })
 const mossa = (c, m) => { (c.mosse ??= []).push(m); if (c.mosse.length > 40) c.mosse.splice(0, c.mosse.length - 40) }
 
 // la lumachina vive i giorni che le mancano fino a oggi (chat/lumaca.mjs): una mossa per ogni giornata che sposta $pzk.
 // → { delta, nuove } o null
-const vive = (c, now) => vivi(c, oggi(), (v) => { if (v.n) mossa(c, { t: now, tipo: 'lumaca', n: Math.abs(v.n), verso: v.n < 0 ? 'meno' : 'piu', pct: v.pct, g: v.g, ev: v.ev }) })
+const vive = (c, now, db) => vivi(c, oggi(), (v) => {
+  if (!v.n) return
+  mossa(c, { t: now, tipo: 'lumaca', n: Math.abs(v.n), verso: v.n < 0 ? 'meno' : 'piu', pct: v.pct, g: v.g, ev: v.ev })
+  if (db) { if (v.n > 0) conia(db, v.n, now); else allaCassa(db, -v.n, now) } // i miracoli coniano, le spese vanno alla cassa
+})
 // le catastrofi e i miracoli appena vissuti diventano notizie della banca (se il database dei giocatori non va, pazienza)
 async function notizieLumaca(c, lu, now) {
   const gravi = (lu?.nuove ?? []).filter((v) => Math.abs(v.pct) >= 25)
@@ -130,7 +143,22 @@ const lgDi = (x) => (x === null || (typeof x === 'string' && /^\d{4}-\d\d-\d\d$/
 // dopo si aggiungono al saldo che manda (undefined: un browser di prima, niente da aggiungere)
 const esDi = (x) => (Number.isInteger(x) && x >= 0 ? x : undefined)
 const esterno = (c, n) => { c.es = (c.es ?? 0) + 1; (c.esterni ??= []).push({ s: c.es, n }); if (c.esterni.length > 30) c.esterni.splice(0, c.esterni.length - 30) }
-function accogli(c, pzk, now, lg, es) {
+// i flussi del browser (games/pzk.js): quanto è andato alla cassa (perso al gioco, speso; negativo: vinto, venduto) e quanto
+// è caduto per terra (le morti), in un lotto numerato (n: un lotto già contato, per una risposta persa, non si conta due
+// volte). Il resto della differenza di saldo è conio: soldi nuovi (il lavoro, le quest, i premi)
+const flussiDi = (x) => {
+  if (!x || typeof x !== 'object' || !Number.isInteger(x.n) || x.n < 1) return null
+  const casa = Number(x.casa), persi = Number(x.persi), lim = (v, a, b) => (Number.isFinite(v) ? Math.max(a, Math.min(b, v)) : 0)
+  return { n: x.n, casa: lim(casa, -1e7, 1e7), persi: lim(persi, 0, 1e7) }
+}
+function contabilizza(db, c, delta, fl, now) {
+  let casa = 0, persi = 0
+  if (fl && fl.n > (c.fn ?? 0)) { casa = fl.casa; persi = fl.persi; c.fn = fl.n }
+  let conio = delta + casa + persi
+  if (conio < 0) { casa -= conio; conio = 0 } // perso più di quanto spiegato: alla cassa
+  allaCassa(db, casa, now); perdi(db, persi, now); conia(db, conio, now)
+}
+function accogli(c, pzk, now, lg, es, db = null, fl = null) {
   if (pzk === undefined || pzk === null) return null
   if (typeof pzk !== 'number' || !Number.isFinite(pzk) || pzk < 0 || pzk > 1e8) return 'saldo strano'
   if (lg !== undefined) for (const v of c.lumaca?.ultime ?? []) if (lg === null || v.g > lg) pzk = Math.max(0, pzk + v.n)
@@ -145,7 +173,9 @@ function accogli(c, pzk, now, lg, es) {
   pzk = mezzi(pzk)
   const secondi = Math.max(0, (now - (c.salvato ?? c.creato)) / 1000)
   if (!illimitato(c) && pzk - c.pzk > 20000 + 1200 * secondi) return 'il saldo non torna: ricarico quello salvato'
+  const delta = pzk - c.pzk
   c.pzk = pzk; c.salvato = now
+  if (db && !eBanca(c)) contabilizza(db, c, delta, fl, now)
   return null
 }
 
@@ -205,7 +235,7 @@ export default async function handler(req, res) {
       const ind = indirizzoDi(url.searchParams.get('ind'))
       const { db } = await store.read()
       if (url.searchParams.has('operazioni')) return json(res, 200, { ok: true, operazioni: OPERAZIONI.map((o) => ({ id: o.id, da: 'pzk' + o.da, ...(o.a ? { a: 'pzk' + o.a, n: o.n } : { togli: o.togli }), ...(db.operazioni?.[o.id] ?? { fatta: false }) })) })
-      if (url.searchParams.has('classifica')) return json(res, 200, { ok: true, classifica: [...db.conti].sort((a, b) => b.pzk - a.pzk).slice(0, 10).map((c) => ({ nome: c.nome, pzk: c.pzk })) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
+      if (url.searchParams.has('classifica')) return json(res, 200, { ok: true, classifica: [...db.conti].filter((c) => !eBanca(c)).sort((a, b) => b.pzk - a.pzk).slice(0, 10).map((c) => ({ nome: c.nome, pzk: c.pzk })) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
       if (ind) { const c = db.conti.find((x) => x.ind === ind); return c ? json(res, 200, { ok: true, conto: { nome: c.nome, ind: 'pzk' + c.ind, creato: c.creato } }, 'public, s-maxage=20') : json(res, 404, { ok: false, errore: 'nessun conto con questo indirizzo' }) }
       return json(res, 200, { ok: true, ...offerta(db) }, 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
     }
@@ -240,7 +270,7 @@ export default async function handler(req, res) {
         const c = { id: now.toString(36) + randomBytes(4).toString('base64url'), nome, k, pin: { s, h: hashPin(body.pin, s) }, ind: RISERVATI[k] ?? nuovoIndirizzo(db), indCambiato: false, creato: now, pzk: INIZIALE, eur: 0, ig: false, salvato: now }
         mossa(c, { t: now, tipo: 'nato', n: INIZIALE })
         db.conti.push(c)
-        return { c, lu: vive(c, now) } // la lumachina nasce col conto e vive già oggi
+        return { c, lu: vive(c, now, db) } // la lumachina nasce col conto e vive già oggi
       })
       if (r.errore) return json(res, 409, { ok: false, errore: r.errore })
       limiti.crea.segna(ip, now)
@@ -259,7 +289,7 @@ export default async function handler(req, res) {
       let lu = null
       if (daVivere(c.lumaca?.g, oggi()).length) { // la lumachina ha giorni da vivere: una scrittura, al più una al giorno
         const id = c.id
-        const r = await aggiorna(store, (d) => { const x = d.conti.find((y) => y.id === id); if (!x) return { invariato: true }; const l = vive(x, now); return l ? { c: x, lu: l } : { invariato: true, c: x } })
+        const r = await aggiorna(store, (d) => { const x = d.conti.find((y) => y.id === id); if (!x) return { invariato: true }; const l = vive(x, now, d); return l ? { c: x, lu: l } : { invariato: true, c: x } })
         if (r.c) c = r.c
         lu = r.lu ?? null
         await notizieLumaca(c, lu, now)
@@ -296,8 +326,10 @@ export default async function handler(req, res) {
       const r = await aggiorna(store, (db) => {
         const c = db.conti.find((x) => x.id === id)
         if (!c) return { errore: 'conto sparito', esci: true }
-        const prima = c.pzk, avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es)), lu = vive(c, now)
-        if (c.pzk === prima && !lu) return { invariato: true, c, avviso }
+        const prima = c.pzk, avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es), db, flussiDi(body.flussi)), lu = vive(c, now, db)
+        const tempo = matura(c, now, (m) => mossa(c, m)) // i sporchi che si puliscono, il lavaggio finito, la galera scontata
+        distruggi(db, now)
+        if (c.pzk === prima && !lu && !tempo && !avviso) return { invariato: true, c, avviso }
         return { c, avviso, lu }
       })
       if (r.errore) return json(res, 401, { ok: false, errore: r.errore, esci: r.esci })
@@ -311,9 +343,10 @@ export default async function handler(req, res) {
     const azione = (fai) => aggiorna(store, (db) => {
       const c = db.conti.find((x) => x.id === id)
       if (!c) return { errore: 'conto sparito', esci: true }
-      const avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es))
+      const avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es), db, flussiDi(body.flussi))
       if (avviso) return { errore: avviso, c }
-      const lu = vive(c, now)
+      const lu = vive(c, now, db)
+      matura(c, now, (m) => mossa(c, m))
       const esito = fai(c, db) ?? {}
       if (esito.errore && lu) return { c, lu, rifiuto: esito.errore }
       return { c, lu, ...esito }
@@ -329,12 +362,13 @@ export default async function handler(req, res) {
       if (!Number.isFinite(quanto) || quanto <= 0) return json(res, 400, { ok: false, errore: 'quanto?' })
       if (!Number.isFinite(t) || now - t > VALE_CAMBIO || t > now + MINUTO) return json(res, 409, { ok: false, errore: 'il cambio è vecchio: sincronizzo', sincronizza: true, tasso, t: now })
       const cambio = b ? tassoA(b, t) : 1 // quello che il wallet mostrava
-      return manda(await azione((c) => {
+      return manda(await azione((c, db) => {
         if (da === 'pzk') {
-          const n = mezzi(Math.min(quanto, c.pzk))
-          if (n < 0.5) return { errore: 'non hai $pzk da convertire' }
+          const n = mezzi(Math.min(quanto, puliti(c)))
+          if (n < 0.5) return { errore: sporchi(c) ? 'i soldi sporchi non si cambiano: prima lavali' : 'non hai $pzk da convertire' }
           const e = cent(n * cambio)
           c.pzk = mezzi(c.pzk - n); c.eur = cent(c.eur + e)
+          allaCassa(db, n, now) // la cassa compra i $pzk e dà gli EUR€
           mossa(c, { t: now, tipo: 'in-eur', n, eur: e, cambio })
           return { fatto: { da: 'pzk', n, eur: e, cambio } }
         }
@@ -343,6 +377,7 @@ export default async function handler(req, res) {
         const n = mezzi(e / cambio)
         if (n < 0.5) return { errore: 'troppo pochi: non fanno nemmeno mezzo $pzk' }
         c.eur = cent(c.eur - e); c.pzk = mezzi(c.pzk + n)
+        allaCassa(db, -n, now)
         mossa(c, { t: now, tipo: 'in-pzk', n, eur: e, cambio })
         return { fatto: { da: 'eur', n, eur: e, cambio } }
       }), { cambio })
@@ -356,7 +391,8 @@ export default async function handler(req, res) {
         const d = db.conti.find((x) => x.ind === ind)
         if (!d) return { errore: 'nessun conto con questo indirizzo' }
         if (d.id === c.id) return { errore: 'sei tu' }
-        if (quanto > c.pzk) return { errore: `non ti bastano: hai ${c.pzk} $pzk` }
+        if (eBanca(d)) return { errore: 'alla cassa di pzk non si manda niente' }
+        if (quanto > puliti(c)) return { errore: sporchi(c) ? `si mandano solo i soldi puliti: ne hai ${puliti(c)}` : `non ti bastano: hai ${c.pzk} $pzk` }
         c.pzk = mezzi(c.pzk - quanto); d.pzk = mezzi(d.pzk + quanto); esterno(d, quanto)
         mossa(c, { t: now, tipo: 'inviato', n: quanto, a: 'pzk' + d.ind, nome: d.nome })
         mossa(d, { t: now, tipo: 'ricevuto', n: quanto, da: 'pzk' + c.ind, nome: c.nome })
@@ -381,23 +417,166 @@ export default async function handler(req, res) {
         const s = sale(); c.pin = { s, h: hashPin(body.nuovo, s) }
       }))
     }
-    if (a === 'ig') return manda(await azione((c) => { if (c.ig) return { errore: 'il regalo l’hai già avuto' }; c.ig = true; c.pzk = mezzi(c.pzk + PREMIO_IG); mossa(c, { t: now, tipo: 'instagram', n: PREMIO_IG }) }))
+    if (a === 'ig') return manda(await azione((c, db) => { if (c.ig) return { errore: 'il regalo l’hai già avuto' }; c.ig = true; if (body.pzk === undefined) { c.pzk = mezzi(c.pzk + PREMIO_IG); conia(db, PREMIO_IG, now) } /* (col saldo del browser il premio c'è già: contato come conio da accogli) */ mossa(c, { t: now, tipo: 'instagram', n: PREMIO_IG }) }))
     if (a === 'trova') {
       const v = BANCONOTE[body.quale]
       if (!v) return json(res, 400, { ok: false, errore: 'quale banconota?' })
-      return manda(await azione((c) => {
+      return manda(await azione((c, db) => {
         const g = oggi()
         if (c.trovati?.g !== g) c.trovati = { g, q: [] }
         if (c.trovati.q.includes(body.quale)) return { errore: 'questa l’hai già raccolta oggi' }
-        c.trovati.q.push(body.quale); c.pzk = mezzi(c.pzk + v)
+        c.trovati.q.push(body.quale)
+        if (body.pzk === undefined) { c.pzk = mezzi(c.pzk + v); conia(db, v, now) } // (col saldo del browser la banconota c'è già: contata come conio da accogli)
         mossa(c, { t: now, tipo: 'trovato', n: v })
       }))
     }
-    if (a === 'sussidio') return manda(await azione((c) => {
+    if (a === 'sussidio') return manda(await azione((c, db) => {
       if (c.pzk >= 1 || c.eur >= 0.01) return { errore: 'non sei a secco' }
       if (c.sussidio === oggi()) return { errore: 'il sussidio è uno al giorno: domani' }
-      c.sussidio = oggi(); c.pzk = mezzi(c.pzk + SUSSIDIO); mossa(c, { t: now, tipo: 'sussidio', n: SUSSIDIO })
+      c.sussidio = oggi(); c.pzk = mezzi(c.pzk + SUSSIDIO); conia(db, SUSSIDIO, now); mossa(c, { t: now, tipo: 'sussidio', n: SUSSIDIO })
     }))
+
+    // ── LA GALERA (26.10): un lavoro rischioso andato male (il dado lo tira il browser: chat/comandi/lavoro.js). La multa, coi
+    // soldi puliti, va alla cassa; si esce prima con la cauzione ──
+    if (a === 'arresto') {
+      const ore = Math.max(0.25, Math.min(12, Number(body.ore) || 1)), multa = mezzi(Math.max(0, Math.min(20000, Number(body.multa) || 0)))
+      return manda(await azione((c, db) => {
+        if (c.galera > now) return { fatto: { galera: c.galera, multa: 0 } }
+        const m = mezzi(Math.min(multa, puliti(c)))
+        c.galera = now + ore * 3600_000
+        if (m > 0) { c.pzk = mezzi(c.pzk - m); allaCassa(db, m, now) }
+        mossa(c, { t: now, tipo: 'arresto', n: m, verso: 'meno', perche: String(body.perche ?? '').slice(0, 60) })
+        return { fatto: { galera: c.galera, multa: m } }
+      }))
+    }
+    if (a === 'cauzione') return manda(await azione((c, db) => {
+      if (!(c.galera > now)) return { errore: 'non sei in galera' }
+      if (puliti(c) < CAUZIONE) return { errore: `la cauzione è ${CAUZIONE} $pzk puliti: ne hai ${puliti(c)}` }
+      c.pzk = mezzi(c.pzk - CAUZIONE); allaCassa(db, CAUZIONE, now); delete c.galera
+      mossa(c, { t: now, tipo: 'cauzione', n: CAUZIONE })
+      return { fatto: { cauzione: CAUZIONE } }
+    }))
+
+    // ── LA LAVATRICE (26.10): fino a 50.000 sporchi in 10 minuti, 2.000 puliti di commissione alla cassa ──
+    if (a === 'lava') {
+      const quanto = mezzi(Number(body.quanto))
+      return manda(await azione((c, db) => {
+        if (c.galera > now) return { errore: 'in galera non si lava niente' }
+        if (c.lavaggio) return { errore: `la lavatrice gira già: finisce alle ${ora(c.lavaggio.fino)}` }
+        const sp = sporchi(c)
+        if (!(sp > 0)) return { errore: 'non hai soldi sporchi da lavare' }
+        if (puliti(c) < LAVA.costo) return { errore: `il lavaggio costa ${LAVA.costo} $pzk puliti: ne hai ${puliti(c)}` }
+        const n = mezzi(Math.min(sp, LAVA.max, quanto > 0 ? quanto : sp))
+        c.pzk = mezzi(c.pzk - LAVA.costo); allaCassa(db, LAVA.costo, now)
+        c.lavaggio = { n, fino: now + LAVA.ms }
+        mossa(c, { t: now, tipo: 'lavatrice', n: LAVA.costo })
+        return { fatto: { lavaggio: c.lavaggio } }
+      }))
+    }
+
+    // ── DECIFRA (26.10): un wallet o una chiavetta trovati dallo spazzino, aperti col decifratore. I $pzk vengono dal fondo
+    // dei portafogli smarriti (erano destinati a sparire: puliti); tre al giorno ──
+    if (a === 'decifra') {
+      const tipo = body.tipo === 'chiavetta' ? 'chiavetta' : 'wallet'
+      return manda(await azione((c, db) => {
+        if (c.galera > now) return { errore: 'in galera i computer non si toccano' }
+        const g = oggi()
+        if (c.decifrati?.g !== g) c.decifrati = { g, n: 0 }
+        if (c.decifrati.n >= 3) return { errore: 'tre al giorno: il decifratore si scalda. domani' }
+        c.decifrati.n++
+        const [da, fino] = tipo === 'chiavetta' ? [400, 4000] : [150, 1500]
+        const n = ritrova(db, mezzi(da + (fino - da) * (randomBytes(2).readUInt16BE() / 65535)))
+        if (n > 0) c.pzk = mezzi(c.pzk + n)
+        mossa(c, { t: now, tipo: 'decifrato', n })
+        return { fatto: { n, tipo, fondo: smarriti(db) } }
+      }))
+    }
+
+    // ── IL COLPO (26.10): la rapina alla cassa di pzk, almeno in due. Chi organizza apre il colpo e ha un codice di quattro
+    // lettere; i complici entrano col codice (al più quattro in tutto, quindici minuti); chi ha organizzato dà il via. Va a
+    // segno nel 32 % dei casi in due, 40 % in tre, 48 % in quattro: il bottino (il 3 % della cassa più l'1 % a testa, al più
+    // 15.000 a testa) si divide ed è SPORCO; se va male, sei ore di galera e una multa (il 20 % dei puliti, al più 5.000).
+    // Un colpo al giorno a testa, col conto di almeno 48 ore (così non si rapina coi conti nuovi) ──
+    if (a === 'colpo') {
+      const op = body.op, codice = String(body.codice ?? '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4)
+      const vede = (k, c) => k && ({ codice: k.codice, membri: k.membri.map((m) => ({ nome: m.nome, ind: 'pzk' + m.ind })), stato: k.stato, scade: k.scade, esito: k.esito ?? null, capo: k.membri[0]?.id === c.id, io: k.membri.some((m) => m.id === c.id) })
+      const tienili = (db) => { db.colpi = (db.colpi ?? []).filter((k) => now - k.creato < 2 * 3600_000) }
+      if (op === 'stato') { // (si chiede ogni pochi secondi: solo lettura)
+        const { db } = await store.read()
+        const c = db.conti.find((x) => x.id === id)
+        if (!c) return json(res, 401, { ok: false, errore: 'conto sparito', esci: true })
+        const tutti = (db.colpi ?? []).filter((k) => now - k.creato < 2 * 3600_000)
+        const k = codice ? tutti.find((x) => x.codice === codice) : tutti.filter((x) => x.membri.some((m) => m.id === c.id)).at(-1)
+        return json(res, 200, { ok: true, colpo: vede(k, c) ?? null, cassa: db.conti.find(eBanca)?.pzk ?? 0, conto: vista(c, now), tasso, t: now })
+      }
+      const r = await azione((c, db) => {
+        tienili(db)
+        const mio = db.colpi.find((k) => k.stato === 'aperto' && k.membri.some((m) => m.id === c.id))
+        const no = c.galera > now ? `sei in galera fino alle ${ora(c.galera)}` : !illimitato(c) && c.creato + ATTESA_INVII > now ? 'per i colpi il conto deve avere almeno 48 ore' : (c.ultimoColpo ?? 0) + GIORNO > now ? `un colpo al giorno: il prossimo dalle ${ora(c.ultimoColpo + GIORNO)}` : null
+        if (op === 'apri') {
+          if (mio) return { colpo: vede(mio, c) }
+          if (no) return { errore: no }
+          let cod
+          do cod = Array.from(randomBytes(4), (x) => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[x % 24]).join(''); while (db.colpi.some((k) => k.codice === cod))
+          const k = { codice: cod, creato: now, scade: now + 15 * MINUTO, stato: 'aperto', membri: [{ id: c.id, nome: c.nome, ind: c.ind }] }
+          db.colpi.push(k)
+          return { colpo: vede(k, c) }
+        }
+        if (op === 'entra') {
+          const k = db.colpi.find((x) => x.codice === codice)
+          if (!k || k.stato !== 'aperto' || k.scade < now) return { errore: 'nessun colpo aperto con questo codice' }
+          if (k.membri.some((m) => m.id === c.id)) return { colpo: vede(k, c) }
+          if (no) return { errore: no }
+          if (mio) return { errore: 'sei già in un altro colpo' }
+          if (k.membri.length >= 4) return { errore: 'la banda è piena: al massimo in quattro' }
+          k.membri.push({ id: c.id, nome: c.nome, ind: c.ind })
+          return { colpo: vede(k, c) }
+        }
+        if (op === 'esci') {
+          if (!mio) return { colpo: null }
+          mio.membri = mio.membri.filter((m) => m.id !== c.id)
+          if (!mio.membri.length) mio.stato = 'sciolto'
+          return { colpo: null }
+        }
+        if (op === 'vai') {
+          const k = mio
+          if (!k || k.membri[0].id !== c.id) return { errore: 'il via lo dà chi ha organizzato il colpo' }
+          if (k.membri.length < 2) return { errore: 'da solo no: serve almeno un complice' }
+          if (k.scade < now) { k.stato = 'scaduto'; return { errore: 'troppo tardi: il colpo è saltato' } }
+          const banda = k.membri.map((m) => db.conti.find((x) => x.id === m.id)).filter(Boolean)
+          for (const x of banda) { matura(x, now); if (x.galera > now) return { errore: `${x.nome} è in galera: il colpo non parte` } }
+          const banca = cassa(db, now), n = banda.length
+          const riuscito = randomBytes(2).readUInt16BE() / 65536 < { 2: 0.32, 3: 0.4, 4: 0.48 }[n]
+          if (riuscito) {
+            const quota = mezzi(Math.min((banca.pzk * (0.03 + 0.01 * n)) / n, 15000))
+            banca.pzk = mezzi(banca.pzk - quota * n)
+            for (const x of banda) {
+              x.pzk = mezzi(x.pzk + quota); sporca(x, quota, now); x.ultimoColpo = now
+              if (x.id !== c.id) esterno(x, quota) // (chi dà il via lo sa dalla risposta)
+              mossa(x, { t: now, tipo: 'rapina', n: quota })
+            }
+            k.esito = { ok: true, quota, bottino: mezzi(quota * n) }
+          } else {
+            const multe = []
+            for (const x of banda) {
+              const m = mezzi(Math.min(puliti(x) * 0.2, 5000))
+              x.pzk = mezzi(x.pzk - m); allaCassa(db, m, now); x.galera = now + 6 * 3600_000; x.ultimoColpo = now
+              if (x.id !== c.id) esterno(x, -m)
+              mossa(x, { t: now, tipo: 'arresto', n: m, verso: 'meno', perche: 'rapina' })
+              multe.push(m)
+            }
+            k.esito = { ok: false, ore: 6, multa: Math.max(...multe) }
+          }
+          k.stato = 'fatto'
+          return { colpo: vede(k, c), notizia: { ok: riuscito, n, bottino: k.esito.bottino ?? 0 } }
+        }
+        return { errore: 'quale mossa? apri, entra, esci, vai' }
+      })
+      if (r.notizia) {
+        try { const dbG = await archivio(PATH_GIOCATORI, vuotoG); if (dbG) await aggiorna(dbG, (g) => { notizia(g, r.c, r.notizia.ok ? 'rapina' : 'retata', r.notizia, now) }) } catch (e) { console.warn('notizie colpo:', e.message) }
+      }
+      return manda(r, { colpo: r.colpo ?? null })
+    }
     return json(res, 400, { ok: false, errore: 'richiesta sbagliata' })
   } catch (e) {
     if (e.occupato) return json(res, 503, { ok: false, errore: 'troppa gente insieme: riprova' })

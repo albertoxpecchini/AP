@@ -13,7 +13,9 @@ export const DESK = {
   top: 0, bottom: 40, minimo: 2989, passo: 0.9, scala: 1,
   cols: [
     { x: 12, items: [
-      { k: '#siti', w: 170, dx: 40, gap: 0, r: -6 },
+      // il wallet (26.10): in cima, avvitato alla saracinesca; non più sospeso in alto a sinistra
+      { k: '#wallet-muro', w: 245, dx: 8, gap: 0, r: -2 },
+      { k: '#siti', w: 170, dx: 40, gap: 4, r: -6 },
       { k: V('alberto pecchini'), w: 285, gap: -70, r: -2 },
       { k: 'manifesti3/lyca-tim', w: 255, dx: 8, gap: -15, r: -3 },
       { k: '#chi-sono', w: 290, dx: 4, gap: -5, r: -2 },
@@ -25,7 +27,9 @@ export const DESK = {
       { k: 'manifesti8/modena', w: 200, dx: 40, gap: 10, r: -1.5 },
     ] },
     { x: 262, items: [
-      { k: 'manifesti4/brat', w: 220, dx: 30, gap: 18, r: 4 },
+      // il cercapersone (26.10): appeso al chiodo, in cima alla seconda pila
+      { k: '#cercapersone-muro', w: 185, dx: 35, gap: 6, r: 3 },
+      { k: 'manifesti4/brat', w: 220, dx: 30, gap: 12, r: 4 },
       { k: V('better call pekko'), w: 280, gap: -35, r: 2 },
       { k: '#social', w: 230, dx: 20, gap: 0, r: -3 },
       { k: V('instagram'), w: 280, gap: -80, r: -4 },
@@ -135,7 +139,8 @@ export const MOB = {
   top: 0, bottom: 40, minimo: 5228, passo: 0.9, scala: 1,
   cols: [
     { x: 6, items: [
-      { k: '#siti', w: 120, dx: 25, gap: 0, r: -6 },
+      { k: '#wallet-muro', w: 182, dx: 2, gap: 0, r: -2 },
+      { k: '#siti', w: 120, dx: 25, gap: 4, r: -6 },
       { k: V('alberto pecchini'), w: 188, gap: -50, r: -2 },
       { k: 'manifesti3/lyca-tim', w: 170, dx: 6, gap: -12, r: -3 },
       { k: V('cascina fontana'), w: 188, gap: -12, r: -2 },
@@ -167,7 +172,8 @@ export const MOB = {
       { k: V('virtual'), w: 180, gap: -12, r: -3 },
     ] },
     { x: 198, items: [
-      { k: 'manifesti4/brat', w: 150, dx: 20, gap: 18, r: 4 },
+      { k: '#cercapersone-muro', w: 150, dx: 20, gap: 4, r: 3 },
+      { k: 'manifesti4/brat', w: 150, dx: 20, gap: 12, r: 4 },
       { k: 'scritte2/brat-summer', w: 105, dx: 45, gap: -35, r: -6 },
       { k: V('better call pekko'), w: 188, gap: -60, r: 2 },
       { k: 'manifesti3/unimore', w: 180, dx: 4, gap: -12, r: 2 },

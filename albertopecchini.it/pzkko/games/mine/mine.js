@@ -458,7 +458,10 @@ function immagineFiche(v, i) {
   return img
 }
 const centro = (e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
-const nelCampo = (c) => { const r = el.campo.getBoundingClientRect(); return { x: r.left + c.x, y: r.top + c.y } }
+// l'ingrandimento del foglio sullo schermo (sul computer il gioco è grande del 20 %: CSS, scale sul foglio): le
+// coordinate del tavolo sono quelle vere, lo schermo le vede ingrandite. Sul telefono 1
+const zoom = () => { const r = el.campo.getBoundingClientRect(); return r.width / (el.campo.offsetWidth || r.width) || 1 }
+const nelCampo = (c) => { const r = el.campo.getBoundingClientRect(), z = zoom(); return { x: r.left + c.x * z, y: r.top + c.y * z } }
 const bancoFiches = () => nelCampo({ x: G.banco.x, y: G.banco.y + G.banco.h / 2 })
 const dalSaldo = () => (el.scegli.hidden ? centro(el.saldo) : centro(el.scegli))
 
@@ -472,11 +475,11 @@ function vola(v, a, b, { durata = 380, alto = 40, ruota = 0, dopo = 0, svanisce 
   img.alt = ''
   img.style.setProperty('--f', `${G.fiche}px`)
   dlg.appendChild(img)
-  const mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - alto
+  const z = zoom(), mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - alto * z // (grande come quelle sul tavolo)
   const anim = img.animate([
-    { transform: `translate(${a.x}px, ${a.y}px) scale(1) rotate(0deg)`, filter: 'drop-shadow(0 2px 2px rgba(0,0,0,.3))', opacity: 1 },
-    { offset: 0.5, transform: `translate(${mx}px, ${my}px) scale(${1.3 * scala}) rotate(${ruota / 2}deg)`, filter: 'drop-shadow(0 14px 10px rgba(0,0,0,.22))', opacity: 1 },
-    { transform: `translate(${b.x}px, ${b.y}px) scale(${scala}) rotate(${ruota}deg)`, filter: 'drop-shadow(0 2px 2px rgba(0,0,0,.3))', opacity: svanisce ? 0 : 1 },
+    { transform: `translate(${a.x}px, ${a.y}px) scale(${z}) rotate(0deg)`, filter: 'drop-shadow(0 2px 2px rgba(0,0,0,.3))', opacity: 1 },
+    { offset: 0.5, transform: `translate(${mx}px, ${my}px) scale(${1.3 * scala * z}) rotate(${ruota / 2}deg)`, filter: 'drop-shadow(0 14px 10px rgba(0,0,0,.22))', opacity: 1 },
+    { transform: `translate(${b.x}px, ${b.y}px) scale(${scala * z}) rotate(${ruota}deg)`, filter: 'drop-shadow(0 2px 2px rgba(0,0,0,.3))', opacity: svanisce ? 0 : 1 },
   ], { duration: durata, delay: dopo, easing: 'cubic-bezier(.3,.7,.4,1)', fill: 'forwards' })
   return anim.finished.then(() => img.remove(), () => img.remove())
 }
@@ -509,7 +512,7 @@ function posa(v) {
   if (stato.fase !== 'punta') { voce(stato.fase === 'gioco' ? 'la puntata è fatta: scopri le caselle o incassa' : 'un attimo…'); return }
   stato.fiche = v
   if (stato.puntata + v > LIMITI.max) { voce(`si punta al massimo ${fmt(LIMITI.max)} $pzk`); return }
-  if (!pzk.punta(GIOCO, v)) { voce(pzk.saldo() >= 1 ? `non ti bastano: hai ${fmt(pzk.saldo())} $pzk` : 'hai finito i $pzk'); scuoti(el.saldo); return }
+  if (!pzk.punta(GIOCO, v)) { voce(pzk.nonBasta()); scuoti(el.saldo); return }
   stato.puntata += v
   stato.mosse.push(v)
   aggiornaBanco()

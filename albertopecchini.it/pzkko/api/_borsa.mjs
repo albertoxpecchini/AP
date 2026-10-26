@@ -11,6 +11,9 @@
 //   il meteo di Mantova (Open-Meteo): sole +2 %, pioggia o temporale −2 %, neve −1 %
 //   la temperatura: sopra i 26° −1,5 %, sotto gli 8° +1,5 %
 //   il giorno +1,2 %, la notte −1,2 %
+//   l'inflazione (26.10, _economia.mjs): quanto è cresciuta l'offerta di $pzk nelle ultime 24 ore. Più soldi coniati a parità
+//   di tutto il resto valgono meno: metà della crescita (al più ±5 % al giorno) si toglie; se l'offerta cala (i portafogli
+//   smarriti che si distruggono) il cambio sale
 // (api/wallet.mjs converte al cambio di quando il wallet si è sincronizzato, se non è passata più di mezz'ora: tassoA)
 import { archivio, aggiorna, blobOpzioni } from './_archivio.mjs'
 
@@ -45,6 +48,7 @@ export const derivaFattori = (f) => {
   if (f.codice === 0 || f.codice === 1) d += 0.02; else if (PIOGGIA(f.codice)) d -= 0.02; else if (NEVE(f.codice)) d -= 0.01
   if (f.temperatura > 26) d -= 0.015; else if (f.temperatura < 8) d += 0.015
   if (f.giorno === true) d += 0.012; else if (f.giorno === false) d -= 0.012
+  if (Number.isFinite(f.inflazione)) d -= Math.max(-0.05, Math.min(0.05, f.inflazione * 0.5))
   return d
 }
 // ── il nervosismo (23.10): col solo passo a caso dello 0,25 % e la deriva il grafico veniva quasi una retta inclinata
@@ -102,8 +106,14 @@ export function tassoA(db, t) {
 export const attuale = (db) => (db.punti.length ? db.punti[db.punti.length - 1][1] : 1)
 
 // ── i fattori del mondo: misurati quando serve un punto nuovo ──
-async function misura(prima, now) {
+async function misura(prima, now, M) {
   const f = { ...(prima ?? {}), misurati: now }
+  // l'offerta: un campione a ogni punto, gli ultimi due giorni; l'inflazione è la crescita rispetto a 20–28 ore fa
+  if (Number.isFinite(M) && M > 0) {
+    f.offerte = [...(prima?.offerte ?? []), [now, M]].filter(([t]) => now - t < 2 * GIORNO)
+    const ieri = f.offerte.find(([t]) => now - t >= 20 * ORA && now - t <= 28 * ORA)
+    f.inflazione = ieri ? M / ieri[1] - 1 : null
+  }
   const ctl = (ms) => AbortSignal.timeout(ms)
   await Promise.all([
     fetch('https://api.open-meteo.com/v1/forecast?latitude=45.1564&longitude=10.7914&current=temperature_2m,is_day,weather_code&timezone=Europe%2FRome', { signal: ctl(4000) })
@@ -117,13 +127,13 @@ async function misura(prima, now) {
 }
 
 /** La borsa aggiornata a adesso (legge, se serve misura i fattori e aggiunge i punti, riscrive). null se l'archivio non c'è. */
-export async function borsa(now = Date.now()) {
+export async function borsa(now = Date.now(), M = null) {
   const store = await archivio(PATH, vuoto)
   if (!store) return null
   const { db } = await aggiorna(store, async (db) => {
     const ultimo = db.punti.length ? db.punti[db.punti.length - 1][0] : -Infinity
     if (ultimo + PASSO > now) return { invariato: true }
-    db.fattori = await misura(db.fattori, now)
+    db.fattori = await misura(db.fattori, now, M)
     // in locale la borsa vive in memoria e rinasce a ogni avvio del server: la si fa nascere tre giorni fa, così il
     // grafico di prova ha una storia; online la storia è quella vera, salvata
     const inLocale = process.env.PZKKO_STORE === 'memory' || (!blobOpzioni() && !process.env.VERCEL)

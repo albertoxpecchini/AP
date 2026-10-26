@@ -10,6 +10,7 @@ import { GIOCHI } from './giochi.js'
 import { NEGOZIO } from './negozio.js'
 import { APP } from './app.js'
 import { GIOCATORI } from './giocatori.js'
+import { SVAGO } from './svago.js'
 
 export const CATEGORIE = [
   ['soldi', 'i soldi', ':pzk:'],
@@ -20,5 +21,5 @@ export const CATEGORIE = [
   ['app', 'telefono, sfide e side quest', ':telefono:'],
   ['giocatori', 'i giocatori', ':trofeo:'],
 ]
-export const COMANDI = [...SOLDI, ...ATTIVITA, ...LAVORO, ...GIOCHI, ...NEGOZIO, ...APP, ...GIOCATORI]
+export const COMANDI = [...SOLDI, ...ATTIVITA, ...LAVORO, ...GIOCHI, ...NEGOZIO, ...APP, ...GIOCATORI, ...SVAGO]
 export const PER_NOME = new Map(COMANDI.flatMap((c) => c.nomi.map((n) => [n, c])))

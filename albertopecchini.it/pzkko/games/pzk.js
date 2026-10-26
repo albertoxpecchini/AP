@@ -15,6 +15,13 @@
 // finito, chiude il conto (regola): quello che era sul tavolo è giocato, torna quello che si è vinto. Si salva il saldo
 // più quello che c'è sui tavoli: se la pagina si chiude a metà giro, alla volta dopo le puntate tornano nel saldo.
 // I conti vanno a mezzi $pzk (il blackjack paga 3 a 2: 5 → 7,5); gli EUR€ a centesimi.
+//
+// L'ECONOMIA (26.10, api/_economia.mjs): ogni regola dice dove vanno i soldi. Di base è un conto con la CASSA DI PZK (le
+// puntate perse, gli acquisti; le vincite e la roba venduta escono da lì): regola(gioco, giocato, torna). I soldi nuovi
+// (il lavoro, le quest, i premi, la miniera) sono CONIO: regola(…, 'conio'); quelli persi morendo cadono per terra:
+// perdi(n). Il browser tiene il conto (W.flussi) e lo manda col saldo a lotti numerati (W.fn); il server fa i conti
+// dell'offerta. Col conto ci sono anche i SOLDI SPORCHI (il bottino delle rapine: si vedono nel saldo ma con pzk non si
+// spendono, quindi punta accetta solo i puliti) e la GALERA (non si punta).
 
 const API = '/api/wallet/' // con la barra finale: il sito ha trailingSlash, e senza ogni POST passava da un redirect 308 che alcuni browser fanno confermare (« reinviare i dati del modulo? »)
 const CHIAVE_SESSIONE = 'pzkko-pzk-sessione'
@@ -35,7 +42,8 @@ const leggiJSON = (dep, k) => { try { return JSON.parse(dep.getItem(k) || 'null'
 const scriviJSON = (dep, k, v) => { try { v === null ? dep.removeItem(k) : dep.setItem(k, JSON.stringify(v)) } catch {} }
 
 // ── lo stato ──
-let W = leggiConto() // il conto: { token, conto, tasso, t, nuovo? } o null
+let W = leggiConto() // il conto: { token, conto, tasso, t, nuovo?, flussi, fn } o null
+const flussi = () => { if (!W) return null; W.flussi ??= { casa: 0, persi: 0 }; W.fn ??= (W.conto.fn ?? 0) + 1; return W.flussi }
 let liberi = W ? Math.max(0, mezzi(W.conto.pzk)) : leggiSessione()
 let online = null // null = non si sa ancora, false = il server dice offline
 let inCorso = null // la richiesta di salvataggio in volo
@@ -63,7 +71,7 @@ export const sulTavolo = (gioco) => tavoli.get(gioco) ?? 0
 /** Dal saldo al tavolo del gioco; false (e niente spostato) se non bastano. */
 export function punta(gioco, n) {
   n = mezzi(n)
-  if (!(n > 0) || n > liberi) return false
+  if (!(n > 0) || n > puliti() || inGalera()) return false
   liberi -= n
   tavoli.set(gioco, sulTavolo(gioco) + n)
   scrivi()
@@ -77,13 +85,40 @@ export function ritira(gioco, n) {
   liberi += n
   scrivi()
 }
-/** Fine di un giro (o di una parte): `giocato` lascia il tavolo, `torna` va nel saldo. */
-export function regola(gioco, giocato, torna) {
+/** Fine di un giro (o di una parte): `giocato` lascia il tavolo, `torna` va nel saldo. `tipo`: 'casa' (di base: un conto
+ *  con la cassa di pzk, che incassa il giocato e paga il tornato), 'conio' (soldi nuovi: il tornato nasce dal nulla). */
+export function regola(gioco, giocato, torna, tipo = 'casa') {
   tavoli.set(gioco, Math.max(0, sulTavolo(gioco) - mezzi(giocato)))
   liberi += mezzi(torna)
+  const F = flussi()
+  if (F && tipo === 'casa') F.casa = mezzi(F.casa + mezzi(giocato) - mezzi(torna))
+  else if (F && tipo === 'conio' && giocato) F.casa = mezzi(F.casa + mezzi(giocato)) // (quello che si era puntato va comunque alla cassa)
   scrivi()
+  // le statistiche del profilo (26.10): i giochi grandi le segnano nello zaino (chat/zaino.js, giro: gli altri li ignora)
+  if (!gioco.startsWith('chat')) import('../chat/zaino.js').then((z) => z.giro?.(gioco, mezzi(giocato), mezzi(torna))).catch(() => {})
 }
 export const aSecco = () => liberi < 1 && sulTavoli() === 0
+/** I $pzk persi per terra (una morte): non vanno alla cassa, finiscono fra i portafogli smarriti. Anche dai soldi sporchi. */
+export function perdi(n) {
+  n = mezzi(Math.min(n, liberi))
+  if (!(n > 0)) return 0
+  liberi -= n
+  const F = flussi()
+  if (F) F.persi = mezzi(F.persi + n)
+  scrivi()
+  return n
+}
+/** I soldi sporchi (il bottino delle rapine): si vedono nel saldo, con pzk non si spendono. */
+export const sporchi = () => (W ? Math.min(liberi, W.conto.sporchi ?? 0) : 0)
+/** I $pzk che si possono spendere con pzk (puntare, comprare, pagare). */
+export const puliti = () => Math.max(0, mezzi(liberi - sporchi()))
+/** Fino a quando si è in galera (0: liberi). */
+export const galera = () => (W?.conto.galera > Date.now() ? W.conto.galera : 0)
+export const inGalera = () => galera() > 0
+export const lavaggio = () => W?.conto.lavaggio ?? null
+/** Perché una puntata non passa (i giochi lo dicono con la loro voce): la galera, i soldi sporchi, o non bastano. */
+export const nonBasta = () => (inGalera() ? `sei in galera fino alle ${oraDi(galera())}` : sporchi() > 0 ? `puoi puntare solo i soldi puliti: ne hai ${fmt(puliti())} (gli altri ${fmt(sporchi())} sono sporchi: lavatrice)` : liberi >= 1 ? `non ti bastano: hai ${fmt(liberi)} $pzk` : 'hai finito i $pzk')
+const oraDi = (t) => new Date(t).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
 
 /**
  * A secco (meno di 1 $pzk libero e niente sui tavoli): nella sessione altri INIZIALE, subito. Col conto: se ci sono
@@ -102,7 +137,7 @@ export function ricarica() {
   return true
 }
 /** Perché ricarica() ha detto di no (per la voce del gioco). */
-export const perche = () => (!W ? '' : W.conto.eur >= 0.01 ? `hai ${fmtEur(W.conto.eur)} EUR€ nel wallet: convertili in $pzk per giocare` : 'il sussidio è uno al giorno: torna domani, o fatti mandare $pzk da un amico')
+export const perche = () => (inGalera() ? `sei in galera fino alle ${oraDi(galera())}: si esce prima con la cauzione (app rapina)` : W && sporchi() > 0 && puliti() < 1 ? 'hai solo soldi sporchi: con pzk non si spendono. lavali nella lavatrice (app del cercapersone)' : !W ? '' : W.conto.eur >= 0.01 ? `hai ${fmtEur(W.conto.eur)} EUR€ nel wallet: convertili in $pzk per giocare` : 'il sussidio è uno al giorno: torna domani, o fatti mandare $pzk da un amico')
 
 /** fn(saldo) a ogni cambio, anche quando il saldo cambia in un'altra scheda. Restituisce la funzione per smettere. */
 export function ascolta(fn) { ascolti.add(fn); return () => ascolti.delete(fn) }
@@ -150,12 +185,17 @@ export const scaduto = () => !!W && Date.now() - W.t > VALE_CAMBIO
 export const serverOnline = () => online
 
 async function chiama(body, { keepalive = false } = {}) {
+  // i flussi partono col saldo (un lotto: n); quando il server dice di averlo contato (conto.fn) si tolgono
+  const F = body.pzk !== undefined ? flussi() : null, lotto = F && { n: W.fn, casa: F.casa, persi: F.persi }
+  if (lotto) body = { ...body, flussi: lotto }
   try {
     // lg: il giorno della lumachina che il saldo di qui contiene già (api/wallet.mjs: se una risposta s'è persa, il server
     // aggiunge le giornate che il browser non ha visto)
     const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(W && { token: W.token, lg: W.conto.lumaca?.g ?? null, ...(Number.isInteger(W.conto.es) && { es: W.conto.es }) }), ...body }), keepalive })
     const d = await r.json().catch(() => ({ ok: false, errore: 'il server non risponde' }))
     online = !d.offline
+    if (lotto && W && d.conto?.fn >= lotto.n) { const G = flussi(); G.casa = mezzi(G.casa - lotto.casa); G.persi = mezzi(G.persi - lotto.persi); W.fn = d.conto.fn + 1 }
+    else if (lotto && W && d.avviso) { W.flussi = { casa: 0, persi: 0 } } // il server ha tenuto il suo saldo: i flussi di qui non valgono più
     if (d.esci && W) { esci(false) }
     return d
   } catch { return { ok: false, errore: 'niente rete: riprova' } }
@@ -230,7 +270,7 @@ export async function sincronizza() {
 }
 // le azioni che toccano il conto: il saldo di qui parte insieme, e il conto torna com'è sul server
 async function azione(body) {
-  if (!W) return { ok: false, errore: 'entra nel wallet, prima' }
+  if (!W) return { ok: false, errore: 'entra nel conto, prima (l’app account del cercapersone)' }
   clearTimeout(attesa); sporco = false
   if (inCorso) await inCorso
   const d = await chiama({ ...body, pzk: W.conto.pzk })
@@ -239,13 +279,30 @@ async function azione(body) {
 }
 /** Converte `quanto` da 'pzk' a EUR€ o da 'eur' a $pzk, al cambio dell'ultima sincronizzazione (se è scaduto, prima si sincronizza). */
 export async function converti(da, quanto) {
-  if (!W) return { ok: false, errore: 'entra nel wallet, prima' }
+  if (!W) return { ok: false, errore: 'entra nel conto, prima (l’app account del cercapersone)' }
   if (scaduto()) { const s = await sincronizza(); if (!s.ok) return s }
   let d = await azione({ a: 'converti', da, quanto, t: W.t })
   if (!d.ok && d.sincronizza) { await sincronizza(); d = await azione({ a: 'converti', da, quanto, t: W.t }) }
   return d
 }
 export const invia = (ind, quanto) => azione({ a: 'invia', ind, quanto })
+// ── l'economia (26.10, api/wallet.mjs) ──
+/** Arrestato (un lavoro rischioso andato male): galera per `ore` e la multa alla cassa. */
+export const arresto = (ore, multa, perche = '') => azione({ a: 'arresto', ore, multa, perche })
+/** La cauzione: si esce di galera pagando la cassa. */
+export const cauzione = () => azione({ a: 'cauzione' })
+/** La lavatrice: `quanto` sporchi (al più 50.000) puliti fra dieci minuti, 2.000 puliti di commissione. */
+export const lava = (quanto) => azione({ a: 'lava', quanto })
+/** Un wallet o una chiavetta trovati dallo spazzino, decifrati: i $pzk dei portafogli smarriti. */
+export const decifra = (tipo) => azione({ a: 'decifra', tipo })
+/** Il colpo alla cassa: op 'apri', 'entra' (col codice), 'esci', 'vai'; 'stato' si chiede spesso e non salva. */
+export async function colpo(op, codice = '') {
+  if (!W) return { ok: false, errore: 'serve il conto (app account)' }
+  if (op !== 'stato') return azione({ a: 'colpo', op, codice })
+  const d = await chiama({ a: 'colpo', op, codice })
+  if (d.conto) accogli(d, { tienipzk: true }) // (il bottino o la multa arrivano come soldi da fuori)
+  return d
+}
 export const cambiaIndirizzo = (nuovo, key) => azione({ a: 'indirizzo', nuovo, ...(key && { key }) })
 export const cambiaPin = (vecchio, nuovo) => azione({ a: 'pin', vecchio, nuovo })
 /** Chi è a questo indirizzo (per controllare prima di inviare). → { ok, conto: { nome, ind } } */
@@ -271,15 +328,20 @@ export function trova(quale) {
 }
 
 // ── il wallet (wallet/wallet.js, caricato dalla pagina quando serve) ──
-/** Apre il wallet su una sezione ('converti', 'entra', 'invia', 'borsa'…): la pagina ascolta l'evento e carica il modulo. */
-export function apriWallet(sezione = null) { document.dispatchEvent(new CustomEvent('pzkko-wallet', { detail: { sezione } })) }
+/** Apre il wallet (la pagina ascolta l'evento e carica il modulo). Dal 26.10 nel wallet ci sono solo il saldo e la borsa: le sue
+ *  vecchie pagine (il conto, il cambio, gli invii, l'altro: 'entra', 'converti', 'invia'…) sono l'app Account del cercapersone. */
+export function apriWallet(sezione = null) {
+  const scheda = { entra: 'conto', conto: 'conto', converti: 'cambio', cambio: 'cambio', invia: 'invia', altro: 'altro' }[sezione]
+  if (scheda) return import('../telefono/telefono.js').then((t) => t.apri('account', { scheda }))
+  document.dispatchEvent(new CustomEvent('pzkko-wallet', { detail: { sezione } }))
+}
 
 /** La riga dei giochi sotto il saldo: «hai anche EUR€ 12,50 nel wallet · convertili in $pzk». C'è solo se ci sono EUR€. */
 export function rigaEuro({ classe = 'pzk-eur' } = {}) {
   const a = document.createElement('a')
   a.href = '#wallet'
   a.className = classe
-  a.title = 'si apre il wallet: gli EUR€ si giocano solo convertiti in $pzk, al cambio di adesso'
+  a.title = 'si apre il cambio (l’app account del cercapersone): gli EUR€ si giocano solo convertiti in $pzk, al cambio di adesso'
   const aggiorna = () => { const e = euro(); a.hidden = !W || e < 0.01; if (!a.hidden) a.innerHTML = `hai anche <b>EUR€ ${fmtEur(e)}</b> nel wallet: convertili in $pzk` }
   a.addEventListener('click', (e) => { e.preventDefault(); apriWallet('converti') })
   osserva(aggiorna)

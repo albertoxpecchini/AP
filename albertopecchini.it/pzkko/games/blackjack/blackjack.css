@@ -117,3 +117,10 @@
   .bj-tasti{flex:1 1 100%;justify-content:flex-end;gap:6px 16px}
   .bj-dai{font-size:24px !important}
 }
+
+/* grandi del 20 % (Alberto, 26.10): sul computer il foglio e tutto quello che c'è dentro si ingrandiscono, col foglio al centro;
+   il telefono e le finestre basse (sopra) restano a tutto schermo. Le fiches che volano stanno nel dialog, non nel foglio: le
+   ingrandisce il loro vola() (zoom), insieme alle coordinate. */
+@media (min-width:821px) and (min-height:641px){
+  .bj-dentro,.bj::before{scale:1.2}
+}

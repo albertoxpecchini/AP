@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 792 214" width="792" height="214">
+<!-- le quattro viti del wallet sul muro (26.10): il banner è avvitato alla saracinesca. Stesse misure della foto (792 × 214) -->
+<defs><radialGradient id="t" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#f1f1ec"/><stop offset=".55" stop-color="#a8a8a2"/><stop offset="1" stop-color="#5b5b56"/></radialGradient></defs>
+<g id="v"><circle cx="0" cy="2.5" r="13" fill="#000" opacity=".45"/><circle r="12" fill="url(#t)" stroke="#2c2c29" stroke-width="2"/><path d="M-7 -1.5h14v3h-14zM-1.5 -7h3v14h-3z" fill="#2c2c29" transform="rotate(22)"/></g>
+<use href="#v" x="24" y="30"/><use href="#v" x="768" y="30" transform="rotate(37 768 30)"/><use href="#v" x="24" y="184" transform="rotate(-51 24 184)"/><use href="#v" x="768" y="184" transform="rotate(14 768 184)"/>
+</svg>

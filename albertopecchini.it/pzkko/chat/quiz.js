@@ -9,6 +9,7 @@
 import * as zaino from './zaino.js'
 import { giornoDi, incassa } from './mercato.js'
 import { DOMANDE, ARGOMENTI } from './quiz-dati.js'
+import { ARGOMENTI_NUOVI, SCELTA } from './quiz-altre.js'
 import { QUIZ as VECCHIE } from './testi.js'
 import { IMMAGINI, src, credito } from './immagini.js'
 import * as db from './db.js'
@@ -20,25 +21,30 @@ export const PAGA = [0, 20, 40, 80]
 export const BONUS_PERFETTA = 100
 
 /** Gli argomenti: i fissi, «vario» (le vecchie domande della chat), «foto» e «giocatori». id → [nome, icona]. */
-export const TUTTI_ARGOMENTI = [...ARGOMENTI, ['foto', 'foto', 'quiz'], ['giocatori', 'giocatori', 'trofeo'], ['vario', 'a caso', 'dado']]
+export const TUTTI_ARGOMENTI = [...ARGOMENTI, ...ARGOMENTI_NUOVI, ['foto', 'foto', 'quiz'], ['giocatori', 'giocatori', 'trofeo'], ['vario', 'a caso', 'dado']]
 
 const mescola = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]] } return b }
 const caso = (a) => a[Math.floor(Math.random() * a.length)]
 
-/** Una domanda pronta: { id, q, risposte: [4 testi], giusta: indice, diff, img?, credito?, nota? }. */
+/** Una domanda pronta: { id, q, risposte: [4 testi], giusta: indice, diff, img?, credito?, nota?, vf? }. Le VERO/FALSO (26.10: «aumenta
+ *  i modi di rispondere») hanno due risposte che non si mescolano mai (vero, falso) e `vf: true`; nei dati la prima è la giusta. */
 function pronta(id, q, risposte, diff, extra = {}) {
+  if (risposte.length === 2 && risposte.every((t) => t === 'vero' || t === 'falso')) return { id, q, risposte: ['vero', 'falso'], giusta: risposte[0] === 'vero' ? 0 : 1, diff, vf: true, ...extra }
   const ord = mescola(risposte.map((t, i) => [t, i === 0]))
   return { id, q, risposte: ord.map(([t]) => t), giusta: ord.findIndex(([, g]) => g), diff, ...extra }
 }
 const daDati = ([arg, q, r, d, nota], i) => pronta(`${arg}:${i}`, q, r, d, { arg, nota })
-const BANCA = DOMANDE.map(daDati)
+const BANCA = [...DOMANDE, ...SCELTA].map(daDati)
 const VARIE = VECCHIE.map(([q, r, d], i) => pronta(`vario:${i}`, q, r, d, { arg: 'vario' }))
 
 /** Le domande «che cos'è nella foto?» dalle immagini. */
 function domandeFoto() {
   const ids = Object.keys(IMMAGINI)
   return ids.map((id) => {
-    const altri = mescola(ids.filter((x) => x !== id)).slice(0, 3).map((x) => IMMAGINI[x].cosa)
+    // i finti sbagliati, se si può, della stessa categoria (`cat`): fra due pesci non si mette un trattore
+    const stessa = ids.filter((x) => x !== id && IMMAGINI[x].cat && IMMAGINI[x].cat === IMMAGINI[id].cat)
+    const altre = ids.filter((x) => x !== id && !stessa.includes(x))
+    const altri = [...mescola(stessa), ...mescola(altre)].slice(0, 3).map((x) => IMMAGINI[x].cosa)
     return pronta(`foto:${id}`, 'Che cos’è nella foto?', [IMMAGINI[id].cosa, ...altri], 2, { arg: 'foto', img: src(id), credito: credito(id), nota: `era ${IMMAGINI[id].cosa}.` })
   })
 }

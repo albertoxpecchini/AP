@@ -11,6 +11,8 @@
 // Le notizie sono dati («tipo» e «dato»): le parole le mette il browser, con le sue icone.
 // (Comincia per _ : Vercel non ne fa una funzione.)
 
+import { sporchi } from './_economia.mjs'
+
 export const PATH_GIOCATORI = process.env.GIOCATORI_BLOB_PATH || 'pzkko/giocatori.json'
 export const vuotoG = () => ({ v: 1, g: {}, notizie: [] })
 
@@ -22,7 +24,9 @@ export const livelloDi = (xp) => 1 + Math.floor(Math.sqrt(Math.max(0, xp) / 60))
 /** Gli oggetti che fanno notizia quando li si prende. */
 export const LEGGENDARI = ['carpa-oro', 'drago', 'tesoro']
 /** Le statistiche che diventano pubbliche (il resto dello zaino resta privato). */
-export const STAT = ['guadagnati', 'vinti', 'persi', 'pescati', 'cacciati', 'scavati', 'morti', 'comandi', 'comprati', 'casse', 'quizGiusti', 'quizTotali', 'sfideFatte', 'missioniFatte', 'acquisti']
+export const STAT = ['guadagnati', 'vinti', 'persi', 'pescati', 'cacciati', 'scavati', 'morti', 'comandi', 'comprati', 'casse', 'quizGiusti', 'quizTotali', 'sfideFatte', 'missioniFatte', 'acquisti', 'giri']
+/** I giochi grandi di cui si tengono i numeri (chat/zaino.js, giro): [mani, vinte, puntato, tornato, il colpo migliore]. */
+export const GIOCHI = ['roulette', 'blackjack', 'mine', 'dado', 'moneta', 'virtual']
 
 /** Le classifiche: nome → come si legge il valore da una riga unita. */
 export const METRICHE = {
@@ -43,10 +47,20 @@ export const METRICHE = {
   missioni: (r) => r.s.missioniFatte,
   serie: (r) => r.serie,
   acquisti: (r) => r.s.acquisti,
+  giri: (r) => r.s.giri,
   vecchiaia: (r) => Math.floor((Date.now() - r.creato) / GIORNO),
 }
 
 const statDi = (z) => Object.fromEntries(STAT.map((k) => [k, num(z?.stat?.[k])]))
+const id = (x) => (typeof x === 'string' && /^[a-z0-9-]{1,24}$/.test(x) ? x : null)
+/** Il profilo che uno si è fatto (telefono/app/profilo.js): solo nomi corti (le liste le ha il browser) e il motto, ripulito. */
+const profiloDi = (p) => {
+  if (!p || typeof p !== 'object') return null
+  const mot = typeof p.mot === 'string' ? p.mot.replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 60) : ''
+  const pr = { av: id(p.av), col: id(p.col), cor: id(p.cor), ...(mot && { mot }) }
+  return Object.values(pr).some(Boolean) ? pr : null
+}
+const giochiDi = (g) => Object.fromEntries(GIOCHI.filter((k) => Array.isArray(g?.[k])).map((k) => [k, g[k].slice(0, 5).map((x) => (Number.isFinite(x) ? Math.round(x * 2) / 2 : 0))]))
 /** La riga pubblica di un giocatore, dal suo conto e dal suo zaino. */
 export function riga(c, z, now) {
   const oggetti = Object.values(z?.oggetti ?? {}).reduce((a, n) => a + num(n), 0)
@@ -56,6 +70,8 @@ export function riga(c, z, now) {
     s: statDi(z), serie: num(z?.serie?.giornaliero?.n), ogg: oggetti,
     rari: (Array.isArray(z?.rari) ? z.rari : []).filter((x) => LEGGENDARI.includes(x)),
     ...(z?.titolo && typeof z.titolo === 'string' && { tit: z.titolo.slice(0, 24) }),
+    ...(profiloDi(z?.profilo) && { pr: profiloDi(z.profilo) }),
+    ...(z?.giochi && { gi: giochiDi(z.giochi) }),
   }
 }
 
@@ -109,13 +125,15 @@ export function unisci(db, conti) {
     const g = db.g[c.id]
     const r = { id: c.id, ind: c.ind, nome: c.nome, creato: c.creato, pzk: c.pzk ?? 0, eur: c.eur ?? 0, xp: 0, mest: null, turni: 0, s: statDi(null), serie: 0, ogg: 0, rari: [], ult: c.salvato ?? c.creato, ...(g ?? {}), ...{ pzk: c.pzk ?? 0, eur: c.eur ?? 0, nome: c.nome, ind: c.ind } }
     r.s = { ...statDi(null), ...r.s }
+    r.sp = sporchi(c) // (26.10) i soldi sporchi e la galera si vedono nel profilo, come la fedina
+    r.gal = c.galera > Date.now() ? c.galera : null
     r.liv = livelloDi(r.xp)
     r.titolo = r.tit ?? titoloDi(r)
     return r
   })
 }
 
-const pubblica = (r) => ({ nome: r.nome, ind: 'pzk' + r.ind, liv: r.liv, titolo: r.titolo, mest: r.mest })
+const pubblica = (r) => ({ nome: r.nome, ind: 'pzk' + r.ind, liv: r.liv, titolo: r.titolo, mest: r.mest, ...(r.pr?.av && { av: r.pr.av }), ...(r.pr?.col && { col: r.pr.col }) })
 const valoreDi = (metrica, r) => { const v = METRICHE[metrica](r); return metrica === 'pzk' || metrica === 'eur' ? Math.round(v * 100) / 100 : v }
 
 /** La classifica per una metrica: i primi n con valore > 0. */
@@ -145,7 +163,7 @@ export function profilo(righe, r) {
   }
   return {
     ...pubblica(r), creato: r.creato, ult: r.ult, xp: r.xp, turni: r.turni, pzk: Math.round(r.pzk * 2) / 2, ogg: r.ogg, serie: r.serie, rari: r.rari, s: r.s,
-    xpProssimo: 60 * r.liv ** 2, giocatori: righe.length, posizioni,
+    xpProssimo: 60 * r.liv ** 2, giocatori: righe.length, posizioni, pr: r.pr ?? null, gi: r.gi ?? {}, sp: r.sp ?? 0, gal: r.gal ?? null,
   }
 }
 

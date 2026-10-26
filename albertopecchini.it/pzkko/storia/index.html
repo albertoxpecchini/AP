@@ -28,6 +28,7 @@
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/art/insegna.svg" as="image">
+<link rel="stylesheet" href="/barra/barra.css"><!-- la barra in alto con le sezioni (barra/barra.js) -->
 <!-- Le scelte di chi guarda (window.pzkkoScelte), che la regia tiene nel browser. Dal 23.10 la pagina parte sempre col
      muro di sempre, in 2D, a mezzogiorno col sole, sul computer e sul telefono: il 3D, l'ora vera con la sera e la notte
      e il meteo vero di Mantova si accendono apposta, in cima alla scheda «grafica» della regia.
@@ -134,6 +135,8 @@ img{display:block;max-width:100%;height:auto}
    le lettere (art/insegna-notte.svg, stessa tela, sovrapposta; dal 23.10 si scarica solo quando si accende: data-src,
    lo script) */
 .portale{position:relative;z-index:32;padding:clamp(18px,3.2vw,40px) 0 0;display:flex;justify-content:center;pointer-events:none}
+/* con la barra in alto (barra/barra.js, 26.10) l'insegna scende sotto di lei, con un po' d'aria: nella scena 3D l'insegna è in 3D e lo spazio c'è già */
+html.con-barra:not(.scena3d) .portale{padding-top:calc(var(--barra) + clamp(22px,3.4vw,48px))}
 .portale h1{position:relative;margin:0;width:min(100%,840px)}
 .insegna{position:relative;z-index:1;width:100%;filter:brightness(calc(1 - .55 * var(--notte)))}
 .insegna.notte{position:absolute;inset:0;z-index:2;filter:none;opacity:calc(var(--insegna) * var(--f-insegna))}
@@ -178,6 +181,7 @@ img{display:block;max-width:100%;height:auto}
 .tag.chiaro{mix-blend-mode:normal;opacity:.95}
 .man{z-index:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)) drop-shadow(0 8px 14px rgba(0,0,0,.28))}
 .pezzo{z-index:1;pointer-events:none}
+.pezzo.vivo{pointer-events:auto} /* il wallet e il cercapersone (26.10): pezzi del muro da toccare */
 
 /* ── le parole sprayate che danno il nome alle zone: graffiti veri (art/scritte/), sotto i fogli ── */
 .spray{z-index:0;margin:0;scroll-margin-top:24px}
@@ -308,7 +312,7 @@ img{display:block;max-width:100%;height:auto}
 /* ── il telefono: il muro visto da vicino, due volantini per riga ─────────── */
 @media (max-width:899px){
   :root{--u:calc(min(100cqw, 600px) / 390)}
-  .parete{height:calc(3683 * var(--u));max-width:600px;margin:0 auto}
+  .parete{height:calc(3730 * var(--u));max-width:600px;margin:0 auto}
   .it{--px:var(--mx,var(--x));--py:var(--my,var(--y));--pw:var(--mw,var(--w));--pr:var(--mr,var(--r,0deg))}
   .spray{font-size:calc(40 * var(--u))}
   .vol h3{font-size:max(calc(22px * var(--ts,1)),calc(16cqw * var(--ts,1)))}
@@ -359,12 +363,12 @@ img{display:block;max-width:100%;height:auto}
    scorrono tutti i dati del wallet, col clic si apre il portafoglio (la foto è art/wallet-banner/banner.webp,
    gpt-image-2; i led li accende wallet/banner.js, che si carica da solo appena la pagina è tranquilla; il portafoglio
    aperto, wallet.css). Il pannello sta sul vetro della foto, misurato sui profili di luce (792 × 214): dentro la cornice
-   nera da x 62 a 713 e da y 63,5 a 154,5. Il cercapersone qui sotto (.chat-tasto) parte 10 px sotto il banner (8 sul
-   telefono). Negli strumenti che fotografano la pagina non c'è (navigator.webdriver),
-   ?wallet lo fa vedere lo stesso. Senza script non c'è ── */
-.wallet-tasto{position:fixed;z-index:85;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));width:calc(52px * 792 / 214);height:52px;padding:0;border:0;background:none;color:#e9e4d8;cursor:pointer;
+   nera da x 62 a 713 e da y 63,5 a 154,5. Dal 26.10 non sta più sospeso in alto a sinistra: è un pezzo della parete
+   (#wallet-muro, in cima alla prima pila), avvitato alla saracinesca (art/muro/viti.svg), e scorre col muro. Negli
+   strumenti che fotografano la pagina i led restano spenti (navigator.webdriver; ?wallet li accende) ── */
+.wallet-tasto{height:auto;aspect-ratio:792/214;padding:0;border:0;background:none;color:#e9e4d8;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
-.wallet-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;pointer-events:none}
+.wallet-tasto img,.chat-tasto img.attacco{position:absolute;inset:0;width:100%;height:100%;max-width:none;pointer-events:none}
 .wallet-tasto canvas,.wallet-tasto::after{position:absolute;left:7.828%;top:29.673%;width:82.197%;height:42.523%}
 .wallet-tasto canvas{display:block;background:#040605}
 /* il vetro sopra i led: un riflesso in diagonale e l'ombra della cornice */
@@ -372,18 +376,16 @@ img{display:block;max-width:100%;height:auto}
 .wallet-tasto .wt-piu{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font:400 20px/1 "Fake Receipt",monospace;color:#46ff7d;text-shadow:0 0 8px rgba(70,255,125,.9),0 2px 3px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
 .wallet-tasto .wt-piu.va{animation:wt-piu 1.6s ease-out forwards}
 @keyframes wt-piu{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
-.wallet-tasto[hidden]{display:none}
-html:not(.js) .wallet-tasto{display:none}
-@media (hover:hover){.wallet-tasto:hover{transform:scale(1.03)}}
-.wallet-tasto:active{transform:scale(.97)}
+@media (hover:hover){.wallet-tasto:hover{scale:1.03}}
+.wallet-tasto:active{scale:.97}
 .wallet-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.wallet-tasto{width:calc(46px * 792 / 214);height:46px}}
 @media (prefers-reduced-motion:reduce){.wallet-tasto{transition:none}.wallet-tasto .wt-piu.va{animation-duration:.01s}}
 
 /* ── il tasto della chat col bot (chat/), sotto il wallet: un cercapersone nero con lo
-   schermo lcd verde dove vive il tomodachi, una chiocciolina a pixel (chat/tomodachi.js); il led rosso lampeggia quando c'è un premio da riscuotere. Negli strumenti che
-   fotografano la pagina non c'è (navigator.webdriver), ?chat lo fa vedere lo stesso. Senza script non c'è ── */
-.chat-tasto{position:fixed;z-index:85;top:calc(max(12px,env(safe-area-inset-top)) + 62px);left:max(12px,env(safe-area-inset-left));width:112px;height:65px;padding:0;border:0;background:none;cursor:pointer;
+   schermo lcd verde dove vive il tomodachi, una chiocciolina a pixel (chat/tomodachi.js); il led rosso lampeggia quando c'è un premio da riscuotere.
+   Dal 26.10 è un pezzo della parete (#cercapersone-muro, in cima alla seconda pila), appeso al chiodo per la clip
+   (art/muro/chiodo.svg). Negli strumenti che fotografano la pagina resta spento (navigator.webdriver; ?chat lo accende) ── */
+.chat-tasto{height:auto;aspect-ratio:336/194;padding:0;border:0;background:none;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
 .chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
 .chat-tasto .ct-lcd{position:absolute;left:8.352%;top:24.677%;width:66.294%;height:56.202%;display:block;border-radius:1px;background:#a9bc96;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden}
@@ -397,12 +399,9 @@ html:not(.js) .wallet-tasto{display:none}
 @keyframes ct-lamp{50%{opacity:.25}}
 /* il led che lavora (chat/led.js): sfarfalla come la spia del disco di un PC finché il sistema fa qualcosa */
 .chat-tasto .ct-led.lavora{background:#ff4a3a;box-shadow:0 0 5px #ff3b2e,0 0 11px rgba(255,59,46,.65);animation:none;opacity:1}
-.chat-tasto[hidden]{display:none}
-html:not(.js) .chat-tasto{display:none}
-@media (hover:hover){.chat-tasto:hover{transform:scale(1.04)}}
-.chat-tasto:active{transform:scale(.96)}
+@media (hover:hover){.chat-tasto:hover{scale:1.04}}
+.chat-tasto:active{scale:.96}
 .chat-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
-@media (max-width:899px){.chat-tasto{top:calc(max(12px,env(safe-area-inset-top)) + 54px);width:96px;height:56px}}
 @media (prefers-reduced-motion:reduce){.chat-tasto{transition:none}.chat-tasto.msg .ct-led{animation:none}}
 /* storia: stile */
 /* La storia del muro (pzkko.it/storia/): la stessa strada, lo stesso script e la stessa scena 3D della home (li rifà da
@@ -534,25 +533,25 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
 
       <!-- quello che c'era già sul muro: graffiti, resti, le gomme da masticare (le formiche della scena ci vanno in fila)
            e il rivolo della condensa (solo nel muro di sempre: nella scena c'è l'acqua vera) -->
-      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:177;--y:697;--w:300;--r:-3deg;--mx:26;--my:531;--mw:230;--mr:-6deg">
-      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:416;--y:818;--w:250;--r:-6deg;--mx:123;--my:1027;--mw:200;--mr:-5deg">
-      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" loading="lazy" style="--x:894;--y:843;--w:230;--r:0deg;--mx:-91;--my:3049;--mw:170;--mr:-5deg">
-      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:987;--y:1267;--w:95;--r:6deg;--mx:156;--my:2530;--mw:70;--mr:8deg">
-      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" loading="lazy" style="--x:40;--y:1729;--w:110;--r:0deg;--mx:25;--my:1689;--mw:110;--mr:0deg">
-      <img class="it tag" src="/art/tag/tag-verde.webp" alt="" width="498" height="360" loading="lazy" style="--x:177;--y:1491;--w:330;--r:2deg;--mx:63;--my:2916;--mw:240;--mr:3deg">
-      <img class="it tag chiaro" src="/art/tag/ciao-bianco.webp" alt="" width="441" height="372" loading="lazy" style="--x:686;--y:502;--w:250;--r:-8deg;--mx:99;--my:2782;--mw:180;--mr:-7deg">
-      <img class="it tag" src="/art/scritte2/unimore.webp" alt="" width="456" height="498" loading="lazy" style="--x:743;--y:202;--w:120;--r:-4deg;--mx:293;--my:151;--mw:95;--mr:-4deg">
-      <img class="it tag" src="/art/strada2/qui.webp" alt="" width="468" height="492" loading="lazy" style="--x:726;--y:1605;--w:120;--r:0deg;--mx:147;--my:3498;--mw:80;--mr:0deg">
-      <img class="it pezzo" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy" style="--x:994;--y:1441;--w:48;--r:0deg;--mx:222;--my:3419;--mw:34;--mr:0deg">
-      <img class="it pezzo" src="/art/bestiole/gomme2.webp" alt="" width="408" height="384" loading="lazy" style="--x:1245;--y:317;--w:30;--r:20deg;--mx:365;--my:3406;--mw:22;--mr:20deg">
+      <img class="it tag" src="/art/tag/tag-nero.webp" alt="" width="444" height="372" loading="lazy" style="--x:177;--y:759;--w:300;--r:-3deg;--mx:26;--my:578;--mw:230;--mr:-6deg">
+      <img class="it tag chiaro" src="/art/tag/throwup-argento.webp" alt="" width="441" height="375" loading="lazy" style="--x:416;--y:818;--w:250;--r:-6deg;--mx:123;--my:1112;--mw:200;--mr:-5deg">
+      <img class="it tag" src="/art/tag/scarabocchio.webp" alt="" width="429" height="444" loading="lazy" style="--x:894;--y:843;--w:230;--r:0deg;--mx:-91;--my:3096;--mw:170;--mr:-5deg">
+      <img class="it tag" src="/art/tag/faccia.webp" alt="" width="261" height="408" loading="lazy" style="--x:987;--y:1267;--w:95;--r:6deg;--mx:156;--my:2577;--mw:70;--mr:8deg">
+      <img class="it tag" src="/art/tag/stencil-chiocciola.webp" alt="" width="438" height="315" loading="lazy" style="--x:40;--y:1829;--w:110;--r:0deg;--mx:25;--my:1736;--mw:110;--mr:0deg">
+      <img class="it tag" src="/art/tag/tag-verde.webp" alt="" width="498" height="360" loading="lazy" style="--x:177;--y:1588;--w:330;--r:2deg;--mx:63;--my:2963;--mw:240;--mr:3deg">
+      <img class="it tag chiaro" src="/art/tag/ciao-bianco.webp" alt="" width="441" height="372" loading="lazy" style="--x:686;--y:502;--w:250;--r:-8deg;--mx:99;--my:2867;--mw:180;--mr:-7deg">
+      <img class="it tag" src="/art/scritte2/unimore.webp" alt="" width="456" height="498" loading="lazy" style="--x:743;--y:202;--w:120;--r:-4deg;--mx:293;--my:236;--mw:95;--mr:-4deg">
+      <img class="it tag" src="/art/strada2/qui.webp" alt="" width="468" height="492" loading="lazy" style="--x:726;--y:1605;--w:120;--r:0deg;--mx:147;--my:3545;--mw:80;--mr:0deg">
+      <img class="it pezzo" src="/art/strada1/gomme.webp" alt="" width="369" height="432" loading="lazy" style="--x:994;--y:1441;--w:48;--r:0deg;--mx:222;--my:3504;--mw:34;--mr:0deg">
+      <img class="it pezzo" src="/art/bestiole/gomme2.webp" alt="" width="408" height="384" loading="lazy" style="--x:1245;--y:317;--w:30;--r:20deg;--mx:365;--my:3491;--mw:22;--mr:20deg">
       <img class="it pezzo" src="/art/bestiole/rivolo.webp" data-scena="no" alt="" width="88" height="604" loading="lazy" style="--x:1215;--y:0;--w:36;--r:0deg;--mx:352;--my:0;--mw:22;--mr:0deg;opacity:.8">
-      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" loading="lazy" style="--x:555;--y:1639;--w:180;--r:-4deg;--mx:220;--my:2026;--mw:120;--mr:-8deg">
-      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" loading="lazy" style="--x:1005;--y:886;--w:170;--r:6deg;--mx:311;--my:1194;--mw:120;--mr:10deg">
+      <img class="it pezzo" src="/art/nastro/resto-bianco.webp" alt="" width="429" height="309" loading="lazy" style="--x:555;--y:1639;--w:180;--r:-4deg;--mx:220;--my:2111;--mw:120;--mr:-8deg">
+      <img class="it pezzo" src="/art/nastro/resto-giallo.webp" alt="" width="471" height="267" loading="lazy" style="--x:1005;--y:886;--w:170;--r:6deg;--mx:311;--my:1279;--mw:120;--mr:10deg">
       <!-- la roba degli altri: il meme di unimore contro unibo, lo stesso della home (scusa, bologna) -->
-      <img class="it man" src="/art/manifesti3/unimore.webp" alt="" width="723" height="708" loading="lazy" style="--x:552;--y:14;--w:255;--r:2deg;--mx:208;--my:18;--mw:170;--mr:2deg">
+      <img class="it man" src="/art/manifesti3/unimore.webp" alt="" width="723" height="708" loading="lazy" style="--x:552;--y:14;--w:255;--r:2deg;--mx:208;--my:103;--mw:170;--mr:2deg">
 
       <!-- l'inizio: si torna al muro, il volantino d'apertura e la prima foto -->
-      <article class="vol it c-giallo" id="storia-torna" style="--x:42;--y:10;--w:190;--r:-3deg;--mx:26;--my:8;--mw:150;--mr:-3deg;--marker-c:#a50d25">
+      <article class="vol it c-giallo" id="storia-torna" style="--x:42;--y:72;--w:190;--r:-3deg;--mx:26;--my:55;--mw:150;--mr:-3deg;--marker-c:#a50d25">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h3><a href="/">← torna al muro</a></h3>
@@ -560,7 +559,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <article class="vol it c-bianco" id="storia-muro" style="--x:12;--y:218;--w:300;--r:-1.5deg;--mx:6;--my:173;--mw:200;--mr:-2deg;--ts:.74;--marker-c:#a50d25">
+      <article class="vol it c-bianco" id="storia-muro" style="--x:12;--y:280;--w:300;--r:-1.5deg;--mx:6;--my:220;--mw:200;--mr:-2deg;--ts:.74;--marker-c:#a50d25">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <p class="kicker">fun fact</p>
@@ -570,7 +569,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <figure class="vol it stampa live" id="storia-scatto-1" style="--x:267;--y:30;--w:320;--r:1.5deg;--mx:6;--my:573;--mw:188;--mr:1.5deg">
+      <figure class="vol it stampa live" id="storia-scatto-1" style="--x:267;--y:127;--w:320;--r:1.5deg;--mx:6;--my:620;--mw:188;--mr:1.5deg">
         <img class="nastro su" src="/art/nastro/carta-gommata.webp" alt="" width="483" height="183" loading="lazy">
         <div class="live-foto">
           <img src="/art/storia/foto-1.webp" width="1080" height="1440" alt="La saracinesca di un ingresso della Coin in via Rizzoli a Bologna: lamiera grigia coperta di graffiti e di più di venti volantini, sopra l'insegna «coin» con le lettere a scatola, il tutto incorniciato dalla pietra del palazzo." loading="lazy">
@@ -581,9 +580,9 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       </figure>
 
       <!-- la storia, in quattro fogli, con gli altri due scatti in mezzo -->
-      <h2 class="it spray foto chiaro scritta" id="storia-com-e-andata" style="--x:37;--y:781;--w:240;--r:-4deg;--mx:21;--my:902;--mw:160;--mr:-4deg">com'è andata<small>(settembre 2024)</small></h2>
+      <h2 class="it spray foto chiaro scritta" id="storia-com-e-andata" style="--x:37;--y:843;--w:240;--r:-4deg;--mx:21;--my:949;--mw:160;--mr:-4deg">com'è andata<small>(settembre 2024)</small></h2>
 
-      <article class="vol it c-verde" id="storia-bologna" style="--x:12;--y:920;--w:275;--r:-2deg;--mx:6;--my:992;--mw:185;--mr:-2deg;--ts:.8;--marker-c:#a50d25">
+      <article class="vol it c-verde" id="storia-bologna" style="--x:12;--y:982;--w:275;--r:-2deg;--mx:6;--my:1039;--mw:185;--mr:-2deg;--ts:.8;--marker-c:#a50d25">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <span class="n" aria-hidden="true">1</span>
@@ -592,7 +591,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <article class="vol it c-giallo" id="storia-iphone" style="--x:262;--y:561;--w:270;--r:2deg;--mx:198;--my:170;--mw:185;--mr:2deg;--ts:.8;--marker-c:#1446a0">
+      <article class="vol it c-giallo" id="storia-iphone" style="--x:262;--y:658;--w:270;--r:2deg;--mx:198;--my:255;--mw:185;--mr:2deg;--ts:.8;--marker-c:#1446a0">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <span class="n" aria-hidden="true">2</span>
@@ -601,7 +600,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <figure class="vol it stampa live" id="storia-scatto-2" style="--x:527;--y:239;--w:245;--r:-1deg;--mx:202;--my:400;--mw:180;--mr:-1deg">
+      <figure class="vol it stampa live" id="storia-scatto-2" style="--x:527;--y:239;--w:245;--r:-1deg;--mx:202;--my:485;--mw:180;--mr:-1deg">
         <img class="puntina" src="/art/nastro/puntina.webp" alt="" width="174" height="201" loading="lazy">
         <div class="live-foto">
           <img src="/art/storia/foto-2-m.webp" width="540" height="720" alt="Il secondo scatto della stessa saracinesca, due secondi dopo, inquadrato appena più in alto." loading="lazy">
@@ -611,7 +610,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         <figcaption>12:28:02<small>scatto 2 di 3</small></figcaption>
       </figure>
 
-      <figure class="vol it stampa live" id="storia-scatto-3" style="--x:270;--y:865;--w:245;--r:2deg;--mx:202;--my:669;--mw:180;--mr:2deg">
+      <figure class="vol it stampa live" id="storia-scatto-3" style="--x:270;--y:962;--w:245;--r:2deg;--mx:202;--my:754;--mw:180;--mr:2deg">
         <img class="nastro sx" src="/art/nastro/scotch-storto.webp" alt="" width="435" height="417" loading="lazy">
         <div class="live-foto">
           <img src="/art/storia/foto-3-m.webp" width="540" height="720" alt="Il terzo scatto, cinque secondi dopo il primo, mentre già mi allontanavo." loading="lazy">
@@ -621,7 +620,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         <figcaption>12:28:05<small>scatto 3 di 3 · e via, a pranzo</small></figcaption>
       </figure>
 
-      <article class="vol it c-bianco flip" id="storia-saracinesca" style="--x:12;--y:1256;--w:280;--r:-1.5deg;--mx:6;--my:1265;--mw:188;--mr:-1.5deg;--ts:.8">
+      <article class="vol it c-bianco flip" id="storia-saracinesca" style="--x:12;--y:1318;--w:280;--r:-1.5deg;--mx:6;--my:1312;--mw:188;--mr:-1.5deg;--ts:.8">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <span class="n" aria-hidden="true">3</span>
@@ -630,7 +629,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <article class="vol it c-giornale" id="storia-due-anni-dopo" style="--x:512;--y:593;--w:275;--r:1.5deg;--mx:198;--my:938;--mw:188;--mr:1.5deg;--ts:.8">
+      <article class="vol it c-giornale" id="storia-due-anni-dopo" style="--x:512;--y:593;--w:275;--r:1.5deg;--mx:198;--my:1023;--mw:188;--mr:1.5deg;--ts:.8">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <span class="n" aria-hidden="true">4</span>
@@ -641,9 +640,9 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       </article>
 
       <!-- cosa è passato dalla foto al muro -->
-      <h2 class="it spray foto chiaro scritta" id="storia-cosa-e-finito" style="--x:530;--y:915;--w:250;--r:-3deg;--mx:11;--my:1683;--mw:180;--mr:-3deg">cosa è finito su pzkko</h2>
+      <h2 class="it spray foto chiaro scritta" id="storia-cosa-e-finito" style="--x:530;--y:915;--w:250;--r:-3deg;--mx:11;--my:1730;--mw:180;--mr:-3deg">cosa è finito su pzkko</h2>
 
-      <article class="vol it c-kraft confronto" id="storia-insegna" style="--x:512;--y:1139;--w:285;--r:-0.5deg;--mx:6;--my:1797;--mw:188;--mr:-0.5deg;--ts:.8">
+      <article class="vol it c-kraft confronto" id="storia-insegna" style="--x:512;--y:1139;--w:285;--r:-0.5deg;--mx:6;--my:1844;--mw:188;--mr:-0.5deg;--ts:.8">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h3>l'insegna</h3>
@@ -656,7 +655,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <article class="vol it c-kraft confronto flip" id="storia-adesivo" style="--x:762;--y:553;--w:270;--r:1deg;--mx:198;--my:1222;--mw:188;--mr:1deg;--ts:.8">
+      <article class="vol it c-kraft confronto flip" id="storia-adesivo" style="--x:762;--y:553;--w:270;--r:1deg;--mx:198;--my:1307;--mw:188;--mr:1deg;--ts:.8">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h3>l'adesivo</h3>
@@ -669,7 +668,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <article class="vol it c-kraft confronto" id="storia-roba-degli-altri" style="--x:762;--y:888;--w:265;--r:-1deg;--mx:6;--my:2165;--mw:188;--mr:-1deg;--ts:.8">
+      <article class="vol it c-kraft confronto" id="storia-roba-degli-altri" style="--x:762;--y:888;--w:265;--r:-1deg;--mx:6;--my:2212;--mw:188;--mr:-1deg;--ts:.8">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h3>la roba degli altri</h3>
@@ -683,7 +682,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       </article>
 
       <!-- i metadati e le curiosità -->
-      <section class="vol it scontrino" id="storia-scontrino" aria-label="i metadati della prima foto, come uno scontrino" style="--x:772;--y:1299;--w:245;--r:0.6deg;--mx:202;--my:1492;--mw:180;--mr:0.6deg">
+      <section class="vol it scontrino" id="storia-scontrino" aria-label="i metadati della prima foto, come uno scontrino" style="--x:772;--y:1299;--w:245;--r:0.6deg;--mx:202;--my:1577;--mw:180;--mr:0.6deg">
         <div class="carta">
         <p class="mano">i metadati non mentono:</p>
         <p class="testa"><b>saracinesca s.n.c.</b>via rizzoli · bologna</p>
@@ -717,7 +716,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </section>
 
-      <article class="vol it c-lucido" id="storia-lo-sapevi" style="--x:262;--y:1219;--w:285;--r:-1deg;--mx:6;--my:2539;--mw:190;--mr:-1deg;--ts:.8">
+      <article class="vol it c-lucido" id="storia-lo-sapevi" style="--x:262;--y:1316;--w:285;--r:-1deg;--mx:6;--my:2586;--mw:190;--mr:-1deg;--ts:.8">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h3>lo sapevi che…</h3>
@@ -729,7 +728,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </article>
 
-      <article class="vol it c-crema" id="storia-ragu" style="--x:1020;--y:468;--w:255;--r:2deg;--mx:198;--my:2848;--mw:185;--mr:2deg;--ts:.8">
+      <article class="vol it c-crema" id="storia-ragu" style="--x:1020;--y:468;--w:255;--r:2deg;--mx:198;--my:2933;--mw:185;--mr:2deg;--ts:.8">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h3>e il ragù?</h3>
@@ -741,7 +740,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       </article>
 
       <!-- bologna 2.0: i meme, nello stile di better call pekko -->
-      <section class="vol it bcp" id="storia-bologna-2-0" aria-labelledby="bologna2" style="--x:762;--y:50;--w:262;--r:0.5deg;--mx:200;--my:2050;--mw:182;--mr:0.5deg">
+      <section class="vol it bcp" id="storia-bologna-2-0" aria-labelledby="bologna2" style="--x:762;--y:50;--w:262;--r:0.5deg;--mx:200;--my:2135;--mw:182;--mr:0.5deg">
         <p class="stella" aria-hidden="true"><span>100% ragù!!!</span></p>
         <div class="banner">
           <h2 class="marchio" id="bologna2"><span>bologna</span> 2.0</h2>
@@ -750,7 +749,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </section>
 
-      <figure class="vol it meme due" id="storia-meme-spaghetti" style="--x:772;--y:330;--w:245;--r:-1.5deg;--mx:200;--my:2340;--mw:182;--mr:-1.5deg">
+      <figure class="vol it meme due" id="storia-meme-spaghetti" style="--x:772;--y:330;--w:245;--r:-1.5deg;--mx:200;--my:2425;--mw:182;--mr:-1.5deg">
         <div class="quadro">
           <img src="/art/storia/meme/spaghetti.webp" alt="Meme a due riquadri: Pekko in giacca gialla gira la faccia e rifiuta con la mano un piatto di spaghetti al sugo; sotto, indica felice un piatto di tagliatelle al ragù." width="720" height="1080" loading="lazy">
           <p class="riga">spaghetti alla bolognese</p>
@@ -758,7 +757,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </figure>
 
-      <figure class="vol it meme" id="storia-meme-nonna" style="--x:1034;--y:20;--w:235;--r:1.5deg;--mx:204;--my:2506;--mw:175;--mr:1.5deg">
+      <figure class="vol it meme" id="storia-meme-nonna" style="--x:1034;--y:20;--w:235;--r:1.5deg;--mx:204;--my:2591;--mw:175;--mr:1.5deg">
         <div class="quadro">
           <img src="/art/storia/meme/nonna.webp" alt="Meme: in una cucina bolognese una nonna furiosa punta il mattarello contro Pekko in giacca viola, che tiene una forchettata di spaghetti al sugo." width="720" height="720" loading="lazy">
           <p class="cap su">quando a bologna ordini</p>
@@ -766,7 +765,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </figure>
 
-      <figure class="vol it meme" id="storia-meme-ragu" style="--x:1042;--y:249;--w:225;--r:2deg;--mx:204;--my:2677;--mw:175;--mr:2deg">
+      <figure class="vol it meme" id="storia-meme-ragu" style="--x:1042;--y:249;--w:225;--r:2deg;--mx:204;--my:2762;--mw:175;--mr:2deg">
         <div class="quadro">
           <img src="/art/storia/meme/ragu.webp" alt="Meme: Pekko in completo verde e camicia rosa mescola un pentolone di ragù sul fornello, con una macchia di sugo sulla cravatta." width="720" height="720" loading="lazy">
           <p class="cap su">il ragù: ore a fuoco lento</p>
@@ -774,7 +773,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </figure>
 
-      <figure class="vol it meme" id="storia-meme-torri" style="--x:1032;--y:797;--w:230;--r:-1deg;--mx:14;--my:2979;--mw:175;--mr:-1deg">
+      <figure class="vol it meme" id="storia-meme-torri" style="--x:1032;--y:797;--w:230;--r:-1deg;--mx:14;--my:3026;--mw:175;--mr:-1deg">
         <div class="quadro">
           <img src="/art/storia/meme/torri.webp" alt="Meme: sotto i portici di Bologna, con le due torri in fondo alla strada, Pekko in completo verde petrolio si inclina di lato come la torre." width="720" height="720" loading="lazy">
           <p class="cap su">la garisenda pende</p>
@@ -782,7 +781,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </figure>
 
-      <figure class="vol it meme" id="storia-meme-mortadella" style="--x:1038;--y:1021;--w:230;--r:1.5deg;--mx:204;--my:3240;--mw:175;--mr:1.5deg">
+      <figure class="vol it meme" id="storia-meme-mortadella" style="--x:1038;--y:1021;--w:230;--r:1.5deg;--mx:204;--my:3325;--mw:175;--mr:1.5deg">
         <div class="quadro">
           <img src="/art/storia/meme/mortadella.webp" alt="Meme: in una salumeria Pekko in gessato blu culla una mortadella intera come un neonato, commosso." width="720" height="720" loading="lazy">
           <p class="cap su">bologna la dotta, la rossa…</p>
@@ -790,7 +789,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </figure>
 
-      <figure class="vol it meme" id="storia-meme-iphone" style="--x:1028;--y:1245;--w:230;--r:-2deg;--mx:10;--my:3150;--mw:175;--mr:-2deg">
+      <figure class="vol it meme" id="storia-meme-iphone" style="--x:1028;--y:1245;--w:230;--r:-2deg;--mx:10;--my:3197;--mw:175;--mr:-2deg">
         <div class="quadro">
           <img src="/art/storia/meme/iphone.webp" alt="Meme: Pekko in completo giallo si accovaccia come un fotografo di moda e fotografa col telefono nuovo una saracinesca coperta di graffiti." width="720" height="720" loading="lazy">
           <p class="cap su">iphone nuovo da due giorni</p>
@@ -798,7 +797,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         </div>
       </figure>
 
-      <article class="vol it c-azzurro fine" id="storia-fine" style="--x:1020;--y:1469;--w:255;--r:1deg;--mx:6;--my:3321;--mw:188;--mr:1deg;--marker-c:#a50d25">
+      <article class="vol it c-azzurro fine" id="storia-fine" style="--x:1020;--y:1469;--w:255;--r:1deg;--mx:6;--my:3368;--mw:188;--mr:1deg;--marker-c:#a50d25">
         <div class="foglio" aria-hidden="true"></div>
         <div class="testo">
           <h3>fine.</h3>
@@ -814,9 +813,12 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       </article>
 
       <!-- sopra: graffette, l'adesivo, il nastro nero -->
-      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" loading="lazy" style="--x:741;--y:307;--w:70;--r:30deg;--mx:185;--my:2315;--mw:50;--mr:30deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441" loading="lazy" style="--x:1224;--y:1740;--w:90;--r:-10deg;--mx:147;--my:3595;--mw:70;--mr:-12deg;z-index:4">
-      <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:924;--y:1277;--w:90;--r:-8deg;--mx:310;--my:1473;--mw:70;--mr:-10deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/graffette.webp" alt="" width="360" height="252" loading="lazy" style="--x:741;--y:307;--w:70;--r:30deg;--mx:185;--my:2400;--mw:50;--mr:30deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/adesivo.webp" alt="" width="438" height="441" loading="lazy" style="--x:1224;--y:1740;--w:90;--r:-10deg;--mx:147;--my:3642;--mw:70;--mr:-12deg;z-index:4">
+      <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:924;--y:1277;--w:90;--r:-8deg;--mx:310;--my:1558;--mw:70;--mr:-10deg;z-index:4">
+      <!-- il wallet e il cercapersone, come nella home (26.10): pezzi vivi del muro (tools/pzkko/storia/disposizione.js) -->
+      <button class="it pezzo vivo wallet-tasto" id="wallet-muro" type="button" style="--x:20;--y:0;--w:245;--r:-2deg;--mx:8;--my:0;--mw:182;--mr:-2deg;z-index:6" aria-label="wallet: i tuoi $pzk, il conto e la borsa"><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas><img class="attacco" src="/art/muro/viti.svg" alt="" width="792" height="214"></button>
+      <button class="it pezzo vivo chat-tasto" id="cercapersone-muro" type="button" style="--x:297;--y:6;--w:185;--r:3deg;--mx:218;--my:4;--mw:150;--mr:3deg;z-index:6" aria-label="chat: parla col bot dei $pzk" title="chat col bot"><img src="/art/chat-pager-grande/pager-piccolo.webp" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span><img class="attacco" src="/art/muro/chiodo.svg" alt="" width="336" height="194"></button>
     </div>
   </main>
   <div class="buio" aria-hidden="true"></div>
@@ -836,10 +838,6 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
 </div>
 <!-- i suoni della strada (suono/): partono al primo tocco o tasto; questo li spegne e li riaccende -->
 <button class="suono" type="button" aria-pressed="true" aria-label="i suoni della strada" title="i suoni della strada" hidden><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4.5 12.4h6.2l8-6.6.3 20.6-8.1-6.8H4.8z"/><path class="s-onde" d="M24.2 10.6c2.6 3 2.8 7.6.2 10.9M28.6 6.8c4.6 4.9 4.8 13.3.3 18.6"/><path class="s-muto" d="M24.5 11.2l8.6 9.4M33 11.4l-8.4 9"/></svg><span>suono</span></button>
-<!-- il wallet dei $pzk (wallet/), sempre in alto a sinistra: il banner di pelle col pannello a led dei $pzk (col cursore sopra scorrono i dati) -->
-<button class="wallet-tasto" type="button" aria-label="wallet: i tuoi $pzk, il conto e la borsa" hidden><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas></button>
-<!-- la chat col bot dei $pzk (chat/), sotto il wallet: il cercapersone con lo schermo lcd -->
-<button class="chat-tasto" type="button" aria-label="chat: parla col bot dei $pzk" title="chat col bot" hidden><img src="/art/chat-pager-grande/pager-piccolo.webp" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span></button>
 
 <script>
 (() => {
@@ -1323,6 +1321,8 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       document.addEventListener('pzkko-chat', (e) => apri(e.detail?.comando))
       ;(window.requestIdleCallback ?? setTimeout)(() => carica().catch(() => {}), { timeout: 4000 })
       if (nel === 'chat') apri()
+      // la voce «account» della barra, dalle altre pagine; poi via il #account dall'indirizzo, così non si riapre (ricaricando, col tasto indietro)
+      if (nel === 'account') { history.replaceState(null, '', location.pathname + location.search); carica().then(() => import('/games/pzk.js')).then((p) => p.apriWallet('conto')).catch(() => {}) }
     }
   }
 
@@ -1350,6 +1350,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
         S.acceso = true
         if (!ctx) {
           ctx = new AC({ latencyHint: 'balanced' })
+          S.ctx = ctx // (anche per i suoni dell'interfaccia: suono/interfaccia.js)
           // (sull'iPhone come un suono di sottofondo: rispetta il tasto del silenzioso e non ferma la musica)
           try { if (navigator.audioSession) navigator.audioSession.type = 'ambient' } catch {}
           ctx.onstatechange = () => tasto?.classList.toggle('va', ctx.state === 'running' && S.acceso)
@@ -1709,7 +1710,7 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
   // sotto la macchia non sposta niente. La luce dalla sera della pagina (--notte). Senza l'arrivo (movimento ridotto,
   // ?intro=0, la ricarica dopo un contesto perso) o in una finestra di forma che la foto non copre, niente foto: il nero.
   // window.pzkkoFotoCarico: la scena tiene il meteo della foto (il dopo pioggia) finché la foto non è sfumata
-  const FOTO = {"computer":{"v":{"giorno":"/art/scena/carico/storia-computer-giorno.webp?v=5a11d003","tramonto":"/art/scena/carico/storia-computer-tramonto.webp?v=b8016c85","sera":"/art/scena/carico/storia-computer-sera.webp?v=335625f1","notte":"/art/scena/carico/storia-computer-notte.webp?v=2ec38b1c"},"bw":2.209,"bh":2.3854,"hm":7.6999,"am":1.5874,"forme":[0.7,2.1]},"telefono":{"v":{"giorno":"/art/scena/carico/storia-telefono-giorno.webp?v=8445d2a3","tramonto":"/art/scena/carico/storia-telefono-tramonto.webp?v=bc17bd45","sera":"/art/scena/carico/storia-telefono-sera.webp?v=4d5e13fb","notte":"/art/scena/carico/storia-telefono-notte.webp?v=7d954da6"},"bw":1.025,"bh":1.6784,"hm":5.9548,"am":0.5502,"forme":[0.42,0.8]}}
+  const FOTO = {"computer":{"v":{"giorno":"/art/scena/carico/storia-computer-giorno.webp?v=a378769f","tramonto":"/art/scena/carico/storia-computer-tramonto.webp?v=db77bb2f","sera":"/art/scena/carico/storia-computer-sera.webp?v=16cb3ca6","notte":"/art/scena/carico/storia-computer-notte.webp?v=cb0a7300"},"bw":2.209,"bh":2.3854,"hm":7.6999,"am":1.5874,"forme":[0.7,2.1]},"telefono":{"v":{"giorno":"/art/scena/carico/storia-telefono-giorno.webp?v=2a5b918a","tramonto":"/art/scena/carico/storia-telefono-tramonto.webp?v=9cfad4a5","sera":"/art/scena/carico/storia-telefono-sera.webp?v=be4b54db","notte":"/art/scena/carico/storia-telefono-notte.webp?v=8ef68733"},"bw":1.025,"bh":1.6784,"hm":5.9548,"am":0.5502,"forme":[0.42,0.8]}}
   const F = FOTO?.[telefono ? 'telefono' : 'computer'], foto = carico.firstElementChild
   const nn = window.pzkkoPagina?.luci.notte ?? (parseFloat(root.style.getPropertyValue('--notte')) || 0)
   const luce = nn <= 0.001 ? 'giorno' : nn < 0.3 ? 'tramonto' : nn < 0.8 ? 'sera' : 'notte'
@@ -1829,5 +1830,6 @@ html.scena-carico .mosca,html.scena-carico .formica,html.scena-carico .goccia,ht
 </script>
 <!-- lo scontrino delle novità (benvenuto/): una volta per versione, a pagina caricata; ?novita lo fa rivedere -->
 <script type="module" src="/benvenuto/benvenuto.js"></script>
+<script type="module" src="/barra/barra.js"></script>
 </body>
 </html>

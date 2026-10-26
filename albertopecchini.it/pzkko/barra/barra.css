@@ -1,0 +1,63 @@
+/* La barra in alto di pzkko.it (26.10, barra/barra.js): niente sfondo. Dall'alto colano pixel scuri (la frangia, --frangia,
+   e qualche pixel che si stacca e cade); sotto, le voci sono pezzi di carta strappati attaccati col nastro, ognuno con la
+   sua carta (.c-…) e il suo carattere (.f-…). Fra un pezzo e l'altro i clic passano alla pagina sotto.
+   --barra è l'altezza: la home ci sposta sotto il tasto del wallet e il cercapersone. */
+@font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Black Ops One";src:url(/fonts/black-ops-one.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Shrikhand";src:url(/fonts/shrikhand.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Rubik Mono One";src:url(/fonts/rubik-mono-one.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Caveat";src:url(/fonts/caveat.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Bungee";src:url(/fonts/bungee.woff2) format("woff2");font-display:swap}
+:root{--barra:72px}
+@media (max-width:899px){:root{--barra:62px}}
+
+.barra{position:fixed;z-index:80;left:0;right:0;top:0;height:calc(var(--barra) + env(safe-area-inset-top));display:flex;align-items:flex-start;justify-content:center;
+  padding:calc(env(safe-area-inset-top) + 12px) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left));pointer-events:none}
+/* i pixel che colano dall'alto e quelli che si staccano */
+.barra-pixel{position:absolute;left:0;right:0;top:env(safe-area-inset-top);height:72px;background:var(--frangia) 0 0 repeat-x;image-rendering:pixelated;pointer-events:none}
+.barra::before{content:"";position:absolute;left:0;right:0;top:0;height:env(safe-area-inset-top);background:#0e0d0c} /* sotto la tacca del telefono */
+.barra-pixel i{position:absolute;top:16px;width:6px;height:6px;background:var(--c);animation:barra-cade linear infinite;opacity:0}
+@keyframes barra-cade{0%{transform:translateY(0);opacity:0}8%{opacity:1}70%{opacity:1}100%{transform:translateY(64px);opacity:0}}
+
+.barra ul{display:flex;align-items:flex-start;gap:8px;margin:0 auto;max-width:100%;padding:8px 6px 14px;list-style:none;overflow-x:auto;scrollbar-width:none;pointer-events:none}
+.barra ul::-webkit-scrollbar{display:none}
+.barra li{flex:none;transform:translateY(var(--y,0)) rotate(var(--r,0deg));transition:transform .18s cubic-bezier(.2,1.4,.4,1)}
+@media (hover:hover){.barra li:hover{transform:translateY(calc(var(--y,0) + 3px)) rotate(0deg) scale(1.07)}}
+
+/* il pezzo di carta: la carta strappata è lo span sotto (il suo clip-path non taglia il nastro né l'ombra) */
+.barra .pezzo{position:relative;isolation:isolate;display:flex;align-items:center;gap:7px;padding:11px 16px 10px;color:#1c1a14;text-decoration:none;white-space:nowrap;
+  pointer-events:auto;filter:drop-shadow(0 2px 1.5px rgba(0,0,0,.45)) drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.barra .carta{position:absolute;inset:0;z-index:-1;background:#f4efe2}
+.barra .pezzo::before{content:"";position:absolute;left:50%;top:-6px;width:34px;height:12px;margin-left:-17px;z-index:1;
+  background:rgba(236,226,190,.78);box-shadow:0 1px 1px rgba(0,0,0,.2);transform:rotate(var(--n,-8deg))} /* il nastro */
+.barra img{width:19px;height:19px;flex:none}
+.barra .pezzo:focus-visible{outline:3px solid #ffd400;outline-offset:3px}
+/* la pagina in cui sei: un giro di pennarello rosso */
+.barra .pezzo[aria-current="page"]::after{content:"";position:absolute;inset:-5px -9px;border:3px solid rgba(165,13,37,.85);border-radius:50%;transform:rotate(-3deg);pointer-events:none}
+
+/* le carte */
+.c-scontrino .carta{background:#fbfaf4 linear-gradient(90deg,transparent 0 96%,rgba(0,0,0,.04) 96%)}
+.c-cartone .carta{background:#c79c6b repeating-linear-gradient(17deg,rgba(90,60,30,.08) 0 2px,transparent 2px 7px)}
+.c-postit .carta{background:#ffe45c linear-gradient(transparent 70%,rgba(0,0,0,.06))}
+.c-rosa .carta{background:#ff9fc8}
+.c-quaderno .carta{background:#fdfdf8 linear-gradient(90deg,transparent 10px,rgba(220,60,60,.55) 10px 11px,transparent 11px),repeating-linear-gradient(transparent 0 9px,rgba(70,120,210,.35) 9px 10px)}
+.c-bianca .carta{background:#f4efe2}
+.c-grigia .carta{background:#c4c0b8}
+.c-indietro .carta{background:#a50d25 repeating-linear-gradient(115deg,transparent 0 6px,rgba(0,0,0,.06) 6px 8px)} /* il tasto indietro: carta rossa */
+.barra .c-indietro{color:#fff!important}
+/* i caratteri */
+.f-macchina{font:400 18px/1 "Special Elite","Courier New",monospace}
+.f-stencil{font:400 18px/1 "Black Ops One",Impact,sans-serif;letter-spacing:.04em}
+.f-pennarello{font:400 20px/1 "Permanent Marker","Comic Sans MS",cursive;color:#a50d25!important}
+.f-tondo{font:400 20px/1 "Shrikhand","Cooper Black",serif;color:#5a1033!important}
+.f-mono{font:400 13px/1 "Rubik Mono One",monospace;color:#1446a0!important}
+.f-mano{font:700 27px/.8 "Caveat",cursive}
+.f-bungee{font:400 15px/1 "Bungee",Impact,sans-serif;color:#55524c!important}
+.barra small{margin-left:3px;padding:2px 4px;background:#a50d25;color:#fff;font:400 9px/1 "Special Elite",monospace;letter-spacing:.04em;transform:rotate(4deg)}
+.barra [aria-disabled="true"]{cursor:default}
+
+@media (max-width:899px){.barra .pezzo{padding:9px 12px 8px}}
+@media (prefers-reduced-motion:reduce){.barra-pixel i{animation:none;display:none}.barra li{transition:none}}
+@media print{.barra{display:none}}

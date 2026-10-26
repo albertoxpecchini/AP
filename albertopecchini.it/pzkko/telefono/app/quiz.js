@@ -50,7 +50,7 @@ function domanda() {
       </div>
       <div class="t-qz-campo">
         ${d.img ? `<figure class="t-qz-foto"><img src="${esc(d.img)}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(d.credito ?? '')}</figcaption></figure>` : grande(d.q)}
-        <div class="t-qz-risp">${d.risposte.map((t, i) => `<button type="button" data-r="${i}"><span>${'ABCD'[i]}</span>${esc(t)}</button>`).join('')}</div>
+        <div class="t-qz-risp${d.vf ? ' vf' : ''}">${d.risposte.map((t, i) => `<button type="button" data-r="${i}"><span>${'ABCD'[i]}</span>${esc(t)}</button>`).join('')}</div>
       </div>
       <div class="t-qz-esito" hidden></div>
     </div>`

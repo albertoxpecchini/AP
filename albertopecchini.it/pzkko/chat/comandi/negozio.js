@@ -1,10 +1,10 @@
 // Lo zaino e il negozio: zaino, negozio, compra, vendi, usa, info, apri (le casse), gratta.
 import * as zaino from '../zaino.js'
-import { NEGOZIO, PER_ID, PESCI, ANIMALI, REPERTI, nomeDi } from '../testi.js'
+import { NEGOZIO, PER_ID, PESCI, ANIMALI, REPERTI, UFFICIO, nomeDi } from '../testi.js'
 import { REPARTI, testoBonus } from '../oggetti.js'
 import * as mercato from '../mercato.js'
 
-const VENDIBILI = [...PESCI, ...ANIMALI, ...REPERTI]
+const VENDIBILI = [...PESCI, ...ANIMALI, ...REPERTI, ...UFFICIO.filter((x) => x.vale > 0)] // (la chiavetta e il wallet no: si decifrano)
 const pezzo = (s) => { s = (s ?? '').trim().toLowerCase(); if (!s) return undefined; return NEGOZIO.find((x) => x.id === s || x.nome.toLowerCase() === s || x.nome.toLowerCase().startsWith(s)) ?? VENDIBILI.find((x) => x.id === s || nomeDi(x.id).toLowerCase().startsWith(s)) }
 /** Il reparto scritto come si scrive («cibo», «roba», «pzk», «att»…). */
 const OFFERTE = ['offerte', 'offerte del giorno', 'regalo']
@@ -89,7 +89,7 @@ export const NEGOZIO_COMANDI = [
         if (!roba.length) return ctx.dì({ colore: 'grigio', d: 'niente da vendere: pesca, caccia o scava.' })
         let tot = 0
         const righe = roba.map(([id, n]) => { const v = vendi(id, n); tot += v; return `:${id}: ${nomeDi(id)}${n > 1 ? ` × ${n}` : ''} → ${ctx.fmt(v)}` })
-        const dati = ctx.paga(tot, { puro: true })
+        const dati = ctx.paga(tot, { puro: true, casa: true }) // (la roba la compra la cassa di pzk)
         return ctx.dì({ colore: 'oro', av: 'bot-ricco', t: ':sacco: venduto tutto', d: righe.join('\n'), pie: `+${ctx.fmt(dati)} $pzk` })
       }
       const x = VENDIBILI.find((v) => v.id === pezzo(che)?.id)
@@ -97,7 +97,7 @@ export const NEGOZIO_COMANDI = [
       const ho = zaino.quanti(x.id)
       if (!ho) return ctx.dì({ colore: 'grigio', d: `non hai :${x.id}: ${nomeDi(x.id)}.` })
       const n = Math.min(ho, parseInt(ctx.args[1]) || 1)
-      const v = ctx.paga(vendi(x.id, n), { puro: true })
+      const v = ctx.paga(vendi(x.id, n), { puro: true, casa: true })
       ctx.dì({ colore: 'oro', t: `:${x.id}: venduto`, d: `${nomeDi(x.id)}${n > 1 ? ` × ${n}` : ''} per ${ctx.pzkHtml(v)}.` })
     },
   },
@@ -141,7 +141,7 @@ export const NEGOZIO_COMANDI = [
       const r = pesca(CASSE[cassa], ctx)
       zaino.conta('casse')
       if (r.niente) return ctx.aggiorna(s, { colore: 'grigio', av: 'bot-triste', t: `:${cassa}: vuota`, d: `dentro: ${r.niente}` })
-      if (r.pzk) { const n = ctx.paga(ctx.tra(r.pzk[0], r.pzk[1]), { puro: true }); return ctx.aggiorna(s, { colore: 'oro', av: 'bot-ricco', t: `:${cassa}: $pzk!`, d: `dentro: ${ctx.pzkHtml(n)}.` }) }
+      if (r.pzk) { const n = ctx.paga(ctx.tra(r.pzk[0], r.pzk[1]), { puro: true, casa: true }); return ctx.aggiorna(s, { colore: 'oro', av: 'bot-ricco', t: `:${cassa}: $pzk!`, d: `dentro: ${ctx.pzkHtml(n)}.` }) }
       zaino.aggiungi(r.oggetto, r.n ?? 1)
       ctx.aggiorna(s, { colore: PER_ID[r.oggetto]?.leggendario ? 'oro' : 'verde', av: 'bot-ride', t: `:${cassa}: :${r.oggetto}:`, d: `dentro: <b>${nomeDi(r.oggetto)}</b>${r.n > 1 ? ` × ${r.n}` : ''}.${PER_ID[r.oggetto]?.vale ? ` Vale ${ctx.fmt(PER_ID[r.oggetto].vale)}: «vendi ${r.oggetto}» quando vuoi.` : ''}` })
     },
@@ -165,7 +165,7 @@ export const NEGOZIO_COMANDI = [
       for (const c of celle) conta[c] = (conta[c] ?? 0) + 1
       const tris = Object.entries(conta).find(([, n]) => n >= 3)?.[0]
       if (!tris) return ctx.scheda({ colore: 'grigio', av: 'bot-triste', d: 'niente tris. Il prossimo, forse.' })
-      const premio = ctx.paga(SIMBOLI.find(([k]) => k === tris)[1], { puro: true })
+      const premio = ctx.paga(SIMBOLI.find(([k]) => k === tris)[1], { puro: true, casa: true })
       zaino.conta('vinti', premio)
       ctx.scheda({ colore: 'oro', av: 'bot-ricco', t: `:${tris}: tris!`, d: `tre :${tris}:: ${ctx.pzkHtml(premio)}.` })
     },

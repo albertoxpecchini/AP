@@ -6,7 +6,7 @@
    barra di stato a cristalli liquidi, piastrelle come adesivi col bordo nero, pannelli di plastica scura coi fosfori verdi,
    tasti di gomma gialli. Le variabili (--led, --ambra…) e la tipografia vengono dalla classe .chat sullo schermo. */
 
-.tel{--w:min(96vw,1240px,calc(90dvh*1341/774));position:fixed;inset:0;margin:auto;width:var(--w);height:calc(var(--w)*774/1341);max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#e9efe6;
+.tel{--w:min(120vw,1550px,calc(112.5dvh*1341/774));position:fixed;inset:auto;left:calc(50% - var(--w)/2);top:calc(50% - var(--w)*774/2682);margin:0;width:var(--w);height:calc(var(--w)*774/1341);max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#e9efe6;
   font-family:"Fake Receipt",ui-monospace,monospace;--mono:"Fake Receipt",ui-monospace,monospace;--fa:"Fake Receipt",ui-monospace,monospace;--marker:"Fake Receipt",ui-monospace,monospace} /* un carattere solo, sempre (Alberto, 23.10) */
 .tel::backdrop{background:radial-gradient(70% 60% at 50% 45%,rgba(70,255,125,.08),transparent 70%),rgba(10,9,8,.68);backdrop-filter:blur(3px);transition:opacity .5s}
 .tel[open]{animation:t-apre .4s cubic-bezier(.2,1.1,.3,1)}
@@ -93,9 +93,10 @@
 .tel.carica .t-cavo-scatola{opacity:1}
 .tel.pieno .t-cavo-scatola{display:none} /* sul cellulare a tutto schermo il cercapersone non c'è */
 
-/* la home: a sinistra l'ora e i widget, a destra le app */
+/* la home: a sinistra l'ora e i widget, a destra le app. Comincia sotto la barra di stato, come le app: la barra è quasi
+   trasparente, e se la home ci scorresse sotto l'ora e le icone si vedrebbero passare attraverso */
 .t-vista{position:absolute;inset:0;overflow:hidden;background:#07100a}
-.t-home{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1.05fr;gap:14px;padding:36px 16px 12px;overflow:hidden auto;scrollbar-width:none;
+.t-home{position:absolute;inset:26px 0 0;display:grid;grid-template-columns:1fr 1.05fr;gap:14px;padding:10px 16px 12px;overflow:hidden auto;overscroll-behavior:none;scrollbar-width:none;
   background:linear-gradient(180deg,rgba(6,12,8,.72),rgba(6,12,8,.9)),radial-gradient(90% 60% at 80% 100%,rgba(70,255,125,.22),transparent 70%),url(/art/muro.webp) center/cover}
 .t-home::-webkit-scrollbar{display:none}
 .t-home[hidden]{display:none}
@@ -222,13 +223,13 @@
 .t-bianco{position:absolute;inset:0;z-index:60;background:#f2fff4;opacity:0;pointer-events:none}
 
 /* sul cellulare: lo schermo prende tutta la finestra, i tasti diventano una barra in basso */
-.tel.pieno{width:100vw;height:100dvh}
+.tel.pieno{left:0;top:0;width:100vw;height:100dvh}
 .tel.pieno .t-cornice,.tel.pieno .t-led,.tel.pieno .t-tasto{display:none}
 .tel.pieno .t-schermo{inset:0;width:100%;height:100%;border-radius:0}
 .tel.pieno .t-palco{width:100%;height:100%;transform:none}
 .tel.pieno .t-stato{height:calc(26px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
 .tel.pieno .t-app{padding-top:calc(26px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
-.tel.pieno .t-home{padding-top:calc(36px + env(safe-area-inset-top,0px));padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+.tel.pieno .t-home{top:calc(26px + env(safe-area-inset-top,0px));padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
 .tel.pieno .t-toast{top:calc(30px + env(safe-area-inset-top,0px))}
 .tel.pieno .t-nav{position:absolute;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(2,1fr);height:calc(48px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);border-top:2px solid #000;background:#151816}
 .tel.pieno .t-nav{gap:8px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
@@ -490,6 +491,7 @@
 /* le risposte: quattro righe uguali che si dividono l'altezza della foto (194 − 3 × 6 di spazio = 44 l'una: due righe di
    testo da 14 px ci stanno, e la risposta più lunga, 43 caratteri × 0,676 em di Fake Receipt = 407 px, va su due righe) */
 .t-qz-risp{grid-area:risp;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(4,minmax(min-content,1fr));gap:6px}
+.t-qz-risp.vf{grid-template-rows:repeat(2,minmax(min-content,1fr))}
 .t-qz-risp button{display:flex;align-items:center;gap:9px;min-width:0;padding:3px 10px;border:2px solid #000;border-radius:8px;background:#1d2534;color:#fff;font:400 14px/1.15 var(--mono);text-align:left;cursor:pointer;box-shadow:0 3px 0 #000;transition:background .15s}
 .t-qz-risp button span{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:4px;background:rgba(255,255,255,.12);font:400 13px/1 var(--fa)}
 @media (hover:hover){.t-qz-risp button:not(:disabled):hover{background:#283550}}
@@ -946,3 +948,310 @@
 @container palco (min-aspect-ratio: 3/2){
   .t-mn-post{grid-template-columns:auto minmax(0,1fr);align-items:start} /* minmax(0,…): i numeri non allargano la griglia oltre lo schermo */
 }
+
+/* ── il profilo (26.10, app/profilo.js): il cartellino col colore scelto (--pf) e la cornice, poi i numeri ── */
+.t-gi-tab.due{grid-template-columns:repeat(2,minmax(0,1fr))}
+.t-pf .meno{color:var(--rosso)}.t-pf .piu{color:var(--led)}
+.t-pf-card{--pf:#46ff7d;position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;margin:6px 0 14px;padding:14px;border:2px solid #000;border-radius:8px;background:linear-gradient(135deg,color-mix(in srgb,var(--pf) 24%,#141915),#141915 65%);box-shadow:0 3px 0 #000}
+.t-pf-av{position:relative;display:grid;place-items:center;width:96px;height:96px;border:3px solid var(--pf);border-radius:50%;background:color-mix(in srgb,var(--pf) 22%,#0c0f0d)}
+.t-pf-av-img{width:78px;height:78px;object-fit:contain}
+.t-pf-av b{position:absolute;right:-6px;bottom:-4px;min-width:30px;height:28px;padding:0 6px;border:2px solid #000;border-radius:14px;background:var(--pf);color:#111;font:400 16px/24px var(--fa);text-align:center}
+.t-pf-chi h3{margin:0 0 2px;font:400 28px/1 var(--fa);color:#fff;overflow-wrap:anywhere}
+.t-pf-chi small{display:block;font:400 11px/1.3 var(--mono);color:#9fb29a}
+.t-pf-chi em{display:inline-block;margin:5px 0 1px;padding:2px 7px;border-radius:4px;background:var(--pf);color:#111;font:400 11px/1.3 var(--mono);font-style:normal;text-transform:uppercase;letter-spacing:.06em}
+.t-pf-chi q{display:block;margin:5px 0 2px;color:var(--pf);font:400 14px/1.3 var(--mono);overflow-wrap:anywhere}
+.t-pf-chi .t-xp i{background:var(--pf);box-shadow:0 0 6px var(--pf)}
+/* le cornici: il nastro adesivo agli angoli, l'oro, il neon del colore, i pixel */
+.t-pf-card.cor-nastro::before,.t-pf-card.cor-nastro::after{content:"";position:absolute;top:-9px;width:58px;height:18px;background:rgba(236,226,190,.78);box-shadow:0 1px 2px rgba(0,0,0,.4);pointer-events:none}
+.t-pf-card.cor-nastro::before{left:-14px;rotate:-32deg}.t-pf-card.cor-nastro::after{right:-14px;rotate:30deg}
+.t-pf-card.cor-oro{border:3px solid #e3b341;box-shadow:0 0 0 2px #000,0 0 16px rgba(227,179,65,.45)}
+.t-pf-card.cor-neon{border-color:var(--pf);box-shadow:0 0 12px var(--pf),inset 0 0 12px color-mix(in srgb,var(--pf) 35%,transparent)}
+.t-pf-card.cor-pixel{border:4px solid var(--pf);border-radius:0;clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px))}
+.t-pf-card.cor-pixel .t-pf-av{border-radius:0}
+.t-pf-sez{margin:0 0 14px}
+.t-pf-sez h4{display:flex;align-items:center;gap:6px;margin:0 0 7px;font:400 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#cfdccb}
+.t-pf-sez h4 .emo{width:20px;height:20px;margin:0}
+.t-pf-sez h4 span{margin-left:auto;font-size:11px;letter-spacing:0;text-transform:none;color:#9fb29a}
+.t-pf-dati{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.t-pf-dati div{padding:8px 4px;border:2px solid #000;border-radius:6px;background:#141915;text-align:center}
+.t-pf-dati b{display:block;font:400 17px/1.15 var(--mono);color:#fff;overflow-wrap:anywhere}
+.t-pf-dati b .emo{width:18px;height:18px;margin:0 2px 0 0}
+.t-pf-dati small{font:400 9.5px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:#9fb29a}
+.t-pf-tab{overflow-x:auto;border:2px solid #000;border-radius:6px;background:#141915}
+.t-pf-tab table{width:100%;border-collapse:collapse;font:400 12.5px/1.2 var(--mono);color:#e9efe6}
+.t-pf-tab th,.t-pf-tab td{padding:6px 7px;white-space:nowrap;text-align:right}
+.t-pf-tab thead th{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#9fb29a;border-bottom:1px solid rgba(255,255,255,.08)}
+.t-pf-tab tbody th{display:flex;align-items:center;gap:6px;text-align:left;font-weight:400;color:#fff}
+.t-pf-tab tbody th .emo{width:20px;height:20px;margin:0}
+.t-pf-tab tr.mai{opacity:.4}
+.t-pf-pos{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.t-pf-pos li{display:grid;grid-template-columns:40px 22px 1fr auto;align-items:center;gap:6px;padding:6px 8px;border:2px solid #000;border-radius:6px;background:#141915;font:400 12.5px/1.2 var(--mono)}
+.t-pf-pos b{font:400 18px/1 var(--fa);color:#ffd400}.t-pf-pos .emo{width:20px;height:20px;margin:0}.t-pf-pos i{font-style:normal}
+.t-pf-avs{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:6px}
+.t-pf-avs button{position:relative;aspect-ratio:1;padding:5px;border:2px solid #000;border-radius:8px;background:#141915;cursor:pointer}
+.t-pf-avs button .emo{width:100%;height:100%;object-fit:contain;margin:0}
+.t-pf-avs button.on{border-color:#ffd400;background:#2a2f1a;box-shadow:0 0 10px rgba(255,212,0,.4)}
+.t-pf-avs button.chiuso>.emo{filter:grayscale(1) brightness(.35)}
+.t-pf-avs button i{position:absolute;right:3px;bottom:3px;width:18px;height:18px}.t-pf-avs button i .emo{width:18px;height:18px}
+.t-pf-col{display:flex;flex-wrap:wrap;gap:9px}
+.t-pf-col button{width:34px;height:34px;border:3px solid #000;border-radius:50%;background:var(--c);cursor:pointer}
+.t-pf-col button.on{box-shadow:0 0 0 3px #fff,0 0 12px var(--c)}
+.t-pf-motto{display:flex;gap:6px}
+.t-pf-motto input{flex:1;min-width:0;padding:7px 9px;border:2px solid #000;border-radius:5px;background:#0c0f0d;color:#fff;font:400 14px/1.2 var(--mono)}
+.t-pf-motto input:focus{outline:2px solid #ffd400;outline-offset:1px}
+.t-pf-nota{margin:6px 0;font:400 12px/1.35 var(--mono);color:#9fb29a}
+.t-gi-eroe[style]{background:linear-gradient(135deg,color-mix(in srgb,var(--pf) 22%,#141915),#141915 60%)}
+.t-gi-mot{display:block;margin:2px 0;color:var(--pf,#cfdccb);font:400 13px/1.3 var(--mono)}
+/* le facce in vendita (26.10): la riga colorata della rarità sotto ogni faccia, il prezzo su quelle non tue, la vetrina */
+.t-pf-avs button{box-shadow:inset 0 -4px 0 var(--ra,transparent)}
+.t-pf-avs button.prezzo>.emo{filter:grayscale(.5) brightness(.6)}
+.t-pf-avs button.vedi{border-color:var(--ra);background:#1d2420}
+.t-pf-avs button em{position:absolute;left:2px;right:2px;bottom:5px;padding:1px 0;border-radius:3px;background:rgba(0,0,0,.75);color:#ffd400;font:400 10px/1.2 var(--mono);font-style:normal;text-align:center}
+.t-pf-vetrina{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:12px;margin:0 0 10px;padding:10px 12px;border:2px solid var(--ra);border-radius:8px;background:linear-gradient(135deg,color-mix(in srgb,var(--ra) 18%,#141915),#141915 70%)}
+.t-pf-vetrina>.emo{width:64px;height:64px;object-fit:contain;margin:0}
+.t-pf-vetrina b{display:block;font:400 20px/1.1 var(--fa);color:#fff;text-transform:capitalize}
+.t-pf-vetrina small{color:var(--ra);font:400 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.t-pf-vetrina p{margin:4px 0 0;font:400 12px/1.3 var(--mono);color:#cfdccb}
+.t-pf-vetrina .c-b:disabled{opacity:.5;cursor:not-allowed}
+.t-pf-leg{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 0;font:400 10.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:#9fb29a}
+.t-pf-leg span::before{content:"";display:inline-block;width:10px;height:4px;margin-right:5px;vertical-align:middle;background:var(--ra)}
+
+/* ── le conversioni (26.10, app/conversioni.js) ── */
+.t-cv-in{width:100%;margin:2px 0 8px;padding:9px 12px;border:2px solid #000;border-radius:6px;background:#0c0f0d;color:#fff;font:400 26px/1.1 var(--mono);letter-spacing:.04em}
+.t-cv-in:focus{outline:2px solid #ffd400;outline-offset:1px}
+.t-cv-scelte{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:8px;font:400 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#9fb29a}
+.t-cv-scelte .t-za-filtri{margin:0;padding:0}
+.t-cv-ris{display:grid;gap:5px;margin-top:4px}
+.t-cv-r{display:grid;grid-template-columns:44px 1fr 22px;align-items:center;gap:10px;width:100%;padding:8px 10px;border:2px solid #000;border-radius:6px;background:#141915;color:#e9efe6;text-align:left;cursor:pointer}
+.t-cv-r small{font:400 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#9fb29a}
+.t-cv-r b{font:400 19px/1.25 var(--mono);color:#fff;overflow-wrap:anywhere}
+.t-cv-r .emo{width:20px;height:20px;margin:0;opacity:0;transition:opacity .15s}
+@media (hover:hover){.t-cv-r:hover .emo{opacity:.8}}
+.t-cv-r.da{border-color:#4f7f49}
+.t-cv-r.c2{background:#18161f}.t-cv-r.c2 small{color:#b47cff}
+.t-cv-err{margin:4px 0;color:var(--rosso);font:400 13px/1.3 var(--mono)}
+.t-cv-nota{margin:4px 0;color:#9fb29a;font:400 12.5px/1.35 var(--mono)}.t-cv-nota b{color:#fff}
+.t-cv-passi p{margin:10px 0 6px;font:400 13px/1.4 var(--mono);color:#cfdccb}
+.t-cv-passi .t-cv-fine{font-size:15px}.t-cv-fine b{color:var(--led)}
+.t-cv-tab{border-collapse:collapse;font:400 13px/1.2 var(--mono);color:#e9efe6}
+.t-cv-tab th{padding:4px 12px 4px 0;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#9fb29a;text-align:left}
+.t-cv-tab td{padding:3px 14px 3px 0;border-top:1px solid rgba(255,255,255,.06)}
+.t-cv-tab td:last-child{color:#ffd400}
+
+/* ── la calcolatrice (26.10, app/calcolatrice.js) ── */
+.t-ca-modi{margin-bottom:8px}
+.t-ca-schermo{display:grid;gap:4px;padding:10px 12px;border:2px solid #000;border-radius:8px;background:#a9bc96;box-shadow:inset 0 0 12px rgba(0,0,0,.35)}
+.t-ca-expr{width:100%;padding:0;border:0;background:none;color:#1c2616;font:400 22px/1.2 var(--mono)}
+.t-ca-expr:focus{outline:none}.t-ca-expr::placeholder{color:rgba(28,38,22,.45)}
+.t-ca-ris{justify-self:end;font:400 30px/1.1 var(--mono);color:#0d140a;overflow-wrap:anywhere;text-align:right}
+.t-ca-ris.vuoto{font-size:15px;color:rgba(28,38,22,.6)}.t-ca-ris.err{font-size:14px;color:#8a1c12}
+.t-ca-tasti{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:10px}
+.t-ca-tasti button{height:38px;border:2px solid #000;border-radius:7px;background:#2b2e29;color:#e9efe6;font:400 15px/1 var(--mono);cursor:pointer;box-shadow:0 3px 0 #000}
+.t-ca-tasti button.n{background:#d9d6c8;color:#111}
+.t-ca-tasti button.rosso{background:#a50d25}
+.t-ca-tasti button.uguale{grid-column:span 2;background:#3d824f;font-size:20px}
+.t-ca-tasti button:active{translate:0 2px;box-shadow:0 1px 0 #000}
+.t-ca-storia{display:grid;gap:4px}
+.t-ca-storia button{display:flex;justify-content:space-between;gap:12px;padding:6px 10px;border:2px solid #000;border-radius:6px;background:#141915;color:#cfdccb;font:400 13px/1.2 var(--mono);cursor:pointer;text-align:left}
+.t-ca-storia b{color:var(--led);white-space:nowrap}
+.t-ca-tri{display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:center}
+.t-ca-tri svg{width:100%;height:auto}
+.t-ca-dati{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 10px}
+.t-ca-campo{display:grid;gap:3px;font:400 10.5px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:#9fb29a}
+.t-ca-campo input,.t-ca-gauss{width:100%;padding:7px 9px;border:2px solid #000;border-radius:5px;background:#0c0f0d;color:#fff;font:400 16px/1.2 var(--mono);text-transform:none;letter-spacing:0}
+.t-ca-campo input:focus,.t-ca-gauss:focus{outline:2px solid #ffd400;outline-offset:1px}
+.t-ca-gauss{resize:vertical;min-height:90px}
+.t-ca-azioni{margin:8px 0}
+.t-ca-out{margin-top:8px}
+.t-ca-griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:5px}
+.t-ca-r{display:grid;gap:3px;padding:7px 10px;border:2px solid #000;border-radius:6px;background:#141915}
+.t-ca-r span{font:400 10.5px/1.25 var(--mono);color:#9fb29a}
+.t-ca-r b{font:400 17px/1.2 var(--mono);color:#fff}.t-ca-r b small{font-size:12px;color:#9fb29a}
+.t-ca-passi{margin:10px 0 0;padding-left:20px;font:400 12.5px/1.45 var(--mono);color:#cfdccb}
+.t-ca-passi li{margin-bottom:3px}.t-ca-passi small{color:#9fb29a}
+@media (max-width:700px){.t-ca-tri{grid-template-columns:1fr}.t-ca-tri svg{max-width:220px;justify-self:center}}
+.t-ca-campo i{font-style:normal;text-transform:none;color:#ffd400} /* α β γ: in maiuscolo sembrerebbero A B Γ */
+.t-ca-calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;align-items:start}
+.t-ca-calc .t-ca-tasti{margin-top:0}
+.t-ca-calc .t-ca-tasti button{height:34px}
+.tel .t-ca-expr{color:#1c2616;-webkit-text-fill-color:#1c2616;text-transform:none} /* .chat input lo sbiadiva */
+@media (max-width:700px){.t-ca-calc{grid-template-columns:1fr}}
+
+/* ── la cucina (26.10, app/cucina.js): la nonna, le ricette, i minigiochi ── */
+.t-cu-nonna{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:12px;margin:2px 0 12px}
+.t-cu-nonna .emo{width:64px;height:64px;margin:0;object-fit:contain}
+.t-cu-nonna p{position:relative;margin:0;padding:9px 12px;border:2px solid #000;border-radius:10px;background:#f4efe2;color:#1c1a14;font:400 14px/1.35 var(--mono)}
+.t-cu-nonna p::before{content:"";position:absolute;left:-9px;top:50%;width:12px;height:12px;background:#f4efe2;border-left:2px solid #000;border-bottom:2px solid #000;transform:translateY(-50%) rotate(45deg)}
+.t-cu-ricette{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.t-cu-r{position:relative;display:grid;grid-template-columns:60px 1fr;align-items:center;gap:12px;padding:10px 12px;border:2px solid #000;border-radius:8px;background:#141915;color:#e9efe6;text-align:left;cursor:pointer;box-shadow:0 3px 0 #000}
+.t-cu-r>.emo{width:60px;height:60px;margin:0;object-fit:contain}
+.t-cu-r b{display:block;font:400 19px/1.1 var(--fa);color:#fff}
+.t-cu-r small{display:block;margin:2px 0;font:400 11.5px/1.3 var(--mono);color:#9fb29a}
+.t-cu-r span{font:400 10.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:#cfdccb}
+.t-cu-r i{position:absolute;right:8px;top:8px;padding:2px 7px;border-radius:4px;background:var(--m);color:#111;font:400 10px/1.3 var(--mono);font-style:normal;text-transform:uppercase}
+@media (hover:hover){.t-cu-r:hover{border-color:#ffd400}}
+.t-cu-gioco{display:flex;flex-direction:column;align-items:stretch}
+.t-cu-titolo{display:grid;gap:2px;margin-bottom:8px;text-align:center}
+.t-cu-titolo b{font:400 22px/1.1 var(--fa);color:#fff}
+.t-cu-titolo small{font:400 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#ffd400}
+.t-cu-via{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.t-cu-via .c-b{font-size:18px;padding:9px 22px 10px}
+.t-cu-tempo{height:6px;margin-bottom:10px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.t-cu-tempo i{display:block;height:100%;background:#ffd400;animation:t-cu-tempo linear forwards;transform-origin:left}
+@keyframes t-cu-tempo{to{transform:scaleX(0)}}
+.tel .t-cu-cibo{width:150px;height:150px;margin:0;object-fit:contain} /* .chat .emo le farebbe alte una riga */
+.t-cu-tavolo{position:relative;align-self:center;display:grid;place-items:center;width:min(100%,420px);height:180px;border:2px solid #000;border-radius:10px;background:#8a5a32 repeating-linear-gradient(90deg,transparent 0 38px,rgba(0,0,0,.08) 38px 40px);cursor:pointer;touch-action:manipulation}
+.t-cu-riga{position:absolute;top:10%;bottom:10%;width:0;border-left:3px dashed #fff;opacity:.85;translate:-1px 0}
+.t-cu-riga.fatto{border-left:3px solid #111;opacity:1}
+.t-cu-coltello{position:absolute;top:-6px;translate:-50% 0;pointer-events:none}
+.t-cu-coltello .emo{width:56px;height:56px;margin:0;rotate:135deg} /* la lama in giù */
+.t-cu-seq{margin:0 0 10px;text-align:center;font:400 14px/1.6 var(--mono);color:#9fb29a}
+.t-cu-seq span.fatto{color:var(--led);text-decoration:line-through}
+.t-cu-carte{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.t-cu-carte button{width:86px;height:86px;padding:8px;border:2px solid #000;border-radius:10px;background:#f4efe2;cursor:pointer;box-shadow:0 3px 0 #000}
+.t-cu-carte button .emo{width:100%;height:100%;margin:0;object-fit:contain}
+.t-cu-carte button.giusto{opacity:.25;translate:0 6px;box-shadow:none}
+.t-cu-ciotola{display:grid;place-items:center;margin-top:8px}.t-cu-ciotola .emo{width:80px;height:80px;margin:0}
+.t-cu-pentola{position:relative;align-self:center;display:grid;place-items:center;width:230px;height:230px;touch-action:none;cursor:grab}
+.t-cu-pentola svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.t-cu-cucchiaio{position:absolute;pointer-events:none}.t-cu-cucchiaio .emo{width:56px;height:56px;margin:0}
+.t-cu-conta{position:absolute;bottom:-4px;font:400 22px/1 var(--fa);color:#fff;text-shadow:0 2px 0 #000}
+.t-cu-impasto{position:relative;align-self:center;display:grid;place-items:center;width:min(100%,360px);height:200px;border:2px solid #000;border-radius:12px;background:#d9c7a0;cursor:pointer;touch-action:manipulation;user-select:none}
+.t-cu-sfoglia{position:absolute;width:70%;height:55%;border-radius:40%;background:#f3e0a8;box-shadow:inset 0 -6px 0 rgba(0,0,0,.08);transform:scale(.4,1.1);transition:transform .08s}
+.tel .t-cu-impasto .t-cu-cibo{position:relative;width:110px;height:110px}
+.t-cu-versa{display:flex;justify-content:center;align-items:flex-end;gap:28px}
+.t-cu-tieni{display:grid;justify-items:center;gap:4px;padding:12px;border:2px solid #000;border-radius:12px;background:#141915;color:#ffd400;font:400 11px/1 var(--mono);text-transform:uppercase;cursor:pointer;touch-action:none;user-select:none}
+.tel .t-cu-tieni .t-cu-cibo{width:110px;height:110px}
+.t-cu-bicchiere{position:relative;width:70px;height:190px;border:3px solid #e9efe6;border-top:0;border-radius:0 0 12px 12px;overflow:hidden;background:rgba(255,255,255,.04)}
+.t-cu-zona{position:absolute;left:0;right:0;background:rgba(70,255,125,.3);border:2px dashed #46ff7d}
+.t-cu-livello{position:absolute;left:0;right:0;bottom:0;height:0;background:#f3e0a8}
+.t-cu-cuoci{display:grid;justify-items:center;gap:12px;cursor:pointer;touch-action:manipulation;user-select:none}
+.tel .t-cu-cuoci .t-cu-cibo{width:130px;height:130px}
+.t-cu-scala{position:relative;width:min(100%,420px);height:30px;border:2px solid #000;border-radius:15px;background:linear-gradient(90deg,#4aa8ff,#ffd400 55%,#ff5a4a)}
+.t-cu-scala .t-cu-zona{top:0;bottom:0;border-radius:4px}
+.t-cu-lancetta{position:absolute;top:-6px;bottom:-6px;width:5px;translate:-50% 0;background:#fff;border:1px solid #000;border-radius:3px}
+.t-cu-cuoci small{font:400 11px/1 var(--mono);text-transform:uppercase;color:#9fb29a}
+.t-cu-voto{display:grid;justify-items:center;margin:10px 0}
+.t-cu-voto b{font:400 64px/1 var(--fa);color:#ffd400;text-shadow:0 3px 0 #000}
+.t-cu-voto small{font:400 11px/1 var(--mono);text-transform:uppercase;color:#9fb29a}
+.t-cu-fine{display:grid;justify-items:center;gap:6px;text-align:center}
+.t-cu-fine>.emo{width:110px;height:110px;margin:0;object-fit:contain}
+.t-cu-medaglia{padding:4px 14px;border:2px solid #000;border-radius:20px;background:var(--m);color:#111;font:400 16px/1.2 var(--fa);text-transform:uppercase;box-shadow:0 3px 0 #000}
+.t-cu-fine>b{font:400 34px/1 var(--fa);color:#fff}
+.t-cu-fine small{color:var(--led);font:400 12px/1 var(--mono);text-transform:uppercase}
+.t-cu-premi{margin:4px 0;font:400 14px/1.4 var(--mono);color:#cfdccb}.t-cu-premi .emo{height:1.4em;vertical-align:-.35em}
+
+/* più di dodici app (26.10: conversioni, calcolatrice, cucina…): sei per riga, un po' più piccole, così stanno tutte senza scorrere */
+.t-griglia:has(> :nth-child(13)){grid-template-columns:repeat(5,minmax(0,1fr));gap:10px 2px}
+.t-griglia:has(> :nth-child(13)) .t-ico-q{width:56px;height:56px}
+.t-griglia:has(> :nth-child(13)) .t-ico-n{font-size:9.5px;letter-spacing:.03em}
+
+/* ── il compilatore C (26.10, app/compilatore.js): l'editor a sinistra, input e output a destra, come mycompiler. Il codice
+   è in Cascadia Code (fonts/): il carattere del cercapersone ha solo maiuscole e il C le distingue ── */
+.t-cc{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:10px;padding:10px 12px 12px}
+.t-cc-es{height:30px;padding:0 8px;border:2px solid #000;border-radius:6px;background:#1a1f1b;color:#cfdccb;font:400 12px/1 var(--mono);cursor:pointer}
+.t-cc-via{background:#46ff7d;box-shadow:0 3px 0 #1b7a3a,0 4px 5px rgba(0,0,0,.4)}
+.t-cc-ed{display:flex;flex-direction:column;min-height:0;border:2px solid #000;border-radius:8px;background:#0b0e0c;overflow:hidden}
+.t-cc-file{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1px solid rgba(255,255,255,.07);background:#141915}
+.t-cc-file .emo{width:20px;height:20px;margin:0}
+.t-cc-file b{font:400 14px/1 "Cascadia Code",ui-monospace,Consolas,monospace;color:#fff;text-transform:none}
+.t-cc-file small{margin-left:auto;font:400 11px/1 "Cascadia Code",ui-monospace,Consolas,monospace;color:#6b7a6d;text-transform:none}
+.t-cc-corpo{flex:1;min-height:0;display:grid;grid-template-columns:auto minmax(0,1fr);overflow:hidden}
+.t-cc-righe,.tel .t-cc-col,.tel .t-cc-src,.t-cc-out pre,.tel .t-cc-in{font:400 14px/1.5 "Cascadia Code",ui-monospace,Consolas,monospace;letter-spacing:0;text-transform:none;tab-size:4}
+.t-cc-righe{margin:0;padding:10px 8px 10px 10px;min-width:3.4em;text-align:right;color:#4d5a4f;user-select:none;border-right:1px solid rgba(255,255,255,.06);will-change:transform}
+.t-cc-righe .err{color:#fff;background:#a50d25;border-radius:3px;padding:0 3px}
+.t-cc-righe .avv{color:#111;background:#ffb02e;border-radius:3px;padding:0 3px}
+.t-cc-area{position:relative;overflow:hidden}
+.tel .t-cc-col,.tel .t-cc-src{position:absolute;inset:0;margin:0;padding:10px 12px;white-space:pre;overflow-wrap:normal}
+.tel .t-cc-col{color:#d8e2d4;pointer-events:none;will-change:transform}
+.tel .t-cc-src{width:100%;height:100%;border:0;resize:none;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:#ffd400;overflow:auto;outline:none}
+.tel .t-cc-src::selection{background:rgba(255,212,0,.28)}
+.t-cc-col i{font-style:normal}
+.t-cc-col .k{color:#ffd400}.t-cc-col .f{color:#4aa8ff}.t-cc-col .s{color:#46ff7d}.t-cc-col .n{color:#ff9a3c}.t-cc-col .p{color:#b47cff}.t-cc-col .c{color:#6b7a6d;font-style:italic}
+.t-cc-pan{display:flex;flex-direction:column;min-height:0;gap:8px}
+.t-cc-tab{margin:0;padding:0}
+.t-cc-dentro{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px}
+.tel .t-cc-in{flex:1;min-height:100px;padding:10px;border:2px solid #000;border-radius:8px;background:#0b0e0c;color:#fff;resize:none}
+.tel .t-cc-in:focus{outline:2px solid #ffd400;outline-offset:1px}
+.t-cc-out{flex:1;min-height:0;overflow:auto;padding:10px;border:2px solid #000;border-radius:8px;background:#050706}
+.t-cc-out pre{margin:0 0 8px;white-space:pre-wrap;overflow-wrap:anywhere;color:#e9efe6}
+.t-cc-out .t-cc-e{color:#ff6b5a}.t-cc-out .t-cc-w{color:#ffb02e}
+.t-cc-vuoto{color:#6b7a6d}
+.t-cc-stato{margin:0;color:#9fb29a;font:400 13px/1.4 var(--mono)}
+.t-cc-fine{margin:6px 0 0;color:#9fb29a;font:400 12px/1.4 "Cascadia Code",ui-monospace,monospace;text-transform:none}
+.t-cc-nota{margin:2px 0 0;color:#6b7a6d;font:400 10.5px/1.35 var(--mono)}
+@media (max-width:700px),(max-height:520px){.t-cc{grid-template-columns:1fr;grid-template-rows:minmax(220px,1.4fr) minmax(160px,1fr)}}
+
+/* ── l'account (26.10, app/account.js): quello che stava nelle pagine del wallet ── */
+.t-ac .t-za-filtri{margin-bottom:8px}
+.t-ac-nota{margin:6px 0 10px;font:400 12.5px/1.45 var(--mono);color:#9fb29a}.t-ac-nota b{color:#fff}
+.t-ac-form .t-ca-dati{margin-bottom:6px}
+.t-ac-azioni{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.t-ac-azioni .c-b:disabled{opacity:.5;cursor:not-allowed}
+.t-ac-esito{margin:0 0 10px;padding:8px 12px;border:2px solid #000;border-radius:6px;background:#17301c;color:var(--led);font:400 13px/1.35 var(--mono)}
+.t-ac-esito.male{background:#3a1512;color:#ff8a7a}
+.t-ac-chi{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.t-ac-chi .emo{width:52px;height:52px;margin:0}
+.t-ac-chi b{display:block;font:400 26px/1 var(--fa);color:#fff}.t-ac-chi small{font:400 12px/1.3 var(--mono);color:#9fb29a}
+.t-ac-mosse{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.t-ac-mosse li{display:flex;justify-content:space-between;gap:12px;padding:6px 10px;border:2px solid #000;border-radius:6px;background:#141915;font:400 12px/1.3 var(--mono);color:#cfdccb}
+.t-ac-mosse b{white-space:nowrap}.t-ac-mosse b.piu{color:var(--led)}.t-ac-mosse b.meno{color:var(--rosso)}
+.t-ac-fader{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;margin:8px 0}
+.t-ac-fader input{width:100%;accent-color:#ffd400}
+.t-ac-pct{font:400 18px/1 var(--mono);color:#ffd400;min-width:4ch;text-align:right}
+.t-ac-conv{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.t-ac-fuori{display:grid;justify-items:center;gap:10px;padding:18px;text-align:center;color:#9fb29a;font:400 13px/1.4 var(--mono)}
+.t-ac-fuori .emo{width:56px;height:56px;margin:0}
+.t-ac-ig{margin:6px 0;font:400 13px/1.4 var(--mono)}
+.t-ac-ig .pzk-ig{color:#ffb02e;text-decoration:underline;cursor:pointer}.t-ac-ig .pzk-ig[hidden]{display:none}.t-ac-ig .pzk-ig b{color:#fff}
+
+/* ── l'economia (26.10): la rapina, la lavatrice, il decifratore ── */
+.t-ra-cassa{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:12px;border:2px solid #000;border-radius:8px;background:linear-gradient(135deg,#2a2412,#141915 70%)}
+.t-ra-cassa .emo{width:64px;height:64px;margin:0}.t-ra-cassa b{display:block;font:400 20px/1 var(--fa);color:#fff}.t-ra-cassa span{display:block;margin:4px 0;font:400 22px/1 var(--mono)}.t-ra-cassa small{font:400 11px/1.3 var(--mono);color:#9fb29a}
+.t-ra-scelta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.t-ra-entra{display:flex;gap:6px}
+.t-ra-entra input{width:110px;padding:7px 10px;border:2px solid #000;border-radius:5px;background:#0c0f0d;color:#ffd400;font:400 22px/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;text-align:center}
+.t-ra-regole{width:100%;border-collapse:collapse;font:400 13px/1.3 var(--mono);color:#e9efe6}.t-ra-regole th{font-size:10px;color:#9fb29a;text-align:left;text-transform:uppercase;padding:4px 6px}.t-ra-regole td{padding:5px 6px;border-top:1px solid rgba(255,255,255,.07)}
+.t-ra-codice{display:grid;justify-items:center;gap:4px;padding:14px;border:2px dashed #ffd400;border-radius:10px;background:#141915}
+.t-ra-codice small,.t-ra-codice span{font:400 11px/1 var(--mono);color:#9fb29a;text-transform:uppercase;letter-spacing:.08em}
+.t-ra-codice b{font:400 56px/1 var(--mono);letter-spacing:.25em;color:#ffd400;text-shadow:0 0 14px rgba(255,212,0,.5)}
+.t-ra-banda{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.t-ra-banda li{display:grid;grid-template-columns:34px 1fr;column-gap:10px;align-items:center;padding:6px 10px;border:2px solid #000;border-radius:6px;background:#141915}
+.t-ra-banda li .emo{grid-row:span 2;width:34px;height:34px;margin:0}.t-ra-banda b{font:400 16px/1 var(--fa);color:#fff}.t-ra-banda small{font:400 11px/1 var(--mono);color:#9fb29a}
+.t-ra-banda li.manca{display:block;color:#9fb29a;font:400 12px/1.4 var(--mono);border-style:dashed}
+.t-ra-esito{display:grid;justify-items:center;gap:6px;padding:18px;border:2px solid #000;border-radius:10px;text-align:center}
+.t-ra-esito.ok{background:linear-gradient(#1d3a20,#141915)}.t-ra-esito.no{background:linear-gradient(#3a1512,#141915)}
+.t-ra-esito .emo{width:80px;height:80px;margin:0}.t-ra-esito b{font:400 30px/1 var(--fa);color:#fff;text-transform:uppercase}.t-ra-esito span{font:400 15px/1.3 var(--mono);color:#e9efe6}
+.t-ra-cella{position:relative;display:grid;justify-items:center;gap:6px;padding:22px;border:2px solid #000;border-radius:10px;background:#20231f;overflow:hidden}
+.t-ra-sbarre{position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(90deg,transparent 0 26px,#5d6670 26px 33px,#2c3036 33px 36px);pointer-events:none}
+.tel .t-ra-cella .t-ra-dentro{width:90px;height:90px;margin:0}
+.t-ra-cella b{position:relative;z-index:2;font:400 28px/1 var(--fa);color:#fff;text-transform:uppercase;background:#a50d25;padding:4px 10px;transform:rotate(-2deg)}
+.t-ra-cella span{position:relative;z-index:2;font:400 14px/1 var(--mono);color:#ffd400;background:#000;padding:4px 8px}
+.t-la-conti{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.t-ca-r.sporchi b{color:#c79b4a}.t-ca-r.sporchi small{font:400 10.5px/1.2 var(--mono);color:#9fb29a}
+.t-la-macchina{width:230px;margin:6px auto 14px;padding:10px 12px 18px;border:3px solid #000;border-radius:16px;background:linear-gradient(#e9e6dc,#c9c5b8);box-shadow:0 4px 0 #000}
+.t-la-pannello{display:flex;align-items:center;gap:8px;height:30px;margin-bottom:10px;padding:0 8px;border-radius:6px;background:#3a3d40}
+.t-la-pannello i{width:12px;height:12px;border-radius:50%;background:#7a7f86;border:2px solid #222}
+.t-la-pannello b{margin-left:auto;padding:2px 6px;border-radius:3px;background:#0b1a0e;color:#46ff7d;font:400 15px/1 var(--mono)}
+.t-la-oblo{position:relative;width:170px;height:170px;margin:0 auto;border:12px solid #8d939b;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),rgba(120,170,210,.35) 40%,rgba(40,60,80,.75));box-shadow:inset 0 0 0 4px #000,0 0 0 3px #000;overflow:hidden}
+.t-la-cestello{position:absolute;inset:0}
+.t-la-cestello img{position:absolute;left:50%;top:50%;width:50px;margin:-15px 0 0 -25px;transform:rotate(var(--a)) translateY(-44px) rotate(calc(var(--a) * -1.5))}
+.t-la-macchina.gira .t-la-cestello{animation:t-la-gira .9s linear infinite}
+@keyframes t-la-gira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.t-la-macchina.gira .t-la-cestello{animation-duration:6s}}
+.t-de-pezzi{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.t-de-pezzo{display:grid;grid-template-columns:56px 1fr;grid-template-rows:auto auto auto;column-gap:10px;align-items:center;padding:10px;border:2px solid #000;border-radius:8px;background:#141915;color:#e9efe6;text-align:left;cursor:pointer}
+.tel .t-de-pezzo .emo{grid-row:span 3;width:56px;height:56px;margin:0}.t-de-pezzo b{font:400 17px/1 var(--fa);color:#fff}.t-de-pezzo small{font:400 11px/1 var(--mono);color:#9fb29a}.t-de-pezzo .c-b{justify-self:start;margin-top:4px}
+.t-de-schermo{padding:14px;border:2px solid #000;border-radius:8px;background:#050806;color:#46ff7d;font:400 15px/1.5 var(--mono)}
+.t-de-schermo small{color:#2f9a55;text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+.t-de-schermo code{display:block;margin:10px 0 4px;font:400 30px/1.1 var(--mono);letter-spacing:.12em;color:#b6ffcb;text-shadow:0 0 10px rgba(70,255,125,.6);overflow-wrap:anywhere}
+.t-de-scelte{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.t-de-scelte .c-b{font-size:16px;padding:10px}
+.t-de-scelte .c-b.giusta{background:#3d824f;color:#fff}.t-de-scelte .c-b.sbagliata{background:#a50d25;color:#fff;animation:t-de-no .3s}
+@keyframes t-de-no{25%{translate:-5px 0}75%{translate:5px 0}}
+.tel .t-ra-esito .emo,.tel .t-ra-cassa .emo{object-fit:contain}
+
+/* i soldi sporchi e la galera nella bio (26.10) */
+.tel .sporco{color:#c79b4a}
+.t-pf-chi em.galera,.t-pf-chi em.sporco{margin-left:4px;background:#a50d25;color:#fff}.t-pf-chi em.sporco{background:#6b5121;color:#fff}
+.t-gi-galera{margin:2px 0;color:#ff6b5a;font:400 12px/1.3 var(--mono)}

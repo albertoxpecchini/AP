@@ -1,7 +1,7 @@
 // I minigiochi: quelli del turno di lavoro (comandi/lavoro.js) e quelli che sono comandi (quiz, veloce in comandi/giochi.js).
 // Ognuno: async (ctx) → { ok, nota, tempo? }. Le parole da riscrivere stanno su una tela (canvas), così non si copiano.
-import { PAROLE, FRASI, COLORI, QUIZ } from './testi.js'
-import { FOGLI_CHAT } from './icone.js'
+import { PAROLE, FRASI, COLORI, QUIZ, UFFICIO } from './testi.js'
+import { FOGLI_CHAT, icona } from './icone.js'
 
 export const normalizza = (s) => String(s ?? '').normalize('NFC').toLowerCase().replace(/[’']/g, '\'').replace(/\s+/g, ' ').trim()
 const mescola = (a) => [...a].sort(() => Math.random() - 0.5)
@@ -170,5 +170,62 @@ export const MINIGIOCHI = {
     const r = await ctx.scegli(s, mescola(risp).map((x) => ({ id: x, eti: x, stile: 'nero' })), 12000)
     ferma()
     return { ok: r === giusta, nota: r === giusta ? 'giusto.' : r === null ? `tempo scaduto: era «${giusta}».` : `no: era «${giusta}».`, diff: difficolta }
+  },
+  /** nastro (26.10, lo spazzino di uffici): sul nastro passano 12 cose, una alla volta, un secondo ciascuna. Si tiene
+   *  (→, trascinando a destra o in su, il tasto «tieni») o si butta (←, a sinistra o in giù, «butta»); chi non decide la
+   *  butta. Si tengono al più TRE cose: dopo, le altre si guardano passare, anche se valgono di più. → { ok, nota, tenuti } */
+  async nastro(ctx) {
+    const MAX = 3, N = 12, FINESTRA = 1000
+    const peso = UFFICIO.reduce((a, x) => a + x.peso, 0)
+    const pesca = () => { let k = Math.random() * peso; for (const x of UFFICIO) { k -= x.peso; if (k <= 0) return x } return UFFICIO[0] }
+    const roba = Array.from({ length: N }, pesca)
+    // (qualcosa di buono verso la fine c'è sempre: chi riempie le tasche subito, magari se lo perde)
+    if (!roba.slice(8).some((x) => x.vale >= 45 || x.sospetto)) roba[8 + Math.floor(Math.random() * 4)] = UFFICIO.find((x) => x.id === (Math.random() < 0.5 ? 'cuffie' : 'orologio'))
+    const s = ctx.dì({ colore: 'blu', t: ':sacco: il nastro dei cestini', d: 'tieni o butta, un secondo a pezzo. tre posti in tasca: una volta pieni, il resto lo guardi passare.' })
+    const box = document.createElement('div')
+    box.className = 'c-nastro'
+    box.tabIndex = 0
+    box.innerHTML = `<div class="c-nastro-tasche">${'<i></i>'.repeat(MAX)}</div><div class="c-nastro-nastro"><div class="c-nastro-pezzo"></div><i class="c-nastro-tempo"></i></div>
+      <div class="c-nastro-tasti"><button type="button" class="c-b nero" data-v="butta">← butta</button><span class="c-nastro-conta">0/${N}</span><button type="button" class="c-b" data-v="tieni">tieni →</button></div>`
+    s.appendChild(box)
+    await ctx.inVista(s, 600)
+    const pezzo = box.querySelector('.c-nastro-pezzo'), tempo = box.querySelector('.c-nastro-tempo'), tasche = [...box.querySelectorAll('.c-nastro-tasche i')], conta = box.querySelector('.c-nastro-conta')
+    const tenuti = []
+    let scelta = null, sveglia = null
+    const decidi = (v) => { if (scelta || !sveglia) return; if (v === 'tieni' && tenuti.length >= MAX) return; scelta = v; sveglia() }
+    box.addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (b) decidi(b.dataset.v) })
+    const tasto = (e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); decidi('tieni') } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); decidi('butta') } }
+    document.addEventListener('keydown', tasto)
+    let x0 = null, y0 = null
+    box.addEventListener('pointerdown', (e) => { if (e.target.closest('button')) return; x0 = e.clientX; y0 = e.clientY })
+    box.addEventListener('pointerup', (e) => {
+      if (x0 === null) return
+      const dx = e.clientX - x0, dy = e.clientY - y0
+      x0 = null
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 28) return
+      decidi(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'tieni' : 'butta') : dy < 0 ? 'tieni' : 'butta')
+    })
+    box.focus({ preventScroll: true })
+    const aspetta = (ms) => new Promise((ok) => { const t = setTimeout(ok, ms); sveglia = () => { clearTimeout(t); ok() } })
+    for (const [i, x] of roba.entries()) {
+      const pieno = tenuti.length >= MAX
+      box.classList.toggle('pieno', pieno)
+      conta.textContent = `${i + 1}/${N}`
+      pezzo.className = 'c-nastro-pezzo entra' + (x.sospetto ? ' sospetto' : '')
+      pezzo.innerHTML = `${icona(x.id, 'emo')}<b>${x.nome.replace(/^(un’|un |una |uno |delle |degli |dei )/i, '')}</b>${x.sospetto ? '<small>⚠ roba che scotta</small>' : x.vale ? `<small>vale ${x.vale}</small>` : ''}`
+      tempo.style.animation = 'none'; void tempo.offsetWidth; tempo.style.animation = `c-nastro-tempo ${FINESTRA}ms linear forwards`
+      scelta = null
+      await aspetta(FINESTRA)
+      sveglia = null
+      const v = !pieno && scelta === 'tieni' ? 'tieni' : 'butta'
+      if (v === 'tieni') { tenuti.push(x.id); tasche[tenuti.length - 1].innerHTML = icona(x.id, 'emo'); tasche[tenuti.length - 1].classList.add('piena') }
+      pezzo.className = 'c-nastro-pezzo ' + (v === 'tieni' ? 'preso' : pieno ? 'passa' : 'via')
+      await new Promise((ok) => setTimeout(ok, 260))
+    }
+    document.removeEventListener('keydown', tasto)
+    box.classList.add('finito')
+    pezzo.innerHTML = ''
+    const valore = tenuti.reduce((a, id) => a + (UFFICIO.find((x) => x.id === id)?.vale ?? 0), 0)
+    return { ok: true, tenuti, nota: tenuti.length ? `in tasca: ${tenuti.map((id) => `:${id}:`).join(' ')} (${valore} $pzk di roba${tenuti.some((id) => UFFICIO.find((x) => x.id === id)?.sospetto) ? ', più quella che scotta' : ''}).` : 'tasche vuote: hai buttato tutto.' }
   },
 }

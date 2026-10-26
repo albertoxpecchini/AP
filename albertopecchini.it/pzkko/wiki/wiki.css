@@ -1,0 +1,216 @@
+/* pzkkopedia (26.10, wiki/wiki.js): le proporzioni e la grafica della skin Vector 2022 di Wikipedia in italiano (sfondo grigio
+   chiarissimo, contenuto bianco col bordo sottile #a2a9b1, testo nero, link blu #0645ad e rossi #ba0000 per le voci che non
+   esistono, titoli di sezione col serif, il resto senza grazie), con un TOCCO di pzkko e basta: Anton per il titolo della voce
+   e per il nome in alto, la fascia di ruggine (#665d56) col filo giallo (#ffd400) dietro la barra del sito, la linguetta
+   attiva sottolineata di giallo, la chiocciola per logo. La barra del sito (barra/barra.css) sta sopra la fascia. */
+@font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
+:root{--sfondo:#f8f9fa;--bordo:#a2a9b1;--testo:#202122;--grigio:#54595d;--link:#0645ad;--visitato:#0b0080;--rosso:#ba0000;--rosso-vis:#a55858;--ruggine:#665d56;--giallo:#ffd400;--blu:#36c;
+  --serif:"Linux Libertine","Georgia","Times",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Lato,Helvetica,Arial,sans-serif;--anton:"Anton",Impact,"Arial Narrow",sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--barra,72px) + 8px)}
+body{position:relative;min-height:100vh;margin:0;padding-top:var(--barra,72px);background:var(--sfondo);color:var(--testo);font:14px/1.6 var(--sans)}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+a:visited{color:var(--visitato)}
+a.new,a.new:visited{color:var(--rosso)}
+a.new:visited{color:var(--rosso-vis)}
+:focus-visible{outline:2px solid var(--blu);outline-offset:2px}
+[hidden]{display:none!important}
+.solo-lettori{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* la fascia di ruggine dietro la barra del sito */
+.fascia{position:absolute;left:0;right:0;top:0;height:var(--barra,72px);background:var(--ruggine);border-bottom:3px solid var(--giallo)}
+.salta{position:absolute;left:8px;top:-60px;z-index:90;padding:8px 14px;background:#fff;border:2px solid var(--blu);border-radius:2px;color:var(--link)}
+.salta:focus{top:calc(var(--barra,72px) + 6px)}
+
+/* l'intestazione: menu e logo a sinistra, la ricerca al centro, le utenze a destra */
+.intestazione{position:relative;z-index:40;display:flex;align-items:center;gap:16px;min-height:52px;padding:6px 16px;background:#fff;border-bottom:1px solid var(--bordo)}
+.int-sx{flex:none;display:flex;align-items:center;gap:6px}
+.hamburger,.bt-icona{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:1px solid transparent;border-radius:2px;background:none;color:var(--grigio);cursor:pointer}
+.hamburger:hover,.bt-icona:hover{background:#eaecf0}
+.hamburger[aria-expanded="true"],.bt-icona[aria-expanded="true"]{background:#eaecf0;border-color:var(--bordo)}
+.logo{display:flex;align-items:center;gap:8px;color:var(--testo)}
+.logo:hover{text-decoration:none}
+.logo:visited{color:var(--testo)}
+.logo-svg{flex:none;display:block}
+.marchio{display:flex;flex-direction:column;line-height:1.1}
+.nome{font:400 24px/1 var(--anton);letter-spacing:.02em;color:#000}
+.slogan{margin-top:3px;font-size:11px;color:var(--grigio)}
+.ricerca{flex:1;min-width:0;max-width:720px;margin:0 auto}
+.ricerca-box{position:relative;display:flex;align-items:center;height:34px;border:1px solid var(--bordo);border-radius:2px;background:#eaecf0;color:var(--grigio)}
+.ricerca-box:focus-within{background:#fff;border-color:var(--blu);box-shadow:inset 0 0 0 1px var(--blu)}
+.ricerca-box>svg{position:absolute;left:9px;pointer-events:none}
+.ricerca input{flex:1;min-width:0;height:100%;padding:0 8px 0 36px;border:0;background:none;color:var(--testo);font:14px var(--sans);outline:none}
+.ricerca input::-webkit-search-cancel-button{display:none}
+.bt-cerca{height:100%;padding:0 12px;border:0;border-left:1px solid var(--bordo);border-radius:0 2px 2px 0;background:none;color:var(--testo);font:700 13px var(--sans);cursor:pointer}
+.bt-cerca:hover{background:#f8f9fa}
+#suggerimenti{position:absolute;left:-1px;right:-1px;top:calc(100% + 1px);z-index:70;margin:0;padding:0;list-style:none;background:#fff;border:1px solid var(--bordo);box-shadow:0 2px 3px rgba(0,0,0,.2)}
+#suggerimenti a{display:block;padding:7px 12px;color:var(--testo)}
+#suggerimenti a:hover{text-decoration:none}
+#suggerimenti [aria-selected="true"],#suggerimenti li:hover{background:#eaf3ff}
+#suggerimenti .sg-cerca{border-top:1px solid #eaecf0;color:var(--link)}
+#suggerimenti .sg-cerca a{color:var(--link)}
+.int-dx{flex:none;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.int-dx>a{padding:6px 8px}
+.tendina{position:relative}
+.pannello{position:absolute;top:100%;z-index:60;min-width:200px;margin:2px 0 0;padding:6px 0;list-style:none;background:#fff;border:1px solid var(--bordo);box-shadow:0 2px 6px rgba(0,0,0,.2);text-align:left}
+.pannello-dx{right:0}
+.pannello a{display:block;padding:6px 14px;white-space:nowrap}
+.pannello a:hover{background:#eaf3ff;text-decoration:none}
+.pannello-nota{padding:4px 14px 6px;border-bottom:1px solid #eaecf0;margin-bottom:4px;color:var(--grigio);font-size:12px}
+
+/* la pagina: menu principale e indice a sinistra, il resto a destra */
+.pagina{position:relative;display:grid;grid-template-columns:208px minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:20px;max-width:1264px;margin:0 auto;padding:16px 16px 0}
+.centro{grid-column:2;grid-row:1/span 2;min-width:0}
+.menu-principale{display:none;font-size:13px}
+.menu-fisso .menu-principale{display:block;grid-column:1;grid-row:1}
+.menu-aperto .menu-principale{display:block;position:absolute;z-index:60;left:16px;top:0;width:250px;padding:10px 16px 14px;background:#fff;border:1px solid var(--bordo);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.mp-testa{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.menu-principale h2{margin:0 0 4px;font:700 13px var(--sans);color:var(--testo)}
+.mp-sposta{padding:0;border:0;background:none;color:var(--link);font:12px var(--sans);cursor:pointer}
+.mp-sposta:hover{text-decoration:underline}
+.menu-principale h3{margin:14px 0 4px;padding-bottom:3px;border-bottom:1px solid #c8ccd1;font:700 12px var(--sans);color:var(--grigio);text-transform:none}
+.menu-principale ul{margin:0;padding:0;list-style:none}
+.menu-principale li a{display:block;padding:3px 0}
+.toc-lato{grid-column:1;grid-row:2;align-self:start;position:sticky;top:calc(var(--barra,72px) + 8px);max-height:calc(100vh - var(--barra,72px) - 24px);overflow:auto;margin-top:18px;font-size:13px}
+.toc-titolo{margin:0 0 6px;font:700 13px var(--sans)}
+.toc-lato ul,.toc-box ul{margin:0;padding:0;list-style:none}
+.toc-lato ul ul,.toc-box ul ul{padding-left:14px}
+.toc-riga{display:flex;align-items:flex-start;justify-content:space-between;gap:4px}
+.toc-riga a{flex:1;padding:3px 0 3px 8px;border-left:3px solid transparent;color:var(--link);line-height:1.35}
+.toc-lato a.attiva{border-left-color:var(--giallo);font-weight:700;color:var(--testo)}
+.toc-apri{flex:none;width:22px;height:22px;padding:0;border:0;background:none;color:var(--grigio);cursor:pointer}
+.toc-apri svg{width:12px;height:12px;transition:transform .15s}
+.toc-apri[aria-expanded="false"] svg{transform:rotate(-90deg)}
+.toc-box{display:none;margin:0 0 14px;padding:8px 12px;background:var(--sfondo);border:1px solid var(--bordo)}
+.toc-box summary{font-weight:700;cursor:pointer}
+.toc-box .toc-riga a{border-left:0}
+
+/* le linguette: Voce/Discussione a sinistra, Leggi/Modifica/Cronologia/Strumenti a destra */
+.linguette{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--bordo)}
+.lin{display:flex;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+.lin>li>a,.bt-strumenti{display:flex;align-items:center;gap:4px;margin-bottom:-1px;padding:10px 12px 8px;border:0;border-bottom:3px solid transparent;background:none;color:var(--link);font:13px/1.2 var(--sans);cursor:pointer}
+.lin>li>a:hover,.bt-strumenti:hover{text-decoration:underline}
+.lin a[aria-current]{border-bottom-color:var(--giallo);box-shadow:0 1px 0 var(--ruggine);color:var(--testo);font-weight:700}
+.lin a.new,.lin a.new:visited{color:var(--rosso)}
+.lin a[aria-current].new{color:var(--rosso)}
+.bt-strumenti svg{width:11px;height:11px}
+.lin .pannello{min-width:210px}
+
+/* il contenuto: titolo, sottotitolo, testo */
+.corpo{min-height:420px;padding:18px 28px 36px;background:#fff;border:1px solid var(--bordo);border-top:0;outline:none}
+.titolo{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+h1:focus,h1:focus-visible,.corpo:focus,.corpo:focus-visible{outline:none}
+h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:#000;overflow-wrap:anywhere;outline:none}
+.btn-lingue{flex:none;display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 10px;border:1px solid #c8ccd1;border-radius:2px;color:#72777d;font-size:12px;cursor:default}
+.btn-lingue svg{width:15px;height:15px}
+.sottotitolo{margin:0 0 16px;color:var(--grigio);font-size:12.5px}
+.e-principale .sottotitolo,.e-speciale .sottotitolo{display:none}
+.wikitesto{overflow-wrap:break-word}
+.wikitesto p{margin:.5em 0 .9em}
+.wikitesto h2{margin:1.1em 0 .3em;padding:0;border-bottom:1px solid var(--bordo);font:400 1.55em/1.3 var(--serif);color:#000}
+.wikitesto h3{margin:.9em 0 .1em;font:700 1.2em/1.5 var(--sans);color:#000}
+.wikitesto :is(h4,h5,h6){margin:.8em 0 .1em;font:700 1em/1.6 var(--sans);color:#000}
+.wikitesto :is(h2,h3,h4,h5,h6){scroll-margin-top:calc(var(--barra,72px) + 8px)}
+.wikitesto ul{margin:.3em 0 .5em 1.6em;padding:0;list-style:square}
+.wikitesto ol{margin:.3em 0 .5em 3.2em;padding:0}
+.wikitesto li{margin-bottom:.1em}
+.wikitesto li::marker{color:var(--link)}
+.wikitesto hr{height:1px;margin:.5em 0;border:0;background:var(--bordo)}
+.wikitesto a.esterno::after{content:"";display:inline-block;width:.7em;height:.7em;margin-left:.25em;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 1h5v5M11 1 5 7M9 8v3H1V3h3' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 1h5v5M11 1 5 7M9 8v3H1V3h3' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat}
+.wikitesto mark,.risultati mark{padding:0 1px;background:#fef6e7;color:inherit;box-shadow:0 0 0 1px var(--giallo)}
+.categorie .catlinks{margin-top:26px}
+.catlinks{padding:6px 12px;background:var(--sfondo);border:1px solid var(--bordo)}
+.catlinks ul{display:inline;margin:0;padding:0;list-style:none}
+.catlinks li{display:inline}
+.catlinks li+li::before{content:" | ";color:var(--grigio)}
+
+/* gli avvisi, i bottoni, le tabelle */
+.avviso{margin:0 0 14px;padding:10px 14px;border:1px solid var(--bordo);border-radius:2px;background:var(--sfondo)}
+.avviso p{margin:.3em 0}
+.avviso ul{margin:.3em 0 .3em 1.4em;padding:0}
+.avviso-info{background:#eaf3ff;border-color:var(--blu)}
+.avviso-avvertenza{background:#fef6e7;border-color:#edab00}
+.avviso-errore{background:#fee7e6;border-color:#d33}
+.bottone{display:inline-block;padding:6px 14px;border:1px solid var(--bordo);border-radius:2px;background:var(--sfondo);color:var(--testo);font:700 14px/1.3 var(--sans);cursor:pointer}
+.bottone:hover{background:#fff;text-decoration:none}
+.bottone-blu,.bottone-blu:visited{background:var(--blu);border-color:var(--blu);color:#fff}
+.bottone-blu:hover{background:#447ff5;border-color:#447ff5;color:#fff}
+.wikitable{border-collapse:collapse;border:1px solid var(--bordo);background:var(--sfondo)}
+.wikitable th,.wikitable td{padding:5px 12px;border:1px solid var(--bordo);text-align:left}
+.wikitable th{background:#eaecf0}
+.wikitable caption{padding:4px;font-weight:700;text-align:left}
+.vuoto-lista{margin:14px 0;padding:14px;border:1px dashed var(--bordo);color:var(--grigio);font-style:italic}
+.colonne{columns:14em;margin:.5em 0 1em 1.4em;padding:0}
+.filtri{margin:0 0 12px;padding:6px 12px;background:var(--sfondo);border:1px solid var(--bordo)}
+.filtri input[type=text],.filtri select,.modulo input{padding:4px 6px;border:1px solid var(--bordo);border-radius:2px;background:#fff;font:14px var(--sans)}
+.filtri-v label{margin-right:12px}
+.modulo{max-width:360px}
+.modulo input{width:100%;padding:6px 8px}
+
+/* la ricerca */
+.cerca-grande{display:flex;gap:8px;max-width:640px;margin:0 0 16px}
+.cerca-grande input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--bordo);border-radius:2px;font:16px var(--sans)}
+.risultati{margin:0;padding:0;list-style:none}
+.risultati li{margin-bottom:14px}
+.ris-titolo{font-size:1.15em}
+.ris-testo{color:var(--grigio)}
+.nessun-risultato{padding:10px 14px;border:1px solid var(--bordo);background:var(--sfondo)}
+
+/* l'editor */
+.modifica{margin-top:6px}
+.mod-barra{display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:4px 6px;background:var(--sfondo);border:1px solid var(--bordo);border-bottom:0}
+.mod-tasto{min-width:34px;height:30px;padding:0 9px;border:1px solid transparent;border-radius:2px;background:none;color:var(--testo);font:14px var(--sans);cursor:pointer}
+.mod-tasto:hover{background:#eaecf0;border-color:#c8ccd1}
+.mod-spazio{flex:1}
+.mod-aiuto{padding:0 8px;font-size:13px}
+#testo-mod{display:block;width:100%;min-height:24em;padding:8px 10px;border:1px solid var(--bordo);border-radius:0 0 2px 2px;background:#fff;color:var(--testo);font:14px/1.55 "Cascadia Code",ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+#testo-mod:focus{outline:2px solid var(--blu);outline-offset:-1px}
+.mod-campo{margin:10px 0 0}
+.mod-campo input[type=text]{width:min(100%,520px);padding:5px 8px;border:1px solid var(--bordo);border-radius:2px;font:14px var(--sans)}
+.mod-campo label{margin-right:14px}
+.mod-nota{margin:12px 0;color:var(--grigio);font-size:12.5px}
+.mod-bottoni{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.anteprima{margin-bottom:18px;padding-bottom:6px;border-bottom:1px solid var(--bordo)}
+.anteprima>h2{margin:0 0 8px;font:700 1.3em var(--sans)}
+.ant-corpo{padding:10px 14px;border:1px solid #c8ccd1;background:#fff}
+.segnaposto{margin:0;padding:16px;border:1px dashed #c8ccd1;color:var(--grigio);font-style:italic;text-align:center}
+
+/* la pagina principale */
+.mp-benvenuti,.mp-riquadro{margin:0 0 12px;border:1px solid var(--bordo);background:var(--sfondo)}
+.mp-benvenuti{padding:14px 18px;background:#f2f4f7}
+.mp-benvenuti h2{margin:0;padding:0;border:0;font:400 1.9em/1.2 var(--serif)}
+.mp-nome{font-family:var(--anton);font-size:.95em;letter-spacing:.02em}
+.mp-sotto{margin:2px 0 8px;color:var(--grigio)}
+.mp-porte{margin:10px 0 0;font-size:13px}
+.mp-griglia{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.mp-riquadro h2{margin:0;padding:5px 12px;border-bottom:1px solid var(--bordo);font:700 1.05em var(--sans);color:#000}
+.mp-corpo{padding:10px 12px;background:#fff}
+.mp-corpo p{margin:.3em 0}
+.vetrina h2{background:#eaf3ff}.sapevi h2{background:#dff3ec}.ricorrenze h2{background:#fef6e7}.eventi h2{background:#fee7e6}.lingue h2,.portali h2,.fratelli h2{background:#eaecf0}
+
+/* il piè di pagina */
+.piede-wiki{padding:18px 4px 32px;color:var(--grigio);font-size:12px}
+.piede-wiki p{margin:0 0 8px}
+.piede-wiki ul{display:flex;flex-wrap:wrap;gap:4px 20px;margin:0 0 10px;padding:0;list-style:none}
+.piede-firma{margin-top:12px!important}
+
+/* lo schermo stretto (o «Versione mobile»): niente colonna, il menu principale è il menu del tasto in alto */
+.stretto .pagina{display:block;padding:0}
+.stretto .corpo{padding:14px 16px 28px;border-left:0;border-right:0}
+.stretto .centro{padding:0}
+.stretto .toc-lato{display:none}
+.stretto .toc-box{display:block}
+.stretto .menu-aperto .menu-principale,.menu-aperto .menu-principale{left:8px}
+.stretto .solo-largo{display:none}
+.stretto h1{font-size:30px}
+.stretto .mp-griglia{display:block}
+.stretto .intestazione{flex-wrap:wrap;gap:6px 8px;padding:6px 10px}
+.stretto .ricerca{order:3;flex:1 0 100%;max-width:none}
+.stretto .int-dx{margin-left:auto}
+.stretto .slogan{display:none}
+.stretto .linguette{padding:0 6px}
+.stretto .lin>li>a,.stretto .bt-strumenti{padding:10px 8px 8px}
+.stretto .btn-lingue{display:none}
+.stretto .piede-wiki{padding:18px 16px 32px}
+@media (min-width:1120px){.stretto .slogan{display:block}}

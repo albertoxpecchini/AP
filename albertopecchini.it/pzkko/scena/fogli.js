@@ -56,6 +56,42 @@ const petizione = (t, dati) => {
   return ct
 }
 
+// Il wallet e il cercapersone sul muro (26.10, index.html #wallet-muro e #cercapersone-muro, .vivo): non hanno una foto,
+// sono vivi. La trama è una tela che ricopia il pezzo della pagina dieci volte al secondo: le sue immagini (la foto, le viti,
+// il chiodo), i canvas accesi (i led del saldo, la chiocciolina) e i riquadri colorati (lo schermo lcd, il led rosso), ognuno
+// dove sta dentro il pezzo (gli strati del tubo catodico no). Nella pagina il pezzo resta sopra, trasparente, per i clic
+const viva = (el) => {
+  const base = el.querySelector('img'), W = 768, H = Math.round((W * Number(base.getAttribute('height'))) / Number(base.getAttribute('width')))
+  const tela = document.createElement('canvas')
+  tela.width = W; tela.height = H
+  const ctx = tela.getContext('2d'), ct = new T.CanvasTexture(tela)
+  ct.colorSpace = T.SRGBColorSpace; ct.anisotropy = 8
+  const dove = (e) => { let x = 0, y = 0; for (let n = e; n && n !== el; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop } return [x, y] }
+  const ridisegna = () => {
+    if (!el.offsetWidth) return
+    const kx = W / el.offsetWidth, ky = H / el.offsetHeight
+    ctx.clearRect(0, 0, W, H)
+    for (const e of el.querySelectorAll('*')) {
+      if (/(^|\s)crt-/.test(e.className?.baseVal ?? e.className ?? '') || !e.offsetWidth) continue // (lo schermo, .crt, sì: il suo verde è il fondo)
+      const cs = getComputedStyle(e)
+      if (cs.display === 'none') continue
+      const [x, y] = dove(e), w = e.offsetWidth * kx, h = e.offsetHeight * ky, X = x * kx, Y = y * ky
+      ctx.globalAlpha = Number(cs.opacity) || 0
+      const fondo = cs.backgroundColor
+      if (fondo && fondo !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(fondo)) {
+        ctx.fillStyle = fondo
+        if (cs.borderRadius.startsWith('50%')) { ctx.beginPath(); ctx.ellipse(X + w / 2, Y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2); ctx.fill() } else ctx.fillRect(X, Y, w, h)
+      }
+      if ((e.tagName === 'IMG' && e.complete && e.naturalWidth) || e.tagName === 'CANVAS') try { ctx.drawImage(e, X, Y, w, h) } catch {}
+    }
+    ctx.globalAlpha = 1
+    ct.needsUpdate = true
+  }
+  ridisegna()
+  setInterval(ridisegna, 100)
+  return ct
+}
+
 // (il nome della foto di un volantino: anche prossima.js, per scaricare quelle dell'altra pagina)
 export const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 const DISSOLVENZA = 450 // ms
@@ -231,7 +267,9 @@ export async function fogli(scene, M, renderer) {
     const sostituisci = (vecchia, t) => { if (vecchia && vecchia !== vuota && vecchia !== t) vecchia.dispose() }
     // (la petizione: la foto vera diventa la tela con le firme sopra, e la foto si toglie dalla scheda)
     const firmato = foto && el.id === 'petizione' && dati?.firme
-    quando(src, (t) => { vera = true; const tt = firmato ? petizione(t, dati) : t; sostituisci(mat.map, tt); mat.map = tt; if (tt !== t) t.dispose(); if (!pezzo.arrivo) pezzo.arrivo = performance.now() }, foto ? 'piene' : 'lo')
+    // (i pezzi vivi: la tela che ricopia la pagina, subito; un filo di luce sua, perché i led e lo schermo si vedano anche di sera)
+    if (cl.contains('vivo')) { mat.map = viva(el); mat.emissiveMap = mat.map; mat.emissive = new T.Color(0xffffff); mat.emissiveIntensity = 0.3; pezzo.arrivo = performance.now() }
+    else quando(src, (t) => { vera = true; const tt = firmato ? petizione(t, dati) : t; sostituisci(mat.map, tt); mat.map = tt; if (tt !== t) t.dispose(); if (!pezzo.arrivo) pezzo.arrivo = performance.now() }, foto ? 'piene' : 'lo')
     // mentre il foglio si è avvicinato per firmare (petizione.js) qui non c'è: torna quando torna lui
     if (el.id === 'petizione') document.addEventListener('pzkko-petizione', (ev) => {
       const fase = ev.detail?.fase

@@ -142,6 +142,31 @@ export const MESTIERI = [
   { id: 'influencer', nome: 'influencer', liv: 12, paga: 650, frase: 'fotografi i tortelli invece di mangiarli', gioco: 'anagramma' },
   { id: 'avvocato', nome: 'avvocato', liv: 15, paga: 800, frase: 'difendi una nutria accusata di vandalismo', gioco: 'quiz' },
   { id: 'sindaco', nome: 'sindaco di Mantova', liv: 20, paga: 1000, frase: 'inauguri una rotonda', gioco: 'calcio' },
+  // (26.10) altri mestieri onesti, con paghe come gli altri
+  { id: 'imbianchino', nome: 'imbianchino', liv: 2, paga: 170, frase: 'dai la seconda mano a un portico di via Roma', gioco: 'colori' },
+  { id: 'pizzaiolo', nome: 'pizzaiolo', liv: 3, paga: 210, frase: 'sforni quaranta margherite il sabato sera', gioco: 'ordine' },
+  { id: 'meccanico', nome: 'meccanico', liv: 5, paga: 300, frase: 'rimetti in moto un Ciao del 1979', gioco: 'icona' },
+  { id: 'bagnino', nome: 'bagnino del Mincio', liv: 6, paga: 330, frase: 'fischi a chi fa il bagno con le nutrie', gioco: 'veloce' },
+  // (26.10) e quelli che pagano tanto ma possono finire in galera: rischio = la probabilità a turno, galera = ore, multa =
+  // $pzk puliti alla cassa. Lo spazzino di uffici è un videogioco (il nastro: minigiochi.js) e il suo rischio cresce con la
+  // roba che si porta via (le chiavette e i wallet: +15 % l'una)
+  { id: 'spazzino', nome: 'spazzino di uffici', liv: 2, paga: 260, frase: 'svuoti i cestini di un ufficio di notte: sul nastro passa di tutto', gioco: 'nastro', rischio: 0.04, galera: 2, multa: 500 },
+  { id: 'corriere', nome: 'corriere di notte', liv: 4, paga: 700, frase: 'porti pacchi che è meglio non aprire', gioco: 'strada', rischio: 0.12, galera: 3, multa: 800 },
+  { id: 'biscazziere', nome: 'biscazziere', liv: 8, paga: 1400, frase: 'tieni il banco in una bisca dietro la stazione', gioco: 'conti', rischio: 0.18, galera: 4, multa: 1500 },
+  { id: 'contrabbandiere', nome: 'contrabbandiere di tortelli', liv: 12, paga: 2200, frase: 'porti tortelli di zucca oltre il confine con Cremona', gioco: 'memoria', rischio: 0.22, galera: 6, multa: 2500 },
+]
+// ── la roba degli uffici (26.10): quello che passa sul nastro dello spazzino. peso = quanto spesso passa; la chiavetta e il
+// wallet pzk non si vendono: si decifrano (l'app decifratore, da installare dalla chat) ──
+export const UFFICIO = [
+  { id: 'cartaccia', nome: 'una cartaccia', peso: 30, vale: 1, schifo: true },
+  { id: 'lattina-vuota', nome: 'una lattina vuota', peso: 22, vale: 2, schifo: true },
+  { id: 'graffette', nome: 'una scatola di graffette', peso: 16, vale: 6 },
+  { id: 'tazza', nome: 'una tazza «il capo sono io»', peso: 12, vale: 18 },
+  { id: 'mouse', nome: 'un mouse senza filo', peso: 9, vale: 45 },
+  { id: 'cuffie', nome: 'delle cuffie col microfono', peso: 6, vale: 90 },
+  { id: 'orologio', nome: 'un orologio da polso', peso: 3, vale: 260, raro: true },
+  { id: 'chiavetta', nome: 'una chiavetta usb', peso: 5, vale: 0, sospetto: true, cosa: 'dentro c’è un wallet pzk cifrato: si apre con l’app decifratore (in chat: «installa decifratore»).' },
+  { id: 'wallet-pzk', nome: 'un wallet pzk cifrato', peso: 4, vale: 0, sospetto: true, cosa: 'qualcuno l’ha perso: si apre con l’app decifratore (in chat: «installa decifratore»).' },
 ]
 
 // ── il negozio: prezzo in $pzk, cosa fa ──
@@ -166,7 +191,7 @@ export const NEGOZIO = [
   ...VECCHI.map((x) => ({ ...x, reparto: REPARTO_VECCHI[x.id] ?? 'fortuna', ...(BONUS_VECCHI[x.id] && { bonus: BONUS_VECCHI[x.id] }), ...(x.tipo === 'attrezzo' && { unico: true }) })),
   ...NUOVI,
 ]
-export const PER_ID = Object.fromEntries([...NEGOZIO, ...PESCI, ...ANIMALI, ...REPERTI].map((x) => [x.id, x]))
+export const PER_ID = Object.fromEntries([...NEGOZIO, ...PESCI, ...ANIMALI, ...REPERTI, ...UFFICIO].map((x) => [x.id, x]))
 /** Il nome di un oggetto, come si scrive nello zaino. */
 export const nomeDi = (id) => PER_ID[id]?.nome?.replace(/^(un’|un |una |uno |il |la |l’)/i, '') ?? id
 

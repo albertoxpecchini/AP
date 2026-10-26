@@ -155,11 +155,19 @@
 .c-rapidi.iniziali .c-r{background:transparent;box-shadow:inset 0 0 0 1px rgba(70,255,125,.18);border-style:dashed}
 
 /* tasto «vai agli ultimi messaggi» con i nuovi */
-.c-giu{position:absolute;right:14px;bottom:112px;z-index:5;display:flex;align-items:center;gap:6px;height:32px;padding:0 11px;border:0;border-radius:16px;background:var(--led);color:#062a12;font:400 15px/1 var(--fa);cursor:pointer;box-shadow:0 3px 0 #0c7a33,0 6px 12px rgba(0,0,0,.5);animation:c-msg .2s ease-out}
+/* il tasto «giù» (26.10, rifatto): un'etichetta del cercapersone, bordo di fosforo e fondo scuro, con la freccia a pixel (SVG:
+   il carattere del cercapersone la «↓» non ce l'ha) che ammicca in giù; coi messaggi nuovi il contatore giallo */
+.c-giu{position:absolute;right:14px;bottom:112px;z-index:5;display:flex;align-items:center;gap:7px;height:34px;padding:0 12px 0 10px;border:2px solid var(--led);border-radius:8px;background:rgba(5,16,9,.94);color:var(--led);font:400 13px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 0 12px rgba(70,255,125,.4),inset 0 0 8px rgba(70,255,125,.15),0 3px 0 #000;text-shadow:0 0 6px rgba(70,255,125,.7);animation:c-msg .2s ease-out}
+.c-giu-freccia{width:14px;height:14px;flex:none;filter:drop-shadow(0 0 3px rgba(70,255,125,.8));animation:c-giu-ammicca 1s steps(2,jump-none) infinite}
+@keyframes c-giu-ammicca{50%{transform:translateY(3px)}}
+@media (hover:hover){.c-giu:hover{background:var(--led);color:#062a12;text-shadow:none}}
+.c-giu:active{translate:0 2px;box-shadow:0 0 12px rgba(70,255,125,.4),0 1px 0 #000}
+@media (prefers-reduced-motion:reduce){.c-giu-freccia{animation:none}}
 .c-giu[hidden]{display:none}
 .c-giu .c-nuovi:not(:empty)::after{content:" nuovi"}
-.c-giu .c-nuovi{font:400 13px/1 var(--mono)}
-.c-giu .c-nuovi{color:#062a12}
+.c-giu .c-nuovi{font:400 11px/1 var(--mono)}
+.c-giu .c-nuovi:not(:empty){padding:3px 6px;border-radius:4px;background:#ffd400;color:#111;text-shadow:none;letter-spacing:.04em}
 
 /* orari, giorni, ripeti */
 .c-ora{align-self:flex-end;flex:none;font:400 9.5px/1 var(--mono);letter-spacing:.04em;color:#6c7a68;margin-bottom:3px}
@@ -241,3 +249,32 @@ tr.cliccabile,li.cliccabile{cursor:pointer}
 @keyframes c-scrive{30%{opacity:1;transform:translateY(-3px)}}
 
 @media (prefers-reduced-motion:reduce){.c-msg,.c-rulli.gira div .emo{animation:none}}
+
+/* ── il nastro dello spazzino (26.10, minigiochi.js: nastro) ── */
+.c-nastro{display:grid;gap:8px;margin-top:8px;outline:none;user-select:none;touch-action:none}
+.c-nastro-tasche{display:flex;justify-content:center;gap:8px}
+.c-nastro-tasche i{display:grid;place-items:center;width:46px;height:46px;border:2px dashed #4d5a4f;border-radius:8px}
+.c-nastro-tasche i.piena{border:2px solid #ffd400;background:#2a2f1a}.chat .c-nastro-tasche .emo{height:34px;width:34px;margin:0}
+.c-nastro-nastro{position:relative;height:140px;border:2px solid #000;border-radius:8px;overflow:hidden;background:#2c2f33 repeating-linear-gradient(90deg,#33373c 0 18px,#24272b 18px 22px);animation:c-nastro-scorre .6s linear infinite}
+@keyframes c-nastro-scorre{to{background-position:-22px 0}}
+.c-nastro.finito .c-nastro-nastro{animation:none;opacity:.6}
+.c-nastro-pezzo{position:absolute;left:50%;top:50%;display:grid;justify-items:center;gap:3px;translate:-50% -50%;text-align:center}
+.chat .c-nastro-pezzo .emo{height:64px;width:64px;margin:0;filter:drop-shadow(0 4px 2px rgba(0,0,0,.5))}
+.c-nastro-pezzo b{font:400 13px/1.1 var(--mono);color:#fff;text-shadow:0 1px 2px #000}
+.c-nastro-pezzo small{font:400 11px/1 var(--mono);color:#ffd400}.c-nastro-pezzo.sospetto small{color:#ff6b5a}
+.c-nastro-pezzo.entra{animation:c-nastro-entra .28s ease-out}
+@keyframes c-nastro-entra{from{translate:120% -50%}}
+.c-nastro-pezzo.preso{animation:c-nastro-preso .26s ease-in forwards}
+@keyframes c-nastro-preso{to{translate:-50% -170%;opacity:0;scale:.5}}
+.c-nastro-pezzo.via{animation:c-nastro-via .26s ease-in forwards}
+@keyframes c-nastro-via{to{translate:-50% 120%;rotate:30deg;opacity:0}}
+.c-nastro-pezzo.passa{animation:c-nastro-passa .26s linear forwards}
+@keyframes c-nastro-passa{to{translate:-220% -50%}}
+.c-nastro-tempo{position:absolute;left:0;bottom:0;height:5px;width:100%;background:#ffd400;transform-origin:left}
+@keyframes c-nastro-tempo{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.c-nastro-tasti{display:flex;justify-content:space-between;align-items:center}
+.c-nastro-conta{font:400 13px/1 var(--mono);color:#9fb29a}
+.c-nastro.pieno [data-v="tieni"]{opacity:.35;pointer-events:none}
+.c-nastro.pieno .c-nastro-nastro::after{content:"tasche piene: guardali passare";position:absolute;left:0;right:0;top:6px;text-align:center;font:400 11px/1 var(--mono);color:#ff6b5a;text-transform:uppercase}
+.c-rischio{color:#ff6b5a;font-weight:400;font-size:.85em;white-space:nowrap}
+.chat .c-nastro-pezzo.sospetto small{color:#ff6b5a}

@@ -38,7 +38,7 @@ export const notizie = () => leggi('notizie=1')
 /** Il mio profilo (serve un conto) e, se vuoi, chi mi sta sopra e sotto in una classifica. */
 export async function io(vicini = null) {
   const token = pzk.token()
-  if (!token) return { ok: false, errore: 'serve un conto: entra nel wallet' }
+  if (!token) return { ok: false, errore: 'serve un conto: crealo nell’app account' }
   try {
     const d = await (await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, ...(vicini && { vicini }) }) })).json()
     return d ?? { ok: false }
@@ -61,6 +61,9 @@ export function testoNotizia(n) {
     case 'quiz': return { icona: 'quiz', html: `${chi} ha azzeccato <b>${D}</b> domande di fila ai quiz` }
     case 'serie': return { icona: 'fuoco', html: `${chi} è a <b>${D}</b> giorni di fila` }
     case 'nuovo': return { icona: 'bot-ride', html: `${chi} è arrivato in banca` }
+    // i colpi alla cassa (26.10, api/wallet.mjs, colpo): { ok, n, bottino }
+    case 'rapina': return { icona: 'lucchettone', html: `${chi} e la sua banda (${D?.n ?? 2}) hanno rapinato la cassa di pzk: <span class="pzk">${Number(D?.bottino ?? 0).toLocaleString('it-IT')} $pzk</span> sporchi` }
+    case 'retata': return { icona: 'sirena', html: `${chi} e la sua banda (${D?.n ?? 2}) presi con le mani nella cassa: sei ore di galera` }
     case 'lumaca': { // le catastrofi e i miracoli della lumachina (api/wallet.mjs): { ev, pct, titolo }
       const p = Number(D?.pct) || 0, titolo = String(D?.titolo ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
       return { icona: p < 0 ? 'bot-triste' : 'bot-ricco', html: `la lumachina di ${chi}: <b>${titolo}</b> (${p < 0 ? '−' : '+'}${Math.abs(p).toLocaleString('it-IT', { maximumFractionDigits: 2 })} % dei $pzk)` }

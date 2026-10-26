@@ -27,6 +27,8 @@ html.scena3d .it{visibility:hidden}
    della storia ne hanno anche altri nel testo), i manifesti che sono link, i tagliandi */
 html.scena3d .vol a{visibility:visible;color:transparent}
 html.scena3d .man-link .it{visibility:visible;opacity:0}
+/* il wallet e il cercapersone sul muro (26.10): li disegna la scena (fogli.js, viva); qui restano, trasparenti, da toccare */
+html.scena3d .parete .vivo{visibility:visible;opacity:0}
 html.scena3d .tagliandi button{visibility:visible;color:transparent;background:none;border-color:transparent}
 /* le bic della petizione (22.10): nella scena sono modelli (penne.js), qui restano dove pendono, da toccare */
 html.scena3d .penna img{visibility:visible;opacity:0}

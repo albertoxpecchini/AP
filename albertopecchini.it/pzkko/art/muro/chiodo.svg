@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 194" width="336" height="194">
+<!-- il chiodo del cercapersone sul muro (26.10): appeso per la clip da cintura. Stesse misure della foto (336 × 194) -->
+<defs><radialGradient id="t" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#e9e6dd"/><stop offset=".5" stop-color="#8f8a80"/><stop offset="1" stop-color="#4a463f"/></radialGradient></defs>
+<ellipse cx="170" cy="17" rx="11" ry="6" fill="#000" opacity=".45"/>
+<circle cx="168" cy="12" r="9.5" fill="url(#t)" stroke="#2a2723" stroke-width="1.8"/>
+<circle cx="165" cy="9" r="2.4" fill="#fff" opacity=".55"/>
+</svg>

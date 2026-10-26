@@ -31,6 +31,8 @@ import * as zaino from '../chat/zaino.js'
 import * as tomodachi from '../chat/tomodachi.js'
 import { icona } from '../chat/icone.js'
 import * as led from '../chat/led.js'
+// le musichette e i suonini (26.10, suono/interfaccia.js: ogni app ha la sua sigla, ogni tasto il suo bip)
+import { musichetta } from '../suono/interfaccia.js'
 import { tubo, allinea } from '../games/crt.js'
 import { tieni, ricordo, ricorda } from './ricordi.js'
 
@@ -47,6 +49,10 @@ precarica.src = PAGER.src // la foto grande è già pronta quando si tocca il ta
 /** Le app: icona (una delle nostre), colore della piastrella, badge (quanti «da fare» mostrare sul pallino). */
 export const APP = [
   { id: 'chat', nome: 'chat', icona: 'app-chat', carica: () => import('./app/chat.js'), badge: () => (zaino.manca('giornaliero') === 0 ? 1 : 0) },
+  // il profilo (26.10): tutti i numeri e la faccia, il colore, la cornice e il motto che vedono gli altri
+  { id: 'profilo', nome: 'profilo', icona: 'app-profilo', carica: () => import('./app/profilo.js') },
+  // l'account (26.10): il conto, il cambio, gli invii e il resto, che prima stavano nelle pagine del wallet
+  { id: 'account', nome: 'account', icona: 'app-account', carica: () => import('./app/account.js') },
   { id: 'negozio', nome: 'shop', icona: 'app-shop', carica: () => import('./app/negozio.js') },
   { id: 'sfide', nome: 'sfide', icona: 'app-sfide', carica: () => import('./app/sfide.js'), badge: () => import('../chat/sfide.js').then((m) => m.daRiscuotere()) },
   { id: 'quiz', nome: 'quiz', icona: 'app-quiz', carica: () => import('./app/quiz.js') },
@@ -60,6 +66,16 @@ export const APP = [
   // pallino: le vincite non ancora viste, o le scommesse aperte sulla partita che sta per chiudere (meno di un minuto)
   { id: 'virtual', nome: 'virtual', icona: 'app-virtual', carica: () => import('./app/virtual.js'), badge: () => import('../games/virtual/schedina.js').then((m) => { m.avvia(); return m.daVedere().length + m.aperteInChiusura() }) },
   { id: 'banca', nome: 'banca', icona: 'app-banca', azione: () => pzk.apriWallet() },
+  // l'economia (26.10, api/_economia.mjs): il colpo alla cassa di pzk, la lavatrice dei soldi sporchi, il decifratore dei wallet
+  // trovati dallo spazzino (solo se installato dalla chat: «installa decifratore»). Il pallino della rapina: la galera
+  { id: 'rapina', nome: 'rapina', icona: 'app-rapina', carica: () => import('./app/rapina.js'), badge: () => (pzk.inGalera() ? 1 : 0) },
+  { id: 'lavatrice', nome: 'lavatrice', icona: 'app-lavatrice', carica: () => import('./app/lavatrice.js'), badge: () => (pzk.lavaggio()?.fino <= Date.now() ? 1 : 0) },
+  { id: 'decifratore', nome: 'decifra', icona: 'app-decifratore', carica: () => import('./app/decifratore.js'), se: () => zaino.installata('decifratore'), badge: () => (zaino.installata('decifratore') ? zaino.quanti('wallet-pzk') + zaino.quanti('chiavetta') : 0) },
+  // le app veloci (26.10): le conversioni fra basi, la calcolatrice da geometra, il compilatore C, la cucina del Mincio
+  { id: 'conversioni', nome: 'bin·hex', icona: 'app-conversioni', carica: () => import('./app/conversioni.js') },
+  { id: 'calcolatrice', nome: 'calcoli', icona: 'app-calcolatrice', carica: () => import('./app/calcolatrice.js') },
+  { id: 'compilatore', nome: 'codice C', icona: 'app-compilatore', carica: () => import('./app/compilatore.js') },
+  { id: 'cucina', nome: 'cucina', icona: 'app-cucina', carica: () => import('./app/cucina.js') },
 ]
 
 // le baggianate del caricamento: ne escono quattro a caso ogni volta, scritte come il registro di un vecchio computer
@@ -236,7 +252,7 @@ async function disegnaHome() {
       </div>
       <button class="t-w t-w-notizie" type="button" data-app="giocatori" data-tab="notizie"><small>dalla banca</small><div class="t-notizia">…</div></button>
     </div>
-    <div class="t-griglia">${APP.map(piastrella).join('')}</div>`
+    <div class="t-griglia">${APP.filter((a) => !a.se || a.se()).map(piastrella).join('')}</div>`
   // si ridisegna solo se è cambiato qualcosa: rifare la home uguale ricrea le icone, che possono lampeggiare un fotogramma
   if (html === ultimaHome && homeEl.childElementCount) { segnaLumaca(); return aggiornaBadge() }
   ultimaHome = html
@@ -463,6 +479,7 @@ async function accedi() {
   const mio = giro
   tomodachi.attendi?.(false)
   porta.dataset.fase = 'carica'
+  musichetta('accendi', true)
   led.inizia()
   try { await carica(mio) } finally { led.finisci() }
   if (mio !== giro || !dlg.open) return // chiuso durante il caricamento
@@ -472,8 +489,8 @@ async function accedi() {
   const ultima = ricordo('cercapersone', { app: null }).app
   const a = attesa ?? (ultima && APP.some((x) => x.id === ultima) && (!zaino.pagerRotto() || ultima === 'chat') ? { app: ultima, opz: {} } : null)
   attesa = null
-  if (a?.app) await vai(a.app, a.opz)
-  else home()
+  if (a?.app) await vai(a.app, a.opz) // (la sigla è quella dell'app)
+  else { musichetta('consentito'); home() }
   porta.classList.add('via') // la porta sfuma e sotto c'è pzk os
   await dorm(RIDOTTO.matches ? 0 : 320)
   if (mio !== giro) return
@@ -483,6 +500,7 @@ async function accedi() {
 
 // ── lo spegnimento: come un vecchio tubo catodico, l'immagine si schiaccia in una riga bianca, poi in un punto, e sparisce ──
 async function spegni() {
+  musichetta('spegni')
   if (RIDOTTO.matches) return
   const bianco = document.createElement('i')
   bianco.className = 't-bianco'
@@ -572,6 +590,7 @@ export function home({ subito = false } = {}) {
   if (!dlg) return
   const prima = corrente
   corrente = null
+  if (prima && dentro) musichetta('home')
   if (dentro) ricorda('cercapersone', { app: null }) // solo se ci torni tu: all'apertura la home si prepara sotto la porta
   storia.length = 0
   for (const { host, ist } of montate.values()) { if (!host.hidden) ist?.nascondi?.(); host.hidden = true; host.classList.remove('entra') }
@@ -604,6 +623,7 @@ export async function vai(id, opz = {}) {
   if (a.azione) { a.azione(); return }
   led.colpo(140)
   if (corrente && corrente !== id && !opz.daIndietro) storia.push(corrente)
+  if (corrente !== id && !opz.daIndietro && dentro) musichetta(id) // la sigla dell'app (tornando indietro no: solo il bip)
   let m = montate.get(id)
   if (!m) {
     const host = document.createElement('section')

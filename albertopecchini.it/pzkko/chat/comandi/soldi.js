@@ -42,7 +42,7 @@ export const SOLDI = [
     async fai(ctx) {
       const c = ctx.pzk.conto(), e = ctx.pzk.euro()
       ctx.dì({ t: `:pzk: ${c ? c.nome : 'la sessione'}`, campi: [['$pzk liberi', ctx.pzkHtml(ctx.pzk.saldo())], ['EUR€ nel wallet', c ? ctx.eurHtml(e) : '—'], ['livello', `:livello: ${zaino.livello()} (${zaino.xp()} xp)`], ['moltiplicatore', `×${zaino.moltiplicatore().toLocaleString('it-IT')}`]],
-        pie: c ? `conto ${c.ind}` : 'sei nella sessione: 1.000 $pzk che non si salvano. Entra nel wallet per tenerli.' })
+        pie: c ? `conto ${c.ind}` : 'sei nella sessione: 1.000 $pzk che non si salvano. Crea il conto nell’app account del cercapersone per tenerli.' })
     },
   },
   {
@@ -81,7 +81,7 @@ export const SOLDI = [
   {
     nomi: ['manda', 'invia', 'dai', 'give', 'pay'], cat: 'soldi', icona: 'pzk', breve: 'manda $pzk a un conto: manda pzk123456 50', uso: 'manda <pzk123456> <quanti>', senzaEventi: true,
     async fai(ctx) {
-      if (!ctx.pzk.conto()) return ctx.dì({ colore: 'ambra', d: 'per inviare serve un conto: entra nel wallet.', pie: 'apro il wallet' }) && ctx.apriWallet('entra')
+      if (!ctx.pzk.conto()) return ctx.dì({ colore: 'ambra', d: 'per inviare serve un conto: crealo nell’app account.', pie: 'apro l’account' }) && ctx.apriWallet('entra')
       const ind = ctx.args[0], n = ctx.importo(ctx.args[1])
       if (!ind || !Number.isFinite(n)) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>manda pzk123456 50</code>.' })
       await ctx.pensa(300)

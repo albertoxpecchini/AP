@@ -273,7 +273,7 @@ function punta(id) {
   if (!r.ok) {
     aggiornaBanco()
     if (r.motivo === 'secco') voce(pzk.perche())
-    else { voce(r.motivo === 'nonbastano' ? `non ti bastano: hai ${fmt(pzk.saldo())} $pzk` : 'hai finito i $pzk'); scuoti(el.saldo) }
+    else { voce(r.motivo === 'nonbastano' ? pzk.nonBasta() : 'hai finito i $pzk'); scuoti(el.saldo) }
     return
   }
   const b = el.quote.querySelector(`[data-id="${id}"]`)
@@ -332,6 +332,8 @@ function aggiornaBanco() {
 }
 function scuoti(e) { if (!RIDOTTO.matches) e.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(-3px)' }, { transform: 'translateX(0)' }], { duration: 300 }) }
 const centro = (e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
+// l'ingrandimento del foglio sullo schermo (sul computer grande del 20 %: CSS, scale sul foglio); sul telefono 1
+const zoom = () => { const d = dlg.querySelector('.vi-dentro'), r = d?.getBoundingClientRect(); return r ? r.width / (d.offsetWidth || r.width) || 1 : 1 }
 /** Una fiche che vola da a a b (coordinate della finestra), con l'arco e l'ombra, come negli altri giochi. */
 function vola(v, a, b, { durata = 380, alto = 40, svanisce = false } = {}) {
   if (RIDOTTO.matches) return Promise.resolve()
@@ -340,11 +342,11 @@ function vola(v, a, b, { durata = 380, alto = 40, svanisce = false } = {}) {
   img.src = `${ART}fiches/f${v}.webp`
   img.alt = ''
   dlg.appendChild(img)
-  const mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - alto
+  const z = zoom(), mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - alto * z
   const anim = img.animate([
-    { transform: `translate(${a.x}px, ${a.y}px) scale(1)`, opacity: 1 },
-    { offset: 0.5, transform: `translate(${mx}px, ${my}px) scale(1.3)`, opacity: 1 },
-    { transform: `translate(${b.x}px, ${b.y}px) scale(1)`, opacity: svanisce ? 0 : 1 },
+    { transform: `translate(${a.x}px, ${a.y}px) scale(${z})`, opacity: 1 },
+    { offset: 0.5, transform: `translate(${mx}px, ${my}px) scale(${1.3 * z})`, opacity: 1 },
+    { transform: `translate(${b.x}px, ${b.y}px) scale(${z})`, opacity: svanisce ? 0 : 1 },
   ], { duration: durata, easing: 'cubic-bezier(.3,.7,.4,1)', fill: 'forwards' })
   return anim.finished.then(() => img.remove(), () => img.remove())
 }

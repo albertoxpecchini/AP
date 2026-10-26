@@ -3,17 +3,16 @@
 // pagina: il saldo in $pzk a led verdi (le stesse cifre a sette segmenti del portachiavi per terra, portachiavi.js), gli
 // EUR€ a led ambra, la batteria su un lcd (100 % alle 7 di mattina, 2 % alle 7 di sera, poi in carica col cavo usb-c
 // infilato nella porta sul fianco sinistro), la targhetta con l'indirizzo, e a destra la borsa: il grafico del cambio
-// PZK/EUR€ (api/borsa.mjs; la manopola cambia il periodo) con la capitalizzazione. I quattro tasti gialli sfilano dalla
-// tasca la «carta» coi moduli: il conto (entra o crea il conto: un nome e un PIN di quattro cifre, niente di più; chi non
-// entra gioca coi 1.000 $pzk della sessione), il cambio (il fader orizzontale: $pzk ↔ EUR€ al cambio dell'ultima
-// sincronizzazione), gli invii fra conti (48 ore dopo la creazione), e il resto (l'indirizzo, che si cambia una volta
-// sola, il PIN, il regalo di instagram). I soldi li tiene ../games/pzk.js, gli stessi dei giochi.
+// PZK/EUR€ (api/borsa.mjs; la manopola cambia il periodo) con la capitalizzazione. Dal 26.10 (Alberto: «in portafoglio
+// solo saldo e borsa») è tutto qui: il conto, il cambio, gli invii e il resto (prima le pagine dei quattro tasti gialli)
+// sono l'app Account del cercapersone (telefono/app/account.js), e i tasti gialli della foto ci portano, ognuno sulla sua
+// scheda. I soldi li tiene ../games/pzk.js, gli stessi dei giochi.
 // Il tasto in alto a sinistra (index.html, .wallet-tasto) è un banner col pannello a led dei $pzk, dove col cursore sopra
 // scorrono tutti i dati del wallet: lo accende prepara(), con banner.js.
 import * as pzk from '../games/pzk.js'
 import { banner } from './banner.js'
 import { tubo } from '../games/crt.js'
-import { tieni, riporta, ricordo, ricorda } from '../telefono/ricordi.js'
+import { ricordo, ricorda } from '../telefono/ricordi.js'
 
 const IMM = { w: 1214, h: 559 } // la foto del portafoglio: le misure degli schermi sono in percentuale di lei
 const POS = {
@@ -271,7 +270,7 @@ function costruisci() {
       <div class="w-schermo w-eur" style="${pos(POS.eur)}"><canvas></canvas><span class="w-eti">EUR€</span></div>
       <div class="w-schermo w-batt" style="${pos(POS.batt)}"><canvas></canvas></div>
       <div class="w-targa" style="${pos(POS.targa)}"></div>
-      <div class="w-schermo w-borsa" style="${pos(POS.borsa)}"><canvas class="w-grafico"></canvas><div class="w-tasso"></div><div class="w-var"></div><div class="w-periodo"></div><div class="w-info"></div><div class="w-pagina" hidden></div></div>
+      <div class="w-schermo w-borsa" style="${pos(POS.borsa)}"><canvas class="w-grafico"></canvas><div class="w-tasso"></div><div class="w-var"></div><div class="w-periodo"></div><div class="w-info"></div></div>
       ${tasti.map((t, i) => `<button class="w-tasto" type="button" data-s="${t}" data-eti="${t}" aria-pressed="false" style="left:${POS.tasti[i][0]}%;top:${POS.tasti[i][1]}%" aria-label="${t}"></button>`).join('')}
       <button class="w-manopola" type="button" data-eti="periodo" aria-label="il periodo del grafico" style="left:${POS.manopola[0]}%;top:${POS.manopola[1]}%">${pomello()}</button>
       <img class="w-cavo" src="/art/wallet-cavo/cavo.webp" alt="" width="771" height="60" loading="lazy" aria-hidden="true"><div class="w-cavo-filo" aria-hidden="true"></div>
@@ -284,18 +283,17 @@ function costruisci() {
   for (const s of dlg.querySelectorAll('.w-saldo, .w-eur, .w-borsa')) tubo(s, { z: 3, fosforo: s.classList.contains('w-eur') ? 'ambra' : 'verde' })
   S = {
     corpo: q(dlg, '.w-corpo'), saldo: q(dlg, '.w-saldo canvas'), sotto: q(dlg, '.w-saldo .w-sotto'), eur: q(dlg, '.w-eur canvas'), batt: q(dlg, '.w-batt canvas'), targa: q(dlg, '.w-targa'),
-    grafico: q(dlg, '.w-grafico'), tasso: q(dlg, '.w-tasso'), var: q(dlg, '.w-var'), periodo: q(dlg, '.w-periodo'), info: q(dlg, '.w-info'), carta: q(dlg, '.w-pagina'), borsaEl: q(dlg, '.w-borsa'), voce: q(dlg, '.w-voce'), manopola: q(dlg, '.w-manopola'),
-    tasti: [...dlg.querySelectorAll('.w-tasto')], sezione: null,
+    grafico: q(dlg, '.w-grafico'), tasso: q(dlg, '.w-tasso'), var: q(dlg, '.w-var'), periodo: q(dlg, '.w-periodo'), info: q(dlg, '.w-info'), borsaEl: q(dlg, '.w-borsa'), voce: q(dlg, '.w-voce'), manopola: q(dlg, '.w-manopola'),
+    tasti: [...dlg.querySelectorAll('.w-tasto')],
   }
-  // ogni pagina ricorda il suo punto, anche quello della lista delle mosse (telefono/ricordi.js; Alberto, 23.10: niente salti in cima)
-  tieni(S.carta, 'wallet', { vista: () => S.carta.dataset.sezione ?? '' })
   // niente tasto per chiudere: si tocca fuori dal portafoglio (o Esc)
   // l'anello giallo del fuoco serve a chi usa la tastiera: dopo un clic col mouse si spegne, al primo tasto premuto torna
   dlg.addEventListener('pointerdown', () => dlg.classList.add('mouse'))
   dlg.addEventListener('keydown', () => dlg.classList.remove('mouse'))
-  dlg.addEventListener('cancel', (e) => { e.preventDefault(); S.sezione ? mostra(null) : chiudi() }) // Esc: prima la pagina, poi il wallet
+  dlg.addEventListener('cancel', (e) => { e.preventDefault(); chiudi() })
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
-  for (const t of S.tasti) t.addEventListener('click', () => mostra(S.sezione === t.dataset.s ? null : t.dataset.s))
+  // i tasti gialli: il wallet si chiude e il cercapersone si apre sull'app Account, sulla scheda del tasto
+  for (const t of S.tasti) t.addEventListener('click', () => { chiudi(); pzk.apriWallet(t.dataset.s) })
   // la manopola è un selettore a scatti: un periodo ogni quarto di giro, sempre in senso orario (gli scatti si sommano, così
   // dall'ultimo periodo al primo la tacca va avanti invece di tornare indietro di mezzo giro); parte già sul periodo giusto
   const giro = () => S.manopola.style.setProperty('--giro', `${-45 + scatti * (360 / PERIODI.length)}deg`)
@@ -326,7 +324,6 @@ function aggiorna() {
   display(S.eur, c ? fmtEur(c.eur).replace(/\./g, '').replace(',', '.') : '----', { colore: '#ffb02e', spento: '#2a1a05', alt: 0.5, luce: !!c })
   S.targa.textContent = c ? c.ind : 'sessione'
   aggiornaBatteria()
-  if (S.sezione) carta(S.sezione, true)
 }
 
 // ── la borsa ──
@@ -357,209 +354,15 @@ function disegnaBorsa() {
   S.info.innerHTML = d.punti?.length ? `<span>min <b>${lo.toFixed(4)}</b></span><span>max <b>${hi.toFixed(4)}</b></span><span>cap <b>${fmt(d.cap?.pzk ?? 0)}</b> · ${d.cap?.conti ?? 0} conti</span>` : ''
 }
 
-// ── le pagine dei tasti (23.10): CONTO, CAMBIO, INVIA e ALTRO aprono la loro pagina DENTRO lo schermo del grafico, al
-// posto del grafico; ripremendo lo stesso tasto (o con Esc) la pagina si chiude e torna il grafico. Niente esce più sotto
-// il portafoglio: si lavora solo dagli schermini. (La funzione si chiama ancora carta(): era la carta che si sfilava.)
-function mostra(sezione) {
-  S.sezione = sezione
-  ricorda('wallet', { sezione }) // riaprendo il wallet (anche dopo il ricaricamento) si torna su questa pagina
-  for (const t of S.tasti) t.setAttribute('aria-pressed', String(t.dataset.s === sezione))
-  S.borsaEl.classList.toggle('in-pagina', !!sezione)
-  if (!sezione) { S.carta.hidden = true; disegnaBorsa(); return }
-  carta(sezione)
-  S.carta.hidden = false
-  riporta(S.carta) // la pagina torna dove l'avevi lasciata (la prima volta dall'alto)
-}
-function carta(sezione, soloDati = false) {
-  const c = pzk.conto(), K = S.carta
-  if (soloDati && K.dataset.sezione === sezione && K.dataset.conto === String(!!c)) { K.querySelectorAll('[data-vivo]').forEach((e) => vivo(e, c)); return }
-  K.dataset.sezione = sezione; K.dataset.conto = String(!!c)
-  K.innerHTML = ''
-  const esito = el('p', 'w-esito')
-  const di = (ok, testo) => { esito.textContent = testo; esito.classList.toggle('male', !ok) }
-  const campo = (lab, attrs, nota) => { const w = el('div'); w.innerHTML = `<label>${lab}</label>`; const i = el('input'); Object.assign(i, attrs); w.appendChild(i); if (nota) w.appendChild(el('p', 'w-nota', nota)); return [w, i] }
-  const pin = (lab = 'PIN, 4 cifre') => campo(lab, { type: 'password', inputMode: 'numeric', autocomplete: 'off', maxLength: 4, pattern: '\\d{4}', placeholder: '····' })
-  const bott = (testo, cls, fai) => { const b = el('button', `w-b ${cls}`, testo); b.type = 'button'; b.addEventListener('click', fai); return b }
-  const attesa = async (b, fai) => { b.disabled = true; try { await fai() } finally { b.disabled = false } }
-
-  if (sezione === 'conto' && !c) {
-    K.innerHTML = `<h3>il conto <small>no sbatti: un nome e quattro cifre</small></h3>
-      <p class="w-nota w-intro"></p>`
-    // il paragrafo in cima cambia con la linguetta, e un errore prende il suo posto: così la pagina resta alta uguale e
-    // sta tutta nello schermo
-    const intro = q(K, '.w-intro')
-    intro.after(esito)
-    const sch = el('div', 'w-sch'); const bE = el('button', '', 'entra'), bC = el('button', '', 'crea il conto'); bE.type = bC.type = 'button'; sch.append(bE, bC); K.appendChild(sch)
-    const form = el('form'); form.addEventListener('submit', (e) => e.preventDefault()); K.appendChild(form)
-    let modo = 'entra'
-    const disegna = () => {
-      bE.setAttribute('aria-selected', String(modo === 'entra')); bC.setAttribute('aria-selected', String(modo === 'crea'))
-      intro.innerHTML = modo === 'entra'
-        ? 'senza conto giochi coi <b>1.000 $pzk della sessione</b>, che non si salvano. col conto restano tuoi, hanno un indirizzo e vivono nella borsa. si parte con 1.000 $pzk.'
-        : 'il PIN non si recupera: scegline uno che ricordi (studenti unimore: le ultime quattro cifre del numero dell’e-mail vanno benissimo).'
-      di(true, '')
-      form.innerHTML = ''
-      const [wn, iN] = campo('nome', { type: 'text', autocomplete: 'username', maxLength: 20, placeholder: 'il tuo nome' })
-      const [wp, iP] = pin()
-      const riga = el('div', 'w-riga'); riga.append(wn, wp); form.appendChild(riga)
-      let iK = null
-      const chiave = el('div'); chiave.hidden = true; const [wk, ik] = campo('chiave di amministrazione', { type: 'password', autocomplete: 'off' }, 'questo nome è di Alberto: serve la chiave del progetto'); chiave.appendChild(wk); iK = ik; form.appendChild(chiave)
-      iN.addEventListener('input', () => { chiave.hidden = !(modo === 'crea' && /^\s*(pzkko|alberto|albertopecchini|pecchini|admin|banca|bancapzk|root)\s*$/i.test(iN.value)) })
-      const az = el('div', 'w-azioni')
-      const b = bott(modo === 'entra' ? 'entra' : 'crea', 'giallo', () => attesa(b, async () => {
-        const r = modo === 'entra' ? await pzk.entra(iN.value, iP.value) : await pzk.crea(iN.value, iP.value, iK?.value || undefined)
-        if (!r.ok) return di(false, r.offline ? 'il wallet è in pausa: il server non ha ancora il suo archivio. per ora valgono i 1.000 della sessione' : r.errore)
-        voce(r.nuovo ? `benvenuto, ${r.conto.nome}: ${r.conto.ind}` : `ciao ${r.conto.nome}`)
-        mostra('conto'); borsa(true)
-      }))
-      form.addEventListener('submit', () => b.click(), { once: false })
-      az.append(b)
-      form.append(az)
-      iN.focus()
-    }
-    bE.addEventListener('click', () => { modo = 'entra'; disegna() }); bC.addEventListener('click', () => { modo = 'crea'; disegna() })
-    disegna()
-    return
-  }
-  if (sezione === 'conto') {
-    K.innerHTML = `<h3>${c.nome} <small>${c.ind}</small></h3>
-      <p>hai <b data-vivo="pzk"></b> e <b data-vivo="eur"></b>.</p>
-      <p class="w-nota">nato il ${new Date(c.creato).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'short', year: 'numeric' })} · <span data-vivo="invii"></span> · cambio delle <span data-vivo="sync"></span></p>`
-    const az = el('div', 'w-azioni')
-    const bS = bott('sincronizza', '', () => attesa(bS, async () => { const r = await pzk.sincronizza(); di(r.ok, r.ok ? `sincronizzato: 1 $pzk = ${pzk.tasso().toFixed(4)} €` : r.errore); borsa(true) }))
-    const bU = bott('esci', 'piatto', () => attesa(bU, async () => { await pzk.esci(); voce('sei uscito: valgono i 1.000 della sessione'); mostra('conto') }))
-    az.append(bS, bU)
-    K.appendChild(az)
-    const ul = el('ul', 'w-mosse'); ul.dataset.vivo = 'mosse'; K.appendChild(ul)
-    K.appendChild(esito)
-    K.querySelectorAll('[data-vivo]').forEach((e) => vivo(e, c))
-    return
-  }
-  if (sezione === 'cambio') {
-    if (!c) { K.innerHTML = '<h3>il cambio</h3><p>gli EUR€ (l’euro finto del wallet: non si prelevano, non si depositano, non si giocano) ci sono solo col conto. i 1.000 della sessione sono 1.000 e basta.</p>'; const b = bott('entra o crea il conto', 'giallo', () => mostra('conto')); K.appendChild(b); return }
-    K.innerHTML = `<h3>il cambio <small>1 $pzk = <span data-vivo="tasso"></span> €</small></h3>
-      <p class="w-nota">parcheggia i $pzk in EUR€ quando pensi che scendano; per giocarli vanno riconvertiti. cambio delle <span data-vivo="sync"></span>.</p>`
-    const verso = el('div', 'w-verso'); const bA = el('button', '', '$pzk → EUR€'), bB = el('button', '', 'EUR€ → $pzk'); bA.type = bB.type = 'button'; verso.append(bA, bB); K.appendChild(verso)
-    const fader = el('div', 'w-fader', '<div class="w-tacche"></div><input type="range" min="0" max="1000" step="1" value="0" aria-label="quanto convertire"><span class="w-led-f"></span>'); K.appendChild(fader)
-    const conv = el('div', 'w-conv'); K.appendChild(conv)
-    const az = el('div', 'w-azioni'); K.appendChild(az); K.appendChild(esito)
-    const range = q(fader, 'input'), led = q(fader, '.w-led-f')
-    let da = c.eur >= 0.01 && pzk.saldo() < 1 ? 'eur' : 'pzk'
-    const tot = () => (da === 'pzk' ? pzk.saldo() : pzk.euro())
-    const quanto = () => { const t = tot(); const v = (Number(range.value) / 1000) * t; return da === 'pzk' ? Math.round(v * 2) / 2 : Math.round(v * 100) / 100 }
-    const scrivi = () => {
-      bA.setAttribute('aria-pressed', String(da === 'pzk')); bB.setAttribute('aria-pressed', String(da === 'eur'))
-      const n = quanto(), t = pzk.tasso()
-      led.textContent = `${Math.round(Number(range.value) / 10)} %`
-      conv.innerHTML = da === 'pzk' ? `<span>dai <b>${fmt(n)}</b> $pzk<br><small>di ${fmt(tot())}</small></span><span>ricevi <b>${fmtEur(n * t)}</b> EUR€</span>` : `<span>dai <b>${fmtEur(n)}</b> EUR€<br><small>di ${fmtEur(tot())}</small></span><span>ricevi <b>${fmt(Math.round((n / t) * 2) / 2)}</b> $pzk</span>`
-      bF.disabled = !(n > 0)
-    }
-    const bF = bott('converti', 'giallo', () => attesa(bF, async () => {
-      const n = quanto(); if (!(n > 0)) return
-      const r = await pzk.converti(da, n)
-      if (!r.ok) return di(false, r.errore)
-      const f = r.fatto
-      di(true, f.da === 'pzk' ? `fatto: ${fmt(f.n)} $pzk → ${fmtEur(f.eur)} EUR€ (a ${f.cambio.toFixed(4)})` : `fatto: ${fmtEur(f.eur)} EUR€ → ${fmt(f.n)} $pzk (a ${f.cambio.toFixed(4)})`)
-      voce(f.da === 'pzk' ? `parcheggiati ${fmtEur(f.eur)} EUR€` : `+${fmt(f.n)} $pzk: vai a giocare`)
-      range.value = '0'; scrivi()
-    }))
-    const bT = bott('tutto', '', () => { range.value = '1000'; scrivi() })
-    az.append(bF, bT)
-    bA.addEventListener('click', () => { da = 'pzk'; range.value = '0'; scrivi() }); bB.addEventListener('click', () => { da = 'eur'; range.value = '0'; scrivi() })
-    range.addEventListener('input', scrivi)
-    K.querySelectorAll('[data-vivo]').forEach((e) => vivo(e, c))
-    scrivi()
-    if (pzk.scaduto()) pzk.sincronizza().then(() => { scrivi(); K.querySelectorAll('[data-vivo]').forEach((e) => vivo(e, pzk.conto())) })
-    return
-  }
-  if (sezione === 'invia') {
-    if (!c) { K.innerHTML = '<h3>invia</h3><p>i $pzk si mandano da un conto a un altro (per indirizzo, pzk + sei cifre). serve il conto, e deve avere almeno 48 ore.</p>'; K.appendChild(bott('entra o crea il conto', 'giallo', () => mostra('conto'))); return }
-    K.innerHTML = `<h3>invia $pzk <small>a un altro conto</small></h3><p class="w-nota"><span data-vivo="invii"></span> gli invii sono in $pzk, almeno 1; si vedono subito nel conto di chi li riceve.</p>`
-    const [wi, iI] = campo('indirizzo', { type: 'text', inputMode: 'numeric', autocomplete: 'off', placeholder: 'pzk398893', maxLength: 10 })
-    const [wq, iQ] = campo('quanti $pzk', { type: 'number', inputMode: 'decimal', min: 1, step: 0.5, placeholder: '10' })
-    const riga = el('div', 'w-riga'); riga.append(wi, wq); K.appendChild(riga)
-    const chi = el('p', 'w-nota'); K.appendChild(chi)
-    iI.addEventListener('change', async () => { const m = /(\d{6})/.exec(iI.value); if (!m) { chi.textContent = ''; return } chi.textContent = '…'; const r = await pzk.chiE('pzk' + m[1]); chi.textContent = r.ok ? `è il conto di ${r.conto.nome}` : r.errore })
-    const az = el('div', 'w-azioni'); K.appendChild(az); K.appendChild(esito)
-    const b = bott('invia', 'giallo', () => attesa(b, async () => {
-      const r = await pzk.invia(iI.value, Number(iQ.value))
-      if (!r.ok) return di(false, r.errore)
-      di(true, `fatto: ${fmt(r.fatto.n)} $pzk a ${r.fatto.nome} (${r.fatto.a})`); voce(`inviati ${fmt(r.fatto.n)} $pzk a ${r.fatto.nome}`); iQ.value = ''
-    }))
-    az.append(b)
-    K.querySelectorAll('[data-vivo]').forEach((e) => vivo(e, c))
-    return
-  }
-  if (sezione === 'altro') {
-    if (!c) { K.innerHTML = '<h3>altro</h3><p>l’indirizzo, il PIN e il regalo di instagram stanno nel conto.</p>'; K.appendChild(bott('entra o crea il conto', 'giallo', () => mostra('conto'))); const ig = pzk.linkInstagram({ fatto: () => voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`) }); K.appendChild(el('p', '', '')).appendChild(ig); return }
-    K.innerHTML = `<h3>altro <small>${c.ind}</small></h3>`
-    // tre linguette, una sezione alla volta (nello schermo non ci stanno tutte insieme)
-    const sch = el('div', 'w-sch'), parti = []
-    const linguetta = (nome, box) => { const b = el('button', '', nome); b.type = 'button'; b.addEventListener('click', () => scegli(parti.indexOf(box))); sch.appendChild(b); parti.push(box) }
-    const scegli = (n) => { parti.forEach((p, i) => { p.hidden = i !== n; sch.children[i].setAttribute('aria-selected', String(i === n)) }); di(true, '') }
-    K.appendChild(sch)
-    // l'indirizzo: una volta sola
-    const ind = el('div')
-    if (!c.indCambiato) {
-      ind.innerHTML = '<p class="w-nota">l’indirizzo è a caso: puoi cambiarlo <b>una volta sola</b> con sei cifre tue (studenti unimore: il numero dell’e-mail).</p>'
-      const [wn, iN] = campo('sei cifre', { type: 'text', inputMode: 'numeric', autocomplete: 'off', maxLength: 6, pattern: '\\d{6}', placeholder: '123456' })
-      const az = el('div', 'w-azioni')
-      const b = bott('cambia indirizzo', '', () => attesa(b, async () => { if (!confirm(`pzk${iN.value}: sicuro? non si cambia più.`)) return; const r = await pzk.cambiaIndirizzo(iN.value); di(r.ok, r.ok ? `fatto: ora sei ${pzk.conto().ind}` : r.errore); if (r.ok) carta('altro') }))
-      az.append(b); ind.append(wn, az)
-    } else ind.innerHTML = `<p class="w-nota">l’indirizzo ${c.ind} l’hai scelto tu: non si cambia più.</p>`
-    K.appendChild(ind)
-    linguetta('indirizzo', ind)
-    // il PIN
-    const pinBox = el('div')
-    const [w1, i1] = pin('PIN di adesso'), [w2, i2] = pin('PIN nuovo')
-    const riga = el('div', 'w-riga'); riga.append(w1, w2); pinBox.appendChild(riga)
-    const az2 = el('div', 'w-azioni'); const bP = bott('cambia PIN', '', () => attesa(bP, async () => { const r = await pzk.cambiaPin(i1.value, i2.value); di(r.ok, r.ok ? 'PIN cambiato' : r.errore); if (r.ok) i1.value = i2.value = '' })); az2.append(bP); pinBox.appendChild(az2)
-    K.appendChild(pinBox)
-    linguetta('PIN', pinBox)
-    // instagram
-    const igp = el('p')
-    igp.appendChild(pzk.linkInstagram({ fatto: () => voce(`grazie del follow: +${fmt(pzk.PREMIO_IG)} $pzk`) }))
-    if (c.ig) igp.appendChild(el('span', 'w-nota', ' il regalo di instagram l’hai già avuto: grazie.'))
-    K.appendChild(igp)
-    linguetta('instagram', igp)
-    K.appendChild(esito)
-    scegli(0)
-  }
-}
-// i pezzi della carta che seguono il conto
-function vivo(e, c) {
-  const k = e.dataset.vivo
-  if (!c) return
-  if (k === 'pzk') e.textContent = `${fmt(c.pzk)} $pzk`
-  else if (k === 'eur') e.textContent = `${fmtEur(c.eur)} EUR€`
-  else if (k === 'tasso') e.textContent = pzk.tasso().toFixed(4)
-  else if (k === 'sync') e.textContent = new Date(pzk.sincronizzato()).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
-  else if (k === 'invii') e.textContent = c.invii ? 'puoi mandare $pzk agli altri conti' : `invii dal ${new Date(c.inviiDa).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
-  else if (k === 'mosse') {
-    const NOMI = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'la lumachina' }
-    // la lumachina (api/wallet.mjs) spende o guadagna: n è sempre positivo, il verso dice da che parte, pct la percentuale col segno
-    const pct = (p) => `${p < 0 ? '−' : '+'}${Math.abs(p).toFixed(2).replace('.', ',')} %`
-    e.innerHTML = [...(c.mosse ?? [])].reverse().map((m) => {
-      const quando = new Date(m.t).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-      const segno = ['in-eur', 'inviato'].includes(m.tipo) || m.verso === 'meno' ? 'meno' : m.tipo === 'indirizzo' ? '' : 'piu'
-      const cosa = m.tipo === 'inviato' || m.tipo === 'ricevuto' ? `${NOMI[m.tipo]} ${m.nome ?? ''} (${m.a ?? m.da})` : m.tipo === 'indirizzo' ? `${NOMI[m.tipo]}: ${m.da} → ${m.a}` : m.tipo === 'in-eur' || m.tipo === 'in-pzk' ? `${NOMI[m.tipo]} a ${m.cambio?.toFixed(4)}` : m.tipo === 'lumaca' && typeof m.pct === 'number' ? `${NOMI.lumaca} ${pct(m.pct)}` : NOMI[m.tipo] ?? m.tipo
-      const n = m.tipo === 'in-eur' ? `−${fmt(m.n)} $pzk → +${fmtEur(m.eur)} €` : m.tipo === 'in-pzk' ? `−${fmtEur(m.eur)} € → +${fmt(m.n)} $pzk` : m.n != null ? `${segno === 'meno' ? '−' : '+'}${fmt(m.n)} $pzk` : ''
-      return `<li><span>${quando} · ${cosa}</span><b class="${segno}">${n}</b></li>`
-    }).join('') || '<li>niente ancora</li>'
-  }
-}
-
 export function apri(sezione = null) {
+  // le pagine di prima (il conto, il cambio, gli invii, l'altro) sono nell'app Account del cercapersone
+  if (['entra', 'conto', 'converti', 'cambio', 'invia', 'altro'].includes(sezione)) return pzk.apriWallet(sezione)
   if (!dlg) costruisci()
   if (!dlg.open) { dlg.classList.remove('chiude'); dlg.showModal(); S.corpo.focus({ preventScroll: true }); mosche() } // il fuoco sul portafoglio, non sul primo tasto (che si accenderebbe di giallo)
   aggiorna()
   if (!borsaDati) disegnaBorsa()
   borsa()
   clearInterval(borsaTimer); borsaTimer = setInterval(() => { if (dlg.open) borsa(true) }, 60000)
-  if (sezione) mostra(sezione === 'converti' ? 'cambio' : sezione === 'entra' ? 'conto' : sezione)
-  else if (!pzk.conto() && !sessionStorage.getItem('pzkko-wallet-visto')) { mostra('conto'); try { sessionStorage.setItem('pzkko-wallet-visto', '1') } catch {} }
-  else if (!S.sezione) { const r = ricordo('wallet', { sezione: null }).sezione; if (r) mostra(r) } // la pagina aperta l'ultima volta
-  if (sezione === 'converti' && pzk.conto()?.eur >= 0.01) voce(`hai ${fmtEur(pzk.euro())} EUR€: convertili per giocare`)
 }
 export function chiudi() {
   if (!dlg?.open) return

@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   try {
     const carica = async () => {
       const [{ db: w }, { db: g }] = await Promise.all([conti.read(), giocatori.read()])
-      return { g, righe: unisci(g, w.conti) }
+      return { g, righe: unisci(g, w.conti.filter((c) => !c.banca)) }
     }
     if (req.method === 'GET' || req.method === 'HEAD') {
       const q = new URL(req.url, 'http://x').searchParams

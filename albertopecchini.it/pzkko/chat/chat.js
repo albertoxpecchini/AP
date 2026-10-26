@@ -68,7 +68,7 @@ export function monta(host) {
   dlg.innerHTML = `<div class="c-schermo">
       <div class="c-testa"><button class="c-indietro" type="button" aria-label="indietro">‹</button>${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
       <div class="c-lista" role="log" aria-live="polite"></div>
-      <button class="c-giu" type="button" aria-label="vai agli ultimi messaggi" hidden><span>↓</span><b class="c-nuovi"></b></button>
+      <button class="c-giu" type="button" aria-label="vai agli ultimi messaggi" hidden><svg class="c-giu-freccia" viewBox="0 0 9 9" aria-hidden="true" shape-rendering="crispEdges"><path d="M3 0h3v4h3v1h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h3z" fill="currentColor"/></svg><span class="c-giu-testo">giù</span><b class="c-nuovi"></b></button>
       <div class="c-rapidi-box">
         <button class="c-fr sx" type="button" aria-label="scorri i tasti a sinistra" hidden>‹</button>
         <div class="c-rapidi" role="toolbar" aria-label="le ultime scelte"></div>
@@ -411,10 +411,11 @@ export async function pensa(ms = 700) {
 }
 
 // ── i soldi, visti dalla chat ──
-/** Paga n $pzk (col moltiplicatore del livello e degli effetti). → quanto è arrivato */
-export function paga(n, { puro = false } = {}) {
+/** Paga n $pzk (col moltiplicatore del livello e degli effetti). Di base sono soldi nuovi (il lavoro, i premi: conio, 26.10);
+ *  `casa`: li paga la cassa di pzk (la roba venduta, le casse, il gratta e vinci). → quanto è arrivato */
+export function paga(n, { puro = false, casa = false } = {}) {
   const tot = mezzi(puro ? n : n * zaino.moltiplicatore())
-  if (tot > 0) { pzk.regola('chat', 0, tot); zaino.conta('guadagnati', tot) }
+  if (tot > 0) { pzk.regola('chat', 0, tot, casa ? 'casa' : 'conio'); zaino.conta('guadagnati', tot) }
   return tot
 }
 /** Toglie n $pzk dal saldo (un acquisto, una multa). → false se non bastano */
@@ -483,7 +484,7 @@ export async function muori(ctx, motivo) {
     return
   }
   const persi = mezzi(Math.min(MORTE.max, pzk.saldo() * MORTE.quota * Math.max(0, 1 + zaino.bonus('morte')))) // il bonsai e il lucchettone ne fanno perdere meno
-  if (persi > 0) spendi(persi)
+  if (persi > 0) pzk.perdi(persi) // (26.10) non vanno alla cassa: cadono per terra, fra i portafogli smarriti che lo spazzino ritrova
   zaino.rompiPager() // e il cercapersone si rompe: quello scassato fa solo lavorare e ricomprare il nuovo (23.10)
   if (!lista) return // la chat non è montata (il tasto «muori» della pagina di prova): basta lo stato
   scheda({ colore: 'rosso', av: 'bot-morto', t: ':teschio: sei morto', d: `${motivo}\nHai perso ${pzkHtml(persi)} (il ${MORTE.quota * 100} % dei $pzk liberi${persi >= MORTE.max ? ', il massimo' : ''}). Gli EUR€ nel wallet non si toccano.\nE il :pager: cercapersone si è <b>scassato</b>: adesso fa solo <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, pie: 'un :cornetto: dal negozio ti avrebbe salvato', azioni: AZIONI_SCASSATO })

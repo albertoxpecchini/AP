@@ -7,7 +7,9 @@
 //           perde? ($pzk persi, senza poter dire no), segna? (una bandierina), se? ([bandierine che devono esserci]),
 //           non? (una bandierina che NON deve esserci), caso? { p, ko: nodo } (con probabilità p va in vai, se no in ko) }
 
-export const MISSIONI = [
+import { MISSIONI_NUOVE } from './missioni-altre.js'
+
+const PRIME = [
   {
     id: 'civico28', nome: 'Il civico 28', icona: 'citofono', breve: 'una porta che dice «chiuso» dal 1987', liv: 1, richiede: ['citofono'], premio: { pzk: 450, xp: 80, oggetto: 'chiave-vecchia' },
     nodi: {
@@ -91,4 +93,5 @@ export const MISSIONI = [
     },
   },
 ]
+export const MISSIONI = [...PRIME, ...MISSIONI_NUOVE]
 export const PER_ID = Object.fromEntries(MISSIONI.map((m) => [m.id, m]))

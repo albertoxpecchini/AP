@@ -163,6 +163,12 @@ export function salvaQuiz(q) { Z.quiz = q; scrivi() }
 // la miniera di $pzk (miniera.js): i pezzi comprati, quelli montati e da quando matura. Solo id e numeri (pochi byte)
 export const minieraStato = () => Z.miniera ?? { posseduti: {}, montati: {}, dal: 0, acc: 0 }
 export function salvaMiniera(m) { Z.miniera = m; scrivi() }
+// la cucina del Mincio (telefono/app/cucina.js): il giorno, le ricette pagate oggi, i piatti già dati oggi, i record
+export const cucinaStato = () => Z.cucina ?? { g: '', pagate: 0, piatti: [], record: {} }
+export function salvaCucina(c) { Z.cucina = c; scrivi() }
+// le app installate dalla chat (26.10: il decifratore, «installa decifratore»): compaiono nel cercapersone
+export const installata = (id) => !!Z.app?.[id]
+export function installa(id) { (Z.app ??= {})[id] = Date.now(); scrivi() }
 /** Segna un oggetto leggendario preso (il database ne fa una notizia). */
 export function nota(id) { Z.rari = [...new Set([...(Z.rari ?? []), id])]; scrivi() }
 
@@ -173,6 +179,25 @@ export function segnaSerie(id, n) { Z.serie[id] = { ultimo: Date.now(), n }; scr
 // ── le statistiche ──
 export const stat = (k) => Z.stat[k] ?? 0
 export function conta(k, n = 1) { Z.stat[k] = (Z.stat[k] ?? 0) + n; scrivi() }
+
+// ── i giochi grandi (26.10, per il profilo): games/pzk.js, a ogni regola, passa di qui. Per ogni gioco
+// [mani, vinte, puntato, tornato, il colpo migliore]; e i vinti e i persi come quelli della chat (le sfide li contano) ──
+export const GIOCHI = ['roulette', 'blackjack', 'mine', 'dado', 'moneta', 'virtual']
+export const giochi = () => Z.giochi ?? {}
+export function giro(gioco, giocato, torna) {
+  if (!GIOCHI.includes(gioco) || !(giocato > 0)) return
+  const g = (Z.giochi ??= {})[gioco] ?? [0, 0, 0, 0, 0], netto = torna - giocato
+  Z.giochi[gioco] = [g[0] + 1, g[1] + (netto > 0 ? 1 : 0), g[2] + giocato, g[3] + torna, Math.max(g[4], netto)]
+  Z.stat.giri = (Z.stat.giri ?? 0) + 1
+  if (netto > 0) Z.stat.vinti = (Z.stat.vinti ?? 0) + netto
+  else if (netto < 0) Z.stat.persi = (Z.stat.persi ?? 0) - netto
+  scrivi()
+}
+
+// ── il profilo (26.10, telefono/app/profilo.js): la faccia, il colore, la cornice e il motto, che gli altri vedono
+// (api/_giocatori.mjs li mette nella riga pubblica). Solo nomi presi dalle liste dell'app e un motto corto ──
+export const profilo = () => ({ av: null, col: 'verde', cor: 'nastro', mot: '', ...(Z.profilo ?? {}) })
+export function salvaProfilo(p) { Z.profilo = { ...profilo(), ...p }; scrivi() }
 
 // ── i tasti rapidi: le ultime scelte, la più recente per prima (le righe scritte, come «roulette 50 rosso») ──
 export const MAX_RAPIDI = 8

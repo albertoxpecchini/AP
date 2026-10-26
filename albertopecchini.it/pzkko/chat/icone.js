@@ -1,7 +1,9 @@
-// Le icone della chat col bot (chat.js): niente emoji di sistema, solo le nostre, disegnate da gpt-image-2 su Replicate
-// (tools/pzkko/fogli.js, i fogli «chat-*») e scontornate in art/chat-<foglio>/<nome>.webp. Nel testo del bot si scrive
-// «:canna:» e diventa <img class="emo">. Questo elenco è l'unica lista dei pezzi: fogli.js lo importa per sapere cosa
-// disegnare in ogni cella, così un'icona nuova si aggiunge qui e basta (poi `node tools/pzkko/immagini.mjs genera chat-…`).
+// Le icone della chat col bot (chat.js) e del cercapersone: niente emoji di sistema, solo le nostre, in art/chat-<foglio>/<nome>.webp.
+// Dal 26.10 TUTTE a pixel, di retro-diffusion/rd-plus su Replicate, col bordo bianco dell'adesivo e pochi dettagli (Alberto:
+// «tieni il modello per sempre»): tools/pzkko/pixel.mjs, una predizione per icona (prima erano fogli di gpt-image-2, di cui
+// restano le descrizioni in tools/pzkko/fogli-chat.js, che pixel.mjs usa come prompt). Nel testo del bot si scrive «:canna:»
+// e diventa <img class="emo">. Questo elenco è l'unica lista dei pezzi: un'icona nuova si aggiunge qui e in pixel.mjs (o
+// nelle descrizioni di fogli-chat.js), poi `node tools/pzkko/pixel.mjs <nome>`.
 
 export const FOGLI_CHAT = {
   // il bot: la chiocciola della banca $pzk (quella delle banconote) con gli occhiali da sole, in otto umori
@@ -28,14 +30,24 @@ export const FOGLI_CHAT = {
   'chat-pzk': ['luckypzkko', 'gomma', 'tombino', 'lucchettone', 'citofono', 'pzkkonet', 'portachiavi', 'petizione', 'neon', 'portafoglio', 'pager', 'peluche'],
   // le app del cercapersone grande (telefono/): piastrelle adesivo intere, e i tre tasti della barra del cellulare
   'chat-app': ['app-chat', 'app-shop', 'app-sfide', 'app-quiz', 'app-quest', 'app-giocatori', 'app-zaino', 'app-foto', 'app-banca', 'app-home', 'app-indietro', 'app-chiudi'],
-  // la piastrella di virtual (23.10 sera): per ora disegnata a mano in SVG → webp (art/chat-app2/app-virtual.webp), da rifare
-  // con gpt-image-2 come le altre (il prompt è nel foglio chat-app2 di tools/pzkko/fogli-chat.js)
+  // la piastrella di virtual (23.10 sera; dal 26.10 a pixel come le altre: tools/pzkko/virtual/icona.mjs, il disegno a
+  // mano di prima, non va più lanciato)
   'chat-app2': ['app-virtual'],
-  // l'app Miniera (23.10): questa NON è di Replicate, è disegnata in codice a pixel come tutta la miniera
-  // (tools/pzkko/miniera-icona.mjs la scrive in art/chat-miniera/; fogli-chat.js non ha un prompt per lei e non la rifà)
+  // le piastrelle delle app nuove (26.10): il profilo, l'account e le app veloci (conversioni, calcolatrice da geometra,
+  // il compilatore C, la cucina del Mincio). Queste e gli avatar NON sono di gpt-image-2: sono a pixel, di
+  // retro-diffusion/rd-plus, una per una (tools/pzkko/pixel.mjs, che ha i prompt; fogli-chat.js non le rifà)
+  'chat-app3': ['app-profilo', 'app-account', 'app-conversioni', 'app-calcolatrice', 'app-compilatore', 'app-cucina', 'app-rapina', 'app-lavatrice', 'app-decifratore'],
+  // la roba degli uffici (26.10): quello che passa sul nastro dello spazzino (testi.js, UFFICIO)
+  'chat-ufficio': ['cartaccia', 'lattina-vuota', 'graffette', 'tazza', 'mouse', 'cuffie', 'orologio', 'chiavetta', 'wallet-pzk'],
+  // la cucina del Mincio (26.10, telefono/app/cucina.js): gli ingredienti, gli attrezzi e i piatti che non c'erano
+  'chat-cucina': ['farina', 'uova', 'burro', 'mandorle', 'riso', 'salamella', 'amaretti', 'parmigiano', 'prezzemolo', 'coltello', 'mattarello', 'mestolo', 'pentola', 'forno', 'risotto', 'luccio-salsa'],
+  // gli avatar del profilo (26.10): i personaggi fra cui scegliere la propria faccia (telefono/app/profilo.js)
+  'chat-avatar': ['av-nutria', 'av-carpa', 'av-virgilio', 'av-rana', 'av-piccione', 'av-zanzara', 'av-zucca', 'av-gatto', 'av-gonzaga', 'av-tortello', 'av-pager', 'av-nonna'],
+  // l'app Miniera (23.10; dal 26.10 di rd-plus come le altre: tools/pzkko/miniera-icona.mjs, il disegno in codice di
+  // prima, non va più lanciato)
   'chat-miniera': ['app-miniera'],
   // i mestieri
-  'chat-mestieri': ['rider', 'cameriere', 'barista', 'bidello', 'salumiere', 'tatuatore', 'streamer', 'sviluppatore', 'prof', 'influencer', 'avvocato', 'sindaco'],
+  'chat-mestieri': ['rider', 'cameriere', 'barista', 'bidello', 'salumiere', 'tatuatore', 'streamer', 'sviluppatore', 'prof', 'influencer', 'avvocato', 'sindaco', 'imbianchino', 'pizzaiolo', 'meccanico', 'bagnino', 'spazzino', 'corriere', 'biscazziere', 'contrabbandiere'],
 }
 
 /** nome → foglio (cartella in art/). */

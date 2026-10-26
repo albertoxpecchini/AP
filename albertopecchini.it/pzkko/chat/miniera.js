@@ -199,7 +199,7 @@ export function incassa() {
   s.acc = mat - n
   s.dal = Date.now()
   salva(s)
-  pzk.regola(GIOCO, 0, n)
+  pzk.regola(GIOCO, 0, n, 'conio') // (26.10) i $pzk minati sono nuovi: conio
   zaino.conta('minati', n)
   zaino.conta('guadagnati', n)
   return { ok: true, n }

@@ -4,13 +4,13 @@
 // animazioni), «vendi» (anche quello in chat, che fa i conti col bonus della vendita), «compra ancora» (lo shop).
 
 import * as zaino from '../../chat/zaino.js'
-import { PER_ID, PESCI, ANIMALI, REPERTI, nomeDi } from '../../chat/testi.js'
+import { PER_ID, PESCI, ANIMALI, REPERTI, UFFICIO, nomeDi } from '../../chat/testi.js'
 import { testoBonus } from '../../chat/oggetti.js'
 import { icona } from '../../chat/icone.js'
 import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
-const VENDIBILI = new Set([...PESCI, ...ANIMALI, ...REPERTI].map((x) => x.id))
+const VENDIBILI = new Set([...PESCI, ...ANIMALI, ...REPERTI, ...UFFICIO.filter((x) => x.vale > 0)].map((x) => x.id))
 const FILTRI = [['tutto', 'tutto'], ['usa', 'da usare'], ['tieni', 'da tenere'], ['attrezzo', 'attrezzi'], ['cassa', 'casse'], ['vendi', 'da vendere']]
 const tipoDi = (id) => (VENDIBILI.has(id) ? 'vendi' : PER_ID[id]?.tipo ?? 'tieni')
 const resto = (ms) => { const m = Math.ceil(ms / 60000); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min` }

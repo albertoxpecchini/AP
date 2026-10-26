@@ -13,11 +13,12 @@ import { fmt, fmtCorto, conto } from '../../games/pzk.js'
 import * as L from '../../chat/lumaca.mjs'
 import { daVedere, visto } from '../../chat/lumaca-avvisi.js'
 import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
+import { faccia as facciaDi, COLORI } from './profilo.js'
 
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const SCHEDE = [['classifiche', 'classifiche', 'trofeo'], ['notizie', 'notizie', 'sirena'], ['cerca', 'cerca', 'cuore'], ['io', 'io', 'bot']]
 const fa = (t) => { const s = Math.round((Date.now() - t) / 1000); return s < 60 ? 'adesso' : s < 3600 ? `${Math.floor(s / 60)} min fa` : s < 86400 ? `${Math.floor(s / 3600)} h fa` : `${Math.floor(s / 86400)} g fa` }
-const avatar = (g) => icona(g.mest && esiste(g.mest) ? g.mest : 'bot')
+const avatar = (g) => icona(facciaDi(g.av ?? g.pr?.av, g.mest)) // la faccia scelta nel profilo (telefono/app/profilo.js), o il mestiere
 
 let host = null, ctx = null
 // la scheda, la classifica, la ricerca e il giocatore aperto si ricordano (telefono/ricordi.js), anche riaprendo la pagina
@@ -139,13 +140,14 @@ function schedaHtml(p, vicini = null) {
   const s = p.s ?? {}, pos = p.posizioni ?? {}
   const pct = Math.max(0, Math.min(100, Math.round((100 * (p.xp - 60 * (p.liv - 1) ** 2)) / Math.max(1, p.xpProssimo - 60 * (p.liv - 1) ** 2))))
   const mio = conto()?.ind === p.ind
-  return `<section class="t-gi-eroe">
+  return `<section class="t-gi-eroe"${COLORI[p.pr?.col] ? ` style="--pf:${COLORI[p.pr.col]}"` : ''}>
       <div class="t-gi-av">${avatar(p)}</div>
-      <h3>${esc(p.nome)}</h3><p class="t-gi-tit">${esc(p.titolo)}${p.mest ? ` · ${esc(nomeDi(p.mest))}` : ''}</p>
+      <h3>${esc(p.nome)}</h3><p class="t-gi-tit">${esc(p.titolo)}${p.mest ? ` · ${esc(nomeDi(p.mest))}` : ''}</p>${p.pr?.mot ? `<q class="t-gi-mot">${esc(p.pr.mot)}</q>` : ''}
       <div class="t-gi-liv"><b>livello ${p.liv}</b><div class="t-xp"><i style="width:${pct}%"></i></div><small>${p.xp} xp</small></div>
+      ${p.gal ? `<p class="t-gi-galera">⚠ in galera fino alle ${new Date(p.gal).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</p>` : ''}
       <p class="t-gi-ind">${p.ind} · in banca da ${fa(p.creato).replace(' fa', '')}${p.ult ? ` · visto ${fa(p.ult)}` : ''}</p>
     </section>
-    <div class="t-gi-numeri">${[['$pzk', `<span class="pzk">${fmtCorto(p.pzk)}</span>`], ['pescati', s.pescati], ['cacciati', s.cacciati], ['scavati', s.scavati], ['quiz', `${s.quizGiusti ?? 0}/${s.quizTotali ?? 0}`], ['sfide', s.sfideFatte], ['quest', s.missioniFatte], ['morti', s.morti], ['serie', `${p.serie} g`]].map(([n, v]) => `<div><b>${typeof v === 'number' ? fmtCorto(v) : v ?? 0}</b><small>${n}</small></div>`).join('')}</div>
+    <div class="t-gi-numeri">${[['$pzk', `<span class="pzk">${fmtCorto(p.pzk)}</span>`], ['pescati', s.pescati], ['cacciati', s.cacciati], ['scavati', s.scavati], ['quiz', `${s.quizGiusti ?? 0}/${s.quizTotali ?? 0}`], ['sfide', s.sfideFatte], ['quest', s.missioniFatte], ['morti', s.morti], ...(p.sp ? [['sporchi', `<span class="sporco">${fmtCorto(p.sp)}</span>`]] : []), ['giochi', `${s.giri ?? 0} mani`], ['serie', `${p.serie} g`]].map(([n, v]) => `<div><b>${typeof v === 'number' ? fmtCorto(v) : v ?? 0}</b><small>${n}</small></div>`).join('')}</div>
     ${Object.keys(pos).length ? `<h4 class="t-sh-sez">in classifica</h4><div class="t-gi-pos">${Object.entries(pos).filter(([m]) => db.METRICHE[m]).sort((a, b) => a[1].pos - b[1].pos).slice(0, 8).map(([m, x]) => `<button type="button" data-metrica="${m}">${icona(db.METRICHE[m][2])}<b>${x.pos}°</b><small>${db.METRICHE[m][0]}</small></button>`).join('')}</div>` : ''}
     ${p.rari?.length ? `<h4 class="t-sh-sez">leggendari presi</h4><div class="t-gi-rari">${p.rari.map((r) => icona(r)).join('')}</div>` : ''}
     ${vicini ? `<h4 class="t-sh-sez">i tuoi rivali (esperienza)</h4><div class="t-gi-rivali">${vicini.su ? `<button type="button" data-ind="${vicini.su.ind}"><small>da superare</small>${avatar(vicini.su)}<b>${esc(vicini.su.nome)}</b><span>${vicini.su.pos}° · ancora ${fmt(vicini.su.valore - vicini.io)} xp</span></button>` : `<div class="t-gi-primo">${icona('trofeo')}<b>sei il primo</b></div>`}${vicini.giu ? `<button type="button" data-ind="${vicini.giu.ind}"><small>ti insegue</small>${avatar(vicini.giu)}<b>${esc(vicini.giu.nome)}</b><span>${vicini.giu.pos}° · ${fmt(vicini.io - vicini.giu.valore)} xp dietro</span></button>` : ''}</div>` : ''}
@@ -169,7 +171,7 @@ async function io() {
   const corpoEl = () => host.querySelector('[data-io]')
   const banca = st.ok ? `<h4 class="t-sh-sez">la banca in numeri</h4><div class="t-gi-numeri">${[['giocatori', st.stats.giocatori], ['attivi oggi', st.stats.attivi24h], ['in settimana', st.stats.attivi7g], ['$pzk in giro', `<span class="pzk">${fmtCorto(st.stats.pzk)}</span>`], ['livello medio', st.stats.livelloMedio], ['pescati', st.stats.pescati], ['quiz giusti', st.stats.quizGiusti], ['sfide', st.stats.sfideFatte], ['quest', st.stats.missioniFatte]].map(([n, v]) => `<div><b>${v}</b><small>${n}</small></div>`).join('')}</div>` : ''
   if (!d.ok) {
-    corpoEl().innerHTML = `<div class="t-vuoto">${icona('lucchetto')}<p>${conto() ? esc(d.errore ?? 'il database adesso non risponde.') : 'per avere un profilo nel database serve un conto: entra nel wallet (nome e PIN, un minuto).'}</p>${conto() ? '' : '<button class="c-b" type="button" data-wallet>apri il wallet</button>'}</div>${banca}`
+    corpoEl().innerHTML = `<div class="t-vuoto">${icona('lucchetto')}<p>${conto() ? esc(d.errore ?? 'il database adesso non risponde.') : 'per avere un profilo nel database serve un conto: crealo nell’app account (nome e PIN, un minuto).'}</p>${conto() ? '' : '<button class="c-b" type="button" data-wallet>crea il conto</button>'}</div>${banca}`
     return
   }
   corpoEl().innerHTML = schedaHtml(d.profilo, d.vicini) + banca
@@ -189,7 +191,7 @@ function clic(e) {
   if (g) { const nuovo = g.dataset.ind !== S.ind; S = { ...S, ind: g.dataset.ind }; disegna(); if (nuovo) dallAlto(host); return }
   const md = e.target.closest('[data-manda]')
   if (md) return ctx.vai('chat', { comando: `manda ${md.dataset.manda} 10` })
-  if (e.target.closest('[data-wallet]')) return ctx.vai('banca')
+  if (e.target.closest('[data-wallet]')) return ctx.vai('account')
   if (e.target.closest('[data-lu-visto]')) { visto(); return disegna() } // «ho capito»: l'avviso urgente se ne va
 }
 
