@@ -10,7 +10,8 @@
 // - ora e sera: l'ora di Mantova e la sua velocità, il buio, l'insegna, i lampioni, lo sfarfallio;
 // - meteo: quello vero o uno scelto, quanto, il bagnato e la neve per terra, un lampo;
 // - strada: le auto (quando, che fari, il neon sotto, una ferma), le bestie, le gocce;
-// - suono: i suoni della strada (suono/, window.pzkkoSuono), acceso, il volume, ognuno da provare;
+// - suono: i suoni della strada (suono/, window.pzkkoSuono), acceso, il volume della strada e quello della musica,
+//   ognuno da provare;
 // - prove: il muro in trasparenza, rifare l'arrivo, il glTF, i numeri della scheda (il muro senza 3D, fino al 23.10 qui,
 //   è l'interruttore del 3D in cima a grafica).
 // In fondo come va la scena (fotogrammi al secondo, qualità, ora, buio, luci, meteo) e «rimetti tutto». Non è modale: la
@@ -476,8 +477,8 @@ function paginaStrada(S) {
   return fuori
 }
 
-// i suoni della strada (suono/): acceso o no (si ricorda, come il nastro in basso a sinistra), il volume, e ogni suono
-// che capita da solo, adesso
+// i suoni della strada (suono/): acceso o no (si ricorda, come il nastro in basso a sinistra), il volume della strada e
+// quello della musica (suono/musica.js; dal 26.10 al 20% e al 70%), e ogni suono che capita da solo, adesso
 function paginaSuono() {
   const U = window.pzkkoSuono
   if (!U) return [titolo('il suono', 25), nota('i suoni della strada non ci sono ancora: partono al primo tocco o tasto sulla pagina.')]
@@ -485,7 +486,8 @@ function paginaSuono() {
   return [
     titolo('il suono', 25),
     caselle('suono', si, () => U.acceso, (v) => U.accendi(v, true), { vivo: true }),
-    cursore('volume', { min: 0, max: 1, leggi: () => U.volume, scrivi: (v) => { U.volume = v }, testo: (v) => `${Math.round(v * 100)}%`, tacche: [[0, 'zitto'], [1, 'forte']] }, 25),
+    cursore('la strada', { min: 0, max: 1, leggi: () => U.volume, scrivi: (v) => { U.volume = v }, testo: (v) => `${Math.round(v * 100)}%`, tacche: [[0, 'zitta'], [1, 'forte']] }, 25),
+    cursore('la musica', { min: 0, max: 1, leggi: () => U.musica ?? 0.7, scrivi: (v) => { U.musica = v }, testo: (v) => `${Math.round(v * 100)}%`, tacche: [[0, 'zitta'], [1, 'forte']] }, 25),
     nota('tutto sintetizzato. da provare:'),
     prova([['le campane', 'campane'], ['mezzogiorno', 'mezzogiorno'], ['un tuono', 'tuono'], ['bussa', 'bussa']]),
     prova([['campanello', 'campanello'], ['vetro', 'vetro'], ['maniglione', 'maniglione'], ['lattina', 'lattina'], ['pozza', 'pozza'], ['chiusino', 'chiusino'], ['cartello', 'cartello'], ['asse delle zucche', 'legno'], ['carta', 'carta'], ['la biro', 'penna']]),
@@ -524,7 +526,7 @@ function rimetti() {
   else { P.orologio.fermo = false; P.orologio.veloce = 1; P.orologio.imposta(Date.now()) }
   Object.assign(P.regola, { ogni: 55, fari: null, neon: null, sfarfallio: true })
   P.fermaAuto(null)
-  if (window.pzkkoSuono) window.pzkkoSuono.volume = 0.7
+  if (window.pzkkoSuono) Object.assign(window.pzkkoSuono, { volume: 0.2, musica: 0.7 })
   Object.assign(R, structuredClone(PREDEFINITI), { meteo: tempo() })
   document.documentElement.classList.remove('scena-allinea')
   P.aggiorna()

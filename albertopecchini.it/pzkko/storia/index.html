@@ -1331,7 +1331,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
   // vero, la goccia, le mosche, il PC del negozio. Il browser lascia partire l'audio solo dopo un gesto: partono al primo
   // tocco o tasto, sfumando (se chi guarda non li ha spenti: pzkko-suono = no nel browser); il nastro in basso a sinistra
   // li spegne e li riaccende. Il motore (suono/suono.js) si scarica solo allora, e riceve il contesto già sbloccato qui,
-  // dentro il gesto (Safari lo vuole lì). window.pzkkoSuono: acceso, volume, accendi(sì, ricorda) e prova(nome) per la
+  // dentro il gesto (Safari lo vuole lì). window.pzkkoSuono: acceso, volume (la strada), musica, accendi(sì, ricorda) e prova(nome) per la
   // regia, evento(nome, dati) per la pagina e la scena, che aspetta in coda finché il motore non c'è. Gli strumenti che
   // fotografano la pagina (navigator.webdriver) il nastro non lo vedono, se non con ?suono
   {
@@ -1340,7 +1340,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
     let vuole = true, ctx = null, motore = null, spegni = 0
     try { vuole = localStorage.getItem('pzkko-suono') !== 'no' } catch {}
     const S = window.pzkkoSuono = {
-      acceso: false, volume: 0.7, coda,
+      acceso: false, volume: 0.2, musica: 0.7, coda, // (26.10: la strada al 20%, la musica di suono/musica.js al 70%)
       evento: (nome, dati = {}) => { if (coda.length < 24) coda.push([nome, dati, performance.now()]) },
       accendi(si = true, ricorda = false) {
         if (ricorda) { vuole = si; try { localStorage.setItem('pzkko-suono', si ? 'si' : 'no') } catch {} }

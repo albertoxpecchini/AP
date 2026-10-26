@@ -6,6 +6,9 @@
 //   node tools/pzkko/suono/ascolta.mjs strumenti [nome…]   ogni strumento da solo, in un OfflineAudioContext (veloce)
 //   node tools/pzkko/suono/ascolta.mjs strada [scena…]     la home vera, col 3D, registrata dal vivo: giorno, notte,
 //                                                           temporale, tramonto, zanzara, negozio (20–30 s l'una)
+//   node tools/pzkko/suono/ascolta.mjs musica [n…]          i brani della musica (suono/musica.js), interi, al volume
+//                                                           solito (70%), in un OfflineAudioContext; n da 1. Con
+//                                                           --tracce niente file: il peso di ogni voce da sola, in dB
 //
 // dalla cartella albertopecchini.it. I livelli sono in dBFS: RMS secondo per secondo e il picco (sopra −1 il suono
 // rischia di gracchiare). Il browser come per gli altri strumenti di pzkko (../browser.mjs).
@@ -180,6 +183,45 @@ if (modo === 'strumenti') {
       return btoa(s)
     }, sec, ricetta, SR)
     await scrivi(`s-${nome}`, leggi(b64))
+  }
+}
+
+// ── la musica: ogni brano con tutti i suoi giri e la coda ──
+if (modo === 'musica') {
+  const page = await aperto.newPage()
+  page.on('pageerror', (e) => console.log('[pageerror]', e.message))
+  page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warn') console.log(`[browser ${m.type()}]`, m.text()) })
+  await page.goto(base + '/__prova.html')
+  const brani = await page.evaluate(async () => (await import('/suono/musica.js')).BRANI.map((b) => [b.nome, b.tracce.map((t) => t[0])]))
+  const rendi = (i, solo) => page.evaluate(async (i, solo, SR) => {
+    const { avvia, durata } = await import('/suono/musica.js')
+    const sec = durata(i) + 5, c = new OfflineAudioContext(2, Math.ceil(sec * SR), SR), m = avvia(c, { brano: i, vivo: false, solo })
+    m.volume(0.7, 0.001); m.programma(sec)
+    const b = await c.startRendering()
+    let q = 0
+    for (let k = 0; k < 2; k++) { const d = b.getChannelData(k); for (let j = 0; j < d.length; j++) q += d[j] * d[j] }
+    return 10 * Math.log10(q / (b.length * 2) + 1e-12)
+  }, i, solo, SR)
+  for (const [i, [nome, tracce]] of brani.entries()) {
+    if (scelti.length && !scelti.includes(String(i + 1))) continue
+    // --tracce: quanto pesa ogni voce da sola (RMS su tutto il brano)
+    if (process.argv.includes('--tracce')) {
+      const pesi = []
+      for (const [k, s] of tracce.entries()) pesi.push(`${s} ${(await rendi(i, k)).toFixed(1)}`)
+      console.log(`${nome.padEnd(18)} ${pesi.join('  ')}`)
+      continue
+    }
+    const b64 = await page.evaluate(async (i, SR) => {
+      const { avvia, durata } = await import('/suono/musica.js')
+      const sec = durata(i) + 5, c = new OfflineAudioContext(2, Math.ceil(sec * SR), SR), m = avvia(c, { brano: i, vivo: false })
+      m.volume(0.7, 0.001); m.programma(sec)
+      const b = await c.startRendering(), f = new Float32Array(b.length * 2)
+      f.set(b.getChannelData(0)); f.set(b.getChannelData(1), b.length)
+      let s = ''; const u8 = new Uint8Array(f.buffer)
+      for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000))
+      return btoa(s)
+    }, i, SR)
+    await scrivi(`m${i + 1}-${nome.replace(/\W+/g, '-')}`, leggi(b64))
   }
 }
 
