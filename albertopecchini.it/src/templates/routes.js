@@ -19,8 +19,8 @@ import { assistenzaPage, assistenzaContattiPage, assistenzaNotFoundPage } from '
 import { assistenza, BCP } from '../data/assistenza.js'
 import { informaticaPage, informaticaLd } from './pages/informatica.js'
 import { informatica } from '../data/informatica.js'
-import { unimore, materiaPath, esercizioPath } from '../data/unimore.js'
-import { unimorePage, materiaPage, esercizioPage } from './pages/unimore.js'
+import { unimore, materiaPath, bloccoPath, esercizioPath } from '../data/unimore.js'
+import { unimorePage, materiaPage, bloccoPage, esercizioPage } from './pages/unimore.js'
 import { tempoLiberoTodo } from '../data/tempo-libero.js'
 
 const websiteLd = () => ({
@@ -222,11 +222,14 @@ export const routes = [
     standalone: true,
     sitemap: false,
   },
-  // Unimore: materie ed esercizi, ancora senza contenuti → fuori da motori e sitemap.
+  // Unimore: materie, blocchi ed esercizi, ancora senza contenuti → fuori da motori e sitemap.
   { path: unimore.path, title: unimore.title, description: unimore.description, render: unimorePage, noindex: true, sitemap: false, hideCta: true },
   ...unimore.materie.flatMap((m) => [
     { path: materiaPath(m), title: `${m.title} — Unimore`, description: m.lead, render: () => materiaPage(m), noindex: true, sitemap: false, hideCta: true },
-    ...m.esercizi.map((e) => ({ path: esercizioPath(m, e), title: `${e.title} — ${m.title}`, description: m.lead, render: () => esercizioPage(m, e), noindex: true, sitemap: false, hideCta: true })),
+    ...m.blocchi.flatMap((b) => [
+      { path: bloccoPath(m, b), title: `${b.title} — ${m.title}`, description: b.lead, render: () => bloccoPage(m, b), noindex: true, sitemap: false, hideCta: true },
+      ...b.esercizi.map((e) => ({ path: esercizioPath(m, b, e), title: `${e.title} · ${b.title} — ${m.title}`, description: b.lead, render: () => esercizioPage(m, b, e), noindex: true, sitemap: false, hideCta: true })),
+    ]),
   ]),
   { path: '/privacy/', priority: 0.2, title: 'Informativa sulla privacy', description: 'Come vengono trattati i dati personali di chi visita il sito o invia una richiesta.', render: privacyPage, hideCta: true },
   { path: '/cookie/', priority: 0.2, title: 'Cookie policy', description: 'Il sito non usa cookie di profilazione: ecco cosa viene salvato nel browser e perché.', render: cookiePage, hideCta: true },
