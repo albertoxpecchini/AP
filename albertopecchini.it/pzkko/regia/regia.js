@@ -479,6 +479,8 @@ function paginaStrada(S) {
 
 // i suoni della strada (suono/): acceso o no (si ricorda, come il nastro in basso a sinistra), il volume della strada e
 // quello della musica (suono/musica.js; dal 26.10 al 20% e al 30%), e ogni suono che capita da solo, adesso
+// la musica suona nella pagina che fa da cornice (suono/cornice.js): se questa è nel suo riquadro, il volume è là
+const musicaDi = () => { try { return window.parent !== window ? window.parent.pzkkoSuono ?? null : null } catch { return null } }
 function paginaSuono() {
   const U = window.pzkkoSuono
   if (!U) return [titolo('il suono', 25), nota('i suoni della strada non ci sono ancora: partono al primo tocco o tasto sulla pagina.')]
@@ -487,7 +489,7 @@ function paginaSuono() {
     titolo('il suono', 25),
     caselle('suono', si, () => U.acceso, (v) => U.accendi(v, true), { vivo: true }),
     cursore('la strada', { min: 0, max: 1, leggi: () => U.volume, scrivi: (v) => { U.volume = v }, testo: (v) => `${Math.round(v * 100)}%`, tacche: [[0, 'zitta'], [1, 'forte']] }, 25),
-    cursore('la musica', { min: 0, max: 1, leggi: () => U.musica ?? 0.3, scrivi: (v) => { U.musica = v }, testo: (v) => `${Math.round(v * 100)}%`, tacche: [[0, 'zitta'], [1, 'forte']] }, 25),
+    cursore('la musica', { min: 0, max: 1, leggi: () => (musicaDi() ?? U).musica ?? 0.3, scrivi: (v) => { (musicaDi() ?? U).musica = v }, testo: (v) => `${Math.round(v * 100)}%`, tacche: [[0, 'zitta'], [1, 'forte']] }, 25),
     nota('tutto sintetizzato. da provare:'),
     prova([['le campane', 'campane'], ['mezzogiorno', 'mezzogiorno'], ['un tuono', 'tuono'], ['bussa', 'bussa']]),
     prova([['campanello', 'campanello'], ['vetro', 'vetro'], ['maniglione', 'maniglione'], ['lattina', 'lattina'], ['pozza', 'pozza'], ['chiusino', 'chiusino'], ['cartello', 'cartello'], ['asse delle zucche', 'legno'], ['carta', 'carta'], ['la biro', 'penna']]),
@@ -527,6 +529,7 @@ function rimetti() {
   Object.assign(P.regola, { ogni: 55, fari: null, neon: null, sfarfallio: true })
   P.fermaAuto(null)
   if (window.pzkkoSuono) Object.assign(window.pzkkoSuono, { volume: 0.2, musica: 0.3 })
+  if (musicaDi()) musicaDi().musica = 0.3
   Object.assign(R, structuredClone(PREDEFINITI), { meteo: tempo() })
   document.documentElement.classList.remove('scena-allinea')
   P.aggiorna()
