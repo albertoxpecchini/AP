@@ -23,6 +23,8 @@ export async function archivio(path, vuoto) {
   if (opz && process.env.PZKKO_STORE !== 'memory') {
     const blob = await import('@vercel/blob')
     return {
+      /** Solo l'ETag, senza scaricare il file (null se non c'è): serve a chi guarda se qualcosa è cambiato (api/live.mjs). */
+      async etag() { const m = await blob.head(path, opz).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e }); return m?.etag ?? null },
       async read() {
         const meta = await blob.head(path, opz).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e })
         if (!meta) return { db: vuoto(), etag: null }
@@ -44,6 +46,7 @@ export async function archivio(path, vuoto) {
   if (process.env.PZKKO_STORE === 'memory' || !process.env.VERCEL) {
     const m = memorie.get(path) ?? memorie.set(path, { db: null, etag: 0 }).get(path)
     return {
+      async etag() { return String(m.etag) },
       async read() { return { db: structuredClone(m.db ?? vuoto()), etag: String(m.etag) } },
       async write(db, etag) { if (etag !== String(m.etag)) return false; m.db = structuredClone(db); m.etag++; return true },
     }

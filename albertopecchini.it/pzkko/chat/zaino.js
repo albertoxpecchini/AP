@@ -49,7 +49,9 @@ function scrivi() {
   if (pzk.conto()) { copia(); salvaPoi() } else scriviJSON(sessionStorage, CHIAVE_SESSIONE, Z)
   for (const f of ascolti) f(Z)
 }
-function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 1500) }
+// (quasi subito: 250 ms, perché dieci cambi di fila siano una richiesta sola; col canale aperto, games/live.js, gli altri
+// dispositivi lo vedono nel giro di qualche secondo)
+function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 250) }
 // (il primo salvataggio aspetta lo zaino del server: se no un dispositivo rimasto indietro scrive sopra quello giusto)
 let primo = Promise.resolve()
 async function salva(keepalive = false) {
@@ -99,6 +101,15 @@ addEventListener('pagehide', () => { clearTimeout(attesa); salva(true) })
 setInterval(() => { if (!document.hidden && !document.documentElement.classList.contains('in-cornice')) sincronizza() }, 40_000)
 // la pagina di fuori si risveglia: quello fatto dentro il riquadro è già sul server
 document.addEventListener('pzkko-altrove', (e) => { if (!e.detail) sincronizza() })
+// il server avvisa (games/live.js) che lo zaino di questo conto è cambiato: se è più nuovo di quello visto, lo si prende
+// (il canale si carica solo col conto, e non durante l'importazione: games/live.js apre subito la connessione)
+let canale = false
+function ascoltaCanale() {
+  if (canale || !pzk.token()) return
+  canale = true
+  import('../games/live.js').then((l) => l.su('zaino', (a) => { if (a.t > visto && !(sporco && inCorso)) sincronizza() })).catch(() => { canale = false })
+}
+if (typeof requestIdleCallback === 'function') requestIdleCallback(ascoltaCanale, { timeout: 3000 }); else setTimeout(ascoltaCanale, 1500)
 // si entra o si esce dal wallet: lo zaino cambia padrone
 pzk.osserva(() => {
   const c = pzk.conto()?.ind ?? null
@@ -106,7 +117,7 @@ pzk.osserva(() => {
   chi = c
   Z = carica()
   for (const f of ascolti) f(Z)
-  if (c) primo = sincronizza()
+  if (c) { primo = sincronizza(); ascoltaCanale() }
 })
 
 /** Lo zaino com'è (da non modificare a mano: usa le funzioni qui sotto). */
