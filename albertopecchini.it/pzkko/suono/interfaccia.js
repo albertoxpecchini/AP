@@ -12,10 +12,14 @@
 //   volantini no: li suona già la strada.
 // - La musica (26.10, musica.js: «voglio le musichette»): sei brani che si alternano, coi suoni accesi, in ogni pagina, al
 //   30% (window.pzkkoSuono.musica, che la regia cambia); le sigle la abbassano un momento, e cambiando pagina riprende
-//   da dov'era (qui sotto, chi la guarda).
+//   da dov'era (qui sotto, chi la guarda). Mentre suona, i link del sito aprono le pagine nella cornice (cornice.js): la
+//   pagina in cui si è entrati resta, e la musica non si ferma; dentro la cornice le pagine non ne fanno partire un'altra.
 // Nella home (e nella storia e nella 404) c'è il motore della strada: si usa il suo contesto (window.pzkkoSuono.ctx) e si
 // tace se il nastro «suono» è spento. Nelle pagine senza la strada (gadget, oggetti, traguardi, info, le prove) un contesto
 // suo, che nasce al primo gesto, e si tace se nel browser i suoni sono stati spenti (pzkko-suono = no).
+
+import { avviaCornice, fuori, vai } from './cornice.js'
+export { vai }
 
 const AC = window.AudioContext ?? window.webkitAudioContext
 let proprio = null, out = null, outCtx = null, bus = null
@@ -114,7 +118,7 @@ export function musichetta(nome, gesto = false) {
   if (sigla?.context === c) { const s = sigla; s.gain.setTargetAtTime(0, c.currentTime, 0.03); setTimeout(() => s.disconnect(), 400) }
   sigla = bus = c.createGain()
   sigla.connect(out)
-  musica?.abbassa(1.4)
+  musica?.abbassa(1.4); fuori?.abbassa(1.4)
   try { m(c, c.currentTime + 0.02) } finally { bus = out }
 }
 
@@ -123,8 +127,9 @@ export function musichetta(nome, gesto = false) {
 let musica = null, scarica = null, alto = -1
 const ricordata = () => { try { return JSON.parse(sessionStorage.getItem('pzkko-musica')) ?? {} } catch { return {} } }
 function guardaMusica() {
+  if (fuori) return // (nella cornice di un'altra pagina: la musica è la sua)
   const P = window.pzkkoSuono
-  const c = document.hidden ? null : P ? (P.acceso ? P.ctx : null) : spentoQui() ? null : proprio
+  const c = document.hidden || spentoQui() ? null : P ? (P.acceso ? P.ctx : null) : proprio
   const v = c?.state === 'running' ? P?.musica ?? 0.3 : 0
   if (c && musica?.c !== c && v) {
     scarica ??= import('./musica.js').then((m) => { musica?.ferma(); musica = m.avvia(c, ricordata()); alto = -1 }).catch(() => {}).finally(() => { scarica = null })
@@ -192,6 +197,7 @@ if (!window.pzkkoTasti) {
   // la musica: guardata un paio di volte al secondo. Nelle pagine senza la strada il contesto nasce al primo gesto (non
   // solo al primo tasto) e dorme a pagina nascosta; andando via, il brano e il punto restano per la pagina dopo
   setInterval(guardaMusica, 400)
+  avviaCornice({ suona: () => !!musica && alto > 0, abbassa: (s) => musica?.abbassa(s) })
   for (const g of ['pointerdown', 'keydown']) addEventListener(g, () => { if (!window.pzkkoSuono) contesto(true) }, { capture: true, passive: true })
   document.addEventListener('visibilitychange', () => { if (proprio) (document.hidden ? proprio.suspend() : proprio.resume()).catch(() => {}) })
   addEventListener('pagehide', () => { if (musica) try { sessionStorage.setItem('pzkko-musica', JSON.stringify(musica.dove())) } catch {} })

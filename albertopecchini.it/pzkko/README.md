@@ -1716,7 +1716,14 @@ mezzo), poi 7 secondi di strada sola e il prossimo; il primo è a caso. Le note 
 timer le programma 1,5 s avanti. Chi decide quando è `interfaccia.js`: suona coi suoni accesi e la pagina in vista,
 nella home sul contesto della strada (il nastro «suono» la spegne con lei), nelle altre pagine col contesto loro, al primo
 gesto; le sigle la abbassano un momento; andando via la pagina scrive il brano e il punto (`pzkko-musica` in
-`sessionStorage`) e quella dopo riprende da lì. I volumi stanno in `window.pzkkoSuono`: `volume` è la strada (0,2,
+`sessionStorage`) e quella dopo riprende da lì. **La cornice** (26.10, `suono/cornice.js`; «fai che la musica non si
+interrompa quando cambio pagina»): mentre la musica suona, i link del sito (e la barra, con `vai`) non lasciano la pagina:
+l'altra si apre in un riquadro grande quanto la finestra, sopra di lei, e la musica va avanti fuori. La pagina di fuori
+dorme (nascosta, la scena 3D ferma con l'evento `pzkko-altrove`, la strada zitta con `window.pzkkoSuono.altrove`);
+l'indirizzo e il titolo seguono quella dentro, avanti e indietro funzionano (il primo passo lo mette la cornice, gli altri
+sono del riquadro), il link verso la pagina di fuori la risveglia, quelli verso altri siti cambiano la finestra intera.
+Dentro, le pagine non fanno partire una musica loro e le sigle abbassano quella di fuori. Serve `X-Frame-Options:
+SAMEORIGIN` (`vercel.json`; prima era `DENY`). Senza musica i link fanno come sempre; ricaricando si carica la pagina vera. I volumi stanno in `window.pzkkoSuono`: `volume` è la strada (0,2,
 prima 0,7), `musica` la musica (0,3); i tasti e le sigle hanno il loro, fisso. `ascolta.mjs musica [n…]` registra i
 brani interi, `--tracce` dice quanto pesa ogni voce da sola (così si è bilanciato il mix).
 
