@@ -1723,7 +1723,7 @@ dorme (nascosta, la scena 3D ferma con l'evento `pzkko-altrove`, la strada zitta
 l'indirizzo e il titolo seguono quella dentro, avanti e indietro funzionano (il primo passo lo mette la cornice, gli altri
 sono del riquadro), il link verso la pagina di fuori la risveglia, quelli verso altri siti cambiano la finestra intera.
 Dentro, le pagine non fanno partire una musica loro e le sigle abbassano quella di fuori. Serve `X-Frame-Options:
-SAMEORIGIN` (`vercel.json`; prima era `DENY`). Senza musica i link fanno come sempre; ricaricando si carica la pagina vera. I volumi stanno in `window.pzkkoSuono`: `volume` è la strada (0,2,
+SAMEORIGIN` in `albertopecchini.it/vercel.json` (vale per i tre siti: il progetto pzkko ha la radice lì; prima era `DENY`). Senza musica i link fanno come sempre; ricaricando si carica la pagina vera. I volumi stanno in `window.pzkkoSuono`: `volume` è la strada (0,2,
 prima 0,7), `musica` la musica (0,3); i tasti e le sigle hanno il loro, fisso. `ascolta.mjs musica [n…]` registra i
 brani interi, `--tracce` dice quanto pesa ogni voce da sola (così si è bilanciato il mix).
 

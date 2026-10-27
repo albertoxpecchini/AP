@@ -7,7 +7,8 @@
 // Dentro, le pagine non suonano musica loro (interfaccia.js chiede a quella di fuori, `fuori`), i link verso un altro sito
 // cambiano la finestra intera e quello verso la pagina di fuori la risveglia. Senza musica (i suoni spenti, prima del
 // primo gesto) i link fanno come sempre. Ricaricando si carica la pagina vera, e la musica riprende da dov'era al primo
-// gesto. Va col permesso di farsi incorniciare dallo stesso sito (X-Frame-Options SAMEORIGIN in vercel.json).
+// gesto. Va col permesso di farsi incorniciare dallo stesso sito: X-Frame-Options SAMEORIGIN in albertopecchini.it/vercel.json,
+// che è quello che conta anche per pzkko.it (il progetto ha la cartella radice lì; pzkko/vercel.json non lo legge nessuno).
 
 const chiave = (u) => u.pathname.replace(/\/?$/, '/') + u.search
 const stessa = (u) => u.origin === location.origin
