@@ -237,7 +237,8 @@ function accogli(d, { tienipzk = false } = {}) {
 }
 // il saldo al server: un po' dopo l'ultimo cambio, e subito (keepalive) quando la pagina si nasconde
 let attesa = 0, sporco = false
-function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 1200) }
+// (quasi subito: 250 ms, perché le puntate di fila siano una richiesta sola; gli altri dispositivi lo sanno da games/live.js)
+function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 250) }
 async function salva(keepalive = false) {
   if (!W || !sporco) return
   sporco = false
@@ -247,6 +248,8 @@ async function salva(keepalive = false) {
   inCorso = null
   if (d.ok) accogli(d, { tienipzk: W?.conto.pzk !== mandato })
   else if (d.conto) accogli(d)
+  // (non andato: troppe richieste, rete, server che non risponde: il saldo di qui non si butta via, si riprova fra 8 secondi)
+  else if (W && /calma|rete|risponde|riprova/.test(d.errore ?? '')) { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 8000) }
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(attesa); salva(true) } })
 addEventListener('pagehide', () => { clearTimeout(attesa); salva(true) })

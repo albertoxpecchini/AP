@@ -189,7 +189,7 @@ const zainoValido = (z) => {
   for (const k of ['oggetti', 'attese', 'effetti', 'serie', 'stat']) if (z[k] && (typeof z[k] !== 'object' || Array.isArray(z[k]) || Object.keys(z[k]).length > 120)) return false
   return JSON.stringify(z).length <= MAX_ZAINO
 }
-const limiti = { crea: limite('wallet-crea', 3, GIORNO), entra: limite('wallet-entra', 8, 10 * MINUTO), tutte: limite('wallet-tutte', 300, 10 * MINUTO) }
+const limiti = { crea: limite('wallet-crea', 3, GIORNO), entra: limite('wallet-entra', 8, 10 * MINUTO), tutte: limite('wallet-tutte', 900, 10 * MINUTO) }
 
 // LE OPERAZIONI DELLA BANCA: passaggi che Alberto chiede e che fa il server, una volta sola ciascuno (segnati in
 // db.operazioni[id], col risultato: quelle non andate si ritentano), alla prima richiesta di ogni istanza della funzione. Per chi manda e per chi riceve sono soldi da

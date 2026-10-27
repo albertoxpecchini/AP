@@ -2170,6 +2170,24 @@ parola, cioè chi scrive avendo visto l'ultimo salvato (`visto`, il `t` dell'ult
 indietro non cancella niente). La prima volta una copia mai sincronizzata che è andata più avanti (più esperienza) vince
 su quella del server.
 
+**Il canale sempre aperto** (26.10, `api/live.mjs`, `games/live.js`; Alberto: «fai un server sempre connesso e che registra
+tutto subito»). Due pezzi, entrambi su Vercel: (1) **si salva quasi subito**: il saldo (`games/pzk.js`) e lo zaino
+(`chat/zaino.js`) partono 250 ms dopo l'ultimo cambio (prima 1,2 e 1,5 secondi: dieci puntate di fila restano una richiesta
+sola), un salvataggio non andato (429, rete, 5xx) si ritenta dopo 8 e 15 secondi, e alla chiusura della pagina parte subito
+(`keepalive`); il limite del wallet è salito da 300 a 900 richieste ogni 10 minuti. (2) **Chi ha un conto tiene aperta una
+richiesta a `/api/live/`** (POST col token, un avviso JSON per riga): il server dice, entro ~3 secondi, che lo zaino
+(`{ k: 'zaino', t }`) o il conto (`{ k: 'conto', pzk, es, fn }`) sono cambiati da un altro dispositivo, e il browser chiede i dati
+veri. Un livello preso sul pc arriva sul telefono aperto senza ricaricare. Vercel chiude una funzione dopo una cinquantina di
+secondi (`maxDuration` 60 in entrambi i `vercel.json`): il server manda `{ k: 'riconnetti' }` e il browser riapre da sé; il
+«ciao» all'apertura dice com'è adesso, così quello che è cambiato mentre si era scollegati si scopre lo stesso. Dentro, un
+**solo controllo comune a tutte le connessioni dell'istanza**: ogni 3 secondi l'ETag dei due file su Blob (`head`), e un
+file lo si scarica solo se è cambiato. Si ferma quando non c'è più nessuno. Aperto solo a pagina in vista, col conto, e non
+nella pagina che dorme sotto la cornice della musica. **Limiti**: il saldo si avvisa ma NON si sincronizza da solo (il saldo lo
+decide il browser che gioca, e il server lo accetta se plausibile: sincronizzare per una differenza farebbe sovrascrivere a chi
+sta fermo quello che ha appena giocato l'altro): si sincronizza solo se sono arrivati soldi da fuori (un invio, la banca).
+**Costo**: ogni controllo sono due richieste `head` a Blob ogni 3 secondi per istanza accesa, fino a che c'è qualcuno
+connesso: con più giocatori insieme è il consumo da guardare nella dashboard di Vercel.
+
 Il modulo si carica da solo appena la pagina è tranquilla e al clic; `#chat` apre direttamente la chat, l'evento
 `pzkko-chat` (con `detail.comando`) la apre scrivendo un comando. Gli strumenti che fotografano la pagina non vedono il tasto
 (`navigator.webdriver`), `?chat` lo fa vedere. **In locale**: `npm run dev:pzkko` e poi `http://localhost:5182/prova/chat/`

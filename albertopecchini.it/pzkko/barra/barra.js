@@ -94,3 +94,5 @@ function barra() {
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', barra)
 else barra()
+// il canale sempre aperto col server (games/live.js): solo chi è entrato nel conto, e quando il browser è tranquillo
+try { if (localStorage.getItem('pzkko-wallet')) (window.requestIdleCallback ?? setTimeout)(() => import('../games/live.js').catch(() => {}), { timeout: 3000 }) } catch {}
