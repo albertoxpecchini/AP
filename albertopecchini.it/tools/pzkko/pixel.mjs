@@ -131,7 +131,8 @@ const ICONE = {
   'bot-ricco': [OGG, poco('a rich cartoon snail seen from the side: on the left its green head with two eye stalks and a big grin, wearing gold sunglasses with dollar signs ON ITS FACE, a thick gold chain around its neck, a fan of green banknotes, a big brown spiral shell on its back')],
   // (26.10 sera) guardate una per una e trovate difettose (tagliate dentro il disegno, sdoppiate, senza il mestiere): prompt nuovi
   'bot-morto': [OGG, poco('a cartoon snail ghost: a pale white translucent snail with a brown shell, black sunglasses with white X marks on the lenses, a small golden halo floating above its head')],
-  telefono: [OGG, poco('one single smartphone seen straight from the front, a glowing blue screen with a small pink heart, only one phone, nothing behind it')],
+  // (27.10: lo schermo celeste enorme con un cuoricino non si riconosceva: corpo scuro, schermo con quattro app colorate)
+  telefono: [OGG, poco('one single modern black smartphone seen straight from the front, thin dark rounded body, a bright screen showing a grid of four small colorful square app icons and a small speaker slot on top, only one phone, drawn small in the middle of the image with lots of empty space around it'), undefined, { regolare: 3 }],
   volpe: [OGG, poco('an orange fox sitting, seen from the side, with a big fluffy tail with a white tip, the whole fox visible from the ears to the tail')],
   tappo: [OGG, poco('a red metal bottle crown cap with crimped zigzag edges, seen from above at an angle')],
   banconota: [OGG, poco('one single flat green banknote with a small snail drawn in the middle, a simple rectangle with all four corners visible')],
@@ -249,6 +250,31 @@ function piastrella(d, w, h, colore, L) {
   return o
 }
 
+/** Le sagome regolari (un telefono, un citofono, un cartello): i LATI si raddrizzano. Per ogni riga si guarda dove comincia e
+ *  dove finisce la figura, e il bordo di sinistra e di destra che hanno la maggior parte delle righe (la moda) diventa il lato
+ *  vero; quello che sporge oltre di al più k pixel (i tasti laterali, un filo, uno scalino) si taglia. Lo stesso per le colonne,
+ *  sopra e sotto. Si taglia soltanto: gli angoli arrotondati (che stanno DENTRO il lato) restano come sono, e il bordo bianco di
+ *  adesivo() segue una sagoma pulita, dello stesso spessore dappertutto. (Un'apertura morfologica non basta: una sporgenza alta
+ *  più del suo filtro ci si appoggia sopra e resta.) (27.10, Alberto: «non devono esserci bordi tagliati male… bordi omogenei
+ *  in figure regolari») */
+function regolare(d, w, h, k) {
+  const pieno = (x, y) => d[(y * w + x) * 4 + 3] > 128
+  const moda = (v) => { const c = new Map(); for (const x of v) c.set(x, (c.get(x) ?? 0) + 1); return [...c.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0]?.[0] }
+  const taglia = (x, y) => { d[(y * w + x) * 4 + 3] = 0 }
+  const sx = [], dx = [], su = [], giu = []
+  for (let y = 0; y < h; y++) { let a = -1, b = -1; for (let x = 0; x < w; x++) if (pieno(x, y)) { if (a < 0) a = x; b = x } sx.push(a); dx.push(b) }
+  for (let x = 0; x < w; x++) { let a = -1, b = -1; for (let y = 0; y < h; y++) if (pieno(x, y)) { if (a < 0) a = y; b = y } su.push(a); giu.push(b) }
+  const L = moda(sx.filter((v) => v >= 0)), R = moda(dx.filter((v) => v >= 0)), T = moda(su.filter((v) => v >= 0)), B = moda(giu.filter((v) => v >= 0))
+  for (let y = 0; y < h; y++) {
+    if (sx[y] >= 0 && sx[y] < L && L - sx[y] <= k) for (let x = sx[y]; x < L; x++) taglia(x, y)
+    if (dx[y] >= 0 && dx[y] > R && dx[y] - R <= k) for (let x = R + 1; x <= dx[y]; x++) taglia(x, y)
+  }
+  for (let x = 0; x < w; x++) {
+    if (su[x] >= 0 && su[x] < T && T - su[x] <= k) for (let y = su[x]; y < T; y++) taglia(x, y)
+    if (giu[x] >= 0 && giu[x] > B && giu[x] - B <= k) for (let y = B + 1; y <= giu[x]; y++) taglia(x, y)
+  }
+}
+
 /** Via i frammenti staccati: si tengono solo le macchie (pixel pieni, a 8 vicini) grandi almeno un ventesimo della più grande. */
 function isole(d, w, h) {
   const id = new Int32Array(w * h).fill(-1), dim = []
@@ -330,6 +356,7 @@ async function lavora(n, png, out = null) {
   const numero = ICONE[n][3]?.numero
   if (numero && !targa(data, info.width, info.height, numero)) throw new Error(`${n}: niente targa vuota dove scrivere ${numero}`)
   if (o.adesivo) isole(data, info.width, info.height)
+  if (ICONE[n][3]?.regolare) regolare(data, info.width, info.height, ICONE[n][3].regolare)
   let img = sharp(data, { raw: info }), w = info.width, h = info.height, px = data
   if (o.piastrella) { px = piastrella(data, w, h, ICONE[n][2], o.piastrella); w = h = o.piastrella }
   if (o.adesivo) {
