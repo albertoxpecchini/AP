@@ -29,7 +29,8 @@
 // sparire.
 //
 // La chat col bot (pzkko/chat/): { a: 'zaino', token } legge lo zaino di chi parla col bot (xp, oggetti, attese…) e
-// { a: 'zaino', token, zaino } lo salva (al più 8 KB, forma controllata), in un file a parte, pzkko/chat.json
+// { a: 'zaino', token, zaino, visto } lo salva unito a quello che c'è (al più 8 KB, forma controllata; 26.10: chi scrive
+// senza aver visto l'ultimo salvato non lo cancella, chat/zaino-unisci.mjs), in un file a parte, pzkko/chat.json
 // ({ zaini: { [id]: zaino } }), così wallet.json non si gonfia. GET ?classifica=1 dà i dieci conti più ricchi (nome e $pzk).
 // Moderazione: con la chiave, { a: 'lista', key } elenca i conti e { a: 'via', key, nome } ne cancella uno.
 // L'ECONOMIA (26.10, _economia.mjs): ogni salvataggio dice dove sono andati i soldi (`flussi`: alla cassa di pzk o persi
@@ -44,6 +45,7 @@ import { borsa, tassoA, attuale } from './_borsa.mjs'
 import { PATH, vuoto, offerta } from './_conti.mjs'
 import { PATH_GIOCATORI, vuotoG, aggiornaGiocatore, notizia } from './_giocatori.mjs'
 import { vivi, daVivere, evento } from '../chat/lumaca.mjs'
+import { unisci, uguali } from '../chat/zaino-unisci.mjs'
 import { cassa, eBanca, conia, allaCassa, perdi, distruggi, ritrova, smarriti, sporchi, puliti, sporca, matura, LAVA, CAUZIONE, PULIZIA } from './_economia.mjs'
 
 export const INIZIALE = 1000, PREMIO_IG = 1000, SUSSIDIO = 1000
@@ -310,7 +312,18 @@ export default async function handler(req, res) {
       if (!chat) return json(res, 503, { ok: false, offline: true, errore: 'lo zaino è in pausa' })
       if (body.zaino === undefined) { const { db } = await chat.read(); return json(res, 200, { ok: true, zaino: db.zaini[id] ?? null }) }
       if (!zainoValido(body.zaino)) return json(res, 400, { ok: false, errore: 'zaino strano' })
-      const r = await aggiorna(chat, (db) => { const mio = db.zaini[id]; if (mio && mio.t > (body.zaino.t ?? 0)) return { invariato: true, zaino: mio }; db.zaini[id] = body.zaino; return { zaino: body.zaino } })
+      // (26.10) si uniscono, non si sostituiscono: quello che cresce soltanto (l'esperienza, le statistiche…) prende il meglio
+      // dei due, il resto lo decide chi ha l'ultima parola. Chi scrive senza aver visto l'ultimo salvato (`visto` più vecchio:
+      // un telefono rimasto indietro) non ce l'ha; i browser di prima, senza `visto`, ce l'hanno se il loro `t` è più recente
+      const r = await aggiorna(chat, (db) => {
+        const mio = db.zaini[id], suo = body.zaino
+        const indietro = !!mio && (body.visto === undefined ? mio.t > (suo.t ?? 0) : mio.t > Number(body.visto))
+        let z = indietro ? unisci(mio, suo) : unisci(suo, mio)
+        if (!zainoValido(z)) z = indietro ? mio : suo
+        if (mio && uguali(z, mio)) return { invariato: true, zaino: mio }
+        db.zaini[id] = z
+        return { zaino: z }
+      })
       // la riga pubblica del giocatore nel database (api/_giocatori.mjs): se non va, lo zaino è salvo lo stesso
       if (!r.invariato) {
         try {
