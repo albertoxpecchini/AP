@@ -722,7 +722,8 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
     }
   }
   // (e quando la pagina dorme sotto la cornice, suono/cornice.js, mentre se ne guarda un'altra: evento pzkko-altrove)
-  let altrove = false
+  let altrove = document.documentElement.classList.contains('in-cornice')
+  if (altrove) fermo = true
   const riparti = () => { if (fermo && !perso && !altrove && !document.hidden) { fermo = false; prima = tConta = performance.now(); contati = 0; requestAnimationFrame(giro) } }
   document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else riparti() })
   document.addEventListener('pzkko-altrove', (e) => { altrove = e.detail; if (altrove) fermo = true; else riparti() })

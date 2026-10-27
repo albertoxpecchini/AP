@@ -7,9 +7,11 @@
 // quello che vince: chi scrive avendo visto l'ultimo salvato. Lo usano chat/zaino.js nel browser e api/wallet.mjs.
 
 const max = (a, b) => Math.max(Number(a) || 0, Number(b) || 0)
+// (chiavi come __proto__ non entrano: il corpo di una richiesta lo scrive chi vuole)
 const perChiave = (a, b, f) => {
-  const o = { ...(a ?? {}) }
-  for (const [k, v] of Object.entries(b ?? {})) o[k] = k in o ? f(o[k], v) : v
+  const o = {}
+  for (const [k, v] of Object.entries(a ?? {})) if (k !== '__proto__') o[k] = v
+  for (const [k, v] of Object.entries(b ?? {})) if (k !== '__proto__') o[k] = Object.hasOwn(o, k) ? f(o[k], v) : v
   return o
 }
 
@@ -21,13 +23,16 @@ export function unisci(base, altro) {
   z.t = max(base.t, altro.t)
   z.xp = max(base.xp, altro.xp)
   z.stat = perChiave(base.stat, altro.stat, max)
-  if (base.giochi || altro.giochi) z.giochi = perChiave(base.giochi, altro.giochi, (x, y) => (Array.isArray(x) && Array.isArray(y) ? x.map((n, i) => max(n, y[i])) : x))
+  if (base.giochi || altro.giochi) z.giochi = perChiave(base.giochi, altro.giochi, (x, y) => (Array.isArray(x) && Array.isArray(y) ? Array.from({ length: Math.max(x.length, y.length) }, (_, i) => max(x[i], y[i])) : x))
   if (base.rari || altro.rari) z.rari = [...new Set([...(base.rari ?? []), ...(altro.rari ?? [])])]
   if (base.app || altro.app) z.app = perChiave(base.app, altro.app, max)
   if (base.serie || altro.serie) z.serie = perChiave(base.serie, altro.serie, (x, y) => ((y?.ultimo ?? 0) > (x?.ultimo ?? 0) ? y : x))
   if (base.quest || altro.quest) {
     const fatte = perChiave(base.quest?.fatte, altro.quest?.fatte, max)
-    z.quest = { attive: Object.fromEntries(Object.entries(base.quest?.attive ?? {}).filter(([k]) => !fatte[k])), fatte }
+    // (in corso: quelle di tutti e due, se non sono già finite; a parità vale `base`; il resto dei campi è di `base`)
+    const attive = perChiave(altro.quest?.attive, base.quest?.attive, (x, y) => y)
+    for (const k of Object.keys(attive)) if (fatte[k]) delete attive[k]
+    z.quest = { ...(altro.quest ?? {}), ...(base.quest ?? {}), attive, fatte }
   }
   if (z.quiz && altro.quiz) z.quiz.migliore = max(z.quiz.migliore, altro.quiz.migliore)
   return z

@@ -55,14 +55,21 @@ let primo = Promise.resolve()
 async function salva(keepalive = false) {
   const t = pzk.token()
   if (!t || !sporco) return
-  await primo
+  // (alla chiusura non si aspetta: la richiesta deve partire adesso, o la pagina se ne va prima)
+  if (!keepalive) await primo
+  if (!sporco) return
   sporco = false
+  const per = chi
   try {
-    inCorso = fetch(API, { method: 'POST', keepalive, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t, zaino: Z, visto }) })
-    const d = await (await inCorso).json().catch(() => null)
+    inCorso = fetch(API, { method: 'POST', keepalive, signal: keepalive ? undefined : AbortSignal.timeout(15_000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t, zaino: Z, visto }) })
+    const r = await inCorso, d = await r.json().catch(() => null)
+    if (per !== chi) return // (nel frattempo si è cambiato conto: la risposta è dell'altro)
     if (d?.ok) dalServer(d.zaino)
-  } catch { sporco = true } finally { inCorso = null }
+    else if (r.status >= 500 || r.status === 429 || !r.status) riprova() // (il server non ce l'ha fatta: non si butta via)
+  } catch { riprova() } finally { inCorso = null }
 }
+// non salvato (rete, 429, 5xx): sporco di nuovo, e un altro tentativo fra 15 secondi
+function riprova() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 15_000) }
 /** Lo zaino che c'è sul server, unito a quello di qui. Vince quello di qui (gli oggetti, le attese…) se ha cambi ancora da
  *  mandare, o se è una copia mai sincronizzata andata più avanti (il pc del 26.10); se no quello del server. Se l'unione ha
  *  qualcosa che il server non ha, gliela si manda. */
@@ -77,17 +84,21 @@ function dalServer(s) {
 }
 /** Col conto: chiede al server lo zaino salvato e lo unisce a quello di qui. */
 export async function sincronizza() {
-  const t = pzk.token()
+  const t = pzk.token(), per = chi
   if (!t) return
   try {
-    const d = await (await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t }) })).json()
-    if (d?.ok) dalServer(d.zaino)
+    const d = await (await fetch(API, { method: 'POST', signal: AbortSignal.timeout(10_000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t }) })).json()
+    if (per === chi && d?.ok) dalServer(d.zaino) // (se nel frattempo il conto è cambiato, quello arrivato è dell'altro: non si mescola)
   } catch {}
 }
 if (pzk.token()) primo = sincronizza()
 document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(attesa); salva(true) } else sincronizza() })
 addEventListener('pagehide', () => { clearTimeout(attesa); salva(true) })
-setInterval(() => { if (!document.hidden) sincronizza() }, 120_000)
+// ogni 40 secondi, a pagina in vista (più spesso = meno oggetti persi fra due dispositivi aperti insieme); non mentre la
+// pagina dorme sotto la cornice della musica (suono/cornice.js): ci pensa quella davanti, che ha il suo zaino
+setInterval(() => { if (!document.hidden && !document.documentElement.classList.contains('in-cornice')) sincronizza() }, 40_000)
+// la pagina di fuori si risveglia: quello fatto dentro il riquadro è già sul server
+document.addEventListener('pzkko-altrove', (e) => { if (!e.detail) sincronizza() })
 // si entra o si esce dal wallet: lo zaino cambia padrone
 pzk.osserva(() => {
   const c = pzk.conto()?.ind ?? null
