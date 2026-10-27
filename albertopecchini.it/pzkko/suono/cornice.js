@@ -12,8 +12,10 @@
 
 const chiave = (u) => u.pathname.replace(/\/?$/, '/') + u.search
 const stessa = (u) => u.origin === location.origin
-/** Un indirizzo che la cornice apre: dello stesso sito, un'altra pagina (non un'ancora di questa), non un file né un'API */
-const vale = (u) => stessa(u) && !/^\/(api|tools)\//.test(u.pathname) && !/\.(?!html?$)\w{2,5}$/.test(u.pathname) && chiave(u) !== chiave(location)
+/** Un indirizzo che la cornice apre: dello stesso sito, non un file né un'API, e un'altra pagina (non un'ancora di questa);
+ *  col riquadro già aperto o in arrivo, qualunque (l'indirizzo di sopra è già il suo: un secondo clic sullo stesso link
+ *  sembrava «questa pagina» e la cambiava davvero, buttando via la cornice) */
+const vale = (u) => stessa(u) && !/^\/(api|tools)\//.test(u.pathname) && !/\.(?!html?$)\w{2,5}$/.test(u.pathname) && (!!f || chiave(u) !== chiave(location))
 
 /** Siamo nel riquadro di un'altra pagina del sito? → la sua cornice ({ casa, chiudi, abbassa }), se no null */
 export const fuori = (() => {
@@ -21,7 +23,8 @@ export const fuori = (() => {
   try { return window.parent.pzkkoCornice ?? null } catch { return null }
 })()
 
-let f = null, casa = null, sincro = 0
+// verso: la pagina chiesta per ultima (se il riquadro la rifiuta, ci si va come sempre: mai fermi su un clic che non fa niente)
+let f = null, casa = null, sincro = 0, verso = null
 const unirl = (url) => new URL(url, location.href)
 
 /** Va a `url`: dentro la cornice se si può (la musica suona), se no come sempre. */
@@ -30,7 +33,7 @@ export function vai(url) {
   if (fuori) {
     if (!stessa(u)) window.top.location.href = u.href
     else if (fuori.casa(u.href)) fuori.chiudi()
-    else location.href = u.href
+    else { fuori.verso?.(u.href); location.href = u.href }
   } else if (window.pzkkoCornice?.apre(u)) apri(u.href)
   else location.href = u.href
 }
@@ -42,7 +45,9 @@ function dorme(si) {
   document.dispatchEvent(new CustomEvent('pzkko-altrove', { detail: si }))
 }
 function apri(url, storia = true) {
-  if (f) { f.src = url; return }
+  if (f && window.pzkkoCornice.casa(url)) return chiudi() // (mentre arriva, di nuovo la pagina di fuori: si resta qui)
+  if (f) { if (verso !== url) { verso = url; f.src = url } return } // (un altro clic sullo stesso link, mentre arriva: niente da capo)
+  verso = url
   casa = { url: location.href, titolo: document.title }
   f = document.createElement('iframe')
   f.className = 'cornice'
@@ -56,7 +61,9 @@ function apri(url, storia = true) {
 /** Ogni pagina che arriva nel riquadro: l'indirizzo e il titolo di sopra diventano i suoi, e la pagina di fuori dorme. */
 function caricata() {
   let w
-  try { w = f.contentWindow; if (w.location.origin !== location.origin) throw 0 } catch { return chiudi() } // (un altro sito: non si sa dove; si torna fuori)
+  // (non si legge: il riquadro è stato rifiutato, o è finito su un altro sito. Si va alla pagina chiesta come sempre: la
+  // musica riparte da capo, ma la pagina cambia. Il 27.10 i browser tenevano in cache le pagine con X-Frame-Options DENY)
+  try { w = f.contentWindow; if (w.location.origin !== location.origin) throw 0 } catch { const u = verso; chiudi(false); if (u) location.href = u; return }
   if (w.location.href === 'about:blank') return
   allinea()
   if (!document.documentElement.classList.contains('in-cornice')) dorme(true)
@@ -95,6 +102,7 @@ export function avviaCornice({ suona, abbassa }) {
     apre: (u) => suona() && vale(u),
     casa: (url) => !!casa && chiave(unirl(url)) === chiave(unirl(casa.url)),
     chiudi: () => chiudi(),
+    verso: (url) => { verso = url },
     abbassa,
   }
   // i link della pagina: quelli che qualcuno ha già preso (la barra, che aspetta il fruscio e poi chiama vai) no
@@ -124,5 +132,6 @@ if (fuori) {
     const u = unirl(a.href)
     if (!stessa(u)) { if (!a.target || a.target === '_self') a.target = '_top'; return }
     if (!a.target && !e.defaultPrevented && fuori.casa(u.href) && !u.hash) { e.preventDefault(); fuori.chiudi() }
+    else if (!a.target || a.target === '_self') fuori.verso?.(u.href)
   })
 }
