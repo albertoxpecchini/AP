@@ -1,24 +1,36 @@
 // I soldi: aiuto, saldo, profilo, attese, i premi giornalieri, l'elemosina, la classifica, manda.
 import * as zaino from '../zaino.js'
 import { PERSONAGGI, nomeDi } from '../testi.js'
+import { PREMI, serieDopo, valore } from '../premi.mjs'
 
-const ORA = 3600_000, GIORNO = 24 * ORA
-const PREMI = { giornaliero: { ogni: GIORNO, base: 300, nome: 'giornaliero', bonus: 50, max: 7 }, settimanale: { ogni: 7 * GIORNO, base: 1500, nome: 'settimanale', bonus: 200, max: 4 }, mensile: { ogni: 30 * GIORNO, base: 5000, nome: 'mensile', bonus: 500, max: 3 } }
-
+// i premi (chat/premi.mjs): col conto li dà il server, che tiene la serie (27.10: l'attesa stava solo nello zaino, si
+// perdeva, e il giornaliero si riscuoteva all'infinito); nella sessione si fanno qui. L'attesa la segna il premio stesso,
+// dall'ultimo preso, e il caffè non la accorcia: il server non lo sa
 function premio(id) {
   const P = PREMI[id]
   return {
     nomi: [id, ...(id === 'giornaliero' ? ['daily', 'giorno'] : id === 'settimanale' ? ['weekly', 'settimana'] : ['monthly', 'mese'])], cat: 'soldi', icona: 'regalo',
-    breve: `il premio ${P.nome}: ${P.base} $pzk, di più se torni ogni volta`, uso: id, attesa: P.ogni / 1000,
+    breve: `il premio ${id}: ${P.base} $pzk, di più se torni ogni volta`, uso: id, attesa: P.ogni / 1000,
     async fai(ctx) {
-      const s = zaino.serie(id)
-      // la serie continua se si torna entro due periodi
-      const n = s.ultimo && Date.now() - s.ultimo < 2 * P.ogni ? Math.min(P.max, s.n + 1) : 1
-      zaino.segnaSerie(id, n)
-      const tot = ctx.paga(P.base + P.bonus * (n - 1))
-      const liv = zaino.daiXp(id === 'giornaliero' ? 20 : id === 'settimanale' ? 60 : 150)
-      ctx.dì({ colore: 'oro', av: 'bot-ricco', t: `:regalo: premio ${P.nome}`, d: `${ctx.pzkHtml(tot)} per te.${n > 1 ? ` Serie di <b>${n}</b> di fila${n >= P.max ? ' (il massimo)' : ''}: +${P.bonus * (n - 1)} di bonus.` : ' Torna fra un po’ per la serie: ogni volta di fila vale di più.'}`, pie: `il prossimo fra ${ctx.durata(P.ogni)}` })
+      let n, tot
+      if (ctx.pzk.conto()) {
+        const [d] = await Promise.all([ctx.pzk.premio(id, zaino.moltiplicatore()), ctx.pensa(400)])
+        // (la serie e l'attesa, nello zaino, sono la copia di quelle del conto: per i traguardi, il profilo e il cercapersone)
+        const s = ctx.pzk.conto()?.premi?.[id]
+        if (s) { zaino.segnaSerie(id, s.n, s.ultimo); zaino.aspettaFino(id, s.ultimo + P.ogni) }
+        if (!d.ok) return ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: `:regalo: premio ${id}`, d: d.errore ?? 'non è andata: riprova.' }) && false
+        n = d.fatto.serie; tot = d.fatto.n
+        zaino.conta('guadagnati', tot)
+      } else {
+        n = serieDopo(P, zaino.serie(id), Date.now())
+        zaino.segnaSerie(id, n)
+        zaino.aspettaFino(id, Date.now() + P.ogni)
+        tot = ctx.paga(valore(P, n))
+      }
+      const liv = zaino.daiXp(P.xp)
+      ctx.dì({ colore: 'oro', av: 'bot-ricco', t: `:regalo: premio ${id}`, d: `${ctx.pzkHtml(tot)} per te.${n > 1 ? ` Serie di <b>${n}</b> di fila${n >= P.max ? ' (il massimo)' : ''}: +${P.bonus * (n - 1)} di bonus.` : ' Torna fra un po’ per la serie: ogni volta di fila vale di più.'}`, pie: `il prossimo fra ${ctx.durata(P.ogni)}` })
       ctx.saleDiLivello(liv)
+      return false // (l'attesa è segnata qui sopra)
     },
   }
 }

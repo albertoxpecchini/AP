@@ -54,21 +54,29 @@ function scrivi() {
 function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 250) }
 // (il primo salvataggio aspetta lo zaino del server: se no un dispositivo rimasto indietro scrive sopra quello giusto)
 let primo = Promise.resolve()
+// UNO ALLA VOLTA (27.10): un salvataggio partito mentre l'altro era ancora in viaggio aveva il `visto` vecchio, il server
+// lo prendeva per un dispositivo rimasto indietro e teneva le sue attese, senza quella appena segnata (il giornaliero si
+// riscuoteva all'infinito). Ora aspetta la risposta di quello prima. `salvati` conta quelli partiti: una lettura
+// (sincronizza) che ne ha visto partire uno è vecchia, e la si butta
+let salvati = 0
 async function salva(keepalive = false) {
-  const t = pzk.token()
-  if (!t || !sporco) return
+  if (!pzk.token() || !sporco) return
   // (alla chiusura non si aspetta: la richiesta deve partire adesso, o la pagina se ne va prima)
-  if (!keepalive) await primo
-  if (!sporco) return
+  if (!keepalive) { await primo; while (inCorso) await inCorso }
+  const t = pzk.token() // (dopo l'attesa: nel frattempo si può essere entrati in un altro conto)
+  if (!t || !sporco) return
   sporco = false
+  salvati++
   const per = chi
+  let fatto
+  const questo = (inCorso = new Promise((r) => { fatto = r }))
   try {
-    inCorso = fetch(API, { method: 'POST', keepalive, signal: keepalive ? undefined : AbortSignal.timeout(15_000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t, zaino: Z, visto }) })
-    const r = await inCorso, d = await r.json().catch(() => null)
+    const r = await fetch(API, { method: 'POST', keepalive, signal: keepalive ? undefined : AbortSignal.timeout(15_000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t, zaino: Z, visto }) })
+    const d = await r.json().catch(() => null)
     if (per !== chi) return // (nel frattempo si è cambiato conto: la risposta è dell'altro)
     if (d?.ok) dalServer(d.zaino)
     else if (r.status >= 500 || r.status === 429 || !r.status) riprova() // (il server non ce l'ha fatta: non si butta via)
-  } catch { riprova() } finally { inCorso = null }
+  } catch { riprova() } finally { if (inCorso === questo) inCorso = null; fatto() }
 }
 // non salvato (rete, 429, 5xx): sporco di nuovo, e un altro tentativo fra 15 secondi
 function riprova() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 15_000) }
@@ -86,11 +94,15 @@ function dalServer(s) {
 }
 /** Col conto: chiede al server lo zaino salvato e lo unisce a quello di qui. */
 export async function sincronizza() {
-  const t = pzk.token(), per = chi
+  if (!pzk.token()) return
+  while (inCorso) await inCorso // (la lettura parte dopo il salvataggio in viaggio, se no torna lo zaino di prima)
+  const t = pzk.token(), per = chi, n = salvati
   if (!t) return
   try {
     const d = await (await fetch(API, { method: 'POST', signal: AbortSignal.timeout(10_000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t }) })).json()
-    if (per === chi && d?.ok) dalServer(d.zaino) // (se nel frattempo il conto è cambiato, quello arrivato è dell'altro: non si mescola)
+    // (se nel frattempo il conto è cambiato, quello arrivato è dell'altro: non si mescola; se è partito un salvataggio, è
+    // vecchio: lo zaino giusto lo porta la risposta di quello)
+    if (per === chi && n === salvati && d?.ok) dalServer(d.zaino)
   } catch {}
 }
 if (pzk.token()) primo = sincronizza()
@@ -180,6 +192,8 @@ export function aspetta(cmd, ms) {
   for (const k of Object.keys(Z.attese)) if (Z.attese[k] < Date.now()) delete Z.attese[k]
   scrivi()
 }
+/** Segna l'attesa fino a `t`, così com'è (i premi: l'ultimo preso lo dice il server, e il caffè non la accorcia). */
+export function aspettaFino(cmd, t) { Z.attese[cmd] = t; scrivi() }
 export const attese = () => Object.entries(Z.attese).filter(([, t]) => t > Date.now()).sort((a, b) => a[1] - b[1])
 export function azzeraAttese() { Z.attese = {}; scrivi() }
 
@@ -220,7 +234,7 @@ export function nota(id) { Z.rari = [...new Set([...(Z.rari ?? []), id])]; scriv
 
 // ── le serie dei premi (giornaliero, settimanale, mensile): { ultimo: ts, n: giorni di fila } ──
 export const serie = (id) => Z.serie[id] ?? { ultimo: 0, n: 0 }
-export function segnaSerie(id, n) { Z.serie[id] = { ultimo: Date.now(), n }; scrivi() }
+export function segnaSerie(id, n, ultimo = Date.now()) { Z.serie[id] = { ultimo, n }; scrivi() }
 
 // ── le statistiche ──
 export const stat = (k) => Z.stat[k] ?? 0

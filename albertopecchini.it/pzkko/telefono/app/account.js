@@ -44,12 +44,12 @@ function conto(c) {
     <h4 class="t-sh-sez">le ultime mosse</h4><ul class="t-ac-mosse">${mosse(c)}</ul>`
 }
 function mosse(c) {
-  const NOMI = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'la lumachina', rapina: 'rapina alla cassa (sporchi)', arresto: 'arresto: multa', cauzione: 'cauzione', lavatrice: 'lavatrice (commissione)', lavati: 'lavati: ora puliti', puliti: 'puliti dal tempo', decifrato: 'wallet decifrato' }
+  const NOMI = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'la lumachina', rapina: 'rapina alla cassa (sporchi)', arresto: 'arresto: multa', cauzione: 'cauzione', lavatrice: 'lavatrice (commissione)', lavati: 'lavati: ora puliti', puliti: 'puliti dal tempo', decifrato: 'wallet decifrato', premio: 'premio' }
   const pct = (p) => `${p < 0 ? '−' : '+'}${Math.abs(p).toFixed(2).replace('.', ',')} %`
   return [...(c.mosse ?? [])].reverse().map((m) => {
     const quando = new Date(m.t).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
     const segno = ['in-eur', 'inviato', 'cauzione', 'lavatrice'].includes(m.tipo) || m.verso === 'meno' ? 'meno' : ['indirizzo', 'lavati', 'puliti'].includes(m.tipo) ? '' : 'piu'
-    const cosa = m.tipo === 'inviato' || m.tipo === 'ricevuto' ? `${NOMI[m.tipo]} ${m.nome ?? ''} (${m.a ?? m.da})` : m.tipo === 'indirizzo' ? `${NOMI[m.tipo]}: ${m.da} → ${m.a}` : m.tipo === 'in-eur' || m.tipo === 'in-pzk' ? `${NOMI[m.tipo]} a ${m.cambio?.toFixed(4)}` : m.tipo === 'lumaca' && typeof m.pct === 'number' ? `${NOMI.lumaca} ${pct(m.pct)}` : NOMI[m.tipo] ?? m.tipo
+    const cosa = m.tipo === 'inviato' || m.tipo === 'ricevuto' ? `${NOMI[m.tipo]} ${m.nome ?? ''} (${m.a ?? m.da})` : m.tipo === 'indirizzo' ? `${NOMI[m.tipo]}: ${m.da} → ${m.a}` : m.tipo === 'in-eur' || m.tipo === 'in-pzk' ? `${NOMI[m.tipo]} a ${m.cambio?.toFixed(4)}` : m.tipo === 'lumaca' && typeof m.pct === 'number' ? `${NOMI.lumaca} ${pct(m.pct)}` : m.tipo === 'premio' ? `${NOMI.premio} ${m.premio ?? ''}` : NOMI[m.tipo] ?? m.tipo
     const n = m.tipo === 'in-eur' ? `−${fmt(m.n)} $pzk → +${fmtEur(m.eur)} €` : m.tipo === 'in-pzk' ? `−${fmtEur(m.eur)} € → +${fmt(m.n)} $pzk` : m.n != null ? `${segno === 'meno' ? '−' : '+'}${fmt(m.n)} $pzk` : ''
     return `<li><span>${quando} · ${esc(cosa)}</span><b class="${segno}">${n}</b></li>`
   }).join('') || '<li><span>niente ancora</span></li>'

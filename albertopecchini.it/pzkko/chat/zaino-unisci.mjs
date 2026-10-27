@@ -3,8 +3,10 @@
 // rimasto indietro (lo zaino del server si chiedeva solo entrando nel conto, non aprendo la pagina), alla prima mossa
 // cancellava i progressi fatti sul pc. Ora si uniscono: quello che cresce soltanto (l'esperienza, le statistiche, i giri
 // ai giochi, i leggendari presi, le app installate, le side quest finite, il record del quiz, la serie più avanti) prende
-// il meglio dei due; il resto (gli oggetti, le attese, gli effetti, il mestiere, le sfide del giorno…) viene da `base`,
-// quello che vince: chi scrive avendo visto l'ultimo salvato. Lo usano chat/zaino.js nel browser e api/wallet.mjs.
+// il meglio dei due; il resto (gli oggetti, gli effetti, il mestiere, le sfide del giorno…) viene da `base`, quello che
+// vince: chi scrive avendo visto l'ultimo salvato. Le attese prendono la scadenza più lontana (27.10: prese da `base`, un
+// salvataggio creduto indietro perdeva quella appena segnata, e il giornaliero si riscuoteva all'infinito; nessuna attesa si
+// accorcia unendo). Lo usano chat/zaino.js nel browser e api/wallet.mjs.
 
 const max = (a, b) => Math.max(Number(a) || 0, Number(b) || 0)
 // (chiavi come __proto__ non entrano: il corpo di una richiesta lo scrive chi vuole)
@@ -23,6 +25,7 @@ export function unisci(base, altro) {
   z.t = max(base.t, altro.t)
   z.xp = max(base.xp, altro.xp)
   z.stat = perChiave(base.stat, altro.stat, max)
+  z.attese = perChiave(base.attese, altro.attese, max)
   if (base.giochi || altro.giochi) z.giochi = perChiave(base.giochi, altro.giochi, (x, y) => (Array.isArray(x) && Array.isArray(y) ? Array.from({ length: Math.max(x.length, y.length) }, (_, i) => max(x[i], y[i])) : x))
   if (base.rari || altro.rari) z.rari = [...new Set([...(base.rari ?? []), ...(altro.rari ?? [])])]
   if (base.app || altro.app) z.app = perChiave(base.app, altro.app, max)

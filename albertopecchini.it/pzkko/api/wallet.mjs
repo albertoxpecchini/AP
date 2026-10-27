@@ -15,8 +15,8 @@
 // conversioni (converti) usano il cambio di quando il wallet si è sincronizzato (t: stato), purché non sia passata più
 // di mezz'ora: dopo, il wallet deve sincronizzarsi (il cambio è quello nuovo). Il regalo di Instagram (+1.000, una volta
 // per conto), le banconote perse per terra (trova: una volta al giorno ciascuna) e il sussidio (1.000 $pzk al giorno a
-// chi è a secco) sono qui. Il PIN si salva con scrypt e un sale; l'accesso dà un token firmato (HMAC) che il browser
-// tiene in localStorage per 180 giorni.
+// chi è a secco) sono qui, e dal 27.10 anche i premi della chat (premio: giornaliero, settimanale, mensile). Il PIN si
+// salva con scrypt e un sale; l'accesso dà un token firmato (HMAC) che il browser tiene in localStorage per 180 giorni.
 //
 // La lumachina (23.10 sera, chat/lumaca.mjs): ogni giorno di Mantova la chiocciolina del cercapersone si sveglia con una
 // salute e decide da sola la giornata, che sposta una percentuale dei $pzk del conto (medicine, visioni, affari, disastri,
@@ -46,6 +46,7 @@ import { PATH, vuoto, offerta } from './_conti.mjs'
 import { PATH_GIOCATORI, vuotoG, aggiornaGiocatore, notizia } from './_giocatori.mjs'
 import { vivi, daVivere, evento } from '../chat/lumaca.mjs'
 import { unisci, uguali } from '../chat/zaino-unisci.mjs'
+import { PREMI, MAX_MOLT, serieDopo, valore } from '../chat/premi.mjs'
 import { cassa, eBanca, conia, allaCassa, perdi, distruggi, ritrova, smarriti, sporchi, puliti, sporca, matura, LAVA, CAUZIONE, PULIZIA } from './_economia.mjs'
 
 export const INIZIALE = 1000, PREMIO_IG = 1000, SUSSIDIO = 1000
@@ -114,6 +115,7 @@ const vista = (c, now) => ({
   // l'economia: i soldi sporchi e quando si puliscono, il lavaggio, la galera, l'ultimo lotto di flussi contato, l'ultimo colpo
   sporchi: sporchi(c), puliti: puliti(c), pulizia: c.sporchi?.length ? c.sporchi[0].t + PULIZIA : null, lavaggio: c.lavaggio ?? null,
   galera: c.galera > now ? c.galera : null, fn: c.fn ?? 0, colpo: c.ultimoColpo ?? 0, decifrati: c.decifrati?.g === oggi() ? c.decifrati.n : 0,
+  premi: c.premi ?? {},
 })
 const mossa = (c, m) => { (c.mosse ??= []).push(m); if (c.mosse.length > 40) c.mosse.splice(0, c.mosse.length - 40) }
 
@@ -189,6 +191,10 @@ const zainoValido = (z) => {
   for (const k of ['oggetti', 'attese', 'effetti', 'serie', 'stat']) if (z[k] && (typeof z[k] !== 'object' || Array.isArray(z[k]) || Object.keys(z[k]).length > 120)) return false
   return JSON.stringify(z).length <= MAX_ZAINO
 }
+// la serie di un premio com'era nello zaino (la scriveva il browser: si prende solo se ha senso), per il primo premio dal server
+const serieDi = (s, P, now) => (s && Number.isFinite(s.ultimo) && s.ultimo > 0 ? { ultimo: Math.min(s.ultimo, now), n: Math.max(1, Math.min(P.max, Math.floor(Number(s.n) || 1))) } : null)
+// quanto manca, a parole
+const fra = (ms) => (ms >= 2 * GIORNO ? `${Math.round(ms / GIORNO)} giorni` : ms >= 2 * ORA ? `${Math.round(ms / ORA)} ore` : ms >= 2 * MINUTO ? `${Math.round(ms / MINUTO)} minuti` : 'un minuto')
 const limiti = { crea: limite('wallet-crea', 3, GIORNO), entra: limite('wallet-entra', 8, 10 * MINUTO), tutte: limite('wallet-tutte', 900, 10 * MINUTO) }
 
 // LE OPERAZIONI DELLA BANCA: passaggi che Alberto chiede e che fa il server, una volta sola ciascuno (segnati in
@@ -367,7 +373,8 @@ export default async function handler(req, res) {
     const manda = async (r, extra = {}) => {
       await notizieLumaca(r.c, r.lu, now)
       const errore = r.errore ?? r.rifiuto, lumaca = r.lu ? { lumaca: r.lu } : {}
-      return errore ? json(res, r.esci ? 401 : 409, { ok: false, errore, esci: r.esci, ...(r.c && { conto: vista(r.c, now), tasso, t: now }), ...lumaca }) : json(res, 200, risposta(r.c, { ...extra, ...lumaca }))
+      // (`fatto`, com'è andata, lo leggono il browser e la chat: prima del 27.10 restava qui, e chi lo leggeva si rompeva)
+      return errore ? json(res, r.esci ? 401 : 409, { ok: false, errore, esci: r.esci, ...(r.c && { conto: vista(r.c, now), tasso, t: now }), ...lumaca }) : json(res, 200, risposta(r.c, { ...extra, ...(r.fatto && { fatto: r.fatto }), ...lumaca }))
     }
 
     if (a === 'converti') {
@@ -448,6 +455,27 @@ export default async function handler(req, res) {
       if (c.sussidio === oggi()) return { errore: 'il sussidio è uno al giorno: domani' }
       c.sussidio = oggi(); c.pzk = mezzi(c.pzk + SUSSIDIO); conia(db, SUSSIDIO, now); mossa(c, { t: now, tipo: 'sussidio', n: SUSSIDIO })
     }))
+
+    // ── I PREMI DELLA CHAT (27.10, chat/premi.mjs): il giornaliero, il settimanale e il mensile. L'attesa stava solo nello zaino
+    // del browser, e due salvataggi dello zaino accavallati la perdevano (Alberto: 20.000 $pzk riscuotendo all'infinito). Ora la
+    // serie sta nel conto, c.premi[id] = { ultimo, n }, e il premio lo dà il server; il moltiplicatore (il livello e i bonus delle
+    // paghe) lo dice il browser, al più MAX_MOLT. Il primo premio di ogni conto riparte dalla serie che c'era nello zaino ──
+    if (a === 'premio') {
+      const pid = body.id, P = typeof pid === 'string' && Object.hasOwn(PREMI, pid) ? PREMI[pid] : null
+      if (!P) return json(res, 400, { ok: false, errore: 'quale premio?' })
+      const molt = Math.max(1, Math.min(MAX_MOLT, Number(body.molt) || 1))
+      let daZaino = null
+      try { const chat = await archivio(PATH_CHAT, vuotoChat); daZaino = chat && (await chat.read()).db.zaini[id]?.serie?.[pid] } catch {}
+      return manda(await azione((c, db) => {
+        const s = c.premi?.[pid] ?? serieDi(daZaino, P, now)
+        if (s && now - s.ultimo < P.ogni) return { errore: `il premio ${pid} torna fra ${fra(s.ultimo + P.ogni - now)}` }
+        const n = serieDopo(P, s, now), tot = mezzi(valore(P, n) * molt)
+        ;(c.premi ??= {})[pid] = { ultimo: now, n }
+        c.pzk = mezzi(c.pzk + tot); conia(db, tot, now)
+        mossa(c, { t: now, tipo: 'premio', n: tot, premio: pid, serie: n })
+        return { fatto: { id: pid, n: tot, serie: n } }
+      }))
+    }
 
     // ── LA GALERA (26.10): un lavoro rischioso andato male (il dado lo tira il browser: chat/comandi/lavoro.js). La multa, coi
     // soldi puliti, va alla cassa; si esce prima con la cauzione ──
