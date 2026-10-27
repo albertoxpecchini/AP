@@ -581,8 +581,10 @@ export function accendi(c) {
     if (now - ultimo < 32) return
     const dt = Math.min(0.2, (now - ultimo) / 1000), t = c.currentTime
     ultimo = now
-    uscita.gain.setTargetAtTime(P.acceso ? P.volume * (modale() ? 0.4 : 1) : 0, t, P.acceso ? (avvio ? 1.3 : 0.25) : 0.1)
-    if (!P.acceso || c.state !== 'running') return
+    // (altrove: la pagina dorme sotto la cornice, suono/cornice.js, e si guarda un'altra pagina: la strada tace)
+    const su = P.acceso && !P.altrove
+    uscita.gain.setTargetAtTime(su ? P.volume * (modale() ? 0.4 : 1) : 0, t, su ? (avvio ? 1.3 : 0.25) : 0.1)
+    if (!su || c.state !== 'running') return
     ascolta()
     if (!dove.daScena && S()) dove = posti()
     const m = meteo()

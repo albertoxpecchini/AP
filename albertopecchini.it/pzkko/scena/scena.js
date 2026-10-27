@@ -721,7 +721,11 @@ async function scena({ root, q, parete, strada, portale, t0, telefono, tela, ren
       }
     }
   }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else if (fermo && !perso) { fermo = false; prima = tConta = performance.now(); contati = 0; requestAnimationFrame(giro) } })
+  // (e quando la pagina dorme sotto la cornice, suono/cornice.js, mentre se ne guarda un'altra: evento pzkko-altrove)
+  let altrove = false
+  const riparti = () => { if (fermo && !perso && !altrove && !document.hidden) { fermo = false; prima = tConta = performance.now(); contati = 0; requestAnimationFrame(giro) } }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) fermo = true; else riparti() })
+  document.addEventListener('pzkko-altrove', (e) => { altrove = e.detail; if (altrove) fermo = true; else riparti() })
   requestAnimationFrame(giro)
 
   // ── la scheda grafica perde il contesto (un driver che si pianta, la memoria che finisce, un'altra pagina 3D che se la

@@ -14,7 +14,8 @@
 
 import { src } from '../chat/icone.js'
 // il fruscio dei pezzi di carta (e i suonini dei tasti e le musichette di tutta la pagina: suono/interfaccia.js)
-import { fruscio } from '../suono/interfaccia.js'
+// (vai: nella cornice, se la musica suona, la pagina nuova si apre senza lasciare questa: suono/cornice.js)
+import { fruscio, vai } from '../suono/interfaccia.js'
 
 // [indirizzo, nome, icona, a cosa serve, la carta, il carattere]
 const VOCI = [
@@ -83,12 +84,12 @@ function barra() {
     fruscio()
     if (a.hasAttribute('data-account') || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return
     e.preventDefault()
-    setTimeout(() => { location.href = a.href }, 120) // (INDIETRO compreso: il suo link è la home, «/»)
+    setTimeout(() => vai(a.href), 120) // (INDIETRO compreso: il suo link è la home, «/»)
   })
   nav.querySelector('[data-account]')?.addEventListener('click', (e) => {
     e.preventDefault()
     if (qui === '/') import('../games/pzk.js').then((p) => p.apriWallet('conto')) // nella home: il cercapersone sull'account
-    else location.href = '/#account'
+    else vai('/#account')
   })
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', barra)
