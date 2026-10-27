@@ -2160,7 +2160,15 @@ cornetto si consuma al posto tuo. E il cercapersone si **scassa** (23.10, `zaino
 la chat accetta solo `lavora` e `compra cercapersone`, che costa quanto il cercapersone del negozio e lo rimette nuovo
 (`mercato.ricompraPager`). Nella pagina di prova i tasti «muori» e «ripara» (a cercapersone chiuso). **Lo zaino** (`chat/zaino.js`) segue i soldi: nella sessione in `sessionStorage`, col
 conto sul server (`pzkko/chat.json`, al più 12 KB) e in `localStorage`; ci stanno anche i tasti rapidi, le sfide, le
-missioni, il quiz e i leggendari presi.
+missioni, il quiz e i leggendari presi. **Sincronizzato fra i dispositivi** (26.10, Alberto: «dal telefono mi dà livello 1,
+dal pc 4»): prima vinceva lo zaino col `t` più recente, e due dispositivi usati a turno si sovrascrivevano a vicenda
+restando ognuno col suo. Ora il browser chiede lo zaino al server aprendo la pagina (e non salva finché non è arrivato),
+tornando sulla pagina e ogni due minuti, e i due zaini si **uniscono** (`chat/zaino-unisci.mjs`, lo stesso nel browser e
+in `api/wallet.mjs`): l'esperienza, le statistiche, i giri ai giochi, i leggendari, le app, le side quest finite e il
+record del quiz prendono il meglio dei due; gli oggetti, le attese, gli effetti e il mestiere vengono da chi ha l'ultima
+parola, cioè chi scrive avendo visto l'ultimo salvato (`visto`, il `t` dell'ultimo zaino visto sul server: chi è rimasto
+indietro non cancella niente). La prima volta una copia mai sincronizzata che è andata più avanti (più esperienza) vince
+su quella del server.
 
 Il modulo si carica da solo appena la pagina è tranquilla e al clic; `#chat` apre direttamente la chat, l'evento
 `pzkko-chat` (con `detail.comando`) la apre scrivendo un comando. Gli strumenti che fotografano la pagina non vedono il tasto

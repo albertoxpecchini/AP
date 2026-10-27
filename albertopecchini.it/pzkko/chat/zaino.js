@@ -4,10 +4,17 @@
 //
 // Come il saldo: nella SESSIONE (chi non è entrato nel wallet) lo zaino sta in sessionStorage e sparisce con la scheda;
 // col CONTO sta sul server (api/wallet.mjs, azione «zaino», un file a parte su Blob: pzkko/chat.json) e in localStorage
-// come copia, si salva un po' dopo ogni cambio e subito quando la pagina si nasconde. Vince chi ha il `t` più recente.
+// come copia, si salva un po' dopo ogni cambio e subito quando la pagina si nasconde.
+// Sincronizzato fra i dispositivi (26.10, Alberto: «dal telefono mi dà livello 1, dal pc 4»): prima vinceva lo zaino col
+// `t` più recente e lo si chiedeva al server solo entrando nel conto, così un telefono rimasto indietro, alla prima mossa,
+// cancellava i progressi del pc. Ora lo si chiede aprendo la pagina (e non si salva finché non è arrivato), tornando
+// sulla pagina e ogni due minuti, e i due zaini si UNISCONO (zaino-unisci.mjs: l'esperienza e le statistiche il meglio dei
+// due, gli oggetti da chi ha l'ultima parola); `visto` è il `t` dell'ultimo zaino visto sul server, e il server lo usa per
+// capire se chi scrive è rimasto indietro.
 
 import * as pzk from '../games/pzk.js'
 import { PER_ID } from './testi.js'
+import { unisci, uguali } from './zaino-unisci.mjs'
 
 const API = '/api/wallet/' // con la barra finale (trailingSlash): senza, il redirect 308 del POST fa chiedere conferma al browser
 const CHIAVE_SESSIONE = 'pzkko-chat-sessione'
@@ -24,6 +31,7 @@ export const livelloDi = (xp) => 1 + Math.floor(Math.sqrt(Math.max(0, xp) / 60))
 /** Gli xp che servono per il livello l. */
 export const xpPer = (l) => 60 * (l - 1) ** 2
 
+let visto = 0 // il `t` dell'ultimo zaino visto sul server (0: mai, o una copia di prima del 26.10)
 let Z = carica()
 let chi = pzk.conto()?.ind ?? null // per chi è lo zaino in memoria
 const ascolti = new Set()
@@ -31,39 +39,55 @@ let attesa = 0, sporco = false, inCorso = null
 
 function carica() {
   const c = pzk.conto()
-  if (c) { const z = leggiJSON(localStorage, CHIAVE_CONTO); return z && z.ind === c.ind && valido(z.zaino) ? z.zaino : vuoto() }
+  if (c) { const z = leggiJSON(localStorage, CHIAVE_CONTO), mio = z && z.ind === c.ind && valido(z.zaino); visto = mio ? z.visto ?? 0 : 0; return mio ? z.zaino : vuoto() }
   const z = leggiJSON(sessionStorage, CHIAVE_SESSIONE)
   return valido(z) ? z : vuoto()
 }
+const copia = () => scriviJSON(localStorage, CHIAVE_CONTO, { ind: pzk.conto()?.ind, zaino: Z, visto })
 function scrivi() {
   Z.t = Date.now()
-  const c = pzk.conto()
-  if (c) { scriviJSON(localStorage, CHIAVE_CONTO, { ind: c.ind, zaino: Z }); salvaPoi() } else scriviJSON(sessionStorage, CHIAVE_SESSIONE, Z)
+  if (pzk.conto()) { copia(); salvaPoi() } else scriviJSON(sessionStorage, CHIAVE_SESSIONE, Z)
   for (const f of ascolti) f(Z)
 }
 function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 1500) }
+// (il primo salvataggio aspetta lo zaino del server: se no un dispositivo rimasto indietro scrive sopra quello giusto)
+let primo = Promise.resolve()
 async function salva(keepalive = false) {
   const t = pzk.token()
   if (!t || !sporco) return
+  await primo
   sporco = false
   try {
-    inCorso = fetch(API, { method: 'POST', keepalive, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t, zaino: Z }) })
+    inCorso = fetch(API, { method: 'POST', keepalive, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t, zaino: Z, visto }) })
     const d = await (await inCorso).json().catch(() => null)
-    if (d?.zaino && valido(d.zaino) && d.zaino.t > Z.t) { Z = d.zaino; scriviJSON(localStorage, CHIAVE_CONTO, { ind: pzk.conto()?.ind, zaino: Z }); for (const f of ascolti) f(Z) }
-  } catch {} finally { inCorso = null }
+    if (d?.ok) dalServer(d.zaino)
+  } catch { sporco = true } finally { inCorso = null }
 }
-/** Col conto: chiede al server lo zaino salvato; se è più recente di quello di qui, vince. */
+/** Lo zaino che c'è sul server, unito a quello di qui. Vince quello di qui (gli oggetti, le attese…) se ha cambi ancora da
+ *  mandare, o se è una copia mai sincronizzata andata più avanti (il pc del 26.10); se no quello del server. Se l'unione ha
+ *  qualcosa che il server non ha, gliela si manda. */
+function dalServer(s) {
+  if (!s || !valido(s)) { if (Z.t && !s) salvaPoi(); return }
+  const qui = sporco || (!visto && Z.xp > s.xp)
+  visto = s.t
+  const z = qui ? unisci(Z, s) : unisci(s, Z)
+  if (!uguali(z, Z)) { Z = z; for (const f of ascolti) f(Z) }
+  if (!uguali(Z, s)) { Z.t = Date.now(); salvaPoi() }
+  copia()
+}
+/** Col conto: chiede al server lo zaino salvato e lo unisce a quello di qui. */
 export async function sincronizza() {
   const t = pzk.token()
   if (!t) return
   try {
     const d = await (await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'zaino', token: t }) })).json()
-    if (d?.zaino && valido(d.zaino) && d.zaino.t > Z.t) { Z = d.zaino; scriviJSON(localStorage, CHIAVE_CONTO, { ind: pzk.conto()?.ind, zaino: Z }); for (const f of ascolti) f(Z) }
-    else if (d?.ok && !d.zaino && Z.t) salvaPoi()
+    if (d?.ok) dalServer(d.zaino)
   } catch {}
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(attesa); salva(true) } })
+if (pzk.token()) primo = sincronizza()
+document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(attesa); salva(true) } else sincronizza() })
 addEventListener('pagehide', () => { clearTimeout(attesa); salva(true) })
+setInterval(() => { if (!document.hidden) sincronizza() }, 120_000)
 // si entra o si esce dal wallet: lo zaino cambia padrone
 pzk.osserva(() => {
   const c = pzk.conto()?.ind ?? null
@@ -71,7 +95,7 @@ pzk.osserva(() => {
   chi = c
   Z = carica()
   for (const f of ascolti) f(Z)
-  if (c) sincronizza()
+  if (c) primo = sincronizza()
 })
 
 /** Lo zaino com'è (da non modificare a mano: usa le funzioni qui sotto). */
@@ -216,4 +240,3 @@ export function azzera() { Z = vuoto(); scrivi() }
 /** Lo zaino pesa troppo per il server? (non dovrebbe mai) */
 export const pesante = () => JSON.stringify(Z).length > MAX_BYTE
 
-if (pzk.token()) setTimeout(sincronizza, 600)
