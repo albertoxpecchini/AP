@@ -183,7 +183,7 @@ export function banner(bottone, { batteria }) {
   setInterval(() => { if (!document.hidden) prendiBorsa() }, 120000)
 
   const pct = (v) => `${v >= 0 ? '▲' : '▼'} ${Math.abs(v * 100).toFixed(2).replace('.', ',')}%`
-  const NOMI = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'da EUR€', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'nuovo indirizzo', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'lumachina', premio: 'premio della chat' }
+  const NOMI = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'da EUR€', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'nuovo indirizzo', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'lumachina' }
   // le voci del nastro: ognuna una funzione che la scrive coi dati del momento in cui entra nel nastro (pochi secondi prima
   // di vedersi), o niente se non c'è. Ogni pezzo è [testo, colore]: ambra le etichette, verde i valori, rosso se scende
   const riga = (...pezzi) => { const o = []; for (const [t, c] of pezzi) scrivi(o, t, c); return o }

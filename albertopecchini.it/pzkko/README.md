@@ -2165,20 +2165,10 @@ dal pc 4»): prima vinceva lo zaino col `t` più recente, e due dispositivi usat
 restando ognuno col suo. Ora il browser chiede lo zaino al server aprendo la pagina (e non salva finché non è arrivato),
 tornando sulla pagina e ogni due minuti, e i due zaini si **uniscono** (`chat/zaino-unisci.mjs`, lo stesso nel browser e
 in `api/wallet.mjs`): l'esperienza, le statistiche, i giri ai giochi, i leggendari, le app, le side quest finite e il
-record del quiz prendono il meglio dei due, le attese la scadenza più lontana; gli oggetti, gli effetti e il mestiere
-vengono da chi ha l'ultima parola, cioè chi scrive avendo visto l'ultimo salvato (`visto`, il `t` dell'ultimo zaino visto
-sul server: chi è rimasto indietro non cancella niente). La prima volta una copia mai sincronizzata che è andata più avanti
-(più esperienza) vince su quella del server. Un salvataggio alla volta: quello dopo aspetta la risposta del primo, e una
-lettura durante la quale ne è partito uno si butta (era vecchia).
-
-**I premi della chat sul server** (27.10, `chat/premi.mjs`; Alberto: «ho fatto tipo 20k riscattando ricompense giornaliere
-all'infinito»). L'attesa del `giornaliero` stava solo nello zaino, e due salvataggi accavallati (dal salvataggio a 250 ms)
-la perdevano: il server prendeva il secondo per un dispositivo rimasto indietro e teneva le attese sue, i $pzk restavano.
-Ora, col conto, `giornaliero`, `settimanale` e `mensile` sono un'azione del wallet (`{ a: 'premio', id, molt }`): la serie
-sta nel conto (`c.premi[id] = { ultimo, n }`, nella vista come `conto.premi`), il server dice di no prima del tempo, conia
-il premio e segna la mossa «premio». Il moltiplicatore lo manda il browser (al più ×3). Il primo premio di ogni conto
-riparte dalla serie dello zaino; lo zaino ne tiene la copia per i traguardi, il profilo e il cercapersone. L'attesa dei
-premi la segna il premio dall'ultimo preso: il caffè non la accorcia più. Nella sessione tutto resta nel browser.
+record del quiz prendono il meglio dei due; gli oggetti, le attese, gli effetti e il mestiere vengono da chi ha l'ultima
+parola, cioè chi scrive avendo visto l'ultimo salvato (`visto`, il `t` dell'ultimo zaino visto sul server: chi è rimasto
+indietro non cancella niente). La prima volta una copia mai sincronizzata che è andata più avanti (più esperienza) vince
+su quella del server.
 
 **Il canale sempre aperto** (26.10, `api/live.mjs`, `games/live.js`; Alberto: «fai un server sempre connesso e che registra
 tutto subito»). Due pezzi, entrambi su Vercel: (1) **si salva quasi subito**: il saldo (`games/pzk.js`) e lo zaino

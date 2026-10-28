@@ -321,8 +321,6 @@ export const cauzione = () => azione({ a: 'cauzione' })
 export const lava = (quanto) => azione({ a: 'lava', quanto })
 /** Un wallet o una chiavetta trovati dallo spazzino, decifrati: i $pzk dei portafogli smarriti. */
 export const decifra = (tipo) => azione({ a: 'decifra', tipo })
-/** Un premio della chat (giornaliero, settimanale, mensile: chat/premi.mjs): lo dà il server, che tiene la serie (conto.premi). */
-export const premio = (id, molt) => azione({ a: 'premio', id, molt })
 /** Il colpo alla cassa: op 'apri', 'entra' (col codice), 'esci', 'vai'; 'stato' si chiede spesso e non salva. */
 export async function colpo(op, codice = '') {
   if (!W) return { ok: false, errore: 'serve il conto (app account)' }
