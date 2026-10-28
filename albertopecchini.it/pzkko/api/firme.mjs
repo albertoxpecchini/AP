@@ -2,11 +2,11 @@
 // firme vere, salvate e uguali per tutti. Chi firma lascia il nome (2–32 caratteri) e la penna con cui firma (blu,
 // nera, rossa); l'ora la mette il server. Chi guarda vede le ultime firme sul foglio, con la data e l'ora di Mantova.
 //
-// Dove sta: un file privato su Vercel Blob (`pzkko/firme.json`), come il database di Better Call Pekko (api/bcp.js):
-// letto sempre dall'origine e riscritto con `ifMatch` sull'ETag, così due firme nello stesso istante non si cancellano
-// (chi perde riprova). Il token (BLOB_READ_WRITE_TOKEN) lo mette Vercel collegando uno store Blob al progetto pzkko.
-// Senza token, online, la funzione risponde «offline» (il foglio si vede, ma non si firma); in locale (il server di
-// npm run dev:pzkko, o FIRME_STORE=memory) le firme stanno in memoria finché il server non si ferma.
+// Dove sta: `pzkko/firme.json` sul server dei dati di Alberto (C:\pzkko-server, dietro il tunnel: _server.mjs; fino al
+// 28.10 su Vercel Blob, tolto dal codice il 29.10), come il database di Better Call Pekko (api/bcp.js): riscritto solo
+// se l'ETag è ancora quello, così due firme nello stesso istante non si cancellano (chi perde riprova). Senza il server,
+// online, la funzione risponde «offline» (il foglio si vede, ma non si firma); in locale (il server di npm run
+// dev:pzkko, o FIRME_STORE=memory) le firme stanno in memoria finché il server non si ferma.
 //
 // Protezioni: campo trappola e tempo minimo da quando il foglio si è avvicinato, limite di frequenza per IP (in memoria,
 // l'IP non si salva), lo stesso nome una volta al giorno, niente link, numeri di telefono o parolacce nei nomi.
@@ -16,7 +16,7 @@
 // Sta qui (.mjs) perché vada online anche quando il progetto pzkko avrà la Root Directory in albertopecchini.it/pzkko;
 // finché la radice è albertopecchini.it, la pubblica albertopecchini.it/api/firme.js, che la riesporta.
 
-import { blobOpzioni } from './_archivio.mjs'
+import { archivioServer, serverGiu, serverOpzioni } from './_server.mjs'
 
 const PATH = process.env.FIRME_BLOB_PATH || 'pzkko/firme.json'
 const MAX_BODY = 2 * 1024
@@ -32,36 +32,14 @@ const json = (res, status, body, cache = 'no-store') => {
   res.end(JSON.stringify(body))
 }
 
-// ── l'archivio: Vercel Blob, oppure la memoria (in locale), oppure niente ─────
+// ── l'archivio: il server di Alberto, oppure la memoria (in locale), oppure niente ─────
 // (in memoria: su globalThis, perché il server di prova reimporta questo file a ogni richiesta)
 const memoria = (globalThis.__pzkkoFirme ??= { db: null, etag: 0 })
 const vuoto = () => ({ firme: [] })
 
 async function backend() {
-  const opz = blobOpzioni() // il token di una volta, o l'id dello store con OIDC (vedi _archivio.mjs)
-  if (opz && process.env.FIRME_STORE !== 'memory') {
-    const blob = await import('@vercel/blob')
-    return {
-      async read() {
-        // prima l'ETag vero (head), poi il contenuto: se qualcuno scrive nel mezzo, il nostro ifMatch fallisce e si
-        // riprova (vedi api/bcp.js)
-        const meta = await blob.head(PATH, opz).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e })
-        if (!meta) return { db: vuoto(), etag: null }
-        const r = await blob.get(PATH, { ...opz, access: 'private', useCache: false })
-        if (!r || !r.stream) return { db: vuoto(), etag: null }
-        return { db: await new Response(r.stream).json(), etag: meta.etag }
-      },
-      async write(db, etag) {
-        try {
-          await blob.put(PATH, JSON.stringify(db), { ...opz, access: 'private', addRandomSuffix: false, allowOverwrite: Boolean(etag), contentType: 'application/json', ...(etag && { ifMatch: etag }) })
-          return true
-        } catch (e) {
-          if (e instanceof blob.BlobPreconditionFailedError || /already exists|precondition/i.test(e.message)) return false
-          throw e
-        }
-      },
-    }
-  }
+  const srv = process.env.FIRME_STORE !== 'memory' && serverOpzioni()
+  if (srv) return serverGiu() ? null : archivioServer(PATH, vuoto, srv)
   if (process.env.FIRME_STORE === 'memory' || !process.env.VERCEL) {
     return {
       async read() { return { db: structuredClone(memoria.db ?? vuoto()), etag: String(memoria.etag) } },

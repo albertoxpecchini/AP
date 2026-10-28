@@ -1,6 +1,6 @@
 // La borsa dei $pzk (22.10 notte): quanto vale un $pzk in EUR€, l'«euroshit» (l'euro finto del wallet: non si preleva,
 // non si deposita, non si gioca; si converte in $pzk, e i $pzk sì). Il cambio è una serie vera, un punto ogni dieci
-// minuti, salvata in pzkko/borsa.json (Vercel Blob, _archivio.mjs): comincia da 1 $pzk = 1 € e da lì si muove da sola.
+// minuti, salvata in pzkko/borsa.json (il server dei dati, _archivio.mjs): comincia da 1 $pzk = 1 € e da lì si muove da sola.
 // L'euro, per finta, non varia mai: si muove solo il $pzk.
 //
 // Come si muove, ogni dieci minuti: un passo a caso (deterministico: nasce dall'ora del punto, così il passato non si
@@ -15,7 +15,7 @@
 //   di tutto il resto valgono meno: metà della crescita (al più ±5 % al giorno) si toglie; se l'offerta cala (i portafogli
 //   smarriti che si distruggono) il cambio sale
 // (api/wallet.mjs converte al cambio di quando il wallet si è sincronizzato, se non è passata più di mezz'ora: tassoA)
-import { archivio, aggiorna, blobOpzioni } from './_archivio.mjs'
+import { archivio, aggiorna, inMemoria } from './_archivio.mjs'
 
 export const PATH = process.env.BORSA_BLOB_PATH || 'pzkko/borsa.json'
 export const PASSO = 10 * 60 * 1000
@@ -136,8 +136,7 @@ export async function borsa(now = Date.now(), M = null) {
     db.fattori = await misura(db.fattori, now, M)
     // in locale la borsa vive in memoria e rinasce a ogni avvio del server: la si fa nascere tre giorni fa, così il
     // grafico di prova ha una storia; online la storia è quella vera, salvata
-    const inLocale = process.env.PZKKO_STORE === 'memory' || (!blobOpzioni() && !process.env.VERCEL)
-    avanza(db, now, db.fattori, inLocale ? now - 3 * GIORNO : now)
+    avanza(db, now, db.fattori, inMemoria() ? now - 3 * GIORNO : now)
   })
   return db
 }

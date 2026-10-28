@@ -5,8 +5,9 @@
 // chi si è riconnesso lo confronta con quello che ha (se in mezzo è cambiato qualcosa, lo scopre da lì). Il browser poi chiede
 // i dati veri (api/wallet.mjs). Vercel non tiene una funzione accesa per sempre: dopo ~50 secondi manda { k: 'riconnetti' } e
 // chiude, e il browser riapre da sé (games/live.js): dal di fuori è sempre connesso.
-// Dentro, UN SOLO controllo per istanza, comune a tutte le connessioni: ogni 3 secondi guarda l'ETag dei due file su Blob
-// (una richiesta leggera ciascuno) e, solo se è cambiato, scarica quel file una volta e lo confronta con quello che ogni
+// Dentro, UN SOLO controllo per istanza, comune a tutte le connessioni: ogni 3 secondi guarda l'ETag dei due file sul
+// server dei dati (una richiesta leggera ciascuno: C:\pzkko-server, _server.mjs; fino al 28.10 su Blob, che proprio
+// questi controlli hanno fatto bloccare) e, solo se è cambiato, scarica quel file una volta e lo confronta con quello che ogni
 // connessione sa. Si ferma da solo quando non c'è più nessuno.
 // Sta qui (.mjs) come le altre; albertopecchini.it/api/live.js la riesporta.
 import { archivio, corpo, json, limite } from './_archivio.mjs'

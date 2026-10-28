@@ -1,57 +1,33 @@
 // L'archivio delle funzioni di pzkko.it che devono ricordare qualcosa (il wallet dei $pzk e la borsa, api/wallet.mjs e
-// api/borsa.mjs; la petizione, api/firme.mjs, ha il suo uguale): un file JSON privato su Vercel Blob per ognuna, letto
-// sempre dall'origine e riscritto con `ifMatch` sull'ETag, così due scritture nello stesso istante non si cancellano (chi
-// perde rilegge e riprova). Le credenziali le mette Vercel collegando uno store Blob al progetto pzkko: una volta il
-// token (BLOB_READ_WRITE_TOKEN), adesso l'id dello store (BLOB_STORE_ID, o col prefisso scelto nel collegamento, come
-// BLOB_READ_WRITE_TOKEN_STORE_ID) e il token OIDC della funzione, che @vercel/blob prende da sé.
-// Senza credenziali, online, l'archivio non c'è (null: la funzione risponde «offline»); in locale (il server di npm run
+// api/borsa.mjs; i giocatori; la petizione, api/firme.mjs, e Better Call Pekko, ../api/bcp.js, hanno il loro uguale): un
+// file JSON per ognuna, letto e riscritto solo se l'ETag è ancora quello, così due scritture nello stesso istante non si
+// cancellano (chi perde rilegge e riprova).
+// I file stanno SUL PC DI ALBERTO, C:\pzkko-server, dietro il tunnel (vedi _server.mjs), con PZKKO_SERVER_URL e
+// PZKKO_SERVER_SECRET nel progetto. Fino al 28.10 stavano su Vercel Blob, che quella notte si è bloccato su tutto
+// l'account (le soglie gratuite superate); il 29.10 Blob è uscito dal codice per sempre (Alberto: «togli vercel come
+// server per sempre; restiamo da me e dal tunnel»).
+// Senza il server, online, l'archivio non c'è (null: la funzione risponde «offline»); in locale (il server di npm run
 // dev:pzkko, o PZKKO_STORE=memory) tutto sta in memoria finché il server non si ferma.
 // (Comincia per _ : Vercel non ne fa una funzione.)
+import { archivioServer, serverGiu, serverOpzioni } from './_server.mjs'
 
 const memorie = (globalThis.__pzkkoArchivi ??= new Map())
 
-/** Le opzioni di Blob per arrivare allo store (col token di una volta, nessuna), o null se lo store non è collegato. */
-export function blobOpzioni() {
-  if (process.env.BLOB_READ_WRITE_TOKEN) return {}
-  const storeId = process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN_STORE_ID
-  return storeId ? { storeId } : null
-}
+/** I file stanno in memoria (le prove in locale): con PZKKO_STORE=memory, o fuori da Vercel senza il server. */
+export const inMemoria = () => process.env.PZKKO_STORE === 'memory' || (!serverOpzioni() && !process.env.VERCEL)
 
-/** L'archivio del file `path` (es. pzkko/wallet.json): { read() → { db, etag }, write(db, etag) → bool }, o null. */
+/** L'archivio del file `path` (es. pzkko/wallet.json): { etag(), read() → { db, etag }, write(db, etag) → bool }, o null. */
 export async function archivio(path, vuoto) {
-  const opz = blobOpzioni()
-  if (opz && process.env.PZKKO_STORE !== 'memory') {
-    const blob = await import('@vercel/blob')
-    return {
-      /** Solo l'ETag, senza scaricare il file (null se non c'è): serve a chi guarda se qualcosa è cambiato (api/live.mjs). */
-      async etag() { const m = await blob.head(path, opz).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e }); return m?.etag ?? null },
-      async read() {
-        const meta = await blob.head(path, opz).catch((e) => { if (e instanceof blob.BlobNotFoundError) return null; throw e })
-        if (!meta) return { db: vuoto(), etag: null }
-        const r = await blob.get(path, { ...opz, access: 'private', useCache: false })
-        if (!r || !r.stream) return { db: vuoto(), etag: null }
-        return { db: await new Response(r.stream).json(), etag: meta.etag }
-      },
-      async write(db, etag) {
-        try {
-          await blob.put(path, JSON.stringify(db), { ...opz, access: 'private', addRandomSuffix: false, allowOverwrite: Boolean(etag), contentType: 'application/json', ...(etag && { ifMatch: etag }) })
-          return true
-        } catch (e) {
-          if (e instanceof blob.BlobPreconditionFailedError || /already exists|precondition/i.test(e.message)) return false
-          throw e
-        }
-      },
-    }
+  if (!inMemoria()) {
+    const srv = serverOpzioni()
+    return srv && !serverGiu() ? archivioServer(path, vuoto, srv) : null // (il server non ha risposto da poco: «in pausa»)
   }
-  if (process.env.PZKKO_STORE === 'memory' || !process.env.VERCEL) {
-    const m = memorie.get(path) ?? memorie.set(path, { db: null, etag: 0 }).get(path)
-    return {
-      async etag() { return String(m.etag) },
-      async read() { return { db: structuredClone(m.db ?? vuoto()), etag: String(m.etag) } },
-      async write(db, etag) { if (etag !== String(m.etag)) return false; m.db = structuredClone(db); m.etag++; return true },
-    }
+  const m = memorie.get(path) ?? memorie.set(path, { db: null, etag: 0 }).get(path)
+  return {
+    async etag() { return String(m.etag) },
+    async read() { return { db: structuredClone(m.db ?? vuoto()), etag: String(m.etag) } },
+    async write(db, etag) { if (etag !== String(m.etag)) return false; m.db = structuredClone(db); m.etag++; return true },
   }
-  return null
 }
 
 /**

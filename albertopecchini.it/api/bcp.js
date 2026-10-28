@@ -3,12 +3,14 @@
 // sondaggio, record del gioco, forum, guestbook, shoutbox ed e-card. Una
 // funzione sola, un documento JSON solo.
 //
-// Dove sta: un file privato su Vercel Blob (`bcp/db.json`), letto sempre
-// dall'origine (useCache: false) e riscritto con `ifMatch` sull'ETag, così due
-// scritture contemporanee non si cancellano a vicenda: chi perde riprova.
-// Il token (BLOB_READ_WRITE_TOKEN) lo mette Vercel collegando lo store al
-// progetto. Senza token la funzione risponde «offline» e la pagina resta in
-// piedi; con BCP_STORE=memory (solo in locale) usa un database in memoria.
+// Dove sta: `bcp/db.json` sul server dei dati di Alberto (C:\pzkko-server, dietro
+// il tunnel: pzkko/api/_server.mjs, con PZKKO_SERVER_URL e PZKKO_SERVER_SECRET nel
+// progetto), riscritto solo se l'ETag è ancora quello, così due scritture
+// contemporanee non si cancellano a vicenda: chi perde riprova. Fino al 28.10
+// stava su Vercel Blob, bloccato quella notte (le soglie gratuite superate) e
+// tolto dal codice il 29.10. Senza il server la funzione risponde «offline» e la
+// pagina resta in piedi; con BCP_STORE=memory (solo in locale) usa un database
+// in memoria.
 //
 // Protezioni: campo trappola e tempo minimo di compilazione come il modulo
 // contatti, limite di frequenza per IP (in memoria, l'IP non si salva), niente
@@ -17,7 +19,7 @@
 
 export const config = { runtime: 'nodejs' }
 
-// BCP_BLOB_PATH solo per le prove in locale contro lo store vero, su un documento a parte
+// BCP_BLOB_PATH solo per le prove contro il server vero, su un documento a parte
 const PATH = process.env.BCP_BLOB_PATH || 'bcp/db.json'
 const MAX_BODY = 8 * 1024
 const CAP = { threads: 60, replies: 40, guestbook: 150, shout: 60, scores: 10, online: 80, giorni: 90, ref: 40 }
@@ -37,52 +39,18 @@ function provenienza(v) {
 // ── Il database iniziale: src/data/bcp-seed.js (lo stampa anche il template) ──
 
 import { seed as SEED } from '../src/data/bcp-seed.js'
+import { archivioServer, serverGiu, serverOpzioni } from '../pzkko/api/_server.mjs'
 
-// ── Archivio: Vercel Blob, oppure memoria (solo in locale), oppure niente ────
+// ── Archivio: il server di Alberto, oppure memoria (solo in locale), oppure niente ────
 
 let memoria = null
 let memoriaEtag = 0
 
 async function backend() {
-  // BCP_STORE=memory vince sulla chiave: in locale .env.local ha il token vero, e
-  // senza questa precedenza le prove scriverebbero nel database di produzione.
-  if (process.env.BLOB_READ_WRITE_TOKEN && process.env.BCP_STORE !== 'memory') {
-    const blob = await import('@vercel/blob')
-    return {
-      async read() {
-        // Prima l'ETag vero (head), poi il contenuto (get). La lettura del JSON arriva
-        // compressa con un ETag «debole» che ifMatch non accetta; in quest'ordine, se
-        // qualcuno scrive nel mezzo, il nostro ifMatch fallisce e si riprova: non si
-        // sovrascrive mai una versione più recente.
-        const meta = await blob.head(PATH).catch((e) => {
-          if (e instanceof blob.BlobNotFoundError) return null
-          throw e
-        })
-        if (!meta) return { db: SEED(), etag: null }
-        const r = await blob.get(PATH, { access: 'private', useCache: false })
-        if (process.env.BCP_DEBUG) console.warn('bcp read:', meta.etag, r && r.blob && r.blob.etag)
-        if (!r || !r.stream) return { db: SEED(), etag: null }
-        return { db: await new Response(r.stream).json(), etag: meta.etag }
-      },
-      async write(db, etag) {
-        try {
-          await blob.put(PATH, JSON.stringify(db), {
-            access: 'private',
-            addRandomSuffix: false,
-            allowOverwrite: Boolean(etag),
-            contentType: 'application/json',
-            ...(etag && { ifMatch: etag }),
-          })
-          return true
-        } catch (e) {
-          // ETag cambiato nel frattempo (o creato da un'altra richiesta): si riprova
-          if (process.env.BCP_DEBUG) console.warn('bcp write:', e.constructor.name, e.message)
-          if (e instanceof blob.BlobPreconditionFailedError || /already exists|precondition/i.test(e.message)) return false
-          throw e
-        }
-      },
-    }
-  }
+  // BCP_STORE=memory vince sul server: le prove in locale non scrivono mai nel
+  // database vero.
+  const srv = process.env.BCP_STORE !== 'memory' && serverOpzioni()
+  if (srv) return serverGiu() ? null : archivioServer(PATH, SEED, srv)
   if (process.env.BCP_STORE === 'memory') {
     return {
       async read() {

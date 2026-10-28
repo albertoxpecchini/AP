@@ -44,8 +44,9 @@ si cancellano, chi perde riprova. Il contenuto iniziale (discussioni e recension
 `src/data/bcp-seed.js` e il template lo stampa nell'HTML, così la pagina regge anche senza
 JavaScript o col database spento (l'API risponde `offline`).
 
-- **Attivazione**: Vercel → Storage → Create → Blob (privato) → collegarlo al progetto `bcp`:
-  Vercel aggiunge `BLOB_READ_WRITE_TOKEN` e al deploy successivo tutto si accende.
+- **Attivazione**: il database sta sul server dei dati di Alberto (`C:\pzkko-server`, vedi
+  `pzkko/api/_server.mjs`; fino al 28.10.2026 su Vercel Blob, bloccato quella notte e tolto dal codice):
+  nel progetto `bcp` servono `PZKKO_SERVER_URL` e `PZKKO_SERVER_SECRET`, poi un deploy.
 - **Protezioni**: campo trappola, 3 s minimi dall'apertura, massimo 4 messaggi al minuto per IP
   (in memoria, l'IP non si salva), niente link né HTML, nomi 2–24 caratteri («pekko» è riservato),
   liste troncate (60 discussioni, 40 risposte, 150 firme, 60 messaggi nella shoutbox).

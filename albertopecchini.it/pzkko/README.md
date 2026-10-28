@@ -2485,13 +2485,11 @@ Progetto `pzkko` dal repository `albertoxpecchini/AP`:
   riesporta (e c'è anche su albertopecchini.it: male non fa). In locale la serve
   `npm run dev:pzkko`.
 - `/api/firme` (22.10): la petizione. `api/firme.mjs` qui dentro, pubblicata come il meteo da
-  `albertopecchini.it/api/firme.js` finché la radice è lì. Le firme stanno in un JSON privato su
-  **Vercel Blob** (`pzkko/firme.json`), letto dall'origine e riscritto con `ifMatch` sull'ETag
-  (due firme insieme non si cancellano: chi perde riprova), come il database di Better Call
-  Pekko (`api/bcp.js`). **Va collegato uno store Blob al progetto pzkko** (Vercel › pzkko ›
-  Storage › Connect, lo store privato di bcp o uno nuovo): Vercel aggiunge
-  `BLOB_READ_WRITE_TOKEN` e al deploy dopo la petizione si accende; senza, risponde «offline» e
-  il foglio si vede ma non si firma. Protezioni: campo trappola, 2,5 s minimi da quando il
+  `albertopecchini.it/api/firme.js` finché la radice è lì. Le firme stanno in un JSON
+  (`pzkko/firme.json`) sul server dei dati di Alberto (vedi sotto; fino al 28.10 su Vercel Blob),
+  riscritto solo se l'ETag è ancora quello (due firme insieme non si cancellano: chi perde
+  riprova), come il database di Better Call Pekko (`api/bcp.js`). Senza il server risponde
+  «offline» e il foglio si vede ma non si firma. Protezioni: campo trappola, 2,5 s minimi da quando il
   foglio si è avvicinato, al massimo 2 firme in 10 minuti e 6 al giorno per IP (in memoria,
   l'IP non si salva), lo stesso nome una volta al giorno, 120 firme l'ora in tutto, nomi di
   2–32 lettere senza link, numeri di telefono, emoji né parolacce (anche camuffate: «c4zz0»,
@@ -2501,16 +2499,28 @@ Progetto `pzkko` dal repository `albertoxpecchini/AP`:
   gli altri entro una ventina di secondi). **Moderazione**: con
   `FIRME_ADMIN_KEY` nel progetto (e la stessa in `.env.local`), `node tools/pzkko/firme.mjs`
   elenca le firme e `node tools/pzkko/firme.mjs via <id>` ne cancella una; oppure si modifica
-  `pzkko/firme.json` dalla pagina dello store. Se il progetto passa alla Root Directory
-  `albertopecchini.it/pzkko`, lì serve un `package.json` con `@vercel/blob`.
+  `C:\pzkko-server\dati\pzkko__firme.json` a server spento.
 - `/api/wallet` e `/api/borsa` (22.10 notte): il wallet dei $pzk e la borsa. `api/wallet.mjs` e `api/borsa.mjs` qui
   dentro, riesportate da `albertopecchini.it/api/wallet.js` e `borsa.js`. I conti in `pzkko/wallet.json` e la serie
-  del cambio in `pzkko/borsa.json` sullo stesso **Vercel Blob** della petizione: senza store collegato rispondono
+  del cambio in `pzkko/borsa.json` sul server dei dati, come la petizione (vedi sotto): senza il server rispondono
   «offline» e la home va avanti coi 1.000 $pzk della sessione (il wallet lo dice). Variabili nel progetto:
   `PZKKO_ADMIN_KEY` (o `FIRME_ADMIN_KEY`) per creare il conto «pzkko» di Alberto e moderare; a piacere
   `WALLET_SECRET` (la firma dei token: senza, deriva dal token del Blob, e cambiando store i token scadono),
   `GITHUB_TOKEN` (le chiamate a GitHub senza token sono 60 l'ora per IP: dagli IP di Vercel possono finire, e allora il
   fattore commit non conta). In locale (`npm run dev:pzkko`) tutto sta in memoria.
+- **Il server dei dati sul pc di Alberto** (28.10; Alberto: «fallo in locale il server, fatto bene e super solido,
+  mettilo in C:, 100% anti hacker»). Dalla notte del 28.10 Vercel Blob è bloccato su tutto l'account (pzkko e Better Call
+  Pekko): le soglie gratuite del piano Hobby superate (10.000 letture e 2.000 scritture al mese; il canale sempre aperto
+  ne fa due ogni 3 secondi), e per 30 giorni ogni lettura dà 403. I file JSON (conti, zaini, borsa, giocatori, firme,
+  `bcp/db.json`) adesso stanno in `C:\pzkko-server` (fuori dal repo: server, prove, istruzioni nel suo `LEGGIMI.md`),
+  dietro un tunnel HTTPS (Tailscale Funnel, `https://desktop-inpvhr2.tail6c90b3.ts.net`). Le funzioni ci arrivano con
+  `api/_server.mjs`, che `_archivio.mjs`, `firme.mjs` e `../api/bcp.js` usano quando nel progetto ci sono
+  `PZKKO_SERVER_URL` (l'indirizzo del tunnel, https) e `PZKKO_SERVER_SECRET` (il segreto di
+  `C:\pzkko-server\config\config.json`). Il 29.10 Blob è uscito dal codice e da `package.json` per sempre (Alberto:
+  «togli vercel come server per sempre; restiamo da me e dal tunnel»). Ogni richiesta e ogni
+  risposta sono firmate (HMAC-SHA256 con ora e nonce: niente richieste rimandate, niente server finti); il server ascolta
+  solo su 127.0.0.1 e scrive solo se l'ETag è ancora quello, come Blob. Se il pc è spento, per 15 secondi alla volta le
+  funzioni rispondono «in pausa» (i 1.000 della sessione) invece di aspettare.
 - Domini: `www.pzkko.it` (principale), `pzkko.it` → 308 verso www
 - Ogni push su `main` pubblica da solo.
 
