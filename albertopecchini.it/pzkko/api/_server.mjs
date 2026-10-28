@@ -17,12 +17,18 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypt
 const stato = (globalThis.__pzkkoServer ??= { copie: new Map(), giuFino: 0 })
 const PAUSA = 15_000
 
+// le variabili come vengono incollate nel pannello di Vercel (29.10: il segreto giusto con un carattere in più, e nessuna
+// firma tornava): il segreto è sempre 43 caratteri base64url (32 byte, installa.ps1), e si pesca anche fra virgolette,
+// «PZKKO_SERVER_SECRET=», la riga del JSON o le due righe incollate insieme; l'indirizzo è il primo https://host
+const SEGRETO = /(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])/
+const INDIRIZZO = /https:\/\/[A-Za-z0-9.-]+(:\d+)?|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/
+const segretoDi = (v) => { const s = String(v ?? '').trim(); return SEGRETO.exec(s)?.[0] ?? s }
+
 /** { url, segreto } se il server è configurato (https, o http solo verso questo computer), se no null. */
 export function serverOpzioni() {
-  const url = String(process.env.PZKKO_SERVER_URL ?? '').trim().replace(/\/+$/, '')
-  const segreto = String(process.env.PZKKO_SERVER_SECRET ?? '').trim()
-  if (segreto.length < 32) return null
-  if (!/^https:\/\/[^/?#]+$/.test(url) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(url)) return null
+  const url = INDIRIZZO.exec(String(process.env.PZKKO_SERVER_URL ?? ''))?.[0] ?? ''
+  const segreto = segretoDi(process.env.PZKKO_SERVER_SECRET)
+  if (segreto.length < 32 || !url) return null
   return { url, segreto }
 }
 /** Il server non ha risposto da poco: meglio dire subito «in pausa». */
@@ -62,7 +68,8 @@ async function chiama({ url, segreto }, metodo, nome, { corpo = null, ifMatch = 
   const b = /^[A-Za-z0-9_-]{43}$/.test(data) ? Buffer.from(data, 'base64url') : null
   if (!b || b.length !== attesa.length || !timingSafeEqual(b, attesa)) {
     stato.giuFino = Date.now() + PAUSA
-    throw errore(`risposta senza la firma giusta (HTTP ${r.status}: il segreto o l'ora non tornano, o non è il server di Alberto)`, { offline: true })
+    // (del segreto si dice solo quanto è lungo e se è un segreto pulito: basta a capire se è stato incollato male)
+    throw errore(`risposta senza la firma giusta (HTTP ${r.status}: il segreto o l'ora non tornano, o non è il server di Alberto; il segreto qui è di ${segreto.length} caratteri${SEGRETO.test(segreto) && segreto.length === 43 ? '' : ', non i 43 di installa.ps1'})`, { offline: true })
   }
   stato.giuFino = 0
   return { status: r.status, etag, testo }
