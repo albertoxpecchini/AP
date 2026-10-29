@@ -44,18 +44,26 @@
    sulla foto: sotto il tasto di sopra la plastica libera va da 430 a 469 px (su 774: l'anello scuro e il bordino lucido
    finiscono a 428, l'anello del tasto di sotto comincia a 470), il centro è a 449,5; per il tasto di sotto alla stessa
    distanza, 634. Tutte e due cadono al 128,4 % dell'altezza del tasto (152 px sotto il bordo alto, su un tasto di 118,3), centrate: mai sul tasto né sul suo bordo. Dal 23.10 sera il
-   tasto di sopra è rosso e dice CHIUDI, quello di sotto è verde e dice INDIETRO (i colori sono nella foto) */
+   tasto di sopra è rosso e dice CHIUDI, quello di sotto dice INDIETRO; era verde, dal 29.10 è rosso anche lui (Alberto:
+   «così uno non lo preme perché verde ma legge prima»). I colori sono nella foto (tools/pzkko/tasti-pager.mjs) */
 .t-tasto::after{position:absolute;left:50%;top:128.4%;translate:-50% -50%;font:400 clamp(12px,1.25cqw,18px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#f3f1ea;white-space:nowrap;
   text-shadow:0 1px 0 #000,0 0 2px #000,0 0 6px rgba(0,0,0,.9)}
 .t-tasto.su::after{content:"chiudi"}.t-tasto.giu::after{content:"indietro"}
 
-/* la barra di stato: una riga di cristalli liquidi */
-.t-stato{position:absolute;inset:0 0 auto 0;z-index:20;height:26px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border-bottom:1px solid rgba(70,255,125,.22);background:linear-gradient(180deg,rgba(70,255,125,.1),rgba(70,255,125,.03));font:400 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--led);text-shadow:0 0 6px rgba(70,255,125,.6);pointer-events:none}
-.t-rete{display:flex;align-items:flex-end;gap:2px;height:12px}
-.t-rete i{display:block;width:3px;background:var(--led);box-shadow:0 0 4px var(--led)}
-.t-rete i:nth-child(1){height:4px}.t-rete i:nth-child(2){height:6px}.t-rete i:nth-child(3){height:9px}.t-rete i:nth-child(4){height:12px}
-.t-rete b{margin-left:6px;font-weight:400;opacity:.85}
+/* la barra di stato: una riga di cristalli liquidi, coi dati veri di chi guarda (29.10, telefono.js: rete, aggiornaStato): il
+   wifi con le tacche date dal ping, il tipo di rete, il ping e la banda a sinistra; l'ora in mezzo esatto (la griglia ha i
+   due lati larghi uguali); la batteria a destra */
+.t-stato{position:absolute;inset:0 0 auto 0;z-index:20;height:26px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid rgba(70,255,125,.22);background:linear-gradient(180deg,rgba(70,255,125,.1),rgba(70,255,125,.03));font:400 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--led);text-shadow:0 0 6px rgba(70,255,125,.6);pointer-events:none}
+.t-rete{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap}
+.t-wifi{flex:none;width:16px;height:13px;overflow:visible}
+.t-wifi path{fill:none;stroke:rgba(70,255,125,.2);stroke-width:1.9;stroke-linecap:round}
+.t-wifi circle{fill:rgba(70,255,125,.2)}
+.t-wifi path.on{stroke:var(--led);filter:drop-shadow(0 0 2px var(--led))}
+.t-wifi circle.on{fill:var(--led)}
+.t-rete b{font-weight:400;opacity:.85;overflow:hidden;text-overflow:ellipsis}
+.t-rete.giu b{color:var(--rosso);opacity:1;text-shadow:0 0 6px rgba(255,91,74,.6)}
 .t-ora{font-size:14px;letter-spacing:.14em}
+.t-batt{justify-self:end}
 .t-batt{display:flex;align-items:center;gap:2px;padding:2px 3px;border:1.5px solid var(--led);border-radius:2px;position:relative;margin-right:4px}
 .t-batt::after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:5px;background:var(--led)}
 .t-batt i{display:block;width:4px;height:7px;background:rgba(70,255,125,.15)}
@@ -93,10 +101,10 @@
 .tel.carica .t-cavo-scatola{opacity:1}
 .tel.pieno .t-cavo-scatola{display:none} /* sul cellulare a tutto schermo il cercapersone non c'è */
 
-/* la home: a sinistra l'ora e i widget, a destra le app. Comincia sotto la barra di stato, come le app: la barra è quasi
-   trasparente, e se la home ci scorresse sotto l'ora e le icone si vedrebbero passare attraverso */
+/* la home: a sinistra l'ora e i widget, a destra le app a pagine. Comincia sotto la barra di stato, come le app: la barra è
+   quasi trasparente, e se la home ci scorresse sotto l'ora e le icone si vedrebbero passare attraverso */
 .t-vista{position:absolute;inset:0;overflow:hidden;background:#07100a}
-.t-home{position:absolute;inset:26px 0 0;display:grid;grid-template-columns:1fr 1.05fr;gap:14px;padding:10px 16px 12px;overflow:hidden auto;overscroll-behavior:none;scrollbar-width:none;
+.t-home{position:absolute;inset:26px 0 0;display:grid;grid-template-columns:1fr 1.05fr;grid-template-rows:minmax(0,1fr);gap:14px;padding:10px 16px 8px;overflow:hidden auto;overscroll-behavior:none;scrollbar-width:none;
   background:linear-gradient(180deg,rgba(6,12,8,.72),rgba(6,12,8,.9)),radial-gradient(90% 60% at 80% 100%,rgba(70,255,125,.22),transparent 70%),url(/art/muro.webp) center/cover}
 .t-home::-webkit-scrollbar{display:none}
 .t-home[hidden]{display:none}
@@ -123,8 +131,23 @@
 .t-notizia{display:flex;gap:8px;align-items:center;margin-top:4px;font-size:13px;line-height:1.25}
 .t-notizia .emo{flex:none;height:26px;width:26px;object-fit:contain;margin:0}
 .t-notizia b{display:inline;margin:0;font:400 13px/1.25 var(--mono);color:#fff}
-/* quattro colonne (dal 23.10, con la miniera le app sono dieci: su tre colonne la quarta riga usciva dallo schermo) */
-.t-griglia{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-content:start;gap:12px 4px;padding-top:2px}
+/* le app a pagine (29.10, Alberto: «spazio per icone 3x3 poi deve scorrere … come l'iphone dei puntini sotto in mezzo»):
+   nove per pagina, e le pagine si scorrono di lato, una alla volta (gli agganci: si ferma sempre su una pagina intera, anche
+   lanciando il dito); il mouse le trascina (telefono.js, sfoglia: .trascina toglie gli agganci finché tiene premuto). Sotto
+   in mezzo i puntini, uno per pagina: quello acceso è la pagina di adesso, cerchiato di rosso se ci sono app col pallino.
+   Prima (dal 23.10) le app stavano tutte in una griglia di quattro colonne, poi cinque, sempre più piccole */
+.t-app-pagine{display:flex;flex-direction:column;min-width:0;min-height:0}
+.t-pagine{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-auto-columns:100%;overflow:auto hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;user-select:none;-webkit-user-select:none}
+.t-pagine::-webkit-scrollbar{display:none}
+.t-home.trascina .t-pagine{scroll-snap-type:none;cursor:grabbing}
+.t-pagina{scroll-snap-align:start;scroll-snap-stop:always;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));place-items:center;gap:4px}
+.t-pagina img{-webkit-user-drag:none;pointer-events:none}
+.t-puntini{flex:none;display:flex;justify-content:center;min-height:18px;padding-top:4px}
+.t-punto{display:grid;place-items:center;width:20px;height:18px;padding:0;border:0;background:none;cursor:pointer}
+.t-punto::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(233,239,230,.32)}
+.t-punto.on::before{background:#f3f7f1;box-shadow:0 0 6px rgba(70,255,125,.55)}
+.t-punto.avviso::before{outline:2px solid var(--rosso);outline-offset:1px}
+@media (hover:hover){.t-punto:not(.on):hover::before{background:rgba(233,239,230,.6)}}
 .t-ico{display:flex;flex-direction:column;align-items:center;gap:5px;padding:0;border:0;background:none;cursor:pointer}
 /* le piastrelle: gli adesivi disegnati da Replicate (art/chat-app/), un po' storti come quelli sul muro */
 .t-ico-q{position:relative;display:block;width:66px;height:66px;transform:rotate(var(--r,0deg));transition:transform .15s}
@@ -187,39 +210,14 @@
 .t-doppio-lcd canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .t-doppio.via{opacity:0}
 
-/* la porta (23.10 sera): l'lcd verde del tomodachi a tutto schermo, identico a quello del doppione, col tasto ACCEDI in basso a
-   destra (la chiocciolina intanto sta a sinistra e lo guarda: tomodachi.attendi). Premuto, la chiocciolina si sposta in alto a
-   sinistra e a destra compaiono «pzk os», il registro con le baggianate e la barra; poi la porta sfuma e sotto c'è pzk os.
-   Alla chiusura torna, con la chiocciolina che saluta. Sta sopra il tubo catodico: l'lcd non è un tubo. */
-.t-porta{position:absolute;inset:0;z-index:45;overflow:hidden;background:#a9bc96;color:#1c2616;font:400 16px/1.2 "Fake Receipt",ui-monospace,monospace;transition:opacity .3s}
+/* la porta: l'lcd verde del tomodachi a tutto schermo, identico a quello del doppione, che torna alla chiusura con la
+   chiocciolina che saluta. Sta sopra il tubo catodico: l'lcd non è un tubo. Dal 23.10 sera al 29.10 c'era anche
+   all'apertura, col tasto ACCEDI e le baggianate del caricamento; ora il cercapersone si accende e basta */
+.t-porta{position:absolute;inset:0;z-index:45;overflow:hidden;background:#a9bc96}
 .t-porta[hidden]{display:none}
-.t-porta.via{opacity:0}
-.t-porta-lcd canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;
-  transition:left .5s cubic-bezier(.6,0,.25,1),top .5s cubic-bezier(.6,0,.25,1),width .5s cubic-bezier(.6,0,.25,1),height .5s cubic-bezier(.6,0,.25,1)}
-/* nel caricamento la chiocciolina e la scritta stanno sulla stessa riga: tutte e due centrate a metà altezza, a 4,5 % dai bordi */
-.t-porta[data-fase="carica"] .t-porta-lcd canvas{left:4.5%;top:27.5%;width:45%;height:45%}
-/* ACCEDI: scritto a cristalli liquidi, con il cursore che lampeggia; compare a scatti come i segmenti di un lcd */
-.tel .t-accedi{position:absolute;right:4%;bottom:9%;display:flex;align-items:center;gap:.45em;padding:.5em .75em .5em 1em;border:max(2px,.2cqw) solid currentColor;border-radius:0;background:none;color:#1c2616;
-  font:400 clamp(16px,2.1cqw,30px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;visibility:hidden}
-.tel .t-accedi::after{content:"";width:.55em;height:.95em;background:currentColor;animation:t-cursore 1.06s linear infinite}
-@keyframes t-cursore{0%,49%{opacity:1}50%,100%{opacity:0}}
-.t-porta.pronta[data-fase="attesa"] .t-accedi{visibility:visible;animation:t-segmenti .3s steps(3)}
-@keyframes t-segmenti{from{opacity:0}}
-@media (hover:hover){.tel .t-accedi:hover{background:#1c2616;color:#a9bc96}}
-.tel .t-accedi:active{background:#1c2616;color:#a9bc96;translate:0 1px}
-.tel .t-accedi:focus-visible{outline:max(2px,.2cqw) dashed #1c2616;outline-offset:.3em}
-/* il caricamento: «pzk os», le ultime tre baggianate (le vecchie sbiadite), la barra a scatti */
-.t-porta-txt{position:absolute;left:53.5%;right:4.5%;top:13%;bottom:13%;display:flex;flex-direction:column;gap:.6em;visibility:hidden;opacity:0;transition:opacity .25s .3s}
-.t-porta[data-fase="carica"] .t-porta-txt{visibility:visible;opacity:1}
-.tel .t-porta-txt b{color:#1c2616;text-shadow:none;font:400 clamp(26px,4.6cqw,66px)/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.02em}
-.t-frasi{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:.4em;margin:0;padding:0;list-style:none;font-size:clamp(12px,1.3cqw,19px);line-height:1.2;letter-spacing:.02em}
-.t-frasi li::before{content:"> "}
-.t-frasi li.ok::after{content:"\a0…\a0ok"} /* spazi che non vanno a capo: «… ok» resta attaccato all'ultima parola */
-.t-frasi li.fine.ok::after{content:""}
-.t-frasi li:not(:last-child){opacity:.5}
-.t-barra{display:block;flex:none;height:clamp(12px,1.5cqw,20px);padding:2px;border:max(2px,.18cqw) solid currentColor}
-.t-barra em{display:block;width:0;height:100%;background:currentColor;transition:width .2s steps(3)}
-/* lo spegnimento (telefono.js, spegni): lo schermo si schiaccia in una riga e poi in un punto; questo strato lo sbianca */
+.t-porta-lcd canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated}
+/* l'accensione e lo spegnimento (telefono.js, accendiSchermo e spegni): lo schermo si apre da un punto e da una riga, e si
+   chiude nello stesso modo; questo strato lo sbianca */
 .t-bianco{position:absolute;inset:0;z-index:60;background:#f2fff4;opacity:0;pointer-events:none}
 
 /* sul cellulare: lo schermo prende tutta la finestra, i tasti diventano una barra in basso */
@@ -234,22 +232,19 @@
 .tel.pieno .t-nav{position:absolute;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(2,1fr);height:calc(48px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);border-top:2px solid #000;background:#151816}
 .tel.pieno .t-nav{gap:8px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
 .tel.pieno .t-nav button{border:2px solid #000;border-radius:7px;color:#fff;font:400 15px/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;box-shadow:0 3px 0 #000;text-shadow:0 1px 0 rgba(0,0,0,.6)}
-.tel.pieno .t-nav [data-t="indietro"]{background:#3d824f} /* i colori delle gomme della foto */
-.tel.pieno .t-nav [data-t="chiudi"]{background:#c74337}
+.tel.pieno .t-nav button{background:#c74337} /* il colore delle gomme della foto: rosse tutte e due dal 29.10 (prima indietro era verde, #3d824f) */
 .tel.pieno .t-nav button:active{translate:0 2px;box-shadow:0 1px 0 #000}
 /* sul cellulare la porta lascia libera la barra (si può chiudere anche da lì); in verticale la chiocciolina sta in alto */
 .tel.pieno .t-porta{bottom:calc(48px + env(safe-area-inset-bottom,0px))}
 @media (max-aspect-ratio:1/1){
   .tel.pieno .t-porta-lcd canvas{top:20%;height:auto}
-  .tel.pieno .t-porta[data-fase="carica"] .t-porta-lcd canvas{left:6%;top:5%;width:88%;height:auto}
-  .tel.pieno .t-porta-txt{left:6%;right:6%;top:calc(5% + 50cqw);bottom:auto;height:auto} /* subito sotto la chiocciolina: alta 88cqw / 2,04 ≈ 43cqw, più lo stacco */
-  .tel.pieno .t-accedi{right:50%;translate:50% 0;bottom:16%}
 }
 
-/* in verticale (il cellulare tenuto dritto): la home in colonna, le app con più spazio sotto */
+/* in verticale (il cellulare tenuto dritto): la home in colonna (le pagine delle app sotto i widget, alte tre file), le app
+   con più spazio sotto */
 @container palco (max-aspect-ratio: 1/1){
-  .t-home{grid-template-columns:1fr;align-content:start}
-  .t-griglia{grid-template-columns:repeat(4,1fr);gap:16px 4px}
+  .t-home{grid-template-columns:1fr;grid-template-rows:none;align-content:start}
+  .t-app-pagine{height:330px}
   .t-w-ora b{font-size:60px}
 }
 @media (prefers-reduced-motion:reduce){.tel[open],.tel.chiude,.t-app.entra,.t-home.torna,.t-pips i.pronta,.t-led.on{animation:none}.t-toast{transition:none}}
@@ -1140,11 +1135,6 @@
 .t-cu-fine>b{font:400 34px/1 var(--fa);color:#fff}
 .t-cu-fine small{color:var(--led);font:400 12px/1 var(--mono);text-transform:uppercase}
 .t-cu-premi{margin:4px 0;font:400 14px/1.4 var(--mono);color:#cfdccb}.t-cu-premi .emo{height:1.4em;vertical-align:-.35em}
-
-/* più di dodici app (26.10: conversioni, calcolatrice, cucina…): sei per riga, un po' più piccole, così stanno tutte senza scorrere */
-.t-griglia:has(> :nth-child(13)){grid-template-columns:repeat(5,minmax(0,1fr));gap:10px 2px}
-.t-griglia:has(> :nth-child(13)) .t-ico-q{width:56px;height:56px}
-.t-griglia:has(> :nth-child(13)) .t-ico-n{font-size:9.5px;letter-spacing:.03em}
 
 /* ── il compilatore C (26.10, app/compilatore.js): l'editor a sinistra, input e output a destra, come mycompiler. Il codice
    è in Cascadia Code (fonts/): il carattere del cercapersone ha solo maiuscole e il C le distingue ── */

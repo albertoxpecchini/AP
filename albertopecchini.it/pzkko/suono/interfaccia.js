@@ -2,7 +2,7 @@
 // tasto ha un suonino»). Come la strada (suono.js), tutto sintetizzato dal vivo, niente file: chiptune a onde quadre,
 // triangoli e rumore.
 // - musichetta(nome): una sigla di un secondo o due per ogni app del cercapersone (telefono/telefono.js, vai), per
-//   l'accensione (ACCEDI), il «accesso consentito», lo spegnimento a tubo catodico e il ritorno alla home; il wallet e i
+//   l'accensione dello schermo, lo spegnimento a tubo catodico e il ritorno alla home; il wallet e i
 //   cinque giochi grandi la suonano da soli quando la loro finestra si apre (qui sotto, chi guarda i dialog). Una sigla
 //   nuova sfuma quella di prima.
 // - Ogni tasto ha il suo suonino, col materiale di dove sta (qui sotto, chi ascolta i clic): il bip a 8 bit nel
@@ -80,7 +80,6 @@ const seme = (s) => () => { s = (s * 1664525 + 1013904223) % 4294967296; return 
 const MUSICHE = {
   // il cercapersone
   accendi: (c, t) => { melodia(c, t, 'C5 E5 G5 C6 E6:3', { passo: 0.07 }); melodia(c, t, 'C3:3 G3:3', { passo: 0.07, onda: 'triangle', vol: 0.16 }) },
-  consentito: (c, t) => melodia(c, t, 'G5 C6:3', { passo: 0.08, onda: 'triangle', vol: 0.16 }),
   spegni: (c, t) => { tono(c, t, 1100, 0.42, { fino: 55, vol: 0.12 }); rumore(c, t + 0.05, 0.3, { f: 600, q: 0.7, vol: 0.05 }) },
   home: (c, t) => melodia(c, t, 'E6 C6', { passo: 0.05, vol: 0.07 }),
   chat: (c, t) => melodia(c, t, 'E6 - E6 G6:2', { passo: 0.06, vol: 0.1 }),

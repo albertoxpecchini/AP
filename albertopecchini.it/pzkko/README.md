@@ -1687,7 +1687,7 @@ specchi, e riparte da dov'era; se non torna entro 8 s ricarica, ma senza l'arriv
 **I suoni dell'interfaccia** (26.10, `suono/interfaccia.js`; Alberto: «crea i suoni dove non ci sono: ogni app ha la sua
 musichetta, ogni tasto ha un suonino»), sintetizzati anche loro, chiptune a onde quadre, triangoli e rumore:
 `musichetta(nome)` suona la sigla di ogni app del cercapersone (`telefono.js`, `vai`: aprendola, non tornando
-indietro), l'accensione (ACCEDI), «accesso consentito», lo spegnimento a tubo catodico e il ritorno alla home; il wallet e
+indietro), l'accensione dello schermo, lo spegnimento a tubo catodico e il ritorno alla home; il wallet e
 i cinque giochi grandi hanno la loro, che parte da sola quando la finestra si apre (un `MutationObserver` sull'`open`
 dei dialog: `.wallet .rl .bj .mn .dd .mo .vi`). Una sigla nuova sfuma quella di prima. Ogni tasto ha il suonino del suo
 materiale (chi ascolta i clic, in cattura): il bip a 8 bit nel cercapersone (più basso per indietro e chiudi, più alto
@@ -2029,15 +2029,21 @@ lcd vive il tomodachi (`chat/tomodachi.js`, la chiocciolina a pixel); il led ros
 riscuotere e **sfarfalla come la spia del disco di un PC** quando il sistema lavora (`chat/led.js`: ogni richiesta al
 server, il bot che pensa e scrive, le app che si caricano). Al clic **il cercapersone si ingrandisce** e diventa lo stesso
 cercapersone in alta qualità (`art/chat-pager-grande/pager-grande.webp`, gpt-image-2, foglio `chat-pager-grande`): il tasto
-è la stessa foto rimpicciolita con l'lcd nelle stesse quote, così l'ingrandimento è puro e non si vede il cambio. Poi
-(23.10 sera) **la porta**: sullo schermo resta il tomodachi, a tutto schermo, e compare il tasto **ACCEDI**; premuto, la
-chiocciolina si sposta e a destra «pzk os» scrive quattro **baggianate** a caso (`BAGGIANATE` in telefono.js: «sveglio i
-criceti nella ruota del server», «soffio nella cartuccia»…) mentre la barra si riempie, e si entra. Niente tasti con la
+è la stessa foto rimpicciolita con l'lcd nelle stesse quote, così l'ingrandimento (420 ms) è puro e non si vede il cambio.
+Arrivando, l'lcd piccolo si spegne e **lo schermo grande si accende come un vecchio televisore** (29.10, Alberto: «appena
+premo il cercapers no caricamento ma solo animazione che lo accendo tipo 400ms»; `accendiSchermo` in telefono.js): un punto
+bianco che si allunga in una riga, la riga che si apre in tutto lo schermo e la luce che cala, in 400 ms; sotto c'è già pzk
+os (l'app chiesta da chi apre, se no l'ultima aperta, se no la home), preparato mentre il doppione vola. Dal 23.10 sera al
+29.10 c'era **la porta**: il tomodachi a tutto schermo, il tasto ACCEDI e tre secondi di baggianate («sveglio i criceti
+nella ruota del server», «soffio nella cartuccia»…); è rimasta solo per il saluto. Niente tasti con la
 «×»: si chiude col **tasto rosso CHIUDI**, toccando fuori o con Esc dalla home: lo schermo **si spegne come un tubo
 catodico** (si schiaccia in una riga bianca, poi in un punto, sul vetro nero), ricompare il tomodachi che **saluta**
 («CIAO» e il cuore, `tomodachi.saluta`) e dopo un paio di secondi il cercapersone si rimpicciolisce da solo nel tasto; un
-secondo «chiudi» mentre saluta chiude subito. Il **tasto verde INDIETRO** torna indietro di una mossa (la pagina interna
-dell'app, poi l'app di prima, poi la home) e si può premere a raffica; nella home non fa niente. La freccia in alto
+secondo «chiudi» mentre saluta chiude subito. Il **tasto INDIETRO** torna indietro di una mossa (la pagina interna
+dell'app, poi l'app di prima, poi la home) e si può premere a raffica; nella home non fa niente. Dal 29.10 è **rosso come
+CHIUDI** (Alberto: «così uno non lo preme perché verde ma legge prima»; prima era verde): sulla foto la gomma l'ha
+ricolorata `tools/pzkko/tasto-indietro-rosso.mjs`, perché il PNG da cui `tasti-pager.mjs` colora i tasti non c'è più
+(`tasti-pager.mjs` ha già il rosso per tutti e due), e sul cellulare è rossa la barra. La freccia in alto
 nelle app fa lo stesso. Tutto il cercapersone, come il wallet, è scritto solo in Fake Receipt. Lo schermo è un **tubo
 catodico che sfarfalla** (`games/crt.js`, come gli schermi del wallet) già sulla porta, e lo è anche lo schermino del
 cercapersone piccolo: i tre tubi (tasto, doppione che vola, schermo grande) sono «insieme», agganciati all'orologio della
@@ -2048,11 +2054,25 @@ Alberto ha voluto oltre allo zoom: niente altro deve muoversi da solo.
 
 **Il cercapersone grande** (`telefono/telefono.js` + `telefono.css`; il nome è rimasto dalla prima versione, che era un
 telefono) è orizzontale come quello piccolo. Le quote sono misurate sul disegno (1341 × 774): lo schermo va da 8,35 % a
-74,65 % in larghezza e da 24,68 % a 80,88 % in altezza; i due tasti sono veri (sopra, rosso: chiudi; sotto, verde: indietro), il led
-è a 84,6 % / 25,6 %. Nello schermo, un palco di 760 punti ridimensionato allo schermo vero: barra di stato lcd (pzkkonet,
-ora, batteria come quella del wallet), la home (ora, saldo, sfide, l'ultima notizia dei giocatori) e le **app**, una per
-modulo in `telefono/app/`, caricate al primo uso e poi tenute montate; le icone sono adesivi disegnati (foglio `chat-app`).
-Sul cellulare lo schermo prende tutta la finestra e i tasti diventano una barra in basso.
+74,65 % in larghezza e da 24,68 % a 80,88 % in altezza; i due tasti sono veri (sopra chiudi, sotto indietro, rossi tutti e
+due), il led è a 84,6 % / 25,6 %. Nello schermo, un palco di 760 punti ridimensionato allo schermo vero: barra di stato lcd,
+la home (ora, saldo, sfide, l'ultima notizia dei giocatori) e le **app**, una per modulo in `telefono/app/`, caricate al
+primo uso e poi tenute montate; le icone sono adesivi disegnati (foglio `chat-app`). Sul cellulare lo schermo prende tutta
+la finestra e i tasti diventano una barra in basso.
+
+- **La barra di stato è vera** (29.10, Alberto: «metti dati veri tipo quelli del pc tipo wifi»): la rete di chi guarda
+  (online o no, il tipo quando il browser lo dice, `navigator.connection`; il **ping vero**, una HEAD a `/favicon.png`
+  all'apertura e ogni 30 secondi; la banda, su Chrome ed Edge), col simbolo del wifi a tre tacche date dal ping; l'ora
+  vera in mezzo; la **batteria vera** (`navigator.getBattery`, Chrome ed Edge: anche il cavo usb-c entra quando il
+  computer è in carica). Dove il browser non dice la batteria (Safari, Firefox) resta quella del gioco, come nel wallet.
+- **La home a pagine** (29.10, Alberto: «fai nella home spazio per icone 3x3 poi deve scorrere quindi fai vedere come
+  l'iphone dei puntini sotto in mezzo»): a sinistra l'ora e i widget, a destra le app **nove per pagina**, divise per
+  genere (`PAGINE` in telefono.js: tu e il gioco, i soldi, gli attrezzi); le pagine si scorrono di lato col dito (gli
+  agganci si fermano sempre su una pagina intera), la rotella, il mouse trascinato o le frecce, e i **puntini** sotto in
+  mezzo, che si possono premere, dicono dove sei. Più furba: un puntino **cerchiato di rosso** vuol dire che in quella
+  pagina c'è un'app col pallino; la pagina si ricorda (riaprendo si torna lì); un'app si carica appena il mouse ci passa
+  sopra o il dito la tocca, così al clic è pronta; i pallini di tutte le app si chiedono insieme, una volta sola per la
+  home e il led. Sul cellulare in verticale le pagine stanno sotto i widget.
 
 - **Chat**: il bot (sotto). **Shop**: un e-commerce: offerte del giorno (tre pezzi a −20/−30/−40 %, uguali per tutti,
   col conto alla rovescia a mezzanotte), reparti, ricerca, ordine, preferiti, la scheda del prodotto, il carrello, la cassa

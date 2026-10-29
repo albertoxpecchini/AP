@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// I due tasti del cercapersone grande di pzkko.it colorati: quello di sopra ROSSO (chiudi), quello di sotto VERDE
-// (indietro). gpt-image-2 li disegna di gomma grigia (foglio «chat-pager-grande» di fogli-chat.js): questo script rifà
+// I due tasti del cercapersone grande di pzkko.it colorati: tutti e due ROSSI, sopra chiudi e sotto indietro (fino al 29.10
+// quello di sotto era VERDE). gpt-image-2 li disegna di gomma grigia (foglio «chat-pager-grande» di fogli-chat.js): questo script rifà
 // pager-grande.webp dal PNG di Replicate con la stessa catena di `immagini.mjs usa` (chiave cromatica, ritaglio,
 // riduzione a 0,75 con lanczos3, webp 82), ma ricolora la gomma PRIMA della compressione; poi rifà la piccola (il
 // cercapersone sotto il wallet, .chat-tasto). Sulla gomma stampa anche i simboli (spegni e indietro, art/chat-pager-simboli/,
@@ -65,9 +65,12 @@ if (!PNG || !existsSync(PNG)) { console.error(`✗ manca il PNG di Replicate (${
 
 // il colore medio che deve avere la gomma: rosso e verde da gomma vera, più profondi del --rosso (#ff5b4a) e del --led
 // (#46ff7d) della pagina
+// (dal 29.10 tutti e due rossi, Alberto: «tasto indietro rosso come chiudi così uno non lo preme perchè verde ma legge
+// prima»; il verde di prima era #3d824f, L* 49, croma 40, tinta 148°. La grande del 23.10 l'ha ricolorata
+// tasto-indietro-rosso.mjs, perché il PNG di Replicate non c'era più)
 const TASTI = [
   { nome: 'sopra', fa: 'chiudi', colore: '#c74337' }, // L* 47,5, croma 63, tinta 35°: il rosso di un tasto d'accensione
-  { nome: 'sotto', fa: 'indietro', colore: '#3d824f' }, // L* 49, croma 40, tinta 148°: il verde di un vecchio apparecchio
+  { nome: 'sotto', fa: 'indietro', colore: '#c74337' }, // lo stesso rosso
 ]
 
 // ── colore: sRGB ↔ Lab (D65) ──────────────────────────────────────────────────────────────────────────────────────

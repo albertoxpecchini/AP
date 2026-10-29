@@ -1,18 +1,25 @@
 // Il cercapersone grande (23.10): si apre dal cercapersone piccolo sotto il wallet (chat/chat.js → apri), che si ingrandisce e
 // diventa lo stesso cercapersone, disegnato in alta qualità (art/chat-pager-grande/pager-grande.webp, gpt-image-2, fogli-chat.js),
-// orizzontale come quello piccolo. Nello schermo vive «pzk os»: la barra di stato (la rete pzkkonet, l'ora, la batteria
-// che si scarica dalle 7 alle 19 come quella del wallet), la home con i widget (il saldo, le sfide, le notizie dei giocatori) e
-// le app: Chat (il bot), Shop, Sfide, Quiz, Quest, Giocatori, Zaino, Foto e Banca (il wallet).
+// orizzontale come quello piccolo. Nello schermo vive «pzk os»: la barra di stato (la rete, l'ora e la batteria vere di chi
+// guarda), la home con i widget (il saldo, le sfide, le notizie dei giocatori) e le app: Chat (il bot), Shop, Sfide, Quiz,
+// Quest, Giocatori, Zaino, Foto, Banca (il wallet) e le altre.
 //
-// Come lo vuole Alberto (23.10 sera):
-// - LA PORTA: quando si apre, sullo schermo resta il tomodachi (la chiocciolina dell'lcd piccolo, a tutto schermo) e compare
-//   il tasto ACCEDI; si preme, parte il caricamento con le baggianate e la barra, e poi si è dentro (nella home, o nell'app
-//   chiesta da chi l'ha aperto).
+// Come lo vuole Alberto:
+// - L'ACCENSIONE (29.10, Alberto: «appena premo il cercapers no caricamento ma solo animazione che lo accendo tipo 400ms»):
+//   il cercapersone piccolo si ingrandisce, il suo lcd si spegne e lo schermo grande si accende come un vecchio televisore,
+//   un punto che diventa una riga e poi tutto lo schermo, in 400 ms; sotto c'è già pzk os (l'app chiesta da chi l'ha aperto,
+//   se no l'ultima aperta, se no la home). Dal 23.10 sera al 29.10 c'era la porta: il tomodachi, il tasto ACCEDI e tre
+//   secondi di baggianate. La porta è rimasta per il saluto.
 // - IL TASTO DI SOPRA È ROSSO E SI CHIAMA CHIUDI: lo schermo si spegne come un vecchio tubo catodico (si schiaccia in una riga
 //   bianca, poi in un punto), ricompare il tomodachi che saluta e dopo un paio di secondi il cercapersone si chiude da solo,
 //   rimpicciolendosi nel tasto. Toccare fuori o Esc nella home fanno lo stesso; un secondo «chiudi» mentre saluta chiude subito.
-// - IL TASTO DI SOTTO È VERDE E RESTA INDIETRO: torna indietro di una mossa (la pagina interna dell'app, poi l'app di prima,
-//   poi la home) e si può premere a raffica; nella home non fa niente, perché si è già usciti da tutto.
+// - IL TASTO DI SOTTO È INDIETRO, ROSSO ANCHE LUI (29.10, Alberto: «tasto indietro rosso come chiudi così uno non lo preme
+//   perché verde ma legge prima»; prima era verde): torna indietro di una mossa (la pagina interna dell'app, poi l'app di
+//   prima, poi la home) e si può premere a raffica; nella home non fa niente, perché si è già usciti da tutto.
+// - LA HOME A PAGINE (29.10, Alberto: «spazio per icone 3x3 poi deve scorrere … come l'iphone dei puntini sotto in mezzo»): a
+//   sinistra l'ora e i widget, a destra le app nove per pagina, divise per genere (PAGINE); si scorrono di lato col dito, la
+//   rotella, il mouse trascinato o le frecce, e i puntini sotto in mezzo dicono quante pagine ci sono e dove sei (si possono
+//   premere). Un puntino cerchiato di rosso: in quella pagina c'è un'app col pallino.
 // Sul cellulare niente cornice: lo schermo prende tutta la finestra e i due tasti diventano una barra in basso.
 // Ogni app è un modulo di telefono/app/ che si carica la prima volta che la apri e poi resta montata (la chat non perde i
 // messaggi quando torni alla home). (Il nome «telefono» è rimasto dalla prima versione, che era un telefono.)
@@ -78,19 +85,14 @@ export const APP = [
   { id: 'cucina', nome: 'cucina', icona: 'app-cucina', carica: () => import('./app/cucina.js') },
 ]
 
-// le baggianate del caricamento: ne escono quattro a caso ogni volta, scritte come il registro di un vecchio computer
-const BAGGIANATE = [
-  'scaldo i fosfori verdi', 'sveglio i criceti nella ruota del server', 'conto i $pzk a mano, uno per uno',
-  'convinco la chiocciola a spostarsi', 'lucido i pixel uno a uno', 'cerco pzkkonet sotto il divano',
-  'carico la mortadella in memoria', 'stiro le righe del tubo catodico', 'soffio nella cartuccia', 'scongelo il cornetto di emergenza',
-  'aspetto che il modem finisca di cantare', 'rimetto in fila i bit scappati', 'nascondo gli euroshit sotto il materasso',
-  'do da mangiare al tomodachi', 'litigo con la stampante (ha vinto lei)', 'meteo di mantova: nebbia, come sempre',
-  'metto i $pzk in borsa e prego', 'allineo i pixel (alberto controlla)', 'accordo il cicalino in la', 'scarico internet: 3 %… 7 %…',
-  'riavvolgo la cassetta con la bic', 'tolgo la polvere dal tubo', 'cerco il senso della vita: errore 404', 'faccio finta di caricare qualcosa',
-  'chiedo la password ai pesci rossi', 'inserisco il gettone', 'stampo lo scontrino di prova', 'pago la bolletta del led rosso',
-  'dico ai giocatori di fare silenzio', 'lancio il dado: 7. ricomincio', 'do una botta al cercapersone (funziona sempre)',
-  'gonfio le gomme alla chiocciola', 'compilo i sogni del bot', 'sposto la virgola dei $pzk (scherzo)',
+// le pagine della home (29.10): nove app per pagina (3 × 3), divise per genere; un genere con più di nove app va a capo in
+// una pagina sua, e un'app nuova che non sta in nessuna lista finisce nell'ultima
+const PAGINE = [
+  ['chat', 'profilo', 'account', 'negozio', 'sfide', 'quiz', 'missioni', 'giocatori', 'zaino'], // tu e il gioco
+  ['miniera', 'foto', 'virtual', 'banca', 'rapina', 'lavatrice', 'decifratore'], // i soldi
+  ['conversioni', 'calcolatrice', 'compilatore', 'cucina'], // gli attrezzi
 ]
+const PER_PAGINA = 9
 
 let dlg = null, corpo = null, schermo = null, palco = null, vista = null, homeEl = null, tostoEl = null, statoEl = null, ledEl = null, porta = null
 let corrente = null // l'id dell'app in primo piano (null: la home)
@@ -98,9 +100,8 @@ const storia = [] // le app aperte prima, per il tasto «indietro»
 const montate = new Map() // id → { host, ist }
 let cssPronto = null
 let orologio = 0
-let dentro = false // passata la porta: si è premuto ACCEDI e il caricamento è finito
-let attesa = null // l'app chiesta da chi ha aperto il cercapersone, che si apre dopo la porta: { app, opz }
-// SENZA CONTO NON SI ENTRA (26.10, Alberto: «non puoi accedere al cercapersone se non ti registri/accedi»): passata la porta, finché
+let dentro = false // acceso: da quando si apre a quando si chiude
+// SENZA CONTO NON SI ENTRA (26.10, Alberto: «non puoi accedere al cercapersone se non ti registri/accedi»): acceso, finché
 // non c'è un conto l'unica app è l'Account (vai e home ci rimandano); l'app che si voleva aprire aspetta qui, e quando il conto
 // c'è (ctx.dopoAccesso, chiamato dall'app Account) si apre.
 let daFare = null // { id, opz }
@@ -122,9 +123,34 @@ function caricaStile() {
   return (cssPronto ??= Promise.all([foglio('/chat/chat.css', 'data-chat-css'), foglio('/telefono/telefono.css', 'data-telefono')]))
 }
 
-// ── la batteria, come quella del wallet: 100 % alle 7, 2 % alle 19, poi in carica fino alle 7 (col cavo usb-c sotto) ──
-// L'ora è quella del gioco (window.pzkkoOrologio.perGioco, come nel wallet): quella vera anche quando la pagina sta
-// ferma a mezzogiorno per la luce; se la regia sposta l'orologio per provare, tutti e due si caricano insieme.
+// ── la barra di stato vera (29.10, Alberto: «nella topbar del cercapersone metti dati veri tipo quelli del pc tipo wifi») ──
+// La rete, l'ora e la batteria del computer o del telefono di chi guarda. La rete: online o no (navigator.onLine), il tipo
+// quando il browser lo dice (navigator.connection.type: wifi, ethernet, cellulare, sui telefoni Android), il ping vero (una
+// richiesta HEAD piccola a pzkko.it all'apertura e ogni 30 secondi, a cercapersone aperto) e la banda (connection.downlink,
+// Chrome ed Edge, che si fermano a 10 Mb/s). Le tre tacche del wifi le dà il ping. La batteria: navigator.getBattery (Chrome
+// ed Edge, anche sul pc: un fisso dice 100 % in carica, e il cavo usb-c entra); dove il browser non la dice (Safari,
+// Firefox) resta quella del gioco qui sotto, come nel wallet.
+let ping = null, pila = null, timerPing = 0
+async function misuraPing() {
+  if (!navigator.onLine) { ping = null; return aggiornaStato() }
+  const t0 = performance.now()
+  try { await fetch(`/favicon.png?ping=${Date.now()}`, { method: 'HEAD', cache: 'no-store' }); ping = Math.round(performance.now() - t0) } catch { ping = null }
+  if (dlg?.open) aggiornaStato()
+}
+function rete() {
+  const c = navigator.connection
+  if (!navigator.onLine || c?.type === 'none') return { tacche: 0, testo: 'offline' }
+  const tipo = { wifi: 'wifi', ethernet: 'eth', cellular: c?.effectiveType ?? 'cell', bluetooth: 'bt', wimax: 'wimax' }[c?.type] ?? ''
+  const ms = ping ?? (c?.rtt || null)
+  const banda = c?.downlink ? `${c.downlink >= 10 ? '10+' : String(c.downlink).replace('.', ',')} mb/s` : ''
+  return { tacche: ms == null ? 2 : ms <= 80 ? 3 : ms <= 250 ? 2 : 1, testo: [tipo, ms != null && `${ms} ms`, banda].filter(Boolean).join(' · ') }
+}
+const batteriaVera = () => (pila ? { pct: Math.round(pila.level * 100), carica: pila.charging } : batteria())
+
+// ── la batteria del gioco, come quella del wallet: 100 % alle 7, 2 % alle 19, poi in carica fino alle 7 (col cavo usb-c
+// sotto). È quella della barra solo dove il browser non dice quella vera. L'ora è quella del gioco
+// (window.pzkkoOrologio.perGioco, come nel wallet): quella vera anche quando la pagina sta ferma a mezzogiorno per la luce;
+// se la regia sposta l'orologio per provare, tutti e due si caricano insieme.
 function oraMantova() {
   const o = window.pzkkoOrologio, ms = o?.perGioco?.() ?? o?.adesso?.() ?? Date.now()
   const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Rome', hour: 'numeric', minute: 'numeric', hour12: false }).formatToParts(new Date(ms))
@@ -148,7 +174,7 @@ function costruisci() {
     <div class="t-schermo chat" data-in="home">
       <div class="t-palco">
         <div class="t-stato" aria-hidden="true">
-          <span class="t-rete"><i></i><i></i><i></i><i></i><b>pzkkonet</b></span>
+          <span class="t-rete"><svg class="t-wifi" viewBox="0 0 16 13"><circle cx="8" cy="11.5" r="1.3"/><path d="M5.9 9.4a3 3 0 0 1 4.2 0"/><path d="M3.4 6.9a6.5 6.5 0 0 1 9.2 0"/><path d="M.9 4.4a10 10 0 0 1 14.2 0"/></svg><b></b></span>
           <span class="t-ora"></span>
           <span class="t-batt"><i></i><i></i><i></i><i></i><i></i><b></b></span>
         </div>
@@ -156,15 +182,11 @@ function costruisci() {
         <div class="t-toast" role="status" aria-live="polite"></div>
         <nav class="t-nav" aria-label="i tasti"><button type="button" data-t="indietro">indietro</button><button type="button" data-t="chiudi">chiudi</button></nav>
       </div>
-      <div class="t-porta" data-fase="attesa" hidden>
-        <div class="t-porta-lcd"></div>
-        <button class="t-accedi" type="button">accedi</button>
-        <div class="t-porta-txt" aria-live="polite"><b>pzk os</b><ol class="t-frasi"></ol><i class="t-barra"><em></em></i></div>
-      </div>
+      <div class="t-porta" hidden><div class="t-porta-lcd"></div></div>
     </div>
     <i class="t-led" aria-hidden="true"></i>
-    <button class="t-tasto su" type="button" data-t="chiudi" aria-label="tasto rosso: chiudi"></button>
-    <button class="t-tasto giu" type="button" data-t="indietro" aria-label="tasto verde: indietro"></button>
+    <button class="t-tasto su" type="button" data-t="chiudi" aria-label="tasto rosso di sopra: chiudi"></button>
+    <button class="t-tasto giu" type="button" data-t="indietro" aria-label="tasto rosso di sotto: indietro"></button>
   </div>`
   document.body.appendChild(dlg)
   corpo = dlg.querySelector('.t-corpo')
@@ -200,20 +222,41 @@ function costruisci() {
     else if (v === 'home') home()
     else if (v.startsWith('app:')) vai(v.slice(4))
   })
-  porta.querySelector('.t-accedi').addEventListener('click', accedi)
-  homeEl.addEventListener('click', (e) => { const b = e.target.closest('[data-app]'); if (b) vai(b.dataset.app, { tab: b.dataset.tab }) })
-  zaino.ascolta(() => { if (dlg.open) { aggiornaStato(); aggiornaLed(); if (!corrente) disegnaHome() } }) // lo stato: anche scassato o no
+  homeEl.addEventListener('click', (e) => {
+    const p = e.target.closest('.t-punto')
+    if (p) return vaiPagina(Number(p.dataset.pagina))
+    const b = e.target.closest('[data-app]')
+    if (b) vai(b.dataset.app, { tab: b.dataset.tab })
+  })
+  sfoglia()
+  // un'app si carica appena il mouse ci passa sopra o il dito la tocca: al clic è già pronta, e lo spinner non si vede
+  const scalda = (e) => { const b = e.target.closest?.('[data-app]'); APP.find((x) => x.id === b?.dataset.app)?.carica?.().catch(() => {}) }
+  homeEl.addEventListener('pointerdown', scalda, { passive: true })
+  homeEl.addEventListener('pointerover', (e) => { if (e.pointerType === 'mouse') scalda(e) }, { passive: true })
+  zaino.ascolta(() => { if (dlg.open) { aggiornaStato(); if (corrente) aggiornaLed(); else disegnaHome() } }) // lo stato: anche scassato o no (la home conta già i pallini e accende il led)
   pzk.osserva(() => {
     if (!corrente && dlg.open) disegnaHome()
     if (dlg.open && dentro && !pzk.conto() && corrente !== 'account') vai('account', { scheda: 'conto' }) // (uscito dal conto, anche da un'altra scheda)
   })
+  // la barra di stato vera: la rete e la batteria cambiano da sole
+  for (const ev of ['online', 'offline']) addEventListener(ev, () => { if (dlg.open) misuraPing() })
+  navigator.connection?.addEventListener?.('change', () => { if (dlg.open) aggiornaStato() })
+  navigator.getBattery?.().then((b) => {
+    pila = b
+    for (const ev of ['levelchange', 'chargingchange']) b.addEventListener(ev, () => { if (dlg.open) aggiornaStato() })
+    if (dlg.open) aggiornaStato()
+  }).catch(() => {})
   new ResizeObserver(adatta).observe(dlg)
   PIENO.addEventListener('change', adatta)
 }
 
 function aggiornaStato() {
-  const b = batteria()
+  const b = batteriaVera(), r = rete()
   statoEl.querySelector('.t-ora').textContent = ora()
+  const rt = statoEl.querySelector('.t-rete')
+  rt.classList.toggle('giu', !r.tacche)
+  rt.querySelectorAll('.t-wifi circle, .t-wifi path').forEach((s, i) => s.classList.toggle('on', r.tacche > 0 && i <= r.tacche))
+  rt.querySelector('b').textContent = r.testo
   const bt = statoEl.querySelector('.t-batt')
   bt.classList.toggle('carica', b.carica); bt.classList.toggle('bassa', b.pct <= 15 && !b.carica)
   dlg.classList.toggle('carica', b.carica) // il cavo usb-c sotto il cercapersone, come quello del wallet
@@ -221,10 +264,15 @@ function aggiornaStato() {
   bt.querySelectorAll('i').forEach((s, i) => s.classList.toggle('on', b.pct > i * 20))
   bt.querySelector('b').textContent = `${b.pct}%`
 }
+/** I pallini di tutte le app, chiesti insieme (non uno dopo l'altro): id → quanti. */
+async function contaBadge() {
+  const n = await Promise.all(APP.map((a) => (a.badge ? Promise.resolve().then(a.badge).catch(() => 0) : 0)))
+  return new Map(APP.map((a, i) => [a.id, Number(n[i]) || 0]))
+}
 /** Il led rosso del cercapersone: lampeggia quando qualche app ha qualcosa da fare. */
 async function aggiornaLed() {
   let n = 0
-  for (const a of APP) if (a.badge) n += (await a.badge()) || 0
+  for (const v of (await contaBadge()).values()) n += v
   ledEl?.classList.toggle('on', n > 0)
 }
 
@@ -233,16 +281,95 @@ const BASE = 760
 function adatta() {
   if (!dlg || !schermo) return
   dlg.classList.toggle('pieno', PIENO.matches)
-  if (PIENO.matches) { palco.style.transform = ''; palco.style.width = ''; palco.style.height = ''; return }
-  const k = schermo.clientWidth / BASE
-  if (!k) return
-  palco.style.width = `${BASE}px`
-  palco.style.height = `${schermo.clientHeight / k}px`
-  palco.style.transform = `scale(${k})`
+  if (PIENO.matches) { palco.style.transform = ''; palco.style.width = ''; palco.style.height = '' }
+  else {
+    const k = schermo.clientWidth / BASE
+    if (!k) return
+    palco.style.width = `${BASE}px`
+    palco.style.height = `${schermo.clientHeight / k}px`
+    palco.style.transform = `scale(${k})`
+  }
+  if (!corrente) vaiPagina(pagina, { liscio: false }) // le pagine cambiano larghezza: si resta su quella di prima
+}
+/** Quanto è ingrandito il palco: un pixel del mouse diviso questo è un punto del palco. */
+const scala = () => (PIENO.matches ? 1 : schermo.clientWidth / BASE) || 1
+
+// ── la home: a sinistra l'ora e i widget, a destra le app a pagine di 3 × 3 ──
+const piastrella = (a, i) => `<button class="t-ico" type="button" data-app="${a.id}" style="--r:${[-2, 1.5, -1, 2, -1.5, 1, -2.5, 1.5, -1][i % 9]}deg"><span class="t-ico-q">${icona(a.icona)}<i class="t-badge" hidden></i></span><span class="t-ico-n">${a.nome}</span></button>`
+/** Le app di ogni pagina (PAGINE, nove alla volta). */
+function pagine() {
+  const visibili = APP.filter((a) => !a.se || a.se())
+  const gruppi = PAGINE.map((ids) => ids.map((id) => visibili.find((a) => a.id === id)).filter(Boolean))
+  gruppi.at(-1).push(...visibili.filter((a) => !PAGINE.some((ids) => ids.includes(a.id))))
+  const out = []
+  for (const g of gruppi) for (let i = 0; i < g.length; i += PER_PAGINA) out.push(g.slice(i, i + PER_PAGINA))
+  return out
 }
 
-// ── la home: a sinistra l'ora e i widget, a destra le app ──
-const piastrella = (a, i) => `<button class="t-ico" type="button" data-app="${a.id}" style="--r:${[-2, 1.5, -1, 2, -1.5, 1, -2.5, 1.5, -1][i % 9]}deg"><span class="t-ico-q">${icona(a.icona)}<i class="t-badge" hidden></i></span><span class="t-ico-n">${a.nome}</span></button>`
+// ── sfogliare le pagine: il dito (lo scorrimento del browser, con gli agganci di telefono.css), la rotella, il mouse
+// trascinato, le frecce e i puntini. La pagina si ricorda (riaprendo si torna lì) ──
+let pagina = ricordo('home', { pagina: 0 }).pagina
+const pagineEl = () => homeEl?.querySelector('.t-pagine')
+/** Va alla pagina n (liscio: scorrendo, come col dito; se no di colpo). */
+function vaiPagina(n, { liscio = true } = {}) {
+  const el = pagineEl()
+  if (!el) return
+  n = Math.max(0, Math.min(el.children.length - 1, n))
+  if (el.clientWidth) el.scrollTo({ left: n * el.clientWidth, behavior: liscio && !RIDOTTO.matches ? 'smooth' : 'instant' })
+  segnaPagina(n)
+}
+/** Il puntino acceso: quello della pagina n (di serie quella che si vede adesso). */
+function segnaPagina(n) {
+  const el = pagineEl()
+  if (n === undefined) { if (!el?.clientWidth) return; n = Math.round(el.scrollLeft / el.clientWidth) }
+  for (const p of homeEl.querySelectorAll('.t-punto')) p.classList.toggle('on', Number(p.dataset.pagina) === n)
+  if (n !== pagina) { pagina = n; ricorda('home', { pagina }) }
+}
+function sfoglia() {
+  let fotogramma = 0, ruota = 0
+  homeEl.addEventListener('scroll', (e) => {
+    if (!e.target.classList?.contains('t-pagine')) return
+    cancelAnimationFrame(fotogramma); fotogramma = requestAnimationFrame(() => segnaPagina())
+  }, { capture: true, passive: true })
+  // la rotella: una tacca, una pagina (il trackpad che scorre di lato fa da sé; se la home scorre in su e in giù, come sul
+  // cellulare in verticale, la rotella è sua)
+  homeEl.addEventListener('wheel', (e) => {
+    if (!e.target.closest?.('.t-pagine') || Math.abs(e.deltaX) >= Math.abs(e.deltaY) || homeEl.scrollHeight > homeEl.clientHeight + 4) return
+    e.preventDefault()
+    if (performance.now() < ruota || Math.abs(e.deltaY) < 4) return
+    ruota = performance.now() + 380
+    vaiPagina(pagina + Math.sign(e.deltaY))
+  }, { passive: false })
+  // il mouse trascina le pagine come un dito: oltre un sesto di pagina si gira, e il clic che segue non apre l'app sotto
+  homeEl.addEventListener('pointerdown', (e) => {
+    const el = e.target.closest('.t-pagine')
+    if (!el || e.pointerType !== 'mouse' || e.button !== 0) return
+    const x0 = e.clientX, s0 = el.scrollLeft
+    let mosso = false
+    const muovi = (ev) => {
+      const dx = (ev.clientX - x0) / scala()
+      if (!mosso && Math.abs(dx) > 6) { mosso = true; homeEl.classList.add('trascina') }
+      if (mosso) el.scrollLeft = s0 - dx
+    }
+    const fine = (ev) => {
+      removeEventListener('pointermove', muovi); removeEventListener('pointerup', fine); removeEventListener('pointercancel', fine)
+      if (!mosso) return
+      homeEl.classList.remove('trascina')
+      const dx = (ev.clientX - x0) / scala(), da = Math.round(s0 / el.clientWidth)
+      vaiPagina(Math.abs(dx) > el.clientWidth / 6 ? da - Math.sign(dx) : da)
+      const blocca = (c) => { c.stopPropagation(); c.preventDefault() }
+      homeEl.addEventListener('click', blocca, { capture: true, once: true })
+      setTimeout(() => homeEl.removeEventListener('click', blocca, { capture: true }), 0)
+    }
+    addEventListener('pointermove', muovi); addEventListener('pointerup', fine); addEventListener('pointercancel', fine)
+  })
+  // le frecce (e pagina su, pagina giù) nella home
+  dlg.addEventListener('keydown', (e) => {
+    if (corrente || !dentro || e.altKey || e.ctrlKey || e.metaKey || e.target.closest?.('input, textarea, select, [contenteditable]')) return
+    const verso = { ArrowRight: 1, PageDown: 1, ArrowLeft: -1, PageUp: -1 }[e.key]
+    if (verso) { e.preventDefault(); vaiPagina(pagina + verso) }
+  })
+}
 async function disegnaHome() {
   const d = new Date()
   const sfide = await import('../chat/sfide.js')
@@ -259,24 +386,32 @@ async function disegnaHome() {
       </div>
       <button class="t-w t-w-notizie" type="button" data-app="giocatori" data-tab="notizie"><small>dalla banca</small><div class="t-notizia">…</div></button>
     </div>
-    <div class="t-griglia">${APP.filter((a) => !a.se || a.se()).map(piastrella).join('')}</div>`
+    ${(() => { const ps = pagine(); return `<div class="t-app-pagine">
+      <div class="t-pagine">${ps.map((p, n) => `<div class="t-pagina" role="group" aria-label="app, pagina ${n + 1} di ${ps.length}">${p.map(piastrella).join('')}</div>`).join('')}</div>
+      <div class="t-puntini">${ps.length > 1 ? ps.map((_, n) => `<button class="t-punto" type="button" data-pagina="${n}" aria-label="pagina ${n + 1}"></button>`).join('') : ''}</div>
+    </div>` })()}`
   // si ridisegna solo se è cambiato qualcosa: rifare la home uguale ricrea le icone, che possono lampeggiare un fotogramma
   if (html === ultimaHome && homeEl.childElementCount) { segnaLumaca(); return aggiornaBadge() }
   ultimaHome = html
   homeEl.innerHTML = html
+  vaiPagina(pagina, { liscio: false })
   aggiornaBadge()
   segnaLumaca() // subito, senza aspettare le notizie dalla rete
   caricaNotizia()
 }
 let ultimaHome = ''
 async function aggiornaBadge() {
+  const conti = await contaBadge()
   let tot = 0
-  for (const a of APP) {
-    if (!a.badge) continue
-    const n = (await a.badge()) || 0
+  for (const [id, n] of conti) {
     tot += n
-    for (const el of homeEl.querySelectorAll(`[data-app="${a.id}"] .t-badge`)) { el.hidden = !n; el.textContent = n > 9 ? '9+' : n }
+    for (const el of homeEl.querySelectorAll(`[data-app="${id}"] .t-badge`)) { el.hidden = !n; el.textContent = n > 9 ? '9+' : n }
   }
+  // i puntini delle pagine con un pallino sono cerchiati di rosso: si sa dove andare senza sfogliarle tutte
+  homeEl.querySelectorAll('.t-pagina').forEach((p, i) => {
+    const c = [...p.querySelectorAll('[data-app]')].some((b) => conti.get(b.dataset.app))
+    homeEl.querySelector(`.t-punto[data-pagina="${i}"]`)?.classList.toggle('avviso', c)
+  })
   ledEl?.classList.toggle('on', tot > 0)
 }
 let notiziaHtml = null // l'ultima notizia della banca: torna quando la lumachina non ha più niente da dire
@@ -356,15 +491,24 @@ function doveGrande() {
   const w = innerWidth * 0.94, h = w * (PAGER.h / PAGER.w)
   return { left: (innerWidth - w) / 2, top: (innerHeight - h) / 2, width: w, height: h }
 }
-async function ingrandisci() {
+/** Si apre: il doppione vola dal tasto al posto del cercapersone grande (420 ms; il suo lcd si spegne arrivando), e lo
+ *  schermo grande si accende. `prepara()` mette pzk os sotto lo schermo spento: parte appena il cercapersone vero è al suo
+ *  posto (invisibile ma misurabile, le app si montano con le loro misure) e lavora mentre il doppione vola. */
+async function ingrandisci(prepara) {
   const r0 = origine?.getBoundingClientRect()
-  if (RIDOTTO.matches || !visibile(r0)) { dlg.showModal(); corpo.focus({ preventScroll: true }); adatta(); return false } // niente transizione: si apre e basta
+  if (RIDOTTO.matches || !visibile(r0)) { // niente volo: si apre e si accende
+    dlg.showModal(); corpo.focus({ preventScroll: true }); allinea(schermo); adatta(); inserisciCavo()
+    const acceso = accendiSchermo()
+    await prepara()
+    return acceso
+  }
   // «fermo»: l'animazione d'apertura normale del dialog resta spenta finché è aperto (se no, tolto «zoom», ripartirebbe e il
   // cercapersone farebbe un saltello un secondo dopo essersi aperto)
   dlg.classList.add('fermo', 'zoom', 'zoom-nascosto')
   dlg.showModal(); corpo.focus({ preventScroll: true })
   allinea(schermo)
   adatta()
+  const pronto = prepara()
   const r1 = doveGrande()
   const d = doppione()
   Object.assign(d.style, rett(r0))
@@ -372,15 +516,19 @@ async function ingrandisci() {
   allinea(d)
   origine.style.visibility = 'hidden' // il tasto «parte»: non resta lì mentre il suo doppione vola
   requestAnimationFrame(() => dlg.classList.add('zoom-sfondo'))
-  await d.animate([{ ...rett(r0), transform: 'rotate(0deg)' }, { offset: 0.55, transform: 'rotate(-2deg)' }, { ...rett(r1), transform: 'rotate(0deg)' }], { duration: 620, easing: 'cubic-bezier(.6,0,.25,1)', fill: 'forwards' }).finished
-  // arrivato: il cercapersone vero (con la porta: lcd e chiocciolina identici a quelli del doppione) compare di colpo sotto il
-  // doppione, che sparisce. Sul cellulare lo schermo vero è a tutta finestra, diverso dal doppione: lì il doppione sfuma.
+  const tempi = { duration: 420, easing: 'cubic-bezier(.6,0,.25,1)', fill: 'forwards' }
+  d.querySelector('.t-doppio-lcd').animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1)', offset: 0.5 }, { filter: 'brightness(0)' }], tempi) // l'lcd piccolo si spegne
+  await d.animate([{ ...rett(r0), transform: 'rotate(0deg)' }, { offset: 0.55, transform: 'rotate(-2deg)' }, { ...rett(r1), transform: 'rotate(0deg)' }], tempi).finished
+  // arrivato: il cercapersone vero compare di colpo sotto il doppione, con lo schermo che si accende (il primo fotogramma è
+  // già il punto bianco sul nero: il contenuto non si vede prima del tempo), e il doppione sparisce. Sul cellulare lo schermo
+  // vero è a tutta finestra, diverso dal doppione: lì il doppione sfuma.
   inserisciCavo()
+  const acceso = accendiSchermo()
   dlg.classList.remove('zoom-nascosto')
   if (PIENO.matches) { d.classList.add('via'); await dorm(320) }
   clearInterval(d.vivo); d.remove()
   dlg.classList.remove('zoom', 'zoom-sfondo')
-  return true
+  await Promise.all([acceso, pronto])
 }
 async function rimpicciolisci() {
   const r0 = origine?.getBoundingClientRect()
@@ -434,79 +582,44 @@ function inserisciCavo() {
   ], { duration: 1300 })
 }
 
-// ── la porta: il tomodachi a tutto schermo e il tasto ACCEDI; poi il caricamento con le baggianate ──
+// ── la porta: il tomodachi a tutto schermo, che alla chiusura saluta ──
 let lcdVivo = null // la copia viva della chiocciolina sulla porta
-function mostraPorta(fase) {
-  porta.dataset.fase = fase
-  porta.classList.remove('via', 'pronta')
+function mostraPorta() {
   porta.hidden = false
   if (!lcdVivo) { lcdVivo = copiaLcd(); porta.querySelector('.t-porta-lcd').replaceChildren(lcdVivo) }
 }
 function nascondiPorta() {
   porta.hidden = true
-  porta.classList.remove('via', 'pronta')
   clearInterval(lcdVivo?.vivo); lcdVivo = null
   porta.querySelector('.t-porta-lcd').replaceChildren()
 }
-/** Il tasto ACCEDI compare (a scatti, come i segmenti di un lcd) e prende il fuoco: Invio lo preme. */
-function portaPronta() {
-  if (porta.hidden || porta.dataset.fase !== 'attesa') return
-  porta.classList.add('pronta')
-  porta.querySelector('.t-accedi').focus({ preventScroll: true })
-}
-const mescola = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]] } return b }
-/** Scrive una riga del registro lettera per lettera, in `ms` millisecondi. */
-async function scrivi(el, testo, ms) {
-  if (RIDOTTO.matches) { el.textContent = testo; return }
-  const passi = Math.min(testo.length, 14)
-  for (let i = 1; i <= passi; i++) { el.textContent = testo.slice(0, Math.ceil((testo.length * i) / passi)); await dorm(ms / passi) }
-}
-/** Il caricamento: quattro baggianate a caso (ognuna finisce con «ok»), la barra che si riempie a scatti, poi «accesso
- *  consentito». Circa tre secondi: abbastanza per leggerle, non tanto da annoiare. */
-async function carica(mio) {
-  const lista = porta.querySelector('.t-frasi'), barra = porta.querySelector('.t-barra em')
-  lista.replaceChildren()
-  barra.style.width = '0%'
-  await dorm(RIDOTTO.matches ? 0 : 420) // la chiocciolina si sposta a sinistra e compare la scritta
-  const frasi = [...mescola(BAGGIANATE).slice(0, 4), pzk.conto() ? 'accesso consentito' : 'serve il conto: crealo o entra']
-  for (let i = 0; i < frasi.length; i++) {
-    if (mio !== giro) return
-    const li = document.createElement('li')
-    if (i === frasi.length - 1) li.className = 'fine'
-    lista.appendChild(li)
-    while (lista.children.length > 3) lista.firstElementChild.remove()
-    await scrivi(li, frasi[i], 240)
-    barra.style.width = `${Math.round(((i + 1) / frasi.length) * 100)}%`
-    await dorm(RIDOTTO.matches ? 300 : i === frasi.length - 1 ? 420 : 220 + Math.random() * 180)
-    li.classList.add('ok')
-  }
-}
-async function accedi() {
-  if (dentro || chiudendo || porta.hidden || porta.dataset.fase !== 'attesa') return
-  const mio = giro
-  tomodachi.attendi?.(false)
-  porta.dataset.fase = 'carica'
-  musichetta('accendi', true)
-  led.inizia()
-  try { await carica(mio) } finally { led.finisci() }
-  if (mio !== giro || !dlg.open) return // chiuso durante il caricamento
-  dentro = true
-  // l'app chiesta da chi ha aperto vince; se nessuno ne chiede una, si torna a quella che era aperta l'ultima volta
-  // (Alberto, 23.10: «memorizza sempre le azioni»; da scassato solo la chat)
-  const ultima = ricordo('cercapersone', { app: null }).app
-  const a = attesa ?? (ultima && APP.some((x) => x.id === ultima) && (!zaino.pagerRotto() || ultima === 'chat') ? { app: ultima, opz: {} } : null)
-  attesa = null
-  if (a?.app) await vai(a.app, a.opz) // (la sigla è quella dell'app)
-  else { if (pzk.conto()) musichetta('consentito'); home() }
-  porta.classList.add('via') // la porta sfuma e sotto c'è pzk os
-  await dorm(RIDOTTO.matches ? 0 : 320)
-  if (mio !== giro) return
-  nascondiPorta()
-  corpo.focus({ preventScroll: true })
+
+// ── l'accensione (29.10): come un vecchio televisore, un punto bianco che si allunga in una riga, la riga che si apre in tutto
+// lo schermo e la luce in più che si spegne, in 400 ms. Il primo fotogramma (il punto sul nero) c'è subito: chi la chiama
+// prima di mostrare lo schermo non vede mai pzk os prima del tempo. Lo spegnimento, qui sotto, è la stessa cosa al contrario ──
+function accendiSchermo() {
+  for (const a of schermo.getAnimations()) a.cancel()
+  schermo.querySelector('.t-bianco')?.remove()
+  musichetta('accendi')
+  led.colpo(400)
+  if (RIDOTTO.matches) return Promise.resolve()
+  const bianco = document.createElement('i')
+  bianco.className = 't-bianco'
+  schermo.appendChild(bianco)
+  const tempi = { duration: 400 }
+  bianco.animate([{ opacity: 1 }, { opacity: 1, offset: 0.3 }, { opacity: 0.4, offset: 0.62 }, { opacity: 0 }], tempi)
+  return schermo.animate([
+    { transform: 'scale(.03,.012)', filter: 'brightness(2.4)', easing: 'cubic-bezier(.3,.6,.4,1)' },
+    { transform: 'scale(1,.012)', filter: 'brightness(2.4)', offset: 0.3, easing: 'cubic-bezier(.5,0,.2,1)' },
+    { transform: 'scale(1,1)', filter: 'brightness(1.5)', offset: 0.62 },
+    { transform: 'scale(1,1)', filter: 'brightness(1)' },
+  ], tempi).finished.catch(() => {}).finally(() => bianco.remove())
 }
 
 // ── lo spegnimento: come un vecchio tubo catodico, l'immagine si schiaccia in una riga bianca, poi in un punto, e sparisce ──
 async function spegni() {
+  for (const a of schermo.getAnimations()) a.cancel() // (chiuso mentre si accendeva)
+  schermo.querySelector('.t-bianco')?.remove()
   musichetta('spegni')
   if (RIDOTTO.matches) return
   const bianco = document.createElement('i')
@@ -538,27 +651,24 @@ export async function apri(app = null, opz = {}) {
   await caricaStile()
   costruisci()
   if (chiudendo) return // sta salutando: prima finisce di chiudersi
-  if (!dlg.open) {
-    if (opz.da) origine = opz.da
-    giro++
-    dentro = false
-    attesa = app ? { app, opz } : null
-    dlg.classList.remove('chiude')
-    aggiornaStato()
-    home() // la home è pronta sotto la porta
-    mostraPorta('attesa')
-    tomodachi.attendi?.(true) // la chiocciolina si mette a sinistra e guarda il tasto ACCEDI
-    if (opz.da) await ingrandisci()
-    else { dlg.showModal(); corpo.focus({ preventScroll: true }); allinea(schermo); adatta(); inserisciCavo() }
-    await dorm(RIDOTTO.matches ? 0 : 160)
-    portaPronta()
-    clearInterval(orologio)
-    orologio = setInterval(() => { if (dlg.open) { aggiornaStato(); if (!corrente) { const o = homeEl.querySelector('.t-w-ora b'); if (o) o.textContent = ora() } } }, 20_000)
-    return
-  }
-  if (!dentro) { if (app) attesa = { app, opz }; return } // ancora sulla porta: l'app si apre dopo ACCEDI
-  if (app) await vai(app, opz)
-  else home()
+  if (dlg.open) { if (app) await vai(app, opz); else home(); return }
+  if (opz.da) origine = opz.da
+  const mio = ++giro
+  dentro = true
+  dlg.classList.remove('chiude')
+  aggiornaStato()
+  misuraPing()
+  // sotto lo schermo spento, pzk os: l'app chiesta da chi apre vince; se nessuno ne chiede una, quella che era aperta l'ultima
+  // volta (Alberto, 23.10: «memorizza sempre le azioni»; da scassato solo la chat), se no la home. Senza sigla: suona
+  // l'accensione
+  const ultima = ricordo('cercapersone', { app: null }).app
+  const a = app ?? (ultima && APP.some((x) => x.id === ultima) && (!zaino.pagerRotto() || ultima === 'chat') ? ultima : null)
+  await ingrandisci(async () => { if (a) await vai(a, { ...opz, muto: true }); else home({ subito: true, muto: true }) })
+  if (mio !== giro) return // chiuso mentre si accendeva
+  if (!corrente) vaiPagina(pagina, { liscio: false })
+  clearInterval(orologio); clearInterval(timerPing)
+  orologio = setInterval(() => { if (dlg.open) { aggiornaStato(); if (!corrente) { const o = homeEl.querySelector('.t-w-ora b'); if (o) o.textContent = ora() } } }, 15_000)
+  timerPing = setInterval(() => { if (dlg.open && !document.hidden) misuraPing() }, 30_000)
 }
 /** Il tasto rosso: spegne lo schermo, il tomodachi ricompare e saluta, e il cercapersone si chiude da solo. */
 export async function chiudi() {
@@ -567,12 +677,10 @@ export async function chiudi() {
   if (dlg.classList.contains('zoom')) return
   chiudendo = (async () => {
     giro++
-    clearInterval(orologio)
-    tomodachi.attendi?.(false)
-    if (dentro) { led.colpo(400); await spegni(); mostraPorta('saluta'); await riaccendi() }
-    else mostraPorta('saluta')
+    clearInterval(orologio); clearInterval(timerPing)
+    if (dentro) { led.colpo(400); await spegni(); mostraPorta(); await riaccendi() }
+    else mostraPorta()
     dentro = false
-    attesa = null
     daFare = null
     tomodachi.saluta?.(2600)
     await aspetta(RIDOTTO.matches ? 1200 : 2300)
@@ -593,14 +701,15 @@ export async function chiudi() {
   })()
   try { await chiudendo } finally { chiudendo = null }
 }
-/** La home. subito: senza l'animazione di ritorno (il tasto indietro: premuto a raffica, ogni volta ripartirebbe). */
-export function home({ subito = false } = {}) {
+/** La home. subito: senza l'animazione di ritorno (il tasto indietro: premuto a raffica, ogni volta ripartirebbe); muto:
+ *  senza sigla (accendendo). */
+export function home({ subito = false, muto = false } = {}) {
   if (!dlg) return
-  if (dentro && !pzk.conto()) { vai('account', { scheda: 'conto' }); return } // (senza conto non c'è una home: vedi daFare)
+  if (dentro && !pzk.conto()) { vai('account', { scheda: 'conto', muto }); return } // (senza conto non c'è una home: vedi daFare)
   const prima = corrente
   corrente = null
   if (prima && dentro) musichetta('home')
-  if (dentro) ricorda('cercapersone', { app: null }) // solo se ci torni tu: all'apertura la home si prepara sotto la porta
+  if (dentro) ricorda('cercapersone', { app: null }) // (da chiuso no: la chiusura riporta alla home, e riaprendo si torna all'ultima app)
   storia.length = 0
   for (const { host, ist } of montate.values()) { if (!host.hidden) ist?.nascondi?.(); host.hidden = true; host.classList.remove('entra') }
   homeEl.hidden = false
@@ -634,7 +743,7 @@ export async function vai(id, opz = {}) {
   if (a.azione) { a.azione(); return }
   led.colpo(140)
   if (corrente && corrente !== id && !opz.daIndietro) storia.push(corrente)
-  if (corrente !== id && !opz.daIndietro && dentro) musichetta(id) // la sigla dell'app (tornando indietro no: solo il bip)
+  if (corrente !== id && !opz.daIndietro && !opz.muto && dentro) musichetta(id) // la sigla dell'app (tornando indietro no: solo il bip; accendendo suona l'accensione)
   let m = montate.get(id)
   if (!m) {
     const host = document.createElement('section')
